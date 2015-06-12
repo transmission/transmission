@@ -39,29 +39,11 @@ class FileTreeModel: public QAbstractItemModel
     };
 
   public:
-    FileTreeModel (QObject *parent = 0, bool isEditable = true);
-    ~FileTreeModel ();
+    FileTreeModel (QObject * parent = nullptr, bool isEditable = true);
+    virtual ~FileTreeModel ();
 
     void setEditable (bool editable);
 
-  public:
-    QVariant data (const QModelIndex &index, int role = Qt::DisplayRole) const;
-    Qt::ItemFlags flags (const QModelIndex& index) const;
-    QVariant headerData (int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
-    QModelIndex index (int row, int column, const QModelIndex& parent = QModelIndex()) const;
-    QModelIndex parent (const QModelIndex& child) const;
-    QModelIndex parent (const QModelIndex& child, int column) const;
-    int rowCount (const QModelIndex& parent = QModelIndex()) const;
-    int columnCount (const QModelIndex &parent = QModelIndex()) const;
-    virtual bool setData (const QModelIndex & index, const QVariant & value, int role = Qt::EditRole);
-
-  signals:
-    void priorityChanged (const QSet<int>& fileIndices, int);
-    void wantedChanged (const QSet<int>& fileIndices, bool);
-    void pathEdited (const QString& oldpath, const QString& newname);
-    void openRequested (const QString& path);
-
-  public:
     void clear ();
     void addFile (int index, const QString& filename,
                   bool wanted, int priority,
@@ -69,22 +51,41 @@ class FileTreeModel: public QAbstractItemModel
                   QList<QModelIndex>& rowsAdded,
                   bool torrentChanged);
 
+    QModelIndex parent (const QModelIndex& child, int column) const;
+
+    // QAbstractItemModel
+    virtual QVariant data (const QModelIndex& index, int role = Qt::DisplayRole) const;
+    virtual Qt::ItemFlags flags (const QModelIndex& index) const;
+    virtual QVariant headerData (int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+    virtual QModelIndex index (int row, int column, const QModelIndex& parent = QModelIndex ()) const;
+    virtual QModelIndex parent (const QModelIndex& child) const;
+    virtual int rowCount (const QModelIndex& parent = QModelIndex ()) const;
+    virtual int columnCount (const QModelIndex& parent = QModelIndex ()) const;
+    virtual bool setData (const QModelIndex& index, const QVariant& value, int role = Qt::EditRole);
+
+  public slots:
+    void clicked (const QModelIndex& index);
+    void doubleClicked (const QModelIndex& index);
+
+  signals:
+    void priorityChanged (const QSet<int>& fileIndices, int);
+    void wantedChanged (const QSet<int>& fileIndices, bool);
+    void pathEdited (const QString& oldpath, const QString& newname);
+    void openRequested (const QString& path);
+
   private:
-    void clearSubtree (const QModelIndex &);
+    void clearSubtree (const QModelIndex&);
     QModelIndex indexOf (FileTreeItem *, int column) const;
-    void parentsChanged (const QModelIndex &, int firstColumn, int lastColumn);
-    void subtreeChanged (const QModelIndex &, int firstColumn, int lastColumn);
+    void parentsChanged (const QModelIndex&, int firstColumn, int lastColumn);
+    void subtreeChanged (const QModelIndex&, int firstColumn, int lastColumn);
     FileTreeItem * findItemForFileIndex (int fileIndex) const;
     FileTreeItem * itemFromIndex (const QModelIndex&) const;
 
   private:
-    FileTreeItem * myRootItem;
-    QMap<int, FileTreeItem *> myIndexCache;
     bool myIsEditable;
 
-  public slots:
-    void clicked (const QModelIndex & index);
-    void doubleClicked (const QModelIndex & index);
+    FileTreeItem * myRootItem;
+    QMap<int, FileTreeItem *> myIndexCache;
 };
 
 #endif // QTR_FILE_TREE_MODEL_H

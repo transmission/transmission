@@ -12,27 +12,18 @@
 
 #include <cctype> // isxdigit()
 
-#include <QIcon>
-#include <QObject>
 #include <QRect>
 #include <QString>
 
-#include "Speed.h"
-
 class QColor;
+class QIcon;
 
-class Utils: public QObject
+class Utils
 {
-    Q_OBJECT
-
-  public:
-    Utils () {}
-    virtual ~Utils () {}
-
   public:
     static QIcon guessMimeIcon (const QString& filename);
     // Test if string is UTF-8 or not
-    static bool isValidUtf8  (const char *s);
+    static bool isValidUtf8 (const char * s);
 
     static QString removeTrailingDirSeparator (const QString& path);
 

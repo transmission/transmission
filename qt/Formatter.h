@@ -12,41 +12,46 @@
 
 #include <stdint.h> // int64_t
 
+#include <QCoreApplication>
 #include <QString>
-#include <QObject>
-#include <QIcon>
 
 class Speed;
 
-class Formatter: public QObject
+class Formatter
 {
-    Q_OBJECT
+    Q_DECLARE_TR_FUNCTIONS (Formatter)
 
   public:
+    enum Size
+    {
+      B,
+      KB,
+      MB,
+      GB,
+      TB
+    };
 
-    Formatter() {}
-    virtual ~Formatter() {}
+    enum Type
+    {
+      SPEED,
+      SIZE,
+      MEM
+    };
 
   public:
-
     static QString memToString (int64_t bytes);
     static QString sizeToString (int64_t bytes);
     static QString speedToString (const Speed& speed);
     static QString percentToString (double x);
     static QString ratioToString (double ratio);
     static QString timeToString (int seconds);
-    static QString uploadSpeedToString(const Speed& up);
-    static QString downloadSpeedToString(const Speed& down);
+    static QString uploadSpeedToString (const Speed& up);
+    static QString downloadSpeedToString (const Speed& down);
 
-  public:
-
-    typedef enum { B, KB, MB, GB, TB } Size;
-    typedef enum { SPEED, SIZE, MEM } Type;
     static QString unitStr (Type t, Size s) { return unitStrings[t][s]; }
     static void initUnits ();
 
   private:
-
     static QString unitStrings[3][5];
 };
 

@@ -157,7 +157,7 @@ TorrentDelegate::margin (const QStyle& style) const
 }
 
 QString
-TorrentDelegate::progressString (const Torrent& tor) const
+TorrentDelegate::progressString (const Torrent& tor)
 {
   const bool isMagnet (!tor.hasMetadata());
   const bool isDone (tor.isDone ());
@@ -266,7 +266,7 @@ TorrentDelegate::progressString (const Torrent& tor) const
 }
 
 QString
-TorrentDelegate::shortTransferString (const Torrent& tor) const
+TorrentDelegate::shortTransferString (const Torrent& tor)
 {
   QString str;
   const bool haveMeta (tor.hasMetadata());
@@ -285,7 +285,7 @@ TorrentDelegate::shortTransferString (const Torrent& tor) const
 }
 
 QString
-TorrentDelegate::shortStatusString (const Torrent& tor) const
+TorrentDelegate::shortStatusString (const Torrent& tor)
 {
   QString str;
   static const QChar ratioSymbol (0x262F);
@@ -312,7 +312,7 @@ TorrentDelegate::shortStatusString (const Torrent& tor) const
 }
 
 QString
-TorrentDelegate::statusString (const Torrent& tor) const
+TorrentDelegate::statusString (const Torrent& tor)
 {
   QString str;
 

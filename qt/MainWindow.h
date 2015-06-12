@@ -11,36 +11,30 @@
 #define QTR_MAIN_WINDOW_H
 
 #include <ctime>
-#include <QLineEdit>
-#include <QIcon>
+
 #include <QMainWindow>
-#include <QMap>
+#include <QNetworkReply>
 #include <QPointer>
-#include <QPushButton>
 #include <QSet>
 #include <QSystemTrayIcon>
 #include <QTimer>
 #include <QWidgetList>
-#include <QNetworkReply>
 
 #include "Filters.h"
 #include "TorrentFilter.h"
 #include "ui_MainWindow.h"
 
+class QAction;
+class QIcon;
+class QMenu;
+
 class AddData;
-class ActionDelegator;
 class Prefs;
 class DetailsDialog;
 class Session;
 class TorrentDelegate;
 class TorrentDelegateMin;
 class TorrentModel;
-class QAction;
-class QLabel;
-class QMenu;
-class QModelIndex;
-class QSortFilterProxyModel;
-class Filterbar;
 
 extern "C"
 {
@@ -51,45 +45,56 @@ class MainWindow: public QMainWindow
 {
     Q_OBJECT
 
-  private:
-    virtual void hideEvent (QHideEvent * event);
-    virtual void showEvent (QShowEvent * event);
+  public:
+    MainWindow (Session&, Prefs&, TorrentModel&, bool minized);
+    virtual ~MainWindow ();
+
+  public slots:
+    void startAll ();
+    void startSelected ();
+    void startSelectedNow ();
+    void pauseAll ();
+    void pauseSelected ();
+    void removeSelected ();
+    void deleteSelected ();
+    void verifySelected ();
+    void queueMoveTop ();
+    void queueMoveUp ();
+    void queueMoveDown ();
+    void queueMoveBottom ();
+    void reannounceSelected ();
+    void onNetworkTimer ();
+
+    void setToolbarVisible (bool);
+    void setFilterbarVisible (bool);
+    void setStatusbarVisible (bool);
+    void setCompactView (bool);
+    void refreshActionSensitivity ();
+    void refreshActionSensitivitySoon ();
+    void wrongAuthentication ();
+
+  protected:
+    // QWidget
+    virtual void contextMenuEvent (QContextMenuEvent *);
+    virtual void dragEnterEvent (QDragEnterEvent *);
+    virtual void dropEvent (QDropEvent *);
 
   private:
-    time_t myLastFullUpdateTime;
-    QDialog * mySessionDialog;
-    QPointer<QDialog> myPrefsDialog;
-    QDialog * myAboutDialog;
-    QDialog * myStatsDialog;
-    DetailsDialog * myDetailsDialog;
-    QSystemTrayIcon myTrayIcon;
-    TorrentFilter myFilterModel;
-    TorrentDelegate * myTorrentDelegate;
-    TorrentDelegateMin * myTorrentDelegateMin;
-    Session& mySession;
-    Prefs& myPrefs;
-    TorrentModel& myModel;
-    Ui_MainWindow ui;
-    time_t myLastSendTime;
-    time_t myLastReadTime;
-    QTimer myNetworkTimer;
-    bool myNetworkError;
-    QTimer myRefreshTrayIconTimer;
-    QTimer myRefreshActionSensitivityTimer;
-    QAction * myDlimitOffAction;
-    QAction * myDlimitOnAction;
-    QAction * myUlimitOffAction;
-    QAction * myUlimitOnAction;
-    QAction * myRatioOffAction;
-    QAction * myRatioOnAction;
+    QIcon getStockIcon (const QString&, int fallback = -1);
 
-  private:
-    QIcon getStockIcon (const QString&, int fallback=-1);
-
-  private:
     QSet<int> getSelectedTorrents () const;
     void updateNetworkIcon ();
-    QWidgetList myHidden;
+
+    QMenu * createOptionsMenu ();
+    QMenu * createStatsModeMenu ();
+    void initStatusBar ();
+
+    void clearSelection ();
+    void addTorrent (const AddData& addMe, bool showOptions);
+
+    // QWidget
+    virtual void hideEvent (QHideEvent * event);
+    virtual void showEvent (QShowEvent * event);
 
   private slots:
     void openPreferences ();
@@ -126,7 +131,6 @@ class MainWindow: public QMainWindow
     void onSessionSourceChanged ();
     void onModelReset ();
 
-  private slots:
     void setSortPref (int);
     void setSortAscendingPref (bool);
     void onSortByActivityToggled (bool);
@@ -140,53 +144,38 @@ class MainWindow: public QMainWindow
     void onSortByStateToggled (bool);
 
   private:
+    Session& mySession;
+    Prefs& myPrefs;
+    TorrentModel& myModel;
+
+    Ui_MainWindow ui;
+
+    time_t myLastFullUpdateTime;
+    QDialog * mySessionDialog;
+    QPointer<QDialog> myPrefsDialog;
+    QDialog * myAboutDialog;
+    QDialog * myStatsDialog;
+    DetailsDialog * myDetailsDialog;
+    QSystemTrayIcon myTrayIcon;
+    TorrentFilter myFilterModel;
+    TorrentDelegate * myTorrentDelegate;
+    TorrentDelegateMin * myTorrentDelegateMin;
+    time_t myLastSendTime;
+    time_t myLastReadTime;
+    QTimer myNetworkTimer;
+    bool myNetworkError;
+    QTimer myRefreshTrayIconTimer;
+    QTimer myRefreshActionSensitivityTimer;
+    QAction * myDlimitOffAction;
+    QAction * myDlimitOnAction;
+    QAction * myUlimitOffAction;
+    QAction * myUlimitOnAction;
+    QAction * myRatioOffAction;
+    QAction * myRatioOnAction;
+    QWidgetList myHidden;
     QWidget * myFilterBar;
-
-  private:
-    QMenu * createOptionsMenu ();
-    QMenu * createStatsModeMenu ();
-    void initStatusBar ();
-
     QAction * myAltSpeedAction;
     QString myErrorMessage;
-
-  public slots:
-    void startAll ();
-    void startSelected ();
-    void startSelectedNow ();
-    void pauseAll ();
-    void pauseSelected ();
-    void removeSelected ();
-    void deleteSelected ();
-    void verifySelected ();
-    void queueMoveTop ();
-    void queueMoveUp ();
-    void queueMoveDown ();
-    void queueMoveBottom ();
-    void reannounceSelected ();
-    void onNetworkTimer ();
-
-  private:
-    void clearSelection ();
-    void addTorrent (const AddData& addMe, bool showOptions);
-
-  public slots:
-    void setToolbarVisible (bool);
-    void setFilterbarVisible (bool);
-    void setStatusbarVisible (bool);
-    void setCompactView (bool);
-    void refreshActionSensitivity ();
-    void refreshActionSensitivitySoon ();
-    void wrongAuthentication ();
-
-  public:
-    MainWindow (Session&, Prefs&, TorrentModel&, bool minized);
-    virtual ~MainWindow ();
-
-  protected:
-    virtual void contextMenuEvent (QContextMenuEvent *);
-    virtual void dragEnterEvent (QDragEnterEvent *);
-    virtual void dropEvent (QDropEvent *);
 };
 
 #endif // QTR_MAIN_WINDOW_H

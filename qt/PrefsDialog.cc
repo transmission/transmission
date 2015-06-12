@@ -532,9 +532,9 @@ PrefsDialog::initDownloadingTab ()
 
 PrefsDialog::PrefsDialog (Session& session, Prefs& prefs, QWidget * parent):
   QDialog (parent),
-  myIsServer (session.isServer ()),
   mySession (session),
-  myPrefs (prefs)
+  myPrefs (prefs),
+  myIsServer (session.isServer ())
 {
   ui.setupUi (this);
 

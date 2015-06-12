@@ -10,7 +10,6 @@
 #ifndef QTR_PREFS_H
 #define QTR_PREFS_H
 
-#include <QDateTime>
 #include <QObject>
 #include <QSet>
 #include <QString>
@@ -19,6 +18,8 @@
 #include <libtransmission/quark.h>
 
 #include "Filters.h"
+
+class QDateTime;
 
 extern "C"
 {
@@ -30,7 +31,6 @@ class Prefs: public QObject
     Q_OBJECT
 
   public:
-
     enum
     {
       /* client prefs */
@@ -131,35 +131,16 @@ class Prefs: public QObject
       PREFS_COUNT
     };
 
-  private:
-
-    struct PrefItem
-    {
-      int id;
-      tr_quark key;
-      int type;
-    };
-
-    static PrefItem myItems[];
-
-  private:
-    QSet<int> myTemporaryPrefs;
-    QString const myConfigDir;
-    mutable QVariant myValues[PREFS_COUNT];
-    void initDefaults (tr_variant *);
-
-    void set (int key, const char * value);
-
   public:
-    bool isCore (int key) const { return FIRST_CORE_PREF<=key && key<=LAST_CORE_PREF; }
+    Prefs (const QString& configDir);
+    virtual ~Prefs ();
+
+    bool isCore (int key) const { return FIRST_CORE_PREF <= key && key <= LAST_CORE_PREF; }
     bool isClient (int key) const { return !isCore (key); }
     const char * keyStr (int i) const { return tr_quark_get_string (myItems[i].key,NULL); }
-    tr_quark getKey  (int i) const { return myItems[i].key; }
+    tr_quark getKey (int i) const { return myItems[i].key; }
     int type (int i) const { return myItems[i].type; }
     const QVariant& variant (int i) const { return myValues[i]; }
-
-    Prefs (const QString& configDir);
-    ~Prefs ();
 
     int getInt (int key) const;
     bool getBool (int key) const;
@@ -173,7 +154,7 @@ class Prefs: public QObject
     {
       QVariant& v (myValues[key]);
       const QVariant tmp = QVariant::fromValue (value);
-      if (v.isNull() || (v!=tmp))
+      if (v.isNull() || v != tmp)
         {
           v = tmp;
           emit changed (key);
@@ -184,6 +165,28 @@ class Prefs: public QObject
 
   signals:
     void changed (int key);
+
+  private:
+    struct PrefItem
+    {
+      int id;
+      tr_quark key;
+      int type;
+    };
+
+  private:
+    void initDefaults (tr_variant *);
+
+    // Intentionally not implemented
+    void set (int key, const char * value);
+
+  private:
+    const QString myConfigDir;
+
+    QSet<int> myTemporaryPrefs;
+    mutable QVariant myValues[PREFS_COUNT];
+
+    static PrefItem myItems[];
 };
 
 #endif // QTR_PREFS_H

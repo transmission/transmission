@@ -17,12 +17,13 @@ class FileTreeDelegate: public QItemDelegate
     Q_OBJECT
 
   public:
-    FileTreeDelegate (QObject * parent=0): QItemDelegate(parent) {}
-    virtual ~FileTreeDelegate() {}
+    FileTreeDelegate (QObject * parent = nullptr): QItemDelegate (parent) {}
+    virtual ~FileTreeDelegate () {}
 
   public:
+    // QAbstractItemDelegate
     virtual QSize sizeHint (const QStyleOptionViewItem&, const QModelIndex&) const;
-    virtual void paint (QPainter*, const QStyleOptionViewItem&, const QModelIndex&) const;
+    virtual void paint (QPainter *, const QStyleOptionViewItem&, const QModelIndex&) const;
 };
 
 #endif // QTR_FILE_TREE_DELEGATE_H

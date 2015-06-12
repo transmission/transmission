@@ -23,19 +23,20 @@ class RelocateDialog: public QDialog
     Q_OBJECT
 
   public:
-    RelocateDialog (Session&, const TorrentModel&, const QSet<int>& ids, QWidget * parent = 0);
-    ~RelocateDialog () {}
+    RelocateDialog (Session&, const TorrentModel&, const QSet<int>& ids, QWidget * parent = nullptr);
+    virtual ~RelocateDialog () {}
+
+  private:
+    QString newLocation () const;
 
   private slots:
     void onSetLocation ();
     void onMoveToggled (bool);
 
   private:
-    QString newLocation () const;
-
-  private:
     Session& mySession;
     const QSet<int> myIds;
+
     Ui::RelocateDialog ui;
 
     static bool myMoveFlag;

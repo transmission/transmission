@@ -15,34 +15,43 @@
 #include <QVector>
 
 #include "Torrent.h"
-#include "TorrentModel.h"
+
+class TorrentModel;
 
 struct TrackerInfo
 {
-    TrackerStat st;
-    int torrentId;
+  TrackerStat st;
+  int torrentId;
 };
+
 Q_DECLARE_METATYPE(TrackerInfo)
 
 class TrackerModel: public QAbstractListModel
 {
     Q_OBJECT
 
-    typedef QVector<TrackerInfo> rows_t;
-    rows_t myRows;
-
   public:
-    void refresh (const TorrentModel&, const QSet<int>& ids);
-    int find (int torrentId, const QString& url) const;
-
-  public:
-    virtual int rowCount (const QModelIndex& parent = QModelIndex()) const;
-    virtual QVariant data (const QModelIndex& index, int role = Qt::DisplayRole) const;
-    enum Role { TrackerRole = Qt::UserRole };
+    enum Role
+    {
+      TrackerRole = Qt::UserRole
+    };
 
   public:
     TrackerModel () {}
     virtual ~TrackerModel () {}
+
+    void refresh (const TorrentModel&, const QSet<int>& ids);
+    int find (int torrentId, const QString& url) const;
+
+    // QAbstractItemModel
+    virtual int rowCount (const QModelIndex& parent = QModelIndex ()) const;
+    virtual QVariant data (const QModelIndex& index, int role = Qt::DisplayRole) const;
+
+  private:
+    typedef QVector<TrackerInfo> rows_t;
+
+  private:
+    rows_t myRows;
 };
 
 #endif // QTR_TRACKER_MODEL_H

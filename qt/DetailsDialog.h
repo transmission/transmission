@@ -16,11 +16,11 @@
 #include <QSet>
 #include <QTimer>
 
-#include "Prefs.h"
-
 #include "ui_DetailsDialog.h"
 
 class QTreeWidgetItem;
+
+class Prefs;
 class Session;
 class Torrent;
 class TorrentModel;
@@ -32,17 +32,13 @@ class DetailsDialog: public QDialog
 {
     Q_OBJECT
 
-  private:
-    void getNewData ();
-
-  private slots:
-    void onTorrentChanged ();
-    void onTimer ();
-
   public:
-    DetailsDialog (Session&, Prefs&, const TorrentModel&, QWidget * parent = 0);
-    ~DetailsDialog ();
+    DetailsDialog (Session&, Prefs&, const TorrentModel&, QWidget * parent = nullptr);
+    virtual ~DetailsDialog ();
+
     void setIds (const QSet<int>& ids);
+
+    // QWidget
     virtual QSize sizeHint () const { return QSize (440, 460); }
 
   private:
@@ -52,35 +48,33 @@ class DetailsDialog: public QDialog
     void initFilesTab ();
     void initOptionsTab ();
 
-  private:
+    void getNewData ();
+
     QIcon getStockIcon (const QString& freedesktop_name, int fallback);
-    QString timeToStringRounded (int seconds);
-    QString trimToDesiredWidth (const QString& str);
-
-  private:
-    Session& mySession;
-    Prefs& myPrefs;
-    const TorrentModel& myModel;
-    QSet<int> myIds;
-    QTimer myTimer;
-    bool myChangedTorrents;
-    bool myHavePendingRefresh;
-
-    Ui::DetailsDialog ui;
-
-    TrackerModel * myTrackerModel;
-    TrackerModelFilter * myTrackerFilter;
-    TrackerDelegate * myTrackerDelegate;
-
-    QMap<QString,QTreeWidgetItem*> myPeers;
 
   private slots:
+    void refresh ();
     void refreshPref (int key);
-    void onBandwidthPriorityChanged (int);
+
+    void onTorrentChanged ();
+    void onTimer ();
+
+    // Tracker tab
+    void onTrackerSelectionChanged ();
+    void onAddTrackerClicked ();
+    void onEditTrackerClicked ();
+    void onRemoveTrackerClicked ();
+    void onShowTrackerScrapesToggled (bool);
+    void onShowBackupTrackersToggled (bool);
+
+    // Files tab
     void onFilePriorityChanged (const QSet<int>& fileIndices, int);
     void onFileWantedChanged (const QSet<int>& fileIndices, bool);
     void onPathEdited (const QString& oldpath, const QString& newname);
     void onOpenRequested (const QString& path);
+
+    // Options tab
+    void onBandwidthPriorityChanged (int);
     void onHonorsSessionLimitsToggled (bool);
     void onDownloadLimitedToggled (bool);
     void onSpinBoxEditingFinished ();
@@ -88,13 +82,24 @@ class DetailsDialog: public QDialog
     void onRatioModeChanged (int);
     void onIdleModeChanged (int);
     void onIdleLimitChanged ();
-    void onShowTrackerScrapesToggled (bool);
-    void onShowBackupTrackersToggled (bool);
-    void onTrackerSelectionChanged ();
-    void onAddTrackerClicked ();
-    void onEditTrackerClicked ();
-    void onRemoveTrackerClicked ();
-    void refresh ();
+
+  private:
+    Session& mySession;
+    Prefs& myPrefs;
+    const TorrentModel& myModel;
+
+    Ui::DetailsDialog ui;
+
+    QSet<int> myIds;
+    QTimer myTimer;
+    bool myChangedTorrents;
+    bool myHavePendingRefresh;
+
+    TrackerModel * myTrackerModel;
+    TrackerModelFilter * myTrackerFilter;
+    TrackerDelegate * myTrackerDelegate;
+
+    QMap<QString, QTreeWidgetItem*> myPeers;
 };
 
 #endif // QTR_DETAILS_DIALOG_H

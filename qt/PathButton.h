@@ -33,23 +33,25 @@ class PathButton: public QToolButton
     void setPath (const QString& path);
     const QString& path () const;
 
+    // QWidget
     virtual QSize sizeHint () const;
 
   signals:
     void pathChanged (const QString& path);
 
   protected:
+    // QWidget
     virtual void paintEvent (QPaintEvent * event);
-
-  private slots:
-    void onClicked ();
-    void onFileSelected (const QString& path);
 
   private:
     void updateAppearance ();
 
     bool isDirMode () const;
     QString effectiveTitle () const;
+
+  private slots:
+    void onClicked ();
+    void onFileSelected (const QString& path);
 
   private:
     Mode myMode;

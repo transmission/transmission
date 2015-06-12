@@ -25,11 +25,17 @@ class FileTreeView: public QTreeView
     Q_OBJECT
 
   public:
-    FileTreeView (QWidget * parent=0, bool editable=true);
+    FileTreeView (QWidget * parent = nullptr, bool editable = true);
+
     void clear ();
-    void update (const FileList& files, bool updateProperties=true);
+    void update (const FileList& files, bool updateProperties = true);
 
     void setEditable (bool editable);
+
+  public slots:
+    void onClicked (const QModelIndex& index);
+    void onDoubleClicked (const QModelIndex& index);
+    void onOpenRequested (const QString& path);
 
   signals:
     void priorityChanged (const QSet<int>& fileIndices, int priority);
@@ -38,17 +44,13 @@ class FileTreeView: public QTreeView
     void openRequested (const QString& path);
 
   protected:
+    // QObject
     bool eventFilter (QObject *, QEvent *);
 
   private:
     FileTreeModel * myModel;
     QSortFilterProxyModel * myProxy;
     FileTreeDelegate * myDelegate;
-
-  public slots:
-    void onClicked (const QModelIndex& index);
-    void onDoubleClicked (const QModelIndex& index);
-    void onOpenRequested (const QString& path);
 };
 
 #endif // QTR_FILE_TREE_VIEW_H

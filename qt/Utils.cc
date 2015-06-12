@@ -18,6 +18,7 @@
 #include <QFile>
 #include <QFileDialog>
 #include <QFileInfo>
+#include <QIcon>
 #include <QInputDialog>
 #include <QObject>
 #include <QPixmapCache>

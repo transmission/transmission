@@ -29,8 +29,8 @@
 #include "Utils.h"
 
 Torrent::Torrent (const Prefs& prefs, int id):
-  magnetTorrent (false),
-  myPrefs (prefs)
+  myPrefs (prefs),
+  magnetTorrent (false)
 {
 #ifndef NDEBUG
   for (int i=0; i<PROPERTY_COUNT; ++i)
@@ -604,7 +604,7 @@ Torrent::update (tr_variant * d)
         {
           if (tr_variantDictFindStr(child, TR_KEY_announce, &str, &len))
             {
-              qApp->favicons.add (QUrl(QString::fromUtf8(str)));
+              qApp->faviconCache ().add (QUrl(QString::fromUtf8(str)));
               list.append (QString::fromUtf8 (str, len));
             }
         }
@@ -644,7 +644,7 @@ Torrent::update (tr_variant * d)
           if (tr_variantDictFindStr(child, TR_KEY_announce, &str, &len))
             {
               trackerStat.announce = QString::fromUtf8 (str, len);
-              qApp->favicons.add (QUrl (trackerStat.announce));
+              qApp->faviconCache ().add (QUrl (trackerStat.announce));
             }
 
           if (tr_variantDictFindInt (child, TR_KEY_announceState, &i))
@@ -800,6 +800,6 @@ Torrent::getError () const
 QPixmap
 TrackerStat::getFavicon () const
 {
-  return qApp->favicons.find (QUrl (announce));
+  return qApp->faviconCache ().find (QUrl (announce));
 }
 

@@ -27,27 +27,15 @@ class FilterBar: public QWidget
     Q_OBJECT
 
   public:
-    FilterBar (Prefs& prefs, const TorrentModel& torrents, const TorrentFilter& filter, QWidget * parent = 0);
-    ~FilterBar ();
+    FilterBar (Prefs& prefs, const TorrentModel& torrents, const TorrentFilter& filter, QWidget * parent = nullptr);
+    virtual ~FilterBar ();
 
   private:
-    FilterBarComboBox * createTrackerCombo (QStandardItemModel * );
+    FilterBarComboBox * createTrackerCombo (QStandardItemModel *);
     FilterBarComboBox * createActivityCombo ();
     void recountSoon ();
     void refreshTrackers ();
     QString getCountString (int n) const;
-
-  private:
-    Prefs& myPrefs;
-    const TorrentModel& myTorrents;
-    const TorrentFilter& myFilter;
-    FilterBarComboBox * myActivityCombo;
-    FilterBarComboBox * myTrackerCombo;
-    QLabel * myCountLabel;
-    QStandardItemModel * myTrackerModel;
-    QTimer * myRecountTimer;
-    bool myIsBootstrapping;
-    FilterBarLineEdit * myLineEdit;
 
   private slots:
     void recount ();
@@ -60,6 +48,19 @@ class FilterBar: public QWidget
     void onTorrentModelRowsRemoved (const QModelIndex&, int, int);
     void onTorrentModelDataChanged (const QModelIndex&, const QModelIndex&);
     void onTextChanged (const QString&);
+
+  private:
+    Prefs& myPrefs;
+    const TorrentModel& myTorrents;
+    const TorrentFilter& myFilter;
+
+    FilterBarComboBox * myActivityCombo;
+    FilterBarComboBox * myTrackerCombo;
+    QLabel * myCountLabel;
+    QStandardItemModel * myTrackerModel;
+    QTimer * myRecountTimer;
+    bool myIsBootstrapping;
+    FilterBarLineEdit * myLineEdit;
 };
 
 #endif // QTR_FILTER_BAR_H

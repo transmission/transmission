@@ -15,10 +15,9 @@
 #include <QSet>
 #include <QVector>
 
-#include "Speed.h"
-#include "Torrent.h"
-
 class Prefs;
+class Speed;
+class Torrent;
 
 extern "C"
 {
@@ -29,35 +28,28 @@ class TorrentModel: public QAbstractListModel
 {
     Q_OBJECT
 
-  private:
-    typedef QMap<int,int> id_to_row_t;
-    typedef QMap<int,Torrent*> id_to_torrent_t;
-    typedef QVector<Torrent*> torrents_t;
-    id_to_row_t myIdToRow;
-    id_to_torrent_t myIdToTorrent;
-    torrents_t myTorrents;
-    const Prefs& myPrefs;
+  public:
+    enum Role
+    {
+      TorrentRole = Qt::UserRole
+    };
 
   public:
+    TorrentModel (const Prefs& prefs);
+    virtual ~TorrentModel ();
+
     void clear ();
     bool hasTorrent (const QString& hashString) const;
-    virtual int rowCount (const QModelIndex& parent = QModelIndex()) const;
+
+    Torrent * getTorrentFromId (int id);
+    const Torrent * getTorrentFromId (int id) const;
+
+    void getTransferSpeed (Speed& uploadSpeed, size_t& uploadPeerCount,
+                           Speed& downloadSpeed, size_t& downloadPeerCount);
+
+    // QAbstractItemModel
+    virtual int rowCount (const QModelIndex& parent = QModelIndex ()) const;
     virtual QVariant data (const QModelIndex& index, int role = Qt::DisplayRole) const;
-    enum Role { TorrentRole = Qt::UserRole };
-
-  public:
-    Torrent* getTorrentFromId (int id);
-    const Torrent* getTorrentFromId (int id) const;
-
-  private:
-    void addTorrent (Torrent *);
-    QSet<int> getIds () const;
-
-  public:
-    void getTransferSpeed (Speed  & uploadSpeed,
-                           size_t & uploadPeerCount,
-                           Speed  & downloadSpeed,
-                           size_t & downloadPeerCount);
 
   signals:
     void torrentsAdded (QSet<int>);
@@ -67,12 +59,24 @@ class TorrentModel: public QAbstractListModel
     void removeTorrents (tr_variant * torrentList);
     void removeTorrent (int id);
 
+  private:
+    typedef QMap<int, int> id_to_row_t;
+    typedef QMap<int, Torrent*> id_to_torrent_t;
+    typedef QVector<Torrent*> torrents_t;
+
+  private:
+    void addTorrent (Torrent *);
+    QSet<int> getIds () const;
+
   private slots:
     void onTorrentChanged (int propertyId);
 
-  public:
-    TorrentModel (const Prefs& prefs);
-    virtual ~TorrentModel ();
+  private:
+    const Prefs& myPrefs;
+
+    id_to_row_t myIdToRow;
+    id_to_torrent_t myIdToTorrent;
+    torrents_t myTorrents;
 };
 
 #endif // QTR_TORRENT_MODEL_H

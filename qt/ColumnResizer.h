@@ -25,6 +25,7 @@ class ColumnResizer: public QObject
 
     void addLayout (QGridLayout * layout);
 
+    // QObject
     virtual bool eventFilter (QObject * object, QEvent * event);
 
   public slots:

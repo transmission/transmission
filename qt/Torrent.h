@@ -17,7 +17,6 @@
 #include <QString>
 #include <QStringList>
 #include <QList>
-#include <QTemporaryFile>
 #include <QVariant>
 
 #include <libtransmission/transmission.h>
@@ -30,9 +29,9 @@
  #undef ERROR
 #endif
 
-class Prefs;
 class QPixmap;
-class QStyle;
+
+class Prefs;
 
 extern "C"
 {
@@ -58,12 +57,15 @@ struct Peer
   double progress;
 };
 
-typedef QList<Peer> PeerList;
 Q_DECLARE_METATYPE(Peer)
+
+typedef QList<Peer> PeerList;
 Q_DECLARE_METATYPE(PeerList)
 
 struct TrackerStat
 {
+  QPixmap getFavicon () const;
+
   bool hasAnnounced;
   bool hasScraped;
   bool isBackup;
@@ -89,16 +91,16 @@ struct TrackerStat
   QString host;
   QString lastAnnounceResult;
   QString lastScrapeResult;
-  QPixmap getFavicon () const;
 };
 
-typedef QList<TrackerStat> TrackerStatsList;
 Q_DECLARE_METATYPE(TrackerStat)
+
+typedef QList<TrackerStat> TrackerStatsList;
 Q_DECLARE_METATYPE(TrackerStatsList)
 
 struct TorrentFile
 {
-  TorrentFile(): wanted(true), index(-1), priority(0), size(0), have(0) {}
+  TorrentFile(): wanted (true), index (-1), priority (0), size (0), have (0) {}
 
   bool wanted;
   int index;
@@ -108,17 +110,16 @@ struct TorrentFile
   uint64_t have;
 };
 
-typedef QList<TorrentFile> FileList;
 Q_DECLARE_METATYPE(TorrentFile)
-Q_DECLARE_METATYPE(FileList)
 
+typedef QList<TorrentFile> FileList;
+Q_DECLARE_METATYPE(FileList)
 
 class Torrent: public QObject
 {
     Q_OBJECT
 
   public:
-
     enum
     {
       ID,
@@ -181,66 +182,11 @@ class Torrent: public QObject
       PROPERTY_COUNT
     };
 
+    typedef QList<tr_quark> KeyList;
+
   public:
     Torrent (const Prefs&, int id);
     virtual ~Torrent ();
-
-  signals:
-    void torrentChanged (int id);
-    void torrentCompleted (int id);
-
-  private:
-
-    enum Group
-    {
-      INFO, // info fields that only need to be loaded once
-      STAT, // commonly-used stats that should be refreshed often
-      STAT_EXTRA,  // rarely used; only refresh if details dialog is open
-      DERIVED // doesn't come from RPC
-    };
-
-    struct Property
-    {
-      int id;
-      tr_quark key;
-      int type;
-      int group;
-    };
-
-    static Property myProperties[];
-
-    bool magnetTorrent;
-
-  public:
-    typedef QList<tr_quark> KeyList;
-    static const KeyList& getInfoKeys ();
-    static const KeyList& getStatKeys ();
-    static const KeyList& getExtraStatKeys ();
-
-  private:
-    static KeyList buildKeyList (Group group);
-
-  private:
-    QVariant myValues[PROPERTY_COUNT];
-
-    int getInt            (int key) const;
-    bool getBool          (int key) const;
-    QTime getTime         (int key) const;
-    QIcon getIcon         (int key) const;
-    double getDouble      (int key) const;
-    qulonglong getSize    (int key) const;
-    QString getString     (int key) const;
-    QDateTime getDateTime (int key) const;
-
-    bool setInt        (int key, int value);
-    bool setBool       (int key, bool value);
-    bool setIcon       (int key, const QIcon&);
-    bool setDouble     (int key, double);
-    bool setString     (int key, const char *);
-    bool setSize       (int key, qulonglong);
-    bool setDateTime   (int key, const QDateTime&);
-
-  public:
 
     int getBandwidthPriority () const { return getInt (BANDWIDTH_PRIORITY); }
     int id () const { return getInt (ID); }
@@ -314,7 +260,6 @@ class Torrent: public QObject
     int queuePosition () const { return getInt (QUEUE_POSITION); }
     bool isStalled () const { return getBool (IS_STALLED); }
 
-  public:
     QString activityString () const;
     tr_torrent_activity getActivity () const { return static_cast<tr_torrent_activity> (getInt (ACTIVITY)); }
     bool isFinished () const { return getBool (IS_FINISHED); }
@@ -329,20 +274,67 @@ class Torrent: public QObject
     bool isQueued () const { return isWaitingToDownload() || isWaitingToSeed(); }
     void notifyComplete () const;
 
-  public:
     void update (tr_variant * dict);
     void setMagnet (bool magnet) { magnetTorrent = magnet; }
 
+    QIcon getMimeTypeIcon () const { return getIcon (MIME_ICON); }
+
+    static const KeyList& getInfoKeys ();
+    static const KeyList& getStatKeys ();
+    static const KeyList& getExtraStatKeys ();
+
+  signals:
+    void torrentChanged (int id);
+    void torrentCompleted (int id);
+
   private:
+    enum Group
+    {
+      INFO, // info fields that only need to be loaded once
+      STAT, // commonly-used stats that should be refreshed often
+      STAT_EXTRA,  // rarely used; only refresh if details dialog is open
+      DERIVED // doesn't come from RPC
+    };
+
+    struct Property
+    {
+      int id;
+      tr_quark key;
+      int type;
+      int group;
+    };
+
+  private:
+    int getInt            (int key) const;
+    bool getBool          (int key) const;
+    QTime getTime         (int key) const;
+    QIcon getIcon         (int key) const;
+    double getDouble      (int key) const;
+    qulonglong getSize    (int key) const;
+    QString getString     (int key) const;
+    QDateTime getDateTime (int key) const;
+
+    bool setInt        (int key, int value);
+    bool setBool       (int key, bool value);
+    bool setIcon       (int key, const QIcon&);
+    bool setDouble     (int key, double);
+    bool setString     (int key, const char *);
+    bool setSize       (int key, qulonglong);
+    bool setDateTime   (int key, const QDateTime&);
+
     const char * getMimeTypeString () const;
     void updateMimeIcon ();
 
-  public:
-    QIcon getMimeTypeIcon () const { return getIcon (MIME_ICON); }
+    static KeyList buildKeyList (Group group);
 
   private:
     const Prefs& myPrefs;
+
+    QVariant myValues[PROPERTY_COUNT];
+    bool magnetTorrent;
     FileList myFiles;
+
+    static Property myProperties[];
 };
 
 Q_DECLARE_METATYPE(const Torrent*)

@@ -29,25 +29,28 @@ class MakeDialog: public QDialog
 {
     Q_OBJECT
 
+  public:
+    MakeDialog (Session&, QWidget * parent = nullptr);
+    virtual ~MakeDialog ();
+
+  protected:
+    // QWidget
+    virtual void dragEnterEvent (QDragEnterEvent *);
+    virtual void dropEvent (QDropEvent *);
+
+  private:
+    QString getSource () const;
+
   private slots:
     void onSourceChanged ();
     void makeTorrent ();
 
   private:
-    QString getSource () const;
-
-  private:
     Session& mySession;
+
     Ui::MakeDialog ui;
+
     std::unique_ptr<tr_metainfo_builder, void(*)(tr_metainfo_builder*)> myBuilder;
-
-  protected:
-    virtual void dragEnterEvent (QDragEnterEvent *);
-    virtual void dropEvent (QDropEvent *);
-
-  public:
-    MakeDialog (Session&, QWidget * parent = 0);
-    virtual ~MakeDialog ();
 };
 
 #endif // QTR_MAKE_DIALOG_H

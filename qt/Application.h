@@ -32,12 +32,27 @@ class Application: public QApplication
     Application (int& argc, char ** argv);
     virtual ~Application ();
 
-  public:
     void raise ();
     bool notifyApp (const QString& title, const QString& body) const;
 
-  public:
-    FaviconCache favicons;
+    FaviconCache& faviconCache ();
+
+  public slots:
+    void addTorrent (const QString&);
+    void addTorrent (const AddData&);
+
+  private:
+    void maybeUpdateBlocklist ();
+    void quitLater ();
+
+  private slots:
+    void consentGiven (int result);
+    void onSessionSourceChanged ();
+    void refreshPref (int key);
+    void refreshTorrents ();
+    void onTorrentsAdded (const QSet<int>& torrents);
+    void onTorrentCompleted (int);
+    void onNewTorrentChanged (int);
 
   private:
     Prefs * myPrefs;
@@ -51,24 +66,7 @@ class Application: public QApplication
     time_t myLastFullUpdateTime;
     QTranslator qtTranslator;
     QTranslator appTranslator;
-
-  private slots:
-    void consentGiven (int result);
-    void onSessionSourceChanged ();
-    void refreshPref (int key);
-    void refreshTorrents ();
-    void onTorrentsAdded (const QSet<int>& torrents);
-    void onTorrentCompleted (int);
-    void onNewTorrentChanged (int);
-
-  public slots:
-    void addTorrent (const QString&);
-    void addTorrent (const AddData&);
-
-  private:
-    void maybeUpdateBlocklist ();
-
-    void quitLater ();
+    FaviconCache myFavicons;
 };
 
 #undef qApp

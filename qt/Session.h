@@ -34,7 +34,8 @@ class FileAdded: public QObject
 
   public:
     FileAdded (int64_t tag, const QString& name): myTag (tag), myName (name) {}
-    ~FileAdded () {}
+    virtual ~FileAdded () {}
+
     void setFileToDelete (const QString& file) { myDelFile = file; }
 
   public slots:
@@ -43,6 +44,7 @@ class FileAdded: public QObject
   private:
     const int64_t myTag;
     const QString myName;
+
     QString myDelFile;
 };
 
@@ -52,29 +54,21 @@ class Session: public QObject
 
   public:
     Session (const QString& configDir, Prefs& prefs);
-    ~Session ();
+    virtual ~Session ();
 
-  public:
     void stop ();
     void restart ();
 
-  private:
-    void start ();
-
-  public:
     const QUrl& getRemoteUrl () const { return myRpc.url (); }
     const tr_session_stats& getStats () const { return myStats; }
     const tr_session_stats& getCumulativeStats () const { return myCumulativeStats; }
     const QString& sessionVersion () const { return mySessionVersion; }
 
-  public:
     int64_t blocklistSize () const { return myBlocklistSize; }
     void setBlocklistSize (int64_t i);
     void updateBlocklist ();
     void portTest ();
     void copyMagnetLinkToClipboard (int torrentId);
-
-  public:
 
     /** returns true if the transmission session is being run inside this client */
     bool isServer () const;
@@ -82,25 +76,11 @@ class Session: public QObject
     /** returns true if isServer () is true or if the remote address is the localhost */
     bool isLocal () const;
 
-  private:
-    void updateStats (tr_variant * args);
-    void updateInfo (tr_variant * args);
-
-  public:
     void exec (tr_quark method, tr_variant * args, int64_t tag = -1);
-    void exec (const char* method, tr_variant * args, int64_t tag = -1);
+    void exec (const char * method, tr_variant * args, int64_t tag = -1);
 
-  public:
     int64_t getUniqueTag () { return nextUniqueTag++; }
 
-  private:
-    void sessionSet (const tr_quark key, const QVariant& variant);
-    void pumpRequests ();
-    void sendTorrentRequest (const char * request, const QSet<int>& torrentIds);
-    static void updateStats (tr_variant * d, tr_session_stats * stats);
-    void refreshTorrents (const QSet<int>& torrentIds);
-
-  public:
     void torrentSet (const QSet<int>& ids, const tr_quark key, bool val);
     void torrentSet (const QSet<int>& ids, const tr_quark key, int val);
     void torrentSet (const QSet<int>& ids, const tr_quark key, double val);
@@ -126,17 +106,14 @@ class Session: public QObject
     void initTorrents (const QSet<int>& ids = QSet<int> ());
     void addNewlyCreatedTorrent (const QString& filename, const QString& localPath);
     void addTorrent (const AddData& addme);
-    void removeTorrents (const QSet<int>& torrentIds, bool deleteFiles=false);
+    void removeTorrents (const QSet<int>& torrentIds, bool deleteFiles = false);
     void verifyTorrents (const QSet<int>& torrentIds);
     void reannounceTorrents (const QSet<int>& torrentIds);
     void launchWebInterface ();
     void updatePref (int key);
-
+  
     /** request a refresh for statistics, including the ones only used by the properties dialog, for a specific torrent */
     void refreshExtraStats (const QSet<int>& ids);
-
-  private slots:
-    void responseReceived (int64_t tag, const QString& result, tr_variant * args);
 
   signals:
     void executed (int64_t tag, const QString& result, tr_variant * arguments);
@@ -154,11 +131,28 @@ class Session: public QObject
     void httpAuthenticationRequired ();
 
   private:
+    void start ();
+
+    void updateStats (tr_variant * args);
+    void updateInfo (tr_variant * args);
+
+    void sessionSet (const tr_quark key, const QVariant& variant);
+    void pumpRequests ();
+    void sendTorrentRequest (const char * request, const QSet<int>& torrentIds);
+    void refreshTorrents (const QSet<int>& torrentIds);
+
+    static void updateStats (tr_variant * d, tr_session_stats * stats);
+
+  private slots:
+    void responseReceived (int64_t tag, const QString& result, tr_variant * args);
+
+  private:
+    QString const myConfigDir;
+    Prefs& myPrefs;
+
     int64_t nextUniqueTag;
     int64_t myBlocklistSize;
-    Prefs& myPrefs;
     tr_session * mySession;
-    QString const myConfigDir;
     QStringList myIdleJSON;
     tr_session_stats myStats;
     tr_session_stats myCumulativeStats;

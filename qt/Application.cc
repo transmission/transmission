@@ -569,6 +569,11 @@ Application::notifyApp (const QString& title, const QString& body) const
   return (replyMsg.type () == QDBusMessage::ReplyMessage) && !replyMsg.arguments ().isEmpty ();
 }
 
+FaviconCache& Application::faviconCache ()
+{
+  return myFavicons;
+}
+
 /***
 ****
 ***/

@@ -16,9 +16,9 @@
 
 FileTreeModel::FileTreeModel (QObject * parent, bool isEditable):
   QAbstractItemModel(parent),
+  myIsEditable (isEditable),
   myRootItem (new FileTreeItem),
-  myIndexCache (),
-  myIsEditable (isEditable)
+  myIndexCache ()
 {
 }
 

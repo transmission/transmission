@@ -20,6 +20,7 @@ class IconToolButton: public QToolButton
     IconToolButton (QWidget * parent = nullptr);
 
   protected:
+    // QWidget
     virtual void paintEvent (QPaintEvent * event);
 };
 

@@ -19,6 +19,7 @@
 #include "FilterBarComboBoxDelegate.h"
 #include "FilterBarLineEdit.h"
 #include "Prefs.h"
+#include "Torrent.h"
 #include "TorrentFilter.h"
 #include "TorrentModel.h"
 
@@ -103,7 +104,7 @@ FilterBar::createActivityCombo ()
 void
 FilterBar::refreshTrackers ()
 {
-  FaviconCache& favicons = qApp->favicons;
+  FaviconCache& favicons = qApp->faviconCache ();
   const int firstTrackerRow = 2; // skip over the "All" and separator...
 
   // pull info from the tracker model...

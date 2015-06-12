@@ -17,28 +17,38 @@
 #include "Prefs.h"
 #include "ui_PrefsDialog.h"
 
-class QAbstractButton;
-class QCheckBox;
-class QDoubleSpinBox;
 class QHttp;
-class QLabel;
-class QLineEdit;
 class QMessageBox;
-class QPushButton;
-class QSpinBox;
 class QString;
-class QTime;
-class QTimeEdit;
-class QVBoxLayout;
-class QWidget;
 
-class FreeSpaceLabel;
 class Prefs;
 class Session;
 
 class PrefsDialog: public QDialog
 {
     Q_OBJECT
+
+  public:
+    PrefsDialog (Session&, Prefs&, QWidget * parent = nullptr);
+    virtual ~PrefsDialog ();
+
+  private:
+    typedef QMap<int, QWidget*> key2widget_t;
+
+  private:
+    bool updateWidgetValue (QWidget * widget, int prefKey);
+    void linkWidgetToPref (QWidget * widget, int prefKey);
+    void updateBlocklistLabel ();
+
+    void setPref (int key, const QVariant& v);
+
+    void initDownloadingTab ();
+    void initSeedingTab ();
+    void initSpeedTab ();
+    void initPrivacyTab ();
+    void initNetworkTab ();
+    void initDesktopTab ();
+    void initRemoteTab ();
 
   private slots:
     void checkBoxToggled (bool checked);
@@ -61,31 +71,13 @@ class PrefsDialog: public QDialog
     void onBlocklistUpdated (int n);
 
   private:
-    bool updateWidgetValue (QWidget * widget, int prefKey);
-    void linkWidgetToPref (QWidget * widget, int prefKey);
-    void updateBlocklistLabel ();
-
-  public:
-    PrefsDialog (Session&, Prefs&, QWidget * parent = 0);
-    ~PrefsDialog ();
-
-  private:
-    void setPref (int key, const QVariant& v);
-
-    void initDownloadingTab ();
-    void initSeedingTab ();
-    void initSpeedTab ();
-    void initPrivacyTab ();
-    void initNetworkTab ();
-    void initDesktopTab ();
-    void initRemoteTab ();
-
-  private:
-    typedef QMap<int,QWidget*> key2widget_t;
-    key2widget_t myWidgets;
-    const bool myIsServer;
     Session& mySession;
     Prefs& myPrefs;
+
+    Ui::PrefsDialog ui;
+
+    key2widget_t myWidgets;
+    const bool myIsServer;
     QWidgetList myWebWidgets;
     QWidgetList myWebAuthWidgets;
     QWidgetList myWebWhitelistWidgets;
@@ -94,7 +86,6 @@ class PrefsDialog: public QDialog
     QWidgetList mySchedWidgets;
     QWidgetList myBlockWidgets;
     QWidgetList myUnsupportedWhenRemote;
-    Ui::PrefsDialog ui;
 
     int myBlocklistHttpTag;
     QHttp * myBlocklistHttp;

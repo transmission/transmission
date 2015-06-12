@@ -25,13 +25,16 @@ class FilterBarComboBox: public QComboBox
     };
 
   public:
-    FilterBarComboBox (QWidget * parent = 0);
+    FilterBarComboBox (QWidget * parent = nullptr);
+
     int currentCount () const;
 
+    // QWidget
     virtual QSize minimumSizeHint () const;
     virtual QSize sizeHint () const;
 
   protected:
+    // QWidget
     virtual void paintEvent (QPaintEvent * e);
 
   private:

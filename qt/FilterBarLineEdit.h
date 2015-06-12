@@ -19,9 +19,10 @@ class FilterBarLineEdit: public QLineEdit
     Q_OBJECT
 
   public:
-    FilterBarLineEdit (QWidget * parent = 0);
+    FilterBarLineEdit (QWidget * parent = nullptr);
 
   protected:
+    // QWidget
     virtual void resizeEvent (QResizeEvent * event);
 
   private slots:

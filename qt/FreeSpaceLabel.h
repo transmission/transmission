@@ -12,9 +12,9 @@
 
 #include <stdint.h>
 
+#include <QLabel>
 #include <QString>
 #include <QTimer>
-#include <QLabel>
 
 class Session;
 
@@ -28,21 +28,21 @@ class FreeSpaceLabel: public QLabel
     Q_OBJECT
 
   public:
-    FreeSpaceLabel (QWidget * parent = 0);
+    FreeSpaceLabel (QWidget * parent = nullptr);
     virtual ~FreeSpaceLabel () {}
 
     void setSession (Session& session);
     void setPath (const QString& folder);
+
+  private slots:
+    void onSessionExecuted (int64_t tag, const QString& result, tr_variant * arguments);
+    void onTimer ();
 
   private:
     Session * mySession;
     int64_t myTag;
     QString myPath;
     QTimer myTimer;
-
-  private slots:
-    void onSessionExecuted (int64_t tag, const QString& result, tr_variant * arguments);
-    void onTimer ();
 };
 
 #endif // QTR_FREE_SPACE_LABEL_H

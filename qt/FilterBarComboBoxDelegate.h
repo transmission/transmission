@@ -22,16 +22,16 @@ class FilterBarComboBoxDelegate: public QItemDelegate
   public:
     FilterBarComboBoxDelegate (QObject * parent, QComboBox * combo);
 
-  public:
     static bool isSeparator (const QModelIndex &index);
     static void setSeparator (QAbstractItemModel * model, const QModelIndex& index);
 
   protected:
-    virtual void paint (QPainter*, const QStyleOptionViewItem&, const QModelIndex&) const;
+    // QAbstractItemDelegate
+    virtual void paint (QPainter *, const QStyleOptionViewItem&, const QModelIndex&) const;
     virtual QSize sizeHint (const QStyleOptionViewItem&, const QModelIndex&) const;
 
   private:
-    QComboBox * myCombo;
+    QComboBox * const myCombo;
 };
 
 #endif // QTR_FILTER_BAR_COMBO_BOX_DELEGATE_H

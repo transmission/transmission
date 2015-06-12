@@ -17,18 +17,18 @@ class Application;
 class DBusAdaptor: public QDBusAbstractAdaptor
 {
     Q_OBJECT
-    Q_CLASSINFO( "D-Bus Interface", "com.transmissionbt.Transmission" )
+    Q_CLASSINFO ("D-Bus Interface", "com.transmissionbt.Transmission")
+
+  public:
+    DBusAdaptor (Application *);
+    virtual ~DBusAdaptor () {}
+
+  public slots:
+    bool PresentWindow ();
+    bool AddMetainfo (const QString&);
 
   private:
     Application * myApp;
-
-  public:
-    DBusAdaptor( Application* );
-    virtual ~DBusAdaptor() {}
-
-  public slots:
-    bool PresentWindow();
-    bool AddMetainfo( const QString& );
 };
 
 #endif // QTR_DBUS_ADAPTOR_H

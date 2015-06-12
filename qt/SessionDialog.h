@@ -23,8 +23,8 @@ class SessionDialog: public QDialog
     Q_OBJECT
 
   public:
-    SessionDialog (Session& session, Prefs& prefs, QWidget * parent = 0);
-    ~SessionDialog () {}
+    SessionDialog (Session& session, Prefs& prefs, QWidget * parent = nullptr);
+    virtual ~SessionDialog () {}
 
   private slots:
     void onAccepted ();
@@ -33,7 +33,9 @@ class SessionDialog: public QDialog
   private:
     Session& mySession;
     Prefs& myPrefs;
+
     Ui::SessionDialog ui;
+
     QWidgetList myRemoteWidgets;
     QWidgetList myAuthWidgets;
 };

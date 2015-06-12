@@ -12,6 +12,7 @@
 #include <cassert>
 #include <iostream>
 
+#include <QDateTime>
 #include <QDir>
 #include <QFile>
 

@@ -15,7 +15,6 @@
 class CustomVariantType
 {
   public:
-
     enum
     {
       TrackerStatsList = QVariant::UserType,

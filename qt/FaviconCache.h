@@ -24,14 +24,8 @@ class FaviconCache: public QObject
     Q_OBJECT
 
   public:
-
-    static QString getHost( const QUrl& url );
-    static QSize getIconSize ();
-
-  public:
-
-    FaviconCache();
-    virtual ~FaviconCache();
+    FaviconCache ();
+    virtual ~FaviconCache ();
 
     // returns a cached pixmap, or a NULL pixmap if there's no match in the cache
     QPixmap find (const QUrl& url);
@@ -42,21 +36,22 @@ class FaviconCache: public QObject
     // this will emit a signal when (if) the icon becomes ready
     void add (const QUrl& url);
 
-  signals:
+    static QString getHost (const QUrl& url);
+    static QSize getIconSize ();
 
+  signals:
     void pixmapReady (const QString& host);
 
   private:
-
-    QNetworkAccessManager * myNAM;
-    QMap<QString,QPixmap> myPixmaps;
-
     QString getCacheDir ();
     void ensureCacheDirHasBeenScanned ();
 
   private slots:
-
     void onRequestFinished (QNetworkReply * reply);
+
+  private:
+    QNetworkAccessManager * myNAM;
+    QMap<QString, QPixmap> myPixmaps;
 };
 
 #endif // QTR_FAVICON_CACHE_H

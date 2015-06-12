@@ -79,6 +79,9 @@ MainWindow::getStockIcon (const QString& name, int fallback)
 }
 
 MainWindow::MainWindow (Session& session, Prefs& prefs, TorrentModel& model, bool minimized):
+  mySession (session),
+  myPrefs (prefs),
+  myModel (model),
   myLastFullUpdateTime (0),
   mySessionDialog (new SessionDialog (session, prefs, this)),
   myPrefsDialog (),
@@ -88,9 +91,6 @@ MainWindow::MainWindow (Session& session, Prefs& prefs, TorrentModel& model, boo
   myFilterModel (prefs),
   myTorrentDelegate (new TorrentDelegate (this)),
   myTorrentDelegateMin (new TorrentDelegateMin (this)),
-  mySession (session),
-  myPrefs (prefs),
-  myModel (model),
   myLastSendTime (0),
   myLastReadTime (0),
   myNetworkTimer (this),

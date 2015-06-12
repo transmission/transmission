@@ -12,19 +12,19 @@
 
 #include <QSortFilterProxyModel>
 
-class TrackerModelFilter : public QSortFilterProxyModel
+class TrackerModelFilter: public QSortFilterProxyModel
 {
     Q_OBJECT
 
   public:
-    TrackerModelFilter (QObject *parent = 0);
+    TrackerModelFilter (QObject * parent = nullptr);
 
-  public:
     void setShowBackupTrackers (bool);
     bool showBackupTrackers () const { return myShowBackups; }
 
   protected:
-    bool filterAcceptsRow (int sourceRow, const QModelIndex&sourceParent) const;
+    // QSortFilterProxyModel
+    virtual bool filterAcceptsRow (int sourceRow, const QModelIndex& sourceParent) const;
 
   private:
     bool myShowBackups;

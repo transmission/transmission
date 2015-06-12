@@ -14,25 +14,30 @@
 
 #include "ui_StatsDialog.h"
 
-class Session;
 class QTimer;
+
+class Session;
 
 class StatsDialog: public QDialog
 {
     Q_OBJECT
 
+  public:
+    StatsDialog (Session&, QWidget * parent = nullptr);
+    ~StatsDialog ();
+
+    // QWidget
+    virtual void setVisible (bool visible);
+
   private slots:
     void updateStats ();
 
-  public:
-    StatsDialog (Session&, QWidget * parent = 0);
-    ~StatsDialog ();
-    virtual void setVisible (bool visible);
-
   private:
-    Session & mySession;
-    QTimer * myTimer;
+    Session& mySession;
+
     Ui::StatsDialog ui;
+
+    QTimer * myTimer;
 };
 
 #endif // QTR_STATS_DIALOG_H

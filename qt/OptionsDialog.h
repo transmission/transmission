@@ -16,7 +16,6 @@
 #include <QFile>
 #include <QMap>
 #include <QString>
-#include <QString>
 #include <QTimer>
 #include <QVector>
 
@@ -38,8 +37,11 @@ class OptionsDialog: public QDialog
     Q_OBJECT
 
   public:
-    OptionsDialog (Session& session, const Prefs& prefs, const AddData& addme, QWidget * parent = 0);
-    ~OptionsDialog ();
+    OptionsDialog (Session& session, const Prefs& prefs, const AddData& addme, QWidget * parent = nullptr);
+    virtual ~OptionsDialog ();
+
+  private:
+    typedef QMap<uint32_t, int32_t> mybins_t;
 
   private:
     void reload ();
@@ -59,16 +61,17 @@ class OptionsDialog: public QDialog
   private:
     Session& mySession;
     AddData myAdd;
+
+    Ui::OptionsDialog ui;
+
     QDir myLocalDestination;
     bool myHaveInfo;
     tr_info myInfo;
-    Ui::OptionsDialog ui;
     QPushButton * myVerifyButton;
     QVector<int> myPriorities;
     QVector<bool> myWanted;
     FileList myFiles;
 
-  private:
     QTimer myVerifyTimer;
     char myVerifyBuf[2048 * 4];
     QFile myVerifyFile;
@@ -78,7 +81,6 @@ class OptionsDialog: public QDialog
     uint32_t myVerifyPiecePos;
     QVector<bool> myVerifyFlags;
     QCryptographicHash myVerifyHash;
-    typedef QMap<uint32_t, int32_t> mybins_t;
     mybins_t myVerifyBins;
     QTimer myEditTimer;
 };

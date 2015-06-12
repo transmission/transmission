@@ -10,16 +10,11 @@
 #ifndef QTR_SPEED_H
 #define QTR_SPEED_H
 
-#include "Formatter.h"
-
 class Speed
 {
-  private:
-    int _Bps;
-    Speed (int Bps): _Bps (Bps) {}
-
   public:
     Speed (): _Bps (0) {}
+
     double KBps () const;
     int Bps () const { return _Bps; }
     bool isZero () const { return _Bps == 0; }
@@ -29,6 +24,12 @@ class Speed
     Speed& operator+= (const Speed& that) { _Bps += that._Bps; return *this; }
     Speed operator+ (const Speed& that) const { return Speed (_Bps + that._Bps); }
     bool operator< (const Speed& that) const { return _Bps < that._Bps; }
+
+  private:
+    Speed (int Bps): _Bps (Bps) {}
+
+  private:
+    int _Bps;
 };
 
 #endif // QTR_SPEED_H

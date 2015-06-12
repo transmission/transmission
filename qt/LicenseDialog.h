@@ -17,8 +17,8 @@ class LicenseDialog: public QDialog
     Q_OBJECT
 
   public:
-    LicenseDialog (QWidget * parent = 0);
-    ~LicenseDialog () {}
+    LicenseDialog (QWidget * parent = nullptr);
+    virtual ~LicenseDialog () {}
 };
 
 #endif // QTR_LICENSE_DIALOG_H

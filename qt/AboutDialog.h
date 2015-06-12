@@ -19,15 +19,16 @@ class AboutDialog: public QDialog
     Q_OBJECT
 
   public:
-    AboutDialog (QWidget * parent = 0);
-    ~AboutDialog () {}
+    AboutDialog (QWidget * parent = nullptr);
+    virtual ~AboutDialog () {}
 
   public slots:
     void showCredits ();
 
   private:
-    QDialog * myLicenseDialog;
     Ui::AboutDialog ui;
+
+    QDialog * myLicenseDialog;
 };
 
 #endif // QTR_ABOUT_DIALOG_H

@@ -275,11 +275,11 @@ Session::updatePref (int key)
 ***/
 
 Session::Session (const QString& configDir, Prefs& prefs):
+  myConfigDir (configDir),
+  myPrefs (prefs),
   nextUniqueTag (FIRST_UNIQUE_TAG),
   myBlocklistSize (-1),
-  myPrefs (prefs),
-  mySession (0),
-  myConfigDir (configDir)
+  mySession (0)
 {
   myStats.ratio = TR_RATIO_NA;
   myStats.uploadedBytes = 0;
