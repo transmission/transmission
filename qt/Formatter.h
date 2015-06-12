@@ -10,7 +10,7 @@
 #ifndef QTR_FORMATTER_H
 #define QTR_FORMATTER_H
 
-#include <stdint.h> // int64_t
+#include <cstdint> // int64_t
 
 #include <QCoreApplication>
 #include <QString>

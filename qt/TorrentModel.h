@@ -51,13 +51,13 @@ class TorrentModel: public QAbstractListModel
     virtual int rowCount (const QModelIndex& parent = QModelIndex ()) const;
     virtual QVariant data (const QModelIndex& index, int role = Qt::DisplayRole) const;
 
-  signals:
-    void torrentsAdded (QSet<int>);
-
   public slots:
     void updateTorrents (tr_variant * torrentList, bool isCompleteList);
     void removeTorrents (tr_variant * torrentList);
     void removeTorrent (int id);
+
+  signals:
+    void torrentsAdded (QSet<int>);
 
   private:
     typedef QMap<int, int> id_to_row_t;

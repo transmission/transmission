@@ -10,7 +10,7 @@
 #ifndef QTR_FREE_SPACE_LABEL_H
 #define QTR_FREE_SPACE_LABEL_H
 
-#include <stdint.h>
+#include <cstdint>
 
 #include <QLabel>
 #include <QString>

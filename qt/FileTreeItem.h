@@ -10,7 +10,7 @@
 #ifndef QTR_FILE_TREE_ITEM_H
 #define QTR_FILE_TREE_ITEM_H
 
-#include <stdint.h>
+#include <cstdint>
 
 #include <QCoreApplication>
 #include <QHash>

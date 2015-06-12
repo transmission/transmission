@@ -7,9 +7,8 @@
  * $Id$
  */
 
-#include <stdlib.h>
-
 #include <cassert>
+#include <cstdlib>
 #include <iostream>
 
 #include <QDateTime>
