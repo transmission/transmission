@@ -15,7 +15,9 @@
 #include <QRect>
 #include <QString>
 
+class QAbstractItemView;
 class QColor;
+class QHeaderView;
 class QIcon;
 
 class Utils
@@ -33,6 +35,9 @@ class Utils
         qSwap (dx1, dx2);
       rect.adjust (dx1, 0, -dx2, 0);
     }
+
+    static int measureViewItem (QAbstractItemView * view, const QString& text);
+    static int measureHeaderItem (QHeaderView * view, const QString& text);
 
     static QColor getFadedColor (const QColor& color);
 

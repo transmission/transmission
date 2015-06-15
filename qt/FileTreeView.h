@@ -44,8 +44,9 @@ class FileTreeView: public QTreeView
     void openRequested (const QString& path);
 
   protected:
-    // QObject
-    bool eventFilter (QObject *, QEvent *);
+    // QWidget
+    virtual void resizeEvent (QResizeEvent * event);
+    virtual void keyPressEvent (QKeyEvent * event);
 
   private:
     FileTreeModel * myModel;

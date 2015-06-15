@@ -38,6 +38,11 @@ class FileTreeModel: public QAbstractItemModel
       NUM_COLUMNS
     };
 
+    enum Role
+    {
+      SortRole = Qt::UserRole
+    };
+
   public:
     FileTreeModel (QObject * parent = nullptr, bool isEditable = true);
     virtual ~FileTreeModel ();

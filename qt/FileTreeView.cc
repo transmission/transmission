@@ -14,8 +14,11 @@
 #include <QSortFilterProxyModel>
 
 #include "FileTreeDelegate.h"
+#include "FileTreeItem.h"
 #include "FileTreeModel.h"
 #include "FileTreeView.h"
+#include "Formatter.h"
+#include "Utils.h"
 
 FileTreeView::FileTreeView (QWidget * parent, bool isEditable):
   QTreeView (parent),
@@ -23,27 +26,16 @@ FileTreeView::FileTreeView (QWidget * parent, bool isEditable):
   myProxy (new QSortFilterProxyModel (this)),
   myDelegate (new FileTreeDelegate (this))
 {
-  setSortingEnabled (true);
-  setAlternatingRowColors (true);
-  setSelectionBehavior (QAbstractItemView::SelectRows);
-  setSelectionMode (QAbstractItemView::ExtendedSelection);
   myProxy->setSourceModel (myModel);
+  myProxy->setSortRole (FileTreeModel::SortRole);
+  myProxy->setSortCaseSensitivity (Qt::CaseInsensitive);
+
   setModel (myProxy);
   setItemDelegate (myDelegate);
-  setHorizontalScrollBarPolicy (Qt::ScrollBarAlwaysOff);
   sortByColumn (FileTreeModel::COL_NAME, Qt::AscendingOrder);
-  installEventFilter (this);
 
   for (int i=0; i<FileTreeModel::NUM_COLUMNS; ++i)
-    {
-      setColumnHidden (i, (i<FileTreeModel::FIRST_VISIBLE_COLUMN) || (FileTreeModel::LAST_VISIBLE_COLUMN<i));
-
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-      header()->setResizeMode(i, QHeaderView::Interactive);
-#else
-      header()->setSectionResizeMode(i, QHeaderView::Interactive);
-#endif
-    }
+    setColumnHidden (i, (i<FileTreeModel::FIRST_VISIBLE_COLUMN) || (FileTreeModel::LAST_VISIBLE_COLUMN<i));
 
   connect (this, SIGNAL(clicked(QModelIndex)),
            this, SLOT(onClicked(QModelIndex)));
@@ -88,58 +80,90 @@ FileTreeView::onOpenRequested (const QString& path)
   emit openRequested (path);
 }
 
-bool
-FileTreeView::eventFilter (QObject * o, QEvent * event)
+void
+FileTreeView::resizeEvent (QResizeEvent * event)
 {
-  // this is kind of a hack to get the last three columns be the
+  QTreeView::resizeEvent (event);
+
+  // this is kind of a hack to get the last four columns be the
   // right size, and to have the filename column use whatever
   // space is left over...
-  if ((o == this) && (event->type() == QEvent::Resize))
-    {
-      QResizeEvent * r = static_cast<QResizeEvent*> (event);
-      int left = r->size().width();
-      const QFontMetrics fontMetrics(font());
-      for (int column=FileTreeModel::FIRST_VISIBLE_COLUMN; column<=FileTreeModel::LAST_VISIBLE_COLUMN; ++column)
-        {
-          if (column == FileTreeModel::COL_NAME)
-            continue;
-          if (isColumnHidden (column))
-            continue;
 
-          QString header;
-          if (column == FileTreeModel::COL_SIZE)
-            header = QLatin1String ("999.9 KiB");
-          else
-            header = myModel->headerData (column, Qt::Horizontal).toString();
-          header += QLatin1String ("    ");
-          const int width = fontMetrics.size (0, header).width();
-          setColumnWidth (column, width);
-            left -= width;
+  int left = event->size ().width () - 1;
+  for (int column = FileTreeModel::FIRST_VISIBLE_COLUMN; column <= FileTreeModel::LAST_VISIBLE_COLUMN; ++column)
+    {
+      if (column == FileTreeModel::COL_NAME)
+        continue;
+      if (isColumnHidden (column))
+        continue;
+
+      int minWidth = 0;
+
+      QStringList itemTexts;
+      switch (column)
+        {
+          case FileTreeModel::COL_SIZE:
+            for (int s = Formatter::B; s <= Formatter::TB; ++s)
+              itemTexts << QLatin1String ("999.9 ") +
+                           Formatter::unitStr (Formatter::MEM, static_cast<Formatter::Size> (s));
+            break;
+
+          case FileTreeModel::COL_PROGRESS:
+            itemTexts << QLatin1String ("  100%  ");
+            break;
+
+          case FileTreeModel::COL_WANTED:
+            minWidth = 20;
+            break;
+
+          case FileTreeModel::COL_PRIORITY:
+            itemTexts << FileTreeItem::tr ("Low") << FileTreeItem::tr ("Normal") <<
+                         FileTreeItem::tr ("High") << FileTreeItem::tr ("Mixed");
+            break;
         }
-      left -= 20; // not sure why this is necessary.  it works in different themes + font sizes though...
-      setColumnWidth(FileTreeModel::COL_NAME, std::max(left,0));
+
+      int itemWidth = 0;
+      for (const QString& itemText: itemTexts)
+        itemWidth = std::max (itemWidth, Utils::measureViewItem (this, itemText));
+
+      const QString headerText = myModel->headerData (column, Qt::Horizontal).toString ();
+      int headerWidth = Utils::measureHeaderItem (this->header (), headerText);
+
+      const int width = std::max (minWidth, std::max (itemWidth, headerWidth));
+      setColumnWidth (column, width);
+
+      left -= width;
     }
+
+  setColumnWidth (FileTreeModel::COL_NAME, std::max (left, 0));
+}
+
+void
+FileTreeView::keyPressEvent (QKeyEvent * event)
+{
+  QTreeView::keyPressEvent (event);
 
   // handle using the keyboard to toggle the
   // wanted/unwanted state or the file priority
-  else if (event->type () == QEvent::KeyPress && state () != EditingState)
+
+  if (state () == EditingState)
+    return;
+
+  if (event->key () == Qt::Key_Space)
     {
-      switch (static_cast<QKeyEvent*> (event)->key ())
-        {
-        case Qt::Key_Space:
-          for (const QModelIndex& i: selectionModel ()->selectedRows (FileTreeModel::COL_WANTED))
-            clicked (i);
-          break;
+      int column;
 
-        case Qt::Key_Enter:
-        case Qt::Key_Return:
-          for (const QModelIndex& i: selectionModel ()->selectedRows (FileTreeModel::COL_PRIORITY))
-            clicked (i);
-          break;
-        }
+      const Qt::KeyboardModifiers modifiers = event->modifiers ();
+      if (modifiers == Qt::NoModifier)
+        column = FileTreeModel::COL_WANTED;
+      else if (modifiers == Qt::ShiftModifier)
+        column = FileTreeModel::COL_PRIORITY;
+      else
+        return;
+
+      for (const QModelIndex& i: selectionModel ()->selectedRows (column))
+        clicked (i);
     }
-
-  return false;
 }
 
 void

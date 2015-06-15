@@ -12,12 +12,14 @@
  #include <shellapi.h>
 #endif
 
+#include <QAbstractItemView>
 #include <QApplication>
 #include <QColor>
 #include <QDataStream>
 #include <QFile>
 #include <QFileDialog>
 #include <QFileInfo>
+#include <QHeaderView>
 #include <QIcon>
 #include <QInputDialog>
 #include <QObject>
@@ -202,6 +204,33 @@ Utils::removeTrailingDirSeparator (const QString& path)
 {
   const QFileInfo pathInfo (path);
   return pathInfo.fileName ().isEmpty () ? pathInfo.absolutePath () : pathInfo.absoluteFilePath ();
+}
+
+int
+Utils::measureViewItem (QAbstractItemView * view, const QString& text)
+{
+  QStyleOptionViewItemV4 option;
+  option.initFrom (view);
+  option.features = QStyleOptionViewItemV2::HasDisplay;
+  option.text = text;
+  option.textElideMode = Qt::ElideNone;
+  option.font = view->font ();
+
+  return view->style ()->sizeFromContents (QStyle::CT_ItemViewItem, &option,
+    QSize (QWIDGETSIZE_MAX, QWIDGETSIZE_MAX), view).width ();
+}
+
+int
+Utils::measureHeaderItem (QHeaderView * view, const QString& text)
+{
+  QStyleOptionHeader option;
+  option.initFrom (view);
+  option.text = text;
+  option.sortIndicator = view->isSortIndicatorShown () ? QStyleOptionHeader::SortDown :
+    QStyleOptionHeader::None;
+
+  return view->style ()->sizeFromContents (QStyle::CT_HeaderSection, &option,
+    QSize (QWIDGETSIZE_MAX, QWIDGETSIZE_MAX), view).width ();
 }
 
 QColor

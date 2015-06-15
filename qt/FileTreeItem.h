@@ -22,6 +22,7 @@
 class FileTreeItem
 {
     Q_DECLARE_TR_FUNCTIONS (FileTreeItem)
+    Q_DISABLE_COPY (FileTreeItem)
 
   public:
     FileTreeItem (const QString& name = QString (), int fileIndex = -1, uint64_t size = 0):
@@ -69,6 +70,7 @@ class FileTreeItem
     void getSubtreeWantedSize (uint64_t& have, uint64_t& total) const;
     double progress () const;
     int priority () const;
+    uint64_t size () const;
     int isSubtreeWanted () const;
     const QHash<QString,int>& getMyChildRows();
 

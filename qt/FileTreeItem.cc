@@ -107,29 +107,35 @@ FileTreeItem::data (int column, int role) const
     {
       value = Qt::AlignRight + Qt::AlignVCenter;
     }
-  else if (role == Qt::DisplayRole)
+  else if (role == Qt::DisplayRole || role == FileTreeModel::SortRole)
     {
       switch(column)
-       {
-         case FileTreeModel::COL_NAME:
-           value.setValue (name());
-           break;
+        {
+          case FileTreeModel::COL_NAME:
+            value.setValue (name());
+            break;
 
-         case FileTreeModel::COL_SIZE:
-           value.setValue (sizeString() + QLatin1String ("  "));
-           break;
+          case FileTreeModel::COL_SIZE:
+            if (role == Qt::DisplayRole)
+              value.setValue (sizeString());
+            else
+              value.setValue (size ());
+            break;
 
-         case FileTreeModel::COL_PROGRESS:
-           value.setValue (progress());
-           break;
+          case FileTreeModel::COL_PROGRESS:
+            value.setValue (progress());
+            break;
 
-         case FileTreeModel::COL_WANTED:
-           value.setValue (isSubtreeWanted());
-           break;
+          case FileTreeModel::COL_WANTED:
+            value.setValue (isSubtreeWanted());
+            break;
 
-         case FileTreeModel::COL_PRIORITY:
-           value.setValue (priorityString());
-           break;
+          case FileTreeModel::COL_PRIORITY:
+            if (role == Qt::DisplayRole)
+              value.setValue (priorityString());
+            else
+              value.setValue (priority ());
+            break;
         }
     }
   else if (role == Qt::DecorationRole && column == FileTreeModel::COL_NAME)
@@ -172,21 +178,19 @@ FileTreeItem::progress () const
 QString
 FileTreeItem::sizeString () const
 {
-  QString str;
+  return Formatter::sizeToString (size ());
+}
 
+uint64_t
+FileTreeItem::size () const
+{
   if (myChildren.isEmpty())
-    {
-      str = Formatter::sizeToString (myTotalSize);
-    }
-  else
-    {
-      uint64_t have = 0;
-      uint64_t total = 0;
-      getSubtreeWantedSize (have, total);
-      str = Formatter::sizeToString (total);
-    }
+    return myTotalSize;
 
-  return str;
+  uint64_t have = 0;
+  uint64_t total = 0;
+  getSubtreeWantedSize (have, total);
+  return total;
 }
 
 std::pair<int,int>

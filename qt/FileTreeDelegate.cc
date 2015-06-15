@@ -57,7 +57,7 @@ FileTreeDelegate::paint (QPainter                    * painter,
       p.state = option.state | QStyle::State_Small;
       p.direction = qApp->layoutDirection();
       p.rect = option.rect;
-      p.rect.setSize (QSize(option.rect.width()-2, option.rect.height()-8));
+      p.rect.setSize (QSize(option.rect.width() - 4, option.rect.height() - 8));
       p.rect.moveCenter (option.rect.center());
       p.fontMetrics = qApp->fontMetrics();
       p.minimum = 0;
@@ -70,19 +70,11 @@ FileTreeDelegate::paint (QPainter                    * painter,
     }
   else if(column == FileTreeModel::COL_WANTED)
     {
-      QStyleOptionButton o;
-      o.state = option.state;
-      o.direction = qApp->layoutDirection();
-      o.rect.setSize (QSize(20, option.rect.height()));
-      o.rect.moveCenter (option.rect.center());
-      o.fontMetrics = qApp->fontMetrics();
-      switch (index.data().toInt())
-        {
-          case Qt::Unchecked: o.state |= QStyle::State_Off; break;
-          case Qt::Checked:   o.state |= QStyle::State_On; break;
-          default:            o.state |= QStyle::State_NoChange;break;
-        }
-      style->drawControl (QStyle::CE_CheckBox, &o, painter);
+      QStyleOptionViewItemV4 vi (option);
+      vi.features |= QStyleOptionViewItemV4::HasCheckIndicator;
+      QRect checkRect = style->subElementRect (QStyle::SE_ItemViewItemCheckIndicator, &vi, nullptr);
+      checkRect.moveCenter (option.rect.center ());
+      drawCheck (painter, vi, checkRect, static_cast<Qt::CheckState> (index.data ().toInt ()));
     }
 
   QItemDelegate::drawFocus (painter, option, option.rect);

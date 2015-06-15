@@ -71,13 +71,14 @@ namespace
   };
 
   int
-  measureViewItem (QAbstractItemView * view, const QString& text)
+  measureViewItem (QTreeWidget * view, int column, const QString& text)
   {
-    QStyleOptionViewItemV4 option;
-    option.features = QStyleOptionViewItemV2::HasDisplay;
-    option.text = text;
-    return view->style ()->sizeFromContents (QStyle::CT_ItemViewItem, &option,
-      QSize (QWIDGETSIZE_MAX, QWIDGETSIZE_MAX), view).width ();
+    const QTreeWidgetItem * headerItem = view->headerItem ();
+
+    const int itemWidth = Utils::measureViewItem (view, text);
+    const int headerWidth = Utils::measureHeaderItem (view->header (), headerItem->text (column));
+
+    return std::max (itemWidth, headerWidth);
   }
 }
 
@@ -1245,11 +1246,11 @@ DetailsDialog::initPeersTab ()
   ui.peersView->sortByColumn (COL_ADDRESS, Qt::AscendingOrder);
 
   ui.peersView->setColumnWidth (COL_LOCK, 20);
-  ui.peersView->setColumnWidth (COL_UP, measureViewItem (ui.peersView, QLatin1String ("1024 MiB/s")));
-  ui.peersView->setColumnWidth (COL_DOWN, measureViewItem (ui.peersView, QLatin1String ("1024 MiB/s")));
-  ui.peersView->setColumnWidth (COL_PERCENT, measureViewItem (ui.peersView, QLatin1String ("100%")));
-  ui.peersView->setColumnWidth (COL_STATUS, measureViewItem (ui.peersView, QLatin1String ("ODUK?EXI")));
-  ui.peersView->setColumnWidth (COL_ADDRESS, measureViewItem (ui.peersView, QLatin1String ("888.888.888.888")));
+  ui.peersView->setColumnWidth (COL_UP, measureViewItem (ui.peersView, COL_UP, QLatin1String ("1024 MiB/s")));
+  ui.peersView->setColumnWidth (COL_DOWN, measureViewItem (ui.peersView, COL_DOWN, QLatin1String ("1024 MiB/s")));
+  ui.peersView->setColumnWidth (COL_PERCENT, measureViewItem (ui.peersView, COL_PERCENT, QLatin1String ("100%")));
+  ui.peersView->setColumnWidth (COL_STATUS, measureViewItem (ui.peersView, COL_STATUS, QLatin1String ("ODUK?EXI")));
+  ui.peersView->setColumnWidth (COL_ADDRESS, measureViewItem (ui.peersView, COL_ADDRESS, QLatin1String ("888.888.888.888")));
 }
 
 /***

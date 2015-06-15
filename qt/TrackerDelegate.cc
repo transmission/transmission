@@ -131,6 +131,8 @@ TrackerDelegate::drawTracker (QPainter                    * painter,
                               const TrackerInfo           & inf) const
 {
   const bool isItemSelected ((option.state & QStyle::State_Selected) != 0);
+  const bool isItemEnabled ((option.state & QStyle::State_Enabled) != 0);
+  const bool isItemActive ((option.state & QStyle::State_Active) != 0);
 
   QIcon trackerIcon (inf.st.getFavicon());
 
@@ -138,6 +140,15 @@ TrackerDelegate::drawTracker (QPainter                    * painter,
   const ItemLayout layout (getText (inf), isItemSelected, option.direction, contentRect.topLeft (), contentRect.width ());
 
   painter->save();
+
+  if (isItemSelected)
+    {
+      QPalette::ColorGroup cg = isItemEnabled ? QPalette::Normal : QPalette::Disabled;
+      if (cg == QPalette::Normal && !isItemActive)
+        cg = QPalette::Inactive;
+
+      painter->fillRect (option.rect, option.palette.brush (cg, QPalette::Highlight));
+    }
 
   trackerIcon.paint (painter, layout.iconRect, Qt::AlignCenter, isItemSelected ? QIcon::Selected : QIcon::Normal, QIcon::On);
 
