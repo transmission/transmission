@@ -1060,7 +1060,8 @@ maybeEncryptBuffer (tr_peerIo * io, struct evbuffer * buf)
         struct evbuffer_iovec iovec;
         evbuffer_ptr_set (buf, &pos, 0, EVBUFFER_PTR_SET);
         do {
-            evbuffer_peek (buf, -1, &pos, &iovec, 1);
+            if (evbuffer_peek (buf, -1, &pos, &iovec, 1) != 1)
+              break;
             tr_cryptoEncrypt (&io->crypto, iovec.iov_len, iovec.iov_base, iovec.iov_base);
         } while (!evbuffer_ptr_set (buf, &pos, iovec.iov_len, EVBUFFER_PTR_ADD));
     }
@@ -1147,7 +1148,8 @@ tr_peerIoReadBytesToBuf (tr_peerIo * io, struct evbuffer * inbuf, struct evbuffe
         struct evbuffer_iovec iovec;
         evbuffer_ptr_set (outbuf, &pos, old_length, EVBUFFER_PTR_SET);
         do {
-            evbuffer_peek (outbuf, byteCount, &pos, &iovec, 1);
+            if (evbuffer_peek (outbuf, byteCount, &pos, &iovec, 1) != 1)
+              break;
             tr_cryptoDecrypt (&io->crypto, iovec.iov_len, iovec.iov_base, iovec.iov_base);
             byteCount -= iovec.iov_len;
         } while (!evbuffer_ptr_set (outbuf, &pos, iovec.iov_len, EVBUFFER_PTR_ADD));
