@@ -7,11 +7,15 @@
  * $Id$
  */
 
+#if defined (HAVE_POSIX_FADVISE) && (!defined (_XOPEN_SOURCE) || _XOPEN_SOURCE < 600)
+ #undef _XOPEN_SOURCE
+ #define _XOPEN_SOURCE 600
+#endif
+
 #include <string.h> /* memcmp () */
 #include <stdlib.h> /* free () */
 
 #ifdef HAVE_POSIX_FADVISE
- #define _XOPEN_SOURCE 600
  #include <fcntl.h> /* posix_fadvise () */
 #endif
 
