@@ -1148,7 +1148,7 @@ tr_peerIoReadBytesToBuf (tr_peerIo * io, struct evbuffer * inbuf, struct evbuffe
         struct evbuffer_iovec iovec;
         evbuffer_ptr_set (outbuf, &pos, old_length, EVBUFFER_PTR_SET);
         do {
-            if (evbuffer_peek (outbuf, byteCount, &pos, &iovec, 1) != 1)
+            if (evbuffer_peek (outbuf, -1, &pos, &iovec, 1) != 1)
               break;
             tr_cryptoDecrypt (&io->crypto, iovec.iov_len, iovec.iov_base, iovec.iov_base);
             byteCount -= iovec.iov_len;
