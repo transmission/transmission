@@ -1041,6 +1041,33 @@ tr_peerIoSetEncryption (tr_peerIo * io, tr_encryption_type encryption_type)
 ***
 **/
 
+static inline void
+processBuffer (tr_crypto        * crypto,
+               struct evbuffer  * buffer,
+               size_t             offset,
+               size_t             size,
+               void            (* callback) (tr_crypto *, size_t, const void *, void *))
+{
+    struct evbuffer_ptr pos;
+    struct evbuffer_iovec iovec;
+
+    evbuffer_ptr_set (buffer, &pos, offset, EVBUFFER_PTR_SET);
+
+    do
+    {
+        if (evbuffer_peek (buffer, size, &pos, &iovec, 1) <= 0)
+            break;
+
+        callback (crypto, iovec.iov_len, iovec.iov_base, iovec.iov_base);
+
+        assert (size >= iovec.iov_len);
+        size -= iovec.iov_len;
+    }
+    while (!evbuffer_ptr_set (buffer, &pos, iovec.iov_len, EVBUFFER_PTR_ADD));
+
+    assert (size == 0);
+}
+
 static void
 addDatatype (tr_peerIo * io, size_t byteCount, bool isPieceData)
 {
@@ -1051,27 +1078,21 @@ addDatatype (tr_peerIo * io, size_t byteCount, bool isPieceData)
     peer_io_push_datatype (io, d);
 }
 
-static void
-maybeEncryptBuffer (tr_peerIo * io, struct evbuffer * buf)
+static inline void
+maybeEncryptBuffer (tr_peerIo       * io,
+                    struct evbuffer * buf,
+                    size_t            offset,
+                    size_t            size)
 {
     if (io->encryption_type == PEER_ENCRYPTION_RC4)
-    {
-        struct evbuffer_ptr pos;
-        struct evbuffer_iovec iovec;
-        evbuffer_ptr_set (buf, &pos, 0, EVBUFFER_PTR_SET);
-        do {
-            if (evbuffer_peek (buf, -1, &pos, &iovec, 1) != 1)
-              break;
-            tr_cryptoEncrypt (&io->crypto, iovec.iov_len, iovec.iov_base, iovec.iov_base);
-        } while (!evbuffer_ptr_set (buf, &pos, iovec.iov_len, EVBUFFER_PTR_ADD));
-    }
+        processBuffer (&io->crypto, buf, offset, size, &tr_cryptoEncrypt);
 }
 
 void
 tr_peerIoWriteBuf (tr_peerIo * io, struct evbuffer * buf, bool isPieceData)
 {
     const size_t byteCount = evbuffer_get_length (buf);
-    maybeEncryptBuffer (io, buf);
+    maybeEncryptBuffer (io, buf, 0, byteCount);
     evbuffer_add_buffer (io->outbuf, buf);
     addDatatype (io, byteCount, isPieceData);
 }
@@ -1127,6 +1148,16 @@ evbuffer_add_uint64 (struct evbuffer * outbuf, uint64_t addme_hll)
 ****
 ***/
 
+static inline void
+maybeDecryptBuffer (tr_peerIo       * io,
+                    struct evbuffer * buf,
+                    size_t            offset,
+                    size_t            size)
+{
+    if (io->encryption_type == PEER_ENCRYPTION_RC4)
+        processBuffer (&io->crypto, buf, offset, size, &tr_cryptoDecrypt);
+}
+
 void
 tr_peerIoReadBytesToBuf (tr_peerIo * io, struct evbuffer * inbuf, struct evbuffer * outbuf, size_t byteCount)
 {
@@ -1142,18 +1173,7 @@ tr_peerIoReadBytesToBuf (tr_peerIo * io, struct evbuffer * inbuf, struct evbuffe
     evbuffer_add_buffer (outbuf, tmp);
     evbuffer_free (tmp);
 
-    /* decrypt if needed */
-    if (io->encryption_type == PEER_ENCRYPTION_RC4) {
-        struct evbuffer_ptr pos;
-        struct evbuffer_iovec iovec;
-        evbuffer_ptr_set (outbuf, &pos, old_length, EVBUFFER_PTR_SET);
-        do {
-            if (evbuffer_peek (outbuf, -1, &pos, &iovec, 1) != 1)
-              break;
-            tr_cryptoDecrypt (&io->crypto, iovec.iov_len, iovec.iov_base, iovec.iov_base);
-            byteCount -= iovec.iov_len;
-        } while (!evbuffer_ptr_set (outbuf, &pos, iovec.iov_len, EVBUFFER_PTR_ADD));
-    }
+    maybeDecryptBuffer (io, outbuf, old_length, byteCount);
 }
 
 void
