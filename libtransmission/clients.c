@@ -457,7 +457,7 @@ tr_clientForId (char * buf, size_t buflen, const void * id_in)
         char out[32], *walk=out;
         const char *in, *in_end;
         for (in= (const char*)id, in_end=in+8; in!=in_end; ++in) {
-            if (isprint (*in))
+            if (isprint ((unsigned char) *in))
                 *walk++ = *in;
             else {
                 tr_snprintf (walk, out+sizeof (out)-walk, "%%%02X", (unsigned int)*in);
