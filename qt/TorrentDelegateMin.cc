@@ -32,7 +32,7 @@ enum
 {
   GUI_PAD = 6,
   BAR_WIDTH = 50,
-  BAR_HEIGHT = 12,
+  BAR_HEIGHT = 16,
   LINE_SPACING = 4
 };
 

@@ -111,6 +111,7 @@ MainWindow::MainWindow (Session& session, Prefs& prefs, TorrentModel& model, boo
   const QSize smallIconSize (i, i);
 
   ui.listView->setStyle (new ListViewProxyStyle);
+  ui.listView->setAttribute (Qt::WA_MacShowFocusRect, false);
 
   // icons
   ui.action_OpenFile->setIcon (getStockIcon (QLatin1String ("document-open"), QStyle::SP_DialogOpenButton));

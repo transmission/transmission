@@ -19,6 +19,9 @@ class IconToolButton: public QToolButton
   public:
     IconToolButton (QWidget * parent = nullptr);
 
+    // QWidget
+    virtual QSize sizeHint () const;
+
   protected:
     // QWidget
     virtual void paintEvent (QPaintEvent * event);

@@ -67,6 +67,12 @@
           <iconset resource="application.qrc">
            <normaloff>:/icons/utilities.png</normaloff>:/icons/utilities.png</iconset>
          </property>
+         <property name="iconSize">
+          <size>
+           <width>16</width>
+           <height>16</height>
+          </size>
+         </property>
          <property name="popupMode">
           <enum>QToolButton::InstantPopup</enum>
          </property>
@@ -79,11 +85,17 @@
         </widget>
        </item>
        <item>
-        <widget class="QToolButton" name="altSpeedButton">
+        <widget class="IconToolButton" name="altSpeedButton">
          <property name="icon">
           <iconset resource="application.qrc">
            <normaloff>:/icons/alt-limit-off.png</normaloff>
            <normalon>:/icons/alt-limit-on.png</normalon>:/icons/alt-limit-off.png</iconset>
+         </property>
+         <property name="iconSize">
+          <size>
+           <width>16</width>
+           <height>16</height>
+          </size>
          </property>
          <property name="checkable">
           <bool>true</bool>
@@ -134,6 +146,12 @@
          <property name="icon">
           <iconset resource="application.qrc">
            <normaloff>:/icons/ratio.png</normaloff>:/icons/ratio.png</iconset>
+         </property>
+         <property name="iconSize">
+          <size>
+           <width>16</width>
+           <height>16</height>
+          </size>
          </property>
          <property name="popupMode">
           <enum>QToolButton::InstantPopup</enum>
