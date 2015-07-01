@@ -229,6 +229,7 @@ tr_logAddMessage (const char * file,
   va_end (ap);
 
   OutputDebugStringA (buf);
+  OutputDebugStringA (TR_NATIVE_EOL_STR);
 
   if (*buf)
     {

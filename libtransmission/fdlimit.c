@@ -518,7 +518,11 @@ tr_fdSocketCreate (tr_session * session,
   if (gFd->peerCount < session->peerLimit)
     if ((s = socket (domain, type, 0)) == TR_BAD_SOCKET)
       if (sockerrno != EAFNOSUPPORT)
-        tr_logAddError (_("Couldn't create socket: %s"), tr_strerror (sockerrno));
+        {
+          char err_buf[512];
+          tr_logAddError (_("Couldn't create socket: %s"),
+                          tr_net_strerror (err_buf, sizeof (err_buf), sockerrno));
+        }
 
   if (s != TR_BAD_SOCKET)
     ++gFd->peerCount;

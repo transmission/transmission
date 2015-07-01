@@ -56,18 +56,19 @@ set_socket_buffers (tr_socket_t fd,
 {
     int size, rbuf, sbuf, rc;
     socklen_t rbuf_len = sizeof (rbuf), sbuf_len = sizeof (sbuf);
+    char err_buf[512];
 
     size = large ? RECV_BUFFER_SIZE : SMALL_BUFFER_SIZE;
     rc = setsockopt (fd, SOL_SOCKET, SO_RCVBUF, (const void *) &size, sizeof (size));
     if (rc < 0)
         tr_logAddNamedError ("UDP", "Failed to set receive buffer: %s",
-                tr_strerror (errno));
+                             tr_net_strerror (err_buf, sizeof (err_buf), sockerrno));
 
     size = large ? SEND_BUFFER_SIZE : SMALL_BUFFER_SIZE;
     rc = setsockopt (fd, SOL_SOCKET, SO_SNDBUF, (const void *) &size, sizeof (size));
     if (rc < 0)
         tr_logAddNamedError ("UDP", "Failed to set send buffer: %s",
-                tr_strerror (errno));
+                             tr_net_strerror (err_buf, sizeof (err_buf), sockerrno));
 
     if (large) {
         rc = getsockopt (fd, SOL_SOCKET, SO_RCVBUF, (void *) &rbuf, &rbuf_len);

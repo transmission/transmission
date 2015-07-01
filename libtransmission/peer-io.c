@@ -1255,24 +1255,25 @@ tr_peerIoTryRead (tr_peerIo * io, size_t howmuch)
         else /* tcp peer connection */
         {
             int e;
+            char err_buf[512];
 
             EVUTIL_SET_SOCKET_ERROR (0);
             res = evbuffer_read (io->inbuf, io->socket, (int)howmuch);
             e = EVUTIL_SOCKET_ERROR ();
 
-            dbgmsg (io, "read %d from peer (%s)", res, (res==-1?tr_strerror (e):""));
+            dbgmsg (io, "read %d from peer (%s)", res,
+                    (res==-1?tr_net_strerror (err_buf, sizeof (err_buf), e):""));
 
             if (evbuffer_get_length (io->inbuf))
                 canReadWrapper (io);
 
             if ((res <= 0) && (io->gotError) && (e != EAGAIN) && (e != EINTR) && (e != EINPROGRESS))
             {
-                char errstr[512];
                 short what = BEV_EVENT_READING | BEV_EVENT_ERROR;
                 if (res == 0)
                     what |= BEV_EVENT_EOF;
                 dbgmsg (io, "tr_peerIoTryRead got an error. res is %d, what is %hd, errno is %d (%s)",
-                        res, what, e, tr_net_strerror (errstr, sizeof (errstr), e));
+                        res, what, e, tr_net_strerror (err_buf, sizeof (err_buf), e));
                 io->gotError (io, what, io->userData);
             }
         }

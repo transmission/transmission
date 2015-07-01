@@ -76,6 +76,8 @@ tr_net_strerror (char * buf, size_t buflen, int err)
     *buf = '\0';
 #ifdef _WIN32
     FormatMessageA (FORMAT_MESSAGE_FROM_SYSTEM, NULL, err, 0, buf, buflen, NULL);
+    while (len > 0 && buf[len - 1] >= '\0' && buf[len - 1] <= ' ')
+      buf[--len] = '\0';
 #else
     tr_strlcpy (buf, tr_strerror (err), buflen);
 #endif
@@ -148,15 +150,17 @@ void
 tr_netSetTOS (tr_socket_t s,
               int         tos)
 {
-#ifdef IP_TOS
-    if (setsockopt (s, IPPROTO_IP, IP_TOS, (const void *) &tos, sizeof (tos)) != -1)
-        return;
+#if defined (IP_TOS) && !defined (_WIN32)
+    if (setsockopt (s, IPPROTO_IP, IP_TOS, (const void *) &tos, sizeof (tos)) == -1)
+    {
+        char err_buf[512];
+        tr_logAddNamedInfo ("Net", "Can't set TOS '%d': %s", tos,
+                            tr_net_strerror (err_buf, sizeof (err_buf), sockerrno));
+    }
 #else
     (void) s;
-    errno = ENOSYS;
+    (void) tos;
 #endif
-
-    tr_logAddNamedInfo ("Net", "Can't set TOS '%d': %s", tos, tr_strerror (errno));
 }
 
 void
@@ -165,16 +169,16 @@ tr_netSetCongestionControl (tr_socket_t   s,
 {
 #ifdef TCP_CONGESTION
     if (setsockopt (s, IPPROTO_TCP, TCP_CONGESTION,
-                    (const void *) algorithm, strlen (algorithm) + 1) != -1)
-        return;
-
+                    (const void *) algorithm, strlen (algorithm) + 1) == -1)
+    {
+        char err_buf[512];
+        tr_logAddNamedInfo ("Net", "Can't set congestion control algorithm '%s': %s",
+                            algorithm, tr_net_strerror (err_buf, sizeof (err_buf), sockerrno));
+    }
 #else
     (void) s;
-    errno = ENOSYS;
+    (void) algorithm;
 #endif
-
-    tr_logAddNamedInfo ("Net", "Can't set congestion control algorithm '%s': %s",
-                        algorithm, tr_strerror (errno));
 }
 
 bool
@@ -246,6 +250,7 @@ tr_netOpenPeerSocket (tr_session        * session,
     const tr_address      * source_addr;
     socklen_t               sourcelen;
     struct sockaddr_storage source_sock;
+    char err_buf[512];
 
     assert (tr_address_is_valid (addr));
 
@@ -260,7 +265,8 @@ tr_netOpenPeerSocket (tr_session        * session,
     if (clientIsSeed) {
         int n = 8192;
         if (setsockopt (s, SOL_SOCKET, SO_RCVBUF, (const void *) &n, sizeof (n)))
-            tr_logAddInfo ("Unable to set SO_RCVBUF on socket %"TR_PRI_SOCK": %s", s, tr_strerror (sockerrno));
+            tr_logAddInfo ("Unable to set SO_RCVBUF on socket %"TR_PRI_SOCK": %s", s,
+                           tr_net_strerror (err_buf, sizeof (err_buf), sockerrno));
     }
 
     if (evutil_make_socket_nonblocking (s) < 0) {
@@ -277,7 +283,8 @@ tr_netOpenPeerSocket (tr_session        * session,
     if (bind (s, (struct sockaddr *) &source_sock, sourcelen))
     {
         tr_logAddError (_("Couldn't set source address %s on %"TR_PRI_SOCK": %s"),
-                tr_address_to_string (source_addr), s, tr_strerror (errno));
+                        tr_address_to_string (source_addr), s,
+                        tr_net_strerror (err_buf, sizeof (err_buf), sockerrno));
         tr_netClose (session, s);
         return TR_BAD_SOCKET; /* -errno */
     }
@@ -291,11 +298,12 @@ tr_netOpenPeerSocket (tr_session        * session,
     {
         int tmperrno;
         tmperrno = sockerrno;
-        if ((tmperrno != ENETUNREACH && tmperrno != EHOSTUNREACH)
-                || addr->type == TR_AF_INET)
+        if ((tmperrno != ENETUNREACH && tmperrno != EHOSTUNREACH) || addr->type == TR_AF_INET)
+        {
             tr_logAddError (_("Couldn't connect socket %"TR_PRI_SOCK" to %s, port %d (errno %d - %s)"),
-                    s, tr_address_to_string (addr), (int)ntohs (port), tmperrno,
-                    tr_strerror (tmperrno));
+                            s, tr_address_to_string (addr), (int)ntohs (port), tmperrno,
+                            tr_net_strerror (err_buf, sizeof (err_buf), tmperrno));
+        }
         tr_netClose (session, s);
         s = TR_BAD_SOCKET; /* -tmperrno */
     }
@@ -371,6 +379,7 @@ tr_netBindTCPImpl (const tr_address * addr,
         {
             const char * fmt;
             const char * hint;
+            char err_buf[512];
 
             if (err == EADDRINUSE)
                 hint = _("Is another copy of Transmission already running?");
@@ -382,7 +391,8 @@ tr_netBindTCPImpl (const tr_address * addr,
             else
                 fmt = _("Couldn't bind port %d on %s: %s (%s)");
 
-            tr_logAddError (fmt, port, tr_address_to_string (addr), tr_strerror (err), hint);
+            tr_logAddError (fmt, port, tr_address_to_string (addr),
+                            tr_net_strerror (err_buf, sizeof (err_buf), err), hint);
         }
         tr_netCloseSocket (fd);
         *errOut = err;
