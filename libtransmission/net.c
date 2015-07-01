@@ -75,7 +75,7 @@ tr_net_strerror (char * buf, size_t buflen, int err)
 {
     *buf = '\0';
 #ifdef _WIN32
-    FormatMessageA (FORMAT_MESSAGE_FROM_SYSTEM, NULL, err, 0, buf, buflen, NULL);
+    DWORD len = FormatMessageA (FORMAT_MESSAGE_FROM_SYSTEM, NULL, err, 0, buf, buflen, NULL);
     while (len > 0 && buf[len - 1] >= '\0' && buf[len - 1] <= ' ')
       buf[--len] = '\0';
 #else
