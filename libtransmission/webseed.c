@@ -162,14 +162,17 @@ write_block_func (void * vdata)
       tr_cache * cache = data->session->cache;
       const tr_piece_index_t piece = data->piece_index;
 
-      while (len > 0)
+      if (!tr_torrentPieceIsComplete (tor, piece))
         {
-          const uint32_t bytes_this_pass = MIN (len, block_size);
-          tr_cacheWriteBlock (cache, tor, piece, offset_end - len, bytes_this_pass, buf);
-          len -= bytes_this_pass;
-        }
+          while (len > 0)
+            {
+              const uint32_t bytes_this_pass = MIN (len, block_size);
+              tr_cacheWriteBlock (cache, tor, piece, offset_end - len, bytes_this_pass, buf);
+              len -= bytes_this_pass;
+            }
 
-      fire_client_got_blocks (tor, w, data->block_index, data->count);
+          fire_client_got_blocks (tor, w, data->block_index, data->count);
+        }
     }
 
   evbuffer_free (buf);
@@ -422,7 +425,7 @@ web_response_func (tr_session    * session,
             }
             else
             {
-              if (buf_len)
+              if (buf_len && !tr_torrentPieceIsComplete (tor, t->piece_index))
                 {
                   /* on_content_changed () will not write a block if it is smaller than
                      the torrent's block size, i.e. the torrent's very last block */
