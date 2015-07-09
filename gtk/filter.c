@@ -273,7 +273,7 @@ GtkWidget* gtr_filter_bar_new(tr_session* session UNUSED, GtkTreeModel* tmodel, 
     gtk_tree_model_filter_set_visible_func(GTK_TREE_MODEL_FILTER(data->filter_model), is_row_visible, data, g_free);
 
     toolbar = gtk_toolbar_new();
-    gtk_style_context_add_class(gtk_widget_get_style_context(toolbar), GTK_STYLE_CLASS_TOOLBAR);
+    gtk_style_context_add_class(gtk_widget_get_style_context(toolbar), "search-bar");
     gtk_container_set_border_width(GTK_CONTAINER(toolbar), 0);
 
     ti = gtk_tool_item_new();
