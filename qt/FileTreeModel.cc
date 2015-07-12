@@ -9,10 +9,80 @@
 
 #include <cassert>
 
-#include <QStringList>
-
 #include "FileTreeItem.h"
 #include "FileTreeModel.h"
+
+namespace
+{
+  class PathIteratorBase
+  {
+    protected:
+      PathIteratorBase(const QString& path, int slashIndex):
+        myPath (path),
+        mySlashIndex (slashIndex),
+        myToken ()
+      {
+        myToken.reserve (path.size () / 2);
+      }
+
+    protected:
+      const QString& myPath;
+      int mySlashIndex;
+      QString myToken;
+
+      static const QChar SlashChar;
+  };
+
+  const QChar PathIteratorBase::SlashChar = QLatin1Char ('/');
+
+  class ForwardPathIterator: public PathIteratorBase
+  {
+    public:
+      ForwardPathIterator (const QString& path):
+        PathIteratorBase (path, path.size () - 1)
+      {
+      }
+
+      bool hasNext () const
+      {
+        return mySlashIndex > 0;
+      }
+
+      const QString& next ()
+      {
+        int newSlashIndex = myPath.lastIndexOf (SlashChar, mySlashIndex);
+        myToken.truncate (0);
+        myToken += myPath.midRef (newSlashIndex + 1, mySlashIndex - newSlashIndex);
+        mySlashIndex = newSlashIndex - 1;
+        return myToken;
+      }
+  };
+
+  class BackwardPathIterator: public PathIteratorBase
+  {
+    public:
+      BackwardPathIterator (const QString& path):
+        PathIteratorBase (path, 0)
+      {
+      }
+
+      bool hasNext () const
+      {
+        return mySlashIndex < myPath.size ();
+      }
+
+      const QString& next ()
+      {
+        int newSlashIndex = myPath.indexOf (SlashChar, mySlashIndex);
+        if (newSlashIndex == -1)
+          newSlashIndex = myPath.size ();
+        myToken.truncate (0);
+        myToken += myPath.midRef (mySlashIndex, newSlashIndex - mySlashIndex);
+        mySlashIndex = newSlashIndex + 1;
+        return myToken;
+      }
+  };
+}
 
 FileTreeModel::FileTreeModel (QObject * parent, bool isEditable):
   QAbstractItemModel(parent),
@@ -221,26 +291,25 @@ FileTreeModel::findItemForFileIndex (int fileIndex) const
 }
 
 void
-FileTreeModel::addFile (int                   fileIndex,
-                        const QString       & filename,
-                        bool                  wanted,
-                        int                   priority,
-                        uint64_t              totalSize,
-                        uint64_t              have,
-                        QList<QModelIndex>  & rowsAdded,
-                        bool                  updateFields)
+FileTreeModel::addFile (int            fileIndex,
+                        const QString& filename,
+                        bool           wanted,
+                        int            priority,
+                        uint64_t       totalSize,
+                        uint64_t       have,
+                        bool           updateFields)
 {
   FileTreeItem * item;
-  QStringList tokens = filename.split (QChar::fromLatin1('/'));
 
   item = findItemForFileIndex (fileIndex);
 
   if (item) // this file is already in the tree, we've added this
     {
       QModelIndex indexWithChangedParents;
-      while (!tokens.isEmpty())
+      ForwardPathIterator filenameIt (filename);
+      while (filenameIt.hasNext ())
         {
-          const QString token = tokens.takeLast();
+          const QString& token = filenameIt.next ();
           const std::pair<int,int> changed = item->update (token, wanted, priority, have, updateFields);
           if (changed.first >= 0)
             {
@@ -260,9 +329,10 @@ FileTreeModel::addFile (int                   fileIndex,
       bool added = false;
 
       item = myRootItem;
-      while (!tokens.isEmpty())
+      BackwardPathIterator filenameIt (filename);
+      while (filenameIt.hasNext ())
         {
-          const QString token = tokens.takeFirst();
+          const QString& token = filenameIt.next ();
           FileTreeItem * child(item->child(token));
           if (!child)
             {
@@ -271,14 +341,12 @@ FileTreeModel::addFile (int                   fileIndex,
               const int n (item->childCount());
 
               beginInsertRows (parentIndex, n, n);
-              if (tokens.isEmpty())
+              if (!filenameIt.hasNext ())
                 child = new FileTreeItem (token, fileIndex, totalSize);
               else
                 child = new FileTreeItem (token);
               item->appendChild (child);
               endInsertRows ();
-
-              rowsAdded.append (indexOf(child, 0));
             }
           item = child;
         }

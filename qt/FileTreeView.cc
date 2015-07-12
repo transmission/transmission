@@ -169,13 +169,37 @@ FileTreeView::keyPressEvent (QKeyEvent * event)
 void
 FileTreeView::update (const FileList& files, bool updateFields)
 {
+  const bool modelWasEmpty = myProxy->rowCount () == 0;
+
   for (const TorrentFile& file: files)
+    myModel->addFile (file.index, file.filename, file.wanted, file.priority, file.size, file.have, updateFields);
+
+  if (modelWasEmpty)
     {
-      QList<QModelIndex> added;
-      myModel->addFile (file.index, file.filename, file.wanted, file.priority, file.size, file.have, added, updateFields);
-      for (const QModelIndex& i: added)
-        expand (myProxy->mapFromSource(i));
+      // expand up until the item with more than one expandable child
+      for (QModelIndex index = myProxy->index (0, 0); index.isValid ();)
+        {
+          const QModelIndex oldIndex = index;
+
+          expand (oldIndex);
+
+          index = QModelIndex ();
+          for (int i = 0, count = myProxy->rowCount (oldIndex); i < count; ++i)
+            {
+              const QModelIndex newIndex = myProxy->index (i, 0, oldIndex);
+              if (myProxy->rowCount (newIndex) == 0)
+                continue;
+              if (index.isValid ())
+                {
+                  index = QModelIndex ();
+                  break;
+                }
+              index = newIndex;
+            }
+        }
     }
+
+  myProxy->sort (header ()->sortIndicatorSection (), header ()->sortIndicatorOrder ());
 }
 
 void

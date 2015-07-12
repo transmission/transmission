@@ -53,7 +53,6 @@ class FileTreeModel: public QAbstractItemModel
     void addFile (int index, const QString& filename,
                   bool wanted, int priority,
                   uint64_t size, uint64_t have,
-                  QList<QModelIndex>& rowsAdded,
                   bool torrentChanged);
 
     QModelIndex parent (const QModelIndex& child, int column) const;

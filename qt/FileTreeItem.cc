@@ -119,7 +119,7 @@ FileTreeItem::data (int column, int role) const
             if (role == Qt::DisplayRole)
               value.setValue (sizeString());
             else
-              value.setValue (size ());
+              value.setValue<quint64> (size ());
             break;
 
           case FileTreeModel::COL_PROGRESS:
