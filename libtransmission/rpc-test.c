@@ -7,10 +7,6 @@
  * $Id$
  */
 
-#include <string.h>
-
-#include <event2/buffer.h>
-
 #include "transmission.h"
 #include "rpcimpl.h"
 #include "utils.h"
@@ -75,18 +71,19 @@ test_list (void)
 ***/
 
 static void
-rpc_response_func (tr_session      * session    UNUSED,
-                   struct evbuffer * response,
-                   void            * setme)
+rpc_response_func (tr_session * session    UNUSED,
+                   tr_variant * response,
+                   void       * setme)
 {
-  tr_variantFromBuf (setme, TR_VARIANT_FMT_JSON, evbuffer_pullup(response,-1), evbuffer_get_length(response), NULL, NULL);
+  *(tr_variant *) setme = *response;
+  tr_variantInitBool (response, false);
 }
 
 static int
 test_session_get_and_set (void)
 {
   tr_session * session;
-  const char * json;
+  tr_variant request;
   tr_variant response;
   tr_variant * args;
   tr_torrent * tor;
@@ -95,10 +92,11 @@ test_session_get_and_set (void)
   tor= libttest_zero_torrent_init (session);
   check (tor != NULL);
 
-  json = "{\"method\":\"session-get\"}";
-  tr_rpc_request_exec_json (session, json, strlen(json), rpc_response_func, &response);
+  tr_variantInitDict (&request, 1);
+  tr_variantDictAddStr (&request, TR_KEY_method, "session-get");
+  tr_rpc_request_exec_json (session, &request, rpc_response_func, &response);
+  tr_variantFree (&request);
 
-  check (tr_variantIsDict(&response));
   check (tr_variantIsDict(&response));
   check (tr_variantDictFindDict (&response, TR_KEY_arguments, &args));
   check (tr_variantDictFind (args, TR_KEY_alt_speed_down) != NULL);

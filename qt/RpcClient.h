@@ -10,6 +10,8 @@
 #ifndef QTR_RPC_CLIENT_H
 #define QTR_RPC_CLIENT_H
 
+#include <memory>
+
 #include <QNetworkReply>
 #include <QObject>
 #include <QString>
@@ -17,15 +19,18 @@
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/quark.h>
+#include <libtransmission/variant.h>
 
 class QByteArray;
 class QNetworkAccessManager;
+
+typedef std::shared_ptr<tr_variant> TrVariantPtr;
+Q_DECLARE_METATYPE (TrVariantPtr);
 
 extern "C"
 {
   struct evbuffer;
   struct tr_session;
-  struct tr_variant;
 }
 
 class RpcClient: public QObject
@@ -55,17 +60,17 @@ class RpcClient: public QObject
     void executed (int64_t tag, const QString& result, tr_variant * args);
 
     // private
-    void responseReceived (const QByteArray& json);
+    void responseReceived (TrVariantPtr json);
 
   private:
-    void sendRequest (const QByteArray& json);
+    void sendRequest (TrVariantPtr json);
     QNetworkAccessManager * networkAccessManager ();
 
-    static void localSessionCallback (tr_session * s, evbuffer * json, void * vself);
+    static void localSessionCallback (tr_session * s, tr_variant * response, void * vself);
 
   private slots:
     void onFinished (QNetworkReply * reply);
-    void parseResponse (const QByteArray& json);
+    void parseResponse (TrVariantPtr json);
 
   private:
     tr_session * mySession;

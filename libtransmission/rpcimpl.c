@@ -84,29 +84,25 @@ notify (tr_session * session,
  * when the task is complete */
 struct tr_rpc_idle_data
 {
- tr_session            * session;
- tr_variant            * response;
- tr_variant            * args_out;
- tr_rpc_response_func    callback;
- void                  * callback_user_data;
+  tr_session            * session;
+  tr_variant            * response;
+  tr_variant            * args_out;
+  tr_rpc_response_func    callback;
+  void                  * callback_user_data;
 };
 
 static void
 tr_idle_function_done (struct tr_rpc_idle_data * data, const char * result)
 {
- struct evbuffer * buf;
+  if (result == NULL)
+    result = "success";
+  tr_variantDictAddStr (data->response, TR_KEY_result, result);
 
- if (result == NULL)
-   result = "success";
- tr_variantDictAddStr (data->response, TR_KEY_result, result);
+  (*data->callback)(data->session, data->response, data->callback_user_data);
 
- buf = tr_variantToBuf (data->response, TR_VARIANT_FMT_JSON_LEAN);
- (*data->callback)(data->session, buf, data->callback_user_data);
- evbuffer_free (buf);
-
- tr_variantFree (data->response);
- tr_free (data->response);
- tr_free (data);
+  tr_variantFree (data->response);
+  tr_free (data->response);
+  tr_free (data);
 }
 
 /***
@@ -1450,7 +1446,7 @@ portTested (tr_session       * session UNUSED,
       tr_snprintf (result, sizeof (result), "success");
     }
 
-    tr_idle_function_done (data, result);
+  tr_idle_function_done (data, result);
 }
 
 static const char*
@@ -2177,28 +2173,29 @@ methods[] =
 };
 
 static void
-noop_response_callback (tr_session       * session UNUSED,
-                        struct evbuffer  * response UNUSED,
-                        void             * user_data UNUSED)
+noop_response_callback (tr_session * session UNUSED,
+                        tr_variant * response UNUSED,
+                        void       * user_data UNUSED)
 {
 }
 
-static void
-request_exec (tr_session             * session,
-              tr_variant             * request,
-              tr_rpc_response_func     callback,
-              void                   * callback_user_data)
+void
+tr_rpc_request_exec_json (tr_session            * session,
+                          const tr_variant      * request,
+                          tr_rpc_response_func    callback,
+                          void                  * callback_user_data)
 {
   int i;
   const char * str;
-  tr_variant * args_in = tr_variantDictFind (request, TR_KEY_arguments);
+  tr_variant * const mutable_request = (tr_variant *) request;
+  tr_variant * args_in = tr_variantDictFind (mutable_request, TR_KEY_arguments);
   const char * result = NULL;
 
   if (callback == NULL)
     callback = noop_response_callback;
 
   /* parse the request */
-  if (!tr_variantDictFindStr (request, TR_KEY_method, &str, NULL))
+  if (!tr_variantDictFindStr (mutable_request, TR_KEY_method, &str, NULL))
     {
       result = "no method name";
     }
@@ -2219,17 +2216,14 @@ request_exec (tr_session             * session,
     {
       int64_t tag;
       tr_variant response;
-      struct evbuffer * buf;
 
       tr_variantInitDict (&response, 3);
       tr_variantDictAddDict (&response, TR_KEY_arguments, 0);
       tr_variantDictAddStr (&response, TR_KEY_result, result);
-      if (tr_variantDictFindInt (request, TR_KEY_tag, &tag))
+      if (tr_variantDictFindInt (mutable_request, TR_KEY_tag, &tag))
         tr_variantDictAddInt (&response, TR_KEY_tag, tag);
 
-      buf = tr_variantToBuf (&response, TR_VARIANT_FMT_JSON_LEAN);
-      (*callback)(session, buf, callback_user_data);
-      evbuffer_free (buf);
+      (*callback)(session, &response, callback_user_data);
 
       tr_variantFree (&response);
     }
@@ -2238,7 +2232,6 @@ request_exec (tr_session             * session,
       int64_t tag;
       tr_variant response;
       tr_variant * args_out;
-      struct evbuffer * buf;
 
       tr_variantInitDict (&response, 3);
       args_out = tr_variantDictAddDict (&response, TR_KEY_arguments, 0);
@@ -2246,12 +2239,10 @@ request_exec (tr_session             * session,
       if (result == NULL)
         result = "success";
       tr_variantDictAddStr (&response, TR_KEY_result, result);
-      if (tr_variantDictFindInt (request, TR_KEY_tag, &tag))
+      if (tr_variantDictFindInt (mutable_request, TR_KEY_tag, &tag))
         tr_variantDictAddInt (&response, TR_KEY_tag, tag);
 
-      buf = tr_variantToBuf (&response, TR_VARIANT_FMT_JSON_LEAN);
-      (*callback)(session, buf, callback_user_data);
-      evbuffer_free (buf);
+      (*callback)(session, &response, callback_user_data);
 
       tr_variantFree (&response);
     }
@@ -2262,33 +2253,13 @@ request_exec (tr_session             * session,
       data->session = session;
       data->response = tr_new0 (tr_variant, 1);
       tr_variantInitDict (data->response, 3);
-      if (tr_variantDictFindInt (request, TR_KEY_tag, &tag))
+      if (tr_variantDictFindInt (mutable_request, TR_KEY_tag, &tag))
         tr_variantDictAddInt (data->response, TR_KEY_tag, tag);
       data->args_out = tr_variantDictAddDict (data->response, TR_KEY_arguments, 0);
       data->callback = callback;
       data->callback_user_data = callback_user_data;
       (*methods[i].func)(session, args_in, data->args_out, data);
     }
-}
-
-void
-tr_rpc_request_exec_json (tr_session            * session,
-                          const void            * request_json,
-                          int                     request_len,
-                          tr_rpc_response_func    callback,
-                          void                  * callback_user_data)
-{
-  tr_variant top;
-  int have_content;
-
-  if (request_len < 0)
-    request_len = strlen (request_json);
-
-  have_content = !tr_variantFromJson (&top, request_json, request_len);
-  request_exec (session, have_content ? &top : NULL, callback, callback_user_data);
-
-  if (have_content)
-    tr_variantFree (&top);
 }
 
 /**
@@ -2366,7 +2337,7 @@ tr_rpc_request_exec_uri (tr_session           * session,
       pch = next ? next + 1 : NULL;
     }
 
-  request_exec (session, &top, callback, callback_user_data);
+  tr_rpc_request_exec_json (session, &top, callback, callback_user_data);
 
   /* cleanup */
   tr_variantFree (&top);

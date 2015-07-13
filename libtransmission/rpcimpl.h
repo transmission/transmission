@@ -21,15 +21,13 @@ extern "C" {
 ****  RPC processing
 ***/
 
-struct evbuffer;
+typedef void (*tr_rpc_response_func)(tr_session * session,
+                                     tr_variant * response,
+                                     void       * user_data);
 
-typedef void (*tr_rpc_response_func)(tr_session      * session,
-                                     struct evbuffer * response,
-                                     void            * user_data);
 /* http://www.json.org/ */
 void tr_rpc_request_exec_json (tr_session            * session,
-                               const void            * request_json,
-                               int                     request_len,
+                               const tr_variant      * request,
                                tr_rpc_response_func    callback,
                                void                  * callback_user_data);
 

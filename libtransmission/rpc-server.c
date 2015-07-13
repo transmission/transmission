@@ -265,14 +265,7 @@ handle_upload (struct evhttp_request * req,
             }
 
           if (have_source)
-            {
-              struct evbuffer * json = tr_variantToBuf (&top, TR_VARIANT_FMT_JSON);
-              tr_rpc_request_exec_json (server->session,
-                                        evbuffer_pullup (json, -1),
-                                        evbuffer_get_length (json),
-                                        NULL, NULL);
-              evbuffer_free (json);
-            }
+            tr_rpc_request_exec_json (server->session, &top, NULL, NULL);
 
           tr_variantFree (&top);
         }
@@ -516,19 +509,21 @@ struct rpc_response_data
 };
 
 static void
-rpc_response_func (tr_session      * session UNUSED,
-                   struct evbuffer * response,
-                   void            * user_data)
+rpc_response_func (tr_session * session UNUSED,
+                   tr_variant * response,
+                   void       * user_data)
 {
   struct rpc_response_data * data = user_data;
+  struct evbuffer * response_buf = tr_variantToBuf (response, TR_VARIANT_FMT_JSON_LEAN);
   struct evbuffer * buf = evbuffer_new ();
 
-  add_response (data->req, data->server, buf, response);
+  add_response (data->req, data->server, buf, response_buf);
   evhttp_add_header (data->req->output_headers,
                      "Content-Type", "application/json; charset=UTF-8");
   evhttp_send_reply (data->req, HTTP_OK, "OK", buf);
 
   evbuffer_free (buf);
+  evbuffer_free (response_buf);
   tr_free (data);
 }
 
@@ -538,13 +533,18 @@ handle_rpc_from_json (struct evhttp_request * req,
                       const char            * json,
                       size_t                  json_len)
 {
+  tr_variant top;
+  bool have_content = tr_variantFromJson (&top, json, json_len) == 0;
   struct rpc_response_data * data;
 
   data = tr_new0 (struct rpc_response_data, 1);
   data->req = req;
   data->server = server;
 
-  tr_rpc_request_exec_json (server->session, json, json_len, rpc_response_func, data);
+  tr_rpc_request_exec_json (server->session, have_content ? &top : NULL, rpc_response_func, data);
+
+  if (have_content)
+    tr_variantFree (&top);
 }
 
 static void

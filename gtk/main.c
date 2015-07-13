@@ -1414,10 +1414,7 @@ call_rpc_for_selected_torrents (struct cbdata * data, const char * method)
 
   if (tr_variantListSize (ids) != 0)
     {
-      int json_len;
-      char * json = tr_variantToStr (&top, TR_VARIANT_FMT_JSON_LEAN, &json_len);
-      tr_rpc_request_exec_json (session, json, json_len, NULL, NULL);
-      g_free (json);
+      tr_rpc_request_exec_json (session, &top, NULL, NULL);
       invoked = TRUE;
     }
 
@@ -1467,16 +1464,24 @@ static void
 start_all_torrents (struct cbdata * data)
 {
   tr_session * session = gtr_core_session (data->core);
-  const char * cmd = "{ \"method\": \"torrent-start\" }";
-  tr_rpc_request_exec_json (session, cmd, strlen (cmd), NULL, NULL);
+  tr_variant request;
+
+  tr_variantInitDict (&request, 1);
+  tr_variantDictAddStr (&request, TR_KEY_method, "torrent-start");
+  tr_rpc_request_exec_json (session, &request, NULL, NULL);
+  tr_variantFree (&request);
 }
 
 static void
 pause_all_torrents (struct cbdata * data)
 {
   tr_session * session = gtr_core_session (data->core);
-  const char * cmd = "{ \"method\": \"torrent-stop\" }";
-  tr_rpc_request_exec_json (session, cmd, strlen (cmd), NULL, NULL);
+  tr_variant request;
+
+  tr_variantInitDict (&request, 1);
+  tr_variantDictAddStr (&request, TR_KEY_method, "torrent-stop");
+  tr_rpc_request_exec_json (session, &request, NULL, NULL);
+  tr_variantFree (&request);
 }
 
 static tr_torrent*

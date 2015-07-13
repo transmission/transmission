@@ -155,8 +155,6 @@ void gtr_core_blocklist_update (TrCore * core);
 
 void gtr_core_exec (TrCore * core, const tr_variant * benc);
 
-void gtr_core_exec_json (TrCore * core, const char * json);
-
 void gtr_core_open_folder (TrCore * core, int torrent_id);
 
 
