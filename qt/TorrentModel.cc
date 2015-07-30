@@ -7,7 +7,6 @@
  * $Id$
  */
 
-#include <cassert>
 #include <iostream>
 
 #include <libtransmission/transmission.h>

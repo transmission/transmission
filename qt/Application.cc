@@ -7,7 +7,6 @@
  * $Id$
  */
 
-#include <cassert>
 #include <ctime>
 #include <iostream>
 

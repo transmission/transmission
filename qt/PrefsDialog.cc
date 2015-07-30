@@ -7,9 +7,13 @@
  * $Id$
  */
 
+#ifdef _WIN32
+ #include <winsock2.h> // FD_SETSIZE
+#else
+ #include <sys/select.h> // FD_SETSIZE
+#endif
+
 #include <cassert>
-#include <climits> /* INT_MAX */
-#include <iostream>
 
 #include <QCheckBox>
 #include <QComboBox>

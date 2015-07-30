@@ -7,8 +7,6 @@
  * $Id$
  */
 
-#include <iostream>
-
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h> // tr_formatter
 

@@ -7,8 +7,6 @@
  * $Id$
  */
 
-#include <iostream>
-
 #include <QAbstractTextDocumentLayout>
 #include <QApplication>
 #include <QPainter>

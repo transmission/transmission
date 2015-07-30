@@ -8,7 +8,6 @@
  */
 
 #include <cassert>
-#include <iostream>
 
 #include <QtGui>
 #include <QCheckBox>
@@ -43,8 +42,6 @@
 #include "TorrentFilter.h"
 #include "TorrentModel.h"
 #include "Utils.h"
-
-#define PREFS_KEY "prefs-key";
 
 
 /**
@@ -336,8 +333,6 @@ MainWindow::onSetPrefs (bool isChecked)
   if (isChecked)
     onSetPrefs ();
 }
-
-#define SHOW_KEY "show-mode"
 
 void
 MainWindow::initStatusBar ()

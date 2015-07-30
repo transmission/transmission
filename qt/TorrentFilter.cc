@@ -8,7 +8,6 @@
  */
 
 #include <algorithm>
-#include <iostream>
 
 #include "Filters.h"
 #include "Prefs.h"

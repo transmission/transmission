@@ -7,9 +7,6 @@
  * $Id$
  */
 
-
-#include <iostream>
-
 #include <QApplication>
 #include <QFont>
 #include <QFontMetrics>

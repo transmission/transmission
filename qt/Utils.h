@@ -12,6 +12,7 @@
 
 #include <cctype> // isxdigit()
 
+#include <QPointer>
 #include <QRect>
 #include <QString>
 
