@@ -17,10 +17,11 @@
 
 #include "AboutDialog.h"
 #include "LicenseDialog.h"
+#include "Utils.h"
 
 AboutDialog::AboutDialog (QWidget * parent):
   QDialog (parent, Qt::Dialog),
-  myLicenseDialog (new LicenseDialog (this))
+  myLicenseDialog ()
 {
   ui.setupUi (this);
 
@@ -29,13 +30,11 @@ AboutDialog::AboutDialog (QWidget * parent):
 
   QPushButton * b;
 
-  b = new QPushButton (tr ("C&redits"), this);
-  ui.dialogButtons->addButton (b, QDialogButtonBox::ActionRole);
+  b = ui.dialogButtons->addButton (tr ("C&redits"), QDialogButtonBox::ActionRole);
   connect (b, SIGNAL (clicked ()), this, SLOT (showCredits ()));
 
-  b = new QPushButton (tr ("&License"), this);
-  ui.dialogButtons->addButton (b, QDialogButtonBox::ActionRole);
-  connect (b, SIGNAL (clicked ()), myLicenseDialog, SLOT (show ()));
+  b = ui.dialogButtons->addButton (tr ("&License"), QDialogButtonBox::ActionRole);
+  connect (b, SIGNAL (clicked ()), this, SLOT (showLicense ()));
 
   ui.dialogButtons->button (QDialogButtonBox::Close)->setDefault (true);
 }
@@ -48,4 +47,10 @@ AboutDialog::showCredits ()
     tr ("Credits"),
     QString::fromUtf8 ("Jordan Lee (Backend; Daemon; GTK+; Qt)\n"
                         "Michell Livingston (OS X)\n"));
+}
+
+void
+AboutDialog::showLicense ()
+{
+  Utils::openDialog (myLicenseDialog, this);
 }

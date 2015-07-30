@@ -195,8 +195,6 @@ DetailsDialog::DetailsDialog (Session       & session,
   adjustSize ();
   ui.commentBrowser->setMaximumHeight (QWIDGETSIZE_MAX);
 
-  setAttribute (Qt::WA_DeleteOnClose, true);
-
   QList<int> initKeys;
   initKeys << Prefs::SHOW_TRACKER_SCRAPES
            << Prefs::SHOW_BACKUP_TRACKERS;

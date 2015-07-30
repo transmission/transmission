@@ -34,7 +34,6 @@
 #include "OptionsDialog.h"
 #include "Prefs.h"
 #include "Session.h"
-#include "SessionDialog.h"
 #include "TorrentModel.h"
 #include "WatchDir.h"
 
@@ -292,14 +291,9 @@ Application::Application (int& argc, char ** argv):
   maybeUpdateBlocklist ();
 
   if (!firstTime)
-    {
-      mySession->restart ();
-    }
+    mySession->restart ();
   else
-    {
-      QDialog * d = new SessionDialog (*mySession, *myPrefs, myWindow);
-      d->show ();
-    }
+    myWindow->openSession ();
 
   if (!myPrefs->getBool (Prefs::USER_HAS_GIVEN_INFORMED_CONSENT))
     {

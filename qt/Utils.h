@@ -41,6 +41,23 @@ class Utils
 
     static QColor getFadedColor (const QColor& color);
 
+    template<typename DialogT, typename... ArgsT>
+    static void
+    openDialog (QPointer<DialogT>& dialog, ArgsT&&... args)
+    {
+      if (dialog.isNull ())
+        {
+          dialog = new DialogT (std::forward<ArgsT> (args)...);
+          dialog->setAttribute (Qt::WA_DeleteOnClose);
+          dialog->show ();
+        }
+      else
+        {
+          dialog->raise ();
+          dialog->activateWindow ();
+        }
+    }
+
     ///
     /// URLs
     ///

@@ -119,6 +119,7 @@ set(${PROJECT_NAME}_HEADERS
 tr_qt_wrap_ui(${PROJECT_NAME}_UI_SOURCES
     AboutDialog.ui
     DetailsDialog.ui
+    LicenseDialog.ui
     MainWindow.ui
     MakeDialog.ui
     MakeProgressDialog.ui

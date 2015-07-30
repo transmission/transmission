@@ -42,6 +42,7 @@
 #include "TorrentDelegateMin.h"
 #include "TorrentFilter.h"
 #include "TorrentModel.h"
+#include "Utils.h"
 
 #define PREFS_KEY "prefs-key";
 
@@ -83,11 +84,11 @@ MainWindow::MainWindow (Session& session, Prefs& prefs, TorrentModel& model, boo
   myPrefs (prefs),
   myModel (model),
   myLastFullUpdateTime (0),
-  mySessionDialog (new SessionDialog (session, prefs, this)),
+  mySessionDialog (),
   myPrefsDialog (),
-  myAboutDialog (new AboutDialog (this)),
-  myStatsDialog (new StatsDialog (session, this)),
-  myDetailsDialog (0),
+  myAboutDialog (),
+  myStatsDialog (),
+  myDetailsDialog (),
   myFilterModel (prefs),
   myTorrentDelegate (new TorrentDelegate (this)),
   myTorrentDelegateMin (new TorrentDelegateMin (this)),
@@ -169,15 +170,15 @@ MainWindow::MainWindow (Session& session, Prefs& prefs, TorrentModel& model, boo
   connect (ui.action_AddURL, SIGNAL (triggered ()), this, SLOT (openURL ()));
   connect (ui.action_New, SIGNAL (triggered ()), this, SLOT (newTorrent ()));
   connect (ui.action_Preferences, SIGNAL (triggered ()), this, SLOT (openPreferences ()));
-  connect (ui.action_Statistics, SIGNAL (triggered ()), myStatsDialog, SLOT (show ()));
+  connect (ui.action_Statistics, SIGNAL (triggered ()), this, SLOT (openStats ()));
   connect (ui.action_Donate, SIGNAL (triggered ()), this, SLOT (openDonate ()));
-  connect (ui.action_About, SIGNAL (triggered ()), myAboutDialog, SLOT (show ()));
+  connect (ui.action_About, SIGNAL (triggered ()), this, SLOT (openAbout ()));
   connect (ui.action_Contents, SIGNAL (triggered ()), this, SLOT (openHelp ()));
   connect (ui.action_OpenFolder, SIGNAL (triggered ()), this, SLOT (openFolder ()));
   connect (ui.action_CopyMagnetToClipboard, SIGNAL (triggered ()), this, SLOT (copyMagnetLinkToClipboard ()));
   connect (ui.action_SetLocation, SIGNAL (triggered ()), this, SLOT (setLocation ()));
   connect (ui.action_Properties, SIGNAL (triggered ()), this, SLOT (openProperties ()));
-  connect (ui.action_SessionDialog, SIGNAL (triggered ()), mySessionDialog, SLOT (show ()));
+  connect (ui.action_SessionDialog, SIGNAL (triggered ()), this, SLOT (openSession ()));
 
   connect (ui.listView, SIGNAL (activated (QModelIndex)), ui.action_Properties, SLOT (trigger ()));
 
@@ -514,38 +515,22 @@ MainWindow::hideEvent (QHideEvent * event)
 ****/
 
 void
-MainWindow::openPreferences ()
+MainWindow::openSession ()
 {
-  if (myPrefsDialog.isNull ())
-    {
-      myPrefsDialog = new PrefsDialog (mySession, myPrefs, this);
-      myPrefsDialog->setAttribute (Qt::WA_DeleteOnClose);
-      myPrefsDialog->show ();
-    }
-  else
-    {
-      myPrefsDialog->raise ();
-      myPrefsDialog->activateWindow ();
-    }
+  Utils::openDialog (mySessionDialog, mySession, myPrefs, this);
 }
 
 void
-MainWindow::onDetailsDestroyed ()
+MainWindow::openPreferences ()
 {
-  myDetailsDialog = 0;
+  Utils::openDialog (myPrefsDialog, mySession, myPrefs, this);
 }
 
 void
 MainWindow::openProperties ()
 {
-  if (myDetailsDialog == 0)
-    {
-      myDetailsDialog = new DetailsDialog (mySession, myPrefs, myModel, this);
-      connect (myDetailsDialog, SIGNAL (destroyed (QObject*)), this, SLOT (onDetailsDestroyed ()));
-    }
-
+  Utils::openDialog (myDetailsDialog, mySession, myPrefs, myModel, this);
   myDetailsDialog->setIds (getSelectedTorrents ());
-  myDetailsDialog->show ();
 }
 
 void
@@ -618,9 +603,21 @@ MainWindow::copyMagnetLinkToClipboard ()
 }
 
 void
+MainWindow::openStats ()
+{
+  Utils::openDialog (myStatsDialog, mySession, this);
+}
+
+void
 MainWindow::openDonate ()
 {
   QDesktopServices::openUrl (QUrl (QLatin1String ("http://www.transmissionbt.com/donate.php")));
+}
+
+void
+MainWindow::openAbout ()
+{
+  Utils::openDialog (myAboutDialog, this);
 }
 
 void
@@ -792,7 +789,7 @@ MainWindow::refreshActionSensitivity ()
   ui.action_QueueMoveDown->setEnabled (haveSelection);
   ui.action_QueueMoveBottom->setEnabled (haveSelection);
 
-  if (myDetailsDialog)
+  if (!myDetailsDialog.isNull ())
     myDetailsDialog->setIds (getSelectedTorrents ());
 }
 
@@ -1382,7 +1379,7 @@ void
 MainWindow::wrongAuthentication ()
 {
   mySession.stop ();
-  mySessionDialog->show ();
+  openSession ();
 }
 
 /***

@@ -121,7 +121,7 @@
      <property name="leftMargin">
       <number>18</number>
      </property>
-     <item row="0" column="0">
+     <item row="0" column="0" colspan="2">
       <widget class="QLabel" name="startCountLabel">
        <property name="text">
         <string notr="true">...</string>

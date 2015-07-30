@@ -11,8 +11,11 @@
 #define QTR_ABOUT_DIALOG_H
 
 #include <QDialog>
+#include <QPointer>
 
 #include "ui_AboutDialog.h"
+
+class LicenseDialog;
 
 class AboutDialog: public QDialog
 {
@@ -22,13 +25,14 @@ class AboutDialog: public QDialog
     AboutDialog (QWidget * parent = nullptr);
     virtual ~AboutDialog () {}
 
-  public slots:
+  private slots:
     void showCredits ();
+    void showLicense ();
 
   private:
     Ui::AboutDialog ui;
 
-    QDialog * myLicenseDialog;
+    QPointer<LicenseDialog> myLicenseDialog;
 };
 
 #endif // QTR_ABOUT_DIALOG_H

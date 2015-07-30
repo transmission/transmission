@@ -12,6 +12,8 @@
 
 #include <QDialog>
 
+#include "ui_LicenseDialog.h"
+
 class LicenseDialog: public QDialog
 {
     Q_OBJECT
@@ -19,6 +21,9 @@ class LicenseDialog: public QDialog
   public:
     LicenseDialog (QWidget * parent = nullptr);
     virtual ~LicenseDialog () {}
+
+  private:
+    Ui::LicenseDialog ui;
 };
 
 #endif // QTR_LICENSE_DIALOG_H

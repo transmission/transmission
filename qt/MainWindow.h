@@ -28,10 +28,14 @@ class QAction;
 class QIcon;
 class QMenu;
 
+class AboutDialog;
 class AddData;
-class Prefs;
 class DetailsDialog;
+class Prefs;
+class PrefsDialog;
 class Session;
+class SessionDialog;
+class StatsDialog;
 class TorrentDelegate;
 class TorrentDelegateMin;
 class TorrentModel;
@@ -73,6 +77,8 @@ class MainWindow: public QMainWindow
     void refreshActionSensitivitySoon ();
     void wrongAuthentication ();
 
+    void openSession ();
+
   protected:
     // QWidget
     virtual void contextMenuEvent (QContextMenuEvent *);
@@ -98,7 +104,6 @@ class MainWindow: public QMainWindow
 
   private slots:
     void openPreferences ();
-    void onDetailsDestroyed ();
     void showTotalRatio ();
     void showTotalTransfer ();
     void showSessionRatio ();
@@ -114,7 +119,9 @@ class MainWindow: public QMainWindow
     void refreshPref (int key);
     void addTorrents (const QStringList& filenames);
     void removeTorrents (const bool deleteFiles);
+    void openStats ();
     void openDonate ();
+    void openAbout ();
     void openHelp ();
     void openFolder ();
     void copyMagnetLinkToClipboard ();
@@ -151,11 +158,11 @@ class MainWindow: public QMainWindow
     Ui_MainWindow ui;
 
     time_t myLastFullUpdateTime;
-    QDialog * mySessionDialog;
-    QPointer<QDialog> myPrefsDialog;
-    QDialog * myAboutDialog;
-    QDialog * myStatsDialog;
-    DetailsDialog * myDetailsDialog;
+    QPointer<SessionDialog> mySessionDialog;
+    QPointer<PrefsDialog> myPrefsDialog;
+    QPointer<AboutDialog> myAboutDialog;
+    QPointer<StatsDialog> myStatsDialog;
+    QPointer<DetailsDialog> myDetailsDialog;
     QSystemTrayIcon myTrayIcon;
     TorrentFilter myFilterModel;
     TorrentDelegate * myTorrentDelegate;
