@@ -285,7 +285,6 @@ QString
 TorrentDelegate::shortStatusString (const Torrent& tor)
 {
   QString str;
-  static const QChar ratioSymbol (0x262F);
 
   switch (tor.getActivity ())
     {

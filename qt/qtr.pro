@@ -55,6 +55,7 @@ TRANSLATIONS += translations/transmission_en.ts \
 
 FORMS += AboutDialog.ui \
          DetailsDialog.ui \
+         LicenseDialog.ui \
          MainWindow.ui \
          MakeDialog.ui \
          MakeProgressDialog.ui \
