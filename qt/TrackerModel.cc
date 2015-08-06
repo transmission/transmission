@@ -103,51 +103,36 @@ TrackerModel::refresh (const TorrentModel& torrentModel, const QSet<int>& ids)
   std::sort (trackers.begin(), trackers.end(), comp);
 
   // merge 'em with the existing list
-  int old_index = 0;
-  int new_index = 0;
+  int oldIndex = 0;
+  int newIndex = 0;
 
-  while  ((old_index < myRows.size()) ||  (new_index < trackers.size()))
+  while (oldIndex < myRows.size () || newIndex < trackers.size ())
     {
-      if (old_index == myRows.size())
+      const bool isEndOfOld = oldIndex == myRows.size ();
+      const bool isEndOfNew = newIndex == trackers.size ();
+
+      if (isEndOfOld || (!isEndOfNew && comp (trackers.at (newIndex), myRows.at (oldIndex))))
         {
           // add this new row
-          beginInsertRows (QModelIndex (), old_index, old_index);
-          myRows.insert (old_index, trackers.at (new_index));
+          beginInsertRows (QModelIndex (), oldIndex, oldIndex);
+          myRows.insert (oldIndex, trackers.at (newIndex));
           endInsertRows ();
-          ++old_index;
-          ++new_index;
+          ++oldIndex;
+          ++newIndex;
         }
-      else if (new_index == trackers.size())
+      else if (isEndOfNew || (!isEndOfOld && comp (myRows.at (oldIndex), trackers.at (newIndex))))
         {
           // remove this old row
-          beginRemoveRows (QModelIndex (), old_index, old_index);
-          myRows.remove (old_index);
+          beginRemoveRows (QModelIndex (), oldIndex, oldIndex);
+          myRows.remove (oldIndex);
           endRemoveRows ();
-        }
-      else if (comp (myRows.at(old_index), trackers.at(new_index)))
-        {
-          // remove this old row
-          beginRemoveRows (QModelIndex (), old_index, old_index);
-          myRows.remove (old_index);
-          endRemoveRows ();
-        }
-      else if (comp (trackers.at(new_index), myRows.at(old_index)))
-        {
-          // add this new row
-          beginInsertRows (QModelIndex (), old_index, old_index);
-          myRows.insert (old_index, trackers.at (new_index));
-          endInsertRows ();
-          ++old_index;
-          ++new_index;
         }
       else // update existing row
         {
-          myRows[old_index].st = trackers.at(new_index).st;
-          QModelIndex topLeft;
-          QModelIndex bottomRight;
-          dataChanged (index(old_index,0), index(old_index,0));
-          ++old_index;
-          ++new_index;
+          myRows[oldIndex].st = trackers.at (newIndex).st;
+          emit dataChanged (index (oldIndex, 0), index (oldIndex, 0));
+          ++oldIndex;
+          ++newIndex;
         }
     }
 }

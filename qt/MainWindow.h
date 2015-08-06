@@ -104,10 +104,6 @@ class MainWindow: public QMainWindow
 
   private slots:
     void openPreferences ();
-    void showTotalRatio ();
-    void showTotalTransfer ();
-    void showSessionRatio ();
-    void showSessionTransfer ();
     void refreshTitle ();
     void refreshStatusBar ();
     void refreshTrayIcon ();
@@ -138,17 +134,10 @@ class MainWindow: public QMainWindow
     void onSessionSourceChanged ();
     void onModelReset ();
 
-    void setSortPref (int);
     void setSortAscendingPref (bool);
-    void onSortByActivityToggled (bool);
-    void onSortByAgeToggled (bool);
-    void onSortByETAToggled (bool);
-    void onSortByNameToggled (bool);
-    void onSortByProgressToggled (bool);
-    void onSortByQueueToggled (bool);
-    void onSortByRatioToggled (bool);
-    void onSortBySizeToggled (bool);
-    void onSortByStateToggled (bool);
+
+    void onStatsModeChanged (QAction * action);
+    void onSortModeChanged (QAction * action);
 
   private:
     Session& mySession;

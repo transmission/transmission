@@ -43,6 +43,17 @@
 #include "TorrentModel.h"
 #include "Utils.h"
 
+#define PREF_VARIANTS_KEY "pref-variants-list"
+#define STATS_MODE_KEY "stats-mode"
+#define SORT_MODE_KEY "sort-mode"
+
+namespace
+{
+  const QLatin1String TotalRatioStatsModeName ("total-ratio");
+  const QLatin1String TotalTransferStatsModeName ("total-transfer");
+  const QLatin1String SessionRatioStatsModeName ("session-ratio");
+  const QLatin1String SessionTransferStatsModeName ("session-transfer");
+}
 
 /**
  * This is a proxy-style for that forces it to be always disabled.
@@ -63,7 +74,6 @@ class ListViewProxyStyle: public QProxyStyle
       return QProxyStyle::styleHint (hint, option, widget, returnData);
     }
 };
-
 
 QIcon
 MainWindow::getStockIcon (const QString& name, int fallback)
@@ -140,15 +150,6 @@ MainWindow::MainWindow (Session& session, Prefs& prefs, TorrentModel& model, boo
   connect (ui.action_Filterbar, SIGNAL (toggled (bool)), this, SLOT (setFilterbarVisible (bool)));
   connect (ui.action_Statusbar, SIGNAL (toggled (bool)), this, SLOT (setStatusbarVisible (bool)));
   connect (ui.action_CompactView, SIGNAL (toggled (bool)), this, SLOT (setCompactView (bool)));
-  connect (ui.action_SortByActivity, SIGNAL (toggled (bool)), this, SLOT (onSortByActivityToggled (bool)));
-  connect (ui.action_SortByAge,      SIGNAL (toggled (bool)), this, SLOT (onSortByAgeToggled (bool)));
-  connect (ui.action_SortByETA,      SIGNAL (toggled (bool)), this, SLOT (onSortByETAToggled (bool)));
-  connect (ui.action_SortByName,     SIGNAL (toggled (bool)), this, SLOT (onSortByNameToggled (bool)));
-  connect (ui.action_SortByProgress, SIGNAL (toggled (bool)), this, SLOT (onSortByProgressToggled (bool)));
-  connect (ui.action_SortByQueue,    SIGNAL (toggled (bool)), this, SLOT (onSortByQueueToggled (bool)));
-  connect (ui.action_SortByRatio,    SIGNAL (toggled (bool)), this, SLOT (onSortByRatioToggled (bool)));
-  connect (ui.action_SortBySize,     SIGNAL (toggled (bool)), this, SLOT (onSortBySizeToggled (bool)));
-  connect (ui.action_SortByState,    SIGNAL (toggled (bool)), this, SLOT (onSortByStateToggled (bool)));
   connect (ui.action_ReverseSortOrder, SIGNAL (toggled (bool)), this, SLOT (setSortAscendingPref (bool)));
   connect (ui.action_Start, SIGNAL (triggered ()), this, SLOT (startSelected ()));
   connect (ui.action_QueueMoveTop,    SIGNAL (triggered ()), this, SLOT (queueMoveTop ()));
@@ -198,16 +199,28 @@ MainWindow::MainWindow (Session& session, Prefs& prefs, TorrentModel& model, boo
   ui.listView->setModel (&myFilterModel);
   connect (ui.listView->selectionModel (), SIGNAL (selectionChanged (QItemSelection, QItemSelection)), this, SLOT (refreshActionSensitivitySoon ()));
 
+  const QPair<QAction *, int> sortModes[] =
+    {
+      qMakePair (ui.action_SortByActivity, static_cast<int> (SortMode::SORT_BY_ACTIVITY)),
+      qMakePair (ui.action_SortByAge, static_cast<int> (SortMode::SORT_BY_AGE)),
+      qMakePair (ui.action_SortByETA, static_cast<int> (SortMode::SORT_BY_ETA)),
+      qMakePair (ui.action_SortByName, static_cast<int> (SortMode::SORT_BY_NAME)),
+      qMakePair (ui.action_SortByProgress, static_cast<int> (SortMode::SORT_BY_PROGRESS)),
+      qMakePair (ui.action_SortByQueue, static_cast<int> (SortMode::SORT_BY_QUEUE)),
+      qMakePair (ui.action_SortByRatio, static_cast<int> (SortMode::SORT_BY_RATIO)),
+      qMakePair (ui.action_SortBySize, static_cast<int> (SortMode::SORT_BY_SIZE)),
+      qMakePair (ui.action_SortByState, static_cast<int> (SortMode::SORT_BY_STATE))
+    };
+
   QActionGroup * actionGroup = new QActionGroup (this);
-  actionGroup->addAction (ui.action_SortByActivity);
-  actionGroup->addAction (ui.action_SortByAge);
-  actionGroup->addAction (ui.action_SortByETA);
-  actionGroup->addAction (ui.action_SortByName);
-  actionGroup->addAction (ui.action_SortByProgress);
-  actionGroup->addAction (ui.action_SortByQueue);
-  actionGroup->addAction (ui.action_SortByRatio);
-  actionGroup->addAction (ui.action_SortBySize);
-  actionGroup->addAction (ui.action_SortByState);
+
+  for (const auto& mode: sortModes)
+    {
+      mode.first->setProperty (SORT_MODE_KEY, mode.second);
+      actionGroup->addAction (mode.first);
+    }
+
+  connect (actionGroup, SIGNAL (triggered (QAction *)), this, SLOT (onSortModeChanged (QAction *)));
 
   myAltSpeedAction = new QAction (tr ("Speed Limits"), this);
   myAltSpeedAction->setIcon (ui.altSpeedButton->icon ());
@@ -316,8 +329,6 @@ MainWindow::onModelReset ()
 *****
 ****/
 
-#define PREF_VARIANTS_KEY "pref-variants-list"
-
 void
 MainWindow::onSetPrefs ()
 {
@@ -351,83 +362,77 @@ MainWindow::initStatusBar ()
 QMenu *
 MainWindow::createOptionsMenu ()
 {
-  QMenu * menu;
-  QMenu * sub;
-  QAction * a;
-  QActionGroup * g;
+  const auto initSpeedSubMenu = [this] (QMenu * menu, QAction *& offAction, QAction *& onAction,
+                                        int pref, int enabledPref)
+  {
+    const int stockSpeeds[] = {5, 10, 20, 30, 40, 50, 75, 100, 150, 200, 250, 500, 750};
+    const int currentValue = myPrefs.get<int> (pref);
 
-  QList<int> stockSpeeds;
-  stockSpeeds << 5 << 10 << 20 << 30 << 40 << 50 << 75 << 100 << 150 << 200 << 250 << 500 << 750;
-  QList<double> stockRatios;
-  stockRatios << 0.25 << 0.50 << 0.75 << 1 << 1.5 << 2 << 3;
+    QActionGroup * actionGroup = new QActionGroup (this);
 
-  menu = new QMenu (this);
-  sub = menu->addMenu (tr ("Limit Download Speed"));
+    offAction = menu->addAction (tr ("Unlimited"));
+    offAction->setCheckable (true);
+    offAction->setProperty (PREF_VARIANTS_KEY, QVariantList () << enabledPref << false);
+    actionGroup->addAction (offAction);
+    connect (offAction, SIGNAL (triggered (bool)), this, SLOT (onSetPrefs (bool)));
 
-    int currentVal = myPrefs.get<int> (Prefs::DSPEED);
-    g = new QActionGroup (this);
-    a = myDlimitOffAction = sub->addAction (tr ("Unlimited"));
-    a->setCheckable (true);
-    a->setProperty (PREF_VARIANTS_KEY, QVariantList () << Prefs::DSPEED_ENABLED << false);
-    g->addAction (a);
-    connect (a, SIGNAL (triggered (bool)), this, SLOT (onSetPrefs (bool)));
-    a = myDlimitOnAction = sub->addAction (tr ("Limited at %1").arg (Formatter::speedToString (Speed::fromKBps (currentVal))));
-    a->setCheckable (true);
-    a->setProperty (PREF_VARIANTS_KEY, QVariantList () << Prefs::DSPEED << currentVal << Prefs::DSPEED_ENABLED << true);
-    g->addAction (a);
-    connect (a, SIGNAL (triggered (bool)), this, SLOT (onSetPrefs (bool)));
-    sub->addSeparator ();
+    onAction = menu->addAction (tr ("Limited at %1").arg (Formatter::speedToString (Speed::fromKBps (currentValue))));
+    onAction->setCheckable (true);
+    onAction->setProperty (PREF_VARIANTS_KEY, QVariantList () << pref << currentValue << enabledPref << true);
+    actionGroup->addAction (onAction);
+    connect (onAction, SIGNAL (triggered (bool)), this, SLOT (onSetPrefs (bool)));
+
+    menu->addSeparator ();
+
     for (const int i: stockSpeeds)
       {
-        a = sub->addAction (Formatter::speedToString (Speed::fromKBps (i)));
-        a->setProperty (PREF_VARIANTS_KEY, QVariantList () << Prefs::DSPEED << i << Prefs::DSPEED_ENABLED << true);
-        connect (a, SIGNAL (triggered (bool)), this, SLOT (onSetPrefs ()));
+        QAction * action = menu->addAction (Formatter::speedToString (Speed::fromKBps (i)));
+        action->setProperty (PREF_VARIANTS_KEY, QVariantList () << pref << i << enabledPref << true);
+        connect (action, SIGNAL (triggered (bool)), this, SLOT (onSetPrefs ()));
       }
+  };
 
-  sub = menu->addMenu (tr ("Limit Upload Speed"));
+  const auto initSeedRatioSubMenu = [this] (QMenu * menu, QAction *& offAction, QAction *& onAction,
+                                            int pref, int enabledPref)
+  {
+    const double stockRatios[] = {0.25, 0.50, 0.75, 1, 1.5, 2, 3};
+    const double currentValue = myPrefs.get<double> (pref);
 
-    currentVal = myPrefs.get<int> (Prefs::USPEED);
-    g = new QActionGroup (this);
-    a = myUlimitOffAction = sub->addAction (tr ("Unlimited"));
-    a->setCheckable (true);
-    a->setProperty (PREF_VARIANTS_KEY, QVariantList () << Prefs::USPEED_ENABLED << false);
-    g->addAction (a);
-    connect (a, SIGNAL (triggered (bool)), this, SLOT (onSetPrefs (bool)));
-    a = myUlimitOnAction = sub->addAction (tr ("Limited at %1").arg (Formatter::speedToString (Speed::fromKBps (currentVal))));
-    a->setCheckable (true);
-    a->setProperty (PREF_VARIANTS_KEY, QVariantList () << Prefs::USPEED << currentVal << Prefs::USPEED_ENABLED << true);
-    g->addAction (a);
-    connect (a, SIGNAL (triggered (bool)), this, SLOT (onSetPrefs (bool)));
-    sub->addSeparator ();
-    for (const int i: stockSpeeds)
-      {
-        a = sub->addAction (Formatter::speedToString (Speed::fromKBps (i)));
-        a->setProperty (PREF_VARIANTS_KEY, QVariantList () << Prefs::USPEED << i << Prefs::USPEED_ENABLED << true);
-        connect (a, SIGNAL (triggered (bool)), this, SLOT (onSetPrefs ()));
-      }
+    QActionGroup * actionGroup = new QActionGroup (this);
 
-  menu->addSeparator ();
-  sub = menu->addMenu (tr ("Stop Seeding at Ratio"));
+    offAction = menu->addAction (tr ("Seed Forever"));
+    offAction->setCheckable (true);
+    offAction->setProperty (PREF_VARIANTS_KEY, QVariantList () << enabledPref << false);
+    actionGroup->addAction (offAction);
+    connect (offAction, SIGNAL (triggered (bool)), this, SLOT (onSetPrefs (bool)));
 
-    double d = myPrefs.get<double> (Prefs::RATIO);
-    g = new QActionGroup (this);
-    a = myRatioOffAction = sub->addAction (tr ("Seed Forever"));
-    a->setCheckable (true);
-    a->setProperty (PREF_VARIANTS_KEY, QVariantList () << Prefs::RATIO_ENABLED << false);
-    g->addAction (a);
-    connect (a, SIGNAL (triggered (bool)), this, SLOT (onSetPrefs (bool)));
-    a = myRatioOnAction = sub->addAction (tr ("Stop at Ratio (%1)").arg (Formatter::ratioToString (d)));
-    a->setCheckable (true);
-    a->setProperty (PREF_VARIANTS_KEY, QVariantList () << Prefs::RATIO << d << Prefs::RATIO_ENABLED << true);
-    g->addAction (a);
-    connect (a, SIGNAL (triggered (bool)), this, SLOT (onSetPrefs (bool)));
-    sub->addSeparator ();
+    onAction = menu->addAction (tr ("Stop at Ratio (%1)").arg (Formatter::ratioToString (currentValue)));
+    onAction->setCheckable (true);
+    onAction->setProperty (PREF_VARIANTS_KEY, QVariantList () << pref << currentValue << enabledPref << true);
+    actionGroup->addAction (onAction);
+    connect (onAction, SIGNAL (triggered (bool)), this, SLOT (onSetPrefs (bool)));
+
+    menu->addSeparator ();
+
     for (const double i: stockRatios)
       {
-        a = sub->addAction (Formatter::ratioToString (i));
-        a->setProperty (PREF_VARIANTS_KEY, QVariantList () << Prefs::RATIO << i << Prefs::RATIO_ENABLED << true);
-        connect (a, SIGNAL (triggered (bool)), this, SLOT (onSetPrefs ()));
+        QAction * action = menu->addAction (Formatter::ratioToString (i));
+        action->setProperty (PREF_VARIANTS_KEY, QVariantList () << pref << i << enabledPref << true);
+        connect (action, SIGNAL (triggered (bool)), this, SLOT (onSetPrefs ()));
       }
+  };
+
+  QMenu * menu = new QMenu (this);
+
+  initSpeedSubMenu (menu->addMenu (tr ("Limit Download Speed")), myDlimitOffAction, myDlimitOnAction,
+                    Prefs::DSPEED, Prefs::DSPEED_ENABLED);
+  initSpeedSubMenu (menu->addMenu (tr ("Limit Upload Speed")), myUlimitOffAction, myUlimitOnAction,
+                    Prefs::USPEED, Prefs::USPEED_ENABLED);
+
+  menu->addSeparator ();
+
+  initSeedRatioSubMenu (menu->addMenu (tr ("Stop Seeding at Ratio")), myRatioOffAction, myRatioOnAction,
+                        Prefs::RATIO, Prefs::RATIO_ENABLED);
 
   return menu;
 }
@@ -435,24 +440,27 @@ MainWindow::createOptionsMenu ()
 QMenu *
 MainWindow::createStatsModeMenu ()
 {
-  QActionGroup * a = new QActionGroup (this);
-  a->addAction (ui.action_TotalRatio);
-  a->addAction (ui.action_TotalTransfer);
-  a->addAction (ui.action_SessionRatio);
-  a->addAction (ui.action_SessionTransfer);
+  const QPair<QAction *, QLatin1String> statsModes[] =
+    {
+      qMakePair (ui.action_TotalRatio, TotalRatioStatsModeName),
+      qMakePair (ui.action_TotalTransfer, TotalTransferStatsModeName),
+      qMakePair (ui.action_SessionRatio, SessionRatioStatsModeName),
+      qMakePair (ui.action_SessionTransfer, SessionTransferStatsModeName)
+    };
 
-  QMenu * m = new QMenu (this);
-  m->addAction (ui.action_TotalRatio);
-  m->addAction (ui.action_TotalTransfer);
-  m->addAction (ui.action_SessionRatio);
-  m->addAction (ui.action_SessionTransfer);
+  QActionGroup * actionGroup = new QActionGroup (this);
+  QMenu * menu = new QMenu (this);
 
-  connect (ui.action_TotalRatio, SIGNAL (triggered ()), this, SLOT (showTotalRatio ()));
-  connect (ui.action_TotalTransfer, SIGNAL (triggered ()), this, SLOT (showTotalTransfer ()));
-  connect (ui.action_SessionRatio, SIGNAL (triggered ()), this, SLOT (showSessionRatio ()));
-  connect (ui.action_SessionTransfer, SIGNAL (triggered ()), this, SLOT (showSessionTransfer ()));
+  for (const auto& mode: statsModes)
+    {
+      mode.first->setProperty (STATS_MODE_KEY, QString (mode.second));
+      actionGroup->addAction (mode.first);
+      menu->addAction (mode.first);
+    }
 
-  return m;
+  connect (actionGroup, SIGNAL (triggered (QAction *)), this, SLOT (onStatsModeChanged (QAction *)));
+
+  return menu;
 }
 
 /****
@@ -460,19 +468,10 @@ MainWindow::createStatsModeMenu ()
 ****/
 
 void
-MainWindow::setSortPref (int i)
+MainWindow::onSortModeChanged (QAction * action)
 {
-  myPrefs.set (Prefs::SORT_MODE, SortMode (i));
+  myPrefs.set (Prefs::SORT_MODE, SortMode (action->property (SORT_MODE_KEY).toInt ()));
 }
-void MainWindow::onSortByActivityToggled (bool b) { if (b) setSortPref (SortMode::SORT_BY_ACTIVITY); }
-void MainWindow::onSortByAgeToggled (bool b) { if (b) setSortPref (SortMode::SORT_BY_AGE); }
-void MainWindow::onSortByETAToggled (bool b) { if (b) setSortPref (SortMode::SORT_BY_ETA); }
-void MainWindow::onSortByNameToggled (bool b) { if (b) setSortPref (SortMode::SORT_BY_NAME); }
-void MainWindow::onSortByProgressToggled (bool b) { if (b) setSortPref (SortMode::SORT_BY_PROGRESS); }
-void MainWindow::onSortByQueueToggled (bool b) { if (b) setSortPref (SortMode::SORT_BY_QUEUE); }
-void MainWindow::onSortByRatioToggled (bool b) { if (b) setSortPref (SortMode::SORT_BY_RATIO); }
-void MainWindow::onSortBySizeToggled (bool b) { if (b) setSortPref (SortMode::SORT_BY_SIZE); }
-void MainWindow::onSortByStateToggled (bool b) { if (b) setSortPref (SortMode::SORT_BY_STATE); }
 
 void
 MainWindow::setSortAscendingPref (bool b)
@@ -691,17 +690,17 @@ MainWindow::refreshStatusBar ()
   const QString mode (myPrefs.getString (Prefs::STATUSBAR_STATS));
   QString str;
 
-  if (mode == QLatin1String ("session-ratio"))
+  if (mode == SessionRatioStatsModeName)
     {
       str = tr ("Ratio: %1").arg (Formatter::ratioToString (mySession.getStats ().ratio));
     }
-  else if (mode == QLatin1String ("session-transfer"))
+  else if (mode == SessionTransferStatsModeName)
     {
       const tr_session_stats& stats (mySession.getStats ());
       str = tr ("Down: %1, Up: %2").arg (Formatter::sizeToString (stats.downloadedBytes))
                                       .arg (Formatter::sizeToString (stats.uploadedBytes));
     }
-  else if (mode == QLatin1String ("total-transfer"))
+  else if (mode == TotalTransferStatsModeName)
     {
       const tr_session_stats& stats (mySession.getCumulativeStats ());
       str = tr ("Down: %1, Up: %2").arg (Formatter::sizeToString (stats.downloadedBytes))
@@ -709,6 +708,7 @@ MainWindow::refreshStatusBar ()
     }
   else // default is "total-ratio"
     {
+      assert (mode == TotalRatioStatsModeName);
       str = tr ("Ratio: %1").arg (Formatter::ratioToString (mySession.getCumulativeStats ().ratio));
     }
 
@@ -882,10 +882,11 @@ MainWindow::reannounceSelected ()
 ***
 **/
 
-void MainWindow::showTotalRatio () { myPrefs.set (Prefs::STATUSBAR_STATS, QString::fromLatin1 ("total-ratio")); }
-void MainWindow::showTotalTransfer () { myPrefs.set (Prefs::STATUSBAR_STATS, QString::fromLatin1 ("total-transfer")); }
-void MainWindow::showSessionRatio () { myPrefs.set (Prefs::STATUSBAR_STATS, QString::fromLatin1 ("session-ratio")); }
-void MainWindow::showSessionTransfer () { myPrefs.set (Prefs::STATUSBAR_STATS, QString::fromLatin1 ("session-transfer")); }
+void
+MainWindow::onStatsModeChanged (QAction * action)
+{
+  myPrefs.set (Prefs::STATUSBAR_STATS, action->property (STATS_MODE_KEY).toString ());
+}
 
 /**
 ***
@@ -960,15 +961,16 @@ MainWindow::refreshPref (int key)
   bool b;
   int i;
   QString str;
+  QActionGroup * actionGroup;
 
   switch (key)
     {
       case Prefs::STATUSBAR_STATS:
         str = myPrefs.getString (key);
-        ui.action_TotalRatio->setChecked (str == QLatin1String ("total-ratio"));
-        ui.action_TotalTransfer->setChecked (str == QLatin1String ("total-transfer"));
-        ui.action_SessionRatio->setChecked (str == QLatin1String ("session-ratio"));
-        ui.action_SessionTransfer->setChecked (str == QLatin1String ("session-transfer"));
+        actionGroup = ui.action_TotalRatio->actionGroup ();
+        assert (actionGroup != nullptr);
+        for (QAction * action: actionGroup->actions ())
+          action->setChecked (str == action->property (STATS_MODE_KEY).toString ());
         refreshStatusBar ();
         break;
 
@@ -978,15 +980,10 @@ MainWindow::refreshPref (int key)
 
       case Prefs::SORT_MODE:
         i = myPrefs.get<SortMode> (key).mode ();
-        ui.action_SortByActivity->setChecked (i == SortMode::SORT_BY_ACTIVITY);
-        ui.action_SortByAge->setChecked (i == SortMode::SORT_BY_AGE);
-        ui.action_SortByETA->setChecked (i == SortMode::SORT_BY_ETA);
-        ui.action_SortByName->setChecked (i == SortMode::SORT_BY_NAME);
-        ui.action_SortByProgress->setChecked (i == SortMode::SORT_BY_PROGRESS);
-        ui.action_SortByQueue->setChecked (i == SortMode::SORT_BY_QUEUE);
-        ui.action_SortByRatio->setChecked (i == SortMode::SORT_BY_RATIO);
-        ui.action_SortBySize->setChecked (i == SortMode::SORT_BY_SIZE);
-        ui.action_SortByState->setChecked (i == SortMode::SORT_BY_STATE);
+        actionGroup = ui.action_SortByActivity->actionGroup ();
+        assert (actionGroup != nullptr);
+        for (QAction * action: actionGroup->actions ())
+          action->setChecked (i == action->property (SORT_MODE_KEY).toInt ());
         break;
 
       case Prefs::DSPEED_ENABLED:
