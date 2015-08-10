@@ -55,6 +55,14 @@ class FileTreeModel: public QAbstractItemModel
                   uint64_t size, uint64_t have,
                   bool torrentChanged);
 
+    bool openFile (const QModelIndex& index);
+
+    void twiddleWanted (const QModelIndexList& indices);
+    void twiddlePriority (const QModelIndexList& indices);
+
+    void setWanted (const QModelIndexList& indices, bool wanted);
+    void setPriority (const QModelIndexList& indices, int priority);
+
     QModelIndex parent (const QModelIndex& child, int column) const;
 
     // QAbstractItemModel
@@ -67,10 +75,6 @@ class FileTreeModel: public QAbstractItemModel
     virtual int columnCount (const QModelIndex& parent = QModelIndex ()) const;
     virtual bool setData (const QModelIndex& index, const QVariant& value, int role = Qt::EditRole);
 
-  public slots:
-    void clicked (const QModelIndex& index);
-    void doubleClicked (const QModelIndex& index);
-
   signals:
     void priorityChanged (const QSet<int>& fileIndices, int);
     void wantedChanged (const QSet<int>& fileIndices, bool);
@@ -80,10 +84,11 @@ class FileTreeModel: public QAbstractItemModel
   private:
     void clearSubtree (const QModelIndex&);
     QModelIndex indexOf (FileTreeItem *, int column) const;
-    void parentsChanged (const QModelIndex&, int firstColumn, int lastColumn);
-    void subtreeChanged (const QModelIndex&, int firstColumn, int lastColumn);
+    void emitParentsChanged (const QModelIndex&, int firstColumn, int lastColumn, QSet<QModelIndex> * visitedParentIndices = nullptr);
+    void emitSubtreeChanged (const QModelIndex&, int firstColumn, int lastColumn);
     FileTreeItem * findItemForFileIndex (int fileIndex) const;
     FileTreeItem * itemFromIndex (const QModelIndex&) const;
+    QModelIndexList getOrphanIndices (const QModelIndexList& indices) const;
 
   private:
     bool myIsEditable;

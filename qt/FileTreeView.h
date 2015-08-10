@@ -15,6 +15,8 @@
 
 #include "Torrent.h" // FileList
 
+class QAction;
+class QMenu;
 class QSortFilterProxyModel;
 
 class FileTreeDelegate;
@@ -32,11 +34,6 @@ class FileTreeView: public QTreeView
 
     void setEditable (bool editable);
 
-  public slots:
-    void onClicked (const QModelIndex& index);
-    void onDoubleClicked (const QModelIndex& index);
-    void onOpenRequested (const QString& path);
-
   signals:
     void priorityChanged (const QSet<int>& fileIndices, int priority);
     void wantedChanged (const QSet<int>& fileIndices, bool wanted);
@@ -47,11 +44,43 @@ class FileTreeView: public QTreeView
     // QWidget
     virtual void resizeEvent (QResizeEvent * event);
     virtual void keyPressEvent (QKeyEvent * event);
+    virtual void mouseDoubleClickEvent (QMouseEvent * event);
+    virtual void contextMenuEvent (QContextMenuEvent * event);
+
+    // QAbstractItemView
+    virtual bool edit (const QModelIndex& index, EditTrigger trigger, QEvent * event);
+
+  private slots:
+    void onClicked (const QModelIndex& index);
+
+    void checkSelectedItems ();
+    void uncheckSelectedItems ();
+    void onlyCheckSelectedItems ();
+    void setSelectedItemsPriority ();
+    bool openSelectedItem ();
+    void renameSelectedItem ();
+
+    void refreshContextMenuActionsSensitivity ();
+    QModelIndexList selectedSourceRows (int column = 0) const;
+
+  private:
+    void initContextMenu ();
 
   private:
     FileTreeModel * myModel;
     QSortFilterProxyModel * myProxy;
     FileTreeDelegate * myDelegate;
+
+    QMenu * myContextMenu = nullptr;
+    QMenu * myPriorityMenu = nullptr;
+    QAction * myCheckSelectedAction = nullptr;
+    QAction * myUncheckSelectedAction = nullptr;
+    QAction * myOnlyCheckSelectedAction = nullptr;
+    QAction * myHighPriorityAction = nullptr;
+    QAction * myNormalPriorityAction = nullptr;
+    QAction * myLowPriorityAction = nullptr;
+    QAction * myOpenAction = nullptr;
+    QAction * myRenameAction = nullptr;
 };
 
 #endif // QTR_FILE_TREE_VIEW_H

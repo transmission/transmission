@@ -304,21 +304,6 @@ FileTreeItem::setSubtreePriority (int i, QSet<int>& ids)
     child->setSubtreePriority (i, ids);
 }
 
-void
-FileTreeItem::twiddlePriority (QSet<int>& ids, int& p)
-{
-  const int old(priority());
-
-  if (old & LOW)
-    p = TR_PRI_NORMAL;
-  else if (old & NORMAL)
-    p = TR_PRI_HIGH;
-  else
-    p = TR_PRI_LOW;
-
-  setSubtreePriority (p, ids);
-}
-
 int
 FileTreeItem::isSubtreeWanted () const
 {
@@ -356,13 +341,6 @@ FileTreeItem::setSubtreeWanted (bool b, QSet<int>& ids)
 
   for (FileTreeItem * const child: myChildren)
     child->setSubtreeWanted (b, ids);
-}
-
-void
-FileTreeItem::twiddleWanted (QSet<int>& ids, bool& wanted)
-{
-  wanted = isSubtreeWanted() != Qt::Checked;
-  setSubtreeWanted (wanted, ids);
 }
 
 QString

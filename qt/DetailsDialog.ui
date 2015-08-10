@@ -585,6 +585,9 @@
          <property name="horizontalScrollBarPolicy">
           <enum>Qt::ScrollBarAlwaysOff</enum>
          </property>
+         <property name="editTriggers">
+          <set>QAbstractItemView::EditKeyPressed</set>
+         </property>
          <property name="alternatingRowColors">
           <bool>true</bool>
          </property>
@@ -593,6 +596,9 @@
          </property>
          <property name="verticalScrollMode">
           <enum>QAbstractItemView::ScrollPerPixel</enum>
+         </property>
+         <property name="uniformRowHeights">
+          <bool>true</bool>
          </property>
          <property name="sortingEnabled">
           <bool>true</bool>

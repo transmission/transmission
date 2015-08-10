@@ -9,6 +9,8 @@
 
 #include <cassert>
 
+#include <libtransmission/transmission.h> // priorities
+
 #include "FileTreeItem.h"
 #include "FileTreeModel.h"
 
@@ -108,7 +110,39 @@ FileTreeModel::setEditable (bool editable)
 FileTreeItem *
 FileTreeModel::itemFromIndex (const QModelIndex& index) const
 {
+  if (!index.isValid())
+    return nullptr;
+
+  assert (index.model () == this);
   return static_cast<FileTreeItem*>(index.internalPointer());
+}
+
+QModelIndexList
+FileTreeModel::getOrphanIndices (const QModelIndexList& indices) const
+{
+  QModelIndexList orphanIndices = indices;
+
+  qSort (orphanIndices);
+
+  for (QMutableListIterator<QModelIndex> it (orphanIndices); it.hasNext ();)
+    {
+      QModelIndex walk = it.next ();
+
+      for (;;)
+        {
+          walk = parent (walk, walk.column ());
+          if (!walk.isValid ())
+            break;
+
+          if (qBinaryFind (orphanIndices, walk) != orphanIndices.end ())
+            {
+              it.remove ();
+              break;
+            }
+        }
+    }
+
+  return orphanIndices;
 }
 
 QVariant
@@ -313,7 +347,7 @@ FileTreeModel::addFile (int            fileIndex,
           const std::pair<int,int> changed = item->update (token, wanted, priority, have, updateFields);
           if (changed.first >= 0)
             {
-              dataChanged (indexOf (item, changed.first), indexOf (item, changed.second));
+              emit dataChanged (indexOf (item, changed.first), indexOf (item, changed.second));
               if (!indexWithChangedParents.isValid () &&
                   changed.first <= COL_PRIORITY && changed.second >= COL_SIZE)
                 indexWithChangedParents = indexOf (item, 0);
@@ -322,7 +356,7 @@ FileTreeModel::addFile (int            fileIndex,
         }
       assert (item == myRootItem);
       if (indexWithChangedParents.isValid ())
-        parentsChanged (indexWithChangedParents, COL_SIZE, COL_PRIORITY);
+        emitParentsChanged (indexWithChangedParents, COL_SIZE, COL_PRIORITY);
     }
   else // we haven't build the FileTreeItems for these tokens yet
     {
@@ -360,13 +394,13 @@ FileTreeModel::addFile (int            fileIndex,
 
           const std::pair<int,int> changed = item->update (item->name(), wanted, priority, have, added || updateFields);
           if (changed.first >= 0)
-            dataChanged (indexOf (item, changed.first), indexOf (item, changed.second));
+            emit dataChanged (indexOf (item, changed.first), indexOf (item, changed.second));
         }
     }
 }
 
 void
-FileTreeModel::parentsChanged (const QModelIndex& index, int firstColumn, int lastColumn)
+FileTreeModel::emitParentsChanged (const QModelIndex& index, int firstColumn, int lastColumn, QSet<QModelIndex> * visitedParentIndices)
 {
   assert (firstColumn <= lastColumn);
 
@@ -378,12 +412,19 @@ FileTreeModel::parentsChanged (const QModelIndex& index, int firstColumn, int la
       if (!walk.isValid ())
         break;
 
-      dataChanged (walk, walk.sibling (walk.row (), lastColumn));
+      if (visitedParentIndices != nullptr)
+        {
+          if (visitedParentIndices->contains (walk))
+            break;
+          visitedParentIndices->insert (walk);
+        }
+
+      emit dataChanged (walk, walk.sibling (walk.row (), lastColumn));
     }
 }
 
 void
-FileTreeModel::subtreeChanged (const QModelIndex& index, int firstColumn, int lastColumn)
+FileTreeModel::emitSubtreeChanged (const QModelIndex& index, int firstColumn, int lastColumn)
 {
   assert (firstColumn <= lastColumn);
 
@@ -391,64 +432,122 @@ FileTreeModel::subtreeChanged (const QModelIndex& index, int firstColumn, int la
   if (!childCount)
     return;
 
-  // tell everyone that this tier changed
-  dataChanged (index.child (0, firstColumn), index.child (childCount - 1, lastColumn));
+  // tell everyone that this item changed
+  emit dataChanged (index.child (0, firstColumn), index.child (childCount - 1, lastColumn));
 
-  // walk the subtiers
+  // walk the subitems
   for (int i=0; i<childCount; ++i)
-    subtreeChanged (index.child (i, 0), firstColumn, lastColumn);
+    emitSubtreeChanged (index.child (i, 0), firstColumn, lastColumn);
 }
 
 void
-FileTreeModel::clicked (const QModelIndex& index)
+FileTreeModel::twiddleWanted (const QModelIndexList& indices)
 {
-  const int column (index.column());
-
-  if (!index.isValid())
-    return;
-
-  if (column == COL_WANTED)
+  QMap<bool, QModelIndexList> wantedIndices;
+  for (const QModelIndex& i: getOrphanIndices (indices))
     {
-      bool want;
-      QSet<int> file_ids;
-      FileTreeItem * item;
-
-      item = itemFromIndex (index);
-      item->twiddleWanted (file_ids, want);
-      emit wantedChanged (file_ids, want);
-
-      dataChanged (index, index);
-      parentsChanged (index, COL_SIZE, COL_WANTED);
-      subtreeChanged (index, COL_WANTED, COL_WANTED);
+      const FileTreeItem * const item = itemFromIndex (i);
+      wantedIndices[item->isSubtreeWanted () != Qt::Checked] << i;
     }
-  else if (column == COL_PRIORITY)
+
+  for (int i = 0; i <= 1; ++i)
     {
-      int priority;
-      QSet<int> file_ids;
-      FileTreeItem * item;
-
-      item = itemFromIndex (index);
-      item->twiddlePriority (file_ids, priority);
-      emit priorityChanged (file_ids, priority);
-
-      dataChanged (index, index);
-      parentsChanged (index, column, column);
-      subtreeChanged (index, column, column);
+      if (wantedIndices.contains (i))
+        setWanted (wantedIndices[i], i != 0);
     }
 }
 
 void
-FileTreeModel::doubleClicked (const QModelIndex& index)
+FileTreeModel::twiddlePriority (const QModelIndexList& indices)
 {
-  if (!index.isValid())
+  QMap<int, QModelIndexList> priorityIndices;
+  for (const QModelIndex& i: getOrphanIndices (indices))
+    {
+      const FileTreeItem * const item = itemFromIndex (i);
+      int priority = item->priority ();
+
+      // ... -> normal -> high -> low -> normal -> ...; mixed -> normal
+      if (priority == FileTreeItem::NORMAL)
+        priority = TR_PRI_HIGH;
+      else if (priority == FileTreeItem::HIGH)
+        priority = TR_PRI_LOW;
+      else
+        priority = TR_PRI_NORMAL;
+
+      priorityIndices[priority] << i;
+    }
+
+  for (int i = TR_PRI_LOW; i <= TR_PRI_HIGH; ++i)
+    {
+      if (priorityIndices.contains (i))
+        setPriority (priorityIndices[i], i);
+    }
+}
+
+void
+FileTreeModel::setWanted (const QModelIndexList& indices, bool wanted)
+{
+  if (indices.isEmpty ())
     return;
 
-  const int column (index.column());
-  if (column == COL_WANTED || column == COL_PRIORITY)
+  const QModelIndexList orphanIndices = getOrphanIndices (indices);
+
+  QSet<int> fileIds;
+  for (const QModelIndex& i: orphanIndices)
+    {
+      FileTreeItem * const item = itemFromIndex (i);
+      item->setSubtreeWanted (wanted, fileIds);
+
+      emit dataChanged (i, i);
+      emitSubtreeChanged (i, COL_WANTED, COL_WANTED);
+    }
+
+  // emit parent changes separately to avoid multiple updates for same items
+  QSet<QModelIndex> parentIndices;
+  for (const QModelIndex& i: orphanIndices)
+    emitParentsChanged (i, COL_SIZE, COL_WANTED, &parentIndices);
+
+  if (!fileIds.isEmpty ())
+    emit wantedChanged (fileIds, wanted);
+}
+
+void
+FileTreeModel::setPriority (const QModelIndexList& indices, int priority)
+{
+  if (indices.isEmpty ())
     return;
 
-  FileTreeItem * item = itemFromIndex (index);
+  const QModelIndexList orphanIndices = getOrphanIndices (indices);
 
-  if (item->childCount () == 0 && item->isComplete ())
-    emit openRequested (item->path ());
+  QSet<int> fileIds;
+  for (const QModelIndex& i: orphanIndices)
+    {
+      FileTreeItem * const item = itemFromIndex (i);
+      item->setSubtreePriority (priority, fileIds);
+
+      emit dataChanged (i, i);
+      emitSubtreeChanged (i, COL_PRIORITY, COL_PRIORITY);
+    }
+
+  // emit parent changes separately to avoid multiple updates for same items
+  QSet<QModelIndex> parentIndices;
+  for (const QModelIndex& i: orphanIndices)
+    emitParentsChanged (i, COL_PRIORITY, COL_PRIORITY, &parentIndices);
+
+  if (!fileIds.isEmpty ())
+    emit priorityChanged (fileIds, priority);
+}
+
+bool
+FileTreeModel::openFile (const QModelIndex& index)
+{
+  if (!index.isValid ())
+    return false;
+
+  FileTreeItem * const item = itemFromIndex (index);
+  if (item->childCount () != 0 || !item->isComplete ())
+    return false;
+
+  emit openRequested (item->path ());
+  return true;
 }

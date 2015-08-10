@@ -8,10 +8,15 @@
  */
 
 #include <algorithm>
+#include <cassert>
 
 #include <QHeaderView>
+#include <QMenu>
+#include <QQueue>
 #include <QResizeEvent>
 #include <QSortFilterProxyModel>
+
+#include <libtransmission/transmission.h> // priorities
 
 #include "FileTreeDelegate.h"
 #include "FileTreeItem.h"
@@ -19,6 +24,8 @@
 #include "FileTreeView.h"
 #include "Formatter.h"
 #include "Utils.h"
+
+#define PRIORITY_KEY "priority"
 
 FileTreeView::FileTreeView (QWidget * parent, bool isEditable):
   QTreeView (parent),
@@ -40,9 +47,6 @@ FileTreeView::FileTreeView (QWidget * parent, bool isEditable):
   connect (this, SIGNAL(clicked(QModelIndex)),
            this, SLOT(onClicked(QModelIndex)));
 
-  connect (this, SIGNAL(doubleClicked(QModelIndex)),
-           this, SLOT(onDoubleClicked(QModelIndex)));
-
   connect (myModel, SIGNAL(priorityChanged(QSet<int>, int)),
            this,    SIGNAL(priorityChanged(QSet<int>, int)));
 
@@ -53,31 +57,17 @@ FileTreeView::FileTreeView (QWidget * parent, bool isEditable):
            this,    SIGNAL(pathEdited(QString, QString)));
 
   connect (myModel, SIGNAL (openRequested (QString)),
-           this,    SLOT (onOpenRequested (QString)),
-           Qt::QueuedConnection);
+           this,    SIGNAL (openRequested (QString)));
 }
 
 void
 FileTreeView::onClicked (const QModelIndex& proxyIndex)
 {
   const QModelIndex modelIndex = myProxy->mapToSource (proxyIndex);
-  myModel->clicked (modelIndex);
-}
-
-void
-FileTreeView::onDoubleClicked (const QModelIndex& proxyIndex)
-{
-  const QModelIndex modelIndex = myProxy->mapToSource (proxyIndex);
-  myModel->doubleClicked (modelIndex);
-}
-
-void
-FileTreeView::onOpenRequested (const QString& path)
-{
-  if (state () == EditingState)
-    return;
-
-  emit openRequested (path);
+  if (modelIndex.column () == FileTreeModel::COL_WANTED)
+    myModel->twiddleWanted (QModelIndexList () << modelIndex);
+  else if (modelIndex.column () == FileTreeModel::COL_PRIORITY)
+    myModel->twiddlePriority (QModelIndexList () << modelIndex);
 }
 
 void
@@ -141,29 +131,55 @@ FileTreeView::resizeEvent (QResizeEvent * event)
 void
 FileTreeView::keyPressEvent (QKeyEvent * event)
 {
+  if (state () != EditingState)
+    {
+      if (event->key () == Qt::Key_Space)
+        {
+          // handle using the keyboard to toggle the
+          // wanted/unwanted state or the file priority
+
+          const Qt::KeyboardModifiers modifiers = event->modifiers ();
+
+          if (modifiers == Qt::NoModifier)
+            {
+              myModel->twiddleWanted (selectedSourceRows ());
+              return;
+            }
+
+          if (modifiers == Qt::ShiftModifier)
+            {
+              myModel->twiddlePriority (selectedSourceRows ());
+              return;
+            }
+        }
+    }
+
   QTreeView::keyPressEvent (event);
+}
 
-  // handle using the keyboard to toggle the
-  // wanted/unwanted state or the file priority
-
-  if (state () == EditingState)
+void
+FileTreeView::mouseDoubleClickEvent (QMouseEvent * event)
+{
+  const QModelIndex index = currentIndex ();
+  if (!index.isValid () || index.column () == FileTreeModel::COL_WANTED || index.column () == FileTreeModel::COL_PRIORITY)
     return;
 
-  if (event->key () == Qt::Key_Space)
-    {
-      int column;
+  if (openSelectedItem ())
+    return;
 
-      const Qt::KeyboardModifiers modifiers = event->modifiers ();
-      if (modifiers == Qt::NoModifier)
-        column = FileTreeModel::COL_WANTED;
-      else if (modifiers == Qt::ShiftModifier)
-        column = FileTreeModel::COL_PRIORITY;
-      else
-        return;
+  QTreeView::mouseDoubleClickEvent (event);
+}
 
-      for (const QModelIndex& i: selectionModel ()->selectedRows (column))
-        clicked (i);
-    }
+void
+FileTreeView::contextMenuEvent (QContextMenuEvent * event)
+{
+  const QModelIndex rootIndex = myModel->index (0, 0);
+  if (!rootIndex.isValid ())
+    return;
+
+  if (myContextMenu == nullptr)
+    initContextMenu ();
+  myContextMenu->popup (event->globalPos ());
 }
 
 void
@@ -212,4 +228,167 @@ void
 FileTreeView::setEditable (bool editable)
 {
   myModel->setEditable (editable);
+}
+
+bool
+FileTreeView::edit (const QModelIndex& index, EditTrigger trigger, QEvent * event)
+{
+  if (selectionModel ()->selectedRows ().size () != 1)
+    return false;
+
+  const QModelIndex nameIndex = index.sibling (index.row (), FileTreeModel::COL_NAME);
+  if (editTriggers ().testFlag (trigger))
+    selectionModel ()->setCurrentIndex (nameIndex, QItemSelectionModel::NoUpdate);
+
+  return QTreeView::edit (nameIndex, trigger, event);
+}
+
+void
+FileTreeView::checkSelectedItems ()
+{
+  myModel->setWanted (selectedSourceRows (), true);
+}
+
+void
+FileTreeView::uncheckSelectedItems ()
+{
+  myModel->setWanted (selectedSourceRows (), false);
+}
+
+void
+FileTreeView::onlyCheckSelectedItems ()
+{
+  const QModelIndex rootIndex = myModel->index (0, FileTreeModel::COL_WANTED);
+  if (!rootIndex.isValid ())
+    return;
+
+  QModelIndexList wantedIndices = selectedSourceRows (FileTreeModel::COL_WANTED);
+  myModel->setWanted (wantedIndices, true);
+
+  qSort (wantedIndices);
+
+  QSet<QModelIndex> wantedIndicesParents;
+  for (const QModelIndex& i: wantedIndices)
+    {
+      for (QModelIndex p = i.parent (); p.isValid (); p = p.parent ())
+        wantedIndicesParents.insert (p.sibling (p.row (), FileTreeModel::COL_WANTED));
+    }
+
+  QQueue<QModelIndex> parentsQueue;
+  parentsQueue.enqueue (rootIndex);
+  QModelIndexList unwantedIndices;
+  while (!parentsQueue.isEmpty ())
+    {
+      const QModelIndex parentIndex = parentsQueue.dequeue ();
+      if (qBinaryFind (wantedIndices, parentIndex) != wantedIndices.end ())
+        continue;
+
+      for (int i = 0, count = myModel->rowCount (parentIndex); i < count; ++i)
+        {
+          const QModelIndex childIndex = parentIndex.child (i, FileTreeModel::COL_WANTED);
+          const int childCheckState = childIndex.data ().toInt ();
+          if (childCheckState == Qt::Unchecked || qBinaryFind (wantedIndices, childIndex) != wantedIndices.end ())
+            continue;
+
+          if (childCheckState == Qt::Checked &&
+              childIndex.sibling (childIndex.row (), FileTreeModel::COL_FILE_INDEX).data ().toInt () >= 0)
+            {
+              unwantedIndices << childIndex;
+            }
+          else
+            {
+              if (!wantedIndicesParents.contains (childIndex))
+                unwantedIndices << childIndex;
+              else
+                parentsQueue.enqueue (childIndex);
+            }
+        }
+    }
+
+  myModel->setWanted (unwantedIndices, false);
+}
+
+void
+FileTreeView::setSelectedItemsPriority ()
+{
+  QAction * action = qobject_cast<QAction *> (sender ());
+  assert (action != nullptr);
+  myModel->setPriority (selectedSourceRows (), action->property (PRIORITY_KEY).toInt ());
+}
+
+bool
+FileTreeView::openSelectedItem ()
+{
+  return myModel->openFile (myProxy->mapToSource (currentIndex ()));
+}
+
+void
+FileTreeView::renameSelectedItem ()
+{
+  QTreeView::edit (currentIndex ());
+}
+
+void
+FileTreeView::refreshContextMenuActionsSensitivity ()
+{
+  assert (myContextMenu != nullptr);
+
+  const QModelIndexList selectedRows = selectionModel ()->selectedRows (FileTreeModel::COL_WANTED);
+
+  QSet<int> checkStates;
+  for (const QModelIndex& i: selectedRows)
+    {
+      checkStates.insert (i.data ().toInt ());
+      if (checkStates.size() == 3)
+        break;
+    }
+
+  const bool haveSelection = !selectedRows.isEmpty ();
+  const bool haveSingleSelection = selectedRows.size() == 1;
+  const bool haveUnchecked = checkStates.contains (Qt::Unchecked) || checkStates.contains (Qt::PartiallyChecked);
+  const bool haveChecked = checkStates.contains (Qt::Checked) || checkStates.contains (Qt::PartiallyChecked);
+
+  myCheckSelectedAction->setEnabled (haveUnchecked);
+  myUncheckSelectedAction->setEnabled (haveChecked);
+  myOnlyCheckSelectedAction->setEnabled (haveSelection);
+  myPriorityMenu->setEnabled (haveSelection);
+  myOpenAction->setEnabled (haveSingleSelection && myProxy->rowCount (selectedRows.first ()) == 0);
+  myRenameAction->setEnabled (haveSingleSelection);
+}
+
+void
+FileTreeView::initContextMenu ()
+{
+  myContextMenu = new QMenu (this);
+
+  myCheckSelectedAction = myContextMenu->addAction (tr ("Check selected"), this, SLOT (checkSelectedItems ()));
+  myUncheckSelectedAction = myContextMenu->addAction (tr ("Uncheck selected"), this, SLOT (uncheckSelectedItems ()));
+  myOnlyCheckSelectedAction = myContextMenu->addAction (tr ("Only check selected"), this, SLOT (onlyCheckSelectedItems ()));
+
+  myContextMenu->addSeparator ();
+
+  myPriorityMenu = myContextMenu->addMenu (tr ("Priority"));
+  myHighPriorityAction = myPriorityMenu->addAction (FileTreeItem::tr ("High"), this, SLOT (setSelectedItemsPriority ()));
+  myNormalPriorityAction = myPriorityMenu->addAction (FileTreeItem::tr ("Normal"), this, SLOT (setSelectedItemsPriority ()));
+  myLowPriorityAction = myPriorityMenu->addAction (FileTreeItem::tr ("Low"), this, SLOT (setSelectedItemsPriority ()));
+
+  myHighPriorityAction->setProperty (PRIORITY_KEY, TR_PRI_HIGH);
+  myNormalPriorityAction->setProperty (PRIORITY_KEY, TR_PRI_NORMAL);
+  myLowPriorityAction->setProperty (PRIORITY_KEY, TR_PRI_LOW);
+
+  myContextMenu->addSeparator ();
+
+  myOpenAction = myContextMenu->addAction (tr ("Open"), this, SLOT (openSelectedItem ()));
+  myRenameAction = myContextMenu->addAction (tr ("Rename..."), this, SLOT (renameSelectedItem ()));
+
+  connect (myContextMenu, SIGNAL (aboutToShow ()), SLOT (refreshContextMenuActionsSensitivity ()));
+}
+
+QModelIndexList
+FileTreeView::selectedSourceRows (int column) const
+{
+  QModelIndexList indices;
+  for (const QModelIndex& i: selectionModel ()->selectedRows (column))
+    indices << myProxy->mapToSource (i);
+  return indices;
 }
