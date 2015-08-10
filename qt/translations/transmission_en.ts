@@ -10,7 +10,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../AboutDialog.cc" line="+28"/>
+        <location filename="../AboutDialog.cc" line="+29"/>
         <source>&lt;b style=&apos;font-size:x-large&apos;&gt;Transmission %1&lt;/b&gt;</source>
         <translation type="unfinished"></translation>
     </message>
@@ -30,12 +30,12 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+3"/>
         <source>&amp;License</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+12"/>
+        <location line="+11"/>
         <source>Credits</source>
         <translation type="unfinished"></translation>
     </message>
@@ -43,7 +43,7 @@
 <context>
     <name>Application</name>
     <message>
-        <location filename="../Application.cc" line="+307"/>
+        <location filename="../Application.cc" line="+300"/>
         <source>&lt;b&gt;Transmission is a file sharing program.&lt;/b&gt;</source>
         <translation type="unfinished"></translation>
     </message>
@@ -71,7 +71,7 @@
 <context>
     <name>DetailsDialog</name>
     <message>
-        <location filename="../DetailsDialog.cc" line="+374"/>
+        <location filename="../DetailsDialog.cc" line="+364"/>
         <source>None</source>
         <translation type="unfinished"></translation>
     </message>
@@ -495,7 +495,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+14"/>
+        <location line="+32"/>
         <source>Options</source>
         <translation type="unfinished"></translation>
     </message>
@@ -571,22 +571,29 @@
 <context>
     <name>FileTreeItem</name>
     <message>
-        <location filename="../FileTreeItem.cc" line="+252"/>
+        <location filename="../FileTreeItem.cc" line="+256"/>
+        <location filename="../FileTreeView.cc" line="+110"/>
+        <location line="+263"/>
         <source>Low</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
+        <location filename="../FileTreeView.cc" line="-262"/>
+        <location line="+260"/>
         <source>High</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
+        <location filename="../FileTreeView.cc" line="-261"/>
+        <location line="+262"/>
         <source>Normal</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
+        <location filename="../FileTreeView.cc" line="-261"/>
         <source>Mixed</source>
         <translation type="unfinished"></translation>
     </message>
@@ -594,7 +601,7 @@
 <context>
     <name>FileTreeModel</name>
     <message>
-        <location filename="../FileTreeModel.cc" line="+92"/>
+        <location filename="../FileTreeModel.cc" line="+196"/>
         <source>File</source>
         <translation type="unfinished"></translation>
     </message>
@@ -620,9 +627,42 @@
     </message>
 </context>
 <context>
+    <name>FileTreeView</name>
+    <message>
+        <location filename="../FileTreeView.cc" line="+253"/>
+        <source>Check selected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Uncheck selected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Only check selected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Priority</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>Open</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Rename...</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>FilterBar</name>
     <message>
-        <location filename="../FilterBar.cc" line="+60"/>
+        <location filename="../FilterBar.cc" line="+61"/>
         <location line="+143"/>
         <source>All</source>
         <translation type="unfinished"></translation>
@@ -687,7 +727,7 @@
 <context>
     <name>Formatter</name>
     <message>
-        <location filename="../Formatter.cc" line="+35"/>
+        <location filename="../Formatter.cc" line="+33"/>
         <source>B/s</source>
         <translation></translation>
     </message>
@@ -831,7 +871,7 @@
 <context>
     <name>LicenseDialog</name>
     <message>
-        <location filename="../LicenseDialog.cc" line="+19"/>
+        <location filename="../LicenseDialog.ui" line="+14"/>
         <source>License</source>
         <translation></translation>
     </message>
@@ -844,7 +884,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+157"/>
+        <location line="+175"/>
         <source>&amp;Torrent</source>
         <translation type="unfinished"></translation>
     </message>
@@ -895,7 +935,7 @@
     </message>
     <message>
         <location line="-161"/>
-        <location filename="../MainWindow.cc" line="+1452"/>
+        <location filename="../MainWindow.cc" line="+1442"/>
         <source>Queue</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1217,47 +1257,45 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cc" line="-1084"/>
+        <location filename="../MainWindow.cc" line="-1015"/>
         <source>Limit Download Speed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+4"/>
-        <location line="+22"/>
+        <location line="-54"/>
         <source>Unlimited</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-17"/>
-        <location line="+22"/>
-        <location line="+605"/>
+        <location line="+6"/>
+        <location line="+615"/>
         <location line="+8"/>
         <source>Limited at %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-622"/>
+        <location line="-573"/>
         <source>Limit Upload Speed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+23"/>
+        <location line="+5"/>
         <source>Stop Seeding at Ratio</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="-31"/>
         <source>Seed Forever</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+5"/>
-        <location line="+598"/>
+        <location line="+6"/>
+        <location line="+601"/>
         <source>Stop at Ratio (%1)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-380"/>
+        <location line="-378"/>
         <source> - %1:%2</source>
         <extracomment>Second (optional) part of main window title &quot;Transmission - host:port&quot; (added when connected to remote session); notice that leading space (before the dash) is included here</extracomment>
         <translation type="unfinished"></translation>
@@ -1269,18 +1307,18 @@
     </message>
     <message>
         <location line="+35"/>
-        <location line="+16"/>
+        <location line="+17"/>
         <source>Ratio: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-11"/>
+        <location line="-12"/>
         <location line="+6"/>
         <source>Down: %1, Up: %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+408"/>
+        <location line="+406"/>
         <source>Torrent Files (*.torrent);;All Files (*.*)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1295,17 +1333,17 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-907"/>
+        <location line="-885"/>
         <source>Speed Limits</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+451"/>
+        <location line="+431"/>
         <source>Network Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+420"/>
+        <location line="+418"/>
         <source>Click to disable Temporary Speed Limits
  (%1 down, %2 up)</source>
         <translation type="unfinished"></translation>
@@ -1671,7 +1709,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+257"/>
+        <location filename="../PrefsDialog.cc" line="+261"/>
         <source>Every Day</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2141,7 +2179,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../Application.cc" line="-232"/>
+        <location filename="../Application.cc" line="-227"/>
         <source>Invalid option</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2356,7 +2394,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>TorrentDelegate</name>
     <message>
-        <location filename="../TorrentDelegate.cc" line="+174"/>
+        <location filename="../TorrentDelegate.cc" line="+171"/>
         <source>Magnetized transfer - retrieving metadata (%1%)</source>
         <extracomment>First part of torrent progress string; %1 is the percentage of torrent metadata downloaded</extracomment>
         <translation type="unfinished"></translation>
@@ -2404,7 +2442,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+41"/>
+        <location line="+40"/>
         <source>Ratio: %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2478,7 +2516,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>TrackerDelegate</name>
     <message numerus="yes">
-        <location filename="../TrackerDelegate.cc" line="+203"/>
+        <location filename="../TrackerDelegate.cc" line="+212"/>
         <source>Got a list of%1 %Ln peer(s)%2 %3 ago</source>
         <extracomment>%1 and %2 are replaced with HTML markup, %3 is duration</extracomment>
         <translation>

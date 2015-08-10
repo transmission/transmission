@@ -40,11 +40,13 @@ win32:LIBS += -lidn -liconv -lwldap32 -liphlpapi
 
 lessThan(QT_MAJOR_VERSION, 5):*-g++*:QMAKE_CXXFLAGS += -std=gnu++11
 
-TRANSLATIONS += translations/transmission_en.ts \
+TRANSLATIONS += translations/transmission_de.ts \
+                translations/transmission_en.ts \
                 translations/transmission_es.ts \
                 translations/transmission_eu.ts \
                 translations/transmission_fr.ts \
                 translations/transmission_hu.ts \
+                translations/transmission_id.ts \
                 translations/transmission_kk.ts \
                 translations/transmission_lt.ts \
                 translations/transmission_pl_PL.ts \
