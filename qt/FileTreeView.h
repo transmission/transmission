@@ -61,10 +61,12 @@ class FileTreeView: public QTreeView
     void renameSelectedItem ();
 
     void refreshContextMenuActionsSensitivity ();
-    QModelIndexList selectedSourceRows (int column = 0) const;
 
   private:
     void initContextMenu ();
+    QModelIndexList selectedSourceRows (int column = 0) const;
+
+    static Qt::CheckState getCumulativeCheckState (const QModelIndexList& indices);
 
   private:
     FileTreeModel * myModel;

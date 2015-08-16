@@ -27,20 +27,20 @@ class FileTreeModel: public QAbstractItemModel
     enum
     {
       COL_NAME,
-      FIRST_VISIBLE_COLUMN = COL_NAME,
       COL_SIZE,
       COL_PROGRESS,
       COL_WANTED,
       COL_PRIORITY,
-      LAST_VISIBLE_COLUMN = COL_PRIORITY,
 
-      COL_FILE_INDEX,
       NUM_COLUMNS
     };
 
     enum Role
     {
-      SortRole = Qt::UserRole
+      SortRole = Qt::UserRole,
+      FileIndexRole,
+      WantedRole,
+      CompleteRole
     };
 
   public:

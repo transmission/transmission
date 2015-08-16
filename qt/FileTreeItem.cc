@@ -94,56 +94,71 @@ FileTreeItem::data (int column, int role) const
 {
   QVariant value;
 
-  if (column == FileTreeModel::COL_FILE_INDEX)
+  switch (role)
     {
-      value.setValue (myFileIndex);
-    }
-  else if (role == Qt::EditRole)
-    {
-      if (column == 0)
-        value.setValue (name());
-    }
-  else if ((role == Qt::TextAlignmentRole) && column == FileTreeModel::COL_SIZE)
-    {
-      value = Qt::AlignRight + Qt::AlignVCenter;
-    }
-  else if (role == Qt::DisplayRole || role == FileTreeModel::SortRole)
-    {
-      switch(column)
-        {
-          case FileTreeModel::COL_NAME:
-            value.setValue (name());
-            break;
+      case FileTreeModel::FileIndexRole:
+        value.setValue (myFileIndex);
+        break;
 
-          case FileTreeModel::COL_SIZE:
-            if (role == Qt::DisplayRole)
-              value.setValue (sizeString());
+      case FileTreeModel::WantedRole:
+        value.setValue (isSubtreeWanted ());
+        break;
+
+      case FileTreeModel::CompleteRole:
+        value.setValue (isComplete ());
+        break;
+
+      case Qt::EditRole:
+        if (column == FileTreeModel::COL_NAME)
+          value.setValue (name ());
+        break;
+
+      case Qt::TextAlignmentRole:
+        if (column == FileTreeModel::COL_SIZE)
+          value = Qt::AlignRight + Qt::AlignVCenter;
+        break;
+
+      case Qt::DisplayRole:
+      case FileTreeModel::SortRole:
+        switch (column)
+          {
+            case FileTreeModel::COL_NAME:
+              value.setValue (name ());
+              break;
+
+            case FileTreeModel::COL_SIZE:
+              if (role == Qt::DisplayRole)
+                value.setValue (sizeString ());
+              else
+                value.setValue<quint64> (size ());
+              break;
+
+            case FileTreeModel::COL_PROGRESS:
+              value.setValue (progress ());
+              break;
+
+            case FileTreeModel::COL_WANTED:
+              value.setValue (isSubtreeWanted ());
+              break;
+
+            case FileTreeModel::COL_PRIORITY:
+              if (role == Qt::DisplayRole)
+                value.setValue (priorityString ());
+              else
+                value.setValue (priority ());
+              break;
+          }
+        break;
+
+      case Qt::DecorationRole:
+        if (column == FileTreeModel::COL_NAME)
+          {
+            if (myFileIndex < 0)
+              value = qApp->style ()->standardIcon (QStyle::SP_DirOpenIcon);
             else
-              value.setValue<quint64> (size ());
-            break;
-
-          case FileTreeModel::COL_PROGRESS:
-            value.setValue (progress());
-            break;
-
-          case FileTreeModel::COL_WANTED:
-            value.setValue (isSubtreeWanted());
-            break;
-
-          case FileTreeModel::COL_PRIORITY:
-            if (role == Qt::DisplayRole)
-              value.setValue (priorityString());
-            else
-              value.setValue (priority ());
-            break;
-        }
-    }
-  else if (role == Qt::DecorationRole && column == FileTreeModel::COL_NAME)
-    {
-      if (childCount () > 0)
-        value = qApp->style ()->standardIcon (QStyle::SP_DirOpenIcon);
-      else
-        value = Utils::guessMimeIcon (name ());
+              value = Utils::guessMimeIcon (name ());
+          }
+        break;
     }
 
   return value;

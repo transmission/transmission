@@ -41,9 +41,6 @@ FileTreeView::FileTreeView (QWidget * parent, bool isEditable):
   setItemDelegate (myDelegate);
   sortByColumn (FileTreeModel::COL_NAME, Qt::AscendingOrder);
 
-  for (int i=0; i<FileTreeModel::NUM_COLUMNS; ++i)
-    setColumnHidden (i, (i<FileTreeModel::FIRST_VISIBLE_COLUMN) || (FileTreeModel::LAST_VISIBLE_COLUMN<i));
-
   connect (this, SIGNAL(clicked(QModelIndex)),
            this, SLOT(onClicked(QModelIndex)));
 
@@ -80,11 +77,9 @@ FileTreeView::resizeEvent (QResizeEvent * event)
   // space is left over...
 
   int left = event->size ().width () - 1;
-  for (int column = FileTreeModel::FIRST_VISIBLE_COLUMN; column <= FileTreeModel::LAST_VISIBLE_COLUMN; ++column)
+  for (int column = 0; column < FileTreeModel::NUM_COLUMNS; ++column)
     {
       if (column == FileTreeModel::COL_NAME)
-        continue;
-      if (isColumnHidden (column))
         continue;
 
       int minWidth = 0;
@@ -258,11 +253,11 @@ FileTreeView::uncheckSelectedItems ()
 void
 FileTreeView::onlyCheckSelectedItems ()
 {
-  const QModelIndex rootIndex = myModel->index (0, FileTreeModel::COL_WANTED);
+  const QModelIndex rootIndex = myModel->index (0, 0);
   if (!rootIndex.isValid ())
     return;
 
-  QModelIndexList wantedIndices = selectedSourceRows (FileTreeModel::COL_WANTED);
+  QModelIndexList wantedIndices = selectedSourceRows ();
   myModel->setWanted (wantedIndices, true);
 
   qSort (wantedIndices);
@@ -271,7 +266,7 @@ FileTreeView::onlyCheckSelectedItems ()
   for (const QModelIndex& i: wantedIndices)
     {
       for (QModelIndex p = i.parent (); p.isValid (); p = p.parent ())
-        wantedIndicesParents.insert (p.sibling (p.row (), FileTreeModel::COL_WANTED));
+        wantedIndicesParents.insert (p);
     }
 
   QQueue<QModelIndex> parentsQueue;
@@ -285,13 +280,12 @@ FileTreeView::onlyCheckSelectedItems ()
 
       for (int i = 0, count = myModel->rowCount (parentIndex); i < count; ++i)
         {
-          const QModelIndex childIndex = parentIndex.child (i, FileTreeModel::COL_WANTED);
-          const int childCheckState = childIndex.data ().toInt ();
+          const QModelIndex childIndex = parentIndex.child (i, 0);
+          const int childCheckState = childIndex.data (FileTreeModel::WantedRole).toInt ();
           if (childCheckState == Qt::Unchecked || qBinaryFind (wantedIndices, childIndex) != wantedIndices.end ())
             continue;
 
-          if (childCheckState == Qt::Checked &&
-              childIndex.sibling (childIndex.row (), FileTreeModel::COL_FILE_INDEX).data ().toInt () >= 0)
+          if (childCheckState == Qt::Checked && childIndex.data (FileTreeModel::FileIndexRole).toInt () >= 0)
             {
               unwantedIndices << childIndex;
             }
@@ -333,26 +327,21 @@ FileTreeView::refreshContextMenuActionsSensitivity ()
 {
   assert (myContextMenu != nullptr);
 
-  const QModelIndexList selectedRows = selectionModel ()->selectedRows (FileTreeModel::COL_WANTED);
-
-  QSet<int> checkStates;
-  for (const QModelIndex& i: selectedRows)
-    {
-      checkStates.insert (i.data ().toInt ());
-      if (checkStates.size() == 3)
-        break;
-    }
+  const QModelIndexList selectedRows = selectionModel ()->selectedRows ();
+  const Qt::CheckState checkState = getCumulativeCheckState (selectedRows);
 
   const bool haveSelection = !selectedRows.isEmpty ();
   const bool haveSingleSelection = selectedRows.size() == 1;
-  const bool haveUnchecked = checkStates.contains (Qt::Unchecked) || checkStates.contains (Qt::PartiallyChecked);
-  const bool haveChecked = checkStates.contains (Qt::Checked) || checkStates.contains (Qt::PartiallyChecked);
+  const bool haveUnchecked = checkState == Qt::Unchecked || checkState == Qt::PartiallyChecked;
+  const bool haveChecked = checkState == Qt::Checked || checkState == Qt::PartiallyChecked;
 
   myCheckSelectedAction->setEnabled (haveUnchecked);
   myUncheckSelectedAction->setEnabled (haveChecked);
   myOnlyCheckSelectedAction->setEnabled (haveSelection);
   myPriorityMenu->setEnabled (haveSelection);
-  myOpenAction->setEnabled (haveSingleSelection && myProxy->rowCount (selectedRows.first ()) == 0);
+  myOpenAction->setEnabled (haveSingleSelection &&
+    selectedRows.first ().data (FileTreeModel::FileIndexRole).toInt () >= 0 &&
+    selectedRows.first ().data (FileTreeModel::CompleteRole).toBool ());
   myRenameAction->setEnabled (haveSingleSelection);
 }
 
@@ -361,9 +350,9 @@ FileTreeView::initContextMenu ()
 {
   myContextMenu = new QMenu (this);
 
-  myCheckSelectedAction = myContextMenu->addAction (tr ("Check selected"), this, SLOT (checkSelectedItems ()));
-  myUncheckSelectedAction = myContextMenu->addAction (tr ("Uncheck selected"), this, SLOT (uncheckSelectedItems ()));
-  myOnlyCheckSelectedAction = myContextMenu->addAction (tr ("Only check selected"), this, SLOT (onlyCheckSelectedItems ()));
+  myCheckSelectedAction = myContextMenu->addAction (tr ("Check Selected"), this, SLOT (checkSelectedItems ()));
+  myUncheckSelectedAction = myContextMenu->addAction (tr ("Uncheck Selected"), this, SLOT (uncheckSelectedItems ()));
+  myOnlyCheckSelectedAction = myContextMenu->addAction (tr ("Only Check Selected"), this, SLOT (onlyCheckSelectedItems ()));
 
   myContextMenu->addSeparator ();
 
@@ -391,4 +380,30 @@ FileTreeView::selectedSourceRows (int column) const
   for (const QModelIndex& i: selectionModel ()->selectedRows (column))
     indices << myProxy->mapToSource (i);
   return indices;
+}
+
+Qt::CheckState
+FileTreeView::getCumulativeCheckState (const QModelIndexList& indices)
+{
+  bool haveChecked = false, haveUnchecked = false;
+
+  for (const QModelIndex& i: indices)
+    {
+      switch (i.data (FileTreeModel::WantedRole).toInt ())
+        {
+          case Qt::Checked:
+            haveChecked = true;
+            break;
+          case Qt::Unchecked:
+            haveUnchecked = true;
+            break;
+          case Qt::PartiallyChecked:
+            return Qt::PartiallyChecked;
+        }
+
+      if (haveChecked && haveUnchecked)
+        return Qt::PartiallyChecked;
+    }
+
+  return haveChecked ? Qt::Checked : Qt::Unchecked;
 }

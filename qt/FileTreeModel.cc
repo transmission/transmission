@@ -545,7 +545,7 @@ FileTreeModel::openFile (const QModelIndex& index)
     return false;
 
   FileTreeItem * const item = itemFromIndex (index);
-  if (item->childCount () != 0 || !item->isComplete ())
+  if (item->fileIndex () < 0 || !item->isComplete ())
     return false;
 
   emit openRequested (item->path ());
