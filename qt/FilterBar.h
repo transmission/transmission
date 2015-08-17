@@ -33,20 +33,16 @@ class FilterBar: public QWidget
   private:
     FilterBarComboBox * createTrackerCombo (QStandardItemModel *);
     FilterBarComboBox * createActivityCombo ();
-    void recountSoon ();
     void refreshTrackers ();
     QString getCountString (int n) const;
 
   private slots:
+    void recountSoon ();
     void recount ();
     void refreshPref (int key);
     void refreshCountLabel ();
     void onActivityIndexChanged (int index);
     void onTrackerIndexChanged (int index);
-    void onTorrentModelReset ();
-    void onTorrentModelRowsInserted (const QModelIndex&, int, int);
-    void onTorrentModelRowsRemoved (const QModelIndex&, int, int);
-    void onTorrentModelDataChanged (const QModelIndex&, const QModelIndex&);
     void onTextChanged (const QString&);
 
   private:
