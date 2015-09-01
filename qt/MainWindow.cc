@@ -530,7 +530,7 @@ MainWindow::openProperties ()
 void
 MainWindow::setLocation ()
 {
-  QDialog * d = new RelocateDialog (mySession, myModel, getSelectedTorrents (), this);
+  RelocateDialog * d = new RelocateDialog (mySession, myModel, getSelectedTorrents (), this);
   d->setAttribute (Qt::WA_DeleteOnClose, true);
   d->show ();
 }

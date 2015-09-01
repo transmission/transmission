@@ -49,7 +49,7 @@ StatsDialog::setVisible (bool visible)
   myTimer->stop ();
   if (visible)
     myTimer->start (REFRESH_INTERVAL_MSEC);
-  QDialog::setVisible (visible);
+  BaseDialog::setVisible (visible);
 }
 
 void

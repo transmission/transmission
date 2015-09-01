@@ -16,7 +16,7 @@
 ***/
 
 void
-SessionDialog::onAccepted ()
+SessionDialog::accept ()
 {
   myPrefs.set (Prefs::SESSION_IS_REMOTE, ui.remoteSessionRadio->isChecked ());
   myPrefs.set (Prefs::SESSION_REMOTE_HOST, ui.hostEdit->text ());
@@ -25,7 +25,7 @@ SessionDialog::onAccepted ()
   myPrefs.set (Prefs::SESSION_REMOTE_USERNAME, ui.usernameEdit->text ());
   myPrefs.set (Prefs::SESSION_REMOTE_PASSWORD, ui.passwordEdit->text ());
   mySession.restart ();
-  hide ();
+  BaseDialog::accept ();
 }
 
 void
@@ -75,7 +75,4 @@ SessionDialog::SessionDialog (Session& session, Prefs& prefs, QWidget * parent):
   myAuthWidgets << ui.passwordLabel << ui.passwordEdit;
 
   resensitize ();
-
-  connect (ui.dialogButtons, SIGNAL (rejected ()), this, SLOT (hide ()));
-  connect (ui.dialogButtons, SIGNAL (accepted ()), this, SLOT (onAccepted ()));
 }

@@ -27,8 +27,11 @@ class SessionDialog: public BaseDialog
     SessionDialog (Session& session, Prefs& prefs, QWidget * parent = nullptr);
     virtual ~SessionDialog () {}
 
+  public slots:
+    // QDialog
+    virtual void accept ();
+
   private slots:
-    void onAccepted ();
     void resensitize ();
 
   private:
