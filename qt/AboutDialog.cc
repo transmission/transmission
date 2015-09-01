@@ -20,7 +20,7 @@
 #include "Utils.h"
 
 AboutDialog::AboutDialog (QWidget * parent):
-  QDialog (parent, Qt::Dialog),
+  BaseDialog (parent),
   myLicenseDialog ()
 {
   ui.setupUi (this);

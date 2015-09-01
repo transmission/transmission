@@ -10,14 +10,15 @@
 #ifndef QTR_ABOUT_DIALOG_H
 #define QTR_ABOUT_DIALOG_H
 
-#include <QDialog>
 #include <QPointer>
+
+#include "BaseDialog.h"
 
 #include "ui_AboutDialog.h"
 
 class LicenseDialog;
 
-class AboutDialog: public QDialog
+class AboutDialog: public BaseDialog
 {
     Q_OBJECT
 

@@ -33,7 +33,7 @@ RelocateDialog::RelocateDialog (Session            & session,
                                 const TorrentModel & model,
                                 const QSet<int>    & ids,
                                 QWidget            * parent):
-  QDialog (parent),
+  BaseDialog (parent),
   mySession (session),
   myIds (ids)
 {

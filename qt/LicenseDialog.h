@@ -10,11 +10,11 @@
 #ifndef QTR_LICENSE_DIALOG_H
 #define QTR_LICENSE_DIALOG_H
 
-#include <QDialog>
+#include "BaseDialog.h"
 
 #include "ui_LicenseDialog.h"
 
-class LicenseDialog: public QDialog
+class LicenseDialog: public BaseDialog
 {
     Q_OBJECT
 

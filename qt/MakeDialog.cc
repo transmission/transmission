@@ -27,7 +27,7 @@
 
 namespace
 {
-  class MakeProgressDialog: public QDialog
+  class MakeProgressDialog: public BaseDialog
   {
       Q_OBJECT
 
@@ -47,7 +47,7 @@ namespace
 }
 
 MakeProgressDialog::MakeProgressDialog (Session& session, tr_metainfo_builder& builder, QWidget * parent):
-  QDialog (parent),
+  BaseDialog (parent),
   mySession (session),
   myBuilder (builder)
 {
@@ -215,7 +215,7 @@ MakeDialog::onSourceChanged ()
 }
 
 MakeDialog::MakeDialog (Session& session, QWidget * parent):
-  QDialog (parent, Qt::Dialog),
+  BaseDialog (parent),
   mySession (session),
   myBuilder (nullptr, &tr_metaInfoBuilderFree)
 {

@@ -11,7 +11,6 @@
 #define QTR_OPTIONS_DIALOG_H
 
 #include <QCryptographicHash>
-#include <QDialog>
 #include <QDir>
 #include <QFile>
 #include <QMap>
@@ -20,6 +19,7 @@
 #include <QVector>
 
 #include "AddData.h" // AddData
+#include "BaseDialog.h"
 #include "Torrent.h" // FileList
 
 #include "ui_OptionsDialog.h"
@@ -32,7 +32,7 @@ extern "C"
   struct tr_variant;
 }
 
-class OptionsDialog: public QDialog
+class OptionsDialog: public BaseDialog
 {
     Q_OBJECT
 

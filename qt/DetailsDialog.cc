@@ -173,11 +173,11 @@ DetailsDialog::getStockIcon (const QString& freedesktop_name, int fallback)
   return icon;
 }
 
-DetailsDialog::DetailsDialog (Session       & session,
-                  Prefs         & prefs,
-                  const TorrentModel& model,
-                  QWidget       * parent):
-  QDialog (parent, Qt::Dialog),
+DetailsDialog::DetailsDialog (Session            & session,
+                              Prefs              & prefs,
+                              const TorrentModel & model,
+                              QWidget            * parent):
+  BaseDialog (parent),
   mySession (session),
   myPrefs (prefs),
   myModel (model),

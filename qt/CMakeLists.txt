@@ -73,6 +73,7 @@ set(${PROJECT_NAME}_HEADERS
     AboutDialog.h
     AddData.h
     Application.h
+    BaseDialog.h
     ColumnResizer.h
     CustomVariantType.h
     DBusAdaptor.h

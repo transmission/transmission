@@ -111,6 +111,6 @@ SOURCES += AboutDialog.cc \
            Utils.cc \
            WatchDir.cc
 HEADERS += $$replace(SOURCES, .cc, .h)
-HEADERS += CustomVariantType.h Speed.h
+HEADERS += BaseDialog.h CustomVariantType.h Speed.h
 
 win32:RC_FILE = qtr.rc

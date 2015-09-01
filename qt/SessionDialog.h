@@ -10,15 +10,16 @@
 #ifndef QTR_SESSION_DIALOG_H
 #define QTR_SESSION_DIALOG_H
 
-#include <QDialog>
 #include <QWidgetList>
+
+#include "BaseDialog.h"
 
 #include "ui_SessionDialog.h"
 
 class Prefs;
 class Session;
 
-class SessionDialog: public QDialog
+class SessionDialog: public BaseDialog
 {
     Q_OBJECT
 

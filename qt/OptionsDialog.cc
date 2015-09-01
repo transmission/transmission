@@ -27,7 +27,7 @@
 ***/
 
 OptionsDialog::OptionsDialog (Session& session, const Prefs& prefs, const AddData& addme, QWidget * parent):
-  QDialog (parent, Qt::Dialog),
+  BaseDialog (parent),
   mySession (session),
   myAdd (addme),
   myHaveInfo (false),

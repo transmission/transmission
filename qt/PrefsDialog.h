@@ -10,11 +10,12 @@
 #ifndef QTR_PREFS_DIALOG_H
 #define QTR_PREFS_DIALOG_H
 
-#include <QDialog>
 #include <QMap>
 #include <QSet>
 
+#include "BaseDialog.h"
 #include "Prefs.h"
+
 #include "ui_PrefsDialog.h"
 
 class QHttp;
@@ -24,7 +25,7 @@ class QString;
 class Prefs;
 class Session;
 
-class PrefsDialog: public QDialog
+class PrefsDialog: public BaseDialog
 {
     Q_OBJECT
 

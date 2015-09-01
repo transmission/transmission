@@ -10,7 +10,7 @@
 #ifndef QTR_STATS_DIALOG_H
 #define QTR_STATS_DIALOG_H
 
-#include <QDialog>
+#include "BaseDialog.h"
 
 #include "ui_StatsDialog.h"
 
@@ -18,7 +18,7 @@ class QTimer;
 
 class Session;
 
-class StatsDialog: public QDialog
+class StatsDialog: public BaseDialog
 {
     Q_OBJECT
 

@@ -10,15 +10,16 @@
 #ifndef QTR_RELOCATE_DIALOG_H
 #define QTR_RELOCATE_DIALOG_H
 
-#include <QDialog>
 #include <QSet>
+
+#include "BaseDialog.h"
 
 #include "ui_RelocateDialog.h"
 
 class Session;
 class TorrentModel;
 
-class RelocateDialog: public QDialog
+class RelocateDialog: public BaseDialog
 {
     Q_OBJECT
 

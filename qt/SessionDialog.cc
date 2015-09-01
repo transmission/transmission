@@ -46,7 +46,7 @@ SessionDialog::resensitize ()
 ***/
 
 SessionDialog::SessionDialog (Session& session, Prefs& prefs, QWidget * parent):
-  QDialog (parent),
+  BaseDialog (parent),
   mySession (session),
   myPrefs (prefs)
 {

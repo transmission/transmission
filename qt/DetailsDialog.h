@@ -10,11 +10,12 @@
 #ifndef QTR_DETAILS_DIALOG_H
 #define QTR_DETAILS_DIALOG_H
 
-#include <QDialog>
 #include <QString>
 #include <QMap>
 #include <QSet>
 #include <QTimer>
+
+#include "BaseDialog.h"
 
 #include "ui_DetailsDialog.h"
 
@@ -28,7 +29,7 @@ class TrackerDelegate;
 class TrackerModel;
 class TrackerModelFilter;
 
-class DetailsDialog: public QDialog
+class DetailsDialog: public BaseDialog
 {
     Q_OBJECT
 

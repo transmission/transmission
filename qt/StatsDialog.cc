@@ -20,7 +20,7 @@ enum
 };
 
 StatsDialog::StatsDialog (Session& session, QWidget * parent):
-  QDialog (parent, Qt::Dialog),
+  BaseDialog (parent),
   mySession (session),
   myTimer (new QTimer (this))
 {

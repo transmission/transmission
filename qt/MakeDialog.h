@@ -12,7 +12,7 @@
 
 #include <memory>
 
-#include <QDialog>
+#include "BaseDialog.h"
 
 #include "ui_MakeDialog.h"
 
@@ -25,7 +25,7 @@ extern "C"
   struct tr_metainfo_builder;
 }
 
-class MakeDialog: public QDialog
+class MakeDialog: public BaseDialog
 {
     Q_OBJECT
 
