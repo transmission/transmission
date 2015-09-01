@@ -1428,36 +1428,5 @@ MainWindow::dropEvent (QDropEvent * event)
 void
 MainWindow::contextMenuEvent (QContextMenuEvent * event)
 {
-  QMenu * menu = new QMenu (this);
-
-  menu->addAction (ui.action_Properties);
-  menu->addAction (ui.action_OpenFolder);
-
-  QAction * sep = new QAction (menu);
-  sep->setSeparator (true);
-  menu->addAction (sep);
-  menu->addAction (ui.action_Start);
-  menu->addAction (ui.action_StartNow);
-  menu->addAction (ui.action_Announce);
-  QMenu * queueMenu = menu->addMenu (tr ("Queue"));
-    queueMenu->addAction (ui.action_QueueMoveTop);
-    queueMenu->addAction (ui.action_QueueMoveUp);
-    queueMenu->addAction (ui.action_QueueMoveDown);
-    queueMenu->addAction (ui.action_QueueMoveBottom);
-  menu->addAction (ui.action_Pause);
-
-  sep = new QAction (menu);
-  sep->setSeparator (true);
-  menu->addAction (sep);
-  menu->addAction (ui.action_Verify);
-  menu->addAction (ui.action_SetLocation);
-  menu->addAction (ui.action_CopyMagnetToClipboard);
-
-  sep = new QAction (menu);
-  sep->setSeparator (true);
-  menu->addAction (sep);
-  menu->addAction (ui.action_Remove);
-  menu->addAction (ui.action_Delete);
-
-  menu->popup (event->globalPos ());
+  ui.menuTorrent->popup (event->globalPos ());
 }

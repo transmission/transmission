@@ -137,6 +137,10 @@ Application::Application (int& argc, char ** argv):
     }
   setWindowIcon (icon);
 
+#ifdef __APPLE__
+  setAttribute (Qt::AA_DontShowIconsInMenus);
+#endif
+
   // parse the command-line arguments
   int c;
   bool minimized = false;
