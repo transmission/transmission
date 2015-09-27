@@ -229,8 +229,7 @@ Utils::measureHeaderItem (QHeaderView * view, const QString& text)
   option.sortIndicator = view->isSortIndicatorShown () ? QStyleOptionHeader::SortDown :
     QStyleOptionHeader::None;
 
-  return view->style ()->sizeFromContents (QStyle::CT_HeaderSection, &option,
-    QSize (QWIDGETSIZE_MAX, QWIDGETSIZE_MAX), view).width ();
+  return view->style ()->sizeFromContents (QStyle::CT_HeaderSection, &option, QSize (), view).width ();
 }
 
 QColor
