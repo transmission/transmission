@@ -88,7 +88,11 @@ tr_upnpDiscover (int msec)
 
 #if (MINIUPNPC_API_VERSION >= 8) /* adds ipv6 and error args */
   int err = UPNPDISCOVER_SUCCESS;
+ #if (MINIUPNPC_API_VERSION >= 14) /* adds ttl */
+  ret = upnpDiscover (msec, NULL, NULL, 0, 0, 2, &err);
+ #else
   ret = upnpDiscover (msec, NULL, NULL, 0, 0, &err);
+ #endif
   have_err = err != UPNPDISCOVER_SUCCESS;
 #else
   ret = upnpDiscover (msec, NULL, NULL, 0);
