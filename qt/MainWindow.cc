@@ -569,10 +569,20 @@ void openSelect (const QString& path)
 void
 MainWindow::openFolder ()
 {
-  const int torrentId (*getSelectedTorrents ().begin ());
+  const QSet<int> selectedTorrents = getSelectedTorrents ();
+  if (selectedTorrents.size () != 1)
+    return;
+
+  const int torrentId (*selectedTorrents.begin ());
   const Torrent * tor (myModel.getTorrentFromId (torrentId));
+  if (tor == nullptr)
+    return;
+
   QString path (tor->getPath ());
-  const FileList files = tor->files ();
+  const FileList& files = tor->files ();
+  if (files.isEmpty ())
+    return;
+
   const QString firstfile = files.at (0).filename;
   int slashIndex = firstfile.indexOf (QLatin1Char ('/'));
   if (slashIndex > -1)
@@ -586,6 +596,7 @@ MainWindow::openFolder ()
       return;
     }
 #endif
+
   QDesktopServices::openUrl (QUrl::fromLocalFile (path));
 }
 
@@ -734,6 +745,7 @@ MainWindow::refreshActionSensitivity ()
   int queued (0);
   int selectedAndPaused (0);
   int selectedAndQueued (0);
+  int selectedWithMetadata (0);
   int canAnnounce (0);
   const QAbstractItemModel * model (ui.listView->model ());
   const QItemSelectionModel * selectionModel (ui.listView->selectionModel ());
@@ -755,20 +767,23 @@ MainWindow::refreshActionSensitivity ()
           if (isPaused) ++ paused;
           if (isSelected && isPaused) ++selectedAndPaused;
           if (isSelected && isQueued) ++selectedAndQueued;
+          if (isSelected && tor->hasMetadata ()) ++selectedWithMetadata;
           if (tor->canManualAnnounce ()) ++canAnnounce;
         }
     }
 
   const bool haveSelection (selected > 0);
-  ui.action_Verify->setEnabled (haveSelection);
+  const bool haveSelectionWithMetadata = selectedWithMetadata > 0;
+  const bool oneSelection (selected == 1);
+
+  ui.action_Verify->setEnabled (haveSelectionWithMetadata);
   ui.action_Remove->setEnabled (haveSelection);
   ui.action_Delete->setEnabled (haveSelection);
   ui.action_Properties->setEnabled (haveSelection);
   ui.action_DeselectAll->setEnabled (haveSelection);
   ui.action_SetLocation->setEnabled (haveSelection);
 
-  const bool oneSelection (selected == 1);
-  ui.action_OpenFolder->setEnabled (oneSelection && mySession.isLocal ());
+  ui.action_OpenFolder->setEnabled (oneSelection && haveSelectionWithMetadata && mySession.isLocal ());
   ui.action_CopyMagnetToClipboard->setEnabled (oneSelection);
 
   ui.action_SelectAll->setEnabled (selected < rowCount);
@@ -799,14 +814,15 @@ MainWindow::clearSelection ()
 }
 
 QSet<int>
-MainWindow::getSelectedTorrents () const
+MainWindow::getSelectedTorrents (bool withMetadataOnly) const
 {
   QSet<int> ids;
 
   for (const QModelIndex& index: ui.listView->selectionModel ()->selectedRows ())
     {
       const Torrent * tor (index.data (TorrentModel::TorrentRole).value<const Torrent*> ());
-      ids.insert (tor->id ());
+      if (tor != nullptr && (!withMetadataOnly || tor->hasMetadata ()))
+        ids.insert (tor->id ());
     }
 
   return ids;
@@ -870,7 +886,7 @@ MainWindow::deleteSelected ()
 void
 MainWindow::verifySelected ()
 {
-  mySession.verifyTorrents (getSelectedTorrents ());
+  mySession.verifyTorrents (getSelectedTorrents (true));
 }
 void
 MainWindow::reannounceSelected ()

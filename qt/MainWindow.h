@@ -88,7 +88,7 @@ class MainWindow: public QMainWindow
   private:
     QIcon getStockIcon (const QString&, int fallback = -1);
 
-    QSet<int> getSelectedTorrents () const;
+    QSet<int> getSelectedTorrents (bool withMetadataOnly = false) const;
     void updateNetworkIcon ();
 
     QMenu * createOptionsMenu ();
