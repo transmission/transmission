@@ -3418,7 +3418,10 @@
 				GCC_WARN_INITIALIZER_NOT_FULLY_BRACKETED = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = "third-party/curl/include";
+				HEADER_SEARCH_PATHS = (
+					"third-party/curl/include",
+					"third-party/openssl/include",
+				);
 				IBC_FLATTEN_NIBS = YES;
 				IBC_NOTICES = NO;
 				IBC_WARNINGS = YES;
@@ -3429,7 +3432,7 @@
 				LIBRARY_SEARCH_PATHS = "third-party/curl/lib";
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				ONLY_ACTIVE_ARCH = YES;
-				SDKROOT = macosx10.10;
+				SDKROOT = macosx;
 				STRIP_INSTALLED_PRODUCT = NO;
 			};
 			name = Debug;
@@ -3536,7 +3539,10 @@
 				GCC_WARN_INITIALIZER_NOT_FULLY_BRACKETED = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = "third-party/curl/include";
+				HEADER_SEARCH_PATHS = (
+					"third-party/curl/include",
+					"third-party/openssl/include",
+				);
 				IBC_FLATTEN_NIBS = YES;
 				IBC_NOTICES = NO;
 				IBC_WARNINGS = YES;
@@ -3547,7 +3553,7 @@
 				LIBRARY_SEARCH_PATHS = "third-party/curl/lib";
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				OTHER_CFLAGS = "-DNDEBUG";
-				SDKROOT = macosx10.10;
+				SDKROOT = macosx;
 			};
 			name = Release;
 		};
@@ -3595,7 +3601,10 @@
 				GCC_WARN_INITIALIZER_NOT_FULLY_BRACKETED = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = "third-party/curl/include";
+				HEADER_SEARCH_PATHS = (
+					"third-party/curl/include",
+					"third-party/openssl/include",
+				);
 				IBC_FLATTEN_NIBS = YES;
 				IBC_NOTICES = NO;
 				IBC_WARNINGS = YES;
@@ -3605,7 +3614,7 @@
 				INFOPLIST_PREPROCESS = YES;
 				LIBRARY_SEARCH_PATHS = "third-party/curl/lib";
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
-				SDKROOT = macosx10.10;
+				SDKROOT = macosx;
 				STRIP_INSTALLED_PRODUCT = NO;
 			};
 			name = "Release - Debug";
