@@ -1386,7 +1386,7 @@ messageLengthIsCorrect (const tr_peerMsgs * msg, uint8_t id, uint32_t len)
 
         case BT_BITFIELD:
             if (tr_torrentHasMetadata (msg->torrent))
-                return len == (msg->torrent->info.pieceCount + 7u) / 8u + 1u;
+                return len == (msg->torrent->info.pieceCount >> 3) + (msg->torrent->info.pieceCount & 7 ? 1 : 0) + 1u;
             /* we don't know the piece count yet,
                so we can only guess whether to send true or false */
             if (msg->metadata_size_hint > 0)
@@ -1486,6 +1486,8 @@ readBtMessage (tr_peerMsgs * msgs, struct evbuffer * inbuf, size_t inlen)
     const size_t  startBufLen = evbuffer_get_length (inbuf);
 #endif
     const bool fext = tr_peerIoSupportsFEXT (msgs->io);
+
+    assert (msglen > 0);
 
     --msglen; /* id length */
 
