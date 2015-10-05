@@ -983,7 +983,7 @@ sendLtepHandshake (tr_peerMsgs * msgs)
 }
 
 static void
-parseLtepHandshake (tr_peerMsgs * msgs, int len, struct evbuffer * inbuf)
+parseLtepHandshake (tr_peerMsgs * msgs, uint32_t len, struct evbuffer * inbuf)
 {
     int64_t   i;
     tr_variant   val, * sub;
@@ -1005,7 +1005,11 @@ parseLtepHandshake (tr_peerMsgs * msgs, int len, struct evbuffer * inbuf)
         return;
     }
 
-    dbgmsg (msgs, "here is the handshake: [%*.*s]", len, len,  tmp);
+    /* arbitrary limit, should be more than enough */
+    if (len <= 4096)
+      dbgmsg (msgs, "here is the handshake: [%*.*s]", (int) len, (int) len, tmp);
+    else
+      dbgmsg (msgs, "handshake length is too big (%" PRIu32 "), printing skipped", len);
 
     /* does the peer prefer encrypted connections? */
     if (tr_variantDictFindInt (&val, TR_KEY_e, &i)) {
@@ -1083,7 +1087,7 @@ parseLtepHandshake (tr_peerMsgs * msgs, int len, struct evbuffer * inbuf)
 }
 
 static void
-parseUtMetadata (tr_peerMsgs * msgs, int msglen, struct evbuffer * inbuf)
+parseUtMetadata (tr_peerMsgs * msgs, uint32_t msglen, struct evbuffer * inbuf)
 {
     tr_variant dict;
     char * msg_end;
@@ -1160,7 +1164,7 @@ parseUtMetadata (tr_peerMsgs * msgs, int msglen, struct evbuffer * inbuf)
 }
 
 static void
-parseUtPex (tr_peerMsgs * msgs, int msglen, struct evbuffer * inbuf)
+parseUtPex (tr_peerMsgs * msgs, uint32_t msglen, struct evbuffer * inbuf)
 {
     int loaded = 0;
     uint8_t * tmp = tr_new (uint8_t, msglen);
@@ -1225,9 +1229,11 @@ parseUtPex (tr_peerMsgs * msgs, int msglen, struct evbuffer * inbuf)
 static void sendPex (tr_peerMsgs * msgs);
 
 static void
-parseLtep (tr_peerMsgs * msgs, int msglen, struct evbuffer  * inbuf)
+parseLtep (tr_peerMsgs * msgs, uint32_t msglen, struct evbuffer * inbuf)
 {
     uint8_t ltep_msgid;
+
+    assert (msglen > 0);
 
     tr_peerIoReadUint8 (msgs->io, inbuf, &ltep_msgid);
     msglen--;
