@@ -97,26 +97,26 @@
 					<div class="prefs-section">
 						<div class="title">Seeding</div>
 						<div class="row"><div class="key"><input type="checkbox" id="seedRatioLimited"/><label for="seedRatioLimited">Stop seeding at ratio:</label></div>
-                                                                 <div class="value"><input type="text" type="number" id="seedRatioLimit"/></div></div>
+                                                                 <div class="value"><input type="number" min="0" id="seedRatioLimit"/></div></div>
 						<div class="row"><div class="key"><input type="checkbox" id="idle-seeding-limit-enabled"/><label for="idle-seeding-limit-enabled">Stop seeding if idle for (min):</label></div>
-                                                                 <div class="value"><input type="text" type="number" id="idle-seeding-limit"/></div></div>
+                                                                 <div class="value"><input type="number" min="0" id="idle-seeding-limit"/></div></div>
 					</div>
 				</div>
 				<div id="prefs-page-speed">
 					<div class="prefs-section">
 						<div class="title">Speed Limits</div>
 						<div class="row"><div class="key"><input type="checkbox" id="speed-limit-up-enabled"/><label for="speed-limit-up-enabled">Upload (kB/s):</label></div>
-                                                                 <div class="value"><input type="text" type="number" id="speed-limit-up"/></div></div>
+                                                                 <div class="value"><input type="number" min="0" id="speed-limit-up"/></div></div>
 						<div class="row"><div class="key"><input type="checkbox" id="speed-limit-down-enabled"/><label for="speed-limit-down-enabled">Download (kB/s):</label></div>
-                                                                 <div class="value"><input type="text" type="number" id="speed-limit-down"/></div></div>
+                                                                 <div class="value"><input type="number" min="0" id="speed-limit-down"/></div></div>
 					</div>
 					<div class="prefs-section">
 						<div class="title"><div id="alternative-speed-limits-title">Alternative Speed Limits</div></div>
 						<div class="row" id="alternative-speed-limits-desc">Override normal speed limits manually or at scheduled times</div>
 						<div class="row"><div class="key">Upload (kB/s):</div>
-                                                                 <div class="value"><input type="text" type="number" id="alt-speed-up"/></div></div>
+                                                                 <div class="value"><input type="number" min="0" id="alt-speed-up"/></div></div>
 						<div class="row"><div class="key">Download (kB/s):</div>
-                                                                 <div class="value"><input type="text" type="number" id="alt-speed-down"/></div></div>
+                                                                 <div class="value"><input type="number" min="0" id="alt-speed-down"/></div></div>
 						<div class="checkbox-row"><input type="checkbox" id="alt-speed-time-enabled"/><label for="alt-speed-time-enabled">Scheduled Times</label></div>
 						<div class="row"><div class="key">From:</div>
 						                 <div class="value"><select id="alt-speed-time-begin"></select></div></div>
@@ -140,9 +140,9 @@
 					<div class="prefs-section">
 						<div class="title">Connections</div>
 						<div class="row"><div class="key"><label for="peer-limit-per-torrent">Max peers per torrent:</label></div>
-						                 <div class="value"><input type="text" type="number" id="peer-limit-per-torrent"/></div></div>
+						                 <div class="value"><input type="number" min="0" id="peer-limit-per-torrent"/></div></div>
 						<div class="row"><div class="key"><label for="peer-limit-global">Max peers overall:</label></div>
-						                 <div class="value"><input type="text" type="number" id="peer-limit-global"/></div></div>
+						                 <div class="value"><input type="number" min="0" id="peer-limit-global"/></div></div>
 					</div>
 					<div class="prefs-section">
 						<div class="title">Options</div>
@@ -170,7 +170,7 @@
 					<div class="prefs-section">
 						<div class="title">Listening Port</div>
 						<div class="row"><div class="key"><label for="peer-port">Peer listening port:</label></div>
-						                 <div class="value"><input type="text" type="number" id="peer-port"/></div></div>
+						                 <div class="value"><input type="number" min="0" max="65535" id="peer-port"/></div></div>
 						<div class="row"><div class="key">&nbsp;</div>
 						                 <div class="value"><span id="port-label">Status: Unknown</span></div></div>
 						<div class="checkbox-row"><input type="checkbox" id="peer-port-random-on-start"/><label for="peer-port-random-on-start">Randomize port on launch</label></div>
