@@ -494,12 +494,15 @@ daemon_start (void * raw_arg,
 
     sd_notifyf (0, "MAINPID=%d\n", (int)getpid());
 
+    /* should go before libevent calls */
+    tr_net_init ();
+
     /* setup event state */
-    ev_base = event_base_new();
+    ev_base = event_base_new ();
     if (ev_base == NULL)
     {
         char buf[256];
-        tr_snprintf(buf, sizeof(buf), "Failed to init daemon event state: %s", tr_strerror(errno));
+        tr_snprintf (buf, sizeof (buf), "Failed to init daemon event state: %s", tr_strerror (errno));
         printMessage (logfile, TR_LOG_ERROR, MY_NAME, buf, __FILE__, __LINE__);
         return 1;
     }

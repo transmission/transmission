@@ -504,6 +504,12 @@ char * tr_env_get_string (const char * key,
 ****
 ***/
 
+void tr_net_init (void);
+
+/***
+****
+***/
+
 #ifdef __cplusplus
 }
 #endif

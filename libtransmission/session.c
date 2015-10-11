@@ -610,7 +610,7 @@ tr_sessionInit (const char  * tag,
     tr_logSetLevel (i);
 
   /* start the libtransmission thread */
-  tr_netInit (); /* must go before tr_eventInit */
+  tr_net_init (); /* must go before tr_eventInit */
   tr_eventInit (session);
   assert (session->events != NULL);
 

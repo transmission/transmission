@@ -55,21 +55,6 @@
 const tr_address tr_in6addr_any = { TR_AF_INET6, { IN6ADDR_ANY_INIT } };
 const tr_address tr_inaddr_any = { TR_AF_INET, { { { { INADDR_ANY, 0x00, 0x00, 0x00 } } } } };
 
-void
-tr_netInit (void)
-{
-    static bool initialized = false;
-
-    if (!initialized)
-    {
-#ifdef _WIN32
-        WSADATA wsaData;
-        WSAStartup (MAKEWORD (2, 2), &wsaData);
-#endif
-        initialized = true;
-    }
-}
-
 char *
 tr_net_strerror (char * buf, size_t buflen, int err)
 {

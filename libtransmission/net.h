@@ -163,8 +163,6 @@ void tr_netClose (tr_session  * session,
 
 void tr_netCloseSocket (tr_socket_t fd);
 
-void tr_netInit (void);
-
 bool tr_net_hasIPv6 (tr_port);
 
 

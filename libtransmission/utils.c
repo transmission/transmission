@@ -29,6 +29,7 @@
 #include <time.h> /* nanosleep () */
 
 #ifdef _WIN32
+ #include <ws2tcpip.h> /* WSAStartup () */
  #include <windows.h> /* Sleep (), GetSystemTimeAsFileTime (), GetEnvironmentVariable () */
  #include <shellapi.h> /* CommandLineToArgv () */
 #else
@@ -1841,4 +1842,23 @@ char * tr_env_get_string (const char * key,
   return value;
 
 #endif
+}
+
+/***
+****
+***/
+
+void
+tr_net_init (void)
+{
+    static bool initialized = false;
+
+    if (!initialized)
+    {
+#ifdef _WIN32
+        WSADATA wsaData;
+        WSAStartup (MAKEWORD (2, 2), &wsaData);
+#endif
+        initialized = true;
+    }
 }
