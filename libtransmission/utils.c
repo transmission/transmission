@@ -1121,18 +1121,21 @@ tr_win32_format_message (uint32_t code)
                               FORMAT_MESSAGE_FROM_SYSTEM |
                               FORMAT_MESSAGE_IGNORE_INSERTS,
                               NULL, code, 0, (LPWSTR)&wide_text, 0, NULL);
+  if (wide_size == 0)
+    return tr_strdup_printf ("Unknown error (0x%08x)", code);
 
   if (wide_size != 0 && wide_text != NULL)
     text = tr_win32_native_to_utf8 (wide_text, wide_size);
 
   LocalFree (wide_text);
 
-  /* Most (all?) messages contain "\r\n" in the end, chop it */
-  text_size = strlen (text);
-  while (text_size > 0 &&
-         text[text_size - 1] >= '\0' &&
-         text[text_size - 1] <= ' ')
-    text[--text_size] = '\0';
+  if (text != NULL)
+    {
+      /* Most (all?) messages contain "\r\n" in the end, chop it */
+      text_size = strlen (text);
+      while (text_size > 0 && isspace ((uint8_t) text[text_size - 1]))
+        text[--text_size] = '\0';
+    }
 
   return text;
 }
