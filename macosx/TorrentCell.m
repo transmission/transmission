@@ -769,7 +769,7 @@
                         + HEIGHT_STATUS + PADDING_BETWEEN_PROGRESS_AND_BAR;
     
     result.size.width = floor(NSMaxX(bounds) - NSMinX(result) - PADDING_HORIZONTAL
-                        - 2.0 * (PADDING_BETWEEN_BUTTONS + NORMAL_BUTTON_WIDTH));
+                        - 3.0 * (PADDING_BETWEEN_BUTTONS + NORMAL_BUTTON_WIDTH));
     
     return result;
 }
@@ -790,7 +790,7 @@
     NSRect result;
     result.size.height = NORMAL_BUTTON_WIDTH;
     result.size.width = NORMAL_BUTTON_WIDTH;
-    result.origin.x = NSMaxX(bounds) - (PADDING_HORIZONTAL + NORMAL_BUTTON_WIDTH + PADDING_BETWEEN_BUTTONS + NORMAL_BUTTON_WIDTH);
+    result.origin.x = NSMaxX(bounds) - (PADDING_HORIZONTAL + NORMAL_BUTTON_WIDTH + 2.0 * (PADDING_BETWEEN_BUTTONS + NORMAL_BUTTON_WIDTH));
     
     if (![fDefaults boolForKey: @"SmallView"])
         result.origin.y = NSMinY(bounds) + PADDING_ABOVE_TITLE + HEIGHT_TITLE - (NORMAL_BUTTON_WIDTH - BAR_HEIGHT) * 0.5
@@ -806,7 +806,7 @@
     NSRect result;
     result.size.height = NORMAL_BUTTON_WIDTH;
     result.size.width = NORMAL_BUTTON_WIDTH;
-    result.origin.x = NSMaxX(bounds) - (PADDING_HORIZONTAL + NORMAL_BUTTON_WIDTH);
+    result.origin.x = NSMaxX(bounds) - (PADDING_HORIZONTAL + 2.0 * NORMAL_BUTTON_WIDTH);
     
     if (![fDefaults boolForKey: @"SmallView"])
         result.origin.y = NSMinY(bounds) + PADDING_ABOVE_TITLE + HEIGHT_TITLE - (NORMAL_BUTTON_WIDTH - BAR_HEIGHT) * 0.5
