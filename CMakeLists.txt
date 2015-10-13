@@ -112,7 +112,7 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 set(CURL_MINIMUM            7.15.4)
 set(EVENT2_MINIMUM          2.0.10)
-set(OPENSSL_MINIMUM         0.9.4)
+set(OPENSSL_MINIMUM         0.9.7)
 set(CYASSL_MINIMUM          3.0)
 set(POLARSSL_MINIMUM        1.2)
 set(ZLIB_MINIMUM            1.2.3)

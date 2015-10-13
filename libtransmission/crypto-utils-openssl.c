@@ -14,6 +14,7 @@
 #include <openssl/err.h>
 #include <openssl/evp.h>
 #include <openssl/rand.h>
+#include <openssl/opensslv.h>
 
 #include "transmission.h"
 #include "crypto-utils.h"
@@ -140,6 +141,32 @@ tr_sha1_final (tr_sha1_ctx_t   handle,
 /***
 ****
 ***/
+
+#if OPENSSL_VERSION_NUMBER < 0x0090802fL
+
+static EVP_CIPHER_CTX *
+openssl_evp_cipher_context_new (void)
+{
+  EVP_CIPHER_CTX * ctx = tr_new (EVP_CIPHER_CTX, 1);
+  if (ctx != NULL)
+    EVP_CIPHER_CTX_init (ctx);
+  return ctx;
+}
+
+static void
+openssl_evp_cipher_context_free (EVP_CIPHER_CTX * ctx)
+{
+  if (ctx)
+    {
+      EVP_CIPHER_CTX_cleanup (ctx);
+      tr_free (ctx);
+    }
+}
+
+#define EVP_CIPHER_CTX_new() openssl_evp_cipher_context_new ()
+#define EVP_CIPHER_CTX_free(x) openssl_evp_cipher_context_free ((x))
+
+#endif
 
 tr_rc4_ctx_t
 tr_rc4_new (void)
