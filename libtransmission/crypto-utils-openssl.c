@@ -147,20 +147,20 @@ tr_sha1_final (tr_sha1_ctx_t   handle,
 static EVP_CIPHER_CTX *
 openssl_evp_cipher_context_new (void)
 {
-  EVP_CIPHER_CTX * ctx = tr_new (EVP_CIPHER_CTX, 1);
-  if (ctx != NULL)
-    EVP_CIPHER_CTX_init (ctx);
-  return ctx;
+  EVP_CIPHER_CTX * handle = tr_new (EVP_CIPHER_CTX, 1);
+  if (handle != NULL)
+    EVP_CIPHER_CTX_init (handle);
+  return handle;
 }
 
 static void
-openssl_evp_cipher_context_free (EVP_CIPHER_CTX * ctx)
+openssl_evp_cipher_context_free (EVP_CIPHER_CTX * handle)
 {
-  if (ctx)
-    {
-      EVP_CIPHER_CTX_cleanup (ctx);
-      tr_free (ctx);
-    }
+  if (handle == NULL)
+    return;
+
+  EVP_CIPHER_CTX_cleanup (handle);
+  tr_free (handle);
 }
 
 #define EVP_CIPHER_CTX_new() openssl_evp_cipher_context_new ()
