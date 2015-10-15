@@ -43,6 +43,12 @@
 #include "variant.h"
 #include "variant-common.h"
 
+/* don't use newlocale/uselocale on old versions of uClibc because they're buggy.
+ * https://trac.transmissionbt.com/ticket/6006 */
+#if defined (__UCLIBC__) && !TR_UCLIBC_CHECK_VERSION (0, 9, 34)
+ #undef HAVE_USELOCALE
+#endif
+
 /**
 ***
 **/
