@@ -637,21 +637,13 @@ isMartianAddr (const struct tr_address * a)
             return (address[0] == 0) ||
                  (address[0] == 127) ||
                  ((address[0] & 0xE0) == 0xE0);
-            break;
         }
 
         case TR_AF_INET6: {
             const unsigned char * address = (const unsigned char*)&a->addr.addr6;
             return (address[0] == 0xFF) ||
                  (memcmp (address, zeroes, 15) == 0 &&
-                  (address[15] == 0 || address[15] == 1)) ||
-                   /* Addresses outside of 2000::/3 are currently reserved,
-                      but might be allocated at some future time. Since
-                      there are a lot of buggy peers pushing around such
-                      addresses over PEX, we reject them until the end of
-                      the 13th Baktun. */
-                 (tr_time () < 1356130800 && (address[0] & 0xE0) != 0x20);
-            break;
+                  (address[15] == 0 || address[15] == 1));
         }
 
         default:
