@@ -19,6 +19,7 @@
 #include <QMessageBox>
 #include <QProcess>
 #include <QRect>
+#include <QSystemTrayIcon>
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/tr-getopt.h>
@@ -545,6 +546,13 @@ Application::raise ()
 bool
 Application::notifyApp (const QString& title, const QString& body) const
 {
+  QDBusConnection bus = QDBusConnection::sessionBus ();
+  if (!bus.isConnected ())
+    {
+      myWindow->trayIcon ().showMessage (title, body);
+      return true;
+    }
+
   const QString dbusServiceName   = QString::fromUtf8 ("org.freedesktop.Notifications");
   const QString dbusInterfaceName = QString::fromUtf8 ("org.freedesktop.Notifications");
   const QString dbusPath          = QString::fromUtf8 ("/org/freedesktop/Notifications");
@@ -560,7 +568,7 @@ Application::notifyApp (const QString& title, const QString& body) const
   args.append (QVariantMap ());                       // hints - unused atm
   args.append (static_cast<int32_t> (-1));            // use the default timeout period
   m.setArguments (args);
-  QDBusMessage replyMsg = QDBusConnection::sessionBus ().call (m);
+  QDBusMessage replyMsg = bus.call (m);
   //std::cerr << qPrintable (replyMsg.errorName ()) << std::endl;
   //std::cerr << qPrintable (replyMsg.errorMessage ()) << std::endl;
   return (replyMsg.type () == QDBusMessage::ReplyMessage) && !replyMsg.arguments ().isEmpty ();

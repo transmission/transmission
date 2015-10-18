@@ -53,6 +53,8 @@ class MainWindow: public QMainWindow
     MainWindow (Session&, Prefs&, TorrentModel&, bool minized);
     virtual ~MainWindow ();
 
+    QSystemTrayIcon& trayIcon () { return myTrayIcon; }
+
   public slots:
     void startAll ();
     void startSelected ();
