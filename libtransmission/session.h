@@ -179,7 +179,6 @@ struct tr_session
 
     char *                       torrentDoneScript;
 
-    char *                       tag;
     char *                       configDir;
     char *                       resumeDir;
     char *                       torrentDir;

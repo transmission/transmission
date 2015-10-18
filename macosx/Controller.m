@@ -361,7 +361,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                                     [tbString UTF8String]);
         
         const char * configDir = tr_getDefaultConfigDir("Transmission");
-        fLib = tr_sessionInit("macosx", configDir, YES, &settings);
+        fLib = tr_sessionInit(configDir, YES, &settings);
         tr_variantFree(&settings);
         
         fConfigDirectory = [[NSString alloc] initWithUTF8String: configDir];

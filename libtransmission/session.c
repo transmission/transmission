@@ -581,10 +581,9 @@ struct init_data
 };
 
 tr_session *
-tr_sessionInit (const char  * tag,
-                const char  * configDir,
-                bool          messageQueuingEnabled,
-                tr_variant     * clientSettings)
+tr_sessionInit (const char * configDir,
+                bool         messageQueuingEnabled,
+                tr_variant * clientSettings)
 {
   int64_t i;
   tr_session * session;
@@ -600,7 +599,6 @@ tr_sessionInit (const char  * tag,
   session->udp6_socket = TR_BAD_SOCKET;
   session->lock = tr_lockNew ();
   session->cache = tr_cacheNew (1024*1024*2);
-  session->tag = tr_strdup (tag);
   session->magicNumber = SESSION_MAGIC_NUMBER;
   tr_bandwidthConstruct (&session->bandwidth, session, NULL);
   tr_variantInitList (&session->removedTorrents, 0);
@@ -1929,7 +1927,6 @@ tr_sessionClose (tr_session * session)
     }
   tr_device_info_free (session->downloadDir);
   tr_free (session->torrentDoneScript);
-  tr_free (session->tag);
   tr_free (session->configDir);
   tr_free (session->resumeDir);
   tr_free (session->torrentDir);

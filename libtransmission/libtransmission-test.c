@@ -276,7 +276,7 @@ libttest_session_init (tr_variant * settings)
   if (!tr_variantDictFind (settings, q))
     tr_variantDictAddInt (settings, q, verbose ? TR_LOG_DEBUG : TR_LOG_ERROR);
 
-  session = tr_sessionInit ("libtransmission-test", sandbox, !verbose, settings);
+  session = tr_sessionInit (sandbox, !verbose, settings);
 
   tr_free (sandbox);
   tr_variantFree (&local_settings);

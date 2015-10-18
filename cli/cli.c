@@ -280,7 +280,7 @@ tr_main (int    argc,
         }
     }
 
-  h = tr_sessionInit ("cli", configDir, false, &settings);
+  h = tr_sessionInit (configDir, false, &settings);
 
   ctor = tr_ctorNew (h);
 

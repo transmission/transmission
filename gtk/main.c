@@ -523,7 +523,7 @@ on_startup (GApplication * application, gpointer user_data)
     g_mkdir_with_parents (str, 0777);
 
   /* initialize the libtransmission session */
-  session = tr_sessionInit ("gtk", cbdata->config_dir, TRUE, gtr_pref_get_all ());
+  session = tr_sessionInit (cbdata->config_dir, TRUE, gtr_pref_get_all ());
 
   gtr_pref_flag_set (TR_KEY_alt_speed_enabled, tr_sessionUsesAltSpeed (session));
   gtr_pref_int_set  (TR_KEY_peer_port, tr_sessionGetPeerPort (session));

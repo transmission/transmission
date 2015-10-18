@@ -252,12 +252,11 @@ void tr_sessionSaveSettings (tr_session              * session,
  *     tr_variantInitDict (&settings, 0);
  *     tr_sessionGetDefaultSettings (&settings);
  *     configDir = tr_getDefaultConfigDir ("Transmission");
- *     session = tr_sessionInit ("mac", configDir, true, &settings);
+ *     session = tr_sessionInit (configDir, true, &settings);
  *
  *     tr_variantFree (&settings);
  * @endcode
  *
- * @param tag "gtk", "macosx", "daemon", etc... this is only for pre-1.30 resume files
  * @param configDir where Transmission will look for resume files, blocklists, etc.
  * @param messageQueueingEnabled if false, messages will be dumped to stderr
  * @param settings libtransmission settings
@@ -265,8 +264,7 @@ void tr_sessionSaveSettings (tr_session              * session,
  * @see tr_sessionLoadSettings ()
  * @see tr_getDefaultConfigDir ()
  */
-tr_session * tr_sessionInit (const char        * tag,
-                             const char        * configDir,
+tr_session * tr_sessionInit (const char        * configDir,
                              bool                messageQueueingEnabled,
                              struct tr_variant * settings);
 

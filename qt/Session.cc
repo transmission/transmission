@@ -351,7 +351,7 @@ Session::start ()
       tr_variant settings;
       tr_variantInitDict (&settings, 0);
       tr_sessionLoadSettings (&settings, myConfigDir.toUtf8 ().constData (), "qt");
-      mySession = tr_sessionInit ("qt", myConfigDir.toUtf8 ().constData (), true, &settings);
+      mySession = tr_sessionInit (myConfigDir.toUtf8 ().constData (), true, &settings);
       tr_variantFree (&settings);
 
       myRpc.start (mySession);
