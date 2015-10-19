@@ -110,6 +110,7 @@ class MainWindow: public QMainWindow
     void refreshStatusBar ();
     void refreshTrayIcon ();
     void refreshTrayIconSoon ();
+    void refreshTorrentViewHeader ();
     void openTorrent ();
     void openURL ();
     void newTorrent ();

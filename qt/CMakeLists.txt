@@ -62,6 +62,7 @@ set(${PROJECT_NAME}_SOURCES
     TorrentDelegateMin.cc
     TorrentFilter.cc
     TorrentModel.cc
+    TorrentView.cc
     TrackerDelegate.cc
     TrackerModel.cc
     TrackerModelFilter.cc
@@ -110,6 +111,7 @@ set(${PROJECT_NAME}_HEADERS
     TorrentDelegateMin.h
     TorrentFilter.h
     TorrentModel.h
+    TorrentView.h
     TrackerDelegate.h
     TrackerModel.h
     TrackerModelFilter.h

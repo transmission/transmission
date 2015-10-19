@@ -40,7 +40,6 @@ class FilterBar: public QWidget
     void recountSoon ();
     void recount ();
     void refreshPref (int key);
-    void refreshCountLabel ();
     void onActivityIndexChanged (int index);
     void onTrackerIndexChanged (int index);
     void onTextChanged (const QString&);

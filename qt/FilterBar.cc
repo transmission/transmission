@@ -230,7 +230,7 @@ FilterBar::FilterBar (Prefs& prefs, const TorrentModel& torrents, const TorrentF
   QHBoxLayout * h = new QHBoxLayout (this);
   h->setContentsMargins (3, 3, 3, 3);
 
-  myCountLabel = new QLabel (this);
+  myCountLabel = new QLabel (tr ("Show:"), this);
   h->addWidget (myCountLabel);
 
   myActivityCombo = createActivityCombo ();
@@ -249,8 +249,6 @@ FilterBar::FilterBar (Prefs& prefs, const TorrentModel& torrents, const TorrentF
   connect (&myPrefs, SIGNAL (changed (int)), this, SLOT (refreshPref (int)));
   connect (myActivityCombo, SIGNAL (currentIndexChanged (int)), this, SLOT (onActivityIndexChanged (int)));
   connect (myTrackerCombo, SIGNAL (currentIndexChanged (int)), this, SLOT (onTrackerIndexChanged (int)));
-  connect (&myFilter, SIGNAL (rowsInserted (QModelIndex, int, int)), this, SLOT (refreshCountLabel ()));
-  connect (&myFilter, SIGNAL (rowsRemoved (QModelIndex, int, int)), this, SLOT (refreshCountLabel ()));
   connect (&myTorrents, SIGNAL (modelReset ()), this, SLOT (recountSoon ()));
   connect (&myTorrents, SIGNAL (rowsInserted (QModelIndex, int, int)), this, SLOT (recountSoon ()));
   connect (&myTorrents, SIGNAL (rowsRemoved (QModelIndex, int, int)), this, SLOT (recountSoon ()));
@@ -259,7 +257,6 @@ FilterBar::FilterBar (Prefs& prefs, const TorrentModel& torrents, const TorrentF
 
   recountSoon ();
   refreshTrackers ();
-  refreshCountLabel ();
   myIsBootstrapping = false;
 
   // initialize our state
@@ -383,24 +380,10 @@ FilterBar::recount ()
     }
 
   refreshTrackers ();
-  refreshCountLabel ();
 }
 
 QString
 FilterBar::getCountString (int n) const
 {
   return QString::fromLatin1 ("%L1").arg (n);
-}
-
-void
-FilterBar::refreshCountLabel ()
-{
-  const int visibleCount = myFilter.rowCount ();
-  const int trackerCount = myTrackerCombo->currentCount ();
-  const int activityCount = myActivityCombo->currentCount ();
-
-  if ((visibleCount == activityCount) || (visibleCount == trackerCount))
-    myCountLabel->setText (tr("Show:"));
-  else
-    myCountLabel->setText (tr("Show %Ln of:", 0, visibleCount));
 }

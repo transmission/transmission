@@ -254,6 +254,11 @@ MainWindow::MainWindow (Session& session, Prefs& prefs, TorrentModel& model, boo
   initStatusBar ();
   ui.verticalLayout->insertWidget (0, myFilterBar = new FilterBar (myPrefs, myModel, myFilterModel));
 
+  connect (&myModel, SIGNAL (rowsInserted (QModelIndex, int, int)), SLOT (refreshTorrentViewHeader ()));
+  connect (&myModel, SIGNAL (rowsRemoved (QModelIndex, int, int)), SLOT (refreshTorrentViewHeader ()));
+  connect (&myFilterModel, SIGNAL (rowsInserted (QModelIndex, int, int)), SLOT (refreshTorrentViewHeader ()));
+  connect (&myFilterModel, SIGNAL (rowsRemoved (QModelIndex, int, int)), SLOT (refreshTorrentViewHeader ()));
+
   QList<int> initKeys;
   initKeys << Prefs::MAIN_WINDOW_X
            << Prefs::SHOW_TRAY_ICON
@@ -300,6 +305,7 @@ MainWindow::MainWindow (Session& session, Prefs& prefs, TorrentModel& model, boo
   refreshTrayIconSoon ();
   refreshStatusBar ();
   refreshTitle ();
+  refreshTorrentViewHeader ();
 }
 
 MainWindow::~MainWindow ()
@@ -726,7 +732,17 @@ MainWindow::refreshStatusBar ()
   ui.statsLabel->setText (str);
 }
 
+void
+MainWindow::refreshTorrentViewHeader ()
+{
+  const int totalCount = myModel.rowCount ();
+  const int visibleCount = myFilterModel.rowCount ();
 
+  if (visibleCount == totalCount)
+    ui.listView->setHeaderText (QString ());
+  else
+    ui.listView->setHeaderText (tr ("Showing %L1 of %Ln torrent(s)", 0, totalCount).arg (visibleCount));
+}
 
 void
 MainWindow::refreshActionSensitivitySoon ()

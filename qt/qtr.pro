@@ -105,6 +105,7 @@ SOURCES += AboutDialog.cc \
            TorrentDelegateMin.cc \
            TorrentFilter.cc \
            TorrentModel.cc \
+           TorrentView.cc \
            TrackerDelegate.cc \
            TrackerModel.cc \
            TrackerModelFilter.cc \
