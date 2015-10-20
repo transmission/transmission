@@ -1343,6 +1343,9 @@ torrentSetLocation (tr_session               * session,
   if (!tr_variantDictFindStr (args_in, TR_KEY_location, &location, NULL))
     return "no location";
 
+  if (tr_sys_path_is_relative (location))
+    return "new location path is not absolute";
+
   bool move;
   int i, torrentCount;
   tr_torrent ** torrents = getTorrents (session, args_in, &torrentCount);
@@ -1711,10 +1714,17 @@ torrentAdd (tr_session               * session,
   if (!filename && !metainfo_base64)
     return "no filename or metainfo specified";
 
+  const char * download_dir = NULL;
+
+  if (tr_variantDictFindStr (args_in, TR_KEY_download_dir, &download_dir, NULL))
+    {
+      if (tr_sys_path_is_relative (download_dir))
+        return "download directory path is not absolute";
+    }
+
   int64_t i;
   bool boolVal;
   tr_variant * l;
-  const char * str;
   const char * cookies = NULL;
   tr_ctor * ctor = tr_ctorNew (session);
 
@@ -1722,8 +1732,8 @@ torrentAdd (tr_session               * session,
 
   tr_variantDictFindStr (args_in, TR_KEY_cookies, &cookies, NULL);
 
-  if (tr_variantDictFindStr (args_in, TR_KEY_download_dir, &str, NULL))
-    tr_ctorSetDownloadDir (ctor, TR_FORCE, str);
+  if (download_dir != NULL)
+    tr_ctorSetDownloadDir (ctor, TR_FORCE, download_dir);
 
   if (tr_variantDictFindBool (args_in, TR_KEY_paused, &boolVal))
     tr_ctorSetPaused (ctor, TR_FORCE, boolVal);

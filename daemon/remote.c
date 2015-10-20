@@ -491,43 +491,6 @@ static char * sessionId = NULL;
 static bool UseSSL = false;
 
 static char*
-tr_getcwd (void)
-{
-  char * result;
-  tr_error * error = NULL;
-
-  result = tr_sys_dir_get_current (&error);
-
-  if (result == NULL)
-    {
-      fprintf (stderr, "getcwd error: \"%s\"", error->message);
-      tr_error_free (error);
-      result = tr_strdup ("");
-    }
-
-  return result;
-}
-
-static char*
-absolutify (const char * path)
-{
-  char * buf;
-
-  if (*path == '/')
-    {
-      buf = tr_strdup (path);
-    }
-  else
-    {
-      char * cwd = tr_getcwd ();
-      buf = tr_buildPath (cwd, path, NULL);
-      tr_free (cwd);
-    }
-
-  return buf;
-}
-
-static char*
 getEncodedMetainfo (const char * filename)
 {
     size_t    len = 0;
@@ -2253,14 +2216,8 @@ processArgs (const char * rpcurl, int argc, const char ** argv)
             }
             case 'w':
             {
-                char * path = absolutify (optarg);
-                if (tadd)
-                    tr_variantDictAddStr (tr_variantDictFind (tadd, TR_KEY_arguments), TR_KEY_download_dir, path);
-                else {
-                    tr_variant * args = ensure_sset (&sset);
-                    tr_variantDictAddStr (args, TR_KEY_download_dir, path);
-                }
-                tr_free (path);
+                tr_variant * args = tadd ? tr_variantDictFind (tadd, TR_KEY_arguments) : ensure_sset (&sset);
+                tr_variantDictAddStr (args, TR_KEY_download_dir, optarg);
                 break;
             }
             case 850:

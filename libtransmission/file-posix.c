@@ -259,6 +259,14 @@ tr_sys_path_get_info (const char        * path,
 }
 
 bool
+tr_sys_path_is_relative (const char * path)
+{
+  assert (path != NULL);
+
+  return path[0] != '/';
+}
+
+bool
 tr_sys_path_is_same (const char  * path1,
                      const char  * path2,
                      tr_error   ** error)

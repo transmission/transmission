@@ -157,6 +157,17 @@ bool            tr_sys_path_exists          (const char         * path,
                                              struct tr_error   ** error);
 
 /**
+ * @brief Check whether path is relative.
+ *
+ * This function only analyzes the string, so no error reporting is needed.
+ *
+ * @param[in] path Path to file or directory.
+ *
+ * @return `True` if path is relative, `false` otherwise
+ */
+bool            tr_sys_path_is_relative     (const char         * path);
+
+/**
  * @brief Test to see if the two filenames point to the same file.
  *
  * @param[in]  path1  Path to first file or directory.

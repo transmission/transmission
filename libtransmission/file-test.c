@@ -321,6 +321,49 @@ test_path_exists (void)
 }
 
 static int
+test_path_is_relative (void)
+{
+  check (tr_sys_path_is_relative (""));
+  check (tr_sys_path_is_relative ("."));
+  check (tr_sys_path_is_relative (".."));
+  check (tr_sys_path_is_relative ("x"));
+  check (tr_sys_path_is_relative ("\\"));
+  check (tr_sys_path_is_relative (":"));
+
+#ifdef _WIN32
+
+  check (tr_sys_path_is_relative ("/"));
+  check (tr_sys_path_is_relative ("//x"));
+  check (tr_sys_path_is_relative ("\\x"));
+  check (tr_sys_path_is_relative ("\\x\\y"));
+  check (tr_sys_path_is_relative ("C:x"));
+  check (tr_sys_path_is_relative ("C:x\\y"));
+
+  check (!tr_sys_path_is_relative ("\\\\"));
+  check (!tr_sys_path_is_relative ("\\\\x"));
+  check (!tr_sys_path_is_relative ("\\\\x\\y"));
+  check (!tr_sys_path_is_relative ("\\\\.\\x"));
+
+  check (!tr_sys_path_is_relative ("a:"));
+  check (!tr_sys_path_is_relative ("a:\\"));
+  check (!tr_sys_path_is_relative ("a:/"));
+  check (!tr_sys_path_is_relative ("Z:"));
+  check (!tr_sys_path_is_relative ("Z:\\"));
+  check (!tr_sys_path_is_relative ("Z:/"));
+
+#else /* _WIN32 */
+
+  check (!tr_sys_path_is_relative ("/"));
+  check (!tr_sys_path_is_relative ("/x"));
+  check (!tr_sys_path_is_relative ("/x/y"));
+  check (!tr_sys_path_is_relative ("//x"));
+
+#endif /* _WIN32 */
+
+  return 0;
+}
+
+static int
 test_path_is_same (void)
 {
   char * const test_dir = create_test_dir (__FUNCTION__);
@@ -1401,6 +1444,7 @@ main (void)
     {
       test_get_info,
       test_path_exists,
+      test_path_is_relative,
       test_path_is_same,
       test_path_resolve,
       test_path_basename_dirname,
