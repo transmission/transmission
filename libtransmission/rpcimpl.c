@@ -1336,35 +1336,30 @@ torrentSetLocation (tr_session               * session,
                     tr_variant               * args_out UNUSED,
                     struct tr_rpc_idle_data  * idle_data UNUSED)
 {
-  const char * errmsg = NULL;
   const char * location = NULL;
 
   assert (idle_data == NULL);
 
   if (!tr_variantDictFindStr (args_in, TR_KEY_location, &location, NULL))
+    return "no location";
+
+  bool move;
+  int i, torrentCount;
+  tr_torrent ** torrents = getTorrents (session, args_in, &torrentCount);
+
+  if (!tr_variantDictFindBool (args_in, TR_KEY_move, &move))
+    move = false;
+
+  for (i=0; i<torrentCount; ++i)
     {
-      errmsg = "no location";
-    }
-  else
-    {
-      bool move;
-      int i, torrentCount;
-      tr_torrent ** torrents = getTorrents (session, args_in, &torrentCount);
-
-      if (!tr_variantDictFindBool (args_in, TR_KEY_move, &move))
-        move = false;
-
-      for (i=0; i<torrentCount; ++i)
-        {
-          tr_torrent * tor = torrents[i];
-          tr_torrentSetLocation (tor, location, move, NULL, NULL);
-          notify (session, TR_RPC_TORRENT_MOVED, tor);
-        }
-
-      tr_free (torrents);
+      tr_torrent * tor = torrents[i];
+      tr_torrentSetLocation (tor, location, move, NULL, NULL);
+      notify (session, TR_RPC_TORRENT_MOVED, tor);
     }
 
-  return errmsg;
+  tr_free (torrents);
+
+  return NULL;
 }
 
 /***
@@ -1403,6 +1398,7 @@ torrentRenamePath (tr_session               * session,
   tr_torrent ** torrents;
   const char * oldpath = NULL;
   const char * newname = NULL;
+  const char * errmsg = NULL;
 
   tr_variantDictFindStr (args_in, TR_KEY_path, &oldpath, NULL);
   tr_variantDictFindStr (args_in, TR_KEY_name, &newname, NULL);
@@ -1411,11 +1407,11 @@ torrentRenamePath (tr_session               * session,
   if (torrentCount == 1)
     tr_torrentRenamePath (torrents[0], oldpath, newname, torrentRenamePathDone, idle_data);
   else
-    tr_idle_function_done (idle_data, "torrent-rename-path requires 1 torrent");
+    errmsg = "torrent-rename-path requires 1 torrent";
 
   /* cleanup */
   tr_free (torrents);
-  return NULL; /* ignored */
+  return errmsg;
 }
 
 /***
@@ -1713,108 +1709,103 @@ torrentAdd (tr_session               * session,
   tr_variantDictFindStr (args_in, TR_KEY_filename, &filename, NULL);
   tr_variantDictFindStr (args_in, TR_KEY_metainfo, &metainfo_base64, NULL);
   if (!filename && !metainfo_base64)
+    return "no filename or metainfo specified";
+
+  int64_t i;
+  bool boolVal;
+  tr_variant * l;
+  const char * str;
+  const char * cookies = NULL;
+  tr_ctor * ctor = tr_ctorNew (session);
+
+  /* set the optional arguments */
+
+  tr_variantDictFindStr (args_in, TR_KEY_cookies, &cookies, NULL);
+
+  if (tr_variantDictFindStr (args_in, TR_KEY_download_dir, &str, NULL))
+    tr_ctorSetDownloadDir (ctor, TR_FORCE, str);
+
+  if (tr_variantDictFindBool (args_in, TR_KEY_paused, &boolVal))
+    tr_ctorSetPaused (ctor, TR_FORCE, boolVal);
+
+  if (tr_variantDictFindInt (args_in, TR_KEY_peer_limit, &i))
+    tr_ctorSetPeerLimit (ctor, TR_FORCE, i);
+
+  if (tr_variantDictFindInt (args_in, TR_KEY_bandwidthPriority, &i))
+    tr_ctorSetBandwidthPriority (ctor, i);
+
+  if (tr_variantDictFindList (args_in, TR_KEY_files_unwanted, &l))
     {
-      return "no filename or metainfo specified";
+      tr_file_index_t fileCount;
+      tr_file_index_t * files = fileListFromList (l, &fileCount);
+      tr_ctorSetFilesWanted (ctor, files, fileCount, false);
+      tr_free (files);
+    }
+
+  if (tr_variantDictFindList (args_in, TR_KEY_files_wanted, &l))
+    {
+      tr_file_index_t fileCount;
+      tr_file_index_t * files = fileListFromList (l, &fileCount);
+      tr_ctorSetFilesWanted (ctor, files, fileCount, true);
+      tr_free (files);
+    }
+
+  if (tr_variantDictFindList (args_in, TR_KEY_priority_low, &l))
+    {
+      tr_file_index_t fileCount;
+      tr_file_index_t * files = fileListFromList (l, &fileCount);
+      tr_ctorSetFilePriorities (ctor, files, fileCount, TR_PRI_LOW);
+      tr_free (files);
+    }
+
+  if (tr_variantDictFindList (args_in, TR_KEY_priority_normal, &l))
+    {
+      tr_file_index_t fileCount;
+      tr_file_index_t * files = fileListFromList (l, &fileCount);
+      tr_ctorSetFilePriorities (ctor, files, fileCount, TR_PRI_NORMAL);
+      tr_free (files);
+    }
+
+  if (tr_variantDictFindList (args_in, TR_KEY_priority_high, &l))
+    {
+      tr_file_index_t fileCount;
+      tr_file_index_t * files = fileListFromList (l, &fileCount);
+      tr_ctorSetFilePriorities (ctor, files, fileCount, TR_PRI_HIGH);
+      tr_free (files);
+    }
+
+  dbgmsg ("torrentAdd: filename is \"%s\"", filename ? filename : " (null)");
+
+  if (isCurlURL (filename))
+    {
+      struct add_torrent_idle_data * d = tr_new0 (struct add_torrent_idle_data, 1);
+      d->data = idle_data;
+      d->ctor = ctor;
+      tr_webRunWithCookies (session, filename, cookies, gotMetadataFromURL, d);
     }
   else
     {
-      int64_t i;
-      bool boolVal;
-      tr_variant * l;
-      const char * str;
-      const char * cookies = NULL;
-      tr_ctor * ctor = tr_ctorNew (session);
+      char * fname = tr_strstrip (tr_strdup (filename));
 
-      /* set the optional arguments */
-
-      tr_variantDictFindStr (args_in, TR_KEY_cookies, &cookies, NULL);
-
-      if (tr_variantDictFindStr (args_in, TR_KEY_download_dir, &str, NULL))
-        tr_ctorSetDownloadDir (ctor, TR_FORCE, str);
-
-      if (tr_variantDictFindBool (args_in, TR_KEY_paused, &boolVal))
-        tr_ctorSetPaused (ctor, TR_FORCE, boolVal);
-
-      if (tr_variantDictFindInt (args_in, TR_KEY_peer_limit, &i))
-        tr_ctorSetPeerLimit (ctor, TR_FORCE, i);
-
-      if (tr_variantDictFindInt (args_in, TR_KEY_bandwidthPriority, &i))
-        tr_ctorSetBandwidthPriority (ctor, i);
-
-      if (tr_variantDictFindList (args_in, TR_KEY_files_unwanted, &l))
+      if (fname == NULL)
         {
-          tr_file_index_t fileCount;
-          tr_file_index_t * files = fileListFromList (l, &fileCount);
-          tr_ctorSetFilesWanted (ctor, files, fileCount, false);
-          tr_free (files);
+          size_t len;
+          char * metainfo = tr_base64_decode_str (metainfo_base64, &len);
+          tr_ctorSetMetainfo (ctor, (uint8_t*)metainfo, len);
+          tr_free (metainfo);
         }
-
-      if (tr_variantDictFindList (args_in, TR_KEY_files_wanted, &l))
+      else if (!strncmp (fname, "magnet:?", 8))
         {
-          tr_file_index_t fileCount;
-          tr_file_index_t * files = fileListFromList (l, &fileCount);
-          tr_ctorSetFilesWanted (ctor, files, fileCount, true);
-          tr_free (files);
-        }
-
-      if (tr_variantDictFindList (args_in, TR_KEY_priority_low, &l))
-        {
-          tr_file_index_t fileCount;
-          tr_file_index_t * files = fileListFromList (l, &fileCount);
-          tr_ctorSetFilePriorities (ctor, files, fileCount, TR_PRI_LOW);
-          tr_free (files);
-        }
-
-      if (tr_variantDictFindList (args_in, TR_KEY_priority_normal, &l))
-        {
-          tr_file_index_t fileCount;
-          tr_file_index_t * files = fileListFromList (l, &fileCount);
-          tr_ctorSetFilePriorities (ctor, files, fileCount, TR_PRI_NORMAL);
-          tr_free (files);
-        }
-
-      if (tr_variantDictFindList (args_in, TR_KEY_priority_high, &l))
-        {
-          tr_file_index_t fileCount;
-          tr_file_index_t * files = fileListFromList (l, &fileCount);
-          tr_ctorSetFilePriorities (ctor, files, fileCount, TR_PRI_HIGH);
-          tr_free (files);
-        }
-
-      dbgmsg ("torrentAdd: filename is \"%s\"", filename ? filename : " (null)");
-
-      if (isCurlURL (filename))
-        {
-          struct add_torrent_idle_data * d = tr_new0 (struct add_torrent_idle_data, 1);
-          d->data = idle_data;
-          d->ctor = ctor;
-          tr_webRunWithCookies (session, filename, cookies, gotMetadataFromURL, d);
+          tr_ctorSetMetainfoFromMagnetLink (ctor, fname);
         }
       else
         {
-          char * fname = tr_strstrip (tr_strdup (filename));
-
-          if (fname == NULL)
-            {
-              size_t len;
-              char * metainfo = tr_base64_decode_str (metainfo_base64, &len);
-              tr_ctorSetMetainfo (ctor, (uint8_t*)metainfo, len);
-              tr_free (metainfo);
-            }
-          else if (!strncmp (fname, "magnet:?", 8))
-            {
-              tr_ctorSetMetainfoFromMagnetLink (ctor, fname);
-            }
-          else
-            {
-              tr_ctorSetMetainfoFromFile (ctor, fname);
-            }
-
-          addTorrentImpl (idle_data, ctor);
-
-          tr_free (fname);
+          tr_ctorSetMetainfoFromFile (ctor, fname);
         }
 
+      addTorrentImpl (idle_data, ctor);
+
+      tr_free (fname);
     }
 
   return NULL;
@@ -2258,7 +2249,11 @@ tr_rpc_request_exec_json (tr_session            * session,
       data->args_out = tr_variantDictAddDict (data->response, TR_KEY_arguments, 0);
       data->callback = callback;
       data->callback_user_data = callback_user_data;
-      (*methods[i].func)(session, args_in, data->args_out, data);
+      result = (*methods[i].func)(session, args_in, data->args_out, data);
+
+      /* Async operation failed prematurely? Invoke callback or else client will not get a reply */
+      if (result != NULL)
+        tr_idle_function_done (data, result);
     }
 }
 
