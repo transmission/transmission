@@ -340,7 +340,7 @@
     [fTorrent setGroupValue: fGroupValue  determinationType: fGroupValueDetermination];
 
     if (fTorrentFile && fCanToggleDelete && [fDeleteCheck state] == NSOnState)
-        [Torrent trashFile: fTorrentFile];
+        [Torrent trashFile: fTorrentFile error: nil];
     
     if ([fStartCheck state] == NSOnState)
         [fTorrent startTransfer];

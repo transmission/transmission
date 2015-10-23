@@ -155,7 +155,7 @@ gboolean on_tree_view_button_released (GtkWidget      * view,
 
 
 /* move a file to the trashcan if GIO is available; otherwise, delete it */
-int gtr_file_trash_or_remove (const char * filename);
+bool gtr_file_trash_or_remove (const char * filename, struct tr_error ** error);
 
 void gtr_paste_clipboard_url_into_entry (GtkWidget * entry);
 

@@ -102,6 +102,7 @@ typedef struct tr_info tr_info;
 typedef struct tr_torrent tr_torrent;
 typedef struct tr_session tr_session;
 
+struct tr_error;
 struct tr_variant;
 
 typedef int8_t tr_priority_t;
@@ -1104,7 +1105,7 @@ tr_torrent * tr_torrentNew (const tr_ctor   * ctor,
 /** @addtogroup tr_torrent Torrents
     @{ */
 
-typedef int (*tr_fileFunc) (const char * filename);
+typedef bool (*tr_fileFunc) (const char * filename, struct tr_error ** error);
 
 /** @brief Removes our .torrent and .resume files for this torrent */
 void tr_torrentRemove (tr_torrent  * torrent,

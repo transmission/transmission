@@ -1122,7 +1122,7 @@ core_create_new_torrent (TrCore * core, tr_ctor * ctor)
           /* #1294: don't delete the .torrent file if it's our internal copy */
           const int is_internal = (strstr (source, config) == source);
           if (!is_internal)
-              gtr_file_trash_or_remove (source);
+              gtr_file_trash_or_remove (source, NULL);
         }
     }
 

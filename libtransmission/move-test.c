@@ -8,7 +8,6 @@
  */
 
 #include <assert.h>
-#include <stdio.h> /* remove() */
 #include <string.h> /* strcmp() */
 #include <stdio.h>
 
@@ -136,7 +135,7 @@ test_incomplete_dir_impl (const char * incomplete_dir, const char * download_dir
     check_file_location (tor, i, tr_buildPath (download_dir, tor->info.files[i].name, NULL));
 
   /* cleanup */
-  tr_torrentRemove (tor, true, remove);
+  tr_torrentRemove (tor, true, tr_sys_path_remove);
   libttest_session_close (session);
   return 0;
 }
@@ -204,7 +203,7 @@ test_set_location (void)
 
   /* cleanup */
   tr_free (target_dir);
-  tr_torrentRemove (tor, true, remove);
+  tr_torrentRemove (tor, true, tr_sys_path_remove);
   libttest_session_close (session);
   return 0;
 }

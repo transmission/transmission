@@ -134,7 +134,7 @@ addResponseCB (GtkDialog * dialog,
           gtr_core_add_torrent (o->core, o->tor, FALSE);
 
           if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (o->trash_check)))
-            gtr_file_trash_or_remove (o->filename);
+            gtr_file_trash_or_remove (o->filename, NULL);
 
           save_recent_destination (o->core, o->downloadDir);
         }

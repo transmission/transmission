@@ -31,6 +31,7 @@
 
 #import "log.h"
 #import "transmission.h" // required by utils.h
+#import "error.h"
 #import "utils.h" // tr_new()
 
 #define ETA_IDLE_DISPLAY_SEC (2*60)
@@ -112,14 +113,22 @@ void renameCallback(tr_torrent * torrent, const char * oldPathCharString, const 
     }
 }
 
-int trashDataFile(const char * filename)
+bool trashDataFile(const char * filename, tr_error ** error)
 {
+    if (filename == NULL)
+        return false;
+
     @autoreleasepool
     {
-        if (filename != NULL)
-            [Torrent trashFile: [NSString stringWithUTF8String: filename]];
+        NSError * localError;
+        if (![Torrent trashFile: [NSString stringWithUTF8String: filename] error: &localError])
+        {
+            tr_error_set_literal(error, [localError code], [[localError description] UTF8String]);
+            return false;
+        }
     }
-    return 0;
+
+    return true;
 }
 
 @implementation Torrent
@@ -139,7 +148,7 @@ int trashDataFile(const char * filename)
     if (self)
     {
         if (torrentDelete && ![[self torrentLocation] isEqualToString: path])
-            [Torrent trashFile: path];
+            [Torrent trashFile: path error: nil];
     }
     return self;
 }
@@ -512,7 +521,7 @@ int trashDataFile(const char * filename)
     return tr_torrentSetPriority(fHandle, priority);
 }
 
-+ (void) trashFile: (NSString *) path
++ (BOOL) trashFile: (NSString *) path error: (NSError **) error
 {
     //attempt to move to trash
     if (![[NSWorkspace sharedWorkspace] performFileOperation: NSWorkspaceRecycleOperation
@@ -520,11 +529,21 @@ int trashDataFile(const char * filename)
                                                        files: [NSArray arrayWithObject: [path lastPathComponent]] tag: nil])
     {
         //if cannot trash, just delete it (will work if it's on a remote volume)
-        NSError * error;
-        if (![[NSFileManager defaultManager] removeItemAtPath: path error: &error])
-            NSLog(@"old Could not trash %@: %@", path, [error localizedDescription]);
-        else {NSLog(@"old removed %@", path);}
+        NSError * localError;
+        if (![[NSFileManager defaultManager] removeItemAtPath: path error: &localError])
+        {
+            NSLog(@"old Could not trash %@: %@", path, [localError localizedDescription]);
+            if (error != nil)
+                *error = localError;
+            return NO;
+        }
+        else
+        {
+            NSLog(@"old removed %@", path);
+        }
     }
+
+    return YES;
 }
 
 - (void) moveTorrentDataFileTo: (NSString *) folder

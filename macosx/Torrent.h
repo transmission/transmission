@@ -133,7 +133,7 @@ typedef enum {
 - (tr_priority_t) priority;
 - (void) setPriority: (tr_priority_t) priority;
 
-+ (void) trashFile: (NSString *) path;
++ (BOOL) trashFile: (NSString *) path error: (NSError **) error;
 - (void) moveTorrentDataFileTo: (NSString *) folder;
 - (void) copyTorrentFileTo: (NSString *) path;
 

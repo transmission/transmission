@@ -18,6 +18,7 @@
 #include <gio/gio.h> /* g_file_trash () */
 
 #include <libtransmission/transmission.h> /* TR_RATIO_NA, TR_RATIO_INF */
+#include <libtransmission/error.h>
 #include <libtransmission/utils.h> /* tr_strratio () */
 #include <libtransmission/web.h> /* tr_webResponseStr () */
 #include <libtransmission/version.h> /* SHORT_VERSION_STRING */
@@ -304,13 +305,14 @@ on_tree_view_button_released (GtkWidget *      view,
   return FALSE;
 }
 
-int
-gtr_file_trash_or_remove (const char * filename)
+bool
+gtr_file_trash_or_remove (const char * filename, tr_error ** error)
 {
   GFile * file;
   gboolean trashed = FALSE;
+  bool result = true;
 
-  g_return_val_if_fail (filename && *filename, 0);
+  g_return_val_if_fail (filename && *filename, false);
 
   file = g_file_new_for_path (filename);
 
@@ -321,6 +323,7 @@ gtr_file_trash_or_remove (const char * filename)
       if (err)
         {
           g_message ("Unable to trash file \"%s\": %s", filename, err->message);
+          tr_error_set_literal (error, err->code, err->message);
           g_clear_error (&err);
         }
     }
@@ -332,12 +335,15 @@ gtr_file_trash_or_remove (const char * filename)
       if (err)
         {
           g_message ("Unable to delete file \"%s\": %s", filename, err->message);
+          tr_error_clear (error);
+          tr_error_set_literal (error, err->code, err->message);
           g_clear_error (&err);
+          result = false;
         }
     }
 
   g_object_unref (G_OBJECT (file));
-  return 0;
+  return result;
 }
 
 const char*

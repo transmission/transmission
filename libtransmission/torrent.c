@@ -20,7 +20,6 @@
 #include <assert.h>
 #include <math.h>
 #include <stdarg.h>
-#include <stdio.h> /* remove () */
 #include <string.h> /* memcmp */
 #include <stdlib.h> /* qsort */
 #include <limits.h> /* INT_MAX */
@@ -3008,7 +3007,7 @@ deleteLocalData (tr_torrent * tor, tr_fileFunc func)
           if (strcmp (name, ".") != 0 && strcmp (name, "..") != 0)
             {
               char * file = tr_buildPath (tmpdir, name, NULL);
-              func (file);
+              func (file, NULL);
               tr_free (file);
             }
         }
@@ -3022,7 +3021,7 @@ deleteLocalData (tr_torrent * tor, tr_fileFunc func)
       while (tr_sys_path_exists (walk, NULL) && !tr_sys_path_is_same (tmpdir, walk, NULL))
         {
           char * tmp = tr_sys_path_dirname (walk, NULL);
-          func (walk);
+          func (walk, NULL);
           tr_free (walk);
           walk = tmp;
         }
@@ -3085,7 +3084,7 @@ tr_torrentDeleteLocalData (tr_torrent * tor, tr_fileFunc func)
   assert (tr_isTorrent (tor));
 
   if (func == NULL)
-    func = remove;
+    func = tr_sys_path_remove;
 
   /* close all the files because we're about to delete them */
   tr_cacheFlushTorrent (tor->session->cache, tor);
@@ -3178,7 +3177,7 @@ setLocation (void * vdata)
         {
           /* blow away the leftover subdirectories in the old location */
           if (do_move)
-            tr_torrentDeleteLocalData (tor, remove);
+            tr_torrentDeleteLocalData (tor, tr_sys_path_remove);
 
           /* set the new location and reverify */
           tr_torrentSetDownloadDir (tor, location);
