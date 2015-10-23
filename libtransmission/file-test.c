@@ -333,16 +333,22 @@ test_path_is_relative (void)
 #ifdef _WIN32
 
   check (tr_sys_path_is_relative ("/"));
-  check (tr_sys_path_is_relative ("//x"));
   check (tr_sys_path_is_relative ("\\x"));
+  check (tr_sys_path_is_relative ("/x"));
   check (tr_sys_path_is_relative ("\\x\\y"));
+  check (tr_sys_path_is_relative ("/x/y"));
   check (tr_sys_path_is_relative ("C:x"));
   check (tr_sys_path_is_relative ("C:x\\y"));
+  check (tr_sys_path_is_relative ("C:x/y"));
 
   check (!tr_sys_path_is_relative ("\\\\"));
+  check (!tr_sys_path_is_relative ("//"));
   check (!tr_sys_path_is_relative ("\\\\x"));
+  check (!tr_sys_path_is_relative ("//x"));
   check (!tr_sys_path_is_relative ("\\\\x\\y"));
+  check (!tr_sys_path_is_relative ("//x/y"));
   check (!tr_sys_path_is_relative ("\\\\.\\x"));
+  check (!tr_sys_path_is_relative ("//./x"));
 
   check (!tr_sys_path_is_relative ("a:"));
   check (!tr_sys_path_is_relative ("a:\\"));

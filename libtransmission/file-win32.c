@@ -367,11 +367,11 @@ tr_sys_path_is_relative (const char * path)
   assert (path != NULL);
 
   /* UNC path: `\\...`. */
-  if (path[0] == '\\' && path[1] == '\\')
+  if (is_unc_path (path))
     return false;
 
   /* Local path: `X:` or `X:\...`. */
-  if (isalpha (path[0]) && path[1] == ':' && (path[2] == '\0' || path[2] == '\\' || path[2] == '/'))
+  if (isalpha (path[0]) && path[1] == ':' && (path[2] == '\0' || is_slash (path[2])))
     return false;
 
   return true;
