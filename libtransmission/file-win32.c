@@ -9,7 +9,6 @@
 
 #include <assert.h>
 #include <ctype.h> /* isalpha () */
-#include <stdlib.h> /* _splitpath_s (), _makepath_s () */
 
 #include <shlobj.h> /* SHCreateDirectoryEx () */
 #include <winioctl.h> /* FSCTL_SET_SPARSE */
@@ -106,6 +105,40 @@ stat_to_sys_path_info (DWORD              attributes,
   info->size |= size_low;
 
   info->last_modified_at = filetime_to_unix_time (mtime);
+}
+
+static inline bool
+is_slash (char c)
+{
+  return c == '\\' || c == '/';
+}
+
+static inline bool
+is_unc_path (const char * path)
+{
+  return is_slash (path[0]) && path[1] == path[0];
+}
+
+static bool
+is_valid_path (const char * path)
+{
+  if (is_unc_path (path))
+    {
+      if (path[2] != '\0' && !isalnum (path[2]))
+        return false;
+    }
+  else
+    {
+      const char * colon_pos = strchr (path, ':');
+      if (colon_pos != NULL)
+        {
+          if (colon_pos != path + 1 || !isalpha (path[0]))
+            return false;
+          path += 2;
+        }
+    }
+
+  return strpbrk (path, "<>:\"|?*") == NULL;
 }
 
 static tr_sys_file_t
@@ -454,57 +487,70 @@ char *
 tr_sys_path_basename (const char  * path,
                       tr_error   ** error)
 {
-  char fname[_MAX_FNAME], ext[_MAX_EXT];
+  if (path == NULL || path[0] == '\0')
+    return tr_strdup (".");
 
-  assert (path != NULL);
-
-  (void) error;
-
-  /* TODO: Error handling */
-
-  if (_splitpath_s (path, NULL, 0, NULL, 0, fname, sizeof (fname), ext, sizeof (ext)) == 0 &&
-      (*fname != '\0' || *ext != '\0'))
+  if (!is_valid_path (path))
     {
-      const size_t tmp_len = strlen (fname) + strlen (ext) + 2;
-      char * const tmp = tr_new (char, tmp_len);
-      if (_makepath_s (tmp, tmp_len, NULL, NULL, fname, ext) == 0)
-        return tmp;
-      tr_free (tmp);
+      set_system_error (error, ERROR_PATH_NOT_FOUND);
+      return NULL;
     }
 
-  return tr_strdup (".");
+  const char * end = path + strlen (path);
+  while (end > path && is_slash (*(end - 1)))
+    --end;
+
+  if (end == path)
+    return tr_strdup ("/");
+
+  const char * name = end;
+  while (name > path && *(name - 1) != ':' && !is_slash (*(name - 1)))
+    --name;
+
+  if (name == end)
+    return tr_strdup ("/");
+
+  return tr_strndup (name, end - name);
 }
 
 char *
 tr_sys_path_dirname (const char  * path,
                      tr_error   ** error)
 {
-  char drive[_MAX_DRIVE], dir[_MAX_DIR];
+  if (path == NULL || path[0] == '\0')
+    return tr_strdup (".");
 
-  assert (path != NULL);
-
-  (void) error;
-
-  /* TODO: Error handling */
-
-  if (_splitpath_s (path, drive, sizeof (drive), dir, sizeof (dir), NULL, 0, NULL, 0) == 0 &&
-      (*drive != '\0' || *dir != '\0'))
+  if (!is_valid_path (path))
     {
-      const size_t tmp_len = strlen (drive) + strlen (dir) + 2;
-      char * const tmp = tr_new (char, tmp_len);
-      if (_makepath_s (tmp, tmp_len, drive, dir, NULL, NULL) == 0)
-        {
-          size_t len = strlen(tmp);
-          while (len > 0 && (tmp[len - 1] == '/' || tmp[len - 1] == '\\'))
-            tmp[--len] = '\0';
-
-          return tmp;
-        }
-
-      tr_free (tmp);
+      set_system_error (error, ERROR_PATH_NOT_FOUND);
+      return NULL;
     }
 
-  return tr_strdup (".");
+  const bool is_unc = is_unc_path (path);
+
+  if (is_unc && path[2] == '\0')
+    return tr_strdup (path);
+
+  const char * end = path + strlen (path);
+  while (end > path && is_slash (*(end - 1)))
+    --end;
+
+  if (end == path)
+    return tr_strdup ("/");
+
+  const char * name = end;
+  while (name > path && *(name - 1) != ':' && !is_slash (*(name - 1)))
+    --name;
+  while (name > path && is_slash (*(name - 1)))
+    --name;
+
+  if (name == path)
+    return tr_strdup (is_unc ? "\\\\" : ".");
+
+  if (name > path && *(name - 1) == ':' && *name != '\0' && !is_slash (*name))
+    return tr_strdup_printf ("%c:.", path[0]);
+
+  return tr_strndup (path, name - path);
 }
 
 bool

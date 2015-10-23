@@ -621,69 +621,117 @@ test_path_resolve (void)
   return 0;
 }
 
+struct xname_test_data
+{
+  const char * input;
+  const char * output;
+};
+
+static int
+test_path_xname (const struct xname_test_data * data,
+                 size_t                         data_size,
+                 char *                      (* func) (const char *, tr_error **))
+{
+  for (size_t i = 0; i < data_size; ++i)
+    {
+      tr_error * err = NULL;
+      char * name = func (data[i].input, &err);
+
+      if (data[i].output != NULL)
+        {
+          check (name != NULL);
+          check (err == NULL);
+          check_streq (data[i].output, name);
+          tr_free (name);
+        }
+      else
+        {
+          check (name == NULL);
+          check (err != NULL);
+          tr_error_clear (&err);
+        }
+    }
+
+  return 0;
+}
+
 static int
 test_path_basename_dirname (void)
 {
-  tr_error * err = NULL;
-  char * name;
-
-  name = tr_sys_path_basename ("/a/b/c", &err);
-  check (name != NULL);
-  check (err == NULL);
-  check_streq ("c", name);
-  tr_free (name);
-
-  name = tr_sys_path_basename ("", &err);
-  check (name != NULL);
-  check (err == NULL);
-  check_streq (".", name);
-  tr_free (name);
-
-  name = tr_sys_path_dirname ("/a/b/c", &err);
-  check (name != NULL);
-  check (err == NULL);
-  check_streq ("/a/b", name);
-  tr_free (name);
-
-  name = tr_sys_path_dirname ("a/b/c", &err);
-  check (name != NULL);
-  check (err == NULL);
-  check_streq ("a/b", name);
-  tr_free (name);
-
-  name = tr_sys_path_dirname ("a", &err);
-  check (name != NULL);
-  check (err == NULL);
-  check_streq (".", name);
-  tr_free (name);
-
-  name = tr_sys_path_dirname ("", &err);
-  check (name != NULL);
-  check (err == NULL);
-  check_streq (".", name);
-  tr_free (name);
-
+  const struct xname_test_data basename_tests[] =
+  {
+    { "a", "a" },
+    { "aa", "aa" },
+    { "/aa", "aa" },
+    { "/a/b/c", "c" },
+    { "/a/b/c/", "c" },
+    { "/", "/" },
+    { "", "." },
 #ifdef _WIN32
-
-  name = tr_sys_path_basename ("c:\\a\\b\\c", &err);
-  check (name != NULL);
-  check (err == NULL);
-  check_streq ("c", name);
-  tr_free (name);
-
-  name = tr_sys_path_dirname ("C:\\a/b\\c", &err);
-  check (name != NULL);
-  check (err == NULL);
-  check_streq ("C:\\a/b", name);
-  tr_free (name);
-
-  name = tr_sys_path_dirname ("a/b\\c", &err);
-  check (name != NULL);
-  check (err == NULL);
-  check_streq ("a/b", name);
-  tr_free (name);
-
+    { "c:\\a\\b\\c", "c" },
+    { "c:", "/" },
+    { "c:/", "/" },
+    { "c:\\", "/" },
+    { "c:a/b", "b" },
+    { "c:a", "a" },
+    { "\\\\a\\b\\c", "c" },
+    { "//a/b", "b" },
+    { "//1.2.3.4/b", "b" },
+    { "\\\\a", "a" },
+    { "\\\\1.2.3.4", "1.2.3.4" },
+    { "\\\\", "/" },
+    { "\\", "/" },
+    { "\\a", "a" },
+    { "\\\\\\", NULL },
+    { "123:" , NULL }
+#else
+    { "////", "/" }
 #endif
+  };
+
+  if (test_path_xname (basename_tests, sizeof (basename_tests) / sizeof (*basename_tests), tr_sys_path_basename) != 0)
+    return 1;
+
+  const struct xname_test_data dirname_tests[] =
+  {
+    { "/a/b/c", "/a/b" },
+    { "a/b/c", "a/b" },
+    { "a/b/c/", "a/b" },
+    { "a", "." },
+    { "a/", "." },
+    { "/", "/" },
+    { "", "." },
+#ifdef _WIN32
+    { "C:\\a/b\\c", "C:\\a/b" },
+    { "C:\\a/b\\c\\", "C:\\a/b" },
+    { "C:\\a/b", "C:\\a" },
+    { "C:/a", "C:" },
+    { "C:", "C:" },
+    { "C:/", "C:" },
+    { "C:\\", "C:" },
+    { "c:a/b", "c:a" },
+    { "c:a", "c:." },
+    { "c:.", "c:." },
+    { "\\\\a\\b\\c", "\\\\a\\b" },
+    { "\\\\a\\b\\c/", "\\\\a\\b" },
+    { "//a/b", "//a" },
+    { "//1.2.3.4/b", "//1.2.3.4" },
+    { "\\\\a", "\\\\" },
+    { "\\\\1.2.3.4", "\\\\" },
+    { "\\\\", "\\\\" },
+    { "\\", "/" },
+    { "a/b\\c", "a/b" },
+    { "\\\\\\" , NULL },
+    { "123:" , NULL }
+#else
+    { "////", "/" }
+#endif
+  };
+
+  if (test_path_xname (dirname_tests, sizeof (dirname_tests) / sizeof (*dirname_tests), tr_sys_path_dirname) != 0)
+    return 1;
+
+  /* TODO: is_same (dirname (x) + '/' + basename (x), x) */
 
   return 0;
 }
