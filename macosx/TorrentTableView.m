@@ -556,6 +556,7 @@
             NSDataDetector * detector = [NSDataDetectorLion dataDetectorWithTypes: NSTextCheckingTypeLink error: nil];
             for (NSString * pbItem in items)
             {
+                pbItem = [pbItem stringByTrimmingCharactersInSet: [NSCharacterSet whitespaceAndNewlineCharacterSet]];
                 if ([pbItem rangeOfString: @"magnet:" options: (NSAnchoredSearch | NSCaseInsensitiveSearch)].location != NSNotFound)
                     [fController openURL: pbItem];
                 else
@@ -586,6 +587,7 @@
                 NSDataDetector * detector = [NSDataDetectorLion dataDetectorWithTypes: NSTextCheckingTypeLink error: nil];
                 for (NSString * pbItem in items)
                 {
+                    pbItem = [pbItem stringByTrimmingCharactersInSet: [NSCharacterSet whitespaceAndNewlineCharacterSet]];
                     if (([pbItem rangeOfString: @"magnet:" options: (NSAnchoredSearch | NSCaseInsensitiveSearch)].location != NSNotFound)
                         || [detector firstMatchInString: pbItem options: 0 range: NSMakeRange(0, [pbItem length])])
                         return YES;
