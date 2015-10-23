@@ -200,7 +200,9 @@ wchar_t * tr_win32_utf8_to_native    (const char    * text,
                                       int             text_size);
 wchar_t * tr_win32_utf8_to_native_ex (const char    * text,
                                       int             text_size,
-                                      int             extra_chars);
+                                      int             extra_chars_before,
+                                      int             extra_chars_after,
+                                      int           * real_result_size);
 char    * tr_win32_format_message    (uint32_t        code);
 
 void      tr_win32_make_args_utf8    (int    * argc,

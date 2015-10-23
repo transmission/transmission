@@ -1080,27 +1080,35 @@ wchar_t *
 tr_win32_utf8_to_native (const char * text,
                          int          text_size)
 {
-  return tr_win32_utf8_to_native_ex (text, text_size, 0);
+  return tr_win32_utf8_to_native_ex (text, text_size, 0, 0, NULL);
 }
 
 wchar_t *
 tr_win32_utf8_to_native_ex (const char * text,
                             int          text_size,
-                            int          extra_chars)
+                            int          extra_chars_before,
+                            int          extra_chars_after,
+                            int        * real_result_size)
 {
   wchar_t * ret = NULL;
   int size;
+
+  if (text_size == -1)
+    text_size = strlen (text);
 
   size = MultiByteToWideChar (CP_UTF8, 0, text, text_size, NULL, 0);
   if (size == 0)
     goto fail;
 
-  ret = tr_new (wchar_t, size + extra_chars + 1);
-  size = MultiByteToWideChar (CP_UTF8, 0, text, text_size, ret, size);
+  ret = tr_new (wchar_t, size + extra_chars_before + extra_chars_after + 1);
+  size = MultiByteToWideChar (CP_UTF8, 0, text, text_size, ret + extra_chars_before, size);
   if (size == 0)
     goto fail;
 
-  ret[size] = L'\0';
+  ret[size + extra_chars_before + extra_chars_after] = L'\0';
+
+  if (real_result_size != NULL)
+    *real_result_size = size;
 
   return ret;
 

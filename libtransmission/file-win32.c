@@ -141,6 +141,60 @@ is_valid_path (const char * path)
   return strpbrk (path, "<>:\"|?*") == NULL;
 }
 
+static wchar_t *
+path_to_native_path_ex (const char * path,
+                        int          extra_chars_after,
+                        int        * real_result_size)
+{
+  /* Extending maximum path length limit up to ~32K. See "Naming Files, Paths, and Namespaces"
+     (https://msdn.microsoft.com/en-us/library/windows/desktop/aa365247.aspx) for more info */
+
+  const wchar_t local_prefix[] = { '\\', '\\', '?', '\\' };
+  const wchar_t unc_prefix[] = { '\\', '\\', '?', '\\', 'U', 'N', 'C', '\\' };
+
+  const bool is_relative = tr_sys_path_is_relative (path);
+  const bool is_unc = is_unc_path (path);
+
+  /* `-2` for UNC since we overwrite existing prefix slashes */
+  const int extra_chars_before = is_relative ? 0 : (is_unc ? ARRAYSIZE (unc_prefix) - 2
+                                                           : ARRAYSIZE (local_prefix));
+
+  /* TODO (?): assert (!is_relative); */
+
+  wchar_t * const wide_path = tr_win32_utf8_to_native_ex (path, -1, extra_chars_before,
+                                                          extra_chars_after, real_result_size);
+  if (wide_path == NULL)
+    return NULL;
+
+  /* Relative paths cannot be used with "\\?\" prefixes. This also means that relative paths are
+     limited to ~260 chars... but we should rarely work with relative paths in the first place */
+  if (!is_relative)
+    {
+      if (is_unc)
+        /* UNC path: "\\server\share" -> "\\?\UNC\server\share" */
+        memcpy (wide_path, unc_prefix, sizeof (unc_prefix));
+      else
+        /* Local path: "C:" -> "\\?\C:" */
+        memcpy (wide_path, local_prefix, sizeof (local_prefix));
+    }
+
+  /* Automatic '/' to '\' conversion is disabled for "\\?\"-prefixed paths */
+  wchar_t * p = wide_path + extra_chars_before;
+  while ((p = wcschr (p, L'/')) != NULL)
+    *p++ = L'\\';
+
+  if (real_result_size != NULL)
+    *real_result_size += extra_chars_before;
+
+  return wide_path;
+}
+
+static wchar_t *
+path_to_native_path (const char * path)
+{
+  return path_to_native_path_ex (path, 0, NULL);
+}
+
 static tr_sys_file_t
 open_file (const char  * path,
            DWORD         access,
@@ -153,7 +207,7 @@ open_file (const char  * path,
 
   assert (path != NULL);
 
-  wide_path = tr_win32_utf8_to_native (path, -1);
+  wide_path = path_to_native_path (path);
 
   if (wide_path != NULL)
     ret = CreateFileW (wide_path, access, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
@@ -182,15 +236,10 @@ create_dir (const char  * path,
 
   (void) permissions;
 
-  wide_path = tr_win32_utf8_to_native (path, -1);
+  wide_path = path_to_native_path (path);
 
   if ((flags & TR_SYS_DIR_CREATE_PARENTS) != 0)
     {
-      /* For some reason SHCreateDirectoryEx has issues with forward slashes */
-      wchar_t * p = wide_path;
-      while ((p = wcschr (p, L'/')) != NULL)
-        *p++ = L'\\';
-
       error_code = SHCreateDirectoryExW (NULL, wide_path, NULL);
       ret = error_code == ERROR_SUCCESS;
     }
@@ -275,7 +324,7 @@ tr_sys_path_exists (const char  * path,
 
   assert (path != NULL);
 
-  wide_path = tr_win32_utf8_to_native (path, -1);
+  wide_path = path_to_native_path (path);
 
   if (wide_path != NULL)
     {
@@ -319,7 +368,7 @@ tr_sys_path_get_info (const char        * path,
   assert (path != NULL);
   assert (info != NULL);
 
-  wide_path = tr_win32_utf8_to_native (path, -1);
+  wide_path = path_to_native_path (path);
 
   if ((flags & TR_SYS_PATH_NO_FOLLOW) == 0)
     {
@@ -392,11 +441,11 @@ tr_sys_path_is_same (const char  * path1,
   assert (path1 != NULL);
   assert (path2 != NULL);
 
-  wide_path1 = tr_win32_utf8_to_native (path1, -1);
+  wide_path1 = path_to_native_path (path1);
   if (wide_path1 == NULL)
     goto fail;
 
-  wide_path2 = tr_win32_utf8_to_native (path2, -1);
+  wide_path2 = path_to_native_path (path2);
   if (wide_path2 == NULL)
     goto fail;
 
@@ -444,7 +493,7 @@ tr_sys_path_resolve (const char  * path,
 
   assert (path != NULL);
 
-  wide_path = tr_win32_utf8_to_native (path, -1);
+  wide_path = path_to_native_path (path);
   if (wide_path == NULL)
     goto fail;
 
@@ -565,8 +614,8 @@ tr_sys_path_rename (const char  * src_path,
   assert (src_path != NULL);
   assert (dst_path != NULL);
 
-  wide_src_path = tr_win32_utf8_to_native (src_path, -1);
-  wide_dst_path = tr_win32_utf8_to_native (dst_path, -1);
+  wide_src_path = path_to_native_path (src_path);
+  wide_dst_path = path_to_native_path (dst_path);
 
   if (wide_src_path != NULL && wide_dst_path != NULL)
     {
@@ -608,7 +657,7 @@ tr_sys_path_remove (const char  * path,
 
   assert (path != NULL);
 
-  wide_path = tr_win32_utf8_to_native (path, -1);
+  wide_path = path_to_native_path (path);
 
   if (wide_path != NULL)
     {
@@ -1159,6 +1208,7 @@ tr_sys_dir_open (const char  * path,
                  tr_error   ** error)
 {
   tr_sys_dir_t ret;
+  int pattern_size;
 
 #ifndef __clang__
   /* Clang gives "static_assert expression is not an integral constant expression" error */
@@ -1168,14 +1218,12 @@ tr_sys_dir_open (const char  * path,
   assert (path != NULL);
 
   ret = tr_new (struct tr_sys_dir_win32, 1);
-  ret->pattern = tr_win32_utf8_to_native_ex (path, -1, 2);
+  ret->pattern = path_to_native_path_ex (path, 2, &pattern_size);
 
   if (ret->pattern != NULL)
     {
-      const size_t pattern_size = wcslen (ret->pattern);
       ret->pattern[pattern_size + 0] = L'\\';
       ret->pattern[pattern_size + 1] = L'*';
-      ret->pattern[pattern_size + 2] = L'\0';
 
       ret->find_handle = INVALID_HANDLE_VALUE;
       ret->utf8_name = NULL;
