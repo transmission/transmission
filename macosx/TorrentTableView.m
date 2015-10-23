@@ -556,12 +556,13 @@
             NSDataDetector * detector = [NSDataDetectorLion dataDetectorWithTypes: NSTextCheckingTypeLink error: nil];
             for (NSString * pbItem in items)
             {
-                if ([pbItem rangeOfString: @"magnet:" options: (NSAnchoredSearch | NSCaseInsensitiveSearch)].location != NSNotFound)
-                    [fController openURL: pbItem];
+                NSString *trimmedItem = [pbItem stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+                if ([trimmedItem rangeOfString: @"magnet:" options: (NSAnchoredSearch | NSCaseInsensitiveSearch)].location != NSNotFound)
+                    [fController openURL: trimmedItem];
                 else
                 {
                     #warning only accept full text?
-                    for (NSTextCheckingResult * result in [detector matchesInString: pbItem options: 0 range: NSMakeRange(0, [pbItem length])])
+                    for (NSTextCheckingResult * result in [detector matchesInString: trimmedItem options: 0 range: NSMakeRange(0, [trimmedItem length])])
                         [fController openURL: [[result URL] absoluteString]];
                 }
             }
