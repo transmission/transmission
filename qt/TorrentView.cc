@@ -16,7 +16,7 @@
 class TorrentView::HeaderWidget: public QWidget
 {
   public:
-    HeaderWidget (QWidget * parent):
+    HeaderWidget (TorrentView * parent):
       QWidget (parent),
       myText ()
     {
@@ -54,6 +54,11 @@ class TorrentView::HeaderWidget: public QWidget
 
       option.rect = style ()->subElementRect (QStyle::SE_HeaderLabel, &option, this);
       painter.drawItemText (option.rect, Qt::AlignCenter, option.palette, true, myText, QPalette::ButtonText);
+    }
+
+    virtual void mouseDoubleClickEvent (QMouseEvent * /*event*/)
+    {
+      emit static_cast<TorrentView *> (parent ())->headerDoubleClicked ();
     }
 
   private:

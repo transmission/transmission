@@ -22,6 +22,9 @@ class TorrentView: public QListView
   public slots:
     void setHeaderText (const QString& text);
 
+  signals:
+    void headerDoubleClicked ();
+
   protected:
     virtual void resizeEvent (QResizeEvent * event);
 

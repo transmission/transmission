@@ -30,6 +30,9 @@ class FilterBar: public QWidget
     FilterBar (Prefs& prefs, const TorrentModel& torrents, const TorrentFilter& filter, QWidget * parent = nullptr);
     virtual ~FilterBar ();
 
+  public slots:
+    void clear ();
+
   private:
     FilterBarComboBox * createTrackerCombo (QStandardItemModel *);
     FilterBarComboBox * createActivityCombo ();

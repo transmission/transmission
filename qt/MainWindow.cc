@@ -258,6 +258,7 @@ MainWindow::MainWindow (Session& session, Prefs& prefs, TorrentModel& model, boo
   connect (&myModel, SIGNAL (rowsRemoved (QModelIndex, int, int)), SLOT (refreshTorrentViewHeader ()));
   connect (&myFilterModel, SIGNAL (rowsInserted (QModelIndex, int, int)), SLOT (refreshTorrentViewHeader ()));
   connect (&myFilterModel, SIGNAL (rowsRemoved (QModelIndex, int, int)), SLOT (refreshTorrentViewHeader ()));
+  connect (ui.listView, SIGNAL (headerDoubleClicked ()), myFilterBar, SLOT (clear ()));
 
   QList<int> initKeys;
   initKeys << Prefs::MAIN_WINDOW_X

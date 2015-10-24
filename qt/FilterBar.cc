@@ -277,6 +277,18 @@ FilterBar::~FilterBar ()
 ***/
 
 void
+FilterBar::clear ()
+{
+  myActivityCombo->setCurrentIndex (0);
+  myTrackerCombo->setCurrentIndex (0);
+  myLineEdit->clear ();
+}
+
+/***
+****
+***/
+
+void
 FilterBar::refreshPref (int key)
 {
   switch (key)
