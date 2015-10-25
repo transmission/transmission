@@ -8,7 +8,6 @@
  */
 
 #include <assert.h>
-#include <stdlib.h> /* tr_renew () -> realloc () */
 #include <string.h> /* memmove */
 
 #include "ptrarray.h"

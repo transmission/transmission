@@ -129,6 +129,15 @@ tr_malloc0 (size_t size)
   return size ? calloc (1, size) : NULL;
 }
 
+void *
+tr_realloc (void * p, size_t size)
+{
+  void * result = size != 0 ? realloc (p, size) : NULL;
+  if (result == NULL)
+    tr_free (p);
+  return result;
+}
+
 void
 tr_free (void * p)
 {

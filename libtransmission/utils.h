@@ -252,6 +252,9 @@ void* tr_malloc (size_t size);
 /** @brief Portability wrapper around calloc () in which `0' is a safe argument */
 void* tr_malloc0 (size_t size);
 
+/** @brief Portability wrapper around reallocf () in which `0' is a safe argument */
+void * tr_realloc (void * p, size_t size);
+
 /** @brief Portability wrapper around free () in which `NULL' is a safe argument */
 void tr_free (void * p);
 
@@ -270,7 +273,7 @@ void* tr_memdup (const void * src, size_t byteCount);
   ((struct_type *) tr_malloc0 (sizeof (struct_type) * ((size_t)(n_structs))))
 
 #define tr_renew(struct_type, mem, n_structs)    \
-  ((struct_type *) realloc ((mem), sizeof (struct_type) * ((size_t)(n_structs))))
+  ((struct_type *) tr_realloc ((mem), sizeof (struct_type) * ((size_t)(n_structs))))
 
 void* tr_valloc (size_t bufLen);
 

@@ -8,7 +8,6 @@
  */
 
 #include <assert.h>
-#include <stdlib.h> /* realloc () */
 #include <string.h> /* memset */
 
 #include "transmission.h"
