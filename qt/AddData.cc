@@ -115,3 +115,19 @@ AddData::readableName () const
 
   return ret;
 }
+
+QString
+AddData::readableShortName () const
+{
+  switch (type)
+    {
+      case FILENAME:
+        return QFileInfo (filename).fileName ();
+
+      case URL:
+        return url.path ().split (QLatin1Char ('/')).last ();
+
+      default:
+        return readableName ();
+    }
+}

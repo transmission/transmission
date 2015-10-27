@@ -54,6 +54,7 @@ set(${PROJECT_NAME}_SOURCES
     PrefsDialog.cc
     RelocateDialog.cc
     RpcClient.cc
+    RpcQueue.cc
     Session.cc
     SessionDialog.cc
     SqueezeLabel.cc

@@ -11,6 +11,7 @@
 
 #include <memory>
 
+#include <QFuture>
 #include <QNetworkReply>
 #include <QObject>
 #include <QString>
@@ -32,6 +33,16 @@ extern "C"
   struct tr_session;
 }
 
+struct RpcResponse
+{
+  QString result;
+  TrVariantPtr args;
+  bool success = false;
+  QNetworkReply::NetworkError networkError = QNetworkReply::NoError;
+};
+
+Q_DECLARE_METATYPE (QFutureInterface<RpcResponse>);
+
 class RpcClient: public QObject
 {
     Q_OBJECT
@@ -47,34 +58,36 @@ class RpcClient: public QObject
     bool isLocal () const;
     const QUrl& url () const;
 
-    void exec (tr_quark method, tr_variant * args, int64_t tag = -1);
-    void exec (const char* method, tr_variant * args, int64_t tag = -1);
+    QFuture<RpcResponse> exec (tr_quark method, tr_variant * args);
+    QFuture<RpcResponse> exec (const char* method, tr_variant * args);
 
   signals:
     void httpAuthenticationRequired ();
     void dataReadProgress ();
     void dataSendProgress ();
-    void error (QNetworkReply::NetworkError code);
-    void errorMessage (const QString& message);
-    void executed (int64_t tag, const QString& result, tr_variant * args);
-
-    // private
-    void responseReceived (TrVariantPtr json);
+    void networkResponse (QNetworkReply::NetworkError code, const QString& message);
 
   private:
-    void sendRequest (TrVariantPtr json);
+    QFuture<RpcResponse> sendRequest (TrVariantPtr json);
     QNetworkAccessManager * networkAccessManager ();
+    int64_t getNextTag ();
+
+    void sendRequestNetwork (TrVariantPtr json, const QFutureInterface<RpcResponse> & promise);
+    int64_t parseResponseTag (TrVariantPtr response);
+    RpcResponse parseResponseData (TrVariantPtr response);
 
     static void localSessionCallback (tr_session * s, tr_variant * response, void * vself);
 
   private slots:
-    void onFinished (QNetworkReply * reply);
-    void parseResponse (TrVariantPtr json);
+    void requestFinishedNetwork (QNetworkReply * reply);
+    void requestFinishedLocal (TrVariantPtr response);
 
   private:
     tr_session * mySession;
     QString mySessionId;
     QUrl myUrl;
     QNetworkAccessManager * myNAM;
+    QHash<int64_t, QFutureInterface<RpcResponse>> myLocalRequests;
+    int64_t myNextTag;
 };
 

@@ -128,8 +128,7 @@ class MainWindow: public QMainWindow
     void toggleSpeedMode ();
     void dataReadProgress ();
     void dataSendProgress ();
-    void onError (QNetworkReply::NetworkError);
-    void errorMessage (const QString&);
+    void onNetworkResponse (QNetworkReply::NetworkError code, QString message);
     void toggleWindows (bool doShow);
     void onSetPrefs ();
     void onSetPrefs (bool);

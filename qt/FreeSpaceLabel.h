@@ -34,12 +34,10 @@ class FreeSpaceLabel: public QLabel
     void setPath (const QString& folder);
 
   private slots:
-    void onSessionExecuted (int64_t tag, const QString& result, tr_variant * arguments);
     void onTimer ();
 
   private:
     Session * mySession;
-    int64_t myTag;
     QString myPath;
     QTimer myTimer;
 };
