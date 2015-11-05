@@ -1831,12 +1831,27 @@ sessionSet (tr_session               * session,
             tr_variant               * args_out UNUSED,
             struct tr_rpc_idle_data  * idle_data UNUSED)
 {
+  assert (idle_data == NULL);
+
+  const char * download_dir = NULL;
+  const char * incomplete_dir = NULL;
+
+  if (tr_variantDictFindStr (args_in, TR_KEY_download_dir, &download_dir, NULL))
+    {
+      if (tr_sys_path_is_relative (download_dir))
+        return "download directory path is not absolute";
+    }
+
+  if (tr_variantDictFindStr (args_in, TR_KEY_incomplete_dir, &incomplete_dir, NULL))
+    {
+      if (tr_sys_path_is_relative (incomplete_dir))
+        return "incomplete torrents directory path is not absolute";
+    }
+
   int64_t i;
   double d;
   bool boolVal;
   const char * str;
-
-  assert (idle_data == NULL);
 
   if (tr_variantDictFindInt (args_in, TR_KEY_cache_size_mb, &i))
     tr_sessionSetCacheLimit_MB (session, i);
@@ -1868,8 +1883,8 @@ sessionSet (tr_session               * session,
   if (tr_variantDictFindStr (args_in, TR_KEY_blocklist_url, &str, NULL))
     tr_blocklistSetURL (session, str);
 
-  if (tr_variantDictFindStr (args_in, TR_KEY_download_dir, &str, NULL))
-    tr_sessionSetDownloadDir (session, str);
+  if (download_dir != NULL)
+    tr_sessionSetDownloadDir (session, download_dir);
 
   if (tr_variantDictFindInt (args_in, TR_KEY_queue_stalled_minutes, &i))
     tr_sessionSetQueueStalledMinutes (session, i);
@@ -1883,8 +1898,8 @@ sessionSet (tr_session               * session,
   if (tr_variantDictFindBool (args_in, TR_KEY_download_queue_enabled, &boolVal))
     tr_sessionSetQueueEnabled (session, TR_DOWN, boolVal);
 
-  if (tr_variantDictFindStr (args_in, TR_KEY_incomplete_dir, &str, NULL))
-    tr_sessionSetIncompleteDir (session, str);
+  if (incomplete_dir != NULL)
+    tr_sessionSetIncompleteDir (session, incomplete_dir);
 
   if (tr_variantDictFindBool (args_in, TR_KEY_incomplete_dir_enabled, &boolVal))
     tr_sessionSetIncompleteDirEnabled (session, boolVal);
@@ -2105,8 +2120,13 @@ freeSpace (tr_session               * session,
   const char * err = NULL;
   int64_t free_space = -1;
 
+  if (!tr_variantDictFindStr (args_in, TR_KEY_path, &path, NULL))
+    return "directory path argument is missing";
+
+  if (tr_sys_path_is_relative (path))
+    return "directory path is not absolute";
+
   /* get the free space */
-  tr_variantDictFindStr (args_in, TR_KEY_path, &path, NULL);
   tmperr = errno;
   errno = 0;
   free_space = tr_sessionGetDirFreeSpace (session, path);
