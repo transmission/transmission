@@ -4,8 +4,7 @@ AM_CFLAGS = \
     @LIBEVENT_CFLAGS@ \
     @LIBCURL_CFLAGS@ \
     @ZLIB_CFLAGS@ \
-    @PTHREAD_CFLAGS@ \
-    ${LIBM}
+    @PTHREAD_CFLAGS@
 
 bin_PROGRAMS = \
     transmission-create \
