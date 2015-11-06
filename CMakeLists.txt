@@ -247,7 +247,8 @@ set(THIRD_PARTY_DIR ${CMAKE_SOURCE_DIR}/third-party)
 
 if(WIN32)
     tr_add_external_auto_library(EVENT2 event
-        PATCH_COMMAND "${CMAKE_COMMAND}" -E copy "${THIRD_PARTY_DIR}/event2.cmake" "<SOURCE_DIR>/CMakeLists.txt")
+        PATCH_COMMAND "${CMAKE_COMMAND}" -E copy "${THIRD_PARTY_DIR}/event2.cmake" "<SOURCE_DIR>/CMakeLists.txt"
+              COMMAND "${CMAKE_COMMAND}" -E chdir "<SOURCE_DIR>" patch -p1 -i "${THIRD_PARTY_DIR}/event2-01-win32.patch")
 else()
     tr_add_external_auto_library(EVENT2 event
         BUILD_IN_SOURCE 1
@@ -287,7 +288,9 @@ if(ENABLE_UTP)
     tr_add_external_auto_library(UTP utp
         PATCH_COMMAND "${CMAKE_COMMAND}" -E copy "${THIRD_PARTY_DIR}/utp.cmake" "<SOURCE_DIR>/CMakeLists.txt"
               COMMAND "${CMAKE_COMMAND}" -E copy "${THIRD_PARTY_DIR}/utp_config.h" "<SOURCE_DIR>/utp_config.h"
-              COMMAND "${CMAKE_COMMAND}" -E chdir "<SOURCE_DIR>" patch -p1 --binary -i "${THIRD_PARTY_DIR}/utp-01-ticket-5002.patch")
+              COMMAND "${CMAKE_COMMAND}" -E chdir "<SOURCE_DIR>" patch -p1 --binary -i "${THIRD_PARTY_DIR}/utp-01-ticket-5002.patch"
+              COMMAND "${CMAKE_COMMAND}" -E chdir "<SOURCE_DIR>" patch -p1 --binary -i "${THIRD_PARTY_DIR}/utp-02-win32.patch"
+              COMMAND "${CMAKE_COMMAND}" -E chdir "<SOURCE_DIR>" patch -p1 --binary -i "${THIRD_PARTY_DIR}/utp-03-msvc14.patch")
 endif()
 
 tr_add_external_auto_library(B64 b64

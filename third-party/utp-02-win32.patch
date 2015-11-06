@@ -1,0 +1,31 @@
+diff --git a/utp.h b/utp.h
+--- a/utp.h
++++ b/utp.h
+@@ -4,12 +4,18 @@
+ #include "utypes.h"
+ 
+ #ifdef WIN32
++#ifndef _CRT_SECURE_NO_DEPRECATE
+ #define _CRT_SECURE_NO_DEPRECATE
++#endif
++#ifndef WIN32_LEAN_AND_MEAN
+ #define WIN32_LEAN_AND_MEAN
++#endif
+ #include <windows.h>
+ #include <winsock2.h>
+ #include <ws2tcpip.h>
++#ifdef _MSC_VER
+ #pragma comment(lib,"ws2_32.lib")
++#endif
+ #else
+ #include <stdlib.h>
+ #include <sys/types.h>
+@@ -142,7 +148,7 @@
+ };
+ 
+ // Get stats for UTP socket
+-void UTP_GetStats(struct UTPSocket *socket, UTPStats *stats);
++void UTP_GetStats(struct UTPSocket *socket, struct UTPStats *stats);
+ #endif
+ 
+ // Close the UTP socket.
