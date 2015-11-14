@@ -1146,21 +1146,19 @@ MainWindow::openTorrent ()
   d->setFileMode (QFileDialog::ExistingFiles);
   d->setAttribute (Qt::WA_DeleteOnClose);
 
-  QCheckBox * b = new QCheckBox (tr ("Show &options dialog"));
-  b->setChecked (myPrefs.getBool (Prefs::OPTIONS_PROMPT));
-  b->setObjectName (SHOW_OPTIONS_CHECKBOX_NAME);
-  auto l = qobject_cast<QGridLayout*> (d->layout ());
-  if (l == nullptr)
+  const auto l = qobject_cast<QGridLayout*> (d->layout ());
+  if (l != nullptr)
     {
-      l = new QGridLayout;
-      d->setLayout (l);
+      QCheckBox * b = new QCheckBox (tr ("Show &options dialog"));
+      b->setChecked (myPrefs.getBool (Prefs::OPTIONS_PROMPT));
+      b->setObjectName (SHOW_OPTIONS_CHECKBOX_NAME);
+      l->addWidget (b, l->rowCount(), 0, 1, -1, Qt::AlignLeft);
     }
-  l->addWidget (b, l->rowCount(), 0, 1, -1, Qt::AlignLeft);
 
   connect (d, SIGNAL (filesSelected (QStringList)),
            this, SLOT (addTorrents (QStringList)));
 
-  d->show ();
+  d->open ();
 }
 
 void
