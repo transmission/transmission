@@ -43,7 +43,8 @@ namespace
   const QString DBUS_OBJECT_PATH = QString::fromUtf8 ("/com/transmissionbt/Transmission");
   const QString DBUS_INTERFACE   = QString::fromUtf8 ("com.transmissionbt.Transmission" );
 
-  const char * MY_READABLE_NAME ("transmission-qt");
+  const QLatin1String MY_CONFIG_NAME ("transmission");
+  const QLatin1String MY_READABLE_NAME ("transmission-qt");
 
   const tr_option opts[] =
   {
@@ -95,30 +96,8 @@ Application::Application (int& argc, char ** argv):
   myWatchDir(nullptr),
   myLastFullUpdateTime (0)
 {
-  const QString MY_CONFIG_NAME = QString::fromUtf8 ("transmission");
-
   setApplicationName (MY_CONFIG_NAME);
-
-  const QString localeName = QLocale ().name ();
-
-  // install the qt translator
-  if (loadTranslation (qtTranslator, QLatin1String ("qt"), localeName, QStringList ()
-        << QLibraryInfo::location (QLibraryInfo::TranslationsPath)
-#ifdef TRANSLATIONS_DIR
-        << QString::fromUtf8 (TRANSLATIONS_DIR)
-#endif
-        << (applicationDirPath () + QLatin1String ("/translations"))
-      ))
-    installTranslator (&qtTranslator);
-
-  // install the transmission translator
-  if (loadTranslation (appTranslator, MY_CONFIG_NAME, localeName, QStringList ()
-#ifdef TRANSLATIONS_DIR
-        << QString::fromUtf8 (TRANSLATIONS_DIR)
-#endif
-        << (applicationDirPath () + QLatin1String ("/translations"))
-      ))
-    installTranslator (&appTranslator);
+  loadTranslations ();
 
   Formatter::initUnits ();
 
@@ -163,12 +142,12 @@ Application::Application (int& argc, char ** argv):
           case 'w': password = QString::fromUtf8 (optarg); break;
           case 'm': minimized = true; break;
           case 'v':
-            std::cerr << MY_READABLE_NAME << ' ' << LONG_VERSION_STRING << std::endl;
+            std::cerr << MY_READABLE_NAME.latin1 () << ' ' << LONG_VERSION_STRING << std::endl;
             quitLater ();
             return;
           case TR_OPT_ERR:
             std::cerr << qPrintable(QObject::tr ("Invalid option")) << std::endl;
-            tr_getopt_usage (MY_READABLE_NAME, getUsage (), opts);
+            tr_getopt_usage (MY_READABLE_NAME.latin1 (), getUsage (), opts);
             quitLater ();
             return;
           default:
@@ -328,6 +307,35 @@ Application::Application (int& argc, char ** argv):
       if (!bus.registerObject (DBUS_OBJECT_PATH, this))
         std::cerr << "couldn't register " << qPrintable (DBUS_OBJECT_PATH) << std::endl;
     }
+}
+
+void
+Application::loadTranslations ()
+{
+  const QStringList qtQmDirs = QStringList () <<
+    QLibraryInfo::location (QLibraryInfo::TranslationsPath) <<
+#ifdef TRANSLATIONS_DIR
+    QString::fromUtf8 (TRANSLATIONS_DIR) <<
+#endif
+    (applicationDirPath () + QLatin1String ("/translations"));
+
+  const QStringList appQmDirs = QStringList () <<
+#ifdef TRANSLATIONS_DIR
+    QString::fromUtf8 (TRANSLATIONS_DIR) <<
+#endif
+    (applicationDirPath () + QLatin1String ("/translations"));
+
+  QString localeName = QLocale ().name ();
+
+  if (!loadTranslation (myAppTranslator, MY_CONFIG_NAME, localeName, appQmDirs))
+    {
+      localeName = QLatin1String ("en");
+      loadTranslation (myAppTranslator, MY_CONFIG_NAME, localeName, appQmDirs);
+    }
+
+  if (loadTranslation (myQtTranslator, QLatin1String ("qt"), localeName, qtQmDirs))
+    installTranslator (&myQtTranslator);
+  installTranslator (&myAppTranslator);
 }
 
 void

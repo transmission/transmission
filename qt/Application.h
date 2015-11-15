@@ -43,6 +43,7 @@ class Application: public QApplication
 
   private:
     void maybeUpdateBlocklist ();
+    void loadTranslations ();
     void quitLater ();
 
   private slots:
@@ -64,8 +65,8 @@ class Application: public QApplication
     QTimer myStatsTimer;
     QTimer mySessionTimer;
     time_t myLastFullUpdateTime;
-    QTranslator qtTranslator;
-    QTranslator appTranslator;
+    QTranslator myQtTranslator;
+    QTranslator myAppTranslator;
     FaviconCache myFavicons;
 };
 
