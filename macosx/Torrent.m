@@ -325,8 +325,12 @@ bool trashDataFile(const char * filename, tr_error ** error)
     
     //make sure the "active" filter is updated when stalled-ness changes
     if (wasStalled != [self isStalled])
-        [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateQueue" object: self];
-    
+        //posting asynchronously with coalescing to prevent stack overflow on lots of torrents changing state at the same time
+        [[NSNotificationQueue defaultQueue] enqueueNotification: [NSNotification notificationWithName: @"UpdateQueue" object: self]
+                                                   postingStyle: NSPostASAP
+                                                   coalesceMask: NSNotificationCoalescingOnName
+                                                       forModes: nil];
+
     //when the torrent is first loaded, update the time machine exclusion
     if (!fTimeMachineExcludeInitialized)
         [self updateTimeMachineExclude];
