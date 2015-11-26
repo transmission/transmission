@@ -134,7 +134,7 @@ function(tr_win32_app_info OVAR DESCR INTNAME ORIGFNAME)
         set(TR_MAIN_ICON "${ARGN}")
     endif()
 
-    configure_file("${CMAKE_SOURCE_DIR}/cmake/Transmission.rc.in" "${INTNAME}.rc")
+    configure_file("${CMAKE_SOURCE_DIR}/cmake/Transmission.rc.in" "${INTNAME}-app-info.rc")
 
-    set(${OVAR} "${CMAKE_CURRENT_BINARY_DIR}/${INTNAME}.rc" PARENT_SCOPE)
+    set(${OVAR} "${CMAKE_CURRENT_BINARY_DIR}/${INTNAME}-app-info.rc" PARENT_SCOPE)
 endfunction()
