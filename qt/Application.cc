@@ -101,6 +101,10 @@ Application::Application (int& argc, char ** argv):
 
   Formatter::initUnits ();
 
+#if QT_VERSION >= QT_VERSION_CHECK(5, 1, 0)
+  setAttribute (Qt::AA_UseHighDpiPixmaps);
+#endif
+
 #if defined (_WIN32) || defined (__APPLE__)
   if (QIcon::themeName ().isEmpty ())
     QIcon::setThemeName (QLatin1String ("Faenza"));
