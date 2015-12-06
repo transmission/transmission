@@ -112,6 +112,7 @@ set(${PROJECT_NAME}_HEADERS
 include_directories(
     ${CMAKE_SOURCE_DIR}
     ${PROJECT_BINARY_DIR}
+    ${LIBAPPINDICATOR_INCLUDE_DIRS}
     ${GTK_INCLUDE_DIRS}
     ${CURL_INCLUDE_DIRS}
 )
@@ -150,6 +151,7 @@ add_executable(${TR_NAME}-gtk WIN32
 
 target_link_libraries(${TR_NAME}-gtk
     ${TR_NAME}
+    ${LIBAPPINDICATOR_LIBRARIES}
     ${GTK_LIBRARIES}
     ${CURL_LIBRARIES}
     ${EVENT2_LIBRARIES}
