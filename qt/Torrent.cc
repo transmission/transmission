@@ -194,7 +194,7 @@ Torrent::setDouble (int i, double value)
   assert (0<=i && i<PROPERTY_COUNT);
   assert (myProperties[i].type == QVariant::Double);
 
-  if (myValues[i].isNull() || myValues[i].toDouble()!=value)
+  if (myValues[i] != value)
     {
       myValues[i].setValue (value);
       changed = true;
