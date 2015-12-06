@@ -114,7 +114,7 @@ namespace
         return QString ();
     }
   }
-};
+}
 
 bool
 PrefsDialog::updateWidgetValue (QWidget * widget, int prefKey)
