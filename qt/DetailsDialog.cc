@@ -412,15 +412,15 @@ DetailsDialog::refresh ()
   const QString stateString = string;
 
   // myHaveLabel
-  double sizeWhenDone = 0;
-  double available = 0;
+  uint64_t sizeWhenDone = 0;
+  uint64_t available = 0;
   if (torrents.empty ())
     {
       string = none;
     }
   else
     {
-      double leftUntilDone = 0;
+      uint64_t leftUntilDone = 0;
       int64_t haveTotal = 0;
       int64_t haveVerified = 0;
       int64_t haveUnverified = 0;
