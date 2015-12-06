@@ -167,7 +167,7 @@ FileTreeModel::flags (const QModelIndex& index) const
   if(index.column() == COL_WANTED)
     i |= Qt::ItemIsUserCheckable | Qt::ItemIsTristate;
 
-  return (Qt::ItemFlags)i;
+  return Qt::ItemFlags(i);
 }
 
 bool

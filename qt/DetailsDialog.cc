@@ -913,7 +913,7 @@ DetailsDialog::refresh ()
 
           item->setText (COL_UP, peer.rateToPeer.isZero () ? QString () : Formatter::speedToString (peer.rateToPeer));
           item->setText (COL_DOWN, peer.rateToClient.isZero () ? QString () : Formatter::speedToString (peer.rateToClient));
-          item->setText (COL_PERCENT, peer.progress > 0 ? QString::fromLatin1 ("%1%").arg ( (int) (peer.progress * 100.0)) : QString ());
+          item->setText (COL_PERCENT, peer.progress > 0 ? QString::fromLatin1 ("%1%").arg(int(peer.progress * 100.0)) : QString ());
           item->setText (COL_STATUS, code);
           item->setToolTip (COL_STATUS, codeTip);
 

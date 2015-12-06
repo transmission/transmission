@@ -50,7 +50,7 @@ AddData::set (const QString& key)
       void * raw = tr_base64_decode (key.toUtf8().constData(), key.toUtf8().size(), &len);
       if (raw)
         {
-          metainfo.append (static_cast<const char*> (raw), (int) len);
+          metainfo.append (static_cast<const char*> (raw), int(len));
           tr_free (raw);
           type = METAINFO;
         }
@@ -72,7 +72,7 @@ AddData::toBase64 () const
     {
       size_t len;
       void * b64 = tr_base64_encode (metainfo.constData(), metainfo.size(), &len);
-      ret = QByteArray (static_cast<const char*> (b64), (int) len);
+      ret = QByteArray (static_cast<const char*> (b64), int(len));
       tr_free (b64);
     }
 

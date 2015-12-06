@@ -185,7 +185,7 @@ FileTreeItem::progress () const
 
   getSubtreeWantedSize (have, total);
   if (total)
-    d = have / (double)total;
+    d = have / double(total);
 
   return d;
 }
