@@ -935,8 +935,8 @@ typedef enum
     TR_FALLBACK, /* indicates the ctor value should be used only
                     in case of missing resume settings */
 
-    TR_FORCE, /* indicates the ctor value should be used
-                 regardless of what's in the resume settings */
+    TR_FORCE /* indicates the ctor value should be used
+                regardless of what's in the resume settings */
 }
 tr_ctorMode;
 
