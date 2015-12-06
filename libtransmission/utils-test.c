@@ -25,13 +25,10 @@
 #include "utils.h"
 #include "web.h"
 
-#define NUM_LOOPS 1
 #define SPEED_TEST 0
 
 #if SPEED_TEST
  #define VERBOSE
- #undef NUM_LOOPS
- #define NUM_LOOPS 200
 #endif
 
 #include "libtransmission-test.h"
