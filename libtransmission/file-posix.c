@@ -866,7 +866,9 @@ tr_sys_file_preallocate (tr_sys_file_t    handle,
 
 #endif
 
+#if defined(HAVE_XFS_XFS_H) || defined(__APPLE__)
 non_sparse_out:
+#endif
       errno = code;
     }
 
