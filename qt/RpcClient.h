@@ -25,7 +25,7 @@ class QByteArray;
 class QNetworkAccessManager;
 
 typedef std::shared_ptr<tr_variant> TrVariantPtr;
-Q_DECLARE_METATYPE (TrVariantPtr);
+Q_DECLARE_METATYPE (TrVariantPtr)
 
 extern "C"
 {
