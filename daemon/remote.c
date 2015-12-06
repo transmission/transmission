@@ -1631,7 +1631,7 @@ processResponse (const char * rpcurl, const void * response, size_t len)
     if (tr_variantFromJson (&top, response, len))
     {
         tr_logAddNamedError (MY_NAME, "Unable to parse response \"%*.*s\"", (int)len,
-               (int)len, (char*)response);
+               (int)len, (const char*)response);
         status |= EXIT_FAILURE;
     }
     else
@@ -2381,7 +2381,7 @@ tr_main (int    argc,
     if (rpcurl == NULL)
         rpcurl = tr_strdup_printf ("%s:%d%s", host, port, DEFAULT_URL);
 
-    exit_status = processArgs (rpcurl, argc, (const char**)argv);
+    exit_status = processArgs (rpcurl, argc, (const char* const *)argv);
 
     tr_free (host);
     tr_free (rpcurl);

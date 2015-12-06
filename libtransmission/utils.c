@@ -604,7 +604,7 @@ tr_strlcpy (char * dst, const void * src, size_t siz)
         ;
     }
 
-  return s - (char*)src - 1;  /* count does not include NUL */
+  return s - (const char*)src - 1;  /* count does not include NUL */
 #endif
 }
 

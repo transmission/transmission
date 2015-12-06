@@ -3467,8 +3467,8 @@ tr_torrentBuildPartial (const tr_torrent * tor, tr_file_index_t fileNum)
 static int
 compareTorrentByQueuePosition (const void * va, const void * vb)
 {
-  const tr_torrent * a = * (const tr_torrent **) va;
-  const tr_torrent * b = * (const tr_torrent **) vb;
+  const tr_torrent * a = * (const tr_torrent * const *) va;
+  const tr_torrent * b = * (const tr_torrent * const *) vb;
 
   return a->queuePosition - b->queuePosition;
 }

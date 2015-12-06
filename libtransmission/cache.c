@@ -82,7 +82,7 @@ getBlockRun (const tr_cache * cache, int pos, struct run_info * info)
 {
   int i;
   const int n = tr_ptrArraySize (&cache->blocks);
-  const struct cache_block ** blocks = (const struct cache_block**) tr_ptrArrayBase (&cache->blocks);
+  const struct cache_block * const * blocks = (const struct cache_block* const *) tr_ptrArrayBase (&cache->blocks);
   const struct cache_block * ref = blocks[pos];
   tr_block_index_t block = ref->block;
 

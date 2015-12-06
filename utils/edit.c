@@ -296,7 +296,7 @@ tr_main (int    argc,
 
   tr_logSetLevel (TR_LOG_ERROR);
 
-  if (parseCommandLine (argc, (const char**)argv))
+  if (parseCommandLine (argc, (const char* const *)argv))
     return EXIT_FAILURE;
 
   if (showVersion)

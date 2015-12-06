@@ -52,7 +52,7 @@ enum
 static int
 pstrcmp (const void * a, const void * b)
 {
-  return g_strcmp0 (* (const char**)a, * (const char**)b);
+  return g_strcmp0 (* (const char* const *)a, * (const char* const *)b);
 }
 
 /* human-readable name; ie, Legaltorrents */
@@ -923,7 +923,7 @@ on_filter_model_row_inserted (GtkTreeModel * tree_model UNUSED,
 static void
 on_filter_model_row_deleted (GtkTreeModel * tree_model UNUSED,
                              GtkTreePath  * path       UNUSED,
-                             gpointer       data       UNUSED)
+                             gpointer       data)
 {
   update_count_label_idle (data);
 }

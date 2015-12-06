@@ -237,7 +237,7 @@ gtr_get_mime_type_icon (const char   * mime_type,
 
 
 const char *
-gtr_get_mime_type_from_filename (const char * file G_GNUC_UNUSED)
+gtr_get_mime_type_from_filename (const char * file)
 {
     char * tmp = g_content_type_guess (file, NULL, 0, NULL);
     const char * ret = get_static_string (tmp);

@@ -1745,7 +1745,7 @@ clientGotBlock (tr_peerMsgs                * msgs,
 static int peerPulse (void * vmsgs);
 
 static void
-didWrite (tr_peerIo * io UNUSED, size_t bytesWritten, bool wasPieceData, void * vmsgs)
+didWrite (tr_peerIo * io, size_t bytesWritten, bool wasPieceData, void * vmsgs)
 {
     tr_peerMsgs * msgs = vmsgs;
 

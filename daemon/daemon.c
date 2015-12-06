@@ -662,7 +662,7 @@ tr_main (int    argc,
     /* load settings from defaults + config file */
     tr_variantInitDict (settings, 0);
     tr_variantDictAddBool (settings, TR_KEY_rpc_enabled, true);
-    *configDir = getConfigDir (argc, (const char**)argv);
+    *configDir = getConfigDir (argc, (const char* const *)argv);
     loaded = tr_sessionLoadSettings (settings, *configDir, MY_NAME);
 
     /* overwrite settings from the comamndline */

@@ -93,8 +93,8 @@ doShowMagnet (const tr_info * inf)
 static int
 compare_files_by_name (const void * va, const void * vb)
 {
-  const tr_file * a = * (const tr_file**)va;
-  const tr_file * b = * (const tr_file**)vb;
+  const tr_file * a = * (const tr_file* const *)va;
+  const tr_file * b = * (const tr_file* const *)vb;
   return strcmp (a->name, b->name);
 }
 
@@ -295,7 +295,7 @@ tr_main (int    argc,
   tr_formatter_size_init (DISK_K, DISK_K_STR, DISK_M_STR, DISK_G_STR, DISK_T_STR);
   tr_formatter_speed_init (SPEED_K, SPEED_K_STR, SPEED_M_STR, SPEED_G_STR, SPEED_T_STR);
 
-  if (parseCommandLine (argc, (const char**)argv))
+  if (parseCommandLine (argc, (const char* const *)argv))
     return EXIT_FAILURE;
 
   if (showVersion)

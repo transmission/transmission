@@ -2324,7 +2324,7 @@ loadBlocklists (tr_session * session)
     {
       int i;
       const int n = tr_ptrArraySize (&loadme);
-      const char ** paths = (const char **) tr_ptrArrayBase (&loadme);
+      const char * const * paths = (const char * const *) tr_ptrArrayBase (&loadme);
 
       for (i=0; i<n; ++i)
         tr_list_append (&blocklists, tr_blocklistFileNew (paths[i], isEnabled));

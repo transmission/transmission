@@ -113,7 +113,7 @@ testStr (void)
   err = tr_bencParseStr (buf, buf+n, &end, &str, &len);
   check_int_eq (0, err);
   check_int_eq (4, len);
-  check (!strncmp ((char*)str, "boat", len));
+  check (!strncmp ((const char*)str, "boat", len));
   check (end == buf + 6);
   str = NULL;
   end = NULL;
@@ -143,7 +143,7 @@ testStr (void)
   err = tr_bencParseStr (buf, buf+n, &end, &str, &len);
   check_int_eq (0, err);
   check_int_eq (3, len);
-  check (!strncmp ((char*)str, "boa", len));
+  check (!strncmp ((const char*)str, "boa", len));
   check (end == buf + 5);
   str = NULL;
   end = NULL;

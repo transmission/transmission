@@ -2256,8 +2256,8 @@ tr_pexCompare (const void * va, const void * vb)
 static int
 compareAtomsByUsefulness (const void * va, const void *vb)
 {
-  const struct peer_atom * a = * (const struct peer_atom**) va;
-  const struct peer_atom * b = * (const struct peer_atom**) vb;
+  const struct peer_atom * a = * (const struct peer_atom* const *) va;
+  const struct peer_atom * b = * (const struct peer_atom* const *) vb;
 
   assert (tr_isAtom (a));
   assert (tr_isAtom (b));
@@ -3664,8 +3664,8 @@ bandwidthPulse (evutil_socket_t foo UNUSED, short bar UNUSED, void * vmgr)
 static int
 compareAtomPtrsByAddress (const void * va, const void *vb)
 {
-  const struct peer_atom * a = * (const struct peer_atom**) va;
-  const struct peer_atom * b = * (const struct peer_atom**) vb;
+  const struct peer_atom * a = * (const struct peer_atom* const *) va;
+  const struct peer_atom * b = * (const struct peer_atom* const *) vb;
 
   assert (tr_isAtom (a));
   assert (tr_isAtom (b));
@@ -3679,8 +3679,8 @@ compareAtomPtrsByShelfDate (const void * va, const void *vb)
 {
   time_t atime;
   time_t btime;
-  const struct peer_atom * a = * (const struct peer_atom**) va;
-  const struct peer_atom * b = * (const struct peer_atom**) vb;
+  const struct peer_atom * a = * (const struct peer_atom* const *) va;
+  const struct peer_atom * b = * (const struct peer_atom* const *) vb;
   const int data_time_cutoff_secs = 60 * 60;
   const time_t tr_now = tr_time ();
 
