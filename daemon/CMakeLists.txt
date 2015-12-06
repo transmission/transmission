@@ -52,6 +52,7 @@ set_target_properties(${TR_NAME}-daemon PROPERTIES
 target_link_libraries(${TR_NAME}-daemon
     ${TR_NAME}
     ${EVENT2_LIBRARIES}
+    ${SYSTEMD_DAEMON_LIBRARIES}
 )
 
 tr_win32_app_info(${PROJECT_NAME}_remote_WIN32_RC_FILE
