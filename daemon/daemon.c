@@ -163,7 +163,7 @@ reopen_log_file (const char *filename)
 }
 
 static const char*
-getConfigDir (int argc, const char ** argv)
+getConfigDir (int argc, const char * const * argv)
 {
     int c;
     const char * configDir = NULL;

@@ -187,11 +187,11 @@ findOption (const tr_option * opts,
 }
 
 int
-tr_getopt (const char *      usage,
-           int               argc,
-           const char **     argv,
-           const tr_option * opts,
-           const char **     setme_optarg)
+tr_getopt (const char         * usage,
+           int                  argc,
+           const char * const  * argv,
+           const tr_option     * opts,
+           const char         ** setme_optarg)
 {
     int               i;
     const char *      arg = NULL;

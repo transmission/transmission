@@ -49,7 +49,7 @@ static bool showVersion = false;
 const char * filename = NULL;
 
 static int
-parseCommandLine (int argc, const char ** argv)
+parseCommandLine (int argc, const char * const * argv)
 {
   int c;
   const char * optarg;

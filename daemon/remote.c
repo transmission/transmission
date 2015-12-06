@@ -1834,7 +1834,7 @@ ensure_tset (tr_variant ** tset)
 }
 
 static int
-processArgs (const char * rpcurl, int argc, const char ** argv)
+processArgs (const char * rpcurl, int argc, const char * const * argv)
 {
     int c;
     int status = EXIT_SUCCESS;
