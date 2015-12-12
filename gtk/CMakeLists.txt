@@ -115,6 +115,7 @@ include_directories(
     ${LIBAPPINDICATOR_INCLUDE_DIRS}
     ${GTK_INCLUDE_DIRS}
     ${CURL_INCLUDE_DIRS}
+    ${EVENT2_INCLUDE_DIRS}
 )
 
 link_directories(
