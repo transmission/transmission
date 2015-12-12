@@ -43,7 +43,7 @@
 <context>
     <name>Application</name>
     <message>
-        <location filename="../Application.cc" line="+300"/>
+        <location filename="../Application.cc" line="+288"/>
         <source>&lt;b&gt;Transmission is a file sharing program.&lt;/b&gt;</source>
         <translation>&lt;b&gt;Transmission 是一个文件共享程序。&lt;/b&gt;</translation>
     </message>
@@ -58,7 +58,7 @@
         <translation>我同意(&amp;A)</translation>
     </message>
     <message>
-        <location line="+64"/>
+        <location line="+93"/>
         <source>Torrent Completed</source>
         <translation>Torrent 已完成</translation>
     </message>
@@ -568,29 +568,29 @@
 <context>
     <name>FileTreeItem</name>
     <message>
-        <location filename="../FileTreeItem.cc" line="+256"/>
-        <location filename="../FileTreeView.cc" line="+110"/>
-        <location line="+263"/>
+        <location filename="../FileTreeItem.cc" line="+271"/>
+        <location filename="../FileTreeView.cc" line="+105"/>
+        <location line="+257"/>
         <source>Low</source>
         <translation>低</translation>
     </message>
     <message>
         <location line="+1"/>
-        <location filename="../FileTreeView.cc" line="-262"/>
-        <location line="+260"/>
+        <location filename="../FileTreeView.cc" line="-256"/>
+        <location line="+254"/>
         <source>High</source>
         <translation>高</translation>
     </message>
     <message>
         <location line="+1"/>
-        <location filename="../FileTreeView.cc" line="-261"/>
-        <location line="+262"/>
+        <location filename="../FileTreeView.cc" line="-255"/>
+        <location line="+256"/>
         <source>Normal</source>
         <translation>普通</translation>
     </message>
     <message>
         <location line="+1"/>
-        <location filename="../FileTreeView.cc" line="-261"/>
+        <location filename="../FileTreeView.cc" line="-255"/>
         <source>Mixed</source>
         <translation>混合</translation>
     </message>
@@ -626,34 +626,34 @@
 <context>
     <name>FileTreeView</name>
     <message>
-        <location filename="../FileTreeView.cc" line="+253"/>
-        <source>Check selected</source>
-        <translation type="unfinished"></translation>
+        <location filename="../FileTreeView.cc" line="+247"/>
+        <source>Check Selected</source>
+        <translation>勾选选择</translation>
     </message>
     <message>
         <location line="+1"/>
-        <source>Uncheck selected</source>
-        <translation type="unfinished"></translation>
+        <source>Uncheck Selected</source>
+        <translation>取消勾选选择</translation>
     </message>
     <message>
         <location line="+1"/>
-        <source>Only check selected</source>
-        <translation type="unfinished"></translation>
+        <source>Only Check Selected</source>
+        <translation>仅勾选选择</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Priority</source>
-        <translation type="unfinished">优先级</translation>
+        <translation>优先级</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Open</source>
-        <translation type="unfinished">打开</translation>
+        <translation>打开</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Rename...</source>
-        <translation type="unfinished"></translation>
+        <translation>重命名...</translation>
     </message>
 </context>
 <context>
@@ -689,15 +689,8 @@
         <source>Finished</source>
         <translation>已完成</translation>
     </message>
-    <message numerus="yes">
-        <location line="+326"/>
-        <source>Show %Ln of:</source>
-        <translation>
-            <numerusform>显示 %Ln /:</numerusform>
-        </translation>
-    </message>
     <message>
-        <location line="-322"/>
+        <location line="+4"/>
         <source>Verifying</source>
         <translation>正在检查</translation>
     </message>
@@ -707,7 +700,7 @@
         <translation>错误</translation>
     </message>
     <message>
-        <location line="+316"/>
+        <location line="+141"/>
         <source>Show:</source>
         <translation>显示:</translation>
     </message>
@@ -927,7 +920,6 @@
     </message>
     <message>
         <location line="-161"/>
-        <location filename="../MainWindow.cc" line="+1442"/>
         <source>Queue</source>
         <translation>队列</translation>
     </message>
@@ -1249,7 +1241,7 @@
         <translation>按队列排序(&amp;Q)</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cc" line="-1015"/>
+        <location filename="../MainWindow.cc" line="+434"/>
         <source>Limit Download Speed</source>
         <translation>限制下载速度</translation>
     </message>
@@ -1260,13 +1252,13 @@
     </message>
     <message>
         <location line="+6"/>
-        <location line="+615"/>
+        <location line="+641"/>
         <location line="+8"/>
         <source>Limited at %1</source>
         <translation>限制在 %1</translation>
     </message>
     <message>
-        <location line="-573"/>
+        <location line="-599"/>
         <source>Limit Upload Speed</source>
         <translation>限制上传速度</translation>
     </message>
@@ -1282,12 +1274,12 @@
     </message>
     <message>
         <location line="+6"/>
-        <location line="+601"/>
+        <location line="+627"/>
         <source>Stop at Ratio (%1)</source>
         <translation>停止当分享率达到 (%1)</translation>
     </message>
     <message>
-        <location line="-378"/>
+        <location line="-393"/>
         <source> - %1:%2</source>
         <extracomment>Second (optional) part of main window title &quot;Transmission - host:port&quot; (added when connected to remote session); notice that leading space (before the dash) is included here</extracomment>
         <translation> - %1:%2</translation>
@@ -1310,32 +1302,32 @@
         <translation>下载: %1, 上传: %2</translation>
     </message>
     <message>
-        <location line="+406"/>
+        <location line="+421"/>
         <source>Torrent Files (*.torrent);;All Files (*.*)</source>
         <translation>Torrent 文件 (*.torrent);;全部文件 (*.*)</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+7"/>
         <source>Show &amp;options dialog</source>
         <translation>显示选项对话框(&amp;O)</translation>
     </message>
     <message>
-        <location line="-6"/>
+        <location line="-9"/>
         <source>Open Torrent</source>
         <translation>打开 Torrent</translation>
     </message>
     <message>
-        <location line="-885"/>
+        <location line="-918"/>
         <source>Speed Limits</source>
         <translation>速度限制</translation>
     </message>
     <message>
-        <location line="+431"/>
+        <location line="+449"/>
         <source>Network Error</source>
         <translation>网络错误</translation>
     </message>
     <message>
-        <location line="+418"/>
+        <location line="+433"/>
         <source>Click to disable Temporary Speed Limits
  (%1 down, %2 up)</source>
         <translation>点击禁用临时速度限制
@@ -1349,7 +1341,7 @@
  (%1 下载, %2 上传)</translation>
     </message>
     <message>
-        <location line="+135"/>
+        <location line="+133"/>
         <source>Remove torrent?</source>
         <translation>移除 Torrent？</translation>
     </message>
@@ -1366,7 +1358,14 @@
         </translation>
     </message>
     <message numerus="yes">
-        <location line="+6"/>
+        <location line="-497"/>
+        <source>Showing %L1 of %Ln torrent(s)</source>
+        <translation>
+            <numerusform>显示 %L1 / %Ln 个 Torrent</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <location line="+503"/>
         <source>Delete these %Ln torrent(s)&apos; downloaded files?</source>
         <translation>
             <numerusform>删除这些 %Ln 个 Torrent 已下载的文件？</numerusform>
@@ -2166,7 +2165,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../Application.cc" line="-227"/>
+        <location filename="../Application.cc" line="-256"/>
         <source>Invalid option</source>
         <translation>无效选项</translation>
     </message>

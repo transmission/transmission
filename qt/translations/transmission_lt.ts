@@ -43,14 +43,14 @@
 <context>
     <name>Application</name>
     <message>
-        <location filename="../Application.cc" line="+300"/>
+        <location filename="../Application.cc" line="+288"/>
         <source>&lt;b&gt;Transmission is a file sharing program.&lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Transmission yra failų dalinimosi programa.&lt;/b&gt;</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kai vykdysite torentą, jo duomenys, dalinimosi tikslais, bus prieinami kitiems. Bet koks turinys, kuriuo dalinatės, yra tik jūsų pačių atsakomybė.</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -58,7 +58,7 @@
         <translation>Aš &amp;sutinku</translation>
     </message>
     <message>
-        <location line="+64"/>
+        <location line="+93"/>
         <source>Torrent Completed</source>
         <translation>Torento siuntimas užbaigtas</translation>
     </message>
@@ -470,17 +470,17 @@
     <message>
         <location line="+22"/>
         <source>Add Tracker</source>
-        <translation type="unfinished"></translation>
+        <translation>Pridėti sekiklį</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Edit Tracker</source>
-        <translation type="unfinished"></translation>
+        <translation>Redaguoti sekiklį</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Remove Trackers</source>
-        <translation type="unfinished"></translation>
+        <translation>Šalinti sekiklius</translation>
     </message>
     <message>
         <location line="+23"/>
@@ -563,7 +563,7 @@
     <message>
         <location line="+1"/>
         <source>&lt;p&gt;&lt;b&gt;Unable to add &quot;%1&quot;.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;It is a duplicate of &quot;%2&quot; which is already added.&lt;/p&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;p&gt;&lt;b&gt;Nepavyko pridėti &quot;%1&quot;.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Tai yra jau pridėto &quot;%2&quot; dublikatas.&lt;/p&gt;</translation>
     </message>
     <message>
         <location line="+19"/>
@@ -574,29 +574,29 @@
 <context>
     <name>FileTreeItem</name>
     <message>
-        <location filename="../FileTreeItem.cc" line="+256"/>
-        <location filename="../FileTreeView.cc" line="+110"/>
-        <location line="+263"/>
+        <location filename="../FileTreeItem.cc" line="+271"/>
+        <location filename="../FileTreeView.cc" line="+105"/>
+        <location line="+257"/>
         <source>Low</source>
         <translation>žemas</translation>
     </message>
     <message>
         <location line="+1"/>
-        <location filename="../FileTreeView.cc" line="-262"/>
-        <location line="+260"/>
+        <location filename="../FileTreeView.cc" line="-256"/>
+        <location line="+254"/>
         <source>High</source>
         <translation>Aukštas</translation>
     </message>
     <message>
         <location line="+1"/>
-        <location filename="../FileTreeView.cc" line="-261"/>
-        <location line="+262"/>
+        <location filename="../FileTreeView.cc" line="-255"/>
+        <location line="+256"/>
         <source>Normal</source>
         <translation>Normalus</translation>
     </message>
     <message>
         <location line="+1"/>
-        <location filename="../FileTreeView.cc" line="-261"/>
+        <location filename="../FileTreeView.cc" line="-255"/>
         <source>Mixed</source>
         <translation>Maišyta</translation>
     </message>
@@ -611,7 +611,7 @@
     <message>
         <location line="+4"/>
         <source>Size</source>
-        <translation type="unfinished"></translation>
+        <translation>Dydis</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -632,34 +632,34 @@
 <context>
     <name>FileTreeView</name>
     <message>
-        <location filename="../FileTreeView.cc" line="+253"/>
-        <source>Check selected</source>
-        <translation type="unfinished"></translation>
+        <location filename="../FileTreeView.cc" line="+247"/>
+        <source>Check Selected</source>
+        <translation>Pažymėti pasirinktus</translation>
     </message>
     <message>
         <location line="+1"/>
-        <source>Uncheck selected</source>
-        <translation type="unfinished"></translation>
+        <source>Uncheck Selected</source>
+        <translation>Nuimti žymėjimą nuo pasirinktų</translation>
     </message>
     <message>
         <location line="+1"/>
-        <source>Only check selected</source>
-        <translation type="unfinished"></translation>
+        <source>Only Check Selected</source>
+        <translation>Pažymėti tik pasirinktus</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Priority</source>
-        <translation type="unfinished">Prioritetas</translation>
+        <translation>Prioritetas</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Open</source>
-        <translation type="unfinished">Atverti</translation>
+        <translation>Atverti</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Rename...</source>
-        <translation type="unfinished"></translation>
+        <translation>Pervadinti...</translation>
     </message>
 </context>
 <context>
@@ -695,17 +695,8 @@
         <source>Finished</source>
         <translation>užbaigtus</translation>
     </message>
-    <message numerus="yes">
-        <location line="+326"/>
-        <source>Show %Ln of:</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
     <message>
-        <location line="-322"/>
+        <location line="+4"/>
         <source>Verifying</source>
         <translation>tikrinamus</translation>
     </message>
@@ -715,7 +706,7 @@
         <translation>klaidas</translation>
     </message>
     <message>
-        <location line="+316"/>
+        <location line="+141"/>
         <source>Show:</source>
         <translation>Rodyti:</translation>
     </message>
@@ -725,7 +716,7 @@
     <message>
         <location filename="../FilterBarLineEdit.cc" line="+48"/>
         <source>Search...</source>
-        <translation type="unfinished"></translation>
+        <translation>Paieška...</translation>
     </message>
 </context>
 <context>
@@ -738,22 +729,22 @@
     <message>
         <location line="+1"/>
         <source>kB/s</source>
-        <translation type="unfinished"></translation>
+        <translation>kB/s</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>MB/s</source>
-        <translation type="unfinished"></translation>
+        <translation>MB/s</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>GB/s</source>
-        <translation type="unfinished"></translation>
+        <translation>GB/s</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>TB/s</source>
-        <translation type="unfinished"></translation>
+        <translation>TB/s</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -764,22 +755,22 @@
     <message>
         <location line="-11"/>
         <source>kB</source>
-        <translation type="unfinished"></translation>
+        <translation>kB</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>MB</source>
-        <translation type="unfinished"></translation>
+        <translation>MB</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>GB</source>
-        <translation type="unfinished"></translation>
+        <translation>GB</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>TB</source>
-        <translation type="unfinished"></translation>
+        <translation>TB</translation>
     </message>
     <message>
         <location line="+9"/>
@@ -817,7 +808,7 @@
         <location line="+20"/>
         <location line="+8"/>
         <source>%1 %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 %2</translation>
     </message>
     <message numerus="yes">
         <location line="+32"/>
@@ -868,12 +859,12 @@
     <message>
         <location filename="../FreeSpaceLabel.cc" line="+58"/>
         <source>&lt;i&gt;Calculating Free Space...&lt;/i&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;i&gt;Apskaičiuojama laisva vieta...&lt;/i&gt;</translation>
     </message>
     <message>
         <location line="+35"/>
         <source>%1 free</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 laisva</translation>
     </message>
 </context>
 <context>
@@ -943,7 +934,6 @@
     </message>
     <message>
         <location line="-161"/>
-        <location filename="../MainWindow.cc" line="+1442"/>
         <source>Queue</source>
         <translation>&amp;Eilė</translation>
     </message>
@@ -1265,7 +1255,7 @@
         <translation>Rikiuoti pagal &amp;eilę</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cc" line="-1015"/>
+        <location filename="../MainWindow.cc" line="+434"/>
         <source>Limit Download Speed</source>
         <translation>Apriboti atsiuntimo greitį</translation>
     </message>
@@ -1276,13 +1266,13 @@
     </message>
     <message>
         <location line="+6"/>
-        <location line="+615"/>
+        <location line="+641"/>
         <location line="+8"/>
         <source>Limited at %1</source>
         <translation>Ribojama iki %1</translation>
     </message>
     <message>
-        <location line="-573"/>
+        <location line="-599"/>
         <source>Limit Upload Speed</source>
         <translation>Apriboti išsiuntimo greitį</translation>
     </message>
@@ -1298,12 +1288,12 @@
     </message>
     <message>
         <location line="+6"/>
-        <location line="+601"/>
+        <location line="+627"/>
         <source>Stop at Ratio (%1)</source>
         <translation>Nebeskleisti esant santykiui (%1)</translation>
     </message>
     <message>
-        <location line="-378"/>
+        <location line="-393"/>
         <source> - %1:%2</source>
         <extracomment>Second (optional) part of main window title &quot;Transmission - host:port&quot; (added when connected to remote session); notice that leading space (before the dash) is included here</extracomment>
         <translation> - %1:%2</translation>
@@ -1326,44 +1316,46 @@
         <translation>Ats.: %1, išs.: %2</translation>
     </message>
     <message>
-        <location line="+406"/>
+        <location line="+421"/>
         <source>Torrent Files (*.torrent);;All Files (*.*)</source>
         <translation>Torentų failai (*.torrent);;Visi failai (*.*)</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+7"/>
         <source>Show &amp;options dialog</source>
         <translation>Rodyti &amp;parinkčių langą</translation>
     </message>
     <message>
-        <location line="-6"/>
+        <location line="-9"/>
         <source>Open Torrent</source>
         <translation>Atverti torentą</translation>
     </message>
     <message>
-        <location line="-885"/>
+        <location line="-918"/>
         <source>Speed Limits</source>
         <translation>Greičio ribojimai</translation>
     </message>
     <message>
-        <location line="+431"/>
+        <location line="+449"/>
         <source>Network Error</source>
-        <translation type="unfinished"></translation>
+        <translation>Tinklo Klaida</translation>
     </message>
     <message>
-        <location line="+418"/>
+        <location line="+433"/>
         <source>Click to disable Temporary Speed Limits
  (%1 down, %2 up)</source>
-        <translation type="unfinished"></translation>
+        <translation>Spustelėkite, kad išjungtumėte laikinus greičio apribojimus
+(%1 atsiuntimui, %2 išsiuntimui)</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Click to enable Temporary Speed Limits
  (%1 down, %2 up)</source>
-        <translation type="unfinished"></translation>
+        <translation>Spustelėkite, kad įjungtumėte laikinus greičio apribojimus
+(%1 atsiuntimui, %2 išsiuntimui)</translation>
     </message>
     <message>
-        <location line="+135"/>
+        <location line="+133"/>
         <source>Remove torrent?</source>
         <translation>Pašalinti torentą?</translation>
     </message>
@@ -1375,19 +1367,28 @@
     <message numerus="yes">
         <location line="-5"/>
         <source>Remove %Ln torrent(s)?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Šalinti %Ln torentą?</numerusform>
+            <numerusform>Šalinti %Ln torentus?</numerusform>
+            <numerusform>Šalinti %Ln torentų?</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location line="+6"/>
+        <location line="-497"/>
+        <source>Showing %L1 of %Ln torrent(s)</source>
+        <translation>
+            <numerusform>Rodomas %L1 iš %Ln torentų</numerusform>
+            <numerusform>Rodomi %L1 iš %Ln torentų</numerusform>
+            <numerusform>Rodoma %L1 iš %Ln torentų</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <location line="+503"/>
         <source>Delete these %Ln torrent(s)&apos; downloaded files?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Ištrinti šio %Ln torento atsiųstus failus?</numerusform>
+            <numerusform>Ištrinti šių %Ln torentų atsiųstus failus?</numerusform>
+            <numerusform>Ištrinti šių %Ln torentų atsiųstus failus?</numerusform>
         </translation>
     </message>
     <message>
@@ -1443,22 +1444,22 @@
     <message>
         <location line="+58"/>
         <source>%1 has not responded yet</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 dar neatsakė</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>%1 is responding</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 atsako</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>%1 last responded %2 ago</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 paskutinį kartą atsakė prieš %2</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>%1 is not responding</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 neatsako</translation>
     </message>
 </context>
 <context>
@@ -1592,17 +1593,17 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
     <message>
         <location line="-13"/>
         <source>Open Torrent from File</source>
-        <translation type="unfinished"></translation>
+        <translation>Atverti torentą iš failo</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Open Torrent from URL or Magnet Link</source>
-        <translation type="unfinished"></translation>
+        <translation>Atverti torentą iš URL ar Magnet nuorodos</translation>
     </message>
     <message>
         <location filename="../OptionsDialog.ui" line="+17"/>
         <source>&amp;Source:</source>
-        <translation type="unfinished"></translation>
+        <translation>Š&amp;altinis:</translation>
     </message>
     <message>
         <location line="+22"/>
@@ -1627,12 +1628,12 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
     <message>
         <location filename="../OptionsDialog.ui" line="+35"/>
         <source>&amp;Priority:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Prioritetas:</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>S&amp;tart when added</source>
-        <translation type="unfinished"></translation>
+        <translation>Pridėjus, pradėti</translation>
     </message>
     <message>
         <location filename="../OptionsDialog.cc" line="+5"/>
@@ -1831,41 +1832,41 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
         <location line="+22"/>
         <source> minute(s) ago</source>
         <extracomment>Spin box suffix, &quot;Download is inactive if data sharing stopped: [ 5 minutes ago ]&quot; (includes leading space after the number, if needed)</extracomment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform> minutę</numerusform>
+            <numerusform> minutes</numerusform>
+            <numerusform> minučių</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../PrefsDialog.ui" line="-638"/>
         <source>Automatically add .torrent files &amp;from:</source>
-        <translation type="unfinished"></translation>
+        <translation>Automatiškai pridėti .torrent &amp;failus iš:</translation>
     </message>
     <message>
         <location line="+22"/>
         <source>Show the Torrent Options &amp;dialog</source>
-        <translation type="unfinished"></translation>
+        <translation>Rodyti torento parinkčių &amp;dialogą</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>&amp;Start added torrents</source>
-        <translation type="unfinished"></translation>
+        <translation>Palei&amp;sti pridėtus torentus</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Mo&amp;ve the .torrent file to the trash</source>
-        <translation type="unfinished"></translation>
+        <translation>Per&amp;kelti .torrent failą į šiukšlinę</translation>
     </message>
     <message>
         <location line="+57"/>
         <source>Download Queue</source>
-        <translation type="unfinished"></translation>
+        <translation>Atsiuntimų Eilė</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Ma&amp;ximum active downloads:</source>
-        <translation type="unfinished"></translation>
+        <translation>Dau&amp;giausiai aktyvių atsiuntimų:</translation>
     </message>
     <message>
         <location line="+67"/>
@@ -1875,20 +1876,20 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
     <message>
         <location line="+79"/>
         <source>Seeding</source>
-        <translation type="unfinished"></translation>
+        <translation>Skleidimas</translation>
     </message>
     <message>
         <location line="+548"/>
         <source>Remote</source>
-        <translation type="unfinished"></translation>
+        <translation>Nuotoliniai</translation>
     </message>
     <message numerus="yes">
         <location filename="../PrefsDialog.cc" line="+145"/>
         <source>&lt;i&gt;Blocklist contains %Ln rule(s)&lt;/i&gt;</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>&lt;i&gt;Blokavimo sąraše yra %Ln taisyklė&lt;/i&gt;</numerusform>
+            <numerusform>&lt;i&gt;Blokavimo sąraše yra %Ln taisyklės&lt;/i&gt;</numerusform>
+            <numerusform>&lt;i&gt;Blokavimo sąraše yra %Ln taisyklių&lt;/i&gt;</numerusform>
         </translation>
     </message>
     <message>
@@ -1914,10 +1915,10 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
     <message numerus="yes">
         <location filename="../PrefsDialog.cc" line="-229"/>
         <source>&lt;b&gt;Update succeeded!&lt;/b&gt;&lt;p&gt;Blocklist now has %Ln rule(s).</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>&lt;b&gt;Naujinimas sėkmingas!&lt;/b&gt;&lt;p&gt;Blokavimo sąraše dabar yra %Ln taisyklė.</numerusform>
+            <numerusform>&lt;b&gt;Naujinimas sėkmingas!&lt;/b&gt;&lt;p&gt;Blokavimo sąraše dabar yra %Ln taisyklės.</numerusform>
+            <numerusform>&lt;b&gt;Naujinimas sėkmingas!&lt;/b&gt;&lt;p&gt;Blokavimo sąraše dabar yra %Ln taisyklių.</numerusform>
         </translation>
     </message>
     <message>
@@ -1994,72 +1995,72 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
     <message>
         <location line="+453"/>
         <source>Remote Control</source>
-        <translation type="unfinished"></translation>
+        <translation>Nuotolinis Valdymas</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Allow &amp;remote access</source>
-        <translation type="unfinished"></translation>
+        <translation>Leisti nuotolinę p&amp;rieigą</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>HTTP &amp;port:</source>
-        <translation type="unfinished"></translation>
+        <translation>HTTP &amp;prievadas:</translation>
     </message>
     <message>
         <location line="+60"/>
         <source>Only allow these IP a&amp;ddresses:</source>
-        <translation type="unfinished"></translation>
+        <translation>Leisti tik šiuos IP a&amp;dresus:</translation>
     </message>
     <message>
         <location line="-1128"/>
         <source>&amp;Upload:</source>
-        <translation type="unfinished"></translation>
+        <translation>Išsi&amp;untimo:</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>&amp;Download:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Atsiuntimo:</translation>
     </message>
     <message>
         <location line="+53"/>
         <source>Alternative Speed Limits</source>
-        <translation type="unfinished"></translation>
+        <translation>Alternatyvūs greičio apribojimai</translation>
     </message>
     <message>
         <location line="+21"/>
         <source>U&amp;pload:</source>
-        <translation type="unfinished"></translation>
+        <translation>Išsiunti&amp;mo:</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>Do&amp;wnload:</source>
-        <translation type="unfinished"></translation>
+        <translation>A&amp;tsiuntimo:</translation>
     </message>
     <message>
         <location line="+836"/>
         <source>Start &amp;minimized in notification area</source>
-        <translation type="unfinished"></translation>
+        <translation>Paleisti su&amp;mažintą pranešimų srityje</translation>
     </message>
     <message>
         <location line="+28"/>
         <source>Notification</source>
-        <translation type="unfinished"></translation>
+        <translation>Pranešimai</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Show a notification when torrents are a&amp;dded</source>
-        <translation type="unfinished"></translation>
+        <translation>Rodyti pranešimą, kai yra pride&amp;dami torentai</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Show a notification when torrents &amp;finish</source>
-        <translation type="unfinished"></translation>
+        <translation>Rodyti pranešimą, kai torentai &amp;yra užbaigiami</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Play a &amp;sound when torrents finish</source>
-        <translation type="unfinished"></translation>
+        <translation>Groti gar&amp;są, kai torentai yra užbaigiami</translation>
     </message>
     <message>
         <location filename="../PrefsDialog.cc" line="-83"/>
@@ -2069,7 +2070,7 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
     <message>
         <location filename="../PrefsDialog.ui" line="-229"/>
         <source>Peer Limits</source>
-        <translation type="unfinished"></translation>
+        <translation>Ryšių ribojimai</translation>
     </message>
     <message>
         <location line="+104"/>
@@ -2104,7 +2105,7 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
     <message>
         <location line="-325"/>
         <source>Encryption</source>
-        <translation type="unfinished"></translation>
+        <translation>Šifravimas</translation>
     </message>
     <message>
         <location filename="../PrefsDialog.cc" line="+160"/>
@@ -2135,12 +2136,12 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
         <location line="+137"/>
         <source>Download is i&amp;nactive if data sharing stopped:</source>
         <extracomment>Please keep this phrase as short as possible, it&apos;s curently the longest and influences dialog width</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Atsiuntimas yra &amp;neaktyvus, jei dalinimasis duomenimis sustabdytas:</translation>
     </message>
     <message>
         <location line="-146"/>
         <source>Downloading</source>
-        <translation type="unfinished"></translation>
+        <translation>Atsiuntimas</translation>
     </message>
     <message>
         <location line="+205"/>
@@ -2196,7 +2197,7 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../Application.cc" line="-227"/>
+        <location filename="../Application.cc" line="-256"/>
         <source>Invalid option</source>
         <translation>Netinkamas parametras</translation>
     </message>
@@ -2239,12 +2240,12 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
     <message>
         <location filename="../Session.cc" line="+548"/>
         <source>Error Renaming Path</source>
-        <translation type="unfinished"></translation>
+        <translation>Klaida, pervadinant kelią</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>&lt;p&gt;&lt;b&gt;Unable to rename &quot;%1&quot; as &quot;%2&quot;: %3.&lt;/b&gt;&lt;/p&gt; &lt;p&gt;Please correct the errors and try again.&lt;/p&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;p&gt;&lt;b&gt;Nepavyko pervadinti &quot;%1&quot; kaip &quot;%2&quot;: %3.&lt;/b&gt;&lt;/p&gt; &lt;p&gt;Prašome ištaisyti klaidas ir bandyti dar kartą.&lt;/p&gt;</translation>
     </message>
     <message>
         <location line="+49"/>
@@ -2344,10 +2345,10 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
     <message numerus="yes">
         <location filename="../StatsDialog.cc" line="+71"/>
         <source>Started %Ln time(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Pradėtas %Ln kartą</numerusform>
+            <numerusform>Pradėtas %Ln kartus</numerusform>
+            <numerusform>Pradėtas %Ln kartų</numerusform>
         </translation>
     </message>
 </context>
@@ -2451,13 +2452,13 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
         <location line="+14"/>
         <source> - %1 left</source>
         <extracomment>Second (optional) part of torrent progress string; %1 is duration; notice that leading space (before the dash) is included here</extracomment>
-        <translation type="unfinished"></translation>
+        <translation> - liko %1</translation>
     </message>
     <message>
         <location line="+4"/>
         <source> - Remaining time unknown</source>
         <extracomment>Second (optional) part of torrent progress string; notice that leading space (before the dash) is included here</extracomment>
-        <translation type="unfinished"></translation>
+        <translation> - Likęs laikas nežinomas</translation>
     </message>
     <message>
         <location line="+40"/>
@@ -2468,19 +2469,19 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
         <location line="+41"/>
         <source>Downloading from %Ln peer(s)</source>
         <extracomment>First part of phrase &quot;Downloading from ... peer(s) and ... web seed(s)&quot;</extracomment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Atsiunčiama iš %Ln siuntėjo</numerusform>
+            <numerusform>Atsiunčiama iš %Ln siuntėjų</numerusform>
+            <numerusform>Atsiunčiama iš %Ln siuntėjų</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+15"/>
         <source>Seeding to %Ln peer(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Skleidžiama %Ln siuntėjui</numerusform>
+            <numerusform>Skleidžiama %Ln siuntėjams</numerusform>
+            <numerusform>Skleidžiama %Ln siuntėjų</numerusform>
         </translation>
     </message>
     <message>
@@ -2491,39 +2492,39 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
     <message numerus="yes">
         <location line="-38"/>
         <source>Downloading metadata from %Ln peer(s) (%1% done)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Atsiunčiami metaduomenys iš %Ln siuntėjo (%1% atlikta)</numerusform>
+            <numerusform>Atsiunčiami metaduomenys iš %Ln siuntėjų (%1% atlikta)</numerusform>
+            <numerusform>Atsiunčiami metaduomenys iš %Ln siuntėjų (%1% atlikta)</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+11"/>
         <source>Downloading from %1 of %Ln connected peer(s)</source>
         <extracomment>First part of phrase &quot;Downloading from ... of ... connected peer(s) and ... web seed(s)&quot;</extracomment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Atsiunčiama iš %1 iš %Ln prisijungusio siuntėjo</numerusform>
+            <numerusform>Atsiunčiama iš %1 iš %Ln prisijungusių siuntėjų</numerusform>
+            <numerusform>Atsiunčiama iš %1 iš %Ln prisijungusių siuntėjų</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+6"/>
         <source> and %Ln web seed(s)</source>
         <extracomment>Second (optional) part of phrase &quot;Downloading from ... of ... connected peer(s) and ... web seed(s)&quot;; notice that leading space (before &quot;and&quot;) is included here</extracomment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform> ir %Ln saityno skleidėjo</numerusform>
+            <numerusform> ir %Ln saityno skleidėjų</numerusform>
+            <numerusform> ir %Ln saityno skleidėjų</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+8"/>
         <source>Seeding to %1 of %Ln connected peer(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Skleidžiama %1 iš %Ln prisijungusio siuntėjo</numerusform>
+            <numerusform>Skleidžiama %1 iš %Ln prisijungusių siuntėjų</numerusform>
+            <numerusform>Skleidžiama %1 iš %Ln prisijungusių siuntėjų</numerusform>
         </translation>
     </message>
     <message>
@@ -2543,10 +2544,10 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
         <location filename="../TrackerDelegate.cc" line="+212"/>
         <source>Got a list of%1 %Ln peer(s)%2 %3 ago</source>
         <extracomment>%1 and %2 are replaced with HTML markup, %3 is duration</extracomment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Prieš %3 gautas%1 %Ln siuntėjo%2 sąrašas</numerusform>
+            <numerusform>Prieš %3 gautas%1 %Ln siuntėjų%2 sąrašas</numerusform>
+            <numerusform>Prieš %3 gautas%1 %Ln siuntėjų%2 sąrašas</numerusform>
         </translation>
     </message>
     <message>
@@ -2587,27 +2588,27 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
         <location line="+17"/>
         <source>Tracker had%1 %Ln seeder(s)%2</source>
         <extracomment>First part of phrase &quot;Tracker had ... seeder(s) and ... leecher(s) ... ago&quot;; %1 and %2 are replaced with HTML markup</extracomment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Sekiklis turėjo%1 %Ln skleidėją%2</numerusform>
+            <numerusform>Sekiklis turėjo%1 %Ln skleidėjus%2</numerusform>
+            <numerusform>Sekiklis turėjo%1 %Ln skleidėjų%2</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+6"/>
         <source> and%1 %Ln leecher(s)%2 %3 ago</source>
         <extracomment>Second part of phrase &quot;Tracker had ... seeder(s) and ... leecher(s) ... ago&quot;; %1 and %2 are replaced with HTML markup, %3 is duration; notice that leading space (before &quot;and&quot;) is included here</extracomment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform> ir%1 %Ln atsisiuntėją%2 prieš %3</numerusform>
+            <numerusform> ir%1 %Ln atsisiuntėjus%2 prieš %3</numerusform>
+            <numerusform> ir%1 %Ln atsisiuntėjų%2 prieš %3</numerusform>
         </translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Tracker had %1no information%2 on peer counts %3 ago</source>
         <extracomment>%1 and %2 are replaced with HTML markup, %3 is duration</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Sekiklis prieš %3 neturėjo %1jokios informacijos%2 apie siuntėjų skaičių</translation>
     </message>
     <message>
         <location line="+9"/>

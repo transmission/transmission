@@ -43,7 +43,7 @@
 <context>
     <name>Application</name>
     <message>
-        <location filename="../Application.cc" line="+300"/>
+        <location filename="../Application.cc" line="+288"/>
         <source>&lt;b&gt;Transmission is a file sharing program.&lt;/b&gt;</source>
         <translation>&lt;b&gt;A Transmission egy fájlmegosztó program.&lt;/b&gt;</translation>
     </message>
@@ -58,7 +58,7 @@
         <translation>&amp;Elfogadom</translation>
     </message>
     <message>
-        <location line="+64"/>
+        <location line="+93"/>
         <source>Torrent Completed</source>
         <translation>Torrent befejezve</translation>
     </message>
@@ -568,29 +568,29 @@
 <context>
     <name>FileTreeItem</name>
     <message>
-        <location filename="../FileTreeItem.cc" line="+256"/>
-        <location filename="../FileTreeView.cc" line="+110"/>
-        <location line="+263"/>
+        <location filename="../FileTreeItem.cc" line="+271"/>
+        <location filename="../FileTreeView.cc" line="+105"/>
+        <location line="+257"/>
         <source>Low</source>
         <translation>Alacsony</translation>
     </message>
     <message>
         <location line="+1"/>
-        <location filename="../FileTreeView.cc" line="-262"/>
-        <location line="+260"/>
+        <location filename="../FileTreeView.cc" line="-256"/>
+        <location line="+254"/>
         <source>High</source>
         <translation>Magas</translation>
     </message>
     <message>
         <location line="+1"/>
-        <location filename="../FileTreeView.cc" line="-261"/>
-        <location line="+262"/>
+        <location filename="../FileTreeView.cc" line="-255"/>
+        <location line="+256"/>
         <source>Normal</source>
         <translation>Normál</translation>
     </message>
     <message>
         <location line="+1"/>
-        <location filename="../FileTreeView.cc" line="-261"/>
+        <location filename="../FileTreeView.cc" line="-255"/>
         <source>Mixed</source>
         <translation>Vegyes</translation>
     </message>
@@ -626,34 +626,34 @@
 <context>
     <name>FileTreeView</name>
     <message>
-        <location filename="../FileTreeView.cc" line="+253"/>
-        <source>Check selected</source>
+        <location filename="../FileTreeView.cc" line="+247"/>
+        <source>Check Selected</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
-        <source>Uncheck selected</source>
+        <source>Uncheck Selected</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
-        <source>Only check selected</source>
+        <source>Only Check Selected</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Priority</source>
-        <translation type="unfinished">Prioritás</translation>
+        <translation>Prioritás</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Open</source>
-        <translation type="unfinished">Megnyitás</translation>
+        <translation>Megnyitás</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Rename...</source>
-        <translation type="unfinished"></translation>
+        <translation>Átnevezés...</translation>
     </message>
 </context>
 <context>
@@ -689,15 +689,8 @@
         <source>Finished</source>
         <translation>Befejezve</translation>
     </message>
-    <message numerus="yes">
-        <location line="+326"/>
-        <source>Show %Ln of:</source>
-        <translation>
-            <numerusform>%Ln mutatása:</numerusform>
-        </translation>
-    </message>
     <message>
-        <location line="-322"/>
+        <location line="+4"/>
         <source>Verifying</source>
         <translation>Ellenőrzés</translation>
     </message>
@@ -707,7 +700,7 @@
         <translation>Hiba</translation>
     </message>
     <message>
-        <location line="+316"/>
+        <location line="+141"/>
         <source>Show:</source>
         <translation>Mutat:</translation>
     </message>
@@ -927,7 +920,6 @@
     </message>
     <message>
         <location line="-161"/>
-        <location filename="../MainWindow.cc" line="+1442"/>
         <source>Queue</source>
         <translation>Sorrend</translation>
     </message>
@@ -949,7 +941,7 @@
     <message>
         <location line="+30"/>
         <source>Open Fold&amp;er</source>
-        <translation>&amp;Mappa megniytása</translation>
+        <translation>&amp;Mappa megnyitása</translation>
     </message>
     <message>
         <location line="+11"/>
@@ -1249,7 +1241,7 @@
         <translation>&amp;Sorrend szerint rendezés</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cc" line="-1015"/>
+        <location filename="../MainWindow.cc" line="+434"/>
         <source>Limit Download Speed</source>
         <translation>Letöltési sebességkorlát</translation>
     </message>
@@ -1260,13 +1252,13 @@
     </message>
     <message>
         <location line="+6"/>
-        <location line="+615"/>
+        <location line="+641"/>
         <location line="+8"/>
         <source>Limited at %1</source>
         <translation>Koráltozva %1-re</translation>
     </message>
     <message>
-        <location line="-573"/>
+        <location line="-599"/>
         <source>Limit Upload Speed</source>
         <translation>Feltöltési sebességkorlát</translation>
     </message>
@@ -1282,12 +1274,12 @@
     </message>
     <message>
         <location line="+6"/>
-        <location line="+601"/>
+        <location line="+627"/>
         <source>Stop at Ratio (%1)</source>
         <translation>Seedelés befejezése ha elérte a %1 arányt</translation>
     </message>
     <message>
-        <location line="-378"/>
+        <location line="-393"/>
         <source> - %1:%2</source>
         <extracomment>Second (optional) part of main window title &quot;Transmission - host:port&quot; (added when connected to remote session); notice that leading space (before the dash) is included here</extracomment>
         <translation type="unfinished"></translation>
@@ -1310,32 +1302,32 @@
         <translation>Le: %1, Fel: %2</translation>
     </message>
     <message>
-        <location line="+406"/>
+        <location line="+421"/>
         <source>Torrent Files (*.torrent);;All Files (*.*)</source>
         <translation>Torrent fájlok (*.torrent);;Minden fájl (*.*)</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+7"/>
         <source>Show &amp;options dialog</source>
         <translation>&amp;Opciók ablak megjelenítése</translation>
     </message>
     <message>
-        <location line="-6"/>
+        <location line="-9"/>
         <source>Open Torrent</source>
         <translation>Torrent megnyitása</translation>
     </message>
     <message>
-        <location line="-885"/>
+        <location line="-918"/>
         <source>Speed Limits</source>
         <translation>Ideiglenes sebesség korlátok</translation>
     </message>
     <message>
-        <location line="+431"/>
+        <location line="+449"/>
         <source>Network Error</source>
         <translation>Hálózati hiba</translation>
     </message>
     <message>
-        <location line="+418"/>
+        <location line="+433"/>
         <source>Click to disable Temporary Speed Limits
  (%1 down, %2 up)</source>
         <translation>Kattintson az ideiglenes sebességkorlátok kikapcsolásához
@@ -1349,7 +1341,7 @@
  (%1 le, %2 fel)</translation>
     </message>
     <message>
-        <location line="+135"/>
+        <location line="+133"/>
         <source>Remove torrent?</source>
         <translation>Valóban törölni kívánod a torrentet?</translation>
     </message>
@@ -1366,7 +1358,14 @@
         </translation>
     </message>
     <message numerus="yes">
-        <location line="+6"/>
+        <location line="-497"/>
+        <source>Showing %L1 of %Ln torrent(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <location line="+503"/>
         <source>Delete these %Ln torrent(s)&apos; downloaded files?</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -2166,7 +2165,7 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../Application.cc" line="-227"/>
+        <location filename="../Application.cc" line="-256"/>
         <source>Invalid option</source>
         <translation>érvénytelen opció</translation>
     </message>

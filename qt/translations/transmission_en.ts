@@ -43,7 +43,7 @@
 <context>
     <name>Application</name>
     <message>
-        <location filename="../Application.cc" line="+304"/>
+        <location filename="../Application.cc" line="+288"/>
         <source>&lt;b&gt;Transmission is a file sharing program.&lt;/b&gt;</source>
         <translation type="unfinished"></translation>
     </message>
@@ -58,7 +58,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+64"/>
+        <location line="+93"/>
         <source>Torrent Completed</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1248,7 +1248,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cc" line="+433"/>
+        <location filename="../MainWindow.cc" line="+434"/>
         <source>Limit Download Speed</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1314,22 +1314,22 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+7"/>
         <source>Show &amp;options dialog</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-6"/>
+        <location line="-9"/>
         <source>Open Torrent</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-917"/>
+        <location line="-918"/>
         <source>Speed Limits</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+448"/>
+        <location line="+449"/>
         <source>Network Error</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1346,7 +1346,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+135"/>
+        <location line="+133"/>
         <source>Remove torrent?</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1364,7 +1364,7 @@
         </translation>
     </message>
     <message numerus="yes">
-        <location line="-499"/>
+        <location line="-497"/>
         <source>Showing %L1 of %Ln torrent(s)</source>
         <translation type="unfinished">
             <numerusform>Showing %L1 of %Ln torrent</numerusform>
@@ -1372,7 +1372,7 @@
         </translation>
     </message>
     <message numerus="yes">
-        <location line="+505"/>
+        <location line="+503"/>
         <source>Delete these %Ln torrent(s)&apos; downloaded files?</source>
         <translation>
             <numerusform>Delete this %Ln torrent&apos;s downloaded files?</numerusform>
@@ -2178,7 +2178,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../Application.cc" line="-227"/>
+        <location filename="../Application.cc" line="-256"/>
         <source>Invalid option</source>
         <translation type="unfinished"></translation>
     </message>

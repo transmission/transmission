@@ -43,7 +43,7 @@
 <context>
     <name>Application</name>
     <message>
-        <location filename="../Application.cc" line="+300"/>
+        <location filename="../Application.cc" line="+288"/>
         <source>&lt;b&gt;Transmission is a file sharing program.&lt;/b&gt;</source>
         <translation>&lt;b&gt;Transmission — програма для поширення файлів.&lt;/b&gt;</translation>
     </message>
@@ -58,7 +58,7 @@
         <translation>По&amp;годжуюсь</translation>
     </message>
     <message>
-        <location line="+64"/>
+        <location line="+93"/>
         <source>Torrent Completed</source>
         <translation>Торент завершено</translation>
     </message>
@@ -563,7 +563,7 @@
     <message>
         <location line="+1"/>
         <source>&lt;p&gt;&lt;b&gt;Unable to add &quot;%1&quot;.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;It is a duplicate of &quot;%2&quot; which is already added.&lt;/p&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;p&gt;&lt;b&gt;Неможливо додати &quot;%1&quot;.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Це дублікат &quot;%2&quot;, який вже було додано.&lt;/p&gt;</translation>
     </message>
     <message>
         <location line="+19"/>
@@ -574,29 +574,29 @@
 <context>
     <name>FileTreeItem</name>
     <message>
-        <location filename="../FileTreeItem.cc" line="+256"/>
-        <location filename="../FileTreeView.cc" line="+110"/>
-        <location line="+263"/>
+        <location filename="../FileTreeItem.cc" line="+271"/>
+        <location filename="../FileTreeView.cc" line="+105"/>
+        <location line="+257"/>
         <source>Low</source>
         <translation>Низький</translation>
     </message>
     <message>
         <location line="+1"/>
-        <location filename="../FileTreeView.cc" line="-262"/>
-        <location line="+260"/>
+        <location filename="../FileTreeView.cc" line="-256"/>
+        <location line="+254"/>
         <source>High</source>
         <translation>Високий</translation>
     </message>
     <message>
         <location line="+1"/>
-        <location filename="../FileTreeView.cc" line="-261"/>
-        <location line="+262"/>
+        <location filename="../FileTreeView.cc" line="-255"/>
+        <location line="+256"/>
         <source>Normal</source>
         <translation>Звичайний</translation>
     </message>
     <message>
         <location line="+1"/>
-        <location filename="../FileTreeView.cc" line="-261"/>
+        <location filename="../FileTreeView.cc" line="-255"/>
         <source>Mixed</source>
         <translation>Змішаний</translation>
     </message>
@@ -632,34 +632,34 @@
 <context>
     <name>FileTreeView</name>
     <message>
-        <location filename="../FileTreeView.cc" line="+253"/>
-        <source>Check selected</source>
-        <translation type="unfinished"></translation>
+        <location filename="../FileTreeView.cc" line="+247"/>
+        <source>Check Selected</source>
+        <translation>Обрати виділене</translation>
     </message>
     <message>
         <location line="+1"/>
-        <source>Uncheck selected</source>
-        <translation type="unfinished"></translation>
+        <source>Uncheck Selected</source>
+        <translation>Зняти виділене</translation>
     </message>
     <message>
         <location line="+1"/>
-        <source>Only check selected</source>
-        <translation type="unfinished"></translation>
+        <source>Only Check Selected</source>
+        <translation>Обрати тільки виділене</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Priority</source>
-        <translation type="unfinished">Пріоритет</translation>
+        <translation>Пріоритет</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Open</source>
-        <translation type="unfinished">Відкрити</translation>
+        <translation>Відкрити</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Rename...</source>
-        <translation type="unfinished"></translation>
+        <translation>Змінити ім&apos;я...</translation>
     </message>
 </context>
 <context>
@@ -695,17 +695,8 @@
         <source>Finished</source>
         <translation>Завершено</translation>
     </message>
-    <message numerus="yes">
-        <location line="+326"/>
-        <source>Show %Ln of:</source>
-        <translation>
-            <numerusform>Показувати %Ln з:</numerusform>
-            <numerusform>Показувати %Ln з:</numerusform>
-            <numerusform>Показувати %Ln з:</numerusform>
-        </translation>
-    </message>
     <message>
-        <location line="-322"/>
+        <location line="+4"/>
         <source>Verifying</source>
         <translation>Перевірка</translation>
     </message>
@@ -715,7 +706,7 @@
         <translation>Помилка</translation>
     </message>
     <message>
-        <location line="+316"/>
+        <location line="+141"/>
         <source>Show:</source>
         <translation>Показувати:</translation>
     </message>
@@ -725,7 +716,7 @@
     <message>
         <location filename="../FilterBarLineEdit.cc" line="+48"/>
         <source>Search...</source>
-        <translation type="unfinished"></translation>
+        <translation>Шукати...</translation>
     </message>
 </context>
 <context>
@@ -943,7 +934,6 @@
     </message>
     <message>
         <location line="-161"/>
-        <location filename="../MainWindow.cc" line="+1442"/>
         <source>Queue</source>
         <translation>Черга</translation>
     </message>
@@ -1265,7 +1255,7 @@
         <translation>Впорядкувати за чергою</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cc" line="-1015"/>
+        <location filename="../MainWindow.cc" line="+434"/>
         <source>Limit Download Speed</source>
         <translation>Обмежити швидкість завантаження</translation>
     </message>
@@ -1276,13 +1266,13 @@
     </message>
     <message>
         <location line="+6"/>
-        <location line="+615"/>
+        <location line="+641"/>
         <location line="+8"/>
         <source>Limited at %1</source>
         <translation>Обмежено до %1</translation>
     </message>
     <message>
-        <location line="-573"/>
+        <location line="-599"/>
         <source>Limit Upload Speed</source>
         <translation>Обмежити швидкість поширення</translation>
     </message>
@@ -1298,12 +1288,12 @@
     </message>
     <message>
         <location line="+6"/>
-        <location line="+601"/>
+        <location line="+627"/>
         <source>Stop at Ratio (%1)</source>
         <translation>Зупинити за співвідношення (%1)</translation>
     </message>
     <message>
-        <location line="-378"/>
+        <location line="-393"/>
         <source> - %1:%2</source>
         <extracomment>Second (optional) part of main window title &quot;Transmission - host:port&quot; (added when connected to remote session); notice that leading space (before the dash) is included here</extracomment>
         <translation> - %1:%2</translation>
@@ -1326,32 +1316,32 @@
         <translation>Завн: %1, Пошир: %2</translation>
     </message>
     <message>
-        <location line="+406"/>
+        <location line="+421"/>
         <source>Torrent Files (*.torrent);;All Files (*.*)</source>
         <translation>Торент файли (*.torrent);;Всі файли (*.*)</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+7"/>
         <source>Show &amp;options dialog</source>
         <translation>Показати &amp;діалог налаштування</translation>
     </message>
     <message>
-        <location line="-6"/>
+        <location line="-9"/>
         <source>Open Torrent</source>
         <translation>Відкрити торент</translation>
     </message>
     <message>
-        <location line="-885"/>
+        <location line="-918"/>
         <source>Speed Limits</source>
         <translation>Обмеження швидкості</translation>
     </message>
     <message>
-        <location line="+431"/>
+        <location line="+449"/>
         <source>Network Error</source>
         <translation>Помилка мережі</translation>
     </message>
     <message>
-        <location line="+418"/>
+        <location line="+433"/>
         <source>Click to disable Temporary Speed Limits
  (%1 down, %2 up)</source>
         <translation>Натисніть для зняття тимчасових обмежень швидкості
@@ -1365,7 +1355,7 @@
 (%1 завантаження, %2 поширення)</translation>
     </message>
     <message>
-        <location line="+135"/>
+        <location line="+133"/>
         <source>Remove torrent?</source>
         <translation>Вилучити торент?</translation>
     </message>
@@ -1384,7 +1374,16 @@
         </translation>
     </message>
     <message numerus="yes">
-        <location line="+6"/>
+        <location line="-497"/>
+        <source>Showing %L1 of %Ln torrent(s)</source>
+        <translation>
+            <numerusform>Відображен %L1 з %Ln торентів</numerusform>
+            <numerusform>Відображені %L1 з %Ln торентів</numerusform>
+            <numerusform>Відображені %L1 з %Ln торентів</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <location line="+503"/>
         <source>Delete these %Ln torrent(s)&apos; downloaded files?</source>
         <translation>
             <numerusform>Вилучити завантажени файлы цього %Ln торенту?</numerusform>
@@ -1833,10 +1832,10 @@ To add another primary URL, add it after a blank line.</source>
         <location line="+22"/>
         <source> minute(s) ago</source>
         <extracomment>Spin box suffix, &quot;Download is inactive if data sharing stopped: [ 5 minutes ago ]&quot; (includes leading space after the number, if needed)</extracomment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform> хвилину тому</numerusform>
+            <numerusform> хвилин тому</numerusform>
+            <numerusform> хвилин тому</numerusform>
         </translation>
     </message>
     <message>
@@ -2137,7 +2136,7 @@ To add another primary URL, add it after a blank line.</source>
         <location line="+137"/>
         <source>Download is i&amp;nactive if data sharing stopped:</source>
         <extracomment>Please keep this phrase as short as possible, it&apos;s curently the longest and influences dialog width</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Завантаження неможливо, якщо обмін даними зупинено:</translation>
     </message>
     <message>
         <location line="-146"/>
@@ -2198,7 +2197,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../Application.cc" line="-227"/>
+        <location filename="../Application.cc" line="-256"/>
         <source>Invalid option</source>
         <translation>Помилковий параметр</translation>
     </message>
@@ -2609,7 +2608,7 @@ To add another primary URL, add it after a blank line.</source>
         <location line="+8"/>
         <source>Tracker had %1no information%2 on peer counts %3 ago</source>
         <extracomment>%1 and %2 are replaced with HTML markup, %3 is duration</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Трекер %1не мав інформації%2 щодо кількості вузлів %3 тому</translation>
     </message>
     <message>
         <location line="+9"/>
