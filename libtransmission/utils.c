@@ -349,13 +349,16 @@ tr_getDirFreeSpace (const char * dir)
 ****/
 
 char*
-evbuffer_free_to_str (struct evbuffer * buf)
+evbuffer_free_to_str (struct evbuffer * buf,
+                      size_t          * result_len)
 {
   const size_t n = evbuffer_get_length (buf);
   char * ret = tr_new (char, n + 1);
   evbuffer_copyout (buf, ret, n);
   evbuffer_free (buf);
   ret[n] = '\0';
+  if (result_len != NULL)
+    *result_len = n;
   return ret;
 }
 
@@ -426,7 +429,7 @@ tr_strdup_vprintf (const char * fmt,
 {
   struct evbuffer * buf = evbuffer_new ();
   evbuffer_add_vprintf (buf, fmt, args);
-  return evbuffer_free_to_str (buf);
+  return evbuffer_free_to_str (buf, NULL);
 }
 
 const char*
@@ -983,7 +986,6 @@ static char*
 strip_non_utf8 (const char * in, size_t inlen)
 {
   const char * end;
-  const char zero = '\0';
   struct evbuffer * buf = evbuffer_new ();
 
   while (!tr_utf8_validate (in, inlen, &end))
@@ -997,8 +999,7 @@ strip_non_utf8 (const char * in, size_t inlen)
     }
 
   evbuffer_add (buf, in, inlen);
-  evbuffer_add (buf, &zero, 1);
-  return evbuffer_free_to_str (buf);
+  return evbuffer_free_to_str (buf, NULL);
 }
 
 static char*

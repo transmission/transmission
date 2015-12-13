@@ -301,7 +301,7 @@ myDebug (const char * file, int line,
       va_end (args);
       evbuffer_add_printf (buf, " (%s:%d)", base, line);
 
-      message = evbuffer_free_to_str (buf);
+      message = evbuffer_free_to_str (buf, NULL);
       tr_sys_file_write_line (fp, message, NULL);
 
       tr_free (base);

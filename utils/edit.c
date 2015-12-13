@@ -177,7 +177,7 @@ replaceSubstr (const char * str, const char * in, const char * out)
 
   evbuffer_add (buf, str, strlen (str));
 
-  return evbuffer_free_to_str (buf);
+  return evbuffer_free_to_str (buf, NULL);
 }
 
 static bool

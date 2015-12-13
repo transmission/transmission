@@ -297,7 +297,8 @@ char* tr_strdup (const void * in);
  */
 int tr_strcmp0 (const char * str1, const char * str2);
 
-char* evbuffer_free_to_str (struct evbuffer * buf);
+char* evbuffer_free_to_str (struct evbuffer * buf,
+                            size_t          * result_len);
 
 /** @brief similar to bsearch () but returns the index of the lower bound */
 int tr_lowerBound (const void * key,

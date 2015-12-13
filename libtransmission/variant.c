@@ -1202,8 +1202,8 @@ char*
 tr_variantToStr (const tr_variant * v, tr_variant_fmt fmt, int * len)
 {
   struct evbuffer * buf = tr_variantToBuf (v, fmt);
-  const size_t n = evbuffer_get_length (buf);
-  char * ret = evbuffer_free_to_str (buf);
+  size_t n;
+  char * ret = evbuffer_free_to_str (buf, &n);
   if (len != NULL)
     *len = (int) n;
   return ret;

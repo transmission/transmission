@@ -767,7 +767,7 @@ dbgmsg_tier_announce_queue (const tr_tier * tier)
             evbuffer_add_printf (buf, "[%d:%s]", i, str);
         }
 
-        message = evbuffer_free_to_str (buf);
+        message = evbuffer_free_to_str (buf, NULL);
         tr_logAddDeep (__FILE__, __LINE__, name, "announce queue is %s", message);
         tr_free (message);
     }

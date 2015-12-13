@@ -117,7 +117,7 @@ announce_url_new (const tr_session * session, const tr_announce_request * req)
         tr_http_escape (buf, ipv6_readable, -1, true);
     }
 
-    return evbuffer_free_to_str (buf);
+    return evbuffer_free_to_str (buf, NULL);
 }
 
 static tr_pex*
@@ -447,7 +447,7 @@ scrape_url_new (const tr_scrape_request * req)
         delimiter = '&';
     }
 
-    return evbuffer_free_to_str (buf);
+    return evbuffer_free_to_str (buf, NULL);
 }
 
 void

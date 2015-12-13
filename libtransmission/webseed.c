@@ -494,7 +494,7 @@ task_request_next_chunk (struct tr_webseed_task * t)
       this_pass = MIN (remain, file->length - file_offset);
 
       if (!urls[file_index])
-        urls[file_index] = evbuffer_free_to_str (make_url (t->webseed, file));
+        urls[file_index] = evbuffer_free_to_str (make_url (t->webseed, file), NULL);
 
       tr_snprintf (range, sizeof range, "%"PRIu64"-%"PRIu64,
                    file_offset, file_offset + this_pass - 1);

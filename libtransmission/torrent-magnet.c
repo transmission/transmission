@@ -406,5 +406,5 @@ tr_torrentInfoGetMagnetLink (const tr_info * inf)
       tr_http_escape (s, inf->webseeds[i], -1, true);
     }
 
-  return evbuffer_free_to_str (s);
+  return evbuffer_free_to_str (s, NULL);
 }

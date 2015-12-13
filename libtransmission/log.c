@@ -194,7 +194,7 @@ tr_logAddDeep (const char  * file,
       va_end (args);
       evbuffer_add_printf (buf, " (%s:%d)", base, line);
       /* FIXME (libevent2) ifdef this out for nonwindows platforms */
-      message = evbuffer_free_to_str (buf);
+      message = evbuffer_free_to_str (buf, NULL);
       OutputDebugStringA (message);
       OutputDebugStringA (TR_NATIVE_EOL_STR);
       if (fp != TR_BAD_SYS_FILE)
