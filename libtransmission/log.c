@@ -182,6 +182,7 @@ tr_logAddDeep (const char  * file,
       va_list args;
       char timestr[64];
       char * message;
+      size_t message_len;
       struct evbuffer * buf = evbuffer_new ();
       char * base = tr_sys_path_basename (file, NULL);
 
@@ -192,13 +193,12 @@ tr_logAddDeep (const char  * file,
       va_start (args, fmt);
       evbuffer_add_vprintf (buf, fmt, args);
       va_end (args);
-      evbuffer_add_printf (buf, " (%s:%d)", base, line);
+      evbuffer_add_printf (buf, " (%s:%d)" TR_NATIVE_EOL_STR, base, line);
       /* FIXME (libevent2) ifdef this out for nonwindows platforms */
-      message = evbuffer_free_to_str (buf, NULL);
+      message = evbuffer_free_to_str (buf, &message_len);
       OutputDebugStringA (message);
-      OutputDebugStringA (TR_NATIVE_EOL_STR);
       if (fp != TR_BAD_SYS_FILE)
-        tr_sys_file_write_line (fp, message, NULL);
+        tr_sys_file_write (fp, message, message_len, NULL, NULL);
 
       tr_free (message);
       tr_free (base);
@@ -219,17 +219,33 @@ tr_logAddMessage (const char * file,
 {
   const int err = errno; /* message logging shouldn't affect errno */
   char buf[1024];
+  int buf_len;
   va_list ap;
   tr_lockLock (getMessageLock ());
 
   /* build the text message */
   *buf = '\0';
   va_start (ap, fmt);
-  evutil_vsnprintf (buf, sizeof (buf), fmt, ap);
+  buf_len = evutil_vsnprintf (buf, sizeof (buf), fmt, ap);
   va_end (ap);
 
-  OutputDebugStringA (buf);
-  OutputDebugStringA (TR_NATIVE_EOL_STR);
+  if (buf_len < 0)
+    return;
+
+#ifdef _WIN32
+  if ((size_t) buf_len < sizeof (buf) - 3)
+    {
+      buf[buf_len + 0] = '\r';
+      buf[buf_len + 1] = '\n';
+      buf[buf_len + 2] = '\0';
+      OutputDebugStringA (buf);
+      buf[buf_len + 0] = '\0';
+    }
+  else
+    {
+      OutputDebugStringA (buf);
+    }
+#endif
 
   if (*buf)
     {
