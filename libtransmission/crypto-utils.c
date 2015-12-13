@@ -208,7 +208,7 @@ tr_base64_encode (const void * input,
           ret_length += ret_length / 72 + 1;
 #endif
 
-          ret = tr_new (char, ret_length + 1);
+          ret = tr_new (char, ret_length + 8);
 
           base64_init_encodestate (&state);
           ret_length = base64_encode_block (input, input_length, ret, &state);
@@ -256,7 +256,7 @@ tr_base64_decode (const void * input,
           size_t ret_length = input_length / 4 * 3;
           base64_decodestate state;
 
-          ret = tr_new (char, ret_length + 1);
+          ret = tr_new (char, ret_length + 8);
 
           base64_init_decodestate (&state);
           ret_length = base64_decode_block (input, input_length, ret, &state);
