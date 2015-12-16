@@ -10,15 +10,18 @@
 #include <ctime>
 #include <iostream>
 
-#include <QDBusConnection>
-#include <QDBusMessage>
-#include <QDBusReply>
 #include <QIcon>
 #include <QLibraryInfo>
 #include <QMessageBox>
 #include <QProcess>
 #include <QRect>
 #include <QSystemTrayIcon>
+
+#ifdef QT_DBUS_LIB
+  #include <QDBusConnection>
+  #include <QDBusMessage>
+  #include <QDBusReply>
+#endif
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/tr-getopt.h>
@@ -27,8 +30,8 @@
 
 #include "AddData.h"
 #include "Application.h"
-#include "DBusInteropHelper.h"
 #include "Formatter.h"
+#include "InteropHelper.h"
 #include "MainWindow.h"
 #include "OptionsDialog.h"
 #include "Prefs.h"
@@ -157,7 +160,7 @@ Application::Application (int& argc, char ** argv):
 
   // try to delegate the work to an existing copy of Transmission
   // before starting ourselves...
-  DBusInteropHelper interopClient;
+  InteropHelper interopClient;
   if (interopClient.isConnected ())
     {
       bool delegated = false;
@@ -175,11 +178,7 @@ Application::Application (int& argc, char ** argv):
               default:                break;
             }
 
-          if (metainfo.isEmpty ())
-            continue;
-
-          const QVariant result = interopClient.addMetainfo (metainfo);
-          if (result.isValid () && result.toBool ())
+          if (!metainfo.isEmpty () && interopClient.addMetainfo (metainfo))
             delegated = true;
         }
 
@@ -294,7 +293,7 @@ Application::Application (int& argc, char ** argv):
   for (const QString& filename: filenames)
     addTorrent (filename);
 
-  DBusInteropHelper::registerObject (this);
+  InteropHelper::registerObject (this);
 }
 
 void
@@ -542,6 +541,7 @@ Application::raise ()
 bool
 Application::notifyApp (const QString& title, const QString& body) const
 {
+#ifdef QT_DBUS_LIB
   const QLatin1String dbusServiceName ("org.freedesktop.Notifications");
   const QLatin1String dbusInterfaceName ("org.freedesktop.Notifications");
   const QLatin1String dbusPath ("/org/freedesktop/Notifications");
@@ -564,6 +564,7 @@ Application::notifyApp (const QString& title, const QString& body) const
       if (replyMsg.isValid () && replyMsg.value () > 0)
         return true;
     }
+#endif
 
   myWindow->trayIcon ().showMessage (title, body);
   return true;
@@ -582,6 +583,8 @@ int
 tr_main (int    argc,
          char * argv[])
 {
+  InteropHelper::initialize ();
+
   Application app (argc, argv);
   return app.exec ();
 }

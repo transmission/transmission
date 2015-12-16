@@ -22,11 +22,26 @@ else()
     endmacro()
 endif()
 
+set(ENABLE_COM_INTEROP OFF)
+if(MSVC AND ((Qt5AxContainer_FOUND AND Qt5AxServer_FOUND) OR (QT_QAXCONTAINER_FOUND AND QT_QAXSERVER_FOUND)))
+    set(ENABLE_COM_INTEROP ON)
+endif()
+
+set(ENABLE_DBUS_INTEROP OFF)
+if(Qt5DBus_FOUND OR QT_QTDBUS_FOUND)
+    set(ENABLE_DBUS_INTEROP ON)
+endif()
+
+if(NOT ENABLE_COM_INTEROP AND NOT ENABLE_DBUS_INTEROP)
+    message(FATAL_ERROR "Neither D-Bus nor COM interop is possible")
+endif()
+
 set(${PROJECT_NAME}_SOURCES
     AboutDialog.cc
     AddData.cc
     Application.cc
     ColumnResizer.cc
+    ComInteropHelper.cc
     DBusInteropHelper.cc
     DetailsDialog.cc
     FaviconCache.cc
@@ -42,6 +57,7 @@ set(${PROJECT_NAME}_SOURCES
     Formatter.cc
     FreeSpaceLabel.cc
     IconToolButton.cc
+    InteropHelper.cc
     InteropObject.cc
     LicenseDialog.cc
     MainWindow.cc
@@ -69,12 +85,20 @@ set(${PROJECT_NAME}_SOURCES
     WatchDir.cc
 )
 
+if (NOT ENABLE_COM_INTEROP)
+    set_source_files_properties(ComInteropHelper.cc PROPERTIES HEADER_FILE_ONLY ON)
+endif()
+if (NOT ENABLE_DBUS_INTEROP)
+    set_source_files_properties(DBusInteropHelper.cc PROPERTIES HEADER_FILE_ONLY ON)
+endif()
+
 set(${PROJECT_NAME}_HEADERS
     AboutDialog.h
     AddData.h
     Application.h
     BaseDialog.h
     ColumnResizer.h
+    ComInteropHelper.h
     CustomVariantType.h
     DBusInteropHelper.h
     DetailsDialog.h
@@ -91,6 +115,7 @@ set(${PROJECT_NAME}_HEADERS
     Formatter.h
     FreeSpaceLabel.h
     IconToolButton.h
+    InteropHelper.h
     InteropObject.h
     LicenseDialog.h
     MainWindow.h
@@ -182,16 +207,27 @@ include_directories(
     ${EVENT2_INCLUDE_DIRS}
 )
 
-add_definitions(
-    "-DTRANSLATIONS_DIR=\"${CMAKE_INSTALL_FULL_DATADIR}/${TR_NAME}/translations\""
-    -DQT_NO_CAST_FROM_ASCII
-)
-
 tr_win32_app_info(${PROJECT_NAME}_WIN32_RC_FILE
     "Transmission Qt Client"
     "transmission-qt"
     "transmission-qt.exe"
     "qtr.ico")
+
+if(ENABLE_COM_INTEROP)
+    find_program(MIDL_EXECUTABLE midl)
+    add_custom_command(
+        OUTPUT
+            ${CMAKE_CURRENT_BINARY_DIR}/transmission-qt.tlb
+        COMMAND
+            ${MIDL_EXECUTABLE} /tlb ${CMAKE_CURRENT_BINARY_DIR}/transmission-qt.tlb transmission-qt.idl
+        DEPENDS
+            transmission-qt.idl
+        WORKING_DIRECTORY
+            ${CMAKE_CURRENT_SOURCE_DIR}
+    )
+    list(APPEND ${PROJECT_NAME}_WIN32_RC_FILE transmission-qt.tlb.rc transmission-qt.idl ${CMAKE_CURRENT_BINARY_DIR}/transmission-qt.tlb)
+    set_source_files_properties(transmission-qt.idl ${CMAKE_CURRENT_BINARY_DIR}/transmission-qt.tlb PROPERTIES HEADER_FILE_ONLY ON)
+endif()
 
 add_executable(${TR_NAME}-qt WIN32
     ${${PROJECT_NAME}_SOURCES}
@@ -208,6 +244,12 @@ target_link_libraries(${TR_NAME}-qt
     ${CURL_LIBRARIES}
     ${EVENT2_LIBRARIES}
 )
+
+target_compile_definitions(${TR_NAME}-qt PRIVATE
+    "TRANSLATIONS_DIR=\"${CMAKE_INSTALL_FULL_DATADIR}/${TR_NAME}/translations\""
+    QT_NO_CAST_FROM_ASCII
+    $<$<BOOL:${ENABLE_COM_INTEROP}>:ENABLE_COM_INTEROP>
+    $<$<BOOL:${ENABLE_DBUS_INTEROP}>:ENABLE_DBUS_INTEROP>)
 
 if(MSVC)
     tr_append_target_property(${TR_NAME}-qt LINK_FLAGS "/ENTRY:mainCRTStartup")

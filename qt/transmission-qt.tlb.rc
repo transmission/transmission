@@ -1,0 +1,6 @@
+#include "winresrc.h"
+
+#pragma code_page(1252)
+
+LANGUAGE 0, 0
+1 TYPELIB "transmission-qt.tlb"
