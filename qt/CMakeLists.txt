@@ -206,17 +206,13 @@ add_executable(${TR_NAME}-qt WIN32
 
 target_link_libraries(${TR_NAME}-qt
     ${TR_NAME}
-    ${QT_LIBRARIES}
+    ${QT_TARGETS}
     ${CURL_LIBRARIES}
     ${EVENT2_LIBRARIES}
 )
 
 if(MSVC)
     tr_append_target_property(${TR_NAME}-qt LINK_FLAGS "/ENTRY:mainCRTStartup")
-endif()
-
-if(USE_QT5)
-    qt5_use_modules(${TR_NAME}-qt ${TR_QT5_MODULES})
 endif()
 
 set_target_properties(${TR_NAME}-qt PROPERTIES AUTOMOC TRUE)
