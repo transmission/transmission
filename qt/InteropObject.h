@@ -7,28 +7,22 @@
  * $Id$
  */
 
-#ifndef QTR_DBUS_ADAPTOR_H
-#define QTR_DBUS_ADAPTOR_H
+#ifndef QTR_INTEROP_OBJECT_H
+#define QTR_INTEROP_OBJECT_H
 
-#include <QDBusAbstractAdaptor>
+#include <QObject>
 
-class Application;
-
-class DBusAdaptor: public QDBusAbstractAdaptor
+class InteropObject: public QObject
 {
     Q_OBJECT
     Q_CLASSINFO ("D-Bus Interface", "com.transmissionbt.Transmission")
 
   public:
-    DBusAdaptor (Application *);
-    virtual ~DBusAdaptor () {}
+    InteropObject (QObject * parent = nullptr);
 
   public slots:
     bool PresentWindow ();
-    bool AddMetainfo (const QString&);
-
-  private:
-    Application * myApp;
+    bool AddMetainfo (const QString& metainfo);
 };
 
-#endif // QTR_DBUS_ADAPTOR_H
+#endif // QTR_INTEROP_OBJECT_H

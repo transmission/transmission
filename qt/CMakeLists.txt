@@ -29,7 +29,7 @@ set(${PROJECT_NAME}_SOURCES
     AddData.cc
     Application.cc
     ColumnResizer.cc
-    DBusAdaptor.cc
+    DBusInteropHelper.cc
     DetailsDialog.cc
     FaviconCache.cc
     FileTreeDelegate.cc
@@ -44,6 +44,7 @@ set(${PROJECT_NAME}_SOURCES
     Formatter.cc
     FreeSpaceLabel.cc
     IconToolButton.cc
+    InteropObject.cc
     LicenseDialog.cc
     MainWindow.cc
     MakeDialog.cc
@@ -77,7 +78,7 @@ set(${PROJECT_NAME}_HEADERS
     BaseDialog.h
     ColumnResizer.h
     CustomVariantType.h
-    DBusAdaptor.h
+    DBusInteropHelper.h
     DetailsDialog.h
     FaviconCache.h
     FileTreeDelegate.h
@@ -92,6 +93,7 @@ set(${PROJECT_NAME}_HEADERS
     Formatter.h
     FreeSpaceLabel.h
     IconToolButton.h
+    InteropObject.h
     LicenseDialog.h
     MainWindow.h
     MakeDialog.h

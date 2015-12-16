@@ -11,9 +11,8 @@
 #include <iostream>
 
 #include <QDBusConnection>
-#include <QDBusConnectionInterface>
-#include <QDBusError>
 #include <QDBusMessage>
+#include <QDBusReply>
 #include <QIcon>
 #include <QLibraryInfo>
 #include <QMessageBox>
@@ -28,7 +27,7 @@
 
 #include "AddData.h"
 #include "Application.h"
-#include "DBusAdaptor.h"
+#include "DBusInteropHelper.h"
 #include "Formatter.h"
 #include "MainWindow.h"
 #include "OptionsDialog.h"
@@ -39,10 +38,6 @@
 
 namespace
 {
-  const QString DBUS_SERVICE     = QString::fromUtf8 ("com.transmissionbt.Transmission" );
-  const QString DBUS_OBJECT_PATH = QString::fromUtf8 ("/com/transmissionbt/Transmission");
-  const QString DBUS_INTERFACE   = QString::fromUtf8 ("com.transmissionbt.Transmission" );
-
   const QLatin1String MY_CONFIG_NAME ("transmission");
   const QLatin1String MY_READABLE_NAME ("transmission-qt");
 
@@ -162,41 +157,38 @@ Application::Application (int& argc, char ** argv):
 
   // try to delegate the work to an existing copy of Transmission
   // before starting ourselves...
-  QDBusConnection bus = QDBusConnection::sessionBus ();
-  if (bus.isConnected ())
-  {
-    bool delegated = false;
-    for (const QString& filename: filenames)
-      {
-        QDBusMessage request = QDBusMessage::createMethodCall (DBUS_SERVICE,
-                                                               DBUS_OBJECT_PATH,
-                                                               DBUS_INTERFACE,
-                                                               QString::fromUtf8 ("AddMetainfo"));
-        QList<QVariant> arguments;
-        AddData a (filename);
-        switch (a.type)
-          {
-            case AddData::URL:      arguments.push_back (a.url.toString ()); break;
-            case AddData::MAGNET:   arguments.push_back (a.magnet); break;
-            case AddData::FILENAME: arguments.push_back (QString::fromLatin1 (a.toBase64 ())); break;
-            case AddData::METAINFO: arguments.push_back (QString::fromLatin1 (a.toBase64 ())); break;
-            default:                break;
-          }
-        request.setArguments (arguments);
+  DBusInteropHelper interopClient;
+  if (interopClient.isConnected ())
+    {
+      bool delegated = false;
+      for (const QString& filename: filenames)
+        {
+          QString metainfo;
 
-        QDBusMessage response = bus.call (request);
-        //std::cerr << qPrintable (response.errorName ()) << std::endl;
-        //std::cerr << qPrintable (response.errorMessage ()) << std::endl;
-        arguments = response.arguments ();
-        delegated |= (arguments.size ()==1) && arguments[0].toBool ();
-      }
+          AddData a (filename);
+          switch (a.type)
+            {
+              case AddData::URL:      metainfo = a.url.toString (); break;
+              case AddData::MAGNET:   metainfo = a.magnet; break;
+              case AddData::FILENAME: metainfo = QString::fromLatin1 (a.toBase64 ()); break;
+              case AddData::METAINFO: metainfo = QString::fromLatin1 (a.toBase64 ()); break;
+              default:                break;
+            }
 
-    if (delegated)
-      {
-        quitLater ();
-        return;
-      }
-  }
+          if (metainfo.isEmpty ())
+            continue;
+
+          const QVariant result = interopClient.addMetainfo (metainfo);
+          if (result.isValid () && result.toBool ())
+            delegated = true;
+        }
+
+      if (delegated)
+        {
+          quitLater ();
+          return;
+        }
+    }
 
   // set the fallback config dir
   if (configDir.isNull ())
@@ -302,15 +294,7 @@ Application::Application (int& argc, char ** argv):
   for (const QString& filename: filenames)
     addTorrent (filename);
 
-  // register as the dbus handler for Transmission
-  if (bus.isConnected ())
-    {
-      new DBusAdaptor (this);
-      if (!bus.registerService (DBUS_SERVICE))
-        std::cerr << "couldn't register " << qPrintable (DBUS_SERVICE) << std::endl;
-      if (!bus.registerObject (DBUS_OBJECT_PATH, this))
-        std::cerr << "couldn't register " << qPrintable (DBUS_OBJECT_PATH) << std::endl;
-    }
+  DBusInteropHelper::registerObject (this);
 }
 
 void
@@ -558,32 +542,31 @@ Application::raise ()
 bool
 Application::notifyApp (const QString& title, const QString& body) const
 {
+  const QLatin1String dbusServiceName ("org.freedesktop.Notifications");
+  const QLatin1String dbusInterfaceName ("org.freedesktop.Notifications");
+  const QLatin1String dbusPath ("/org/freedesktop/Notifications");
+
   QDBusConnection bus = QDBusConnection::sessionBus ();
-  if (!bus.isConnected ())
+  if (bus.isConnected ())
     {
-      myWindow->trayIcon ().showMessage (title, body);
-      return true;
+      QDBusMessage m = QDBusMessage::createMethodCall (dbusServiceName, dbusPath, dbusInterfaceName, QLatin1String ("Notify"));
+      QVariantList args;
+      args.append (QLatin1String ("Transmission")); // app_name
+      args.append (0U);                             // replaces_id
+      args.append (QLatin1String ("transmission")); // icon
+      args.append (title);                          // summary
+      args.append (body);                           // body
+      args.append (QStringList ());                 // actions - unused for plain passive popups
+      args.append (QVariantMap ());                 // hints - unused atm
+      args.append (static_cast<int32_t> (-1));      // use the default timeout period
+      m.setArguments (args);
+      const QDBusReply<quint32> replyMsg = bus.call (m);
+      if (replyMsg.isValid () && replyMsg.value () > 0)
+        return true;
     }
 
-  const QString dbusServiceName   = QString::fromUtf8 ("org.freedesktop.Notifications");
-  const QString dbusInterfaceName = QString::fromUtf8 ("org.freedesktop.Notifications");
-  const QString dbusPath          = QString::fromUtf8 ("/org/freedesktop/Notifications");
-
-  QDBusMessage m = QDBusMessage::createMethodCall (dbusServiceName, dbusPath, dbusInterfaceName, QString::fromUtf8 ("Notify"));
-  QList<QVariant> args;
-  args.append (QString::fromUtf8 ("Transmission")); // app_name
-  args.append (0U);                                   // replaces_id
-  args.append (QString::fromUtf8 ("transmission")); // icon
-  args.append (title);                                // summary
-  args.append (body);                                 // body
-  args.append (QStringList ());                       // actions - unused for plain passive popups
-  args.append (QVariantMap ());                       // hints - unused atm
-  args.append (static_cast<int32_t> (-1));            // use the default timeout period
-  m.setArguments (args);
-  QDBusMessage replyMsg = bus.call (m);
-  //std::cerr << qPrintable (replyMsg.errorName ()) << std::endl;
-  //std::cerr << qPrintable (replyMsg.errorMessage ()) << std::endl;
-  return (replyMsg.type () == QDBusMessage::ReplyMessage) && !replyMsg.arguments ().isEmpty ();
+  myWindow->trayIcon ().showMessage (title, body);
+  return true;
 }
 
 FaviconCache& Application::faviconCache ()

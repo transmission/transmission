@@ -9,28 +9,27 @@
 
 #include "AddData.h"
 #include "Application.h"
-#include "DBusAdaptor.h"
+#include "InteropObject.h"
 
-DBusAdaptor::DBusAdaptor (Application* app):
-  QDBusAbstractAdaptor (app),
-  myApp (app)
+InteropObject::InteropObject (QObject * parent):
+  QObject (parent)
 {
 }
 
 bool
-DBusAdaptor::PresentWindow ()
+InteropObject::PresentWindow ()
 {
-  myApp->raise ();
+  qApp->raise ();
   return true;
 }
 
 bool
-DBusAdaptor::AddMetainfo (const QString& key)
+InteropObject::AddMetainfo (const QString& metainfo)
 {
-  AddData addme (key);
+  AddData addme (metainfo);
 
   if (addme.type != addme.NONE)
-    myApp->addTorrent (addme);
+    qApp->addTorrent (addme);
 
   return true;
 }
