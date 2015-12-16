@@ -11,8 +11,6 @@ if(USE_QT5)
         qt5_add_translation(${ARGN})
     endmacro()
 else()
-    include(${QT_USE_FILE})
-
     macro(tr_qt_wrap_ui)
         qt4_wrap_ui(${ARGN})
     endmacro()
