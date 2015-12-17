@@ -22,20 +22,6 @@ else()
     endmacro()
 endif()
 
-set(ENABLE_COM_INTEROP OFF)
-if(MSVC AND ((Qt5AxContainer_FOUND AND Qt5AxServer_FOUND) OR (QT_QAXCONTAINER_FOUND AND QT_QAXSERVER_FOUND)))
-    set(ENABLE_COM_INTEROP ON)
-endif()
-
-set(ENABLE_DBUS_INTEROP OFF)
-if(Qt5DBus_FOUND OR QT_QTDBUS_FOUND)
-    set(ENABLE_DBUS_INTEROP ON)
-endif()
-
-if(NOT ENABLE_COM_INTEROP AND NOT ENABLE_DBUS_INTEROP)
-    message(FATAL_ERROR "Neither D-Bus nor COM interop is possible")
-endif()
-
 set(${PROJECT_NAME}_SOURCES
     AboutDialog.cc
     AddData.cc
@@ -85,10 +71,10 @@ set(${PROJECT_NAME}_SOURCES
     WatchDir.cc
 )
 
-if (NOT ENABLE_COM_INTEROP)
+if (NOT ENABLE_QT_COM_INTEROP)
     set_source_files_properties(ComInteropHelper.cc PROPERTIES HEADER_FILE_ONLY ON)
 endif()
-if (NOT ENABLE_DBUS_INTEROP)
+if (NOT ENABLE_QT_DBUS_INTEROP)
     set_source_files_properties(DBusInteropHelper.cc PROPERTIES HEADER_FILE_ONLY ON)
 endif()
 
@@ -213,8 +199,7 @@ tr_win32_app_info(${PROJECT_NAME}_WIN32_RC_FILE
     "transmission-qt.exe"
     "qtr.ico")
 
-if(ENABLE_COM_INTEROP)
-    find_program(MIDL_EXECUTABLE midl)
+if(ENABLE_QT_COM_INTEROP)
     add_custom_command(
         OUTPUT
             ${CMAKE_CURRENT_BINARY_DIR}/transmission-qt.tlb
@@ -248,8 +233,8 @@ target_link_libraries(${TR_NAME}-qt
 target_compile_definitions(${TR_NAME}-qt PRIVATE
     "TRANSLATIONS_DIR=\"${CMAKE_INSTALL_FULL_DATADIR}/${TR_NAME}/translations\""
     QT_NO_CAST_FROM_ASCII
-    $<$<BOOL:${ENABLE_COM_INTEROP}>:ENABLE_COM_INTEROP>
-    $<$<BOOL:${ENABLE_DBUS_INTEROP}>:ENABLE_DBUS_INTEROP>)
+    $<$<BOOL:${ENABLE_QT_COM_INTEROP}>:ENABLE_COM_INTEROP>
+    $<$<BOOL:${ENABLE_QT_DBUS_INTEROP}>:ENABLE_DBUS_INTEROP>)
 
 if(MSVC)
     tr_append_target_property(${TR_NAME}-qt LINK_FLAGS "/ENTRY:mainCRTStartup")
