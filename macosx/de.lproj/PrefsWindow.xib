@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="4514" systemVersion="13C44" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="9531" systemVersion="15B42" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
-        <deployment version="1060" identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="4514"/>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="9531"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="PrefsController">
@@ -53,8 +53,8 @@
             </connections>
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
-        <customObject id="-3" userLabel="Application"/>
-        <window title="Einstellungen" allowsToolTipsWhenApplicationIsInactive="NO" releasedWhenClosed="NO" showsToolbarButton="NO" wantsToBeColor="NO" visibleAtLaunch="NO" animationBehavior="default" id="23" userLabel="Preferences" customClass="PrefsWindow">
+        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
+        <window title="Einstellungen" allowsToolTipsWhenApplicationIsInactive="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" animationBehavior="default" id="23" userLabel="Preferences" customClass="PrefsWindow">
             <windowStyleMask key="styleMask" titled="YES" closable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="108" y="632" width="555" height="107"/>
@@ -305,7 +305,7 @@
                                         <autoresizingMask key="autoresizingMask"/>
                                         <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="57" id="1215">
                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                            <font key="font" metaFont="system"/>
+                                            <font key="font" metaFont="menu"/>
                                             <menu key="menu" title="OtherViews" id="52">
                                                 <items>
                                                     <menuItem state="on" id="57">
@@ -401,7 +401,7 @@
                                         <autoresizingMask key="autoresizingMask"/>
                                         <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="220" id="1220">
                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                            <font key="font" metaFont="system"/>
+                                            <font key="font" metaFont="menu"/>
                                             <menu key="menu" title="OtherViews" id="217">
                                                 <items>
                                                     <menuItem state="on" id="220">
@@ -460,7 +460,7 @@
                                         <autoresizingMask key="autoresizingMask"/>
                                         <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="540" id="1228">
                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                            <font key="font" metaFont="system"/>
+                                            <font key="font" metaFont="menu"/>
                                             <menu key="menu" title="OtherViews" id="539">
                                                 <items>
                                                     <menuItem state="on" id="540">
@@ -525,16 +525,16 @@
                                             <action selector="setAutoStartDownloads:" target="-2" id="1946"/>
                                             <binding destination="365" name="value" keyPath="values.AutoStartDownload" id="1336">
                                                 <dictionary key="options">
-                                                    <integer key="NSMultipleValuesPlaceholder" value="-1"/>
-                                                    <real key="NSConditionallySetsEnabled" value="1"/>
-                                                    <integer key="NSAlwaysPresentsApplicationModalAlerts" value="0"/>
                                                     <integer key="NSAllowsEditingMultipleValuesSelection" value="0"/>
+                                                    <integer key="NSAlwaysPresentsApplicationModalAlerts" value="0"/>
+                                                    <real key="NSConditionallySetsEnabled" value="1"/>
                                                     <integer key="NSConditionallySetsHidden" value="0"/>
-                                                    <integer key="NSNullPlaceholder" value="-1"/>
-                                                    <integer key="NSNotApplicablePlaceholder" value="-1"/>
-                                                    <real key="NSValidatesImmediately" value="1"/>
+                                                    <integer key="NSMultipleValuesPlaceholder" value="-1"/>
                                                     <integer key="NSNoSelectionPlaceholder" value="-1"/>
+                                                    <integer key="NSNotApplicablePlaceholder" value="-1"/>
+                                                    <integer key="NSNullPlaceholder" value="-1"/>
                                                     <real key="NSRaisesForNotApplicableKeys" value="1"/>
+                                                    <real key="NSValidatesImmediately" value="1"/>
                                                 </dictionary>
                                             </binding>
                                         </connections>
@@ -584,16 +584,11 @@
                                         <rect key="frame" x="236" y="171" width="44" height="22"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="1229">
-                                            <numberFormatter key="formatter" formatterBehavior="custom10_4" positiveFormat="#0" negativeFormat="#0" allowsFloats="NO" usesGroupingSeparator="NO" groupingSize="0" minimumIntegerDigits="1" maximumIntegerDigits="42" minimumFractionDigits="0" maximumFractionDigits="0" id="920">
-                                                <real key="roundingIncrement" value="0.0"/>
-                                                <nil key="nilSymbol"/>
+                                            <numberFormatter key="formatter" formatterBehavior="custom10_4" positiveFormat="#0" negativeFormat="#0" allowsFloats="NO" usesGroupingSeparator="NO" paddingCharacter="*" groupingSize="0" minimumIntegerDigits="1" maximumIntegerDigits="42" decimalSeparator="." groupingSeparator="," currencyDecimalSeparator="." plusSign="+" minusSign="-" notANumberSymbol="NaN" perMillSymbol="‰" percentSymbol="%" exponentSymbol="E" positivePrefix="" positiveSuffix="" negativePrefix="-" negativeSuffix="" id="920">
                                                 <nil key="negativeInfinitySymbol"/>
                                                 <nil key="positiveInfinitySymbol"/>
                                                 <real key="minimum" value="1"/>
                                                 <real key="maximum" value="99999"/>
-                                                <metadata>
-                                                    <bool key="localizesFormat" value="YES"/>
-                                                </metadata>
                                             </numberFormatter>
                                             <font key="font" metaFont="system"/>
                                             <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
@@ -643,16 +638,11 @@
                                         <rect key="frame" x="368" y="312" width="44" height="22"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="1233">
-                                            <numberFormatter key="formatter" formatterBehavior="custom10_4" positiveFormat="#0.00" negativeFormat="#0.00" usesGroupingSeparator="NO" groupingSize="0" minimumIntegerDigits="1" maximumIntegerDigits="42" minimumFractionDigits="2" maximumFractionDigits="2" id="840">
-                                                <real key="roundingIncrement" value="0.0"/>
-                                                <nil key="nilSymbol"/>
+                                            <numberFormatter key="formatter" formatterBehavior="custom10_4" positiveFormat="#0.00" negativeFormat="#0.00" usesGroupingSeparator="NO" paddingCharacter="*" groupingSize="0" minimumIntegerDigits="1" maximumIntegerDigits="42" minimumFractionDigits="2" maximumFractionDigits="2" decimalSeparator="." groupingSeparator="," currencyDecimalSeparator="." plusSign="+" minusSign="-" notANumberSymbol="NaN" perMillSymbol="‰" percentSymbol="%" exponentSymbol="E" positivePrefix="" positiveSuffix="" negativePrefix="-" negativeSuffix="" id="840">
                                                 <nil key="negativeInfinitySymbol"/>
                                                 <nil key="positiveInfinitySymbol"/>
                                                 <integer key="minimum" value="0"/>
                                                 <real key="maximum" value="99999"/>
-                                                <metadata>
-                                                    <bool key="localizesFormat" value="YES"/>
-                                                </metadata>
                                             </numberFormatter>
                                             <font key="font" metaFont="system"/>
                                             <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
@@ -681,14 +671,9 @@
                                         <rect key="frame" x="201" y="254" width="41" height="22"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="1960">
-                                            <numberFormatter key="formatter" formatterBehavior="default10_4" positiveFormat="#" negativeFormat="#" usesGroupingSeparator="NO" lenient="YES" groupingSize="0" minimumIntegerDigits="0" maximumIntegerDigits="42" minimumFractionDigits="0" maximumFractionDigits="0" id="1961">
-                                                <real key="roundingIncrement" value="0.0"/>
+                                            <numberFormatter key="formatter" formatterBehavior="default10_4" positiveFormat="#" negativeFormat="#" usesGroupingSeparator="NO" lenient="YES" paddingCharacter="*" groupingSize="0" minimumIntegerDigits="0" maximumIntegerDigits="42" decimalSeparator="." groupingSeparator="," currencyDecimalSeparator="." plusSign="+" minusSign="-" notANumberSymbol="NaN" perMillSymbol="‰" percentSymbol="%" exponentSymbol="E" positivePrefix="" positiveSuffix="" negativePrefix="-" negativeSuffix="" id="1961">
                                                 <real key="minimum" value="1"/>
                                                 <real key="maximum" value="99999"/>
-                                                <metadata>
-                                                    <bool key="localizesFormat" value="YES"/>
-                                                    <real key="inspectorSampleValue" value="5"/>
-                                                </metadata>
                                             </numberFormatter>
                                             <font key="font" metaFont="system"/>
                                             <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
@@ -735,16 +720,11 @@
                                         <rect key="frame" x="236" y="146" width="44" height="22"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="1238">
-                                            <numberFormatter key="formatter" formatterBehavior="custom10_4" positiveFormat="#0" negativeFormat="#0" allowsFloats="NO" usesGroupingSeparator="NO" groupingSize="0" minimumIntegerDigits="1" maximumIntegerDigits="42" minimumFractionDigits="0" maximumFractionDigits="0" id="921">
-                                                <real key="roundingIncrement" value="0.0"/>
-                                                <nil key="nilSymbol"/>
+                                            <numberFormatter key="formatter" formatterBehavior="custom10_4" positiveFormat="#0" negativeFormat="#0" allowsFloats="NO" usesGroupingSeparator="NO" paddingCharacter="*" groupingSize="0" minimumIntegerDigits="1" maximumIntegerDigits="42" decimalSeparator="." groupingSeparator="," currencyDecimalSeparator="." plusSign="+" minusSign="-" notANumberSymbol="NaN" perMillSymbol="‰" percentSymbol="%" exponentSymbol="E" positivePrefix="" positiveSuffix="" negativePrefix="-" negativeSuffix="" id="921">
                                                 <nil key="negativeInfinitySymbol"/>
                                                 <nil key="positiveInfinitySymbol"/>
                                                 <real key="minimum" value="1"/>
                                                 <real key="maximum" value="99999"/>
-                                                <metadata>
-                                                    <bool key="localizesFormat" value="YES"/>
-                                                </metadata>
                                             </numberFormatter>
                                             <font key="font" metaFont="system"/>
                                             <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
@@ -785,16 +765,11 @@
                                         <rect key="frame" x="316" y="121" width="44" height="22"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="1241">
-                                            <numberFormatter key="formatter" formatterBehavior="custom10_4" positiveFormat="#0" negativeFormat="#0" allowsFloats="NO" usesGroupingSeparator="NO" groupingSize="0" minimumIntegerDigits="1" maximumIntegerDigits="309" minimumFractionDigits="0" maximumFractionDigits="0" decimalSeparator="," groupingSeparator="." currencySymbol="¤" internationalCurrencySymbol="¤¤" currencyDecimalSeparator="," id="922">
-                                                <real key="roundingIncrement" value="0.0"/>
-                                                <nil key="nilSymbol"/>
+                                            <numberFormatter key="formatter" formatterBehavior="custom10_4" positiveFormat="#0" negativeFormat="#0" allowsFloats="NO" usesGroupingSeparator="NO" paddingCharacter="*" groupingSize="0" minimumIntegerDigits="1" maximumIntegerDigits="309" decimalSeparator="," groupingSeparator="." currencySymbol="¤" internationalCurrencySymbol="¤¤" currencyDecimalSeparator="," plusSign="+" minusSign="-" notANumberSymbol="NaN" perMillSymbol="‰" percentSymbol="%" exponentSymbol="E" positivePrefix="" positiveSuffix="" negativePrefix="-" negativeSuffix="" id="922">
                                                 <nil key="negativeInfinitySymbol"/>
                                                 <nil key="positiveInfinitySymbol"/>
                                                 <real key="minimum" value="1"/>
                                                 <real key="maximum" value="99999"/>
-                                                <metadata>
-                                                    <bool key="localizesFormat" value="YES"/>
-                                                </metadata>
                                             </numberFormatter>
                                             <font key="font" metaFont="system"/>
                                             <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
@@ -845,7 +820,7 @@
                                         <autoresizingMask key="autoresizingMask"/>
                                         <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="1309" id="1307">
                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                            <font key="font" metaFont="system"/>
+                                            <font key="font" metaFont="menu"/>
                                             <menu key="menu" title="OtherViews" id="1308">
                                                 <items>
                                                     <menuItem state="on" id="1309"/>
@@ -855,8 +830,8 @@
                                         <connections>
                                             <action selector="setSound:" target="-2" id="1320"/>
                                             <binding destination="-2" name="contentValues" keyPath="sounds" id="1330"/>
-                                            <binding destination="365" name="enabled" keyPath="values.PlayDownloadSound" id="1316"/>
                                             <binding destination="365" name="selectedValue" keyPath="values.DownloadSound" previousBinding="1330" id="1331"/>
+                                            <binding destination="365" name="enabled" keyPath="values.PlayDownloadSound" id="1316"/>
                                             <outlet property="nextKeyView" destination="1300" id="1641"/>
                                         </connections>
                                     </popUpButton>
@@ -876,7 +851,7 @@
                                         <autoresizingMask key="autoresizingMask"/>
                                         <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="1305" id="1303">
                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                            <font key="font" metaFont="system"/>
+                                            <font key="font" metaFont="menu"/>
                                             <menu key="menu" title="OtherViews" id="1304">
                                                 <items>
                                                     <menuItem state="on" id="1305"/>
@@ -939,7 +914,7 @@
                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                         <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="2051" id="2049">
                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                            <font key="font" metaFont="system"/>
+                                            <font key="font" metaFont="menu"/>
                                             <menu key="menu" title="OtherViews" id="2050">
                                                 <items>
                                                     <menuItem state="on" id="2051">
@@ -1073,7 +1048,7 @@
                     <autoresizingMask key="autoresizingMask"/>
                     <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="1811" id="1809">
                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                        <font key="font" metaFont="system"/>
+                        <font key="font" metaFont="menu"/>
                         <menu key="menu" title="OtherViews" id="1810">
                             <items>
                                 <menuItem state="on" id="1811"/>
@@ -1119,7 +1094,7 @@
                 <segmentedControl verticalHuggingPriority="750" id="1772">
                     <rect key="frame" x="20" y="19" width="67" height="23"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                    <segmentedCell key="cell" alignment="left" style="smallSquare" trackingMode="momentary" id="1773">
+                    <segmentedCell key="cell" borderStyle="border" alignment="left" style="smallSquare" trackingMode="momentary" id="1773">
                         <font key="font" metaFont="system"/>
                         <segments>
                             <segment image="NSAddTemplate" width="32">
@@ -1142,10 +1117,10 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" columnResizing="NO" multipleSelection="NO" emptySelection="NO" autosaveColumns="NO" rowHeight="18" id="1774">
-                                <rect key="frame" x="0.0" y="0.0" width="158" height="197"/>
+                                <rect key="frame" x="0.0" y="0.0" width="158" height="20"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <size key="intercellSpacing" width="3" height="2"/>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                 <tableColumns>
                                     <tableColumn identifier="Color" editable="NO" width="20" minWidth="20" maxWidth="20" id="1777">
@@ -1154,7 +1129,7 @@
                                             <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                         </tableHeaderCell>
-                                        <imageCell key="dataCell" controlSize="small" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="B6BE934A-29A0-4853-A3CE-84725C32DDDD" id="1782"/>
+                                        <imageCell key="dataCell" controlSize="small" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="2E136052-B864-4307-A633-4F456C27164B" id="1782"/>
                                     </tableColumn>
                                     <tableColumn identifier="Name" editable="NO" width="132" minWidth="40" maxWidth="1000" id="1779">
                                         <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Name">
@@ -1201,7 +1176,7 @@
                     <autoresizingMask key="autoresizingMask"/>
                     <popUpButtonCell key="cell" type="push" title="Täglich" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" tag="127" imageScaling="proportionallyDown" inset="2" selectedItem="1910" id="1908">
                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                        <font key="font" metaFont="system"/>
+                        <font key="font" metaFont="menu"/>
                         <menu key="menu" title="OtherViews" id="1909">
                             <items>
                                 <menuItem title="Täglich" state="on" tag="127" id="1910"/>
@@ -1231,32 +1206,7 @@
                         <font key="font" metaFont="system"/>
                         <calendarDate key="date" timeIntervalSinceReferenceDate="-31575600" calendarFormat="%Y-%m-%d %H:%M:%S %z">
                             <!--2000-01-01 08:00:00 -0500-->
-                            <timeZone key="timeZone" name="America/New_York">
-                                <mutableData key="data">
-VFppZgAAAAAAAAAAAAAAAAAAAAAAAAAEAAAABAAAAAAAAADrAAAABAAAABCeph5wn7rrYKCGAHChms1g
-omXicKOD6eCkaq5wpTWnYKZTyvCnFYlgqDOs8Kj+peCqE47wqt6H4KvzcPCsvmngrdNS8K6eS+CvszTw
-sH4t4LGcUXCyZ0pgs3wzcLRHLGC1XBVwticOYLc793C4BvBguRvZcLnm0mC7BPXwu8a0YLzk1/C9r9Dg
-vsS58L+PsuDApJvwwW+U4MKEffDDT3bgxGRf8MUvWODGTXxwxw864MgtXnDI+Fdgyg1AcMrYOWDLiPBw
-0iP0cNJg++DTdeTw1EDd4NVVxvDWIL/g1zWo8NgAoeDZFYrw2eCD4Nr+p3DbwGXg3N6JcN2pgmDevmtw
-34lkYOCeTXDhaUZg4n4vcONJKGDkXhFw5Vcu4OZHLfDnNxDg6CcP8OkW8uDqBvHw6vbU4Ovm0/Ds1rbg
-7ca18O6/02Dvr9Jw8J+1YPGPtHDyf5dg82+WcPRfeWD1T3hw9j9bYPcvWnD4KHfg+Q88cPoIWeD6+Fjw
-++g74PzYOvD9yB3g/rgc8P+n/+AAl/7wAYfh4AJ34PADcP5gBGD9cAVQ4GAGQN9wBzDCYAeNGXAJEKRg
-Ca2U8ArwhmAL4IVwDNmi4A3AZ3AOuYTgD6mD8BCZZuARiWXwEnlI4BNpR/AUWSrgFUkp8BY5DOAXKQvw
-GCIpYBkI7fAaAgtgGvIKcBvh7WAc0exwHcHPYB6xznAfobFgIHYA8CGBk2AiVeLwI2qv4CQ1xPAlSpHg
-JhWm8Ccqc+An/sNwKQpV4CnepXAq6jfgK76HcCzTVGAtnmlwLrM2YC9+S3AwkxhgMWdn8DJy+mAzR0nw
-NFLcYDUnK/A2Mr5gNwcN8Dgb2uA45u/wOfu84DrG0fA7257gPK/ucD27gOA+j9BwP5ti4EBvsnBBhH9g
-Qk+UcENkYWBEL3ZwRURDYEXzqPBHLV/gR9OK8EkNQeBJs2zwSu0j4EuciXBM1kBgTXxrcE62ImBPXE1w
-UJYEYFE8L3BSdeZgUxwRcFRVyGBU+/NwVjWqYFblD/BYHsbgWMTx8Fn+qOBapNPwW96K4FyEtfBdvmzg
-XmSX8F+eTuBgTbRwYYdrYGItlnBjZ01gZA14cGVHL2Bl7VpwZycRYGfNPHBpBvNgaa0ecGrm1WBrljrw
-bM/x4G12HPBur9Pgb1X+8HCPteBxNeDwcm+X4HMVwvB0T3ngdP7fcHY4lmB23sFweBh4YHi+o3B5+Fpg
-ep6FcHvYPGB8fmdwfbgeYH5eSXB/mABgAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQAB
-AAEAAQABAAEAAQABAgMBAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEA
-AQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEA
-AQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEA
-AQABAAEAAQABAAEAAQABAAEAAf//x8ABAP//ubAABP//x8ABCP//x8ABDEVEVABFU1QARVdUAEVQVAAA
-AAABAAAAAQ
-</mutableData>
-                            </timeZone>
+                            <timeZone key="timeZone" name="America/New_York"/>
                         </calendarDate>
                         <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -1276,32 +1226,7 @@ AAABAAAAAQ
                         <font key="font" metaFont="system"/>
                         <calendarDate key="date" timeIntervalSinceReferenceDate="-31525200" calendarFormat="%Y-%m-%d %H:%M:%S %z">
                             <!--2000-01-01 22:00:00 -0500-->
-                            <timeZone key="timeZone" name="America/New_York">
-                                <mutableData key="data">
-VFppZgAAAAAAAAAAAAAAAAAAAAAAAAAEAAAABAAAAAAAAADrAAAABAAAABCeph5wn7rrYKCGAHChms1g
-omXicKOD6eCkaq5wpTWnYKZTyvCnFYlgqDOs8Kj+peCqE47wqt6H4KvzcPCsvmngrdNS8K6eS+CvszTw
-sH4t4LGcUXCyZ0pgs3wzcLRHLGC1XBVwticOYLc793C4BvBguRvZcLnm0mC7BPXwu8a0YLzk1/C9r9Dg
-vsS58L+PsuDApJvwwW+U4MKEffDDT3bgxGRf8MUvWODGTXxwxw864MgtXnDI+Fdgyg1AcMrYOWDLiPBw
-0iP0cNJg++DTdeTw1EDd4NVVxvDWIL/g1zWo8NgAoeDZFYrw2eCD4Nr+p3DbwGXg3N6JcN2pgmDevmtw
-34lkYOCeTXDhaUZg4n4vcONJKGDkXhFw5Vcu4OZHLfDnNxDg6CcP8OkW8uDqBvHw6vbU4Ovm0/Ds1rbg
-7ca18O6/02Dvr9Jw8J+1YPGPtHDyf5dg82+WcPRfeWD1T3hw9j9bYPcvWnD4KHfg+Q88cPoIWeD6+Fjw
-++g74PzYOvD9yB3g/rgc8P+n/+AAl/7wAYfh4AJ34PADcP5gBGD9cAVQ4GAGQN9wBzDCYAeNGXAJEKRg
-Ca2U8ArwhmAL4IVwDNmi4A3AZ3AOuYTgD6mD8BCZZuARiWXwEnlI4BNpR/AUWSrgFUkp8BY5DOAXKQvw
-GCIpYBkI7fAaAgtgGvIKcBvh7WAc0exwHcHPYB6xznAfobFgIHYA8CGBk2AiVeLwI2qv4CQ1xPAlSpHg
-JhWm8Ccqc+An/sNwKQpV4CnepXAq6jfgK76HcCzTVGAtnmlwLrM2YC9+S3AwkxhgMWdn8DJy+mAzR0nw
-NFLcYDUnK/A2Mr5gNwcN8Dgb2uA45u/wOfu84DrG0fA7257gPK/ucD27gOA+j9BwP5ti4EBvsnBBhH9g
-Qk+UcENkYWBEL3ZwRURDYEXzqPBHLV/gR9OK8EkNQeBJs2zwSu0j4EuciXBM1kBgTXxrcE62ImBPXE1w
-UJYEYFE8L3BSdeZgUxwRcFRVyGBU+/NwVjWqYFblD/BYHsbgWMTx8Fn+qOBapNPwW96K4FyEtfBdvmzg
-XmSX8F+eTuBgTbRwYYdrYGItlnBjZ01gZA14cGVHL2Bl7VpwZycRYGfNPHBpBvNgaa0ecGrm1WBrljrw
-bM/x4G12HPBur9Pgb1X+8HCPteBxNeDwcm+X4HMVwvB0T3ngdP7fcHY4lmB23sFweBh4YHi+o3B5+Fpg
-ep6FcHvYPGB8fmdwfbgeYH5eSXB/mABgAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQAB
-AAEAAQABAAEAAQABAgMBAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEA
-AQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEA
-AQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEA
-AQABAAEAAQABAAEAAQABAAEAAf//x8ABAP//ubAABP//x8ABCP//x8ABDEVEVABFU1QARVdUAEVQVAAA
-AAABAAAAAQ
-</mutableData>
-                            </timeZone>
+                            <timeZone key="timeZone" name="America/New_York"/>
                         </calendarDate>
                         <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -1402,16 +1327,11 @@ AAABAAAAAQ
                     <rect key="frame" x="355" y="121" width="50" height="22"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="1272">
-                        <numberFormatter key="formatter" formatterBehavior="custom10_4" positiveFormat="#0" negativeFormat="#0" allowsFloats="NO" usesGroupingSeparator="NO" groupingSize="0" minimumIntegerDigits="1" maximumIntegerDigits="42" minimumFractionDigits="0" maximumFractionDigits="0" id="929">
-                            <real key="roundingIncrement" value="0.0"/>
-                            <nil key="nilSymbol"/>
+                        <numberFormatter key="formatter" formatterBehavior="custom10_4" positiveFormat="#0" negativeFormat="#0" allowsFloats="NO" usesGroupingSeparator="NO" paddingCharacter="*" groupingSize="0" minimumIntegerDigits="1" maximumIntegerDigits="42" decimalSeparator="." groupingSeparator="," currencyDecimalSeparator="." plusSign="+" minusSign="-" notANumberSymbol="NaN" perMillSymbol="‰" percentSymbol="%" exponentSymbol="E" positivePrefix="" positiveSuffix="" negativePrefix="-" negativeSuffix="" id="929">
                             <nil key="negativeInfinitySymbol"/>
                             <nil key="positiveInfinitySymbol"/>
                             <integer key="minimum" value="0"/>
                             <real key="maximum" value="99999"/>
-                            <metadata>
-                                <bool key="localizesFormat" value="YES"/>
-                            </metadata>
                         </numberFormatter>
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
@@ -1427,16 +1347,11 @@ AAABAAAAAQ
                     <rect key="frame" x="355" y="149" width="50" height="22"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="1271">
-                        <numberFormatter key="formatter" formatterBehavior="custom10_4" positiveFormat="#0" negativeFormat="#0" allowsFloats="NO" usesGroupingSeparator="NO" groupingSize="0" minimumIntegerDigits="1" maximumIntegerDigits="42" minimumFractionDigits="0" maximumFractionDigits="0" id="928">
-                            <real key="roundingIncrement" value="0.0"/>
-                            <nil key="nilSymbol"/>
+                        <numberFormatter key="formatter" formatterBehavior="custom10_4" positiveFormat="#0" negativeFormat="#0" allowsFloats="NO" usesGroupingSeparator="NO" paddingCharacter="*" groupingSize="0" minimumIntegerDigits="1" maximumIntegerDigits="42" decimalSeparator="." groupingSeparator="," currencyDecimalSeparator="." plusSign="+" minusSign="-" notANumberSymbol="NaN" perMillSymbol="‰" percentSymbol="%" exponentSymbol="E" positivePrefix="" positiveSuffix="" negativePrefix="-" negativeSuffix="" id="928">
                             <nil key="negativeInfinitySymbol"/>
                             <nil key="positiveInfinitySymbol"/>
                             <integer key="minimum" value="0"/>
                             <real key="maximum" value="99999"/>
-                            <metadata>
-                                <bool key="localizesFormat" value="YES"/>
-                            </metadata>
                         </numberFormatter>
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
@@ -1497,16 +1412,11 @@ AAABAAAAAQ
                     <rect key="frame" x="375" y="198" width="50" height="22"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="1266">
-                        <numberFormatter key="formatter" formatterBehavior="custom10_4" positiveFormat="#0" negativeFormat="#0" allowsFloats="NO" usesGroupingSeparator="NO" groupingSize="0" minimumIntegerDigits="1" maximumIntegerDigits="42" minimumFractionDigits="0" maximumFractionDigits="0" id="927">
-                            <real key="roundingIncrement" value="0.0"/>
-                            <nil key="nilSymbol"/>
+                        <numberFormatter key="formatter" formatterBehavior="custom10_4" positiveFormat="#0" negativeFormat="#0" allowsFloats="NO" usesGroupingSeparator="NO" paddingCharacter="*" groupingSize="0" minimumIntegerDigits="1" maximumIntegerDigits="42" decimalSeparator="." groupingSeparator="," currencyDecimalSeparator="." plusSign="+" minusSign="-" notANumberSymbol="NaN" perMillSymbol="‰" percentSymbol="%" exponentSymbol="E" positivePrefix="" positiveSuffix="" negativePrefix="-" negativeSuffix="" id="927">
                             <nil key="negativeInfinitySymbol"/>
                             <nil key="positiveInfinitySymbol"/>
                             <integer key="minimum" value="0"/>
                             <real key="maximum" value="99999"/>
-                            <metadata>
-                                <bool key="localizesFormat" value="YES"/>
-                            </metadata>
                         </numberFormatter>
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
@@ -1535,16 +1445,11 @@ AAABAAAAAQ
                     <rect key="frame" x="375" y="224" width="50" height="22"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="1264">
-                        <numberFormatter key="formatter" formatterBehavior="custom10_4" positiveFormat="#0" negativeFormat="#0" allowsFloats="NO" usesGroupingSeparator="NO" groupingSize="0" minimumIntegerDigits="1" maximumIntegerDigits="42" minimumFractionDigits="0" maximumFractionDigits="0" id="926">
-                            <real key="roundingIncrement" value="0.0"/>
-                            <nil key="nilSymbol"/>
+                        <numberFormatter key="formatter" formatterBehavior="custom10_4" positiveFormat="#0" negativeFormat="#0" allowsFloats="NO" usesGroupingSeparator="NO" paddingCharacter="*" groupingSize="0" minimumIntegerDigits="1" maximumIntegerDigits="42" decimalSeparator="." groupingSeparator="," currencyDecimalSeparator="." plusSign="+" minusSign="-" notANumberSymbol="NaN" perMillSymbol="‰" percentSymbol="%" exponentSymbol="E" positivePrefix="" positiveSuffix="" negativePrefix="-" negativeSuffix="" id="926">
                             <nil key="negativeInfinitySymbol"/>
                             <nil key="positiveInfinitySymbol"/>
                             <integer key="minimum" value="0"/>
                             <real key="maximum" value="99999"/>
-                            <metadata>
-                                <bool key="localizesFormat" value="YES"/>
-                            </metadata>
                         </numberFormatter>
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
@@ -1572,8 +1477,8 @@ AAABAAAAAQ
                     </buttonCell>
                     <connections>
                         <action selector="setBlocklistAutoUpdate:" target="-2" id="1745"/>
-                        <binding destination="365" name="enabled" keyPath="values.BlocklistNew" id="1989"/>
                         <binding destination="365" name="value" keyPath="values.BlocklistAutoUpdate" id="1744"/>
+                        <binding destination="365" name="enabled" keyPath="values.BlocklistNew" id="1989"/>
                     </connections>
                 </button>
                 <button horizontalHuggingPriority="750" verticalHuggingPriority="750" id="1473">
@@ -1707,16 +1612,11 @@ AAABAAAAAQ
                     <rect key="frame" x="364" y="347" width="50" height="22"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="1444">
-                        <numberFormatter key="formatter" formatterBehavior="custom10_4" positiveFormat="#0" negativeFormat="#0" allowsFloats="NO" usesGroupingSeparator="NO" groupingSize="0" minimumIntegerDigits="1" maximumIntegerDigits="42" minimumFractionDigits="0" maximumFractionDigits="0" id="1445">
-                            <real key="roundingIncrement" value="0.0"/>
-                            <nil key="nilSymbol"/>
+                        <numberFormatter key="formatter" formatterBehavior="custom10_4" positiveFormat="#0" negativeFormat="#0" allowsFloats="NO" usesGroupingSeparator="NO" paddingCharacter="*" groupingSize="0" minimumIntegerDigits="1" maximumIntegerDigits="42" decimalSeparator="." groupingSeparator="," currencyDecimalSeparator="." plusSign="+" minusSign="-" notANumberSymbol="NaN" perMillSymbol="‰" percentSymbol="%" exponentSymbol="E" positivePrefix="" positiveSuffix="" negativePrefix="-" negativeSuffix="" id="1445">
                             <nil key="negativeInfinitySymbol"/>
                             <nil key="positiveInfinitySymbol"/>
                             <real key="minimum" value="1"/>
                             <real key="maximum" value="3000"/>
-                            <metadata>
-                                <bool key="localizesFormat" value="YES"/>
-                            </metadata>
                         </numberFormatter>
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
@@ -1748,16 +1648,11 @@ AAABAAAAAQ
                     <rect key="frame" x="298" y="374" width="50" height="22"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="1448">
-                        <numberFormatter key="formatter" formatterBehavior="custom10_4" positiveFormat="#0" negativeFormat="#0" allowsFloats="NO" usesGroupingSeparator="NO" groupingSize="0" minimumIntegerDigits="1" maximumIntegerDigits="42" minimumFractionDigits="0" maximumFractionDigits="0" id="1449">
-                            <real key="roundingIncrement" value="0.0"/>
-                            <nil key="nilSymbol"/>
+                        <numberFormatter key="formatter" formatterBehavior="custom10_4" positiveFormat="#0" negativeFormat="#0" allowsFloats="NO" usesGroupingSeparator="NO" paddingCharacter="*" groupingSize="0" minimumIntegerDigits="1" maximumIntegerDigits="42" decimalSeparator="." groupingSeparator="," currencyDecimalSeparator="." plusSign="+" minusSign="-" notANumberSymbol="NaN" perMillSymbol="‰" percentSymbol="%" exponentSymbol="E" positivePrefix="" positiveSuffix="" negativePrefix="-" negativeSuffix="" id="1449">
                             <nil key="negativeInfinitySymbol"/>
                             <nil key="positiveInfinitySymbol"/>
                             <real key="minimum" value="1"/>
                             <real key="maximum" value="3000"/>
-                            <metadata>
-                                <bool key="localizesFormat" value="YES"/>
-                            </metadata>
                         </numberFormatter>
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
@@ -1895,16 +1790,11 @@ AAABAAAAAQ
                     <rect key="frame" x="155" y="150" width="50" height="22"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="1245">
-                        <numberFormatter key="formatter" formatterBehavior="custom10_4" positiveFormat="#0" negativeFormat="#0" allowsFloats="NO" usesGroupingSeparator="NO" groupingSize="0" minimumIntegerDigits="1" maximumIntegerDigits="42" minimumFractionDigits="0" maximumFractionDigits="0" id="935">
-                            <real key="roundingIncrement" value="0.0"/>
-                            <nil key="nilSymbol"/>
+                        <numberFormatter key="formatter" formatterBehavior="custom10_4" positiveFormat="#0" negativeFormat="#0" allowsFloats="NO" usesGroupingSeparator="NO" paddingCharacter="*" groupingSize="0" minimumIntegerDigits="1" maximumIntegerDigits="42" decimalSeparator="." groupingSeparator="," currencyDecimalSeparator="." plusSign="+" minusSign="-" notANumberSymbol="NaN" perMillSymbol="‰" percentSymbol="%" exponentSymbol="E" positivePrefix="" positiveSuffix="" negativePrefix="-" negativeSuffix="" id="935">
                             <nil key="negativeInfinitySymbol"/>
                             <nil key="positiveInfinitySymbol"/>
                             <real key="minimum" value="1"/>
                             <real key="maximum" value="65535"/>
-                            <metadata>
-                                <bool key="localizesFormat" value="YES"/>
-                            </metadata>
                         </numberFormatter>
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
@@ -2030,15 +1920,15 @@ AAABAAAAAQ
                     </textFieldCell>
                     <connections>
                         <action selector="setRPCUsername:" target="-2" id="1571"/>
+                        <binding destination="365" name="enabled" keyPath="values.RPC" id="1558"/>
                         <binding destination="365" name="enabled2" keyPath="values.RPCAuthorize" previousBinding="1558" id="1575">
                             <dictionary key="options">
-                                <integer key="NSNotApplicablePlaceholder" value="-1"/>
-                                <integer key="NSNoSelectionPlaceholder" value="-1"/>
                                 <integer key="NSMultipleValuesPlaceholder" value="-1"/>
+                                <integer key="NSNoSelectionPlaceholder" value="-1"/>
+                                <integer key="NSNotApplicablePlaceholder" value="-1"/>
                                 <integer key="NSNullPlaceholder" value="-1"/>
                             </dictionary>
                         </binding>
-                        <binding destination="365" name="enabled" keyPath="values.RPC" id="1558"/>
                         <binding destination="365" name="value" keyPath="values.RPCUsername" id="1565"/>
                         <outlet property="nextKeyView" destination="1509" id="1625"/>
                     </connections>
@@ -2055,7 +1945,7 @@ AAABAAAAAQ
                 <segmentedControl verticalHuggingPriority="750" id="1534">
                     <rect key="frame" x="115" y="81" width="67" height="23"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                    <segmentedCell key="cell" state="on" alignment="left" style="smallSquare" trackingMode="momentary" id="1535">
+                    <segmentedCell key="cell" state="on" borderStyle="border" alignment="left" style="smallSquare" trackingMode="momentary" id="1535">
                         <font key="font" metaFont="system"/>
                         <segments>
                             <segment image="NSAddTemplate" width="32">
@@ -2068,15 +1958,15 @@ AAABAAAAAQ
                     </segmentedCell>
                     <connections>
                         <action selector="addRemoveRPCIP:" target="-2" id="1539"/>
+                        <binding destination="365" name="enabled" keyPath="values.RPC" id="1547"/>
                         <binding destination="365" name="enabled2" keyPath="values.RPCUseWhitelist" previousBinding="1547" id="1755">
                             <dictionary key="options">
-                                <integer key="NSNotApplicablePlaceholder" value="-1"/>
-                                <integer key="NSNoSelectionPlaceholder" value="-1"/>
                                 <integer key="NSMultipleValuesPlaceholder" value="-1"/>
+                                <integer key="NSNoSelectionPlaceholder" value="-1"/>
+                                <integer key="NSNotApplicablePlaceholder" value="-1"/>
                                 <integer key="NSNullPlaceholder" value="-1"/>
                             </dictionary>
                         </binding>
-                        <binding destination="365" name="enabled" keyPath="values.RPC" id="1547"/>
                     </connections>
                 </segmentedControl>
                 <scrollView horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" id="1518">
@@ -2087,10 +1977,10 @@ AAABAAAAAQ
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" columnResizing="NO" autosaveColumns="NO" typeSelect="NO" id="1521">
-                                <rect key="frame" x="0.0" y="0.0" width="318" height="76"/>
+                                <rect key="frame" x="0.0" y="0.0" width="318" height="19"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <size key="intercellSpacing" width="3" height="2"/>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                 <tableColumns>
                                     <tableColumn identifier="IP" width="315" minWidth="40" maxWidth="1000" id="1523">
@@ -2108,15 +1998,15 @@ AAABAAAAAQ
                                     </tableColumn>
                                 </tableColumns>
                                 <connections>
+                                    <binding destination="365" name="enabled" keyPath="values.RPC" id="1546"/>
                                     <binding destination="365" name="enabled2" keyPath="values.RPCUseWhitelist" previousBinding="1546" id="1754">
                                         <dictionary key="options">
-                                            <integer key="NSNotApplicablePlaceholder" value="-1"/>
-                                            <integer key="NSNoSelectionPlaceholder" value="-1"/>
                                             <integer key="NSMultipleValuesPlaceholder" value="-1"/>
+                                            <integer key="NSNoSelectionPlaceholder" value="-1"/>
+                                            <integer key="NSNotApplicablePlaceholder" value="-1"/>
                                             <integer key="NSNullPlaceholder" value="-1"/>
                                         </dictionary>
                                     </binding>
-                                    <binding destination="365" name="enabled" keyPath="values.RPC" id="1546"/>
                                     <outlet property="dataSource" destination="-2" id="1532"/>
                                     <outlet property="delegate" destination="-2" id="1537"/>
                                 </connections>
@@ -2146,15 +2036,15 @@ AAABAAAAAQ
                     </secureTextFieldCell>
                     <connections>
                         <action selector="setRPCPassword:" target="-2" id="1572"/>
+                        <binding destination="365" name="enabled" keyPath="values.RPC" id="1559"/>
                         <binding destination="365" name="enabled2" keyPath="values.RPCAuthorize" previousBinding="1559" id="1576">
                             <dictionary key="options">
-                                <integer key="NSNotApplicablePlaceholder" value="-1"/>
-                                <integer key="NSNoSelectionPlaceholder" value="-1"/>
                                 <integer key="NSMultipleValuesPlaceholder" value="-1"/>
+                                <integer key="NSNoSelectionPlaceholder" value="-1"/>
+                                <integer key="NSNotApplicablePlaceholder" value="-1"/>
                                 <integer key="NSNullPlaceholder" value="-1"/>
                             </dictionary>
                         </binding>
-                        <binding destination="365" name="enabled" keyPath="values.RPC" id="1559"/>
                         <outlet property="nextKeyView" destination="1491" id="1626"/>
                     </connections>
                 </secureTextField>
@@ -2222,16 +2112,11 @@ AAABAAAAAQ
                     <rect key="frame" x="211" y="228" width="50" height="22"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="1494">
-                        <numberFormatter key="formatter" formatterBehavior="custom10_4" positiveFormat="#0" negativeFormat="#0" allowsFloats="NO" usesGroupingSeparator="NO" groupingSize="0" minimumIntegerDigits="1" maximumIntegerDigits="42" minimumFractionDigits="0" maximumFractionDigits="0" id="1495">
-                            <real key="roundingIncrement" value="0.0"/>
-                            <nil key="nilSymbol"/>
+                        <numberFormatter key="formatter" formatterBehavior="custom10_4" positiveFormat="#0" negativeFormat="#0" allowsFloats="NO" usesGroupingSeparator="NO" paddingCharacter="*" groupingSize="0" minimumIntegerDigits="1" maximumIntegerDigits="42" decimalSeparator="." groupingSeparator="," currencyDecimalSeparator="." plusSign="+" minusSign="-" notANumberSymbol="NaN" perMillSymbol="‰" percentSymbol="%" exponentSymbol="E" positivePrefix="" positiveSuffix="" negativePrefix="-" negativeSuffix="" id="1495">
                             <nil key="negativeInfinitySymbol"/>
                             <nil key="positiveInfinitySymbol"/>
                             <real key="minimum" value="1"/>
                             <real key="maximum" value="65535"/>
-                            <metadata>
-                                <bool key="localizesFormat" value="YES"/>
-                            </metadata>
                         </numberFormatter>
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
@@ -2253,15 +2138,15 @@ AAABAAAAAQ
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                     <connections>
+                        <binding destination="365" name="enabled" keyPath="values.RPC" id="1691"/>
                         <binding destination="365" name="enabled2" keyPath="values.RPCAuthorize" previousBinding="1691" id="1693">
                             <dictionary key="options">
-                                <integer key="NSNotApplicablePlaceholder" value="-1"/>
-                                <integer key="NSNoSelectionPlaceholder" value="-1"/>
                                 <integer key="NSMultipleValuesPlaceholder" value="-1"/>
+                                <integer key="NSNoSelectionPlaceholder" value="-1"/>
+                                <integer key="NSNotApplicablePlaceholder" value="-1"/>
                                 <integer key="NSNullPlaceholder" value="-1"/>
                             </dictionary>
                         </binding>
-                        <binding destination="365" name="enabled" keyPath="values.RPC" id="1691"/>
                     </connections>
                 </textField>
                 <textField verticalHuggingPriority="750" id="1554" customClass="ColorTextField">
@@ -2273,15 +2158,15 @@ AAABAAAAAQ
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                     <connections>
+                        <binding destination="365" name="enabled" keyPath="values.RPC" id="1692"/>
                         <binding destination="365" name="enabled2" keyPath="values.RPCAuthorize" previousBinding="1692" id="1694">
                             <dictionary key="options">
-                                <integer key="NSNotApplicablePlaceholder" value="-1"/>
-                                <integer key="NSNoSelectionPlaceholder" value="-1"/>
                                 <integer key="NSMultipleValuesPlaceholder" value="-1"/>
+                                <integer key="NSNoSelectionPlaceholder" value="-1"/>
+                                <integer key="NSNotApplicablePlaceholder" value="-1"/>
                                 <integer key="NSNullPlaceholder" value="-1"/>
                             </dictionary>
                         </binding>
-                        <binding destination="365" name="enabled" keyPath="values.RPC" id="1692"/>
                     </connections>
                 </textField>
                 <textField verticalHuggingPriority="750" id="1492" customClass="ColorTextField">
@@ -2313,10 +2198,10 @@ AAABAAAAAQ
         </customObject>
     </objects>
     <resources>
-        <image name="B6BE934A-29A0-4853-A3CE-84725C32DDDD" width="18" height="18">
+        <image name="2E136052-B864-4307-A633-4F456C27164B" width="18" height="18">
             <mutableData key="keyedArchiveRepresentation">
-YnBsaXN0MDDUAQIDBAUGPj9YJHZlcnNpb25YJG9iamVjdHNZJGFyY2hpdmVyVCR0b3ASAAGGoK4HCBMU
-GR4fIyQsLzI4O1UkbnVsbNUJCgsMDQ4PEBESVk5TU2l6ZVYkY2xhc3NcTlNJbWFnZUZsYWdzVk5TUmVw
+YnBsaXN0MDDUAQIDBAUGPT5YJHZlcnNpb25YJG9iamVjdHNZJGFyY2hpdmVyVCR0b3ASAAGGoK4HCBMU
+GR4fIyQrLjE3OlUkbnVsbNUJCgsMDQ4PEBESVk5TU2l6ZVYkY2xhc3NcTlNJbWFnZUZsYWdzVk5TUmVw
 c1dOU0NvbG9ygAKADRIgwAAAgAOAC1h7MTgsIDE4fdIVChYYWk5TLm9iamVjdHOhF4AEgArSFQoaHaIb
 HIAFgAaACRAA0iAKISJfEBROU1RJRkZSZXByZXNlbnRhdGlvboAHgAhPERHETU0AKgAABGKAACBQOCQW
 DQeEQmDAuBv6BveFRGJROKEMVBRGOZ1vVlNd1vdVRSRRQDQMEwMEQMJg8LhgcKM2ENILhdsdsrl2AxkN
@@ -2395,18 +2280,17 @@ ZgAA8qcAAA1ZAAAT0AAACg52Y2d0AAAAAAAAAAEAAQAAAAAAAAABAAAAAQAAAAAAAAABAAAAAQAAAAAA
 AAABAABuZGluAAAAAAAAADYAAKdAAABVgAAATMAAAJ7AAAAlgAAADMAAAFAAAABUQAACMzMAAjMzAAIz
 MwAAAAAAAAAAc2YzMgAAAAAAAQxyAAAF+P//8x0AAAe6AAD9cv//+53///2kAAAD2QAAwHFtbW9kAAAA
 AAAABhAAAKAHAAAAAMknHgAAAAAAAAAAAAAAAAAAAAAA0iUmJyhaJGNsYXNzbmFtZVgkY2xhc3Nlc18Q
-EE5TQml0bWFwSW1hZ2VSZXCjKSorXxAQTlNCaXRtYXBJbWFnZVJlcFpOU0ltYWdlUmVwWE5TT2JqZWN0
-0iUmLS5XTlNBcnJheaItK9IlJjAxXk5TTXV0YWJsZUFycmF5ozAtK9MzNAo1NjdXTlNXaGl0ZVxOU0Nv
-bG9yU3BhY2VEMCAwABADgAzSJSY5OldOU0NvbG9yojkr0iUmPD1XTlNJbWFnZaI8K18QD05TS2V5ZWRB
-cmNoaXZlctFAQVRyb290gAEACAARABoAIwAtADIANwBGAEwAVwBeAGUAcgB5AIEAgwCFAIoAjACOAJcA
-nACnAKkAqwCtALIAtQC3ALkAuwC9AMIA2QDbAN0SpRKqErUSvhLREtUS6BLzEvwTARMJEwwTERMgEyQT
-KxMzE0ATRRNHE0kTThNWE1kTXhNmE2kTexN+E4MAAAAAAAACAQAAAAAAAABCAAAAAAAAAAAAAAAAAAAT
-hQ
+EE5TQml0bWFwSW1hZ2VSZXCjJykqWk5TSW1hZ2VSZXBYTlNPYmplY3TSJSYsLVdOU0FycmF5oiwq0iUm
+LzBeTlNNdXRhYmxlQXJyYXmjLywq0zIzCjQ1NldOU1doaXRlXE5TQ29sb3JTcGFjZUQwIDAAEAOADNIl
+Jjg5V05TQ29sb3KiOCrSJSY7PFdOU0ltYWdlojsqXxAPTlNLZXllZEFyY2hpdmVy0T9AVHJvb3SAAQAI
+ABEAGgAjAC0AMgA3AEYATABXAF4AZQByAHkAgQCDAIUAigCMAI4AlwCcAKcAqQCrAK0AsgC1ALcAuQC7
+AL0AwgDZANsA3RKlEqoStRK+EtES1RLgEukS7hL2EvkS/hMNExETGBMgEy0TMhM0EzYTOxNDE0YTSxNT
+E1YTaBNrE3AAAAAAAAACAQAAAAAAAABBAAAAAAAAAAAAAAAAAAATcg
 </mutableData>
         </image>
-        <image name="NSAddTemplate" width="8" height="8"/>
-        <image name="NSRemoveTemplate" width="8" height="8"/>
-        <image name="TurtleTemplate" width="128" height="128"/>
+        <image name="NSAddTemplate" width="11" height="11"/>
+        <image name="NSRemoveTemplate" width="11" height="11"/>
+        <image name="TurtleTemplate" width="18" height="18"/>
         <image name="YellowDot" width="16" height="16"/>
     </resources>
 </document>

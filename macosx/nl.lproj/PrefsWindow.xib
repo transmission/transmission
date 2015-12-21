@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="5053" systemVersion="13C64" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="9531" systemVersion="15B42" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
-        <deployment version="1060" identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="5053"/>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="9531"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="PrefsController">
@@ -53,7 +53,7 @@
             </connections>
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
-        <customObject id="-3" userLabel="Application"/>
+        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <window title="Voorkeuren" allowsToolTipsWhenApplicationIsInactive="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" animationBehavior="default" id="23" userLabel="Preferences" customClass="PrefsWindow">
             <windowStyleMask key="styleMask" titled="YES" closable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
@@ -304,7 +304,7 @@
                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                         <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="57" id="1215">
                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                            <font key="font" metaFont="system"/>
+                                            <font key="font" metaFont="menu"/>
                                             <menu key="menu" title="OtherViews" id="52">
                                                 <items>
                                                     <menuItem state="on" id="57">
@@ -400,7 +400,7 @@
                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                         <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="220" id="1220">
                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                            <font key="font" metaFont="system"/>
+                                            <font key="font" metaFont="menu"/>
                                             <menu key="menu" title="OtherViews" id="217">
                                                 <items>
                                                     <menuItem state="on" id="220">
@@ -459,7 +459,7 @@
                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                         <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="540" id="1228">
                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                            <font key="font" metaFont="system"/>
+                                            <font key="font" metaFont="menu"/>
                                             <menu key="menu" title="OtherViews" id="539">
                                                 <items>
                                                     <menuItem state="on" id="540">
@@ -673,9 +673,6 @@
                                             <numberFormatter key="formatter" formatterBehavior="default10_4" usesGroupingSeparator="NO" lenient="YES" groupingSize="0" minimumIntegerDigits="0" maximumIntegerDigits="42" id="1961">
                                                 <real key="minimum" value="1"/>
                                                 <real key="maximum" value="99999"/>
-                                                <metadata>
-                                                    <real key="inspectorSampleValue" value="5"/>
-                                                </metadata>
                                             </numberFormatter>
                                             <font key="font" metaFont="system"/>
                                             <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
@@ -822,7 +819,7 @@
                                         <autoresizingMask key="autoresizingMask" flexibleMaxY="YES"/>
                                         <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="1309" id="1307">
                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                            <font key="font" metaFont="system"/>
+                                            <font key="font" metaFont="menu"/>
                                             <menu key="menu" title="OtherViews" id="1308">
                                                 <items>
                                                     <menuItem state="on" id="1309"/>
@@ -832,8 +829,8 @@
                                         <connections>
                                             <action selector="setSound:" target="-2" id="1320"/>
                                             <binding destination="-2" name="contentValues" keyPath="sounds" id="1330"/>
-                                            <binding destination="365" name="enabled" keyPath="values.PlayDownloadSound" id="1316"/>
                                             <binding destination="365" name="selectedValue" keyPath="values.DownloadSound" previousBinding="1330" id="1331"/>
+                                            <binding destination="365" name="enabled" keyPath="values.PlayDownloadSound" id="1316"/>
                                             <outlet property="nextKeyView" destination="1300" id="1641"/>
                                         </connections>
                                     </popUpButton>
@@ -853,7 +850,7 @@
                                         <autoresizingMask key="autoresizingMask" flexibleMaxY="YES"/>
                                         <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="1305" id="1303">
                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                            <font key="font" metaFont="system"/>
+                                            <font key="font" metaFont="menu"/>
                                             <menu key="menu" title="OtherViews" id="1304">
                                                 <items>
                                                     <menuItem state="on" id="1305"/>
@@ -916,7 +913,7 @@
                                         <autoresizingMask key="autoresizingMask" flexibleMaxY="YES"/>
                                         <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="2051" id="2049">
                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                            <font key="font" metaFont="system"/>
+                                            <font key="font" metaFont="menu"/>
                                             <menu key="menu" title="OtherViews" id="2050">
                                                 <items>
                                                     <menuItem state="on" id="2051">
@@ -1050,7 +1047,7 @@
                     <autoresizingMask key="autoresizingMask"/>
                     <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="1811" id="1809">
                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                        <font key="font" metaFont="system"/>
+                        <font key="font" metaFont="menu"/>
                         <menu key="menu" title="OtherViews" id="1810">
                             <items>
                                 <menuItem state="on" id="1811"/>
@@ -1096,7 +1093,7 @@
                 <segmentedControl verticalHuggingPriority="750" id="1772">
                     <rect key="frame" x="20" y="19" width="67" height="23"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                    <segmentedCell key="cell" alignment="left" style="smallSquare" trackingMode="momentary" id="1773">
+                    <segmentedCell key="cell" borderStyle="border" alignment="left" style="smallSquare" trackingMode="momentary" id="1773">
                         <font key="font" metaFont="system"/>
                         <segments>
                             <segment image="NSAddTemplate" width="32">
@@ -1119,10 +1116,10 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" columnResizing="NO" multipleSelection="NO" emptySelection="NO" autosaveColumns="NO" rowHeight="18" id="1774">
-                                <rect key="frame" x="0.0" y="0.0" width="141" height="169"/>
+                                <rect key="frame" x="0.0" y="0.0" width="141" height="20"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <size key="intercellSpacing" width="3" height="2"/>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                 <tableColumns>
                                     <tableColumn identifier="Color" editable="NO" width="20" minWidth="20" maxWidth="20" id="1777">
@@ -1131,7 +1128,7 @@
                                             <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                         </tableHeaderCell>
-                                        <imageCell key="dataCell" controlSize="small" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="7054653F-06EF-493D-8872-A2DBFA18421A" id="1782"/>
+                                        <imageCell key="dataCell" controlSize="small" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="3B327358-6347-40E5-8781-42EA5EB29D40" id="1782"/>
                                     </tableColumn>
                                     <tableColumn identifier="Name" editable="NO" width="115" minWidth="40" maxWidth="1000" id="1779">
                                         <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Naam">
@@ -1178,7 +1175,7 @@
                     <autoresizingMask key="autoresizingMask"/>
                     <popUpButtonCell key="cell" type="push" title="Elke dag" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" tag="127" imageScaling="proportionallyDown" inset="2" selectedItem="1910" id="1908">
                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                        <font key="font" metaFont="system"/>
+                        <font key="font" metaFont="menu"/>
                         <menu key="menu" title="OtherViews" id="1909">
                             <items>
                                 <menuItem title="Elke dag" state="on" tag="127" id="1910"/>
@@ -1208,32 +1205,7 @@
                         <font key="font" metaFont="system"/>
                         <calendarDate key="date" timeIntervalSinceReferenceDate="-31575600" calendarFormat="%Y-%m-%d %H:%M:%S %z">
                             <!--2000-01-01 08:00:00 -0500-->
-                            <timeZone key="timeZone" name="America/New_York">
-                                <mutableData key="data">
-VFppZgAAAAAAAAAAAAAAAAAAAAAAAAAEAAAABAAAAAAAAADrAAAABAAAABCeph5wn7rrYKCGAHChms1g
-omXicKOD6eCkaq5wpTWnYKZTyvCnFYlgqDOs8Kj+peCqE47wqt6H4KvzcPCsvmngrdNS8K6eS+CvszTw
-sH4t4LGcUXCyZ0pgs3wzcLRHLGC1XBVwticOYLc793C4BvBguRvZcLnm0mC7BPXwu8a0YLzk1/C9r9Dg
-vsS58L+PsuDApJvwwW+U4MKEffDDT3bgxGRf8MUvWODGTXxwxw864MgtXnDI+Fdgyg1AcMrYOWDLiPBw
-0iP0cNJg++DTdeTw1EDd4NVVxvDWIL/g1zWo8NgAoeDZFYrw2eCD4Nr+p3DbwGXg3N6JcN2pgmDevmtw
-34lkYOCeTXDhaUZg4n4vcONJKGDkXhFw5Vcu4OZHLfDnNxDg6CcP8OkW8uDqBvHw6vbU4Ovm0/Ds1rbg
-7ca18O6/02Dvr9Jw8J+1YPGPtHDyf5dg82+WcPRfeWD1T3hw9j9bYPcvWnD4KHfg+Q88cPoIWeD6+Fjw
-++g74PzYOvD9yB3g/rgc8P+n/+AAl/7wAYfh4AJ34PADcP5gBGD9cAVQ4GAGQN9wBzDCYAeNGXAJEKRg
-Ca2U8ArwhmAL4IVwDNmi4A3AZ3AOuYTgD6mD8BCZZuARiWXwEnlI4BNpR/AUWSrgFUkp8BY5DOAXKQvw
-GCIpYBkI7fAaAgtgGvIKcBvh7WAc0exwHcHPYB6xznAfobFgIHYA8CGBk2AiVeLwI2qv4CQ1xPAlSpHg
-JhWm8Ccqc+An/sNwKQpV4CnepXAq6jfgK76HcCzTVGAtnmlwLrM2YC9+S3AwkxhgMWdn8DJy+mAzR0nw
-NFLcYDUnK/A2Mr5gNwcN8Dgb2uA45u/wOfu84DrG0fA7257gPK/ucD27gOA+j9BwP5ti4EBvsnBBhH9g
-Qk+UcENkYWBEL3ZwRURDYEXzqPBHLV/gR9OK8EkNQeBJs2zwSu0j4EuciXBM1kBgTXxrcE62ImBPXE1w
-UJYEYFE8L3BSdeZgUxwRcFRVyGBU+/NwVjWqYFblD/BYHsbgWMTx8Fn+qOBapNPwW96K4FyEtfBdvmzg
-XmSX8F+eTuBgTbRwYYdrYGItlnBjZ01gZA14cGVHL2Bl7VpwZycRYGfNPHBpBvNgaa0ecGrm1WBrljrw
-bM/x4G12HPBur9Pgb1X+8HCPteBxNeDwcm+X4HMVwvB0T3ngdP7fcHY4lmB23sFweBh4YHi+o3B5+Fpg
-ep6FcHvYPGB8fmdwfbgeYH5eSXB/mABgAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQAB
-AAEAAQABAAEAAQABAgMBAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEA
-AQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEA
-AQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEA
-AQABAAEAAQABAAEAAQABAAEAAf//x8ABAP//ubAABP//x8ABCP//x8ABDEVEVABFU1QARVdUAEVQVAAA
-AAABAAAAAQ
-</mutableData>
-                            </timeZone>
+                            <timeZone key="timeZone" name="America/New_York"/>
                         </calendarDate>
                         <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -1253,32 +1225,7 @@ AAABAAAAAQ
                         <font key="font" metaFont="system"/>
                         <calendarDate key="date" timeIntervalSinceReferenceDate="-31525200" calendarFormat="%Y-%m-%d %H:%M:%S %z">
                             <!--2000-01-01 22:00:00 -0500-->
-                            <timeZone key="timeZone" name="America/New_York">
-                                <mutableData key="data">
-VFppZgAAAAAAAAAAAAAAAAAAAAAAAAAEAAAABAAAAAAAAADrAAAABAAAABCeph5wn7rrYKCGAHChms1g
-omXicKOD6eCkaq5wpTWnYKZTyvCnFYlgqDOs8Kj+peCqE47wqt6H4KvzcPCsvmngrdNS8K6eS+CvszTw
-sH4t4LGcUXCyZ0pgs3wzcLRHLGC1XBVwticOYLc793C4BvBguRvZcLnm0mC7BPXwu8a0YLzk1/C9r9Dg
-vsS58L+PsuDApJvwwW+U4MKEffDDT3bgxGRf8MUvWODGTXxwxw864MgtXnDI+Fdgyg1AcMrYOWDLiPBw
-0iP0cNJg++DTdeTw1EDd4NVVxvDWIL/g1zWo8NgAoeDZFYrw2eCD4Nr+p3DbwGXg3N6JcN2pgmDevmtw
-34lkYOCeTXDhaUZg4n4vcONJKGDkXhFw5Vcu4OZHLfDnNxDg6CcP8OkW8uDqBvHw6vbU4Ovm0/Ds1rbg
-7ca18O6/02Dvr9Jw8J+1YPGPtHDyf5dg82+WcPRfeWD1T3hw9j9bYPcvWnD4KHfg+Q88cPoIWeD6+Fjw
-++g74PzYOvD9yB3g/rgc8P+n/+AAl/7wAYfh4AJ34PADcP5gBGD9cAVQ4GAGQN9wBzDCYAeNGXAJEKRg
-Ca2U8ArwhmAL4IVwDNmi4A3AZ3AOuYTgD6mD8BCZZuARiWXwEnlI4BNpR/AUWSrgFUkp8BY5DOAXKQvw
-GCIpYBkI7fAaAgtgGvIKcBvh7WAc0exwHcHPYB6xznAfobFgIHYA8CGBk2AiVeLwI2qv4CQ1xPAlSpHg
-JhWm8Ccqc+An/sNwKQpV4CnepXAq6jfgK76HcCzTVGAtnmlwLrM2YC9+S3AwkxhgMWdn8DJy+mAzR0nw
-NFLcYDUnK/A2Mr5gNwcN8Dgb2uA45u/wOfu84DrG0fA7257gPK/ucD27gOA+j9BwP5ti4EBvsnBBhH9g
-Qk+UcENkYWBEL3ZwRURDYEXzqPBHLV/gR9OK8EkNQeBJs2zwSu0j4EuciXBM1kBgTXxrcE62ImBPXE1w
-UJYEYFE8L3BSdeZgUxwRcFRVyGBU+/NwVjWqYFblD/BYHsbgWMTx8Fn+qOBapNPwW96K4FyEtfBdvmzg
-XmSX8F+eTuBgTbRwYYdrYGItlnBjZ01gZA14cGVHL2Bl7VpwZycRYGfNPHBpBvNgaa0ecGrm1WBrljrw
-bM/x4G12HPBur9Pgb1X+8HCPteBxNeDwcm+X4HMVwvB0T3ngdP7fcHY4lmB23sFweBh4YHi+o3B5+Fpg
-ep6FcHvYPGB8fmdwfbgeYH5eSXB/mABgAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQAB
-AAEAAQABAAEAAQABAgMBAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEA
-AQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEA
-AQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEA
-AQABAAEAAQABAAEAAQABAAEAAf//x8ABAP//ubAABP//x8ABCP//x8ABDEVEVABFU1QARVdUAEVQVAAA
-AAABAAAAAQ
-</mutableData>
-                            </timeZone>
+                            <timeZone key="timeZone" name="America/New_York"/>
                         </calendarDate>
                         <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -1528,8 +1475,8 @@ AAABAAAAAQ
                     </buttonCell>
                     <connections>
                         <action selector="setBlocklistAutoUpdate:" target="-2" id="1745"/>
-                        <binding destination="365" name="enabled" keyPath="values.BlocklistNew" id="1989"/>
                         <binding destination="365" name="value" keyPath="values.BlocklistAutoUpdate" id="1744"/>
+                        <binding destination="365" name="enabled" keyPath="values.BlocklistNew" id="1989"/>
                     </connections>
                 </button>
                 <button horizontalHuggingPriority="750" verticalHuggingPriority="750" id="1473">
@@ -1971,6 +1918,7 @@ AAABAAAAAQ
                     </textFieldCell>
                     <connections>
                         <action selector="setRPCUsername:" target="-2" id="1571"/>
+                        <binding destination="365" name="enabled" keyPath="values.RPC" id="1558"/>
                         <binding destination="365" name="enabled2" keyPath="values.RPCAuthorize" previousBinding="1558" id="1575">
                             <dictionary key="options">
                                 <integer key="NSMultipleValuesPlaceholder" value="-1"/>
@@ -1979,7 +1927,6 @@ AAABAAAAAQ
                                 <integer key="NSNullPlaceholder" value="-1"/>
                             </dictionary>
                         </binding>
-                        <binding destination="365" name="enabled" keyPath="values.RPC" id="1558"/>
                         <binding destination="365" name="value" keyPath="values.RPCUsername" id="1565"/>
                         <outlet property="nextKeyView" destination="1509" id="1625"/>
                     </connections>
@@ -1996,7 +1943,7 @@ AAABAAAAAQ
                 <segmentedControl verticalHuggingPriority="750" id="1534">
                     <rect key="frame" x="103" y="67" width="67" height="23"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                    <segmentedCell key="cell" state="on" alignment="left" style="smallSquare" trackingMode="momentary" id="1535">
+                    <segmentedCell key="cell" state="on" borderStyle="border" alignment="left" style="smallSquare" trackingMode="momentary" id="1535">
                         <font key="font" metaFont="system"/>
                         <segments>
                             <segment image="NSAddTemplate" width="32">
@@ -2009,6 +1956,7 @@ AAABAAAAAQ
                     </segmentedCell>
                     <connections>
                         <action selector="addRemoveRPCIP:" target="-2" id="1539"/>
+                        <binding destination="365" name="enabled" keyPath="values.RPC" id="1547"/>
                         <binding destination="365" name="enabled2" keyPath="values.RPCUseWhitelist" previousBinding="1547" id="1755">
                             <dictionary key="options">
                                 <integer key="NSMultipleValuesPlaceholder" value="-1"/>
@@ -2017,7 +1965,6 @@ AAABAAAAAQ
                                 <integer key="NSNullPlaceholder" value="-1"/>
                             </dictionary>
                         </binding>
-                        <binding destination="365" name="enabled" keyPath="values.RPC" id="1547"/>
                     </connections>
                 </segmentedControl>
                 <scrollView horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" id="1518">
@@ -2028,13 +1975,13 @@ AAABAAAAAQ
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" columnResizing="NO" autosaveColumns="NO" typeSelect="NO" id="1521">
-                                <rect key="frame" x="0.0" y="0.0" width="306" height="76"/>
+                                <rect key="frame" x="0.0" y="0.0" width="291" height="19"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <size key="intercellSpacing" width="3" height="2"/>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                 <tableColumns>
-                                    <tableColumn identifier="IP" width="303" minWidth="40" maxWidth="1000" id="1523">
+                                    <tableColumn identifier="IP" width="288" minWidth="40" maxWidth="1000" id="1523">
                                         <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="IP-adres">
                                             <font key="font" metaFont="smallSystem"/>
                                             <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -2049,6 +1996,7 @@ AAABAAAAAQ
                                     </tableColumn>
                                 </tableColumns>
                                 <connections>
+                                    <binding destination="365" name="enabled" keyPath="values.RPC" id="1546"/>
                                     <binding destination="365" name="enabled2" keyPath="values.RPCUseWhitelist" previousBinding="1546" id="1754">
                                         <dictionary key="options">
                                             <integer key="NSMultipleValuesPlaceholder" value="-1"/>
@@ -2057,7 +2005,6 @@ AAABAAAAAQ
                                             <integer key="NSNullPlaceholder" value="-1"/>
                                         </dictionary>
                                     </binding>
-                                    <binding destination="365" name="enabled" keyPath="values.RPC" id="1546"/>
                                     <outlet property="dataSource" destination="-2" id="1532"/>
                                     <outlet property="delegate" destination="-2" id="1537"/>
                                 </connections>
@@ -2087,6 +2034,7 @@ AAABAAAAAQ
                     </secureTextFieldCell>
                     <connections>
                         <action selector="setRPCPassword:" target="-2" id="1572"/>
+                        <binding destination="365" name="enabled" keyPath="values.RPC" id="1559"/>
                         <binding destination="365" name="enabled2" keyPath="values.RPCAuthorize" previousBinding="1559" id="1576">
                             <dictionary key="options">
                                 <integer key="NSMultipleValuesPlaceholder" value="-1"/>
@@ -2095,7 +2043,6 @@ AAABAAAAAQ
                                 <integer key="NSNullPlaceholder" value="-1"/>
                             </dictionary>
                         </binding>
-                        <binding destination="365" name="enabled" keyPath="values.RPC" id="1559"/>
                         <outlet property="nextKeyView" destination="1491" id="1626"/>
                     </connections>
                 </secureTextField>
@@ -2189,6 +2136,7 @@ AAABAAAAAQ
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                     <connections>
+                        <binding destination="365" name="enabled" keyPath="values.RPC" id="1691"/>
                         <binding destination="365" name="enabled2" keyPath="values.RPCAuthorize" previousBinding="1691" id="1693">
                             <dictionary key="options">
                                 <integer key="NSMultipleValuesPlaceholder" value="-1"/>
@@ -2197,7 +2145,6 @@ AAABAAAAAQ
                                 <integer key="NSNullPlaceholder" value="-1"/>
                             </dictionary>
                         </binding>
-                        <binding destination="365" name="enabled" keyPath="values.RPC" id="1691"/>
                     </connections>
                 </textField>
                 <textField verticalHuggingPriority="750" id="1554" customClass="ColorTextField">
@@ -2209,6 +2156,7 @@ AAABAAAAAQ
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                     <connections>
+                        <binding destination="365" name="enabled" keyPath="values.RPC" id="1692"/>
                         <binding destination="365" name="enabled2" keyPath="values.RPCAuthorize" previousBinding="1692" id="1694">
                             <dictionary key="options">
                                 <integer key="NSMultipleValuesPlaceholder" value="-1"/>
@@ -2217,7 +2165,6 @@ AAABAAAAAQ
                                 <integer key="NSNullPlaceholder" value="-1"/>
                             </dictionary>
                         </binding>
-                        <binding destination="365" name="enabled" keyPath="values.RPC" id="1692"/>
                     </connections>
                 </textField>
                 <textField verticalHuggingPriority="750" id="1492" customClass="ColorTextField">
@@ -2249,10 +2196,10 @@ AAABAAAAAQ
         </customObject>
     </objects>
     <resources>
-        <image name="7054653F-06EF-493D-8872-A2DBFA18421A" width="18" height="18">
+        <image name="3B327358-6347-40E5-8781-42EA5EB29D40" width="18" height="18">
             <mutableData key="keyedArchiveRepresentation">
-YnBsaXN0MDDUAQIDBAUGPj9YJHZlcnNpb25YJG9iamVjdHNZJGFyY2hpdmVyVCR0b3ASAAGGoK4HCBMU
-GR4fIyQsLzI4O1UkbnVsbNUJCgsMDQ4PEBESVk5TU2l6ZVYkY2xhc3NcTlNJbWFnZUZsYWdzVk5TUmVw
+YnBsaXN0MDDUAQIDBAUGPT5YJHZlcnNpb25YJG9iamVjdHNZJGFyY2hpdmVyVCR0b3ASAAGGoK4HCBMU
+GR4fIyQrLjE3OlUkbnVsbNUJCgsMDQ4PEBESVk5TU2l6ZVYkY2xhc3NcTlNJbWFnZUZsYWdzVk5TUmVw
 c1dOU0NvbG9ygAKADRIgwAAAgAOAC1h7MTgsIDE4fdIVChYYWk5TLm9iamVjdHOhF4AEgArSFQoaHaIb
 HIAFgAaACRAA0iAKISJfEBROU1RJRkZSZXByZXNlbnRhdGlvboAHgAhPEQ3uTU0AKgAAAGiAOuBP8AQW
 DQeEQmFQuGQ2HQWBOuCQ+KRWLRSIxOLxuORaMx2QSGFx+RSWRSSTSmNyiVS2HyyXTGFTCZTWIQObTmDT
@@ -2314,17 +2261,17 @@ x/pX+uf7d/wH/Jj9Kf26/kv+3P9t//9wYXJhAAAAAAADAAAAAmZmAADypwAADVkAABPQAAAKDnZjZ3QA
 AAAAAAAAAQABAAAAAAAAAAEAAAABAAAAAAAAAAEAAAABAAAAAAAAAAEAAG5kaW4AAAAAAAAANgAAp0AA
 AFWAAABMwAAAnsAAACWAAAAMwAAAUAAAAFRAAAIzMwACMzMAAjMzAAAAAAAAAABzZjMyAAAAAAABDHIA
 AAX4///zHQAAB7oAAP1y///7nf///aQAAAPZAADAcW1tb2QAAAAAAAAGEAAAoAcAAAAAySceAAAAAAAA
-AAAAAAAAAAAAAADSJSYnKFokY2xhc3NuYW1lWCRjbGFzc2VzXxAQTlNCaXRtYXBJbWFnZVJlcKMpKitf
-EBBOU0JpdG1hcEltYWdlUmVwWk5TSW1hZ2VSZXBYTlNPYmplY3TSJSYtLldOU0FycmF5oi0r0iUmMDFe
-TlNNdXRhYmxlQXJyYXmjMC0r0zM0CjU2N1dOU1doaXRlXE5TQ29sb3JTcGFjZUQwIDAAEAOADNIlJjk6
-V05TQ29sb3KiOSvSJSY8PVdOU0ltYWdlojwrXxAPTlNLZXllZEFyY2hpdmVy0UBBVHJvb3SAAQAIABEA
-GgAjAC0AMgA3AEYATABXAF4AZQByAHkAgQCDAIUAigCMAI4AlwCcAKcAqQCrAK0AsgC1ALcAuQC7AL0A
-wgDZANsA3Q7PDtQO3w7oDvsO/w8SDx0PJg8rDzMPNg87D0oPTg9VD10Pag9vD3EPcw94D4APgw+ID5AP
-kw+lD6gPrQAAAAAAAAIBAAAAAAAAAEIAAAAAAAAAAAAAAAAAAA+vA
+AAAAAAAAAAAAAADSJSYnKFokY2xhc3NuYW1lWCRjbGFzc2VzXxAQTlNCaXRtYXBJbWFnZVJlcKMnKSpa
+TlNJbWFnZVJlcFhOU09iamVjdNIlJiwtV05TQXJyYXmiLCrSJSYvMF5OU011dGFibGVBcnJheaMvLCrT
+MjMKNDU2V05TV2hpdGVcTlNDb2xvclNwYWNlRDAgMAAQA4AM0iUmODlXTlNDb2xvcqI4KtIlJjs8V05T
+SW1hZ2WiOypfEA9OU0tleWVkQXJjaGl2ZXLRP0BUcm9vdIABAAgAEQAaACMALQAyADcARgBMAFcAXgBl
+AHIAeQCBAIMAhQCKAIwAjgCXAJwApwCpAKsArQCyALUAtwC5ALsAvQDCANkA2wDdDs8O1A7fDugO+w7/
+DwoPEw8YDyAPIw8oDzcPOw9CD0oPVw9cD14PYA9lD20PcA91D30PgA+SD5UPmgAAAAAAAAIBAAAAAAAA
+AEEAAAAAAAAAAAAAAAAAAA+cA
 </mutableData>
         </image>
-        <image name="NSAddTemplate" width="8" height="8"/>
-        <image name="NSRemoveTemplate" width="8" height="8"/>
+        <image name="NSAddTemplate" width="11" height="11"/>
+        <image name="NSRemoveTemplate" width="11" height="11"/>
         <image name="TurtleTemplate" width="18" height="18"/>
         <image name="YellowDot" width="16" height="16"/>
     </resources>

@@ -1,1104 +1,349 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="8.00">
-	<data>
-		<int key="IBDocument.SystemTarget">1060</int>
-		<string key="IBDocument.SystemVersion">11D50</string>
-		<string key="IBDocument.InterfaceBuilderVersion">2182</string>
-		<string key="IBDocument.AppKitVersion">1138.32</string>
-		<string key="IBDocument.HIToolboxVersion">568.00</string>
-		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
-			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
-			<string key="NS.object.0">2182</string>
-		</object>
-		<array key="IBDocument.IntegratedClassDependencies">
-			<string>NSTextField</string>
-			<string>NSTableView</string>
-			<string>NSScrollView</string>
-			<string>NSTextFieldCell</string>
-			<string>NSLevelIndicatorCell</string>
-			<string>NSCustomView</string>
-			<string>NSTableHeaderView</string>
-			<string>NSTableColumn</string>
-			<string>NSImageCell</string>
-			<string>NSScroller</string>
-			<string>NSCustomObject</string>
-		</array>
-		<array key="IBDocument.PluginDependencies">
-			<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-		</array>
-		<object class="NSMutableDictionary" key="IBDocument.Metadata">
-			<string key="NS.key.0">PluginDependencyRecalculationVersion</string>
-			<integer value="1" key="NS.object.0"/>
-		</object>
-		<array class="NSMutableArray" key="IBDocument.RootObjects" id="1000">
-			<object class="NSCustomObject" id="1001">
-				<string key="NSClassName">InfoPeersViewController</string>
-			</object>
-			<object class="NSCustomObject" id="1003">
-				<string key="NSClassName">FirstResponder</string>
-			</object>
-			<object class="NSCustomObject" id="1004">
-				<string key="NSClassName">NSApplication</string>
-			</object>
-			<object class="NSCustomView" id="360777202">
-				<reference key="NSNextResponder"/>
-				<int key="NSvFlags">274</int>
-				<array class="NSMutableArray" key="NSSubviews">
-					<object class="NSTextField" id="456525247">
-						<reference key="NSNextResponder" ref="360777202"/>
-						<int key="NSvFlags">290</int>
-						<string key="NSFrame">{{7, 10}, {340, 28}}</string>
-						<reference key="NSSuperview" ref="360777202"/>
-						<reference key="NSWindow"/>
-						<reference key="NSNextKeyView"/>
-						<bool key="NSEnabled">YES</bool>
-						<object class="NSTextFieldCell" key="NSCell" id="524548358">
-							<int key="NSCellFlags">67239488</int>
-							<int key="NSCellFlags2">138545152</int>
-							<string type="base64-UTF8" key="NSContents">TXVsdGlsaW5lIExhYmVsCk11bHRpbGluZSBMYWJlbA</string>
-							<object class="NSFont" key="NSSupport" id="26">
-								<string key="NSName">LucidaGrande</string>
-								<double key="NSSize">11</double>
-								<int key="NSfFlags">3100</int>
-							</object>
-							<string key="NSPlaceholderString">no peer info available</string>
-							<reference key="NSControlView" ref="456525247"/>
-							<object class="NSColor" key="NSBackgroundColor">
-								<int key="NSColorSpace">6</int>
-								<string key="NSCatalogName">System</string>
-								<string key="NSColorName">controlColor</string>
-								<object class="NSColor" key="NSColor" id="492461609">
-									<int key="NSColorSpace">3</int>
-									<bytes key="NSWhite">MC42NjY2NjY2NjY3AA</bytes>
-								</object>
-							</object>
-							<object class="NSColor" key="NSTextColor" id="612008619">
-								<int key="NSColorSpace">6</int>
-								<string key="NSCatalogName">System</string>
-								<string key="NSColorName">controlTextColor</string>
-								<object class="NSColor" key="NSColor" id="1067516375">
-									<int key="NSColorSpace">3</int>
-									<bytes key="NSWhite">MAA</bytes>
-								</object>
-							</object>
-						</object>
-					</object>
-					<object class="NSScrollView" id="902227095">
-						<reference key="NSNextResponder" ref="360777202"/>
-						<int key="NSvFlags">274</int>
-						<array class="NSMutableArray" key="NSSubviews">
-							<object class="NSClipView" id="91099094">
-								<reference key="NSNextResponder" ref="902227095"/>
-								<int key="NSvFlags">2304</int>
-								<array class="NSMutableArray" key="NSSubviews">
-									<object class="NSTableView" id="298614287">
-										<reference key="NSNextResponder" ref="91099094"/>
-										<int key="NSvFlags">256</int>
-										<string key="NSFrameSize">{332, 209}</string>
-										<reference key="NSSuperview" ref="91099094"/>
-										<reference key="NSWindow"/>
-										<reference key="NSNextKeyView" ref="290419194"/>
-										<bool key="NSEnabled">YES</bool>
-										<object class="NSTableHeaderView" key="NSHeaderView" id="491528206">
-											<reference key="NSNextResponder" ref="805572887"/>
-											<int key="NSvFlags">256</int>
-											<string key="NSFrameSize">{332, 17}</string>
-											<reference key="NSSuperview" ref="805572887"/>
-											<reference key="NSWindow"/>
-											<reference key="NSNextKeyView" ref="91099094"/>
-											<reference key="NSTableView" ref="298614287"/>
-										</object>
-										<object class="_NSCornerView" key="NSCornerView">
-											<nil key="NSNextResponder"/>
-											<int key="NSvFlags">-2147483392</int>
-											<string key="NSFrame">{{-22, 0}, {12, 17}}</string>
-										</object>
-										<array class="NSMutableArray" key="NSTableColumns">
-											<object class="NSTableColumn" id="625040704">
-												<string key="NSIdentifier">IP</string>
-												<double key="NSWidth">98</double>
-												<double key="NSMinWidth">10</double>
-												<double key="NSMaxWidth">250</double>
-												<object class="NSTableHeaderCell" key="NSHeaderCell">
-													<int key="NSCellFlags">75628096</int>
-													<int key="NSCellFlags2">2048</int>
-													<string key="NSContents">IP Address</string>
-													<reference key="NSSupport" ref="26"/>
-													<object class="NSColor" key="NSBackgroundColor" id="5410140">
-														<int key="NSColorSpace">6</int>
-														<string key="NSCatalogName">System</string>
-														<string key="NSColorName">headerColor</string>
-														<object class="NSColor" key="NSColor" id="388713163">
-															<int key="NSColorSpace">3</int>
-															<bytes key="NSWhite">MQA</bytes>
-														</object>
-													</object>
-													<object class="NSColor" key="NSTextColor" id="841384021">
-														<int key="NSColorSpace">6</int>
-														<string key="NSCatalogName">System</string>
-														<string key="NSColorName">headerTextColor</string>
-														<reference key="NSColor" ref="1067516375"/>
-													</object>
-												</object>
-												<object class="NSTextFieldCell" key="NSDataCell" id="461918787">
-													<int key="NSCellFlags">337772096</int>
-													<int key="NSCellFlags2">2048</int>
-													<string key="NSContents">Text Cell</string>
-													<reference key="NSSupport" ref="26"/>
-													<reference key="NSControlView" ref="298614287"/>
-													<object class="NSColor" key="NSBackgroundColor" id="907173649">
-														<int key="NSColorSpace">6</int>
-														<string key="NSCatalogName">System</string>
-														<string key="NSColorName">controlBackgroundColor</string>
-														<reference key="NSColor" ref="492461609"/>
-													</object>
-													<reference key="NSTextColor" ref="612008619"/>
-												</object>
-												<int key="NSResizingMask">2</int>
-												<bool key="NSIsResizeable">YES</bool>
-												<reference key="NSTableView" ref="298614287"/>
-												<object class="NSSortDescriptor" key="NSSortDescriptorPrototype" id="714474160">
-													<string key="NSKey">IP</string>
-													<bool key="NSAscending">YES</bool>
-													<string key="NSSelector">compareNumeric:</string>
-												</object>
-											</object>
-											<object class="NSTableColumn" id="615644455">
-												<string key="NSIdentifier">Client</string>
-												<double key="NSWidth">76</double>
-												<double key="NSMinWidth">20</double>
-												<double key="NSMaxWidth">10000</double>
-												<object class="NSTableHeaderCell" key="NSHeaderCell">
-													<int key="NSCellFlags">75628096</int>
-													<int key="NSCellFlags2">2048</int>
-													<string key="NSContents">Client</string>
-													<reference key="NSSupport" ref="26"/>
-													<object class="NSColor" key="NSBackgroundColor">
-														<int key="NSColorSpace">3</int>
-														<bytes key="NSWhite">MC4zMzMzMzI5OQA</bytes>
-													</object>
-													<reference key="NSTextColor" ref="841384021"/>
-												</object>
-												<object class="NSTextFieldCell" key="NSDataCell" id="377059204">
-													<int key="NSCellFlags">337772096</int>
-													<int key="NSCellFlags2">2048</int>
-													<string key="NSContents">Text Cell</string>
-													<reference key="NSSupport" ref="26"/>
-													<reference key="NSControlView" ref="298614287"/>
-													<reference key="NSBackgroundColor" ref="907173649"/>
-													<reference key="NSTextColor" ref="612008619"/>
-												</object>
-												<int key="NSResizingMask">3</int>
-												<bool key="NSIsResizeable">YES</bool>
-												<reference key="NSTableView" ref="298614287"/>
-												<object class="NSSortDescriptor" key="NSSortDescriptorPrototype">
-													<string key="NSKey">Client</string>
-													<bool key="NSAscending">YES</bool>
-													<string key="NSSelector">localizedStandardCompare:</string>
-												</object>
-											</object>
-											<object class="NSTableColumn" id="609419005">
-												<string key="NSIdentifier">Encryption</string>
-												<double key="NSWidth">14</double>
-												<double key="NSMinWidth">14</double>
-												<double key="NSMaxWidth">14</double>
-												<object class="NSTableHeaderCell" key="NSHeaderCell">
-													<int key="NSCellFlags">75628096</int>
-													<int key="NSCellFlags2">2048</int>
-													<string key="NSContents"/>
-													<reference key="NSSupport" ref="26"/>
-													<reference key="NSBackgroundColor" ref="5410140"/>
-													<reference key="NSTextColor" ref="841384021"/>
-												</object>
-												<object class="NSImageCell" key="NSDataCell" id="765769369">
-													<int key="NSCellFlags">130560</int>
-													<int key="NSCellFlags2">33554432</int>
-													<object class="NSImage" key="NSContents">
-														<int key="NSImageFlags">549453824</int>
-														<string key="NSSize">{14, 14}</string>
-														<array class="NSMutableArray" key="NSReps">
-															<array>
-																<integer value="0"/>
-																<object class="NSCachedImageRep">
-																	<object class="NSData" key="NSTIFFRepresentation">
-																		<bytes key="NS.bytes">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
-cmlnaHQgQXBwbGUsIEluYy4sIDIwMTIAWFlaIAAAAAAAAPMWAAEAAAABFspYWVogAAAAAAAAccAAADmK
-AAABZ1hZWiAAAAAAAABhIwAAueYAABP2WFlaIAAAAAAAACPyAAAMkAAAvdBjdXJ2AAAAAAAABAAAAAAF
-AAoADwAUABkAHgAjACgALQAyADYAOwBAAEUASgBPAFQAWQBeAGMAaABtAHIAdwB8AIEAhgCLAJAAlQCa
-AJ8AowCoAK0AsgC3ALwAwQDGAMsA0ADVANsA4ADlAOsA8AD2APsBAQEHAQ0BEwEZAR8BJQErATIBOAE+
-AUUBTAFSAVkBYAFnAW4BdQF8AYMBiwGSAZoBoQGpAbEBuQHBAckB0QHZAeEB6QHyAfoCAwIMAhQCHQIm
-Ai8COAJBAksCVAJdAmcCcQJ6AoQCjgKYAqICrAK2AsECywLVAuAC6wL1AwADCwMWAyEDLQM4A0MDTwNa
-A2YDcgN+A4oDlgOiA64DugPHA9MD4APsA/kEBgQTBCAELQQ7BEgEVQRjBHEEfgSMBJoEqAS2BMQE0wTh
-BPAE/gUNBRwFKwU6BUkFWAVnBXcFhgWWBaYFtQXFBdUF5QX2BgYGFgYnBjcGSAZZBmoGewaMBp0GrwbA
-BtEG4wb1BwcHGQcrBz0HTwdhB3QHhgeZB6wHvwfSB+UH+AgLCB8IMghGCFoIbgiCCJYIqgi+CNII5wj7
-CRAJJQk6CU8JZAl5CY8JpAm6Cc8J5Qn7ChEKJwo9ClQKagqBCpgKrgrFCtwK8wsLCyILOQtRC2kLgAuY
-C7ALyAvhC/kMEgwqDEMMXAx1DI4MpwzADNkM8w0NDSYNQA1aDXQNjg2pDcMN3g34DhMOLg5JDmQOfw6b
-DrYO0g7uDwkPJQ9BD14Peg+WD7MPzw/sEAkQJhBDEGEQfhCbELkQ1xD1ERMRMRFPEW0RjBGqEckR6BIH
-EiYSRRJkEoQSoxLDEuMTAxMjE0MTYxODE6QTxRPlFAYUJxRJFGoUixStFM4U8BUSFTQVVhV4FZsVvRXg
-FgMWJhZJFmwWjxayFtYW+hcdF0EXZReJF64X0hf3GBsYQBhlGIoYrxjVGPoZIBlFGWsZkRm3Gd0aBBoq
-GlEadxqeGsUa7BsUGzsbYxuKG7Ib2hwCHCocUhx7HKMczBz1HR4dRx1wHZkdwx3sHhYeQB5qHpQevh7p
-HxMfPh9pH5Qfvx/qIBUgQSBsIJggxCDwIRwhSCF1IaEhziH7IiciVSKCIq8i3SMKIzgjZiOUI8Ij8CQf
-JE0kfCSrJNolCSU4JWgllyXHJfcmJyZXJocmtyboJxgnSSd6J6sn3CgNKD8ocSiiKNQpBik4KWspnSnQ
-KgIqNSpoKpsqzysCKzYraSudK9EsBSw5LG4soizXLQwtQS12Last4S4WLkwugi63Lu4vJC9aL5Evxy/+
-MDUwbDCkMNsxEjFKMYIxujHyMioyYzKbMtQzDTNGM38zuDPxNCs0ZTSeNNg1EzVNNYc1wjX9Njc2cjau
-Nuk3JDdgN5w31zgUOFA4jDjIOQU5Qjl/Obw5+To2OnQ6sjrvOy07azuqO+g8JzxlPKQ84z0iPWE9oT3g
-PiA+YD6gPuA/IT9hP6I/4kAjQGRApkDnQSlBakGsQe5CMEJyQrVC90M6Q31DwEQDREdEikTORRJFVUWa
-Rd5GIkZnRqtG8Ec1R3tHwEgFSEtIkUjXSR1JY0mpSfBKN0p9SsRLDEtTS5pL4kwqTHJMuk0CTUpNk03c
-TiVObk63TwBPSU+TT91QJ1BxULtRBlFQUZtR5lIxUnxSx1MTU19TqlP2VEJUj1TbVShVdVXCVg9WXFap
-VvdXRFeSV+BYL1h9WMtZGllpWbhaB1pWWqZa9VtFW5Vb5Vw1XIZc1l0nXXhdyV4aXmxevV8PX2Ffs2AF
-YFdgqmD8YU9homH1YklinGLwY0Njl2PrZEBklGTpZT1lkmXnZj1mkmboZz1nk2fpaD9olmjsaUNpmmnx
-akhqn2r3a09rp2v/bFdsr20IbWBtuW4SbmtuxG8eb3hv0XArcIZw4HE6cZVx8HJLcqZzAXNdc7h0FHRw
-dMx1KHWFdeF2Pnabdvh3VnezeBF4bnjMeSp5iXnnekZ6pXsEe2N7wnwhfIF84X1BfaF+AX5ifsJ/I3+E
-f+WAR4CogQqBa4HNgjCCkoL0g1eDuoQdhICE44VHhauGDoZyhteHO4efiASIaYjOiTOJmYn+imSKyosw
-i5aL/IxjjMqNMY2Yjf+OZo7OjzaPnpAGkG6Q1pE/kaiSEZJ6kuOTTZO2lCCUipT0lV+VyZY0lp+XCpd1
-l+CYTJi4mSSZkJn8mmia1ZtCm6+cHJyJnPedZJ3SnkCerp8dn4uf+qBpoNihR6G2oiailqMGo3aj5qRW
-pMelOKWpphqmi6b9p26n4KhSqMSpN6mpqhyqj6sCq3Wr6axcrNCtRK24ri2uoa8Wr4uwALB1sOqxYLHW
-skuywrM4s660JbSctRO1irYBtnm28Ldot+C4WbjRuUq5wro7urW7LrunvCG8m70VvY++Cr6Evv+/er/1
-wHDA7MFnwePCX8Lbw1jD1MRRxM7FS8XIxkbGw8dBx7/IPci8yTrJuco4yrfLNsu2zDXMtc01zbXONs62
-zzfPuNA50LrRPNG+0j/SwdNE08bUSdTL1U7V0dZV1tjXXNfg2GTY6Nls2fHadtr724DcBdyK3RDdlt4c
-3qLfKd+v4DbgveFE4cziU+Lb42Pj6+Rz5PzlhOYN5pbnH+ep6DLovOlG6dDqW+rl63Dr++yG7RHtnO4o
-7rTvQO/M8Fjw5fFy8f/yjPMZ86f0NPTC9VD13vZt9vv3ivgZ+Kj5OPnH+lf65/t3/Af8mP0p/br+S/7c
-/23//3BhcmEAAAAAAAMAAAACZmYAAPKnAAANWQAAE9AAAAoOdmNndAAAAAAAAAABAAEAAAAAAAAAAQAA
-AAEAAAAAAAAAAQAAAAEAAAAAAAAAAQAAbmRpbgAAAAAAAAA2AACnQAAAVYAAAEzAAACewAAAJYAAAAzA
-AABQAAAAVEAAAjMzAAIzMwACMzMAAAAAAAAAAHNmMzIAAAAAAAEMcgAABfj///MdAAAHugAA/XL///ud
-///9pAAAA9kAAMBxbW1vZAAAAAAAAAYQAACgBwAAAADJJx4AAAAAAAAAAAAAAAAAAAAAAA</bytes>
-																	</object>
-																	<string key="NSCacheWindowColorSpace">NSCalibratedRGBColorSpace</string>
-																	<int key="NSCacheWindowBPS">8</int>
-																	<int key="NSCacheWindowBPP">24</int>
-																	<int key="NSCacheWindowIsPlanar">0</int>
-																</object>
-															</array>
-														</array>
-														<object class="NSColor" key="NSColor">
-															<int key="NSColorSpace">3</int>
-															<bytes key="NSWhite">MCAwAA</bytes>
-														</object>
-													</object>
-													<int key="NSAlign">0</int>
-													<int key="NSScale">0</int>
-													<int key="NSStyle">0</int>
-													<bool key="NSAnimates">YES</bool>
-												</object>
-												<reference key="NSTableView" ref="298614287"/>
-												<object class="NSSortDescriptor" key="NSSortDescriptorPrototype">
-													<string key="NSKey">Encryption</string>
-													<bool key="NSAscending">NO</bool>
-													<string key="NSSelector">compare:</string>
-												</object>
-											</object>
-											<object class="NSTableColumn" id="923653991">
-												<string key="NSIdentifier">Progress</string>
-												<double key="NSWidth">32</double>
-												<double key="NSMinWidth">10</double>
-												<double key="NSMaxWidth">1000</double>
-												<object class="NSTableHeaderCell" key="NSHeaderCell">
-													<int key="NSCellFlags">75628096</int>
-													<int key="NSCellFlags2">2048</int>
-													<string key="NSContents">%</string>
-													<reference key="NSSupport" ref="26"/>
-													<reference key="NSBackgroundColor" ref="5410140"/>
-													<reference key="NSTextColor" ref="841384021"/>
-												</object>
-												<object class="NSLevelIndicatorCell" key="NSDataCell" id="467327927">
-													<int key="NSCellFlags">130560</int>
-													<int key="NSCellFlags2">0</int>
-													<reference key="NSControlView" ref="298614287"/>
-													<double key="NSMaxValue">1</double>
-													<double key="NSWarningValue">0.69999999999999996</double>
-													<double key="NSCriticalValue">0.29999999999999999</double>
-													<int key="NSIndicatorStyle">1</int>
-												</object>
-												<int key="NSResizingMask">2</int>
-												<bool key="NSIsResizeable">YES</bool>
-												<reference key="NSTableView" ref="298614287"/>
-												<object class="NSSortDescriptor" key="NSSortDescriptorPrototype">
-													<string key="NSKey">Progress</string>
-													<bool key="NSAscending">YES</bool>
-													<string key="NSSelector">compare:</string>
-												</object>
-											</object>
-											<object class="NSTableColumn" id="364077053">
-												<string key="NSIdentifier">DL From</string>
-												<double key="NSWidth">47</double>
-												<double key="NSMinWidth">18.104489999999998</double>
-												<double key="NSMaxWidth">60</double>
-												<object class="NSTableHeaderCell" key="NSHeaderCell">
-													<int key="NSCellFlags">75628096</int>
-													<int key="NSCellFlags2">2048</int>
-													<string key="NSContents">DL</string>
-													<reference key="NSSupport" ref="26"/>
-													<reference key="NSBackgroundColor" ref="5410140"/>
-													<reference key="NSTextColor" ref="841384021"/>
-												</object>
-												<object class="NSTextFieldCell" key="NSDataCell" id="588366726">
-													<int key="NSCellFlags">337772096</int>
-													<int key="NSCellFlags2">67110912</int>
-													<string key="NSContents">Text Cell</string>
-													<reference key="NSSupport" ref="26"/>
-													<reference key="NSControlView" ref="298614287"/>
-													<reference key="NSBackgroundColor" ref="907173649"/>
-													<reference key="NSTextColor" ref="612008619"/>
-												</object>
-												<int key="NSResizingMask">2</int>
-												<bool key="NSIsResizeable">YES</bool>
-												<reference key="NSTableView" ref="298614287"/>
-												<object class="NSSortDescriptor" key="NSSortDescriptorPrototype" id="877670419">
-													<string key="NSKey">DL From Rate</string>
-													<bool key="NSAscending">NO</bool>
-													<string key="NSSelector">compare:</string>
-												</object>
-											</object>
-											<object class="NSTableColumn" id="95906117">
-												<string key="NSIdentifier">UL To</string>
-												<double key="NSWidth">47</double>
-												<double key="NSMinWidth">18</double>
-												<double key="NSMaxWidth">60</double>
-												<object class="NSTableHeaderCell" key="NSHeaderCell">
-													<int key="NSCellFlags">75628096</int>
-													<int key="NSCellFlags2">2048</int>
-													<string key="NSContents">UL</string>
-													<reference key="NSSupport" ref="26"/>
-													<reference key="NSBackgroundColor" ref="5410140"/>
-													<reference key="NSTextColor" ref="841384021"/>
-												</object>
-												<object class="NSTextFieldCell" key="NSDataCell" id="421796553">
-													<int key="NSCellFlags">337772096</int>
-													<int key="NSCellFlags2">67110912</int>
-													<string key="NSContents">Text Cell</string>
-													<reference key="NSSupport" ref="26"/>
-													<reference key="NSControlView" ref="298614287"/>
-													<reference key="NSBackgroundColor" ref="907173649"/>
-													<reference key="NSTextColor" ref="612008619"/>
-												</object>
-												<int key="NSResizingMask">2</int>
-												<bool key="NSIsResizeable">YES</bool>
-												<reference key="NSTableView" ref="298614287"/>
-												<object class="NSSortDescriptor" key="NSSortDescriptorPrototype">
-													<string key="NSKey">UL To Rate</string>
-													<bool key="NSAscending">NO</bool>
-													<string key="NSSelector">compare:</string>
-												</object>
-											</object>
-										</array>
-										<double key="NSIntercellSpacingWidth">3</double>
-										<double key="NSIntercellSpacingHeight">2</double>
-										<reference key="NSBackgroundColor" ref="388713163"/>
-										<object class="NSColor" key="NSGridColor" id="603390146">
-											<int key="NSColorSpace">6</int>
-											<string key="NSCatalogName">System</string>
-											<string key="NSColorName">gridColor</string>
-											<object class="NSColor" key="NSColor">
-												<int key="NSColorSpace">3</int>
-												<bytes key="NSWhite">MC41AA</bytes>
-											</object>
-										</object>
-										<double key="NSRowHeight">14</double>
-										<int key="NSTvFlags">-742359040</int>
-										<reference key="NSDelegate"/>
-										<reference key="NSDataSource"/>
-										<string key="NSAutosaveName">InspectorTable</string>
-										<array key="NSSortDescriptors">
-											<reference ref="714474160"/>
-											<reference ref="877670419"/>
-										</array>
-										<int key="NSColumnAutoresizingStyle">1</int>
-										<int key="NSDraggingSourceMaskForLocal">15</int>
-										<int key="NSDraggingSourceMaskForNonLocal">0</int>
-										<bool key="NSAllowsTypeSelect">NO</bool>
-										<int key="NSTableViewDraggingDestinationStyle">0</int>
-										<int key="NSTableViewGroupRowStyle">1</int>
-									</object>
-								</array>
-								<string key="NSFrame">{{1, 17}, {332, 209}}</string>
-								<reference key="NSSuperview" ref="902227095"/>
-								<reference key="NSWindow"/>
-								<reference key="NSNextKeyView" ref="298614287"/>
-								<reference key="NSDocView" ref="298614287"/>
-								<reference key="NSBGColor" ref="907173649"/>
-								<int key="NScvFlags">4</int>
-							</object>
-							<object class="NSScroller" id="290419194">
-								<reference key="NSNextResponder" ref="902227095"/>
-								<int key="NSvFlags">-2147483392</int>
-								<string key="NSFrame">{{328, 17}, {11, 117}}</string>
-								<reference key="NSSuperview" ref="902227095"/>
-								<reference key="NSWindow"/>
-								<reference key="NSNextKeyView" ref="1026901693"/>
-								<int key="NSsFlags">256</int>
-								<reference key="NSTarget" ref="902227095"/>
-								<string key="NSAction">_doScroller:</string>
-								<double key="NSPercent">0.99521531100478466</double>
-							</object>
-							<object class="NSScroller" id="1026901693">
-								<reference key="NSNextResponder" ref="902227095"/>
-								<int key="NSvFlags">-2147483392</int>
-								<string key="NSFrame">{{1, 215}, {335, 11}}</string>
-								<reference key="NSSuperview" ref="902227095"/>
-								<reference key="NSWindow"/>
-								<reference key="NSNextKeyView" ref="456525247"/>
-								<int key="NSsFlags">257</int>
-								<reference key="NSTarget" ref="902227095"/>
-								<string key="NSAction">_doScroller:</string>
-								<double key="NSPercent">0.97953216374269003</double>
-							</object>
-							<object class="NSClipView" id="805572887">
-								<reference key="NSNextResponder" ref="902227095"/>
-								<int key="NSvFlags">2304</int>
-								<array class="NSMutableArray" key="NSSubviews">
-									<reference ref="491528206"/>
-								</array>
-								<string key="NSFrame">{{1, 0}, {332, 17}}</string>
-								<reference key="NSSuperview" ref="902227095"/>
-								<reference key="NSWindow"/>
-								<reference key="NSNextKeyView" ref="491528206"/>
-								<reference key="NSDocView" ref="491528206"/>
-								<reference key="NSBGColor" ref="907173649"/>
-								<int key="NScvFlags">4</int>
-							</object>
-						</array>
-						<string key="NSFrame">{{10, 44}, {334, 227}}</string>
-						<reference key="NSSuperview" ref="360777202"/>
-						<reference key="NSWindow"/>
-						<reference key="NSNextKeyView" ref="805572887"/>
-						<int key="NSsFlags">133682</int>
-						<reference key="NSVScroller" ref="290419194"/>
-						<reference key="NSHScroller" ref="1026901693"/>
-						<reference key="NSContentView" ref="91099094"/>
-						<reference key="NSHeaderClipView" ref="805572887"/>
-						<bytes key="NSScrollAmts">AAAAAAAAAABBgAAAQYAAAA</bytes>
-					</object>
-					<object class="NSScrollView" id="19947409">
-						<reference key="NSNextResponder" ref="360777202"/>
-						<int key="NSvFlags">266</int>
-						<array class="NSMutableArray" key="NSSubviews">
-							<object class="NSClipView" id="810248708">
-								<reference key="NSNextResponder" ref="19947409"/>
-								<int key="NSvFlags">2304</int>
-								<array class="NSMutableArray" key="NSSubviews">
-									<object class="NSTableView" id="804988141">
-										<reference key="NSNextResponder" ref="810248708"/>
-										<int key="NSvFlags">256</int>
-										<string key="NSFrameSize">{332, 48}</string>
-										<reference key="NSSuperview" ref="810248708"/>
-										<reference key="NSWindow"/>
-										<reference key="NSNextKeyView" ref="163772156"/>
-										<bool key="NSEnabled">YES</bool>
-										<object class="NSTableHeaderView" key="NSHeaderView" id="496895863">
-											<reference key="NSNextResponder" ref="649295662"/>
-											<int key="NSvFlags">256</int>
-											<string key="NSFrameSize">{332, 17}</string>
-											<reference key="NSSuperview" ref="649295662"/>
-											<reference key="NSWindow"/>
-											<reference key="NSNextKeyView" ref="810248708"/>
-											<reference key="NSTableView" ref="804988141"/>
-										</object>
-										<object class="_NSCornerView" key="NSCornerView">
-											<nil key="NSNextResponder"/>
-											<int key="NSvFlags">-2147483392</int>
-											<string key="NSFrame">{{-22, 0}, {12, 17}}</string>
-										</object>
-										<array class="NSMutableArray" key="NSTableColumns">
-											<object class="NSTableColumn" id="108058264">
-												<string key="NSIdentifier">Address</string>
-												<double key="NSWidth">288</double>
-												<double key="NSMinWidth">10</double>
-												<double key="NSMaxWidth">10000</double>
-												<object class="NSTableHeaderCell" key="NSHeaderCell">
-													<int key="NSCellFlags">75628096</int>
-													<int key="NSCellFlags2">2048</int>
-													<string key="NSContents">Web Seeds</string>
-													<reference key="NSSupport" ref="26"/>
-													<reference key="NSBackgroundColor" ref="5410140"/>
-													<reference key="NSTextColor" ref="841384021"/>
-												</object>
-												<object class="NSTextFieldCell" key="NSDataCell" id="128109287">
-													<int key="NSCellFlags">337772096</int>
-													<int key="NSCellFlags2">2048</int>
-													<string key="NSContents">Text Cell</string>
-													<reference key="NSSupport" ref="26"/>
-													<reference key="NSControlView" ref="804988141"/>
-													<reference key="NSBackgroundColor" ref="907173649"/>
-													<reference key="NSTextColor" ref="612008619"/>
-												</object>
-												<int key="NSResizingMask">3</int>
-												<bool key="NSIsResizeable">YES</bool>
-												<reference key="NSTableView" ref="804988141"/>
-												<object class="NSSortDescriptor" key="NSSortDescriptorPrototype" id="946902179">
-													<string key="NSKey">Address</string>
-													<bool key="NSAscending">YES</bool>
-													<string key="NSSelector">localizedCaseInsensitiveCompare:</string>
-												</object>
-											</object>
-											<object class="NSTableColumn" id="324182690">
-												<string key="NSIdentifier">DL From</string>
-												<double key="NSWidth">38</double>
-												<double key="NSMinWidth">18</double>
-												<double key="NSMaxWidth">60</double>
-												<object class="NSTableHeaderCell" key="NSHeaderCell">
-													<int key="NSCellFlags">75628096</int>
-													<int key="NSCellFlags2">2048</int>
-													<string key="NSContents">DL</string>
-													<reference key="NSSupport" ref="26"/>
-													<reference key="NSBackgroundColor" ref="5410140"/>
-													<reference key="NSTextColor" ref="841384021"/>
-												</object>
-												<object class="NSTextFieldCell" key="NSDataCell" id="645756468">
-													<int key="NSCellFlags">337772096</int>
-													<int key="NSCellFlags2">2048</int>
-													<string key="NSContents">Text Cell</string>
-													<object class="NSFont" key="NSSupport">
-														<string key="NSName">LucidaGrande</string>
-														<double key="NSSize">11</double>
-														<int key="NSfFlags">16</int>
-													</object>
-													<reference key="NSControlView" ref="804988141"/>
-													<reference key="NSBackgroundColor" ref="907173649"/>
-													<reference key="NSTextColor" ref="612008619"/>
-												</object>
-												<int key="NSResizingMask">2</int>
-												<bool key="NSIsResizeable">YES</bool>
-												<reference key="NSTableView" ref="804988141"/>
-												<object class="NSSortDescriptor" key="NSSortDescriptorPrototype">
-													<string key="NSKey">DL From Rate</string>
-													<bool key="NSAscending">YES</bool>
-													<string key="NSSelector">compare:</string>
-												</object>
-											</object>
-										</array>
-										<double key="NSIntercellSpacingWidth">3</double>
-										<double key="NSIntercellSpacingHeight">2</double>
-										<reference key="NSBackgroundColor" ref="388713163"/>
-										<reference key="NSGridColor" ref="603390146"/>
-										<double key="NSRowHeight">14</double>
-										<int key="NSTvFlags">-608141312</int>
-										<reference key="NSDelegate"/>
-										<reference key="NSDataSource"/>
-										<string key="NSAutosaveName">InspectorTableWebSeeds</string>
-										<array key="NSSortDescriptors">
-											<reference ref="946902179"/>
-										</array>
-										<int key="NSColumnAutoresizingStyle">1</int>
-										<int key="NSDraggingSourceMaskForLocal">15</int>
-										<int key="NSDraggingSourceMaskForNonLocal">0</int>
-										<bool key="NSAllowsTypeSelect">NO</bool>
-										<int key="NSTableViewDraggingDestinationStyle">0</int>
-										<int key="NSTableViewGroupRowStyle">1</int>
-									</object>
-								</array>
-								<string key="NSFrame">{{1, 17}, {332, 48}}</string>
-								<reference key="NSSuperview" ref="19947409"/>
-								<reference key="NSWindow"/>
-								<reference key="NSNextKeyView" ref="804988141"/>
-								<reference key="NSDocView" ref="804988141"/>
-								<reference key="NSBGColor" ref="907173649"/>
-								<int key="NScvFlags">4</int>
-							</object>
-							<object class="NSScroller" id="163772156">
-								<reference key="NSNextResponder" ref="19947409"/>
-								<int key="NSvFlags">-2147483392</int>
-								<string key="NSFrame">{{328, 17}, {11, 37}}</string>
-								<reference key="NSSuperview" ref="19947409"/>
-								<reference key="NSWindow"/>
-								<reference key="NSNextKeyView" ref="981295629"/>
-								<int key="NSsFlags">256</int>
-								<reference key="NSTarget" ref="19947409"/>
-								<string key="NSAction">_doScroller:</string>
-								<double key="NSPercent">0.77083330000000005</double>
-							</object>
-							<object class="NSScroller" id="981295629">
-								<reference key="NSNextResponder" ref="19947409"/>
-								<int key="NSvFlags">-2147483392</int>
-								<string key="NSFrame">{{1, 54}, {327, 11}}</string>
-								<reference key="NSSuperview" ref="19947409"/>
-								<reference key="NSWindow"/>
-								<reference key="NSNextKeyView" ref="902227095"/>
-								<int key="NSsFlags">257</int>
-								<reference key="NSTarget" ref="19947409"/>
-								<string key="NSAction">_doScroller:</string>
-								<double key="NSPercent">0.89182059999999996</double>
-							</object>
-							<object class="NSClipView" id="649295662">
-								<reference key="NSNextResponder" ref="19947409"/>
-								<int key="NSvFlags">2304</int>
-								<array class="NSMutableArray" key="NSSubviews">
-									<reference ref="496895863"/>
-								</array>
-								<string key="NSFrame">{{1, 0}, {332, 17}}</string>
-								<reference key="NSSuperview" ref="19947409"/>
-								<reference key="NSWindow"/>
-								<reference key="NSNextKeyView" ref="496895863"/>
-								<reference key="NSDocView" ref="496895863"/>
-								<reference key="NSBGColor" ref="907173649"/>
-								<int key="NScvFlags">4</int>
-							</object>
-						</array>
-						<string key="NSFrame">{{10, 275}, {334, 66}}</string>
-						<reference key="NSSuperview" ref="360777202"/>
-						<reference key="NSWindow"/>
-						<reference key="NSNextKeyView" ref="649295662"/>
-						<int key="NSsFlags">133682</int>
-						<reference key="NSVScroller" ref="163772156"/>
-						<reference key="NSHScroller" ref="981295629"/>
-						<reference key="NSContentView" ref="810248708"/>
-						<reference key="NSHeaderClipView" ref="649295662"/>
-						<bytes key="NSScrollAmts">AAAAAAAAAABBgAAAQYAAAA</bytes>
-					</object>
-				</array>
-				<string key="NSFrameSize">{354, 346}</string>
-				<reference key="NSSuperview"/>
-				<reference key="NSWindow"/>
-				<reference key="NSNextKeyView" ref="19947409"/>
-				<string key="NSClassName">NSView</string>
-				<string key="NSExtension">NSResponder</string>
-			</object>
-		</array>
-		<object class="IBObjectContainer" key="IBDocument.Objects">
-			<array class="NSMutableArray" key="connectionRecords">
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">fConnectedPeersField</string>
-						<reference key="source" ref="1001"/>
-						<reference key="destination" ref="456525247"/>
-					</object>
-					<int key="connectionID">31</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">view</string>
-						<reference key="source" ref="1001"/>
-						<reference key="destination" ref="360777202"/>
-					</object>
-					<int key="connectionID">32</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">fPeerTable</string>
-						<reference key="source" ref="1001"/>
-						<reference key="destination" ref="298614287"/>
-					</object>
-					<int key="connectionID">37</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">fWebSeedTable</string>
-						<reference key="source" ref="1001"/>
-						<reference key="destination" ref="804988141"/>
-					</object>
-					<int key="connectionID">38</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">dataSource</string>
-						<reference key="source" ref="298614287"/>
-						<reference key="destination" ref="1001"/>
-					</object>
-					<int key="connectionID">33</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">delegate</string>
-						<reference key="source" ref="298614287"/>
-						<reference key="destination" ref="1001"/>
-					</object>
-					<int key="connectionID">34</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">delegate</string>
-						<reference key="source" ref="804988141"/>
-						<reference key="destination" ref="1001"/>
-					</object>
-					<int key="connectionID">35</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">dataSource</string>
-						<reference key="source" ref="804988141"/>
-						<reference key="destination" ref="1001"/>
-					</object>
-					<int key="connectionID">36</int>
-				</object>
-			</array>
-			<object class="IBMutableOrderedSet" key="objectRecords">
-				<array key="orderedObjects">
-					<object class="IBObjectRecord">
-						<int key="objectID">0</int>
-						<array key="object" id="0"/>
-						<reference key="children" ref="1000"/>
-						<nil key="parent"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">-2</int>
-						<reference key="object" ref="1001"/>
-						<reference key="parent" ref="0"/>
-						<string key="objectName">File's Owner</string>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">-1</int>
-						<reference key="object" ref="1003"/>
-						<reference key="parent" ref="0"/>
-						<string key="objectName">First Responder</string>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">-3</int>
-						<reference key="object" ref="1004"/>
-						<reference key="parent" ref="0"/>
-						<string key="objectName">Application</string>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">2</int>
-						<reference key="object" ref="360777202"/>
-						<array class="NSMutableArray" key="children">
-							<reference ref="456525247"/>
-							<reference ref="19947409"/>
-							<reference ref="902227095"/>
-						</array>
-						<reference key="parent" ref="0"/>
-						<string key="objectName">Peers</string>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">3</int>
-						<reference key="object" ref="456525247"/>
-						<array class="NSMutableArray" key="children">
-							<reference ref="524548358"/>
-						</array>
-						<reference key="parent" ref="360777202"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">4</int>
-						<reference key="object" ref="19947409"/>
-						<array class="NSMutableArray" key="children">
-							<reference ref="804988141"/>
-							<reference ref="163772156"/>
-							<reference ref="981295629"/>
-							<reference ref="496895863"/>
-						</array>
-						<reference key="parent" ref="360777202"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">5</int>
-						<reference key="object" ref="902227095"/>
-						<array class="NSMutableArray" key="children">
-							<reference ref="491528206"/>
-							<reference ref="1026901693"/>
-							<reference ref="290419194"/>
-							<reference ref="298614287"/>
-						</array>
-						<reference key="parent" ref="360777202"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">6</int>
-						<reference key="object" ref="491528206"/>
-						<reference key="parent" ref="902227095"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">7</int>
-						<reference key="object" ref="1026901693"/>
-						<reference key="parent" ref="902227095"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">8</int>
-						<reference key="object" ref="290419194"/>
-						<reference key="parent" ref="902227095"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">9</int>
-						<reference key="object" ref="298614287"/>
-						<array class="NSMutableArray" key="children">
-							<reference ref="364077053"/>
-							<reference ref="625040704"/>
-							<reference ref="615644455"/>
-							<reference ref="95906117"/>
-							<reference ref="923653991"/>
-							<reference ref="609419005"/>
-						</array>
-						<reference key="parent" ref="902227095"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">10</int>
-						<reference key="object" ref="364077053"/>
-						<array class="NSMutableArray" key="children">
-							<reference ref="588366726"/>
-						</array>
-						<reference key="parent" ref="298614287"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">11</int>
-						<reference key="object" ref="625040704"/>
-						<array class="NSMutableArray" key="children">
-							<reference ref="461918787"/>
-						</array>
-						<reference key="parent" ref="298614287"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">12</int>
-						<reference key="object" ref="615644455"/>
-						<array class="NSMutableArray" key="children">
-							<reference ref="377059204"/>
-						</array>
-						<reference key="parent" ref="298614287"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">13</int>
-						<reference key="object" ref="95906117"/>
-						<array class="NSMutableArray" key="children">
-							<reference ref="421796553"/>
-						</array>
-						<reference key="parent" ref="298614287"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">14</int>
-						<reference key="object" ref="923653991"/>
-						<array class="NSMutableArray" key="children">
-							<reference ref="467327927"/>
-						</array>
-						<reference key="parent" ref="298614287"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">15</int>
-						<reference key="object" ref="609419005"/>
-						<array class="NSMutableArray" key="children">
-							<reference ref="765769369"/>
-						</array>
-						<reference key="parent" ref="298614287"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">16</int>
-						<reference key="object" ref="765769369"/>
-						<reference key="parent" ref="609419005"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">17</int>
-						<reference key="object" ref="467327927"/>
-						<reference key="parent" ref="923653991"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">18</int>
-						<reference key="object" ref="421796553"/>
-						<reference key="parent" ref="95906117"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">19</int>
-						<reference key="object" ref="377059204"/>
-						<reference key="parent" ref="615644455"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">20</int>
-						<reference key="object" ref="461918787"/>
-						<reference key="parent" ref="625040704"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">21</int>
-						<reference key="object" ref="588366726"/>
-						<reference key="parent" ref="364077053"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">22</int>
-						<reference key="object" ref="804988141"/>
-						<array class="NSMutableArray" key="children">
-							<reference ref="324182690"/>
-							<reference ref="108058264"/>
-						</array>
-						<reference key="parent" ref="19947409"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">23</int>
-						<reference key="object" ref="163772156"/>
-						<reference key="parent" ref="19947409"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">24</int>
-						<reference key="object" ref="981295629"/>
-						<reference key="parent" ref="19947409"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">25</int>
-						<reference key="object" ref="496895863"/>
-						<reference key="parent" ref="19947409"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">26</int>
-						<reference key="object" ref="324182690"/>
-						<array class="NSMutableArray" key="children">
-							<reference ref="645756468"/>
-						</array>
-						<reference key="parent" ref="804988141"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">27</int>
-						<reference key="object" ref="108058264"/>
-						<array class="NSMutableArray" key="children">
-							<reference ref="128109287"/>
-						</array>
-						<reference key="parent" ref="804988141"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">28</int>
-						<reference key="object" ref="128109287"/>
-						<reference key="parent" ref="108058264"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">29</int>
-						<reference key="object" ref="645756468"/>
-						<reference key="parent" ref="324182690"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">30</int>
-						<reference key="object" ref="524548358"/>
-						<reference key="parent" ref="456525247"/>
-					</object>
-				</array>
-			</object>
-			<dictionary class="NSMutableDictionary" key="flattenedProperties">
-				<string key="-1.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<string key="-2.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<string key="-3.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<string key="10.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<string key="11.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<string key="12.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<string key="13.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<string key="14.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<string key="15.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<string key="16.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<string key="17.CustomClassName">PeerProgressIndicatorCell</string>
-				<string key="17.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<string key="18.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="18.IBShouldRemoveOnLegacySave"/>
-				<string key="19.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="19.IBShouldRemoveOnLegacySave"/>
-				<string key="2.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<string key="20.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="20.IBShouldRemoveOnLegacySave"/>
-				<string key="21.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="21.IBShouldRemoveOnLegacySave"/>
-				<string key="22.CustomClassName">WebSeedTableView</string>
-				<string key="22.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<string key="23.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="23.IBShouldRemoveOnLegacySave"/>
-				<string key="24.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="24.IBShouldRemoveOnLegacySave"/>
-				<string key="25.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="25.IBShouldRemoveOnLegacySave"/>
-				<string key="26.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<string key="27.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<string key="28.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="28.IBShouldRemoveOnLegacySave"/>
-				<string key="29.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<string key="3.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<string key="30.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<string key="4.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<string key="5.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<string key="6.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="6.IBShouldRemoveOnLegacySave"/>
-				<string key="7.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="7.IBShouldRemoveOnLegacySave"/>
-				<string key="8.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<integer value="1" key="8.IBShouldRemoveOnLegacySave"/>
-				<string key="9.CustomClassName">PeerTableView</string>
-				<string key="9.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-			</dictionary>
-			<dictionary class="NSMutableDictionary" key="unlocalizedProperties"/>
-			<nil key="activeLocalization"/>
-			<dictionary class="NSMutableDictionary" key="localizations"/>
-			<nil key="sourceID"/>
-			<int key="maxID">38</int>
-		</object>
-		<object class="IBClassDescriber" key="IBDocument.Classes">
-			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
-				<object class="IBPartialClassDescription">
-					<string key="className">InfoPeersViewController</string>
-					<string key="superclassName">NSViewController</string>
-					<dictionary class="NSMutableDictionary" key="outlets">
-						<string key="fConnectedPeersField">NSTextField</string>
-						<string key="fPeerTable">NSTableView</string>
-						<string key="fWebSeedTable">NSTableView</string>
-					</dictionary>
-					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
-						<object class="IBToOneOutletInfo" key="fConnectedPeersField">
-							<string key="name">fConnectedPeersField</string>
-							<string key="candidateClassName">NSTextField</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="fPeerTable">
-							<string key="name">fPeerTable</string>
-							<string key="candidateClassName">NSTableView</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="fWebSeedTable">
-							<string key="name">fWebSeedTable</string>
-							<string key="candidateClassName">NSTableView</string>
-						</object>
-					</dictionary>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">./Classes/InfoPeersViewController.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">PeerProgressIndicatorCell</string>
-					<string key="superclassName">NSLevelIndicatorCell</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">./Classes/PeerProgressIndicatorCell.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">PeerTableView</string>
-					<string key="superclassName">NSTableView</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">./Classes/PeerTableView.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">WebSeedTableView</string>
-					<string key="superclassName">NSTableView</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">./Classes/WebSeedTableView.h</string>
-					</object>
-				</object>
-			</array>
-		</object>
-		<int key="IBDocument.localizationMode">0</int>
-		<string key="IBDocument.TargetRuntimeIdentifier">IBCocoaFramework</string>
-		<object class="NSMutableDictionary" key="IBDocument.PluginDeclaredDependencies">
-			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin.macosx</string>
-			<real value="1060" key="NS.object.0"/>
-		</object>
-		<object class="NSMutableDictionary" key="IBDocument.PluginDeclaredDependencyDefaults">
-			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin.macosx</string>
-			<real value="1070" key="NS.object.0"/>
-		</object>
-		<bool key="IBDocument.PluginDeclaredDependenciesTrackSystemTargetVersion">YES</bool>
-		<int key="IBDocument.defaultPropertyAccessControl">3</int>
-	</data>
-</archive>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="9531" systemVersion="15B42" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+    <dependencies>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="9531"/>
+    </dependencies>
+    <objects>
+        <customObject id="-2" userLabel="File's Owner" customClass="InfoPeersViewController">
+            <connections>
+                <outlet property="fConnectedPeersField" destination="3" id="31"/>
+                <outlet property="fPeerTable" destination="9" id="37"/>
+                <outlet property="fWebSeedTable" destination="22" id="38"/>
+                <outlet property="view" destination="2" id="32"/>
+            </connections>
+        </customObject>
+        <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
+        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
+        <customView id="2" userLabel="Peers">
+            <rect key="frame" x="0.0" y="0.0" width="354" height="346"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <scrollView autohidesScrollers="YES" horizontalLineScroll="16" horizontalPageScroll="0.0" verticalLineScroll="16" verticalPageScroll="0.0" usesPredominantAxisScrolling="NO" id="4">
+                    <rect key="frame" x="10" y="275" width="334" height="66"/>
+                    <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                    <clipView key="contentView" id="3cX-mp-ymB">
+                        <rect key="frame" x="1" y="23" width="332" height="42"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" alternatingRowBackgroundColors="YES" typeSelect="NO" autosaveName="InspectorTableWebSeeds" rowHeight="14" headerView="25" id="22" customClass="WebSeedTableView">
+                                <rect key="frame" x="0.0" y="0.0" width="332" height="16"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <size key="intercellSpacing" width="3" height="2"/>
+                                <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
+                                <tableColumns>
+                                    <tableColumn identifier="Address" editable="NO" width="288" minWidth="10" maxWidth="10000" id="27">
+                                        <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Web Seeds">
+                                            <font key="font" metaFont="smallSystem"/>
+                                            <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
+                                        </tableHeaderCell>
+                                        <textFieldCell key="dataCell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" alignment="left" title="Text Cell" id="28">
+                                            <font key="font" metaFont="smallSystem"/>
+                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                        </textFieldCell>
+                                        <sortDescriptor key="sortDescriptorPrototype" selector="localizedCaseInsensitiveCompare:" sortKey="Address"/>
+                                        <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
+                                    </tableColumn>
+                                    <tableColumn identifier="DL From" editable="NO" width="38" minWidth="18" maxWidth="60" id="26">
+                                        <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="DL">
+                                            <font key="font" metaFont="smallSystem"/>
+                                            <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
+                                        </tableHeaderCell>
+                                        <textFieldCell key="dataCell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" alignment="left" title="Text Cell" id="29">
+                                            <font key="font" metaFont="smallSystem"/>
+                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                        </textFieldCell>
+                                        <sortDescriptor key="sortDescriptorPrototype" selector="compare:" sortKey="DL From Rate"/>
+                                        <tableColumnResizingMask key="resizingMask" userResizable="YES"/>
+                                    </tableColumn>
+                                </tableColumns>
+                                <connections>
+                                    <outlet property="dataSource" destination="-2" id="36"/>
+                                    <outlet property="delegate" destination="-2" id="35"/>
+                                </connections>
+                            </tableView>
+                        </subviews>
+                        <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </clipView>
+                    <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" controlSize="small" horizontal="YES" id="24">
+                        <rect key="frame" x="1" y="54" width="327" height="11"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </scroller>
+                    <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" controlSize="small" horizontal="NO" id="23">
+                        <rect key="frame" x="328" y="17" width="11" height="37"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </scroller>
+                    <tableHeaderView key="headerView" id="25">
+                        <rect key="frame" x="0.0" y="0.0" width="332" height="23"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </tableHeaderView>
+                </scrollView>
+                <scrollView autohidesScrollers="YES" horizontalLineScroll="16" horizontalPageScroll="0.0" verticalLineScroll="16" verticalPageScroll="0.0" usesPredominantAxisScrolling="NO" id="5">
+                    <rect key="frame" x="10" y="44" width="334" height="227"/>
+                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                    <clipView key="contentView" id="epQ-kx-kDE">
+                        <rect key="frame" x="1" y="23" width="332" height="203"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" alternatingRowBackgroundColors="YES" multipleSelection="NO" typeSelect="NO" autosaveName="InspectorTable" rowHeight="14" headerView="6" id="9" customClass="PeerTableView">
+                                <rect key="frame" x="0.0" y="0.0" width="332" height="16"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <size key="intercellSpacing" width="3" height="2"/>
+                                <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
+                                <tableColumns>
+                                    <tableColumn identifier="IP" editable="NO" width="98" minWidth="10" maxWidth="250" id="11">
+                                        <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="IP Address">
+                                            <font key="font" metaFont="smallSystem"/>
+                                            <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
+                                        </tableHeaderCell>
+                                        <textFieldCell key="dataCell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" alignment="left" title="Text Cell" id="20">
+                                            <font key="font" metaFont="smallSystem"/>
+                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                        </textFieldCell>
+                                        <sortDescriptor key="sortDescriptorPrototype" selector="compareNumeric:" sortKey="IP"/>
+                                        <tableColumnResizingMask key="resizingMask" userResizable="YES"/>
+                                    </tableColumn>
+                                    <tableColumn identifier="Client" editable="NO" width="76" minWidth="20" maxWidth="10000" id="12">
+                                        <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Client">
+                                            <font key="font" metaFont="smallSystem"/>
+                                            <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="backgroundColor" white="0.33333299" alpha="1" colorSpace="calibratedWhite"/>
+                                        </tableHeaderCell>
+                                        <textFieldCell key="dataCell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" alignment="left" title="Text Cell" id="19">
+                                            <font key="font" metaFont="smallSystem"/>
+                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                        </textFieldCell>
+                                        <sortDescriptor key="sortDescriptorPrototype" selector="localizedStandardCompare:" sortKey="Client"/>
+                                        <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
+                                    </tableColumn>
+                                    <tableColumn identifier="Encryption" editable="NO" width="14" minWidth="14" maxWidth="14" id="15">
+                                        <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left">
+                                            <font key="font" metaFont="smallSystem"/>
+                                            <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
+                                        </tableHeaderCell>
+                                        <imageCell key="dataCell" refusesFirstResponder="YES" alignment="left" animates="YES" imageScaling="proportionallyDown" image="59C1959B-24E0-4539-A0D8-B946BA4886D1" id="16"/>
+                                        <sortDescriptor key="sortDescriptorPrototype" selector="compare:" sortKey="Encryption" ascending="NO"/>
+                                    </tableColumn>
+                                    <tableColumn identifier="Progress" editable="NO" width="32" minWidth="10" maxWidth="1000" id="14">
+                                        <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="%">
+                                            <font key="font" metaFont="smallSystem"/>
+                                            <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
+                                        </tableHeaderCell>
+                                        <levelIndicatorCell key="dataCell" alignment="left" maxValue="1" warningValue="0.69999999999999996" criticalValue="0.29999999999999999" levelIndicatorStyle="continuousCapacity" id="17" customClass="PeerProgressIndicatorCell"/>
+                                        <sortDescriptor key="sortDescriptorPrototype" selector="compare:" sortKey="Progress"/>
+                                        <tableColumnResizingMask key="resizingMask" userResizable="YES"/>
+                                    </tableColumn>
+                                    <tableColumn identifier="DL From" editable="NO" width="47" minWidth="18.104489999999998" maxWidth="60" id="10">
+                                        <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="DL">
+                                            <font key="font" metaFont="smallSystem"/>
+                                            <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
+                                        </tableHeaderCell>
+                                        <textFieldCell key="dataCell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" alignment="right" title="Text Cell" id="21">
+                                            <font key="font" metaFont="smallSystem"/>
+                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                        </textFieldCell>
+                                        <sortDescriptor key="sortDescriptorPrototype" selector="compare:" sortKey="DL From Rate" ascending="NO"/>
+                                        <tableColumnResizingMask key="resizingMask" userResizable="YES"/>
+                                    </tableColumn>
+                                    <tableColumn identifier="UL To" editable="NO" width="47" minWidth="18" maxWidth="60" id="13">
+                                        <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="UL">
+                                            <font key="font" metaFont="smallSystem"/>
+                                            <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
+                                        </tableHeaderCell>
+                                        <textFieldCell key="dataCell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" alignment="right" title="Text Cell" id="18">
+                                            <font key="font" metaFont="smallSystem"/>
+                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                        </textFieldCell>
+                                        <sortDescriptor key="sortDescriptorPrototype" selector="compare:" sortKey="UL To Rate" ascending="NO"/>
+                                        <tableColumnResizingMask key="resizingMask" userResizable="YES"/>
+                                    </tableColumn>
+                                </tableColumns>
+                                <connections>
+                                    <outlet property="dataSource" destination="-2" id="33"/>
+                                    <outlet property="delegate" destination="-2" id="34"/>
+                                </connections>
+                            </tableView>
+                        </subviews>
+                        <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </clipView>
+                    <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" controlSize="small" horizontal="YES" id="7">
+                        <rect key="frame" x="1" y="215" width="335" height="11"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </scroller>
+                    <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" controlSize="small" horizontal="NO" id="8">
+                        <rect key="frame" x="328" y="17" width="11" height="117"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </scroller>
+                    <tableHeaderView key="headerView" id="6">
+                        <rect key="frame" x="0.0" y="0.0" width="332" height="23"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </tableHeaderView>
+                </scrollView>
+                <textField verticalHuggingPriority="750" id="3">
+                    <rect key="frame" x="7" y="10" width="340" height="28"/>
+                    <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+                    <textFieldCell key="cell" controlSize="small" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="center" placeholderString="no peer info available" id="30">
+                        <font key="font" metaFont="smallSystem"/>
+                        <string key="title">Multiline Label
+Multiline Label</string>
+                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+            </subviews>
+        </customView>
+    </objects>
+    <resources>
+        <image name="59C1959B-24E0-4539-A0D8-B946BA4886D1" width="14" height="14">
+            <mutableData key="keyedArchiveRepresentation">
+YnBsaXN0MDDUAQIDBAUGPT5YJHZlcnNpb25YJG9iamVjdHNZJGFyY2hpdmVyVCR0b3ASAAGGoK4HCBMU
+GR4fIyQrLjE3OlUkbnVsbNUJCgsMDQ4PEBESVk5TU2l6ZVYkY2xhc3NcTlNJbWFnZUZsYWdzVk5TUmVw
+c1dOU0NvbG9ygAKADRIgwAAAgAOAC1h7MTQsIDE0fdIVChYYWk5TLm9iamVjdHOhF4AEgArSFQoaHaIb
+HIAFgAaACRAA0iAKISJfEBROU1RJRkZSZXByZXNlbnRhdGlvboAHgAhPERxuTU0AKgAADEgAAAAAAAAA
+AAAAAAAAAAAAAAAAAAMBAAcVCQE3Hw4CSlArDoxSLA6RMRoIZygVB1sSCQBCDgcAPAsEADQKBAAyBgAA
+KQUAACYAAAAeAAAAGgAAABAAAAANAAAABgAAAAUAAAACAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAABAAAA
+AQEBAQUEAgENFQoCOyERBE9cNRSWYTkWnEgsEXlAKA9vKhoJVyUXB1EgEQVJHg8FRhcLAzsVCQM4DQgC
+LQsHAikIAwEcBwMBGAMBABEDAQAOAAAABwAAAAYAAAAAAAAAAAAAAAEAAAACBAQEDAUFBRENDA0kEA4O
+LhwPCFYxHg5so3M3zrqEP+DQlUjm0JNH5bd8N9mwdDLUnF0lw5VXIr19SRqqdUQYo101EYtUMA+COB4J
+ZDAZB1wcDgJLFgsBRAUBACYCAAAdAAAABgAAAAIAAAABAAAAAwYGBhEJCQkZFxYXQRsZGU0jGRNrNycY
+gKt7PdnEjUbq56pV+eqrVfnUk0bwzYxB7Lt2Mty0by7Xm2Emw5RcI7x8Shmoc0QWn1UwEIFLKQ15MBgF
+ZiYTBFsIAgAuAwAAIgAAAAYAAAACAAAAAAICAgYODg8qGRkaRlBRUc9WWFjjSEtN2FBOSdmPbT7rpXtC
+8Oq2Zvz1wG3+98Rx+/fEcPv0u2P59Llf+PGzVfjwr1D37aFB8uqaPPHbfy3uznQo6I5JGst0OhWzGgsC
+PwoDACcBAAAFAAAAAAAAAAACAgIHERITMh4fIFFdXl7nZmdo/VpfYutfYF3qjW5H76B7SfHpuGz99sNz
+/vzNev39zXj9+sNq/vrBZv76vFv/+rlX//2sR//8pkL/8Y0y/+OBLfqcUR3bf0AXwh4PBksNBgMxAQAA
+BwAAAAEAAAAAAwMDCRobHEQpKixjcHN16YGEh/+foaf8oqGl/JSEef2diHP937t9/+zGf//90oP//M9/
+/+auZP/ip1//2qFY/9ufVf/tnEn/8JpE//GPOP/jhTP6jlAg3HNCHcsoHxiAGRYVZgQEBBUBAQEHAAAA
+AAQEBAocHh9MLC4wa3Z6feqJjZD/s7S4/7a1t/+fkon/pJOC/927gP/pxID//NKF//vOgP/hqWL/3KJd
+/9KaXf/UmVr/6ppK/+6YRv/ykTn/5Yc1+45XKuB0SifSMikjmCIgH34FBQUZAQEBCQEBAQQGBgcSJykq
+aTk7PYiFiJLunqGo/+rl1//y69r/2M27/9TFr//VtIb/2raA//XMgv/1yH3/1p9i/8+YYf/Cl3j/xZh2
+/+ObUv/pm0v/8ZpD/+eWRf+lfFv6kXNd+FpaVu5HS0vRDg4OLQQEBBIBAQEFBwcHFSssLnE9P0KQiYyW
+8KKlrP/y7tz//PXf/+PWvv/dzLL/0rOI/9Wzgf/0y4L/9cl9/9qiZP/Tm2P/w5h6/8aYeP/lnVT/651N
+/++aRP/ml0j/q4Zn/5h+av5iY2D4TlNT2w8PDy4EBAQSAgICBwkKCho3OTuLSk1QqpCXofOorrT/8/LU
+//340v/v2qT/6NCa/8atkP/IrI3/8cuF//fNgf/zvGv/77Zn/9ugZ//bnmT/86lY//SoU//mlED/3pJG
+/7mYfv+okYP6Z2dk2lFUVLwNDQ4oAgICDwICAggKCgobOz0/lE5RVbKUmqP0q7G2//Px1P/+99D/8tue
+/+vRlP/IrY7/yKyM/+7Hgf/1yn3/98Fs//S7Z//goWD/4J5d//SsWP/1qlT/5JNA/9uRR/+7moH/qpSF
++WVlZdBPUlSyDQ0NJgICAg4EBAQMDQ4OIkZHSKhbXV/Goaet97e7vv/17tn///LS//vbkf/20ob/2rOB
+/9euff/er2n/47Jm//jAZ//3vWT/35lP/9+XTP/7r1L/+65Q/9+SQv/Vj0n/tZmF/6OSiPVZWVm1REZI
+lwoLCx0BAQEJBAQEDA4ODiNIS0yuXmFjzKarsPi7v8L/9u7c///z1v/53Jf/9NOL/9m0hP/VrX//16Rk
+/9ynYP/3v2f/971k/+KcTP/imkr/+7BR//uvUP/dk0T/05BL/7KYhv+fkIfzVFRUqz9BQ40JCgoaAQEB
+CAMEBQ8OEBEpU1ZWwWpubt+yuLr7xsvN//f39P/9+/T/6uTL/+LZv//Cq5//vZ6S/8GDYf/Jh1r/9b5k
+//vEY//0sVL/9K9P//6zT//6sE//2JRP/8yQV/+kkYP/kIV/70BBQoktLzFqBgYGFAAAAAUDBAUQDxAR
+KlVZWsdtcXPktbu8/MjOz//39/n//Pv6/+ro2P/j3c3/xamm/8CcmP/CgWj/yYVg//K9Zf/4xGP/+LdW
+//i1U//+s07/+q9O/9WVVP/JkFz/n4+B/4qCfe06OzuAJyoqYQUFBhEAAAAEBQUFERISEi1bYGLWc3l7
+87i8wv7JzdT/7PHz//P3+f/3+/n/9/Hu//evsv/yo6X/25mT/9qci//ntmz/7Ltm//zGYP/+xF3/+rJL
+//SsTP/OmWT/v5Rr/5CEfv96dXTpJigoYxYYGEQDAwMJAAAAAAYGBhQTExQwXWFj2nR5fPeyt77+wcfN
+/+Dm6//n7fH/8vb3//Xt7//7srT/96eo/9yioP/ZpJf/37Ju/+S3Z//8x2H//8Zd//mxS//yq0z/zZpp
+/76UcP+Jgnz+c3Fx5yMjI1wTFBQ9AgICCAAAAAALCwsgFxcYO2BhY+Nxc3b+jJSe/5Ocpv+gqrX/p7C7
+/8XJz//Ny8//4Lu4/9+5tf/EvLv/v7iy/7ygeP/Dom3/98Jh//7DXf/3q0v/8KVP/8efff+3mYL+fHh3
+8mVmaNkYGxtNCg0NLwEBAQYAAAAADAwMIBcXFzlYWVvSZmhr63uCiu+AiJHwiZOd9JCao/aws7r4uLe8
++cyyrfvMsaz7tLW1/rCxrf6tlXb/tpdr//O9YP/8v1z/9ahK/+2jT//Bm3z/sJSA/XVycuxfYGPSFhgY
+RwkLCyoBAQEFAAAAAAkJCRcNDQ0jJiYmZCsrK3M1NjaHOTo6j0dJSq5MTlC2XV1dzGFhYdJra2zgbW5v
+5WxydvNtcnT2dW5i/oV1Xf/bo1T/66lS/++hTP/km0//oH9l/4t2ZvlVV1fSRElLtxARETUHBwccAQEB
+BAAAAAAICAgTCgoKGxsbGkkeHh1UJCQjaCgoJ3A2NjaROzs7mkdHR7BKS0u3UlZXyFRYWs1XXmLdWV5h
+4mJeVu1yZlPxzpVO+t+dTfvqmkr/35RM/5J0Xfp9al3yS0xMxDs/QagPEBAvBwcHGAAAAAMAAAAAAQEB
+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
+QwBEAEYAYQByAGcAZQAtAEwAQwBEAEwAQwBEACAAVwBhAHIAbgBhAFMAegDtAG4AZQBzACAATABDAEQA
+QgBhAHIAZQB2AG4A/QAgAEwAQwBEAEwAQwBEAC0AZgBhAHIAdgBlAHMAawDmAHIAbQQaBD4EOwRMBD4E
+QAQ+BDIEOAQ5ACAATABDAEQgDwBMAEMARAAgBkUGRAZIBkYGKQBMAEMARAAgAGMAbwBsAG8AcgBpAEwA
+QwBEACAAYwBvAGwAbwByAEsAbABlAHUAcgBlAG4ALQBMAEMARCAPAEwAQwBEACAF5gXRBeIF1QXgBdkA
+VgDkAHIAaQAtAEwAQwBEX2mCcgAgAEwAQwBEAEwAQwBEACAATQDgAHUARgBhAHIAZQBiAG4A6QAgAEwA
+QwBEBCYEMgQ1BEIEPQQ+BDkAIAQWBBoALQQ0BDgEQQQ/BDsENQQ5AEwAQwBEACAAYwBvAHUAbABlAHUA
+cgBXAGEAcgBuAGEAIABMAEMARABMAEMARAAgAGUAbgAgAGMAbwBsAG8AcgBMAEMARAAgDioONQBGAGEA
+cgBiAC0ATABDAEQAQwBvAGwAbwByACAATABDAEQATABDAEQAIABDAG8AbABvAHIAaQBkAG8ASwBvAGwA
+bwByACAATABDAEQDiAOzA8cDwQPJA7wDtwAgA78DuAPMA70DtwAgAEwAQwBEAEYA5AByAGcALQBMAEMA
+RABSAGUAbgBrAGwAaQAgAEwAQwBEMKsw6TD8ACAATABDAEQATABDAEQAIABhACAAQwBvAHIAZQBzAAB0
+ZXh0AAAAAENvcHlyaWdodCBBcHBsZSBJbmMuLCAyMDE1AABYWVogAAAAAAAA8xYAAQAAAAEWylhZWiAA
+AAAAAABxwAAAOYoAAAFnWFlaIAAAAAAAAGEjAAC55gAAE/ZYWVogAAAAAAAAI/IAAAyQAAC90GN1cnYA
+AAAAAAAEAAAAAAUACgAPABQAGQAeACMAKAAtADIANgA7AEAARQBKAE8AVABZAF4AYwBoAG0AcgB3AHwA
+gQCGAIsAkACVAJoAnwCjAKgArQCyALcAvADBAMYAywDQANUA2wDgAOUA6wDwAPYA+wEBAQcBDQETARkB
+HwElASsBMgE4AT4BRQFMAVIBWQFgAWcBbgF1AXwBgwGLAZIBmgGhAakBsQG5AcEByQHRAdkB4QHpAfIB
++gIDAgwCFAIdAiYCLwI4AkECSwJUAl0CZwJxAnoChAKOApgCogKsArYCwQLLAtUC4ALrAvUDAAMLAxYD
+IQMtAzgDQwNPA1oDZgNyA34DigOWA6IDrgO6A8cD0wPgA+wD+QQGBBMEIAQtBDsESARVBGMEcQR+BIwE
+mgSoBLYExATTBOEE8AT+BQ0FHAUrBToFSQVYBWcFdwWGBZYFpgW1BcUF1QXlBfYGBgYWBicGNwZIBlkG
+agZ7BowGnQavBsAG0QbjBvUHBwcZBysHPQdPB2EHdAeGB5kHrAe/B9IH5Qf4CAsIHwgyCEYIWghuCIII
+lgiqCL4I0gjnCPsJEAklCToJTwlkCXkJjwmkCboJzwnlCfsKEQonCj0KVApqCoEKmAquCsUK3ArzCwsL
+Igs5C1ELaQuAC5gLsAvIC+EL+QwSDCoMQwxcDHUMjgynDMAM2QzzDQ0NJg1ADVoNdA2ODakNww3eDfgO
+Ew4uDkkOZA5/DpsOtg7SDu4PCQ8lD0EPXg96D5YPsw/PD+wQCRAmEEMQYRB+EJsQuRDXEPURExExEU8R
+bRGMEaoRyRHoEgcSJhJFEmQShBKjEsMS4xMDEyMTQxNjE4MTpBPFE+UUBhQnFEkUahSLFK0UzhTwFRIV
+NBVWFXgVmxW9FeAWAxYmFkkWbBaPFrIW1hb6Fx0XQRdlF4kXrhfSF/cYGxhAGGUYihivGNUY+hkgGUUZ
+axmRGbcZ3RoEGioaURp3Gp4axRrsGxQbOxtjG4obshvaHAIcKhxSHHscoxzMHPUdHh1HHXAdmR3DHewe
+Fh5AHmoelB6+HukfEx8+H2kflB+/H+ogFSBBIGwgmCDEIPAhHCFIIXUhoSHOIfsiJyJVIoIiryLdIwoj
+OCNmI5QjwiPwJB8kTSR8JKsk2iUJJTglaCWXJccl9yYnJlcmhya3JugnGCdJJ3onqyfcKA0oPyhxKKIo
+1CkGKTgpaymdKdAqAio1KmgqmyrPKwIrNitpK50r0SwFLDksbiyiLNctDC1BLXYtqy3hLhYuTC6CLrcu
+7i8kL1ovkS/HL/4wNTBsMKQw2zESMUoxgjG6MfIyKjJjMpsy1DMNM0YzfzO4M/E0KzRlNJ402DUTNU01
+hzXCNf02NzZyNq426TckN2A3nDfXOBQ4UDiMOMg5BTlCOX85vDn5OjY6dDqyOu87LTtrO6o76DwnPGU8
+pDzjPSI9YT2hPeA+ID5gPqA+4D8hP2E/oj/iQCNAZECmQOdBKUFqQaxB7kIwQnJCtUL3QzpDfUPARANE
+R0SKRM5FEkVVRZpF3kYiRmdGq0bwRzVHe0fASAVIS0iRSNdJHUljSalJ8Eo3Sn1KxEsMS1NLmkviTCpM
+cky6TQJNSk2TTdxOJU5uTrdPAE9JT5NP3VAnUHFQu1EGUVBRm1HmUjFSfFLHUxNTX1OqU/ZUQlSPVNtV
+KFV1VcJWD1ZcVqlW91dEV5JX4FgvWH1Yy1kaWWlZuFoHWlZaplr1W0VblVvlXDVchlzWXSddeF3JXhpe
+bF69Xw9fYV+zYAVgV2CqYPxhT2GiYfViSWKcYvBjQ2OXY+tkQGSUZOllPWWSZedmPWaSZuhnPWeTZ+lo
+P2iWaOxpQ2maafFqSGqfavdrT2una/9sV2yvbQhtYG25bhJua27Ebx5veG/RcCtwhnDgcTpxlXHwckty
+pnMBc11zuHQUdHB0zHUodYV14XY+dpt2+HdWd7N4EXhueMx5KnmJeed6RnqlewR7Y3vCfCF8gXzhfUF9
+oX4BfmJ+wn8jf4R/5YBHgKiBCoFrgc2CMIKSgvSDV4O6hB2EgITjhUeFq4YOhnKG14c7h5+IBIhpiM6J
+M4mZif6KZIrKizCLlov8jGOMyo0xjZiN/45mjs6PNo+ekAaQbpDWkT+RqJIRknqS45NNk7aUIJSKlPSV
+X5XJljSWn5cKl3WX4JhMmLiZJJmQmfyaaJrVm0Kbr5wcnImc951kndKeQJ6unx2fi5/6oGmg2KFHobai
+JqKWowajdqPmpFakx6U4pammGqaLpv2nbqfgqFKoxKk3qamqHKqPqwKrdavprFys0K1ErbiuLa6hrxav
+i7AAsHWw6rFgsdayS7LCszizrrQltJy1E7WKtgG2ebbwt2i34LhZuNG5SrnCuju6tbsuu6e8IbybvRW9
+j74KvoS+/796v/XAcMDswWfB48JfwtvDWMPUxFHEzsVLxcjGRsbDx0HHv8g9yLzJOsm5yjjKt8s2y7bM
+Ncy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp22vvb
+gNwF3IrdEN2W3hzeot8p36/gNuC94UThzOJT4tvjY+Pr5HPk/OWE5g3mlucf56noMui86Ubp0Opb6uXr
+cOv77IbtEe2c7ijutO9A78zwWPDl8XLx//KM8xnzp/Q09ML1UPXe9m32+/eK+Bn4qPk4+cf6V/rn+3f8
+B/yY/Sn9uv5L/tz/bf//cGFyYQAAAAAAAwAAAAJmZgAA8qcAAA1ZAAAT0AAACg52Y2d0AAAAAAAAAAEA
+AQAAAAAAAAABAAAAAQAAAAAAAAABAAAAAQAAAAAAAAABAABuZGluAAAAAAAAADYAAKdAAABVgAAATMAA
+AJ7AAAAlgAAADMAAAFAAAABUQAACMzMAAjMzAAIzMwAAAAAAAAAAc2YzMgAAAAAAAQxyAAAF+P//8x0A
+AAe6AAD9cv//+53///2kAAAD2QAAwHFtbW9kAAAAAAAABhAAAKAOAAAAAMnOfBgAAAAAAAAAAAAAAAAA
+AAAA0iUmJyhaJGNsYXNzbmFtZVgkY2xhc3Nlc18QEE5TQml0bWFwSW1hZ2VSZXCjJykqWk5TSW1hZ2VS
+ZXBYTlNPYmplY3TSJSYsLVdOU0FycmF5oiwq0iUmLzBeTlNNdXRhYmxlQXJyYXmjLywq0zIzCjQ1NldO
+U1doaXRlXE5TQ29sb3JTcGFjZUQwIDAAEAOADNIlJjg5V05TQ29sb3KiOCrSJSY7PFdOU0ltYWdlojsq
+XxAPTlNLZXllZEFyY2hpdmVy0T9AVHJvb3SAAQAIABEAGgAjAC0AMgA3AEYATABXAF4AZQByAHkAgQCD
+AIUAigCMAI4AlwCcAKcAqQCrAK0AsgC1ALcAuQC7AL0AwgDZANsA3R1PHVQdXx1oHXsdfx2KHZMdmB2g
+HaMdqB23Hbsdwh3KHdcd3B3eHeAd5R3tHfAd9R39HgAeEh4VHhoAAAAAAAACAQAAAAAAAABBAAAAAAAA
+AAAAAAAAAAAeHA
+</mutableData>
+        </image>
+    </resources>
+</document>
