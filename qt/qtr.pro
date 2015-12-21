@@ -19,7 +19,7 @@ greaterThan(QT_MAJOR_VERSION, 4) {
     QT += widgets
 }
 
-DEFINES += QT_NO_CAST_FROM_ASCII
+DEFINES += QT_NO_CAST_FROM_ASCII ENABLE_DBUS_INTEROP
 win32:DEFINES += QT_DBUS
 
 TRANSMISSION_TOP = ..
@@ -38,7 +38,7 @@ unix: LIBS += -L$${EVENT_TOP}/lib -lz -lrt
 win32:LIBS += -levent-2.0 -lws2_32 -lintl
 win32:LIBS += -lidn -liconv -lwldap32 -liphlpapi
 
-lessThan(QT_MAJOR_VERSION, 5):*-g++*:QMAKE_CXXFLAGS += -std=gnu++11
+lessThan(QT_MAJOR_VERSION, 5) : *-g++* | *-clang* : QMAKE_CXXFLAGS += -std=gnu++11
 
 TRANSLATIONS += translations/transmission_de.ts \
                 translations/transmission_en.ts \
@@ -74,7 +74,7 @@ SOURCES += AboutDialog.cc \
            AddData.cc \
            Application.cc \
            ColumnResizer.cc \
-           DBusAdaptor.cc \
+           DBusInteropHelper.cc \
            DetailsDialog.cc \
            FaviconCache.cc \
            FileTreeDelegate.cc \
@@ -89,6 +89,8 @@ SOURCES += AboutDialog.cc \
            Formatter.cc \
            FreeSpaceLabel.cc \
            IconToolButton.cc \
+           InteropHelper.cc \
+           InteropObject.cc \
            LicenseDialog.cc \
            MainWindow.cc \
            MakeDialog.cc \
