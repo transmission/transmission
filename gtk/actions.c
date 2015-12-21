@@ -142,7 +142,7 @@ static GActionEntry win_entries[] =
     { "toggle-main-window", toggle_action_cb, NULL, "true", change_toggle_cb, {} },
     { "toggle-message-log", toggle_action_cb, NULL, "false", change_toggle_cb, {} },
     /* pref toggle actions */
-    { "statusbar-stats", radio_action_cb, "s", "\"total-transfer\"", change_value_cb, {} },
+    { "statusbar-stats", radio_action_cb, "s", "\"total-ratio\"", change_value_cb, {} },
     { "alt-speed-enabled", toggle_action_cb, NULL, "false", change_pref_cb, {} },
     { "speed-limit-up-enabled", toggle_action_cb, NULL, "false", change_pref_cb, {} },
     { "speed-limit-down-enabled", toggle_action_cb, NULL, "false", change_pref_cb, {} },
