@@ -28,8 +28,6 @@
 
 - (void) awakeFromNib
 {
-    [(NSMatrix *)[self controlView] setToolTip: [self title] forCell: self];
-    
     NSNotificationCenter * nc = [NSNotificationCenter defaultCenter];
     [nc addObserver: self selector: @selector(updateControlTint:)
         name: NSControlTintDidChangeNotification object: NSApp];
@@ -38,7 +36,6 @@
     
     //expects the icon to currently be set as the image
     fIcon = [[self image] retain];
-    [self setSelectedTab: fSelected];
 }
 
 - (void) dealloc
@@ -49,10 +46,26 @@
     [super dealloc];
 }
 
+- (void) setControlView: (NSView *) controlView
+{
+    const BOOL hadControlView = [self controlView] != nil;
+
+    [super setControlView: controlView];
+
+    if (!hadControlView)
+    {
+        [(NSMatrix *)[self controlView] setToolTip: [self title] forCell: self];
+        [self setSelectedTab: fSelected];
+    }
+}
+
 - (void) setSelectedTab: (BOOL) selected
 {
     fSelected = selected;
     
+    if ([self controlView] == nil)
+        return;
+
     NSInteger row, col;
     [(NSMatrix *)[self controlView] getRow: &row column: &col ofCell: self];
     NSRect tabRect = [(NSMatrix *)[self controlView] cellFrameAtRow: row column: col];
