@@ -590,9 +590,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [[NSRunLoop currentRunLoop] addTimer: fTimer forMode: NSModalPanelRunLoopMode];
     [[NSRunLoop currentRunLoop] addTimer: fTimer forMode: NSEventTrackingRunLoopMode];
     
-    #warning FIXME: https://forum.transmissionbt.com/viewtopic.php?f=4&t=16519
-    [NSEvent startPeriodicEventsAfterDelay: 0 withPeriod: 1];
-
     [self applyFilter];
     
     [fWindow makeKeyAndOrderFront: nil];
