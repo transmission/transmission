@@ -187,16 +187,16 @@ tr_variant_string_set_quark (struct tr_variant_string  * str,
 static void
 tr_variant_string_set_string (struct tr_variant_string  * str,
                               const char                * bytes,
-                              int                         len)
+                              size_t                      len)
 {
   tr_variant_string_clear (str);
 
   if (bytes == NULL)
     len = 0;
-  else if (len < 0)
+  else if (len == TR_BAD_SIZE)
     len = strlen (bytes);
 
-  if ((size_t)len < sizeof(str->str.buf))
+  if (len < sizeof (str->str.buf))
     {
       str->type = TR_STRING_TYPE_BUF;
       memcpy (str->str.buf, bytes, len);
@@ -476,7 +476,7 @@ tr_variantInitQuark (tr_variant * v, const tr_quark q)
 }
 
 void
-tr_variantInitStr (tr_variant * v, const void * str, int len)
+tr_variantInitStr (tr_variant * v, const void * str, size_t len)
 {
   tr_variantInit (v, TR_VARIANT_TYPE_STR);
   tr_variant_string_set_string (&v->val.s, str, len);
@@ -598,7 +598,7 @@ tr_variantListAddStr (tr_variant  * list,
                       const char  * val)
 {
   tr_variant * child = tr_variantListAdd (list);
-  tr_variantInitStr (child, val, -1);
+  tr_variantInitStr (child, val, TR_BAD_SIZE);
   return child;
 }
 
@@ -727,7 +727,7 @@ tr_variantDictAddStr (tr_variant      * dict,
                       const char      * val)
 {
   tr_variant * child = dictFindOrAdd (dict, key, TR_VARIANT_TYPE_STR);
-  tr_variantInitStr (child, val, -1);
+  tr_variantInitStr (child, val, TR_BAD_SIZE);
   return child;
 }
 

@@ -365,15 +365,15 @@ evbuffer_free_to_str (struct evbuffer * buf,
 char*
 tr_strdup (const void * in)
 {
-  return tr_strndup (in, in ? (int)strlen ((const char *)in) : 0);
+  return tr_strndup (in, in != NULL ? strlen (in) : 0);
 }
 
 char*
-tr_strndup (const void * in, int len)
+tr_strndup (const void * in, size_t len)
 {
   char * out = NULL;
 
-  if (len < 0)
+  if (len == TR_BAD_SIZE)
     {
       out = tr_strdup (in);
     }
@@ -671,7 +671,7 @@ tr_hex_to_binary (const char * input,
 ***/
 
 static bool
-isValidURLChars (const char * url, int url_len)
+isValidURLChars (const char * url, size_t url_len)
 {
   const char * c;
   const char * end;
@@ -706,7 +706,7 @@ tr_urlIsValidTracker (const char * url)
     }
   else
     {
-      const int len = strlen (url);
+      const size_t len = strlen (url);
 
       valid = isValidURLChars (url, len)
            && !tr_urlParse (url, len, NULL, NULL, NULL, NULL)
@@ -718,7 +718,7 @@ tr_urlIsValidTracker (const char * url)
 
 /** @brief return true if the URL is a http or https or ftp or sftp one that Transmission understands */
 bool
-tr_urlIsValid (const char * url, int url_len)
+tr_urlIsValid (const char * url, size_t url_len)
 {
   bool valid;
 
@@ -728,7 +728,7 @@ tr_urlIsValid (const char * url, int url_len)
     }
   else
     {
-      if (url_len < 0)
+      if (url_len == TR_BAD_SIZE)
         url_len = strlen (url);
 
       valid = isValidURLChars (url, url_len)
@@ -748,7 +748,7 @@ tr_addressIsIP (const char * str)
 
 int
 tr_urlParse (const char * url_in,
-             int          len,
+             size_t       len,
              char **      setme_protocol,
              char **      setme_host,
              int *        setme_port,
@@ -756,7 +756,7 @@ tr_urlParse (const char * url_in,
 {
   int err;
   int port = 0;
-  int n;
+  size_t n;
   char * tmp;
   char * pch;
   size_t host_len;
@@ -770,7 +770,7 @@ tr_urlParse (const char * url_in,
     {
       *pch = '\0';
       protocol = tmp;
-      protocol_len = pch - protocol;
+      protocol_len = (size_t) (pch - protocol);
       pch += 3;
       if ((n = strcspn (pch, ":/")))
         {
@@ -1041,20 +1041,20 @@ to_utf8 (const char * in, size_t inlen)
 }
 
 char*
-tr_utf8clean (const char * str, int max_len)
+tr_utf8clean (const char * str, size_t max_len)
 {
   char * ret;
   const char * end;
 
-  if (max_len < 0)
-    max_len = (int) strlen (str);
+  if (max_len == TR_BAD_SIZE)
+    max_len = strlen (str);
 
   if (tr_utf8_validate (str, max_len, &end))
     ret = tr_strndup (str, max_len);
   else
     ret = to_utf8 (str, max_len);
 
-  assert (tr_utf8_validate (ret, -1, NULL));
+  assert (tr_utf8_validate (ret, TR_BAD_SIZE, NULL));
   return ret;
 }
 
@@ -1234,7 +1234,7 @@ struct number_range
  * Anything else is an error and will return failure.
  */
 static bool
-parseNumberSection (const char * str, int len, struct number_range * setme)
+parseNumberSection (const char * str, size_t len, struct number_range * setme)
 {
   long a, b;
   bool success;
@@ -1289,7 +1289,7 @@ compareInt (const void * va, const void * vb)
  * If a fragment of the string can't be parsed, NULL is returned.
  */
 int*
-tr_parseNumberRange (const char * str_in, int len, int * setmeCount)
+tr_parseNumberRange (const char * str_in, size_t len, int * setmeCount)
 {
   int n = 0;
   int * uniq = NULL;
@@ -1305,7 +1305,7 @@ tr_parseNumberRange (const char * str_in, int len, int * setmeCount)
       const char * pch = strchr (walk, ',');
       if (pch)
         {
-          success = parseNumberSection (walk, pch-walk, &range);
+          success = parseNumberSection (walk, (size_t) (pch - walk), &range);
           walk = pch + 1;
         }
       else

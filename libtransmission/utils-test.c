@@ -105,7 +105,7 @@ test_utf8 (void)
   char * out;
 
   in = "hello world";
-  out = tr_utf8clean (in, -1);
+  out = tr_utf8clean (in, TR_BAD_SIZE);
   check_streq (in, out);
   tr_free (out);
 
@@ -119,14 +119,14 @@ test_utf8 (void)
   out = tr_utf8clean (in, 17);
   check (out != NULL);
   check ((strlen (out) == 17) || (strlen (out) == 33));
-  check (tr_utf8_validate (out, -1, NULL));
+  check (tr_utf8_validate (out, TR_BAD_SIZE, NULL));
   tr_free (out);
 
   /* same string, but utf-8 clean */
   in = "Трудно быть Богом";
-  out = tr_utf8clean (in, -1);
+  out = tr_utf8clean (in, TR_BAD_SIZE);
   check (out != NULL);
-  check (tr_utf8_validate (out, -1, NULL));
+  check (tr_utf8_validate (out, TR_BAD_SIZE, NULL));
   check_streq (in, out);
   tr_free (out);
 
@@ -140,7 +140,7 @@ test_numbers (void)
   int count;
   int * numbers;
 
-  numbers = tr_parseNumberRange ("1-10,13,16-19", -1, &count);
+  numbers = tr_parseNumberRange ("1-10,13,16-19", TR_BAD_SIZE, &count);
   check_int_eq (15, count);
   check_int_eq (1, numbers[0]);
   check_int_eq (6, numbers[5]);
@@ -150,22 +150,22 @@ test_numbers (void)
   check_int_eq (19, numbers[14]);
   tr_free (numbers);
 
-  numbers = tr_parseNumberRange ("1-5,3-7,2-6", -1, &count);
+  numbers = tr_parseNumberRange ("1-5,3-7,2-6", TR_BAD_SIZE, &count);
   check (count == 7);
   check (numbers != NULL);
   for (i=0; i<count; ++i)
     check_int_eq (i+1, numbers[i]);
   tr_free (numbers);
 
-  numbers = tr_parseNumberRange ("1-Hello", -1, &count);
+  numbers = tr_parseNumberRange ("1-Hello", TR_BAD_SIZE, &count);
   check_int_eq (0, count);
   check (numbers == NULL);
 
-  numbers = tr_parseNumberRange ("1-", -1, &count);
+  numbers = tr_parseNumberRange ("1-", TR_BAD_SIZE, &count);
   check_int_eq (0, count);
   check (numbers == NULL);
 
-  numbers = tr_parseNumberRange ("Hello", -1, &count);
+  numbers = tr_parseNumberRange ("Hello", TR_BAD_SIZE, &count);
   check_int_eq (0, count);
   check (numbers == NULL);
 
@@ -317,7 +317,7 @@ test_url (void)
   const char * url;
 
   url = "http://1";
-  check (!tr_urlParse (url, -1, &scheme, &host, &port, &path));
+  check (!tr_urlParse (url, TR_BAD_SIZE, &scheme, &host, &port, &path));
   check_streq ("http", scheme);
   check_streq ("1", host);
   check_streq ("/", path);
@@ -327,7 +327,7 @@ test_url (void)
   tr_free (host);
 
   url = "http://www.some-tracker.org/some/path";
-  check (!tr_urlParse (url, -1, &scheme, &host, &port, &path));
+  check (!tr_urlParse (url, TR_BAD_SIZE, &scheme, &host, &port, &path));
   check_streq ("http", scheme);
   check_streq ("www.some-tracker.org", host);
   check_streq ("/some/path", path);
@@ -337,7 +337,7 @@ test_url (void)
   tr_free (host);
 
   url = "http://www.some-tracker.org:80/some/path";
-  check (!tr_urlParse (url, -1, &scheme, &host, &port, &path));
+  check (!tr_urlParse (url, TR_BAD_SIZE, &scheme, &host, &port, &path));
   check_streq ("http", scheme);
   check_streq ("www.some-tracker.org", host);
   check_streq ("/some/path", path);

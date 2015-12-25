@@ -89,6 +89,8 @@ extern "C" {
 
 #define SHA_DIGEST_LENGTH 20
 #define TR_INET6_ADDRSTRLEN 46
+ 
+#define TR_BAD_SIZE ((size_t) -1)
 
 typedef uint32_t tr_file_index_t;
 typedef uint32_t tr_piece_index_t;

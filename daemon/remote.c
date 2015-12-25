@@ -577,7 +577,7 @@ addDays (tr_variant * args, const tr_quark key, const char * arg)
       int valueCount;
       int * values;
 
-      values = tr_parseNumberRange (arg, -1, &valueCount);
+      values = tr_parseNumberRange (arg, TR_BAD_SIZE, &valueCount);
       for (i=0; i<valueCount; ++i)
         {
           if (values[i] < 0 || values[i] > 7)
@@ -615,7 +615,7 @@ addFiles (tr_variant      * args,
     {
       int i;
       int valueCount;
-      int * values = tr_parseNumberRange (arg, -1, &valueCount);
+      int * values = tr_parseNumberRange (arg, TR_BAD_SIZE, &valueCount);
 
       for (i=0; i<valueCount; ++i)
         tr_variantListAddInt (files, values[i]);

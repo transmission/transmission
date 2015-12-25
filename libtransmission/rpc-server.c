@@ -130,9 +130,9 @@ send_simple_response (struct evhttp_request * req,
 struct tr_mimepart
 {
   char * headers;
-  int headers_len;
+  size_t headers_len;
   char * body;
-  int body_len;
+  size_t body_len;
 };
 
 static void
@@ -176,9 +176,9 @@ extract_parts_from_multipart (const struct evkeyvalq  * headers,
           if (rnrn)
             {
               struct tr_mimepart * p = tr_new (struct tr_mimepart, 1);
-              p->headers_len = rnrn - part;
+              p->headers_len = (size_t) (rnrn - part);
               p->headers = tr_strndup (part, p->headers_len);
-              p->body_len = (part+part_len) - (rnrn + 4);
+              p->body_len = (size_t) ((part + part_len) - (rnrn + 4));
               p->body = tr_strndup (rnrn+4, p->body_len);
               tr_ptrArrayAppend (setme_parts, p);
             }
@@ -221,7 +221,7 @@ handle_upload (struct evhttp_request * req,
         {
           const struct tr_mimepart * p = tr_ptrArrayNth (&parts, i);
           const char * ours = get_current_session_id (server);
-          const int ourlen = strlen (ours);
+          const size_t ourlen = strlen (ours);
           hasSessionId = ourlen<=p->body_len && !memcmp (p->body, ours, ourlen);
         }
 
@@ -237,7 +237,7 @@ handle_upload (struct evhttp_request * req,
       else for (i=0; i<n; ++i)
         {
           struct tr_mimepart * p = tr_ptrArrayNth (&parts, i);
-          int body_len = p->body_len;
+          size_t body_len = p->body_len;
           tr_variant top, *args;
           tr_variant test;
           bool have_source = false;
@@ -563,7 +563,7 @@ handle_rpc (struct evhttp_request * req, struct tr_rpc_server  * server)
       struct rpc_response_data * data = tr_new0 (struct rpc_response_data, 1);
       data->req = req;
       data->server = server;
-      tr_rpc_request_exec_uri (server->session, q+1, -1, rpc_response_func, data);
+      tr_rpc_request_exec_uri (server->session, q + 1, TR_BAD_SIZE, rpc_response_func, data);
     }
   else
     {

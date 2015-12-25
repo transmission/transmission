@@ -22,7 +22,7 @@ test_list (void)
   const char * str;
   tr_variant top;
 
-  tr_rpc_parse_list_str (&top, "12", -1);
+  tr_rpc_parse_list_str (&top, "12", TR_BAD_SIZE);
   check (tr_variantIsInt (&top));
   check (tr_variantGetInt (&top, &i));
   check_int_eq (12, i);
@@ -34,7 +34,7 @@ test_list (void)
   check_int_eq (1, i);
   tr_variantFree (&top);
 
-  tr_rpc_parse_list_str (&top, "6,7", -1);
+  tr_rpc_parse_list_str (&top, "6,7", TR_BAD_SIZE);
   check (tr_variantIsList (&top));
   check (tr_variantListSize (&top) == 2);
   check (tr_variantGetInt (tr_variantListChild (&top, 0), &i));
@@ -43,14 +43,14 @@ test_list (void)
   check_int_eq (7, i);
   tr_variantFree (&top);
 
-  tr_rpc_parse_list_str (&top, "asdf", -1);
+  tr_rpc_parse_list_str (&top, "asdf", TR_BAD_SIZE);
   check (tr_variantIsString (&top));
   check (tr_variantGetStr (&top, &str, &len));
   check_int_eq (4, len);
   check_streq ("asdf", str);
   tr_variantFree (&top);
 
-  tr_rpc_parse_list_str (&top, "1,3-5", -1);
+  tr_rpc_parse_list_str (&top, "1,3-5", TR_BAD_SIZE);
   check (tr_variantIsList (&top));
   check (tr_variantListSize (&top) == 4);
   check (tr_variantGetInt (tr_variantListChild (&top, 0), &i));

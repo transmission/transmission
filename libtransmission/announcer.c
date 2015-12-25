@@ -229,7 +229,7 @@ getKey (const char * url)
     char * host = NULL;
     int port = 0;
 
-    tr_urlParse (url, -1, &scheme, &host, &port, NULL);
+    tr_urlParse (url, TR_BAD_SIZE, &scheme, &host, &port, NULL);
     ret = tr_strdup_printf ("%s://%s:%d", (scheme?scheme:"invalid"), (host?host:"invalid"), port);
 
     tr_free (host);
@@ -583,7 +583,7 @@ filter_trackers (tr_tracker_info * input, int input_count, int * setme_count)
             char * host;
             char * path;
             bool is_duplicate = false;
-            tr_urlParse (input[i].announce, -1, &scheme, &host, &port, &path);
+            tr_urlParse (input[i].announce, TR_BAD_SIZE, &scheme, &host, &port, &path);
 
             /* weed out one common source of duplicates:
              * "http://tracker/announce" +

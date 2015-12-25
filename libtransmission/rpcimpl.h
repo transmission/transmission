@@ -34,13 +34,13 @@ void tr_rpc_request_exec_json (tr_session            * session,
 /* see the RPC spec's "Request URI Notation" section */
 void tr_rpc_request_exec_uri (tr_session           * session,
                               const void           * request_uri,
-                              int                    request_len,
+                              size_t                 request_uri_len,
                               tr_rpc_response_func   callback,
                               void                 * callback_user_data);
 
 void tr_rpc_parse_list_str (tr_variant  * setme,
                             const char  * list_str,
-                            int           list_str_len);
+                            size_t        list_str_len);
 
 #ifdef __cplusplus
 }

@@ -190,7 +190,7 @@ void tr_wait_msec (long int delay_milliseconds);
  * @param str the string to make a clean copy of
  * @param len the length of the string to copy. If -1, the entire string is used.
  */
-char* tr_utf8clean (const char * str, int len) TR_GNUC_MALLOC;
+char* tr_utf8clean (const char * str, size_t len) TR_GNUC_MALLOC;
 
 #ifdef _WIN32
 
@@ -283,7 +283,7 @@ void* tr_valloc (size_t bufLen);
  * @param len length of the substring to copy. if a length less than zero is passed in, strlen (len) is used
  * @return a newly-allocated copy of `in' that can be freed with tr_free ()
  */
-char* tr_strndup (const void * in, int len) TR_GNUC_MALLOC;
+char* tr_strndup (const void * in, size_t len) TR_GNUC_MALLOC;
 
 /**
  * @brief make a newly-allocated copy of a string
@@ -363,12 +363,12 @@ bool tr_addressIsIP (const char * address);
 bool tr_urlIsValidTracker (const char * url) TR_GNUC_NONNULL (1);
 
 /** @brief return true if the url is a [ http, https, ftp, ftps ] url that Transmission understands */
-bool tr_urlIsValid (const char * url, int url_len) TR_GNUC_NONNULL (1);
+bool tr_urlIsValid (const char * url, size_t url_len) TR_GNUC_NONNULL (1);
 
 /** @brief parse a URL into its component parts
     @return zero on success or an error number if an error occurred */
 int  tr_urlParse (const char * url,
-                  int          url_len,
+                  size_t       url_len,
                   char      ** setme_scheme,
                   char      ** setme_host,
                   int        * setme_port,
@@ -388,8 +388,8 @@ double tr_getRatio (uint64_t numerator, uint64_t denominator);
  * For example, "5-8" will return [ 5, 6, 7, 8 ] and setmeCount will be 4.
  */
 int* tr_parseNumberRange (const char * str,
-                          int str_len,
-                          int * setmeCount) TR_GNUC_MALLOC TR_GNUC_NONNULL (1);
+                          size_t       str_len,
+                          int        * setmeCount) TR_GNUC_MALLOC TR_GNUC_NONNULL (1);
 
 
 /**

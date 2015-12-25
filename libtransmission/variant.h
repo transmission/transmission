@@ -206,7 +206,7 @@ bool         tr_variantGetStr          (const tr_variant * variant,
 
 void         tr_variantInitStr         (tr_variant       * initme,
                                         const void       * str,
-                                        int                str_len);
+                                        size_t             str_len);
 
 void         tr_variantInitQuark       (tr_variant       * initme,
                                         const tr_quark     quark);

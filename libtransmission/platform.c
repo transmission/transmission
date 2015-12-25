@@ -553,7 +553,7 @@ tr_getWebClientDir (const tr_session * session UNUSED)
                 if (end)
                   {
                     if ((end - tmp) > 1)
-                      tr_list_append (&candidates, tr_strndup (tmp, end - tmp));
+                      tr_list_append (&candidates, tr_strndup (tmp, (size_t) (end - tmp)));
                     tmp = (char *) end + 1;
                   }
                 else if (tmp && *tmp)

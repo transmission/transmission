@@ -2299,7 +2299,7 @@ tr_rpc_request_exec_json (tr_session            * session,
 void
 tr_rpc_parse_list_str (tr_variant  * setme,
                        const char  * str,
-                       int           len)
+                       size_t        len)
 
 {
   int valueCount;
@@ -2329,14 +2329,14 @@ tr_rpc_parse_list_str (tr_variant  * setme,
 void
 tr_rpc_request_exec_uri (tr_session           * session,
                          const void           * request_uri,
-                         int                    request_len,
+                         size_t                 request_uri_len,
                          tr_rpc_response_func   callback,
                          void                 * callback_user_data)
 {
   const char * pch;
   tr_variant top;
   tr_variant * args;
-  char * request = tr_strndup (request_uri, request_len);
+  char * request = tr_strndup (request_uri, request_uri_len);
 
   tr_variantInitDict (&top, 3);
   args = tr_variantDictAddDict (&top, TR_KEY_arguments, 0);
@@ -2349,11 +2349,11 @@ tr_rpc_request_exec_uri (tr_session           * session,
       const char * next = strchr (pch, '&');
       if (delim)
         {
-          char * key = tr_strndup (pch, delim - pch);
+          char * key = tr_strndup (pch, (size_t) (delim - pch));
           int isArg = strcmp (key, "method") && strcmp (key, "tag");
           tr_variant * parent = isArg ? args : &top;
 
-          tr_rpc_parse_list_str (tr_variantDictAdd (parent, tr_quark_new (key, delim-pch)),
+          tr_rpc_parse_list_str (tr_variantDictAdd (parent, tr_quark_new (key, (size_t) (delim - pch))),
                                  delim + 1,
                                  next ? (size_t)(next - (delim + 1)) : strlen (delim + 1));
           tr_free (key);
