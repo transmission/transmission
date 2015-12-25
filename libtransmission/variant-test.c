@@ -159,7 +159,7 @@ testString (const char * str, bool isGood)
   const char * end = NULL;
   char * saved;
   const size_t    len = strlen (str);
-  int savedLen;
+  size_t savedLen;
   int err;
 
   err = tr_variantFromBencFull (&val, str, len, NULL, &end);
@@ -195,7 +195,7 @@ testParse (void)
   char buf[512];
   const char * end;
   int err;
-  int len;
+  size_t len;
   int64_t i;
   char * saved;
 
@@ -435,7 +435,7 @@ static int
 testStackSmash (void)
 {
   int i;
-  int len;
+  size_t len;
   int err;
   char * in;
   const char * end;
@@ -509,7 +509,7 @@ testParse2 (void)
   const char * strVal;
   double realVal;
   bool boolVal;
-  int len;
+  size_t len;
   char * benc;
   const char * end;
   size_t strLen;

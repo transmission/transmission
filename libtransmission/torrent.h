@@ -167,13 +167,13 @@ struct tr_torrent
     char * incompleteDir;
 
     /* Length, in bytes, of the "info" dict in the .torrent file. */
-    int infoDictLength;
+    size_t infoDictLength;
 
     /* Offset, in bytes, of the beginning of the "info" dict in the .torrent file.
      *
      * Used by the torrent-magnet code for serving metainfo to peers.
      * This field is lazy-generated and might not be initialized yet. */
-    int infoDictOffset;
+    size_t infoDictOffset;
 
     /* Where the files are now.
      * This pointer will be equal to downloadDir or incompleteDir */

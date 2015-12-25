@@ -607,15 +607,16 @@ tr_webGetResponseStr (long code)
 void
 tr_http_escape (struct evbuffer  * out,
                 const char       * str,
-                int                len,
+                size_t             len,
                 bool               escape_slashes)
 {
-  const char * end;
+  if (str == NULL)
+    return;
 
-  if ((len < 0) && (str != NULL))
+  if (len == TR_BAD_SIZE)
     len = strlen (str);
 
-  for (end=str+len; str && str!=end; ++str)
+  for (const char * end = str + len; str != end; ++str)
     {
       if ((*str == ',') || (*str == '-')
                         || (*str == '.')
@@ -630,7 +631,7 @@ tr_http_escape (struct evbuffer  * out,
 }
 
 char *
-tr_http_unescape (const char * str, int len)
+tr_http_unescape (const char * str, size_t len)
 {
   char * tmp = curl_unescape (str, len);
   char * ret = tr_strdup (tmp);

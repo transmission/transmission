@@ -1955,7 +1955,7 @@ fillOutputBuffer (tr_peerMsgs * msgs, time_t now)
         && popNextMetadataRequest (msgs, &piece))
     {
         char * data;
-        int dataLen;
+        size_t dataLen;
         bool ok = false;
 
         data = tr_torrentGetMetadataPiece (msgs->torrent, piece, &dataLen);

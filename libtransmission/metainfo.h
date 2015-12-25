@@ -21,7 +21,7 @@ bool  tr_metainfoParse (const tr_session  * session,
                         const tr_variant  * variant,
                         tr_info           * setmeInfo,
                         bool              * setmeHasInfoDict,
-                        int               * setmeInfoDictLength);
+                        size_t            * setmeInfoDictLength);
 
 void tr_metainfoRemoveSaved (const tr_session * session,
                              const tr_info    * info);

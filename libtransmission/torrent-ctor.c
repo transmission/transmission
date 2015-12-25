@@ -111,7 +111,7 @@ tr_ctorSetMetainfoFromMagnetLink (tr_ctor * ctor, const char * magnet_link)
     if (magnet_info == NULL)
         err = -1;
     else {
-        int len;
+        size_t len;
         tr_variant tmp;
         char * str;
 

@@ -116,7 +116,7 @@ int tr_variantToFile (const tr_variant * variant,
 
 char* tr_variantToStr (const tr_variant * variant,
                        tr_variant_fmt     fmt,
-                       int              * len);
+                       size_t           * len);
 
 struct evbuffer * tr_variantToBuf (const tr_variant * variant,
                                    tr_variant_fmt     fmt);

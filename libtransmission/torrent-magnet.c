@@ -98,12 +98,12 @@ tr_torrentSetMetadataSizeHint (tr_torrent * tor, int size)
     }
 }
 
-static int
+static size_t
 findInfoDictOffset (const tr_torrent * tor)
 {
   size_t fileLen;
   uint8_t * fileContents;
-  int offset = 0;
+  size_t offset = 0;
 
   /* load the file, and find the info dict's offset inside the file */
   if ((fileContents = tr_loadFile (tor->info.torrent, &fileLen, NULL)))
@@ -116,7 +116,7 @@ findInfoDictOffset (const tr_torrent * tor)
 
           if (tr_variantDictFindDict (&top, TR_KEY_info, &infoDict))
             {
-              int infoLen;
+              size_t infoLen;
               char * infoContents = tr_variantToStr (infoDict, TR_VARIANT_FMT_BENC, &infoLen);
               const uint8_t * i = (const uint8_t*) tr_memmem ((char*)fileContents, fileLen, infoContents, infoLen);
               offset = i != NULL ? i - fileContents : 0;
@@ -145,7 +145,7 @@ ensureInfoDictOffsetIsCached (tr_torrent * tor)
 }
 
 void*
-tr_torrentGetMetadataPiece (tr_torrent * tor, int piece, int * len)
+tr_torrentGetMetadataPiece (tr_torrent * tor, int piece, size_t * len)
 {
   char * ret = NULL;
 
@@ -160,24 +160,23 @@ tr_torrentGetMetadataPiece (tr_torrent * tor, int piece, int * len)
       ensureInfoDictOffsetIsCached (tor);
 
       assert (tor->infoDictLength > 0);
-      assert (tor->infoDictOffset >= 0);
 
       fd = tr_sys_file_open (tor->info.torrent, TR_SYS_FILE_READ, 0, NULL);
       if (fd != TR_BAD_SYS_FILE)
         {
-          const int o = piece  * METADATA_PIECE_SIZE;
+          const size_t o = piece * METADATA_PIECE_SIZE;
 
           if (tr_sys_file_seek (fd, tor->infoDictOffset + o, TR_SEEK_SET, NULL, NULL))
             {
-              const int l = o + METADATA_PIECE_SIZE <= tor->infoDictLength
-                          ? METADATA_PIECE_SIZE
-                          : tor->infoDictLength - o;
+              const size_t l = o + METADATA_PIECE_SIZE <= tor->infoDictLength
+                             ? METADATA_PIECE_SIZE
+                             : tor->infoDictLength - o;
 
               if (0<l && l<=METADATA_PIECE_SIZE)
                 {
                   char * buf = tr_new (char, l);
                   uint64_t n;
-                  if (tr_sys_file_read (fd, buf, l, &n, NULL) && n == (unsigned int) l)
+                  if (tr_sys_file_read (fd, buf, l, &n, NULL) && n == l)
                     {
                       *len = l;
                       ret = buf;
@@ -259,7 +258,7 @@ tr_torrentSetMetadataPiece (tr_torrent  * tor, int piece, const void  * data, in
                 {
                   bool hasInfo;
                   tr_info info;
-                  int infoDictLength;
+                  size_t infoDictLength;
 
                   /* remove any old .torrent and .resume files */
                   tr_sys_path_remove (path, NULL);
@@ -391,19 +390,19 @@ tr_torrentInfoGetMagnetLink (const tr_info * inf)
   if (name && *name)
     {
       evbuffer_add_printf (s, "%s", "&dn=");
-      tr_http_escape (s, name, -1, true);
+      tr_http_escape (s, name, TR_BAD_SIZE, true);
     }
 
   for (i=0; i<inf->trackerCount; ++i)
     {
       evbuffer_add_printf (s, "%s", "&tr=");
-      tr_http_escape (s, inf->trackers[i].announce, -1, true);
+      tr_http_escape (s, inf->trackers[i].announce, TR_BAD_SIZE, true);
     }
 
   for (i=0; i<inf->webseedCount; i++)
     {
       evbuffer_add_printf (s, "%s", "&ws=");
-      tr_http_escape (s, inf->webseeds[i], -1, true);
+      tr_http_escape (s, inf->webseeds[i], TR_BAD_SIZE, true);
     }
 
   return evbuffer_free_to_str (s, NULL);

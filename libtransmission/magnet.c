@@ -41,10 +41,10 @@ static const int base32Lookup[] =
 static const int base32LookupLen = sizeof (base32Lookup) / sizeof (base32Lookup[0]);
 
 static void
-base32_to_sha1 (uint8_t * out, const char * in, const int inlen)
+base32_to_sha1 (uint8_t * out, const char * in, const size_t inlen)
 {
-  const int outlen = 20;
-  int i, index, offset;
+  const size_t outlen = 20;
+  size_t i, index, offset;
 
   memset (out, 0, 20);
 
@@ -121,26 +121,26 @@ tr_magnetParse (const char * uri)
           const char * delim = strchr (key, '=');
           const char * val = delim == NULL ? NULL : delim + 1;
           const char * next = strchr (delim == NULL ? key : val, '&');
-          int keylen, vallen;
+          size_t keylen, vallen;
 
           if (delim != NULL)
-            keylen = delim - key;
+            keylen = (size_t) (delim - key);
           else if (next != NULL)
-            keylen = next - key;
+            keylen = (size_t) (next - key);
           else
             keylen = strlen (key);
 
           if (val == NULL)
             vallen = 0;
           else if (next != NULL)
-            vallen = next - val;
+            vallen = (size_t) (next - val);
           else
             vallen = strlen (val);
 
           if ((keylen==2) && !memcmp (key, "xt", 2) && val && !memcmp (val, "urn:btih:", 9))
             {
               const char * hash = val + 9;
-              const int hashlen = vallen - 9;
+              const size_t hashlen = vallen - 9;
 
               if (hashlen == 40)
                 {

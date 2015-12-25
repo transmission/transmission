@@ -412,8 +412,8 @@ static const char*
 tr_metainfoParseImpl (const tr_session  * session,
                       tr_info           * inf,
                       bool              * hasInfoDict,
-                      int               * infoDictLength,
-                      const tr_variant     * meta_in)
+                      size_t            * infoDictLength,
+                      const tr_variant  * meta_in)
 {
   int64_t i;
   size_t len;
@@ -468,7 +468,7 @@ tr_metainfoParseImpl (const tr_session  * session,
     }
   else
     {
-      int len;
+      size_t len;
       char * bstr = tr_variantToStr (infoDict, TR_VARIANT_FMT_BENC, &len);
       tr_sha1 (inf->hash, bstr, len, NULL);
       tr_sha1_to_hex (inf->hashString, inf->hash);
@@ -576,7 +576,7 @@ tr_metainfoParse (const tr_session * session,
                   const tr_variant * meta_in,
                   tr_info          * inf,
                   bool             * hasInfoDict,
-                  int              * infoDictLength)
+                  size_t           * infoDictLength)
 {
   const char * badTag = tr_metainfoParseImpl (session,
                                               inf,

@@ -114,7 +114,7 @@ announce_url_new (const tr_session * session, const tr_announce_request * req)
         char ipv6_readable[INET6_ADDRSTRLEN];
         evutil_inet_ntop (AF_INET6, ipv6, ipv6_readable, INET6_ADDRSTRLEN);
         evbuffer_add_printf (buf, "&ipv6=");
-        tr_http_escape (buf, ipv6_readable, -1, true);
+        tr_http_escape (buf, ipv6_readable, TR_BAD_SIZE, true);
     }
 
     return evbuffer_free_to_str (buf, NULL);
@@ -215,7 +215,7 @@ on_announce_done (tr_session   * session,
             if (!variant_loaded)
                 fprintf (stderr, "%s", "Announce response was not in benc format\n");
             else {
-                int i, len;
+                size_t i, len;
                 char * str = tr_variantToStr (&benc, TR_VARIANT_FMT_JSON, &len);
                 fprintf (stderr, "%s", "Announce response:\n< ");
                 for (i=0; i<len; ++i)
@@ -370,7 +370,7 @@ on_scrape_done (tr_session   * session,
             if (!variant_loaded)
                 fprintf (stderr, "%s", "Scrape response was not in benc format\n");
             else {
-                int i, len;
+                size_t i, len;
                 char * str = tr_variantToStr (&top, TR_VARIANT_FMT_JSON, &len);
                 fprintf (stderr, "%s", "Scrape response:\n< ");
                 for (i=0; i<len; ++i)

@@ -980,7 +980,7 @@ static tr_parse_result
 torrentParseImpl (const tr_ctor  * ctor,
                   tr_info        * setmeInfo,
                   bool           * setmeHasInfo,
-                  int            * dictLength,
+                  size_t         * dictLength,
                   int            * setme_duplicate_id)
 {
   bool doFree;
@@ -1039,7 +1039,7 @@ tr_torrentParse (const tr_ctor * ctor, tr_info * setmeInfo)
 tr_torrent *
 tr_torrentNew (const tr_ctor * ctor, int * setme_error, int * setme_duplicate_id)
 {
-  int len;
+  size_t len;
   bool hasInfo;
   tr_info tmpInfo;
   tr_parse_result r;

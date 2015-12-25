@@ -142,7 +142,7 @@ RpcClient::sendRequest (TrVariantPtr json)
       if (!mySessionId.isEmpty ())
         request.setRawHeader (TR_RPC_SESSION_ID_HEADER, mySessionId.toUtf8 ());
 
-      int rawJsonDataLength;
+      size_t rawJsonDataLength;
       char * rawJsonData = tr_variantToStr (json.get (), TR_VARIANT_FMT_JSON_LEAN, &rawJsonDataLength);
       QByteArray jsonData (rawJsonData, rawJsonDataLength);
       tr_free (rawJsonData);
