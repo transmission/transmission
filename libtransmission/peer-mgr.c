@@ -3059,7 +3059,7 @@ rechokeUploads (tr_swarm * s, const uint64_t now)
   tr_peer ** peers = (tr_peer**) tr_ptrArrayBase (&s->peers);
   struct ChokeData * choke = tr_new0 (struct ChokeData, peerCount);
   const tr_session * session = s->manager->session;
-  const int chokeAll = !tr_torrentIsPieceTransferAllowed (s->tor, TR_CLIENT_TO_PEER);
+  const bool chokeAll = !tr_torrentIsPieceTransferAllowed (s->tor, TR_CLIENT_TO_PEER);
   const bool isMaxedOut = isBandwidthMaxedOut (&s->tor->bandwidth, now, TR_UP);
 
   assert (swarmIsLocked (s));

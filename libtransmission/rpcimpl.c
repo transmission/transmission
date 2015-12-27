@@ -1007,7 +1007,7 @@ setFilePriorities (tr_torrent * tor,
 
 static const char*
 setFileDLs (tr_torrent * tor,
-            int          do_download,
+            bool         do_download,
             tr_variant * list)
 {
   int i;
