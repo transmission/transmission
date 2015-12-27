@@ -1830,7 +1830,7 @@
                 <imageView id="354">
                     <rect key="frame" x="251" y="144" width="14" height="14"/>
                     <autoresizingMask key="autoresizingMask"/>
-                    <imageCell key="cell" refusesFirstResponder="YES" alignment="left" animates="YES" imageScaling="proportionallyDown" image="YellowDot" id="1249"/>
+                    <imageCell key="cell" refusesFirstResponder="YES" alignment="left" animates="YES" imageScaling="proportionallyDown" image="NSStatusPartiallyAvailable" id="1249"/>
                 </imageView>
                 <progressIndicator horizontalHuggingPriority="750" verticalHuggingPriority="750" maxValue="100" displayedWhenStopped="NO" bezeled="NO" indeterminate="YES" controlSize="small" style="spinning" id="353">
                     <rect key="frame" x="250" y="143" width="16" height="16"/>
@@ -2288,7 +2288,7 @@ E1YTaBNrE3AAAAAAAAACAQAAAAAAAABBAAAAAAAAAAAAAAAAAAATcg
         </image>
         <image name="NSAddTemplate" width="11" height="11"/>
         <image name="NSRemoveTemplate" width="11" height="11"/>
+        <image name="NSStatusPartiallyAvailable" width="16" height="16"/>
         <image name="TurtleTemplate" width="18" height="18"/>
-        <image name="YellowDot" width="16" height="16"/>
     </resources>
 </document>

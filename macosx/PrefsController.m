@@ -421,15 +421,15 @@
     {
         case PORT_STATUS_OPEN:
             [fPortStatusField setStringValue: NSLocalizedString(@"Port is open", "Preferences -> Network -> port status")];
-            [fPortStatusImage setImage: [NSImage imageNamed: @"GreenDot"]];
+            [fPortStatusImage setImage: [NSImage imageNamed: NSImageNameStatusAvailable]];
             break;
         case PORT_STATUS_CLOSED:
             [fPortStatusField setStringValue: NSLocalizedString(@"Port is closed", "Preferences -> Network -> port status")];
-            [fPortStatusImage setImage: [NSImage imageNamed: @"RedDot"]];
+            [fPortStatusImage setImage: [NSImage imageNamed: NSImageNameStatusUnavailable]];
             break;
         case PORT_STATUS_ERROR:
             [fPortStatusField setStringValue: NSLocalizedString(@"Port check site is down", "Preferences -> Network -> port status")];
-            [fPortStatusImage setImage: [NSImage imageNamed: @"YellowDot"]];
+            [fPortStatusImage setImage: [NSImage imageNamed: NSImageNameStatusPartiallyAvailable]];
             break;
         default:
             NSAssert1(NO, @"Port checker returned invalid status: %d", [fPortChecker status]);
