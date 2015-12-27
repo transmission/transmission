@@ -45,6 +45,8 @@
     
     [fRatioStopField setFloatValue: [fDefaults floatForKey: @"RatioLimit"]];
     [fIdleStopField setIntegerValue: [fDefaults integerForKey: @"IdleLimitMinutes"]];
+
+    [[self view] setFrameSize: [[self view] fittingSize]];
 }
 
 - (IBAction) updatedDisplayString: (id) sender
