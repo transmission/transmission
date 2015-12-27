@@ -254,6 +254,8 @@ tr_bitfieldFreeArray (tr_bitfield * b)
 static void
 tr_bitfieldSetTrueCount (tr_bitfield * b, size_t n)
 {
+  assert (n <= b->bit_count);
+
   b->true_count = n;
 
   if (tr_bitfieldHasAll (b) || tr_bitfieldHasNone (b))
@@ -269,9 +271,21 @@ tr_bitfieldRebuildTrueCount (tr_bitfield * b)
 }
 
 static void
-tr_bitfieldIncTrueCount (tr_bitfield * b, int i)
+tr_bitfieldIncTrueCount (tr_bitfield * b, size_t i)
 {
+  assert (i <= b->bit_count);
+  assert (b->true_count <= b->bit_count - i);
+
   tr_bitfieldSetTrueCount (b, b->true_count + i);
+}
+
+static void
+tr_bitfieldDecTrueCount (tr_bitfield * b, size_t i)
+{
+  assert (i <= b->bit_count);
+  assert (b->true_count >= i);
+
+  tr_bitfieldSetTrueCount (b, b->true_count - i);
 }
 
 /****
@@ -423,10 +437,10 @@ tr_bitfieldRem (tr_bitfield * b, size_t nth)
 {
   assert (tr_bitfieldIsValid (b));
 
-  if (!tr_bitfieldHas (b, nth) && tr_bitfieldEnsureNthBitAlloced (b, nth))
+  if (tr_bitfieldHas (b, nth) && tr_bitfieldEnsureNthBitAlloced (b, nth))
     {
       b->bits[nth >> 3u] &= (0xff7f >> (nth & 7u));
-      tr_bitfieldIncTrueCount (b, -1);
+      tr_bitfieldDecTrueCount (b, 1);
     }
 }
 
@@ -466,5 +480,5 @@ tr_bitfieldRemRange (tr_bitfield * b, size_t begin, size_t end)
         memset (b->bits + sb, 0, eb - sb);
     }
 
-  tr_bitfieldIncTrueCount (b, -diff);
+  tr_bitfieldDecTrueCount (b, diff);
 }

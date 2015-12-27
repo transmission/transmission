@@ -78,7 +78,15 @@ test_bitfields (void)
   for (i=0; i<bitcount; i++)
     check (tr_bitfieldHas (&field, i));
 
+  /* test tr_bitfieldRem */
+  for (i=0; i<bitcount; i++)
+    if ((i % 7) != 0)
+      tr_bitfieldRem (&field, i);
+  for (i=0; i<bitcount; i++)
+    check (tr_bitfieldHas (&field, i) == (! (i % 7)));
+
   /* test tr_bitfieldRemRange in the middle of a boundary */
+  tr_bitfieldAddRange (&field, 0, 64);
   tr_bitfieldRemRange (&field, 4, 21);
   for (i=0; i<64; i++)
     check (tr_bitfieldHas (&field, i) == ((i < 4) || (i >= 21)));
