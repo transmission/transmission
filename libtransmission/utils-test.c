@@ -317,7 +317,7 @@ test_url (void)
   const char * url;
 
   url = "http://1";
-  check (!tr_urlParse (url, TR_BAD_SIZE, &scheme, &host, &port, &path));
+  check (tr_urlParse (url, TR_BAD_SIZE, &scheme, &host, &port, &path));
   check_streq ("http", scheme);
   check_streq ("1", host);
   check_streq ("/", path);
@@ -327,7 +327,7 @@ test_url (void)
   tr_free (host);
 
   url = "http://www.some-tracker.org/some/path";
-  check (!tr_urlParse (url, TR_BAD_SIZE, &scheme, &host, &port, &path));
+  check (tr_urlParse (url, TR_BAD_SIZE, &scheme, &host, &port, &path));
   check_streq ("http", scheme);
   check_streq ("www.some-tracker.org", host);
   check_streq ("/some/path", path);
@@ -337,7 +337,7 @@ test_url (void)
   tr_free (host);
 
   url = "http://www.some-tracker.org:80/some/path";
-  check (!tr_urlParse (url, TR_BAD_SIZE, &scheme, &host, &port, &path));
+  check (tr_urlParse (url, TR_BAD_SIZE, &scheme, &host, &port, &path));
   check_streq ("http", scheme);
   check_streq ("www.some-tracker.org", host);
   check_streq ("/some/path", path);

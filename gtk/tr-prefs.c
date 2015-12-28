@@ -501,8 +501,8 @@ static void
 on_blocklist_url_changed (GtkEditable * e, gpointer gbutton)
 {
   gchar * url = gtk_editable_get_chars (e, 0, -1);
-  const gboolean err = tr_urlParse (url, TR_BAD_SIZE, NULL, NULL, NULL, NULL);
-  gtk_widget_set_sensitive (GTK_WIDGET (gbutton), !err);
+  const gboolean is_url_valid = tr_urlParse (url, TR_BAD_SIZE, NULL, NULL, NULL, NULL);
+  gtk_widget_set_sensitive (GTK_WIDGET (gbutton), is_url_valid);
   g_free (url);
 }
 

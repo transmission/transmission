@@ -359,15 +359,15 @@ void tr_hex_to_binary (const char * input, void * output, size_t byte_length) TR
 /** @brief convenience function to determine if an address is an IP address (IPv4 or IPv6) */
 bool tr_addressIsIP (const char * address);
 
-/** @brief return true if the url is a http or https url that Transmission understands */
+/** @brief return true if the url is a http or https or UDP url that Transmission understands */
 bool tr_urlIsValidTracker (const char * url) TR_GNUC_NONNULL (1);
 
-/** @brief return true if the url is a [ http, https, ftp, ftps ] url that Transmission understands */
+/** @brief return true if the url is a [ http, https, ftp, sftp ] url that Transmission understands */
 bool tr_urlIsValid (const char * url, size_t url_len) TR_GNUC_NONNULL (1);
 
 /** @brief parse a URL into its component parts
-    @return zero on success or an error number if an error occurred */
-int  tr_urlParse (const char * url,
+    @return True on success or false if an error occurred */
+bool tr_urlParse (const char * url,
                   size_t       url_len,
                   char      ** setme_scheme,
                   char      ** setme_host,

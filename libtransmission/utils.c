@@ -673,9 +673,7 @@ tr_hex_to_binary (const char * input,
 static bool
 isValidURLChars (const char * url, size_t url_len)
 {
-  const char * c;
-  const char * end;
-  static const char * rfc2396_valid_chars =
+  static const char rfc2396_valid_chars[] =
     "abcdefghijklmnopqrstuvwxyz" /* lowalpha */
     "ABCDEFGHIJKLMNOPQRSTUVWXYZ" /* upalpha */
     "0123456789"                 /* digit */
@@ -687,56 +685,41 @@ isValidURLChars (const char * url, size_t url_len)
   if (url == NULL)
     return false;
 
-  for (c=url, end=c+url_len; c && *c && c!=end; ++c)
-    if (!strchr (rfc2396_valid_chars, *c))
+  for (const char * c = url, * end = url + url_len; c < end && *c != '\0'; ++c)
+    if (memchr (rfc2396_valid_chars, *c, sizeof (rfc2396_valid_chars) - 1) == NULL)
       return false;
 
   return true;
 }
 
-/** @brief return true if the URL is a http or https or UDP one that Transmission understands */
 bool
 tr_urlIsValidTracker (const char * url)
 {
-  bool valid;
-
   if (url == NULL)
-    {
-      valid = false;
-    }
-  else
-    {
-      const size_t len = strlen (url);
+    return false;
 
-      valid = isValidURLChars (url, len)
-           && !tr_urlParse (url, len, NULL, NULL, NULL, NULL)
-           && (!memcmp (url,"http://",7) || !memcmp (url,"https://",8) || !memcmp (url,"udp://",6));
-    }
+  const size_t url_len = strlen (url);
 
-  return valid;
+  return isValidURLChars (url, url_len)
+      && tr_urlParse (url, url_len, NULL, NULL, NULL, NULL)
+      && (memcmp (url, "http://", 7) == 0 || memcmp (url, "https://", 8) == 0 ||
+          memcmp (url, "udp://", 6) == 0);
 }
 
-/** @brief return true if the URL is a http or https or ftp or sftp one that Transmission understands */
 bool
-tr_urlIsValid (const char * url, size_t url_len)
+tr_urlIsValid (const char * url,
+               size_t       url_len)
 {
-  bool valid;
-
   if (url == NULL)
-    {
-      valid = false;
-    }
-  else
-    {
-      if (url_len == TR_BAD_SIZE)
-        url_len = strlen (url);
+    return false;
 
-      valid = isValidURLChars (url, url_len)
-           && !tr_urlParse (url, url_len, NULL, NULL, NULL, NULL)
-           && (!memcmp (url,"http://",7) || !memcmp (url,"https://",8) || !memcmp (url,"ftp://",6) || !memcmp (url,"sftp://",7));
-    }
+  if (url_len == TR_BAD_SIZE)
+    url_len = strlen (url);
 
-  return valid;
+  return isValidURLChars (url, url_len)
+      && tr_urlParse (url, url_len, NULL, NULL, NULL, NULL)
+      && (memcmp (url, "http://", 7) == 0 || memcmp (url, "https://", 8) == 0 ||
+          memcmp (url, "ftp://", 6) == 0 || memcmp (url, "sftp://", 7) == 0);
 }
 
 bool
@@ -746,78 +729,114 @@ tr_addressIsIP (const char * str)
   return tr_address_from_string (&tmp, str);
 }
 
-int
-tr_urlParse (const char * url_in,
-             size_t       len,
-             char **      setme_protocol,
-             char **      setme_host,
-             int *        setme_port,
-             char **      setme_path)
+static int
+parse_port (const char * port,
+            size_t       port_len)
 {
-  int err;
-  int port = 0;
-  size_t n;
-  char * tmp;
-  char * pch;
-  size_t host_len;
-  size_t protocol_len;
-  const char * host = NULL;
-  const char * protocol = NULL;
-  const char * path = NULL;
+  char * tmp = tr_strndup (port, port_len);
+  char * end;
 
-  tmp = tr_strndup (url_in, len);
-  if ((pch = strstr (tmp, "://")))
-    {
-      *pch = '\0';
-      protocol = tmp;
-      protocol_len = (size_t) (pch - protocol);
-      pch += 3;
-      if ((n = strcspn (pch, ":/")))
-        {
-          const int havePort = pch[n] == ':';
-          host = pch;
-          host_len = n;
-          pch += n;
-          if (pch && *pch)
-            *pch++ = '\0';
-          if (havePort)
-            {
-              char * end;
-              port = strtol (pch, &end, 10);
-              pch = end;
-            }
-          path = pch;
-        }
-    }
+  long port_num = strtol (tmp, &end, 10);
 
-  err = !host || !path || !protocol;
-
-  if (!err && !port)
-    {
-      if (!strcmp (protocol, "udp")) port = 80;
-      else if (!strcmp (protocol, "ftp")) port = 21;
-      else if (!strcmp (protocol, "sftp")) port = 22;
-      else if (!strcmp (protocol, "http")) port = 80;
-      else if (!strcmp (protocol, "https")) port = 443;
-    }
-
-  if (!err)
-    {
-      if (setme_protocol) *setme_protocol = tr_strndup (protocol, protocol_len);
-
-      if (setme_host){ ((char*)host)[-3] = ':'; *setme_host =
-                        tr_strndup (host, host_len); }
-
-      if (setme_path){ if (!*path) *setme_path = tr_strdup ("/");
-                       else if (path[0] == '/') *setme_path = tr_strdup (path);
-                       else { ((char*)path)[-1] = '/'; *setme_path = tr_strdup (path - 1); } }
-
-      if (setme_port) *setme_port = port;
-    }
-
+  if (*end != '\0' || port_num <= 0 || port_num >= 65536)
+    port_num = -1;
 
   tr_free (tmp);
-  return err;
+
+  return (int) port_num;
+}
+
+static int
+get_port_for_scheme (const char * scheme,
+                     size_t       scheme_len)
+{
+  struct known_scheme
+    {
+      const char * name;
+      int          port;
+    };
+
+  static const struct known_scheme known_schemes[] =
+    {
+      { "udp",    80 },
+      { "ftp",    21 },
+      { "sftp",   22 },
+      { "http",   80 },
+      { "https", 443 },
+      { NULL,      0 }
+    };
+
+  for (const struct known_scheme * s = known_schemes; s->name != NULL; ++s)
+    {
+      if (scheme_len == strlen (s->name) && memcmp (scheme, s->name, scheme_len) == 0)
+        return s->port;
+    }
+
+  return -1;
+}
+
+bool
+tr_urlParse (const char  * url,
+             size_t        url_len,
+             char       ** setme_scheme,
+             char       ** setme_host,
+             int         * setme_port,
+             char       ** setme_path)
+{
+  if (url_len == TR_BAD_SIZE)
+    url_len = strlen (url);
+
+  const char * scheme = url;
+  const char * scheme_end = tr_memmem (scheme, url_len, "://", 3);
+  if (scheme_end == NULL)
+    return false;
+
+  const size_t scheme_len = scheme_end - scheme;
+  if (scheme_len == 0)
+    return false;
+
+  url += scheme_len + 3;
+  url_len -= scheme_len + 3;
+
+  const char * authority = url;
+  const char * authority_end = memchr (authority, '/', url_len);
+  if (authority_end == NULL)
+    authority_end = authority + url_len;
+
+  const size_t authority_len = authority_end - authority;
+  if (authority_len == 0)
+    return false;
+
+  url += authority_len;
+  url_len -= authority_len;
+
+  const char * host_end = memchr (authority, ':', authority_len);
+
+  const size_t host_len = host_end != NULL ? host_end - authority : authority_len;
+  if (host_len == 0)
+    return false;
+
+  const size_t port_len = host_end != NULL ? authority_end - host_end - 1 : 0;
+
+  if (setme_scheme != NULL)
+    *setme_scheme = tr_strndup (scheme, scheme_len);
+
+  if (setme_host != NULL)
+    *setme_host = tr_strndup (authority, host_len);
+
+  if (setme_port != NULL)
+    *setme_port = port_len > 0 ? parse_port (host_end + 1, port_len)
+                               : get_port_for_scheme (scheme, scheme_len);
+
+  if (setme_path != NULL)
+    {
+      if (url[0] == '\0')
+        *setme_path = tr_strdup ("/");
+      else
+        *setme_path = tr_strndup (url, url_len);
+    }
+
+  return true;
 }
 
 /***
