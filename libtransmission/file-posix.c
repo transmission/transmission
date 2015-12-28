@@ -872,7 +872,9 @@ non_sparse_out:
       errno = code;
     }
 
+#ifdef HAVE_FALLOCATE64
 out:
+#endif
   if (!ret)
     set_system_error (error, errno);
 

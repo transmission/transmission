@@ -7,6 +7,11 @@
  * $Id$
  */
 
+#ifdef __APPLE__
+ /* OpenSSL "deprecated" as of OS X 10.7, but we still use it */
+ #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
 #include <assert.h>
 
 #include <openssl/bn.h>

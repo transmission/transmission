@@ -18,12 +18,6 @@
 #include "variant-common.h"
 #include "libtransmission-test.h"
 
-static inline tr_quark
-toQuark (const char * str)
-{
-  return tr_quark_new (str, strlen(str));
-}
-
 static int
 test_elements (void)
 {

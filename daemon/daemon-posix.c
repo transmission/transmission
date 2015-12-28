@@ -165,7 +165,7 @@ dtr_daemon (const dtr_callbacks  * cb,
   if (!foreground)
     {
 
-#if defined (HAVE_DAEMON) && !defined (__UCLIBC__)
+#if defined (HAVE_DAEMON) && !defined (__APPLE__) && !defined (__UCLIBC__)
 
       if (daemon (true, false) == -1)
         {

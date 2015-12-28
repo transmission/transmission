@@ -348,11 +348,15 @@ swarmUnlock (tr_swarm * swarm)
   managerUnlock (swarm->manager);
 }
 
+#ifndef NDEBUG
+
 static inline int
 swarmIsLocked (const tr_swarm * swarm)
 {
   return tr_sessionIsLocked (swarm->manager->session);
 }
+
+#endif /* NDEBUG */
 
 /**
 ***
