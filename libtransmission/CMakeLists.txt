@@ -15,11 +15,15 @@ set(${PROJECT_NAME}_SOURCES
     ConvertUTF.c
     crypto.c
     crypto-utils.c
+    crypto-utils-cyassl.c
     crypto-utils-fallback.c
-    crypto-utils-${CRYPTO_PKG}.c
+    crypto-utils-openssl.c
+    crypto-utils-polarssl.c
     error.c
     fdlimit.c
     file.c
+    file-posix.c
+    file-win32.c
     handshake.c
     history.c
     inout.c
@@ -51,6 +55,7 @@ set(${PROJECT_NAME}_SOURCES
     tr-getopt.c
     tr-lpd.c
     tr-udp.c
+    tr-utp.c
     upnp.c
     utils.c
     variant-benc.c
@@ -62,10 +67,17 @@ set(${PROJECT_NAME}_SOURCES
     wildmat.c
 )
 
+set_source_files_properties(crypto-utils-fallback.c PROPERTIES HEADER_FILE_ONLY ON)
+foreach(CP cyassl openssl polarssl)
+    if(NOT CP STREQUAL CRYPTO_PKG)
+        set_source_files_properties(crypto-utils-${CP}.c PROPERTIES HEADER_FILE_ONLY ON)
+    endif()
+endforeach()
+
 if(WIN32)
-    list(APPEND ${PROJECT_NAME}_SOURCES file-win32.c)
+    set_source_files_properties(file-posix.c PROPERTIES HEADER_FILE_ONLY ON)
 else()
-    list(APPEND ${PROJECT_NAME}_SOURCES file-posix.c)
+    set_source_files_properties(file-win32.c PROPERTIES HEADER_FILE_ONLY ON)
 endif()
 
 set(${PROJECT_NAME}_PUBLIC_HEADERS
@@ -123,6 +135,7 @@ set(${PROJECT_NAME}_PRIVATE_HEADERS
     trevent.h
     tr-lpd.h
     tr-udp.h
+    tr-utp.h
     upnp.h
     variant-common.h
     verify.h
@@ -130,9 +143,8 @@ set(${PROJECT_NAME}_PRIVATE_HEADERS
     webseed.h
 )
 
-if(ENABLE_UTP)
-    list(APPEND ${PROJECT_NAME}_SOURCES tr-utp.c)
-    list(APPEND ${PROJECT_NAME}_PRIVATE_HEADERS tr-utp.h)
+if(NOT ENABLE_UTP)
+    set_source_files_properties(tr-utp.c PROPERTIES HEADER_FILE_ONLY ON)
 endif()
 
 add_definitions(

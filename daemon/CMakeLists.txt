@@ -20,13 +20,15 @@ include_directories(
 
 set(${PROJECT_NAME}_SOURCES
     daemon.c
+    daemon-posix.c
+    daemon-win32.c
     watch.c
 )
 
 if(WIN32)
-    list(APPEND ${PROJECT_NAME}_SOURCES daemon-win32.c)
+    set_source_files_properties(daemon-posix.c PROPERTIES HEADER_FILE_ONLY ON)
 else()
-    list(APPEND ${PROJECT_NAME}_SOURCES daemon-posix.c)
+    set_source_files_properties(daemon-win32.c PROPERTIES HEADER_FILE_ONLY ON)
 endif()
 
 set(${PROJECT_NAME}_HEADERS
