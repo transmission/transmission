@@ -2178,7 +2178,8 @@ torrentCallScript (const tr_torrent * tor, const char * script)
           for (i = 0; env[i] != NULL; ++i)
             putenv (env[i]);
 
-          (void) chdir ("/");
+          if (chdir ("/") == -1)
+            /* ignore (nice to have but not that critical) */;
 
           if (execvp (script, cmd) == -1)
             tr_logAddTorErr (tor, "error executing script \"%s\": %s", script, tr_strerror (errno));

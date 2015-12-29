@@ -11,7 +11,7 @@
 #include <errno.h>
 #include <pthread.h>
 #include <signal.h>
-#include <stdlib.h> /* daemon (), exit () */
+#include <stdlib.h> /* abort (), daemon (), exit () */
 #include <fcntl.h> /* open () */
 #include <unistd.h> /* fork (), setsid (), chdir (), dup2 (), close (), pipe () */
 
@@ -70,7 +70,8 @@ send_signal_to_pipe (int sig)
 {
   const int old_errno = errno;
 
-  write (signal_pipe[1], &sig, sizeof (sig));
+  if (write (signal_pipe[1], &sig, sizeof (sig)) == -1)
+    abort ();
 
   errno = old_errno;
 }

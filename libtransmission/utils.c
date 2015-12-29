@@ -812,7 +812,7 @@ tr_urlParse (const char  * url,
 
   const char * host_end = memchr (authority, ':', authority_len);
 
-  const size_t host_len = host_end != NULL ? host_end - authority : authority_len;
+  const size_t host_len = host_end != NULL ? (size_t) (host_end - authority) : authority_len;
   if (host_len == 0)
     return false;
 

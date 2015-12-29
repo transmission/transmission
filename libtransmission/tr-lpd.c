@@ -404,7 +404,8 @@ tr_lpdEnabled (const tr_session* ss)
 * @remark Declared inline for the compiler not to allege us of feeding unused
 * functions. In any other respect, lpd_consistencyCheck is an orphaned function.
 */
-static inline void lpd_consistencyCheck (void)
+UNUSED static inline void
+lpd_consistencyCheck (void)
 {
     /* if the following check fails, the definition of a hash string has changed
      * without our knowledge; revise string handling in functions tr_lpdSendAnnounce

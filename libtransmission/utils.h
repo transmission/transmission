@@ -360,10 +360,10 @@ void tr_hex_to_binary (const char * input, void * output, size_t byte_length) TR
 bool tr_addressIsIP (const char * address);
 
 /** @brief return true if the url is a http or https or UDP url that Transmission understands */
-bool tr_urlIsValidTracker (const char * url) TR_GNUC_NONNULL (1);
+bool tr_urlIsValidTracker (const char * url);
 
 /** @brief return true if the url is a [ http, https, ftp, sftp ] url that Transmission understands */
-bool tr_urlIsValid (const char * url, size_t url_len) TR_GNUC_NONNULL (1);
+bool tr_urlIsValid (const char * url, size_t url_len);
 
 /** @brief parse a URL into its component parts
     @return True on success or false if an error occurred */
