@@ -675,7 +675,7 @@ onNowTimer (evutil_socket_t foo UNUSED, short bar UNUSED, void * vsession)
   if (usec < min)
     usec = min;
   tr_timerAdd (session->nowTimer, 0, usec);
-  /* fprintf (stderr, "time %"TR_PRIuSIZE" sec, %"TR_PRIuSIZE" microsec\n", (size_t)tr_time (), (size_t)tv.tv_usec); */
+  /* fprintf (stderr, "time %zu sec, %zu microsec\n", (size_t)tr_time (), (size_t)tv.tv_usec); */
 }
 
 static void loadBlocklists (tr_session * session);
@@ -1869,7 +1869,7 @@ tr_sessionClose (tr_session * session)
 
   assert (tr_isSession (session));
 
-  dbgmsg ("shutting down transmission session %p... now is %"TR_PRIuSIZE", deadline is %"TR_PRIuSIZE, (void*)session, (size_t)time (NULL), (size_t)deadline);
+  dbgmsg ("shutting down transmission session %p... now is %zu, deadline is %zu", (void*)session, (size_t)time (NULL), (size_t)deadline);
 
   /* close the session */
   tr_runInEventThread (session, sessionCloseImpl, session);
@@ -1886,7 +1886,7 @@ tr_sessionClose (tr_session * session)
   while ((session->shared || session->web || session->announcer || session->announcer_udp)
            && !deadlineReached (deadline))
     {
-      dbgmsg ("waiting on port unmap (%p) or announcer (%p)... now %"TR_PRIuSIZE" deadline %"TR_PRIuSIZE,
+      dbgmsg ("waiting on port unmap (%p) or announcer (%p)... now %zu deadline %zu",
               (void*)session->shared, (void*)session->announcer, (size_t)time (NULL), (size_t)deadline);
       tr_wait_msec (50);
     }
@@ -1898,7 +1898,7 @@ tr_sessionClose (tr_session * session)
   while (session->events != NULL)
     {
       static bool forced = false;
-      dbgmsg ("waiting for libtransmission thread to finish... now %"TR_PRIuSIZE" deadline %"TR_PRIuSIZE, (size_t)time (NULL), (size_t)deadline);
+      dbgmsg ("waiting for libtransmission thread to finish... now %zu deadline %zu", (size_t)time (NULL), (size_t)deadline);
       tr_wait_msec (100);
 
       if (deadlineReached (deadline) && !forced)

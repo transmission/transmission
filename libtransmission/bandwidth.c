@@ -393,7 +393,7 @@ tr_bandwidthUsed (tr_bandwidth  * b,
 
 #ifdef DEBUG_DIRECTION
 if ((dir == DEBUG_DIRECTION) && (band->isLimited))
-fprintf (stderr, "%p consumed %5"TR_PRIuSIZE" bytes of %5s data... was %6"TR_PRIuSIZE", now %6"TR_PRIuSIZE" left\n",
+fprintf (stderr, "%p consumed %5zu bytes of %5s data... was %6zu, now %6zu left\n",
          b, byteCount, (isPieceData?"piece":"raw"), oldBytesLeft, band->bytesLeft);
 #endif
 

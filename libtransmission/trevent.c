@@ -190,8 +190,8 @@ readFromPipe (evutil_socket_t   fd,
         {
             struct tr_run_data data;
             const size_t       nwant = sizeof (data);
-            const ssize_t      ngot = piperead (fd, &data, nwant);
-            if (!eh->die && (ngot == (ssize_t)nwant))
+            const ev_ssize_t   ngot = piperead (fd, &data, nwant);
+            if (!eh->die && (ngot == (ev_ssize_t) nwant))
             {
                 dbgmsg ("invoking function in libevent thread");
               (data.func)(data.user_data);
@@ -324,8 +324,8 @@ tr_runInEventThread (tr_session * session,
     {
       tr_pipe_end_t fd;
       char ch;
-      ssize_t res_1;
-      ssize_t res_2;
+      ev_ssize_t res_1;
+      ev_ssize_t res_2;
       tr_event_handle * e = session->events;
       struct tr_run_data data;
 

@@ -411,7 +411,7 @@ utp_on_read (void *closure, const unsigned char *buf, size_t buflen)
     assert (tr_isPeerIo (io));
 
     rc = evbuffer_add (io->inbuf, buf, buflen);
-    dbgmsg (io, "utp_on_read got %"TR_PRIuSIZE" bytes", buflen);
+    dbgmsg (io, "utp_on_read got %zu bytes", buflen);
 
     if (rc < 0) {
         tr_logAddNamedError ("UTP", "On read evbuffer_add");
@@ -430,7 +430,7 @@ utp_on_write (void *closure, unsigned char *buf, size_t buflen)
     assert (tr_isPeerIo (io));
 
     rc = evbuffer_remove (io->outbuf, buf, buflen);
-    dbgmsg (io, "utp_on_write sending %"TR_PRIuSIZE" bytes... evbuffer_remove returned %d", buflen, rc);
+    dbgmsg (io, "utp_on_write sending %zu bytes... evbuffer_remove returned %d", buflen, rc);
     assert (rc == (int)buflen); /* if this fails, we've corrupted our bookkeeping somewhere */
     if (rc < (long)buflen) {
         tr_logAddNamedError ("UTP", "Short write: %d < %ld", rc, (long)buflen);
@@ -448,7 +448,7 @@ utp_get_rb_size (void *closure)
 
     bytes = tr_bandwidthClamp (&io->bandwidth, TR_DOWN, UTP_READ_BUFFER_SIZE);
 
-    dbgmsg (io, "utp_get_rb_size is saying it's ready to read %"TR_PRIuSIZE" bytes", bytes);
+    dbgmsg (io, "utp_get_rb_size is saying it's ready to read %zu bytes", bytes);
     return UTP_READ_BUFFER_SIZE - bytes;
 }
 
@@ -509,7 +509,7 @@ utp_on_overhead (void *closure, uint8_t send, size_t count, int type UNUSED)
     tr_peerIo *io = closure;
     assert (tr_isPeerIo (io));
 
-    dbgmsg (io, "utp_on_overhead -- count is %"TR_PRIuSIZE, count);
+    dbgmsg (io, "utp_on_overhead -- count is %zu", count);
 
     tr_bandwidthUsed (&io->bandwidth, send ? TR_UP : TR_DOWN,
                       count, false, tr_time_msec ());
@@ -1287,7 +1287,7 @@ tr_peerIoTryWrite (tr_peerIo * io, size_t howmuch)
 {
     int n = 0;
     const size_t old_len = evbuffer_get_length (io->outbuf);
-    dbgmsg (io, "in tr_peerIoTryWrite %"TR_PRIuSIZE, howmuch);
+    dbgmsg (io, "in tr_peerIoTryWrite %zu", howmuch);
 
     if (howmuch > old_len)
         howmuch = old_len;
@@ -1340,7 +1340,7 @@ tr_peerIoFlush (tr_peerIo  * io, tr_direction dir, size_t limit)
     else
         bytesUsed = tr_peerIoTryWrite (io, limit);
 
-    dbgmsg (io, "flushing peer-io, direction %d, limit %"TR_PRIuSIZE", bytesUsed %d", (int)dir, limit, bytesUsed);
+    dbgmsg (io, "flushing peer-io, direction %d, limit %zu, bytesUsed %d", (int)dir, limit, bytesUsed);
     return bytesUsed;
 }
 

@@ -370,7 +370,7 @@ add_response (struct evhttp_request * req,
           iovec[0].iov_len -= server->stream.avail_out;
 
 #if 0
-          fprintf (stderr, "compressed response is %.2f of original (raw==%"TR_PRIuSIZE" bytes; compressed==%"TR_PRIuSIZE")\n",
+          fprintf (stderr, "compressed response is %.2f of original (raw==%zu bytes; compressed==%zu)\n",
                    (double)evbuffer_get_length (out)/content_len,
                    content_len, evbuffer_get_length (out));
 #endif

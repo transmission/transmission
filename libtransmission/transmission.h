@@ -29,62 +29,8 @@ extern "C" {
 #include <inttypes.h> /* uintN_t */
 #include <time.h> /* time_t */
 
-#ifdef _MSC_VER
- typedef intptr_t ssize_t;
-#endif
-
-#if !defined (__cplusplus)
- #ifdef HAVE_STDBOOL_H
-  #include <stdbool.h>
- #elif !defined (__bool_true_false_are_defined)
-  #define bool uint8_t
-  #define true 1
-  #define false 0
- #endif
-#endif
-
-#ifndef PRId64
- #ifdef _WIN32
-  #define PRId64 "I64"
- #else
-  #define PRId64 "lld"
- #endif
-#endif
-
-#ifndef PRIu64
- #ifdef _WIN32
-  #define PRIu64 "I64u"
- #else
-  #define PRIu64 "llu"
- #endif
-#endif
-
-#ifndef PRIu32
- #ifdef _WIN32
-  #define PRIu32 "u"
- #else
-  #define PRIu32 "lu"
- #endif
-#endif
-
-#ifndef PRIdMAX
- #ifdef _WIN32
-  #define PRIdMAX "I64"
- #else
-  #define PRIdMAX "jd"
- #endif
-#endif
-
-#ifndef TR_PRIuSIZE
- #ifdef _WIN32
-  #define TR_PRIuSIZE "Iu"
- #else
-  #define TR_PRIuSIZE "zu"
- #endif
-#endif
-
-#if defined (_MSC_VER) && !defined (__cplusplus)
- #define inline __inline
+#ifndef __cplusplus
+ #include <stdbool.h>
 #endif
 
 #define SHA_DIGEST_LENGTH 20

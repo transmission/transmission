@@ -130,7 +130,7 @@ writeFunc (void * ptr, size_t size, size_t nmemb, void * vtask)
     }
 
   evbuffer_add (task->response, ptr, byteCount);
-  dbgmsg ("wrote %"TR_PRIuSIZE" bytes to task %p's buffer", byteCount, (void*)task);
+  dbgmsg ("wrote %zu bytes to task %p's buffer", byteCount, (void*)task);
   return byteCount;
 }
 

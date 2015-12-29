@@ -258,18 +258,18 @@ on_announce_done (tr_session   * session,
                 response->downloads = i;
 
             if (tr_variantDictFindRaw (&benc, TR_KEY_peers6, &raw, &len)) {
-                dbgmsg (data->log_name, "got a peers6 length of %"TR_PRIuSIZE, len);
+                dbgmsg (data->log_name, "got a peers6 length of %zu", len);
                 response->pex6 = tr_peerMgrCompact6ToPex (raw, len,
                                               NULL, 0, &response->pex6_count);
             }
 
             if (tr_variantDictFindRaw (&benc, TR_KEY_peers, &raw, &len)) {
-                dbgmsg (data->log_name, "got a compact peers length of %"TR_PRIuSIZE, len);
+                dbgmsg (data->log_name, "got a compact peers length of %zu", len);
                 response->pex = tr_peerMgrCompactToPex (raw, len,
                                                NULL, 0, &response->pex_count);
             } else if (tr_variantDictFindList (&benc, TR_KEY_peers, &tmp)) {
                 response->pex = listToPex (tmp, &response->pex_count);
-                dbgmsg (data->log_name, "got a peers list with %"TR_PRIuSIZE" entries",
+                dbgmsg (data->log_name, "got a peers list with %zu entries",
                         response->pex_count);
             }
         }

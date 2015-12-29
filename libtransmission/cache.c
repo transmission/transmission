@@ -93,7 +93,7 @@ getBlockRun (const tr_cache * cache, int pos, struct run_info * info)
         break;
       if (b->tor != ref->tor)
         break;
-      //fprintf (stderr, "pos %d tor %d block %"TR_PRIuSIZE" time %"TR_PRIuSIZE"\n", i, b->tor->uniqueId, (size_t)b->block, (size_t)b->time);
+      //fprintf (stderr, "pos %d tor %d block %zu time %zu\n", i, b->tor->uniqueId, (size_t)b->block, (size_t)b->time);
     }
 
   //fprintf (stderr, "run is %d long from [%d to %d)\n", (int)(i-pos), i, (int)pos);
@@ -438,7 +438,7 @@ tr_cacheFlushFile (tr_cache * cache, tr_torrent * torrent, tr_file_index_t i)
 
   tr_torGetFileBlockRange (torrent, i, &first, &last);
   pos = findBlockPos (cache, torrent, first);
-  dbgmsg ("flushing file %d from cache to disk: blocks [%"TR_PRIuSIZE"...%"TR_PRIuSIZE"]", (int)i, (size_t)first, (size_t)last);
+  dbgmsg ("flushing file %d from cache to disk: blocks [%zu...%zu]", (int)i, (size_t)first, (size_t)last);
 
   /* flush out all the blocks in that file */
   while (!err && (pos < tr_ptrArraySize (&cache->blocks)))

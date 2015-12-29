@@ -88,7 +88,7 @@ error_handler (jsonsl_t                  jsn,
 
   if (data->source)
     {
-      tr_logAddError ("JSON parse failed in %s at pos %"TR_PRIuSIZE": %s -- remaining text \"%.16s\"",
+      tr_logAddError ("JSON parse failed in %s at pos %zu: %s -- remaining text \"%.16s\"",
               data->source,
               jsn->pos,
               jsonsl_strerror (error),
@@ -96,7 +96,7 @@ error_handler (jsonsl_t                  jsn,
     }
   else
     {
-      tr_logAddError ("JSON parse failed at pos %"TR_PRIuSIZE": %s -- remaining text \"%.16s\"",
+      tr_logAddError ("JSON parse failed at pos %zu: %s -- remaining text \"%.16s\"",
               jsn->pos,
               jsonsl_strerror (error),
               buf);

@@ -334,7 +334,7 @@ pokeBatchPeriod (tr_peerMsgs * msgs, int interval)
 static void
 dbgOutMessageLen (tr_peerMsgs * msgs)
 {
-  dbgmsg (msgs, "outMessage size is now %"TR_PRIuSIZE, evbuffer_get_length (msgs->outMessages));
+  dbgmsg (msgs, "outMessage size is now %zu", evbuffer_get_length (msgs->outMessages));
 }
 
 static void
@@ -906,7 +906,7 @@ void
 tr_peerMsgsCancel (tr_peerMsgs * msgs, tr_block_index_t block)
 {
     struct peer_request req;
-/*fprintf (stderr, "SENDING CANCEL MESSAGE FOR BLOCK %"TR_PRIuSIZE"\n\t\tFROM PEER %p ------------------------------------\n", (size_t)block, msgs->peer);*/
+/*fprintf (stderr, "SENDING CANCEL MESSAGE FOR BLOCK %zu\n\t\tFROM PEER %p ------------------------------------\n", (size_t)block, msgs->peer);*/
     blockToReq (msgs->torrent, block, &req);
     protocolSendCancel (msgs, &req);
 }
@@ -1300,7 +1300,7 @@ readBtId (tr_peerMsgs * msgs, struct evbuffer * inbuf, size_t inlen)
 
     tr_peerIoReadUint8 (msgs->io, inbuf, &id);
     msgs->incoming.id = id;
-    dbgmsg (msgs, "msgs->incoming.id is now %d; msgs->incoming.length is %"TR_PRIuSIZE, id, (size_t)msgs->incoming.length);
+    dbgmsg (msgs, "msgs->incoming.id is now %d; msgs->incoming.length is %zu", id, (size_t)msgs->incoming.length);
 
     if (id == BT_PIECE)
     {
@@ -1463,7 +1463,7 @@ readBtPiece (tr_peerMsgs      * msgs,
 
         fireClientGotPieceData (msgs, n);
         *setme_piece_bytes_read += n;
-        dbgmsg (msgs, "got %"TR_PRIuSIZE" bytes for block %u:%u->%u ... %d remain",
+        dbgmsg (msgs, "got %zu bytes for block %u:%u->%u ... %d remain",
                n, req->index, req->offset, req->length,
              (int)(req->length - evbuffer_get_length (block_buffer)));
         if (evbuffer_get_length (block_buffer) < req->length)
@@ -1497,7 +1497,7 @@ readBtMessage (tr_peerMsgs * msgs, struct evbuffer * inbuf, size_t inlen)
 
     --msglen; /* id length */
 
-    dbgmsg (msgs, "got BT id %d, len %d, buffer size is %"TR_PRIuSIZE, (int)id, (int)msglen, inlen);
+    dbgmsg (msgs, "got BT id %d, len %d, buffer size is %zu", (int)id, (int)msglen, inlen);
 
     if (inlen < msglen)
         return READ_LATER;
@@ -1764,7 +1764,7 @@ canRead (tr_peerIo * io, void * vmsgs, size_t * piece)
     struct evbuffer * in = tr_peerIoGetReadBuffer (io);
     const size_t      inlen = evbuffer_get_length (in);
 
-    dbgmsg (msgs, "canRead: inlen is %"TR_PRIuSIZE", msgs->state is %d", inlen, msgs->state);
+    dbgmsg (msgs, "canRead: inlen is %zu, msgs->state is %d", inlen, msgs->state);
 
     if (!inlen)
     {
@@ -1932,14 +1932,14 @@ fillOutputBuffer (tr_peerMsgs * msgs, time_t now)
 
     if (haveMessages && !msgs->outMessagesBatchedAt) /* fresh batch */
     {
-        dbgmsg (msgs, "started an outMessages batch (length is %"TR_PRIuSIZE")", evbuffer_get_length (msgs->outMessages));
+        dbgmsg (msgs, "started an outMessages batch (length is %zu)", evbuffer_get_length (msgs->outMessages));
         msgs->outMessagesBatchedAt = now;
     }
     else if (haveMessages && ((now - msgs->outMessagesBatchedAt) >= msgs->outMessagesBatchPeriod))
     {
         const size_t len = evbuffer_get_length (msgs->outMessages);
         /* flush the protocol messages */
-        dbgmsg (msgs, "flushing outMessages... to %p (length is %"TR_PRIuSIZE")", (void*)msgs->io, len);
+        dbgmsg (msgs, "flushing outMessages... to %p (length is %zu)", (void*)msgs->io, len);
         tr_peerIoWriteBuf (msgs->io, msgs->outMessages, false);
         msgs->clientSentAnythingAt = now;
         msgs->outMessagesBatchedAt = 0;
@@ -2046,7 +2046,7 @@ fillOutputBuffer (tr_peerMsgs * msgs, time_t now)
             /* check the piece if it needs checking... */
             if (!err && tr_torrentPieceNeedsCheck (msgs->torrent, req.index))
                 if ((err = !tr_torrentCheckPiece (msgs->torrent, req.index)))
-                    tr_torrentSetLocalError (msgs->torrent, _("Please Verify Local Data! Piece #%"TR_PRIuSIZE" is corrupt."), (size_t)req.index);
+                    tr_torrentSetLocalError (msgs->torrent, _("Please Verify Local Data! Piece #%zu is corrupt."), (size_t)req.index);
 
             if (err)
             {
@@ -2147,7 +2147,7 @@ sendBitfield (tr_peerMsgs * msgs)
     evbuffer_add_uint32 (out, sizeof (uint8_t) + byte_count);
     evbuffer_add_uint8 (out, BT_BITFIELD);
     evbuffer_add     (out, bytes, byte_count);
-    dbgmsg (msgs, "sending bitfield... outMessage size is now %"TR_PRIuSIZE, evbuffer_get_length (out));
+    dbgmsg (msgs, "sending bitfield... outMessage size is now %zu", evbuffer_get_length (out));
     pokeBatchPeriod (msgs, IMMEDIATE_PRIORITY_INTERVAL_SECS);
 
     tr_free (bytes);
@@ -2442,7 +2442,7 @@ sendPex (tr_peerMsgs * msgs)
             evbuffer_add_uint8 (out, msgs->ut_pex_id);
             evbuffer_add_buffer (out, payload);
             pokeBatchPeriod (msgs, HIGH_PRIORITY_INTERVAL_SECS);
-            dbgmsg (msgs, "sending a pex message; outMessage size is now %"TR_PRIuSIZE, evbuffer_get_length (out));
+            dbgmsg (msgs, "sending a pex message; outMessage size is now %zu", evbuffer_get_length (out));
             dbgOutMessageLen (msgs);
 
             evbuffer_free (payload);

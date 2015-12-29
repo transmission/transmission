@@ -277,7 +277,7 @@ addURL (tr_variant * metainfo, const char * url)
         {
           tr_variant * tier = tr_variantListAddList (announce_list, 1);
           tr_variantListAddStr (tier, url);
-          printf ("\tAdded \"%s\" to \"announce-list\" tier %"TR_PRIuSIZE"\n", url, tr_variantListSize (announce_list));
+          printf ("\tAdded \"%s\" to \"announce-list\" tier %zu\n", url, tr_variantListSize (announce_list));
           changed = true;
         }
     }

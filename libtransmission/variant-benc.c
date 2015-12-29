@@ -304,7 +304,7 @@ saveStringFunc (const tr_variant * v, void * evbuf)
   size_t len;
   const char * str;
   tr_variantGetStr (v, &str, &len);
-  evbuffer_add_printf (evbuf, "%"TR_PRIuSIZE":", len);
+  evbuffer_add_printf (evbuf, "%zu:", len);
   evbuffer_add (evbuf, str, len);
 }
 

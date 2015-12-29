@@ -560,9 +560,9 @@ onTrackerResponse (tr_torrent * tor, const tr_tracker_event * event, void * unus
           const bool allAreSeeds = seedProbability == 100;
 
           if (allAreSeeds)
-            tr_logAddTorDbg (tor, "Got %"TR_PRIuSIZE" seeds from tracker", event->pexCount);
+            tr_logAddTorDbg (tor, "Got %zu seeds from tracker", event->pexCount);
           else
-            tr_logAddTorDbg (tor, "Got %"TR_PRIuSIZE" peers from tracker", event->pexCount);
+            tr_logAddTorDbg (tor, "Got %zu peers from tracker", event->pexCount);
 
           for (i = 0; i < event->pexCount; ++i)
             tr_peerMgrAddPex (tor, TR_PEER_FROM_TRACKER, &event->pex[i], seedProbability);
@@ -2636,7 +2636,7 @@ tr_torrentCheckPiece (tr_torrent * tor, tr_piece_index_t pieceIndex)
 {
   const bool pass = tr_ioTestPiece (tor, pieceIndex);
 
-  tr_deeplog_tor (tor, "[LAZY] tr_torrentCheckPiece tested piece %"TR_PRIuSIZE", pass==%d", (size_t)pieceIndex, (int)pass);
+  tr_deeplog_tor (tor, "[LAZY] tr_torrentCheckPiece tested piece %zu, pass==%d", (size_t)pieceIndex, (int)pass);
   tr_torrentSetHasPiece (tor, pieceIndex, pass);
   tr_torrentSetPieceChecked (tor, pieceIndex);
   tor->anyDate = tr_time ();
@@ -3315,7 +3315,7 @@ tr_torrentGotBlock (tr_torrent * tor, tr_block_index_t block)
       p = tr_torBlockPiece (tor, block);
       if (tr_torrentPieceIsComplete (tor, p))
         {
-          tr_logAddTorDbg (tor, "[LAZY] checking just-completed piece %"TR_PRIuSIZE, (size_t)p);
+          tr_logAddTorDbg (tor, "[LAZY] checking just-completed piece %zu", (size_t)p);
 
           if (tr_torrentCheckPiece (tor, p))
             {

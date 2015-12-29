@@ -1032,8 +1032,8 @@ on_announce_done (const tr_announce_response  * response,
                       "interval:%d "
                       "min_interval:%d "
                       "tracker_id_str:%s "
-                      "pex:%"TR_PRIuSIZE" "
-                      "pex6:%"TR_PRIuSIZE" "
+                      "pex:%zu "
+                      "pex6:%zu "
                       "err:%s "
                       "warn:%s",
                     (int)response->did_connect,
@@ -1284,8 +1284,8 @@ on_scrape_error (tr_session * session, tr_tier * tier, const char * errmsg)
 
     /* schedule a rescrape */
     interval = getRetryInterval (tier->currentTracker);
-    dbgmsg (tier, "Retrying scrape in %"TR_PRIuSIZE" seconds.", (size_t)interval);
-    tr_logAddTorInfo (tier->tor, "Retrying scrape in %"TR_PRIuSIZE" seconds.", (size_t)interval);
+    dbgmsg (tier, "Retrying scrape in %zu seconds.", (size_t)interval);
+    tr_logAddTorInfo (tier->tor, "Retrying scrape in %zu seconds.", (size_t)interval);
     tier->lastScrapeSucceeded = false;
     tier->scrapeAt = get_next_scrape_time (session, tier, interval);
 }
