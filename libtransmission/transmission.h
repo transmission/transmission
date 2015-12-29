@@ -29,8 +29,14 @@ extern "C" {
 #include <inttypes.h> /* uintN_t */
 #include <time.h> /* time_t */
 
-#ifndef __cplusplus
- #include <stdbool.h>
+#if !defined (__cplusplus)
+ #ifdef HAVE_STDBOOL_H
+  #include <stdbool.h>
+ #elif !defined (__bool_true_false_are_defined)
+  #define bool uint8_t
+  #define true 1
+  #define false 0
+ #endif
 #endif
 
 #define SHA_DIGEST_LENGTH 20
