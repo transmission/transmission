@@ -142,6 +142,10 @@ if(WIN32)
             # Reduce noise (at least for now)
             set(CMAKE_${L}_FLAGS "${CMAKE_${L}_FLAGS} /wd4244 /wd4267")
         endif()
+
+        if(MINGW)
+            set(CMAKE_${L}_FLAGS "${CMAKE_${L}_FLAGS} -D__USE_MINGW_ANSI_STDIO=1")
+        endif()
     endforeach()
 endif()
 
@@ -310,7 +314,8 @@ set(THIRD_PARTY_DIR ${CMAKE_SOURCE_DIR}/third-party)
 if(WIN32)
     tr_add_external_auto_library(EVENT2 event
         PATCH_COMMAND "${CMAKE_COMMAND}" -E copy "${THIRD_PARTY_DIR}/event2.cmake" "<SOURCE_DIR>/CMakeLists.txt"
-              COMMAND "${CMAKE_COMMAND}" -E chdir "<SOURCE_DIR>" patch -p1 -i "${THIRD_PARTY_DIR}/event2-01-win32.patch")
+              COMMAND "${CMAKE_COMMAND}" -E chdir "<SOURCE_DIR>" patch -p1 -i "${THIRD_PARTY_DIR}/event2-01-win32.patch"
+              COMMAND "${CMAKE_COMMAND}" -E chdir "<SOURCE_DIR>" patch -p1 -i "${THIRD_PARTY_DIR}/event2-02-win32.patch")
 else()
     tr_add_external_auto_library(EVENT2 event
         BUILD_IN_SOURCE 1
