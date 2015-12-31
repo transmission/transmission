@@ -254,7 +254,7 @@ tr_bitfieldFreeArray (tr_bitfield * b)
 static void
 tr_bitfieldSetTrueCount (tr_bitfield * b, size_t n)
 {
-  assert (n <= b->bit_count);
+  assert (b->bit_count == 0 || n <= b->bit_count);
 
   b->true_count = n;
 
@@ -273,8 +273,8 @@ tr_bitfieldRebuildTrueCount (tr_bitfield * b)
 static void
 tr_bitfieldIncTrueCount (tr_bitfield * b, size_t i)
 {
-  assert (i <= b->bit_count);
-  assert (b->true_count <= b->bit_count - i);
+  assert (b->bit_count == 0 || i <= b->bit_count);
+  assert (b->bit_count == 0 || b->true_count <= b->bit_count - i);
 
   tr_bitfieldSetTrueCount (b, b->true_count + i);
 }
@@ -282,8 +282,8 @@ tr_bitfieldIncTrueCount (tr_bitfield * b, size_t i)
 static void
 tr_bitfieldDecTrueCount (tr_bitfield * b, size_t i)
 {
-  assert (i <= b->bit_count);
-  assert (b->true_count >= i);
+  assert (b->bit_count == 0 || i <= b->bit_count);
+  assert (b->bit_count == 0 || b->true_count >= i);
 
   tr_bitfieldSetTrueCount (b, b->true_count - i);
 }
