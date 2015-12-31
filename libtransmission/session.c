@@ -1781,13 +1781,10 @@ compareTorrentByCur (const void * va, const void * vb)
 static void closeBlocklists (tr_session *);
 
 static void
-sessionCloseImpl (void * vsession)
+sessionCloseImplStart (tr_session * session)
 {
   int i, n;
   tr_torrent ** torrents;
-  tr_session * session = vsession;
-
-  assert (tr_isSession (session));
 
   session->isClosing = true;
 
@@ -1829,15 +1826,11 @@ sessionCloseImpl (void * vsession)
 
   tr_cacheFree (session->cache);
   session->cache = NULL;
+}
 
-  /* gotta keep udp running long enough to send out all
-     the &event=stopped UDP tracker messages */
-  while (!tr_tracker_udp_is_idle (session))
-    {
-      tr_tracker_udp_upkeep (session);
-      tr_wait_msec (100);
-    }
-
+static void
+sessionCloseImplFinish (tr_session * session)
+{
   /* we had to wait until UDP trackers were closed before closing these: */
   evdns_base_free (session->evdns_base, 0);
   session->evdns_base = NULL;
@@ -1852,6 +1845,42 @@ sessionCloseImpl (void * vsession)
   tr_fdClose (session);
 
   session->isClosed = true;
+}
+
+static void
+sessionCloseImplWaitForIdleUdp (evutil_socket_t   foo UNUSED,
+                                short             bar UNUSED,
+                                void            * vsession)
+{
+  tr_session * session = vsession;
+
+  assert (tr_isSession (session));
+
+  /* gotta keep udp running long enough to send out all
+     the &event=stopped UDP tracker messages */
+  if (!tr_tracker_udp_is_idle (session))
+    {
+      tr_tracker_udp_upkeep (session);
+      tr_timerAdd (session->saveTimer, 0, 100000);
+      return;
+    }
+
+  sessionCloseImplFinish (session);
+}
+
+static void
+sessionCloseImpl (void * vsession)
+{
+  tr_session * session = vsession;
+
+  assert (tr_isSession (session));
+
+  sessionCloseImplStart (session);
+
+  /* saveTimer is not used at this point, reusing for UDP shutdown wait */
+  assert (session->saveTimer == NULL);
+  session->saveTimer = evtimer_new (session->event_base, sessionCloseImplWaitForIdleUdp, session);
+  tr_timerAdd (session->saveTimer, 0, 0);
 }
 
 static int

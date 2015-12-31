@@ -451,10 +451,10 @@ static void tau_tracker_upkeep (struct tau_tracker *);
 static void
 tau_tracker_free (struct tau_tracker * t)
 {
+    assert (t->dns_request == NULL);
+
     if (t->addr)
         evutil_freeaddrinfo (t->addr);
-    if (t->dns_request != NULL)
-        evdns_getaddrinfo_cancel (t->dns_request);
     tr_ptrArrayDestruct (&t->announces, (PtrArrayForeachFunc)tau_announce_request_free);
     tr_ptrArrayDestruct (&t->scrapes, (PtrArrayForeachFunc)tau_scrape_request_free);
     tr_free (t->host);
@@ -500,7 +500,7 @@ tau_tracker_on_dns (int errcode, struct evutil_addrinfo *addr, void * vtracker)
     if (errcode)
     {
         char * errmsg = tr_strdup_printf (_("DNS Lookup failed: %s"),
-                                          evdns_err_to_string (errcode));
+                                          evutil_gai_strerror (errcode));
         dbgmsg (tracker->key, "%s", errmsg);
         tau_tracker_fail_all (tracker, false, false, errmsg);
         tr_free (errmsg);
@@ -654,16 +654,18 @@ static bool
 tau_tracker_is_idle (const struct tau_tracker * tracker)
 {
     return tr_ptrArrayEmpty (&tracker->announces)
-        && tr_ptrArrayEmpty (&tracker->scrapes);
+        && tr_ptrArrayEmpty (&tracker->scrapes)
+        && tracker->dns_request == NULL;
 }
 
 static void
 tau_tracker_upkeep (struct tau_tracker * tracker)
 {
     const time_t now = tr_time ();
+    const bool closing = tracker->close_at != 0;
 
     /* if the address info is too old, expire it */
-    if (tracker->addr && (tracker->addr_expiration_time <= now)) {
+    if (tracker->addr != NULL && (closing || tracker->addr_expiration_time <= now)) {
         dbgmsg (tracker->host, "Expiring old DNS result");
         evutil_freeaddrinfo (tracker->addr);
         tracker->addr = NULL;
@@ -674,7 +676,7 @@ tau_tracker_upkeep (struct tau_tracker * tracker)
         return;
 
     /* if we don't have an address yet, try & get one now. */
-    if (!tracker->addr && (tracker->dns_request == NULL))
+    if (!closing && tracker->addr == NULL && tracker->dns_request == NULL)
     {
         struct evutil_addrinfo hints;
         memset (&hints, 0, sizeof (hints));
@@ -853,6 +855,8 @@ tr_tracker_udp_start_shutdown (tr_session * session)
         for (i=0, n=tr_ptrArraySize (&tau->trackers); i<n; ++i)
         {
             struct tau_tracker * tracker = tr_ptrArrayNth (&tau->trackers, i);
+            if (tracker->dns_request != NULL)
+                evdns_getaddrinfo_cancel (tracker->dns_request);
             tracker->close_at = now + 3;
             tau_tracker_upkeep (tracker);
         }

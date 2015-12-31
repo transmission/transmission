@@ -203,6 +203,8 @@ readFromPipe (evutil_socket_t   fd,
         {
             dbgmsg ("pipe eof reached... removing event listener");
             event_free (eh->pipeEvent);
+            tr_netCloseSocket (eh->fds[0]);
+            event_base_loopexit (eh->base, NULL);
             break;
         }
 
