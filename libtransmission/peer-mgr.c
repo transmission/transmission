@@ -2619,17 +2619,12 @@ tr_peerMgrGetDesiredAvailable (const tr_torrent * tor)
 
   /* common shortcuts... */
 
-  if (!tor->isRunning || tor->isStopping)
-    return 0;
-
-  if (tr_torrentIsSeed (tor))
-    return 0;
-
-  if (!tr_torrentHasMetadata (tor))
+  if (!tor->isRunning || tor->isStopping ||
+      tr_torrentIsSeed (tor) || !tr_torrentHasMetadata (tor))
     return 0;
 
   s = tor->swarm;
-  if (s == NULL)
+  if (s == NULL || !s->isRunning)
     return 0;
 
   n = tr_ptrArraySize (&s->peers);
