@@ -61,6 +61,42 @@ tr_watchdir_win32;
 ****
 ***/
 
+static BOOL
+tr_get_overlapped_result_ex (HANDLE       handle,
+                             LPOVERLAPPED overlapped,
+                             LPDWORD      bytes_transferred,
+                             DWORD        timeout,
+                             BOOL         alertable)
+{
+  typedef BOOL (WINAPI * impl_t) (HANDLE, LPOVERLAPPED, LPDWORD, DWORD, BOOL);
+
+  static impl_t real_impl = NULL;
+  static bool is_real_impl_valid = false;
+
+  if (!is_real_impl_valid)
+    {
+      real_impl = (impl_t) GetProcAddress (GetModuleHandleW (L"kernel32.dll"),
+                                           "GetOverlappedResultEx");
+      is_real_impl_valid = true;
+    }
+
+  if (real_impl != NULL)
+    return real_impl (handle, overlapped, bytes_transferred, timeout, alertable);
+
+  const DWORD wait_result = WaitForSingleObjectEx (handle, timeout, alertable);
+  if (wait_result == WAIT_FAILED)
+    return FALSE;
+  if (wait_result == WAIT_IO_COMPLETION || wait_result == WAIT_TIMEOUT)
+    {
+      SetLastError (wait_result);
+      return FALSE;
+    }
+
+  assert (wait_result == WAIT_OBJECT_0);
+
+  return GetOverlappedResult (handle, overlapped, bytes_transferred, FALSE);
+}
+
 static unsigned int __stdcall
 tr_watchdir_win32_thread (void * context)
 {
@@ -68,8 +104,8 @@ tr_watchdir_win32_thread (void * context)
   tr_watchdir_win32 * const backend = BACKEND_UPCAST (tr_watchdir_get_backend (handle));
   DWORD bytes_transferred;
 
-  while (GetOverlappedResultEx (backend->fd, &backend->overlapped, &bytes_transferred,
-                                INFINITE, FALSE))
+  while (tr_get_overlapped_result_ex (backend->fd, &backend->overlapped, &bytes_transferred,
+                                      INFINITE, FALSE))
     {
       PFILE_NOTIFY_INFORMATION info = (PFILE_NOTIFY_INFORMATION) backend->buffer;
 
