@@ -103,7 +103,7 @@
 "%d tracker" = "%d Tracker";
 
 /* Torrent -> status string */
-"%d web seeds" = "%d Web-Verteiler";
+"%d web seeds" = "%d Web-Verteilern";
 
 /* time string */
 "%u days" = "%u Tage";
