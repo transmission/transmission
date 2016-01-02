@@ -18,11 +18,14 @@
   * Prevent completed pieces modification by webseeds
   * Require absolute paths in RPC requests
   * Fix and unify torrent origin display in GTK+, Qt and web clients
+  * Fix crash on session shutdown (evdns_getaddrinfo_cancel)
 ==== Mac Client ====
   * UI fixes for OS X 10.9+
   * Trim potential URIs from clipboard
   * Allow downloading files from http servers (not https) on OS X 10.11+
+  * Fix global options popover layout
   * Fix building with Xcode 7+
+  * Drop OS X 10.6 support
 ==== GTK+ Client ====
   * Fix overshoot and undershoot indicators display with GTK+ 3.16+ in main window
 ==== Qt Client ====
@@ -42,6 +45,7 @@
   * Add Chinese (China), German, Indonesian, Italian (Italy), Korean, Polish (Poland), Ukrainian translations; update existing translations
 ==== Daemon ====
   * Run as service on Windows when in background mode
+  * Rework directory watching, add support for native mechanisms on BSD/Darwin (kqueue) and Windows (ReadDirectoryChanges)
   * Don't make assumptions of remote path validity in transmission-remote
 ==== Web Client ====
   * Content Security Policy enhancements
