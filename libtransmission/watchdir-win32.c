@@ -320,3 +320,4 @@ fail:
   tr_free (wide_path);
   return NULL;
 }
+
