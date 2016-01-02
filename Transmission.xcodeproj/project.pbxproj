@@ -293,7 +293,6 @@
 		A2D22A130D65EEE700007D5F /* verify.c in Sources */ = {isa = PBXBuildFile; fileRef = A2D22A100D65EED100007D5F /* verify.c */; };
 		A2D307A40D9EC6870051FD27 /* BlocklistDownloader.m in Sources */ = {isa = PBXBuildFile; fileRef = A2D307A30D9EC6870051FD27 /* BlocklistDownloader.m */; };
 		A2D307B10D9EC9F50051FD27 /* BlocklistStatusWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A2D307B00D9EC9F50051FD27 /* BlocklistStatusWindow.xib */; };
-		A2D5972A0F5AE49E0001AB3C /* watch.c in Sources */ = {isa = PBXBuildFile; fileRef = A2D597280F5AE49E0001AB3C /* watch.c */; };
 		A2D77451154CC25700A62B93 /* WebSeedTableView.h in Headers */ = {isa = PBXBuildFile; fileRef = A2D7744F154CC25700A62B93 /* WebSeedTableView.h */; };
 		A2D77452154CC25700A62B93 /* WebSeedTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = A2D77450154CC25700A62B93 /* WebSeedTableView.m */; };
 		A2D77453154CC72B00A62B93 /* WebSeedTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = A2D77450154CC25700A62B93 /* WebSeedTableView.m */; };
@@ -473,6 +472,11 @@
 		C1639A7C1A55F57200E42033 /* cdecode.h in Headers */ = {isa = PBXBuildFile; fileRef = C1639A7A1A55F57200E42033 /* cdecode.h */; };
 		C1639A7D1A55F57200E42033 /* cencode.h in Headers */ = {isa = PBXBuildFile; fileRef = C1639A7B1A55F57200E42033 /* cencode.h */; };
 		C1F690FD1AD0627500D95CF0 /* daemon-posix.c in Sources */ = {isa = PBXBuildFile; fileRef = C1F690FC1AD0627500D95CF0 /* daemon-posix.c */; };
+		C1FEE5771C3223CC00D62832 /* watchdir-common.h in Headers */ = {isa = PBXBuildFile; fileRef = C1FEE5721C3223CC00D62832 /* watchdir-common.h */; };
+		C1FEE5781C3223CC00D62832 /* watchdir-generic.c in Sources */ = {isa = PBXBuildFile; fileRef = C1FEE5731C3223CC00D62832 /* watchdir-generic.c */; };
+		C1FEE5791C3223CC00D62832 /* watchdir-kqueue.c in Sources */ = {isa = PBXBuildFile; fileRef = C1FEE5741C3223CC00D62832 /* watchdir-kqueue.c */; };
+		C1FEE57A1C3223CC00D62832 /* watchdir.c in Sources */ = {isa = PBXBuildFile; fileRef = C1FEE5751C3223CC00D62832 /* watchdir.c */; };
+		C1FEE57B1C3223CC00D62832 /* watchdir.h in Headers */ = {isa = PBXBuildFile; fileRef = C1FEE5761C3223CC00D62832 /* watchdir.h */; };
 		D4AF3B2F0C41F7A500D46B6B /* list.c in Sources */ = {isa = PBXBuildFile; fileRef = D4AF3B2D0C41F7A500D46B6B /* list.c */; };
 		D4AF3B300C41F7A600D46B6B /* list.h in Headers */ = {isa = PBXBuildFile; fileRef = D4AF3B2E0C41F7A500D46B6B /* list.h */; };
 		E138A9780C04D88F00C5426C /* ProgressGradients.m in Sources */ = {isa = PBXBuildFile; fileRef = E138A9760C04D88F00C5426C /* ProgressGradients.m */; };
@@ -1034,8 +1038,6 @@
 		A2D307A20D9EC6870051FD27 /* BlocklistDownloader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = BlocklistDownloader.h; path = macosx/BlocklistDownloader.h; sourceTree = "<group>"; };
 		A2D307A30D9EC6870051FD27 /* BlocklistDownloader.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = BlocklistDownloader.m; path = macosx/BlocklistDownloader.m; sourceTree = "<group>"; };
 		A2D307B00D9EC9F50051FD27 /* BlocklistStatusWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = BlocklistStatusWindow.xib; path = macosx/BlocklistStatusWindow.xib; sourceTree = "<group>"; };
-		A2D597280F5AE49E0001AB3C /* watch.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = watch.c; path = daemon/watch.c; sourceTree = "<group>"; };
-		A2D597290F5AE49E0001AB3C /* watch.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = watch.h; path = daemon/watch.h; sourceTree = "<group>"; };
 		A2D7744F154CC25700A62B93 /* WebSeedTableView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = WebSeedTableView.h; path = macosx/WebSeedTableView.h; sourceTree = "<group>"; };
 		A2D77450154CC25700A62B93 /* WebSeedTableView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = WebSeedTableView.m; path = macosx/WebSeedTableView.m; sourceTree = "<group>"; };
 		A2D8CFBF15FA177A0056E93D /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = macosx/QuickLookPlugin/ru.lproj/Localizable.strings; sourceTree = SOURCE_ROOT; };
@@ -1230,6 +1232,11 @@
 		C1639A7B1A55F57200E42033 /* cencode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = cencode.h; path = "third-party/libb64/b64/cencode.h"; sourceTree = "<group>"; };
 		C1F690FC1AD0627500D95CF0 /* daemon-posix.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "daemon-posix.c"; path = "daemon/daemon-posix.c"; sourceTree = "<group>"; };
 		C1F690FE1AD0628400D95CF0 /* daemon.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = daemon.h; path = daemon/daemon.h; sourceTree = "<group>"; };
+		C1FEE5721C3223CC00D62832 /* watchdir-common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "watchdir-common.h"; path = "libtransmission/watchdir-common.h"; sourceTree = "<group>"; };
+		C1FEE5731C3223CC00D62832 /* watchdir-generic.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "watchdir-generic.c"; path = "libtransmission/watchdir-generic.c"; sourceTree = "<group>"; };
+		C1FEE5741C3223CC00D62832 /* watchdir-kqueue.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "watchdir-kqueue.c"; path = "libtransmission/watchdir-kqueue.c"; sourceTree = "<group>"; };
+		C1FEE5751C3223CC00D62832 /* watchdir.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = watchdir.c; path = libtransmission/watchdir.c; sourceTree = "<group>"; };
+		C1FEE5761C3223CC00D62832 /* watchdir.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = watchdir.h; path = libtransmission/watchdir.h; sourceTree = "<group>"; };
 		D4AF3B2D0C41F7A500D46B6B /* list.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = list.c; path = libtransmission/list.c; sourceTree = "<group>"; };
 		D4AF3B2E0C41F7A500D46B6B /* list.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = list.h; path = libtransmission/list.h; sourceTree = "<group>"; };
 		E138A9750C04D88F00C5426C /* ProgressGradients.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ProgressGradients.h; path = macosx/ProgressGradients.h; sourceTree = "<group>"; };
@@ -1810,6 +1817,11 @@
 				A2A4EA0B0DE106E8000CE197 /* ConvertUTF.h */,
 				A2A4EA0A0DE106E8000CE197 /* ConvertUTF.c */,
 				4DB74F070E8CD75100AEB1A8 /* wildmat.c */,
+				C1FEE5751C3223CC00D62832 /* watchdir.c */,
+				C1FEE5761C3223CC00D62832 /* watchdir.h */,
+				C1FEE5731C3223CC00D62832 /* watchdir-generic.c */,
+				C1FEE5741C3223CC00D62832 /* watchdir-kqueue.c */,
+				C1FEE5721C3223CC00D62832 /* watchdir-common.h */,
 			);
 			name = libtransmission;
 			sourceTree = "<group>";
@@ -2012,8 +2024,6 @@
 				C1F690FE1AD0628400D95CF0 /* daemon.h */,
 				C1F690FC1AD0627500D95CF0 /* daemon-posix.c */,
 				BEFC1C140C07756200B0BB3C /* remote.c */,
-				A2D597280F5AE49E0001AB3C /* watch.c */,
-				A2D597290F5AE49E0001AB3C /* watch.h */,
 			);
 			name = daemon;
 			sourceTree = "<group>";
@@ -2122,6 +2132,7 @@
 				BEFC1E450C07861A00B0BB3C /* net.h in Headers */,
 				BEFC1E490C07861A00B0BB3C /* metainfo.h in Headers */,
 				BEFC1E4D0C07861A00B0BB3C /* session.h in Headers */,
+				C1FEE5771C3223CC00D62832 /* watchdir-common.h in Headers */,
 				BEFC1E4E0C07861A00B0BB3C /* inout.h in Headers */,
 				BEFC1E520C07861A00B0BB3C /* fdlimit.h in Headers */,
 				BEFC1E550C07861A00B0BB3C /* completion.h in Headers */,
@@ -2140,6 +2151,7 @@
 				A29DF8BA0DB2544C00D04E5A /* resume.h in Headers */,
 				A29DF8BB0DB2544C00D04E5A /* torrent.h in Headers */,
 				A29DF8BE0DB2545F00D04E5A /* verify.h in Headers */,
+				C1FEE57B1C3223CC00D62832 /* watchdir.h in Headers */,
 				A2AAB6650DE0D08B00E04DDA /* blocklist.h in Headers */,
 				A2A4E9210DE0F7E9000CE197 /* web.h in Headers */,
 				A2A4EA0F0DE106EE000CE197 /* ConvertUTF.h in Headers */,
@@ -2753,6 +2765,7 @@
 				BEFC1E4A0C07861A00B0BB3C /* metainfo.c in Sources */,
 				BEFC1E4F0C07861A00B0BB3C /* inout.c in Sources */,
 				BEFC1E530C07861A00B0BB3C /* fdlimit.c in Sources */,
+				C1FEE5781C3223CC00D62832 /* watchdir-generic.c in Sources */,
 				BEFC1E560C07861A00B0BB3C /* completion.c in Sources */,
 				BEFC1E580C07861A00B0BB3C /* clients.c in Sources */,
 				A2BE9C520C1E4AF5002D16E6 /* makemeta.c in Sources */,
@@ -2786,10 +2799,12 @@
 				4D80185910BBC0B0008A4AF2 /* magnet.c in Sources */,
 				A209EE5C1144B51E002B02D1 /* history.c in Sources */,
 				A220EC5B118C8A060022B4BE /* tr-lpd.c in Sources */,
+				C1FEE57A1C3223CC00D62832 /* watchdir.c in Sources */,
 				A23547E211CD0B090046EAE6 /* cache.c in Sources */,
 				A284214412DA663E00FBDDBB /* tr-udp.c in Sources */,
 				A2679294130E00A000CB7464 /* tr-utp.c in Sources */,
 				A23F29A2132A447400E9A83B /* announcer-http.c in Sources */,
+				C1FEE5791C3223CC00D62832 /* watchdir-kqueue.c in Sources */,
 				A2AA9BE1132CAC8E00FA131E /* announcer-udp.c in Sources */,
 				A2D77452154CC25700A62B93 /* WebSeedTableView.m in Sources */,
 				A2A7B32A164F87D400B98C65 /* jsonsl.c in Sources */,
@@ -2966,7 +2981,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				BEFC1C1A0C07756200B0BB3C /* daemon.c in Sources */,
-				A2D5972A0F5AE49E0001AB3C /* watch.c in Sources */,
 				C1F690FD1AD0627500D95CF0 /* daemon-posix.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

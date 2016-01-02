@@ -204,35 +204,32 @@ dnl ----------------------------------------------------------------------------
 dnl
 dnl file monitoring for the daemon
 
-AC_CHECK_HEADER([sys/inotify.h],
-                [AC_CHECK_FUNC([inotify_init],[have_inotify="yes"],[have_inotify="no"])],
-                [have_inotify="no"])
 AC_ARG_WITH([inotify],
-            [AS_HELP_STRING([--with-inotify],[Enable inotify support (default=auto)])],
-            [want_inotify=${withval}],
-            [want_inotify=${have_inotify}])
-if test "x$want_inotify" = "xyes" ; then
-    if test "x$have_inotify" = "xyes"; then
-      AC_DEFINE([WITH_INOTIFY],[1])
-    else
-      AC_MSG_ERROR("inotify not found!")
-    fi
-fi
+            [AS_HELP_STRING([--with-inotify], [Enable inotify support (default=auto)])],
+            [WANT_INOTIFY=${withval}],
+            [WANT_INOTIFY=auto])
+HAVE_INOTIFY=0
+AS_IF([test "x$WANT_INOTIFY" != "xno"],
+      [AC_CHECK_HEADER([sys/inotify.h],
+                       [AC_CHECK_FUNC([inotify_init],
+                                      [HAVE_INOTIFY=1])],
+                       [AS_IF([test "x$WANT_INOTIFY" = "xyes"],
+                              [AC_MSG_ERROR("inotify not found!")])])])
+AM_CONDITIONAL([USE_INOTIFY], [test "x$WANT_INOTIFY" != "xno" -a $HAVE_INOTIFY -eq 1])
 
-AC_CHECK_HEADER([sys/event.h],
-                [AC_CHECK_FUNC([kqueue],[have_kqueue="yes"],[have_kqueue="no"])],
-                [have_kqueue="no"])
 AC_ARG_WITH([kqueue],
             [AS_HELP_STRING([--with-kqueue],[Enable kqueue support (default=auto)])],
-            [want_kqueue=${withval}],
-            [want_kqueue=${have_kqueue}])
-if test "x$want_kqueue" = "xyes" ; then
-    if test "x$have_kqueue" = "xyes"; then
-      AC_DEFINE([WITH_KQUEUE],[1])
-    else
-      AC_MSG_ERROR("kqueue not found!")
-    fi
-fi
+            [WITH_KQUEUE=${withval}],
+            [WITH_KQUEUE=auto])
+HAVE_KQUEUE=0
+AS_IF([test "x$WITH_KQUEUE" != "xno"],
+      [AC_CHECK_HEADER([sys/event.h],
+                       [AC_CHECK_FUNC([kqueue],
+                                      [HAVE_KQUEUE=1])],
+                       [AS_IF([test "x$WANT_KQUEUE" = "xyes"],
+                              [AC_MSG_ERROR("kqueue not found!")])])])
+AM_CONDITIONAL([USE_KQUEUE], [test "x$WITH_KQUEUE" != "xno" -a $HAVE_KQUEUE -eq 1])
+
 
 AC_CHECK_HEADERS([sys/statvfs.h \
                   xfs/xfs.h])

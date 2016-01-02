@@ -62,6 +62,11 @@ set(${PROJECT_NAME}_SOURCES
     variant.c
     variant-json.c
     verify.c
+    watchdir.c
+    watchdir-generic.c
+    watchdir-inotify.c
+    watchdir-kqueue.c
+    watchdir-win32.c
     web.c
     webseed.c
     wildmat.c
@@ -74,10 +79,22 @@ foreach(CP cyassl openssl polarssl)
     endif()
 endforeach()
 
+if(WITH_INOTIFY)
+    add_definitions(-DWITH_INOTIFY)
+else()
+    set_source_files_properties(watchdir-inotify.c PROPERTIES HEADER_FILE_ONLY ON)
+endif()
+
+if(WITH_KQUEUE)
+    add_definitions(-DWITH_KQUEUE)
+else()
+    set_source_files_properties(watchdir-kqueue.c PROPERTIES HEADER_FILE_ONLY ON)
+endif()
+
 if(WIN32)
     set_source_files_properties(file-posix.c PROPERTIES HEADER_FILE_ONLY ON)
 else()
-    set_source_files_properties(file-win32.c PROPERTIES HEADER_FILE_ONLY ON)
+    set_source_files_properties(file-win32.c watchdir-win32.c PROPERTIES HEADER_FILE_ONLY ON)
 endif()
 
 set(${PROJECT_NAME}_PUBLIC_HEADERS
@@ -92,6 +109,7 @@ set(${PROJECT_NAME}_PUBLIC_HEADERS
     transmission.h
     utils.h
     variant.h
+    watchdir.h
     web.h
     ${PROJECT_BINARY_DIR}/version.h
 )
@@ -140,6 +158,7 @@ set(${PROJECT_NAME}_PRIVATE_HEADERS
     variant-common.h
     verify.h
     version.h
+    watchdir-common.h
     webseed.h
 )
 
@@ -240,7 +259,8 @@ if(ENABLE_TESTS)
 
     set(crypto-test_ADD_SOURCES crypto-test-ref.h)
 
-    foreach(T bitfield blocklist clients crypto error file history json magnet metainfo move peer-msgs quark rename rpc session tr-getopt utils variant)
+    foreach(T bitfield blocklist clients crypto error file history json magnet metainfo move peer-msgs quark rename rpc session
+              tr-getopt utils variant watchdir)
         set(TP ${TR_NAME}-test-${T})
         add_executable(${TP} ${T}-test.c ${${T}-test_ADD_SOURCES})
         target_link_libraries(${TP} ${TR_NAME} ${TR_NAME}-test)

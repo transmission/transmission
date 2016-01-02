@@ -34,11 +34,9 @@ LDADD = \
     @PTHREAD_LIBS@ \
     ${LIBM}
 
-noinst_HEADERS = \
-    daemon.h \
-    watch.h
+noinst_HEADERS = daemon.h
 
-transmission_daemon_SOURCES = daemon.c watch.c
+transmission_daemon_SOURCES = daemon.c
 transmission_remote_SOURCES = remote.c
 
 if WIN32

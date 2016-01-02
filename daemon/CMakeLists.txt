@@ -1,13 +1,5 @@
 project(trdaemon)
 
-if(WITH_INOTIFY)
-    add_definitions(-DWITH_INOTIFY)
-endif()
-
-if(WITH_KQUEUE)
-    add_definitions(-DWITH_KQUEUE)
-endif()
-
 if(WITH_SYSTEMD)
     add_definitions(-DUSE_SYSTEMD_DAEMON)
 endif()
@@ -22,7 +14,6 @@ set(${PROJECT_NAME}_SOURCES
     daemon.c
     daemon-posix.c
     daemon-win32.c
-    watch.c
 )
 
 if(WIN32)
@@ -33,7 +24,6 @@ endif()
 
 set(${PROJECT_NAME}_HEADERS
     daemon.h
-    watch.h
 )
 
 tr_win32_app_info(${PROJECT_NAME}_WIN32_RC_FILE

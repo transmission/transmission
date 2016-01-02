@@ -21,7 +21,6 @@
  #include <unistd.h> /* getpid */
 #endif
 
-#include <event2/buffer.h>
 #include <event2/event.h>
 
 #include <libtransmission/transmission.h>
@@ -32,6 +31,7 @@
 #include <libtransmission/utils.h>
 #include <libtransmission/variant.h>
 #include <libtransmission/version.h>
+#include <libtransmission/watchdir.h>
 
 #ifdef USE_SYSTEMD_DAEMON
  #include <systemd/sd-daemon.h>
@@ -41,7 +41,6 @@
 #endif
 
 #include "daemon.h"
-#include "watch.h"
 
 #define MY_NAME "transmission-daemon"
 
@@ -185,10 +184,17 @@ getConfigDir (int argc, const char * const * argv)
     return configDir;
 }
 
-static void
-onFileAdded (tr_session * session, const char * dir, const char * file)
+static tr_watchdir_status
+onFileAdded (tr_watchdir_t   dir,
+             const char    * name,
+             void          * context)
 {
-    char * filename = tr_buildPath (dir, file, NULL);
+    tr_session * session = context;
+
+    if (!tr_str_has_suffix (name, ".torrent"))
+        return TR_WATCHDIR_IGNORE;
+
+    char * filename = tr_buildPath (tr_watchdir_get_path (dir), name, NULL);
     tr_ctor * ctor = tr_ctorNew (session);
     int err = tr_ctorSetMetainfoFromFile (ctor, filename);
 
@@ -197,19 +203,19 @@ onFileAdded (tr_session * session, const char * dir, const char * file)
         tr_torrentNew (ctor, &err, NULL);
 
         if (err == TR_PARSE_ERR)
-            tr_logAddError ("Error parsing .torrent file \"%s\"", file);
+            tr_logAddError ("Error parsing .torrent file \"%s\"", name);
         else
         {
             bool trash = false;
             const bool test = tr_ctorGetDeleteSource (ctor, &trash);
 
-            tr_logAddInfo ("Parsing .torrent file successful \"%s\"", file);
+            tr_logAddInfo ("Parsing .torrent file successful \"%s\"", name);
 
             if (test && trash)
             {
                 tr_error * error = NULL;
 
-                tr_logAddInfo ("Deleting input .torrent file \"%s\"", file);
+                tr_logAddInfo ("Deleting input .torrent file \"%s\"", name);
                 if (!tr_sys_path_remove (filename, &error))
                 {
                     tr_logAddError ("Error deleting .torrent file: %s", error->message);
@@ -224,9 +230,15 @@ onFileAdded (tr_session * session, const char * dir, const char * file)
             }
         }
     }
+    else
+    {
+        err = TR_PARSE_ERR;
+    }
 
     tr_ctorFree (ctor);
     tr_free (filename);
+
+    return err == TR_PARSE_ERR ? TR_WATCHDIR_RETRY : TR_WATCHDIR_ACCEPT;
 }
 
 static void
@@ -293,12 +305,11 @@ reportStatus (void)
 }
 
 static void
-periodicUpdate (evutil_socket_t fd UNUSED, short what UNUSED, void *watchdir)
+periodicUpdate (evutil_socket_t   fd UNUSED,
+                short             what UNUSED,
+                void            * context UNUSED)
 {
-    dtr_watchdir_update (watchdir);
-
     pumpLogMessages (logfile);
-
     reportStatus ();
 }
 
@@ -479,10 +490,10 @@ daemon_start (void * raw_arg,
 {
     bool boolVal;
     const char * pid_filename;
-    dtr_watchdir * watchdir = NULL;
     bool pidfile_created = false;
     tr_session * session = NULL;
-    struct event *status_ev;
+    struct event * status_ev = NULL;
+    tr_watchdir_t watchdir = NULL;
 
     struct daemon_data * const arg = raw_arg;
     tr_variant * const settings = &arg->settings;
@@ -558,7 +569,8 @@ daemon_start (void * raw_arg,
             && *dir)
         {
             tr_logAddInfo ("Watching \"%s\" for new .torrent files", dir);
-            watchdir = dtr_watchdir_new (mySession, dir, onFileAdded);
+            if ((watchdir = tr_watchdir_new (dir, &onFileAdded, mySession, ev_base)) == NULL)
+                goto cleanup;
         }
     }
 
@@ -581,7 +593,7 @@ daemon_start (void * raw_arg,
     /* Create new timer event to report daemon status */
     {
         struct timeval one_sec = { 1, 0 };
-        status_ev = event_new(ev_base, -1, EV_PERSIST, &periodicUpdate, watchdir);
+        status_ev = event_new(ev_base, -1, EV_PERSIST, &periodicUpdate, NULL);
         if (status_ev == NULL)
         {
             tr_logAddError("Failed to create status event %s", tr_strerror(errno));
@@ -607,6 +619,8 @@ cleanup:
     sd_notify( 0, "STATUS=Closing transmission session...\n" );
     printf ("Closing transmission session...");
 
+    tr_watchdir_free (watchdir);
+
     if (status_ev)
     {
         event_del(status_ev);
@@ -615,7 +629,6 @@ cleanup:
     event_base_free(ev_base);
 
     tr_sessionSaveSettings (mySession, configDir, settings);
-    dtr_watchdir_free (watchdir);
     tr_sessionClose (mySession);
     pumpLogMessages (logfile);
     printf (" done.\n");

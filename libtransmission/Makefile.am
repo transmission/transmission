@@ -72,12 +72,22 @@ libtransmission_a_SOURCES = \
   variant-benc.c \
   variant-json.c \
   verify.c \
+  watchdir.c \
+  watchdir-generic.c \
   web.c \
   webseed.c \
   wildmat.c
 
+if USE_INOTIFY
+libtransmission_a_SOURCES += watchdir-inotify.c
+endif
+
+if USE_KQUEUE
+libtransmission_a_SOURCES += watchdir-kqueue.c
+endif
+
 if WIN32
-libtransmission_a_SOURCES += file-win32.c
+libtransmission_a_SOURCES += file-win32.c watchdir-win32.c
 else
 libtransmission_a_SOURCES += file-posix.c
 endif
@@ -150,6 +160,8 @@ noinst_HEADERS = \
   variant-common.h \
   verify.h \
   version.h \
+  watchdir.h \
+  watchdir-common.h \
   web.h \
   webseed.h
 
@@ -173,7 +185,8 @@ TESTS = \
   session-test \
   tr-getopt-test \
   utils-test \
-  variant-test
+  variant-test \
+  watchdir-test
 
 noinst_PROGRAMS = $(TESTS)
 
@@ -269,6 +282,10 @@ utils_test_LDFLAGS = ${apps_ldflags}
 variant_test_SOURCES = variant-test.c $(TEST_SOURCES)
 variant_test_LDADD = ${apps_ldadd}
 variant_test_LDFLAGS = ${apps_ldflags}
+
+watchdir_test_SOURCES = watchdir-test.c $(TEST_SOURCES)
+watchdir_test_LDADD = ${apps_ldadd}
+watchdir_test_LDFLAGS = ${apps_ldflags}
 
 rename_test_SOURCES = rename-test.c $(TEST_SOURCES)
 rename_test_LDADD = ${apps_ldadd}
