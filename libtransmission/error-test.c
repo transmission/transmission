@@ -17,12 +17,8 @@ test_error_set (void)
 {
   tr_error * err = NULL;
 
-#if 0
-
   tr_error_prefix (&err, "error: ");
   check (err == NULL);
-
-#endif /* 0 */
 
   tr_error_set (&err, 1, "error: %s (%d)", "oops", 2);
   check (err != NULL);
@@ -36,14 +32,10 @@ test_error_set (void)
   check_int_eq (2, err->code);
   check_streq ("oops", err->message);
 
-#if 0
-
   tr_error_prefix (&err, "error: ");
   check (err != NULL);
   check_int_eq (2, err->code);
   check_streq ("error: oops", err->message);
-
-#endif /* 0 */
 
   tr_error_free (err);
 
@@ -67,8 +59,6 @@ test_error_propagate (void)
   check_streq ("oops", err2->message);
   check (err == NULL);
 
-#if 0
-
   tr_error_propagate_prefixed (&err, &err2, "error: ");
   check (err != NULL);
   check_int_eq (1, err->code);
@@ -77,8 +67,6 @@ test_error_propagate (void)
 
   tr_error_propagate (NULL, &err);
   check (err == NULL);
-
-#endif /* 0 */
 
   tr_error_free (err2);
 
