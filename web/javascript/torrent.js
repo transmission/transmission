@@ -259,6 +259,8 @@ Torrent.prototype =
 	isStopped: function() { return this.getStatus() === Torrent._StatusStopped; },
 	isChecking: function() { return this.getStatus() === Torrent._StatusCheck; },
 	isDownloading: function() { return this.getStatus() === Torrent._StatusDownload; },
+	isQueued: function() { return this.getStatus() === Torrent._StatusDownloadWait ||
+	                              this.getStatus() === Torrent._StatusSeedWait; },
 	isDone: function() { return this.getLeftUntilDone() < 1; },
 	needsMetaData: function(){ return this.getMetadataPercentComplete() < 1; },
 	getActivity: function() { return this.getDownloadSpeed() + this.getUploadSpeed(); },
