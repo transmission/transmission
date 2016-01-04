@@ -80,10 +80,12 @@ libtransmission_a_SOURCES = \
 
 if USE_INOTIFY
 libtransmission_a_SOURCES += watchdir-inotify.c
+AM_CPPFLAGS += -DWITH_INOTIFY
 endif
 
 if USE_KQUEUE
 libtransmission_a_SOURCES += watchdir-kqueue.c
+AM_CPPFLAGS += -DWITH_KQUEUE
 endif
 
 if WIN32

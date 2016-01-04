@@ -219,16 +219,16 @@ AM_CONDITIONAL([USE_INOTIFY], [test "x$WANT_INOTIFY" != "xno" -a $HAVE_INOTIFY -
 
 AC_ARG_WITH([kqueue],
             [AS_HELP_STRING([--with-kqueue],[Enable kqueue support (default=auto)])],
-            [WITH_KQUEUE=${withval}],
-            [WITH_KQUEUE=auto])
+            [WANT_KQUEUE=${withval}],
+            [WANT_KQUEUE=auto])
 HAVE_KQUEUE=0
-AS_IF([test "x$WITH_KQUEUE" != "xno"],
+AS_IF([test "x$WANT_KQUEUE" != "xno"],
       [AC_CHECK_HEADER([sys/event.h],
                        [AC_CHECK_FUNC([kqueue],
                                       [HAVE_KQUEUE=1])],
                        [AS_IF([test "x$WANT_KQUEUE" = "xyes"],
                               [AC_MSG_ERROR("kqueue not found!")])])])
-AM_CONDITIONAL([USE_KQUEUE], [test "x$WITH_KQUEUE" != "xno" -a $HAVE_KQUEUE -eq 1])
+AM_CONDITIONAL([USE_KQUEUE], [test "x$WANT_KQUEUE" != "xno" -a $HAVE_KQUEUE -eq 1])
 
 
 AC_CHECK_HEADERS([sys/statvfs.h \
