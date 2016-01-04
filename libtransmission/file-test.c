@@ -93,9 +93,9 @@ create_hardlink (const char * dst_path, const char * src_path)
 static void
 clear_path_info (tr_sys_path_info * info)
 {
-  info->type = (tr_sys_path_type_t)-1;
-  info->size = (uint64_t)-1;
-  info->last_modified_at = (time_t)-1;
+  info->type = (tr_sys_path_type_t) -1;
+  info->size = (uint64_t) -1;
+  info->last_modified_at = (time_t) -1;
 }
 
 static bool
@@ -165,6 +165,7 @@ test_get_info (void)
   tr_sys_file_t fd;
   tr_error * err = NULL;
   char * path1, * path2;
+  time_t t;
 
   path1 = tr_buildPath (test_dir, "a", NULL);
   path2 = tr_buildPath (test_dir, "b", NULL);
@@ -174,6 +175,7 @@ test_get_info (void)
   check (err != NULL);
   tr_error_clear (&err);
 
+  t = time (NULL);
   libtest_create_file_with_string_contents (path1, "test");
 
   /* Good file info */
@@ -182,7 +184,7 @@ test_get_info (void)
   check (err == NULL);
   check_int_eq (TR_SYS_PATH_IS_FILE, info.type);
   check_int_eq (4, info.size);
-  check (info.last_modified_at >= time(0) - 1 && info.last_modified_at <= time(0));
+  check (info.last_modified_at >= t && info.last_modified_at <= time (NULL));
 
   /* Good file info (by handle) */
   fd = tr_sys_file_open (path1, TR_SYS_FILE_READ, 0, NULL);
@@ -191,19 +193,20 @@ test_get_info (void)
   check (err == NULL);
   check_int_eq (TR_SYS_PATH_IS_FILE, info.type);
   check_int_eq (4, info.size);
-  check (info.last_modified_at >= time(0) - 1 && info.last_modified_at <= time(0));
+  check (info.last_modified_at >= t && info.last_modified_at <= time (NULL));
   tr_sys_file_close (fd, NULL);
 
   tr_sys_path_remove (path1, NULL);
 
   /* Good directory info */
+  t = time (NULL);
   tr_sys_dir_create (path1, 0, 0777, NULL);
   clear_path_info (&info);
   check (tr_sys_path_get_info (path1, 0, &info, &err));
   check (err == NULL);
   check_int_eq (TR_SYS_PATH_IS_DIRECTORY, info.type);
-  check (info.size != (uint64_t)-1);
-  check (info.last_modified_at >= time(0) - 1 && info.last_modified_at <= time(0));
+  check (info.size != (uint64_t) -1);
+  check (info.last_modified_at >= t && info.last_modified_at <= time (NULL));
   tr_sys_path_remove (path1, NULL);
 
   if (create_symlink (path1, path2, false))
@@ -213,6 +216,7 @@ test_get_info (void)
       check (err != NULL);
       tr_error_clear (&err);
 
+      t = time (NULL);
       libtest_create_file_with_string_contents (path2, "test");
 
       /* Good file info */
@@ -221,7 +225,7 @@ test_get_info (void)
       check (err == NULL);
       check_int_eq (TR_SYS_PATH_IS_FILE, info.type);
       check_int_eq (4, info.size);
-      check (info.last_modified_at >= time(0) - 1 && info.last_modified_at <= time(0));
+      check (info.last_modified_at >= t && info.last_modified_at <= time (NULL));
 
       /* Good file info (by handle) */
       fd = tr_sys_file_open (path1, TR_SYS_FILE_READ, 0, NULL);
@@ -230,19 +234,20 @@ test_get_info (void)
       check (err == NULL);
       check_int_eq (TR_SYS_PATH_IS_FILE, info.type);
       check_int_eq (4, info.size);
-      check (info.last_modified_at >= time(0) - 1 && info.last_modified_at <= time(0));
+      check (info.last_modified_at >= t && info.last_modified_at <= time (NULL));
       tr_sys_file_close (fd, NULL);
 
       tr_sys_path_remove (path2, NULL);
 
       /* Good directory info */
+      t = time (NULL);
       tr_sys_dir_create (path2, 0, 0777, NULL);
       clear_path_info (&info);
       check (tr_sys_path_get_info (path1, 0, &info, &err));
       check (err == NULL);
       check_int_eq (TR_SYS_PATH_IS_DIRECTORY, info.type);
-      check (info.size != (uint64_t)-1);
-      check (info.last_modified_at >= time(0) - 1 && info.last_modified_at <= time(0));
+      check (info.size != (uint64_t) -1);
+      check (info.last_modified_at >= t && info.last_modified_at <= time (NULL));
 
       tr_sys_path_remove (path2, NULL);
       tr_sys_path_remove (path1, NULL);
