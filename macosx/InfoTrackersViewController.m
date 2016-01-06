@@ -116,7 +116,7 @@
         
         [fTrackerTable setTrackers: fTrackers];
         
-        if ([NSApp isOnLionOrBetter] && (oldTrackers && [fTrackers isEqualToArray: oldTrackers]))
+        if (oldTrackers && [fTrackers isEqualToArray: oldTrackers])
             [fTrackerTable setNeedsDisplay: YES];
         else
             [fTrackerTable reloadData];
@@ -399,9 +399,8 @@
             return;
     }
     
-    
-    if ([NSApp isOnLionOrBetter])
-        [fTrackerTable beginUpdates];
+
+    [fTrackerTable beginUpdates];
     
     for (Torrent * torrent in removeIdentifiers)
         [torrent removeTrackers: [removeIdentifiers objectForKey: torrent]];
@@ -411,22 +410,12 @@
     fTrackers = [[NSMutableArray alloc] init];
     for (Torrent * torrent in fTorrents)
         [fTrackers addObjectsFromArray: [torrent allTrackerStats]];
+
+    [fTrackerTable removeRowsAtIndexes: removeIndexes withAnimation: NSTableViewAnimationSlideLeft];
     
-    if ([NSApp isOnLionOrBetter])
-    {
-        [fTrackerTable removeRowsAtIndexes: removeIndexes withAnimation: NSTableViewAnimationSlideLeft];
-        
-        [fTrackerTable setTrackers: fTrackers];
-        
-        [fTrackerTable endUpdates];
-    }
-    else
-    {
-        [fTrackerTable setTrackers: fTrackers];
-        
-        [fTrackerTable reloadData];
-        [fTrackerTable deselectAll: self];
-    }
+    [fTrackerTable setTrackers: fTrackers];
+    
+    [fTrackerTable endUpdates];
     
     [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateUI" object: nil]; //incase sort by tracker
 }

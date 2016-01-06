@@ -707,20 +707,13 @@ CA
         <customObject id="206" userLabel="Controller" customClass="Controller">
             <connections>
                 <outlet property="fActionButton" destination="3435" id="3438"/>
-                <outlet property="fActionMenu" destination="1041" id="3434"/>
-                <outlet property="fCheckRatioItem" destination="1317" id="3043"/>
                 <outlet property="fClearCompletedButton" destination="3420" id="3425"/>
-                <outlet property="fDownloadLimitItem" destination="1068" id="1464"/>
-                <outlet property="fDownloadMenu" destination="1060" id="1456"/>
-                <outlet property="fDownloadNoLimitItem" destination="1070" id="1463"/>
                 <outlet property="fGroupsSetContextMenu" destination="2850" id="2855"/>
                 <outlet property="fGroupsSetMenu" destination="2840" id="2843"/>
                 <outlet property="fNextFilterItem" destination="1797" id="1801"/>
                 <outlet property="fNextInfoTabItem" destination="1693" id="1703"/>
-                <outlet property="fNoCheckRatioItem" destination="1316" id="3044"/>
                 <outlet property="fOpenIgnoreDownloadFolder" destination="1680" id="1682"/>
                 <outlet property="fPrevInfoTabItem" destination="1694" id="1704"/>
-                <outlet property="fRatioStopMenu" destination="1310" id="3076"/>
                 <outlet property="fShareContextMenu" destination="lvU-Va-GzM" id="TN5-xV-ApO"/>
                 <outlet property="fShareContextMenuItem" destination="8t6-wh-5UW" id="f1v-KF-xYb"/>
                 <outlet property="fShareMenu" destination="Cay-iU-bH4" id="nHs-6t-KFn"/>
@@ -729,9 +722,6 @@ CA
                 <outlet property="fSpeedLimitButton" destination="2690" id="2703"/>
                 <outlet property="fTableView" destination="3091" id="3118"/>
                 <outlet property="fTotalTorrentsField" destination="2700" id="2702"/>
-                <outlet property="fUploadLimitItem" destination="1046" id="1466"/>
-                <outlet property="fUploadMenu" destination="1045" id="1455"/>
-                <outlet property="fUploadNoLimitItem" destination="1058" id="1465"/>
                 <outlet property="fWindow" destination="21" id="246"/>
             </connections>
         </customObject>
@@ -868,154 +858,6 @@ CA
         </menu>
         <customObject id="1812" userLabel="SUUpdater" customClass="SUUpdater"/>
         <userDefaultsController representsSharedInstance="YES" id="1815" userLabel="Shared Defaults"/>
-        <menu title="ActionMenu" id="1041" userLabel="ActionMenu">
-            <items>
-                <menuItem title="Stato dei file selezionati" id="3163">
-                    <connections>
-                        <action selector="toggleStatusString:" target="206" id="3165"/>
-                    </connections>
-                </menuItem>
-                <menuItem isSeparatorItem="YES" id="3164">
-                    <modifierMask key="keyEquivalentModifierMask" command="YES"/>
-                </menuItem>
-                <menuItem title="Usa gruppi" id="3080">
-                    <connections>
-                        <action selector="setSortByGroup:" target="206" id="3081"/>
-                    </connections>
-                </menuItem>
-                <menuItem title="Ordina trasferimenti per" id="1638">
-                    <menu key="submenu" title="Ordina trasferimenti per" id="1639">
-                        <items>
-                            <menuItem title="Ordine coda" id="1646">
-                                <connections>
-                                    <action selector="setSort:" target="206" id="1657"/>
-                                </connections>
-                            </menuItem>
-                            <menuItem title="Attività" tag="6" id="2326">
-                                <connections>
-                                    <action selector="setSort:" target="206" id="2327"/>
-                                </connections>
-                            </menuItem>
-                            <menuItem title="Data inserimento" tag="1" id="1642">
-                                <connections>
-                                    <action selector="setSort:" target="206" id="1653"/>
-                                </connections>
-                            </menuItem>
-                            <menuItem title="Nome" tag="2" id="1643">
-                                <connections>
-                                    <action selector="setSort:" target="206" id="1654"/>
-                                </connections>
-                            </menuItem>
-                            <menuItem title="Avanzamento" tag="3" id="1644">
-                                <connections>
-                                    <action selector="setSort:" target="206" id="1655"/>
-                                </connections>
-                            </menuItem>
-                            <menuItem title="Dimensione" tag="7" id="1645">
-                                <connections>
-                                    <action selector="setSort:" target="206" id="1656"/>
-                                </connections>
-                            </menuItem>
-                            <menuItem title="Stato" tag="4" id="3432">
-                                <connections>
-                                    <action selector="setSort:" target="206" id="3433"/>
-                                </connections>
-                            </menuItem>
-                            <menuItem title="Server traccia" tag="5" id="1930">
-                                <connections>
-                                    <action selector="setSort:" target="206" id="1931"/>
-                                </connections>
-                            </menuItem>
-                            <menuItem isSeparatorItem="YES" id="2883">
-                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
-                            </menuItem>
-                            <menuItem title="Crescente" id="1884">
-                                <connections>
-                                    <action selector="setSortReverse:" target="206" id="1887"/>
-                                </connections>
-                            </menuItem>
-                            <menuItem title="Decrescente" tag="1" id="3403">
-                                <connections>
-                                    <action selector="setSortReverse:" target="206" id="3404"/>
-                                </connections>
-                            </menuItem>
-                        </items>
-                    </menu>
-                </menuItem>
-                <menuItem isSeparatorItem="YES" id="1641">
-                    <modifierMask key="keyEquivalentModifierMask" command="YES"/>
-                </menuItem>
-                <menuItem title="Limite banda di ricezione" id="1059">
-                    <menu key="submenu" title="Limite banda di ricezione" id="1060">
-                        <items>
-                            <menuItem title="Non limitata" id="1070">
-                                <connections>
-                                    <action selector="setLimitGlobalEnabled:" target="206" id="1426"/>
-                                </connections>
-                            </menuItem>
-                            <menuItem title="Limitata" id="1068">
-                                <connections>
-                                    <action selector="setLimitGlobalEnabled:" target="206" id="1427"/>
-                                </connections>
-                            </menuItem>
-                            <menuItem isSeparatorItem="YES" id="1064">
-                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
-                            </menuItem>
-                        </items>
-                        <connections>
-                            <outlet property="delegate" destination="206" id="3074"/>
-                        </connections>
-                    </menu>
-                </menuItem>
-                <menuItem title="Limite banda di invio" id="1044">
-                    <menu key="submenu" title="Limite banda di invio" id="1045">
-                        <items>
-                            <menuItem title="Non limitata" id="1058">
-                                <connections>
-                                    <action selector="setLimitGlobalEnabled:" target="206" id="1424"/>
-                                </connections>
-                            </menuItem>
-                            <menuItem title="Limitata" id="1046">
-                                <connections>
-                                    <action selector="setLimitGlobalEnabled:" target="206" id="1425"/>
-                                </connections>
-                            </menuItem>
-                            <menuItem isSeparatorItem="YES" id="1048">
-                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
-                            </menuItem>
-                        </items>
-                        <connections>
-                            <outlet property="delegate" destination="206" id="3073"/>
-                        </connections>
-                    </menu>
-                </menuItem>
-                <menuItem isSeparatorItem="YES" id="1341">
-                    <modifierMask key="keyEquivalentModifierMask" command="YES"/>
-                </menuItem>
-                <menuItem title="Ferma distribuzione al rapporto" id="1309">
-                    <menu key="submenu" title="Ferma distribuzione al rapporto" id="1310">
-                        <items>
-                            <menuItem title="Sempre in distribuzione" id="1316">
-                                <connections>
-                                    <action selector="setRatioGlobalEnabled:" target="206" id="3042"/>
-                                </connections>
-                            </menuItem>
-                            <menuItem title="Ferma al rapporto" id="1317">
-                                <connections>
-                                    <action selector="setRatioGlobalEnabled:" target="206" id="3041"/>
-                                </connections>
-                            </menuItem>
-                            <menuItem isSeparatorItem="YES" id="1318">
-                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
-                            </menuItem>
-                        </items>
-                        <connections>
-                            <outlet property="delegate" destination="206" id="3075"/>
-                        </connections>
-                    </menu>
-                </menuItem>
-            </items>
-        </menu>
         <menu title="Menu" autoenablesItems="NO" id="1936" userLabel="TorrentActionMenu">
             <items>
                 <menuItem title="Priorità" id="3196">

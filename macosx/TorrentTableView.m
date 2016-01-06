@@ -73,8 +73,6 @@
         fMouseControlRow = -1;
         fMouseRevealRow = -1;
         fMouseActionRow = -1;
-        #warning we can get rid of the on 10.7
-        fActionPushedRow = -1;
         
         fActionPopoverShown = NO;
         
@@ -169,7 +167,6 @@
             [cell setControlHover: row == fMouseControlRow];
             [cell setRevealHover: row == fMouseRevealRow];
             [cell setActionHover: row == fMouseActionRow];
-            [cell setActionPushed: row == fActionPushedRow];
         }
     }
     else
@@ -403,20 +400,8 @@
     //avoid weird behavior when showing menu by doing this after mouse down
     if (row != -1 && fMouseActionRow == row)
     {
-        if (![NSApp isOnLionOrBetter])
-        {
-            fActionPushedRow = row;
-            [self setNeedsDisplayInRect: [self rectOfRow: row]]; //ensure button is pushed down
-        }
-        
         #warning maybe make appear on mouse down
         [self displayTorrentActionPopoverForEvent: event];
-        
-        if (![NSApp isOnLionOrBetter])
-        {
-            fActionPushedRow = -1;
-            [self setNeedsDisplayInRect: [self rectOfRow: row]];
-        }
     }
     else if (!pushed && [event clickCount] == 2) //double click
     {
@@ -548,12 +533,12 @@
     NSURL * url;
     if ((url = [NSURL URLFromPasteboard: [NSPasteboard generalPasteboard]]))
         [fController openURL: [url absoluteString]];
-    else if ([NSApp isOnLionOrBetter])
+    else
     {
         NSArray * items = [[NSPasteboard generalPasteboard] readObjectsForClasses: [NSArray arrayWithObject: [NSString class]] options: nil];
         if (items)
         {
-            NSDataDetector * detector = [NSDataDetectorLion dataDetectorWithTypes: NSTextCheckingTypeLink error: nil];
+            NSDataDetector * detector = [NSDataDetector dataDetectorWithTypes: NSTextCheckingTypeLink error: nil];
             for (NSString * pbItem in items)
             {
                 pbItem = [pbItem stringByTrimmingCharactersInSet: [NSCharacterSet whitespaceAndNewlineCharacterSet]];
@@ -578,24 +563,21 @@
     {
         if ([[[NSPasteboard generalPasteboard] types] containsObject: NSURLPboardType])
             return YES;
-        
-        if ([NSApp isOnLionOrBetter])
+
+        NSArray * items = [[NSPasteboard generalPasteboard] readObjectsForClasses: [NSArray arrayWithObject: [NSString class]] options: nil];
+        if (items)
         {
-            NSArray * items = [[NSPasteboard generalPasteboard] readObjectsForClasses: [NSArray arrayWithObject: [NSString class]] options: nil];
-            if (items)
+            NSDataDetector * detector = [NSDataDetector dataDetectorWithTypes: NSTextCheckingTypeLink error: nil];
+            for (NSString * pbItem in items)
             {
-                NSDataDetector * detector = [NSDataDetectorLion dataDetectorWithTypes: NSTextCheckingTypeLink error: nil];
-                for (NSString * pbItem in items)
-                {
-                    pbItem = [pbItem stringByTrimmingCharactersInSet: [NSCharacterSet whitespaceAndNewlineCharacterSet]];
-                    if (([pbItem rangeOfString: @"magnet:" options: (NSAnchoredSearch | NSCaseInsensitiveSearch)].location != NSNotFound)
-                        || [detector firstMatchInString: pbItem options: 0 range: NSMakeRange(0, [pbItem length])])
-                        return YES;
-                }
+                pbItem = [pbItem stringByTrimmingCharactersInSet: [NSCharacterSet whitespaceAndNewlineCharacterSet]];
+                if (([pbItem rangeOfString: @"magnet:" options: (NSAnchoredSearch | NSCaseInsensitiveSearch)].location != NSNotFound)
+                    || [detector firstMatchInString: pbItem options: 0 range: NSMakeRange(0, [pbItem length])])
+                    return YES;
             }
         }
-        
-        return NO;
+    
+    return NO;
     }
     
     return YES;
@@ -623,45 +605,24 @@
         return;
     
     const NSRect rect = [fTorrentCell iconRectForBounds: [self rectOfRow: row]];
+
+    if (fActionPopoverShown)
+        return;
     
-    if ([NSApp isOnLionOrBetter])
-    {
-        if (fActionPopoverShown)
-            return;
-        
-        Torrent * torrent = [self itemAtRow: row];
-        
-        NSPopover * popover = [[NSPopoverLion alloc] init];
-        [popover setBehavior: NSPopoverBehaviorTransient];
-        InfoOptionsViewController * infoViewController = [[InfoOptionsViewController alloc] init];
-        [popover setContentViewController: infoViewController];
-        [popover setDelegate: self];
-        
-        [popover showRelativeToRect: rect ofView: self preferredEdge: NSMaxYEdge];
-        [infoViewController setInfoForTorrents: [NSArray arrayWithObject: torrent]];
-        [infoViewController updateInfo];
-        
-        [infoViewController release];
-        [popover release];
-    }
-    else
-    {
-        //update file action menu
-        fMenuTorrent = [[self itemAtRow: row] retain];
-        
-        //update global limit check
-        [fGlobalLimitItem setState: [fMenuTorrent usesGlobalSpeedLimit] ? NSOnState : NSOffState];
-        
-        //place menu below button
-        NSPoint location = rect.origin;
-        location.y += NSHeight(rect) + 5.0;
-        
-        location = [self convertPoint: location toView: self];
-        [fActionMenu popUpMenuPositioningItem: nil atLocation: location inView: self];
-        
-        [fMenuTorrent release];
-        fMenuTorrent = nil;
-    }
+    Torrent * torrent = [self itemAtRow: row];
+    
+    NSPopover * popover = [[NSPopover alloc] init];
+    [popover setBehavior: NSPopoverBehaviorTransient];
+    InfoOptionsViewController * infoViewController = [[InfoOptionsViewController alloc] init];
+    [popover setContentViewController: infoViewController];
+    [popover setDelegate: self];
+    
+    [popover showRelativeToRect: rect ofView: self preferredEdge: NSMaxYEdge];
+    [infoViewController setInfoForTorrents: [NSArray arrayWithObject: torrent]];
+    [infoViewController updateInfo];
+    
+    [infoViewController release];
+    [popover release];
 }
 
 //don't show multiple popovers when clicking the gear button repeatedly

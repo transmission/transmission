@@ -166,9 +166,8 @@
 - (void) awakeFromNib
 {
     fHasLoaded = YES;
-    
-    if ([NSApp isOnLionOrBetter])
-        [[self window] setRestorationClass: [self class]];
+
+    [[self window] setRestorationClass: [self class]];
     
     NSToolbar * toolbar = [[NSToolbar alloc] initWithIdentifier: @"Preferences Toolbar"];
     [toolbar setDelegate: self];

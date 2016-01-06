@@ -66,9 +66,8 @@ tr_session * fLib = NULL;
     fTimer = [[NSTimer scheduledTimerWithTimeInterval: UPDATE_SECONDS target: self selector: @selector(updateStats) userInfo: nil repeats: YES] retain];
     [[NSRunLoop currentRunLoop] addTimer: fTimer forMode: NSModalPanelRunLoopMode];
     [[NSRunLoop currentRunLoop] addTimer: fTimer forMode: NSEventTrackingRunLoopMode];
-    
-    if ([NSApp isOnLionOrBetter])
-        [[self window] setRestorationClass: [self class]];
+
+    [[self window] setRestorationClass: [self class]];
     
     [[self window] setTitle: NSLocalizedString(@"Statistics", "Stats window -> title")];
     

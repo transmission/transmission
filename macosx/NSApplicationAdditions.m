@@ -26,11 +26,6 @@
 
 @implementation NSApplication (NSApplicationAdditions)
 
-- (BOOL) isOnLionOrBetter
-{
-	return floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_6;
-}
-
 - (BOOL) isOnMountainLionOrBetter
 {
     return floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_7;

@@ -57,9 +57,7 @@
     NSWindow * window = [self window];
     [window setFrameAutosaveName: @"MessageWindowFrame"];
     [window setFrameUsingName: @"MessageWindowFrame"];
-    
-    if ([NSApp isOnLionOrBetter])
-        [window setRestorationClass: [self class]];
+    [window setRestorationClass: [self class]];
     
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(resizeColumn)
         name: NSTableViewColumnDidResizeNotification object: fMessageTable];
@@ -380,20 +378,13 @@
     [fLock lock];
     
     [fMessages removeAllObjects];
-    
-    const BOOL onLion = [NSApp isOnLionOrBetter];
-    
-    if (onLion)
-        [fMessageTable beginUpdates];
-    
-    if (onLion)
-        [fMessageTable removeRowsAtIndexes: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [fDisplayedMessages count])] withAnimation: NSTableViewAnimationSlideLeft];
+
+    [fMessageTable beginUpdates];
+    [fMessageTable removeRowsAtIndexes: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [fDisplayedMessages count])] withAnimation: NSTableViewAnimationSlideLeft];
+
     [fDisplayedMessages removeAllObjects];
-    
-    if (onLion)
-        [fMessageTable endUpdates];
-    else
-        [fMessageTable reloadData];
+
+    [fMessageTable endUpdates];
     
     [fLock unlock];
 }
@@ -469,11 +460,8 @@
     }];
     
     NSArray * tempMessages = [[fMessages objectsAtIndexes: indexes] sortedArrayUsingDescriptors: [fMessageTable sortDescriptors]];
-    
-    const BOOL onLion = [NSApp isOnLionOrBetter];
-    
-    if (onLion)
-        [fMessageTable beginUpdates];
+
+    [fMessageTable beginUpdates];
     
     //figure out which rows were added/moved
     NSUInteger currentIndex = 0, totalCount = 0;
@@ -493,8 +481,7 @@
             if (previousIndex != currentIndex)
             {
                 [fDisplayedMessages moveObjectAtIndex: previousIndex toIndex: currentIndex];
-                if (onLion)
-                    [fMessageTable moveRowAtIndex: previousIndex toIndex: currentIndex];
+                [fMessageTable moveRowAtIndex: previousIndex toIndex: currentIndex];
             }
             ++currentIndex;
         }
@@ -507,24 +494,14 @@
     {
         const NSRange removeRange = NSMakeRange(currentIndex, [fDisplayedMessages count]-currentIndex);
         [fDisplayedMessages removeObjectsInRange: removeRange];
-        if (onLion)
-            [fMessageTable removeRowsAtIndexes: [NSIndexSet indexSetWithIndexesInRange: removeRange] withAnimation: NSTableViewAnimationSlideDown];
+        [fMessageTable removeRowsAtIndexes: [NSIndexSet indexSetWithIndexesInRange: removeRange] withAnimation: NSTableViewAnimationSlideDown];
     }
     
     //add new items
     [fDisplayedMessages insertObjects: itemsToAdd atIndexes: itemsToAddIndexes];
-    if (onLion)
-        [fMessageTable insertRowsAtIndexes: itemsToAddIndexes withAnimation: NSTableViewAnimationSlideUp];
-    
-    if (onLion)
-        [fMessageTable endUpdates];
-    else
-    {
-        [fMessageTable reloadData];
-        
-        if ([fDisplayedMessages count] > 0)
-            [fMessageTable deselectAll: self];
-    }
+    [fMessageTable insertRowsAtIndexes: itemsToAddIndexes withAnimation: NSTableViewAnimationSlideUp];
+
+    [fMessageTable endUpdates];
     
     NSAssert2([fDisplayedMessages isEqualToArray: tempMessages], @"Inconsistency between message arrays! %@ %@", fDisplayedMessages, tempMessages);
 }

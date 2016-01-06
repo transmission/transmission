@@ -120,34 +120,17 @@
     if ([[pasteboard types] containsObject: GROUP_TABLE_VIEW_DATA_TYPE])
     {
         NSIndexSet * indexes = [NSKeyedUnarchiver unarchiveObjectWithData: [pasteboard dataForType: GROUP_TABLE_VIEW_DATA_TYPE]];
-        NSInteger oldRow = [indexes firstIndex], selectedRow = [fTableView selectedRow];
+        NSInteger oldRow = [indexes firstIndex];
         
         if (oldRow < newRow)
             newRow--;
-        
-        if ([NSApp isOnLionOrBetter])
-            [fTableView beginUpdates];
+
+        [fTableView beginUpdates];
         
         [[GroupsController groups] moveGroupAtRow: oldRow toRow: newRow];
-        
-        if ([NSApp isOnLionOrBetter])
-        {
-            [fTableView moveRowAtIndex: oldRow toIndex: newRow];
-            [fTableView endUpdates];
-        }
-        else
-        {
-            if (selectedRow == oldRow)
-                selectedRow = newRow;
-            else if (selectedRow > oldRow && selectedRow <= newRow)
-                selectedRow--;
-            else if (selectedRow < oldRow && selectedRow >= newRow)
-                selectedRow++;
-            else;
-            
-            [fTableView selectRowIndexes: [NSIndexSet indexSetWithIndex: selectedRow] byExtendingSelection: NO];
-            [fTableView reloadData];
-        }
+
+        [fTableView moveRowAtIndex: oldRow toIndex: newRow];
+        [fTableView endUpdates];
     }
     
     return YES;
@@ -163,20 +146,14 @@
     switch ([[sender cell] tagForSegment: [sender selectedSegment]])
     {
         case ADD_TAG:
-            if ([NSApp isOnLionOrBetter])
-                [fTableView beginUpdates];
+            [fTableView beginUpdates];
             
             [[GroupsController groups] addNewGroup];
             
             row = [fTableView numberOfRows];
-            
-            if ([NSApp isOnLionOrBetter])
-            {
-                [fTableView insertRowsAtIndexes: [NSIndexSet indexSetWithIndex: row] withAnimation: NSTableViewAnimationSlideUp];
-                [fTableView endUpdates];
-            }
-            else
-                [fTableView reloadData];
+
+            [fTableView insertRowsAtIndexes: [NSIndexSet indexSetWithIndex: row] withAnimation: NSTableViewAnimationSlideUp];
+            [fTableView endUpdates];
             
             [fTableView selectRowIndexes: [NSIndexSet indexSetWithIndex: row] byExtendingSelection: NO];
             [fTableView scrollRowToVisible: row];
@@ -188,19 +165,13 @@
         case REMOVE_TAG:
             row = [fTableView selectedRow];
             
-            
-            if ([NSApp isOnLionOrBetter])
-                [fTableView beginUpdates];
+
+            [fTableView beginUpdates];
             
             [[GroupsController groups] removeGroupWithRowIndex: row];            
-            
-            if ([NSApp isOnLionOrBetter])
-            {
-                [fTableView removeRowsAtIndexes: [NSIndexSet indexSetWithIndex: row] withAnimation: NSTableViewAnimationSlideUp];
-                [fTableView endUpdates];
-            }
-            else
-                [fTableView reloadData];
+
+            [fTableView removeRowsAtIndexes: [NSIndexSet indexSetWithIndex: row] withAnimation: NSTableViewAnimationSlideUp];
+            [fTableView endUpdates];
             
             if ([fTableView numberOfRows] > 0)
             {

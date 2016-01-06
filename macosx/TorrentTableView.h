@@ -43,7 +43,7 @@
     
     IBOutlet NSMenu * fContextRow, * fContextNoRow;
     
-    NSInteger fMouseRow, fMouseControlRow, fMouseRevealRow, fMouseActionRow, fActionPushedRow;
+    NSInteger fMouseRow, fMouseControlRow, fMouseRevealRow, fMouseActionRow;
     NSArray * fSelectedValues;
     
     IBOutlet NSMenu * fActionMenu, * fUploadMenu, * fDownloadMenu, * fRatioMenu, * fPriorityMenu;

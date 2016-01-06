@@ -86,15 +86,6 @@ typedef enum
     
     IBOutlet NSMenu                 * fSortMenu;
     
-    IBOutlet NSMenu                 * fActionMenu;
-    
-    IBOutlet NSMenu                 * fUploadMenu, * fDownloadMenu;
-    IBOutlet NSMenuItem             * fUploadLimitItem, * fUploadNoLimitItem,
-                                    * fDownloadLimitItem, * fDownloadNoLimitItem;
-    
-    IBOutlet NSMenu                 * fRatioStopMenu;
-    IBOutlet NSMenuItem             * fCheckRatioItem, * fNoCheckRatioItem;
-    
     IBOutlet NSMenu                 * fGroupsSetMenu, * fGroupsSetContextMenu;
     
     IBOutlet NSMenu                 * fShareMenu, * fShareContextMenu;
@@ -230,12 +221,6 @@ typedef enum
 - (void) speedLimitChanged: (id) sender;
 - (void) altSpeedToggledCallbackIsLimited: (NSDictionary *) dict;
 
-- (void) setLimitGlobalEnabled: (id) sender;
-- (void) setQuickLimitGlobal: (id) sender;
-
-- (void) setRatioGlobalEnabled: (id) sender;
-- (void) setQuickRatioGlobal: (id) sender;
-
 - (void) changeAutoImport;
 - (void) checkAutoImportDirectory;
 
@@ -250,7 +235,6 @@ typedef enum
 - (void) toggleSmallView: (id) sender;
 - (void) togglePiecesBar: (id) sender;
 - (void) toggleAvailabilityBar: (id) sender;
-- (void) toggleStatusString: (id) sender;
 
 - (void) toggleStatusBar: (id) sender;
 - (void) showStatusBar: (BOOL) show animate: (BOOL) animate;

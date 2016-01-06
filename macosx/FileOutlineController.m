@@ -111,11 +111,8 @@ typedef enum
     
     if ((!text && !fFilterText) || (text && fFilterText && [text isEqualToString: fFilterText]))
         return;
-    
-    const BOOL onLion = [NSApp isOnLionOrBetter];
-    
-    if (onLion)
-        [fOutline beginUpdates];
+
+    [fOutline beginUpdates];
     
     NSUInteger currentIndex = 0, totalCount = 0;
     NSMutableArray * itemsToAdd = [NSMutableArray array];
@@ -179,7 +176,7 @@ typedef enum
                     }
                 }
                 
-                if (move && onLion)
+                if (move)
                     [fOutline moveItemAtIndex: previousIndex inParent: parent toIndex: currentIndex inParent: nil];
                 
                 ++currentIndex;
@@ -194,19 +191,14 @@ typedef enum
     {
         const NSRange removeRange = NSMakeRange(currentIndex, [fFileList count]-currentIndex);
         [fFileList removeObjectsInRange: removeRange];
-        if (onLion)
-            [fOutline removeItemsAtIndexes: [NSIndexSet indexSetWithIndexesInRange: removeRange] inParent: nil withAnimation: NSTableViewAnimationSlideDown];
+        [fOutline removeItemsAtIndexes: [NSIndexSet indexSetWithIndexesInRange: removeRange] inParent: nil withAnimation: NSTableViewAnimationSlideDown];
     }
     
     //add new items
     [fFileList insertObjects: itemsToAdd atIndexes: itemsToAddIndexes];
-    if (onLion)
-        [fOutline insertItemsAtIndexes: itemsToAddIndexes inParent: nil withAnimation: NSTableViewAnimationSlideUp];
-    
-    if (onLion)
-        [fOutline endUpdates];
-    else
-        [fOutline reloadData];
+    [fOutline insertItemsAtIndexes: itemsToAddIndexes inParent: nil withAnimation: NSTableViewAnimationSlideUp];
+
+    [fOutline endUpdates];
     
     [fFilterText release];
     fFilterText = [text retain];

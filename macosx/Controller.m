@@ -1474,13 +1474,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (void) confirmRemoveTorrents: (NSArray *) torrents deleteData: (BOOL) deleteData
 {
-    NSMutableArray * selectedValues = nil;
-    if (![NSApp isOnLionOrBetter])
-    {
-        selectedValues = [NSMutableArray arrayWithArray: [fTableView selectedValues]];
-        [selectedValues removeObjectsInArray: torrents];
-    }
-    
     //miscellaneous
     for (Torrent * torrent in torrents)
     {
@@ -1523,24 +1516,22 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         
         if ([indexes count] > 0)
         {
-            if ([NSApp isOnLionOrBetter])
+            if (!beganUpdate)
             {
-                if (!beganUpdate)
-                {
-                    [NSAnimationContext beginGrouping]; //this has to be before we set the completion handler (#4874)
-                    
-                    //we can't closeRemoveTorrent: until it's no longer in the GUI at all
-                    [[NSAnimationContext currentContext] setCompletionHandler: ^{
-                        for (Torrent * torrent in torrents)
-                            [torrent closeRemoveTorrent: deleteData];
-                    }];
-                    
-                    [fTableView beginUpdates];
-                    beganUpdate = YES;
-                }
+                [NSAnimationContext beginGrouping]; //this has to be before we set the completion handler (#4874)
                 
-                [fTableView removeItemsAtIndexes: indexes inParent: parent withAnimation: NSTableViewAnimationSlideLeft];
+                //we can't closeRemoveTorrent: until it's no longer in the GUI at all
+                [[NSAnimationContext currentContext] setCompletionHandler: ^{
+                    for (Torrent * torrent in torrents)
+                        [torrent closeRemoveTorrent: deleteData];
+                }];
+                
+                [fTableView beginUpdates];
+                beganUpdate = YES;
             }
+            
+            [fTableView removeItemsAtIndexes: indexes inParent: parent withAnimation: NSTableViewAnimationSlideLeft];
+
             [displayedTorrents removeObjectsAtIndexes: indexes];
         }
     };
@@ -1569,9 +1560,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         for (Torrent * torrent in torrents)
             [torrent closeRemoveTorrent: deleteData];
     }
-    
-    if (selectedValues)
-        [fTableView selectValues: selectedValues];
     
     [self fullUpdateUI];
 }
@@ -2226,18 +2214,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (void) sortTorrents: (BOOL) includeQueueOrder
 {
-    const BOOL onLion = [NSApp isOnLionOrBetter];
-    
-    NSArray * selectedValues;
-    if (!onLion)
-        selectedValues = [fTableView selectedValues];
-    
     //actually sort
     [self sortTorrentsCallUpdates: YES includeQueueOrder: includeQueueOrder];
-    
-    if (!onLion)
-        [fTableView selectValues: selectedValues];
-    
     [fTableView setNeedsDisplay: YES];
 }
 
@@ -2306,7 +2284,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         descriptors = [NSArray arrayWithObject: orderDescriptor];
     }
     
-    BOOL beganTableUpdate = !callUpdates || ![NSApp isOnLionOrBetter];
+    BOOL beganTableUpdate = !callUpdates;
     
     //actually sort
     if ([fDefaults boolForKey: @"SortByGroup"])
@@ -2319,10 +2297,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     if (beganTableUpdate && callUpdates)
     {
-        if ([NSApp isOnLionOrBetter])
-            [fTableView endUpdates];
-        else
-            [fTableView reloadData];
+        [fTableView endUpdates];
     }
 }
 
@@ -2348,13 +2323,11 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             if (!*beganTableUpdate)
             {
                 *beganTableUpdate = YES;
-                if ([NSApp isOnLionOrBetter])
-                    [fTableView beginUpdates];
+                [fTableView beginUpdates];
             }
             
             [rearrangeArray moveObjectAtIndex: currentIndex toIndex: insertIndex];
-            if ([NSApp isOnLionOrBetter])
-                [fTableView moveItemAtIndex: currentIndex inParent: parent toIndex: insertIndex inParent: parent];
+            [fTableView moveItemAtIndex: currentIndex inParent: parent toIndex: insertIndex inParent: parent];
         }
     }
     
@@ -2363,12 +2336,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (void) applyFilter
 {
-    const BOOL onLion = [NSApp isOnLionOrBetter];
-    
-    NSArray * selectedValuesSL = nil;
-    if (!onLion)
-        selectedValuesSL = [fTableView selectedValues];
-    
     __block int32_t active = 0, downloading = 0, seeding = 0, paused = 0;
     NSString * filterType = [fDefaults stringForKey: @"Filter"];
     BOOL filterActive = NO, filterDownload = NO, filterSeed = NO, filterPause = NO, filterStatus = YES;
@@ -2498,16 +2465,13 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     }
     
     BOOL beganUpdates = NO;
-    
-    if (onLion)
-    {
-        //don't animate torrents when first launching
-        static dispatch_once_t onceToken;
-        dispatch_once(&onceToken, ^{
-            [[NSAnimationContext currentContext] setDuration: 0];
-        });
-        [NSAnimationContext beginGrouping];
-    }
+
+    //don't animate torrents when first launching
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        [[NSAnimationContext currentContext] setDuration: 0];
+    });
+    [NSAnimationContext beginGrouping];
     
     //add/remove torrents (and rearrange for groups), one by one
     if (!groupRows && !wasGroupRows)
@@ -2529,15 +2493,13 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         if ([addIndexes count] > 0 || [removePreviousIndexes count] > 0)
         {
             beganUpdates = YES;
-            if (onLion)
-                [fTableView beginUpdates];
+            [fTableView beginUpdates];
             
             //remove torrents we didn't find
             if ([removePreviousIndexes count] > 0)
             {
                 [fDisplayedTorrents removeObjectsAtIndexes: removePreviousIndexes];
-                if (onLion)
-                    [fTableView removeItemsAtIndexes: removePreviousIndexes inParent: nil withAnimation: NSTableViewAnimationSlideDown];
+                [fTableView removeItemsAtIndexes: removePreviousIndexes inParent: nil withAnimation: NSTableViewAnimationSlideDown];
             }
             
             //add new torrents
@@ -2553,13 +2515,11 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                     [addIndexes removeIndexes: newAddIndexes];
                     
                     [fDisplayedTorrents addObjectsFromArray: [allTorrents objectsAtIndexes: newAddIndexes]];
-                    if (onLion)
-                        [fTableView insertItemsAtIndexes: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange([fDisplayedTorrents count] - [newAddIndexes count], [newAddIndexes count])] inParent: nil withAnimation: NSTableViewAnimationSlideLeft];
+                    [fTableView insertItemsAtIndexes: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange([fDisplayedTorrents count] - [newAddIndexes count], [newAddIndexes count])] inParent: nil withAnimation: NSTableViewAnimationSlideLeft];
                 }
                 
                 [fDisplayedTorrents addObjectsFromArray: [allTorrents objectsAtIndexes: addIndexes]];
-                if (onLion)
-                    [fTableView insertItemsAtIndexes: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange([fDisplayedTorrents count] - [addIndexes count], [addIndexes count])] inParent: nil withAnimation: NSTableViewAnimationSlideDown];
+                [fTableView insertItemsAtIndexes: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange([fDisplayedTorrents count] - [addIndexes count], [addIndexes count])] inParent: nil withAnimation: NSTableViewAnimationSlideDown];
             }
         }
     }
@@ -2569,8 +2529,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         
         #warning don't always do?
         beganUpdates = YES;
-        if (onLion)
-            [fTableView beginUpdates];
+        [fTableView beginUpdates];
         
         NSMutableIndexSet * unusedAllTorrentsIndexes = [NSMutableIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [allTorrents count])];
         
@@ -2607,12 +2566,9 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                             newGroup = [[[TorrentGroup alloc] initWithGroup: groupValue] autorelease];
                             [groupsByIndex setObject: newGroup forKey: [NSNumber numberWithInteger: groupValue]];
                             [fDisplayedTorrents addObject: newGroup];
-                            
-                            if (onLion)
-                            {
-                                [fTableView insertItemsAtIndexes: [NSIndexSet indexSetWithIndex: [fDisplayedTorrents count]-1] inParent: nil withAnimation: NSTableViewAnimationEffectFade];
-                                [fTableView isGroupCollapsed: groupValue] ? [fTableView collapseItem: newGroup] : [fTableView expandItem: newGroup];
-                            }
+
+                            [fTableView insertItemsAtIndexes: [NSIndexSet indexSetWithIndex: [fDisplayedTorrents count]-1] inParent: nil withAnimation: NSTableViewAnimationEffectFade];
+                            [fTableView isGroupCollapsed: groupValue] ? [fTableView collapseItem: newGroup] : [fTableView expandItem: newGroup];
                         }
                         else //if we haven't processed the other group yet, we have to make sure we don't flag it for removal the next time
                         {
@@ -2623,9 +2579,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                         
                         [[group torrents] removeObjectAtIndex: indexInGroup];
                         [[newGroup torrents] addObject: torrent];
-                        
-                        if (onLion)
-                            [fTableView moveItemAtIndex: indexInGroup inParent: group toIndex: [[newGroup torrents] count]-1 inParent: newGroup];
+
+                        [fTableView moveItemAtIndex: indexInGroup inParent: group toIndex: [[newGroup torrents] count]-1 inParent: newGroup];
                         
                         --indexInGroup;
                     }
@@ -2638,8 +2593,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             if ([removeIndexes count] > 0)
             {
                 [[group torrents] removeObjectsAtIndexes: removeIndexes];
-                if (onLion)
-                    [fTableView removeItemsAtIndexes: removeIndexes inParent: group withAnimation: NSTableViewAnimationEffectFade];
+                [fTableView removeItemsAtIndexes: removeIndexes inParent: group withAnimation: NSTableViewAnimationEffectFade];
             }
         }
         
@@ -2653,20 +2607,15 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                 group = [[[TorrentGroup alloc] initWithGroup: groupValue] autorelease];
                 [groupsByIndex setObject: group forKey: [NSNumber numberWithInteger: groupValue]];
                 [fDisplayedTorrents addObject: group];
-                
-                if (onLion)
-                {
-                    [fTableView insertItemsAtIndexes: [NSIndexSet indexSetWithIndex: [fDisplayedTorrents count]-1] inParent: nil withAnimation: NSTableViewAnimationEffectFade];
-                    [fTableView isGroupCollapsed: groupValue] ? [fTableView collapseItem: group] : [fTableView expandItem: group];
-                }
+
+                [fTableView insertItemsAtIndexes: [NSIndexSet indexSetWithIndex: [fDisplayedTorrents count]-1] inParent: nil withAnimation: NSTableViewAnimationEffectFade];
+                [fTableView isGroupCollapsed: groupValue] ? [fTableView collapseItem: group] : [fTableView expandItem: group];
             }
             
             [[group torrents] addObject: torrent];
-            if (onLion)
-            {
-                const BOOL newTorrent = fAddingTransfers && [fAddingTransfers containsObject: torrent];
-                [fTableView insertItemsAtIndexes: [NSIndexSet indexSetWithIndex: [[group torrents] count]-1] inParent: group withAnimation: newTorrent ? NSTableViewAnimationSlideLeft : NSTableViewAnimationSlideDown];
-            }
+
+            const BOOL newTorrent = fAddingTransfers && [fAddingTransfers containsObject: torrent];
+            [fTableView insertItemsAtIndexes: [NSIndexSet indexSetWithIndex: [[group torrents] count]-1] inParent: group withAnimation: newTorrent ? NSTableViewAnimationSlideLeft : NSTableViewAnimationSlideDown];
         }
         
         //remove empty groups
@@ -2677,8 +2626,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         if ([removeGroupIndexes count] > 0)
         {
             [fDisplayedTorrents removeObjectsAtIndexes: removeGroupIndexes];
-            if (onLion)
-                [fTableView removeItemsAtIndexes: removeGroupIndexes inParent: nil withAnimation: NSTableViewAnimationEffectFade];
+            [fTableView removeItemsAtIndexes: removeGroupIndexes inParent: nil withAnimation: NSTableViewAnimationEffectFade];
         }
         
         //now that all groups are there, sort them - don't insert on the fly in case groups were reordered in prefs
@@ -2697,11 +2645,9 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         NSArray * selectedValues = [fTableView selectedValues];
         
         beganUpdates = YES;
-        if (onLion)
-            [fTableView beginUpdates];
-        
-        if (onLion)
-            [fTableView removeItemsAtIndexes: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [fDisplayedTorrents count])] inParent: nil withAnimation: NSTableViewAnimationSlideDown];
+        [fTableView beginUpdates];
+
+        [fTableView removeItemsAtIndexes: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [fDisplayedTorrents count])] inParent: nil withAnimation: NSTableViewAnimationSlideDown];
         
         if (groupRows)
         {
@@ -2728,9 +2674,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         }
         else
             [fDisplayedTorrents setArray: allTorrents];
-        
-        if (onLion)
-            [fTableView insertItemsAtIndexes: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [fDisplayedTorrents count])] inParent: nil withAnimation: NSTableViewAnimationEffectFade];
+
+        [fTableView insertItemsAtIndexes: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [fDisplayedTorrents count])] inParent: nil withAnimation: NSTableViewAnimationEffectFade];
         
         if (groupRows) 
         { 
@@ -2745,34 +2690,13 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     
     //sort the torrents (won't sort the groups, though)
     [self sortTorrentsCallUpdates: !beganUpdates includeQueueOrder: YES];
+
+    if (beganUpdates)
+        [fTableView endUpdates];
+    [fTableView setNeedsDisplay: YES];
     
-    if (onLion)
-    {
-        if (beganUpdates)
-            [fTableView endUpdates];
-        [fTableView setNeedsDisplay: YES];
-        
-        [NSAnimationContext endGrouping];
-    }
-    else
-    {
-        [fTableView reloadData];
-        
-        if (groupRows)
-        {
-            for (TorrentGroup * group in fDisplayedTorrents)
-            {
-                if ([fTableView isGroupCollapsed: [group groupIndex]])
-                    [fTableView collapseItem: group];
-                else
-                    [fTableView expandItem: group];
-            }
-        }
-    }
-    
-    if (!onLion)
-        [fTableView selectValues: selectedValuesSL];
-    
+    [NSAnimationContext endGrouping];
+
     [self resetInfo]; //if group is already selected, but the torrents in it change
     
     [self setBottomCountText: groupRows || filterStatus || filterGroup || searchStrings];
@@ -2793,31 +2717,19 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 - (IBAction) showGlobalPopover: (id) sender
 {
-    if ([NSApp isOnLionOrBetter])
-    {
-        if (fGlobalPopoverShown)
-            return;
-        
-        NSPopover * popover = [[NSPopoverLion alloc] init];
-        [popover setBehavior: NSPopoverBehaviorTransient];
-        GlobalOptionsPopoverViewController * viewController = [[GlobalOptionsPopoverViewController alloc] initWithHandle: fLib];
-        [popover setContentViewController: viewController];
-        [popover setDelegate: self];
-        
-        [popover showRelativeToRect: [sender frame] ofView: sender preferredEdge: NSMaxYEdge];
-        
-        [viewController release];
-        [popover release];
-    }
-    else
-    {
-        //place menu below button
-        NSRect rect = [sender frame];
-        NSPoint location = rect.origin;
-        location.y += NSHeight(rect) + 5.0;
-        
-        [fActionMenu popUpMenuPositioningItem: nil atLocation: location inView: sender];
-    }
+    if (fGlobalPopoverShown)
+        return;
+    
+    NSPopover * popover = [[NSPopover alloc] init];
+    [popover setBehavior: NSPopoverBehaviorTransient];
+    GlobalOptionsPopoverViewController * viewController = [[GlobalOptionsPopoverViewController alloc] initWithHandle: fLib];
+    [popover setContentViewController: viewController];
+    [popover setDelegate: self];
+    
+    [popover showRelativeToRect: [sender frame] ofView: sender preferredEdge: NSMaxYEdge];
+    
+    [viewController release];
+    [popover release];
 }
 
 //don't show multiple popovers when clicking the gear button repeatedly
@@ -2845,43 +2757,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         {
             NSMenuItem * item = [[groupMenu itemAtIndex: 0] retain];
             [groupMenu removeItemAtIndex: 0];
-            [menu addItem: item];
-            [item release];
-        }
-    }
-    else if (menu == fUploadMenu || menu == fDownloadMenu)
-    {
-        if ([menu numberOfItems] > 3)
-            return;
-        
-        const NSInteger speedLimitActionValue[] = { 5, 10, 20, 30, 40, 50, 75, 100, 150, 200, 250, 500, 750, 1000, 1500, 2000, -1 };
-        
-        NSMenuItem * item;
-        for (NSInteger i = 0; speedLimitActionValue[i] != -1; i++)
-        {
-            item = [[NSMenuItem alloc] initWithTitle: [NSString stringWithFormat: NSLocalizedString(@"%d KB/s",
-                    "Action menu -> upload/download limit"), speedLimitActionValue[i]] action: @selector(setQuickLimitGlobal:)
-                    keyEquivalent: @""];
-            [item setTarget: self];
-            [item setRepresentedObject: [NSNumber numberWithInt: speedLimitActionValue[i]]];
-            [menu addItem: item];
-            [item release];
-        }
-    }
-    else if (menu == fRatioStopMenu)
-    {
-        if ([menu numberOfItems] > 3)
-            return;
-        
-        const float ratioLimitActionValue[] = { 0.25, 0.5, 0.75, 1.0, 1.5, 2.0, 3.0, -1 };
-        
-        NSMenuItem * item;
-        for (NSInteger i = 0; ratioLimitActionValue[i] != -1; i++)
-        {
-            item = [[NSMenuItem alloc] initWithTitle: [NSString localizedStringWithFormat: @"%.2f", ratioLimitActionValue[i]]
-                    action: @selector(setQuickRatioGlobal:) keyEquivalent: @""];
-            [item setTarget: self];
-            [item setRepresentedObject: [NSNumber numberWithFloat: ratioLimitActionValue[i]]];
             [menu addItem: item];
             [item release];
         }
@@ -2942,39 +2817,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                                      identifier: GROWL_AUTO_SPEED_LIMIT];
     
     [dict release];
-}
-
-- (void) setLimitGlobalEnabled: (id) sender
-{
-    BOOL upload = [sender menu] == fUploadMenu;
-    [fDefaults setBool: sender == (upload ? fUploadLimitItem : fDownloadLimitItem) forKey: upload ? @"CheckUpload" : @"CheckDownload"];
-    
-    [fPrefsController applySpeedSettings: nil];
-}
-
-- (void) setQuickLimitGlobal: (id) sender
-{
-    BOOL upload = [sender menu] == fUploadMenu;
-    [fDefaults setInteger: [[sender representedObject] intValue] forKey: upload ? @"UploadLimit" : @"DownloadLimit"];
-    [fDefaults setBool: YES forKey: upload ? @"CheckUpload" : @"CheckDownload"];
-    
-    [fPrefsController updateLimitFields];
-    [fPrefsController applySpeedSettings: nil];
-}
-
-- (void) setRatioGlobalEnabled: (id) sender
-{
-    [fDefaults setBool: sender == fCheckRatioItem forKey: @"RatioCheck"];
-    
-    [fPrefsController applyRatioSetting: nil];
-}
-
-- (void) setQuickRatioGlobal: (id) sender
-{
-    [fDefaults setBool: YES forKey: @"RatioCheck"];
-    [fDefaults setFloat: [[sender representedObject] floatValue] forKey: @"RatioLimit"];
-    
-    [fPrefsController updateRatioStopFieldOld];
 }
 
 - (void) sound: (NSSound *) sound didFinishPlaying: (BOOL) finishedPlaying
@@ -3232,11 +3074,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     NSPasteboard * pasteboard = [info draggingPasteboard];
     if ([[pasteboard types] containsObject: TORRENT_TABLE_VIEW_DATA_TYPE])
     {
-        //remember selected rows
-        NSArray * selectedValues = nil;
-        if (![NSApp isOnLionOrBetter])
-            selectedValues = [fTableView selectedValues];
-    
         NSIndexSet * indexes = [NSKeyedUnarchiver unarchiveObjectWithData: [pasteboard dataForType: TORRENT_TABLE_VIEW_DATA_TYPE]];
         
         //get the torrents to move
@@ -3284,9 +3121,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             }
             
             //do the drag animation here so that the dragged torrents are the ones that are animated as moving, and not the torrents around them
-            const BOOL onLion = [NSApp isOnLionOrBetter];
-            if (onLion)
-                [fTableView beginUpdates];
+            [fTableView beginUpdates];
             
             NSUInteger insertDisplayIndex = topTorrent ? [groupTorrents indexOfObject: topTorrent] + 1 : 0;
             
@@ -3310,20 +3145,16 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
                     [newTorrents insertObject: torrent atIndex: insertDisplayIndex];
                     [oldTorrents removeObjectAtIndex: oldIndex];
                 }
-                
-                if (onLion)
-                    [fTableView moveItemAtIndex: oldIndex inParent: oldParent toIndex: insertDisplayIndex inParent: item];
+
+                [fTableView moveItemAtIndex: oldIndex inParent: oldParent toIndex: insertDisplayIndex inParent: item];
                 
                 ++insertDisplayIndex;
             }
-            
-            if (onLion)
-                [fTableView endUpdates];
+
+            [fTableView endUpdates];
         }
         
         [self applyFilter];
-        if (selectedValues)
-            [fTableView selectValues: selectedValues];
     }
     
     return YES;
@@ -3453,12 +3284,10 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [fTableView setUsesAlternatingRowBackgroundColors: !makeSmall];
     
     [fTableView setRowHeight: makeSmall ? ROW_HEIGHT_SMALL : ROW_HEIGHT_REGULAR];
-    
-    if ([NSApp isOnLionOrBetter])
-        [fTableView beginUpdates];
+
+    [fTableView beginUpdates];
     [fTableView noteHeightOfRowsWithIndexesChanged: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [fTableView numberOfRows])]];
-    if ([NSApp isOnLionOrBetter])
-        [fTableView endUpdates];
+    [fTableView endUpdates];
     
     //resize for larger min height if not set to auto size
     if (![fDefaults boolForKey: @"AutoSize"])
@@ -3494,17 +3323,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 {
     [fDefaults setBool: ![fDefaults boolForKey: @"DisplayProgressBarAvailable"] forKey: @"DisplayProgressBarAvailable"];
     [fTableView display];
-}
-
-#warning elliminate when 10.7-only
-- (void) toggleStatusString: (id) sender
-{
-    if ([fDefaults boolForKey: @"SmallView"])
-        [fDefaults setBool: ![fDefaults boolForKey: @"DisplaySmallStatusRegular"] forKey: @"DisplaySmallStatusRegular"];
-    else
-        [fDefaults setBool: ![fDefaults boolForKey: @"DisplayStatusProgressSelected"] forKey: @"DisplayStatusProgressSelected"];
-    
-    [fTableView setNeedsDisplay: YES];
 }
 
 - (NSRect) windowFrameByAddingHeight: (CGFloat) height checkLimits: (BOOL) check
@@ -4301,53 +4119,12 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         return [fWindow isVisible];
     }
     
-    #warning remove when menu is removed (10.7-only)
-    if (action == @selector(toggleStatusString:))
-    {
-        if ([fDefaults boolForKey: @"SmallView"])
-        {
-            [menuItem setTitle: NSLocalizedString(@"Remaining Time", "Action menu -> status string toggle")];
-            [menuItem setState: ![fDefaults boolForKey: @"DisplaySmallStatusRegular"] ? NSOnState : NSOffState];
-        }
-        else
-        {
-            [menuItem setTitle: NSLocalizedString(@"Status of Selected Files", "Action menu -> status string toggle")];
-            [menuItem setState: [fDefaults boolForKey: @"DisplayStatusProgressSelected"] ? NSOnState : NSOffState];
-        }
-        
-        return [fWindow isVisible];
-    }
-    
     if (action == @selector(toggleAvailabilityBar:))
     {
         [menuItem setState: [fDefaults boolForKey: @"DisplayProgressBarAvailable"] ? NSOnState : NSOffState];
         return [fWindow isVisible];
     }
     
-    if (action == @selector(setLimitGlobalEnabled:))
-    {
-        BOOL upload = [menuItem menu] == fUploadMenu;
-        BOOL limit = menuItem == (upload ? fUploadLimitItem : fDownloadLimitItem);
-        if (limit)
-            [menuItem setTitle: [NSString stringWithFormat: NSLocalizedString(@"Limit (%d KB/s)",
-                                    "Action menu -> upload/download limit"),
-                                    [fDefaults integerForKey: upload ? @"UploadLimit" : @"DownloadLimit"]]];
-        
-        [menuItem setState: [fDefaults boolForKey: upload ? @"CheckUpload" : @"CheckDownload"] ? limit : !limit];
-        return YES;
-    }
-    
-    if (action == @selector(setRatioGlobalEnabled:))
-    {
-        BOOL check = menuItem == fCheckRatioItem;
-        if (check)
-            [menuItem setTitle: [NSString localizedStringWithFormat: NSLocalizedString(@"Stop at Ratio (%.2f)",
-                                    "Action menu -> ratio stop"), [fDefaults floatForKey: @"RatioLimit"]]];
-        
-        [menuItem setState: [fDefaults boolForKey: @"RatioCheck"] ? check : !check];
-        return YES;
-    }
-
     //enable show info
     if (action == @selector(showInfo:))
     {
