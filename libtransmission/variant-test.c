@@ -513,10 +513,10 @@ testParse2 (void)
   char * benc;
   const char * end;
   size_t strLen;
-  const tr_quark key_bool = tr_quark_new ("this-is-a-bool", -1);
-  const tr_quark key_real = tr_quark_new ("this-is-a-real", -1);
-  const tr_quark key_int  = tr_quark_new ("this-is-an-int", -1);
-  const tr_quark key_str  = tr_quark_new ("this-is-a-string", -1);
+  const tr_quark key_bool = tr_quark_new ("this-is-a-bool", TR_BAD_SIZE);
+  const tr_quark key_real = tr_quark_new ("this-is-a-real", TR_BAD_SIZE);
+  const tr_quark key_int  = tr_quark_new ("this-is-an-int", TR_BAD_SIZE);
+  const tr_quark key_str  = tr_quark_new ("this-is-a-string", TR_BAD_SIZE);
 
   tr_variantInitDict (&top, 0);
   tr_variantDictAddBool (&top, key_bool, true);

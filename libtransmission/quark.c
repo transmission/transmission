@@ -480,7 +480,7 @@ tr_quark_new (const void * str, size_t len)
 
   if (str == NULL)
     len = 0;
-  else if (len == (size_t)-1)
+  else if (len == TR_BAD_SIZE)
     len = strlen (str);
 
   if (!tr_quark_lookup (str, len, &ret))

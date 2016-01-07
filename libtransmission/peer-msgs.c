@@ -930,7 +930,7 @@ sendLtepHandshake (tr_peerMsgs * msgs)
         return;
 
     if (!version_quark)
-      version_quark = tr_quark_new (TR_NAME " " USERAGENT_PREFIX, -1);
+      version_quark = tr_quark_new (TR_NAME " " USERAGENT_PREFIX, TR_BAD_SIZE);
 
     dbgmsg (msgs, "sending an ltep handshake");
     msgs->clientSentLtepHandshake = true;

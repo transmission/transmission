@@ -2527,7 +2527,7 @@ metainfoLookupInit (tr_session * session)
               if (!tr_torrentParse (ctor, &inf))
                 {
                   ++n;
-                  tr_variantDictAddStr (lookup, tr_quark_new(inf.hashString,-1), path);
+                  tr_variantDictAddStr (lookup, tr_quark_new(inf.hashString, TR_BAD_SIZE), path);
                 }
               tr_free (path);
             }
@@ -2548,7 +2548,7 @@ tr_sessionFindTorrentFile (const tr_session * session,
 
   if (!session->metainfoLookup)
     metainfoLookupInit ((tr_session*)session);
-  tr_variantDictFindStr (session->metainfoLookup, tr_quark_new(hashString,-1), &filename, NULL);
+  tr_variantDictFindStr (session->metainfoLookup, tr_quark_new(hashString, TR_BAD_SIZE), &filename, NULL);
 
   return filename;
 }
@@ -2563,7 +2563,7 @@ tr_sessionSetTorrentFile (tr_session * session,
    * in that same directory, we don't need to do anything here if the
    * lookup table hasn't been built yet */
   if (session->metainfoLookup)
-    tr_variantDictAddStr (session->metainfoLookup, tr_quark_new(hashString,-1), filename);
+    tr_variantDictAddStr (session->metainfoLookup, tr_quark_new(hashString, TR_BAD_SIZE), filename);
 }
 
 /***

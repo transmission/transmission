@@ -17,6 +17,7 @@ static int
 test_static_quarks (void)
 {
   int i;
+  tr_quark q1, q2;
 
   for (i=0; i<TR_N_KEYS; i++)
     {
@@ -40,6 +41,10 @@ test_static_quarks (void)
 
       check (strcmp (str1, str2) < 0);
     }
+
+  const tr_quark q = tr_quark_new (NULL, TR_BAD_SIZE);
+  check_int_eq (TR_KEY_NONE, q);
+  check_streq ("", tr_quark_get_string (q, NULL));
 
   return 0;
 }

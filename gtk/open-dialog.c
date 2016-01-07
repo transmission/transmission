@@ -39,7 +39,7 @@ get_recent_destinations (void)
       char key[64];
       const char * val;
       g_snprintf (key, sizeof (key), "recent-download-dir-%d", i+1);
-      if ((val = gtr_pref_string_get (tr_quark_new(key,-1))))
+      if ((val = gtr_pref_string_get (tr_quark_new(key, TR_BAD_SIZE))))
         list = g_slist_append (list, (void*)val);
     }
 
@@ -73,7 +73,7 @@ save_recent_destination (TrCore * core, const char * dir)
     {
       char key[64];
       g_snprintf (key, sizeof (key), "recent-download-dir-%d", i + 1);
-      gtr_pref_string_set (tr_quark_new(key,-1), l->data);
+      gtr_pref_string_set (tr_quark_new(key, TR_BAD_SIZE), l->data);
     }
   gtr_pref_save (gtr_core_session (core));
 

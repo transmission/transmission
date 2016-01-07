@@ -2038,7 +2038,7 @@ myHandshakeDoneCB (tr_handshake  * handshake,
               char buf[128];
 
               if (peer_id != NULL)
-                client = tr_quark_new (tr_clientForId (buf, sizeof (buf), peer_id), -1);
+                client = tr_quark_new (tr_clientForId (buf, sizeof (buf), peer_id), TR_BAD_SIZE);
               else
                 client = TR_KEY_NONE;
 
