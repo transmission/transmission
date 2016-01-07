@@ -525,7 +525,7 @@
     NSAssert([titleString size].width >= NSWidth(realRect), @"Full rect width should not be less than the used title rect width!");
     
     if ([titleString size].width > NSWidth(realRect)
-        && NSMouseInRect([view convertPoint: [[view window] convertScreenToBase: [NSEvent mouseLocation]] fromView: nil], realRect, [view isFlipped]))
+        && NSMouseInRect([view convertPoint: [[view window] mouseLocationOutsideOfEventStream] fromView: nil], realRect, [view isFlipped]))
     {
         realRect.size.width = [titleString size].width;
         return NSInsetRect(realRect, -PADDING_EXPANSION_FRAME, -PADDING_EXPANSION_FRAME);

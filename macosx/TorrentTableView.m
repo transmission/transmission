@@ -234,7 +234,7 @@
     if (rows.length == 0)
         return;
     
-    NSPoint mouseLocation = [self convertPoint: [[self window] convertScreenToBase: [NSEvent mouseLocation]] fromView: nil];
+    NSPoint mouseLocation = [self convertPoint: [[self window] mouseLocationOutsideOfEventStream] fromView: nil];
     for (NSUInteger row = rows.location; row < NSMaxRange(rows); row++)
     {
         if (![[self itemAtRow: row] isKindOfClass: [Torrent class]])

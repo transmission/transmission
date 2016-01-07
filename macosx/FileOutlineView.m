@@ -96,7 +96,7 @@
     if (visibleRows.length == 0)
         return;
     
-    NSPoint mouseLocation = [self convertPoint: [[self window] convertScreenToBase: [NSEvent mouseLocation]] fromView: nil];
+    NSPoint mouseLocation = [self convertPoint: [[self window] mouseLocationOutsideOfEventStream] fromView: nil];
     
     for (NSInteger row = visibleRows.location, col = [self columnWithIdentifier: @"Priority"]; row < NSMaxRange(visibleRows); row++)
     {
