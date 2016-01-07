@@ -68,34 +68,47 @@ incompleteMetadataFree (struct tr_incomplete_metadata * m)
   tr_free (m);
 }
 
-void
-tr_torrentSetMetadataSizeHint (tr_torrent * tor, int size)
+bool
+tr_torrentSetMetadataSizeHint (tr_torrent * tor, int64_t size)
 {
-  if (!tr_torrentHasMetadata (tor))
+  if (tr_torrentHasMetadata (tor))
+    return false;
+
+  if (tor->incompleteMetadata != NULL)
+    return false;
+
+  const int n = (size <= 0 || size > INT_MAX) ? -1 :
+                size / METADATA_PIECE_SIZE + (size % METADATA_PIECE_SIZE != 0 ? 1 : 0);
+
+  dbgmsg (tor, "metadata is %" PRId64 " bytes in %d pieces", size, n);
+
+  if (n <= 0)
+    return false;
+
+  struct tr_incomplete_metadata * m = tr_new (struct tr_incomplete_metadata, 1);
+  if (m == NULL)
+    return false;
+
+  m->pieceCount = n;
+  m->metadata = tr_new (uint8_t, size);
+  m->metadata_size = size;
+  m->piecesNeededCount = n;
+  m->piecesNeeded = tr_new (struct metadata_node, n);
+
+  if (m->metadata == NULL || m->piecesNeeded == NULL)
     {
-      if (tor->incompleteMetadata == NULL)
-        {
-          int i;
-          struct tr_incomplete_metadata * m;
-          const int n = (size + (METADATA_PIECE_SIZE - 1)) / METADATA_PIECE_SIZE;
-          dbgmsg (tor, "metadata is %d bytes in %d pieces", size, n);
-
-          m = tr_new (struct tr_incomplete_metadata, 1);
-          m->pieceCount = n;
-          m->metadata = tr_new (uint8_t, size);
-          m->metadata_size = size;
-          m->piecesNeededCount = n;
-          m->piecesNeeded = tr_new (struct metadata_node, n);
-
-          for (i=0; i<n; ++i)
-            {
-              m->piecesNeeded[i].piece = i;
-              m->piecesNeeded[i].requestedAt = 0;
-            }
-
-          tor->incompleteMetadata = m;
-        }
+      incompleteMetadataFree (m);
+      return false;
     }
+
+  for (int i = 0; i < n; ++i)
+    {
+      m->piecesNeeded[i].piece = i;
+      m->piecesNeeded[i].requestedAt = 0;
+    }
+
+  tor->incompleteMetadata = m;
+  return true;
 }
 
 static size_t
@@ -204,8 +217,10 @@ tr_torrentSetMetadataPiece (tr_torrent  * tor, int piece, const void  * data, in
   const int offset = piece * METADATA_PIECE_SIZE;
 
   assert (tr_isTorrent (tor));
+  assert (data != NULL);
+  assert (len >= 0);
 
-  dbgmsg (tor, "got metadata piece %d", piece);
+  dbgmsg (tor, "got metadata piece %d of %d bytes", piece, len);
 
   /* are we set up to download metadata? */
   m = tor->incompleteMetadata;
@@ -213,7 +228,14 @@ tr_torrentSetMetadataPiece (tr_torrent  * tor, int piece, const void  * data, in
     return;
 
   /* does this data pass the smell test? */
-  if (offset + len > m->metadata_size)
+  if (piece < 0 || piece >= m->pieceCount)
+    return;
+  if (piece < m->pieceCount - 1 ? len != METADATA_PIECE_SIZE : len > METADATA_PIECE_SIZE)
+    return;
+
+  assert (offset <= m->metadata_size);
+
+  if (len == 0 || len > m->metadata_size - offset)
     return;
 
   /* do we need this piece? */

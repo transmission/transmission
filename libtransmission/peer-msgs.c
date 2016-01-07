@@ -1045,8 +1045,8 @@ parseLtepHandshake (tr_peerMsgs * msgs, uint32_t len, struct evbuffer * inbuf)
 
     /* look for metainfo size (BEP 9) */
     if (tr_variantDictFindInt (&val, TR_KEY_metadata_size, &i)) {
-        tr_torrentSetMetadataSizeHint (msgs->torrent, i);
-        msgs->metadata_size_hint = (size_t) i;
+        if (tr_torrentSetMetadataSizeHint (msgs->torrent, i))
+            msgs->metadata_size_hint = (size_t) i;
     }
 
     /* look for upload_only (BEP 21) */

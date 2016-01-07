@@ -14,6 +14,7 @@
 #ifndef TR_TORRENT_MAGNET_H
 #define TR_TORRENT_MAGNET_H 1
 
+#include <inttypes.h>
 #include <time.h>
 
 enum
@@ -28,7 +29,7 @@ void tr_torrentSetMetadataPiece (tr_torrent * tor, int piece, const void * data,
 
 bool tr_torrentGetNextMetadataRequest (tr_torrent * tor, time_t now, int * setme);
 
-void tr_torrentSetMetadataSizeHint (tr_torrent * tor, int metadata_size);
+bool tr_torrentSetMetadataSizeHint (tr_torrent * tor, int64_t metadata_size);
 
 double tr_torrentGetMetadataPercent (const tr_torrent * tor);
 
