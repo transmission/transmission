@@ -56,6 +56,8 @@ struct tr_rpc_server
     char             * url;
     struct in_addr     bindAddress;
     struct evhttp    * httpd;
+    struct event     * start_retry_timer;
+    int                start_retry_counter;
     tr_session       * session;
     char             * username;
     char             * password;
@@ -694,30 +696,109 @@ handle_request (struct evhttp_request * req, void * arg)
     }
 }
 
+enum
+{
+  SERVER_START_RETRY_COUNT = 10,
+  SERVER_START_RETRY_DELAY_STEP = 3,
+  SERVER_START_RETRY_DELAY_INCREMENT = 5,
+  SERVER_START_RETRY_MAX_DELAY = 60
+};
+
+static void
+startServer (void * vserver);
+
+static void
+rpc_server_on_start_retry (evutil_socket_t   fd UNUSED,
+                           short             type UNUSED,
+                           void            * context)
+{
+  startServer (context);
+}
+
+static int
+rpc_server_start_retry (tr_rpc_server * server)
+{
+  int retry_delay = (server->start_retry_counter / SERVER_START_RETRY_DELAY_STEP + 1) *
+                    SERVER_START_RETRY_DELAY_INCREMENT;
+  retry_delay = MIN (retry_delay, SERVER_START_RETRY_MAX_DELAY);
+
+  if (server->start_retry_timer == NULL)
+    server->start_retry_timer = evtimer_new (server->session->event_base,
+                                             rpc_server_on_start_retry, server);
+
+  tr_timerAdd (server->start_retry_timer, retry_delay, 0);
+  ++server->start_retry_counter;
+
+  return retry_delay;
+}
+
+static void
+rpc_server_start_retry_cancel (tr_rpc_server * server)
+{
+  if (server->start_retry_timer != NULL)
+    {
+      event_free (server->start_retry_timer);
+      server->start_retry_timer = NULL;
+    }
+
+  server->start_retry_counter = 0;
+}
+
 static void
 startServer (void * vserver)
 {
-  tr_rpc_server * server  = vserver;
-  tr_address addr;
+  tr_rpc_server * server = vserver;
 
-  if (!server->httpd)
+  if (server->httpd != NULL)
+    return;
+
+  struct evhttp * httpd = evhttp_new (server->session->event_base);
+  const char * address = tr_rpcGetBindAddress (server);
+  const int port = server->port;
+
+  if (evhttp_bind_socket (httpd, address, port) == -1)
     {
-      addr.type = TR_AF_INET;
-      addr.addr.addr4 = server->bindAddress;
-      server->httpd = evhttp_new (server->session->event_base);
-      evhttp_bind_socket (server->httpd, tr_address_to_string (&addr), server->port);
-      evhttp_set_gencb (server->httpd, handle_request, server);
+      evhttp_free (httpd);
+
+      if (server->start_retry_counter < SERVER_START_RETRY_COUNT)
+        {
+          const int retry_delay = rpc_server_start_retry (server);
+
+          tr_logAddNamedDbg (MY_NAME, "Unable to bind to %s:%d, retrying in %d seconds",
+                             address, port, retry_delay);
+          return;
+        }
+
+      tr_logAddNamedError (MY_NAME, "Unable to bind to %s:%d after %d attempts, giving up",
+                           address, port, SERVER_START_RETRY_COUNT);
     }
+  else
+    {
+      evhttp_set_gencb (httpd, handle_request, server);
+      server->httpd = httpd;
+
+      tr_logAddNamedDbg (MY_NAME, "Started listening on %s:%d", address, port);
+    }
+
+  rpc_server_start_retry_cancel (server);
 }
 
 static void
 stopServer (tr_rpc_server * server)
 {
-  if (server->httpd)
-    {
-      evhttp_free (server->httpd);
-      server->httpd = NULL;
-    }
+  rpc_server_start_retry_cancel (server);
+
+  struct evhttp * httpd = server->httpd;
+  if (httpd == NULL)
+    return;
+
+  const char * address = tr_rpcGetBindAddress (server);
+  const int port = server->port;
+
+  server->httpd = NULL;
+  evhttp_free (httpd);
+
+  tr_logAddNamedDbg (MY_NAME, "Stopped listening on %s:%d", address, port);
 }
 
 static void
