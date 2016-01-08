@@ -195,7 +195,7 @@
                 return NSZeroRect;
             
             frame.origin = [fileOutlineView convertPoint: frame.origin toView: nil];
-            frame.origin = [[[self view] window] convertBaseToScreen: frame.origin];
+            frame = [[[self view] window] convertRectToScreen: frame];
             frame.origin.y -= frame.size.height;
             return frame;
         }

@@ -297,7 +297,7 @@ typedef enum
     
     NSRect windowRect = [window frame], viewRect = [view frame];
     
-    const CGFloat difference = (NSHeight(viewRect) - oldHeight) * [window userSpaceScaleFactor];
+    const CGFloat difference = NSHeight(viewRect) - oldHeight;
     windowRect.origin.y -= difference;
     windowRect.size.height += difference;
     
@@ -308,7 +308,7 @@ typedef enum
             const CGFloat screenHeight = NSHeight([[window screen] visibleFrame]);
             if (NSHeight(windowRect) > screenHeight)
             {
-                const CGFloat difference = (screenHeight - NSHeight(windowRect)) * [window userSpaceScaleFactor];
+                const CGFloat difference = screenHeight - NSHeight(windowRect);
                 windowRect.origin.y -= difference;
                 windowRect.size.height += difference;
                 

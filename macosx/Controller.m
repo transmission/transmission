@@ -3643,7 +3643,7 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             return NSZeroRect;
         
         frame.origin = [fTableView convertPoint: frame.origin toView: nil];
-        frame.origin = [fWindow convertBaseToScreen: frame.origin];
+        frame = [fWindow convertRectToScreen: frame];
         frame.origin.y -= frame.size.height;
         return frame;
     }
