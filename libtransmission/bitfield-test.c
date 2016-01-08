@@ -125,12 +125,71 @@ test_bitfields (void)
   return 0;
 }
 
+static int
+test_bitfield_has_all_none (void)
+{
+  tr_bitfield field;
+
+  tr_bitfieldConstruct (&field, 3);
+
+  check (!tr_bitfieldHasAll (&field));
+  check (tr_bitfieldHasNone (&field));
+
+  tr_bitfieldAdd (&field, 0);
+  check (!tr_bitfieldHasAll (&field));
+  check (!tr_bitfieldHasNone (&field));
+
+  tr_bitfieldRem (&field, 0);
+  tr_bitfieldAdd (&field, 1);
+  check (!tr_bitfieldHasAll (&field));
+  check (!tr_bitfieldHasNone (&field));
+
+  tr_bitfieldRem (&field, 1);
+  tr_bitfieldAdd (&field, 2);
+  check (!tr_bitfieldHasAll (&field));
+  check (!tr_bitfieldHasNone (&field));
+
+  tr_bitfieldAdd (&field, 0);
+  tr_bitfieldAdd (&field, 1);
+  check (tr_bitfieldHasAll (&field));
+  check (!tr_bitfieldHasNone (&field));
+
+  tr_bitfieldSetHasNone (&field);
+  check (!tr_bitfieldHasAll (&field));
+  check (tr_bitfieldHasNone (&field));
+
+  tr_bitfieldSetHasAll (&field);
+  check (tr_bitfieldHasAll (&field));
+  check (!tr_bitfieldHasNone (&field));
+
+  tr_bitfieldDestruct (&field);
+  tr_bitfieldConstruct (&field, 0);
+
+  check (!tr_bitfieldHasAll (&field));
+  check (!tr_bitfieldHasNone (&field));
+
+  tr_bitfieldSetHasNone (&field);
+  check (!tr_bitfieldHasAll (&field));
+  check (tr_bitfieldHasNone (&field));
+
+  tr_bitfieldSetHasAll (&field);
+  check (tr_bitfieldHasAll (&field));
+  check (!tr_bitfieldHasNone (&field));
+
+  tr_bitfieldDestruct (&field);
+  return 0;
+}
+
 int
 main (void)
 {
   int l;
   int ret;
-  const testFunc tests[] = { test_bitfields };
+  const testFunc tests[] =
+    {
+      test_bitfields,
+      test_bitfield_has_all_none
+    };
 
   if ((ret = runTests (tests, NUM_TESTS (tests))))
     return ret;

@@ -17,7 +17,6 @@ static int
 test_static_quarks (void)
 {
   int i;
-  tr_quark q1, q2;
 
   for (i=0; i<TR_N_KEYS; i++)
     {
