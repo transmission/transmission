@@ -426,7 +426,6 @@ if(CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
         -W
         -Wcast-align
         -Wfloat-equal
-        -Wformat-security
         -Wmissing-format-attribute
         -Wpointer-arith
         -Wredundant-decls
@@ -438,6 +437,14 @@ if(CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
         list(APPEND NEEDED_COMPILER_FLAGS
             -Wextra
             -Winit-self)
+    endif()
+
+    if(MINGW)
+        # Disable excessive warnings since we're using __USE_MINGW_ANSI_STDIO
+        # Hopefully, any potential issues will be spotted on other platforms
+        list(APPEND NEEDED_COMPILER_FLAGS -Wno-format)
+    else()
+        list(APPEND NEEDED_COMPILER_FLAGS -Wformat-security)
     endif()
 
     set(NEEDED_C_COMPILER_FLAGS
