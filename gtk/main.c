@@ -643,13 +643,12 @@ main (int argc, char ** argv)
 #if !GLIB_CHECK_VERSION(2,35,4)
   g_type_init ();
 #endif
-  gtk_init (&argc, &argv);
   g_set_application_name (_("Transmission"));
-  gtk_window_set_default_icon_name (MY_CONFIG_NAME);
 
   /* parse the command line */
   option_context = g_option_context_new (_("[torrent files or urls]"));
   g_option_context_add_main_entries (option_context, option_entries, GETTEXT_PACKAGE);
+  g_option_context_add_group (option_context, gtk_get_option_group (FALSE));
   g_option_context_set_translation_domain (option_context, GETTEXT_PACKAGE);
   if (!g_option_context_parse (option_context, &argc, &argv, &error))
     {
@@ -666,6 +665,8 @@ main (int argc, char ** argv)
       fprintf (stderr, "%s %s\n", MY_READABLE_NAME, LONG_VERSION_STRING);
       return 0;
     }
+
+  gtk_window_set_default_icon_name (MY_CONFIG_NAME);
 
   /* init the unit formatters */
   tr_formatter_mem_init (mem_K, _ (mem_K_str), _ (mem_M_str), _ (mem_G_str), _ (mem_T_str));
