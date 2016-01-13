@@ -134,18 +134,18 @@ Gw
                                 </textField>
                                 <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="85">
                                     <rect key="frame" x="70" y="9" width="97" height="26"/>
-                                    <popUpButtonCell key="cell" type="push" title="High" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" selectedItem="90" id="86">
+                                    <popUpButtonCell key="cell" type="push" title="Yüksek" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" selectedItem="90" id="86">
                                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                         <font key="font" metaFont="menu"/>
                                         <menu key="menu" title="OtherViews" id="87">
                                             <items>
-                                                <menuItem title="High" state="on" image="PriorityHighTemplate" id="90">
+                                                <menuItem title="Yüksek" state="on" image="PriorityHighTemplate" id="90">
                                                     <modifierMask key="keyEquivalentModifierMask"/>
                                                 </menuItem>
-                                                <menuItem title="Normal" image="PriorityNormalTemplate" tag="1" id="89">
+                                                <menuItem title="Olağan" image="PriorityNormalTemplate" tag="1" id="89">
                                                     <modifierMask key="keyEquivalentModifierMask"/>
                                                 </menuItem>
-                                                <menuItem title="Low" image="PriorityLowTemplate" tag="2" id="88">
+                                                <menuItem title="Düşük" image="PriorityLowTemplate" tag="2" id="88">
                                                     <modifierMask key="keyEquivalentModifierMask"/>
                                                 </menuItem>
                                             </items>
