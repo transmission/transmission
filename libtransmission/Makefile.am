@@ -188,7 +188,8 @@ TESTS = \
   tr-getopt-test \
   utils-test \
   variant-test \
-  watchdir-test
+  watchdir-test \
+  watchdir-generic-test
 
 noinst_PROGRAMS = $(TESTS)
 
@@ -288,6 +289,11 @@ variant_test_LDFLAGS = ${apps_ldflags}
 watchdir_test_SOURCES = watchdir-test.c $(TEST_SOURCES)
 watchdir_test_LDADD = ${apps_ldadd}
 watchdir_test_LDFLAGS = ${apps_ldflags}
+
+watchdir_generic_test_SOURCES = watchdir-test.c $(TEST_SOURCES)
+watchdir_generic_test_LDADD = ${apps_ldadd}
+watchdir_generic_test_LDFLAGS = ${apps_ldflags}
+watchdir_generic_test_CPPFLAGS = -DWATCHDIR_TEST_FORCE_GENERIC $(AM_CPPFLAGS)
 
 rename_test_SOURCES = rename-test.c $(TEST_SOURCES)
 rename_test_LDADD = ${apps_ldadd}

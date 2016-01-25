@@ -232,7 +232,8 @@ tr_watchdir_t
 tr_watchdir_new (const char        * path,
                  tr_watchdir_cb      callback,
                  void              * callback_user_data,
-                 struct event_base * event_base)
+                 struct event_base * event_base,
+                 bool                force_generic)
 {
   tr_watchdir_t handle;
 
@@ -243,18 +244,21 @@ tr_watchdir_new (const char        * path,
   handle->event_base = event_base;
   tr_watchdir_retries_init (&handle->active_retries);
 
+  if (!force_generic)
+    {
 #ifdef WITH_INOTIFY
-  if (handle->backend == NULL)
-    handle->backend = tr_watchdir_inotify_new (handle);
+      if (handle->backend == NULL)
+        handle->backend = tr_watchdir_inotify_new (handle);
 #endif
 #ifdef WITH_KQUEUE
-  if (handle->backend == NULL)
-    handle->backend = tr_watchdir_kqueue_new (handle);
+      if (handle->backend == NULL)
+        handle->backend = tr_watchdir_kqueue_new (handle);
 #endif
 #ifdef _WIN32
-  if (handle->backend == NULL)
-    handle->backend = tr_watchdir_win32_new (handle);
+      if (handle->backend == NULL)
+        handle->backend = tr_watchdir_win32_new (handle);
 #endif
+    }
 
   if (handle->backend == NULL)
     handle->backend = tr_watchdir_generic_new (handle);

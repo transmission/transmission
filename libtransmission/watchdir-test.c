@@ -97,6 +97,21 @@ create_dir (const char * parent_dir,
   tr_free (path);
 }
 
+tr_watchdir_t
+create_watchdir (const char        * path,
+                 tr_watchdir_cb      callback,
+                 void              * callback_user_data,
+                 struct event_base * event_base)
+{
+#ifdef WATCHDIR_TEST_FORCE_GENERIC
+  const bool force_generic = true;
+#else
+  const bool force_generic = false;
+#endif
+
+  return tr_watchdir_new (path, callback, callback_user_data, event_base, force_generic);
+}
+
 /***
 ****
 ***/
@@ -109,7 +124,7 @@ test_construct (void)
 
   ev_base = event_base_new();
 
-  wd = tr_watchdir_new (test_dir, &callback, NULL, ev_base);
+  wd = create_watchdir (test_dir, &callback, NULL, ev_base);
   check (wd != NULL);
   check (tr_sys_path_is_same (test_dir, tr_watchdir_get_path (wd), NULL));
 
@@ -136,7 +151,7 @@ test_initial_scan (void)
     callback_data wd_data = CB_DATA_STATIC_INIT;
     reset_callback_data (&wd_data, TR_WATCHDIR_ACCEPT);
 
-    tr_watchdir_t wd = tr_watchdir_new (test_dir, &callback, &wd_data, ev_base);
+    tr_watchdir_t wd = create_watchdir (test_dir, &callback, &wd_data, ev_base);
     check (wd != NULL);
 
     process_events ();
@@ -153,7 +168,7 @@ test_initial_scan (void)
     callback_data wd_data = CB_DATA_STATIC_INIT;
     reset_callback_data (&wd_data, TR_WATCHDIR_ACCEPT);
 
-    tr_watchdir_t wd = tr_watchdir_new (test_dir, &callback, &wd_data, ev_base);
+    tr_watchdir_t wd = create_watchdir (test_dir, &callback, &wd_data, ev_base);
     check (wd != NULL);
 
     process_events ();
@@ -184,7 +199,7 @@ test_watch (void)
   tr_watchdir_generic_interval = ONE_HUNDRED_MSEC;
 
   reset_callback_data (&wd_data, TR_WATCHDIR_ACCEPT);
-  wd = tr_watchdir_new (test_dir, &callback, &wd_data, ev_base);
+  wd = create_watchdir (test_dir, &callback, &wd_data, ev_base);
   check (wd != NULL);
 
   process_events ();
@@ -239,11 +254,11 @@ test_watch_two_dirs (void)
   create_dir (dir2, NULL);
 
   reset_callback_data (&wd1_data, TR_WATCHDIR_ACCEPT);
-  wd1 = tr_watchdir_new (dir1, &callback, &wd1_data, ev_base);
+  wd1 = create_watchdir (dir1, &callback, &wd1_data, ev_base);
   check (wd1 != NULL);
 
   reset_callback_data (&wd2_data, TR_WATCHDIR_ACCEPT);
-  wd2 = tr_watchdir_new (dir2, &callback, &wd2_data, ev_base);
+  wd2 = create_watchdir (dir2, &callback, &wd2_data, ev_base);
   check (wd2 != NULL);
 
   process_events ();
@@ -347,7 +362,7 @@ test_retry (void)
   tr_watchdir_retry_max_interval = tr_watchdir_retry_start_interval;
 
   reset_callback_data (&wd_data, TR_WATCHDIR_RETRY);
-  wd = tr_watchdir_new (test_dir, &callback, &wd_data, ev_base);
+  wd = create_watchdir (test_dir, &callback, &wd_data, ev_base);
   check (wd != NULL);
 
   process_events ();

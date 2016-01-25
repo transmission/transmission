@@ -559,17 +559,14 @@ daemon_start (void * raw_arg,
         daemon_reconfigure (arg);
 
     /* maybe add a watchdir */
+    if (tr_variantDictFindBool (settings, TR_KEY_watch_dir_enabled, &boolVal) && boolVal)
     {
         const char * dir;
 
-        if (tr_variantDictFindBool (settings, TR_KEY_watch_dir_enabled, &boolVal)
-            && boolVal
-            && tr_variantDictFindStr (settings, TR_KEY_watch_dir, &dir, NULL)
-            && dir
-            && *dir)
+        if (tr_variantDictFindStr (settings, TR_KEY_watch_dir, &dir, NULL) && dir != NULL && *dir != '\0')
         {
             tr_logAddInfo ("Watching \"%s\" for new .torrent files", dir);
-            if ((watchdir = tr_watchdir_new (dir, &onFileAdded, mySession, ev_base)) == NULL)
+            if ((watchdir = tr_watchdir_new (dir, &onFileAdded, mySession, ev_base, false)) == NULL)
                 goto cleanup;
         }
     }
