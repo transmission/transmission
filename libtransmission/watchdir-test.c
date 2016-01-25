@@ -97,7 +97,7 @@ create_dir (const char * parent_dir,
   tr_free (path);
 }
 
-tr_watchdir_t
+static tr_watchdir_t
 create_watchdir (const char        * path,
                  tr_watchdir_cb      callback,
                  void              * callback_user_data,
