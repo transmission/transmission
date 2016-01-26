@@ -117,6 +117,8 @@ addResponseCB (GtkDialog * dialog,
                gpointer    gdata)
 {
   struct OpenData * o = gdata;
+  gint w = 0;
+  gint h = 0;
 
   if (o->tor)
     {
@@ -139,6 +141,11 @@ addResponseCB (GtkDialog * dialog,
           save_recent_destination (o->core, o->downloadDir);
         }
     }
+
+  gtk_window_get_size (GTK_WINDOW(dialog), &w, &h);
+
+  gtr_pref_int_set (TR_KEY_details_window_width, w);
+  gtr_pref_int_set (TR_KEY_details_window_height, h);
 
   tr_ctorFree (o->ctor);
   g_free (o->filename);
@@ -288,6 +295,9 @@ gtr_torrent_options_dialog_new (GtkWindow * parent, TrCore * core, tr_ctor * cto
                                            GTK_RESPONSE_ACCEPT,
                                            GTK_RESPONSE_CANCEL,
                                            -1);
+  gtk_window_set_default_size(GTK_WINDOW(d),
+                              gtr_pref_int_get (TR_KEY_details_window_width),
+                              gtr_pref_int_get (TR_KEY_details_window_height));
 
   if (!tr_ctorGetDownloadDir (ctor, TR_FORCE, &str))
     g_assert_not_reached ();
