@@ -104,11 +104,11 @@ MakeProgressDialog::onProgress ()
   else if (b.result == TR_MAKEMETA_CANCELLED)
     str = tr ("Cancelled");
   else if (b.result == TR_MAKEMETA_IO_READ)
-    str = tr ("Error reading \"%1\": %2").arg (QString::fromUtf8 (b.errfile)).
-                                          arg (QString::fromLocal8Bit (tr_strerror (b.my_errno)));
+    str = tr ("Error reading \"%1\": %2").arg (QString::fromUtf8 (b.errfile),
+                                          QString::fromLocal8Bit (tr_strerror (b.my_errno)));
   else if (b.result == TR_MAKEMETA_IO_WRITE)
-    str = tr ("Error writing \"%1\": %2").arg (QString::fromUtf8 (b.errfile)).
-                                          arg (QString::fromLocal8Bit (tr_strerror (b.my_errno)));
+    str = tr ("Error writing \"%1\": %2").arg (QString::fromUtf8 (b.errfile),
+                                          QString::fromLocal8Bit (tr_strerror (b.my_errno)));
   ui.progressLabel->setText (str);
 
   // buttons
@@ -132,7 +132,7 @@ MakeDialog::makeTorrent ()
   // get the tiers
   int tier = 0;
   QVector<tr_tracker_info> trackers;
-  for (const QString& line: ui.trackersEdit->toPlainText ().split (QLatin1Char ('\n')))
+  foreach (const QString& line, ui.trackersEdit->toPlainText ().split (QLatin1Char ('\n')))
     {
       const QString announceUrl = line.trimmed ();
       if (announceUrl.isEmpty ())
@@ -150,7 +150,7 @@ MakeDialog::makeTorrent ()
 
   // the file to create
   const QString path = QString::fromUtf8 (myBuilder->top);
-  const QString torrentName = QFileInfo (path).completeBaseName () + QLatin1String (".torrent");
+  const QString torrentName = QFileInfo (path).completeBaseName () + QStringLiteral (".torrent");
   const QString target = QDir (ui.destinationButton->path ()).filePath (torrentName);
 
   // comment
@@ -205,10 +205,10 @@ MakeDialog::onSourceChanged ()
       QString files = tr ("%Ln File(s)", 0, myBuilder->fileCount);
       QString pieces = tr ("%Ln Piece(s)", 0, myBuilder->pieceCount);
       text = tr ("%1 in %2; %3 @ %4")
-               .arg (Formatter::sizeToString (myBuilder->totalSize))
-               .arg (files)
-               .arg (pieces)
-               .arg (Formatter::sizeToString (myBuilder->pieceSize));
+               .arg (Formatter::sizeToString (myBuilder->totalSize),
+               files,
+               pieces,
+               Formatter::sizeToString (myBuilder->pieceSize));
     }
 
   ui.sourceSizeLabel->setText (text);
@@ -258,14 +258,14 @@ MakeDialog::dragEnterEvent (QDragEnterEvent * event)
 {
   const QMimeData * mime = event->mimeData ();
 
-  if (!mime->urls ().isEmpty () && QFileInfo (mime->urls ().front ().path ()).exists ())
+  if (!mime->urls ().isEmpty () && QFileInfo (mime->urls ().at (0).path ()).exists ())
     event->acceptProposedAction ();
 }
 
 void
 MakeDialog::dropEvent (QDropEvent * event)
 {
-  const QString filename = event->mimeData ()->urls ().front ().path ();
+  const QString filename = event->mimeData ()->urls ().at (0).path ();
   const QFileInfo fileInfo (filename);
 
   if (fileInfo.exists ())

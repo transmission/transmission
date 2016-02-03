@@ -109,13 +109,12 @@ Application::Application (int& argc, char ** argv):
 #endif
 
   // set the default icon
-  QIcon icon = QIcon::fromTheme (QLatin1String ("transmission"));
+  QIcon icon = QIcon::fromTheme (QStringLiteral ("transmission"));
   if (icon.isNull ())
     {
-      QList<int> sizes;
-      sizes << 16 << 22 << 24 << 32 << 48 << 64 << 72 << 96 << 128 << 192 << 256;
-      for (const int size: sizes)
-        icon.addPixmap (QPixmap (QString::fromLatin1 (":/icons/transmission-%1.png").arg (size)));
+      QList<int> sizes = {16, 22, 24, 32, 48, 64, 72, 96, 128, 192, 256};
+      foreach (const int size, sizes)
+        icon.addPixmap (QPixmap (QStringLiteral(":/icons/transmission-%1.png").arg (size)));
     }
   setWindowIcon (icon);
 
@@ -164,7 +163,7 @@ Application::Application (int& argc, char ** argv):
   if (interopClient.isConnected ())
     {
       bool delegated = false;
-      for (const QString& filename: filenames)
+      foreach (const QString& filename, filenames)
         {
           QString metainfo;
 
@@ -199,7 +198,7 @@ Application::Application (int& argc, char ** argv):
     dir.mkpath (configDir);
 
   // is this the first time we've run transmission?
-  const bool firstTime = !dir.exists (QLatin1String ("settings.json"));
+  const bool firstTime = !dir.exists (QStringLiteral ("settings.json"));
 
   // initialize the prefs
   myPrefs = new Prefs (configDir);
@@ -242,9 +241,8 @@ Application::Application (int& argc, char ** argv):
   connect (myWatchDir, SIGNAL (torrentFileAdded (QString)), this, SLOT (addTorrent (QString)));
 
   // init from preferences
-  QList<int> initKeys;
-  initKeys << Prefs::DIR_WATCH;
-  for (const int key: initKeys)
+  QList<int> initKeys = { Prefs::DIR_WATCH };
+  foreach (const int key, initKeys)
     refreshPref (key);
   connect (myPrefs, SIGNAL (changed (int)), this, SLOT (refreshPref (const int)));
 
@@ -290,7 +288,7 @@ Application::Application (int& argc, char ** argv):
       dialog->show ();
     }
 
-  for (const QString& filename: filenames)
+  foreach (const QString& filename, filenames)
     addTorrent (filename);
 
   InteropHelper::registerObject (this);
@@ -302,25 +300,25 @@ Application::loadTranslations ()
   const QStringList qtQmDirs = QStringList () <<
     QLibraryInfo::location (QLibraryInfo::TranslationsPath) <<
 #ifdef TRANSLATIONS_DIR
-    QString::fromUtf8 (TRANSLATIONS_DIR) <<
+    QStringLiteral (TRANSLATIONS_DIR) <<
 #endif
-    (applicationDirPath () + QLatin1String ("/translations"));
+    (applicationDirPath () + QStringLiteral ("/translations"));
 
   const QStringList appQmDirs = QStringList () <<
 #ifdef TRANSLATIONS_DIR
-    QString::fromUtf8 (TRANSLATIONS_DIR) <<
+    QStringLiteral(TRANSLATIONS_DIR) <<
 #endif
-    (applicationDirPath () + QLatin1String ("/translations"));
+    (applicationDirPath () + QStringLiteral ("/translations"));
 
   QString localeName = QLocale ().name ();
 
   if (!loadTranslation (myAppTranslator, MY_CONFIG_NAME, localeName, appQmDirs))
     {
-      localeName = QLatin1String ("en");
+      localeName = QStringLiteral ("en");
       loadTranslation (myAppTranslator, MY_CONFIG_NAME, localeName, appQmDirs);
     }
 
-  if (loadTranslation (myQtTranslator, QLatin1String ("qt"), localeName, qtQmDirs))
+  if (loadTranslation (myQtTranslator, QStringLiteral ("qt"), localeName, qtQmDirs))
     installTranslator (&myQtTranslator);
   installTranslator (&myAppTranslator);
 }
@@ -339,7 +337,7 @@ Application::onTorrentsAdded (const QSet<int>& torrents)
   if (!myPrefs->getBool (Prefs::SHOW_NOTIFICATION_ON_ADD))
     return;
 
-  for (const int id: torrents)
+  foreach (const int id, torrents)
     {
       Torrent * tor = myModel->getTorrentFromId (id);
 
@@ -549,7 +547,7 @@ Application::notifyApp (const QString& title, const QString& body) const
   QDBusConnection bus = QDBusConnection::sessionBus ();
   if (bus.isConnected ())
     {
-      QDBusMessage m = QDBusMessage::createMethodCall (dbusServiceName, dbusPath, dbusInterfaceName, QLatin1String ("Notify"));
+      QDBusMessage m = QDBusMessage::createMethodCall (dbusServiceName, dbusPath, dbusInterfaceName, QStringLiteral ("Notify"));
       QVariantList args;
       args.append (QLatin1String ("Transmission")); // app_name
       args.append (0U);                             // replaces_id

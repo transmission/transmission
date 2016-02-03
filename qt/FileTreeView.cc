@@ -89,12 +89,12 @@ FileTreeView::resizeEvent (QResizeEvent * event)
         {
           case FileTreeModel::COL_SIZE:
             for (int s = Formatter::B; s <= Formatter::TB; ++s)
-              itemTexts << QLatin1String ("999.9 ") +
+              itemTexts << QStringLiteral ("999.9 ") +
                            Formatter::unitStr (Formatter::MEM, static_cast<Formatter::Size> (s));
             break;
 
           case FileTreeModel::COL_PROGRESS:
-            itemTexts << QLatin1String ("  100%  ");
+            itemTexts << QStringLiteral ("  100%  ");
             break;
 
           case FileTreeModel::COL_WANTED:
@@ -108,7 +108,7 @@ FileTreeView::resizeEvent (QResizeEvent * event)
         }
 
       int itemWidth = 0;
-      for (const QString& itemText: itemTexts)
+      foreach (const QString& itemText, itemTexts)
         itemWidth = std::max (itemWidth, Utils::measureViewItem (this, itemText));
 
       const QString headerText = myModel->headerData (column, Qt::Horizontal).toString ();
@@ -263,7 +263,7 @@ FileTreeView::onlyCheckSelectedItems ()
   qSort (wantedIndices);
 
   QSet<QModelIndex> wantedIndicesParents;
-  for (const QModelIndex& i: wantedIndices)
+  foreach (const QModelIndex& i, wantedIndices)
     {
       for (QModelIndex p = i.parent (); p.isValid (); p = p.parent ())
         wantedIndicesParents.insert (p);
@@ -377,7 +377,7 @@ QModelIndexList
 FileTreeView::selectedSourceRows (int column) const
 {
   QModelIndexList indices;
-  for (const QModelIndex& i: selectionModel ()->selectedRows (column))
+  foreach (const QModelIndex& i, selectionModel ()->selectedRows (column))
     indices << myProxy->mapToSource (i);
   return indices;
 }

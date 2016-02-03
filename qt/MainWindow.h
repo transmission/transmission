@@ -56,25 +56,6 @@ class MainWindow: public QMainWindow
     QSystemTrayIcon& trayIcon () { return myTrayIcon; }
 
   public slots:
-    void startAll ();
-    void startSelected ();
-    void startSelectedNow ();
-    void pauseAll ();
-    void pauseSelected ();
-    void removeSelected ();
-    void deleteSelected ();
-    void verifySelected ();
-    void queueMoveTop ();
-    void queueMoveUp ();
-    void queueMoveDown ();
-    void queueMoveBottom ();
-    void reannounceSelected ();
-    void onNetworkTimer ();
-
-    void setToolbarVisible (bool);
-    void setFilterbarVisible (bool);
-    void setStatusbarVisible (bool);
-    void setCompactView (bool);
     void refreshActionSensitivity ();
     void refreshActionSensitivitySoon ();
     void wrongAuthentication ();
@@ -97,7 +78,6 @@ class MainWindow: public QMainWindow
     QMenu * createStatsModeMenu ();
     void initStatusBar ();
 
-    void clearSelection ();
     void addTorrent (const AddData& addMe, bool showOptions);
 
     // QWidget
@@ -105,7 +85,6 @@ class MainWindow: public QMainWindow
     virtual void showEvent (QShowEvent * event);
 
   private slots:
-    void openPreferences ();
     void refreshTitle ();
     void refreshStatusBar ();
     void refreshTrayIcon ();
@@ -118,29 +97,15 @@ class MainWindow: public QMainWindow
     void refreshPref (int key);
     void addTorrents (const QStringList& filenames);
     void removeTorrents (const bool deleteFiles);
-    void openStats ();
-    void openDonate ();
-    void openAbout ();
-    void openHelp ();
     void openFolder ();
-    void copyMagnetLinkToClipboard ();
     void setLocation ();
     void openProperties ();
     void toggleSpeedMode ();
-    void dataReadProgress ();
-    void dataSendProgress ();
     void onError (QNetworkReply::NetworkError);
-    void errorMessage (const QString&);
     void toggleWindows (bool doShow);
     void onSetPrefs ();
     void onSetPrefs (bool);
-    void onSessionSourceChanged ();
     void onModelReset ();
-
-    void setSortAscendingPref (bool);
-
-    void onStatsModeChanged (QAction * action);
-    void onSortModeChanged (QAction * action);
 
   private:
     Session& mySession;

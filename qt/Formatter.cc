@@ -177,21 +177,21 @@ Formatter::timeToString (int seconds)
       if (days >= 4 || !hours)
         str = d;
       else
-        str = tr ("%1, %2").arg (d).arg (h);
+        str = tr ("%1, %2").arg (d,h);
     }
   else if (hours)
     {
       if (hours >= 4 || !minutes)
         str = h;
       else
-        str = tr ("%1, %2").arg (h).arg (m);
+        str = tr ("%1, %2").arg (h,m);
     }
   else if (minutes)
     {
       if (minutes >= 4 || !seconds)
         str = m;
       else
-        str = tr ("%1, %2").arg (m).arg (s);
+        str = tr ("%1, %2").arg (m,s);
     }
   else
     {

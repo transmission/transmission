@@ -49,7 +49,7 @@ FaviconCache::getCacheDir ()
     QStandardPaths::writableLocation (QStandardPaths::CacheLocation);
 #endif
 
-  return QDir(base).absoluteFilePath (QLatin1String ("favicons"));
+  return QDir(base).absoluteFilePath (QStringLiteral ("favicons"));
 }
 
 void
@@ -65,7 +65,7 @@ FaviconCache::ensureCacheDirHasBeenScanned ()
       cacheDir.mkpath (cacheDir.absolutePath ());
 
       QStringList files = cacheDir.entryList (QDir::Files|QDir::Readable);
-      for (const QString& file: files)
+      foreach (const QString& file, files)
         {
           QPixmap pixmap;
           pixmap.load (cacheDir.absoluteFilePath (file));
@@ -123,10 +123,10 @@ FaviconCache::add (const QUrl& url)
       myPixmaps.insert (host, QPixmap ());
 
       // try to download the favicon
-      const QString path = QLatin1String ("http://") + host + QLatin1String ("/favicon.");
+      const QString path = QStringLiteral ("http://") + host + QStringLiteral ("/favicon.");
       QStringList suffixes;
-      suffixes << QLatin1String ("ico") << QLatin1String ("png") << QLatin1String ("gif") << QLatin1String ("jpg");
-      for (const QString& suffix: suffixes)
+      suffixes << QStringLiteral ("ico") << QStringLiteral ("png") << QStringLiteral ("gif") << QStringLiteral ("jpg");
+      foreach (const QString& suffix, suffixes)
         myNAM->get (QNetworkRequest (path + suffix));
     }
 }

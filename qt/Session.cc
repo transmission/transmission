@@ -92,7 +92,7 @@ FileAdded::executed (int64_t tag, const QString& result, tr_variant * arguments)
           const QString name = QString::fromUtf8 (str);
           QMessageBox::warning (qApp->activeWindow (),
                                 tr ("Add Torrent"),
-                                tr ("<p><b>Unable to add \"%1\".</b></p><p>It is a duplicate of \"%2\" which is already added.</p>").arg (myFilename).arg (name));
+                                tr ("<p><b>Unable to add \"%1\".</b></p><p>It is a duplicate of \"%2\" which is already added.</p>").arg (myFilename,name));
         }
 
       if (!myDelFile.isEmpty ())
@@ -112,7 +112,7 @@ FileAdded::executed (int64_t tag, const QString& result, tr_variant * arguments)
 
       QMessageBox::warning (qApp->activeWindow (),
                             tr ("Error Adding Torrent"),
-                            QString::fromLatin1 ("<p><b>%1</b></p><p>%2</p>").arg (text).arg (myName));
+                            QStringLiteral ("<p><b>%1</b></p><p>%2</p>").arg (text,myName));
     }
 
   deleteLater ();
@@ -334,10 +334,10 @@ Session::start ()
   if (myPrefs.get<bool> (Prefs::SESSION_IS_REMOTE))
     {
       QUrl url;
-      url.setScheme (QLatin1String ("http"));
+      url.setScheme (QStringLiteral ("http"));
       url.setHost (myPrefs.get<QString> (Prefs::SESSION_REMOTE_HOST));
       url.setPort (myPrefs.get<int> (Prefs::SESSION_REMOTE_PORT));
-      url.setPath (QLatin1String ("/transmission/rpc"));
+      url.setPath (QStringLiteral ("/transmission/rpc"));
       if (myPrefs.get<bool> (Prefs::SESSION_REMOTE_AUTH))
         {
           url.setUserName (myPrefs.get<QString> (Prefs::SESSION_REMOTE_USERNAME));
@@ -660,7 +660,9 @@ Session::responseReceived (int64_t tag, const QString& result, tr_variant * args
               tr_variantDictFindStr (args, TR_KEY_path, &path, 0);
               tr_variantDictFindStr (args, TR_KEY_name, &name, 0);
               const QString title = tr ("Error Renaming Path");
-              const QString text = tr ("<p><b>Unable to rename \"%1\" as \"%2\": %3.</b></p> <p>Please correct the errors and try again.</p>").arg (QString::fromUtf8 (path)).arg (QString::fromUtf8 (name)).arg (result);
+              const QString text = tr ("<p><b>Unable to rename \"%1\" as \"%2\": %3.</b></p> <p>Please correct the errors and try again.</p>")
+                    .arg (QString::fromUtf8 (path), QString::fromUtf8 (name), result);
+
               QMessageBox * d = new QMessageBox (QMessageBox::Information, title, text,
                                                  QMessageBox::Close,
                                                  qApp->activeWindow ());
@@ -979,12 +981,12 @@ Session::launchWebInterface ()
   if (!mySession) // remote session
     {
       url = myRpc.url ();
-      url.setPath (QLatin1String ("/transmission/web/"));
+      url.setPath (QStringLiteral ("/transmission/web/"));
     }
   else // local session
     {
-      url.setScheme (QLatin1String ("http"));
-      url.setHost (QLatin1String ("localhost"));
+      url.setScheme (QStringLiteral ("http"));
+      url.setHost (QStringLiteral ("localhost"));
       url.setPort (myPrefs.getInt (Prefs::RPC_PORT));
     }
 

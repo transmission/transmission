@@ -178,7 +178,7 @@ TorrentDelegateMin::drawTorrent (QPainter                   * painter,
   progressBarState |= QStyle::State_Small;
 
   const QIcon::Mode emblemIm = isItemSelected ? QIcon::Selected : QIcon::Normal;
-  const QIcon emblemIcon = tor.hasError () ? QIcon::fromTheme (QLatin1String ("emblem-important"), style->standardIcon (QStyle::SP_MessageBoxWarning)) : QIcon ();
+  const QIcon emblemIcon = tor.hasError () ? QIcon::fromTheme (QStringLiteral ("emblem-important"), style->standardIcon (QStyle::SP_MessageBoxWarning)) : QIcon ();
 
   // layout
   const QSize m (margin (*style));
@@ -218,7 +218,7 @@ TorrentDelegateMin::drawTorrent (QPainter                   * painter,
       myProgressBarStyle->palette.setColor (QPalette::Window, silverBack);
     }
   myProgressBarStyle->state = progressBarState;
-  myProgressBarStyle->text = QString::fromLatin1 ("%1%").arg (static_cast<int> (tr_truncd (100.0 * tor.percentDone (), 0)));
+  myProgressBarStyle->text = QStringLiteral ("%1%").arg (static_cast<int> (tr_truncd (100.0 * tor.percentDone (), 0)));
   myProgressBarStyle->textVisible = true;
   myProgressBarStyle->textAlignment = Qt::AlignCenter;
   setProgressBarPercentDone (option, tor);

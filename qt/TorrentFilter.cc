@@ -30,7 +30,7 @@ TorrentFilter::TorrentFilter (const Prefs& prefs):
            << Prefs::FILTER_MODE
            << Prefs::FILTER_TRACKERS
            << Prefs::FILTER_TEXT;
-  for (const int key: initKeys)
+  foreach (const int key, initKeys)
     refreshPref (key);
 }
 

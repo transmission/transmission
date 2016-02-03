@@ -59,7 +59,7 @@ struct Peer
 
 Q_DECLARE_METATYPE(Peer)
 
-typedef QList<Peer> PeerList;
+typedef QVector<Peer> PeerList;
 Q_DECLARE_METATYPE(PeerList)
 
 struct TrackerStat
@@ -95,7 +95,7 @@ struct TrackerStat
 
 Q_DECLARE_METATYPE(TrackerStat)
 
-typedef QList<TrackerStat> TrackerStatsList;
+typedef QVector<TrackerStat> TrackerStatsList;
 Q_DECLARE_METATYPE(TrackerStatsList)
 
 struct TorrentFile
@@ -112,7 +112,7 @@ struct TorrentFile
 
 Q_DECLARE_METATYPE(TorrentFile)
 
-typedef QList<TorrentFile> FileList;
+typedef QVector<TorrentFile> FileList;
 Q_DECLARE_METATYPE(FileList)
 
 class Torrent: public QObject
@@ -253,8 +253,8 @@ class Torrent: public QObject
     int seedIdleLimit () const { return getInt (SEED_IDLE_LIMIT); }
     tr_idlelimit seedIdleMode () const { return static_cast<tr_idlelimit> (getInt (SEED_IDLE_MODE)); }
     TrackerStatsList trackerStats () const{ return myValues[TRACKERSTATS].value<TrackerStatsList>(); }
-    QStringList trackers() const { return myValues[TRACKERS].value<QStringList>(); }
-    QStringList hosts() const { return myValues[HOSTS].value<QStringList>(); }
+    QStringList trackers() const { return myValues[TRACKERS].toStringList(); }
+    QStringList hosts() const { return myValues[HOSTS].toStringList(); }
     PeerList peers () const{ return myValues[PEERS].value<PeerList>(); }
     const FileList& files () const { return myFiles; }
     int queuePosition () const { return getInt (QUEUE_POSITION); }
