@@ -715,14 +715,14 @@ MainWindow::refreshStatusBar ()
   else if (mode == SessionTransferStatsModeName)
     {
       const tr_session_stats& stats (mySession.getStats ());
-      str = tr ("Down: %1, Up: %2").arg (Formatter::sizeToString (stats.downloadedBytes))
-                                      .arg (Formatter::sizeToString (stats.uploadedBytes));
+      str = tr ("Down: %1, Up: %2").arg (Formatter::sizeToString (stats.downloadedBytes),
+                                      Formatter::sizeToString (stats.uploadedBytes));
     }
   else if (mode == TotalTransferStatsModeName)
     {
       const tr_session_stats& stats (mySession.getCumulativeStats ());
-      str = tr ("Down: %1, Up: %2").arg (Formatter::sizeToString (stats.downloadedBytes))
-                                   .arg (Formatter::sizeToString (stats.uploadedBytes));
+      str = tr ("Down: %1, Up: %2").arg (Formatter::sizeToString (stats.downloadedBytes),
+                                   Formatter::sizeToString (stats.uploadedBytes));
     }
   else // default is "total-ratio"
     {
@@ -1108,8 +1108,8 @@ MainWindow::refreshPref (int key)
                                 : tr ("Click to enable Temporary Speed Limits\n (%1 down, %2 up)");
           const Speed d = Speed::fromKBps (myPrefs.getInt (Prefs::ALT_SPEED_LIMIT_DOWN));
           const Speed u = Speed::fromKBps (myPrefs.getInt (Prefs::ALT_SPEED_LIMIT_UP));
-          ui.altSpeedButton->setToolTip (fmt.arg (Formatter::speedToString (d))
-                                            .arg (Formatter::speedToString (u)));
+          ui.altSpeedButton->setToolTip (fmt.arg (Formatter::speedToString (d),
+                                            Formatter::speedToString (u)));
           break;
         }
 
@@ -1348,7 +1348,7 @@ MainWindow::updateNetworkIcon ()
   else if (secondsSinceLastRead < 30)
     tip = tr ("%1 is responding").arg (url);
   else if (secondsSinceLastRead < (60*2))
-    tip = tr ("%1 last responded %2 ago").arg (url).arg (Formatter::timeToString (secondsSinceLastRead));
+    tip = tr ("%1 last responded %2 ago").arg (url,Formatter::timeToString (secondsSinceLastRead));
   else
     tip = tr ("%1 is not responding").arg (url);
 
