@@ -60,7 +60,7 @@ void
 ColumnResizer::update ()
 {
   int maxWidth = 0;
-  for (QGridLayout * const layout: myLayouts)
+  foreach (QGridLayout * const layout, myLayouts)
     {
       for (int i = 0, count = layout->rowCount (); i < count; ++i)
         {
@@ -71,7 +71,7 @@ ColumnResizer::update ()
         }
     }
 
-  for (QGridLayout * const layout: myLayouts)
+  foreach (QGridLayout * const layout, myLayouts)
     layout->setColumnMinimumWidth (0, maxWidth);
 }
 

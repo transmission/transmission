@@ -108,7 +108,7 @@ FileTreeView::resizeEvent (QResizeEvent * event)
         }
 
       int itemWidth = 0;
-      for (const QString& itemText: itemTexts)
+      foreach (const QString& itemText, itemTexts)
         itemWidth = std::max (itemWidth, Utils::measureViewItem (this, itemText));
 
       const QString headerText = myModel->headerData (column, Qt::Horizontal).toString ();
@@ -263,7 +263,7 @@ FileTreeView::onlyCheckSelectedItems ()
   qSort (wantedIndices);
 
   QSet<QModelIndex> wantedIndicesParents;
-  for (const QModelIndex& i: wantedIndices)
+  foreach (const QModelIndex& i, wantedIndices)
     {
       for (QModelIndex p = i.parent (); p.isValid (); p = p.parent ())
         wantedIndicesParents.insert (p);
@@ -377,7 +377,7 @@ QModelIndexList
 FileTreeView::selectedSourceRows (int column) const
 {
   QModelIndexList indices;
-  for (const QModelIndex& i: selectionModel ()->selectedRows (column))
+  foreach (const QModelIndex& i, selectionModel ()->selectedRows (column))
     indices << myProxy->mapToSource (i);
   return indices;
 }

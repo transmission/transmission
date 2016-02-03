@@ -315,7 +315,7 @@ FileTreeItem::setSubtreePriority (int i, QSet<int>& ids)
         ids.insert (myFileIndex);
     }
 
-  for (FileTreeItem * const child: myChildren)
+  foreach (FileTreeItem * const child, myChildren)
     child->setSubtreePriority (i, ids);
 }
 
@@ -326,7 +326,7 @@ FileTreeItem::isSubtreeWanted () const
     return myIsWanted ? Qt::Checked : Qt::Unchecked;
 
   int wanted(-1);
-  for (const FileTreeItem * const child: myChildren)
+  foreach (const FileTreeItem * const child, myChildren)
     {
       const int childWanted = child->isSubtreeWanted();
 
@@ -354,7 +354,7 @@ FileTreeItem::setSubtreeWanted (bool b, QSet<int>& ids)
         ids.insert(myFileIndex);
     }
 
-  for (FileTreeItem * const child: myChildren)
+  foreach (FileTreeItem * const child, myChildren)
     child->setSubtreeWanted (b, ids);
 }
 

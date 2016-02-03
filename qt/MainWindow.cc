@@ -277,7 +277,7 @@ MainWindow::MainWindow (Session& session, Prefs& prefs, TorrentModel& model, boo
            << Prefs::USPEED_ENABLED
            << Prefs::RATIO
            << Prefs::RATIO_ENABLED;
-  for (const int key: initKeys)
+  foreach (const int key, initKeys)
     refreshPref (key);
 
   connect (&mySession, SIGNAL (sourceChanged ()), this, SLOT (onSessionSourceChanged ()));
@@ -835,7 +835,7 @@ MainWindow::getSelectedTorrents (bool withMetadataOnly) const
 {
   QSet<int> ids;
 
-  for (const QModelIndex& index: ui.listView->selectionModel ()->selectedRows ())
+  foreach (const QModelIndex& index, ui.listView->selectionModel ()->selectedRows ())
     {
       const Torrent * tor (index.data (TorrentModel::TorrentRole).value<const Torrent*> ());
       if (tor != nullptr && (!withMetadataOnly || tor->hasMetadata ()))
@@ -1002,7 +1002,7 @@ MainWindow::refreshPref (int key)
         str = myPrefs.getString (key);
         actionGroup = ui.action_TotalRatio->actionGroup ();
         assert (actionGroup != nullptr);
-        for (QAction * action: actionGroup->actions ())
+        foreach (QAction * action, actionGroup->actions ())
           action->setChecked (str == action->property (STATS_MODE_KEY).toString ());
         refreshStatusBar ();
         break;
@@ -1015,7 +1015,7 @@ MainWindow::refreshPref (int key)
         i = myPrefs.get<SortMode> (key).mode ();
         actionGroup = ui.action_SortByActivity->actionGroup ();
         assert (actionGroup != nullptr);
-        for (QAction * action: actionGroup->actions ())
+        foreach (QAction * action, actionGroup->actions ())
           action->setChecked (i == action->property (SORT_MODE_KEY).toInt ());
         break;
 
@@ -1218,7 +1218,7 @@ MainWindow::removeTorrents (const bool deleteFiles)
   int connected  = 0;
   int count;
 
-  for (const QModelIndex& index: ui.listView->selectionModel ()->selectedRows ())
+  foreach (const QModelIndex& index, ui.listView->selectionModel ()->selectedRows ())
     {
       const Torrent * tor (index.data (TorrentModel::TorrentRole).value<const Torrent*> ());
       ids.insert (tor->id ());
@@ -1432,11 +1432,11 @@ MainWindow::dropEvent (QDropEvent * event)
     }
   else if (event->mimeData()->hasUrls())
     {
-      for (const QUrl& url: event->mimeData()->urls())
+      foreach (const QUrl& url, event->mimeData()->urls())
         list.append(url.toLocalFile());
     }
 
-  for (const QString& entry: list)
+  foreach (const QString& entry, list)
     {
       QString key = entry.trimmed();
 
