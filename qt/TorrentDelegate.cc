@@ -272,7 +272,7 @@ TorrentDelegate::shortTransferString (const Torrent& tor)
 
   if (haveDown)
     str = Formatter::downloadSpeedToString(tor.downloadSpeed()) +
-          QLatin1String ("   ") +
+          QStringLiteral ("   ") +
           Formatter::uploadSpeedToString(tor.uploadSpeed());
 
   else if (haveUp)
@@ -295,7 +295,7 @@ TorrentDelegate::shortStatusString (const Torrent& tor)
       case TR_STATUS_DOWNLOAD:
       case TR_STATUS_SEED:
         str = shortTransferString(tor) +
-              QLatin1String ("    ") +
+              QStringLiteral ("    ") +
               tr("Ratio: %1").arg(Formatter::ratioToString(tor.ratio()));
         break;
 
@@ -481,7 +481,7 @@ TorrentDelegate::drawTorrent (QPainter                   * painter,
   progressBarState |= QStyle::State_Small;
 
   const QIcon::Mode emblemIm = isItemSelected ? QIcon::Selected : QIcon::Normal;
-  const QIcon emblemIcon = tor.hasError () ? QIcon::fromTheme (QLatin1String ("emblem-important"), style->standardIcon (QStyle::SP_MessageBoxWarning)) : QIcon ();
+  const QIcon emblemIcon = tor.hasError () ? QIcon::fromTheme (QStringLiteral ("emblem-important"), style->standardIcon (QStyle::SP_MessageBoxWarning)) : QIcon ();
 
   // layout
   const QSize m (margin (*style));

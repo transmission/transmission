@@ -65,31 +65,31 @@ FilterBar::createActivityCombo ()
   model->appendRow (new QStandardItem); // separator
   delegate->setSeparator (model, model->index (1, 0));
 
-  row = new QStandardItem (QIcon::fromTheme (QLatin1String ("system-run")), tr ("Active"));
+  row = new QStandardItem (QIcon::fromTheme (QStringLiteral ("system-run")), tr ("Active"));
   row->setData (FilterMode::SHOW_ACTIVE, ActivityRole);
   model->appendRow (row);
 
-  row = new QStandardItem (QIcon::fromTheme (QLatin1String ("go-down")), tr ("Downloading"));
+  row = new QStandardItem (QIcon::fromTheme (QStringLiteral ("go-down")), tr ("Downloading"));
   row->setData (FilterMode::SHOW_DOWNLOADING, ActivityRole);
   model->appendRow (row);
 
-  row = new QStandardItem (QIcon::fromTheme (QLatin1String ("go-up")), tr ("Seeding"));
+  row = new QStandardItem (QIcon::fromTheme (QStringLiteral ("go-up")), tr ("Seeding"));
   row->setData (FilterMode::SHOW_SEEDING, ActivityRole);
   model->appendRow (row);
 
-  row = new QStandardItem (QIcon::fromTheme (QLatin1String ("media-playback-pause")), tr ("Paused"));
+  row = new QStandardItem (QIcon::fromTheme (QStringLiteral ("media-playback-pause")), tr ("Paused"));
   row->setData (FilterMode::SHOW_PAUSED, ActivityRole);
   model->appendRow (row);
 
-  row = new QStandardItem (QIcon::fromTheme (QLatin1String ("dialog-ok")), tr ("Finished"));
+  row = new QStandardItem (QIcon::fromTheme (QStringLiteral ("dialog-ok")), tr ("Finished"));
   row->setData (FilterMode::SHOW_FINISHED, ActivityRole);
   model->appendRow (row);
 
-  row = new QStandardItem (QIcon::fromTheme (QLatin1String ("view-refresh")), tr ("Verifying"));
+  row = new QStandardItem (QIcon::fromTheme (QStringLiteral ("view-refresh")), tr ("Verifying"));
   row->setData (FilterMode::SHOW_VERIFYING, ActivityRole);
   model->appendRow (row);
 
-  row = new QStandardItem (QIcon::fromTheme (QLatin1String ("process-stop")), tr ("Error"));
+  row = new QStandardItem (QIcon::fromTheme (QStringLiteral ("process-stop")), tr ("Error"));
   row->setData (FilterMode::SHOW_ERROR, ActivityRole);
   model->appendRow (row);
 

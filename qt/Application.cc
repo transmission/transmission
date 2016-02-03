@@ -109,7 +109,7 @@ Application::Application (int& argc, char ** argv):
 #endif
 
   // set the default icon
-  QIcon icon = QIcon::fromTheme (QLatin1String ("transmission"));
+  QIcon icon = QIcon::fromTheme (QStringLiteral ("transmission"));
   if (icon.isNull ())
     {
       QList<int> sizes = {16, 22, 24, 32, 48, 64, 72, 96, 128, 192, 256};
@@ -198,7 +198,7 @@ Application::Application (int& argc, char ** argv):
     dir.mkpath (configDir);
 
   // is this the first time we've run transmission?
-  const bool firstTime = !dir.exists (QLatin1String ("settings.json"));
+  const bool firstTime = !dir.exists (QStringLiteral ("settings.json"));
 
   // initialize the prefs
   myPrefs = new Prefs (configDir);
@@ -302,23 +302,23 @@ Application::loadTranslations ()
 #ifdef TRANSLATIONS_DIR
     QString::fromUtf8 (TRANSLATIONS_DIR) <<
 #endif
-    (applicationDirPath () + QLatin1String ("/translations"));
+    (applicationDirPath () + QStringLiteral ("/translations"));
 
   const QStringList appQmDirs = QStringList () <<
 #ifdef TRANSLATIONS_DIR
     QString::fromUtf8 (TRANSLATIONS_DIR) <<
 #endif
-    (applicationDirPath () + QLatin1String ("/translations"));
+    (applicationDirPath () + QStringLiteral ("/translations"));
 
   QString localeName = QLocale ().name ();
 
   if (!loadTranslation (myAppTranslator, MY_CONFIG_NAME, localeName, appQmDirs))
     {
-      localeName = QLatin1String ("en");
+      localeName = QStringLiteral ("en");
       loadTranslation (myAppTranslator, MY_CONFIG_NAME, localeName, appQmDirs);
     }
 
-  if (loadTranslation (myQtTranslator, QLatin1String ("qt"), localeName, qtQmDirs))
+  if (loadTranslation (myQtTranslator, QStringLiteral ("qt"), localeName, qtQmDirs))
     installTranslator (&myQtTranslator);
   installTranslator (&myAppTranslator);
 }
@@ -547,7 +547,7 @@ Application::notifyApp (const QString& title, const QString& body) const
   QDBusConnection bus = QDBusConnection::sessionBus ();
   if (bus.isConnected ())
     {
-      QDBusMessage m = QDBusMessage::createMethodCall (dbusServiceName, dbusPath, dbusInterfaceName, QLatin1String ("Notify"));
+      QDBusMessage m = QDBusMessage::createMethodCall (dbusServiceName, dbusPath, dbusInterfaceName, QStringLiteral ("Notify"));
       QVariantList args;
       args.append (QLatin1String ("Transmission")); // app_name
       args.append (0U);                             // replaces_id

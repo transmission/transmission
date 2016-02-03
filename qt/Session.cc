@@ -334,10 +334,10 @@ Session::start ()
   if (myPrefs.get<bool> (Prefs::SESSION_IS_REMOTE))
     {
       QUrl url;
-      url.setScheme (QLatin1String ("http"));
+      url.setScheme (QStringLiteral ("http"));
       url.setHost (myPrefs.get<QString> (Prefs::SESSION_REMOTE_HOST));
       url.setPort (myPrefs.get<int> (Prefs::SESSION_REMOTE_PORT));
-      url.setPath (QLatin1String ("/transmission/rpc"));
+      url.setPath (QStringLiteral ("/transmission/rpc"));
       if (myPrefs.get<bool> (Prefs::SESSION_REMOTE_AUTH))
         {
           url.setUserName (myPrefs.get<QString> (Prefs::SESSION_REMOTE_USERNAME));
@@ -979,12 +979,12 @@ Session::launchWebInterface ()
   if (!mySession) // remote session
     {
       url = myRpc.url ();
-      url.setPath (QLatin1String ("/transmission/web/"));
+      url.setPath (QStringLiteral ("/transmission/web/"));
     }
   else // local session
     {
-      url.setScheme (QLatin1String ("http"));
-      url.setHost (QLatin1String ("localhost"));
+      url.setScheme (QStringLiteral ("http"));
+      url.setHost (QStringLiteral ("localhost"));
       url.setPort (myPrefs.getInt (Prefs::RPC_PORT));
     }
 

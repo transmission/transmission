@@ -122,28 +122,28 @@ MainWindow::MainWindow (Session& session, Prefs& prefs, TorrentModel& model, boo
   ui.listView->setAttribute (Qt::WA_MacShowFocusRect, false);
 
   // icons
-  ui.action_OpenFile->setIcon (getStockIcon (QLatin1String ("document-open"), QStyle::SP_DialogOpenButton));
-  ui.action_New->setIcon (getStockIcon (QLatin1String ("document-new"), QStyle::SP_DesktopIcon));
-  ui.action_Properties->setIcon (getStockIcon (QLatin1String ("document-properties"), QStyle::SP_DesktopIcon));
-  ui.action_OpenFolder->setIcon (getStockIcon (QLatin1String ("folder-open"), QStyle::SP_DirOpenIcon));
-  ui.action_Start->setIcon (getStockIcon (QLatin1String ("media-playback-start"), QStyle::SP_MediaPlay));
-  ui.action_StartNow->setIcon (getStockIcon (QLatin1String ("media-playback-start"), QStyle::SP_MediaPlay));
-  ui.action_Announce->setIcon (getStockIcon (QLatin1String ("network-transmit-receive")));
-  ui.action_Pause->setIcon (getStockIcon (QLatin1String ("media-playback-pause"), QStyle::SP_MediaPause));
-  ui.action_Remove->setIcon (getStockIcon (QLatin1String ("list-remove"), QStyle::SP_TrashIcon));
-  ui.action_Delete->setIcon (getStockIcon (QLatin1String ("edit-delete"), QStyle::SP_TrashIcon));
-  ui.action_StartAll->setIcon (getStockIcon (QLatin1String ("media-playback-start"), QStyle::SP_MediaPlay));
-  ui.action_PauseAll->setIcon (getStockIcon (QLatin1String ("media-playback-pause"), QStyle::SP_MediaPause));
-  ui.action_Quit->setIcon (getStockIcon (QLatin1String ("application-exit")));
-  ui.action_SelectAll->setIcon (getStockIcon (QLatin1String ("edit-select-all")));
-  ui.action_ReverseSortOrder->setIcon (getStockIcon (QLatin1String ("view-sort-ascending"), QStyle::SP_ArrowDown));
-  ui.action_Preferences->setIcon (getStockIcon (QLatin1String ("preferences-system")));
-  ui.action_Contents->setIcon (getStockIcon (QLatin1String ("help-contents"), QStyle::SP_DialogHelpButton));
-  ui.action_About->setIcon (getStockIcon (QLatin1String ("help-about")));
-  ui.action_QueueMoveTop->setIcon (getStockIcon (QLatin1String ("go-top")));
-  ui.action_QueueMoveUp->setIcon (getStockIcon (QLatin1String ("go-up"), QStyle::SP_ArrowUp));
-  ui.action_QueueMoveDown->setIcon (getStockIcon (QLatin1String ("go-down"), QStyle::SP_ArrowDown));
-  ui.action_QueueMoveBottom->setIcon (getStockIcon (QLatin1String ("go-bottom")));
+  ui.action_OpenFile->setIcon (getStockIcon (QStringLiteral ("document-open"), QStyle::SP_DialogOpenButton));
+  ui.action_New->setIcon (getStockIcon (QStringLiteral ("document-new"), QStyle::SP_DesktopIcon));
+  ui.action_Properties->setIcon (getStockIcon (QStringLiteral ("document-properties"), QStyle::SP_DesktopIcon));
+  ui.action_OpenFolder->setIcon (getStockIcon (QStringLiteral ("folder-open"), QStyle::SP_DirOpenIcon));
+  ui.action_Start->setIcon (getStockIcon (QStringLiteral ("media-playback-start"), QStyle::SP_MediaPlay));
+  ui.action_StartNow->setIcon (getStockIcon (QStringLiteral ("media-playback-start"), QStyle::SP_MediaPlay));
+  ui.action_Announce->setIcon (getStockIcon (QStringLiteral ("network-transmit-receive")));
+  ui.action_Pause->setIcon (getStockIcon (QStringLiteral ("media-playback-pause"), QStyle::SP_MediaPause));
+  ui.action_Remove->setIcon (getStockIcon (QStringLiteral ("list-remove"), QStyle::SP_TrashIcon));
+  ui.action_Delete->setIcon (getStockIcon (QStringLiteral ("edit-delete"), QStyle::SP_TrashIcon));
+  ui.action_StartAll->setIcon (getStockIcon (QStringLiteral ("media-playback-start"), QStyle::SP_MediaPlay));
+  ui.action_PauseAll->setIcon (getStockIcon (QStringLiteral ("media-playback-pause"), QStyle::SP_MediaPause));
+  ui.action_Quit->setIcon (getStockIcon (QStringLiteral ("application-exit")));
+  ui.action_SelectAll->setIcon (getStockIcon (QStringLiteral ("edit-select-all")));
+  ui.action_ReverseSortOrder->setIcon (getStockIcon (QStringLiteral ("view-sort-ascending"), QStyle::SP_ArrowDown));
+  ui.action_Preferences->setIcon (getStockIcon (QStringLiteral ("preferences-system")));
+  ui.action_Contents->setIcon (getStockIcon (QStringLiteral ("help-contents"), QStyle::SP_DialogHelpButton));
+  ui.action_About->setIcon (getStockIcon (QStringLiteral ("help-about")));
+  ui.action_QueueMoveTop->setIcon (getStockIcon (QStringLiteral ("go-top")));
+  ui.action_QueueMoveUp->setIcon (getStockIcon (QStringLiteral ("go-up"), QStyle::SP_ArrowUp));
+  ui.action_QueueMoveDown->setIcon (getStockIcon (QStringLiteral ("go-down"), QStyle::SP_ArrowDown));
+  ui.action_QueueMoveBottom->setIcon (getStockIcon (QStringLiteral ("go-bottom")));
 
   // ui signals
   connect (ui.action_Toolbar, SIGNAL (toggled (bool)), this, SLOT (setToolbarVisible (bool)));
@@ -241,7 +241,7 @@ MainWindow::MainWindow (Session& session, Prefs& prefs, TorrentModel& model, boo
   menu->addSeparator ();
   menu->addAction (ui.action_Quit);
   myTrayIcon.setContextMenu (menu);
-  myTrayIcon.setIcon (QIcon::fromTheme (QLatin1String ("transmission-tray-icon"), qApp->windowIcon ()));
+  myTrayIcon.setIcon (QIcon::fromTheme (QStringLiteral ("transmission-tray-icon"), qApp->windowIcon ()));
 
   connect (&myPrefs, SIGNAL (changed (int)), this, SLOT (refreshPref (int)));
   connect (ui.action_ShowMainWindow, SIGNAL (triggered (bool)), this, SLOT (toggleWindows (bool)));
@@ -623,7 +623,7 @@ MainWindow::openStats ()
 void
 MainWindow::openDonate ()
 {
-  QDesktopServices::openUrl (QUrl (QLatin1String ("http://www.transmissionbt.com/donate.php")));
+  QDesktopServices::openUrl (QUrl (QStringLiteral ("http://www.transmissionbt.com/donate.php")));
 }
 
 void
@@ -642,7 +642,7 @@ MainWindow::openHelp ()
 void
 MainWindow::refreshTitle ()
 {
-  QString title (QLatin1String ("Transmission"));
+  QString title (QStringLiteral ("Transmission"));
   const QUrl url (mySession.getRemoteUrl ());
   if (!url.isEmpty ())
     //: Second (optional) part of main window title "Transmission - host:port" (added when connected to remote session);
@@ -680,7 +680,7 @@ MainWindow::refreshTrayIcon ()
   else if (downCount)
     {
       tip = Formatter::downloadSpeedToString(downSpeed) +
-            QLatin1String ("   ") +
+            QStringLiteral ("   ") +
             Formatter::uploadSpeedToString(upSpeed);
     }
   else if (upCount)
@@ -1288,7 +1288,7 @@ MainWindow::removeTorrents (const bool deleteFiles)
         }
     }
 
-  msgBox.setWindowTitle (QLatin1String (" "));
+  msgBox.setWindowTitle (QStringLiteral (" "));
   msgBox.setText (QString::fromLatin1 ("<big><b>%1</big></b>").arg (primary_text));
   msgBox.setInformativeText (secondary_text);
   msgBox.setStandardButtons (QMessageBox::Ok | QMessageBox::Cancel);
@@ -1414,7 +1414,7 @@ MainWindow::dragEnterEvent (QDragEnterEvent * event)
 {
   const QMimeData * mime = event->mimeData ();
 
-  if (mime->hasFormat (QLatin1String ("application/x-bittorrent"))
+  if (mime->hasFormat (QStringLiteral ("application/x-bittorrent"))
         || mime->hasUrls()
         || mime->text ().trimmed ().endsWith (QLatin1String (".torrent"), Qt::CaseInsensitive)
         || mime->text ().startsWith (QLatin1String ("magnet:"), Qt::CaseInsensitive))

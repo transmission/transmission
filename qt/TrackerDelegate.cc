@@ -182,12 +182,12 @@ TrackerDelegate::getText (const TrackerInfo& inf) const
   QString key;
   QString str;
   const time_t now (time (0));
-  const QString err_markup_begin = QLatin1String ("<span style=\"color:red\">");
-  const QString err_markup_end = QLatin1String ("</span>");
-  const QString timeout_markup_begin = QLatin1String ("<span style=\"color:#224466\">");
-  const QString timeout_markup_end = QLatin1String ("</span>");
-  const QString success_markup_begin = QLatin1String ("<span style=\"color:#008B00\">");
-  const QString success_markup_end = QLatin1String ("</span>");
+  const QString err_markup_begin = QStringLiteral ("<span style=\"color:red\">");
+  const QString err_markup_end = QStringLiteral ("</span>");
+  const QString timeout_markup_begin = QStringLiteral ("<span style=\"color:#224466\">");
+  const QString timeout_markup_end = QStringLiteral ("</span>");
+  const QString success_markup_begin = QStringLiteral ("<span style=\"color:#008B00\">");
+  const QString success_markup_end = QStringLiteral ("</span>");
 
   // hostname
   str += inf.st.isBackup ? QLatin1String ("<i>") : QLatin1String ("<b>");
@@ -196,7 +196,7 @@ TrackerDelegate::getText (const TrackerInfo& inf) const
   tr_urlParse (inf.st.announce.toUtf8().constData(), TR_BAD_SIZE, NULL, &host, &port, NULL);
   str += QString::fromLatin1 ("%1:%2").arg (QString::fromUtf8 (host)).arg (port);
   tr_free (host);
-  if (!key.isEmpty()) str += QLatin1String (" - ") + key;
+  if (!key.isEmpty()) str += QStringLiteral (" - ") + key;
   str += inf.st.isBackup ? QLatin1String ("</i>") : QLatin1String ("</b>");
 
   // announce & scrape info

@@ -137,7 +137,7 @@ class PeerItem: public QTreeWidgetItem
               if (ipAddress.protocol () == QAbstractSocket::IPv4Protocol)
                 {
                   const quint32 ipv4Address = ipAddress.toIPv4Address ();
-                  collatedAddress = QLatin1String ("1-") +
+                  collatedAddress = QStringLiteral ("1-") +
                     QString::fromLatin1 (QByteArray::number (ipv4Address, 16).rightJustified (8, '0'));
                 }
               else if (ipAddress.protocol () == QAbstractSocket::IPv6Protocol)
@@ -146,12 +146,12 @@ class PeerItem: public QTreeWidgetItem
                   QByteArray tmp (16, '\0');
                   for (int i = 0; i < 16; ++i)
                     tmp[i] = ipv6Address[i];
-                  collatedAddress = QLatin1String ("2-") + QString::fromLatin1 (tmp.toHex ());
+                  collatedAddress = QStringLiteral ("2-") + QString::fromLatin1 (tmp.toHex ());
                 }
             }
 
           if (collatedAddress.isEmpty ())
-            collatedAddress = QLatin1String ("3-") + peer.address.toLower ();
+            collatedAddress = QStringLiteral ("3-") + peer.address.toLower ();
         }
 
       return collatedAddress;
@@ -867,7 +867,7 @@ DetailsDialog::refresh ()
 
           if (item == 0) // new peer has connected
             {
-              static const QIcon myEncryptionIcon (QLatin1String (":/icons/encrypted.png"));
+              static const QIcon myEncryptionIcon (QStringLiteral (":/icons/encrypted.png"));
               static const QIcon myEmptyIcon;
               item = new PeerItem (peer);
               item->setTextAlignment (COL_UP, Qt::AlignRight|Qt::AlignVCenter);
@@ -1212,9 +1212,9 @@ DetailsDialog::initTrackerTab ()
   ui.trackersView->setModel (myTrackerFilter);
   ui.trackersView->setItemDelegate (myTrackerDelegate);
 
-  ui.addTrackerButton->setIcon (getStockIcon (QLatin1String ("list-add"), QStyle::SP_DialogOpenButton));
-  ui.editTrackerButton->setIcon (getStockIcon (QLatin1String ("document-properties"), QStyle::SP_DesktopIcon));
-  ui.removeTrackerButton->setIcon (getStockIcon (QLatin1String ("list-remove"), QStyle::SP_TrashIcon));
+  ui.addTrackerButton->setIcon (getStockIcon (QStringLiteral ("list-add"), QStyle::SP_DialogOpenButton));
+  ui.editTrackerButton->setIcon (getStockIcon (QStringLiteral ("document-properties"), QStyle::SP_DesktopIcon));
+  ui.removeTrackerButton->setIcon (getStockIcon (QStringLiteral ("list-remove"), QStyle::SP_TrashIcon));
 
   ui.showTrackerScrapesCheck->setChecked (myPrefs.getBool (Prefs::SHOW_TRACKER_SCRAPES));
   ui.showBackupTrackersCheck->setChecked (myPrefs.getBool (Prefs::SHOW_BACKUP_TRACKERS));
@@ -1244,11 +1244,11 @@ DetailsDialog::initPeersTab ()
   ui.peersView->sortByColumn (COL_ADDRESS, Qt::AscendingOrder);
 
   ui.peersView->setColumnWidth (COL_LOCK, 20);
-  ui.peersView->setColumnWidth (COL_UP, measureViewItem (ui.peersView, COL_UP, QLatin1String ("1024 MiB/s")));
-  ui.peersView->setColumnWidth (COL_DOWN, measureViewItem (ui.peersView, COL_DOWN, QLatin1String ("1024 MiB/s")));
-  ui.peersView->setColumnWidth (COL_PERCENT, measureViewItem (ui.peersView, COL_PERCENT, QLatin1String ("100%")));
-  ui.peersView->setColumnWidth (COL_STATUS, measureViewItem (ui.peersView, COL_STATUS, QLatin1String ("ODUK?EXI")));
-  ui.peersView->setColumnWidth (COL_ADDRESS, measureViewItem (ui.peersView, COL_ADDRESS, QLatin1String ("888.888.888.888")));
+  ui.peersView->setColumnWidth (COL_UP, measureViewItem (ui.peersView, COL_UP, QStringLiteral ("1024 MiB/s")));
+  ui.peersView->setColumnWidth (COL_DOWN, measureViewItem (ui.peersView, COL_DOWN, QStringLiteral ("1024 MiB/s")));
+  ui.peersView->setColumnWidth (COL_PERCENT, measureViewItem (ui.peersView, COL_PERCENT, QStringLiteral ("100%")));
+  ui.peersView->setColumnWidth (COL_STATUS, measureViewItem (ui.peersView, COL_STATUS, QStringLiteral ("ODUK?EXI")));
+  ui.peersView->setColumnWidth (COL_ADDRESS, measureViewItem (ui.peersView, COL_ADDRESS, QStringLiteral ("888.888.888.888")));
 }
 
 /***
