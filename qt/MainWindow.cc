@@ -201,17 +201,17 @@ MainWindow::MainWindow (Session& session, Prefs& prefs, TorrentModel& model, boo
   ui.listView->setModel (&myFilterModel);
   connect (ui.listView->selectionModel (), SIGNAL (selectionChanged (QItemSelection, QItemSelection)), this, SLOT (refreshActionSensitivitySoon ()));
 
-  const QPair<QAction *, int> sortModes[] =
+  const QPair<QAction *, SortMode::SortType> sortModes[] =
     {
-      qMakePair (ui.action_SortByActivity, static_cast<int> (SortMode::SORT_BY_ACTIVITY)),
-      qMakePair (ui.action_SortByAge, static_cast<int> (SortMode::SORT_BY_AGE)),
-      qMakePair (ui.action_SortByETA, static_cast<int> (SortMode::SORT_BY_ETA)),
-      qMakePair (ui.action_SortByName, static_cast<int> (SortMode::SORT_BY_NAME)),
-      qMakePair (ui.action_SortByProgress, static_cast<int> (SortMode::SORT_BY_PROGRESS)),
-      qMakePair (ui.action_SortByQueue, static_cast<int> (SortMode::SORT_BY_QUEUE)),
-      qMakePair (ui.action_SortByRatio, static_cast<int> (SortMode::SORT_BY_RATIO)),
-      qMakePair (ui.action_SortBySize, static_cast<int> (SortMode::SORT_BY_SIZE)),
-      qMakePair (ui.action_SortByState, static_cast<int> (SortMode::SORT_BY_STATE))
+      qMakePair (ui.action_SortByActivity, SortMode::SORT_BY_ACTIVITY),
+      qMakePair (ui.action_SortByAge, SortMode::SORT_BY_AGE),
+      qMakePair (ui.action_SortByETA, SortMode::SORT_BY_ETA),
+      qMakePair (ui.action_SortByName, SortMode::SORT_BY_NAME),
+      qMakePair (ui.action_SortByProgress, SortMode::SORT_BY_PROGRESS),
+      qMakePair (ui.action_SortByQueue, SortMode::SORT_BY_QUEUE),
+      qMakePair (ui.action_SortByRatio, SortMode::SORT_BY_RATIO),
+      qMakePair (ui.action_SortBySize, SortMode::SORT_BY_SIZE),
+      qMakePair (ui.action_SortByState, SortMode::SORT_BY_STATE)
     };
 
   QActionGroup * actionGroup = new QActionGroup (this);
