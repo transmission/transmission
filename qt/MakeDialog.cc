@@ -150,7 +150,7 @@ MakeDialog::makeTorrent ()
 
   // the file to create
   const QString path = QString::fromUtf8 (myBuilder->top);
-  const QString torrentName = QFileInfo (path).completeBaseName () + QLatin1String (".torrent");
+  const QString torrentName = QFileInfo (path).completeBaseName () + QStringLiteral (".torrent");
   const QString target = QDir (ui.destinationButton->path ()).filePath (torrentName);
 
   // comment
