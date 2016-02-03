@@ -261,23 +261,23 @@ MainWindow::MainWindow (Session& session, Prefs& prefs, TorrentModel& model, boo
   connect (&myFilterModel, SIGNAL (rowsRemoved (QModelIndex, int, int)), SLOT (refreshTorrentViewHeader ()));
   connect (ui.listView, SIGNAL (headerDoubleClicked ()), myFilterBar, SLOT (clear ()));
 
-  QList<int> initKeys;
-  initKeys << Prefs::MAIN_WINDOW_X
-           << Prefs::SHOW_TRAY_ICON
-           << Prefs::SORT_REVERSED
-           << Prefs::SORT_MODE
-           << Prefs::FILTERBAR
-           << Prefs::STATUSBAR
-           << Prefs::STATUSBAR_STATS
-           << Prefs::TOOLBAR
-           << Prefs::ALT_SPEED_LIMIT_ENABLED
-           << Prefs::COMPACT_VIEW
-           << Prefs::DSPEED
-           << Prefs::DSPEED_ENABLED
-           << Prefs::USPEED
-           << Prefs::USPEED_ENABLED
-           << Prefs::RATIO
-           << Prefs::RATIO_ENABLED;
+  QList<int> initKeys = { Prefs::MAIN_WINDOW_X,
+           Prefs::SHOW_TRAY_ICON,
+           Prefs::SORT_REVERSED,
+           Prefs::SORT_MODE,
+           Prefs::FILTERBAR,
+           Prefs::STATUSBAR,
+           Prefs::STATUSBAR_STATS,
+           Prefs::TOOLBAR,
+           Prefs::ALT_SPEED_LIMIT_ENABLED,
+           Prefs::COMPACT_VIEW,
+           Prefs::DSPEED,
+           Prefs::DSPEED_ENABLED,
+           Prefs::USPEED,
+           Prefs::USPEED_ENABLED,
+           Prefs::RATIO,
+           Prefs::RATIO_ENABLED};
+
   foreach (const int key, initKeys)
     refreshPref (key);
 
