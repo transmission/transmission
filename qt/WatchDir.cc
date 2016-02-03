@@ -108,7 +108,7 @@ WatchDir::watcherActivated (const QString& path)
 
   // try to add any new files which end in .torrent
   const QSet<QString> newFiles (files - myWatchDirFiles);
-  const QString torrentSuffix = QString::fromUtf8 (".torrent");
+  const QString torrentSuffix = QStringLiteral (".torrent");
   foreach (const QString& name, newFiles)
     {
       if (name.endsWith (torrentSuffix, Qt::CaseInsensitive))

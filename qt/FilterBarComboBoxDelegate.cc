@@ -39,7 +39,7 @@ FilterBarComboBoxDelegate::isSeparator (const QModelIndex& index)
 void
 FilterBarComboBoxDelegate::setSeparator (QAbstractItemModel * model, const QModelIndex& index)
 {
-  model->setData (index, QString::fromLatin1 ("separator"), Qt::AccessibleDescriptionRole);
+  model->setData (index, QStringLiteral ("separator"), Qt::AccessibleDescriptionRole);
 
   if (QStandardItemModel *m = qobject_cast<QStandardItemModel*> (model))
     if (QStandardItem *item = m->itemFromIndex (index))

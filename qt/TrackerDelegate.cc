@@ -194,7 +194,7 @@ TrackerDelegate::getText (const TrackerInfo& inf) const
   char * host = NULL;
   int port = 0;
   tr_urlParse (inf.st.announce.toUtf8().constData(), TR_BAD_SIZE, NULL, &host, &port, NULL);
-  str += QString::fromLatin1 ("%1:%2").arg (QString::fromUtf8 (host)).arg (port);
+  str += QStringLiteral ("%1:%2").arg (QString::fromUtf8 (host)).arg (port);
   tr_free (host);
   if (!key.isEmpty()) str += QStringLiteral (" - ") + key;
   str += inf.st.isBackup ? QLatin1String ("</i>") : QLatin1String ("</b>");

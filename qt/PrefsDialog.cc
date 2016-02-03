@@ -253,10 +253,10 @@ PrefsDialog::initSpeedTab ()
   const QString speed_K_str = Formatter::unitStr (Formatter::SPEED, Formatter::KB);
   const QLocale locale;
 
-  ui.uploadSpeedLimitSpin->setSuffix (QString::fromLatin1 (" %1").arg (speed_K_str));
-  ui.downloadSpeedLimitSpin->setSuffix (QString::fromLatin1 (" %1").arg (speed_K_str));
-  ui.altUploadSpeedLimitSpin->setSuffix (QString::fromLatin1 (" %1").arg (speed_K_str));
-  ui.altDownloadSpeedLimitSpin->setSuffix (QString::fromLatin1 (" %1").arg (speed_K_str));
+  ui.uploadSpeedLimitSpin->setSuffix (QStringLiteral (" %1").arg (speed_K_str));
+  ui.downloadSpeedLimitSpin->setSuffix (QStringLiteral (" %1").arg (speed_K_str));
+  ui.altUploadSpeedLimitSpin->setSuffix (QStringLiteral (" %1").arg (speed_K_str));
+  ui.altDownloadSpeedLimitSpin->setSuffix (QStringLiteral (" %1").arg (speed_K_str));
 
   ui.altSpeedLimitDaysCombo->addItem (tr ("Every Day"), QVariant (TR_SCHED_ALL));
   ui.altSpeedLimitDaysCombo->addItem (tr ("Weekdays"),  QVariant (TR_SCHED_WEEKDAY));

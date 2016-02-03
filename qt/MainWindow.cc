@@ -635,7 +635,7 @@ MainWindow::openAbout ()
 void
 MainWindow::openHelp ()
 {
-  QDesktopServices::openUrl (QUrl (QString::fromLatin1 ("http://www.transmissionbt.com/help/gtk/%1.%2x").
+  QDesktopServices::openUrl (QUrl (QStringLiteral ("http://www.transmissionbt.com/help/gtk/%1.%2x").
     arg (MAJOR_VERSION).arg (MINOR_VERSION / 10)));
 }
 
@@ -1289,7 +1289,7 @@ MainWindow::removeTorrents (const bool deleteFiles)
     }
 
   msgBox.setWindowTitle (QStringLiteral (" "));
-  msgBox.setText (QString::fromLatin1 ("<big><b>%1</big></b>").arg (primary_text));
+  msgBox.setText (QStringLiteral ("<big><b>%1</big></b>").arg (primary_text));
   msgBox.setInformativeText (secondary_text);
   msgBox.setStandardButtons (QMessageBox::Ok | QMessageBox::Cancel);
   msgBox.setDefaultButton (QMessageBox::Cancel);
