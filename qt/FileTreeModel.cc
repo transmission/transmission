@@ -444,7 +444,7 @@ void
 FileTreeModel::twiddleWanted (const QModelIndexList& indices)
 {
   QMap<bool, QModelIndexList> wantedIndices;
-  for (const QModelIndex& i: getOrphanIndices (indices))
+  foreach (const QModelIndex& i, getOrphanIndices (indices))
     {
       const FileTreeItem * const item = itemFromIndex (i);
       wantedIndices[item->isSubtreeWanted () != Qt::Checked] << i;
@@ -461,7 +461,7 @@ void
 FileTreeModel::twiddlePriority (const QModelIndexList& indices)
 {
   QMap<int, QModelIndexList> priorityIndices;
-  for (const QModelIndex& i: getOrphanIndices (indices))
+  foreach (const QModelIndex& i, getOrphanIndices (indices))
     {
       const FileTreeItem * const item = itemFromIndex (i);
       int priority = item->priority ();

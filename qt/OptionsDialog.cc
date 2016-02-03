@@ -333,7 +333,7 @@ OptionsDialog::clearVerify ()
   myVerifyPiecePos = 0;
   myVerifyTimer.stop ();
 
-  for (TorrentFile& f: myFiles)
+  for (TorrentFile& f : myFiles)
     f.have = 0;
 
   ui.filesView->update (myFiles);
@@ -431,7 +431,7 @@ OptionsDialog::onTimeout ()
   if (done)
     {
       uint64_t have = 0;
-      for (const TorrentFile& f: myFiles)
+      foreach (const TorrentFile& f, myFiles)
         have += f.have;
 
       if (!have) // everything failed

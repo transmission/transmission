@@ -132,7 +132,7 @@ MakeDialog::makeTorrent ()
   // get the tiers
   int tier = 0;
   QVector<tr_tracker_info> trackers;
-  for (const QString& line: ui.trackersEdit->toPlainText ().split (QLatin1Char ('\n')))
+  foreach (const QString& line, ui.trackersEdit->toPlainText ().split (QLatin1Char ('\n')))
     {
       const QString announceUrl = line.trimmed ();
       if (announceUrl.isEmpty ())

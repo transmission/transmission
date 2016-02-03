@@ -112,10 +112,9 @@ Application::Application (int& argc, char ** argv):
   QIcon icon = QIcon::fromTheme (QLatin1String ("transmission"));
   if (icon.isNull ())
     {
-      QList<int> sizes;
-      sizes << 16 << 22 << 24 << 32 << 48 << 64 << 72 << 96 << 128 << 192 << 256;
-      for (const int size: sizes)
-        icon.addPixmap (QPixmap (QString::fromLatin1 (":/icons/transmission-%1.png").arg (size)));
+      QList<int> sizes = {16, 22, 24, 32, 48, 64, 72, 96, 128, 192, 256};
+      foreach (const int size, sizes)
+        icon.addPixmap (QPixmap (QStringLiteral(":/icons/transmission-%1.png").arg (size)));
     }
   setWindowIcon (icon);
 
@@ -164,7 +163,7 @@ Application::Application (int& argc, char ** argv):
   if (interopClient.isConnected ())
     {
       bool delegated = false;
-      for (const QString& filename: filenames)
+      foreach (const QString& filename, filenames)
         {
           QString metainfo;
 
@@ -242,9 +241,8 @@ Application::Application (int& argc, char ** argv):
   connect (myWatchDir, SIGNAL (torrentFileAdded (QString)), this, SLOT (addTorrent (QString)));
 
   // init from preferences
-  QList<int> initKeys;
-  initKeys << Prefs::DIR_WATCH;
-  for (const int key: initKeys)
+  QList<int> initKeys = { Prefs::DIR_WATCH };
+  foreach (const int key, initKeys)
     refreshPref (key);
   connect (myPrefs, SIGNAL (changed (int)), this, SLOT (refreshPref (const int)));
 
@@ -290,7 +288,7 @@ Application::Application (int& argc, char ** argv):
       dialog->show ();
     }
 
-  for (const QString& filename: filenames)
+  foreach (const QString& filename, filenames)
     addTorrent (filename);
 
   InteropHelper::registerObject (this);
@@ -339,7 +337,7 @@ Application::onTorrentsAdded (const QSet<int>& torrents)
   if (!myPrefs->getBool (Prefs::SHOW_NOTIFICATION_ON_ADD))
     return;
 
-  for (const int id: torrents)
+  foreach (const int id, torrents)
     {
       Torrent * tor = myModel->getTorrentFromId (id);
 
