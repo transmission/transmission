@@ -15,6 +15,7 @@
 
 class TorrentView::HeaderWidget: public QWidget
 {
+    Q_OBJECT
   public:
     HeaderWidget (TorrentView * parent):
       QWidget (parent),
@@ -102,3 +103,5 @@ TorrentView::adjustHeaderPosition ()
   headerWidgetRect.setHeight (myHeaderWidget->sizeHint ().height ());
   myHeaderWidget->setGeometry (headerWidgetRect);
 }
+
+#include "TorrentView.moc"
