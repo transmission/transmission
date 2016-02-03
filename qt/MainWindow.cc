@@ -62,6 +62,7 @@ namespace
  */
 class ListViewProxyStyle: public QProxyStyle
 {
+  Q_OBJECT
   public:
 
     int styleHint (StyleHint            hint,
@@ -610,7 +611,7 @@ MainWindow::openFolder ()
 void
 MainWindow::copyMagnetLinkToClipboard ()
 {
-  const int id (*getSelectedTorrents ().begin ());
+  const int id (*getSelectedTorrents ().cbegin ());
   mySession.copyMagnetLinkToClipboard (id);
 }
 
@@ -1461,3 +1462,5 @@ MainWindow::contextMenuEvent (QContextMenuEvent * event)
 {
   ui.menuTorrent->popup (event->globalPos ());
 }
+
+#include "MainWindow.moc"

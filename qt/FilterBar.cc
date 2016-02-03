@@ -144,7 +144,7 @@ FilterBar::refreshTrackers ()
   foreach (const QString& host, oldHosts & newHosts)
     {
       const QString name = readableHostName (host);
-      QStandardItem * row = myTrackerModel->findItems (name).first ();
+      QStandardItem * row = myTrackerModel->findItems (name).at (0);
       const int count = torrentsPerHost[name];
       row->setData (count, FilterBarComboBox::CountRole);
       row->setData (getCountString (count), FilterBarComboBox::CountStringRole);
@@ -155,7 +155,7 @@ FilterBar::refreshTrackers ()
   foreach (const QString& host, oldHosts - newHosts)
     {
       const QString name = readableHostName (host);
-      QStandardItem * item = myTrackerModel->findItems (name).first ();
+      QStandardItem * item = myTrackerModel->findItems (name).at (0);
       if (!item->data (TrackerRole).toString ().isEmpty ()) // don't remove "All"
         myTrackerModel->removeRows (item->row (), 1);
     }

@@ -258,14 +258,14 @@ MakeDialog::dragEnterEvent (QDragEnterEvent * event)
 {
   const QMimeData * mime = event->mimeData ();
 
-  if (!mime->urls ().isEmpty () && QFileInfo (mime->urls ().front ().path ()).exists ())
+  if (!mime->urls ().isEmpty () && QFileInfo (mime->urls ().at (0).path ()).exists ())
     event->acceptProposedAction ();
 }
 
 void
 MakeDialog::dropEvent (QDropEvent * event)
 {
-  const QString filename = event->mimeData ()->urls ().front ().path ();
+  const QString filename = event->mimeData ()->urls ().at (0).path ();
   const QFileInfo fileInfo (filename);
 
   if (fileInfo.exists ())
