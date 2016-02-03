@@ -59,7 +59,7 @@ struct Peer
 
 Q_DECLARE_METATYPE(Peer)
 
-typedef QList<Peer> PeerList;
+typedef QVector<Peer> PeerList;
 Q_DECLARE_METATYPE(PeerList)
 
 struct TrackerStat
@@ -95,7 +95,7 @@ struct TrackerStat
 
 Q_DECLARE_METATYPE(TrackerStat)
 
-typedef QList<TrackerStat> TrackerStatsList;
+typedef QVector<TrackerStat> TrackerStatsList;
 Q_DECLARE_METATYPE(TrackerStatsList)
 
 struct TorrentFile
@@ -112,7 +112,7 @@ struct TorrentFile
 
 Q_DECLARE_METATYPE(TorrentFile)
 
-typedef QList<TorrentFile> FileList;
+typedef QVector<TorrentFile> FileList;
 Q_DECLARE_METATYPE(FileList)
 
 class Torrent: public QObject
