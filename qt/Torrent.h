@@ -253,8 +253,8 @@ class Torrent: public QObject
     int seedIdleLimit () const { return getInt (SEED_IDLE_LIMIT); }
     tr_idlelimit seedIdleMode () const { return static_cast<tr_idlelimit> (getInt (SEED_IDLE_MODE)); }
     TrackerStatsList trackerStats () const{ return myValues[TRACKERSTATS].value<TrackerStatsList>(); }
-    QStringList trackers() const { return myValues[TRACKERS].value<QStringList>(); }
-    QStringList hosts() const { return myValues[HOSTS].value<QStringList>(); }
+    QStringList trackers() const { return myValues[TRACKERS].toStringList(); }
+    QStringList hosts() const { return myValues[HOSTS].toStringList(); }
     PeerList peers () const{ return myValues[PEERS].value<PeerList>(); }
     const FileList& files () const { return myFiles; }
     int queuePosition () const { return getInt (QUEUE_POSITION); }
