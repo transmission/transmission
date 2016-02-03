@@ -147,34 +147,35 @@ MainWindow::MainWindow (Session& session, Prefs& prefs, TorrentModel& model, boo
   ui.action_QueueMoveBottom->setIcon (getStockIcon (QStringLiteral ("go-bottom")));
 
   // ui signals
-  connect (ui.action_Toolbar, SIGNAL (toggled (bool)), this, SLOT (setToolbarVisible (bool)));
-  connect (ui.action_Filterbar, SIGNAL (toggled (bool)), this, SLOT (setFilterbarVisible (bool)));
-  connect (ui.action_Statusbar, SIGNAL (toggled (bool)), this, SLOT (setStatusbarVisible (bool)));
-  connect (ui.action_CompactView, SIGNAL (toggled (bool)), this, SLOT (setCompactView (bool)));
-  connect (ui.action_ReverseSortOrder, SIGNAL (toggled (bool)), this, SLOT (setSortAscendingPref (bool)));
-  connect (ui.action_Start, SIGNAL (triggered ()), this, SLOT (startSelected ()));
-  connect (ui.action_QueueMoveTop,    SIGNAL (triggered ()), this, SLOT (queueMoveTop ()));
-  connect (ui.action_QueueMoveUp,     SIGNAL (triggered ()), this, SLOT (queueMoveUp ()));
-  connect (ui.action_QueueMoveDown,   SIGNAL (triggered ()), this, SLOT (queueMoveDown ()));
-  connect (ui.action_QueueMoveBottom, SIGNAL (triggered ()), this, SLOT (queueMoveBottom ()));
-  connect (ui.action_StartNow, SIGNAL (triggered ()), this, SLOT (startSelectedNow ()));
-  connect (ui.action_Pause, SIGNAL (triggered ()), this, SLOT (pauseSelected ()));
-  connect (ui.action_Remove, SIGNAL (triggered ()), this, SLOT (removeSelected ()));
-  connect (ui.action_Delete, SIGNAL (triggered ()), this, SLOT (deleteSelected ()));
-  connect (ui.action_Verify, SIGNAL (triggered ()), this, SLOT (verifySelected ()));
-  connect (ui.action_Announce, SIGNAL (triggered ()), this, SLOT (reannounceSelected ()));
-  connect (ui.action_StartAll, SIGNAL (triggered ()), this, SLOT (startAll ()));
-  connect (ui.action_PauseAll, SIGNAL (triggered ()), this, SLOT (pauseAll ()));
+  connect (ui.action_Toolbar, &QAction::toggled, [this](bool visible) {myPrefs.set (Prefs::TOOLBAR, visible);});
+  connect (ui.action_Filterbar, &QAction::toggled, [this](bool visible){  myPrefs.set (Prefs::FILTERBAR, visible);});
+  connect (ui.action_Statusbar, &QAction::toggled, [this](bool visible){  myPrefs.set (Prefs::STATUSBAR, visible);});
+  connect (ui.action_CompactView, &QAction::toggled, [this](bool visible){  myPrefs.set (Prefs::COMPACT_VIEW, visible);});
+  connect (ui.action_ReverseSortOrder, &QAction::toggled, [this](bool b){  myPrefs.set (Prefs::SORT_REVERSED, b);});
+  connect (ui.action_Start, &QAction::triggered, [this]{ mySession.startTorrents (getSelectedTorrents ()); });
+  connect (ui.action_QueueMoveTop,    &QAction::triggered, [this]{ mySession.queueMoveTop (getSelectedTorrents ());});
+  connect (ui.action_QueueMoveUp,     &QAction::triggered, [this]{ mySession.queueMoveUp (getSelectedTorrents ());});
+  connect (ui.action_QueueMoveDown,   &QAction::triggered, [this]{ mySession.queueMoveDown (getSelectedTorrents ());});
+  connect (ui.action_QueueMoveBottom, &QAction::triggered, [this]{  mySession.queueMoveBottom (getSelectedTorrents ());});
+  connect (ui.action_StartNow, &QAction::triggered, [this]{  mySession.startTorrentsNow (getSelectedTorrents ());});
+  connect (ui.action_Pause, &QAction::triggered, [this]{ mySession.pauseTorrents (getSelectedTorrents ());});
+  connect (ui.action_Remove, &QAction::triggered, [this]{ removeTorrents (false);});
+  connect (ui.action_Delete, &QAction::triggered, [this]{ removeTorrents (true);});
+  connect (ui.action_Verify, &QAction::triggered, [this]{  mySession.verifyTorrents (getSelectedTorrents (true));});
+  connect (ui.action_Announce, &QAction::triggered, [this]{  mySession.reannounceTorrents (getSelectedTorrents ());});
+  connect (ui.action_StartAll, &QAction::triggered, [this]{  mySession.startTorrents ();});
+  connect (ui.action_PauseAll, &QAction::triggered, [this]{  mySession.pauseTorrents ();});
   connect (ui.action_OpenFile, SIGNAL (triggered ()), this, SLOT (openTorrent ()));
   connect (ui.action_AddURL, SIGNAL (triggered ()), this, SLOT (openURL ()));
   connect (ui.action_New, SIGNAL (triggered ()), this, SLOT (newTorrent ()));
-  connect (ui.action_Preferences, SIGNAL (triggered ()), this, SLOT (openPreferences ()));
-  connect (ui.action_Statistics, SIGNAL (triggered ()), this, SLOT (openStats ()));
-  connect (ui.action_Donate, SIGNAL (triggered ()), this, SLOT (openDonate ()));
-  connect (ui.action_About, SIGNAL (triggered ()), this, SLOT (openAbout ()));
-  connect (ui.action_Contents, SIGNAL (triggered ()), this, SLOT (openHelp ()));
+  connect (ui.action_Preferences, &QAction::triggered, [this]{  Utils::openDialog (myPrefsDialog, mySession, myPrefs, this);});
+  connect (ui.action_Statistics, &QAction::triggered, [this]{  Utils::openDialog (myStatsDialog, mySession, this);});
+  connect (ui.action_Donate, &QAction::triggered, [this]{ QDesktopServices::openUrl (QUrl (QStringLiteral ("http://www.transmissionbt.com/donate.php")));});
+  connect (ui.action_About, &QAction::triggered, [this]{  Utils::openDialog (myAboutDialog, this);});
+  connect (ui.action_Contents, &QAction::triggered, [this]{
+      QDesktopServices::openUrl (QUrl (QStringLiteral ("http://www.transmissionbt.com/help/gtk/%1.%2x").arg (MAJOR_VERSION).arg (MINOR_VERSION / 10)));});
   connect (ui.action_OpenFolder, SIGNAL (triggered ()), this, SLOT (openFolder ()));
-  connect (ui.action_CopyMagnetToClipboard, SIGNAL (triggered ()), this, SLOT (copyMagnetLinkToClipboard ()));
+  connect (ui.action_CopyMagnetToClipboard, &QAction::triggered, [this]{mySession.copyMagnetLinkToClipboard (*getSelectedTorrents ().cbegin ());});
   connect (ui.action_SetLocation, SIGNAL (triggered ()), this, SLOT (setLocation ()));
   connect (ui.action_Properties, SIGNAL (triggered ()), this, SLOT (openProperties ()));
   connect (ui.action_SessionDialog, SIGNAL (triggered ()), this, SLOT (openSession ()));
@@ -221,7 +222,7 @@ MainWindow::MainWindow (Session& session, Prefs& prefs, TorrentModel& model, boo
       actionGroup->addAction (mode.first);
     }
 
-  connect (actionGroup, SIGNAL (triggered (QAction *)), this, SLOT (onSortModeChanged (QAction *)));
+  connect (actionGroup, &QActionGroup::triggered, [this](QAction *action){  myPrefs.set (Prefs::SORT_MODE, SortMode (action->property (SORT_MODE_KEY).toInt ()));});
 
   myAltSpeedAction = new QAction (tr ("Speed Limits"), this);
   myAltSpeedAction->setIcon (ui.altSpeedButton->icon ());
@@ -281,13 +282,13 @@ MainWindow::MainWindow (Session& session, Prefs& prefs, TorrentModel& model, boo
   foreach (const int key, initKeys)
     refreshPref (key);
 
-  connect (&mySession, SIGNAL (sourceChanged ()), this, SLOT (onSessionSourceChanged ()));
+  connect (&mySession, &Session::sourceChanged, [this]{myModel.clear();});
   connect (&mySession, SIGNAL (statsUpdated ()), this, SLOT (refreshStatusBar ()));
-  connect (&mySession, SIGNAL (dataReadProgress ()), this, SLOT (dataReadProgress ()));
-  connect (&mySession, SIGNAL (dataSendProgress ()), this, SLOT (dataSendProgress ()));
+  connect (&mySession, &Session::dataReadProgress, [this] { if (!myNetworkError) myLastReadTime = time (NULL);});
+  connect (&mySession, &Session::dataSendProgress, [this] { myLastSendTime = time (NULL);});
   connect (&mySession, SIGNAL (httpAuthenticationRequired ()), this, SLOT (wrongAuthentication ()));
   connect (&mySession, SIGNAL (error (QNetworkReply::NetworkError)), this, SLOT (onError (QNetworkReply::NetworkError)));
-  connect (&mySession, SIGNAL (errorMessage (QString)), this, SLOT (errorMessage(QString)));
+  connect (&mySession, &Session::errorMessage, [this](const QString& msg) { myErrorMessage = msg;});
 
   if (mySession.isServer ())
     {
@@ -295,7 +296,7 @@ MainWindow::MainWindow (Session& session, Prefs& prefs, TorrentModel& model, boo
     }
   else
     {
-      connect (&myNetworkTimer, SIGNAL (timeout ()), this, SLOT (onNetworkTimer ()));
+      connect (&myNetworkTimer, &QTimer::timeout, [this]{  updateNetworkIcon (); });
       myNetworkTimer.start (1000);
     }
 
@@ -314,16 +315,6 @@ MainWindow::~MainWindow ()
 {
 }
 
-/****
-*****
-****/
-
-void
-MainWindow::onSessionSourceChanged ()
-{
-  myModel.clear ();
-}
-
 void
 MainWindow::onModelReset ()
 {
@@ -332,10 +323,6 @@ MainWindow::onModelReset ()
   refreshStatusBar ();
   refreshTrayIconSoon ();
 }
-
-/****
-*****
-****/
 
 void
 MainWindow::onSetPrefs ()
@@ -466,30 +453,10 @@ MainWindow::createStatsModeMenu ()
       menu->addAction (mode.first);
     }
 
-  connect (actionGroup, SIGNAL (triggered (QAction *)), this, SLOT (onStatsModeChanged (QAction *)));
+  connect (actionGroup, &QActionGroup::triggered, [this](QAction* action){ myPrefs.set (Prefs::STATUSBAR_STATS, action->property (STATS_MODE_KEY).toString ());});
 
   return menu;
 }
-
-/****
-*****
-****/
-
-void
-MainWindow::onSortModeChanged (QAction * action)
-{
-  myPrefs.set (Prefs::SORT_MODE, SortMode (action->property (SORT_MODE_KEY).toInt ()));
-}
-
-void
-MainWindow::setSortAscendingPref (bool b)
-{
-  myPrefs.set (Prefs::SORT_REVERSED, b);
-}
-
-/****
-*****
-****/
 
 void
 MainWindow::showEvent (QShowEvent * event)
@@ -498,10 +465,6 @@ MainWindow::showEvent (QShowEvent * event)
 
   ui.action_ShowMainWindow->setChecked (true);
 }
-
-/****
-*****
-****/
 
 void
 MainWindow::hideEvent (QHideEvent * event)
@@ -512,20 +475,10 @@ MainWindow::hideEvent (QHideEvent * event)
     ui.action_ShowMainWindow->setChecked (false);
 }
 
-/****
-*****
-****/
-
 void
 MainWindow::openSession ()
 {
   Utils::openDialog (mySessionDialog, mySession, myPrefs, this);
-}
-
-void
-MainWindow::openPreferences ()
-{
-  Utils::openDialog (myPrefsDialog, mySession, myPrefs, this);
 }
 
 void
@@ -562,7 +515,7 @@ void openSelect (const QString& path)
 static
 void openSelect (const QString& path)
 {
-  QStringList scriptArgs;
+  QStringList scriptArgs
   scriptArgs << QLatin1String ("-e")
              << QString::fromLatin1 ("tell application \"Finder\" to reveal POSIX file \"%1\"").arg (path);
   QProcess::execute (QLatin1String ("/usr/bin/osascript"), scriptArgs);
@@ -606,38 +559,6 @@ MainWindow::openFolder ()
 #endif
 
   QDesktopServices::openUrl (QUrl::fromLocalFile (path));
-}
-
-void
-MainWindow::copyMagnetLinkToClipboard ()
-{
-  const int id (*getSelectedTorrents ().cbegin ());
-  mySession.copyMagnetLinkToClipboard (id);
-}
-
-void
-MainWindow::openStats ()
-{
-  Utils::openDialog (myStatsDialog, mySession, this);
-}
-
-void
-MainWindow::openDonate ()
-{
-  QDesktopServices::openUrl (QUrl (QStringLiteral ("http://www.transmissionbt.com/donate.php")));
-}
-
-void
-MainWindow::openAbout ()
-{
-  Utils::openDialog (myAboutDialog, this);
-}
-
-void
-MainWindow::openHelp ()
-{
-  QDesktopServices::openUrl (QUrl (QStringLiteral ("http://www.transmissionbt.com/help/gtk/%1.%2x").
-    arg (MAJOR_VERSION).arg (MINOR_VERSION / 10)));
 }
 
 void
@@ -821,16 +742,6 @@ MainWindow::refreshActionSensitivity ()
     myDetailsDialog->setIds (getSelectedTorrents ());
 }
 
-/**
-***
-**/
-
-void
-MainWindow::clearSelection ()
-{
-  ui.action_DeselectAll->trigger ();
-}
-
 QSet<int>
 MainWindow::getSelectedTorrents (bool withMetadataOnly) const
 {
@@ -847,116 +758,12 @@ MainWindow::getSelectedTorrents (bool withMetadataOnly) const
 }
 
 void
-MainWindow::startSelected ()
-{
-  mySession.startTorrents (getSelectedTorrents ());
-}
-void
-MainWindow::startSelectedNow ()
-{
-  mySession.startTorrentsNow (getSelectedTorrents ());
-}
-void
-MainWindow::pauseSelected ()
-{
-  mySession.pauseTorrents (getSelectedTorrents ());
-}
-void
-MainWindow::queueMoveTop ()
-{
-  mySession.queueMoveTop (getSelectedTorrents ());
-}
-void
-MainWindow::queueMoveUp ()
-{
-  mySession.queueMoveUp (getSelectedTorrents ());
-}
-void
-MainWindow::queueMoveDown ()
-{
-  mySession.queueMoveDown (getSelectedTorrents ());
-}
-void
-MainWindow::queueMoveBottom ()
-{
-  mySession.queueMoveBottom (getSelectedTorrents ());
-}
-void
-MainWindow::startAll ()
-{
-  mySession.startTorrents ();
-}
-void
-MainWindow::pauseAll ()
-{
-  mySession.pauseTorrents ();
-}
-void
-MainWindow::removeSelected ()
-{
-  removeTorrents (false);
-}
-void
-MainWindow::deleteSelected ()
-{
-  removeTorrents (true);
-}
-void
-MainWindow::verifySelected ()
-{
-  mySession.verifyTorrents (getSelectedTorrents (true));
-}
-void
-MainWindow::reannounceSelected ()
-{
-  mySession.reannounceTorrents (getSelectedTorrents ());
-}
-
-/**
-***
-**/
-
-void
-MainWindow::onStatsModeChanged (QAction * action)
-{
-  myPrefs.set (Prefs::STATUSBAR_STATS, action->property (STATS_MODE_KEY).toString ());
-}
-
-/**
-***
-**/
-
-void
-MainWindow::setCompactView (bool visible)
-{
-  myPrefs.set (Prefs::COMPACT_VIEW, visible);
-}
-void
 MainWindow::toggleSpeedMode ()
 {
   myPrefs.toggleBool (Prefs::ALT_SPEED_LIMIT_ENABLED);
   const bool mode = myPrefs.get<bool> (Prefs::ALT_SPEED_LIMIT_ENABLED);
   myAltSpeedAction->setChecked (mode);
 }
-void
-MainWindow::setToolbarVisible (bool visible)
-{
-  myPrefs.set (Prefs::TOOLBAR, visible);
-}
-void
-MainWindow::setFilterbarVisible (bool visible)
-{
-  myPrefs.set (Prefs::FILTERBAR, visible);
-}
-void
-MainWindow::setStatusbarVisible (bool visible)
-{
-  myPrefs.set (Prefs::STATUSBAR, visible);
-}
-
-/**
-***
-**/
 
 void
 MainWindow::toggleWindows (bool doShow)
@@ -1118,10 +925,6 @@ MainWindow::refreshPref (int key)
         break;
     }
 }
-
-/***
-****
-***/
 
 namespace
 {
@@ -1312,10 +1115,6 @@ MainWindow::removeTorrents (const bool deleteFiles)
     }
 }
 
-/***
-****
-***/
-
 void
 MainWindow::updateNetworkIcon ()
 {
@@ -1358,25 +1157,6 @@ MainWindow::updateNetworkIcon ()
 }
 
 void
-MainWindow::onNetworkTimer ()
-{
-  updateNetworkIcon ();
-}
-
-void
-MainWindow::dataReadProgress ()
-{
-  if (!myNetworkError)
-  myLastReadTime = time (NULL);
-}
-
-void
-MainWindow::dataSendProgress ()
-{
-  myLastSendTime = time (NULL);
-}
-
-void
 MainWindow::onError (QNetworkReply::NetworkError code)
 {
   const bool hadError = myNetworkError;
@@ -1394,21 +1174,11 @@ MainWindow::onError (QNetworkReply::NetworkError code)
 }
 
 void
-MainWindow::errorMessage (const QString& msg)
-{
-    myErrorMessage = msg;
-}
-
-void
 MainWindow::wrongAuthentication ()
 {
   mySession.stop ();
   openSession ();
 }
-
-/***
-****
-***/
 
 void
 MainWindow::dragEnterEvent (QDragEnterEvent * event)
@@ -1452,10 +1222,6 @@ MainWindow::dropEvent (QDropEvent * event)
         }
     }
 }
-
-/***
-****
-***/
 
 void
 MainWindow::contextMenuEvent (QContextMenuEvent * event)
