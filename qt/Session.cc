@@ -112,7 +112,7 @@ FileAdded::executed (int64_t tag, const QString& result, tr_variant * arguments)
 
       QMessageBox::warning (qApp->activeWindow (),
                             tr ("Error Adding Torrent"),
-                            QString::fromLatin1 ("<p><b>%1</b></p><p>%2</p>").arg (text).arg (myName));
+                            QStringLiteral ("<p><b>%1</b></p><p>%2</p>").arg (text).arg (myName));
     }
 
   deleteLater ();

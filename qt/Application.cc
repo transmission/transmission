@@ -300,13 +300,13 @@ Application::loadTranslations ()
   const QStringList qtQmDirs = QStringList () <<
     QLibraryInfo::location (QLibraryInfo::TranslationsPath) <<
 #ifdef TRANSLATIONS_DIR
-    QString::fromUtf8 (TRANSLATIONS_DIR) <<
+    QStringLiteral (TRANSLATIONS_DIR) <<
 #endif
     (applicationDirPath () + QStringLiteral ("/translations"));
 
   const QStringList appQmDirs = QStringList () <<
 #ifdef TRANSLATIONS_DIR
-    QString::fromUtf8 (TRANSLATIONS_DIR) <<
+    QStringLiteral(TRANSLATIONS_DIR) <<
 #endif
     (applicationDirPath () + QStringLiteral ("/translations"));
 

@@ -459,9 +459,9 @@ DetailsDialog::refresh ()
           //: %2 is overall size of torrent data,
           //: %3 is percentage (%1/%2*100)
           string = tr ("%1 of %2 (%3%)")
-                     .arg (Formatter::sizeToString (haveVerified))
-                     .arg (Formatter::sizeToString (sizeWhenDone))
-                     .arg (pct);
+                     .arg (Formatter::sizeToString (haveVerified),
+                     Formatter::sizeToString (sizeWhenDone),
+                     pct);
         }
       else
         {
@@ -471,10 +471,10 @@ DetailsDialog::refresh ()
           //: %3 is percentage (%1/%2*100),
           //: %4 is amount of downloaded but not yet verified data
           string = tr ("%1 of %2 (%3%), %4 Unverified")
-                     .arg (Formatter::sizeToString (haveVerified + haveUnverified))
-                     .arg (Formatter::sizeToString (sizeWhenDone))
-                     .arg (pct)
-                     .arg (Formatter::sizeToString (haveUnverified));
+                     .arg (Formatter::sizeToString (haveVerified + haveUnverified),
+                     Formatter::sizeToString (sizeWhenDone),
+                     pct,
+                     Formatter::sizeToString (haveUnverified));
         }
     }
   ui.haveValueLabel->setText (string);
@@ -485,7 +485,7 @@ DetailsDialog::refresh ()
   else if (sizeWhenDone == 0)
     string = none;
   else
-    string = QString::fromLatin1 ("%1%").arg (Formatter::percentToString ( (100.0 * available) / sizeWhenDone));
+    string = QStringLiteral ("%1%").arg (Formatter::percentToString ( (100.0 * available) / sizeWhenDone));
   ui.availabilityValueLabel->setText (string);
 
   // myDownloadedLabel
@@ -905,7 +905,7 @@ DetailsDialog::refresh ()
                 }
 
               if (!txt.isEmpty ())
-                codeTip += QString::fromLatin1 ("%1: %2\n").arg (ch).arg (txt);
+                codeTip += QStringLiteral ("%1: %2\n").arg (ch).arg (txt);
             }
 
           if (!codeTip.isEmpty ())
@@ -913,7 +913,7 @@ DetailsDialog::refresh ()
 
           item->setText (COL_UP, peer.rateToPeer.isZero () ? QString () : Formatter::speedToString (peer.rateToPeer));
           item->setText (COL_DOWN, peer.rateToClient.isZero () ? QString () : Formatter::speedToString (peer.rateToClient));
-          item->setText (COL_PERCENT, peer.progress > 0 ? QString::fromLatin1 ("%1%").arg(int(peer.progress * 100.0)) : QString ());
+          item->setText (COL_PERCENT, peer.progress > 0 ? QStringLiteral ("%1%").arg(int(peer.progress * 100.0)) : QString ());
           item->setText (COL_STATUS, code);
           item->setToolTip (COL_STATUS, codeTip);
 
@@ -1155,8 +1155,8 @@ DetailsDialog::initOptionsTab ()
 {
   const QString speed_K_str = Formatter::unitStr (Formatter::SPEED, Formatter::KB);
 
-  ui.singleDownSpin->setSuffix (QString::fromLatin1 (" %1").arg (speed_K_str));
-  ui.singleUpSpin->setSuffix (QString::fromLatin1 (" %1").arg (speed_K_str));
+  ui.singleDownSpin->setSuffix (QStringLiteral (" %1").arg (speed_K_str));
+  ui.singleUpSpin->setSuffix (QStringLiteral (" %1").arg (speed_K_str));
 
   ui.singleDownSpin->setProperty (PREF_KEY, TR_KEY_downloadLimit);
   ui.singleUpSpin->setProperty (PREF_KEY, TR_KEY_uploadLimit);
