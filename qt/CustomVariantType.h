@@ -12,13 +12,12 @@
 
 #include <QVariant>
 
-class CustomVariantType
+namespace CustomVariantType
 {
-  public:
-    enum
+    enum CustomVariantType
     {
-      TrackerStatsList = QVariant::UserType,
-      PeerList = QVariant::UserType,
+      TrackerStatsList = QVariant::UserType + 1,
+      PeerList,
       FileList,
       FilterModeType,
       SortModeType
