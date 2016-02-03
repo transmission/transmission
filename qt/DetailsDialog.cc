@@ -505,7 +505,7 @@ DetailsDialog::refresh ()
       const QString dstr = Formatter::sizeToString (d);
       const QString fstr = Formatter::sizeToString (f);
       if (f)
-        string = tr ("%1 (%2 corrupt)").arg (dstr).arg (fstr);
+        string = tr ("%1 (%2 corrupt)").arg (dstr,fstr);
       else
         string = dstr;
     }
@@ -526,8 +526,8 @@ DetailsDialog::refresh ()
           d += t->downloadedEver ();
         }
       string = tr ("%1 (Ratio: %2)")
-                 .arg (Formatter::sizeToString (u))
-                 .arg (Formatter::ratioToString (tr_getRatio (u, d)));
+                 .arg (Formatter::sizeToString (u),
+                 Formatter::ratioToString (tr_getRatio (u, d)));
     }
   ui.uploadedValueLabel->setText (string);
 
@@ -662,8 +662,8 @@ DetailsDialog::refresh ()
         string = none;
       else if (pieceSize > 0)
         string = tr ("%1 (%Ln pieces @ %2)", "", pieces)
-                   .arg (Formatter::sizeToString (size))
-                   .arg (Formatter::memToString (pieceSize));
+                   .arg (Formatter::sizeToString (size),
+                   Formatter::memToString (pieceSize));
       else
         string = tr ("%1 (%Ln pieces)", "", pieces)
                    .arg (Formatter::sizeToString (size));
@@ -751,7 +751,7 @@ DetailsDialog::refresh ()
       else if (empty_creator && !empty_date)
         string = tr ("Created on %1").arg (date);
       else
-        string = tr ("Created by %1 on %2").arg (creator).arg (date);
+        string = tr ("Created by %1 on %2").arg (creator,date);
     }
   ui.originValueLabel->setText (string);
 
