@@ -98,10 +98,7 @@ Application::Application (int& argc, char ** argv):
   loadTranslations ();
 
   Formatter::initUnits ();
-
-#if QT_VERSION >= QT_VERSION_CHECK(5, 1, 0)
   setAttribute (Qt::AA_UseHighDpiPixmaps);
-#endif
 
 #if defined (_WIN32) || defined (__APPLE__)
   if (QIcon::themeName ().isEmpty ())
@@ -225,41 +222,41 @@ Application::Application (int& argc, char ** argv):
   myWatchDir = new WatchDir (*myModel);
 
   // when the session gets torrent info, update the model
-  connect (mySession, SIGNAL (torrentsUpdated (tr_variant*,bool)), myModel, SLOT (updateTorrents (tr_variant*,bool)));
+  connect (mySession, &Session::torrentsUpdated, myModel, &TorrentModel::updateTorrents);
   connect (mySession, SIGNAL (torrentsUpdated (tr_variant*,bool)), myWindow, SLOT (refreshActionSensitivity ()));
-  connect (mySession, SIGNAL (torrentsRemoved (tr_variant*)), myModel, SLOT (removeTorrents (tr_variant*)));
+  connect (mySession, &Session::torrentsRemoved, myModel, &TorrentModel::removeTorrents);
   // when the session source gets changed, request a full refresh
-  connect (mySession, SIGNAL (sourceChanged ()), this, SLOT (onSessionSourceChanged ()));
+  connect (mySession, &Session::sourceChanged, this, &Application::onSessionSourceChanged);
   // when the model sees a torrent for the first time, ask the session for full info on it
-  connect (myModel, SIGNAL (torrentsAdded (QSet<int>)), mySession, SLOT (initTorrents (QSet<int>)));
-  connect (myModel, SIGNAL (torrentsAdded (QSet<int>)), this, SLOT (onTorrentsAdded (QSet<int>)));
+  connect (myModel,  &TorrentModel::torrentsAdded, mySession, &Session::initTorrents);
+  connect (myModel, &TorrentModel::torrentsAdded, this, &Application::onTorrentsAdded);
 
   mySession->initTorrents ();
   mySession->refreshSessionStats ();
 
   // when torrents are added to the watch directory, tell the session
-  connect (myWatchDir, SIGNAL (torrentFileAdded (QString)), this, SLOT (addTorrent (QString)));
+  connect (myWatchDir, &WatchDir::torrentFileAdded, this, &Application::addTorrent);
 
   // init from preferences
   QList<int> initKeys = { Prefs::DIR_WATCH };
   foreach (const int key, initKeys)
     refreshPref (key);
-  connect (myPrefs, SIGNAL (changed (int)), this, SLOT (refreshPref (const int)));
+  connect (myPrefs, &Prefs::changed, this, &Application::refreshPref);
 
   QTimer * timer = &myModelTimer;
-  connect (timer, SIGNAL (timeout ()), this, SLOT (refreshTorrents ()));
+  connect (timer, &QTimer::timeout, this, &Application::refreshTorrents);
   timer->setSingleShot (false);
   timer->setInterval (MODEL_REFRESH_INTERVAL_MSEC);
   timer->start ();
 
   timer = &myStatsTimer;
-  connect (timer, SIGNAL (timeout ()), mySession, SLOT (refreshSessionStats ()));
+  connect (timer, &QTimer::timeout, mySession, &Session::refreshSessionStats);
   timer->setSingleShot (false);
   timer->setInterval (STATS_REFRESH_INTERVAL_MSEC);
   timer->start ();
 
   timer = &mySessionTimer;
-  connect (timer, SIGNAL (timeout ()), mySession, SLOT (refreshSessionInfo ()));
+  connect (timer, &QTimer::timeout, mySession, &Session::refreshSessionInfo);
   timer->setSingleShot (false);
   timer->setInterval (SESSION_REFRESH_INTERVAL_MSEC);
   timer->start ();
@@ -282,7 +279,7 @@ Application::Application (int& argc, char ** argv):
       dialog->setDefaultButton (QMessageBox::Ok);
       dialog->setModal (true);
 
-      connect (dialog, SIGNAL (finished (int)), this, SLOT (consentGiven (int)));
+      connect (dialog, &QMessageBox::finished, this, &Application::consentGiven);
 
       dialog->setAttribute (Qt::WA_DeleteOnClose);
       dialog->show ();
@@ -507,11 +504,11 @@ Application::addTorrent (const QString& key)
   const AddData addme (key);
 
   if (addme.type != addme.NONE)
-    addTorrent (addme);
+    addTorrentData (addme);
 }
 
 void
-Application::addTorrent (const AddData& addme)
+Application::addTorrentData (const AddData& addme)
 {
   if (!myPrefs->getBool (Prefs::OPTIONS_PROMPT))
     {

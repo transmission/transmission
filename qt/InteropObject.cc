@@ -29,7 +29,7 @@ InteropObject::AddMetainfo (const QString& metainfo)
   AddData addme (metainfo);
 
   if (addme.type != addme.NONE)
-    qApp->addTorrent (addme);
+    qApp->addTorrentData (addme);
 
   return true;
 }
