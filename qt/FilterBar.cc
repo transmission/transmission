@@ -10,6 +10,7 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QStandardItemModel>
+#include <QLineEdit>
 
 #include "Application.h"
 #include "FaviconCache.h"
@@ -17,7 +18,6 @@
 #include "FilterBar.h"
 #include "FilterBarComboBox.h"
 #include "FilterBarComboBoxDelegate.h"
-#include "FilterBarLineEdit.h"
 #include "Prefs.h"
 #include "Torrent.h"
 #include "TorrentFilter.h"
@@ -241,8 +241,10 @@ FilterBar::FilterBar (Prefs& prefs, const TorrentModel& torrents, const TorrentF
   myTrackerCombo = createTrackerCombo (myTrackerModel);
   h->addWidget (myTrackerCombo);
 
-  myLineEdit = new FilterBarLineEdit (this);
+  myLineEdit = new QLineEdit (this);
   h->addWidget (myLineEdit);
+  myLineEdit->setClearButtonEnabled(true);
+  myLineEdit->setPlaceholderText(tr("Search..."));
   connect (myLineEdit, &QLineEdit::textChanged, this, &FilterBar::onTextChanged);
 
   // listen for changes from the other players
