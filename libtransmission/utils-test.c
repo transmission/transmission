@@ -130,6 +130,20 @@ test_utf8 (void)
   check_streq (in, out);
   tr_free (out);
 
+  in = "\xF4\x00\x81\x82";
+  out = tr_utf8clean (in, 4);
+  check (out != NULL);
+  check_streq ("?", out);
+  check (tr_utf8_validate (out, TR_BAD_SIZE, NULL));
+  tr_free (out);
+
+  in = "\xF4\x33\x81\x82";
+  out = tr_utf8clean (in, 4);
+  check (out != NULL);
+  check_streq ("?3??", out);
+  check (tr_utf8_validate (out, TR_BAD_SIZE, NULL));
+  tr_free (out);
+
   return 0;
 }
 
