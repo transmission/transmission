@@ -201,10 +201,10 @@ DetailsDialog::DetailsDialog (Session            & session,
   foreach (const int key, initKeys)
     refreshPref (key);
 
-  connect (&myTimer, SIGNAL (timeout ()), this, SLOT (onTimer ()));
-  connect (&myPrefs, SIGNAL (changed (int)), this, SLOT (refreshPref (int)));
+  connect (&myTimer, &QTimer::timeout, this, &DetailsDialog::getNewData);
+  connect (&myPrefs, &Prefs::changed, this, &DetailsDialog::refreshPref);
 
-  onTimer ();
+  getNewData ();
   myTimer.setSingleShot (false);
   myTimer.start (REFRESH_INTERVAL_MSEC);
 }
@@ -229,7 +229,7 @@ DetailsDialog::setIds (const QSet<int>& ids)
     {
       const Torrent * tor = myModel.getTorrentFromId (id);
       if (tor)
-        disconnect (tor, SIGNAL (torrentChanged (int)), this, SLOT (onTorrentChanged ()));
+        disconnect (tor, &Torrent::torrentChanged, this, &DetailsDialog::onTorrentChanged);
     }
 
   ui.filesView->clear ();
@@ -241,13 +241,13 @@ DetailsDialog::setIds (const QSet<int>& ids)
     {
       const Torrent * tor = myModel.getTorrentFromId (id);
       if (tor)
-        connect (tor, SIGNAL (torrentChanged (int)), this, SLOT (onTorrentChanged ()));
+        connect (tor, &Torrent::torrentChanged, this, &DetailsDialog::onTorrentChanged);
     }
 
   for (int i = 0, end = ui.tabs->count(); i < end; ++i)
     ui.tabs->widget (i)->setEnabled (false);
 
-  onTimer ();
+  getNewData();
 }
 
 void
@@ -285,12 +285,6 @@ DetailsDialog::refreshPref (int key)
 ***/
 
 void
-DetailsDialog::onTimer ()
-{
-  getNewData ();
-}
-
-void
 DetailsDialog::getNewData ()
 {
   if (!myIds.empty ())
@@ -310,8 +304,9 @@ DetailsDialog::getNewData ()
 }
 
 void
-DetailsDialog::onTorrentChanged ()
+DetailsDialog::onTorrentChanged (int id)
 {
+    Q_UNUSED(id)
   if (!myHavePendingRefresh)
     {
       myHavePendingRefresh = true;
@@ -1017,8 +1012,9 @@ DetailsDialog::onIdleModeChanged (int index)
 }
 
 void
-DetailsDialog::onIdleLimitChanged ()
+DetailsDialog::onIdleLimitChanged (int unused)
 {
+    Q_UNUSED(unused);
   //: Spin box suffix, "Stop seeding if idle for: [ 5 minutes ]" (includes leading space after the number, if needed)
   const QString unitsSuffix = tr (" minute(s)", 0, ui.idleSpin->value ());
   if (ui.idleSpin->suffix () != unitsSuffix)
@@ -1183,18 +1179,22 @@ DetailsDialog::initOptionsTab ()
   cr->addLayout (ui.peerConnectionsSectionLayout);
   cr->update ();
 
-  connect (ui.sessionLimitCheck, SIGNAL (clicked (bool)), SLOT (onHonorsSessionLimitsToggled (bool)));
-  connect (ui.singleDownCheck, SIGNAL (clicked (bool)), SLOT (onDownloadLimitedToggled (bool)));
-  connect (ui.singleDownSpin, SIGNAL (editingFinished ()), SLOT (onSpinBoxEditingFinished ()));
-  connect (ui.singleUpCheck, SIGNAL (clicked (bool)), SLOT (onUploadLimitedToggled (bool)));
-  connect (ui.singleUpSpin, SIGNAL (editingFinished ()), SLOT (onSpinBoxEditingFinished ()));
-  connect (ui.bandwidthPriorityCombo, SIGNAL (currentIndexChanged (int)), SLOT (onBandwidthPriorityChanged (int)));
-  connect (ui.ratioCombo, SIGNAL (currentIndexChanged (int)), SLOT (onRatioModeChanged (int)));
-  connect (ui.ratioSpin, SIGNAL (editingFinished ()), SLOT (onSpinBoxEditingFinished ()));
-  connect (ui.idleCombo, SIGNAL (currentIndexChanged (int)), SLOT (onIdleModeChanged (int)));
-  connect (ui.idleSpin, SIGNAL (editingFinished ()), SLOT (onSpinBoxEditingFinished ()));
-  connect (ui.idleSpin, SIGNAL (valueChanged (int)), SLOT (onIdleLimitChanged ()));
-  connect (ui.peerLimitSpin, SIGNAL (editingFinished ()), SLOT (onSpinBoxEditingFinished ()));
+  connect (ui.sessionLimitCheck, &QCheckBox::clicked, this, &DetailsDialog::onHonorsSessionLimitsToggled);
+  connect (ui.singleDownCheck, &QCheckBox::clicked, this, &DetailsDialog::onDownloadLimitedToggled);
+  connect (ui.singleDownSpin, &QSpinBox::editingFinished, this, &DetailsDialog::onSpinBoxEditingFinished);
+  connect (ui.singleUpCheck, &QCheckBox::clicked, this, &DetailsDialog::onUploadLimitedToggled);
+  connect (ui.singleUpSpin, &QSpinBox::editingFinished, this, &DetailsDialog::onSpinBoxEditingFinished);
+  connect (ui.ratioSpin, &QSpinBox::editingFinished, this, &DetailsDialog::onSpinBoxEditingFinished);
+  connect (ui.idleSpin, &QSpinBox::editingFinished, this, &DetailsDialog::onSpinBoxEditingFinished);
+  connect (ui.peerLimitSpin, &QSpinBox::editingFinished, this, &DetailsDialog::onSpinBoxEditingFinished);
+
+  connect (ui.idleSpin, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+           this, &DetailsDialog::onIdleLimitChanged);
+
+  auto indexChanged = static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged);
+  connect (ui.bandwidthPriorityCombo, indexChanged, this, &DetailsDialog::onBandwidthPriorityChanged);
+  connect (ui.ratioCombo, indexChanged, this, &DetailsDialog::onRatioModeChanged);
+  connect (ui.idleCombo, indexChanged, this, &DetailsDialog::onIdleModeChanged);
 }
 
 /***
@@ -1221,11 +1221,11 @@ DetailsDialog::initTrackerTab ()
 
   connect (ui.trackersView->selectionModel (), SIGNAL (selectionChanged (QItemSelection, QItemSelection)),
     SLOT (onTrackerSelectionChanged ()));
-  connect (ui.addTrackerButton, SIGNAL (clicked ()), SLOT (onAddTrackerClicked ()));
-  connect (ui.editTrackerButton, SIGNAL (clicked ()), SLOT (onEditTrackerClicked ()));
-  connect (ui.removeTrackerButton, SIGNAL (clicked ()), SLOT (onRemoveTrackerClicked ()));
-  connect (ui.showTrackerScrapesCheck, SIGNAL (clicked (bool)), SLOT (onShowTrackerScrapesToggled (bool)));
-  connect (ui.showBackupTrackersCheck, SIGNAL (clicked (bool)), SLOT (onShowBackupTrackersToggled (bool)));
+  connect (ui.addTrackerButton, &QToolButton::clicked, this, &DetailsDialog::onAddTrackerClicked);
+  connect (ui.editTrackerButton,&QToolButton::clicked, this, &DetailsDialog::onEditTrackerClicked);
+  connect (ui.removeTrackerButton, &QToolButton::clicked, this, &DetailsDialog::onRemoveTrackerClicked);
+  connect (ui.showTrackerScrapesCheck, &QCheckBox::clicked, this, &DetailsDialog::onShowTrackerScrapesToggled);
+  connect (ui.showBackupTrackersCheck, &QCheckBox::clicked, this, &DetailsDialog::onShowBackupTrackersToggled);
 
   onTrackerSelectionChanged ();
 }
@@ -1258,10 +1258,10 @@ DetailsDialog::initPeersTab ()
 void
 DetailsDialog::initFilesTab ()
 {
-  connect (ui.filesView, SIGNAL (priorityChanged (QSet<int>, int)), SLOT (onFilePriorityChanged (QSet<int>, int)));
-  connect (ui.filesView, SIGNAL (wantedChanged (QSet<int>, bool)), SLOT (onFileWantedChanged (QSet<int>, bool)));
-  connect (ui.filesView, SIGNAL (pathEdited (QString, QString)), SLOT (onPathEdited (QString, QString)));
-  connect (ui.filesView, SIGNAL (openRequested (QString)), SLOT (onOpenRequested (QString)));
+  connect (ui.filesView, &FileTreeView::priorityChanged, this, &DetailsDialog::onFilePriorityChanged);
+  connect (ui.filesView, &FileTreeView::wantedChanged, this, &DetailsDialog::onFileWantedChanged);
+  connect (ui.filesView, &FileTreeView::pathEdited, this, &DetailsDialog::onPathEdited);
+  connect (ui.filesView, &FileTreeView::openRequested, this, &DetailsDialog::onOpenRequested);
 }
 
 void
