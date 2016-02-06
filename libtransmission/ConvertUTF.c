@@ -304,12 +304,12 @@ static Boolean isLegalUTF8 (const UTF8 *source, int length) {
 	/* Everything else falls through when "true"... */
     case 4: if ((a = (*--srcptr)) < 0x80 || a > 0xBF) return false;
     case 3: if ((a = (*--srcptr)) < 0x80 || a > 0xBF) return false;
-    case 2: if ((a = (*--srcptr)) > 0xBF) return false;
+    case 2: if ((a = (*--srcptr)) < 0x80 || a > 0xBF) return false;
 
 	switch (*source) {
 	    /* no fall-through in this inner switch */
 	    case 0xE0: if (a < 0xA0) return false; break;
-	    case 0xED: if ((a < 0x80) || (a > 0x9F)) return false; break;
+	    case 0xED: if (a > 0x9F) return false; break;
 	    case 0xF0: if (a < 0x90) return false; break;
 	    case 0xF4: if (a > 0x8F) return false; break;
 	    default:   if (a < 0x80) return false;
@@ -407,7 +407,7 @@ ConversionResult ConvertUTF8toUTF16 (
     while (source < sourceEnd) {
 	UTF32 ch = 0;
 	unsigned short extraBytesToRead = trailingBytesForUTF8[*source];
-	if (source + extraBytesToRead >= sourceEnd) {
+	if (extraBytesToRead >= sourceEnd - source) {
 	    result = sourceExhausted; break;
 	}
 	/* Do this check whether lenient or strict */
@@ -533,7 +533,7 @@ ConversionResult ConvertUTF8toUTF32 (
     while (source < sourceEnd) {
 	UTF32 ch = 0;
 	unsigned short extraBytesToRead = trailingBytesForUTF8[*source];
-	if (source + extraBytesToRead >= sourceEnd) {
+	if (extraBytesToRead >= sourceEnd - source) {
 	    result = sourceExhausted; break;
 	}
 	/* Do this check whether lenient or strict */
