@@ -26,7 +26,7 @@ class TorrentView: public QListView
     void headerDoubleClicked ();
 
   protected:
-    virtual void resizeEvent (QResizeEvent * event);
+    void resizeEvent (QResizeEvent * event) override;
 
   private:
     class HeaderWidget;

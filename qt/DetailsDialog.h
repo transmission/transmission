@@ -40,7 +40,7 @@ class DetailsDialog: public BaseDialog
     void setIds (const QSet<int>& ids);
 
     // QWidget
-    virtual QSize sizeHint () const { return QSize (440, 460); }
+    QSize sizeHint () const override { return QSize (440, 460); }
 
   private:
     void initPeersTab ();
