@@ -39,7 +39,7 @@ class Application: public QApplication
 
   public slots:
     void addTorrent (const QString&);
-    void addTorrent (const AddData&);
+    void addTorrentData (const AddData&);
 
   private:
     void maybeUpdateBlocklist ();
