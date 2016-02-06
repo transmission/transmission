@@ -153,7 +153,10 @@ find_package(Threads)
 find_package(PkgConfig QUIET)
 
 find_package(CURL ${CURL_MINIMUM} REQUIRED)
-
+if(APPLE)
+	# last version of OS X broke openssl, use the brew installed one.
+	include_directories(/usr/local/opt/openssl/include)
+endif()
 if(UNIX)
     find_package(ICONV REQUIRED)
 endif()

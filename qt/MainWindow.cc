@@ -515,7 +515,7 @@ void openSelect (const QString& path)
 static
 void openSelect (const QString& path)
 {
-  QStringList scriptArgs
+  QStringList scriptArgs;
   scriptArgs << QLatin1String ("-e")
              << QString::fromLatin1 ("tell application \"Finder\" to reveal POSIX file \"%1\"").arg (path);
   QProcess::execute (QLatin1String ("/usr/bin/osascript"), scriptArgs);
