@@ -34,14 +34,14 @@ class PathButton: public QToolButton
     const QString& path () const;
 
     // QWidget
-    virtual QSize sizeHint () const;
+    QSize sizeHint () const override;
 
   signals:
     void pathChanged (const QString& path);
 
   protected:
     // QWidget
-    virtual void paintEvent (QPaintEvent * event);
+    void paintEvent (QPaintEvent * event) override;
 
   private:
     void updateAppearance ();

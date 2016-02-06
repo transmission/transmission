@@ -54,7 +54,7 @@ class SqueezeLabel: public QLabel
 
   protected:
     // QWidget
-    virtual void paintEvent (QPaintEvent * paintEvent);
+    void paintEvent (QPaintEvent * paintEvent) override;
 };
 
 #endif // QTR_SQUEEZE_LABEL_H

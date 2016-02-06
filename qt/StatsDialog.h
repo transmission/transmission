@@ -27,7 +27,7 @@ class StatsDialog: public BaseDialog
     ~StatsDialog ();
 
     // QWidget
-    virtual void setVisible (bool visible);
+    void setVisible (bool visible) override;
 
   private slots:
     void updateStats ();

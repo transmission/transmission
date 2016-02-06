@@ -48,8 +48,8 @@ class TorrentModel: public QAbstractListModel
                            Speed& downloadSpeed, size_t& downloadPeerCount);
 
     // QAbstractItemModel
-    virtual int rowCount (const QModelIndex& parent = QModelIndex ()) const;
-    virtual QVariant data (const QModelIndex& index, int role = Qt::DisplayRole) const;
+    int rowCount (const QModelIndex& parent = QModelIndex ()) const override;
+    QVariant data (const QModelIndex& index, int role = Qt::DisplayRole) const override;
 
   public slots:
     void updateTorrents (tr_variant * torrentList, bool isCompleteList);

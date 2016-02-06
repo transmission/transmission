@@ -29,7 +29,7 @@ class SessionDialog: public BaseDialog
 
   public slots:
     // QDialog
-    virtual void accept ();
+    void accept () override;
 
   private slots:
     void resensitize ();

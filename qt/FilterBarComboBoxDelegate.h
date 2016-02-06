@@ -27,8 +27,8 @@ class FilterBarComboBoxDelegate: public QItemDelegate
 
   protected:
     // QAbstractItemDelegate
-    virtual void paint (QPainter *, const QStyleOptionViewItem&, const QModelIndex&) const;
-    virtual QSize sizeHint (const QStyleOptionViewItem&, const QModelIndex&) const;
+    void paint (QPainter *, const QStyleOptionViewItem&, const QModelIndex&) const override;
+    QSize sizeHint (const QStyleOptionViewItem&, const QModelIndex&) const override;
 
   private:
     QComboBox * const myCombo;

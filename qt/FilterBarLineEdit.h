@@ -23,7 +23,7 @@ class FilterBarLineEdit: public QLineEdit
 
   protected:
     // QWidget
-    virtual void resizeEvent (QResizeEvent * event);
+    void resizeEvent (QResizeEvent * event) override;
 
   private slots:
     void updateClearButtonVisibility ();

@@ -64,9 +64,9 @@ class MainWindow: public QMainWindow
 
   protected:
     // QWidget
-    virtual void contextMenuEvent (QContextMenuEvent *);
-    virtual void dragEnterEvent (QDragEnterEvent *);
-    virtual void dropEvent (QDropEvent *);
+    void contextMenuEvent (QContextMenuEvent *) override;
+    void dragEnterEvent (QDragEnterEvent *) override;
+    void dropEvent (QDropEvent *) override;
 
   private:
     QIcon getStockIcon (const QString&, int fallback = -1);
@@ -81,8 +81,8 @@ class MainWindow: public QMainWindow
     void addTorrent (const AddData& addMe, bool showOptions);
 
     // QWidget
-    virtual void hideEvent (QHideEvent * event);
-    virtual void showEvent (QShowEvent * event);
+    void hideEvent (QHideEvent * event) override;
+    void showEvent (QShowEvent * event) override;
 
   private slots:
     void refreshTitle ();

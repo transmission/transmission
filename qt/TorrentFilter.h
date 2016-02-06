@@ -40,8 +40,8 @@ class TorrentFilter: public QSortFilterProxyModel
 
   protected:
     // QSortFilterProxyModel
-    virtual bool filterAcceptsRow (int, const QModelIndex&) const;
-    virtual bool lessThan (const QModelIndex&, const QModelIndex&) const;
+    bool filterAcceptsRow (int, const QModelIndex&) const override;
+    bool lessThan (const QModelIndex&, const QModelIndex&) const override;
 
   private:
     bool activityFilterAcceptsTorrent (const Torrent * tor, const FilterMode& mode) const;
