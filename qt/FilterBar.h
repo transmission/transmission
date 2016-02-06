@@ -15,9 +15,9 @@
 class QLabel;
 class QStandardItemModel;
 class QTimer;
+class QLineEdit;
 
 class FilterBarComboBox;
-class FilterBarLineEdit;
 class Prefs;
 class TorrentFilter;
 class TorrentModel;
@@ -58,7 +58,7 @@ class FilterBar: public QWidget
     QStandardItemModel * myTrackerModel;
     QTimer * myRecountTimer;
     bool myIsBootstrapping;
-    FilterBarLineEdit * myLineEdit;
+    QLineEdit * myLineEdit;
 };
 
 #endif // QTR_FILTER_BAR_H
