@@ -340,14 +340,14 @@ Application::onTorrentsAdded (const QSet<int>& torrents)
 
       if (tor->name ().isEmpty ()) // wait until the torrent's INFO fields are loaded
         {
-          connect (tor, SIGNAL (torrentChanged (int)), this, SLOT (onNewTorrentChanged (int)));
+          connect (tor, &Torrent::torrentChanged, this, &Application::onNewTorrentChanged);
         }
       else
         {
           onNewTorrentChanged (id);
 
           if (!tor->isSeed ())
-            connect (tor, SIGNAL (torrentCompleted (int)), this, SLOT (onTorrentCompleted (int)));
+            connect (tor, &Torrent::torrentCompleted, this, &Application::onTorrentCompleted);
         }
     }
 }
@@ -371,7 +371,7 @@ Application::onTorrentCompleted (int id)
 #endif
         }
 
-      disconnect (tor, SIGNAL (torrentCompleted (int)), this, SLOT (onTorrentCompleted (int)));
+      disconnect (tor, &Torrent::torrentCompleted, this, &Application::onTorrentCompleted);
     }
 }
 
@@ -386,10 +386,10 @@ Application::onNewTorrentChanged (int id)
       if (age_secs < 30)
         notifyApp (tr ("Torrent Added"), tor->name ());
 
-      disconnect (tor, SIGNAL (torrentChanged (int)), this, SLOT (onNewTorrentChanged (int)));
+      disconnect (tor, &Torrent::torrentChanged, this, &Application::onNewTorrentChanged);
 
       if (!tor->isSeed ())
-        connect (tor, SIGNAL (torrentCompleted (int)), this, SLOT (onTorrentCompleted (int)));
+        connect (tor, &Torrent::torrentCompleted, this, &Application::onTorrentCompleted);
     }
 }
 

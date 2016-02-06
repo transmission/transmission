@@ -38,7 +38,7 @@ ColumnResizer::ColumnResizer (QObject * parent):
   myLayouts ()
 {
   myTimer->setSingleShot (true);
-  connect (myTimer, SIGNAL (timeout ()), SLOT (update ()));
+  connect (myTimer, &QTimer::timeout, this, &ColumnResizer::update);
 }
 
 void

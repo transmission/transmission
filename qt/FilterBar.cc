@@ -243,17 +243,21 @@ FilterBar::FilterBar (Prefs& prefs, const TorrentModel& torrents, const TorrentF
 
   myLineEdit = new FilterBarLineEdit (this);
   h->addWidget (myLineEdit);
-  connect (myLineEdit, SIGNAL (textChanged (QString)), this, SLOT (onTextChanged (QString)));
+  connect (myLineEdit, &QLineEdit::textChanged, this, &FilterBar::onTextChanged);
 
   // listen for changes from the other players
-  connect (&myPrefs, SIGNAL (changed (int)), this, SLOT (refreshPref (int)));
-  connect (myActivityCombo, SIGNAL (currentIndexChanged (int)), this, SLOT (onActivityIndexChanged (int)));
-  connect (myTrackerCombo, SIGNAL (currentIndexChanged (int)), this, SLOT (onTrackerIndexChanged (int)));
-  connect (&myTorrents, SIGNAL (modelReset ()), this, SLOT (recountSoon ()));
-  connect (&myTorrents, SIGNAL (rowsInserted (QModelIndex, int, int)), this, SLOT (recountSoon ()));
-  connect (&myTorrents, SIGNAL (rowsRemoved (QModelIndex, int, int)), this, SLOT (recountSoon ()));
-  connect (&myTorrents, SIGNAL (dataChanged (QModelIndex, QModelIndex)), this, SLOT (recountSoon ()));
-  connect (myRecountTimer, SIGNAL (timeout ()), this, SLOT (recount ()));
+  connect (&myPrefs, &Prefs::changed, this, &FilterBar::refreshPref);
+
+  auto indChanged = static_cast<void (FilterBarComboBox::*)(int)>(&FilterBarComboBox::currentIndexChanged);
+  connect (myActivityCombo, indChanged, this, &FilterBar::onActivityIndexChanged);
+  connect (myTrackerCombo, indChanged, this, &FilterBar::onTrackerIndexChanged);
+  connect (myRecountTimer, &QTimer::timeout, this, &FilterBar::recount);
+
+  auto callRecountSoon = [this] { recountSoon(); };
+  connect (&myTorrents, &TorrentModel::modelReset, callRecountSoon);
+  connect (&myTorrents, &TorrentModel::rowsInserted, callRecountSoon);
+  connect (&myTorrents, &TorrentModel::rowsRemoved, callRecountSoon);
+  connect (&myTorrents, &TorrentModel::dataChanged, callRecountSoon);
 
   recountSoon ();
   refreshTrackers ();
