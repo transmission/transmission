@@ -31,26 +31,15 @@ AboutDialog::AboutDialog (QWidget * parent):
   QPushButton * b;
 
   b = ui.dialogButtons->addButton (tr ("C&redits"), QDialogButtonBox::ActionRole);
-  connect (b, SIGNAL (clicked ()), this, SLOT (showCredits ()));
+  connect (b, &QPushButton::clicked, [this]{
+	  QMessageBox::about (
+		this,
+		tr ("Credits"),
+		QString::fromUtf8 ("Jordan Lee (Backend; Daemon; GTK+; Qt)\n"
+							"Michell Livingston (OS X)\n"));
+  });
 
   b = ui.dialogButtons->addButton (tr ("&License"), QDialogButtonBox::ActionRole);
-  connect (b, SIGNAL (clicked ()), this, SLOT (showLicense ()));
-
+  connect (b, &QPushButton::clicked, [this]{  Utils::openDialog (myLicenseDialog, this); });
   ui.dialogButtons->button (QDialogButtonBox::Close)->setDefault (true);
-}
-
-void
-AboutDialog::showCredits ()
-{
-  QMessageBox::about (
-    this,
-    tr ("Credits"),
-    QString::fromUtf8 ("Jordan Lee (Backend; Daemon; GTK+; Qt)\n"
-                        "Michell Livingston (OS X)\n"));
-}
-
-void
-AboutDialog::showLicense ()
-{
-  Utils::openDialog (myLicenseDialog, this);
 }
