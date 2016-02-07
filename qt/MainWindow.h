@@ -39,6 +39,7 @@ class StatsDialog;
 class TorrentDelegate;
 class TorrentDelegateMin;
 class TorrentModel;
+class FilterBar;
 
 extern "C"
 {
@@ -137,7 +138,7 @@ class MainWindow: public QMainWindow
     QAction * myRatioOffAction;
     QAction * myRatioOnAction;
     QWidgetList myHidden;
-    QWidget * myFilterBar;
+    FilterBar * myFilterBar;
     QAction * myAltSpeedAction;
     QString myErrorMessage;
 };
