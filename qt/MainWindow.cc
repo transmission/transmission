@@ -165,41 +165,42 @@ MainWindow::MainWindow (Session& session, Prefs& prefs, TorrentModel& model, boo
   connect (ui.action_Announce, &QAction::triggered, [this]{  mySession.reannounceTorrents (getSelectedTorrents ());});
   connect (ui.action_StartAll, &QAction::triggered, [this]{  mySession.startTorrents ();});
   connect (ui.action_PauseAll, &QAction::triggered, [this]{  mySession.pauseTorrents ();});
-  connect (ui.action_OpenFile, SIGNAL (triggered ()), this, SLOT (openTorrent ()));
-  connect (ui.action_AddURL, SIGNAL (triggered ()), this, SLOT (openURL ()));
-  connect (ui.action_New, SIGNAL (triggered ()), this, SLOT (newTorrent ()));
+
+  connect (ui.action_OpenFile, &QAction::triggered, this, &MainWindow::openTorrent);
+  connect (ui.action_AddURL, &QAction::triggered, this, &MainWindow::openURL);
+  connect (ui.action_New, &QAction::triggered, this, &MainWindow::newTorrent);
   connect (ui.action_Preferences, &QAction::triggered, [this]{  Utils::openDialog (myPrefsDialog, mySession, myPrefs, this);});
   connect (ui.action_Statistics, &QAction::triggered, [this]{  Utils::openDialog (myStatsDialog, mySession, this);});
   connect (ui.action_Donate, &QAction::triggered, [this]{ QDesktopServices::openUrl (QUrl (QStringLiteral ("http://www.transmissionbt.com/donate.php")));});
   connect (ui.action_About, &QAction::triggered, [this]{  Utils::openDialog (myAboutDialog, this);});
   connect (ui.action_Contents, &QAction::triggered, [this]{
       QDesktopServices::openUrl (QUrl (QStringLiteral ("http://www.transmissionbt.com/help/gtk/%1.%2x").arg (MAJOR_VERSION).arg (MINOR_VERSION / 10)));});
-  connect (ui.action_OpenFolder, SIGNAL (triggered ()), this, SLOT (openFolder ()));
+  connect (ui.action_OpenFolder, &QAction::triggered, this, &MainWindow::openFolder);
   connect (ui.action_CopyMagnetToClipboard, &QAction::triggered, [this]{mySession.copyMagnetLinkToClipboard (*getSelectedTorrents ().cbegin ());});
-  connect (ui.action_SetLocation, SIGNAL (triggered ()), this, SLOT (setLocation ()));
-  connect (ui.action_Properties, SIGNAL (triggered ()), this, SLOT (openProperties ()));
-  connect (ui.action_SessionDialog, SIGNAL (triggered ()), this, SLOT (openSession ()));
+  connect (ui.action_SetLocation, &QAction::triggered, this, &MainWindow::setLocation);
+  connect (ui.action_Properties, &QAction::triggered, this, &MainWindow::openProperties);
+  connect (ui.action_SessionDialog, &QAction::triggered, this, &MainWindow::openSession);
 
-  connect (ui.listView, SIGNAL (activated (QModelIndex)), ui.action_Properties, SLOT (trigger ()));
+  connect (ui.listView, &TorrentView::activated, [this] { ui.action_Properties->trigger();});
 
   // signals
-  connect (ui.action_SelectAll, SIGNAL (triggered ()), ui.listView, SLOT (selectAll ()));
-  connect (ui.action_DeselectAll, SIGNAL (triggered ()), ui.listView, SLOT (clearSelection ()));
+  connect (ui.action_SelectAll, &QAction::triggered, ui.listView, &TorrentView::selectAll);
+  connect (ui.action_DeselectAll, &QAction::triggered, ui.listView, &TorrentView::clearSelection);
 
-  connect (&myFilterModel, SIGNAL (rowsInserted (QModelIndex, int, int)), this, SLOT (refreshActionSensitivitySoon ()));
-  connect (&myFilterModel, SIGNAL (rowsRemoved (QModelIndex, int, int)), this, SLOT (refreshActionSensitivitySoon ()));
+  connect (&myFilterModel, &TorrentFilter::rowsInserted, [this] {refreshActionSensitivitySoon ();});
+  connect (&myFilterModel, &TorrentFilter::rowsRemoved, [this] {refreshActionSensitivitySoon ();});
 
-  connect (ui.action_Quit, SIGNAL (triggered ()), qApp, SLOT (quit ()));
+  connect (ui.action_Quit, &QAction::triggered, qApp, &QApplication::quit);
 
   // torrent view
   myFilterModel.setSourceModel (&myModel);
-  connect (&myModel, SIGNAL (modelReset ()), this, SLOT (onModelReset ()));
-  connect (&myModel, SIGNAL (rowsRemoved (QModelIndex, int, int)), this, SLOT (onModelReset ()));
-  connect (&myModel, SIGNAL (rowsInserted (QModelIndex, int, int)), this, SLOT (onModelReset ()));
-  connect (&myModel, SIGNAL (dataChanged (QModelIndex, QModelIndex)), this, SLOT (refreshTrayIconSoon ()));
+  connect (&myModel, &TorrentModel::modelReset, this, &MainWindow::onModelReset);
+  connect (&myModel, &TorrentModel::rowsRemoved, [this] {onModelReset ();});
+  connect (&myModel, &TorrentModel::rowsInserted, [this] {onModelReset ();});
+  connect (&myModel, &TorrentModel::dataChanged, [this] {refreshTrayIconSoon ();});
 
   ui.listView->setModel (&myFilterModel);
-  connect (ui.listView->selectionModel (), SIGNAL (selectionChanged (QItemSelection, QItemSelection)), this, SLOT (refreshActionSensitivitySoon ()));
+  connect (ui.listView->selectionModel (), &QItemSelectionModel::selectionChanged, [this]{refreshActionSensitivitySoon ();});
 
   const QPair<QAction *, SortMode::SortType> sortModes[] =
     {
@@ -222,12 +223,14 @@ MainWindow::MainWindow (Session& session, Prefs& prefs, TorrentModel& model, boo
       actionGroup->addAction (mode.first);
     }
 
-  connect (actionGroup, &QActionGroup::triggered, [this](QAction *action){  myPrefs.set (Prefs::SORT_MODE, SortMode (action->property (SORT_MODE_KEY).toInt ()));});
+  connect (actionGroup, &QActionGroup::triggered, [this](QAction *action){
+      myPrefs.set (Prefs::SORT_MODE, SortMode (action->property (SORT_MODE_KEY).toInt ()));
+  });
 
   myAltSpeedAction = new QAction (tr ("Speed Limits"), this);
   myAltSpeedAction->setIcon (ui.altSpeedButton->icon ());
   myAltSpeedAction->setCheckable (true);
-  connect (myAltSpeedAction, SIGNAL (triggered ()), this, SLOT (toggleSpeedMode ()));
+  connect (myAltSpeedAction, &QAction::triggered, this, &MainWindow::toggleSpeedMode);
 
   QMenu * menu = new QMenu (this);
   menu->addAction (ui.action_OpenFile);
@@ -245,10 +248,9 @@ MainWindow::MainWindow (Session& session, Prefs& prefs, TorrentModel& model, boo
   myTrayIcon.setContextMenu (menu);
   myTrayIcon.setIcon (QIcon::fromTheme (QStringLiteral ("transmission-tray-icon"), qApp->windowIcon ()));
 
-  connect (&myPrefs, SIGNAL (changed (int)), this, SLOT (refreshPref (int)));
-  connect (ui.action_ShowMainWindow, SIGNAL (triggered (bool)), this, SLOT (toggleWindows (bool)));
-  connect (&myTrayIcon, SIGNAL (activated (QSystemTrayIcon::ActivationReason)),
-           this, SLOT (trayActivated (QSystemTrayIcon::ActivationReason)));
+  connect (&myPrefs, &Prefs::changed, this, &MainWindow::refreshPref);
+  connect (ui.action_ShowMainWindow, &QAction::triggered, this, &MainWindow::toggleWindows);
+  connect (&myTrayIcon, &QSystemTrayIcon::activated, this, &MainWindow::trayActivated);
 
   toggleWindows (!minimized);
   ui.action_TrayIcon->setChecked (minimized || prefs.getBool (Prefs::SHOW_TRAY_ICON));
@@ -256,11 +258,11 @@ MainWindow::MainWindow (Session& session, Prefs& prefs, TorrentModel& model, boo
   initStatusBar ();
   ui.verticalLayout->insertWidget (0, myFilterBar = new FilterBar (myPrefs, myModel, myFilterModel));
 
-  connect (&myModel, SIGNAL (rowsInserted (QModelIndex, int, int)), SLOT (refreshTorrentViewHeader ()));
-  connect (&myModel, SIGNAL (rowsRemoved (QModelIndex, int, int)), SLOT (refreshTorrentViewHeader ()));
-  connect (&myFilterModel, SIGNAL (rowsInserted (QModelIndex, int, int)), SLOT (refreshTorrentViewHeader ()));
-  connect (&myFilterModel, SIGNAL (rowsRemoved (QModelIndex, int, int)), SLOT (refreshTorrentViewHeader ()));
-  connect (ui.listView, SIGNAL (headerDoubleClicked ()), myFilterBar, SLOT (clear ()));
+  connect (&myModel, &TorrentModel::rowsInserted, [this] {refreshTorrentViewHeader ();});
+  connect (&myModel, &TorrentModel::rowsRemoved, [this] {refreshTorrentViewHeader ();});
+  connect (&myFilterModel, &TorrentFilter::rowsInserted, [this] {refreshTorrentViewHeader ();});
+  connect (&myFilterModel, &TorrentFilter::rowsRemoved, [this] {refreshTorrentViewHeader ();});
+  connect (ui.listView, &TorrentView::headerDoubleClicked, myFilterBar, &FilterBar::clear);
 
   QList<int> initKeys = { Prefs::MAIN_WINDOW_X,
            Prefs::SHOW_TRAY_ICON,
