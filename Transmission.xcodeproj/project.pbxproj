@@ -3331,8 +3331,8 @@
 					"-DHAVE_LIBGEN",
 					"-DHAVE_STRCASECMP",
 					"-DHAVE_ZLIB",
+					"-DHAVE_ICONV",
 				);
-				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				PRODUCT_NAME = transmission;
 			};
 			name = Debug;
@@ -3496,6 +3496,7 @@
 					"-DHAVE_LIBGEN",
 					"-DHAVE_STRCASECMP",
 					"-DHAVE_ZLIB",
+					"-DHAVE_ICONV",
 				);
 				PRODUCT_NAME = transmission;
 			};
@@ -3709,6 +3710,7 @@
 					"-DHAVE_LIBGEN",
 					"-DHAVE_STRCASECMP",
 					"-DHAVE_ZLIB",
+					"-DHAVE_ICONV",
 				);
 				PRODUCT_NAME = transmission;
 			};

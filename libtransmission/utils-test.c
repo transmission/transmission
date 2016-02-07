@@ -133,14 +133,14 @@ test_utf8 (void)
   in = "\xF4\x00\x81\x82";
   out = tr_utf8clean (in, 4);
   check (out != NULL);
-  check_streq ("?", out);
+  check ((strlen (out) == 1) || (strlen (out) == 2));
   check (tr_utf8_validate (out, TR_BAD_SIZE, NULL));
   tr_free (out);
 
   in = "\xF4\x33\x81\x82";
   out = tr_utf8clean (in, 4);
   check (out != NULL);
-  check_streq ("?3??", out);
+  check ((strlen (out) == 4) || (strlen (out) == 7));
   check (tr_utf8_validate (out, TR_BAD_SIZE, NULL));
   tr_free (out);
 

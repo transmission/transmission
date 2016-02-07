@@ -13,7 +13,6 @@
 
 #if defined (XCODE_BUILD)
  #define HAVE_GETPAGESIZE
- #define HAVE_ICONV_OPEN
  #define HAVE_VALLOC
 #endif
 
@@ -37,7 +36,7 @@
  #include <unistd.h> /* getpagesize () */
 #endif
 
-#ifdef HAVE_ICONV_OPEN
+#ifdef HAVE_ICONV
  #include <iconv.h>
 #endif
 
@@ -1026,7 +1025,7 @@ to_utf8 (const char * in, size_t inlen)
 {
   char * ret = NULL;
 
-#ifdef HAVE_ICONV_OPEN
+#ifdef HAVE_ICONV
   int i;
   const char * encodings[] = { "CURRENT", "ISO-8859-15" };
   const int encoding_count = sizeof (encodings) / sizeof (encodings[1]);

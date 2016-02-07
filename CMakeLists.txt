@@ -154,9 +154,7 @@ find_package(PkgConfig QUIET)
 
 find_package(CURL ${CURL_MINIMUM} REQUIRED)
 
-if(UNIX)
-    find_package(ICONV REQUIRED)
-endif()
+find_package(ICONV)
 
 if(WITH_CRYPTO STREQUAL "AUTO" OR WITH_CRYPTO STREQUAL "openssl")
     tr_get_required_flag(WITH_CRYPTO OPENSSL_IS_REQUIRED)
@@ -490,7 +488,6 @@ set(NEEDED_FUNCTIONS
     getmntent
     getpagesize
     htonll
-    iconv_open
     localtime_r
     memmem
     mkdtemp
@@ -514,6 +511,10 @@ foreach(F ${NEEDED_FUNCTIONS})
         add_definitions(-DHAVE_${F_ID})
     endif()
 endforeach()
+
+if(ICONV_FOUND)
+    add_definitions(-DHAVE_ICONV_OPEN)
+endif()
 
 # if(MINGW)
 #     check_function_exists(__mingw_printf HAVE_MINGW_PRINTF)
