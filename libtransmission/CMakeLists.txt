@@ -200,7 +200,6 @@ include_directories(
     ${ZLIB_INCLUDE_DIRS}
     ${CRYPTO_INCLUDE_DIRS}
     ${CURL_INCLUDE_DIRS}
-    ${ICONV_INCLUDE_DIRS}
     ${EVENT2_INCLUDE_DIRS}
     ${NATPMP_INCLUDE_DIRS}
     ${MINIUPNPC_INCLUDE_DIRS}
@@ -208,6 +207,10 @@ include_directories(
     ${UTP_INCLUDE_DIRS}
     ${B64_INCLUDE_DIRS}
 )
+
+if(ICONV_FOUND)
+    include_directories(${ICONV_INCLUDE_DIRS})
+endif()
 
 if(ENABLE_UTP)
     include_directories(${TP_TOP}/libutp)
@@ -233,7 +236,6 @@ target_link_libraries(${TR_NAME}
     ${ZLIB_LIBRARIES}
     ${CRYPTO_LIBRARIES}
     ${CURL_LIBRARIES}
-    ${ICONV_LIBRARIES}
     ${EVENT2_LIBRARIES}
     ${NATPMP_LIBRARIES}
     ${MINIUPNPC_LIBRARIES}
@@ -243,6 +245,10 @@ target_link_libraries(${TR_NAME}
     ${LIBINTL_LIBRARY}
     ${LIBM_LIBRARY}
 )
+
+if(ICONV_FOUND)
+    target_link_libraries(${TR_NAME} ${ICONV_LIBRARIES})
+endif()
 
 if(WIN32)
     target_link_libraries(${TR_NAME} iphlpapi ws2_32)
