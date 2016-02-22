@@ -28,15 +28,9 @@ AboutDialog::AboutDialog (QWidget * parent):
   ui.iconLabel->setPixmap (qApp->windowIcon ().pixmap (48));
   ui.titleLabel->setText (tr ("<b style='font-size:x-large'>Transmission %1</b>").arg (QStringLiteral(LONG_VERSION_STRING)));
 
-  QPushButton * b;
-
-  b = ui.dialogButtons->addButton (tr ("C&redits"), QDialogButtonBox::ActionRole);
+  QPushButton * b = ui.dialogButtons->addButton (tr ("C&redits"), QDialogButtonBox::ActionRole);
   connect (b, &QPushButton::clicked, [this]{
-	  QMessageBox::about (
-		this,
-		tr ("Credits"),
-		QString::fromUtf8 ("Jordan Lee (Backend; Daemon; GTK+; Qt)\n"
-							"Michell Livingston (OS X)\n"));
+	  QMessageBox::about (this, tr ("Credits"), QStringLiteral("Jordan Lee (Backend; Daemon; GTK+; Qt)\n Michell Livingston (OS X)\n"));
   });
 
   b = ui.dialogButtons->addButton (tr ("&License"), QDialogButtonBox::ActionRole);
