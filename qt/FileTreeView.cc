@@ -7,7 +7,6 @@
  * $Id$
  */
 
-#include <algorithm>
 #include <cassert>
 
 #include <QHeaderView>
@@ -15,8 +14,6 @@
 #include <QQueue>
 #include <QResizeEvent>
 #include <QSortFilterProxyModel>
-
-#include <libtransmission/transmission.h> // priorities
 
 #include "FileTreeDelegate.h"
 #include "FileTreeItem.h"

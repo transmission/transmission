@@ -7,11 +7,6 @@
  * $Id$
  */
 
-#include <algorithm> // std::sort()
-
-#include <QUrl>
-
-#include "Application.h" // Application
 #include "TorrentModel.h"
 #include "TrackerModel.h"
 

@@ -12,28 +12,11 @@
  #include <shellapi.h>
 #endif
 
-#include <QAbstractItemView>
 #include <QApplication>
-#include <QColor>
-#include <QDataStream>
-#include <QFile>
-#include <QFileDialog>
 #include <QFileInfo>
 #include <QHeaderView>
-#include <QIcon>
-#include <QInputDialog>
-#include <QObject>
-#include <QPixmapCache>
-#include <QSet>
-#include <QStyle>
 
-#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
 #include <QMimeDatabase>
-#include <QMimeType>
-#endif
-
-#include <libtransmission/transmission.h>
-#include <libtransmission/utils.h> // tr_formatter
 
 #include "Utils.h"
 

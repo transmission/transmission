@@ -10,14 +10,10 @@
 #ifndef QTR_FILE_TREE_ITEM_H
 #define QTR_FILE_TREE_ITEM_H
 
-#include <cstdint>
-
 #include <QCoreApplication>
 #include <QHash>
 #include <QList>
 #include <QSet>
-#include <QString>
-#include <QVariant>
 
 class FileTreeItem
 {

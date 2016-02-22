@@ -10,21 +10,15 @@
 #include <cassert>
 #include <iostream>
 
-#include <QApplication>
 #include <QFileIconProvider>
-#include <QFileInfo>
-#include <QSet>
-#include <QString>
 #include <QStyle>
 #include <QUrl>
-#include <QVariant>
 
-#include <libtransmission/transmission.h>
-#include <libtransmission/utils.h> /* tr_new0, tr_strdup */
 #include <libtransmission/variant.h>
 
 #include "Application.h"
 #include "Prefs.h"
+#include "CustomVariantType.h"
 #include "Torrent.h"
 #include "Utils.h"
 

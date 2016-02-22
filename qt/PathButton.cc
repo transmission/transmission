@@ -8,11 +8,8 @@
  */
 
 #include <QApplication>
-#include <QDir>
 #include <QFileDialog>
 #include <QFileIconProvider>
-#include <QFileInfo>
-#include <QStyle>
 #include <QStyleOptionToolButton>
 #include <QStylePainter>
 

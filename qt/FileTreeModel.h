@@ -10,10 +10,7 @@
 #ifndef QTR_FILE_TREE_MODEL_H
 #define QTR_FILE_TREE_MODEL_H
 
-#include <cstdint>
-
 #include <QAbstractItemModel>
-#include <QList>
 #include <QMap>
 #include <QSet>
 

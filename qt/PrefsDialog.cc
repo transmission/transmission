@@ -9,45 +9,17 @@
 
 #ifdef _WIN32
  #include <winsock2.h> // FD_SETSIZE
-#else
- #include <sys/select.h> // FD_SETSIZE
 #endif
 
 #include <cassert>
 
-#include <QCheckBox>
-#include <QComboBox>
-#include <QCoreApplication>
-#include <QDialogButtonBox>
-#include <QDoubleSpinBox>
-#include <QFileIconProvider>
 #include <QFileInfo>
-#include <QHBoxLayout>
-#include <QIcon>
-#include <QLabel>
-#include <QLineEdit>
-#include <QList>
 #include <QMessageBox>
-#include <QPushButton>
-#include <QSpinBox>
-#include <QStyle>
-#include <QTabWidget>
-#include <QTime>
-#include <QTimeEdit>
-#include <QTimer>
-#include <QVBoxLayout>
 
 #include "ColumnResizer.h"
-#include "FreeSpaceLabel.h"
 #include "Formatter.h"
-#include "Prefs.h"
 #include "PrefsDialog.h"
 #include "Session.h"
-#include "Utils.h"
-
-/***
-****
-***/
 
 namespace
 {

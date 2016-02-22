@@ -10,8 +10,6 @@
 #ifndef QTR_DETAILS_DIALOG_H
 #define QTR_DETAILS_DIALOG_H
 
-#include <QString>
-#include <QMap>
 #include <QSet>
 #include <QTimer>
 

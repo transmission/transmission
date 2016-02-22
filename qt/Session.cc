@@ -11,27 +11,18 @@
 #include <iostream>
 
 #include <QApplication>
-#include <QByteArray>
 #include <QClipboard>
-#include <QCoreApplication>
-#include <QDebug>
 #include <QDesktopServices>
-#include <QFile>
 #include <QFileInfo>
 #include <QMessageBox>
-#include <QStyle>
-#include <QTextStream>
 
-#include <libtransmission/transmission.h>
 #include <libtransmission/utils.h> // tr_free
-#include <libtransmission/variant.h>
 
 #include "AddData.h"
 #include "Prefs.h"
 #include "Session.h"
-#include "SessionDialog.h"
 #include "Torrent.h"
-#include "Utils.h"
+#include "CustomVariantType.h"
 
 namespace
 {

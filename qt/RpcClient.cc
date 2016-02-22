@@ -7,17 +7,9 @@
  * $Id$
  */
 
-#include <iostream>
-
 #include <QApplication>
 #include <QHostAddress>
-#include <QNetworkAccessManager>
-#include <QNetworkReply>
-#include <QNetworkRequest>
 
-#include <event2/buffer.h>
-
-#include <libtransmission/transmission.h>
 #include <libtransmission/rpcimpl.h>
 #include <libtransmission/utils.h> // tr_free
 #include <libtransmission/version.h> // LONG_VERSION_STRING

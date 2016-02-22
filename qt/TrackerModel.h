@@ -11,8 +11,6 @@
 #define QTR_TRACKER_MODEL_H
 
 #include <QAbstractListModel>
-#include <QSet>
-#include <QVector>
 
 #include "Torrent.h"
 

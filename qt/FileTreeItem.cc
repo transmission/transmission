@@ -7,7 +7,6 @@
  * $Id$
  */
 
-#include <algorithm>
 #include <cassert>
 
 #include <QApplication>

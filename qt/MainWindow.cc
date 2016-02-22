@@ -10,36 +10,26 @@
 #include <cassert>
 
 #include <QtGui>
-#include <QCheckBox>
-#include <QIcon>
 #include <QProxyStyle>
-#include <QLabel>
 #include <QFileDialog>
 #include <QMessageBox>
 
-#include <libtransmission/transmission.h>
 #include <libtransmission/version.h>
 
 #include "AboutDialog.h"
-#include "AddData.h"
 #include "Application.h"
 #include "DetailsDialog.h"
 #include "FilterBar.h"
-#include "Filters.h"
 #include "Formatter.h"
 #include "MainWindow.h"
 #include "MakeDialog.h"
 #include "OptionsDialog.h"
-#include "Prefs.h"
 #include "PrefsDialog.h"
 #include "RelocateDialog.h"
 #include "Session.h"
 #include "SessionDialog.h"
-#include "Speed.h"
 #include "StatsDialog.h"
-#include "TorrentDelegate.h"
 #include "TorrentDelegateMin.h"
-#include "TorrentFilter.h"
 #include "TorrentModel.h"
 #include "Utils.h"
 

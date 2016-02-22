@@ -16,8 +16,6 @@
 
 #include "ui_MakeDialog.h"
 
-class QAbstractButton;
-
 class Session;
 
 extern "C"

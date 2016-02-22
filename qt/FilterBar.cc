@@ -13,8 +13,6 @@
 #include <QLineEdit>
 
 #include "Application.h"
-#include "FaviconCache.h"
-#include "Filters.h"
 #include "FilterBar.h"
 #include "FilterBarComboBox.h"
 #include "FilterBarComboBoxDelegate.h"

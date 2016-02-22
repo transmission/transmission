@@ -12,17 +12,11 @@
 
 #include <QObject>
 #include <QIcon>
-#include <QMetaType>
 #include <QDateTime>
-#include <QString>
-#include <QStringList>
-#include <QList>
-#include <QVariant>
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/quark.h>
 
-#include "CustomVariantType.h"
 #include "Speed.h"
 
 #ifdef ERROR

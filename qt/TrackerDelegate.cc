@@ -11,21 +11,14 @@
 #include <QApplication>
 #include <QPainter>
 #include <QPixmap>
-#include <QTextDocument>
 
-#include <libtransmission/transmission.h>
 #include <libtransmission/utils.h>
 
 #include "FaviconCache.h"
 #include "Formatter.h"
-#include "Torrent.h"
 #include "TrackerDelegate.h"
 #include "TrackerModel.h"
 #include "Utils.h"
-
-/***
-****
-***/
 
 namespace
 {

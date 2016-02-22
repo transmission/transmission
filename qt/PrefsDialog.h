@@ -11,7 +11,6 @@
 #define QTR_PREFS_DIALOG_H
 
 #include <QMap>
-#include <QSet>
 
 #include "BaseDialog.h"
 #include "Prefs.h"

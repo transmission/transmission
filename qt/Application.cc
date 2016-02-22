@@ -7,15 +7,11 @@
  * $Id$
  */
 
-#include <ctime>
 #include <iostream>
 
-#include <QIcon>
 #include <QLibraryInfo>
 #include <QMessageBox>
 #include <QProcess>
-#include <QRect>
-#include <QSystemTrayIcon>
 
 #ifdef QT_DBUS_LIB
   #include <QDBusConnection>
@@ -23,12 +19,9 @@
   #include <QDBusReply>
 #endif
 
-#include <libtransmission/transmission.h>
 #include <libtransmission/tr-getopt.h>
-#include <libtransmission/utils.h>
 #include <libtransmission/version.h>
 
-#include "AddData.h"
 #include "Application.h"
 #include "Formatter.h"
 #include "InteropHelper.h"

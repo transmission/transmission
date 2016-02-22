@@ -8,7 +8,6 @@
  */
 
 #include <QDir>
-#include <QFileInfo>
 #include <QMimeData>
 #include <QPushButton>
 #include <QTimer>
@@ -21,7 +20,6 @@
 #include "Formatter.h"
 #include "MakeDialog.h"
 #include "Session.h"
-#include "Utils.h"
 
 #include "ui_MakeProgressDialog.h"
 

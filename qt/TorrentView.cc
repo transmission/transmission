@@ -8,7 +8,6 @@
  */
 
 #include <QApplication>
-#include <QStyleOptionHeader>
 #include <QStylePainter>
 
 #include "TorrentView.h"

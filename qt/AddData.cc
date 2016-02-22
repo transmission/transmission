@@ -7,10 +7,8 @@
  * $Id$
  */
 
-#include <QFile>
 #include <QDir>
 
-#include <libtransmission/transmission.h>
 #include <libtransmission/crypto-utils.h> // tr_base64_encode()
 
 #include "AddData.h"

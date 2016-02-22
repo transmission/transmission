@@ -12,15 +12,9 @@
 
 #include <QCryptographicHash>
 #include <QDir>
-#include <QFile>
-#include <QMap>
-#include <QString>
-#include <QTimer>
-#include <QVector>
 
 #include "AddData.h" // AddData
 #include "BaseDialog.h"
-#include "Torrent.h" // FileList
 
 #include "ui_OptionsDialog.h"
 

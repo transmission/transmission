@@ -7,24 +7,12 @@
  * $Id$
  */
 
-#include <QFileInfo>
 #include <QPushButton>
 
-#include <libtransmission/transmission.h>
-#include <libtransmission/utils.h> /* mime64 */
-#include <libtransmission/variant.h>
-
-#include "AddData.h"
-#include "FreeSpaceLabel.h"
 #include "OptionsDialog.h"
 #include "Prefs.h"
 #include "Session.h"
-#include "Torrent.h"
 #include "Utils.h"
-
-/***
-****
-***/
 
 OptionsDialog::OptionsDialog (Session& session, const Prefs& prefs, const AddData& addme, QWidget * parent):
   BaseDialog (parent),

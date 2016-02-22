@@ -10,7 +10,6 @@
 #ifndef QTR_FILTERS_H
 #define QTR_FILTERS_H
 
-#include <QMetaType>
 #include <QString>
 #include <QVariant>
 

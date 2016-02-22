@@ -7,14 +7,11 @@
  * $Id$
  */
 
-#include <iostream>
+#include <QVariant>
 
-#include <libtransmission/transmission.h>
 #include <libtransmission/variant.h>
 
-#include "Speed.h"
 #include "Torrent.h"
-#include "TorrentDelegate.h"
 #include "TorrentModel.h"
 
 void

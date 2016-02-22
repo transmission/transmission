@@ -11,9 +11,7 @@
 #define QTR_TORRENT_MODEL_H
 
 #include <QAbstractListModel>
-#include <QMap>
 #include <QSet>
-#include <QVector>
 
 class Prefs;
 class Speed;

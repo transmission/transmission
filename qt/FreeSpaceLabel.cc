@@ -9,9 +9,6 @@
 
 #include <QDir>
 
-#include <libtransmission/transmission.h>
-#include <libtransmission/variant.h>
-
 #include "Formatter.h"
 #include "FreeSpaceLabel.h"
 #include "Session.h"
@@ -91,7 +88,7 @@ FreeSpaceLabel::onSessionExecuted (int64_t tag, const QString& result, tr_varian
   if (tr_variantDictFindInt (arguments, TR_KEY_size_bytes, &bytes) && bytes >= 0)
     setText (tr("%1 free").arg(Formatter::sizeToString (bytes)));
   else
-    setText (QString ());
+    clear();
 
   // update the tooltip
   size_t len = 0;

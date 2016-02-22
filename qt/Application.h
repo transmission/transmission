@@ -11,7 +11,6 @@
 #define QTR_APPLICATION_H
 
 #include <QApplication>
-#include <QSet>
 #include <QTimer>
 #include <QTranslator>
 

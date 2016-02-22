@@ -11,10 +11,6 @@
 #include "Session.h"
 #include "SessionDialog.h"
 
-/***
-****
-***/
-
 void
 SessionDialog::accept ()
 {
@@ -40,10 +36,6 @@ SessionDialog::resensitize ()
   foreach (QWidget * const w, myAuthWidgets)
     w->setEnabled (isRemote && useAuth);
 }
-
-/***
-****
-***/
 
 SessionDialog::SessionDialog (Session& session, Prefs& prefs, QWidget * parent):
   BaseDialog (parent),

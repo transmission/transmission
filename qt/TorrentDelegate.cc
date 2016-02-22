@@ -8,14 +8,7 @@
  */
 
 #include <QApplication>
-#include <QFont>
-#include <QFontMetrics>
-#include <QIcon>
-#include <QModelIndex>
 #include <QPainter>
-#include <QPixmap>
-#include <QPixmapCache>
-#include <QStyleOptionProgressBar>
 
 #include "Formatter.h"
 #include "Torrent.h"

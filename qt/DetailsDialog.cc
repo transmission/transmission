@@ -8,28 +8,13 @@
  */
 
 #include <cassert>
-#include <climits> /* INT_MAX */
-#include <ctime>
 
-#include <QDateTime>
 #include <QDesktopServices>
-#include <QEvent>
-#include <QFont>
-#include <QFontMetrics>
-#include <QHeaderView>
 #include <QHostAddress>
 #include <QInputDialog>
-#include <QItemSelectionModel>
-#include <QLabel>
-#include <QList>
-#include <QMap>
 #include <QMessageBox>
-#include <QResizeEvent>
-#include <QStringList>
-#include <QStyle>
-#include <QTreeWidgetItem>
+#include <QFile>
 
-#include <libtransmission/transmission.h>
 #include <libtransmission/utils.h> // tr_getRatio ()
 
 #include "ColumnResizer.h"
@@ -37,8 +22,6 @@
 #include "Formatter.h"
 #include "Prefs.h"
 #include "Session.h"
-#include "SqueezeLabel.h"
-#include "Torrent.h"
 #include "TorrentModel.h"
 #include "TrackerDelegate.h"
 #include "TrackerModel.h"
@@ -848,6 +831,7 @@ DetailsDialog::refresh ()
   ///  Peers tab
   ///
 
+  // TODO: Transform this into a TreeModel?
   QMap<QString,QTreeWidgetItem*> peers2;
   QList<QTreeWidgetItem*> newItems;
   foreach (const Torrent * const t, torrents)
@@ -989,6 +973,7 @@ DetailsDialog::onSpinBoxEditingFinished ()
   const QObject * spin = sender ();
   const tr_quark key = spin->property (PREF_KEY).toInt ();
   const QDoubleSpinBox * d = qobject_cast<const QDoubleSpinBox*> (spin);
+
   if (d)
     mySession.torrentSet (myIds, key, d->value ());
   else
@@ -1075,10 +1060,9 @@ DetailsDialog::onAddTrackerClicked ()
         {
           QMessageBox::warning (this, tr ("Error"), tr ("Tracker already exists."));
         }
-        else
+      else
         {
-          QStringList urls;
-          urls << url;
+          QStringList urls(url);
           mySession.torrentSet (ids, TR_KEY_trackerAdd, urls);
           getNewData ();
         }
@@ -1111,9 +1095,7 @@ DetailsDialog::onEditTrackerClicked ()
     }
     else
     {
-      QSet<int> ids;
-      ids << trackerInfo.torrentId;
-
+      QSet<int> ids = { trackerInfo.torrentId };
       const QPair<int,QString> idUrl = qMakePair (trackerInfo.st.id, newval);
 
       mySession.torrentSet (ids, TR_KEY_trackerReplace, idUrl);
@@ -1137,8 +1119,7 @@ DetailsDialog::onRemoveTrackerClicked ()
   // batch all of a tracker's torrents into one command
   foreach (const int id, torrentId_to_trackerIds.uniqueKeys ())
     {
-      QSet<int> ids;
-      ids << id;
+      QSet<int> ids = {id};
       mySession.torrentSet (ids, TR_KEY_trackerRemove, torrentId_to_trackerIds.values (id));
     }
 
@@ -1237,8 +1218,7 @@ DetailsDialog::initTrackerTab ()
 void
 DetailsDialog::initPeersTab ()
 {
-  QStringList headers;
-  headers << QString () << tr ("Up") << tr ("Down") << tr ("%") << tr ("Status") << tr ("Address") << tr ("Client");
+  QStringList headers { tr ("Up"), tr ("Down"), tr ("%"), tr ("Status"), tr ("Address"), tr ("Client")};
 
   ui.peersView->setHeaderLabels (headers);
   ui.peersView->sortByColumn (COL_ADDRESS, Qt::AscendingOrder);

@@ -7,15 +7,12 @@
  * $Id$
  */
 
-#include <iostream>
-
 #include <QDir>
 #include <QFileSystemWatcher>
 #include <QTimer>
 
 #include <libtransmission/transmission.h>
 
-#include "Prefs.h"
 #include "TorrentModel.h"
 #include "WatchDir.h"
 

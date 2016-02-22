@@ -10,8 +10,6 @@
 #ifndef QTR_SESSION_DIALOG_H
 #define QTR_SESSION_DIALOG_H
 
-#include <QWidgetList>
-
 #include "BaseDialog.h"
 
 #include "ui_SessionDialog.h"

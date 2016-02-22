@@ -7,12 +7,9 @@
  * $Id$
  */
 
-#include <QApplication>
-#include <QIcon>
 #include <QMessageBox>
 #include <QPushButton>
 
-#include <libtransmission/transmission.h>
 #include <libtransmission/version.h>
 
 #include "AboutDialog.h"

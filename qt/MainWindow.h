@@ -10,17 +10,11 @@
 #ifndef QTR_MAIN_WINDOW_H
 #define QTR_MAIN_WINDOW_H
 
-#include <ctime>
-
 #include <QMainWindow>
 #include <QNetworkReply>
 #include <QPointer>
-#include <QSet>
 #include <QSystemTrayIcon>
-#include <QTimer>
-#include <QWidgetList>
 
-#include "Filters.h"
 #include "TorrentFilter.h"
 #include "ui_MainWindow.h"
 
@@ -41,10 +35,7 @@ class TorrentDelegateMin;
 class TorrentModel;
 class FilterBar;
 
-extern "C"
-{
-  struct tr_variant;
-}
+struct tr_variant;
 
 class MainWindow: public QMainWindow
 {

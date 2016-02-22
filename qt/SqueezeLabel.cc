@@ -40,7 +40,6 @@
 ****************************************************************************/
 
 #include <QPainter>
-#include <QStyle>
 #include <QStyleOption>
 
 #include "SqueezeLabel.h"

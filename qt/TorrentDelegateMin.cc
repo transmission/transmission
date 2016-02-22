@@ -8,22 +8,12 @@
  */
 
 #include <QApplication>
-#include <QBrush>
-#include <QFont>
-#include <QFontMetrics>
-#include <QIcon>
-#include <QModelIndex>
 #include <QPainter>
-#include <QPixmap>
-#include <QPixmapCache>
-#include <QStyleOptionProgressBar>
 
-#include <libtransmission/transmission.h>
 #include <libtransmission/utils.h>
 
 #include "Torrent.h"
 #include "TorrentDelegateMin.h"
-#include "TorrentModel.h"
 #include "Utils.h"
 
 enum

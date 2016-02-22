@@ -10,10 +10,7 @@
 #include <iostream>
 
 #include <QDBusConnection>
-#include <QDBusMessage>
 #include <QDBusReply>
-#include <QString>
-#include <QVariant>
 
 #include "DBusInteropHelper.h"
 #include "InteropObject.h"
