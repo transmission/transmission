@@ -513,7 +513,7 @@ foreach(F ${NEEDED_FUNCTIONS})
 endforeach()
 
 if(ICONV_FOUND)
-    add_definitions(-DHAVE_ICONV_OPEN)
+    add_definitions(-DHAVE_ICONV)
 endif()
 
 # if(MINGW)
