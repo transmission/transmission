@@ -43,6 +43,7 @@ class TorrentDelegate: public QStyledItemDelegate
     static QString shortTransferString (const Torrent& tor);
 
   protected:
+    void applyColor(const QColor& highlight, const QColor& base, const QColor& window) const;
     QStyleOptionProgressBar * myProgressBarStyle;
 
     static QColor blueBrush;

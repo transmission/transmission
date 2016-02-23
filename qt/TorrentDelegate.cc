@@ -419,6 +419,14 @@ TorrentDelegate::setProgressBarPercentDone (const QStyleOptionViewItem & option,
 }
 
 void
+TorrentDelegate::applyColor(const QColor& highlight, const QColor& base, const QColor& window) const
+{
+      myProgressBarStyle->palette.setBrush (QPalette::Highlight, highlight);
+      myProgressBarStyle->palette.setColor (QPalette::Base, base);
+      myProgressBarStyle->palette.setColor (QPalette::Window, window);
+}
+
+void
 TorrentDelegate::drawTorrent (QPainter                   * painter,
                               const QStyleOptionViewItem & option,
                               const Torrent              & tor) const
@@ -432,6 +440,7 @@ TorrentDelegate::drawTorrent (QPainter                   * painter,
   const bool isItemActive ((option.state & QStyle::State_Active) != 0);
 
   painter->save ();
+
 
   if (isItemSelected)
     {
@@ -486,12 +495,6 @@ TorrentDelegate::drawTorrent (QPainter                   * painter,
   painter->setFont (layout.progressFont);
   painter->drawText (layout.progressRect, Qt::AlignLeft | Qt::AlignVCenter, layout.progressText ());
   myProgressBarStyle->rect = layout.barRect;
-
-  auto applyColor = [this] (QColor highlight, QColor base, QColor window) {
-      myProgressBarStyle->palette.setBrush (QPalette::Highlight, highlight);
-      myProgressBarStyle->palette.setColor (QPalette::Base, base);
-      myProgressBarStyle->palette.setColor (QPalette::Window, window);
-  };
 
   if (tor.isDownloading())
       applyColor(blueBrush, blueBack, blueBack);
