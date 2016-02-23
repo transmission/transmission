@@ -379,14 +379,9 @@ Torrent::updateMimeIcon ()
 {
   const FileList& files (myFiles);
 
-  QIcon icon;
-
-  if (files.size () > 1)
-    icon = QFileIconProvider().icon (QFileIconProvider::Folder);
-  else if (files.size () == 1)
-    icon = Utils::guessMimeIcon (files.at(0).filename);
-  else
-    icon = QIcon ();
+  QIcon icon =  (files.size () > 1)  ? QFileIconProvider().icon (QFileIconProvider::Folder)
+             :  (files.size () == 1) ? Utils::guessMimeIcon (files.at(0).filename)
+             :  icon = QIcon ();
 
   setIcon (MIME_ICON, icon);
 }
