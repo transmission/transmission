@@ -249,57 +249,22 @@ Torrent::setIcon (int i, const QIcon& value)
   return true;
 }
 
-int
-Torrent::getInt (int i) const
-{
-  assert (0<=i && i<PROPERTY_COUNT);
-  assert (myProperties[i].type == QVariant::Int);
-
-  return myValues[i].toInt ();
+#define DEFINE_GETTER(TYPE, QTYPE, NAME) \
+TYPE Torrent::get##NAME(int i) const { \
+  assert (0<=i && i<PROPERTY_COUNT); \
+  assert (myProperties[i].type == QVariant::QTYPE); \
+  return myValues[i].to##QTYPE (); \
 }
 
-QDateTime
-Torrent::getDateTime (int i) const
-{
-  assert (0<=i && i<PROPERTY_COUNT);
-  assert (myProperties[i].type == QVariant::DateTime);
+DEFINE_GETTER(int, Int, Int)
+DEFINE_GETTER(QDateTime, DateTime, DateTime)
+DEFINE_GETTER(bool, Bool, Bool)
+DEFINE_GETTER(qulonglong, ULongLong, Size)
+DEFINE_GETTER(double, Double, Double)
+DEFINE_GETTER(QString, String, String)
 
-  return myValues[i].toDateTime ();
-}
+#undef GETTER
 
-bool
-Torrent::getBool (int i) const
-{
-  assert (0<=i && i<PROPERTY_COUNT);
-  assert (myProperties[i].type == QVariant::Bool);
-
-  return myValues[i].toBool ();
-}
-
-qulonglong
-Torrent::getSize (int i) const
-{
-    assert (0<=i && i<PROPERTY_COUNT);
-    assert (myProperties[i].type == QVariant::ULongLong);
-
-    return myValues[i].toULongLong ();
-}
-double
-Torrent::getDouble (int i) const
-{
-  assert (0<=i && i<PROPERTY_COUNT);
-  assert (myProperties[i].type == QVariant::Double);
-
-  return myValues[i].toDouble ();
-}
-QString
-Torrent::getString (int i) const
-{
-  assert (0<=i && i<PROPERTY_COUNT);
-  assert (myProperties[i].type == QVariant::String);
-
-  return myValues[i].toString ();
-}
 QIcon
 Torrent::getIcon (int i) const
 {
