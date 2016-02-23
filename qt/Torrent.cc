@@ -109,10 +109,9 @@ Torrent::buildKeyList (Group group)
 {
   KeyList keys;
 
-  if (keys.empty())
-    for (int i=0; i<PROPERTY_COUNT; ++i)
-      if (myProperties[i].id==ID || myProperties[i].group==group)
-        keys << myProperties[i].key;
+  for (int i=0; i<PROPERTY_COUNT; ++i)
+    if (myProperties[i].id==ID || myProperties[i].group==group)
+      keys << myProperties[i].key;
 
   return keys;
 }
@@ -120,11 +119,7 @@ Torrent::buildKeyList (Group group)
 const Torrent::KeyList&
 Torrent::getInfoKeys ()
 {
-  static KeyList keys;
-
-  if (keys.isEmpty())
-    keys << buildKeyList(INFO) << TR_KEY_files;
-
+  static KeyList keys = KeyList() << buildKeyList(INFO) << TR_KEY_files;
   return keys;
 }
 
@@ -138,11 +133,7 @@ Torrent::getStatKeys ()
 const Torrent::KeyList&
 Torrent::getExtraStatKeys()
 {
-  static KeyList keys;
-
-  if (keys.isEmpty())
-    keys << buildKeyList(STAT_EXTRA) << TR_KEY_fileStats;
-
+  static KeyList keys = KeyList() << buildKeyList(STAT_EXTRA) << TR_KEY_fileStats;
   return keys;
 }
 
