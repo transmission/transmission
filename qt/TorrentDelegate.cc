@@ -442,31 +442,20 @@ TorrentDelegate::drawTorrent (QPainter                   * painter,
       painter->fillRect(option.rect, option.palette.brush(cg, QPalette::Highlight));
     }
 
-  QIcon::Mode im;
-  if (isPaused || !isItemEnabled)
-    im = QIcon::Disabled;
-  else if (isItemSelected)
-    im = QIcon::Selected;
-  else
-    im = QIcon::Normal;
+  QIcon::Mode im = (isPaused || !isItemEnabled) ? QIcon::Disabled
+                 : (isItemSelected) ?  QIcon::Selected
+                 : QIcon::Normal;
 
-  QIcon::State qs;
-  if (isPaused)
-    qs = QIcon::Off;
-  else
-    qs = QIcon::On;
+  QIcon::State qs = (isPaused) ? QIcon::Off : QIcon::On;
 
   QPalette::ColorGroup cg = QPalette::Normal;
+
   if (isPaused || !isItemEnabled)
     cg = QPalette::Disabled;
   if (cg == QPalette::Normal && !isItemActive)
     cg = QPalette::Inactive;
 
-  QPalette::ColorRole cr;
-  if (isItemSelected)
-    cr = QPalette::HighlightedText;
-  else
-    cr = QPalette::Text;
+  QPalette::ColorRole cr = (isItemSelected) ? QPalette::HighlightedText : QPalette::Text;
 
   QStyle::State progressBarState (option.state);
   if (isPaused)
@@ -497,24 +486,20 @@ TorrentDelegate::drawTorrent (QPainter                   * painter,
   painter->setFont (layout.progressFont);
   painter->drawText (layout.progressRect, Qt::AlignLeft | Qt::AlignVCenter, layout.progressText ());
   myProgressBarStyle->rect = layout.barRect;
+
+  auto applyColor = [this] (QColor highlight, QColor base, QColor window) {
+      myProgressBarStyle->palette.setBrush (QPalette::Highlight, highlight);
+      myProgressBarStyle->palette.setColor (QPalette::Base, base);
+      myProgressBarStyle->palette.setColor (QPalette::Window, window);
+  };
+
   if (tor.isDownloading())
-    {
-      myProgressBarStyle->palette.setBrush (QPalette::Highlight, blueBrush);
-      myProgressBarStyle->palette.setColor (QPalette::Base, blueBack);
-      myProgressBarStyle->palette.setColor (QPalette::Window, blueBack);
-    }
+      applyColor(blueBrush, blueBack, blueBack);
   else if (tor.isSeeding())
-    {
-      myProgressBarStyle->palette.setBrush (QPalette::Highlight, greenBrush);
-      myProgressBarStyle->palette.setColor (QPalette::Base, greenBack);
-      myProgressBarStyle->palette.setColor (QPalette::Window, greenBack);
-    }
+      applyColor(greenBrush, greenBack, greenBack);
   else
-    {
-      myProgressBarStyle->palette.setBrush (QPalette::Highlight, silverBrush);
-      myProgressBarStyle->palette.setColor (QPalette::Base, silverBack);
-      myProgressBarStyle->palette.setColor (QPalette::Window, silverBack);
-    }
+      applyColor(silverBrush, silverBack, silverBack);
+
   myProgressBarStyle->state = progressBarState;
   setProgressBarPercentDone (option, tor);
 
