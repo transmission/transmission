@@ -35,7 +35,6 @@ AddData::set (const QString& key)
       QFile file (key);
       file.open (QIODevice::ReadOnly);
       metainfo = file.readAll ();
-      file.close ();
     }
   else if (Utils::isHexHashcode (key))
     {
