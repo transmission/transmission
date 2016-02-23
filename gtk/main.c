@@ -59,8 +59,6 @@
 #define MY_CONFIG_NAME "transmission"
 #define MY_READABLE_NAME "transmission-gtk"
 
-#define TR_RESOURCE_PATH "/com/transmissionbt/transmission/"
-
 #define SHOW_LICENSE
 static const char * LICENSE =
   "Copyright 2005-2014. All code is copyrighted by the respective authors.\n"

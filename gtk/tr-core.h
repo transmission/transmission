@@ -35,6 +35,8 @@ G_BEGIN_DECLS
 #define TR_CORE_TYPE (tr_core_get_type ())
 #define TR_CORE(o)(G_TYPE_CHECK_INSTANCE_CAST ((o), TR_CORE_TYPE, TrCore))
 
+#define TR_RESOURCE_PATH "/com/transmissionbt/transmission/"
+
 typedef struct _TrCore
 {
     GObject parent;

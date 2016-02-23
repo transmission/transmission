@@ -34,12 +34,6 @@ noinst_HEADERS = \
     filter.h \
     hig.h \
     icons.h \
-    icon-lock.h \
-    icon-logo-24.h \
-    icon-logo-48.h \
-    icon-ratio.h \
-    icon-turtle.h \
-    icon-utilities.h \
     makemeta-ui.h \
     msgwin.h \
     notify.h \

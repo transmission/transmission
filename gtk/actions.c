@@ -19,13 +19,6 @@
 #include "tr-core.h"
 #include "tr-prefs.h"
 
-#include "icon-lock.h"
-#include "icon-logo-24.h"
-#include "icon-logo-48.h"
-#include "icon-ratio.h"
-#include "icon-turtle.h"
-#include "icon-utilities.h"
-
 #define UNUSED G_GNUC_UNUSED
 
 static TrCore * myCore = NULL;
@@ -131,21 +124,21 @@ static GtkActionEntry entries[] =
 
 typedef struct
 {
-    const guint8*   raw;
-    const char *    name;
+    const char * filename;
+    const char * name;
 }
 BuiltinIconInfo;
 
 static const BuiltinIconInfo my_fallback_icons[] =
 {
-    { tr_icon_logo_48,  WINDOW_ICON          },
-    { tr_icon_logo_24,  TRAY_ICON            },
-    { tr_icon_logo_48,  NOTIFICATION_ICON    },
-    { tr_icon_lock,     "transmission-lock"  },
-    { utilities_icon,   "utilities"          },
-    { blue_turtle,      "alt-speed-on"       },
-    { grey_turtle,      "alt-speed-off"      },
-    { ratio_icon,       "ratio"              }
+    { "logo-48",     WINDOW_ICON         },
+    { "logo-24",     TRAY_ICON           },
+    { "logo-48",     NOTIFICATION_ICON   },
+    { "lock",        "transmission-lock" },
+    { "utilities",   "utilities"         },
+    { "turtle-blue", "alt-speed-on"      },
+    { "turtle-grey", "alt-speed-off"     },
+    { "ratio",       "ratio"             }
 };
 
 static void
@@ -165,8 +158,11 @@ register_my_icons (void)
       if (!gtk_icon_theme_has_icon (theme, name))
         {
           GdkPixbuf * p;
+          gchar * resource_path = g_strdup_printf (TR_RESOURCE_PATH "icons/%s.png", my_fallback_icons[i].filename);
 
-          p = gdk_pixbuf_new_from_inline (-1, my_fallback_icons[i].raw, FALSE, NULL);
+          p = gdk_pixbuf_new_from_resource (resource_path, NULL);
+
+          g_free (resource_path);
 
           if (p != NULL)
             {

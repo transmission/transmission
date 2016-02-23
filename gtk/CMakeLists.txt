@@ -35,6 +35,13 @@ add_custom_command(
         --c-name transmission
         transmission.gresource.xml
     DEPENDS
+        icons/hicolor_apps_24x24_transmission.png
+        icons/hicolor_apps_48x48_transmission.png
+        icons/lock.png
+        icons/ratio.png
+        icons/turtle-blue.png
+        icons/turtle-grey.png
+        icons/utilities.png
         transmission.gresource.xml
         transmission-ui.xml
     WORKING_DIRECTORY
@@ -87,13 +94,7 @@ set(${PROJECT_NAME}_HEADERS
     file-list.h
     filter.h
     hig.h
-    icon-lock.h
-    icon-logo-24.h
-    icon-logo-48.h
-    icon-ratio.h
     icons.h
-    icon-turtle.h
-    icon-utilities.h
     makemeta-ui.h
     msgwin.h
     notify.h
