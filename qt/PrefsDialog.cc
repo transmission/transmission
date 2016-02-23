@@ -524,17 +524,18 @@ PrefsDialog::PrefsDialog (Session& session, Prefs& prefs, QWidget * parent):
 
   connect (&mySession, SIGNAL (sessionUpdated ()), SLOT (sessionUpdated ()));
 
-  QList<int> keys;
-  keys << Prefs::RPC_ENABLED
-       << Prefs::ALT_SPEED_LIMIT_ENABLED
-       << Prefs::ALT_SPEED_LIMIT_TIME_ENABLED
-       << Prefs::ENCRYPTION
-       << Prefs::BLOCKLIST_ENABLED
-       << Prefs::DIR_WATCH
-       << Prefs::DOWNLOAD_DIR
-       << Prefs::INCOMPLETE_DIR
-       << Prefs::INCOMPLETE_DIR_ENABLED
-       << Prefs::SCRIPT_TORRENT_DONE_FILENAME;
+  QList<int> keys = {
+    Prefs::RPC_ENABLED,
+    Prefs::ALT_SPEED_LIMIT_ENABLED,
+    Prefs::ALT_SPEED_LIMIT_TIME_ENABLED,
+    Prefs::ENCRYPTION,
+    Prefs::BLOCKLIST_ENABLED,
+    Prefs::DIR_WATCH,
+    Prefs::DOWNLOAD_DIR,
+    Prefs::INCOMPLETE_DIR,
+    Prefs::INCOMPLETE_DIR_ENABLED,
+    Prefs::SCRIPT_TORRENT_DONE_FILENAME};
+
   foreach (const int key, keys)
     refreshPref (key);
 
