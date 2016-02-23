@@ -1034,7 +1034,11 @@ to_utf8 (const char * in, size_t inlen)
 
   for (i=0; !ret && i<encoding_count; ++i)
     {
+#ifdef ICONV_SECOND_ARGUMENT_IS_CONST
+      const char * inbuf = in;
+#else
       char * inbuf = (char*) in;
+#endif
       char * outbuf = out;
       size_t inbytesleft = inlen;
       size_t outbytesleft = buflen;

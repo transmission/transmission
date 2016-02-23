@@ -514,6 +514,9 @@ endforeach()
 
 if(ICONV_FOUND)
     add_definitions(-DHAVE_ICONV)
+    if(ICONV_SECOND_ARGUMENT_IS_CONST)
+        add_definitions(-DICONV_SECOND_ARGUMENT_IS_CONST)
+    endif()
 endif()
 
 # if(MINGW)
