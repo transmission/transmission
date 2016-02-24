@@ -23,7 +23,7 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="4">
-                        <rect key="frame" x="374" y="13" width="82" height="32"/>
+                        <rect key="frame" x="375" y="13" width="82" height="32"/>
                         <buttonCell key="cell" type="push" title="OK" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="11">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
@@ -36,7 +36,7 @@ DQ
                         </connections>
                     </button>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3">
-                        <rect key="frame" x="292" y="13" width="82" height="32"/>
+                        <rect key="frame" x="293" y="13" width="82" height="32"/>
                         <buttonCell key="cell" type="push" title="Cancel" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="12">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
@@ -202,10 +202,10 @@ Gw
                 <constraints>
                     <constraint firstItem="31" firstAttribute="top" secondItem="2" secondAttribute="top" constant="20" symbolic="YES" id="1Jg-cj-cM7"/>
                     <constraint firstItem="3" firstAttribute="baseline" secondItem="4" secondAttribute="baseline" id="5s0-LB-Uz9"/>
+                    <constraint firstItem="4" firstAttribute="trailing" secondItem="31" secondAttribute="trailing" id="6QZ-ZD-jUp"/>
                     <constraint firstItem="3" firstAttribute="width" secondItem="4" secondAttribute="width" id="BtS-HC-7t8"/>
                     <constraint firstItem="4" firstAttribute="top" secondItem="31" secondAttribute="bottom" constant="20" symbolic="YES" id="Fdz-Zn-Job"/>
                     <constraint firstItem="4" firstAttribute="leading" secondItem="3" secondAttribute="trailing" constant="12" symbolic="YES" id="M9R-YJ-zaI"/>
-                    <constraint firstItem="4" firstAttribute="trailing" secondItem="34" secondAttribute="trailing" id="gOE-7h-IRu"/>
                     <constraint firstAttribute="bottom" secondItem="4" secondAttribute="bottom" constant="20" symbolic="YES" id="p9Z-th-Gwr"/>
                     <constraint firstAttribute="trailing" secondItem="31" secondAttribute="trailing" constant="20" symbolic="YES" id="qbO-FY-Vz7"/>
                     <constraint firstItem="31" firstAttribute="leading" secondItem="2" secondAttribute="leading" constant="20" symbolic="YES" id="yq5-wo-4Sy"/>
