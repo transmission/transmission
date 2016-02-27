@@ -464,6 +464,7 @@
 		C1077A50183EB29600634C22 /* file-posix.c in Sources */ = {isa = PBXBuildFile; fileRef = C1077A4C183EB29600634C22 /* file-posix.c */; };
 		C1077A51183EB29600634C22 /* file.h in Headers */ = {isa = PBXBuildFile; fileRef = C1077A4D183EB29600634C22 /* file.h */; };
 		C1305EBE186A13B100F03351 /* file.c in Sources */ = {isa = PBXBuildFile; fileRef = C1305EB8186A134000F03351 /* file.c */; };
+		C15320211C82602500CC21E2 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8D1107310486CEB800E47090 /* Info.plist */; };
 		C1639A741A55F4E000E42033 /* libb64.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C1639A6F1A55F4D600E42033 /* libb64.a */; };
 		C1639A781A55F56600E42033 /* cdecode.c in Sources */ = {isa = PBXBuildFile; fileRef = C1639A761A55F56600E42033 /* cdecode.c */; };
 		C1639A791A55F56600E42033 /* cencode.c in Sources */ = {isa = PBXBuildFile; fileRef = C1639A771A55F56600E42033 /* cencode.c */; };
@@ -2633,6 +2634,7 @@
 				A2DC496E15842D5200758FF1 /* Lock@2x.png in Resources */,
 				A2DC497015842D5C00758FF1 /* Magnet@2x.png in Resources */,
 				A2DC497215842D8000758FF1 /* PauseHover@2x.png in Resources */,
+				C15320211C82602500CC21E2 /* Info.plist in Resources */,
 				A2DC497615842D9700758FF1 /* PauseOff@2x.png in Resources */,
 				A2DC497815842D9C00758FF1 /* PauseOn@2x.png in Resources */,
 				A2DC497A15842DC100758FF1 /* PinTemplate@2x.png in Resources */,

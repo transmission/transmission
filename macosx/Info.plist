@@ -94,7 +94,7 @@
 	<key>SUAllowsAutomaticUpdates</key>
 	<false/>
 	<key>SUFeedURL</key>
-	<string>http://update.transmissionbt.com/appcast.xml</string>
+	<string>https://update.transmissionbt.com/appcast.xml</string>
 	<key>SUPublicDSAKeyFile</key>
 	<string>sparkle_dsa_pub.pem</string>
 	<key>SUScheduledCheckInterval</key>
