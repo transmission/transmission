@@ -43,7 +43,7 @@
 <context>
     <name>Application</name>
     <message>
-        <location filename="../Application.cc" line="+288"/>
+        <location filename="../Application.cc" line="+279"/>
         <source>&lt;b&gt;Transmission is a file sharing program.&lt;/b&gt;</source>
         <translation>&lt;b&gt;Transmission adalah sebuah program untuk berbagi berkas.&lt;/b&gt;</translation>
     </message>
@@ -58,7 +58,7 @@
         <translation>Saya &amp;Setuju</translation>
     </message>
     <message>
-        <location line="+93"/>
+        <location line="+85"/>
         <source>Torrent Completed</source>
         <translation>Torrent Selesai</translation>
     </message>
@@ -2165,7 +2165,7 @@ Untuk menambahkan URL utama, tambahkan setelah baris kosong.</translation>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../Application.cc" line="-256"/>
+        <location filename="../Application.cc" line="-241"/>
         <source>Invalid option</source>
         <translation>Opsi Tidak sah</translation>
     </message>

@@ -43,7 +43,7 @@
 <context>
     <name>Application</name>
     <message>
-        <location filename="../Application.cc" line="+288"/>
+        <location filename="../Application.cc" line="+279"/>
         <source>&lt;b&gt;Transmission is a file sharing program.&lt;/b&gt;</source>
         <translation>&lt;b&gt;A Transmission egy fájlmegosztó program.&lt;/b&gt;</translation>
     </message>
@@ -58,7 +58,7 @@
         <translation>&amp;Elfogadom</translation>
     </message>
     <message>
-        <location line="+93"/>
+        <location line="+85"/>
         <source>Torrent Completed</source>
         <translation>Torrent befejezve</translation>
     </message>
@@ -1282,7 +1282,7 @@
         <location line="-393"/>
         <source> - %1:%2</source>
         <extracomment>Second (optional) part of main window title &quot;Transmission - host:port&quot; (added when connected to remote session); notice that leading space (before the dash) is included here</extracomment>
-        <translation type="unfinished"></translation>
+        <translation> - %1:%2</translation>
     </message>
     <message>
         <location line="+28"/>
@@ -1360,15 +1360,15 @@
     <message numerus="yes">
         <location line="-497"/>
         <source>Showing %L1 of %Ln torrent(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%L1 /%Ln torrent mutatása</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+503"/>
         <source>Delete these %Ln torrent(s)&apos; downloaded files?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Valóban le kívánod törölni a torrent letöltött fájlait?</numerusform>
         </translation>
     </message>
     <message>
@@ -2165,7 +2165,7 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../Application.cc" line="-256"/>
+        <location filename="../Application.cc" line="-241"/>
         <source>Invalid option</source>
         <translation>érvénytelen opció</translation>
     </message>
@@ -2506,7 +2506,7 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
         <location line="+8"/>
         <source>Peer list request %1timed out%2 %3 ago; will retry</source>
         <extracomment>%1 and %2 are replaced with HTML markup, %3 is duration</extracomment>
-        <translation>A %1 partnerlista lekérés időtúllépés re futott %2 %3 ezelőtt; újrapróbálom </translation>
+        <translation>A %1 partnerlista lekérés időtúllépésre futott %2 %3 ezelőtt; újrapróbálom </translation>
     </message>
     <message>
         <location line="+8"/>
