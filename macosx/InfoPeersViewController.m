@@ -96,6 +96,14 @@
     fWebSeedTableHeight = webSeedTableFrame.size.height;
     fSpaceBetweenWebSeedAndPeer = webSeedTableFrame.origin.y - NSMaxY([[fPeerTable enclosingScrollView] frame]);
     
+    CABasicAnimation * webSeedTableAnimation = [CABasicAnimation animation];
+    webSeedTableAnimation.timingFunction = [CAMediaTimingFunction functionWithName: kCAMediaTimingFunctionLinear];
+    webSeedTableAnimation.duration = 0.125;
+    [fWebSeedTableHeightConstraint setAnimations: [NSDictionary dictionaryWithObject: webSeedTableAnimation
+                                                                              forKey: @"constant"]];
+    [fPeerTableTopConstraint setAnimations: [NSDictionary dictionaryWithObject: webSeedTableAnimation
+                                                                        forKey: @"constant"]];
+
     [self setWebSeedTableHidden: YES animate: NO];
 }
 
@@ -105,8 +113,6 @@
     
     [fPeers release];
     [fWebSeeds release];
-    
-    [fWebSeedTableAnimation release];
     
     [super dealloc];
 }
@@ -241,10 +247,6 @@
 
 - (void) clearView
 {
-    //if in the middle of animating, just stop and resize immediately
-    if (fWebSeedTableAnimation)
-        [self setWebSeedTableHidden: !fWebSeeds animate: NO];
-    
     [fPeers release];
     fPeers = nil;
     [fWebSeeds release];
@@ -448,25 +450,6 @@
     return nil;
 }
 
-- (void) animationDidEnd: (NSAnimation *) animation
-{
-    if (animation == fWebSeedTableAnimation)
-    {
-        [fWebSeedTableAnimation release];
-        fWebSeedTableAnimation = nil;
-    }
-}
-
-- (void) stopWebSeedAnimation
-{
-    if (fWebSeedTableAnimation)
-    {
-        [fWebSeedTableAnimation stopAnimation]; // jumps to end frame
-        [fWebSeedTableAnimation release];
-        fWebSeedTableAnimation = nil;
-    }
-}
-
 @end
 
 @implementation InfoPeersViewController (Private)
@@ -511,60 +494,14 @@
 {
     if (animate && (![[self view] window] || ![[[self view] window] isVisible]))
         animate = NO;
+
+    const CGFloat webSeedTableHeight = hide ? 1 : fWebSeedTableHeight;
+    const CGFloat spaceBetweenWebSeedAndPeer = hide ? -2 : fSpaceBetweenWebSeedAndPeer;
     
-    if (fWebSeedTableAnimation)
-    {
-        [fWebSeedTableAnimation stopAnimation];
-        [fWebSeedTableAnimation release];
-        fWebSeedTableAnimation = nil;
-    }
-    
-    NSRect webSeedFrame = [[fWebSeedTable enclosingScrollView] frame];
-    NSRect peerFrame = [[fPeerTable enclosingScrollView] frame];
-    
-    if (hide)
-    {
-        CGFloat webSeedFrameMaxY = NSMaxY(webSeedFrame);
-        webSeedFrame.size.height = 0;
-        webSeedFrame.origin.y = webSeedFrameMaxY;
-        
-        peerFrame.size.height = webSeedFrameMaxY - peerFrame.origin.y;
-    }
-    else
-    {
-        webSeedFrame.origin.y -= fWebSeedTableHeight - webSeedFrame.size.height;
-        webSeedFrame.size.height = fWebSeedTableHeight;
-        
-        peerFrame.size.height = (webSeedFrame.origin.y - fSpaceBetweenWebSeedAndPeer) - peerFrame.origin.y;
-    }
-    
-    [[fWebSeedTable enclosingScrollView] setHidden: NO]; //this is needed for some reason
-    
-    //actually resize tables
-    if (animate)
-    {
-        NSDictionary * webSeedDict = [NSDictionary dictionaryWithObjectsAndKeys:
-                                    [fWebSeedTable enclosingScrollView], NSViewAnimationTargetKey,
-                                    [NSValue valueWithRect: [[fWebSeedTable enclosingScrollView] frame]], NSViewAnimationStartFrameKey,
-                                    [NSValue valueWithRect: webSeedFrame], NSViewAnimationEndFrameKey, nil],
-                    * peerDict = [NSDictionary dictionaryWithObjectsAndKeys:
-                                    [fPeerTable enclosingScrollView], NSViewAnimationTargetKey,
-                                    [NSValue valueWithRect: [[fPeerTable enclosingScrollView] frame]], NSViewAnimationStartFrameKey,
-                                    [NSValue valueWithRect: peerFrame], NSViewAnimationEndFrameKey, nil];
-        
-        fWebSeedTableAnimation = [[NSViewAnimation alloc] initWithViewAnimations:
-                                        [NSArray arrayWithObjects: webSeedDict, peerDict, nil]];
-        [fWebSeedTableAnimation setDuration: 0.125];
-        [fWebSeedTableAnimation setAnimationBlockingMode: NSAnimationNonblocking];
-        [fWebSeedTableAnimation setDelegate: self];
-        
-        [fWebSeedTableAnimation startAnimation];
-    }
-    else
-    {
-        [[fWebSeedTable enclosingScrollView] setFrame: webSeedFrame];
-        [[fPeerTable enclosingScrollView] setFrame: peerFrame];
-    }
+    [(animate ? [fWebSeedTableHeightConstraint animator] : fWebSeedTableHeightConstraint) setConstant: webSeedTableHeight];
+    [(animate ? [fPeerTableTopConstraint animator] : fPeerTableTopConstraint) setConstant: spaceBetweenWebSeedAndPeer];
+
+    [[fWebSeedTable enclosingScrollView] setHidden: hide];
 }
 
 - (NSArray *) peerSortDescriptors

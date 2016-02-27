@@ -37,6 +37,8 @@
 {
     NSArray * fTorrents;
     
+    CGFloat fMinWindowWidth;
+    
     NSViewController <InfoViewController> * fViewController;
     NSInteger fCurrentTabTag;
     IBOutlet NSMatrix * fTabMatrix;
