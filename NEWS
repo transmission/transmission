@@ -1,4 +1,4 @@
-=== Transmission 2.90 (XXXX/XX/XX) ===
+=== Transmission 2.90 (2016/02/XX) ===
 [http://trac.transmissionbt.com/query?milestone=2.90&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Fix renaming torrent files with common prefix
