@@ -51,8 +51,12 @@ EXTRA_DIST += \
   third-party/b64.cmake \
   third-party/dht.cmake \
   third-party/event2.cmake \
+  third-party/event2-01-win32.patch \
+  third-party/event2-02-win32.patch \
   third-party/natpmp.cmake \
   third-party/utp-01-ticket-5002.patch \
+  third-party/utp-02-win32.patch \
+  third-party/utp-03-msvc14.patch \
   third-party/utp.cmake \
   third-party/utp_config.h \
   utils/CMakeLists.txt
