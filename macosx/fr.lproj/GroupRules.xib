@@ -9,6 +9,7 @@
             <connections>
                 <outlet property="fGroupRulesSheetWindow" destination="1" id="17"/>
                 <outlet property="fRuleEditor" destination="34" id="56"/>
+                <outlet property="fRuleEditorHeightConstraint" destination="v6L-SJ-HFk" id="nX1-ss-fWF"/>
             </connections>
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
@@ -187,7 +188,7 @@ Gw
                         </clipView>
                         <constraints>
                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="430" id="T2h-Cn-ygX"/>
-                            <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="50" id="v6L-SJ-HFk"/>
+                            <constraint firstAttribute="height" constant="167" id="v6L-SJ-HFk"/>
                         </constraints>
                         <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="YES" id="33">
                             <rect key="frame" x="-100" y="-100" width="360" height="15"/>
