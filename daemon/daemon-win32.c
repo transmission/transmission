@@ -147,7 +147,7 @@ stop_service (void)
     }
 }
 
-static DWORD
+static DWORD WINAPI
 handle_service_ctrl (DWORD  control_code,
                      DWORD  event_type,
                      LPVOID event_data,
