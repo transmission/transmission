@@ -32,6 +32,9 @@
 #import "transmission.h" // required by utils.h
 #import "utils.h"
 
+#define ANIMATION_ID_KEY @"animationId"
+#define WEB_SEED_ANIMATION_ID @"webSeed"
+
 @interface InfoPeersViewController (Private)
 
 - (void) setupInfo;
@@ -92,18 +95,15 @@
                                                                         "inspector -> web seed table -> header tool tip")];
     
     //prepare for animating peer table and web seed table
-    NSRect webSeedTableFrame = [[fWebSeedTable enclosingScrollView] frame];
-    fWebSeedTableHeight = webSeedTableFrame.size.height;
-    fSpaceBetweenWebSeedAndPeer = webSeedTableFrame.origin.y - NSMaxY([[fPeerTable enclosingScrollView] frame]);
+    fViewTopMargin = fWebSeedTableTopConstraint.constant;
     
     CABasicAnimation * webSeedTableAnimation = [CABasicAnimation animation];
-    webSeedTableAnimation.timingFunction = [CAMediaTimingFunction functionWithName: kCAMediaTimingFunctionLinear];
-    webSeedTableAnimation.duration = 0.125;
-    [fWebSeedTableHeightConstraint setAnimations: [NSDictionary dictionaryWithObject: webSeedTableAnimation
-                                                                              forKey: @"constant"]];
-    [fPeerTableTopConstraint setAnimations: [NSDictionary dictionaryWithObject: webSeedTableAnimation
-                                                                        forKey: @"constant"]];
-
+    [webSeedTableAnimation setTimingFunction: [CAMediaTimingFunction functionWithName: kCAMediaTimingFunctionLinear]];
+    [webSeedTableAnimation setDuration: 0.125];
+    [webSeedTableAnimation setDelegate: self];
+    [webSeedTableAnimation setValue: WEB_SEED_ANIMATION_ID forKey: ANIMATION_ID_KEY];
+    [fWebSeedTableTopConstraint setAnimations: @{ @"constant": webSeedTableAnimation }];
+    
     [self setWebSeedTableHidden: YES animate: NO];
 }
 
@@ -450,6 +450,22 @@
     return nil;
 }
 
+- (void) animationDidStart: (CAAnimation *) animation
+{
+    if (![[animation valueForKey: ANIMATION_ID_KEY] isEqualToString: WEB_SEED_ANIMATION_ID])
+        return;
+
+    [[fWebSeedTable enclosingScrollView] setHidden: NO];
+}
+
+- (void) animationDidStop: (CAAnimation *) animation finished: (BOOL) finished
+{
+    if (![[animation valueForKey: ANIMATION_ID_KEY] isEqualToString: WEB_SEED_ANIMATION_ID])
+        return;
+
+    [[fWebSeedTable enclosingScrollView] setHidden: finished && fWebSeedTableTopConstraint.constant < 0];
+}
+
 @end
 
 @implementation InfoPeersViewController (Private)
@@ -495,13 +511,9 @@
     if (animate && (![[self view] window] || ![[[self view] window] isVisible]))
         animate = NO;
 
-    const CGFloat webSeedTableHeight = hide ? 1 : fWebSeedTableHeight;
-    const CGFloat spaceBetweenWebSeedAndPeer = hide ? -2 : fSpaceBetweenWebSeedAndPeer;
+    const CGFloat webSeedTableTopMargin = hide ? -NSHeight([[fWebSeedTable enclosingScrollView] frame]) : fViewTopMargin;
     
-    [(animate ? [fWebSeedTableHeightConstraint animator] : fWebSeedTableHeightConstraint) setConstant: webSeedTableHeight];
-    [(animate ? [fPeerTableTopConstraint animator] : fPeerTableTopConstraint) setConstant: spaceBetweenWebSeedAndPeer];
-
-    [[fWebSeedTable enclosingScrollView] setHidden: hide];
+    [(animate ? [fWebSeedTableTopConstraint animator] : fWebSeedTableTopConstraint) setConstant: webSeedTableTopMargin];
 }
 
 - (NSArray *) peerSortDescriptors

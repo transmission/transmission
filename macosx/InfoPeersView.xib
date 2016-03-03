@@ -9,9 +9,8 @@
             <connections>
                 <outlet property="fConnectedPeersField" destination="3" id="31"/>
                 <outlet property="fPeerTable" destination="9" id="37"/>
-                <outlet property="fPeerTableTopConstraint" destination="1HX-la-u47" id="zd4-80-4DZ"/>
                 <outlet property="fWebSeedTable" destination="22" id="38"/>
-                <outlet property="fWebSeedTableHeightConstraint" destination="4th-jd-ByN" id="hUk-mR-d0k"/>
+                <outlet property="fWebSeedTableTopConstraint" destination="IMm-aI-A03" id="3qg-eC-YGm"/>
                 <outlet property="view" destination="2" id="32"/>
             </connections>
         </customObject>
@@ -212,14 +211,16 @@ Multiline Label</string>
                 </textField>
             </subviews>
             <constraints>
-                <constraint firstItem="5" firstAttribute="top" secondItem="4" secondAttribute="bottom" constant="4" id="1HX-la-u47"/>
+                <constraint firstItem="5" firstAttribute="top" secondItem="4" secondAttribute="bottom" priority="998" constant="4" id="1HX-la-u47"/>
                 <constraint firstItem="4" firstAttribute="leading" secondItem="2" secondAttribute="leading" constant="12" id="5f9-U1-5ZR"/>
                 <constraint firstItem="3" firstAttribute="leading" secondItem="2" secondAttribute="leading" constant="12" id="7lL-BM-0yj"/>
                 <constraint firstItem="4" firstAttribute="top" secondItem="2" secondAttribute="top" constant="12" id="IMm-aI-A03"/>
                 <constraint firstAttribute="trailing" secondItem="3" secondAttribute="trailing" constant="12" id="PfO-Qp-6s2"/>
                 <constraint firstAttribute="bottom" secondItem="3" secondAttribute="bottom" constant="12" id="R8j-Z7-6VA"/>
-                <constraint firstItem="3" firstAttribute="top" secondItem="5" secondAttribute="bottom" constant="4" id="ksH-yX-eMF"/>
+                <constraint firstItem="3" firstAttribute="top" secondItem="5" secondAttribute="bottom" priority="998" constant="4" id="ksH-yX-eMF"/>
                 <constraint firstItem="5" firstAttribute="leading" secondItem="2" secondAttribute="leading" constant="12" id="lcP-Pq-CY0"/>
+                <constraint firstItem="5" firstAttribute="top" relation="greaterThanOrEqual" secondItem="4" secondAttribute="bottom" constant="4" id="pIJ-b4-EP1"/>
+                <constraint firstItem="5" firstAttribute="top" secondItem="2" secondAttribute="top" priority="999" constant="12" id="t9u-iC-TTZ"/>
                 <constraint firstAttribute="trailing" secondItem="5" secondAttribute="trailing" constant="12" id="tCQ-be-4sj"/>
                 <constraint firstAttribute="trailing" secondItem="4" secondAttribute="trailing" constant="12" id="zRK-YF-yfr"/>
             </constraints>
