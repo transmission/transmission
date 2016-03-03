@@ -2105,8 +2105,6 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
         [notification setHasActionButton: YES];
         [notification setActionButtonTitle: NSLocalizedString(@"Show", "notification button")];
         
-        notification.additionalActions = @[ [NSUserNotificationAction actionWithIdentifier:@"a" title:@"a"], [NSUserNotificationAction actionWithIdentifier:@"b" title:@"b"] ];
-        
         NSMutableDictionary * userInfo = [NSMutableDictionary dictionaryWithObject: [torrent hashString] forKey: @"Hash"];
         if (location)
             [userInfo setObject: location forKey: @"Location"];
