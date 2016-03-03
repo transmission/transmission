@@ -842,6 +842,24 @@
     return fPiecesBarPercent;
 }
 
+- (void) selectAndScrollToRow: (NSInteger) row
+{
+    NSParameterAssert(row >= 0);
+    NSParameterAssert(row < [self numberOfRows]);
+    
+    [self selectRowIndexes: [NSIndexSet indexSetWithIndex: row] byExtendingSelection: NO];
+    
+    const NSRect rowRect = [self rectOfRow: row];
+    const NSRect viewRect = [[self superview] frame];
+
+    NSPoint scrollOrigin = rowRect.origin;
+    scrollOrigin.y += (rowRect.size.height - viewRect.size.height) / 2;
+    if (scrollOrigin.y < 0)
+        scrollOrigin.y = 0;
+
+    [[[self superview] animator] setBoundsOrigin: scrollOrigin];
+}
+
 @end
 
 @implementation TorrentTableView (Private)

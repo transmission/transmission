@@ -91,4 +91,6 @@
 - (void) togglePiecesBar;
 - (CGFloat) piecesBarPercent;
 
+- (void) selectAndScrollToRow: (NSInteger) row;
+
 @end

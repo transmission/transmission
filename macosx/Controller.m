@@ -1991,8 +1991,9 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
             }
             
             NSAssert1(row != -1, @"expected a row to be found for torrent %@", torrent);
-            [fTableView selectRowIndexes: [NSIndexSet indexSetWithIndex: row] byExtendingSelection:NO];
-            #warning focus the window
+
+            [self showMainWindow: nil];
+            [fTableView selectAndScrollToRow: row];
         }
     }
 }
