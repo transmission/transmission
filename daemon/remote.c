@@ -274,7 +274,7 @@ static tr_option opts[] =
     { 600, "reannounce",             "Reannounce the current torrent(s)", NULL,  0, NULL },
     { 'r', "remove",                 "Remove the current torrent(s)", "r",  0, NULL },
     { 930, "peers",                  "Set the maximum number of peers for the current torrent(s) or globally", "pr", 1, "<max>" },
-    { 'R', "remove-and-delete",      "Remove the current torrent(s) and delete local data", NULL, 0, NULL },
+    { 840, "remove-and-delete",      "Remove the current torrent(s) and delete local data", "rad", 0, NULL },
     { 800, "torrent-done-script",    "Specify a script to run when a torrent finishes", NULL, 1, "<file>" },
     { 801, "no-torrent-done-script", "Don't run a script when torrents finish", NULL, 0, NULL },
     { 950, "seedratio",              "Let the current torrent(s) seed until a specific ratio", "sr", 1, "ratio" },
@@ -471,7 +471,7 @@ getOptMode (int val)
         return MODE_PORT_TEST;
 
       case 'r': /* remove */
-      case 'R': /* remove and delete */
+      case 840: /* remove and delete */
         return MODE_TORRENT_REMOVE;
 
       case 960: /* move */
@@ -2277,14 +2277,14 @@ processArgs (const char * rpcurl, int argc, const char * const * argv)
                 break;
             }
             case 'r':
-            case 'R':
+            case 840:
             {
                 tr_variant * args;
                 tr_variant * top = tr_new0 (tr_variant, 1);
                 tr_variantInitDict (top, 2);
                 tr_variantDictAddStr (top, TR_KEY_method, "torrent-remove");
                 args = tr_variantDictAddDict (top, ARGUMENTS, 2);
-                tr_variantDictAddBool (args, TR_KEY_delete_local_data, c=='R');
+                tr_variantDictAddBool (args, TR_KEY_delete_local_data, c == 840);
                 addIdArg (args, id, NULL);
                 status |= flush (rpcurl, &top);
                 break;
