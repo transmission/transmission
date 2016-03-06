@@ -1,4 +1,4 @@
-=== Transmission 2.91 (2016/03/XX) ===
+=== Transmission 2.91 (2016/03/06) ===
 [http://trac.transmissionbt.com/query?milestone=2.91&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
   * Fix Makefile.am to include Windows patches into source archive
