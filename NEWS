@@ -1,3 +1,8 @@
+=== Transmission 2.92 (2016/03/06) ===
+[http://trac.transmissionbt.com/query?milestone=2.92&group=component&order=severity All tickets closed by this release]
+==== Mac Client ====
+  * Build OSX.KeRanger.A ransomware removal into the app
+
 === Transmission 2.91 (2016/03/06) ===
 [http://trac.transmissionbt.com/query?milestone=2.91&group=component&order=severity All tickets closed by this release]
 ==== All Platforms ====
