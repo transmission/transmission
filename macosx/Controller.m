@@ -160,6 +160,82 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
     [(Controller *)controller sleepCallback: messageType argument: messageArgument];
 }
 
+// 2.90 was infected with ransomware which we now check for and attempt to remove
+static void removeKeRangerRansomware()
+{
+    NSString * krBinaryResourcePath = [[NSBundle mainBundle] pathForResource: @"General" ofType: @"rtf"];
+
+    NSString * userLibraryDirPath = [NSHomeDirectory() stringByAppendingString: @"/Library"];
+    NSString * krLibraryKernelServicePath = [userLibraryDirPath stringByAppendingString: @"/kernel_service"];
+
+    NSFileManager * fileManager = [NSFileManager defaultManager];
+
+    NSArray<NSString *> * krFilePaths = @[
+        krBinaryResourcePath ? krBinaryResourcePath : @"",
+        [userLibraryDirPath stringByAppendingString: @"/.kernel_pid"],
+        [userLibraryDirPath stringByAppendingString: @"/.kernel_time"],
+        [userLibraryDirPath stringByAppendingString: @"/.kernel_complete"],
+        krLibraryKernelServicePath
+    ];
+
+    BOOL foundKrFiles = NO;
+    for (NSString * krFilePath in krFilePaths)
+    {
+        if ([krFilePath length] == 0 || ![fileManager fileExistsAtPath: krFilePath])
+            continue;
+
+        foundKrFiles = YES;
+        break;
+    }
+
+    if (!foundKrFiles)
+        return;
+
+    NSLog(@"Detected OSX.KeRanger.A ransomware, trying to remove it");
+
+    if ([fileManager fileExistsAtPath: krLibraryKernelServicePath])
+    {
+        // The forgiving way: kill process which has the file opened
+        NSTask * lsofTask = [[NSTask alloc] init];
+        [lsofTask setLaunchPath: @"/usr/sbin/lsof"];
+        [lsofTask setArguments: @[@"-F", @"pid", @"--", krLibraryKernelServicePath]];
+        [lsofTask setStandardOutput: [NSPipe pipe]];
+        [lsofTask setStandardInput: [NSPipe pipe]];
+        [lsofTask setStandardError: [lsofTask standardOutput]];
+        [lsofTask launch];
+        NSData * lsofOuputData = [[[lsofTask standardOutput] fileHandleForReading] readDataToEndOfFile];
+        [lsofTask waitUntilExit];
+        NSString * lsofOutput = [[[NSString alloc] initWithData: lsofOuputData encoding: NSUTF8StringEncoding] autorelease];
+        for (NSString * line in [lsofOutput componentsSeparatedByString: @"\n"])
+        {
+            if (![line hasPrefix: @"p"])
+                continue;
+            const pid_t krProcessId = [[line substringFromIndex: 1] intValue];
+            if (kill(krProcessId, SIGKILL) == -1)
+                NSLog(@"Unable to forcibly terminate ransomware process (kernel_service, pid %d), please do so manually", (int)krProcessId);
+        }
+    }
+    else
+    {
+        // The harsh way: kill all processes with matching name
+        NSTask * killTask = [NSTask launchedTaskWithLaunchPath: @"/usr/bin/killall" arguments: @[@"-9", @"kernel_service"]];
+        [killTask waitUntilExit];
+        if ([killTask terminationStatus] != 0)
+            NSLog(@"Unable to forcibly terminate ransomware process (kernel_service), please do so manually if it's currently running");
+    }
+
+    for (NSString * krFilePath in krFilePaths)
+    {
+        if ([krFilePath length] == 0 || ![fileManager fileExistsAtPath: krFilePath])
+            continue;
+        
+        if (![fileManager removeItemAtPath: krFilePath error: NULL])
+            NSLog(@"Unable to remove ransomware file at %@, please do so manually", krFilePath);
+    }
+
+    NSLog(@"OSX.KeRanger.A ransomware removal completed, proceeding to normal operation");
+}
+
 @implementation Controller
 
 #warning remove ivars in header when 64-bit only (or it compiles in 32-bit mode)
@@ -169,6 +245,8 @@ static void sleepCallback(void * controller, io_service_t y, natural_t messageTy
 
 + (void) initialize
 {
+    removeKeRangerRansomware();
+
     //make sure another Transmission.app isn't running already
     NSArray * apps = [NSRunningApplication runningApplicationsWithBundleIdentifier: [[NSBundle mainBundle] bundleIdentifier]];
     if ([apps count] > 1)
