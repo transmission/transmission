@@ -10,14 +10,12 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QStandardItemModel>
+#include <QLineEdit>
 
 #include "Application.h"
-#include "FaviconCache.h"
-#include "Filters.h"
 #include "FilterBar.h"
 #include "FilterBarComboBox.h"
 #include "FilterBarComboBoxDelegate.h"
-#include "FilterBarLineEdit.h"
 #include "Prefs.h"
 #include "Torrent.h"
 #include "TorrentFilter.h"
@@ -65,31 +63,31 @@ FilterBar::createActivityCombo ()
   model->appendRow (new QStandardItem); // separator
   delegate->setSeparator (model, model->index (1, 0));
 
-  row = new QStandardItem (QIcon::fromTheme (QLatin1String ("system-run")), tr ("Active"));
+  row = new QStandardItem (QIcon::fromTheme (QStringLiteral ("system-run")), tr ("Active"));
   row->setData (FilterMode::SHOW_ACTIVE, ActivityRole);
   model->appendRow (row);
 
-  row = new QStandardItem (QIcon::fromTheme (QLatin1String ("go-down")), tr ("Downloading"));
+  row = new QStandardItem (QIcon::fromTheme (QStringLiteral ("go-down")), tr ("Downloading"));
   row->setData (FilterMode::SHOW_DOWNLOADING, ActivityRole);
   model->appendRow (row);
 
-  row = new QStandardItem (QIcon::fromTheme (QLatin1String ("go-up")), tr ("Seeding"));
+  row = new QStandardItem (QIcon::fromTheme (QStringLiteral ("go-up")), tr ("Seeding"));
   row->setData (FilterMode::SHOW_SEEDING, ActivityRole);
   model->appendRow (row);
 
-  row = new QStandardItem (QIcon::fromTheme (QLatin1String ("media-playback-pause")), tr ("Paused"));
+  row = new QStandardItem (QIcon::fromTheme (QStringLiteral ("media-playback-pause")), tr ("Paused"));
   row->setData (FilterMode::SHOW_PAUSED, ActivityRole);
   model->appendRow (row);
 
-  row = new QStandardItem (QIcon::fromTheme (QLatin1String ("dialog-ok")), tr ("Finished"));
+  row = new QStandardItem (QIcon::fromTheme (QStringLiteral ("dialog-ok")), tr ("Finished"));
   row->setData (FilterMode::SHOW_FINISHED, ActivityRole);
   model->appendRow (row);
 
-  row = new QStandardItem (QIcon::fromTheme (QLatin1String ("view-refresh")), tr ("Verifying"));
+  row = new QStandardItem (QIcon::fromTheme (QStringLiteral ("view-refresh")), tr ("Verifying"));
   row->setData (FilterMode::SHOW_VERIFYING, ActivityRole);
   model->appendRow (row);
 
-  row = new QStandardItem (QIcon::fromTheme (QLatin1String ("process-stop")), tr ("Error"));
+  row = new QStandardItem (QIcon::fromTheme (QStringLiteral ("process-stop")), tr ("Error"));
   row->setData (FilterMode::SHOW_ERROR, ActivityRole);
   model->appendRow (row);
 
@@ -127,12 +125,12 @@ FilterBar::refreshTrackers ()
         break;
       const Torrent * tor = index.data (TorrentModel::TorrentRole).value<const Torrent*> ();
       QSet<QString> torrentNames;
-      for (const QString& host: tor->hosts ())
+      foreach (const QString& host, tor->hosts ())
         {
           newHosts.insert (host);
           torrentNames.insert (readableHostName (host));
         }
-      for (const QString& name: torrentNames)
+      foreach (const QString& name, torrentNames)
         ++torrentsPerHost[name];
     }
 
@@ -141,10 +139,10 @@ FilterBar::refreshTrackers ()
   myTrackerModel->setData (myTrackerModel->index (0,0), getCountString (myTorrents.rowCount ()), FilterBarComboBox::CountStringRole);
 
   // rows to update
-  for (const QString& host: oldHosts & newHosts)
+  foreach (const QString& host, oldHosts & newHosts)
     {
       const QString name = readableHostName (host);
-      QStandardItem * row = myTrackerModel->findItems (name).front ();
+      QStandardItem * row = myTrackerModel->findItems (name).at (0);
       const int count = torrentsPerHost[name];
       row->setData (count, FilterBarComboBox::CountRole);
       row->setData (getCountString (count), FilterBarComboBox::CountStringRole);
@@ -152,17 +150,17 @@ FilterBar::refreshTrackers ()
     }
 
   // rows to remove
-  for (const QString& host: oldHosts - newHosts)
+  foreach (const QString& host, oldHosts - newHosts)
     {
       const QString name = readableHostName (host);
-      QStandardItem * item = myTrackerModel->findItems (name).front ();
+      QStandardItem * item = myTrackerModel->findItems (name).at (0);
       if (!item->data (TrackerRole).toString ().isEmpty ()) // don't remove "All"
         myTrackerModel->removeRows (item->row (), 1);
     }
 
   // rows to add
   bool anyAdded = false;
-  for (const QString& host: newHosts - oldHosts)
+  foreach (const QString& host, newHosts - oldHosts)
     {
       const QString name = readableHostName (host);
 
@@ -241,19 +239,25 @@ FilterBar::FilterBar (Prefs& prefs, const TorrentModel& torrents, const TorrentF
   myTrackerCombo = createTrackerCombo (myTrackerModel);
   h->addWidget (myTrackerCombo);
 
-  myLineEdit = new FilterBarLineEdit (this);
+  myLineEdit = new QLineEdit (this);
   h->addWidget (myLineEdit);
-  connect (myLineEdit, SIGNAL (textChanged (QString)), this, SLOT (onTextChanged (QString)));
+  myLineEdit->setClearButtonEnabled(true);
+  myLineEdit->setPlaceholderText(tr("Search..."));
+  connect (myLineEdit, &QLineEdit::textChanged, this, &FilterBar::onTextChanged);
 
   // listen for changes from the other players
-  connect (&myPrefs, SIGNAL (changed (int)), this, SLOT (refreshPref (int)));
-  connect (myActivityCombo, SIGNAL (currentIndexChanged (int)), this, SLOT (onActivityIndexChanged (int)));
-  connect (myTrackerCombo, SIGNAL (currentIndexChanged (int)), this, SLOT (onTrackerIndexChanged (int)));
-  connect (&myTorrents, SIGNAL (modelReset ()), this, SLOT (recountSoon ()));
-  connect (&myTorrents, SIGNAL (rowsInserted (QModelIndex, int, int)), this, SLOT (recountSoon ()));
-  connect (&myTorrents, SIGNAL (rowsRemoved (QModelIndex, int, int)), this, SLOT (recountSoon ()));
-  connect (&myTorrents, SIGNAL (dataChanged (QModelIndex, QModelIndex)), this, SLOT (recountSoon ()));
-  connect (myRecountTimer, SIGNAL (timeout ()), this, SLOT (recount ()));
+  connect (&myPrefs, &Prefs::changed, this, &FilterBar::refreshPref);
+
+  auto indChanged = static_cast<void (FilterBarComboBox::*)(int)>(&FilterBarComboBox::currentIndexChanged);
+  connect (myActivityCombo, indChanged, this, &FilterBar::onActivityIndexChanged);
+  connect (myTrackerCombo, indChanged, this, &FilterBar::onTrackerIndexChanged);
+  connect (myRecountTimer, &QTimer::timeout, this, &FilterBar::recount);
+
+  auto callRecountSoon = [this] { recountSoon(); };
+  connect (&myTorrents, &TorrentModel::modelReset, callRecountSoon);
+  connect (&myTorrents, &TorrentModel::rowsInserted, callRecountSoon);
+  connect (&myTorrents, &TorrentModel::rowsRemoved, callRecountSoon);
+  connect (&myTorrents, &TorrentModel::dataChanged, callRecountSoon);
 
   recountSoon ();
   refreshTrackers ();
@@ -263,7 +267,7 @@ FilterBar::FilterBar (Prefs& prefs, const TorrentModel& torrents, const TorrentF
   QList<int> initKeys;
   initKeys << Prefs::FILTER_MODE
            << Prefs::FILTER_TRACKERS;
-  for (const int key: initKeys)
+  foreach (const int key, initKeys)
       refreshPref (key);
 }
 
@@ -397,5 +401,5 @@ FilterBar::recount ()
 QString
 FilterBar::getCountString (int n) const
 {
-  return QString::fromLatin1 ("%L1").arg (n);
+  return QStringLiteral ("%L1").arg (n);
 }

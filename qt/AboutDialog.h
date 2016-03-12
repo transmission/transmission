@@ -26,10 +26,6 @@ class AboutDialog: public BaseDialog
     AboutDialog (QWidget * parent = nullptr);
     virtual ~AboutDialog () {}
 
-  private slots:
-    void showCredits ();
-    void showLicense ();
-
   private:
     Ui::AboutDialog ui;
 

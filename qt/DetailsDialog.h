@@ -10,8 +10,6 @@
 #ifndef QTR_DETAILS_DIALOG_H
 #define QTR_DETAILS_DIALOG_H
 
-#include <QString>
-#include <QMap>
 #include <QSet>
 #include <QTimer>
 
@@ -40,7 +38,7 @@ class DetailsDialog: public BaseDialog
     void setIds (const QSet<int>& ids);
 
     // QWidget
-    virtual QSize sizeHint () const { return QSize (440, 460); }
+    QSize sizeHint () const override { return QSize (440, 460); }
 
   private:
     void initPeersTab ();
@@ -49,16 +47,14 @@ class DetailsDialog: public BaseDialog
     void initFilesTab ();
     void initOptionsTab ();
 
-    void getNewData ();
-
     QIcon getStockIcon (const QString& freedesktop_name, int fallback);
 
   private slots:
     void refresh ();
     void refreshPref (int key);
 
-    void onTorrentChanged ();
-    void onTimer ();
+    void onTorrentChanged (int id);
+    void getNewData ();
 
     // Tracker tab
     void onTrackerSelectionChanged ();
@@ -82,7 +78,7 @@ class DetailsDialog: public BaseDialog
     void onUploadLimitedToggled (bool);
     void onRatioModeChanged (int);
     void onIdleModeChanged (int);
-    void onIdleLimitChanged ();
+    void onIdleLimitChanged (int unused = 0);
 
   private:
     Session& mySession;

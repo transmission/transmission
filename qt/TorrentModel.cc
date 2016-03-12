@@ -7,14 +7,11 @@
  * $Id$
  */
 
-#include <iostream>
+#include <QVariant>
 
-#include <libtransmission/transmission.h>
 #include <libtransmission/variant.h>
 
-#include "Speed.h"
 #include "Torrent.h"
-#include "TorrentDelegate.h"
 #include "TorrentModel.h"
 
 void
@@ -190,7 +187,7 @@ TorrentModel::updateTorrents (tr_variant * torrents, bool isCompleteList)
 
       beginInsertRows (QModelIndex(), oldCount, newCount - 1);
 
-      for (Torrent * const tor: newTorrents)
+      foreach (Torrent * const tor, newTorrents)
         {
           addTorrent (tor);
           addIds.insert (tor->id ());
@@ -206,7 +203,7 @@ TorrentModel::updateTorrents (tr_variant * torrents, bool isCompleteList)
     {
       QSet<int> removedIds (oldIds);
       removedIds -= newIds;
-      for (const int id: removedIds)
+      foreach (const int id, removedIds)
         removeTorrent (id);
     }
 }
@@ -242,7 +239,7 @@ TorrentModel::getTransferSpeed (Speed   & uploadSpeed,
   Speed upSpeed, downSpeed;
   size_t upCount=0, downCount=0;
 
-  for (const Torrent * const tor: myTorrents)
+  foreach (const Torrent * const tor, myTorrents)
     {
       upSpeed += tor->uploadSpeed ();
       upCount += tor->peersWeAreUploadingTo ();
@@ -263,7 +260,7 @@ TorrentModel::getIds () const
   QSet<int> ids;
 
   ids.reserve (myTorrents.size());
-  for (const Torrent * const tor: myTorrents)
+  foreach (const Torrent * const tor, myTorrents)
     ids.insert (tor->id());
 
   return ids;
@@ -272,7 +269,7 @@ TorrentModel::getIds () const
 bool
 TorrentModel::hasTorrent (const QString& hashString) const
 {
-  for (const Torrent * const tor: myTorrents)
+  foreach (const Torrent * const tor, myTorrents)
     if (tor->hashString () == hashString)
       return true;
 

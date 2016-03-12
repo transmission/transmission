@@ -10,7 +10,6 @@
 #ifndef QTR_FILTERS_H
 #define QTR_FILTERS_H
 
-#include <QMetaType>
 #include <QString>
 #include <QVariant>
 
@@ -51,7 +50,7 @@ Q_DECLARE_METATYPE(FilterMode)
 class SortMode
 {
   public:
-    enum
+    enum SortType
     {
       SORT_BY_ACTIVITY,
       SORT_BY_AGE,

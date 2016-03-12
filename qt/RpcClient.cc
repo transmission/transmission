@@ -7,17 +7,9 @@
  * $Id$
  */
 
-#include <iostream>
-
 #include <QApplication>
 #include <QHostAddress>
-#include <QNetworkAccessManager>
-#include <QNetworkReply>
-#include <QNetworkRequest>
 
-#include <event2/buffer.h>
-
-#include <libtransmission/transmission.h>
 #include <libtransmission/rpcimpl.h>
 #include <libtransmission/utils.h> // tr_free
 #include <libtransmission/version.h> // LONG_VERSION_STRING
@@ -87,14 +79,8 @@ RpcClient::isLocal () const
   if (mySession != 0)
     return true;
 
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-  if (myUrl.host () == QLatin1String ("127.0.0.1") ||
-      myUrl.host ().compare (QLatin1String ("localhost"), Qt::CaseInsensitive) == 0)
-    return true;
-#else
   if (QHostAddress (myUrl.host ()).isLoopback ())
     return true;
-#endif
 
   return false;
 }
@@ -136,7 +122,7 @@ RpcClient::sendRequest (TrVariantPtr json)
     {
       QNetworkRequest request;
       request.setUrl (myUrl);
-      request.setRawHeader ("User-Agent", (qApp->applicationName () + QLatin1Char ('/') + QString::fromUtf8 (LONG_VERSION_STRING)).toUtf8 ());
+      request.setRawHeader ("User-Agent", (qApp->applicationName () + QLatin1Char ('/') + QStringLiteral(LONG_VERSION_STRING)).toUtf8 ());
       request.setRawHeader ("Content-Type", "application/json; charset=UTF-8");
 
       if (!mySessionId.isEmpty ())

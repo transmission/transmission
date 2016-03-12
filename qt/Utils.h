@@ -65,7 +65,7 @@ class Utils
 
     static bool isMagnetLink (const QString& s)
     {
-      return s.startsWith (QString::fromUtf8 ("magnet:?"));
+      return s.startsWith (QLatin1String("magnet:?"));
     }
 
     static bool isHexHashcode (const QString& s)
@@ -78,10 +78,9 @@ class Utils
 
     static bool isUriWithSupportedScheme (const QString& s)
     {
-      static const QString ftp = QString::fromUtf8 ("ftp://");
-      static const QString http = QString::fromUtf8 ("http://");
-      static const QString https = QString::fromUtf8 ("https://");
-      return s.startsWith(http) || s.startsWith(https) || s.startsWith(ftp);
+      return s.startsWith(QLatin1String("http://")) ||
+             s.startsWith(QLatin1String("https://")) ||
+             s.startsWith(QLatin1String("ftp://"));
     }
 };
 

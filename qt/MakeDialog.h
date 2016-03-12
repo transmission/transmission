@@ -16,8 +16,6 @@
 
 #include "ui_MakeDialog.h"
 
-class QAbstractButton;
-
 class Session;
 
 extern "C"
@@ -35,8 +33,8 @@ class MakeDialog: public BaseDialog
 
   protected:
     // QWidget
-    virtual void dragEnterEvent (QDragEnterEvent *);
-    virtual void dropEvent (QDropEvent *);
+    void dragEnterEvent (QDragEnterEvent *) override;
+    void dropEvent (QDropEvent *) override;
 
   private:
     QString getSource () const;

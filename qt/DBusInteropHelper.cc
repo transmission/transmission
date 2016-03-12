@@ -10,10 +10,7 @@
 #include <iostream>
 
 #include <QDBusConnection>
-#include <QDBusMessage>
 #include <QDBusReply>
-#include <QString>
-#include <QVariant>
 
 #include "DBusInteropHelper.h"
 #include "InteropObject.h"
@@ -35,7 +32,7 @@ QVariant
 DBusInteropHelper::addMetainfo (const QString& metainfo)
 {
   QDBusMessage request = QDBusMessage::createMethodCall (DBUS_SERVICE, DBUS_OBJECT_PATH,
-                                                         DBUS_INTERFACE, QLatin1String ("AddMetainfo"));
+                                                         DBUS_INTERFACE, QStringLiteral ("AddMetainfo"));
   request.setArguments (QVariantList () << metainfo);
 
   const QDBusReply<bool> response = QDBusConnection::sessionBus ().call (request);

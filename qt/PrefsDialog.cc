@@ -9,45 +9,17 @@
 
 #ifdef _WIN32
  #include <winsock2.h> // FD_SETSIZE
-#else
- #include <sys/select.h> // FD_SETSIZE
 #endif
 
 #include <cassert>
 
-#include <QCheckBox>
-#include <QComboBox>
-#include <QCoreApplication>
-#include <QDialogButtonBox>
-#include <QDoubleSpinBox>
-#include <QFileIconProvider>
 #include <QFileInfo>
-#include <QHBoxLayout>
-#include <QIcon>
-#include <QLabel>
-#include <QLineEdit>
-#include <QList>
 #include <QMessageBox>
-#include <QPushButton>
-#include <QSpinBox>
-#include <QStyle>
-#include <QTabWidget>
-#include <QTime>
-#include <QTimeEdit>
-#include <QTimer>
-#include <QVBoxLayout>
 
 #include "ColumnResizer.h"
-#include "FreeSpaceLabel.h"
 #include "Formatter.h"
-#include "Prefs.h"
 #include "PrefsDialog.h"
 #include "Session.h"
-#include "Utils.h"
-
-/***
-****
-***/
 
 namespace
 {
@@ -253,10 +225,10 @@ PrefsDialog::initSpeedTab ()
   const QString speed_K_str = Formatter::unitStr (Formatter::SPEED, Formatter::KB);
   const QLocale locale;
 
-  ui.uploadSpeedLimitSpin->setSuffix (QString::fromLatin1 (" %1").arg (speed_K_str));
-  ui.downloadSpeedLimitSpin->setSuffix (QString::fromLatin1 (" %1").arg (speed_K_str));
-  ui.altUploadSpeedLimitSpin->setSuffix (QString::fromLatin1 (" %1").arg (speed_K_str));
-  ui.altDownloadSpeedLimitSpin->setSuffix (QString::fromLatin1 (" %1").arg (speed_K_str));
+  ui.uploadSpeedLimitSpin->setSuffix (QStringLiteral (" %1").arg (speed_K_str));
+  ui.downloadSpeedLimitSpin->setSuffix (QStringLiteral (" %1").arg (speed_K_str));
+  ui.altUploadSpeedLimitSpin->setSuffix (QStringLiteral (" %1").arg (speed_K_str));
+  ui.altDownloadSpeedLimitSpin->setSuffix (QStringLiteral (" %1").arg (speed_K_str));
 
   ui.altSpeedLimitDaysCombo->addItem (tr ("Every Day"), QVariant (TR_SCHED_ALL));
   ui.altSpeedLimitDaysCombo->addItem (tr ("Weekdays"),  QVariant (TR_SCHED_WEEKDAY));
@@ -552,25 +524,26 @@ PrefsDialog::PrefsDialog (Session& session, Prefs& prefs, QWidget * parent):
 
   connect (&mySession, SIGNAL (sessionUpdated ()), SLOT (sessionUpdated ()));
 
-  QList<int> keys;
-  keys << Prefs::RPC_ENABLED
-       << Prefs::ALT_SPEED_LIMIT_ENABLED
-       << Prefs::ALT_SPEED_LIMIT_TIME_ENABLED
-       << Prefs::ENCRYPTION
-       << Prefs::BLOCKLIST_ENABLED
-       << Prefs::DIR_WATCH
-       << Prefs::DOWNLOAD_DIR
-       << Prefs::INCOMPLETE_DIR
-       << Prefs::INCOMPLETE_DIR_ENABLED
-       << Prefs::SCRIPT_TORRENT_DONE_FILENAME;
-  for (const int key: keys)
+  QList<int> keys = {
+    Prefs::RPC_ENABLED,
+    Prefs::ALT_SPEED_LIMIT_ENABLED,
+    Prefs::ALT_SPEED_LIMIT_TIME_ENABLED,
+    Prefs::ENCRYPTION,
+    Prefs::BLOCKLIST_ENABLED,
+    Prefs::DIR_WATCH,
+    Prefs::DOWNLOAD_DIR,
+    Prefs::INCOMPLETE_DIR,
+    Prefs::INCOMPLETE_DIR_ENABLED,
+    Prefs::SCRIPT_TORRENT_DONE_FILENAME};
+
+  foreach (const int key, keys)
     refreshPref (key);
 
   // if it's a remote session, disable the preferences
   // that don't work in remote sessions
   if (!myIsServer)
     {
-      for (QWidget * const w: myUnsupportedWhenRemote)
+      foreach (QWidget * const w, myUnsupportedWhenRemote)
         {
           w->setToolTip (tr ("Not supported by remote sessions"));
           w->setEnabled (false);
@@ -620,11 +593,11 @@ PrefsDialog::refreshPref (int key)
           const bool enabled (myPrefs.getBool (Prefs::RPC_ENABLED));
           const bool whitelist (myPrefs.getBool (Prefs::RPC_WHITELIST_ENABLED));
           const bool auth (myPrefs.getBool (Prefs::RPC_AUTH_REQUIRED));
-          for (QWidget * const w: myWebWhitelistWidgets)
+          foreach (QWidget * const w, myWebWhitelistWidgets)
             w->setEnabled (enabled && whitelist);
-          for (QWidget * const w: myWebAuthWidgets)
+          foreach (QWidget * const w, myWebAuthWidgets)
             w->setEnabled (enabled && auth);
-          for (QWidget * const w: myWebWidgets)
+          foreach (QWidget * const w, myWebWidgets)
             w->setEnabled (enabled);
           break;
         }
@@ -632,7 +605,7 @@ PrefsDialog::refreshPref (int key)
       case Prefs::ALT_SPEED_LIMIT_TIME_ENABLED:
         {
           const bool enabled = myPrefs.getBool (key);
-          for (QWidget * const w: mySchedWidgets)
+          foreach (QWidget * const w, mySchedWidgets)
             w->setEnabled (enabled);
           break;
         }
@@ -640,7 +613,7 @@ PrefsDialog::refreshPref (int key)
       case Prefs::BLOCKLIST_ENABLED:
         {
           const bool enabled = myPrefs.getBool (key);
-          for (QWidget * const w: myBlockWidgets)
+          foreach (QWidget * const w, myBlockWidgets)
             w->setEnabled (enabled);
           break;
         }

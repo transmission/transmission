@@ -22,8 +22,8 @@ class FileTreeDelegate: public QItemDelegate
 
   public:
     // QAbstractItemDelegate
-    virtual QSize sizeHint (const QStyleOptionViewItem&, const QModelIndex&) const;
-    virtual void paint (QPainter *, const QStyleOptionViewItem&, const QModelIndex&) const;
+    QSize sizeHint (const QStyleOptionViewItem&, const QModelIndex&) const override;
+    void paint (QPainter *, const QStyleOptionViewItem&, const QModelIndex&) const override;
 };
 
 #endif // QTR_FILE_TREE_DELEGATE_H

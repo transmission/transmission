@@ -10,10 +10,7 @@
 #ifndef QTR_FILE_TREE_MODEL_H
 #define QTR_FILE_TREE_MODEL_H
 
-#include <cstdint>
-
 #include <QAbstractItemModel>
-#include <QList>
 #include <QMap>
 #include <QSet>
 
@@ -66,14 +63,14 @@ class FileTreeModel: public QAbstractItemModel
     QModelIndex parent (const QModelIndex& child, int column) const;
 
     // QAbstractItemModel
-    virtual QVariant data (const QModelIndex& index, int role = Qt::DisplayRole) const;
-    virtual Qt::ItemFlags flags (const QModelIndex& index) const;
-    virtual QVariant headerData (int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
-    virtual QModelIndex index (int row, int column, const QModelIndex& parent = QModelIndex ()) const;
-    virtual QModelIndex parent (const QModelIndex& child) const;
-    virtual int rowCount (const QModelIndex& parent = QModelIndex ()) const;
-    virtual int columnCount (const QModelIndex& parent = QModelIndex ()) const;
-    virtual bool setData (const QModelIndex& index, const QVariant& value, int role = Qt::EditRole);
+    QVariant data (const QModelIndex& index, int role = Qt::DisplayRole) const override;
+    Qt::ItemFlags flags (const QModelIndex& index) const override;
+    QVariant headerData (int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
+    QModelIndex index (int row, int column, const QModelIndex& parent = QModelIndex ()) const override;
+    QModelIndex parent (const QModelIndex& child) const override;
+    int rowCount (const QModelIndex& parent = QModelIndex ()) const override;
+    int columnCount (const QModelIndex& parent = QModelIndex ()) const override;
+    bool setData (const QModelIndex& index, const QVariant& value, int role = Qt::EditRole) override;
 
   signals:
     void priorityChanged (const QSet<int>& fileIndices, int);

@@ -14,11 +14,7 @@
 
 #include <QNetworkReply>
 #include <QObject>
-#include <QString>
-#include <QUrl>
 
-#include <libtransmission/transmission.h>
-#include <libtransmission/quark.h>
 #include <libtransmission/variant.h>
 
 class QByteArray;

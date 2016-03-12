@@ -7,14 +7,10 @@
  * $Id$
  */
 
-#include <algorithm>
-
-#include "Filters.h"
 #include "Prefs.h"
 #include "Torrent.h"
 #include "TorrentFilter.h"
 #include "TorrentModel.h"
-#include "Utils.h"
 
 TorrentFilter::TorrentFilter (const Prefs& prefs):
   myPrefs (prefs)
@@ -30,7 +26,7 @@ TorrentFilter::TorrentFilter (const Prefs& prefs):
            << Prefs::FILTER_MODE
            << Prefs::FILTER_TRACKERS
            << Prefs::FILTER_TEXT;
-  for (const int key: initKeys)
+  foreach (const int key, initKeys)
     refreshPref (key);
 }
 

@@ -10,21 +10,15 @@
 #include <cassert>
 #include <iostream>
 
-#include <QApplication>
 #include <QFileIconProvider>
-#include <QFileInfo>
-#include <QSet>
-#include <QString>
 #include <QStyle>
 #include <QUrl>
-#include <QVariant>
 
-#include <libtransmission/transmission.h>
-#include <libtransmission/utils.h> /* tr_new0, tr_strdup */
 #include <libtransmission/variant.h>
 
 #include "Application.h"
 #include "Prefs.h"
+#include "CustomVariantType.h"
 #include "Torrent.h"
 #include "Utils.h"
 
@@ -115,10 +109,9 @@ Torrent::buildKeyList (Group group)
 {
   KeyList keys;
 
-  if (keys.empty())
-    for (int i=0; i<PROPERTY_COUNT; ++i)
-      if (myProperties[i].id==ID || myProperties[i].group==group)
-        keys << myProperties[i].key;
+  for (int i=0; i<PROPERTY_COUNT; ++i)
+    if (myProperties[i].id==ID || myProperties[i].group==group)
+      keys << myProperties[i].key;
 
   return keys;
 }
@@ -126,11 +119,7 @@ Torrent::buildKeyList (Group group)
 const Torrent::KeyList&
 Torrent::getInfoKeys ()
 {
-  static KeyList keys;
-
-  if (keys.isEmpty())
-    keys << buildKeyList(INFO) << TR_KEY_files;
-
+  static KeyList keys = KeyList() << buildKeyList(INFO) << TR_KEY_files;
   return keys;
 }
 
@@ -144,11 +133,7 @@ Torrent::getStatKeys ()
 const Torrent::KeyList&
 Torrent::getExtraStatKeys()
 {
-  static KeyList keys;
-
-  if (keys.isEmpty())
-    keys << buildKeyList(STAT_EXTRA) << TR_KEY_fileStats;
-
+  static KeyList keys = KeyList() << buildKeyList(STAT_EXTRA) << TR_KEY_fileStats;
   return keys;
 }
 
@@ -264,57 +249,22 @@ Torrent::setIcon (int i, const QIcon& value)
   return true;
 }
 
-int
-Torrent::getInt (int i) const
-{
-  assert (0<=i && i<PROPERTY_COUNT);
-  assert (myProperties[i].type == QVariant::Int);
-
-  return myValues[i].toInt ();
+#define DEFINE_GETTER(TYPE, QTYPE, NAME) \
+TYPE Torrent::get##NAME(int i) const { \
+  assert (0<=i && i<PROPERTY_COUNT); \
+  assert (myProperties[i].type == QVariant::QTYPE); \
+  return myValues[i].to##QTYPE (); \
 }
 
-QDateTime
-Torrent::getDateTime (int i) const
-{
-  assert (0<=i && i<PROPERTY_COUNT);
-  assert (myProperties[i].type == QVariant::DateTime);
+DEFINE_GETTER(int, Int, Int)
+DEFINE_GETTER(QDateTime, DateTime, DateTime)
+DEFINE_GETTER(bool, Bool, Bool)
+DEFINE_GETTER(qulonglong, ULongLong, Size)
+DEFINE_GETTER(double, Double, Double)
+DEFINE_GETTER(QString, String, String)
 
-  return myValues[i].toDateTime ();
-}
+#undef GETTER
 
-bool
-Torrent::getBool (int i) const
-{
-  assert (0<=i && i<PROPERTY_COUNT);
-  assert (myProperties[i].type == QVariant::Bool);
-
-  return myValues[i].toBool ();
-}
-
-qulonglong
-Torrent::getSize (int i) const
-{
-    assert (0<=i && i<PROPERTY_COUNT);
-    assert (myProperties[i].type == QVariant::ULongLong);
-
-    return myValues[i].toULongLong ();
-}
-double
-Torrent::getDouble (int i) const
-{
-  assert (0<=i && i<PROPERTY_COUNT);
-  assert (myProperties[i].type == QVariant::Double);
-
-  return myValues[i].toDouble ();
-}
-QString
-Torrent::getString (int i) const
-{
-  assert (0<=i && i<PROPERTY_COUNT);
-  assert (myProperties[i].type == QVariant::String);
-
-  return myValues[i].toString ();
-}
 QIcon
 Torrent::getIcon (int i) const
 {
@@ -356,7 +306,7 @@ Torrent::getSeedRatio (double& ratio) const
 bool
 Torrent::hasFileSubstring (const QString& substr) const
 {
-  for (const TorrentFile& file: myFiles)
+  foreach (const TorrentFile& file, myFiles)
     if (file.filename.contains (substr, Qt::CaseInsensitive))
       return true;
 
@@ -366,7 +316,7 @@ Torrent::hasFileSubstring (const QString& substr) const
 bool
 Torrent::hasTrackerSubstring (const QString& substr) const
 {
-  for (const QString& s: myValues[TRACKERS].toStringList())
+  foreach (const QString& s, myValues[TRACKERS].toStringList())
     if (s.contains (substr, Qt::CaseInsensitive))
       return true;
 
@@ -429,14 +379,9 @@ Torrent::updateMimeIcon ()
 {
   const FileList& files (myFiles);
 
-  QIcon icon;
-
-  if (files.size () > 1)
-    icon = QFileIconProvider().icon (QFileIconProvider::Folder);
-  else if (files.size () == 1)
-    icon = Utils::guessMimeIcon (files.at(0).filename);
-  else
-    icon = QIcon ();
+  QIcon icon =  (files.size () > 1)  ? QFileIconProvider().icon (QFileIconProvider::Folder)
+             :  (files.size () == 1) ? Utils::guessMimeIcon (files.at(0).filename)
+             :  icon = QIcon ();
 
   setIcon (MIME_ICON, icon);
 }
@@ -612,7 +557,7 @@ Torrent::update (tr_variant * d)
       if (myValues[TRACKERS] != list)
         {
           QStringList hosts;
-          for (const QString& tracker: list)
+          foreach (const QString& tracker, list)
             {
               const QString host = FaviconCache::getHost (QUrl (tracker));
               if (!host.isEmpty())

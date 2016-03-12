@@ -8,7 +8,6 @@
  */
 
 #include <QApplication>
-#include <QStyle>
 #include <QStylePainter>
 
 #include "FilterBarComboBox.h"

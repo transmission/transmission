@@ -11,9 +11,7 @@
 #define QTR_TORRENT_MODEL_H
 
 #include <QAbstractListModel>
-#include <QMap>
 #include <QSet>
-#include <QVector>
 
 class Prefs;
 class Speed;
@@ -48,8 +46,8 @@ class TorrentModel: public QAbstractListModel
                            Speed& downloadSpeed, size_t& downloadPeerCount);
 
     // QAbstractItemModel
-    virtual int rowCount (const QModelIndex& parent = QModelIndex ()) const;
-    virtual QVariant data (const QModelIndex& index, int role = Qt::DisplayRole) const;
+    int rowCount (const QModelIndex& parent = QModelIndex ()) const override;
+    QVariant data (const QModelIndex& index, int role = Qt::DisplayRole) const override;
 
   public slots:
     void updateTorrents (tr_variant * torrentList, bool isCompleteList);

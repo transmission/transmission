@@ -7,24 +7,12 @@
  * $Id$
  */
 
-#include <QFileInfo>
 #include <QPushButton>
 
-#include <libtransmission/transmission.h>
-#include <libtransmission/utils.h> /* mime64 */
-#include <libtransmission/variant.h>
-
-#include "AddData.h"
-#include "FreeSpaceLabel.h"
 #include "OptionsDialog.h"
 #include "Prefs.h"
 #include "Session.h"
-#include "Torrent.h"
 #include "Utils.h"
-
-/***
-****
-***/
 
 OptionsDialog::OptionsDialog (Session& session, const Prefs& prefs, const AddData& addme, QWidget * parent):
   BaseDialog (parent),
@@ -70,7 +58,7 @@ OptionsDialog::OptionsDialog (Session& session, const Prefs& prefs, const AddDat
   ui.sourceLabel->setBuddy (ui.sourceStack->currentWidget ());
 
   const QFontMetrics fontMetrics (font ());
-  const int width = fontMetrics.size (0, QString::fromUtf8 ("This is a pretty long torrent filename indeed.torrent")).width ();
+  const int width = fontMetrics.size (0, QStringLiteral ("This is a pretty long torrent filename indeed.torrent")).width ();
   ui.sourceStack->setMinimumWidth (width);
 
   const QString downloadDir (Utils::removeTrailingDirSeparator (prefs.getString (Prefs::DOWNLOAD_DIR)));
@@ -333,7 +321,7 @@ OptionsDialog::clearVerify ()
   myVerifyPiecePos = 0;
   myVerifyTimer.stop ();
 
-  for (TorrentFile& f: myFiles)
+  for (TorrentFile& f : myFiles)
     f.have = 0;
 
   ui.filesView->update (myFiles);
@@ -431,7 +419,7 @@ OptionsDialog::onTimeout ()
   if (done)
     {
       uint64_t have = 0;
-      for (const TorrentFile& f: myFiles)
+      foreach (const TorrentFile& f, myFiles)
         have += f.have;
 
       if (!have) // everything failed

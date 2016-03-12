@@ -8,7 +8,6 @@
  */
 
 #include <QStyle>
-#include <QStyleOption>
 #include <QStyleOptionToolButton>
 #include <QStylePainter>
 

@@ -10,10 +10,7 @@
 #ifndef QTR_FORMATTER_H
 #define QTR_FORMATTER_H
 
-#include <cstdint> // int64_t
-
 #include <QCoreApplication>
-#include <QString>
 
 class Speed;
 

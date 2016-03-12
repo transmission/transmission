@@ -12,11 +12,8 @@
 
 #include <QObject>
 #include <QSet>
-#include <QString>
-#include <QStringList>
 
 #include <libtransmission/transmission.h>
-#include <libtransmission/quark.h>
 
 #include "RpcClient.h"
 
@@ -111,7 +108,7 @@ class Session: public QObject
     void reannounceTorrents (const QSet<int>& torrentIds);
     void launchWebInterface ();
     void updatePref (int key);
-  
+
     /** request a refresh for statistics, including the ones only used by the properties dialog, for a specific torrent */
     void refreshExtraStats (const QSet<int>& ids);
 

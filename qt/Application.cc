@@ -7,15 +7,11 @@
  * $Id$
  */
 
-#include <ctime>
 #include <iostream>
 
-#include <QIcon>
 #include <QLibraryInfo>
 #include <QMessageBox>
 #include <QProcess>
-#include <QRect>
-#include <QSystemTrayIcon>
 
 #ifdef QT_DBUS_LIB
   #include <QDBusConnection>
@@ -23,12 +19,9 @@
   #include <QDBusReply>
 #endif
 
-#include <libtransmission/transmission.h>
 #include <libtransmission/tr-getopt.h>
-#include <libtransmission/utils.h>
 #include <libtransmission/version.h>
 
-#include "AddData.h"
 #include "Application.h"
 #include "Formatter.h"
 #include "InteropHelper.h"
@@ -98,10 +91,7 @@ Application::Application (int& argc, char ** argv):
   loadTranslations ();
 
   Formatter::initUnits ();
-
-#if QT_VERSION >= QT_VERSION_CHECK(5, 1, 0)
   setAttribute (Qt::AA_UseHighDpiPixmaps);
-#endif
 
 #if defined (_WIN32) || defined (__APPLE__)
   if (QIcon::themeName ().isEmpty ())
@@ -109,13 +99,12 @@ Application::Application (int& argc, char ** argv):
 #endif
 
   // set the default icon
-  QIcon icon = QIcon::fromTheme (QLatin1String ("transmission"));
+  QIcon icon = QIcon::fromTheme (QStringLiteral ("transmission"));
   if (icon.isNull ())
     {
-      QList<int> sizes;
-      sizes << 16 << 22 << 24 << 32 << 48 << 64 << 72 << 96 << 128 << 192 << 256;
-      for (const int size: sizes)
-        icon.addPixmap (QPixmap (QString::fromLatin1 (":/icons/transmission-%1.png").arg (size)));
+      QList<int> sizes = {16, 22, 24, 32, 48, 64, 72, 96, 128, 192, 256};
+      foreach (const int size, sizes)
+        icon.addPixmap (QPixmap (QStringLiteral(":/icons/transmission-%1.png").arg (size)));
     }
   setWindowIcon (icon);
 
@@ -164,7 +153,7 @@ Application::Application (int& argc, char ** argv):
   if (interopClient.isConnected ())
     {
       bool delegated = false;
-      for (const QString& filename: filenames)
+      foreach (const QString& filename, filenames)
         {
           QString metainfo;
 
@@ -199,7 +188,7 @@ Application::Application (int& argc, char ** argv):
     dir.mkpath (configDir);
 
   // is this the first time we've run transmission?
-  const bool firstTime = !dir.exists (QLatin1String ("settings.json"));
+  const bool firstTime = !dir.exists (QStringLiteral ("settings.json"));
 
   // initialize the prefs
   myPrefs = new Prefs (configDir);
@@ -226,42 +215,41 @@ Application::Application (int& argc, char ** argv):
   myWatchDir = new WatchDir (*myModel);
 
   // when the session gets torrent info, update the model
-  connect (mySession, SIGNAL (torrentsUpdated (tr_variant*,bool)), myModel, SLOT (updateTorrents (tr_variant*,bool)));
+  connect (mySession, &Session::torrentsUpdated, myModel, &TorrentModel::updateTorrents);
   connect (mySession, SIGNAL (torrentsUpdated (tr_variant*,bool)), myWindow, SLOT (refreshActionSensitivity ()));
-  connect (mySession, SIGNAL (torrentsRemoved (tr_variant*)), myModel, SLOT (removeTorrents (tr_variant*)));
+  connect (mySession, &Session::torrentsRemoved, myModel, &TorrentModel::removeTorrents);
   // when the session source gets changed, request a full refresh
-  connect (mySession, SIGNAL (sourceChanged ()), this, SLOT (onSessionSourceChanged ()));
+  connect (mySession, &Session::sourceChanged, this, &Application::onSessionSourceChanged);
   // when the model sees a torrent for the first time, ask the session for full info on it
-  connect (myModel, SIGNAL (torrentsAdded (QSet<int>)), mySession, SLOT (initTorrents (QSet<int>)));
-  connect (myModel, SIGNAL (torrentsAdded (QSet<int>)), this, SLOT (onTorrentsAdded (QSet<int>)));
+  connect (myModel,  &TorrentModel::torrentsAdded, mySession, &Session::initTorrents);
+  connect (myModel, &TorrentModel::torrentsAdded, this, &Application::onTorrentsAdded);
 
   mySession->initTorrents ();
   mySession->refreshSessionStats ();
 
   // when torrents are added to the watch directory, tell the session
-  connect (myWatchDir, SIGNAL (torrentFileAdded (QString)), this, SLOT (addTorrent (QString)));
+  connect (myWatchDir, &WatchDir::torrentFileAdded, this, &Application::addTorrent);
 
   // init from preferences
-  QList<int> initKeys;
-  initKeys << Prefs::DIR_WATCH;
-  for (const int key: initKeys)
+  QList<int> initKeys = { Prefs::DIR_WATCH };
+  foreach (const int key, initKeys)
     refreshPref (key);
-  connect (myPrefs, SIGNAL (changed (int)), this, SLOT (refreshPref (const int)));
+  connect (myPrefs, &Prefs::changed, this, &Application::refreshPref);
 
   QTimer * timer = &myModelTimer;
-  connect (timer, SIGNAL (timeout ()), this, SLOT (refreshTorrents ()));
+  connect (timer, &QTimer::timeout, this, &Application::refreshTorrents);
   timer->setSingleShot (false);
   timer->setInterval (MODEL_REFRESH_INTERVAL_MSEC);
   timer->start ();
 
   timer = &myStatsTimer;
-  connect (timer, SIGNAL (timeout ()), mySession, SLOT (refreshSessionStats ()));
+  connect (timer, &QTimer::timeout, mySession, &Session::refreshSessionStats);
   timer->setSingleShot (false);
   timer->setInterval (STATS_REFRESH_INTERVAL_MSEC);
   timer->start ();
 
   timer = &mySessionTimer;
-  connect (timer, SIGNAL (timeout ()), mySession, SLOT (refreshSessionInfo ()));
+  connect (timer, &QTimer::timeout, mySession, &Session::refreshSessionInfo);
   timer->setSingleShot (false);
   timer->setInterval (SESSION_REFRESH_INTERVAL_MSEC);
   timer->start ();
@@ -284,13 +272,13 @@ Application::Application (int& argc, char ** argv):
       dialog->setDefaultButton (QMessageBox::Ok);
       dialog->setModal (true);
 
-      connect (dialog, SIGNAL (finished (int)), this, SLOT (consentGiven (int)));
+      connect (dialog, &QMessageBox::finished, this, &Application::consentGiven);
 
       dialog->setAttribute (Qt::WA_DeleteOnClose);
       dialog->show ();
     }
 
-  for (const QString& filename: filenames)
+  foreach (const QString& filename, filenames)
     addTorrent (filename);
 
   InteropHelper::registerObject (this);
@@ -302,25 +290,25 @@ Application::loadTranslations ()
   const QStringList qtQmDirs = QStringList () <<
     QLibraryInfo::location (QLibraryInfo::TranslationsPath) <<
 #ifdef TRANSLATIONS_DIR
-    QString::fromUtf8 (TRANSLATIONS_DIR) <<
+    QStringLiteral (TRANSLATIONS_DIR) <<
 #endif
-    (applicationDirPath () + QLatin1String ("/translations"));
+    (applicationDirPath () + QStringLiteral ("/translations"));
 
   const QStringList appQmDirs = QStringList () <<
 #ifdef TRANSLATIONS_DIR
-    QString::fromUtf8 (TRANSLATIONS_DIR) <<
+    QStringLiteral(TRANSLATIONS_DIR) <<
 #endif
-    (applicationDirPath () + QLatin1String ("/translations"));
+    (applicationDirPath () + QStringLiteral ("/translations"));
 
   QString localeName = QLocale ().name ();
 
   if (!loadTranslation (myAppTranslator, MY_CONFIG_NAME, localeName, appQmDirs))
     {
-      localeName = QLatin1String ("en");
+      localeName = QStringLiteral ("en");
       loadTranslation (myAppTranslator, MY_CONFIG_NAME, localeName, appQmDirs);
     }
 
-  if (loadTranslation (myQtTranslator, QLatin1String ("qt"), localeName, qtQmDirs))
+  if (loadTranslation (myQtTranslator, QStringLiteral ("qt"), localeName, qtQmDirs))
     installTranslator (&myQtTranslator);
   installTranslator (&myAppTranslator);
 }
@@ -339,20 +327,20 @@ Application::onTorrentsAdded (const QSet<int>& torrents)
   if (!myPrefs->getBool (Prefs::SHOW_NOTIFICATION_ON_ADD))
     return;
 
-  for (const int id: torrents)
+  foreach (const int id, torrents)
     {
       Torrent * tor = myModel->getTorrentFromId (id);
 
       if (tor->name ().isEmpty ()) // wait until the torrent's INFO fields are loaded
         {
-          connect (tor, SIGNAL (torrentChanged (int)), this, SLOT (onNewTorrentChanged (int)));
+          connect (tor, &Torrent::torrentChanged, this, &Application::onNewTorrentChanged);
         }
       else
         {
           onNewTorrentChanged (id);
 
           if (!tor->isSeed ())
-            connect (tor, SIGNAL (torrentCompleted (int)), this, SLOT (onTorrentCompleted (int)));
+            connect (tor, &Torrent::torrentCompleted, this, &Application::onTorrentCompleted);
         }
     }
 }
@@ -376,7 +364,7 @@ Application::onTorrentCompleted (int id)
 #endif
         }
 
-      disconnect (tor, SIGNAL (torrentCompleted (int)), this, SLOT (onTorrentCompleted (int)));
+      disconnect (tor, &Torrent::torrentCompleted, this, &Application::onTorrentCompleted);
     }
 }
 
@@ -391,10 +379,10 @@ Application::onNewTorrentChanged (int id)
       if (age_secs < 30)
         notifyApp (tr ("Torrent Added"), tor->name ());
 
-      disconnect (tor, SIGNAL (torrentChanged (int)), this, SLOT (onNewTorrentChanged (int)));
+      disconnect (tor, &Torrent::torrentChanged, this, &Application::onNewTorrentChanged);
 
       if (!tor->isSeed ())
-        connect (tor, SIGNAL (torrentCompleted (int)), this, SLOT (onTorrentCompleted (int)));
+        connect (tor, &Torrent::torrentCompleted, this, &Application::onTorrentCompleted);
     }
 }
 
@@ -509,11 +497,11 @@ Application::addTorrent (const QString& key)
   const AddData addme (key);
 
   if (addme.type != addme.NONE)
-    addTorrent (addme);
+    addTorrentData (addme);
 }
 
 void
-Application::addTorrent (const AddData& addme)
+Application::addTorrentData (const AddData& addme)
 {
   if (!myPrefs->getBool (Prefs::OPTIONS_PROMPT))
     {
@@ -549,7 +537,7 @@ Application::notifyApp (const QString& title, const QString& body) const
   QDBusConnection bus = QDBusConnection::sessionBus ();
   if (bus.isConnected ())
     {
-      QDBusMessage m = QDBusMessage::createMethodCall (dbusServiceName, dbusPath, dbusInterfaceName, QLatin1String ("Notify"));
+      QDBusMessage m = QDBusMessage::createMethodCall (dbusServiceName, dbusPath, dbusInterfaceName, QStringLiteral ("Notify"));
       QVariantList args;
       args.append (QLatin1String ("Transmission")); // app_name
       args.append (0U);                             // replaces_id

@@ -24,46 +24,36 @@ namespace
  unsigned int size_K;
 }
 
-QString Formatter::unitStrings[3][5];
+QString Formatter::unitStrings[3][5] = {
+    { {tr("B/s")}, {tr("kB/s")}, {tr("MB/s")}, {tr("GB/s")}, {tr("TB/s")}},
+    { {tr("B")},   {tr("kB")},   {tr("MB")},   {tr("GB")},   {tr("TB")}},
+    { {tr("B")},   {tr("KiB")},  {tr("MiB")},  {tr("GiB")},  {tr("TiB")}},
+};
 
 void
 Formatter::initUnits ()
 {
+
  speed_K = 1000;
- unitStrings[SPEED][B]  = tr ( "B/s");
- unitStrings[SPEED][KB] = tr ("kB/s");
- unitStrings[SPEED][MB] = tr ("MB/s");
- unitStrings[SPEED][GB] = tr ("GB/s");
- unitStrings[SPEED][TB] = tr ("TB/s");
  tr_formatter_speed_init (speed_K,
-                          unitStrings[SPEED][KB].toUtf8().constData(),
-                          unitStrings[SPEED][MB].toUtf8().constData(),
-                          unitStrings[SPEED][GB].toUtf8().constData(),
-                          unitStrings[SPEED][TB].toUtf8().constData());
+                          qPrintable(unitStrings[SPEED][KB]),
+                          qPrintable(unitStrings[SPEED][MB]),
+                          qPrintable(unitStrings[SPEED][GB]),
+                          qPrintable(unitStrings[SPEED][TB]));
 
   size_K = 1000;
-  unitStrings[SIZE][B]  = tr ( "B");
-  unitStrings[SIZE][KB] = tr ("kB");
-  unitStrings[SIZE][MB] = tr ("MB");
-  unitStrings[SIZE][GB] = tr ("GB");
-  unitStrings[SIZE][TB] = tr ("TB");
   tr_formatter_size_init (size_K,
-                          unitStrings[SIZE][KB].toUtf8().constData(),
-                          unitStrings[SIZE][MB].toUtf8().constData(),
-                          unitStrings[SIZE][GB].toUtf8().constData(),
-                          unitStrings[SIZE][TB].toUtf8().constData());
+                          qPrintable(unitStrings[SIZE][KB]),
+                          qPrintable(unitStrings[SIZE][MB]),
+                          qPrintable(unitStrings[SIZE][GB]),
+                          qPrintable(unitStrings[SIZE][TB]));
 
   mem_K = 1024;
-  unitStrings[MEM][B]  = tr (  "B");
-  unitStrings[MEM][KB] = tr ("KiB");
-  unitStrings[MEM][MB] = tr ("MiB");
-  unitStrings[MEM][GB] = tr ("GiB");
-  unitStrings[MEM][TB] = tr ("TiB");
   tr_formatter_mem_init (mem_K,
-                         unitStrings[MEM][KB].toUtf8().constData(),
-                         unitStrings[MEM][MB].toUtf8().constData(),
-                         unitStrings[MEM][GB].toUtf8().constData(),
-                         unitStrings[MEM][TB].toUtf8().constData());
+                         qPrintable(unitStrings[MEM][KB]),
+                         qPrintable(unitStrings[MEM][MB]),
+                         qPrintable(unitStrings[MEM][GB]),
+                         qPrintable(unitStrings[MEM][TB]));
 }
 
 /***
@@ -177,21 +167,21 @@ Formatter::timeToString (int seconds)
       if (days >= 4 || !hours)
         str = d;
       else
-        str = tr ("%1, %2").arg (d).arg (h);
+        str = tr ("%1, %2").arg (d,h);
     }
   else if (hours)
     {
       if (hours >= 4 || !minutes)
         str = h;
       else
-        str = tr ("%1, %2").arg (h).arg (m);
+        str = tr ("%1, %2").arg (h,m);
     }
   else if (minutes)
     {
       if (minutes >= 4 || !seconds)
         str = m;
       else
-        str = tr ("%1, %2").arg (m).arg (s);
+        str = tr ("%1, %2").arg (m,s);
     }
   else
     {

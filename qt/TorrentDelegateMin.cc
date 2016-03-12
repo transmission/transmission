@@ -8,22 +8,12 @@
  */
 
 #include <QApplication>
-#include <QBrush>
-#include <QFont>
-#include <QFontMetrics>
-#include <QIcon>
-#include <QModelIndex>
 #include <QPainter>
-#include <QPixmap>
-#include <QPixmapCache>
-#include <QStyleOptionProgressBar>
 
-#include <libtransmission/transmission.h>
 #include <libtransmission/utils.h>
 
 #include "Torrent.h"
 #include "TorrentDelegateMin.h"
-#include "TorrentModel.h"
 #include "Utils.h"
 
 enum
@@ -146,19 +136,11 @@ TorrentDelegateMin::drawTorrent (QPainter                   * painter,
       painter->fillRect(option.rect, option.palette.brush(cg, QPalette::Highlight));
     }
 
-  QIcon::Mode im;
-  if (isPaused || !isItemEnabled)
-    im = QIcon::Disabled;
-  else if (isItemSelected)
-    im = QIcon::Selected;
-  else
-    im = QIcon::Normal;
+  QIcon::Mode im = (isPaused || !isItemEnabled) ? QIcon::Disabled
+                 : (isItemSelected) ? QIcon::Selected
+                 : QIcon::Normal;
 
-  QIcon::State qs;
-  if (isPaused)
-    qs = QIcon::Off;
-  else
-    qs = QIcon::On;
+  QIcon::State qs =  (isPaused) ? QIcon::Off : QIcon::On;
 
   QPalette::ColorGroup cg = QPalette::Normal;
   if (isPaused || !isItemEnabled)
@@ -166,11 +148,7 @@ TorrentDelegateMin::drawTorrent (QPainter                   * painter,
   if (cg == QPalette::Normal && !isItemActive)
     cg = QPalette::Inactive;
 
-  QPalette::ColorRole cr;
-  if (isItemSelected)
-    cr = QPalette::HighlightedText;
-  else
-    cr = QPalette::Text;
+  QPalette::ColorRole cr = (isItemSelected) ? QPalette::HighlightedText : QPalette::Text;
 
   QStyle::State progressBarState (option.state);
   if (isPaused)
@@ -178,7 +156,7 @@ TorrentDelegateMin::drawTorrent (QPainter                   * painter,
   progressBarState |= QStyle::State_Small;
 
   const QIcon::Mode emblemIm = isItemSelected ? QIcon::Selected : QIcon::Normal;
-  const QIcon emblemIcon = tor.hasError () ? QIcon::fromTheme (QLatin1String ("emblem-important"), style->standardIcon (QStyle::SP_MessageBoxWarning)) : QIcon ();
+  const QIcon emblemIcon = tor.hasError () ? QIcon::fromTheme (QStringLiteral ("emblem-important"), style->standardIcon (QStyle::SP_MessageBoxWarning)) : QIcon ();
 
   // layout
   const QSize m (margin (*style));
@@ -199,26 +177,16 @@ TorrentDelegateMin::drawTorrent (QPainter                   * painter,
   painter->setFont (layout.statusFont);
   painter->drawText (layout.statusRect, Qt::AlignLeft | Qt::AlignVCenter, layout.statusText ());
   myProgressBarStyle->rect = layout.barRect;
+
   if (tor.isDownloading())
-    {
-      myProgressBarStyle->palette.setBrush (QPalette::Highlight, blueBrush);
-      myProgressBarStyle->palette.setColor (QPalette::Base, blueBack);
-      myProgressBarStyle->palette.setColor (QPalette::Window, blueBack);
-    }
+      applyColor(blueBrush, blueBack, blueBack);
   else if (tor.isSeeding())
-    {
-      myProgressBarStyle->palette.setBrush (QPalette::Highlight, greenBrush);
-      myProgressBarStyle->palette.setColor (QPalette::Base, greenBack);
-      myProgressBarStyle->palette.setColor (QPalette::Window, greenBack);
-    }
+      applyColor(greenBrush, greenBack, greenBack);
   else
-    {
-      myProgressBarStyle->palette.setBrush (QPalette::Highlight, silverBrush);
-      myProgressBarStyle->palette.setColor (QPalette::Base, silverBack);
-      myProgressBarStyle->palette.setColor (QPalette::Window, silverBack);
-    }
+      applyColor(silverBrush, silverBack, silverBack);
+
   myProgressBarStyle->state = progressBarState;
-  myProgressBarStyle->text = QString::fromLatin1 ("%1%").arg (static_cast<int> (tr_truncd (100.0 * tor.percentDone (), 0)));
+  myProgressBarStyle->text = QStringLiteral ("%1%").arg (static_cast<int> (tr_truncd (100.0 * tor.percentDone (), 0)));
   myProgressBarStyle->textVisible = true;
   myProgressBarStyle->textAlignment = Qt::AlignCenter;
   setProgressBarPercentDone (option, tor);

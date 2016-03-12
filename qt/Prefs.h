@@ -12,8 +12,6 @@
 
 #include <QObject>
 #include <QSet>
-#include <QString>
-#include <QVariant>
 
 #include <libtransmission/quark.h>
 

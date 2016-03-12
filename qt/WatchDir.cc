@@ -7,15 +7,12 @@
  * $Id$
  */
 
-#include <iostream>
-
 #include <QDir>
 #include <QFileSystemWatcher>
 #include <QTimer>
 
 #include <libtransmission/transmission.h>
 
-#include "Prefs.h"
 #include "TorrentModel.h"
 #include "WatchDir.h"
 
@@ -103,13 +100,13 @@ WatchDir::watcherActivated (const QString& path)
 
   // get the list of files currently in the watch directory
   QSet<QString> files;
-  for (const QString& str: dir.entryList (QDir::Readable|QDir::Files))
+  foreach (const QString& str, dir.entryList (QDir::Readable|QDir::Files))
     files.insert (str);
 
   // try to add any new files which end in .torrent
   const QSet<QString> newFiles (files - myWatchDirFiles);
-  const QString torrentSuffix = QString::fromUtf8 (".torrent");
-  for (const QString& name: newFiles)
+  const QString torrentSuffix = QStringLiteral (".torrent");
+  foreach (const QString& name, newFiles)
     {
       if (name.endsWith (torrentSuffix, Qt::CaseInsensitive))
         {
@@ -147,6 +144,6 @@ WatchDir::rescanAllWatchedDirectories ()
   if (myWatcher == nullptr)
     return;
 
-  for (const QString& path: myWatcher->directories ())
+  foreach (const QString& path, myWatcher->directories ())
     watcherActivated (path);
 }

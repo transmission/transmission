@@ -22,8 +22,8 @@ class TorrentDelegateMin: public TorrentDelegate
 
   protected:
     // TorrentDelegate
-    virtual QSize sizeHint (const QStyleOptionViewItem&, const Torrent&) const;
-    virtual void drawTorrent (QPainter * painter, const QStyleOptionViewItem& option, const Torrent&) const;
+    QSize sizeHint (const QStyleOptionViewItem&, const Torrent&) const override;
+    void drawTorrent (QPainter * painter, const QStyleOptionViewItem& option, const Torrent&) const override;
 };
 
 #endif // QTR_TORRENT_DELEGATE_MIN_H

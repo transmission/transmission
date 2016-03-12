@@ -9,9 +9,6 @@
 
 #include <QDir>
 
-#include <libtransmission/transmission.h>
-#include <libtransmission/variant.h>
-
 #include "Formatter.h"
 #include "FreeSpaceLabel.h"
 #include "Session.h"
@@ -30,7 +27,7 @@ FreeSpaceLabel::FreeSpaceLabel (QWidget * parent):
   myTimer.setSingleShot (true);
   myTimer.setInterval (INTERVAL_MSEC);
 
-  connect (&myTimer, SIGNAL (timeout ()), this, SLOT (onTimer ()));
+  connect (&myTimer, &QTimer::timeout, this, &FreeSpaceLabel::onTimer);
 }
 
 void
@@ -44,8 +41,7 @@ FreeSpaceLabel::setSession (Session& session)
 
   mySession = &session;
 
-  connect (mySession, SIGNAL (executed (int64_t, QString, tr_variant *)),
-           this,      SLOT (onSessionExecuted (int64_t, QString, tr_variant *)));
+  connect (mySession, &Session::executed, this, &FreeSpaceLabel::onSessionExecuted);
 
   onTimer ();
 }
@@ -92,7 +88,7 @@ FreeSpaceLabel::onSessionExecuted (int64_t tag, const QString& result, tr_varian
   if (tr_variantDictFindInt (arguments, TR_KEY_size_bytes, &bytes) && bytes >= 0)
     setText (tr("%1 free").arg(Formatter::sizeToString (bytes)));
   else
-    setText (QString ());
+    clear();
 
   // update the tooltip
   size_t len = 0;

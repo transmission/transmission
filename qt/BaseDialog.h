@@ -14,6 +14,7 @@
 
 class BaseDialog: public QDialog
 {
+  Q_OBJECT
   public:
     BaseDialog (QWidget * parent = nullptr, Qt::WindowFlags flags = 0):
       QDialog (parent, flags)

@@ -8,14 +8,7 @@
  */
 
 #include <QApplication>
-#include <QFont>
-#include <QFontMetrics>
-#include <QIcon>
-#include <QModelIndex>
 #include <QPainter>
-#include <QPixmap>
-#include <QPixmapCache>
-#include <QStyleOptionProgressBar>
 
 #include "Formatter.h"
 #include "Torrent.h"
@@ -178,9 +171,9 @@ TorrentDelegate::progressString (const Torrent& tor)
       //: %2 is how much we'll have when done,
       //: %3 is a percentage of the two
       str = tr ("%1 of %2 (%3%)")
-            .arg (Formatter::sizeToString (haveTotal))
-            .arg (Formatter::sizeToString (tor.sizeWhenDone()))
-            .arg (Formatter::percentToString (tor.percentDone() * 100.0));
+            .arg (Formatter::sizeToString (haveTotal),
+            Formatter::sizeToString (tor.sizeWhenDone()),
+            Formatter::percentToString (tor.percentDone() * 100.0));
     }
   else if (!isSeed) // partial seed
     {
@@ -194,12 +187,12 @@ TorrentDelegate::progressString (const Torrent& tor)
           //: %5 is our upload-to-download ratio,
           //: %6 is the ratio we want to reach before we stop uploading
           str = tr ("%1 of %2 (%3%), uploaded %4 (Ratio: %5 Goal: %6)")
-                .arg (Formatter::sizeToString (haveTotal))
-                .arg (Formatter::sizeToString (tor.totalSize()))
-                .arg (Formatter::percentToString (tor.percentComplete() * 100.0))
-                .arg (Formatter::sizeToString (tor.uploadedEver()))
-                .arg (Formatter::ratioToString (tor.ratio()))
-                .arg (Formatter::ratioToString (seedRatio));
+                .arg (Formatter::sizeToString (haveTotal),
+                Formatter::sizeToString (tor.totalSize()),
+                Formatter::percentToString (tor.percentComplete() * 100.0),
+                Formatter::sizeToString (tor.uploadedEver()),
+                Formatter::ratioToString (tor.ratio()),
+                Formatter::ratioToString (seedRatio));
         }
         else
         {
@@ -210,11 +203,11 @@ TorrentDelegate::progressString (const Torrent& tor)
             //: %4 is how much we've uploaded,
             //: %5 is our upload-to-download ratio
             str = tr ("%1 of %2 (%3%), uploaded %4 (Ratio: %5)")
-                  .arg (Formatter::sizeToString (haveTotal))
-                  .arg (Formatter::sizeToString (tor.totalSize()))
-                  .arg (Formatter::percentToString (tor.percentComplete() * 100.0))
-                  .arg (Formatter::sizeToString (tor.uploadedEver()))
-                  .arg (Formatter::ratioToString (tor.ratio()));
+                  .arg (Formatter::sizeToString (haveTotal),
+                  Formatter::sizeToString (tor.totalSize()),
+                  Formatter::percentToString (tor.percentComplete() * 100.0),
+                  Formatter::sizeToString (tor.uploadedEver()),
+                  Formatter::ratioToString (tor.ratio()));
         }
     }
   else // seeding
@@ -227,10 +220,10 @@ TorrentDelegate::progressString (const Torrent& tor)
           //: %3 is our upload-to-download ratio,
           //: %4 is the ratio we want to reach before we stop uploading
           str = tr ("%1, uploaded %2 (Ratio: %3 Goal: %4)")
-                .arg (Formatter::sizeToString (haveTotal))
-                .arg (Formatter::sizeToString (tor.uploadedEver()))
-                .arg (Formatter::ratioToString (tor.ratio()))
-                .arg (Formatter::ratioToString (seedRatio));
+                .arg (Formatter::sizeToString (haveTotal),
+                Formatter::sizeToString (tor.uploadedEver()),
+                Formatter::ratioToString (tor.ratio()),
+                Formatter::ratioToString (seedRatio));
         }
       else // seeding w/o a ratio
         {
@@ -239,9 +232,9 @@ TorrentDelegate::progressString (const Torrent& tor)
           //: %2 is how much we've uploaded,
           //: %3 is our upload-to-download ratio
           str = tr ("%1, uploaded %2 (Ratio: %3)")
-                .arg (Formatter::sizeToString (haveTotal))
-                .arg (Formatter::sizeToString (tor.uploadedEver()))
-                .arg (Formatter::ratioToString (tor.ratio()));
+                .arg (Formatter::sizeToString (haveTotal),
+                Formatter::sizeToString (tor.uploadedEver()),
+                Formatter::ratioToString (tor.ratio()));
         }
     }
 
@@ -272,7 +265,7 @@ TorrentDelegate::shortTransferString (const Torrent& tor)
 
   if (haveDown)
     str = Formatter::downloadSpeedToString(tor.downloadSpeed()) +
-          QLatin1String ("   ") +
+          QStringLiteral ("   ") +
           Formatter::uploadSpeedToString(tor.uploadSpeed());
 
   else if (haveUp)
@@ -295,7 +288,7 @@ TorrentDelegate::shortStatusString (const Torrent& tor)
       case TR_STATUS_DOWNLOAD:
       case TR_STATUS_SEED:
         str = shortTransferString(tor) +
-              QLatin1String ("    ") +
+              QStringLiteral ("    ") +
               tr("Ratio: %1").arg(Formatter::ratioToString(tor.ratio()));
         break;
 
@@ -426,6 +419,14 @@ TorrentDelegate::setProgressBarPercentDone (const QStyleOptionViewItem & option,
 }
 
 void
+TorrentDelegate::applyColor(const QColor& highlight, const QColor& base, const QColor& window) const
+{
+      myProgressBarStyle->palette.setBrush (QPalette::Highlight, highlight);
+      myProgressBarStyle->palette.setColor (QPalette::Base, base);
+      myProgressBarStyle->palette.setColor (QPalette::Window, window);
+}
+
+void
 TorrentDelegate::drawTorrent (QPainter                   * painter,
                               const QStyleOptionViewItem & option,
                               const Torrent              & tor) const
@@ -440,6 +441,7 @@ TorrentDelegate::drawTorrent (QPainter                   * painter,
 
   painter->save ();
 
+
   if (isItemSelected)
     {
       QPalette::ColorGroup cg = isItemEnabled ? QPalette::Normal : QPalette::Disabled;
@@ -449,31 +451,20 @@ TorrentDelegate::drawTorrent (QPainter                   * painter,
       painter->fillRect(option.rect, option.palette.brush(cg, QPalette::Highlight));
     }
 
-  QIcon::Mode im;
-  if (isPaused || !isItemEnabled)
-    im = QIcon::Disabled;
-  else if (isItemSelected)
-    im = QIcon::Selected;
-  else
-    im = QIcon::Normal;
+  QIcon::Mode im = (isPaused || !isItemEnabled) ? QIcon::Disabled
+                 : (isItemSelected) ?  QIcon::Selected
+                 : QIcon::Normal;
 
-  QIcon::State qs;
-  if (isPaused)
-    qs = QIcon::Off;
-  else
-    qs = QIcon::On;
+  QIcon::State qs = (isPaused) ? QIcon::Off : QIcon::On;
 
   QPalette::ColorGroup cg = QPalette::Normal;
+
   if (isPaused || !isItemEnabled)
     cg = QPalette::Disabled;
   if (cg == QPalette::Normal && !isItemActive)
     cg = QPalette::Inactive;
 
-  QPalette::ColorRole cr;
-  if (isItemSelected)
-    cr = QPalette::HighlightedText;
-  else
-    cr = QPalette::Text;
+  QPalette::ColorRole cr = (isItemSelected) ? QPalette::HighlightedText : QPalette::Text;
 
   QStyle::State progressBarState (option.state);
   if (isPaused)
@@ -481,7 +472,7 @@ TorrentDelegate::drawTorrent (QPainter                   * painter,
   progressBarState |= QStyle::State_Small;
 
   const QIcon::Mode emblemIm = isItemSelected ? QIcon::Selected : QIcon::Normal;
-  const QIcon emblemIcon = tor.hasError () ? QIcon::fromTheme (QLatin1String ("emblem-important"), style->standardIcon (QStyle::SP_MessageBoxWarning)) : QIcon ();
+  const QIcon emblemIcon = tor.hasError () ? QIcon::fromTheme (QStringLiteral ("emblem-important"), style->standardIcon (QStyle::SP_MessageBoxWarning)) : QIcon ();
 
   // layout
   const QSize m (margin (*style));
@@ -504,24 +495,14 @@ TorrentDelegate::drawTorrent (QPainter                   * painter,
   painter->setFont (layout.progressFont);
   painter->drawText (layout.progressRect, Qt::AlignLeft | Qt::AlignVCenter, layout.progressText ());
   myProgressBarStyle->rect = layout.barRect;
+
   if (tor.isDownloading())
-    {
-      myProgressBarStyle->palette.setBrush (QPalette::Highlight, blueBrush);
-      myProgressBarStyle->palette.setColor (QPalette::Base, blueBack);
-      myProgressBarStyle->palette.setColor (QPalette::Window, blueBack);
-    }
+      applyColor(blueBrush, blueBack, blueBack);
   else if (tor.isSeeding())
-    {
-      myProgressBarStyle->palette.setBrush (QPalette::Highlight, greenBrush);
-      myProgressBarStyle->palette.setColor (QPalette::Base, greenBack);
-      myProgressBarStyle->palette.setColor (QPalette::Window, greenBack);
-    }
+      applyColor(greenBrush, greenBack, greenBack);
   else
-    {
-      myProgressBarStyle->palette.setBrush (QPalette::Highlight, silverBrush);
-      myProgressBarStyle->palette.setColor (QPalette::Base, silverBack);
-      myProgressBarStyle->palette.setColor (QPalette::Window, silverBack);
-    }
+      applyColor(silverBrush, silverBack, silverBack);
+
   myProgressBarStyle->state = progressBarState;
   setProgressBarPercentDone (option, tor);
 

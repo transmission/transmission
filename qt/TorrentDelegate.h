@@ -26,8 +26,8 @@ class TorrentDelegate: public QStyledItemDelegate
     virtual ~TorrentDelegate ();
 
     // QAbstractItemDelegate
-    virtual QSize sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const;
-    virtual void paint(QPainter * painter, const QStyleOptionViewItem& option, const QModelIndex& index) const;
+    QSize sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const override;
+    void paint(QPainter * painter, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
 
   protected:
     QSize margin (const QStyle& style) const;
@@ -43,6 +43,7 @@ class TorrentDelegate: public QStyledItemDelegate
     static QString shortTransferString (const Torrent& tor);
 
   protected:
+    void applyColor(const QColor& highlight, const QColor& base, const QColor& window) const;
     QStyleOptionProgressBar * myProgressBarStyle;
 
     static QColor blueBrush;

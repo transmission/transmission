@@ -10,17 +10,11 @@
 #ifndef QTR_MAIN_WINDOW_H
 #define QTR_MAIN_WINDOW_H
 
-#include <ctime>
-
 #include <QMainWindow>
 #include <QNetworkReply>
 #include <QPointer>
-#include <QSet>
 #include <QSystemTrayIcon>
-#include <QTimer>
-#include <QWidgetList>
 
-#include "Filters.h"
 #include "TorrentFilter.h"
 #include "ui_MainWindow.h"
 
@@ -39,11 +33,9 @@ class StatsDialog;
 class TorrentDelegate;
 class TorrentDelegateMin;
 class TorrentModel;
+class FilterBar;
 
-extern "C"
-{
-  struct tr_variant;
-}
+struct tr_variant;
 
 class MainWindow: public QMainWindow
 {
@@ -56,25 +48,6 @@ class MainWindow: public QMainWindow
     QSystemTrayIcon& trayIcon () { return myTrayIcon; }
 
   public slots:
-    void startAll ();
-    void startSelected ();
-    void startSelectedNow ();
-    void pauseAll ();
-    void pauseSelected ();
-    void removeSelected ();
-    void deleteSelected ();
-    void verifySelected ();
-    void queueMoveTop ();
-    void queueMoveUp ();
-    void queueMoveDown ();
-    void queueMoveBottom ();
-    void reannounceSelected ();
-    void onNetworkTimer ();
-
-    void setToolbarVisible (bool);
-    void setFilterbarVisible (bool);
-    void setStatusbarVisible (bool);
-    void setCompactView (bool);
     void refreshActionSensitivity ();
     void refreshActionSensitivitySoon ();
     void wrongAuthentication ();
@@ -83,9 +56,9 @@ class MainWindow: public QMainWindow
 
   protected:
     // QWidget
-    virtual void contextMenuEvent (QContextMenuEvent *);
-    virtual void dragEnterEvent (QDragEnterEvent *);
-    virtual void dropEvent (QDropEvent *);
+    void contextMenuEvent (QContextMenuEvent *) override;
+    void dragEnterEvent (QDragEnterEvent *) override;
+    void dropEvent (QDropEvent *) override;
 
   private:
     QIcon getStockIcon (const QString&, int fallback = -1);
@@ -97,15 +70,13 @@ class MainWindow: public QMainWindow
     QMenu * createStatsModeMenu ();
     void initStatusBar ();
 
-    void clearSelection ();
     void addTorrent (const AddData& addMe, bool showOptions);
 
     // QWidget
-    virtual void hideEvent (QHideEvent * event);
-    virtual void showEvent (QShowEvent * event);
+    void hideEvent (QHideEvent * event) override;
+    void showEvent (QShowEvent * event) override;
 
   private slots:
-    void openPreferences ();
     void refreshTitle ();
     void refreshStatusBar ();
     void refreshTrayIcon ();
@@ -118,29 +89,15 @@ class MainWindow: public QMainWindow
     void refreshPref (int key);
     void addTorrents (const QStringList& filenames);
     void removeTorrents (const bool deleteFiles);
-    void openStats ();
-    void openDonate ();
-    void openAbout ();
-    void openHelp ();
     void openFolder ();
-    void copyMagnetLinkToClipboard ();
     void setLocation ();
     void openProperties ();
     void toggleSpeedMode ();
-    void dataReadProgress ();
-    void dataSendProgress ();
     void onError (QNetworkReply::NetworkError);
-    void errorMessage (const QString&);
     void toggleWindows (bool doShow);
     void onSetPrefs ();
     void onSetPrefs (bool);
-    void onSessionSourceChanged ();
     void onModelReset ();
-
-    void setSortAscendingPref (bool);
-
-    void onStatsModeChanged (QAction * action);
-    void onSortModeChanged (QAction * action);
 
   private:
     Session& mySession;
@@ -172,7 +129,7 @@ class MainWindow: public QMainWindow
     QAction * myRatioOffAction;
     QAction * myRatioOnAction;
     QWidgetList myHidden;
-    QWidget * myFilterBar;
+    FilterBar * myFilterBar;
     QAction * myAltSpeedAction;
     QString myErrorMessage;
 };
