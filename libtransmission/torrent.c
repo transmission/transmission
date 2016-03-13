@@ -112,7 +112,7 @@ tr_torrentFindFromHash (tr_session * session, const uint8_t * torrentHash)
 
   while ((tor = tr_torrentNext (session, tor)))
     if (*tor->info.hash == *torrentHash)
-      if (!memcmp (tor->info.hash, torrentHash, SHA_DIGEST_LENGTH))
+      if (memcmp (tor->info.hash, torrentHash, SHA_DIGEST_LENGTH) == 0)
         return tor;
 
   return NULL;
@@ -140,7 +140,7 @@ tr_torrentFindFromObfuscatedHash (tr_session * session,
   tr_torrent * tor = NULL;
 
   while ((tor = tr_torrentNext (session, tor)))
-    if (!memcmp (tor->obfuscatedHash, obfuscatedTorrentHash, SHA_DIGEST_LENGTH))
+    if (memcmp (tor->obfuscatedHash, obfuscatedTorrentHash, SHA_DIGEST_LENGTH) == 0)
       return tor;
 
   return NULL;
@@ -1080,7 +1080,7 @@ tr_torrentSetDownloadDir (tr_torrent * tor, const char * path)
 {
   assert (tr_isTorrent (tor));
 
-  if (!path || !tor->downloadDir || strcmp (path, tor->downloadDir))
+  if (path == NULL || tor->downloadDir == NULL || strcmp (path, tor->downloadDir) != 0)
     {
       tr_free (tor->downloadDir);
       tor->downloadDir = tr_strdup (path);
@@ -2785,7 +2785,7 @@ tr_torrentSetAnnounceList (tr_torrent             * tor,
           bool clear = true;
 
           for (i=0; clear && i<trackerCount; ++i)
-            if (!strcmp (trackers[i].announce, tor->errorTracker))
+            if (strcmp (trackers[i].announce, tor->errorTracker) == 0)
               clear = false;
 
           if (clear)
@@ -2882,12 +2882,12 @@ isJunkFile (const char * base)
   static const int file_count = sizeof (files) / sizeof (files[0]);
 
   for (i=0; i<file_count; ++i)
-    if (!strcmp (base, files[i]))
+    if (strcmp (base, files[i]) == 0)
       return true;
 
 #ifdef __APPLE__
   /* check for resource forks. <http://support.apple.com/kb/TA20578> */
-  if (!memcmp (base, "._", 2))
+  if (memcmp (base, "._", 2) == 0)
     return true;
 #endif
 
@@ -3262,7 +3262,7 @@ tr_torrentFileCompleted (tr_torrent * tor, tr_file_index_t fileIndex)
    * it until now -- then rename it to match the one in the metadata */
   if (tr_torrentFindFile2 (tor, fileIndex, &base, &sub, NULL))
     {
-      if (strcmp (sub, f->name))
+      if (strcmp (sub, f->name) != 0)
         {
           char * oldpath = tr_buildPath (base, sub, NULL);
           char * newpath = tr_buildPath (base, f->name, NULL);
@@ -3648,8 +3648,8 @@ renameArgsAreValid (const char * oldpath, const char * newname)
 {
   return (oldpath && *oldpath)
       && (newname && *newname)
-      && (strcmp (newname, "."))
-      && (strcmp (newname, ".."))
+      && (strcmp (newname, ".") != 0)
+      && (strcmp (newname, "..") != 0)
       && (strchr (newname, TR_PATH_DELIMITER) == NULL);
 }
 
@@ -3668,7 +3668,7 @@ renameFindAffectedFiles (tr_torrent * tor, const char * oldpath, size_t * setme_
       const char * name = tor->info.files[i].name;
       const size_t len = strlen (name);
       if ((len == oldpath_len || (len > oldpath_len && name[oldpath_len] == '/')) &&
-          !memcmp (oldpath, name, oldpath_len))
+          memcmp (oldpath, name, oldpath_len) == 0)
         indices[n++] = i;
     }
 
@@ -3768,7 +3768,7 @@ renameTorrentFileString (tr_torrent       * tor,
       tr_free (tmp);
     }
 
-  if (!strcmp (file->name, name))
+  if (strcmp (file->name, name) == 0)
     {
       tr_free (name);
     }

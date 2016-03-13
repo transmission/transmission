@@ -256,7 +256,7 @@ doScrape (const tr_info * inf)
 
                       while (tr_variantDictChild (files, i++, &key, &val))
                         {
-                          if (!memcmp (inf->hash, tr_quark_get_string(key,NULL), SHA_DIGEST_LENGTH))
+                          if (memcmp (inf->hash, tr_quark_get_string (key, NULL), SHA_DIGEST_LENGTH) == 0)
                             {
                               int64_t seeders = -1;
                               int64_t leechers = -1;

@@ -359,8 +359,8 @@ tr_variantGetBool (const tr_variant * v, bool * setme)
       *setme = v->val.i!=0;
 
   if (!success && tr_variantGetStr (v, &str, NULL))
-    if ((success = (!strcmp (str,"true") || !strcmp (str,"false"))))
-      *setme = !strcmp (str,"true");
+    if ((success = (strcmp (str,"true") == 0 || strcmp (str,"false") == 0)))
+      *setme = strcmp (str,"true") == 0;
 
   return success;
 }

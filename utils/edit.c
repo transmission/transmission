@@ -93,7 +93,7 @@ removeURL (tr_variant * metainfo, const char * url)
   tr_variant * announce_list;
   bool changed = false;
 
-  if (tr_variantDictFindStr (metainfo, TR_KEY_announce, &str, NULL) && !strcmp (str, url))
+  if (tr_variantDictFindStr (metainfo, TR_KEY_announce, &str, NULL) && strcmp (str, url) == 0)
     {
       printf ("\tRemoved \"%s\" from \"announce\"\n", str);
       tr_variantDictRemove (metainfo, TR_KEY_announce);
@@ -110,7 +110,7 @@ removeURL (tr_variant * metainfo, const char * url)
           int nodeIndex = 0;
           while ((node = tr_variantListChild (tier, nodeIndex)))
             {
-              if (tr_variantGetStr (node, &str, NULL) && !strcmp (str, url))
+              if (tr_variantGetStr (node, &str, NULL) && strcmp (str, url) == 0)
                 {
                   printf ("\tRemoved \"%s\" from \"announce-list\" tier #%d\n", str, (tierIndex+1));
                   tr_variantListRemove (tier, nodeIndex);
@@ -233,7 +233,7 @@ announce_list_has_url (tr_variant * announce_list, const char * url)
       const char * str;
       int nodeCount = 0;
       while ((node = tr_variantListChild (tier, nodeCount++)))
-        if (tr_variantGetStr (node, &str, NULL) && !strcmp (str, url))
+        if (tr_variantGetStr (node, &str, NULL) && strcmp (str, url) == 0)
           return true;
     }
 

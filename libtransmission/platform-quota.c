@@ -87,7 +87,7 @@ getdev (const char * path)
     return NULL;
 
   while (getmntent(fp, &mnt))
-    if (!tr_strcmp0 (path, mnt.mnt_mountp))
+    if (tr_strcmp0 (path, mnt.mnt_mountp) == 0)
       break;
   fclose(fp);
   return mnt.mnt_special;
@@ -99,7 +99,7 @@ getdev (const char * path)
     return NULL;
 
   while ((mnt = getmntent(fp)) != NULL)
-    if (!tr_strcmp0 (path, mnt->mnt_dir))
+    if (tr_strcmp0 (path, mnt->mnt_dir) == 0)
       break;
 
   endmntent(fp);
@@ -116,7 +116,7 @@ getdev (const char * path)
     return NULL;
 
   for (i=0; i<n; i++)
-    if (!tr_strcmp0 (path, mnt[i].f_mntonname))
+    if (tr_strcmp0 (path, mnt[i].f_mntonname) == 0)
       break;
 
   return (i < n) ? mnt[i].f_mntfromname : NULL;
@@ -137,7 +137,7 @@ getfstype (const char * device)
   if (fp == NULL)
     return NULL;
   while (getmntent(fp, &mnt))
-    if (!tr_strcmp0 (device, mnt.mnt_mountp))
+    if (tr_strcmp0 (device, mnt.mnt_mountp) == 0)
       break;
   fclose(fp);
   return mnt.mnt_fstype;
@@ -149,7 +149,7 @@ getfstype (const char * device)
     return NULL;
 
   while ((mnt = getmntent (fp)) != NULL)
-    if (!tr_strcmp0 (device, mnt->mnt_fsname))
+    if (tr_strcmp0 (device, mnt->mnt_fsname) == 0)
       break;
 
   endmntent(fp);
@@ -166,7 +166,7 @@ getfstype (const char * device)
     return NULL;
 
   for (i=0; i<n; i++)
-    if (!tr_strcmp0 (device, mnt[i].f_mntfromname))
+    if (tr_strcmp0 (device, mnt[i].f_mntfromname) == 0)
       break;
 
   return (i < n) ? mnt[i].f_fstypename : NULL;

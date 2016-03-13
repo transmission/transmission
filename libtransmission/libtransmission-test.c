@@ -62,7 +62,7 @@ check_condition_impl (const char * file, int line, bool condition)
 bool
 check_streq_impl (const char * file, int line, const char * expected, const char * actual)
 {
-  const bool pass = !tr_strcmp0 (expected, actual);
+  const bool pass = tr_strcmp0 (expected, actual) == 0;
 
   if (should_print (pass)) {
     if (pass)

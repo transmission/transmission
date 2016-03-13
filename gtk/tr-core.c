@@ -618,21 +618,21 @@ core_set_sort_mode (TrCore * core, const char * mode, gboolean is_reversed)
   GtkSortType type = is_reversed ? GTK_SORT_ASCENDING : GTK_SORT_DESCENDING;
   GtkTreeSortable * sortable = GTK_TREE_SORTABLE (gtr_core_model (core));
 
-  if (!g_strcmp0 (mode, "sort-by-activity"))
+  if (g_strcmp0 (mode, "sort-by-activity") == 0)
     sort_func = compare_by_activity;
-  else if (!g_strcmp0 (mode, "sort-by-age"))
+  else if (g_strcmp0 (mode, "sort-by-age") == 0)
     sort_func = compare_by_age;
-  else if (!g_strcmp0 (mode, "sort-by-progress"))
+  else if (g_strcmp0 (mode, "sort-by-progress") == 0)
     sort_func = compare_by_progress;
-  else if (!g_strcmp0 (mode, "sort-by-queue"))
+  else if (g_strcmp0 (mode, "sort-by-queue") == 0)
     sort_func = compare_by_queue;
-  else if (!g_strcmp0 (mode, "sort-by-time-left"))
+  else if (g_strcmp0 (mode, "sort-by-time-left") == 0)
     sort_func = compare_by_eta;
-  else if (!g_strcmp0 (mode, "sort-by-ratio"))
+  else if (g_strcmp0 (mode, "sort-by-ratio") == 0)
     sort_func = compare_by_ratio;
-  else if (!g_strcmp0 (mode, "sort-by-state"))
+  else if (g_strcmp0 (mode, "sort-by-state") == 0)
     sort_func = compare_by_state;
-  else if (!g_strcmp0 (mode, "sort-by-size"))
+  else if (g_strcmp0 (mode, "sort-by-size") == 0)
     sort_func = compare_by_size;
   else {
     sort_func = compare_by_name;
@@ -1665,7 +1665,7 @@ core_commit_prefs_change (TrCore * core, const tr_quark key)
 void
 gtr_core_set_pref (TrCore * self, const tr_quark key, const char * newval)
 {
-  if (g_strcmp0 (newval, gtr_pref_string_get (key)))
+  if (g_strcmp0 (newval, gtr_pref_string_get (key)) != 0)
     {
       gtr_pref_string_set (key, newval);
       core_commit_prefs_change (self, key);

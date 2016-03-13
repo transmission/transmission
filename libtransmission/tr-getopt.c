@@ -149,7 +149,7 @@ findOption (const tr_option * opts,
         if ((matchlen < len)
           && (str[0] == '-')
           && (str[1] == '-')
-          && !strncmp (str+2, o->longName, len)
+          && strncmp (str+2, o->longName, len) == 0
           && (str[len + 2] == '\0' || (o->has_arg && str[len + 2] == '=')))
         {
             matchlen = len;
@@ -161,7 +161,7 @@ findOption (const tr_option * opts,
 
         if ((matchlen < len)
           && (str[0] == '-')
-          && !strncmp (str+1, o->shortName, len)
+          && strncmp (str+1, o->shortName, len) == 0
           && (str[len + 1] == '\0' || o->has_arg))
         {
             matchlen = len;
@@ -202,7 +202,7 @@ tr_getopt (const char         * usage,
     /* handle the builtin 'help' option */
     for (i = 1; i < argc; ++i)
     {
-        if (!strcmp (argv[i], "-h") || !strcmp (argv[i], "--help"))
+        if (strcmp (argv[i], "-h") == 0 || strcmp (argv[i], "--help") == 0)
         {
             tr_getopt_usage (argv[0], usage, opts);
             exit (0);

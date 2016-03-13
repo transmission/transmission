@@ -188,7 +188,7 @@ tr_strip_positional_args (const char* str)
     }
 
   *out = '\0';
-  return !in || strcmp (buf, in) ? buf : in;
+  return (in == NULL || strcmp (buf, in) != 0) ? buf : in;
 }
 
 /**
@@ -403,7 +403,7 @@ tr_memmem (const char * haystack, size_t haystacklen,
   if (needlelen > haystacklen || !haystack || !needle)
     return NULL;
   for (i=0; i<=haystacklen-needlelen; ++i)
-    if (!memcmp (haystack+i, needle, needlelen))
+    if (memcmp (haystack + i, needle, needlelen) == 0)
       return haystack+i;
   return NULL;
 #endif

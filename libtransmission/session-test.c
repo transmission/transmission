@@ -32,7 +32,7 @@ testPeerId (void)
         tr_peerIdInit (peer_id);
 
         check (strlen ((char*)peer_id) == PEER_ID_LEN);
-        check (!memcmp (peer_id, PEERID_PREFIX, 8));
+        check (memcmp (peer_id, PEERID_PREFIX, 8) == 0);
 
         for (j = 8; j < PEER_ID_LEN; ++j)
         {

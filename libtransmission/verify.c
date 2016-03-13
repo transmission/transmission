@@ -116,7 +116,7 @@ verifyTorrent (tr_torrent * tor, bool * stopFlag)
           uint8_t hash[SHA_DIGEST_LENGTH];
 
           tr_sha1_final (sha, hash);
-          hasPiece = !memcmp (hash, tor->info.pieces[pieceIndex].hash, SHA_DIGEST_LENGTH);
+          hasPiece = memcmp (hash, tor->info.pieces[pieceIndex].hash, SHA_DIGEST_LENGTH) == 0;
 
           if (hasPiece || hadPiece)
             {

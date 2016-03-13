@@ -160,7 +160,7 @@ tracker_filter_model_update (gpointer gstore)
             }
 
           for (k=0; k<keyCount; ++k)
-            if (!g_strcmp0 (keys[k], key))
+            if (g_strcmp0 (keys[k], key) == 0)
               break;
 
           if (k==keyCount)
@@ -444,7 +444,7 @@ test_tracker (tr_torrent * tor, int active_tracker_type, const char * host)
       for (i=0; i<inf->trackerCount; ++i)
         {
           gtr_get_host_from_url (tmp, sizeof (tmp), inf->trackers[i].announce);
-          if (!g_strcmp0 (tmp, host))
+          if (g_strcmp0 (tmp, host) == 0)
             break;
         }
 

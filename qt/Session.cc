@@ -774,11 +774,11 @@ Session::updateInfo (tr_variant * d)
           const char * val;
           if (tr_variantGetStr (b, &val, NULL))
             {
-              if (!qstrcmp (val , "required"))
+              if (qstrcmp (val , "required") == 0)
                 myPrefs.set (i, 2);
-              else if (!qstrcmp (val , "preferred"))
+              else if (qstrcmp (val , "preferred") == 0)
                 myPrefs.set (i, 1);
-              else if (!qstrcmp (val , "tolerated"))
+              else if (qstrcmp (val , "tolerated") == 0)
                 myPrefs.set (i, 0);
             }
           continue;

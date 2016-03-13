@@ -313,5 +313,5 @@ tr_ioTestPiece (tr_torrent * tor, tr_piece_index_t piece)
   uint8_t hash[SHA_DIGEST_LENGTH];
 
   return recalculateHash (tor, piece, hash)
-      && !memcmp (hash, tor->info.pieces[piece].hash, SHA_DIGEST_LENGTH);
+      && memcmp (hash, tor->info.pieces[piece].hash, SHA_DIGEST_LENGTH) == 0;
 }

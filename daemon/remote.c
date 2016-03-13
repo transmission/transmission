@@ -519,11 +519,11 @@ addIdArg (tr_variant * args, const char * id, const char * fallback)
         }
     }
 
-  if (!tr_strcmp0 (id, "active"))
+  if (tr_strcmp0 (id, "active") == 0)
     {
       tr_variantDictAddStr (args, TR_KEY_ids, "recently-active");
     }
-  else if (strcmp (id, "all"))
+  else if (strcmp (id, "all") != 0)
     {
       const char * pch;
       bool isList = strchr (id,',') || strchr (id,'-');
@@ -611,7 +611,7 @@ addFiles (tr_variant      * args,
       arg = "-1"; /* no file will have this index, so should be a no-op */
     }
 
-  if (strcmp (arg, "all"))
+  if (strcmp (arg, "all") != 0)
     {
       int i;
       int valueCount;
@@ -718,7 +718,7 @@ parseResponseHeader (void *ptr, size_t size, size_t nmemb, void * stream UNUSED)
     const char * key = TR_RPC_SESSION_ID_HEADER ": ";
     const size_t key_len = strlen (key);
 
-    if ((line_len >= key_len) && !memcmp (line, key, key_len))
+    if (line_len >= key_len && memcmp (line, key, key_len) == 0)
     {
         const char * begin = line + key_len;
         const char * end = begin;
@@ -1641,7 +1641,7 @@ processResponse (const char * rpcurl, const void * response, size_t len)
 
         if (tr_variantDictFindStr (&top, TR_KEY_result, &str, NULL))
         {
-            if (strcmp (str, "success"))
+            if (strcmp (str, "success") != 0)
             {
                 printf ("Error: %s\n", str);
                 status |= EXIT_FAILURE;
@@ -1693,7 +1693,7 @@ processResponse (const char * rpcurl, const void * response, size_t len)
                     status |= EXIT_FAILURE;
                 else {
                     printf ("%s responded: \"%s\"\n", rpcurl, str);
-                    if (strcmp (str, "success"))
+                    if (strcmp (str, "success") != 0)
                         status |= EXIT_FAILURE;
                 }
         }
@@ -2327,11 +2327,11 @@ getHostAndPortAndRpcUrl (int * argc, char ** argv,
         int          i;
         const char * s = argv[1];
         const char * delim = strchr (s, ':');
-        if (!strncmp (s, "http://", 7))   /* user passed in http rpc url */
+        if (strncmp (s, "http://", 7) == 0)   /* user passed in http rpc url */
         {
             *rpcurl = tr_strdup_printf ("%s/rpc/", s + 7);
         }
-        else if (!strncmp (s, "https://", 8)) /* user passed in https rpc url */
+        else if (strncmp (s, "https://", 8) == 0) /* user passed in https rpc url */
         {
             UseSSL = true;
             *rpcurl = tr_strdup_printf ("%s/rpc/", s + 8);

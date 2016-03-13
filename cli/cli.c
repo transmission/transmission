@@ -290,11 +290,11 @@ tr_main (int    argc,
     {
       tr_ctorSetMetainfo (ctor, fileContents, fileLength);
     }
-  else if (!memcmp (torrentPath, "magnet:?", 8))
+  else if (memcmp (torrentPath, "magnet:?", 8) == 0)
     {
       tr_ctorSetMetainfoFromMagnetLink (ctor, torrentPath);
     }
-  else if (!memcmp (torrentPath, "http", 4))
+  else if (memcmp (torrentPath, "http", 4) == 0)
     {
       tr_webRun (h, torrentPath, onTorrentFileDownloaded, ctor);
       waitingOnWeb = true;

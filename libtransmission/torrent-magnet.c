@@ -264,7 +264,7 @@ tr_torrentSetMetadataPiece (tr_torrent  * tor, int piece, const void  * data, in
       /* we've got a complete set of metainfo... see if it passes the checksum test */
       dbgmsg (tor, "metainfo piece %d was the last one", piece);
       tr_sha1 (sha1, m->metadata, m->metadata_size, NULL);
-      if ((checksumPassed = !memcmp (sha1, tor->info.hash, SHA_DIGEST_LENGTH)))
+      if ((checksumPassed = memcmp (sha1, tor->info.hash, SHA_DIGEST_LENGTH) == 0))
         {
           /* checksum passed; now try to parse it as benc */
           tr_variant infoDict;

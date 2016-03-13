@@ -225,7 +225,7 @@ tr_convertAnnounceToScrape (const char * announce)
    * it will be taken as a sign that that tracker doesn't support
    * the scrape convention. If it does, substitute 'scrape' for
    * 'announce' to find the scrape page. */
-  if (((s = strrchr (announce, '/'))) && !strncmp (++s, "announce", 8))
+  if (((s = strrchr (announce, '/')) != NULL) && strncmp (++s, "announce", 8) == 0)
     {
       const char * prefix = announce;
       const size_t prefix_len = s - announce;
@@ -240,7 +240,7 @@ tr_convertAnnounceToScrape (const char * announce)
       assert (walk - scrape == (int)alloc_len);
     }
   /* Some torrents with UDP annouce URLs don't have /announce. */
-  else if (!strncmp (announce, "udp:", 4))
+  else if (strncmp (announce, "udp:", 4) == 0)
     {
       scrape = tr_strdup (announce);
     }

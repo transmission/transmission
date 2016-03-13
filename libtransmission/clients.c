@@ -113,17 +113,17 @@ isMainlineStyle (const uint8_t * peer_id)
 static bool
 decodeBitCometClient (char * buf, size_t buflen, const uint8_t * id)
 {
-    int is_bitlord;
+    bool is_bitlord;
     int major, minor;
     const char * name;
     const char * mod = NULL;
 
-    if (!memcmp (id, "exbc", 4)) mod = "";
-    else if (!memcmp (id, "FUTB", 4)) mod = " (Solidox Mod) ";
-    else if (!memcmp (id, "xUTB", 4)) mod = " (Mod 2) ";
+    if (memcmp (id, "exbc", 4) == 0) mod = "";
+    else if (memcmp (id, "FUTB", 4) == 0) mod = " (Solidox Mod) ";
+    else if (memcmp (id, "xUTB", 4) == 0) mod = " (Mod 2) ";
     else return false;
 
-    is_bitlord = !memcmp (id+6, "LORD", 4);
+    is_bitlord = memcmp (id+6, "LORD", 4) == 0;
     name = (is_bitlord) ? "BitLord " : "BitComet ";
     major = id[4];
     minor = id[5];
@@ -153,38 +153,38 @@ tr_clientForId (char * buf, size_t buflen, const void * id_in)
     /* Azureus-style */
     if (id[0] == '-' && id[7] == '-')
     {
-        if (!memcmp (id+1, "TR", 2))
+        if (memcmp (id+1, "TR", 2) == 0)
         {
-            if (!memcmp (id+3, "000", 3)) /* very old client style: -TR0006- is 0.6 */
+            if (memcmp (id+3, "000", 3) == 0) /* very old client style: -TR0006- is 0.6 */
                 tr_snprintf (buf, buflen, "Transmission 0.%c", id[6]);
-            else if (!memcmp (id+3, "00", 2)) /* previous client style: -TR0072- is 0.72 */
+            else if (memcmp (id+3, "00", 2) == 0) /* previous client style: -TR0072- is 0.72 */
                 tr_snprintf (buf, buflen, "Transmission 0.%02d", strint (id+5,2));
             else /* current client style: -TR111Z- is 1.11+ */
                 tr_snprintf (buf, buflen, "Transmission %d.%02d%s", strint (id+3,1), strint (id+4,2),
                           id[6]=='Z' || id[6]=='X' ? "+" : "");
         }
-        else if (!memcmp (id+1, "UT", 2))
+        else if (memcmp (id+1, "UT", 2) == 0)
         {
             tr_snprintf (buf, buflen, "\xc2\xb5Torrent %d.%d.%d%s",
                          strint (id+3,1), strint (id+4,1), strint (id+5,1), getMnemonicEnd (id[6]));
         }
-        else if (!memcmp (id+1, "BT", 2))
+        else if (memcmp (id+1, "BT", 2) == 0)
         {
             tr_snprintf (buf, buflen, "BitTorrent %d.%d.%d%s",
                          strint (id+3,1), strint (id+4,1), strint (id+5,1), getMnemonicEnd (id[6]));
         }
-        else if (!memcmp (id+1, "UM", 2))
+        else if (memcmp (id+1, "UM", 2) == 0)
         {
             tr_snprintf (buf, buflen, "\xc2\xb5Torrent Mac %d.%d.%d%s",
                          strint (id+3,1), strint (id+4,1), strint (id+5,1), getMnemonicEnd (id[6]));
         }
-        else if (!memcmp (id+1, "UE", 2))
+        else if (memcmp (id+1, "UE", 2) == 0)
         {
             tr_snprintf (buf, buflen, "\xc2\xb5Torrent Embedded %d.%d.%d%s",
                         strint (id+3,1), strint (id+4,1), strint (id+5,1), getMnemonicEnd (id[6]));
         }
 
-        else if (!memcmp (id+1, "AZ", 2))
+        else if (memcmp (id+1, "AZ", 2) == 0)
         {
             if (id[3] > '3' || (id[3] == '3' && id[4] >= '1')) /* Vuze starts at version 3.1.0.0 */
                 four_digits (buf, buflen, "Vuze", id+3);
@@ -192,7 +192,7 @@ tr_clientForId (char * buf, size_t buflen, const void * id_in)
                 four_digits (buf, buflen, "Azureus", id+3);
         }
 
-        else if (!memcmp (id+1, "KT", 2))
+        else if (memcmp (id+1, "KT", 2) == 0)
         {
             if (id[5] == 'D')
                 tr_snprintf (buf, buflen, "KTorrent %d.%d Dev %d", charint (id[3]), charint (id[4]), charint (id[6]));
@@ -202,108 +202,108 @@ tr_clientForId (char * buf, size_t buflen, const void * id_in)
                 three_digits (buf, buflen, "KTorrent", id+3);
         }
 
-        else if (!memcmp (id+1, "AG", 2)) four_digits (buf, buflen, "Ares", id+3);
-        else if (!memcmp (id+1, "AR", 2)) four_digits (buf, buflen, "Arctic", id+3);
-        else if (!memcmp (id+1, "AT", 2)) four_digits (buf, buflen, "Artemis", id+3);
-        else if (!memcmp (id+1, "AV", 2)) four_digits (buf, buflen, "Avicora", id+3);
-        else if (!memcmp (id+1, "BB", 2)) four_digits (buf, buflen, "BitBuddy", id+3);
-        else if (!memcmp (id+1, "BE", 2)) four_digits (buf, buflen, "BitTorrent SDK", id+3);
-        else if (!memcmp (id+1, "BG", 2)) four_digits (buf, buflen, "BTGetit", id+3);
-        else if (!memcmp (id+1, "BH", 2)) four_digits (buf, buflen, "BitZilla", id+3);
-        else if (!memcmp (id+1, "BM", 2)) four_digits (buf, buflen, "BitMagnet", id+3);
-        else if (!memcmp (id+1, "BP", 2)) four_digits (buf, buflen, "BitTorrent Pro (Azureus + Spyware)", id+3);
-        else if (!memcmp (id+1, "BX", 2)) four_digits (buf, buflen, "BittorrentX", id+3);
-        else if (!memcmp (id+1, "bk", 2)) four_digits (buf, buflen, "BitKitten (libtorrent)", id+3);
-        else if (!memcmp (id+1, "BS", 2)) four_digits (buf, buflen, "BTSlave", id+3);
-        else if (!memcmp (id+1, "BW", 2)) four_digits (buf, buflen, "BitWombat", id+3);
-        else if (!memcmp (id+1, "BX", 2)) four_digits (buf, buflen, "BittorrentX", id+3);
-        else if (!memcmp (id+1, "EB", 2)) four_digits (buf, buflen, "EBit", id+3);
-        else if (!memcmp (id+1, "DE", 2)) four_digits (buf, buflen, "Deluge", id+3);
-        else if (!memcmp (id+1, "DP", 2)) four_digits (buf, buflen, "Propogate Data Client", id+3);
-        else if (!memcmp (id+1, "FC", 2)) four_digits (buf, buflen, "FileCroc", id+3);
-        else if (!memcmp (id+1, "FT", 2)) four_digits (buf, buflen, "FoxTorrent/RedSwoosh", id+3);
-        else if (!memcmp (id+1, "GR", 2)) four_digits (buf, buflen, "GetRight", id+3);
-        else if (!memcmp (id+1, "GS", 2)) four_digits (buf, buflen, "GSTorrent", id+3);
-        else if (!memcmp (id+1, "HK", 2)) four_digits (buf, buflen, "Hekate", id+3);
-        else if (!memcmp (id+1, "HN", 2)) four_digits (buf, buflen, "Hydranode", id+3);
-        else if (!memcmp (id+1, "KG", 2)) four_digits (buf, buflen, "KGet", id+3);
-        else if (!memcmp (id+1, "LC", 2)) four_digits (buf, buflen, "LeechCraft", id+3);
-        else if (!memcmp (id+1, "LH", 2)) four_digits (buf, buflen, "LH-ABC", id+3);
-        else if (!memcmp (id+1, "NX", 2)) four_digits (buf, buflen, "Net Transport", id+3);
-        else if (!memcmp (id+1, "MK", 2)) four_digits (buf, buflen, "Meerkat", id+3);
-        else if (!memcmp (id+1, "MO", 2)) four_digits (buf, buflen, "MonoTorrent", id+3);
-        else if (!memcmp (id+1, "MR", 2)) four_digits (buf, buflen, "Miro", id+3);
-        else if (!memcmp (id+1, "MT", 2)) four_digits (buf, buflen, "Moonlight", id+3);
-        else if (!memcmp (id+1, "OS", 2)) four_digits (buf, buflen, "OneSwarm", id+3);
-        else if (!memcmp (id+1, "OT", 2)) four_digits (buf, buflen, "OmegaTorrent", id+3);
-        else if (!memcmp (id+1, "PD", 2)) four_digits (buf, buflen, "Pando", id+3);
-        else if (!memcmp (id+1, "QD", 2)) four_digits (buf, buflen, "QQDownload", id+3);
-        else if (!memcmp (id+1, "RS", 2)) four_digits (buf, buflen, "Rufus", id+3);
-        else if (!memcmp (id+1, "RT", 2)) four_digits (buf, buflen, "Retriever", id+3);
-        else if (!memcmp (id+1, "RZ", 2)) four_digits (buf, buflen, "RezTorrent", id+3);
-        else if (!memcmp (id+1, "SD", 2)) four_digits (buf, buflen, "Thunder", id+3);
-        else if (!memcmp (id+1, "SM", 2)) four_digits (buf, buflen, "SoMud", id+3);
-        else if (!memcmp (id+1, "SS", 2)) four_digits (buf, buflen, "SwarmScope", id+3);
-        else if (!memcmp (id+1, "ST", 2)) four_digits (buf, buflen, "SymTorrent", id+3);
-        else if (!memcmp (id+1, "SZ", 2)) four_digits (buf, buflen, "Shareaza", id+3);
-        else if (!memcmp (id+1, "S~", 2)) four_digits (buf, buflen, "Shareaza", id+3);
-        else if (!memcmp (id+1, "st", 2)) four_digits (buf, buflen, "SharkTorrent", id+3);
-        else if (!memcmp (id+1, "TN", 2)) four_digits (buf, buflen, "Torrent .NET", id+3);
-        else if (!memcmp (id+1, "TS", 2)) four_digits (buf, buflen, "TorrentStorm", id+3);
-        else if (!memcmp (id+1, "TT", 2)) four_digits (buf, buflen, "TuoTu", id+3);
-        else if (!memcmp (id+1, "UL", 2)) four_digits (buf, buflen, "uLeecher!", id+3);
-        else if (!memcmp (id+1, "VG", 2)) four_digits (buf, buflen, "Vagaa", id+3);
-        else if (!memcmp (id+1, "WT", 2)) four_digits (buf, buflen, "BitLet", id+3);
-        else if (!memcmp (id+1, "WY", 2)) four_digits (buf, buflen, "FireTorrent", id+3);
-        else if (!memcmp (id+1, "XL", 2)) four_digits (buf, buflen, "Xunlei", id+3);
-        else if (!memcmp (id+1, "XS", 2)) four_digits (buf, buflen, "XSwifter", id+3);
-        else if (!memcmp (id+1, "XT", 2)) four_digits (buf, buflen, "XanTorrent", id+3);
-        else if (!memcmp (id+1, "XX", 2)) four_digits (buf, buflen, "Xtorrent", id+3);
-        else if (!memcmp (id+1, "ZT", 2)) four_digits (buf, buflen, "Zip Torrent", id+3);
-        else if (!memcmp (id+1, "ZO", 2)) four_digits (buf, buflen, "Zona", id+3);
+        else if (memcmp (id+1, "AG", 2) == 0) four_digits (buf, buflen, "Ares", id+3);
+        else if (memcmp (id+1, "AR", 2) == 0) four_digits (buf, buflen, "Arctic", id+3);
+        else if (memcmp (id+1, "AT", 2) == 0) four_digits (buf, buflen, "Artemis", id+3);
+        else if (memcmp (id+1, "AV", 2) == 0) four_digits (buf, buflen, "Avicora", id+3);
+        else if (memcmp (id+1, "BB", 2) == 0) four_digits (buf, buflen, "BitBuddy", id+3);
+        else if (memcmp (id+1, "BE", 2) == 0) four_digits (buf, buflen, "BitTorrent SDK", id+3);
+        else if (memcmp (id+1, "BG", 2) == 0) four_digits (buf, buflen, "BTGetit", id+3);
+        else if (memcmp (id+1, "BH", 2) == 0) four_digits (buf, buflen, "BitZilla", id+3);
+        else if (memcmp (id+1, "BM", 2) == 0) four_digits (buf, buflen, "BitMagnet", id+3);
+        else if (memcmp (id+1, "BP", 2) == 0) four_digits (buf, buflen, "BitTorrent Pro (Azureus + Spyware)", id+3);
+        else if (memcmp (id+1, "BX", 2) == 0) four_digits (buf, buflen, "BittorrentX", id+3);
+        else if (memcmp (id+1, "bk", 2) == 0) four_digits (buf, buflen, "BitKitten (libtorrent)", id+3);
+        else if (memcmp (id+1, "BS", 2) == 0) four_digits (buf, buflen, "BTSlave", id+3);
+        else if (memcmp (id+1, "BW", 2) == 0) four_digits (buf, buflen, "BitWombat", id+3);
+        else if (memcmp (id+1, "BX", 2) == 0) four_digits (buf, buflen, "BittorrentX", id+3);
+        else if (memcmp (id+1, "EB", 2) == 0) four_digits (buf, buflen, "EBit", id+3);
+        else if (memcmp (id+1, "DE", 2) == 0) four_digits (buf, buflen, "Deluge", id+3);
+        else if (memcmp (id+1, "DP", 2) == 0) four_digits (buf, buflen, "Propogate Data Client", id+3);
+        else if (memcmp (id+1, "FC", 2) == 0) four_digits (buf, buflen, "FileCroc", id+3);
+        else if (memcmp (id+1, "FT", 2) == 0) four_digits (buf, buflen, "FoxTorrent/RedSwoosh", id+3);
+        else if (memcmp (id+1, "GR", 2) == 0) four_digits (buf, buflen, "GetRight", id+3);
+        else if (memcmp (id+1, "GS", 2) == 0) four_digits (buf, buflen, "GSTorrent", id+3);
+        else if (memcmp (id+1, "HK", 2) == 0) four_digits (buf, buflen, "Hekate", id+3);
+        else if (memcmp (id+1, "HN", 2) == 0) four_digits (buf, buflen, "Hydranode", id+3);
+        else if (memcmp (id+1, "KG", 2) == 0) four_digits (buf, buflen, "KGet", id+3);
+        else if (memcmp (id+1, "LC", 2) == 0) four_digits (buf, buflen, "LeechCraft", id+3);
+        else if (memcmp (id+1, "LH", 2) == 0) four_digits (buf, buflen, "LH-ABC", id+3);
+        else if (memcmp (id+1, "NX", 2) == 0) four_digits (buf, buflen, "Net Transport", id+3);
+        else if (memcmp (id+1, "MK", 2) == 0) four_digits (buf, buflen, "Meerkat", id+3);
+        else if (memcmp (id+1, "MO", 2) == 0) four_digits (buf, buflen, "MonoTorrent", id+3);
+        else if (memcmp (id+1, "MR", 2) == 0) four_digits (buf, buflen, "Miro", id+3);
+        else if (memcmp (id+1, "MT", 2) == 0) four_digits (buf, buflen, "Moonlight", id+3);
+        else if (memcmp (id+1, "OS", 2) == 0) four_digits (buf, buflen, "OneSwarm", id+3);
+        else if (memcmp (id+1, "OT", 2) == 0) four_digits (buf, buflen, "OmegaTorrent", id+3);
+        else if (memcmp (id+1, "PD", 2) == 0) four_digits (buf, buflen, "Pando", id+3);
+        else if (memcmp (id+1, "QD", 2) == 0) four_digits (buf, buflen, "QQDownload", id+3);
+        else if (memcmp (id+1, "RS", 2) == 0) four_digits (buf, buflen, "Rufus", id+3);
+        else if (memcmp (id+1, "RT", 2) == 0) four_digits (buf, buflen, "Retriever", id+3);
+        else if (memcmp (id+1, "RZ", 2) == 0) four_digits (buf, buflen, "RezTorrent", id+3);
+        else if (memcmp (id+1, "SD", 2) == 0) four_digits (buf, buflen, "Thunder", id+3);
+        else if (memcmp (id+1, "SM", 2) == 0) four_digits (buf, buflen, "SoMud", id+3);
+        else if (memcmp (id+1, "SS", 2) == 0) four_digits (buf, buflen, "SwarmScope", id+3);
+        else if (memcmp (id+1, "ST", 2) == 0) four_digits (buf, buflen, "SymTorrent", id+3);
+        else if (memcmp (id+1, "SZ", 2) == 0) four_digits (buf, buflen, "Shareaza", id+3);
+        else if (memcmp (id+1, "S~", 2) == 0) four_digits (buf, buflen, "Shareaza", id+3);
+        else if (memcmp (id+1, "st", 2) == 0) four_digits (buf, buflen, "SharkTorrent", id+3);
+        else if (memcmp (id+1, "TN", 2) == 0) four_digits (buf, buflen, "Torrent .NET", id+3);
+        else if (memcmp (id+1, "TS", 2) == 0) four_digits (buf, buflen, "TorrentStorm", id+3);
+        else if (memcmp (id+1, "TT", 2) == 0) four_digits (buf, buflen, "TuoTu", id+3);
+        else if (memcmp (id+1, "UL", 2) == 0) four_digits (buf, buflen, "uLeecher!", id+3);
+        else if (memcmp (id+1, "VG", 2) == 0) four_digits (buf, buflen, "Vagaa", id+3);
+        else if (memcmp (id+1, "WT", 2) == 0) four_digits (buf, buflen, "BitLet", id+3);
+        else if (memcmp (id+1, "WY", 2) == 0) four_digits (buf, buflen, "FireTorrent", id+3);
+        else if (memcmp (id+1, "XL", 2) == 0) four_digits (buf, buflen, "Xunlei", id+3);
+        else if (memcmp (id+1, "XS", 2) == 0) four_digits (buf, buflen, "XSwifter", id+3);
+        else if (memcmp (id+1, "XT", 2) == 0) four_digits (buf, buflen, "XanTorrent", id+3);
+        else if (memcmp (id+1, "XX", 2) == 0) four_digits (buf, buflen, "Xtorrent", id+3);
+        else if (memcmp (id+1, "ZT", 2) == 0) four_digits (buf, buflen, "Zip Torrent", id+3);
+        else if (memcmp (id+1, "ZO", 2) == 0) four_digits (buf, buflen, "Zona", id+3);
 
-        else if (!memcmp (id+1, "AG", 2)) three_digits (buf, buflen, "Ares", id+3);
-        else if (!memcmp (id+1, "A~", 2)) three_digits (buf, buflen, "Ares", id+3);
-        else if (!memcmp (id+1, "ES", 2)) three_digits (buf, buflen, "Electric Sheep", id+3);
-        else if (!memcmp (id+1, "HL", 2)) three_digits (buf, buflen, "Halite", id+3);
-        else if (!memcmp (id+1, "LT", 2)) three_digits (buf, buflen, "libtorrent (Rasterbar)", id+3);
-        else if (!memcmp (id+1, "lt", 2)) three_digits (buf, buflen, "libTorrent (Rakshasa)", id+3);
-        else if (!memcmp (id+1, "MP", 2)) three_digits (buf, buflen, "MooPolice", id+3);
-        else if (!memcmp (id+1, "pb", 2)) three_digits (buf, buflen, "pbTorrent", id+3);
-        else if (!memcmp (id+1, "TT", 2)) three_digits (buf, buflen, "TuoTu", id+3);
-        else if (!memcmp (id+1, "qB", 2)) three_digits (buf, buflen, "qBittorrent", id+3);
+        else if (memcmp (id+1, "AG", 2) == 0) three_digits (buf, buflen, "Ares", id+3);
+        else if (memcmp (id+1, "A~", 2) == 0) three_digits (buf, buflen, "Ares", id+3);
+        else if (memcmp (id+1, "ES", 2) == 0) three_digits (buf, buflen, "Electric Sheep", id+3);
+        else if (memcmp (id+1, "HL", 2) == 0) three_digits (buf, buflen, "Halite", id+3);
+        else if (memcmp (id+1, "LT", 2) == 0) three_digits (buf, buflen, "libtorrent (Rasterbar)", id+3);
+        else if (memcmp (id+1, "lt", 2) == 0) three_digits (buf, buflen, "libTorrent (Rakshasa)", id+3);
+        else if (memcmp (id+1, "MP", 2) == 0) three_digits (buf, buflen, "MooPolice", id+3);
+        else if (memcmp (id+1, "pb", 2) == 0) three_digits (buf, buflen, "pbTorrent", id+3);
+        else if (memcmp (id+1, "TT", 2) == 0) three_digits (buf, buflen, "TuoTu", id+3);
+        else if (memcmp (id+1, "qB", 2) == 0) three_digits (buf, buflen, "qBittorrent", id+3);
 
-        else if (!memcmp (id+1, "AX", 2)) two_major_two_minor (buf, buflen, "BitPump", id+3);
-        else if (!memcmp (id+1, "BC", 2)) two_major_two_minor (buf, buflen, "BitComet", id+3);
-        else if (!memcmp (id+1, "CD", 2)) two_major_two_minor (buf, buflen, "Enhanced CTorrent", id+3);
-        else if (!memcmp (id+1, "LP", 2)) two_major_two_minor (buf, buflen, "Lphant", id+3);
+        else if (memcmp (id+1, "AX", 2) == 0) two_major_two_minor (buf, buflen, "BitPump", id+3);
+        else if (memcmp (id+1, "BC", 2) == 0) two_major_two_minor (buf, buflen, "BitComet", id+3);
+        else if (memcmp (id+1, "CD", 2) == 0) two_major_two_minor (buf, buflen, "Enhanced CTorrent", id+3);
+        else if (memcmp (id+1, "LP", 2) == 0) two_major_two_minor (buf, buflen, "Lphant", id+3);
 
-        else if (!memcmp (id+1, "BF", 2)) no_version (buf, buflen, "BitFlu");
-        else if (!memcmp (id+1, "LW", 2)) no_version (buf, buflen, "LimeWire");
+        else if (memcmp (id+1, "BF", 2) == 0) no_version (buf, buflen, "BitFlu");
+        else if (memcmp (id+1, "LW", 2) == 0) no_version (buf, buflen, "LimeWire");
 
-        else if (!memcmp (id+1, "BB", 2))
+        else if (memcmp (id+1, "BB", 2) == 0)
         {
             tr_snprintf (buf, buflen, "BitBuddy %c.%c%c%c", id[3], id[4], id[5], id[6]);
         }
-        else if (!memcmp (id+1, "BR", 2))
+        else if (memcmp (id+1, "BR", 2) == 0)
         {
             tr_snprintf (buf, buflen, "BitRocket %c.%c (%c%c)", id[3], id[4], id[5], id[6]);
         }
-        else if (!memcmp (id+1, "CT", 2))
+        else if (memcmp (id+1, "CT", 2) == 0)
         {
             tr_snprintf (buf, buflen, "CTorrent %d.%d.%02d", charint (id[3]), charint (id[4]), strint (id+5,2));
         }
-        else if (!memcmp (id+1, "XC", 2) || !memcmp (id+1, "XX", 2))
+        else if (memcmp (id+1, "XC", 2) == 0 || memcmp (id+1, "XX", 2) == 0)
         {
             tr_snprintf (buf, buflen, "Xtorrent %d.%d (%d)", charint (id[3]), charint (id[4]), strint (id+5,2));
         }
-        else if (!memcmp (id+1, "BOW", 3))
+        else if (memcmp (id+1, "BOW", 3) == 0)
         {
-                 if (!memcmp (&id[4], "A0B", 3)) tr_snprintf (buf, buflen, "Bits on Wheels 1.0.5");
-            else if (!memcmp (&id[4], "A0C", 3)) tr_snprintf (buf, buflen, "Bits on Wheels 1.0.6");
+                 if (memcmp (&id[4], "A0B", 3) == 0) tr_snprintf (buf, buflen, "Bits on Wheels 1.0.5");
+            else if (memcmp (&id[4], "A0C", 3) == 0) tr_snprintf (buf, buflen, "Bits on Wheels 1.0.6");
             else                                   tr_snprintf (buf, buflen, "Bits on Wheels %c.%c.%c", id[4], id[5], id[5]);
         }
-        else if (!memcmp (id+1, "MG", 2))
+        else if (memcmp (id+1, "MG", 2) == 0)
         {
             tr_snprintf (buf, buflen, "MediaGet %d.%02d", charint (id[3]), charint (id[4]));
         }
@@ -315,17 +315,17 @@ tr_clientForId (char * buf, size_t buflen, const void * id_in)
     /* uTorrent will replace the trailing dash with an extra digit for longer version numbers */
     if (id[0] == '-')
     {
-        if (!memcmp (id+1, "UT", 2))
+        if (memcmp (id+1, "UT", 2) == 0)
         {
             tr_snprintf (buf, buflen, "\xc2\xb5Torrent %d.%d.%d%s",
                         strint (id+3,1), strint (id+4,1), strint (id+5,2), getMnemonicEnd (id[7]));
         }
-        else if (!memcmp (id+1, "UM", 2))
+        else if (memcmp (id+1, "UM", 2) == 0)
         {
             tr_snprintf (buf, buflen, "\xc2\xb5Torrent Mac %d.%d.%d%s",
                         strint (id+3,1), strint (id+4,1), strint (id+5,2), getMnemonicEnd (id[7]));
         }
-        else if (!memcmp (id+1, "UE", 2))
+        else if (memcmp (id+1, "UE", 2) == 0)
         {
             tr_snprintf (buf, buflen, "\xc2\xb5Torrent Embedded %d.%d.%d%s",
                         strint (id+3,1), strint (id+4,1), strint (id+5,2), getMnemonicEnd (id[7]));
@@ -347,76 +347,76 @@ tr_clientForId (char * buf, size_t buflen, const void * id_in)
         return buf;
 
     /* Clients with no version */
-         if (!memcmp (id, "AZ2500BT", 8))  no_version (buf, buflen, "BitTyrant (Azureus Mod)");
-    else if (!memcmp (id, "LIME", 4))      no_version (buf, buflen, "Limewire");
-    else if (!memcmp (id, "martini", 7))   no_version (buf, buflen, "Martini Man");
-    else if (!memcmp (id, "Pando", 5))     no_version (buf, buflen, "Pando");
-    else if (!memcmp (id, "a00---0", 7))   no_version (buf, buflen, "Swarmy");
-    else if (!memcmp (id, "a02---0", 7))   no_version (buf, buflen, "Swarmy");
-    else if (!memcmp (id, "-G3", 3))       no_version (buf, buflen, "G3 Torrent");
-    else if (!memcmp (id, "10-------", 9)) no_version (buf, buflen, "JVtorrent");
-    else if (!memcmp (id, "346-", 4))      no_version (buf, buflen, "TorrentTopia");
-    else if (!memcmp (id, "eX", 2))        no_version (buf, buflen, "eXeem");
-    else if (!memcmp (id, "aria2-", 6))    no_version (buf, buflen, "aria2");
-    else if (!memcmp (id, "-WT-", 4))      no_version (buf, buflen, "BitLet");
-    else if (!memcmp (id, "-FG", 3))       two_major_two_minor (buf, buflen, "FlashGet", id+3);
+         if (memcmp (id, "AZ2500BT", 8) == 0)  no_version (buf, buflen, "BitTyrant (Azureus Mod)");
+    else if (memcmp (id, "LIME", 4) == 0)      no_version (buf, buflen, "Limewire");
+    else if (memcmp (id, "martini", 7) == 0)   no_version (buf, buflen, "Martini Man");
+    else if (memcmp (id, "Pando", 5) == 0)     no_version (buf, buflen, "Pando");
+    else if (memcmp (id, "a00---0", 7) == 0)   no_version (buf, buflen, "Swarmy");
+    else if (memcmp (id, "a02---0", 7) == 0)   no_version (buf, buflen, "Swarmy");
+    else if (memcmp (id, "-G3", 3) == 0)       no_version (buf, buflen, "G3 Torrent");
+    else if (memcmp (id, "10-------", 9) == 0) no_version (buf, buflen, "JVtorrent");
+    else if (memcmp (id, "346-", 4) == 0)      no_version (buf, buflen, "TorrentTopia");
+    else if (memcmp (id, "eX", 2) == 0)        no_version (buf, buflen, "eXeem");
+    else if (memcmp (id, "aria2-", 6) == 0)    no_version (buf, buflen, "aria2");
+    else if (memcmp (id, "-WT-", 4) == 0)      no_version (buf, buflen, "BitLet");
+    else if (memcmp (id, "-FG", 3) == 0)       two_major_two_minor (buf, buflen, "FlashGet", id+3);
 
     /* Everything else */
-    else if (!memcmp (id, "S3", 2) && id[2] == '-' && id[4] == '-' && id[6] == '-')
+    else if (memcmp (id, "S3", 2) == 0 && id[2] == '-' && id[4] == '-' && id[6] == '-')
     {
         tr_snprintf (buf, buflen, "Amazon S3 %c.%c.%c", id[3], id[5], id[7]);
     }
-    else if (!memcmp (id, "OP", 2))
+    else if (memcmp (id, "OP", 2) == 0)
     {
         tr_snprintf (buf, buflen, "Opera (Build %c%c%c%c)", id[2], id[3], id[4], id[5]);
     }
-    else if (!memcmp (id, "-ML", 3))
+    else if (memcmp (id, "-ML", 3) == 0)
     {
         tr_snprintf (buf, buflen, "MLDonkey %c%c%c%c%c", id[3], id[4], id[5], id[6], id[7]);
     }
-    else if (!memcmp (id, "DNA", 3))
+    else if (memcmp (id, "DNA", 3) == 0)
     {
         tr_snprintf (buf, buflen, "BitTorrent DNA %d.%d.%d", strint (id+3,2),
                                                              strint (id+5,2),
                                                              strint (id+7,2));
     }
-    else if (!memcmp (id, "Plus", 4))
+    else if (memcmp (id, "Plus", 4) == 0)
     {
         tr_snprintf (buf, buflen, "Plus! v2 %c.%c%c", id[4], id[5], id[6]);
     }
-    else if (!memcmp (id, "XBT", 3))
+    else if (memcmp (id, "XBT", 3) == 0)
     {
         tr_snprintf (buf, buflen, "XBT Client %c.%c.%c%s", id[3], id[4], id[5], getMnemonicEnd (id[6]));
     }
-    else if (!memcmp (id, "Mbrst", 5))
+    else if (memcmp (id, "Mbrst", 5) == 0)
     {
         tr_snprintf (buf, buflen, "burst! %c.%c.%c", id[5], id[7], id[9]);
     }
-    else if (!memcmp (id, "btpd", 4))
+    else if (memcmp (id, "btpd", 4) == 0)
     {
         tr_snprintf (buf, buflen, "BT Protocol Daemon %c%c%c", id[5], id[6], id[7]);
     }
-    else if (!memcmp (id, "BLZ", 3))
+    else if (memcmp (id, "BLZ", 3) == 0)
     {
         tr_snprintf (buf, buflen, "Blizzard Downloader %d.%d", id[3]+1, id[4]);
     }
-    else if (!memcmp (id, "-SP", 3))
+    else if (memcmp (id, "-SP", 3) == 0)
     {
         three_digits (buf, buflen, "BitSpirit", id+3);
     }
-    else if ('\0' == id[0] && !memcmp (id+2, "BS", 2))
+    else if ('\0' == id[0] && memcmp (id+2, "BS", 2) == 0)
     {
         tr_snprintf (buf, buflen, "BitSpirit %u", (id[1] == 0 ? 1 : id[1]));
     }
-    else if (!memcmp (id, "QVOD", 4))
+    else if (memcmp (id, "QVOD", 4) == 0)
     {
         four_digits (buf, buflen, "QVOD", id+4);
     }
-    else if (!memcmp (id, "-NE", 3))
+    else if (memcmp (id, "-NE", 3) == 0)
     {
         four_digits (buf, buflen, "BT Next Evolution", id+3);
     }
-    else if (!memcmp (id, "TIX", 3))
+    else if (memcmp (id, "TIX", 3) == 0)
     {
         two_major_two_minor (buf, buflen, "Tixati", id+3);
     }

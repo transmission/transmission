@@ -224,7 +224,7 @@ handle_upload (struct evhttp_request * req,
           const struct tr_mimepart * p = tr_ptrArrayNth (&parts, i);
           const char * ours = get_current_session_id (server);
           const size_t ourlen = strlen (ours);
-          hasSessionId = ourlen<=p->body_len && !memcmp (p->body, ours, ourlen);
+          hasSessionId = ourlen <= p->body_len && memcmp (p->body, ours, ourlen) == 0;
         }
 
       if (!hasSessionId)
@@ -245,7 +245,7 @@ handle_upload (struct evhttp_request * req,
           bool have_source = false;
           char * body = p->body;
 
-          if (body_len >= 2 && !memcmp (&body[body_len - 2], "\r\n", 2))
+          if (body_len >= 2 && memcmp (&body[body_len - 2], "\r\n", 2) == 0)
             body_len -= 2;
 
           tr_variantInitDict (&top, 2);
@@ -310,7 +310,7 @@ mimetype_guess (const char * path)
   const char * dot = strrchr (path, '.');
 
   for (i = 0; dot && i < TR_N_ELEMENTS (types); ++i)
-    if (!strcmp (dot + 1, types[i].suffix))
+    if (strcmp (dot + 1, types[i].suffix) == 0)
       return types[i].mime_type;
 
   return "application/octet-stream";
@@ -593,7 +593,7 @@ test_session_id (struct tr_rpc_server * server, struct evhttp_request * req)
 {
   const char * ours = get_current_session_id (server);
   const char * theirs = evhttp_find_header (req->input_headers, TR_RPC_SESSION_ID_HEADER);
-  const bool success =  theirs && !strcmp (theirs, ours);
+  const bool success =  theirs != NULL && strcmp (theirs, ours) == 0;
   return success;
 }
 
@@ -638,7 +638,7 @@ handle_request (struct evhttp_request * req, void * arg)
             "<p>If you're still using ACLs, use a whitelist instead. See the transmission-daemon manpage for details.</p>");
         }
       else if (server->isPasswordEnabled
-                 && (!pass || !user || strcmp (server->username, user)
+                 && (pass == NULL || user == NULL || strcmp (server->username, user) != 0
                                      || !tr_ssha1_matches (server->password,
                                                            pass)))
         {
@@ -647,18 +647,18 @@ handle_request (struct evhttp_request * req, void * arg)
                              "Basic realm=\"" MY_REALM "\"");
           send_simple_response (req, 401, "Unauthorized User");
         }
-      else if (strncmp (req->uri, server->url, strlen (server->url)))
+      else if (strncmp (req->uri, server->url, strlen (server->url)) != 0)
         {
           char * location = tr_strdup_printf ("%sweb/", server->url);
           evhttp_add_header (req->output_headers, "Location", location);
           send_simple_response (req, HTTP_MOVEPERM, NULL);
           tr_free (location);
         }
-      else if (!strncmp (req->uri + strlen (server->url), "web/", 4))
+      else if (strncmp (req->uri + strlen (server->url), "web/", 4) == 0)
         {
           handle_web_client (req, server);
         }
-      else if (!strcmp (req->uri + strlen (server->url), "upload"))
+      else if (strcmp (req->uri + strlen (server->url), "upload") == 0)
         {
           handle_upload (req, server);
         }
@@ -683,7 +683,7 @@ handle_request (struct evhttp_request * req, void * arg)
           tr_free (tmp);
         }
 #endif
-      else if (!strncmp (req->uri + strlen (server->url), "rpc", 3))
+      else if (strncmp (req->uri + strlen (server->url), "rpc", 3) == 0)
         {
           handle_rpc (req, server);
         }
