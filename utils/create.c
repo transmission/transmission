@@ -156,7 +156,14 @@ tr_main (int    argc,
 
   if (outfile == NULL)
     {
-      char * base = tr_sys_path_basename (infile, NULL);
+      tr_error * error = NULL;
+      char * base = tr_sys_path_basename (infile, &error);
+      if (base == NULL)
+        {
+          fprintf (stderr, "ERROR: Cannot deduce output path from input path: %s\n", error->message);
+          return EXIT_FAILURE;
+        }
+
       char * end = tr_strdup_printf ("%s.torrent", base);
       char * cwd = tr_getcwd ();
       outfile = out2 = tr_buildPath (cwd, end, NULL);

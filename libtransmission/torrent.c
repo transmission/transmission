@@ -3048,6 +3048,9 @@ deleteLocalData (tr_torrent * tor, tr_fileFunc func)
       dir = tr_sys_path_dirname (filename, NULL);
       tr_free (filename);
 
+      if (dir == NULL)
+        continue;
+
       /* walk up the directory tree until we reach 'top' */
       if (!tr_sys_path_is_same (top, dir, NULL) && strcmp (top, dir) != 0)
         {
@@ -3753,6 +3756,9 @@ renameTorrentFileString (tr_torrent       * tor,
   else
     {
       char * tmp = tr_sys_path_dirname (oldpath, NULL);
+
+      if (tmp == NULL)
+        return;
 
       if (oldpath_len >= strlen(file->name))
         name = tr_buildPath (tmp, newname, NULL);

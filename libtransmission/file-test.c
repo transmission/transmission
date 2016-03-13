@@ -669,6 +669,47 @@ test_path_xname (const struct xname_test_data * data,
 static int
 test_path_basename_dirname (void)
 {
+  const struct xname_test_data common_xname_tests[] =
+  {
+    { "/", "/" },
+    { "", "." },
+#ifdef _WIN32
+    { "\\", "/" },
+    /* Invalid paths */
+    { "\\\\\\", NULL },
+    { "123:" , NULL },
+    /* Reserved characters */
+    { "<", NULL },
+    { ">", NULL },
+    { ":", NULL },
+    { "\"", NULL },
+    { "|", NULL },
+    { "?", NULL },
+    { "*", NULL },
+    { "a\\<", NULL },
+    { "a\\>", NULL },
+    { "a\\:", NULL },
+    { "a\\\"", NULL },
+    { "a\\|", NULL },
+    { "a\\?", NULL },
+    { "a\\*", NULL },
+    { "c:\\a\\b<c\\d", NULL },
+    { "c:\\a\\b>c\\d", NULL },
+    { "c:\\a\\b:c\\d", NULL },
+    { "c:\\a\\b\"c\\d", NULL },
+    { "c:\\a\\b|c\\d", NULL },
+    { "c:\\a\\b?c\\d", NULL },
+    { "c:\\a\\b*c\\d", NULL }
+#else
+    { "////", "/" }
+#endif
+  };
+
+  if (test_path_xname (common_xname_tests, sizeof (common_xname_tests) / sizeof (*common_xname_tests), tr_sys_path_basename) != 0)
+    return 1;
+  if (test_path_xname (common_xname_tests, sizeof (common_xname_tests) / sizeof (*common_xname_tests), tr_sys_path_dirname) != 0)
+    return 1;
+
   const struct xname_test_data basename_tests[] =
   {
     { "a", "a" },
@@ -676,8 +717,6 @@ test_path_basename_dirname (void)
     { "/aa", "aa" },
     { "/a/b/c", "c" },
     { "/a/b/c/", "c" },
-    { "/", "/" },
-    { "", "." },
 #ifdef _WIN32
     { "c:\\a\\b\\c", "c" },
     { "c:", "/" },
@@ -690,13 +729,8 @@ test_path_basename_dirname (void)
     { "//1.2.3.4/b", "b" },
     { "\\\\a", "a" },
     { "\\\\1.2.3.4", "1.2.3.4" },
-    { "\\\\", "/" },
     { "\\", "/" },
-    { "\\a", "a" },
-    { "\\\\\\", NULL },
-    { "123:" , NULL }
-#else
-    { "////", "/" }
+    { "\\a", "a" }
 #endif
   };
 
@@ -710,8 +744,6 @@ test_path_basename_dirname (void)
     { "a/b/c/", "a/b" },
     { "a", "." },
     { "a/", "." },
-    { "/", "/" },
-    { "", "." },
 #ifdef _WIN32
     { "C:\\a/b\\c", "C:\\a/b" },
     { "C:\\a/b\\c\\", "C:\\a/b" },
@@ -730,12 +762,7 @@ test_path_basename_dirname (void)
     { "\\\\a", "\\\\" },
     { "\\\\1.2.3.4", "\\\\" },
     { "\\\\", "\\\\" },
-    { "\\", "/" },
-    { "a/b\\c", "a/b" },
-    { "\\\\\\" , NULL },
-    { "123:" , NULL }
-#else
-    { "////", "/" }
+    { "a/b\\c", "a/b" }
 #endif
   };
 

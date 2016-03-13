@@ -1478,8 +1478,8 @@ tr_moveFile (const char * oldpath, const char * newpath, tr_error ** error)
 
   /* make sure the target directory exists */
   {
-    char * newdir = tr_sys_path_dirname (newpath, NULL);
-    const bool i = tr_sys_dir_create (newdir, TR_SYS_DIR_CREATE_PARENTS, 0777, error);
+    char * newdir = tr_sys_path_dirname (newpath, error);
+    const bool i = newdir != NULL && tr_sys_dir_create (newdir, TR_SYS_DIR_CREATE_PARENTS, 0777, error);
     tr_free (newdir);
     if (!i)
       {
