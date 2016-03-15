@@ -1444,8 +1444,8 @@ MainWindow::dropEvent (QDropEvent * event)
         {
           const QUrl url (key);
 
-          if (url.scheme () == QLatin1String ("file"))
-            key = QUrl::fromPercentEncoding (url.path().toUtf8());
+          if (url.isLocalFile ())
+            key = url.toLocalFile ();
 
           qApp->addTorrent (key);
         }
