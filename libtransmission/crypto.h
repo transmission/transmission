@@ -11,7 +11,8 @@
  #error only libtransmission should #include this header.
 #endif
 
-#pragma once
+#ifndef TR_ENCRYPTION_H
+#define TR_ENCRYPTION_H
 
 #include <inttypes.h>
 
@@ -84,3 +85,4 @@ bool           tr_cryptoSecretKeySha1 (const tr_crypto * crypto,
 
 /* @} */
 
+#endif

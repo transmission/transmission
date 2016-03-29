@@ -10,6 +10,8 @@
 #include <string.h>
 
 #include "transmission.h"
+#include "crypto.h"
+#include "crypto-utils.h"
 
 #include "libtransmission-test.h"
 
