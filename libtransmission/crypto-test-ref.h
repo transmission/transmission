@@ -168,5 +168,8 @@
 #define tr_sha1_to_hex_ tr_sha1_to_hex
 #define tr_hex_to_sha1_ tr_hex_to_sha1
 
+#include "crypto.h"
+#include "crypto-utils.h"
+
 #endif /* CRYPTO_REFERENCE_CHECK */
 
