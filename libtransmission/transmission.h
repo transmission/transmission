@@ -20,10 +20,12 @@
 extern "C" {
 #endif
 
-#if defined(__GNUC__)
- #define TR_DEPRECATED __attribute__((deprecated))
-#elif defined(__clang__)
+#if defined(__clang__)
  #define TR_DEPRECATED __attribute__((gnu::deprecated))
+#elif defined(__GNUC__)
+ #define TR_DEPRECATED __attribute__((deprecated))
+#elif defined(_MSC_VER)
+ #define TR_DEPRECATED __declspec(deprecated)
 #else
  #define TR_DEPRECATED
 #endif
@@ -2040,15 +2042,16 @@ const tr_stat * tr_torrentStat (tr_torrent * torrent);
 const tr_stat * tr_torrentStatCached (tr_torrent * torrent);
 
 /** @deprecated */
-void tr_torrentSetAddedDate (tr_torrent * torrent,
-                             time_t       addedDate) TR_DEPRECATED;
+TR_DEPRECATED void tr_torrentSetAddedDate (tr_torrent * torrent,
+                                           time_t       addedDate);
 
 /** @deprecated */
-void tr_torrentSetActivityDate (tr_torrent * torrent,
-                                time_t       activityDate) TR_DEPRECATED;
+TR_DEPRECATED void tr_torrentSetActivityDate (tr_torrent * torrent,
+                                              time_t       activityDate);
 
 /** @deprecated */
-void tr_torrentSetDoneDate (tr_torrent * torrent, time_t doneDate) TR_DEPRECATED;
+TR_DEPRECATED void tr_torrentSetDoneDate (tr_torrent * torrent,
+                                          time_t       doneDate);
 
 /** @} */
 
