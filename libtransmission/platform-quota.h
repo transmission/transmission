@@ -11,8 +11,7 @@
  #error only libtransmission should #include this header.
 #endif
 
-#ifndef TR_PLATFORM_QUOTA_H
-#define TR_PLATFORM_QUOTA_H
+#pragma once
 
 /**
  * @addtogroup tr_session Session
@@ -36,4 +35,3 @@ void tr_device_info_free (struct tr_device_info * info);
 
 /** @} */
 
-#endif

@@ -7,8 +7,7 @@
  * $Id$
  */
 
-#ifndef QTR_TORRENT_H
-#define QTR_TORRENT_H
+#pragma once
 
 #include <QObject>
 #include <QIcon>
@@ -339,4 +338,3 @@ class Torrent: public QObject
 
 Q_DECLARE_METATYPE(const Torrent*)
 
-#endif // QTR_TORRENT_H

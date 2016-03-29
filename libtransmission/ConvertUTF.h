@@ -1,9 +1,8 @@
-#ifndef CONVERT_UNICODE_H
-#define CONVERT_UNICODE_H
-
 #ifndef __TRANSMISSION__
-#error only libtransmission should #include this header.
+ #error only libtransmission should #include this header.
 #endif
+
+#pragma once
 
 /*
  * Copyright 2001-2004 Unicode, Inc.
@@ -159,5 +158,3 @@ Boolean tr_utf8_validate (const char * str, size_t max_len, const char ** end);
 #endif
 
 /* --------------------------------------------------------------------- */
-
-#endif /* CONVERT_UNICODE_H */

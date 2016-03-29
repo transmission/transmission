@@ -8,11 +8,10 @@
  */
 
 #ifndef __TRANSMISSION__
-#error only libtransmission should #include this header.
+ #error only libtransmission should #include this header.
 #endif
 
-#ifndef TR_UPNP_H
-#define TR_UPNP_H 1
+#pragma once
 
 /**
  * @addtogroup port_forwarding Port Forwarding
@@ -30,4 +29,3 @@ int       tr_upnpPulse (      tr_upnp *,
                             int isEnabled,
                             int doPortCheck);
 /* @} */
-#endif

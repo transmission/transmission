@@ -7,8 +7,7 @@
  * $Id$
  */
 
-#ifndef QTR_FILE_TREE_MODEL_H
-#define QTR_FILE_TREE_MODEL_H
+#pragma once
 
 #include <cstdint>
 
@@ -97,4 +96,3 @@ class FileTreeModel: public QAbstractItemModel
     QMap<int, FileTreeItem *> myIndexCache;
 };
 
-#endif // QTR_FILE_TREE_MODEL_H

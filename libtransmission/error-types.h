@@ -7,8 +7,7 @@
  * $Id$
  */
 
-#ifndef TR_ERROR_TYPES_H
-#define TR_ERROR_TYPES_H
+#pragma once
 
 #ifdef _WIN32
 
@@ -38,4 +37,3 @@
 
 #endif /* _WIN32 */
 
-#endif /* TR_ERROR_TYPES_H */

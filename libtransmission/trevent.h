@@ -8,11 +8,10 @@
  */
 
 #ifndef __TRANSMISSION__
-#error only libtransmission should #include this header.
+ #error only libtransmission should #include this header.
 #endif
 
-#ifndef TR_EVENT_H
-#define TR_EVENT_H
+#pragma once
 
 /**
 **/
@@ -25,4 +24,3 @@ bool   tr_amInEventThread (const tr_session *);
 
 void   tr_runInEventThread (tr_session *, void func (void*), void * user_data);
 
-#endif

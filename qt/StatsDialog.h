@@ -7,8 +7,7 @@
  * $Id$
  */
 
-#ifndef QTR_STATS_DIALOG_H
-#define QTR_STATS_DIALOG_H
+#pragma once
 
 #include "BaseDialog.h"
 
@@ -40,4 +39,3 @@ class StatsDialog: public BaseDialog
     QTimer * myTimer;
 };
 
-#endif // QTR_STATS_DIALOG_H

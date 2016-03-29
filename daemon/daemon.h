@@ -7,8 +7,7 @@
  * $Id$
  */
 
-#ifndef DTR_DAEMON_H
-#define DTR_DAEMON_H
+#pragma once
 
 struct tr_error;
 
@@ -26,4 +25,3 @@ bool dtr_daemon (const dtr_callbacks  * cb,
                  int                  * exit_code,
                  struct tr_error     ** error);
 
-#endif /* DTR_DAEMON_H */

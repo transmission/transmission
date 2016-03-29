@@ -7,8 +7,7 @@
  * $Id$
  */
 
-#ifndef TR_GETOPT_H
-#define TR_GETOPT_H
+#pragma once
 
 #ifdef __cplusplus
 extern "C" {
@@ -67,4 +66,3 @@ void tr_getopt_usage (const char       * appName,
 
 /** @} */
 
-#endif /* TR_GETOPT_H */

@@ -23,11 +23,10 @@
  *****************************************************************************/
 
 #ifndef __TRANSMISSION__
-#error only libtransmission should #include this header.
+ #error only libtransmission should #include this header.
 #endif
 
-#ifndef TR_NET_H
-#define TR_NET_H
+#pragma once
 
 #ifdef _WIN32
  #include <inttypes.h>
@@ -174,4 +173,3 @@ char* tr_net_strerror (char * buf, size_t buflen, int err);
 
 const unsigned char *tr_globalIPv6 (void);
 
-#endif /* TR_NET_H */

@@ -25,8 +25,7 @@ THE SOFTWARE.
  #error only libtransmission should #include this header.
 #endif
 
-#ifndef TR_UTP_H
-#define TR_UTP_H
+#pragma once
 
 int tr_utpPacket (const unsigned char *buf, size_t buflen,
                  const struct sockaddr *from, socklen_t fromlen,
@@ -37,4 +36,3 @@ void tr_utpClose (tr_session *);
 void tr_utpSendTo (void *closure, const unsigned char *buf, size_t buflen,
                   const struct sockaddr *to, socklen_t tolen);
 
-#endif /* #ifndef TR_UTP_H */

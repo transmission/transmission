@@ -22,8 +22,7 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#ifndef GTR_CONFIG_H
-#define GTR_CONFIG_H
+#pragma once
 
 #include <inttypes.h>
 #include <libtransmission/transmission.h> /* tr_variant, tr_session */
@@ -46,4 +45,3 @@ void                gtr_pref_string_set      (const tr_quark key, const char * v
 void                gtr_pref_save            (tr_session *);
 struct tr_variant*  gtr_pref_get_all         (void);
 
-#endif /* GTR_CONFIG_H */

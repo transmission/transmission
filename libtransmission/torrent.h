@@ -11,8 +11,7 @@
  #error only libtransmission should #include this header.
 #endif
 
-#ifndef TR_TORRENT_H
-#define TR_TORRENT_H 1
+#pragma once
 
 #include "bandwidth.h" /* tr_bandwidth */
 #include "completion.h" /* tr_completion */
@@ -511,4 +510,3 @@ tr_torrentGetQueueDirection (const tr_torrent * tor)
   return tr_torrentIsSeed (tor) ? TR_UP : TR_DOWN;
 }
 
-#endif

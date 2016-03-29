@@ -7,8 +7,7 @@
  * $Id$
  */
 
-#ifndef QTR_SESSION_H
-#define QTR_SESSION_H
+#pragma once
 
 #include <QObject>
 #include <QSet>
@@ -160,4 +159,3 @@ class Session: public QObject
     RpcClient myRpc;
 };
 
-#endif // QTR_SESSION_H

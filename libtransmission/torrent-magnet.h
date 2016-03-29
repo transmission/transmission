@@ -11,8 +11,7 @@
  #error only libtransmission should #include this header.
 #endif
 
-#ifndef TR_TORRENT_MAGNET_H
-#define TR_TORRENT_MAGNET_H 1
+#pragma once
 
 #include <inttypes.h>
 #include <time.h>
@@ -33,4 +32,3 @@ bool tr_torrentSetMetadataSizeHint (tr_torrent * tor, int64_t metadata_size);
 
 double tr_torrentGetMetadataPercent (const tr_torrent * tor);
 
-#endif

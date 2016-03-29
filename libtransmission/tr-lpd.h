@@ -24,8 +24,7 @@ THE SOFTWARE.
  #error only libtransmission should #include this header.
 #endif
 
-#ifndef _TR_LPD_H
-#define _TR_LPD_H
+#pragma once
 
 /* $Id$ */
 
@@ -47,6 +46,4 @@ bool tr_lpdSendAnnounce (const tr_torrent*);
 
 /**
 * @} */
-
-#endif /* _TR_LPD_H */
 

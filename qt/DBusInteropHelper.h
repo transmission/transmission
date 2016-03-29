@@ -7,8 +7,7 @@
  * $Id$
  */
 
-#ifndef QTR_DBUS_INTEROP_HELPER_H
-#define QTR_DBUS_INTEROP_HELPER_H
+#pragma once
 
 class QObject;
 class QString;
@@ -24,4 +23,3 @@ class DBusInteropHelper
     static void registerObject (QObject * parent);
 };
 
-#endif // QTR_DBUS_INTEROP_HELPER_H

@@ -11,8 +11,7 @@
  #error only the libtransmission announcer module should #include this header.
 #endif
 
-#ifndef _TR_ANNOUNCER_COMMON_H_
-#define _TR_ANNOUNCER_COMMON_H_
+#pragma once
 
 #include "transmission.h" /* SHA_DIGEST_LENGTH */
 #include "session.h" /* PEER_ID_LEN */
@@ -235,4 +234,3 @@ void tr_tracker_udp_announce (tr_session                 * session,
 
 void tr_tracker_udp_start_shutdown (tr_session * session);
 
-#endif /* _TR_ANNOUNCER_COMMON_H_ */

@@ -8,11 +8,10 @@
  */
 
 #ifndef __TRANSMISSION__
-#error only libtransmission should #include this header.
+ #error only libtransmission should #include this header.
 #endif
 
-#ifndef TR_BANDWIDTH_H
-#define TR_BANDWIDTH_H
+#pragma once
 
 #include <assert.h>
 
@@ -267,4 +266,4 @@ void tr_bandwidthSetPeer (tr_bandwidth      * bandwidth,
                           struct tr_peerIo  * peerIo);
 
 /* @} */
-#endif
+

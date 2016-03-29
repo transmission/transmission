@@ -7,8 +7,7 @@
  * $Id$
  */
 
-#ifndef QTR_TRACKER_DELEGATE_H
-#define QTR_TRACKER_DELEGATE_H
+#pragma once
 
 #include <QItemDelegate>
 
@@ -42,4 +41,3 @@ class TrackerDelegate: public QItemDelegate
     bool myShowMore;
 };
 
-#endif // QTR_TRACKER_DELEGATE_H

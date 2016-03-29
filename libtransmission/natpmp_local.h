@@ -8,11 +8,10 @@
  */
 
 #ifndef __TRANSMISSION__
-#error only libtransmission should #include this header.
+ #error only libtransmission should #include this header.
 #endif
 
-#ifndef TR_NATPMP_H
-#define TR_NATPMP_H 1
+#pragma once
 
 /**
  * @addtogroup port_forwarding Port Forwarding
@@ -28,4 +27,3 @@ void tr_natpmpClose (tr_natpmp *);
 int tr_natpmpPulse (tr_natpmp *, tr_port port, bool isEnabled, tr_port * public_port);
 
 /* @} */
-#endif

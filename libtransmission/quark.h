@@ -7,8 +7,7 @@
  * $Id$
  */
 
-#ifndef TR_QUARK_H
-#define TR_QUARK_H 1
+#pragma once
 
 #ifdef __cplusplus
 extern "C" {
@@ -432,4 +431,3 @@ tr_quark tr_quark_new (const void * str, size_t len);
 }
 #endif
 
-#endif

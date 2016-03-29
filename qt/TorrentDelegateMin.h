@@ -7,8 +7,7 @@
  * $Id$
  */
 
-#ifndef QTR_TORRENT_DELEGATE_MIN_H
-#define QTR_TORRENT_DELEGATE_MIN_H
+#pragma once
 
 #include "TorrentDelegate.h"
 
@@ -26,4 +25,3 @@ class TorrentDelegateMin: public TorrentDelegate
     virtual void drawTorrent (QPainter * painter, const QStyleOptionViewItem& option, const Torrent&) const;
 };
 
-#endif // QTR_TORRENT_DELEGATE_MIN_H

@@ -7,8 +7,7 @@
  * $Id$
  */
 
-#ifndef QTR_PREFS_DIALOG_H
-#define QTR_PREFS_DIALOG_H
+#pragma once
 
 #include <QMap>
 #include <QSet>
@@ -93,4 +92,3 @@ class PrefsDialog: public BaseDialog
     QMessageBox * myBlocklistDialog;
 };
 
-#endif // QTR_PREFS_DIALOG_H

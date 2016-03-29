@@ -7,8 +7,7 @@
  * $Id$
  */
 
-#ifndef QTR_BASE_DIALOG_H
-#define QTR_BASE_DIALOG_H
+#pragma once
 
 #include <QDialog>
 
@@ -22,4 +21,3 @@ class BaseDialog: public QDialog
     }
 };
 
-#endif // QTR_BASE_DIALOG_H

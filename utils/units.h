@@ -7,8 +7,7 @@
  * $Id:$
  */
 
-#ifndef UNITS_H
-#define UNITS_H
+#pragma once
 
 #define MEM_K 1024
 #define MEM_K_STR "KiB"
@@ -30,4 +29,3 @@
 #define SPEED_G_STR "GB/s"
 #define SPEED_T_STR "TB/s"
 
-#endif

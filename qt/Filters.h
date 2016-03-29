@@ -7,8 +7,7 @@
  * $Id$
  */
 
-#ifndef QTR_FILTERS_H
-#define QTR_FILTERS_H
+#pragma once
 
 #include <QMetaType>
 #include <QString>
@@ -84,4 +83,3 @@ class SortMode
 
 Q_DECLARE_METATYPE(SortMode)
 
-#endif // QTR_FILTERS_H

@@ -11,8 +11,7 @@
  #error only libtransmission should #include this header.
 #endif
 
-#ifndef TR_CACHE_H
-#define TR_CACHE_H
+#pragma once
 
 struct evbuffer;
 
@@ -67,4 +66,3 @@ int tr_cacheFlushFile (tr_cache         * cache,
                        tr_torrent       * torrent,
                        tr_file_index_t    file);
 
-#endif

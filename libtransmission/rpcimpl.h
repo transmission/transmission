@@ -7,8 +7,7 @@
  * $Id$
  */
 
-#ifndef TR_RPC_H
-#define TR_RPC_H
+#pragma once
 
 #ifdef __cplusplus
 extern "C" {
@@ -46,4 +45,3 @@ void tr_rpc_parse_list_str (tr_variant  * setme,
 }
 #endif
 
-#endif /* TR_RPC_H */

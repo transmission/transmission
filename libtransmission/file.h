@@ -7,8 +7,7 @@
  * $Id$
  */
 
-#ifndef TR_FILE_H
-#define TR_FILE_H
+#pragma once
 
 #include <inttypes.h>
 #include <time.h>
@@ -691,4 +690,3 @@ bool            tr_sys_dir_close            (tr_sys_dir_t         handle,
 }
 #endif
 
-#endif

@@ -7,8 +7,7 @@
  * $Id$
  */
 
-#ifndef TR_HTTP_H
-#define TR_HTTP_H
+#pragma once
 
 #include <curl/curl.h>
 
@@ -78,4 +77,3 @@ char* tr_http_unescape (const char * str, size_t len);
 }
 #endif
 
-#endif

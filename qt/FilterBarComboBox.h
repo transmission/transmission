@@ -7,8 +7,7 @@
  * $Id$
  */
 
-#ifndef QTR_FILTER_BAR_COMBO_BOX_H
-#define QTR_FILTER_BAR_COMBO_BOX_H
+#pragma once
 
 #include <QComboBox>
 
@@ -41,4 +40,3 @@ class FilterBarComboBox: public QComboBox
     QSize calculateSize (const QSize& textSize, const QSize& countSize) const;
 };
 
-#endif // QTR_FILTER_BAR_COMBO_BOX_H

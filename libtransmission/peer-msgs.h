@@ -11,8 +11,7 @@
  #error only libtransmission should #include this header.
 #endif
 
-#ifndef TR_PEER_MSGS_H
-#define TR_PEER_MSGS_H
+#pragma once
 
 #include <inttypes.h>
 #include "peer-common.h"
@@ -88,4 +87,3 @@ size_t       tr_generateAllowedSet           (tr_piece_index_t         * setmePi
 
 
 /* @} */
-#endif

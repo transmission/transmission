@@ -7,8 +7,7 @@
  * $Id$
  */
 
-#ifndef QTR_TORRENT_DELEGATE_H
-#define QTR_TORRENT_DELEGATE_H
+#pragma once
 
 #include <QStyledItemDelegate>
 
@@ -53,4 +52,3 @@ class TorrentDelegate: public QStyledItemDelegate
     static QColor silverBack;
 };
 
-#endif // QTR_TORRENT_DELEGATE_H

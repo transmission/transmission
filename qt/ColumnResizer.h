@@ -7,8 +7,7 @@
  * $Id$
  */
 
-#ifndef QTR_COLUMN_RESIZER_H
-#define QTR_COLUMN_RESIZER_H
+#pragma once
 
 #include <QObject>
 #include <QSet>
@@ -39,4 +38,3 @@ class ColumnResizer: public QObject
     QSet<QGridLayout *> myLayouts;
 };
 
-#endif // QTR_COLUMN_RESIZER_H

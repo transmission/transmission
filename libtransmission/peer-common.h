@@ -11,8 +11,7 @@
  #error only libtransmission should #include this header.
 #endif
 
-#ifndef TR_PEER_H
-#define TR_PEER_H
+#pragma once
 
 #include "transmission.h"
 #include "bitfield.h"
@@ -180,4 +179,3 @@ void tr_swarmIncrementActivePeers (struct tr_swarm * swarm, tr_direction directi
 
 /** @} */
 
-#endif

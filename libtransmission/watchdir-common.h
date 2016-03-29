@@ -7,8 +7,7 @@
  * $Id$
  */
 
-#ifndef TR_WATCHDIR_COMMON_H
-#define TR_WATCHDIR_COMMON_H
+#pragma once
 
 #ifndef __LIBTRANSMISSION_WATCHDIR_MODULE__
  #error only the libtransmission watchdir module should #include this header.
@@ -52,4 +51,3 @@ tr_watchdir_backend * tr_watchdir_kqueue_new     (tr_watchdir_t        handle);
 tr_watchdir_backend * tr_watchdir_win32_new      (tr_watchdir_t        handle);
 #endif
 
-#endif /* TR_WATCHDIR_COMMON_H */

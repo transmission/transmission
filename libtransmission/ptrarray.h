@@ -11,8 +11,7 @@
  #error only libtransmission should #include this header.
 #endif
 
-#ifndef TR_PTR_ARRAY_H
-#define TR_PTR_ARRAY_H
+#pragma once
 
 #include <assert.h>
 
@@ -140,4 +139,3 @@ void* tr_ptrArrayFindSorted (tr_ptrArray * array,
                              int compare (const void*, const void*));
 
 /* @} */
-#endif

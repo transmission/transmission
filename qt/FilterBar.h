@@ -7,8 +7,7 @@
  * $Id$
  */
 
-#ifndef QTR_FILTER_BAR_H
-#define QTR_FILTER_BAR_H
+#pragma once
 
 #include <QWidget>
 
@@ -61,4 +60,3 @@ class FilterBar: public QWidget
     FilterBarLineEdit * myLineEdit;
 };
 
-#endif // QTR_FILTER_BAR_H

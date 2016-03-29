@@ -6,8 +6,7 @@
  * $Id$
  */
 
-#ifndef GTR_ICONS_H
-#define GTR_ICONS_H
+#pragma once
 
 #define DIRECTORY_MIME_TYPE "folder"
 #define UNKNOWN_MIME_TYPE "unknown"
@@ -18,4 +17,3 @@ GdkPixbuf  * gtr_get_mime_type_icon (const char   * mime_type,
                                      GtkIconSize    icon_size,
                                      GtkWidget    * for_widget);
 
-#endif

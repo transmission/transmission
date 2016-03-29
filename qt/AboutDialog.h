@@ -7,8 +7,7 @@
  * $Id$
  */
 
-#ifndef QTR_ABOUT_DIALOG_H
-#define QTR_ABOUT_DIALOG_H
+#pragma once
 
 #include <QPointer>
 
@@ -36,4 +35,3 @@ class AboutDialog: public BaseDialog
     QPointer<LicenseDialog> myLicenseDialog;
 };
 
-#endif // QTR_ABOUT_DIALOG_H

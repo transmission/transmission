@@ -8,11 +8,10 @@
  */
 
 #ifndef __TRANSMISSION__
-#error only libtransmission should #include this header.
+ #error only libtransmission should #include this header.
 #endif
 
-#ifndef _TR_ANNOUNCER_H_
-#define _TR_ANNOUNCER_H_
+#pragma once
 
 #include "transmission.h"
 
@@ -111,6 +110,3 @@ void tr_tracker_udp_close (tr_session * session);
 
 bool tr_tracker_udp_is_idle (const tr_session * session);
 
-
-
-#endif /* _TR_ANNOUNCER_H_ */

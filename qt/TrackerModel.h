@@ -7,8 +7,7 @@
  * $Id$
  */
 
-#ifndef QTR_TRACKER_MODEL_H
-#define QTR_TRACKER_MODEL_H
+#pragma once
 
 #include <QAbstractListModel>
 #include <QSet>
@@ -54,4 +53,3 @@ class TrackerModel: public QAbstractListModel
     rows_t myRows;
 };
 
-#endif // QTR_TRACKER_MODEL_H

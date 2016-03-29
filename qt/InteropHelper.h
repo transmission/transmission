@@ -7,8 +7,7 @@
  * $Id$
  */
 
-#ifndef QTR_INTEROP_HELPER_H
-#define QTR_INTEROP_HELPER_H
+#pragma once
 
 #ifdef ENABLE_COM_INTEROP
   #include "ComInteropHelper.h"
@@ -40,4 +39,3 @@ class InteropHelper
 #endif
 };
 
-#endif // QTR_INTEROP_HELPER_H

@@ -7,8 +7,7 @@
  * $Id$
  */
 
-#ifndef TR_WATCHDIR_H
-#define TR_WATCHDIR_H
+#pragma once
 
 #ifdef __cplusplus
 extern "C" {
@@ -46,4 +45,3 @@ const char    * tr_watchdir_get_path (tr_watchdir_t       handle);
 }
 #endif
 
-#endif /* TR_WATCHDIR_H */

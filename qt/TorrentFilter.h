@@ -7,8 +7,7 @@
  * $Id$
  */
 
-#ifndef QTR_TORRENT_FILTER_H
-#define QTR_TORRENT_FILTER_H
+#pragma once
 
 #include <QSortFilterProxyModel>
 
@@ -54,4 +53,3 @@ class TorrentFilter: public QSortFilterProxyModel
     const Prefs& myPrefs;
 };
 
-#endif // QTR_TORRENT_FILTER_H

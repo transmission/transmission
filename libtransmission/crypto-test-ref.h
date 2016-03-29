@@ -7,8 +7,7 @@
  * $Id$
  */
 
-#ifndef TR_CRYPTO_TEST_REF_H
-#define TR_CRYPTO_TEST_REF_H
+#pragma once
 
 /* #define CRYPTO_REFERENCE_CHECK */
 
@@ -171,4 +170,3 @@
 
 #endif /* CRYPTO_REFERENCE_CHECK */
 
-#endif /* TR_CRYPTO_TEST_REF_H */

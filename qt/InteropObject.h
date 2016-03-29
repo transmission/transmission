@@ -7,8 +7,7 @@
  * $Id$
  */
 
-#ifndef QTR_INTEROP_OBJECT_H
-#define QTR_INTEROP_OBJECT_H
+#pragma once
 
 #include <QObject>
 
@@ -36,4 +35,3 @@ class InteropObject: public QObject
     bool AddMetainfo (const QString& metainfo);
 };
 
-#endif // QTR_INTEROP_OBJECT_H

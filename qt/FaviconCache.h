@@ -7,8 +7,7 @@
  * $Id$
  */
 
-#ifndef QTR_FAVICON_CACHE_H
-#define QTR_FAVICON_CACHE_H
+#pragma once
 
 #include <QMap>
 #include <QString>
@@ -54,4 +53,3 @@ class FaviconCache: public QObject
     QMap<QString, QPixmap> myPixmaps;
 };
 
-#endif // QTR_FAVICON_CACHE_H

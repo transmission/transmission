@@ -9,8 +9,7 @@
 
 /* Note VERBOSE needs to be (un)defined before including this file */
 
-#ifndef LIBTRANSMISSION_TEST_H
-#define LIBTRANSMISSION_TEST_H 1
+#pragma once
 
 #include <stdio.h>
 #include <string.h> /* strlen() */
@@ -101,4 +100,3 @@ void         libtest_sandbox_destroy (const char * sandbox);
 
 void         libttest_sync (void);
 
-#endif /* !LIBTRANSMISSION_TEST_H */

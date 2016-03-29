@@ -11,8 +11,7 @@
  #error only libtransmission should #include this header.
 #endif
 
-#ifndef TR_IO_H
-#define TR_IO_H 1
+#pragma once
 
 struct tr_torrent;
 
@@ -64,4 +63,3 @@ void tr_ioFindFileLocation (const tr_torrent  * tor,
 
 
 /* @} */
-#endif

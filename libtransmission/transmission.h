@@ -13,8 +13,7 @@
  * most of the remaining headers in libtransmission are private.
  */
 
-#ifndef TR_TRANSMISSION_H
-#define TR_TRANSMISSION_H 1
+#pragma once
 
 #ifdef __cplusplus
 extern "C" {
@@ -2063,4 +2062,3 @@ static inline bool tr_isBool (bool b) { return b==1 || b==0; }
 }
 #endif
 
-#endif

@@ -7,12 +7,11 @@
  * $Id$
  */
 
-#ifndef TR_ENCRYPTION_H
-#define TR_ENCRYPTION_H
-
 #ifndef __TRANSMISSION__
-#error only libtransmission should #include this header.
+ #error only libtransmission should #include this header.
 #endif
+
+#pragma once
 
 #include <inttypes.h>
 
@@ -85,4 +84,3 @@ bool           tr_cryptoSecretKeySha1 (const tr_crypto * crypto,
 
 /* @} */
 
-#endif

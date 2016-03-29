@@ -7,12 +7,10 @@
  * $Id$
  */
 
-#ifndef GTR_STATS_DIALOG_H
-#define GTR_STATS_DIALOG_H
+#pragma once
 
 #include <gtk/gtk.h>
 #include "tr-core.h"
 
 GtkWidget* gtr_stats_dialog_new (GtkWindow * parent, TrCore * core);
 
-#endif /* GTR_STATS_DIALOG_H */

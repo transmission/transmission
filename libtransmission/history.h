@@ -11,8 +11,7 @@
  #error only libtransmission should #include this header.
 #endif
 
-#ifndef TR_RECENT_HISTORY_H
-#define TR_RECENT_HISTORY_H
+#pragma once
 
 /**
  * A generic short-term memory object that remembers how many times
@@ -56,4 +55,3 @@ void tr_historyAdd (tr_recentHistory *, time_t when, unsigned int n);
  */
 unsigned int tr_historyGet (const tr_recentHistory *, time_t when, unsigned int seconds);
 
-#endif

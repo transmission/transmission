@@ -7,8 +7,7 @@
  * $Id$
  */
 
-#ifndef QTR_SESSION_DIALOG_H
-#define QTR_SESSION_DIALOG_H
+#pragma once
 
 #include <QWidgetList>
 
@@ -44,4 +43,3 @@ class SessionDialog: public BaseDialog
     QWidgetList myAuthWidgets;
 };
 
-#endif // QTR_SESSION_DIALOG_H

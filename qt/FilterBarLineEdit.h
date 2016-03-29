@@ -7,8 +7,7 @@
  * $Id$
  */
 
-#ifndef QTR_FILTER_BAR_LINE_EDIT_H
-#define QTR_FILTER_BAR_LINE_EDIT_H
+#pragma once
 
 #include <QLineEdit>
 
@@ -32,4 +31,3 @@ class FilterBarLineEdit: public QLineEdit
     QToolButton * myClearButton;
 };
 
-#endif // QTR_FILTER_BAR_LINE_EDIT_H

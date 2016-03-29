@@ -7,8 +7,7 @@
  * $Id$
  */
 
-#ifndef QTR_RELOCATE_DIALOG_H
-#define QTR_RELOCATE_DIALOG_H
+#pragma once
 
 #include <QSet>
 
@@ -43,4 +42,3 @@ class RelocateDialog: public BaseDialog
     static bool myMoveFlag;
 };
 
-#endif // QTR_RELOCATE_DIALOG_H

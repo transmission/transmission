@@ -7,8 +7,7 @@
  * $Id$
  */
 
-#ifndef QTR_MAIN_WINDOW_H
-#define QTR_MAIN_WINDOW_H
+#pragma once
 
 #include <ctime>
 
@@ -177,4 +176,3 @@ class MainWindow: public QMainWindow
     QString myErrorMessage;
 };
 
-#endif // QTR_MAIN_WINDOW_H

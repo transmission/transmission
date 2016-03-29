@@ -7,8 +7,7 @@
  * $Id$
  */
 
-#ifndef QTR_PATH_BUTTON_H
-#define QTR_PATH_BUTTON_H
+#pragma once
 
 #include <QToolButton>
 
@@ -60,4 +59,3 @@ class PathButton: public QToolButton
     QString myPath;
 };
 
-#endif // QTR_PATH_BUTTON_H

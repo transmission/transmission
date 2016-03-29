@@ -22,8 +22,7 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#ifndef GTR_CORE_H
-#define GTR_CORE_H
+#pragma once
 
 #include <gtk/gtk.h>
 
@@ -196,5 +195,3 @@ enum
 
 G_END_DECLS
 
-
-#endif /* GTR_CORE_H */

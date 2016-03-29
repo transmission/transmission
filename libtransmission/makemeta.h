@@ -7,8 +7,7 @@
  * $Id$
  */
 
-#ifndef TR_MAKEMETA_H
-#define TR_MAKEMETA_H 1
+#pragma once
 
 #ifdef __cplusplus
 extern "C" {
@@ -130,4 +129,3 @@ void tr_makeMetaInfo (tr_metainfo_builder *   builder,
 }
 #endif
 
-#endif

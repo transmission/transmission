@@ -7,8 +7,7 @@
  * $Id$
  */
 
-#ifndef QTR_FREE_SPACE_LABEL_H
-#define QTR_FREE_SPACE_LABEL_H
+#pragma once
 
 #include <cstdint>
 
@@ -45,4 +44,3 @@ class FreeSpaceLabel: public QLabel
     QTimer myTimer;
 };
 
-#endif // QTR_FREE_SPACE_LABEL_H

@@ -7,8 +7,7 @@
  * $Id$
  */
 
-#ifndef QTR_FILTER_BAR_COMBO_BOX_DELEGATE_H
-#define QTR_FILTER_BAR_COMBO_BOX_DELEGATE_H
+#pragma once
 
 #include <QItemDelegate>
 
@@ -34,4 +33,3 @@ class FilterBarComboBoxDelegate: public QItemDelegate
     QComboBox * const myCombo;
 };
 
-#endif // QTR_FILTER_BAR_COMBO_BOX_DELEGATE_H

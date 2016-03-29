@@ -11,8 +11,7 @@
  #error only libtransmission should #include this header.
 #endif
 
-#ifndef TR_INTERNAL_H
-#define TR_INTERNAL_H 1
+#pragma once
 
 #define TR_NAME "Transmission"
 
@@ -327,5 +326,3 @@ void tr_sessionGetNextQueuedTorrents (tr_session   * session,
 
 int tr_sessionCountQueueFreeSlots (tr_session * session, tr_direction);
 
-
-#endif

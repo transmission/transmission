@@ -11,8 +11,7 @@
 #error only libtransmission should #include this header.
 #endif
 
-#ifndef TR_VERIFY_H
-#define TR_VERIFY_H 1
+#pragma once
 
 /**
  * @addtogroup file_io File IO
@@ -29,4 +28,3 @@ void tr_verifyClose (tr_session *);
 
 /* @} */
 
-#endif

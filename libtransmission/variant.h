@@ -7,8 +7,7 @@
  * $Id$
  */
 
-#ifndef TR_VARIANT_H
-#define TR_VARIANT_H 1
+#pragma once
 
 #ifdef __cplusplus
 extern "C" {
@@ -435,4 +434,3 @@ void         tr_variantMergeDicts      (tr_variant       * dict_target,
 }
 #endif
 
-#endif

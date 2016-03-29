@@ -7,8 +7,7 @@
  * $Id$
  */
 
-#ifndef QTR_FILE_TREE_VIEW_H
-#define QTR_FILE_TREE_VIEW_H
+#pragma once
 
 #include <QSet>
 #include <QTreeView>
@@ -85,4 +84,3 @@ class FileTreeView: public QTreeView
     QAction * myRenameAction = nullptr;
 };
 
-#endif // QTR_FILE_TREE_VIEW_H

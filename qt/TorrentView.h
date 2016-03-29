@@ -7,8 +7,7 @@
  * $Id$
  */
 
-#ifndef QTR_TORRENT_VIEW_H
-#define QTR_TORRENT_VIEW_H
+#pragma once
 
 #include <QListView>
 
@@ -38,4 +37,3 @@ class TorrentView: public QListView
     HeaderWidget * const myHeaderWidget;
 };
 
-#endif // QTR_TORRENT_VIEW_H

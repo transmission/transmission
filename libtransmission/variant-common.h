@@ -11,8 +11,7 @@
  #error only libtransmission/variant-*.c should #include this header.
 #endif
 
-#ifndef _TR_VARIANT_COMMON_H_
-#define _TR_VARIANT_COMMON_H_
+#pragma once
 
 typedef void (*VariantWalkFunc)(const tr_variant * val, void * user_data);
 
@@ -64,5 +63,3 @@ int tr_variantParseBenc (const void     * buf,
                          const char ** setme_end);
 
 
-
-#endif /* _TR_VARIANT_COMMON_H_ */

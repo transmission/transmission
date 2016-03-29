@@ -11,8 +11,7 @@
  #error only libtransmission should #include this header.
 #endif
 
-#ifndef TR_PLATFORM_H
-#define TR_PLATFORM_H
+#pragma once
 
 #define TR_PATH_DELIMITER '/'
 #define TR_PATH_DELIMITER_STR "/"
@@ -79,4 +78,3 @@ bool tr_lockHave (const tr_lock *);
 
 /* @} */
 
-#endif

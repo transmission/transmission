@@ -11,8 +11,7 @@
  #error only libtransmission should #include this header.
 #endif
 
-#ifndef TR_LIST_H
-#define TR_LIST_H
+#pragma once
 
 /**
  * @addtogroup utils Utilities
@@ -110,5 +109,4 @@ void tr_list_insert_sorted (tr_list          ** list,
 
 
 /* @} */
-#endif /* TR_LIST_H */
 

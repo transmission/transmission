@@ -7,8 +7,7 @@
  * $Id$
  */
 
-#ifndef QTR_TORRENT_MODEL_H
-#define QTR_TORRENT_MODEL_H
+#pragma once
 
 #include <QAbstractListModel>
 #include <QMap>
@@ -79,4 +78,3 @@ class TorrentModel: public QAbstractListModel
     torrents_t myTorrents;
 };
 
-#endif // QTR_TORRENT_MODEL_H

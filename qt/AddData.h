@@ -7,8 +7,7 @@
  * $Id$
  */
 
-#ifndef QTR_ADD_DATA_H
-#define QTR_ADD_DATA_H
+#pragma once
 
 #include <QByteArray>
 #include <QString>
@@ -45,4 +44,3 @@ class AddData
     QUrl url;
 };
 
-#endif // QTR_ADD_DATA_H

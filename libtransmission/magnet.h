@@ -11,8 +11,7 @@
  #error only libtransmission should #include this header.
 #endif
 
-#ifndef TR_MAGNET_H
-#define TR_MAGNET_H 1
+#pragma once
 
 #include "transmission.h"
 #include "variant.h"
@@ -39,4 +38,3 @@ void tr_magnetCreateMetainfo (const tr_magnet_info *, tr_variant *);
 
 void tr_magnetFree (tr_magnet_info * info);
 
-#endif

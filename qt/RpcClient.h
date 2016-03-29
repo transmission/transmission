@@ -7,8 +7,7 @@
  * $Id$
  */
 
-#ifndef QTR_RPC_CLIENT_H
-#define QTR_RPC_CLIENT_H
+#pragma once
 
 #include <memory>
 
@@ -79,4 +78,3 @@ class RpcClient: public QObject
     QNetworkAccessManager * myNAM;
 };
 
-#endif // QTR_RPC_CLIENT_H

@@ -7,8 +7,7 @@
  * $Id$
  */
 
-#ifndef QTR_PREFS_H
-#define QTR_PREFS_H
+#pragma once
 
 #include <QObject>
 #include <QSet>
@@ -189,4 +188,3 @@ class Prefs: public QObject
     static PrefItem myItems[];
 };
 
-#endif // QTR_PREFS_H

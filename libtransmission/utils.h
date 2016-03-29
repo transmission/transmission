@@ -7,8 +7,7 @@
  * $Id$
  */
 
-#ifndef TR_UTILS_H
-#define TR_UTILS_H 1
+#pragma once
 
 #include <inttypes.h>
 #include <stdarg.h>
@@ -532,4 +531,3 @@ void tr_net_init (void);
 
 /** @} */
 
-#endif

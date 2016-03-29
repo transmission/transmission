@@ -7,8 +7,7 @@
  * $Id$
  */
 
-#ifndef TR_CRYPTO_UTILS_H
-#define TR_CRYPTO_UTILS_H
+#pragma once
 
 #include <inttypes.h>
 #include <stddef.h>
@@ -222,4 +221,3 @@ tr_hex_to_sha1 (uint8_t    * sha1,
 }
 #endif
 
-#endif /* TR_CRYPTO_UTILS_H */
