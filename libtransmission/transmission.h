@@ -20,9 +20,7 @@
 extern "C" {
 #endif
 
-#if defined(__clang__)
- #define TR_DEPRECATED __attribute__((gnu::deprecated))
-#elif defined(__GNUC__)
+#if defined(__GNUC__)
  #define TR_DEPRECATED __attribute__((deprecated))
 #elif defined(_MSC_VER)
  #define TR_DEPRECATED __declspec(deprecated)
