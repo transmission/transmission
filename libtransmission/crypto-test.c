@@ -22,7 +22,7 @@ test_torrent_hash (void)
 {
   tr_crypto a;
   uint8_t hash[SHA_DIGEST_LENGTH];
-  int i;
+  uint8_t i;
 
   for (i = 0; i < SHA_DIGEST_LENGTH; ++i)
     hash[i] = i;
@@ -70,7 +70,7 @@ test_encrypt_decrypt (void)
   int i;
 
   for (i = 0; i < SHA_DIGEST_LENGTH; ++i)
-    hash[i] = i;
+    hash[i] = (uint8_t)i;
 
   tr_cryptoConstruct (&a, hash, false);
   tr_cryptoConstruct_ (&b, hash, true);
@@ -215,59 +215,59 @@ test_base64 (void)
 {
   size_t len;
   char * in, * out;
-  int i;
+  size_t i;
 
   out = tr_base64_encode_str ("YOYO!", &len);
-  check_int_eq (strlen (out), len);
+  check_uint_eq (strlen (out), len);
   check (base64_eq ("WU9ZTyE=", out));
   in = tr_base64_decode_str (out, &len);
-  check_int_eq (5, len);
+  check_uint_eq (5, len);
   check_streq ("YOYO!", in);
   tr_free (in);
   tr_free (out);
 
   out = tr_base64_encode ("", 0, &len);
-  check_int_eq (0, len);
+  check_uint_eq (0, len);
   check_streq ("", out);
   tr_free (out);
   out = tr_base64_decode ("", 0, &len);
-  check_int_eq (0, len);
+  check_uint_eq (0, len);
   check_streq ("", out);
   tr_free (out);
 
   out = tr_base64_encode (NULL, 0, &len);
-  check_int_eq (0, len);
+  check_uint_eq (0, len);
   check (out == NULL);
   out = tr_base64_decode (NULL, 0, &len);
-  check_int_eq (0, len);
+  check_uint_eq (0, len);
   check (out == NULL);
 
 #define MAX_BUF_SIZE 1024
 
   for (i = 1; i <= MAX_BUF_SIZE; ++i)
     {
-      int j;
+      size_t j;
       char buf[MAX_BUF_SIZE + 1];
 
       for (j = 0; j < i; ++j)
-        buf[j] = tr_rand_int_weak (256);
+        buf[j] = (char) tr_rand_int_weak (256);
 
       out = tr_base64_encode (buf, j, &len);
-      check_int_eq (strlen (out), len);
+      check_uint_eq (strlen (out), len);
       in = tr_base64_decode (out, len, &len);
-      check_int_eq (j, len);
+      check_uint_eq (j, len);
       check (memcmp (in, buf, len) == 0);
       tr_free (in);
       tr_free (out);
 
       for (j = 0; j < i; ++j)
-        buf[j] = 1 + tr_rand_int_weak (255);
+        buf[j] = (char)(1 + tr_rand_int_weak (255));
       buf[j] = '\0';
 
       out = tr_base64_encode_str (buf, &len);
-      check_int_eq (strlen (out), len);
+      check_uint_eq (strlen (out), len);
       in = tr_base64_decode_str (out, &len);
-      check_int_eq (j, len);
+      check_uint_eq (j, len);
       check_streq (in, buf);
       tr_free (in);
       tr_free (out);

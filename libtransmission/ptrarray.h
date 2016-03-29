@@ -11,8 +11,8 @@
  #error only libtransmission should #include this header.
 #endif
 
-#ifndef _TR_PTR_ARRAY_H_
-#define _TR_PTR_ARRAY_H_
+#ifndef TR_PTR_ARRAY_H
+#define TR_PTR_ARRAY_H
 
 #include <assert.h>
 

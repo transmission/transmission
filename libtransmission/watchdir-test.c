@@ -31,16 +31,16 @@ callback_data;
 
 #define CB_DATA_STATIC_INIT { NULL, NULL, 0 }
 
-struct event_base * ev_base = NULL;
+static struct event_base * ev_base = NULL;
 
 extern struct timeval tr_watchdir_generic_interval;
 extern unsigned int   tr_watchdir_retry_limit;
 extern struct timeval tr_watchdir_retry_start_interval;
 extern struct timeval tr_watchdir_retry_max_interval;
 
-const struct timeval FIFTY_MSEC       = { 0,  50000 };
-const struct timeval ONE_HUNDRED_MSEC = { 0, 100000 };
-const struct timeval TWO_HUNDRED_MSEC = { 0, 200000 };
+static const struct timeval FIFTY_MSEC       = { 0,  50000 };
+static const struct timeval ONE_HUNDRED_MSEC = { 0, 100000 };
+static const struct timeval TWO_HUNDRED_MSEC = { 0, 200000 };
 
 static void
 process_events (void)

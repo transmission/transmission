@@ -25,9 +25,10 @@ extern bool verbose;
 bool should_print (bool pass);
 
 bool check_condition_impl (const char * file, int line, bool condition);
-bool check_int_eq_impl (const char * file, int line, int64_t expected, int64_t actual);
-bool check_ptr_eq_impl (const char * file, int line, const void * expected, const void * actual);
-bool check_streq_impl (const char * file, int line, const char * expected, const char * actual);
+bool check_int_eq_impl    (const char * file, int line, int64_t      expected, int64_t      actual);
+bool check_uint_eq_impl   (const char * file, int line, uint64_t     expected, uint64_t     actual);
+bool check_ptr_eq_impl    (const char * file, int line, const void * expected, const void * actual);
+bool check_streq_impl     (const char * file, int line, const char * expected, const char * actual);
 
 /***
 ****
@@ -51,6 +52,13 @@ bool check_streq_impl (const char * file, int line, const char * expected, const
   do { \
     ++current_test; \
     if (!check_int_eq_impl (__FILE__, __LINE__, (expected), (actual))) \
+      return current_test; \
+  } while (0)
+
+#define check_uint_eq(expected, actual) \
+  do { \
+    ++current_test; \
+    if (!check_uint_eq_impl (__FILE__, __LINE__, (expected), (actual))) \
       return current_test; \
   } while (0)
 

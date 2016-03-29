@@ -36,7 +36,7 @@ testPeerId (void)
 
         for (j = 8; j < PEER_ID_LEN; ++j)
         {
-            char tmp[2] = { peer_id[j], '\0' };
+            char tmp[2] = { (char)peer_id[j], '\0' };
             val += strtoul (tmp, NULL, 36);
         }
 

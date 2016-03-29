@@ -301,19 +301,19 @@ test_hex (void)
 static int
 test_array (void)
 {
-  int i;
-  int array[10] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
-  int n = sizeof (array) / sizeof (array[0]);
+  size_t i;
+  size_t array[10] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+  size_t n = sizeof (array) / sizeof (array[0]);
 
-  tr_removeElementFromArray (array, 5u, sizeof (int), n--);
+  tr_removeElementFromArray (array, 5u, sizeof (size_t), n--);
   for (i=0; i<n; ++i)
     check_int_eq ((i<5 ? i : i+1), array[i]);
 
-  tr_removeElementFromArray (array, 0u, sizeof (int), n--);
+  tr_removeElementFromArray (array, 0u, sizeof (size_t), n--);
   for (i=0; i<n; ++i)
     check_int_eq ((i<4 ? i+1 : i+2), array[i]);
 
-  tr_removeElementFromArray (array, n-1, sizeof (int), n); n--;
+  tr_removeElementFromArray (array, n-1, sizeof (size_t), n); n--;
   for (i=0; i<n; ++i)
     check_int_eq ((i<4 ? i+1 : i+2), array[i]);
 

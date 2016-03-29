@@ -103,7 +103,7 @@ testStr (void)
   n = tr_snprintf ((char*)buf, sizeof (buf), "%zu:boat", (size_t)(SIZE_MAX-2));
   err = tr_bencParseStr (buf, buf+n, &end, &str, &len);
   check_int_eq (EILSEQ, err);
-  check_int_eq (0, len);
+  check_uint_eq (0, len);
   check (str == NULL);
   check (end == NULL);
   check (!len);
@@ -112,7 +112,7 @@ testStr (void)
   n = tr_snprintf ((char*)buf, sizeof (buf), "4:boat");
   err = tr_bencParseStr (buf, buf+n, &end, &str, &len);
   check_int_eq (0, err);
-  check_int_eq (4, len);
+  check_uint_eq (4, len);
   check (strncmp ((const char*)str, "boat", len) == 0);
   check (end == buf + 6);
   str = NULL;
@@ -122,7 +122,7 @@ testStr (void)
   /* string goes past end of buffer */
   err = tr_bencParseStr (buf, buf+(n-1), &end, &str, &len);
   check_int_eq (EILSEQ, err);
-  check_int_eq (0, len);
+  check_uint_eq (0, len);
   check (str == NULL);
   check (end == NULL);
   check (!len);
@@ -131,7 +131,7 @@ testStr (void)
   n = tr_snprintf ((char*)buf, sizeof (buf), "0:");
   err = tr_bencParseStr (buf, buf+n, &end, &str, &len);
   check_int_eq (0, err);
-  check_int_eq (0, len);
+  check_uint_eq (0, len);
   check (!*str);
   check (end == buf + 2);
   str = NULL;
@@ -142,7 +142,7 @@ testStr (void)
   n = tr_snprintf ((char*)buf, sizeof (buf), "3:boat");
   err = tr_bencParseStr (buf, buf+n, &end, &str, &len);
   check_int_eq (0, err);
-  check_int_eq (3, len);
+  check_uint_eq (3, len);
   check (strncmp ((const char*)str, "boa", len) == 0);
   check (end == buf + 5);
   str = NULL;
@@ -178,7 +178,7 @@ testString (const char * str, bool isGood)
       check (end == str + len);
       saved = tr_variantToStr (&val, TR_VARIANT_FMT_BENC, &savedLen);
       check_streq (str, saved);
-      check_int_eq (savedLen, len);
+      check_uint_eq (savedLen, len);
       tr_free (saved);
       tr_variantFree (&val);
     }
@@ -414,16 +414,16 @@ testMerge (void)
   check (tr_variantDictFindInt (&dest, i4, &i));
   check_int_eq (-35, i);
   check (tr_variantDictFindStr (&dest, s5, &s, &len));
-  check_int_eq (3, len);
+  check_uint_eq (3, len);
   check_streq ("abc", s);
   check (tr_variantDictFindStr (&dest, s6, &s, &len));
-  check_int_eq (3, len);
+  check_uint_eq (3, len);
   check_streq ("xyz", s);
   check (tr_variantDictFindStr (&dest, s7, &s,  &len));
-  check_int_eq (9, len);
+  check_uint_eq (9, len);
   check_streq ("127.0.0.1", s);
   check (tr_variantDictFindStr (&dest, s8, &s, &len));
-  check_int_eq (3, len);
+  check_uint_eq (3, len);
   check_streq ("ghi", s);
 
   tr_variantFree (&dest);
@@ -534,7 +534,7 @@ testParse2 (void)
   check (tr_variantDictFindBool (&top, key_bool, &boolVal));
   check (boolVal == true);
   check (tr_variantDictFindStr (&top, key_str, &strVal, &strLen));
-  check_int_eq (16, strLen);
+  check_uint_eq (16, strLen);
   check_streq ("this-is-a-string", strVal);
   check (tr_variantDictFindReal (&top, key_real, &realVal));
   check_int_eq (50, (int)(realVal*100));

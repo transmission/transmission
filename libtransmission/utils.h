@@ -164,16 +164,16 @@ int64_t tr_getDirFreeSpace (const char * path);
 
 /**
  * @brief Convenience wrapper around timer_add () to have a timer wake up in a number of seconds and microseconds
- * @param timer
- * @param seconds
- * @param microseconds
+ * @param timer         the timer to set
+ * @param seconds       seconds to wait
+ * @param microseconds  microseconds to wait
  */
 void tr_timerAdd (struct event * timer, int seconds, int microseconds) TR_GNUC_NONNULL (1);
 
 /**
  * @brief Convenience wrapper around timer_add () to have a timer wake up in a number of milliseconds
- * @param timer
- * @param milliseconds
+ * @param timer         the timer to set
+ * @param milliseconds  milliseconds to wait
  */
 void tr_timerAddMsec (struct event * timer, int milliseconds) TR_GNUC_NONNULL (1);
 
@@ -329,8 +329,8 @@ int tr_snprintf (char * buf, size_t buflen,
                  const char * fmt, ...) TR_GNUC_PRINTF (3, 4) TR_GNUC_NONNULL (1,3);
 
 /** @brief Convenience wrapper around strerorr () guaranteed to not return NULL
-    @param errno */
-const char* tr_strerror (int);
+    @param errnum the error number to describe */
+const char* tr_strerror (int errnum);
 
 /** @brief strips leading and trailing whitspace from a string
     @return the stripped string */
@@ -412,10 +412,10 @@ double tr_truncd (double x, int decimal_places);
 char* tr_strpercent (char * buf, double x, size_t buflen);
 
 /**
- * @param buf the buffer to write the string to
- * @param buflef buf's size
- * @param ratio the ratio to convert to a string
- * @param the string represntation of "infinity"
+ * @param buf      the buffer to write the string to
+ * @param buflen   buf's size
+ * @param ratio    the ratio to convert to a string
+ * @param infinity the string represntation of "infinity"
  */
 char* tr_strratio (char * buf, size_t buflen, double ratio, const char * infinity) TR_GNUC_NONNULL (1,4);
 
@@ -494,7 +494,7 @@ char* tr_formatter_speed_KBps (char * buf, double KBps, size_t buflen);
 char* tr_formatter_mem_B (char * buf, int64_t bytes, size_t buflen);
 
 /* format a memory size from MB into a user-readable string. */
-static inline char* tr_formatter_mem_MB (char * buf, double MBps, size_t buflen) { return tr_formatter_mem_B (buf, MBps * tr_mem_K * tr_mem_K, buflen); }
+static inline char* tr_formatter_mem_MB (char * buf, double MBps, size_t buflen) { return tr_formatter_mem_B (buf, (int64_t)(MBps * tr_mem_K * tr_mem_K), buflen); }
 
 /* format a file size from bytes into a user-readable string. */
 char* tr_formatter_size_B (char * buf, int64_t bytes, size_t buflen);

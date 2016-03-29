@@ -20,6 +20,14 @@
 extern "C" {
 #endif
 
+#if defined(__GNUC__)
+ #define TR_DEPRECATED __attribute__((deprecated))
+#elif defined(__clang__)
+ #define TR_DEPRECATED __attribute__((gnu::deprecated))
+#else
+ #define TR_DEPRECATED
+#endif
+
 /***
 ****
 ****  Basic Types
@@ -145,23 +153,24 @@ const char* tr_getDefaultDownloadDir (void);
  *     tr_variantFree (&settings);
  * @endcode
  *
- * @param initme pointer to a tr_variant dictionary
+ * @param setme_dictionary pointer to a tr_variant dictionary
  * @see tr_sessionLoadSettings ()
  * @see tr_sessionInit ()
  * @see tr_getDefaultConfigDir ()
  */
-void tr_sessionGetDefaultSettings (struct tr_variant * dictionary);
+void tr_sessionGetDefaultSettings (struct tr_variant * setme_dictionary);
 
 /**
  * Add the session's current configuration settings to the benc dictionary.
  *
  * FIXME: this probably belongs in libtransmissionapp
  *
- * @param session
- * @param dictionary
+ * @param session          the session to query
+ * @param setme_dictionary the dictionary to populate
  * @see tr_sessionGetDefaultSettings ()
  */
-void tr_sessionGetSettings (tr_session *, struct tr_variant * dictionary);
+void tr_sessionGetSettings (tr_session * session,
+                            struct tr_variant * setme_dictionary);
 
 /**
  * Load settings from the configuration directory's settings.json file,
@@ -187,13 +196,14 @@ bool tr_sessionLoadSettings (struct tr_variant  * dictionary,
  *
  * FIXME: this belongs in libtransmissionapp
  *
- * @param session
- * @param dictionary
+ * @param session    the session to save
+ * @param configDir  the directory to write to
+ * @param dictionary the dictionary to save
  * @see tr_sessionLoadSettings ()
  */
 void tr_sessionSaveSettings (tr_session              * session,
                              const char              * configDir,
-                             const struct tr_variant * dictonary);
+                             const struct tr_variant * dictionary);
 
 /**
  * @brief Initialize a libtransmission session.
@@ -355,8 +365,8 @@ tr_port tr_sessionGetRPCPort (const tr_session * session);
 /**
  * @brief Specify which base URL to use.
  *
- * @detail The RPC API is accessible under <url>/rpc, the web interface under
- * <url>/web.
+ * @param session the session to set
+ * @param url     the base url to use. The RPC API is accessible under <url>/rpc, the web interface under * <url>/web.
  *
  *  @see tr_sessionGetRPCUrl
  */
@@ -895,8 +905,9 @@ typedef enum
 tr_ctorMode;
 
 /** @brief Create a torrent constructor object used to instantiate a tr_torrent
-    @param session the tr_session. This is required if you're going to call
-                   tr_torrentNew (), but you can use NULL for tr_torrentParse ().
+    @param session_or_NULL the tr_session.
+                           This is required if you're going to call tr_torrentNew (),
+                           but you can use NULL for tr_torrentParse ().
     @see tr_torrentNew (), tr_torrentParse () */
 tr_ctor* tr_ctorNew (const tr_session * session_or_NULL);
 
@@ -1012,9 +1023,9 @@ tr_parse_result;
  *         TR_PARSE_OK if parsing succeeded and it's not a duplicate;
  *         TR_PARSE_DUPLICATE if parsing succeeded but it's a duplicate.
  *
- * @param setme_info If parsing is successful and setme_info is non-NULL,
- *                   the parsed metainfo is stored there and sould be freed
- *                   by calling tr_metainfoFree () when no longer needed.
+ * @param setme_info_or_NULL If parsing is successful and setme_info is non-NULL,
+ *                           the parsed metainfo is stored there and sould be freed
+ *                           by calling tr_metainfoFree () when no longer needed.
  *
  * Notes:
  *
@@ -1038,12 +1049,12 @@ void tr_metainfoFree (tr_info * inf);
  *
  * Returns a pointer to the torrent on success, or NULL on failure.
  *
- * @param setme_error: TR_PARSE_ERR if the parsing failed;
- *                     TR_PARSE_OK if parsing succeeded and it's not a duplicate;
- *                     TR_PARSE_DUPLICATE if parsing succeeded but it's a duplicate.
- *
- * @param setme_duplicate_id: when setmeError is TR_PARSE_DUPLICATE,
- *                            this field is set to the duplicate torrent's id.
+ * @param ctor               the builder struct
+ * @param setme_error        TR_PARSE_ERR if the parsing failed;
+ *                           TR_PARSE_OK if parsing succeeded and it's not a duplicate;
+ *                           TR_PARSE_DUPLICATE if parsing succeeded but it's a duplicate.
+ * @param setme_duplicate_id when setmeError is TR_PARSE_DUPLICATE,
+ *                           this field is set to the duplicate torrent's id.
  */
 tr_torrent * tr_torrentNew (const tr_ctor   * ctor,
                             int             * setme_error,
@@ -1082,11 +1093,11 @@ typedef void (*tr_torrent_rename_done_func)(tr_torrent  * torrent,
 /**
  * @brief Rename a file or directory in a torrent.
  *
- * @tor: the torrent whose path will be renamed.
- * @oldpath: the path to the file or folder that will be renamed
- * @newname: the file or folder's new name
- * @callback: the callback invoked when the renaming finishes, or NULL
- * @callback_data: the pointer to pass in the callback's user_data arg
+ * @param tor           the torrent whose path will be renamed
+ * @param oldpath       the path to the file or folder that will be renamed
+ * @param newname       the file or folder's new name
+ * @param callback      the callback invoked when the renaming finishes, or NULL
+ * @param callback_data the pointer to pass in the callback's user_data arg
  *
  * As a special case, renaming the root file in a torrent will also
  * update tr_info.name.
@@ -1124,7 +1135,7 @@ void tr_torrentRenamePath (tr_torrent                  * tor,
                            const char                  * oldpath,
                            const char                  * newname,
                            tr_torrent_rename_done_func   callback,
-                           void                        * callback_user_data);
+                           void                        * callback_data);
 
 enum
 {
@@ -1180,7 +1191,7 @@ const char* tr_torrentName (const tr_torrent *);
  * @param tor the torrent whose file we're looking for
  * @param fileNum the fileIndex, in [0...tr_info.fileCount)
  */
-char* tr_torrentFindFile (const tr_torrent * tor, tr_file_index_t fileNo);
+char* tr_torrentFindFile (const tr_torrent * tor, tr_file_index_t fileNum);
 
 
 /***
@@ -1710,7 +1721,7 @@ void tr_torrentAmountFinished (const tr_torrent  * torrent,
  * @param aborted true if the verify ended prematurely for some reason,
  *                such as tr_torrentStop() or tr_torrentSetLocation()
  *                being called during verification.
- * @param callback_data the user-defined pointer from tr_torrentVerify()
+ * @param user_data the user-defined pointer from tr_torrentVerify()
  */
 typedef void (*tr_verify_done_func)(tr_torrent  * torrent,
                                     bool          aborted,
@@ -2030,14 +2041,14 @@ const tr_stat * tr_torrentStatCached (tr_torrent * torrent);
 
 /** @deprecated */
 void tr_torrentSetAddedDate (tr_torrent * torrent,
-                             time_t       addedDate);
+                             time_t       addedDate) TR_DEPRECATED;
 
 /** @deprecated */
 void tr_torrentSetActivityDate (tr_torrent * torrent,
-                                time_t       activityDate);
+                                time_t       activityDate) TR_DEPRECATED;
 
 /** @deprecated */
-void tr_torrentSetDoneDate (tr_torrent * torrent, time_t doneDate);
+void tr_torrentSetDoneDate (tr_torrent * torrent, time_t doneDate) TR_DEPRECATED;
 
 /** @} */
 

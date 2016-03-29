@@ -303,7 +303,7 @@ toSpeedKBps (unsigned int Bps)  { return Bps / (double)tr_speed_K; }
 static inline uint64_t
 toMemBytes (unsigned int MB) { uint64_t B = tr_mem_K * tr_mem_K; B *= MB; return B; }
 static inline int
-toMemMB  (uint64_t B)      { return B / (tr_mem_K * tr_mem_K); }
+toMemMB  (uint64_t B)      { return (int)(B / (tr_mem_K * tr_mem_K)); }
 
 /**
 **/
