@@ -253,3 +253,8 @@ install(FILES transmission-qt.desktop DESTINATION ${CMAKE_INSTALL_DATADIR}/appli
 if(ENABLE_NLS)
     install(FILES ${${PROJECT_NAME}_QM_FILES} DESTINATION ${CMAKE_INSTALL_DATADIR}/${TR_NAME}/translations)
 endif()
+
+if(WIN32)
+    file(GENERATE OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/dist-qt.conf" CONTENT "")
+    install(FILES "${CMAKE_CURRENT_BINARY_DIR}/dist-qt.conf" DESTINATION ${CMAKE_INSTALL_SYSCONFDIR} RENAME qt.conf)
+endif()

@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+
+  <?include TransmissionConfig.wxi ?>
+
+  <Fragment>
+    <DirectoryRef Id="INSTALLDIR" FileSource="$(var.SrcDir)\bin">
+
+      <Component Id="exe.transmission.qt">
+        <File DiskId="1" Id="exe.transmission.qt" KeyPath="yes" Name="transmission-qt.exe">
+          <Shortcut Id="exe.transmission.qt.startMenu" Directory="ProgramMenuFolder" Name="Transmission Qt Client" WorkingDirectory="INSTALLDIR" Icon="Tr.ico" Advertise="yes" />
+          <Shortcut Id="exe.transmission.qt.desktop" Directory="DesktopFolder" Name="Transmission Qt Client" WorkingDirectory="INSTALLDIR" Icon="Tr.ico" Advertise="yes" />
+
+          <TypeLib Id="{1E405FC2-1A3A-468B-8BD6-BFBB58770390}" Description="Transmission Qt Client Type Library" HelpDirectory="INSTALLDIR" Language="0" MajorVersion="1" MinorVersion="0">
+            <AppId Id="{792D1AAC-53CC-4DC9-BC29-E5295FDB93A9}" Description="Transmission Qt Client">
+              <Class Id="{0E2C952C-0597-491F-BA26-249D7E6FAB49}" Description="Transmission Qt Client Class" Version="1.0" Advertise="no">
+                <Interface Id="{9402F54F-4906-4F20-AD73-AFCFEB5B228D}" Name="IQtClient" ProxyStubClassId32="{00020420-0000-0000-C000-000000000046}" />
+                <ProgId Id="Transmission.QtClient.1" Description="Transmission Qt Client Class">
+                  <ProgId Id="Transmission.QtClient" Description="Transmission Qt Client Class" />
+                </ProgId>
+              </Class>
+            </AppId>                                
+          </TypeLib>
+        </File>
+
+        <RegistryKey Root="HKLM" Key="SOFTWARE">
+          <RegistryKey Key="Transmission\Capabilities">
+            <RegistryValue Name="ApplicationDescription" Value="A fast and easy BitTorrent client." Type="string" />
+            <RegistryValue Name="ApplicationIcon" Value="&quot;[#exe.transmission.qt]&quot;,0" Type="string" />
+            <RegistryValue Name="ApplicationName" Value="Transmission" Type="string" />
+            <RegistryValue Key="DefaultIcon" Value="&quot;[#exe.transmission.qt]&quot;,0" Type="string" />
+            <RegistryValue Key="FileAssociations" Name=".torrent" Value="Transmission.TorrentFile.1" Type="string" />
+            <RegistryValue Key="MIMEAssociations" Name="application/x-bittorrent" Value="Transmission.TorrentFile.1" Type="string" />
+            <RegistryValue Key="URLAssociations" Name="magnet" Value="Transmission.MagnetUri.1" Type="string" />
+          </RegistryKey>
+          <RegistryValue Key="RegisteredApplications" Name="Transmission.$(var.TrVersionMsi)" Value="SOFTWARE\Transmission\Capabilities" Type="string" />
+        </RegistryKey>
+
+        <RegistryKey Root="HKCR" Key="Applications\transmission-qt.exe">
+          <RegistryValue Key="SupportedTypes" Name=".torrent" Value="" Type="string" />
+          <RegistryValue Key="shell\open\command" Value="&quot;[#exe.transmission.qt]&quot; &quot;%1&quot;" Type="string" />
+        </RegistryKey>
+
+        <RegistryKey Root="HKCR" Key=".torrent">
+          <RegistryValue Name="ContentType" Value="application/x-bittorrent" Type="string" />
+          <RegistryValue Key="OpenWithList\transmission-qt.exe" Value="" Type="string" />
+        </RegistryKey>
+        <RegistryKey Root="HKCR" Key="MIME\Database\Content Type\application/x-bittorrent">
+          <RegistryValue Name="Extension" Value=".torrent" Type="string" />
+        </RegistryKey>
+        <RegistryKey Root="HKCR" Key="Transmission.TorrentFile.1">
+          <RegistryValue Value="Torrent Metadata File" Type="string" />
+          <RegistryValue Name="FriendlyTypeName" Value="@&quot;[#exe.transmission.qt]&quot;,-100" Type="string" />
+          <RegistryValue Key="DefaultIcon" Value="&quot;[#exe.transmission.qt]&quot;,0" Type="string" />
+          <RegistryValue Key="shell\open\command" Value="&quot;[#exe.transmission.qt]&quot; &quot;%1&quot;" Type="string" />
+        </RegistryKey>
+
+        <RegistryKey Root="HKCR" Key="magnet">
+          <RegistryValue Value="URL:magnet" Type="string" />
+          <RegistryValue Name="URL Protocol" Value="" Type="string" />
+          <RegistryValue Key="OpenWithList\transmission-qt.exe" Value="" Type="string" />
+        </RegistryKey>
+        <RegistryKey Root="HKCR" Key="Transmission.MagnetUri.1">
+          <RegistryValue Value="Magnet URI" Type="string" />
+          <RegistryValue Name="FriendlyTypeName" Value="@&quot;[#exe.transmission.qt]&quot;,-101" Type="string" />
+          <RegistryValue Name="URL Protocol" Value="" Type="string" />
+          <RegistryValue Key="DefaultIcon" Value="&quot;[#exe.transmission.qt]&quot;,0" Type="string" />
+          <RegistryValue Key="shell\open\command" Value="&quot;[#exe.transmission.qt]&quot; &quot;%1&quot;" Type="string" />
+        </RegistryKey>
+
+        <RegistryKey Root="HKCR" Key="AppID\transmission-qt.exe">
+          <RegistryValue Name="AppID" Value="{792D1AAC-53CC-4DC9-BC29-E5295FDB93A9}" Type="string" />
+        </RegistryKey>
+      </Component>
+
+      <Directory Id="QMINSTALLDIR" Name="translations" />
+
+    </DirectoryRef>
+    <DirectoryRef Id="INSTALLDIR" FileSource="$(var.SrcDir)\etc">
+
+      <Component Id="conf.qt">
+        <File DiskId="1" KeyPath="yes" Name="qt.conf" />
+      </Component>
+
+    </DirectoryRef>
+    <DirectoryRef Id="INSTALLDIR" FileSource="$(var.QtDir)\bin">
+
+      <Component Id="dll.qt5.core">
+        <File DiskId="1" KeyPath="yes" Name="Qt5Core.dll" />
+      </Component>
+      <Component Id="dll.qt5.dbus">
+        <File DiskId="1" KeyPath="yes" Name="Qt5DBus.dll" />
+      </Component>
+      <Component Id="dll.qt5.gui">
+        <File DiskId="1" KeyPath="yes" Name="Qt5Gui.dll" />
+      </Component>
+      <Component Id="dll.qt5.network">
+        <File DiskId="1" KeyPath="yes" Name="Qt5Network.dll" />
+      </Component>
+      <Component Id="dll.qt5.widgets">
+        <File DiskId="1" KeyPath="yes" Name="Qt5Widgets.dll" />
+      </Component>
+
+    </DirectoryRef>
+    <DirectoryRef Id="INSTALLDIR" FileSource="$(var.QtDir)\plugins">
+
+      <Directory Id="QTPLATFORMDIR" Name="platforms">
+        <Component Id="dll.qt5.plugins.platforms.windows">
+          <File DiskId="1" KeyPath="yes" Name="qwindows.dll" />
+        </Component>
+      </Directory>
+
+    </DirectoryRef>
+    <DirectoryRef Id="INSTALLDIR" FileSource="$(var.ThirdPartyDir)\bin">
+
+      <Component Id="dll.dbus">
+        <File DiskId="1" KeyPath="yes" Name="dbus-1-3.dll" />
+      </Component>
+      <Component Id="dll.expat">
+        <File DiskId="1" KeyPath="yes" Name="expat.dll" />
+      </Component>
+
+    </DirectoryRef>
+  </Fragment>
+
+  <Fragment>
+    <ComponentGroup Id="QtClientComponents">
+      <ComponentRef Id="exe.transmission.qt" />
+      <ComponentRef Id="conf.qt" />
+      <ComponentRef Id="dll.qt5.core" />
+      <ComponentRef Id="dll.qt5.dbus" />
+      <ComponentRef Id="dll.qt5.gui" />
+      <ComponentRef Id="dll.qt5.network" />
+      <ComponentRef Id="dll.qt5.widgets" />
+      <ComponentRef Id="dll.qt5.plugins.platforms.windows" />
+      <ComponentRef Id="dll.dbus" />
+      <ComponentRef Id="dll.expat" />
+      <ComponentGroupRef Id="QtClientTranslationsComponents" />
+      <ComponentGroupRef Id="QtTranslationsComponents" />
+    </ComponentGroup>
+  </Fragment>
+
+</Wix>
