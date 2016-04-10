@@ -1,5 +1,5 @@
 /**
- * Copyright © Dave Perrett and Malcolm Jarvis
+ * Copyright © Dave Perrett, Malcolm Jarvis and Artem Vorotnikov
  *
  * This file is licensed under the GPLv2.
  * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
@@ -9,18 +9,6 @@ var transmission,
     dialog,
     isMobileDevice = RegExp("(iPhone|iPod|Android)").test(navigator.userAgent),
     scroll_timeout;
-
-if (!Array.indexOf) {
-    Array.prototype.indexOf = function (obj) {
-        var i, len;
-        for (i = 0, len = this.length; i < len; i++) {
-            if (this[i] == obj) {
-                return i;
-            };
-        };
-        return -1;
-    };
-};
 
 // http://forum.jquery.com/topic/combining-ui-dialog-and-tabs
 $.fn.tabbedDialog = function (dialog_opts) {
