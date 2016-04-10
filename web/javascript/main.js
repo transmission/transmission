@@ -5,25 +5,17 @@
  * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  */
 
-$(document).ready(function () {
-    // IE8 and below don’t support ES5 Date.now()
-    if (!Date.now) {
-        Date.now = function () {
-            return +new Date();
-        };
-    };
-
+function main() {
     // IE specific fixes here
-    if ($.browser.msie) {
+    if (jQuery.browser.msie) {
         try {
             document.execCommand("BackgroundImageCache", false, true);
         } catch (err) {};
-        $('.dialog_container').css('height', $(window).height() + 'px');
     };
 
-    if ($.browser.safari) {
+    if (jQuery.browser.safari) {
         // Move search field's margin down for the styled input
-        $('#torrent_search').css('margin-top', 3);
+        document.getElementById("torrent_search").style["margin-top"] = 3;
     };
 
     if (isMobileDevice) {
@@ -40,12 +32,14 @@ $(document).ready(function () {
         if (window.navigator.standalone) {
             // Fix min height for isMobileDevice when run in full screen mode from home screen
             // so the footer appears in the right place
-            $('body div#torrent_container').css('min-height', '338px');
+            document.getElementById("torrent_container").style["min-height"] = "338px";
         };
-        $("label[for=torrent_upload_url]").text("URL: ");
+        document.querySelector("label[for=torrent_upload_url]").textContent("URL: ");
     } else {
         // Fix for non-Safari-3 browsers: dark borders to replace shadows.
-        $('div.dialog_container div.dialog_window').css('border', '1px solid #777');
+        Array.from(document.getElementsByClassName("dialog_window")).forEach(function (e) {
+            e.style["border"] = "1px solid #777";
+        });
     };
 
     // Initialise the dialog controller
@@ -53,4 +47,6 @@ $(document).ready(function () {
 
     // Initialise the main Transmission controller
     transmission = new Transmission();
-});
+};
+
+document.addEventListener("DOMContentLoaded", main);
