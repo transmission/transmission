@@ -6,7 +6,9 @@ dist_data_DATA = \
   file-row.js \
   formatter.js \
   inspector.js \
+  main.js \
   notifications.js \
+  polyfill.js \
   prefs-dialog.js \
   remote.js \
   torrent.js \
