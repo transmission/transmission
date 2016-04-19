@@ -1,5 +1,5 @@
 /*
- * This file Copyright (C) 2012-2015 Mnemosyne LLC
+ * This file Copyright (C) 2012-2016 Mnemosyne LLC
  *
  * It may be used under the GNU GPL versions 2 or 3
  * or any future license endorsed by Mnemosyne LLC.
@@ -114,4 +114,20 @@ AddData::readableName () const
     }
 
   return ret;
+}
+
+QString
+AddData::readableShortName () const
+{
+  switch (type)
+    {
+      case FILENAME:
+        return QFileInfo (filename).fileName ();
+
+      case URL:
+        return url.path ().split (QLatin1Char ('/')).last ();
+
+      default:
+        return readableName ();
+    }
 }

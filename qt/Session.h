@@ -1,5 +1,5 @@
 /*
- * This file Copyright (C) 2009-2015 Mnemosyne LLC
+ * This file Copyright (C) 2009-2016 Mnemosyne LLC
  *
  * It may be used under the GNU GPL versions 2 or 3
  * or any future license endorsed by Mnemosyne LLC.
@@ -18,6 +18,7 @@
 #include <libtransmission/quark.h>
 
 #include "RpcClient.h"
+#include "Torrent.h"
 
 class AddData;
 class Prefs;
@@ -26,26 +27,6 @@ extern "C"
 {
   struct tr_variant;
 }
-
-class FileAdded: public QObject
-{
-    Q_OBJECT
-
-  public:
-    FileAdded (int64_t tag, const QString& name): myTag (tag), myName (name) {}
-    virtual ~FileAdded () {}
-
-    void setFileToDelete (const QString& file) { myDelFile = file; }
-
-  public slots:
-    void executed (int64_t tag, const QString& result, tr_variant * arguments);
-
-  private:
-    const int64_t myTag;
-    const QString myName;
-
-    QString myDelFile;
-};
 
 class Session: public QObject
 {
@@ -75,10 +56,8 @@ class Session: public QObject
     /** returns true if isServer () is true or if the remote address is the localhost */
     bool isLocal () const;
 
-    void exec (tr_quark method, tr_variant * args, int64_t tag = -1);
-    void exec (const char * method, tr_variant * args, int64_t tag = -1);
-
-    int64_t getUniqueTag () { return nextUniqueTag++; }
+    RpcResponseFuture exec (tr_quark method, tr_variant * args);
+    RpcResponseFuture exec (const char * method, tr_variant * args);
 
     void torrentSet (const QSet<int>& ids, const tr_quark key, bool val);
     void torrentSet (const QSet<int>& ids, const tr_quark key, int val);
@@ -115,7 +94,6 @@ class Session: public QObject
     void refreshExtraStats (const QSet<int>& ids);
 
   signals:
-    void executed (int64_t tag, const QString& result, tr_variant * arguments);
     void sourceChanged ();
     void portTested (bool isOpen);
     void statsUpdated ();
@@ -125,8 +103,7 @@ class Session: public QObject
     void torrentsRemoved (tr_variant * torrentList);
     void dataReadProgress ();
     void dataSendProgress ();
-    void error (QNetworkReply::NetworkError);
-    void errorMessage (const QString&);
+    void networkResponse (QNetworkReply::NetworkError code, const QString& message);
     void httpAuthenticationRequired ();
 
   private:
@@ -138,18 +115,14 @@ class Session: public QObject
     void sessionSet (const tr_quark key, const QVariant& variant);
     void pumpRequests ();
     void sendTorrentRequest (const char * request, const QSet<int>& torrentIds);
-    void refreshTorrents (const QSet<int>& torrentIds);
+    void refreshTorrents (const QSet<int>& torrentIds, const Torrent::KeyList& keys);
 
     static void updateStats (tr_variant * d, tr_session_stats * stats);
-
-  private slots:
-    void responseReceived (int64_t tag, const QString& result, tr_variant * args);
 
   private:
     QString const myConfigDir;
     Prefs& myPrefs;
 
-    int64_t nextUniqueTag;
     int64_t myBlocklistSize;
     tr_session * mySession;
     QStringList myIdleJSON;

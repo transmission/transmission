@@ -1,5 +1,5 @@
 /*
- * This file Copyright (C) 2009-2015 Mnemosyne LLC
+ * This file Copyright (C) 2009-2016 Mnemosyne LLC
  *
  * It may be used under the GNU GPL versions 2 or 3
  * or any future license endorsed by Mnemosyne LLC.
@@ -285,8 +285,7 @@ MainWindow::MainWindow (Session& session, Prefs& prefs, TorrentModel& model, boo
   connect (&mySession, SIGNAL (dataReadProgress ()), this, SLOT (dataReadProgress ()));
   connect (&mySession, SIGNAL (dataSendProgress ()), this, SLOT (dataSendProgress ()));
   connect (&mySession, SIGNAL (httpAuthenticationRequired ()), this, SLOT (wrongAuthentication ()));
-  connect (&mySession, SIGNAL (error (QNetworkReply::NetworkError)), this, SLOT (onError (QNetworkReply::NetworkError)));
-  connect (&mySession, SIGNAL (errorMessage (QString)), this, SLOT (errorMessage(QString)));
+  connect (&mySession, SIGNAL (networkResponse (QNetworkReply::NetworkError, QString)), this, SLOT (onNetworkResponse (QNetworkReply::NetworkError, QString)));
 
   if (mySession.isServer ())
     {
@@ -1376,13 +1375,14 @@ MainWindow::dataSendProgress ()
 }
 
 void
-MainWindow::onError (QNetworkReply::NetworkError code)
+MainWindow::onNetworkResponse (QNetworkReply::NetworkError code, const QString& message)
 {
   const bool hadError = myNetworkError;
   const bool haveError = (code != QNetworkReply::NoError)
                       && (code != QNetworkReply::UnknownContentError);
 
   myNetworkError = haveError;
+  myErrorMessage = message;
   refreshTrayIconSoon();
   updateNetworkIcon();
 
@@ -1390,12 +1390,6 @@ MainWindow::onError (QNetworkReply::NetworkError code)
   // That way we can rebuild after a restart of transmission-daemon
   if (hadError && !haveError)
     myModel.clear();
-}
-
-void
-MainWindow::errorMessage (const QString& msg)
-{
-    myErrorMessage = msg;
 }
 
 void

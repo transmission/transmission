@@ -1,5 +1,5 @@
 /*
- * This file Copyright (C) 2014-2015 Mnemosyne LLC
+ * This file Copyright (C) 2014-2016 Mnemosyne LLC
  *
  * It may be used under the GNU GPL versions 2 or 3
  * or any future license endorsed by Mnemosyne LLC.
@@ -11,6 +11,9 @@
 
 #include <memory>
 
+#include <QFuture>
+#include <QFutureInterface>
+#include <QHash>
 #include <QNetworkReply>
 #include <QObject>
 #include <QString>
@@ -32,6 +35,19 @@ extern "C"
   struct tr_session;
 }
 
+struct RpcResponse
+{
+  QString result;
+  TrVariantPtr args;
+  bool success = false;
+  QNetworkReply::NetworkError networkError = QNetworkReply::NoError;
+};
+
+Q_DECLARE_METATYPE (QFutureInterface<RpcResponse>);
+
+// The response future -- the RPC engine returns one for each request made.
+typedef QFuture<RpcResponse> RpcResponseFuture;
+
 class RpcClient: public QObject
 {
     Q_OBJECT
@@ -47,34 +63,37 @@ class RpcClient: public QObject
     bool isLocal () const;
     const QUrl& url () const;
 
-    void exec (tr_quark method, tr_variant * args, int64_t tag = -1);
-    void exec (const char* method, tr_variant * args, int64_t tag = -1);
+    RpcResponseFuture exec (tr_quark method, tr_variant * args);
+    RpcResponseFuture exec (const char * method, tr_variant * args);
 
   signals:
     void httpAuthenticationRequired ();
     void dataReadProgress ();
     void dataSendProgress ();
-    void error (QNetworkReply::NetworkError code);
-    void errorMessage (const QString& message);
-    void executed (int64_t tag, const QString& result, tr_variant * args);
-
-    // private
-    void responseReceived (TrVariantPtr json);
+    void networkResponse (QNetworkReply::NetworkError code, const QString& message);
 
   private:
-    void sendRequest (TrVariantPtr json);
+    RpcResponseFuture sendRequest (TrVariantPtr json);
     QNetworkAccessManager * networkAccessManager ();
+    int64_t getNextTag ();
+
+    void sendNetworkRequest (TrVariantPtr json, const QFutureInterface<RpcResponse> &promise);
+    void sendLocalRequest (TrVariantPtr json, const QFutureInterface<RpcResponse> &promise, int64_t tag);
+    int64_t parseResponseTag (tr_variant& response);
+    RpcResponse parseResponseData (tr_variant& response);
 
     static void localSessionCallback (tr_session * s, tr_variant * response, void * vself);
 
   private slots:
-    void onFinished (QNetworkReply * reply);
-    void parseResponse (TrVariantPtr json);
+    void networkRequestFinished (QNetworkReply *reply);
+    void localRequestFinished (TrVariantPtr response);
 
   private:
     tr_session * mySession;
     QString mySessionId;
     QUrl myUrl;
     QNetworkAccessManager * myNAM;
+    QHash<int64_t, QFutureInterface<RpcResponse>> myLocalRequests;
+    int64_t myNextTag;
 };
 

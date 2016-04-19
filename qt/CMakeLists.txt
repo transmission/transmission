@@ -54,6 +54,7 @@ set(${PROJECT_NAME}_SOURCES
     PrefsDialog.cc
     RelocateDialog.cc
     RpcClient.cc
+    RpcQueue.cc
     Session.cc
     SessionDialog.cc
     SqueezeLabel.cc
@@ -112,6 +113,7 @@ set(${PROJECT_NAME}_HEADERS
     PrefsDialog.h
     RelocateDialog.h
     RpcClient.h
+    RpcQueue.h
     Session.h
     SessionDialog.h
     Speed.h

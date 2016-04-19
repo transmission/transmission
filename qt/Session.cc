@@ -1,5 +1,5 @@
 /*
- * This file Copyright (C) 2009-2015 Mnemosyne LLC
+ * This file Copyright (C) 2009-2016 Mnemosyne LLC
  *
  * It may be used under the GNU GPL versions 2 or 3
  * or any future license endorsed by Mnemosyne LLC.
@@ -28,28 +28,11 @@
 
 #include "AddData.h"
 #include "Prefs.h"
+#include "RpcQueue.h"
 #include "Session.h"
 #include "SessionDialog.h"
 #include "Torrent.h"
 #include "Utils.h"
-
-namespace
-{
-  enum
-  {
-    TAG_SOME_TORRENTS,
-    TAG_ALL_TORRENTS,
-    TAG_SESSION_STATS,
-    TAG_SESSION_INFO,
-    TAG_BLOCKLIST_UPDATE,
-    TAG_ADD_TORRENT,
-    TAG_PORT_TEST,
-    TAG_MAGNET_LINK,
-    TAG_RENAME_PATH,
-
-    FIRST_UNIQUE_TAG
-  };
-}
 
 /***
 ****
@@ -69,58 +52,13 @@ namespace
     for (const tr_quark key: keys)
       tr_variantListAddQuark (list, key);
   }
+
+  // If this object is passed as "ids" (compared by address), then recently active torrents are queried.
+  const QSet<int> recentlyActiveIds = QSet<int>() << -1;
+
+  // If this object is passed as "ids" (compared by being empty), then all torrents are queried.
+  const QSet<int> allIds;
 }
-
-/***
-****
-***/
-
-void
-FileAdded::executed (int64_t tag, const QString& result, tr_variant * arguments)
-{
-  if (tag != myTag)
-    return;
-
-  if (result == QLatin1String ("success"))
-    {
-      tr_variant * dup;
-      const char * str;
-      if (tr_variantDictFindDict (arguments, TR_KEY_torrent_duplicate, &dup) &&
-          tr_variantDictFindStr (dup, TR_KEY_name, &str, NULL))
-        {
-          const QString myFilename = QFileInfo (myName).fileName ();
-          const QString name = QString::fromUtf8 (str);
-          QMessageBox::warning (qApp->activeWindow (),
-                                tr ("Add Torrent"),
-                                tr ("<p><b>Unable to add \"%1\".</b></p><p>It is a duplicate of \"%2\" which is already added.</p>").arg (myFilename).arg (name));
-        }
-
-      if (!myDelFile.isEmpty ())
-        {
-          QFile file (myDelFile);
-          file.setPermissions (QFile::ReadOwner | QFile::WriteOwner);
-          file.remove ();
-        }
-    }
-  else
-    {
-      QString text = result;
-
-      for (int i=0, n=text.size (); i<n; ++i)
-        if (!i || text[i-1].isSpace ())
-          text[i] = text[i].toUpper ();
-
-      QMessageBox::warning (qApp->activeWindow (),
-                            tr ("Error Adding Torrent"),
-                            QString::fromLatin1 ("<p><b>%1</b></p><p>%2</p>").arg (text).arg (myName));
-    }
-
-  deleteLater ();
-}
-
-/***
-****
-***/
 
 void
 Session::sessionSet (const tr_quark key, const QVariant& value)
@@ -133,7 +71,7 @@ Session::sessionSet (const tr_quark key, const QVariant& value)
       case QVariant::Int:    tr_variantDictAddInt (&args, key, value.toInt ()); break;
       case QVariant::Double: tr_variantDictAddReal (&args, key, value.toDouble ()); break;
       case QVariant::String: tr_variantDictAddStr (&args, key, value.toString ().toUtf8 ().constData ()); break;
-      default:               assert ("unknown type");
+      default:               assert (false);
     }
 
   exec ("session-set", &args);
@@ -142,7 +80,25 @@ Session::sessionSet (const tr_quark key, const QVariant& value)
 void
 Session::portTest ()
 {
-  exec ("port-test", nullptr, TAG_PORT_TEST);
+  RpcQueue * q = new RpcQueue ();
+
+  q->add (
+    [this] ()
+    {
+      return exec ("port-test", nullptr);
+    });
+
+  q->add (
+    [this] (const RpcResponse& r)
+    {
+      bool isOpen = false;
+      if (r.success)
+        tr_variantDictFindBool (r.args.get (), TR_KEY_port_is_open, &isOpen);
+
+      emit portTested (isOpen);
+    });
+
+  q->run ();
 }
 
 void
@@ -153,7 +109,28 @@ Session::copyMagnetLinkToClipboard (int torrentId)
   tr_variantListAddInt (tr_variantDictAddList (&args, TR_KEY_ids, 1), torrentId);
   tr_variantListAddStr (tr_variantDictAddList (&args, TR_KEY_fields, 1), "magnetLink");
 
-  exec (TR_KEY_torrent_get, &args, TAG_MAGNET_LINK);
+  RpcQueue * q = new RpcQueue ();
+
+  q->add (
+    [this, &args] ()
+    {
+      return exec (TR_KEY_torrent_get, &args);
+    });
+
+  q->add (
+    [this] (const RpcResponse& r)
+    {
+      tr_variant * torrents;
+      tr_variant * child;
+      const char * str;
+
+      if (tr_variantDictFindList (r.args.get (), TR_KEY_torrents, &torrents)
+          && (child = tr_variantListChild (torrents, 0))
+          && tr_variantDictFindStr (child, TR_KEY_magnetLink, &str, NULL))
+        qApp->clipboard ()->setText (QString::fromUtf8 (str));
+    });
+
+  q->run ();
 }
 
 void
@@ -277,7 +254,6 @@ Session::updatePref (int key)
 Session::Session (const QString& configDir, Prefs& prefs):
   myConfigDir (configDir),
   myPrefs (prefs),
-  nextUniqueTag (FIRST_UNIQUE_TAG),
   myBlocklistSize (-1),
   mySession (0)
 {
@@ -290,14 +266,10 @@ Session::Session (const QString& configDir, Prefs& prefs):
   myCumulativeStats = myStats;
 
   connect (&myPrefs, SIGNAL (changed (int)), this, SLOT (updatePref (int)));
-
-  connect (&myRpc, SIGNAL (executed (int64_t, QString, tr_variant *)), this, SLOT (responseReceived (int64_t, QString, tr_variant *)));
-
   connect (&myRpc, SIGNAL (httpAuthenticationRequired ()), this, SIGNAL (httpAuthenticationRequired ()));
   connect (&myRpc, SIGNAL (dataReadProgress ()), this, SIGNAL (dataReadProgress ()));
   connect (&myRpc, SIGNAL (dataSendProgress ()), this, SIGNAL (dataSendProgress ()));
-  connect (&myRpc, SIGNAL (error (QNetworkReply::NetworkError)), this, SIGNAL (error (QNetworkReply::NetworkError)));
-  connect (&myRpc, SIGNAL (errorMessage (QString)), this, SIGNAL (errorMessage (QString)));
+  connect (&myRpc, SIGNAL (networkResponse (QNetworkReply::NetworkError, QString)), this, SIGNAL (networkResponse (QNetworkReply::NetworkError, QString)));
 }
 
 Session::~Session ()
@@ -387,7 +359,11 @@ namespace
   void
   addOptionalIds (tr_variant * args, const QSet<int>& ids)
   {
-    if (!ids.isEmpty ())
+    if (&ids == &recentlyActiveIds)
+      {
+        tr_variantDictAddStr (args, TR_KEY_ids, "recently-active");
+      }
+    else if (!ids.isEmpty ())
       {
         tr_variant * idList (tr_variantDictAddList (args, TR_KEY_ids, ids.size ()));
         for (const int i: ids)
@@ -439,7 +415,7 @@ Session::torrentSet (const QSet<int>& ids, const tr_quark key, const QStringList
   for (const QString& str: value)
     tr_variantListAddStr (list, str.toUtf8 ().constData ());
 
-  exec(TR_KEY_torrent_set, &args);
+  exec (TR_KEY_torrent_set, &args);
 }
 
 void
@@ -489,36 +465,81 @@ Session::torrentRenamePath (const QSet<int>& ids, const QString& oldpath, const 
   tr_variantDictAddStr (&args, TR_KEY_path, oldpath.toUtf8 ().constData ());
   tr_variantDictAddStr (&args, TR_KEY_name, newname.toUtf8 ().constData ());
 
-  exec ("torrent-rename-path", &args, TAG_RENAME_PATH);
+  RpcQueue * q = new RpcQueue ();
+
+  q->add (
+    [this, &args] ()
+    {
+      return exec ("torrent-rename-path", &args);
+    },
+    [this] (const RpcResponse& r)
+    {
+      const char * path = "(unknown)";
+      const char * name = "(unknown)";
+      tr_variantDictFindStr (r.args.get (), TR_KEY_path, &path, nullptr);
+      tr_variantDictFindStr (r.args.get (), TR_KEY_name, &name, nullptr);
+
+      QMessageBox * d = new QMessageBox (QMessageBox::Information,
+                                         tr ("Error Renaming Path"),
+                                         tr ("<p><b>Unable to rename \"%1\" as \"%2\": %3.</b></p> "
+                                             "<p>Please correct the errors and try again.</p>")
+                                           .arg (QString::fromUtf8 (path))
+                                           .arg (QString::fromUtf8 (name))
+                                           .arg (r.result),
+                                         QMessageBox::Close,
+                                         qApp->activeWindow ());
+      connect (d, SIGNAL (rejected ()), d, SLOT (deleteLater ()));
+      d->show ();
+    });
+
+  q->add (
+    [this] (const RpcResponse& r)
+    {
+      int64_t id = 0;
+
+      if (tr_variantDictFindInt (r.args.get (), TR_KEY_id, &id)
+          && id != 0)
+        refreshTorrents (QSet<int> () << id,
+                         KeyList () << TR_KEY_fileStats << TR_KEY_files << TR_KEY_id << TR_KEY_name);
+    });
+
+  q->run ();
 }
 
 void
-Session::refreshTorrents (const QSet<int>& ids)
+Session::refreshTorrents (const QSet<int>& ids, const KeyList& keys)
 {
-  if (ids.empty ())
-    {
-      refreshAllTorrents ();
-    }
-  else
-    {
-      tr_variant args;
-      tr_variantInitDict (&args, 2);
-      addList (tr_variantDictAddList (&args, TR_KEY_fields, 0), getStatKeys ());
-      addOptionalIds (&args, ids);
+  tr_variant args;
+  tr_variantInitDict (&args, 2);
+  addList (tr_variantDictAddList (&args, TR_KEY_fields, 0), keys);
+  addOptionalIds (&args, ids);
 
-      exec (TR_KEY_torrent_get, &args, TAG_SOME_TORRENTS);
-    }
+  RpcQueue * q = new RpcQueue ();
+
+  q->add (
+    [this, &args] ()
+    {
+      return exec (TR_KEY_torrent_get, &args);
+    });
+
+  const bool allTorrents = ids.empty ();
+  q->add (
+    [this, allTorrents] (const RpcResponse& r)
+    {
+      tr_variant * torrents;
+      if (tr_variantDictFindList (r.args.get (), TR_KEY_torrents, &torrents))
+        emit torrentsUpdated (torrents, allTorrents);
+      if (tr_variantDictFindList (r.args.get (), TR_KEY_removed, &torrents))
+        emit torrentsRemoved (torrents);
+    });
+
+  q->run ();
 }
 
 void
 Session::refreshExtraStats (const QSet<int>& ids)
 {
-  tr_variant args;
-  tr_variantInitDict (&args, 3);
-  addOptionalIds (&args, ids);
-  addList (tr_variantDictAddList (&args, TR_KEY_fields, 0), getStatKeys () + getExtraStatKeys ());
-
-  exec (TR_KEY_torrent_get, &args, TAG_SOME_TORRENTS);
+  refreshTorrents (ids, getStatKeys () + getExtraStatKeys ());
 }
 
 void
@@ -528,9 +549,21 @@ Session::sendTorrentRequest (const char * request, const QSet<int>& ids)
   tr_variantInitDict (&args, 1);
   addOptionalIds (&args, ids);
 
-  exec (request, &args);
+  RpcQueue * q = new RpcQueue ();
 
-  refreshTorrents (ids);
+  q->add (
+    [this, request, &args] ()
+    {
+      return exec (request, &args);
+    });
+
+  q->add (
+    [this, ids] ()
+    {
+      refreshTorrents (ids, getStatKeys ());
+    });
+
+  q->run ();
 }
 
 void Session::pauseTorrents    (const QSet<int>& ids) { sendTorrentRequest ("torrent-stop",      ids); }
@@ -544,181 +577,97 @@ void Session::queueMoveBottom  (const QSet<int>& ids) { sendTorrentRequest ("que
 void
 Session::refreshActiveTorrents ()
 {
-  tr_variant args;
-  tr_variantInitDict (&args, 2);
-  tr_variantDictAddStr (&args, TR_KEY_ids, "recently-active");
-  addList (tr_variantDictAddList (&args, TR_KEY_fields, 0), getStatKeys ());
-
-  exec (TR_KEY_torrent_get, &args, TAG_SOME_TORRENTS);
+  refreshTorrents (recentlyActiveIds, getStatKeys ());
 }
 
 void
 Session::refreshAllTorrents ()
 {
-  tr_variant args;
-  tr_variantInitDict (&args, 1);
-  addList (tr_variantDictAddList (&args, TR_KEY_fields, 0), getStatKeys ());
-
-  exec (TR_KEY_torrent_get, &args, TAG_ALL_TORRENTS);
+  refreshTorrents (allIds, getStatKeys ());
 }
 
 void
 Session::initTorrents (const QSet<int>& ids)
 {
-  tr_variant args;
-  tr_variantInitDict (&args, 2);
-  addOptionalIds (&args, ids);
-  addList (tr_variantDictAddList (&args, TR_KEY_fields, 0), getStatKeys ()+getInfoKeys ());
-
-  exec ("torrent-get", &args, ids.isEmpty () ? TAG_ALL_TORRENTS : TAG_SOME_TORRENTS);
+  refreshTorrents (ids, getStatKeys () + getInfoKeys ());
 }
 
 void
 Session::refreshSessionStats ()
 {
-  exec ("session-stats", nullptr, TAG_SESSION_STATS);
+  RpcQueue * q = new RpcQueue ();
+
+  q->add (
+    [this] ()
+    {
+      return exec ("session-stats", nullptr);
+    });
+
+  q->add (
+    [this] (const RpcResponse& r)
+    {
+      updateStats (r.args.get ());
+    });
+
+  q->run ();
 }
 
 void
 Session::refreshSessionInfo ()
 {
-  exec ("session-get", nullptr, TAG_SESSION_INFO);
+  RpcQueue * q = new RpcQueue ();
+
+  q->add (
+    [this] ()
+    {
+      return exec ("session-get", nullptr);
+    });
+
+  q->add (
+    [this] (const RpcResponse& r)
+    {
+      updateInfo (r.args.get ());
+    });
+
+  q->run ();
 }
 
 void
 Session::updateBlocklist ()
 {
-  exec ("blocklist-update", nullptr, TAG_BLOCKLIST_UPDATE);
+  RpcQueue * q = new RpcQueue ();
+
+  q->add (
+    [this] ()
+    {
+      return exec ("blocklist-update", nullptr);
+    });
+
+  q->add (
+    [this] (const RpcResponse& r)
+    {
+      int64_t blocklistSize;
+      if (tr_variantDictFindInt (r.args.get (), TR_KEY_blocklist_size, &blocklistSize))
+        setBlocklistSize (blocklistSize);
+    });
+
+  q->run ();
 }
 
 /***
 ****
 ***/
 
-void
-Session::exec (tr_quark method, tr_variant * args, int64_t tag)
+RpcResponseFuture
+Session::exec (tr_quark method, tr_variant * args)
 {
-  myRpc.exec (method, args, tag);
+  return myRpc.exec (method, args);
 }
 
-void
-Session::exec (const char* method, tr_variant * args, int64_t tag)
+RpcResponseFuture
+Session::exec (const char * method, tr_variant * args)
 {
-  myRpc.exec (method, args, tag);
-}
-
-void
-Session::responseReceived (int64_t tag, const QString& result, tr_variant * args)
-{
-  emit executed (tag, result, args);
-
-  if (tag < 0)
-    return;
-
-  switch (tag)
-    {
-      case TAG_SOME_TORRENTS:
-      case TAG_ALL_TORRENTS:
-        if (args != nullptr)
-          {
-            tr_variant * torrents;
-            if (tr_variantDictFindList (args, TR_KEY_torrents, &torrents))
-                emit torrentsUpdated (torrents, tag==TAG_ALL_TORRENTS);
-            if (tr_variantDictFindList (args, TR_KEY_removed, &torrents))
-                emit torrentsRemoved (torrents);
-          }
-        break;
-
-      case TAG_SESSION_STATS:
-        if (args != nullptr)
-          updateStats (args);
-        break;
-
-      case TAG_SESSION_INFO:
-        if (args != nullptr)
-          updateInfo (args);
-        break;
-
-      case TAG_BLOCKLIST_UPDATE:
-        {
-          int64_t intVal = 0;
-          if (args != nullptr)
-            {
-              if (tr_variantDictFindInt (args, TR_KEY_blocklist_size, &intVal))
-                setBlocklistSize (intVal);
-            }
-          break;
-        }
-
-      case TAG_RENAME_PATH:
-        {
-          int64_t id = 0;
-          if (result != QLatin1String ("success"))
-            {
-              const char * path = "";
-              const char * name = "";
-              tr_variantDictFindStr (args, TR_KEY_path, &path, 0);
-              tr_variantDictFindStr (args, TR_KEY_name, &name, 0);
-              const QString title = tr ("Error Renaming Path");
-              const QString text = tr ("<p><b>Unable to rename \"%1\" as \"%2\": %3.</b></p> <p>Please correct the errors and try again.</p>").arg (QString::fromUtf8 (path)).arg (QString::fromUtf8 (name)).arg (result);
-              QMessageBox * d = new QMessageBox (QMessageBox::Information, title, text,
-                                                 QMessageBox::Close,
-                                                 qApp->activeWindow ());
-              connect (d, SIGNAL (rejected ()), d, SLOT (deleteLater ()));
-              d->show ();
-            }
-          else if (tr_variantDictFindInt (args, TR_KEY_id, &id) && id)
-            {
-              tr_variant args;
-              tr_variantInitDict (&args, 2);
-              tr_variantDictAddInt (&args, TR_KEY_ids, id);
-              addList (tr_variantDictAddList (&args, TR_KEY_fields, 0),
-                       KeyList () << TR_KEY_fileStats << TR_KEY_files << TR_KEY_id << TR_KEY_name);
-              exec ("torrent-get", &args, TAG_SOME_TORRENTS);
-            }
-
-          break;
-      }
-
-      case TAG_PORT_TEST:
-        {
-          bool isOpen;
-          if (args == nullptr ||
-              !tr_variantDictFindBool (args, TR_KEY_port_is_open, &isOpen))
-            isOpen = false;
-          emit portTested (isOpen);
-          break;
-        }
-
-      case TAG_MAGNET_LINK:
-        {
-          tr_variant * torrents;
-          tr_variant * child;
-          const char * str;
-          if (args != nullptr
-              && tr_variantDictFindList (args, TR_KEY_torrents, &torrents)
-              && ( (child = tr_variantListChild (torrents, 0)))
-              && tr_variantDictFindStr (child, TR_KEY_magnetLink, &str, NULL))
-            qApp->clipboard ()->setText (QString::fromUtf8 (str));
-          break;
-        }
-
-      case TAG_ADD_TORRENT:
-        {
-          const char * str = "";
-          if (result != QLatin1String ("success"))
-            {
-              QMessageBox * d = new QMessageBox (QMessageBox::Information,
-                                                 tr ("Add Torrent"),
-                                                 QString::fromUtf8 (str),
-                                                 QMessageBox::Close,
-                                                 qApp->activeWindow ());
-              connect (d, SIGNAL (rejected ()), d, SLOT (deleteLater ()));
-              d->show ();
-            }
-          break;
-        }
-    }
+  return myRpc.exec (method, args);
 }
 
 void
@@ -892,16 +841,59 @@ Session::addTorrent (const AddData& addMe, tr_variant * args, bool trashOriginal
         break;
     }
 
-  const int64_t tag = getUniqueTag ();
+  RpcQueue * q = new RpcQueue ();
 
-  // maybe delete the source .torrent
-  FileAdded * fileAdded = new FileAdded (tag, addMe.readableName ());
+  q->add (
+    [this, args] ()
+    {
+      return exec ("torrent-add", args);
+    },
+    [this, addMe] (const RpcResponse& r)
+    {
+      QMessageBox * d = new QMessageBox (QMessageBox::Warning,
+                                         tr ("Error Adding Torrent"),
+                                         QString::fromLatin1 ("<p><b>%1</b></p><p>%2</p>")
+                                           .arg (r.result)
+                                           .arg (addMe.readableName ()),
+                                         QMessageBox::Close,
+                                         qApp->activeWindow ());
+      connect (d, SIGNAL (rejected ()), d, SLOT (deleteLater ()));
+      d->show ();
+    });
+
+  q->add (
+    [this, addMe] (const RpcResponse& r)
+    {
+      tr_variant * dup;
+      const char * str;
+
+      if (tr_variantDictFindDict (r.args.get (), TR_KEY_torrent_duplicate, &dup) &&
+          tr_variantDictFindStr (dup, TR_KEY_name, &str, NULL))
+        {
+          const QString name = QString::fromUtf8 (str);
+          QMessageBox * d = new QMessageBox (QMessageBox::Warning,
+                                             tr ("Add Torrent"),
+                                             tr ("<p><b>Unable to add \"%1\".</b></p>"
+                                                 "<p>It is a duplicate of \"%2\" which is already added.</p>")
+                                               .arg (addMe.readableShortName ())
+                                               .arg (name),
+                                             QMessageBox::Close,
+                                             qApp->activeWindow ());
+          connect (d, SIGNAL (rejected ()), d, SLOT (deleteLater ()));
+          d->show ();
+        }
+    });
+
   if (trashOriginal && addMe.type == AddData::FILENAME)
-    fileAdded->setFileToDelete (addMe.filename);
-  connect (this, SIGNAL (executed (int64_t, QString, tr_variant *)),
-           fileAdded, SLOT (executed (int64_t, QString, tr_variant *)));
+    q->add (
+      [this, addMe] ()
+      {
+        QFile original (addMe.filename);
+        original.setPermissions (QFile::ReadOwner | QFile::WriteOwner);
+        original.remove ();
+      });
 
-  exec ("torrent-add", args, tag);
+  q->run ();
 }
 
 void
