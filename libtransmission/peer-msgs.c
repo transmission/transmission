@@ -181,7 +181,7 @@ struct tr_peerMsgs
   /* whether or not the peer has indicated it will download from us. */
   bool peer_is_interested;
 
-  /* whether or the peer is choking us. */
+  /* whether or not the peer is choking us. */
   bool client_is_choked;
 
   /* whether or not we've indicated to the peer that we would download from them if unchoked. */
