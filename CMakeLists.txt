@@ -398,9 +398,9 @@ endif()
 if(WITH_SYSTEMD)
     tr_get_required_flag(WITH_SYSTEMD SYSTEMD_IS_REQUIRED)
 
-    pkg_check_modules(SYSTEMD_DAEMON ${SYSTEMD_IS_REQUIRED} libsystemd-daemon)
+    pkg_check_modules(SYSTEMD ${SYSTEMD_IS_REQUIRED} libsystemd)
 
-    tr_fixup_auto_option(WITH_SYSTEMD SYSTEMD_DAEMON_FOUND SYSTEMD_IS_REQUIRED)
+    tr_fixup_auto_option(WITH_SYSTEMD SYSTEMD_FOUND SYSTEMD_IS_REQUIRED)
 endif()
 
 include_directories(${CMAKE_BINARY_DIR})
