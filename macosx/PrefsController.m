@@ -845,7 +845,8 @@
             [fDefaults setBool: YES forKey: @"DownloadLocationConstant"];
             [self updateShowAddMagnetWindowField];
             
-            tr_sessionSetDownloadDir(fHandle, [folder UTF8String]);
+            assert(folder.length > 0);
+            tr_sessionSetDownloadDir(fHandle, [folder fileSystemRepresentation]);
         }
         else
         {
@@ -871,7 +872,8 @@
             NSString * folder = [[[panel URLs] objectAtIndex: 0] path];
             [fDefaults setObject: folder forKey: @"IncompleteDownloadFolder"];
             
-            tr_sessionSetIncompleteDir(fHandle, [folder UTF8String]);
+            assert(folder.length > 0);
+            tr_sessionSetIncompleteDir(fHandle, [folder fileSystemRepresentation]);
         }
         [fIncompleteFolderPopUp selectItemAtIndex: 0];
     }];
@@ -892,8 +894,10 @@
         {
             NSString * filePath = [[[panel URLs] objectAtIndex: 0] path];
             
+            assert(filePath.length > 0);
+            
             [fDefaults setObject: filePath forKey: @"DoneScriptPath"];
-            tr_sessionSetTorrentDoneScript(fHandle, [filePath UTF8String]);
+            tr_sessionSetTorrentDoneScript(fHandle, [filePath fileSystemRepresentation]);
             
             [fDefaults setBool: YES forKey: @"DoneScriptEnabled"];
             tr_sessionSetTorrentDoneScriptEnabled(fHandle, YES);
