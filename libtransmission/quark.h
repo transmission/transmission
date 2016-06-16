@@ -282,6 +282,7 @@ enum
   TR_KEY_remote_session_password,
   TR_KEY_remote_session_port,
   TR_KEY_remote_session_requres_authentication,
+  TR_KEY_remote_session_use_ssl,
   TR_KEY_remote_session_username,
   TR_KEY_removed,
   TR_KEY_rename_partial_files,
