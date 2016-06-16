@@ -21,6 +21,7 @@ SessionDialog::accept ()
   myPrefs.set (Prefs::SESSION_IS_REMOTE, ui.remoteSessionRadio->isChecked ());
   myPrefs.set (Prefs::SESSION_REMOTE_HOST, ui.hostEdit->text ());
   myPrefs.set (Prefs::SESSION_REMOTE_PORT, ui.portSpin->value ());
+  myPrefs.set (Prefs::SESSION_REMOTE_SSL, ui.sslCheck->isChecked ());
   myPrefs.set (Prefs::SESSION_REMOTE_AUTH, ui.authCheck->isChecked ());
   myPrefs.set (Prefs::SESSION_REMOTE_USERNAME, ui.usernameEdit->text ());
   myPrefs.set (Prefs::SESSION_REMOTE_PASSWORD, ui.passwordEdit->text ());
@@ -63,6 +64,10 @@ SessionDialog::SessionDialog (Session& session, Prefs& prefs, QWidget * parent):
 
   ui.portSpin->setValue (prefs.get<int> (Prefs::SESSION_REMOTE_PORT));
   myRemoteWidgets << ui.portLabel << ui.portSpin;
+
+  ui.sslCheck->setChecked (prefs.get<bool> (Prefs::SESSION_REMOTE_SSL));
+  connect (ui.sslCheck, SIGNAL (toggled (bool)), this, SLOT (resensitize ()));
+  myRemoteWidgets << ui.sslCheck;
 
   ui.authCheck->setChecked (prefs.get<bool> (Prefs::SESSION_REMOTE_AUTH));
   connect (ui.authCheck, SIGNAL (toggled (bool)), this, SLOT (resensitize ()));
