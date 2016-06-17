@@ -317,7 +317,7 @@ Session::start ()
           url.setPassword (myPrefs.get<QString> (Prefs::SESSION_REMOTE_PASSWORD));
         }
 
-      myRpc.start (url);
+      myRpc.start (url, myPrefs.get<bool> (Prefs::SESSION_REMOTE_ANY_CERT));
     }
   else
     {

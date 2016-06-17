@@ -50,7 +50,8 @@ RpcClient::RpcClient (QObject * parent):
   QObject (parent),
   mySession (nullptr),
   myNAM (nullptr),
-  myNextTag (0)
+  myNextTag (0),
+  sslNoVerify (false)
 {
   qRegisterMetaType<TrVariantPtr> ("TrVariantPtr");
 }
@@ -76,9 +77,10 @@ RpcClient::start (tr_session * session)
 }
 
 void
-RpcClient::start (const QUrl& url)
+RpcClient::start (const QUrl& url, bool anyCert)
 {
   myUrl = url;
+  sslNoVerify = anyCert;
 }
 
 bool
@@ -139,6 +141,12 @@ RpcClient::sendNetworkRequest (TrVariantPtr json, const QFutureInterface<RpcResp
 
   if (!mySessionId.isEmpty ())
     request.setRawHeader (TR_RPC_SESSION_ID_HEADER, mySessionId.toUtf8 ());
+
+  if (sslNoVerify) {
+    QSslConfiguration mySslConfig = QSslConfiguration::defaultConfiguration();
+    mySslConfig.setPeerVerifyMode (QSslSocket::PeerVerifyMode::VerifyNone);
+    request.setSslConfiguration (mySslConfig);
+  }
 
   size_t rawJsonDataLength;
   char * rawJsonData = tr_variantToStr (json.get (), TR_VARIANT_FMT_JSON_LEAN, &rawJsonDataLength);
