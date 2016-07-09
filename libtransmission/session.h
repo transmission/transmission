@@ -11,8 +11,7 @@
  #error only libtransmission should #include this header.
 #endif
 
-#ifndef TR_INTERNAL_H
-#define TR_INTERNAL_H 1
+#pragma once
 
 #define TR_NAME "Transmission"
 
@@ -303,7 +302,7 @@ toSpeedKBps (unsigned int Bps)  { return Bps / (double)tr_speed_K; }
 static inline uint64_t
 toMemBytes (unsigned int MB) { uint64_t B = tr_mem_K * tr_mem_K; B *= MB; return B; }
 static inline int
-toMemMB  (uint64_t B)      { return B / (tr_mem_K * tr_mem_K); }
+toMemMB  (uint64_t B)      { return (int)(B / (tr_mem_K * tr_mem_K)); }
 
 /**
 **/
@@ -327,5 +326,3 @@ void tr_sessionGetNextQueuedTorrents (tr_session   * session,
 
 int tr_sessionCountQueueFreeSlots (tr_session * session, tr_direction);
 
-
-#endif

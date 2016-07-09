@@ -42,6 +42,9 @@ getFiles (const char      * dir,
           const char      * base,
           struct FileList * list)
 {
+  if (dir == NULL || base == NULL)
+    return NULL;
+
   tr_sys_dir_t odir;
   char * buf;
   tr_sys_path_info info;
@@ -373,8 +376,11 @@ makeInfoDict (tr_variant          * dict,
     }
 
   base = tr_sys_path_basename (builder->top, NULL);
-  tr_variantDictAddStr (dict, TR_KEY_name, base);
-  tr_free (base);
+  if (base != NULL)
+    {
+      tr_variantDictAddStr (dict, TR_KEY_name, base);
+      tr_free (base);
+    }
 
   tr_variantDictAddInt (dict, TR_KEY_piece_length, builder->pieceSize);
 

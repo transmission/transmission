@@ -7,8 +7,7 @@
  * $Id$
  */
 
-#ifndef QTR_FILE_TREE_ITEM_H
-#define QTR_FILE_TREE_ITEM_H
+#pragma once
 
 #include <cstdint>
 
@@ -86,4 +85,3 @@ class FileTreeItem
     size_t myFirstUnhashedRow;
 };
 
-#endif // QTR_FILE_TREE_ITEM_H

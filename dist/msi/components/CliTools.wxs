@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+
+  <?include TransmissionConfig.wxi ?>
+
+  <Fragment>
+    <DirectoryRef Id="INSTALLDIR" FileSource="$(var.SrcDir)\bin">
+      <Component Id="exe.transmission.remote">
+        <File DiskId="1" KeyPath="yes" Name="transmission-remote.exe" />
+      </Component>
+      <Component Id="exe.transmission.create">
+        <File DiskId="1" KeyPath="yes" Name="transmission-create.exe" />
+      </Component>
+      <Component Id="exe.transmission.edit">
+        <File DiskId="1" KeyPath="yes" Name="transmission-edit.exe" />
+      </Component>
+      <Component Id="exe.transmission.show">
+        <File DiskId="1" KeyPath="yes" Name="transmission-show.exe" />
+      </Component>
+    </DirectoryRef>
+  </Fragment>
+
+  <Fragment>
+    <ComponentGroup Id="CliToolsComponents">
+      <ComponentRef Id="exe.transmission.remote" />
+      <ComponentRef Id="exe.transmission.create" />
+      <ComponentRef Id="exe.transmission.edit" />
+      <ComponentRef Id="exe.transmission.show" />
+    </ComponentGroup>
+  </Fragment>
+
+</Wix>

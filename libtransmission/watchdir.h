@@ -7,8 +7,7 @@
  * $Id$
  */
 
-#ifndef TR_WATCHDIR_H
-#define TR_WATCHDIR_H
+#pragma once
 
 #ifdef __cplusplus
 extern "C" {
@@ -35,7 +34,8 @@ typedef tr_watchdir_status (* tr_watchdir_cb) (tr_watchdir_t   handle,
 tr_watchdir_t   tr_watchdir_new      (const char        * path,
                                       tr_watchdir_cb      callback,
                                       void              * callback_user_data,
-                                      struct event_base * event_base);
+                                      struct event_base * event_base,
+                                      bool                force_generic);
 
 void            tr_watchdir_free     (tr_watchdir_t       handle);
 
@@ -45,4 +45,3 @@ const char    * tr_watchdir_get_path (tr_watchdir_t       handle);
 }
 #endif
 
-#endif /* TR_WATCHDIR_H */

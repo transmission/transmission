@@ -7,8 +7,7 @@
  * $Id$
  */
 
-#ifndef QTR_LICENSE_DIALOG_H
-#define QTR_LICENSE_DIALOG_H
+#pragma once
 
 #include "BaseDialog.h"
 
@@ -26,4 +25,3 @@ class LicenseDialog: public BaseDialog
     Ui::LicenseDialog ui;
 };
 
-#endif // QTR_LICENSE_DIALOG_H

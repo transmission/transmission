@@ -351,7 +351,7 @@ loadName (tr_variant * dict, tr_torrent * tor)
     {
       ret = TR_FR_NAME;
 
-      if (tr_strcmp0 (tr_torrentName(tor), name))
+      if (tr_strcmp0 (tr_torrentName(tor), name) != 0)
         {
           tr_free (tor->info.name);
           tor->info.name = tr_strdup (name);
@@ -614,16 +614,16 @@ loadProgress (tr_variant * dict, tr_torrent * tor)
 
           if (!tr_variantGetRaw (b, &buf, &buflen))
             err = "Invalid value for \"blocks\"";
-          else if ((buflen == 3) && !memcmp (buf, "all", 3))
+          else if (buflen == 3 && memcmp (buf, "all", 3) == 0)
             tr_bitfieldSetHasAll (&blocks);
-          else if ((buflen == 4) && !memcmp (buf, "none", 4))
+          else if (buflen == 4 && memcmp (buf, "none", 4) == 0)
             tr_bitfieldSetHasNone (&blocks);
           else
             tr_bitfieldSetRaw (&blocks, buf, buflen, true);
         }
       else if (tr_variantDictFindStr (prog, TR_KEY_have, &str, NULL))
         {
-          if (!strcmp (str, "all"))
+          if (strcmp (str, "all") == 0)
             tr_bitfieldSetHasAll (&blocks);
           else
             err = "Invalid value for HAVE";

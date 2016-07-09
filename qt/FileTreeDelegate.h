@@ -7,8 +7,7 @@
  * $Id$
  */
 
-#ifndef QTR_FILE_TREE_DELEGATE_H
-#define QTR_FILE_TREE_DELEGATE_H
+#pragma once
 
 #include <QItemDelegate>
 
@@ -26,4 +25,3 @@ class FileTreeDelegate: public QItemDelegate
     virtual void paint (QPainter *, const QStyleOptionViewItem&, const QModelIndex&) const;
 };
 
-#endif // QTR_FILE_TREE_DELEGATE_H

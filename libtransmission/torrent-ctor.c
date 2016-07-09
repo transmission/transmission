@@ -159,8 +159,11 @@ tr_ctorSetMetainfoFromFile (tr_ctor *    ctor,
             if (!name || !*name)
             {
                 char * base = tr_sys_path_basename (filename, NULL);
-                tr_variantDictAddStr (info, TR_KEY_name, base);
-                tr_free (base);
+                if (base != NULL)
+                  {
+                    tr_variantDictAddStr (info, TR_KEY_name, base);
+                    tr_free (base);
+                  }
             }
         }
     }

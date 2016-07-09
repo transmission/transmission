@@ -407,7 +407,7 @@ on_scrape_done (tr_session   * session,
                     for (j=0; j<response->row_count; ++j)
                     {
                         struct tr_scrape_response_row * row = &response->rows[j];
-                        if (!memcmp (tr_quark_get_string(key,NULL), row->info_hash, SHA_DIGEST_LENGTH))
+                        if (memcmp (tr_quark_get_string (key, NULL), row->info_hash, SHA_DIGEST_LENGTH) == 0)
                         {
                             if (tr_variantDictFindInt (val, TR_KEY_complete, &intVal))
                                 row->seeders = intVal;

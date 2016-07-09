@@ -7,8 +7,7 @@
  * $Id$
  */
 
-#ifndef QTR_SPEED_H
-#define QTR_SPEED_H
+#pragma once
 
 class Speed
 {
@@ -32,4 +31,3 @@ class Speed
     int _Bps;
 };
 
-#endif // QTR_SPEED_H

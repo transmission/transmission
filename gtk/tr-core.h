@@ -22,8 +22,7 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#ifndef GTR_CORE_H
-#define GTR_CORE_H
+#pragma once
 
 #include <gtk/gtk.h>
 
@@ -34,6 +33,8 @@ G_BEGIN_DECLS
 
 #define TR_CORE_TYPE (tr_core_get_type ())
 #define TR_CORE(o)(G_TYPE_CHECK_INSTANCE_CAST ((o), TR_CORE_TYPE, TrCore))
+
+#define TR_RESOURCE_PATH "/com/transmissionbt/transmission/"
 
 typedef struct _TrCore
 {
@@ -194,5 +195,3 @@ enum
 
 G_END_DECLS
 
-
-#endif /* GTR_CORE_H */

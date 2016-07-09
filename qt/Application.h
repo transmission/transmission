@@ -7,8 +7,7 @@
  * $Id$
  */
 
-#ifndef QTR_APPLICATION_H
-#define QTR_APPLICATION_H
+#pragma once
 
 #include <QApplication>
 #include <QSet>
@@ -73,4 +72,3 @@ class Application: public QApplication
 #undef qApp
 #define qApp static_cast<Application*> (Application::instance ())
 
-#endif // QTR_APPLICATION_H

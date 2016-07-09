@@ -769,7 +769,7 @@ tau_session_get_tracker (struct tr_announcer_udp * tau, const char * url)
     key = tr_strdup_printf ("%s:%d", host, port);
     for (i=0, n=tr_ptrArraySize (&tau->trackers); !tracker && i<n; ++i) {
         struct tau_tracker * tmp = tr_ptrArrayNth (&tau->trackers, i);
-        if (!tr_strcmp0 (tmp->key, key))
+        if (tr_strcmp0 (tmp->key, key) == 0)
             tracker = tmp;
     }
 

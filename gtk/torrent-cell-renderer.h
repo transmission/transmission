@@ -7,8 +7,7 @@
  * $Id$
  */
 
-#ifndef GTR_TORRENT_CELL_RENDERER_H
-#define GTR_TORRENT_CELL_RENDERER_H
+#pragma once
 
 #include <gtk/gtk.h>
 
@@ -40,4 +39,3 @@ GType torrent_cell_renderer_get_type (void) G_GNUC_CONST;
 
 GtkCellRenderer * torrent_cell_renderer_new (void);
 
-#endif /* GTR_TORRENT_CELL_RENDERER_H */

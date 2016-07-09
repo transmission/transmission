@@ -7,11 +7,9 @@
  * $Id$
  */
 
-#ifndef QTR_TORRENT_MODEL_H
-#define QTR_TORRENT_MODEL_H
+#pragma once
 
 #include <QAbstractListModel>
-#include <QMap>
 #include <QSet>
 #include <QVector>
 
@@ -60,12 +58,11 @@ class TorrentModel: public QAbstractListModel
     void torrentsAdded (QSet<int>);
 
   private:
-    typedef QMap<int, int> id_to_row_t;
-    typedef QMap<int, Torrent*> id_to_torrent_t;
     typedef QVector<Torrent*> torrents_t;
 
   private:
     void addTorrent (Torrent *);
+    void addTorrents (torrents_t&& torrents, QSet<int>& addIds);
     QSet<int> getIds () const;
 
   private slots:
@@ -74,9 +71,6 @@ class TorrentModel: public QAbstractListModel
   private:
     const Prefs& myPrefs;
 
-    id_to_row_t myIdToRow;
-    id_to_torrent_t myIdToTorrent;
     torrents_t myTorrents;
 };
 
-#endif // QTR_TORRENT_MODEL_H

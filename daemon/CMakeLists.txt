@@ -1,7 +1,7 @@
 project(trdaemon)
 
 if(WITH_SYSTEMD)
-    add_definitions(-DUSE_SYSTEMD_DAEMON)
+    add_definitions(-DUSE_SYSTEMD)
 endif()
 
 include_directories(
@@ -37,14 +37,14 @@ add_executable(${TR_NAME}-daemon
     ${${PROJECT_NAME}_WIN32_RC_FILE})
 
 set_target_properties(${TR_NAME}-daemon PROPERTIES
-    COMPILE_FLAGS "${SYSTEMD_DAEMON_CFLAGS}"
-    LINK_FLAGS "${SYSTEMD_DAEMON_LDFLAGS}"
+    COMPILE_FLAGS "${SYSTEMD_CFLAGS}"
+    LINK_FLAGS "${SYSTEMD_LDFLAGS}"
 )
 
 target_link_libraries(${TR_NAME}-daemon
     ${TR_NAME}
     ${EVENT2_LIBRARIES}
-    ${SYSTEMD_DAEMON_LIBRARIES}
+    ${SYSTEMD_LIBRARIES}
 )
 
 tr_win32_app_info(${PROJECT_NAME}_remote_WIN32_RC_FILE

@@ -11,8 +11,7 @@
  #error only libtransmission should #include this header.
 #endif
 
-#ifndef TR_METAINFO_H
-#define TR_METAINFO_H 1
+#pragma once
 
 #include "transmission.h"
 #include "variant.h"
@@ -28,5 +27,3 @@ void tr_metainfoRemoveSaved (const tr_session * session,
 
 char* tr_metainfoGetBasename (const tr_info *);
 
-
-#endif

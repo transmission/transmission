@@ -39,8 +39,7 @@
 **
 ****************************************************************************/
 
-#ifndef QTR_SQUEEZE_LABEL_H
-#define QTR_SQUEEZE_LABEL_H
+#pragma once
 
 #include <QLabel>
 
@@ -57,4 +56,3 @@ class SqueezeLabel: public QLabel
     virtual void paintEvent (QPaintEvent * paintEvent);
 };
 
-#endif // QTR_SQUEEZE_LABEL_H

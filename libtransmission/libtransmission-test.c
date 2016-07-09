@@ -62,7 +62,7 @@ check_condition_impl (const char * file, int line, bool condition)
 bool
 check_streq_impl (const char * file, int line, const char * expected, const char * actual)
 {
-  const bool pass = !tr_strcmp0 (expected, actual);
+  const bool pass = tr_strcmp0 (expected, actual) == 0;
 
   if (should_print (pass)) {
     if (pass)
@@ -84,6 +84,21 @@ check_int_eq_impl (const char * file, int line, int64_t expected, int64_t actual
       fprintf (stderr, "PASS %s:%d\n", file, line);
     else
       fprintf (stderr, "FAIL %s:%d, expected \"%"PRId64"\", got \"%"PRId64"\"\n", file, line, expected, actual);
+  }
+
+  return pass;
+}
+
+bool
+check_uint_eq_impl (const char * file, int line, uint64_t expected, uint64_t actual)
+{
+  const bool pass = expected == actual;
+
+  if (should_print (pass)) {
+    if (pass)
+      fprintf (stderr, "PASS %s:%d\n", file, line);
+    else
+      fprintf (stderr, "FAIL %s:%d, expected \"%"PRIu64"\", got \"%"PRIu64"\"\n", file, line, expected, actual);
   }
 
   return pass;
@@ -194,21 +209,18 @@ libtest_sandbox_destroy (const char * sandbox)
 ***/
 
 #define MEM_K 1024
-#define MEM_B_STR   "B"
 #define MEM_K_STR "KiB"
 #define MEM_M_STR "MiB"
 #define MEM_G_STR "GiB"
 #define MEM_T_STR "TiB"
 
 #define DISK_K 1000
-#define DISK_B_STR  "B"
 #define DISK_K_STR "kB"
 #define DISK_M_STR "MB"
 #define DISK_G_STR "GB"
 #define DISK_T_STR "TB"
 
 #define SPEED_K 1000
-#define SPEED_B_STR  "B/s"
 #define SPEED_K_STR "kB/s"
 #define SPEED_M_STR "MB/s"
 #define SPEED_G_STR "GB/s"

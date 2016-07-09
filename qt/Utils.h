@@ -7,8 +7,7 @@
  * $Id$
  */
 
-#ifndef QTR_UTILS_H
-#define QTR_UTILS_H
+#pragma once
 
 #include <cctype> // isxdigit()
 
@@ -85,4 +84,3 @@ class Utils
     }
 };
 
-#endif // QTR_UTILS_H

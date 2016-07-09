@@ -7,8 +7,7 @@
  * $Id$
  */
 
-#ifndef TR_LOG_H
-#define TR_LOG_H 1
+#pragma once
 
 #include <stddef.h> /* size_t */
 
@@ -129,4 +128,3 @@ char* tr_logGetTimeStr (char * buf, size_t buflen) TR_GNUC_NONNULL (1);
 
 /** @} */
 
-#endif

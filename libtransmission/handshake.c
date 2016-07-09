@@ -258,7 +258,7 @@ parseHandshake (tr_handshake *    handshake,
 
   /* confirm the protocol */
   tr_peerIoReadBytes (handshake->io, inbuf, name, HANDSHAKE_NAME_LEN);
-  if (memcmp (name, HANDSHAKE_NAME, HANDSHAKE_NAME_LEN))
+  if (memcmp (name, HANDSHAKE_NAME, HANDSHAKE_NAME_LEN) != 0)
     return HANDSHAKE_ENCRYPTION_WRONG;
 
   /* read the reserved bytes */
@@ -268,7 +268,7 @@ parseHandshake (tr_handshake *    handshake,
   tr_peerIoReadBytes (handshake->io, inbuf, hash, sizeof (hash));
   assert (tr_peerIoHasTorrentHash (handshake->io));
   if (!tr_torrentExists (handshake->session, hash)
-      || memcmp (hash, tr_peerIoGetTorrentHash (handshake->io), SHA_DIGEST_LENGTH))
+      || memcmp (hash, tr_peerIoGetTorrentHash (handshake->io), SHA_DIGEST_LENGTH) != 0)
     {
       dbgmsg (handshake, "peer returned the wrong hash. wtf?");
       return HANDSHAKE_BAD_TORRENT;
@@ -283,7 +283,7 @@ parseHandshake (tr_handshake *    handshake,
   dbgmsg (handshake, "peer-id is [%*.*s]", PEER_ID_LEN, PEER_ID_LEN, peer_id);
 
   tor = tr_torrentFindFromHash (handshake->session, hash);
-  if (!memcmp (peer_id, tr_torrentGetPeerId(tor), PEER_ID_LEN))
+  if (memcmp (peer_id, tr_torrentGetPeerId(tor), PEER_ID_LEN) == 0)
     {
       dbgmsg (handshake, "streuth!  we've connected to ourselves.");
       return HANDSHAKE_PEER_IS_SELF;
@@ -514,7 +514,7 @@ readVC (tr_handshake    * handshake,
       memcpy (tmp, evbuffer_pullup (inbuf, key_len), key_len);
       tr_cryptoDecryptInit (handshake->crypto);
       tr_cryptoDecrypt (handshake->crypto, key_len, tmp, tmp);
-      if (!memcmp (tmp, key, key_len))
+      if (memcmp (tmp, key, key_len) == 0)
         break;
 
       evbuffer_drain (inbuf, 1);
@@ -642,7 +642,7 @@ readHandshake (tr_handshake    * handshake,
   assert (pstrlen == 19);
   tr_peerIoReadBytes (handshake->io, inbuf, pstr, pstrlen);
   pstr[pstrlen] = '\0';
-  if (memcmp (pstr, "BitTorrent protocol", 19))
+  if (memcmp (pstr, "BitTorrent protocol", 19) != 0)
     return tr_handshakeDone (handshake, false);
 
   /* reserved bytes */
@@ -675,7 +675,7 @@ readHandshake (tr_handshake    * handshake,
     {
       assert (tr_peerIoHasTorrentHash (handshake->io));
 
-      if (memcmp (hash, tr_peerIoGetTorrentHash (handshake->io), SHA_DIGEST_LENGTH))
+      if (memcmp (hash, tr_peerIoGetTorrentHash (handshake->io), SHA_DIGEST_LENGTH) != 0)
         {
           dbgmsg (handshake, "peer returned the wrong hash. wtf?");
           return tr_handshakeDone (handshake, false);
@@ -721,7 +721,7 @@ readPeerId (tr_handshake    * handshake,
 
   /* if we've somehow connected to ourselves, don't keep the connection */
   tor = tr_torrentFindFromHash (handshake->session, tr_peerIoGetTorrentHash (handshake->io));
-  connected_to_self = (tor != NULL) && !memcmp (peer_id, tr_torrentGetPeerId(tor), PEER_ID_LEN);
+  connected_to_self = (tor != NULL) && memcmp (peer_id, tr_torrentGetPeerId(tor), PEER_ID_LEN) == 0;
 
   return tr_handshakeDone (handshake, !connected_to_self);
 }

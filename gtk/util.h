@@ -7,8 +7,7 @@
  * $Id$
  */
 
-#ifndef GTR_UTIL_H
-#define GTR_UTIL_H
+#pragma once
 
 #include <sys/types.h>
 #include <glib.h>
@@ -164,4 +163,3 @@ void gtr_paste_clipboard_url_into_entry (GtkWidget * entry);
  * and prevents selected text in the label from being deselected */
 void gtr_label_set_text (GtkLabel * lb, const char * text);
 
-#endif /* GTR_UTIL_H */

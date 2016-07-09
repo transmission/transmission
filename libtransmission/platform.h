@@ -11,8 +11,7 @@
  #error only libtransmission should #include this header.
 #endif
 
-#ifndef TR_PLATFORM_H
-#define TR_PLATFORM_H
+#pragma once
 
 #define TR_PATH_DELIMITER '/'
 #define TR_PATH_DELIMITER_STR "/"
@@ -54,7 +53,7 @@ tr_thread* tr_threadNew (void (*func)(void *), void * arg);
 
 /** @brief Return nonzero if this function is being called from `thread'
     @param thread the thread being tested */
-bool tr_amInThread (const tr_thread *);
+bool tr_amInThread (const tr_thread * thread);
 
 /***
 ****
@@ -79,4 +78,3 @@ bool tr_lockHave (const tr_lock *);
 
 /* @} */
 
-#endif

@@ -609,7 +609,7 @@ gtr_text_buffer_set_text (GtkTextBuffer * b, const char * str)
   gtk_text_buffer_get_bounds (b, &start, &end);
   old_str = gtk_text_buffer_get_text (b, &start, &end, FALSE);
 
-  if ((old_str == NULL) || g_strcmp0 (old_str, str))
+  if (old_str == NULL || g_strcmp0 (old_str, str) != 0)
     gtk_text_buffer_set_text (b, str, -1);
 
   g_free (old_str);
@@ -686,7 +686,7 @@ refreshInfo (struct DetailsImpl * di, tr_torrent ** torrents, int n)
 
       for (i=1; i<n; ++i)
         {
-          mixed_creator |= g_strcmp0 (creator, infos[i]->creator ? infos[i]->creator : "");
+          mixed_creator |= g_strcmp0 (creator, infos[i]->creator ? infos[i]->creator : "") != 0;
           mixed_date |= (date != infos[i]->dateCreated);
         }
 
@@ -727,7 +727,7 @@ refreshInfo (struct DetailsImpl * di, tr_torrent ** torrents, int n)
       const char * baseline = infos[0]->comment ? infos[0]->comment : "";
 
       for (i=1; i<n; ++i)
-        if (g_strcmp0 (baseline, infos[i]->comment ? infos[i]->comment : ""))
+        if (g_strcmp0 (baseline, infos[i]->comment ? infos[i]->comment : "") != 0)
           break;
 
       if (i==n)
@@ -747,7 +747,7 @@ refreshInfo (struct DetailsImpl * di, tr_torrent ** torrents, int n)
       const char * baseline = tr_torrentGetDownloadDir (torrents[0]);
 
       for (i=1; i<n; ++i)
-        if (g_strcmp0 (baseline, tr_torrentGetDownloadDir (torrents[i])))
+        if (g_strcmp0 (baseline, tr_torrentGetDownloadDir (torrents[i])) != 0)
           break;
 
       if (i==n)
@@ -986,7 +986,7 @@ refreshInfo (struct DetailsImpl * di, tr_torrent ** torrents, int n)
       const char * baseline = stats[0]->errorString;
 
       for (i=1; i<n; ++i)
-        if (g_strcmp0 (baseline, stats[i]->errorString))
+        if (g_strcmp0 (baseline, stats[i]->errorString) != 0)
           break;
 
       if (i==n)
@@ -1286,7 +1286,7 @@ initPeerRow (GtkListStore        * store,
   char collated_name[128];
   const char * client = peer->client;
 
-  if (!client || !g_strcmp0 (client, "Unknown Client"))
+  if (client == NULL || g_strcmp0 (client, "Unknown Client") == 0)
     client = "";
 
   if (sscanf (peer->addr, "%d.%d.%d.%d", q, q+1, q+2, q+3) != 4)

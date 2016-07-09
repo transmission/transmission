@@ -234,15 +234,17 @@ FilterBar::FilterBar (Prefs& prefs, const TorrentModel& torrents, const TorrentF
   h->addWidget (myCountLabel);
 
   myActivityCombo = createActivityCombo ();
-  myActivityCombo->setSizePolicy (QSizePolicy (QSizePolicy::Fixed, QSizePolicy::Fixed));
   h->addWidget (myActivityCombo);
 
   myTrackerModel = new QStandardItemModel (this);
   myTrackerCombo = createTrackerCombo (myTrackerModel);
   h->addWidget (myTrackerCombo);
 
+  h->addStretch ();
+
   myLineEdit = new FilterBarLineEdit (this);
-  h->addWidget (myLineEdit);
+  myLineEdit->setMaximumWidth (250);
+  h->addWidget (myLineEdit, 1);
   connect (myLineEdit, SIGNAL (textChanged (QString)), this, SLOT (onTextChanged (QString)));
 
   // listen for changes from the other players

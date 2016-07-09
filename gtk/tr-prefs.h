@@ -7,8 +7,7 @@
  * $Id$
  */
 
-#ifndef GTR_PREFS_H
-#define GTR_PREFS_H
+#pragma once
 
 #include <gtk/gtk.h>
 
@@ -53,4 +52,3 @@ enum
     SECONDARY_WINDOW_REFRESH_INTERVAL_SECONDS = 2
 };
 
-#endif /* GTR_PREFS_H */

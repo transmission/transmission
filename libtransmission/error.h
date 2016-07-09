@@ -7,8 +7,7 @@
  * $Id$
  */
 
-#ifndef TR_ERROR_H
-#define TR_ERROR_H
+#pragma once
 
 #include <stdarg.h>
 
@@ -171,4 +170,3 @@ void       tr_error_propagate_prefixed (tr_error   ** new_error,
 }
 #endif
 
-#endif

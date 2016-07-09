@@ -37,11 +37,11 @@
     
     IBOutlet NSTableView * fPeerTable;
     IBOutlet WebSeedTableView * fWebSeedTable;
-    CGFloat fWebSeedTableHeight, fSpaceBetweenWebSeedAndPeer;
-    
-    NSViewAnimation * fWebSeedTableAnimation;
     
     IBOutlet NSTextField * fConnectedPeersField;
+
+    CGFloat fViewTopMargin;
+    IBOutlet NSLayoutConstraint * fWebSeedTableTopConstraint;
 }
 
 - (void) setInfoForTorrents: (NSArray *) torrents;
@@ -49,6 +49,5 @@
 
 - (void) saveViewSize;
 - (void) clearView;
-- (void) stopWebSeedAnimation;
 
 @end

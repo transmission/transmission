@@ -43,7 +43,7 @@
 <context>
     <name>Application</name>
     <message>
-        <location filename="../Application.cc" line="+288"/>
+        <location filename="../Application.cc" line="+279"/>
         <source>&lt;b&gt;Transmission is a file sharing program.&lt;/b&gt;</source>
         <translation>&lt;b&gt;Transmission agiri elkarbanatze programa bat da.&lt;/b&gt;</translation>
     </message>
@@ -58,7 +58,7 @@
         <translation>&amp;Onartzen dut</translation>
     </message>
     <message>
-        <location line="+93"/>
+        <location line="+85"/>
         <source>Torrent Completed</source>
         <translation>Torrenta Osatuta</translation>
     </message>
@@ -2181,7 +2181,7 @@ Beste lehen URL bat gehitzeko, gehitu hura lerro huts baten ondoren.</translatio
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../Application.cc" line="-256"/>
+        <location filename="../Application.cc" line="-241"/>
         <source>Invalid option</source>
         <translation>Aukera baliogabea</translation>
     </message>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="9531" systemVersion="15B42" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="9531" systemVersion="15B42" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="9531"/>
@@ -19,49 +19,51 @@
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <window title="Torrent Inspector" allowsToolTipsWhenApplicationIsInactive="NO" restorable="NO" hidesOnDeactivate="YES" oneShot="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="5" userLabel="InfoWindow" customClass="NSPanel">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" resizable="YES" utility="YES"/>
-            <windowPositionMask key="initialPositionMask" leftStrut="YES" topStrut="YES"/>
-            <rect key="contentRect" x="897" y="867" width="403" height="75"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1028"/>
-            <value key="minSize" type="size" width="350" height="73"/>
+            <rect key="contentRect" x="897" y="867" width="403" height="77"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
+            <value key="minSize" type="size" width="350" height="77"/>
             <view key="contentView" id="6">
-                <rect key="frame" x="0.0" y="0.0" width="403" height="75"/>
+                <rect key="frame" x="0.0" y="0.0" width="403" height="77"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <textField verticalHuggingPriority="750" id="15" customClass="InfoTextField">
-                        <rect key="frame" x="47" y="47" width="349" height="17"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                    <textField horizontalHuggingPriority="249" verticalHuggingPriority="750" horizontalCompressionResistancePriority="249" translatesAutoresizingMaskIntoConstraints="NO" id="15" customClass="InfoTextField">
+                        <rect key="frame" x="48" y="50" width="347" height="17"/>
                         <textFieldCell key="cell" lineBreakMode="truncatingMiddle" sendsActionOnEndEditing="YES" alignment="left" title="title" id="1481">
                             <font key="font" metaFont="systemBold"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <textField verticalHuggingPriority="750" id="1832">
-                        <rect key="frame" x="47" y="42" width="349" height="17"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                    <textField horizontalHuggingPriority="249" verticalHuggingPriority="750" horizontalCompressionResistancePriority="249" translatesAutoresizingMaskIntoConstraints="NO" id="1832">
+                        <rect key="frame" x="48" y="43" width="347" height="17"/>
                         <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="No Torrents Selected" id="1833">
                             <font key="font" metaFont="systemBold"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <imageView id="28">
-                        <rect key="frame" x="10" y="32" width="32" height="32"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <imageView horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="28">
+                        <rect key="frame" x="10" y="35" width="32" height="32"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="32" id="8RE-eg-dQr"/>
+                            <constraint firstAttribute="height" constant="32" id="dFT-cY-S1H"/>
+                        </constraints>
                         <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="NSApplicationIcon" id="1482"/>
                     </imageView>
-                    <textField verticalHuggingPriority="750" id="29" customClass="InfoTextField">
-                        <rect key="frame" x="47" y="33" width="349" height="14"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                    <textField horizontalHuggingPriority="249" verticalHuggingPriority="750" horizontalCompressionResistancePriority="249" translatesAutoresizingMaskIntoConstraints="NO" id="29" customClass="InfoTextField">
+                        <rect key="frame" x="48" y="36" width="347" height="14"/>
                         <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="info" id="1483">
                             <font key="font" metaFont="smallSystem"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <matrix verticalHuggingPriority="750" allowsEmptySelection="NO" autosizesCells="NO" id="927">
+                    <matrix horizontalHuggingPriority="750" verticalHuggingPriority="750" allowsEmptySelection="NO" autosizesCells="NO" translatesAutoresizingMaskIntoConstraints="NO" id="927">
                         <rect key="frame" x="0.0" y="0.0" width="330" height="25"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="25" id="hKz-ct-bbc"/>
+                            <constraint firstAttribute="width" constant="330" id="z2h-O9-V2h"/>
+                        </constraints>
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         <size key="cellSize" width="55" height="25"/>
                         <size key="intercellSpacing" width="0.0" height="2"/>
@@ -111,15 +113,40 @@
                             <action selector="setTab:" target="-2" id="1107"/>
                         </connections>
                     </matrix>
-                    <customView id="1830" customClass="InfoTabButtonBack">
+                    <customView verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="1830" customClass="InfoTabButtonBack">
                         <rect key="frame" x="330" y="0.0" width="73" height="25"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                        <constraints>
+                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="20" id="PKE-Ur-jFy"/>
+                        </constraints>
                     </customView>
                 </subviews>
+                <constraints>
+                    <constraint firstItem="1830" firstAttribute="height" secondItem="927" secondAttribute="height" id="7kC-sv-Rac"/>
+                    <constraint firstItem="29" firstAttribute="leading" secondItem="15" secondAttribute="leading" id="BNH-Tr-hFi"/>
+                    <constraint firstItem="1832" firstAttribute="centerY" secondItem="28" secondAttribute="centerY" id="El1-Gz-xIm"/>
+                    <constraint firstItem="15" firstAttribute="leading" secondItem="28" secondAttribute="trailing" constant="8" symbolic="YES" id="KnI-DH-f2f"/>
+                    <constraint firstAttribute="trailing" secondItem="1832" secondAttribute="trailing" constant="10" id="KvA-Du-d9V"/>
+                    <constraint firstAttribute="trailing" secondItem="15" secondAttribute="trailing" constant="10" id="NcT-hF-ea0"/>
+                    <constraint firstItem="1830" firstAttribute="top" secondItem="927" secondAttribute="top" id="TnS-Sn-O3R"/>
+                    <constraint firstItem="29" firstAttribute="top" secondItem="15" secondAttribute="bottom" id="Y9O-lX-kmT"/>
+                    <constraint firstItem="1830" firstAttribute="leading" secondItem="927" secondAttribute="trailing" id="ZTN-6K-vX5"/>
+                    <constraint firstItem="927" firstAttribute="top" relation="greaterThanOrEqual" secondItem="29" secondAttribute="bottom" constant="10" id="b6k-JH-u2F"/>
+                    <constraint firstItem="15" firstAttribute="top" secondItem="28" secondAttribute="top" id="eMj-JO-xBI"/>
+                    <constraint firstItem="927" firstAttribute="top" relation="greaterThanOrEqual" secondItem="28" secondAttribute="bottom" constant="10" id="gqi-Zg-4t0"/>
+                    <constraint firstItem="927" firstAttribute="top" secondItem="28" secondAttribute="bottom" priority="249" constant="10" id="kUG-oS-arE"/>
+                    <constraint firstItem="1832" firstAttribute="leading" secondItem="28" secondAttribute="trailing" constant="8" symbolic="YES" id="kix-P7-jf3"/>
+                    <constraint firstAttribute="trailing" secondItem="29" secondAttribute="trailing" constant="10" id="kvJ-zV-yMM"/>
+                    <constraint firstItem="28" firstAttribute="leading" secondItem="6" secondAttribute="leading" constant="10" id="lNe-yY-iVE"/>
+                    <constraint firstItem="28" firstAttribute="top" secondItem="6" secondAttribute="top" constant="10" id="nES-K0-lBd"/>
+                    <constraint firstAttribute="trailing" secondItem="1830" secondAttribute="trailing" id="nUk-KN-r8J"/>
+                    <constraint firstItem="927" firstAttribute="leading" secondItem="6" secondAttribute="leading" id="sJ7-kc-lcC"/>
+                    <constraint firstItem="927" firstAttribute="top" secondItem="29" secondAttribute="bottom" priority="249" constant="10" id="xWX-F2-B3L"/>
+                </constraints>
             </view>
             <connections>
                 <outlet property="delegate" destination="-2" id="556"/>
             </connections>
+            <point key="canvasLocation" x="326.5" y="153.5"/>
         </window>
     </objects>
     <resources>

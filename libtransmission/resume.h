@@ -8,11 +8,10 @@
  */
 
 #ifndef __TRANSMISSION__
-#error only libtransmission should #include this header.
+ #error only libtransmission should #include this header.
 #endif
 
-#ifndef TR_RESUME_H
-#define TR_RESUME_H
+#pragma once
 
 enum
 {
@@ -37,7 +36,7 @@ enum
   TR_FR_TIME_SEEDING        = (1 << 18),
   TR_FR_TIME_DOWNLOADING    = (1 << 19),
   TR_FR_FILENAMES           = (1 << 20),
-  TR_FR_NAME                = (1 << 21),
+  TR_FR_NAME                = (1 << 21)
 };
 
 /**
@@ -54,4 +53,3 @@ void     tr_torrentRemoveResume (const tr_torrent  * tor);
 int      tr_torrentRenameResume (const tr_torrent  * tor,
                                  const char        * newname);
 
-#endif

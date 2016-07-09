@@ -13,7 +13,6 @@
 
 #if defined (XCODE_BUILD)
  #define HAVE_GETPAGESIZE
- #define HAVE_ICONV_OPEN
  #define HAVE_VALLOC
 #endif
 
@@ -37,7 +36,7 @@
  #include <unistd.h> /* getpagesize () */
 #endif
 
-#ifdef HAVE_ICONV_OPEN
+#ifdef HAVE_ICONV
  #include <iconv.h>
 #endif
 
@@ -189,7 +188,7 @@ tr_strip_positional_args (const char* str)
     }
 
   *out = '\0';
-  return !in || strcmp (buf, in) ? buf : in;
+  return (in == NULL || strcmp (buf, in) != 0) ? buf : in;
 }
 
 /**
@@ -404,7 +403,7 @@ tr_memmem (const char * haystack, size_t haystacklen,
   if (needlelen > haystacklen || !haystack || !needle)
     return NULL;
   for (i=0; i<=haystacklen-needlelen; ++i)
-    if (!memcmp (haystack+i, needle, needlelen))
+    if (memcmp (haystack + i, needle, needlelen) == 0)
       return haystack+i;
   return NULL;
 #endif
@@ -1026,7 +1025,7 @@ to_utf8 (const char * in, size_t inlen)
 {
   char * ret = NULL;
 
-#ifdef HAVE_ICONV_OPEN
+#ifdef HAVE_ICONV
   int i;
   const char * encodings[] = { "CURRENT", "ISO-8859-15" };
   const int encoding_count = sizeof (encodings) / sizeof (encodings[1]);
@@ -1035,7 +1034,11 @@ to_utf8 (const char * in, size_t inlen)
 
   for (i=0; !ret && i<encoding_count; ++i)
     {
+#ifdef ICONV_SECOND_ARGUMENT_IS_CONST
+      const char * inbuf = in;
+#else
       char * inbuf = (char*) in;
+#endif
       char * outbuf = out;
       size_t inbytesleft = inlen;
       size_t outbytesleft = buflen;
@@ -1475,8 +1478,8 @@ tr_moveFile (const char * oldpath, const char * newpath, tr_error ** error)
 
   /* make sure the target directory exists */
   {
-    char * newdir = tr_sys_path_dirname (newpath, NULL);
-    const bool i = tr_sys_dir_create (newdir, TR_SYS_DIR_CREATE_PARENTS, 0777, error);
+    char * newdir = tr_sys_path_dirname (newpath, error);
+    const bool i = newdir != NULL && tr_sys_dir_create (newdir, TR_SYS_DIR_CREATE_PARENTS, 0777, error);
     tr_free (newdir);
     if (!i)
       {

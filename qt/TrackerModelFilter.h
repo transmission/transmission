@@ -7,8 +7,7 @@
  * $Id$
  */
 
-#ifndef QTR_TRACKER_MODEL_FILTER_H
-#define QTR_TRACKER_MODEL_FILTER_H
+#pragma once
 
 #include <QSortFilterProxyModel>
 
@@ -30,4 +29,3 @@ class TrackerModelFilter: public QSortFilterProxyModel
     bool myShowBackups;
 };
 
-#endif // QTR_TRACKER_MODEL_FILTER_H

@@ -1,5 +1,5 @@
 /*
- * This file Copyright (C) 2009-2015 Mnemosyne LLC
+ * This file Copyright (C) 2009-2016 Mnemosyne LLC
  *
  * It may be used under the GNU GPL versions 2 or 3
  * or any future license endorsed by Mnemosyne LLC.
@@ -7,8 +7,7 @@
  * $Id$
  */
 
-#ifndef QTR_MAIN_WINDOW_H
-#define QTR_MAIN_WINDOW_H
+#pragma once
 
 #include <ctime>
 
@@ -129,8 +128,7 @@ class MainWindow: public QMainWindow
     void toggleSpeedMode ();
     void dataReadProgress ();
     void dataSendProgress ();
-    void onError (QNetworkReply::NetworkError);
-    void errorMessage (const QString&);
+    void onNetworkResponse (QNetworkReply::NetworkError code, const QString& message);
     void toggleWindows (bool doShow);
     void onSetPrefs ();
     void onSetPrefs (bool);
@@ -177,4 +175,3 @@ class MainWindow: public QMainWindow
     QString myErrorMessage;
 };
 
-#endif // QTR_MAIN_WINDOW_H

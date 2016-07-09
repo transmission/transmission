@@ -33,7 +33,7 @@
 #include <libtransmission/version.h>
 #include <libtransmission/watchdir.h>
 
-#ifdef USE_SYSTEMD_DAEMON
+#ifdef USE_SYSTEMD
  #include <systemd/sd-daemon.h>
 #else
  static void sd_notify (int status UNUSED, const char * str UNUSED) { }
@@ -69,6 +69,7 @@ static const char *logfileName = NULL;
 static tr_sys_file_t logfile = TR_BAD_SYS_FILE;
 static tr_session * mySession = NULL;
 static tr_quark key_pidfile = 0;
+static tr_quark key_watch_dir_force_generic = 0;
 static struct event_base *ev_base = NULL;
 
 /***
@@ -559,17 +560,18 @@ daemon_start (void * raw_arg,
         daemon_reconfigure (arg);
 
     /* maybe add a watchdir */
+    if (tr_variantDictFindBool (settings, TR_KEY_watch_dir_enabled, &boolVal) && boolVal)
     {
         const char * dir;
+        bool force_generic;
 
-        if (tr_variantDictFindBool (settings, TR_KEY_watch_dir_enabled, &boolVal)
-            && boolVal
-            && tr_variantDictFindStr (settings, TR_KEY_watch_dir, &dir, NULL)
-            && dir
-            && *dir)
+        if (!tr_variantDictFindBool (settings, key_watch_dir_force_generic, &force_generic))
+          force_generic = false;
+
+        if (tr_variantDictFindStr (settings, TR_KEY_watch_dir, &dir, NULL) && dir != NULL && *dir != '\0')
         {
             tr_logAddInfo ("Watching \"%s\" for new .torrent files", dir);
-            if ((watchdir = tr_watchdir_new (dir, &onFileAdded, mySession, ev_base)) == NULL)
+            if ((watchdir = tr_watchdir_new (dir, &onFileAdded, mySession, ev_base, force_generic)) == NULL)
                 goto cleanup;
         }
     }
@@ -670,7 +672,8 @@ tr_main (int    argc,
     tr_variant * const settings = &arg.settings;
     const char ** const configDir = &arg.configDir;
 
-    key_pidfile = tr_quark_new ("pidfile",  7);
+    key_pidfile = tr_quark_new ("pidfile", 7);
+    key_watch_dir_force_generic = tr_quark_new ("watch-dir-force-generic", 23);
 
     /* load settings from defaults + config file */
     tr_variantInitDict (settings, 0);

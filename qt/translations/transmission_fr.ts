@@ -43,7 +43,7 @@
 <context>
     <name>Application</name>
     <message>
-        <location filename="../Application.cc" line="+288"/>
+        <location filename="../Application.cc" line="+279"/>
         <source>&lt;b&gt;Transmission is a file sharing program.&lt;/b&gt;</source>
         <translation>&lt;b&gt;Transmission est un programme de partage de fichiers.&lt;/b&gt;</translation>
     </message>
@@ -58,7 +58,7 @@
         <translation>Je suis d&apos;&amp;accord</translation>
     </message>
     <message>
-        <location line="+93"/>
+        <location line="+85"/>
         <source>Torrent Completed</source>
         <translation>Torrent complété</translation>
     </message>
@@ -2181,7 +2181,7 @@ Pour ajouter une autre URL primaire, placez-la après une ligne vide.</translati
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../Application.cc" line="-256"/>
+        <location filename="../Application.cc" line="-241"/>
         <source>Invalid option</source>
         <translation>Option invalide</translation>
     </message>

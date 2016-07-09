@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+
+  <?include TransmissionConfig.wxi ?>
+
+  <Fragment>
+    <DirectoryRef Id="INSTALLDIR" FileSource="$(var.SrcDir)\bin">
+      <Component Id="exe.transmission.daemon">
+        <File DiskId="1" KeyPath="yes" Name="transmission-daemon.exe" />
+        <ServiceInstall Id="exe.transmission.daemon.service" Name="Transmission" Type="ownProcess" Account="NT AUTHORITY\LocalService" Start="auto" ErrorControl="normal"
+            DisplayName="Transmission Daemon" Description="Background BitTorrent service accessible with Qt client, web UI, or remote CLI tool.">
+          <util:ServiceConfig FirstFailureActionType="restart" SecondFailureActionType="restart" ThirdFailureActionType="none" ResetPeriodInDays="1"
+              RestartServiceDelayInSeconds="5" />
+        </ServiceInstall>
+        <ServiceControl Id="exe.transmission.daemon.service.ctl" Name="Transmission" Start="install" Stop="both" Remove="uninstall" />
+      </Component>
+    </DirectoryRef>
+  </Fragment>
+
+  <Fragment>
+    <ComponentGroup Id="DaemonComponents">
+      <ComponentRef Id="exe.transmission.daemon" />
+    </ComponentGroup>
+  </Fragment>
+
+</Wix>

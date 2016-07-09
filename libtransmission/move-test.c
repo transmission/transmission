@@ -68,7 +68,7 @@ test_incomplete_dir_threadfunc (void * vdata)
 static int
 test_incomplete_dir_impl (const char * incomplete_dir, const char * download_dir)
 {
-  size_t i;
+  tr_file_index_t file_index;
   tr_session * session;
   tr_torrent * tor;
   tr_completeness completeness;
@@ -93,13 +93,14 @@ test_incomplete_dir_impl (const char * incomplete_dir, const char * download_dir
   check (tr_torrentStat(tor)->leftUntilDone == tor->info.pieceSize);
   check_file_location (tor, 0, tr_strdup_printf("%s/%s.part", incomplete_dir, tor->info.files[0].name));
   check_file_location (tor, 1, tr_buildPath(incomplete_dir, tor->info.files[1].name, NULL));
-  check_int_eq (tor->info.pieceSize, tr_torrentStat(tor)->leftUntilDone);
+  check_uint_eq (tor->info.pieceSize, tr_torrentStat(tor)->leftUntilDone);
 
   completeness = completeness_unset;
   tr_torrentSetCompletenessCallback (tor, zeroes_completeness_func, &completeness);
 
   /* now finish writing it */
   {
+    tr_block_index_t block_index;
     tr_block_index_t first, last;
     char * zero_block = tr_new0 (char, tor->blockSize);
     struct test_incomplete_dir_data data;
@@ -110,10 +111,10 @@ test_incomplete_dir_impl (const char * incomplete_dir, const char * download_dir
     data.buf = evbuffer_new ();
 
     tr_torGetPieceBlockRange (tor, data.pieceIndex, &first, &last);
-    for (i=first; i<=last; ++i)
+    for (block_index=first; block_index<=last; ++block_index)
       {
         evbuffer_add (data.buf, zero_block, tor->blockSize);
-        data.block = i;
+        data.block = block_index;
         data.done = false;
         data.offset = data.block * tor->blockSize;
         tr_runInEventThread (session, test_incomplete_dir_threadfunc, &data);
@@ -125,14 +126,14 @@ test_incomplete_dir_impl (const char * incomplete_dir, const char * download_dir
   }
 
   libttest_blockingTorrentVerify (tor);
-  check_int_eq (0, tr_torrentStat(tor)->leftUntilDone);
+  check_uint_eq (0, tr_torrentStat(tor)->leftUntilDone);
 
   while ((completeness==completeness_unset) && (time(NULL)<=deadline))
     tr_wait_msec (50);
 
   check_int_eq (TR_SEED, completeness);
-  for (i=0; i<tor->info.fileCount; ++i)
-    check_file_location (tor, i, tr_buildPath (download_dir, tor->info.files[i].name, NULL));
+  for (file_index=0; file_index<tor->info.fileCount; ++file_index)
+    check_file_location (tor, file_index, tr_buildPath (download_dir, tor->info.files[file_index].name, NULL));
 
   /* cleanup */
   tr_torrentRemove (tor, true, tr_sys_path_remove);
@@ -167,7 +168,7 @@ test_incomplete_dir (void)
 static int
 test_set_location (void)
 {
-  size_t i;
+  tr_file_index_t file_index;
   int state;
   char * target_dir;
   tr_torrent * tor;
@@ -183,7 +184,7 @@ test_set_location (void)
   tor = libttest_zero_torrent_init (session);
   libttest_zero_torrent_populate (tor, true);
   libttest_blockingTorrentVerify (tor);
-  check_int_eq (0, tr_torrentStat(tor)->leftUntilDone);
+  check_uint_eq (0, tr_torrentStat(tor)->leftUntilDone);
 
   /* now move it */
   state = -1;
@@ -194,12 +195,12 @@ test_set_location (void)
 
   /* confirm the torrent is still complete after being moved */
   libttest_blockingTorrentVerify (tor);
-  check_int_eq (0, tr_torrentStat(tor)->leftUntilDone);
+  check_uint_eq (0, tr_torrentStat(tor)->leftUntilDone);
 
   /* confirm the filest really got moved */
   libttest_sync ();
-  for (i=0; i<tor->info.fileCount; ++i)
-    check_file_location (tor, i, tr_buildPath (target_dir, tor->info.files[i].name, NULL));
+  for (file_index=0; file_index<tor->info.fileCount; ++file_index)
+    check_file_location (tor, file_index, tr_buildPath (target_dir, tor->info.files[file_index].name, NULL));
 
   /* cleanup */
   tr_free (target_dir);

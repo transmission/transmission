@@ -41,8 +41,8 @@ set(TR_NAME ${PROJECT_NAME})
 #         "Z" for unsupported trunk builds,
 #         "0" for stable, supported releases
 # these should be the only two lines you need to change
-set(TR_USER_AGENT_PREFIX "2.84+")
-set(TR_PEER_ID_PREFIX "-TR284Z-")
+set(TR_USER_AGENT_PREFIX "2.92+")
+set(TR_PEER_ID_PREFIX "-TR292Z-")
 
 string(REGEX MATCH "^([0-9]+)\\.([0-9]+).*" TR_VERSION "${TR_USER_AGENT_PREFIX}")
 set(TR_VERSION_MAJOR "${CMAKE_MATCH_1}")
@@ -60,10 +60,16 @@ set(TR_SCM_REVISION_FILE "${CMAKE_SOURCE_DIR}/REVISION")
 set(TR_SCM_REVISION_RELIABLE ON)
 
 if(IS_DIRECTORY ${CMAKE_SOURCE_DIR}/.svn)
-    find_package(Subversion)
-    if(Subversion_FOUND)
-        Subversion_WC_INFO(${CMAKE_SOURCE_DIR} TR_SVN)
-        set(TR_SCM_REVISION "${TR_SVN_WC_REVISION}")
+    if(NOT "$ENV{JENKINS_URL}" STREQUAL "" AND NOT "$ENV{SVN_REVISION}" STREQUAL "")
+        # Jenkins automated build, use the set environment variables to avoid
+        # version mismatches between java's svn and command line's svn
+        set(TR_SCM_REVISION "$ENV{SVN_REVISION}")
+    else()
+        find_package(Subversion)
+        if(Subversion_FOUND)
+            Subversion_WC_INFO(${CMAKE_SOURCE_DIR} TR_SVN)
+            set(TR_SCM_REVISION "${TR_SVN_WC_REVISION}")
+        endif()
     endif()
 elseif(IS_DIRECTORY ${CMAKE_SOURCE_DIR}/.git)
     find_package(Git)
@@ -121,12 +127,12 @@ set(GLIB_MINIMUM            2.32.0)
 set(GIO_MINIMUM             2.26.0)
 set(LIBAPPINDICATOR_MINIMUM 0.4.90)
 
-tr_github_upstream(EVENT2    libevent/libevent  c51b159cff 7be95856a39714dfd2218cb56415c990)
-tr_github_upstream(NATPMP    miniupnp/libnatpmp cf7f452d66 f1e7d5bf580972738d8ef21743d0adf7)
-tr_github_upstream(MINIUPNPC miniupnp/miniupnp  5de2bcb561 bdc5b64b9b8401d3524c50b9ec8173c1)
-tr_github_upstream(DHT       jech/dht           cc379e406d 958253fafa01c59950d357c148aff090)
-tr_github_upstream(UTP       bittorrent/libutp  7c4f19abdf 8b92aa05abec5f6675cdde6477cd6f51)
-tr_github_upstream(B64       mikedld/libb64     c1e3323498 10128cb30ad768d2c4caf627e0f69db3)
+tr_github_upstream(EVENT2    transmission/libevent  c51b159cff 7be95856a39714dfd2218cb56415c990)
+tr_github_upstream(NATPMP    transmission/libnatpmp cf7f452d66 f1e7d5bf580972738d8ef21743d0adf7)
+tr_github_upstream(MINIUPNPC transmission/miniupnp  5de2bcb561 bdc5b64b9b8401d3524c50b9ec8173c1)
+tr_github_upstream(DHT       transmission/dht       cc379e406d 958253fafa01c59950d357c148aff090)
+tr_github_upstream(UTP       transmission/libutp    7c4f19abdf 8b92aa05abec5f6675cdde6477cd6f51)
+tr_github_upstream(B64       transmission/libb64    c1e3323498 10128cb30ad768d2c4caf627e0f69db3)
 
 if(WIN32)
     foreach(L C CXX)
@@ -154,9 +160,7 @@ find_package(PkgConfig QUIET)
 
 find_package(CURL ${CURL_MINIMUM} REQUIRED)
 
-if(UNIX)
-    find_package(ICONV REQUIRED)
-endif()
+find_package(ICONV)
 
 if(WITH_CRYPTO STREQUAL "AUTO" OR WITH_CRYPTO STREQUAL "openssl")
     tr_get_required_flag(WITH_CRYPTO OPENSSL_IS_REQUIRED)
@@ -260,7 +264,7 @@ if(ENABLE_QT)
     else()
         set(QT4_REQUIRED_MODULES QtCore QtGui QtNetwork)
         set(QT4_OPTIONAL_MODULES QtDBus QAxContainer QAxServer)
-        find_package(Qt4 4.6.2 QUIET COMPONENTS ${QT4_REQUIRED_MODULES} OPTIONAL_COMPONENTS ${QT4_OPTIONAL_MODULES})
+        find_package(Qt4 4.8.0 QUIET COMPONENTS ${QT4_REQUIRED_MODULES} OPTIONAL_COMPONENTS ${QT4_OPTIONAL_MODULES})
         foreach(M ${QT4_REQUIRED_MODULES})
             string(TOUPPER "${M}" M_UPPER)
             if(QT_${M_UPPER}_FOUND)
@@ -394,9 +398,9 @@ endif()
 if(WITH_SYSTEMD)
     tr_get_required_flag(WITH_SYSTEMD SYSTEMD_IS_REQUIRED)
 
-    pkg_check_modules(SYSTEMD_DAEMON ${SYSTEMD_IS_REQUIRED} libsystemd-daemon)
+    pkg_check_modules(SYSTEMD ${SYSTEMD_IS_REQUIRED} libsystemd)
 
-    tr_fixup_auto_option(WITH_SYSTEMD SYSTEMD_DAEMON_FOUND SYSTEMD_IS_REQUIRED)
+    tr_fixup_auto_option(WITH_SYSTEMD SYSTEMD_FOUND SYSTEMD_IS_REQUIRED)
 endif()
 
 include_directories(${CMAKE_BINARY_DIR})
@@ -490,7 +494,6 @@ set(NEEDED_FUNCTIONS
     getmntent
     getpagesize
     htonll
-    iconv_open
     localtime_r
     memmem
     mkdtemp
@@ -514,6 +517,13 @@ foreach(F ${NEEDED_FUNCTIONS})
         add_definitions(-DHAVE_${F_ID})
     endif()
 endforeach()
+
+if(ICONV_FOUND)
+    add_definitions(-DHAVE_ICONV)
+    if(ICONV_SECOND_ARGUMENT_IS_CONST)
+        add_definitions(-DICONV_SECOND_ARGUMENT_IS_CONST)
+    endif()
+endif()
 
 # if(MINGW)
 #     check_function_exists(__mingw_printf HAVE_MINGW_PRINTF)
@@ -562,6 +572,10 @@ endif()
 
 if(INSTALL_DOC)
     install(FILES AUTHORS COPYING NEWS README extras/rpc-spec.txt extras/send-email-when-torrent-done.sh DESTINATION ${CMAKE_INSTALL_DOCDIR})
+endif()
+
+if(MSVC AND ENABLE_DAEMON AND ENABLE_QT AND ENABLE_UTILS AND USE_QT5 AND WITH_CRYPTO STREQUAL "openssl")
+    add_subdirectory(dist/msi)
 endif()
 
 set(CPACK_SOURCE_GENERATOR TBZ2)

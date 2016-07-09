@@ -161,7 +161,7 @@ test1 (void)
     check (tr_variantIsDict (args));
     check ((ids = tr_variantDictFind (args, TR_KEY_ids)));
     check (tr_variantIsList (ids));
-    check_int_eq (2, tr_variantListSize (ids));
+    check_uint_eq (2, tr_variantListSize (ids));
     check (tr_variantGetInt (tr_variantListChild (ids, 0), &i));
     check_int_eq (7, i);
     check (tr_variantGetInt (tr_variantListChild (ids, 1), &i));

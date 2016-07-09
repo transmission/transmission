@@ -11,10 +11,9 @@
  #error only libtransmission should #include this header.
 #endif
 
-#include "variant.h"
+#pragma once
 
-#ifndef TR_RPC_SERVER_H
-#define TR_RPC_SERVER_H
+#include "variant.h"
 
 typedef struct tr_rpc_server tr_rpc_server;
 
@@ -65,4 +64,3 @@ bool            tr_rpcIsPasswordEnabled (const tr_rpc_server * session);
 
 const char*     tr_rpcGetBindAddress (const tr_rpc_server * server);
 
-#endif

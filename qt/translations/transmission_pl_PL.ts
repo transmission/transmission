@@ -43,7 +43,7 @@
 <context>
     <name>Application</name>
     <message>
-        <location filename="../Application.cc" line="+288"/>
+        <location filename="../Application.cc" line="+279"/>
         <source>&lt;b&gt;Transmission is a file sharing program.&lt;/b&gt;</source>
         <translation>&lt;b&gt;Transmission to program do dzielenia się plikami.&lt;/b&gt;</translation>
     </message>
@@ -58,7 +58,7 @@
         <translation>&amp;Zgadzam się</translation>
     </message>
     <message>
-        <location line="+93"/>
+        <location line="+85"/>
         <source>Torrent Completed</source>
         <translation>Ukończono pobieranie</translation>
     </message>
@@ -2197,7 +2197,7 @@ By dodać inny główny URL, wpisz go po pustej linii.</translation>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../Application.cc" line="-256"/>
+        <location filename="../Application.cc" line="-241"/>
         <source>Invalid option</source>
         <translation>Nieprawidłowa opcja</translation>
     </message>

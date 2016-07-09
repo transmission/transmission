@@ -299,12 +299,16 @@
 
 - (void) ruleEditorRowsDidChange: (NSNotification *) notification
 {
-    const CGFloat heightDifference = [fRuleEditor numberOfRows] * [fRuleEditor rowHeight] - [fRuleEditor frame].size.height;
-    NSRect windowFrame = [fRuleEditor window].frame;
-    windowFrame.size.height += heightDifference;
-    windowFrame.origin.y -= heightDifference;
+    NSScrollView * ruleEditorScrollView = [fRuleEditor enclosingScrollView];
     
-    [fRuleEditor.window setFrame: windowFrame display: YES animate: YES];
+    const CGFloat rowHeight = [fRuleEditor rowHeight];
+    const CGFloat bordersHeight = [ruleEditorScrollView frame].size.height - [ruleEditorScrollView contentSize].height;
+
+    const CGFloat requiredRowCount = [fRuleEditor numberOfRows];
+    const CGFloat maxVisibleRowCount = (long)((NSHeight([[[fRuleEditor window] screen] visibleFrame]) * 2 / 3) / rowHeight);
+    
+    [fRuleEditorHeightConstraint setConstant: MIN(requiredRowCount, maxVisibleRowCount) * rowHeight + bordersHeight];
+    [ruleEditorScrollView setHasVerticalScroller: requiredRowCount > maxVisibleRowCount];
 }
 
 @end

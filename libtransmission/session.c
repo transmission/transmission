@@ -250,7 +250,7 @@ tr_sessionGetPublicAddress (const tr_session * session, int tr_af_type, bool * i
     }
 
   if (is_default_value && bindinfo)
-    *is_default_value = !tr_strcmp0 (default_value, tr_address_to_string (&bindinfo->addr));
+    *is_default_value = tr_strcmp0 (default_value, tr_address_to_string (&bindinfo->addr)) == 0;
 
   return bindinfo ? &bindinfo->addr : NULL;
 }
@@ -991,7 +991,7 @@ tr_sessionGetDirFreeSpace (tr_session * session, const char * dir)
 {
   int64_t free_space;
 
-  if (!tr_strcmp0 (dir, tr_sessionGetDownloadDir (session)))
+  if (tr_strcmp0 (dir, tr_sessionGetDownloadDir (session)) == 0)
     free_space = tr_device_info_get_free_space (session->downloadDir);
   else
     free_space = tr_getDirFreeSpace (dir);
@@ -2263,7 +2263,7 @@ tr_stringEndsWith (const char * str, const char * end)
   const size_t slen = strlen (str);
   const size_t elen = strlen (end);
 
-  return slen >= elen && !memcmp (&str[slen - elen], end, elen);
+  return slen >= elen && memcmp (&str[slen - elen], end, elen) == 0;
 }
 
 static void

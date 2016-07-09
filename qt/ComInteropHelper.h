@@ -7,8 +7,7 @@
  * $Id$
  */
 
-#ifndef QTR_COM_INTEROP_HELPER_H
-#define QTR_COM_INTEROP_HELPER_H
+#pragma once
 
 #include <memory>
 
@@ -34,4 +33,3 @@ class ComInteropHelper
     std::unique_ptr<QAxObject> m_client;
 };
 
-#endif // QTR_COM_INTEROP_HELPER_H

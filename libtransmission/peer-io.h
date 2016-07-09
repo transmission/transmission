@@ -8,11 +8,10 @@
  */
 
 #ifndef __TRANSMISSION__
-#error only libtransmission should #include this header.
+ #error only libtransmission should #include this header.
 #endif
 
-#ifndef TR_PEER_IO_H
-#define TR_PEER_IO_H
+#pragma once
 
 /**
 ***
@@ -398,4 +397,3 @@ static inline struct evbuffer * tr_peerIoGetReadBuffer (tr_peerIo * io)
 
 /* @} */
 
-#endif

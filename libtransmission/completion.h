@@ -11,8 +11,7 @@
  #error only libtransmission should #include this header.
 #endif
 
-#ifndef TR_COMPLETION_H
-#define TR_COMPLETION_H
+#pragma once
 
 #include "transmission.h"
 #include "bitfield.h"
@@ -142,5 +141,3 @@ tr_cpInvalidateDND (tr_completion * cp)
   cp->sizeWhenDoneIsDirty = true;
 }
 
-
-#endif

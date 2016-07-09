@@ -7,8 +7,7 @@
  * $Id$
  */
 
-#ifndef GTR_ACTIONS_H
-#define GTR_ACTIONS_H
+#pragma once
 
 #include <gtk/gtk.h>
 #include "tr-core.h"
@@ -28,4 +27,3 @@ void        gtr_action_set_toggled (const char * action_name, gboolean is_toggle
 void        gtr_action_set_important (const char * action_name, gboolean is_important);
 GtkWidget*  gtr_action_get_widget  (const char * path);
 
-#endif

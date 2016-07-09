@@ -32,11 +32,11 @@ testPeerId (void)
         tr_peerIdInit (peer_id);
 
         check (strlen ((char*)peer_id) == PEER_ID_LEN);
-        check (!memcmp (peer_id, PEERID_PREFIX, 8));
+        check (memcmp (peer_id, PEERID_PREFIX, 8) == 0);
 
         for (j = 8; j < PEER_ID_LEN; ++j)
         {
-            char tmp[2] = { peer_id[j], '\0' };
+            char tmp[2] = { (char)peer_id[j], '\0' };
             val += strtoul (tmp, NULL, 36);
         }
 

@@ -3,8 +3,8 @@ dnl STATUS: "X" for prerelease beta builds,
 dnl         "Z" for unsupported trunk builds,
 dnl         "0" for stable, supported releases
 dnl these should be the only two lines you need to change
-m4_define([user_agent_prefix],[2.84+])
-m4_define([peer_id_prefix],[-TR284Z-])
+m4_define([user_agent_prefix],[2.92+])
+m4_define([peer_id_prefix],[-TR292Z-])
 
 AC_INIT([transmission],[user_agent_prefix],[http://trac.transmissionbt.com/newticket])
 AC_SUBST(USERAGENT_PREFIX,[user_agent_prefix])
@@ -107,7 +107,7 @@ AC_HEADER_STDC
 AC_HEADER_TIME
 
 AC_CHECK_HEADERS([stdbool.h xlocale.h])
-AC_CHECK_FUNCS([iconv_open pread pwrite lrintf strlcpy daemon dirname basename canonicalize_file_name strcasecmp localtime_r fallocate64 posix_fallocate memmem strsep strtold syslog valloc getpagesize posix_memalign statvfs htonll ntohll mkdtemp uselocale _configthreadlocale])
+AC_CHECK_FUNCS([iconv pread pwrite lrintf strlcpy daemon dirname basename canonicalize_file_name strcasecmp localtime_r fallocate64 posix_fallocate memmem strsep strtold syslog valloc getpagesize posix_memalign statvfs htonll ntohll mkdtemp uselocale _configthreadlocale])
 AC_PROG_INSTALL
 AC_PROG_MAKE_SET
 ACX_PTHREAD
@@ -240,15 +240,15 @@ dnl
 dnl file monitoring for the daemon
 
 # Check whether to enable systemd startup notification.
-# This requires libsystemd-daemon.
-AC_ARG_WITH([systemd-daemon], AS_HELP_STRING([--with-systemd-daemon],
+# This requires libsystemd.
+AC_ARG_WITH([systemd], AS_HELP_STRING([--with-systemd],
             [Add support for systemd startup notification (default is autodetected)]),
-            [USE_SYSTEMD_DAEMON=$withval], [USE_SYSTEMD_DAEMON=auto])
-AS_IF([test "x$USE_SYSTEMD_DAEMON" != "xno"], [
-    PKG_CHECK_MODULES([SYSTEMD_DAEMON], [libsystemd-daemon],
-        [AC_DEFINE(USE_SYSTEMD_DAEMON,1,[Use systemd startup notification])],
-        [AS_IF([test "x$USE_SYSTEMD_DAEMON" = "xyes"],
-            [AC_MSG_ERROR([systemd startup notification support requested, but libsystemd-daemon not found.])]
+            [USE_SYSTEMD=$withval], [USE_SYSTEMD=auto])
+AS_IF([test "x$USE_SYSTEMD" != "xno"], [
+    PKG_CHECK_MODULES([SYSTEMD], [libsystemd],
+        [AC_DEFINE(USE_SYSTEMD,1,[Use systemd startup notification])],
+        [AS_IF([test "x$USE_SYSTEMD" = "xyes"],
+            [AC_MSG_ERROR([systemd startup notification support requested, but libsystemd not found.])]
         )]
     )
 ])

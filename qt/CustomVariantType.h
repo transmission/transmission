@@ -7,8 +7,7 @@
  * $Id$
  */
 
-#ifndef QTR_TYPES_H
-#define QTR_TYPES_H
+#pragma once
 
 #include <QVariant>
 
@@ -25,4 +24,3 @@ class CustomVariantType
     };
 };
 
-#endif // QTR_TYPES_H

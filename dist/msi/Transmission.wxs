@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+
+  <?include TransmissionConfig.wxi ?>
+
+  <?if $(sys.BUILDARCH) = x64 ?>
+    <?define ProductName = "Transmission $(var.TrVersionFull) (x64)" ?>
+    <?define PlatformProgramFilesFolder = "ProgramFiles64Folder" ?>
+  <?else ?>
+    <?define ProductName = "Transmission $(var.TrVersionFull)" ?>
+    <?define PlatformProgramFilesFolder = "ProgramFilesFolder" ?>
+  <?endif ?>
+
+  <Product Name="$(var.ProductName)" Id="*" UpgradeCode="1FB3C295-9BD4-4248-8C8B-B85CD11FE7C4" Language="1033" Codepage="1252" Version="$(var.TrVersionMsi)" Manufacturer="Transmission Project">
+    <Package Id="*" Keywords="Installer" Description="Transmission $(var.TrVersion) Installer" Comments="A Fast, Easy, and Free BitTorrent Client" Manufacturer="Transmission Project" InstallerVersion="500" InstallScope="perMachine" Languages="1033" Compressed="yes" SummaryCodepage="1252" />
+    <MajorUpgrade DowngradeErrorMessage="A later version of [ProductName] is already installed. Setup will now exit." AllowSameVersionUpgrades="yes" />
+
+    <Condition Message="This application is only supported on Windows Vista, Windows Server 2008, or higher.">
+      Installed OR (VersionNT &gt;= 600)
+    </Condition>
+
+    <Property Id="TRQTWINSTALLDIR">
+      <RegistrySearch Id="TrQtWRegSearch" Root="HKLM" Key="SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Transmission-Qt" Name="InstallLocation" Type="directory" Win64="no"/>
+      <RegistrySearch Id="TrQtWRegSearch64" Root="HKLM" Key="SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Transmission-Qt" Name="InstallLocation" Type="directory" Win64="yes"/>
+    </Property>
+    <Condition Message="Another version of Transmission is already installed at &quot;[TRQTWINSTALLDIR]&quot;. Uninstall it first and then try again.">
+      NOT TRQTWINSTALLDIR
+    </Condition>
+
+    <Media Id="1" Cabinet="main.cab" EmbedCab="yes" DiskPrompt="CD-ROM #1" />
+    <Property Id="DiskPrompt" Value="Transmission $(var.TrVersion) Installation [1]" />
+
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Merge Id="VCRedist" SourceFile="$(env.CommonProgramFiles(x86))\Merge Modules\Microsoft_VC140_CRT_$(sys.BUILDARCH).msm" DiskId="1" Language="0" />
+      <Directory Id="$(var.PlatformProgramFilesFolder)" Name="PFiles">
+        <Directory Id="INSTALLDIR" Name="Transmission">
+          <Directory Id="WEBINSTALLDIR" Name="web" />
+        </Directory>
+      </Directory>
+      <Directory Id="ProgramMenuFolder" Name="Programs"/>
+      <Directory Id="DesktopFolder" Name="Desktop" />
+    </Directory>
+
+    <Feature Id="CompleteInstall" Title="Transmission" Level="1" AllowAdvertise="no" Display="expand" ConfigurableDirectory="INSTALLDIR">
+      <Feature Id="VCRedist" Title="Visual C++ 14.0 Runtime" Level="1" AllowAdvertise="no" Display="hidden">
+        <MergeRef Id="VCRedist" />
+      </Feature>
+      <Feature Id="CommonLibs" Level="1" AllowAdvertise="no" Display="hidden">
+        <ComponentGroupRef Id="CommonLibsComponents" />
+      </Feature>
+      <Feature Id="QtClient" Title="Qt client" Description="Native GUI application with local and remote sessions support." Level="1" AllowAdvertise="no">
+        <ComponentGroupRef Id="QtClientComponents" />
+      </Feature>
+      <Feature Id="Daemon" Title="Daemon" Description="Background service accessible with Qt client, web UI, or remote CLI tool." Level="2" AllowAdvertise="no">
+        <ComponentGroupRef Id="DaemonComponents" />
+      </Feature>
+      <Feature Id="CmdTools" Title="Command-line tools" Description="Various command-line tools useful for scripting (remote, create, edit, show)." Level="2" AllowAdvertise="no">
+        <ComponentGroupRef Id="CliToolsComponents" />
+      </Feature>
+      <Feature Id="WebUi" Title="Web interface" Description="Web UI to access Qt client or daemon via web browser." Level="2" AllowAdvertise="no">
+        <ComponentGroupRef Id="WebUiComponents" />
+      </Feature>
+    </Feature>
+
+    <UIRef Id="WixUI_FeatureTree" />
+    <UIRef Id="WixUI_ErrorProgressText" />
+
+    <WixVariable Id="WixUILicenseRtf" Value="$(var.LicenseFile)" />
+
+    <Icon Id="Tr.ico" SourceFile="Transmission.ico" />
+    <Property Id="ARPPRODUCTICON" Value="Tr.ico" />
+
+    <Property Id="ARPURLINFOABOUT" Value="https://www.transmissionbt.com/" />
+    <Property Id="ARPHELPLINK" Value="https://forum.transmissionbt.com/" />
+  </Product>
+
+</Wix>

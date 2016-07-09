@@ -123,7 +123,7 @@ compareStops (const void * va, const void * vb)
         return i;
 
     /* secondary key: the torrent's info_hash */
-    if ((i = memcmp (a->info_hash, b->info_hash, SHA_DIGEST_LENGTH)))
+    if ((i = memcmp (a->info_hash, b->info_hash, SHA_DIGEST_LENGTH)) != 0)
         return i;
 
     /* tertiary key: the tracker's announec url */
@@ -591,9 +591,9 @@ filter_trackers (tr_tracker_info * input, int input_count, int * setme_count)
              */
             for (j=0, jn=n; !is_duplicate && j<jn; ++j)
                 is_duplicate = (tmp[j].port==port)
-                            && !strcmp (tmp[j].scheme,scheme)
-                            && !strcmp (tmp[j].host,host)
-                            && !strcmp (tmp[j].path,path);
+                            && strcmp (tmp[j].scheme, scheme) == 0
+                            && strcmp (tmp[j].host, host) == 0
+                            && strcmp (tmp[j].path, path) == 0;
 
             if (is_duplicate) {
                 tr_free (path);
@@ -617,8 +617,8 @@ filter_trackers (tr_tracker_info * input, int input_count, int * setme_count)
         for (j=i+1, jn=n; j<jn; ++j)
             if ((tmp[i].info.tier!=tmp[j].info.tier)
                        && (tmp[i].port==tmp[j].port)
-                       && !tr_strcmp0 (tmp[i].host,tmp[j].host)
-                       && !tr_strcmp0 (tmp[i].path,tmp[j].path))
+                       && tr_strcmp0 (tmp[i].host, tmp[j].host) == 0
+                       && tr_strcmp0 (tmp[i].path, tmp[j].path) == 0)
                 tmp[j].info.tier = tmp[i].info.tier;
 
     /* sort them, for two reasons:
@@ -1220,9 +1220,9 @@ announce_request_delegate (tr_announcer               * announcer,
              request->peer_id);
 #endif
 
-    if (!memcmp (request->url, "http", 4))
+    if (memcmp (request->url, "http", 4) == 0)
         tr_tracker_http_announce (session, request, callback, callback_data);
-    else if (!memcmp (request->url, "udp://", 6))
+    else if (memcmp (request->url, "udp://", 6) == 0)
         tr_tracker_udp_announce (session, request, callback, callback_data);
     else
         tr_logAddError ("Unsupported url: %s", request->url);
@@ -1298,7 +1298,7 @@ find_tier (tr_torrent * tor, const char * scrape)
 
     for (i=0; tt && i<tt->tier_count; ++i) {
         const tr_tracker * const tracker = tt->tiers[i].currentTracker;
-        if (tracker && !tr_strcmp0 (scrape, tracker->scrape))
+        if (tracker != NULL && tr_strcmp0 (scrape, tracker->scrape) == 0)
             return &tt->tiers[i];
     }
 
@@ -1399,9 +1399,9 @@ scrape_request_delegate (tr_announcer             * announcer,
 {
     tr_session * session = announcer->session;
 
-    if (!memcmp (request->url, "http", 4))
+    if (memcmp (request->url, "http", 4) == 0)
         tr_tracker_http_scrape (session, request, callback, callback_data);
-    else if (!memcmp (request->url, "udp://", 6))
+    else if (memcmp (request->url, "udp://", 6) == 0)
         tr_tracker_udp_scrape (session, request, callback, callback_data);
     else
         tr_logAddError ("Unsupported url: %s", request->url);
@@ -1432,7 +1432,7 @@ multiscrape (tr_announcer * announcer, tr_ptrArray * tiers)
 
             if (req->info_hash_count >= TR_MULTISCRAPE_MAX)
                 continue;
-            if (tr_strcmp0 (req->url, url))
+            if (tr_strcmp0 (req->url, url) != 0)
                 continue;
 
             memcpy (req->info_hash[req->info_hash_count++], hash, SHA_DIGEST_LENGTH);
@@ -1713,7 +1713,7 @@ copy_tier_attributes_impl (struct tr_tier * tgt, int trackerIndex, const tr_tier
 
     /* sanity clause */
     assert (trackerIndex < tgt->tracker_count);
-    assert (!tr_strcmp0 (tgt->trackers[trackerIndex].announce, src->currentTracker->announce));
+    assert (tr_strcmp0 (tgt->trackers[trackerIndex].announce, src->currentTracker->announce) == 0);
 
     /* bitwise copy will handle most of tr_tier's fields... */
     *tgt = *src;
@@ -1742,7 +1742,7 @@ copy_tier_attributes (struct tr_torrent_tiers * tt, const tr_tier * src)
     /* find a tier (if any) which has a match for src->currentTracker */
     for (i=0; !found && i<tt->tier_count; ++i)
         for (j=0; !found && j<tt->tiers[i].tracker_count; ++j)
-            if ((found = !tr_strcmp0 (src->currentTracker->announce, tt->tiers[i].trackers[j].announce)))
+            if ((found = tr_strcmp0 (src->currentTracker->announce, tt->tiers[i].trackers[j].announce) == 0))
                 copy_tier_attributes_impl (&tt->tiers[i], j, src);
 }
 

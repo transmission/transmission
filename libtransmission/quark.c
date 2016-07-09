@@ -411,7 +411,7 @@ compareKeys (const void * va, const void * vb)
 
   ret = memcmp (a->str, b->str, MIN (a->len, b->len));
 
-  if (!ret && (a->len != b->len))
+  if (ret == 0 && a->len != b->len)
     ret = a->len < b->len ? -1 : 1;
 
   return ret;

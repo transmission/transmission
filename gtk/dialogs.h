@@ -22,8 +22,7 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#ifndef GTR_DIALOGS_H
-#define GTR_DIALOGS_H
+#pragma once
 
 #include "tr-core.h"
 #include "util.h"
@@ -36,4 +35,3 @@ void gtr_confirm_remove (GtkWindow * parent,
                           GSList    * gtorrents,
                           gboolean    doDelete);
 
-#endif /* GTR_DIALOGS_H */

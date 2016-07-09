@@ -200,7 +200,6 @@ include_directories(
     ${ZLIB_INCLUDE_DIRS}
     ${CRYPTO_INCLUDE_DIRS}
     ${CURL_INCLUDE_DIRS}
-    ${ICONV_INCLUDE_DIRS}
     ${EVENT2_INCLUDE_DIRS}
     ${NATPMP_INCLUDE_DIRS}
     ${MINIUPNPC_INCLUDE_DIRS}
@@ -208,6 +207,10 @@ include_directories(
     ${UTP_INCLUDE_DIRS}
     ${B64_INCLUDE_DIRS}
 )
+
+if(ICONV_FOUND)
+    include_directories(${ICONV_INCLUDE_DIRS})
+endif()
 
 if(ENABLE_UTP)
     include_directories(${TP_TOP}/libutp)
@@ -233,7 +236,6 @@ target_link_libraries(${TR_NAME}
     ${ZLIB_LIBRARIES}
     ${CRYPTO_LIBRARIES}
     ${CURL_LIBRARIES}
-    ${ICONV_LIBRARIES}
     ${EVENT2_LIBRARIES}
     ${NATPMP_LIBRARIES}
     ${MINIUPNPC_LIBRARIES}
@@ -243,6 +245,10 @@ target_link_libraries(${TR_NAME}
     ${LIBINTL_LIBRARY}
     ${LIBM_LIBRARY}
 )
+
+if(ICONV_FOUND)
+    target_link_libraries(${TR_NAME} ${ICONV_LIBRARIES})
+endif()
 
 if(WIN32)
     target_link_libraries(${TR_NAME} iphlpapi ws2_32)
@@ -259,11 +265,22 @@ if(ENABLE_TESTS)
 
     set(crypto-test_ADD_SOURCES crypto-test-ref.h)
 
+    set(watchdir@generic-test_DEFINITIONS WATCHDIR_TEST_FORCE_GENERIC)
+
     foreach(T bitfield blocklist clients crypto error file history json magnet metainfo move peer-msgs quark rename rpc session
-              tr-getopt utils variant watchdir)
+              tr-getopt utils variant watchdir watchdir@generic)
         set(TP ${TR_NAME}-test-${T})
-        add_executable(${TP} ${T}-test.c ${${T}-test_ADD_SOURCES})
+        if(T MATCHES "^([^@]+)@.+$")
+            string(REPLACE "@" "_" TP "${TP}")
+            set(${TP}_TEST_BASENAME "${CMAKE_MATCH_1}")
+        else()
+            set(${TP}_TEST_BASENAME "${T}")
+        endif()
+        add_executable(${TP} ${${TP}_TEST_BASENAME}-test.c ${${T}-test_ADD_SOURCES})
         target_link_libraries(${TP} ${TR_NAME} ${TR_NAME}-test)
+        if(DEFINED ${T}-test_DEFINITIONS)
+            target_compile_definitions(${TP} PRIVATE ${${T}-test_DEFINITIONS})
+        endif()
         add_test(NAME ${T} COMMAND ${TP})
         set_property(TARGET ${TP} PROPERTY FOLDER "UnitTests")
     endforeach()

@@ -7,8 +7,7 @@
  * $Id$
  */
 
-#ifndef GTR_HIG_H
-#define GTR_HIG_H
+#pragma once
 
 #include <gtk/gtk.h>
 
@@ -73,4 +72,3 @@ enum
     GUI_PAD_LARGE = 12
 };
 
-#endif /* GTR_HIG_H */

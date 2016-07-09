@@ -7,8 +7,7 @@
  * $Id$
  */
 
-#ifndef QTR_FORMATTER_H
-#define QTR_FORMATTER_H
+#pragma once
 
 #include <cstdint> // int64_t
 
@@ -55,4 +54,3 @@ class Formatter
     static QString unitStrings[3][5];
 };
 
-#endif // QTR_FORMATTER_H

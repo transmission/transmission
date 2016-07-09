@@ -39,6 +39,8 @@
     
     IBOutlet NSWindow * fGroupRulesSheetWindow;
     IBOutlet NSPredicateEditor * fRuleEditor;
+
+    IBOutlet NSLayoutConstraint * fRuleEditorHeightConstraint;
 }
 
 - (void) addRemoveGroup: (id) sender;

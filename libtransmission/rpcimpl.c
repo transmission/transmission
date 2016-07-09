@@ -154,7 +154,7 @@ getTorrents (tr_session * session,
     }
   else if (tr_variantDictFindStr (args, TR_KEY_ids, &str, NULL))
     {
-      if (!strcmp (str, "recently-active"))
+      if (strcmp (str, "recently-active") == 0)
         {
           tr_torrent * tor = NULL;
           const time_t now = tr_time ();
@@ -935,7 +935,7 @@ torrentGet (tr_session               * session,
 
   assert (idle_data == NULL);
 
-  if (tr_variantDictFindStr (args_in, TR_KEY_ids, &strVal, NULL) && !strcmp (strVal, "recently-active"))
+  if (tr_variantDictFindStr (args_in, TR_KEY_ids, &strVal, NULL) && strcmp (strVal, "recently-active") == 0)
     {
       int n = 0;
       tr_variant * d;
@@ -1053,7 +1053,7 @@ findAnnounceUrl (const tr_tracker_info * t, int n, const char * url, int * pos)
 
   for (i=0; i<n; ++i)
     {
-      if (!strcmp (t[i].announce, url))
+      if (strcmp (t[i].announce, url) == 0)
         {
           found = true;
 
@@ -1674,9 +1674,9 @@ isCurlURL (const char * filename)
   if (filename == NULL)
     return false;
 
-  return !strncmp (filename, "ftp://", 6) ||
-         !strncmp (filename, "http://", 7) ||
-         !strncmp (filename, "https://", 8);
+  return strncmp (filename, "ftp://", 6) == 0 ||
+         strncmp (filename, "http://", 7) == 0 ||
+         strncmp (filename, "https://", 8) == 0;
 }
 
 static tr_file_index_t*
@@ -1804,7 +1804,7 @@ torrentAdd (tr_session               * session,
           tr_ctorSetMetainfo (ctor, (uint8_t*)metainfo, len);
           tr_free (metainfo);
         }
-      else if (!strncmp (fname, "magnet:?", 8))
+      else if (strncmp (fname, "magnet:?", 8) == 0)
         {
           tr_ctorSetMetainfoFromMagnetLink (ctor, fname);
         }
@@ -1978,9 +1978,9 @@ sessionSet (tr_session               * session,
 
   if (tr_variantDictFindStr (args_in, TR_KEY_encryption, &str, NULL))
     {
-      if (!tr_strcmp0 (str, "required"))
+      if (tr_strcmp0 (str, "required") == 0)
         tr_sessionSetEncryption (session, TR_ENCRYPTION_REQUIRED);
-      else if (!tr_strcmp0 (str, "tolerated"))
+      else if (tr_strcmp0 (str, "tolerated") == 0)
         tr_sessionSetEncryption (session, TR_CLEAR_PREFERRED);
       else
         tr_sessionSetEncryption (session, TR_ENCRYPTION_PREFERRED);
@@ -2225,7 +2225,7 @@ tr_rpc_request_exec_json (tr_session            * session,
       const int n = TR_N_ELEMENTS (methods);
 
       for (i=0; i<n; ++i)
-        if (!strcmp (str, methods[i].name))
+        if (strcmp (str, methods[i].name) == 0)
           break;
 
       if (i ==n)
@@ -2350,7 +2350,7 @@ tr_rpc_request_exec_uri (tr_session           * session,
       if (delim)
         {
           char * key = tr_strndup (pch, (size_t) (delim - pch));
-          int isArg = strcmp (key, "method") && strcmp (key, "tag");
+          bool isArg = strcmp (key, "method") != 0 && strcmp (key, "tag") != 0;
           tr_variant * parent = isArg ? args : &top;
 
           tr_rpc_parse_list_str (tr_variantDictAdd (parent, tr_quark_new (key, (size_t) (delim - pch))),

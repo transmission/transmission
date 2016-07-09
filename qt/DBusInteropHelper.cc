@@ -28,7 +28,7 @@ namespace
 bool
 DBusInteropHelper::isConnected () const
 {
-  return !QDBusConnection::sessionBus ().isConnected ();
+  return QDBusConnection::sessionBus ().isConnected ();
 }
 
 QVariant

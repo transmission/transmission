@@ -72,7 +72,7 @@
 		<true/>
 	</dict>
 	<key>NSHumanReadableCopyright</key>
-	<string>Copyright © 2005-2014 The Transmission Project</string>
+	<string>Copyright © 2005-2016 The Transmission Project</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
@@ -94,7 +94,7 @@
 	<key>SUAllowsAutomaticUpdates</key>
 	<false/>
 	<key>SUFeedURL</key>
-	<string>http://update.transmissionbt.com/appcast.xml</string>
+	<string>https://update.transmissionbt.com/appcast.xml</string>
 	<key>SUPublicDSAKeyFile</key>
 	<string>sparkle_dsa_pub.pem</string>
 	<key>SUScheduledCheckInterval</key>

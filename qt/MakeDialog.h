@@ -7,8 +7,7 @@
  * $Id$
  */
 
-#ifndef QTR_MAKE_DIALOG_H
-#define QTR_MAKE_DIALOG_H
+#pragma once
 
 #include <memory>
 
@@ -53,4 +52,3 @@ class MakeDialog: public BaseDialog
     std::unique_ptr<tr_metainfo_builder, void(*)(tr_metainfo_builder*)> myBuilder;
 };
 
-#endif // QTR_MAKE_DIALOG_H

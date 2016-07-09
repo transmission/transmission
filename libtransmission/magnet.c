@@ -111,7 +111,7 @@ tr_magnetParse (const char * uri)
   uint8_t sha1[SHA_DIGEST_LENGTH];
   tr_magnet_info * info = NULL;
 
-  if ((uri != NULL) && !memcmp (uri, "magnet:?", 8))
+  if (uri != NULL && memcmp (uri, "magnet:?", 8) == 0)
     {
       const char * walk;
 
@@ -137,7 +137,7 @@ tr_magnetParse (const char * uri)
           else
             vallen = strlen (val);
 
-          if ((keylen==2) && !memcmp (key, "xt", 2) && val && !memcmp (val, "urn:btih:", 9))
+          if (keylen == 2 && memcmp (key, "xt", 2) == 0 && val != NULL && memcmp (val, "urn:btih:", 9) == 0)
             {
               const char * hash = val + 9;
               const size_t hashlen = vallen - 9;
@@ -154,19 +154,19 @@ tr_magnetParse (const char * uri)
                 }
             }
 
-          if ((vallen > 0) && (keylen==2) && !memcmp (key, "dn", 2))
+          if (vallen > 0 && keylen == 2 && memcmp (key, "dn", 2) == 0)
             displayName = tr_http_unescape (val, vallen);
 
           if ((vallen > 0) && (trCount < MAX_TRACKERS))
             {
               int i;
-              if ((keylen==2) && !memcmp (key, "tr", 2))
+              if (keylen == 2 && memcmp (key, "tr", 2) == 0)
                 tr[trCount++] = tr_http_unescape (val, vallen);
               else if ((sscanf (key, "tr.%d=", &i) == 1) && (i >= 0)) /* ticket #3341 and #5134 */
                 tr[trCount++] = tr_http_unescape (val, vallen);
             }
 
-          if ((vallen > 0) && (keylen==2) && !memcmp (key, "ws", 2) && (wsCount < MAX_WEBSEEDS))
+          if (vallen > 0 && keylen == 2 && memcmp (key, "ws", 2) == 0 && wsCount < MAX_WEBSEEDS)
             ws[wsCount++] = tr_http_unescape (val, vallen);
 
           walk = next != NULL ? next + 1 : NULL;

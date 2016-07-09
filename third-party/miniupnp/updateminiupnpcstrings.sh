@@ -3,10 +3,10 @@
 # project miniupnp : http://miniupnp.free.fr/
 # (c) 2009 Thomas Bernard
 
-VERSION_FILE=$1
-TEMPLATE_FILE=$2
-FILE=$3
-TMPFILE=$3.tmp
+VERSION_FILE="$1"
+TEMPLATE_FILE="$2"
+FILE="$3"
+TMPFILE="$3.tmp"
 
 # detecting the OS name and version
 OS_NAME=`uname -s`
@@ -38,17 +38,17 @@ if [ "$OS_NAME" = "AmigaOS" ]; then
 fi
 
 echo "Detected OS [$OS_NAME] version [$OS_VERSION]"
-MINIUPNPC_VERSION=`cat ${VERSION_FILE}`
+MINIUPNPC_VERSION=`cat "${VERSION_FILE}"`
 echo "MiniUPnPc version [${MINIUPNPC_VERSION}]"
 
 EXPR="s|OS_STRING \".*\"|OS_STRING \"${OS_NAME}/${OS_VERSION}\"|"
 #echo $EXPR
-test -f ${FILE}.in
+test -f "${FILE}.in"
 echo "setting OS_STRING macro value to ${OS_NAME}/${OS_VERSION} in $FILE."
-sed -e "$EXPR" < $TEMPLATE_FILE > $TMPFILE
+sed -e "$EXPR" < "$TEMPLATE_FILE" > "$TMPFILE"
 
 EXPR="s|MINIUPNPC_VERSION_STRING \".*\"|MINIUPNPC_VERSION_STRING \"${MINIUPNPC_VERSION}\"|"
 echo "setting MINIUPNPC_VERSION_STRING macro value to ${MINIUPNPC_VERSION} in $FILE."
-sed -e "$EXPR" < $TMPFILE > $FILE
-rm $TMPFILE
+sed -e "$EXPR" < "$TMPFILE" > "$FILE"
+rm "$TMPFILE"
 

@@ -7,8 +7,7 @@
  * $Id$
  */
 
-#ifndef GTR_NOTIFY_H
-#define GTR_NOTIFY_H
+#pragma once
 
 #include "tr-core.h"
 
@@ -18,4 +17,3 @@ void gtr_notify_torrent_added   (const char * name);
 
 void gtr_notify_torrent_completed (TrCore * core, int torrent_id);
 
-#endif

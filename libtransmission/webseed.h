@@ -8,11 +8,10 @@
  */
 
 #ifndef __TRANSMISSION__
-#error only libtransmission should #include this header.
+ #error only libtransmission should #include this header.
 #endif
 
-#ifndef TR_WEBSEED_H
-#define TR_WEBSEED_H
+#pragma once
 
 typedef struct tr_webseed tr_webseed;
 
@@ -23,4 +22,3 @@ tr_webseed* tr_webseedNew (struct tr_torrent * torrent,
                            tr_peer_callback    callback,
                            void              * callback_data);
 
-#endif

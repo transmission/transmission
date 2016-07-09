@@ -7,8 +7,7 @@
  * $Id$
  */
 
-#ifndef QTR_OPTIONS_DIALOG_H
-#define QTR_OPTIONS_DIALOG_H
+#pragma once
 
 #include <QCryptographicHash>
 #include <QDir>
@@ -85,4 +84,3 @@ class OptionsDialog: public BaseDialog
     QTimer myEditTimer;
 };
 
-#endif // QTR_OPTIONS_DIALOG_H

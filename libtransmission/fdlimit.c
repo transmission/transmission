@@ -165,7 +165,12 @@ cached_file_open (struct tr_cached_file  * o,
   /* create subfolders, if any */
   if (writable)
     {
-      char * dir = tr_sys_path_dirname (filename, NULL);
+      char * dir = tr_sys_path_dirname (filename, &error);
+      if (dir == NULL)
+        {
+          tr_logAddError (_("Couldn't get directory for \"%1$s\": %2$s"), filename, error->message);
+          goto fail;
+        }
       if (!tr_sys_dir_create (dir, TR_SYS_DIR_CREATE_PARENTS, 0777, &error))
         {
           tr_logAddError (_("Couldn't create \"%1$s\": %2$s"), dir, error->message);

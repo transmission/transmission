@@ -8,11 +8,10 @@
  */
 
 #ifndef __TRANSMISSION__
-#error only libtransmission should #include this header.
+ #error only libtransmission should #include this header.
 #endif
 
-#ifndef SHARED_H
-#define SHARED_H 1
+#pragma once
 
 #include "transmission.h"
 
@@ -40,4 +39,3 @@ bool       tr_sharedTraversalIsEnabled (const tr_shared * s);
 int        tr_sharedTraversalStatus (const tr_shared *);
 
 /** @} */
-#endif

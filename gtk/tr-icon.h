@@ -7,8 +7,7 @@
  * $Id$
  */
 
-#ifndef GTR_ICON_H
-#define GTR_ICON_H
+#pragma once
 
 #include <gtk/gtk.h>
 #include "tr-core.h"
@@ -16,4 +15,3 @@
 gpointer  gtr_icon_new    (TrCore * core);
 void      gtr_icon_refresh (gpointer);
 
-#endif /* GTR_ICON_H */

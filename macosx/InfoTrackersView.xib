@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="9531" systemVersion="15B42" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="9531" systemVersion="15B42" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="9531"/>
@@ -18,11 +18,10 @@
             <rect key="frame" x="0.0" y="0.0" width="382" height="352"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <segmentedControl verticalHuggingPriority="750" id="4">
-                    <rect key="frame" x="9" y="8" width="71" height="18"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                    <segmentedCell key="cell" controlSize="mini" state="on" borderStyle="border" alignment="left" style="roundRect" trackingMode="momentary" id="5">
-                        <font key="font" metaFont="miniSystem"/>
+                <segmentedControl verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="4">
+                    <rect key="frame" x="11" y="11" width="71" height="18"/>
+                    <segmentedCell key="cell" controlSize="small" state="on" borderStyle="border" alignment="left" style="roundRect" trackingMode="momentary" id="5">
+                        <font key="font" metaFont="smallSystem"/>
                         <segments>
                             <segment image="NSAddTemplate" width="32"/>
                             <segment image="NSRemoveTemplate" width="32" tag="1"/>
@@ -32,21 +31,20 @@
                         <action selector="addRemoveTracker:" target="-2" id="16"/>
                     </connections>
                 </segmentedControl>
-                <scrollView autohidesScrollers="YES" horizontalLineScroll="59" horizontalPageScroll="10" verticalLineScroll="59" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" id="3">
-                    <rect key="frame" x="10" y="27" width="362" height="320"/>
-                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                <scrollView autohidesScrollers="YES" horizontalLineScroll="59" horizontalPageScroll="10" verticalLineScroll="59" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="3">
+                    <rect key="frame" x="12" y="36" width="358" height="304"/>
                     <clipView key="contentView" copiesOnScroll="NO" id="sFV-Gc-aEj">
-                        <rect key="frame" x="1" y="1" width="360" height="318"/>
+                        <rect key="frame" x="1" y="1" width="356" height="302"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" columnResizing="NO" autosaveColumns="NO" typeSelect="NO" rowHeight="57" id="6" customClass="TrackerTableView">
-                                <rect key="frame" x="0.0" y="0.0" width="360" height="59"/>
+                                <rect key="frame" x="0.0" y="0.0" width="356" height="59"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <size key="intercellSpacing" width="3" height="2"/>
                                 <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                 <tableColumns>
-                                    <tableColumn identifier="Tracker" width="357" minWidth="40" maxWidth="1000" id="9">
+                                    <tableColumn identifier="Tracker" width="353" minWidth="40" maxWidth="1000" id="9">
                                         <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left">
                                             <font key="font" metaFont="smallSystem"/>
                                             <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -68,16 +66,28 @@
                         </subviews>
                         <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </clipView>
-                    <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" doubleValue="0.0027777779999999998" horizontal="YES" id="7">
-                        <rect key="frame" x="-100" y="-100" width="372" height="15"/>
+                    <constraints>
+                        <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="150" placeholder="YES" id="9cv-V6-NW6"/>
+                        <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="300" placeholder="YES" id="9jz-rF-9Vf"/>
+                    </constraints>
+                    <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" doubleValue="0.0027777779999999998" controlSize="small" horizontal="YES" id="7">
+                        <rect key="frame" x="-100" y="-100" width="372" height="11"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </scroller>
                     <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" controlSize="small" horizontal="NO" id="8">
-                        <rect key="frame" x="350" y="1" width="11" height="138"/>
+                        <rect key="frame" x="346" y="1" width="11" height="0.0"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </scroller>
                 </scrollView>
             </subviews>
+            <constraints>
+                <constraint firstAttribute="trailing" secondItem="3" secondAttribute="trailing" constant="12" id="9Bs-yg-J47"/>
+                <constraint firstItem="3" firstAttribute="leading" secondItem="2" secondAttribute="leading" constant="12" id="EKy-Fd-QsG"/>
+                <constraint firstItem="3" firstAttribute="top" secondItem="2" secondAttribute="top" constant="12" id="TI3-QK-Ict"/>
+                <constraint firstAttribute="bottom" secondItem="4" secondAttribute="bottom" constant="12" id="WWe-3w-uSv"/>
+                <constraint firstItem="4" firstAttribute="top" secondItem="3" secondAttribute="bottom" constant="8" symbolic="YES" id="XN7-Nl-L9f"/>
+                <constraint firstItem="4" firstAttribute="leading" secondItem="3" secondAttribute="leading" id="Y7G-n2-OaR"/>
+            </constraints>
         </customView>
     </objects>
     <resources>

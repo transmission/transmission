@@ -398,9 +398,9 @@ OptionsDialog::onTimeout ()
   if (leftInPiece == 0)
     {
       const QByteArray result (myVerifyHash.result ());
-      const bool matches = !memcmp (result.constData (),
-                                    myInfo.pieces[myVerifyPieceIndex].hash,
-                                    SHA_DIGEST_LENGTH);
+      const bool matches = memcmp (result.constData (),
+                                   myInfo.pieces[myVerifyPieceIndex].hash,
+                                   SHA_DIGEST_LENGTH) == 0;
       myVerifyFlags[myVerifyPieceIndex] = matches;
       myVerifyPiecePos = 0;
       ++myVerifyPieceIndex;

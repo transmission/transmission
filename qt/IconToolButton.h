@@ -7,8 +7,7 @@
  * $Id$
  */
 
-#ifndef QTR_ICON_TOOL_BUTTON_H
-#define QTR_ICON_TOOL_BUTTON_H
+#pragma once
 
 #include <QToolButton>
 
@@ -27,4 +26,3 @@ class IconToolButton: public QToolButton
     virtual void paintEvent (QPaintEvent * event);
 };
 
-#endif // QTR_ICON_TOOL_BUTTON_H

@@ -8,11 +8,10 @@
  */
 
 #ifndef __TRANSMISSION__
-#error only libtransmission should #include this header.
+ #error only libtransmission should #include this header.
 #endif
 
-#ifndef TR_HANDSHAKE_H
-#define TR_HANDSHAKE_H
+#pragma once
 
 #include "transmission.h"
 #include "net.h"
@@ -51,4 +50,3 @@ struct tr_peerIo*      tr_handshakeStealIO (tr_handshake * handshake);
 
 
 /** @} */
-#endif

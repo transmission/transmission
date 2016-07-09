@@ -11,8 +11,7 @@
  #error only libtransmission should #include this header.
 #endif
 
-#ifndef TR_BITFIELD_H
-#define TR_BITFIELD_H 1
+#pragma once
 
 #include "transmission.h"
 
@@ -97,4 +96,3 @@ tr_bitfieldHasNone (const tr_bitfield * b)
 
 bool tr_bitfieldHas (const tr_bitfield * b, size_t n);
 
-#endif

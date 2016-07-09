@@ -7,8 +7,7 @@
  * $Id$
  */
 
-#ifndef QTR_WATCH_DIR_H
-#define QTR_WATCH_DIR_H
+#pragma once
 
 #include <QObject>
 #include <QSet>
@@ -55,4 +54,3 @@ class WatchDir: public QObject
     QFileSystemWatcher * myWatcher;
 };
 
-#endif // QTR_WATCH_DIR_H

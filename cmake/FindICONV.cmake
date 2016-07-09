@@ -22,8 +22,7 @@ if(ICONV_FOUND AND NOT DEFINED ICONV_SECOND_ARGUMENT_IS_CONST)
     set(CMAKE_REQUIRED_INCLUDES ${ICONV_INCLUDE_DIRS})
     set(CMAKE_REQUIRED_LIBRARIES ${ICONV_LIBRARIES})
 
-    check_c_source_compiles(
-        "
+    check_c_source_compiles("
         #include <iconv.h>
         int main ()
         {
@@ -34,7 +33,10 @@ if(ICONV_FOUND AND NOT DEFINED ICONV_SECOND_ARGUMENT_IS_CONST)
             size_t olen = 0;
             iconv (conv, &in, &ilen, &out, &olen);
             return 0;
-        }" ICONV_SECOND_ARGUMENT_IS_CONST)
+        }"
+        ICONV_SECOND_ARGUMENT_IS_CONST
+        FAIL_REGEX "incompatible pointer type"
+        FAIL_REGEX "discards qualifiers in nested pointer types")
 
     set(CMAKE_REQUIRED_INCLUDES)
     set(CMAKE_REQUIRED_LIBRARIES)

@@ -8,11 +8,10 @@
  */
 
 #ifndef __TRANSMISSION__
-#error only libtransmission should #include this header.
+ #error only libtransmission should #include this header.
 #endif
 
-#ifndef TR_BLOCKLIST_H
-#define TR_BLOCKLIST_H
+#pragma once
 
 struct tr_address;
 
@@ -40,4 +39,3 @@ bool               tr_blocklistFileHasAddress   (tr_blocklistFile        * b,
 int                tr_blocklistFileSetContent   (tr_blocklistFile        * b,
                                                  const char              * filename);
 
-#endif
