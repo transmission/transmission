@@ -1,4 +1,4 @@
-ABOUT
+## ABOUT
 
   Transmission is a fast, easy, and free BitTorrent client.
   It comes in several flavors:
@@ -10,7 +10,7 @@ ABOUT
 
   Visit http://www.transmissionbt.com/ for more information.
 
-BUILDING
+## BUILDING
 
   Transmission has an Xcode project file (Transmission.xcodeproj)
   for building in Xcode.
@@ -18,7 +18,7 @@ BUILDING
   For a more detailed description, and dependancies, visit:
   http://trac.transmissionbt.com/wiki/
 
-  Building a Transmission release from the command line:
+### Building a Transmission release from the command line:
 
     $ xz -d -c transmission-2.11.tar.xz | tar xf -
     $ cd transmission-2.11
@@ -26,7 +26,7 @@ BUILDING
     $ make
     $ sudo make install
 
-  Building Transmission from the nightly builds:
+###  Building Transmission from the nightly builds:
 
     Download a tarball from http://build.transmissionbt.com/job/trunk-linux-inc/
     and follow the steps from the previous section.
@@ -34,7 +34,7 @@ BUILDING
     If you're new to building programs from source code, this is typically 
     easier than building from SVN.
 
-  Building Transmission from SVN (First Time):
+###  Building Transmission from SVN (First Time):
 
     $ svn co svn://svn.transmissionbt.com/Transmission/trunk Transmission
     $ cd Transmission
@@ -42,7 +42,7 @@ BUILDING
     $ make
     $ sudo make install
 
-  Building Transmission from SVN (Updating):
+###  Building Transmission from SVN (Updating):
 
     $ cd Transmission
     $ make clean
@@ -52,4 +52,5 @@ BUILDING
     $ sudo make install
 
   Notes for building on Solaris' C compiler:  User av reports success with
-  this invocation: ./configure CC=c99 CXX=CC CFLAGS='-D__EXTENSIONS__ -mt'
+  this invocation: `./configure CC=c99 CXX=CC CFLAGS='-D__EXTENSIONS__ -mt'`
+  
