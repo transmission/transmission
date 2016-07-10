@@ -120,7 +120,7 @@ typedef enum
     
     NSMutableDictionary * removedIndexesForParents = nil; //ugly, but we can't modify the actual file nodes
     
-    NSArray * tempList = !text ? [fTorrent fileList] : [fTorrent flatFileList];
+    NSArray * tempList = [fTorrent fileList];
     for (FileListNode * item in tempList)
     {
         __block BOOL filter = NO;
