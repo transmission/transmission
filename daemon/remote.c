@@ -29,6 +29,13 @@
 #include <libtransmission/utils.h>
 #include <libtransmission/variant.h>
 #include <libtransmission/version.h>
+#include <errno.h>
+
+#ifdef _WIN32
+ #include <direct.h> /* _getcwd () */
+#else
+ #include <unistd.h> /* getcwd () */
+#endif
 
 #define MY_NAME "transmission-remote"
 #define DEFAULT_HOST "localhost"
@@ -57,6 +64,8 @@
 #define SPEED_M_STR "MB/s"
 #define SPEED_G_STR "GB/s"
 #define SPEED_T_STR "TB/s"
+
+#define TR_PATH_DELIMITER '/'
 
 /***
 ****
@@ -503,6 +512,58 @@ getEncodedMetainfo (const char * filename)
         tr_free (buf);
     }
     return b64;
+}
+
+static char*
+tr_getcwd (void)
+{
+  char * result;
+  char buf[2048];
+
+#ifdef WIN32
+  result = _getcwd (buf, sizeof (buf));
+#else
+  result = getcwd (buf, sizeof (buf));
+#endif
+
+  if (result == NULL)
+    {
+      fprintf (stderr, "getcwd error: \"%s\"", tr_strerror (errno));
+      *buf = '\0';
+    }
+
+  return tr_strdup (buf);
+}
+
+static char*
+absolutify (const char * path)
+{
+  char * buf;
+
+  if (*path == TR_PATH_DELIMITER)
+    {
+      buf = tr_strdup (path);
+    }
+  else
+    {
+      char * cwd = tr_getcwd ();
+
+  	  if (tr_strcmp0 (path, ".") == 0 || 
+  		  tr_strcmp0 (path, "./") == 0) 
+  	    {
+  	    	buf = tr_malloc ((strlen (cwd) + 1) * sizeof (char));
+              /*   reserve space for path delimiter	*/
+  	    	strncpy (buf, cwd, strlen (cwd));
+  	    	buf[strlen (cwd)] = TR_PATH_DELIMITER;
+  	    } 
+  	  else 
+    	{
+      	  buf = tr_buildPath (cwd, path, NULL);
+    	}
+      tr_free (cwd);
+    }
+
+  return buf;
 }
 
 static void
@@ -2216,8 +2277,10 @@ processArgs (const char * rpcurl, int argc, const char * const * argv)
             }
             case 'w':
             {
+                char * path = absolutify (optarg);
                 tr_variant * args = tadd ? tr_variantDictFind (tadd, TR_KEY_arguments) : ensure_sset (&sset);
-                tr_variantDictAddStr (args, TR_KEY_download_dir, optarg);
+                tr_variantDictAddStr (args, TR_KEY_download_dir, path);
+                tr_free (path);
                 break;
             }
             case 850:
