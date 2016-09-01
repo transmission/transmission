@@ -551,7 +551,7 @@ absolutify (const char * path)
   	  if (tr_strcmp0 (path, ".") == 0 || 
   		  tr_strcmp0 (path, "./") == 0) 
   	    {
-  	    	buf = tr_malloc ((strlen (cwd) + 1) * sizeof (char));
+  	    	buf = tr_malloc ((strlen (cwd) + 2) * sizeof (char));
               /*   reserve space for path delimiter	*/
   	    	strncpy (buf, cwd, strlen (cwd));
   	    	buf[strlen (cwd)] = TR_PATH_DELIMITER;
