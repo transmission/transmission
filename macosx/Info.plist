@@ -28,7 +28,7 @@
 	<key>CFBundleExecutable</key>
 	<string>Transmission</string>
 	<key>CFBundleGetInfoString</key>
-	<string>VERSION_STRING_INFOPLIST (SVN_REVISION_NUM)</string>
+	<string>VERSION_STRING_INFOPLIST (VCS_REVISION_NUM)</string>
 	<key>CFBundleHelpBookFolder</key>
 	<string>TransmissionHelp</string>
 	<key>CFBundleHelpBookName</key>
@@ -59,7 +59,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>SVN_REVISION_NUM</string>
+	<string>VCS_REVISION_NUM</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.utilities</string>
 	<key>LSMinimumSystemVersion</key>
