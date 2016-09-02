@@ -63,7 +63,6 @@ THE SOFTWARE.
 * This module implements the Local Peer Discovery (LPD) protocol as supported by the
 * uTorrent client application. A typical LPD datagram is 119 bytes long.
 *
-* $Id$
 */
 
 static void event_callback (evutil_socket_t, short, void*);

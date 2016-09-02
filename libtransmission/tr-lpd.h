@@ -26,8 +26,6 @@ THE SOFTWARE.
 
 #pragma once
 
-/* $Id$ */
-
 int  tr_lpdInit (tr_session*, tr_address*);
 void tr_lpdUninit (tr_session*);
 bool tr_lpdEnabled (const tr_session*);

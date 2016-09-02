@@ -4,7 +4,6 @@
  * It may be used under the GNU GPL versions 2 or 3
  * or any future license endorsed by Mnemosyne LLC.
  *
- * $Id$
  */
 
 #if defined (HAVE_USELOCALE) && (!defined (_XOPEN_SOURCE) || _XOPEN_SOURCE < 700)
