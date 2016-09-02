@@ -46,7 +46,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root)
-%doc AUTHORS NEWS README
+%doc AUTHORS NEWS README.md
 %attr(755,root,root) %{_bindir}/%{name}*
 %{_datadir}/applications/%{name}-gtk.desktop
 %{_datadir}/pixmaps/*

@@ -31,7 +31,7 @@ EXTRA_DIST = \
   NEWS \
   AUTHORS \
   COPYING \
-  README \
+  README.md \
   autogen.sh \
   update-version-h.sh \
   Transmission.xcodeproj/project.pbxproj

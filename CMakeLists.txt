@@ -571,7 +571,7 @@ if(ENABLE_GTK AND ENABLE_NLS)
 endif()
 
 if(INSTALL_DOC)
-    install(FILES AUTHORS COPYING NEWS README extras/rpc-spec.txt extras/send-email-when-torrent-done.sh DESTINATION ${CMAKE_INSTALL_DOCDIR})
+    install(FILES AUTHORS COPYING NEWS README.md extras/rpc-spec.txt extras/send-email-when-torrent-done.sh DESTINATION ${CMAKE_INSTALL_DOCDIR})
 endif()
 
 if(MSVC AND ENABLE_DAEMON AND ENABLE_QT AND ENABLE_UTILS AND USE_QT5 AND WITH_CRYPTO STREQUAL "openssl")
