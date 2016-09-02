@@ -20,28 +20,23 @@ peer_id_prefix=`grep m4_define configure.ac | sed "s/[][)(]/,/g" | grep peer_id_
 major_version=`echo ${user_agent_prefix} | awk -F . '{print $1}'`
 minor_version=`echo ${user_agent_prefix} | awk -F . '{print $2 + 0}'`
 
+vcs_revision=
 vcs_revision_file=REVISION
-vcs_revision_reliable=true
 
 if [ -n "$JENKINS_URL" -a -n "$VCS_REVISION" ]; then
     # Jenkins automated build, use the set environment variables to avoid
     # version mismatches between java's svn and command line's svn
     vcs_revision=$VCS_REVISION
-elif [ -d ".svn" ] && type svnversion >/dev/null 2>&1; then
-    # If this is a svn tree, and svnversion is available in PATH, use it to
-    # grab the version.
-    vcs_revision=`svnversion -n . | cut -d: -f1 | cut -dM -f1 | cut -dS -f1`
+elif [ -d ".git" ] && type git >/dev/null 2>&1; then
+    vcs_revision=`git rev-list --max-count=1 --abbrev-commit HEAD`
 elif [ -f "$vcs_revision_file" ]; then
     vcs_revision=`cat "$vcs_revision_file"`
-else
-    # Give up and check the source files
-    vcs_revision=`awk '/\\$Id: /{ if ($4>i) i=$4 } END {print i}' */*.cc */*.[chm] */*.po`
-    vcs_revision_reliable=false
 fi
 
-if $vcs_revision_reliable; then
+if [ -n "$vcs_revision" ]; then
     [ -f "$vcs_revision_file" ] && [ "`cat "$vcs_revision_file"`" = "$vcs_revision" ] || echo "$vcs_revision" > "$vcs_revision_file"
 else
+    vcs_revision=0
     rm -f "$vcs_revision_file"
 fi
 
