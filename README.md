@@ -6,13 +6,13 @@ Transmission is a fast, easy, and free BitTorrent client. It comes in several fl
   * A headless daemon for servers and routers
   * A web UI for remote controlling any of the above
 
-Visit http://www.transmissionbt.com/ for more information.
+Visit https://transmissionbt.com/ for more information.
 
 ## Building
 
 Transmission has an Xcode project file (Transmission.xcodeproj) for building in Xcode.
 
-For a more detailed description, and dependencies, visit: http://trac.transmissionbt.com/wiki/
+For a more detailed description, and dependencies, visit: https://github.com/transmission/transmission/wiki
 
 ### Building a Transmission release from the command line
 
@@ -24,7 +24,7 @@ For a more detailed description, and dependencies, visit: http://trac.transmissi
 
 ### Building Transmission from the nightly builds
 
-Download a tarball from http://build.transmissionbt.com/job/trunk-linux-inc/ and follow the steps from the previous section.
+Download a tarball from https://build.transmissionbt.com/job/trunk-linux-inc/ and follow the steps from the previous section.
 
 If you're new to building programs from source code, this is typically easier than building from SVN.
 
