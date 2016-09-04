@@ -32,7 +32,7 @@
 #include "version.h"
 #include "web.h"
 
-#define RPC_VERSION     15
+#define RPC_VERSION     16
 #define RPC_VERSION_MIN 1
 
 #define RECENTLY_ACTIVE_SECONDS 60
@@ -2039,71 +2039,264 @@ sessionStats (tr_session               * session,
   return NULL;
 }
 
+static void
+addSessionField (tr_session * s,
+                 tr_variant * d,
+                 tr_quark     key)
+{
+  switch (key)
+    {
+      case TR_KEY_alt_speed_up:
+        tr_variantDictAddInt (d, key, tr_sessionGetAltSpeed_KBps (s, TR_UP));
+        break;
+
+      case TR_KEY_alt_speed_down:
+        tr_variantDictAddInt (d, key, tr_sessionGetAltSpeed_KBps (s, TR_DOWN));
+        break;
+
+      case TR_KEY_alt_speed_enabled:
+        tr_variantDictAddBool (d, key, tr_sessionUsesAltSpeed (s));
+        break;
+
+      case TR_KEY_alt_speed_time_begin:
+        tr_variantDictAddInt (d, key, tr_sessionGetAltSpeedBegin (s));
+        break;
+
+      case TR_KEY_alt_speed_time_end:
+        tr_variantDictAddInt (d, key,tr_sessionGetAltSpeedEnd (s));
+        break;
+
+      case TR_KEY_alt_speed_time_day:
+        tr_variantDictAddInt (d, key,tr_sessionGetAltSpeedDay (s));
+        break;
+
+      case TR_KEY_alt_speed_time_enabled:
+        tr_variantDictAddBool (d, key, tr_sessionUsesAltSpeedTime (s));
+        break;
+
+      case TR_KEY_blocklist_enabled:
+        tr_variantDictAddBool (d, key, tr_blocklistIsEnabled (s));
+        break;
+
+      case TR_KEY_blocklist_url:
+        tr_variantDictAddStr (d, key, tr_blocklistGetURL (s));
+        break;
+
+      case TR_KEY_cache_size_mb:
+        tr_variantDictAddInt (d, key, tr_sessionGetCacheLimit_MB (s));
+        break;
+
+      case TR_KEY_blocklist_size:
+        tr_variantDictAddInt (d, key, tr_blocklistGetRuleCount (s));
+        break;
+
+      case TR_KEY_config_dir:
+        tr_variantDictAddStr (d, key, tr_sessionGetConfigDir (s));
+        break;
+
+      case TR_KEY_download_dir:
+        tr_variantDictAddStr (d, key, tr_sessionGetDownloadDir (s));
+        break;
+
+      case TR_KEY_download_dir_free_space:
+        tr_variantDictAddInt (d, key, tr_device_info_get_free_space (s->downloadDir));
+        break;
+
+      case TR_KEY_download_queue_enabled:
+        tr_variantDictAddBool (d, key, tr_sessionGetQueueEnabled (s, TR_DOWN));
+        break;
+
+      case TR_KEY_download_queue_size:
+        tr_variantDictAddInt (d, key, tr_sessionGetQueueSize (s, TR_DOWN));
+        break;
+
+      case TR_KEY_peer_limit_global:
+        tr_variantDictAddInt (d, key, tr_sessionGetPeerLimit (s));
+        break;
+
+      case TR_KEY_peer_limit_per_torrent:
+        tr_variantDictAddInt (d, key, tr_sessionGetPeerLimitPerTorrent (s));
+        break;
+
+      case TR_KEY_incomplete_dir:
+        tr_variantDictAddStr (d, key, tr_sessionGetIncompleteDir (s));
+        break;
+
+      case TR_KEY_incomplete_dir_enabled:
+        tr_variantDictAddBool (d, key, tr_sessionIsIncompleteDirEnabled (s));
+        break;
+
+      case TR_KEY_pex_enabled:
+        tr_variantDictAddBool (d, key, tr_sessionIsPexEnabled (s));
+        break;
+
+      case TR_KEY_utp_enabled:
+        tr_variantDictAddBool (d, key, tr_sessionIsUTPEnabled (s));
+        break;
+
+      case TR_KEY_dht_enabled:
+        tr_variantDictAddBool (d, key, tr_sessionIsDHTEnabled (s));
+        break;
+
+      case TR_KEY_lpd_enabled:
+        tr_variantDictAddBool (d, key, tr_sessionIsLPDEnabled (s));
+        break;
+
+      case TR_KEY_peer_port:
+        tr_variantDictAddInt (d, key, tr_sessionGetPeerPort (s));
+        break;
+
+      case TR_KEY_peer_port_random_on_start:
+        tr_variantDictAddBool (d, key, tr_sessionGetPeerPortRandomOnStart (s));
+        break;
+
+      case TR_KEY_port_forwarding_enabled:
+        tr_variantDictAddBool (d, key, tr_sessionIsPortForwardingEnabled (s));
+        break;
+
+      case TR_KEY_rename_partial_files:
+        tr_variantDictAddBool (d, key, tr_sessionIsIncompleteFileNamingEnabled (s));
+        break;
+
+      case TR_KEY_rpc_version:
+        tr_variantDictAddInt (d, key, RPC_VERSION);
+        break;
+
+      case TR_KEY_rpc_version_minimum:
+        tr_variantDictAddInt (d, key, RPC_VERSION_MIN);
+        break;
+
+      case TR_KEY_seedRatioLimit:
+        tr_variantDictAddReal (d, key, tr_sessionGetRatioLimit (s));
+        break;
+
+      case TR_KEY_seedRatioLimited:
+        tr_variantDictAddBool (d, key, tr_sessionIsRatioLimited (s));
+        break;
+
+      case TR_KEY_idle_seeding_limit:
+        tr_variantDictAddInt (d, key, tr_sessionGetIdleLimit (s));
+        break;
+
+      case TR_KEY_idle_seeding_limit_enabled:
+        tr_variantDictAddBool (d, key, tr_sessionIsIdleLimited (s));
+        break;
+
+      case TR_KEY_seed_queue_enabled:
+        tr_variantDictAddBool (d, key, tr_sessionGetQueueEnabled (s, TR_UP));
+        break;
+
+      case TR_KEY_seed_queue_size:
+        tr_variantDictAddInt (d, key, tr_sessionGetQueueSize (s, TR_UP));
+        break;
+
+      case TR_KEY_start_added_torrents:
+        tr_variantDictAddBool (d, key, !tr_sessionGetPaused (s));
+        break;
+
+      case TR_KEY_trash_original_torrent_files:
+        tr_variantDictAddBool (d, key, tr_sessionGetDeleteSource (s));
+        break;
+
+      case TR_KEY_speed_limit_up:
+        tr_variantDictAddInt (d, key, tr_sessionGetSpeedLimit_KBps (s, TR_UP));
+        break;
+
+      case TR_KEY_speed_limit_up_enabled:
+        tr_variantDictAddBool (d, key, tr_sessionIsSpeedLimited (s, TR_UP));
+        break;
+
+      case TR_KEY_speed_limit_down:
+        tr_variantDictAddInt (d, key, tr_sessionGetSpeedLimit_KBps (s, TR_DOWN));
+        break;
+
+      case TR_KEY_speed_limit_down_enabled:
+        tr_variantDictAddBool (d, key, tr_sessionIsSpeedLimited (s, TR_DOWN));
+        break;
+
+      case TR_KEY_script_torrent_done_filename:
+        tr_variantDictAddStr (d, key, tr_sessionGetTorrentDoneScript (s));
+        break;
+
+      case TR_KEY_script_torrent_done_enabled:
+        tr_variantDictAddBool (d, key, tr_sessionIsTorrentDoneScriptEnabled (s));
+        break;
+
+      case TR_KEY_queue_stalled_enabled:
+        tr_variantDictAddBool (d, key, tr_sessionGetQueueStalledEnabled (s));
+        break;
+
+      case TR_KEY_queue_stalled_minutes:
+        tr_variantDictAddInt (d, key, tr_sessionGetQueueStalledMinutes (s));
+        break;
+
+      case TR_KEY_units:
+        tr_formatter_get_units (tr_variantDictAddDict (d, key, 0));
+        break;
+
+      case TR_KEY_version:
+        tr_variantDictAddStr (d, key, LONG_VERSION_STRING);
+        break;
+
+      case TR_KEY_encryption:
+        {
+          const char * str;
+
+          switch (tr_sessionGetEncryption (s))
+            {
+              case TR_CLEAR_PREFERRED:
+                str = "tolerated";
+                break;
+
+              case TR_ENCRYPTION_REQUIRED:
+                str = "required";
+                break;
+
+              default:
+                str = "preferred";
+                break;
+            }
+
+          tr_variantDictAddStr (d, key, str);
+          break;
+        }
+    }
+}
+
 static const char*
 sessionGet (tr_session               * s,
-            tr_variant               * args_in UNUSED,
+            tr_variant               * args_in,
             tr_variant               * args_out,
             struct tr_rpc_idle_data  * idle_data UNUSED)
 {
-  const char * str;
-  tr_variant * d = args_out;
+  tr_variant * fields;
 
   assert (idle_data == NULL);
-  tr_variantDictAddInt  (d, TR_KEY_alt_speed_up, tr_sessionGetAltSpeed_KBps (s,TR_UP));
-  tr_variantDictAddInt  (d, TR_KEY_alt_speed_down, tr_sessionGetAltSpeed_KBps (s,TR_DOWN));
-  tr_variantDictAddBool (d, TR_KEY_alt_speed_enabled, tr_sessionUsesAltSpeed (s));
-  tr_variantDictAddInt  (d, TR_KEY_alt_speed_time_begin, tr_sessionGetAltSpeedBegin (s));
-  tr_variantDictAddInt  (d, TR_KEY_alt_speed_time_end,tr_sessionGetAltSpeedEnd (s));
-  tr_variantDictAddInt  (d, TR_KEY_alt_speed_time_day,tr_sessionGetAltSpeedDay (s));
-  tr_variantDictAddBool (d, TR_KEY_alt_speed_time_enabled, tr_sessionUsesAltSpeedTime (s));
-  tr_variantDictAddBool (d, TR_KEY_blocklist_enabled, tr_blocklistIsEnabled (s));
-  tr_variantDictAddStr  (d, TR_KEY_blocklist_url, tr_blocklistGetURL (s));
-  tr_variantDictAddInt  (d, TR_KEY_cache_size_mb, tr_sessionGetCacheLimit_MB (s));
-  tr_variantDictAddInt  (d, TR_KEY_blocklist_size, tr_blocklistGetRuleCount (s));
-  tr_variantDictAddStr  (d, TR_KEY_config_dir, tr_sessionGetConfigDir (s));
-  tr_variantDictAddStr  (d, TR_KEY_download_dir, tr_sessionGetDownloadDir (s));
-  tr_variantDictAddInt  (d, TR_KEY_download_dir_free_space, tr_device_info_get_free_space (s->downloadDir));
-  tr_variantDictAddBool (d, TR_KEY_download_queue_enabled, tr_sessionGetQueueEnabled (s, TR_DOWN));
-  tr_variantDictAddInt  (d, TR_KEY_download_queue_size, tr_sessionGetQueueSize (s, TR_DOWN));
-  tr_variantDictAddInt  (d, TR_KEY_peer_limit_global, tr_sessionGetPeerLimit (s));
-  tr_variantDictAddInt  (d, TR_KEY_peer_limit_per_torrent, tr_sessionGetPeerLimitPerTorrent (s));
-  tr_variantDictAddStr  (d, TR_KEY_incomplete_dir, tr_sessionGetIncompleteDir (s));
-  tr_variantDictAddBool (d, TR_KEY_incomplete_dir_enabled, tr_sessionIsIncompleteDirEnabled (s));
-  tr_variantDictAddBool (d, TR_KEY_pex_enabled, tr_sessionIsPexEnabled (s));
-  tr_variantDictAddBool (d, TR_KEY_utp_enabled, tr_sessionIsUTPEnabled (s));
-  tr_variantDictAddBool (d, TR_KEY_dht_enabled, tr_sessionIsDHTEnabled (s));
-  tr_variantDictAddBool (d, TR_KEY_lpd_enabled, tr_sessionIsLPDEnabled (s));
-  tr_variantDictAddInt  (d, TR_KEY_peer_port, tr_sessionGetPeerPort (s));
-  tr_variantDictAddBool (d, TR_KEY_peer_port_random_on_start, tr_sessionGetPeerPortRandomOnStart (s));
-  tr_variantDictAddBool (d, TR_KEY_port_forwarding_enabled, tr_sessionIsPortForwardingEnabled (s));
-  tr_variantDictAddBool (d, TR_KEY_rename_partial_files, tr_sessionIsIncompleteFileNamingEnabled (s));
-  tr_variantDictAddInt  (d, TR_KEY_rpc_version, RPC_VERSION);
-  tr_variantDictAddInt  (d, TR_KEY_rpc_version_minimum, RPC_VERSION_MIN);
-  tr_variantDictAddReal (d, TR_KEY_seedRatioLimit, tr_sessionGetRatioLimit (s));
-  tr_variantDictAddBool (d, TR_KEY_seedRatioLimited, tr_sessionIsRatioLimited (s));
-  tr_variantDictAddInt  (d, TR_KEY_idle_seeding_limit, tr_sessionGetIdleLimit (s));
-  tr_variantDictAddBool (d, TR_KEY_idle_seeding_limit_enabled, tr_sessionIsIdleLimited (s));
-  tr_variantDictAddBool (d, TR_KEY_seed_queue_enabled, tr_sessionGetQueueEnabled (s, TR_UP));
-  tr_variantDictAddInt  (d, TR_KEY_seed_queue_size, tr_sessionGetQueueSize (s, TR_UP));
-  tr_variantDictAddBool (d, TR_KEY_start_added_torrents, !tr_sessionGetPaused (s));
-  tr_variantDictAddBool (d, TR_KEY_trash_original_torrent_files, tr_sessionGetDeleteSource (s));
-  tr_variantDictAddInt  (d, TR_KEY_speed_limit_up, tr_sessionGetSpeedLimit_KBps (s, TR_UP));
-  tr_variantDictAddBool (d, TR_KEY_speed_limit_up_enabled, tr_sessionIsSpeedLimited (s, TR_UP));
-  tr_variantDictAddInt  (d, TR_KEY_speed_limit_down, tr_sessionGetSpeedLimit_KBps (s, TR_DOWN));
-  tr_variantDictAddBool (d, TR_KEY_speed_limit_down_enabled, tr_sessionIsSpeedLimited (s, TR_DOWN));
-  tr_variantDictAddStr  (d, TR_KEY_script_torrent_done_filename, tr_sessionGetTorrentDoneScript (s));
-  tr_variantDictAddBool (d, TR_KEY_script_torrent_done_enabled, tr_sessionIsTorrentDoneScriptEnabled (s));
-  tr_variantDictAddBool (d, TR_KEY_queue_stalled_enabled, tr_sessionGetQueueStalledEnabled (s));
-  tr_variantDictAddInt  (d, TR_KEY_queue_stalled_minutes, tr_sessionGetQueueStalledMinutes (s));
-  tr_formatter_get_units (tr_variantDictAddDict (d, TR_KEY_units, 0));
-  tr_variantDictAddStr  (d, TR_KEY_version, LONG_VERSION_STRING);
-  switch (tr_sessionGetEncryption (s))
+
+  if (tr_variantDictFindList (args_in, TR_KEY_fields, &fields))
     {
-      case TR_CLEAR_PREFERRED: str = "tolerated"; break;
-      case TR_ENCRYPTION_REQUIRED: str = "required"; break;
-      default: str = "preferred"; break;
+      const size_t field_count = tr_variantListSize (fields);
+
+      for (size_t i = 0; i < field_count; ++i)
+        {
+          const char * field_name;
+          size_t field_name_len;
+          tr_quark field_id;
+
+          if (!tr_variantGetStr (tr_variantListChild (fields, i), &field_name, &field_name_len))
+            continue;
+
+          if (!tr_quark_lookup (field_name, field_name_len, &field_id))
+            continue;
+
+          addSessionField (s, args_out, field_id);
+        }
     }
-  tr_variantDictAddStr (d, TR_KEY_encryption, str);
+  else
+    {
+      for (tr_quark field_id = TR_KEY_NONE + 1; field_id < TR_N_KEYS; ++field_id)
+        addSessionField (s, args_out, field_id);
+    }
 
   return NULL;
 }
