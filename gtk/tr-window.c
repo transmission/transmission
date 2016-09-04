@@ -384,11 +384,9 @@ GtkWidget* gtr_status_bar_new(PrivateData *p)
     GtkWidget* w;
     GtkWidget* box;
     GtkWidget* pop;
-    GtkWidget* box_wrapper;
+    GtkWidget* action_bar;
 
-    box_wrapper = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-
-    gtk_style_context_add_class(gtk_widget_get_style_context(box_wrapper), "status-bar");
+    action_bar = gtk_action_bar_new();
 
     w = gtk_menu_button_new();
     gtk_button_set_image(GTK_BUTTON(w), gtk_image_new_from_icon_name("network-transmit-receive-symbolic",
@@ -406,33 +404,26 @@ GtkWidget* gtr_status_bar_new(PrivateData *p)
 
     gtk_menu_button_set_popover(GTK_MENU_BUTTON(w), GTK_WIDGET(pop));
 
-    gtk_box_pack_start(GTK_BOX(box_wrapper), w, FALSE, FALSE, 0);
+    gtk_action_bar_pack_start(GTK_ACTION_BAR(action_bar), w);
 
     /* turtle */
     p->alt_speed_image = gtk_image_new();
     w = p->alt_speed_button = gtk_toggle_button_new();
     gtk_button_set_image(GTK_BUTTON(w), p->alt_speed_image);
     g_signal_connect(w, "toggled", G_CALLBACK(alt_speed_toggled_cb), p);
-    gtk_box_pack_start(GTK_BOX(box_wrapper), w, FALSE, FALSE, 0);
+    gtk_action_bar_pack_start(GTK_ACTION_BAR(action_bar), w);
 
     /* download */
     w = dl_lb = gtk_label_new(NULL);
     p->dl_lb = GTK_LABEL(w);
     gtk_label_set_single_line_mode(p->dl_lb, TRUE);
-    gtk_box_pack_start(GTK_BOX(box_wrapper), w, TRUE, FALSE, 0);
+    gtk_action_bar_pack_start(GTK_ACTION_BAR(action_bar), w);
 
     /* upload */
     w = ul_lb = gtk_label_new(NULL);
     p->ul_lb = GTK_LABEL(w);
     gtk_label_set_single_line_mode(p->ul_lb, TRUE);
-    gtk_box_pack_start(GTK_BOX(box_wrapper), w, TRUE, FALSE, 0);
-
-    /* ratio */
-    w = gtk_label_new(NULL);
-    g_object_set(G_OBJECT(w), "margin-left", GUI_PAD_BIG, NULL);
-    p->stats_lb = GTK_LABEL(w);
-    gtk_label_set_single_line_mode(p->stats_lb, TRUE);
-    gtk_box_pack_start(GTK_BOX(box_wrapper), w, TRUE, FALSE, 0);
+    gtk_action_bar_pack_start(GTK_ACTION_BAR(action_bar), w);
 
     /* statistics button */
     w = gtk_menu_button_new();
@@ -440,9 +431,16 @@ GtkWidget* gtr_status_bar_new(PrivateData *p)
     gtk_button_set_image(GTK_BUTTON(w), gtk_image_new_from_icon_name("statistics-symbolic", GTK_ICON_SIZE_SMALL_TOOLBAR));
     gtk_menu_button_set_menu_model(GTK_MENU_BUTTON(w), get_statistics_menu_model());
     gtk_widget_set_tooltip_text(w, _("Statistics"));
-    gtk_box_pack_end(GTK_BOX(box_wrapper), w, FALSE, FALSE, 0);
+    gtk_action_bar_pack_end(GTK_ACTION_BAR(action_bar), w);
 
-    return box_wrapper;
+    /* ratio */
+    w = gtk_label_new(NULL);
+    g_object_set(G_OBJECT(w), "margin-left", GUI_PAD_BIG, NULL);
+    p->stats_lb = GTK_LABEL(w);
+    gtk_label_set_single_line_mode(p->stats_lb, TRUE);
+    gtk_action_bar_pack_end(GTK_ACTION_BAR(action_bar), w);
+
+    return GTK_WIDGET(action_bar);
 }
 
 gboolean gtr_window_is_paused(TrCore* core)
