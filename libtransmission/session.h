@@ -196,6 +196,7 @@ struct tr_session
 
     struct tr_web *              web;
 
+    struct tr_session_id       * session_id;
     struct tr_rpc_server *       rpcServer;
     tr_rpc_func                  rpc_func;
     void *                       rpc_func_user_data;

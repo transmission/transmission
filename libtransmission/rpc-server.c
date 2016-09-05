@@ -30,6 +30,7 @@
 #include "rpcimpl.h"
 #include "rpc-server.h"
 #include "session.h"
+#include "session-id.h"
 #include "trevent.h"
 #include "utils.h"
 #include "variant.h"
@@ -63,9 +64,6 @@ struct tr_rpc_server
     char             * whitelistStr;
     tr_list          * whitelist;
 
-    char             * sessionId;
-    time_t             sessionIdExpiresAt;
-
     bool               isStreamInitialized;
     z_stream           stream;
 };
@@ -81,32 +79,11 @@ struct tr_rpc_server
 ****
 ***/
 
-static char*
+static const char *
 get_current_session_id (struct tr_rpc_server * server)
 {
-  const time_t now = tr_time ();
-
-  if (!server->sessionId || (now >= server->sessionIdExpiresAt))
-    {
-      int i;
-      const int n = 48;
-      const char * pool = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-      const size_t pool_size = strlen (pool);
-      unsigned char * buf = tr_new (unsigned char, n+1);
-
-      tr_rand_buffer (buf, n);
-      for (i=0; i<n; ++i)
-        buf[i] = pool[ buf[i] % pool_size ];
-      buf[n] = '\0';
-
-      tr_free (server->sessionId);
-      server->sessionId = (char*) buf;
-      server->sessionIdExpiresAt = now + (60*60); /* expire in an hour */
-    }
-
-  return server->sessionId;
+  return tr_session_id_get_current (server->session->session_id);
 }
-
 
 /**
 ***
@@ -1004,7 +981,6 @@ closeServer (void * vserver)
   if (s->isStreamInitialized)
     deflateEnd (&s->stream);
   tr_free (s->url);
-  tr_free (s->sessionId);
   tr_free (s->whitelistStr);
   tr_free (s->username);
   tr_free (s->password);
