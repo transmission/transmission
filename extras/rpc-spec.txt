@@ -518,8 +518,8 @@
 
    Method name: "session-set"
    Request arguments: one or more of 4.1's arguments, except: "blocklist-size",
-                      "config-dir", "rpc-version", "rpc-version-minimum", and
-                      "version"
+                      "config-dir", "rpc-version", "rpc-version-minimum",
+                      "version", and "session-id"
    Response arguments: none
 
 4.1.2.  Accessors
@@ -768,6 +768,7 @@
          |         | yes       | torrent-add          | new return arg "torrent-duplicate"
    ------+---------+-----------+----------------------+-------------------------------
    16    | 3.00    | yes       | session-get          | new request arg "fields"
+         |         | yes       | session-get          | new arg "session-id"
 
 5.1.  Upcoming Breakage
 

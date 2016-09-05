@@ -26,6 +26,7 @@
 #include "platform-quota.h" /* tr_device_info_get_free_space() */
 #include "rpcimpl.h"
 #include "session.h"
+#include "session-id.h"
 #include "torrent.h"
 #include "utils.h"
 #include "variant.h"
@@ -2260,6 +2261,10 @@ addSessionField (tr_session * s,
           tr_variantDictAddStr (d, key, str);
           break;
         }
+
+      case TR_KEY_session_id:
+        tr_variantDictAddStr (d, key, tr_session_id_get_current (s->session_id));
+        break;
     }
 }
 
