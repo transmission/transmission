@@ -1,3 +1,5 @@
+#import <QuickLook/QuickLook.h>
+
 #import "transmission.h"
 #import "NSStringAdditions.h"
 

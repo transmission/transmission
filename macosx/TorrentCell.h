@@ -20,6 +20,8 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#import <AppKit/AppKit.h>
+
 @interface TorrentCell : NSActionCell
 {
     NSUserDefaults * fDefaults;

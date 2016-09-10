@@ -3,6 +3,8 @@ project(transmission)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
+set(CMAKE_MACOSX_RPATH ON)
+
 include(CheckIncludeFile)
 include(CheckIncludeFiles)
 include(CheckFunctionExists)
@@ -14,6 +16,7 @@ include(TrMacros)
         option(ENABLE_DAEMON        "Build daemon" ON)
 tr_auto_option(ENABLE_GTK           "Build GTK+ client" AUTO)
 tr_auto_option(ENABLE_QT            "Build Qt client" AUTO)
+tr_auto_option(ENABLE_MAC           "Build Mac client" AUTO)
         option(ENABLE_UTILS         "Build utils (create, edit, show)" ON)
         option(ENABLE_CLI           "Build command-line client" OFF)
         option(ENABLE_TESTS         "Build unit tests" ON)
@@ -277,6 +280,21 @@ if(ENABLE_QT)
     tr_fixup_auto_option(ENABLE_QT QT_FOUND QT_IS_REQUIRED)
 endif()
 
+if(ENABLE_MAC)
+    tr_get_required_flag(ENABLE_MAC MAC_IS_REQUIRED)
+
+    if(APPLE)
+        set(MAC_FOUND ON)
+    else()
+        set(MAC_FOUND OFF)
+        if(MAC_IS_REQUIRED)
+            message(SEND_ERROR "Mac build is impossible on non-Mac system.")
+        endif()
+    endif()
+
+    tr_fixup_auto_option(ENABLE_MAC MAC_FOUND MAC_IS_REQUIRED)
+endif()
+
 find_package(ZLIB ${ZLIB_MINIMUM})
 if(ZLIB_FOUND)
     add_definitions(-DHAVE_ZLIB)
@@ -287,10 +305,18 @@ set(THIRD_PARTY_DIR ${CMAKE_SOURCE_DIR}/third-party)
 if(WIN32)
     tr_add_external_auto_library(EVENT2 libevent event)
 else()
+    set(EVENT2_CONFIGURE_FLAGS)
+    if(APPLE)
+        if(CRYPTO_PKG STREQUAL "openssl")
+            list(APPEND EVENT2_CONFIGURE_FLAGS "CPPFLAGS=-I${CRYPTO_INCLUDE_DIRS}")
+        else()
+            list(APPEND EVENT2_CONFIGURE_FLAGS "CPPFLAGS=-I${THIRD_PARTY_DIR}/openssl/include")
+        endif()
+    endif()
     tr_add_external_auto_library(EVENT2 libevent event
         BUILD_IN_SOURCE 1
         CONFIGURE_COMMAND "<SOURCE_DIR>/autogen.sh"
-                  COMMAND "<SOURCE_DIR>/configure" "--prefix=<INSTALL_DIR>" "--disable-shared")
+                  COMMAND "<SOURCE_DIR>/configure" "--prefix=<INSTALL_DIR>" "--disable-shared" ${EVENT2_CONFIGURE_FLAGS})
 endif()
 
 tr_add_external_auto_library(NATPMP libnatpmp natpmp)
@@ -510,20 +536,29 @@ if(ENABLE_TESTS)
     enable_testing()
 endif()
 
+function(tr_install_web DST_DIR)
+    install(DIRECTORY ${CMAKE_SOURCE_DIR}/web DESTINATION ${DST_DIR}
+        PATTERN *.am EXCLUDE
+        PATTERN *.in EXCLUDE
+        PATTERN *.scss EXCLUDE)
+endfunction()
+
 add_subdirectory(libtransmission)
 
-foreach(P daemon cli utils gtk qt)
+set(MAC_PROJECT_DIR macosx)
+
+foreach(P daemon cli utils gtk qt mac)
     string(TOUPPER "${P}" P_ID)
     if(ENABLE_${P_ID})
+        if(DEFINED ${P_ID}_PROJECT_DIR)
+            set(P ${${P_ID}_PROJECT_DIR})
+        endif()
         add_subdirectory(${P})
     endif()
 endforeach()
 
 if(ENABLE_DAEMON OR ENABLE_GTK OR ENABLE_QT)
-    install(DIRECTORY web DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/${TR_NAME}
-        PATTERN *.am EXCLUDE
-        PATTERN *.in EXCLUDE
-        PATTERN *.scss EXCLUDE)
+    tr_install_web(${CMAKE_INSTALL_DATAROOTDIR}/${TR_NAME})
 endif()
 
 if(ENABLE_GTK AND ENABLE_NLS)
