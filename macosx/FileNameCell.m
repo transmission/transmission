@@ -193,7 +193,7 @@
     return result;
 }
 
-- (NSRect) rectForStatusWithString: (NSAttributedString *) string withTitleRect: (NSRect) titleRect inBounds: (NSRect) bounds;
+- (NSRect) rectForStatusWithString: (NSAttributedString *) string withTitleRect: (NSRect) titleRect inBounds: (NSRect) bounds
 {
     const NSSize statusSize = [string size];
     

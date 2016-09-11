@@ -557,7 +557,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
     //check if moving inside itself
     NSArray * oldComponents = [oldFolder pathComponents],
             * newComponents = [folder pathComponents];
-    const NSInteger oldCount = [oldComponents count];
+    const NSUInteger oldCount = [oldComponents count];
     
     if (oldCount < [newComponents count] && [[newComponents objectAtIndex: oldCount] isEqualToString: [self name]]
         && [folder hasPrefix: oldFolder])
@@ -721,7 +721,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
     //recreate the tracker structure
     const int oldTrackerCount = fInfo->trackerCount;
     tr_tracker_info * trackerStructs = tr_new(tr_tracker_info, oldTrackerCount+1);
-    for (NSUInteger i=0; i < oldTrackerCount; ++i)
+    for (int i = 0; i < oldTrackerCount; ++i)
         trackerStructs[i] = fInfo->trackers[i];
     
     trackerStructs[oldTrackerCount].announce = (char *)[tracker UTF8String];
@@ -1376,7 +1376,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
     return fGroupValue;
 }
 
-- (void) setGroupValue: (NSInteger) groupValue determinationType: (TorrentDeterminationType) determinationType;
+- (void) setGroupValue: (NSInteger) groupValue determinationType: (TorrentDeterminationType) determinationType
 {
     if (groupValue != fGroupValue)
     {
@@ -1447,7 +1447,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
 
 - (BOOL) canChangeDownloadCheckForFile: (NSUInteger) index
 {
-    NSAssert2(index < [self fileCount], @"Index %ld is greater than file count %ld", index, [self fileCount]);
+    NSAssert2((NSInteger)index < [self fileCount], @"Index %ld is greater than file count %ld", index, [self fileCount]);
     
     return [self canChangeDownloadCheckForFiles: [NSIndexSet indexSetWithIndex: index]];
 }
@@ -1523,7 +1523,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
 - (NSSet *) filePrioritiesForIndexes: (NSIndexSet *) indexSet
 {
     BOOL low = NO, normal = NO, high = NO;
-    NSMutableSet * priorities = [NSMutableSet setWithCapacity: MIN([indexSet count], 3)];
+    NSMutableSet * priorities = [NSMutableSet setWithCapacity: MIN([indexSet count], 3u)];
     
     for (NSUInteger index = [indexSet firstIndex]; index != NSNotFound; index = [indexSet indexGreaterThanIndex: index])
     {

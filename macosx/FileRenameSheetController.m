@@ -120,7 +120,7 @@ typedef void (^CompletionBlock)(BOOL);
     [self.cancelButton setFrame:newCancelFrame];
 }
 
-- (IBAction) rename: (id) sender;
+- (IBAction) rename: (id) sender
 {
     void (^completionHandler)(BOOL) = ^(BOOL didRename) {
         if (didRename)

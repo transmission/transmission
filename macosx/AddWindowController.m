@@ -115,7 +115,9 @@
         case TR_PRI_HIGH: priorityIndex = POPUP_PRIORITY_HIGH; break;
         case TR_PRI_NORMAL: priorityIndex = POPUP_PRIORITY_NORMAL; break;
         case TR_PRI_LOW: priorityIndex = POPUP_PRIORITY_LOW; break;
-        default: NSAssert1(NO, @"Unknown priority for adding torrent: %d", [fTorrent priority]);
+        default:
+            NSAssert1(NO, @"Unknown priority for adding torrent: %d", [fTorrent priority]);
+            priorityIndex = POPUP_PRIORITY_NORMAL;
     }
     [fPriorityPopUp selectItemAtIndex: priorityIndex];
     
@@ -258,7 +260,9 @@
         case POPUP_PRIORITY_HIGH: priority = TR_PRI_HIGH; break;
         case POPUP_PRIORITY_NORMAL: priority = TR_PRI_NORMAL; break;
         case POPUP_PRIORITY_LOW: priority = TR_PRI_LOW; break;
-        default: NSAssert1(NO, @"Unknown priority tag for adding torrent: %ld", [sender tag]);
+        default:
+            NSAssert1(NO, @"Unknown priority tag for adding torrent: %ld", [sender tag]);
+            priority = TR_PRI_NORMAL;
     }
     [fTorrent setPriority: priority];
 }

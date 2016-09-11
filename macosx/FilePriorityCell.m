@@ -124,7 +124,7 @@
     }
     else
     {
-        NSMutableArray * images = [NSMutableArray arrayWithCapacity: MAX(count, 1)];
+        NSMutableArray * images = [NSMutableArray arrayWithCapacity: MAX(count, 1u)];
         CGFloat totalWidth;
         
         if (count == 0)
