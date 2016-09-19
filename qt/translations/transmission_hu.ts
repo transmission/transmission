@@ -1374,12 +1374,12 @@
     <message>
         <location line="+6"/>
         <source>Once removed, continuing the transfer will require the torrent file or magnet link.</source>
-        <translation>Ha egyzser eltávolítod a folytatáshoz szükséged lesz a torrent fájlra, vagy egy magnet linkre.</translation>
+        <translation>Ha egyszer eltávolítod a folytatáshoz szükséged lesz a torrent fájlra, vagy egy magnet linkre.</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Once removed, continuing the transfers will require the torrent files or magnet links.</source>
-        <translation>Ha egyzser eltávolítod a folytatáshoz szükséged lesz a torrent fájlokra, vagy egy magnet linkekre.</translation>
+        <translation>Ha egyszer eltávolítod a folytatáshoz szükséged lesz a torrent fájlokra, vagy egy magnet linkekre.</translation>
     </message>
     <message>
         <location line="+5"/>
