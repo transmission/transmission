@@ -224,19 +224,24 @@ tr_lockUnlock (tr_lock * l)
 #ifdef _WIN32
 
 static char *
-win32_get_known_folder (REFKNOWNFOLDERID folder_id)
+win32_get_known_folder_ex (REFKNOWNFOLDERID folder_id, DWORD flags)
 {
   char * ret = NULL;
   PWSTR path;
 
-  if (SHGetKnownFolderPath (folder_id, KF_FLAG_DONT_UNEXPAND | KF_FLAG_DONT_VERIFY,
-                            NULL, &path) == S_OK)
+  if (SHGetKnownFolderPath (folder_id, flags | KF_FLAG_DONT_UNEXPAND, NULL, &path) == S_OK)
     {
       ret = tr_win32_native_to_utf8 (path, -1);
       CoTaskMemFree (path);
     }
 
   return ret;
+}
+
+static char *
+win32_get_known_folder (REFKNOWNFOLDERID folder_id)
+{
+  return win32_get_known_folder_ex (folder_id, KF_FLAG_DONT_VERIFY);
 }
 
 #endif
@@ -585,4 +590,22 @@ tr_getWebClientDir (const tr_session * session UNUSED)
     }
 
   return s;
+}
+
+char *
+tr_getSessionIdDir (void)
+{
+#ifndef _WIN32
+
+  return tr_strdup ("/tmp");
+
+#else
+
+  char * program_data_dir = win32_get_known_folder_ex (&FOLDERID_ProgramData, KF_FLAG_CREATE);
+  char * result = tr_buildPath (program_data_dir, "Transmission", NULL);
+  tr_free (program_data_dir);
+  tr_sys_dir_create (result, 0, 0, NULL);
+  return result;
+
+#endif
 }

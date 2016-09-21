@@ -6,21 +6,8 @@
  *
  */
 
-#if defined (HAVE_MKDTEMP) && (!defined (_XOPEN_SOURCE) || _XOPEN_SOURCE < 700)
- #undef _XOPEN_SOURCE
- #define _XOPEN_SOURCE 700
-#elif (defined (HAVE_POSIX_FADVISE) || defined (HAVE_POSIX_FALLOCATE)) && (!defined (_XOPEN_SOURCE) || _XOPEN_SOURCE < 600)
- #undef _XOPEN_SOURCE
- #define _XOPEN_SOURCE 600
-#endif
-
-#if (defined (HAVE_FALLOCATE64) || defined (HAVE_CANONICALIZE_FILE_NAME)) && !defined (_GNU_SOURCE)
- #define _GNU_SOURCE
-#endif
-
-#if defined (__APPLE__) && !defined (_DARWIN_C_SOURCE)
- #define _DARWIN_C_SOURCE
-#endif
+#undef _GNU_SOURCE
+#define _GNU_SOURCE
 
 #include <assert.h>
 #include <dirent.h>
@@ -31,8 +18,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/mman.h> /* mmap (), munmap () */
 #include <sys/types.h>
+#include <sys/file.h> /* flock () */
+#include <sys/mman.h> /* mmap (), munmap () */
 #include <sys/stat.h>
 #include <unistd.h> /* lseek (), write (), ftruncate (), pread (), pwrite (), pathconf (), etc */
 
@@ -913,6 +901,35 @@ tr_sys_file_unmap (const void  * address,
   assert (size > 0);
 
   ret = munmap ((void *) address, size) != -1;
+
+  if (!ret)
+    set_system_error (error, errno);
+
+  return ret;
+}
+
+bool
+tr_sys_file_lock (tr_sys_file_t    handle,
+                  int              operation,
+                  tr_error      ** error)
+{
+  bool ret;
+  int native_operation = 0;
+
+  assert (handle != TR_BAD_SYS_FILE);
+  assert ((operation & ~(TR_SYS_FILE_LOCK_SH | TR_SYS_FILE_LOCK_EX | TR_SYS_FILE_LOCK_NB | TR_SYS_FILE_LOCK_UN)) == 0);
+  assert (!!(operation & TR_SYS_FILE_LOCK_SH) + !!(operation & TR_SYS_FILE_LOCK_EX) + !!(operation & TR_SYS_FILE_LOCK_UN) == 1);
+
+  if ((operation & TR_SYS_FILE_LOCK_SH) != 0)
+    native_operation |= LOCK_SH;
+  if ((operation & TR_SYS_FILE_LOCK_EX) != 0)
+    native_operation |= LOCK_EX;
+  if ((operation & TR_SYS_FILE_LOCK_NB) != 0)
+    native_operation |= LOCK_NB;
+  if ((operation & TR_SYS_FILE_LOCK_UN) != 0)
+    native_operation |= LOCK_UN;
+
+  ret = flock (handle, native_operation) != -1;
 
   if (!ret)
     set_system_error (error, errno);

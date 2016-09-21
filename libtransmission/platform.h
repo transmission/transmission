@@ -37,6 +37,9 @@ const char * tr_getTorrentDir (const tr_session *);
 /** @brief return the directory where the Web Client's web ui files are kept */
 const char * tr_getWebClientDir (const tr_session *);
 
+/** @brief return the directory where session id lock files are stored */
+char * tr_getSessionIdDir (void);
+
 /** @} */
 
 

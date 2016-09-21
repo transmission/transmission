@@ -37,6 +37,20 @@ void tr_session_id_free (tr_session_id_t session_id);
  */
 const char * tr_session_id_get_current (tr_session_id_t session_id);
 
+/**
+ * Check if session ID corresponds to session running on the same machine as
+ * the caller.
+ *
+ * This is useful for various behavior alterations, such as transforming
+ * relative paths to absolute before passing through RPC, or presenting
+ * different UI for local and remote sessions.
+ *
+ * @param[in] session_id String representation of session identifier object.
+ *
+ * @return `True` if session is valid and local, `false` otherwise.
+ */
+bool tr_session_id_is_local (const char * session_id);
+
 #ifdef __cplusplus
 }
 #endif
