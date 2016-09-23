@@ -623,7 +623,7 @@ MainWindow::openStats ()
 void
 MainWindow::openDonate ()
 {
-  QDesktopServices::openUrl (QUrl (QLatin1String ("http://www.transmissionbt.com/donate.php")));
+  QDesktopServices::openUrl (QUrl (QLatin1String ("https://transmissionbt.com/donate/")));
 }
 
 void
