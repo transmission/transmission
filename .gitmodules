@@ -1,0 +1,3 @@
+[submodule "third-party/libevent"]
+	path = third-party/libevent
+	url = https://github.com/transmission/libevent
