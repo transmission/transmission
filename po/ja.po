@@ -8,686 +8,686 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2012-02-03 15:22-0600\n"
-"PO-Revision-Date: 2013-05-16 11:20+0000\n"
-"Last-Translator: epii <public.epii@gmail.com>\n"
+"PO-Revision-Date: 2015-11-28 03:24+0000\n"
+"Last-Translator: Kenichi Ito <ken.i54k@gmail.com>\n"
 "Language-Team: Japanese <ja@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2013-06-26 02:12+0000\n"
-"X-Generator: Launchpad (build 16681)\n"
+"X-Launchpad-Export-Date: 2016-09-27 19:08+0000\n"
+"X-Generator: Launchpad (build 18204)\n"
 
-#: ../gtk/actions.c:45
+#: ../gtk/actions.c:35
 msgid "Sort by _Activity"
 msgstr "アクティブ順に並び替え(_A)"
 
-#: ../gtk/actions.c:46
+#: ../gtk/actions.c:36
 msgid "Sort by _Name"
 msgstr "名前順に並び替え(_N)"
 
-#: ../gtk/actions.c:47
+#: ../gtk/actions.c:37
 msgid "Sort by _Progress"
 msgstr "進捗率順に並び替え(_P)"
 
-#: ../gtk/actions.c:48
+#: ../gtk/actions.c:38
 msgid "Sort by _Queue"
 msgstr "キュー順に並び替え(_Q)"
 
-#: ../gtk/actions.c:49
+#: ../gtk/actions.c:39
 msgid "Sort by Rati_o"
 msgstr "負担率順に並び替え(_O)"
 
-#: ../gtk/actions.c:50
+#: ../gtk/actions.c:40
 msgid "Sort by Stat_e"
 msgstr "状態順に並び替え(_E)"
 
-#: ../gtk/actions.c:51
+#: ../gtk/actions.c:41
 msgid "Sort by A_ge"
 msgstr "追加順に並び替え(_G)"
 
-#: ../gtk/actions.c:52
+#: ../gtk/actions.c:42
 msgid "Sort by Time _Left"
 msgstr "残り時間順に並び替え(_L)"
 
-#: ../gtk/actions.c:53
+#: ../gtk/actions.c:43
 msgid "Sort by Si_ze"
 msgstr "サイズ順に並び替え(_Z)"
 
-#: ../gtk/actions.c:70
+#: ../gtk/actions.c:60
 msgid "_Show Transmission"
 msgstr "Transmission ウインドウを表示(_S)"
 
-#: ../gtk/actions.c:71
+#: ../gtk/actions.c:61
 msgid "Message _Log"
 msgstr "メッセージログ(_L)"
 
-#: ../gtk/actions.c:86
+#: ../gtk/actions.c:76
 msgid "Enable Alternative Speed _Limits"
 msgstr "一時的な速度制限を有効にする(_L)"
 
-#: ../gtk/actions.c:87
+#: ../gtk/actions.c:77
 msgid "_Compact View"
 msgstr "コンパクト表示(_C)"
 
-#: ../gtk/actions.c:88
+#: ../gtk/actions.c:78
 msgid "Re_verse Sort Order"
 msgstr "逆順に並び替え(_V)"
 
-#: ../gtk/actions.c:89
+#: ../gtk/actions.c:79
 msgid "_Filterbar"
 msgstr "フィルターバー(_F)"
 
-#: ../gtk/actions.c:90
+#: ../gtk/actions.c:80
 msgid "_Statusbar"
 msgstr "ステータスバー(_S)"
 
-#: ../gtk/actions.c:91
+#: ../gtk/actions.c:81
 msgid "_Toolbar"
 msgstr "ツールバー(_T)"
 
-#: ../gtk/actions.c:96
+#: ../gtk/actions.c:86
 msgid "_File"
 msgstr "ファイル(_F)"
 
-#: ../gtk/actions.c:97
+#: ../gtk/actions.c:87
 msgid "_Torrent"
 msgstr "Torrent(_T)"
 
-#: ../gtk/actions.c:98
+#: ../gtk/actions.c:88
 msgid "_View"
 msgstr "表示(_V)"
 
-#: ../gtk/actions.c:99
+#: ../gtk/actions.c:89
 msgid "_Sort Torrents By"
 msgstr "Torrentの並べ替え(_S)"
 
-#: ../gtk/actions.c:100
+#: ../gtk/actions.c:90
 msgid "_Queue"
 msgstr "キュー(_Q)"
 
-#: ../gtk/actions.c:101 ../gtk/details.c:2426
+#: ../gtk/actions.c:91 ../gtk/details.c:2620
 msgid "_Edit"
 msgstr "編集(_E)"
 
-#: ../gtk/actions.c:102
+#: ../gtk/actions.c:92
 msgid "_Help"
 msgstr "ヘルプ(_H)"
 
-#: ../gtk/actions.c:103
+#: ../gtk/actions.c:93
 msgid "Copy _Magnet Link to Clipboard"
-msgstr "マグネット・リンクをクリップボードにコピー(_M)"
+msgstr "マグネットリンクをクリップボードにコピー(_M)"
 
-#: ../gtk/actions.c:104
+#: ../gtk/actions.c:94
 msgid "Open _URL…"
 msgstr "URLを開く(_U)…"
 
-#: ../gtk/actions.c:104
+#: ../gtk/actions.c:94
 msgid "Open URL…"
 msgstr "URLを開く…"
 
-#: ../gtk/actions.c:105 ../gtk/actions.c:106
+#: ../gtk/actions.c:95 ../gtk/actions.c:96
 msgid "Open a torrent"
 msgstr "torrent を開く"
 
-#: ../gtk/actions.c:107
+#: ../gtk/actions.c:97
 msgid "_Start"
 msgstr "開始(_S)"
 
-#: ../gtk/actions.c:107
+#: ../gtk/actions.c:97
 msgid "Start torrent"
 msgstr "Torrentを開始"
 
-#: ../gtk/actions.c:108
+#: ../gtk/actions.c:98
 msgid "Start _Now"
 msgstr "今すぐ開始(_N)"
 
-#: ../gtk/actions.c:108
+#: ../gtk/actions.c:98
 msgid "Start torrent now"
 msgstr "torrentをすぐに開始する"
 
-#: ../gtk/actions.c:109
+#: ../gtk/actions.c:99
 msgid "_Statistics"
 msgstr "統計データ(_S)"
 
-#: ../gtk/actions.c:110
+#: ../gtk/actions.c:100
 msgid "_Donate"
 msgstr "寄付(_D)"
 
-#: ../gtk/actions.c:111
+#: ../gtk/actions.c:101
 msgid "_Verify Local Data"
 msgstr "ローカルデータを検証(_V)"
 
-#: ../gtk/actions.c:112
+#: ../gtk/actions.c:102
 msgid "_Pause"
 msgstr "中断(_P)"
 
-#: ../gtk/actions.c:112
+#: ../gtk/actions.c:102
 msgid "Pause torrent"
 msgstr "Torrentを一時停止"
 
-#: ../gtk/actions.c:113
+#: ../gtk/actions.c:103
 msgid "_Pause All"
 msgstr "全て休止(_P)"
 
-#: ../gtk/actions.c:113
+#: ../gtk/actions.c:103
 msgid "Pause all torrents"
 msgstr "全てのtorrentを一時停止"
 
-#: ../gtk/actions.c:114
+#: ../gtk/actions.c:104
 msgid "_Start All"
 msgstr "すべてを開始(_S)"
 
-#: ../gtk/actions.c:114
+#: ../gtk/actions.c:104
 msgid "Start all torrents"
 msgstr "全てのtorrentを開始"
 
-#: ../gtk/actions.c:115
+#: ../gtk/actions.c:105
 msgid "Set _Location…"
 msgstr "場所を設定する(_L)..."
 
-#: ../gtk/actions.c:116
+#: ../gtk/actions.c:106
 msgid "Remove torrent"
 msgstr "Torrentを削除"
 
-#: ../gtk/actions.c:117
+#: ../gtk/actions.c:107
 msgid "_Delete Files and Remove"
 msgstr "ファイルの削除(_D)"
 
-#: ../gtk/actions.c:118
+#: ../gtk/actions.c:108
 msgid "_New…"
 msgstr "新規(_N)…"
 
-#: ../gtk/actions.c:118
+#: ../gtk/actions.c:108
 msgid "Create a torrent"
 msgstr "torrentを作成"
 
-#: ../gtk/actions.c:119
+#: ../gtk/actions.c:109
 msgid "_Quit"
 msgstr "終了(_Q)"
 
-#: ../gtk/actions.c:120
+#: ../gtk/actions.c:110
 msgid "Select _All"
 msgstr "すべて選択(_A)"
 
-#: ../gtk/actions.c:121
+#: ../gtk/actions.c:111
 msgid "Dese_lect All"
 msgstr "すべて選択解除(_L)"
 
-#: ../gtk/actions.c:123
+#: ../gtk/actions.c:113
 msgid "Torrent properties"
 msgstr "Torrentのプロパティ"
 
-#: ../gtk/actions.c:124
+#: ../gtk/actions.c:114
 msgid "Open Fold_er"
 msgstr "フォルダを開く(_E)"
 
-#: ../gtk/actions.c:126
+#: ../gtk/actions.c:116
 msgid "_Contents"
 msgstr "コンテンツ(_C)"
 
-#: ../gtk/actions.c:127
+#: ../gtk/actions.c:117
 msgid "Ask Tracker for _More Peers"
 msgstr "トラッカーに他のピアを要求(_M)"
 
-#: ../gtk/actions.c:128
+#: ../gtk/actions.c:118
 msgid "Move to _Top"
 msgstr "一番上に移動(_T)"
 
-#: ../gtk/actions.c:129
+#: ../gtk/actions.c:119
 msgid "Move _Up"
 msgstr "上に移動(_U)"
 
-#: ../gtk/actions.c:130
+#: ../gtk/actions.c:120
 msgid "Move _Down"
 msgstr "下に移動(_D)"
 
-#: ../gtk/actions.c:131
+#: ../gtk/actions.c:121
 msgid "Move to _Bottom"
 msgstr "一番下に移動(_B)"
 
-#: ../gtk/actions.c:132
+#: ../gtk/actions.c:122
 msgid "Present Main Window"
 msgstr "メインウィンドウが起動しています"
 
-#: ../gtk/conf.c:331 ../gtk/conf.c:336
+#: ../gtk/conf.c:317 ../gtk/conf.c:322
 #, c-format
 msgid "Importing \"%s\""
 msgstr "\"%s\" のインポート中"
 
-#: ../gtk/details.c:448 ../gtk/details.c:460
+#: ../gtk/details.c:475 ../gtk/details.c:487
 msgid "Use global settings"
 msgstr "全体設定を使用する"
 
-#: ../gtk/details.c:449
+#: ../gtk/details.c:476
 msgid "Seed regardless of ratio"
 msgstr "比率に拘わらずシードする"
 
-#: ../gtk/details.c:450
+#: ../gtk/details.c:477
 msgid "Stop seeding at ratio:"
 msgstr "アップロード比率がこの値に達するまでシードする:"
 
-#: ../gtk/details.c:461
+#: ../gtk/details.c:488
 msgid "Seed regardless of activity"
 msgstr "活動度に拘わらずシードする"
 
-#: ../gtk/details.c:462
+#: ../gtk/details.c:489
 msgid "Stop seeding if idle for N minutes:"
 msgstr "N分間アイドル状態だった場合にはシードを中止する:"
 
-#: ../gtk/details.c:478 ../gtk/tr-prefs.c:1282
+#: ../gtk/details.c:505 ../gtk/tr-prefs.c:1315
 msgid "Speed"
 msgstr "速度"
 
-#: ../gtk/details.c:480
+#: ../gtk/details.c:507
 msgid "Honor global _limits"
 msgstr "全体設定に従う(_L)"
 
-#: ../gtk/details.c:485
+#: ../gtk/details.c:512
 #, c-format
 msgid "Limit _download speed (%s):"
 msgstr "ダウンロード速度の上限 (%s)(_D):"
 
-#: ../gtk/details.c:498
+#: ../gtk/details.c:525
 #, c-format
 msgid "Limit _upload speed (%s):"
 msgstr "アップロード速度の上限 (%s)(_U):"
 
-#: ../gtk/details.c:511 ../gtk/open-dialog.c:351
+#: ../gtk/details.c:538 ../gtk/open-dialog.c:368
 msgid "Torrent _priority:"
 msgstr "Torrent の優先度(_P):"
 
-#: ../gtk/details.c:515
+#: ../gtk/details.c:542
 msgid "Seeding Limits"
 msgstr "シードする上限"
 
-#: ../gtk/details.c:525
+#: ../gtk/details.c:552
 msgid "_Ratio:"
 msgstr "比率(_R):"
 
-#: ../gtk/details.c:534
+#: ../gtk/details.c:561
 msgid "_Idle:"
 msgstr "アイドル状態(_I):"
 
-#: ../gtk/details.c:537
+#: ../gtk/details.c:564
 msgid "Peer Connections"
 msgstr "ピアとの接続"
 
-#: ../gtk/details.c:540
+#: ../gtk/details.c:567
 msgid "_Maximum peers:"
 msgstr "ピア最大数(_M):"
 
-#: ../gtk/details.c:559 ../gtk/torrent-cell-renderer.c:201
-#: ../libtransmission/verify.c:273
+#: ../gtk/details.c:586 ../gtk/torrent-cell-renderer.c:206
+#: ../libtransmission/verify.c:269
 msgid "Queued for verification"
 msgstr "検証待ち"
 
-#: ../gtk/details.c:560
+#: ../gtk/details.c:587
 msgid "Verifying local data"
 msgstr "ローカルデータの検証中"
 
-#: ../gtk/details.c:561 ../gtk/torrent-cell-renderer.c:204
+#: ../gtk/details.c:588 ../gtk/torrent-cell-renderer.c:209
 msgid "Queued for download"
 msgstr "ダウンロードのキュー"
 
-#: ../gtk/details.c:562 ../gtk/filter.c:702
+#: ../gtk/details.c:589 ../gtk/filter.c:591
 msgctxt "Verb"
 msgid "Downloading"
 msgstr "ダウンロード中"
 
-#: ../gtk/details.c:563 ../gtk/torrent-cell-renderer.c:207
+#: ../gtk/details.c:590 ../gtk/torrent-cell-renderer.c:212
 msgid "Queued for seeding"
 msgstr "シード待ち"
 
-#: ../gtk/details.c:564 ../gtk/filter.c:703
+#: ../gtk/details.c:591 ../gtk/filter.c:592
 msgctxt "Verb"
 msgid "Seeding"
 msgstr "シード中"
 
-#: ../gtk/details.c:565 ../gtk/filter.c:705 ../gtk/torrent-cell-renderer.c:198
+#: ../gtk/details.c:592 ../gtk/filter.c:594 ../gtk/torrent-cell-renderer.c:203
 msgid "Finished"
 msgstr "終了"
 
-#: ../gtk/details.c:565 ../gtk/filter.c:704 ../gtk/torrent-cell-renderer.c:198
+#: ../gtk/details.c:592 ../gtk/filter.c:593 ../gtk/torrent-cell-renderer.c:203
 msgid "Paused"
 msgstr "一時停止"
 
-#: ../gtk/details.c:598
+#: ../gtk/details.c:625 ../gtk/details.c:702
 msgid "N/A"
 msgstr "N/A"
 
-#: ../gtk/details.c:610 ../gtk/file-list.c:610
+#: ../gtk/details.c:637 ../gtk/file-list.c:619
 msgid "Mixed"
 msgstr "混合"
 
-#: ../gtk/details.c:611
+#: ../gtk/details.c:638
 msgid "No Torrents Selected"
 msgstr "Torrentファイルが選択されていません"
 
-#: ../gtk/details.c:633
+#: ../gtk/details.c:667
 msgid "Private to this tracker -- DHT and PEX disabled"
 msgstr "このトラッカーをプライベートにする -- DHT と PEX は無効になります"
 
-#: ../gtk/details.c:635
+#: ../gtk/details.c:669
 msgid "Public torrent"
 msgstr "Torrentを公開"
 
-#: ../gtk/details.c:658
+#: ../gtk/details.c:707
 #, c-format
 msgid "Created by %1$s"
 msgstr "%1$s によって作成"
 
-#: ../gtk/details.c:660
+#: ../gtk/details.c:709
 #, c-format
 msgid "Created on %1$s"
 msgstr "%1$s に作成"
 
-#: ../gtk/details.c:662
+#: ../gtk/details.c:711
 #, c-format
 msgid "Created by %1$s on %2$s"
 msgstr "%1$s により %2$s に作成"
 
-#: ../gtk/details.c:748
+#: ../gtk/details.c:823
 msgid "Unknown"
 msgstr "不明"
 
-#: ../gtk/details.c:776
+#: ../gtk/details.c:856
 #, c-format
 msgid "%1$s (%2$'d piece @ %3$s)"
 msgid_plural "%1$s (%2$'d pieces @ %3$s)"
 msgstr[0] "%1$s (%2$'d ピース @ %3$s)"
 
-#: ../gtk/details.c:782
+#: ../gtk/details.c:864
 #, c-format
 msgid "%1$s (%2$'d piece)"
 msgid_plural "%1$s (%2$'d pieces)"
 msgstr[0] "%1$s (%2$'d ピース)"
 
-#: ../gtk/details.c:816
+#: ../gtk/details.c:906
 #, c-format
 msgid "%1$s (%2$s%%)"
 msgstr "%1$s (%2$s%%)"
 
-#: ../gtk/details.c:818
+#: ../gtk/details.c:908
 #, c-format
 msgid "%1$s (%2$s%% of %3$s%% Available)"
 msgstr "%1$s（ダウンロード可能率 %3$s%% 中の %2$s%%）"
 
-#: ../gtk/details.c:820
+#: ../gtk/details.c:910
 #, c-format
 msgid "%1$s (%2$s%% of %3$s%% Available); %4$s Unverified"
 msgstr "%1$s (%3$s%% 中 %2$s%% 利用可能); %4$s 未検証"
 
-#: ../gtk/details.c:839
+#: ../gtk/details.c:937
 #, c-format
 msgid "%1$s (+%2$s corrupt)"
 msgstr "%1$s (+%2$s 破損)"
 
-#: ../gtk/details.c:861
+#: ../gtk/details.c:965
 #, c-format
 msgid "%s (Ratio: %s)"
 msgstr "%s（比率： %s）"
 
-#: ../gtk/details.c:889
+#: ../gtk/details.c:998
 msgid "No errors"
 msgstr "エラーはありません"
 
-#: ../gtk/details.c:902
+#: ../gtk/details.c:1017
 msgid "Never"
 msgstr "しない"
 
-#: ../gtk/details.c:906
+#: ../gtk/details.c:1024
 msgid "Active now"
 msgstr "現在アクティブ"
 
-#: ../gtk/details.c:910
+#: ../gtk/details.c:1030
 #, c-format
 msgid "%1$s ago"
 msgstr "%1$s前"
 
-#: ../gtk/details.c:929
+#: ../gtk/details.c:1049
 msgid "Activity"
 msgstr "アクティビティ"
 
-#: ../gtk/details.c:934
+#: ../gtk/details.c:1054
 msgid "Torrent size:"
 msgstr "torrent サイズ:"
 
-#: ../gtk/details.c:939
+#: ../gtk/details.c:1059
 msgid "Have:"
 msgstr "ダウンロード済:"
 
-#: ../gtk/details.c:944 ../gtk/stats.c:155 ../gtk/stats.c:172
+#: ../gtk/details.c:1069 ../gtk/stats.c:156 ../gtk/stats.c:178
 msgid "Downloaded:"
 msgstr "ダウンロード済:"
 
-#: ../gtk/details.c:949 ../gtk/stats.c:152 ../gtk/stats.c:169
+#: ../gtk/details.c:1064 ../gtk/stats.c:152 ../gtk/stats.c:174
 msgid "Uploaded:"
 msgstr "アップロード済:"
 
-#: ../gtk/details.c:954
+#: ../gtk/details.c:1074
 msgid "State:"
 msgstr "状態:"
 
-#: ../gtk/details.c:959
+#: ../gtk/details.c:1079
 msgid "Running time:"
 msgstr "実行時間:"
 
-#: ../gtk/details.c:964
+#: ../gtk/details.c:1084
 msgid "Remaining time:"
 msgstr "残り時間:"
 
-#: ../gtk/details.c:969
+#: ../gtk/details.c:1089
 msgid "Last activity:"
 msgstr "最後のアクティビティ:"
 
-#: ../gtk/details.c:975
+#: ../gtk/details.c:1095
 msgid "Error:"
 msgstr "エラー:"
 
-#: ../gtk/details.c:980
+#: ../gtk/details.c:1099
 msgid "Details"
 msgstr "詳細"
 
-#: ../gtk/details.c:986
+#: ../gtk/details.c:1105
 msgid "Location:"
 msgstr "場所:"
 
-#: ../gtk/details.c:993
+#: ../gtk/details.c:1112
 msgid "Hash:"
 msgstr "ハッシュ:"
 
-#: ../gtk/details.c:999
+#: ../gtk/details.c:1118
 msgid "Privacy:"
 msgstr "プライバシー:"
 
-#: ../gtk/details.c:1006
+#: ../gtk/details.c:1125
 msgid "Origin:"
 msgstr "作成:"
 
-#: ../gtk/details.c:1023
+#: ../gtk/details.c:1142
 msgid "Comment:"
 msgstr "コメント:"
 
-#: ../gtk/details.c:1051
+#: ../gtk/details.c:1056
 msgid "Webseeds"
 msgstr "Web シード"
 
-#: ../gtk/details.c:1053 ../gtk/details.c:1106
+#: ../gtk/details.c:1172 ../gtk/details.c:1225
 msgid "Down"
 msgstr "下り"
 
-#: ../gtk/details.c:1104
+#: ../gtk/details.c:1223
 msgid "Address"
 msgstr "アドレス"
 
-#: ../gtk/details.c:1108
+#: ../gtk/details.c:1227
 msgid "Up"
 msgstr "上り"
 
-#: ../gtk/details.c:1109
+#: ../gtk/details.c:1228
 msgid "Client"
 msgstr "クライアント"
 
-#: ../gtk/details.c:1110
+#: ../gtk/details.c:1229
 msgid "%"
 msgstr "%"
 
-#: ../gtk/details.c:1112
+#: ../gtk/details.c:1231
 msgid "Up Reqs"
 msgstr "アップロード要求"
 
-#: ../gtk/details.c:1114
+#: ../gtk/details.c:1233
 msgid "Dn Reqs"
 msgstr "ダウンロード要求"
 
-#: ../gtk/details.c:1116
+#: ../gtk/details.c:1235
 msgid "Dn Blocks"
 msgstr "Dn ブロック"
 
-#: ../gtk/details.c:1118
+#: ../gtk/details.c:1237
 msgid "Up Blocks"
 msgstr "Up ブロック"
 
-#: ../gtk/details.c:1120
+#: ../gtk/details.c:1239
 msgid "We Cancelled"
 msgstr "こちら側でキャンセルされました"
 
-#: ../gtk/details.c:1122
+#: ../gtk/details.c:1241
 msgid "They Cancelled"
 msgstr "相手側でキャンセルされました"
 
-#: ../gtk/details.c:1123
+#: ../gtk/details.c:1242
 msgid "Flags"
 msgstr "フラグ"
 
-#: ../gtk/details.c:1478
+#: ../gtk/details.c:1625
 msgid "Optimistic unchoke"
 msgstr "楽観的アンチョーク"
 
-#: ../gtk/details.c:1479
+#: ../gtk/details.c:1626
 msgid "Downloading from this peer"
 msgstr "このピアからダウンロード中"
 
-#: ../gtk/details.c:1480
+#: ../gtk/details.c:1627
 msgid "We would download from this peer if they would let us"
 msgstr "許可されればこのピアからダウンロード可能"
 
-#: ../gtk/details.c:1481
+#: ../gtk/details.c:1628
 msgid "Uploading to peer"
 msgstr "ピアへのアップロード"
 
-#: ../gtk/details.c:1482
+#: ../gtk/details.c:1629
 msgid "We would upload to this peer if they asked"
 msgstr "ピアから要求されればアップロード可能"
 
-#: ../gtk/details.c:1483
+#: ../gtk/details.c:1630
 msgid "Peer has unchoked us, but we're not interested"
 msgstr "ピアはこちらのチョークを解除しましたが、インタレストではありません。"
 
-#: ../gtk/details.c:1484
+#: ../gtk/details.c:1631
 msgid "We unchoked this peer, but they're not interested"
 msgstr "このピアのチョークを解除しましたが、ピアはインタレストではありません。"
 
-#: ../gtk/details.c:1485
+#: ../gtk/details.c:1632
 msgid "Encrypted connection"
 msgstr "暗号化接続"
 
-#: ../gtk/details.c:1486
+#: ../gtk/details.c:1633
 msgid "Peer was found through Peer Exchange (PEX)"
 msgstr "ピアをPeer Exchange(PEX)経由で見つけました。"
 
-#: ../gtk/details.c:1487
+#: ../gtk/details.c:1634
 msgid "Peer was found through DHT"
 msgstr "ピアをDHT経由で見つけました。"
 
-#: ../gtk/details.c:1488
+#: ../gtk/details.c:1635
 msgid "Peer is an incoming connection"
 msgstr "外部から接続してきたピア"
 
-#: ../gtk/details.c:1489
+#: ../gtk/details.c:1636
 msgid "Peer is connected over µTP"
 msgstr "ピアとµTPで接続しました"
 
-#: ../gtk/details.c:1734 ../gtk/details.c:2441
+#: ../gtk/details.c:1888 ../gtk/details.c:2635
 msgid "Show _more details"
 msgstr "詳細を表示(_M)"
 
-#: ../gtk/details.c:1805
+#: ../gtk/details.c:1959
 #, c-format
 msgid "Got a list of %1$s%2$'d peers%3$s %4$s ago"
 msgstr "%4$s前に %1$s%2$'d 個のピア%3$s のリストを取得"
 
-#: ../gtk/details.c:1809
+#: ../gtk/details.c:1963
 #, c-format
 msgid "Peer list request %1$stimed out%2$s %3$s ago; will retry"
 msgstr "ピアリストの要求が %3$s前に%1$sタイムアウト%2$sしました; 再試行します"
 
-#: ../gtk/details.c:1812
+#: ../gtk/details.c:1966
 #, c-format
 msgid "Got an error %1$s\"%2$s\"%3$s %4$s ago"
 msgstr "%4$s前にエラーが発生しました %1$s\"%2$s\"%3$s"
 
-#: ../gtk/details.c:1820
+#: ../gtk/details.c:1974
 msgid "No updates scheduled"
 msgstr "アップデートはスケジュールされていません"
 
-#: ../gtk/details.c:1825
+#: ../gtk/details.c:1980
 #, c-format
 msgid "Asking for more peers in %s"
 msgstr "ピアが他にないか%s後に確認します"
 
-#: ../gtk/details.c:1829
+#: ../gtk/details.c:1985
 msgid "Queued to ask for more peers"
 msgstr "他にピアがないか確認するようにキュー"
 
-#: ../gtk/details.c:1834
+#: ../gtk/details.c:1991
 #, c-format
 msgid "Asking for more peers now… <small>%s</small>"
 msgstr "追加のピアを問い合わせています… <small>%s</small>"
 
-#: ../gtk/details.c:1844
+#: ../gtk/details.c:2002
 #, c-format
 msgid "Tracker had %s%'d seeders and %'d leechers%s %s ago"
 msgstr "トラッカーには %s%'d 個のシーダーと %'d 個のリーチャー%s がありました (%s前)"
 
-#: ../gtk/details.c:1848
+#: ../gtk/details.c:2006
 #, c-format
 msgid "Got a scrape error \"%s%s%s\" %s ago"
 msgstr "スクレイプエラー \"%s%s%s\" を %s 前に取得しました"
 
-#: ../gtk/details.c:1858
+#: ../gtk/details.c:2017
 #, c-format
 msgid "Asking for peer counts in %s"
 msgstr "%s にピアの計測を行っています"
 
-#: ../gtk/details.c:1862
+#: ../gtk/details.c:2022
 msgid "Queued to ask for peer counts"
 msgstr "ピア数の確認をキュー"
 
-#: ../gtk/details.c:1867
+#: ../gtk/details.c:2028
 #, c-format
 msgid "Asking for peer counts now… <small>%s</small>"
 msgstr "ピア数を問い合わせています… <small>%s</small>"
 
-#: ../gtk/details.c:2137
+#: ../gtk/details.c:2313
 msgid "List contains invalid URLs"
 msgstr "リストに無効なURLが含まれています"
 
-#: ../gtk/details.c:2142
+#: ../gtk/details.c:2318 ../gtk/file-list.c:819
 msgid "Please correct the errors and try again."
 msgstr "エラーを訂正して再度実行してください。"
 
-#: ../gtk/details.c:2192
+#: ../gtk/details.c:2374
 #, c-format
 msgid "%s - Edit Trackers"
 msgstr "%s - トラッカーを編集"
 
-#: ../gtk/details.c:2202
+#: ../gtk/details.c:2384
 msgid "Tracker Announce URLs"
 msgstr "トラッカーのアナウンスURL"
 
-#: ../gtk/details.c:2205 ../gtk/makemeta-ui.c:490
+#: ../gtk/details.c:2387 ../gtk/makemeta-ui.c:499
 msgid ""
 "To add a backup URL, add it on the line after the primary URL.\n"
 "To add another primary URL, add it after a blank line."
@@ -695,61 +695,61 @@ msgstr ""
 "代替URLを追加するときは、プライマリURLの後ろの行に追加してください。\n"
 "他のプライマリURLを追加するときは、空白行を挟んで追加してください。"
 
-#: ../gtk/details.c:2302
+#: ../gtk/details.c:2488
 #, c-format
 msgid "%s - Add Tracker"
 msgstr "%s - トラッカーを追加"
 
-#: ../gtk/details.c:2316
+#: ../gtk/details.c:2502
 msgid "Tracker"
 msgstr "トラッカー"
 
-#: ../gtk/details.c:2322
+#: ../gtk/details.c:2508
 msgid "_Announce URL:"
 msgstr "アナウンスURL(_A):"
 
-#: ../gtk/details.c:2397 ../gtk/details.c:2541 ../gtk/filter.c:323
+#: ../gtk/details.c:2591 ../gtk/details.c:2736
 msgid "Trackers"
 msgstr "トラッカー"
 
-#: ../gtk/details.c:2421
+#: ../gtk/details.c:2615
 msgid "_Add"
 msgstr "追加(_A)"
 
-#: ../gtk/details.c:2432
+#: ../gtk/details.c:2626
 msgid "_Remove"
 msgstr "削除(_R)"
 
-#: ../gtk/details.c:2448
+#: ../gtk/details.c:2642
 msgid "Show _backup trackers"
 msgstr "代替トラッカーを表示(_B)"
 
-#: ../gtk/details.c:2533 ../gtk/msgwin.c:440
+#: ../gtk/details.c:2728 ../gtk/msgwin.c:438
 msgid "Information"
 msgstr "情報"
 
-#: ../gtk/details.c:2537
+#: ../gtk/details.c:2732
 msgid "Peers"
 msgstr "ピア"
 
-#: ../gtk/details.c:2546
+#: ../gtk/details.c:2741
 msgid "File listing not available for combined torrent properties"
 msgstr "ファイル一覧は結合 torrent プロパティでは使用できません"
 
-#: ../gtk/details.c:2550 ../gtk/makemeta-ui.c:437
+#: ../gtk/details.c:2745 ../gtk/makemeta-ui.c:446
 msgid "Files"
 msgstr "ファイル"
 
-#: ../gtk/details.c:2554 ../gtk/tr-prefs.c:1239 ../gtk/tr-window.c:658
+#: ../gtk/details.c:2749 ../gtk/tr-prefs.c:1222 ../gtk/tr-window.c:685
 msgid "Options"
 msgstr "オプション"
 
-#: ../gtk/details.c:2578
+#: ../gtk/details.c:2773
 #, c-format
 msgid "%s Properties"
 msgstr "%sのプロパティ"
 
-#: ../gtk/details.c:2589
+#: ../gtk/details.c:2784
 #, c-format
 msgid "%'d Torrent Properties"
 msgstr "%'d Torrent プロパティ"
@@ -795,113 +795,114 @@ msgid "One of these torrents has not finished downloading."
 msgid_plural "Some of these torrents have not finished downloading."
 msgstr[0] "これらのtorrentのどれかはダウンロードが完了していません。"
 
-#: ../gtk/file-list.c:607 ../gtk/filter.c:348 ../gtk/util.c:471
+#: ../gtk/file-list.c:616 ../gtk/util.c:483
 msgid "High"
 msgstr "高"
 
-#: ../gtk/file-list.c:608 ../gtk/filter.c:352 ../gtk/util.c:472
+#: ../gtk/file-list.c:617 ../gtk/util.c:484
 msgid "Normal"
 msgstr "通常"
 
-#: ../gtk/file-list.c:609 ../gtk/filter.c:356 ../gtk/util.c:473
+#: ../gtk/file-list.c:618 ../gtk/util.c:485
 msgid "Low"
 msgstr "低"
 
-#: ../gtk/file-list.c:827 ../gtk/msgwin.c:305
+#: ../gtk/file-list.c:936 ../gtk/msgwin.c:303
 msgid "Name"
 msgstr "名前"
 
 #. add "size" column
-#: ../gtk/file-list.c:842
+#: ../gtk/file-list.c:953
 msgid "Size"
 msgstr "サイズ"
 
 #. add "progress" column
-#: ../gtk/file-list.c:857
+#: ../gtk/file-list.c:968
 msgid "Have"
 msgstr "保持"
 
 #. add "enabled" column
-#: ../gtk/file-list.c:870
+#: ../gtk/file-list.c:981
 msgid "Download"
 msgstr "ダウンロード"
 
 #. add priority column
-#: ../gtk/file-list.c:886 ../gtk/filter.c:343
+#: ../gtk/file-list.c:997
 msgid "Priority"
 msgstr "優先度"
 
-#: ../gtk/filter.c:315 ../gtk/filter.c:699
+#: ../gtk/filter.c:281 ../gtk/filter.c:588
 msgid "All"
 msgstr "全て"
 
-#: ../gtk/filter.c:329 ../gtk/tr-prefs.c:567 ../gtk/tr-prefs.c:1285
+#: ../gtk/tr-prefs.c:546 ../gtk/tr-prefs.c:1321
 msgid "Privacy"
 msgstr "プライバシー"
 
-#: ../gtk/filter.c:334
+#: ../gtk/filter.c:333
 msgid "Public"
 msgstr "公開"
 
-#: ../gtk/filter.c:338
+#: ../gtk/filter.c:337
 msgid "Private"
 msgstr "プライベート"
 
-#: ../gtk/filter.c:701
+#: ../gtk/filter.c:590
 msgid "Active"
 msgstr "アクティブ"
 
-#: ../gtk/filter.c:706
+#: ../gtk/filter.c:595
 msgctxt "Verb"
 msgid "Verifying"
 msgstr "検証中"
 
-#: ../gtk/filter.c:707 ../gtk/msgwin.c:439
+#: ../gtk/filter.c:596 ../gtk/msgwin.c:437 ../gtk/util.c:696
+#, c-format
 msgid "Error"
 msgstr "エラー"
 
-#. add the activity combobox
-#: ../gtk/filter.c:996
+#: ../gtk/filter.c:893
+#, c-format
 msgid "_Show:"
 msgstr "表示(_S):"
 
-#: ../gtk/main.c:308
+#: ../gtk/main.c:307
 #, c-format
 msgid "Error registering Transmission as x-scheme-handler/magnet handler: %s"
 msgstr "Transmission を x-scheme-handler/magnet のハンドラとして登録する際にエラーが発生しました: %s"
 
-#: ../gtk/main.c:477
+#: ../gtk/main.c:490
 #, c-format
 msgid ""
 "Got signal %d; trying to shut down cleanly. Do it again if it gets stuck."
-msgstr ""
+msgstr "シグナル %d を受け取りました。安全にシャットダウンを行なっています。フリーズした場合にはもう一度試してみてください。"
 
-#: ../gtk/main.c:610
+#: ../gtk/main.c:623
 msgid "Where to look for configuration files"
 msgstr "探している設定ファイルの場所"
 
-#: ../gtk/main.c:611
+#: ../gtk/main.c:624
 msgid "Start with all torrents paused"
 msgstr "すべての一時停止したtorrentを再開"
 
-#: ../gtk/main.c:612
+#: ../gtk/main.c:625
 msgid "Start minimized in notification area"
 msgstr "通知エリアで最小化した状態で起動する"
 
-#: ../gtk/main.c:613
+#: ../gtk/main.c:626
 msgid "Show version number and exit"
 msgstr "バージョンを表示して終了"
 
-#: ../gtk/main.c:630 ../gtk/transmission-gtk.desktop.in.h:1
+#: ../gtk/main.c:644 ../gtk/transmission-gtk.desktop.in.h:1
 msgid "Transmission"
 msgstr "Transmission"
 
 #. parse the command line
-#: ../gtk/main.c:634
+#: ../gtk/main.c:647
 msgid "[torrent files or urls]"
 msgstr "[torrent ファイルまたは url]"
 
-#: ../gtk/main.c:639
+#: ../gtk/main.c:653
 #, c-format
 msgid ""
 "%s\n"
@@ -910,7 +911,7 @@ msgstr ""
 "%s\n"
 "'%s --help' で利用可能なすべてのコマンドラインのオプション一覧が表示されます。\n"
 
-#: ../gtk/main.c:739
+#: ../gtk/main.c:730
 msgid ""
 "Transmission is a file-sharing program. When you run a torrent, its data "
 "will be made available to others by means of upload. You and you alone are "
@@ -920,44 +921,44 @@ msgstr ""
 "Transmissionはファイル共有プログラムです。torrentを実行する際、そのデータはアップロードで他の人に利用できるようになります。あなたやあな"
 "た自身は、適切な判断の行使とあなたの地域法を遵守することに全面的に責任があります。"
 
-#: ../gtk/main.c:741
+#: ../gtk/main.c:732
 msgid "I _Accept"
 msgstr "同意します(_A)"
 
-#: ../gtk/main.c:963
+#: ../gtk/main.c:988
 msgid "<b>Closing Connections</b>"
 msgstr "<b>コネクション切断中</b>"
 
-#: ../gtk/main.c:967
+#: ../gtk/main.c:992
 msgid "Sending upload/download totals to tracker…"
 msgstr "トラッカーにアップロード/ダウンロードの総量を送信しています…"
 
-#: ../gtk/main.c:972
+#: ../gtk/main.c:997
 msgid "_Quit Now"
 msgstr "今すぐ終了(_Q)"
 
-#: ../gtk/main.c:1030
+#: ../gtk/main.c:1058
 msgid "Couldn't add corrupt torrent"
 msgid_plural "Couldn't add corrupt torrents"
 msgstr[0] "破損したtorrentは追加できません"
 
-#: ../gtk/main.c:1037
+#: ../gtk/main.c:1065
 msgid "Couldn't add duplicate torrent"
 msgid_plural "Couldn't add duplicate torrents"
 msgstr[0] "重複したtorrentは追加できません"
 
-#: ../gtk/main.c:1336
+#: ../gtk/main.c:1373
 msgid "A fast and easy BitTorrent client"
 msgstr "速くて簡単な BitTorrent クライアント"
 
-#: ../gtk/main.c:1337
+#: ../gtk/main.c:1374
 msgid "Copyright (c) The Transmission Project"
 msgstr "Copyright (c) The Transmission Project"
 
 #. Translators: translate "translator-credits" as your name
 #. to have it appear in the credits in the "About"
 #. dialog
-#: ../gtk/main.c:1343
+#: ../gtk/main.c:1380
 msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
@@ -969,11 +970,12 @@ msgstr ""
 "  Hidehiko Tsushima https://launchpad.net/~hidehiko-betsukai\n"
 "  Hiroshi Tagawa https://launchpad.net/~kuponuga\n"
 "  ISHII Hironaga https://launchpad.net/~hinomiya-gla\n"
+"  José Lou Chang https://launchpad.net/~obake\n"
 "  Jun Kobayashi https://launchpad.net/~jkbys\n"
+"  Kenichi Ito https://launchpad.net/~ken-i54k\n"
 "  Kentaro Kazuhama https://launchpad.net/~kazken3\n"
 "  Koichi Akabe https://launchpad.net/~vbkaisetsu\n"
 "  Krzysztof Klimonda https://launchpad.net/~kklimonda\n"
-"  Linux Lover https://launchpad.net/~obake\n"
 "  Makoto Kato https://launchpad.net/~makoto-kt\n"
 "  Masato HASHIMOTO https://launchpad.net/~hashimo\n"
 "  Masatoshi Haraoka https://launchpad.net/~f99aq8ove\n"
@@ -991,279 +993,279 @@ msgstr ""
 "  epii https://launchpad.net/~epii\n"
 "  sunatomo https://launchpad.net/~naiyu"
 
-#: ../gtk/makemeta-ui.c:75
+#: ../gtk/makemeta-ui.c:72
 #, c-format
 msgid "Creating \"%s\""
 msgstr "\"%s\" を作成中"
 
-#: ../gtk/makemeta-ui.c:77
+#: ../gtk/makemeta-ui.c:74
 #, c-format
 msgid "Created \"%s\"!"
 msgstr "\"%s\" を作成しました!"
 
-#: ../gtk/makemeta-ui.c:79
+#: ../gtk/makemeta-ui.c:76
 #, c-format
 msgid "Error: invalid announce URL \"%s\""
 msgstr "エラー: 無効なアナウンスURL \"%s\""
 
-#: ../gtk/makemeta-ui.c:81
+#: ../gtk/makemeta-ui.c:78
 #, c-format
 msgid "Cancelled"
 msgstr "キャンセルしました"
 
-#: ../gtk/makemeta-ui.c:83
+#: ../gtk/makemeta-ui.c:80
 #, c-format
 msgid "Error reading \"%s\": %s"
 msgstr "読み込み中にエラー \"%s\": %s"
 
-#: ../gtk/makemeta-ui.c:85
+#: ../gtk/makemeta-ui.c:82
 #, c-format
 msgid "Error writing \"%s\": %s"
 msgstr "書き込み中にエラー \"%s\": %s"
 
 #. how much data we've scanned through to generate checksums
-#: ../gtk/makemeta-ui.c:102
+#: ../gtk/makemeta-ui.c:103
 #, c-format
 msgid "Scanned %s"
 msgstr "スキャン済み %s"
 
-#: ../gtk/makemeta-ui.c:167 ../gtk/makemeta-ui.c:425
+#: ../gtk/makemeta-ui.c:171 ../gtk/makemeta-ui.c:434
 msgid "New Torrent"
 msgstr "新規 Torrent"
 
-#: ../gtk/makemeta-ui.c:183
+#: ../gtk/makemeta-ui.c:187
 msgid "Creating torrent…"
 msgstr "Torrentを作成中…"
 
-#: ../gtk/makemeta-ui.c:292
+#: ../gtk/makemeta-ui.c:299
 msgid "No source selected"
 msgstr "ソースファイル未選択"
 
-#: ../gtk/makemeta-ui.c:298
+#: ../gtk/makemeta-ui.c:305
 #, c-format
 msgid "%1$s; %2$'d File"
 msgid_plural "%1$s; %2$'d Files"
 msgstr[0] "%1$s; %2$'d ファイル"
 
-#: ../gtk/makemeta-ui.c:305
+#: ../gtk/makemeta-ui.c:312
 #, c-format
 msgid "%1$'d Piece @ %2$s"
 msgid_plural "%1$'d Pieces @ %2$s"
 msgstr[0] "%1$'d ピース @ %2$s"
 
-#: ../gtk/makemeta-ui.c:439
+#: ../gtk/makemeta-ui.c:448
 msgid "Sa_ve to:"
 msgstr "保存先(_V):"
 
-#: ../gtk/makemeta-ui.c:445
+#: ../gtk/makemeta-ui.c:454
 msgid "Source F_older:"
 msgstr "ソースフォルダ(_O):"
 
-#: ../gtk/makemeta-ui.c:457
+#: ../gtk/makemeta-ui.c:466
 msgid "Source _File:"
 msgstr "ソースファイル(_F):"
 
-#: ../gtk/makemeta-ui.c:469
+#: ../gtk/makemeta-ui.c:478
 msgid "<i>No source selected</i>"
 msgstr "<i>ソースファイルが選択されていません</i>"
 
-#: ../gtk/makemeta-ui.c:473
+#: ../gtk/makemeta-ui.c:482
 msgid "Properties"
 msgstr "プロパティ"
 
-#: ../gtk/makemeta-ui.c:475
+#: ../gtk/makemeta-ui.c:484
 msgid "_Trackers:"
 msgstr "トラッカー(_T):"
 
-#: ../gtk/makemeta-ui.c:497
+#: ../gtk/makemeta-ui.c:506
 msgid "Co_mment:"
 msgstr "コメント(_M):"
 
-#: ../gtk/makemeta-ui.c:506
+#: ../gtk/makemeta-ui.c:515
 msgid "_Private torrent"
 msgstr "プライベート torrent(_P)"
 
-#: ../gtk/msgwin.c:144
+#: ../gtk/msgwin.c:142
 #, c-format
 msgid "Couldn't save \"%s\""
 msgstr "\"%s\" を保存できませんでした"
 
-#: ../gtk/msgwin.c:205
+#: ../gtk/msgwin.c:203
 msgid "Save Log"
 msgstr "ログを保存"
 
-#: ../gtk/msgwin.c:300
+#: ../gtk/msgwin.c:298
 msgid "Time"
 msgstr "時間"
 
-#: ../gtk/msgwin.c:310
+#: ../gtk/msgwin.c:308
 msgid "Message"
 msgstr "メッセージ"
 
-#: ../gtk/msgwin.c:441
+#: ../gtk/msgwin.c:439
 msgid "Debug"
 msgstr "デバッグ"
 
-#: ../gtk/msgwin.c:467
+#: ../gtk/msgwin.c:465
 msgid "Message Log"
 msgstr "メッセージ ログ"
 
-#: ../gtk/msgwin.c:502
+#: ../gtk/msgwin.c:500
 msgid "Level"
 msgstr "レベル"
 
-#: ../gtk/notify.c:219
+#: ../gtk/notify.c:214
 msgid "Open File"
 msgstr "ファイルを開く"
 
-#: ../gtk/notify.c:224
+#: ../gtk/notify.c:219
 msgid "Open Folder"
 msgstr "フォルダを開く"
 
-#: ../gtk/notify.c:232
+#: ../gtk/notify.c:227
 msgid "Torrent Complete"
 msgstr "完了"
 
-#: ../gtk/notify.c:254
+#: ../gtk/notify.c:249
 msgid "Torrent Added"
 msgstr "Torrent が追加されました"
 
-#: ../gtk/open-dialog.c:240
+#: ../gtk/open-dialog.c:250
 msgid "Torrent files"
 msgstr "Torrentファイル"
 
-#: ../gtk/open-dialog.c:245
+#: ../gtk/open-dialog.c:255
 msgid "All files"
 msgstr "すべてのファイル"
 
 #. make the dialog
-#: ../gtk/open-dialog.c:270
+#: ../gtk/open-dialog.c:280
 msgid "Torrent Options"
 msgstr "Torrentオプション"
 
-#: ../gtk/open-dialog.c:292 ../gtk/tr-prefs.c:334
+#: ../gtk/open-dialog.c:302 ../gtk/tr-prefs.c:296
 msgid "Mo_ve .torrent file to the trash"
 msgstr ".torrent ファイルをゴミ箱に移動する(_V)"
 
-#: ../gtk/open-dialog.c:294 ../gtk/tr-prefs.c:326
+#: ../gtk/open-dialog.c:304
 msgid "_Start when added"
 msgstr "追加と同時に開始する(_S)"
 
 #. "torrent file" row
-#: ../gtk/open-dialog.c:310
+#: ../gtk/open-dialog.c:320
 msgid "_Torrent file:"
 msgstr "Torrentファイル(_T):"
 
-#: ../gtk/open-dialog.c:313
+#: ../gtk/open-dialog.c:323
 msgid "Select Source File"
 msgstr "ソースファイルの選択"
 
-#: ../gtk/open-dialog.c:325
+#: ../gtk/open-dialog.c:335
 msgid "_Destination folder:"
 msgstr "保存先フォルダ(_D):"
 
-#: ../gtk/open-dialog.c:328
+#: ../gtk/open-dialog.c:338
 msgid "Select Destination Folder"
 msgstr "保存先フォルダの選択"
 
-#: ../gtk/open-dialog.c:427
+#: ../gtk/open-dialog.c:444
 msgid "Open a Torrent"
 msgstr "Torrent を開く"
 
-#: ../gtk/open-dialog.c:443 ../gtk/tr-prefs.c:330
+#: ../gtk/open-dialog.c:460
 msgid "Show _options dialog"
 msgstr "オプション・ダイアログを表示(_O)"
 
-#: ../gtk/open-dialog.c:491
+#: ../gtk/open-dialog.c:509
 msgid "Open URL"
 msgstr "URLを開く"
 
-#: ../gtk/open-dialog.c:504
+#: ../gtk/open-dialog.c:522
 msgid "Open torrent from URL"
 msgstr "URL から Torrent を開く"
 
-#: ../gtk/open-dialog.c:509
+#: ../gtk/open-dialog.c:527
 msgid "_URL"
 msgstr "_URL"
 
-#: ../gtk/relocate.c:62
+#: ../gtk/relocate.c:61
 #, c-format
 msgid "Moving \"%s\""
 msgstr "\"%s\"を移動しています"
 
-#: ../gtk/relocate.c:84
+#: ../gtk/relocate.c:83
 msgid "Couldn't move torrent"
 msgstr "torrent を移動できませんでした"
 
-#: ../gtk/relocate.c:125
+#: ../gtk/relocate.c:118
 msgid "This may take a moment…"
 msgstr "作業には数分かかる場合があります…"
 
-#: ../gtk/relocate.c:156 ../gtk/relocate.c:176
+#: ../gtk/relocate.c:149 ../gtk/relocate.c:169
 msgid "Set Torrent Location"
 msgstr "Torrent の場所を設定"
 
-#: ../gtk/relocate.c:172 ../gtk/tr-prefs.c:269
+#: ../gtk/relocate.c:165
 msgid "Location"
 msgstr "場所"
 
-#: ../gtk/relocate.c:179
+#: ../gtk/relocate.c:172
 msgid "Torrent _location:"
 msgstr "Torrent の保存場所(_L):"
 
-#: ../gtk/relocate.c:180
+#: ../gtk/relocate.c:173
 msgid "_Move from the current folder"
 msgstr "現在のフォルダから移動する(_M)"
 
-#: ../gtk/relocate.c:183
+#: ../gtk/relocate.c:176
 msgid "Local data is _already there"
 msgstr "ローカルデータは既に存在します(_A)"
 
-#: ../gtk/stats.c:72 ../gtk/stats.c:164
+#: ../gtk/stats.c:72 ../gtk/stats.c:167
 #, c-format
 msgid "Started %'d time"
 msgid_plural "Started %'d times"
 msgstr[0] "起動回数 %'d 回"
 
-#: ../gtk/stats.c:97
+#: ../gtk/stats.c:96
 msgid "Reset your statistics?"
 msgstr "統計をリセットしますか?"
 
-#: ../gtk/stats.c:98
+#: ../gtk/stats.c:97
 msgid ""
 "These statistics are for your information only. Resetting them doesn't "
 "affect the statistics logged by your BitTorrent trackers."
 msgstr ""
 "これらの統計はあなたに関する情報のみです。これの統計をリセットしてもあなたのBitTorrentのトラッカーで記録した統計には影響を及ぼしません。"
 
-#: ../gtk/stats.c:109 ../gtk/stats.c:137
+#: ../gtk/stats.c:108 ../gtk/stats.c:136
 msgid "_Reset"
 msgstr "リセット(_R)"
 
-#: ../gtk/stats.c:134 ../gtk/tr-window.c:699
+#: ../gtk/stats.c:133 ../gtk/tr-window.c:730
 msgid "Statistics"
 msgstr "統計情報"
 
-#: ../gtk/stats.c:149
+#: ../gtk/stats.c:148
 msgid "Current Session"
 msgstr "現在のセッション"
 
-#: ../gtk/stats.c:158 ../gtk/stats.c:175
+#: ../gtk/stats.c:160 ../gtk/stats.c:182
 msgid "Ratio:"
 msgstr "比率:"
 
-#: ../gtk/stats.c:161 ../gtk/stats.c:178
+#: ../gtk/stats.c:164 ../gtk/stats.c:186
 msgid "Duration:"
 msgstr "時間:"
 
-#: ../gtk/stats.c:163
+#: ../gtk/stats.c:166
 msgid "Total"
 msgstr "合計"
 
 #. %1$s is how much we've got,
 #. %2$s is how much we'll have when done,
 #. %3$s%% is a percentage of the two
-#: ../gtk/torrent-cell-renderer.c:61
+#: ../gtk/torrent-cell-renderer.c:59
 #, c-format
 msgid "%1$s of %2$s (%3$s%%)"
 msgstr "%2$s中%1$s (%3$s%%)"
@@ -1274,7 +1276,7 @@ msgstr "%2$s中%1$s (%3$s%%)"
 #. %4$s is how much we've uploaded,
 #. %5$s is our upload-to-download ratio,
 #. %6$s is the ratio we want to reach before we stop uploading
-#: ../gtk/torrent-cell-renderer.c:77
+#: ../gtk/torrent-cell-renderer.c:75
 #, c-format
 msgid "%1$s of %2$s (%3$s%%), uploaded %4$s (Ratio: %5$s Goal: %6$s)"
 msgstr "%2$s中%1$s (%3$s%%)、うち%4$sアップロード（比率: %5$s、目標: %6$s）"
@@ -1284,7 +1286,7 @@ msgstr "%2$s中%1$s (%3$s%%)、うち%4$sアップロード（比率: %5$s、目
 #. %3$s%% is a percentage of the two,
 #. %4$s is how much we've uploaded,
 #. %5$s is our upload-to-download ratio
-#: ../gtk/torrent-cell-renderer.c:93
+#: ../gtk/torrent-cell-renderer.c:91
 #, c-format
 msgid "%1$s of %2$s (%3$s%%), uploaded %4$s (Ratio: %5$s)"
 msgstr "%2$s中%1$s (%3$s%%)、うち%4$sアップロード（比率: %5$s）"
@@ -1293,7 +1295,7 @@ msgstr "%2$s中%1$s (%3$s%%)、うち%4$sアップロード（比率: %5$s）"
 #. %2$s is how much we've uploaded,
 #. %3$s is our upload-to-download ratio,
 #. %4$s is the ratio we want to reach before we stop uploading
-#: ../gtk/torrent-cell-renderer.c:110
+#: ../gtk/torrent-cell-renderer.c:108
 #, c-format
 msgid "%1$s, uploaded %2$s (Ratio: %3$s Goal: %4$s)"
 msgstr "%1$s, アップロード済み %2$s (比率: %3$s 目標: %4$s)"
@@ -1301,17 +1303,17 @@ msgstr "%1$s, アップロード済み %2$s (比率: %3$s 目標: %4$s)"
 #. %1$s is the torrent's total size,
 #. %2$s is how much we've uploaded,
 #. %3$s is our upload-to-download ratio
-#: ../gtk/torrent-cell-renderer.c:122
+#: ../gtk/torrent-cell-renderer.c:120
 #, c-format
 msgid "%1$s, uploaded %2$s (Ratio: %3$s)"
 msgstr "%1$s, アップロード %2$s (アップロード率: %3$s)"
 
-#: ../gtk/torrent-cell-renderer.c:136
+#: ../gtk/torrent-cell-renderer.c:134
 msgid "Remaining time unknown"
 msgstr "残り時間不明"
 
 #. time remaining
-#: ../gtk/torrent-cell-renderer.c:142
+#: ../gtk/torrent-cell-renderer.c:140
 #, c-format
 msgid "%s remaining"
 msgstr "残り %s"
@@ -1328,15 +1330,15 @@ msgstr "%1$s %2$s, %3$s %4$s"
 msgid "%1$s %2$s"
 msgstr "%1$s %2$s"
 
-#: ../gtk/torrent-cell-renderer.c:179
+#: ../gtk/torrent-cell-renderer.c:183
 msgid "Stalled"
 msgstr "ストール"
 
-#: ../gtk/torrent-cell-renderer.c:181 ../gtk/tr-icon.c:69
+#: ../gtk/tr-icon.c:61
 msgid "Idle"
 msgstr "アイドル"
 
-#: ../gtk/torrent-cell-renderer.c:211
+#: ../gtk/torrent-cell-renderer.c:216
 #, c-format
 msgid "Verifying local data (%.1f%% tested)"
 msgstr "ローカルデータを検証中 (完了 %.1f%%)"
@@ -1346,17 +1348,17 @@ msgstr "ローカルデータを検証中 (完了 %.1f%%)"
 msgid "Ratio %s"
 msgstr "比率 %s"
 
-#: ../gtk/torrent-cell-renderer.c:244
+#: ../gtk/torrent-cell-renderer.c:246
 #, c-format
 msgid "Tracker gave a warning: \"%s\""
 msgstr "トラッカーが警告を発しました： \"%s\""
 
-#: ../gtk/torrent-cell-renderer.c:245
+#: ../gtk/torrent-cell-renderer.c:247
 #, c-format
 msgid "Tracker gave an error: \"%s\""
 msgstr "トラッカーがエラーを発しました： \"%s\""
 
-#: ../gtk/torrent-cell-renderer.c:246
+#: ../gtk/torrent-cell-renderer.c:248
 #, c-format
 msgid "Error: %s"
 msgstr "エラー: %s"
@@ -1373,7 +1375,7 @@ msgid "Downloading metadata from %1$'d peer (%2$d%% done)"
 msgid_plural "Downloading metadata from %1$'d peers (%2$d%% done)"
 msgstr[0] "%1$'d 個のピアからメタデータをダウンロード中 (%2$d%% 完了)"
 
-#: ../gtk/torrent-cell-renderer.c:301
+#: ../gtk/torrent-cell-renderer.c:303
 #, c-format
 msgid "Seeding to %1$'d of %2$'d connected peer"
 msgid_plural "Seeding to %1$'d of %2$'d connected peers"
@@ -1391,26 +1393,26 @@ msgstr "Transmission BitTorrent クライアント"
 msgid "Download and share files over BitTorrent"
 msgstr "BitTorrentでファイルをダウンロードおよび共有します"
 
-#: ../gtk/tr-core.c:1181
+#: ../gtk/tr-core.c:1218
 #, c-format
 msgid "Couldn't read \"%s\": %s"
 msgstr "\"%s\"を読み込めません: %s"
 
-#: ../gtk/tr-core.c:1277
+#: ../gtk/tr-core.c:1314
 #, c-format
 msgid "Skipping unknown torrent \"%s\""
 msgstr "不明なtorrent \"%s\" をスキップします"
 
-#: ../gtk/tr-core.c:1521
+#: ../gtk/tr-core.c:1568
 msgid "Inhibiting desktop hibernation"
 msgstr "デスクトップが休止状態になるのを抑制する"
 
-#: ../gtk/tr-core.c:1525
+#: ../gtk/tr-core.c:1572
 #, c-format
 msgid "Couldn't inhibit desktop hibernation: %s"
 msgstr "デスクトップが休止状態になるのを抑制できませんでした: %s"
 
-#: ../gtk/tr-core.c:1559
+#: ../gtk/tr-core.c:1606
 msgid "Allowing desktop hibernation"
 msgstr "デスクトップ休止状態を許可しています"
 
@@ -1423,7 +1425,7 @@ msgstr "(制限: %s)"
 #. * %2$s: current upload limit, if any
 #. * %3$s: current download speed
 #. * %4$s: current download limit, if any
-#: ../gtk/tr-icon.c:109
+#: ../gtk/tr-icon.c:101
 #, c-format
 msgid ""
 "Transmission\n"
@@ -1434,7 +1436,7 @@ msgstr ""
 "アップロード: %1$s %2$s\n"
 "ダウンロード: %3$s %4$s"
 
-#: ../gtk/tr-prefs.c:272
+#: ../gtk/tr-prefs.c:301
 msgid "Save to _Location:"
 msgstr "保存先フォルダ(_L):"
 
@@ -1450,15 +1452,15 @@ msgstr "最大同時ダウンロード数(_D):"
 msgid "Downloads sharing data in the last N minutes are _active:"
 msgstr ""
 
-#: ../gtk/tr-prefs.c:286 ../libtransmission/torrent.c:1919
+#: ../gtk/tr-prefs.c:319 ../libtransmission/torrent.c:2010
 msgid "Incomplete"
 msgstr "未完成"
 
-#: ../gtk/tr-prefs.c:288
+#: ../gtk/tr-prefs.c:321
 msgid "Append \"._part\" to incomplete files' names"
 msgstr "ダウンロード未完了のファイル名に \".part\" を付け足す(_P)"
 
-#: ../gtk/tr-prefs.c:292
+#: ../gtk/tr-prefs.c:325
 msgid "Keep _incomplete torrents in:"
 msgstr "不完全な torrent を残す(_I):"
 
@@ -1466,368 +1468,368 @@ msgstr "不完全な torrent を残す(_I):"
 msgid "Call _script when torrent is completed:"
 msgstr "torrent の完了時にスクリプトを呼び出す(_S):"
 
-#: ../gtk/tr-prefs.c:324
+#: ../gtk/tr-prefs.c:279
 msgctxt "Gerund"
 msgid "Adding"
 msgstr "追加中"
 
-#: ../gtk/tr-prefs.c:338
+#: ../gtk/tr-prefs.c:339
 msgid "Automatically _add torrents from:"
 msgstr "Torrentファイルを自動的に加える(_A):"
 
-#: ../gtk/tr-prefs.c:346
+#: ../gtk/tr-prefs.c:1319
 msgctxt "Gerund"
 msgid "Seeding"
 msgstr "シード中"
 
-#: ../gtk/tr-prefs.c:348
+#: ../gtk/tr-prefs.c:358
 msgid "Stop seeding at _ratio:"
 msgstr "次の比率でシードを止める(_R):"
 
-#: ../gtk/tr-prefs.c:355
+#: ../gtk/tr-prefs.c:365
 msgid "Stop seeding if idle for _N minutes:"
 msgstr "N分アイドル状態が続いたらシードを止める(_N):"
 
-#: ../gtk/tr-prefs.c:378 ../gtk/tr-prefs.c:1291
+#: ../gtk/tr-prefs.c:388 ../gtk/tr-prefs.c:1325
 msgid "Desktop"
 msgstr "デスクトップ"
 
-#: ../gtk/tr-prefs.c:380
+#: ../gtk/tr-prefs.c:390
 msgid "_Inhibit hibernation when torrents are active"
 msgstr "Torrent動作中はハイバネートさせない(_I)"
 
-#: ../gtk/tr-prefs.c:384
+#: ../gtk/tr-prefs.c:394
 msgid "Show Transmission icon in the _notification area"
 msgstr "通知エリアに Transmission のアイコンを表示(_N)"
 
-#: ../gtk/tr-prefs.c:389
+#: ../gtk/tr-prefs.c:399
 msgid "Notification"
 msgstr "通知"
 
-#: ../gtk/tr-prefs.c:391
+#: ../gtk/tr-prefs.c:401
 msgid "Show a notification when torrents are a_dded"
 msgstr "Torrent追加時に通知を表示する(_D)"
 
-#: ../gtk/tr-prefs.c:395
+#: ../gtk/tr-prefs.c:405
 msgid "Show a notification when torrents _finish"
 msgstr "Torrent終了時に通知を表示する(_F)"
 
-#: ../gtk/tr-prefs.c:399
+#: ../gtk/tr-prefs.c:409
 msgid "Play a _sound when torrents finish"
 msgstr "Torrent終了時にサウンドを再生する(_S)"
 
-#: ../gtk/tr-prefs.c:427
+#: ../gtk/tr-prefs.c:437
 #, c-format
 msgid "Blocklist contains %'d rule"
 msgid_plural "Blocklist contains %'d rules"
 msgstr[0] "ブロックリストは %'d 個のルールを含んでいます"
 
-#: ../gtk/tr-prefs.c:460
+#: ../gtk/tr-prefs.c:471
 #, c-format
 msgid "Blocklist has %'d rule."
 msgid_plural "Blocklist has %'d rules."
 msgstr[0] "ブロックリストとして %'d 個のルールがあります。"
 
-#: ../gtk/tr-prefs.c:464
+#: ../gtk/tr-prefs.c:475
 msgid "<b>Update succeeded!</b>"
 msgstr "<b>アップデート成功!</b>"
 
-#: ../gtk/tr-prefs.c:464
+#: ../gtk/tr-prefs.c:475
 msgid "<b>Unable to update.</b>"
 msgstr "<b>アップデートはできません。</b>"
 
-#: ../gtk/tr-prefs.c:479
+#: ../gtk/tr-prefs.c:490
 msgid "Update Blocklist"
 msgstr "ブロックリストの更新"
 
-#: ../gtk/tr-prefs.c:481
+#: ../gtk/tr-prefs.c:492
 msgid "Getting new blocklist…"
 msgstr "新しいブロックリストを取得中…"
 
-#: ../gtk/tr-prefs.c:509
+#: ../gtk/tr-prefs.c:520
 msgid "Allow encryption"
 msgstr "暗号化を許可する"
 
-#: ../gtk/tr-prefs.c:510
+#: ../gtk/tr-prefs.c:521
 msgid "Prefer encryption"
 msgstr "暗号化を優先する"
 
-#: ../gtk/tr-prefs.c:511
+#: ../gtk/tr-prefs.c:522
 msgid "Require encryption"
 msgstr "暗号化を要求する"
 
-#: ../gtk/tr-prefs.c:535
+#: ../gtk/tr-prefs.c:553
 msgid "Blocklist"
 msgstr "ブロックリスト"
 
-#: ../gtk/tr-prefs.c:537
+#: ../gtk/tr-prefs.c:555
 msgid "Enable _blocklist:"
 msgstr "ブロックリストを有効にする(_B):"
 
-#: ../gtk/tr-prefs.c:551
+#: ../gtk/tr-prefs.c:569
 msgid "_Update"
 msgstr "更新する(_U)"
 
-#: ../gtk/tr-prefs.c:561
+#: ../gtk/tr-prefs.c:579
 msgid "Enable _automatic updates"
 msgstr "自動更新を有効にする(_A)"
 
-#: ../gtk/tr-prefs.c:569
+#: ../gtk/tr-prefs.c:548
 msgid "_Encryption mode:"
 msgstr "暗号化モード(_E):"
 
-#: ../gtk/tr-prefs.c:573
+#: ../gtk/tr-prefs.c:1232
 msgid "Use PE_X to find more peers"
 msgstr "より多くのピアを見つけるためPEXを使用する(_X)"
 
-#: ../gtk/tr-prefs.c:575
+#: ../gtk/tr-prefs.c:1234
 msgid ""
 "PEX is a tool for exchanging peer lists with the peers you're connected to."
 msgstr "PEXは接続中のピアと、ピアのリストを交換するツールです。"
 
-#: ../gtk/tr-prefs.c:579
+#: ../gtk/tr-prefs.c:1238
 msgid "Use _DHT to find more peers"
 msgstr "より多くのピアを見つけるためDHTを使用する(_D)"
 
-#: ../gtk/tr-prefs.c:581
+#: ../gtk/tr-prefs.c:1240
 msgid "DHT is a tool for finding peers without a tracker."
 msgstr "DHTはトラッカーを介さずにピアを見つけるツールです。"
 
-#: ../gtk/tr-prefs.c:585
+#: ../gtk/tr-prefs.c:1244
 msgid "Use _Local Peer Discovery to find more peers"
 msgstr "より多くのピアを見つけるために、Local Peer Discoveryを使用する(_L)"
 
-#: ../gtk/tr-prefs.c:587
+#: ../gtk/tr-prefs.c:1246
 msgid "LPD is a tool for finding peers on your local network."
 msgstr "LPD はローカル・ネットワーク上のピアを検索するツールです。"
 
-#: ../gtk/tr-prefs.c:803
+#: ../gtk/tr-prefs.c:807
 msgid "Web Client"
 msgstr "Webクライアント"
 
 #. "enabled" checkbutton
-#: ../gtk/tr-prefs.c:806
+#: ../gtk/tr-prefs.c:810
 msgid "_Enable web client"
 msgstr "Webクライアントを有効にする(_E)"
 
-#: ../gtk/tr-prefs.c:812
+#: ../gtk/tr-prefs.c:806
 msgid "_Open web client"
 msgstr "Webブラウザで開く(_O)"
 
-#: ../gtk/tr-prefs.c:821
+#: ../gtk/tr-prefs.c:815
 msgid "HTTP _port:"
 msgstr "HTTPポート(_P):"
 
 #. require authentication
-#: ../gtk/tr-prefs.c:825
+#: ../gtk/tr-prefs.c:819
 msgid "Use _authentication"
 msgstr "認証を利用する(_A)"
 
 #. username
-#: ../gtk/tr-prefs.c:833
+#: ../gtk/tr-prefs.c:827
 msgid "_Username:"
 msgstr "ユーザ名(_U):"
 
 #. password
-#: ../gtk/tr-prefs.c:840
+#: ../gtk/tr-prefs.c:834
 msgid "Pass_word:"
 msgstr "パスワード(_W):"
 
 #. require authentication
-#: ../gtk/tr-prefs.c:848
+#: ../gtk/tr-prefs.c:852
 msgid "Only allow these IP a_ddresses to connect:"
 msgstr "以下のIPアドレスからの接続のみ許可する(_D):"
 
-#: ../gtk/tr-prefs.c:873
+#: ../gtk/tr-prefs.c:867
 msgid "IP addresses may use wildcards, such as 192.168.*.*"
 msgstr "IPアドレスの記述には、192.168.*.*のようにワイルドカード(*)を使用できます"
 
-#: ../gtk/tr-prefs.c:895
+#: ../gtk/tr-prefs.c:889
 msgid "Addresses:"
 msgstr "アドレス:"
 
-#: ../gtk/tr-prefs.c:1012
+#: ../gtk/tr-prefs.c:997
 msgid "Every Day"
 msgstr "毎日"
 
-#: ../gtk/tr-prefs.c:1013
+#: ../gtk/tr-prefs.c:998
 msgid "Weekdays"
 msgstr "平日"
 
-#: ../gtk/tr-prefs.c:1014
+#: ../gtk/tr-prefs.c:999
 msgid "Weekends"
 msgstr "週末"
 
-#: ../gtk/tr-prefs.c:1015
+#: ../gtk/tr-prefs.c:1000
 msgid "Sunday"
 msgstr "日曜"
 
-#: ../gtk/tr-prefs.c:1016
+#: ../gtk/tr-prefs.c:1001
 msgid "Monday"
 msgstr "月曜"
 
-#: ../gtk/tr-prefs.c:1017
+#: ../gtk/tr-prefs.c:1002
 msgid "Tuesday"
 msgstr "火曜"
 
-#: ../gtk/tr-prefs.c:1018
+#: ../gtk/tr-prefs.c:1003
 msgid "Wednesday"
 msgstr "水曜"
 
-#: ../gtk/tr-prefs.c:1019
+#: ../gtk/tr-prefs.c:1004
 msgid "Thursday"
 msgstr "木曜"
 
-#: ../gtk/tr-prefs.c:1020
+#: ../gtk/tr-prefs.c:1005
 msgid "Friday"
 msgstr "金曜"
 
-#: ../gtk/tr-prefs.c:1021
+#: ../gtk/tr-prefs.c:1006
 msgid "Saturday"
 msgstr "土曜"
 
-#: ../gtk/tr-prefs.c:1052
+#: ../gtk/tr-prefs.c:1037
 msgid "Speed Limits"
 msgstr "速度制限"
 
-#: ../gtk/tr-prefs.c:1054
+#: ../gtk/tr-prefs.c:1039
 #, c-format
 msgid "_Upload (%s):"
 msgstr "アップロード(%s)(_U):"
 
-#: ../gtk/tr-prefs.c:1061
+#: ../gtk/tr-prefs.c:1046
 #, c-format
 msgid "_Download (%s):"
 msgstr "ダウンロード(%s)(_D):"
 
-#: ../gtk/tr-prefs.c:1072
+#: ../gtk/tr-prefs.c:1055
 msgid "Alternative Speed Limits"
 msgstr "一時的な速度制限"
 
-#: ../gtk/tr-prefs.c:1079
+#: ../gtk/tr-prefs.c:1064
 msgid "Override normal speed limits manually or at scheduled times"
 msgstr "手動またはスケジュールによって速度制限を切り替える"
 
-#: ../gtk/tr-prefs.c:1086
+#: ../gtk/tr-prefs.c:1071
 #, c-format
 msgid "U_pload (%s):"
 msgstr "アップロード(%s)(_P):"
 
-#: ../gtk/tr-prefs.c:1090
+#: ../gtk/tr-prefs.c:1075
 #, c-format
 msgid "Do_wnload (%s):"
 msgstr "ダウンロード(%s)(_W):"
 
-#: ../gtk/tr-prefs.c:1094
+#: ../gtk/tr-prefs.c:1079
 msgid "_Scheduled times:"
 msgstr "スケジュール(_S):"
 
-#: ../gtk/tr-prefs.c:1099
+#: ../gtk/tr-prefs.c:1084
 msgid " _to "
 msgstr " から(_T) "
 
-#: ../gtk/tr-prefs.c:1110
+#: ../gtk/tr-prefs.c:1095
 msgid "_On days:"
 msgstr "日(_O):"
 
-#: ../gtk/tr-prefs.c:1143 ../gtk/tr-prefs.c:1212
+#: ../gtk/tr-prefs.c:1127 ../gtk/tr-prefs.c:1195 ../gtk/tr-prefs.c:1276
 msgid "Status unknown"
 msgstr "状態が不明です"
 
-#: ../gtk/tr-prefs.c:1167
+#: ../gtk/tr-prefs.c:1150
 msgid "Port is <b>open</b>"
 msgstr "ポートは<b>開いています</b>"
 
-#: ../gtk/tr-prefs.c:1167
+#: ../gtk/tr-prefs.c:1150
 msgid "Port is <b>closed</b>"
 msgstr "ポートは<b>閉じています</b>"
 
-#: ../gtk/tr-prefs.c:1182
+#: ../gtk/tr-prefs.c:1165
 msgid "<i>Testing TCP port…</i>"
 msgstr "<i>TCPポートを検証中…</i>"
 
-#: ../gtk/tr-prefs.c:1205
+#: ../gtk/tr-prefs.c:1188
 msgid "Listening Port"
 msgstr "待ち受けポート"
 
-#: ../gtk/tr-prefs.c:1207
+#: ../gtk/tr-prefs.c:1190
 msgid "_Port used for incoming connections:"
 msgstr "受信コネクションで利用するポート(_P):"
 
-#: ../gtk/tr-prefs.c:1215
+#: ../gtk/tr-prefs.c:1198
 msgid "Te_st Port"
 msgstr "テスト(_S)"
 
-#: ../gtk/tr-prefs.c:1222
+#: ../gtk/tr-prefs.c:1205
 msgid "Pick a _random port every time Transmission is started"
 msgstr "Transmissionがスタートする度にランダムなポートを選択する(_R)"
 
-#: ../gtk/tr-prefs.c:1226
+#: ../gtk/tr-prefs.c:1209
 msgid "Use UPnP or NAT-PMP port _forwarding from my router"
 msgstr "UPnP か NAT-PMP によるポート転送を使用する(_F)"
 
-#: ../gtk/tr-prefs.c:1231
+#: ../gtk/tr-prefs.c:1214
 msgid "Peer Limits"
 msgstr "ピア制限"
 
-#: ../gtk/tr-prefs.c:1234
+#: ../gtk/tr-prefs.c:1217
 msgid "Maximum peers per _torrent:"
 msgstr "Torrent毎の最大ピア数(_T):"
 
-#: ../gtk/tr-prefs.c:1236
+#: ../gtk/tr-prefs.c:1219
 msgid "Maximum peers _overall:"
 msgstr "全体での最大ピア数(_O):"
 
-#: ../gtk/tr-prefs.c:1242
+#: ../gtk/tr-prefs.c:1225
 msgid "Enable _uTP for peer communication"
 msgstr "ピア通信でuTPを有効にする(_U)"
 
-#: ../gtk/tr-prefs.c:1244
+#: ../gtk/tr-prefs.c:1227
 msgid "uTP is a tool for reducing network congestion."
 msgstr "uTPはネットワークの輻輳を少なくするツールです。"
 
-#: ../gtk/tr-prefs.c:1262
+#: ../gtk/tr-prefs.c:1301
 msgid "Transmission Preferences"
 msgstr "Transmission 設定"
 
-#: ../gtk/tr-prefs.c:1276
+#: ../gtk/tr-prefs.c:1281
 msgid "Torrents"
 msgstr "Torrent"
 
-#: ../gtk/tr-prefs.c:1279
+#: ../gtk/tr-prefs.c:1317
 msgctxt "Gerund"
 msgid "Downloading"
 msgstr "ダウンロード中"
 
-#: ../gtk/tr-prefs.c:1288
+#: ../gtk/tr-prefs.c:1323
 msgid "Network"
 msgstr "ネットワーク"
 
-#: ../gtk/tr-prefs.c:1294
+#: ../gtk/tr-prefs.c:1299
 msgid "Web"
 msgstr "Web"
 
-#: ../gtk/tr-window.c:148
+#: ../gtk/tr-window.c:141
 msgid "Torrent"
 msgstr "Torrent"
 
-#: ../gtk/tr-window.c:252
+#: ../gtk/tr-window.c:251
 msgid "Total Ratio"
 msgstr "全体比率"
 
-#: ../gtk/tr-window.c:253
+#: ../gtk/tr-window.c:252
 msgid "Session Ratio"
 msgstr "セッション比率"
 
-#: ../gtk/tr-window.c:254
+#: ../gtk/tr-window.c:253
 msgid "Total Transfer"
 msgstr "全体転送"
 
-#: ../gtk/tr-window.c:255
+#: ../gtk/tr-window.c:254
 msgid "Session Transfer"
 msgstr "セッション転送"
 
-#: ../gtk/tr-window.c:284
+#: ../gtk/tr-window.c:288
 #, c-format
 msgid ""
 "Click to disable Alternative Speed Limits\n"
@@ -1836,7 +1838,7 @@ msgstr ""
 "クリックすると一時的な速度制限を無効化します\n"
 "(ダウンロード %1$s, アップロード %2$s)"
 
-#: ../gtk/tr-window.c:285
+#: ../gtk/tr-window.c:289
 #, c-format
 msgid ""
 "Click to enable Alternative Speed Limits\n"
@@ -1845,112 +1847,112 @@ msgstr ""
 "クリックすると一時的な速度制限を有効化します\n"
 "(ダウンロード %1$s, アップロード %2$s)"
 
-#: ../gtk/tr-window.c:350
+#: ../gtk/tr-window.c:349
 #, c-format
 msgid "Tracker will allow requests in %s"
 msgstr ""
 
-#: ../gtk/tr-window.c:419
+#: ../gtk/tr-window.c:424
 msgid "Unlimited"
 msgstr "制限なし"
 
-#: ../gtk/tr-window.c:486
+#: ../gtk/tr-window.c:497
 msgid "Seed Forever"
 msgstr "ずっとシードする"
 
-#: ../gtk/tr-window.c:524
+#: ../gtk/tr-window.c:536
 msgid "Limit Download Speed"
 msgstr "ダウンロード速度制限"
 
-#: ../gtk/tr-window.c:528
+#: ../gtk/tr-window.c:540
 msgid "Limit Upload Speed"
 msgstr "アップロード速度制限"
 
-#: ../gtk/tr-window.c:535
+#: ../gtk/tr-window.c:547
 msgid "Stop Seeding at Ratio"
 msgstr "シードを停止する比率"
 
-#: ../gtk/tr-window.c:569
+#: ../gtk/tr-window.c:581
 #, c-format
 msgid "Stop at Ratio (%s)"
 msgstr "この比率で停止 (%s)"
 
-#: ../gtk/tr-window.c:771
+#: ../gtk/tr-window.c:777
 #, c-format
 msgid "%1$'d of %2$'d Torrent"
 msgid_plural "%1$'d of %2$'d Torrents"
 msgstr[0] "%1$'d / %2$'d Torrent"
 
-#: ../gtk/tr-window.c:777
+#: ../gtk/tr-window.c:783
 #, c-format
 msgid "%'d Torrent"
 msgid_plural "%'d Torrents"
 msgstr[0] "%'d Torrent"
 
-#: ../gtk/tr-window.c:797 ../gtk/tr-window.c:825
+#: ../gtk/tr-window.c:804 ../gtk/tr-window.c:832
 #, c-format
 msgid "Ratio: %s"
 msgstr "アップロード率: %s"
 
-#: ../gtk/tr-window.c:808
+#: ../gtk/tr-window.c:815
 #, c-format
 msgid "Down: %1$s, Up: %2$s"
 msgstr "Down: %1$s, Up: %2$s"
 
-#: ../gtk/tr-window.c:819
+#: ../gtk/tr-window.c:826
 #, c-format
 msgid "size|Down: %1$s, Up: %2$s"
 msgstr "サイズ|Down: %1$s, Up: %2$s"
 
-#: ../gtk/util.c:38
+#: ../gtk/util.c:37
 msgid "KiB"
 msgstr "KB"
 
-#: ../gtk/util.c:39
+#: ../gtk/util.c:38
 msgid "MiB"
 msgstr "MB"
 
-#: ../gtk/util.c:40
+#: ../gtk/util.c:39
 msgid "GiB"
 msgstr "GB"
 
-#: ../gtk/util.c:41
+#: ../gtk/util.c:40
 msgid "TiB"
 msgstr "TB"
 
-#: ../gtk/util.c:44
+#: ../gtk/util.c:43
 msgid "kB"
 msgstr "kB"
 
-#: ../gtk/util.c:45
+#: ../gtk/util.c:44
 msgid "MB"
 msgstr "MB"
 
-#: ../gtk/util.c:46
+#: ../gtk/util.c:45
 msgid "GB"
 msgstr "GB"
 
-#: ../gtk/util.c:47
+#: ../gtk/util.c:46
 msgid "TB"
 msgstr "TB"
 
-#: ../gtk/util.c:50
+#: ../gtk/util.c:49
 msgid "kB/s"
 msgstr "kB/s"
 
-#: ../gtk/util.c:51
+#: ../gtk/util.c:50
 msgid "MB/s"
 msgstr "MB/s"
 
-#: ../gtk/util.c:52
+#: ../gtk/util.c:51
 msgid "GB/s"
 msgstr "GB/s"
 
-#: ../gtk/util.c:53
+#: ../gtk/util.c:52
 msgid "TB/s"
 msgstr "TB/s"
 
-#: ../cli/cli.c:115 ../gtk/util.c:87 ../libtransmission/utils.c:1509
+#: ../cli/cli.c:117 ../gtk/util.c:87 ../libtransmission/utils.c:1444
 msgid "None"
 msgstr "なし"
 
@@ -1978,45 +1980,45 @@ msgid "%'d second"
 msgid_plural "%'d seconds"
 msgstr[0] "%'d 秒"
 
-#: ../gtk/util.c:223
+#: ../gtk/util.c:229
 #, c-format
 msgid "The torrent file \"%s\" contains invalid data."
 msgstr "Torrentファイル\"%s\"には無効なデータが含まれています。"
 
-#: ../gtk/util.c:224
+#: ../gtk/util.c:222
 #, c-format
 msgid "The torrent file \"%s\" is already in use."
 msgstr "torrentファイル \"%s\" はすでに使用中です。"
 
-#: ../gtk/util.c:225
+#: ../gtk/util.c:233
 #, c-format
 msgid "The torrent file \"%s\" encountered an unknown error."
 msgstr "torrentファイル \"%s\" で不明なエラーが発生しました。"
 
-#: ../gtk/util.c:233
+#: ../gtk/util.c:239
 msgid "Error opening torrent"
 msgstr "Torrentのオープンエラー"
 
-#: ../gtk/util.c:540
+#: ../gtk/util.c:552
 #, c-format
 msgid "Error opening \"%s\""
 msgstr "\"%s\"を開くときにエラーが発生しました"
 
-#: ../gtk/util.c:543
+#: ../gtk/util.c:555
 #, c-format
 msgid "Server returned \"%1$ld %2$s\""
 msgstr "サーバーが\"%1$ld %2$s\"を返しました"
 
-#: ../gtk/util.c:563
+#: ../gtk/util.c:575
 msgid "Unrecognized URL"
 msgstr "認識されない URL"
 
-#: ../gtk/util.c:565
+#: ../gtk/util.c:577
 #, c-format
 msgid "Transmission doesn't know how to use \"%s\""
 msgstr "Transmissionは、\"%s\"の使用方法を把握していません"
 
-#: ../gtk/util.c:570
+#: ../gtk/util.c:582
 #, c-format
 msgid ""
 "This magnet link appears to be intended for something other than BitTorrent. "
@@ -2026,255 +2028,255 @@ msgstr ""
 "っています。"
 
 #. did caller give us an uninitialized val?
-#: ../libtransmission/bencode.c:1117
+#: ../libtransmission/variant.c:974
 msgid "Invalid metadata"
 msgstr "無効なメタデータ"
 
-#: ../libtransmission/bencode.c:1723 ../libtransmission/bencode.c:1751
+#: ../libtransmission/variant.c:1257 ../libtransmission/variant.c:1280
 #, c-format
 msgid "Couldn't save temporary file \"%1$s\": %2$s"
 msgstr "一時ファイル \"%1$s\" を保存できませんでした: %2$s"
 
-#: ../libtransmission/bencode.c:1738
+#: ../libtransmission/variant.c:1266
 #, c-format
 msgid "Saved \"%s\""
 msgstr "\"%s\"として保存しました"
 
-#: ../libtransmission/bencode.c:1743 ../libtransmission/blocklist.c:417
-#: ../libtransmission/rpcimpl.c:1260 ../libtransmission/rpcimpl.c:1271
-#: ../libtransmission/rpcimpl.c:1287
+#: ../libtransmission/blocklist.c:402 ../libtransmission/rpcimpl.c:1513
+#: ../libtransmission/rpcimpl.c:1527 ../libtransmission/rpcimpl.c:1546
+#: ../libtransmission/variant.c:1271
 #, c-format
 msgid "Couldn't save file \"%1$s\": %2$s"
 msgstr "\"%1$s\" 保存失敗: %2$s"
 
-#: ../libtransmission/blocklist.c:86 ../libtransmission/blocklist.c:325
-#: ../libtransmission/utils.c:438
+#: ../libtransmission/blocklist.c:67 ../libtransmission/blocklist.c:309
+#: ../libtransmission/utils.c:233
 #, c-format
 msgid "Couldn't read \"%1$s\": %2$s"
 msgstr "\"%1$s\" 読み込み失敗: %2$s"
 
-#: ../libtransmission/blocklist.c:115
+#: ../libtransmission/blocklist.c:100
 #, c-format
 msgid "Blocklist \"%s\" contains %zu entries"
 msgstr "ブロックリスト\"%s\"には%zu個のエントリが存在します"
 
 #. don't try to display the actual lines - it causes issues
-#: ../libtransmission/blocklist.c:368
+#: ../libtransmission/blocklist.c:352
 #, c-format
 msgid "blocklist skipped invalid address at line %d"
 msgstr "ブロックリストの%d行目にある不正なアドレスをスキップしました"
 
-#: ../libtransmission/blocklist.c:420
+#: ../libtransmission/blocklist.c:408
 #, c-format
 msgid "Blocklist \"%s\" updated with %zu entries"
 msgstr "ブロックリスト\"%s\"の%zu個のエントリを更新しました"
 
-#: ../libtransmission/fdlimit.c:348 ../libtransmission/utils.c:574
-#: ../libtransmission/utils.c:585
+#: ../libtransmission/fdlimit.c:171 ../libtransmission/file-posix.c:189
+#: ../libtransmission/file-posix.c:199
 #, c-format
 msgid "Couldn't create \"%1$s\": %2$s"
 msgstr "\"%1$s\" 作成失敗: %2$s"
 
-#: ../libtransmission/fdlimit.c:369
+#: ../libtransmission/fdlimit.c:191
 #, c-format
 msgid "Couldn't open \"%1$s\": %2$s"
 msgstr "\"%1$s\" オープン失敗: %2$s"
 
-#: ../libtransmission/fdlimit.c:384
+#: ../libtransmission/fdlimit.c:231
 #, c-format
 msgid "Couldn't truncate \"%1$s\": %2$s"
 msgstr "\"%1$s\"を切り捨てできませんでした: %2$s"
 
-#: ../libtransmission/fdlimit.c:670
+#: ../libtransmission/fdlimit.c:523
 #, c-format
 msgid "Couldn't create socket: %s"
 msgstr "ソケット作成失敗: %s"
 
-#: ../libtransmission/makemeta.c:63
+#: ../libtransmission/makemeta.c:53
 #, c-format
 msgid "Torrent Creator is skipping file \"%s\": %s"
 msgstr "Torrent Creatorはファイル\"%s\"をスキップしています: %s"
 
-#: ../libtransmission/metainfo.c:533
+#: ../libtransmission/metainfo.c:590
 #, c-format
 msgid "Invalid metadata entry \"%s\""
 msgstr "無効なメタデータのエントリー \"%s\""
 
-#: ../libtransmission/natpmp.c:32
+#: ../libtransmission/natpmp.c:30
 msgid "Port Forwarding (NAT-PMP)"
 msgstr "ポートフォワーディング (NAT-PMP)"
 
-#: ../libtransmission/natpmp.c:72
+#: ../libtransmission/natpmp.c:70
 #, c-format
 msgid "%s succeeded (%d)"
 msgstr "%s に成功しました (%d)"
 
-#: ../libtransmission/natpmp.c:141
+#: ../libtransmission/natpmp.c:138
 #, c-format
 msgid "Found public address \"%s\""
 msgstr "パブリックアドレス\"%s\"が見つかりました"
 
-#: ../libtransmission/natpmp.c:176
+#: ../libtransmission/natpmp.c:173
 #, c-format
 msgid "no longer forwarding port %d"
 msgstr "ポート %d のフォワードを行わない"
 
-#: ../libtransmission/natpmp.c:221
+#: ../libtransmission/natpmp.c:218
 #, c-format
 msgid "Port %d forwarded successfully"
 msgstr "ポート %d の開通に成功しました"
 
-#: ../libtransmission/net.c:268
+#: ../libtransmission/net.c:269
 #, c-format
 msgid "Couldn't set source address %s on %d: %s"
 msgstr "ソースアドレス%s (%d)を設定できませんでした: %s"
 
-#: ../libtransmission/net.c:284
+#: ../libtransmission/net.c:286
 #, c-format
 msgid "Couldn't connect socket %d to %s, port %d (errno %d - %s)"
-msgstr ""
+msgstr "ソケット %d を%s にポート %d で接続することができませんでした (errno %d - %s)"
 
-#: ../libtransmission/net.c:360
+#: ../libtransmission/net.c:370
 msgid "Is another copy of Transmission already running?"
 msgstr "他の Transmission プログラムをすでに実行していませんか?"
 
-#: ../libtransmission/net.c:365
+#: ../libtransmission/net.c:375
 #, c-format
 msgid "Couldn't bind port %d on %s: %s"
 msgstr "%2$s: %3$s に対するポート %1$d のバインドに失敗しました"
 
-#: ../libtransmission/net.c:367
+#: ../libtransmission/net.c:377
 #, c-format
 msgid "Couldn't bind port %d on %s: %s (%s)"
 msgstr "ポート%d、アドレス%sのbind()に失敗しました： %s (%s)"
 
-#: ../libtransmission/peer-msgs.c:1898
+#: ../libtransmission/peer-msgs.c:2049
 #, c-format
 msgid "Please Verify Local Data! Piece #%zu is corrupt."
 msgstr "ローカルデータを検証してください! ピース #%zu は破損しています。"
 
-#: ../libtransmission/port-forwarding.c:31
+#: ../libtransmission/port-forwarding.c:29
 msgid "Port Forwarding"
 msgstr "ポートフォワーディング"
 
-#: ../libtransmission/port-forwarding.c:58
+#: ../libtransmission/port-forwarding.c:56
 msgid "Starting"
 msgstr "開始"
 
-#: ../libtransmission/port-forwarding.c:59
+#: ../libtransmission/port-forwarding.c:57
 msgid "Forwarded"
 msgstr "転送済み"
 
-#: ../libtransmission/port-forwarding.c:60
+#: ../libtransmission/port-forwarding.c:58
 msgid "Stopping"
 msgstr "停止"
 
-#: ../libtransmission/port-forwarding.c:61
+#: ../libtransmission/port-forwarding.c:59
 msgid "Not forwarded"
 msgstr "転送されていません"
 
-#: ../libtransmission/port-forwarding.c:91 ../libtransmission/torrent.c:2060
+#: ../libtransmission/port-forwarding.c:90 ../libtransmission/torrent.c:2216
 #, c-format
 msgid "State changed from \"%1$s\" to \"%2$s\""
 msgstr "状態が \"%1$s\" から \"%2$s\" に変化しました"
 
-#: ../libtransmission/port-forwarding.c:181
+#: ../libtransmission/port-forwarding.c:180
 msgid "Stopped"
 msgstr "停止しました"
 
 #. first %s is the application name
 #. second %s is the version number
-#: ../libtransmission/session.c:722
+#: ../libtransmission/session.c:738
 #, c-format
 msgid "%s %s started"
 msgstr "%s %s が開始しました"
 
-#: ../libtransmission/session.c:1943
+#: ../libtransmission/session.c:2032
 #, c-format
 msgid "Loaded %d torrents"
 msgstr "%d torrentをロードしました"
 
-#: ../libtransmission/torrent.c:525
+#: ../libtransmission/torrent.c:574
 #, c-format
 msgid "Tracker warning: \"%s\""
 msgstr "トラッカー警告: \"%s\""
 
-#: ../libtransmission/torrent.c:532
+#: ../libtransmission/torrent.c:581
 #, c-format
 msgid "Tracker error: \"%s\""
 msgstr "トラッカーエラー: \"%s\""
 
-#: ../libtransmission/torrent.c:787
+#: ../libtransmission/torrent.c:845
 msgid ""
 "No data found! Ensure your drives are connected or use \"Set Location\". To "
 "re-download, remove the torrent and re-add it."
 msgstr ""
 
-#: ../libtransmission/torrent.c:1677
+#: ../libtransmission/torrent.c:1732
 msgid "Restarted manually -- disabling its seed ratio"
 msgstr ""
 
-#: ../libtransmission/torrent.c:1829
+#: ../libtransmission/torrent.c:1915
 msgid "Removing torrent"
 msgstr "torrent の削除"
 
-#: ../libtransmission/torrent.c:1913
+#: ../libtransmission/torrent.c:2004
 msgid "Done"
 msgstr "完了"
 
-#: ../libtransmission/torrent.c:1916
+#: ../libtransmission/torrent.c:2007
 msgid "Complete"
 msgstr "完了"
 
-#: ../libtransmission/upnp.c:35
+#: ../libtransmission/upnp.c:29
 msgid "Port Forwarding (UPnP)"
 msgstr "ポートフォワーディング (UPnP)"
 
-#: ../libtransmission/upnp.c:199
+#: ../libtransmission/upnp.c:226
 #, c-format
 msgid "Found Internet Gateway Device \"%s\""
-msgstr ""
+msgstr "インターネットゲートウェイデバイス\"%s\"が見つかりました"
 
-#: ../libtransmission/upnp.c:202
+#: ../libtransmission/upnp.c:229
 #, c-format
 msgid "Local Address is \"%s\""
 msgstr "ローカルアドレス \"%s\""
 
-#: ../libtransmission/upnp.c:231
+#: ../libtransmission/upnp.c:258
 #, c-format
 msgid "Port %d isn't forwarded"
 msgstr "ポート %d は開通していません"
 
-#: ../libtransmission/upnp.c:242
+#: ../libtransmission/upnp.c:269
 #, c-format
 msgid "Stopping port forwarding through \"%s\", service \"%s\""
 msgstr ""
 
-#: ../libtransmission/upnp.c:275
+#: ../libtransmission/upnp.c:302
 #, c-format
 msgid ""
 "Port forwarding through \"%s\", service \"%s\". (local address: %s:%d)"
 msgstr ""
 
-#: ../libtransmission/upnp.c:280
+#: ../libtransmission/upnp.c:307
 msgid "Port forwarding successful!"
 msgstr "ポートフォワーディングは成功しました!"
 
-#: ../libtransmission/utils.c:452
+#: ../libtransmission/utils.c:245 ../libtransmission/utils.c:246
 msgid "Not a regular file"
 msgstr ""
 
-#: ../libtransmission/utils.c:470
+#: ../libtransmission/utils.c:258
 msgid "Memory allocation failed"
 msgstr "メモリ割り当てに失敗しました"
 
 #. Node exists but isn't a folder
-#: ../libtransmission/utils.c:584
+#: ../libtransmission/file-posix.c:198
 #, c-format
 msgid "File \"%s\" is in the way"
 msgstr ""
 
-#: ../libtransmission/verify.c:229
+#: ../libtransmission/verify.c:224
 msgid "Verifying torrent"
 msgstr "Torrent の検証中"
 
