@@ -463,6 +463,8 @@
 		C1077A4F183EB29600634C22 /* error.h in Headers */ = {isa = PBXBuildFile; fileRef = C1077A4B183EB29600634C22 /* error.h */; };
 		C1077A50183EB29600634C22 /* file-posix.c in Sources */ = {isa = PBXBuildFile; fileRef = C1077A4C183EB29600634C22 /* file-posix.c */; };
 		C1077A51183EB29600634C22 /* file.h in Headers */ = {isa = PBXBuildFile; fileRef = C1077A4D183EB29600634C22 /* file.h */; };
+		C10C644D1D9AF328003C1B4C /* session-id.c in Sources */ = {isa = PBXBuildFile; fileRef = C10C644B1D9AF328003C1B4C /* session-id.c */; };
+		C10C644E1D9AF328003C1B4C /* session-id.h in Headers */ = {isa = PBXBuildFile; fileRef = C10C644C1D9AF328003C1B4C /* session-id.h */; };
 		C1305EBE186A13B100F03351 /* file.c in Sources */ = {isa = PBXBuildFile; fileRef = C1305EB8186A134000F03351 /* file.c */; };
 		C15320211C82602500CC21E2 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8D1107310486CEB800E47090 /* Info.plist */; };
 		C1639A741A55F4E000E42033 /* libb64.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C1639A6F1A55F4D600E42033 /* libb64.a */; };
@@ -1223,6 +1225,8 @@
 		C1077A4B183EB29600634C22 /* error.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = error.h; path = libtransmission/error.h; sourceTree = "<group>"; };
 		C1077A4C183EB29600634C22 /* file-posix.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "file-posix.c"; path = "libtransmission/file-posix.c"; sourceTree = "<group>"; };
 		C1077A4D183EB29600634C22 /* file.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = file.h; path = libtransmission/file.h; sourceTree = "<group>"; };
+		C10C644B1D9AF328003C1B4C /* session-id.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "session-id.c"; path = "libtransmission/session-id.c"; sourceTree = "<group>"; };
+		C10C644C1D9AF328003C1B4C /* session-id.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "session-id.h"; path = "libtransmission/session-id.h"; sourceTree = "<group>"; };
 		C1305EB8186A134000F03351 /* file.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = file.c; path = libtransmission/file.c; sourceTree = "<group>"; };
 		C1639A6F1A55F4D600E42033 /* libb64.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libb64.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		C1639A761A55F56600E42033 /* cdecode.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = cdecode.c; path = "third-party/libb64/cdecode.c"; sourceTree = "<group>"; };
@@ -1759,6 +1763,8 @@
 				BEFC1DF50C07861A00B0BB3C /* transmission.h */,
 				BEFC1DF60C07861A00B0BB3C /* session.c */,
 				BEFC1E140C07861A00B0BB3C /* session.h */,
+				C10C644B1D9AF328003C1B4C /* session-id.c */,
+				C10C644C1D9AF328003C1B4C /* session-id.h */,
 				A20152790D1C26EB0081714F /* torrent-ctor.c */,
 				A23F299F132A447400E9A83B /* announcer-common.h */,
 				A25964A4106D73A800453B31 /* announcer.c */,
@@ -2140,6 +2146,7 @@
 				D4AF3B300C41F7A600D46B6B /* list.h in Headers */,
 				A24621410C769D0900088E81 /* trevent.h in Headers */,
 				4D36BA700CA2F00800A63CA5 /* crypto.h in Headers */,
+				C10C644E1D9AF328003C1B4C /* session-id.h in Headers */,
 				4D36BA730CA2F00800A63CA5 /* handshake.h in Headers */,
 				4D36BA750CA2F00800A63CA5 /* peer-io.h in Headers */,
 				4D36BA780CA2F00800A63CA5 /* peer-mgr.h in Headers */,
@@ -2774,6 +2781,7 @@
 				4D36BA720CA2F00800A63CA5 /* handshake.c in Sources */,
 				4D36BA740CA2F00800A63CA5 /* peer-io.c in Sources */,
 				C1033E071A3279B800EF44D8 /* crypto-utils-fallback.c in Sources */,
+				C10C644D1D9AF328003C1B4C /* session-id.c in Sources */,
 				4D36BA770CA2F00800A63CA5 /* peer-mgr.c in Sources */,
 				C1077A50183EB29600634C22 /* file-posix.c in Sources */,
 				4D36BA790CA2F00800A63CA5 /* peer-msgs.c in Sources */,

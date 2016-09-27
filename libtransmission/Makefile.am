@@ -56,6 +56,7 @@ libtransmission_a_SOURCES = \
   rpcimpl.c \
   rpc-server.c \
   session.c \
+  session-id.c \
   stats.c \
   torrent.c \
   torrent-ctor.c \
@@ -146,6 +147,7 @@ noinst_HEADERS = \
   rpcimpl.h \
   rpc-server.h \
   session.h \
+  session-id.h \
   stats.h \
   torrent.h \
   torrent-magnet.h \
