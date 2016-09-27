@@ -315,6 +315,7 @@ static const struct tr_key_struct my_static[] =
   { "seederCount", 11 },
   { "seeding-time-seconds", 20 },
   { "session-count", 13 },
+  { "session-id", 10 },
   { "sessionCount", 12 },
   { "show-backup-trackers", 20 },
   { "show-extra-peer-details", 23 },

@@ -46,6 +46,7 @@ set(${PROJECT_NAME}_SOURCES
     rpcimpl.c
     rpc-server.c
     session.c
+    session-id.c
     stats.c
     torrent.c
     torrent-ctor.c
@@ -105,6 +106,7 @@ set(${PROJECT_NAME}_PUBLIC_HEADERS
     makemeta.h
     quark.h
     rpcimpl.h
+    session-id.h
     tr-getopt.h
     transmission.h
     utils.h

@@ -518,15 +518,16 @@
 
    Method name: "session-set"
    Request arguments: one or more of 4.1's arguments, except: "blocklist-size",
-                      "config-dir", "rpc-version", "rpc-version-minimum", and
-                      "version"
+                      "config-dir", "rpc-version", "rpc-version-minimum",
+                      "version", and "session-id"
    Response arguments: none
 
 4.1.2.  Accessors
 
    Method name: "session-get"
-   Request arguments: none
-   Response arguments: all of 4.1's arguments
+   Request arguments: an optional "fields" array of keys (see 4.1)
+   Response arguments: key/value pairs matching the request's "fields"
+       argument if present, or all supported fields (see 4.1) otherwise.
 
 4.2.  Session Statistics
 
@@ -743,7 +744,7 @@
    13    | 2.30    | yes       | session-get          | new arg "isUTP" to the "peers" list
          |         | yes       | torrent-add          | new arg "cookies"
          |         |        NO | torrent-get          | removed arg "peersKnown"
-   ------+---------+-----------+--------------------------+-------------------------------
+   ------+---------+-----------+----------------------+-------------------------------
    14    | 2.40    |        NO | torrent-get          | values of "status" field changed
          |         | yes       | torrent-get          | new arg "queuePosition"
          |         | yes       | torrent-get          | new arg "isStalled"
@@ -760,11 +761,14 @@
          |         | yes       |                      | new method "queue-move-down"
          |         | yes       |                      | new method "queue-move-bottom"
          |         | yes       |                      | new method "torrent-start-now"
-   ------+---------+-----------+--------------------------+-------------------------------
+   ------+---------+-----------+----------------------+-------------------------------
    15    | 2.80    | yes       | torrent-get          | new arg "etaIdle"
          |         | yes       | torrent-rename-path  | new method
          |         | yes       | free-space           | new method
-         |         | yes       | torrent-add          | new return return arg "torrent-duplicate"
+         |         | yes       | torrent-add          | new return arg "torrent-duplicate"
+   ------+---------+-----------+----------------------+-------------------------------
+   16    | 3.00    | yes       | session-get          | new request arg "fields"
+         |         | yes       | session-get          | new arg "session-id"
 
 5.1.  Upcoming Breakage
 

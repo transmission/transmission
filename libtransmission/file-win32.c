@@ -1144,6 +1144,40 @@ tr_sys_file_unmap (const void  * address,
   return ret;
 }
 
+bool
+tr_sys_file_lock (tr_sys_file_t    handle,
+                  int              operation,
+                  tr_error      ** error)
+{
+  bool ret;
+  OVERLAPPED overlapped = { .Pointer = 0, .hEvent = NULL };
+
+  assert (handle != TR_BAD_SYS_FILE);
+  assert ((operation & ~(TR_SYS_FILE_LOCK_SH | TR_SYS_FILE_LOCK_EX | TR_SYS_FILE_LOCK_NB | TR_SYS_FILE_LOCK_UN)) == 0);
+  assert (!!(operation & TR_SYS_FILE_LOCK_SH) + !!(operation & TR_SYS_FILE_LOCK_EX) + !!(operation & TR_SYS_FILE_LOCK_UN) == 1);
+
+  if ((operation & TR_SYS_FILE_LOCK_UN) == 0)
+    {
+      DWORD native_flags = 0;
+
+      if ((operation & TR_SYS_FILE_LOCK_EX) != 0)
+        native_flags |= LOCKFILE_EXCLUSIVE_LOCK;
+      if ((operation & TR_SYS_FILE_LOCK_NB) != 0)
+        native_flags |= LOCKFILE_FAIL_IMMEDIATELY;
+
+      ret = LockFileEx (handle, native_flags, 0, MAXDWORD, MAXDWORD, &overlapped) != FALSE;
+    }
+  else
+    {
+      ret = UnlockFileEx (handle, 0, MAXDWORD, MAXDWORD, &overlapped) != FALSE;
+    }
+
+  if (!ret)
+    set_system_error (error, GetLastError ());
+
+  return ret;
+}
+
 char *
 tr_sys_dir_get_current (tr_error ** error)
 {
