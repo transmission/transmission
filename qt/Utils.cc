@@ -45,9 +45,9 @@
 extern QPixmap qt_pixmapFromWinHICON(HICON icon);
 #endif
 
-#ifdef _WIN32
 namespace
 {
+#ifdef _WIN32
   void
   addAssociatedFileIcon (const QFileInfo& fileInfo, UINT iconSize, QIcon& icon)
   {
@@ -83,8 +83,14 @@ namespace
     if (!pixmap.isNull ())
       icon.addPixmap (pixmap);
   }
-} // namespace
 #endif
+
+  bool
+  isSlashChar (const QChar& c)
+  {
+    return c == QLatin1Char ('/') || c == QLatin1Char ('\\');
+  }
+} // namespace
 
 QIcon
 Utils::guessMimeIcon (const QString& filename)
@@ -201,8 +207,10 @@ Utils::isValidUtf8 (const char * s)
 QString
 Utils::removeTrailingDirSeparator (const QString& path)
 {
-  const QFileInfo pathInfo (path);
-  return pathInfo.fileName ().isEmpty () ? pathInfo.absolutePath () : pathInfo.absoluteFilePath ();
+  int i = path.size ();
+  while (i > 1 && isSlashChar (path[i - 1]))
+    --i;
+  return path.left (i);
 }
 
 int
