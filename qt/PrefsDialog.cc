@@ -130,6 +130,8 @@ PrefsDialog::updateWidgetValue (QWidget * widget, int prefKey)
     w->setText (myPrefs.getString (prefKey));
   else if (auto w = qobject_cast<PathButton*> (widget))
     w->setPath (myPrefs.getString (prefKey));
+  else if (auto w = qobject_cast<FreeSpaceLabel*> (widget))
+    w->setPath (myPrefs.getString (prefKey));
   else
     return false;
 
@@ -490,6 +492,7 @@ PrefsDialog::initDownloadingTab ()
   linkWidgetToPref (ui.trashTorrentFileCheck, Prefs::TRASH_ORIGINAL);
   linkWidgetToPref (ui.downloadDirButton, Prefs::DOWNLOAD_DIR);
   linkWidgetToPref (ui.downloadDirEdit, Prefs::DOWNLOAD_DIR);
+  linkWidgetToPref (ui.downloadDirFreeSpaceLabel, Prefs::DOWNLOAD_DIR);
   linkWidgetToPref (ui.downloadQueueSizeSpin, Prefs::DOWNLOAD_QUEUE_SIZE);
   linkWidgetToPref (ui.queueStalledMinutesSpin, Prefs::QUEUE_STALLED_MINUTES);
   linkWidgetToPref (ui.renamePartialFilesCheck, Prefs::RENAME_PARTIAL_FILES);
@@ -651,36 +654,10 @@ PrefsDialog::refreshPref (int key)
           break;
         }
 
-      case Prefs::DIR_WATCH:
-        ui.watchDirButton->setText (QFileInfo (myPrefs.getString (Prefs::DIR_WATCH)).fileName ());
-        break;
-
-      case Prefs::SCRIPT_TORRENT_DONE_FILENAME:
-        {
-          const QString path (myPrefs.getString (key));
-          ui.completionScriptButton->setText (QFileInfo (path).fileName ());
-          break;
-        }
-
       case Prefs::PEER_PORT:
         ui.peerPortStatusLabel->setText (tr ("Status unknown"));
         ui.testPeerPortButton->setEnabled (true);
         break;
-
-      case Prefs::DOWNLOAD_DIR:
-        {
-          const QString path (myPrefs.getString (key));
-          ui.downloadDirButton->setText (QFileInfo (path).fileName ());
-          ui.downloadDirFreeSpaceLabel->setPath (path);
-          break;
-        }
-
-      case Prefs::INCOMPLETE_DIR:
-        {
-          QString path (myPrefs.getString (key));
-          ui.incompleteDirButton->setText (QFileInfo (path).fileName ());
-          break;
-        }
 
       default:
         break;
