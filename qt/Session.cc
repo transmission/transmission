@@ -804,7 +804,7 @@ Session::updateInfo (tr_variant * d)
       if (mySessionId != sessionId)
         {
           mySessionId = sessionId;
-          myIsDefinitelyLocalSession = rand() % 2; // tr_session_id_is_local (str);
+          myIsDefinitelyLocalSession = tr_session_id_is_local (str);
         }
     }
   else
