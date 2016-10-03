@@ -128,6 +128,8 @@ class Session: public QObject
     tr_session_stats myStats;
     tr_session_stats myCumulativeStats;
     QString mySessionVersion;
+    QString mySessionId;
+    bool myIsDefinitelyLocalSession;
     RpcClient myRpc;
 };
 

@@ -29,8 +29,9 @@ OptionsDialog::OptionsDialog (Session& session, const Prefs& prefs, const AddDat
   BaseDialog (parent),
   mySession (session),
   myAdd (addme),
+  myIsLocal (mySession.isLocal ()),
   myHaveInfo (false),
-  myVerifyButton (nullptr),
+  myVerifyButton (new QPushButton (tr ("&Verify Local Data"), this)),
   myVerifyFile (nullptr),
   myVerifyHash (QCryptographicHash::Sha1),
   myEditTimer (this)
@@ -76,42 +77,27 @@ OptionsDialog::OptionsDialog (Session& session, const Prefs& prefs, const AddDat
   ui.freeSpaceLabel->setSession (mySession);
   ui.freeSpaceLabel->setPath (downloadDir);
 
-  if (session.isLocal ())
-    {
-      ui.destinationStack->setCurrentWidget (ui.destinationButton);
-      ui.destinationButton->setMode (PathButton::DirectoryMode);
-      ui.destinationButton->setTitle (tr ("Select Destination"));
-      ui.destinationButton->setPath (downloadDir);
-      myLocalDestination = downloadDir;
-      connect (ui.destinationButton, SIGNAL (pathChanged (QString)), this, SLOT (onDestinationChanged ()));
-    }
-  else
-    {
-      ui.destinationStack->setCurrentWidget (ui.destinationEdit);
-      ui.destinationEdit->setText (downloadDir);
-      ui.freeSpaceLabel->setPath (downloadDir);
-      connect (ui.destinationEdit, SIGNAL (textEdited (QString)), &myEditTimer, SLOT (start ()));
-      connect (ui.destinationEdit, SIGNAL (editingFinished ()), this, SLOT (onDestinationChanged ()));
-    }
+  ui.destinationButton->setMode (PathButton::DirectoryMode);
+  ui.destinationButton->setTitle (tr ("Select Destination"));
+  ui.destinationButton->setPath (downloadDir);
+  ui.destinationEdit->setText (downloadDir);
 
-  ui.destinationStack->setFixedHeight (ui.destinationStack->currentWidget ()->sizeHint ().height ());
-  ui.destinationLabel->setBuddy (ui.destinationStack->currentWidget ());
+  if (myIsLocal)
+    myLocalDestination = downloadDir;
+
+  connect (ui.destinationButton, SIGNAL (pathChanged (QString)), this, SLOT (onDestinationChanged ()));
+  connect (ui.destinationEdit, SIGNAL (textEdited (QString)), &myEditTimer, SLOT (start ()));
+  connect (ui.destinationEdit, SIGNAL (editingFinished ()), this, SLOT (onDestinationChanged ()));
 
   ui.filesView->setEditable (false);
-  if (!session.isLocal ())
-    ui.filesView->hideColumn (2); // hide the % done, since we've no way of knowing
 
   ui.priorityCombo->addItem (tr ("High"),   TR_PRI_HIGH);
   ui.priorityCombo->addItem (tr ("Normal"), TR_PRI_NORMAL);
   ui.priorityCombo->addItem (tr ("Low"),    TR_PRI_LOW);
   ui.priorityCombo->setCurrentIndex (1); // Normal
 
-  if (session.isLocal ())
-    {
-      myVerifyButton = new QPushButton (tr ("&Verify Local Data"), this);
-      ui.dialogButtons->addButton (myVerifyButton, QDialogButtonBox::ActionRole);
-      connect (myVerifyButton, SIGNAL (clicked (bool)), this, SLOT (onVerify ()));
-    }
+  ui.dialogButtons->addButton (myVerifyButton, QDialogButtonBox::ActionRole);
+  connect (myVerifyButton, SIGNAL (clicked (bool)), this, SLOT (onVerify ()));
 
   ui.startCheck->setChecked (prefs.getBool (Prefs::START));
   ui.trashCheck->setChecked (prefs.getBool (Prefs::TRASH_ORIGINAL));
@@ -124,6 +110,9 @@ OptionsDialog::OptionsDialog (Session& session, const Prefs& prefs, const AddDat
 
   connect (&myVerifyTimer, SIGNAL (timeout ()), this, SLOT (onTimeout ()));
 
+  connect (&mySession, SIGNAL (sessionUpdated ()), SLOT (onSessionUpdated ()));
+
+  updateWidgetsLocality ();
   reload ();
 }
 
@@ -184,8 +173,7 @@ OptionsDialog::reload ()
   const bool haveFilesToShow = myHaveInfo && myInfo.fileCount > 0;
 
   ui.filesView->setVisible (haveFilesToShow);
-  if (myVerifyButton != nullptr)
-    myVerifyButton->setVisible (haveFilesToShow);
+  myVerifyButton->setEnabled (haveFilesToShow);
   layout ()->setSizeConstraint (haveFilesToShow ? QLayout::SetDefaultConstraint : QLayout::SetFixedSize);
 
   if (myHaveInfo)
@@ -207,6 +195,30 @@ OptionsDialog::reload ()
     }
 
   ui.filesView->update (myFiles);
+}
+
+void
+OptionsDialog::updateWidgetsLocality ()
+{
+  ui.destinationStack->setCurrentWidget (myIsLocal ? static_cast<QWidget*> (ui.destinationButton) : ui.destinationEdit);
+  ui.destinationStack->setFixedHeight (ui.destinationStack->currentWidget ()->sizeHint ().height ());
+  ui.destinationLabel->setBuddy (ui.destinationStack->currentWidget ());
+
+  // hide the % done when non-local, since we've no way of knowing
+  (ui.filesView->*(myIsLocal ? &QTreeView::showColumn : &QTreeView::hideColumn)) (2);
+
+  myVerifyButton->setVisible (myIsLocal);
+}
+
+void
+OptionsDialog::onSessionUpdated ()
+{
+  const bool isLocal = mySession.isLocal ();
+  if (myIsLocal != isLocal)
+    {
+      myIsLocal = isLocal;
+      updateWidgetsLocality ();
+    }
 }
 
 void

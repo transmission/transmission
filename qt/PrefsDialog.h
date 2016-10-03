@@ -38,6 +38,7 @@ class PrefsDialog: public BaseDialog
     bool updateWidgetValue (QWidget * widget, int prefKey);
     void linkWidgetToPref (QWidget * widget, int prefKey);
     void updateBlocklistLabel ();
+    void updateDownloadingWidgetsLocality ();
 
     void setPref (int key, const QVariant& v);
 
@@ -75,8 +76,10 @@ class PrefsDialog: public BaseDialog
 
     Ui::PrefsDialog ui;
 
-    key2widget_t myWidgets;
     const bool myIsServer;
+    bool myIsLocal;
+
+    key2widget_t myWidgets;
     QWidgetList myWebWidgets;
     QWidgetList myWebAuthWidgets;
     QWidgetList myWebWhitelistWidgets;

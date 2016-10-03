@@ -43,6 +43,7 @@ class OptionsDialog: public BaseDialog
 
   private:
     void reload ();
+    void updateWidgetsLocality ();
     void clearInfo ();
     void clearVerify ();
 
@@ -56,12 +57,15 @@ class OptionsDialog: public BaseDialog
     void onSourceChanged ();
     void onDestinationChanged ();
 
+    void onSessionUpdated ();
+
   private:
     Session& mySession;
     AddData myAdd;
 
     Ui::OptionsDialog ui;
 
+    bool myIsLocal;
     QDir myLocalDestination;
     bool myHaveInfo;
     tr_info myInfo;
