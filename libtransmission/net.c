@@ -639,7 +639,7 @@ isMartianAddr (const struct tr_address * a)
         case TR_AF_INET6: {
             const unsigned char * address = (const unsigned char*)&a->addr.addr6;
             return (address[0] == 0xFF) ||
-                 (memcmp (address, zeroes, 15) == 0 &&
+                 (strncmp (address, zeroes, 15) == 0 &&
                   (address[15] == 0 || address[15] == 1));
         }
 

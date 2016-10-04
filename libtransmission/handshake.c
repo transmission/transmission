@@ -8,7 +8,7 @@
 
 #include <assert.h>
 #include <errno.h>
-#include <string.h> /* strcmp (), strlen () */
+#include <string.h> /* strcmp (), strlen (), strncmp () */
 
 #include <event2/buffer.h>
 #include <event2/event.h>
@@ -642,7 +642,7 @@ readHandshake (tr_handshake    * handshake,
   assert (pstrlen == 19);
   tr_peerIoReadBytes (handshake->io, inbuf, pstr, pstrlen);
   pstr[pstrlen] = '\0';
-  if (memcmp (pstr, "BitTorrent protocol", 19) != 0)
+  if (strncmp (pstr, "BitTorrent protocol", 19) != 0)
     return tr_handshakeDone (handshake, false);
 
   /* reserved bytes */

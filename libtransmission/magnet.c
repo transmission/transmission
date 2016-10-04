@@ -110,7 +110,7 @@ tr_magnetParse (const char * uri)
   uint8_t sha1[SHA_DIGEST_LENGTH];
   tr_magnet_info * info = NULL;
 
-  if (uri != NULL && memcmp (uri, "magnet:?", 8) == 0)
+  if (uri != NULL && strncmp (uri, "magnet:?", 8) == 0)
     {
       const char * walk;
 
@@ -136,7 +136,7 @@ tr_magnetParse (const char * uri)
           else
             vallen = strlen (val);
 
-          if (keylen == 2 && memcmp (key, "xt", 2) == 0 && val != NULL && memcmp (val, "urn:btih:", 9) == 0)
+          if (keylen == 2 && memcmp (key, "xt", 2) == 0 && val != NULL && strncmp (val, "urn:btih:", 9) == 0)
             {
               const char * hash = val + 9;
               const size_t hashlen = vallen - 9;
