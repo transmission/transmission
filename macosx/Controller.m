@@ -682,9 +682,11 @@ static void removeKeRangerRansomware()
     [[NSAppleEventManager sharedAppleEventManager] setEventHandler: self andSelector: @selector(handleOpenContentsEvent:replyEvent:)
         forEventClass: kCoreEventClass andEventID: kAEOpenContents];
     
-    //if we were opened from a user notification, do the corresponding action
     if ([NSApp isOnMountainLionOrBetter])
     {
+        [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(applicationDidBecomeActive:) name: NSApplicationDidBecomeActiveNotification object: NSApp];
+        
+        //if we were opened from a user notification, do the corresponding action
         NSUserNotification * launchNotification = [[notification userInfo] objectForKey: NSApplicationLaunchUserNotificationKey];
         if (launchNotification)
             [self userNotificationCenter: nil didActivateNotification: launchNotification];
@@ -742,6 +744,11 @@ static void removeKeRangerRansomware()
             [alert release];
         }
     }
+}
+
+- (void) applicationDidBecomeActive: (NSNotification *) notification
+{
+    [[NSUserNotificationCenter defaultUserNotificationCenter] removeAllDeliveredNotifications];
 }
 
 - (BOOL) applicationShouldHandleReopen: (NSApplication *) app hasVisibleWindows: (BOOL) visibleWindows
