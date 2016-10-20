@@ -642,7 +642,7 @@ readHandshake (tr_handshake    * handshake,
   assert (pstrlen == 19);
   tr_peerIoReadBytes (handshake->io, inbuf, pstr, pstrlen);
   pstr[pstrlen] = '\0';
-  if (strncmp (pstr, "BitTorrent protocol", 19) != 0)
+  if (strncmp ((const char *)pstr, "BitTorrent protocol", 19) != 0)
     return tr_handshakeDone (handshake, false);
 
   /* reserved bytes */
