@@ -6,14 +6,26 @@
  *
  */
 
+#if defined (CYASSL_IS_WOLFSSL)
+ #define API_HEADER(x) <wolfssl/x>
+ #define API_HEADER_CRYPT(x) API_HEADER (wolfcrypt/x)
+ #define API(x) wc_##x
+ #define API_VERSION_HEX LIBWOLFSSL_VERSION_HEX
+#else
+ #define API_HEADER(x) <cyassl/x>
+ #define API_HEADER_CRYPT(x) API_HEADER (ctaocrypt/x)
+ #define API(x) x
+ #define API_VERSION_HEX LIBCYASSL_VERSION_HEX
+#endif
+
 #include <assert.h>
 
-#include <cyassl/ctaocrypt/arc4.h>
-#include <cyassl/ctaocrypt/dh.h>
-#include <cyassl/ctaocrypt/error-crypt.h>
-#include <cyassl/ctaocrypt/random.h>
-#include <cyassl/ctaocrypt/sha.h>
-#include <cyassl/version.h>
+#include API_HEADER_CRYPT (arc4.h)
+#include API_HEADER_CRYPT (dh.h)
+#include API_HEADER_CRYPT (error-crypt.h)
+#include API_HEADER_CRYPT (random.h)
+#include API_HEADER_CRYPT (sha.h)
+#include API_HEADER (version.h)
 
 #include "transmission.h"
 #include "crypto-utils.h"
@@ -45,7 +57,9 @@ log_cyassl_error (int          error_code,
 {
   if (tr_logLevelIsActive (TR_LOG_ERROR))
     {
-#if LIBCYASSL_VERSION_HEX >= 0x03000002
+#if API_VERSION_HEX >= 0x03004000
+      const char * error_message = API (GetErrorString) (error_code);
+#elif API_VERSION_HEX >= 0x03000002
       const char * error_message = CTaoCryptGetErrorString (error_code);
 #else
       char error_message[CYASSL_MAX_ERROR_SZ];
@@ -81,7 +95,7 @@ get_rng (void)
 
   if (!rng_initialized)
     {
-      if (!check_result (InitRng (&rng)))
+      if (!check_result (API (InitRng) (&rng)))
         return NULL;
       rng_initialized = true;
     }
@@ -109,7 +123,7 @@ tr_sha1_init (void)
 {
   Sha * handle = tr_new (Sha, 1);
 
-  if (check_result (InitSha (handle)))
+  if (check_result (API (InitSha) (handle)))
     return handle;
 
   tr_free (handle);
@@ -128,7 +142,7 @@ tr_sha1_update (tr_sha1_ctx_t   handle,
 
   assert (data != NULL);
 
-  return check_result (ShaUpdate (handle, data, data_length));
+  return check_result (API (ShaUpdate) (handle, data, data_length));
 }
 
 bool
@@ -141,7 +155,7 @@ tr_sha1_final (tr_sha1_ctx_t   handle,
     {
       assert (handle != NULL);
 
-      ret = check_result (ShaFinal (handle, hash));
+      ret = check_result (API (ShaFinal) (handle, hash));
     }
 
   tr_free (handle);
@@ -172,7 +186,7 @@ tr_rc4_set_key (tr_rc4_ctx_t    handle,
   assert (handle != NULL);
   assert (key != NULL);
 
-  Arc4SetKey (handle, key, key_length);
+  API (Arc4SetKey) (handle, key, key_length);
 }
 
 void
@@ -189,7 +203,7 @@ tr_rc4_process (tr_rc4_ctx_t   handle,
   assert (input != NULL);
   assert (output != NULL);
 
-  Arc4Process (handle, output, input, length);
+  API (Arc4Process) (handle, output, input, length);
 }
 
 /***
@@ -207,10 +221,10 @@ tr_dh_new (const uint8_t * prime_num,
   assert (prime_num != NULL);
   assert (generator_num != NULL);
 
-  InitDhKey (&handle->dh);
-  if (!check_result (DhSetKey (&handle->dh,
-                               prime_num, prime_num_length,
-                               generator_num, generator_num_length)))
+  API (InitDhKey) (&handle->dh);
+  if (!check_result (API (DhSetKey) (&handle->dh,
+                                     prime_num, prime_num_length,
+                                     generator_num, generator_num_length)))
     {
       tr_free (handle);
       return NULL;
@@ -229,7 +243,7 @@ tr_dh_free (tr_dh_ctx_t raw_handle)
   if (handle == NULL)
     return;
 
-  FreeDhKey (&handle->dh);
+  API (FreeDhKey) (&handle->dh);
   tr_free (handle->private_key);
   tr_free (handle);
 }
@@ -252,9 +266,9 @@ tr_dh_make_key (tr_dh_ctx_t   raw_handle,
 
   tr_lockLock (rng_lock);
 
-  if (!check_result (DhGenerateKeyPair (&handle->dh, get_rng (),
-                                        handle->private_key, &my_private_key_length,
-                                        public_key, &my_public_key_length)))
+  if (!check_result (API (DhGenerateKeyPair) (&handle->dh, get_rng (),
+                                              handle->private_key, &my_private_key_length,
+                                              public_key, &my_public_key_length)))
     {
       tr_lockUnlock (rng_lock);
       return false;
@@ -286,10 +300,10 @@ tr_dh_agree (tr_dh_ctx_t     raw_handle,
 
   ret = tr_dh_secret_new (handle->key_length);
 
-  if (check_result (DhAgree (&handle->dh,
-                             ret->key, &my_secret_key_length,
-                             handle->private_key, handle->private_key_length,
-                             other_public_key, other_public_key_length)))
+  if (check_result (API (DhAgree) (&handle->dh,
+                                   ret->key, &my_secret_key_length,
+                                   handle->private_key, handle->private_key_length,
+                                   other_public_key, other_public_key_length)))
     {
       tr_dh_secret_align (ret, my_secret_key_length);
     }
@@ -316,7 +330,7 @@ tr_rand_buffer (void   * buffer,
   assert (buffer != NULL);
 
   tr_lockLock (rng_lock);
-  ret = check_result (RNG_GenerateBlock (get_rng (), buffer, length));
+  ret = check_result (API (RNG_GenerateBlock) (get_rng (), buffer, length));
   tr_lockUnlock (rng_lock);
 
   return ret;

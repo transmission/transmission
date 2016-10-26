@@ -139,7 +139,7 @@ AS_IF([test "x$want_crypto" = "xauto" -o "x$want_crypto" = "xopenssl"], [
 ])
 AS_IF([test "x$want_crypto" = "xauto" -o "x$want_crypto" = "xcyassl"], [
     PKG_CHECK_MODULES(WOLFSSL, [wolfssl >= $CYASSL_MINIMUM],
-        [want_crypto="cyassl"; CRYPTO_PKG="cyassl"; CRYPTO_CFLAGS="$WOLFSSL_CFLAGS"; CRYPTO_LIBS="$WOLFSSL_LIBS"],
+        [want_crypto="cyassl"; CRYPTO_PKG="cyassl"; CRYPTO_CFLAGS="$WOLFSSL_CFLAGS"; CRYPTO_LIBS="$WOLFSSL_LIBS"; CYASSL_IS_WOLFSSL=yes],
         [PKG_CHECK_MODULES(CYASSL, [cyassl >= $CYASSL_MINIMUM],
             [want_crypto="cyassl"; CRYPTO_PKG="cyassl"; CRYPTO_CFLAGS="$CYASSL_CFLAGS"; CRYPTO_LIBS="$CYASSL_LIBS"],
             [AS_IF([test "x$want_crypto" = "xcyassl"],
@@ -182,6 +182,7 @@ AS_IF([test "x$CRYPTO_PKG" = "x"], [
 
 AM_CONDITIONAL([CRYPTO_USE_OPENSSL],[test "x$CRYPTO_PKG" = "xopenssl"])
 AM_CONDITIONAL([CRYPTO_USE_CYASSL],[test "x$CRYPTO_PKG" = "xcyassl"])
+AM_CONDITIONAL([CYASSL_IS_WOLFSSL],[test "x$CYASSL_IS_WOLFSSL" = "xyes"])
 AM_CONDITIONAL([CRYPTO_USE_POLARSSL],[test "x$CRYPTO_PKG" = "xpolarssl"])
 AM_CONDITIONAL([POLARSSL_IS_MBEDTLS],[test "x$POLARSSL_IS_MBEDTLS" = "xyes"])
 AC_SUBST(CRYPTO_PKG)
