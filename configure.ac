@@ -149,23 +149,26 @@ AS_IF([test "x$want_crypto" = "xauto" -o "x$want_crypto" = "xcyassl"], [
     )
 ])
 AS_IF([test "x$want_crypto" = "xauto" -o "x$want_crypto" = "xpolarssl"], [
-    AC_CHECK_HEADER([polarssl/version.h],
-        [AC_EGREP_CPP([version_ok], [#include <polarssl/version.h>
-                                     #if defined (POLARSSL_VERSION_NUMBER) && POLARSSL_VERSION_NUMBER >= $POLARSSL_MINIMUM
-                                     version_ok
-                                     #endif],
-            [AC_CHECK_LIB([polarssl], [dhm_calc_secret],
-                [want_crypto="polarssl"; CRYPTO_PKG="polarssl"; CRYPTO_CFLAGS=""; CRYPTO_LIBS="-lpolarssl"],
+    PKG_CHECK_MODULES(MBEDTLS, [mbedtls >= $POLARSSL_MINIMUM],
+        [want_crypto="polarssl"; CRYPTO_PKG="polarssl"; CRYPTO_CFLAGS="$MBEDTLS_CFLAGS"; CRYPTO_LIBS="$MBEDTLS_LIBS"; POLARSSL_IS_MBEDTLS=yes],
+        [AC_CHECK_HEADER([polarssl/version.h],
+            [AC_EGREP_CPP([version_ok], [#include <polarssl/version.h>
+                                         #if defined (POLARSSL_VERSION_NUMBER) && POLARSSL_VERSION_NUMBER >= $POLARSSL_MINIMUM
+                                         version_ok
+                                         #endif],
+                [AC_CHECK_LIB([polarssl], [dhm_calc_secret],
+                    [want_crypto="polarssl"; CRYPTO_PKG="polarssl"; CRYPTO_CFLAGS=""; CRYPTO_LIBS="-lpolarssl"],
+                    [AS_IF([test "x$want_crypto" = "xpolarssl"],
+                        [AC_MSG_ERROR([PolarSSL support requested, but library not found.])]
+                    )]
+                )],
                 [AS_IF([test "x$want_crypto" = "xpolarssl"],
-                    [AC_MSG_ERROR([PolarSSL support requested, but library not found.])]
+                    [AC_MSG_ERROR([PolarSSL support requested, but version not suitable.])]
                 )]
             )],
             [AS_IF([test "x$want_crypto" = "xpolarssl"],
-                [AC_MSG_ERROR([PolarSSL support requested, but version not suitable.])]
+                [AC_MSG_ERROR([PolarSSL support requested, but headers not found.])]
             )]
-        )],
-        [AS_IF([test "x$want_crypto" = "xpolarssl"],
-            [AC_MSG_ERROR([PolarSSL support requested, but headers not found.])]
         )]
     )
 ])
@@ -180,6 +183,7 @@ AS_IF([test "x$CRYPTO_PKG" = "x"], [
 AM_CONDITIONAL([CRYPTO_USE_OPENSSL],[test "x$CRYPTO_PKG" = "xopenssl"])
 AM_CONDITIONAL([CRYPTO_USE_CYASSL],[test "x$CRYPTO_PKG" = "xcyassl"])
 AM_CONDITIONAL([CRYPTO_USE_POLARSSL],[test "x$CRYPTO_PKG" = "xpolarssl"])
+AM_CONDITIONAL([POLARSSL_IS_MBEDTLS],[test "x$POLARSSL_IS_MBEDTLS" = "xyes"])
 AC_SUBST(CRYPTO_PKG)
 AC_SUBST(CRYPTO_CFLAGS)
 AC_SUBST(CRYPTO_LIBS)

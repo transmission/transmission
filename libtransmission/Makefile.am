@@ -102,6 +102,9 @@ libtransmission_a_SOURCES += crypto-utils-cyassl.c
 endif
 if CRYPTO_USE_POLARSSL
 libtransmission_a_SOURCES += crypto-utils-polarssl.c
+if POLARSSL_IS_MBEDTLS
+AM_CPPFLAGS += -DPOLARSSL_IS_MBEDTLS
+endif
 endif
 
 noinst_HEADERS = \
