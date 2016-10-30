@@ -3,6 +3,7 @@ _Name=Transmission
 _GenericName=BitTorrent Client
 _X-GNOME-FullName=Transmission BitTorrent Client
 _Comment=Download and share files over BitTorrent
+Comment[ru]=Загружайте файлы и делитесь ими через BitTorrent
 Exec=transmission-gtk %U
 Icon=transmission
 Terminal=false
