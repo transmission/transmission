@@ -131,7 +131,7 @@ typedef enum
 
 #define TRANSFER_PLIST  @"Transfers.plist"
 
-#define WEBSITE_URL @"http://www.transmissionbt.com/"
+#define WEBSITE_URL @"https://transmissionbt.com/"
 #define FORUM_URL   @"http://forum.transmissionbt.com/"
 #define TRAC_URL    @"http://trac.transmissionbt.com/"
 #define DONATE_URL  @"https://transmissionbt.com/donate/"

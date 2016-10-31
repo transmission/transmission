@@ -57,7 +57,7 @@
    <item>
     <widget class="QLabel" name="linkLabel">
      <property name="text">
-      <string notr="true">&lt;a href=&quot;http://www.transmissionbt.com/&quot;&gt;http://www.transmissionbt.com/&lt;/a&gt;</string>
+      <string notr="true">&lt;a href=&quot;https://transmissionbt.com/&quot;&gt;https://transmissionbt.com/&lt;/a&gt;</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
