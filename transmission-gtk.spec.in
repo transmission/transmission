@@ -8,7 +8,7 @@ Version:   %{version}
 Release:   %{release}
 License:   MIT
 Group:     Applications/Internet
-URL:       http://www.transmissionbt.com/
+URL:       https://transmissionbt.com/
 Epoch:     1
 Source0:   %{name}-%{version}.tar.bz2
 
