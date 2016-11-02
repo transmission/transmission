@@ -132,8 +132,8 @@ typedef enum
 #define TRANSFER_PLIST  @"Transfers.plist"
 
 #define WEBSITE_URL @"https://transmissionbt.com/"
-#define FORUM_URL   @"http://forum.transmissionbt.com/"
-#define TRAC_URL    @"http://trac.transmissionbt.com/"
+#define FORUM_URL   @"https://forum.transmissionbt.com/"
+#define TRAC_URL    @"https://trac.transmissionbt.com/"
 #define DONATE_URL  @"https://transmissionbt.com/donate/"
 
 #define DONATE_NAG_TIME (60 * 60 * 24 * 7)

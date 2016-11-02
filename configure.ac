@@ -6,7 +6,7 @@ dnl these should be the only two lines you need to change
 m4_define([user_agent_prefix],[2.92+])
 m4_define([peer_id_prefix],[-TR292Z-])
 
-AC_INIT([transmission],[user_agent_prefix],[http://trac.transmissionbt.com/newticket])
+AC_INIT([transmission],[user_agent_prefix],[https://trac.transmissionbt.com/newticket])
 AC_SUBST(USERAGENT_PREFIX,[user_agent_prefix])
 AC_SUBST(PEERID_PREFIX,[peer_id_prefix])
 

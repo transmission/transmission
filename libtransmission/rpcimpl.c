@@ -1455,7 +1455,7 @@ portTest (tr_session               * session,
           struct tr_rpc_idle_data  * idle_data)
 {
   const int port = tr_sessionGetPeerPort (session);
-  char * url = tr_strdup_printf ("http://portcheck.transmissionbt.com/%d", port);
+  char * url = tr_strdup_printf ("https://portcheck.transmissionbt.com/%d", port);
   tr_webRun (session, url, portTested, idle_data);
   tr_free (url);
   return NULL;
