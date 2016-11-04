@@ -976,7 +976,7 @@ msgstr[1] "No se pudieron añadir los torrents dañados"
 #: ../gtk/main.c:1065
 msgid "Couldn't add duplicate torrent"
 msgid_plural "Couldn't add duplicate torrents"
-msgstr[0] "No su pudo añadir el torrent duplicado"
+msgstr[0] "No se pudo añadir el torrent duplicado"
 msgstr[1] "No se pudieron añadir los torrents duplicados"
 
 #: ../gtk/main.c:1373
