@@ -1361,7 +1361,7 @@ update_model_loop (gpointer gdata)
 static void
 show_about_dialog (GtkWindow * parent)
 {
-  const char * uri = "http://www.transmissionbt.com/";
+  const char * uri = "https://transmissionbt.com/";
   const char * authors[] = { "Jordan Lee (Backend; GTK+)",
                              "Mitchell Livingston (Backend; OS X)",
                              NULL };

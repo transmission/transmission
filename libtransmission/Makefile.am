@@ -100,9 +100,15 @@ libtransmission_a_SOURCES += crypto-utils-openssl.c
 endif
 if CRYPTO_USE_CYASSL
 libtransmission_a_SOURCES += crypto-utils-cyassl.c
+if CYASSL_IS_WOLFSSL
+AM_CPPFLAGS += -DCYASSL_IS_WOLFSSL
+endif
 endif
 if CRYPTO_USE_POLARSSL
 libtransmission_a_SOURCES += crypto-utils-polarssl.c
+if POLARSSL_IS_MBEDTLS
+AM_CPPFLAGS += -DPOLARSSL_IS_MBEDTLS
+endif
 endif
 
 noinst_HEADERS = \

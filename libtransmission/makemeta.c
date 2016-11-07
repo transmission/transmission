@@ -293,7 +293,7 @@ getHashInfo (tr_metainfo_builder * b)
 
       assert (bufptr - buf == (int)thisPieceSize);
       assert (leftInPiece == 0);
-      tr_sha1 (walk, buf, thisPieceSize, NULL);
+      tr_sha1 (walk, buf, (int) thisPieceSize, NULL);
       walk += SHA_DIGEST_LENGTH;
 
       if (b->abortFlag)

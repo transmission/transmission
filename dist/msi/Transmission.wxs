@@ -70,7 +70,7 @@
     <Icon Id="Tr.ico" SourceFile="Transmission.ico" />
     <Property Id="ARPPRODUCTICON" Value="Tr.ico" />
 
-    <Property Id="ARPURLINFOABOUT" Value="https://www.transmissionbt.com/" />
+    <Property Id="ARPURLINFOABOUT" Value="https://transmissionbt.com/" />
     <Property Id="ARPHELPLINK" Value="https://forum.transmissionbt.com/" />
   </Product>
 

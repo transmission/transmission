@@ -141,7 +141,7 @@ tr_ssha1 (const char * plain_text)
   for (i = 0; i < saltval_len; ++i)
     salt[i] = salter[salt[i] % salter_len];
 
-  tr_sha1 (sha, plain_text, strlen (plain_text), salt, (size_t) saltval_len, NULL);
+  tr_sha1 (sha, plain_text, (int) strlen (plain_text), salt, saltval_len, NULL);
   tr_sha1_to_hex (&buf[1], sha);
   memcpy (&buf[1 + 2 * SHA_DIGEST_LENGTH], &salt, saltval_len);
   buf[1 + 2 * SHA_DIGEST_LENGTH + saltval_len] = '\0';
@@ -170,7 +170,7 @@ tr_ssha1_matches (const char * ssha1,
 
   /* hash pass + salt */
   my_ssha1 = tr_malloc (2 * SHA_DIGEST_LENGTH + saltlen + 2);
-  tr_sha1 (buf, plain_text, strlen (plain_text), salt, saltlen, NULL);
+  tr_sha1 (buf, plain_text, (int) strlen (plain_text), salt, (int) saltlen, NULL);
   tr_sha1_to_hex (&my_ssha1[1], buf);
   memcpy (my_ssha1 + 1 + 2 * SHA_DIGEST_LENGTH, salt, saltlen);
   my_ssha1[1 + 2 * SHA_DIGEST_LENGTH + saltlen] = '\0';

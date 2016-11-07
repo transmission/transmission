@@ -90,6 +90,12 @@ macro(tr_add_external_auto_library ID LIBNAME)
         set(${ID}_UPSTREAM_TARGET ${LIBNAME}-${${ID}_RELEASE})
         set(${ID}_PREFIX "${CMAKE_BINARY_DIR}/third-party/${${ID}_UPSTREAM_TARGET}")
 
+        set(${ID}_INCLUDE_DIR "${${ID}_PREFIX}/include" CACHE INTERNAL "")
+        set(${ID}_LIBRARY "${${ID}_PREFIX}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}${LIBNAME}${CMAKE_STATIC_LIBRARY_SUFFIX}" CACHE INTERNAL "")
+
+        set(${ID}_INCLUDE_DIRS ${${ID}_INCLUDE_DIR})
+        set(${ID}_LIBRARIES ${${ID}_LIBRARY})
+
         ExternalProject_Add(
             ${${ID}_UPSTREAM_TARGET}
             ${${ID}_UPSTREAM}
@@ -102,15 +108,10 @@ macro(tr_add_external_auto_library ID LIBNAME)
                 "-DCMAKE_CXX_FLAGS:STRING=${CMAKE_CXX_FLAGS}"
                 "-DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}"
                 "-DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>"
+            BUILD_BYPRODUCTS "${${ID}_LIBRARY}"
         )
 
         set_property(TARGET ${${ID}_UPSTREAM_TARGET} PROPERTY FOLDER "ThirdParty")
-
-        set(${ID}_INCLUDE_DIR "${${ID}_PREFIX}/include" CACHE INTERNAL "")
-        set(${ID}_LIBRARY "${${ID}_PREFIX}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}${LIBNAME}${CMAKE_STATIC_LIBRARY_SUFFIX}" CACHE INTERNAL "")
-
-        set(${ID}_INCLUDE_DIRS ${${ID}_INCLUDE_DIR})
-        set(${ID}_LIBRARIES ${${ID}_LIBRARY})
     endif()
 endmacro()
 
