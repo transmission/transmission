@@ -308,6 +308,8 @@ tr_torrentSetMetadataPiece (tr_torrent  * tor, int piece, const void  * data, in
                       tr_sessionSetTorrentFile (tor->session, tor->info.hashString, tor->info.torrent);
                       tr_torrentGotNewInfoDict (tor);
                       tr_torrentSetDirty (tor);
+                    }else{
+                      tr_metainfoFree(&info);
                     }
 
                   tr_variantFree (&newMetainfo);
