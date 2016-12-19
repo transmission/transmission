@@ -373,9 +373,7 @@ endif()
 
 if(WITH_SYSTEMD)
     tr_get_required_flag(WITH_SYSTEMD SYSTEMD_IS_REQUIRED)
-
-    pkg_check_modules(SYSTEMD ${SYSTEMD_IS_REQUIRED} libsystemd)
-
+    find_package(SYSTEMD)
     tr_fixup_auto_option(WITH_SYSTEMD SYSTEMD_FOUND SYSTEMD_IS_REQUIRED)
 endif()
 
