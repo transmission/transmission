@@ -397,7 +397,7 @@ test_truncd (void)
 #if !(defined (_MSC_VER) || (defined (__MINGW32__) && defined (__MSVCRT__)))
   /* FIXME: MSCVRT behaves differently in case of nan */
   tr_snprintf (buf, sizeof (buf), "%.2f", tr_truncd (nan, 2));
-  check (strstr (buf, "nan") != NULL);
+  check (strstr (buf, "nan") != NULL || strstr (buf, "NaN") != NULL);
 #else
   (void) nan;
 #endif
