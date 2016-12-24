@@ -13,7 +13,7 @@ if(UNIX)
 endif()
 
 find_path(EVENT2_INCLUDE_DIR NAMES event2/event.h HINTS ${_EVENT2_INCLUDEDIR})
-find_library(EVENT2_LIBRARY NAMES event HINTS ${_EVENT2_LIBDIR})
+find_library(EVENT2_LIBRARY NAMES event-2.1 event-2.0 event HINTS ${_EVENT2_LIBDIR})
 
 if(EVENT2_INCLUDE_DIR)
     if(_EVENT2_VERSION)
