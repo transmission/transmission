@@ -254,14 +254,11 @@ target_link_libraries(${TR_NAME}
     ${B64_LIBRARIES}
     ${LIBINTL_LIBRARY}
     ${LIBM_LIBRARY}
+    ${TR_NETWORK_LIBRARIES}
 )
 
 if(ICONV_FOUND)
     target_link_libraries(${TR_NAME} ${ICONV_LIBRARIES})
-endif()
-
-if(WIN32)
-    target_link_libraries(${TR_NAME} iphlpapi ws2_32)
 endif()
 
 if(ENABLE_TESTS)
