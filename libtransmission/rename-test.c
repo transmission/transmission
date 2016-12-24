@@ -435,15 +435,19 @@ test_multifile_torrent (void)
       testFileExistsAndConsistsOfThisString (tor, i, expected_contents[i]);
     }
 
+  tr_ctorFree (ctor);
+  tr_torrentRemove (tor, false, NULL);
+
+  do
+    {
+      tr_wait_msec (10);
+    }
+  while (tr_sessionCountTorrents (session) > 0);
+
   /**
   ***  Test renaming prefixes (shouldn't work)
   **/
 
-  tr_ctorFree (ctor);
-  tr_torrentRemove (tor, false, NULL);
-  do {
-    tr_wait_msec (10);
-  } while (0);
   ctor = tr_ctorNew (session);
   tor = create_torrent_from_base64_metainfo (ctor,
     "ZDEwOmNyZWF0ZWQgYnkyNTpUcmFuc21pc3Npb24vMi42MSAoMTM0MDcpMTM6Y3JlYXRpb24gZGF0"
