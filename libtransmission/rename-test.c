@@ -84,6 +84,16 @@ torrentRenameAndWait (tr_torrent * tor,
   return error;
 }
 
+static void
+torrentRemoveAndWait (tr_torrent * tor,
+                      int          expected_torrent_count)
+{
+  tr_torrentRemove (tor, false, NULL);
+
+  while (tr_sessionCountTorrents (session) != expected_torrent_count)
+    tr_wait_msec (10);
+}
+
 /***
 ****
 ***/
@@ -221,7 +231,7 @@ test_single_filename_torrent (void)
 
   /* cleanup */
   tr_ctorFree (ctor);
-  tr_torrentRemove (tor, false, NULL);
+  torrentRemoveAndWait (tor, 0);
   return 0;
 }
 
@@ -436,13 +446,7 @@ test_multifile_torrent (void)
     }
 
   tr_ctorFree (ctor);
-  tr_torrentRemove (tor, false, NULL);
-
-  do
-    {
-      tr_wait_msec (10);
-    }
-  while (tr_sessionCountTorrents (session) > 0);
+  torrentRemoveAndWait (tor, 0);
 
   /**
   ***  Test renaming prefixes (shouldn't work)
@@ -483,7 +487,7 @@ test_multifile_torrent (void)
 
   /* cleanup */
   tr_ctorFree (ctor);
-  tr_torrentRemove (tor, false, NULL);
+  torrentRemoveAndWait (tor, 0);
   return 0;
 }
 
@@ -550,7 +554,7 @@ test_partial_file (void)
       tr_free (expected);
     }
 
-  tr_torrentRemove (tor, false, NULL);
+  torrentRemoveAndWait (tor, 0);
   return 0;
 }
 
