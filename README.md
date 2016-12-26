@@ -16,35 +16,36 @@ For a more detailed description, and dependencies, visit: https://github.com/tra
 
 ### Building a Transmission release from the command line
 
-    $ xz -d -c transmission-2.11.tar.xz | tar xf -
-    $ cd transmission-2.11
-    $ ./configure
+    $ tar xf transmission-2.92.tar.xz
+    $ cd transmission-2.92
+    $ mkdir build
+    $ cmake ..
     $ make
     $ sudo make install
 
 ### Building Transmission from the nightly builds
 
-Download a tarball from https://build.transmissionbt.com/job/trunk-linux-inc/ and follow the steps from the previous section.
+Download a tarball from https://build.transmissionbt.com/job/trunk-linux/ and follow the steps from the previous section.
 
-If you're new to building programs from source code, this is typically easier than building from SVN.
+If you're new to building programs from source code, this is typically easier than building from Git.
 
-### Building Transmission from SVN (first time)
+### Building Transmission from Git (first time)
 
-    $ svn co svn://svn.transmissionbt.com/Transmission/trunk Transmission
+    $ git clone https://github.com/transmission/transmission Transmission
     $ cd Transmission
-    $ ./autogen.sh
+    $ git submodule update --init
+    $ mkdir build
+    $ cd build
+    $ cmake ..
     $ make
     $ sudo make install
 
-### Building Transmission from SVN (updating)
+### Building Transmission from Git (updating)
 
-    $ cd Transmission
+    $ cd Transmission/build
     $ make clean
-    $ svn up
-    $ ./update-version-h.sh
+    $ git pull --rebase --prune
+    $ git submodule update
+    $ cmake ..
     $ make
     $ sudo make install
-
-Notes for building on Solaris' C compiler: User av reports success with this invocation:
-
-    ./configure CC=c99 CXX=CC CFLAGS='-D__EXTENSIONS__ -mt'
