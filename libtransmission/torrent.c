@@ -1773,6 +1773,9 @@ onVerifyDoneThreadFunc (void * vdata)
   struct verify_data * data = vdata;
   tr_torrent * tor = data->tor;
 
+  if (tor->isDeleting)
+    goto cleanup;
+
   if (!data->aborted)
     tr_torrentRecheckCompleteness (tor);
 
@@ -1785,6 +1788,7 @@ onVerifyDoneThreadFunc (void * vdata)
       torrentStart (tor, false);
     }
 
+cleanup:
   tr_free (data);
 }
 
@@ -1793,6 +1797,13 @@ onVerifyDone (tr_torrent * tor, bool aborted, void * vdata)
 {
   struct verify_data * data = vdata;
   assert (data->tor == tor);
+
+  if (tor->isDeleting)
+    {
+      tr_free (data);
+      return;
+    }
+
   data->aborted = aborted;
   tr_runInEventThread (tor->session, onVerifyDoneThreadFunc, data);
 }
@@ -1804,6 +1815,12 @@ verifyTorrent (void * vdata)
   struct verify_data * data = vdata;
   tr_torrent * tor = data->tor;
   tr_sessionLock (tor->session);
+
+  if (tor->isDeleting)
+    {
+      tr_free (data);
+      goto unlock;
+    }
 
   /* if the torrent's already being verified, stop it */
   tr_verifyRemove (tor);
@@ -1818,6 +1835,7 @@ verifyTorrent (void * vdata)
   else
     tr_verifyAdd (tor, onVerifyDone, data);
 
+unlock:
   tr_sessionUnlock (tor->session);
 }
 
