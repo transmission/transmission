@@ -69,15 +69,7 @@ function(tr_make_id INPUT OVAR)
     set(${OVAR} "${ID}" PARENT_SCOPE)
 endfunction()
 
-macro(tr_github_upstream ID REPOID RELID RELMD5)
-    set(${ID}_RELEASE "${RELID}")
-    set(${ID}_UPSTREAM URL "https://github.com/${REPOID}/archive/${RELID}.tar.gz")
-    if(NOT SKIP_UPSTREAM_CHECKSUM)
-        list(APPEND ${ID}_UPSTREAM URL_MD5 "${RELMD5}")
-    endif()
-endmacro()
-
-macro(tr_add_external_auto_library ID LIBNAME)
+macro(tr_add_external_auto_library ID DIRNAME LIBNAME)
     if(USE_SYSTEM_${ID})
         tr_get_required_flag(USE_SYSTEM_${ID} SYSTEM_${ID}_IS_REQUIRED)
         find_package(${ID} ${${ID}_MINIMUM} ${SYSTEM_${ID}_IS_REQUIRED})
@@ -87,7 +79,7 @@ macro(tr_add_external_auto_library ID LIBNAME)
     if(USE_SYSTEM_${ID})
         unset(${ID}_UPSTREAM_TARGET)
     else()
-        set(${ID}_UPSTREAM_TARGET ${LIBNAME}-${${ID}_RELEASE})
+        set(${ID}_UPSTREAM_TARGET ${LIBNAME})
         set(${ID}_PREFIX "${CMAKE_BINARY_DIR}/third-party/${${ID}_UPSTREAM_TARGET}")
 
         set(${ID}_INCLUDE_DIR "${${ID}_PREFIX}/include" CACHE INTERNAL "")
@@ -98,7 +90,7 @@ macro(tr_add_external_auto_library ID LIBNAME)
 
         ExternalProject_Add(
             ${${ID}_UPSTREAM_TARGET}
-            ${${ID}_UPSTREAM}
+            URL "${CMAKE_SOURCE_DIR}/third-party/${DIRNAME}"
             ${ARGN}
             PREFIX "${${ID}_PREFIX}"
             CMAKE_ARGS

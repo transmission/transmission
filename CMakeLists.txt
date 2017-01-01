@@ -103,13 +103,6 @@ set(GLIB_MINIMUM            2.32.0)
 set(GIO_MINIMUM             2.26.0)
 set(LIBAPPINDICATOR_MINIMUM 0.4.90)
 
-tr_github_upstream(EVENT2    transmission/libevent  c51b159cff 7be95856a39714dfd2218cb56415c990)
-tr_github_upstream(NATPMP    transmission/libnatpmp cf7f452d66 f1e7d5bf580972738d8ef21743d0adf7)
-tr_github_upstream(MINIUPNPC transmission/miniupnp  5de2bcb561 bdc5b64b9b8401d3524c50b9ec8173c1)
-tr_github_upstream(DHT       transmission/dht       cc379e406d 958253fafa01c59950d357c148aff090)
-tr_github_upstream(UTP       transmission/libutp    7c4f19abdf 8b92aa05abec5f6675cdde6477cd6f51)
-tr_github_upstream(B64       transmission/libb64    c1e3323498 10128cb30ad768d2c4caf627e0f69db3)
-
 if(WIN32)
     foreach(L C CXX)
         # Target version (Vista and up)
@@ -292,31 +285,20 @@ endif()
 set(THIRD_PARTY_DIR ${CMAKE_SOURCE_DIR}/third-party)
 
 if(WIN32)
-    tr_add_external_auto_library(EVENT2 event
-        PATCH_COMMAND "${CMAKE_COMMAND}" -E copy "${THIRD_PARTY_DIR}/event2.cmake" "<SOURCE_DIR>/CMakeLists.txt"
-              COMMAND "${CMAKE_COMMAND}" -E chdir "<SOURCE_DIR>" patch -p1 -i "${THIRD_PARTY_DIR}/event2-01-win32.patch"
-              COMMAND "${CMAKE_COMMAND}" -E chdir "<SOURCE_DIR>" patch -p1 -i "${THIRD_PARTY_DIR}/event2-02-win32.patch")
+    tr_add_external_auto_library(EVENT2 libevent event)
 else()
-    tr_add_external_auto_library(EVENT2 event
+    tr_add_external_auto_library(EVENT2 libevent event
         BUILD_IN_SOURCE 1
         CONFIGURE_COMMAND "<SOURCE_DIR>/autogen.sh"
                   COMMAND "<SOURCE_DIR>/configure" "--prefix=<INSTALL_DIR>" "--disable-shared")
 endif()
 
-tr_add_external_auto_library(NATPMP natpmp
-    PATCH_COMMAND "${CMAKE_COMMAND}" -E copy "${THIRD_PARTY_DIR}/natpmp.cmake" "<SOURCE_DIR>/CMakeLists.txt")
+tr_add_external_auto_library(NATPMP libnatpmp natpmp)
 if(NOT USE_SYSTEM_NATPMP)
     set(NATPMP_DEFINITIONS -DNATPMP_STATICLIB)
 endif()
 
-tr_add_external_auto_library(MINIUPNPC miniupnpc
-    PATCH_COMMAND "${CMAKE_COMMAND}" -E remove_directory "<SOURCE_DIR>/minissdpd"
-          COMMAND "${CMAKE_COMMAND}" -E remove_directory "<SOURCE_DIR>/miniupnpc-async"
-          COMMAND "${CMAKE_COMMAND}" -E remove_directory "<SOURCE_DIR>/miniupnpc-libevent"
-          COMMAND "${CMAKE_COMMAND}" -E remove_directory "<SOURCE_DIR>/miniupnpd"
-          COMMAND "${CMAKE_COMMAND}" -E remove "<SOURCE_DIR>/README"
-          COMMAND "${CMAKE_COMMAND}" -E copy_directory "<SOURCE_DIR>/miniupnpc" "<SOURCE_DIR>"
-          COMMAND "${CMAKE_COMMAND}" -E remove_directory "<SOURCE_DIR>/miniupnpc"
+tr_add_external_auto_library(MINIUPNPC miniupnpc miniupnpc
     CMAKE_ARGS
         -DUPNPC_BUILD_STATIC=ON
         -DUPNPC_BUILD_SHARED=OFF
@@ -328,22 +310,13 @@ if(NOT USE_SYSTEM_MINIUPNPC)
     set(MINIUPNPC_API_VERSION 12)
 endif()
 
-tr_add_external_auto_library(DHT dht
-    PATCH_COMMAND "${CMAKE_COMMAND}" -E copy "${THIRD_PARTY_DIR}/dht.cmake" "<SOURCE_DIR>/CMakeLists.txt")
+tr_add_external_auto_library(DHT dht dht)
 
 if(ENABLE_UTP)
-    tr_add_external_auto_library(UTP utp
-        PATCH_COMMAND "${CMAKE_COMMAND}" -E copy "${THIRD_PARTY_DIR}/utp.cmake" "<SOURCE_DIR>/CMakeLists.txt"
-              COMMAND "${CMAKE_COMMAND}" -E copy "${THIRD_PARTY_DIR}/utp_config.h" "<SOURCE_DIR>/utp_config.h"
-              COMMAND "${CMAKE_COMMAND}" -E chdir "<SOURCE_DIR>" patch -p1 --binary -i "${THIRD_PARTY_DIR}/utp-01-ticket-5002.patch"
-              COMMAND "${CMAKE_COMMAND}" -E chdir "<SOURCE_DIR>" patch -p1 --binary -i "${THIRD_PARTY_DIR}/utp-02-win32.patch"
-              COMMAND "${CMAKE_COMMAND}" -E chdir "<SOURCE_DIR>" patch -p1 --binary -i "${THIRD_PARTY_DIR}/utp-03-msvc14.patch")
+    tr_add_external_auto_library(UTP libutp utp)
 endif()
 
-tr_add_external_auto_library(B64 b64
-    PATCH_COMMAND "${CMAKE_COMMAND}" -E copy "${THIRD_PARTY_DIR}/b64.cmake" "<SOURCE_DIR>/CMakeLists.txt"
-          COMMAND "${CMAKE_COMMAND}" -E chdir "<SOURCE_DIR>" patch -p1 -i "${THIRD_PARTY_DIR}/b64-01-newline.patch"
-          COMMAND "${CMAKE_COMMAND}" -E chdir "<SOURCE_DIR>" patch -p1 -i "${THIRD_PARTY_DIR}/b64-02-unsigned-char.patch")
+tr_add_external_auto_library(B64 libb64 b64)
 
 if(WITH_INOTIFY)
     tr_get_required_flag(WITH_INOTIFY INOTIFY_IS_REQUIRED)
