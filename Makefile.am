@@ -46,19 +46,6 @@ EXTRA_DIST += \
   libtransmission/version.h.in \
   po/CMakeLists.txt \
   qt/CMakeLists.txt \
-  third-party/b64-01-newline.patch \
-  third-party/b64-02-unsigned-char.patch \
-  third-party/b64.cmake \
-  third-party/dht.cmake \
-  third-party/event2.cmake \
-  third-party/event2-01-win32.patch \
-  third-party/event2-02-win32.patch \
-  third-party/natpmp.cmake \
-  third-party/utp-01-ticket-5002.patch \
-  third-party/utp-02-win32.patch \
-  third-party/utp-03-msvc14.patch \
-  third-party/utp.cmake \
-  third-party/utp_config.h \
   utils/CMakeLists.txt
 
 if HAVE_REVISION_FILE

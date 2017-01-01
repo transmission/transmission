@@ -103,6 +103,9 @@ if test "x$GCC" = "xyes" ; then
     fi
 fi
 
+AC_PROG_LN_S
+AC_PROG_MKDIR_P
+
 AC_HEADER_STDC
 AC_HEADER_TIME
 
@@ -263,7 +266,7 @@ dnl ----------------------------------------------------------------------------
 dnl
 dnl  dht
 
-DHT_CFLAGS="-I\$(top_srcdir)/third-party/dht"
+DHT_CFLAGS="-I\$(top_builddir)/third-party/dht/include"
 DHT_LIBS="\$(top_builddir)/third-party/dht/libdht.a"
 DHT_LIBS_QT="\$\${TRANSMISSION_TOP}/third-party/dht/libdht.a"
 build_bundled_dht="yes"
@@ -289,7 +292,7 @@ dnl ----------------------------------------------------------------------------
 dnl
 dnl  libb64
 
-LIBB64_CFLAGS="-I\$(top_srcdir)/third-party/libb64"
+LIBB64_CFLAGS="-I\$(top_srcdir)/third-party/libb64/include"
 LIBB64_LIBS="\$(top_builddir)/third-party/libb64/libb64.a"
 LIBB64_LIBS_QT="\$\${TRANSMISSION_TOP}/third-party/libb64/libb64.a"
 build_bundled_b64="yes"
@@ -351,7 +354,7 @@ if test "x$want_utp" = "xyes"; then
         AC_DEFINE([WITH_UTP],[1])
         build_utp="system"
     elif test "x$CXX" != "x"; then
-        LIBUTP_CFLAGS="-I\$(top_srcdir)/third-party/"
+        LIBUTP_CFLAGS="-I\$(top_builddir)/third-party/libutp/include"
         LIBUTP_LIBS="\$(top_builddir)/third-party/libutp/libutp.a"
         LIBUTP_LIBS_QT="\$\${TRANSMISSION_TOP}/third-party/libutp/libutp.a"
         if test "x$libutp_extra_libs" != "x" ; then
@@ -457,9 +460,9 @@ LIBS="$ac_save_LIBS"
 AC_MSG_RESULT([$upnp_version])
 AM_CONDITIONAL([BUILD_MINIUPNP],[test "x$upnp_version" = "xnone"])
 if test "x$upnp_version" = "xnone" ; then
-    LIBUPNP_CFLAGS="-I\$(top_srcdir)/third-party/"
-    LIBUPNP_LIBS="\$(top_builddir)/third-party/miniupnp/libminiupnp.a"
-    LIBUPNP_LIBS_QT="\$\${TRANSMISSION_TOP}/third-party/miniupnp/libminiupnp.a"
+    LIBUPNP_CFLAGS="-I\$(top_builddir)/third-party/miniupnpc/include"
+    LIBUPNP_LIBS="\$(top_builddir)/third-party/miniupnpc/libminiupnp.a"
+    LIBUPNP_LIBS_QT="\$\${TRANSMISSION_TOP}/third-party/miniupnpc/libminiupnp.a"
 else
     AC_DEFINE([SYSTEM_MINIUPNP])
     LIBUPNP_CFLAGS="" 
@@ -659,7 +662,7 @@ AC_CONFIG_FILES([Makefile
                  third-party/libb64/Makefile
                  third-party/libutp/Makefile
                  third-party/libnatpmp/Makefile
-                 third-party/miniupnp/Makefile
+                 third-party/miniupnpc/Makefile
                  macosx/Makefile
                  gtk/Makefile
                  gtk/icons/Makefile

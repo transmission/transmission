@@ -8,7 +8,7 @@ if BUILD_UTP
   UTP_DIR = libutp
 endif
 if BUILD_MINIUPNP
-  MINIUPNP_DIR = miniupnp
+  MINIUPNP_DIR = miniupnpc
 endif
 if BUILD_NATPMP 
   NATPMP_DIR = libnatpmp 
