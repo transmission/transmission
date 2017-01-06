@@ -1226,6 +1226,7 @@ void tr_sessionSetDownloadGroups(tr_session* session, tr_variant const* groups)
 {
     assert(tr_isSession(session));
 
+    tr_variantFree(&session->downloadGroups);
     tr_variantInitList(&session->downloadGroups, tr_variantListSize(groups));
     tr_variantListCopy(&session->downloadGroups, groups);
 }
