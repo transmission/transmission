@@ -173,6 +173,10 @@ div#toolbar
 	> div#toolbar-pause-all {
 		background-image: url('images/toolbar-pause-all.png');
 	}
+        
+        > div#toolbar > div#toolbar-set-group {
+                background-image: url('images/toolbar-group.png'); 
+        }
 
 	> div#toolbar-inspector {
 		background-image: url('images/toolbar-info.png');
@@ -286,7 +290,41 @@ ul.torrent_list
 		&.compact { padding: 4px; }
 		&.even { background-color: #F7F7F7; }
 		&.selected { background-color: $selection-color; }
-		&.compact { div.torrent_name { color: black; } }
+		&.compact { 
+                        div.torrent_name { color: black; } 
+                        div.torrent_group {
+                          height: 16px;
+                          margin-top: 0;
+                        }
+
+                }
+                
+                
+               div.torrent_group {
+                  height: 58px;
+                  float: left;
+                  width: 16px;
+                  border: 1px solid rgba(0, 0, 0, 0.2);
+                  border-radius: 3px;
+                  margin-top: 2px;
+                  &.movies {
+                          background-color: rgb(128, 159, 255);
+                  }
+                  &.tv {
+                          background-color: rgb(159, 128, 255);
+                  }
+                  &.anime {
+                          background-color: rgb(223, 128, 255);
+                  }
+                  &.music {
+                          background-color: rgb(159, 255, 128);
+                  }
+                  &.software {
+                          background-color: rgb(255, 208, 66);
+                  }
+                }
+
+
 
 		// start-stop button
 		a {
@@ -336,10 +374,11 @@ ul.torrent_list
 
 		div.torrent_progress_details,
 		div.torrent_peer_details {
-			clear: left;
+			clear: none;
 			overflow: hidden;
 			text-overflow: ellipsis;
 			white-space: nowrap;
+                        margin-left: 26px;
 		}
 
 		div.torrent_progress_details.error,
@@ -382,6 +421,7 @@ ul.torrent_list
 		&.full {
 			margin-top: 2px;
 			margin-bottom: 5px;
+                        margin-left: 26px;
 		}
 	}
 	div.torrent_peer_details.compact
@@ -427,6 +467,48 @@ ul.torrent_list
 	-moz-user-select: none;
 	-webkit-user-select: none;
 }
+
+.color-row {
+        overflow: hidden;
+        white-space: nowrap;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        margin-bottom: 1px;
+        padding: 0 0 1px 1px; 
+}
+.color-row.error{
+        border-color: rgba(250, 0, 0, .75);
+        background-color: rgba(250, 0, 0, .15); 
+}
+.color-row .controls {
+        position:relative;
+        top: 5px; 
+}
+.color-row .controls .ui-icon {
+        display: inline-block;
+        border-radius:4px;
+        margin-left:3px;
+        cursor:pointer; 
+}
+.color-row .controls .ui-icon.disabled {
+        visibility:hidden; 
+}
+.color-row .controls .ui-icon:hover {
+        background-color: rgba(120, 120, 120, .5);
+}
+.color-row input {
+        min-width:80px; 
+        width: 30%; 
+} /* should be 30% if code column is displayed */
+
+.color-row.removed {
+        opacity: 0.5; 
+}
+#prefs-page-groups .message {
+        clear: both;
+        color: red; 
+}
+
 
 .prefs-section
 {

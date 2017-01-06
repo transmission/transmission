@@ -89,13 +89,59 @@ div#toolbar {
   div#toolbar > div#toolbar-start-all {
     background-image: url("images/toolbar-start-all.png"); }
   div#toolbar > div#toolbar-pause-all {
-    background-image: url("images/toolbar-pause-all.png"); }
+    background-image: url("images/toolbar-pause-all.png"); }    
+  div#toolbar > div#toolbar-set-group {
+    background-image: url('images/toolbar-group.png'); }
   div#toolbar > div#toolbar-inspector {
     background-image: url("images/toolbar-info.png");
     float: right;
     margin-right: 4px; }
   div#toolbar > *.disabled {
     opacity: 0.25; }
+
+
+/*--------------------------------------
+ *
+ * ColorPicker (http://www.laktek.com/2008/10/27/really-simple-color-picker-in-jquery/)
+ *
+ *--------------------------------------*/
+div.colorPicker-picker {
+  width: 16px;
+  height: 16px;
+  padding: 0 !important;
+  border: 1px solid grey;
+  background: url(images/picker-arrow.png) no-repeat top right;
+  cursor: pointer;
+  font-weight:bold;
+  text-align: center;
+  display: inline-block;
+  position:relative;
+  top:-2px;
+  margin: 0 4px;
+}
+
+div.colorPicker-palette {
+  width: 110px;
+  position: absolute;
+  border: 1px solid grey;
+  background-color: white;
+  padding: 2px;
+  z-index: 9999;
+  box-shadow: black 4px 4px 12px;
+}
+div.colorPicker_hexWrap {width: 100%; float:left }
+div.colorPicker_hexWrap label {font-size: 95%; color: #2F2F2F; margin: 5px 2px; width: 25%}
+div.colorPicker_hexWrap input {margin: 5px 2px; padding: 0; font-size: 95%; border: 1px solid #000; width: 65%; }
+div.colorPicker-swatch {
+  height: 12px;
+  width: 12px;
+  border: 1px solid #000;
+  margin: 2px;
+  float: left;
+  cursor: pointer;
+  line-height: 12px;
+}
+
 
 /***
 ****
@@ -156,7 +202,7 @@ div#torrent_container {
   right: 0px;
   left: 0px;
   padding: 0px;
-  margin: 0px;
+  margin: 0px;images/toolbar-pause-all.png
   overflow: auto;
   -webkit-overflow-scrolling: touch; }
 
