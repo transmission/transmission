@@ -340,7 +340,7 @@ void tr_sessionGetDefaultSettings(tr_variant* d)
 
     tr_variant const* knownGroups;
 
-    tr_variantDictReserve(d, 64);
+    tr_variantDictReserve(d, 65);
     tr_variantDictAddBool(d, TR_KEY_blocklist_enabled, false);
     tr_variantDictAddStr(d, TR_KEY_blocklist_url, "http://www.example.com/blocklist");
     tr_variantDictAddInt(d, TR_KEY_cache_size_mb, DEFAULT_CACHE_SIZE_MB);
@@ -413,7 +413,9 @@ void tr_sessionGetSettings(tr_session* s, tr_variant* d)
 {
     assert(tr_variantIsDict(d));
 
-    tr_variantDictReserve(d, 63);
+    tr_variant const* knownGroups;
+
+    tr_variantDictReserve(d, 65);
     tr_variantDictAddBool(d, TR_KEY_blocklist_enabled, tr_blocklistIsEnabled(s));
     tr_variantDictAddStr(d, TR_KEY_blocklist_url, tr_blocklistGetURL(s));
     tr_variantDictAddInt(d, TR_KEY_cache_size_mb, tr_sessionGetCacheLimit_MB(s));
@@ -478,6 +480,9 @@ void tr_sessionGetSettings(tr_session* s, tr_variant* d)
     tr_variantDictAddStr(d, TR_KEY_bind_address_ipv6, tr_address_to_string(&s->public_ipv6->addr));
     tr_variantDictAddBool(d, TR_KEY_start_added_torrents, !tr_sessionGetPaused(s));
     tr_variantDictAddBool(d, TR_KEY_trash_original_torrent_files, tr_sessionGetDeleteSource(s));
+    tr_variantDictAddStr(d, TR_KEY_download_group_default, tr_sessionGetDownloadGroupDefault(s));
+    knownGroups = tr_sessionGetDownloadGroups(s);
+    tr_variantListCopy(tr_variantDictAddList(d, TR_KEY_download_groups, tr_variantListSize(knownGroups)), knownGroups);
 }
 
 bool tr_sessionLoadSettings(tr_variant* dict, char const* configDir, char const* appName)
@@ -1247,6 +1252,7 @@ void tr_sessionSetDownloadGroupDefault(tr_session* session, char const* defaultG
 {
     assert(tr_isSession(session));
 
+    tr_free(session->downloadGroupDefault);
     session->downloadGroupDefault = tr_strdup(defaultGroup);
 }
 
