@@ -207,6 +207,17 @@ TransmissionRemote.prototype = {
             "location": new_location
         }, callback, context);
     },
+    
+    setGroupTorrents: function(torrent_ids, new_group, callback, context) {
+          var args = {
+                  ids: torrent_ids,
+                  downloadGroup: new_group
+              };
+          this.sendRequest({
+                  arguments: args,
+                  method: 'torrent-set'
+          }, callback, context);
+    },
 
     removeTorrents: function (torrent_ids, callback, context) {
         this.sendTorrentActionRequests('torrent-remove', torrent_ids, callback, context);
@@ -252,16 +263,22 @@ TransmissionRemote.prototype = {
             remote._controller.refreshTorrents();
         });
     },
-    savePrefs: function (args) {
-        var remote = this;
-        var o = {
-            method: 'session-set',
-            arguments: args
-        };
-        this.sendRequest(o, function () {
-            remote._controller.loadDaemonPrefs();
-        });
-    },
+    savePrefs: function(args, callback) {
+           var remote = this;
+           var o = {
+                   method: 'session-set',
+                   arguments: args
+           };
+          this.sendRequest(o, function() {
+                  remote._controller.loadDaemonPrefs();
+          });
+          if(typeof(callback) === 'undefined') {
+                  callback = function() {
+                          remote._controller.loadDaemonPrefs();
+                  };
+          }
+          this.sendRequest(o, callback);
+   },
     updateBlocklist: function () {
         var remote = this;
         var o = {

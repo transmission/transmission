@@ -75,6 +75,7 @@ Torrent.Fields.Stats = [
     'status',
     'trackers',
     'downloadDir',
+    'downloadGroup',
     'uploadedEver',
     'uploadRatio',
     'webseedsSendingToUs'
@@ -167,6 +168,14 @@ Torrent.prototype = {
         };
         return announces.join('\t');
     },
+    
+    collateGroups: function(groups) {
+          var i, t, announces = [];
+
+          for (i=0; t=groups[i]; ++i)
+                  announces.push(t.announce.toLowerCase());
+          return announces.join('\t');
+    },
 
     refreshFields: function (data) {
         var key;
@@ -222,6 +231,9 @@ Torrent.prototype = {
     },
     getDownloadDir: function () {
         return this.fields.downloadDir;
+    },
+    getDownloadGroup: function() { 
+        return this.fields.downloadGroup; 
     },
     getDownloadSpeed: function () {
         return this.fields.rateDownload;
@@ -337,11 +349,27 @@ Torrent.prototype = {
     isFinished: function () {
         return this.fields.isFinished;
     },
+    
+    getDownloadGroupColor: function() {
+          var groupName = this.fields.downloadGroup.toLowerCase();
+          var $op = $('#group-colors div[name="' + groupName + '"] input.color');
+          return $op.length != 0 ? 'background-color:'+ $op.val() : '';
+    },
+
 
     // derived accessors
     hasExtraInfo: function () {
         return 'hashString' in this.fields;
     },
+    
+    getCollatedGroup: function() {
+          var f = this.fields;
+          if (!f.collatedGroup && f.downloadGroup)
+                  f.collatedGroup = f.downloadGroup;
+          return f.collatedGroup || '';
+    },
+
+    
     isSeeding: function () {
         return this.getStatus() === Torrent._StatusSeed;
     },
@@ -461,7 +489,7 @@ Torrent.prototype = {
      * @param search substring to look for, or null
      * @return true if it passes the test, false if it fails
      */
-    test: function (state, search, tracker) {
+    test: function(state, search, tracker, group){
         // flter by state...
         var pass = this.testState(state);
 
@@ -474,6 +502,11 @@ Torrent.prototype = {
         if (pass && tracker && tracker.length) {
             pass = this.getCollatedTrackers().indexOf(tracker) !== -1;
         };
+        
+        // maybe filter by group...
+        if (pass && group && group.length) {
+            pass = this.getCollatedGroup().indexOf(group) !== -1;
+        }
 
         return pass;
     }

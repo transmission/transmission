@@ -115,10 +115,13 @@ TorrentRendererHelper.formatDL = function (t) {
 function TorrentRendererFull() {};
 TorrentRendererFull.prototype = {
     createRow: function () {
-        var root, name, peers, progressbar, details, image, button;
+        var root, name, peers, progressbar, details, image, button, group;
 
         root = document.createElement('li');
         root.className = 'torrent';
+        
+        group = document.createElement('div');
+        group.className = 'torrent_group';
 
         name = document.createElement('div');
         name.className = 'torrent_name';
@@ -134,7 +137,8 @@ TorrentRendererFull.prototype = {
         image = document.createElement('div');
         button = document.createElement('a');
         button.appendChild(image);
-
+        
+        root.appendChild(group);
         root.appendChild(name);
         root.appendChild(peers);
         root.appendChild(button);
@@ -142,6 +146,7 @@ TorrentRendererFull.prototype = {
         root.appendChild(details);
 
         root._name_container = name;
+        root._group_container = group;
         root._peer_details_container = peers;
         root._progress_details_container = details;
         root._progressbar = progressbar;
@@ -264,6 +269,9 @@ TorrentRendererFull.prototype = {
     render: function (controller, t, root) {
         // name
         setTextContent(root._name_container, t.getName());
+        
+        // group
+        $(root._group_container).attr('style', t.getDownloadGroupColor());
 
         // progressbar
         TorrentRendererHelper.renderProgressbar(controller, t, root._progressbar);
@@ -294,17 +302,21 @@ TorrentRendererFull.prototype = {
 function TorrentRendererCompact() {};
 TorrentRendererCompact.prototype = {
     createRow: function () {
-        var progressbar, details, name, root;
+        var progressbar, details, name, root, group;
 
         progressbar = TorrentRendererHelper.createProgressbar('compact');
 
         details = document.createElement('div');
         details.className = 'torrent_peer_details compact';
+        
+        group = document.createElement('div');
+        group.className = 'torrent_group';
 
         name = document.createElement('div');
         name.className = 'torrent_name compact';
 
         root = document.createElement('li');
+        root.appendChild(group);
         root.appendChild(progressbar.element);
         root.appendChild(details);
         root.appendChild(name);
@@ -312,6 +324,7 @@ TorrentRendererCompact.prototype = {
         root._progressbar = progressbar;
         root._details_container = details;
         root._name_container = name;
+        root._group_container = group;
         return root;
     },
 
@@ -351,6 +364,9 @@ TorrentRendererCompact.prototype = {
         var e = root._name_container;
         $(e).toggleClass('paused', is_stopped);
         setTextContent(e, t.getName());
+
+        // group
+        $(root._group_container).attr('style', t.getDownloadGroupColor());
 
         // peer details
         var has_error = t.getError() !== Torrent._ErrNone;

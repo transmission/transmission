@@ -44,6 +44,7 @@ Transmission.prototype = {
         $('#toolbar-start-all').click($.proxy(this.startAllClicked, this));
         $('#toolbar-remove').click($.proxy(this.removeClicked, this));
         $('#toolbar-open').click($.proxy(this.openTorrentClicked, this));
+        $('#toolbar-set-group').click($.proxy(this.setGroupClicked,this));
 
         $('#prefs-button').click($.proxy(this.togglePrefsDialogClicked, this));
 
@@ -55,6 +56,9 @@ Transmission.prototype = {
 
         $('#move_confirm_button').click($.proxy(this.confirmMoveClicked, this));
         $('#move_cancel_button').click($.proxy(this.hideMoveDialog, this));
+        
+        $('#set_group_confirm_button').click($.proxy(this.confirmSetGroupClicked,this));
+        $('#set_group_cancel_button').click($.proxy(this.hideSetGroupDialog,this));
 
         $('#turtle-button').click($.proxy(this.toggleTurtleClicked, this));
         $('#compact-button').click($.proxy(this.toggleCompactClicked, this));
@@ -73,6 +77,7 @@ Transmission.prototype = {
         e.val(this[Prefs._FilterMode]);
         e.change($.proxy(this.onFilterModeClicked, this));
         $('#filter-tracker').change($.proxy(this.onFilterTrackerClicked, this));
+        $('#filter-group').change($.proxy(this.onFilterGroupClicked,this));
 
         if (!isMobileDevice) {
             $(document).bind('keydown', $.proxy(this.keyDown, this));
@@ -97,6 +102,7 @@ Transmission.prototype = {
         e.toolbar_pause_button = $('#toolbar-pause')[0];
         e.toolbar_start_button = $('#toolbar-start')[0];
         e.toolbar_remove_button = $('#toolbar-remove')[0];
+        e.toolbar_set_group     = $('#toolbar-set-group')[0];
         this.elements = e;
 
         // Apply the prefs settings to the gui
@@ -226,6 +232,9 @@ Transmission.prototype = {
             },
             deselect_all: function () {
                 tr.deselectAll();
+            },
+            context_set_group : function() { 
+                tr.setGroupSelectedTorrents(false); 
             }
         };
 
@@ -611,10 +620,28 @@ Transmission.prototype = {
         this.updateButtonStates();
     },
 
-    confirmMoveClicked: function () {
-        this.moveSelectedTorrents(true);
-        this.hideUploadDialog();
+    hideSetGroupDialog: function() {
+          $('#set_group_container').hide();
+          this.updateButtonStates();
     },
+
+    confirmMoveClicked: function() {
+           this.moveSelectedTorrents(true);
+           this.hideUploadDialog();
+    },
+
+    confirmSetGroupClicked: function() {
+          this.setGroupSelectedTorrents(true);
+          this.hideUploadDialog();
+    },
+    
+    setGroupClicked: function(ev) {
+          if (this.isButtonEnabled(ev)) {
+                  this.setGroupSelectedTorrents(false);
+          }
+    },
+
+
 
     hideRenameDialog: function () {
         $('body.open_showing').removeClass('open_showing');
@@ -949,6 +976,7 @@ Transmission.prototype = {
         var folderInput = $('input#add-dialog-folder-input');
         var startInput = $('input#torrent_auto_start');
         var urlInput = $('input#torrent_upload_url');
+        var downloadGroups = $('select#download-groups');
 
         if (!confirmed) {
             // update the upload dialog's fields
@@ -957,6 +985,7 @@ Transmission.prototype = {
             startInput.attr('checked', this.shouldAddedTorrentsStart());
             folderInput.attr('value', $("#download-dir").val());
             folderInput.change($.proxy(this.updateFreeSpaceInAddDialog, this));
+            downloadGroups.val($('#download-group-default').val());
             this.updateFreeSpaceInAddDialog();
 
             // show the dialog
@@ -965,6 +994,7 @@ Transmission.prototype = {
         } else {
             var paused = !startInput.is(':checked');
             var destination = folderInput.val();
+            var group = downloadGroups.val();
             var remote = this.remote;
 
             jQuery.each(fileInput[0].files, function (i, file) {
@@ -980,6 +1010,7 @@ Transmission.prototype = {
                             arguments: {
                                 'paused': paused,
                                 'download-dir': destination,
+                                'downloadGroup': group,
                                 'metainfo': metainfo
                             }
                         };
@@ -1002,6 +1033,7 @@ Transmission.prototype = {
                     arguments: {
                         'paused': paused,
                         'download-dir': destination,
+                        'downloadGroup': group,
                         'filename': url
                     }
                 };
@@ -1038,6 +1070,35 @@ Transmission.prototype = {
             this.promptSetLocation(confirmed, torrents);
         };
     },
+    
+    promptSetGroup: function(confirmed, torrents) {
+          if (! confirmed) {
+                  var group;
+                  if (torrents.length === 1) {
+                          group = torrents[0].getDownloadGroup();
+                  } else {
+                          group = $("#download-group-default").val();
+                  }
+                  $('select#torrent_set_group').val(group);
+                  $('#set_group_container').show();
+                  $('#download-group-default').focus();
+          } else {
+                  var ids = this.getTorrentIds(torrents);
+                  this.remote.setGroupTorrents(
+                          ids, 
+                          $("select#torrent_set_group").val(), 
+                          this.refreshTorrents, 
+                          this);
+                  $('#set_group_container').hide();
+          }
+    },
+
+    setGroupSelectedTorrents: function(confirmed) {
+          var torrents = this.getSelectedTorrents();
+          if (torrents.length)
+                  this.promptSetGroup(confirmed, torrents);
+    },
+
 
     removeSelectedTorrents: function () {
         var torrents = this.getSelectedTorrents();
@@ -1218,6 +1279,32 @@ Transmission.prototype = {
 
         this.prefsDialog.set(o);
 
+        // seperate function for other prefs??
+        if (typeof(o['download-groups']) !== 'undefined'
+        && typeof(o['download-group-default']) !== 'undefined')
+        {
+              var ddAdd = $('#download-groups'); // a drop-box when add a torrent
+              var ddSet = $('#torrent_set_group'); // a drop-box when change group
+              // defaults are new or more/less items (TODO: check if there are differences)
+              if (ddAdd.children().length == 0 || ddAdd.children().length != o['download-groups'].length)
+              {
+                      ddAdd = ddAdd.empty(); // clear children
+                      ddSet = ddSet.empty();
+                      for (var idx = 0; idx < o['download-groups'].length; idx++)
+                      {
+                              ddAdd.append($('<option>' + o['download-groups'][idx][0] + '</option>').val(o['download-groups'][idx][0].toLowerCase()));
+                              ddSet.append($('<option>' + o['download-groups'][idx][0] + '</option>').val(o['download-groups'][idx][0].toLowerCase()));
+                      }
+              }
+
+              var setSelected = o['download-group-default'].toLowerCase();
+              if(ddAdd.val() != setSelected) // default has changed
+              {
+                      ddAdd.val(setSelected);
+              }
+        }
+
+
         if (RPC._TurtleState in o) {
             b = o[RPC._TurtleState];
             e = $('#turtle-button');
@@ -1284,6 +1371,41 @@ Transmission.prototype = {
         var i, names, name, str, o;
         var e = $('#filter-tracker');
         var trackers = this.getTrackers();
+        var g = $('#filter-group');
+        var downloadGroups = this.getGroups();
+        
+        
+        if (!this.filterGroup)
+                  str = '<option value="all" selected="selected">All</option>';
+          else
+                  str = '<option value="all">All</option>';
+
+          var p = this.sessionProperties;
+          if(p && typeof(p['download-groups']) !== 'undefined')
+          {
+                  for(var i in p["download-groups"]) {
+                          var key = p["download-groups"][i][0].toLowerCase();
+                          if(typeof(downloadGroups[key]) != 'undefined')
+                          {
+                                  var item = downloadGroups[key];
+                                  str += '<option value="' + item.group + '"' + (item.group === this.filterGroup ? ' selected="selected"' : '') + '>' + p["download-groups"][i][0] + '</option>';
+                                  // exclude processed object to get lost keys
+                                  delete downloadGroups[key];
+                          }
+                  }
+                  // lost keys
+                  for(var i in downloadGroups)
+                  {
+                          o = downloadGroups[i];
+                          str += '<option value="' + o.group + '"' + (o.group === this.filterGroup ? ' selected="selected"' : '') + '>[' + o.group + ']</option>';
+                  }
+          }
+
+          if (!this.filterGroupsStr || (this.filterGroupsStr !== str)) {
+                  this.filterGroupsStr = str;
+                  $('#filter-group').html(str);
+          }
+
 
         // build a sorted list of names
         names = [];
@@ -1372,6 +1494,7 @@ Transmission.prototype = {
             tr.setEnabled(e.toolbar_pause_button, s.activeSel > 0);
             tr.setEnabled(e.toolbar_start_button, s.pausedSel > 0);
             tr.setEnabled(e.toolbar_remove_button, s.sel > 0);
+            tr.setEnabled(e.toolbar_set_group, s.sel > 0);
         });
     },
 
@@ -1446,6 +1569,7 @@ Transmission.prototype = {
         var sort_direction = this[Prefs._SortDirection];
         var filter_mode = this[Prefs._FilterMode];
         var filter_text = this.filterText;
+        var filter_group = this.filterGroup;
         var filter_tracker = this.filterTracker;
         var renderer = this.torrentRenderer;
         var list = this.elements.torrent_list;
@@ -1489,7 +1613,7 @@ Transmission.prototype = {
         for (i = 0; row = dirty_rows[i]; ++i) {
             id = row.getTorrentId();
             t = this._torrents[id];
-            if (t && t.test(filter_mode, filter_text, filter_tracker)) {
+            if (t && t.test(filter_mode, filter_text, filter_tracker, filter_group)) {
                 tmp.push(row);
             };
             delete this.dirtyTorrents[id];
@@ -1500,7 +1624,7 @@ Transmission.prototype = {
         // but don't already have a row
         for (id in this.dirtyTorrents) {
             t = this._torrents[id];
-            if (t && t.test(filter_mode, filter_text, filter_tracker)) {
+            if (t && t.test(filter_mode, filter_text, filter_tracker, filter_group)) {
                 row = new TorrentRow(renderer, this, t);
                 e = row.getElement();
                 e.row = row;
@@ -1585,6 +1709,21 @@ Transmission.prototype = {
         var tracker = $('#filter-tracker').val();
         this.setFilterTracker(tracker === 'all' ? null : tracker);
     },
+    
+    onFilterGroupClicked: function(ev) {
+          var group = $('#filter-group').val();
+          this.setFilterGroup(group==='all' ? null : group);
+    },
+
+    setFilterGroup: function(group) {
+          // update which tracker is selected in the popup
+          var key = group ? group : 'all',
+              id = '#show-group-' + key;
+          $(id).addClass('selected').siblings().removeClass('selected');
+
+          this.filterGroup = group;
+          this.refilter(true);
+    },
 
     setFilterTracker: function (domain) {
         // update which tracker is selected in the popup
@@ -1658,6 +1797,32 @@ Transmission.prototype = {
 
         return ret;
     },
+    
+    getGroups: function()
+    {
+          var ret = {};
+
+          var torrents = this.getAllTorrents();
+          for (var i=0, torrent; torrent=torrents[i]; ++i)
+          {
+                  var names = [];
+                  var group = torrent.getDownloadGroup();
+
+                  if (!(group in ret))
+                          ret[group] = { 'group': group,
+                                         'count': 0 };
+
+                  if (names.indexOf(group) === -1)
+                          names.push(group);
+
+                  for (var j=0, name; name=names[j]; ++j)
+                          ret[name].count++;
+          }
+
+          return ret;
+    },
+
+
 
     /***
      ****
