@@ -13,6 +13,7 @@
 		<script type="text/javascript" src="./javascript/jquery/jquery-ui.min.js"></script>
 		<script type="text/javascript" src="./javascript/jquery/jquery.ui-contextmenu.min.js"></script>
 		<link rel="stylesheet" href="./style/jqueryui/jquery-ui.min.css" type="text/css" media="all" />
+                <link rel="stylesheet" href="./style/transmission/spectrum.min.css" type="text/css" media="all"/>
 <!--
 		<link media="screen" href="./style/transmission/mobile.css" type= "text/css" rel="stylesheet" />
 -->
@@ -23,6 +24,7 @@
 		<![endif]-->
 		<script type="text/javascript" src="./javascript/jquery/jquery.transmenu.min.js"></script>
 		<script type="text/javascript" src="./javascript/jquery/json2.min.js"></script>
+                <script type="text/javascript" src="./javascript/jquery/spectrum.min.js"></script>
 		<script type="text/javascript" src="./javascript/polyfill.js"></script>
 		<script type="text/javascript" src="./javascript/common.js"></script>
 		<script type="text/javascript" src="./javascript/inspector.js"></script>
@@ -50,6 +52,9 @@
 			<div id="toolbar-start-all" title="Start All Torrents"></div>
 			<div id="toolbar-pause-all" title="Pause All Torrents"></div>
 			<div id="toolbar-inspector" title="Toggle Inspector"></div>
+                        <div id="toolbar-separator"></div>
+                        <div id="toolbar-set-group" title="Change Group"></div>
+
 		</div>
 
 		<div id="statusbar">
@@ -64,6 +69,7 @@
 					<option value="finished">Finished</option>
 				</select>
 				<select id="filter-tracker"></select>
+                                <select id="filter-group"></select>                                
 				<input type="search" id="torrent_search" placeholder="Filter" />
 				<span id="filter-count">&nbsp;</span>
 			</div>
@@ -86,6 +92,7 @@
 				<li id="prefs-tab-speed"><a href="#prefs-page-speed">Speed</a></li>
 				<li id="prefs-tab-peers"><a href="#prefs-page-peers">Peers</a></li>
 				<li id="prefs-tab-network"><a href="#prefs-page-network">Network</a></li>
+                                <li id="prefs-tab-groups"><a href="#prefs-page-groups">Groups</a></li>
 				<li class="ui-tab-dialog-close"></li>
 			</ul>
 			<div>
@@ -93,6 +100,12 @@
 					<div class="prefs-section">
 						<div class="title">Downloading</div>
 						<div class="row"><div class="key">Download to:</div><div class="value"><input type="text" id="download-dir"/></div></div>
+                                                <div class="row">
+                                                  <div class="key">Default download group:</div>
+                                                  <div class="value">
+                                                          <select id="download-group-default"></select>
+                                                  </div>
+                                                </div>
 						<div class="checkbox-row"><input type="checkbox" id="start-added-torrents"/><label for="start-added-torrents">Start when added</label></div>
 						<div class="checkbox-row"><input type="checkbox" id="rename-partial-files"/><label for="rename-partial-files">Append &quot;.part&quot; to incomplete files' names</label></div>
 					</div>
@@ -183,6 +196,24 @@
 						<div class="checkbox-row"><input type="checkbox" id="utp-enabled" title="uTP is a tool for reducing network congestion."/>
 						                          <label for="utp-enabled" title="uTP is a tool for reducing network congestion.">Enable uTP for peer communication</label></div>
 					</div>
+                                        
+                                        <div id="prefs-page-groups">
+                                                  <div class="prefs-section">
+                                                          <div class="title">Group colors and order</div>
+                                                          <div class="row">
+                                                              <div class="value colors" id="group-colors"></div>
+                                                          </div>
+                                                          <div class="row">
+                                                                  <div class="key">
+                                                                          <input type="button" value="Update" id="groups-update-button">
+                                                                  </div>
+                                                          </div>
+                                                          <div class="message">&nbsp;</div>
+                                                  </div>
+                                          </div>
+
+                                        
+                                        
 				</div>
 			</div>
 		</div>
@@ -217,6 +248,7 @@
 					<div class="title">Details</div>
 					<div class="row"><div class="key">Size:</div><div class="value" id="inspector-info-size">&nbsp;</div></div>
 					<div class="row"><div class="key">Location:</div><div class="value" id="inspector-info-location">&nbsp;</div></div>
+                                        <div class="row"><div class="key">Group:</div><div class="value" id="inspector-info-group">&nbsp;</div></div>
 					<div class="row"><div class="key">Hash:</div><div class="value" id="inspector-info-hash">&nbsp;</div></div>
 					<div class="row"><div class="key">Privacy:</div><div class="value" id="inspector-info-privacy">&nbsp;</div></div>
 					<div class="row"><div class="key">Origin:</div><div class="value" id="inspector-info-origin">&nbsp;</div></div>
@@ -293,6 +325,8 @@
 							<input type="file" name="torrent_files[]" id="torrent_upload_file" multiple="multiple" />
 						<label for="torrent_upload_url">Or enter a URL:</label>
 							<input type="url" id="torrent_upload_url"/>
+                                                <label for="download-groups" id="download_groups_label">Download group:</label>
+                                                        <select id="download-groups"></select>
 						<label id='add-dialog-folder-label' for="add-dialog-folder-input">Destination folder:</label>
 							<input type="text" id="add-dialog-folder-input"/>
 							<input type="checkbox" id="torrent_auto_start" />
@@ -334,6 +368,22 @@
 				</form>
 			</div>
 		</div>
+                <div class="dialog_container" id="set_group_container" style="display:none;">
+                <div class="dialog_top_bar"></div>
+                        <div class="dialog_window">
+                          <div class="dialog_logo" id="set_group_dialog_logo"></div>
+                          <h2 class="dialog_heading">Set group</h2>
+                          <form action="#" method="post" id="torrent_set_group_form"
+                                  enctype="multipart/form-data" target="torrent_set_group_frame">
+                                  <div class="dialog_message">
+                                          <label for="torrent_set_group">Group:</label>
+                                          <select id="torrent_set_group"></select>
+                                  </div>
+                                  <a href="#set_group" id="set_group_confirm_button">Apply</a>
+                                  <a href="#cancel" id="set_group_cancel_button">Cancel</a>
+                          </form>
+                        </div>
+                </div>
 
 		<div class="torrent_footer">
 			<div id="settings_menu" title="Settings Menu">&nbsp;</div>

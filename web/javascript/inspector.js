@@ -481,6 +481,23 @@ function Inspector(controller) {
                 };
             };
             setTextContent(e.foldername_lb, str);
+            //
+            //  group
+            //
+
+            str = '';
+            if(torrents.length < 1)
+                str = none;
+            else {
+                for(i=0; t=torrents[i]; ++i) {
+                    if(str != t.getDownloadGroup()) {
+                        str += '<span class="group" style="' + t.getDownloadGroupColor() + '">' + t.getDownloadGroup() + '</span>';
+                    }
+                }
+                str = '<span class="groupwrap">' + str + '</span>';
+            }
+            setInnerHTML(e.group_lb, str);
+
         },
 
         /****
@@ -831,6 +848,7 @@ function Inspector(controller) {
             data.elements.last_activity_lb = $('#inspector-info-last-activity')[0];
             data.elements.error_lb = $('#inspector-info-error')[0];
             data.elements.size_lb = $('#inspector-info-size')[0];
+            data.elements.group_lb = $('#inspector-info-group')[0];
             data.elements.foldername_lb = $('#inspector-info-location')[0];
             data.elements.hash_lb = $('#inspector-info-hash')[0];
             data.elements.privacy_lb = $('#inspector-info-privacy')[0];
