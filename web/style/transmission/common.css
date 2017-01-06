@@ -99,6 +99,40 @@ div#toolbar {
   div#toolbar > *.disabled {
     opacity: 0.25; }
 
+  .prefs-section .row .value.colors {
+    margin-left: 0; }
+
+
+  .color-row {
+    overflow: hidden;
+    white-space: nowrap;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    margin-bottom: 1px;
+    padding: 0 0 1px 1px; }
+  .color-row.error{
+    border-color: rgba(250, 0, 0, .75);
+    background-color: rgba(250, 0, 0, .15); }
+  .color-row .controls {
+    position:relative;
+    top: 5px; }
+  .color-row .controls .ui-icon {
+    display: inline-block;
+    border-radius:4px;
+    margin-left:3px;
+    cursor:pointer; }
+  .color-row .controls .ui-icon.disabled {
+    visibility:hidden; }
+  .color-row .controls .ui-icon:hover {
+    background-color: rgba(120, 120, 120, .5); }
+  .color-row input {
+    min-width:80px; width: 30%; } /* should be 30% if code column is displayed */
+  .color-row.removed {
+    opacity: 0.5; }
+  #prefs-page-groups .message {
+    clear: both;
+    color: red; }
+
 
 /*--------------------------------------
  *
