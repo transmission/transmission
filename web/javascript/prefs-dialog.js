@@ -67,21 +67,21 @@ function PrefsDialog(remote) {
                 showInput: true,
                 showInitial: false,
                 showPalette: true,
-                showSelectionPalette: false,
-                maxPaletteSize: 10,
-                preferredFormat: 'hex',
+                preferredFormat: "hex",
+                showInput: true,
                 showButtons: false,
                 hide: function (color) {
                     onControlChangedGroupColor(this, color);
                 },
                 palette: [
-                    ['rgb(0,0,0)','rgb(67,67,67)','rgb(102,102,102)','rgb(153,153,153)','rgb(183,183,183)','rgb(204,204,204)','rgb(217,217,217)','rgb(239,239,239)','rgb(243,243,243)','rgb(255,255,255)'],
-                    ['rgb(152,0,0)','rgb(255,0,0)','rgb(255,153,0)','rgb(255,255,0)','rgb(0,255,0)','rgb(0,255,255)','rgb(74,134,232)','rgb(0,0,255)','rgb(153,0,255)','rgb(255,0,255)'],
-                    ['rgb(221,126,107)','rgb(234,153,153)','rgb(249,203,156)','rgb(255,229,153)','rgb(182,215,168)','rgb(162,196,201)','rgb(164,194,244)','rgb(159,197,232)','rgb(180,167,214)','rgb(213,166,189)'],
-                    ['rgb(204,65,37)','rgb(224,102,102)','rgb(246,178,107)','rgb(255,217,102)','rgb(147,196,125)','rgb(118,165,175)','rgb(109,158,235)','rgb(111,168,220)','rgb(142,124,195)','rgb(194,123,160)'],
-                    ['rgb(166,28,0)','rgb(204,0,0)','rgb(230,145,56)','rgb(241,194,50)','rgb(106,168,79)','rgb(69,129,142)','rgb(60,120,216)','rgb(61,133,198)','rgb(103,78,167)','rgb(166,77,121)'],
-                    ['rgb(133,32,12)','rgb(153,0,0)','rgb(180,95,6)','rgb(191,144,0)','rgb(56,118,29)','rgb(19,79,92)','rgb(17,85,204)','rgb(11,83,148)','rgb(53,28,117)','rgb(116,27,71)'],
-                    ['rgb(91,15,0)','rgb(102,0,0)','rgb(120,63,4)','rgb(127,96,0)','rgb(39,78,19)','rgb(12,52,61)','rgb(28,69,135)','rgb(7,55,99)','rgb(32,18,77)','rgb(76,17,48)']
+                    ["#000","#444","#666","#999","#ccc","#eee","#f3f3f3","#fff"],
+                    ["#f00","#f90","#ff0","#0f0","#0ff","#00f","#90f","#f0f"],
+                    ["#f4cccc","#fce5cd","#fff2cc","#d9ead3","#d0e0e3","#cfe2f3","#d9d2e9","#ead1dc"],
+                    ["#ea9999","#f9cb9c","#ffe599","#b6d7a8","#a2c4c9","#9fc5e8","#b4a7d6","#d5a6bd"],
+                    ["#e06666","#f6b26b","#ffd966","#93c47d","#76a5af","#6fa8dc","#8e7cc3","#c27ba0"],
+                    ["#c00","#e69138","#f1c232","#6aa84f","#45818e","#3d85c6","#674ea7","#a64d79"],
+                    ["#900","#b45f06","#bf9000","#38761d","#134f5c","#0b5394","#351c75","#741b47"],
+                    ["#600","#783f04","#7f6000","#274e13","#0c343d","#073763","#20124d","#4c1130"]
                 ]
 
             }
@@ -211,7 +211,7 @@ function PrefsDialog(remote) {
         }
         gtab = $('#group-colors').empty().append($(tabSnip));
         // apply color pickers
-        gtab.find('.color-row .color').spectrum(data.spectrumOpt);
+        gtab.find('.color-row .color').spectrum(data.groups.spectrumOpt);
         // events
         gtab.find('.controls span.up').click('', onControlClickGroupUp);
         gtab.find('.controls span.down').click('', onControlClickGroupDown);

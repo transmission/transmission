@@ -133,6 +133,18 @@ div#toolbar {
     clear: both;
     color: red; }
 
+#inspector-page-info .row .groupwrap {
+  display: inline-block;
+  overflow: hidden;
+  white-space:nowrap; }
+#inspector-page-info .row .group {
+  display: inline-block;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+  padding: 0 4px; }
+#inspector-page-info .row .group:not(:first-child) {
+  margin-left: 10px; }
+
 
 /*--------------------------------------
  *
