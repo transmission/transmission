@@ -194,6 +194,9 @@ struct tr_session
 
     struct tr_device_info* downloadDir;
 
+    tr_variant downloadGroups;
+    char* downloadGroupDefault;
+
     struct tr_list* blocklists;
     struct tr_peerMgr* peerMgr;
     struct tr_shared* shared;

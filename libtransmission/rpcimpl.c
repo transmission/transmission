@@ -619,6 +619,10 @@ static void addField(tr_torrent* const tor, tr_info const* const inf, tr_stat co
         tr_variantDictAddInt(d, key, st->downloadedEver);
         break;
 
+    case TR_KEY_downloadGroup:
+        tr_variantDictAddStr(d, key, tr_torrentGetDownloadGroup(tor));
+        break;
+
     case TR_KEY_downloadLimit:
         tr_variantDictAddInt(d, key, tr_torrentGetSpeedLimit_KBps(tor, TR_DOWN));
         break;
@@ -1289,6 +1293,7 @@ static char const* torrentSet(tr_session* session, tr_variant* args_in, tr_varia
     {
         int64_t tmp;
         double d;
+        char const* str = NULL;
         tr_variant* files;
         tr_variant* trackers;
         bool boolVal;
@@ -1382,6 +1387,11 @@ static char const* torrentSet(tr_session* session, tr_variant* args_in, tr_varia
         if (tr_variantDictFindInt(args_in, TR_KEY_queuePosition, &tmp))
         {
             tr_torrentSetQueuePosition(tor, tmp);
+        }
+
+        if (tr_variantDictFindStr(args_in, TR_KEY_downloadGroup, &str, NULL))
+        {
+            tr_torrentSetDownloadGroup(tor, str);
         }
 
         if (errmsg == NULL && tr_variantDictFindList(args_in, TR_KEY_trackerAdd, &trackers))
@@ -1793,6 +1803,7 @@ static char const* torrentAdd(tr_session* session, tr_variant* args_in, tr_varia
     bool boolVal;
     tr_variant* l;
     char const* cookies = NULL;
+    char const* download_group = NULL;
     tr_ctor* ctor = tr_ctorNew(session);
 
     /* set the optional arguments */
@@ -1817,6 +1828,11 @@ static char const* torrentAdd(tr_session* session, tr_variant* args_in, tr_varia
     if (tr_variantDictFindInt(args_in, TR_KEY_bandwidthPriority, &i))
     {
         tr_ctorSetBandwidthPriority(ctor, i);
+    }
+
+    if (tr_variantDictFindStr(args_in, TR_KEY_downloadGroup, &download_group, NULL))
+    {
+        tr_ctorSetDownloadGroup(ctor, TR_FORCE, download_group);
     }
 
     if (tr_variantDictFindList(args_in, TR_KEY_files_unwanted, &l))
@@ -1928,6 +1944,7 @@ static char const* sessionSet(tr_session* session, tr_variant* args_in, tr_varia
     double d;
     bool boolVal;
     char const* str;
+    tr_variant* list;
 
     if (tr_variantDictFindInt(args_in, TR_KEY_cache_size_mb, &i))
     {
@@ -1982,6 +1999,16 @@ static char const* sessionSet(tr_session* session, tr_variant* args_in, tr_varia
     if (download_dir != NULL)
     {
         tr_sessionSetDownloadDir(session, download_dir);
+    }
+
+    if (tr_variantDictFindStr(args_in, TR_KEY_download_group_default, &str, NULL))
+    {
+        tr_sessionSetDownloadGroupDefault(session, str);
+    }
+
+    if (tr_variantDictFindList(args_in, TR_KEY_download_groups, &list))
+    {
+        tr_sessionSetDownloadGroups(session, list);
     }
 
     if (tr_variantDictFindInt(args_in, TR_KEY_queue_stalled_minutes, &i))
@@ -2257,6 +2284,18 @@ static void addSessionField(tr_session* s, tr_variant* d, tr_quark key)
 
     case TR_KEY_download_dir:
         tr_variantDictAddStr(d, key, tr_sessionGetDownloadDir(s));
+        break;
+
+    case TR_KEY_download_groups:
+        {
+            tr_variant const* knownGroups;
+            knownGroups = tr_sessionGetDownloadGroups(s);
+            tr_variantListCopy(tr_variantDictAddList(d, key, tr_variantListSize(knownGroups)), knownGroups);
+            break;
+        }
+
+    case TR_KEY_download_group_default:
+        tr_variantDictAddStr(d, key, tr_sessionGetDownloadGroupDefault(s));
         break;
 
     case TR_KEY_download_dir_free_space:

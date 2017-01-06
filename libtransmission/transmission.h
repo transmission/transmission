@@ -125,6 +125,16 @@ char const* tr_getDefaultConfigDir(char const* appname);
  */
 char const* tr_getDefaultDownloadDir(void);
 
+/**
+ * @brief returns Transmisson's default download groups.
+ */
+struct tr_variant const* tr_getDefaultDownloadGroups(void);
+
+/**
+ * @brief returns Transmisson's default download group default.
+ */
+char const* tr_getDefaultDownloadGroupDefault(void);
+
 #define TR_DEFAULT_BIND_ADDRESS_IPV4 "0.0.0.0"
 #define TR_DEFAULT_BIND_ADDRESS_IPV6 "::"
 #define TR_DEFAULT_RPC_WHITELIST "127.0.0.1,::1"
@@ -265,6 +275,40 @@ char const* tr_sessionGetDownloadDir(tr_session const* session);
  * @return zero or positive integer on success, -1 in case of error.
  */
 int64_t tr_sessionGetDirFreeSpace(tr_session* session, char const* dir);
+
+//=================================================================================
+
+/**
+ * @brief Set the per-session download groups for new torrents
+ * @see tr_sessionInit()
+ * @see tr_sessionGetDownloadGroups()
+ */
+void tr_sessionSetDownloadGroups(tr_session* session, struct tr_variant const* groups);
+
+/**
+ * @brief Get the download groups for new torrents
+ *
+ * This is set by tr_sessionInit() or tr_sessionSetDownloadGroups()
+ */
+struct tr_variant const* tr_sessionGetDownloadGroups(tr_session const* session);
+
+/**
+ * @brief Set the per-session default download group for new torrents
+ * @see tr_sessionInit()
+ * @see tr_sessionGetDownloadGroupDefault()
+ * @see tr_ctorSetDownloadGroups() **
+ */
+void tr_sessionSetDownloadGroupDefault(tr_session* session, char const* defaultGroup);
+
+/**
+ * @brief Get the default download group for new torrents
+ *
+ * This is set by tr_sessionInit() or tr_sessionSetDownloadGroupDefault(),
+ * and can be overridden on a per-torrent basis by tr_ctorSetDownloadGroups().
+ */
+char const* tr_sessionGetDownloadGroupDefault(tr_session const* session);
+
+//=================================================================================
 
 /**
  * @brief Set the torrent's bandwidth priority.
@@ -891,6 +935,10 @@ void tr_ctorSetPeerLimit(tr_ctor* ctor, tr_ctorMode mode, uint16_t limit);
     @see tr_sessionInit() */
 void tr_ctorSetDownloadDir(tr_ctor* ctor, tr_ctorMode mode, char const* directory);
 
+/** @brief Set the download group for the torrent being added with this ctor.
+ */
+void tr_ctorSetDownloadGroup(tr_ctor* ctor, tr_ctorMode mode, char const* group);
+
 /**
  * @brief Set the incompleteDir for this torrent.
  *
@@ -919,6 +967,9 @@ bool tr_ctorGetPaused(tr_ctor const* ctor, tr_ctorMode mode, bool* setmeIsPaused
 
 /** @brief Get the download path from this peer constructor */
 bool tr_ctorGetDownloadDir(tr_ctor const* ctor, tr_ctorMode mode, char const** setmeDownloadDir);
+
+/** @brief Get the download group from this peer constructor */
+bool tr_ctorGetDownloadGroup(tr_ctor const* ctor, tr_ctorMode mode, char const** setmeGroup);
 
 /** @brief Get the incomplete directory from this peer constructor */
 bool tr_ctorGetIncompleteDir(tr_ctor const* ctor, char const** setmeIncompleteDir);
@@ -1207,6 +1258,13 @@ tr_priority_t* tr_torrentGetFilePriorities(tr_torrent const* torrent);
 void tr_torrentSetFileDLs(tr_torrent* torrent, tr_file_index_t const* files, tr_file_index_t fileCount, bool do_download);
 
 tr_info const* tr_torrentInfo(tr_torrent const* torrent);
+
+/* Raw function to change the torrent's downloadGroup field.
+   This should only be used by libtransmission or to bootstrap
+   a newly-instantiated tr_torrent object. */
+void tr_torrentSetDownloadGroup(tr_torrent* tor, char const* group);
+
+char const* tr_torrentGetDownloadGroup(tr_torrent const* tor);
 
 /* Raw function to change the torrent's downloadDir field.
    This should only be used by libtransmission or to bootstrap

@@ -734,6 +734,8 @@ void tr_torrentSaveResume(tr_torrent* tor)
     tr_variantDictAddInt(&top, TR_KEY_max_peers, tor->maxConnectedPeers);
     tr_variantDictAddInt(&top, TR_KEY_bandwidth_priority, tr_torrentGetPriority(tor));
     tr_variantDictAddBool(&top, TR_KEY_paused, !tor->isRunning && !tor->isQueued);
+    tr_variantDictAddStr(&top, TR_KEY_downloadGroup, tor->downloadGroup);
+
     savePeers(&top, tor);
 
     if (tr_torrentHasMetadata(tor))
@@ -822,6 +824,18 @@ static uint64_t loadFromFile(tr_torrent* tor, uint64_t fieldsToLoad)
         }
 
         fieldsLoaded |= TR_FR_INCOMPLETE_DIR;
+    }
+
+    if ((fieldsToLoad & (TR_FR_PROGRESS | TR_FR_GROUP)) != 0 && tr_variantDictFindStr(&top, TR_KEY_downloadGroup, &str, &len) &&
+        str != NULL && *str != '\0')
+    {
+        if (tr_strcmp0(str, tor->downloadGroup) != 0)
+        {
+            tr_free(tor->downloadGroup);
+            tor->downloadGroup = tr_strndup(str, len);
+        }
+
+        fieldsLoaded |= TR_FR_GROUP;
     }
 
     if ((fieldsToLoad & TR_FR_DOWNLOADED) != 0 && tr_variantDictFindInt(&top, TR_KEY_downloaded, &i))

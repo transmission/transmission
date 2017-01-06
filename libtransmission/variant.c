@@ -957,7 +957,7 @@ void tr_variantFree(tr_variant* v)
 ****
 ***/
 
-static void tr_variantListCopy(tr_variant* target, tr_variant const* src)
+void tr_variantListCopy(tr_variant* target, tr_variant const* src)
 {
     int i = 0;
     tr_variant const* val;
@@ -1074,9 +1074,21 @@ void tr_variantMergeDicts(tr_variant* target, tr_variant const* source)
             }
             else if (tr_variantIsList(val))
             {
-                if (tr_variantDictFind(target, key) == NULL)
+                tr_variant* targetList = tr_variantDictFind(target, key);
+
+                if (targetList == NULL)
                 {
                     tr_variantListCopy(tr_variantDictAddList(target, key, tr_variantListSize(val)), val);
+                }
+                else
+                {
+                    // if we are processing TR_KEY_download_groups list
+                    // overwrite target with source
+                    if (key == TR_KEY_download_groups && tr_variantListSize(val) > 0)
+                    {
+                        tr_variantInitList(targetList, tr_variantListSize(val));
+                        tr_variantListCopy(targetList, val);
+                    }
                 }
             }
             else if (tr_variantIsDict(val))

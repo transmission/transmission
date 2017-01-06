@@ -338,7 +338,9 @@ void tr_sessionGetDefaultSettings(tr_variant* d)
 {
     assert(tr_variantIsDict(d));
 
-    tr_variantDictReserve(d, 63);
+    tr_variant const* knownGroups;
+
+    tr_variantDictReserve(d, 64);
     tr_variantDictAddBool(d, TR_KEY_blocklist_enabled, false);
     tr_variantDictAddStr(d, TR_KEY_blocklist_url, "http://www.example.com/blocklist");
     tr_variantDictAddInt(d, TR_KEY_cache_size_mb, DEFAULT_CACHE_SIZE_MB);
@@ -402,6 +404,9 @@ void tr_sessionGetDefaultSettings(tr_variant* d)
     tr_variantDictAddStr(d, TR_KEY_bind_address_ipv6, TR_DEFAULT_BIND_ADDRESS_IPV6);
     tr_variantDictAddBool(d, TR_KEY_start_added_torrents, true);
     tr_variantDictAddBool(d, TR_KEY_trash_original_torrent_files, false);
+    tr_variantDictAddStr(d, TR_KEY_download_group_default, tr_getDefaultDownloadGroupDefault());
+    knownGroups = tr_getDefaultDownloadGroups();
+    tr_variantListCopy(tr_variantDictAddList(d, TR_KEY_download_groups, tr_variantListSize(knownGroups)), knownGroups);
 }
 
 void tr_sessionGetSettings(tr_session* s, tr_variant* d)
@@ -803,6 +808,7 @@ static void sessionSetImpl(void* vdata)
     tr_session* session = data->session;
     tr_variant* settings = data->clientSettings;
     struct tr_turtle_info* turtle = &session->turtle;
+    tr_variant* groups;
 
     assert(tr_isSession(session));
     assert(tr_variantIsDict(settings));
@@ -896,6 +902,16 @@ static void sessionSetImpl(void* vdata)
     if (tr_variantDictFindInt(settings, TR_KEY_peer_id_ttl_hours, &i))
     {
         session->peer_id_ttl_hours = i;
+    }
+
+    if (tr_variantDictFindList(settings, TR_KEY_download_groups, &groups))
+    {
+        tr_sessionSetDownloadGroups(session, groups);
+    }
+
+    if (tr_variantDictFindStr(settings, TR_KEY_download_group_default, &str, NULL))
+    {
+        tr_sessionSetDownloadGroupDefault(session, str);
     }
 
     /* torrent queues */
@@ -1200,6 +1216,51 @@ int64_t tr_sessionGetDirFreeSpace(tr_session* session, char const* dir)
     }
 
     return free_space;
+}
+
+/***
+****
+***/
+
+void tr_sessionSetDownloadGroups(tr_session* session, tr_variant const* groups)
+{
+    assert(tr_isSession(session));
+
+    tr_variantInitList(&session->downloadGroups, tr_variantListSize(groups));
+    tr_variantListCopy(&session->downloadGroups, groups);
+}
+
+tr_variant const* tr_sessionGetDownloadGroups(tr_session const* session)
+{
+    static tr_variant groups;
+
+    assert(tr_isSession(session));
+
+    tr_variantInitList(&groups, tr_variantListSize(&session->downloadGroups));
+    tr_variantListCopy(&groups, &session->downloadGroups);
+
+    return &groups;
+}
+
+void tr_sessionSetDownloadGroupDefault(tr_session* session, char const* defaultGroup)
+{
+    assert(tr_isSession(session));
+
+    session->downloadGroupDefault = tr_strdup(defaultGroup);
+}
+
+char const* tr_sessionGetDownloadGroupDefault(tr_session const* session)
+{
+    char const* defaultGroup = NULL;
+
+    assert(tr_isSession(session));
+
+    if (session->downloadGroupDefault != NULL)
+    {
+        defaultGroup = session->downloadGroupDefault;
+    }
+
+    return defaultGroup;
 }
 
 /***
@@ -2104,6 +2165,7 @@ void tr_sessionClose(tr_session* session)
 
     /* free the session memory */
     tr_variantFree(&session->removedTorrents);
+    tr_variantFree(&session->downloadGroups);
     tr_bandwidthDestruct(&session->bandwidth);
     tr_bitfieldDestruct(&session->turtle.minutes);
     tr_session_id_free(session->session_id);

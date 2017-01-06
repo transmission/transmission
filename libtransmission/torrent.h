@@ -133,6 +133,10 @@ struct tr_torrent
     /* Where the files are when the torrent is incomplete */
     char* incompleteDir;
 
+    /* Complete files will be copied to this subdir when it's complete,
+       or not if it contains an empty string */
+    char* downloadGroup;
+
     /* Length, in bytes, of the "info" dict in the .torrent file. */
     size_t infoDictLength;
 

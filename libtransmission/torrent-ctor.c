@@ -21,10 +21,12 @@ struct optional_args
     bool isSet_paused;
     bool isSet_connected;
     bool isSet_downloadDir;
+    bool isSet_downloadGroup;
 
     bool isPaused;
     uint16_t peerLimit;
     char* downloadDir;
+    char* downloadGroup;
 };
 
 /** Opaque class used when instantiating torrents.
@@ -357,6 +359,21 @@ void tr_ctorSetDownloadDir(tr_ctor* ctor, tr_ctorMode mode, char const* director
     }
 }
 
+void tr_ctorSetDownloadGroup(tr_ctor* ctor, tr_ctorMode mode, char const* group)
+{
+    struct optional_args* args = &ctor->optionalArgs[mode];
+
+    tr_free(args->downloadGroup);
+    args->downloadGroup = NULL;
+    args->isSet_downloadGroup = false;
+
+    if (group != NULL && *group != '\0')
+    {
+        args->isSet_downloadGroup = true;
+        args->downloadGroup = tr_strdup(group);
+    }
+}
+
 void tr_ctorSetIncompleteDir(tr_ctor* ctor, char const* directory)
 {
     tr_free(ctor->incompleteDir);
@@ -409,6 +426,23 @@ bool tr_ctorGetDownloadDir(tr_ctor const* ctor, tr_ctorMode mode, char const** s
     else if (setmeDownloadDir != NULL)
     {
         *setmeDownloadDir = args->downloadDir;
+    }
+
+    return ret;
+}
+
+bool tr_ctorGetDownloadGroup(tr_ctor const* ctor, tr_ctorMode mode, char const** setmeGroup)
+{
+    bool ret = true;
+    struct optional_args const* args = &ctor->optionalArgs[mode];
+
+    if (!args->isSet_downloadGroup)
+    {
+        ret = false;
+    }
+    else if (setmeGroup != NULL)
+    {
+        *setmeGroup = args->downloadGroup;
     }
 
     return ret;
@@ -490,6 +524,7 @@ tr_ctor* tr_ctorNew(tr_session const* session)
         tr_ctorSetPaused(ctor, TR_FALLBACK, tr_sessionGetPaused(session));
         tr_ctorSetPeerLimit(ctor, TR_FALLBACK, session->peerLimitPerTorrent);
         tr_ctorSetDownloadDir(ctor, TR_FALLBACK, tr_sessionGetDownloadDir(session));
+        tr_ctorSetDownloadGroup(ctor, TR_FALLBACK, tr_sessionGetDownloadGroupDefault(session));
     }
 
     tr_ctorSetSave(ctor, true);
@@ -501,6 +536,8 @@ void tr_ctorFree(tr_ctor* ctor)
     clearMetainfo(ctor);
     tr_free(ctor->optionalArgs[1].downloadDir);
     tr_free(ctor->optionalArgs[0].downloadDir);
+    tr_free(ctor->optionalArgs[1].downloadGroup);
+    tr_free(ctor->optionalArgs[0].downloadGroup);
     tr_free(ctor->incompleteDir);
     tr_free(ctor->want);
     tr_free(ctor->notWant);

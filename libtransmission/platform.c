@@ -458,6 +458,42 @@ char const* tr_getDefaultDownloadDir(void)
     return user_dir;
 }
 
+tr_variant const* tr_getDefaultDownloadGroups(void)
+{
+    static tr_variant groups;
+    tr_variantInitList(&groups, 3);
+
+    static tr_variant movies;
+    tr_variantInitList(&movies, 2);
+    tr_variantListAddStr(&movies, "Movies");
+    tr_variantListAddStr(&movies, "#8383d8");
+
+    static tr_variant music;
+    tr_variantInitList(&music, 2);
+    tr_variantListAddStr(&music, "Music");
+    tr_variantListAddStr(&music, "#cc0000");
+
+    static tr_variant software;
+    tr_variantInitList(&software, 2);
+    tr_variantListAddStr(&software, "Software");
+    tr_variantListAddStr(&software, "#4c1130");
+
+    tr_variantListCopy(tr_variantListAddList(&groups, 0), &movies);
+    tr_variantListCopy(tr_variantListAddList(&groups, 0), &music);
+    tr_variantListCopy(tr_variantListAddList(&groups, 0), &software);
+
+    return &groups;
+}
+
+char const* tr_getDefaultDownloadGroupDefault(void)
+{
+    static char* defaultDownloadGroup = NULL;
+
+    defaultDownloadGroup = tr_strdup("movies");
+
+    return defaultDownloadGroup;
+}
+
 /***
 ****
 ***/

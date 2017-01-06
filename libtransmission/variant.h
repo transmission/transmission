@@ -101,6 +101,8 @@ tr_variant;
 
 void tr_variantFree(tr_variant*);
 
+void tr_variantListCopy(tr_variant* target, tr_variant const* src);
+
 /***
 ****  Serialization / Deserialization
 ***/
