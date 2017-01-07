@@ -1731,6 +1731,7 @@ static void freeTorrent(tr_torrent* tor)
     tr_cpDestruct(&tor->completion);
 
     tr_free(tor->downloadDir);
+    tr_free(tor->downloadGroup);
     tr_free(tor->incompleteDir);
 
     if (tor == session->torrentList)
