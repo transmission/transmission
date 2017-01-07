@@ -317,19 +317,31 @@ ul.torrent_list {
       white-space: nowrap;
       color: #222;
       margin-top: 2px;
-      margin-bottom: 2px; }
+      margin-bottom: 2px;
+      margin-left: 26px;}
       ul.torrent_list li.torrent div.torrent_name.compact {
         font-size: 1.0em;
         font-weight: normal; }
       ul.torrent_list li.torrent div.torrent_name.paused {
         font-weight: normal;
         color: #777; }
+
+  ul.torrent_list li.torrent div.torrent_group {
+    height: 58px;
+    float: left;
+    width: 16px;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+    margin-top: 2px;
+  }
     ul.torrent_list li.torrent div.torrent_progress_details,
     ul.torrent_list li.torrent div.torrent_peer_details {
-      clear: left;
+      clear: none;
       overflow: hidden;
       text-overflow: ellipsis;
-      white-space: nowrap; }
+      white-space: nowrap;
+      margin-left: 26px;
+    }
     ul.torrent_list li.torrent div.torrent_progress_details.error,
     ul.torrent_list li.torrent div.torrent_peer_details.error {
       color: #F00; }
@@ -346,7 +358,8 @@ ul.torrent_list {
       /*float: right;*/ }
     ul.torrent_list div.torrent_progress_bar_container.full {
       margin-top: 2px;
-      margin-bottom: 5px; }
+      margin-bottom: 5px;
+      margin-left: 26px;}
   ul.torrent_list div.torrent_peer_details.compact {
     margin-top: 2px;
     margin-right: 65px;
