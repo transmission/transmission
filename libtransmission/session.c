@@ -2192,6 +2192,7 @@ void tr_sessionClose(tr_session* session)
     tr_free(session->incompleteDir);
     tr_free(session->blocklist_url);
     tr_free(session->peer_congestion_algorithm);
+    tr_free(session->downloadGroupDefault);
     tr_free(session);
 }
 
