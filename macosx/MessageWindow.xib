@@ -46,9 +46,9 @@
                             <font key="font" metaFont="menu"/>
                             <menu key="menu" title="OtherViews" id="16">
                                 <items>
-                                    <menuItem title="Error" state="on" image="RedDot" id="17"/>
-                                    <menuItem title="Info" image="YellowDot" id="18"/>
-                                    <menuItem title="Debug" image="PurpleDot" id="19"/>
+                                    <menuItem title="Error" state="on" image="RedDotFlat" id="17"/>
+                                    <menuItem title="Info" image="YellowDotFlat" id="18"/>
+                                    <menuItem title="Debug" image="PurpleDotFlat" id="19"/>
                                 </items>
                             </menu>
                         </popUpButtonCell>
@@ -311,8 +311,8 @@ HaMdqB23Hbsdwh3KHdcd3B3eHeAd5R3tHfAd9R39HgAeEh4VHhoAAAAAAAACAQAAAAAAAABBAAAAAAAA
 AAAAAAAAAAAeHA
 </mutableData>
         </image>
-        <image name="PurpleDot" width="16" height="16"/>
-        <image name="RedDot" width="16" height="16"/>
-        <image name="YellowDot" width="16" height="16"/>
+        <image name="PurpleDotFlat" width="16" height="16"/>
+        <image name="RedDotFlat" width="16" height="16"/>
+        <image name="YellowDotFlat" width="16" height="16"/>
     </resources>
 </document>
