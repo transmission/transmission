@@ -116,21 +116,29 @@ test_sha1 (void)
 static int
 test_ssha1 (void)
 {
-  const char * const test_data[] =
-    {
-      "test",
-      "QNY)(*#$B)!_X$B !_B#($^!)*&$%CV!#)&$C!@$(P*)"
-    };
+  struct
+  {
+    const char * const plain_text;
+    const char * const ssha1;
+  }
+  test_data[] =
+  {
+    { "test", "{15ad0621b259a84d24dcd4e75b09004e98a3627bAMbyRHJy" },
+    { "QNY)(*#$B)!_X$B !_B#($^!)*&$%CV!#)&$C!@$(P*)", "{10e2d7acbb104d970514a147cd16d51dfa40fb3c0OSwJtOL" }
+  };
 
   size_t i;
 
-#define HASH_COUNT (16 * 1024)
+#define HASH_COUNT (4 * 1024)
 
   for (i = 0; i < sizeof (test_data) / sizeof (*test_data); ++i)
     {
-      char * const phrase = tr_strdup (test_data[i]);
+      char * const phrase = tr_strdup (test_data[i].plain_text);
       char ** hashes = tr_new (char *, HASH_COUNT);
       size_t j;
+
+      check (tr_ssha1_matches (test_data[i].ssha1, phrase));
+      check (tr_ssha1_matches_ (test_data[i].ssha1, phrase));
 
       for (j = 0; j < HASH_COUNT; ++j)
         {
@@ -172,6 +180,10 @@ test_ssha1 (void)
     }
 
 #undef HASH_COUNT
+
+  /* should work with different salt lengths as well */
+  check (tr_ssha1_matches ("{a94a8fe5ccb19ba61c4c0873d391e987982fbbd3", "test"));
+  check (tr_ssha1_matches ("{d209a21d3bc4f8fc4f8faf347e69f3def597eb170pySy4ai1ZPMjeU1", "test"));
 
   return 0;
 }
