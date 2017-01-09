@@ -133,6 +133,8 @@ tr_ssha1 (const char * plain_text)
                                "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                                "./";
 
+  assert (plain_text != NULL);
+
   size_t i;
   unsigned char salt[saltval_len];
   uint8_t sha[SHA_DIGEST_LENGTH];
@@ -155,34 +157,27 @@ bool
 tr_ssha1_matches (const char * ssha1,
                   const char * plain_text)
 {
-  char * salt;
-  size_t saltlen;
-  char * my_ssha1;
-  uint8_t buf[SHA_DIGEST_LENGTH];
-  bool result;
-  const size_t sourcelen = strlen (ssha1);
+  assert (ssha1 != NULL);
+  assert (plain_text != NULL);
+
+  const size_t brace_len = 1;
+  const size_t brace_and_hash_len = brace_len + 2 * SHA_DIGEST_LENGTH;
+
+  const size_t source_len = strlen (ssha1);
+  if (source_len < brace_and_hash_len || ssha1[0] != '{')
+    return false;
 
   /* extract the salt */
-  if (sourcelen < 2 * SHA_DIGEST_LENGTH - 1)
-    return false;
-  saltlen = sourcelen - 2 * SHA_DIGEST_LENGTH - 1;
-  salt = tr_malloc (saltlen);
-  memcpy (salt, ssha1 + 2 * SHA_DIGEST_LENGTH + 1, saltlen);
+  const char * const salt = ssha1 + brace_and_hash_len;
+  const size_t salt_len = source_len - brace_and_hash_len;
+
+  uint8_t buf[SHA_DIGEST_LENGTH * 2 + 1];
 
   /* hash pass + salt */
-  my_ssha1 = tr_malloc (2 * SHA_DIGEST_LENGTH + saltlen + 2);
-  tr_sha1 (buf, plain_text, strlen (plain_text), salt, saltlen, NULL);
-  tr_sha1_to_hex (&my_ssha1[1], buf);
-  memcpy (my_ssha1 + 1 + 2 * SHA_DIGEST_LENGTH, salt, saltlen);
-  my_ssha1[1 + 2 * SHA_DIGEST_LENGTH + saltlen] = '\0';
-  my_ssha1[0] = '{';
+  tr_sha1 (buf, plain_text, (int) strlen (plain_text), salt, (int) salt_len, NULL);
+  tr_sha1_to_hex ((char *) buf, buf);
 
-  result = strcmp (ssha1, my_ssha1) == 0;
-
-  tr_free (my_ssha1);
-  tr_free (salt);
-
-  return result;
+  return strncmp (ssha1 + brace_len, (const char *) buf, SHA_DIGEST_LENGTH * 2) == 0;
 }
 
 /***
