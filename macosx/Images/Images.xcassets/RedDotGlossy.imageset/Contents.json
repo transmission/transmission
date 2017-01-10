@@ -2,12 +2,12 @@
   "images" : [
     {
       "idiom" : "mac",
-      "filename" : "RedDot.png",
+      "filename" : "RedDotGlossy.png",
       "scale" : "1x"
     },
     {
       "idiom" : "mac",
-      "filename" : "RedDot@2x.png",
+      "filename" : "RedDotGlossy@2x.png",
       "scale" : "2x"
     }
   ],
