@@ -20,6 +20,8 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#import <AppKit/AppKit.h>
+
 #define NSByteCountFormatterMtLion NSClassFromString(@"NSByteCountFormatter")
 #define NSUserNotificationMtLion NSClassFromString(@"NSUserNotification")
 #define NSUserNotificationCenterMtLion NSClassFromString(@"NSUserNotificationCenter")

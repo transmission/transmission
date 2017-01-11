@@ -20,6 +20,8 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#import <AppKit/AppKit.h>
+
 #import "ExpandedPathToIconTransformer.h"
 
 @implementation ExpandedPathToIconTransformer

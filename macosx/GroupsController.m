@@ -120,7 +120,7 @@ GroupsController * fGroupsInstance = nil;
 {
     if (index != -1)
     {
-        for (NSInteger i = 0; i < [fGroups count]; i++)
+        for (NSUInteger i = 0; i < [fGroups count]; i++)
             if (index == [[[fGroups objectAtIndex: i] objectForKey: @"Index"] integerValue])
                 return i;
     }
@@ -336,7 +336,7 @@ GroupsController * fGroupsInstance = nil;
     return [menu autorelease];
 }
 
-- (NSInteger) groupIndexForTorrent: (Torrent *) torrent;
+- (NSInteger) groupIndexForTorrent: (Torrent *) torrent
 {
     for (NSDictionary * group in fGroups)
     {

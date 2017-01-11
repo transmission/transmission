@@ -96,7 +96,7 @@
     
     NSPoint mouseLocation = [self convertPoint: [[self window] mouseLocationOutsideOfEventStream] fromView: nil];
     
-    for (NSInteger row = visibleRows.location, col = [self columnWithIdentifier: @"Priority"]; row < NSMaxRange(visibleRows); row++)
+    for (NSInteger row = visibleRows.location, col = [self columnWithIdentifier: @"Priority"]; (NSUInteger)row < NSMaxRange(visibleRows); row++)
     {
         FilePriorityCell * cell = (FilePriorityCell *)[self preparedCellAtColumn: col row: row];
         

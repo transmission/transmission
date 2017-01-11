@@ -1490,7 +1490,7 @@ static void removeKeRangerRansomware()
             
             NSString * title, * message;
             
-            const NSInteger selected = [torrents count];
+            const NSUInteger selected = [torrents count];
             if (selected == 1)
             {
                 NSString * torrentName = [(Torrent *)[torrents objectAtIndex: 0] name];
@@ -2620,7 +2620,7 @@ static void removeKeRangerRansomware()
             NSMutableIndexSet * removeIndexes = [NSMutableIndexSet indexSet];
             
             //needs to be a signed integer
-            for (NSInteger indexInGroup = 0; indexInGroup < [[group torrents] count]; ++indexInGroup)
+            for (NSUInteger indexInGroup = 0; indexInGroup < [[group torrents] count]; ++indexInGroup)
             {
                 Torrent * torrent = [[group torrents] objectAtIndex: indexInGroup];
                 const NSUInteger allIndex = [allTorrents indexOfObjectAtIndexes: unusedAllTorrentsIndexes options: NSEnumerationConcurrent passingTest: ^(id obj, NSUInteger idx, BOOL * stop) {
@@ -4160,6 +4160,7 @@ static void removeKeRangerRansomware()
                 break;
             default:
                 NSAssert1(NO, @"Unknown sort tag received: %ld", [menuItem tag]);
+                sortType = SORT_ORDER;
         }
         
         [menuItem setState: [sortType isEqualToString: [fDefaults stringForKey: @"Sort"]] ? NSOnState : NSOffState];

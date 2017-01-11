@@ -20,6 +20,8 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#import <Foundation/Foundation.h>
+
 @interface NSMutableArray (NSMutableArrayAdditions)
 
 - (void) moveObjectAtIndex: (NSUInteger) fromIndex toIndex: (NSUInteger) toIndex;

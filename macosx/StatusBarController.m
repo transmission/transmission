@@ -234,6 +234,7 @@ typedef enum
                 break;
             default:
                 NSAssert1(NO, @"Unknown status label tag received: %ld", [menuItem tag]);
+                statusLabel = STATUS_RATIO_TOTAL;
         }
         
         [menuItem setState: [statusLabel isEqualToString: [[NSUserDefaults standardUserDefaults] stringForKey: @"StatusLabel"]]

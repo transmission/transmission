@@ -164,7 +164,7 @@
     NSAssert(![NSApp isOnYosemiteOrBetter], @"you should be using NSDateComponentsFormatter on >= 10.10");
     NSParameterAssert(max > 0);
     
-    NSMutableArray * timeArray = [NSMutableArray arrayWithCapacity: MIN(max, 5)];
+    NSMutableArray * timeArray = [NSMutableArray arrayWithCapacity: MIN(max, 5u)];
     NSUInteger remaining = seconds; //causes problems for some users when it's a uint64_t
     
     if (seconds >= 31557600) //official amount of seconds in one year

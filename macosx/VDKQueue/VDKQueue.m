@@ -19,6 +19,8 @@
 //	   3. This notice may not be removed or altered from any source
 //	   distribution.
 
+#import <AppKit/AppKit.h>
+
 #import "VDKQueue.h"
 #import <unistd.h>
 #import <fcntl.h>

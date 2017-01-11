@@ -234,7 +234,7 @@
 #pragma mark -
 #pragma mark Rule editor
 
-- (IBAction) toggleUseAutoAssignRules: (id) sender;
+- (IBAction) toggleUseAutoAssignRules: (id) sender
 {
     NSInteger index = [[GroupsController groups] indexForRow: [fTableView selectedRow]];
     if ([fAutoAssignRulesEnableCheck state] == NSOnState)
@@ -250,7 +250,7 @@
     [fAutoAssignRulesEditButton setEnabled: [fAutoAssignRulesEnableCheck state] == NSOnState];
 }
 
-- (IBAction) orderFrontRulesSheet: (id) sender;
+- (IBAction) orderFrontRulesSheet: (id) sender
 {
     if (!fGroupRulesSheetWindow)
         [NSBundle loadNibNamed: @"GroupRules" owner: self];
@@ -266,7 +266,7 @@
         contextInfo: NULL];
 }
 
-- (IBAction) cancelRules: (id) sender;
+- (IBAction) cancelRules: (id) sender
 {
     [fGroupRulesSheetWindow orderOut: nil];
     [NSApp endSheet: fGroupRulesSheetWindow];
@@ -280,7 +280,7 @@
     }
 }
 
-- (IBAction) saveRules: (id) sender;
+- (IBAction) saveRules: (id) sender
 {
     [fGroupRulesSheetWindow orderOut: nil];
     [NSApp endSheet: fGroupRulesSheetWindow];

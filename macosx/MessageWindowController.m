@@ -354,6 +354,7 @@
             break;
         default:
             NSAssert1(NO, @"Unknown message log level: %ld", [fLevelButton indexOfSelectedItem]);
+            level = TR_LOG_INFO;
     }
     
     if ([[NSUserDefaults standardUserDefaults] integerForKey: @"MessageLevel"] == level)
@@ -527,6 +528,7 @@
             break;
         default:
             NSAssert1(NO, @"Unknown message log level: %ld", level);
+            levelString = @"?";
     }
     
     return [NSString stringWithFormat: @"%@ %@ [%@] %@: %@", [message objectForKey: @"Date"],
