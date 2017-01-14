@@ -1364,6 +1364,7 @@ show_about_dialog (GtkWindow * parent)
   const char * uri = "https://transmissionbt.com/";
   const char * authors[] = { "Jordan Lee (Backend; GTK+)",
                              "Mitchell Livingston (Backend; OS X)",
+                             "Mike Gelfand",
                              NULL };
 
   gtk_show_about_dialog (parent,
