@@ -42,7 +42,7 @@ else
     rm -f "$vcs_revision_file"
 fi
 
-vcs_revision=${vcs_revision:0:10}
+vcs_revision=`echo $vcs_revision | head -c10`
 
 cat > libtransmission/version.h.new << EOF
 #pragma once
