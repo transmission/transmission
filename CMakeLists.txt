@@ -62,16 +62,16 @@ endif()
 
 set(TR_VCS_REVISION_FILE "${CMAKE_SOURCE_DIR}/REVISION")
 
-if(NOT "$ENV{JENKINS_URL}" STREQUAL "" AND NOT "$ENV{VCS_REVISION}" STREQUAL "")
-    # Jenkins automated build, use the set environment variables to avoid
-    # version mismatches between java's svn and command line's svn
-    set(TR_VCS_REVISION "$ENV{VCS_REVISION}")
+if(NOT "$ENV{JENKINS_URL}" STREQUAL "" AND NOT "$ENV{GIT_COMMIT}" STREQUAL "")
+    set(TR_VCS_REVISION "$ENV{GIT_COMMIT}")
+elseif(NOT "$ENV{TEAMCITY_PROJECT_NAME}" STREQUAL "" AND NOT "$ENV{BUILD_VCS_NUMBER}" STREQUAL "")
+    set(TR_VCS_REVISION "$ENV{BUILD_VCS_NUMBER}")
 elseif(IS_DIRECTORY ${CMAKE_SOURCE_DIR}/.git)
     find_package(Git)
     if(GIT_FOUND)
         execute_process(
             COMMAND
-                ${GIT_EXECUTABLE} rev-list --max-count=1 --abbrev-commit HEAD
+                ${GIT_EXECUTABLE} rev-list --max-count=1 HEAD
             WORKING_DIRECTORY
                 ${CMAKE_SOURCE_DIR}
             OUTPUT_VARIABLE
@@ -83,15 +83,18 @@ endif()
 
 if("${TR_VCS_REVISION}" STREQUAL "" AND EXISTS "${TR_VCS_REVISION_FILE}")
     file(READ "${TR_VCS_REVISION_FILE}" TR_VCS_REVISION)
-    string(STRIP "${TR_VCS_REVISION}" TR_VCS_REVISION)
 endif()
 
+string(STRIP "${TR_VCS_REVISION}" TR_VCS_REVISION)
+
 if(NOT "${TR_VCS_REVISION}" STREQUAL "")
-    file(WRITE "${TR_VCS_REVISION_FILE}" "${TR_VCS_REVISION}")
+    file(WRITE "${TR_VCS_REVISION_FILE}" "${TR_VCS_REVISION}\n")
 else()
     set(TR_VCS_REVISION 0)
     file(REMOVE "${TR_VCS_REVISION_FILE}")
 endif()
+
+string(SUBSTRING "${TR_VCS_REVISION}" 0 10 TR_VCS_REVISION)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
