@@ -2304,12 +2304,10 @@ loadBlocklists (tr_session * session)
       else
         {
           char * binname;
-          char * basename;
           tr_sys_path_info path_info;
           tr_sys_path_info binname_info;
 
-          basename = tr_sys_path_basename (name, NULL);
-          binname = tr_strdup_printf ("%s" TR_PATH_DELIMITER_STR "%s.bin", dirname, basename);
+          binname = tr_strdup_printf ("%s" TR_PATH_DELIMITER_STR "%s.bin", dirname, name);
 
           if (!tr_sys_path_get_info (binname, 0, &binname_info, NULL)) /* create it */
             {
@@ -2344,7 +2342,6 @@ loadBlocklists (tr_session * session)
               tr_free (old);
             }
 
-          tr_free (basename);
           tr_free (binname);
         }
 

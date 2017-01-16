@@ -516,12 +516,15 @@ tr_getWebClientDir (const tr_session * session UNUSED)
                 module_path = tr_win32_native_to_utf8 (wide_module_path, -1);
                 dir = tr_sys_path_dirname (module_path, NULL);
                 tr_free (module_path);
-                s = tr_buildPath (dir, "Web", NULL);
-                tr_free (dir);
-                if (!isWebClientDir (s))
+                if (dir != NULL)
                   {
-                    tr_free (s);
-                    s = NULL;
+                    s = tr_buildPath (dir, "Web", NULL);
+                    tr_free (dir);
+                    if (!isWebClientDir (s))
+                      {
+                        tr_free (s);
+                        s = NULL;
+                      }
                   }
             }
 
