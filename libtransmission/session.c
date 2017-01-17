@@ -1866,6 +1866,9 @@ sessionCloseImplWaitForIdleUdp (evutil_socket_t   foo UNUSED,
 static void
 sessionCloseImplFinish (tr_session * session)
 {
+  event_free (session->saveTimer);
+  session->saveTimer = NULL;
+
   /* we had to wait until UDP trackers were closed before closing these: */
   evdns_base_free (session->evdns_base, 0);
   session->evdns_base = NULL;
