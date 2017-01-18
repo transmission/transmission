@@ -129,10 +129,10 @@
 		A225A4C0187E369C00CDE823 /* ShareToolbarItem.m in Sources */ = {isa = PBXBuildFile; fileRef = A225A4BF187E369C00CDE823 /* ShareToolbarItem.m */; };
 		A2265F420B5EF5F40093DDA5 /* FileNameCell.m in Sources */ = {isa = PBXBuildFile; fileRef = A2265F400B5EF5F40093DDA5 /* FileNameCell.m */; };
 		A226FDAC0D0CDF20005A7F71 /* libnatpmp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C7A118D0D0B2EB800B5701F /* libnatpmp.a */; };
-		A2290D1E14421CC100B95A09 /* libcrypto.0.9.8.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A27653A714369C5C009D3CCF /* libcrypto.0.9.8.dylib */; };
-		A2290D2014421CD000B95A09 /* libcrypto.0.9.8.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A27653A714369C5C009D3CCF /* libcrypto.0.9.8.dylib */; };
-		A2290D2214421CD800B95A09 /* libcrypto.0.9.8.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A27653A714369C5C009D3CCF /* libcrypto.0.9.8.dylib */; };
-		A2290D2514421D1A00B95A09 /* libcrypto.0.9.8.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A27653A714369C5C009D3CCF /* libcrypto.0.9.8.dylib */; };
+		A2290D1E14421CC100B95A09 /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A27653A714369C5C009D3CCF /* libcrypto.dylib */; };
+		A2290D2014421CD000B95A09 /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A27653A714369C5C009D3CCF /* libcrypto.dylib */; };
+		A2290D2214421CD800B95A09 /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A27653A714369C5C009D3CCF /* libcrypto.dylib */; };
+		A2290D2514421D1A00B95A09 /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A27653A714369C5C009D3CCF /* libcrypto.dylib */; };
 		A2290D2E1442B23200B95A09 /* libcurl.4.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2290D2D1442B23200B95A09 /* libcurl.4.dylib */; };
 		A2290D2F1442B23200B95A09 /* libcurl.4.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2290D2D1442B23200B95A09 /* libcurl.4.dylib */; };
 		A2290D301442B23200B95A09 /* libcurl.4.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2290D2D1442B23200B95A09 /* libcurl.4.dylib */; };
@@ -393,7 +393,7 @@
 		A2F35BCA15C5A0A100EBF632 /* GenerateThumbnailForURL.m in Sources */ = {isa = PBXBuildFile; fileRef = A2F35BC915C5A0A100EBF632 /* GenerateThumbnailForURL.m */; };
 		A2F35BCC15C5A0A100EBF632 /* GeneratePreviewForURL.m in Sources */ = {isa = PBXBuildFile; fileRef = A2F35BCB15C5A0A100EBF632 /* GeneratePreviewForURL.m */; };
 		A2F35BD415C5A19A00EBF632 /* libtransmission.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D18389709DEC0030047D688 /* libtransmission.a */; };
-		A2F35BD715C5A46D00EBF632 /* libcrypto.0.9.8.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A27653A714369C5C009D3CCF /* libcrypto.0.9.8.dylib */; };
+		A2F35BD715C5A46D00EBF632 /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A27653A714369C5C009D3CCF /* libcrypto.dylib */; };
 		A2F35BDA15C5A49200EBF632 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2B6141B1395ADE9000E0975 /* libz.dylib */; };
 		A2F35BDB15C5A4A000EBF632 /* libiconv.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A296EF3411E5605E004A2781 /* libiconv.dylib */; };
 		A2F35BE115C5A7ED00EBF632 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2F35BE015C5A7ED00EBF632 /* Cocoa.framework */; };
@@ -920,7 +920,7 @@
 		A2725D5C0DE7507C003445E7 /* TrackerTableView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = TrackerTableView.m; path = macosx/TrackerTableView.m; sourceTree = "<group>"; };
 		A27476FF0CC38EE6003CC76D /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = macosx/es.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		A27477010CC38EE6003CC76D /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = macosx/es.lproj/Localizable.strings; sourceTree = "<group>"; };
-		A27653A714369C5C009D3CCF /* libcrypto.0.9.8.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.0.9.8.dylib; path = "third-party/openssl/lib/libcrypto.0.9.8.dylib"; sourceTree = "<group>"; };
+		A27653A714369C5C009D3CCF /* libcrypto.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.dylib; path = "third-party/openssl/lib/libcrypto.dylib"; sourceTree = "<group>"; };
 		A277DA090C693D9C00DA2CD4 /* ActionOn.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ActionOn.png; path = macosx/Images/ActionOn.png; sourceTree = "<group>"; };
 		A279E3D011C3BDC300D48B1F /* nl */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = nl; path = macosx/nl.lproj/AddMagnetWindow.xib; sourceTree = "<group>"; };
 		A279E3D111C3BDC300D48B1F /* nl */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = nl; path = macosx/nl.lproj/InfoActivityView.xib; sourceTree = "<group>"; };
@@ -1256,7 +1256,7 @@
 			files = (
 				4D9A2BF009E16D21002D0FF9 /* libtransmission.a in Frameworks */,
 				A296EF3C11E560BD004A2781 /* libiconv.dylib in Frameworks */,
-				A2290D1E14421CC100B95A09 /* libcrypto.0.9.8.dylib in Frameworks */,
+				A2290D1E14421CC100B95A09 /* libcrypto.dylib in Frameworks */,
 				A2290D2F1442B23200B95A09 /* libcurl.4.dylib in Frameworks */,
 				A2B6141E1395B0EC000E0975 /* libz.dylib in Frameworks */,
 				A2B3FB4C0E59023000FF78FB /* Cocoa.framework in Frameworks */,
@@ -1273,7 +1273,7 @@
 				A24F19080A3A790800C9C145 /* Sparkle.framework in Frameworks */,
 				A261F1DC0A69A1610002815A /* Growl.framework in Frameworks */,
 				A296EF3B11E560A7004A2781 /* libiconv.dylib in Frameworks */,
-				A2290D2514421D1A00B95A09 /* libcrypto.0.9.8.dylib in Frameworks */,
+				A2290D2514421D1A00B95A09 /* libcrypto.dylib in Frameworks */,
 				A2290D2E1442B23200B95A09 /* libcurl.4.dylib in Frameworks */,
 				A2B6141F1395B0F5000E0975 /* libz.dylib in Frameworks */,
 				A2E669790F5B8E5A00B4251A /* Security.framework in Frameworks */,
@@ -1307,7 +1307,7 @@
 				A2F35BD415C5A19A00EBF632 /* libtransmission.a in Frameworks */,
 				A2F35BDB15C5A4A000EBF632 /* libiconv.dylib in Frameworks */,
 				A2F35BDA15C5A49200EBF632 /* libz.dylib in Frameworks */,
-				A2F35BD715C5A46D00EBF632 /* libcrypto.0.9.8.dylib in Frameworks */,
+				A2F35BD715C5A46D00EBF632 /* libcrypto.dylib in Frameworks */,
 				A2AB76EA15D8130B009EFC95 /* libcurl.4.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1345,7 +1345,7 @@
 			files = (
 				BEFC1C050C07753500B0BB3C /* libtransmission.a in Frameworks */,
 				A296EF3D11E560C3004A2781 /* libiconv.dylib in Frameworks */,
-				A2290D2014421CD000B95A09 /* libcrypto.0.9.8.dylib in Frameworks */,
+				A2290D2014421CD000B95A09 /* libcrypto.dylib in Frameworks */,
 				A2290D301442B23200B95A09 /* libcurl.4.dylib in Frameworks */,
 				A2B6141D1395B0E3000E0975 /* libz.dylib in Frameworks */,
 				A2B3FB530E59027100FF78FB /* Cocoa.framework in Frameworks */,
@@ -1358,7 +1358,7 @@
 			files = (
 				BEFC1D2D0C0783D900B0BB3C /* libtransmission.a in Frameworks */,
 				A296EF3E11E560D1004A2781 /* libiconv.dylib in Frameworks */,
-				A2290D2214421CD800B95A09 /* libcrypto.0.9.8.dylib in Frameworks */,
+				A2290D2214421CD800B95A09 /* libcrypto.dylib in Frameworks */,
 				A2290D311442B23200B95A09 /* libcurl.4.dylib in Frameworks */,
 				A2B6141C1395ADE9000E0975 /* libz.dylib in Frameworks */,
 				A25E03D90E4015100086C225 /* Cocoa.framework in Frameworks */,
@@ -1838,7 +1838,7 @@
 		4DDBB71509E16B3F00284745 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
-				A27653A714369C5C009D3CCF /* libcrypto.0.9.8.dylib */,
+				A27653A714369C5C009D3CCF /* libcrypto.dylib */,
 				A2290D2D1442B23200B95A09 /* libcurl.4.dylib */,
 				A296EF3411E5605E004A2781 /* libiconv.dylib */,
 				A2B6141B1395ADE9000E0975 /* libz.dylib */,
