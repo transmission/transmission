@@ -38,12 +38,12 @@
 
 + (NSString *) ellipsis
 {
-	return [NSString stringWithUTF8String: "\xE2\x80\xA6"];
+    return [NSString stringWithUTF8String: "\xE2\x80\xA6"];
 }
 
 - (NSString *) stringByAppendingEllipsis
 {
-	return [self stringByAppendingString: [NSString ellipsis]];
+    return [self stringByAppendingString: [NSString ellipsis]];
 }
 
 #warning use localizedStringWithFormat: directly when 10.8-only
@@ -60,7 +60,7 @@
             [numberFormatter setNumberStyle: NSNumberFormatterDecimalStyle];
             [numberFormatter setMaximumFractionDigits: 0];
         });
-        
+
         return [numberFormatter stringFromNumber: [NSNumber numberWithUnsignedInteger: value]];
     }
 }
@@ -81,9 +81,9 @@
     if ([NSApp isOnMountainLionOrBetter])
     {
         NSByteCountFormatter * fileSizeFormatter = [[NSByteCountFormatterMtLion alloc] init];
-        
+
         fullString = [fileSizeFormatter stringFromByteCount: fullSize];
-        
+
         //figure out the magniture of the two, since we can't rely on comparing the units because of localization and pluralization issues (for example, "1 byte of 2 bytes")
         BOOL partialUnitsSame;
         if (partialSize == 0)
@@ -94,10 +94,10 @@
             const unsigned int magnitudeFull = fullSize < 1000 ? 0 : log(fullSize)/log(1000); //we have to catch 0 with a special case, so might as well avoid the math for all of magnitude 0
             partialUnitsSame = magnitudePartial == magnitudeFull;
         }
-        
+
         [fileSizeFormatter setIncludesUnit: !partialUnitsSame];
         partialString = [fileSizeFormatter stringFromByteCount: partialSize];
-        
+
         [fileSizeFormatter release];
     }
     else
@@ -106,7 +106,7 @@
         fullString = [self stringForFileSizeLion: fullSize showUnitUnless: nil unitsUsed: &units];
         partialString = [self stringForFileSizeLion: partialSize showUnitUnless: units unitsUsed: nil];
     }
-    
+
     return [NSString stringWithFormat: NSLocalizedString(@"%@ of %@", "file size string"), partialString, fullString];
 }
 
@@ -163,10 +163,10 @@
 {
     NSAssert(![NSApp isOnYosemiteOrBetter], @"you should be using NSDateComponentsFormatter on >= 10.10");
     NSParameterAssert(max > 0);
-    
+
     NSMutableArray * timeArray = [NSMutableArray arrayWithCapacity: MIN(max, 5u)];
     NSUInteger remaining = seconds; //causes problems for some users when it's a uint64_t
-    
+
     if (seconds >= 31557600) //official amount of seconds in one year
     {
         const NSUInteger years = remaining / 31557600;
@@ -201,13 +201,13 @@
     }
     if (max > 0 && showSeconds)
         [timeArray addObject: [NSString stringWithFormat: NSLocalizedString(@"%u sec", "time string"), remaining]];
-    
+
     NSString * timeString = [timeArray componentsJoinedByString: @" "];
-    
+
     if (includesTimeRemainingPhrase) {
         timeString = [NSString stringWithFormat: NSLocalizedString(@"%@ remaining", "time remaining string"), timeString];
     }
-    
+
     return timeString;
 }
 
@@ -220,7 +220,7 @@
 - (NSArray *) betterComponentsSeparatedByCharactersInSet: (NSCharacterSet *) separators
 {
     NSMutableArray * components = [NSMutableArray array];
-    
+
     NSCharacterSet * includededCharSet = [separators invertedSet];
     NSUInteger index = 0;
     const NSUInteger fullLength = [self length];
@@ -229,20 +229,20 @@
         const NSUInteger start = [self rangeOfCharacterFromSet: includededCharSet options: 0 range: NSMakeRange(index, fullLength - index)].location;
         if (start == NSNotFound)
             break;
-        
+
         const NSRange endRange = [self rangeOfCharacterFromSet: separators options: 0 range: NSMakeRange(start, fullLength - start)];
         if (endRange.location == NSNotFound)
         {
             [components addObject: [self substringFromIndex: start]];
             break;
         }
-        
+
         [components addObject: [self substringWithRange: NSMakeRange(start, endRange.location - start)]];
-        
+
         index = NSMaxRange(endRange);
     }
     while (YES);
-    
+
     return components;
 }
 
@@ -279,22 +279,22 @@
         unit = NSLocalizedString(@"TB", "File size - terabytes");
         decimals = 2;
     }
-    
+
     //match Finder's behavior
     NSNumberFormatter * numberFormatter = [[NSNumberFormatter alloc] init];
     [numberFormatter setNumberStyle: NSNumberFormatterDecimalStyle];
     [numberFormatter setMinimumFractionDigits: 0];
     [numberFormatter setMaximumFractionDigits: decimals];
-    
+
     NSString * fileSizeString = [numberFormatter stringFromNumber: [NSNumber numberWithFloat: convertedSize]];
     [numberFormatter release];
-    
+
     if (!notAllowedUnit || ![unit isEqualToString: notAllowedUnit])
         fileSizeString = [fileSizeString stringByAppendingFormat: @" %@", unit];
-    
+
     if (unitUsed)
         *unitUsed = unit;
-    
+
     return fileSizeString;
 }
 
@@ -302,9 +302,9 @@
 {
     if (speed <= 999.95) //0.0 KB/s to 999.9 KB/s
         return [NSString localizedStringWithFormat: @"%.1f %@", speed, kb];
-    
+
     speed /= 1000.0;
-    
+
     if (speed <= 99.995) //1.00 MB/s to 99.99 MB/s
         return [NSString localizedStringWithFormat: @"%.2f %@", speed, mb];
     else if (speed <= 999.95) //100.0 MB/s to 999.9 MB/s

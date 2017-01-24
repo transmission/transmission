@@ -38,9 +38,9 @@
 {
     if (count == fCount)
         return;
-    
+
     fCount = count;
-    
+
     [self setToolTip: fCount == 1 ? NSLocalizedString(@"1 transfer", "Filter Button -> tool tip")
         : [NSString stringWithFormat: NSLocalizedString(@"%@ transfers", "Filter Bar Button -> tool tip"),
             [NSString formattedUInteger: fCount]]];

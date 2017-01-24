@@ -27,7 +27,7 @@
 @interface FileListNode : NSObject <NSCopying>
 {
     NSMutableIndexSet * fIndexes;
-    
+
     NSString * fName;
     NSString * fPath;
     Torrent * fTorrent;

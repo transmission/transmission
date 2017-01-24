@@ -32,7 +32,7 @@
 - (void) setEnabled: (BOOL) flag
 {
     [super setEnabled: flag];
-    
+
     NSColor * color = flag ? [NSColor controlTextColor] : [NSColor disabledControlTextColor];
     [self setTextColor: color];
 }

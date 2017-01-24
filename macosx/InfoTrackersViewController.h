@@ -30,14 +30,14 @@
 @interface InfoTrackersViewController : NSViewController <InfoViewController>
 {
     NSArray * fTorrents;
-    
+
     BOOL fSet;
-    
+
     NSMutableArray * fTrackers;
-    
+
     IBOutlet TrackerTableView * fTrackerTable;
     TrackerCell * fTrackerCell;
-    
+
     IBOutlet NSSegmentedControl * fTrackerAddRemoveControl;
 }
 

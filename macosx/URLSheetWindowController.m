@@ -45,35 +45,35 @@ NSString * urlString = nil;
 - (void) awakeFromNib
 {
     [fLabelField setStringValue: NSLocalizedString(@"Internet address of torrent file:", "URL sheet label")];
-    
+
     if (urlString)
     {
         [fTextField setStringValue: urlString];
         [fTextField selectText: self];
-        
+
         [self updateOpenButtonForURL: urlString];
     }
-    
+
     [fOpenButton setTitle: NSLocalizedString(@"Open", "URL sheet button")];
     [fCancelButton setTitle: NSLocalizedString(@"Cancel", "URL sheet button")];
-    
+
     [fOpenButton sizeToFit];
     [fCancelButton sizeToFit];
-    
+
     //size the two buttons the same
     NSRect openFrame = [fOpenButton frame];
     openFrame.size.width += 10.0;
     NSRect cancelFrame = [fCancelButton frame];
     cancelFrame.size.width += 10.0;
-    
+
     if (NSWidth(openFrame) > NSWidth(cancelFrame))
         cancelFrame.size.width = NSWidth(openFrame);
     else
         openFrame.size.width = NSWidth(cancelFrame);
-    
+
     openFrame.origin.x = NSWidth([[self window] frame]) - NSWidth(openFrame) - 20.0 + 6.0; //I don't know why the extra 6.0 is needed
     [fOpenButton setFrame: openFrame];
-    
+
     cancelFrame.origin.x = NSMinX(openFrame) - NSWidth(cancelFrame);
     [fCancelButton setFrame: cancelFrame];
 }
@@ -115,7 +115,7 @@ NSString * urlString = nil;
         if (prefixRange.location != NSNotFound && [string length] == NSMaxRange(prefixRange))
             enable = NO;
     }
-    
+
     [fOpenButton setEnabled: enable];
 }
 

@@ -34,7 +34,7 @@
     NSMenuItem * menuItem = [[NSMenuItem alloc] initWithTitle: [self label] action: [self action] keyEquivalent: @""];
     [menuItem setTarget: [self target]];
     [menuItem setEnabled: [[self target] validateToolbarItem: self]];
-    
+
     return [menuItem autorelease];
 }
 

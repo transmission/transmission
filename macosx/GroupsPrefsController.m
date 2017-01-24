@@ -43,9 +43,9 @@
 - (void) awakeFromNib
 {
     [fTableView registerForDraggedTypes: [NSArray arrayWithObject: GROUP_TABLE_VIEW_DATA_TYPE]];
-    
+
     [fSelectedColorView addObserver: self forKeyPath: @"color" options: 0 context: NULL];
-    
+
     [self updateSelectedGroup];
 }
 
@@ -58,7 +58,7 @@
 {
     GroupsController * groupsController = [GroupsController groups];
     NSInteger groupsIndex = [groupsController indexForRow: row];
-    
+
     NSString * identifier = [tableColumn identifier];
     if ([identifier isEqualToString: @"Color"])
         return [groupsController imageForIndex: groupsIndex];
@@ -107,7 +107,7 @@
         [fTableView setDropRow: row dropOperation: NSTableViewDropAbove];
         return NSDragOperationGeneric;
     }
-    
+
     return NSDragOperationNone;
 }
 
@@ -119,18 +119,18 @@
     {
         NSIndexSet * indexes = [NSKeyedUnarchiver unarchiveObjectWithData: [pasteboard dataForType: GROUP_TABLE_VIEW_DATA_TYPE]];
         NSInteger oldRow = [indexes firstIndex];
-        
+
         if (oldRow < newRow)
             newRow--;
 
         [fTableView beginUpdates];
-        
+
         [[GroupsController groups] moveGroupAtRow: oldRow toRow: newRow];
 
         [fTableView moveRowAtIndex: oldRow toIndex: newRow];
         [fTableView endUpdates];
     }
-    
+
     return YES;
 }
 
@@ -140,37 +140,37 @@
         [[NSColorPanel sharedColorPanel] close];
 
     NSInteger row;
-    
+
     switch ([[sender cell] tagForSegment: [sender selectedSegment]])
     {
         case ADD_TAG:
             [fTableView beginUpdates];
-            
+
             [[GroupsController groups] addNewGroup];
-            
+
             row = [fTableView numberOfRows];
 
             [fTableView insertRowsAtIndexes: [NSIndexSet indexSetWithIndex: row] withAnimation: NSTableViewAnimationSlideUp];
             [fTableView endUpdates];
-            
+
             [fTableView selectRowIndexes: [NSIndexSet indexSetWithIndex: row] byExtendingSelection: NO];
             [fTableView scrollRowToVisible: row];
-            
+
             [[fSelectedColorNameField window] makeFirstResponder: fSelectedColorNameField];
-            
+
             break;
-        
+
         case REMOVE_TAG:
             row = [fTableView selectedRow];
-            
+
 
             [fTableView beginUpdates];
-            
-            [[GroupsController groups] removeGroupWithRowIndex: row];            
+
+            [[GroupsController groups] removeGroupWithRowIndex: row];
 
             [fTableView removeRowsAtIndexes: [NSIndexSet indexSetWithIndex: row] withAnimation: NSTableViewAnimationSlideUp];
             [fTableView endUpdates];
-            
+
             if ([fTableView numberOfRows] > 0)
             {
                 if (row == [fTableView numberOfRows])
@@ -178,10 +178,10 @@
                 [fTableView selectRowIndexes: [NSIndexSet indexSetWithIndex: row] byExtendingSelection: NO];
                 [fTableView scrollRowToVisible: row];
             }
-            
+
             break;
     }
-    
+
     [self updateSelectedGroup];
 }
 
@@ -194,7 +194,7 @@
     [panel setCanChooseFiles: NO];
     [panel setCanChooseDirectories: YES];
     [panel setCanCreateDirectories: YES];
-    
+
     [panel beginSheetModalForWindow: [fCustomLocationPopUp window] completionHandler: ^(NSInteger result) {
         const NSInteger index = [[GroupsController groups] indexForRow: [fTableView selectedRow]];
         if (result == NSFileHandlingPanelOKButton)
@@ -208,9 +208,9 @@
             if (![[GroupsController groups] customDownloadLocationForIndex: index])
                 [[GroupsController groups] setUsesCustomDownloadLocation: NO forIndex: index];
         }
-        
+
         [self refreshCustomLocationWithSingleGroup];
-        
+
         [fCustomLocationPopUp selectItemAtIndex: 0];
     }];
 }
@@ -256,12 +256,12 @@
         [NSBundle loadNibNamed: @"GroupRules" owner: self];
 
     NSInteger index = [[GroupsController groups] indexForRow: [fTableView selectedRow]];
-	NSPredicate *predicate = [[GroupsController groups] autoAssignRulesForIndex: index];
-	[fRuleEditor setObjectValue: predicate];
-	
+    NSPredicate *predicate = [[GroupsController groups] autoAssignRulesForIndex: index];
+    [fRuleEditor setObjectValue: predicate];
+
     if ([fRuleEditor numberOfRows] == 0)
         [fRuleEditor addRow: nil];
-        
+
     [NSApp beginSheet: fGroupRulesSheetWindow modalForWindow: [fTableView window] modalDelegate: nil didEndSelector: NULL
         contextInfo: NULL];
 }
@@ -270,7 +270,7 @@
 {
     [fGroupRulesSheetWindow orderOut: nil];
     [NSApp endSheet: fGroupRulesSheetWindow];
-    
+
     NSInteger index = [[GroupsController groups] indexForRow: [fTableView selectedRow]];
     if (![[GroupsController groups] autoAssignRulesForIndex: index])
     {
@@ -284,13 +284,13 @@
 {
     [fGroupRulesSheetWindow orderOut: nil];
     [NSApp endSheet: fGroupRulesSheetWindow];
-    
+
     NSInteger index = [[GroupsController groups] indexForRow: [fTableView selectedRow]];
     [[GroupsController groups] setUsesAutoAssignRules: YES forIndex: index];
-    
+
     NSPredicate * predicate = [fRuleEditor objectValue];
     [[GroupsController groups] setAutoAssignRules: predicate forIndex: index];
-	
+
     [fAutoAssignRulesEnableCheck setState: [[GroupsController groups] usesAutoAssignRulesForIndex: index]];
     [fAutoAssignRulesEditButton setEnabled: [fAutoAssignRulesEnableCheck state] == NSOnState];
 }
@@ -298,13 +298,13 @@
 - (void) ruleEditorRowsDidChange: (NSNotification *) notification
 {
     NSScrollView * ruleEditorScrollView = [fRuleEditor enclosingScrollView];
-    
+
     const CGFloat rowHeight = [fRuleEditor rowHeight];
     const CGFloat bordersHeight = [ruleEditorScrollView frame].size.height - [ruleEditorScrollView contentSize].height;
 
     const CGFloat requiredRowCount = [fRuleEditor numberOfRows];
     const CGFloat maxVisibleRowCount = (long)((NSHeight([[[fRuleEditor window] screen] visibleFrame]) * 2 / 3) / rowHeight);
-    
+
     [fRuleEditorHeightConstraint setConstant: MIN(requiredRowCount, maxVisibleRowCount) * rowHeight + bordersHeight];
     [ruleEditorScrollView setHasVerticalScroller: requiredRowCount > maxVisibleRowCount];
 }
@@ -323,7 +323,7 @@
         [fSelectedColorView setEnabled: YES];
         [fSelectedColorNameField setStringValue: [[GroupsController groups] nameForIndex: index]];
         [fSelectedColorNameField setEnabled: YES];
-        
+
         [self refreshCustomLocationWithSingleGroup];
 
         [fAutoAssignRulesEnableCheck setState: [[GroupsController groups] usesAutoAssignRulesForIndex: index]];
@@ -346,12 +346,12 @@
 - (void) refreshCustomLocationWithSingleGroup
 {
     const NSInteger index = [[GroupsController groups] indexForRow: [fTableView selectedRow]];
-    
+
     const BOOL hasCustomLocation = [[GroupsController groups] usesCustomDownloadLocationForIndex: index];
     [fCustomLocationEnableCheck setState: hasCustomLocation];
     [fCustomLocationEnableCheck setEnabled: YES];
     [fCustomLocationPopUp setEnabled: hasCustomLocation];
-    
+
     NSString * location = [[GroupsController groups] customDownloadLocationForIndex: index];
     if (location)
     {

@@ -33,9 +33,9 @@
 {
     if (fromIndex == toIndex)
         return;
-    
+
     id object = [[self objectAtIndex: fromIndex] retain];
-    
+
     //shift objects - more efficient than simply removing the object and re-inserting the object
     if (fromIndex < toIndex)
     {
@@ -48,7 +48,7 @@
             [self replaceObjectAtIndex: i withObject: [self objectAtIndex: i-1]];
     }
     [self replaceObjectAtIndex: toIndex withObject: object];
-    
+
     [object release];
 }
 

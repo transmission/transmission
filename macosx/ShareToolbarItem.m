@@ -16,18 +16,18 @@
 {
     NSMenuItem * menuItem = [[NSMenuItem alloc] initWithTitle: [self label] action: nil keyEquivalent: @""];
     [menuItem setEnabled: [[self target] validateToolbarItem: self]];
-    
+
     if ([menuItem isEnabled]) {
         NSMenu *servicesMenu = [[NSMenu alloc] initWithTitle: @""];
         for (NSMenuItem * item in [[ShareTorrentFileHelper sharedHelper] menuItems])
         {
             [servicesMenu addItem:item];
         }
-        
+
         [menuItem setSubmenu:servicesMenu];
         [servicesMenu release]; // can't believe we're not using ARC yet!
     }
-    
+
     return menuItem;
 }
 

@@ -73,7 +73,7 @@
         uploaded += [torrent uploadedTotal];
         downloaded += [torrent downloadedTotal];
     }
-    
+
     return tr_getRatio(uploaded, downloaded);
 }
 
@@ -82,7 +82,7 @@
     CGFloat rate = 0.0;
     for (Torrent * torrent in fTorrents)
         rate += [torrent uploadRate];
-    
+
     return rate;
 }
 
@@ -91,7 +91,7 @@
     CGFloat rate = 0.0;
     for (Torrent * torrent in fTorrents)
         rate += [torrent downloadRate];
-    
+
     return rate;
 }
 
