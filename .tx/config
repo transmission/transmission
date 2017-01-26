@@ -5,3 +5,8 @@ host = https://www.transifex.com
 file_filter = qt/translations/transmission_<lang>.ts
 source_lang = en
 type = QT
+
+[transmissionbt.transmission-gtk]
+file_filter = po/<lang>.po
+source_lang = en
+type = PO

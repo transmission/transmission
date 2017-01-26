@@ -1,695 +1,695 @@
-# Bengali translation for transmission
-# Copyright (c) 2010 Rosetta Contributors and Canonical Ltd 2010
-# This file is distributed under the same license as the transmission package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2010.
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
+#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: transmission\n"
-"Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2012-02-03 15:22-0600\n"
-"PO-Revision-Date: 2011-11-15 17:47+0000\n"
-"Last-Translator: Ishak Herock <Unknown>\n"
-"Language-Team: Bengali <bn@li.org>\n"
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-01-27 03:12+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2017\n"
+"Language-Team: Bengali (https://www.transifex.com/transmissionbt/teams/33778/"
+"bn/)\n"
+"Language: bn\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2016-09-27 19:08+0000\n"
-"X-Generator: Launchpad (build 18204)\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../gtk/actions.c:35
+#: ../cli/cli.c:115 ../gtk/util.c:86 ../libtransmission/utils.c:1446
+msgid "None"
+msgstr "কোনটিই নয়"
+
+#: ../gtk/actions.c:34
 msgid "Sort by _Activity"
 msgstr "সক্রিয়তা অনুসারে সাজাও (_A)"
 
-#: ../gtk/actions.c:36
+#: ../gtk/actions.c:35
 msgid "Sort by _Name"
 msgstr "নাম অনুযায়ী সাজান (_N)"
 
-#: ../gtk/actions.c:37
+#: ../gtk/actions.c:36
 msgid "Sort by _Progress"
 msgstr "সাফল্য অনুসারে সাজাও  (_P)"
 
-#: ../gtk/actions.c:38
+#: ../gtk/actions.c:37
 msgid "Sort by _Queue"
 msgstr "সারিবদ্ধ অনুযায়ী সাজান (_Q)"
 
-#: ../gtk/actions.c:39
+#: ../gtk/actions.c:38
 msgid "Sort by Rati_o"
 msgstr "অনুপাত অনুযায়ী সাজাও (_o)"
 
-#: ../gtk/actions.c:40
+#: ../gtk/actions.c:39
 msgid "Sort by Stat_e"
 msgstr "অবস্থা অনুযায়ী সাজাও (_e)"
 
-#: ../gtk/actions.c:41
+#: ../gtk/actions.c:40
 msgid "Sort by A_ge"
 msgstr "বয়স অনুযায়ী সাজাও (_g)"
 
-#: ../gtk/actions.c:42
+#: ../gtk/actions.c:41
 msgid "Sort by Time _Left"
 msgstr "বাকি সময় অনুযায়ী সাজাও (_L)"
 
-#: ../gtk/actions.c:43
+#: ../gtk/actions.c:42
 msgid "Sort by Si_ze"
 msgstr "আকৃতি অনুযায়ী সাজাও (_z)"
 
-#: ../gtk/actions.c:60
+#: ../gtk/actions.c:59
 msgid "_Show Transmission"
 msgstr "ট্রান্সমিশন দেখাও (_S)"
 
-#: ../gtk/actions.c:61
+#: ../gtk/actions.c:60
 msgid "Message _Log"
 msgstr "মেসেজ _লগ"
 
-#: ../gtk/actions.c:76
+#: ../gtk/actions.c:75
 msgid "Enable Alternative Speed _Limits"
 msgstr "বিকল্প গতি সীমা সক্রিয় (_L)"
 
-#: ../gtk/actions.c:77
+#: ../gtk/actions.c:76
 msgid "_Compact View"
 msgstr "কম্প্যাক্ট দেখুন (_C)"
 
-#: ../gtk/actions.c:78
+#: ../gtk/actions.c:77
 msgid "Re_verse Sort Order"
 msgstr "বিপরীত ক্রমিকায়ন (_v)"
 
-#: ../gtk/actions.c:79
+#: ../gtk/actions.c:78
 msgid "_Filterbar"
 msgstr "ফিল্টার বারে (_F)"
 
-#: ../gtk/actions.c:80
+#: ../gtk/actions.c:79
 msgid "_Statusbar"
 msgstr "স্ট্যাটাস বার (_S)"
 
-#: ../gtk/actions.c:81
+#: ../gtk/actions.c:80
 msgid "_Toolbar"
 msgstr "টুলবার(_ট)"
 
-#: ../gtk/actions.c:86
+#: ../gtk/actions.c:85
 msgid "_File"
 msgstr "ফাইল(_F)"
 
-#: ../gtk/actions.c:87
+#: ../gtk/actions.c:86
 msgid "_Torrent"
 msgstr "টরেন্ট (_T)"
 
-#: ../gtk/actions.c:88
+#: ../gtk/actions.c:87
 msgid "_View"
 msgstr "প্রদর্শন (_V)"
 
-#: ../gtk/actions.c:89
+#: ../gtk/actions.c:88
 msgid "_Sort Torrents By"
 msgstr "যার দ্বারা টরেনট বাছাই (_S)"
 
-#: ../gtk/actions.c:90
+#: ../gtk/actions.c:89
 msgid "_Queue"
 msgstr "সারিবদ্ধ (_Q)"
 
-#: ../gtk/actions.c:91 ../gtk/details.c:2620
+#: ../gtk/actions.c:90 ../gtk/details.c:2619
 msgid "_Edit"
 msgstr "সম্পাদনা (_E)"
 
-#: ../gtk/actions.c:92
+#: ../gtk/actions.c:91
 msgid "_Help"
 msgstr "সহায়তা (_H)"
 
-#: ../gtk/actions.c:93
+#: ../gtk/actions.c:92
 msgid "Copy _Magnet Link to Clipboard"
 msgstr "ম্যাগনেট লিঙ্কটি ক্লিপবোর্ডে কপি কর (_M)"
 
-#: ../gtk/actions.c:94
+#: ../gtk/actions.c:93
 msgid "Open _URL…"
 msgstr "URL খুলুন (_U)..."
 
-#: ../gtk/actions.c:94
+#: ../gtk/actions.c:93
 msgid "Open URL…"
 msgstr "URL খুলুন..."
 
-#: ../gtk/actions.c:95 ../gtk/actions.c:96
+#: ../gtk/actions.c:94 ../gtk/actions.c:95
 msgid "Open a torrent"
 msgstr "টরেনট খুলুন"
 
-#: ../gtk/actions.c:97
+#: ../gtk/actions.c:96
 msgid "_Start"
 msgstr "শুরু (_S)"
 
-#: ../gtk/actions.c:97
+#: ../gtk/actions.c:96
 msgid "Start torrent"
 msgstr "টরেন্ট শুরু কর"
 
-#: ../gtk/actions.c:98
+#: ../gtk/actions.c:97
 msgid "Start _Now"
 msgstr "এখন আরম্ভ করুন (_N)"
 
-#: ../gtk/actions.c:98
+#: ../gtk/actions.c:97
 msgid "Start torrent now"
 msgstr "টরেন্ট আরম্ত করুন"
 
-#: ../gtk/actions.c:99
+#: ../gtk/actions.c:98
 msgid "_Statistics"
 msgstr "পরিসংখ্যান (_S)"
 
-#: ../gtk/actions.c:100
+#: ../gtk/actions.c:99
 msgid "_Donate"
 msgstr "_দান করুন"
 
-#: ../gtk/actions.c:101
+#: ../gtk/actions.c:100
 msgid "_Verify Local Data"
 msgstr "লোকাল ডাটা পরীক্ষা কর (_V)"
 
-#: ../gtk/actions.c:102
+#: ../gtk/actions.c:101
 msgid "_Pause"
 msgstr "বিরতি (_P)"
 
-#: ../gtk/actions.c:102
+#: ../gtk/actions.c:101
 msgid "Pause torrent"
 msgstr "টরেন্ট বিরতি"
 
-#: ../gtk/actions.c:103
+#: ../gtk/actions.c:102
 msgid "_Pause All"
 msgstr "সব বিরতি"
 
-#: ../gtk/actions.c:103
+#: ../gtk/actions.c:102
 msgid "Pause all torrents"
 msgstr "সব টরেন্ট বিরতি"
 
-#: ../gtk/actions.c:104
+#: ../gtk/actions.c:103
 msgid "_Start All"
 msgstr "সব শুরু (_S)"
 
-#: ../gtk/actions.c:104
+#: ../gtk/actions.c:103
 msgid "Start all torrents"
 msgstr "সব টরেন্ট শুরু কর"
 
-#: ../gtk/actions.c:105
+#: ../gtk/actions.c:104
 msgid "Set _Location…"
 msgstr "অবস্হান নির্ধারণ করুন (_L)"
 
-#: ../gtk/actions.c:106
+#: ../gtk/actions.c:105
 msgid "Remove torrent"
 msgstr "টরেন্ট অপসারণ কর"
 
-#: ../gtk/actions.c:107
+#: ../gtk/actions.c:106
 msgid "_Delete Files and Remove"
 msgstr "ফাইল মোছ এবং অপসারণ কর (_D)"
 
-#: ../gtk/actions.c:108
+#: ../gtk/actions.c:107
 msgid "_New…"
 msgstr "নতুন (_N)..."
 
-#: ../gtk/actions.c:108
+#: ../gtk/actions.c:107
 msgid "Create a torrent"
 msgstr "একটি টরেন্ট তৈরী কর"
 
-#: ../gtk/actions.c:109
+#: ../gtk/actions.c:108
 msgid "_Quit"
 msgstr "প্রস্থান (_Q)"
 
-#: ../gtk/actions.c:110
+#: ../gtk/actions.c:109
 msgid "Select _All"
 msgstr "সবগুলো নির্বাচন কর (_A)"
 
-#: ../gtk/actions.c:111
+#: ../gtk/actions.c:110
 msgid "Dese_lect All"
 msgstr "সব অনির্বাচিত করুন (_L)"
 
-#: ../gtk/actions.c:113
+#: ../gtk/actions.c:112
 msgid "Torrent properties"
 msgstr "টরেনট বৈশিষ্ট্যাবলী"
 
-#: ../gtk/actions.c:114
+#: ../gtk/actions.c:113
 msgid "Open Fold_er"
 msgstr "ফোল্ডার খুলুন"
 
-#: ../gtk/actions.c:116
+#: ../gtk/actions.c:115
 msgid "_Contents"
 msgstr "বিষয়বস্তু (_C)"
 
-#: ../gtk/actions.c:117
+#: ../gtk/actions.c:116
 msgid "Ask Tracker for _More Peers"
 msgstr "আরও পিয়ারের জন্য ট্র্যাকারকে বল (_M)"
 
-#: ../gtk/actions.c:118
+#: ../gtk/actions.c:117
 msgid "Move to _Top"
 msgstr "উপরে সরান (_T)"
 
-#: ../gtk/actions.c:119
+#: ../gtk/actions.c:118
 msgid "Move _Up"
 msgstr "উপরে সরান (_U)"
 
-#: ../gtk/actions.c:120
+#: ../gtk/actions.c:119
 msgid "Move _Down"
 msgstr "নিচে সরান (_D)"
 
-#: ../gtk/actions.c:121
+#: ../gtk/actions.c:120
 msgid "Move to _Bottom"
 msgstr "নিচে সরান (_B)"
 
-#: ../gtk/actions.c:122
+#: ../gtk/actions.c:121
 msgid "Present Main Window"
 msgstr "প্রধান উইন্ডো উপস্হাপন করুন"
 
-#: ../gtk/conf.c:317 ../gtk/conf.c:322
-#, c-format
-msgid "Importing \"%s\""
-msgstr "\"%s\" ইম্পোর্ট করা হচ্ছে"
-
-#: ../gtk/details.c:475 ../gtk/details.c:487
+#: ../gtk/details.c:474 ../gtk/details.c:486
 msgid "Use global settings"
 msgstr "আন্তর্জাতিক সেটিং ব্যবহার"
 
-#: ../gtk/details.c:476
+#: ../gtk/details.c:475
 msgid "Seed regardless of ratio"
 msgstr "অনুপাত নির্বিশেষে সীড"
 
-#: ../gtk/details.c:477
+#: ../gtk/details.c:476
 msgid "Stop seeding at ratio:"
 msgstr "অনুপাত এ সীডিং বন্ধ করুন:"
 
-#: ../gtk/details.c:488
+#: ../gtk/details.c:487
 msgid "Seed regardless of activity"
 msgstr "বীজ নির্বিশেষে কার্যকলাপ"
 
-#: ../gtk/details.c:489
+#: ../gtk/details.c:488
 msgid "Stop seeding if idle for N minutes:"
 msgstr "N মিনিটের নিষ্ক্রিয়তার জন্য সীডিং বন্ধ করুন:"
 
-#: ../gtk/details.c:505 ../gtk/tr-prefs.c:1315
+#: ../gtk/details.c:504 ../gtk/tr-prefs.c:1314
 msgid "Speed"
 msgstr "গতি"
 
-#: ../gtk/details.c:507
+#: ../gtk/details.c:506
 msgid "Honor global _limits"
 msgstr "আন্তর্জাতিক সীমা সম্মান (_l)"
 
-#: ../gtk/details.c:512
+#: ../gtk/details.c:511
 #, c-format
 msgid "Limit _download speed (%s):"
 msgstr "ডাউনলোডের গতিসীমা ( %s ) করুন (_d):"
 
-#: ../gtk/details.c:525
+#: ../gtk/details.c:524
 #, c-format
 msgid "Limit _upload speed (%s):"
 msgstr "আপলোডের গতিসীমা (%s) করুন (_u):"
 
-#: ../gtk/details.c:538 ../gtk/open-dialog.c:368
+#: ../gtk/details.c:537 ../gtk/open-dialog.c:367
 msgid "Torrent _priority:"
 msgstr "টরেন্ট অগ্রাধিকার (_p):"
 
-#: ../gtk/details.c:542
+#: ../gtk/details.c:541
 msgid "Seeding Limits"
 msgstr "সীডের সীমা"
 
-#: ../gtk/details.c:552
+#: ../gtk/details.c:551
 msgid "_Ratio:"
 msgstr "অনুপাত (_R):"
 
-#: ../gtk/details.c:561
+#: ../gtk/details.c:560
 msgid "_Idle:"
 msgstr "কর্মহীন (_I):"
 
-#: ../gtk/details.c:564
+#: ../gtk/details.c:563
 msgid "Peer Connections"
 msgstr "পিয়ার সংযোগ"
 
-#: ../gtk/details.c:567
+#: ../gtk/details.c:566
 msgid "_Maximum peers:"
 msgstr "সর্বোচ্চ পিয়ারঃ (_M)"
 
-#: ../gtk/details.c:586 ../gtk/torrent-cell-renderer.c:206
-#: ../libtransmission/verify.c:269
+#: ../gtk/details.c:585 ../gtk/torrent-cell-renderer.c:205
+#: ../libtransmission/verify.c:268
 msgid "Queued for verification"
 msgstr "যাচাই এর জন্য সরিবদ্ধ করা হয়েছে"
 
-#: ../gtk/details.c:587
+#: ../gtk/details.c:586
 msgid "Verifying local data"
 msgstr "তথ্য যাচাই করা হচ্ছে"
 
-#: ../gtk/details.c:588 ../gtk/torrent-cell-renderer.c:209
+#: ../gtk/details.c:587 ../gtk/torrent-cell-renderer.c:208
 msgid "Queued for download"
 msgstr "ডাউনলোডের জন্য সারিবদ্ধ"
 
-#: ../gtk/details.c:589 ../gtk/filter.c:591
+#: ../gtk/details.c:588 ../gtk/filter.c:590
 msgctxt "Verb"
 msgid "Downloading"
 msgstr "ডাউনলোড করা হচ্ছে"
 
-#: ../gtk/details.c:590 ../gtk/torrent-cell-renderer.c:212
+#: ../gtk/details.c:589 ../gtk/torrent-cell-renderer.c:211
 msgid "Queued for seeding"
 msgstr "সীডিং এর জন্য সারিবদ্ধ"
 
-#: ../gtk/details.c:591 ../gtk/filter.c:592
+#: ../gtk/details.c:590 ../gtk/filter.c:591
 msgctxt "Verb"
 msgid "Seeding"
 msgstr "সীডিং"
 
-#: ../gtk/details.c:592 ../gtk/filter.c:594 ../gtk/torrent-cell-renderer.c:203
+#: ../gtk/details.c:591 ../gtk/filter.c:593 ../gtk/torrent-cell-renderer.c:202
 msgid "Finished"
 msgstr "সমাপ্ত"
 
-#: ../gtk/details.c:592 ../gtk/filter.c:593 ../gtk/torrent-cell-renderer.c:203
+#: ../gtk/details.c:591 ../gtk/filter.c:592 ../gtk/torrent-cell-renderer.c:202
 msgid "Paused"
 msgstr "বিরত"
 
-#: ../gtk/details.c:625 ../gtk/details.c:702
+#: ../gtk/details.c:624 ../gtk/details.c:701
 msgid "N/A"
 msgstr "প্রযোজ্য নয়"
 
-#: ../gtk/details.c:637 ../gtk/file-list.c:619
+#: ../gtk/details.c:636 ../gtk/file-list.c:618
 msgid "Mixed"
 msgstr "মিশ্রিত"
 
-#: ../gtk/details.c:638
+#: ../gtk/details.c:637
 msgid "No Torrents Selected"
 msgstr "কোন টরেন্ট বাছাই করা হয়নি"
 
-#: ../gtk/details.c:667
+#: ../gtk/details.c:666
 msgid "Private to this tracker -- DHT and PEX disabled"
 msgstr "অনুসরনকারীকে গোপন করার জন্য --DHT এবং PEX নিষ্ক্রিয় করুন"
 
-#: ../gtk/details.c:669
+#: ../gtk/details.c:668
 msgid "Public torrent"
 msgstr "পাবলিক টরেন্ট"
 
-#: ../gtk/details.c:707
+#: ../gtk/details.c:706
 #, c-format
 msgid "Created by %1$s"
 msgstr "%1$s এর দ্বারা তৈরী"
 
-#: ../gtk/details.c:709
+#: ../gtk/details.c:708
 #, c-format
 msgid "Created on %1$s"
 msgstr "%1$s এ তৈরী"
 
-#: ../gtk/details.c:711
+#: ../gtk/details.c:710
 #, c-format
 msgid "Created by %1$s on %2$s"
 msgstr "%1$s এর দ্বারা %2$s এ তৈরী"
 
-#: ../gtk/details.c:823
+#: ../gtk/details.c:822
 msgid "Unknown"
 msgstr "অজ্ঞাত"
 
-#: ../gtk/details.c:856
+#: ../gtk/details.c:855
 #, c-format
 msgid "%1$s (%2$'d piece @ %3$s)"
 msgid_plural "%1$s (%2$'d pieces @ %3$s)"
 msgstr[0] "%1$s (%2$'d টি অংশ @ %3$s)"
 msgstr[1] "%1$s (%2$'d টি অংশ @ %3$s)"
 
-#: ../gtk/details.c:864
+#: ../gtk/details.c:863
 #, c-format
 msgid "%1$s (%2$'d piece)"
 msgid_plural "%1$s (%2$'d pieces)"
 msgstr[0] "%1$s (%2$'d-টি অংশ)"
 msgstr[1] "%1$s (%2$'d-টি অংশ)"
 
-#: ../gtk/details.c:906
+#: ../gtk/details.c:905
 #, c-format
 msgid "%1$s (%2$s%%)"
 msgstr "%1$s (%2$s%%)"
 
-#: ../gtk/details.c:908
+#: ../gtk/details.c:907
 #, c-format
 msgid "%1$s (%2$s%% of %3$s%% Available)"
 msgstr "%1$s (%3$s%% এর %2$s%% অবশিষ্ট)"
 
-#: ../gtk/details.c:910
+#: ../gtk/details.c:909
 #, c-format
 msgid "%1$s (%2$s%% of %3$s%% Available); %4$s Unverified"
 msgstr "%1$s (%2$s%% of %3$s%% Available); %4$s Unverified"
 
-#: ../gtk/details.c:937
+#: ../gtk/details.c:936
 #, c-format
 msgid "%1$s (+%2$s corrupt)"
 msgstr "%1$s (+%2$s corrupt)"
 
-#: ../gtk/details.c:965
+#: ../gtk/details.c:964
 #, c-format
 msgid "%s (Ratio: %s)"
 msgstr "%s (Ratio: %s)"
 
-#: ../gtk/details.c:998
+#: ../gtk/details.c:997
 msgid "No errors"
 msgstr "কোন ত্রুটি নেই"
 
-#: ../gtk/details.c:1017
+#: ../gtk/details.c:1016
 msgid "Never"
 msgstr "কখনই নয়"
 
-#: ../gtk/details.c:1024
+#: ../gtk/details.c:1023
 msgid "Active now"
 msgstr "এখনই কার্যকর"
 
-#: ../gtk/details.c:1030
+#: ../gtk/details.c:1029
 #, c-format
 msgid "%1$s ago"
 msgstr "%1$s পূর্বে"
 
-#: ../gtk/details.c:1049
+#: ../gtk/details.c:1048
 msgid "Activity"
 msgstr "কার্যকারিতা"
 
-#: ../gtk/details.c:1054
+#: ../gtk/details.c:1053
 msgid "Torrent size:"
 msgstr "টরেন্ট আকৃতিঃ"
 
-#: ../gtk/details.c:1059
+#: ../gtk/details.c:1058
 msgid "Have:"
 msgstr "আছে:"
 
-#: ../gtk/details.c:1069 ../gtk/stats.c:156 ../gtk/stats.c:178
-msgid "Downloaded:"
-msgstr "ডাউনলোড হয়েছেঃ"
-
-#: ../gtk/details.c:1064 ../gtk/stats.c:152 ../gtk/stats.c:174
+#: ../gtk/details.c:1063 ../gtk/stats.c:151 ../gtk/stats.c:173
 msgid "Uploaded:"
 msgstr "আপলোড হয়েছেঃ"
 
-#: ../gtk/details.c:1074
+#: ../gtk/details.c:1068 ../gtk/stats.c:155 ../gtk/stats.c:177
+msgid "Downloaded:"
+msgstr "ডাউনলোড হয়েছেঃ"
+
+#: ../gtk/details.c:1073
 msgid "State:"
 msgstr "অবস্থা:"
 
-#: ../gtk/details.c:1079
+#: ../gtk/details.c:1078
 msgid "Running time:"
 msgstr "চালু সময়ঃ"
 
-#: ../gtk/details.c:1084
+#: ../gtk/details.c:1083
 msgid "Remaining time:"
 msgstr "বাকী থাকা সময়:"
 
-#: ../gtk/details.c:1089
+#: ../gtk/details.c:1088
 msgid "Last activity:"
 msgstr "সর্বশেষ কার্যঃ"
 
-#: ../gtk/details.c:1095
+#: ../gtk/details.c:1094
 msgid "Error:"
 msgstr "ত্রুটি:"
 
-#: ../gtk/details.c:1099
+#: ../gtk/details.c:1098
 msgid "Details"
 msgstr "বিবরণ"
 
-#: ../gtk/details.c:1105
+#: ../gtk/details.c:1104
 msgid "Location:"
 msgstr "অবস্থান:"
 
-#: ../gtk/details.c:1112
+#: ../gtk/details.c:1111
 msgid "Hash:"
 msgstr "হ্যাশঃ"
 
-#: ../gtk/details.c:1118
+#: ../gtk/details.c:1117
 msgid "Privacy:"
 msgstr "প্রাইভেসীঃ"
 
-#: ../gtk/details.c:1125
+#: ../gtk/details.c:1124
 msgid "Origin:"
 msgstr "উৎসঃ"
 
-#: ../gtk/details.c:1142
+#: ../gtk/details.c:1141
 msgid "Comment:"
 msgstr "মন্তব্য:"
 
-#: ../gtk/details.c:1056
-msgid "Webseeds"
-msgstr "ওয়েবসীড সমূহ"
+#: ../gtk/details.c:1169
+msgid "Web Seeds"
+msgstr ""
 
-#: ../gtk/details.c:1172 ../gtk/details.c:1225
+#: ../gtk/details.c:1171 ../gtk/details.c:1224
 msgid "Down"
 msgstr "নিচে"
 
-#: ../gtk/details.c:1223
+#: ../gtk/details.c:1222
 msgid "Address"
 msgstr "ঠিকানা"
 
-#: ../gtk/details.c:1227
+#: ../gtk/details.c:1226
 msgid "Up"
 msgstr "উপরে"
 
-#: ../gtk/details.c:1228
+#: ../gtk/details.c:1227
 msgid "Client"
 msgstr "ক্লায়েন্ট"
 
-#: ../gtk/details.c:1229
+#: ../gtk/details.c:1228
 msgid "%"
 msgstr "%"
 
-#: ../gtk/details.c:1231
+#: ../gtk/details.c:1230
 msgid "Up Reqs"
 msgstr "উপরে অনুরোধ"
 
-#: ../gtk/details.c:1233
+#: ../gtk/details.c:1232
 msgid "Dn Reqs"
 msgstr "Dn Reqs"
 
-#: ../gtk/details.c:1235
+#: ../gtk/details.c:1234
 msgid "Dn Blocks"
 msgstr "Dn ব্লক"
 
-#: ../gtk/details.c:1237
+#: ../gtk/details.c:1236
 msgid "Up Blocks"
 msgstr "উপরে ব্লক"
 
-#: ../gtk/details.c:1239
+#: ../gtk/details.c:1238
 msgid "We Cancelled"
 msgstr "আমরা বাতিল করেছি"
 
-#: ../gtk/details.c:1241
+#: ../gtk/details.c:1240
 msgid "They Cancelled"
 msgstr "তারা বাতিল করেছে"
 
-#: ../gtk/details.c:1242
+#: ../gtk/details.c:1241
 msgid "Flags"
 msgstr "ফ্ল্যাগ"
 
-#: ../gtk/details.c:1625
+#: ../gtk/details.c:1624
 msgid "Optimistic unchoke"
 msgstr "আশাবাদী unchoke"
 
-#: ../gtk/details.c:1626
+#: ../gtk/details.c:1625
 msgid "Downloading from this peer"
 msgstr "এই পিয়ার থেকে ডাউনলোড করা হচছে"
 
-#: ../gtk/details.c:1627
+#: ../gtk/details.c:1626
 msgid "We would download from this peer if they would let us"
 msgstr "যদি তারা আমাদের দেয় আমরা এই পিয়ার থেকে ডাউনলোড করব"
 
-#: ../gtk/details.c:1628
+#: ../gtk/details.c:1627
 msgid "Uploading to peer"
 msgstr "পিয়ারে আপলোড"
 
-#: ../gtk/details.c:1629
+#: ../gtk/details.c:1628
 msgid "We would upload to this peer if they asked"
 msgstr "যদি তারা জিজ্ঞাসা করে আমরা এই পীয়ার আপলোড করব"
 
-#: ../gtk/details.c:1630
+#: ../gtk/details.c:1629
 msgid "Peer has unchoked us, but we're not interested"
 msgstr "পিয়ার আমাদের রুদ্ধ করেছে, কিন্তু আমরা আগ্রহী ছিলাম না"
 
-#: ../gtk/details.c:1631
+#: ../gtk/details.c:1630
 msgid "We unchoked this peer, but they're not interested"
 msgstr "আমরা এই পিয়ারটি রুদ্ধ করেছি, কিন্তু তারা আগ্রহী নয়"
 
-#: ../gtk/details.c:1632
+#: ../gtk/details.c:1631
 msgid "Encrypted connection"
 msgstr "এনক্রিপ্টকৃত সংযোগ"
 
-#: ../gtk/details.c:1633
+#: ../gtk/details.c:1632
 msgid "Peer was found through Peer Exchange (PEX)"
 msgstr "পিয়ার বিনিময় (PEX) মাধ্যমে পিয়ার পাওয়া যায়নি"
 
-#: ../gtk/details.c:1634
+#: ../gtk/details.c:1633
 msgid "Peer was found through DHT"
 msgstr "পিয়ার DHT মাধ্যমে পাওয়া যায়নি"
 
-#: ../gtk/details.c:1635
+#: ../gtk/details.c:1634
 msgid "Peer is an incoming connection"
 msgstr "পিয়ার একটি অন্তর্মুখী সংযোগ"
 
-#: ../gtk/details.c:1636
+#: ../gtk/details.c:1635
 msgid "Peer is connected over µTP"
 msgstr "পিয়ার μTP দ্বারা যুক্ত হয়"
 
-#: ../gtk/details.c:1888 ../gtk/details.c:2635
+#: ../gtk/details.c:1887 ../gtk/details.c:2634
 msgid "Show _more details"
 msgstr "আরো বিস্তারিত দেখাও (_m)"
 
-#: ../gtk/details.c:1959
+#: ../gtk/details.c:1958
 #, c-format
 msgid "Got a list of %1$s%2$'d peers%3$s %4$s ago"
 msgstr "%3$s%4$s আগে %1$s%2$'d পিয়ার তালিকা পাওয়া গেছে"
 
-#: ../gtk/details.c:1963
+#: ../gtk/details.c:1962
 #, c-format
 msgid "Peer list request %1$stimed out%2$s %3$s ago; will retry"
 msgstr "%2$s %3$s আগে %1$stimed পিয়ার তালিকা অনুরোধ; পুনরায় চেষ্টা করা হবে"
 
-#: ../gtk/details.c:1966
+#: ../gtk/details.c:1965
 #, c-format
 msgid "Got an error %1$s\"%2$s\"%3$s %4$s ago"
 msgstr "%1$s\"%2$s\"%3$s %4$s এর আগে একটি ত্রুটি পাওয়া গেছে"
 
-#: ../gtk/details.c:1974
+#: ../gtk/details.c:1973
 msgid "No updates scheduled"
 msgstr "কোন হালনাগাদ নির্ধারিত হয়নি"
 
-#: ../gtk/details.c:1980
+#: ../gtk/details.c:1979
 #, c-format
 msgid "Asking for more peers in %s"
 msgstr "%s তে আরও পিয়ার চাওয়া হচ্ছে"
 
-#: ../gtk/details.c:1985
+#: ../gtk/details.c:1984
 msgid "Queued to ask for more peers"
 msgstr "আরও পিয়ার সরিবদ্ধের জন্য বলা হচ্ছে"
 
-#: ../gtk/details.c:1991
+#: ../gtk/details.c:1990
 #, c-format
 msgid "Asking for more peers now… <small>%s</small>"
 msgstr "এখন আরও পিয়ার চাওয়া হচ্ছে... <small>%s</small>"
 
-#: ../gtk/details.c:2002
+#: ../gtk/details.c:2001
 #, c-format
 msgid "Tracker had %s%'d seeders and %'d leechers%s %s ago"
 msgstr "ট্র্যাকারের ছিল %s%'d সীডার এবং %'d লীচার%s %s পূর্বে"
 
-#: ../gtk/details.c:2006
+#: ../gtk/details.c:2005
 #, c-format
 msgid "Got a scrape error \"%s%s%s\" %s ago"
 msgstr "%4$s আগে \"%3$s%2$s%1$s\" স্ক্রাপ ভুল পাওয়া গেছে"
 
-#: ../gtk/details.c:2017
+#: ../gtk/details.c:2016
 #, c-format
 msgid "Asking for peer counts in %s"
 msgstr "%s তে পিয়ার গণনার জন্য বলা হয়েছে"
 
-#: ../gtk/details.c:2022
+#: ../gtk/details.c:2021
 msgid "Queued to ask for peer counts"
 msgstr "পিয়ার গণনার জন্য সারিবদ্ধ করতে অনুরোধ করা হয়েছে"
 
-#: ../gtk/details.c:2028
+#: ../gtk/details.c:2027
 #, c-format
 msgid "Asking for peer counts now… <small>%s</small>"
 msgstr "পিয়ার গণনার জন্য চাওয়া হচ্ছে... <small>%s</small>"
 
-#: ../gtk/details.c:2313
+#: ../gtk/details.c:2312
 msgid "List contains invalid URLs"
 msgstr "অকার্যকর URLs তালিকায় ধারন করা আছে"
 
-#: ../gtk/details.c:2318 ../gtk/file-list.c:819
+#: ../gtk/details.c:2317 ../gtk/file-list.c:818
 msgid "Please correct the errors and try again."
 msgstr "অনুগ্রহ করে ত্রুটি সঠিক করুন এবং পুনরায় চেষ্টা করুন।"
 
-#: ../gtk/details.c:2374
+#: ../gtk/details.c:2373
 #, c-format
 msgid "%s - Edit Trackers"
 msgstr "%s - ট্র্যাকার সম্পাদনা করুন"
 
-#: ../gtk/details.c:2384
+#: ../gtk/details.c:2383
 msgid "Tracker Announce URLs"
 msgstr "ট্র্যাকার URLs ঘোষণা করেছে"
 
-#: ../gtk/details.c:2387 ../gtk/makemeta-ui.c:499
+#: ../gtk/details.c:2386 ../gtk/makemeta-ui.c:498
 msgid ""
 "To add a backup URL, add it on the line after the primary URL.\n"
 "To add another primary URL, add it after a blank line."
@@ -697,80 +697,80 @@ msgstr ""
 "একটি ব্যাকআপ URL যুক্ত করুন, প্রাথমিক URL এর পরের সারিতে এটি সংযুক্ত করুন।‌\n"
 " ভিন্ন URL এ সংযুক্ত করতে, এটির পর একটি ফাঁকা লাইন পরে সংযুক্ত করুন।"
 
-#: ../gtk/details.c:2488
+#: ../gtk/details.c:2487
 #, c-format
 msgid "%s - Add Tracker"
 msgstr "%s - ট্র্যাকার যোগ"
 
-#: ../gtk/details.c:2502
+#: ../gtk/details.c:2501
 msgid "Tracker"
 msgstr "ট্র্যাকার"
 
-#: ../gtk/details.c:2508
+#: ../gtk/details.c:2507
 msgid "_Announce URL:"
 msgstr "_URL ঘোষণা (_U):"
 
-#: ../gtk/details.c:2591 ../gtk/details.c:2736
+#: ../gtk/details.c:2590 ../gtk/details.c:2735
 msgid "Trackers"
 msgstr "ট্র্যাকার"
 
-#: ../gtk/details.c:2615
+#: ../gtk/details.c:2614
 msgid "_Add"
 msgstr "সংযুক্ত (_A)"
 
-#: ../gtk/details.c:2626
+#: ../gtk/details.c:2625
 msgid "_Remove"
 msgstr "অপসারণ (_R)"
 
-#: ../gtk/details.c:2642
+#: ../gtk/details.c:2641
 msgid "Show _backup trackers"
 msgstr "ব্যাকআপ ট্র্যাকার প্রদর্শন করুন (_b)"
 
-#: ../gtk/details.c:2728 ../gtk/msgwin.c:438
+#: ../gtk/details.c:2727 ../gtk/msgwin.c:437
 msgid "Information"
 msgstr "তথ্য"
 
-#: ../gtk/details.c:2732
+#: ../gtk/details.c:2731
 msgid "Peers"
 msgstr "পিয়ার"
 
-#: ../gtk/details.c:2741
+#: ../gtk/details.c:2740
 msgid "File listing not available for combined torrent properties"
 msgstr "যৌথ টরেন্ট বৈশিেষ্ট্যর জন্য ফাইল তালিকাকরন সহজলভ্য নয়"
 
-#: ../gtk/details.c:2745 ../gtk/makemeta-ui.c:446
+#: ../gtk/details.c:2744 ../gtk/makemeta-ui.c:445
 msgid "Files"
 msgstr "ফাইল"
 
-#: ../gtk/details.c:2749 ../gtk/tr-prefs.c:1222 ../gtk/tr-window.c:685
+#: ../gtk/details.c:2748 ../gtk/tr-prefs.c:1221 ../gtk/tr-window.c:683
 msgid "Options"
 msgstr "অপশন"
 
-#: ../gtk/details.c:2773
+#: ../gtk/details.c:2772
 #, c-format
 msgid "%s Properties"
 msgstr "%s-এর বৈশিষ্ট্য"
 
-#: ../gtk/details.c:2784
+#: ../gtk/details.c:2783
 #, c-format
 msgid "%'d Torrent Properties"
 msgstr "%'d টরেন্ট বৈশিষ্ট্য"
 
-#: ../gtk/dialogs.c:95
+#: ../gtk/dialogs.c:93
 #, c-format
 msgid "Remove torrent?"
 msgid_plural "Remove %d torrents?"
 msgstr[0] "টরেন্ট অপসারণ করা হবে কি?"
 msgstr[1] "%d টরেন্ট অপসারণ করা হবে কি?"
 
-#: ../gtk/dialogs.c:101
+#: ../gtk/dialogs.c:99
 #, c-format
 msgid "Delete this torrent's downloaded files?"
 msgid_plural "Delete these %d torrents' downloaded files?"
 msgstr[0] "%d টরেন্টের এই ডাউনলোডকৃত ফাইল মুছে ফেলা হবে কি?"
 msgstr[1] "%d টরেন্টের এই ডাউনলোডকৃত ফাইলগুলো মুছে ফেলা হবে কি?"
 
-#: ../gtk/dialogs.c:111
+#: ../gtk/dialogs.c:109
 msgid ""
 "Once removed, continuing the transfer will require the torrent file or "
 "magnet link."
@@ -778,147 +778,144 @@ msgid_plural ""
 "Once removed, continuing the transfers will require the torrent files or "
 "magnet links."
 msgstr[0] ""
-"একবার অপসারণ হয়ে গেলে, টরেন্ট ফাইল অথবা ম্যাগনেট লিঙ্ক প্রয়োজন হবে "
-"স্থানান্তকরন অব্যাহত করার জন্য।"
+"একবার অপসারণ হয়ে গেলে, টরেন্ট ফাইল অথবা ম্যাগনেট লিঙ্ক প্রয়োজন হবে স্থানান্তকরন "
+"অব্যাহত করার জন্য।"
 msgstr[1] ""
-"একবার অপসারণ হয়ে গেলে, টরেন্ট ফাইল অথবা ম্যাগনেট লিঙ্ক প্রয়োজন হবে "
-"স্থানান্তকরন অব্যাহত করার জন্য।"
+"একবার অপসারণ হয়ে গেলে, টরেন্ট ফাইল অথবা ম্যাগনেট লিঙ্ক প্রয়োজন হবে স্থানান্তকরন "
+"অব্যাহত করার জন্য।"
 
-#: ../gtk/dialogs.c:117
+#: ../gtk/dialogs.c:115
 msgid "This torrent has not finished downloading."
 msgid_plural "These torrents have not finished downloading."
 msgstr[0] "এই টরেন্ট ডাউনলোড শেষ হয়নি।"
 msgstr[1] "এই টরেন্ট ডাউনলোড শেষ হয়নি।"
 
-#: ../gtk/dialogs.c:123
+#: ../gtk/dialogs.c:121
 msgid "This torrent is connected to peers."
 msgid_plural "These torrents are connected to peers."
 msgstr[0] "এই টরেন্ট পীয়ারে সংযুক্ত।"
 msgstr[1] "টরেন্ট পীয়ারে সংযুক্ত।"
 
-#: ../gtk/dialogs.c:130
+#: ../gtk/dialogs.c:128
 msgid "One of these torrents is connected to peers."
 msgid_plural "Some of these torrents are connected to peers."
 msgstr[0] "এই টরেন্টের একটি পিয়ারের সাথে সংযুক্ত রয়েছে।"
 msgstr[1] "এই টরেন্টের কিছু পিয়ারের সাথে সংযুক্ত রয়েছে।"
 
-#: ../gtk/dialogs.c:137
+#: ../gtk/dialogs.c:135
 msgid "One of these torrents has not finished downloading."
 msgid_plural "Some of these torrents have not finished downloading."
 msgstr[0] "এই টরেন্টের একটি ডাউনলোড করা শেষ হয়নি।"
 msgstr[1] "এই টরেন্টের কিছু ডাউনলোড করা শেষ হয়নি।"
 
-#: ../gtk/file-list.c:616 ../gtk/util.c:483
+#: ../gtk/file-list.c:615 ../gtk/util.c:482
 msgid "High"
 msgstr "উচ্চ"
 
-#: ../gtk/file-list.c:617 ../gtk/util.c:484
+#: ../gtk/file-list.c:616 ../gtk/util.c:483
 msgid "Normal"
 msgstr "স্বাভাবিক"
 
-#: ../gtk/file-list.c:618 ../gtk/util.c:485
+#: ../gtk/file-list.c:617 ../gtk/util.c:484
 msgid "Low"
 msgstr "নিম্ন"
 
-#: ../gtk/file-list.c:936 ../gtk/msgwin.c:303
+#: ../gtk/file-list.c:813
+#, c-format
+msgid "Unable to rename file as \"%s\": %s"
+msgstr ""
+
+#: ../gtk/file-list.c:935 ../gtk/msgwin.c:302
 msgid "Name"
 msgstr "নাম"
 
 #. add "size" column
-#: ../gtk/file-list.c:953
+#: ../gtk/file-list.c:952
 msgid "Size"
 msgstr "আকার"
 
 #. add "progress" column
-#: ../gtk/file-list.c:968
+#: ../gtk/file-list.c:967
 msgid "Have"
 msgstr "আছে"
 
 #. add "enabled" column
-#: ../gtk/file-list.c:981
+#: ../gtk/file-list.c:980
 msgid "Download"
 msgstr "ডাউনলোড"
 
 #. add priority column
-#: ../gtk/file-list.c:997
+#: ../gtk/file-list.c:996
 msgid "Priority"
 msgstr "অগ্রাধিকার"
 
-#: ../gtk/filter.c:281 ../gtk/filter.c:588
+#: ../gtk/filter.c:280 ../gtk/filter.c:587
 msgid "All"
 msgstr "সব"
 
-#: ../gtk/tr-prefs.c:546 ../gtk/tr-prefs.c:1321
-msgid "Privacy"
-msgstr "গোপনীয়তা"
-
-#: ../gtk/filter.c:333
-msgid "Public"
-msgstr "প্রকাশ্য"
-
-#: ../gtk/filter.c:337
-msgid "Private"
-msgstr "ব্যক্তিগত"
-
-#: ../gtk/filter.c:590
+#: ../gtk/filter.c:589
 msgid "Active"
 msgstr "সক্রিয়"
 
-#: ../gtk/filter.c:595
+#: ../gtk/filter.c:594
 msgctxt "Verb"
 msgid "Verifying"
 msgstr "প্রমাণ করা"
 
-#: ../gtk/filter.c:596 ../gtk/msgwin.c:437 ../gtk/util.c:696
+#: ../gtk/filter.c:595 ../gtk/msgwin.c:436 ../gtk/util.c:695
 #, c-format
 msgid "Error"
 msgstr "ত্রুটি"
 
-#: ../gtk/filter.c:893
+#: ../gtk/filter.c:892
 #, c-format
 msgid "_Show:"
 msgstr "প্রদর্শন: (_S)"
 
-#: ../gtk/main.c:307
+#: ../gtk/filter.c:894
 #, c-format
-msgid "Error registering Transmission as x-scheme-handler/magnet handler: %s"
+msgid "_Show %'d of:"
 msgstr ""
-"x-scheme-handler/magnet handler: %s ত্রুটি হিসাবে ট্রান্সমিশন নিবন্ধন হবে"
 
-#: ../gtk/main.c:490
+#: ../gtk/main.c:325
+#, c-format
+msgid "Error registering Transmission as a %s handler: %s"
+msgstr ""
+
+#: ../gtk/main.c:488
 #, c-format
 msgid ""
 "Got signal %d; trying to shut down cleanly. Do it again if it gets stuck."
 msgstr ""
-"পরিচ্ছন্নভাবে বন্ধ করার চেষ্টা করতে সংকেত %d পেয়েছিলাম। এটি আবার করুন যদি "
-"এটি আটকে যায়।"
+"পরিচ্ছন্নভাবে বন্ধ করার চেষ্টা করতে সংকেত %d পেয়েছিলাম। এটি আবার করুন যদি এটি "
+"আটকে যায়।"
 
-#: ../gtk/main.c:623
+#: ../gtk/main.c:621
 msgid "Where to look for configuration files"
 msgstr "কনফিগারেশন ফাইল কোথায় অনুসন্ধান করা হবে"
 
-#: ../gtk/main.c:624
+#: ../gtk/main.c:622
 msgid "Start with all torrents paused"
 msgstr "সমস্ত স্হগিত টরেন্ট থেকে শুরু করুন"
 
-#: ../gtk/main.c:625
+#: ../gtk/main.c:623
 msgid "Start minimized in notification area"
 msgstr "বিজ্ঞপ্তি এলাকায় হ্রাস করা শুরু করুন"
 
-#: ../gtk/main.c:626
+#: ../gtk/main.c:624
 msgid "Show version number and exit"
 msgstr "সংস্করণ সংখ্যা প্রদর্শন করুন এবং প্রস্হান করুন"
 
-#: ../gtk/main.c:644 ../gtk/transmission-gtk.desktop.in.h:1
+#: ../gtk/main.c:642 ../gtk/transmission-gtk.desktop.in.h:1
 msgid "Transmission"
 msgstr "ট্রান্সমিশন"
 
 #. parse the command line
-#: ../gtk/main.c:647
+#: ../gtk/main.c:645
 msgid "[torrent files or urls]"
 msgstr "[torrent files or urls]"
 
-#: ../gtk/main.c:653
+#: ../gtk/main.c:651
 #, c-format
 msgid ""
 "%s\n"
@@ -927,57 +924,53 @@ msgstr ""
 "সহজলভ্য কমান্ড লাইন অপশনের পূর্ণ তালিকা দেখার জন্য %s\n"
 "Run '%s --help'.\n"
 
-#: ../gtk/main.c:730
+#: ../gtk/main.c:753
 msgid ""
-"Transmission is a file-sharing program. When you run a torrent, its data "
-"will be made available to others by means of upload. You and you alone are "
-"fully responsible for exercising proper judgement and abiding by your local "
-"laws."
+"Transmission is a file sharing program. When you run a torrent, its data "
+"will be made available to others by means of upload. Any content you share "
+"is your sole responsibility."
 msgstr ""
-"ট্রান্সমিশন একটি ফাইল শেয়ারিং প্রোগ্রাম। যখন আপনি একটি টরেন্ট প্রবাহ করবেন, "
-"এটির তথ্য অন্যের কাছে আপলোডের জন্য সহজলভ্য হবে। আপনি এবং শুধুমাত্র আপনিই "
-"সম্পূর্নরূপে দায়ী থাকবেন সঠিক রায় চর্চার জন্য এবং স্হানীয় আইন মেনে চলার জন্য।"
 
-#: ../gtk/main.c:732
-msgid "I _Accept"
-msgstr "আমি গ্রহণ করছি (_A)"
+#: ../gtk/main.c:755
+msgid "I _Agree"
+msgstr ""
 
-#: ../gtk/main.c:988
+#: ../gtk/main.c:986
 msgid "<b>Closing Connections</b>"
 msgstr "<b>সংযোগ বন্ধ করা</b>"
 
-#: ../gtk/main.c:992
+#: ../gtk/main.c:990
 msgid "Sending upload/download totals to tracker…"
 msgstr "ট্র্যাকার কে আপলোড/ডাউনলোড সম্পূর্ণ প্রেরণ করা হচ্ছে..."
 
-#: ../gtk/main.c:997
+#: ../gtk/main.c:995
 msgid "_Quit Now"
 msgstr "এখন প্রস্থান (_Q)"
 
-#: ../gtk/main.c:1058
+#: ../gtk/main.c:1056
 msgid "Couldn't add corrupt torrent"
 msgid_plural "Couldn't add corrupt torrents"
 msgstr[0] "বিকৃত টরেন্ট যোগ করা যায়নি"
 msgstr[1] "বিকৃত টরেন্ট যোগ করা যায়নি"
 
-#: ../gtk/main.c:1065
+#: ../gtk/main.c:1063
 msgid "Couldn't add duplicate torrent"
 msgid_plural "Couldn't add duplicate torrents"
 msgstr[0] "অনুরূপ টরেন্ট যোগ করা যায়নি"
 msgstr[1] "অনুরূপ টরেন্ট যোগ করা যায়নি"
 
-#: ../gtk/main.c:1373
+#: ../gtk/main.c:1372
 msgid "A fast and easy BitTorrent client"
 msgstr "একটি দ্রুত এবং সহজ BitTorrent ক্লায়েন্ট"
 
-#: ../gtk/main.c:1374
+#: ../gtk/main.c:1373
 msgid "Copyright (c) The Transmission Project"
 msgstr "Copyright (c) ট্রান্সমিশন প্রকল্প"
 
 #. Translators: translate "translator-credits" as your name
 #. to have it appear in the credits in the "About"
 #. dialog
-#: ../gtk/main.c:1380
+#: ../gtk/main.c:1379
 msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
@@ -992,283 +985,283 @@ msgstr ""
 "  Zenat Rahnuma https://launchpad.net/~zenat\n"
 "  bijoy_rebel https://launchpad.net/~oneof-rebel"
 
-#: ../gtk/makemeta-ui.c:72
+#: ../gtk/makemeta-ui.c:71
 #, c-format
 msgid "Creating \"%s\""
 msgstr "তৈরি করা হচ্ছে \"%s\""
 
-#: ../gtk/makemeta-ui.c:74
+#: ../gtk/makemeta-ui.c:73
 #, c-format
 msgid "Created \"%s\"!"
 msgstr "তৈরি করা হয়েছে \"%s\"!"
 
-#: ../gtk/makemeta-ui.c:76
+#: ../gtk/makemeta-ui.c:75
 #, c-format
 msgid "Error: invalid announce URL \"%s\""
 msgstr "ত্রুটি:অকার্যকর প্রকাশ করা হয় URL \"%s\""
 
-#: ../gtk/makemeta-ui.c:78
+#: ../gtk/makemeta-ui.c:77
 #, c-format
 msgid "Cancelled"
 msgstr "বাতিল করা হয়েছে"
 
-#: ../gtk/makemeta-ui.c:80
+#: ../gtk/makemeta-ui.c:79
 #, c-format
 msgid "Error reading \"%s\": %s"
 msgstr "পড়ায় ত্রুটি \"%s\": %s"
 
-#: ../gtk/makemeta-ui.c:82
+#: ../gtk/makemeta-ui.c:81
 #, c-format
 msgid "Error writing \"%s\": %s"
 msgstr "ত্রুটি লিখন \"%s\": %s"
 
 #. how much data we've scanned through to generate checksums
-#: ../gtk/makemeta-ui.c:103
+#: ../gtk/makemeta-ui.c:102
 #, c-format
 msgid "Scanned %s"
 msgstr "স্ক্যানকৃ্ত %s"
 
-#: ../gtk/makemeta-ui.c:171 ../gtk/makemeta-ui.c:434
+#: ../gtk/makemeta-ui.c:170 ../gtk/makemeta-ui.c:433
 msgid "New Torrent"
 msgstr "নতুন টরেন্ট"
 
-#: ../gtk/makemeta-ui.c:187
+#: ../gtk/makemeta-ui.c:186
 msgid "Creating torrent…"
 msgstr "টরেন্ট তৈরি করা হচ্ছে..."
 
-#: ../gtk/makemeta-ui.c:299
+#: ../gtk/makemeta-ui.c:298
 msgid "No source selected"
 msgstr "কোন উৎস নির্বাচিত হয়নি"
 
-#: ../gtk/makemeta-ui.c:305
+#: ../gtk/makemeta-ui.c:304
 #, c-format
 msgid "%1$s; %2$'d File"
 msgid_plural "%1$s; %2$'d Files"
 msgstr[0] "%1$s; %2$'d ফাইল"
 msgstr[1] "%1$s; %2$'d ফাইল"
 
-#: ../gtk/makemeta-ui.c:312
+#: ../gtk/makemeta-ui.c:311
 #, c-format
 msgid "%1$'d Piece @ %2$s"
 msgid_plural "%1$'d Pieces @ %2$s"
 msgstr[0] "%1$'d Piece @ %2$s"
 msgstr[1] "%1$'d Pieces @ %2$s"
 
-#: ../gtk/makemeta-ui.c:448
+#: ../gtk/makemeta-ui.c:447
 msgid "Sa_ve to:"
 msgstr "যেখানে সংরক্ষন করা হবে:"
 
-#: ../gtk/makemeta-ui.c:454
+#: ../gtk/makemeta-ui.c:453
 msgid "Source F_older:"
 msgstr "উত্স ফোল্ডার: (_o)"
 
-#: ../gtk/makemeta-ui.c:466
+#: ../gtk/makemeta-ui.c:465
 msgid "Source _File:"
 msgstr "উত্স ফাইল: (_F)"
 
-#: ../gtk/makemeta-ui.c:478
+#: ../gtk/makemeta-ui.c:477
 msgid "<i>No source selected</i>"
 msgstr "<i>কোন উৎস নির্বাচিত হয়নি</i>"
 
-#: ../gtk/makemeta-ui.c:482
+#: ../gtk/makemeta-ui.c:481
 msgid "Properties"
 msgstr "বৈশিষ্ট্যাবলী"
 
-#: ../gtk/makemeta-ui.c:484
+#: ../gtk/makemeta-ui.c:483
 msgid "_Trackers:"
 msgstr "ট্র্যাকার: (_T)"
 
-#: ../gtk/makemeta-ui.c:506
+#: ../gtk/makemeta-ui.c:505
 msgid "Co_mment:"
 msgstr "মন্তব্য: (_m)"
 
-#: ../gtk/makemeta-ui.c:515
+#: ../gtk/makemeta-ui.c:514
 msgid "_Private torrent"
 msgstr "টরেন্ট ব্যক্তিগত (_P)"
 
-#: ../gtk/msgwin.c:142
+#: ../gtk/msgwin.c:141
 #, c-format
 msgid "Couldn't save \"%s\""
 msgstr "সংরক্ষণ করা যাচ্ছেনা \"%s\""
 
-#: ../gtk/msgwin.c:203
+#: ../gtk/msgwin.c:202
 msgid "Save Log"
 msgstr "লগ সংরক্ষণ"
 
-#: ../gtk/msgwin.c:298
+#: ../gtk/msgwin.c:297
 msgid "Time"
 msgstr "সময়"
 
-#: ../gtk/msgwin.c:308
+#: ../gtk/msgwin.c:307
 msgid "Message"
 msgstr "বার্তা"
 
-#: ../gtk/msgwin.c:439
+#: ../gtk/msgwin.c:438
 msgid "Debug"
 msgstr "ডিবাগ"
 
-#: ../gtk/msgwin.c:465
+#: ../gtk/msgwin.c:464
 msgid "Message Log"
 msgstr "বার্তার লগ"
 
-#: ../gtk/msgwin.c:500
+#: ../gtk/msgwin.c:499
 msgid "Level"
 msgstr "স্তর"
 
-#: ../gtk/notify.c:214
+#: ../gtk/notify.c:213
 msgid "Open File"
 msgstr "ফাইল খুলুন"
 
-#: ../gtk/notify.c:219
+#: ../gtk/notify.c:218
 msgid "Open Folder"
 msgstr "ফোল্ডার খুলুন"
 
-#: ../gtk/notify.c:227
+#: ../gtk/notify.c:226
 msgid "Torrent Complete"
 msgstr "টরেন্ট সম্পন্ন"
 
-#: ../gtk/notify.c:249
+#: ../gtk/notify.c:248
 msgid "Torrent Added"
 msgstr "টরেন্ট যোগ করা হয়েছে"
 
-#: ../gtk/open-dialog.c:250
+#: ../gtk/open-dialog.c:249
 msgid "Torrent files"
 msgstr "টরেন্ট ফাইলসমুহ"
 
-#: ../gtk/open-dialog.c:255
+#: ../gtk/open-dialog.c:254
 msgid "All files"
 msgstr "সব ফাইল"
 
 #. make the dialog
-#: ../gtk/open-dialog.c:280
+#: ../gtk/open-dialog.c:279
 msgid "Torrent Options"
 msgstr "টরেন্ট অপশনসমূহ"
 
-#: ../gtk/open-dialog.c:302 ../gtk/tr-prefs.c:296
+#: ../gtk/open-dialog.c:301 ../gtk/tr-prefs.c:295
 msgid "Mo_ve .torrent file to the trash"
 msgstr ".torrent ফাইলটি ট্র্যাশে সরাও (_v)"
 
-#: ../gtk/open-dialog.c:304
+#: ../gtk/open-dialog.c:303
 msgid "_Start when added"
 msgstr "যুক্ত করা মাত্র শুরু কর (_S)"
 
 #. "torrent file" row
-#: ../gtk/open-dialog.c:320
+#: ../gtk/open-dialog.c:319
 msgid "_Torrent file:"
 msgstr "টরেন্ট ফাইল(_T):"
 
-#: ../gtk/open-dialog.c:323
+#: ../gtk/open-dialog.c:322
 msgid "Select Source File"
 msgstr "সোর্স ফাইল নির্বাচন করুন"
 
-#: ../gtk/open-dialog.c:335
+#: ../gtk/open-dialog.c:334
 msgid "_Destination folder:"
 msgstr "গন্তব্যের ফোল্ডার (_D):"
 
-#: ../gtk/open-dialog.c:338
+#: ../gtk/open-dialog.c:337
 msgid "Select Destination Folder"
 msgstr "গন্তব্য ফোল্ডারটি নির্বাচন করুন"
 
-#: ../gtk/open-dialog.c:444
+#: ../gtk/open-dialog.c:443
 msgid "Open a Torrent"
 msgstr "টরেন্ট খোলা"
 
-#: ../gtk/open-dialog.c:460
+#: ../gtk/open-dialog.c:459
 msgid "Show _options dialog"
 msgstr "অপশন ডায়ালগ প্রদর্শন করুন (_o)"
 
-#: ../gtk/open-dialog.c:509
+#: ../gtk/open-dialog.c:508
 msgid "Open URL"
 msgstr "URL খুলুন"
 
-#: ../gtk/open-dialog.c:522
+#: ../gtk/open-dialog.c:521
 msgid "Open torrent from URL"
 msgstr "URL থেকে টরেন্ট খুলুন"
 
-#: ../gtk/open-dialog.c:527
+#: ../gtk/open-dialog.c:526
 msgid "_URL"
 msgstr "ইউআরএল (_U)"
 
-#: ../gtk/relocate.c:61
+#: ../gtk/relocate.c:60
 #, c-format
 msgid "Moving \"%s\""
 msgstr "সরানো হচ্ছে \"%s\""
 
-#: ../gtk/relocate.c:83
+#: ../gtk/relocate.c:82
 msgid "Couldn't move torrent"
 msgstr "টরেন্ট সরানো যাচ্ছেনা"
 
-#: ../gtk/relocate.c:118
+#: ../gtk/relocate.c:117
 msgid "This may take a moment…"
 msgstr "এটি একটি মুহূর্ত সময় নিতে পারে..."
 
-#: ../gtk/relocate.c:149 ../gtk/relocate.c:169
+#: ../gtk/relocate.c:148 ../gtk/relocate.c:168
 msgid "Set Torrent Location"
 msgstr "টরেন্ট অবস্থান নির্ধারণ করুন"
 
-#: ../gtk/relocate.c:165
+#: ../gtk/relocate.c:164
 msgid "Location"
 msgstr "অবস্থান"
 
-#: ../gtk/relocate.c:172
+#: ../gtk/relocate.c:171
 msgid "Torrent _location:"
 msgstr "টরেন্টের অবস্থান: (_l)"
 
-#: ../gtk/relocate.c:173
+#: ../gtk/relocate.c:172
 msgid "_Move from the current folder"
 msgstr "বর্তমান ফোল্ডার থেকে স্থানান্তর করুন (_M)"
 
-#: ../gtk/relocate.c:176
+#: ../gtk/relocate.c:175
 msgid "Local data is _already there"
 msgstr "স্হানীয় উপাত্ত ইতিমধ্যে সেখানে আছে (_a)"
 
-#: ../gtk/stats.c:72 ../gtk/stats.c:167
+#: ../gtk/stats.c:71 ../gtk/stats.c:166
 #, c-format
 msgid "Started %'d time"
 msgid_plural "Started %'d times"
 msgstr[0] "%'d সময় শুরু"
 msgstr[1] "%'d সময় শুরু"
 
-#: ../gtk/stats.c:96
+#: ../gtk/stats.c:95
 msgid "Reset your statistics?"
 msgstr "আপনার পরিসংখ্যান পুনঃনির্ধারণ করা হবে কি?"
 
-#: ../gtk/stats.c:97
+#: ../gtk/stats.c:96
 msgid ""
 "These statistics are for your information only. Resetting them doesn't "
 "affect the statistics logged by your BitTorrent trackers."
 msgstr ""
-"শুধুমাত্র আপনার অবগতির জন্য এই পরিসংখ্যান। পরিসংখ্যানটি আপনার BitTorrent "
-"ট্র্যাকারের দ্বারা লগকৃত যা পুনর্বিন্যস্ত হলেও প্রভাব পরবে না।"
+"শুধুমাত্র আপনার অবগতির জন্য এই পরিসংখ্যান। পরিসংখ্যানটি আপনার BitTorrent ট্র্যাকারের "
+"দ্বারা লগকৃত যা পুনর্বিন্যস্ত হলেও প্রভাব পরবে না।"
 
-#: ../gtk/stats.c:108 ../gtk/stats.c:136
+#: ../gtk/stats.c:107 ../gtk/stats.c:135
 msgid "_Reset"
 msgstr "পুনঃনির্ধারণ (_R)"
 
-#: ../gtk/stats.c:133 ../gtk/tr-window.c:730
+#: ../gtk/stats.c:132 ../gtk/tr-window.c:728
 msgid "Statistics"
 msgstr "পরিসংখ্যান"
 
-#: ../gtk/stats.c:148
+#: ../gtk/stats.c:147
 msgid "Current Session"
 msgstr "বর্তমান সেশন"
 
-#: ../gtk/stats.c:160 ../gtk/stats.c:182
+#: ../gtk/stats.c:159 ../gtk/stats.c:181
 msgid "Ratio:"
 msgstr "সম্পর্ক"
 
-#: ../gtk/stats.c:164 ../gtk/stats.c:186
+#: ../gtk/stats.c:163 ../gtk/stats.c:185
 msgid "Duration:"
 msgstr "স্থিতিকাল:"
 
-#: ../gtk/stats.c:166
+#: ../gtk/stats.c:165
 msgid "Total"
 msgstr "সর্বমোট"
 
 #. %1$s is how much we've got,
 #. %2$s is how much we'll have when done,
 #. %3$s%% is a percentage of the two
-#: ../gtk/torrent-cell-renderer.c:59
+#: ../gtk/torrent-cell-renderer.c:58
 #, c-format
 msgid "%1$s of %2$s (%3$s%%)"
 msgstr "%1$s of %2$s (%3$s%%)"
@@ -1279,7 +1272,7 @@ msgstr "%1$s of %2$s (%3$s%%)"
 #. %4$s is how much we've uploaded,
 #. %5$s is our upload-to-download ratio,
 #. %6$s is the ratio we want to reach before we stop uploading
-#: ../gtk/torrent-cell-renderer.c:75
+#: ../gtk/torrent-cell-renderer.c:74
 #, c-format
 msgid "%1$s of %2$s (%3$s%%), uploaded %4$s (Ratio: %5$s Goal: %6$s)"
 msgstr "%1$s of %2$s (%3$s%%), uploaded %4$s (Ratio: %5$s Goal: %6$s)"
@@ -1289,7 +1282,7 @@ msgstr "%1$s of %2$s (%3$s%%), uploaded %4$s (Ratio: %5$s Goal: %6$s)"
 #. %3$s%% is a percentage of the two,
 #. %4$s is how much we've uploaded,
 #. %5$s is our upload-to-download ratio
-#: ../gtk/torrent-cell-renderer.c:91
+#: ../gtk/torrent-cell-renderer.c:90
 #, c-format
 msgid "%1$s of %2$s (%3$s%%), uploaded %4$s (Ratio: %5$s)"
 msgstr "%1$s of %2$s (%3$s%%), uploaded %4$s (Ratio: %5$s)"
@@ -1298,7 +1291,7 @@ msgstr "%1$s of %2$s (%3$s%%), uploaded %4$s (Ratio: %5$s)"
 #. %2$s is how much we've uploaded,
 #. %3$s is our upload-to-download ratio,
 #. %4$s is the ratio we want to reach before we stop uploading
-#: ../gtk/torrent-cell-renderer.c:108
+#: ../gtk/torrent-cell-renderer.c:107
 #, c-format
 msgid "%1$s, uploaded %2$s (Ratio: %3$s Goal: %4$s)"
 msgstr "%1$s, uploaded %2$s (Ratio: %3$s Goal: %4$s)"
@@ -1306,81 +1299,95 @@ msgstr "%1$s, uploaded %2$s (Ratio: %3$s Goal: %4$s)"
 #. %1$s is the torrent's total size,
 #. %2$s is how much we've uploaded,
 #. %3$s is our upload-to-download ratio
-#: ../gtk/torrent-cell-renderer.c:120
+#: ../gtk/torrent-cell-renderer.c:119
 #, c-format
 msgid "%1$s, uploaded %2$s (Ratio: %3$s)"
 msgstr "%1$s, uploaded %2$s (Ratio: %3$s)"
 
-#: ../gtk/torrent-cell-renderer.c:134
+#: ../gtk/torrent-cell-renderer.c:133
 msgid "Remaining time unknown"
 msgstr "অবশিষ্ট সময় অজানা"
 
 #. time remaining
-#: ../gtk/torrent-cell-renderer.c:140
+#: ../gtk/torrent-cell-renderer.c:139
 #, c-format
 msgid "%s remaining"
 msgstr "%s বাকী আছে"
 
-#. 1==down arrow, 2==down speed, 3==up arrow, 4==down speed
-#: ../gtk/torrent-cell-renderer.c:167
+#. down speed, down symbol, up speed, up symbol
+#: ../gtk/torrent-cell-renderer.c:164
 #, c-format
-msgid "%1$s %2$s, %3$s %4$s"
-msgstr "%1$s %2$s, %3$s %4$s"
+msgid "%1$s %2$s  %3$s %4$s"
+msgstr ""
 
-#. bandwidth speed + unicode arrow
-#: ../gtk/torrent-cell-renderer.c:172 ../gtk/torrent-cell-renderer.c:176
+#. up speed, up symbol
+#: ../gtk/torrent-cell-renderer.c:176
 #, c-format
-msgid "%1$s %2$s"
-msgstr "%1$s %2$s"
+msgid "%1$s  %2$s"
+msgstr ""
 
-#: ../gtk/torrent-cell-renderer.c:183
+#: ../gtk/torrent-cell-renderer.c:182
 msgid "Stalled"
 msgstr "স্হগিত"
 
-#: ../gtk/tr-icon.c:61
-msgid "Idle"
-msgstr "নিষ্ক্রিয়"
-
-#: ../gtk/torrent-cell-renderer.c:216
+#: ../gtk/torrent-cell-renderer.c:215
 #, c-format
 msgid "Verifying local data (%.1f%% tested)"
 msgstr "স্হানীয় উপাত্ত যাচাই করা হচ্ছে (%.1f%% tested)"
 
-#: ../gtk/torrent-cell-renderer.c:222
-#, c-format
-msgid "Ratio %s"
-msgstr "অনুপাত %s"
-
-#: ../gtk/torrent-cell-renderer.c:246
+#: ../gtk/torrent-cell-renderer.c:245
 #, c-format
 msgid "Tracker gave a warning: \"%s\""
 msgstr "ট্র্যাকার একটি সতর্কবানী দিয়েছেন: \"%s\""
 
-#: ../gtk/torrent-cell-renderer.c:247
+#: ../gtk/torrent-cell-renderer.c:246
 #, c-format
 msgid "Tracker gave an error: \"%s\""
 msgstr "ট্র্যাকার একটি ত্রুটি দিয়েছেন: \"%s\""
 
-#: ../gtk/torrent-cell-renderer.c:248
+#: ../gtk/torrent-cell-renderer.c:247
 #, c-format
 msgid "Error: %s"
 msgstr "ত্রুটি: %s"
 
-#: ../gtk/torrent-cell-renderer.c:266
+#. Downloading metadata from 2 peer (s)(50% done)
+#: ../gtk/torrent-cell-renderer.c:267
 #, c-format
-msgid "Downloading from %1$'d of %2$'d connected peer"
-msgid_plural "Downloading from %1$'d of %2$'d connected peers"
-msgstr[0] "সংযুক্ত পীয়ারের %2$'d ডাউনলোড করা হয়েছে %1$'d থেকে"
-msgstr[1] "সংযুক্ত পীয়ারের %2$'d ডাউনলোড করা হয়েছে %1$'d থেকে"
+msgid "Downloading metadata from %1$'d %2$s (%3$d%% done)"
+msgstr ""
 
+#: ../gtk/torrent-cell-renderer.c:269 ../gtk/torrent-cell-renderer.c:278
+#: ../gtk/torrent-cell-renderer.c:295
+msgid "peer"
+msgid_plural "peers"
+msgstr[0] ""
+msgstr[1] ""
+
+#. Downloading from 2 of 3 peer (s) and 2 webseed (s)
 #: ../gtk/torrent-cell-renderer.c:275
 #, c-format
-msgid "Downloading metadata from %1$'d peer (%2$d%% done)"
-msgid_plural "Downloading metadata from %1$'d peers (%2$d%% done)"
-msgstr[0] "পিয়ার %1$'d থেকে মেটাডাটা ডাউনলোড করা হচ্ছে (%2$d%% done)"
-msgstr[1] "পিয়ার %1$'d থেকে মেটাডাটা ডাউনলোড করা হচ্ছে (%2$d%% done)"
+msgid "Downloading from %1$'d of %2$'d %3$s and %4$'d %5$s"
+msgstr ""
 
-#: ../gtk/torrent-cell-renderer.c:303
+#: ../gtk/torrent-cell-renderer.c:280 ../gtk/torrent-cell-renderer.c:287
+msgid "web seed"
+msgid_plural "web seeds"
+msgstr[0] ""
+msgstr[1] ""
+
+#. Downloading from 3 web seed (s)
+#: ../gtk/torrent-cell-renderer.c:285
+#, c-format
+msgid "Downloading from %1$'d %2$s"
+msgstr ""
+
+#. Downloading from 2 of 3 peer (s)
+#: ../gtk/torrent-cell-renderer.c:292
+#, c-format
+msgid "Downloading from %1$'d of %2$'d %3$s"
+msgstr ""
+
+#: ../gtk/torrent-cell-renderer.c:302
 #, c-format
 msgid "Seeding to %1$'d of %2$'d connected peer"
 msgid_plural "Seeding to %1$'d of %2$'d connected peers"
@@ -1399,39 +1406,51 @@ msgstr "ট্রান্সমিশন BitTorrent ক্লায়েন্ট
 msgid "Download and share files over BitTorrent"
 msgstr "সমস্ত BitTorrent এ ফাইল ডাউনলোড এবং অংশগ্রহন করুন"
 
-#: ../gtk/tr-core.c:1218
+#: ../gtk/transmission-gtk.desktop.in.h:5
+msgid "Start Transmission with All Torrents Paused"
+msgstr ""
+
+#: ../gtk/transmission-gtk.desktop.in.h:6
+msgid "Start Transmission Minimized"
+msgstr ""
+
+#: ../gtk/tr-core.c:1216
 #, c-format
 msgid "Couldn't read \"%s\": %s"
 msgstr "পড়তে পারা যাচ্ছে না \"%s\": %s"
 
-#: ../gtk/tr-core.c:1314
+#: ../gtk/tr-core.c:1312
 #, c-format
 msgid "Skipping unknown torrent \"%s\""
 msgstr "অজানা টরেন্ট বাদ দিয়ে যাওয়া হচ্ছে \"%s\""
 
-#: ../gtk/tr-core.c:1568
+#: ../gtk/tr-core.c:1566
 msgid "Inhibiting desktop hibernation"
 msgstr "ডেস্কটপ সুপ্তকরণ সংযত করা হচ্ছে"
 
-#: ../gtk/tr-core.c:1572
+#: ../gtk/tr-core.c:1570
 #, c-format
 msgid "Couldn't inhibit desktop hibernation: %s"
 msgstr "ডেস্কটপ সুপ্তকরণ সংযত করা যায়নি: %s"
 
-#: ../gtk/tr-core.c:1606
+#: ../gtk/tr-core.c:1604
 msgid "Allowing desktop hibernation"
 msgstr "ডেস্কটপ সুপ্তকরণ অনুমোদিত হচ্ছে"
 
-#: ../gtk/tr-icon.c:86 ../gtk/tr-icon.c:102
+#: ../gtk/tr-icon.c:60
+msgid "Idle"
+msgstr "নিষ্ক্রিয়"
+
+#: ../gtk/tr-icon.c:77 ../gtk/tr-icon.c:93
 #, c-format
-msgid "(Limit: %s)"
-msgstr "(সীমা: %s)"
+msgid " (Limit: %s)"
+msgstr ""
 
 #. %1$s: current upload speed
 #. * %2$s: current upload limit, if any
 #. * %3$s: current download speed
 #. * %4$s: current download limit, if any
-#: ../gtk/tr-icon.c:101
+#: ../gtk/tr-icon.c:100
 #, c-format
 msgid ""
 "Transmission\n"
@@ -1442,946 +1461,959 @@ msgstr ""
 "Up: %1$s %2$s\n"
 "Down: %3$s %4$s"
 
-#: ../gtk/tr-prefs.c:301
-msgid "Save to _Location:"
-msgstr "অবস্থানে সংরক্ষণ করুন (_L):"
-
-#: ../gtk/tr-prefs.c:275
-msgid "Queue"
-msgstr "সারি"
-
-#: ../gtk/tr-prefs.c:277
-msgid "Maximum active _downloads:"
-msgstr "সর্বাধিক সক্রিয় ডাউনলোডসমূহ (_d):"
-
-#: ../gtk/tr-prefs.c:281
-msgid "Downloads sharing data in the last N minutes are _active:"
-msgstr ""
-"শেষ এন মিনিটের মধ্যে ডাউনলোডের অংশগ্রহন করা উপাত্ত সক্রিয় হয়েছে (_a):"
-
-#: ../gtk/tr-prefs.c:319 ../libtransmission/torrent.c:2010
-msgid "Incomplete"
-msgstr "অসম্পূর্ণ"
-
-#: ../gtk/tr-prefs.c:321
-msgid "Append \"._part\" to incomplete files' names"
-msgstr "অসম্পূর্ণ ফাইলের নামের পরিশেষে \"._part\" যোগ করুন"
-
-#: ../gtk/tr-prefs.c:325
-msgid "Keep _incomplete torrents in:"
-msgstr "অস্পূর্ণ টরেন্ট ভিতরে রাখুন (_i):"
-
-#: ../gtk/tr-prefs.c:299
-msgid "Call _script when torrent is completed:"
-msgstr "স্ক্রিপ্ট কল করুন যখন টরেন্ট শেষ হবে (_s):"
-
-#: ../gtk/tr-prefs.c:279
+#: ../gtk/tr-prefs.c:278
 msgctxt "Gerund"
 msgid "Adding"
 msgstr "যোগ করা হচ্ছে"
 
-#: ../gtk/tr-prefs.c:339
-msgid "Automatically _add torrents from:"
-msgstr "স্বয়ংক্রিয়ভাবে টরেন্ট থেকে যোগ করুন (_a):"
+#: ../gtk/tr-prefs.c:280
+msgid "Automatically add .torrent files _from:"
+msgstr ""
 
-#: ../gtk/tr-prefs.c:1319
-msgctxt "Gerund"
-msgid "Seeding"
-msgstr "সীড করা হচ্ছে"
+#: ../gtk/tr-prefs.c:287
+msgid "Show the Torrent Options _dialog"
+msgstr ""
 
-#: ../gtk/tr-prefs.c:358
+#: ../gtk/tr-prefs.c:291
+msgid "_Start added torrents"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:300
+msgid "Save to _Location:"
+msgstr "অবস্থানে সংরক্ষণ করুন (_L):"
+
+#: ../gtk/tr-prefs.c:307
+msgid "Download Queue"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:309
+msgid "Ma_ximum active downloads:"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:313
+msgid "Downloads sharing data in the last _N minutes are active:"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:318 ../libtransmission/torrent.c:2027
+msgid "Incomplete"
+msgstr "অসম্পূর্ণ"
+
+#: ../gtk/tr-prefs.c:320
+msgid "Append \"._part\" to incomplete files' names"
+msgstr "অসম্পূর্ণ ফাইলের নামের পরিশেষে \"._part\" যোগ করুন"
+
+#: ../gtk/tr-prefs.c:324
+msgid "Keep _incomplete torrents in:"
+msgstr "অস্পূর্ণ টরেন্ট ভিতরে রাখুন (_i):"
+
+#: ../gtk/tr-prefs.c:331
+msgid "Call scrip_t when torrent is completed:"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:355
+msgid "Limits"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:357
 msgid "Stop seeding at _ratio:"
 msgstr "অনুপাতে সীডিং বন্ধ করুন (_r):"
 
-#: ../gtk/tr-prefs.c:365
+#: ../gtk/tr-prefs.c:364
 msgid "Stop seeding if idle for _N minutes:"
 msgstr "এন মিনিটের জন্য নিস্ক্রিয় থাকলে সীড করা বন্ধ করুন (_N):"
 
-#: ../gtk/tr-prefs.c:388 ../gtk/tr-prefs.c:1325
+#: ../gtk/tr-prefs.c:387 ../gtk/tr-prefs.c:1324
 msgid "Desktop"
 msgstr "ডেস্কটপ"
 
-#: ../gtk/tr-prefs.c:390
+#: ../gtk/tr-prefs.c:389
 msgid "_Inhibit hibernation when torrents are active"
 msgstr "সুপ্তকরণ সংযত করুন যখন টরেন্ট সক্রিয় থাকবে (_I)"
 
-#: ../gtk/tr-prefs.c:394
+#: ../gtk/tr-prefs.c:393
 msgid "Show Transmission icon in the _notification area"
 msgstr "ঘোষণা ক্ষেত্রে ট্রান্সমিশন অইকন প্রদর্শন করুন (_n)"
 
-#: ../gtk/tr-prefs.c:399
+#: ../gtk/tr-prefs.c:398
 msgid "Notification"
 msgstr "ঘোষণা"
 
-#: ../gtk/tr-prefs.c:401
+#: ../gtk/tr-prefs.c:400
 msgid "Show a notification when torrents are a_dded"
 msgstr "একটি ঘোষণা প্রদর্শন করুন যখন টরেন্ট সংযুক্ত করা হয় (_d)"
 
-#: ../gtk/tr-prefs.c:405
+#: ../gtk/tr-prefs.c:404
 msgid "Show a notification when torrents _finish"
 msgstr "একটি ঘোষণা প্রদর্শন করুন যখন টরেন্ট সম্পন্ন হয় (_f)"
 
-#: ../gtk/tr-prefs.c:409
+#: ../gtk/tr-prefs.c:408
 msgid "Play a _sound when torrents finish"
 msgstr "একটি শব্দ প্লে করুন যখন টরেন্ট সম্পন্ন হয় (_s)"
 
-#: ../gtk/tr-prefs.c:437
+#: ../gtk/tr-prefs.c:436
 #, c-format
 msgid "Blocklist contains %'d rule"
 msgid_plural "Blocklist contains %'d rules"
 msgstr[0] "Blocklist এ %'d নিয়ম রয়েছে"
 msgstr[1] "Blocklist এ %'d নিয়ম রয়েছে"
 
-#: ../gtk/tr-prefs.c:471
+#: ../gtk/tr-prefs.c:470
 #, c-format
 msgid "Blocklist has %'d rule."
 msgid_plural "Blocklist has %'d rules."
 msgstr[0] "Blocklist এ %'d নিয়ম আছে।"
 msgstr[1] "Blocklist এ %'d নিয়ম আছে।"
 
-#: ../gtk/tr-prefs.c:475
+#: ../gtk/tr-prefs.c:474
 msgid "<b>Update succeeded!</b>"
 msgstr "<b>সাফল্যের সাথে হালনাগাদ করা হয়েছে!</b>"
 
-#: ../gtk/tr-prefs.c:475
+#: ../gtk/tr-prefs.c:474
 msgid "<b>Unable to update.</b>"
 msgstr "<b>হালনাগাদ করতে অক্ষম।</b>"
 
-#: ../gtk/tr-prefs.c:490
+#: ../gtk/tr-prefs.c:489
 msgid "Update Blocklist"
 msgstr "Blocklist হালনাগাদ করুন"
 
-#: ../gtk/tr-prefs.c:492
+#: ../gtk/tr-prefs.c:491
 msgid "Getting new blocklist…"
 msgstr "নতুন ব্লক তালিকা প্রাপ্ত হচ্ছে..."
 
-#: ../gtk/tr-prefs.c:520
+#: ../gtk/tr-prefs.c:519
 msgid "Allow encryption"
 msgstr "এনক্রিপশন অনুমতি"
 
-#: ../gtk/tr-prefs.c:521
+#: ../gtk/tr-prefs.c:520
 msgid "Prefer encryption"
 msgstr "এনক্রিপশন উপস্থাপিত করা"
 
-#: ../gtk/tr-prefs.c:522
+#: ../gtk/tr-prefs.c:521
 msgid "Require encryption"
 msgstr "এনক্রিপশন প্রয়োজন"
 
-#: ../gtk/tr-prefs.c:553
-msgid "Blocklist"
-msgstr "ব্লক তালিকা"
+#: ../gtk/tr-prefs.c:545 ../gtk/tr-prefs.c:1320
+msgid "Privacy"
+msgstr "গোপনীয়তা"
 
-#: ../gtk/tr-prefs.c:555
-msgid "Enable _blocklist:"
-msgstr "ব্লক তালিকা সক্রিয় (_b)"
-
-#: ../gtk/tr-prefs.c:569
-msgid "_Update"
-msgstr "হালনাগাদ (_U)"
-
-#: ../gtk/tr-prefs.c:579
-msgid "Enable _automatic updates"
-msgstr "স্বয়ংক্রিয় হালনাগাদ সক্রিয়"
-
-#: ../gtk/tr-prefs.c:548
+#: ../gtk/tr-prefs.c:547
 msgid "_Encryption mode:"
 msgstr "এনক্রিপশন মোড (_E)"
 
-#: ../gtk/tr-prefs.c:1232
-msgid "Use PE_X to find more peers"
-msgstr "আরও পিয়ার খুঁজতে PE_X ব্যবহার করুন (_X)"
+#: ../gtk/tr-prefs.c:552
+msgid "Blocklist"
+msgstr "ব্লক তালিকা"
 
-#: ../gtk/tr-prefs.c:1234
-msgid ""
-"PEX is a tool for exchanging peer lists with the peers you're connected to."
+#: ../gtk/tr-prefs.c:554
+msgid "Enable _blocklist:"
+msgstr "ব্লক তালিকা সক্রিয় (_b)"
+
+#: ../gtk/tr-prefs.c:568
+msgid "_Update"
+msgstr "হালনাগাদ (_U)"
+
+#: ../gtk/tr-prefs.c:578
+msgid "Enable _automatic updates"
+msgstr "স্বয়ংক্রিয় হালনাগাদ সক্রিয়"
+
+#: ../gtk/tr-prefs.c:796
+msgid "Remote Control"
 msgstr ""
-"আপনি যে পিয়ারের সাথে সংযুক্ত আছেন সেই পিয়ারের সাথে বিনিময়ের জন্য PEX হল একটি "
-"টুল।"
-
-#: ../gtk/tr-prefs.c:1238
-msgid "Use _DHT to find more peers"
-msgstr "আরও পিয়ার খোঁজার জন্য ব্যবহার করুন DHT (_D)"
-
-#: ../gtk/tr-prefs.c:1240
-msgid "DHT is a tool for finding peers without a tracker."
-msgstr "ট্র্যাকার ব্যতীত একটি টুল অনুসন্ধানের জন্য DHT একটি টুল।"
-
-#: ../gtk/tr-prefs.c:1244
-msgid "Use _Local Peer Discovery to find more peers"
-msgstr "আরও পিয়ার অনুসন্ধানের জন্য Local Peer Discovery ব্যবহার করুন (_L)"
-
-#: ../gtk/tr-prefs.c:1246
-msgid "LPD is a tool for finding peers on your local network."
-msgstr "LPD হল আপনার স্থানীয় নেটওয়ার্কে পিয়ার খুঁজে বের করার একটি টুল।"
-
-#: ../gtk/tr-prefs.c:807
-msgid "Web Client"
-msgstr "ওয়েব ক্লায়েন্ট"
 
 #. "enabled" checkbutton
-#: ../gtk/tr-prefs.c:810
-msgid "_Enable web client"
-msgstr "ওয়েব ক্লায়েন্ট সক্রিয় (_E)"
+#: ../gtk/tr-prefs.c:799
+msgid "Allow _remote access"
+msgstr ""
 
-#: ../gtk/tr-prefs.c:806
+#: ../gtk/tr-prefs.c:805
 msgid "_Open web client"
 msgstr "ওয়েব ক্লায়েন্ট খুলুন (_O)"
 
-#: ../gtk/tr-prefs.c:815
+#: ../gtk/tr-prefs.c:814
 msgid "HTTP _port:"
 msgstr "HTTP পোর্ট: (_p)"
 
 #. require authentication
-#: ../gtk/tr-prefs.c:819
+#: ../gtk/tr-prefs.c:818
 msgid "Use _authentication"
 msgstr "প্রমাণীকরণ ব্যবহার করুন (_a)"
 
 #. username
-#: ../gtk/tr-prefs.c:827
+#: ../gtk/tr-prefs.c:826
 msgid "_Username:"
 msgstr "ব্যবহারকারীর নাম: (_U)"
 
 #. password
-#: ../gtk/tr-prefs.c:834
+#: ../gtk/tr-prefs.c:833
 msgid "Pass_word:"
 msgstr "পাসওয়ার্ড: (_w)"
 
 #. require authentication
-#: ../gtk/tr-prefs.c:852
-msgid "Only allow these IP a_ddresses to connect:"
-msgstr "সংযোগের জন্য শুধুমাত্র এই আইপি এড্রেসের অনুমোদন দিন (_d):"
+#: ../gtk/tr-prefs.c:841
+msgid "Only allow these IP a_ddresses:"
+msgstr ""
 
-#: ../gtk/tr-prefs.c:867
+#: ../gtk/tr-prefs.c:866
 msgid "IP addresses may use wildcards, such as 192.168.*.*"
 msgstr "ওয়াল্ড কার্ডে আইপি এড্রেস ব্যবহার হতে পারে, যেমন ১৯২.১৬৮.*.*"
 
-#: ../gtk/tr-prefs.c:889
+#: ../gtk/tr-prefs.c:888
 msgid "Addresses:"
 msgstr "ঠিকানা:"
 
-#: ../gtk/tr-prefs.c:997
+#: ../gtk/tr-prefs.c:996
 msgid "Every Day"
 msgstr "প্রতিদিন"
 
-#: ../gtk/tr-prefs.c:998
+#: ../gtk/tr-prefs.c:997
 msgid "Weekdays"
 msgstr "সাপ্তাহিক দিন"
 
-#: ../gtk/tr-prefs.c:999
+#: ../gtk/tr-prefs.c:998
 msgid "Weekends"
 msgstr "সপ্তাহান্তে"
 
-#: ../gtk/tr-prefs.c:1000
+#: ../gtk/tr-prefs.c:999
 msgid "Sunday"
 msgstr "রবিবার"
 
-#: ../gtk/tr-prefs.c:1001
+#: ../gtk/tr-prefs.c:1000
 msgid "Monday"
 msgstr "সোমবার"
 
-#: ../gtk/tr-prefs.c:1002
+#: ../gtk/tr-prefs.c:1001
 msgid "Tuesday"
 msgstr "মঙ্গলবার"
 
-#: ../gtk/tr-prefs.c:1003
+#: ../gtk/tr-prefs.c:1002
 msgid "Wednesday"
 msgstr "বুধবার"
 
-#: ../gtk/tr-prefs.c:1004
+#: ../gtk/tr-prefs.c:1003
 msgid "Thursday"
 msgstr "বৃহস্পতিবার"
 
-#: ../gtk/tr-prefs.c:1005
+#: ../gtk/tr-prefs.c:1004
 msgid "Friday"
 msgstr "শুক্রবার"
 
-#: ../gtk/tr-prefs.c:1006
+#: ../gtk/tr-prefs.c:1005
 msgid "Saturday"
 msgstr "শনিবার"
 
-#: ../gtk/tr-prefs.c:1037
+#: ../gtk/tr-prefs.c:1036
 msgid "Speed Limits"
 msgstr "গতির সীমা"
 
-#: ../gtk/tr-prefs.c:1039
+#: ../gtk/tr-prefs.c:1038
 #, c-format
 msgid "_Upload (%s):"
 msgstr "হালনাগাদকৃত (%s): (_U)"
 
-#: ../gtk/tr-prefs.c:1046
+#: ../gtk/tr-prefs.c:1045
 #, c-format
 msgid "_Download (%s):"
 msgstr "ডাউনলোড (%s): (_D)"
 
-#: ../gtk/tr-prefs.c:1055
+#: ../gtk/tr-prefs.c:1054
 msgid "Alternative Speed Limits"
 msgstr "বিকল্প গতিসীমা"
 
-#: ../gtk/tr-prefs.c:1064
+#: ../gtk/tr-prefs.c:1063
 msgid "Override normal speed limits manually or at scheduled times"
 msgstr "স্বাভাবিক গতিসীমা নিজে অথবা নির্ধারিত সময় অগ্রাহ্য করুন"
 
-#: ../gtk/tr-prefs.c:1071
+#: ../gtk/tr-prefs.c:1070
 #, c-format
 msgid "U_pload (%s):"
 msgstr "আপলোড (_p) (%s):"
 
-#: ../gtk/tr-prefs.c:1075
+#: ../gtk/tr-prefs.c:1074
 #, c-format
 msgid "Do_wnload (%s):"
 msgstr "ডাউনলোড (_w) (%s):"
 
-#: ../gtk/tr-prefs.c:1079
+#: ../gtk/tr-prefs.c:1078
 msgid "_Scheduled times:"
 msgstr "নির্ধারিত সময় (_S):"
 
-#: ../gtk/tr-prefs.c:1084
+#: ../gtk/tr-prefs.c:1083
 msgid " _to "
 msgstr " থেকে (_t) "
 
-#: ../gtk/tr-prefs.c:1095
+#: ../gtk/tr-prefs.c:1094
 msgid "_On days:"
 msgstr "দিনে (_O):"
 
-#: ../gtk/tr-prefs.c:1127 ../gtk/tr-prefs.c:1195 ../gtk/tr-prefs.c:1276
+#: ../gtk/tr-prefs.c:1126 ../gtk/tr-prefs.c:1194 ../gtk/tr-prefs.c:1275
 msgid "Status unknown"
 msgstr "অবস্থা অজানা"
 
-#: ../gtk/tr-prefs.c:1150
+#: ../gtk/tr-prefs.c:1149
 msgid "Port is <b>open</b>"
 msgstr "পোর্ট হল <b>খোলা</b>"
 
-#: ../gtk/tr-prefs.c:1150
+#: ../gtk/tr-prefs.c:1149
 msgid "Port is <b>closed</b>"
 msgstr "পোর্ট হল <b>বন্ধ</b>"
 
-#: ../gtk/tr-prefs.c:1165
+#: ../gtk/tr-prefs.c:1164
 msgid "<i>Testing TCP port…</i>"
 msgstr "<i>পরীক্ষা করা হচ্ছে TCP পোর্ট…</i>"
 
-#: ../gtk/tr-prefs.c:1188
+#: ../gtk/tr-prefs.c:1187
 msgid "Listening Port"
 msgstr "পোর্ট শ্রবণ করা হচ্ছে"
 
-#: ../gtk/tr-prefs.c:1190
+#: ../gtk/tr-prefs.c:1189
 msgid "_Port used for incoming connections:"
 msgstr "পোর্ট ব্যবহার করা হচ্ছে আসন্ন সংযোগের জন্য (_P):"
 
-#: ../gtk/tr-prefs.c:1198
+#: ../gtk/tr-prefs.c:1197
 msgid "Te_st Port"
 msgstr "পোর্ট পরীক্ষা করুন (_s)"
 
-#: ../gtk/tr-prefs.c:1205
+#: ../gtk/tr-prefs.c:1204
 msgid "Pick a _random port every time Transmission is started"
 msgstr "সবসময় একটি এলোমেলো পোর্ট নির্বাচন করুন ট্রন্সমিশন শুরু হয়েছে"
 
-#: ../gtk/tr-prefs.c:1209
+#: ../gtk/tr-prefs.c:1208
 msgid "Use UPnP or NAT-PMP port _forwarding from my router"
-msgstr ""
-"রাউটার থেকে পুন:প্রেরণের জন্য UPnP অথবা NAT-PMP পোর্ট ব্যবহার করুন (_f)"
+msgstr "রাউটার থেকে পুন:প্রেরণের জন্য UPnP অথবা NAT-PMP পোর্ট ব্যবহার করুন (_f)"
 
-#: ../gtk/tr-prefs.c:1214
+#: ../gtk/tr-prefs.c:1213
 msgid "Peer Limits"
 msgstr "পিয়ারের সীমা"
 
-#: ../gtk/tr-prefs.c:1217
+#: ../gtk/tr-prefs.c:1216
 msgid "Maximum peers per _torrent:"
 msgstr "প্রতি পিয়ারের জন্য সর্বোচ্চ সীমা (_t):"
 
-#: ../gtk/tr-prefs.c:1219
+#: ../gtk/tr-prefs.c:1218
 msgid "Maximum peers _overall:"
 msgstr "সামগ্রিক সর্বোচ্চ পিয়ার (_o):"
 
-#: ../gtk/tr-prefs.c:1225
+#: ../gtk/tr-prefs.c:1224
 msgid "Enable _uTP for peer communication"
 msgstr "পিয়ার যোগাযোগের জন্য uTP সক্রিয় করুন (_u):"
 
-#: ../gtk/tr-prefs.c:1227
+#: ../gtk/tr-prefs.c:1226
 msgid "uTP is a tool for reducing network congestion."
 msgstr "uTP নেটওয়ার্ক পূর্ণতা কমানোর জন্য একটি টুল।"
 
-#: ../gtk/tr-prefs.c:1301
+#: ../gtk/tr-prefs.c:1231
+msgid "Use PE_X to find more peers"
+msgstr "আরও পিয়ার খুঁজতে PE_X ব্যবহার করুন (_X)"
+
+#: ../gtk/tr-prefs.c:1233
+msgid ""
+"PEX is a tool for exchanging peer lists with the peers you're connected to."
+msgstr ""
+"আপনি যে পিয়ারের সাথে সংযুক্ত আছেন সেই পিয়ারের সাথে বিনিময়ের জন্য PEX হল একটি টুল।"
+
+#: ../gtk/tr-prefs.c:1237
+msgid "Use _DHT to find more peers"
+msgstr "আরও পিয়ার খোঁজার জন্য ব্যবহার করুন DHT (_D)"
+
+#: ../gtk/tr-prefs.c:1239
+msgid "DHT is a tool for finding peers without a tracker."
+msgstr "ট্র্যাকার ব্যতীত একটি টুল অনুসন্ধানের জন্য DHT একটি টুল।"
+
+#: ../gtk/tr-prefs.c:1243
+msgid "Use _Local Peer Discovery to find more peers"
+msgstr "আরও পিয়ার অনুসন্ধানের জন্য Local Peer Discovery ব্যবহার করুন (_L)"
+
+#: ../gtk/tr-prefs.c:1245
+msgid "LPD is a tool for finding peers on your local network."
+msgstr "LPD হল আপনার স্থানীয় নেটওয়ার্কে পিয়ার খুঁজে বের করার একটি টুল।"
+
+#: ../gtk/tr-prefs.c:1300
 msgid "Transmission Preferences"
 msgstr "ট্রান্সমিশনের পছন্দসমূহ"
 
-#: ../gtk/tr-prefs.c:1281
-msgid "Torrents"
-msgstr "টরেন্ট"
-
-#: ../gtk/tr-prefs.c:1317
+#: ../gtk/tr-prefs.c:1316
 msgctxt "Gerund"
 msgid "Downloading"
 msgstr "ডাউনলোড হচ্ছে"
 
-#: ../gtk/tr-prefs.c:1323
+#: ../gtk/tr-prefs.c:1318
+msgctxt "Gerund"
+msgid "Seeding"
+msgstr "সীড করা হচ্ছে"
+
+#: ../gtk/tr-prefs.c:1322
 msgid "Network"
 msgstr "নেটওয়ার্ক"
 
-#: ../gtk/tr-prefs.c:1299
-msgid "Web"
-msgstr "ওয়েব"
+#: ../gtk/tr-prefs.c:1326
+msgid "Remote"
+msgstr ""
 
-#: ../gtk/tr-window.c:141
+#: ../gtk/tr-window.c:139
 msgid "Torrent"
 msgstr "টরেন্ট"
 
-#: ../gtk/tr-window.c:251
+#: ../gtk/tr-window.c:249
 msgid "Total Ratio"
 msgstr "মোট অনুপাত"
 
-#: ../gtk/tr-window.c:252
+#: ../gtk/tr-window.c:250
 msgid "Session Ratio"
 msgstr "সেশন অনুপাত"
 
-#: ../gtk/tr-window.c:253
+#: ../gtk/tr-window.c:251
 msgid "Total Transfer"
 msgstr "মোট স্থানান্তর"
 
-#: ../gtk/tr-window.c:254
+#: ../gtk/tr-window.c:252
 msgid "Session Transfer"
 msgstr "সেশন স্থানান্তর"
 
-#: ../gtk/tr-window.c:288
+#: ../gtk/tr-window.c:280
 #, c-format
 msgid ""
 "Click to disable Alternative Speed Limits\n"
-"(%1$s down, %2$s up)"
+" (%1$s down, %2$s up)"
 msgstr ""
-"বিকল্প গতিসীমা নিস্ক্রিয় করতে ক্লিক করুন\n"
-"(%1$s down, %2$s up)"
 
-#: ../gtk/tr-window.c:289
+#: ../gtk/tr-window.c:281
 #, c-format
 msgid ""
 "Click to enable Alternative Speed Limits\n"
-"(%1$s down, %2$s up)"
+" (%1$s down, %2$s up)"
 msgstr ""
-"বিকল্প গতিসীমা সস্ক্রিয় করতে ক্লিক করুন\n"
-"(%1$s down, %2$s up)"
 
-#: ../gtk/tr-window.c:349
+#: ../gtk/tr-window.c:347
 #, c-format
 msgid "Tracker will allow requests in %s"
 msgstr "ট্র্যাকার আবেদন অনুমোদন করবেন %s এর মধ্যে"
 
-#: ../gtk/tr-window.c:424
+#: ../gtk/tr-window.c:422
 msgid "Unlimited"
 msgstr "অসীম"
 
-#: ../gtk/tr-window.c:497
+#: ../gtk/tr-window.c:495
 msgid "Seed Forever"
 msgstr "সবসময়ের জন্য সীড"
 
-#: ../gtk/tr-window.c:536
+#: ../gtk/tr-window.c:534
 msgid "Limit Download Speed"
 msgstr "ডাউনলোডের গতি সীমিত করুন"
 
-#: ../gtk/tr-window.c:540
+#: ../gtk/tr-window.c:538
 msgid "Limit Upload Speed"
 msgstr "আপলোডের গতি সীমিত করুন"
 
-#: ../gtk/tr-window.c:547
+#: ../gtk/tr-window.c:545
 msgid "Stop Seeding at Ratio"
 msgstr "অনুপাত সীড করা বন্ধ করুন"
 
-#: ../gtk/tr-window.c:581
+#: ../gtk/tr-window.c:579
 #, c-format
 msgid "Stop at Ratio (%s)"
 msgstr "অনুপাতে বন্ধ করুন (%s)"
 
-#: ../gtk/tr-window.c:777
-#, c-format
-msgid "%1$'d of %2$'d Torrent"
-msgid_plural "%1$'d of %2$'d Torrents"
-msgstr[0] "টরেন্ট %2$'d এর %1$'d"
-msgstr[1] "টরেন্ট %2$'d এর %1$'d"
-
-#: ../gtk/tr-window.c:783
-#, c-format
-msgid "%'d Torrent"
-msgid_plural "%'d Torrents"
-msgstr[0] "%'d Torrent"
-msgstr[1] "%'d Torrents"
-
-#: ../gtk/tr-window.c:804 ../gtk/tr-window.c:832
+#: ../gtk/tr-window.c:802 ../gtk/tr-window.c:830
 #, c-format
 msgid "Ratio: %s"
 msgstr "অনুপাত: %s"
 
-#: ../gtk/tr-window.c:815
+#: ../gtk/tr-window.c:813
 #, c-format
 msgid "Down: %1$s, Up: %2$s"
 msgstr "নিচে: %1$s, উপরে: %2$s"
 
-#: ../gtk/tr-window.c:826
+#: ../gtk/tr-window.c:824
 #, c-format
 msgid "size|Down: %1$s, Up: %2$s"
 msgstr "আকার|নিচে: %1$s, উপরে: %2$s"
 
-#: ../gtk/util.c:37
+#: ../gtk/util.c:36
 msgid "KiB"
 msgstr "KiB"
 
-#: ../gtk/util.c:38
+#: ../gtk/util.c:37
 msgid "MiB"
 msgstr "MiB"
 
-#: ../gtk/util.c:39
+#: ../gtk/util.c:38
 msgid "GiB"
 msgstr "GiB"
 
-#: ../gtk/util.c:40
+#: ../gtk/util.c:39
 msgid "TiB"
 msgstr "TiB"
 
-#: ../gtk/util.c:43
+#: ../gtk/util.c:42
 msgid "kB"
 msgstr "kB"
 
-#: ../gtk/util.c:44
+#: ../gtk/util.c:43
 msgid "MB"
 msgstr "MB"
 
-#: ../gtk/util.c:45
+#: ../gtk/util.c:44
 msgid "GB"
 msgstr "GB"
 
-#: ../gtk/util.c:46
+#: ../gtk/util.c:45
 msgid "TB"
 msgstr "TB"
 
-#: ../gtk/util.c:49
+#: ../gtk/util.c:48
 msgid "kB/s"
 msgstr "kB/s"
 
-#: ../gtk/util.c:50
+#: ../gtk/util.c:49
 msgid "MB/s"
 msgstr "MB/s"
 
-#: ../gtk/util.c:51
+#: ../gtk/util.c:50
 msgid "GB/s"
 msgstr "GB/s"
 
-#: ../gtk/util.c:52
+#: ../gtk/util.c:51
 msgid "TB/s"
 msgstr "TB/s"
 
-#: ../cli/cli.c:117 ../gtk/util.c:87 ../libtransmission/utils.c:1444
-msgid "None"
-msgstr "কোনটিই নয়"
-
-#: ../gtk/util.c:108
+#: ../gtk/util.c:107
 #, c-format
 msgid "%'d day"
 msgid_plural "%'d days"
 msgstr[0] "%'d দিন"
 msgstr[1] "%'d  দিন"
 
-#: ../gtk/util.c:109
+#: ../gtk/util.c:108
 #, c-format
 msgid "%'d hour"
 msgid_plural "%'d hours"
 msgstr[0] "%'d ঘন্টা"
 msgstr[1] "%'d ঘন্টা"
 
-#: ../gtk/util.c:110
+#: ../gtk/util.c:109
 #, c-format
 msgid "%'d minute"
 msgid_plural "%'d minutes"
 msgstr[0] "%'d মিনিট"
 msgstr[1] "%'d মিনিট"
 
-#: ../gtk/util.c:111
+#: ../gtk/util.c:110
 #, c-format
 msgid "%'d second"
 msgid_plural "%'d seconds"
 msgstr[0] "%'d সেকেন্ড"
 msgstr[1] "%'d সেকেন্ড"
 
-#: ../gtk/util.c:229
+#: ../gtk/util.c:228
 #, c-format
 msgid "The torrent file \"%s\" contains invalid data."
 msgstr "টরেন্ট ফাইল \"%s\" অকার্যকর উপাত্ত ধারণ করে।"
 
-#: ../gtk/util.c:222
+#: ../gtk/util.c:230
 #, c-format
-msgid "The torrent file \"%s\" is already in use."
-msgstr "টরেন্ট ফাইল \"%s\" ইতোমধ্যে ব্যবহৃত হচ্ছে।"
+msgid "The torrent file \"%s\" is already in use by \"%s.\""
+msgstr ""
 
-#: ../gtk/util.c:233
+#: ../gtk/util.c:232
 #, c-format
 msgid "The torrent file \"%s\" encountered an unknown error."
 msgstr "টরেন্ট ফাইল \"%s\" একটি অজানা ত্রুটির সম্মুখীন হয়েছিল।"
 
-#: ../gtk/util.c:239
+#: ../gtk/util.c:238
 msgid "Error opening torrent"
 msgstr "টরেন্ট খোলার সময় ত্রুটি হচ্ছে"
 
-#: ../gtk/util.c:552
+#: ../gtk/util.c:551
 #, c-format
 msgid "Error opening \"%s\""
 msgstr "\"%s\" খোলার সময় ত্রুটি হচ্ছে"
 
-#: ../gtk/util.c:555
+#: ../gtk/util.c:554
 #, c-format
 msgid "Server returned \"%1$ld %2$s\""
 msgstr "পুনরাগত সার্ভার \"%1$ld %2$s\""
 
-#: ../gtk/util.c:575
+#: ../gtk/util.c:574
 msgid "Unrecognized URL"
 msgstr "অচেনা URL"
 
-#: ../gtk/util.c:577
+#: ../gtk/util.c:576
 #, c-format
 msgid "Transmission doesn't know how to use \"%s\""
 msgstr "ট্রান্সমিশন অবগত নয় যে কিভাবে \"%s\" ব্যবহার করতে হবে"
 
-#: ../gtk/util.c:582
+#: ../gtk/util.c:581
 #, c-format
 msgid ""
 "This magnet link appears to be intended for something other than BitTorrent. "
 "BitTorrent magnet links have a section containing \"%s\"."
 msgstr ""
-"এই ম্যাগনেট লিংকটি প্রদর্শত হচ্ছে বিট টরেন্ট ছাড়া অন্য কিছুকে মনস্হ করে। বিট "
-"টরেন্ট ম্যাগনেট লিঙ্কের একটি অংশ আছে যা \"%s\" ‌ধারণ করছে।"
+"এই ম্যাগনেট লিংকটি প্রদর্শত হচ্ছে বিট টরেন্ট ছাড়া অন্য কিছুকে মনস্হ করে। বিট টরেন্ট "
+"ম্যাগনেট লিঙ্কের একটি অংশ আছে যা \"%s\" ‌ধারণ করছে।"
 
-#. did caller give us an uninitialized val?
-#: ../libtransmission/variant.c:974
-msgid "Invalid metadata"
-msgstr "অকার্যকর মেটাডাটা"
-
-#: ../libtransmission/variant.c:1257 ../libtransmission/variant.c:1280
+#: ../gtk/util.c:701
 #, c-format
-msgid "Couldn't save temporary file \"%1$s\": %2$s"
-msgstr "অস্হায়ী ফাইল \"%1$s\" সংরক্ষণ করা যায়নি: %2$s"
+msgid "%s free"
+msgstr ""
 
-#: ../libtransmission/variant.c:1266
+#: ../libtransmission/announcer.c:1059 ../libtransmission/announcer.c:1352
+msgid "Could not connect to tracker"
+msgstr ""
+
+#: ../libtransmission/announcer.c:1063 ../libtransmission/announcer.c:1356
+msgid "Tracker did not respond"
+msgstr ""
+
+#: ../libtransmission/announcer.c:1125
+msgid "Success"
+msgstr ""
+
+#: ../libtransmission/announcer-http.c:203
+#: ../libtransmission/announcer-http.c:353
 #, c-format
-msgid "Saved \"%s\""
-msgstr "সংরক্ষণ করা হয়েছে \"%s\""
+msgid "Tracker gave HTTP response code %1$ld (%2$s)"
+msgstr ""
 
-#: ../libtransmission/blocklist.c:402 ../libtransmission/rpcimpl.c:1513
-#: ../libtransmission/rpcimpl.c:1527 ../libtransmission/rpcimpl.c:1546
-#: ../libtransmission/variant.c:1271
+#: ../libtransmission/announcer-udp.c:262
+#: ../libtransmission/announcer-udp.c:412
+msgid "Unknown error"
+msgstr ""
+
+#: ../libtransmission/announcer-udp.c:501
 #, c-format
-msgid "Couldn't save file \"%1$s\": %2$s"
-msgstr "ফাইল \"%1$s\" সংরক্ষণ করা যায়নি: %2$s"
+msgid "DNS Lookup failed: %s"
+msgstr ""
 
-#: ../libtransmission/blocklist.c:67 ../libtransmission/blocklist.c:309
-#: ../libtransmission/utils.c:233
+#: ../libtransmission/announcer-udp.c:602
+msgid "Connection failed"
+msgstr ""
+
+#: ../libtransmission/blocklist.c:66 ../libtransmission/blocklist.c:308
+#: ../libtransmission/utils.c:232
 #, c-format
 msgid "Couldn't read \"%1$s\": %2$s"
 msgstr "\"%1$s\" পড়া যায়নি: %2$s"
 
-#: ../libtransmission/blocklist.c:100
+#: ../libtransmission/blocklist.c:99
 #, c-format
 msgid "Blocklist \"%s\" contains %zu entries"
 msgstr "\"%s\" ব্লক লিস্ট ধারণ করে %zu এন্ট্রি"
 
 #. don't try to display the actual lines - it causes issues
-#: ../libtransmission/blocklist.c:352
+#: ../libtransmission/blocklist.c:351
 #, c-format
 msgid "blocklist skipped invalid address at line %d"
 msgstr "রেখা %d এর অকার্যকর ঠিকানা ব্লকলিস্ট এড়িয়ে গেছে"
 
-#: ../libtransmission/blocklist.c:408
+#: ../libtransmission/blocklist.c:401 ../libtransmission/rpcimpl.c:1513
+#: ../libtransmission/rpcimpl.c:1527 ../libtransmission/rpcimpl.c:1546
+#: ../libtransmission/variant.c:1270
+#, c-format
+msgid "Couldn't save file \"%1$s\": %2$s"
+msgstr "ফাইল \"%1$s\" সংরক্ষণ করা যায়নি: %2$s"
+
+#: ../libtransmission/blocklist.c:407
 #, c-format
 msgid "Blocklist \"%s\" updated with %zu entries"
 msgstr "Blocklist \"%s\" updated with %zu entries"
 
-#: ../libtransmission/fdlimit.c:171 ../libtransmission/file-posix.c:189
-#: ../libtransmission/file-posix.c:199
+#: ../libtransmission/fdlimit.c:170
+#, c-format
+msgid "Couldn't get directory for \"%1$s\": %2$s"
+msgstr ""
+
+#: ../libtransmission/fdlimit.c:175 ../libtransmission/file-posix.c:176
+#: ../libtransmission/file-posix.c:186
 #, c-format
 msgid "Couldn't create \"%1$s\": %2$s"
 msgstr "\"%1$s\": %2$s তৈরী করা যায়নি"
 
-#: ../libtransmission/fdlimit.c:191
+#: ../libtransmission/fdlimit.c:195
 #, c-format
 msgid "Couldn't open \"%1$s\": %2$s"
 msgstr "\"%1$s\": %2$s খোলা যায়নি"
 
-#: ../libtransmission/fdlimit.c:231
+#: ../libtransmission/fdlimit.c:207
+msgid "full"
+msgstr ""
+
+#: ../libtransmission/fdlimit.c:212
+msgid "sparse"
+msgstr ""
+
+#: ../libtransmission/fdlimit.c:219
+#, c-format
+msgid "Couldn't preallocate file \"%1$s\" (%2$s, size: %3$<PRIu64>): %4$s"
+msgstr ""
+
+#: ../libtransmission/fdlimit.c:224
+#, c-format
+msgid "Preallocated file \"%1$s\" (%2$s, size: %3$<PRIu64>)"
+msgstr ""
+
+#: ../libtransmission/fdlimit.c:235
 #, c-format
 msgid "Couldn't truncate \"%1$s\": %2$s"
 msgstr "\"%1$s\" এর সম্মুখভাগের অংশ বাদ দেয়া যায়নি: %2$s"
 
-#: ../libtransmission/fdlimit.c:523
+#: ../libtransmission/fdlimit.c:527
 #, c-format
 msgid "Couldn't create socket: %s"
 msgstr "সকেট তৈরি করা যায়নি: %s"
 
-#: ../libtransmission/makemeta.c:53
-#, c-format
-msgid "Torrent Creator is skipping file \"%s\": %s"
-msgstr "টরেন্ট নির্মাতা \"%s\" ফাইল এড়িয়ে যাচ্ছে: %s"
-
-#: ../libtransmission/metainfo.c:590
-#, c-format
-msgid "Invalid metadata entry \"%s\""
-msgstr "অকার্যকর মেটাডাটা এন্ট্রি করা হচ্ছে \"%s\""
-
-#: ../libtransmission/natpmp.c:30
-msgid "Port Forwarding (NAT-PMP)"
-msgstr "পোর্ট পুন:প্রেরণ করা হচ্ছে (NAT-PMP)"
-
-#: ../libtransmission/natpmp.c:70
-#, c-format
-msgid "%s succeeded (%d)"
-msgstr "%s সফল হয়েছে (%d)"
-
-#: ../libtransmission/natpmp.c:138
-#, c-format
-msgid "Found public address \"%s\""
-msgstr "পবলিক ঠিকানা পাওয়া গিয়েছে \"%s\""
-
-#: ../libtransmission/natpmp.c:173
-#, c-format
-msgid "no longer forwarding port %d"
-msgstr "অনুবর্তন পোর্ট নেই %d"
-
-#: ../libtransmission/natpmp.c:218
-#, c-format
-msgid "Port %d forwarded successfully"
-msgstr "পোর্ট %d পুন:প্রেরণ সফল হয়েছে"
-
-#: ../libtransmission/net.c:269
-#, c-format
-msgid "Couldn't set source address %s on %d: %s"
-msgstr "%s সোর্স অ্যাড্রেস %d এর উপর নির্ধারণ করা যায়নি: %s"
-
-#: ../libtransmission/net.c:286
-#, c-format
-msgid "Couldn't connect socket %d to %s, port %d (errno %d - %s)"
-msgstr "%d থেকে %s তে সকেট সংযোগ দেয়া যায়নি, পোর্ট %d (errno %d - %s)"
-
-#: ../libtransmission/net.c:370
-msgid "Is another copy of Transmission already running?"
-msgstr "ট্রান্সমিশনের অন্য অনুলিপি কি ইতোমধ্যে চলমান?"
-
-#: ../libtransmission/net.c:375
-#, c-format
-msgid "Couldn't bind port %d on %s: %s"
-msgstr "%d পোর্ট %s এ আবদ্ধ করা যায়নি: %s"
-
-#: ../libtransmission/net.c:377
-#, c-format
-msgid "Couldn't bind port %d on %s: %s (%s)"
-msgstr "Couldn't bind port %d on %s: %s (%s)"
-
-#: ../libtransmission/peer-msgs.c:2049
-#, c-format
-msgid "Please Verify Local Data! Piece #%zu is corrupt."
-msgstr "স্হানীয় উপাত্ত যাচাই করুন! #%zu অংশ বিকৃত হয়েছে।"
-
-#: ../libtransmission/port-forwarding.c:29
-msgid "Port Forwarding"
-msgstr "পোর্ট পুন:প্রেরিত হচ্ছে"
-
-#: ../libtransmission/port-forwarding.c:56
-msgid "Starting"
-msgstr "শুরু করা হচ্ছে"
-
-#: ../libtransmission/port-forwarding.c:57
-msgid "Forwarded"
-msgstr "ফরওয়ার্ড"
-
-#: ../libtransmission/port-forwarding.c:58
-msgid "Stopping"
-msgstr "বন্ধ করা হচ্ছে"
-
-#: ../libtransmission/port-forwarding.c:59
-msgid "Not forwarded"
-msgstr "সম্মুখে নয়"
-
-#: ../libtransmission/port-forwarding.c:90 ../libtransmission/torrent.c:2216
-#, c-format
-msgid "State changed from \"%1$s\" to \"%2$s\""
-msgstr "অবস্হা \"%2$s\" হতে \"%1$s\" পরিবর্তিত হয়েছে"
-
-#: ../libtransmission/port-forwarding.c:180
-msgid "Stopped"
-msgstr "বন্ধ"
-
-#. first %s is the application name
-#. second %s is the version number
-#: ../libtransmission/session.c:738
-#, c-format
-msgid "%s %s started"
-msgstr "%s %s শুরু করা হয়েছে"
-
-#: ../libtransmission/session.c:2032
-#, c-format
-msgid "Loaded %d torrents"
-msgstr "%d টরেন্ট লোড হয়েছে"
-
-#: ../libtransmission/torrent.c:574
-#, c-format
-msgid "Tracker warning: \"%s\""
-msgstr "ট্র্যাকার সতর্কীকরণ: \"%s\""
-
-#: ../libtransmission/torrent.c:581
-#, c-format
-msgid "Tracker error: \"%s\""
-msgstr "ট্র্যাকারের ত্রুটি: \"%s\""
-
-#: ../libtransmission/torrent.c:845
-msgid ""
-"No data found! Ensure your drives are connected or use \"Set Location\". To "
-"re-download, remove the torrent and re-add it."
-msgstr ""
-"কোন উপাত্ত পাওয়া যায়নি! আপনার ড্রাইভ সংযুক্ত কিনা তা নিশ্চত করুন অথবা "
-"ব্যবহার করুন \"Set Location\"। পুনরায় ডাউনলোডের জন্য টরেন্ট অপসারণ করুন এবং "
-"পুনরায় যোগ করুন।"
-
-#: ../libtransmission/torrent.c:1732
-msgid "Restarted manually -- disabling its seed ratio"
-msgstr ""
-"স্বয়ংক্রিয় ভাবে পনরায় চালু হয়েছে -- এটির সীড অনুপাত নিস্ক্রিয় করা হচ্ছে"
-
-#: ../libtransmission/torrent.c:1915
-msgid "Removing torrent"
-msgstr "টরেন্ট অপসারণ করা হচ্ছে"
-
-#: ../libtransmission/torrent.c:2004
-msgid "Done"
-msgstr "সম্পন্ন"
-
-#: ../libtransmission/torrent.c:2007
-msgid "Complete"
-msgstr "সম্পন্ন করা"
-
-#: ../libtransmission/upnp.c:29
-msgid "Port Forwarding (UPnP)"
-msgstr "পোর্ট পুন:প্রেরণ করা হচ্ছে (UPnP)"
-
-#: ../libtransmission/upnp.c:226
-#, c-format
-msgid "Found Internet Gateway Device \"%s\""
-msgstr "ইন্টারনেট গেটওয়ে ডিভাইস পাওয়া গিয়েছে \"%s\""
-
-#: ../libtransmission/upnp.c:229
-#, c-format
-msgid "Local Address is \"%s\""
-msgstr "স্থানীয় ঠিকানা \"%s\""
-
-#: ../libtransmission/upnp.c:258
-#, c-format
-msgid "Port %d isn't forwarded"
-msgstr "%d পোর্ট পুন:প্রেরণ করা হয়নি"
-
-#: ../libtransmission/upnp.c:269
-#, c-format
-msgid "Stopping port forwarding through \"%s\", service \"%s\""
-msgstr "\"%s\" দ্বারা পোর্ট পুন:প্রেরণ বন্ধ করা হয়েছে, সার্ভিস \"%s\""
-
-#: ../libtransmission/upnp.c:302
-#, c-format
-msgid ""
-"Port forwarding through \"%s\", service \"%s\". (local address: %s:%d)"
-msgstr ""
-"\"%s\" দ্বারা পোর্ট পুন:প্রেরণ করা হচ্ছে, সার্ভিস \"%s\"। (local address: "
-"%s:%d)"
-
-#: ../libtransmission/upnp.c:307
-msgid "Port forwarding successful!"
-msgstr "পোর্ট পুনঃপ্রেরণ সফল!"
-
-#: ../libtransmission/utils.c:245 ../libtransmission/utils.c:246
-msgid "Not a regular file"
-msgstr "নিয়মিত ফাইল নয়"
-
-#: ../libtransmission/utils.c:258
-msgid "Memory allocation failed"
-msgstr "মেমোরি বন্টন ব্যর্থ হয়েছে"
-
 #. Node exists but isn't a folder
-#: ../libtransmission/file-posix.c:198
+#: ../libtransmission/file-posix.c:185
 #, c-format
 msgid "File \"%s\" is in the way"
 msgstr "\"%s\" ফাইল আসছে"
 
-#: ../libtransmission/verify.c:224
+#: ../libtransmission/makemeta.c:55
+#, c-format
+msgid "Torrent Creator is skipping file \"%s\": %s"
+msgstr "টরেন্ট নির্মাতা \"%s\" ফাইল এড়িয়ে যাচ্ছে: %s"
+
+#: ../libtransmission/makemeta.c:179
+#, c-format
+msgid "Failed to set piece size to %s, leaving it at %s"
+msgstr ""
+
+#: ../libtransmission/metainfo.c:589
+#, c-format
+msgid "Invalid metadata entry \"%s\""
+msgstr "অকার্যকর মেটাডাটা এন্ট্রি করা হচ্ছে \"%s\""
+
+#: ../libtransmission/natpmp.c:29
+msgid "Port Forwarding (NAT-PMP)"
+msgstr "পোর্ট পুন:প্রেরণ করা হচ্ছে (NAT-PMP)"
+
+#: ../libtransmission/natpmp.c:69
+#, c-format
+msgid "%s succeeded (%d)"
+msgstr "%s সফল হয়েছে (%d)"
+
+#: ../libtransmission/natpmp.c:137
+#, c-format
+msgid "Found public address \"%s\""
+msgstr "পবলিক ঠিকানা পাওয়া গিয়েছে \"%s\""
+
+#: ../libtransmission/natpmp.c:172
+#, c-format
+msgid "no longer forwarding port %d"
+msgstr "অনুবর্তন পোর্ট নেই %d"
+
+#: ../libtransmission/natpmp.c:217
+#, c-format
+msgid "Port %d forwarded successfully"
+msgstr "পোর্ট %d পুন:প্রেরণ সফল হয়েছে"
+
+#: ../libtransmission/net.c:267
+#, c-format
+msgid "Couldn't set source address %s on %<PRIdMAX>: %s"
+msgstr ""
+
+#: ../libtransmission/net.c:285
+#, c-format
+msgid "Couldn't connect socket %<PRIdMAX> to %s, port %d (errno %d - %s)"
+msgstr ""
+
+#: ../libtransmission/net.c:367
+msgid "Is another copy of Transmission already running?"
+msgstr "ট্রান্সমিশনের অন্য অনুলিপি কি ইতোমধ্যে চলমান?"
+
+#: ../libtransmission/net.c:372
+#, c-format
+msgid "Couldn't bind port %d on %s: %s"
+msgstr "%d পোর্ট %s এ আবদ্ধ করা যায়নি: %s"
+
+#: ../libtransmission/net.c:374
+#, c-format
+msgid "Couldn't bind port %d on %s: %s (%s)"
+msgstr "Couldn't bind port %d on %s: %s (%s)"
+
+#: ../libtransmission/peer-msgs.c:2048
+#, c-format
+msgid "Please Verify Local Data! Piece #%zu is corrupt."
+msgstr "স্হানীয় উপাত্ত যাচাই করুন! #%zu অংশ বিকৃত হয়েছে।"
+
+#: ../libtransmission/platform.c:434
+#, c-format
+msgid "Searching for web interface file \"%s\""
+msgstr ""
+
+#: ../libtransmission/port-forwarding.c:28
+msgid "Port Forwarding"
+msgstr "পোর্ট পুন:প্রেরিত হচ্ছে"
+
+#: ../libtransmission/port-forwarding.c:55
+msgid "Starting"
+msgstr "শুরু করা হচ্ছে"
+
+#: ../libtransmission/port-forwarding.c:56
+msgid "Forwarded"
+msgstr "ফরওয়ার্ড"
+
+#: ../libtransmission/port-forwarding.c:57
+msgid "Stopping"
+msgstr "বন্ধ করা হচ্ছে"
+
+#: ../libtransmission/port-forwarding.c:58
+msgid "Not forwarded"
+msgstr "সম্মুখে নয়"
+
+#: ../libtransmission/port-forwarding.c:89 ../libtransmission/torrent.c:2233
+#, c-format
+msgid "State changed from \"%1$s\" to \"%2$s\""
+msgstr "অবস্হা \"%2$s\" হতে \"%1$s\" পরিবর্তিত হয়েছে"
+
+#: ../libtransmission/port-forwarding.c:179
+msgid "Stopped"
+msgstr "বন্ধ"
+
+#: ../libtransmission/rpcimpl.c:1536
+#, c-format
+msgid "Error uncompressing blocklist: %s (%d)"
+msgstr ""
+
+#: ../libtransmission/rpc-server.c:1001
+#, c-format
+msgid "Couldn't find settings key \"%s\""
+msgstr ""
+
+#: ../libtransmission/rpc-server.c:1073
+#, c-format
+msgid "%s is not a valid address"
+msgstr ""
+
+#: ../libtransmission/rpc-server.c:1078
+#, c-format
+msgid "%s is not an IPv4 address. RPC listeners must be IPv4"
+msgstr ""
+
+#: ../libtransmission/rpc-server.c:1085
+#, c-format
+msgid "Serving RPC and Web requests on port 127.0.0.1:%d%s"
+msgstr ""
+
+#: ../libtransmission/rpc-server.c:1089
+msgid "Whitelist enabled"
+msgstr ""
+
+#: ../libtransmission/rpc-server.c:1092
+msgid "Password required"
+msgstr ""
+
+#. first %s is the application name
+#. second %s is the version number
+#: ../libtransmission/session.c:739
+#, c-format
+msgid "%s %s started"
+msgstr "%s %s শুরু করা হয়েছে"
+
+#: ../libtransmission/session.c:2037
+#, c-format
+msgid "Loaded %d torrents"
+msgstr "%d টরেন্ট লোড হয়েছে"
+
+#: ../libtransmission/torrent.c:573
+#, c-format
+msgid "Tracker warning: \"%s\""
+msgstr "ট্র্যাকার সতর্কীকরণ: \"%s\""
+
+#: ../libtransmission/torrent.c:580
+#, c-format
+msgid "Tracker error: \"%s\""
+msgstr "ট্র্যাকারের ত্রুটি: \"%s\""
+
+#: ../libtransmission/torrent.c:844
+msgid ""
+"No data found! Ensure your drives are connected or use \"Set Location\". To "
+"re-download, remove the torrent and re-add it."
+msgstr ""
+"কোন উপাত্ত পাওয়া যায়নি! আপনার ড্রাইভ সংযুক্ত কিনা তা নিশ্চত করুন অথবা ব্যবহার করুন "
+"\"Set Location\"। পুনরায় ডাউনলোডের জন্য টরেন্ট অপসারণ করুন এবং পুনরায় যোগ করুন।"
+
+#: ../libtransmission/torrent.c:1731
+msgid "Restarted manually -- disabling its seed ratio"
+msgstr "স্বয়ংক্রিয় ভাবে পনরায় চালু হয়েছে -- এটির সীড অনুপাত নিস্ক্রিয় করা হচ্ছে"
+
+#: ../libtransmission/torrent.c:1932
+msgid "Removing torrent"
+msgstr "টরেন্ট অপসারণ করা হচ্ছে"
+
+#: ../libtransmission/torrent.c:2021
+msgid "Done"
+msgstr "সম্পন্ন"
+
+#: ../libtransmission/torrent.c:2024
+msgid "Complete"
+msgstr "সম্পন্ন করা"
+
+#: ../libtransmission/torrent.c:3347
+#, c-format
+msgid "Piece %<PRIu32>, which was just downloaded, failed its checksum test"
+msgstr ""
+
+#: ../libtransmission/torrent-magnet.c:296
+msgid "Magnet torrent's metadata is not usable"
+msgstr ""
+
+#: ../libtransmission/upnp.c:28
+msgid "Port Forwarding (UPnP)"
+msgstr "পোর্ট পুন:প্রেরণ করা হচ্ছে (UPnP)"
+
+#: ../libtransmission/upnp.c:225
+#, c-format
+msgid "Found Internet Gateway Device \"%s\""
+msgstr "ইন্টারনেট গেটওয়ে ডিভাইস পাওয়া গিয়েছে \"%s\""
+
+#: ../libtransmission/upnp.c:228
+#, c-format
+msgid "Local Address is \"%s\""
+msgstr "স্থানীয় ঠিকানা \"%s\""
+
+#: ../libtransmission/upnp.c:257
+#, c-format
+msgid "Port %d isn't forwarded"
+msgstr "%d পোর্ট পুন:প্রেরণ করা হয়নি"
+
+#: ../libtransmission/upnp.c:268
+#, c-format
+msgid "Stopping port forwarding through \"%s\", service \"%s\""
+msgstr "\"%s\" দ্বারা পোর্ট পুন:প্রেরণ বন্ধ করা হয়েছে, সার্ভিস \"%s\""
+
+#: ../libtransmission/upnp.c:301
+#, c-format
+msgid "Port forwarding through \"%s\", service \"%s\". (local address: %s:%d)"
+msgstr ""
+"\"%s\" দ্বারা পোর্ট পুন:প্রেরণ করা হচ্ছে, সার্ভিস \"%s\"। (local address: %s:%d)"
+
+#: ../libtransmission/upnp.c:306
+msgid "Port forwarding successful!"
+msgstr "পোর্ট পুনঃপ্রেরণ সফল!"
+
+#: ../libtransmission/utils.c:244 ../libtransmission/utils.c:245
+msgid "Not a regular file"
+msgstr "নিয়মিত ফাইল নয়"
+
+#. did caller give us an uninitialized val?
+#: ../libtransmission/variant.c:973
+msgid "Invalid metadata"
+msgstr "অকার্যকর মেটাডাটা"
+
+#: ../libtransmission/variant.c:1256 ../libtransmission/variant.c:1279
+#, c-format
+msgid "Couldn't save temporary file \"%1$s\": %2$s"
+msgstr "অস্হায়ী ফাইল \"%1$s\" সংরক্ষণ করা যায়নি: %2$s"
+
+#: ../libtransmission/variant.c:1265
+#, c-format
+msgid "Saved \"%s\""
+msgstr "সংরক্ষণ করা হয়েছে \"%s\""
+
+#: ../libtransmission/variant.c:1308
+msgid "Unable to parse file content"
+msgstr ""
+
+#: ../libtransmission/verify.c:223
 msgid "Verifying torrent"
 msgstr "টরেন্ট পরীক্ষা করা হচ্ছে"
-
-#~ msgid "Enable Temporary Speed _Limits"
-#~ msgstr "অস্থায়ী গতিসীমা কার্যকর কর (_L)"
-
-#~ msgid "Add a torrent"
-#~ msgstr "একটি টরেন্ট যুক্ত কর"
-
-#~ msgid "_Add File..."
-#~ msgstr "একটি ফাইল যুক্ত কর... (_A)"
-
-#~ msgid "Add URL..."
-#~ msgstr "ইউআরএল যুক্ত কর..."
-
-#~ msgid "Add _URL..."
-#~ msgstr "ইউআরএল যুক্ত কর... (_U)"
-
-#~ msgid "Set _Location..."
-#~ msgstr "অবস্থান নির্ধারণ কর (_L)"
-
-#~ msgid "_New..."
-#~ msgstr "নতুন...(_N)"
-
-#~ msgid "_Open Folder"
-#~ msgstr "ফোল্ডার খুলুন (_O)"
-
-#, c-format
-#~ msgid "%s is already running."
-#~ msgstr "%s ইতোমধ্যে চলছে।"
-
-#~ msgid "Add a Torrent"
-#~ msgstr "একটি টরেন্ট যুক্ত করুন"
-
-#~ msgid "Add URL"
-#~ msgstr "ইউআরএল যুক্ত করুন"
-
-#~ msgid "Add torrent from URL"
-#~ msgstr "ইউআরএল থেকে টরেন্ট যুক্ত করুন"
-
-#~ msgid "Downloading"
-#~ msgstr "ডাউনলোড করা হচ্ছে"
-
-#~ msgid "Seeding"
-#~ msgstr "সীড করা"
-
-#~ msgid "Waiting to verify local data"
-#~ msgstr "তথ্য যাচাইয়ের জন্য অপেক্ষা"
-
-#~ msgid "Open _URL..."
-#~ msgstr "URL খুলুন (_U)..."
-
-#~ msgid "Open URL..."
-#~ msgstr "URL খুলুন..."
-
-#~ msgid "Verifying"
-#~ msgstr "যাচাই করা হচ্ছে"
-
-#~ msgid "Queued"
-#~ msgstr "সারিবদ্ধ"
-
-#~ msgid "Download complete"
-#~ msgstr "ডাউনলোড সম্পন্ন"
-
-#~ msgid "MiB/s"
-#~ msgstr "MiB/s"
-
-#~ msgid "KiB/s"
-#~ msgstr "কি.বাইট/সেকেন্ড"
-
-#~ msgid "TiB/s"
-#~ msgstr "TiB/s"
-
-#~ msgid "GiB/s"
-#~ msgstr "GiB/s"
-
-#~ msgid "Creating torrent..."
-#~ msgstr "টরেন্ট তৈরি করা হচ্ছে..."
-
-#~ msgid "Transmission Bittorrent Client"
-#~ msgstr "ট্রান্সমিশন BitTorrent ক্লায়েন্ট"
-
-#~ msgid "BitTorrent Activity"
-#~ msgstr "BitTorrent কাজ"

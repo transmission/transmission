@@ -1,697 +1,695 @@
-# Malay translation for transmission
-# Copyright (c) 2008 Rosetta Contributors and Canonical Ltd 2008
-# This file is distributed under the same license as the transmission package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2008.
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
+#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: transmission\n"
-"Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2012-02-03 15:22-0600\n"
-"PO-Revision-Date: 2013-04-18 02:04+0000\n"
-"Last-Translator: abuyop <Unknown>\n"
-"Language-Team: Malay <ms@li.org>\n"
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-01-27 03:12+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2017\n"
+"Language-Team: Malay (https://www.transifex.com/transmissionbt/teams/33778/"
+"ms/)\n"
+"Language: ms\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2016-09-27 19:08+0000\n"
-"X-Generator: Launchpad (build 18204)\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 
-#: ../gtk/actions.c:35
+#: ../cli/cli.c:115 ../gtk/util.c:86 ../libtransmission/utils.c:1446
+msgid "None"
+msgstr "Tiada"
+
+#: ../gtk/actions.c:34
 msgid "Sort by _Activity"
 msgstr "Susun mengikut _Aktiviti"
 
-#: ../gtk/actions.c:36
+#: ../gtk/actions.c:35
 msgid "Sort by _Name"
 msgstr "Susun mengikut _Nama"
 
-#: ../gtk/actions.c:37
+#: ../gtk/actions.c:36
 msgid "Sort by _Progress"
 msgstr "Susun mengikut_kemajuan"
 
-#: ../gtk/actions.c:38
+#: ../gtk/actions.c:37
 msgid "Sort by _Queue"
 msgstr "Isih berdasarkan _Baris Gilir"
 
-#: ../gtk/actions.c:39
+#: ../gtk/actions.c:38
 msgid "Sort by Rati_o"
 msgstr "Susun mengikut _Nisbah"
 
-#: ../gtk/actions.c:40
+#: ../gtk/actions.c:39
 msgid "Sort by Stat_e"
 msgstr "Susun mengikut Stat_e"
 
-#: ../gtk/actions.c:41
+#: ../gtk/actions.c:40
 msgid "Sort by A_ge"
 msgstr "Susun mengikut u_mur"
 
-#: ../gtk/actions.c:42
+#: ../gtk/actions.c:41
 msgid "Sort by Time _Left"
 msgstr "Susun mengikut Waktu _Tinggal"
 
-#: ../gtk/actions.c:43
+#: ../gtk/actions.c:42
 msgid "Sort by Si_ze"
 msgstr "Susun mengikut Sa_iz"
 
-#: ../gtk/actions.c:60
+#: ../gtk/actions.c:59
 msgid "_Show Transmission"
 msgstr "_Papar Transmission"
 
-#: ../gtk/actions.c:61
+#: ../gtk/actions.c:60
 msgid "Message _Log"
 msgstr "_Log mesej"
 
-#: ../gtk/actions.c:76
+#: ../gtk/actions.c:75
 msgid "Enable Alternative Speed _Limits"
 msgstr "Benarkan _Had Kelajuan Alternatif"
 
-#: ../gtk/actions.c:77
+#: ../gtk/actions.c:76
 msgid "_Compact View"
 msgstr "Paparan _Padat"
 
-#: ../gtk/actions.c:78
+#: ../gtk/actions.c:77
 msgid "Re_verse Sort Order"
 msgstr "Tertib Isih Ber_balik"
 
-#: ../gtk/actions.c:79
+#: ../gtk/actions.c:78
 msgid "_Filterbar"
 msgstr "Palang Pe_napis"
 
-#: ../gtk/actions.c:80
+#: ../gtk/actions.c:79
 msgid "_Statusbar"
 msgstr "Bar _Status"
 
-#: ../gtk/actions.c:81
+#: ../gtk/actions.c:80
 msgid "_Toolbar"
 msgstr "_Toolbar"
 
-#: ../gtk/actions.c:86
+#: ../gtk/actions.c:85
 msgid "_File"
 msgstr "_Fail"
 
-#: ../gtk/actions.c:87
+#: ../gtk/actions.c:86
 msgid "_Torrent"
 msgstr "_Torrent"
 
-#: ../gtk/actions.c:88
+#: ../gtk/actions.c:87
 msgid "_View"
 msgstr "_Lihat"
 
-#: ../gtk/actions.c:89
+#: ../gtk/actions.c:88
 msgid "_Sort Torrents By"
 msgstr "_Susun Torrent Mengikut"
 
-#: ../gtk/actions.c:90
+#: ../gtk/actions.c:89
 msgid "_Queue"
 msgstr "Baris _Gilir"
 
-#: ../gtk/actions.c:91 ../gtk/details.c:2620
+#: ../gtk/actions.c:90 ../gtk/details.c:2619
 msgid "_Edit"
 msgstr "_Sunting"
 
-#: ../gtk/actions.c:92
+#: ../gtk/actions.c:91
 msgid "_Help"
 msgstr "_Bantuan"
 
-#: ../gtk/actions.c:93
+#: ../gtk/actions.c:92
 msgid "Copy _Magnet Link to Clipboard"
 msgstr "Salin Pautan _Magnet ke Papan Keratan"
 
-#: ../gtk/actions.c:94
+#: ../gtk/actions.c:93
 msgid "Open _URL…"
 msgstr "Buka _URL..."
 
-#: ../gtk/actions.c:94
+#: ../gtk/actions.c:93
 msgid "Open URL…"
 msgstr "Buka URL..."
 
-#: ../gtk/actions.c:95 ../gtk/actions.c:96
+#: ../gtk/actions.c:94 ../gtk/actions.c:95
 msgid "Open a torrent"
 msgstr "Buka torrent"
 
-#: ../gtk/actions.c:97
+#: ../gtk/actions.c:96
 msgid "_Start"
 msgstr "_Mula"
 
-#: ../gtk/actions.c:97
+#: ../gtk/actions.c:96
 msgid "Start torrent"
 msgstr "Mula torrent"
 
-#: ../gtk/actions.c:98
+#: ../gtk/actions.c:97
 msgid "Start _Now"
 msgstr "Mula Sekara_ng"
 
-#: ../gtk/actions.c:98
+#: ../gtk/actions.c:97
 msgid "Start torrent now"
 msgstr "Mula torrent sekarang"
 
-#: ../gtk/actions.c:99
+#: ../gtk/actions.c:98
 msgid "_Statistics"
 msgstr "_Statistik"
 
-#: ../gtk/actions.c:100
+#: ../gtk/actions.c:99
 msgid "_Donate"
 msgstr "_Beri Sumbangan"
 
-#: ../gtk/actions.c:101
+#: ../gtk/actions.c:100
 msgid "_Verify Local Data"
 msgstr "_Sahkan Data Tempatan"
 
-#: ../gtk/actions.c:102
+#: ../gtk/actions.c:101
 msgid "_Pause"
 msgstr "_Jeda"
 
-#: ../gtk/actions.c:102
+#: ../gtk/actions.c:101
 msgid "Pause torrent"
 msgstr "Jeda torrent"
 
-#: ../gtk/actions.c:103
+#: ../gtk/actions.c:102
 msgid "_Pause All"
 msgstr "_Jeda Semua"
 
-#: ../gtk/actions.c:103
+#: ../gtk/actions.c:102
 msgid "Pause all torrents"
 msgstr "Jeda semua torrent"
 
-#: ../gtk/actions.c:104
+#: ../gtk/actions.c:103
 msgid "_Start All"
 msgstr "_Mulakan Semua"
 
-#: ../gtk/actions.c:104
+#: ../gtk/actions.c:103
 msgid "Start all torrents"
 msgstr "Mulakan semua torrent"
 
-#: ../gtk/actions.c:105
+#: ../gtk/actions.c:104
 msgid "Set _Location…"
 msgstr "Tetapkan _Lokasi..."
 
-#: ../gtk/actions.c:106
+#: ../gtk/actions.c:105
 msgid "Remove torrent"
 msgstr "Buang torrent"
 
-#: ../gtk/actions.c:107
+#: ../gtk/actions.c:106
 msgid "_Delete Files and Remove"
 msgstr "_Hapus Fail-fail dan Buang"
 
-#: ../gtk/actions.c:108
+#: ../gtk/actions.c:107
 msgid "_New…"
 msgstr "_Baru..."
 
-#: ../gtk/actions.c:108
+#: ../gtk/actions.c:107
 msgid "Create a torrent"
 msgstr "Binakan satu torrent"
 
-#: ../gtk/actions.c:109
+#: ../gtk/actions.c:108
 msgid "_Quit"
 msgstr "_Keluar"
 
-#: ../gtk/actions.c:110
+#: ../gtk/actions.c:109
 msgid "Select _All"
 msgstr "Pilih _Semua"
 
-#: ../gtk/actions.c:111
+#: ../gtk/actions.c:110
 msgid "Dese_lect All"
 msgstr "_Nyahpilih Semua"
 
-#: ../gtk/actions.c:113
+#: ../gtk/actions.c:112
 msgid "Torrent properties"
 msgstr "Sifat Torrent"
 
-#: ../gtk/actions.c:114
+#: ../gtk/actions.c:113
 msgid "Open Fold_er"
 msgstr "Buka Fold_er"
 
-#: ../gtk/actions.c:116
+#: ../gtk/actions.c:115
 msgid "_Contents"
 msgstr "_Kandungan"
 
-#: ../gtk/actions.c:117
+#: ../gtk/actions.c:116
 msgid "Ask Tracker for _More Peers"
 msgstr "Mintak Tracker untuk _membanyakkan Peer"
 
-#: ../gtk/actions.c:118
+#: ../gtk/actions.c:117
 msgid "Move to _Top"
 msgstr "Alih ke _Atas"
 
-#: ../gtk/actions.c:119
+#: ../gtk/actions.c:118
 msgid "Move _Up"
 msgstr "Naik _ke Atas"
 
-#: ../gtk/actions.c:120
+#: ../gtk/actions.c:119
 msgid "Move _Down"
 msgstr "Turun ke _Bawah"
 
-#: ../gtk/actions.c:121
+#: ../gtk/actions.c:120
 msgid "Move to _Bottom"
 msgstr "Alih ke Ba_wah"
 
-#: ../gtk/actions.c:122
+#: ../gtk/actions.c:121
 msgid "Present Main Window"
 msgstr "Hadirkan Tetingkap Utama"
 
-#: ../gtk/conf.c:317 ../gtk/conf.c:322
-#, c-format
-msgid "Importing \"%s\""
-msgstr "Mengimport \"%s\""
-
-#: ../gtk/details.c:475 ../gtk/details.c:487
+#: ../gtk/details.c:474 ../gtk/details.c:486
 msgid "Use global settings"
 msgstr "Guna tetapan sejagat"
 
-#: ../gtk/details.c:476
+#: ../gtk/details.c:475
 msgid "Seed regardless of ratio"
 msgstr "Semai tanpa menuruti nisbah"
 
-#: ../gtk/details.c:477
+#: ../gtk/details.c:476
 msgid "Stop seeding at ratio:"
 msgstr "Henti menyemai pada nisbah:"
 
-#: ../gtk/details.c:488
+#: ../gtk/details.c:487
 msgid "Seed regardless of activity"
 msgstr "Semai tanpa menuruti aktiviti"
 
-#: ../gtk/details.c:489
+#: ../gtk/details.c:488
 msgid "Stop seeding if idle for N minutes:"
 msgstr "Henti menyemai jika melahu N minit:"
 
-#: ../gtk/details.c:505 ../gtk/tr-prefs.c:1315
+#: ../gtk/details.c:504 ../gtk/tr-prefs.c:1314
 msgid "Speed"
 msgstr "Kelajuan"
 
-#: ../gtk/details.c:507
+#: ../gtk/details.c:506
 msgid "Honor global _limits"
 msgstr "Hormati _had sejagat"
 
-#: ../gtk/details.c:512
+#: ../gtk/details.c:511
 #, c-format
 msgid "Limit _download speed (%s):"
 msgstr "Had kelajuan muat _turun (%s):"
 
-#: ../gtk/details.c:525
+#: ../gtk/details.c:524
 #, c-format
 msgid "Limit _upload speed (%s):"
 msgstr "Had kelajuan muat _naik (%s):"
 
-#: ../gtk/details.c:538 ../gtk/open-dialog.c:368
+#: ../gtk/details.c:537 ../gtk/open-dialog.c:367
 msgid "Torrent _priority:"
 msgstr "Keutamaan _torrent:"
 
-#: ../gtk/details.c:542
+#: ../gtk/details.c:541
 msgid "Seeding Limits"
 msgstr "Had Penyemaian"
 
-#: ../gtk/details.c:552
+#: ../gtk/details.c:551
 msgid "_Ratio:"
 msgstr "_Nisbah:"
 
-#: ../gtk/details.c:561
+#: ../gtk/details.c:560
 msgid "_Idle:"
 msgstr "_Melahu:"
 
-#: ../gtk/details.c:564
+#: ../gtk/details.c:563
 msgid "Peer Connections"
 msgstr "Sambungan Rakan"
 
-#: ../gtk/details.c:567
+#: ../gtk/details.c:566
 msgid "_Maximum peers:"
 msgstr "_Peer Maksima:"
 
-#: ../gtk/details.c:586 ../gtk/torrent-cell-renderer.c:206
-#: ../libtransmission/verify.c:269
+#: ../gtk/details.c:585 ../gtk/torrent-cell-renderer.c:205
+#: ../libtransmission/verify.c:268
 msgid "Queued for verification"
 msgstr "Dibaris gilir untuk pengesahan"
 
-#: ../gtk/details.c:587
+#: ../gtk/details.c:586
 msgid "Verifying local data"
 msgstr "Mengesahkan data tempatan"
 
-#: ../gtk/details.c:588 ../gtk/torrent-cell-renderer.c:209
+#: ../gtk/details.c:587 ../gtk/torrent-cell-renderer.c:208
 msgid "Queued for download"
 msgstr "Dibaris gilir untuk muat turun"
 
-#: ../gtk/details.c:589 ../gtk/filter.c:591
+#: ../gtk/details.c:588 ../gtk/filter.c:590
 msgctxt "Verb"
 msgid "Downloading"
 msgstr "Memuat turun"
 
-#: ../gtk/details.c:590 ../gtk/torrent-cell-renderer.c:212
+#: ../gtk/details.c:589 ../gtk/torrent-cell-renderer.c:211
 msgid "Queued for seeding"
 msgstr "Dibaris gilir untuk menyemai"
 
-#: ../gtk/details.c:591 ../gtk/filter.c:592
+#: ../gtk/details.c:590 ../gtk/filter.c:591
 msgctxt "Verb"
 msgid "Seeding"
 msgstr "Menyemai"
 
-#: ../gtk/details.c:592 ../gtk/filter.c:594 ../gtk/torrent-cell-renderer.c:203
+#: ../gtk/details.c:591 ../gtk/filter.c:593 ../gtk/torrent-cell-renderer.c:202
 msgid "Finished"
 msgstr "Selesai"
 
-#: ../gtk/details.c:592 ../gtk/filter.c:593 ../gtk/torrent-cell-renderer.c:203
+#: ../gtk/details.c:591 ../gtk/filter.c:592 ../gtk/torrent-cell-renderer.c:202
 msgid "Paused"
 msgstr "Dijeda"
 
-#: ../gtk/details.c:625 ../gtk/details.c:702
+#: ../gtk/details.c:624 ../gtk/details.c:701
 msgid "N/A"
 msgstr "T/A"
 
-#: ../gtk/details.c:637 ../gtk/file-list.c:619
+#: ../gtk/details.c:636 ../gtk/file-list.c:618
 msgid "Mixed"
 msgstr "Campuran"
 
-#: ../gtk/details.c:638
+#: ../gtk/details.c:637
 msgid "No Torrents Selected"
 msgstr "Tiada torrent Dipilih"
 
-#: ../gtk/details.c:667
+#: ../gtk/details.c:666
 msgid "Private to this tracker -- DHT and PEX disabled"
 msgstr "Peribadikan penjejak ini - DHT dan PEX dilumpuhkan"
 
-#: ../gtk/details.c:669
+#: ../gtk/details.c:668
 msgid "Public torrent"
 msgstr "Torrent awam"
 
-#: ../gtk/details.c:707
+#: ../gtk/details.c:706
 #, c-format
 msgid "Created by %1$s"
 msgstr "Dicipta oleh %1$s"
 
-#: ../gtk/details.c:709
+#: ../gtk/details.c:708
 #, c-format
 msgid "Created on %1$s"
 msgstr "Dicipta pada %1$s"
 
-#: ../gtk/details.c:711
+#: ../gtk/details.c:710
 #, c-format
 msgid "Created by %1$s on %2$s"
 msgstr "Dicipta oleh %1$s pada %2$s"
 
-#: ../gtk/details.c:823
+#: ../gtk/details.c:822
 msgid "Unknown"
 msgstr "Tidak diketahui"
 
-#: ../gtk/details.c:856
+#: ../gtk/details.c:855
 #, c-format
 msgid "%1$s (%2$'d piece @ %3$s)"
 msgid_plural "%1$s (%2$'d pieces @ %3$s)"
-msgstr[0] "%1$s (%2$'d bahagian @ %3$s)"
-msgstr[1] "%1$s (%2$'d bahagian @ %3$s)"
+msgstr[0] ""
 
-#: ../gtk/details.c:864
+#: ../gtk/details.c:863
 #, c-format
 msgid "%1$s (%2$'d piece)"
 msgid_plural "%1$s (%2$'d pieces)"
-msgstr[0] "%1$s (%2$'d bahagian)"
-msgstr[1] "%1$s (%2$'d bahagian)"
+msgstr[0] ""
 
-#: ../gtk/details.c:906
+#: ../gtk/details.c:905
 #, c-format
 msgid "%1$s (%2$s%%)"
 msgstr "%1$s (%2$s%%)"
 
-#: ../gtk/details.c:908
+#: ../gtk/details.c:907
 #, c-format
 msgid "%1$s (%2$s%% of %3$s%% Available)"
 msgstr "%1$s (%2$s%% of %3$s%% Ada)"
 
-#: ../gtk/details.c:910
+#: ../gtk/details.c:909
 #, c-format
 msgid "%1$s (%2$s%% of %3$s%% Available); %4$s Unverified"
 msgstr "%1$s (%2$s%% dari %3$s%% Ada); %4$s Tidak Disahkan"
 
-#: ../gtk/details.c:937
+#: ../gtk/details.c:936
 #, c-format
 msgid "%1$s (+%2$s corrupt)"
 msgstr "%1$s (+%2$s rosak)"
 
-#: ../gtk/details.c:965
+#: ../gtk/details.c:964
 #, c-format
 msgid "%s (Ratio: %s)"
 msgstr "%s (Nisbah: %s)"
 
-#: ../gtk/details.c:998
+#: ../gtk/details.c:997
 msgid "No errors"
 msgstr "Tiada ralat"
 
-#: ../gtk/details.c:1017
+#: ../gtk/details.c:1016
 msgid "Never"
 msgstr "Tidak Pernah"
 
-#: ../gtk/details.c:1024
+#: ../gtk/details.c:1023
 msgid "Active now"
 msgstr "Aktifkan sekarang"
 
-#: ../gtk/details.c:1030
+#: ../gtk/details.c:1029
 #, c-format
 msgid "%1$s ago"
 msgstr "%1$s yang lalu"
 
-#: ../gtk/details.c:1049
+#: ../gtk/details.c:1048
 msgid "Activity"
 msgstr "Aktiviti"
 
-#: ../gtk/details.c:1054
+#: ../gtk/details.c:1053
 msgid "Torrent size:"
 msgstr "Saiz torrent:"
 
-#: ../gtk/details.c:1059
+#: ../gtk/details.c:1058
 msgid "Have:"
 msgstr "Mempunyai:"
 
-#: ../gtk/details.c:1069 ../gtk/stats.c:156 ../gtk/stats.c:178
-msgid "Downloaded:"
-msgstr "Telah Dimuat turun:"
-
-#: ../gtk/details.c:1064 ../gtk/stats.c:152 ../gtk/stats.c:174
+#: ../gtk/details.c:1063 ../gtk/stats.c:151 ../gtk/stats.c:173
 msgid "Uploaded:"
 msgstr "Telah dimuatnaik"
 
-#: ../gtk/details.c:1074
+#: ../gtk/details.c:1068 ../gtk/stats.c:155 ../gtk/stats.c:177
+msgid "Downloaded:"
+msgstr "Telah Dimuat turun:"
+
+#: ../gtk/details.c:1073
 msgid "State:"
 msgstr "Keadaan:"
 
-#: ../gtk/details.c:1079
+#: ../gtk/details.c:1078
 msgid "Running time:"
 msgstr "Masa dijalankan:"
 
-#: ../gtk/details.c:1084
+#: ../gtk/details.c:1083
 msgid "Remaining time:"
 msgstr "Masa berbaki:"
 
-#: ../gtk/details.c:1089
+#: ../gtk/details.c:1088
 msgid "Last activity:"
 msgstr "Aktiviti akhir:"
 
-#: ../gtk/details.c:1095
+#: ../gtk/details.c:1094
 msgid "Error:"
 msgstr "Ralat:"
 
-#: ../gtk/details.c:1099
+#: ../gtk/details.c:1098
 msgid "Details"
 msgstr "Perincian"
 
-#: ../gtk/details.c:1105
+#: ../gtk/details.c:1104
 msgid "Location:"
 msgstr "Lokasi:"
 
-#: ../gtk/details.c:1112
+#: ../gtk/details.c:1111
 msgid "Hash:"
 msgstr "Hash:"
 
-#: ../gtk/details.c:1118
+#: ../gtk/details.c:1117
 msgid "Privacy:"
 msgstr "Persendirian:"
 
-#: ../gtk/details.c:1125
+#: ../gtk/details.c:1124
 msgid "Origin:"
 msgstr "Asal:"
 
-#: ../gtk/details.c:1142
+#: ../gtk/details.c:1141
 msgid "Comment:"
 msgstr "Komen:"
 
-#: ../gtk/details.c:1056
-msgid "Webseeds"
-msgstr "SemaianWeb"
+#: ../gtk/details.c:1169
+msgid "Web Seeds"
+msgstr ""
 
-#: ../gtk/details.c:1172 ../gtk/details.c:1225
+#: ../gtk/details.c:1171 ../gtk/details.c:1224
 msgid "Down"
 msgstr "Turun"
 
-#: ../gtk/details.c:1223
+#: ../gtk/details.c:1222
 msgid "Address"
 msgstr "Alamat"
 
-#: ../gtk/details.c:1227
+#: ../gtk/details.c:1226
 msgid "Up"
 msgstr "Naik"
 
-#: ../gtk/details.c:1228
+#: ../gtk/details.c:1227
 msgid "Client"
 msgstr "Klien"
 
-#: ../gtk/details.c:1229
+#: ../gtk/details.c:1228
 msgid "%"
 msgstr "%"
 
-#: ../gtk/details.c:1231
+#: ../gtk/details.c:1230
 msgid "Up Reqs"
 msgstr "Keperluan Muat Naik"
 
-#: ../gtk/details.c:1233
+#: ../gtk/details.c:1232
 msgid "Dn Reqs"
 msgstr "Keperluan Muat Turun"
 
-#: ../gtk/details.c:1235
+#: ../gtk/details.c:1234
 msgid "Dn Blocks"
 msgstr "Blok Muat Turun"
 
-#: ../gtk/details.c:1237
+#: ../gtk/details.c:1236
 msgid "Up Blocks"
 msgstr "Blok Muat Naik"
 
-#: ../gtk/details.c:1239
+#: ../gtk/details.c:1238
 msgid "We Cancelled"
 msgstr "Kami Batalkan"
 
-#: ../gtk/details.c:1241
+#: ../gtk/details.c:1240
 msgid "They Cancelled"
 msgstr "Mereka Batalkan"
 
-#: ../gtk/details.c:1242
+#: ../gtk/details.c:1241
 msgid "Flags"
 msgstr "Bendera"
 
-#: ../gtk/details.c:1625
+#: ../gtk/details.c:1624
 msgid "Optimistic unchoke"
 msgstr "Nyahsumbat Optimistik"
 
-#: ../gtk/details.c:1626
+#: ../gtk/details.c:1625
 msgid "Downloading from this peer"
 msgstr "Memuat turun dari rakan ini"
 
-#: ../gtk/details.c:1627
+#: ../gtk/details.c:1626
 msgid "We would download from this peer if they would let us"
 msgstr "Kami ingin memuat turun dari rakan ini jika mereka membenarkannya"
 
-#: ../gtk/details.c:1628
+#: ../gtk/details.c:1627
 msgid "Uploading to peer"
 msgstr "Muatnaik ke peer"
 
-#: ../gtk/details.c:1629
+#: ../gtk/details.c:1628
 msgid "We would upload to this peer if they asked"
 msgstr "Kami ingin memuat naik ke rakan ini jika mereka memohonnya"
 
-#: ../gtk/details.c:1630
+#: ../gtk/details.c:1629
 msgid "Peer has unchoked us, but we're not interested"
 msgstr "Rakan telah menyahsumbat kami, tetapi kita tidak berminat"
 
-#: ../gtk/details.c:1631
+#: ../gtk/details.c:1630
 msgid "We unchoked this peer, but they're not interested"
 msgstr "Kami telah menyahsumbat rakan ini, tetapi mereka tidak berminat"
 
-#: ../gtk/details.c:1632
+#: ../gtk/details.c:1631
 msgid "Encrypted connection"
 msgstr "Sambungan tersulit"
 
-#: ../gtk/details.c:1633
+#: ../gtk/details.c:1632
 msgid "Peer was found through Peer Exchange (PEX)"
 msgstr "Rakan ditemui melalui Pertukaran Rakan (PEX)"
 
-#: ../gtk/details.c:1634
+#: ../gtk/details.c:1633
 msgid "Peer was found through DHT"
 msgstr "Rakan ditemui melalui DHT"
 
-#: ../gtk/details.c:1635
+#: ../gtk/details.c:1634
 msgid "Peer is an incoming connection"
 msgstr "Rakan merupakan sambungan masuk"
 
-#: ../gtk/details.c:1636
+#: ../gtk/details.c:1635
 msgid "Peer is connected over µTP"
 msgstr "Rakan disambung melalui µTP"
 
-#: ../gtk/details.c:1888 ../gtk/details.c:2635
+#: ../gtk/details.c:1887 ../gtk/details.c:2634
 msgid "Show _more details"
 msgstr "Papar _lagi perincian"
 
-#: ../gtk/details.c:1959
+#: ../gtk/details.c:1958
 #, c-format
 msgid "Got a list of %1$s%2$'d peers%3$s %4$s ago"
 msgstr "Memperoleh senarai %1$s%2$'d rakan %3$s %4$s yang lalu"
 
-#: ../gtk/details.c:1963
+#: ../gtk/details.c:1962
 #, c-format
 msgid "Peer list request %1$stimed out%2$s %3$s ago; will retry"
 msgstr ""
 "Permintaan senarai rakan %1$s telah tamat masa %2$s %3$s yang lalu; akan "
 "cuba lakukan sekali lagi"
 
-#: ../gtk/details.c:1966
+#: ../gtk/details.c:1965
 #, c-format
 msgid "Got an error %1$s\"%2$s\"%3$s %4$s ago"
 msgstr "Memperoleh ralat %1$s\"%2$s\"%3$s %4$s yang lalu"
 
-#: ../gtk/details.c:1974
+#: ../gtk/details.c:1973
 msgid "No updates scheduled"
 msgstr "Tiada kemaskini dijadualkan"
 
-#: ../gtk/details.c:1980
+#: ../gtk/details.c:1979
 #, c-format
 msgid "Asking for more peers in %s"
 msgstr "Memohon lagi rakan didalam %s"
 
-#: ../gtk/details.c:1985
+#: ../gtk/details.c:1984
 msgid "Queued to ask for more peers"
 msgstr "Dibaris gilirkan untuk memohon lagi rakan"
 
-#: ../gtk/details.c:1991
+#: ../gtk/details.c:1990
 #, c-format
 msgid "Asking for more peers now… <small>%s</small>"
 msgstr "Menanya lebih rakan sekarang... <small>%s</small>"
 
-#: ../gtk/details.c:2002
+#: ../gtk/details.c:2001
 #, c-format
 msgid "Tracker had %s%'d seeders and %'d leechers%s %s ago"
 msgstr "Penjejak mempunyai %s%'d penyemai dan %'d penyedut%s %s yang lalu"
 
-#: ../gtk/details.c:2006
+#: ../gtk/details.c:2005
 #, c-format
 msgid "Got a scrape error \"%s%s%s\" %s ago"
 msgstr "Dapat ralat skrap \"%s%s%s\" %s yang lalu"
 
-#: ../gtk/details.c:2017
+#: ../gtk/details.c:2016
 #, c-format
 msgid "Asking for peer counts in %s"
 msgstr "Memohon kiraan rakan didalam %s"
 
-#: ../gtk/details.c:2022
+#: ../gtk/details.c:2021
 msgid "Queued to ask for peer counts"
 msgstr "Dibaris gilirkan untuk pohon kiraan rakan"
 
-#: ../gtk/details.c:2028
+#: ../gtk/details.c:2027
 #, c-format
 msgid "Asking for peer counts now… <small>%s</small>"
 msgstr "Menanya kiraan rakan sekarang... <small>%s</small>"
 
-#: ../gtk/details.c:2313
+#: ../gtk/details.c:2312
 msgid "List contains invalid URLs"
 msgstr "Senarai mengandungi URL yang tidak sah"
 
-#: ../gtk/details.c:2318 ../gtk/file-list.c:819
+#: ../gtk/details.c:2317 ../gtk/file-list.c:818
 msgid "Please correct the errors and try again."
 msgstr "Sila betulkan ralat dan cuba lagi."
 
-#: ../gtk/details.c:2374
+#: ../gtk/details.c:2373
 #, c-format
 msgid "%s - Edit Trackers"
 msgstr "%s - Sunting Penjejak"
 
-#: ../gtk/details.c:2384
+#: ../gtk/details.c:2383
 msgid "Tracker Announce URLs"
 msgstr "URL Makluman Penjejak"
 
-#: ../gtk/details.c:2387 ../gtk/makemeta-ui.c:499
+#: ../gtk/details.c:2386 ../gtk/makemeta-ui.c:498
 msgid ""
 "To add a backup URL, add it on the line after the primary URL.\n"
 "To add another primary URL, add it after a blank line."
@@ -699,80 +697,78 @@ msgstr ""
 "Untuk menambah URL sandar, tambahkannya pada baris selepas URL utama.\n"
 "Untuk menambah URL utama yang lain, tambahkannya selepasa baris kosong."
 
-#: ../gtk/details.c:2488
+#: ../gtk/details.c:2487
 #, c-format
 msgid "%s - Add Tracker"
 msgstr "%s - Tambah Penjejak"
 
-#: ../gtk/details.c:2502
+#: ../gtk/details.c:2501
 msgid "Tracker"
 msgstr "Penjejak"
 
-#: ../gtk/details.c:2508
+#: ../gtk/details.c:2507
 msgid "_Announce URL:"
 msgstr "_Umumkan URL:"
 
-#: ../gtk/details.c:2591 ../gtk/details.c:2736
+#: ../gtk/details.c:2590 ../gtk/details.c:2735
 msgid "Trackers"
 msgstr "Tracker"
 
-#: ../gtk/details.c:2615
+#: ../gtk/details.c:2614
 msgid "_Add"
 msgstr "_Tambah"
 
-#: ../gtk/details.c:2626
+#: ../gtk/details.c:2625
 msgid "_Remove"
 msgstr "_Buang"
 
-#: ../gtk/details.c:2642
+#: ../gtk/details.c:2641
 msgid "Show _backup trackers"
 msgstr "Papar penjejak san_dar"
 
-#: ../gtk/details.c:2728 ../gtk/msgwin.c:438
+#: ../gtk/details.c:2727 ../gtk/msgwin.c:437
 msgid "Information"
 msgstr "Informasi"
 
-#: ../gtk/details.c:2732
+#: ../gtk/details.c:2731
 msgid "Peers"
 msgstr "Peer"
 
-#: ../gtk/details.c:2741
+#: ../gtk/details.c:2740
 msgid "File listing not available for combined torrent properties"
 msgstr "Penyenaraian fail tiada untuk ciri-ciri torent tergabung"
 
-#: ../gtk/details.c:2745 ../gtk/makemeta-ui.c:446
+#: ../gtk/details.c:2744 ../gtk/makemeta-ui.c:445
 msgid "Files"
 msgstr "Fail"
 
-#: ../gtk/details.c:2749 ../gtk/tr-prefs.c:1222 ../gtk/tr-window.c:685
+#: ../gtk/details.c:2748 ../gtk/tr-prefs.c:1221 ../gtk/tr-window.c:683
 msgid "Options"
 msgstr "Pilihan"
 
-#: ../gtk/details.c:2773
+#: ../gtk/details.c:2772
 #, c-format
 msgid "%s Properties"
 msgstr "Ciri-ciri %s"
 
-#: ../gtk/details.c:2784
+#: ../gtk/details.c:2783
 #, c-format
 msgid "%'d Torrent Properties"
 msgstr "Ciri-Ciri Torrent %'d"
 
-#: ../gtk/dialogs.c:95
+#: ../gtk/dialogs.c:93
 #, c-format
 msgid "Remove torrent?"
 msgid_plural "Remove %d torrents?"
-msgstr[0] "Buang torrent?"
-msgstr[1] "Buang %d torrent?"
+msgstr[0] ""
 
-#: ../gtk/dialogs.c:101
+#: ../gtk/dialogs.c:99
 #, c-format
 msgid "Delete this torrent's downloaded files?"
 msgid_plural "Delete these %d torrents' downloaded files?"
-msgstr[0] "Padam fail muat turun torrent ini?"
-msgstr[1] "Padam fail muat turun torrent ini?"
+msgstr[0] ""
 
-#: ../gtk/dialogs.c:111
+#: ../gtk/dialogs.c:109
 msgid ""
 "Once removed, continuing the transfer will require the torrent file or "
 "magnet link."
@@ -780,114 +776,102 @@ msgid_plural ""
 "Once removed, continuing the transfers will require the torrent files or "
 "magnet links."
 msgstr[0] ""
-"Apabila dibuangkan, penyambungan pindahan akan memerlukan fail torrent atau "
-"pautan magnet."
-msgstr[1] ""
-"Apabila dibuangkan, penyambungan pindahan akan memerlukan fail torrent atau "
-"pautan magnet."
 
-#: ../gtk/dialogs.c:117
+#: ../gtk/dialogs.c:115
 msgid "This torrent has not finished downloading."
 msgid_plural "These torrents have not finished downloading."
-msgstr[0] "Torrent ini belum selesai memuat turun."
-msgstr[1] "Torrent ini belum selesai memuat turun."
+msgstr[0] ""
 
-#: ../gtk/dialogs.c:123
+#: ../gtk/dialogs.c:121
 msgid "This torrent is connected to peers."
 msgid_plural "These torrents are connected to peers."
-msgstr[0] "Torrent ini disambungkan dengan rakan."
-msgstr[1] "Torrent ini disambungkan dengan rakan."
+msgstr[0] ""
 
-#: ../gtk/dialogs.c:130
+#: ../gtk/dialogs.c:128
 msgid "One of these torrents is connected to peers."
 msgid_plural "Some of these torrents are connected to peers."
-msgstr[0] "Salah satu daripada torrent ini disambungkan dengan rakan."
-msgstr[1] "Salah satu daripada torrent ini disambungkan dengan rakan."
+msgstr[0] ""
 
-#: ../gtk/dialogs.c:137
+#: ../gtk/dialogs.c:135
 msgid "One of these torrents has not finished downloading."
 msgid_plural "Some of these torrents have not finished downloading."
-msgstr[0] "Salah satu daripada torrent ini belum selesai memuat turun."
-msgstr[1] "Salah satu daripada torrent ini belum selesai memuat turun."
+msgstr[0] ""
 
-#: ../gtk/file-list.c:616 ../gtk/util.c:483
+#: ../gtk/file-list.c:615 ../gtk/util.c:482
 msgid "High"
 msgstr "Tinggi"
 
-#: ../gtk/file-list.c:617 ../gtk/util.c:484
+#: ../gtk/file-list.c:616 ../gtk/util.c:483
 msgid "Normal"
 msgstr "Normal"
 
-#: ../gtk/file-list.c:618 ../gtk/util.c:485
+#: ../gtk/file-list.c:617 ../gtk/util.c:484
 msgid "Low"
 msgstr "Rendah"
 
-#: ../gtk/file-list.c:936 ../gtk/msgwin.c:303
+#: ../gtk/file-list.c:813
+#, c-format
+msgid "Unable to rename file as \"%s\": %s"
+msgstr ""
+
+#: ../gtk/file-list.c:935 ../gtk/msgwin.c:302
 msgid "Name"
 msgstr "Nama"
 
 #. add "size" column
-#: ../gtk/file-list.c:953
+#: ../gtk/file-list.c:952
 msgid "Size"
 msgstr "Saiz"
 
 #. add "progress" column
-#: ../gtk/file-list.c:968
+#: ../gtk/file-list.c:967
 msgid "Have"
 msgstr "Punyai"
 
 #. add "enabled" column
-#: ../gtk/file-list.c:981
+#: ../gtk/file-list.c:980
 msgid "Download"
 msgstr "Muatturun"
 
 #. add priority column
-#: ../gtk/file-list.c:997
+#: ../gtk/file-list.c:996
 msgid "Priority"
 msgstr "Prioriti"
 
-#: ../gtk/filter.c:281 ../gtk/filter.c:588
+#: ../gtk/filter.c:280 ../gtk/filter.c:587
 msgid "All"
 msgstr "Semua"
 
-#: ../gtk/tr-prefs.c:546 ../gtk/tr-prefs.c:1321
-msgid "Privacy"
-msgstr "Peribadi"
-
-#: ../gtk/filter.c:333
-msgid "Public"
-msgstr "Awam"
-
-#: ../gtk/filter.c:337
-msgid "Private"
-msgstr "Peribadi"
-
-#: ../gtk/filter.c:590
+#: ../gtk/filter.c:589
 msgid "Active"
 msgstr "Aktif"
 
-#: ../gtk/filter.c:595
+#: ../gtk/filter.c:594
 msgctxt "Verb"
 msgid "Verifying"
 msgstr "Mengesahkan"
 
-#: ../gtk/filter.c:596 ../gtk/msgwin.c:437 ../gtk/util.c:696
+#: ../gtk/filter.c:595 ../gtk/msgwin.c:436 ../gtk/util.c:695
 #, c-format
 msgid "Error"
 msgstr "Ralat"
 
-#: ../gtk/filter.c:893
+#: ../gtk/filter.c:892
 #, c-format
 msgid "_Show:"
 msgstr "_Papar:"
 
-#: ../gtk/main.c:307
+#: ../gtk/filter.c:894
 #, c-format
-msgid "Error registering Transmission as x-scheme-handler/magnet handler: %s"
+msgid "_Show %'d of:"
 msgstr ""
-"Ralat mendatar Transmission sebagai pengendali x-scheme-handler/magnet: %s"
 
-#: ../gtk/main.c:490
+#: ../gtk/main.c:325
+#, c-format
+msgid "Error registering Transmission as a %s handler: %s"
+msgstr ""
+
+#: ../gtk/main.c:488
 #, c-format
 msgid ""
 "Got signal %d; trying to shut down cleanly. Do it again if it gets stuck."
@@ -895,32 +879,32 @@ msgstr ""
 "Dapat isyarat %d; cuba dimatikan mengikut prosedur. Lakukan lagi jika "
 "tersangkut."
 
-#: ../gtk/main.c:623
+#: ../gtk/main.c:621
 msgid "Where to look for configuration files"
 msgstr "Dimana perlu cari fail konfigurasi"
 
-#: ../gtk/main.c:624
+#: ../gtk/main.c:622
 msgid "Start with all torrents paused"
 msgstr "Mulakan dengan semua torrent dijedakan"
 
-#: ../gtk/main.c:625
+#: ../gtk/main.c:623
 msgid "Start minimized in notification area"
 msgstr "Mula dengan diminimakan didalam kawasan pemberitahuan"
 
-#: ../gtk/main.c:626
+#: ../gtk/main.c:624
 msgid "Show version number and exit"
 msgstr "Papar nombor versi dan keluar"
 
-#: ../gtk/main.c:644 ../gtk/transmission-gtk.desktop.in.h:1
+#: ../gtk/main.c:642 ../gtk/transmission-gtk.desktop.in.h:1
 msgid "Transmission"
 msgstr "Transmission"
 
 #. parse the command line
-#: ../gtk/main.c:647
+#: ../gtk/main.c:645
 msgid "[torrent files or urls]"
 msgstr "[fail torrent atau url]"
 
-#: ../gtk/main.c:653
+#: ../gtk/main.c:651
 #, c-format
 msgid ""
 "%s\n"
@@ -930,58 +914,51 @@ msgstr ""
 "Jalankan '%s --help' untuk melihat senarai penuh pilihan baris perintah yang "
 "tersedia.\n"
 
-#: ../gtk/main.c:730
+#: ../gtk/main.c:753
 msgid ""
-"Transmission is a file-sharing program. When you run a torrent, its data "
-"will be made available to others by means of upload. You and you alone are "
-"fully responsible for exercising proper judgement and abiding by your local "
-"laws."
+"Transmission is a file sharing program. When you run a torrent, its data "
+"will be made available to others by means of upload. Any content you share "
+"is your sole responsibility."
 msgstr ""
-"Transmission merupakan program perkongsian-fail. Bila anda jalankan torrent, "
-"datanya akan tersedia untuk orang lain bagi tujuan dimuat naik. Anda sendiri "
-"bertanggungjawab sepenuhnya melakukan penilaian yang sepatutnya dan menuruti "
-"undang-undang setempat."
 
-#: ../gtk/main.c:732
-msgid "I _Accept"
-msgstr "Saya _Terima"
+#: ../gtk/main.c:755
+msgid "I _Agree"
+msgstr ""
 
-#: ../gtk/main.c:988
+#: ../gtk/main.c:986
 msgid "<b>Closing Connections</b>"
 msgstr "<b>Menutup Sambungan</b>"
 
-#: ../gtk/main.c:992
+#: ../gtk/main.c:990
 msgid "Sending upload/download totals to tracker…"
 msgstr "Menghantar jumlah muat naik/muat turun ke penjejak..."
 
-#: ../gtk/main.c:997
+#: ../gtk/main.c:995
 msgid "_Quit Now"
 msgstr "_Tutup sekarang"
 
-#: ../gtk/main.c:1058
+#: ../gtk/main.c:1056
 msgid "Couldn't add corrupt torrent"
 msgid_plural "Couldn't add corrupt torrents"
-msgstr[0] "Tidak dapat menambah torrent rosak"
-msgstr[1] "Tidak dapat menambah torrent rosak"
+msgstr[0] ""
 
-#: ../gtk/main.c:1065
+#: ../gtk/main.c:1063
 msgid "Couldn't add duplicate torrent"
 msgid_plural "Couldn't add duplicate torrents"
-msgstr[0] "Tidak dapat menambah torrent pendua"
-msgstr[1] "Tidak dapat menambah torrent pendua"
+msgstr[0] ""
 
-#: ../gtk/main.c:1373
+#: ../gtk/main.c:1372
 msgid "A fast and easy BitTorrent client"
 msgstr "Klien BitTorrent yang mudah dan pantas"
 
-#: ../gtk/main.c:1374
+#: ../gtk/main.c:1373
 msgid "Copyright (c) The Transmission Project"
 msgstr "Hakcipta (c) Projek Transmission"
 
 #. Translators: translate "translator-credits" as your name
 #. to have it appear in the credits in the "About"
 #. dialog
-#: ../gtk/main.c:1380
+#: ../gtk/main.c:1379
 msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
@@ -990,248 +967,245 @@ msgstr ""
 "  babylon2233 https://launchpad.net/~babylon2233\n"
 "  melayubuntu https://launchpad.net/~zul-malc"
 
-#: ../gtk/makemeta-ui.c:72
+#: ../gtk/makemeta-ui.c:71
 #, c-format
 msgid "Creating \"%s\""
 msgstr "Mencipta \"%s\""
 
-#: ../gtk/makemeta-ui.c:74
+#: ../gtk/makemeta-ui.c:73
 #, c-format
 msgid "Created \"%s\"!"
 msgstr "Ciptakan \"%s\"!"
 
-#: ../gtk/makemeta-ui.c:76
+#: ../gtk/makemeta-ui.c:75
 #, c-format
 msgid "Error: invalid announce URL \"%s\""
 msgstr "Ralat: URL makluman \"%s\" tidak sah"
 
-#: ../gtk/makemeta-ui.c:78
+#: ../gtk/makemeta-ui.c:77
 #, c-format
 msgid "Cancelled"
 msgstr "Dibatalkan"
 
-#: ../gtk/makemeta-ui.c:80
+#: ../gtk/makemeta-ui.c:79
 #, c-format
 msgid "Error reading \"%s\": %s"
 msgstr "Ralat membaca \"%s\": %s"
 
-#: ../gtk/makemeta-ui.c:82
+#: ../gtk/makemeta-ui.c:81
 #, c-format
 msgid "Error writing \"%s\": %s"
 msgstr "Ralat menulis \"%s\": %s"
 
 #. how much data we've scanned through to generate checksums
-#: ../gtk/makemeta-ui.c:103
+#: ../gtk/makemeta-ui.c:102
 #, c-format
 msgid "Scanned %s"
 msgstr "Imbas %s"
 
-#: ../gtk/makemeta-ui.c:171 ../gtk/makemeta-ui.c:434
+#: ../gtk/makemeta-ui.c:170 ../gtk/makemeta-ui.c:433
 msgid "New Torrent"
 msgstr "Turrent Baru"
 
-#: ../gtk/makemeta-ui.c:187
+#: ../gtk/makemeta-ui.c:186
 msgid "Creating torrent…"
 msgstr "Mencipta torrent..."
 
-#: ../gtk/makemeta-ui.c:299
+#: ../gtk/makemeta-ui.c:298
 msgid "No source selected"
 msgstr "Tiada sumber dipilih"
 
-#: ../gtk/makemeta-ui.c:305
+#: ../gtk/makemeta-ui.c:304
 #, c-format
 msgid "%1$s; %2$'d File"
 msgid_plural "%1$s; %2$'d Files"
-msgstr[0] "%1$s; Fail %2$'d"
-msgstr[1] "%1$s; Fail %2$'d"
+msgstr[0] ""
 
-#: ../gtk/makemeta-ui.c:312
+#: ../gtk/makemeta-ui.c:311
 #, c-format
 msgid "%1$'d Piece @ %2$s"
 msgid_plural "%1$'d Pieces @ %2$s"
-msgstr[0] "%1$'d Bahagian @ %2$s"
-msgstr[1] "%1$'d Bahagian @ %2$s"
+msgstr[0] ""
 
-#: ../gtk/makemeta-ui.c:448
+#: ../gtk/makemeta-ui.c:447
 msgid "Sa_ve to:"
 msgstr "Sim_pan ke:"
 
-#: ../gtk/makemeta-ui.c:454
+#: ../gtk/makemeta-ui.c:453
 msgid "Source F_older:"
 msgstr "F_older Sumber:"
 
-#: ../gtk/makemeta-ui.c:466
+#: ../gtk/makemeta-ui.c:465
 msgid "Source _File:"
 msgstr "_Fail Sumber:"
 
-#: ../gtk/makemeta-ui.c:478
+#: ../gtk/makemeta-ui.c:477
 msgid "<i>No source selected</i>"
 msgstr "<i>Tiada sumber dipilih</i>"
 
-#: ../gtk/makemeta-ui.c:482
+#: ../gtk/makemeta-ui.c:481
 msgid "Properties"
 msgstr "Ciri-ciri"
 
-#: ../gtk/makemeta-ui.c:484
+#: ../gtk/makemeta-ui.c:483
 msgid "_Trackers:"
 msgstr "_Penjejak:"
 
-#: ../gtk/makemeta-ui.c:506
+#: ../gtk/makemeta-ui.c:505
 msgid "Co_mment:"
 msgstr "U_lasan:"
 
-#: ../gtk/makemeta-ui.c:515
+#: ../gtk/makemeta-ui.c:514
 msgid "_Private torrent"
 msgstr "Torrent _peribadi"
 
-#: ../gtk/msgwin.c:142
+#: ../gtk/msgwin.c:141
 #, c-format
 msgid "Couldn't save \"%s\""
 msgstr "Tidak dapat menyimpan \"%s\""
 
-#: ../gtk/msgwin.c:203
+#: ../gtk/msgwin.c:202
 msgid "Save Log"
 msgstr "Simpan Log"
 
-#: ../gtk/msgwin.c:298
+#: ../gtk/msgwin.c:297
 msgid "Time"
 msgstr "Masa"
 
-#: ../gtk/msgwin.c:308
+#: ../gtk/msgwin.c:307
 msgid "Message"
 msgstr "Mesej"
 
-#: ../gtk/msgwin.c:439
+#: ../gtk/msgwin.c:438
 msgid "Debug"
 msgstr "Nyahpepijat"
 
-#: ../gtk/msgwin.c:465
+#: ../gtk/msgwin.c:464
 msgid "Message Log"
 msgstr "Log Mesej"
 
-#: ../gtk/msgwin.c:500
+#: ../gtk/msgwin.c:499
 msgid "Level"
 msgstr "Aras"
 
-#: ../gtk/notify.c:214
+#: ../gtk/notify.c:213
 msgid "Open File"
 msgstr "Buka Fail"
 
-#: ../gtk/notify.c:219
+#: ../gtk/notify.c:218
 msgid "Open Folder"
 msgstr "Buka Folder"
 
-#: ../gtk/notify.c:227
+#: ../gtk/notify.c:226
 msgid "Torrent Complete"
 msgstr "Torrent Selesai"
 
-#: ../gtk/notify.c:249
+#: ../gtk/notify.c:248
 msgid "Torrent Added"
 msgstr "Torrent Ditambah"
 
-#: ../gtk/open-dialog.c:250
+#: ../gtk/open-dialog.c:249
 msgid "Torrent files"
 msgstr "Fail torrent"
 
-#: ../gtk/open-dialog.c:255
+#: ../gtk/open-dialog.c:254
 msgid "All files"
 msgstr "Semua fail"
 
 #. make the dialog
-#: ../gtk/open-dialog.c:280
+#: ../gtk/open-dialog.c:279
 msgid "Torrent Options"
 msgstr "Opsyen torrent"
 
-#: ../gtk/open-dialog.c:302 ../gtk/tr-prefs.c:296
+#: ../gtk/open-dialog.c:301 ../gtk/tr-prefs.c:295
 msgid "Mo_ve .torrent file to the trash"
 msgstr "A_lih fail .torrent ke tong sampah"
 
-#: ../gtk/open-dialog.c:304
+#: ../gtk/open-dialog.c:303
 msgid "_Start when added"
 msgstr "_Mulakan apabila ditambah"
 
 #. "torrent file" row
-#: ../gtk/open-dialog.c:320
+#: ../gtk/open-dialog.c:319
 msgid "_Torrent file:"
 msgstr "_Fail torrent:"
 
-#: ../gtk/open-dialog.c:323
+#: ../gtk/open-dialog.c:322
 msgid "Select Source File"
 msgstr "Pilih fail sumber"
 
-#: ../gtk/open-dialog.c:335
+#: ../gtk/open-dialog.c:334
 msgid "_Destination folder:"
 msgstr "_Folder destinasi:"
 
-#: ../gtk/open-dialog.c:338
+#: ../gtk/open-dialog.c:337
 msgid "Select Destination Folder"
 msgstr "Pilih folder destinasi"
 
-#: ../gtk/open-dialog.c:444
+#: ../gtk/open-dialog.c:443
 msgid "Open a Torrent"
 msgstr "Buka Torrent"
 
-#: ../gtk/open-dialog.c:460
+#: ../gtk/open-dialog.c:459
 msgid "Show _options dialog"
 msgstr "Papar dialog p_ilihan"
 
-#: ../gtk/open-dialog.c:509
+#: ../gtk/open-dialog.c:508
 msgid "Open URL"
 msgstr "Buka URL"
 
-#: ../gtk/open-dialog.c:522
+#: ../gtk/open-dialog.c:521
 msgid "Open torrent from URL"
 msgstr "Buka torrent dari URL"
 
-#: ../gtk/open-dialog.c:527
+#: ../gtk/open-dialog.c:526
 msgid "_URL"
 msgstr "_URL"
 
-#: ../gtk/relocate.c:61
+#: ../gtk/relocate.c:60
 #, c-format
 msgid "Moving \"%s\""
 msgstr "Mengalih \"%s\""
 
-#: ../gtk/relocate.c:83
+#: ../gtk/relocate.c:82
 msgid "Couldn't move torrent"
 msgstr "Tidak dapat memgalih torrent"
 
-#: ../gtk/relocate.c:118
+#: ../gtk/relocate.c:117
 msgid "This may take a moment…"
 msgstr "Ia mengambil sedikit masa..."
 
-#: ../gtk/relocate.c:149 ../gtk/relocate.c:169
+#: ../gtk/relocate.c:148 ../gtk/relocate.c:168
 msgid "Set Torrent Location"
 msgstr "Tetapkan Lokasi Torrent"
 
-#: ../gtk/relocate.c:165
+#: ../gtk/relocate.c:164
 msgid "Location"
 msgstr "Lokasi"
 
-#: ../gtk/relocate.c:172
+#: ../gtk/relocate.c:171
 msgid "Torrent _location:"
 msgstr "_Lokasi torrent:"
 
-#: ../gtk/relocate.c:173
+#: ../gtk/relocate.c:172
 msgid "_Move from the current folder"
 msgstr "_Alih dari folder semasa"
 
-#: ../gtk/relocate.c:176
+#: ../gtk/relocate.c:175
 msgid "Local data is _already there"
 msgstr "Data setempat _sudah ada"
 
-#: ../gtk/stats.c:72 ../gtk/stats.c:167
+#: ../gtk/stats.c:71 ../gtk/stats.c:166
 #, c-format
 msgid "Started %'d time"
 msgid_plural "Started %'d times"
-msgstr[0] "Dimulakan %'d kali"
-msgstr[1] "Dimulakan %'d kali"
+msgstr[0] ""
 
-#: ../gtk/stats.c:96
+#: ../gtk/stats.c:95
 msgid "Reset your statistics?"
 msgstr "Tetap semula statistik anda?"
 
-#: ../gtk/stats.c:97
+#: ../gtk/stats.c:96
 msgid ""
 "These statistics are for your information only. Resetting them doesn't "
 "affect the statistics logged by your BitTorrent trackers."
@@ -1239,34 +1213,34 @@ msgstr ""
 "Statistik ini untuk maklumat anda sahaja. Tetapkannya semula tidak "
 "mempengaruhi statistik yang dilog oleh penjejak BitTorrent anda."
 
-#: ../gtk/stats.c:108 ../gtk/stats.c:136
+#: ../gtk/stats.c:107 ../gtk/stats.c:135
 msgid "_Reset"
 msgstr "_Tetap Semula"
 
-#: ../gtk/stats.c:133 ../gtk/tr-window.c:730
+#: ../gtk/stats.c:132 ../gtk/tr-window.c:728
 msgid "Statistics"
 msgstr "Statistik"
 
-#: ../gtk/stats.c:148
+#: ../gtk/stats.c:147
 msgid "Current Session"
 msgstr "Sesi Semasa"
 
-#: ../gtk/stats.c:160 ../gtk/stats.c:182
+#: ../gtk/stats.c:159 ../gtk/stats.c:181
 msgid "Ratio:"
 msgstr "Nisbah:"
 
-#: ../gtk/stats.c:164 ../gtk/stats.c:186
+#: ../gtk/stats.c:163 ../gtk/stats.c:185
 msgid "Duration:"
 msgstr "Jangkamasa:"
 
-#: ../gtk/stats.c:166
+#: ../gtk/stats.c:165
 msgid "Total"
 msgstr "Jumlah"
 
 #. %1$s is how much we've got,
 #. %2$s is how much we'll have when done,
 #. %3$s%% is a percentage of the two
-#: ../gtk/torrent-cell-renderer.c:59
+#: ../gtk/torrent-cell-renderer.c:58
 #, c-format
 msgid "%1$s of %2$s (%3$s%%)"
 msgstr "%1$s dari %2$s (%3$s%%)"
@@ -1277,18 +1251,17 @@ msgstr "%1$s dari %2$s (%3$s%%)"
 #. %4$s is how much we've uploaded,
 #. %5$s is our upload-to-download ratio,
 #. %6$s is the ratio we want to reach before we stop uploading
-#: ../gtk/torrent-cell-renderer.c:75
+#: ../gtk/torrent-cell-renderer.c:74
 #, c-format
 msgid "%1$s of %2$s (%3$s%%), uploaded %4$s (Ratio: %5$s Goal: %6$s)"
-msgstr ""
-"%1$s dari %2$s (%3$s%%), dimuat naik %4$s (Nisbah: %5$s Sasaran: %6$s)"
+msgstr "%1$s dari %2$s (%3$s%%), dimuat naik %4$s (Nisbah: %5$s Sasaran: %6$s)"
 
 #. %1$s is how much we've got,
 #. %2$s is the torrent's total size,
 #. %3$s%% is a percentage of the two,
 #. %4$s is how much we've uploaded,
 #. %5$s is our upload-to-download ratio
-#: ../gtk/torrent-cell-renderer.c:91
+#: ../gtk/torrent-cell-renderer.c:90
 #, c-format
 msgid "%1$s of %2$s (%3$s%%), uploaded %4$s (Ratio: %5$s)"
 msgstr "%1$s dari %2$s (%3$s%%), dimuat naik %4$s (Nisbah: %5$s)"
@@ -1297,7 +1270,7 @@ msgstr "%1$s dari %2$s (%3$s%%), dimuat naik %4$s (Nisbah: %5$s)"
 #. %2$s is how much we've uploaded,
 #. %3$s is our upload-to-download ratio,
 #. %4$s is the ratio we want to reach before we stop uploading
-#: ../gtk/torrent-cell-renderer.c:108
+#: ../gtk/torrent-cell-renderer.c:107
 #, c-format
 msgid "%1$s, uploaded %2$s (Ratio: %3$s Goal: %4$s)"
 msgstr "%1$s, dimuat naik %2$s (Nibah: %3$s Sasaran: %4$s)"
@@ -1305,86 +1278,97 @@ msgstr "%1$s, dimuat naik %2$s (Nibah: %3$s Sasaran: %4$s)"
 #. %1$s is the torrent's total size,
 #. %2$s is how much we've uploaded,
 #. %3$s is our upload-to-download ratio
-#: ../gtk/torrent-cell-renderer.c:120
+#: ../gtk/torrent-cell-renderer.c:119
 #, c-format
 msgid "%1$s, uploaded %2$s (Ratio: %3$s)"
 msgstr "%1$s, dimuat naik %2$s (Nisbah: %3$s)"
 
-#: ../gtk/torrent-cell-renderer.c:134
+#: ../gtk/torrent-cell-renderer.c:133
 msgid "Remaining time unknown"
 msgstr "Masa berbaki tidak diketahui"
 
 #. time remaining
-#: ../gtk/torrent-cell-renderer.c:140
+#: ../gtk/torrent-cell-renderer.c:139
 #, c-format
 msgid "%s remaining"
 msgstr "%s berbaki"
 
-#. 1==down arrow, 2==down speed, 3==up arrow, 4==down speed
-#: ../gtk/torrent-cell-renderer.c:167
+#. down speed, down symbol, up speed, up symbol
+#: ../gtk/torrent-cell-renderer.c:164
 #, c-format
-msgid "%1$s %2$s, %3$s %4$s"
-msgstr "%1$s %2$s, %3$s %4$s"
+msgid "%1$s %2$s  %3$s %4$s"
+msgstr ""
 
-#. bandwidth speed + unicode arrow
-#: ../gtk/torrent-cell-renderer.c:172 ../gtk/torrent-cell-renderer.c:176
+#. up speed, up symbol
+#: ../gtk/torrent-cell-renderer.c:176
 #, c-format
-msgid "%1$s %2$s"
-msgstr "%1$s %2$s"
+msgid "%1$s  %2$s"
+msgstr ""
 
-#: ../gtk/torrent-cell-renderer.c:183
+#: ../gtk/torrent-cell-renderer.c:182
 msgid "Stalled"
 msgstr "Tergantung"
 
-#: ../gtk/tr-icon.c:61
-msgid "Idle"
-msgstr "Melahu"
-
-#: ../gtk/torrent-cell-renderer.c:216
+#: ../gtk/torrent-cell-renderer.c:215
 #, c-format
 msgid "Verifying local data (%.1f%% tested)"
 msgstr "Mengesahkan data setempat (%.1f%% diuji)"
 
-#: ../gtk/torrent-cell-renderer.c:222
-#, c-format
-msgid "Ratio %s"
-msgstr "Nisbah %s"
-
-#: ../gtk/torrent-cell-renderer.c:246
+#: ../gtk/torrent-cell-renderer.c:245
 #, c-format
 msgid "Tracker gave a warning: \"%s\""
 msgstr "Penjejak telah memberi amaran: \"%s\""
 
-#: ../gtk/torrent-cell-renderer.c:247
+#: ../gtk/torrent-cell-renderer.c:246
 #, c-format
 msgid "Tracker gave an error: \"%s\""
 msgstr "Penjejak memberikan ralat: \"%s\""
 
-#: ../gtk/torrent-cell-renderer.c:248
+#: ../gtk/torrent-cell-renderer.c:247
 #, c-format
 msgid "Error: %s"
 msgstr "Ralat: %s"
 
-#: ../gtk/torrent-cell-renderer.c:266
+#. Downloading metadata from 2 peer (s)(50% done)
+#: ../gtk/torrent-cell-renderer.c:267
 #, c-format
-msgid "Downloading from %1$'d of %2$'d connected peer"
-msgid_plural "Downloading from %1$'d of %2$'d connected peers"
-msgstr[0] "Memuat turun %1$'d dari %2$'d rakan yang bersambung"
-msgstr[1] "Memuat turun %1$'d dari %2$'d rakan yang bersambung"
+msgid "Downloading metadata from %1$'d %2$s (%3$d%% done)"
+msgstr ""
 
+#: ../gtk/torrent-cell-renderer.c:269 ../gtk/torrent-cell-renderer.c:278
+#: ../gtk/torrent-cell-renderer.c:295
+msgid "peer"
+msgid_plural "peers"
+msgstr[0] ""
+
+#. Downloading from 2 of 3 peer (s) and 2 webseed (s)
 #: ../gtk/torrent-cell-renderer.c:275
 #, c-format
-msgid "Downloading metadata from %1$'d peer (%2$d%% done)"
-msgid_plural "Downloading metadata from %1$'d peers (%2$d%% done)"
-msgstr[0] "Memuat turun data meta dari %1$'d rakan (%2$d%% selesai)"
-msgstr[1] "Memuat turun data meta dari %1$'d rakan (%2$d%% selesai)"
+msgid "Downloading from %1$'d of %2$'d %3$s and %4$'d %5$s"
+msgstr ""
 
-#: ../gtk/torrent-cell-renderer.c:303
+#: ../gtk/torrent-cell-renderer.c:280 ../gtk/torrent-cell-renderer.c:287
+msgid "web seed"
+msgid_plural "web seeds"
+msgstr[0] ""
+
+#. Downloading from 3 web seed (s)
+#: ../gtk/torrent-cell-renderer.c:285
+#, c-format
+msgid "Downloading from %1$'d %2$s"
+msgstr ""
+
+#. Downloading from 2 of 3 peer (s)
+#: ../gtk/torrent-cell-renderer.c:292
+#, c-format
+msgid "Downloading from %1$'d of %2$'d %3$s"
+msgstr ""
+
+#: ../gtk/torrent-cell-renderer.c:302
 #, c-format
 msgid "Seeding to %1$'d of %2$'d connected peer"
 msgid_plural "Seeding to %1$'d of %2$'d connected peers"
-msgstr[0] "Menyemai kepada %1$'d dari %2$'d rakan yang bersambung"
-msgstr[1] "Menyemai kepada %1$'d dari %2$'d rakan yang bersambung"
+msgstr[0] ""
 
 #: ../gtk/transmission-gtk.desktop.in.h:2
 msgid "BitTorrent Client"
@@ -1398,39 +1382,51 @@ msgstr "Klien BitTorrent Transmission"
 msgid "Download and share files over BitTorrent"
 msgstr "Muat turun dan kongsi fail melalui BitTorrent"
 
-#: ../gtk/tr-core.c:1218
+#: ../gtk/transmission-gtk.desktop.in.h:5
+msgid "Start Transmission with All Torrents Paused"
+msgstr ""
+
+#: ../gtk/transmission-gtk.desktop.in.h:6
+msgid "Start Transmission Minimized"
+msgstr ""
+
+#: ../gtk/tr-core.c:1216
 #, c-format
 msgid "Couldn't read \"%s\": %s"
 msgstr "Tidak dapat baca \"%s\": %s"
 
-#: ../gtk/tr-core.c:1314
+#: ../gtk/tr-core.c:1312
 #, c-format
 msgid "Skipping unknown torrent \"%s\""
 msgstr "Melangkau torrent \"%s\" yang tidak diketahui"
 
-#: ../gtk/tr-core.c:1568
+#: ../gtk/tr-core.c:1566
 msgid "Inhibiting desktop hibernation"
 msgstr "Merencatkan hibernasi desktop"
 
-#: ../gtk/tr-core.c:1572
+#: ../gtk/tr-core.c:1570
 #, c-format
 msgid "Couldn't inhibit desktop hibernation: %s"
 msgstr "Tidak dapat rencatkan hibernasi desktop: %s"
 
-#: ../gtk/tr-core.c:1606
+#: ../gtk/tr-core.c:1604
 msgid "Allowing desktop hibernation"
 msgstr "Membenarkan hibernasi desktop"
 
-#: ../gtk/tr-icon.c:86 ../gtk/tr-icon.c:102
+#: ../gtk/tr-icon.c:60
+msgid "Idle"
+msgstr "Melahu"
+
+#: ../gtk/tr-icon.c:77 ../gtk/tr-icon.c:93
 #, c-format
-msgid "(Limit: %s)"
-msgstr "(Had: %s)"
+msgid " (Limit: %s)"
+msgstr ""
 
 #. %1$s: current upload speed
 #. * %2$s: current upload limit, if any
 #. * %3$s: current download speed
 #. * %4$s: current download limit, if any
-#: ../gtk/tr-icon.c:101
+#: ../gtk/tr-icon.c:100
 #, c-format
 msgid ""
 "Transmission\n"
@@ -1441,600 +1437,584 @@ msgstr ""
 "Naik: %1$s %2$s\n"
 "Turun: %3$s %4$s"
 
-#: ../gtk/tr-prefs.c:301
-msgid "Save to _Location:"
-msgstr "Simpan ke _Lokasi:"
-
-#: ../gtk/tr-prefs.c:275
-msgid "Queue"
-msgstr "Baris Gilir"
-
-#: ../gtk/tr-prefs.c:277
-msgid "Maximum active _downloads:"
-msgstr "M&uat turun aktif maksimum:"
-
-#: ../gtk/tr-prefs.c:281
-msgid "Downloads sharing data in the last N minutes are _active:"
-msgstr "Muat turun data kongsi salam N minit terakhir adalah _aktif:"
-
-#: ../gtk/tr-prefs.c:319 ../libtransmission/torrent.c:2010
-msgid "Incomplete"
-msgstr "Tidak lengkap"
-
-#: ../gtk/tr-prefs.c:321
-msgid "Append \"._part\" to incomplete files' names"
-msgstr "Tambah \"._part\" pada nama fail yang belum lengkap"
-
-#: ../gtk/tr-prefs.c:325
-msgid "Keep _incomplete torrents in:"
-msgstr "Simpan torrent yang belum selesai didalam:"
-
-#: ../gtk/tr-prefs.c:299
-msgid "Call _script when torrent is completed:"
-msgstr "Panggil _skrip bila torrent selesai:"
-
-#: ../gtk/tr-prefs.c:279
+#: ../gtk/tr-prefs.c:278
 msgctxt "Gerund"
 msgid "Adding"
 msgstr "Menambah"
 
-#: ../gtk/tr-prefs.c:339
-msgid "Automatically _add torrents from:"
-msgstr "Tam_bah torrent secara automatik dari:"
+#: ../gtk/tr-prefs.c:280
+msgid "Automatically add .torrent files _from:"
+msgstr ""
 
-#: ../gtk/tr-prefs.c:1319
-msgctxt "Gerund"
-msgid "Seeding"
-msgstr "Menyemai"
+#: ../gtk/tr-prefs.c:287
+msgid "Show the Torrent Options _dialog"
+msgstr ""
 
-#: ../gtk/tr-prefs.c:358
+#: ../gtk/tr-prefs.c:291
+msgid "_Start added torrents"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:300
+msgid "Save to _Location:"
+msgstr "Simpan ke _Lokasi:"
+
+#: ../gtk/tr-prefs.c:307
+msgid "Download Queue"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:309
+msgid "Ma_ximum active downloads:"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:313
+msgid "Downloads sharing data in the last _N minutes are active:"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:318 ../libtransmission/torrent.c:2027
+msgid "Incomplete"
+msgstr "Tidak lengkap"
+
+#: ../gtk/tr-prefs.c:320
+msgid "Append \"._part\" to incomplete files' names"
+msgstr "Tambah \"._part\" pada nama fail yang belum lengkap"
+
+#: ../gtk/tr-prefs.c:324
+msgid "Keep _incomplete torrents in:"
+msgstr "Simpan torrent yang belum selesai didalam:"
+
+#: ../gtk/tr-prefs.c:331
+msgid "Call scrip_t when torrent is completed:"
+msgstr "Panggil skr_ip bila torrent sudah lengkap:"
+
+#: ../gtk/tr-prefs.c:355
+msgid "Limits"
+msgstr "Had"
+
+#: ../gtk/tr-prefs.c:357
 msgid "Stop seeding at _ratio:"
 msgstr "Henti menyemai pada _nisbah:"
 
-#: ../gtk/tr-prefs.c:365
+#: ../gtk/tr-prefs.c:364
 msgid "Stop seeding if idle for _N minutes:"
 msgstr "Henti menyemai jika melahu selama _N minit:"
 
-#: ../gtk/tr-prefs.c:388 ../gtk/tr-prefs.c:1325
+#: ../gtk/tr-prefs.c:387 ../gtk/tr-prefs.c:1324
 msgid "Desktop"
 msgstr "Desktop"
 
-#: ../gtk/tr-prefs.c:390
+#: ../gtk/tr-prefs.c:389
 msgid "_Inhibit hibernation when torrents are active"
 msgstr "_rencatkan hibernasi bila torrent aktif"
 
-#: ../gtk/tr-prefs.c:394
+#: ../gtk/tr-prefs.c:393
 msgid "Show Transmission icon in the _notification area"
 msgstr "Papar ikon Transmission didalam kawasan _pemberitahuan"
 
-#: ../gtk/tr-prefs.c:399
+#: ../gtk/tr-prefs.c:398
 msgid "Notification"
 msgstr "Pemberitahuan"
 
-#: ../gtk/tr-prefs.c:401
+#: ../gtk/tr-prefs.c:400
 msgid "Show a notification when torrents are a_dded"
 msgstr "Papar pemberitahuan bila torrent _ditambah"
 
-#: ../gtk/tr-prefs.c:405
+#: ../gtk/tr-prefs.c:404
 msgid "Show a notification when torrents _finish"
 msgstr "Papar pemberitahuan bila torrent s_elesai"
 
-#: ../gtk/tr-prefs.c:409
+#: ../gtk/tr-prefs.c:408
 msgid "Play a _sound when torrents finish"
 msgstr "Main bun_yi bila torrent selesai"
 
-#: ../gtk/tr-prefs.c:437
+#: ../gtk/tr-prefs.c:436
 #, c-format
 msgid "Blocklist contains %'d rule"
 msgid_plural "Blocklist contains %'d rules"
-msgstr[0] "Senarai halang mengandungi %'d peraturan"
-msgstr[1] "Senarai halang mengandungi %'d peraturan"
+msgstr[0] ""
 
-#: ../gtk/tr-prefs.c:471
+#: ../gtk/tr-prefs.c:470
 #, c-format
 msgid "Blocklist has %'d rule."
 msgid_plural "Blocklist has %'d rules."
-msgstr[0] "Senarai halang mempunyai %'d peraturan."
-msgstr[1] "Senarai halang mempunyai %'d peraturan."
+msgstr[0] ""
 
-#: ../gtk/tr-prefs.c:475
+#: ../gtk/tr-prefs.c:474
 msgid "<b>Update succeeded!</b>"
 msgstr "<b>Kemaskini berjaya!</b>"
 
-#: ../gtk/tr-prefs.c:475
+#: ../gtk/tr-prefs.c:474
 msgid "<b>Unable to update.</b>"
 msgstr "<b>Tidak boleh mengemaskini.</b>"
 
-#: ../gtk/tr-prefs.c:490
+#: ../gtk/tr-prefs.c:489
 msgid "Update Blocklist"
 msgstr "Kemaskini Senarai Sekat"
 
-#: ../gtk/tr-prefs.c:492
+#: ../gtk/tr-prefs.c:491
 msgid "Getting new blocklist…"
 msgstr "Mendapatkan senarai sekat baru..."
 
-#: ../gtk/tr-prefs.c:520
+#: ../gtk/tr-prefs.c:519
 msgid "Allow encryption"
 msgstr "Benarkan penyulitan"
 
-#: ../gtk/tr-prefs.c:521
+#: ../gtk/tr-prefs.c:520
 msgid "Prefer encryption"
 msgstr "Utamakan penyulitan"
 
-#: ../gtk/tr-prefs.c:522
+#: ../gtk/tr-prefs.c:521
 msgid "Require encryption"
 msgstr "Perlukan penyulitan"
 
-#: ../gtk/tr-prefs.c:553
-msgid "Blocklist"
-msgstr "Senarai Sekat"
+#: ../gtk/tr-prefs.c:545 ../gtk/tr-prefs.c:1320
+msgid "Privacy"
+msgstr "Peribadi"
 
-#: ../gtk/tr-prefs.c:555
-msgid "Enable _blocklist:"
-msgstr "Benarikan senarai _halang:"
-
-#: ../gtk/tr-prefs.c:569
-msgid "_Update"
-msgstr "_Kemaskini"
-
-#: ../gtk/tr-prefs.c:579
-msgid "Enable _automatic updates"
-msgstr "Benarkan kemaskini _automatik"
-
-#: ../gtk/tr-prefs.c:548
+#: ../gtk/tr-prefs.c:547
 msgid "_Encryption mode:"
 msgstr "Mod _penyulitan:"
 
-#: ../gtk/tr-prefs.c:1232
+#: ../gtk/tr-prefs.c:552
+msgid "Blocklist"
+msgstr "Senarai Sekat"
+
+#: ../gtk/tr-prefs.c:554
+msgid "Enable _blocklist:"
+msgstr "Benarikan senarai _halang:"
+
+#: ../gtk/tr-prefs.c:568
+msgid "_Update"
+msgstr "_Kemaskini"
+
+#: ../gtk/tr-prefs.c:578
+msgid "Enable _automatic updates"
+msgstr "Benarkan kemaskini _automatik"
+
+#: ../gtk/tr-prefs.c:796
+msgid "Remote Control"
+msgstr ""
+
+#. "enabled" checkbutton
+#: ../gtk/tr-prefs.c:799
+msgid "Allow _remote access"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:805
+msgid "_Open web client"
+msgstr "B_uka klien sesawang"
+
+#: ../gtk/tr-prefs.c:814
+msgid "HTTP _port:"
+msgstr "_Port HTTP:"
+
+#. require authentication
+#: ../gtk/tr-prefs.c:818
+msgid "Use _authentication"
+msgstr "Guna pen_gesahihan"
+
+#. username
+#: ../gtk/tr-prefs.c:826
+msgid "_Username:"
+msgstr "_Nama Pengguna:"
+
+#. password
+#: ../gtk/tr-prefs.c:833
+msgid "Pass_word:"
+msgstr "Kata _Laluan:"
+
+#. require authentication
+#: ../gtk/tr-prefs.c:841
+msgid "Only allow these IP a_ddresses:"
+msgstr ""
+
+#: ../gtk/tr-prefs.c:866
+msgid "IP addresses may use wildcards, such as 192.168.*.*"
+msgstr "Alamat IP boleh menggunakan kad liar. seperti 192.168.*.*"
+
+#: ../gtk/tr-prefs.c:888
+msgid "Addresses:"
+msgstr "Alamat:"
+
+#: ../gtk/tr-prefs.c:996
+msgid "Every Day"
+msgstr "Setiap Hari"
+
+#: ../gtk/tr-prefs.c:997
+msgid "Weekdays"
+msgstr "Hari bekerja"
+
+#: ../gtk/tr-prefs.c:998
+msgid "Weekends"
+msgstr "Hujung minggu"
+
+#: ../gtk/tr-prefs.c:999
+msgid "Sunday"
+msgstr "Ahad"
+
+#: ../gtk/tr-prefs.c:1000
+msgid "Monday"
+msgstr "Isnin"
+
+#: ../gtk/tr-prefs.c:1001
+msgid "Tuesday"
+msgstr "Selasa"
+
+#: ../gtk/tr-prefs.c:1002
+msgid "Wednesday"
+msgstr "Rabu"
+
+#: ../gtk/tr-prefs.c:1003
+msgid "Thursday"
+msgstr "Khamis"
+
+#: ../gtk/tr-prefs.c:1004
+msgid "Friday"
+msgstr "Jumaat"
+
+#: ../gtk/tr-prefs.c:1005
+msgid "Saturday"
+msgstr "Sabtu"
+
+#: ../gtk/tr-prefs.c:1036
+msgid "Speed Limits"
+msgstr "Had Kelajuan"
+
+#: ../gtk/tr-prefs.c:1038
+#, c-format
+msgid "_Upload (%s):"
+msgstr "_Muat Naik (%s):"
+
+#: ../gtk/tr-prefs.c:1045
+#, c-format
+msgid "_Download (%s):"
+msgstr "Mu_at Turun (%s):"
+
+#: ../gtk/tr-prefs.c:1054
+msgid "Alternative Speed Limits"
+msgstr "Had Kelajuan Alternatif"
+
+#: ../gtk/tr-prefs.c:1063
+msgid "Override normal speed limits manually or at scheduled times"
+msgstr ""
+"Batalkan had kelajuan normal secara manual atau mengikut masa terjadual"
+
+#: ../gtk/tr-prefs.c:1070
+#, c-format
+msgid "U_pload (%s):"
+msgstr "Mua_t Naik (%s):"
+
+#: ../gtk/tr-prefs.c:1074
+#, c-format
+msgid "Do_wnload (%s):"
+msgstr "Mu_at Turun (%s):"
+
+#: ../gtk/tr-prefs.c:1078
+msgid "_Scheduled times:"
+msgstr "Masa ter_jadual:"
+
+#: ../gtk/tr-prefs.c:1083
+msgid " _to "
+msgstr " _ke "
+
+#: ../gtk/tr-prefs.c:1094
+msgid "_On days:"
+msgstr "_Pada hari:"
+
+#: ../gtk/tr-prefs.c:1126 ../gtk/tr-prefs.c:1194 ../gtk/tr-prefs.c:1275
+msgid "Status unknown"
+msgstr "Status tidak diketahui"
+
+#: ../gtk/tr-prefs.c:1149
+msgid "Port is <b>open</b>"
+msgstr "Port <b>dibuka</b>"
+
+#: ../gtk/tr-prefs.c:1149
+msgid "Port is <b>closed</b>"
+msgstr "Port <b>ditutup</b>"
+
+#: ../gtk/tr-prefs.c:1164
+msgid "<i>Testing TCP port…</i>"
+msgstr "<i>Menguji port TCP…</i>"
+
+#: ../gtk/tr-prefs.c:1187
+msgid "Listening Port"
+msgstr "Mendengar Port"
+
+#: ../gtk/tr-prefs.c:1189
+msgid "_Port used for incoming connections:"
+msgstr "_Port yang digunakan untuk sambungan masuk:"
+
+#: ../gtk/tr-prefs.c:1197
+msgid "Te_st Port"
+msgstr "U_ji Port"
+
+#: ../gtk/tr-prefs.c:1204
+msgid "Pick a _random port every time Transmission is started"
+msgstr "Ambil port _rawak setiap kali Transmission dimulakan"
+
+#: ../gtk/tr-prefs.c:1208
+msgid "Use UPnP or NAT-PMP port _forwarding from my router"
+msgstr "Guna port maju UPNP atau NAT dari penghala saya"
+
+#: ../gtk/tr-prefs.c:1213
+msgid "Peer Limits"
+msgstr "Had Rakan"
+
+#: ../gtk/tr-prefs.c:1216
+msgid "Maximum peers per _torrent:"
+msgstr "Rakan maksimum se _torrent:"
+
+#: ../gtk/tr-prefs.c:1218
+msgid "Maximum peers _overall:"
+msgstr "Kese_luruhan rakan maksimum:"
+
+#: ../gtk/tr-prefs.c:1224
+msgid "Enable _uTP for peer communication"
+msgstr "Benarkan _UTP untuk komunikasi rakan"
+
+#: ../gtk/tr-prefs.c:1226
+msgid "uTP is a tool for reducing network congestion."
+msgstr "uTP ialah alat untuk mengurangkan kesesakan rangkaian."
+
+#: ../gtk/tr-prefs.c:1231
 msgid "Use PE_X to find more peers"
 msgstr "Guna PE_X untuk mencari lagi rakan"
 
-#: ../gtk/tr-prefs.c:1234
+#: ../gtk/tr-prefs.c:1233
 msgid ""
 "PEX is a tool for exchanging peer lists with the peers you're connected to."
 msgstr ""
 "PEX adalah alat untuk menukar senarai rakan dengan rakan yang anda sedang "
 "disambungkan."
 
-#: ../gtk/tr-prefs.c:1238
+#: ../gtk/tr-prefs.c:1237
 msgid "Use _DHT to find more peers"
 msgstr "Gunna _DHT untuk mencari lagi rakan"
 
-#: ../gtk/tr-prefs.c:1240
+#: ../gtk/tr-prefs.c:1239
 msgid "DHT is a tool for finding peers without a tracker."
 msgstr "DHT adalah alat untuk mencari rakan tanpa penjejak."
 
-#: ../gtk/tr-prefs.c:1244
+#: ../gtk/tr-prefs.c:1243
 msgid "Use _Local Peer Discovery to find more peers"
 msgstr "Guna Penemuan _Rakan Setempat untuk mencari lagi rakan"
 
-#: ../gtk/tr-prefs.c:1246
+#: ../gtk/tr-prefs.c:1245
 msgid "LPD is a tool for finding peers on your local network."
 msgstr "LDP adalah alat untuk mencari rakan didalam rangkaian setempat anda."
 
-#: ../gtk/tr-prefs.c:807
-msgid "Web Client"
-msgstr "Klien Sesawang"
-
-#. "enabled" checkbutton
-#: ../gtk/tr-prefs.c:810
-msgid "_Enable web client"
-msgstr "_Benarkan klien sesawang"
-
-#: ../gtk/tr-prefs.c:806
-msgid "_Open web client"
-msgstr "B_uka klien sesawang"
-
-#: ../gtk/tr-prefs.c:815
-msgid "HTTP _port:"
-msgstr "_Port HTTP:"
-
-#. require authentication
-#: ../gtk/tr-prefs.c:819
-msgid "Use _authentication"
-msgstr "Guna pen_gesahihan"
-
-#. username
-#: ../gtk/tr-prefs.c:827
-msgid "_Username:"
-msgstr "_Nama Pengguna:"
-
-#. password
-#: ../gtk/tr-prefs.c:834
-msgid "Pass_word:"
-msgstr "Kata _Laluan:"
-
-#. require authentication
-#: ../gtk/tr-prefs.c:852
-msgid "Only allow these IP a_ddresses to connect:"
-msgstr "Hanya benarkan a_lamat IP ini untuk sambung:"
-
-#: ../gtk/tr-prefs.c:867
-msgid "IP addresses may use wildcards, such as 192.168.*.*"
-msgstr "Alamat IP boleh menggunakan kad liar. seperti 192.168.*.*"
-
-#: ../gtk/tr-prefs.c:889
-msgid "Addresses:"
-msgstr "Alamat:"
-
-#: ../gtk/tr-prefs.c:997
-msgid "Every Day"
-msgstr "Setiap Hari"
-
-#: ../gtk/tr-prefs.c:998
-msgid "Weekdays"
-msgstr "Hari bekerja"
-
-#: ../gtk/tr-prefs.c:999
-msgid "Weekends"
-msgstr "Hujung minggu"
-
-#: ../gtk/tr-prefs.c:1000
-msgid "Sunday"
-msgstr "Ahad"
-
-#: ../gtk/tr-prefs.c:1001
-msgid "Monday"
-msgstr "Isnin"
-
-#: ../gtk/tr-prefs.c:1002
-msgid "Tuesday"
-msgstr "Selasa"
-
-#: ../gtk/tr-prefs.c:1003
-msgid "Wednesday"
-msgstr "Rabu"
-
-#: ../gtk/tr-prefs.c:1004
-msgid "Thursday"
-msgstr "Khamis"
-
-#: ../gtk/tr-prefs.c:1005
-msgid "Friday"
-msgstr "Jumaat"
-
-#: ../gtk/tr-prefs.c:1006
-msgid "Saturday"
-msgstr "Sabtu"
-
-#: ../gtk/tr-prefs.c:1037
-msgid "Speed Limits"
-msgstr "Had Kelajuan"
-
-#: ../gtk/tr-prefs.c:1039
-#, c-format
-msgid "_Upload (%s):"
-msgstr "_Muat Naik (%s):"
-
-#: ../gtk/tr-prefs.c:1046
-#, c-format
-msgid "_Download (%s):"
-msgstr "Mu_at Turun (%s):"
-
-#: ../gtk/tr-prefs.c:1055
-msgid "Alternative Speed Limits"
-msgstr "Had Kelajuan Alternatif"
-
-#: ../gtk/tr-prefs.c:1064
-msgid "Override normal speed limits manually or at scheduled times"
-msgstr ""
-"Batalkan had kelajuan normal secara manual atau mengikut masa terjadual"
-
-#: ../gtk/tr-prefs.c:1071
-#, c-format
-msgid "U_pload (%s):"
-msgstr "Mua_t Naik (%s):"
-
-#: ../gtk/tr-prefs.c:1075
-#, c-format
-msgid "Do_wnload (%s):"
-msgstr "Mu_at Turun (%s):"
-
-#: ../gtk/tr-prefs.c:1079
-msgid "_Scheduled times:"
-msgstr "Masa ter_jadual:"
-
-#: ../gtk/tr-prefs.c:1084
-msgid " _to "
-msgstr " _ke "
-
-#: ../gtk/tr-prefs.c:1095
-msgid "_On days:"
-msgstr "_Pada hari:"
-
-#: ../gtk/tr-prefs.c:1127 ../gtk/tr-prefs.c:1195 ../gtk/tr-prefs.c:1276
-msgid "Status unknown"
-msgstr "Status tidak diketahui"
-
-#: ../gtk/tr-prefs.c:1150
-msgid "Port is <b>open</b>"
-msgstr "Port <b>dibuka</b>"
-
-#: ../gtk/tr-prefs.c:1150
-msgid "Port is <b>closed</b>"
-msgstr "Port <b>ditutup</b>"
-
-#: ../gtk/tr-prefs.c:1165
-msgid "<i>Testing TCP port…</i>"
-msgstr "<i>Menguji port TCP…</i>"
-
-#: ../gtk/tr-prefs.c:1188
-msgid "Listening Port"
-msgstr "Mendengar Port"
-
-#: ../gtk/tr-prefs.c:1190
-msgid "_Port used for incoming connections:"
-msgstr "_Port yang digunakan untuk sambungan masuk:"
-
-#: ../gtk/tr-prefs.c:1198
-msgid "Te_st Port"
-msgstr "U_ji Port"
-
-#: ../gtk/tr-prefs.c:1205
-msgid "Pick a _random port every time Transmission is started"
-msgstr "Ambil port _rawak setiap kali Transmission dimulakan"
-
-#: ../gtk/tr-prefs.c:1209
-msgid "Use UPnP or NAT-PMP port _forwarding from my router"
-msgstr "Guna port maju UPNP atau NAT dari penghala saya"
-
-#: ../gtk/tr-prefs.c:1214
-msgid "Peer Limits"
-msgstr "Had Rakan"
-
-#: ../gtk/tr-prefs.c:1217
-msgid "Maximum peers per _torrent:"
-msgstr "Rakan maksimum se _torrent:"
-
-#: ../gtk/tr-prefs.c:1219
-msgid "Maximum peers _overall:"
-msgstr "Kese_luruhan rakan maksimum:"
-
-#: ../gtk/tr-prefs.c:1225
-msgid "Enable _uTP for peer communication"
-msgstr "Benarkan _UTP untuk komunikasi rakan"
-
-#: ../gtk/tr-prefs.c:1227
-msgid "uTP is a tool for reducing network congestion."
-msgstr "uTP ialah alat untuk mengurangkan kesesakan rangkaian."
-
-#: ../gtk/tr-prefs.c:1301
+#: ../gtk/tr-prefs.c:1300
 msgid "Transmission Preferences"
 msgstr "Keutamaan Transmission"
 
-#: ../gtk/tr-prefs.c:1281
-msgid "Torrents"
-msgstr "Torrent"
-
-#: ../gtk/tr-prefs.c:1317
+#: ../gtk/tr-prefs.c:1316
 msgctxt "Gerund"
 msgid "Downloading"
 msgstr "Memuat turun"
 
-#: ../gtk/tr-prefs.c:1323
+#: ../gtk/tr-prefs.c:1318
+msgctxt "Gerund"
+msgid "Seeding"
+msgstr "Menyemai"
+
+#: ../gtk/tr-prefs.c:1322
 msgid "Network"
 msgstr "Rangkaian"
 
-#: ../gtk/tr-prefs.c:1299
-msgid "Web"
-msgstr "Sesawang"
+#: ../gtk/tr-prefs.c:1326
+msgid "Remote"
+msgstr ""
 
-#: ../gtk/tr-window.c:141
+#: ../gtk/tr-window.c:139
 msgid "Torrent"
 msgstr "Torrent"
 
-#: ../gtk/tr-window.c:251
+#: ../gtk/tr-window.c:249
 msgid "Total Ratio"
 msgstr "Jumlah Nisbah"
 
-#: ../gtk/tr-window.c:252
+#: ../gtk/tr-window.c:250
 msgid "Session Ratio"
 msgstr "Sesi Nisbah"
 
-#: ../gtk/tr-window.c:253
+#: ../gtk/tr-window.c:251
 msgid "Total Transfer"
 msgstr "Jumlah Pemindahan"
 
-#: ../gtk/tr-window.c:254
+#: ../gtk/tr-window.c:252
 msgid "Session Transfer"
 msgstr "Sesi Pemindahan"
 
-#: ../gtk/tr-window.c:288
+#: ../gtk/tr-window.c:280
 #, c-format
 msgid ""
 "Click to disable Alternative Speed Limits\n"
-"(%1$s down, %2$s up)"
+" (%1$s down, %2$s up)"
 msgstr ""
-"Klik untuk lumpuhkan Had Kelajuan Alternatif\n"
-"(%1$s turun, %2$s naik)"
 
-#: ../gtk/tr-window.c:289
+#: ../gtk/tr-window.c:281
 #, c-format
 msgid ""
 "Click to enable Alternative Speed Limits\n"
-"(%1$s down, %2$s up)"
+" (%1$s down, %2$s up)"
 msgstr ""
-"Klik untuk benarkan Had Kelajuan Alternatif\n"
-"(%1$s turun, %2$s naik)"
 
-#: ../gtk/tr-window.c:349
+#: ../gtk/tr-window.c:347
 #, c-format
 msgid "Tracker will allow requests in %s"
 msgstr "Penjejak akan membenarkan permohonan di %s"
 
-#: ../gtk/tr-window.c:424
+#: ../gtk/tr-window.c:422
 msgid "Unlimited"
 msgstr "Tanpa Had"
 
-#: ../gtk/tr-window.c:497
+#: ../gtk/tr-window.c:495
 msgid "Seed Forever"
 msgstr "Semai Selamanya"
 
-#: ../gtk/tr-window.c:536
+#: ../gtk/tr-window.c:534
 msgid "Limit Download Speed"
 msgstr "Hadkan Kelajuan Muat Turun"
 
-#: ../gtk/tr-window.c:540
+#: ../gtk/tr-window.c:538
 msgid "Limit Upload Speed"
 msgstr "Hadkan Kelajuan Muat Naik"
 
-#: ../gtk/tr-window.c:547
+#: ../gtk/tr-window.c:545
 msgid "Stop Seeding at Ratio"
 msgstr "Henti Menyemai pada Nisbah"
 
-#: ../gtk/tr-window.c:581
+#: ../gtk/tr-window.c:579
 #, c-format
 msgid "Stop at Ratio (%s)"
 msgstr "Henti pada Nisbah (%s)"
 
-#: ../gtk/tr-window.c:777
-#, c-format
-msgid "%1$'d of %2$'d Torrent"
-msgid_plural "%1$'d of %2$'d Torrents"
-msgstr[0] "%1$'d dari %2$'d Torrent"
-msgstr[1] "%1$'d dari %2$'d Torrent"
-
-#: ../gtk/tr-window.c:783
-#, c-format
-msgid "%'d Torrent"
-msgid_plural "%'d Torrents"
-msgstr[0] "%'d Torrent"
-msgstr[1] "%'d Torrent"
-
-#: ../gtk/tr-window.c:804 ../gtk/tr-window.c:832
+#: ../gtk/tr-window.c:802 ../gtk/tr-window.c:830
 #, c-format
 msgid "Ratio: %s"
 msgstr "Nisbah: %s"
 
-#: ../gtk/tr-window.c:815
+#: ../gtk/tr-window.c:813
 #, c-format
 msgid "Down: %1$s, Up: %2$s"
 msgstr "Muat Turun: %1$s, Naik: %2$s"
 
-#: ../gtk/tr-window.c:826
+#: ../gtk/tr-window.c:824
 #, c-format
 msgid "size|Down: %1$s, Up: %2$s"
 msgstr "saiz|Muat Turun: %1$s, Muat Naik: %2$s"
 
-#: ../gtk/util.c:37
+#: ../gtk/util.c:36
 msgid "KiB"
 msgstr "KiB"
 
-#: ../gtk/util.c:38
+#: ../gtk/util.c:37
 msgid "MiB"
 msgstr "MiB"
 
-#: ../gtk/util.c:39
+#: ../gtk/util.c:38
 msgid "GiB"
 msgstr "GiB"
 
-#: ../gtk/util.c:40
+#: ../gtk/util.c:39
 msgid "TiB"
 msgstr "TiB"
 
-#: ../gtk/util.c:43
+#: ../gtk/util.c:42
 msgid "kB"
 msgstr "kB"
 
-#: ../gtk/util.c:44
+#: ../gtk/util.c:43
 msgid "MB"
 msgstr "MB"
 
-#: ../gtk/util.c:45
+#: ../gtk/util.c:44
 msgid "GB"
 msgstr "GB"
 
-#: ../gtk/util.c:46
+#: ../gtk/util.c:45
 msgid "TB"
 msgstr "TB"
 
-#: ../gtk/util.c:49
+#: ../gtk/util.c:48
 msgid "kB/s"
 msgstr "kB/s"
 
-#: ../gtk/util.c:50
+#: ../gtk/util.c:49
 msgid "MB/s"
 msgstr "MB/s"
 
-#: ../gtk/util.c:51
+#: ../gtk/util.c:50
 msgid "GB/s"
 msgstr "GB/s"
 
-#: ../gtk/util.c:52
+#: ../gtk/util.c:51
 msgid "TB/s"
 msgstr "TB/s"
 
-#: ../cli/cli.c:117 ../gtk/util.c:87 ../libtransmission/utils.c:1444
-msgid "None"
-msgstr "Tiada"
-
-#: ../gtk/util.c:108
+#: ../gtk/util.c:107
 #, c-format
 msgid "%'d day"
 msgid_plural "%'d days"
-msgstr[0] "%'d hari"
-msgstr[1] "%'d hari"
+msgstr[0] ""
 
-#: ../gtk/util.c:109
+#: ../gtk/util.c:108
 #, c-format
 msgid "%'d hour"
 msgid_plural "%'d hours"
-msgstr[0] "%'d jam"
-msgstr[1] "%'d jam"
+msgstr[0] ""
 
-#: ../gtk/util.c:110
+#: ../gtk/util.c:109
 #, c-format
 msgid "%'d minute"
 msgid_plural "%'d minutes"
-msgstr[0] "%'d minit"
-msgstr[1] "%'d minit"
+msgstr[0] ""
 
-#: ../gtk/util.c:111
+#: ../gtk/util.c:110
 #, c-format
 msgid "%'d second"
 msgid_plural "%'d seconds"
-msgstr[0] "%'d saat"
-msgstr[1] "%'d saat"
+msgstr[0] ""
 
-#: ../gtk/util.c:229
+#: ../gtk/util.c:228
 #, c-format
 msgid "The torrent file \"%s\" contains invalid data."
 msgstr "fail torrent \"%s\" mengandungi data tidak sah."
 
-#: ../gtk/util.c:222
+#: ../gtk/util.c:230
 #, c-format
-msgid "The torrent file \"%s\" is already in use."
-msgstr "Fail torrent \"%s\" sedang digunakan."
+msgid "The torrent file \"%s\" is already in use by \"%s.\""
+msgstr ""
 
-#: ../gtk/util.c:233
+#: ../gtk/util.c:232
 #, c-format
 msgid "The torrent file \"%s\" encountered an unknown error."
 msgstr "Fail torrent \"%s\" mengalami ralat yang tidak diketahui."
 
-#: ../gtk/util.c:239
+#: ../gtk/util.c:238
 msgid "Error opening torrent"
 msgstr "Ralat membuka torrent"
 
-#: ../gtk/util.c:552
+#: ../gtk/util.c:551
 #, c-format
 msgid "Error opening \"%s\""
 msgstr "Ralat membuka \"%s\""
 
-#: ../gtk/util.c:555
+#: ../gtk/util.c:554
 #, c-format
 msgid "Server returned \"%1$ld %2$s\""
 msgstr "Pelayan mengembalikan \"%1$ld %2$s\""
 
-#: ../gtk/util.c:575
+#: ../gtk/util.c:574
 msgid "Unrecognized URL"
 msgstr "URL tidak dikenalpasti"
 
-#: ../gtk/util.c:577
+#: ../gtk/util.c:576
 #, c-format
 msgid "Transmission doesn't know how to use \"%s\""
 msgstr "Transmission tidak tahu bagaimana hendak gunakan \"%s\""
 
-#: ../gtk/util.c:582
+#: ../gtk/util.c:581
 #, c-format
 msgid ""
 "This magnet link appears to be intended for something other than BitTorrent. "
@@ -2043,186 +2023,280 @@ msgstr ""
 "Pautan magnet kelihatan bertujuan untuk tujuan lain selain dari BitTorrent. "
 "Pautan magnet BitTorrent mempunyai bahagian yang mengandungi \"%s\"."
 
-#. did caller give us an uninitialized val?
-#: ../libtransmission/variant.c:974
-msgid "Invalid metadata"
-msgstr "Data meta tidak sah"
-
-#: ../libtransmission/variant.c:1257 ../libtransmission/variant.c:1280
+#: ../gtk/util.c:701
 #, c-format
-msgid "Couldn't save temporary file \"%1$s\": %2$s"
-msgstr "Tidak dapat menyimpan fail sementara \"%1$s\": %2$s"
+msgid "%s free"
+msgstr ""
 
-#: ../libtransmission/variant.c:1266
+#: ../libtransmission/announcer.c:1059 ../libtransmission/announcer.c:1352
+msgid "Could not connect to tracker"
+msgstr ""
+
+#: ../libtransmission/announcer.c:1063 ../libtransmission/announcer.c:1356
+msgid "Tracker did not respond"
+msgstr ""
+
+#: ../libtransmission/announcer.c:1125
+msgid "Success"
+msgstr ""
+
+#: ../libtransmission/announcer-http.c:203
+#: ../libtransmission/announcer-http.c:353
 #, c-format
-msgid "Saved \"%s\""
-msgstr "Simpan \"%s\""
+msgid "Tracker gave HTTP response code %1$ld (%2$s)"
+msgstr ""
 
-#: ../libtransmission/blocklist.c:402 ../libtransmission/rpcimpl.c:1513
-#: ../libtransmission/rpcimpl.c:1527 ../libtransmission/rpcimpl.c:1546
-#: ../libtransmission/variant.c:1271
+#: ../libtransmission/announcer-udp.c:262
+#: ../libtransmission/announcer-udp.c:412
+msgid "Unknown error"
+msgstr ""
+
+#: ../libtransmission/announcer-udp.c:501
 #, c-format
-msgid "Couldn't save file \"%1$s\": %2$s"
-msgstr "Tidak dapat menyimpan fail \"%1$s\": %2$s"
+msgid "DNS Lookup failed: %s"
+msgstr ""
 
-#: ../libtransmission/blocklist.c:67 ../libtransmission/blocklist.c:309
-#: ../libtransmission/utils.c:233
+#: ../libtransmission/announcer-udp.c:602
+msgid "Connection failed"
+msgstr ""
+
+#: ../libtransmission/blocklist.c:66 ../libtransmission/blocklist.c:308
+#: ../libtransmission/utils.c:232
 #, c-format
 msgid "Couldn't read \"%1$s\": %2$s"
 msgstr "Tidak dapat membaca \"%1$s\": %2$s"
 
-#: ../libtransmission/blocklist.c:100
+#: ../libtransmission/blocklist.c:99
 #, c-format
 msgid "Blocklist \"%s\" contains %zu entries"
 msgstr "Senarai halang \"%s\" mengandungi %zu masukan"
 
 #. don't try to display the actual lines - it causes issues
-#: ../libtransmission/blocklist.c:352
+#: ../libtransmission/blocklist.c:351
 #, c-format
 msgid "blocklist skipped invalid address at line %d"
 msgstr "senarai halang melangkau alamat tidak sah pada baris %d"
 
-#: ../libtransmission/blocklist.c:408
+#: ../libtransmission/blocklist.c:401 ../libtransmission/rpcimpl.c:1513
+#: ../libtransmission/rpcimpl.c:1527 ../libtransmission/rpcimpl.c:1546
+#: ../libtransmission/variant.c:1270
+#, c-format
+msgid "Couldn't save file \"%1$s\": %2$s"
+msgstr "Tidak dapat menyimpan fail \"%1$s\": %2$s"
+
+#: ../libtransmission/blocklist.c:407
 #, c-format
 msgid "Blocklist \"%s\" updated with %zu entries"
 msgstr "Senarai halang \"%s\" mengemaskini dengan masukan %zu"
 
-#: ../libtransmission/fdlimit.c:171 ../libtransmission/file-posix.c:189
-#: ../libtransmission/file-posix.c:199
+#: ../libtransmission/fdlimit.c:170
+#, c-format
+msgid "Couldn't get directory for \"%1$s\": %2$s"
+msgstr ""
+
+#: ../libtransmission/fdlimit.c:175 ../libtransmission/file-posix.c:176
+#: ../libtransmission/file-posix.c:186
 #, c-format
 msgid "Couldn't create \"%1$s\": %2$s"
 msgstr "Tak boleh bina \"%1$s\": %2$s"
 
-#: ../libtransmission/fdlimit.c:191
+#: ../libtransmission/fdlimit.c:195
 #, c-format
 msgid "Couldn't open \"%1$s\": %2$s"
 msgstr "Tak boleh buka \"%1$s\": %2$s"
 
-#: ../libtransmission/fdlimit.c:231
+#: ../libtransmission/fdlimit.c:207
+msgid "full"
+msgstr ""
+
+#: ../libtransmission/fdlimit.c:212
+msgid "sparse"
+msgstr ""
+
+#: ../libtransmission/fdlimit.c:219
+#, c-format
+msgid "Couldn't preallocate file \"%1$s\" (%2$s, size: %3$<PRIu64>): %4$s"
+msgstr ""
+
+#: ../libtransmission/fdlimit.c:224
+#, c-format
+msgid "Preallocated file \"%1$s\" (%2$s, size: %3$<PRIu64>)"
+msgstr ""
+
+#: ../libtransmission/fdlimit.c:235
 #, c-format
 msgid "Couldn't truncate \"%1$s\": %2$s"
 msgstr "Tidak dapat memangkas \"%1$s\": %2$s"
 
-#: ../libtransmission/fdlimit.c:523
+#: ../libtransmission/fdlimit.c:527
 #, c-format
 msgid "Couldn't create socket: %s"
 msgstr "Tidak dapat mencipta soket: %s"
 
-#: ../libtransmission/makemeta.c:53
+#. Node exists but isn't a folder
+#: ../libtransmission/file-posix.c:185
+#, c-format
+msgid "File \"%s\" is in the way"
+msgstr "Fail \"%s\" didalam proses"
+
+#: ../libtransmission/makemeta.c:55
 #, c-format
 msgid "Torrent Creator is skipping file \"%s\": %s"
 msgstr "Pencipta torrent melangkau fail \"%s\": %s"
 
-#: ../libtransmission/metainfo.c:590
+#: ../libtransmission/makemeta.c:179
+#, c-format
+msgid "Failed to set piece size to %s, leaving it at %s"
+msgstr ""
+
+#: ../libtransmission/metainfo.c:589
 #, c-format
 msgid "Invalid metadata entry \"%s\""
 msgstr "Masukan data meta \"%s\" tidak sah"
 
-#: ../libtransmission/natpmp.c:30
+#: ../libtransmission/natpmp.c:29
 msgid "Port Forwarding (NAT-PMP)"
 msgstr "Majukan Port (NAT-PMP)"
 
-#: ../libtransmission/natpmp.c:70
+#: ../libtransmission/natpmp.c:69
 #, c-format
 msgid "%s succeeded (%d)"
 msgstr "%s berhasil (%d)"
 
-#: ../libtransmission/natpmp.c:138
+#: ../libtransmission/natpmp.c:137
 #, c-format
 msgid "Found public address \"%s\""
 msgstr "Menemui alamat awam \"%s\""
 
-#: ../libtransmission/natpmp.c:173
+#: ../libtransmission/natpmp.c:172
 #, c-format
 msgid "no longer forwarding port %d"
 msgstr "tiada lagi majukan port %d"
 
-#: ../libtransmission/natpmp.c:218
+#: ../libtransmission/natpmp.c:217
 #, c-format
 msgid "Port %d forwarded successfully"
 msgstr "Port %d berjaya dimajukan"
 
-#: ../libtransmission/net.c:269
+#: ../libtransmission/net.c:267
 #, c-format
-msgid "Couldn't set source address %s on %d: %s"
-msgstr "Tidak dapat tetapkan alamat sumber %s pada %d: %s"
+msgid "Couldn't set source address %s on %<PRIdMAX>: %s"
+msgstr ""
 
-#: ../libtransmission/net.c:286
+#: ../libtransmission/net.c:285
 #, c-format
-msgid "Couldn't connect socket %d to %s, port %d (errno %d - %s)"
-msgstr "Tidak dapat sambungkan soket %d ke %s, port %d (errno %d - %s)"
+msgid "Couldn't connect socket %<PRIdMAX> to %s, port %d (errno %d - %s)"
+msgstr ""
 
-#: ../libtransmission/net.c:370
+#: ../libtransmission/net.c:367
 msgid "Is another copy of Transmission already running?"
 msgstr "Adakah Transmission sudah dijalankan?"
 
-#: ../libtransmission/net.c:375
+#: ../libtransmission/net.c:372
 #, c-format
 msgid "Couldn't bind port %d on %s: %s"
 msgstr "Tidak dapat ikat port %d pada %s: %s"
 
-#: ../libtransmission/net.c:377
+#: ../libtransmission/net.c:374
 #, c-format
 msgid "Couldn't bind port %d on %s: %s (%s)"
 msgstr "Tidak dapat ikat port %d pada %s: %s (%s)"
 
-#: ../libtransmission/peer-msgs.c:2049
+#: ../libtransmission/peer-msgs.c:2048
 #, c-format
 msgid "Please Verify Local Data! Piece #%zu is corrupt."
 msgstr "Sila Sahkan Ketulan Data Setempat #%zu sudah rosak."
 
-#: ../libtransmission/port-forwarding.c:29
+#: ../libtransmission/platform.c:434
+#, c-format
+msgid "Searching for web interface file \"%s\""
+msgstr ""
+
+#: ../libtransmission/port-forwarding.c:28
 msgid "Port Forwarding"
 msgstr "Pemajuan Port"
 
-#: ../libtransmission/port-forwarding.c:56
+#: ../libtransmission/port-forwarding.c:55
 msgid "Starting"
 msgstr "Memulakan"
 
-#: ../libtransmission/port-forwarding.c:57
+#: ../libtransmission/port-forwarding.c:56
 msgid "Forwarded"
 msgstr "Dimajukan"
 
-#: ../libtransmission/port-forwarding.c:58
+#: ../libtransmission/port-forwarding.c:57
 msgid "Stopping"
 msgstr "Berhenti"
 
-#: ../libtransmission/port-forwarding.c:59
+#: ../libtransmission/port-forwarding.c:58
 msgid "Not forwarded"
 msgstr "Tidak dimajukan"
 
-#: ../libtransmission/port-forwarding.c:90 ../libtransmission/torrent.c:2216
+#: ../libtransmission/port-forwarding.c:89 ../libtransmission/torrent.c:2233
 #, c-format
 msgid "State changed from \"%1$s\" to \"%2$s\""
 msgstr "Keadaan diubah dari \"%1$s\" ke \"%2$s\""
 
-#: ../libtransmission/port-forwarding.c:180
+#: ../libtransmission/port-forwarding.c:179
 msgid "Stopped"
 msgstr "Dihentikan"
 
+#: ../libtransmission/rpcimpl.c:1536
+#, c-format
+msgid "Error uncompressing blocklist: %s (%d)"
+msgstr ""
+
+#: ../libtransmission/rpc-server.c:1001
+#, c-format
+msgid "Couldn't find settings key \"%s\""
+msgstr ""
+
+#: ../libtransmission/rpc-server.c:1073
+#, c-format
+msgid "%s is not a valid address"
+msgstr ""
+
+#: ../libtransmission/rpc-server.c:1078
+#, c-format
+msgid "%s is not an IPv4 address. RPC listeners must be IPv4"
+msgstr ""
+
+#: ../libtransmission/rpc-server.c:1085
+#, c-format
+msgid "Serving RPC and Web requests on port 127.0.0.1:%d%s"
+msgstr ""
+
+#: ../libtransmission/rpc-server.c:1089
+msgid "Whitelist enabled"
+msgstr ""
+
+#: ../libtransmission/rpc-server.c:1092
+msgid "Password required"
+msgstr ""
+
 #. first %s is the application name
 #. second %s is the version number
-#: ../libtransmission/session.c:738
+#: ../libtransmission/session.c:739
 #, c-format
 msgid "%s %s started"
 msgstr "%s %s dimulakan"
 
-#: ../libtransmission/session.c:2032
+#: ../libtransmission/session.c:2037
 #, c-format
 msgid "Loaded %d torrents"
 msgstr "Memuatkan %d torrent"
 
-#: ../libtransmission/torrent.c:574
+#: ../libtransmission/torrent.c:573
 #, c-format
 msgid "Tracker warning: \"%s\""
 msgstr "Amaran penjejak: \"%s\""
 
-#: ../libtransmission/torrent.c:581
+#: ../libtransmission/torrent.c:580
 #, c-format
 msgid "Tracker error: \"%s\""
 msgstr "Ralat penjejak: \"%s\""
 
-#: ../libtransmission/torrent.c:845
+#: ../libtransmission/torrent.c:844
 msgid ""
 "No data found! Ensure your drives are connected or use \"Set Location\". To "
 "re-download, remove the torrent and re-add it."
@@ -2230,511 +2304,88 @@ msgstr ""
 "Tiada data ditemui! Pastikan pemacu anda bersambung atau guna \"Tetapkan "
 "Lokasi\". Untuk muat turun semula, buang torrent dan tambah sekali lagi."
 
-#: ../libtransmission/torrent.c:1732
+#: ../libtransmission/torrent.c:1731
 msgid "Restarted manually -- disabling its seed ratio"
 msgstr "Mula semula secara manual -- lumpuhkan nisbah semainya"
 
-#: ../libtransmission/torrent.c:1915
+#: ../libtransmission/torrent.c:1932
 msgid "Removing torrent"
 msgstr "Membuang torrent"
 
-#: ../libtransmission/torrent.c:2004
+#: ../libtransmission/torrent.c:2021
 msgid "Done"
 msgstr "Selesai"
 
-#: ../libtransmission/torrent.c:2007
+#: ../libtransmission/torrent.c:2024
 msgid "Complete"
 msgstr "Selesai"
 
-#: ../libtransmission/upnp.c:29
+#: ../libtransmission/torrent.c:3347
+#, c-format
+msgid "Piece %<PRIu32>, which was just downloaded, failed its checksum test"
+msgstr ""
+
+#: ../libtransmission/torrent-magnet.c:296
+msgid "Magnet torrent's metadata is not usable"
+msgstr ""
+
+#: ../libtransmission/upnp.c:28
 msgid "Port Forwarding (UPnP)"
 msgstr "Pemajuan Port (UPnP)"
 
-#: ../libtransmission/upnp.c:226
+#: ../libtransmission/upnp.c:225
 #, c-format
 msgid "Found Internet Gateway Device \"%s\""
 msgstr "Menemui Peranti Get Laluan Internet \"%s\""
 
-#: ../libtransmission/upnp.c:229
+#: ../libtransmission/upnp.c:228
 #, c-format
 msgid "Local Address is \"%s\""
 msgstr "Alamat Setempat ialah \"%s\""
 
-#: ../libtransmission/upnp.c:258
+#: ../libtransmission/upnp.c:257
 #, c-format
 msgid "Port %d isn't forwarded"
 msgstr "Port %d tidak dimajukan"
 
-#: ../libtransmission/upnp.c:269
+#: ../libtransmission/upnp.c:268
 #, c-format
 msgid "Stopping port forwarding through \"%s\", service \"%s\""
 msgstr "Menghentikan pemajuan port melalui \"%s\", perkhidmatan \"%s\""
 
-#: ../libtransmission/upnp.c:302
+#: ../libtransmission/upnp.c:301
 #, c-format
-msgid ""
-"Port forwarding through \"%s\", service \"%s\". (local address: %s:%d)"
+msgid "Port forwarding through \"%s\", service \"%s\". (local address: %s:%d)"
 msgstr ""
 "Pemajuan port melalui \"%s\", perkhidmatan \"%s\". (alamat setempat: %s:%d)"
 
-#: ../libtransmission/upnp.c:307
+#: ../libtransmission/upnp.c:306
 msgid "Port forwarding successful!"
 msgstr "Pemajuan port berjaya!"
 
-#: ../libtransmission/utils.c:245 ../libtransmission/utils.c:246
+#: ../libtransmission/utils.c:244 ../libtransmission/utils.c:245
 msgid "Not a regular file"
 msgstr "Bukan fail biasa"
 
-#: ../libtransmission/utils.c:258
-msgid "Memory allocation failed"
-msgstr "Peruntukan ingatan gagal"
+#. did caller give us an uninitialized val?
+#: ../libtransmission/variant.c:973
+msgid "Invalid metadata"
+msgstr "Data meta tidak sah"
 
-#. Node exists but isn't a folder
-#: ../libtransmission/file-posix.c:198
+#: ../libtransmission/variant.c:1256 ../libtransmission/variant.c:1279
 #, c-format
-msgid "File \"%s\" is in the way"
-msgstr "Fail \"%s\" didalam proses"
+msgid "Couldn't save temporary file \"%1$s\": %2$s"
+msgstr "Tidak dapat menyimpan fail sementara \"%1$s\": %2$s"
 
-#: ../libtransmission/verify.c:224
+#: ../libtransmission/variant.c:1265
+#, c-format
+msgid "Saved \"%s\""
+msgstr "Simpan \"%s\""
+
+#: ../libtransmission/variant.c:1308
+msgid "Unable to parse file content"
+msgstr ""
+
+#: ../libtransmission/verify.c:223
 msgid "Verifying torrent"
 msgstr "Mengesahkan torrent"
-
-#~ msgid "_Main Window"
-#~ msgstr "Tetingkap _Utama"
-
-#~ msgid "Add a Torrent"
-#~ msgstr "Tambah Torrent"
-
-#~ msgid "Sort by _Ratio"
-#~ msgstr "Susun mengikut _Nisbah"
-
-#~ msgid "Sort by _State"
-#~ msgstr "Susun mengikut_keadaan"
-
-#~ msgid "Sort by _Tracker"
-#~ msgstr "Susun mengikut_tracker"
-
-#~ msgid "Add a torrent"
-#~ msgstr "Tambahkan satu torrent"
-
-#~ msgid "_Add..."
-#~ msgstr "_Tambah..."
-
-#~ msgid "_Open Folder"
-#~ msgstr "_Buka Folder"
-
-#~ msgid "_New..."
-#~ msgstr "Ba_ru..."
-
-#~ msgid "_Move source file to Trash"
-#~ msgstr "_Pindahkan fail sumber ke tong sampah"
-
-#~ msgid "Status"
-#~ msgstr "Status"
-
-#~ msgid "<b>Seeders:</b>"
-#~ msgstr "<b>Seeder:</b>"
-
-#, c-format
-#~ msgid "%'d Piece"
-#~ msgid_plural "%'d Pieces"
-#~ msgstr[0] "%'d Cebisan"
-#~ msgstr[1] "%'d Cebisan"
-
-#~ msgid "Pieces:"
-#~ msgstr "Cebisan:"
-
-#~ msgid "Date:"
-#~ msgstr "Tarikh:"
-
-#~ msgid "Creator:"
-#~ msgstr "Pembina:"
-
-#~ msgid "Origins"
-#~ msgstr "Asalan"
-
-#~ msgid "Torrent file:"
-#~ msgstr "Fail torrent:"
-
-#, c-format
-#~ msgid "%.1f%%"
-#~ msgstr "%.1f%%"
-
-#~ msgid "Progress:"
-#~ msgstr "Kemajuan:"
-
-#~ msgid "Transfer"
-#~ msgstr "Pemindahan"
-
-#~ msgid "Dates"
-#~ msgstr "Haribulan"
-
-#~ msgid "Started at:"
-#~ msgstr "Dimulakan pada:"
-
-#~ msgid "Limits"
-#~ msgstr "Had"
-
-#~ msgid "Tracker:"
-#~ msgstr "Tracker:"
-
-#~ msgid "Announce"
-#~ msgstr "Mengumumkan"
-
-#~ msgid "Now"
-#~ msgstr "Sekarang"
-
-#~ msgid "File"
-#~ msgstr "Fail"
-
-#~ msgid "Progress"
-#~ msgstr "Perkembangan"
-
-#~ msgid "Temporary  Speed _Limits"
-#~ msgstr "Had _Laju Sementara"
-
-#~ msgid "Sort by T_racker"
-#~ msgstr "Susun mengikut P_enjejak"
-
-#~ msgid "_Minimal View"
-#~ msgstr "_Paparan Minima"
-
-#~ msgid "Set _Location"
-#~ msgstr "Set _Tempat"
-
-#, c-format
-#~ msgid "%s is already running."
-#~ msgstr "%s telah berjalan."
-
-#~ msgid "Display _options dialog"
-#~ msgstr "Papar _dialog pilihan"
-
-#~ msgid "Use _global settings"
-#~ msgstr "Guna _penetapan global"
-
-#~ msgid "_Seed torrent until its ratio reaches:"
-#~ msgstr "_Semai torrent sehingga ratio sampai:"
-
-#~ msgid "Limit _download speed (KB/s):"
-#~ msgstr "Had _kelajuan muatturun (KB/s):"
-
-#~ msgid "Limit _upload speed (KB/s):"
-#~ msgstr "Had _kelajuan muatnaik (KB/s):"
-
-#~ msgid "Downloading"
-#~ msgstr "Sedang Dimuaturun"
-
-#~ msgid "Seeding"
-#~ msgstr "Menyemai"
-
-#~ msgid "Waiting to verify local data"
-#~ msgstr "Menunggu untuk mengesahkan data tempatan"
-
-#~ msgid "Enable Temporary Speed _Limits"
-#~ msgstr "Benarkan _Had Kelajuan Sementara"
-
-#~ msgid "Add _URL..."
-#~ msgstr "Tambah _URL..."
-
-#~ msgid "_Add File..."
-#~ msgstr "_Tambah Fail..."
-
-#~ msgid "Add URL..."
-#~ msgstr "Tambah URL..."
-
-#~ msgid "Add URL"
-#~ msgstr "Tambah URL"
-
-#~ msgid "Add torrent from URL"
-#~ msgstr "Tambah torrent dari URL"
-
-#~ msgid "Limit _upload speed (KiB/s):"
-#~ msgstr "Had kelajuan muat _naik (KiB/s):"
-
-#~ msgid "Limit _download speed (KiB/s):"
-#~ msgstr "Had kelajuan _muat turun (KiB/s):"
-
-#~ msgid "Seed-Until Ratio"
-#~ msgstr "Semai-Sehingga Menetapi Nisbah"
-
-#~ msgid "Seed _regardless of ratio"
-#~ msgstr "Semai _tanpa menetapi nisbah"
-
-#, c-format
-#~ msgid "%1$s (%2$.1f%%); %3$s Unverified"
-#~ msgstr "%1$s (%2$.1f%%); %3$s Tidak Disahkan"
-
-#, c-format
-#~ msgid "%1$s (%2$.1f%%)"
-#~ msgstr "%1$s (%2$.1f%%)"
-
-#, c-format
-#~ msgid "%1$.1f%%"
-#~ msgstr "%1$.1f%%"
-
-#~ msgid "Peer was discovered through DHT"
-#~ msgstr "Rakan telah ditemui melalui DHT"
-
-#~ msgid "Peer was discovered through Peer Exchange (PEX)"
-#~ msgstr "Rakan telah ditemui melalui Penukaran Rakan (PEX)"
-
-#~ msgid "Edit Trackers"
-#~ msgstr "Sunting Penjejak"
-
-#, c-format
-#~ msgid "Asking for peer counts now... <small>%s</small>"
-#~ msgstr "Memohon kiraan rakan sekarang... <small>%s</small>"
-
-#, c-format
-#~ msgid "Asking for more peers now... <small>%s</small>"
-#~ msgstr "Memohon lagi rakan sekarang... <small>%s</small>"
-
-#~ msgid "_Edit Trackers"
-#~ msgstr "_Sunting Penjejak"
-
-#~ msgid "<big><b>Quit Transmission?</b></big>"
-#~ msgstr "<big><b>Keluar Dari Transmission?</b></big>"
-
-#~ msgid "_Don't ask me again"
-#~ msgstr "_Jangan tanya saya lagi"
-
-#~ msgid "Queued"
-#~ msgstr "Dibaris gilir"
-
-#, c-format
-#~ msgid ""
-#~ "Got signal %d; trying to shut down cleanly.  Do it again if it gets stuck."
-#~ msgstr ""
-#~ "Dapat isyarat %d; cuba mematikannya dengan betul. Lakukannya semula jika ia "
-#~ "tersangkut."
-
-#~ msgid ""
-#~ "Transmission is a file-sharing program.  When you run a torrent, its data "
-#~ "will be made available to others by means of upload.  You and you alone are "
-#~ "fully responsible for exercising proper judgement and abiding by your local "
-#~ "laws."
-#~ msgstr ""
-#~ "Transmission merupakan program perkongsian-fail. Apabila anda menjalankan "
-#~ "torrent, datanya akan dapat diperoleh oleh orang lain dengan cara dimuat "
-#~ "naikkan. Anda secara sendirian adalah bertanggung jawab penuh untuk "
-#~ "melaksanakan penilaian yang sepatutnya dan mematuhi undang-undang tempatan "
-#~ "anda."
-
-#~ msgid "Transmission cannot be started."
-#~ msgstr "Transmission tidak dapat dimulakan."
-
-#~ msgid ""
-#~ "Transmission is already running, but is not responding.  To start a new "
-#~ "session, you must first close the existing Transmission process."
-#~ msgstr ""
-#~ "Transmission sudah dijalankan, tetapi ia menjadi kaku. Untuk memulakan sesi "
-#~ "baru, anda mesti tutup  proses Transmission yang sedia ada."
-
-#~ msgid "Sending upload/download totals to tracker..."
-#~ msgstr "Menhantat Jumlah muat naik/muat turun ke penjejak..."
-
-#~ msgid "Copyright 2005-2009 The Transmission Project"
-#~ msgstr "Hakcipta 2005-2009 Projek Transmission"
-
-#~ msgid "Creating torrent..."
-#~ msgstr "Mencipta torrent..."
-
-#~ msgid "Download complete"
-#~ msgstr "Muat turun selesai"
-
-#~ msgid ""
-#~ "These statistics are for your information only.  Resetting them doesn't "
-#~ "affect the statistics logged by your BitTorrent trackers."
-#~ msgstr ""
-#~ "Statistik ini adalah untuk makluman anda sahaja. Penetapan semulanya tidak "
-#~ "akan memberi kesan terhadap statistik yang dilogkan oleh penjejak BitTorrent "
-#~ "anda."
-
-#~ msgid "This may take a moment..."
-#~ msgstr "Tindakan ini mengambil masa..."
-
-#, c-format
-#~ msgid "%1$s of %2$s (%3$.2f%%)"
-#~ msgstr "%1$s dari %2$s (%3$.2f%%)"
-
-#, c-format
-#~ msgid "%1$s of %2$s (%3$.2f%%), uploaded %4$s (Ratio: %5$s)"
-#~ msgstr "%1$s dari %2$s (%3$.2f%%), dimuat naik %4$s (Nisbah: %5$s)"
-
-#, c-format
-#~ msgid "%1$s of %2$s (%3$.2f%%), uploaded %4$s (Ratio: %5$s Goal: %6$s)"
-#~ msgstr ""
-#~ "%1$s dari %2$s (%3$.2f%%), dimuat naik %4$s (Nisbah: %5$s Sasaran: %6$s)"
-
-#~ msgid "Announce URL"
-#~ msgstr "Maklum URL"
-
-#~ msgid "Transmission Bittorrent Client"
-#~ msgstr "Klien BitTorrent Transmission"
-
-#~ msgid "BitTorrent Activity"
-#~ msgstr "Aktiviti BitTorrent"
-
-#~ msgid "Tier"
-#~ msgstr "Peringkat"
-
-#, c-format
-#~ msgid "Couldn't disable desktop hibernation: %s"
-#~ msgstr "Tidak dapat melumpuhkan hibernasi desktop: %s"
-
-#~ msgid "Disallowing desktop hibernation"
-#~ msgstr "Halang hibernasi desktop"
-
-#~ msgid "Adding"
-#~ msgstr "Penambahan"
-
-#~ msgid "Call scrip_t when torrent is completed:"
-#~ msgstr "Panggil skr_ip bila torrent sudah lengkap:"
-
-#, c-format
-#~ msgid "Enable _blocklist (contains %'d rule)"
-#~ msgid_plural "Enable _blocklist (contains %'d rules)"
-#~ msgstr[0] "Benarkan senarai se_kat (mengandungi %'d peraturan)"
-#~ msgstr[1] "Benarkan senarai se_kat (mengandungi %'d peraturan)"
-
-#, c-format
-#~ msgid "Blocklist now has %'d rule."
-#~ msgid_plural "Blocklist now has %'d rules."
-#~ msgstr[0] "Senarai sekat sekarang mempunyai %'d peraturan."
-#~ msgstr[1] "Senarai sekat sekarang mempunyai %'d peraturan."
-
-#~ msgid "Play _sound when downloads are complete"
-#~ msgstr "Main _bunyi bila muat turun selesai"
-
-#~ msgid "Show _popup notifications"
-#~ msgstr "Papar dialog _timbul pemberitahuan"
-
-#~ msgid "Inhibit _hibernation when torrents are active"
-#~ msgstr "Halang _hibernasi bila torrent aktif"
-
-#~ msgid "Getting new blocklist..."
-#~ msgstr "Mendapatkan senarai sekat baru..."
-
-#~ msgid "Use Local Peer Discovery to find more peers"
-#~ msgstr "Guna Penemuan Rakan Setempat (LDP) untuk mencari lagi rakan"
-
-#~ msgid "Listening _port:"
-#~ msgstr "_Port mendengar:"
-
-#~ msgid "Proxy _type:"
-#~ msgstr "_Jenis proksi:"
-
-#~ msgid "Proxy _port:"
-#~ msgstr "_Port proksi:"
-
-#~ msgid "Proxy _server:"
-#~ msgstr "Pela_yan proksi:"
-
-#~ msgid "Connect to tracker via a pro_xy"
-#~ msgstr "Sambung ke penjejak melalui pro_ksi"
-
-#~ msgid "Temporary Speed Limits"
-#~ msgstr "Had Kelajuan Sementara"
-
-#~ msgid "Set _Location..."
-#~ msgstr "Tetapkan _Lokasi..."
-
-#, c-format
-#~ msgid "%1$s (%2$s%% of %3$s%% Available) + %4$s Unverified"
-#~ msgstr "%1$s (%2$s%% of %3$s%% Ada) + %4$s Tidak Disahkan"
-
-#~ msgid "Verifying"
-#~ msgstr "Mengesahkan"
-
-#, c-format
-#~ msgid "Limit do_wnload speed (%s):"
-#~ msgstr "Hadkan kelajuan muat t_urun (%s):"
-
-#, c-format
-#~ msgid "Limit u_pload speed (%s):"
-#~ msgstr "Hadkan kelajuan muat _naik (%s):"
-
-#~ msgid "Incoming Peers"
-#~ msgstr "Rakan Masuk"
-
-#~ msgid "_Port for incoming connections:"
-#~ msgstr "_Port untuk sambungan masuk:"
-
-#~ msgid "<i>Testing...</i>"
-#~ msgstr "<i>Menguji...</i>"
-
-#, c-format
-#~ msgid ""
-#~ "Click to disable Temporary Speed Limits\n"
-#~ "(%1$s down, %2$s up)"
-#~ msgstr ""
-#~ "Klik untuk lumpuhkan Had Kelajuan Sementara\n"
-#~ "(%1$s muat turun, %2$s muat naik)"
-
-#, c-format
-#~ msgid ""
-#~ "Click to enable Temporary Speed Limits\n"
-#~ "(%1$s down, %2$s up)"
-#~ msgstr ""
-#~ "Klik untuk benarkan Had Kelajuan Sementara\n"
-#~ "(%1$s muat turun, %2$s muat naik)"
-
-#~ msgid "GiB/s"
-#~ msgstr "GiB/s"
-
-#~ msgid "MiB/s"
-#~ msgstr "MiB/s"
-
-#~ msgid "size|None"
-#~ msgstr "saiz|Tiada"
-
-#~ msgid "TiB/s"
-#~ msgstr "TiB/s"
-
-#~ msgid "KiB/s"
-#~ msgstr "KiB/s"
-
-#, c-format
-#~ msgid ""
-#~ "This magnet link appears to be intended for something other than BitTorrent. "
-#~ " BitTorrent magnet links have a section containing \"%s\"."
-#~ msgstr ""
-#~ "Pautan magnet ini kelihatan untuk dilakukan selain dari BitTorrent. Pautan "
-#~ "magnet BitTorrent mempunyai seksyen yang mengandungi \"%s\"."
-
-#, c-format
-#~ msgid "Preallocated file \"%s\""
-#~ msgstr "Fail terpra-untuk \"%s\""
-
-#~ msgid ""
-#~ "Can't find local data.  Try \"Set Location\" to find it, or restart the "
-#~ "torrent to re-download."
-#~ msgstr ""
-#~ "Tidak dapat mencari data setempat. Cuba \"Tetapkan Lokasi\" untuk "
-#~ "mencarinya, atau mula semula torrent untuk dimuatkan semula."
-
-#~ msgid ""
-#~ "No data found!  Reconnect any disconnected drives, use \"Set Location\", or "
-#~ "restart the torrent to re-download."
-#~ msgstr ""
-#~ "Tiada data ditemui! Sambung semula mana-mana pemacu yang diputuskan, guna "
-#~ "\"Tetapkan Lokasi\", atau mulakan semula torrent untuk dimuat turun semula."
-
-#, c-format
-#~ msgid ""
-#~ "Port forwarding through \"%s\", service \"%s\".  (local address: %s:%d)"
-#~ msgstr ""
-#~ "Pemajuan port melalui \"%s\", perkhidmatan \"%s\". (alamat setempat: %s%d)"
-
-#~ msgid "Open _URL..."
-#~ msgstr "Buka _URL..."
-
-#~ msgid "Open URL..."
-#~ msgstr "Buka URL..."
-
-#~ msgid ""
-#~ "Transmission is already running, but is not responding. To start a new "
-#~ "session, you must first close the existing Transmission process."
-#~ msgstr ""
-#~ "Transmission sudah dijalankan, tetapi menjadi kaku. Untuk memulakan sesi "
-#~ "baru, anda mesti tutup proses Transmission sedia ada."

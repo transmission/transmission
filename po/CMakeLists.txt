@@ -6,7 +6,6 @@ set(${PROJECT_NAME}_LINGUAS
     ast
     az
     be
-    be@latin
     bg
     bn
     bo
@@ -17,6 +16,7 @@ set(${PROJECT_NAME}_LINGUAS
     ceb
     ckb
     cs
+    cy
     da
     de
     el
