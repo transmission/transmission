@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="eu">
+<TS version="2.0" language="ka">
 <defaultcodec>UTF-8</defaultcodec>
 <context>
     <name>AboutDialog</name>
     <message>
         <location filename="../AboutDialog.ui" line="+14"/>
         <source>About Transmission</source>
-        <translation>Transmissioni buruz</translation>
+        <translation>Transmission-ის შესახებ</translation>
     </message>
     <message>
         <location filename="../AboutDialog.cc" line="+28"/>
@@ -17,27 +17,27 @@
     <message>
         <location filename="../AboutDialog.ui" line="+26"/>
         <source>A fast and easy BitTorrent client</source>
-        <translation>BitTorrent bezero azkar eta erraz bat</translation>
+        <translation>სწრაფი და მარტივი BitTorrent კლიენტი</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Copyright (c) The Transmission Project</source>
-        <translation>Copyrighta (c) Transmission Egitasmoa</translation>
+        <translation>საავტორო უფლებები (c) The Transmission პროექტი</translation>
     </message>
     <message>
         <location filename="../AboutDialog.cc" line="+4"/>
         <source>C&amp;redits</source>
-        <translation>&amp;Kreditoak</translation>
+        <translation>ა&amp;ვტორები</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>&amp;License</source>
-        <translation>&amp;Baimena</translation>
+        <translation>&amp;ლიცენზია</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Credits</source>
-        <translation>Kreditoak</translation>
+        <translation>ავტორები</translation>
     </message>
 </context>
 <context>
@@ -45,27 +45,27 @@
     <message>
         <location filename="../Application.cc" line="+278"/>
         <source>&lt;b&gt;Transmission is a file sharing program.&lt;/b&gt;</source>
-        <translation>&lt;b&gt;Transmission agiri elkarbanatze programa bat da.&lt;/b&gt;</translation>
+        <translation>&lt;b&gt;Transmission ფაილების გასაზიარებელი პროგრამაა.&lt;/b&gt;</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility.</source>
-        <translation>Torrent bati ekiten diozunean, bere datuak eskuragarri daude besteentzat igoera bidez. Elkarbanatzen duzun edozein eduki zeure erantzukizunezkoa besterik ez da.</translation>
+        <translation>როდესაც ტორენტს გაუშვებთ, მისი მონაცემები ატვირთვის საშუალებით ხელმისაწვდომი გახდება სხვებისთვისაც. ნებისმიერი თქვენ მიერ გაზიარებული შიგთავსი არის მხოლოდ თქვენი პასუხისმგებლობა.</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>I &amp;Agree</source>
-        <translation>&amp;Onartzen dut</translation>
+        <translation>&amp;ვეთანხმები</translation>
     </message>
     <message>
         <location line="+85"/>
         <source>Torrent Completed</source>
-        <translation>Torrenta Osatuta</translation>
+        <translation>ტორენტი დასრულდა</translation>
     </message>
     <message>
         <location line="+24"/>
         <source>Torrent Added</source>
-        <translation>Torrenta Gehituta</translation>
+        <translation>ტორენტი დაემატა</translation>
     </message>
 </context>
 <context>
@@ -73,143 +73,143 @@
     <message>
         <location filename="../DetailsDialog.cc" line="+363"/>
         <source>None</source>
-        <translation>Ezer ez</translation>
+        <translation>არაფერი</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Mixed</source>
-        <translation>Nahastua</translation>
+        <translation>შერეული</translation>
     </message>
     <message>
         <location line="+1"/>
         <location line="+218"/>
         <source>Unknown</source>
-        <translation>Ezezaguna</translation>
+        <translation>უცნობი</translation>
     </message>
     <message>
         <location line="-179"/>
         <source>Finished</source>
-        <translation>Amaituta</translation>
+        <translation>დასრულებული</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Paused</source>
-        <translation>Pausatuta</translation>
+        <translation>შეჩერებული</translation>
     </message>
     <message>
         <location line="+204"/>
         <source>Active now</source>
-        <translation>Jardunean orain</translation>
+        <translation>ახლა აქტიური</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>%1 ago</source>
-        <translation>Duela %1</translation>
+        <translation>%1ს წინ</translation>
     </message>
     <message numerus="yes">
         <location line="+51"/>
         <source>%1 (%Ln pieces @ %2)</source>
         <translation>
-            <numerusform>%1 (%Ln atal @ %2)</numerusform>
-            <numerusform>%1 (%Ln atal @ %2)</numerusform>
+            <numerusform>%1 (%Ln ნაწილი @ %2)</numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+4"/>
         <source>%1 (%Ln pieces)</source>
         <translation>
-            <numerusform>%1 (%Ln atal)</numerusform>
-            <numerusform>%1 (%Ln atal)</numerusform>
+            <numerusform>%1 (%Ln ნაწილი)</numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message>
         <location line="+26"/>
         <source>Private to this tracker -- DHT and PEX disabled</source>
-        <translation>Aztarnari honen pribatua -- DHT eta PEX ezgaituta</translation>
+        <translation>პრივატული ამ ტრეკერთან -- DHT და PEX გამორთულია</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Public torrent</source>
-        <translation>Torrent publikoa</translation>
+        <translation>საჯარო ტორენტი</translation>
     </message>
     <message>
         <location line="+55"/>
         <source>Created by %1</source>
-        <translation>Sortzailea: %1</translation>
+        <translation>ავტორი: %1</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Created on %1</source>
-        <translation>Sortua: %1</translation>
+        <translation>შექმნილი - %1</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Created by %1 on %2</source>
-        <translation>Sortua: %1 %2-an</translation>
+        <translation>ავტორი %1 - %2</translation>
     </message>
     <message>
         <location line="+123"/>
         <location line="+23"/>
         <source>Encrypted connection</source>
-        <translation>Elkarkaketa enkriptatua</translation>
+        <translation>დაშიფრული კავშირი</translation>
     </message>
     <message>
         <location line="-7"/>
         <source>Optimistic unchoke</source>
-        <translation>Itogabetasun baikorra</translation>
+        <translation>ოპტიმისტური განჭედვა</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Downloading from this peer</source>
-        <translation>Hartzaile honengandik jeisten</translation>
+        <translation>იტვირთება ამ პირისგან</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>We would download from this peer if they would let us</source>
-        <translation>Hartzaile honetatik jeitsiko genuke beraiek utziz gero</translation>
+        <translation>ნება რომ მოგვცეს, ამ პირისგან ჩამოვტვირთავდით</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Uploading to peer</source>
-        <translation>Hartzailera igotzen</translation>
+        <translation>იტვირთება პირთან</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>We would upload to this peer if they asked</source>
-        <translation>Hartzaile honetara igoko genuke beraiek galdetuz gero</translation>
+        <translation>რომ მოითხოვონ, ამ პირს ავუტვირთავთ</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Peer has unchoked us, but we&apos;re not interested</source>
-        <translation>Hartzaileak itogabetu gaitu, baina ez gaude interesaturik</translation>
+        <translation>პირმა განგვჭედა, მაგრამ ეს არ გვაინტერესებს</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>We unchoked this peer, but they&apos;re not interested</source>
-        <translation>Hartzaile hau itogabetu dugu, baina beraiek ez daude interesaturik</translation>
+        <translation>ეს პირი განვჭედეთ, მაგრამ მას ეს არ აინტერესებს</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Peer was discovered through DHT</source>
-        <translation>Hartzailea DHT bidez aurkitu da</translation>
+        <translation>პირი აღმოჩენილია DHT-ს გამოყენებით</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Peer was discovered through Peer Exchange (PEX)</source>
-        <translation>Hartzailea (PEX) Hartzaile Aldaketa bidea aurkitu  da</translation>
+        <translation>პირი აღმოჩენილია პირების გაცვლის (PEX) გამოყენებით</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Peer is an incoming connection</source>
-        <translation>Hartzailea barrurako elkarketa bat da</translation>
+        <translation>პირი შემომავალი კავშირია</translation>
     </message>
     <message numerus="yes">
         <location line="+120"/>
         <source> minute(s)</source>
         <extracomment>Spin box suffix, &quot;Stop seeding if idle for: [ 5 minutes ]&quot; (includes leading space after the number, if needed)</extracomment>
         <translation>
-            <numerusform> minutu</numerusform>
-            <numerusform> minutu</numerusform>
+            <numerusform>წუთი</numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -217,12 +217,12 @@
         <location line="+12"/>
         <location line="+34"/>
         <source>Error</source>
-        <translation>Akatsa</translation>
+        <translation>შეცდომა</translation>
     </message>
     <message>
         <location line="-34"/>
         <source>Tracker already exists.</source>
-        <translation>Aztarnaria jadanik badago.</translation>
+        <translation>ტრეკერი უკვე არსებობს.</translation>
     </message>
     <message>
         <location line="-628"/>
@@ -234,110 +234,110 @@
         <location line="+9"/>
         <source>%1 of %2 (%3%)</source>
         <extracomment>Text following the &quot;Have:&quot; label in torrent properties dialog; %1 is amount of downloaded and verified data, %2 is overall size of torrent data, %3 is percentage (%1/%2*100)</extracomment>
-        <translation>%1 --&gt; %2 (%3%)</translation>
+        <translation>%1 / %2 (%3%)</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>%1 of %2 (%3%), %4 Unverified</source>
         <extracomment>Text following the &quot;Have:&quot; label in torrent properties dialog; %1 is amount of downloaded data (both verified and unverified), %2 is overall size of torrent data, %3 is percentage (%1/%2*100), %4 is amount of downloaded but not yet verified data</extracomment>
-        <translation>%1 --&gt; %2 (%3%), %4 Egiaztatu gabe</translation>
+        <translation>%1 / %2 (%3%), %4 შეუმოწმებელი</translation>
     </message>
     <message>
         <location line="+35"/>
         <source>%1 (%2 corrupt)</source>
-        <translation>%1 (%2 hondatuta)</translation>
+        <translation>%1 (%2 დაზიანებული)</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>%1 (Ratio: %2)</source>
-        <translation>%1 (Maila: %2)</translation>
+        <translation>%1 (შეფარდება: %2)</translation>
     </message>
     <message>
         <location line="+220"/>
         <source>N/A</source>
-        <translation>E/G</translation>
+        <translation>N/A</translation>
     </message>
     <message>
         <location line="+156"/>
         <source>Peer is connected over uTP</source>
-        <translation>Hartzailea uTP bidez elkarketaturik dago</translation>
+        <translation>პირი დაკავშირებულია uTP-ს გამოყენებით</translation>
     </message>
     <message>
         <location line="+155"/>
         <source>Add URL </source>
-        <translation>Gehitu URL-a </translation>
+        <translation>URL-ს დამატება </translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Add tracker announce URL:</source>
-        <translation>Gehitu aztarnari iragarpen URL-a:</translation>
+        <translation>ტრეკერის გამოცხადების URL-ს დამატება:</translation>
     </message>
     <message>
         <location line="+8"/>
         <location line="+46"/>
         <source>Invalid URL &quot;%1&quot;</source>
-        <translation>URL baliogabea &quot;%1&quot;</translation>
+        <translation>არასწორი URL &quot;%1&quot;</translation>
     </message>
     <message>
         <location line="-11"/>
         <source>Edit URL </source>
-        <translation>Editatu URL-a </translation>
+        <translation>URL-ს რედაქტირება </translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Edit tracker announce URL:</source>
-        <translation>Editatu aztarnari iragarpen URL-a:</translation>
+        <translation>ტრეკერის გამოცხადების URL-ს რედაქტირება:</translation>
     </message>
     <message>
         <location line="+63"/>
         <source>High</source>
-        <translation>Handia</translation>
+        <translation>მაღალი</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Normal</source>
-        <translation>Arrunta</translation>
+        <translation>ჩვეულებრივი</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Low</source>
-        <translation>Apala</translation>
+        <translation>დაბალი</translation>
     </message>
     <message>
         <location line="+2"/>
         <location line="+4"/>
         <source>Use Global Settings</source>
-        <translation>Erabili Ezarpen Orokorrak</translation>
+        <translation>გლობალური პარამეტრების გამოყენება</translation>
     </message>
     <message>
         <location line="-3"/>
         <source>Seed regardless of ratio</source>
-        <translation>Emaritu maila kontuan izan gabe</translation>
+        <translation>სიდირება შეფარდების მიუხედავად</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Stop seeding at ratio:</source>
-        <translation>Gelditu emaritza maila honetan:</translation>
+        <translation>სიდირების შეჩერება შეფარდებაზე:</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Seed regardless of activity</source>
-        <translation>Emaritu jarduera kontuan izan gabe</translation>
+        <translation>სიდირება აქტიურობის მიუხედავად</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Stop seeding if idle for:</source>
-        <translation>Gelditu emaritza jardungabe badago:</translation>
+        <translation>სიდირების შეჩერება უმოქმედობის:</translation>
     </message>
     <message>
         <location line="+64"/>
         <source>Up</source>
-        <translation>Igotzen</translation>
+        <translation>ატ.</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Down</source>
-        <translation>Jeisten</translation>
+        <translation>ჩამ.</translation>
     </message>
     <message>
         <location line="+0"/>
@@ -347,207 +347,207 @@
     <message>
         <location line="+0"/>
         <source>Status</source>
-        <translation>Egoera</translation>
+        <translation>სტატუსი</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Address</source>
-        <translation>Helbidea</translation>
+        <translation>მისამართი</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Client</source>
-        <translation>Bezeroa</translation>
+        <translation>კლიენტი</translation>
     </message>
     <message>
         <location filename="../DetailsDialog.ui" line="+14"/>
         <source>Torrent Properties</source>
-        <translation>Torrent Ezaugarriak</translation>
+        <translation>ტორენტის თვისებები</translation>
     </message>
     <message>
         <location line="+16"/>
         <source>Information</source>
-        <translation>Argibideak</translation>
+        <translation>ინფორმაცია</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Activity</source>
-        <translation>Jarduera</translation>
+        <translation>აქტოვპბა</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Have:</source>
-        <translation>Du:</translation>
+        <translation>მიღებულია:</translation>
     </message>
     <message>
         <location line="+26"/>
         <source>Availability:</source>
-        <translation>Eskuragarritasuna:</translation>
+        <translation>ხელმისაწვდომობა:</translation>
     </message>
     <message>
         <location line="+26"/>
         <source>Uploaded:</source>
-        <translation>Igota:</translation>
+        <translation>ატივრთული:</translation>
     </message>
     <message>
         <location line="+26"/>
         <source>Downloaded:</source>
-        <translation>Jeitsita:</translation>
+        <translation>ჩამოტვირთული:</translation>
     </message>
     <message>
         <location line="+26"/>
         <source>State:</source>
-        <translation>Egoera:</translation>
+        <translation>მდგომარეობა:</translation>
     </message>
     <message>
         <location line="+26"/>
         <source>Running time:</source>
-        <translation>Jardun denbora:</translation>
+        <translation>გაშვებული დრო:</translation>
     </message>
     <message>
         <location line="+26"/>
         <source>Remaining time:</source>
-        <translation>Gelditzen den denbora:</translation>
+        <translation>დარჩენილი დრო:</translation>
     </message>
     <message>
         <location line="+26"/>
         <source>Last activity:</source>
-        <translation>Azken jarduera:</translation>
+        <translation>ბოლო აქტივობა:</translation>
     </message>
     <message>
         <location line="+26"/>
         <source>Error:</source>
-        <translation>Akatsa:</translation>
+        <translation>შეცდომა</translation>
     </message>
     <message>
         <location line="+47"/>
         <source>Details</source>
-        <translation>Xehetasunak</translation>
+        <translation>დეტალები</translation>
     </message>
     <message>
         <location line="+109"/>
         <source>Size:</source>
-        <translation>Neurria:</translation>
+        <translation>ზომა:</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Location:</source>
-        <translation>Kokalekua:</translation>
+        <translation>მდებარეობა:</translation>
     </message>
     <message>
         <location line="-66"/>
         <source>Hash:</source>
-        <translation>Hasha:</translation>
+        <translation>ჰეში:</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Privacy:</source>
-        <translation>Pribatutasuna:</translation>
+        <translation>პრივატულობა:</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Origin:</source>
-        <translation>Jatorria:</translation>
+        <translation>წარმოშობა:</translation>
     </message>
     <message>
         <location line="+78"/>
         <source>Comment:</source>
-        <translation>Aipamena:</translation>
+        <translation>კომენტარები:</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>Peers</source>
-        <translation>Hartzaileak</translation>
+        <translation>პირები</translation>
     </message>
     <message>
         <location line="+32"/>
         <source>Tracker</source>
-        <translation>Aztarnaria</translation>
+        <translation>აღმნუსხავი</translation>
     </message>
     <message>
         <location line="+22"/>
         <source>Add Tracker</source>
-        <translation>Gehitu Aztarnaria</translation>
+        <translation>აღმნუსხავის დამატება</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Edit Tracker</source>
-        <translation>Editatu Aztarnaria</translation>
+        <translation>აღმნუსხავის რედაქტირება</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Remove Trackers</source>
-        <translation>Kendu Aztarnariak</translation>
+        <translation>აღმნუსხავის წაშლა</translation>
     </message>
     <message>
         <location line="+23"/>
         <source>Show &amp;more details</source>
-        <translation>Erakutsi &amp;xehetasun gehiago</translation>
+        <translation>&amp;მეტი დეტალის ჩვენება</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Show &amp;backup trackers</source>
-        <translation>Erakutsi &amp;babeskopia aztarnariak</translation>
+        <translation>&amp;სარეზერვო ტრეკერების ჩვენება</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Files</source>
-        <translation>Agiriak</translation>
+        <translation>ფაილები</translation>
     </message>
     <message>
         <location line="+32"/>
         <source>Options</source>
-        <translation>Aukerak</translation>
+        <translation>პარამეტრები</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Speed</source>
-        <translation>Abiadura</translation>
+        <translation>სიჩქარე</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Honor global &amp;limits</source>
-        <translation>&amp;Ohorezko muga orokorrak</translation>
+        <translation>გლობალური &amp;შეზღუდვების პატივისცემა</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Limit &amp;download speed:</source>
-        <translation>&amp;Mugatu jeisketa abiadura:</translation>
+        <translation>&amp;ჩამოტვირთვის სიჩქარის შეზღუდვა:</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>Limit &amp;upload speed:</source>
-        <translation>M&amp;ugatu igoera abiadura:</translation>
+        <translation>&amp;ატვირთვის სიჩქარის შეზღუდვა:</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>Torrent &amp;priority:</source>
-        <translation>&amp;Torrent lehentasuna:</translation>
+        <translation>ტორენტის &amp;პრიორიტეტი:</translation>
     </message>
     <message>
         <location line="+34"/>
         <source>Seeding Limits</source>
-        <translation>Emaritza Mugak</translation>
+        <translation>სიდირების ლიმიტები</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>&amp;Ratio:</source>
-        <translation>M&amp;aila:</translation>
+        <translation>შე&amp;ფარდება</translation>
     </message>
     <message>
         <location line="+30"/>
         <source>&amp;Idle:</source>
-        <translation>&amp;Jardungabe:</translation>
+        <translation>&amp;უმოქმედო:</translation>
     </message>
     <message>
         <location line="+50"/>
         <source>Peer Connections</source>
-        <translation>Hartzaile Elkarketak</translation>
+        <translation>პირის კავშირები</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>&amp;Maximum peers:</source>
-        <translation>&amp;Gehienezko hartzaile:</translation>
+        <translation>&amp;მაქსიმალური პირები:</translation>
     </message>
 </context>
 <context>
@@ -557,27 +557,27 @@
         <location filename="../FileTreeView.cc" line="+104"/>
         <location line="+257"/>
         <source>Low</source>
-        <translation>Apala</translation>
+        <translation>დაბალი</translation>
     </message>
     <message>
         <location line="+1"/>
         <location filename="../FileTreeView.cc" line="-256"/>
         <location line="+254"/>
         <source>High</source>
-        <translation>Handia</translation>
+        <translation>მაღალი</translation>
     </message>
     <message>
         <location line="+1"/>
         <location filename="../FileTreeView.cc" line="-255"/>
         <location line="+256"/>
         <source>Normal</source>
-        <translation>Arrunta</translation>
+        <translation>ჩვეულებრივი</translation>
     </message>
     <message>
         <location line="+1"/>
         <location filename="../FileTreeView.cc" line="-255"/>
         <source>Mixed</source>
-        <translation>Nahastua</translation>
+        <translation>შერეული</translation>
     </message>
 </context>
 <context>
@@ -585,27 +585,27 @@
     <message>
         <location filename="../FileTreeModel.cc" line="+195"/>
         <source>File</source>
-        <translation>Agiria</translation>
+        <translation>ფაილი</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Size</source>
-        <translation>Neurria</translation>
+        <translation>ზომა</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Progress</source>
-        <translation>Garapena</translation>
+        <translation>პროგრესი</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Download</source>
-        <translation>Jeitsi</translation>
+        <translation>ჩამოტვირთვა</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Priority</source>
-        <translation>Lehentasuna</translation>
+        <translation>პრიორიტეტი</translation>
     </message>
 </context>
 <context>
@@ -613,32 +613,32 @@
     <message>
         <location filename="../FileTreeView.cc" line="+247"/>
         <source>Check Selected</source>
-        <translation>Aukeratu Hautatua</translation>
+        <translation>არჩეულის მონიშვნა</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Uncheck Selected</source>
-        <translation>Desaukeratu Hautatua</translation>
+        <translation>არჩეულის გადანიშვნა</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Only Check Selected</source>
-        <translation>Aukeratu Hautatua Bakarrik</translation>
+        <translation>მხოლოდ არჩეულის მონიშვნა</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Priority</source>
-        <translation>Lehentasuna</translation>
+        <translation>პრიორიტეტი</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Open</source>
-        <translation>Ireki</translation>
+        <translation>გახსნა</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Rename...</source>
-        <translation>Berrizendatu...</translation>
+        <translation>გადარქმევა...</translation>
     </message>
 </context>
 <context>
@@ -647,47 +647,47 @@
         <location filename="../FilterBar.cc" line="+60"/>
         <location line="+143"/>
         <source>All</source>
-        <translation>Denak</translation>
+        <translation>ყველა</translation>
     </message>
     <message>
         <location line="-136"/>
         <source>Active</source>
-        <translation>Jardunean</translation>
+        <translation>აქტიური</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Downloading</source>
-        <translation>Jeisten</translation>
+        <translation>ჩამოტვირთვა</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Seeding</source>
-        <translation>Emaritzan</translation>
+        <translation>ატვირთვა</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Paused</source>
-        <translation>Pausatuta</translation>
+        <translation>შეჩერებული</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Finished</source>
-        <translation>Amaituta</translation>
+        <translation>დასრულებული</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Verifying</source>
-        <translation>Egiaztatzen</translation>
+        <translation>გადამოწმებული</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Error</source>
-        <translation>Akatsa</translation>
+        <translation>შეცდომიანი</translation>
     </message>
     <message>
         <location line="+141"/>
         <source>Show:</source>
-        <translation>Erakutsi:</translation>
+        <translation>გამოჩნდეს:</translation>
     </message>
 </context>
 <context>
@@ -695,7 +695,7 @@
     <message>
         <location filename="../FilterBarLineEdit.cc" line="+47"/>
         <source>Search...</source>
-        <translation>Bilatu</translation>
+        <translation>ძიება...</translation>
     </message>
 </context>
 <context>
@@ -703,85 +703,85 @@
     <message>
         <location filename="../Formatter.cc" line="+32"/>
         <source>B/s</source>
-        <translation>B/s</translation>
+        <translation>ბ/წ</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>kB/s</source>
-        <translation>kB/s</translation>
+        <translation>კბ/წ</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>MB/s</source>
-        <translation>MB/s</translation>
+        <translation>მბ/წ</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>GB/s</source>
-        <translation>GB/s</translation>
+        <translation>გბ/წ</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>TB/s</source>
-        <translation>TB/s</translation>
+        <translation>ტბ/წ</translation>
     </message>
     <message>
         <location line="+8"/>
         <location line="+12"/>
         <source>B</source>
-        <translation>B</translation>
+        <translation>ბ</translation>
     </message>
     <message>
         <location line="-11"/>
         <source>kB</source>
-        <translation>kB</translation>
+        <translation>კბ</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>MB</source>
-        <translation>MB</translation>
+        <translation>მბ</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>GB</source>
-        <translation>GB</translation>
+        <translation>გბ</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>TB</source>
-        <translation>TB</translation>
+        <translation>ტბ</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>KiB</source>
-        <translation>KiB</translation>
+        <translation>კიბ</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>MiB</source>
-        <translation>MiB</translation>
+        <translation>მიბ</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>GiB</source>
-        <translation>GiB</translation>
+        <translation>გიბ</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>TiB</source>
-        <translation>TiB</translation>
+        <translation>ტიბ</translation>
     </message>
     <message>
         <location line="+32"/>
         <location line="+14"/>
         <source>Unknown</source>
-        <translation>Ezezaguna</translation>
+        <translation>უცნობი</translation>
     </message>
     <message>
         <location line="-11"/>
         <location line="+14"/>
         <source>None</source>
-        <translation>Ezer ez</translation>
+        <translation>არაფერი</translation>
     </message>
     <message>
         <location line="+20"/>
@@ -793,32 +793,32 @@
         <location line="+32"/>
         <source>%Ln day(s)</source>
         <translation>
-            <numerusform>%Ln egun</numerusform>
-            <numerusform>%Ln egun</numerusform>
+            <numerusform>%Ln დღე</numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+1"/>
         <source>%Ln hour(s)</source>
         <translation>
-            <numerusform>%Ln ordu</numerusform>
-            <numerusform>%Ln ordu</numerusform>
+            <numerusform>%Ln საათი</numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+1"/>
         <source>%Ln minute(s)</source>
         <translation>
-            <numerusform>%Ln minutu</numerusform>
-            <numerusform>%Ln minutu</numerusform>
+            <numerusform>%Ln წუთი</numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+1"/>
         <source>%Ln second(s)</source>
         <translation>
-            <numerusform>%Ln segundu</numerusform>
-            <numerusform>%Ln segundu</numerusform>
+            <numerusform>%Ln წამი</numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -834,12 +834,12 @@
     <message>
         <location filename="../FreeSpaceLabel.cc" line="+50"/>
         <source>&lt;i&gt;Calculating Free Space...&lt;/i&gt;</source>
-        <translation>&lt;i&gt;Toki Askea Kalkulatzen...&lt;/i&gt;</translation>
+        <translation>&lt;i&gt;თავისუფალი ადგილის გამოთვლა...&lt;/i&gt;</translation>
     </message>
     <message>
         <location line="+34"/>
         <source>%1 free</source>
-        <translation>%1 aske</translation>
+        <translation>%1 თავისუფალი</translation>
     </message>
 </context>
 <context>
@@ -847,7 +847,7 @@
     <message>
         <location filename="../LicenseDialog.ui" line="+14"/>
         <source>License</source>
-        <translation>Baimena</translation>
+        <translation>ლიცენზია</translation>
     </message>
 </context>
 <context>
@@ -860,412 +860,412 @@
     <message>
         <location line="+175"/>
         <source>&amp;Torrent</source>
-        <translation>&amp;Torrenta</translation>
+        <translation>&amp;ტორენტი</translation>
     </message>
     <message>
         <location line="+30"/>
         <source>&amp;Edit</source>
-        <translation>&amp;Editatu</translation>
+        <translation>&amp;რედაქტირება</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>&amp;Help</source>
-        <translation>&amp;Laguntza</translation>
+        <translation>&amp;დახმარება</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>&amp;View</source>
-        <translation>&amp;Ikusi</translation>
+        <translation>&amp;ხედი</translation>
     </message>
     <message>
         <location line="+22"/>
         <source>&amp;File</source>
-        <translation>&amp;Agiria</translation>
+        <translation>&amp;ფაილი</translation>
     </message>
     <message>
         <location line="+66"/>
         <source>&amp;New...</source>
-        <translation>&amp;Berria...</translation>
+        <translation>&amp;ახალი...</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Create a new torrent</source>
-        <translation>Sortu torrent berri bat</translation>
+        <translation>ახალი ტორენტის შექმნა</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>&amp;Properties</source>
-        <translation>&amp;Ezaugarriak</translation>
+        <translation>&amp;თვისებები</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Show torrent properties</source>
-        <translation>Erakutsi torrentaren ezaugarriak</translation>
+        <translation>ტორენტის თვისებების ჩვენება</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Open the torrent&apos;s folder</source>
-        <translation>Ireki torrentaren agiritegia</translation>
+        <translation>ტორენტის საქაღალდის გახსნა</translation>
     </message>
     <message>
         <location line="-161"/>
         <source>Queue</source>
-        <translation>Lerrokatu</translation>
+        <translation>რიგი</translation>
     </message>
     <message>
         <location line="+122"/>
         <source>&amp;Open...</source>
-        <translation>&amp;Ireki...</translation>
+        <translation>&amp;გახსნა...</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Open</source>
-        <translation>Ireki</translation>
+        <translation>გახსნა</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Open a torrent</source>
-        <translation>Ireki torrent bat</translation>
+        <translation>ტორენტის გახსნა</translation>
     </message>
     <message>
         <location line="+30"/>
         <source>Open Fold&amp;er</source>
-        <translation>&amp;Ireki Agiritegia</translation>
+        <translation>სა&amp;ქაღალდის გახსნა</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>&amp;Start</source>
-        <translation>&amp;Hasi</translation>
+        <translation>&amp;დაწყება</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Start torrent</source>
-        <translation>Hasi torrenta</translation>
+        <translation>ტორენტის დაწყება</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Ask Tracker for &amp;More Peers</source>
-        <translation>&amp;Galdetu Aztarnariari Hartzaile Gehiagoz</translation>
+        <translation>ტრეკერისთვის &amp;მეტი პირების მოთხოვნა</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Ask tracker for more peers</source>
-        <translation>Galdetu aztarnariari hartzaile gehiagoz</translation>
+        <translation>აღმნუსხავისთვის მეტი პირის მოთხოვნა</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>&amp;Pause</source>
-        <translation>&amp;Pausatu</translation>
+        <translation>&amp;შეჩერება</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Pause torrent</source>
-        <translation>Pausatu torrenta</translation>
+        <translation>ტორენტის შეჩერება</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>&amp;Verify Local Data</source>
-        <translation>Egiaztatu &amp;Tokiko Datuak</translation>
+        <translation>ადგილობრივი მონაცემების &amp;გადამოწმება</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Verify local data</source>
-        <translation>Egiaztatu tokiko datuak</translation>
+        <translation>ადგილობრივი მონაცემების გადამოწმება</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>&amp;Remove</source>
-        <translation>&amp;Kendu</translation>
+        <translation>&amp;ამოღება</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Remove torrent</source>
-        <translation>Kendu torrenta</translation>
+        <translation>ტორენტის ამოღება</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>&amp;Delete Files and Remove</source>
-        <translation>E&amp;zabatu Agiriak eta Kendu</translation>
+        <translation>ფაილების წაშლა და ამოღე&amp;ბა</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Remove torrent and delete its files</source>
-        <translation>Kendu torrenta eta ezabatu bere agiriak</translation>
+        <translation>ტორენტის ამოღება და მისი ფაილების წაშლა</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>&amp;Start All</source>
-        <translation>&amp;Hasi Denak</translation>
+        <translation>ყველას &amp;დაწყება</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>&amp;Pause All</source>
-        <translation>&amp;Pausatu Denak</translation>
+        <translation>ყველას &amp;შეჩერება</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>&amp;Quit</source>
-        <translation>Ut&amp;zi</translation>
+        <translation>&amp;გასვლა</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>&amp;Select All</source>
-        <translation>Hautatu &amp;Denak</translation>
+        <translation>ყველას &amp;არჩევა</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>&amp;Deselect All</source>
-        <translation>&amp;Ezhautatu Denak</translation>
+        <translation>ყველას &amp;გადარჩევა</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>&amp;Preferences</source>
-        <translation>&amp;Hobespenak</translation>
+        <translation>&amp;პარამეტრები</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>&amp;Compact View</source>
-        <translation>&amp;Ikuspegi Trinkoa</translation>
+        <translation>&amp;კომპაქტური ხედი</translation>
     </message>
     <message>
         <location line="+3"/>
         <location line="+3"/>
         <source>Compact View</source>
-        <translation>Ikuspegi Trinkoa</translation>
+        <translation>კომპაქტური ხედი</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>&amp;Toolbar</source>
-        <translation>&amp;Tresnabarra</translation>
+        <translation>&amp;ხელსაწყოთა ზოლი</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>&amp;Filterbar</source>
-        <translation>I&amp;ragazkibarra</translation>
+        <translation>&amp;ფილტრის ზოლი</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>&amp;Statusbar</source>
-        <translation>&amp;Egoerabarra</translation>
+        <translation>&amp;სტატუსის ზოლი</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Sort by &amp;Activity</source>
-        <translation>Antolatu &amp;Jardueraz</translation>
+        <translation>დალაგება &amp;აქტივობით</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Sort by A&amp;ge</source>
-        <translation>Antolatu &amp;Adinez</translation>
+        <translation>დალაგება ა&amp;საკით</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Sort by Time &amp;Left</source>
-        <translation>Antolatu Gelditzen &amp;Denboraz</translation>
+        <translation>დალაგება &amp;დარჩენილი დროით</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Sort by &amp;Name</source>
-        <translation>Antolatu I&amp;zenez</translation>
+        <translation>დალაგება &amp;სახელით</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Sort by &amp;Progress</source>
-        <translation>Antolatu &amp;Garapenez</translation>
+        <translation>დალაგება &amp;პროგრესით</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Sort by Rati&amp;o</source>
-        <translation>Antolatu &amp;Mailaz</translation>
+        <translation>დალაგება &amp;შეფარდებით</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Sort by Si&amp;ze</source>
-        <translation>Antolatu &amp;Neurriz</translation>
+        <translation>დალაგება &amp;ზომით</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Sort by Stat&amp;e</source>
-        <translation>Antolat&amp;u Egoeraz</translation>
+        <translation>დალაგება მ&amp;დგომარეობით</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Sort by T&amp;racker</source>
-        <translation>Antolatu Az&amp;tarnariz</translation>
+        <translation>დალაგება ტ&amp;რეკერით</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Message &amp;Log</source>
-        <translation>Mezu &amp;Oharra</translation>
+        <translation>შეტყობინებების &amp;ჟურნალი</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>&amp;Statistics</source>
-        <translation>&amp;Estatistikak</translation>
+        <translation>&amp;სტატისტიკა</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>&amp;Contents</source>
-        <translation>Ed&amp;ukiak</translation>
+        <translation>&amp;შიგთავსი</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>&amp;About</source>
-        <translation>Honi &amp;Buruz</translation>
+        <translation>შესა&amp;ხებ</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Re&amp;verse Sort Order</source>
-        <translation>Alderantzizkatu Antolakuntza &amp;Hurrenkera</translation>
+        <translation>დალაგების მიმართულების შე&amp;ბრუნება</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>&amp;Name</source>
-        <translation>&amp;Izena</translation>
+        <translation>&amp;სახელი</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>&amp;Files</source>
-        <translation>&amp;Agiriak</translation>
+        <translation>&amp;ფაილები</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>&amp;Tracker</source>
-        <translation>A&amp;ztarnaria</translation>
+        <translation>&amp;ტრეკერი</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Total Ratio</source>
-        <translation>Maila Guztira</translation>
+        <translation>საერთო შეფარდება</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Session Ratio</source>
-        <translation>Saio Maila</translation>
+        <translation>სესიის შეფარდება</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Total Transfer</source>
-        <translation>Eskualdaketa Guztira</translation>
+        <translation>საერთო ტრანსფერი</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Session Transfer</source>
-        <translation>Saioan Eskualdatuta</translation>
+        <translation>სესიის ტრანსფერი</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>&amp;Main Window</source>
-        <translation>Leiho &amp;Nagusia</translation>
+        <translation>&amp;მთავარი ფანჯარა</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Tray &amp;Icon</source>
-        <translation>Erretilu &amp;Ikurra</translation>
+        <translation>დავალებების ზოლის &amp;ხატულა</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>&amp;Change Session...</source>
-        <translation>&amp;Aldatu Saioa...</translation>
+        <translation>სესიის &amp;შეცვლა...</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Choose Session</source>
         <extracomment>Start a local session or connect to a running session</extracomment>
-        <translation>Hautatu Saioa</translation>
+        <translation>სესიის არჩევა</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Set &amp;Location...</source>
-        <translation>Ez&amp;arri Kokalekua...</translation>
+        <translation>&amp;მდებარეობის დაყენება...</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>&amp;Copy Magnet Link to Clipboard</source>
-        <translation>Kopiatu &amp;Magnet Lotura Gakora</translation>
+        <translation>მაგნიტური ბმულის ა&amp;სლი ბუფერში</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Open &amp;URL...</source>
-        <translation>Ireki &amp;URL-a...</translation>
+        <translation>&amp;URL-ს გახსნა...</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>&amp;Donate</source>
-        <translation>&amp;Dirulaguntza</translation>
+        <translation>შე&amp;წირვა</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Start &amp;Now</source>
-        <translation>Hasi &amp;Orain</translation>
+        <translation>&amp;ახლავე დაწყება</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Bypass the queue and start now</source>
-        <translation>Ezikusi lerroa eta hasi orain</translation>
+        <translation>რიგისთვის გვერდის ავლა და ახლავე დაწყება</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Move to &amp;Top</source>
-        <translation>Mugitu &amp;Goren</translation>
+        <translation>&amp;თავში ატანა</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Move &amp;Up</source>
-        <translation>Mugitu G&amp;ora</translation>
+        <translation>&amp;მაღლა ატანა</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Move &amp;Down</source>
-        <translation>Mugitu B&amp;ehera</translation>
+        <translation>დაბლა &amp;ჩატანა</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Move to &amp;Bottom</source>
-        <translation>Mugitu &amp;Beheren</translation>
+        <translation>&amp;ბოლოში ჩატანა</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Sort by &amp;Queue</source>
-        <translation>Antolatu &amp;Lerroz</translation>
+        <translation>დალაგება &amp;რიგით</translation>
     </message>
     <message>
         <location filename="../MainWindow.cc" line="+432"/>
         <source>Limit Download Speed</source>
-        <translation>Mugatu Jeisketa Abiadura</translation>
+        <translation>ჩამოტვირთვის სიჩქარის შეზღუდვა</translation>
     </message>
     <message>
         <location line="-54"/>
         <source>Unlimited</source>
-        <translation>Mugagabea</translation>
+        <translation>შეუზღუდავი</translation>
     </message>
     <message>
         <location line="+6"/>
         <location line="+641"/>
         <location line="+8"/>
         <source>Limited at %1</source>
-        <translation>Muga: %1</translation>
+        <translation>შეზღუდული %1-ზე</translation>
     </message>
     <message>
         <location line="-599"/>
         <source>Limit Upload Speed</source>
-        <translation>Mugatu Igoera Abiadura</translation>
+        <translation>ატვირთვის სიჩქარის შეზღუდვა</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Stop Seeding at Ratio</source>
-        <translation>Gelditu Emaritza Maila honetan</translation>
+        <translation>სიდირების შეჩერება ამ შეფარდებაზე</translation>
     </message>
     <message>
         <location line="-31"/>
         <source>Seed Forever</source>
-        <translation>Emaritu Etengabe</translation>
+        <translation>სიდირება სამუდამოდ</translation>
     </message>
     <message>
         <location line="+6"/>
         <location line="+627"/>
         <source>Stop at Ratio (%1)</source>
-        <translation>Gelditu Maila honetan (%1)</translation>
+        <translation>შეჩერება ამ შეფარდებაზე (%1)</translation>
     </message>
     <message>
         <location line="-393"/>
@@ -1276,162 +1276,163 @@
     <message>
         <location line="+28"/>
         <source>Idle</source>
-        <translation>Jardungabe</translation>
+        <translation>უმოქმედო</translation>
     </message>
     <message>
         <location line="+35"/>
         <location line="+17"/>
         <source>Ratio: %1</source>
-        <translation>Maila: %1</translation>
+        <translation>შეფარდება: %1</translation>
     </message>
     <message>
         <location line="-12"/>
         <location line="+6"/>
         <source>Down: %1, Up: %2</source>
-        <translation>Jeisketa: %1, Igoera: %2</translation>
+        <translation>ჩამ.: %1, ატვ.: %2</translation>
     </message>
     <message>
         <location line="+421"/>
         <source>Torrent Files (*.torrent);;All Files (*.*)</source>
-        <translation>Torrent Agiriak (*.torrent);;Agiri Guzitak (*.*)</translation>
+        <translation>ტორენტ ფაილები (*.torrent);;ყველა ფაილი (*.*)</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Show &amp;options dialog</source>
-        <translation>Erakutsi a&amp;ukera elkarrizketa</translation>
+        <translation>&amp;პარამეტრების დიალოგის ჩვენება</translation>
     </message>
     <message>
         <location line="-9"/>
         <source>Open Torrent</source>
-        <translation>Ireki Torrenta</translation>
+        <translation>ტორენტის გახსნა</translation>
     </message>
     <message>
         <location line="-917"/>
         <source>Speed Limits</source>
-        <translation>Abiadura Mugak</translation>
+        <translation>სიჩქარის ლიმიტები</translation>
     </message>
     <message>
         <location line="+448"/>
         <source>Network Error</source>
-        <translation>Sare Akatsa</translation>
+        <translation>ქსელის შეცდომა</translation>
     </message>
     <message>
         <location line="+433"/>
         <source>Click to disable Temporary Speed Limits
  (%1 down, %2 up)</source>
-        <translation>Klikatu Aldibaterako Abiadura Mugak ezgaitzeko
- (%1 jeitsiera, %2 igoera)</translation>
+        <translation>დააწკაპუნეთ სიჩქარის დროებითი შეზღუდვების გამოსართავად
+ (%1 ჩამ., %2 ატვ.)</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Click to enable Temporary Speed Limits
  (%1 down, %2 up)</source>
-        <translation>Klikatu Aldibaterako Abiadura Mugak gaitzeko
- (%1 jeitsiera, %2 igoera)</translation>
+        <translation>დააწკაპუნეთ სიჩქარის დროებითი შეზღუდვების ჩასართავად
+ (%1 ჩამ., %2 ატვ.)</translation>
     </message>
     <message>
         <location line="+133"/>
         <source>Remove torrent?</source>
-        <translation>Kendu torrenta?</translation>
+        <translation>გსურთ ტორენტის ამოღება?</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Delete this torrent&apos;s downloaded files?</source>
-        <translation>Ezabatu jeitsitako torrent honen agiriak?</translation>
+        <translation>გსურთ ამ ტორენტის ჩამოტვირთული ფაილების წაშლა?</translation>
     </message>
     <message numerus="yes">
         <location line="-5"/>
         <source>Remove %Ln torrent(s)?</source>
         <translation>
-            <numerusform>Kendu %Ln torrent?</numerusform>
-            <numerusform>Kendu %Ln torrent?</numerusform>
+            <numerusform>ამოღებულ იქნას %Ln ტორენტი?</numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="-497"/>
         <source>Showing %L1 of %Ln torrent(s)</source>
         <translation>
-            <numerusform>Erakusten %L1 -&gt; %Ln torrent</numerusform>
-            <numerusform>Erakusten %L1 -&gt; %Ln torrent</numerusform>
+            <numerusform>ნაჩვენებია %L1 ტორენტი %Ln-დან</numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+503"/>
         <source>Delete these %Ln torrent(s)&apos; downloaded files?</source>
         <translation>
-            <numerusform>Ezabatu jeitsitako %Ln torrent hauen agiriak?</numerusform>
-            <numerusform>Ezabatu jeitsitako %Ln torrent hauen agiriak?</numerusform>
+            <numerusform>წაიშალოს ამ %Ln ტორენტების ჩამოტვირთული ფაილები?
+</numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Once removed, continuing the transfer will require the torrent file or magnet link.</source>
-        <translation>Behin kenduta, eskualdaketarekin jarraitzeak torrent agiria edo magnet lotura beharko du.</translation>
+        <translation>ამოღების შემდეგ, ტრანსფერის გაგრძელებისთვის საჭირო იქნება ტორენტ ფაილი ან მაგნიტური ბმული.</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Once removed, continuing the transfers will require the torrent files or magnet links.</source>
-        <translation>Behin kenduta, eskualdaketekin jarraitzeak torrent agiriak edo magnet loturak beharko ditu.</translation>
+        <translation>ამოღების შემდეგ, ტრანსფერების გაგრძელებისთვის საჭირო იქნება ტორენტ ფაილები ან მაგნიტური ბმულები.</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>This torrent has not finished downloading.</source>
-        <translation>Torrent honek ez dut jeisketa amaitu.</translation>
+        <translation>ტორენტს არ დაუსრულებია ჩამოტვირთვა.</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>These torrents have not finished downloading.</source>
-        <translation>Torrent hauek ez dute jeisketa amaitu.</translation>
+        <translation>ტორენტებს არ დაუსრულებიათ ჩამოტვირთვა.</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>This torrent is connected to peers.</source>
-        <translation>Torrent hau hartzailetara elkarketaturik dago.</translation>
+        <translation>ტორენტი დაკავშირებულია პირებთან.</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>These torrents are connected to peers.</source>
-        <translation>Torrent hauek hartzailetara elkarketaturik daude.</translation>
+        <translation>ტორენტები დაკავშირებულია პირებთან.</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>One of these torrents is connected to peers.</source>
-        <translation>Torrent hauetako bat hartzailetara elkarketaturik dago.</translation>
+        <translation>ერთ-ერთი ტორენტი დაკავშირებულია პირებთან.</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Some of these torrents are connected to peers.</source>
-        <translation>Torrent hauetako batzuk hartzailetara elkarketaturik daude.</translation>
+        <translation>ზოგიერთი ტორენტი დაკავშირებულია პირებთან.</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>One of these torrents has not finished downloading.</source>
-        <translation>Torrent hauetako batek ez du jeisketa amaitu.</translation>
+        <translation>ერთ-ერთი ტორენტს ჩამოტვირთვა არ დაუსრულებია.</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Some of these torrents have not finished downloading.</source>
-        <translation>Torrent hauetako batzuk ez dute jeisketa amaitu.</translation>
+        <translation>ზოგიერთ ტორენტს ჩამოტვირთვა არ დაუსრულებია.</translation>
     </message>
     <message>
         <location line="+58"/>
         <source>%1 has not responded yet</source>
-        <translation>%1 ez du oraindik erantzun</translation>
+        <translation>%1-ს ჯერ არ უპასუხია</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>%1 is responding</source>
-        <translation>%1 erantzuten ari da</translation>
+        <translation>%1 პასუხობს</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>%1 last responded %2 ago</source>
-        <translation>%1 azken erantzuna duela %2</translation>
+        <translation>%1-მ  ბოლოს უპასუხა %2ს წინ</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>%1 is not responding</source>
-        <translation>%1 ez du erantzuten</translation>
+        <translation>%1 არ პასუხობს</translation>
     </message>
 </context>
 <context>
@@ -1439,80 +1440,81 @@
     <message>
         <location filename="../MakeDialog.ui" line="+17"/>
         <source>New Torrent</source>
-        <translation>Torrent Berria</translation>
+        <translation>ახალი ტორენტი</translation>
     </message>
     <message>
         <location filename="../MakeDialog.cc" line="+200"/>
         <source>&lt;i&gt;No source selected&lt;i&gt;</source>
-        <translation>&lt;i&gt;Ez dago iturbururik hautatuta&lt;i&gt;</translation>
+        <translation>&lt;i&gt;წყარო არაა არჩეული&lt;i&gt;</translation>
     </message>
     <message numerus="yes">
         <location line="+4"/>
         <source>%Ln File(s)</source>
         <translation>
-            <numerusform>%Ln Agiri</numerusform>
-            <numerusform>%Ln Agiri</numerusform>
+            <numerusform>%Ln ფაილი</numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+1"/>
         <source>%Ln Piece(s)</source>
         <translation>
-            <numerusform>%Ln Atal</numerusform>
-            <numerusform>%Ln Atal</numerusform>
+            <numerusform>%Ln ნაწილი
+</numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message>
         <location line="+1"/>
         <source>%1 in %2; %3 @ %4</source>
-        <translation>%1 -&gt; %2; %3 @ %4</translation>
+        <translation>%1 - %2; %3 @ %4</translation>
     </message>
     <message>
         <location filename="../MakeDialog.ui" line="+9"/>
         <source>Files</source>
-        <translation>Agiriak</translation>
+        <translation>ფაილები</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Sa&amp;ve to:</source>
-        <translation>&amp;Gorde hemen:</translation>
+        <translation>შეი&amp;ნახოს აქ:</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Source f&amp;older:</source>
-        <translation>&amp;Iturburu agiritegia:</translation>
+        <translation>წყაროს &amp;საქაღალდე:</translation>
     </message>
     <message>
         <location line="+14"/>
         <source>Source &amp;file:</source>
-        <translation>I&amp;turburu Agiria:</translation>
+        <translation>წყაროს &amp;ფაილი:</translation>
     </message>
     <message>
         <location line="+41"/>
         <source>Properties</source>
-        <translation>Ezaugarriak</translation>
+        <translation>თვისებები</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>&amp;Trackers:</source>
-        <translation>A&amp;ztarnariak:</translation>
+        <translation>&amp;ტრეკერები:</translation>
     </message>
     <message>
         <location line="+23"/>
         <source>To add a backup URL, add it on the line after the primary URL.
 To add another primary URL, add it after a blank line.</source>
-        <translation>Babeskopia URL bat gehitzeko, gehitu hura lehen URL-aren ondorengo lerroan.
-Beste lehen URL bat gehitzeko, gehitu hura lerro huts baten ondoren.</translation>
+        <translation>თუ მარქაფის URL-ს დამზადება გსურთ, დაამატეთ ის მთავარი URL-ს მოდმევნო ველში.
+სხვა მთავარი URL-ს დასამატებლად, მოათავსეთ ის ცარიელ ველში.</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Co&amp;mment:</source>
-        <translation>&amp;Aipamena:</translation>
+        <translation>კო&amp;მენტარი:</translation>
     </message>
     <message>
         <location line="+14"/>
         <source>&amp;Private torrent</source>
-        <translation>&amp;Torrent pribatua</translation>
+        <translation>&amp;პრივატული ტორენტი</translation>
     </message>
 </context>
 <context>
@@ -1520,37 +1522,37 @@ Beste lehen URL bat gehitzeko, gehitu hura lerro huts baten ondoren.</translatio
     <message>
         <location filename="../MakeProgressDialog.ui" line="+14"/>
         <source>New Torrent</source>
-        <translation>Torrent Berria</translation>
+        <translation>ახალი ტორენტი</translation>
     </message>
     <message>
         <location filename="../MakeDialog.cc" line="-108"/>
         <source>Creating &quot;%1&quot;</source>
-        <translation>&quot;%1&quot; sortzen</translation>
+        <translation>იქნება &quot;%1&quot;</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Created &quot;%1&quot;!</source>
-        <translation>&quot;%1&quot; sortuta!</translation>
+        <translation>შეიქმნა &quot;%1&quot;!</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Error: invalid announce URL &quot;%1&quot;</source>
-        <translation>Akatsa: iragarpen URL baliogabea &quot;%1&quot;</translation>
+        <translation>შეცდომა: არასწორი გამოცხადების URL &quot;%1&quot;</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Cancelled</source>
-        <translation>Ezeztatuta</translation>
+        <translation>გაუქმდა</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Error reading &quot;%1&quot;: %2</source>
-        <translation>Akatsa irakurtzen &quot;%1&quot;: %2</translation>
+        <translation>წაკითხვის შეცდომა &quot;%1&quot;: %2</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Error writing &quot;%1&quot;: %2</source>
-        <translation>Akatsa idazten &quot;%1&quot;: %2</translation>
+        <translation>ჩაწერის შეცდომა &quot;%1&quot;: %2</translation>
     </message>
 </context>
 <context>
@@ -1558,72 +1560,72 @@ Beste lehen URL bat gehitzeko, gehitu hura lerro huts baten ondoren.</translatio
     <message>
         <location filename="../OptionsDialog.cc" line="+56"/>
         <source>Open Torrent</source>
-        <translation>Ireki Torrenta</translation>
+        <translation>ტორენტის გახსნა</translation>
     </message>
     <message>
         <location line="-13"/>
         <source>Open Torrent from File</source>
-        <translation>Ireki Torrenta Agiritik</translation>
+        <translation>ტორენტის გახსნა ფაილიდან</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Open Torrent from URL or Magnet Link</source>
-        <translation>Ireki Torrenta URL edo Magnet Loturatik</translation>
+        <translation>ტორენტის გახსნა URL-დან ან მაგნიტური ბმულიდან</translation>
     </message>
     <message>
         <location filename="../OptionsDialog.ui" line="+17"/>
         <source>&amp;Source:</source>
-        <translation>&amp;Iturburua:</translation>
+        <translation>&amp;წყარო:</translation>
     </message>
     <message>
         <location line="+22"/>
         <source>&amp;Destination folder:</source>
-        <translation>&amp;Helmuga agiritegia:</translation>
+        <translation>&amp;დანიშნულების საქაღალდე:</translation>
     </message>
     <message>
         <location filename="../OptionsDialog.cc" line="+49"/>
         <source>High</source>
-        <translation>Handia</translation>
+        <translation>მაღალი</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Normal</source>
-        <translation>Arrunta</translation>
+        <translation>ჩვეულებრივი</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Low</source>
-        <translation>Apala</translation>
+        <translation>დაბალი</translation>
     </message>
     <message>
         <location filename="../OptionsDialog.ui" line="+35"/>
         <source>&amp;Priority:</source>
-        <translation>&amp;Lehentasuna:</translation>
+        <translation>&amp;პრიორიტეტი:</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>S&amp;tart when added</source>
-        <translation>H&amp;asi gehitutakoan</translation>
+        <translation>&amp;დაწყება დამატებისას</translation>
     </message>
     <message>
         <location filename="../OptionsDialog.cc" line="-62"/>
         <source>&amp;Verify Local Data</source>
-        <translation>&amp;Egiaztatu Tokiko Datuak</translation>
+        <translation>ადგილობრივი მონაცემების &amp;გადამოწმება</translation>
     </message>
     <message>
         <location filename="../OptionsDialog.ui" line="+7"/>
         <source>Mo&amp;ve .torrent file to the trash</source>
-        <translation>&amp;Mugitu .torrent agiria zakarrontzira</translation>
+        <translation>.torrent ფაილის სანაგვეში გადა&amp;ტანა</translation>
     </message>
     <message>
         <location filename="../OptionsDialog.cc" line="+23"/>
         <source>Torrent Files (*.torrent);;All Files (*.*)</source>
-        <translation>Torrent Agiriak (*.torrent);;Agiri Denak (*.*)</translation>
+        <translation>ტორენტ ფაილები (*.torrent);;ყველა ფაილი (*.*)</translation>
     </message>
     <message>
         <location line="+24"/>
         <source>Select Destination</source>
-        <translation>Hautatu Helmuga</translation>
+        <translation>აირჩიეთ მდებარეობა</translation>
     </message>
 </context>
 <context>
@@ -1632,17 +1634,17 @@ Beste lehen URL bat gehitzeko, gehitu hura lerro huts baten ondoren.</translatio
         <location filename="../PathButton.cc" line="+30"/>
         <location line="+72"/>
         <source>(None)</source>
-        <translation>(Ezer ez)</translation>
+        <translation>(არაფერი)</translation>
     </message>
     <message>
         <location line="+76"/>
         <source>Select Folder</source>
-        <translation>Hautatu Agiritegia</translation>
+        <translation>საქაღალდის არჩევა</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Select File</source>
-        <translation>Hautatu Agiria</translation>
+        <translation>ფაილის არჩევა</translation>
     </message>
 </context>
 <context>
@@ -1650,151 +1652,151 @@ Beste lehen URL bat gehitzeko, gehitu hura lerro huts baten ondoren.</translatio
     <message>
         <location filename="../PrefsDialog.ui" line="+1139"/>
         <source>Use &amp;authentication</source>
-        <translation>E&amp;rabili egiaztapena</translation>
+        <translation>&amp;ავთენტიფიკაციის გამოყენება</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>&amp;Username:</source>
-        <translation>&amp;Erabiltzaile-izena:</translation>
+        <translation>&amp;მომხმარებლის სახელი:</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Pass&amp;word:</source>
-        <translation>&amp;Sarhitza:</translation>
+        <translation>&amp;პაროლი</translation>
     </message>
     <message>
         <location line="-53"/>
         <source>&amp;Open web client</source>
-        <translation>&amp;Ireki web bezeroa</translation>
+        <translation>ვებ კლიენტის &amp;გახსნა</translation>
     </message>
     <message>
         <location line="+80"/>
         <source>Addresses:</source>
-        <translation>Helbideak:</translation>
+        <translation>მისამართები:</translation>
     </message>
     <message>
         <location line="-1150"/>
         <source>Speed Limits</source>
-        <translation>Abiadura Mugak</translation>
+        <translation>სიჩქარის შეზღუდვები</translation>
     </message>
     <message>
         <location line="+99"/>
         <source>&lt;small&gt;Override normal speed limits manually or at scheduled times&lt;/small&gt;</source>
-        <translation>&lt;small&gt;Ezeztatu abiadura muga arruntak eskuz edo denborak egitarautuz&lt;/small&gt;</translation>
+        <translation>&lt;small&gt;სიჩქარის ჩვეულებრივი შეზღუდვების უგულებელყოფა ხელით ან მითითებულ დროს.&lt;/small&gt;</translation>
     </message>
     <message>
         <location line="+47"/>
         <source>&amp;Scheduled times:</source>
-        <translation>Egitarautu &amp;denborak:</translation>
+        <translation>&amp;რეგულარულ დროს:</translation>
     </message>
     <message>
         <location line="+44"/>
         <source>&amp;On days:</source>
-        <translation>Eg&amp;unak:</translation>
+        <translation>&amp;დღეებში:</translation>
     </message>
     <message>
         <location filename="../PrefsDialog.cc" line="+262"/>
         <source>Every Day</source>
-        <translation>Egunero</translation>
+        <translation>ყოველდღე</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Weekdays</source>
-        <translation>Lanegunak</translation>
+        <translation>სამუშაო დღეებში</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Weekends</source>
-        <translation>Asteburuak</translation>
+        <translation>შაბათ-კვირას</translation>
     </message>
     <message>
         <location line="-154"/>
         <source>Sunday</source>
-        <translation>Igandea</translation>
+        <translation>კვირას</translation>
     </message>
     <message>
         <location line="-12"/>
         <source>Monday</source>
-        <translation>Astelehena</translation>
+        <translation>ორშაბათს</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Tuesday</source>
-        <translation>Asteartea</translation>
+        <translation>სამშაბათს</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Wednesday</source>
-        <translation>Asteazkena</translation>
+        <translation>ოთხშაბათს</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Thursday</source>
-        <translation>Osteguna</translation>
+        <translation>ხუთშაბათს</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Friday</source>
-        <translation>Ostirala</translation>
+        <translation>პარასკევს</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Saturday</source>
-        <translation>Larunbata</translation>
+        <translation>შაბათს</translation>
     </message>
     <message>
         <location line="+212"/>
         <source>Port is &lt;b&gt;open&lt;/b&gt;</source>
-        <translation>Ataka &lt;b&gt;irekita&lt;/b&gt; dago</translation>
+        <translation>პორტი &lt;b&gt;გახსნილია&lt;/b&gt;</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Port is &lt;b&gt;closed&lt;/b&gt;</source>
-        <translation>Ataka &lt;b&gt;itxita&lt;/b&gt; dago</translation>
+        <translation>პორტი &lt;b&gt;დახურულია&lt;/b&gt;</translation>
     </message>
     <message>
         <location filename="../PrefsDialog.ui" line="+513"/>
         <source>Incoming Peers</source>
-        <translation>Barrurako Hartzaileak</translation>
+        <translation>შემომავალი პირები</translation>
     </message>
     <message>
         <location line="+32"/>
         <location filename="../PrefsDialog.cc" line="+337"/>
         <source>Status unknown</source>
-        <translation>Egoera ezezaguna</translation>
+        <translation>მდგომარეობა უცნობია</translation>
     </message>
     <message>
         <location line="-20"/>
         <source>&amp;Port for incoming connections:</source>
-        <translation>&amp;Barrurako elkarketentzako ataka:</translation>
+        <translation>&amp;პორტი შემომავალი კავშირებისთვის:</translation>
     </message>
     <message>
         <location line="+44"/>
         <source>Use UPnP or NAT-PMP port &amp;forwarding from my router</source>
-        <translation>&amp;Erabili UPnP edo NAT-PMP ataka bidalketa nire bideratzailetik</translation>
+        <translation>როუტერიდან UPnP ან NAT-PMP პორტის &amp;გადამისამართების გამოყენება</translation>
     </message>
     <message>
         <location line="+107"/>
         <source>Options</source>
-        <translation>Aukerak</translation>
+        <translation>პარამეტრები</translation>
     </message>
     <message>
         <location line="+15"/>
         <source>Enable &amp;uTP for peer connections</source>
-        <translation>Gaitu &amp;uTP hartzaile elkarketentzat</translation>
+        <translation>uTP-ს ჩართვა &amp;პირებთან კავშირებისთვის</translation>
     </message>
     <message>
         <location line="-3"/>
         <source>uTP is a tool for reducing network congestion.</source>
-        <translation>uTP sare betekada murrizteko tresna bat da.</translation>
+        <translation>uTP ქსელის უსაძრაობის შესამცირებელი ხელსაწყოა</translation>
     </message>
     <message numerus="yes">
         <location filename="../PrefsDialog.cc" line="-216"/>
         <source> minute(s)</source>
         <extracomment>Spin box suffix, &quot;Stop seeding if idle for: [ 5 minutes ]&quot; (includes leading space after the number, if needed)</extracomment>
         <translation>
-            <numerusform> minutu</numerusform>
-            <numerusform> minutu</numerusform>
+            <numerusform>წუთი</numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -1802,362 +1804,362 @@ Beste lehen URL bat gehitzeko, gehitu hura lerro huts baten ondoren.</translatio
         <source> minute(s) ago</source>
         <extracomment>Spin box suffix, &quot;Download is inactive if data sharing stopped: [ 5 minutes ago ]&quot; (includes leading space after the number, if needed)</extracomment>
         <translation>
-            <numerusform> minutu duela</numerusform>
-            <numerusform> minutu duela</numerusform>
+            <numerusform>წუთის წინ</numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message>
         <location filename="../PrefsDialog.ui" line="-638"/>
         <source>Automatically add .torrent files &amp;from:</source>
-        <translation>&amp;Berezgaitasunez gehitu .torrent agiriak hemendik:</translation>
+        <translation>.torrent ფაილების ავტომატური დამატება &amp;საქაღალდიდან:</translation>
     </message>
     <message>
         <location line="+22"/>
         <source>Show the Torrent Options &amp;dialog</source>
-        <translation>Erakutsi &amp;Torrentaren Aukera elkarrizketa</translation>
+        <translation>ტორენტის პარამეტრების &amp;დიალოგის ჩვენება</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>&amp;Start added torrents</source>
-        <translation>&amp;Hasi gehitutako torrentak</translation>
+        <translation>&amp;დამატებული ტორენტების დაწყება</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Mo&amp;ve the .torrent file to the trash</source>
-        <translation>&amp;Mugitu .torrent agiriak zakarrontzira</translation>
+        <translation>.torrent ფაილის ნაგავში &amp;გადატანა</translation>
     </message>
     <message>
         <location line="+57"/>
         <source>Download Queue</source>
-        <translation>Jeisketa Lerroa</translation>
+        <translation>ჩამოტვირთვის რიგი</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Ma&amp;ximum active downloads:</source>
-        <translation>Gehienezko &amp;jeisketa eraginda:</translation>
+        <translation>მა&amp;ქსიმალური აქტიური ჩამოტვირთვები:</translation>
     </message>
     <message>
         <location line="+67"/>
         <source>Incomplete</source>
-        <translation>Osatugabe</translation>
+        <translation>არასრული</translation>
     </message>
     <message>
         <location line="+79"/>
         <source>Seeding</source>
-        <translation>Emaritzan</translation>
+        <translation>სიდირება</translation>
     </message>
     <message>
         <location line="+548"/>
         <source>Remote</source>
-        <translation>Hurrunekoa</translation>
+        <translation>დისტანციური</translation>
     </message>
     <message numerus="yes">
         <location filename="../PrefsDialog.cc" line="+153"/>
         <source>&lt;i&gt;Blocklist contains %Ln rule(s)&lt;/i&gt;</source>
         <translation>
-            <numerusform>&lt;i&gt;Blokeo-zerrendak ditu %Ln arau&lt;/i&gt;</numerusform>
-            <numerusform>&lt;i&gt;Blokeo-zerrendak %Ln arau ditu&lt;/i&gt;</numerusform>
+            <numerusform>&lt;i&gt;შავი სია შეიცავს %Ln წესს&lt;/i&gt;</numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message>
         <location filename="../PrefsDialog.ui" line="-287"/>
         <source>Pick a &amp;random port every time Transmission is started</source>
-        <translation>&amp;Hautatu zorizko ataka bat Transmission abiarazten den bakoitzean</translation>
+        <translation>&amp;შემთხვევითი პორტის არჩევა Transmission-ის ყოველ გაშვებაზე</translation>
     </message>
     <message>
         <location line="-252"/>
         <source>Limits</source>
-        <translation>Mugak</translation>
+        <translation>შეზღუდვები</translation>
     </message>
     <message>
         <location line="+299"/>
         <source>Maximum peers per &amp;torrent:</source>
-        <translation>Gehinezko hartzaile &amp;torrenteko:</translation>
+        <translation>მაქსიმალური პირები თითო &amp;ტორენტზე:</translation>
     </message>
     <message>
         <location line="+23"/>
         <source>Maximum peers &amp;overall:</source>
-        <translation>Gehinezko hartzaile &amp;orotara:</translation>
+        <translation>მაქსიმალური პირები &amp;მთლიანობაში:</translation>
     </message>
     <message numerus="yes">
         <location filename="../PrefsDialog.cc" line="-237"/>
         <source>&lt;b&gt;Update succeeded!&lt;/b&gt;&lt;p&gt;Blocklist now has %Ln rule(s).</source>
         <translation>
-            <numerusform>&lt;b&gt;Eguneraketa eginda!&lt;/b&gt;&lt;p&gt;Blokeo-zerrendak orain %Ln arau ditu.</numerusform>
-            <numerusform>&lt;b&gt;Eguneraketa eginda!&lt;/b&gt;&lt;p&gt;Blokeo-zerrendak orain %Ln arau ditu.</numerusform>
+            <numerusform>&lt;b&gt;წარმატებით განახლდა!&lt;/b&gt;&lt;p&gt;შავი სია ახლა შეიცავს %Ln წესს.</numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message>
         <location line="+9"/>
         <source>&lt;b&gt;Update Blocklist&lt;/b&gt;&lt;p&gt;Getting new blocklist...</source>
-        <translation>&lt;b&gt;Eguneratu Blokeo-zerrenda&lt;/b&gt;&lt;p&gt;Blokeo-zerrenda berria lortzen...</translation>
+        <translation>&lt;b&gt;სიის განახლება&lt;/b&gt;&lt;p&gt;ახალი შავი სიის მიღება...</translation>
     </message>
     <message>
         <location filename="../PrefsDialog.ui" line="-193"/>
         <source>Blocklist</source>
-        <translation>Blokeo-zerrenda</translation>
+        <translation>შავი სია</translation>
     </message>
     <message>
         <location line="+42"/>
         <source>Enable &amp;automatic updates</source>
-        <translation>Gaitu &amp;berezgaitasunezko eguneraketak</translation>
+        <translation>&amp;ავტომატური განახლებების ჩართვა</translation>
     </message>
     <message>
         <location filename="../PrefsDialog.cc" line="+19"/>
         <source>Allow encryption</source>
-        <translation>Ahalbidetu enkriptaketa</translation>
+        <translation>დაშიფვრის დაშვება</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Prefer encryption</source>
-        <translation>Hobetsi enkriptaketa</translation>
+        <translation>უპირატესობა დაშიფვრას</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Require encryption</source>
-        <translation>Beharrezkoa enkriptaketa</translation>
+        <translation>დაშიფვრის მოთხოვნა</translation>
     </message>
     <message>
         <location filename="../PrefsDialog.ui" line="-97"/>
         <source>Privacy</source>
-        <translation>Pribatutasuna</translation>
+        <translation>პრივატულობა</translation>
     </message>
     <message>
         <location line="-403"/>
         <source>&amp;to</source>
-        <translation>&amp;hona</translation>
+        <translation>&amp;სად</translation>
     </message>
     <message>
         <location line="+763"/>
         <location line="+9"/>
         <source>Desktop</source>
-        <translation>Mahaigaina</translation>
+        <translation>სამუშაო მაგიდა</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Show Transmission icon in the &amp;notification area</source>
-        <translation>Erakutsi &amp;Transmission ikurra jakinarazpen eremuan</translation>
+        <translation>Transmission-ის ხატულის ჩვენება &amp;შეტყობინებების არეში</translation>
     </message>
     <message>
         <location line="-213"/>
         <source>Te&amp;st Port</source>
-        <translation>&amp;Ataka Azterketa</translation>
+        <translation>პორტის შე&amp;მოწმება</translation>
     </message>
     <message>
         <location line="-101"/>
         <source>Enable &amp;blocklist:</source>
-        <translation>Gaitu blokeo-&amp;zerrenda:</translation>
+        <translation>შავი &amp;სიის ჩართვა</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>&amp;Update</source>
-        <translation>&amp;Eguneraketa</translation>
+        <translation>&amp;განახლება</translation>
     </message>
     <message>
         <location line="-66"/>
         <source>&amp;Encryption mode:</source>
-        <translation>Enkriptaketa &amp;modua:</translation>
+        <translation>&amp;დაშიფვირის სახეობა:</translation>
     </message>
     <message>
         <location line="+453"/>
         <source>Remote Control</source>
-        <translation>Hurruneko Agintea</translation>
+        <translation>დისტანციური მართვა</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Allow &amp;remote access</source>
-        <translation>Ahalbidetu h&amp;urruneko sarbidea</translation>
+        <translation>&amp;დისტანციური წვოდმის დაშვება</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>HTTP &amp;port:</source>
-        <translation>HTTP &amp;ataka:</translation>
+        <translation>HTTP &amp;პორტი:</translation>
     </message>
     <message>
         <location line="+60"/>
         <source>Only allow these IP a&amp;ddresses:</source>
-        <translation>A&amp;halbidetu IP helbide hauek bakarrik:</translation>
+        <translation>მხოლოდ ამ IP მი&amp;სამართების დაშვება:</translation>
     </message>
     <message>
         <location line="-1128"/>
         <source>&amp;Upload:</source>
-        <translation>&amp;Igoera:</translation>
+        <translation>&amp;ატვირთვა:</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>&amp;Download:</source>
-        <translation>&amp;Jeitsera:</translation>
+        <translation>&amp;ჩამოტვირთვა:</translation>
     </message>
     <message>
         <location line="+53"/>
         <source>Alternative Speed Limits</source>
-        <translation>Aurkerazko Abiadura Mugak</translation>
+        <translation>ალტერნატიული სიჩქარის შეზღუდვები</translation>
     </message>
     <message>
         <location line="+21"/>
         <source>U&amp;pload:</source>
-        <translation>I&amp;goera:</translation>
+        <translation>ა&amp;ტვირთვა:</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>Do&amp;wnload:</source>
-        <translation>J&amp;eitsiera:</translation>
+        <translation>ჩა&amp;მოტვირთვა:</translation>
     </message>
     <message>
         <location line="+836"/>
         <source>Start &amp;minimized in notification area</source>
-        <translation>&amp;Hasi jakinarazpen eremuan ikurtuta</translation>
+        <translation>შეტყობინებების არეში &amp;ჩაკეცილ მდგომარეობაში გაშვება</translation>
     </message>
     <message>
         <location line="+28"/>
         <source>Notification</source>
-        <translation>Jakinarazpena</translation>
+        <translation>ცნობება</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Show a notification when torrents are a&amp;dded</source>
-        <translation>&amp;Erakutsi jakinarazpen bat torreta gehitzen denean</translation>
+        <translation>ცნობება ტორენტის დამა&amp;ტებისას</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Show a notification when torrents &amp;finish</source>
-        <translation>E&amp;rakutsi jakinarazpen bat torrentak amaitzean</translation>
+        <translation>ცნობება ტორენტის და&amp;სრულებისას</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Play a &amp;sound when torrents finish</source>
-        <translation>&amp;Jo soinu bat torrentek amaitzean</translation>
+        <translation>&amp;ხმის დაკვრა ტორენტის დასრულებისას</translation>
     </message>
     <message>
         <location filename="../PrefsDialog.cc" line="-83"/>
         <source>Testing TCP Port...</source>
-        <translation>TCP Ataka aztertzen...</translation>
+        <translation>მოწმდება TCP პორტი...</translation>
     </message>
     <message>
         <location filename="../PrefsDialog.ui" line="-229"/>
         <source>Peer Limits</source>
-        <translation>Hartzaile Mugak</translation>
+        <translation>პირის შეზღუდვები</translation>
     </message>
     <message>
         <location line="+104"/>
         <source>Use PE&amp;X to find more peers</source>
-        <translation>Erabili PE&amp;X hartzaile gehiago bilatzeko</translation>
+        <translation>PE&amp;X-ის გამოყენება მეტი პირის საპოვნად</translation>
     </message>
     <message>
         <location line="-3"/>
         <source>PEX is a tool for exchanging peer lists with the peers you&apos;re connected to.</source>
-        <translation>PEX elkarketaturik zauden hartzaileekin hartzaile zerrendak elkarraldatzeko tresna bat da.</translation>
+        <translation>PEX ხელსაწყოა, რომელიც გამოიყენება თქვენთან დაკავშირებულ პირებთან პირის სიების გასაცვლელად.</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Use &amp;DHT to find more peers</source>
-        <translation>Erabili &amp;DHT hartzaile gehiago bilatzeko</translation>
+        <translation>&amp;DHT-ს გამოყენება მეტი პირის საპოვნად</translation>
     </message>
     <message>
         <location line="-3"/>
         <source>DHT is a tool for finding peers without a tracker.</source>
-        <translation>DHT aztarnari gabeko hartzaileak bilatzeko tresna bat da.</translation>
+        <translation>DHT ტრეკერის გარეშე მყოფი პირების საპოვნელი ყელსაწყოა.</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Use &amp;Local Peer Discovery to find more peers</source>
-        <translation>Erabili To&amp;kiko Hartzaile Aurkikuntza hartzaile gehiago bilatzeko</translation>
+        <translation>&amp;ლოკალური პირების აღმოჩენის გამოყენება მეტი პირის საპოვნად</translation>
     </message>
     <message>
         <location line="-3"/>
         <source>LPD is a tool for finding peers on your local network.</source>
-        <translation>LPD zure tokiko zarean hartzaile gehiago bilatzeko tresna bat da.</translation>
+        <translation>LPD თქვენს ლოკალურ ქსელში პირების საპოვნელი ხელსაწყოა.</translation>
     </message>
     <message>
         <location line="-325"/>
         <source>Encryption</source>
-        <translation>Enkriptaketa</translation>
+        <translation>დაშიფვრა</translation>
     </message>
     <message>
         <location filename="../PrefsDialog.cc" line="+153"/>
         <source>Select &quot;Torrent Done&quot; Script</source>
-        <translation>Hautatu &quot;Torrenta Eginda&quot; Eskripta</translation>
+        <translation>შეარჩიეთ &quot;ტორენტის დასრულების&quot; სკრიპტი</translation>
     </message>
     <message>
         <location line="-1"/>
         <source>Select Incomplete Directory</source>
-        <translation>Hautatu Osatugabeko Zuzenbidea</translation>
+        <translation>შეარჩიეთ არასრულის დირექტორია</translation>
     </message>
     <message>
         <location line="-2"/>
         <source>Select Watch Directory</source>
-        <translation>Hautatu Ikusi Zuzenbidea</translation>
+        <translation>შეარჩიეთ დასაკვირვებელი დირექტორია</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Select Destination</source>
-        <translation>Hautatu Helmuga</translation>
+        <translation>აირჩიეთ დანიშნულების ადგილი</translation>
     </message>
     <message>
         <location filename="../PrefsDialog.ui" line="-355"/>
         <source>Adding</source>
-        <translation>Gehiketa</translation>
+        <translation>ემატება</translation>
     </message>
     <message>
         <location line="+137"/>
         <source>Download is i&amp;nactive if data sharing stopped:</source>
         <extracomment>Please keep this phrase as short as possible, it&apos;s curently the longest and influences dialog width</extracomment>
-        <translation>Jeisketa &amp;jardungabe elkabanatzea geldik badago:</translation>
+        <translation>ჩამოტვირთვა უმოქ&amp;მედოა თუ მონაცემთა გაზიარება შეჩერდა:</translation>
     </message>
     <message>
         <location line="-146"/>
         <source>Downloading</source>
-        <translation>Jeisten</translation>
+        <translation>ჩამოტვირთვა</translation>
     </message>
     <message>
         <location line="+205"/>
         <source>Append &quot;.&amp;part&quot; to incomplete files&apos; names</source>
-        <translation>&amp;Erantsi &quot;.part&quot; osatugabeko agiri izenei</translation>
+        <translation>&quot;.&amp;part&quot;-ის მიკვრა დაუსრულებელი ფაილების სახელებისთვის</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Keep &amp;incomplete files in:</source>
-        <translation>&amp;Gorde osatugabeko agiriak hemen:</translation>
+        <translation>&amp;არასრული ფაილების შენახვა მდებარეობაში:</translation>
     </message>
     <message>
         <location line="-148"/>
         <source>Save to &amp;Location:</source>
-        <translation>Gorde &amp;Kokaleku honetan:</translation>
+        <translation>შენახვა მ&amp;დებარეობაში:</translation>
     </message>
     <message>
         <location line="+170"/>
         <source>Call scrip&amp;t when torrent is completed:</source>
-        <translation>&amp;Deitu eskripta torrenta osatutakoan:</translation>
+        <translation>სკრი&amp;პტის გამოძახება ტორენტის დასრულებისას:</translation>
     </message>
     <message>
         <location line="+59"/>
         <source>Stop seeding at &amp;ratio:</source>
-        <translation>&amp;Gelditu emaritza maila honetan:</translation>
+        <translation>სიდირების შეჩერება შეფარდება&amp;ზე:</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>Stop seedi&amp;ng if idle for:</source>
-        <translation>Gelditu emarit&amp;za jardungabe badago:</translation>
+        <translation>სიდირების შეჩერე&amp;ბა უქმად ყოფნისას:</translation>
     </message>
     <message>
         <location line="-557"/>
         <source>Transmission Preferences</source>
-        <translation>Transmission Hobespenak</translation>
+        <translation>Transmission-ის პარამეტრები</translation>
     </message>
     <message>
         <location line="+16"/>
         <source>Speed</source>
-        <translation>Abiadura</translation>
+        <translation>სიჩქარე</translation>
     </message>
     <message>
         <location line="+703"/>
         <source>Network</source>
-        <translation>Sarea</translation>
+        <translation>ქსელი</translation>
     </message>
     <message>
         <location filename="../PrefsDialog.cc" line="+99"/>
         <source>Not supported by remote sessions</source>
-        <translation>Ez dago sostengaturik hurruneko saioentzat</translation>
+        <translation>დისტანციური სესიების მხრიდან მხარდაჭერილი არაა</translation>
     </message>
 </context>
 <context>
@@ -2165,7 +2167,7 @@ Beste lehen URL bat gehitzeko, gehitu hura lerro huts baten ondoren.</translatio
     <message>
         <location filename="../Application.cc" line="-241"/>
         <source>Invalid option</source>
-        <translation>Aukera baliogabea</translation>
+        <translation>არასწორი პარამეტრი</translation>
     </message>
 </context>
 <context>
@@ -2173,32 +2175,32 @@ Beste lehen URL bat gehitzeko, gehitu hura lerro huts baten ondoren.</translatio
     <message>
         <location filename="../RelocateDialog.cc" line="+64"/>
         <source>Select Location</source>
-        <translation>Hautatu Kokalekua</translation>
+        <translation>მდებარეობის არჩევა</translation>
     </message>
     <message>
         <location filename="../RelocateDialog.ui" line="+14"/>
         <source>Set Torrent Location</source>
-        <translation>Ezarri Torrentaren Kokalekua</translation>
+        <translation>ტორენტის მდებარეობის დაყენება</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Set Location</source>
-        <translation>Ezarri Kokalekua</translation>
+        <translation>მდებარეობის დაყენება</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>New &amp;location:</source>
-        <translation>&amp;Kokaleku berria:</translation>
+        <translation>ახალი &amp;მდებარეობა:</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>&amp;Move from the current folder</source>
-        <translation>&amp;Mugitu oraingo agiritegitik</translation>
+        <translation>&amp;მიმდინარე საქაღალდიდან გადატანა</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Local data is &amp;already there</source>
-        <translation>&amp;Tokiko datuak jadanik hor daude</translation>
+        <translation>ადგილობრივი მონაცემები &amp;უკვე მანდაა</translation>
     </message>
 </context>
 <context>
@@ -2206,27 +2208,27 @@ Beste lehen URL bat gehitzeko, gehitu hura lerro huts baten ondoren.</translatio
     <message>
         <location filename="../Session.cc" line="+486"/>
         <source>Error Renaming Path</source>
-        <translation>Akatsa Helburua Berrizendatzerakoan</translation>
+        <translation>ბილიკის გადარქმევის შეცდომა</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>&lt;p&gt;&lt;b&gt;Unable to rename &quot;%1&quot; as &quot;%2&quot;: %3.&lt;/b&gt;&lt;/p&gt; &lt;p&gt;Please correct the errors and try again.&lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;b&gt;Ezinezkoa berreizendatzea &quot;%1&quot; -&gt; &quot;%2&quot;: %3.&lt;/b&gt;&lt;/p&gt; &lt;p&gt;Mesedez zuzendu akatsak eta saiatu berriro.&lt;/p&gt;</translation>
+        <translation>&lt;p&gt;&lt;b&gt;ვერ მოხერხდა &quot;%1-ის&quot; &quot;%2&quot;: %3-ად გადარქმევა.&lt;/b&gt;&lt;/p&gt; &lt;p&gt;გთხოვთ გამოასწორეთ შეცდომები და სცადეთ ხელახლა.&lt;/p&gt;</translation>
     </message>
     <message>
         <location line="+384"/>
         <source>Error Adding Torrent</source>
-        <translation type="unfinished">Akatsa Torrenta Gehitzerakoan</translation>
+        <translation type="unfinished">ტორენტის დამატების შეცდომა</translation>
     </message>
     <message>
         <location line="+21"/>
         <source>Add Torrent</source>
-        <translation>Gehitu Torrenta</translation>
+        <translation>ტორენტის დამატება</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>&lt;p&gt;&lt;b&gt;Unable to add &quot;%1&quot;.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;It is a duplicate of &quot;%2&quot; which is already added.&lt;/p&gt;</source>
-        <translation type="unfinished">&lt;p&gt;&lt;b&gt;Ezinezkoa &quot;%1&quot; gehitzea.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Jadanik gehituta dagoen &quot;%2&quot;-ren bikoizketa da.&lt;/p&gt;</translation>
+        <translation type="unfinished">&lt;p&gt;&lt;b&gt;&quot;%1&quot; ვერ დაემატა.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;ის არის უკვე დამატებული ფაილის &quot;%2&quot; ასლი.&lt;/p&gt;</translation>
     </message>
 </context>
 <context>
@@ -2234,47 +2236,47 @@ Beste lehen URL bat gehitzeko, gehitu hura lerro huts baten ondoren.</translatio
     <message>
         <location filename="../SessionDialog.ui" line="+14"/>
         <source>Change Session</source>
-        <translation>Aldatu Saioa</translation>
+        <translation>სესიის შეცვლა</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Source</source>
-        <translation>Iturburua</translation>
+        <translation>წყარო</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Start &amp;Local Session</source>
-        <translation>Hasi &amp;Tokiko Saioa</translation>
+        <translation>&amp;ადგილობრივი სესიის დაწყება</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Connect to &amp;Remote Session</source>
-        <translation>Elkarketatu H&amp;urruneko Saiora</translation>
+        <translation>&amp;დისტანციურ სესიასთან დაკავშირება</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>&amp;Host:</source>
-        <translation>&amp;Hostalaria:</translation>
+        <translation>&amp;ჰოსტი:</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>&amp;Port:</source>
-        <translation>&amp;Ataka:</translation>
+        <translation>&amp;პორტი:</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>&amp;Authentication required</source>
-        <translation>&amp;Egiaztapena beharrezkoa</translation>
+        <translation>საჭიროა &amp;ავთენტიფიკაცია</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>&amp;Username:</source>
-        <translation>Erabiltzaile-&amp;izena:</translation>
+        <translation>&amp;მომხმარებლის სახელი:</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Pass&amp;word:</source>
-        <translation>&amp;Sarhitza:</translation>
+        <translation>პარო&amp;ლი:</translation>
     </message>
 </context>
 <context>
@@ -2282,48 +2284,48 @@ Beste lehen URL bat gehitzeko, gehitu hura lerro huts baten ondoren.</translatio
     <message>
         <location filename="../StatsDialog.ui" line="+14"/>
         <source>Statistics</source>
-        <translation>Estatistikak</translation>
+        <translation>სტატისტიკა</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Current Session</source>
-        <translation>Oraingo Saioa</translation>
+        <translation>მიმდინარე სესია</translation>
     </message>
     <message>
         <location line="+12"/>
         <location line="+96"/>
         <source>Uploaded:</source>
-        <translation>Igota:</translation>
+        <translation>ატვირთული:</translation>
     </message>
     <message>
         <location line="-82"/>
         <location line="+96"/>
         <source>Downloaded:</source>
-        <translation>Jeitsita:</translation>
+        <translation>ჩამოტვირთული:</translation>
     </message>
     <message>
         <location line="-82"/>
         <location line="+96"/>
         <source>Ratio:</source>
-        <translation>Maila:</translation>
+        <translation>შეფარდება:</translation>
     </message>
     <message>
         <location line="-82"/>
         <location line="+96"/>
         <source>Duration:</source>
-        <translation>Iraupena:</translation>
+        <translation>ხანგრძლივობა:</translation>
     </message>
     <message>
         <location line="-61"/>
         <source>Total</source>
-        <translation>Guztira</translation>
+        <translation>მთლიანობაში</translation>
     </message>
     <message numerus="yes">
         <location filename="../StatsDialog.cc" line="+70"/>
         <source>Started %Ln time(s)</source>
         <translation>
-            <numerusform>Hasita %Ln aldiz</numerusform>
-            <numerusform>Hasita %Ln aldiz</numerusform>
+            <numerusform>გაშვებულია %Ln-ჯერ</numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
 </context>
@@ -2332,57 +2334,57 @@ Beste lehen URL bat gehitzeko, gehitu hura lerro huts baten ondoren.</translatio
     <message>
         <location filename="../Torrent.cc" line="+773"/>
         <source>Verifying local data</source>
-        <translation>Tokiko datuak egiaztatzen</translation>
+        <translation>ადგილობრივი მონაცემების გადამოწმება</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Downloading</source>
-        <translation>Jeisten</translation>
+        <translation>ჩამოტვირთვა</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Seeding</source>
-        <translation>Emaritzan</translation>
+        <translation>სიდირება</translation>
     </message>
     <message>
         <location line="-6"/>
         <source>Finished</source>
-        <translation>Amaituta</translation>
+        <translation>დასრულდა</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Paused</source>
-        <translation>Pausatuta</translation>
+        <translation>შეჩერებულია</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Queued for verification</source>
-        <translation>Egiaztapenerako lerrokatuta</translation>
+        <translation>რიგშია შემოწმებისთვის</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Queued for download</source>
-        <translation>Jeisteko lerrokatuta</translation>
+        <translation>რიგშია ჩამოტვირთვისთვის</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Queued for seeding</source>
-        <translation>Emaritzarako lerrokatuta</translation>
+        <translation>რიგშია სიდირებისთვის</translation>
     </message>
     <message>
         <location line="+14"/>
         <source>Tracker gave a warning: %1</source>
-        <translation>Aztarnariak arrisku bat eman du: %1</translation>
+        <translation>ტრეკერმა გამოუშვა გაფრთხილება: %1</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Tracker gave an error: %1</source>
-        <translation>Aztarnariak akats bat eman du: %1</translation>
+        <translation>ტრეკერმა გამოუშვა შეცდომა: %1</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Error: %1</source>
-        <translation>Akatsa: %1</translation>
+        <translation>შეცდომა: %1</translation>
     </message>
 </context>
 <context>
@@ -2391,70 +2393,70 @@ Beste lehen URL bat gehitzeko, gehitu hura lerro huts baten ondoren.</translatio
         <location filename="../TorrentDelegate.cc" line="+170"/>
         <source>Magnetized transfer - retrieving metadata (%1%)</source>
         <extracomment>First part of torrent progress string; %1 is the percentage of torrent metadata downloaded</extracomment>
-        <translation>Magneturiko eskualdaketa - metadatu berreskurapena (%1%)</translation>
+        <translation>მაგნეტიზირებული ტრანსფერი - მეტამონაცემების მიღება (%1%)</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>%1 of %2 (%3%)</source>
         <extracomment>First part of torrent progress string; %1 is how much we&apos;ve got, %2 is how much we&apos;ll have when done, %3 is a percentage of the two</extracomment>
-        <translation>%1 --&gt; %2 (%3%)</translation>
+        <translation>%1/%2 (%3%)</translation>
     </message>
     <message>
         <location line="+16"/>
         <source>%1 of %2 (%3%), uploaded %4 (Ratio: %5 Goal: %6)</source>
         <extracomment>First part of torrent progress string; %1 is how much we&apos;ve got, %2 is the torrent&apos;s total size, %3 is a percentage of the two, %4 is how much we&apos;ve uploaded, %5 is our upload-to-download ratio, %6 is the ratio we want to reach before we stop uploading</extracomment>
-        <translation>%1 --&gt; %2 (%3%), igota %4 (Maila: %5 Xedea: %6)</translation>
+        <translation>%1/%2 (%3%), ატვირთული %4 (შეფარდება: %5 მიზანი: %6)</translation>
     </message>
     <message>
         <location line="+16"/>
         <source>%1 of %2 (%3%), uploaded %4 (Ratio: %5)</source>
         <extracomment>First part of torrent progress string; %1 is how much we&apos;ve got, %2 is the torrent&apos;s total size, %3 is a percentage of the two, %4 is how much we&apos;ve uploaded, %5 is our upload-to-download ratio</extracomment>
-        <translation>%1 --&gt; %2 (%3%), igota %4 (Maila: %5)</translation>
+        <translation>%1/%2 (%3%), ატვირთული %4 (შეფარდება: %5)</translation>
     </message>
     <message>
         <location line="+17"/>
         <source>%1, uploaded %2 (Ratio: %3 Goal: %4)</source>
         <extracomment>First part of torrent progress string; %1 is the torrent&apos;s total size, %2 is how much we&apos;ve uploaded, %3 is our upload-to-download ratio, %4 is the ratio we want to reach before we stop uploading</extracomment>
-        <translation>%1, igota %2 (Maila: %3 Xedea: %4)</translation>
+        <translation>%1, ატვირთული %2 (შეფარდება: %3 მიზანი: %4)</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>%1, uploaded %2 (Ratio: %3)</source>
         <extracomment>First part of torrent progress string; %1 is the torrent&apos;s total size, %2 is how much we&apos;ve uploaded, %3 is our upload-to-download ratio</extracomment>
-        <translation>%1, igota %2 (Maila: %3)</translation>
+        <translation>%1, ატვირთული %2 (შეფარდება: %3)</translation>
     </message>
     <message>
         <location line="+14"/>
         <source> - %1 left</source>
         <extracomment>Second (optional) part of torrent progress string; %1 is duration; notice that leading space (before the dash) is included here</extracomment>
-        <translation> - %1 gelditzen d(ir)a</translation>
+        <translation> - %1 დარჩენილი</translation>
     </message>
     <message>
         <location line="+4"/>
         <source> - Remaining time unknown</source>
         <extracomment>Second (optional) part of torrent progress string; notice that leading space (before the dash) is included here</extracomment>
-        <translation> - Gelditzen den denbora ezezaguna</translation>
+        <translation> - დარჩენილი დრო უცნობია</translation>
     </message>
     <message>
         <location line="+40"/>
         <source>Ratio: %1</source>
-        <translation>Maila: %1</translation>
+        <translation>შეფარდება: %1</translation>
     </message>
     <message numerus="yes">
         <location line="+41"/>
         <source>Downloading from %Ln peer(s)</source>
         <extracomment>First part of phrase &quot;Downloading from ... peer(s) and ... web seed(s)&quot;</extracomment>
         <translation>
-            <numerusform>Jeisten %1 --&gt; %Ln elkarketaturiko hartzailetik</numerusform>
-            <numerusform>Jeisten %1 --&gt; %Ln elkarketaturiko hartzailetik</numerusform>
+            <numerusform>იტვირთება %Ln პირისგან</numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+15"/>
         <source>Seeding to %Ln peer(s)</source>
         <translation>
-            <numerusform>%Ln hartzailera emaritzen</numerusform>
-            <numerusform>%Ln hartzailera emaritzen</numerusform>
+            <numerusform>სიდირდება %Ln პირზე</numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -2466,8 +2468,8 @@ Beste lehen URL bat gehitzeko, gehitu hura lerro huts baten ondoren.</translatio
         <location line="-38"/>
         <source>Downloading metadata from %Ln peer(s) (%1% done)</source>
         <translation>
-            <numerusform>Metadatuak jeisten %Ln hartzailetik (%1% eginda)</numerusform>
-            <numerusform>Metadatuak jeisten %Ln hartzailetik (%1% eginda)</numerusform>
+            <numerusform>მეტამონაცემების ჩამოტვირთვა %Ln პირისგან (%1% დასრულდა)</numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -2475,8 +2477,8 @@ Beste lehen URL bat gehitzeko, gehitu hura lerro huts baten ondoren.</translatio
         <source>Downloading from %1 of %Ln connected peer(s)</source>
         <extracomment>First part of phrase &quot;Downloading from ... of ... connected peer(s) and ... web seed(s)&quot;</extracomment>
         <translation>
-            <numerusform>Jeisten %1 --&gt; %Ln elkarketaturiko hartzailetik</numerusform>
-            <numerusform>Jeisten %1 --&gt; %Ln elkarketaturiko hartzailetik</numerusform>
+            <numerusform>იტვირთება %Ln დაკავშირებულ პირთაგან %1-სგან</numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -2484,27 +2486,27 @@ Beste lehen URL bat gehitzeko, gehitu hura lerro huts baten ondoren.</translatio
         <source> and %Ln web seed(s)</source>
         <extracomment>Second (optional) part of phrase &quot;Downloading from ... of ... connected peer(s) and ... web seed(s)&quot;; notice that leading space (before &quot;and&quot;) is included here</extracomment>
         <translation>
-            <numerusform> eta %Ln web emaritza</numerusform>
-            <numerusform> eta %Ln web emaritza</numerusform>
+            <numerusform>და %Ln ვებ სიდისგან</numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+8"/>
         <source>Seeding to %1 of %Ln connected peer(s)</source>
         <translation>
-            <numerusform>%1 --&gt; %Ln elkarturiko hartzailera emaritzen</numerusform>
-            <numerusform>%1 --&gt; %Ln elkarturiko hartzailera emaritzen</numerusform>
+            <numerusform>სიდირდება %Ln დაკავშირებულ პირთაგან %1-ზე</numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Error</source>
-        <translation>Akatsa</translation>
+        <translation>შეცდომა</translation>
     </message>
     <message>
         <location line="-70"/>
         <source>Verifying local data (%1% tested)</source>
-        <translation>Tokiko datuak egiaztatzen (%1% aztertuta)</translation>
+        <translation>ადგილობრივი მონაცემების გადამოწმება (%1% შემოწმებულია)</translation>
     </message>
 </context>
 <context>
@@ -2514,51 +2516,51 @@ Beste lehen URL bat gehitzeko, gehitu hura lerro huts baten ondoren.</translatio
         <source>Got a list of%1 %Ln peer(s)%2 %3 ago</source>
         <extracomment>%1 and %2 are replaced with HTML markup, %3 is duration</extracomment>
         <translation>
-            <numerusform>Zerrenda:%1 %Ln hartzaile%2 %3</numerusform>
-            <numerusform>Zerrenda:%1 %Ln hartzaile%2 %3</numerusform>
+            <numerusform>მიღებული იქნა სია %1 %Ln პირით%2 %3ს წინ</numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Peer list request %1timed out%2 %3 ago; will retry</source>
         <extracomment>%1 and %2 are replaced with HTML markup, %3 is duration</extracomment>
-        <translation>Hartzaile zerrenda eskaera %1denboraz kanpo%2 %3 ; besaiatuko da</translation>
+        <translation>პირების სიის მოთხოვნას %1ვადა გაუვიდა%2 %3 ს წინ; მოხდება ხელახალი ცდა</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Got an error %1&quot;%2&quot;%3 %4 ago</source>
         <extracomment>%1 and %3 are replaced with HTML markup, %2 is error message, %4 is duration</extracomment>
-        <translation>Akatsa: %1&quot;%2&quot;%3 %4</translation>
+        <translation>მიღებული იქნა შეცდომა %1&quot;%2&quot;%3 %4ს წინ</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>No updates scheduled</source>
-        <translation>Ez dago eguneraketarik egitaraututa</translation>
+        <translation>განახლებები არაა დაგეგმილი</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Asking for more peers in %1</source>
         <extracomment>%1 is duration</extracomment>
-        <translation>Hartzaile gehiagogaitik galdetzen: %1</translation>
+        <translation>მეტი პირის მოთხოვნა - %1</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Queued to ask for more peers</source>
-        <translation>Lerrokatuta hartzaile gehiagogaitik galdetzeko</translation>
+        <translation>იმყოფება მეტი პირის მოთხოვნის რიგში</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Asking for more peers now... &lt;small&gt;%1&lt;/small&gt;</source>
         <extracomment>%1 is duration</extracomment>
-        <translation>Hartzaile gehiagogaitik galdetzen orain... &lt;small&gt;%1&lt;/small&gt;</translation>
+        <translation>მეტი პირის მოთხოვნა ახლა... &lt;small&gt;%1&lt;/small&gt;</translation>
     </message>
     <message numerus="yes">
         <location line="+17"/>
         <source>Tracker had%1 %Ln seeder(s)%2</source>
         <extracomment>First part of phrase &quot;Tracker had ... seeder(s) and ... leecher(s) ... ago&quot;; %1 and %2 are replaced with HTML markup</extracomment>
         <translation>
-            <numerusform>Aztarnariak du%1 %Ln emale%2</numerusform>
-            <numerusform>Aztarnariak du%1 %Ln emale%2</numerusform>
+            <numerusform>ტრეკერს გააჩნდა %1 %Ln სიდერი%2</numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -2566,38 +2568,38 @@ Beste lehen URL bat gehitzeko, gehitu hura lerro huts baten ondoren.</translatio
         <source> and%1 %Ln leecher(s)%2 %3 ago</source>
         <extracomment>Second part of phrase &quot;Tracker had ... seeder(s) and ... leecher(s) ... ago&quot;; %1 and %2 are replaced with HTML markup, %3 is duration; notice that leading space (before &quot;and&quot;) is included here</extracomment>
         <translation>
-            <numerusform> eta%1 %Ln izain%2 %3</numerusform>
-            <numerusform> eta%1 %Ln izain%2 %3</numerusform>
+            <numerusform>და%1 %Ln ლიჩერი%2 %3ს წინ</numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Tracker had %1no information%2 on peer counts %3 ago</source>
         <extracomment>%1 and %2 are replaced with HTML markup, %3 is duration</extracomment>
-        <translation>Aztarnariak du %1argibiderik ez%2 hartzaile zenbatekoan duela %3</translation>
+        <translation>ტრაკერს %1არ გააჩნდა ინფორმაცია%2 პირების რაოდენობაზე %3ს წინ</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Got a scrape error %1&quot;%2&quot;%3 %4 ago</source>
         <extracomment>%1 and %3 are replaced with HTML markup, %2 is error message, %4 is duration</extracomment>
-        <translation>Zuriketa akatsa: %1&quot;%2&quot;%3 %4</translation>
+        <translation>მიღებული იქნა სქრეიფის შეცდომა %1&quot;%2&quot;%3 %4ს წინ</translation>
     </message>
     <message>
         <location line="+18"/>
         <source>Asking for peer counts in %1</source>
         <extracomment>%1 is duration</extracomment>
-        <translation>Hartzaile zenbatekoaz galdetzen: %1</translation>
+        <translation>პირების რაოდენობის მოთხოვნა %1ში</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Queued to ask for peer counts</source>
-        <translation>Lerrokatuta hartzaile zenbatekoaz galdetzeko</translation>
+        <translation>პირების რაოდენობის მოთხოვნის რიგში</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Asking for peer counts now... &lt;small&gt;%1&lt;/small&gt;</source>
         <extracomment>%1 is duration</extracomment>
-        <translation>Hartzaile zenbatekoagaitik galdetzen orain... &lt;small&gt;%1&lt;/small&gt;</translation>
+        <translation>პირების მოთხოვნა ხდება ახლა... &lt;small&gt;%1&lt;/small&gt;</translation>
     </message>
 </context>
 </TS>

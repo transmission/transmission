@@ -162,12 +162,16 @@ set(${PROJECT_NAME}_LINGUAS
     hu
     id
     it_IT
+    ka
     kk
     ko
     lt
+    nl
     pl_PL
     pt_BR
     ru
+    sv
+    tr_TR
     uk
     zh_CN
 )
