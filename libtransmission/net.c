@@ -247,7 +247,7 @@ tr_netOpenPeerSocket (tr_session        * session,
     if (clientIsSeed) {
         int n = 8192;
         if (setsockopt (s, SOL_SOCKET, SO_RCVBUF, (const void *) &n, sizeof (n)))
-            tr_logAddInfo ("Unable to set SO_RCVBUF on socket %"TR_PRI_SOCK": %s", s,
+            tr_logAddInfo ("Unable to set SO_RCVBUF on socket %" PRIdMAX ": %s", (intmax_t) s,
                            tr_net_strerror (err_buf, sizeof (err_buf), sockerrno));
     }
 
@@ -264,8 +264,8 @@ tr_netOpenPeerSocket (tr_session        * session,
     sourcelen = setup_sockaddr (source_addr, 0, &source_sock);
     if (bind (s, (struct sockaddr *) &source_sock, sourcelen))
     {
-        tr_logAddError (_("Couldn't set source address %s on %"TR_PRI_SOCK": %s"),
-                        tr_address_to_string (source_addr), s,
+        tr_logAddError (_("Couldn't set source address %s on %" PRIdMAX ": %s"),
+                        tr_address_to_string (source_addr), (intmax_t) s,
                         tr_net_strerror (err_buf, sizeof (err_buf), sockerrno));
         tr_netClose (session, s);
         return TR_BAD_SOCKET; /* -errno */
@@ -282,16 +282,16 @@ tr_netOpenPeerSocket (tr_session        * session,
         tmperrno = sockerrno;
         if ((tmperrno != ENETUNREACH && tmperrno != EHOSTUNREACH) || addr->type == TR_AF_INET)
         {
-            tr_logAddError (_("Couldn't connect socket %"TR_PRI_SOCK" to %s, port %d (errno %d - %s)"),
-                            s, tr_address_to_string (addr), (int)ntohs (port), tmperrno,
+            tr_logAddError (_("Couldn't connect socket %" PRIdMAX " to %s, port %d (errno %d - %s)"),
+                            (intmax_t) s, tr_address_to_string (addr), (int)ntohs (port), tmperrno,
                             tr_net_strerror (err_buf, sizeof (err_buf), tmperrno));
         }
         tr_netClose (session, s);
         s = TR_BAD_SOCKET; /* -tmperrno */
     }
 
-    tr_logAddDeep (__FILE__, __LINE__, NULL, "New OUTGOING connection %"TR_PRI_SOCK" (%s)",
-                   s, tr_peerIoAddrStr (addr, port));
+    tr_logAddDeep (__FILE__, __LINE__, NULL, "New OUTGOING connection %" PRIdMAX " (%s)",
+                   (intmax_t) s, tr_peerIoAddrStr (addr, port));
 
     return s;
 }
@@ -382,7 +382,7 @@ tr_netBindTCPImpl (const tr_address * addr,
     }
 
     if (!suppressMsgs)
-        tr_logAddDebug ("Bound socket %"TR_PRI_SOCK" to port %d on %s", fd, port, tr_address_to_string (addr));
+        tr_logAddDebug ("Bound socket %" PRIdMAX " to port %d on %s", (intmax_t) fd, port, tr_address_to_string (addr));
 
     if (listen (fd, 128) == -1) {
         *errOut = sockerrno;

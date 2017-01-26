@@ -38,7 +38,6 @@
 #ifdef _WIN32
  typedef SOCKET tr_socket_t;
  #define TR_BAD_SOCKET INVALID_SOCKET
- #define TR_PRI_SOCK "Id" /* intentionally signed to print -1 nicely. */
 
  #undef  EADDRINUSE
  #define EADDRINUSE              WSAEADDRINUSE
@@ -65,7 +64,6 @@
  typedef int tr_socket_t;
  /** @brief Platform-specific invalid socket descriptor constant. */
  #define TR_BAD_SOCKET (-1)
- #define TR_PRI_SOCK "d"
 
  #define sockerrno errno
 #endif

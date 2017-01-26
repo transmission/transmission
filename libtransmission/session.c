@@ -191,8 +191,8 @@ accept_incoming_peer (evutil_socket_t fd, short what UNUSED, void * vsession)
   clientSocket = tr_netAccept (session, fd, &clientAddr, &clientPort);
   if (clientSocket != TR_BAD_SOCKET)
     {
-      tr_logAddDeep (__FILE__, __LINE__, NULL, "new incoming connection %"TR_PRI_SOCK" (%s)",
-                       clientSocket, tr_peerIoAddrStr (&clientAddr, clientPort));
+      tr_logAddDeep (__FILE__, __LINE__, NULL, "new incoming connection %" PRIdMAX " (%s)",
+                     (intmax_t) clientSocket, tr_peerIoAddrStr (&clientAddr, clientPort));
       tr_peerMgrAddIncoming (session->peerMgr, &clientAddr, clientPort,
                              clientSocket, NULL);
     }
