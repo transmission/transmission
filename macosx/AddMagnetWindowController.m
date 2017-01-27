@@ -287,7 +287,7 @@
         fTorrent.scheduledDate = fScheduledDate.dateValue;
         // Add user notification
         NSString * location = [fTorrent dataLocation];
-        NSString * notificationTitle = NSLocalizedString(@"Scheduled Download", "notification title");
+        NSString * notificationTitle = NSLocalizedString(@"Starting Scheduled Download", "notification title");
         if ([NSApp isOnMountainLionOrBetter])
         {
             NSUserNotification * notification = [[NSUserNotificationMtLion alloc] init];
@@ -304,7 +304,6 @@
                 [userInfo setObject: location forKey: @"Location"];
             }
             [notification setUserInfo: userInfo];
-            
             [[NSUserNotificationCenterMtLion defaultUserNotificationCenter] scheduleNotification:notification];
             [notification release];
         }

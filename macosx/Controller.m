@@ -598,8 +598,9 @@ static void removeKeRangerRansomware()
 
     fBadger = [[Badger alloc] initWithLib: fLib];
 
-    if ([NSApp isOnMountainLionOrBetter])
+    if ([NSApp isOnMountainLionOrBetter]) {
         [[NSUserNotificationCenterMtLion defaultUserNotificationCenter] setDelegate: self];
+    }
 
     // remove Share menu items
     if (![NSApp isOnMountainLionOrBetter]) {
@@ -1993,18 +1994,22 @@ static void removeKeRangerRansomware()
 }
 
 #pragma mark - NSUserNotificationCenter Delegates
-- (BOOL) userNotificationCenter: (NSUserNotificationCenter *) center shouldPresentNotification:(NSUserNotification *) notification
-{
-    // If there is no user info, display notification anyway
+- (void) userNotificationCenter:(NSUserNotificationCenter *)center didDeliverNotification:(NSUserNotification *)notification {
+    // If there is no user info, exit
     if (![notification userInfo])
-        return YES;
+        return;
     NSDictionary *userInfo = [notification userInfo];
     if ([userInfo.allKeys containsObject:@"ScheduledDownload"]) {
-        // Scheduled download, start download but do not display notification
+        // Scheduled download, remove notification
+        [center removeDeliveredNotification:notification];
+        // Start download
         Torrent * torrent = [self torrentForHash: [[notification userInfo] objectForKey: @"Hash"]];
         [torrent startTransfer];
-        return NO;
     }
+}
+
+- (BOOL) userNotificationCenter: (NSUserNotificationCenter *) center shouldPresentNotification:(NSUserNotification *) notification
+{
     return YES;
 }
 
