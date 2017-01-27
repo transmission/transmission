@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n == 1) ? 0 : 1;\n"
-"X-Launchpad-Export-Date: 2016-09-27 19:08+0000\n"
-"X-Generator: Launchpad (build 18204)\n"
+"X-Launchpad-Export-Date: 2017-01-26 18:49+0000\n"
+"X-Generator: Launchpad (build 18315)\n"
 
 #: ../gtk/actions.c:35
 msgid "Sort by _Activity"
