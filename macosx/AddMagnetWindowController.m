@@ -26,10 +26,15 @@
 #import "GroupsController.h"
 #import "NSStringAdditions.h"
 #import "Torrent.h"
+#import "NSApplicationAdditions.h"
 
 #define POPUP_PRIORITY_HIGH 0
 #define POPUP_PRIORITY_NORMAL 1
 #define POPUP_PRIORITY_LOW 2
+
+#define POPUP_START_NOW 0
+#define POPUP_START_MANUAL 1
+#define POPUP_START_SCHEDULED 2
 
 @interface AddMagnetWindowController (Private)
 
@@ -74,6 +79,13 @@
     [self setGroupsMenu];
     [fGroupPopUp selectItemWithTag: fGroupValue];
 
+    // Start selection
+    BOOL autoStart = [[NSUserDefaults standardUserDefaults] boolForKey: @"AutoStartDownload"];
+    NSInteger startIndex = autoStart ? POPUP_START_NOW : POPUP_START_MANUAL;
+    [fStartPopup selectItemAtIndex:startIndex];
+    fScheduledDate.dateValue = [NSDate date];
+    
+    // Priority
     NSInteger priorityIndex;
     switch ([fTorrent priority])
     {
@@ -85,9 +97,7 @@
             priorityIndex = POPUP_PRIORITY_NORMAL;
     }
     [fPriorityPopUp selectItemAtIndex: priorityIndex];
-
-    [fStartCheck setState: [[NSUserDefaults standardUserDefaults] boolForKey: @"AutoStartDownload"] ? NSOnState : NSOffState];
-
+    
     if (fDestination)
         [self setDestinationPath: fDestination determinationType: TorrentDeterminationAutomatic];
     else
@@ -150,8 +160,6 @@
     cancelButtonFrame.origin.x -= addButtonWidthIncrease + (buttonWidth - oldCancelButtonWidth);
     [fAddButton setFrame: addButtonFrame];
     [fCancelButton setFrame: cancelButtonFrame];
-
-    [fStartCheck sizeToFit];
 }
 
 - (void) windowDidLoad
@@ -233,6 +241,11 @@
     return YES;
 }
 
+- (IBAction) changeStart: (id) sender
+{
+    fScheduledDate.hidden = [sender indexOfSelectedItem] != POPUP_START_SCHEDULED;
+}
+
 - (void) changePriority: (id) sender
 {
     tr_priority_t priority;
@@ -267,8 +280,35 @@
 {
     [fTorrent setGroupValue: fGroupValue determinationType: fGroupDeterminationType];
 
-    if ([fStartCheck state] == NSOnState)
+    if ([fStartPopup indexOfSelectedItem] == POPUP_START_NOW) {
         [fTorrent startTransfer];
+    } else if ([fStartPopup indexOfSelectedItem] == POPUP_START_SCHEDULED) {
+        // Set scheduled date/time
+        fTorrent.scheduledDate = fScheduledDate.dateValue;
+        // Add user notification
+        NSString * location = [fTorrent dataLocation];
+        NSString * notificationTitle = NSLocalizedString(@"Scheduled Download", "notification title");
+        if ([NSApp isOnMountainLionOrBetter])
+        {
+            NSUserNotification * notification = [[NSUserNotificationMtLion alloc] init];
+            [notification setTitle: notificationTitle];
+            [notification setInformativeText: [fTorrent name]];
+            notification.deliveryDate = fScheduledDate.dateValue;
+            
+            [notification setHasActionButton: YES];
+            [notification setActionButtonTitle: NSLocalizedString(@"Show", "notification button")];
+            
+            NSMutableDictionary * userInfo = [NSMutableDictionary dictionaryWithObject: [fTorrent hashString] forKey: @"Hash"];
+            userInfo[@"ScheduledDownload"] = @1;
+            if (location) {
+                [userInfo setObject: location forKey: @"Location"];
+            }
+            [notification setUserInfo: userInfo];
+            
+            [[NSUserNotificationCenterMtLion defaultUserNotificationCenter] scheduleNotification:notification];
+            [notification release];
+        }
+    }
 
     [self close];
     [fController askOpenMagnetConfirmed: self add: YES]; //ensure last, since it releases this controller

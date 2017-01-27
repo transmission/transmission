@@ -31,9 +31,10 @@
 {
     IBOutlet NSImageView * fIconView, * fLocationImageView;
     IBOutlet NSTextField * fNameField, * fStatusField, * fLocationField;
-    IBOutlet NSButton * fStartCheck, * fDeleteCheck;
-    IBOutlet NSPopUpButton * fGroupPopUp, * fPriorityPopUp;
+    IBOutlet NSButton * fDeleteCheck;
+    IBOutlet NSPopUpButton * fGroupPopUp, * fPriorityPopUp, * fStartPopup;
     IBOutlet NSProgressIndicator * fVerifyIndicator;
+    IBOutlet NSDatePicker * fScheduledDate;
 
     IBOutlet NSTextField * fFileFilterField;
     IBOutlet NSButton * fCheckAllButton, *fUncheckAllButton;

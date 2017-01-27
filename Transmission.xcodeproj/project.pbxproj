@@ -2200,7 +2200,6 @@
 				A2E57B9C13109DC200A7DAB1 /* FilterBar.xib in Resources */,
 				A220AF7B13D7CC460035C512 /* GlobalOptionsPopover.xib in Resources */,
 				F63480631E1D7274005B9E09 /* Images.xcassets in Resources */,
-				C15320211C82602500CC21E2 /* Info.plist in Resources */,
 				A2451E6A16ACE4EB00586E0E /* FileRenameSheetController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2272,7 +2271,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cd third-party/miniupnpc\nln -s . miniupnp";
+			shellScript = "cd third-party/miniupnpc\nrm miniupnp\nln -s . miniupnp";
 		};
 		C12F197D1E1AE6830005E93F /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -2286,7 +2285,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cd third-party/libutp\nln -s . libutp";
+			shellScript = "cd third-party/libutp\nrm libutp\nln -s . libutp";
 		};
 		C12F197E1E1AE6D50005E93F /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -2300,7 +2299,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cd third-party/dht\nln -s . dht";
+			shellScript = "cd third-party/dht\nrm dht\nln -s . dht";
 		};
 /* End PBXShellScriptBuildPhase section */
 

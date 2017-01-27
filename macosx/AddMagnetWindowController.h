@@ -30,16 +30,16 @@
 {
     IBOutlet NSImageView * fLocationImageView;
     IBOutlet NSTextField * fNameField, * fLocationField;
-    IBOutlet NSButton * fStartCheck;
-    IBOutlet NSPopUpButton * fGroupPopUp, * fPriorityPopUp;
+    IBOutlet NSPopUpButton * fGroupPopUp, * fPriorityPopUp, * fStartPopup;
+    IBOutlet NSDatePicker * fScheduledDate;
 
     //remove these when switching to auto layout
     IBOutlet NSTextField * fMagnetLinkLabel;
-    IBOutlet NSTextField * fDownloadToLabel, * fGroupLabel, * fPriorityLabel;
+    IBOutlet NSTextField * fDownloadToLabel, * fGroupLabel, * fPriorityLabel, * FStartLabel;
     IBOutlet NSButton * fChangeDestinationButton;
     IBOutlet NSBox * fDownloadToBox;
     IBOutlet NSButton * fAddButton, * fCancelButton;
-
+    
     Controller * fController;
 
     Torrent * fTorrent;

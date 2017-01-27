@@ -61,6 +61,7 @@ typedef enum {
     BOOL fResumeOnWake;
 
     BOOL fTimeMachineExcludeInitialized;
+    
 }
 
 - (id) initWithPath: (NSString *) path location: (NSString *) location deleteTorrentFile: (BOOL) torrentDelete
@@ -125,6 +126,7 @@ typedef enum {
 - (uint16_t) maxPeerConnect;
 
 @property (nonatomic) BOOL removeWhenFinishSeeding;
+@property (nonatomic, strong) NSDate * scheduledDate;
 
 - (BOOL) waitingToStart;
 

@@ -1742,6 +1742,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
         name: @"GroupValueRemoved" object: nil];
 
     fTimeMachineExcludeInitialized = NO;
+    
     [self update];
 
     return self;

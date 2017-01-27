@@ -1992,8 +1992,19 @@ static void removeKeRangerRansomware()
     [fTotalTorrentsField setStringValue: totalTorrentsString];
 }
 
+#pragma mark - NSUserNotificationCenter Delegates
 - (BOOL) userNotificationCenter: (NSUserNotificationCenter *) center shouldPresentNotification:(NSUserNotification *) notification
 {
+    // If there is no user info, display notification anyway
+    if (![notification userInfo])
+        return YES;
+    NSDictionary *userInfo = [notification userInfo];
+    if ([userInfo.allKeys containsObject:@"ScheduledDownload"]) {
+        // Scheduled download, start download but do not display notification
+        Torrent * torrent = [self torrentForHash: [[notification userInfo] objectForKey: @"Hash"]];
+        [torrent startTransfer];
+        return NO;
+    }
     return YES;
 }
 

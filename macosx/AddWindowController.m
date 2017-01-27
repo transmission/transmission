@@ -27,12 +27,17 @@
 #import "GroupsController.h"
 #import "NSStringAdditions.h"
 #import "Torrent.h"
+#import "NSApplicationAdditions.h"
 
 #define UPDATE_SECONDS 1.0
 
 #define POPUP_PRIORITY_HIGH 0
 #define POPUP_PRIORITY_NORMAL 1
 #define POPUP_PRIORITY_LOW 2
+
+#define POPUP_START_NOW 0
+#define POPUP_START_MANUAL 1
+#define POPUP_START_SCHEDULED 2
 
 @interface AddWindowController (Private)
 
@@ -109,6 +114,13 @@
     [self setGroupsMenu];
     [fGroupPopUp selectItemWithTag: fGroupValue];
 
+    // Start selection
+    BOOL autoStart = [[NSUserDefaults standardUserDefaults] boolForKey: @"AutoStartDownload"];
+    NSInteger startIndex = autoStart ? POPUP_START_NOW : POPUP_START_MANUAL;
+    [fStartPopup selectItemAtIndex:startIndex];
+    fScheduledDate.dateValue = [NSDate date];
+    
+    // Priority
     NSInteger priorityIndex;
     switch ([fTorrent priority])
     {
@@ -120,8 +132,6 @@
             priorityIndex = POPUP_PRIORITY_NORMAL;
     }
     [fPriorityPopUp selectItemAtIndex: priorityIndex];
-
-    [fStartCheck setState: [[NSUserDefaults standardUserDefaults] boolForKey: @"AutoStartDownload"] ? NSOnState : NSOffState];
 
     [fDeleteCheck setState: fDeleteTorrentEnableInitially ? NSOnState : NSOffState];
     [fDeleteCheck setEnabled: fCanToggleDelete];
@@ -252,6 +262,11 @@
     [self updateFiles];
 }
 
+- (IBAction) changeStart: (id) sender
+{
+    fScheduledDate.hidden = [sender indexOfSelectedItem] != POPUP_START_SCHEDULED;
+}
+
 - (void) changePriority: (id) sender
 {
     tr_priority_t priority;
@@ -344,8 +359,35 @@
     if (fTorrentFile && fCanToggleDelete && [fDeleteCheck state] == NSOnState)
         [Torrent trashFile: fTorrentFile error: nil];
 
-    if ([fStartCheck state] == NSOnState)
+    if ([fStartPopup indexOfSelectedItem] == POPUP_START_NOW) {
         [fTorrent startTransfer];
+    } else if ([fStartPopup indexOfSelectedItem] == POPUP_START_SCHEDULED) {
+        // Set scheduled date/time
+        fTorrent.scheduledDate = fScheduledDate.dateValue;
+        // Add user notification
+        NSString * location = [fTorrent dataLocation];
+        NSString * notificationTitle = NSLocalizedString(@"Scheduled Download", "notification title");
+        if ([NSApp isOnMountainLionOrBetter])
+        {
+            NSUserNotification * notification = [[NSUserNotificationMtLion alloc] init];
+            [notification setTitle: notificationTitle];
+            [notification setInformativeText: [fTorrent name]];
+            notification.deliveryDate = fScheduledDate.dateValue;
+            
+            [notification setHasActionButton: YES];
+            [notification setActionButtonTitle: NSLocalizedString(@"Show", "notification button")];
+            
+            NSMutableDictionary * userInfo = [NSMutableDictionary dictionaryWithObject: [fTorrent hashString] forKey: @"Hash"];
+            userInfo[@"ScheduledDownload"] = @1;
+            if (location) {
+                [userInfo setObject: location forKey: @"Location"];
+            }
+            [notification setUserInfo: userInfo];
+            
+            [[NSUserNotificationCenterMtLion defaultUserNotificationCenter] scheduleNotification:notification];
+            [notification release];
+        }
+    }
 
     [fFileController setTorrent: nil]; //avoid a crash when window tries to update
 
