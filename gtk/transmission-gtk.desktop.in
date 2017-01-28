@@ -2,6 +2,8 @@
 _Name=Transmission
 _GenericName=BitTorrent Client
 _Comment=Download and share files over BitTorrent
+# Translators: Search terms to find this application. Do NOT translate or localize the semicolons! The list MUST also end with a semicolon!
+_Keywords=torrents;downloading;uploading;share;sharing;
 Exec=transmission-gtk %U
 Icon=transmission
 Terminal=false
