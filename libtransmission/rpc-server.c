@@ -54,7 +54,7 @@ struct tr_rpc_server
     bool isWhitelistEnabled;
     tr_port port;
     char* url;
-    struct in_addr bindAddress;
+    struct tr_address bindAddress;
     struct evhttp* httpd;
     struct event* start_retry_timer;
     int start_retry_counter;
@@ -957,10 +957,7 @@ bool tr_rpcIsPasswordEnabled(tr_rpc_server const* server)
 
 char const* tr_rpcGetBindAddress(tr_rpc_server const* server)
 {
-    tr_address addr;
-    addr.type = TR_AF_INET;
-    addr.addr.addr4 = server->bindAddress;
-    return tr_address_to_string(&addr);
+    return tr_address_to_string(&server->bindAddress);
 }
 
 /****
@@ -1115,17 +1112,17 @@ tr_rpc_server* tr_rpcInit(tr_session* session, tr_variant* settings)
         tr_logAddNamedError(MY_NAME, _("%s is not a valid address"), str);
         address = tr_inaddr_any;
     }
-    else if (address.type != TR_AF_INET)
+    else if (address.type != TR_AF_INET && address.type != TR_AF_INET6)
     {
-        tr_logAddNamedError(MY_NAME, _("%s is not an IPv4 address. RPC listeners must be IPv4"), str);
+        tr_logAddNamedError(MY_NAME, _("%s is not an IPv4 or IPv6 address. RPC listeners must be IPv4 or IPv6"), str);
         address = tr_inaddr_any;
     }
 
-    s->bindAddress = address.addr.addr4;
+    s->bindAddress = address;
 
     if (s->isEnabled)
     {
-        tr_logAddNamedInfo(MY_NAME, _("Serving RPC and Web requests on port 127.0.0.1:%d%s"), (int)s->port, s->url);
+        tr_logAddNamedInfo(MY_NAME, _("Serving RPC and Web requests on %s:%d%s"), tr_rpcGetBindAddress(s), (int)s->port, s->url);
         tr_runInEventThread(session, startServer, s);
 
         if (s->isWhitelistEnabled)

@@ -41,7 +41,7 @@ via RPC commands from transmission's web interface or
 .It Fl a Fl -allowed Ar x.x.x.x,...
 Allow RPC access to a comma-delimited whitelist of IP addresses.
 Wildcards can be specified in an address by using '*'.
-Default: "127.0.0.1"
+Default: "127.0.0.1,::1"
 Example: "127.0.0.*,192.168.1.*"
 .It Fl b Fl -blocklist
 Enable peer blocklists. Transmission understands the bluetack blocklist file format.
@@ -84,7 +84,7 @@ Listen for IPv4 BitTorrent connections on a specific address. Only one IPv4 list
 .It Fl I Fl -bind-address-ipv6
 Listen for IPv6 BitTorrent connections on a specific address. Only one IPv6 listening address is allowed. Default: :: (All addresses)
 .It Fl r Fl -rpc-bind-address
-Listen for RPC connections on a specific address. This must be an IPv4 address. Only one RPC listening address is allowed. Default: 0.0.0.0 (All addresses)
+Listen for RPC connections on a specific address. This must be an IPv4 or IPv6 address. Only one RPC listening address is allowed. Default: 0.0.0.0 (All IPv4 addresses)
 .It Fl -paused
 Pause all torrents on startup
 .It Fl L Fl -peerlimit-global Ar limit
