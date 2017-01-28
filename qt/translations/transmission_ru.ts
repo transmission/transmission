@@ -1453,8 +1453,8 @@
     </message>
     <message>
         <location filename="../MakeDialog.cc" line="+200"/>
-        <source>&lt;i&gt;No source selected&lt;i&gt;</source>
-        <translation>&lt;i&gt;Не выбраны исходные данные&lt;i&gt;</translation>
+        <source>&lt;i&gt;No source selected&lt;/i&gt;</source>
+        <translation>&lt;i&gt;Не выбраны исходные данные&lt;/i&gt;</translation>
     </message>
     <message numerus="yes">
         <location line="+4"/>

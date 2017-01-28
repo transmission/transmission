@@ -1434,8 +1434,8 @@
     </message>
     <message>
         <location filename="../MakeDialog.cc" line="+200"/>
-        <source>&lt;i&gt;No source selected&lt;i&gt;</source>
-        <translation>&lt;i&gt;아무런 출처도 선택되지 않았습니다&lt;i&gt;</translation>
+        <source>&lt;i&gt;No source selected&lt;/i&gt;</source>
+        <translation>&lt;i&gt;아무런 출처도 선택되지 않았습니다&lt;/i&gt;</translation>
     </message>
     <message numerus="yes">
         <location line="+4"/>

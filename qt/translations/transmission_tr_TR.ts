@@ -1433,7 +1433,7 @@
     </message>
     <message>
         <location filename="../MakeDialog.cc" line="+200"/>
-        <source>&lt;i&gt;No source selected&lt;i&gt;</source>
+        <source>&lt;i&gt;No source selected&lt;/i&gt;</source>
         <translation>&lt;i&gt;Hiçbir kaynak seçilmedi&lt;/i&gt; </translation>
     </message>
     <message numerus="yes">
