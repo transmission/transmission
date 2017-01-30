@@ -48,7 +48,7 @@ typedef enum
     ADD_CREATED
 } addType;
 
-@interface Controller : NSObject <GrowlApplicationBridgeDelegate, NSURLDownloadDelegate, NSUserNotificationCenterDelegate, NSPopoverDelegate, NSSharingServiceDelegate, NSSharingServicePickerDelegate, NSSoundDelegate, NSToolbarDelegate, NSWindowDelegate, QLPreviewPanelDataSource, QLPreviewPanelDelegate, VDKQueueDelegate>
+@interface Controller : NSObject <GrowlApplicationBridgeDelegate, NSURLDownloadDelegate, NSUserNotificationCenterDelegate, NSPopoverDelegate, NSSharingServiceDelegate, NSSharingServicePickerDelegate, NSSharingServicePickerTouchBarItemDelegate, NSSoundDelegate, NSToolbarDelegate, NSWindowDelegate, QLPreviewPanelDataSource, QLPreviewPanelDelegate, VDKQueueDelegate>
 {
     tr_session                      * fLib;
 
@@ -88,6 +88,28 @@ typedef enum
 
     IBOutlet NSMenu                 * fShareMenu, * fShareContextMenu;
     IBOutlet NSMenuItem             * fShareMenuItem, * fShareContextMenuItem; // remove when dropping 10.6
+    IBOutlet NSTouchBar *touchbar;
+    //TouchBar items
+    IBOutlet NSTouchBarItem *createTouchBarItem;
+    IBOutlet NSButton *createTouchBarButton;
+    IBOutlet NSTouchBarItem *openFileTouchBarItem;
+    IBOutlet NSButton *openFileTouchBarButton;
+    IBOutlet NSTouchBarItem *removeTouchBarItem;
+    IBOutlet NSButton *removeTouchBarButton;
+    IBOutlet NSTouchBarItem *pauseAllTouchBarItem;
+    IBOutlet NSButton *pauseAllTouchBarButton;
+    IBOutlet NSTouchBarItem *resumeAllTouchBarItem;
+    IBOutlet NSButton *resumeAllTouchBarButton;
+    IBOutlet NSTouchBarItem *speedLimitTouchBarItem;
+    IBOutlet NSButton *speedLimitTouchBarButton;
+    IBOutlet NSTouchBarItem *cleanupTouchBarItem;
+    IBOutlet NSButton *cleanupTouchBarButton;
+    IBOutlet NSTouchBarItem *quickLookTouchBarItem;
+    IBOutlet NSButton *quickLookTouchBarButton;
+    IBOutlet NSTouchBarItem *showInfoTouchBarItem;
+    IBOutlet NSButton *showInfoTouchBarButton;
+    IBOutlet NSSharingServicePickerTouchBarItem *shareTouchBarButton;
+    //^^^should probably move these into an IBOutlet collection, or better yet stop using IB for them
 
     QLPreviewPanel                  * fPreviewPanel;
     BOOL                            fQuitting;
@@ -129,6 +151,9 @@ typedef enum
 - (void) openURLShowSheet: (id) sender;
 
 - (void) quitSheetDidEnd: (NSWindow *) sheet returnCode: (NSInteger) returnCode contextInfo: (void *) contextInfo;
+
+- (NSArray *)itemsForSharingServicePickerTouchBarItem:(NSSharingServicePickerTouchBarItem *)pickerTouchBarItem;
+- (void)setupTouchBarIfReady;
 
 - (tr_session *) sessionHandle;
 

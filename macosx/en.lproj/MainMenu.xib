@@ -1,8 +1,11 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="9531" systemVersion="15B42" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11762" systemVersion="16D32" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="9531"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaDFRPlugin" version="7104"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11762"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+        <capability name="the Touch Bar" message="Use a version of macOS with Touch Bar support." minToolsVersion="8.1" minSystemVersion="10.12.1" requiredIntegratedClassName="NSTouchBar"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="NSApplication">
@@ -73,7 +76,7 @@
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <outlineView verticalHuggingPriority="750" allowsExpansionToolTips="YES" alternatingRowBackgroundColors="YES" columnReordering="NO" columnResizing="NO" autosaveColumns="NO" rowHeight="62" indentationPerLevel="16" indentationMarkerFollowsCell="NO" outlineTableColumn="3093" id="3091" customClass="TorrentTableView">
-                                    <rect key="frame" x="0.0" y="0.0" width="515" height="65"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="515" height="224"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <size key="intercellSpacing" width="2" height="3"/>
                                     <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -85,7 +88,7 @@
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" white="0.33333299" alpha="1" colorSpace="calibratedWhite"/>
                                             </tableHeaderCell>
-                                            <imageCell key="dataCell" controlSize="small" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="F0181CA3-98B9-44D2-B2B8-A7EA369CEEA5" id="3146">
+                                            <imageCell key="dataCell" controlSize="small" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="AE3BF170-61B8-4442-B044-F1B3640B7F9E" id="3146">
                                                 <font key="font" metaFont="system"/>
                                             </imageCell>
                                         </tableColumn>
@@ -108,7 +111,7 @@
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                             </tableHeaderCell>
-                                            <imageCell key="dataCell" controlSize="small" refusesFirstResponder="YES" alignment="left" imageAlignment="right" imageScaling="proportionallyDown" image="F0181CA3-98B9-44D2-B2B8-A7EA369CEEA5" id="3138">
+                                            <imageCell key="dataCell" controlSize="small" refusesFirstResponder="YES" alignment="left" imageAlignment="right" imageScaling="proportionallyDown" image="AE3BF170-61B8-4442-B044-F1B3640B7F9E" id="3138">
                                                 <font key="font" metaFont="system"/>
                                             </imageCell>
                                         </tableColumn>
@@ -130,7 +133,7 @@
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                             </tableHeaderCell>
-                                            <imageCell key="dataCell" controlSize="small" refusesFirstResponder="YES" alignment="left" imageAlignment="right" imageScaling="proportionallyDown" image="F0181CA3-98B9-44D2-B2B8-A7EA369CEEA5" id="3139">
+                                            <imageCell key="dataCell" controlSize="small" refusesFirstResponder="YES" alignment="left" imageAlignment="right" imageScaling="proportionallyDown" image="AE3BF170-61B8-4442-B044-F1B3640B7F9E" id="3139">
                                                 <font key="font" metaFont="system"/>
                                             </imageCell>
                                         </tableColumn>
@@ -161,7 +164,6 @@
                                     </connections>
                                 </outlineView>
                             </subviews>
-                            <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </clipView>
                         <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="YES" id="3090">
                             <rect key="frame" x="-100" y="-100" width="451" height="15"/>
@@ -173,6 +175,159 @@
                         </scroller>
                     </scrollView>
                 </subviews>
+                <touchBar key="touchBar" customizationIdentifier="mainCustomizableBar" id="tcL-q8-3Ks">
+                    <touchBarItems>
+                        <touchBarItem identifier="org.m0k.transmission.createTouchBarItem" customizationLabel="Create" id="3kb-xU-XWS">
+                            <viewController key="viewController" id="FRT-wa-5td">
+                                <button key="view" verticalHuggingPriority="750" misplaced="YES" id="I8E-OP-gm5">
+                                    <rect key="frame" x="0.0" y="0.0" width="51" height="30"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                    <buttonCell key="cell" type="push" bezelStyle="rounded" image="ToolbarCreateTemplate" imagePosition="overlaps" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="eQU-d0-7CQ">
+                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                        <font key="font" metaFont="system"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <action selector="performTouchBarAction:" target="206" id="le0-iA-8ty"/>
+                                    </connections>
+                                </button>
+                            </viewController>
+                            <size key="designTimeSize" width="51" height="30"/>
+                        </touchBarItem>
+                        <touchBarItem identifier="org.m0k.transmission.openFileTouchBarItem" customizationLabel="Open" id="Y1w-96-lgU">
+                            <viewController key="viewController" id="vP0-zl-nf7">
+                                <button key="view" verticalHuggingPriority="750" misplaced="YES" tag="1" id="HgF-eV-zK3">
+                                    <rect key="frame" x="0.0" y="0.0" width="51" height="30"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                    <buttonCell key="cell" type="push" bezelStyle="rounded" image="ToolbarOpenTemplate" imagePosition="only" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Wq5-3p-gDY">
+                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                        <font key="font" metaFont="system"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <action selector="performTouchBarAction:" target="206" id="ePo-wh-61K"/>
+                                    </connections>
+                                </button>
+                            </viewController>
+                            <size key="designTimeSize" width="51" height="30"/>
+                        </touchBarItem>
+                        <touchBarItem identifier="org.m0k.transmission.removeTouchBarItem" customizationLabel="Remove" id="LLh-LX-3mL">
+                            <viewController key="viewController" id="I5o-3Q-aXN">
+                                <button key="view" verticalHuggingPriority="750" misplaced="YES" tag="9" id="eP6-Nv-jIj">
+                                    <rect key="frame" x="0.0" y="0.0" width="51" height="30"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                    <buttonCell key="cell" type="push" bezelStyle="rounded" image="ToolbarRemoveTemplate" imagePosition="only" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="fOA-yK-czC">
+                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                        <font key="font" metaFont="system"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <action selector="performTouchBarAction:" target="206" id="afJ-hd-06E"/>
+                                    </connections>
+                                </button>
+                            </viewController>
+                            <size key="designTimeSize" width="51" height="30"/>
+                        </touchBarItem>
+                        <touchBarSpacerItem identifier="NSTouchBarItemIdentifierFixedSpaceSmall" id="9Ug-Ga-Iru"/>
+                        <touchBarItem identifier="org.m0k.transmission.pauseAllTouchBarItem" customizationLabel="Pause All" id="tfc-EV-Jyd">
+                            <viewController key="viewController" id="GTe-qR-enn">
+                                <button key="view" verticalHuggingPriority="750" tag="2" id="pWV-Ye-mBm">
+                                    <rect key="frame" x="0.0" y="0.0" width="51" height="30"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                    <buttonCell key="cell" type="push" bezelStyle="rounded" image="ToolbarPauseAllTemplate" imagePosition="only" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="2n8-m3-uI8">
+                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                        <font key="font" metaFont="system"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <action selector="performTouchBarAction:" target="206" id="9Y7-MB-qT6"/>
+                                    </connections>
+                                </button>
+                            </viewController>
+                            <size key="designTimeSize" width="51" height="30"/>
+                        </touchBarItem>
+                        <touchBarItem identifier="org.m0k.transmission.resumeAllTouchBarItem" customizationLabel="Resume All" id="WWB-KN-gGX">
+                            <viewController key="viewController" id="1Pg-tK-ltg">
+                                <button key="view" verticalHuggingPriority="750" tag="3" id="CZY-bz-DKh">
+                                    <rect key="frame" x="0.0" y="0.0" width="51" height="30"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                    <buttonCell key="cell" type="push" bezelStyle="rounded" image="ToolbarResumeAllTemplate" imagePosition="overlaps" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="zxO-ke-EMU">
+                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                        <font key="font" metaFont="system"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <action selector="performTouchBarAction:" target="206" id="Ehs-8b-l7A"/>
+                                    </connections>
+                                </button>
+                            </viewController>
+                            <size key="designTimeSize" width="51" height="30"/>
+                        </touchBarItem>
+                        <touchBarSpacerItem identifier="NSTouchBarItemIdentifierFixedSpaceSmall" id="Zha-pW-ceD"/>
+                        <touchBarItem identifier="org.m0k.transmission.showInfoTouchBarItem" customizationLabel="Info" id="sXG-hj-xtZ">
+                            <viewController key="viewController" id="t1t-ee-PKm">
+                                <button key="view" verticalHuggingPriority="750" tag="7" id="Xuj-TN-U2S">
+                                    <rect key="frame" x="0.0" y="0.0" width="51" height="30"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                    <buttonCell key="cell" type="push" bezelStyle="rounded" image="ToolbarInfoTemplate" imagePosition="only" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="S2r-hZ-v0p">
+                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                        <font key="font" metaFont="system"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <action selector="performTouchBarAction:" target="206" id="1vY-oY-QtZ"/>
+                                    </connections>
+                                </button>
+                            </viewController>
+                            <size key="designTimeSize" width="51" height="30"/>
+                        </touchBarItem>
+                        <touchBarItem identifier="org.m0k.transmission.quickLookTouchBarItem" customizationLabel="Quick Look" id="wS3-rq-F7d">
+                            <viewController key="viewController" id="6rZ-fQ-zG9">
+                                <button key="view" verticalHuggingPriority="750" tag="6" id="pq3-U7-TJL">
+                                    <rect key="frame" x="0.0" y="0.0" width="51" height="30"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                    <buttonCell key="cell" type="push" bezelStyle="rounded" image="NSQuickLookTemplate" imagePosition="only" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="irh-A0-SgC">
+                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                        <font key="font" metaFont="system"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <action selector="performTouchBarAction:" target="206" id="0b1-nz-Uic"/>
+                                    </connections>
+                                </button>
+                            </viewController>
+                            <size key="designTimeSize" width="51" height="30"/>
+                        </touchBarItem>
+                        <touchBarSpacerItem identifier="NSTouchBarItemIdentifierFixedSpaceSmall" id="eoO-D9-xcl"/>
+                        <sharingServicePickerItem id="Kog-ia-vJp"/>
+                        <touchBarSpacerItem identifier="NSTouchBarItemIdentifierFixedSpaceSmall" id="Bf7-ic-Cwa"/>
+                        <touchBarItem identifier="org.m0k.transmission.speedLimitTouchBarItem" customizationLabel="Speed Limit" id="1eH-Tc-mqb">
+                            <viewController key="viewController" id="ZRX-rA-OsM">
+                                <button key="view" verticalHuggingPriority="750" tag="4" id="TdZ-Jr-wxW">
+                                    <rect key="frame" x="0.0" y="0.0" width="51" height="30"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                    <buttonCell key="cell" type="push" bezelStyle="rounded" image="TurtleTemplate" imagePosition="only" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="zu6-x4-heB">
+                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                        <font key="font" metaFont="system"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <action selector="performTouchBarAction:" target="206" id="8Ui-1q-tgw"/>
+                                    </connections>
+                                </button>
+                            </viewController>
+                            <size key="designTimeSize" width="51" height="30"/>
+                        </touchBarItem>
+                        <touchBarItem identifier="org.m0k.transmission.cleanupTouchBarItem" customizationLabel="Cleanup" id="2gy-7A-4Yz">
+                            <viewController key="viewController" id="GrF-V8-EZ1">
+                                <button key="view" verticalHuggingPriority="750" tag="5" id="Ldv-k3-P0d">
+                                    <rect key="frame" x="0.0" y="0.0" width="51" height="30"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                    <buttonCell key="cell" type="push" bezelStyle="rounded" image="CleanupTemplate" imagePosition="only" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="KeO-zH-RpV">
+                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                        <font key="font" metaFont="system"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <action selector="performTouchBarAction:" target="206" id="RDb-s6-I8Y"/>
+                                    </connections>
+                                </button>
+                            </viewController>
+                            <size key="designTimeSize" width="51" height="30"/>
+                        </touchBarItem>
+                    </touchBarItems>
+                </touchBar>
             </view>
             <connections>
                 <outlet property="menu" destination="29" id="2687"/>
@@ -703,9 +858,14 @@ CA
                     </menu>
                 </menuItem>
             </items>
+            <point key="canvasLocation" x="112" y="511"/>
         </menu>
         <customObject id="206" userLabel="Controller" customClass="Controller">
             <connections>
+                <outlet property="cleanupTouchBarButton" destination="Ldv-k3-P0d" id="xQb-GO-wkY"/>
+                <outlet property="cleanupTouchBarItem" destination="2gy-7A-4Yz" id="Yrt-xl-O2j"/>
+                <outlet property="createTouchBarButton" destination="I8E-OP-gm5" id="Sz7-Zi-i9n"/>
+                <outlet property="createTouchBarItem" destination="3kb-xU-XWS" id="STu-BK-ggG"/>
                 <outlet property="fActionButton" destination="3435" id="3438"/>
                 <outlet property="fClearCompletedButton" destination="3420" id="3425"/>
                 <outlet property="fGroupsSetContextMenu" destination="2850" id="2855"/>
@@ -723,6 +883,22 @@ CA
                 <outlet property="fTableView" destination="3091" id="3118"/>
                 <outlet property="fTotalTorrentsField" destination="2700" id="2702"/>
                 <outlet property="fWindow" destination="21" id="246"/>
+                <outlet property="openFileTouchBarButton" destination="HgF-eV-zK3" id="RGv-RO-U0d"/>
+                <outlet property="openFileTouchBarItem" destination="Y1w-96-lgU" id="zNT-SS-1Zl"/>
+                <outlet property="pauseAllTouchBarButton" destination="pWV-Ye-mBm" id="Ewt-g6-roi"/>
+                <outlet property="pauseAllTouchBarItem" destination="tfc-EV-Jyd" id="Xus-bJ-o2h"/>
+                <outlet property="quickLookTouchBarButton" destination="pq3-U7-TJL" id="pPD-Ji-vcD"/>
+                <outlet property="quickLookTouchBarItem" destination="wS3-rq-F7d" id="d9s-12-g4q"/>
+                <outlet property="removeTouchBarButton" destination="eP6-Nv-jIj" id="V0y-Wb-M7a"/>
+                <outlet property="removeTouchBarItem" destination="LLh-LX-3mL" id="5qe-gG-Dos"/>
+                <outlet property="resumeAllTouchBarButton" destination="CZY-bz-DKh" id="Nsl-Ye-feA"/>
+                <outlet property="resumeAllTouchBarItem" destination="WWB-KN-gGX" id="cWw-hr-app"/>
+                <outlet property="shareTouchBarButton" destination="Kog-ia-vJp" id="yeM-d4-Hhs"/>
+                <outlet property="showInfoTouchBarButton" destination="Xuj-TN-U2S" id="SP5-m6-WaY"/>
+                <outlet property="showInfoTouchBarItem" destination="sXG-hj-xtZ" id="vxS-YU-50V"/>
+                <outlet property="speedLimitTouchBarButton" destination="TdZ-Jr-wxW" id="2MX-eP-1PQ"/>
+                <outlet property="speedLimitTouchBarItem" destination="1eH-Tc-mqb" id="3iQ-2h-qCa"/>
+                <outlet property="touchbar" destination="tcL-q8-3Ks" id="U8U-4O-jvw"/>
             </connections>
         </customObject>
         <menu title="Menu" id="456" userLabel="ContextRowMenu">
@@ -977,8 +1153,7 @@ CA
         </menu>
     </objects>
     <resources>
-        <image name="CleanupTemplate" width="18" height="18"/>
-        <image name="F0181CA3-98B9-44D2-B2B8-A7EA369CEEA5" width="62" height="62">
+        <image name="AE3BF170-61B8-4442-B044-F1B3640B7F9E" width="62" height="62">
             <mutableData key="keyedArchiveRepresentation">
 YnBsaXN0MDDUAQIDBAUGPT5YJHZlcnNpb25YJG9iamVjdHNZJGFyY2hpdmVyVCR0b3ASAAGGoK4HCBMU
 GR4fIyQrLjE3OlUkbnVsbNUJCgsMDQ4PEBESVk5TU2l6ZVYkY2xhc3NcTlNJbWFnZUZsYWdzVk5TUmVw
@@ -2089,10 +2264,18 @@ AeIAAQHnAAEB7wABAfIAAQH3AAEB/wABAgIAAQIUAAECFwABAhwAAAAAAAAEAQAAAAAAAABBAAAAAAAA
 AAAAAAAAAAECHg
 </mutableData>
         </image>
+        <image name="CleanupTemplate" width="18" height="18"/>
         <image name="NSActionTemplate" width="14" height="14"/>
+        <image name="NSQuickLookTemplate" width="19" height="12"/>
         <image name="PriorityHighTemplate" width="12" height="12"/>
         <image name="PriorityLowTemplate" width="12" height="12"/>
         <image name="PriorityNormalTemplate" width="12" height="12"/>
+        <image name="ToolbarCreateTemplate" width="16" height="16"/>
+        <image name="ToolbarInfoTemplate" width="20" height="20"/>
+        <image name="ToolbarOpenTemplate" width="16" height="16"/>
+        <image name="ToolbarPauseAllTemplate" width="16" height="16"/>
+        <image name="ToolbarRemoveTemplate" width="16" height="16"/>
+        <image name="ToolbarResumeAllTemplate" width="16" height="16"/>
         <image name="TurtleTemplate" width="18" height="18"/>
     </resources>
 </document>
