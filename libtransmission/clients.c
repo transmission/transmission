@@ -220,7 +220,7 @@ tr_clientForId (char * buf, size_t buflen, const void * id_in)
         else if (strncmp (chid+1, "BX", 2) == 0) four_digits (buf, buflen, "BittorrentX", id+3);
         else if (strncmp (chid+1, "EB", 2) == 0) four_digits (buf, buflen, "EBit", id+3);
         else if (strncmp (chid+1, "DE", 2) == 0) four_digits (buf, buflen, "Deluge", id+3);
-        else if (strncmp (chid+1, "DP", 2) == 0) four_digits (buf, buflen, "Propogate Data Client", id+3);
+        else if (strncmp (chid+1, "DP", 2) == 0) four_digits (buf, buflen, "Propagate Data Client", id+3);
         else if (strncmp (chid+1, "FC", 2) == 0) four_digits (buf, buflen, "FileCroc", id+3);
         else if (strncmp (chid+1, "FT", 2) == 0) four_digits (buf, buflen, "FoxTorrent/RedSwoosh", id+3);
         else if (strncmp (chid+1, "GR", 2) == 0) four_digits (buf, buflen, "GetRight", id+3);
