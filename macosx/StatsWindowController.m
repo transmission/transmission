@@ -167,22 +167,18 @@ tr_session * fLib = NULL;
     tr_sessionGetCumulativeStats(fLib, &statsAll);
     tr_sessionGetStats(fLib, &statsSession);
 
-    NSByteCountFormatter * byteFormatter = nil;
-    if ([NSApp isOnMountainLionOrBetter])
-    {
-        byteFormatter = [[NSByteCountFormatterMtLion alloc] init];
-        [byteFormatter setAllowedUnits: NSByteCountFormatterUseBytes];
-    }
+    NSByteCountFormatter * byteFormatter = [[NSByteCountFormatter alloc] init];
+    [byteFormatter setAllowedUnits: NSByteCountFormatterUseBytes];
 
     [fUploadedField setStringValue: [NSString stringForFileSize: statsSession.uploadedBytes]];
-    [fUploadedField setToolTip: [NSApp isOnMountainLionOrBetter] ? [byteFormatter stringFromByteCount: statsSession.uploadedBytes] : [NSString stringWithFormat: NSLocalizedString(@"%@ bytes", "stats -> bytes"), [NSString formattedUInteger: statsSession.uploadedBytes]]];
+    [fUploadedField setToolTip: [byteFormatter stringFromByteCount: statsSession.uploadedBytes]];
     [fUploadedAllField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%@ total", "stats total"), [NSString stringForFileSize: statsAll.uploadedBytes]]];
-    [fUploadedAllField setToolTip: [NSApp isOnMountainLionOrBetter] ? [byteFormatter stringFromByteCount: statsAll.uploadedBytes] : [NSString stringWithFormat: NSLocalizedString(@"%@ bytes", "stats -> bytes"), [NSString formattedUInteger: statsAll.uploadedBytes]]];
+    [fUploadedAllField setToolTip: [byteFormatter stringFromByteCount: statsAll.uploadedBytes]];
 
     [fDownloadedField setStringValue: [NSString stringForFileSize: statsSession.downloadedBytes]];
-    [fDownloadedField setToolTip: [NSApp isOnMountainLionOrBetter] ? [byteFormatter stringFromByteCount: statsSession.downloadedBytes] : [NSString stringWithFormat: NSLocalizedString(@"%@ bytes", "stats -> bytes"), [NSString formattedUInteger: statsSession.downloadedBytes]]];
+    [fDownloadedField setToolTip: [byteFormatter stringFromByteCount: statsSession.downloadedBytes]];
     [fDownloadedAllField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%@ total", "stats total"), [NSString stringForFileSize: statsAll.downloadedBytes]]];
-    [fDownloadedAllField setToolTip: [NSApp isOnMountainLionOrBetter] ? [byteFormatter stringFromByteCount: statsAll.downloadedBytes] : [NSString stringWithFormat: NSLocalizedString(@"%@ bytes", "stats -> bytes"), [NSString formattedUInteger: statsAll.downloadedBytes]]];
+    [fDownloadedAllField setToolTip: [byteFormatter stringFromByteCount: statsAll.downloadedBytes]];
 
     [byteFormatter release];
 

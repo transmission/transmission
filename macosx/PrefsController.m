@@ -134,7 +134,7 @@
         }
 
         //set built-in Growl
-        [GrowlApplicationBridge setShouldUseBuiltInNotifications: ![NSApp isOnMountainLionOrBetter] && [fDefaults boolForKey: @"DisplayNotifications"]];
+        [GrowlApplicationBridge setShouldUseBuiltInNotifications: NO];
 
         [self setAutoUpdateToBeta: nil];
     }
@@ -1504,7 +1504,7 @@
         [fGrowlAppButton setTarget: self];
         [fGrowlAppButton setAction: @selector(openGrowlApp:)];
     }
-    else if ([NSApp isOnMountainLionOrBetter])
+    else
     {
         [fBuiltInGrowlButton setHidden: YES];
         [fGrowlAppButton setHidden: NO];
@@ -1515,13 +1515,6 @@
 
         [fGrowlAppButton setTarget: self];
         [fGrowlAppButton setAction: @selector(openNotificationSystemPrefs:)];
-    }
-    else
-    {
-        [fBuiltInGrowlButton setHidden: NO];
-        [fGrowlAppButton setHidden: YES];
-
-        [fBuiltInGrowlButton setState: [fDefaults boolForKey: @"DisplayNotifications"]];
     }
 }
 

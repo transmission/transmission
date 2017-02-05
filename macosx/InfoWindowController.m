@@ -453,17 +453,10 @@ typedef enum
                     [NSString stringWithFormat: NSLocalizedString(@"%@ total", "Inspector -> selected torrents"),
                         [NSString stringForFileSize: size]]]];
 
-                NSString * byteString;
-                if ([NSApp isOnMountainLionOrBetter])
-                {
-                    NSByteCountFormatter * formatter = [[NSByteCountFormatterMtLion alloc] init];
-                    [formatter setAllowedUnits: NSByteCountFormatterUseBytes];
-                    byteString = [formatter stringFromByteCount: size];
-                    [formatter release];
-                }
-                else
-                    byteString = [NSString stringWithFormat: NSLocalizedString(@"%@ bytes", "Inspector -> selected torrents"), [NSString formattedUInteger: size]];
-                [fBasicInfoField setToolTip: byteString];
+                NSByteCountFormatter * formatter = [[NSByteCountFormatter alloc] init];
+                [formatter setAllowedUnits: NSByteCountFormatterUseBytes];
+                [fBasicInfoField setToolTip: [formatter stringFromByteCount: size]];
+                [formatter release];
             }
             else
             {
@@ -512,17 +505,10 @@ typedef enum
             }
             [fBasicInfoField setStringValue: basicString];
 
-            NSString * byteString;
-            if ([NSApp isOnMountainLionOrBetter])
-            {
-                NSByteCountFormatter * formatter = [[NSByteCountFormatterMtLion alloc] init];
-                [formatter setAllowedUnits: NSByteCountFormatterUseBytes];
-                byteString = [formatter stringFromByteCount: [torrent size]];
-                [formatter release];
-            }
-            else
-                byteString = [NSString stringWithFormat: NSLocalizedString(@"%@ bytes", "Inspector -> selected torrents"), [NSString formattedUInteger: [torrent size]]];
-            [fBasicInfoField setToolTip: byteString];
+            NSByteCountFormatter * formatter = [[NSByteCountFormatter alloc] init];
+            [formatter setAllowedUnits: NSByteCountFormatterUseBytes];
+            [fBasicInfoField setToolTip: [formatter stringFromByteCount: [torrent size]]];
+            [formatter release];
         }
         else
         {

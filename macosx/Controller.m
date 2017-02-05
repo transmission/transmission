@@ -392,34 +392,23 @@ static void removeKeRangerRansomware()
         tr_variantDictAddBool(&settings, TR_KEY_utp_enabled, [fDefaults boolForKey: @"UTPGlobal"]);
 
 
-        NSString * kbString, * mbString, * gbString, * tbString;
-        if ([NSApp isOnMountainLionOrBetter])
-        {
-            NSByteCountFormatter * unitFormatter = [[NSByteCountFormatterMtLion alloc] init];
-            [unitFormatter setIncludesCount: NO];
-            [unitFormatter setAllowsNonnumericFormatting: NO];
+        NSByteCountFormatter * unitFormatter = [[NSByteCountFormatter alloc] init];
+        [unitFormatter setIncludesCount: NO];
+        [unitFormatter setAllowsNonnumericFormatting: NO];
 
-            [unitFormatter setAllowedUnits: NSByteCountFormatterUseKB];
-            kbString = [unitFormatter stringFromByteCount: 17]; //use a random value to avoid possible pluralization issues with 1 or 0 (an example is if we use 1 for bytes, we'd get "byte" when we'd want "bytes" for the generic libtransmission value at least)
+        [unitFormatter setAllowedUnits: NSByteCountFormatterUseKB];
+        NSString * kbString = [unitFormatter stringFromByteCount: 17]; //use a random value to avoid possible pluralization issues with 1 or 0 (an example is if we use 1 for bytes, we'd get "byte" when we'd want "bytes" for the generic libtransmission value at least)
 
-            [unitFormatter setAllowedUnits: NSByteCountFormatterUseMB];
-            mbString = [unitFormatter stringFromByteCount: 17];
+        [unitFormatter setAllowedUnits: NSByteCountFormatterUseMB];
+        NSString * mbString = [unitFormatter stringFromByteCount: 17];
 
-            [unitFormatter setAllowedUnits: NSByteCountFormatterUseGB];
-            gbString = [unitFormatter stringFromByteCount: 17];
+        [unitFormatter setAllowedUnits: NSByteCountFormatterUseGB];
+        NSString * gbString = [unitFormatter stringFromByteCount: 17];
 
-            [unitFormatter setAllowedUnits: NSByteCountFormatterUseTB];
-            tbString = [unitFormatter stringFromByteCount: 17];
+        [unitFormatter setAllowedUnits: NSByteCountFormatterUseTB];
+        NSString * tbString = [unitFormatter stringFromByteCount: 17];
 
-            [unitFormatter release];
-        }
-        else
-        {
-            kbString = NSLocalizedString(@"KB", "file/memory size - kilobytes");
-            mbString = NSLocalizedString(@"MB", "file/memory size - megabytes");
-            gbString = NSLocalizedString(@"GB", "file/memory size - gigabytes");
-            tbString = NSLocalizedString(@"TB", "file/memory size - terabytes");
-        }
+        [unitFormatter release];
 
         tr_formatter_size_init(1000, [kbString UTF8String],
                                         [mbString UTF8String],
@@ -598,14 +587,7 @@ static void removeKeRangerRansomware()
 
     fBadger = [[Badger alloc] initWithLib: fLib];
 
-    if ([NSApp isOnMountainLionOrBetter])
-        [[NSUserNotificationCenterMtLion defaultUserNotificationCenter] setDelegate: self];
-
-    // remove Share menu items
-    if (![NSApp isOnMountainLionOrBetter]) {
-        [[fShareMenuItem menu] removeItem:fShareMenuItem];
-        [[fShareContextMenuItem menu] removeItem:fShareContextMenuItem];
-    }
+    [[NSUserNotificationCenter defaultUserNotificationCenter] setDelegate: self];
 
     //observe notifications
     NSNotificationCenter * nc = [NSNotificationCenter defaultCenter];
@@ -683,12 +665,9 @@ static void removeKeRangerRansomware()
         forEventClass: kCoreEventClass andEventID: kAEOpenContents];
 
     //if we were opened from a user notification, do the corresponding action
-    if ([NSApp isOnMountainLionOrBetter])
-    {
-        NSUserNotification * launchNotification = [[notification userInfo] objectForKey: NSApplicationLaunchUserNotificationKey];
-        if (launchNotification)
-            [self userNotificationCenter: nil didActivateNotification: launchNotification];
-    }
+    NSUserNotification * launchNotification = [[notification userInfo] objectForKey: NSApplicationLaunchUserNotificationKey];
+    if (launchNotification)
+        [self userNotificationCenter: nil didActivateNotification: launchNotification];
 
     //auto importing
     [self checkAutoImportDirectory];
@@ -2109,23 +2088,20 @@ static void removeKeRangerRansomware()
         NSString * location = [torrent dataLocation];
 
         NSString * notificationTitle = NSLocalizedString(@"Download Complete", "notification title");
-        if ([NSApp isOnMountainLionOrBetter])
-        {
-            NSUserNotification * notification = [[NSUserNotificationMtLion alloc] init];
-            [notification setTitle: notificationTitle];
-            [notification setInformativeText: [torrent name]];
+        NSUserNotification * notification = [[NSUserNotification alloc] init];
+        [notification setTitle: notificationTitle];
+        [notification setInformativeText: [torrent name]];
 
-            [notification setHasActionButton: YES];
-            [notification setActionButtonTitle: NSLocalizedString(@"Show", "notification button")];
+        [notification setHasActionButton: YES];
+        [notification setActionButtonTitle: NSLocalizedString(@"Show", "notification button")];
 
-            NSMutableDictionary * userInfo = [NSMutableDictionary dictionaryWithObject: [torrent hashString] forKey: @"Hash"];
-            if (location)
-                [userInfo setObject: location forKey: @"Location"];
-            [notification setUserInfo: userInfo];
+        NSMutableDictionary * userInfo = [NSMutableDictionary dictionaryWithObject: [torrent hashString] forKey: @"Hash"];
+        if (location)
+            [userInfo setObject: location forKey: @"Location"];
+        [notification setUserInfo: userInfo];
 
-            [[NSUserNotificationCenterMtLion defaultUserNotificationCenter] deliverNotification: notification];
-            [notification release];
-        }
+        [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification: notification];
+        [notification release];
 
         NSMutableDictionary * clickContext = [NSMutableDictionary dictionaryWithObjectsAndKeys:
                                               GROWL_DOWNLOAD_COMPLETE, @"Type", nil];
@@ -2136,8 +2112,6 @@ static void removeKeRangerRansomware()
         [GrowlApplicationBridge notifyWithTitle: notificationTitle
                                     description: [torrent name] notificationName: GROWL_DOWNLOAD_COMPLETE
                                     iconData: nil priority: 0 isSticky: NO clickContext: clickContext];
-
-        //NSLog(@"delegate: %@", [[NSUserNotificationCenterMtLion defaultUserNotificationCenter] delegate]);
 
         if (![fWindow isMainWindow])
             [fBadger addCompletedTorrent: torrent];
@@ -2173,23 +2147,20 @@ static void removeKeRangerRansomware()
     NSString * location = [torrent dataLocation];
 
     NSString * notificationTitle = NSLocalizedString(@"Seeding Complete", "notification title");
-    if ([NSApp isOnMountainLionOrBetter])
-    {
-        NSUserNotification * notification = [[NSUserNotificationMtLion alloc] init];
-        [notification setTitle: notificationTitle];
-        [notification setInformativeText: [torrent name]];
+    NSUserNotification * userNotification = [[NSUserNotification alloc] init];
+    [userNotification setTitle: notificationTitle];
+    [userNotification setInformativeText: [torrent name]];
 
-        [notification setHasActionButton: YES];
-        [notification setActionButtonTitle: NSLocalizedString(@"Show", "notification button")];
+    [userNotification setHasActionButton: YES];
+    [userNotification setActionButtonTitle: NSLocalizedString(@"Show", "notification button")];
 
-        NSMutableDictionary * userInfo = [NSMutableDictionary dictionaryWithObject: [torrent hashString] forKey: @"Hash"];
-        if (location)
-            [userInfo setObject: location forKey: @"Location"];
-        [notification setUserInfo: userInfo];
+    NSMutableDictionary * userInfo = [NSMutableDictionary dictionaryWithObject: [torrent hashString] forKey: @"Hash"];
+    if (location)
+        [userInfo setObject: location forKey: @"Location"];
+    [userNotification setUserInfo: userInfo];
 
-        [[NSUserNotificationCenterMtLion defaultUserNotificationCenter] deliverNotification: notification];
-        [notification release];
-    }
+    [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification: userNotification];
+    [userNotification release];
 
     NSMutableDictionary * clickContext = [NSMutableDictionary dictionaryWithObject: GROWL_SEEDING_COMPLETE forKey: @"Type"];
 
@@ -2971,17 +2942,14 @@ static void removeKeRangerRansomware()
                 [self openFiles: [NSArray arrayWithObject: fullFile] addType: ADD_AUTO forcePath: nil];
 
                 NSString * notificationTitle = NSLocalizedString(@"Torrent File Auto Added", "notification title");
-                if ([NSApp isOnMountainLionOrBetter])
-                {
-                    NSUserNotification* notification = [[NSUserNotificationMtLion alloc] init];
-                    [notification setTitle: notificationTitle];
-                    [notification setInformativeText: file];
+                NSUserNotification* notification = [[NSUserNotification alloc] init];
+                [notification setTitle: notificationTitle];
+                [notification setInformativeText: file];
 
-                    [notification setHasActionButton: NO];
+                [notification setHasActionButton: NO];
 
-                    [[NSUserNotificationCenterMtLion defaultUserNotificationCenter] deliverNotification: notification];
-                    [notification release];
-                }
+                [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification: notification];
+                [notification release];
 
                 [GrowlApplicationBridge notifyWithTitle: notificationTitle
                     description: file notificationName: GROWL_AUTO_ADD iconData: nil priority: 0 isSticky: NO
@@ -4013,30 +3981,20 @@ static void removeKeRangerRansomware()
 
 - (NSArray *) toolbarAllowedItemIdentifiers: (NSToolbar *) toolbar
 {
-    NSMutableArray *items = [NSMutableArray arrayWithObjects:
-                             TOOLBAR_CREATE, TOOLBAR_OPEN_FILE, TOOLBAR_OPEN_WEB, TOOLBAR_REMOVE,
-                             TOOLBAR_PAUSE_RESUME_SELECTED, TOOLBAR_PAUSE_RESUME_ALL,
-                             TOOLBAR_SHARE, TOOLBAR_QUICKLOOK, TOOLBAR_FILTER, TOOLBAR_INFO,
-                             NSToolbarSeparatorItemIdentifier,
-                             NSToolbarSpaceItemIdentifier,
-                             NSToolbarFlexibleSpaceItemIdentifier,
-                             NSToolbarCustomizeToolbarItemIdentifier, nil];
-    if (![NSApp isOnMountainLionOrBetter]) {
-        [items removeObject:TOOLBAR_SHARE];
-    }
-    return items;
+    return @[ TOOLBAR_CREATE, TOOLBAR_OPEN_FILE, TOOLBAR_OPEN_WEB, TOOLBAR_REMOVE,
+              TOOLBAR_PAUSE_RESUME_SELECTED, TOOLBAR_PAUSE_RESUME_ALL,
+              TOOLBAR_SHARE, TOOLBAR_QUICKLOOK, TOOLBAR_FILTER, TOOLBAR_INFO,
+              NSToolbarSeparatorItemIdentifier,
+              NSToolbarSpaceItemIdentifier,
+              NSToolbarFlexibleSpaceItemIdentifier,
+              NSToolbarCustomizeToolbarItemIdentifier ];
 }
 
 - (NSArray *) toolbarDefaultItemIdentifiers: (NSToolbar *) toolbar
 {
-    NSMutableArray *items = [NSMutableArray arrayWithObjects:
-                             TOOLBAR_CREATE, TOOLBAR_OPEN_FILE, TOOLBAR_REMOVE, NSToolbarSpaceItemIdentifier,
-                             TOOLBAR_PAUSE_RESUME_ALL, NSToolbarFlexibleSpaceItemIdentifier,
-                             TOOLBAR_SHARE, TOOLBAR_QUICKLOOK, TOOLBAR_FILTER, TOOLBAR_INFO, nil];
-    if (![NSApp isOnMountainLionOrBetter]) {
-        [items removeObject:TOOLBAR_SHARE];
-    }
-    return items;
+    return @[ TOOLBAR_CREATE, TOOLBAR_OPEN_FILE, TOOLBAR_REMOVE, NSToolbarSpaceItemIdentifier,
+              TOOLBAR_PAUSE_RESUME_ALL, NSToolbarFlexibleSpaceItemIdentifier,
+              TOOLBAR_SHARE, TOOLBAR_QUICKLOOK, TOOLBAR_FILTER, TOOLBAR_INFO ];
 }
 
 - (BOOL) validateToolbarItem: (NSToolbarItem *) toolbarItem
