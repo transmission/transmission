@@ -31,6 +31,14 @@
 #define ADD_TAG 0
 #define REMOVE_TAG 1
 
+@interface GroupsPrefsController ()
+
+@property (nonatomic, retain) IBOutlet NSWindow * groupRulesSheetWindow;
+@property (nonatomic, assign) IBOutlet NSPredicateEditor * ruleEditor;
+@property (nonatomic, assign) IBOutlet NSLayoutConstraint * ruleEditorHeightConstraint;
+
+@end
+
 @interface GroupsPrefsController (Private)
 
 - (void) updateSelectedGroup;
@@ -39,6 +47,10 @@
 @end
 
 @implementation GroupsPrefsController
+
+@synthesize groupRulesSheetWindow;
+@synthesize ruleEditor;
+@synthesize ruleEditorHeightConstraint;
 
 - (void) awakeFromNib
 {
@@ -252,24 +264,24 @@
 
 - (IBAction) orderFrontRulesSheet: (id) sender
 {
-    if (!fGroupRulesSheetWindow)
-        [NSBundle loadNibNamed: @"GroupRules" owner: self];
+    if (!self.groupRulesSheetWindow)
+        [[NSBundle mainBundle] loadNibNamed: @"GroupRules" owner: self topLevelObjects: NULL];
 
     NSInteger index = [[GroupsController groups] indexForRow: [fTableView selectedRow]];
     NSPredicate *predicate = [[GroupsController groups] autoAssignRulesForIndex: index];
-    [fRuleEditor setObjectValue: predicate];
+    [self.ruleEditor setObjectValue: predicate];
 
-    if ([fRuleEditor numberOfRows] == 0)
-        [fRuleEditor addRow: nil];
+    if ([self.ruleEditor numberOfRows] == 0)
+        [self.ruleEditor addRow: nil];
 
-    [NSApp beginSheet: fGroupRulesSheetWindow modalForWindow: [fTableView window] modalDelegate: nil didEndSelector: NULL
+    [NSApp beginSheet: self.groupRulesSheetWindow modalForWindow: [fTableView window] modalDelegate: nil didEndSelector: NULL
         contextInfo: NULL];
 }
 
 - (IBAction) cancelRules: (id) sender
 {
-    [fGroupRulesSheetWindow orderOut: nil];
-    [NSApp endSheet: fGroupRulesSheetWindow];
+    [self.groupRulesSheetWindow orderOut: nil];
+    [NSApp endSheet: self.groupRulesSheetWindow];
 
     NSInteger index = [[GroupsController groups] indexForRow: [fTableView selectedRow]];
     if (![[GroupsController groups] autoAssignRulesForIndex: index])
@@ -282,13 +294,13 @@
 
 - (IBAction) saveRules: (id) sender
 {
-    [fGroupRulesSheetWindow orderOut: nil];
-    [NSApp endSheet: fGroupRulesSheetWindow];
+    [self.groupRulesSheetWindow orderOut: nil];
+    [NSApp endSheet: self.groupRulesSheetWindow];
 
     NSInteger index = [[GroupsController groups] indexForRow: [fTableView selectedRow]];
     [[GroupsController groups] setUsesAutoAssignRules: YES forIndex: index];
 
-    NSPredicate * predicate = [fRuleEditor objectValue];
+    NSPredicate * predicate = [self.ruleEditor objectValue];
     [[GroupsController groups] setAutoAssignRules: predicate forIndex: index];
 
     [fAutoAssignRulesEnableCheck setState: [[GroupsController groups] usesAutoAssignRulesForIndex: index]];
@@ -297,15 +309,15 @@
 
 - (void) ruleEditorRowsDidChange: (NSNotification *) notification
 {
-    NSScrollView * ruleEditorScrollView = [fRuleEditor enclosingScrollView];
+    NSScrollView * ruleEditorScrollView = [self.ruleEditor enclosingScrollView];
 
-    const CGFloat rowHeight = [fRuleEditor rowHeight];
+    const CGFloat rowHeight = [self.ruleEditor rowHeight];
     const CGFloat bordersHeight = [ruleEditorScrollView frame].size.height - [ruleEditorScrollView contentSize].height;
 
-    const CGFloat requiredRowCount = [fRuleEditor numberOfRows];
-    const CGFloat maxVisibleRowCount = (long)((NSHeight([[[fRuleEditor window] screen] visibleFrame]) * 2 / 3) / rowHeight);
+    const CGFloat requiredRowCount = [self.ruleEditor numberOfRows];
+    const CGFloat maxVisibleRowCount = (long)((NSHeight([[[self.ruleEditor window] screen] visibleFrame]) * 2 / 3) / rowHeight);
 
-    [fRuleEditorHeightConstraint setConstant: MIN(requiredRowCount, maxVisibleRowCount) * rowHeight + bordersHeight];
+    [self.ruleEditorHeightConstraint setConstant: MIN(requiredRowCount, maxVisibleRowCount) * rowHeight + bordersHeight];
     [ruleEditorScrollView setHasVerticalScroller: requiredRowCount > maxVisibleRowCount];
 }
 

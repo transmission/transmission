@@ -8,9 +8,9 @@
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="GroupsPrefsController">
             <connections>
-                <outlet property="fGroupRulesSheetWindow" destination="1" id="17"/>
-                <outlet property="fRuleEditor" destination="34" id="56"/>
-                <outlet property="fRuleEditorHeightConstraint" destination="v6L-SJ-HFk" id="nX1-ss-fWF"/>
+                <outlet property="groupRulesSheetWindow" destination="1" id="17"/>
+                <outlet property="ruleEditor" destination="34" id="56"/>
+                <outlet property="ruleEditorHeightConstraint" destination="v6L-SJ-HFk" id="nX1-ss-fWF"/>
             </connections>
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>

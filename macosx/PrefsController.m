@@ -1525,6 +1525,11 @@
     }
 }
 
+static NSString * getOSStatusDescription(OSStatus errorCode)
+{
+    return [[NSError errorWithDomain: NSOSStatusErrorDomain code: errorCode userInfo: NULL] description];
+}
+
 - (void) setKeychainPassword: (const char *) password forService: (const char *) service username: (const char *) username
 {
     SecKeychainItemRef item = NULL;
@@ -1537,13 +1542,15 @@
         {
             result = SecKeychainItemModifyAttributesAndData(item, NULL, passwordLength, (const void *)password);
             if (result != noErr)
-                NSLog(@"Problem updating Keychain item: %s", GetMacOSStatusErrorString(result));
+                NSLog(@"Problem updating Keychain item: %@", getOSStatusDescription(result));
         }
         else //remove the item
         {
             result = SecKeychainItemDelete(item);
             if (result != noErr)
-                NSLog(@"Problem removing Keychain item: %s", GetMacOSStatusErrorString(result));
+            {
+                NSLog(@"Problem removing Keychain item: %@", getOSStatusDescription(result));
+            }
         }
     }
     else if (result == errSecItemNotFound) //not found, so add
@@ -1553,11 +1560,11 @@
             result = SecKeychainAddGenericPassword(NULL, strlen(service), service, strlen(username), username,
                         passwordLength, (const void *)password, NULL);
             if (result != noErr)
-                NSLog(@"Problem adding Keychain item: %s", GetMacOSStatusErrorString(result));
+                NSLog(@"Problem adding Keychain item: %@", getOSStatusDescription(result));
         }
     }
     else
-        NSLog(@"Problem accessing Keychain: %s", GetMacOSStatusErrorString(result));
+        NSLog(@"Problem accessing Keychain: %@", getOSStatusDescription(result));
 }
 
 @end
