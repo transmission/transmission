@@ -1863,16 +1863,26 @@ bool trashDataFile(const char * filename, tr_error ** error)
 
             //quarantine the finished data
             NSString * dataLocation = [[self currentDirectory] stringByAppendingPathComponent: [self name]];
-            FSRef ref;
-            if (FSPathMakeRef((const UInt8 *)[dataLocation UTF8String], &ref, NULL) == noErr)
+            NSDictionary * quarantineProperties = @{ (NSString *)kLSQuarantineTypeKey : (NSString *)kLSQuarantineTypeOtherDownload };
+            if ([NSApp isOnYosemiteOrBetter])
             {
-                NSDictionary * quarantineProperties = [NSDictionary dictionaryWithObject: (NSString *)kLSQuarantineTypeOtherDownload forKey: (NSString *)kLSQuarantineTypeKey];
-                if (LSSetItemAttribute(&ref, kLSRolesAll, kLSItemQuarantineProperties, quarantineProperties) != noErr)
-                    NSLog(@"Failed to quarantine: %@", dataLocation);
+                NSURL * dataLocationUrl = [NSURL fileURLWithPath: dataLocation];
+                NSError * error = nil;
+                if (![dataLocationUrl setResourceValue: quarantineProperties forKey: NSURLQuarantinePropertiesKey error: &error])
+                    NSLog(@"Failed to quarantine %@: %@", dataLocation, [error description]);
             }
             else
-                NSLog(@"Could not find file to quarantine: %@", dataLocation);
-
+            {
+                NSString * dataLocation = [[self currentDirectory] stringByAppendingPathComponent: [self name]];
+                FSRef ref;
+                if (FSPathMakeRef((const UInt8 *)[dataLocation UTF8String], &ref, NULL) == noErr)
+                {
+                    if (LSSetItemAttribute(&ref, kLSRolesAll, kLSItemQuarantineProperties, quarantineProperties) != noErr)
+                        NSLog(@"Failed to quarantine: %@", dataLocation);
+                }
+                else
+                    NSLog(@"Could not find file to quarantine: %@", dataLocation);
+            }
             break;
         }
         case TR_LEECH:

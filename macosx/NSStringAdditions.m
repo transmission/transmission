@@ -46,66 +46,40 @@
     return [self stringByAppendingString: [NSString ellipsis]];
 }
 
-#warning use localizedStringWithFormat: directly when 10.8-only
+#warning use localizedStringWithFormat: directly when 10.9-only and stringsdict translations are in place
 + (NSString *) formattedUInteger: (NSUInteger) value
 {
-    if ([NSApp isOnMountainLionOrBetter])
-        return [NSString localizedStringWithFormat: @"%lu", value];
-    else
-    {
-        static NSNumberFormatter * numberFormatter;
-        static dispatch_once_t onceToken;
-        dispatch_once(&onceToken, ^{
-            numberFormatter = [[NSNumberFormatter alloc] init];
-            [numberFormatter setNumberStyle: NSNumberFormatterDecimalStyle];
-            [numberFormatter setMaximumFractionDigits: 0];
-        });
-
-        return [numberFormatter stringFromNumber: [NSNumber numberWithUnsignedInteger: value]];
-    }
+    return [NSString localizedStringWithFormat: @"%lu", value];
 }
 
 #warning should we take long long instead?
 + (NSString *) stringForFileSize: (uint64_t) size
 {
-    if ([NSApp isOnMountainLionOrBetter])
-        return [NSByteCountFormatterMtLion stringFromByteCount: size countStyle: NSByteCountFormatterCountStyleFile];
-    else
-        return [self stringForFileSizeLion: size showUnitUnless: nil unitsUsed: nil];
+    return [NSByteCountFormatter stringFromByteCount: size countStyle: NSByteCountFormatterCountStyleFile];
 }
 
 #warning should we take long long instead?
 + (NSString *) stringForFilePartialSize: (uint64_t) partialSize fullSize: (uint64_t) fullSize
 {
-    NSString * partialString, * fullString;
-    if ([NSApp isOnMountainLionOrBetter])
-    {
-        NSByteCountFormatter * fileSizeFormatter = [[NSByteCountFormatterMtLion alloc] init];
+    NSByteCountFormatter * fileSizeFormatter = [[NSByteCountFormatter alloc] init];
 
-        fullString = [fileSizeFormatter stringFromByteCount: fullSize];
+    NSString * fullString = [fileSizeFormatter stringFromByteCount: fullSize];
 
-        //figure out the magniture of the two, since we can't rely on comparing the units because of localization and pluralization issues (for example, "1 byte of 2 bytes")
-        BOOL partialUnitsSame;
-        if (partialSize == 0)
-            partialUnitsSame = YES; //we want to just show "0" when we have no partial data, so always set to the same units
-        else
-        {
-            const unsigned int magnitudePartial = log(partialSize)/log(1000);
-            const unsigned int magnitudeFull = fullSize < 1000 ? 0 : log(fullSize)/log(1000); //we have to catch 0 with a special case, so might as well avoid the math for all of magnitude 0
-            partialUnitsSame = magnitudePartial == magnitudeFull;
-        }
-
-        [fileSizeFormatter setIncludesUnit: !partialUnitsSame];
-        partialString = [fileSizeFormatter stringFromByteCount: partialSize];
-
-        [fileSizeFormatter release];
-    }
+    //figure out the magniture of the two, since we can't rely on comparing the units because of localization and pluralization issues (for example, "1 byte of 2 bytes")
+    BOOL partialUnitsSame;
+    if (partialSize == 0)
+        partialUnitsSame = YES; //we want to just show "0" when we have no partial data, so always set to the same units
     else
     {
-        NSString * units;
-        fullString = [self stringForFileSizeLion: fullSize showUnitUnless: nil unitsUsed: &units];
-        partialString = [self stringForFileSizeLion: partialSize showUnitUnless: units unitsUsed: nil];
+        const unsigned int magnitudePartial = log(partialSize)/log(1000);
+        const unsigned int magnitudeFull = fullSize < 1000 ? 0 : log(fullSize)/log(1000); //we have to catch 0 with a special case, so might as well avoid the math for all of magnitude 0
+        partialUnitsSame = magnitudePartial == magnitudeFull;
     }
+
+    [fileSizeFormatter setIncludesUnit: !partialUnitsSame];
+    NSString * partialString = [fileSizeFormatter stringFromByteCount: partialSize];
+
+    [fileSizeFormatter release];
 
     return [NSString stringWithFormat: NSLocalizedString(@"%@ of %@", "file size string"), partialString, fullString];
 }

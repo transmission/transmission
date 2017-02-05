@@ -22,13 +22,8 @@
 
 #import <AppKit/AppKit.h>
 
-#define NSByteCountFormatterMtLion NSClassFromString(@"NSByteCountFormatter")
-#define NSUserNotificationMtLion NSClassFromString(@"NSUserNotification")
-#define NSUserNotificationCenterMtLion NSClassFromString(@"NSUserNotificationCenter")
-
 @interface NSApplication (NSApplicationAdditions)
 
-- (BOOL) isOnMountainLionOrBetter;
 - (BOOL) isOnYosemiteOrBetter;
 
 @end
