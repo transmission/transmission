@@ -1,9 +1,10 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="9531" systemVersion="15B42" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11762" systemVersion="16D32" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="9531"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11762"/>
         <capability name="box content view" minToolsVersion="7.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="AddMagnetWindowController">
@@ -96,7 +97,7 @@ Gw
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <box title="Box" borderType="line" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="102">
+                    <box borderType="line" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="102">
                         <rect key="frame" x="17" y="56" width="376" height="103"/>
                         <view key="contentView" id="xWJ-qu-F1m">
                             <rect key="frame" x="1" y="1" width="374" height="101"/>
@@ -200,8 +201,6 @@ Gw
                                         <constraint firstAttribute="bottom" secondItem="11" secondAttribute="bottom" constant="4" id="pXd-Et-qSg"/>
                                         <constraint firstAttribute="trailing" secondItem="12" secondAttribute="trailing" constant="8" id="rwE-2S-hoU"/>
                                     </constraints>
-                                    <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
-                                    <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                 </box>
                                 <button horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="9">
                                     <rect key="frame" x="290" y="63" width="75" height="28"/>
@@ -245,8 +244,6 @@ Gw
                             <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="33" secondAttribute="trailing" constant="12" id="UOi-ih-uaZ"/>
                             <constraint firstItem="10" firstAttribute="top" secondItem="102" secondAttribute="top" constant="12" id="rZh-Hj-QWi"/>
                         </constraints>
-                        <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
-                        <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                     </box>
                 </subviews>
                 <constraints>
