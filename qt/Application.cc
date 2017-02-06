@@ -317,7 +317,7 @@ Application::loadTranslations ()
     QLatin1String ("qtbase");
 #endif
 
-  const QLocale locale = QLocale::system ();
+  const QLocale locale;
   const QLocale englishLocale (QLocale::English, QLocale::UnitedStates);
 
   if (loadTranslation (myQtTranslator, qtFileName, locale, qtQmDirs) ||
