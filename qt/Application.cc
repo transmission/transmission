@@ -70,15 +70,14 @@ namespace
   };
 
   bool
-  loadTranslation (QTranslator& translator, const QString& name, const QString& localeName,
+  loadTranslation (QTranslator& translator, const QString& name, const QLocale& locale,
                    const QStringList& searchDirectories)
   {
-    const QString filename = name + QLatin1Char ('_') + localeName;
     for (const QString& directory: searchDirectories)
-    {
-      if (translator.load (filename, directory))
-        return true;
-    }
+      {
+        if (translator.load (locale, name, QLatin1String ("_"), directory))
+          return true;
+      }
 
     return false;
   }
@@ -311,17 +310,23 @@ Application::loadTranslations ()
 #endif
     (applicationDirPath () + QLatin1String ("/translations"));
 
-  QString localeName = QLocale ().name ();
+  const QString qtFileName =
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+    QLatin1String ("qt");
+#else
+    QLatin1String ("qtbase");
+#endif
 
-  if (!loadTranslation (myAppTranslator, MY_CONFIG_NAME, localeName, appQmDirs))
-    {
-      localeName = QLatin1String ("en");
-      loadTranslation (myAppTranslator, MY_CONFIG_NAME, localeName, appQmDirs);
-    }
+  const QLocale locale = QLocale::system ();
+  const QLocale englishLocale (QLocale::English, QLocale::UnitedStates);
 
-  if (loadTranslation (myQtTranslator, QLatin1String ("qt"), localeName, qtQmDirs))
+  if (loadTranslation (myQtTranslator, qtFileName, locale, qtQmDirs) ||
+      loadTranslation (myQtTranslator, qtFileName, englishLocale, qtQmDirs))
     installTranslator (&myQtTranslator);
-  installTranslator (&myAppTranslator);
+
+  if (loadTranslation (myAppTranslator, MY_CONFIG_NAME, locale, appQmDirs) ||
+      loadTranslation (myAppTranslator, MY_CONFIG_NAME, englishLocale, appQmDirs))
+    installTranslator (&myAppTranslator);
 }
 
 void
