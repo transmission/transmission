@@ -105,6 +105,7 @@ SOURCES += AboutDialog.cc \
            SessionDialog.cc \
            SqueezeLabel.cc \
            StatsDialog.cc \
+           StyleHelper.cc \
            Torrent.cc \
            TorrentDelegate.cc \
            TorrentDelegateMin.cc \

@@ -181,6 +181,23 @@ Utils::guessMimeIcon (const QString& filename)
   return fallback;
 }
 
+QIcon
+Utils::getIconFromIndex (const QModelIndex& index)
+{
+  const QVariant variant = index.data (Qt::DecorationRole);
+  switch (variant.type ())
+    {
+      case QVariant::Icon:
+        return qvariant_cast<QIcon> (variant);
+
+      case QVariant::Pixmap:
+        return QIcon (qvariant_cast<QPixmap> (variant));
+
+      default:
+        return QIcon ();
+    }
+}
+
 bool
 Utils::isValidUtf8 (const char * s)
 {

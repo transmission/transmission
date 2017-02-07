@@ -589,6 +589,9 @@ tr_main (int    argc,
 {
   InteropHelper::initialize ();
 
+  Application::setAttribute (Qt::AA_EnableHighDpiScaling);
+  Application::setAttribute (Qt::AA_UseHighDpiPixmaps);
+
   Application app (argc, argv);
   return app.exec ();
 }

@@ -13,6 +13,7 @@
 
 #include "FilterBarComboBox.h"
 #include "FilterBarComboBoxDelegate.h"
+#include "StyleHelper.h"
 #include "Utils.h"
 
 namespace
@@ -86,10 +87,10 @@ FilterBarComboBoxDelegate::paint (QPainter                    * painter,
       Utils::narrowRect (boundingBox, 0, countRect.width () + hmargin, option.direction);
       const QRect displayRect = boundingBox;
 
+      const QIcon icon = Utils::getIconFromIndex (index);
+
       drawBackground (painter, option, index);
-      QStyleOptionViewItem option2 = option;
-      option2.decorationSize = myCombo->iconSize ();
-      drawDecoration (painter, option, decorationRect, decoration (option2,index.data (Qt::DecorationRole)));
+      icon.paint (painter, decorationRect, Qt::AlignCenter, StyleHelper::getIconMode (option.state), QIcon::Off);
       drawDisplay (painter, option, displayRect, index.data (Qt::DisplayRole).toString ());
       drawDisplay (painter, disabledOption, countRect, index.data (FilterBarComboBox::CountStringRole).toString ());
       drawFocus (painter, option, displayRect|countRect);
@@ -113,7 +114,7 @@ FilterBarComboBoxDelegate::sizeHint (const QStyleOptionViewItem & option,
       QSize size = QItemDelegate::sizeHint (option, index);
       size.setHeight (qMax (size.height (), myCombo->iconSize ().height () + 6));
       size.rwidth () += s->pixelMetric (QStyle::PM_FocusFrameHMargin, 0, myCombo);
-      size.rwidth () += rect (option,index,FilterBarComboBox::CountStringRole).width ();
+      size.rwidth () += rect (option, index, FilterBarComboBox::CountStringRole).width ();
       size.rwidth () += hmargin * 4;
       return size;
     }

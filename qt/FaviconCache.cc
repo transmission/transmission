@@ -104,9 +104,7 @@ FaviconCache::findFromHost (const QString& host)
 {
   ensureCacheDirHasBeenScanned ();
 
-  const QPixmap pixmap = myPixmaps[host];
-  const QSize rightSize = getIconSize ();
-  return pixmap.isNull () || pixmap.size () == rightSize ? pixmap : pixmap.scaled (rightSize);
+  return myPixmaps[host];
 }
 
 void

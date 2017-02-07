@@ -59,6 +59,7 @@ set(${PROJECT_NAME}_SOURCES
     SessionDialog.cc
     SqueezeLabel.cc
     StatsDialog.cc
+    StyleHelper.cc
     Torrent.cc
     TorrentDelegate.cc
     TorrentDelegateMin.cc
@@ -119,6 +120,7 @@ set(${PROJECT_NAME}_HEADERS
     Speed.h
     SqueezeLabel.h
     StatsDialog.h
+    StyleHelper.h
     Torrent.h
     TorrentDelegate.h
     TorrentDelegateMin.h

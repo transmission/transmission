@@ -147,7 +147,7 @@ FilterBar::refreshTrackers ()
       const int count = torrentsPerHost[name];
       row->setData (count, FilterBarComboBox::CountRole);
       row->setData (getCountString (count), FilterBarComboBox::CountStringRole);
-      row->setData (favicons.findFromHost (host), Qt::DecorationRole);
+      row->setData (QIcon (favicons.findFromHost (host)), Qt::DecorationRole);
     }
 
   // rows to remove
@@ -182,7 +182,7 @@ FilterBar::refreshTrackers ()
       const int count = torrentsPerHost[host];
       row->setData (count, FilterBarComboBox::CountRole);
       row->setData (getCountString (count), FilterBarComboBox::CountStringRole);
-      row->setData (favicons.findFromHost (host), Qt::DecorationRole);
+      row->setData (QIcon (favicons.findFromHost (host)), Qt::DecorationRole);
       row->setData (host, TrackerRole);
       myTrackerModel->insertRow (i, row);
       anyAdded = true;
