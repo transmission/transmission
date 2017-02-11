@@ -1,27 +1,5 @@
 project(trqt)
 
-if(USE_QT5)
-    macro(tr_qt_wrap_ui)
-        qt5_wrap_ui(${ARGN})
-    endmacro()
-    macro(tr_qt_add_resources)
-        qt5_add_resources(${ARGN})
-    endmacro()
-    macro(tr_qt_add_translation)
-        qt5_add_translation(${ARGN})
-    endmacro()
-else()
-    macro(tr_qt_wrap_ui)
-        qt4_wrap_ui(${ARGN})
-    endmacro()
-    macro(tr_qt_add_resources)
-        qt4_add_resources(${ARGN})
-    endmacro()
-    macro(tr_qt_add_translation)
-        qt4_add_translation(${ARGN})
-    endmacro()
-endif()
-
 set(${PROJECT_NAME}_SOURCES
     AboutDialog.cc
     AddData.cc

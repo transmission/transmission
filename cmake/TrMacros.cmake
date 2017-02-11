@@ -184,3 +184,15 @@ function(tr_fixup_bundle_item BUNDLE_DIR BUNDLE_ITEMS DEP_DIRS)
         endforeach()
     endwhile()
 endfunction()
+
+macro(tr_qt_wrap_ui)
+    qt5_wrap_ui(${ARGN})
+endmacro()
+
+macro(tr_qt_add_resources)
+    qt5_add_resources(${ARGN})
+endmacro()
+
+macro(tr_qt_add_translation)
+    qt5_add_translation(${ARGN})
+endmacro()
