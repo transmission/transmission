@@ -97,10 +97,6 @@ Application::Application (int& argc, char ** argv):
 
   Formatter::initUnits ();
 
-#if QT_VERSION >= QT_VERSION_CHECK(5, 1, 0)
-  setAttribute (Qt::AA_UseHighDpiPixmaps);
-#endif
-
 #if defined (_WIN32) || defined (__APPLE__)
   if (QIcon::themeName ().isEmpty ())
     QIcon::setThemeName (QLatin1String ("Faenza"));
@@ -310,12 +306,7 @@ Application::loadTranslations ()
 #endif
     (applicationDirPath () + QLatin1String ("/translations"));
 
-  const QString qtFileName =
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-    QLatin1String ("qt");
-#else
-    QLatin1String ("qtbase");
-#endif
+  const QString qtFileName = QLatin1String ("qtbase");
 
   const QLocale locale;
   const QLocale englishLocale (QLocale::English, QLocale::UnitedStates);
@@ -589,7 +580,10 @@ tr_main (int    argc,
 {
   InteropHelper::initialize ();
 
+#if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
   Application::setAttribute (Qt::AA_EnableHighDpiScaling);
+#endif
+
   Application::setAttribute (Qt::AA_UseHighDpiPixmaps);
 
   Application app (argc, argv);

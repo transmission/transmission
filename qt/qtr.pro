@@ -84,7 +84,6 @@ SOURCES += AboutDialog.cc \
            FilterBar.cc \
            FilterBarComboBox.cc \
            FilterBarComboBoxDelegate.cc \
-           FilterBarLineEdit.cc \
            Filters.cc \
            Formatter.cc \
            FreeSpaceLabel.cc \

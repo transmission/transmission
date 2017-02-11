@@ -16,7 +16,6 @@ set(${PROJECT_NAME}_SOURCES
     FilterBar.cc
     FilterBarComboBox.cc
     FilterBarComboBoxDelegate.cc
-    FilterBarLineEdit.cc
     Filters.cc
     Formatter.cc
     FreeSpaceLabel.cc
@@ -76,7 +75,6 @@ set(${PROJECT_NAME}_HEADERS
     FilterBar.h
     FilterBarComboBox.h
     FilterBarComboBoxDelegate.h
-    FilterBarLineEdit.h
     Filters.h
     Formatter.h
     FreeSpaceLabel.h

@@ -8,6 +8,7 @@
 
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QLineEdit>
 #include <QStandardItemModel>
 
 #include "Application.h"
@@ -16,7 +17,6 @@
 #include "FilterBar.h"
 #include "FilterBarComboBox.h"
 #include "FilterBarComboBoxDelegate.h"
-#include "FilterBarLineEdit.h"
 #include "Prefs.h"
 #include "Torrent.h"
 #include "TorrentFilter.h"
@@ -241,7 +241,9 @@ FilterBar::FilterBar (Prefs& prefs, const TorrentModel& torrents, const TorrentF
 
   h->addStretch ();
 
-  myLineEdit = new FilterBarLineEdit (this);
+  myLineEdit = new QLineEdit (this);
+  myLineEdit->setClearButtonEnabled (true);
+  myLineEdit->setPlaceholderText (tr ("Search..."));
   myLineEdit->setMaximumWidth (250);
   h->addWidget (myLineEdit, 1);
   connect (myLineEdit, SIGNAL (textChanged (QString)), this, SLOT (onTextChanged (QString)));

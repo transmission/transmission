@@ -21,15 +21,12 @@
 #include <QHeaderView>
 #include <QIcon>
 #include <QInputDialog>
+#include <QMimeDatabase>
+#include <QMimeType>
 #include <QObject>
 #include <QPixmapCache>
 #include <QSet>
 #include <QStyle>
-
-#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
-#include <QMimeDatabase>
-#include <QMimeType>
-#endif
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h> // tr_formatter
@@ -40,7 +37,7 @@
 ****
 ***/
 
-#if defined(_WIN32) && QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+#if defined(_WIN32)
 // Should be in QtWinExtras soon, but for now let's import it manually
 extern QPixmap qt_pixmapFromWinHICON(HICON icon);
 #endif
@@ -68,11 +65,7 @@ namespace
           {
             if (shellFileInfo.hIcon != NULL)
               {
-#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
                 pixmap = qt_pixmapFromWinHICON (shellFileInfo.hIcon);
-#else
-                pixmap = QPixmap::fromWinHICON (shellFileInfo.hIcon);
-#endif
                 ::DestroyIcon (shellFileInfo.hIcon);
               }
           }
@@ -113,68 +106,12 @@ Utils::guessMimeIcon (const QString& filename)
   if (!icon.isNull ())
     return icon;
 
-#elif QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+#else
 
   QMimeDatabase mimeDb;
   QMimeType mimeType = mimeDb.mimeTypeForFile (filename, QMimeDatabase::MatchExtension);
   if (mimeType.isValid ())
     return QIcon::fromTheme (mimeType.iconName (), QIcon::fromTheme (mimeType.genericIconName (), fallback));
-
-#else
-
-  enum { DISK, DOCUMENT, PICTURE, VIDEO, ARCHIVE, AUDIO, APP, TYPE_COUNT };
-  static QIcon fileIcons[TYPE_COUNT];
-  static QSet<QString> suffixes[TYPE_COUNT];
-
-  if (fileIcons[0].isNull ())
-    {
-      suffixes[DISK] << QString::fromLatin1("iso");
-      fileIcons[DISK]= QIcon::fromTheme (QString::fromLatin1("media-optical"), fallback);
-
-      const char * doc_types[] = {
-        "abw", "csv", "doc", "dvi", "htm", "html", "ini", "log", "odp",
-        "ods", "odt", "pdf", "ppt", "ps",  "rtf", "tex", "txt", "xml" };
-      for (const char * t: doc_types)
-        suffixes[DOCUMENT] << QString::fromLatin1(t);
-      fileIcons[DOCUMENT] = QIcon::fromTheme (QString::fromLatin1("text-x-generic"), fallback);
-
-      const char * pic_types[] = {
-        "bmp", "gif", "jpg", "jpeg", "pcx", "png", "psd", "ras", "tga", "tiff" };
-      for (const char * t: pic_types)
-        suffixes[PICTURE] << QString::fromLatin1(t);
-      fileIcons[PICTURE]  = QIcon::fromTheme (QString::fromLatin1("image-x-generic"), fallback);
-
-      const char * vid_types[] = {
-        "3gp", "asf", "avi", "mkv", "mov", "mpeg", "mpg", "mp4",
-        "ogm", "ogv", "qt", "rm", "wmv" };
-      for (const char * t: vid_types)
-        suffixes[VIDEO] << QString::fromLatin1(t);
-      fileIcons[VIDEO] = QIcon::fromTheme (QString::fromLatin1("video-x-generic"), fallback);
-
-      const char * arc_types[] = {
-        "7z", "ace", "bz2", "cbz", "gz", "gzip", "lzma", "rar", "sft", "tar", "zip" };
-      for (const char * t: arc_types)
-        suffixes[ARCHIVE] << QString::fromLatin1(t);
-      fileIcons[ARCHIVE]  = QIcon::fromTheme (QString::fromLatin1("package-x-generic"), fallback);
-
-      const char * aud_types[] = {
-        "aac", "ac3", "aiff", "ape", "au", "flac", "m3u", "m4a", "mid", "midi", "mp2",
-        "mp3", "mpc", "nsf", "oga", "ogg", "ra", "ram", "shn", "voc", "wav", "wma" };
-      for (const char * t: aud_types)
-        suffixes[AUDIO] << QString::fromLatin1(t);
-      fileIcons[AUDIO] = QIcon::fromTheme (QString::fromLatin1("audio-x-generic"), fallback);
-
-      const char * exe_types[] = { "bat", "cmd", "com", "exe" };
-      for (const char * t: exe_types)
-        suffixes[APP] << QString::fromLatin1(t);
-      fileIcons[APP] = QIcon::fromTheme (QString::fromLatin1("application-x-executable"), fallback);
-    }
-
-  QString suffix (QFileInfo (filename).suffix ().toLower ());
-
-  for (int i=0; i<TYPE_COUNT; ++i)
-    if (suffixes[i].contains (suffix))
-      return fileIcons[i];
 
 #endif
 

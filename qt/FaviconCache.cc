@@ -10,12 +10,7 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
-
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
- #include <QDesktopServices>
-#else
- #include <QStandardPaths>
-#endif
+#include <QStandardPaths>
 
 #include "FaviconCache.h"
 
@@ -41,12 +36,7 @@ FaviconCache::~FaviconCache ()
 QString
 FaviconCache::getCacheDir ()
 {
-  const QString base =
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-    QDesktopServices::storageLocation (QDesktopServices::CacheLocation);
-#else
-    QStandardPaths::writableLocation (QStandardPaths::CacheLocation);
-#endif
+  const QString base = QStandardPaths::writableLocation (QStandardPaths::CacheLocation);
 
   return QDir(base).absoluteFilePath (QLatin1String ("favicons"));
 }
