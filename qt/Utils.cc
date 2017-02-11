@@ -170,9 +170,9 @@ Utils::removeTrailingDirSeparator (const QString& path)
 int
 Utils::measureViewItem (QAbstractItemView * view, const QString& text)
 {
-  QStyleOptionViewItemV4 option;
+  QStyleOptionViewItem option;
   option.initFrom (view);
-  option.features = QStyleOptionViewItemV2::HasDisplay;
+  option.features = QStyleOptionViewItem::HasDisplay;
   option.text = text;
   option.textElideMode = Qt::ElideNone;
   option.font = view->font ();
