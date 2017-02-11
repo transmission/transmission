@@ -211,6 +211,10 @@ if(ENABLE_QT)
     set(QT5_REQUIRED_MODULES Core Gui Widgets Network LinguistTools)
     set(QT5_OPTIONAL_MODULES DBus AxContainer AxServer)
 
+    if(WIN32)
+        list(APPEND QT5_REQUIRED_MODULES WinExtras)
+    endif()
+
     foreach(M ${QT5_REQUIRED_MODULES})
         find_package(Qt5${M} ${QT5_MINIMUM} QUIET)
         if(Qt5${M}_FOUND)

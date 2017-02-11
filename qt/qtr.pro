@@ -13,6 +13,7 @@ man.files = transmission-qt.1
 
 CONFIG += qt thread debug link_pkgconfig c++11 warn_on
 QT += network dbus
+win32:QT += winextras
 PKGCONFIG = fontconfig libcurl openssl libevent
 
 greaterThan(QT_MAJOR_VERSION, 4) {

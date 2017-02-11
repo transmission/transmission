@@ -28,6 +28,10 @@
 #include <QSet>
 #include <QStyle>
 
+#ifdef _WIN32
+#include <QtWin>
+#endif
+
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h> // tr_formatter
 
@@ -36,11 +40,6 @@
 /***
 ****
 ***/
-
-#if defined(_WIN32)
-// Should be in QtWinExtras soon, but for now let's import it manually
-extern QPixmap qt_pixmapFromWinHICON(HICON icon);
-#endif
 
 namespace
 {
@@ -65,7 +64,7 @@ namespace
           {
             if (shellFileInfo.hIcon != NULL)
               {
-                pixmap = qt_pixmapFromWinHICON (shellFileInfo.hIcon);
+                pixmap = QtWin::fromHICON (shellFileInfo.hIcon);
                 ::DestroyIcon (shellFileInfo.hIcon);
               }
           }
@@ -106,14 +105,12 @@ Utils::guessMimeIcon (const QString& filename)
   if (!icon.isNull ())
     return icon;
 
-#else
+#endif
 
   QMimeDatabase mimeDb;
   QMimeType mimeType = mimeDb.mimeTypeForFile (filename, QMimeDatabase::MatchExtension);
   if (mimeType.isValid ())
     return QIcon::fromTheme (mimeType.iconName (), QIcon::fromTheme (mimeType.genericIconName (), fallback));
-
-#endif
 
   return fallback;
 }
