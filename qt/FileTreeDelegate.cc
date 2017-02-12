@@ -69,8 +69,8 @@ FileTreeDelegate::paint (QPainter                    * painter,
     }
   else if(column == FileTreeModel::COL_WANTED)
     {
-      QStyleOptionViewItemV4 vi (option);
-      vi.features |= QStyleOptionViewItemV4::HasCheckIndicator;
+      QStyleOptionViewItem vi (option);
+      vi.features |= QStyleOptionViewItem::HasCheckIndicator;
       QRect checkRect = style->subElementRect (QStyle::SE_ItemViewItemCheckIndicator, &vi, nullptr);
       checkRect.moveCenter (option.rect.center ());
       drawCheck (painter, vi, checkRect, static_cast<Qt::CheckState> (index.data ().toInt ()));

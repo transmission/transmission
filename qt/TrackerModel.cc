@@ -40,7 +40,7 @@ TrackerModel::data (const QModelIndex& index, int role) const
             break;
 
           case Qt::DecorationRole:
-            var = trackerInfo.st.getFavicon ();
+            var = QIcon (trackerInfo.st.getFavicon ());
             break;
 
           case TrackerRole:

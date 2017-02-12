@@ -197,7 +197,7 @@ MakeDialog::onSourceChanged ()
   QString text;
   if (myBuilder == nullptr)
     {
-      text = tr ("<i>No source selected<i>");
+      text = tr ("<i>No source selected</i>");
     }
   else
     {

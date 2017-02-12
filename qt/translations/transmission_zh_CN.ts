@@ -10,7 +10,7 @@
         <translation>关于 Transmission</translation>
     </message>
     <message>
-        <location filename="../AboutDialog.cc" line="+29"/>
+        <location filename="../AboutDialog.cc" line="+28"/>
         <source>&lt;b style=&apos;font-size:x-large&apos;&gt;Transmission %1&lt;/b&gt;</source>
         <translation>&lt;b style=&apos;font-size:x-large&apos;&gt;Transmission %1&lt;/b&gt;</translation>
     </message>
@@ -27,7 +27,7 @@
     <message>
         <location filename="../AboutDialog.cc" line="+4"/>
         <source>C&amp;redits</source>
-        <translation>感谢(&amp;R)</translation>
+        <translation>致谢(&amp;R)</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -37,13 +37,13 @@
     <message>
         <location line="+11"/>
         <source>Credits</source>
-        <translation>感谢</translation>
+        <translation>致谢</translation>
     </message>
 </context>
 <context>
     <name>Application</name>
     <message>
-        <location filename="../Application.cc" line="+279"/>
+        <location filename="../Application.cc" line="+278"/>
         <source>&lt;b&gt;Transmission is a file sharing program.&lt;/b&gt;</source>
         <translation>&lt;b&gt;Transmission 是一个文件共享程序。&lt;/b&gt;</translation>
     </message>
@@ -71,7 +71,7 @@
 <context>
     <name>DetailsDialog</name>
     <message>
-        <location filename="../DetailsDialog.cc" line="+364"/>
+        <location filename="../DetailsDialog.cc" line="+363"/>
         <source>None</source>
         <translation>无</translation>
     </message>
@@ -548,28 +548,10 @@
     </message>
 </context>
 <context>
-    <name>FileAdded</name>
-    <message>
-        <location filename="../Session.cc" line="+94"/>
-        <source>Add Torrent</source>
-        <translation>添加 Torrent</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>&lt;p&gt;&lt;b&gt;Unable to add &quot;%1&quot;.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;It is a duplicate of &quot;%2&quot; which is already added.&lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;b&gt;无法添加 &quot;%1&quot;。&lt;/b&gt;&lt;/p&gt;&lt;p&gt;它与已经添加的 &quot;%2&quot; 重复。&lt;/p&gt;</translation>
-    </message>
-    <message>
-        <location line="+19"/>
-        <source>Error Adding Torrent</source>
-        <translation>添加 Torrent 错误</translation>
-    </message>
-</context>
-<context>
     <name>FileTreeItem</name>
     <message>
-        <location filename="../FileTreeItem.cc" line="+271"/>
-        <location filename="../FileTreeView.cc" line="+105"/>
+        <location filename="../FileTreeItem.cc" line="+270"/>
+        <location filename="../FileTreeView.cc" line="+104"/>
         <location line="+257"/>
         <source>Low</source>
         <translation>低</translation>
@@ -598,7 +580,7 @@
 <context>
     <name>FileTreeModel</name>
     <message>
-        <location filename="../FileTreeModel.cc" line="+196"/>
+        <location filename="../FileTreeModel.cc" line="+195"/>
         <source>File</source>
         <translation>文件</translation>
     </message>
@@ -659,7 +641,7 @@
 <context>
     <name>FilterBar</name>
     <message>
-        <location filename="../FilterBar.cc" line="+61"/>
+        <location filename="../FilterBar.cc" line="+60"/>
         <location line="+143"/>
         <source>All</source>
         <translation>全部</translation>
@@ -708,7 +690,7 @@
 <context>
     <name>FilterBarLineEdit</name>
     <message>
-        <location filename="../FilterBarLineEdit.cc" line="+48"/>
+        <location filename="../FilterBarLineEdit.cc" line="+47"/>
         <source>Search...</source>
         <translation>搜索...</translation>
     </message>
@@ -716,7 +698,7 @@
 <context>
     <name>Formatter</name>
     <message>
-        <location filename="../Formatter.cc" line="+33"/>
+        <location filename="../Formatter.cc" line="+32"/>
         <source>B/s</source>
         <translation>B/s</translation>
     </message>
@@ -843,12 +825,12 @@
 <context>
     <name>FreeSpaceLabel</name>
     <message>
-        <location filename="../FreeSpaceLabel.cc" line="+58"/>
+        <location filename="../FreeSpaceLabel.cc" line="+50"/>
         <source>&lt;i&gt;Calculating Free Space...&lt;/i&gt;</source>
         <translation>&lt;i&gt;正在计算可用空间...&lt;/i&gt;</translation>
     </message>
     <message>
-        <location line="+35"/>
+        <location line="+34"/>
         <source>%1 free</source>
         <translation>%1 可用</translation>
     </message>
@@ -1241,7 +1223,7 @@
         <translation>按队列排序(&amp;Q)</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cc" line="+434"/>
+        <location filename="../MainWindow.cc" line="+432"/>
         <source>Limit Download Speed</source>
         <translation>限制下载速度</translation>
     </message>
@@ -1317,12 +1299,12 @@
         <translation>打开 Torrent</translation>
     </message>
     <message>
-        <location line="-918"/>
+        <location line="-917"/>
         <source>Speed Limits</source>
         <translation>速度限制</translation>
     </message>
     <message>
-        <location line="+449"/>
+        <location line="+448"/>
         <source>Network Error</source>
         <translation>网络错误</translation>
     </message>
@@ -1450,9 +1432,9 @@
         <translation>新的 Torrent</translation>
     </message>
     <message>
-        <location filename="../MakeDialog.cc" line="+201"/>
-        <source>&lt;i&gt;No source selected&lt;i&gt;</source>
-        <translation>&lt;i&gt;没有选择来源&lt;i&gt;</translation>
+        <location filename="../MakeDialog.cc" line="+200"/>
+        <source>&lt;i&gt;No source selected&lt;/i&gt;</source>
+        <translation>&lt;i&gt;没有选择来源&lt;/i&gt;</translation>
     </message>
     <message numerus="yes">
         <location line="+4"/>
@@ -1587,7 +1569,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>目标文件夹(&amp;D):</translation>
     </message>
     <message>
-        <location filename="../OptionsDialog.cc" line="+60"/>
+        <location filename="../OptionsDialog.cc" line="+49"/>
         <source>High</source>
         <translation>高</translation>
     </message>
@@ -1612,7 +1594,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>添加后开始(&amp;T)</translation>
     </message>
     <message>
-        <location filename="../OptionsDialog.cc" line="+5"/>
+        <location filename="../OptionsDialog.cc" line="-62"/>
         <source>&amp;Verify Local Data</source>
         <translation>检查本地数据(&amp;V)</translation>
     </message>
@@ -1622,12 +1604,12 @@ To add another primary URL, add it after a blank line.</source>
         <translation>将 .torrent 文件移至回收站(&amp;V)</translation>
     </message>
     <message>
-        <location filename="../OptionsDialog.cc" line="-55"/>
+        <location filename="../OptionsDialog.cc" line="+23"/>
         <source>Torrent Files (*.torrent);;All Files (*.*)</source>
         <translation>Torrent 文件 (*.torrent);;全部文件 (*.*)</translation>
     </message>
     <message>
-        <location line="+27"/>
+        <location line="+24"/>
         <source>Select Destination</source>
         <translation>选择目标</translation>
     </message>
@@ -1635,7 +1617,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>PathButton</name>
     <message>
-        <location filename="../PathButton.cc" line="+31"/>
+        <location filename="../PathButton.cc" line="+30"/>
         <location line="+72"/>
         <source>(None)</source>
         <translation>(无)</translation>
@@ -1699,7 +1681,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>天数(&amp;O):</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+261"/>
+        <location filename="../PrefsDialog.cc" line="+262"/>
         <source>Every Day</source>
         <translation>每天</translation>
     </message>
@@ -1714,7 +1696,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>周末</translation>
     </message>
     <message>
-        <location line="-152"/>
+        <location line="-154"/>
         <source>Sunday</source>
         <translation>星期天</translation>
     </message>
@@ -1749,7 +1731,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>星期六</translation>
     </message>
     <message>
-        <location line="+210"/>
+        <location line="+212"/>
         <source>Port is &lt;b&gt;open&lt;/b&gt;</source>
         <translation>端口是 &lt;b&gt;打开的&lt;/b&gt;</translation>
     </message>
@@ -1765,7 +1747,7 @@ To add another primary URL, add it after a blank line.</source>
     </message>
     <message>
         <location line="+32"/>
-        <location filename="../PrefsDialog.cc" line="+340"/>
+        <location filename="../PrefsDialog.cc" line="+337"/>
         <source>Status unknown</source>
         <translation>状态未知</translation>
     </message>
@@ -1795,7 +1777,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>uTP 是一个减小网络拥挤的工具。</translation>
     </message>
     <message numerus="yes">
-        <location filename="../PrefsDialog.cc" line="-219"/>
+        <location filename="../PrefsDialog.cc" line="-216"/>
         <source> minute(s)</source>
         <extracomment>Spin box suffix, &quot;Stop seeding if idle for: [ 5 minutes ]&quot; (includes leading space after the number, if needed)</extracomment>
         <translation>
@@ -1856,7 +1838,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>远程</translation>
     </message>
     <message numerus="yes">
-        <location filename="../PrefsDialog.cc" line="+145"/>
+        <location filename="../PrefsDialog.cc" line="+153"/>
         <source>&lt;i&gt;Blocklist contains %Ln rule(s)&lt;/i&gt;</source>
         <translation>
             <numerusform>&lt;i&gt;黑名单包含 %Ln 条规则&lt;/i&gt;</numerusform>
@@ -1883,7 +1865,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>全体最大用户数(&amp;O):</translation>
     </message>
     <message numerus="yes">
-        <location filename="../PrefsDialog.cc" line="-229"/>
+        <location filename="../PrefsDialog.cc" line="-237"/>
         <source>&lt;b&gt;Update succeeded!&lt;/b&gt;&lt;p&gt;Blocklist now has %Ln rule(s).</source>
         <translation>
             <numerusform>&lt;b&gt;更新成功！&lt;/b&gt;&lt;p&gt;黑名单现在有 %Ln 条规则。</numerusform>
@@ -2076,7 +2058,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>加密</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+160"/>
+        <location filename="../PrefsDialog.cc" line="+153"/>
         <source>Select &quot;Torrent Done&quot; Script</source>
         <translation>选择 &quot;Torrent 完成&quot; 脚本</translation>
     </message>
@@ -2098,13 +2080,13 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location filename="../PrefsDialog.ui" line="-355"/>
         <source>Adding</source>
-        <translation>正在添加</translation>
+        <translation>添加</translation>
     </message>
     <message>
         <location line="+137"/>
         <source>Download is i&amp;nactive if data sharing stopped:</source>
         <extracomment>Please keep this phrase as short as possible, it&apos;s curently the longest and influences dialog width</extracomment>
-        <translation>下载是不活动的如果停止分享数据在(&amp;N):</translation>
+        <translation>下载是非活动的如果停止分享数据在(&amp;N):</translation>
     </message>
     <message>
         <location line="-146"/>
@@ -2157,7 +2139,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>网络</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+91"/>
+        <location filename="../PrefsDialog.cc" line="+99"/>
         <source>Not supported by remote sessions</source>
         <translation>远程会话不支持</translation>
     </message>
@@ -2173,7 +2155,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>RelocateDialog</name>
     <message>
-        <location filename="../RelocateDialog.cc" line="+65"/>
+        <location filename="../RelocateDialog.cc" line="+64"/>
         <source>Select Location</source>
         <translation>选择位置</translation>
     </message>
@@ -2206,7 +2188,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+548"/>
+        <location filename="../Session.cc" line="+486"/>
         <source>Error Renaming Path</source>
         <translation>重命名路径错误</translation>
     </message>
@@ -2216,9 +2198,19 @@ To add another primary URL, add it after a blank line.</source>
         <translation>&lt;p&gt;&lt;b&gt;无法重命名 &quot;%1&quot; 为 &quot;%2&quot;: %3.&lt;/b&gt;&lt;/p&gt; &lt;p&gt;请纠正错误后重试。&lt;/p&gt;</translation>
     </message>
     <message>
-        <location line="+49"/>
+        <location line="+384"/>
+        <source>Error Adding Torrent</source>
+        <translation type="unfinished">添加 Torrent 错误</translation>
+    </message>
+    <message>
+        <location line="+21"/>
         <source>Add Torrent</source>
         <translation>添加 Torrent</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>&lt;p&gt;&lt;b&gt;Unable to add &quot;%1&quot;.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;It is a duplicate of &quot;%2&quot; which is already added.&lt;/p&gt;</source>
+        <translation type="unfinished">&lt;p&gt;&lt;b&gt;无法添加 &quot;%1&quot;。&lt;/b&gt;&lt;/p&gt;&lt;p&gt;它与已经添加的 &quot;%2&quot; 重复。&lt;/p&gt;</translation>
     </message>
 </context>
 <context>
@@ -2311,7 +2303,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>总计</translation>
     </message>
     <message numerus="yes">
-        <location filename="../StatsDialog.cc" line="+71"/>
+        <location filename="../StatsDialog.cc" line="+70"/>
         <source>Started %Ln time(s)</source>
         <translation>
             <numerusform>已启动 %Ln 次</numerusform>
@@ -2321,7 +2313,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>Torrent</name>
     <message>
-        <location filename="../Torrent.cc" line="+774"/>
+        <location filename="../Torrent.cc" line="+773"/>
         <source>Verifying local data</source>
         <translation>正在检查本地数据</translation>
     </message>
@@ -2379,7 +2371,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>TorrentDelegate</name>
     <message>
-        <location filename="../TorrentDelegate.cc" line="+171"/>
+        <location filename="../TorrentDelegate.cc" line="+170"/>
         <source>Magnetized transfer - retrieving metadata (%1%)</source>
         <extracomment>First part of torrent progress string; %1 is the percentage of torrent metadata downloaded</extracomment>
         <translation>磁力传输 - 正在检索元数据 (%1%)</translation>
@@ -2495,7 +2487,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>TrackerDelegate</name>
     <message numerus="yes">
-        <location filename="../TrackerDelegate.cc" line="+212"/>
+        <location filename="../TrackerDelegate.cc" line="+211"/>
         <source>Got a list of%1 %Ln peer(s)%2 %3 ago</source>
         <extracomment>%1 and %2 are replaced with HTML markup, %3 is duration</extracomment>
         <translation>

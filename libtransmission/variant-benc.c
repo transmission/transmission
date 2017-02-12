@@ -257,11 +257,19 @@ tr_variantParseBenc (const void    * buf_in,
         break;
     }
 
-  if (!err && (!top->type || !tr_ptrArrayEmpty(&stack)))
+  if (err == 0 && (top->type == 0 || !tr_ptrArrayEmpty(&stack)))
     err = EILSEQ;
 
-  if (!err && setme_end)
-    *setme_end = (const char*) buf;
+  if (err == 0)
+    {
+      if (setme_end != NULL)
+        *setme_end = (const char*) buf;
+    }
+  else if (top->type != 0)
+    {
+      tr_variantFree (top);
+      tr_variantInit (top, 0);
+    }
 
   tr_ptrArrayDestruct (&stack, NULL);
   return err;

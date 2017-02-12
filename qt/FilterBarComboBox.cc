@@ -11,6 +11,7 @@
 #include <QStylePainter>
 
 #include "FilterBarComboBox.h"
+#include "StyleHelper.h"
 #include "Utils.h"
 
 namespace
@@ -109,19 +110,12 @@ FilterBarComboBox::paintEvent (QPaintEvent * e)
       rect.adjust (2, 1, -2, -1);
 
       // draw the icon
-      QPixmap pixmap;
-      QVariant variant = modelIndex.data (Qt::DecorationRole);
-      switch (variant.type ())
-        {
-          case QVariant::Pixmap: pixmap = qvariant_cast<QPixmap> (variant); break;
-          case QVariant::Icon:   pixmap = qvariant_cast<QIcon> (variant).pixmap (iconSize ()); break;
-          default: break;
-        }
-      if (!pixmap.isNull ())
+      const QIcon icon = Utils::getIconFromIndex (modelIndex);
+      if (!icon.isNull ())
         {
           const QRect iconRect = QStyle::alignedRect(opt.direction, Qt::AlignLeft | Qt::AlignVCenter,
                                                      opt.iconSize, rect);
-          painter.drawPixmap (iconRect.topLeft (), pixmap);
+          icon.paint (&painter, iconRect, Qt::AlignCenter, StyleHelper::getIconMode (opt.state), QIcon::Off);
           Utils::narrowRect (rect, iconRect.width () + hmargin, 0, opt.direction);
         }
 

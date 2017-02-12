@@ -113,12 +113,16 @@ Transmission.prototype = {
         this.updateButtonsSoon();
     },
 
-    loadDaemonPrefs: function (async) {
+    loadDaemonPrefs: function (async, callback) {
         this.remote.loadDaemonPrefs(function (data) {
             var o = data['arguments'];
             Prefs.getClutchPrefs(o);
             this.updateGuiFromSession(o);
             this.sessionProperties = o;
+
+            if (callback) {
+                callback();
+            }
         }, this, async);
     },
 
@@ -632,14 +636,23 @@ Transmission.prototype = {
 
     // turn the periodic ajax session refresh on & off
     togglePeriodicSessionRefresh: function (enabled) {
-        clearInterval(this.sessionInterval);
-        delete this.sessionInterval;
-        if (enabled) {
-            var callback = $.proxy(this.loadDaemonPrefs, this);
-            var msec = 8000;
+        var that = this,
+            msec = 8000;
 
-            this.sessionInterval = setInterval(callback, msec);
-        };
+        function callback() {
+            that.loadDaemonPrefs(undefined, rescheduleTimeout);
+        }
+
+        function rescheduleTimeout() {
+            that.sessionTimeout = setTimeout(callback, msec);
+        }
+
+        clearTimeout(this.sessionTimeout);
+        delete this.sessionTimeout;
+
+        if (enabled) {
+            rescheduleTimeout();
+        }
     },
 
     toggleTurtleClicked: function () {
@@ -829,8 +842,18 @@ Transmission.prototype = {
         }
     },
 
-    updateTorrents: function (ids, fields) {
-        this.remote.updateTorrents(ids, fields, this.updateFromTorrentGet, this);
+    updateTorrents: function (ids, fields, callback) {
+        var that = this;
+
+        function f(updates, removedIds) {
+            if (callback) {
+                callback();
+            }
+
+            that.updateFromTorrentGet(updates, removedIds);
+        }
+
+        this.remote.updateTorrents(ids, fields, f);
     },
 
     refreshTorrents: function () {
@@ -1676,20 +1699,32 @@ Transmission.prototype = {
 
     // turn the periodic ajax stats refresh on & off
     togglePeriodicStatsRefresh: function (enabled) {
-        clearInterval(this.statsInterval);
-        delete this.statsInterval;
+        var that = this,
+            msec = 5000;
+
+        function callback() {
+            that.loadDaemonStats(undefined, rescheduleTimeout);
+        }
+
+        function rescheduleTimeout() {
+            that.statsTimeout = setTimeout(callback, msec);
+        }
+
+        clearTimeout(this.statsTimeout);
+        delete this.statsTimeout;
 
         if (enabled) {
-            var callback = $.proxy(this.loadDaemonStats, this);
-            var msec = 5000;
-
-            this.statsInterval = setInterval(callback, msec);
-        };
+            rescheduleTimeout();
+        }
     },
 
-    loadDaemonStats: function (async) {
+    loadDaemonStats: function (async, callback) {
         this.remote.loadDaemonStats(function (data) {
             this.updateStats(data['arguments']);
+
+            if (callback) {
+                callback();
+            }
         }, this, async);
     },
 

@@ -25,17 +25,17 @@
 @interface MessageWindowController : NSWindowController
 {
     IBOutlet NSTableView * fMessageTable;
-    
+
     IBOutlet NSPopUpButton * fLevelButton;
     IBOutlet NSButton * fSaveButton, * fClearButton;
     IBOutlet NSSearchField * fFilterField;
-    
+
     NSMutableArray * fMessages, * fDisplayedMessages;
-    
+
     NSDictionary * fAttributes;
-    
+
     NSTimer * fTimer;
-    
+
     NSLock * fLock;
 }
 

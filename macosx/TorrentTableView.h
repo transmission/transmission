@@ -32,25 +32,25 @@
 @interface TorrentTableView : NSOutlineView <NSOutlineViewDelegate, NSAnimationDelegate, NSPopoverDelegate>
 {
     IBOutlet Controller * fController;
-    
+
     TorrentCell * fTorrentCell;
-    
+
     NSUserDefaults * fDefaults;
-    
+
     NSMutableIndexSet * fCollapsedGroups;
-    
+
     IBOutlet NSMenu * fContextRow, * fContextNoRow;
-    
+
     NSInteger fMouseRow, fMouseControlRow, fMouseRevealRow, fMouseActionRow;
     NSArray * fSelectedValues;
-    
+
     IBOutlet NSMenu * fActionMenu, * fUploadMenu, * fDownloadMenu, * fRatioMenu, * fPriorityMenu;
     IBOutlet NSMenuItem * fGlobalLimitItem;
     Torrent * fMenuTorrent;
-    
+
     CGFloat fPiecesBarPercent;
     NSAnimation * fPiecesBarAnimation;
-    
+
     BOOL fActionPopoverShown;
 }
 

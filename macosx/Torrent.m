@@ -102,7 +102,7 @@ void renameCallback(tr_torrent * torrent, const char * oldPathCharString, const 
     @autoreleasepool {
         NSString * oldPath = [NSString stringWithUTF8String: oldPathCharString];
         NSString * newName = [NSString stringWithUTF8String: newNameCharString];
-        
+
         dispatch_async(dispatch_get_main_queue(), ^{
             NSDictionary * contextDict = [(NSDictionary *)contextInfo autorelease];
             Torrent * torrentObject = [contextDict objectForKey: @"Torrent"];
@@ -142,7 +142,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
             removeWhenFinishSeeding: nil
             downloadFolder: location
             legacyIncompleteFolder: nil];
-    
+
     if (self)
     {
         if (torrentDelete && ![[self torrentLocation] isEqualToString: path])
@@ -158,7 +158,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
             removeWhenFinishSeeding: nil
             downloadFolder: location
             legacyIncompleteFolder: nil];
-    
+
     return self;
 }
 
@@ -168,7 +168,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
             lib: lib groupValue: nil
             removeWhenFinishSeeding: nil
             downloadFolder: location legacyIncompleteFolder: nil];
-    
+
     return self;
 }
 
@@ -184,7 +184,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
                 downloadFolder: [history objectForKey: @"DownloadFolder"] //upgrading from versions < 1.80
                 legacyIncompleteFolder: [[history objectForKey: @"UseIncompleteFolder"] boolValue] //upgrading from versions < 1.80
                                         ? [history objectForKey: @"IncompleteFolder"] : nil];
-    
+
     if (self)
     {
         //start transfer
@@ -194,7 +194,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
             fStat = tr_torrentStat(fHandle);
             [self startTransferNoQueue];
         }
-        
+
         //upgrading from versions < 1.30: get old added, activity, and done dates
         NSDate * date;
         if ((date = [history objectForKey: @"Date"]))
@@ -203,7 +203,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
             tr_torrentSetActivityDate(fHandle, [date timeIntervalSince1970]);
         if ((date = [history objectForKey: @"DateCompleted"]))
             tr_torrentSetDoneDate(fHandle, [date timeIntervalSince1970]);
-        
+
         //upgrading from versions < 1.60: get old stop ratio settings
         NSNumber * ratioSetting;
         if ((ratioSetting = [history objectForKey: @"RatioSetting"]))
@@ -236,20 +236,20 @@ bool trashDataFile(const char * filename, tr_error ** error)
 - (void) dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver: self];
-    
+
     if (fFileStat)
         tr_torrentFilesFree(fFileStat, [self fileCount]);
-    
+
     [fPreviousFinishedIndexes release];
     [fPreviousFinishedIndexesDate release];
-    
+
     [fHashString release];
-    
+
     [fIcon release];
-    
+
     [fFileList release];
     [fFlatFileList release];
-    
+
     [super dealloc];
 }
 
@@ -267,7 +267,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
 {
     //allow the file to be indexed by Time Machine
     [self setTimeMachineExclude: NO];
-    
+
     tr_torrentRemove(fHandle, trashFiles, trashDataFile);
 }
 
@@ -275,9 +275,9 @@ bool trashDataFile(const char * filename, tr_error ** error)
 {
     //if data existed in original download location, unexclude it before changing the location
     [self setTimeMachineExclude: NO];
-    
+
     tr_torrentSetDownloadDir(fHandle, [folder UTF8String]);
-	
+
     fDownloadFolderDetermination = determinationType;
 }
 
@@ -309,7 +309,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
 {
     [fPreviousFinishedIndexes release];
     fPreviousFinishedIndexes = [indexes retain];
-    
+
     [fPreviousFinishedIndexesDate release];
     fPreviousFinishedIndexesDate = indexes != nil ? [[NSDate alloc] init] : nil;
 }
@@ -318,9 +318,9 @@ bool trashDataFile(const char * filename, tr_error ** error)
 {
     //get previous stalled value before update
     const BOOL wasStalled = fStat != NULL && [self isStalled];
-    
+
     fStat = tr_torrentStat(fHandle);
-    
+
     //make sure the "active" filter is updated when stalled-ness changes
     if (wasStalled != [self isStalled])
         //posting asynchronously with coalescing to prevent stack overflow on lots of torrents changing state at the same time
@@ -340,7 +340,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
     {
         ignoreQueue ? tr_torrentStartNow(fHandle) : tr_torrentStart(fHandle);
         [self update];
-        
+
         //capture, specifically, stop-seeding settings changing to unlimited
         [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateOptions" object: nil];
     }
@@ -436,7 +436,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
 - (void) setRatioLimit: (CGFloat) limit
 {
     NSParameterAssert(limit >= 0);
-    
+
     tr_torrentSetRatioLimit(fHandle, limit);
 }
 
@@ -463,7 +463,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
 - (void) setIdleLimitMinutes: (NSUInteger) limit
 {
     NSParameterAssert(limit > 0);
-    
+
     tr_torrentSetIdleLimit(fHandle, limit);
 }
 
@@ -500,7 +500,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
 - (void) setMaxPeerConnect: (uint16_t) count
 {
     NSParameterAssert(count > 0);
-    
+
     tr_torrentSetPeerLimit(fHandle, count);
 }
 
@@ -553,12 +553,12 @@ bool trashDataFile(const char * filename, tr_error ** error)
     NSString * oldFolder = [self currentDirectory];
     if ([oldFolder isEqualToString: folder])
         return;
-    
+
     //check if moving inside itself
     NSArray * oldComponents = [oldFolder pathComponents],
             * newComponents = [folder pathComponents];
-    const NSInteger oldCount = [oldComponents count];
-    
+    const NSUInteger oldCount = [oldComponents count];
+
     if (oldCount < [newComponents count] && [[newComponents objectAtIndex: oldCount] isEqualToString: [self name]]
         && [folder hasPrefix: oldFolder])
     {
@@ -569,19 +569,19 @@ bool trashDataFile(const char * filename, tr_error ** error)
                         NSLocalizedString(@"The move operation of \"%@\" cannot be done.",
                                             "Move inside itself alert -> message"), [self name]]];
         [alert addButtonWithTitle: NSLocalizedString(@"OK", "Move inside itself alert -> button")];
-        
+
         [alert runModal];
         [alert release];
-        
+
         return;
     }
-    
+
     volatile int status;
     tr_torrentSetLocation(fHandle, [folder UTF8String], YES, NULL, &status);
-    
+
     while (status == TR_LOC_MOVING) //block while moving (for now)
         [NSThread sleepForTimeInterval: 0.05];
-    
+
     if (status == TR_LOC_DONE)
         [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateStats" object: nil];
     else
@@ -591,11 +591,11 @@ bool trashDataFile(const char * filename, tr_error ** error)
         [alert setInformativeText: [NSString stringWithFormat:
                 NSLocalizedString(@"The move operation of \"%@\" cannot be done.", "Move error alert -> message"), [self name]]];
         [alert addButtonWithTitle: NSLocalizedString(@"OK", "Move error alert -> button")];
-        
+
         [alert runModal];
         [alert release];
     }
-    
+
     [self updateTimeMachineExclude];
 }
 
@@ -608,18 +608,18 @@ bool trashDataFile(const char * filename, tr_error ** error)
 {
     if ([self allDownloaded] || ![fDefaults boolForKey: @"WarningRemainingSpace"])
         return YES;
-    
+
     NSString * downloadFolder = [self currentDirectory];
     NSDictionary * systemAttributes;
     if ((systemAttributes = [[NSFileManager defaultManager] attributesOfFileSystemForPath: downloadFolder error: NULL]))
     {
         const uint64_t remainingSpace = [[systemAttributes objectForKey: NSFileSystemFreeSize] unsignedLongLongValue];
-        
+
         //if the remaining space is greater than the size left, then there is enough space regardless of preallocation
         if (remainingSpace < [self sizeLeft] && remainingSpace < tr_torrentGetBytesLeftToAllocate(fHandle))
         {
             NSString * volumeName = [[[NSFileManager defaultManager] componentsToDisplayForPath: downloadFolder] objectAtIndex: 0];
-            
+
             NSAlert * alert = [[NSAlert alloc] init];
             [alert setMessageText: [NSString stringWithFormat:
                                     NSLocalizedString(@"Not enough remaining disk space to download \"%@\" completely.",
@@ -629,7 +629,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
                                         "Torrent disk space alert -> message"), volumeName]];
             [alert addButtonWithTitle: NSLocalizedString(@"OK", "Torrent disk space alert -> button")];
             [alert addButtonWithTitle: NSLocalizedString(@"Download Anyway", "Torrent disk space alert -> button")];
-            
+
             [alert setShowsSuppressionButton: YES];
             [[alert suppressionButton] setTitle: NSLocalizedString(@"Do not check disk space again",
                                                     "Torrent disk space alert -> button")];
@@ -638,7 +638,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
             if ([[alert suppressionButton] state] == NSOnState)
                 [fDefaults setBool: NO forKey: @"WarningRemainingSpace"];
             [alert release];
-            
+
             return result != NSAlertFirstButtonReturn;
         }
     }
@@ -649,7 +649,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
 {
     if ([self isMagnet])
         return [NSImage imageNamed: @"Magnet"];
-    
+
     if (!fIcon)
         fIcon = [self isFolder] ? [[NSImage imageNamed: NSImageNameFolder] retain]
                                 : [[[NSWorkspace sharedWorkspace] iconForFileType: [[self name] pathExtension]] retain];
@@ -680,9 +680,9 @@ bool trashDataFile(const char * filename, tr_error ** error)
 {
     int count;
     tr_tracker_stat * stats = tr_torrentTrackers(fHandle, &count);
-    
+
     NSMutableArray * trackers = [NSMutableArray arrayWithCapacity: (count > 0 ? count + (stats[count-1].tier + 1) : 0)];
-    
+
     int prevTier = -1;
     for (int i=0; i < count; ++i)
     {
@@ -691,12 +691,12 @@ bool trashDataFile(const char * filename, tr_error ** error)
             [trackers addObject: @{ @"Tier" : @(stats[i].tier + 1), @"Name" : [self name] }];
             prevTier = stats[i].tier;
         }
-        
+
         TrackerNode * tracker = [[TrackerNode alloc] initWithTrackerStat: &stats[i] torrent: self];
         [trackers addObject: tracker];
         [tracker release];
     }
-    
+
     tr_torrentTrackersFree(stats, count);
     return trackers;
 }
@@ -704,33 +704,33 @@ bool trashDataFile(const char * filename, tr_error ** error)
 - (NSArray *) allTrackersFlat
 {
     NSMutableArray * allTrackers = [NSMutableArray arrayWithCapacity: fInfo->trackerCount];
-    
+
     for (NSInteger i=0; i < fInfo->trackerCount; i++)
         [allTrackers addObject: [NSString stringWithUTF8String: fInfo->trackers[i].announce]];
-    
+
     return allTrackers;
 }
 
 - (BOOL) addTrackerToNewTier: (NSString *) tracker
 {
     tracker = [tracker stringByTrimmingCharactersInSet: [NSCharacterSet whitespaceAndNewlineCharacterSet]];
-    
+
     if ([tracker rangeOfString: @"://"].location == NSNotFound)
         tracker = [@"http://" stringByAppendingString: tracker];
-    
+
     //recreate the tracker structure
     const int oldTrackerCount = fInfo->trackerCount;
     tr_tracker_info * trackerStructs = tr_new(tr_tracker_info, oldTrackerCount+1);
-    for (NSUInteger i=0; i < oldTrackerCount; ++i)
+    for (int i = 0; i < oldTrackerCount; ++i)
         trackerStructs[i] = fInfo->trackers[i];
-    
+
     trackerStructs[oldTrackerCount].announce = (char *)[tracker UTF8String];
     trackerStructs[oldTrackerCount].tier = trackerStructs[oldTrackerCount-1].tier + 1;
     trackerStructs[oldTrackerCount].id = oldTrackerCount;
-    
+
     const BOOL success = tr_torrentSetAnnounceList(fHandle, trackerStructs, oldTrackerCount+1);
     tr_free(trackerStructs);
-    
+
     return success;
 }
 
@@ -738,17 +738,17 @@ bool trashDataFile(const char * filename, tr_error ** error)
 {
     //recreate the tracker structure
     tr_tracker_info * trackerStructs = tr_new(tr_tracker_info, fInfo->trackerCount);
-    
+
     NSUInteger newCount = 0;
     for (NSUInteger i = 0; i < fInfo->trackerCount; i++)
     {
         if (![trackers containsObject: [NSString stringWithUTF8String: fInfo->trackers[i].announce]])
             trackerStructs[newCount++] = fInfo->trackers[i];
     }
-    
+
     const BOOL success = tr_torrentSetAnnounceList(fHandle, trackerStructs, newCount);
     NSAssert(success, @"Removing tracker addresses failed");
-    
+
     tr_free(trackerStructs);
 }
 
@@ -797,14 +797,14 @@ bool trashDataFile(const char * filename, tr_error ** error)
 {
     if ([self isMagnet])
         return nil;
-    
+
     if ([self isFolder])
     {
         NSString * dataLocation = [[self currentDirectory] stringByAppendingPathComponent: [self name]];
-        
+
         if (![[NSFileManager defaultManager] fileExistsAtPath: dataLocation])
             return nil;
-        
+
         return dataLocation;
     }
     else
@@ -812,10 +812,10 @@ bool trashDataFile(const char * filename, tr_error ** error)
         char * location = tr_torrentFindFile(fHandle, 0);
         if (location == NULL)
             return nil;
-        
+
         NSString * dataLocation = [NSString stringWithUTF8String: location];
         free(location);
-        
+
         return dataLocation;
     }
 }
@@ -826,10 +826,10 @@ bool trashDataFile(const char * filename, tr_error ** error)
     {
         NSString * basePath = [[node path] stringByAppendingPathComponent: [node name]];
         NSString * dataLocation = [[self currentDirectory] stringByAppendingPathComponent: basePath];
-        
+
         if (![[NSFileManager defaultManager] fileExistsAtPath: dataLocation])
             return nil;
-        
+
         return dataLocation;
     }
     else
@@ -837,10 +837,10 @@ bool trashDataFile(const char * filename, tr_error ** error)
         char * location = tr_torrentFindFile(fHandle, [[node indexes] firstIndex]);
         if (location == NULL)
             return nil;
-        
+
         NSString * dataLocation = [NSString stringWithUTF8String: location];
         free(location);
-        
+
         return dataLocation;
     }
 }
@@ -849,9 +849,9 @@ bool trashDataFile(const char * filename, tr_error ** error)
 {
     NSParameterAssert(newName != nil);
     NSParameterAssert(![newName isEqualToString: @""]);
-    
+
     NSDictionary * contextInfo = [@{ @"Torrent" : self, @"CompletionHandler" : [[completionHandler copy] autorelease] } retain];
-    
+
     tr_torrentRenamePath(fHandle, fInfo->name, [newName UTF8String], renameCallback, contextInfo);
 }
 
@@ -860,9 +860,9 @@ bool trashDataFile(const char * filename, tr_error ** error)
     NSParameterAssert([node torrent] == self);
     NSParameterAssert(newName != nil);
     NSParameterAssert(![newName isEqualToString: @""]);
-    
+
     NSDictionary * contextInfo = [@{ @"Torrent" : self, @"Nodes" : @[ node ], @"CompletionHandler" : [[completionHandler copy] autorelease] } retain];
-    
+
     NSString * oldPath = [[node path] stringByAppendingPathComponent: [node name]];
     tr_torrentRenamePath(fHandle, [oldPath UTF8String], [newName UTF8String], renameCallback, contextInfo);
 }
@@ -881,7 +881,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
 {
     if ([self size] == 0) //magnet links
         return 0.0;
-    
+
     return (CGFloat)[self sizeLeft] / [self size];
 }
 
@@ -944,15 +944,15 @@ bool trashDataFile(const char * filename, tr_error ** error)
 {
     if (![self isAnyErrorOrWarning])
         return @"";
-    
+
     NSString * error;
     if (!(error = [NSString stringWithUTF8String: fStat->errorString])
         && !(error = [NSString stringWithCString: fStat->errorString encoding: NSISOLatin1StringEncoding]))
         error = [NSString stringWithFormat: @"(%@)", NSLocalizedString(@"unreadable error", "Torrent -> error string unreadable")];
-    
+
     //libtransmission uses "Set Location", Mac client uses "Move data file to..." - very hacky!
     error = [error stringByReplacingOccurrencesOfString: @"Set Location" withString: [@"Move Data File To" stringByAppendingEllipsis]];
-    
+
     return error;
 }
 
@@ -960,14 +960,14 @@ bool trashDataFile(const char * filename, tr_error ** error)
 {
     int totalPeers;
     tr_peer_stat * peers = tr_torrentPeers(fHandle, &totalPeers);
-    
+
     NSMutableArray * peerDicts = [NSMutableArray arrayWithCapacity: totalPeers];
-    
+
     for (int i = 0; i < totalPeers; i++)
     {
         tr_peer_stat * peer = &peers[i];
         NSMutableDictionary * dict = [NSMutableDictionary dictionaryWithCapacity: 12];
-        
+
         [dict setObject: [self name] forKey: @"Name"];
         [dict setObject: [NSNumber numberWithInt: peer->from] forKey: @"From"];
         [dict setObject: [NSString stringWithUTF8String: peer->addr] forKey: @"IP"];
@@ -978,17 +978,17 @@ bool trashDataFile(const char * filename, tr_error ** error)
         [dict setObject: [NSNumber numberWithBool: peer->isUTP] forKey: @"uTP"];
         [dict setObject: [NSString stringWithUTF8String: peer->client] forKey: @"Client"];
         [dict setObject: [NSString stringWithUTF8String: peer->flagStr] forKey: @"Flags"];
-        
+
         if (peer->isUploadingTo)
             [dict setObject: [NSNumber numberWithDouble: peer->rateToPeer_KBps] forKey: @"UL To Rate"];
         if (peer->isDownloadingFrom)
             [dict setObject: [NSNumber numberWithDouble: peer->rateToClient_KBps] forKey: @"DL From Rate"];
-        
+
         [peerDicts addObject: dict];
     }
-    
+
     tr_torrentPeersFree(peers, totalPeers);
-    
+
     return peerDicts;
 }
 
@@ -1000,24 +1000,24 @@ bool trashDataFile(const char * filename, tr_error ** error)
 - (NSArray *) webSeeds
 {
     NSMutableArray * webSeeds = [NSMutableArray arrayWithCapacity: fInfo->webseedCount];
-    
+
     double * dlSpeeds = tr_torrentWebSpeeds_KBps(fHandle);
-    
+
     for (NSInteger i = 0; i < fInfo->webseedCount; i++)
     {
         NSMutableDictionary * dict = [NSMutableDictionary dictionaryWithCapacity: 3];
-        
+
         [dict setObject: [self name] forKey: @"Name"];
         [dict setObject: [NSString stringWithUTF8String: fInfo->webseeds[i]] forKey: @"Address"];
-        
+
         if (dlSpeeds[i] != -1.0)
             [dict setObject: [NSNumber numberWithDouble: dlSpeeds[i]] forKey: @"DL From Rate"];
-        
+
         [webSeeds addObject: dict];
     }
-    
+
     tr_free(dlSpeeds);
-    
+
     return webSeeds;
 }
 
@@ -1029,13 +1029,13 @@ bool trashDataFile(const char * filename, tr_error ** error)
                     ? [NSString stringWithFormat: NSLocalizedString(@"%@ of torrent metadata retrieved",
                         "Torrent -> progress string"), [NSString percentString: fStat->metadataPercentComplete longDecimals: YES]]
                     : NSLocalizedString(@"torrent metadata needed", "Torrent -> progress string");
-        
+
         return [NSString stringWithFormat: @"%@ - %@", NSLocalizedString(@"Magnetized transfer", "Torrent -> progress string"),
                                             progressString];
     }
-    
+
     NSString * string;
-    
+
     if (![self allDownloaded])
     {
         CGFloat progress;
@@ -1049,7 +1049,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
             string = [NSString stringForFilePartialSize: [self haveTotal] fullSize: [self size]];
             progress = [self progress];
         }
-        
+
         string = [string stringByAppendingFormat: @" (%@)", [NSString percentString: progress longDecimals: YES]];
     }
     else
@@ -1069,25 +1069,25 @@ bool trashDataFile(const char * filename, tr_error ** error)
         }
         else
             downloadString = [NSString stringForFileSize: [self size]];
-        
+
         NSString * uploadString = [NSString stringWithFormat: NSLocalizedString(@"uploaded %@ (Ratio: %@)",
                                     "Torrent -> progress string"), [NSString stringForFileSize: [self uploadedTotal]],
                                     [NSString stringForRatio: [self ratio]]];
-        
+
         string = [downloadString stringByAppendingFormat: @", %@", uploadString];
     }
-    
+
     //add time when downloading or seed limit set
     if ([self shouldShowEta])
         string = [string stringByAppendingFormat: @" - %@", [self etaString]];
-    
+
     return string;
 }
 
 - (NSString *) statusString
 {
     NSString * string;
-    
+
     if ([self isAnyErrorOrWarning])
     {
         switch (fStat->error)
@@ -1097,7 +1097,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
             case TR_STAT_TRACKER_WARNING: string = NSLocalizedString(@"Tracker returned warning", "Torrent -> status string"); break;
             default: NSAssert(NO, @"unknown error state");
         }
-        
+
         NSString * errorString = [self errorMessage];
         if (errorString && ![errorString isEqualToString: @""])
             string = [string stringByAppendingFormat: @": %@", errorString];
@@ -1112,15 +1112,15 @@ bool trashDataFile(const char * filename, tr_error ** error)
                 else
                     string = NSLocalizedString(@"Paused", "Torrent -> status string");
                 break;
-            
+
             case TR_STATUS_DOWNLOAD_WAIT:
                 string = [NSLocalizedString(@"Waiting to download", "Torrent -> status string") stringByAppendingEllipsis];
                 break;
-                
+
             case TR_STATUS_SEED_WAIT:
                 string = [NSLocalizedString(@"Waiting to seed", "Torrent -> status string") stringByAppendingEllipsis];
                 break;
-            
+
             case TR_STATUS_CHECK_WAIT:
                 string = [NSLocalizedString(@"Waiting to check existing data", "Torrent -> status string") stringByAppendingEllipsis];
                 break;
@@ -1138,7 +1138,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
                 else
                     string = [NSString stringWithFormat: NSLocalizedString(@"Downloading from %d of 1 peer",
                                                     "Torrent -> status string"), [self peersSendingToUs]];
-                
+
                 const NSInteger webSeedCount = fStat->webseedsSendingToUs;
                 if (webSeedCount > 0)
                 {
@@ -1148,10 +1148,10 @@ bool trashDataFile(const char * filename, tr_error ** error)
                     else
                         webSeedString = [NSString stringWithFormat: NSLocalizedString(@"%d web seeds", "Torrent -> status string"),
                                                                     webSeedCount];
-                    
+
                     string = [string stringByAppendingFormat: @" + %@", webSeedString];
                 }
-                
+
                 break;
 
             case TR_STATUS_SEED:
@@ -1162,11 +1162,11 @@ bool trashDataFile(const char * filename, tr_error ** error)
                     string = [NSString stringWithFormat: NSLocalizedString(@"Seeding to %d of 1 peer", "Torrent -> status string"),
                                                     [self peersGettingFromUs]];
         }
-        
+
         if ([self isStalled])
             string = [NSLocalizedString(@"Stalled", "Torrent -> status string") stringByAppendingFormat: @", %@", string];
     }
-    
+
     //append even if error
     if ([self isActive] && ![self isChecking])
     {
@@ -1178,14 +1178,14 @@ bool trashDataFile(const char * filename, tr_error ** error)
             string = [string stringByAppendingFormat: @" - %@: %@",
                         NSLocalizedString(@"UL", "Torrent -> status string"), [NSString stringForSpeed: [self uploadRate]]];
     }
-    
+
     return string;
 }
 
 - (NSString *) shortStatusString
 {
     NSString * string;
-    
+
     switch (fStat->activity)
     {
         case TR_STATUS_STOPPED:
@@ -1194,11 +1194,11 @@ bool trashDataFile(const char * filename, tr_error ** error)
             else
                 string = NSLocalizedString(@"Paused", "Torrent -> status string");
             break;
-        
+
         case TR_STATUS_DOWNLOAD_WAIT:
             string = [NSLocalizedString(@"Waiting to download", "Torrent -> status string") stringByAppendingEllipsis];
             break;
-            
+
         case TR_STATUS_SEED_WAIT:
             string = [NSLocalizedString(@"Waiting to seed", "Torrent -> status string") stringByAppendingEllipsis];
             break;
@@ -1212,19 +1212,19 @@ bool trashDataFile(const char * filename, tr_error ** error)
                         NSLocalizedString(@"Checking existing data", "Torrent -> status string"),
                         [NSString percentString: [self checkingProgress] longDecimals: YES]];
             break;
-        
+
         case TR_STATUS_DOWNLOAD:
             string = [NSString stringWithFormat: @"%@: %@, %@: %@",
                             NSLocalizedString(@"DL", "Torrent -> status string"), [NSString stringForSpeed: [self downloadRate]],
                             NSLocalizedString(@"UL", "Torrent -> status string"), [NSString stringForSpeed: [self uploadRate]]];
             break;
-        
+
         case TR_STATUS_SEED:
             string = [NSString stringWithFormat: @"%@: %@, %@: %@",
                             NSLocalizedString(@"Ratio", "Torrent -> status string"), [NSString stringForRatio: [self ratio]],
                             NSLocalizedString(@"UL", "Torrent -> status string"), [NSString stringForSpeed: [self uploadRate]]];
     }
-    
+
     return string;
 }
 
@@ -1245,21 +1245,21 @@ bool trashDataFile(const char * filename, tr_error ** error)
         case TR_STATUS_SEED_WAIT:
         {
             NSString * string = NSLocalizedString(@"Paused", "Torrent -> status string");
-            
+
             NSString * extra = nil;
             if ([self waitingToStart])
             {
-                extra = fStat->activity == TR_STATUS_DOWNLOAD_WAIT 
+                extra = fStat->activity == TR_STATUS_DOWNLOAD_WAIT
                         ? NSLocalizedString(@"Waiting to download", "Torrent -> status string")
                         : NSLocalizedString(@"Waiting to seed", "Torrent -> status string");
             }
             else if ([self isFinishedSeeding])
                 extra = NSLocalizedString(@"Seeding complete", "Torrent -> status string");
             else;
-        
+
             return extra ? [string stringByAppendingFormat: @" (%@)", extra] : string;
         }
-        
+
         case TR_STATUS_CHECK_WAIT:
             return [NSLocalizedString(@"Waiting to check existing data", "Torrent -> status string") stringByAppendingEllipsis];
 
@@ -1376,13 +1376,13 @@ bool trashDataFile(const char * filename, tr_error ** error)
     return fGroupValue;
 }
 
-- (void) setGroupValue: (NSInteger) groupValue determinationType: (TorrentDeterminationType) determinationType;
+- (void) setGroupValue: (NSInteger) groupValue determinationType: (TorrentDeterminationType) determinationType
 {
     if (groupValue != fGroupValue)
     {
         fGroupValue = groupValue;
         [[NSNotificationCenter defaultCenter] postNotificationName: kTorrentDidChangeGroupNotification object: self];
-	}
+    }
     fGroupValueDetermination = determinationType;
 }
 
@@ -1416,7 +1416,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
 {
     if (fFileStat)
         tr_torrentFilesFree(fFileStat, [self fileCount]);
-    
+
     fFileStat = tr_torrentFiles(fHandle, NULL);
 }
 
@@ -1424,31 +1424,31 @@ bool trashDataFile(const char * filename, tr_error ** error)
 {
     if ([self fileCount] == 1 || [self isComplete])
         return [self progress];
-    
+
     if (!fFileStat)
         [self updateFileStat];
-    
+
     // #5501
     if ([node size] == 0) {
         return 1.0;
     }
-    
+
     NSIndexSet * indexSet = [node indexes];
-    
+
     if ([indexSet count] == 1)
         return fFileStat[[indexSet firstIndex]].progress;
-    
+
     uint64_t have = 0;
     for (NSInteger index = [indexSet firstIndex]; index != NSNotFound; index = [indexSet indexGreaterThanIndex: index])
         have += fFileStat[index].bytesCompleted;
-    
+
     return (CGFloat)have / [node size];
 }
 
 - (BOOL) canChangeDownloadCheckForFile: (NSUInteger) index
 {
-    NSAssert2(index < [self fileCount], @"Index %ld is greater than file count %ld", index, [self fileCount]);
-    
+    NSAssert2((NSInteger)index < [self fileCount], @"Index %ld is greater than file count %ld", index, [self fileCount]);
+
     return [self canChangeDownloadCheckForFiles: [NSIndexSet indexSetWithIndex: index]];
 }
 
@@ -1456,10 +1456,10 @@ bool trashDataFile(const char * filename, tr_error ** error)
 {
     if ([self fileCount] == 1 || [self isComplete])
         return NO;
-    
+
     if (!fFileStat)
         [self updateFileStat];
-    
+
     __block BOOL canChange = NO;
     [indexSet enumerateIndexesWithOptions: NSEnumerationConcurrent usingBlock: ^(NSUInteger index, BOOL *stop) {
         if (fFileStat[index].progress < 1.0)
@@ -1480,7 +1480,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
             onState = YES;
         else
             offState = YES;
-        
+
         if (onState && offState)
             return NSMixedState;
     }
@@ -1493,10 +1493,10 @@ bool trashDataFile(const char * filename, tr_error ** error)
     tr_file_index_t * files = malloc(count * sizeof(tr_file_index_t));
     for (NSUInteger index = [indexSet firstIndex], i = 0; index != NSNotFound; index = [indexSet indexGreaterThanIndex: index], i++)
         files[i] = index;
-    
+
     tr_torrentSetFileDLs(fHandle, files, count, state != NSOffState);
     free(files);
-    
+
     [self update];
     [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentFileCheckChange" object: self];
 }
@@ -1507,7 +1507,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
     tr_file_index_t * files = tr_malloc(count * sizeof(tr_file_index_t));
     for (NSUInteger index = [indexSet firstIndex], i = 0; index != NSNotFound; index = [indexSet indexGreaterThanIndex: index], i++)
         files[i] = index;
-    
+
     tr_torrentSetFilePriorities(fHandle, files, count, priority);
     tr_free(files);
 }
@@ -1523,13 +1523,13 @@ bool trashDataFile(const char * filename, tr_error ** error)
 - (NSSet *) filePrioritiesForIndexes: (NSIndexSet *) indexSet
 {
     BOOL low = NO, normal = NO, high = NO;
-    NSMutableSet * priorities = [NSMutableSet setWithCapacity: MIN([indexSet count], 3)];
-    
+    NSMutableSet * priorities = [NSMutableSet setWithCapacity: MIN([indexSet count], 3u)];
+
     for (NSUInteger index = [indexSet firstIndex]; index != NSNotFound; index = [indexSet indexGreaterThanIndex: index])
     {
         if (![self canChangeDownloadCheckForFile: index])
             continue;
-        
+
         const tr_priority_t priority = fInfo->files[index].priority;
         switch (priority)
         {
@@ -1551,7 +1551,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
             default:
                 NSAssert2(NO, @"Unknown priority %d for file index %ld", priority, index);
         }
-        
+
         [priorities addObject: [NSNumber numberWithInteger: priority]];
         if (low && normal && high)
             break;
@@ -1597,7 +1597,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
 {
     if (fStat->idleSecs == -1)
         return -1;
-    
+
     return fStat->idleSecs / 60;
 }
 
@@ -1630,16 +1630,16 @@ bool trashDataFile(const char * filename, tr_error ** error)
 {
     int count;
     tr_tracker_stat * stats = tr_torrentTrackers(fHandle, &count);
-    
+
     NSString * best = nil;
-    
+
     for (int i=0; i < count; ++i)
     {
         NSString * tracker = [NSString stringWithUTF8String: stats[i].host];
         if (!best || [tracker localizedCaseInsensitiveCompare: best] == NSOrderedAscending)
             best = tracker;
     }
-    
+
     tr_torrentTrackersFree(stats, count);
     return best;
 }
@@ -1668,38 +1668,38 @@ bool trashDataFile(const char * filename, tr_error ** error)
 {
     if (!(self = [super init]))
         return nil;
-    
+
     fDefaults = [NSUserDefaults standardUserDefaults];
-    
+
     if (torrentStruct)
         fHandle = torrentStruct;
     else
     {
         //set libtransmission settings for initialization
         tr_ctor * ctor = tr_ctorNew(lib);
-        
+
         tr_ctorSetPaused(ctor, TR_FORCE, YES);
         if (downloadFolder)
             tr_ctorSetDownloadDir(ctor, TR_FORCE, [downloadFolder UTF8String]);
         if (incompleteFolder)
             tr_ctorSetIncompleteDir(ctor, [incompleteFolder UTF8String]);
-        
+
         tr_parse_result result = TR_PARSE_ERR;
         if (path)
             result = tr_ctorSetMetainfoFromFile(ctor, [path UTF8String]);
-        
+
         if (result != TR_PARSE_OK && magnetAddress)
             result = tr_ctorSetMetainfoFromMagnetLink(ctor, [magnetAddress UTF8String]);
-        
+
         //backup - shouldn't be needed after upgrade to 1.70
         if (result != TR_PARSE_OK && hashString)
             result = tr_ctorSetMetainfoFromHash(ctor, [hashString UTF8String]);
-        
+
         if (result == TR_PARSE_OK)
             fHandle = tr_torrentNew(ctor, NULL, NULL);
-        
+
         tr_ctorFree(ctor);
-        
+
         if (!fHandle)
         {
             [self release];
@@ -1708,23 +1708,23 @@ bool trashDataFile(const char * filename, tr_error ** error)
     }
 
     fInfo = tr_torrentInfo(fHandle);
-    
+
     tr_torrentSetQueueStartCallback(fHandle, startQueueCallback, self);
     tr_torrentSetCompletenessCallback(fHandle, completenessChangeCallback, self);
     tr_torrentSetRatioLimitHitCallback(fHandle, ratioLimitHitCallback, self);
     tr_torrentSetIdleLimitHitCallback(fHandle, idleLimitHitCallback, self);
     tr_torrentSetMetadataCallback(fHandle, metadataCallback, self);
-    
+
     fHashString = [[NSString alloc] initWithUTF8String: fInfo->hashString];
-    
+
     fResumeOnWake = NO;
-    
+
     //don't do after this point - it messes with auto-group functionality
     if (![self isMagnet])
         [self createFileList];
-	
+
     fDownloadFolderDetermination = TorrentDeterminationAutomatic;
-    
+
     if (groupValue)
     {
         fGroupValueDetermination = TorrentDeterminationUserSpecified;
@@ -1735,45 +1735,45 @@ bool trashDataFile(const char * filename, tr_error ** error)
         fGroupValueDetermination = TorrentDeterminationAutomatic;
         fGroupValue = [[GroupsController groups] groupIndexForTorrent: self];
     }
-    
+
     fRemoveWhenFinishSeeding = removeWhenFinishSeeding ? [removeWhenFinishSeeding boolValue] : [fDefaults boolForKey: @"RemoveWhenFinishSeeding"];
-    
+
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(checkGroupValueForRemoval:)
         name: @"GroupValueRemoved" object: nil];
-    
+
     fTimeMachineExcludeInitialized = NO;
     [self update];
-    
+
     return self;
 }
 
 - (void) createFileList
 {
     NSAssert(![self isMagnet], @"Cannot create a file list until the torrent is demagnetized");
-    
+
     if ([self isFolder])
     {
         const NSInteger count = [self fileCount];
         NSMutableArray * flatFileList = [NSMutableArray arrayWithCapacity: count];
-        
+
         FileListNode * tempNode = nil;
-        
+
         for (NSInteger i = 0; i < count; i++)
         {
             tr_file * file = &fInfo->files[i];
-            
+
             NSString * fullPath = [NSString stringWithUTF8String: file->name];
             NSArray * pathComponents = [fullPath pathComponents];
-            
+
             if (!tempNode)
                 tempNode = [[FileListNode alloc] initWithFolderName:[pathComponents objectAtIndex: 0] path:@"" torrent:self];
-            
+
             [self insertPathForComponents: pathComponents withComponentIndex: 1 forParent: tempNode fileSize: file->length index: i flatList: flatFileList];
         }
-        
+
         [self sortFileList: [tempNode children]];
         [self sortFileList: flatFileList];
-        
+
         fFileList = [[NSArray alloc] initWithArray: [tempNode children]];
         fFlatFileList = [[NSArray alloc] initWithArray: flatFileList];
         [tempNode release];
@@ -1792,10 +1792,10 @@ bool trashDataFile(const char * filename, tr_error ** error)
 {
     NSParameterAssert([components count] > 0);
     NSParameterAssert(componentIndex < [components count]);
-    
+
     NSString * name = [components objectAtIndex: componentIndex];
     const BOOL isFolder = componentIndex < ([components count]-1);
-    
+
     //determine if folder node already exists
     __block FileListNode * node = nil;
     if (isFolder)
@@ -1808,7 +1808,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
             }
         }];
     }
-    
+
     //create new folder or file if it doesn't already exist
     if (!node)
     {
@@ -1820,14 +1820,14 @@ bool trashDataFile(const char * filename, tr_error ** error)
             node = [[[FileListNode alloc] initWithFileName: name path: path size: size index: index torrent: self] autorelease];
             [flatFileList addObject: node];
         }
-        
+
         [parent insertChild: node];
     }
-    
+
     if (isFolder)
     {
         [node insertIndex: index withSize: size];
-        
+
         [self insertPathForComponents: components withComponentIndex: (componentIndex+1) forParent: node fileSize: size index: index flatList: flatFileList];
     }
 }
@@ -1836,7 +1836,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
 {
     NSSortDescriptor * descriptor = [NSSortDescriptor sortDescriptorWithKey: @"name" ascending: YES selector: @selector(localizedStandardCompare:)];
     [fileNodes sortUsingDescriptors: [NSArray arrayWithObject: descriptor]];
-    
+
     [fileNodes enumerateObjectsWithOptions: NSEnumerationConcurrent usingBlock: ^(FileListNode * node, NSUInteger idx, BOOL * stop) {
         if ([node isFolder])
             [self sortFileList: [node children]];
@@ -1852,7 +1852,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
 - (void) completenessChange: (tr_completeness) status wasRunning: (BOOL) wasRunning
 {
     fStat = tr_torrentStat(fHandle); //don't call update yet to avoid auto-stop
-    
+
     switch (status)
     {
         case TR_SEED:
@@ -1860,26 +1860,36 @@ bool trashDataFile(const char * filename, tr_error ** error)
         {
             NSDictionary * statusInfo = @{ @"Status" : @(status), @"WasRunning" : @(wasRunning) };
             [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentFinishedDownloading" object: self userInfo: statusInfo];
-            
+
             //quarantine the finished data
             NSString * dataLocation = [[self currentDirectory] stringByAppendingPathComponent: [self name]];
-            FSRef ref;
-            if (FSPathMakeRef((const UInt8 *)[dataLocation UTF8String], &ref, NULL) == noErr)
+            NSDictionary * quarantineProperties = @{ (NSString *)kLSQuarantineTypeKey : (NSString *)kLSQuarantineTypeOtherDownload };
+            if ([NSApp isOnYosemiteOrBetter])
             {
-                NSDictionary * quarantineProperties = [NSDictionary dictionaryWithObject: (NSString *)kLSQuarantineTypeOtherDownload forKey: (NSString *)kLSQuarantineTypeKey];
-                if (LSSetItemAttribute(&ref, kLSRolesAll, kLSItemQuarantineProperties, quarantineProperties) != noErr)
-                    NSLog(@"Failed to quarantine: %@", dataLocation);
+                NSURL * dataLocationUrl = [NSURL fileURLWithPath: dataLocation];
+                NSError * error = nil;
+                if (![dataLocationUrl setResourceValue: quarantineProperties forKey: NSURLQuarantinePropertiesKey error: &error])
+                    NSLog(@"Failed to quarantine %@: %@", dataLocation, [error description]);
             }
             else
-                NSLog(@"Could not find file to quarantine: %@", dataLocation);
-            
+            {
+                NSString * dataLocation = [[self currentDirectory] stringByAppendingPathComponent: [self name]];
+                FSRef ref;
+                if (FSPathMakeRef((const UInt8 *)[dataLocation UTF8String], &ref, NULL) == noErr)
+                {
+                    if (LSSetItemAttribute(&ref, kLSRolesAll, kLSItemQuarantineProperties, quarantineProperties) != noErr)
+                        NSLog(@"Failed to quarantine: %@", dataLocation);
+                }
+                else
+                    NSLog(@"Could not find file to quarantine: %@", dataLocation);
+            }
             break;
         }
         case TR_LEECH:
             [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentRestartedDownloading" object: self];
             break;
     }
-    
+
     [self update];
     [self updateTimeMachineExclude];
 }
@@ -1887,14 +1897,14 @@ bool trashDataFile(const char * filename, tr_error ** error)
 - (void) ratioLimitHit
 {
     fStat = tr_torrentStat(fHandle);
-    
+
     [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentFinishedSeeding" object: self];
 }
 
 - (void) idleLimitHit
 {
     fStat = tr_torrentStat(fHandle);
-    
+
     [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentFinishedSeeding" object: self];
 }
 
@@ -1903,13 +1913,13 @@ bool trashDataFile(const char * filename, tr_error ** error)
     fStat = tr_torrentStat(fHandle);
 
     [self createFileList];
-    
+
     /* If the torrent is in no group, or the group was automatically determined based on criteria evaluated
      * before we had metadata for this torrent, redetermine the group
      */
     if ((fGroupValueDetermination == TorrentDeterminationAutomatic) || ([self groupValue] == -1))
         [self setGroupValue: [[GroupsController groups] groupIndexForTorrent: self] determinationType: TorrentDeterminationAutomatic];
-    
+
     //change the location if the group calls for it and it's either not already set or was set automatically before
     if (((fDownloadFolderDetermination == TorrentDeterminationAutomatic) || !tr_torrentGetCurrentDir(fHandle)) &&
         [[GroupsController groups] usesCustomDownloadLocationForIndex: [self groupValue]])
@@ -1917,7 +1927,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
         NSString *location = [[GroupsController groups] customDownloadLocationForIndex: [self groupValue]];
         [self changeDownloadFolderBeforeUsing: location determinationType:TorrentDeterminationAutomatic];
     }
-    
+
     [[NSNotificationCenter defaultCenter] postNotificationName: @"ResetInspector" object: self userInfo: @{ @"Torrent" : self }];
 }
 
@@ -1926,34 +1936,34 @@ bool trashDataFile(const char * filename, tr_error ** error)
     NSParameterAssert(completionHandler != nil);
     NSParameterAssert(oldPath != nil);
     NSParameterAssert(newName != nil);
-    
+
     NSString * path = [oldPath stringByDeletingLastPathComponent];
-    
+
     if (success)
     {
         NSString * oldName = [oldPath lastPathComponent];
         void (^__block updateNodeAndChildrenForRename)(FileListNode *) = ^(FileListNode * node) {
             [node updateFromOldName: oldName toNewName: newName inPath: path];
-            
+
             if ([node isFolder]) {
                 [[node children] enumerateObjectsWithOptions: NSEnumerationConcurrent usingBlock: ^(FileListNode * childNode, NSUInteger idx, BOOL * stop) {
                     updateNodeAndChildrenForRename(childNode);
                 }];
             }
         };
-        
+
         if (!nodes)
             nodes = fFlatFileList;
         [nodes enumerateObjectsWithOptions: NSEnumerationConcurrent usingBlock: ^(FileListNode * node, NSUInteger idx, BOOL *stop) {
             updateNodeAndChildrenForRename(node);
         }];
-        
+
         //resort lists
         NSMutableArray * fileList = [fFileList mutableCopy];
         [fFileList release];
         [self sortFileList: fileList];
         fFileList = fileList;
-        
+
         NSMutableArray * flatFileList = [fFlatFileList mutableCopy];
         [fFlatFileList release];
         [self sortFileList: flatFileList];
@@ -1961,7 +1971,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
     }
     else
         NSLog(@"Error renaming %@ to %@", oldPath, [path stringByAppendingPathComponent: newName]);
-    
+
     completionHandler(success);
 }
 
@@ -1974,12 +1984,12 @@ bool trashDataFile(const char * filename, tr_error ** error)
         //ratio: show if it's set at all
         if (tr_torrentGetSeedRatio(fHandle, NULL))
             return YES;
-        
+
         //idle: show only if remaining time is less than cap
         if (fStat->etaIdle != TR_ETA_NOT_AVAIL && fStat->etaIdle < ETA_IDLE_DISPLAY_SEC)
             return YES;
     }
-    
+
     return NO;
 }
 
@@ -2000,9 +2010,9 @@ bool trashDataFile(const char * filename, tr_error ** error)
     }
     else
         return NSLocalizedString(@"remaining time unknown", "Torrent -> eta string");
-    
+
     NSString * idleString;
-    
+
     if ([NSApp isOnYosemiteOrBetter]) {
         static NSDateComponentsFormatter *formatter;
         static dispatch_once_t onceToken;
@@ -2013,17 +2023,17 @@ bool trashDataFile(const char * filename, tr_error ** error)
             formatter.collapsesLargestUnit = YES;
             formatter.includesTimeRemainingPhrase = YES;
         });
-        
+
         idleString = [formatter stringFromTimeInterval: eta];
     }
     else {
         idleString = [NSString timeString: eta includesTimeRemainingPhrase: YES showSeconds: YES maxFields: 2];
     }
-    
+
     if (fromIdle) {
         idleString = [idleString stringByAppendingFormat: @" (%@)", NSLocalizedString(@"inactive", "Torrent -> eta string")];
     }
-    
+
     return idleString;
 }
 

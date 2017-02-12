@@ -34,24 +34,24 @@
     IBOutlet NSButton * fStartCheck, * fDeleteCheck;
     IBOutlet NSPopUpButton * fGroupPopUp, * fPriorityPopUp;
     IBOutlet NSProgressIndicator * fVerifyIndicator;
-    
+
     IBOutlet NSTextField * fFileFilterField;
     IBOutlet NSButton * fCheckAllButton, *fUncheckAllButton;
-    
+
     IBOutlet FileOutlineController * fFileController;
     IBOutlet NSScrollView * fFileScrollView;
-    
+
     Controller * fController;
-    
+
     Torrent * fTorrent;
     NSString * fDestination, * fTorrentFile;
     BOOL fLockDestination;
-    
+
     BOOL fDeleteTorrentEnableInitially, fCanToggleDelete;
     NSInteger fGroupValue;
-    
+
     NSTimer * fTimer;
-	
+
     TorrentDeterminationType fGroupValueDetermination;
 }
 

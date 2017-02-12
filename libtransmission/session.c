@@ -191,8 +191,8 @@ accept_incoming_peer (evutil_socket_t fd, short what UNUSED, void * vsession)
   clientSocket = tr_netAccept (session, fd, &clientAddr, &clientPort);
   if (clientSocket != TR_BAD_SOCKET)
     {
-      tr_logAddDeep (__FILE__, __LINE__, NULL, "new incoming connection %"TR_PRI_SOCK" (%s)",
-                       clientSocket, tr_peerIoAddrStr (&clientAddr, clientPort));
+      tr_logAddDeep (__FILE__, __LINE__, NULL, "new incoming connection %" PRIdMAX " (%s)",
+                     (intmax_t) clientSocket, tr_peerIoAddrStr (&clientAddr, clientPort));
       tr_peerMgrAddIncoming (session->peerMgr, &clientAddr, clientPort,
                              clientSocket, NULL);
     }
@@ -1866,6 +1866,9 @@ sessionCloseImplWaitForIdleUdp (evutil_socket_t   foo UNUSED,
 static void
 sessionCloseImplFinish (tr_session * session)
 {
+  event_free (session->saveTimer);
+  session->saveTimer = NULL;
+
   /* we had to wait until UDP trackers were closed before closing these: */
   evdns_base_free (session->evdns_base, 0);
   session->evdns_base = NULL;
@@ -2304,12 +2307,10 @@ loadBlocklists (tr_session * session)
       else
         {
           char * binname;
-          char * basename;
           tr_sys_path_info path_info;
           tr_sys_path_info binname_info;
 
-          basename = tr_sys_path_basename (name, NULL);
-          binname = tr_strdup_printf ("%s" TR_PATH_DELIMITER_STR "%s.bin", dirname, basename);
+          binname = tr_strdup_printf ("%s" TR_PATH_DELIMITER_STR "%s.bin", dirname, name);
 
           if (!tr_sys_path_get_info (binname, 0, &binname_info, NULL)) /* create it */
             {
@@ -2344,7 +2345,6 @@ loadBlocklists (tr_session * session)
               tr_free (old);
             }
 
-          tr_free (basename);
           tr_free (binname);
         }
 

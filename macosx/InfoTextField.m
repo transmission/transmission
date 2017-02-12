@@ -27,14 +27,14 @@
 - (void) setStringValue: (NSString *) string
 {
     [super setStringValue: string];
-    
+
     [self setSelectable: ![[self stringValue] isEqualToString: @""]];
 }
 
 - (void) setObjectValue: (id <NSCopying>) object
 {
     [super setObjectValue: object];
-    
+
     [self setSelectable: ![[self stringValue] isEqualToString: @""]];
 }
 

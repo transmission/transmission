@@ -29,9 +29,9 @@
 {
     Torrent * fTorrent;
     NSMutableArray * fFileList;
-    
+
     IBOutlet FileOutlineView * fOutline;
-    
+
     NSString * fFilterText;
 }
 

@@ -25,7 +25,7 @@
 @interface InfoTabButtonCell : NSButtonCell
 {
     NSImage * fIcon;
-    
+
     BOOL fSelected;
 }
 

@@ -32,14 +32,14 @@
     if ((self = [super init]))
     {
         fLib = lib;
-        
+
         BadgeView * view = [[BadgeView alloc] initWithLib: lib];
         [[NSApp dockTile] setContentView: view];
         [view release];
-        
+
         fHashes = [[NSMutableSet alloc] init];
     }
-    
+
     return self;
 }
 
@@ -55,7 +55,7 @@
                                     ? downloadRate : 0.0;
     const CGFloat displayUlRate = [[NSUserDefaults standardUserDefaults] boolForKey: @"BadgeUploadRate"]
                                     ? uploadRate : 0.0;
-    
+
     //only update if the badged values change
     if ([(BadgeView *)[[NSApp dockTile] contentView] setRatesWithDownload: displayDlRate upload: displayUlRate])
         [[NSApp dockTile] display];
@@ -64,7 +64,7 @@
 - (void) addCompletedTorrent: (Torrent *) torrent
 {
     NSParameterAssert(torrent != nil);
-    
+
     [fHashes addObject: [torrent hashString]];
     [[NSApp dockTile] setBadgeLabel: [NSString formattedUInteger: [fHashes count]]];
 }

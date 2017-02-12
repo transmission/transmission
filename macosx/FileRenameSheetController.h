@@ -17,7 +17,7 @@
     FileListNode * _node;
     void (^_completionHandler)(BOOL);
     NSString * _originalName;
-    
+
     IBOutlet NSTextField * _labelField;
     IBOutlet NSTextField * _inputField;
     IBOutlet NSButton * _renameButton;

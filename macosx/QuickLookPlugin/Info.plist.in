@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>CFBundleDocumentTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>QLGenerator</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>org.bittorrent.torrent</string>
+				<string>com.bittorrent.torrent</string>
+			</array>
+		</dict>
+	</array>
+	<key>CFBundleExecutable</key>
+	<string>QuickLookPlugin</string>
+	<key>CFBundleIdentifier</key>
+	<string>org.m0k.transmission.QuickLookPlugin</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>QuickLookPlugin</string>
+	<key>CFBundleShortVersionString</key>
+	<string>1</string>
+	<key>CFBundleVersion</key>
+	<string>1.0</string>
+	<key>CFPlugInDynamicRegisterFunction</key>
+	<string></string>
+	<key>CFPlugInDynamicRegistration</key>
+	<string>NO</string>
+	<key>CFPlugInFactories</key>
+	<dict>
+		<key>FDF02409-6B04-4738-973D-1AADB4FC34D8</key>
+		<string>QuickLookGeneratorPluginFactory</string>
+	</dict>
+	<key>CFPlugInTypes</key>
+	<dict>
+		<key>5E2D9680-5022-40FA-B806-43349622E5B9</key>
+		<array>
+			<string>FDF02409-6B04-4738-973D-1AADB4FC34D8</string>
+		</array>
+	</dict>
+	<key>CFPlugInUnloadFunction</key>
+	<string></string>
+	<key>NSHumanReadableCopyright</key>
+	<string>Copyright © 2005-2016 The Transmission Project</string>
+	<key>QLNeedsToBeRunInMainThread</key>
+	<false/>
+	<key>QLPreviewHeight</key>
+	<integer>600</integer>
+	<key>QLPreviewWidth</key>
+	<integer>600</integer>
+	<key>QLSupportsConcurrentRequests</key>
+	<true/>
+	<key>QLThumbnailMinimumSize</key>
+	<real>17</real>
+</dict>
+</plist>

@@ -127,6 +127,8 @@ test_construct (void)
   check (wd != NULL);
   check (tr_sys_path_is_same (test_dir, tr_watchdir_get_path (wd), NULL));
 
+  process_events ();
+
   tr_watchdir_free (wd);
 
   event_base_free (ev_base);

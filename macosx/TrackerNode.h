@@ -28,7 +28,7 @@
 @interface TrackerNode : NSObject
 {
     tr_tracker_stat fStat;
-    
+
     Torrent * fTorrent;
 }
 

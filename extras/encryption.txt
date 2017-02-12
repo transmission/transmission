@@ -35,7 +35,7 @@ B is the receiver
 Prime P is a 768 bit safe prime, "0xFFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628B80DC1CD129024E088A67CC74020BBEA63B139B22514A08798E3404DDEF9519B3CD3A431B302B0A6DF25F14374FE1356D6D51C245E485B576625E7EC6F44C42E9A63A36210000000000090563"
 Generator G is "2"
 
-Xa and Xb are a variable size random integers. 
+Xa and Xb are a variable size random integers.
 They are the private key for each side and have to be discarded after
 the DH handshake is done. Minimum length is 128 bit. Anything beyond 180 bit
 is not believed to add any further security and only increases the necessary
@@ -116,7 +116,7 @@ ENCRYPT() is RC4, that uses one of the following keys to send data:
 The first 1024 bytes of the RC4 output are discarded.
 consecutive calls to ENCRYPT() by one side continue the encryption
 stream (no reinitialization, no keychange). They are only used to distinguish
-semantically seperate content. 
+semantically seperate content.
 
 
 ENCRYPT2() is the negotiated crypto method.
@@ -155,7 +155,7 @@ are met the handshake can be considered as invalid.
 
 2 (termination by B)
 if A sent less than 96 Bytes within 30 seconds
-if A sent more than 608 bytes 
+if A sent more than 608 bytes
 
 3 (termination by A)
 if B sent less than 96 Bytes within 30 seconds

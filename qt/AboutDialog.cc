@@ -45,7 +45,8 @@ AboutDialog::showCredits ()
     this,
     tr ("Credits"),
     QString::fromUtf8 ("Jordan Lee (Backend; Daemon; GTK+; Qt)\n"
-                        "Michell Livingston (OS X)\n"));
+                        "Mitchell Livingston (OS X)\n"
+                        "Mike Gelfand\n"));
 }
 
 void

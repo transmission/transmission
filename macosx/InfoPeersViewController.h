@@ -28,14 +28,14 @@
 @interface InfoPeersViewController : NSViewController <InfoViewController, NSAnimationDelegate>
 {
     NSArray * fTorrents;
-    
+
     BOOL fSet;
-    
+
     NSMutableArray * fPeers, * fWebSeeds;
-    
+
     IBOutlet NSTableView * fPeerTable;
     IBOutlet WebSeedTableView * fWebSeedTable;
-    
+
     IBOutlet NSTextField * fConnectedPeersField;
 
     CGFloat fViewTopMargin;

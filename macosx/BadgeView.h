@@ -26,9 +26,9 @@
 @interface BadgeView : NSView
 {
     tr_session * fLib;
-    
+
     NSMutableDictionary * fAttributes;
-    
+
     CGFloat fDownloadRate, fUploadRate;
     BOOL fQuitting;
 }

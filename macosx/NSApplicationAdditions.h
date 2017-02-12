@@ -20,13 +20,10 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#define NSByteCountFormatterMtLion NSClassFromString(@"NSByteCountFormatter")
-#define NSUserNotificationMtLion NSClassFromString(@"NSUserNotification")
-#define NSUserNotificationCenterMtLion NSClassFromString(@"NSUserNotificationCenter")
+#import <AppKit/AppKit.h>
 
 @interface NSApplication (NSApplicationAdditions)
 
-- (BOOL) isOnMountainLionOrBetter;
 - (BOOL) isOnYosemiteOrBetter;
 
 @end

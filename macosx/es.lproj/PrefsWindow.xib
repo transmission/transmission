@@ -1,8 +1,9 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="9531" systemVersion="15B42" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11762" systemVersion="16D32" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="9531"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11762"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="PrefsController">
@@ -296,11 +297,11 @@
                     <tabViewItems>
                         <tabViewItem label="Añadir" identifier="" id="253">
                             <view key="view" id="255">
-                                <rect key="frame" x="10" y="33" width="496" height="324"/>
+                                <rect key="frame" x="10" y="33" width="496" height="333"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <subviews>
                                     <popUpButton verticalHuggingPriority="750" id="51">
-                                        <rect key="frame" x="259" y="291" width="182" height="26"/>
+                                        <rect key="frame" x="259" y="300" width="182" height="26"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                         <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="57" id="1215">
                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -343,7 +344,7 @@
                                         </popUpButtonCell>
                                     </popUpButton>
                                     <textField verticalHuggingPriority="750" id="59">
-                                        <rect key="frame" x="109" y="296" width="151" height="17"/>
+                                        <rect key="frame" x="109" y="305" width="151" height="17"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Ubicación por defecto:" id="1216">
                                             <font key="font" metaFont="system"/>
@@ -352,7 +353,7 @@
                                         </textFieldCell>
                                     </textField>
                                     <textField verticalHuggingPriority="750" id="61">
-                                        <rect key="frame" x="44" y="296" width="62" height="17"/>
+                                        <rect key="frame" x="44" y="305" width="62" height="17"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Ajustes:" id="1217">
                                             <font key="font" metaFont="system"/>
@@ -361,7 +362,7 @@
                                         </textFieldCell>
                                     </textField>
                                     <button id="115">
-                                        <rect key="frame" x="109" y="227" width="345" height="18"/>
+                                        <rect key="frame" x="109" y="236" width="345" height="18"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                         <buttonCell key="cell" type="check" title="Eliminar torrents al comenzar la descarga" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1218">
                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -372,7 +373,7 @@
                                         </connections>
                                     </button>
                                     <button id="1939">
-                                        <rect key="frame" x="109" y="207" width="345" height="18"/>
+                                        <rect key="frame" x="109" y="216" width="345" height="18"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                         <buttonCell key="cell" type="check" title="Añadir .part a los archivos incompletos" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1940">
                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -384,7 +385,7 @@
                                         </connections>
                                     </button>
                                     <button id="209">
-                                        <rect key="frame" x="109" y="74" width="181" height="18"/>
+                                        <rect key="frame" x="109" y="83" width="181" height="18"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                         <buttonCell key="cell" type="check" title="Buscar torrents en:" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1219">
                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -396,7 +397,7 @@
                                         </connections>
                                     </button>
                                     <popUpButton verticalHuggingPriority="750" id="216">
-                                        <rect key="frame" x="255" y="70" width="182" height="26"/>
+                                        <rect key="frame" x="255" y="79" width="182" height="26"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                         <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="220" id="1220">
                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -434,7 +435,7 @@
                                         </connections>
                                     </popUpButton>
                                     <textField verticalHuggingPriority="750" id="352">
-                                        <rect key="frame" x="9" y="75" width="97" height="17"/>
+                                        <rect key="frame" x="9" y="84" width="97" height="17"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Autoañadir:" id="1226">
                                             <font key="font" metaFont="system"/>
@@ -443,7 +444,7 @@
                                         </textFieldCell>
                                     </textField>
                                     <button id="537">
-                                        <rect key="frame" x="109" y="270" width="178" height="18"/>
+                                        <rect key="frame" x="109" y="279" width="178" height="18"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                         <buttonCell key="cell" type="check" title="Datos incompletos en:" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1227">
                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -455,7 +456,7 @@
                                         </connections>
                                     </button>
                                     <popUpButton verticalHuggingPriority="750" id="538">
-                                        <rect key="frame" x="273" y="266" width="182" height="26"/>
+                                        <rect key="frame" x="273" y="275" width="182" height="26"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                         <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="540" id="1228">
                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -492,7 +493,7 @@
                                         </connections>
                                     </popUpButton>
                                     <button id="1293">
-                                        <rect key="frame" x="109" y="171" width="307" height="18"/>
+                                        <rect key="frame" x="109" y="180" width="307" height="18"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                         <buttonCell key="cell" type="check" title="Mostrar la ventana de opciones" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1294">
                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -503,7 +504,7 @@
                                         </connections>
                                     </button>
                                     <button id="1947">
-                                        <rect key="frame" x="109" y="111" width="315" height="18"/>
+                                        <rect key="frame" x="109" y="120" width="315" height="18"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                         <buttonCell key="cell" type="check" title="Mostrar una ventana al abrir un enlace magnet" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1948">
                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -514,7 +515,7 @@
                                         </connections>
                                     </button>
                                     <button id="1334">
-                                        <rect key="frame" x="109" y="247" width="345" height="18"/>
+                                        <rect key="frame" x="109" y="256" width="345" height="18"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                         <buttonCell key="cell" type="check" title="Empezar tareas inmediatamente" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1335">
                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -539,7 +540,7 @@
                                         </connections>
                                     </button>
                                     <button id="1476">
-                                        <rect key="frame" x="128" y="131" width="288" height="18"/>
+                                        <rect key="frame" x="128" y="140" width="288" height="18"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                         <buttonCell key="cell" type="check" title="Sólo cuando se añadan manualmente" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1477">
                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -551,7 +552,7 @@
                                         </connections>
                                     </button>
                                     <textField verticalHuggingPriority="750" id="1337">
-                                        <rect key="frame" x="21" y="172" width="86" height="17"/>
+                                        <rect key="frame" x="21" y="181" width="86" height="17"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Al añadir:" id="1338">
                                             <font key="font" metaFont="system"/>
@@ -560,7 +561,7 @@
                                         </textFieldCell>
                                     </textField>
                                     <button id="1339">
-                                        <rect key="frame" x="128" y="151" width="235" height="18"/>
+                                        <rect key="frame" x="128" y="160" width="235" height="18"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                         <buttonCell key="cell" type="check" title="Sólo cuando haya varios archivos" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1340">
                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1109,10 +1110,10 @@
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" heightSizable="YES"/>
                     <clipView key="contentView" id="fRP-Wa-RJL">
                         <rect key="frame" x="1" y="1" width="141" height="169"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <tableView focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" columnResizing="NO" multipleSelection="NO" emptySelection="NO" autosaveColumns="NO" rowHeight="18" id="1774">
-                                <rect key="frame" x="0.0" y="0.0" width="141" height="20"/>
+                                <rect key="frame" x="0.0" y="0.0" width="141" height="169"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <size key="intercellSpacing" width="3" height="2"/>
                                 <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -1146,7 +1147,6 @@
                                 </connections>
                             </tableView>
                         </subviews>
-                        <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </clipView>
                     <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" doubleValue="0.19672129999999999" horizontal="YES" id="1775">
                         <rect key="frame" x="-100" y="-100" width="470" height="15"/>
@@ -1966,10 +1966,10 @@ los límites globales de ancho de banda</string>
                     <autoresizingMask key="autoresizingMask"/>
                     <clipView key="contentView" id="BUU-B1-SiU">
                         <rect key="frame" x="1" y="1" width="291" height="76"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" columnResizing="NO" autosaveColumns="NO" typeSelect="NO" id="1521">
-                                <rect key="frame" x="0.0" y="0.0" width="291" height="19"/>
+                                <rect key="frame" x="0.0" y="0.0" width="291" height="76"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <size key="intercellSpacing" width="3" height="2"/>
                                 <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -2004,7 +2004,6 @@ los límites globales de ancho de banda</string>
                                 </connections>
                             </tableView>
                         </subviews>
-                        <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </clipView>
                     <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="YES" id="1520">
                         <rect key="frame" x="-100" y="-100" width="327" height="15"/>
