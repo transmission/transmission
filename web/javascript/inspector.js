@@ -423,7 +423,7 @@ function Inspector(controller) {
                 str = none;
             }
             uri = parseUri(str);
-            if (uri.protocol == 'http' || uri.parseUri == 'https') {
+            if (uri.protocol == 'http' || uri.protocol == 'https') {
                 str = encodeURI(str);
                 setInnerHTML(e.comment_lb, '<a href="' + str + '" target="_blank" >' + str + '</a>');
             } else {
