@@ -388,7 +388,7 @@ tr_webThreadFunc (void * vsession)
   web->taskLock = tr_lockNew ();
   web->tasks = NULL;
   web->curl_verbose = tr_env_key_exists ("TR_CURL_VERBOSE");
-  web->curl_ssl_verify = tr_env_key_exists ("TR_CURL_SSL_VERIFY");
+  web->curl_ssl_verify = true;
   web->curl_ca_bundle = tr_env_get_string ("CURL_CA_BUNDLE", NULL);
   if (web->curl_ssl_verify)
     {
