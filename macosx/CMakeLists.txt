@@ -320,7 +320,7 @@ else()
     set(${PROJECT_NAME}_ENABLED_LINGUAS en)
 endif()
 
-set(${PROJECT_NAME}_LANG_XIB_FILES
+set(${PROJECT_NAME}_BASE_XIB_FILES
     AddMagnetWindow.xib
     AddWindow.xib
     Creator.xib
@@ -329,6 +329,9 @@ set(${PROJECT_NAME}_LANG_XIB_FILES
     InfoActivityView.xib
     InfoGeneralView.xib
     InfoOptionsView.xib
+)
+
+set(${PROJECT_NAME}_LANG_XIB_FILES
     MainMenu.xib
     PrefsWindow.xib
 )
@@ -349,17 +352,33 @@ endforeach()
 set_source_files_properties(${${PROJECT_NAME}_NIB_FILES} PROPERTIES
     MACOSX_PACKAGE_LOCATION Resources)
 
-set(${PROJECT_NAME}_LINGUAS_XIB_FILES)
-set(${PROJECT_NAME}_LINGUAS_NIB_FILES)
+set(${PROJECT_NAME}_${LANG}_BASE_NIB_FILES)
+foreach(F ${${PROJECT_NAME}_BASE_XIB_FILES} ${${PROJECT_NAME}_LANG_XIB_FILES})
+    set(F_XIB "Base.lproj/${F}")
+    get_filename_component(F_BASE "${F}" NAME_WE)
+    set(F_NIB "${PROJECT_BINARY_DIR}/Base.lproj/${F_BASE}.nib")
+    tr_wrap_xib("${F_XIB}" "${F_NIB}")
+    list(APPEND ${PROJECT_NAME}_XIB_FILES "${F_XIB}")
+    list(APPEND ${PROJECT_NAME}_NIB_FILES "${F_NIB}")
+    list(APPEND ${PROJECT_NAME}_BASE_NIB_FILES "${F_NIB}")
+endforeach()
+
+set_source_files_properties(${${PROJECT_NAME}_BASE_NIB_FILES} PROPERTIES
+    MACOSX_PACKAGE_LOCATION Resources/Base.lproj)
+
 foreach(LANG ${${PROJECT_NAME}_ENABLED_LINGUAS})
     set(${PROJECT_NAME}_${LANG}_NIB_FILES)
     foreach(F ${${PROJECT_NAME}_LANG_XIB_FILES})
+        if(LANG STREQUAL "en")
+            break()
+        endif()
+
         set(F_XIB "${LANG}.lproj/${F}")
         get_filename_component(F_BASE "${F}" NAME_WE)
         set(F_NIB "${PROJECT_BINARY_DIR}/${LANG}.lproj/${F_BASE}.nib")
         tr_wrap_xib("${F_XIB}" "${F_NIB}")
-        list(APPEND ${PROJECT_NAME}_LINGUAS_XIB_FILES "${F_XIB}")
-        list(APPEND ${PROJECT_NAME}_LINGUAS_NIB_FILES "${F_NIB}")
+        list(APPEND ${PROJECT_NAME}_XIB_FILES "${F_XIB}")
+        list(APPEND ${PROJECT_NAME}_NIB_FILES "${F_NIB}")
         list(APPEND ${PROJECT_NAME}_${LANG}_NIB_FILES "${F_NIB}")
     endforeach()
 
@@ -367,6 +386,10 @@ foreach(LANG ${${PROJECT_NAME}_ENABLED_LINGUAS})
     foreach(F ${${PROJECT_NAME}_LANG_STRINGS_FILES})
         list(APPEND ${PROJECT_NAME}_${LANG}_STRINGS_FILES ${LANG}.lproj/${F})
     endforeach()
+
+    list(APPEND ${PROJECT_NAME}_RESOURCES ${${PROJECT_NAME}_${LANG}_NIB_FILES} ${${PROJECT_NAME}_${LANG}_STRINGS_FILES})
+    set_source_files_properties(${${PROJECT_NAME}_${LANG}_NIB_FILES} ${${PROJECT_NAME}_${LANG}_STRINGS_FILES} PROPERTIES
+        MACOSX_PACKAGE_LOCATION Resources/${LANG}.lproj)
 endforeach()
 
 include_directories(
@@ -384,19 +407,11 @@ add_library(vdkqueue STATIC
     VDKQueue/VDKQueue.h
 )
 
-foreach(LANG ${${PROJECT_NAME}_ENABLED_LINGUAS})
-    list(APPEND ${PROJECT_NAME}_RESOURCES ${${PROJECT_NAME}_${LANG}_NIB_FILES} ${${PROJECT_NAME}_${LANG}_STRINGS_FILES})
-    set_source_files_properties(${${PROJECT_NAME}_${LANG}_NIB_FILES} ${${PROJECT_NAME}_${LANG}_STRINGS_FILES} PROPERTIES
-        MACOSX_PACKAGE_LOCATION Resources/${LANG}.lproj)
-endforeach()
-
 add_executable(${TR_NAME}-mac MACOSX_BUNDLE
     ${${PROJECT_NAME}_SOURCES}
     ${${PROJECT_NAME}_HEADERS}
     ${${PROJECT_NAME}_XIB_FILES}
     ${${PROJECT_NAME}_NIB_FILES}
-    ${${PROJECT_NAME}_LINGUAS_XIB_FILES}
-    ${${PROJECT_NAME}_LINGUAS_NIB_FILES}
     ${${PROJECT_NAME}_RESOURCES}
 )
 

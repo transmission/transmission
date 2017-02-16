@@ -63,7 +63,7 @@
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.utilities</string>
 	<key>LSMinimumSystemVersion</key>
-	<string>10.7.0</string>
+	<string>10.9</string>
 	<key>NSAppleScriptEnabled</key>
 	<string>YES</string>
 	<key>NSAppTransportSecurity</key>

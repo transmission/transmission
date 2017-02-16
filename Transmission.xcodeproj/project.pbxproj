@@ -571,7 +571,6 @@
 		A209EAC31142CF28002B02D1 /* InfoActivityViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = InfoActivityViewController.m; path = macosx/InfoActivityViewController.m; sourceTree = "<group>"; };
 		A209EAC41142CF28002B02D1 /* InfoGeneralViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = InfoGeneralViewController.h; path = macosx/InfoGeneralViewController.h; sourceTree = "<group>"; };
 		A209EAC51142CF28002B02D1 /* InfoGeneralViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = InfoGeneralViewController.m; path = macosx/InfoGeneralViewController.m; sourceTree = "<group>"; };
-		A209EAEB1142D294002B02D1 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = macosx/en.lproj/InfoGeneralView.xib; sourceTree = "<group>"; };
 		A209EAFF1142D3A5002B02D1 /* InfoTrackersViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = InfoTrackersViewController.h; path = macosx/InfoTrackersViewController.h; sourceTree = "<group>"; };
 		A209EB001142D3A5002B02D1 /* InfoTrackersViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = InfoTrackersViewController.m; path = macosx/InfoTrackersViewController.m; sourceTree = "<group>"; };
 		A209EB1F1142DD85002B02D1 /* InfoTrackersView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = InfoTrackersView.xib; path = macosx/InfoTrackersView.xib; sourceTree = "<group>"; };
@@ -583,7 +582,6 @@
 		A209EBD81142F52B002B02D1 /* InfoFileView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = InfoFileView.xib; path = macosx/InfoFileView.xib; sourceTree = "<group>"; };
 		A209EBF71142FEEE002B02D1 /* InfoOptionsViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = InfoOptionsViewController.h; path = macosx/InfoOptionsViewController.h; sourceTree = "<group>"; };
 		A209EBF81142FEEE002B02D1 /* InfoOptionsViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = InfoOptionsViewController.m; path = macosx/InfoOptionsViewController.m; sourceTree = "<group>"; };
-		A209EC13114301C6002B02D1 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = macosx/en.lproj/InfoOptionsView.xib; sourceTree = "<group>"; };
 		A209ECA1114319C3002B02D1 /* InfoWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = InfoWindow.xib; path = macosx/InfoWindow.xib; sourceTree = "<group>"; };
 		A209EE5A1144B51E002B02D1 /* history.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = history.c; path = libtransmission/history.c; sourceTree = "<group>"; };
 		A209EE5B1144B51E002B02D1 /* history.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = history.h; path = libtransmission/history.h; sourceTree = "<group>"; };
@@ -591,26 +589,22 @@
 		A20BFFB60D091CC700CE5D2B /* ToolbarSegmentedCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = ToolbarSegmentedCell.m; path = macosx/ToolbarSegmentedCell.m; sourceTree = "<group>"; };
 		A21282A50CA6C66800EAEE0F /* StatusBarView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = StatusBarView.h; path = macosx/StatusBarView.h; sourceTree = "<group>"; };
 		A21282A60CA6C66800EAEE0F /* StatusBarView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = StatusBarView.m; path = macosx/StatusBarView.m; sourceTree = "<group>"; };
-		A215BF5D0F02EBB800350CDB /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = macosx/en.lproj/GroupRules.xib; sourceTree = "<group>"; };
 		A21979890D07B78400438EA7 /* GroupToolbarItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = GroupToolbarItem.h; path = macosx/GroupToolbarItem.h; sourceTree = "<group>"; };
 		A219798A0D07B78400438EA7 /* GroupToolbarItem.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = GroupToolbarItem.m; path = macosx/GroupToolbarItem.m; sourceTree = "<group>"; };
 		A21A9BE0106D86A800F1C3C1 /* TrackerNode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = TrackerNode.h; path = macosx/TrackerNode.h; sourceTree = "<group>"; };
 		A21A9BE1106D86A800F1C3C1 /* TrackerNode.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = TrackerNode.m; path = macosx/TrackerNode.m; sourceTree = "<group>"; };
 		A21A9D3F106EC2E800F1C3C1 /* TrackerCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = TrackerCell.h; path = macosx/TrackerCell.h; sourceTree = "<group>"; };
 		A21A9D40106EC2E800F1C3C1 /* TrackerCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = TrackerCell.m; path = macosx/TrackerCell.m; sourceTree = "<group>"; };
-		A21F1539117299F100CF5A9C /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = macosx/en.lproj/AddMagnetWindow.xib; sourceTree = "<group>"; };
 		A21F15AA11729A8B00CF5A9C /* AddMagnetWindowController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AddMagnetWindowController.m; path = macosx/AddMagnetWindowController.m; sourceTree = "<group>"; };
 		A21F15AB11729A8B00CF5A9C /* AddMagnetWindowController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AddMagnetWindowController.h; path = macosx/AddMagnetWindowController.h; sourceTree = "<group>"; };
 		A21FBBA90EDA78C300BC3C51 /* bandwidth.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = bandwidth.h; path = libtransmission/bandwidth.h; sourceTree = "<group>"; };
 		A21FBBAA0EDA78C300BC3C51 /* bandwidth.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = bandwidth.c; path = libtransmission/bandwidth.c; sourceTree = "<group>"; };
-		A220AF7A13D7CC460035C512 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = macosx/en.lproj/GlobalOptionsPopover.xib; sourceTree = "<group>"; };
 		A220EC59118C8A060022B4BE /* tr-lpd.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "tr-lpd.c"; path = "libtransmission/tr-lpd.c"; sourceTree = "<group>"; };
 		A220EC5A118C8A060022B4BE /* tr-lpd.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "tr-lpd.h"; path = "libtransmission/tr-lpd.h"; sourceTree = "<group>"; };
 		A220EE6611A8382C0022B4BE /* de */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = de; path = macosx/de.lproj/AddMagnetWindow.xib; sourceTree = "<group>"; };
 		A220EE6911A838450022B4BE /* de */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = de; path = macosx/de.lproj/InfoActivityView.xib; sourceTree = "<group>"; };
 		A220EE6A11A838640022B4BE /* de */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = de; path = macosx/de.lproj/InfoGeneralView.xib; sourceTree = "<group>"; };
 		A220EE6B11A838750022B4BE /* de */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = de; path = macosx/de.lproj/InfoOptionsView.xib; sourceTree = "<group>"; };
-		A220EE9B11A841F50022B4BE /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = macosx/en.lproj/InfoActivityView.xib; sourceTree = "<group>"; };
 		A220EED011AB3F8F0022B4BE /* it */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = it; path = macosx/it.lproj/AddMagnetWindow.xib; sourceTree = "<group>"; };
 		A220EED211AB3F9B0022B4BE /* it */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = it; path = macosx/it.lproj/InfoActivityView.xib; sourceTree = "<group>"; };
 		A220EED311AB3F9B0022B4BE /* it */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = it; path = macosx/it.lproj/InfoGeneralView.xib; sourceTree = "<group>"; };
@@ -783,12 +777,8 @@
 		A28E1DDF0CFFD8EC00E16385 /* ButtonToolbarItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ButtonToolbarItem.h; path = macosx/ButtonToolbarItem.h; sourceTree = "<group>"; };
 		A28F4F750E085BDC003A3882 /* ColorTextField.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ColorTextField.h; path = macosx/ColorTextField.h; sourceTree = "<group>"; };
 		A28F4F760E085BDC003A3882 /* ColorTextField.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = ColorTextField.m; path = macosx/ColorTextField.m; sourceTree = "<group>"; };
-		A291477B0E195A0C00F60CB2 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = macosx/en.lproj/AddWindow.xib; sourceTree = "<group>"; };
-		A291477C0E195A0C00F60CB2 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = macosx/en.lproj/Creator.xib; sourceTree = "<group>"; };
 		A291477D0E195A0C00F60CB2 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = macosx/en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		A291477F0E195A0C00F60CB2 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = macosx/en.lproj/Localizable.strings; sourceTree = "<group>"; };
-		A29147800E195A0C00F60CB2 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = macosx/en.lproj/MainMenu.xib; sourceTree = "<group>"; };
-		A29147810E195A0C00F60CB2 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = macosx/en.lproj/PrefsWindow.xib; sourceTree = "<group>"; };
 		A292A6E40DFB45E5004B9C0A /* peer-common.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "peer-common.h"; path = "libtransmission/peer-common.h"; sourceTree = "<group>"; };
 		A292A6E50DFB45EC004B9C0A /* webseed.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = webseed.c; path = libtransmission/webseed.c; sourceTree = "<group>"; };
 		A292A6E60DFB45EC004B9C0A /* webseed.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = webseed.h; path = libtransmission/webseed.h; sourceTree = "<group>"; };
@@ -1013,6 +1003,16 @@
 		E138A9750C04D88F00C5426C /* ProgressGradients.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ProgressGradients.h; path = macosx/ProgressGradients.h; sourceTree = "<group>"; };
 		E138A9760C04D88F00C5426C /* ProgressGradients.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = ProgressGradients.m; path = macosx/ProgressGradients.m; sourceTree = "<group>"; };
 		F63480621E1D7274005B9E09 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = macosx/Images/Images.xcassets; sourceTree = "<group>"; };
+		F679F3531E560287009B0504 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = macosx/Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		F679F3541E560288009B0504 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = macosx/Base.lproj/PrefsWindow.xib; sourceTree = "<group>"; };
+		F679F3551E560288009B0504 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = macosx/Base.lproj/Creator.xib; sourceTree = "<group>"; };
+		F679F3561E560288009B0504 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = macosx/Base.lproj/AddWindow.xib; sourceTree = "<group>"; };
+		F679F3571E560288009B0504 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = macosx/Base.lproj/AddMagnetWindow.xib; sourceTree = "<group>"; };
+		F679F3581E560288009B0504 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = macosx/Base.lproj/GroupRules.xib; sourceTree = "<group>"; };
+		F679F3591E560289009B0504 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = macosx/Base.lproj/InfoGeneralView.xib; sourceTree = "<group>"; };
+		F679F35A1E560289009B0504 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = macosx/Base.lproj/InfoActivityView.xib; sourceTree = "<group>"; };
+		F679F35B1E560289009B0504 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = macosx/Base.lproj/InfoOptionsView.xib; sourceTree = "<group>"; };
+		F679F35C1E560289009B0504 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = macosx/Base.lproj/GlobalOptionsPopover.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -2162,6 +2162,7 @@
 				de,
 				da,
 				"pt-PT",
+				Base,
 			);
 			mainGroup = 29B97314FDCFA39411CA2CEA /* Transmission */;
 			projectDirPath = "";
@@ -2680,7 +2681,6 @@
 		A209EAE81142D294002B02D1 /* InfoActivityView.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
-				A220EE9B11A841F50022B4BE /* en */,
 				A220EE6911A838450022B4BE /* de */,
 				A220EED211AB3F9B0022B4BE /* it */,
 				A220EEDA11AE95CE0022B4BE /* es */,
@@ -2690,6 +2690,7 @@
 				A279E3D111C3BDC300D48B1F /* nl */,
 				A263C56E1560A4470082A3D1 /* da */,
 				A2A9D122187DD75A00C52A1F /* tr */,
+				F679F35A1E560289009B0504 /* Base */,
 			);
 			name = InfoActivityView.xib;
 			sourceTree = "<group>";
@@ -2697,7 +2698,6 @@
 		A209EAEA1142D294002B02D1 /* InfoGeneralView.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
-				A209EAEB1142D294002B02D1 /* en */,
 				A220EE6A11A838640022B4BE /* de */,
 				A220EED311AB3F9B0022B4BE /* it */,
 				A220EEDB11AE95CE0022B4BE /* es */,
@@ -2707,6 +2707,7 @@
 				A279E3D211C3BDC300D48B1F /* nl */,
 				A263C56D1560A4420082A3D1 /* da */,
 				A2A9D121187DD75900C52A1F /* tr */,
+				F679F3591E560289009B0504 /* Base */,
 			);
 			name = InfoGeneralView.xib;
 			sourceTree = "<group>";
@@ -2714,7 +2715,6 @@
 		A209EC11114301C6002B02D1 /* InfoOptionsView.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
-				A209EC13114301C6002B02D1 /* en */,
 				A220EE6B11A838750022B4BE /* de */,
 				A220EED411AB3F9B0022B4BE /* it */,
 				A220EEDC11AE95CE0022B4BE /* es */,
@@ -2724,6 +2724,7 @@
 				A279E3D311C3BDC300D48B1F /* nl */,
 				A263C56F1560A44B0082A3D1 /* da */,
 				A2A9D123187DD75B00C52A1F /* tr */,
+				F679F35B1E560289009B0504 /* Base */,
 			);
 			name = InfoOptionsView.xib;
 			sourceTree = "<group>";
@@ -2731,7 +2732,6 @@
 		A215BF5B0F02EBB800350CDB /* GroupRules.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
-				A215BF5D0F02EBB800350CDB /* en */,
 				A22CF7AC0FA3505F0009BD3E /* it */,
 				A22CF7B90FA352740009BD3E /* fr */,
 				A22CF7C90FA5D3F90009BD3E /* es */,
@@ -2741,6 +2741,7 @@
 				A2613F9411B3383200472893 /* pt_PT */,
 				A263C56C1560A43E0082A3D1 /* da */,
 				A2A9D120187DD75800C52A1F /* tr */,
+				F679F3581E560288009B0504 /* Base */,
 			);
 			name = GroupRules.xib;
 			sourceTree = "<group>";
@@ -2748,7 +2749,6 @@
 		A21F1538117299F100CF5A9C /* AddMagnetWindow.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
-				A21F1539117299F100CF5A9C /* en */,
 				A220EE6611A8382C0022B4BE /* de */,
 				A220EED011AB3F8F0022B4BE /* it */,
 				A220EED911AE95CE0022B4BE /* es */,
@@ -2758,6 +2758,7 @@
 				A279E3D011C3BDC300D48B1F /* nl */,
 				A263C56B1560A43A0082A3D1 /* da */,
 				A2A9D11F187DD75700C52A1F /* tr */,
+				F679F3571E560288009B0504 /* Base */,
 			);
 			name = AddMagnetWindow.xib;
 			sourceTree = "<group>";
@@ -2765,7 +2766,6 @@
 		A220AF7913D7CC460035C512 /* GlobalOptionsPopover.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
-				A220AF7A13D7CC460035C512 /* en */,
 				A292C9E01413BA5F00EF710F /* es */,
 				A292C9E2141593DA00EF710F /* de */,
 				A292C9E414163AE500EF710F /* it */,
@@ -2775,6 +2775,7 @@
 				A2A1C81D142EC032008C17BF /* nl */,
 				A263C5701560A44F0082A3D1 /* da */,
 				A2A9D124187DD75C00C52A1F /* tr */,
+				F679F35C1E560289009B0504 /* Base */,
 			);
 			name = GlobalOptionsPopover.xib;
 			sourceTree = "<group>";
@@ -2799,7 +2800,6 @@
 		A23F4FF00D1D98AD002FCB97 /* PrefsWindow.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
-				A29147810E195A0C00F60CB2 /* en */,
 				A223AA830D220CEB00840069 /* nl */,
 				A265A3320D25767700198AC8 /* fr */,
 				A265A3C20D25AE7800198AC8 /* es */,
@@ -2809,6 +2809,7 @@
 				A2613F9B11B3383200472893 /* pt_PT */,
 				A263C5681560A4290082A3D1 /* da */,
 				A2A9D11C187DD75400C52A1F /* tr */,
+				F679F3541E560288009B0504 /* Base */,
 			);
 			name = PrefsWindow.xib;
 			sourceTree = "<group>";
@@ -2816,7 +2817,6 @@
 		A23F50000D1D99D7002FCB97 /* MainMenu.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
-				A29147800E195A0C00F60CB2 /* en */,
 				A223AA810D220CEB00840069 /* nl */,
 				A265A3300D25767700198AC8 /* fr */,
 				A265A3C00D25AE7800198AC8 /* es */,
@@ -2826,6 +2826,7 @@
 				A2613F9A11B3383200472893 /* pt_PT */,
 				A263C5651560A35B0082A3D1 /* da */,
 				A2A9D11B187DD75300C52A1F /* tr */,
+				F679F3531E560287009B0504 /* Base */,
 			);
 			name = MainMenu.xib;
 			sourceTree = "<group>";
@@ -2850,7 +2851,6 @@
 		A26AF27C0D2DBDDF00FF7140 /* AddWindow.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
-				A291477B0E195A0C00F60CB2 /* en */,
 				A2AC81D60D987E2D00A2878C /* nl */,
 				A2CBDED80D993E4500BB22BC /* fr */,
 				A2CBDF9E0D9AD08100BB22BC /* ru */,
@@ -2860,6 +2860,7 @@
 				A2613F9211B3383200472893 /* pt_PT */,
 				A263C56A1560A4370082A3D1 /* da */,
 				A2A9D11E187DD75600C52A1F /* tr */,
+				F679F3561E560288009B0504 /* Base */,
 			);
 			name = AddWindow.xib;
 			sourceTree = "<group>";
@@ -2867,7 +2868,6 @@
 		A29576010D11D63C0093B167 /* Creator.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
-				A291477C0E195A0C00F60CB2 /* en */,
 				A223AA7D0D220CEB00840069 /* nl */,
 				A265A32E0D25767700198AC8 /* fr */,
 				A265A3BE0D25AE7800198AC8 /* es */,
@@ -2877,6 +2877,7 @@
 				A2613F9311B3383200472893 /* pt_PT */,
 				A263C5691560A4310082A3D1 /* da */,
 				A2A9D11D187DD75500C52A1F /* tr */,
+				F679F3551E560288009B0504 /* Base */,
 			);
 			name = Creator.xib;
 			sourceTree = "<group>";
