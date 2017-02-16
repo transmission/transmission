@@ -1,0 +1,54 @@
+
+/* Class = "NSWindow"; title = "Window"; ObjectID = "1"; */
+"1.title" = "Window";
+
+/* Class = "NSTextFieldCell"; title = "Nome do ficheiro"; ObjectID = "6"; */
+"6.title" = "Nome do ficheiro";
+
+/* Class = "NSTextFieldCell"; title = "Ficheiro"; ObjectID = "13"; */
+"13.title" = "Ficheiro";
+
+/* Class = "NSTextFieldCell"; title = "Guardar em:"; ObjectID = "15"; */
+"15.title" = "Guardar em:";
+
+/* Class = "NSButtonCell"; title = "Alterar…"; ObjectID = "16"; */
+"16.title" = "Alterar…";
+
+/* Class = "NSButtonCell"; title = "Iniciar ao adicionar"; ObjectID = "18"; */
+"18.title" = "Iniciar ao adicionar";
+
+/* Class = "NSButtonCell"; title = "Adicionar"; ObjectID = "20"; */
+"20.title" = "Adicionar";
+
+/* Class = "NSButtonCell"; title = "Cancelar"; ObjectID = "22"; */
+"22.title" = "Cancelar";
+
+/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "35"; */
+"35.title" = "OtherViews";
+
+/* Class = "NSTextFieldCell"; title = "Grupo:"; ObjectID = "41"; */
+"41.title" = "Grupo:";
+
+/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "87"; */
+"87.title" = "OtherViews";
+
+/* Class = "NSMenuItem"; title = "Baixa"; ObjectID = "88"; */
+"88.title" = "Baixa";
+
+/* Class = "NSMenuItem"; title = "Normal"; ObjectID = "89"; */
+"89.title" = "Normal";
+
+/* Class = "NSMenuItem"; title = "Alta"; ObjectID = "90"; */
+"90.title" = "Alta";
+
+/* Class = "NSTextFieldCell"; title = "Prioridade:"; ObjectID = "91"; */
+"91.title" = "Prioridade:";
+
+/* Class = "NSTextFieldCell"; title = "Ligação Magnet"; ObjectID = "101"; */
+"101.title" = "Ligação Magnet";
+
+/* Class = "NSBox"; title = "Box"; ObjectID = "102"; */
+"102.title" = "Box";
+
+/* Class = "NSMenuItem"; title = "Nenhum"; ObjectID = "2zq-5y-smI"; */
+"2zq-5y-smI.title" = "Nenhum";
