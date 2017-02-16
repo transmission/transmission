@@ -1,0 +1,90 @@
+
+/* Class = "NSTextFieldCell"; title = "gedownload:"; ObjectID = "30"; */
+"30.title" = "gedownload:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "Niet beschikbaar"; ObjectID = "31"; */
+"31.placeholderString" = "Niet beschikbaar";
+
+/* Class = "NSTextFieldCell"; title = "Geupload:"; ObjectID = "32"; */
+"32.title" = "Geupload:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "Niet beschikbaar"; ObjectID = "33"; */
+"33.placeholderString" = "Niet beschikbaar";
+
+/* Class = "NSTextFieldCell"; title = "Ratio:"; ObjectID = "34"; */
+"34.title" = "Ratio:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "Niet beschikbaar"; ObjectID = "35"; */
+"35.placeholderString" = "Niet beschikbaar";
+
+/* Class = "NSTextFieldCell"; title = "In bezit:"; ObjectID = "36"; */
+"36.title" = "In bezit:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "Niet beschikbaar"; ObjectID = "37"; */
+"37.placeholderString" = "Niet beschikbaar";
+
+/* Class = "NSTextFieldCell"; title = "Staat:"; ObjectID = "38"; */
+"38.title" = "Staat:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "Niet beschikbaar"; ObjectID = "39"; */
+"39.placeholderString" = "Niet beschikbaar";
+
+/* Class = "NSTextFieldCell"; title = "Foutmelding:"; ObjectID = "41"; */
+"41.title" = "Foutmelding:";
+
+/* Class = "NSTextFieldCell"; title = "Datum"; ObjectID = "42"; */
+"42.title" = "Datum";
+
+/* Class = "NSTextFieldCell"; title = "Toegevoegd:"; ObjectID = "43"; */
+"43.title" = "Toegevoegd:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "Niet beschikbaar"; ObjectID = "44"; */
+"44.placeholderString" = "Niet beschikbaar";
+
+/* Class = "NSTextFieldCell"; title = "Voltooid:"; ObjectID = "46"; */
+"46.title" = "Voltooid:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "Niet beschikbaar"; ObjectID = "47"; */
+"47.placeholderString" = "Niet beschikbaar";
+
+/* Class = "NSTextFieldCell"; title = "Transfer"; ObjectID = "50"; */
+"50.title" = "Transfer";
+
+/* Class = "NSTextFieldCell"; title = "Bijgewerkt:"; ObjectID = "51"; */
+"51.title" = "Bijgewerkt:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "Niet beschikbaar"; ObjectID = "52"; */
+"52.placeholderString" = "Niet beschikbaar";
+
+/* Class = "NSSegmentedCell"; 54.ibShadowedLabels[0] = "Voortgang"; ObjectID = "54"; */
+"54.ibShadowedLabels[0]" = "Voortgang";
+
+/* Class = "NSSegmentedCell"; 54.ibShadowedLabels[1] = "Beschikbaar"; ObjectID = "54"; */
+"54.ibShadowedLabels[1]" = "Beschikbaar";
+
+/* Class = "NSTextFieldCell"; title = "Voortgang:"; ObjectID = "55"; */
+"55.title" = "Voortgang:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "Niet beschikbaar"; ObjectID = "56"; */
+"56.placeholderString" = "Niet beschikbaar";
+
+/* Class = "NSTextFieldCell"; title = "Corrupte DL:"; ObjectID = "57"; */
+"57.title" = "Corrupte DL:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "Niet beschikbaar"; ObjectID = "58"; */
+"58.placeholderString" = "Niet beschikbaar";
+
+/* Class = "NSTextFieldCell"; title = "Verstreken tijd"; ObjectID = "85"; */
+"85.title" = "Verstreken tijd";
+
+/* Class = "NSTextFieldCell"; title = "Downloaden:"; ObjectID = "86"; */
+"86.title" = "Downloaden:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "Niet beschikbaar"; ObjectID = "87"; */
+"87.placeholderString" = "Niet beschikbaar";
+
+/* Class = "NSTextFieldCell"; title = "Seeden:"; ObjectID = "89"; */
+"89.title" = "Seeden:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "Niet beschikbaar"; ObjectID = "90"; */
+"90.placeholderString" = "Niet beschikbaar";

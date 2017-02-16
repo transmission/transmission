@@ -1,0 +1,90 @@
+
+/* Class = "NSTextFieldCell"; title = "Empfangen:"; ObjectID = "30"; */
+"30.title" = "Empfangen:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "—"; ObjectID = "31"; */
+"31.placeholderString" = "—";
+
+/* Class = "NSTextFieldCell"; title = "Gesendet:"; ObjectID = "32"; */
+"32.title" = "Gesendet:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "—"; ObjectID = "33"; */
+"33.placeholderString" = "—";
+
+/* Class = "NSTextFieldCell"; title = "Verhältnis:"; ObjectID = "34"; */
+"34.title" = "Verhältnis:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "—"; ObjectID = "35"; */
+"35.placeholderString" = "—";
+
+/* Class = "NSTextFieldCell"; title = "Vorhanden:"; ObjectID = "36"; */
+"36.title" = "Vorhanden:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "—"; ObjectID = "37"; */
+"37.placeholderString" = "—";
+
+/* Class = "NSTextFieldCell"; title = "Status:"; ObjectID = "38"; */
+"38.title" = "Status:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "—"; ObjectID = "39"; */
+"39.placeholderString" = "—";
+
+/* Class = "NSTextFieldCell"; title = "Fehler:"; ObjectID = "41"; */
+"41.title" = "Fehler:";
+
+/* Class = "NSTextFieldCell"; title = "Zeitpunkte"; ObjectID = "42"; */
+"42.title" = "Zeitpunkte";
+
+/* Class = "NSTextFieldCell"; title = "Hinzugefügt:"; ObjectID = "43"; */
+"43.title" = "Hinzugefügt:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "—"; ObjectID = "44"; */
+"44.placeholderString" = "—";
+
+/* Class = "NSTextFieldCell"; title = "Fertiggestellt:"; ObjectID = "46"; */
+"46.title" = "Fertiggestellt:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "—"; ObjectID = "47"; */
+"47.placeholderString" = "—";
+
+/* Class = "NSTextFieldCell"; title = "Übertragung"; ObjectID = "50"; */
+"50.title" = "Übertragung";
+
+/* Class = "NSTextFieldCell"; title = "Letzte Aktivität:"; ObjectID = "51"; */
+"51.title" = "Letzte Aktivität:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "—"; ObjectID = "52"; */
+"52.placeholderString" = "—";
+
+/* Class = "NSSegmentedCell"; 54.ibShadowedLabels[0] = "Fortschritt"; ObjectID = "54"; */
+"54.ibShadowedLabels[0]" = "Fortschritt";
+
+/* Class = "NSSegmentedCell"; 54.ibShadowedLabels[1] = "Verfügbar"; ObjectID = "54"; */
+"54.ibShadowedLabels[1]" = "Verfügbar";
+
+/* Class = "NSTextFieldCell"; title = "Fortschritt:"; ObjectID = "55"; */
+"55.title" = "Fortschritt:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "—"; ObjectID = "56"; */
+"56.placeholderString" = "—";
+
+/* Class = "NSTextFieldCell"; title = "Fehlgeschlagen:"; ObjectID = "57"; */
+"57.title" = "Fehlgeschlagen:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "—"; ObjectID = "58"; */
+"58.placeholderString" = "—";
+
+/* Class = "NSTextFieldCell"; title = "Dauer"; ObjectID = "85"; */
+"85.title" = "Dauer";
+
+/* Class = "NSTextFieldCell"; title = "Empfangen:"; ObjectID = "86"; */
+"86.title" = "Empfangen:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "—"; ObjectID = "87"; */
+"87.placeholderString" = "—";
+
+/* Class = "NSTextFieldCell"; title = "Verteilen:"; ObjectID = "89"; */
+"89.title" = "Verteilen:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "—"; ObjectID = "90"; */
+"90.placeholderString" = "—";
