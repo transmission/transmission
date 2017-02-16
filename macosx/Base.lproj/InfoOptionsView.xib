@@ -48,7 +48,7 @@
                     <popUpButtonCell key="cell" type="roundRect" title="Normal" bezelStyle="roundedRect" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" tag="1" imageScaling="proportionallyDown" inset="2" selectedItem="51" id="48">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="smallSystem"/>
-                        <menu key="menu" title="OtherViews" id="49">
+                        <menu key="menu" id="49">
                             <items>
                                 <menuItem title="High" image="PriorityHighTemplate" id="52"/>
                                 <menuItem title="Normal" state="on" image="PriorityNormalTemplate" tag="1" id="51"/>
@@ -166,7 +166,7 @@
                     <popUpButtonCell key="cell" type="roundRect" title="Global Setting" bezelStyle="roundedRect" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" preferredEdge="maxY" selectedItem="41" id="38">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="smallSystem"/>
-                        <menu key="menu" title="OtherViews" id="39">
+                        <menu key="menu" id="39">
                             <items>
                                 <menuItem title="Global Setting" state="on" id="41"/>
                                 <menuItem title="Unlimited" id="40"/>
@@ -315,7 +315,7 @@
                     <popUpButtonCell key="cell" type="roundRect" title="Global Setting" bezelStyle="roundedRect" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" preferredEdge="maxY" selectedItem="87" id="84">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="smallSystem"/>
-                        <menu key="menu" title="OtherViews" id="85">
+                        <menu key="menu" id="85">
                             <items>
                                 <menuItem title="Global Setting" state="on" id="87"/>
                                 <menuItem title="Unlimited" id="88"/>
