@@ -341,6 +341,10 @@ set(${PROJECT_NAME}_LANG_STRINGS_FILES
     Localizable.strings
 )
 
+set(${PROJECT_NAME}_LANG_NON_EN_STRINGS_FILES
+    GlobalOptionsPopover.strings
+)
+
 set(${PROJECT_NAME}_NIB_FILES)
 foreach(F ${${PROJECT_NAME}_XIB_FILES})
     get_filename_component(F_BASE "${F}" NAME_WE)
@@ -386,6 +390,11 @@ foreach(LANG ${${PROJECT_NAME}_ENABLED_LINGUAS})
     foreach(F ${${PROJECT_NAME}_LANG_STRINGS_FILES})
         list(APPEND ${PROJECT_NAME}_${LANG}_STRINGS_FILES ${LANG}.lproj/${F})
     endforeach()
+    if(NOT LANG STREQUAL "en")
+        foreach(F ${${PROJECT_NAME}_LANG_NON_EN_STRINGS_FILES})
+            list(APPEND ${PROJECT_NAME}_${LANG}_STRINGS_FILES ${LANG}.lproj/${F})
+        endforeach()
+    endif()
 
     list(APPEND ${PROJECT_NAME}_RESOURCES ${${PROJECT_NAME}_${LANG}_NIB_FILES} ${${PROJECT_NAME}_${LANG}_STRINGS_FILES})
     set_source_files_properties(${${PROJECT_NAME}_${LANG}_NIB_FILES} ${${PROJECT_NAME}_${LANG}_STRINGS_FILES} PROPERTIES

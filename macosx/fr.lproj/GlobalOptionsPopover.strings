@@ -1,0 +1,33 @@
+
+/* Class = "NSTextFieldCell"; title = "Limites d'envoi"; ObjectID = "22"; */
+"22.title" = "Limites d'envoi";
+
+/* Class = "NSTextFieldCell"; title = "Bande-passante"; ObjectID = "23"; */
+"23.title" = "Bande-passante";
+
+/* Class = "NSTextFieldCell"; title = "Ko/s"; ObjectID = "26"; */
+"26.title" = "Ko/s";
+
+/* Class = "NSButtonCell"; title = "Limiter l'émission :"; ObjectID = "43"; */
+"43.title" = "Limiter l'émission :";
+
+/* Class = "NSButtonCell"; title = "Limiter la réception :"; ObjectID = "44"; */
+"44.title" = "Limiter la réception :";
+
+/* Class = "NSTextFieldCell"; title = "minutes"; ObjectID = "98"; */
+"98.title" = "minutes";
+
+/* Class = "NSButtonCell"; title = "État des fichiers sélectionnés"; ObjectID = "114"; */
+"114.title" = "État des fichiers sélectionnés";
+
+/* Class = "NSButtonCell"; title = "Arrêt de l'envoi au ratio :"; ObjectID = "116"; */
+"116.title" = "Arrêt de l'envoi au ratio :";
+
+/* Class = "NSButtonCell"; title = "Arrêt de l'envoi si inactif plus de"; ObjectID = "118"; */
+"118.title" = "Arrêt de l'envoi si inactif plus de";
+
+/* Class = "NSButtonCell"; title = "Temps restant"; ObjectID = "130"; */
+"130.title" = "Temps restant";
+
+/* Class = "NSTextFieldCell"; title = "Ko/s"; ObjectID = "180"; */
+"180.title" = "Ko/s";

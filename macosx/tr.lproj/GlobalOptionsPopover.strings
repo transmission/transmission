@@ -1,0 +1,33 @@
+
+/* Class = "NSTextFieldCell"; title = "Besleme Limitleri"; ObjectID = "22"; */
+"22.title" = "Besleme Limitleri";
+
+/* Class = "NSTextFieldCell"; title = "Aktarım Bant Genişliği"; ObjectID = "23"; */
+"23.title" = "Aktarım Bant Genişliği";
+
+/* Class = "NSTextFieldCell"; title = "KB/s"; ObjectID = "26"; */
+"26.title" = "KB/s";
+
+/* Class = "NSButtonCell"; title = "Göndermeyi sınırla:"; ObjectID = "43"; */
+"43.title" = "Göndermeyi sınırla:";
+
+/* Class = "NSButtonCell"; title = "İndirmeyi sınırla:"; ObjectID = "44"; */
+"44.title" = "İndirmeyi sınırla:";
+
+/* Class = "NSTextFieldCell"; title = "dakika"; ObjectID = "98"; */
+"98.title" = "dakika";
+
+/* Class = "NSButtonCell"; title = "Seçili dosyaların durumu"; ObjectID = "114"; */
+"114.title" = "Seçili dosyaların durumu";
+
+/* Class = "NSButtonCell"; title = "Şu oranda beslemeyi durdur:"; ObjectID = "116"; */
+"116.title" = "Şu oranda beslemeyi durdur:";
+
+/* Class = "NSButtonCell"; title = "Şu kadar boşta kalınca beslemeyi durdur:"; ObjectID = "118"; */
+"118.title" = "Şu kadar boşta kalınca beslemeyi durdur:";
+
+/* Class = "NSButtonCell"; title = "Kalan süre"; ObjectID = "130"; */
+"130.title" = "Kalan süre";
+
+/* Class = "NSTextFieldCell"; title = "KB/s"; ObjectID = "180"; */
+"180.title" = "KB/s";
