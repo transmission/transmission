@@ -38,14 +38,14 @@
                 <scrollView horizontalHuggingPriority="249" horizontalCompressionResistancePriority="249" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="4">
                     <rect key="frame" x="84" y="53" width="260" height="58"/>
                     <clipView key="contentView" id="4uz-20-4jl">
-                        <rect key="frame" x="1" y="1" width="247" height="56"/>
+                        <rect key="frame" x="1" y="1" width="258" height="56"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <textView editable="NO" importsGraphics="NO" richText="NO" horizontallyResizable="YES" usesFontPanel="YES" usesRuler="YES" linkDetection="YES" spellingCorrection="YES" smartInsertDelete="YES" id="38">
-                                <rect key="frame" x="0.0" y="0.0" width="247" height="56"/>
+                                <rect key="frame" x="0.0" y="0.0" width="258" height="56"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                <size key="minSize" width="247" height="56"/>
+                                <size key="minSize" width="258" height="56"/>
                                 <size key="maxSize" width="768" height="10000000"/>
                                 <color key="insertionPointColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             </textView>
@@ -61,7 +61,7 @@
                         <autoresizingMask key="autoresizingMask"/>
                     </scroller>
                     <scroller key="verticalScroller" verticalHuggingPriority="750" controlSize="small" horizontal="NO" id="39">
-                        <rect key="frame" x="248" y="1" width="11" height="56"/>
+                        <rect key="frame" x="245" y="1" width="14" height="56"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </scroller>
                 </scrollView>
@@ -128,7 +128,7 @@
                         <constraint firstAttribute="height" constant="14" id="50q-rm-IPl"/>
                         <constraint firstAttribute="width" constant="14" id="Zd6-df-Ynq"/>
                     </constraints>
-                    <buttonCell key="cell" type="square" title="RevealDataFile" bezelStyle="shadowlessSquare" image="RevealOff" imagePosition="only" alignment="center" alternateImage="RevealOn" imageScaling="proportionallyDown" inset="2" id="29">
+                    <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="RevealOff" imagePosition="overlaps" alignment="center" alternateImage="RevealOn" imageScaling="proportionallyDown" inset="2" id="29">
                         <behavior key="behavior" lightByContents="YES"/>
                         <font key="font" metaFont="label"/>
                     </buttonCell>

@@ -1,0 +1,48 @@
+
+/* Class = "NSTextFieldCell"; title = "Partes:"; ObjectID = "21"; */
+"21.title" = "Partes:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/D"; ObjectID = "22"; */
+"22.placeholderString" = "N/D";
+
+/* Class = "NSTextFieldCell"; title = "Seguridad:"; ObjectID = "24"; */
+"24.title" = "Seguridad:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/D"; ObjectID = "25"; */
+"25.placeholderString" = "N/D";
+
+/* Class = "NSTextFieldCell"; title = "Archivo:"; ObjectID = "26"; */
+"26.title" = "Archivo:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/D"; ObjectID = "27"; */
+"27.placeholderString" = "N/D";
+
+/* Class = "NSTextFieldCell"; title = "Dónde"; ObjectID = "28"; */
+"28.title" = "Dónde";
+
+/* Class = "NSButtonCell"; title = "RevealDataFile"; ObjectID = "29"; */
+"29.title" = "RevealDataFile";
+
+/* Class = "NSTextFieldCell"; title = "Creador:"; ObjectID = "30"; */
+"30.title" = "Creador:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/D"; ObjectID = "31"; */
+"31.placeholderString" = "N/D";
+
+/* Class = "NSTextFieldCell"; title = "Creado:"; ObjectID = "32"; */
+"32.title" = "Creado:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/D"; ObjectID = "33"; */
+"33.placeholderString" = "N/D";
+
+/* Class = "NSTextFieldCell"; title = "Comentarios:"; ObjectID = "35"; */
+"35.title" = "Comentarios:";
+
+/* Class = "NSTextFieldCell"; title = "Hash:"; ObjectID = "36"; */
+"36.title" = "Hash:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "N/D"; ObjectID = "37"; */
+"37.placeholderString" = "N/D";
+
+/* Class = "NSTextFieldCell"; title = "Información del torrent"; ObjectID = "41"; */
+"41.title" = "Información del torrent";

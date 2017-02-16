@@ -1,0 +1,48 @@
+
+/* Class = "NSTextFieldCell"; title = "Части:"; ObjectID = "21"; */
+"21.title" = "Части:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "Нет данных"; ObjectID = "22"; */
+"22.placeholderString" = "Нет данных";
+
+/* Class = "NSTextFieldCell"; title = "Защита:"; ObjectID = "24"; */
+"24.title" = "Защита:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "Нет данных"; ObjectID = "25"; */
+"25.placeholderString" = "Нет данных";
+
+/* Class = "NSTextFieldCell"; title = "Данные:"; ObjectID = "26"; */
+"26.title" = "Данные:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "Нет данных"; ObjectID = "27"; */
+"27.placeholderString" = "Нет данных";
+
+/* Class = "NSTextFieldCell"; title = "Местоположение"; ObjectID = "28"; */
+"28.title" = "Местоположение";
+
+/* Class = "NSButtonCell"; title = "RevealDataFile"; ObjectID = "29"; */
+"29.title" = "RevealDataFile";
+
+/* Class = "NSTextFieldCell"; title = "Программма:"; ObjectID = "30"; */
+"30.title" = "Программма:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "Нет данных"; ObjectID = "31"; */
+"31.placeholderString" = "Нет данных";
+
+/* Class = "NSTextFieldCell"; title = "Дата:"; ObjectID = "32"; */
+"32.title" = "Дата:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "Нет данных"; ObjectID = "33"; */
+"33.placeholderString" = "Нет данных";
+
+/* Class = "NSTextFieldCell"; title = "Комментарии:"; ObjectID = "35"; */
+"35.title" = "Комментарии:";
+
+/* Class = "NSTextFieldCell"; title = "Хеш:"; ObjectID = "36"; */
+"36.title" = "Хеш:";
+
+/* Class = "NSTextFieldCell"; placeholderString = "Нет данных"; ObjectID = "37"; */
+"37.placeholderString" = "Нет данных";
+
+/* Class = "NSTextFieldCell"; title = "Информация о торренте"; ObjectID = "41"; */
+"41.title" = "Информация о торренте";
