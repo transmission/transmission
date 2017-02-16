@@ -1,0 +1,66 @@
+
+/* Class = "NSWindow"; title = "Finestra"; ObjectID = "1"; */
+"1.title" = "Finestra";
+
+/* Class = "NSButtonCell"; title = "Ok"; ObjectID = "11"; */
+"11.title" = "Ok";
+
+/* Class = "NSButtonCell"; title = "Annulla"; ObjectID = "12"; */
+"12.title" = "Annulla";
+
+/* Class = "NSMenuItem"; title = "inizia per"; ObjectID = "40"; */
+"40.title" = "inizia per";
+
+/* Class = "NSMenuItem"; title = "è"; ObjectID = "42"; */
+"42.title" = "è";
+
+/* Class = "NSMenuItem"; title = "delle seguenti affermazioni è vera"; ObjectID = "49"; */
+"49.title" = "delle seguenti affermazioni è vera";
+
+/* Class = "NSMenuItem"; title = "Una qualsiasi"; ObjectID = "50"; */
+"50.title" = "Una qualsiasi";
+
+/* Class = "NSMenuItem"; title = "Ognuna"; ObjectID = "51"; */
+"51.title" = "Ognuna";
+
+/* Class = "NSMenuItem"; title = "Il nome"; ObjectID = "100"; */
+"100.title" = "Il nome";
+
+/* Class = "NSMenuItem"; title = "Il commento"; ObjectID = "102"; */
+"102.title" = "Il commento";
+
+/* Class = "NSMenuItem"; title = "rispecchia"; ObjectID = "118"; */
+"118.title" = "rispecchia";
+
+/* Class = "NSMenuItem"; title = "contiene"; ObjectID = "153"; */
+"153.title" = "contiene";
+
+/* Class = "NSMenuItem"; title = "inizia per"; ObjectID = "154"; */
+"154.title" = "inizia per";
+
+/* Class = "NSMenuItem"; title = "finisce per"; ObjectID = "155"; */
+"155.title" = "finisce per";
+
+/* Class = "NSMenuItem"; title = "è"; ObjectID = "156"; */
+"156.title" = "è";
+
+/* Class = "NSMenuItem"; title = "Un qualsiasi file"; ObjectID = "161"; */
+"161.title" = "Un qualsiasi file";
+
+/* Class = "NSMenuItem"; title = "Un qualsiasi server traccia"; ObjectID = "162"; */
+"162.title" = "Un qualsiasi server traccia";
+
+/* Class = "NSMenuItem"; title = "finisce per"; ObjectID = "163"; */
+"163.title" = "finisce per";
+
+/* Class = "NSMenuItem"; title = "non è"; ObjectID = "164"; */
+"164.title" = "non è";
+
+/* Class = "NSMenuItem"; title = "contiene"; ObjectID = "165"; */
+"165.title" = "contiene";
+
+/* Class = "NSMenuItem"; title = "Nessuno"; ObjectID = "166"; */
+"166.title" = "Nessuno";
+
+/* Class = "NSMenuItem"; title = "rispecchia"; ObjectID = "167"; */
+"167.title" = "rispecchia";

@@ -343,6 +343,7 @@ set(${PROJECT_NAME}_LANG_STRINGS_FILES
 
 set(${PROJECT_NAME}_LANG_NON_EN_STRINGS_FILES
     GlobalOptionsPopover.strings
+    GroupRules.strings
     InfoActivityView.strings
     InfoGeneralView.strings
     InfoOptionsView.strings

@@ -1,0 +1,66 @@
+
+/* Class = "NSWindow"; title = "Window"; ObjectID = "1"; */
+"1.title" = "Window";
+
+/* Class = "NSButtonCell"; title = "OK"; ObjectID = "11"; */
+"11.title" = "OK";
+
+/* Class = "NSButtonCell"; title = "Annuller"; ObjectID = "12"; */
+"12.title" = "Annuller";
+
+/* Class = "NSMenuItem"; title = "begynder med"; ObjectID = "40"; */
+"40.title" = "begynder med";
+
+/* Class = "NSMenuItem"; title = "er"; ObjectID = "42"; */
+"42.title" = "er";
+
+/* Class = "NSMenuItem"; title = "af følgende er sandt"; ObjectID = "49"; */
+"49.title" = "af følgende er sandt";
+
+/* Class = "NSMenuItem"; title = "Enhver"; ObjectID = "50"; */
+"50.title" = "Enhver";
+
+/* Class = "NSMenuItem"; title = "Alle"; ObjectID = "51"; */
+"51.title" = "Alle";
+
+/* Class = "NSMenuItem"; title = "Navn"; ObjectID = "100"; */
+"100.title" = "Navn";
+
+/* Class = "NSMenuItem"; title = "Kommentar"; ObjectID = "102"; */
+"102.title" = "Kommentar";
+
+/* Class = "NSMenuItem"; title = "matcher"; ObjectID = "118"; */
+"118.title" = "matcher";
+
+/* Class = "NSMenuItem"; title = "indeholder"; ObjectID = "153"; */
+"153.title" = "indeholder";
+
+/* Class = "NSMenuItem"; title = "begynder med"; ObjectID = "154"; */
+"154.title" = "begynder med";
+
+/* Class = "NSMenuItem"; title = "ender med"; ObjectID = "155"; */
+"155.title" = "ender med";
+
+/* Class = "NSMenuItem"; title = "er"; ObjectID = "156"; */
+"156.title" = "er";
+
+/* Class = "NSMenuItem"; title = "Enhver fil"; ObjectID = "161"; */
+"161.title" = "Enhver fil";
+
+/* Class = "NSMenuItem"; title = "Enhver tracker"; ObjectID = "162"; */
+"162.title" = "Enhver tracker";
+
+/* Class = "NSMenuItem"; title = "ender med"; ObjectID = "163"; */
+"163.title" = "ender med";
+
+/* Class = "NSMenuItem"; title = "er ikke"; ObjectID = "164"; */
+"164.title" = "er ikke";
+
+/* Class = "NSMenuItem"; title = "indeholder"; ObjectID = "165"; */
+"165.title" = "indeholder";
+
+/* Class = "NSMenuItem"; title = "Ingen"; ObjectID = "166"; */
+"166.title" = "Ingen";
+
+/* Class = "NSMenuItem"; title = "matcher"; ObjectID = "167"; */
+"167.title" = "matcher";

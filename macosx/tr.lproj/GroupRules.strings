@@ -1,0 +1,66 @@
+
+/* Class = "NSWindow"; title = "Window"; ObjectID = "1"; */
+"1.title" = "Window";
+
+/* Class = "NSButtonCell"; title = "Tamam"; ObjectID = "11"; */
+"11.title" = "Tamam";
+
+/* Class = "NSButtonCell"; title = "Vazgeç"; ObjectID = "12"; */
+"12.title" = "Vazgeç";
+
+/* Class = "NSMenuItem"; title = "başlayan"; ObjectID = "40"; */
+"40.title" = "başlayan";
+
+/* Class = "NSMenuItem"; title = "eşit"; ObjectID = "42"; */
+"42.title" = "eşit";
+
+/* Class = "NSMenuItem"; title = "aşağıdakilerden biri doğru ise"; ObjectID = "49"; */
+"49.title" = "aşağıdakilerden biri doğru ise";
+
+/* Class = "NSMenuItem"; title = "Herhangi biri"; ObjectID = "50"; */
+"50.title" = "Herhangi biri";
+
+/* Class = "NSMenuItem"; title = "Hepsi"; ObjectID = "51"; */
+"51.title" = "Hepsi";
+
+/* Class = "NSMenuItem"; title = "Ad"; ObjectID = "100"; */
+"100.title" = "Ad";
+
+/* Class = "NSMenuItem"; title = "Yorum"; ObjectID = "102"; */
+"102.title" = "Yorum";
+
+/* Class = "NSMenuItem"; title = "eşleşen"; ObjectID = "118"; */
+"118.title" = "eşleşen";
+
+/* Class = "NSMenuItem"; title = "içeren"; ObjectID = "153"; */
+"153.title" = "içeren";
+
+/* Class = "NSMenuItem"; title = "başlayan"; ObjectID = "154"; */
+"154.title" = "başlayan";
+
+/* Class = "NSMenuItem"; title = "biten"; ObjectID = "155"; */
+"155.title" = "biten";
+
+/* Class = "NSMenuItem"; title = "eşit"; ObjectID = "156"; */
+"156.title" = "eşit";
+
+/* Class = "NSMenuItem"; title = "Dosya"; ObjectID = "161"; */
+"161.title" = "Dosya";
+
+/* Class = "NSMenuItem"; title = "İzleyici"; ObjectID = "162"; */
+"162.title" = "İzleyici";
+
+/* Class = "NSMenuItem"; title = "biten"; ObjectID = "163"; */
+"163.title" = "biten";
+
+/* Class = "NSMenuItem"; title = "eşit değil"; ObjectID = "164"; */
+"164.title" = "eşit değil";
+
+/* Class = "NSMenuItem"; title = "içeren"; ObjectID = "165"; */
+"165.title" = "içeren";
+
+/* Class = "NSMenuItem"; title = "Hiçbiri"; ObjectID = "166"; */
+"166.title" = "Hiçbiri";
+
+/* Class = "NSMenuItem"; title = "eşleşen"; ObjectID = "167"; */
+"167.title" = "eşleşen";

@@ -1,0 +1,66 @@
+
+/* Class = "NSWindow"; title = "Window"; ObjectID = "1"; */
+"1.title" = "Window";
+
+/* Class = "NSButtonCell"; title = "OK"; ObjectID = "11"; */
+"11.title" = "OK";
+
+/* Class = "NSButtonCell"; title = "Отменить"; ObjectID = "12"; */
+"12.title" = "Отменить";
+
+/* Class = "NSMenuItem"; title = "начинается с"; ObjectID = "40"; */
+"40.title" = "начинается с";
+
+/* Class = "NSMenuItem"; title = "="; ObjectID = "42"; */
+"42.title" = "=";
+
+/* Class = "NSMenuItem"; title = "из следующих условий удовлетвор."; ObjectID = "49"; */
+"49.title" = "из следующих условий удовлетвор.";
+
+/* Class = "NSMenuItem"; title = "Какое-либо"; ObjectID = "50"; */
+"50.title" = "Какое-либо";
+
+/* Class = "NSMenuItem"; title = "Все"; ObjectID = "51"; */
+"51.title" = "Все";
+
+/* Class = "NSMenuItem"; title = "Имя"; ObjectID = "100"; */
+"100.title" = "Имя";
+
+/* Class = "NSMenuItem"; title = "Комментарий"; ObjectID = "102"; */
+"102.title" = "Комментарий";
+
+/* Class = "NSMenuItem"; title = "совпадает с"; ObjectID = "118"; */
+"118.title" = "совпадает с";
+
+/* Class = "NSMenuItem"; title = "содержит"; ObjectID = "153"; */
+"153.title" = "содержит";
+
+/* Class = "NSMenuItem"; title = "начинается с"; ObjectID = "154"; */
+"154.title" = "начинается с";
+
+/* Class = "NSMenuItem"; title = "заканчивается на"; ObjectID = "155"; */
+"155.title" = "заканчивается на";
+
+/* Class = "NSMenuItem"; title = "="; ObjectID = "156"; */
+"156.title" = "=";
+
+/* Class = "NSMenuItem"; title = "Любой файл"; ObjectID = "161"; */
+"161.title" = "Любой файл";
+
+/* Class = "NSMenuItem"; title = "Любой трекер"; ObjectID = "162"; */
+"162.title" = "Любой трекер";
+
+/* Class = "NSMenuItem"; title = "заканчивается на"; ObjectID = "163"; */
+"163.title" = "заканчивается на";
+
+/* Class = "NSMenuItem"; title = "≠"; ObjectID = "164"; */
+"164.title" = "≠";
+
+/* Class = "NSMenuItem"; title = "содержит"; ObjectID = "165"; */
+"165.title" = "содержит";
+
+/* Class = "NSMenuItem"; title = "Ни одно"; ObjectID = "166"; */
+"166.title" = "Ни одно";
+
+/* Class = "NSMenuItem"; title = "совпадает с"; ObjectID = "167"; */
+"167.title" = "совпадает с";
