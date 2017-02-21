@@ -131,6 +131,8 @@
         {
             [fName release];
             fName = [newName copy];
+            [fIcon release];
+            fIcon = nil;
             return YES;
         }
     }

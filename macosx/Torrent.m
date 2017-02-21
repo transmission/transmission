@@ -1968,6 +1968,9 @@ bool trashDataFile(const char * filename, tr_error ** error)
         [fFlatFileList release];
         [self sortFileList: flatFileList];
         fFlatFileList = flatFileList;
+
+        [fIcon release];
+        fIcon = nil;
     }
     else
         NSLog(@"Error renaming %@ to %@", oldPath, [path stringByAppendingPathComponent: newName]);

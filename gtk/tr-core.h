@@ -125,6 +125,8 @@ void gtr_core_add_torrent (TrCore*, tr_torrent*, gboolean do_notify);
  */
 void gtr_core_torrents_added (TrCore * self);
 
+void gtr_core_torrent_changed (TrCore * self, int id);
+
 /******
 *******
 ******/
