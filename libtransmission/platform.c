@@ -98,11 +98,16 @@ tr_amInThread (const tr_thread * t)
 static ThreadFuncReturnType
 ThreadFunc (void * _t)
 {
+#ifndef _WIN32
+  pthread_detach (pthread_self ());
+#endif
+
   tr_thread * t = _t;
 
   t->func (t->arg);
 
   tr_free (t);
+
 #ifdef _WIN32
   _endthreadex (0);
   return 0;
@@ -125,7 +130,6 @@ tr_threadNew (void (*func)(void *), void * arg)
   }
 #else
   pthread_create (&t->thread, NULL, (void* (*)(void*))ThreadFunc, t);
-  pthread_detach (t->thread);
 #endif
 
   return t;
