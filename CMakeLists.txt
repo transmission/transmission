@@ -137,6 +137,7 @@ find_package(CURL ${CURL_MINIMUM} REQUIRED)
 
 find_package(ICONV)
 
+set(CRYPTO_PKG "")
 if(WITH_CRYPTO STREQUAL "AUTO" OR WITH_CRYPTO STREQUAL "openssl")
     tr_get_required_flag(WITH_CRYPTO OPENSSL_IS_REQUIRED)
     find_package(OpenSSL ${OPENSSL_MINIMUM} ${OPENSSL_IS_REQUIRED})
