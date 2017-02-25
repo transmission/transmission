@@ -6,9 +6,11 @@
   <?if $(sys.BUILDARCH) = x64 ?>
     <?define ProductName = "Transmission $(var.TrVersionFull) (x64)" ?>
     <?define PlatformProgramFilesFolder = "ProgramFiles64Folder" ?>
+    <?define PlatformSystemFolder = "System64Folder" ?>
   <?else ?>
     <?define ProductName = "Transmission $(var.TrVersionFull)" ?>
     <?define PlatformProgramFilesFolder = "ProgramFilesFolder" ?>
+    <?define PlatformSystemFolder = "SystemFolder" ?>
   <?endif ?>
 
   <Product Name="$(var.ProductName)" Id="*" UpgradeCode="1FB3C295-9BD4-4248-8C8B-B85CD11FE7C4" Language="1033" Codepage="1252" Version="$(var.TrVersionMsi)" Manufacturer="Transmission Project">
@@ -25,6 +27,15 @@
     </Property>
     <Condition Message="Another version of Transmission is already installed at &quot;[TRQTWINSTALLDIR]&quot;. Uninstall it first and then try again.">
       NOT TRQTWINSTALLDIR
+    </Condition>
+
+    <Property Id="UCRTINSTALLED">
+      <DirectorySearch Id="UcrtDirSearch" Path="[$(var.PlatformSystemFolder)]" Depth="0">
+        <FileSearch Id="UcrtFileSearch" Name="ucrtbase.dll" MinVersion="6.2.10585.0" />
+      </DirectorySearch>
+    </Property>
+    <Condition Message="The Universal C Runtime is not installed. Please run Windows Update and install all required Windows updates. You can download the UCRT separately from here: https://support.microsoft.com/en-us/kb/2999226">
+      UCRTINSTALLED
     </Condition>
 
     <Media Id="1" Cabinet="main.cab" EmbedCab="yes" DiskPrompt="CD-ROM #1" />
