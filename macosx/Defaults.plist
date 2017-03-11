@@ -180,6 +180,10 @@
 	<string>RatioTotal</string>
 	<key>SUEnableAutomaticChecks</key>
 	<true/>
+	<key>OnDoubleClickWhenCompletedAction</key>
+	<integer>0</integer>
+	<key>OnDoubleClickWhenDownloadingAction</key>
+	<integer>0</integer>
 	<key>UploadLimit</key>
 	<integer>50</integer>
 	<key>UseIncompleteDownloadFolder</key>

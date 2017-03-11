@@ -401,14 +401,26 @@
         #warning maybe make appear on mouse down
         [self displayTorrentActionPopoverForEvent: event];
     }
-    else if (!pushed && [event clickCount] == 2) //double click
+    else if (row != -1 && !pushed && [event clickCount] == 2) //double click on torrent
     {
-        id item = nil;
-        if (row != -1)
-            item = [self itemAtRow: row];
-
-        if (!item || [item isKindOfClass: [Torrent class]])
-            [fController showInfo: nil];
+        id item = [self itemAtRow: row];
+        // Depending on current preferences, choose double-click action
+        if ([item isKindOfClass: [Torrent class]]) {
+            int action = [item isComplete] ? [fDefaults integerForKey: @"OnDoubleClickWhenCompletedAction"] : [fDefaults integerForKey: @"OnDoubleClickWhenDownloadingAction"];
+            switch (action) {
+                case 0: // show file options menu
+                    [fController showInfo: nil];
+                    break;
+                case 1: // toggle pause/resume for torrent
+                    [self toggleControlForTorrent: item];
+                    break;
+                case 2: // show in finder
+                    [fController revealFile: nil];
+                    break;
+                default:
+                    break;
+            }
+        }
         else
         {
             if ([self isItemExpanded: item])
