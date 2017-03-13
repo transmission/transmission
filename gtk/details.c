@@ -2691,6 +2691,20 @@ details_free (gpointer gdata)
   g_free (data);
 }
 
+static void
+on_details_response (GtkWidget *d)
+{
+  gint w = 0;
+  gint h = 0;
+
+  gtk_window_get_size (GTK_WINDOW(d), &w, &h);
+
+  gtr_pref_int_set (TR_KEY_details_window_width, w);
+  gtr_pref_int_set (TR_KEY_details_window_height, h);
+
+  gtk_widget_destroy (d);
+}
+
 GtkWidget*
 gtr_torrent_details_dialog_new (GtkWindow * parent, TrCore * core)
 {
@@ -2716,9 +2730,13 @@ gtr_torrent_details_dialog_new (GtkWindow * parent, TrCore * core)
   di->dialog = d;
   gtk_window_set_role (GTK_WINDOW (d), "tr-info");
   g_signal_connect_swapped (d, "response",
-                            G_CALLBACK (gtk_widget_destroy), d);
+                            G_CALLBACK (on_details_response), d);
   gtk_container_set_border_width (GTK_CONTAINER (d), GUI_PAD);
   g_object_set_qdata_full (G_OBJECT (d), DETAILS_KEY, di, details_free);
+
+  gtk_window_set_default_size(GTK_WINDOW(d),
+                              gtr_pref_int_get (TR_KEY_details_window_width),
+                              gtr_pref_int_get (TR_KEY_details_window_height));
 
   n = gtk_notebook_new ();
   gtk_container_set_border_width (GTK_CONTAINER (n), GUI_PAD);

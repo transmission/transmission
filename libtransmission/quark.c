@@ -80,6 +80,8 @@ static const struct tr_key_struct my_static[] =
   { "delete-local-data", 17 },
   { "desiredAvailable", 16 },
   { "destination", 11 },
+  { "details-window-height", 21 },
+  { "details-window-width", 20 },
   { "dht-enabled", 11 },
   { "display-name", 12 },
   { "dnd", 3 },

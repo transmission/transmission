@@ -100,6 +100,8 @@ tr_prefs_init_defaults (tr_variant * d)
   tr_variantDictAddStr  (d, TR_KEY_sort_mode, "sort-by-name");
   tr_variantDictAddBool (d, TR_KEY_sort_reversed, FALSE);
   tr_variantDictAddBool (d, TR_KEY_compact_view, FALSE);
+  tr_variantDictAddInt  (d, TR_KEY_details_window_height, 500);
+  tr_variantDictAddInt  (d, TR_KEY_details_window_width, 300);
 }
 
 static tr_variant*
