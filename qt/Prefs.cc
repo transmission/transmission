@@ -60,6 +60,7 @@ Prefs::PrefItem Prefs::myItems[] =
   { SESSION_IS_REMOTE, TR_KEY_remote_session_enabled, QVariant::Bool },
   { SESSION_REMOTE_HOST, TR_KEY_remote_session_host, QVariant::String },
   { SESSION_REMOTE_PORT, TR_KEY_remote_session_port, QVariant::Int },
+  { SESSION_REMOTE_SSL, TR_KEY_remote_session_ssl, QVariant::Bool },
   { SESSION_REMOTE_AUTH, TR_KEY_remote_session_requres_authentication, QVariant::Bool },
   { SESSION_REMOTE_USERNAME, TR_KEY_remote_session_username, QVariant::String },
   { SESSION_REMOTE_PASSWORD, TR_KEY_remote_session_password, QVariant::String },
@@ -281,6 +282,7 @@ Prefs::initDefaults (tr_variant * d)
   tr_variantDictAddBool (d, TR_KEY_inhibit_desktop_hibernation, false);
   tr_variantDictAddBool (d, TR_KEY_prompt_before_exit, true);
   tr_variantDictAddBool (d, TR_KEY_remote_session_enabled, false);
+  tr_variantDictAddBool (d, TR_KEY_remote_session_ssl, false);
   tr_variantDictAddBool (d, TR_KEY_remote_session_requres_authentication, false);
   tr_variantDictAddBool (d, TR_KEY_show_backup_trackers, false);
   tr_variantDictAddBool (d, TR_KEY_show_extra_peer_details, false),

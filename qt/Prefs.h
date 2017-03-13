@@ -64,6 +64,7 @@ class Prefs: public QObject
       SESSION_IS_REMOTE,
       SESSION_REMOTE_HOST,
       SESSION_REMOTE_PORT,
+      SESSION_REMOTE_SSL,
       SESSION_REMOTE_AUTH,
       SESSION_REMOTE_USERNAME,
       SESSION_REMOTE_PASSWORD,
@@ -186,4 +187,3 @@ class Prefs: public QObject
 
     static PrefItem myItems[];
 };
-
