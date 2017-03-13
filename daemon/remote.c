@@ -4,6 +4,7 @@
  * It may be used under the GNU GPL versions 2 or 3
  * or any future license endorsed by Mnemosyne LLC.
  *
+ * $Id$
  */
 
 #include <assert.h>
@@ -28,6 +29,14 @@
 #include <libtransmission/utils.h>
 #include <libtransmission/variant.h>
 #include <libtransmission/version.h>
+#include <libtransmission/file.h>
+/*#include <errno.h>*/
+
+/*#ifdef _WIN32*/
+ /*#include <direct.h> [> _getcwd () <]*/
+/*#else*/
+ /*#include <unistd.h> [> getcwd () <]*/
+/*#endif*/
 
 #define MY_NAME "transmission-remote"
 #define DEFAULT_HOST "localhost"
@@ -56,6 +65,7 @@
 #define SPEED_M_STR "MB/s"
 #define SPEED_G_STR "GB/s"
 #define SPEED_T_STR "TB/s"
+#define TR_PATH_DELIMITER '/'
 
 /***
 ****
@@ -502,6 +512,78 @@ getEncodedMetainfo (const char * filename)
         tr_free (buf);
     }
     return b64;
+}
+
+/*static char**/
+/*tr_getcwd (void)*/
+/*{*/
+  /*char * result;*/
+  /*char buf[2048];*/
+
+/*#ifdef WIN32*/
+  /*result = _getcwd (buf, sizeof (buf));*/
+/*#else*/
+  /*result = getcwd (buf, sizeof (buf));*/
+/*#endif*/
+
+  /*if (result == NULL)*/
+    /*{*/
+      /*fprintf (stderr, "getcwd error: \"%s\"", tr_strerror (errno));*/
+      /**buf = '\0';*/
+    /*}*/
+
+  /*return tr_strdup (buf);*/
+/*}*/
+
+static bool 
+tr_daemon_same_machine (const char * rpcurl)
+{
+	if (strstr (rpcurl, "localhost") == NULL &&
+			strstr (rpcurl, "127.0.0.1") == NULL)
+	  {
+		return false;
+	  }
+	else
+	  {
+		return true;
+	  }
+}
+
+static char*
+absolutify (const char * path, const char * rpcurl)
+{
+  /*
+   * check if transmission is running on the same machine as the client 
+   * if true then absolutize the path given by the user
+   */
+
+	if (tr_daemon_same_machine (rpcurl) == false || 
+			tr_sys_path_is_relative (path) == false)
+  	{
+  	  return NULL;
+  	}
+  	else
+  	  {
+		char * buf;
+  	  	char * cwd = tr_sys_dir_get_current (NULL);
+  	  
+  	  	if (tr_strcmp0 (path, ".") == 0 || 
+  	  	tr_strcmp0 (path, "./") == 0) 
+  	  	{
+  	  	  buf = tr_malloc ((strlen (cwd) + 2) * sizeof (char));
+  	  	  memset (buf, 0, strlen (cwd) + 2);
+  	  	  /*   reserve space for path delimiter	*/
+  	  	  strncpy (buf, cwd, strlen (cwd));
+  	  	  buf[strlen (cwd)] = TR_PATH_DELIMITER;
+  	  	}  
+  	  	else 
+  	  	{
+  	  	  buf = tr_buildPath (cwd, path, NULL);
+  	  	}
+  	  	  tr_free (cwd);
+  	  	  
+        return buf;
+  	  }   
 }
 
 static void
@@ -2215,8 +2297,19 @@ processArgs (const char * rpcurl, int argc, const char * const * argv)
             }
             case 'w':
             {
+                /* split rpcurl to get only the host */
+                char * path = absolutify (optarg, rpcurl);
                 tr_variant * args = tadd ? tr_variantDictFind (tadd, TR_KEY_arguments) : ensure_sset (&sset);
-                tr_variantDictAddStr (args, TR_KEY_download_dir, optarg);
+                if (path != NULL)
+                  {
+                	tr_variantDictAddStr (args, TR_KEY_download_dir, path);
+                	tr_free (path);
+				  }
+				else
+				  {
+					  /*path was absolute or daemon is on remote machine*/
+                	tr_variantDictAddStr (args, TR_KEY_download_dir, optarg);
+                  }
                 break;
             }
             case 850:
