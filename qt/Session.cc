@@ -307,7 +307,7 @@ Session::start ()
   if (myPrefs.get<bool> (Prefs::SESSION_IS_REMOTE))
     {
       QUrl url;
-      url.setScheme (QLatin1String ("http"));
+      url.setScheme (QLatin1String (myPrefs.get<bool> (Prefs::SESSION_REMOTE_SSL) ? "https" : "http"));
       url.setHost (myPrefs.get<QString> (Prefs::SESSION_REMOTE_HOST));
       url.setPort (myPrefs.get<int> (Prefs::SESSION_REMOTE_PORT));
       url.setPath (QLatin1String ("/transmission/rpc"));

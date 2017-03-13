@@ -281,6 +281,7 @@ enum
   TR_KEY_remote_session_password,
   TR_KEY_remote_session_port,
   TR_KEY_remote_session_requres_authentication,
+  TR_KEY_remote_session_ssl,
   TR_KEY_remote_session_username,
   TR_KEY_removed,
   TR_KEY_rename_partial_files,
@@ -430,4 +431,3 @@ tr_quark tr_quark_new (const void * str, size_t len);
 #ifdef __cplusplus
 }
 #endif
-

@@ -280,6 +280,7 @@ static const struct tr_key_struct my_static[] =
   { "remote-session-password", 23 },
   { "remote-session-port", 19 },
   { "remote-session-requres-authentication", 37 },
+  { "remote-session-ssl", 18 },
   { "remote-session-username", 23 },
   { "removed", 7 },
   { "rename-partial-files", 20 },

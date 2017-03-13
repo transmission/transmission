@@ -49,6 +49,7 @@ namespace
     { 'm', "minimized",  "Start minimized in system tray", "m", 0, NULL },
     { 'p', "port",  "Port to use when connecting to an existing session", "p", 1, "<port>" },
     { 'r', "remote",  "Connect to an existing session at the specified hostname", "r", 1, "<host>" },
+    { 's', "ssl", "Use SSL when connecting to an existing session", "s", 0, NULL },
     { 'u', "username", "Username to use when connecting to an existing session", "u", 1, "<username>" },
     { 'v', "version", "Show version number and exit", "v", 0, NULL },
     { 'w', "password", "Password to use when connecting to an existing session", "w", 1, "<password>" },
@@ -123,6 +124,7 @@ Application::Application (int& argc, char ** argv):
   const char * optarg;
   QString host;
   QString port;
+  bool ssl = false;
   QString username;
   QString password;
   QString configDir;
@@ -134,6 +136,7 @@ Application::Application (int& argc, char ** argv):
           case 'g': configDir = QString::fromUtf8 (optarg); break;
           case 'p': port = QString::fromUtf8 (optarg); break;
           case 'r': host = QString::fromUtf8 (optarg); break;
+          case 's': ssl = true; break;
           case 'u': username = QString::fromUtf8 (optarg); break;
           case 'w': password = QString::fromUtf8 (optarg); break;
           case 'm': minimized = true; break;
@@ -201,6 +204,8 @@ Application::Application (int& argc, char ** argv):
     myPrefs->set (Prefs::SESSION_REMOTE_HOST, host);
   if (!port.isNull ())
     myPrefs->set (Prefs::SESSION_REMOTE_PORT, port.toUInt ());
+  if (ssl)
+    myPrefs->set (Prefs::SESSION_REMOTE_SSL, ssl);
   if (!username.isNull ())
     myPrefs->set (Prefs::SESSION_REMOTE_USERNAME, username);
   if (!password.isNull ())

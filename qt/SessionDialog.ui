@@ -80,13 +80,20 @@
       </widget>
      </item>
      <item row="4" column="0" colspan="2">
+      <widget class="QCheckBox" name="sslCheck">
+       <property name="text">
+        <string>&amp;SSL</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="0" colspan="2">
       <widget class="QCheckBox" name="authCheck">
        <property name="text">
         <string>&amp;Authentication required</string>
        </property>
       </widget>
      </item>
-     <item row="5" column="0">
+     <item row="6" column="0">
       <widget class="QLabel" name="usernameLabel">
        <property name="text">
         <string>&amp;Username:</string>
@@ -96,10 +103,10 @@
        </property>
       </widget>
      </item>
-     <item row="5" column="1">
+     <item row="6" column="1">
       <widget class="QLineEdit" name="usernameEdit"/>
      </item>
-     <item row="6" column="0">
+     <item row="7" column="0">
       <widget class="QLabel" name="passwordLabel">
        <property name="text">
         <string>Pass&amp;word:</string>
@@ -109,7 +116,7 @@
        </property>
       </widget>
      </item>
-     <item row="6" column="1">
+     <item row="7" column="1">
       <widget class="QLineEdit" name="passwordEdit">
        <property name="echoMode">
         <enum>QLineEdit::Password</enum>
