@@ -252,6 +252,15 @@ TransmissionRemote.prototype = {
             remote._controller.refreshTorrents();
         });
     },
+    checkForAddTorrentInUrl: function() {
+        var url = getUrlVar('addtorrent');
+
+        if(url){
+            var paused = this._controller.shouldAddedTorrentsStart;
+            this.addTorrentByUrl(unescape(url), { paused: paused });
+            history.replaceState(null, "", location.href.split("?")[0]);
+        }
+    },
     savePrefs: function (args) {
         var remote = this;
         var o = {

@@ -24,6 +24,7 @@ Dialog.prototype = {
         this._message = $('#dialog_message');
         this._cancel_button = $('#dialog_cancel_button');
         this._confirm_button = $('#dialog_confirm_button');
+        this._default_app_button = $('#default_app_button');
         this._callback = null;
 
         // Observe the buttons
@@ -33,6 +34,9 @@ Dialog.prototype = {
         this._confirm_button.bind('click', {
             dialog: this
         }, this.onConfirmClicked);
+        this._default_app_button.bind('click', {
+            dialog: this
+        }, this.onDefaultAppClicked);
     },
 
     /*--------------------------------------------
@@ -56,6 +60,12 @@ Dialog.prototype = {
         var dialog = event.data.dialog;
         dialog._callback();
         dialog.hideDialog();
+    },
+
+    onDefaultAppClicked: function(event) {
+        window.navigator.registerProtocolHandler("magnet", returnBaseURL() + "?addtorrent=%s", "Transmission Web");
+        /* The following is not yet implemented in any browser */
+        window.navigator.registerContentHandler("application/x-bittorrent", returnBaseURL() + "?addtorrent=%s", "Transmission Web");
     },
 
     /*--------------------------------------------

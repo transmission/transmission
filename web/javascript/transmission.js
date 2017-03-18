@@ -107,6 +107,10 @@ Transmission.prototype = {
         this.loadDaemonPrefs(async);
         this.loadDaemonStats(async);
         this.initializeTorrents();
+
+        // Check for a new torrent provided using the url (#2404)
+        this.remote.checkForAddTorrentInUrl();
+
         this.refreshTorrents();
         this.togglePeriodicSessionRefresh(true);
 

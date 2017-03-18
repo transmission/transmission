@@ -99,6 +99,53 @@ String.prototype.trim = function () {
     return this.replace(/^\s*/, "").replace(/\s*$/, "");
 };
 
+/*
+ *   Give us the base path of transmission web
+ *   Used for our content / protocol handlers in dialog.js
+ *
+ *   @returns string
+ */
+
+function returnBaseURL( )
+{
+ 	var href = window.location.href;
+	if (href.indexOf('?') != -1)
+		href = href.substring(0, href.indexOf('?'));
+	if (href.indexOf('#') != -1)
+		href = href.substring(0, href.indexOf('#'));
+
+	return href;
+}
+
+/*
+ * Get a list of parameters send through the url
+ *
+ * @returns string[]
+ */
+function getUrlVars()
+{
+	var vars = [], hash;
+	var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+	for(var i = 0; i < hashes.length; i++)
+	{
+		hash = hashes[i].split('=');
+		vars.push(hash[0]);
+		vars[hash[0]] = hash[1];
+	}
+	return vars;
+}
+
+/*
+ * Get a specific url variable
+ *
+ * @param string name
+ * @returns string
+ */
+function getUrlVar ( name )
+{
+	return getUrlVars()[name];
+}
+
 /***
  ****  Preferences
  ***/
