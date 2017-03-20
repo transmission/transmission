@@ -4,6 +4,7 @@
  * It may be used under the GNU GPL versions 2 or 3
  * or any future license endorsed by Mnemosyne LLC.
  *
+ * $Id$
  */
 
 #include <assert.h>
@@ -206,7 +207,7 @@ getUsage (void)
     return
         MY_NAME" "LONG_VERSION_STRING"\n"
         "A fast and easy BitTorrent client\n"
-        "https://transmissionbt.com/\n"
+        "http://www.transmissionbt.com/\n"
         "\n"
         "Usage: " MY_NAME
         " [host] [options]\n"
@@ -551,6 +552,7 @@ absolutify (const char * path)
   		  tr_strcmp0 (path, "./") == 0) 
   	    {
   	    	buf = tr_malloc ((strlen (cwd) + 2) * sizeof (char));
+  	    	memset (buf, 0, strlen (cwd) + 2);
               /*   reserve space for path delimiter	*/
   	    	strncpy (buf, cwd, strlen (cwd));
   	    	buf[strlen (cwd)] = TR_PATH_DELIMITER;
