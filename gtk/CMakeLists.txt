@@ -50,11 +50,20 @@ add_custom_command(
 
 if(ENABLE_NLS)
     find_program(INTLTOOL_MERGE_EXECUTABLE intltool-merge REQUIRED)
+
     set(${PROJECT_NAME}_DESKTOP_FILE "${PROJECT_BINARY_DIR}/${TR_NAME}-gtk.desktop")
     add_custom_command(
         OUTPUT ${${PROJECT_NAME}_DESKTOP_FILE}
         COMMAND ${INTLTOOL_MERGE_EXECUTABLE} --desktop-style --utf8 ${CMAKE_SOURCE_DIR}/po ${PROJECT_SOURCE_DIR}/transmission-gtk.desktop.in ${${PROJECT_NAME}_DESKTOP_FILE}
         DEPENDS ${PROJECT_SOURCE_DIR}/transmission-gtk.desktop.in
+        VERBATIM
+    )
+
+    set(${PROJECT_NAME}_APPDATA_FILE "${PROJECT_BINARY_DIR}/${TR_NAME}-gtk.appdata.xml")
+    add_custom_command(
+        OUTPUT ${${PROJECT_NAME}_APPDATA_FILE}
+        COMMAND ${INTLTOOL_MERGE_EXECUTABLE} --xml-style --utf8 ${CMAKE_SOURCE_DIR}/po ${PROJECT_SOURCE_DIR}/transmission-gtk.appdata.xml.in ${${PROJECT_NAME}_APPDATA_FILE}
+        DEPENDS ${PROJECT_SOURCE_DIR}/transmission-gtk.appdata.xml.in
         VERBATIM
     )
 endif()
@@ -148,6 +157,7 @@ add_executable(${TR_NAME}-gtk WIN32
     ${${PROJECT_NAME}_SOURCES}
     ${${PROJECT_NAME}_HEADERS}
     ${${PROJECT_NAME}_DESKTOP_FILE}
+    ${${PROJECT_NAME}_APPDATA_FILE}
     ${${PROJECT_NAME}_WIN32_RC_FILE}
 )
 
@@ -188,6 +198,7 @@ endif()
 
 if(ENABLE_NLS)
     install(FILES ${${PROJECT_NAME}_DESKTOP_FILE} DESTINATION ${CMAKE_INSTALL_DATADIR}/applications)
+    install(FILES ${${PROJECT_NAME}_APPDATA_FILE} DESTINATION ${CMAKE_INSTALL_DATADIR}/appdata)
 else()
     install(FILES transmission-gtk.desktop.in DESTINATION ${CMAKE_INSTALL_DATADIR}/applications RENAME ${TR_NAME}-gtk.desktop)
 endif()

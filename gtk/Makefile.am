@@ -100,6 +100,13 @@ DESKTOP_FILES=$(DESKTOP_IN_FILES:.desktop.in=.desktop)
 Productivitydir = $(datadir)/applications
 Productivity_DATA = $(DESKTOP_FILES)
 
+APPDATA_IN_FILES=transmission-gtk.appdata.xml.in
+APPDATA_FILES=$(APPDATA_IN_FILES:.xml.in=.xml)
+@INTLTOOL_XML_RULE@
+
+appdatadir = $(datadir)/appdata
+appdata_DATA = $(APPDATA_FILES)
+
 icon_DATA = transmission.png
 icondir = $(datadir)/pixmaps
 
