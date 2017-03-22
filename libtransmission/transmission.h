@@ -1810,6 +1810,7 @@ struct tr_info
 
 static inline bool tr_torrentHasMetadata (const tr_torrent * tor)
 {
+    if (!tor) { return false; }
     return tr_torrentInfo (tor)->fileCount > 0;
 }
 
