@@ -677,7 +677,7 @@ static void removeKeRangerRansomware()
         [[BonjourController defaultController] startWithPort: [fDefaults integerForKey: @"RPCPort"]];
     
     //setup TouchBar stuff
-    [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(setupTouchBarIfReady) userInfo:nil repeats:NO];
+    [self setupTouchBarIfReady];
     [NSApp setAutomaticCustomizeTouchBarMenuItemEnabled: YES];
     
     shareTouchBarButton.delegate = self;

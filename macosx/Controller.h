@@ -90,27 +90,26 @@ typedef enum
     IBOutlet NSMenuItem             * fShareMenuItem, * fShareContextMenuItem; // remove when dropping 10.6
     IBOutlet NSTouchBar *touchbar;
     //TouchBar items
-    IBOutlet NSTouchBarItem *createTouchBarItem;
-    IBOutlet NSButton *createTouchBarButton;
-    IBOutlet NSTouchBarItem *openFileTouchBarItem;
-    IBOutlet NSButton *openFileTouchBarButton;
-    IBOutlet NSTouchBarItem *removeTouchBarItem;
-    IBOutlet NSButton *removeTouchBarButton;
-    IBOutlet NSTouchBarItem *pauseAllTouchBarItem;
-    IBOutlet NSButton *pauseAllTouchBarButton;
-    IBOutlet NSTouchBarItem *resumeAllTouchBarItem;
-    IBOutlet NSButton *resumeAllTouchBarButton;
-    IBOutlet NSTouchBarItem *speedLimitTouchBarItem;
-    IBOutlet NSButton *speedLimitTouchBarButton;
-    IBOutlet NSTouchBarItem *cleanupTouchBarItem;
-    IBOutlet NSButton *cleanupTouchBarButton;
-    IBOutlet NSTouchBarItem *quickLookTouchBarItem;
-    IBOutlet NSButton *quickLookTouchBarButton;
-    IBOutlet NSTouchBarItem *showInfoTouchBarItem;
-    IBOutlet NSButton *showInfoTouchBarButton;
-    IBOutlet NSSharingServicePickerTouchBarItem *shareTouchBarButton;
-    //^^^should probably move these into an IBOutlet collection, or better yet stop using IB for them
-
+    IBOutlet NSTouchBarItem         * createTouchBarItem;
+    IBOutlet NSButton               * createTouchBarButton;
+    IBOutlet NSTouchBarItem         * openFileTouchBarItem;
+    IBOutlet NSButton               * openFileTouchBarButton;
+    IBOutlet NSTouchBarItem         * removeTouchBarItem;
+    IBOutlet NSButton               * removeTouchBarButton;
+    IBOutlet NSTouchBarItem         * pauseAllTouchBarItem;
+    IBOutlet NSButton               * pauseAllTouchBarButton;
+    IBOutlet NSTouchBarItem         * resumeAllTouchBarItem;
+    IBOutlet NSButton               * resumeAllTouchBarButton;
+    IBOutlet NSTouchBarItem         * speedLimitTouchBarItem;
+    IBOutlet NSButton               * speedLimitTouchBarButton;
+    IBOutlet NSTouchBarItem         * cleanupTouchBarItem;
+    IBOutlet NSButton               * cleanupTouchBarButton;
+    IBOutlet NSTouchBarItem         * quickLookTouchBarItem;
+    IBOutlet NSButton               * quickLookTouchBarButton;
+    IBOutlet NSTouchBarItem         * showInfoTouchBarItem;
+    IBOutlet NSButton               * showInfoTouchBarButton;
+    IBOutlet NSSharingServicePickerTouchBarItem * shareTouchBarButton;
+    
     QLPreviewPanel                  * fPreviewPanel;
     BOOL                            fQuitting;
     BOOL                            fQuitRequested;
