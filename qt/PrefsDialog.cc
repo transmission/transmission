@@ -190,6 +190,10 @@ bool PrefsDialog::updateWidgetValue(QWidget* widget, int pref_key) const
     {
         pref_widget.as<FreeSpaceLabel>()->setPath(prefs_.getString(pref_key));
     }
+    else if (pref_widget.is<QPlainTextEdit>())
+    {
+        pref_widget.as<QPlainTextEdit>()->setPlainText(prefs_.getString(pref_key));
+    }
     else
     {
         return false;
@@ -233,6 +237,10 @@ void PrefsDialog::linkWidgetToPref(QWidget* widget, int pref_key)
     if (auto const* spin_box = qobject_cast<QAbstractSpinBox*>(widget); spin_box != nullptr)
     {
         connect(spin_box, &QAbstractSpinBox::editingFinished, this, &PrefsDialog::spinBoxEditingFinished);
+    }
+    else if (pref_widget.is<QPlainTextEdit>())
+    {
+        connect(widget, SIGNAL(textChanged()), SLOT(plainTextChanged()));
     }
 }
 
@@ -292,6 +300,22 @@ void PrefsDialog::pathChanged(QString const& path)
     if (pref_widget.is<PathButton>())
     {
         setPref(pref_widget.getPrefKey(), path);
+    }
+}
+
+void PrefsDialog::plainTextChanged()
+{
+    PreferenceWidget const pref_widget(sender());
+
+    if (pref_widget.is<QPlainTextEdit>())
+    {
+        auto const* const plain_text_edit = pref_widget.as<QPlainTextEdit>();
+
+        if (plain_text_edit->document()->isModified())
+        {
+            prefs_.set(pref_widget.getPrefKey(), plain_text_edit->toPlainText());
+            // we avoid using setPref() because the included refreshPref() call would reset the cursor while we're editing
+        }
     }
 }
 
@@ -423,6 +447,7 @@ void PrefsDialog::initNetworkTab()
     linkWidgetToPref(ui_.enablePexCheck, Prefs::PEX_ENABLED);
     linkWidgetToPref(ui_.enableDhtCheck, Prefs::DHT_ENABLED);
     linkWidgetToPref(ui_.enableLpdCheck, Prefs::LPD_ENABLED);
+    linkWidgetToPref(ui_.defaultTrackersPlainTextEdit, Prefs::DEFAULT_TRACKERS);
 
     auto* cr = new ColumnResizer(this);
     cr->addLayout(ui_.incomingPeersSectionLayout);
@@ -775,11 +800,15 @@ void PrefsDialog::refreshPref(int key)
     {
         QWidget* w(it.value());
 
+        w->blockSignals(true);
+
         if (!updateWidgetValue(w, key) && (key == Prefs::ENCRYPTION))
         {
             auto* combo_box = qobject_cast<QComboBox*>(w);
             int const index = combo_box->findData(prefs_.getInt(key));
             combo_box->setCurrentIndex(index);
         }
+
+        w->blockSignals(false);
     }
 }

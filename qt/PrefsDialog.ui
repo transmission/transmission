@@ -983,6 +983,26 @@
            </property>
           </widget>
          </item>
+         <item>
+          <widget class="QLabel" name="defaultTrackersLabel">
+           <property name="toolTip">
+            <string>a list of default trackers to be added to new public torrents (and existing ones, after a reload)</string>
+           </property>
+           <property name="text">
+            <string>Default Trackers:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPlainTextEdit" name="defaultTrackersPlainTextEdit">
+           <property name="lineWrapMode">
+            <enum>QPlainTextEdit::NoWrap</enum>
+           </property>
+           <property name="plainText">
+            <string notr="true"/>
+           </property>
+          </widget>
+         </item>
         </layout>
        </item>
        <item>

@@ -762,6 +762,10 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
     grid-column: span 2;
   }
 
+  #default-trackers {
+    height: 300px;
+  }
+
   .blocklist-size-label,
   .blocklist-update-button,
   .port-status {

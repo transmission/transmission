@@ -480,6 +480,8 @@ int tr_sessionGetCacheLimit_MB(tr_session const* session);
 
 tr_encryption_mode tr_sessionGetEncryption(tr_session* session);
 void tr_sessionSetEncryption(tr_session* session, tr_encryption_mode mode);
+void tr_sessionSetDefaultTrackers(tr_session* session, char const* defaultTrackersStr);
+char const* tr_sessionGetDefaultTrackers(tr_session const* session);
 
 /***********************************************************************
 ** Incoming Peer Connections Port

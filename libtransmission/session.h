@@ -387,6 +387,8 @@ public:
 
     std::unique_ptr<tr_rpc_server> rpc_server_;
 
+    struct tr_list* defaultTrackers;
+    char* defaultTrackersStr;
     // One of <netinet/ip.h>'s IPTOS_ values.
     // See tr_netTos*() in libtransmission/net.h for more info
     // Only session.cc should use this.

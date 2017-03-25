@@ -332,6 +332,7 @@ void tr_sessionGetDefaultSettings(tr_variant* d)
     tr_variantDictAddBool(d, TR_KEY_dht_enabled, true);
     tr_variantDictAddBool(d, TR_KEY_utp_enabled, true);
     tr_variantDictAddBool(d, TR_KEY_lpd_enabled, false);
+    tr_variantDictAddStr(d, TR_KEY_default_trackers, "");
     tr_variantDictAddStr(d, TR_KEY_download_dir, tr_getDefaultDownloadDir());
     tr_variantDictAddInt(d, TR_KEY_speed_limit_down, 100);
     tr_variantDictAddBool(d, TR_KEY_speed_limit_down_enabled, false);
@@ -407,6 +408,7 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* d)
     tr_variantDictAddBool(d, TR_KEY_blocklist_enabled, s->useBlocklist());
     tr_variantDictAddStr(d, TR_KEY_blocklist_url, s->blocklistUrl());
     tr_variantDictAddInt(d, TR_KEY_cache_size_mb, tr_sessionGetCacheLimit_MB(s));
+    tr_variantDictAddStr(d, TR_KEY_default_trackers, tr_sessionGetDefaultTrackers(s));
     tr_variantDictAddBool(d, TR_KEY_dht_enabled, s->isDHTEnabled);
     tr_variantDictAddBool(d, TR_KEY_utp_enabled, s->isUTPEnabled);
     tr_variantDictAddBool(d, TR_KEY_lpd_enabled, s->isLPDEnabled);
@@ -809,6 +811,11 @@ static void sessionSetImpl(void* vdata)
     if (tr_variantDictFindInt(settings, TR_KEY_cache_size_mb, &i))
     {
         tr_sessionSetCacheLimit_MB(session, i);
+    }
+
+    if (tr_variantDictFindStr(settings, TR_KEY_default_trackers, &str, NULL))
+    {
+        tr_sessionSetDefaultTrackers(session, str);
     }
 
     if (tr_variantDictFindInt(settings, TR_KEY_peer_limit_per_torrent, &i))
@@ -2001,6 +2008,8 @@ void tr_sessionClose(tr_session* session)
     tr_session_id_free(session->session_id);
 
     delete session;
+    tr_list_free(&session->defaultTrackers, NULL);
+    tr_free(session->defaultTrackersStr);
 }
 
 struct sessionLoadTorrentsData
@@ -2238,6 +2247,55 @@ int tr_sessionGetCacheLimit_MB(tr_session const* session)
     TR_ASSERT(tr_isSession(session));
 
     return tr_toMemMB(tr_cacheGetLimit(session->cache));
+}
+
+/***
+****
+***/
+
+void tr_sessionSetDefaultTrackers(tr_session* session, char const* defaultTrackersStr)
+{
+    void* tmp;
+    char const* walk;
+
+    TR_ASSERT(tr_isSession(session));
+
+    /* keep the string */
+    tmp = session->defaultTrackersStr;
+    session->defaultTrackersStr = tr_strdup(defaultTrackersStr);
+    tr_free(tmp);
+
+    /* clear out the old list entries */
+    while ((tmp = tr_list_pop_front(&session->defaultTrackers)))
+    {
+        tr_free(tmp);
+    }
+
+    /* build the new list entries */
+    for (walk = defaultTrackersStr; walk && *walk;)
+    {
+        char const* delimiters = " ,;\r\n\t";
+        size_t const len = strcspn(walk, delimiters);
+        if (len)
+        {
+            char* token = tr_strndup(walk, len);
+            tr_list_append(&session->defaultTrackers, token);
+        }
+
+        if (walk[len] == '\0')
+        {
+            break;
+        }
+
+        walk += len + 1;
+    }
+}
+
+char const* tr_sessionGetDefaultTrackers(tr_session const* session)
+{
+    TR_ASSERT(tr_isSession(session));
+
+    return session->defaultTrackersStr ? session->defaultTrackersStr : NULL;
 }
 
 /***

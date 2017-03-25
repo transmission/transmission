@@ -63,6 +63,10 @@ export class PrefsDialog extends EventTarget {
   }
 
   static _getValue(e) {
+    if (e.tagName === 'TEXTAREA') {
+      return e.value;
+    }
+
     switch (e.type) {
       case 'checkbox':
       case 'radio':
@@ -118,6 +122,15 @@ export class PrefsDialog extends EventTarget {
           const n = Formatter.number(value);
           element.innerHTML = `Blocklist has <span class="blocklist-size-number">${n}</span> rules`;
           setTextContent(this.elements.peers.blocklist_update_button, 'Update');
+        } else if (element.tagName === 'TEXTAREA') {
+          if (
+            // eslint-disable-next-line eqeqeq
+            element.value != value &&
+            element !== document.activeElement
+          ) {
+            element.value = value;
+            element.dispatchEvent(new Event('change'));
+          }
         } else {
           switch (element.type) {
             case 'checkbox':
@@ -646,7 +659,25 @@ export class PrefsDialog extends EventTarget {
     root.append(cal.root);
     const utp_check = cal.check;
 
+    label = document.createElement('div');
+    label.textContent = 'Default trackers';
+    label.classList.add('section-label');
+    root.append(label);
+
+    label = document.createElement('label');
+    label.textContent =
+      '(added to new public torrents and to existing ones on reload):';
+    root.append(label);
+
+    const textarea = document.createElement('textarea');
+    textarea.dataset.key = 'default-trackers';
+    textarea.id = 'default-trackers';
+    label.setAttribute('for', textarea.id);
+    root.append(textarea);
+    const default_trackers_textarea = textarea;
+
     return {
+      default_trackers_textarea,
       port_forwarding_check,
       port_input,
       port_status_label,
@@ -714,6 +745,8 @@ export class PrefsDialog extends EventTarget {
               console.trace(`unhandled input: ${element.type}`);
               break;
           }
+        } else if (element.tagName === 'TEXTAREA') {
+          element.addEventListener('change', on_change);
         }
       }
     };

@@ -102,7 +102,7 @@ static auto constexpr Options = std::array<tr_option, 43>{
       { 'C', "no-watch-dir", "Disable the watch-dir", "C", false, nullptr },
       { 941, "incomplete-dir", "Where to store new torrents until they're complete", nullptr, true, "<directory>" },
       { 942, "no-incomplete-dir", "Don't store incomplete torrents in a different location", nullptr, false, nullptr },
-      { 'd', "dump-settings", "Dump the settings and exit", "d", false, nullptr },
+    { 943, "default-trackers", "Default trackers to be automatically added to public torrents", NULL, true, "<list>" },
       { 'e', "logfile", "Dump the log messages to this filename", "e", true, "<filename>" },
       { 'f', "foreground", "Run in the foreground instead of daemonizing", "f", false, nullptr },
       { 'g', "config-dir", "Where to look for configuration files", "g", true, "<path>" },
@@ -414,6 +414,10 @@ static bool parse_args(
 
         case 942:
             tr_variantDictAddBool(settings, TR_KEY_incomplete_dir_enabled, false);
+            break;
+
+        case 943:
+            tr_variantDictAddStr(settings, TR_KEY_default_trackers, optarg);
             break;
 
         case 'd':
