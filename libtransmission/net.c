@@ -384,6 +384,17 @@ tr_netBindTCPImpl (const tr_address * addr,
     if (!suppressMsgs)
         tr_logAddDebug ("Bound socket %" PRIdMAX " to port %d on %s", (intmax_t) fd, port, tr_address_to_string (addr));
 
+#ifdef TCP_FASTOPEN
+
+#ifndef SOL_TCP
+#define SOL_TCP IPPROTO_TCP
+#endif
+
+    optval = 5;
+    setsockopt (fd, SOL_TCP, TCP_FASTOPEN, (const void *) &optval, sizeof (optval));
+
+#endif
+
     if (listen (fd, 128) == -1) {
         *errOut = sockerrno;
         tr_netCloseSocket (fd);

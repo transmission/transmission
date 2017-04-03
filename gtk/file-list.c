@@ -801,7 +801,17 @@ on_rename_done_idle (struct rename_data * data)
       GtkTreeIter iter;
 
       if (gtk_tree_model_get_iter_from_string (data->file_data->model, &iter, data->path_string))
-        gtk_tree_store_set (data->file_data->store, &iter, FC_LABEL, data->newname, -1);
+        {
+          const gboolean isLeaf = !gtk_tree_model_iter_has_child (data->file_data->model, &iter);
+          const char * mime_type = isLeaf ? gtr_get_mime_type_from_filename (data->newname) : DIRECTORY_MIME_TYPE;
+          GdkPixbuf * icon = gtr_get_mime_type_icon (mime_type, GTK_ICON_SIZE_MENU, data->file_data->view);
+
+          gtk_tree_store_set (data->file_data->store, &iter, FC_LABEL, data->newname, FC_ICON, icon, -1);
+
+          GtkTreeIter parent;
+          if (!gtk_tree_model_iter_parent (data->file_data->model, &parent, &iter))
+            gtr_core_torrent_changed (data->file_data->core, data->file_data->torrentId);
+        }
     }
   else
     {

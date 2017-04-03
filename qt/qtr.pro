@@ -13,6 +13,7 @@ man.files = transmission-qt.1
 
 CONFIG += qt thread debug link_pkgconfig c++11 warn_on
 QT += network dbus
+win32:QT += winextras
 PKGCONFIG = fontconfig libcurl openssl libevent
 
 greaterThan(QT_MAJOR_VERSION, 4) {
@@ -84,7 +85,6 @@ SOURCES += AboutDialog.cc \
            FilterBar.cc \
            FilterBarComboBox.cc \
            FilterBarComboBoxDelegate.cc \
-           FilterBarLineEdit.cc \
            Filters.cc \
            Formatter.cc \
            FreeSpaceLabel.cc \
@@ -105,6 +105,7 @@ SOURCES += AboutDialog.cc \
            SessionDialog.cc \
            SqueezeLabel.cc \
            StatsDialog.cc \
+           StyleHelper.cc \
            Torrent.cc \
            TorrentDelegate.cc \
            TorrentDelegateMin.cc \

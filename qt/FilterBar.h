@@ -11,11 +11,11 @@
 #include <QWidget>
 
 class QLabel;
+class QLineEdit;
 class QStandardItemModel;
 class QTimer;
 
 class FilterBarComboBox;
-class FilterBarLineEdit;
 class Prefs;
 class TorrentFilter;
 class TorrentModel;
@@ -56,6 +56,6 @@ class FilterBar: public QWidget
     QStandardItemModel * myTrackerModel;
     QTimer * myRecountTimer;
     bool myIsBootstrapping;
-    FilterBarLineEdit * myLineEdit;
+    QLineEdit * myLineEdit;
 };
 

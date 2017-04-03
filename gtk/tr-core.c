@@ -1355,6 +1355,19 @@ gtr_core_torrents_added (TrCore * self)
 }
 
 void
+gtr_core_torrent_changed (TrCore * self, int id)
+{
+  GtkTreeIter iter;
+  GtkTreeModel * model = core_raw_model (self);
+
+  if (find_row_from_torrent_id (model, id, &iter))
+    {
+      GtkTreePath * path = gtk_tree_model_get_path (model, &iter);
+      gtk_tree_model_row_changed (model, path, &iter);
+    }
+}
+
+void
 gtr_core_remove_torrent (TrCore * core, int id, gboolean delete_local_data)
 {
   tr_torrent * tor = gtr_core_find_torrent (core, id);
