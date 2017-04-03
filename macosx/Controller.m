@@ -677,7 +677,7 @@ static void removeKeRangerRansomware()
         [[BonjourController defaultController] startWithPort: [fDefaults integerForKey: @"RPCPort"]];
     
     //setup TouchBar stuff
-    [self setupTouchBarIfReady];
+    [self setupTouchBar];
     [NSApp setAutomaticCustomizeTouchBarMenuItemEnabled: YES];
     
     shareTouchBarButton.delegate = self;
@@ -859,10 +859,8 @@ static void removeKeRangerRansomware()
     tr_sessionClose(fLib);
 }
 
-- (void) setupTouchBarIfReady
+- (void) setupTouchBar
 {
-    if (touchbar != nil)
-    {
         [touchbar setDefaultItemIdentifiers: @[createTouchBarItem.identifier,
                                                openFileTouchBarItem.identifier,
                                                removeTouchBarItem.identifier,
@@ -882,16 +880,8 @@ static void removeKeRangerRansomware()
                                                             quickLookTouchBarItem.identifier,
                                                             showInfoTouchBarItem.identifier,
                                                             NSTouchBarItemIdentifierFlexibleSpace,
-                                                            NSTouchBarItemIdentifierFixedSpaceLarge,
-                                                            NSTouchBarItemIdentifierFixedSpaceSmall,
                                                             shareTouchBarButton.identifier
                                                             ]];
-    }
-    else
-    {
-        [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector: @selector(setupTouchBarIfReady) userInfo:nil repeats:NO];
-    }
-    
 }
 
 - (tr_session *) sessionHandle
@@ -3815,7 +3805,7 @@ static void removeKeRangerRansomware()
     [picker showRelativeToRect:[sender bounds] ofView:sender preferredEdge:NSMinYEdge];
 }
 
-- (NSArray *)itemsForSharingServicePickerTouchBarItem:(NSSharingServicePickerTouchBarItem *)pickerTouchBarItem
+- (NSArray *) itemsForSharingServicePickerTouchBarItem:(NSSharingServicePickerTouchBarItem *)pickerTouchBarItem
 {
     return [[ShareTorrentFileHelper sharedHelper] shareTorrentURLs];
 }
@@ -4113,7 +4103,7 @@ static void removeKeRangerRansomware()
               TOOLBAR_PAUSE_RESUME_ALL, NSToolbarFlexibleSpaceItemIdentifier,
               TOOLBAR_SHARE, TOOLBAR_QUICKLOOK, TOOLBAR_FILTER, TOOLBAR_INFO ];
 }
-
+/*
 - (BOOL) validateToolbarItem: (NSToolbarItem *) toolbarItem
 {
     NSString * ident = [toolbarItem itemIdentifier];
@@ -4195,6 +4185,87 @@ static void removeKeRangerRansomware()
     [self syncToTouchBarForItem: ident withValue: enabled];
     return enabled;
 
+}
+*/
+
+- (BOOL) validateToolbarItem:(NSToolbarItem *) toolbarItem {
+    NSString * ident = [toolbarItem itemIdentifier];
+    BOOL enabled = [self isToolbarItemValid: toolbarItem];
+    
+    [self syncToTouchBarForItem: ident withValue: enabled];
+    return enabled;
+}
+
+- (BOOL) isToolbarItemValid: (NSToolbarItem *) toolbarItem
+{
+    NSString * ident = [toolbarItem itemIdentifier];
+    
+    //enable remove item
+    if ([ident isEqualToString: TOOLBAR_REMOVE])
+        return [fTableView numberOfSelectedRows] > 0;
+    
+    //enable pause all item
+    if ([ident isEqualToString: TOOLBAR_PAUSE_ALL])
+    {
+        for (Torrent * torrent in fTorrents)
+            if ([torrent isActive] || [torrent waitingToStart])
+                return YES;
+        return NO;
+    }
+    
+    //enable resume all item
+    if ([ident isEqualToString: TOOLBAR_RESUME_ALL])
+    {
+        for (Torrent * torrent in fTorrents)
+            if (![torrent isActive] && ![torrent waitingToStart] && ![torrent isFinishedSeeding])
+                return YES;
+        return NO;
+    }
+    
+    //enable pause item
+    if ([ident isEqualToString: TOOLBAR_PAUSE_SELECTED])
+    {
+        for (Torrent * torrent in [fTableView selectedTorrents])
+            if ([torrent isActive] || [torrent waitingToStart])
+                return YES;
+        return NO;
+    }
+    
+    //enable resume item
+    if ([ident isEqualToString: TOOLBAR_RESUME_SELECTED])
+    {
+        for (Torrent * torrent in [fTableView selectedTorrents])
+            if (![torrent isActive] && ![torrent waitingToStart])
+                return YES;
+        return NO;
+    }
+    
+    //set info item
+    if ([ident isEqualToString: TOOLBAR_INFO])
+    {
+        [(NSButton *)[toolbarItem view] setState: [[fInfoController window] isVisible]];
+        return YES;
+    }
+    
+    //set filter item
+    if ([ident isEqualToString: TOOLBAR_FILTER])
+    {
+        [(NSButton *)[toolbarItem view] setState: fFilterBar != nil];
+        return YES;
+    }
+    
+    //set quick look item
+    if ([ident isEqualToString: TOOLBAR_QUICKLOOK])
+    {
+        [(NSButton *)[toolbarItem view] setState: [QLPreviewPanel sharedPreviewPanelExists] && [[QLPreviewPanel sharedPreviewPanel] isVisible]];
+        return YES;
+    }
+    
+    //enable share item
+    if ([ident isEqualToString: TOOLBAR_SHARE])
+        return [fTableView numberOfSelectedRows] > 0;
+    
+    return YES;
 }
 
 - (BOOL) validateMenuItem: (NSMenuItem *) menuItem
