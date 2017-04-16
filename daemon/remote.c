@@ -1264,7 +1264,7 @@ static void printFileList(tr_variant* top)
 static void printPeersImpl(tr_variant* peers)
 {
     int i, n;
-    printf("%-20s  %-12s  %-5s %-6s  %-6s  %s\n", "Address", "Flags", "Done", "Down", "Up", "Client");
+    printf("%-40s  %-12s  %-5s %-6s  %-6s  %s\n", "Address", "Flags", "Done", "Down", "Up", "Client");
 
     for (i = 0, n = tr_variantListSize(peers); i < n; ++i)
     {
@@ -1277,7 +1277,7 @@ static void printPeersImpl(tr_variant* peers)
             tr_variantDictFindReal(d, TR_KEY_progress, &progress) && tr_variantDictFindStr(d, TR_KEY_flagStr, &flagstr, NULL) &&
             tr_variantDictFindInt(d, TR_KEY_rateToClient, &rateToClient) && tr_variantDictFindInt(d, TR_KEY_rateToPeer, &rateToPeer))
         {
-            printf("%-20s  %-12s  %-5.1f %6.1f  %6.1f  %s\n", address, flagstr, (progress * 100.0), rateToClient / (double)tr_speed_K,
+            printf("%-40s  %-12s  %-5.1f %6.1f  %6.1f  %s\n", address, flagstr, (progress * 100.0), rateToClient / (double)tr_speed_K,
                 rateToPeer / (double)tr_speed_K, client);
         }
     }
