@@ -17,81 +17,79 @@
 
 class FileTreeItem;
 
-class FileTreeModel: public QAbstractItemModel
+class FileTreeModel : public QAbstractItemModel
 {
     Q_OBJECT
 
-  public:
+public:
     enum
     {
-      COL_NAME,
-      COL_SIZE,
-      COL_PROGRESS,
-      COL_WANTED,
-      COL_PRIORITY,
-
-      NUM_COLUMNS
+        COL_NAME,
+        COL_SIZE,
+        COL_PROGRESS,
+        COL_WANTED,
+        COL_PRIORITY,
+        //
+        NUM_COLUMNS
     };
 
     enum Role
     {
-      SortRole = Qt::UserRole,
-      FileIndexRole,
-      WantedRole,
-      CompleteRole
+        SortRole = Qt::UserRole,
+        FileIndexRole,
+        WantedRole,
+        CompleteRole
     };
 
-  public:
-    FileTreeModel (QObject * parent = nullptr, bool isEditable = true);
-    virtual ~FileTreeModel ();
+public:
+    FileTreeModel(QObject* parent = nullptr, bool isEditable = true);
+    virtual ~FileTreeModel();
 
-    void setEditable (bool editable);
+    void setEditable(bool editable);
 
-    void clear ();
-    void addFile (int index, const QString& filename,
-                  bool wanted, int priority,
-                  uint64_t size, uint64_t have,
-                  bool torrentChanged);
+    void clear();
+    void addFile(int index, const QString& filename, bool wanted, int priority, uint64_t size, uint64_t have,
+        bool torrentChanged);
 
-    bool openFile (const QModelIndex& index);
+    bool openFile(const QModelIndex& index);
 
-    void twiddleWanted (const QModelIndexList& indices);
-    void twiddlePriority (const QModelIndexList& indices);
+    void twiddleWanted(const QModelIndexList& indices);
+    void twiddlePriority(const QModelIndexList& indices);
 
-    void setWanted (const QModelIndexList& indices, bool wanted);
-    void setPriority (const QModelIndexList& indices, int priority);
+    void setWanted(const QModelIndexList& indices, bool wanted);
+    void setPriority(const QModelIndexList& indices, int priority);
 
-    QModelIndex parent (const QModelIndex& child, int column) const;
+    QModelIndex parent(const QModelIndex& child, int column) const;
 
     // QAbstractItemModel
-    virtual QVariant data (const QModelIndex& index, int role = Qt::DisplayRole) const;
-    virtual Qt::ItemFlags flags (const QModelIndex& index) const;
-    virtual QVariant headerData (int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
-    virtual QModelIndex index (int row, int column, const QModelIndex& parent = QModelIndex ()) const;
-    virtual QModelIndex parent (const QModelIndex& child) const;
-    virtual int rowCount (const QModelIndex& parent = QModelIndex ()) const;
-    virtual int columnCount (const QModelIndex& parent = QModelIndex ()) const;
-    virtual bool setData (const QModelIndex& index, const QVariant& value, int role = Qt::EditRole);
+    virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
+    virtual Qt::ItemFlags flags(const QModelIndex& index) const;
+    virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+    virtual QModelIndex index(int row, int column, const QModelIndex& parent = QModelIndex()) const;
+    virtual QModelIndex parent(const QModelIndex& child) const;
+    virtual int rowCount(const QModelIndex& parent = QModelIndex()) const;
+    virtual int columnCount(const QModelIndex& parent = QModelIndex()) const;
+    virtual bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole);
 
-  signals:
-    void priorityChanged (const QSet<int>& fileIndices, int);
-    void wantedChanged (const QSet<int>& fileIndices, bool);
-    void pathEdited (const QString& oldpath, const QString& newname);
-    void openRequested (const QString& path);
+signals:
+    void priorityChanged(const QSet<int>& fileIndices, int);
+    void wantedChanged(const QSet<int>& fileIndices, bool);
+    void pathEdited(const QString& oldpath, const QString& newname);
+    void openRequested(const QString& path);
 
-  private:
-    void clearSubtree (const QModelIndex&);
-    QModelIndex indexOf (FileTreeItem *, int column) const;
-    void emitParentsChanged (const QModelIndex&, int firstColumn, int lastColumn, QSet<QModelIndex> * visitedParentIndices = nullptr);
-    void emitSubtreeChanged (const QModelIndex&, int firstColumn, int lastColumn);
-    FileTreeItem * findItemForFileIndex (int fileIndex) const;
-    FileTreeItem * itemFromIndex (const QModelIndex&) const;
-    QModelIndexList getOrphanIndices (const QModelIndexList& indices) const;
+private:
+    void clearSubtree(const QModelIndex&);
+    QModelIndex indexOf(FileTreeItem*, int column) const;
+    void emitParentsChanged(const QModelIndex&, int firstColumn, int lastColumn,
+        QSet<QModelIndex>* visitedParentIndices = nullptr);
+    void emitSubtreeChanged(const QModelIndex&, int firstColumn, int lastColumn);
+    FileTreeItem* findItemForFileIndex(int fileIndex) const;
+    FileTreeItem* itemFromIndex(const QModelIndex&) const;
+    QModelIndexList getOrphanIndices(const QModelIndexList& indices) const;
 
-  private:
+private:
     bool myIsEditable;
 
-    FileTreeItem * myRootItem;
-    QMap<int, FileTreeItem *> myIndexCache;
+    FileTreeItem* myRootItem;
+    QMap<int, FileTreeItem*> myIndexCache;
 };
-

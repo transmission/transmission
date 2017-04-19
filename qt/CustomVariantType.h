@@ -12,14 +12,13 @@
 
 class CustomVariantType
 {
-  public:
+public:
     enum
     {
-      TrackerStatsList = QVariant::UserType,
-      PeerList = QVariant::UserType,
-      FileList,
-      FilterModeType,
-      SortModeType
+        TrackerStatsList = QVariant::UserType,
+        PeerList = QVariant::UserType,
+        FileList,
+        FilterModeType,
+        SortModeType
     };
 };
-

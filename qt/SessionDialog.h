@@ -17,22 +17,25 @@
 class Prefs;
 class Session;
 
-class SessionDialog: public BaseDialog
+class SessionDialog : public BaseDialog
 {
     Q_OBJECT
 
-  public:
-    SessionDialog (Session& session, Prefs& prefs, QWidget * parent = nullptr);
-    virtual ~SessionDialog () {}
+public:
+    SessionDialog(Session& session, Prefs& prefs, QWidget* parent = nullptr);
 
-  public slots:
+    virtual ~SessionDialog()
+    {
+    }
+
+public slots:
     // QDialog
-    virtual void accept ();
+    virtual void accept();
 
-  private slots:
-    void resensitize ();
+private slots:
+    void resensitize();
 
-  private:
+private:
     Session& mySession;
     Prefs& myPrefs;
 
@@ -41,4 +44,3 @@ class SessionDialog: public BaseDialog
     QWidgetList myRemoteWidgets;
     QWidgetList myAuthWidgets;
 };
-

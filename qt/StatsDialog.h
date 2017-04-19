@@ -16,25 +16,24 @@ class QTimer;
 
 class Session;
 
-class StatsDialog: public BaseDialog
+class StatsDialog : public BaseDialog
 {
     Q_OBJECT
 
-  public:
-    StatsDialog (Session&, QWidget * parent = nullptr);
-    ~StatsDialog ();
+public:
+    StatsDialog(Session&, QWidget* parent = nullptr);
+    ~StatsDialog();
 
     // QWidget
-    virtual void setVisible (bool visible);
+    virtual void setVisible(bool visible);
 
-  private slots:
-    void updateStats ();
+private slots:
+    void updateStats();
 
-  private:
+private:
     Session& mySession;
 
     Ui::StatsDialog ui;
 
-    QTimer * myTimer;
+    QTimer* myTimer;
 };
-

@@ -13,6 +13,6 @@
 
 class StyleHelper
 {
-  public:
-    static QIcon::Mode getIconMode (QStyle::State state);
+public:
+    static QIcon::Mode getIconMode(QStyle::State state);
 };

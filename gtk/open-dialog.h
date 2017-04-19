@@ -11,9 +11,8 @@
 #include <gtk/gtk.h>
 #include "tr-core.h"
 
-GtkWidget* gtr_torrent_open_from_url_dialog_new (GtkWindow * parent, TrCore * core);
-GtkWidget* gtr_torrent_open_from_file_dialog_new (GtkWindow * parent, TrCore * core);
+GtkWidget* gtr_torrent_open_from_url_dialog_new(GtkWindow* parent, TrCore* core);
+GtkWidget* gtr_torrent_open_from_file_dialog_new(GtkWindow* parent, TrCore* core);
 
 /* This dialog assumes ownership of the ctor */
-GtkWidget* gtr_torrent_options_dialog_new (GtkWindow * parent, TrCore * core, tr_ctor * ctor);
-
+GtkWidget* gtr_torrent_options_dialog_new(GtkWindow* parent, TrCore* core, tr_ctor* ctor);

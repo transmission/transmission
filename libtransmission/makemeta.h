@@ -9,13 +9,14 @@
 #pragma once
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 typedef struct tr_metainfo_builder_file
 {
-    char *      filename;
-    uint64_t    size;
+    char* filename;
+    uint64_t size;
 }
 tr_metainfo_builder_file;
 
@@ -24,11 +25,10 @@ typedef enum
     TR_MAKEMETA_OK,
     TR_MAKEMETA_URL,
     TR_MAKEMETA_CANCELLED,
-    TR_MAKEMETA_IO_READ,   /* see builder.errfile, builder.my_errno */
-    TR_MAKEMETA_IO_WRITE   /* see builder.errfile, builder.my_errno */
+    TR_MAKEMETA_IO_READ, /* see builder.errfile, builder.my_errno */
+    TR_MAKEMETA_IO_WRITE /* see builder.errfile, builder.my_errno */
 }
 tr_metainfo_builder_err;
-
 
 typedef struct tr_metainfo_builder
 {
@@ -37,13 +37,13 @@ typedef struct tr_metainfo_builder
     ***  and cleaned up by tr_metaInfoBuilderFree ()
     **/
 
-    char *                      top;
-    tr_metainfo_builder_file *  files;
-    uint64_t                    totalSize;
-    uint32_t                    fileCount;
-    uint32_t                    pieceSize;
-    uint32_t                    pieceCount;
-    bool                        isFolder;
+    char* top;
+    tr_metainfo_builder_file* files;
+    uint64_t totalSize;
+    uint32_t fileCount;
+    uint32_t pieceSize;
+    uint32_t pieceCount;
+    bool isFolder;
 
     /**
     ***  These are set inside tr_makeMetaInfo ()
@@ -51,11 +51,11 @@ typedef struct tr_metainfo_builder
     ***  and cleaned up by tr_metaInfoBuilderFree ()
     **/
 
-    tr_tracker_info *  trackers;
-    int                trackerCount;
-    char *             comment;
-    char *             outputFile;
-    bool               isPrivate;
+    tr_tracker_info* trackers;
+    int trackerCount;
+    char* comment;
+    char* outputFile;
+    bool isPrivate;
 
     /**
     ***  These are set inside tr_makeMetaInfo () so the client
@@ -64,29 +64,28 @@ typedef struct tr_metainfo_builder
     ***  tell tr_makeMetaInfo () to abort and clean up after itself.
     **/
 
-    uint32_t                   pieceIndex;
-    bool                       abortFlag;
-    bool                       isDone;
-    tr_metainfo_builder_err    result;
+    uint32_t pieceIndex;
+    bool abortFlag;
+    bool isDone;
+    tr_metainfo_builder_err result;
 
     /* file in use when result was set to _IO_READ or _IO_WRITE,
      * or the URL in use when the result was set to _URL */
-    char    errfile[2048];
+    char errfile[2048];
 
     /* errno encountered when result was set to _IO_READ or _IO_WRITE */
-    int    my_errno;
+    int my_errno;
 
     /**
     ***  This is an implementation detail.
     ***  The client should never use these fields.
     **/
 
-    struct tr_metainfo_builder * nextBuilder;
+    struct tr_metainfo_builder* nextBuilder;
 }
 tr_metainfo_builder;
 
-
-tr_metainfo_builder * tr_metaInfoBuilderCreate (const char * topFile);
+tr_metainfo_builder* tr_metaInfoBuilderCreate(const char* topFile);
 
 /**
  * Call this before tr_makeMetaInfo() to override the builder.pieceSize
@@ -94,10 +93,9 @@ tr_metainfo_builder * tr_metaInfoBuilderCreate (const char * topFile);
  *
  * @return false if the piece size isn't valid; eg, isn't a power of two.
  */
-bool tr_metaInfoBuilderSetPieceSize (tr_metainfo_builder * builder,
-                                     uint32_t              bytes);
+bool tr_metaInfoBuilderSetPieceSize(tr_metainfo_builder* builder, uint32_t bytes);
 
-void tr_metaInfoBuilderFree (tr_metainfo_builder*);
+void tr_metaInfoBuilderFree(tr_metainfo_builder*);
 
 /**
  * @brief create a new .torrent file
@@ -116,15 +114,9 @@ void tr_metaInfoBuilderFree (tr_metainfo_builder*);
  *
  * @param trackerCount size of the `trackers' array
  */
-void tr_makeMetaInfo (tr_metainfo_builder *   builder,
-                      const char *            outputFile,
-                      const tr_tracker_info * trackers,
-                      int                     trackerCount,
-                      const char *            comment,
-                      bool                    isPrivate);
-
+void tr_makeMetaInfo(tr_metainfo_builder* builder, const char* outputFile, const tr_tracker_info* trackers, int trackerCount,
+    const char* comment, bool isPrivate);
 
 #ifdef __cplusplus
 }
 #endif
-

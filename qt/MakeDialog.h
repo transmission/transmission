@@ -20,34 +20,33 @@ class Session;
 
 extern "C"
 {
-  struct tr_metainfo_builder;
+struct tr_metainfo_builder;
 }
 
-class MakeDialog: public BaseDialog
+class MakeDialog : public BaseDialog
 {
     Q_OBJECT
 
-  public:
-    MakeDialog (Session&, QWidget * parent = nullptr);
-    virtual ~MakeDialog ();
+public:
+    MakeDialog(Session&, QWidget* parent = nullptr);
+    virtual ~MakeDialog();
 
-  protected:
+protected:
     // QWidget
-    virtual void dragEnterEvent (QDragEnterEvent *);
-    virtual void dropEvent (QDropEvent *);
+    virtual void dragEnterEvent(QDragEnterEvent*);
+    virtual void dropEvent(QDropEvent*);
 
-  private:
-    QString getSource () const;
+private:
+    QString getSource() const;
 
-  private slots:
-    void onSourceChanged ();
-    void makeTorrent ();
+private slots:
+    void onSourceChanged();
+    void makeTorrent();
 
-  private:
+private:
     Session& mySession;
 
     Ui::MakeDialog ui;
 
-    std::unique_ptr<tr_metainfo_builder, void(*)(tr_metainfo_builder*)> myBuilder;
+    std::unique_ptr<tr_metainfo_builder, void (*)(tr_metainfo_builder*)> myBuilder;
 };
-

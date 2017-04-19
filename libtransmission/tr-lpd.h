@@ -21,15 +21,15 @@ THE SOFTWARE.
 */
 
 #ifndef __TRANSMISSION__
- #error only libtransmission should #include this header.
+#error only libtransmission should #include this header.
 #endif
 
 #pragma once
 
-int  tr_lpdInit (tr_session*, tr_address*);
-void tr_lpdUninit (tr_session*);
-bool tr_lpdEnabled (const tr_session*);
-bool tr_lpdSendAnnounce (const tr_torrent*);
+int tr_lpdInit(tr_session*, tr_address*);
+void tr_lpdUninit(tr_session*);
+bool tr_lpdEnabled(const tr_session*);
+bool tr_lpdSendAnnounce(const tr_torrent*);
 
 /**
 * @defgroup Preproc Helper macros
@@ -40,8 +40,7 @@ bool tr_lpdSendAnnounce (const tr_torrent*);
 * @note A lower case macro name is tolerable here since this definition of lengthof ()
 * is intimately related to sizeof semantics.
 * Meaningful return values are only guaranteed for true array types. */
-#define lengthof(arr)(sizeof (* (arr)) > 0 ? sizeof (arr) / sizeof (* (arr)) : 0)
+#define lengthof(arr) (sizeof(*(arr)) > 0 ? sizeof(arr) / sizeof(*(arr)) : 0)
 
 /**
 * @} */
-

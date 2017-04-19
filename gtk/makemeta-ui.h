@@ -11,5 +11,4 @@
 #include <gtk/gtk.h>
 #include "tr-core.h"
 
-GtkWidget* gtr_torrent_creation_dialog_new (GtkWindow * parent, TrCore * core);
-
+GtkWidget* gtr_torrent_creation_dialog_new(GtkWindow* parent, TrCore* core);

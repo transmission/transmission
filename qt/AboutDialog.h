@@ -16,21 +16,20 @@
 
 class LicenseDialog;
 
-class AboutDialog: public BaseDialog
+class AboutDialog : public BaseDialog
 {
     Q_OBJECT
 
-  public:
-    AboutDialog (QWidget * parent = nullptr);
-    virtual ~AboutDialog () {}
+public:
+    AboutDialog(QWidget* parent = nullptr);
+    virtual ~AboutDialog() = default;
 
-  private slots:
-    void showCredits ();
-    void showLicense ();
+private slots:
+    void showCredits();
+    void showLicense();
 
-  private:
+private:
     Ui::AboutDialog ui;
 
     QPointer<LicenseDialog> myLicenseDialog;
 };
-

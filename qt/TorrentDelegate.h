@@ -15,33 +15,33 @@ class QStyleOptionProgressBar;
 
 class Torrent;
 
-class TorrentDelegate: public QStyledItemDelegate
+class TorrentDelegate : public QStyledItemDelegate
 {
     Q_OBJECT
 
-  public:
-    explicit TorrentDelegate (QObject * parent = nullptr);
-    virtual ~TorrentDelegate ();
+public:
+    explicit TorrentDelegate(QObject* parent = nullptr);
+    virtual ~TorrentDelegate();
 
     // QAbstractItemDelegate
     virtual QSize sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const;
-    virtual void paint(QPainter * painter, const QStyleOptionViewItem& option, const QModelIndex& index) const;
+    virtual void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const;
 
-  protected:
-    QSize margin (const QStyle& style) const;
-    void setProgressBarPercentDone (const QStyleOptionViewItem& option, const Torrent&) const;
+protected:
+    QSize margin(const QStyle& style) const;
+    void setProgressBarPercentDone(const QStyleOptionViewItem& option, const Torrent&) const;
 
     // Our own overridables
-    virtual QSize sizeHint (const QStyleOptionViewItem&, const Torrent&) const;
-    virtual void drawTorrent (QPainter * painter, const QStyleOptionViewItem& option, const Torrent&) const;
+    virtual QSize sizeHint(const QStyleOptionViewItem&, const Torrent&) const;
+    virtual void drawTorrent(QPainter* painter, const QStyleOptionViewItem& option, const Torrent&) const;
 
-    static QString statusString (const Torrent& tor);
-    static QString progressString (const Torrent& tor);
-    static QString shortStatusString (const Torrent& tor);
-    static QString shortTransferString (const Torrent& tor);
+    static QString statusString(const Torrent& tor);
+    static QString progressString(const Torrent& tor);
+    static QString shortStatusString(const Torrent& tor);
+    static QString shortTransferString(const Torrent& tor);
 
-  protected:
-    QStyleOptionProgressBar * myProgressBarStyle;
+protected:
+    QStyleOptionProgressBar* myProgressBarStyle;
 
     static QColor blueBrush;
     static QColor greenBrush;
@@ -50,4 +50,3 @@ class TorrentDelegate: public QStyledItemDelegate
     static QColor greenBack;
     static QColor silverBack;
 };
-

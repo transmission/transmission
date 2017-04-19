@@ -10,18 +10,17 @@
 
 #include <QToolButton>
 
-class IconToolButton: public QToolButton
+class IconToolButton : public QToolButton
 {
     Q_OBJECT
 
-  public:
-    IconToolButton (QWidget * parent = nullptr);
+public:
+    IconToolButton(QWidget* parent = nullptr);
 
     // QWidget
-    virtual QSize sizeHint () const;
+    virtual QSize sizeHint() const;
 
-  protected:
+protected:
     // QWidget
-    virtual void paintEvent (QPaintEvent * event);
+    virtual void paintEvent(QPaintEvent* event);
 };
-
