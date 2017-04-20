@@ -155,7 +155,7 @@ bool TorrentFilter::lessThan(QModelIndex const& left, QModelIndex const& right) 
     // fall through
 
     case SortMode::SORT_BY_PROGRESS:
-        if (a->isMagnet() != b->isMagnet())
+        if (val == 0)
         {
             val = -compare(a->isMagnet(), b->isMagnet());
         }
