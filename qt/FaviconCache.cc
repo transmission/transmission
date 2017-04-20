@@ -35,7 +35,7 @@ FaviconCache::~FaviconCache()
 
 QString FaviconCache::getCacheDir()
 {
-    const QString base = QStandardPaths::writableLocation(QStandardPaths::CacheLocation);
+    QString const base = QStandardPaths::writableLocation(QStandardPaths::CacheLocation);
 
     return QDir(base).absoluteFilePath(QLatin1String("favicons"));
 }
@@ -53,7 +53,7 @@ void FaviconCache::ensureCacheDirHasBeenScanned()
 
         QStringList files = cacheDir.entryList(QDir::Files | QDir::Readable);
 
-        for (const QString& file : files)
+        for (QString const& file : files)
         {
             QPixmap pixmap;
             pixmap.load(cacheDir.absoluteFilePath(file));
@@ -66,11 +66,11 @@ void FaviconCache::ensureCacheDirHasBeenScanned()
     }
 }
 
-QString FaviconCache::getHost(const QUrl& url)
+QString FaviconCache::getHost(QUrl const& url)
 {
     QString host = url.host();
-    const int first_dot = host.indexOf(QLatin1Char('.'));
-    const int last_dot = host.lastIndexOf(QLatin1Char('.'));
+    int const first_dot = host.indexOf(QLatin1Char('.'));
+    int const last_dot = host.lastIndexOf(QLatin1Char('.'));
 
     if ((first_dot != -1) && (last_dot != -1) && (first_dot != last_dot))
     {
@@ -85,23 +85,23 @@ QSize FaviconCache::getIconSize()
     return QSize(16, 16);
 }
 
-QPixmap FaviconCache::find(const QUrl& url)
+QPixmap FaviconCache::find(QUrl const& url)
 {
     return findFromHost(getHost(url));
 }
 
-QPixmap FaviconCache::findFromHost(const QString& host)
+QPixmap FaviconCache::findFromHost(QString const& host)
 {
     ensureCacheDirHasBeenScanned();
 
     return myPixmaps[host];
 }
 
-void FaviconCache::add(const QUrl& url)
+void FaviconCache::add(QUrl const& url)
 {
     ensureCacheDirHasBeenScanned();
 
-    const QString host = getHost(url);
+    QString const host = getHost(url);
 
     if (!myPixmaps.contains(host))
     {
@@ -109,11 +109,11 @@ void FaviconCache::add(const QUrl& url)
         myPixmaps.insert(host, QPixmap());
 
         // try to download the favicon
-        const QString path = QLatin1String("http://") + host + QLatin1String("/favicon.");
+        QString const path = QLatin1String("http://") + host + QLatin1String("/favicon.");
         QStringList suffixes;
         suffixes << QLatin1String("ico") << QLatin1String("png") << QLatin1String("gif") << QLatin1String("jpg");
 
-        for (const QString& suffix : suffixes)
+        for (QString const& suffix : suffixes)
         {
             myNAM->get(QNetworkRequest(path + suffix));
         }
@@ -122,11 +122,11 @@ void FaviconCache::add(const QUrl& url)
 
 void FaviconCache::onRequestFinished(QNetworkReply* reply)
 {
-    const QString host = reply->url().host();
+    QString const host = reply->url().host();
 
     QPixmap pixmap;
 
-    const QByteArray content = reply->readAll();
+    QByteArray const content = reply->readAll();
 
     if (!reply->error())
     {

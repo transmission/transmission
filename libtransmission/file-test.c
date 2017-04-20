@@ -30,14 +30,14 @@
 
 static tr_session* session;
 
-static char* create_test_dir(const char* name)
+static char* create_test_dir(char const* name)
 {
     char* const test_dir = tr_buildPath(tr_sessionGetConfigDir(session), name, NULL);
     tr_sys_dir_create(test_dir, 0, 0777, NULL);
     return test_dir;
 }
 
-static bool create_symlink(const char* dst_path, const char* src_path, bool dst_is_dir)
+static bool create_symlink(char const* dst_path, char const* src_path, bool dst_is_dir)
 {
 #ifndef _WIN32
 
@@ -64,7 +64,7 @@ static bool create_symlink(const char* dst_path, const char* src_path, bool dst_
 #endif
 }
 
-static bool create_hardlink(const char* dst_path, const char* src_path)
+static bool create_hardlink(char const* dst_path, char const* src_path)
 {
 #ifndef _WIN32
 
@@ -92,19 +92,19 @@ static void clear_path_info(tr_sys_path_info* info)
     info->last_modified_at = (time_t)-1;
 }
 
-static bool path_contains_no_symlinks(const char* path)
+static bool path_contains_no_symlinks(char const* path)
 {
-    const char* p = path;
+    char const* p = path;
 
     while (*p != '\0')
     {
         tr_sys_path_info info;
         char* pathPart;
-        const char* slashPos = strchr(p, '/');
+        char const* slashPos = strchr(p, '/');
 
 #ifdef _WIN32
 
-        const char* backslashPos = strchr(p, '\\');
+        char const* backslashPos = strchr(p, '\\');
 
         if (slashPos == NULL || (backslashPos != NULL && backslashPos < slashPos))
         {
@@ -135,7 +135,7 @@ static bool path_contains_no_symlinks(const char* path)
     return true;
 }
 
-static bool validate_permissions(const char* path, unsigned int permissions)
+static bool validate_permissions(char const* path, unsigned int permissions)
 {
 #ifndef _WIN32
 
@@ -626,11 +626,11 @@ static int test_path_resolve(void)
 
 struct xname_test_data
 {
-    const char* input;
-    const char* output;
+    char const* input;
+    char const* output;
 };
 
-static int test_path_xname(const struct xname_test_data* data, size_t data_size, char* (*func)(const char*, tr_error**))
+static int test_path_xname(struct xname_test_data const* data, size_t data_size, char* (*func)(char const*, tr_error**))
 {
     for (size_t i = 0; i < data_size; ++i)
     {
@@ -657,7 +657,7 @@ static int test_path_xname(const struct xname_test_data* data, size_t data_size,
 
 static int test_path_basename_dirname(void)
 {
-    const struct xname_test_data common_xname_tests[] =
+    struct xname_test_data const common_xname_tests[] =
     {
         { "/", "/" },
         { "", "." },
@@ -704,7 +704,7 @@ static int test_path_basename_dirname(void)
         return 1;
     }
 
-    const struct xname_test_data basename_tests[] =
+    struct xname_test_data const basename_tests[] =
     {
         { "a", "a" },
         { "aa", "aa" },
@@ -733,7 +733,7 @@ static int test_path_basename_dirname(void)
         return 1;
     }
 
-    const struct xname_test_data dirname_tests[] =
+    struct xname_test_data const dirname_tests[] =
     {
         { "/a/b/c", "/a/b" },
         { "a/b/c", "a/b" },
@@ -1431,11 +1431,11 @@ static int test_dir_create(void)
     return 0;
 }
 
-static int test_dir_read_impl(const char* path, bool* have1, bool* have2)
+static int test_dir_read_impl(char const* path, bool* have1, bool* have2)
 {
     tr_error* err = NULL;
     tr_sys_dir_t dd;
-    const char* name;
+    char const* name;
 
     *have1 = *have2 = false;
 
@@ -1530,7 +1530,7 @@ static int test_dir_read(void)
 
 int main(void)
 {
-    const testFunc tests[] =
+    testFunc const tests[] =
     {
         test_get_info,
         test_path_exists,

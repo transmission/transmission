@@ -32,10 +32,10 @@ class DetailsDialog : public BaseDialog
     Q_OBJECT
 
 public:
-    DetailsDialog(Session&, Prefs&, const TorrentModel&, QWidget* parent = nullptr);
+    DetailsDialog(Session&, Prefs&, TorrentModel const&, QWidget* parent = nullptr);
     virtual ~DetailsDialog();
 
-    void setIds(const QSet<int>& ids);
+    void setIds(QSet<int> const& ids);
 
     // QWidget
     virtual QSize sizeHint() const
@@ -52,7 +52,7 @@ private:
 
     void getNewData();
 
-    QIcon getStockIcon(const QString& freedesktop_name, int fallback);
+    QIcon getStockIcon(QString const& freedesktop_name, int fallback);
 
 private slots:
     void refresh();
@@ -70,10 +70,10 @@ private slots:
     void onShowBackupTrackersToggled(bool);
 
     // Files tab
-    void onFilePriorityChanged(const QSet<int>& fileIndices, int);
-    void onFileWantedChanged(const QSet<int>& fileIndices, bool);
-    void onPathEdited(const QString& oldpath, const QString& newname);
-    void onOpenRequested(const QString& path);
+    void onFilePriorityChanged(QSet<int> const& fileIndices, int);
+    void onFileWantedChanged(QSet<int> const& fileIndices, bool);
+    void onPathEdited(QString const& oldpath, QString const& newname);
+    void onOpenRequested(QString const& path);
 
     // Options tab
     void onBandwidthPriorityChanged(int);
@@ -88,7 +88,7 @@ private slots:
 private:
     Session& mySession;
     Prefs& myPrefs;
-    const TorrentModel& myModel;
+    TorrentModel const& myModel;
 
     Ui::DetailsDialog ui;
 

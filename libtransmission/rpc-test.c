@@ -17,7 +17,7 @@ static int test_list(void)
 {
     size_t len;
     int64_t i;
-    const char* str;
+    char const* str;
     tr_variant top;
 
     tr_rpc_parse_list_str(&top, "12", TR_BAD_SIZE);
@@ -156,7 +156,7 @@ static int test_session_get_and_set(void)
 
 int main(void)
 {
-    const testFunc tests[] =
+    testFunc const tests[] =
     {
         test_list,
         test_session_get_and_set

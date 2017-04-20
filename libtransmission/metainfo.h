@@ -15,9 +15,9 @@
 #include "transmission.h"
 #include "variant.h"
 
-bool tr_metainfoParse(const tr_session* session, const tr_variant* variant, tr_info* setmeInfo, bool* setmeHasInfoDict,
+bool tr_metainfoParse(tr_session const* session, tr_variant const* variant, tr_info* setmeInfo, bool* setmeHasInfoDict,
     size_t* setmeInfoDictLength);
 
-void tr_metainfoRemoveSaved(const tr_session* session, const tr_info* info);
+void tr_metainfoRemoveSaved(tr_session const* session, tr_info const* info);
 
-char* tr_metainfoGetBasename(const tr_info*);
+char* tr_metainfoGetBasename(tr_info const*);

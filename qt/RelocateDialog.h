@@ -22,7 +22,7 @@ class RelocateDialog : public BaseDialog
     Q_OBJECT
 
 public:
-    RelocateDialog(Session&, const TorrentModel&, const QSet<int>& ids, QWidget* parent = nullptr);
+    RelocateDialog(Session&, TorrentModel const&, QSet<int> const& ids, QWidget* parent = nullptr);
 
     virtual ~RelocateDialog()
     {
@@ -37,7 +37,7 @@ private slots:
 
 private:
     Session& mySession;
-    const QSet<int> myIds;
+    QSet<int> const myIds;
 
     Ui::RelocateDialog ui;
 

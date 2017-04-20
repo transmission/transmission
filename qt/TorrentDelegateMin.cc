@@ -61,8 +61,8 @@ public:
     QRect barRect;
 
 public:
-    ItemLayout(const QString& nameText, const QString& statusText, const QIcon& emblemIcon, const QFont& baseFont,
-        Qt::LayoutDirection direction, const QPoint& topLeft, int width);
+    ItemLayout(QString const& nameText, QString const& statusText, QIcon const& emblemIcon, QFont const& baseFont,
+        Qt::LayoutDirection direction, QPoint const& topLeft, int width);
 
     QSize size() const
     {
@@ -80,28 +80,28 @@ public:
     }
 
 private:
-    QString elidedText(const QFont& font, const QString& text, int width) const
+    QString elidedText(QFont const& font, QString const& text, int width) const
     {
         return QFontMetrics(font).elidedText(text, Qt::ElideRight, width);
     }
 };
 
-ItemLayout::ItemLayout(const QString& nameText, const QString& statusText, const QIcon& emblemIcon, const QFont& baseFont,
-    Qt::LayoutDirection direction, const QPoint& topLeft, int width) :
+ItemLayout::ItemLayout(QString const& nameText, QString const& statusText, QIcon const& emblemIcon, QFont const& baseFont,
+    Qt::LayoutDirection direction, QPoint const& topLeft, int width) :
     myNameText(nameText),
     myStatusText(statusText),
     nameFont(baseFont),
     statusFont(baseFont)
 {
-    const QStyle* style(qApp->style());
-    const int iconSize(style->pixelMetric(QStyle::PM_SmallIconSize));
+    QStyle const* style(qApp->style());
+    int const iconSize(style->pixelMetric(QStyle::PM_SmallIconSize));
 
-    const QFontMetrics nameFM(nameFont);
-    const QSize nameSize(nameFM.size(0, myNameText));
+    QFontMetrics const nameFM(nameFont);
+    QSize const nameSize(nameFM.size(0, myNameText));
 
     statusFont.setPointSize(static_cast<int>(statusFont.pointSize() * 0.85));
-    const QFontMetrics statusFM(statusFont);
-    const QSize statusSize(statusFM.size(0, myStatusText));
+    QFontMetrics const statusFM(statusFont);
+    QSize const statusSize(statusFM.size(0, myStatusText));
 
     QRect baseRect(topLeft, QSize(width, qMax(iconSize, qMax(nameSize.height(), qMax(statusSize.height(),
         static_cast<int>(BAR_HEIGHT))))));
@@ -119,25 +119,25 @@ ItemLayout::ItemLayout(const QString& nameText, const QString& statusText, const
 
 } // namespace
 
-QSize TorrentDelegateMin::sizeHint(const QStyleOptionViewItem& option, const Torrent& tor) const
+QSize TorrentDelegateMin::sizeHint(QStyleOptionViewItem const& option, Torrent const& tor) const
 {
-    const bool isMagnet(!tor.hasMetadata());
-    const QSize m(margin(*qApp->style()));
-    const ItemLayout layout(isMagnet ? progressString(tor) : tor.name(), shortStatusString(tor), QIcon(), option.font,
+    bool const isMagnet(!tor.hasMetadata());
+    QSize const m(margin(*qApp->style()));
+    ItemLayout const layout(isMagnet ? progressString(tor) : tor.name(), shortStatusString(tor), QIcon(), option.font,
         option.direction, QPoint(0, 0), option.rect.width() - m.width() * 2);
     return layout.size() + m * 2;
 }
 
-void TorrentDelegateMin::drawTorrent(QPainter* painter, const QStyleOptionViewItem& option, const Torrent& tor) const
+void TorrentDelegateMin::drawTorrent(QPainter* painter, QStyleOptionViewItem const& option, Torrent const& tor) const
 {
-    const QStyle* style(qApp->style());
+    QStyle const* style(qApp->style());
 
-    const bool isPaused(tor.isPaused());
-    const bool isMagnet(!tor.hasMetadata());
+    bool const isPaused(tor.isPaused());
+    bool const isMagnet(!tor.hasMetadata());
 
-    const bool isItemSelected((option.state & QStyle::State_Selected) != 0);
-    const bool isItemEnabled((option.state & QStyle::State_Enabled) != 0);
-    const bool isItemActive((option.state & QStyle::State_Active) != 0);
+    bool const isItemSelected((option.state & QStyle::State_Selected) != 0);
+    bool const isItemEnabled((option.state & QStyle::State_Enabled) != 0);
+    bool const isItemActive((option.state & QStyle::State_Active) != 0);
 
     painter->save();
 
@@ -211,14 +211,14 @@ void TorrentDelegateMin::drawTorrent(QPainter* painter, const QStyleOptionViewIt
 
     progressBarState |= QStyle::State_Small;
 
-    const QIcon::Mode emblemIm = isItemSelected ? QIcon::Selected : QIcon::Normal;
-    const QIcon emblemIcon = tor.hasError() ? QIcon::fromTheme(QLatin1String("emblem-important"),
+    QIcon::Mode const emblemIm = isItemSelected ? QIcon::Selected : QIcon::Normal;
+    QIcon const emblemIcon = tor.hasError() ? QIcon::fromTheme(QLatin1String("emblem-important"),
         style->standardIcon(QStyle::SP_MessageBoxWarning)) : QIcon();
 
     // layout
-    const QSize m(margin(*style));
-    const QRect contentRect(option.rect.adjusted(m.width(), m.height(), -m.width(), -m.height()));
-    const ItemLayout layout(isMagnet ? progressString(tor) : tor.name(), shortStatusString(tor), emblemIcon, option.font,
+    QSize const m(margin(*style));
+    QRect const contentRect(option.rect.adjusted(m.width(), m.height(), -m.width(), -m.height()));
+    ItemLayout const layout(isMagnet ? progressString(tor) : tor.name(), shortStatusString(tor), emblemIcon, option.font,
         option.direction, contentRect.topLeft(), contentRect.width());
 
     // render

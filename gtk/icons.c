@@ -12,7 +12,7 @@
 
 #define VOID_PIXBUF_KEY "void-pixbuf"
 
-static const char* get_static_string(const char* s)
+static char const* get_static_string(char const* s)
 {
     static GStringChunk* static_strings = NULL;
 
@@ -73,9 +73,9 @@ static IconCache* icon_cache_new(GtkWidget* for_widget, int icon_size)
     return icon_cache;
 }
 
-static const char* _icon_cache_get_icon_key(GIcon* icon)
+static char const* _icon_cache_get_icon_key(GIcon* icon)
 {
-    const char* key = NULL;
+    char const* key = NULL;
 
     if (G_IS_THEMED_ICON(icon))
     {
@@ -116,7 +116,7 @@ static GdkPixbuf* get_themed_icon_pixbuf(GThemedIcon* icon, int size, GtkIconThe
 
     g_object_get(icon, "names", &icon_names, NULL);
 
-    icon_info = gtk_icon_theme_choose_icon(icon_theme, (const char**)icon_names, size, 0);
+    icon_info = gtk_icon_theme_choose_icon(icon_theme, (char const**)icon_names, size, 0);
 
     if (icon_info == NULL)
     {
@@ -181,10 +181,10 @@ static GdkPixbuf* _get_icon_pixbuf(GIcon* icon, int size, GtkIconTheme* theme)
     return NULL;
 }
 
-static GdkPixbuf* icon_cache_get_mime_type_icon(IconCache* icon_cache, const char* mime_type)
+static GdkPixbuf* icon_cache_get_mime_type_icon(IconCache* icon_cache, char const* mime_type)
 {
     GIcon* icon;
-    const char* key = NULL;
+    char const* key = NULL;
     GdkPixbuf* pixbuf;
 
     icon = g_content_type_get_icon(mime_type);
@@ -216,7 +216,7 @@ static GdkPixbuf* icon_cache_get_mime_type_icon(IconCache* icon_cache, const cha
     return pixbuf;
 }
 
-GdkPixbuf* gtr_get_mime_type_icon(const char* mime_type, GtkIconSize icon_size, GtkWidget* for_widget)
+GdkPixbuf* gtr_get_mime_type_icon(char const* mime_type, GtkIconSize icon_size, GtkWidget* for_widget)
 {
     int n;
 
@@ -259,10 +259,10 @@ GdkPixbuf* gtr_get_mime_type_icon(const char* mime_type, GtkIconSize icon_size, 
     return icon_cache_get_mime_type_icon(icon_cache[n], mime_type);
 }
 
-const char* gtr_get_mime_type_from_filename(const char* file)
+char const* gtr_get_mime_type_from_filename(char const* file)
 {
     char* tmp = g_content_type_guess(file, NULL, 0, NULL);
-    const char* ret = get_static_string(tmp);
+    char const* ret = get_static_string(tmp);
     g_free(tmp);
     return ret;
 }

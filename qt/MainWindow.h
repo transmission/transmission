@@ -90,8 +90,8 @@ protected:
     virtual void dropEvent(QDropEvent*);
 
 private:
-    QIcon getStockIcon(const QString&, int fallback = -1);
-    QIcon getStockIcon(const QString&, int fallback, const QStringList& emblemNames);
+    QIcon getStockIcon(QString const&, int fallback = -1);
+    QIcon getStockIcon(QString const&, int fallback, QStringList const& emblemNames);
 
     QSet<int> getSelectedTorrents(bool withMetadataOnly = false) const;
     void updateNetworkIcon();
@@ -101,7 +101,7 @@ private:
     void initStatusBar();
 
     void clearSelection();
-    void addTorrent(const AddData& addMe, bool showOptions);
+    void addTorrent(AddData const& addMe, bool showOptions);
 
     // QWidget
     virtual void hideEvent(QHideEvent* event);
@@ -119,8 +119,8 @@ private slots:
     void newTorrent();
     void trayActivated(QSystemTrayIcon::ActivationReason);
     void refreshPref(int key);
-    void addTorrents(const QStringList& filenames);
-    void removeTorrents(const bool deleteFiles);
+    void addTorrents(QStringList const& filenames);
+    void removeTorrents(bool const deleteFiles);
     void openStats();
     void openDonate();
     void openAbout();
@@ -132,7 +132,7 @@ private slots:
     void toggleSpeedMode();
     void dataReadProgress();
     void dataSendProgress();
-    void onNetworkResponse(QNetworkReply::NetworkError code, const QString& message);
+    void onNetworkResponse(QNetworkReply::NetworkError code, QString const& message);
     void toggleWindows(bool doShow);
     void onSetPrefs();
     void onSetPrefs(bool);

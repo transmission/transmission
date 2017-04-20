@@ -87,8 +87,8 @@ enum
     lpd_maxDatagramLength = 200 /**<the size an LPD datagram must not exceed */
 };
 
-const char lpd_mcastGroup[] = "239.192.152.143"; /**<LPD multicast group */
-const int lpd_mcastPort = 6771; /**<LPD source and destination UPD port */
+char const lpd_mcastGroup[] = "239.192.152.143"; /**<LPD multicast group */
+int const lpd_mcastPort = 6771; /**<LPD source and destination UPD port */
 static struct sockaddr_in lpd_mcastAddr; /**<initialized from the above constants in tr_lpdInit */
 
 /**
@@ -167,7 +167,7 @@ static int lpd_unsolicitedMsgCounter;
 * If parameter is not NULL, the declared protocol version is returned as part of
 * the lpd_protocolVersion structure.
 */
-static const char* lpd_extractHeader(const char* s, struct lpd_protocolVersion* const ver)
+static char const* lpd_extractHeader(char const* s, struct lpd_protocolVersion* const ver)
 {
     int major = -1, minor = -1;
     size_t len;
@@ -194,8 +194,8 @@ static const char* lpd_extractHeader(const char* s, struct lpd_protocolVersion* 
 
     {
         /* a pair of blank lines at the end of the string, no place else */
-        const char* const two_blank = CRLF CRLF CRLF;
-        const char* const end = strstr(s, two_blank);
+        char const* const two_blank = CRLF CRLF CRLF;
+        char const* const end = strstr(s, two_blank);
 
         if (end == NULL || strlen(end) > strlen(two_blank))
         {
@@ -227,7 +227,7 @@ static const char* lpd_extractHeader(const char* s, struct lpd_protocolVersion* 
 *   - assemble search string "\r\nName: " and locate position
 *   - copy back value from end to next "\r\n"
 */
-static bool lpd_extractParam(const char* const str, const char* const name, int n, char* const val)
+static bool lpd_extractParam(char const* const str, char const* const name, int n, char* const val)
 {
     /* configure maximum length of search string here */
     enum
@@ -235,7 +235,7 @@ static bool lpd_extractParam(const char* const str, const char* const name, int 
         maxLength = 30
     };
     char sstr[maxLength] = { 0 };
-    const char* pos;
+    char const* pos;
 
     assert(str != NULL && name != NULL);
     assert(val != NULL);
@@ -256,8 +256,8 @@ static bool lpd_extractParam(const char* const str, const char* const name, int 
     }
 
     {
-        const char* const beg = pos + strlen(sstr);
-        const char* const new_line = strstr(beg, CRLF);
+        char const* const beg = pos + strlen(sstr);
+        char const* const new_line = strstr(beg, CRLF);
 
         /* the value is delimited by the next CRLF */
         int len = new_line - beg;
@@ -294,7 +294,7 @@ static void on_upkeep_timer(evutil_socket_t, short, void*);
 int tr_lpdInit(tr_session* ss, tr_address* tr_addr UNUSED)
 {
     struct ip_mreq mcastReq;
-    const int opt_on = 1, opt_off = 0;
+    int const opt_on = 1, opt_off = 0;
 
     if (session) /* already initialized */
     {
@@ -327,7 +327,7 @@ int tr_lpdInit(tr_session* ss, tr_address* tr_addr UNUSED)
             goto fail;
         }
 
-        if (setsockopt(lpd_socket, SOL_SOCKET, SO_REUSEADDR, (const void*)&opt_on, sizeof opt_on) < 0)
+        if (setsockopt(lpd_socket, SOL_SOCKET, SO_REUSEADDR, (void const*)&opt_on, sizeof opt_on) < 0)
         {
             goto fail;
         }
@@ -351,12 +351,12 @@ int tr_lpdInit(tr_session* ss, tr_address* tr_addr UNUSED)
         mcastReq.imr_multiaddr = lpd_mcastAddr.sin_addr;
         mcastReq.imr_interface.s_addr = htonl(INADDR_ANY);
 
-        if (setsockopt(lpd_socket, IPPROTO_IP, IP_ADD_MEMBERSHIP, (const void*)&mcastReq, sizeof mcastReq) < 0)
+        if (setsockopt(lpd_socket, IPPROTO_IP, IP_ADD_MEMBERSHIP, (void const*)&mcastReq, sizeof mcastReq) < 0)
         {
             goto fail;
         }
 
-        if (setsockopt(lpd_socket, IPPROTO_IP, IP_MULTICAST_LOOP, (const void*)&opt_off, sizeof opt_off) < 0)
+        if (setsockopt(lpd_socket, IPPROTO_IP, IP_MULTICAST_LOOP, (void const*)&opt_off, sizeof opt_off) < 0)
         {
             goto fail;
         }
@@ -364,7 +364,7 @@ int tr_lpdInit(tr_session* ss, tr_address* tr_addr UNUSED)
 
     /* setup datagram socket (send) */
     {
-        const unsigned char scope = lpd_announceScope;
+        unsigned char const scope = lpd_announceScope;
 
         lpd_socket2 = socket(PF_INET, SOCK_DGRAM, 0);
 
@@ -379,12 +379,12 @@ int tr_lpdInit(tr_session* ss, tr_address* tr_addr UNUSED)
         }
 
         /* configure outbound multicast TTL */
-        if (setsockopt(lpd_socket2, IPPROTO_IP, IP_MULTICAST_TTL, (const void*)&scope, sizeof scope) < 0)
+        if (setsockopt(lpd_socket2, IPPROTO_IP, IP_MULTICAST_TTL, (void const*)&scope, sizeof scope) < 0)
         {
             goto fail;
         }
 
-        if (setsockopt(lpd_socket2, IPPROTO_IP, IP_MULTICAST_LOOP, (const void*)&opt_off, sizeof opt_off) < 0)
+        if (setsockopt(lpd_socket2, IPPROTO_IP, IP_MULTICAST_LOOP, (void const*)&opt_off, sizeof opt_off) < 0)
         {
             goto fail;
         }
@@ -407,7 +407,7 @@ int tr_lpdInit(tr_session* ss, tr_address* tr_addr UNUSED)
 
 fail:
     {
-        const int save = errno;
+        int const save = errno;
         evutil_closesocket(lpd_socket);
         evutil_closesocket(lpd_socket2);
         lpd_socket = lpd_socket2 = TR_BAD_SOCKET;
@@ -442,7 +442,7 @@ void tr_lpdUninit(tr_session* ss)
     session = NULL;
 }
 
-bool tr_lpdEnabled(const tr_session* ss)
+bool tr_lpdEnabled(tr_session const* ss)
 {
     return ss && (ss == session);
 }
@@ -479,10 +479,10 @@ UNUSED static inline void lpd_consistencyCheck(void)
 * matter). A listening client on the same network might react by adding us to his
 * peer pool for torrent t.
 */
-bool tr_lpdSendAnnounce(const tr_torrent* t)
+bool tr_lpdSendAnnounce(tr_torrent const* t)
 {
     size_t i;
-    const char fmt[] =
+    char const fmt[] =
         "BT-SEARCH * HTTP/%u.%u" CRLF
         "Host: %s:%u" CRLF
         "Port: %u" CRLF
@@ -509,11 +509,11 @@ bool tr_lpdSendAnnounce(const tr_torrent* t)
 
     /* actually send the query out using [lpd_socket2] */
     {
-        const int len = strlen(query);
+        int const len = strlen(query);
 
         /* destination address info has already been set up in tr_lpdInit (),
          * so we refrain from preparing another sockaddr_in here */
-        int res = sendto(lpd_socket2, (const void*)query, len, 0, (const struct sockaddr*)&lpd_mcastAddr, sizeof lpd_mcastAddr);
+        int res = sendto(lpd_socket2, (void const*)query, len, 0, (struct sockaddr const*)&lpd_mcastAddr, sizeof lpd_mcastAddr);
 
         if (res != len)
         {
@@ -540,7 +540,7 @@ bool tr_lpdSendAnnounce(const tr_torrent* t)
 * is able to extract the necessary information from the announce message. That is, if
 * return != 0, the caller may retrieve the value from the passed structure.
 */
-static int tr_lpdConsiderAnnounce(tr_pex* peer, const char* const msg)
+static int tr_lpdConsiderAnnounce(tr_pex* peer, char const* const msg)
 {
     enum
     {
@@ -557,7 +557,7 @@ static int tr_lpdConsiderAnnounce(tr_pex* peer, const char* const msg)
     {
         tr_torrent* tor = NULL;
 
-        const char* params = lpd_extractHeader(msg, &ver);
+        char const* params = lpd_extractHeader(msg, &ver);
 
         if (params == NULL || ver.major != 1) /* allow messages of protocol v1 */
         {
@@ -619,7 +619,7 @@ static int tr_lpdConsiderAnnounce(tr_pex* peer, const char* const msg)
 * most of the previous paragraph isn't true anymore... we weren't using that functionality
 * before. are there cases where we should? if not, should we remove the bells & whistles?
 */
-static int tr_lpdAnnounceMore(const time_t now, const int interval)
+static int tr_lpdAnnounceMore(time_t const now, int const interval)
 {
     tr_torrent* tor = NULL;
     int announcesSent = 0;
@@ -671,7 +671,7 @@ static int tr_lpdAnnounceMore(const time_t now, const int interval)
 
     /* perform housekeeping for the flood protection mechanism */
     {
-        const int maxAnnounceCap = interval * lpd_announceCapFactor;
+        int const maxAnnounceCap = interval * lpd_announceCapFactor;
 
         if (lpd_unsolicitedMsgCounter < 0)
         {
@@ -687,7 +687,7 @@ static int tr_lpdAnnounceMore(const time_t now, const int interval)
 
 static void on_upkeep_timer(evutil_socket_t foo UNUSED, short bar UNUSED, void* vsession UNUSED)
 {
-    const time_t now = tr_time();
+    time_t const now = tr_time();
     tr_lpdAnnounceMore(now, UPKEEP_INTERVAL_SECS);
     tr_timerAdd(upkeep_timer, UPKEEP_INTERVAL_SECS, 0);
 }

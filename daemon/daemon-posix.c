@@ -24,7 +24,7 @@
 ****
 ***/
 
-static const dtr_callbacks* callbacks = NULL;
+static dtr_callbacks const* callbacks = NULL;
 static void* callback_arg = NULL;
 
 static int signal_pipe[2];
@@ -33,7 +33,7 @@ static int signal_pipe[2];
 ****
 ***/
 
-static void set_system_error(tr_error** error, int code, const char* message)
+static void set_system_error(tr_error** error, int code, char const* message)
 {
     tr_error_set(error, code, "%s (%d): %s", message, code, tr_strerror(code));
 }
@@ -62,7 +62,7 @@ static void handle_signal(int sig)
 
 static void send_signal_to_pipe(int sig)
 {
-    const int old_errno = errno;
+    int const old_errno = errno;
 
     if (write(signal_pipe[1], &sig, sizeof(sig)) == -1)
     {
@@ -143,7 +143,7 @@ static bool setup_signal_handler(int sig, tr_error** error)
 ****
 ***/
 
-bool dtr_daemon(const dtr_callbacks* cb, void* cb_arg, bool foreground, int* exit_code, tr_error** error)
+bool dtr_daemon(dtr_callbacks const* cb, void* cb_arg, bool foreground, int* exit_code, tr_error** error)
 {
     callbacks = cb;
     callback_arg = cb_arg;
@@ -194,7 +194,7 @@ bool dtr_daemon(const dtr_callbacks* cb, void* cb_arg, bool foreground, int* exi
         */
 
         {
-            const int fd = open("/dev/null", O_RDWR, 0);
+            int const fd = open("/dev/null", O_RDWR, 0);
             dup2(fd, STDIN_FILENO);
             dup2(fd, STDOUT_FILENO);
             dup2(fd, STDERR_FILENO);

@@ -51,9 +51,9 @@ FileTreeView::FileTreeView(QWidget* parent, bool isEditable) :
     connect(myModel, SIGNAL(openRequested(QString)), this, SIGNAL(openRequested(QString)));
 }
 
-void FileTreeView::onClicked(const QModelIndex& proxyIndex)
+void FileTreeView::onClicked(QModelIndex const& proxyIndex)
 {
-    const QModelIndex modelIndex = myProxy->mapToSource(proxyIndex);
+    QModelIndex const modelIndex = myProxy->mapToSource(proxyIndex);
 
     if (modelIndex.column() == FileTreeModel::COL_WANTED)
     {
@@ -112,15 +112,15 @@ void FileTreeView::resizeEvent(QResizeEvent* event)
 
         int itemWidth = 0;
 
-        for (const QString& itemText : itemTexts)
+        for (QString const& itemText : itemTexts)
         {
             itemWidth = std::max(itemWidth, Utils::measureViewItem(this, itemText));
         }
 
-        const QString headerText = myModel->headerData(column, Qt::Horizontal).toString();
+        QString const headerText = myModel->headerData(column, Qt::Horizontal).toString();
         int headerWidth = Utils::measureHeaderItem(this->header(), headerText);
 
-        const int width = std::max(minWidth, std::max(itemWidth, headerWidth));
+        int const width = std::max(minWidth, std::max(itemWidth, headerWidth));
         setColumnWidth(column, width);
 
         left -= width;
@@ -138,7 +138,7 @@ void FileTreeView::keyPressEvent(QKeyEvent* event)
             // handle using the keyboard to toggle the
             // wanted/unwanted state or the file priority
 
-            const Qt::KeyboardModifiers modifiers = event->modifiers();
+            Qt::KeyboardModifiers const modifiers = event->modifiers();
 
             if (modifiers == Qt::NoModifier)
             {
@@ -159,7 +159,7 @@ void FileTreeView::keyPressEvent(QKeyEvent* event)
 
 void FileTreeView::mouseDoubleClickEvent(QMouseEvent* event)
 {
-    const QModelIndex index = currentIndex();
+    QModelIndex const index = currentIndex();
 
     if (!index.isValid() || index.column() == FileTreeModel::COL_WANTED || index.column() == FileTreeModel::COL_PRIORITY)
     {
@@ -176,7 +176,7 @@ void FileTreeView::mouseDoubleClickEvent(QMouseEvent* event)
 
 void FileTreeView::contextMenuEvent(QContextMenuEvent* event)
 {
-    const QModelIndex rootIndex = myModel->index(0, 0);
+    QModelIndex const rootIndex = myModel->index(0, 0);
 
     if (!rootIndex.isValid())
     {
@@ -191,11 +191,11 @@ void FileTreeView::contextMenuEvent(QContextMenuEvent* event)
     myContextMenu->popup(event->globalPos());
 }
 
-void FileTreeView::update(const FileList& files, bool updateFields)
+void FileTreeView::update(FileList const& files, bool updateFields)
 {
-    const bool modelWasEmpty = myProxy->rowCount() == 0;
+    bool const modelWasEmpty = myProxy->rowCount() == 0;
 
-    for (const TorrentFile& file : files)
+    for (TorrentFile const& file : files)
     {
         myModel->addFile(file.index, file.filename, file.wanted, file.priority, file.size, file.have, updateFields);
     }
@@ -205,7 +205,7 @@ void FileTreeView::update(const FileList& files, bool updateFields)
         // expand up until the item with more than one expandable child
         for (QModelIndex index = myProxy->index(0, 0); index.isValid();)
         {
-            const QModelIndex oldIndex = index;
+            QModelIndex const oldIndex = index;
 
             expand(oldIndex);
 
@@ -213,7 +213,7 @@ void FileTreeView::update(const FileList& files, bool updateFields)
 
             for (int i = 0, count = myProxy->rowCount(oldIndex); i < count; ++i)
             {
-                const QModelIndex newIndex = myProxy->index(i, 0, oldIndex);
+                QModelIndex const newIndex = myProxy->index(i, 0, oldIndex);
 
                 if (myProxy->rowCount(newIndex) == 0)
                 {
@@ -244,14 +244,14 @@ void FileTreeView::setEditable(bool editable)
     myModel->setEditable(editable);
 }
 
-bool FileTreeView::edit(const QModelIndex& index, EditTrigger trigger, QEvent* event)
+bool FileTreeView::edit(QModelIndex const& index, EditTrigger trigger, QEvent* event)
 {
     if (selectionModel()->selectedRows().size() != 1)
     {
         return false;
     }
 
-    const QModelIndex nameIndex = index.sibling(index.row(), FileTreeModel::COL_NAME);
+    QModelIndex const nameIndex = index.sibling(index.row(), FileTreeModel::COL_NAME);
 
     if (editTriggers().testFlag(trigger))
     {
@@ -273,7 +273,7 @@ void FileTreeView::uncheckSelectedItems()
 
 void FileTreeView::onlyCheckSelectedItems()
 {
-    const QModelIndex rootIndex = myModel->index(0, 0);
+    QModelIndex const rootIndex = myModel->index(0, 0);
 
     if (!rootIndex.isValid())
     {
@@ -287,7 +287,7 @@ void FileTreeView::onlyCheckSelectedItems()
 
     QSet<QModelIndex> wantedIndicesParents;
 
-    for (const QModelIndex& i : wantedIndices)
+    for (QModelIndex const& i : wantedIndices)
     {
         for (QModelIndex p = i.parent(); p.isValid(); p = p.parent())
         {
@@ -301,7 +301,7 @@ void FileTreeView::onlyCheckSelectedItems()
 
     while (!parentsQueue.isEmpty())
     {
-        const QModelIndex parentIndex = parentsQueue.dequeue();
+        QModelIndex const parentIndex = parentsQueue.dequeue();
 
         if (qBinaryFind(wantedIndices, parentIndex) != wantedIndices.end())
         {
@@ -310,8 +310,8 @@ void FileTreeView::onlyCheckSelectedItems()
 
         for (int i = 0, count = myModel->rowCount(parentIndex); i < count; ++i)
         {
-            const QModelIndex childIndex = parentIndex.child(i, 0);
-            const int childCheckState = childIndex.data(FileTreeModel::WantedRole).toInt();
+            QModelIndex const childIndex = parentIndex.child(i, 0);
+            int const childCheckState = childIndex.data(FileTreeModel::WantedRole).toInt();
 
             if (childCheckState == Qt::Unchecked || qBinaryFind(wantedIndices, childIndex) != wantedIndices.end())
             {
@@ -360,13 +360,13 @@ void FileTreeView::refreshContextMenuActionsSensitivity()
 {
     assert(myContextMenu != nullptr);
 
-    const QModelIndexList selectedRows = selectionModel()->selectedRows();
-    const Qt::CheckState checkState = getCumulativeCheckState(selectedRows);
+    QModelIndexList const selectedRows = selectionModel()->selectedRows();
+    Qt::CheckState const checkState = getCumulativeCheckState(selectedRows);
 
-    const bool haveSelection = !selectedRows.isEmpty();
-    const bool haveSingleSelection = selectedRows.size() == 1;
-    const bool haveUnchecked = checkState == Qt::Unchecked || checkState == Qt::PartiallyChecked;
-    const bool haveChecked = checkState == Qt::Checked || checkState == Qt::PartiallyChecked;
+    bool const haveSelection = !selectedRows.isEmpty();
+    bool const haveSingleSelection = selectedRows.size() == 1;
+    bool const haveUnchecked = checkState == Qt::Unchecked || checkState == Qt::PartiallyChecked;
+    bool const haveChecked = checkState == Qt::Checked || checkState == Qt::PartiallyChecked;
 
     myCheckSelectedAction->setEnabled(haveUnchecked);
     myUncheckSelectedAction->setEnabled(haveChecked);
@@ -408,7 +408,7 @@ QModelIndexList FileTreeView::selectedSourceRows(int column) const
 {
     QModelIndexList indices;
 
-    for (const QModelIndex& i : selectionModel()->selectedRows(column))
+    for (QModelIndex const& i : selectionModel()->selectedRows(column))
     {
         indices << myProxy->mapToSource(i);
     }
@@ -416,11 +416,11 @@ QModelIndexList FileTreeView::selectedSourceRows(int column) const
     return indices;
 }
 
-Qt::CheckState FileTreeView::getCumulativeCheckState(const QModelIndexList& indices)
+Qt::CheckState FileTreeView::getCumulativeCheckState(QModelIndexList const& indices)
 {
     bool haveChecked = false, haveUnchecked = false;
 
-    for (const QModelIndex& i : indices)
+    for (QModelIndex const& i : indices)
     {
         switch (i.data(FileTreeModel::WantedRole).toInt())
         {

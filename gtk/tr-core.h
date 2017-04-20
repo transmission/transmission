@@ -30,7 +30,7 @@
 G_BEGIN_DECLS
 
 #define TR_CORE_TYPE (tr_core_get_type())
-#define TR_CORE(o)(G_TYPE_CHECK_INSTANCE_CAST((o), TR_CORE_TYPE, TrCore))
+#define TR_CORE(o) (G_TYPE_CHECK_INSTANCE_CAST((o), TR_CORE_TYPE, TrCore))
 
 #define TR_RESOURCE_PATH "/com/transmissionbt/transmission/"
 
@@ -54,11 +54,11 @@ typedef struct _TrCoreClass
 {
     GObjectClass parent_class;
 
-    void (*add_error)(TrCore*, enum tr_core_err, const char* name);
+    void (*add_error)(TrCore*, enum tr_core_err, char const* name);
     void (*add_prompt)(TrCore*, gpointer ctor);
     void (*blocklist_updated)(TrCore*, int ruleCount);
     void (*busy)(TrCore*, gboolean is_busy);
-    void (*prefs_changed)(TrCore*, const tr_quark key);
+    void (*prefs_changed)(TrCore*, tr_quark const key);
     void (*port_tested)(TrCore*, gboolean is_open);
     void (*quit)(TrCore*);
 }
@@ -83,7 +83,7 @@ size_t gtr_core_get_torrent_count(TrCore* self);
 
 tr_torrent* gtr_core_find_torrent(TrCore* core, int id);
 
-void gtr_core_pref_changed(TrCore* core, const tr_quark key);
+void gtr_core_pref_changed(TrCore* core, tr_quark const key);
 
 
 /******
@@ -106,7 +106,7 @@ void gtr_core_load(TrCore* self, gboolean forcepaused);
 void gtr_core_add_files(TrCore* core, GSList* files, gboolean do_start, gboolean do_prompt, gboolean do_notify);
 
 /** @brief Add a torrent from a URL */
-bool gtr_core_add_from_url(TrCore* core, const char* url);
+bool gtr_core_add_from_url(TrCore* core, char const* url);
 
 /** @brief Add a torrent.
     @param ctor this function assumes ownership of the ctor */
@@ -137,10 +137,10 @@ void gtr_core_update(TrCore* self);
 ***  Set a preference value, save the prefs file, and emit the "prefs-changed" signal
 **/
 
-void gtr_core_set_pref(TrCore* self, const tr_quark key, const char* val);
-void gtr_core_set_pref_bool(TrCore* self, const tr_quark key, gboolean val);
-void gtr_core_set_pref_int(TrCore* self, const tr_quark key, int val);
-void gtr_core_set_pref_double(TrCore* self, const tr_quark key, double val);
+void gtr_core_set_pref(TrCore* self, tr_quark const key, char const* val);
+void gtr_core_set_pref_bool(TrCore* self, tr_quark const key, gboolean val);
+void gtr_core_set_pref_int(TrCore* self, tr_quark const key, int val);
+void gtr_core_set_pref_double(TrCore* self, tr_quark const key, double val);
 
 /**
 ***
@@ -150,7 +150,7 @@ void gtr_core_port_test(TrCore* core);
 
 void gtr_core_blocklist_update(TrCore* core);
 
-void gtr_core_exec(TrCore* core, const tr_variant* benc);
+void gtr_core_exec(TrCore* core, tr_variant const* benc);
 
 void gtr_core_open_folder(TrCore* core, int torrent_id);
 

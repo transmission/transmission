@@ -30,18 +30,18 @@ public:
     {
     }
 
-    AddData(const QString& str)
+    AddData(QString const& str)
     {
         set(str);
     }
 
-    int set(const QString&);
+    int set(QString const&);
 
     QByteArray toBase64() const;
     QString readableName() const;
     QString readableShortName() const;
 
-    static bool isSupported(const QString& str)
+    static bool isSupported(QString const& str)
     {
         return AddData(str).type != NONE;
     }

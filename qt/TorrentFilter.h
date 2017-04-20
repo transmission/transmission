@@ -29,7 +29,7 @@ public:
     };
 
 public:
-    TorrentFilter(const Prefs& prefs);
+    TorrentFilter(Prefs const& prefs);
     virtual ~TorrentFilter();
 
     int hiddenRowCount() const;
@@ -38,16 +38,16 @@ public:
 
 protected:
     // QSortFilterProxyModel
-    virtual bool filterAcceptsRow(int, const QModelIndex&) const;
-    virtual bool lessThan(const QModelIndex&, const QModelIndex&) const;
+    virtual bool filterAcceptsRow(int, QModelIndex const&) const;
+    virtual bool lessThan(QModelIndex const&, QModelIndex const&) const;
 
 private:
-    bool activityFilterAcceptsTorrent(const Torrent* tor, const FilterMode& mode) const;
-    bool trackerFilterAcceptsTorrent(const Torrent* tor, const QString& tracker) const;
+    bool activityFilterAcceptsTorrent(Torrent const* tor, FilterMode const& mode) const;
+    bool trackerFilterAcceptsTorrent(Torrent const* tor, QString const& tracker) const;
 
 private slots:
     void refreshPref(int key);
 
 private:
-    const Prefs& myPrefs;
+    Prefs const& myPrefs;
 };

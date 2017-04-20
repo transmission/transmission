@@ -33,7 +33,7 @@ static inline int IsDebuggerPresent(void)
     return false;
 }
 
-static inline void OutputDebugStringA(const void* unused UNUSED)
+static inline void OutputDebugStringA(void const* unused UNUSED)
 {
 }
 
@@ -71,7 +71,7 @@ tr_sys_file_t tr_logGetFile(void)
 
     if (!initialized)
     {
-        const int fd = tr_env_get_int("TR_DEBUG_FD", 0);
+        int const fd = tr_env_get_int("TR_DEBUG_FD", 0);
 
         switch (fd)
         {
@@ -170,9 +170,9 @@ bool tr_logGetDeepEnabled(void)
     return deepLoggingIsActive != 0;
 }
 
-void tr_logAddDeep(const char* file, int line, const char* name, const char* fmt, ...)
+void tr_logAddDeep(char const* file, int line, char const* name, char const* fmt, ...)
 {
-    const tr_sys_file_t fp = tr_logGetFile();
+    tr_sys_file_t const fp = tr_logGetFile();
 
     if (fp != TR_BAD_SYS_FILE || IsDebuggerPresent())
     {
@@ -212,9 +212,9 @@ void tr_logAddDeep(const char* file, int line, const char* name, const char* fmt
 ****
 ***/
 
-void tr_logAddMessage(const char* file, int line, tr_log_level level, const char* name, const char* fmt, ...)
+void tr_logAddMessage(char const* file, int line, tr_log_level level, char const* name, char const* fmt, ...)
 {
-    const int err = errno; /* message logging shouldn't affect errno */
+    int const err = errno; /* message logging shouldn't affect errno */
     char buf[1024];
     int buf_len;
     va_list ap;

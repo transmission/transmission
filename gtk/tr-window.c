@@ -88,12 +88,12 @@ static void view_row_activated(GtkTreeView* tree_view UNUSED, GtkTreePath* path 
     gtr_action_activate("show-torrent-properties");
 }
 
-static gboolean tree_view_search_equal_func(GtkTreeModel* model, gint column UNUSED, const gchar* key, GtkTreeIter* iter,
+static gboolean tree_view_search_equal_func(GtkTreeModel* model, gint column UNUSED, gchar const* key, GtkTreeIter* iter,
     gpointer search_data UNUSED)
 {
     gboolean match;
     char* lower;
-    const char* name = NULL;
+    char const* name = NULL;
 
     lower = g_strstrip(g_utf8_strdown(key, -1));
     gtk_tree_model_get(model, iter, MC_NAME_COLLATED, &name, -1);
@@ -149,7 +149,7 @@ static GtkWidget* makeview(PrivateData* p)
 
 static void syncAltSpeedButton(PrivateData* p);
 
-static void prefsChanged(TrCore* core UNUSED, const tr_quark key, gpointer wind)
+static void prefsChanged(TrCore* core UNUSED, tr_quark const key, gpointer wind)
 {
     gboolean isEnabled;
     PrivateData* p = get_private_data(GTK_WINDOW(wind));
@@ -212,7 +212,7 @@ static void onYinYangReleased(GtkWidget* w UNUSED, gpointer vprivate)
 
 static struct
 {
-    const char* val, *i18n;
+    char const* val, *i18n;
 }
 stats_modes[] =
 {
@@ -227,7 +227,7 @@ static void status_menu_toggled_cb(GtkCheckMenuItem* menu_item, gpointer vprivat
     if (gtk_check_menu_item_get_active(menu_item))
     {
         PrivateData* p = vprivate;
-        const char*   val = g_object_get_data(G_OBJECT(menu_item), STATS_MODE);
+        char const* val = g_object_get_data(G_OBJECT(menu_item), STATS_MODE);
         gtr_core_set_pref(p->core, TR_KEY_statusbar_stats, val);
     }
 }
@@ -237,9 +237,9 @@ static void syncAltSpeedButton(PrivateData* p)
     char u[32];
     char d[32];
     char* str;
-    const char* fmt;
-    const gboolean b = gtr_pref_flag_get(TR_KEY_alt_speed_enabled);
-    const char* stock = b ? "alt-speed-on" : "alt-speed-off";
+    char const* fmt;
+    gboolean const b = gtr_pref_flag_get(TR_KEY_alt_speed_enabled);
+    char const* stock = b ? "alt-speed-on" : "alt-speed-off";
     GtkWidget* w = p->alt_speed_button;
 
     tr_formatter_speed_KBps(u, gtr_pref_int_get(TR_KEY_alt_speed_up), sizeof(u));
@@ -259,7 +259,7 @@ static void syncAltSpeedButton(PrivateData* p)
 static void alt_speed_toggled_cb(GtkToggleButton* button, gpointer vprivate)
 {
     PrivateData* p = vprivate;
-    const gboolean b = gtk_toggle_button_get_active(button);
+    gboolean const b = gtk_toggle_button_get_active(button);
     gtr_core_set_pref_bool(p->core, TR_KEY_alt_speed_enabled,  b);
 }
 
@@ -270,7 +270,7 @@ static void alt_speed_toggled_cb(GtkToggleButton* button, gpointer vprivate)
 static void findMaxAnnounceTime(GtkTreeModel* model, GtkTreePath* path UNUSED, GtkTreeIter* iter, gpointer gmaxTime)
 {
     tr_torrent* tor;
-    const tr_stat* torStat;
+    tr_stat const* torStat;
     time_t* maxTime = gmaxTime;
 
     gtk_tree_model_get(model, iter, MC_TORRENT, &tor, -1);
@@ -284,7 +284,7 @@ static gboolean onAskTrackerQueryTooltip(GtkWidget* widget UNUSED, gint x UNUSED
     gboolean handled;
     time_t maxTime = 0;
     PrivateData* p = gdata;
-    const time_t now = time(NULL);
+    time_t const now = time(NULL);
 
     gtk_tree_selection_selected_foreach(p->selection, findMaxAnnounceTime, &maxTime);
 
@@ -296,7 +296,7 @@ static gboolean onAskTrackerQueryTooltip(GtkWidget* widget UNUSED, gint x UNUSED
     {
         char buf[512];
         char timebuf[64];
-        const int seconds = maxTime - now;
+        int const seconds = maxTime - now;
 
         tr_strltime(timebuf, seconds, sizeof(timebuf));
         g_snprintf(buf, sizeof(buf), _("Tracker will allow requests in %s"), timebuf);
@@ -335,7 +335,7 @@ static void onSpeedToggled(GtkCheckMenuItem* check, gpointer vp)
     GObject* o = G_OBJECT(check);
     gboolean isEnabled = g_object_get_data(o, ENABLED_KEY) != 0;
     tr_direction dir = GPOINTER_TO_INT(g_object_get_data(o, DIRECTION_KEY));
-    const tr_quark key = dir == TR_UP ? TR_KEY_speed_limit_up_enabled : TR_KEY_speed_limit_down_enabled;
+    tr_quark const key = dir == TR_UP ? TR_KEY_speed_limit_up_enabled : TR_KEY_speed_limit_down_enabled;
 
     if (gtk_check_menu_item_get_active(check))
     {
@@ -348,7 +348,7 @@ static void onSpeedSet(GtkCheckMenuItem* check, gpointer vp)
     tr_quark key;
     PrivateData* p = vp;
     GObject* o = G_OBJECT(check);
-    const int KBps = GPOINTER_TO_INT(g_object_get_data(o, SPEED_KEY));
+    int const KBps = GPOINTER_TO_INT(g_object_get_data(o, SPEED_KEY));
     tr_direction dir = GPOINTER_TO_INT(g_object_get_data(o, DIRECTION_KEY));
 
     key = dir == TR_UP ? TR_KEY_speed_limit_up : TR_KEY_speed_limit_down;
@@ -365,7 +365,7 @@ static GtkWidget* createSpeedMenu(PrivateData* p, tr_direction dir)
     GtkWidget* w;
     GtkWidget* m;
     GtkMenuShell* menu_shell;
-    const int speeds_KBps[] = { 5, 10, 20, 30, 40, 50, 75, 100, 150, 200, 250, 500, 750 };
+    int const speeds_KBps[] = { 5, 10, 20, 30, 40, 50, 75, 100, 150, 200, 250, 500, 750 };
 
     m = gtk_menu_new();
     menu_shell = GTK_MENU_SHELL(m);
@@ -410,7 +410,7 @@ static GtkWidget* createSpeedMenu(PrivateData* p, tr_direction dir)
 
 #define RATIO_KEY "stock-ratio-index"
 
-static const double stockRatios[] = { 0.25, 0.5, 0.75, 1, 1.5, 2, 3 };
+static double const stockRatios[] = { 0.25, 0.5, 0.75, 1, 1.5, 2, 3 };
 
 static void onRatioToggled(GtkCheckMenuItem* check, gpointer vp)
 {
@@ -426,7 +426,7 @@ static void onRatioSet(GtkCheckMenuItem* check, gpointer vp)
 {
     PrivateData* p = vp;
     int i = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(check), RATIO_KEY));
-    const double ratio = stockRatios[i];
+    double const ratio = stockRatios[i];
     gtr_core_set_pref_double(p->core, TR_KEY_ratio_limit, ratio);
     gtr_core_set_pref_bool(p->core, TR_KEY_ratio_limit_enabled, TRUE);
 }
@@ -538,7 +538,7 @@ static void onOptionsClicked(GtkButton* button UNUSED, gpointer vp)
 GtkWidget* gtr_window_new(GtkApplication* app, GtkUIManager* ui_mgr, TrCore* core)
 {
     int i, n;
-    const char* pch, * style;
+    char const* pch, * style;
     PrivateData* p;
     GtkWidget* sibling = NULL;
     GtkWidget* ul_lb, * dl_lb;
@@ -601,7 +601,7 @@ GtkWidget* gtr_window_new(GtkApplication* app, GtkUIManager* ui_mgr, TrCore* cor
 
     for (i = 0, n = G_N_ELEMENTS(stats_modes); i < n; ++i)
     {
-        const char* val = stats_modes[i].val;
+        char const* val = stats_modes[i].val;
         w = gtk_radio_menu_item_new_with_label(l, _(stats_modes[i].i18n));
         l = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(w));
         gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(w), g_strcmp0(val, pch) == 0);
@@ -723,7 +723,7 @@ GtkWidget* gtr_window_new(GtkApplication* app, GtkUIManager* ui_mgr, TrCore* cor
 
 static void updateStats(PrivateData* p)
 {
-    const char* pch;
+    char const* pch;
     char up[32];
     char down[32];
     char ratio[32];

@@ -40,18 +40,18 @@ public:
         _Bps = Bps;
     }
 
-    Speed& operator +=(const Speed& that)
+    Speed& operator +=(Speed const& that)
     {
         _Bps += that._Bps;
         return *this;
     }
 
-    Speed operator +(const Speed& that) const
+    Speed operator +(Speed const& that) const
     {
         return Speed(_Bps + that._Bps);
     }
 
-    bool operator <(const Speed& that) const
+    bool operator <(Speed const& that) const
     {
         return _Bps < that._Bps;
     }

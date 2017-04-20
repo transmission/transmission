@@ -68,16 +68,16 @@ typedef struct
 }
 tr_peer_event;
 
-extern const tr_peer_event TR_PEER_EVENT_INIT;
+extern tr_peer_event const TR_PEER_EVENT_INIT;
 
-typedef void (* tr_peer_callback)(struct tr_peer* peer, const tr_peer_event* event, void* client_data);
+typedef void (* tr_peer_callback)(struct tr_peer* peer, tr_peer_event const* event, void* client_data);
 
 /***
 ****
 ***/
 
 typedef void (* tr_peer_destruct_func)(struct tr_peer* peer);
-typedef bool (* tr_peer_is_transferring_pieces_func)(const struct tr_peer* peer, uint64_t now, tr_direction direction,
+typedef bool (* tr_peer_is_transferring_pieces_func)(struct tr_peer const* peer, uint64_t now, tr_direction direction,
     unsigned int* Bps);
 
 struct tr_peer_virtual_funcs
@@ -128,18 +128,18 @@ typedef struct tr_peer
     tr_recentHistory cancelsSentToClient;
     tr_recentHistory cancelsSentToPeer;
 
-    const struct tr_peer_virtual_funcs* funcs;
+    struct tr_peer_virtual_funcs const* funcs;
 }
 tr_peer;
 
-void tr_peerConstruct(struct tr_peer* peer, const tr_torrent* tor);
+void tr_peerConstruct(struct tr_peer* peer, tr_torrent const* tor);
 
 void tr_peerDestruct(struct tr_peer* peer);
 
 /** Update the tr_peer.progress field based on the 'have' bitset. */
 void tr_peerUpdateProgress(tr_torrent* tor, struct tr_peer*);
 
-bool tr_peerIsSeed(const struct tr_peer* peer);
+bool tr_peerIsSeed(struct tr_peer const* peer);
 
 /***
 ****
@@ -154,9 +154,9 @@ typedef struct tr_swarm_stats
 }
 tr_swarm_stats;
 
-extern const tr_swarm_stats TR_SWARM_STATS_INIT;
+extern tr_swarm_stats const TR_SWARM_STATS_INIT;
 
-void tr_swarmGetStats(const struct tr_swarm* swarm, tr_swarm_stats* setme);
+void tr_swarmGetStats(struct tr_swarm const* swarm, tr_swarm_stats* setme);
 
 void tr_swarmIncrementActivePeers(struct tr_swarm* swarm, tr_direction direction, bool is_active);
 

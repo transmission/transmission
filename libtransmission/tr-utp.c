@@ -72,13 +72,13 @@ bool UTP_Write(struct UTPSocket* socket, size_t count)
     return false;
 }
 
-int tr_utpPacket(const unsigned char* buf UNUSED, size_t buflen UNUSED, const struct sockaddr* from UNUSED,
+int tr_utpPacket(unsigned char const* buf UNUSED, size_t buflen UNUSED, struct sockaddr const* from UNUSED,
     socklen_t fromlen UNUSED, tr_session* ss UNUSED)
 {
     return -1;
 }
 
-struct UTPSocket* UTP_Create(SendToProc* send_to_proc UNUSED, void* send_to_userdata UNUSED, const struct sockaddr* addr UNUSED,
+struct UTPSocket* UTP_Create(SendToProc* send_to_proc UNUSED, void* send_to_userdata UNUSED, struct sockaddr const* addr UNUSED,
     socklen_t addrlen UNUSED)
 {
     errno = ENOSYS;
@@ -89,7 +89,7 @@ void tr_utpClose(tr_session* ss UNUSED)
 {
 }
 
-void tr_utpSendTo(void* closure UNUSED, const unsigned char* buf UNUSED, size_t buflen UNUSED, const struct sockaddr* to UNUSED,
+void tr_utpSendTo(void* closure UNUSED, unsigned char const* buf UNUSED, size_t buflen UNUSED, struct sockaddr const* to UNUSED,
     socklen_t tolen UNUSED)
 {
 }
@@ -129,17 +129,17 @@ static void incoming(void* closure, struct UTPSocket* s)
     tr_peerMgrAddIncoming(ss->peerMgr, &addr, port, TR_BAD_SOCKET, s);
 }
 
-void tr_utpSendTo(void* closure, const unsigned char* buf, size_t buflen, const struct sockaddr* to, socklen_t tolen)
+void tr_utpSendTo(void* closure, unsigned char const* buf, size_t buflen, struct sockaddr const* to, socklen_t tolen)
 {
     tr_session* ss = closure;
 
     if (to->sa_family == AF_INET && ss->udp_socket != TR_BAD_SOCKET)
     {
-        sendto(ss->udp_socket, (const void*)buf, buflen, 0, to, tolen);
+        sendto(ss->udp_socket, (void const*)buf, buflen, 0, to, tolen);
     }
     else if (to->sa_family == AF_INET6 && ss->udp6_socket != TR_BAD_SOCKET)
     {
-        sendto(ss->udp6_socket, (const void*)buf, buflen, 0, to, tolen);
+        sendto(ss->udp6_socket, (void const*)buf, buflen, 0, to, tolen);
     }
 }
 
@@ -174,7 +174,7 @@ static void timer_callback(evutil_socket_t s UNUSED, short type UNUSED, void* cl
     reset_timer(ss);
 }
 
-int tr_utpPacket(const unsigned char* buf, size_t buflen, const struct sockaddr* from, socklen_t fromlen, tr_session* ss)
+int tr_utpPacket(unsigned char const* buf, size_t buflen, struct sockaddr const* from, socklen_t fromlen, tr_session* ss)
 {
     if (!ss->isClosed && !utp_timer)
     {

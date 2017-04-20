@@ -36,7 +36,7 @@ void tr_session_id_free(tr_session_id_t session_id);
  *
  * @return String representation of current session identifier.
  */
-const char* tr_session_id_get_current(tr_session_id_t session_id);
+char const* tr_session_id_get_current(tr_session_id_t session_id);
 
 /**
  * Check if session ID corresponds to session running on the same machine as
@@ -50,7 +50,7 @@ const char* tr_session_id_get_current(tr_session_id_t session_id);
  *
  * @return `True` if session is valid and local, `false` otherwise.
  */
-bool tr_session_id_is_local(const char* session_id);
+bool tr_session_id_is_local(char const* session_id);
 
 #ifdef __cplusplus
 }

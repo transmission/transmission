@@ -64,9 +64,9 @@ static int test_encrypt_decrypt(void)
     tr_crypto a;
     tr_crypto_ b;
     uint8_t hash[SHA_DIGEST_LENGTH];
-    const char test1[] = { "test1" };
+    char const test1[] = { "test1" };
     char buf11[sizeof(test1)], buf12[sizeof(test1)];
-    const char test2[] = { "@#)C$@)#(*%bvkdjfhwbc039bc4603756VB3)" };
+    char const test2[] = { "@#)C$@)#(*%bvkdjfhwbc039bc4603756VB3)" };
     char buf21[sizeof(test2)], buf22[sizeof(test2)];
     int i;
 
@@ -122,8 +122,8 @@ static int test_ssha1(void)
 {
     struct
     {
-        const char* const plain_text;
-        const char* const ssha1;
+        char const* const plain_text;
+        char const* const ssha1;
     }
     test_data[] =
     {
@@ -203,7 +203,7 @@ static int test_random(void)
     /* test that tr_rand_int () stays in-bounds */
     for (i = 0; i < 100000; ++i)
     {
-        const int val = tr_rand_int(100);
+        int const val = tr_rand_int(100);
         check(val >= 0);
         check(val < 100);
     }
@@ -211,7 +211,7 @@ static int test_random(void)
     return 0;
 }
 
-static bool base64_eq(const char* a, const char* b)
+static bool base64_eq(char const* a, char const* b)
 {
     for (;; ++a, ++b)
     {
@@ -308,7 +308,7 @@ static int test_base64(void)
 
 int main(void)
 {
-    const testFunc tests[] =
+    testFunc const tests[] =
     {
         test_torrent_hash,
         test_encrypt_decrypt,

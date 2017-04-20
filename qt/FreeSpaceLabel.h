@@ -31,7 +31,7 @@ public:
     }
 
     void setSession(Session& session);
-    void setPath(const QString& folder);
+    void setPath(QString const& folder);
 
 private slots:
     void onTimer();

@@ -64,7 +64,7 @@ static void set_system_error_if_file_found(tr_error** error, DWORD code)
     }
 }
 
-static time_t filetime_to_unix_time(const FILETIME* t)
+static time_t filetime_to_unix_time(FILETIME const* t)
 {
     uint64_t tmp = 0;
 
@@ -79,7 +79,7 @@ static time_t filetime_to_unix_time(const FILETIME* t)
     return tmp / 1000000UL;
 }
 
-static void stat_to_sys_path_info(DWORD attributes, DWORD size_low, DWORD size_high, const FILETIME* mtime,
+static void stat_to_sys_path_info(DWORD attributes, DWORD size_low, DWORD size_high, FILETIME const* mtime,
     tr_sys_path_info* info)
 {
     assert(mtime != NULL);
@@ -110,12 +110,12 @@ static inline bool is_slash(char c)
     return c == '\\' || c == '/';
 }
 
-static inline bool is_unc_path(const char* path)
+static inline bool is_unc_path(char const* path)
 {
     return is_slash(path[0]) && path[1] == path[0];
 }
 
-static bool is_valid_path(const char* path)
+static bool is_valid_path(char const* path)
 {
     if (is_unc_path(path))
     {
@@ -126,7 +126,7 @@ static bool is_valid_path(const char* path)
     }
     else
     {
-        const char* colon_pos = strchr(path, ':');
+        char const* colon_pos = strchr(path, ':');
 
         if (colon_pos != NULL)
         {
@@ -142,19 +142,19 @@ static bool is_valid_path(const char* path)
     return strpbrk(path, "<>:\"|?*") == NULL;
 }
 
-static wchar_t* path_to_native_path_ex(const char* path, int extra_chars_after, int* real_result_size)
+static wchar_t* path_to_native_path_ex(char const* path, int extra_chars_after, int* real_result_size)
 {
     /* Extending maximum path length limit up to ~32K. See "Naming Files, Paths, and Namespaces"
        (https://msdn.microsoft.com/en-us/library/windows/desktop/aa365247.aspx) for more info */
 
-    const wchar_t local_prefix[] = { '\\', '\\', '?', '\\' };
-    const wchar_t unc_prefix[] = { '\\', '\\', '?', '\\', 'U', 'N', 'C', '\\' };
+    wchar_t const local_prefix[] = { '\\', '\\', '?', '\\' };
+    wchar_t const unc_prefix[] = { '\\', '\\', '?', '\\', 'U', 'N', 'C', '\\' };
 
-    const bool is_relative = tr_sys_path_is_relative(path);
-    const bool is_unc = is_unc_path(path);
+    bool const is_relative = tr_sys_path_is_relative(path);
+    bool const is_unc = is_unc_path(path);
 
     /* `-2` for UNC since we overwrite existing prefix slashes */
-    const int extra_chars_before = is_relative ? 0 : (is_unc ? ARRAYSIZE(unc_prefix) - 2 : ARRAYSIZE(local_prefix));
+    int const extra_chars_before = is_relative ? 0 : (is_unc ? ARRAYSIZE(unc_prefix) - 2 : ARRAYSIZE(local_prefix));
 
     /* TODO (?): assert (!is_relative); */
 
@@ -197,12 +197,12 @@ static wchar_t* path_to_native_path_ex(const char* path, int extra_chars_after, 
     return wide_path;
 }
 
-static wchar_t* path_to_native_path(const char* path)
+static wchar_t* path_to_native_path(char const* path)
 {
     return path_to_native_path_ex(path, 0, NULL);
 }
 
-static tr_sys_file_t open_file(const char* path, DWORD access, DWORD disposition, DWORD flags, tr_error** error)
+static tr_sys_file_t open_file(char const* path, DWORD access, DWORD disposition, DWORD flags, tr_error** error)
 {
     tr_sys_file_t ret = TR_BAD_SYS_FILE;
     wchar_t* wide_path;
@@ -227,7 +227,7 @@ static tr_sys_file_t open_file(const char* path, DWORD access, DWORD disposition
     return ret;
 }
 
-static bool create_dir(const char* path, int flags, int permissions, bool okay_if_exists, tr_error** error)
+static bool create_dir(char const* path, int flags, int permissions, bool okay_if_exists, tr_error** error)
 {
     bool ret;
     wchar_t* wide_path;
@@ -256,7 +256,7 @@ static bool create_dir(const char* path, int flags, int permissions, bool okay_i
 
     if (!ret && error_code == ERROR_ALREADY_EXISTS && okay_if_exists)
     {
-        const DWORD attributes = GetFileAttributesW(wide_path);
+        DWORD const attributes = GetFileAttributesW(wide_path);
 
         if (attributes != INVALID_FILE_ATTRIBUTES &&
             (attributes & FILE_ATTRIBUTE_DIRECTORY) != 0)
@@ -275,7 +275,7 @@ static bool create_dir(const char* path, int flags, int permissions, bool okay_i
     return ret;
 }
 
-static void create_temp_path(char* path_template, void (* callback)(const char* path, void* param,
+static void create_temp_path(char* path_template, void (* callback)(char const* path, void* param,
     tr_error** error), void* callback_param, tr_error** error)
 {
     char* path;
@@ -297,7 +297,7 @@ static void create_temp_path(char* path_template, void (* callback)(const char* 
 
         while (i > 0 && path_template[i - 1] == 'X')
         {
-            const int c = tr_rand_int(26 + 26 + 10);
+            int const c = tr_rand_int(26 + 26 + 10);
             path[i - 1] = c < 26 ? c + 'A' : (c < 26 + 26 ? (c - 26) + 'a' : (c - 26 - 26) + '0');
             --i;
         }
@@ -326,7 +326,7 @@ static void create_temp_path(char* path_template, void (* callback)(const char* 
     tr_free(path);
 }
 
-bool tr_sys_path_exists(const char* path, tr_error** error)
+bool tr_sys_path_exists(char const* path, tr_error** error)
 {
     bool ret = false;
     wchar_t* wide_path;
@@ -369,7 +369,7 @@ bool tr_sys_path_exists(const char* path, tr_error** error)
     return ret;
 }
 
-bool tr_sys_path_get_info(const char* path, int flags, tr_sys_path_info* info, tr_error** error)
+bool tr_sys_path_get_info(char const* path, int flags, tr_sys_path_info* info, tr_error** error)
 {
     bool ret = false;
     wchar_t* wide_path;
@@ -430,7 +430,7 @@ bool tr_sys_path_get_info(const char* path, int flags, tr_sys_path_info* info, t
     return ret;
 }
 
-bool tr_sys_path_is_relative(const char* path)
+bool tr_sys_path_is_relative(char const* path)
 {
     assert(path != NULL);
 
@@ -449,7 +449,7 @@ bool tr_sys_path_is_relative(const char* path)
     return true;
 }
 
-bool tr_sys_path_is_same(const char* path1, const char* path2, tr_error** error)
+bool tr_sys_path_is_same(char const* path1, char const* path2, tr_error** error)
 {
     bool ret = false;
     wchar_t* wide_path1 = NULL;
@@ -514,7 +514,7 @@ cleanup:
     return ret;
 }
 
-char* tr_sys_path_resolve(const char* path, tr_error** error)
+char* tr_sys_path_resolve(char const* path, tr_error** error)
 {
     char* ret = NULL;
     wchar_t* wide_path;
@@ -579,7 +579,7 @@ cleanup:
     return ret;
 }
 
-char* tr_sys_path_basename(const char* path, tr_error** error)
+char* tr_sys_path_basename(char const* path, tr_error** error)
 {
     if (path == NULL || path[0] == '\0')
     {
@@ -592,7 +592,7 @@ char* tr_sys_path_basename(const char* path, tr_error** error)
         return NULL;
     }
 
-    const char* end = path + strlen(path);
+    char const* end = path + strlen(path);
 
     while (end > path && is_slash(*(end - 1)))
     {
@@ -604,7 +604,7 @@ char* tr_sys_path_basename(const char* path, tr_error** error)
         return tr_strdup("/");
     }
 
-    const char* name = end;
+    char const* name = end;
 
     while (name > path && *(name - 1) != ':' && !is_slash(*(name - 1)))
     {
@@ -619,7 +619,7 @@ char* tr_sys_path_basename(const char* path, tr_error** error)
     return tr_strndup(name, end - name);
 }
 
-char* tr_sys_path_dirname(const char* path, tr_error** error)
+char* tr_sys_path_dirname(char const* path, tr_error** error)
 {
     if (path == NULL || path[0] == '\0')
     {
@@ -632,14 +632,14 @@ char* tr_sys_path_dirname(const char* path, tr_error** error)
         return NULL;
     }
 
-    const bool is_unc = is_unc_path(path);
+    bool const is_unc = is_unc_path(path);
 
     if (is_unc && path[2] == '\0')
     {
         return tr_strdup(path);
     }
 
-    const char* end = path + strlen(path);
+    char const* end = path + strlen(path);
 
     while (end > path && is_slash(*(end - 1)))
     {
@@ -651,7 +651,7 @@ char* tr_sys_path_dirname(const char* path, tr_error** error)
         return tr_strdup("/");
     }
 
-    const char* name = end;
+    char const* name = end;
 
     while (name > path && *(name - 1) != ':' && !is_slash(*(name - 1)))
     {
@@ -676,7 +676,7 @@ char* tr_sys_path_dirname(const char* path, tr_error** error)
     return tr_strndup(path, name - path);
 }
 
-bool tr_sys_path_rename(const char* src_path, const char* dst_path, tr_error** error)
+bool tr_sys_path_rename(char const* src_path, char const* dst_path, tr_error** error)
 {
     bool ret = false;
     wchar_t* wide_src_path;
@@ -723,7 +723,7 @@ bool tr_sys_path_rename(const char* src_path, const char* dst_path, tr_error** e
     return ret;
 }
 
-bool tr_sys_path_remove(const char* path, tr_error** error)
+bool tr_sys_path_remove(char const* path, tr_error** error)
 {
     bool ret = false;
     wchar_t* wide_path;
@@ -734,7 +734,7 @@ bool tr_sys_path_remove(const char* path, tr_error** error)
 
     if (wide_path != NULL)
     {
-        const DWORD attributes = GetFileAttributesW(wide_path);
+        DWORD const attributes = GetFileAttributesW(wide_path);
 
         if (attributes != INVALID_FILE_ATTRIBUTES)
         {
@@ -795,7 +795,7 @@ tr_sys_file_t tr_sys_file_get_std(tr_std_sys_file_t std_file, tr_error** error)
     return ret;
 }
 
-tr_sys_file_t tr_sys_file_open(const char* path, int flags, int permissions, tr_error** error)
+tr_sys_file_t tr_sys_file_open(char const* path, int flags, int permissions, tr_error** error)
 {
     tr_sys_file_t ret;
     DWORD native_access = 0;
@@ -859,7 +859,7 @@ tr_sys_file_t tr_sys_file_open(const char* path, int flags, int permissions, tr_
     return ret;
 }
 
-static void file_open_temp_callback(const char* path, void* param, tr_error** error)
+static void file_open_temp_callback(char const* path, void* param, tr_error** error)
 {
     tr_sys_file_t* result = (tr_sys_file_t*)param;
 
@@ -1018,7 +1018,7 @@ bool tr_sys_file_read_at(tr_sys_file_t handle, void* buffer, uint64_t size, uint
     return ret;
 }
 
-bool tr_sys_file_write(tr_sys_file_t handle, const void* buffer, uint64_t size, uint64_t* bytes_written, tr_error** error)
+bool tr_sys_file_write(tr_sys_file_t handle, void const* buffer, uint64_t size, uint64_t* bytes_written, tr_error** error)
 {
     bool ret = false;
     DWORD my_bytes_written;
@@ -1049,7 +1049,7 @@ bool tr_sys_file_write(tr_sys_file_t handle, const void* buffer, uint64_t size, 
     return ret;
 }
 
-bool tr_sys_file_write_at(tr_sys_file_t handle, const void* buffer, uint64_t size, uint64_t offset, uint64_t* bytes_written,
+bool tr_sys_file_write_at(tr_sys_file_t handle, void const* buffer, uint64_t size, uint64_t offset, uint64_t* bytes_written,
     tr_error** error)
 {
     bool ret = false;
@@ -1192,7 +1192,7 @@ void* tr_sys_file_map_for_reading(tr_sys_file_t handle, uint64_t offset, uint64_
     return ret;
 }
 
-bool tr_sys_file_unmap(const void* address, uint64_t size, tr_error** error)
+bool tr_sys_file_unmap(void const* address, uint64_t size, tr_error** error)
 {
     bool ret;
 
@@ -1278,12 +1278,12 @@ char* tr_sys_dir_get_current(tr_error** error)
     return ret;
 }
 
-bool tr_sys_dir_create(const char* path, int flags, int permissions, tr_error** error)
+bool tr_sys_dir_create(char const* path, int flags, int permissions, tr_error** error)
 {
     return create_dir(path, flags, permissions, true, error);
 }
 
-static void dir_create_temp_callback(const char* path, void* param, tr_error** error)
+static void dir_create_temp_callback(char const* path, void* param, tr_error** error)
 {
     bool* result = (bool*)param;
 
@@ -1303,7 +1303,7 @@ bool tr_sys_dir_create_temp(char* path_template, tr_error** error)
     return ret;
 }
 
-tr_sys_dir_t tr_sys_dir_open(const char* path, tr_error** error)
+tr_sys_dir_t tr_sys_dir_open(char const* path, tr_error** error)
 {
     tr_sys_dir_t ret;
     int pattern_size;
@@ -1339,7 +1339,7 @@ tr_sys_dir_t tr_sys_dir_open(const char* path, tr_error** error)
     return ret;
 }
 
-const char* tr_sys_dir_read_name(tr_sys_dir_t handle, tr_error** error)
+char const* tr_sys_dir_read_name(tr_sys_dir_t handle, tr_error** error)
 {
     char* ret;
     DWORD error_code = ERROR_SUCCESS;

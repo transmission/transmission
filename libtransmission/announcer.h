@@ -39,11 +39,11 @@ typedef struct
     TrackerEventType messageType;
 
     /* for TR_TRACKER_WARNING and TR_TRACKER_ERROR */
-    const char* text;
-    const char* tracker;
+    char const* text;
+    char const* tracker;
 
     /* for TR_TRACKER_PEERS */
-    const struct tr_pex* pex;
+    struct tr_pex const* pex;
     size_t pexCount;
 
     /* [0...100] for probability a peer is a seed. calculated by the leecher/seeder ratio */
@@ -51,7 +51,7 @@ typedef struct
 }
 tr_tracker_event;
 
-typedef void (* tr_tracker_callback)(tr_torrent* tor, const tr_tracker_event* event, void* client_data);
+typedef void (* tr_tracker_callback)(tr_torrent* tor, tr_tracker_event const* event, void* client_data);
 
 /**
 ***  Session ctor/dtor
@@ -67,7 +67,7 @@ void tr_announcerClose(tr_session*);
 
 struct tr_torrent_tiers* tr_announcerAddTorrent(tr_torrent* torrent, tr_tracker_callback cb, void* cbdata);
 
-bool tr_announcerHasBacklog(const struct tr_announcer*);
+bool tr_announcerHasBacklog(struct tr_announcer const*);
 
 void tr_announcerResetTorrent(struct tr_announcer*, tr_torrent*);
 
@@ -75,7 +75,7 @@ void tr_announcerRemoveTorrent(struct tr_announcer*, tr_torrent*);
 
 void tr_announcerChangeMyPort(tr_torrent*);
 
-bool tr_announcerCanManualAnnounce(const tr_torrent*);
+bool tr_announcerCanManualAnnounce(tr_torrent const*);
 
 void tr_announcerManualAnnounce(tr_torrent*);
 
@@ -92,9 +92,9 @@ enum
 
 void tr_announcerAddBytes(tr_torrent*, int up_down_or_corrupt, uint32_t byteCount);
 
-time_t tr_announcerNextManualAnnounce(const tr_torrent*);
+time_t tr_announcerNextManualAnnounce(tr_torrent const*);
 
-tr_tracker_stat* tr_announcerStats(const tr_torrent* torrent, int* setmeTrackerCount);
+tr_tracker_stat* tr_announcerStats(tr_torrent const* torrent, int* setmeTrackerCount);
 
 void tr_announcerStatsFree(tr_tracker_stat* trackers, int trackerCount);
 
@@ -106,4 +106,4 @@ void tr_tracker_udp_upkeep(tr_session* session);
 
 void tr_tracker_udp_close(tr_session* session);
 
-bool tr_tracker_udp_is_idle(const tr_session* session);
+bool tr_tracker_udp_is_idle(tr_session const* session);

@@ -28,10 +28,10 @@
 #define SERVICE_CONTROL_PRESHUTDOWN 0x0000000F
 #endif
 
-static const dtr_callbacks* callbacks = NULL;
+static dtr_callbacks const* callbacks = NULL;
 static void* callback_arg = NULL;
 
-static const LPCWSTR service_name = L"TransmissionDaemon";
+static LPCWSTR const service_name = L"TransmissionDaemon";
 
 static SERVICE_STATUS_HANDLE status_handle = NULL;
 static DWORD current_state = SERVICE_STOPPED;
@@ -42,14 +42,14 @@ static HANDLE service_stop_thread = NULL;
 ****
 ***/
 
-static void set_system_error(tr_error** error, DWORD code, const char* message)
+static void set_system_error(tr_error** error, DWORD code, char const* message)
 {
     char* const system_message = tr_win32_format_message(code);
     tr_error_set(error, code, "%s (0x%08lx): %s", message, code, system_message);
     tr_free(system_message);
 }
 
-static void do_log_system_error(const char* file, int line, tr_log_level level, DWORD code, const char* message)
+static void do_log_system_error(char const* file, int line, tr_log_level level, DWORD code, char const* message)
 {
     char* const system_message = tr_win32_format_message(code);
     tr_logAddMessage(file, line, level, "[dtr_daemon] %s (0x%08lx): %s", message, code, system_message);
@@ -59,7 +59,7 @@ static void do_log_system_error(const char* file, int line, tr_log_level level, 
 #define log_system_error(level, code, message) \
     do \
     { \
-        const DWORD local_code = (code); \
+        DWORD const local_code = (code); \
         \
         if (tr_logLevelIsActive((level))) \
         { \
@@ -107,7 +107,7 @@ static unsigned int __stdcall service_stop_thread_main(void* param)
 {
     callbacks->on_stop(callback_arg);
 
-    const DWORD sleep_time = 500;
+    DWORD const sleep_time = 500;
     DWORD wait_time = (DWORD)(UINT_PTR)param;
 
     for (DWORD checkpoint = 2; WaitForSingleObject(service_thread, sleep_time) == WAIT_TIMEOUT; ++checkpoint)
@@ -126,7 +126,7 @@ static void stop_service(void)
         return;
     }
 
-    const DWORD wait_time = 30 * 1000;
+    DWORD const wait_time = 30 * 1000;
 
     update_service_status(SERVICE_STOP_PENDING, NO_ERROR, 0, 1, wait_time);
 
@@ -224,7 +224,7 @@ static VOID WINAPI service_main(DWORD argc, LPWSTR* argv)
 ****
 ***/
 
-bool dtr_daemon(const dtr_callbacks* cb, void* cb_arg, bool foreground, int* exit_code, tr_error** error)
+bool dtr_daemon(dtr_callbacks const* cb, void* cb_arg, bool foreground, int* exit_code, tr_error** error)
 {
     callbacks = cb;
     callback_arg = cb_arg;
@@ -243,7 +243,7 @@ bool dtr_daemon(const dtr_callbacks* cb, void* cb_arg, bool foreground, int* exi
     }
     else
     {
-        const SERVICE_TABLE_ENTRY service_table[] =
+        SERVICE_TABLE_ENTRY const service_table[] =
         {
             { (LPWSTR)service_name, &service_main },
             { NULL, NULL }

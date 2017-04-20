@@ -27,7 +27,7 @@ static inline bool tr_logLevelIsActive(tr_log_level level)
     return tr_logGetLevel() >= level;
 }
 
-void tr_logAddMessage(const char* file, int line, tr_log_level level, const char* torrent, const char* fmt, ...)
+void tr_logAddMessage(char const* file, int line, tr_log_level level, char const* torrent, char const* fmt, ...)
     TR_GNUC_PRINTF(5, 6);
 
 #define tr_logAddNamedError(n, ...) \
@@ -125,7 +125,7 @@ tr_sys_file_t tr_logGetFile(void);
 /** @brief return true if deep logging has been enabled by the user; false otherwise */
 bool tr_logGetDeepEnabled(void);
 
-void tr_logAddDeep(const char* file, int line, const char* name, const char* fmt, ...) TR_GNUC_PRINTF(4, 5)
+void tr_logAddDeep(char const* file, int line, char const* name, char const* fmt, ...) TR_GNUC_PRINTF(4, 5)
     TR_GNUC_NONNULL(1, 4);
 
 /** @brief set the buffer with the current time formatted for deep logging. */

@@ -91,12 +91,12 @@ typedef struct
 }
 tr_scrape_response;
 
-typedef void (* tr_scrape_response_func)(const tr_scrape_response* response, void* user_data);
+typedef void (* tr_scrape_response_func)(tr_scrape_response const* response, void* user_data);
 
-void tr_tracker_http_scrape(tr_session* session, const tr_scrape_request* req, tr_scrape_response_func response_func,
+void tr_tracker_http_scrape(tr_session* session, tr_scrape_request const* req, tr_scrape_response_func response_func,
     void* user_data);
 
-void tr_tracker_udp_scrape(tr_session* session, const tr_scrape_request* req, tr_scrape_response_func response_func,
+void tr_tracker_udp_scrape(tr_session* session, tr_scrape_request const* req, tr_scrape_response_func response_func,
     void* user_data);
 
 /***
@@ -112,7 +112,7 @@ typedef enum
 }
 tr_announce_event;
 
-const char* tr_announce_event_get_string(tr_announce_event);
+char const* tr_announce_event_get_string(tr_announce_event);
 
 typedef struct
 {
@@ -213,12 +213,12 @@ typedef struct
 }
 tr_announce_response;
 
-typedef void (* tr_announce_response_func)(const tr_announce_response* response, void* userdata);
+typedef void (* tr_announce_response_func)(tr_announce_response const* response, void* userdata);
 
-void tr_tracker_http_announce(tr_session* session, const tr_announce_request* req, tr_announce_response_func response_func,
+void tr_tracker_http_announce(tr_session* session, tr_announce_request const* req, tr_announce_response_func response_func,
     void* user_data);
 
-void tr_tracker_udp_announce(tr_session* session, const tr_announce_request* req, tr_announce_response_func response_func,
+void tr_tracker_udp_announce(tr_session* session, tr_announce_request const* req, tr_announce_response_func response_func,
     void* user_data);
 
 void tr_tracker_udp_start_shutdown(tr_session* session);

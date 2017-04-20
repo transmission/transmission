@@ -23,7 +23,7 @@
 /* this base32 code converted from code by Robert Kaye and Gordon Mohr
  * and is public domain. see http://bitzi.com/publicdomain for more info */
 
-static const int base32Lookup[] =
+static int const base32Lookup[] =
 {
     0xFF, 0xFF, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F, /* '0', '1', '2', '3', '4', '5', '6', '7' */
     0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, /* '8', '9', ':', ';', '<', '=', '>', '?' */
@@ -37,11 +37,11 @@ static const int base32Lookup[] =
     0x17, 0x18, 0x19, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF /* 'x', 'y', 'z', '{', '|', '}', '~', 'DEL' */
 };
 
-static const int base32LookupLen = sizeof(base32Lookup) / sizeof(base32Lookup[0]);
+static int const base32LookupLen = sizeof(base32Lookup) / sizeof(base32Lookup[0]);
 
-static void base32_to_sha1(uint8_t* out, const char* in, const size_t inlen)
+static void base32_to_sha1(uint8_t* out, char const* in, size_t const inlen)
 {
-    const size_t outlen = 20;
+    size_t const outlen = 20;
     size_t i, index, offset;
 
     memset(out, 0, 20);
@@ -109,7 +109,7 @@ static void base32_to_sha1(uint8_t* out, const char* in, const size_t inlen)
 #define MAX_TRACKERS 64
 #define MAX_WEBSEEDS 64
 
-tr_magnet_info* tr_magnetParse(const char* uri)
+tr_magnet_info* tr_magnetParse(char const* uri)
 {
     bool got_checksum = false;
     int trCount = 0;
@@ -122,14 +122,14 @@ tr_magnet_info* tr_magnetParse(const char* uri)
 
     if (uri != NULL && strncmp(uri, "magnet:?", 8) == 0)
     {
-        const char* walk;
+        char const* walk;
 
         for (walk = uri + 8; walk && *walk;)
         {
-            const char* key = walk;
-            const char* delim = strchr(key, '=');
-            const char* val = delim == NULL ? NULL : delim + 1;
-            const char* next = strchr(delim == NULL ? key : val, '&');
+            char const* key = walk;
+            char const* delim = strchr(key, '=');
+            char const* val = delim == NULL ? NULL : delim + 1;
+            char const* next = strchr(delim == NULL ? key : val, '&');
             size_t keylen, vallen;
 
             if (delim != NULL)
@@ -160,8 +160,8 @@ tr_magnet_info* tr_magnetParse(const char* uri)
 
             if (keylen == 2 && memcmp(key, "xt", 2) == 0 && val != NULL && strncmp(val, "urn:btih:", 9) == 0)
             {
-                const char* hash = val + 9;
-                const size_t hashlen = vallen - 9;
+                char const* hash = val + 9;
+                size_t const hashlen = vallen - 9;
 
                 if (hashlen == 40)
                 {
@@ -242,7 +242,7 @@ void tr_magnetFree(tr_magnet_info* info)
     }
 }
 
-void tr_magnetCreateMetainfo(const tr_magnet_info* info, tr_variant* top)
+void tr_magnetCreateMetainfo(tr_magnet_info const* info, tr_variant* top)
 {
     int i;
     tr_variant* d;

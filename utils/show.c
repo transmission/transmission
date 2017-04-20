@@ -36,7 +36,7 @@ static tr_option options[] =
     { 0, NULL, NULL, NULL, 0, NULL }
 };
 
-static const char* getUsage(void)
+static char const* getUsage(void)
 {
     return "Usage: " MY_NAME " [options] <.torrent file>";
 }
@@ -44,12 +44,12 @@ static const char* getUsage(void)
 static bool magnetFlag = false;
 static bool scrapeFlag = false;
 static bool showVersion = false;
-const char* filename = NULL;
+char const* filename = NULL;
 
-static int parseCommandLine(int argc, const char* const* argv)
+static int parseCommandLine(int argc, char const* const* argv)
 {
     int c;
-    const char* optarg;
+    char const* optarg;
 
     while ((c = tr_getopt(getUsage(), argc, argv, options, &optarg)))
     {
@@ -79,21 +79,21 @@ static int parseCommandLine(int argc, const char* const* argv)
     return 0;
 }
 
-static void doShowMagnet(const tr_info* inf)
+static void doShowMagnet(tr_info const* inf)
 {
     char* str = tr_torrentInfoGetMagnetLink(inf);
     printf("%s", str);
     tr_free(str);
 }
 
-static int compare_files_by_name(const void* va, const void* vb)
+static int compare_files_by_name(void const* va, void const* vb)
 {
-    const tr_file* a = *(const tr_file* const*)va;
-    const tr_file* b = *(const tr_file* const*)vb;
+    tr_file const* a = *(tr_file const* const*)va;
+    tr_file const* b = *(tr_file const* const*)vb;
     return strcmp(a->name, b->name);
 }
 
-static void showInfo(const tr_info* inf)
+static void showInfo(tr_info const* inf)
 {
     unsigned int i;
     char buf[128];
@@ -184,7 +184,7 @@ static void showInfo(const tr_info* inf)
 
 static size_t writeFunc(void* ptr, size_t size, size_t nmemb, void* buf)
 {
-    const size_t byteCount = size * nmemb;
+    size_t const byteCount = size * nmemb;
     evbuffer_add(buf, ptr, byteCount);
     return byteCount;
 }
@@ -201,7 +201,7 @@ static CURL* tr_curl_easy_init(struct evbuffer* writebuf)
     return curl;
 }
 
-static void doScrape(const tr_info* inf)
+static void doScrape(tr_info const* inf)
 {
     unsigned int i;
 
@@ -210,7 +210,7 @@ static void doScrape(const tr_info* inf)
         CURL* curl;
         CURLcode res;
         struct evbuffer* buf;
-        const char* scrape = inf->trackers[i].scrape;
+        char const* scrape = inf->trackers[i].scrape;
         char* url;
         char escaped[SHA_DIGEST_LENGTH * 3 + 1];
 
@@ -249,7 +249,7 @@ static void doScrape(const tr_info* inf)
                 tr_variant top;
                 tr_variant* files;
                 bool matched = false;
-                const char* begin = (const char*)evbuffer_pullup(buf, -1);
+                char const* begin = (char const*)evbuffer_pullup(buf, -1);
 
                 if (!tr_variantFromBenc(&top, begin, evbuffer_get_length(buf)))
                 {
@@ -300,7 +300,7 @@ int tr_main(int argc, char* argv[])
     tr_formatter_size_init(DISK_K, DISK_K_STR, DISK_M_STR, DISK_G_STR, DISK_T_STR);
     tr_formatter_speed_init(SPEED_K, SPEED_K_STR, SPEED_M_STR, SPEED_G_STR, SPEED_T_STR);
 
-    if (parseCommandLine(argc, (const char* const*)argv))
+    if (parseCommandLine(argc, (char const* const*)argv))
     {
         return EXIT_FAILURE;
     }

@@ -43,9 +43,9 @@ static GtkRadioActionEntry sort_radio_entries[] =
 
 static void sort_changed_cb(GtkAction* action UNUSED, GtkRadioAction* current, gpointer user_data UNUSED)
 {
-    const tr_quark key = TR_KEY_sort_mode;
-    const int i = gtk_radio_action_get_current_value(current);
-    const char* val = sort_radio_entries[i].name;
+    tr_quark const key = TR_KEY_sort_mode;
+    int const i = gtk_radio_action_get_current_value(current);
+    char const* val = sort_radio_entries[i].name;
 
     gtr_core_set_pref(myCore, key, val);
 }
@@ -58,8 +58,8 @@ static GtkToggleActionEntry show_toggle_entries[] =
 
 static void toggle_pref_cb(GtkToggleAction* action, gpointer user_data UNUSED)
 {
-    const char* key = gtk_action_get_name(GTK_ACTION(action));
-    const gboolean val = gtk_toggle_action_get_active(action);
+    char const* key = gtk_action_get_name(GTK_ACTION(action));
+    gboolean const val = gtk_toggle_action_get_active(action);
 
     gtr_core_set_pref_bool(myCore, tr_quark_new(key, TR_BAD_SIZE), val);
 }
@@ -117,12 +117,12 @@ static GtkActionEntry entries[] =
 
 typedef struct
 {
-    const char* filename;
-    const char* name;
+    char const* filename;
+    char const* name;
 }
 BuiltinIconInfo;
 
-static const BuiltinIconInfo my_fallback_icons[] =
+static BuiltinIconInfo const my_fallback_icons[] =
 {
     { "logo-48", WINDOW_ICON },
     { "logo-24", TRAY_ICON },
@@ -137,7 +137,7 @@ static const BuiltinIconInfo my_fallback_icons[] =
 static void register_my_icons(void)
 {
     int i;
-    const int n = G_N_ELEMENTS(my_fallback_icons);
+    int const n = G_N_ELEMENTS(my_fallback_icons);
     GtkIconTheme* theme = gtk_icon_theme_get_default();
     GtkIconFactory* factory = gtk_icon_factory_new();
 
@@ -145,7 +145,7 @@ static void register_my_icons(void)
 
     for (i = 0; i < n; ++i)
     {
-        const char* name = my_fallback_icons[i].name;
+        char const* name = my_fallback_icons[i].name;
 
         if (!gtk_icon_theme_has_icon(theme, name))
         {
@@ -187,8 +187,8 @@ void gtr_actions_init(GtkUIManager* ui_manager, gpointer callback_user_data)
 {
     int i, n;
     int active;
-    const char* match;
-    const int n_entries = G_N_ELEMENTS(entries);
+    char const* match;
+    int const n_entries = G_N_ELEMENTS(entries);
     GtkActionGroup* action_group;
 
     myUIManager = ui_manager;
@@ -251,7 +251,7 @@ static void ensure_action_map_loaded(GtkUIManager* uim)
         for (ait = actions; ait != NULL; ait = ait->next)
         {
             GtkAction*   action = GTK_ACTION(ait->data);
-            const char* name = gtk_action_get_name(action);
+            char const* name = gtk_action_get_name(action);
             g_hash_table_insert(key_to_action, g_strdup(name), action);
         }
 
@@ -259,13 +259,13 @@ static void ensure_action_map_loaded(GtkUIManager* uim)
     }
 }
 
-static GtkAction* get_action(const char* name)
+static GtkAction* get_action(char const* name)
 {
     ensure_action_map_loaded(myUIManager);
     return (GtkAction*) g_hash_table_lookup(key_to_action, name);
 }
 
-void gtr_action_activate(const char* name)
+void gtr_action_activate(char const* name)
 {
     GtkAction* action = get_action(name);
 
@@ -273,7 +273,7 @@ void gtr_action_activate(const char* name)
     gtk_action_activate(action);
 }
 
-void gtr_action_set_sensitive(const char* name, gboolean b)
+void gtr_action_set_sensitive(char const* name, gboolean b)
 {
     GtkAction* action = get_action(name);
 
@@ -281,7 +281,7 @@ void gtr_action_set_sensitive(const char* name, gboolean b)
     g_object_set(action, "sensitive", b, NULL);
 }
 
-void gtr_action_set_important(const char* name, gboolean b)
+void gtr_action_set_important(char const* name, gboolean b)
 {
     GtkAction* action = get_action(name);
 
@@ -289,14 +289,14 @@ void gtr_action_set_important(const char* name, gboolean b)
     g_object_set(action, "is-important", b, NULL);
 }
 
-void gtr_action_set_toggled(const char* name, gboolean b)
+void gtr_action_set_toggled(char const* name, gboolean b)
 {
     GtkAction* action = get_action(name);
 
     gtk_toggle_action_set_active(GTK_TOGGLE_ACTION(action), b);
 }
 
-GtkWidget* gtr_action_get_widget(const char* path)
+GtkWidget* gtr_action_get_widget(char const* path)
 {
     return gtk_ui_manager_get_widget(myUIManager, path);
 }

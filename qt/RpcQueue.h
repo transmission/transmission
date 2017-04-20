@@ -52,26 +52,26 @@ public:
 private:
     // Internally queued function. Takes the last response future, makes a
     // request and returns a new response future.
-    typedef std::function<RpcResponseFuture (const RpcResponseFuture&)> QueuedFunction;
+    typedef std::function<RpcResponseFuture (RpcResponseFuture const&)> QueuedFunction;
 
     // Internally stored error handler function. Takes the last response future and returns nothing.
-    typedef std::function<void (const RpcResponseFuture&)> ErrorHandlerFunction;
+    typedef std::function<void (RpcResponseFuture const&)> ErrorHandlerFunction;
 
 private slots:
     void stepFinished();
 
 private:
-    void runNext(const RpcResponseFuture& response);
+    void runNext(RpcResponseFuture const& response);
 
     // These overloads convert various forms of input closures to what we store internally.
 
     // normal closure, takes response and returns new future
     template<typename Func, typename std::enable_if<
-        std::is_same<typename std::result_of<Func(const RpcResponse&)>::type, RpcResponseFuture>::value
+        std::is_same<typename std::result_of<Func(RpcResponse const&)>::type, RpcResponseFuture>::value
     >::type* = nullptr>
-    QueuedFunction normalizeFunc(const Func& func)
+    QueuedFunction normalizeFunc(Func const& func)
     {
-        return [func](const RpcResponseFuture& r)
+        return [func](RpcResponseFuture const& r)
             {
                 return func(r.result());
             };
@@ -81,9 +81,9 @@ private:
     template<typename Func, typename std::enable_if<
         std::is_same<typename std::result_of<Func()>::type, RpcResponseFuture>::value
     >::type* = nullptr>
-    QueuedFunction normalizeFunc(const Func& func)
+    QueuedFunction normalizeFunc(Func const& func)
     {
-        return [func](const RpcResponseFuture&)
+        return [func](RpcResponseFuture const&)
             {
                 return func();
             };
@@ -91,11 +91,11 @@ private:
 
     // closure without return value ("auxiliary"), takes response and returns nothing -- internally we reuse the last future
     template<typename Func, typename std::enable_if<
-        std::is_same<typename std::result_of<Func(const RpcResponse&)>::type, void>::value
+        std::is_same<typename std::result_of<Func(RpcResponse const&)>::type, void>::value
     >::type* = nullptr>
-    QueuedFunction normalizeFunc(const Func& func)
+    QueuedFunction normalizeFunc(Func const& func)
     {
-        return [func](const RpcResponseFuture& r)
+        return [func](RpcResponseFuture const& r)
             {
                 func(r.result());
                 return r;
@@ -106,9 +106,9 @@ private:
     template<typename Func, typename std::enable_if<
         std::is_same<typename std::result_of<Func()>::type, void>::value
     >::type* = nullptr>
-    QueuedFunction normalizeFunc(const Func& func)
+    QueuedFunction normalizeFunc(Func const& func)
     {
-        return [func](const RpcResponseFuture& r)
+        return [func](RpcResponseFuture const& r)
             {
                 func();
                 return r;
@@ -117,11 +117,11 @@ private:
 
     // normal error handler, takes last response
     template<typename Func, typename std::enable_if<
-        std::is_same<typename std::result_of<Func(const RpcResponse&)>::type, void>::value
+        std::is_same<typename std::result_of<Func(RpcResponse const&)>::type, void>::value
     >::type* = nullptr>
-    ErrorHandlerFunction normalizeErrorHandler(const Func& func)
+    ErrorHandlerFunction normalizeErrorHandler(Func const& func)
     {
-        return [func](const RpcResponseFuture& r)
+        return [func](RpcResponseFuture const& r)
             {
                 func(r.result());
             };
@@ -131,9 +131,9 @@ private:
     template<typename Func, typename std::enable_if<
         std::is_same<typename std::result_of<Func()>::type, void>::value
     >::type* = nullptr>
-    ErrorHandlerFunction normalizeErrorHandler(const Func& func)
+    ErrorHandlerFunction normalizeErrorHandler(Func const& func)
     {
-        return [func](const RpcResponseFuture& r)
+        return [func](RpcResponseFuture const& r)
             {
                 func();
             };

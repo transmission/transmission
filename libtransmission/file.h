@@ -149,7 +149,7 @@ tr_sys_path_info;
  *
  * @return `True` on success, `false` otherwise (with `error` set accordingly).
  */
-bool tr_sys_path_get_info(const char* path, int flags, tr_sys_path_info* info, struct tr_error** error);
+bool tr_sys_path_get_info(char const* path, int flags, tr_sys_path_info* info, struct tr_error** error);
 
 /**
  * @brief Portability wrapper for `access ()`.
@@ -162,7 +162,7 @@ bool tr_sys_path_get_info(const char* path, int flags, tr_sys_path_info* info, s
  *         be returned in case of error; if you need to distinguish the two,
  *         check if `error` is `NULL` afterwards.
  */
-bool tr_sys_path_exists(const char* path, struct tr_error** error);
+bool tr_sys_path_exists(char const* path, struct tr_error** error);
 
 /**
  * @brief Check whether path is relative.
@@ -173,7 +173,7 @@ bool tr_sys_path_exists(const char* path, struct tr_error** error);
  *
  * @return `True` if path is relative, `false` otherwise
  */
-bool tr_sys_path_is_relative(const char* path);
+bool tr_sys_path_is_relative(char const* path);
 
 /**
  * @brief Test to see if the two filenames point to the same file.
@@ -188,7 +188,7 @@ bool tr_sys_path_is_relative(const char* path);
  *         if you need to distinguish the two, check if `error` is `NULL`
  *         afterwards.
  */
-bool tr_sys_path_is_same(const char* path1, const char* path2, struct tr_error** error);
+bool tr_sys_path_is_same(char const* path1, char const* path2, struct tr_error** error);
 
 /**
  * @brief Portability wrapper for `realpath ()`.
@@ -202,7 +202,7 @@ bool tr_sys_path_is_same(const char* path1, const char* path2, struct tr_error**
  *         when no longer needed), `NULL` otherwise (with `error` set
  *         accordingly).
  */
-char* tr_sys_path_resolve(const char* path, struct tr_error** error);
+char* tr_sys_path_resolve(char const* path, struct tr_error** error);
 
 /**
  * @brief Portability wrapper for `basename ()`.
@@ -216,7 +216,7 @@ char* tr_sys_path_resolve(const char* path, struct tr_error** error);
  *         it when no longer needed), `NULL` otherwise (with `error` set
  *         accordingly).
  */
-char* tr_sys_path_basename(const char* path, struct tr_error** error);
+char* tr_sys_path_basename(char const* path, struct tr_error** error);
 
 /**
  * @brief Portability wrapper for `dirname ()`.
@@ -230,7 +230,7 @@ char* tr_sys_path_basename(const char* path, struct tr_error** error);
  *         when no longer needed), `NULL` otherwise (with `error` set
  *         accordingly).
  */
-char* tr_sys_path_dirname(const char* path, struct tr_error** error);
+char* tr_sys_path_dirname(char const* path, struct tr_error** error);
 
 /**
  * @brief Portability wrapper for `rename ()`.
@@ -244,7 +244,7 @@ char* tr_sys_path_dirname(const char* path, struct tr_error** error);
  *         Rename will generally only succeed if both source and destination are
  *         on the same partition.
  */
-bool tr_sys_path_rename(const char* src_path, const char* dst_path, struct tr_error** error);
+bool tr_sys_path_rename(char const* src_path, char const* dst_path, struct tr_error** error);
 
 /**
  * @brief Portability wrapper for `remove ()`.
@@ -257,7 +257,7 @@ bool tr_sys_path_rename(const char* src_path, const char* dst_path, struct tr_er
  *         Directory removal will only succeed if it is empty (contains no other
  *         files and directories).
  */
-bool tr_sys_path_remove(const char* path, struct tr_error** error);
+bool tr_sys_path_remove(char const* path, struct tr_error** error);
 
 /* File-related wrappers */
 
@@ -287,7 +287,7 @@ tr_sys_file_t tr_sys_file_get_std(tr_std_sys_file_t std_file, struct tr_error** 
  * @return Opened file descriptor on success, `TR_BAD_SYS_FILE` otherwise (with
  *         `error` set accordingly).
  */
-tr_sys_file_t tr_sys_file_open(const char* path, int flags, int permissions, struct tr_error** error);
+tr_sys_file_t tr_sys_file_open(char const* path, int flags, int permissions, struct tr_error** error);
 
 /**
  * @brief Portability wrapper for `mkstemp ()`.
@@ -390,7 +390,7 @@ bool tr_sys_file_read_at(tr_sys_file_t handle, void* buffer, uint64_t size, uint
  *
  * @return `True` on success, `false` otherwise (with `error` set accordingly).
  */
-bool tr_sys_file_write(tr_sys_file_t handle, const void* buffer, uint64_t size, uint64_t* bytes_written,
+bool tr_sys_file_write(tr_sys_file_t handle, void const* buffer, uint64_t size, uint64_t* bytes_written,
     struct tr_error** error);
 
 /**
@@ -408,7 +408,7 @@ bool tr_sys_file_write(tr_sys_file_t handle, const void* buffer, uint64_t size, 
  *
  * @return `True` on success, `false` otherwise (with `error` set accordingly).
  */
-bool tr_sys_file_write_at(tr_sys_file_t handle, const void* buffer, uint64_t size, uint64_t offset, uint64_t* bytes_written,
+bool tr_sys_file_write_at(tr_sys_file_t handle, void const* buffer, uint64_t size, uint64_t offset, uint64_t* bytes_written,
     struct tr_error** error);
 
 /**
@@ -484,7 +484,7 @@ void* tr_sys_file_map_for_reading(tr_sys_file_t handle, uint64_t offset, uint64_
  *
  * @return `True` on success, `false` otherwise (with `error` set accordingly).
  */
-bool tr_sys_file_unmap(const void* address, uint64_t size, struct tr_error** error);
+bool tr_sys_file_unmap(void const* address, uint64_t size, struct tr_error** error);
 
 /**
  * @brief Portability wrapper for `flock ()`.
@@ -542,7 +542,7 @@ bool tr_sys_file_read_line(tr_sys_file_t handle, char* buffer, size_t buffer_siz
  *
  * @return `True` on success, `false` otherwise (with `error` set accordingly).
  */
-bool tr_sys_file_write_line(tr_sys_file_t handle, const char* buffer, struct tr_error** error);
+bool tr_sys_file_write_line(tr_sys_file_t handle, char const* buffer, struct tr_error** error);
 
 /**
  * @brief Portability wrapper for `fprintf ()`.
@@ -561,7 +561,7 @@ bool tr_sys_file_write_line(tr_sys_file_t handle, const char* buffer, struct tr_
  *
  * @return `True` on success, `false` otherwise (with `error` set accordingly).
  */
-bool tr_sys_file_write_fmt(tr_sys_file_t handle, const char* format, struct tr_error** error, ...);
+bool tr_sys_file_write_fmt(tr_sys_file_t handle, char const* format, struct tr_error** error, ...);
 
 /* Directory-related wrappers */
 
@@ -589,7 +589,7 @@ char* tr_sys_dir_get_current(struct tr_error** error);
  *
  * @return `True` on success, `false` otherwise (with `error` set accordingly).
  */
-bool tr_sys_dir_create(const char* path, int flags, int permissions, struct tr_error** error);
+bool tr_sys_dir_create(char const* path, int flags, int permissions, struct tr_error** error);
 
 /**
  * @brief Portability wrapper for `mkdtemp ()`.
@@ -616,7 +616,7 @@ bool tr_sys_dir_create_temp(char* path_template, struct tr_error** error);
  * @return Opened directory descriptor on success, `TR_BAD_SYS_DIR` otherwise
  *         (with `error` set accordingly).
  */
-tr_sys_dir_t tr_sys_dir_open(const char* path, struct tr_error** error);
+tr_sys_dir_t tr_sys_dir_open(char const* path, struct tr_error** error);
 
 /**
  * @brief Portability wrapper for `readdir ()`.
@@ -631,7 +631,7 @@ tr_sys_dir_t tr_sys_dir_open(const char* path, struct tr_error** error);
  *         of directory; if you need to distinguish the two, check if `error`
  *         is `NULL` afterwards.
  */
-const char* tr_sys_dir_read_name(tr_sys_dir_t handle, struct tr_error** error);
+char const* tr_sys_dir_read_name(tr_sys_dir_t handle, struct tr_error** error);
 
 /**
  * @brief Portability wrapper for `closedir ()`.

@@ -32,20 +32,20 @@ public:
     };
 
 public:
-    TorrentModel(const Prefs& prefs);
+    TorrentModel(Prefs const& prefs);
     virtual ~TorrentModel();
 
     void clear();
-    bool hasTorrent(const QString& hashString) const;
+    bool hasTorrent(QString const& hashString) const;
 
     Torrent* getTorrentFromId(int id);
-    const Torrent* getTorrentFromId(int id) const;
+    Torrent const* getTorrentFromId(int id) const;
 
     void getTransferSpeed(Speed& uploadSpeed, size_t& uploadPeerCount, Speed& downloadSpeed, size_t& downloadPeerCount);
 
     // QAbstractItemModel
-    virtual int rowCount(const QModelIndex& parent = QModelIndex()) const;
-    virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
+    virtual int rowCount(QModelIndex const& parent = QModelIndex()) const;
+    virtual QVariant data(QModelIndex const& index, int role = Qt::DisplayRole) const;
 
 public slots:
     void updateTorrents(tr_variant* torrentList, bool isCompleteList);
@@ -67,7 +67,7 @@ private slots:
     void onTorrentChanged(int propertyId);
 
 private:
-    const Prefs& myPrefs;
+    Prefs const& myPrefs;
 
     torrents_t myTorrents;
 };

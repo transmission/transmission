@@ -71,9 +71,9 @@ static bool verify = false;
 static sig_atomic_t gotsig = false;
 static sig_atomic_t manualUpdate = false;
 
-static const char* torrentPath = NULL;
+static char const* torrentPath = NULL;
 
-static const struct tr_option options[] =
+static struct tr_option const options[] =
 {
     { 'b', "blocklist", "Enable peer blocklists", "b", 0, NULL },
     { 'B', "no-blocklist", "Disable peer blocklists", "B", 0, NULL },
@@ -96,14 +96,14 @@ static const struct tr_option options[] =
     { 0, NULL, NULL, NULL, 0, NULL }
 };
 
-static const char* getUsage(void)
+static char const* getUsage(void)
 {
     return "A fast and easy BitTorrent client\n"
            "\n"
            "Usage: " MY_READABLE_NAME " [options] <file|url|magnet>";
 }
 
-static int parseCommandLine(tr_variant*, int argc, const char** argv);
+static int parseCommandLine(tr_variant*, int argc, char const** argv);
 
 static void sigHandler(int signal);
 
@@ -136,13 +136,13 @@ static char* tr_strlratio(char* buf, double ratio, size_t buflen)
 static bool waitingOnWeb;
 
 static void onTorrentFileDownloaded(tr_session* session UNUSED, bool did_connect UNUSED, bool did_timeout UNUSED,
-    long response_code UNUSED, const void* response, size_t response_byte_count, void* ctor)
+    long response_code UNUSED, void const* response, size_t response_byte_count, void* ctor)
 {
     tr_ctorSetMetainfo(ctor, response, response_byte_count);
     waitingOnWeb = false;
 }
 
-static void getStatusStr(const tr_stat* st, char* buf, size_t buflen)
+static void getStatusStr(tr_stat const* st, char* buf, size_t buflen)
 {
     if (st->activity == TR_STATUS_CHECK_WAIT)
     {
@@ -184,12 +184,12 @@ static void getStatusStr(const tr_stat* st, char* buf, size_t buflen)
     }
 }
 
-static const char* getConfigDir(int argc, const char** argv)
+static char const* getConfigDir(int argc, char const** argv)
 {
     int c;
-    const char* configDir = NULL;
-    const char* optarg;
-    const int ind = tr_optind;
+    char const* configDir = NULL;
+    char const* optarg;
+    int const ind = tr_optind;
 
     while ((c = tr_getopt(getUsage(), argc, argv, options, &optarg)))
     {
@@ -216,10 +216,10 @@ int tr_main(int argc, char* argv[])
     tr_ctor* ctor;
     tr_torrent* tor = NULL;
     tr_variant settings;
-    const char* configDir;
+    char const* configDir;
     uint8_t* fileContents;
     size_t fileLength;
-    const char* str;
+    char const* str;
 
     tr_formatter_mem_init(MEM_K, MEM_K_STR, MEM_M_STR, MEM_G_STR, MEM_T_STR);
     tr_formatter_size_init(DISK_K, DISK_K_STR, DISK_M_STR, DISK_G_STR, DISK_T_STR);
@@ -236,11 +236,11 @@ int tr_main(int argc, char* argv[])
 
     /* load the defaults from config file + libtransmission defaults */
     tr_variantInitDict(&settings, 0);
-    configDir = getConfigDir(argc, (const char**)argv);
+    configDir = getConfigDir(argc, (char const**)argv);
     tr_sessionLoadSettings(&settings, configDir, MY_CONFIG_NAME);
 
     /* the command line overrides defaults */
-    if (parseCommandLine(&settings, argc, (const char**)argv))
+    if (parseCommandLine(&settings, argc, (char const**)argv))
     {
         return EXIT_FAILURE;
     }
@@ -333,8 +333,8 @@ int tr_main(int argc, char* argv[])
     for (;;)
     {
         char line[LINEWIDTH];
-        const tr_stat* st;
-        const char* messageName[] =
+        tr_stat const* st;
+        char const* messageName[] =
         {
             NULL,
             "Tracker gave a warning:",
@@ -395,10 +395,10 @@ int tr_main(int argc, char* argv[])
 ****
 ***/
 
-static int parseCommandLine(tr_variant* d, int argc, const char** argv)
+static int parseCommandLine(tr_variant* d, int argc, char const** argv)
 {
     int c;
-    const char* optarg;
+    char const* optarg;
 
     while ((c = tr_getopt(getUsage(), argc, argv, options, &optarg)))
     {

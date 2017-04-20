@@ -26,7 +26,7 @@ void RelocateDialog::onMoveToggled(bool b)
     myMoveFlag = b;
 }
 
-RelocateDialog::RelocateDialog(Session& session, const TorrentModel& model, const QSet<int>& ids, QWidget* parent) :
+RelocateDialog::RelocateDialog(Session& session, TorrentModel const& model, QSet<int> const& ids, QWidget* parent) :
     BaseDialog(parent),
     mySession(session),
     myIds(ids)
@@ -35,9 +35,9 @@ RelocateDialog::RelocateDialog(Session& session, const TorrentModel& model, cons
 
     QString path;
 
-    for (const int id : myIds)
+    for (int const id : myIds)
     {
-        const Torrent* tor = model.getTorrentFromId(id);
+        Torrent const* tor = model.getTorrentFromId(id);
 
         if (path.isEmpty())
         {

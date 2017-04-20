@@ -31,7 +31,7 @@ struct optional_args
  * @ingroup tr_ctor */
 struct tr_ctor
 {
-    const tr_session* session;
+    tr_session const* session;
     bool saveInOurTorrentsDir;
     bool doDelete;
 
@@ -62,7 +62,7 @@ struct tr_ctor
 ****
 ***/
 
-static void setSourceFile(tr_ctor* ctor, const char* sourceFile)
+static void setSourceFile(tr_ctor* ctor, char const* sourceFile)
 {
     tr_free(ctor->sourceFile);
     ctor->sourceFile = tr_strdup(sourceFile);
@@ -79,7 +79,7 @@ static void clearMetainfo(tr_ctor* ctor)
     setSourceFile(ctor, NULL);
 }
 
-int tr_ctorSetMetainfo(tr_ctor* ctor, const uint8_t* metainfo, size_t len)
+int tr_ctorSetMetainfo(tr_ctor* ctor, uint8_t const* metainfo, size_t len)
 {
     int err;
 
@@ -89,12 +89,12 @@ int tr_ctorSetMetainfo(tr_ctor* ctor, const uint8_t* metainfo, size_t len)
     return err;
 }
 
-const char* tr_ctorGetSourceFile(const tr_ctor* ctor)
+char const* tr_ctorGetSourceFile(tr_ctor const* ctor)
 {
     return ctor->sourceFile;
 }
 
-int tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, const char* magnet_link)
+int tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, char const* magnet_link)
 {
     int err;
     tr_magnet_info* magnet_info = tr_magnetParse(magnet_link);
@@ -111,7 +111,7 @@ int tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, const char* magnet_link)
 
         tr_magnetCreateMetainfo(magnet_info, &tmp);
         str = tr_variantToStr(&tmp, TR_VARIANT_FMT_BENC, &len);
-        err = tr_ctorSetMetainfo(ctor, (const uint8_t*)str, len);
+        err = tr_ctorSetMetainfo(ctor, (uint8_t const*)str, len);
 
         tr_free(str);
         tr_variantFree(&tmp);
@@ -121,7 +121,7 @@ int tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, const char* magnet_link)
     return err;
 }
 
-int tr_ctorSetMetainfoFromFile(tr_ctor* ctor, const char* filename)
+int tr_ctorSetMetainfoFromFile(tr_ctor* ctor, char const* filename)
 {
     uint8_t* metainfo;
     size_t len;
@@ -148,7 +148,7 @@ int tr_ctorSetMetainfoFromFile(tr_ctor* ctor, const char* filename)
 
         if (tr_variantDictFindDict(&ctor->metainfo, TR_KEY_info, &info))
         {
-            const char* name;
+            char const* name;
 
             if (!tr_variantDictFindStr(info, TR_KEY_name_utf_8, &name, NULL))
             {
@@ -175,10 +175,10 @@ int tr_ctorSetMetainfoFromFile(tr_ctor* ctor, const char* filename)
     return err;
 }
 
-int tr_ctorSetMetainfoFromHash(tr_ctor* ctor, const char* hashString)
+int tr_ctorSetMetainfoFromHash(tr_ctor* ctor, char const* hashString)
 {
     int err;
-    const char* filename;
+    char const* filename;
 
     filename = tr_sessionFindTorrentFile(ctor->session, hashString);
 
@@ -198,7 +198,7 @@ int tr_ctorSetMetainfoFromHash(tr_ctor* ctor, const char* hashString)
 ****
 ***/
 
-void tr_ctorSetFilePriorities(tr_ctor* ctor, const tr_file_index_t* files, tr_file_index_t fileCount, tr_priority_t priority)
+void tr_ctorSetFilePriorities(tr_ctor* ctor, tr_file_index_t const* files, tr_file_index_t fileCount, tr_priority_t priority)
 {
     tr_file_index_t** myfiles;
     tr_file_index_t* mycount;
@@ -226,7 +226,7 @@ void tr_ctorSetFilePriorities(tr_ctor* ctor, const tr_file_index_t* files, tr_fi
     *mycount = fileCount;
 }
 
-void tr_ctorInitTorrentPriorities(const tr_ctor* ctor, tr_torrent* tor)
+void tr_ctorInitTorrentPriorities(tr_ctor const* ctor, tr_torrent* tor)
 {
     tr_file_index_t i;
 
@@ -246,7 +246,7 @@ void tr_ctorInitTorrentPriorities(const tr_ctor* ctor, tr_torrent* tor)
     }
 }
 
-void tr_ctorSetFilesWanted(tr_ctor* ctor, const tr_file_index_t* files, tr_file_index_t fileCount, bool wanted)
+void tr_ctorSetFilesWanted(tr_ctor* ctor, tr_file_index_t const* files, tr_file_index_t fileCount, bool wanted)
 {
     tr_file_index_t** myfiles = wanted ? &ctor->want : &ctor->notWant;
     tr_file_index_t* mycount = wanted ? &ctor->wantSize : &ctor->notWantSize;
@@ -256,7 +256,7 @@ void tr_ctorSetFilesWanted(tr_ctor* ctor, const tr_file_index_t* files, tr_file_
     *mycount = fileCount;
 }
 
-void tr_ctorInitTorrentWanted(const tr_ctor* ctor, tr_torrent* tor)
+void tr_ctorInitTorrentWanted(tr_ctor const* ctor, tr_torrent* tor)
 {
     if (ctor->notWantSize)
     {
@@ -281,7 +281,7 @@ void tr_ctorSetDeleteSource(tr_ctor* ctor, bool deleteSource)
     ctor->isSet_delete = true;
 }
 
-bool tr_ctorGetDeleteSource(const tr_ctor* ctor, bool* setme)
+bool tr_ctorGetDeleteSource(tr_ctor const* ctor, bool* setme)
 {
     bool ret = true;
 
@@ -308,7 +308,7 @@ void tr_ctorSetSave(tr_ctor* ctor, bool saveInOurTorrentsDir)
     ctor->saveInOurTorrentsDir = saveInOurTorrentsDir;
 }
 
-bool tr_ctorGetSave(const tr_ctor* ctor)
+bool tr_ctorGetSave(tr_ctor const* ctor)
 {
     return ctor && ctor->saveInOurTorrentsDir;
 }
@@ -338,7 +338,7 @@ void tr_ctorSetPeerLimit(tr_ctor* ctor, tr_ctorMode mode, uint16_t peerLimit)
     args->peerLimit = peerLimit;
 }
 
-void tr_ctorSetDownloadDir(tr_ctor* ctor, tr_ctorMode mode, const char* directory)
+void tr_ctorSetDownloadDir(tr_ctor* ctor, tr_ctorMode mode, char const* directory)
 {
     struct optional_args* args;
 
@@ -357,16 +357,16 @@ void tr_ctorSetDownloadDir(tr_ctor* ctor, tr_ctorMode mode, const char* director
     }
 }
 
-void tr_ctorSetIncompleteDir(tr_ctor* ctor, const char* directory)
+void tr_ctorSetIncompleteDir(tr_ctor* ctor, char const* directory)
 {
     tr_free(ctor->incompleteDir);
     ctor->incompleteDir = tr_strdup(directory);
 }
 
-bool tr_ctorGetPeerLimit(const tr_ctor* ctor, tr_ctorMode mode, uint16_t* setmeCount)
+bool tr_ctorGetPeerLimit(tr_ctor const* ctor, tr_ctorMode mode, uint16_t* setmeCount)
 {
     bool ret = true;
-    const struct optional_args* args = &ctor->optionalArgs[mode];
+    struct optional_args const* args = &ctor->optionalArgs[mode];
 
     if (!args->isSet_connected)
     {
@@ -380,10 +380,10 @@ bool tr_ctorGetPeerLimit(const tr_ctor* ctor, tr_ctorMode mode, uint16_t* setmeC
     return ret;
 }
 
-bool tr_ctorGetPaused(const tr_ctor* ctor, tr_ctorMode mode, bool* setmeIsPaused)
+bool tr_ctorGetPaused(tr_ctor const* ctor, tr_ctorMode mode, bool* setmeIsPaused)
 {
     bool ret = true;
-    const struct optional_args* args = &ctor->optionalArgs[mode];
+    struct optional_args const* args = &ctor->optionalArgs[mode];
 
     if (!args->isSet_paused)
     {
@@ -397,10 +397,10 @@ bool tr_ctorGetPaused(const tr_ctor* ctor, tr_ctorMode mode, bool* setmeIsPaused
     return ret;
 }
 
-bool tr_ctorGetDownloadDir(const tr_ctor* ctor, tr_ctorMode mode, const char** setmeDownloadDir)
+bool tr_ctorGetDownloadDir(tr_ctor const* ctor, tr_ctorMode mode, char const** setmeDownloadDir)
 {
     bool ret = true;
-    const struct optional_args* args = &ctor->optionalArgs[mode];
+    struct optional_args const* args = &ctor->optionalArgs[mode];
 
     if (!args->isSet_downloadDir)
     {
@@ -414,7 +414,7 @@ bool tr_ctorGetDownloadDir(const tr_ctor* ctor, tr_ctorMode mode, const char** s
     return ret;
 }
 
-bool tr_ctorGetIncompleteDir(const tr_ctor* ctor, const char** setmeIncompleteDir)
+bool tr_ctorGetIncompleteDir(tr_ctor const* ctor, char const** setmeIncompleteDir)
 {
     bool ret = true;
 
@@ -430,7 +430,7 @@ bool tr_ctorGetIncompleteDir(const tr_ctor* ctor, const char** setmeIncompleteDi
     return ret;
 }
 
-bool tr_ctorGetMetainfo(const tr_ctor* ctor, const tr_variant** setme)
+bool tr_ctorGetMetainfo(tr_ctor const* ctor, tr_variant const** setme)
 {
     bool ret = true;
 
@@ -446,7 +446,7 @@ bool tr_ctorGetMetainfo(const tr_ctor* ctor, const tr_variant** setme)
     return ret;
 }
 
-tr_session* tr_ctorGetSession(const tr_ctor* ctor)
+tr_session* tr_ctorGetSession(tr_ctor const* ctor)
 {
     return (tr_session*)ctor->session;
 }
@@ -468,7 +468,7 @@ void tr_ctorSetBandwidthPriority(tr_ctor* ctor, tr_priority_t priority)
     }
 }
 
-tr_priority_t tr_ctorGetBandwidthPriority(const tr_ctor* ctor)
+tr_priority_t tr_ctorGetBandwidthPriority(tr_ctor const* ctor)
 {
     return ctor->bandwidthPriority;
 }
@@ -477,7 +477,7 @@ tr_priority_t tr_ctorGetBandwidthPriority(const tr_ctor* ctor)
 ****
 ***/
 
-tr_ctor* tr_ctorNew(const tr_session* session)
+tr_ctor* tr_ctorNew(tr_session const* session)
 {
     tr_ctor* ctor = tr_new0(struct tr_ctor, 1);
 

@@ -56,8 +56,8 @@ void StatsDialog::setVisible(bool visible)
 
 void StatsDialog::updateStats()
 {
-    const tr_session_stats& current(mySession.getStats());
-    const tr_session_stats& total(mySession.getCumulativeStats());
+    tr_session_stats const& current(mySession.getStats());
+    tr_session_stats const& total(mySession.getCumulativeStats());
 
     ui.currentUploadedValueLabel->setText(Formatter::sizeToString(current.uploadedBytes));
     ui.currentDownloadedValueLabel->setText(Formatter::sizeToString(current.downloadedBytes));

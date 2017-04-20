@@ -85,13 +85,13 @@ void MakeProgressDialog::onButtonBoxClicked(QAbstractButton* button)
 void MakeProgressDialog::onProgress()
 {
     // progress bar
-    const tr_metainfo_builder& b = myBuilder;
-    const double denom = b.pieceCount ? b.pieceCount : 1;
+    tr_metainfo_builder const& b = myBuilder;
+    double const denom = b.pieceCount ? b.pieceCount : 1;
     ui.progressBar->setValue(static_cast<int>((100.0 * b.pieceIndex) / denom));
 
     // progress label
-    const QString top = QString::fromUtf8(b.top);
-    const QString base(QFileInfo(top).completeBaseName());
+    QString const top = QString::fromUtf8(b.top);
+    QString const base(QFileInfo(top).completeBaseName());
     QString str;
 
     if (!b.isDone)
@@ -146,9 +146,9 @@ void MakeDialog::makeTorrent()
     int tier = 0;
     QVector<tr_tracker_info> trackers;
 
-    for (const QString& line : ui.trackersEdit->toPlainText().split(QLatin1Char('\n')))
+    for (QString const& line : ui.trackersEdit->toPlainText().split(QLatin1Char('\n')))
     {
-        const QString announceUrl = line.trimmed();
+        QString const announceUrl = line.trimmed();
 
         if (announceUrl.isEmpty())
         {
@@ -164,9 +164,9 @@ void MakeDialog::makeTorrent()
     }
 
     // the file to create
-    const QString path = QString::fromUtf8(myBuilder->top);
-    const QString torrentName = QFileInfo(path).completeBaseName() + QLatin1String(".torrent");
-    const QString target = QDir(ui.destinationButton->path()).filePath(torrentName);
+    QString const path = QString::fromUtf8(myBuilder->top);
+    QString const torrentName = QFileInfo(path).completeBaseName() + QLatin1String(".torrent");
+    QString const target = QDir(ui.destinationButton->path()).filePath(torrentName);
 
     // comment
     QString comment;
@@ -203,7 +203,7 @@ void MakeDialog::onSourceChanged()
 {
     myBuilder.reset();
 
-    const QString filename = getSource();
+    QString const filename = getSource();
 
     if (!filename.isEmpty())
     {
@@ -268,7 +268,7 @@ MakeDialog::~MakeDialog()
 
 void MakeDialog::dragEnterEvent(QDragEnterEvent* event)
 {
-    const QMimeData* mime = event->mimeData();
+    QMimeData const* mime = event->mimeData();
 
     if (!mime->urls().isEmpty() && QFileInfo(mime->urls().front().path()).exists())
     {
@@ -278,8 +278,8 @@ void MakeDialog::dragEnterEvent(QDragEnterEvent* event)
 
 void MakeDialog::dropEvent(QDropEvent* event)
 {
-    const QString filename = event->mimeData()->urls().front().path();
-    const QFileInfo fileInfo(filename);
+    QString const filename = event->mimeData()->urls().front().path();
+    QFileInfo const fileInfo(filename);
 
     if (fileInfo.exists())
     {

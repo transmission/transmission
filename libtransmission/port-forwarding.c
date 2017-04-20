@@ -24,7 +24,7 @@
 #include "upnp.h"
 #include "utils.h"
 
-static const char* getKey(void)
+static char const* getKey(void)
 {
     return _("Port Forwarding");
 }
@@ -49,7 +49,7 @@ struct tr_shared
 ****
 ***/
 
-static const char* getNatStateStr(int state)
+static char const* getNatStateStr(int state)
 {
     switch (state)
     {
@@ -75,8 +75,8 @@ static void natPulse(tr_shared* s, bool do_check)
     int oldStatus;
     int newStatus;
     tr_port public_peer_port;
-    const tr_port private_peer_port = s->session->private_peer_port;
-    const int is_enabled = s->isEnabled && !s->isShuttingDown;
+    tr_port const private_peer_port = s->session->private_peer_port;
+    int const is_enabled = s->isEnabled && !s->isShuttingDown;
 
     if (s->natpmp == NULL)
     {
@@ -246,12 +246,12 @@ void tr_sharedPortChanged(tr_session* session)
     }
 }
 
-bool tr_sharedTraversalIsEnabled(const tr_shared* s)
+bool tr_sharedTraversalIsEnabled(tr_shared const* s)
 {
     return s->isEnabled;
 }
 
-int tr_sharedTraversalStatus(const tr_shared* s)
+int tr_sharedTraversalStatus(tr_shared const* s)
 {
     return MAX(s->natpmpStatus, s->upnpStatus);
 }

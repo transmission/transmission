@@ -19,7 +19,7 @@
 namespace
 {
 
-static const int INTERVAL_MSEC = 15000;
+static int const INTERVAL_MSEC = 15000;
 
 } // namespace
 
@@ -45,7 +45,7 @@ void FreeSpaceLabel::setSession(Session& session)
     onTimer();
 }
 
-void FreeSpaceLabel::setPath(const QString& path)
+void FreeSpaceLabel::setPath(QString const& path)
 {
     if (myPath != path)
     {
@@ -75,7 +75,7 @@ void FreeSpaceLabel::onTimer()
             return mySession->exec("free-space", &args);
         });
 
-    q->add([this](const RpcResponse& r)
+    q->add([this](RpcResponse const& r)
         {
             QString str;
 
@@ -93,7 +93,7 @@ void FreeSpaceLabel::onTimer()
 
             // update the tooltip
             size_t len = 0;
-            const char* path = 0;
+            char const* path = 0;
             tr_variantDictFindStr(r.args.get(), TR_KEY_path, &path, &len);
             str = QString::fromUtf8(path, len);
             setToolTip(QDir::toNativeSeparators(str));

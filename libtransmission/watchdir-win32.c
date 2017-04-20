@@ -79,7 +79,7 @@ static BOOL tr_get_overlapped_result_ex(HANDLE handle, LPOVERLAPPED overlapped, 
         return real_impl(handle, overlapped, bytes_transferred, timeout, alertable);
     }
 
-    const DWORD wait_result = WaitForSingleObjectEx(handle, timeout, alertable);
+    DWORD const wait_result = WaitForSingleObjectEx(handle, timeout, alertable);
 
     if (wait_result == WAIT_FAILED)
     {
@@ -99,7 +99,7 @@ static BOOL tr_get_overlapped_result_ex(HANDLE handle, LPOVERLAPPED overlapped, 
 
 static unsigned int __stdcall tr_watchdir_win32_thread(void* context)
 {
-    const tr_watchdir_t handle = context;
+    tr_watchdir_t const handle = context;
     tr_watchdir_win32* const backend = BACKEND_UPCAST(tr_watchdir_get_backend(handle));
     DWORD bytes_transferred;
 
@@ -114,7 +114,7 @@ static unsigned int __stdcall tr_watchdir_win32_thread(void* context)
 
         info->NextEntryOffset = bytes_transferred - ((BYTE*)info - (BYTE*)backend->buffer);
 
-        send(backend->notify_pipe[1], (const char*)backend->buffer, bytes_transferred, 0);
+        send(backend->notify_pipe[1], (char const*)backend->buffer, bytes_transferred, 0);
 
         if (!ReadDirectoryChangesW(backend->fd, backend->buffer, sizeof(backend->buffer), FALSE, WIN32_WATCH_MASK, NULL,
             &backend->overlapped, NULL))
@@ -134,19 +134,19 @@ static unsigned int __stdcall tr_watchdir_win32_thread(void* context)
 
 static void tr_watchdir_win32_on_first_scan(evutil_socket_t fd UNUSED, short type UNUSED, void* context)
 {
-    const tr_watchdir_t handle = context;
+    tr_watchdir_t const handle = context;
 
     tr_watchdir_scan(handle, NULL);
 }
 
 static void tr_watchdir_win32_on_event(struct bufferevent* event, void* context)
 {
-    const tr_watchdir_t handle = context;
+    tr_watchdir_t const handle = context;
     size_t nread;
     size_t name_size = MAX_PATH * sizeof(WCHAR);
     char* buffer = tr_malloc(sizeof(FILE_NOTIFY_INFORMATION) + name_size);
     PFILE_NOTIFY_INFORMATION ev = (PFILE_NOTIFY_INFORMATION)buffer;
-    const size_t header_size = offsetof(FILE_NOTIFY_INFORMATION, FileName);
+    size_t const header_size = offsetof(FILE_NOTIFY_INFORMATION, FileName);
 
     /* Read the size of the struct excluding name into buf. Guaranteed to have at
        least sizeof (*ev) available */
@@ -164,7 +164,7 @@ static void tr_watchdir_win32_on_event(struct bufferevent* event, void* context)
             break;
         }
 
-        const size_t nleft = ev->NextEntryOffset - nread;
+        size_t const nleft = ev->NextEntryOffset - nread;
 
         assert(ev->FileNameLength % sizeof(WCHAR) == 0);
         assert(ev->FileNameLength > 0);
@@ -252,7 +252,7 @@ static void tr_watchdir_win32_free(tr_watchdir_backend* backend_base)
 
 tr_watchdir_backend* tr_watchdir_win32_new(tr_watchdir_t handle)
 {
-    const char* const path = tr_watchdir_get_path(handle);
+    char const* const path = tr_watchdir_get_path(handle);
     wchar_t* wide_path;
     tr_watchdir_win32* backend;
 

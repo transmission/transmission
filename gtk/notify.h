@@ -12,6 +12,6 @@
 
 void gtr_notify_init(void);
 
-void gtr_notify_torrent_added(const char* name);
+void gtr_notify_torrent_added(char const* name);
 
 void gtr_notify_torrent_completed(TrCore* core, int torrent_id);

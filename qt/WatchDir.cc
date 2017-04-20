@@ -22,7 +22,7 @@
 ****
 ***/
 
-WatchDir::WatchDir(const TorrentModel& model) :
+WatchDir::WatchDir(TorrentModel const& model) :
     myModel(model),
     myWatcher(0)
 {
@@ -36,7 +36,7 @@ WatchDir::~WatchDir()
 ****
 ***/
 
-int WatchDir::metainfoTest(const QString& filename) const
+int WatchDir::metainfoTest(QString const& filename) const
 {
     int ret;
     tr_info inf;
@@ -44,7 +44,7 @@ int WatchDir::metainfoTest(const QString& filename) const
 
     // parse
     tr_ctorSetMetainfoFromFile(ctor, filename.toUtf8().constData());
-    const int err = tr_torrentParse(ctor, &inf);
+    int const err = tr_torrentParse(ctor, &inf);
 
     if (err)
     {
@@ -72,7 +72,7 @@ int WatchDir::metainfoTest(const QString& filename) const
 void WatchDir::onTimeout()
 {
     QTimer* t = qobject_cast<QTimer*>(sender());
-    const QString filename = t->objectName();
+    QString const filename = t->objectName();
 
     if (metainfoTest(filename) == OK)
     {
@@ -82,7 +82,7 @@ void WatchDir::onTimeout()
     t->deleteLater();
 }
 
-void WatchDir::setPath(const QString& path, bool isEnabled)
+void WatchDir::setPath(QString const& path, bool isEnabled)
 {
     // clear out any remnants of the previous watcher, if any
     myWatchDirFiles.clear();
@@ -104,27 +104,27 @@ void WatchDir::setPath(const QString& path, bool isEnabled)
     }
 }
 
-void WatchDir::watcherActivated(const QString& path)
+void WatchDir::watcherActivated(QString const& path)
 {
-    const QDir dir(path);
+    QDir const dir(path);
 
     // get the list of files currently in the watch directory
     QSet<QString> files;
 
-    for (const QString& str : dir.entryList(QDir::Readable | QDir::Files))
+    for (QString const& str : dir.entryList(QDir::Readable | QDir::Files))
     {
         files.insert(str);
     }
 
     // try to add any new files which end in .torrent
-    const QSet<QString> newFiles(files - myWatchDirFiles);
-    const QString torrentSuffix = QString::fromUtf8(".torrent");
+    QSet<QString> const newFiles(files - myWatchDirFiles);
+    QString const torrentSuffix = QString::fromUtf8(".torrent");
 
-    for (const QString& name : newFiles)
+    for (QString const& name : newFiles)
     {
         if (name.endsWith(torrentSuffix, Qt::CaseInsensitive))
         {
-            const QString filename = dir.absoluteFilePath(name);
+            QString const filename = dir.absoluteFilePath(name);
 
             switch (metainfoTest(filename))
             {
@@ -160,7 +160,7 @@ void WatchDir::rescanAllWatchedDirectories()
         return;
     }
 
-    for (const QString& path : myWatcher->directories())
+    for (QString const& path : myWatcher->directories())
     {
         watcherActivated(path);
     }

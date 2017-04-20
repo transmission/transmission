@@ -58,8 +58,8 @@ public:
     QRect progressRect;
 
 public:
-    ItemLayout(const QString& nameText, const QString& statusText, const QString& progressText, const QIcon& emblemIcon,
-        const QFont& baseFont, Qt::LayoutDirection direction, const QPoint& topLeft, int width);
+    ItemLayout(QString const& nameText, QString const& statusText, QString const& progressText, QIcon const& emblemIcon,
+        QFont const& baseFont, Qt::LayoutDirection direction, QPoint const& topLeft, int width);
 
     QSize size() const
     {
@@ -82,14 +82,14 @@ public:
     }
 
 private:
-    QString elidedText(const QFont& font, const QString& text, int width) const
+    QString elidedText(QFont const& font, QString const& text, int width) const
     {
         return QFontMetrics(font).elidedText(text, Qt::ElideRight, width);
     }
 };
 
-ItemLayout::ItemLayout(const QString& nameText, const QString& statusText, const QString& progressText, const QIcon& emblemIcon,
-    const QFont& baseFont, Qt::LayoutDirection direction, const QPoint& topLeft, int width) :
+ItemLayout::ItemLayout(QString const& nameText, QString const& statusText, QString const& progressText, QIcon const& emblemIcon,
+    QFont const& baseFont, Qt::LayoutDirection direction, QPoint const& topLeft, int width) :
     myNameText(nameText),
     myStatusText(statusText),
     myProgressText(progressText),
@@ -97,20 +97,20 @@ ItemLayout::ItemLayout(const QString& nameText, const QString& statusText, const
     statusFont(baseFont),
     progressFont(baseFont)
 {
-    const QStyle* style(qApp->style());
-    const int iconSize(style->pixelMetric(QStyle::PM_LargeIconSize));
+    QStyle const* style(qApp->style());
+    int const iconSize(style->pixelMetric(QStyle::PM_LargeIconSize));
 
     nameFont.setWeight(QFont::Bold);
-    const QFontMetrics nameFM(nameFont);
-    const QSize nameSize(nameFM.size(0, myNameText));
+    QFontMetrics const nameFM(nameFont);
+    QSize const nameSize(nameFM.size(0, myNameText));
 
     statusFont.setPointSize(static_cast<int>(statusFont.pointSize() * 0.9));
-    const QFontMetrics statusFM(statusFont);
-    const QSize statusSize(statusFM.size(0, myStatusText));
+    QFontMetrics const statusFM(statusFont);
+    QSize const statusSize(statusFM.size(0, myStatusText));
 
     progressFont.setPointSize(static_cast<int>(progressFont.pointSize() * 0.9));
-    const QFontMetrics progressFM(progressFont);
-    const QSize progressSize(progressFM.size(0, myProgressText));
+    QFontMetrics const progressFM(progressFont);
+    QSize const progressSize(progressFM.size(0, myProgressText));
 
     QRect baseRect(topLeft, QSize(width, 0));
     Utils::narrowRect(baseRect, iconSize + GUI_PAD, 0, direction);
@@ -153,22 +153,22 @@ TorrentDelegate::~TorrentDelegate()
 ****
 ***/
 
-QSize TorrentDelegate::margin(const QStyle& style) const
+QSize TorrentDelegate::margin(QStyle const& style) const
 {
     Q_UNUSED(style);
 
     return QSize(4, 4);
 }
 
-QString TorrentDelegate::progressString(const Torrent& tor)
+QString TorrentDelegate::progressString(Torrent const& tor)
 {
-    const bool isMagnet(!tor.hasMetadata());
-    const bool isDone(tor.isDone());
-    const bool isSeed(tor.isSeed());
-    const uint64_t haveTotal(tor.haveTotal());
+    bool const isMagnet(!tor.hasMetadata());
+    bool const isDone(tor.isDone());
+    bool const isSeed(tor.isSeed());
+    uint64_t const haveTotal(tor.haveTotal());
     QString str;
     double seedRatio;
-    const bool hasSeedRatio(tor.getSeedRatio(seedRatio));
+    bool const hasSeedRatio(tor.getSeedRatio(seedRatio));
 
     if (isMagnet) // magnet link with no metadata
     {
@@ -262,12 +262,12 @@ QString TorrentDelegate::progressString(const Torrent& tor)
     return str.trimmed();
 }
 
-QString TorrentDelegate::shortTransferString(const Torrent& tor)
+QString TorrentDelegate::shortTransferString(Torrent const& tor)
 {
     QString str;
-    const bool haveMeta(tor.hasMetadata());
-    const bool haveDown(haveMeta && ((tor.webseedsWeAreDownloadingFrom() > 0) || (tor.peersWeAreDownloadingFrom() > 0)));
-    const bool haveUp(haveMeta && tor.peersWeAreUploadingTo() > 0);
+    bool const haveMeta(tor.hasMetadata());
+    bool const haveDown(haveMeta && ((tor.webseedsWeAreDownloadingFrom() > 0) || (tor.peersWeAreDownloadingFrom() > 0)));
+    bool const haveUp(haveMeta && tor.peersWeAreUploadingTo() > 0);
 
     if (haveDown)
     {
@@ -282,7 +282,7 @@ QString TorrentDelegate::shortTransferString(const Torrent& tor)
     return str.trimmed();
 }
 
-QString TorrentDelegate::shortStatusString(const Torrent& tor)
+QString TorrentDelegate::shortStatusString(Torrent const& tor)
 {
     QString str;
 
@@ -305,7 +305,7 @@ QString TorrentDelegate::shortStatusString(const Torrent& tor)
     return str.trimmed();
 }
 
-QString TorrentDelegate::statusString(const Torrent& tor)
+QString TorrentDelegate::statusString(Torrent const& tor)
 {
     QString str;
 
@@ -393,57 +393,57 @@ QString TorrentDelegate::statusString(const Torrent& tor)
 ****
 ***/
 
-QSize TorrentDelegate::sizeHint(const QStyleOptionViewItem& option, const Torrent& tor) const
+QSize TorrentDelegate::sizeHint(QStyleOptionViewItem const& option, Torrent const& tor) const
 {
-    const QSize m(margin(*qApp->style()));
-    const ItemLayout layout(tor.name(), progressString(tor), statusString(tor), QIcon(), option.font, option.direction,
+    QSize const m(margin(*qApp->style()));
+    ItemLayout const layout(tor.name(), progressString(tor), statusString(tor), QIcon(), option.font, option.direction,
         QPoint(0, 0), option.rect.width() - m.width() * 2);
     return layout.size() + m * 2;
 }
 
-QSize TorrentDelegate::sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const
+QSize TorrentDelegate::sizeHint(QStyleOptionViewItem const& option, QModelIndex const& index) const
 {
-    const Torrent* tor(index.data(TorrentModel::TorrentRole).value<const Torrent*>());
+    Torrent const* tor(index.data(TorrentModel::TorrentRole).value<Torrent const*>());
     return sizeHint(option, *tor);
 }
 
-void TorrentDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const
+void TorrentDelegate::paint(QPainter* painter, QStyleOptionViewItem const& option, QModelIndex const& index) const
 {
-    const Torrent* tor(index.data(TorrentModel::TorrentRole).value<const Torrent*>());
+    Torrent const* tor(index.data(TorrentModel::TorrentRole).value<Torrent const*>());
     painter->save();
     painter->setClipRect(option.rect);
     drawTorrent(painter, option, *tor);
     painter->restore();
 }
 
-void TorrentDelegate::setProgressBarPercentDone(const QStyleOptionViewItem& option, const Torrent& tor) const
+void TorrentDelegate::setProgressBarPercentDone(QStyleOptionViewItem const& option, Torrent const& tor) const
 {
     double seedRatioLimit;
 
     if (tor.isSeeding() && tor.getSeedRatio(seedRatioLimit))
     {
-        const double seedRateRatio = tor.ratio() / seedRatioLimit;
-        const int scaledProgress = seedRateRatio * (myProgressBarStyle->maximum - myProgressBarStyle->minimum);
+        double const seedRateRatio = tor.ratio() / seedRatioLimit;
+        int const scaledProgress = seedRateRatio * (myProgressBarStyle->maximum - myProgressBarStyle->minimum);
         myProgressBarStyle->progress = myProgressBarStyle->minimum + scaledProgress;
     }
     else
     {
-        const bool isMagnet(!tor.hasMetadata());
+        bool const isMagnet(!tor.hasMetadata());
         myProgressBarStyle->direction = option.direction;
         myProgressBarStyle->progress = static_cast<int>(myProgressBarStyle->minimum + (((isMagnet ? tor.metadataPercentDone() :
             tor.percentDone()) * (myProgressBarStyle->maximum - myProgressBarStyle->minimum))));
     }
 }
 
-void TorrentDelegate::drawTorrent(QPainter* painter, const QStyleOptionViewItem& option, const Torrent& tor) const
+void TorrentDelegate::drawTorrent(QPainter* painter, QStyleOptionViewItem const& option, Torrent const& tor) const
 {
-    const QStyle* style(qApp->style());
+    QStyle const* style(qApp->style());
 
-    const bool isPaused(tor.isPaused());
+    bool const isPaused(tor.isPaused());
 
-    const bool isItemSelected((option.state & QStyle::State_Selected) != 0);
-    const bool isItemEnabled((option.state & QStyle::State_Enabled) != 0);
-    const bool isItemActive((option.state & QStyle::State_Active) != 0);
+    bool const isItemSelected((option.state & QStyle::State_Selected) != 0);
+    bool const isItemEnabled((option.state & QStyle::State_Enabled) != 0);
+    bool const isItemActive((option.state & QStyle::State_Active) != 0);
 
     painter->save();
 
@@ -517,14 +517,14 @@ void TorrentDelegate::drawTorrent(QPainter* painter, const QStyleOptionViewItem&
 
     progressBarState |= QStyle::State_Small;
 
-    const QIcon::Mode emblemIm = isItemSelected ? QIcon::Selected : QIcon::Normal;
-    const QIcon emblemIcon = tor.hasError() ? QIcon::fromTheme(QLatin1String("emblem-important"),
+    QIcon::Mode const emblemIm = isItemSelected ? QIcon::Selected : QIcon::Normal;
+    QIcon const emblemIcon = tor.hasError() ? QIcon::fromTheme(QLatin1String("emblem-important"),
         style->standardIcon(QStyle::SP_MessageBoxWarning)) : QIcon();
 
     // layout
-    const QSize m(margin(*style));
-    const QRect contentRect(option.rect.adjusted(m.width(), m.height(), -m.width(), -m.height()));
-    const ItemLayout layout(tor.name(), progressString(tor), statusString(tor), emblemIcon, option.font, option.direction,
+    QSize const m(margin(*style));
+    QRect const contentRect(option.rect.adjusted(m.width(), m.height(), -m.width(), -m.height()));
+    ItemLayout const layout(tor.name(), progressString(tor), statusString(tor), emblemIcon, option.font, option.direction,
         contentRect.topLeft(), contentRect.width());
 
     // render

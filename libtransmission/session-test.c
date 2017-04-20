@@ -48,9 +48,9 @@ static int testPeerId(void)
 static int test_session_id(void)
 {
     tr_session_id_t session_id;
-    const char* session_id_str_1 = NULL;
-    const char* session_id_str_2 = NULL;
-    const char* session_id_str_3 = NULL;
+    char const* session_id_str_1 = NULL;
+    char const* session_id_str_2 = NULL;
+    char const* session_id_str_3 = NULL;
 
     check(!tr_session_id_is_local(NULL));
     check(!tr_session_id_is_local(""));
@@ -131,7 +131,7 @@ static int test_session_id(void)
 
 int main(void)
 {
-    const testFunc tests[] =
+    testFunc const tests[] =
     {
         testPeerId,
         test_session_id

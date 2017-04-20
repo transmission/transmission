@@ -31,5 +31,5 @@ public:
 
 public slots:
     bool PresentWindow();
-    bool AddMetainfo(const QString& metainfo);
+    bool AddMetainfo(QString const& metainfo);
 };

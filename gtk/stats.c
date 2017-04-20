@@ -36,7 +36,7 @@ struct stat_ui
     TrCore* core;
 };
 
-static void setLabel(GtkLabel* l, const char* str)
+static void setLabel(GtkLabel* l, char const* str)
 {
     gtr_label_set_text(l, str);
 }
@@ -52,9 +52,9 @@ static void setLabelFromRatio(GtkLabel* l, double d)
 static gboolean updateStats(gpointer gdata)
 {
     char buf[128];
-    const char* fmt;
+    char const* fmt;
     tr_session_stats one, all;
-    const size_t buflen = sizeof(buf);
+    size_t const buflen = sizeof(buf);
     struct stat_ui* ui = gdata;
 
     tr_sessionGetStats(gtr_core_session(ui->core), &one);
@@ -87,10 +87,10 @@ static void dialogResponse(GtkDialog* dialog, gint response, gpointer gdata)
 
     if (response == TR_RESPONSE_RESET)
     {
-        const char* primary = _("Reset your statistics?");
-        const char* secondary = _("These statistics are for your information only. "
+        char const* primary = _("Reset your statistics?");
+        char const* secondary = _("These statistics are for your information only. "
                 "Resetting them doesn't affect the statistics logged by your BitTorrent trackers.");
-        const int flags = GTK_DIALOG_DESTROY_WITH_PARENT | GTK_DIALOG_MODAL;
+        int const flags = GTK_DIALOG_DESTROY_WITH_PARENT | GTK_DIALOG_MODAL;
         GtkWidget* w = gtk_message_dialog_new(GTK_WINDOW(dialog), flags, GTK_MESSAGE_QUESTION, GTK_BUTTONS_NONE, "%s", primary);
         gtk_dialog_add_buttons(GTK_DIALOG(w), GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, _("_Reset"), TR_RESPONSE_RESET, NULL);
         gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(w), "%s", secondary);

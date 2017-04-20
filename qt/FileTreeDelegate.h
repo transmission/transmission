@@ -26,6 +26,6 @@ public:
 
 public:
     // QAbstractItemDelegate
-    virtual QSize sizeHint(const QStyleOptionViewItem&, const QModelIndex&) const;
-    virtual void paint(QPainter*, const QStyleOptionViewItem&, const QModelIndex&) const;
+    virtual QSize sizeHint(QStyleOptionViewItem const&, QModelIndex const&) const;
+    virtual void paint(QPainter*, QStyleOptionViewItem const&, QModelIndex const&) const;
 };

@@ -37,9 +37,9 @@ extern unsigned int tr_watchdir_retry_limit;
 extern struct timeval tr_watchdir_retry_start_interval;
 extern struct timeval tr_watchdir_retry_max_interval;
 
-static const struct timeval FIFTY_MSEC = { 0, 50000 };
-static const struct timeval ONE_HUNDRED_MSEC = { 0, 100000 };
-static const struct timeval TWO_HUNDRED_MSEC = { 0, 200000 };
+static struct timeval const FIFTY_MSEC = { 0, 50000 };
+static struct timeval const ONE_HUNDRED_MSEC = { 0, 100000 };
+static struct timeval const TWO_HUNDRED_MSEC = { 0, 200000 };
 
 static void process_events(void)
 {
@@ -47,7 +47,7 @@ static void process_events(void)
     event_base_dispatch(ev_base);
 }
 
-static tr_watchdir_status callback(tr_watchdir_t dir, const char* name, void* context)
+static tr_watchdir_status callback(tr_watchdir_t dir, char const* name, void* context)
 {
     callback_data* const data = context;
 
@@ -75,27 +75,27 @@ static void reset_callback_data(callback_data* data, tr_watchdir_status result)
     data->result = result;
 }
 
-static void create_file(const char* parent_dir, const char* name)
+static void create_file(char const* parent_dir, char const* name)
 {
     char* const path = tr_buildPath(parent_dir, name, NULL);
     libtest_create_file_with_string_contents(path, "");
     tr_free(path);
 }
 
-static void create_dir(const char* parent_dir, const char* name)
+static void create_dir(char const* parent_dir, char const* name)
 {
     char* const path = tr_buildPath(parent_dir, name, NULL);
     tr_sys_dir_create(path, 0, 0700, NULL);
     tr_free(path);
 }
 
-static tr_watchdir_t create_watchdir(const char* path, tr_watchdir_cb callback, void* callback_user_data,
+static tr_watchdir_t create_watchdir(char const* path, tr_watchdir_cb callback, void* callback_user_data,
     struct event_base* event_base)
 {
 #ifdef WATCHDIR_TEST_FORCE_GENERIC
-    const bool force_generic = true;
+    bool const force_generic = true;
 #else
-    const bool force_generic = false;
+    bool const force_generic = false;
 #endif
 
     return tr_watchdir_new(path, callback, callback_user_data, event_base, force_generic);
@@ -383,7 +383,7 @@ static int test_retry(void)
 
 int main(void)
 {
-    const testFunc tests[] =
+    testFunc const tests[] =
     {
         test_construct,
         test_initial_scan,

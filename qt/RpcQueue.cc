@@ -68,7 +68,7 @@ void RpcQueue::stepFinished()
     deleteLater();
 }
 
-void RpcQueue::runNext(const RpcResponseFuture& response)
+void RpcQueue::runNext(RpcResponseFuture const& response)
 {
     assert(!myQueue.isEmpty());
 

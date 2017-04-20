@@ -24,7 +24,7 @@
 #include "upnp.h"
 #include "utils.h"
 
-static const char* getKey(void)
+static char const* getKey(void)
 {
     return _("Port Forwarding (UPnP)");
 }
@@ -108,7 +108,7 @@ static struct UPNPDev* tr_upnpDiscover(int msec)
     return ret;
 }
 
-static int tr_upnpGetSpecificPortMappingEntry(tr_upnp* handle, const char* proto)
+static int tr_upnpGetSpecificPortMappingEntry(tr_upnp* handle, char const* proto)
 {
     int err;
     char intClient[16];
@@ -134,10 +134,10 @@ static int tr_upnpGetSpecificPortMappingEntry(tr_upnp* handle, const char* proto
     return err;
 }
 
-static int tr_upnpAddPortMapping(const tr_upnp* handle, const char* proto, tr_port port, const char* desc)
+static int tr_upnpAddPortMapping(tr_upnp const* handle, char const* proto, tr_port port, char const* desc)
 {
     int err;
-    const int old_errno = errno;
+    int const old_errno = errno;
     char portStr[16];
     errno = 0;
 
@@ -161,7 +161,7 @@ static int tr_upnpAddPortMapping(const tr_upnp* handle, const char* proto, tr_po
     return err;
 }
 
-static void tr_upnpDeletePortMapping(const tr_upnp* handle, const char* proto, tr_port port)
+static void tr_upnpDeletePortMapping(tr_upnp const* handle, char const* proto, tr_port port)
 {
     char portStr[16];
 

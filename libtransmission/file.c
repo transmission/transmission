@@ -48,7 +48,7 @@ bool tr_sys_file_read_line(tr_sys_file_t handle, char* buffer, size_t buffer_siz
 
         if (found_eol || buffer_size == 0 || bytes_read == 0)
         {
-            const int64_t delta = -(int64_t)bytes_read + i + (found_eol ? 1 : 0);
+            int64_t const delta = -(int64_t)bytes_read + i + (found_eol ? 1 : 0);
 
             if (delta != 0)
             {
@@ -76,7 +76,7 @@ bool tr_sys_file_read_line(tr_sys_file_t handle, char* buffer, size_t buffer_siz
     return ret;
 }
 
-bool tr_sys_file_write_line(tr_sys_file_t handle, const char* buffer, tr_error** error)
+bool tr_sys_file_write_line(tr_sys_file_t handle, char const* buffer, tr_error** error)
 {
     bool ret;
 
@@ -93,7 +93,7 @@ bool tr_sys_file_write_line(tr_sys_file_t handle, const char* buffer, tr_error**
     return ret;
 }
 
-bool tr_sys_file_write_fmt(tr_sys_file_t handle, const char* format, tr_error** error, ...)
+bool tr_sys_file_write_fmt(tr_sys_file_t handle, char const* format, tr_error** error, ...)
 {
     bool ret = false;
     char* buffer;

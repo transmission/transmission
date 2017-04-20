@@ -31,7 +31,7 @@ static int testInt(void)
     uint8_t buf[128];
     int64_t val;
     int err;
-    const uint8_t* end;
+    uint8_t const* end;
 
     /* good int string */
     tr_snprintf((char*)buf, sizeof(buf), "i64e");
@@ -92,8 +92,8 @@ static int testStr(void)
     uint8_t buf[128];
     int err;
     int n;
-    const uint8_t* end;
-    const uint8_t* str;
+    uint8_t const* end;
+    uint8_t const* str;
     size_t len;
 
     /* string len is designed to overflow */
@@ -110,7 +110,7 @@ static int testStr(void)
     err = tr_bencParseStr(buf, buf + n, &end, &str, &len);
     check_int_eq(0, err);
     check_uint_eq(4, len);
-    check(strncmp((const char*)str, "boat", len) == 0);
+    check(strncmp((char const*)str, "boat", len) == 0);
     check(end == buf + 6);
     str = NULL;
     end = NULL;
@@ -140,7 +140,7 @@ static int testStr(void)
     err = tr_bencParseStr(buf, buf + n, &end, &str, &len);
     check_int_eq(0, err);
     check_uint_eq(3, len);
-    check(strncmp((const char*)str, "boa", len) == 0);
+    check(strncmp((char const*)str, "boa", len) == 0);
     check(end == buf + 5);
     str = NULL;
     end = NULL;
@@ -149,12 +149,12 @@ static int testStr(void)
     return 0;
 }
 
-static int testString(const char* str, bool isGood)
+static int testString(char const* str, bool isGood)
 {
     tr_variant val;
-    const char* end = NULL;
+    char const* end = NULL;
     char* saved;
-    const size_t len = strlen(str);
+    size_t const len = strlen(str);
     size_t savedLen;
     int err;
 
@@ -188,7 +188,7 @@ static int testParse(void)
     tr_variant* child;
     tr_variant* child2;
     char buf[512];
-    const char* end;
+    char const* end;
     int err;
     size_t len;
     int64_t i;
@@ -286,7 +286,7 @@ static int testParse(void)
     tr_snprintf((char*)buf, sizeof(buf), "lld1:bi32e1:ai64eeee");
     err = tr_variantFromBencFull(&val, buf, sizeof(buf), NULL, &end);
     check(!err);
-    check(end == buf + strlen((const char*)buf));
+    check(end == buf + strlen((char const*)buf));
     check((child = tr_variantListChild(&val, 0)));
     check((child2 = tr_variantListChild(child, 0)));
     saved = tr_variantToStr(&val, TR_VARIANT_FMT_BENC, &len);
@@ -335,7 +335,7 @@ static void stripWhitespace(char* in)
     *out = '\0';
 }
 
-static int testJSONSnippet(const char* benc_str, const char* expected)
+static int testJSONSnippet(char const* benc_str, char const* expected)
 {
     tr_variant top;
     char* serialized;
@@ -359,8 +359,8 @@ static int testJSONSnippet(const char* benc_str, const char* expected)
 static int testJSON(void)
 {
     int val;
-    const char* benc_str;
-    const char* expected;
+    char const* benc_str;
+    char const* expected;
 
     benc_str = "i6e";
     expected = "6";
@@ -410,15 +410,15 @@ static int testMerge(void)
     size_t len;
     tr_variant dest, src;
     int64_t i;
-    const char* s;
-    const tr_quark i1 = tr_quark_new("i1", 2);
-    const tr_quark i2 = tr_quark_new("i2", 2);
-    const tr_quark i3 = tr_quark_new("i3", 2);
-    const tr_quark i4 = tr_quark_new("i4", 2);
-    const tr_quark s5 = tr_quark_new("s5", 2);
-    const tr_quark s6 = tr_quark_new("s6", 2);
-    const tr_quark s7 = tr_quark_new("s7", 2);
-    const tr_quark s8 = tr_quark_new("s8", 2);
+    char const* s;
+    tr_quark const i1 = tr_quark_new("i1", 2);
+    tr_quark const i2 = tr_quark_new("i2", 2);
+    tr_quark const i3 = tr_quark_new("i3", 2);
+    tr_quark const i4 = tr_quark_new("i4", 2);
+    tr_quark const s5 = tr_quark_new("s5", 2);
+    tr_quark const s6 = tr_quark_new("s6", 2);
+    tr_quark const s7 = tr_quark_new("s7", 2);
+    tr_quark const s8 = tr_quark_new("s8", 2);
 
     /* initial dictionary (default values) */
     tr_variantInitDict(&dest, 10);
@@ -472,10 +472,10 @@ static int testStackSmash(void)
     size_t len;
     int err;
     char* in;
-    const char* end;
+    char const* end;
     tr_variant val;
     char* saved;
-    const int depth = STACK_SMASH_DEPTH;
+    int const depth = STACK_SMASH_DEPTH;
 
     in = tr_new(char, depth * 2 + 1);
 
@@ -503,10 +503,10 @@ static int testBool(void)
     tr_variant top;
     int64_t intVal;
     bool boolVal;
-    const tr_quark key1 = tr_quark_new("key1", 4);
-    const tr_quark key2 = tr_quark_new("key2", 4);
-    const tr_quark key3 = tr_quark_new("key3", 4);
-    const tr_quark key4 = tr_quark_new("key4", 4);
+    tr_quark const key1 = tr_quark_new("key1", 4);
+    tr_quark const key2 = tr_quark_new("key2", 4);
+    tr_quark const key3 = tr_quark_new("key3", 4);
+    tr_quark const key4 = tr_quark_new("key4", 4);
 
     tr_variantInitDict(&top, 0);
 
@@ -540,17 +540,17 @@ static int testParse2(void)
     tr_variant top;
     tr_variant top2;
     int64_t intVal;
-    const char* strVal;
+    char const* strVal;
     double realVal;
     bool boolVal;
     size_t len;
     char* benc;
-    const char* end;
+    char const* end;
     size_t strLen;
-    const tr_quark key_bool = tr_quark_new("this-is-a-bool", TR_BAD_SIZE);
-    const tr_quark key_real = tr_quark_new("this-is-a-real", TR_BAD_SIZE);
-    const tr_quark key_int = tr_quark_new("this-is-an-int", TR_BAD_SIZE);
-    const tr_quark key_str = tr_quark_new("this-is-a-string", TR_BAD_SIZE);
+    tr_quark const key_bool = tr_quark_new("this-is-a-bool", TR_BAD_SIZE);
+    tr_quark const key_real = tr_quark_new("this-is-a-real", TR_BAD_SIZE);
+    tr_quark const key_int = tr_quark_new("this-is-an-int", TR_BAD_SIZE);
+    tr_quark const key_str = tr_quark_new("this-is-a-string", TR_BAD_SIZE);
 
     tr_variantInitDict(&top, 0);
     tr_variantDictAddBool(&top, key_bool, true);
@@ -583,7 +583,7 @@ static int testParse2(void)
 
 int main(void)
 {
-    static const testFunc tests[] =
+    static testFunc const tests[] =
     {
         testInt,
         testStr,

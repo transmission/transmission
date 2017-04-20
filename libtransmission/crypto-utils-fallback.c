@@ -43,7 +43,7 @@ static void tr_dh_secret_align(struct tr_dh_secret* handle, size_t current_key_l
     tr_dh_align_key(handle->key, current_key_length, handle->key_length);
 }
 
-bool tr_dh_secret_derive(tr_dh_secret_t raw_handle, const void* prepend_data, size_t prepend_data_size, const void* append_data,
+bool tr_dh_secret_derive(tr_dh_secret_t raw_handle, void const* prepend_data, size_t prepend_data_size, void const* append_data,
     size_t append_data_size, uint8_t* hash)
 {
     struct tr_dh_secret* handle = raw_handle;

@@ -41,7 +41,7 @@
 
 #define MY_NAME "tr_crypto_utils"
 
-static void log_polarssl_error(int error_code, const char* file, int line)
+static void log_polarssl_error(int error_code, char const* file, int line)
 {
     if (tr_logLevelIsActive(TR_LOG_ERROR))
     {
@@ -61,9 +61,9 @@ static void log_polarssl_error(int error_code, const char* file, int line)
 
 #define log_error(error_code) log_polarssl_error((error_code), __FILE__, __LINE__)
 
-static bool check_polarssl_result(int result, int expected_result, const char* file, int line)
+static bool check_polarssl_result(int result, int expected_result, char const* file, int line)
 {
-    const bool ret = result == expected_result;
+    bool const ret = result == expected_result;
 
     if (!ret)
     {
@@ -145,7 +145,7 @@ tr_sha1_ctx_t tr_sha1_init(void)
     return handle;
 }
 
-bool tr_sha1_update(tr_sha1_ctx_t handle, const void* data, size_t data_length)
+bool tr_sha1_update(tr_sha1_ctx_t handle, void const* data, size_t data_length)
 {
     assert(handle != NULL);
 
@@ -201,7 +201,7 @@ void tr_rc4_free(tr_rc4_ctx_t handle)
     tr_free(handle);
 }
 
-void tr_rc4_set_key(tr_rc4_ctx_t handle, const uint8_t* key, size_t key_length)
+void tr_rc4_set_key(tr_rc4_ctx_t handle, uint8_t const* key, size_t key_length)
 {
     assert(handle != NULL);
     assert(key != NULL);
@@ -209,7 +209,7 @@ void tr_rc4_set_key(tr_rc4_ctx_t handle, const uint8_t* key, size_t key_length)
     API(arc4_setup)(handle, key, key_length);
 }
 
-void tr_rc4_process(tr_rc4_ctx_t handle, const void* input, void* output, size_t length)
+void tr_rc4_process(tr_rc4_ctx_t handle, void const* input, void* output, size_t length)
 {
     assert(handle != NULL);
 
@@ -228,7 +228,7 @@ void tr_rc4_process(tr_rc4_ctx_t handle, const void* input, void* output, size_t
 ****
 ***/
 
-tr_dh_ctx_t tr_dh_new(const uint8_t* prime_num, size_t prime_num_length, const uint8_t* generator_num,
+tr_dh_ctx_t tr_dh_new(uint8_t const* prime_num, size_t prime_num_length, uint8_t const* generator_num,
     size_t generator_num_length)
 {
     API(dhm_context) * handle = tr_new0(API(dhm_context), 1);
@@ -277,7 +277,7 @@ bool tr_dh_make_key(tr_dh_ctx_t raw_handle, size_t private_key_length, uint8_t* 
     return check_result(API(dhm_make_public)(handle, private_key_length, public_key, handle->len, my_rand, NULL));
 }
 
-tr_dh_secret_t tr_dh_agree(tr_dh_ctx_t raw_handle, const uint8_t* other_public_key, size_t other_public_key_length)
+tr_dh_secret_t tr_dh_agree(tr_dh_ctx_t raw_handle, uint8_t const* other_public_key, size_t other_public_key_length)
 {
     API(dhm_context) * handle = raw_handle;
     struct tr_dh_secret* ret;

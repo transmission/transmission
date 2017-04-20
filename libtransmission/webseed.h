@@ -16,4 +16,4 @@ typedef struct tr_webseed tr_webseed;
 
 #include "peer-common.h"
 
-tr_webseed* tr_webseedNew(struct tr_torrent* torrent, const char* url, tr_peer_callback callback, void* callback_data);
+tr_webseed* tr_webseedNew(struct tr_torrent* torrent, char const* url, tr_peer_callback callback, void* callback_data);

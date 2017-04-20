@@ -36,14 +36,14 @@ enum
 ****
 ***/
 
-static void getProgressString(GString* gstr, const tr_torrent* tor, const tr_info* info, const tr_stat* st)
+static void getProgressString(GString* gstr, tr_torrent const* tor, tr_info const* info, tr_stat const* st)
 {
-    const int isDone = st->leftUntilDone == 0;
-    const uint64_t haveTotal = st->haveUnchecked + st->haveValid;
-    const int isSeed = st->haveValid >= info->totalSize;
+    int const isDone = st->leftUntilDone == 0;
+    uint64_t const haveTotal = st->haveUnchecked + st->haveValid;
+    int const isSeed = st->haveValid >= info->totalSize;
     char buf1[32], buf2[32], buf3[32], buf4[32], buf5[32], buf6[32];
     double seedRatio;
-    const gboolean hasSeedRatio = tr_torrentGetSeedRatio(tor, &seedRatio);
+    gboolean const hasSeedRatio = tr_torrentGetSeedRatio(tor, &seedRatio);
 
     if (!isDone) /* downloading */
     {
@@ -122,7 +122,7 @@ static void getProgressString(GString* gstr, const tr_torrent* tor, const tr_inf
     /* add time when downloading */
     if ((st->activity == TR_STATUS_DOWNLOAD) || (hasSeedRatio && (st->activity == TR_STATUS_SEED)))
     {
-        const int eta = st->eta;
+        int const eta = st->eta;
         g_string_append(gstr, " - ");
 
         if (eta < 0)
@@ -139,12 +139,12 @@ static void getProgressString(GString* gstr, const tr_torrent* tor, const tr_inf
     }
 }
 
-static char* getShortTransferString(const tr_torrent* tor, const tr_stat* st, double uploadSpeed_KBps,
+static char* getShortTransferString(tr_torrent const* tor, tr_stat const* st, double uploadSpeed_KBps,
     double downloadSpeed_KBps, char* buf, size_t buflen)
 {
-    const int haveMeta = tr_torrentHasMetadata(tor);
-    const int haveUp = haveMeta && st->peersGettingFromUs > 0;
-    const int haveDown = haveMeta && ((st->peersSendingToUs > 0) || (st->webseedsSendingToUs > 0));
+    int const haveMeta = tr_torrentHasMetadata(tor);
+    int const haveUp = haveMeta && st->peersGettingFromUs > 0;
+    int const haveDown = haveMeta && ((st->peersSendingToUs > 0) || (st->webseedsSendingToUs > 0));
 
     if (haveDown)
     {
@@ -176,7 +176,7 @@ static char* getShortTransferString(const tr_torrent* tor, const tr_stat* st, do
     return buf;
 }
 
-static void getShortStatusString(GString* gstr, const tr_torrent* tor, const tr_stat* st, double uploadSpeed_KBps,
+static void getShortStatusString(GString* gstr, tr_torrent const* tor, tr_stat const* st, double uploadSpeed_KBps,
     double downloadSpeed_KBps)
 {
     switch (st->activity)
@@ -219,12 +219,12 @@ static void getShortStatusString(GString* gstr, const tr_torrent* tor, const tr_
     }
 }
 
-static void getStatusString(GString* gstr, const tr_torrent* tor, const tr_stat* st, const double uploadSpeed_KBps,
-    const double downloadSpeed_KBps)
+static void getStatusString(GString* gstr, tr_torrent const* tor, tr_stat const* st, double const uploadSpeed_KBps,
+    double const downloadSpeed_KBps)
 {
     if (st->error)
     {
-        const char* fmt[] =
+        char const* fmt[] =
         {
             NULL,
             N_("Tracker gave a warning: \"%s\""),
@@ -327,10 +327,10 @@ struct TorrentCellRendererPrivate
 ****
 ***/
 
-static GdkPixbuf* get_icon(const tr_torrent* tor, GtkIconSize icon_size, GtkWidget* for_widget)
+static GdkPixbuf* get_icon(tr_torrent const* tor, GtkIconSize icon_size, GtkWidget* for_widget)
 {
-    const char* mime_type;
-    const tr_info* info = tr_torrentInfo(tor);
+    char const* mime_type;
+    tr_info const* info = tr_torrentInfo(tor);
 
     if (info->fileCount == 0)
     {
@@ -368,12 +368,12 @@ static void get_size_compact(TorrentCellRenderer* cell, GtkWidget* widget, gint*
     GtkRequisition icon_size;
     GtkRequisition name_size;
     GtkRequisition stat_size;
-    const char* name;
+    char const* name;
     GdkPixbuf* icon;
 
     struct TorrentCellRendererPrivate* p = cell->priv;
-    const tr_torrent* tor = p->tor;
-    const tr_stat* st = tr_torrentStatCached((tr_torrent*)tor);
+    tr_torrent const* tor = p->tor;
+    tr_stat const* st = tr_torrentStatCached((tr_torrent*)tor);
     GString* gstr_stat = p->gstr1;
 
     icon = get_icon(tor, COMPACT_ICON_SIZE, widget);
@@ -419,13 +419,13 @@ static void get_size_full(TorrentCellRenderer* cell, GtkWidget* widget, gint* wi
     GtkRequisition name_size;
     GtkRequisition stat_size;
     GtkRequisition prog_size;
-    const char* name;
+    char const* name;
     GdkPixbuf* icon;
 
     struct TorrentCellRendererPrivate* p = cell->priv;
-    const tr_torrent* tor = p->tor;
-    const tr_stat* st = tr_torrentStatCached((tr_torrent*)tor);
-    const tr_info* inf = tr_torrentInfo(tor);
+    tr_torrent const* tor = p->tor;
+    tr_stat const* st = tr_torrentStatCached((tr_torrent*)tor);
+    tr_info const* inf = tr_torrentInfo(tor);
     GString* gstr_prog = p->gstr1;
     GString* gstr_stat = p->gstr2;
 
@@ -466,7 +466,7 @@ static void get_size_full(TorrentCellRenderer* cell, GtkWidget* widget, gint* wi
     g_object_unref(icon);
 }
 
-static void torrent_cell_renderer_get_size(GtkCellRenderer* cell, GtkWidget* widget, const GdkRectangle* cell_area,
+static void torrent_cell_renderer_get_size(GtkCellRenderer* cell, GtkWidget* widget, GdkRectangle const* cell_area,
     gint* x_offset, gint* y_offset, gint* width, gint* height)
 {
     TorrentCellRenderer* self = TORRENT_CELL_RENDERER(cell);
@@ -512,9 +512,9 @@ static void torrent_cell_renderer_get_size(GtkCellRenderer* cell, GtkWidget* wid
 typedef GdkRGBA GtrColor;
 #define FOREGROUND_COLOR_KEY "foreground-rgba"
 
-static void get_text_color(GtkWidget* w, const tr_stat* st, GtrColor* setme)
+static void get_text_color(GtkWidget* w, tr_stat const* st, GtrColor* setme)
 {
-    static const GdkRGBA red = { 1.0, 0, 0, 0 };
+    static GdkRGBA const red = { 1.0, 0, 0, 0 };
 
     if (st->error)
     {
@@ -531,7 +531,7 @@ static void get_text_color(GtkWidget* w, const tr_stat* st, GtrColor* setme)
 }
 
 
-static double get_percent_done(const tr_torrent* tor, const tr_stat* st, bool* seed)
+static double get_percent_done(tr_torrent const* tor, tr_stat const* st, bool* seed)
 {
     double d;
 
@@ -552,13 +552,13 @@ static double get_percent_done(const tr_torrent* tor, const tr_stat* st, bool* s
 typedef cairo_t GtrDrawable;
 
 static void gtr_cell_renderer_render(GtkCellRenderer* renderer, GtrDrawable* drawable, GtkWidget* widget,
-    const GdkRectangle* area, GtkCellRendererState flags)
+    GdkRectangle const* area, GtkCellRendererState flags)
 {
     gtk_cell_renderer_render(renderer, drawable, widget, area, area, flags);
 }
 
 static void render_compact(TorrentCellRenderer* cell, GtrDrawable* window, GtkWidget* widget,
-    const GdkRectangle* background_area, const GdkRectangle* cell_area UNUSED, GtkCellRendererState flags)
+    GdkRectangle const* background_area, GdkRectangle const* cell_area UNUSED, GtkCellRendererState flags)
 {
     int xpad, ypad;
     GtkRequisition size;
@@ -567,18 +567,18 @@ static void render_compact(TorrentCellRenderer* cell, GtrDrawable* window, GtkWi
     GdkRectangle stat_area;
     GdkRectangle prog_area;
     GdkRectangle fill_area;
-    const char* name;
+    char const* name;
     GdkPixbuf* icon;
     GtrColor text_color;
     bool seed;
 
     struct TorrentCellRendererPrivate* p = cell->priv;
-    const tr_torrent* tor = p->tor;
-    const tr_stat* st = tr_torrentStatCached((tr_torrent*)tor);
-    const gboolean active = (st->activity != TR_STATUS_STOPPED) && (st->activity != TR_STATUS_DOWNLOAD_WAIT) &&
+    tr_torrent const* tor = p->tor;
+    tr_stat const* st = tr_torrentStatCached((tr_torrent*)tor);
+    gboolean const active = (st->activity != TR_STATUS_STOPPED) && (st->activity != TR_STATUS_DOWNLOAD_WAIT) &&
         (st->activity != TR_STATUS_SEED_WAIT);
-    const double percentDone = get_percent_done(tor, st, &seed);
-    const gboolean sensitive = active || st->error;
+    double const percentDone = get_percent_done(tor, st, &seed);
+    gboolean const sensitive = active || st->error;
     GString* gstr_stat = p->gstr1;
 
     icon = get_icon(tor, COMPACT_ICON_SIZE, widget);
@@ -631,8 +631,8 @@ static void render_compact(TorrentCellRenderer* cell, GtrDrawable* window, GtkWi
     g_object_unref(icon);
 }
 
-static void render_full(TorrentCellRenderer* cell, GtrDrawable* window, GtkWidget* widget, const GdkRectangle* background_area,
-    const GdkRectangle* cell_area UNUSED, GtkCellRendererState flags)
+static void render_full(TorrentCellRenderer* cell, GtrDrawable* window, GtkWidget* widget, GdkRectangle const* background_area,
+    GdkRectangle const* cell_area UNUSED, GtkCellRendererState flags)
 {
     int xpad, ypad;
     GtkRequisition size;
@@ -642,19 +642,19 @@ static void render_full(TorrentCellRenderer* cell, GtrDrawable* window, GtkWidge
     GdkRectangle stat_area;
     GdkRectangle prog_area;
     GdkRectangle prct_area;
-    const char* name;
+    char const* name;
     GdkPixbuf* icon;
     GtrColor text_color;
     bool seed;
 
     struct TorrentCellRendererPrivate* p = cell->priv;
-    const tr_torrent* tor = p->tor;
-    const tr_stat* st = tr_torrentStatCached((tr_torrent*)tor);
-    const tr_info* inf = tr_torrentInfo(tor);
-    const gboolean active = (st->activity != TR_STATUS_STOPPED) && (st->activity != TR_STATUS_DOWNLOAD_WAIT) &&
+    tr_torrent const* tor = p->tor;
+    tr_stat const* st = tr_torrentStatCached((tr_torrent*)tor);
+    tr_info const* inf = tr_torrentInfo(tor);
+    gboolean const active = (st->activity != TR_STATUS_STOPPED) && (st->activity != TR_STATUS_DOWNLOAD_WAIT) &&
         (st->activity != TR_STATUS_SEED_WAIT);
-    const double percentDone = get_percent_done(tor, st, &seed);
-    const gboolean sensitive = active || st->error;
+    double const percentDone = get_percent_done(tor, st, &seed);
+    gboolean const sensitive = active || st->error;
     GString* gstr_prog = p->gstr1;
     GString* gstr_stat = p->gstr2;
 
@@ -742,7 +742,7 @@ static void render_full(TorrentCellRenderer* cell, GtrDrawable* window, GtkWidge
 }
 
 static void torrent_cell_renderer_render(GtkCellRenderer* cell, GtrDrawable* window, GtkWidget* widget,
-    const GdkRectangle* background_area, const GdkRectangle* cell_area, GtkCellRendererState flags)
+    GdkRectangle const* background_area, GdkRectangle const* cell_area, GtkCellRendererState flags)
 {
     TorrentCellRenderer* self = TORRENT_CELL_RENDERER(cell);
 
@@ -770,7 +770,7 @@ static void torrent_cell_renderer_render(GtkCellRenderer* cell, GtrDrawable* win
 #endif
 }
 
-static void torrent_cell_renderer_set_property(GObject* object, guint property_id, const GValue* v, GParamSpec* pspec)
+static void torrent_cell_renderer_set_property(GObject* object, guint property_id, GValue const* v, GParamSpec* pspec)
 {
     TorrentCellRenderer* self = TORRENT_CELL_RENDERER(object);
     struct TorrentCellRendererPrivate* p = self->priv;
@@ -805,7 +805,7 @@ static void torrent_cell_renderer_set_property(GObject* object, guint property_i
 
 static void torrent_cell_renderer_get_property(GObject* object, guint property_id, GValue* v, GParamSpec* pspec)
 {
-    const TorrentCellRenderer* self = TORRENT_CELL_RENDERER(object);
+    TorrentCellRenderer const* self = TORRENT_CELL_RENDERER(object);
     struct TorrentCellRendererPrivate* p = self->priv;
 
     switch (property_id)

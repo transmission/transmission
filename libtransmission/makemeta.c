@@ -36,7 +36,7 @@ struct FileList
     struct FileList* next;
 };
 
-static struct FileList* getFiles(const char* dir, const char* base, struct FileList* list)
+static struct FileList* getFiles(char const* dir, char const* base, struct FileList* list)
 {
     if (dir == NULL || base == NULL)
     {
@@ -60,7 +60,7 @@ static struct FileList* getFiles(const char* dir, const char* base, struct FileL
 
     if (info.type == TR_SYS_PATH_IS_DIRECTORY && (odir = tr_sys_dir_open(buf, NULL)) != TR_BAD_SYS_DIR)
     {
-        const char* name;
+        char const* name;
 
         while ((name = tr_sys_dir_read_name(odir, NULL)) != NULL)
         {
@@ -87,9 +87,9 @@ static struct FileList* getFiles(const char* dir, const char* base, struct FileL
 
 static uint32_t bestPieceSize(uint64_t totalSize)
 {
-    const uint32_t KiB = 1024;
-    const uint32_t MiB = 1048576;
-    const uint32_t GiB = 1073741824;
+    uint32_t const KiB = 1024;
+    uint32_t const MiB = 1048576;
+    uint32_t const GiB = 1073741824;
 
     if (totalSize >= (2 * GiB))
     {
@@ -124,15 +124,15 @@ static uint32_t bestPieceSize(uint64_t totalSize)
     return 32 * KiB; /* less than 50 meg */
 }
 
-static int builderFileCompare(const void* va, const void* vb)
+static int builderFileCompare(void const* va, void const* vb)
 {
-    const tr_metainfo_builder_file* a = va;
-    const tr_metainfo_builder_file* b = vb;
+    tr_metainfo_builder_file const* a = va;
+    tr_metainfo_builder_file const* b = vb;
 
     return evutil_ascii_strcasecmp(a->filename, b->filename);
 }
 
-tr_metainfo_builder* tr_metaInfoBuilderCreate(const char* topFileArg)
+tr_metainfo_builder* tr_metaInfoBuilderCreate(char const* topFileArg)
 {
     int i;
     struct FileList* files;
@@ -183,7 +183,7 @@ tr_metainfo_builder* tr_metaInfoBuilderCreate(const char* topFileArg)
 
 static bool isValidPieceSize(uint32_t n)
 {
-    const bool isPowerOfTwo = !(n == 0) && !(n & (n - 1));
+    bool const isPowerOfTwo = !(n == 0) && !(n & (n - 1));
 
     return isPowerOfTwo;
 }
@@ -277,14 +277,14 @@ static uint8_t* getHashInfo(tr_metainfo_builder* b)
     while (totalRemain)
     {
         uint8_t* bufptr = buf;
-        const uint32_t thisPieceSize = (uint32_t)MIN(b->pieceSize, totalRemain);
+        uint32_t const thisPieceSize = (uint32_t)MIN(b->pieceSize, totalRemain);
         uint64_t leftInPiece = thisPieceSize;
 
         assert(b->pieceIndex < b->pieceCount);
 
         while (leftInPiece)
         {
-            const uint64_t n_this_pass = MIN(b->files[fileIndex].size - off, leftInPiece);
+            uint64_t const n_this_pass = MIN(b->files[fileIndex].size - off, leftInPiece);
             uint64_t n_read = 0;
             tr_sys_file_read(fd, bufptr, n_this_pass, &n_read, NULL);
             bufptr += n_read;
@@ -342,7 +342,7 @@ static uint8_t* getHashInfo(tr_metainfo_builder* b)
     return ret;
 }
 
-static void getFileInfo(const char* topFile, const tr_metainfo_builder_file* file, tr_variant* uninitialized_length,
+static void getFileInfo(char const* topFile, tr_metainfo_builder_file const* file, tr_variant* uninitialized_length,
     tr_variant* uninitialized_path)
 {
     size_t offset;
@@ -365,7 +365,7 @@ static void getFileInfo(const char* topFile, const tr_metainfo_builder_file* fil
     {
         char* filename = tr_strdup(file->filename + offset);
         char* walk = filename;
-        const char* token;
+        char const* token;
 
         while ((token = tr_strsep(&walk, TR_PATH_DELIMITER_STR)))
         {
@@ -559,8 +559,8 @@ static void makeMetaWorkerFunc(void* unused UNUSED)
     workerThread = NULL;
 }
 
-void tr_makeMetaInfo(tr_metainfo_builder* builder, const char* outputFile, const tr_tracker_info* trackers, int trackerCount,
-    const char* comment, bool isPrivate)
+void tr_makeMetaInfo(tr_metainfo_builder* builder, char const* outputFile, tr_tracker_info const* trackers, int trackerCount,
+    char const* comment, bool isPrivate)
 {
     int i;
     tr_lock* lock;

@@ -108,7 +108,7 @@ static int piperead(tr_pipe_end_t s, void* buf, int len)
 
     if (ret < 0)
     {
-        const int werror = WSAGetLastError();
+        int const werror = WSAGetLastError();
 
         switch (werror)
         {
@@ -200,8 +200,8 @@ static void readFromPipe(evutil_socket_t fd, short eventType, void* veh)
     case 'r': /* run in libevent thread */
         {
             struct tr_run_data data;
-            const size_t nwant = sizeof(data);
-            const ev_ssize_t ngot = piperead(fd, &data, nwant);
+            size_t const nwant = sizeof(data);
+            ev_ssize_t const ngot = piperead(fd, &data, nwant);
 
             if (!eh->die && (ngot == (ev_ssize_t)nwant))
             {
@@ -229,7 +229,7 @@ static void readFromPipe(evutil_socket_t fd, short eventType, void* veh)
     }
 }
 
-static void logFunc(int severity, const char* message)
+static void logFunc(int severity, char const* message)
 {
     if (severity >= _EVENT_LOG_ERR)
     {
@@ -321,7 +321,7 @@ void tr_eventClose(tr_session* session)
 ***
 **/
 
-bool tr_amInEventThread(const tr_session* session)
+bool tr_amInEventThread(tr_session const* session)
 {
     assert(tr_isSession(session));
     assert(session->events != NULL);

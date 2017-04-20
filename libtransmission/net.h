@@ -94,22 +94,22 @@ typedef struct tr_address
     } addr;
 } tr_address;
 
-extern const tr_address tr_inaddr_any;
-extern const tr_address tr_in6addr_any;
+extern tr_address const tr_inaddr_any;
+extern tr_address const tr_in6addr_any;
 
-const char* tr_address_to_string(const tr_address* addr);
+char const* tr_address_to_string(tr_address const* addr);
 
-const char* tr_address_to_string_with_buf(const tr_address* addr, char* buf, size_t buflen);
+char const* tr_address_to_string_with_buf(tr_address const* addr, char* buf, size_t buflen);
 
-bool tr_address_from_string(tr_address* setme, const char* string);
+bool tr_address_from_string(tr_address* setme, char const* string);
 
-bool tr_address_from_sockaddr_storage(tr_address* setme, tr_port* port, const struct sockaddr_storage* src);
+bool tr_address_from_sockaddr_storage(tr_address* setme, tr_port* port, struct sockaddr_storage const* src);
 
-int tr_address_compare(const tr_address* a, const tr_address* b);
+int tr_address_compare(tr_address const* a, tr_address const* b);
 
-bool tr_address_is_valid_for_peers(const tr_address* addr, tr_port port);
+bool tr_address_is_valid_for_peers(tr_address const* addr, tr_port port);
 
-static inline bool tr_address_is_valid(const tr_address* a)
+static inline bool tr_address_is_valid(tr_address const* a)
 {
     return (a != NULL) && (a->type == TR_AF_INET || a->type == TR_AF_INET6);
 }
@@ -120,17 +120,17 @@ static inline bool tr_address_is_valid(const tr_address* a)
 
 struct tr_session;
 
-tr_socket_t tr_netOpenPeerSocket(tr_session* session, const tr_address* addr, tr_port port, bool clientIsSeed);
+tr_socket_t tr_netOpenPeerSocket(tr_session* session, tr_address const* addr, tr_port port, bool clientIsSeed);
 
-struct UTPSocket* tr_netOpenPeerUTPSocket(tr_session* session, const tr_address* addr, tr_port port, bool clientIsSeed);
+struct UTPSocket* tr_netOpenPeerUTPSocket(tr_session* session, tr_address const* addr, tr_port port, bool clientIsSeed);
 
-tr_socket_t tr_netBindTCP(const tr_address* addr, tr_port port, bool suppressMsgs);
+tr_socket_t tr_netBindTCP(tr_address const* addr, tr_port port, bool suppressMsgs);
 
 tr_socket_t tr_netAccept(tr_session* session, tr_socket_t bound, tr_address* setme_addr, tr_port* setme_port);
 
 void tr_netSetTOS(tr_socket_t s, int tos);
 
-void tr_netSetCongestionControl(tr_socket_t s, const char* algorithm);
+void tr_netSetCongestionControl(tr_socket_t s, char const* algorithm);
 
 void tr_netClose(tr_session* session, tr_socket_t s);
 
@@ -144,4 +144,4 @@ bool tr_net_hasIPv6(tr_port);
  */
 char* tr_net_strerror(char* buf, size_t buflen, int err);
 
-const unsigned char* tr_globalIPv6(void);
+unsigned char const* tr_globalIPv6(void);

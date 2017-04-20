@@ -63,10 +63,10 @@ tr_watchdir_kqueue;
 
 static void tr_watchdir_kqueue_on_event(evutil_socket_t fd UNUSED, short type UNUSED, void* context)
 {
-    const tr_watchdir_t handle = context;
+    tr_watchdir_t const handle = context;
     tr_watchdir_kqueue* const backend = BACKEND_UPCAST(tr_watchdir_get_backend(handle));
     struct kevent ke;
-    const struct timespec ts = { 0, 0 };
+    struct timespec const ts = { 0, 0 };
 
     if (kevent(backend->kq, NULL, 0, &ke, 1, &ts) == -1)
     {
@@ -112,7 +112,7 @@ static void tr_watchdir_kqueue_free(tr_watchdir_backend* backend_base)
 
 tr_watchdir_backend* tr_watchdir_kqueue_new(tr_watchdir_t handle)
 {
-    const char* const path = tr_watchdir_get_path(handle);
+    char const* const path = tr_watchdir_get_path(handle);
     struct kevent ke;
     tr_watchdir_kqueue* backend;
 

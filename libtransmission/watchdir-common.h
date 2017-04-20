@@ -30,7 +30,7 @@ struct event_base* tr_watchdir_get_event_base(tr_watchdir_t handle);
 
 /* ... */
 
-void tr_watchdir_process(tr_watchdir_t handle, const char* name);
+void tr_watchdir_process(tr_watchdir_t handle, char const* name);
 
 void tr_watchdir_scan(tr_watchdir_t handle, struct tr_ptrArray* dir_entries);
 

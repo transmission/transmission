@@ -19,7 +19,7 @@ namespace
 class PathIteratorBase
 {
 protected:
-    PathIteratorBase(const QString& path, int slashIndex) :
+    PathIteratorBase(QString const& path, int slashIndex) :
         myPath(path),
         mySlashIndex(slashIndex),
         myToken()
@@ -28,19 +28,19 @@ protected:
     }
 
 protected:
-    const QString& myPath;
+    QString const& myPath;
     int mySlashIndex;
     QString myToken;
 
-    static const QChar SlashChar;
+    static QChar const SlashChar;
 };
 
-const QChar PathIteratorBase::SlashChar = QLatin1Char('/');
+QChar const PathIteratorBase::SlashChar = QLatin1Char('/');
 
 class ForwardPathIterator : public PathIteratorBase
 {
 public:
-    ForwardPathIterator(const QString& path) :
+    ForwardPathIterator(QString const& path) :
         PathIteratorBase(path, path.size() - 1)
     {
     }
@@ -50,7 +50,7 @@ public:
         return mySlashIndex > 0;
     }
 
-    const QString& next()
+    QString const& next()
     {
         int newSlashIndex = myPath.lastIndexOf(SlashChar, mySlashIndex);
         myToken.truncate(0);
@@ -63,7 +63,7 @@ public:
 class BackwardPathIterator : public PathIteratorBase
 {
 public:
-    BackwardPathIterator(const QString& path) :
+    BackwardPathIterator(QString const& path) :
         PathIteratorBase(path, 0)
     {
     }
@@ -73,7 +73,7 @@ public:
         return mySlashIndex < myPath.size();
     }
 
-    const QString& next()
+    QString const& next()
     {
         int newSlashIndex = myPath.indexOf(SlashChar, mySlashIndex);
 
@@ -111,7 +111,7 @@ void FileTreeModel::setEditable(bool editable)
     myIsEditable = editable;
 }
 
-FileTreeItem* FileTreeModel::itemFromIndex(const QModelIndex& index) const
+FileTreeItem* FileTreeModel::itemFromIndex(QModelIndex const& index) const
 {
     if (!index.isValid())
     {
@@ -122,7 +122,7 @@ FileTreeItem* FileTreeModel::itemFromIndex(const QModelIndex& index) const
     return static_cast<FileTreeItem*>(index.internalPointer());
 }
 
-QModelIndexList FileTreeModel::getOrphanIndices(const QModelIndexList& indices) const
+QModelIndexList FileTreeModel::getOrphanIndices(QModelIndexList const& indices) const
 {
     QModelIndexList orphanIndices = indices;
 
@@ -152,7 +152,7 @@ QModelIndexList FileTreeModel::getOrphanIndices(const QModelIndexList& indices) 
     return orphanIndices;
 }
 
-QVariant FileTreeModel::data(const QModelIndex& index, int role) const
+QVariant FileTreeModel::data(QModelIndex const& index, int role) const
 {
     QVariant value;
 
@@ -164,7 +164,7 @@ QVariant FileTreeModel::data(const QModelIndex& index, int role) const
     return value;
 }
 
-Qt::ItemFlags FileTreeModel::flags(const QModelIndex& index) const
+Qt::ItemFlags FileTreeModel::flags(QModelIndex const& index) const
 {
     int i(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
 
@@ -181,7 +181,7 @@ Qt::ItemFlags FileTreeModel::flags(const QModelIndex& index) const
     return Qt::ItemFlags(i);
 }
 
-bool FileTreeModel::setData(const QModelIndex& index, const QVariant& newname, int role)
+bool FileTreeModel::setData(QModelIndex const& index, QVariant const& newname, int role)
 {
     if (role == Qt::EditRole)
     {
@@ -229,7 +229,7 @@ QVariant FileTreeModel::headerData(int column, Qt::Orientation orientation, int 
     return data;
 }
 
-QModelIndex FileTreeModel::index(int row, int column, const QModelIndex& parent) const
+QModelIndex FileTreeModel::index(int row, int column, QModelIndex const& parent) const
 {
     QModelIndex i;
 
@@ -257,12 +257,12 @@ QModelIndex FileTreeModel::index(int row, int column, const QModelIndex& parent)
     return i;
 }
 
-QModelIndex FileTreeModel::parent(const QModelIndex& child) const
+QModelIndex FileTreeModel::parent(QModelIndex const& child) const
 {
     return parent(child, 0); // QAbstractItemModel::parent() wants col 0
 }
 
-QModelIndex FileTreeModel::parent(const QModelIndex& child, int column) const
+QModelIndex FileTreeModel::parent(QModelIndex const& child, int column) const
 {
     QModelIndex parent;
 
@@ -274,7 +274,7 @@ QModelIndex FileTreeModel::parent(const QModelIndex& child, int column) const
     return parent;
 }
 
-int FileTreeModel::rowCount(const QModelIndex& parent) const
+int FileTreeModel::rowCount(QModelIndex const& parent) const
 {
     FileTreeItem* parentItem;
 
@@ -290,7 +290,7 @@ int FileTreeModel::rowCount(const QModelIndex& parent) const
     return parentItem->childCount();
 }
 
-int FileTreeModel::columnCount(const QModelIndex& parent) const
+int FileTreeModel::columnCount(QModelIndex const& parent) const
 {
     Q_UNUSED(parent);
 
@@ -307,7 +307,7 @@ QModelIndex FileTreeModel::indexOf(FileTreeItem* item, int column) const
     return createIndex(item->row(), column, item);
 }
 
-void FileTreeModel::clearSubtree(const QModelIndex& top)
+void FileTreeModel::clearSubtree(QModelIndex const& top)
 {
     size_t i = rowCount(top);
 
@@ -345,7 +345,7 @@ FileTreeItem* FileTreeModel::findItemForFileIndex(int fileIndex) const
     return myIndexCache.value(fileIndex, 0);
 }
 
-void FileTreeModel::addFile(int fileIndex, const QString& filename, bool wanted, int priority, uint64_t totalSize,
+void FileTreeModel::addFile(int fileIndex, QString const& filename, bool wanted, int priority, uint64_t totalSize,
     uint64_t have, bool updateFields)
 {
     FileTreeItem* item;
@@ -359,8 +359,8 @@ void FileTreeModel::addFile(int fileIndex, const QString& filename, bool wanted,
 
         while (filenameIt.hasNext())
         {
-            const QString& token = filenameIt.next();
-            const std::pair<int, int> changed = item->update(token, wanted, priority, have, updateFields);
+            QString const& token = filenameIt.next();
+            std::pair<int, int> const changed = item->update(token, wanted, priority, have, updateFields);
 
             if (changed.first >= 0)
             {
@@ -391,14 +391,14 @@ void FileTreeModel::addFile(int fileIndex, const QString& filename, bool wanted,
 
         while (filenameIt.hasNext())
         {
-            const QString& token = filenameIt.next();
+            QString const& token = filenameIt.next();
             FileTreeItem* child(item->child(token));
 
             if (!child)
             {
                 added = true;
                 QModelIndex parentIndex(indexOf(item, 0));
-                const int n(item->childCount());
+                int const n(item->childCount());
 
                 beginInsertRows(parentIndex, n, n);
 
@@ -425,7 +425,7 @@ void FileTreeModel::addFile(int fileIndex, const QString& filename, bool wanted,
 
             myIndexCache[fileIndex] = item;
 
-            const std::pair<int, int> changed = item->update(item->name(), wanted, priority, have, added || updateFields);
+            std::pair<int, int> const changed = item->update(item->name(), wanted, priority, have, added || updateFields);
 
             if (changed.first >= 0)
             {
@@ -435,7 +435,7 @@ void FileTreeModel::addFile(int fileIndex, const QString& filename, bool wanted,
     }
 }
 
-void FileTreeModel::emitParentsChanged(const QModelIndex& index, int firstColumn, int lastColumn,
+void FileTreeModel::emitParentsChanged(QModelIndex const& index, int firstColumn, int lastColumn,
     QSet<QModelIndex>* visitedParentIndices)
 {
     assert(firstColumn <= lastColumn);
@@ -465,11 +465,11 @@ void FileTreeModel::emitParentsChanged(const QModelIndex& index, int firstColumn
     }
 }
 
-void FileTreeModel::emitSubtreeChanged(const QModelIndex& index, int firstColumn, int lastColumn)
+void FileTreeModel::emitSubtreeChanged(QModelIndex const& index, int firstColumn, int lastColumn)
 {
     assert(firstColumn <= lastColumn);
 
-    const int childCount = rowCount(index);
+    int const childCount = rowCount(index);
 
     if (!childCount)
     {
@@ -486,13 +486,13 @@ void FileTreeModel::emitSubtreeChanged(const QModelIndex& index, int firstColumn
     }
 }
 
-void FileTreeModel::twiddleWanted(const QModelIndexList& indices)
+void FileTreeModel::twiddleWanted(QModelIndexList const& indices)
 {
     QMap<bool, QModelIndexList> wantedIndices;
 
-    for (const QModelIndex& i : getOrphanIndices(indices))
+    for (QModelIndex const& i : getOrphanIndices(indices))
     {
-        const FileTreeItem* const item = itemFromIndex(i);
+        FileTreeItem const* const item = itemFromIndex(i);
         wantedIndices[item->isSubtreeWanted() != Qt::Checked] << i;
     }
 
@@ -505,13 +505,13 @@ void FileTreeModel::twiddleWanted(const QModelIndexList& indices)
     }
 }
 
-void FileTreeModel::twiddlePriority(const QModelIndexList& indices)
+void FileTreeModel::twiddlePriority(QModelIndexList const& indices)
 {
     QMap<int, QModelIndexList> priorityIndices;
 
-    for (const QModelIndex& i : getOrphanIndices(indices))
+    for (QModelIndex const& i : getOrphanIndices(indices))
     {
-        const FileTreeItem* const item = itemFromIndex(i);
+        FileTreeItem const* const item = itemFromIndex(i);
         int priority = item->priority();
 
         // ... -> normal -> high -> low -> normal -> ...; mixed -> normal
@@ -540,18 +540,18 @@ void FileTreeModel::twiddlePriority(const QModelIndexList& indices)
     }
 }
 
-void FileTreeModel::setWanted(const QModelIndexList& indices, bool wanted)
+void FileTreeModel::setWanted(QModelIndexList const& indices, bool wanted)
 {
     if (indices.isEmpty())
     {
         return;
     }
 
-    const QModelIndexList orphanIndices = getOrphanIndices(indices);
+    QModelIndexList const orphanIndices = getOrphanIndices(indices);
 
     QSet<int> fileIds;
 
-    for (const QModelIndex& i : orphanIndices)
+    for (QModelIndex const& i : orphanIndices)
     {
         FileTreeItem* const item = itemFromIndex(i);
         item->setSubtreeWanted(wanted, fileIds);
@@ -563,7 +563,7 @@ void FileTreeModel::setWanted(const QModelIndexList& indices, bool wanted)
     // emit parent changes separately to avoid multiple updates for same items
     QSet<QModelIndex> parentIndices;
 
-    for (const QModelIndex& i : orphanIndices)
+    for (QModelIndex const& i : orphanIndices)
     {
         emitParentsChanged(i, COL_SIZE, COL_WANTED, &parentIndices);
     }
@@ -574,18 +574,18 @@ void FileTreeModel::setWanted(const QModelIndexList& indices, bool wanted)
     }
 }
 
-void FileTreeModel::setPriority(const QModelIndexList& indices, int priority)
+void FileTreeModel::setPriority(QModelIndexList const& indices, int priority)
 {
     if (indices.isEmpty())
     {
         return;
     }
 
-    const QModelIndexList orphanIndices = getOrphanIndices(indices);
+    QModelIndexList const orphanIndices = getOrphanIndices(indices);
 
     QSet<int> fileIds;
 
-    for (const QModelIndex& i : orphanIndices)
+    for (QModelIndex const& i : orphanIndices)
     {
         FileTreeItem* const item = itemFromIndex(i);
         item->setSubtreePriority(priority, fileIds);
@@ -597,7 +597,7 @@ void FileTreeModel::setPriority(const QModelIndexList& indices, int priority)
     // emit parent changes separately to avoid multiple updates for same items
     QSet<QModelIndex> parentIndices;
 
-    for (const QModelIndex& i : orphanIndices)
+    for (QModelIndex const& i : orphanIndices)
     {
         emitParentsChanged(i, COL_PRIORITY, COL_PRIORITY, &parentIndices);
     }
@@ -608,7 +608,7 @@ void FileTreeModel::setPriority(const QModelIndexList& indices, int priority)
     }
 }
 
-bool FileTreeModel::openFile(const QModelIndex& index)
+bool FileTreeModel::openFile(QModelIndex const& index)
 {
     if (!index.isValid())
     {

@@ -37,8 +37,8 @@ struct tr_session_id
 
 static char* generate_new_session_id_value(void)
 {
-    const char pool[] = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    const size_t pool_size = sizeof(pool) - 1;
+    char const pool[] = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    size_t const pool_size = sizeof(pool) - 1;
 
     char* buf = tr_new(char, SESSION_ID_SIZE + 1);
 
@@ -54,7 +54,7 @@ static char* generate_new_session_id_value(void)
     return buf;
 }
 
-static char* get_session_id_lock_file_path(const char* session_id)
+static char* get_session_id_lock_file_path(char const* session_id)
 {
     char* lock_file_dir = tr_getSessionIdDir();
     char* lock_file_path = tr_strdup_printf("%s/tr_session_id_%s", lock_file_dir, session_id);
@@ -62,7 +62,7 @@ static char* get_session_id_lock_file_path(const char* session_id)
     return lock_file_path;
 }
 
-static tr_sys_file_t create_session_id_lock_file(const char* session_id)
+static tr_sys_file_t create_session_id_lock_file(char const* session_id)
 {
     if (session_id == NULL)
     {
@@ -101,7 +101,7 @@ static tr_sys_file_t create_session_id_lock_file(const char* session_id)
     return lock_file;
 }
 
-static void destroy_session_id_lock_file(tr_sys_file_t lock_file, const char* session_id)
+static void destroy_session_id_lock_file(tr_sys_file_t lock_file, char const* session_id)
 {
     if (lock_file != TR_BAD_SYS_FILE)
     {
@@ -118,7 +118,7 @@ static void destroy_session_id_lock_file(tr_sys_file_t lock_file, const char* se
 
 tr_session_id_t tr_session_id_new(void)
 {
-    const tr_session_id_t session_id = tr_new0(struct tr_session_id, 1);
+    tr_session_id_t const session_id = tr_new0(struct tr_session_id, 1);
 
     session_id->current_lock_file = TR_BAD_SYS_FILE;
     session_id->previous_lock_file = TR_BAD_SYS_FILE;
@@ -142,9 +142,9 @@ void tr_session_id_free(tr_session_id_t session_id)
     tr_free(session_id);
 }
 
-const char* tr_session_id_get_current(tr_session_id_t session_id)
+char const* tr_session_id_get_current(tr_session_id_t session_id)
 {
-    const time_t now = tr_time();
+    time_t const now = tr_time();
 
     if (session_id->current_value == NULL || now >= session_id->expires_at)
     {
@@ -163,7 +163,7 @@ const char* tr_session_id_get_current(tr_session_id_t session_id)
     return session_id->current_value;
 }
 
-bool tr_session_id_is_local(const char* session_id)
+bool tr_session_id_is_local(char const* session_id)
 {
     bool ret = false;
 

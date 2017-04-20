@@ -40,7 +40,7 @@ private:
     void updateBlocklistLabel();
     void updateDownloadingWidgetsLocality();
 
-    void setPref(int key, const QVariant& v);
+    void setPref(int key, QVariant const& v);
 
     void initDownloadingTab();
     void initSeedingTab();
@@ -55,7 +55,7 @@ private slots:
     void spinBoxEditingFinished();
     void timeEditingFinished();
     void lineEditingFinished();
-    void pathChanged(const QString& path);
+    void pathChanged(QString const& path);
     void refreshPref(int key);
     void encryptionEdited(int);
     void altSpeedDaysEdited(int);
@@ -76,7 +76,7 @@ private:
 
     Ui::PrefsDialog ui;
 
-    const bool myIsServer;
+    bool const myIsServer;
     bool myIsLocal;
 
     key2widget_t myWidgets;

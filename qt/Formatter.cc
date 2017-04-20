@@ -109,23 +109,23 @@ QString Formatter::sizeToString(int64_t bytes)
     return QString::fromUtf8(buf);
 }
 
-QString Formatter::speedToString(const Speed& speed)
+QString Formatter::speedToString(Speed const& speed)
 {
     char buf[128];
     tr_formatter_speed_KBps(buf, speed.KBps(), sizeof(buf));
     return QString::fromUtf8(buf);
 }
 
-QString Formatter::uploadSpeedToString(const Speed& uploadSpeed)
+QString Formatter::uploadSpeedToString(Speed const& uploadSpeed)
 {
-    static const QChar uploadSymbol(0x25B4);
+    static QChar const uploadSymbol(0x25B4);
 
     return tr("%1 %2").arg(speedToString(uploadSpeed)).arg(uploadSymbol);
 }
 
-QString Formatter::downloadSpeedToString(const Speed& downloadSpeed)
+QString Formatter::downloadSpeedToString(Speed const& downloadSpeed)
 {
-    static const QChar downloadSymbol(0x25BE);
+    static QChar const downloadSymbol(0x25BE);
 
     return tr("%1 %2").arg(speedToString(downloadSpeed)).arg(downloadSymbol);
 }

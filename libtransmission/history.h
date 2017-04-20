@@ -52,4 +52,4 @@ void tr_historyAdd(tr_recentHistory*, time_t when, unsigned int n);
  * @param when the current time in sec, such as from tr_time ()
  * @param seconds how many seconds to count back through.
  */
-unsigned int tr_historyGet(const tr_recentHistory*, time_t when, unsigned int seconds);
+unsigned int tr_historyGet(tr_recentHistory const*, time_t when, unsigned int seconds);

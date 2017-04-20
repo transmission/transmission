@@ -51,14 +51,14 @@
 namespace
 {
 
-const char* PREF_KEY("pref-key");
+char const* PREF_KEY("pref-key");
 
 void setPrefKey(QObject* object, int key)
 {
     object->setProperty(PREF_KEY, key);
 }
 
-int getPrefKey(const QObject* object)
+int getPrefKey(QObject const* object)
 {
     return object->property(PREF_KEY).toInt();
 }
@@ -203,14 +203,14 @@ void PrefsDialog::checkBoxToggled(bool checked)
 
 void PrefsDialog::spinBoxEditingFinished()
 {
-    const QObject* spin = sender();
-    const int key = getPrefKey(spin);
+    QObject const* spin = sender();
+    int const key = getPrefKey(spin);
 
-    if (auto e = qobject_cast<const QDoubleSpinBox*>(spin))
+    if (auto e = qobject_cast<QDoubleSpinBox const*>(spin))
     {
         setPref(key, e->value());
     }
-    else if (auto e = qobject_cast<const QSpinBox*>(spin))
+    else if (auto e = qobject_cast<QSpinBox const*>(spin))
     {
         setPref(key, e->value());
     }
@@ -218,7 +218,7 @@ void PrefsDialog::spinBoxEditingFinished()
 
 void PrefsDialog::timeEditingFinished()
 {
-    if (auto e = qobject_cast<const QTimeEdit*>(sender()))
+    if (auto e = qobject_cast<QTimeEdit const*>(sender()))
     {
         setPref(getPrefKey(e), QTime(0, 0).secsTo(e->time()) / 60);
     }
@@ -226,7 +226,7 @@ void PrefsDialog::timeEditingFinished()
 
 void PrefsDialog::lineEditingFinished()
 {
-    if (auto e = qobject_cast<const QLineEdit*>(sender()))
+    if (auto e = qobject_cast<QLineEdit const*>(sender()))
     {
         if (e->isModified())
         {
@@ -235,9 +235,9 @@ void PrefsDialog::lineEditingFinished()
     }
 }
 
-void PrefsDialog::pathChanged(const QString& path)
+void PrefsDialog::pathChanged(QString const& path)
 {
-    if (auto b = qobject_cast<const PathButton*>(sender()))
+    if (auto b = qobject_cast<PathButton const*>(sender()))
     {
         setPref(getPrefKey(b), path);
     }
@@ -271,14 +271,14 @@ void PrefsDialog::initRemoteTab()
 
 void PrefsDialog::altSpeedDaysEdited(int i)
 {
-    const int value = qobject_cast<QComboBox*>(sender())->itemData(i).toInt();
+    int const value = qobject_cast<QComboBox*>(sender())->itemData(i).toInt();
     setPref(Prefs::ALT_SPEED_LIMIT_TIME_DAY, value);
 }
 
 void PrefsDialog::initSpeedTab()
 {
-    const QString speed_K_str = Formatter::unitStr(Formatter::SPEED, Formatter::KB);
-    const QLocale locale;
+    QString const speed_K_str = Formatter::unitStr(Formatter::SPEED, Formatter::KB);
+    QLocale const locale;
 
     ui.uploadSpeedLimitSpin->setSuffix(QString::fromLatin1(" %1").arg(speed_K_str));
     ui.downloadSpeedLimitSpin->setSuffix(QString::fromLatin1(" %1").arg(speed_K_str));
@@ -415,7 +415,7 @@ void PrefsDialog::onUpdateBlocklistClicked()
 
 void PrefsDialog::encryptionEdited(int i)
 {
-    const int value(qobject_cast<QComboBox*>(sender())->itemData(i).toInt());
+    int const value(qobject_cast<QComboBox*>(sender())->itemData(i).toInt());
     setPref(Prefs::ENCRYPTION, value);
 }
 
@@ -450,7 +450,7 @@ void PrefsDialog::initPrivacyTab()
 void PrefsDialog::onIdleLimitChanged()
 {
     //: Spin box suffix, "Stop seeding if idle for: [ 5 minutes ]" (includes leading space after the number, if needed)
-    const QString unitsSuffix = tr(" minute(s)", 0, ui.idleLimitSpin->value());
+    QString const unitsSuffix = tr(" minute(s)", 0, ui.idleLimitSpin->value());
 
     if (ui.idleLimitSpin->suffix() != unitsSuffix)
     {
@@ -473,7 +473,7 @@ void PrefsDialog::initSeedingTab()
 void PrefsDialog::onQueueStalledMinutesChanged()
 {
     //: Spin box suffix, "Download is inactive if data sharing stopped: [ 5 minutes ago ]" (includes leading space after the number, if needed)
-    const QString unitsSuffix = tr(" minute(s) ago", 0, ui.queueStalledMinutesSpin->value());
+    QString const unitsSuffix = tr(" minute(s) ago", 0, ui.queueStalledMinutesSpin->value());
 
     if (ui.queueStalledMinutesSpin->suffix() != unitsSuffix)
     {
@@ -573,7 +573,7 @@ PrefsDialog::PrefsDialog(Session& session, Prefs& prefs, QWidget* parent) :
         Prefs::BLOCKLIST_ENABLED << Prefs::DIR_WATCH << Prefs::DOWNLOAD_DIR << Prefs::INCOMPLETE_DIR <<
         Prefs::INCOMPLETE_DIR_ENABLED << Prefs::SCRIPT_TORRENT_DONE_FILENAME;
 
-    for (const int key : keys)
+    for (int const key : keys)
     {
         refreshPref(key);
     }
@@ -596,7 +596,7 @@ PrefsDialog::~PrefsDialog()
 {
 }
 
-void PrefsDialog::setPref(int key, const QVariant& v)
+void PrefsDialog::setPref(int key, QVariant const& v)
 {
     myPrefs.set(key, v);
     refreshPref(key);
@@ -608,7 +608,7 @@ void PrefsDialog::setPref(int key, const QVariant& v)
 
 void PrefsDialog::sessionUpdated()
 {
-    const bool isLocal = mySession.isLocal();
+    bool const isLocal = mySession.isLocal();
 
     if (myIsLocal != isLocal)
     {
@@ -621,7 +621,7 @@ void PrefsDialog::sessionUpdated()
 
 void PrefsDialog::updateBlocklistLabel()
 {
-    const int n = mySession.blocklistSize();
+    int const n = mySession.blocklistSize();
     ui.blocklistStatusLabel->setText(tr("<i>Blocklist contains %Ln rule(s)</i>", 0, n));
 }
 
@@ -633,9 +633,9 @@ void PrefsDialog::refreshPref(int key)
     case Prefs::RPC_WHITELIST_ENABLED:
     case Prefs::RPC_AUTH_REQUIRED:
         {
-            const bool enabled(myPrefs.getBool(Prefs::RPC_ENABLED));
-            const bool whitelist(myPrefs.getBool(Prefs::RPC_WHITELIST_ENABLED));
-            const bool auth(myPrefs.getBool(Prefs::RPC_AUTH_REQUIRED));
+            bool const enabled(myPrefs.getBool(Prefs::RPC_ENABLED));
+            bool const whitelist(myPrefs.getBool(Prefs::RPC_WHITELIST_ENABLED));
+            bool const auth(myPrefs.getBool(Prefs::RPC_AUTH_REQUIRED));
 
             for (QWidget* const w : myWebWhitelistWidgets)
             {
@@ -657,7 +657,7 @@ void PrefsDialog::refreshPref(int key)
 
     case Prefs::ALT_SPEED_LIMIT_TIME_ENABLED:
         {
-            const bool enabled = myPrefs.getBool(key);
+            bool const enabled = myPrefs.getBool(key);
 
             for (QWidget* const w : mySchedWidgets)
             {
@@ -669,7 +669,7 @@ void PrefsDialog::refreshPref(int key)
 
     case Prefs::BLOCKLIST_ENABLED:
         {
-            const bool enabled = myPrefs.getBool(key);
+            bool const enabled = myPrefs.getBool(key);
 
             for (QWidget* const w : myBlockWidgets)
             {
@@ -699,7 +699,7 @@ void PrefsDialog::refreshPref(int key)
             if (key == Prefs::ENCRYPTION)
             {
                 QComboBox* comboBox(qobject_cast<QComboBox*>(w));
-                const int index = comboBox->findData(myPrefs.getInt(key));
+                int const index = comboBox->findData(myPrefs.getInt(key));
                 comboBox->setCurrentIndex(index);
             }
         }

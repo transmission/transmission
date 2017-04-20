@@ -67,7 +67,7 @@ static gboolean is_pinned_to_new(struct MsgData* data)
         if (gtk_tree_view_get_visible_range(data->view, NULL, &last_visible))
         {
             GtkTreeIter iter;
-            const int row_count = gtk_tree_model_iter_n_children(data->sort, NULL);
+            int const row_count = gtk_tree_model_iter_n_children(data->sort, NULL);
 
             if (gtk_tree_model_iter_nth_child(data->sort, &iter, NULL, row_count - 1))
             {
@@ -88,7 +88,7 @@ static void scroll_to_bottom(struct MsgData* data)
     if (data->sort != NULL)
     {
         GtkTreeIter iter;
-        const int row_count = gtk_tree_model_iter_n_children(data->sort, NULL);
+        int const row_count = gtk_tree_model_iter_n_children(data->sort, NULL);
 
         if (gtk_tree_model_iter_nth_child(data->sort, &iter, NULL, row_count - 1))
         {
@@ -106,8 +106,8 @@ static void scroll_to_bottom(struct MsgData* data)
 static void level_combo_changed_cb(GtkComboBox* combo_box, gpointer gdata)
 {
     struct MsgData* data = gdata;
-    const int level = gtr_combo_box_get_active_enum(combo_box);
-    const gboolean pinned_to_new = is_pinned_to_new(data);
+    int const level = gtr_combo_box_get_active_enum(combo_box);
+    gboolean const pinned_to_new = is_pinned_to_new(data);
 
     tr_logSetLevel(level);
     gtr_core_set_pref_int(data->core, TR_KEY_message_level, level);
@@ -124,7 +124,7 @@ static void level_combo_changed_cb(GtkComboBox* combo_box, gpointer gdata)
 static char* gtr_localtime(time_t time)
 {
     char buf[256], *eoln;
-    const struct tm tm = *localtime(&time);
+    struct tm const tm = *localtime(&time);
 
     g_strlcpy(buf, asctime(&tm), sizeof(buf));
 
@@ -136,7 +136,7 @@ static char* gtr_localtime(time_t time)
     return g_locale_to_utf8(buf, -1, NULL, NULL, NULL);
 }
 
-static void doSave(GtkWindow* parent, struct MsgData* data, const char* filename)
+static void doSave(GtkWindow* parent, struct MsgData* data, char const* filename)
 {
     FILE* fp = fopen(filename, "w+");
 
@@ -157,8 +157,8 @@ static void doSave(GtkWindow* parent, struct MsgData* data, const char* filename
             do
             {
                 char* date;
-                const char* levelStr;
-                const struct tr_log_message* node;
+                char const* levelStr;
+                struct tr_log_message const* node;
 
                 gtk_tree_model_get(model, &iter, COL_TR_MSG, &node, -1);
                 date = gtr_localtime(node->when);
@@ -227,7 +227,7 @@ static void onPauseToggled(GtkToggleToolButton* w, gpointer gdata)
     data->isPaused = gtk_toggle_tool_button_get_active(w);
 }
 
-static const char* getForegroundColor(int msgLevel)
+static char const* getForegroundColor(int msgLevel)
 {
     switch (msgLevel)
     {
@@ -249,9 +249,9 @@ static const char* getForegroundColor(int msgLevel)
 static void renderText(GtkTreeViewColumn* column UNUSED, GtkCellRenderer* renderer, GtkTreeModel* tree_model, GtkTreeIter* iter,
     gpointer gcol)
 {
-    const int col = GPOINTER_TO_INT(gcol);
+    int const col = GPOINTER_TO_INT(gcol);
     char* str = NULL;
-    const struct tr_log_message* node;
+    struct tr_log_message const* node;
 
     gtk_tree_model_get(tree_model, iter, col, &str, COL_TR_MSG, &node, -1);
     g_object_set(renderer, "text", str, "foreground", getForegroundColor(node->level), "ellipsize", PANGO_ELLIPSIZE_END, NULL);
@@ -262,7 +262,7 @@ static void renderTime(GtkTreeViewColumn* column UNUSED, GtkCellRenderer* render
 {
     struct tm tm;
     char buf[16];
-    const struct tr_log_message* node;
+    struct tr_log_message const* node;
 
     gtk_tree_model_get(tree_model, iter, COL_TR_MSG, &node, -1);
     tm = *localtime(&node->when);
@@ -274,7 +274,7 @@ static void appendColumn(GtkTreeView* view, int col)
 {
     GtkCellRenderer*    r;
     GtkTreeViewColumn* c;
-    const char* title = NULL;
+    char const* title = NULL;
 
     switch (col)
     {
@@ -333,8 +333,8 @@ static void appendColumn(GtkTreeView* view, int col)
 
 static gboolean isRowVisible(GtkTreeModel* model, GtkTreeIter* iter, gpointer gdata)
 {
-    const struct tr_log_message* node;
-    const struct MsgData* data = gdata;
+    struct tr_log_message const* node;
+    struct MsgData const* data = gdata;
 
     gtk_tree_model_get(model, iter, COL_TR_MSG, &node, -1);
 
@@ -354,11 +354,11 @@ static tr_log_message* addMessages(GtkListStore* store, struct tr_log_message* h
 {
     tr_log_message* i;
     static unsigned int sequence = 0;
-    const char* default_name = g_get_application_name();
+    char const* default_name = g_get_application_name();
 
     for (i = head; i && i->next; i = i->next)
     {
-        const char* name = i->name ? i->name : default_name;
+        char const* name = i->name ? i->name : default_name;
 
         gtk_list_store_insert_with_values(store, NULL, 0,
             COL_TR_MSG, i,
@@ -389,7 +389,7 @@ static tr_log_message* addMessages(GtkListStore* store, struct tr_log_message* h
 static gboolean onRefresh(gpointer gdata)
 {
     struct MsgData* data = gdata;
-    const gboolean pinned_to_new = is_pinned_to_new(data);
+    gboolean const pinned_to_new = is_pinned_to_new(data);
 
     if (!data->isPaused)
     {

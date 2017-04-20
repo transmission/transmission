@@ -28,14 +28,14 @@ typedef struct tr_list
 }
 tr_list;
 
-typedef int (* TrListCompareFunc)(const void* a, const void* b);
+typedef int (* TrListCompareFunc)(void const* a, void const* b);
 typedef void (* TrListForeachFunc)(void*);
 
 /**
  * @brief return the number of items in the list
  * @return the number of items in the list
  */
-int tr_list_size(const tr_list* list);
+int tr_list_size(tr_list const* list);
 
 /**
  * @brief free the specified list and set its pointer to NULL
@@ -71,7 +71,7 @@ void* tr_list_pop_front(tr_list** list);
  * @param data data to remove
  * @return the removed data pointer, or NULL if no match was found
  */
-void* tr_list_remove_data(tr_list** list, const void* data);
+void* tr_list_remove_data(tr_list** list, void const* data);
 
 /**
  * @brief remove the list's node that compares equal to "b" when compared with "compare_func"
@@ -80,7 +80,7 @@ void* tr_list_remove_data(tr_list** list, const void* data);
  * @param compare_func the comparison function. The arguments passed to it will be the list's pointers and the comparison key "b"
  * @return the removed data pointer, or NULL if no match was found
  */
-void* tr_list_remove(tr_list** list, const void* b, TrListCompareFunc compare_func);
+void* tr_list_remove(tr_list** list, void const* b, TrListCompareFunc compare_func);
 
 /**
  * @brief find the list node whose data that compares equal to "b" when compared with "compare_func"
@@ -89,7 +89,7 @@ void* tr_list_remove(tr_list** list, const void* b, TrListCompareFunc compare_fu
  * @param compare_func the comparison function. The arguments passed to it will be the list's pointers and the comparison key "b"
  * @return the matching list node, or NULL if not match was found
  */
-tr_list* tr_list_find(tr_list* list, const void* b, TrListCompareFunc compare_func);
+tr_list* tr_list_find(tr_list* list, void const* b, TrListCompareFunc compare_func);
 
 /**
  * @brief Insert in an ordered list

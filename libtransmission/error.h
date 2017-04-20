@@ -47,7 +47,7 @@ tr_error;
  *
  * @return Newly allocated error object on success, `NULL` otherwise.
  */
-tr_error* tr_error_new(int code, const char* message_format, ...) TR_GNUC_PRINTF(2, 3);
+tr_error* tr_error_new(int code, char const* message_format, ...) TR_GNUC_PRINTF(2, 3);
 
 /**
  * @brief Create new error object using literal error message.
@@ -57,7 +57,7 @@ tr_error* tr_error_new(int code, const char* message_format, ...) TR_GNUC_PRINTF
  *
  * @return Newly allocated error object on success, `NULL` otherwise.
  */
-tr_error* tr_error_new_literal(int code, const char* message);
+tr_error* tr_error_new_literal(int code, char const* message);
 
 /**
  * @brief Create new error object using `vprintf`-style formatting.
@@ -68,7 +68,7 @@ tr_error* tr_error_new_literal(int code, const char* message);
  *
  * @return Newly allocated error object on success, `NULL` otherwise.
  */
-tr_error* tr_error_new_valist(int code, const char* message_format, va_list args);
+tr_error* tr_error_new_valist(int code, char const* message_format, va_list args);
 
 /**
  * @brief Free memory used by error object.
@@ -87,7 +87,7 @@ void tr_error_free(tr_error* error);
  * @param[in]     message_format Error message format string.
  * @param[in]     ...            Format arguments.
  */
-void tr_error_set(tr_error** error, int code, const char* message_format, ...) TR_GNUC_PRINTF(3, 4);
+void tr_error_set(tr_error** error, int code, char const* message_format, ...) TR_GNUC_PRINTF(3, 4);
 
 /**
  * @brief Create and set new error object using literal error message.
@@ -98,7 +98,7 @@ void tr_error_set(tr_error** error, int code, const char* message_format, ...) T
  * @param[in]     code    Error code (platform-specific).
  * @param[in]     message Error message.
  */
-void tr_error_set_literal(tr_error** error, int code, const char* message);
+void tr_error_set_literal(tr_error** error, int code, char const* message);
 
 /**
  * @brief Propagate existing error object upwards.
@@ -132,7 +132,7 @@ void tr_error_clear(tr_error** error);
  * @param[in]     prefix_format Prefix format string.
  * @param[in]     ...           Format arguments.
  */
-void tr_error_prefix(tr_error** error, const char* prefix_format, ...) TR_GNUC_PRINTF(2, 3);
+void tr_error_prefix(tr_error** error, char const* prefix_format, ...) TR_GNUC_PRINTF(2, 3);
 
 /**
  * @brief Prefix message and propagate existing error object upwards.
@@ -146,7 +146,7 @@ void tr_error_prefix(tr_error** error, const char* prefix_format, ...) TR_GNUC_P
  * @param[in] prefix_format Prefix format string.
  * @param[in] ... Format arguments.
  */
-void tr_error_propagate_prefixed(tr_error** new_error, tr_error** old_error, const char* prefix_format, ...) TR_GNUC_PRINTF(3,
+void tr_error_propagate_prefixed(tr_error** new_error, tr_error** old_error, char const* prefix_format, ...) TR_GNUC_PRINTF(3,
     4);
 
 /** @} */

@@ -51,8 +51,8 @@ static bool verifyTorrent(tr_torrent* tor, bool* stopFlag)
     tr_file_index_t fileIndex = 0;
     tr_file_index_t prevFileIndex = !fileIndex;
     tr_piece_index_t pieceIndex = 0;
-    const time_t begin = tr_time();
-    const size_t buflen = 1024 * 128; /* 128 KiB buffer */
+    time_t const begin = tr_time();
+    size_t const buflen = 1024 * 128; /* 128 KiB buffer */
     uint8_t* buffer = tr_valloc(buflen);
 
     sha = tr_sha1_init();
@@ -65,7 +65,7 @@ static bool verifyTorrent(tr_torrent* tor, bool* stopFlag)
         uint64_t leftInPiece;
         uint64_t bytesThisPass;
         uint64_t leftInFile;
-        const tr_file* file = &tor->info.files[fileIndex];
+        tr_file const* file = &tor->info.files[fileIndex];
 
         /* if we're starting a new piece... */
         if (piecePos == 0)
@@ -248,14 +248,14 @@ static void verifyThreadFunc(void* unused UNUSED)
     tr_lockUnlock(getVerifyLock());
 }
 
-static int compareVerifyByPriorityAndSize(const void* va, const void* vb)
+static int compareVerifyByPriorityAndSize(void const* va, void const* vb)
 {
-    const struct verify_node* a = va;
-    const struct verify_node* b = vb;
+    struct verify_node const* a = va;
+    struct verify_node const* b = vb;
 
     /* higher priority comes before lower priority */
-    const tr_priority_t pa = tr_torrentGetPriority(a->torrent);
-    const tr_priority_t pb = tr_torrentGetPriority(b->torrent);
+    tr_priority_t const pa = tr_torrentGetPriority(a->torrent);
+    tr_priority_t const pb = tr_torrentGetPriority(b->torrent);
 
     if (pa != pb)
     {
@@ -301,10 +301,10 @@ void tr_verifyAdd(tr_torrent* tor, tr_verify_done_func callback_func, void* call
     tr_lockUnlock(getVerifyLock());
 }
 
-static int compareVerifyByTorrent(const void* va, const void* vb)
+static int compareVerifyByTorrent(void const* va, void const* vb)
 {
-    const struct verify_node* a = va;
-    const tr_torrent* b = vb;
+    struct verify_node const* a = va;
+    tr_torrent const* b = vb;
     return a->torrent - b;
 }
 

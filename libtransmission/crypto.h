@@ -43,31 +43,31 @@ typedef struct
 tr_crypto;
 
 /** @brief construct a new tr_crypto object */
-void tr_cryptoConstruct(tr_crypto* crypto, const uint8_t* torrentHash, bool isIncoming);
+void tr_cryptoConstruct(tr_crypto* crypto, uint8_t const* torrentHash, bool isIncoming);
 
 /** @brief destruct an existing tr_crypto object */
 void tr_cryptoDestruct(tr_crypto* crypto);
 
-void tr_cryptoSetTorrentHash(tr_crypto* crypto, const uint8_t* torrentHash);
+void tr_cryptoSetTorrentHash(tr_crypto* crypto, uint8_t const* torrentHash);
 
-const uint8_t* tr_cryptoGetTorrentHash(const tr_crypto* crypto);
+uint8_t const* tr_cryptoGetTorrentHash(tr_crypto const* crypto);
 
-bool tr_cryptoHasTorrentHash(const tr_crypto* crypto);
+bool tr_cryptoHasTorrentHash(tr_crypto const* crypto);
 
-bool tr_cryptoComputeSecret(tr_crypto* crypto, const uint8_t* peerPublicKey);
+bool tr_cryptoComputeSecret(tr_crypto* crypto, uint8_t const* peerPublicKey);
 
-const uint8_t* tr_cryptoGetMyPublicKey(const tr_crypto* crypto, int* setme_len);
+uint8_t const* tr_cryptoGetMyPublicKey(tr_crypto const* crypto, int* setme_len);
 
 void tr_cryptoDecryptInit(tr_crypto* crypto);
 
-void tr_cryptoDecrypt(tr_crypto* crypto, size_t buflen, const void* buf_in, void* buf_out);
+void tr_cryptoDecrypt(tr_crypto* crypto, size_t buflen, void const* buf_in, void* buf_out);
 
 void tr_cryptoEncryptInit(tr_crypto* crypto);
 
-void tr_cryptoEncrypt(tr_crypto* crypto, size_t buflen, const void* buf_in, void* buf_out);
+void tr_cryptoEncrypt(tr_crypto* crypto, size_t buflen, void const* buf_in, void* buf_out);
 
-bool tr_cryptoSecretKeySha1(const tr_crypto* crypto, const void* prepend_data, size_t prepend_data_size,
-    const void* append_data, size_t append_data_size, uint8_t* hash);
+bool tr_cryptoSecretKeySha1(tr_crypto const* crypto, void const* prepend_data, size_t prepend_data_size,
+    void const* append_data, size_t append_data_size, uint8_t* hash);
 
 /* @} */
 

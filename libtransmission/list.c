@@ -11,7 +11,7 @@
 #include "platform.h"
 #include "utils.h"
 
-static const tr_list TR_LIST_CLEAR = { NULL, NULL, NULL };
+static tr_list const TR_LIST_CLEAR = { NULL, NULL, NULL };
 
 static tr_list* recycled_nodes = NULL;
 
@@ -124,7 +124,7 @@ void tr_list_append(tr_list** list, void* data)
     }
 }
 
-static tr_list* tr_list_find_data(tr_list* list, const void* data)
+static tr_list* tr_list_find_data(tr_list* list, void const* data)
 {
     for (; list; list = list->next)
     {
@@ -176,17 +176,17 @@ void* tr_list_pop_front(tr_list** list)
     return ret;
 }
 
-void* tr_list_remove_data(tr_list** list, const void* data)
+void* tr_list_remove_data(tr_list** list, void const* data)
 {
     return tr_list_remove_node(list, tr_list_find_data(*list, data));
 }
 
-void* tr_list_remove(tr_list** list, const void* b, TrListCompareFunc compare_func)
+void* tr_list_remove(tr_list** list, void const* b, TrListCompareFunc compare_func)
 {
     return tr_list_remove_node(list, tr_list_find(*list, b, compare_func));
 }
 
-tr_list* tr_list_find(tr_list* list, const void* b, TrListCompareFunc func)
+tr_list* tr_list_find(tr_list* list, void const* b, TrListCompareFunc func)
 {
     for (; list; list = list->next)
     {
@@ -206,7 +206,7 @@ void tr_list_insert_sorted(tr_list** list, void* data, TrListCompareFunc compare
 
     for (l = *list; l != NULL; l = l->next)
     {
-        const int c = (compare)(data, l->data);
+        int const c = (compare)(data, l->data);
 
         if (c <= 0)
         {
@@ -233,7 +233,7 @@ void tr_list_insert_sorted(tr_list** list, void* data, TrListCompareFunc compare
     }
 }
 
-int tr_list_size(const tr_list* list)
+int tr_list_size(tr_list const* list)
 {
     int size = 0;
 

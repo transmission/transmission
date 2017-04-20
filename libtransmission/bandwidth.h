@@ -126,7 +126,7 @@ void tr_bandwidthConstruct(tr_bandwidth* bandwidth, tr_session* session, tr_band
 void tr_bandwidthDestruct(tr_bandwidth* bandwidth);
 
 /** @brief test to see if the pointer refers to a live bandwidth object */
-static inline bool tr_isBandwidth(const tr_bandwidth* b)
+static inline bool tr_isBandwidth(tr_bandwidth const* b)
 {
     return (b != NULL) && (b->magicNumber == BANDWIDTH_MAGIC_NUMBER);
 }
@@ -143,7 +143,7 @@ static inline bool tr_isBandwidth(const tr_bandwidth* b)
 static inline bool tr_bandwidthSetDesiredSpeed_Bps(tr_bandwidth* bandwidth, tr_direction dir, unsigned int desiredSpeed)
 {
     unsigned int* value = &bandwidth->band[dir].desiredSpeed_Bps;
-    const bool didChange = desiredSpeed != *value;
+    bool const didChange = desiredSpeed != *value;
     *value = desiredSpeed;
     return didChange;
 }
@@ -152,7 +152,7 @@ static inline bool tr_bandwidthSetDesiredSpeed_Bps(tr_bandwidth* bandwidth, tr_d
  * @brief Get the desired speed for the bandwidth subtree.
  * @see tr_bandwidthSetDesiredSpeed
  */
-static inline double tr_bandwidthGetDesiredSpeed_Bps(const tr_bandwidth* bandwidth, tr_direction dir)
+static inline double tr_bandwidthGetDesiredSpeed_Bps(tr_bandwidth const* bandwidth, tr_direction dir)
 {
     return bandwidth->band[dir].desiredSpeed_Bps;
 }
@@ -163,7 +163,7 @@ static inline double tr_bandwidthGetDesiredSpeed_Bps(const tr_bandwidth* bandwid
 static inline bool tr_bandwidthSetLimited(tr_bandwidth* bandwidth, tr_direction dir, bool isLimited)
 {
     bool* value = &bandwidth->band[dir].isLimited;
-    const bool didChange = isLimited != *value;
+    bool const didChange = isLimited != *value;
     *value = isLimited;
     return didChange;
 }
@@ -171,7 +171,7 @@ static inline bool tr_bandwidthSetLimited(tr_bandwidth* bandwidth, tr_direction 
 /**
  * @return nonzero if this bandwidth throttles its peer-ios speeds
  */
-static inline bool tr_bandwidthIsLimited(const tr_bandwidth* bandwidth, tr_direction dir)
+static inline bool tr_bandwidthIsLimited(tr_bandwidth const* bandwidth, tr_direction dir)
 {
     return bandwidth->band[dir].isLimited;
 }
@@ -184,17 +184,17 @@ void tr_bandwidthAllocate(tr_bandwidth* bandwidth, tr_direction direction, unsig
 /**
  * @brief clamps byteCount down to a number that this bandwidth will allow to be consumed
  */
-unsigned int tr_bandwidthClamp(const tr_bandwidth* bandwidth, tr_direction direction, unsigned int byteCount);
+unsigned int tr_bandwidthClamp(tr_bandwidth const* bandwidth, tr_direction direction, unsigned int byteCount);
 
 /******
 *******
 ******/
 
 /** @brief Get the raw total of bytes read or sent by this bandwidth subtree. */
-unsigned int tr_bandwidthGetRawSpeed_Bps(const tr_bandwidth* bandwidth, const uint64_t now, const tr_direction direction);
+unsigned int tr_bandwidthGetRawSpeed_Bps(tr_bandwidth const* bandwidth, uint64_t const now, tr_direction const direction);
 
 /** @brief Get the number of piece data bytes read or sent by this bandwidth subtree. */
-unsigned int tr_bandwidthGetPieceSpeed_Bps(const tr_bandwidth* bandwidth, const uint64_t now, const tr_direction direction);
+unsigned int tr_bandwidthGetPieceSpeed_Bps(tr_bandwidth const* bandwidth, uint64_t const now, tr_direction const direction);
 
 /**
  * @brief Notify the bandwidth object that some of its allocated bandwidth has been consumed.
@@ -217,12 +217,12 @@ void tr_bandwidthSetParent(tr_bandwidth* bandwidth, tr_bandwidth* parent);
 static inline bool tr_bandwidthHonorParentLimits(tr_bandwidth* bandwidth, tr_direction direction, bool isEnabled)
 {
     bool* value = &bandwidth->band[direction].honorParentLimits;
-    const bool didChange = isEnabled != *value;
+    bool const didChange = isEnabled != *value;
     *value = isEnabled;
     return didChange;
 }
 
-static inline bool tr_bandwidthAreParentLimitsHonored(const tr_bandwidth* bandwidth, tr_direction direction)
+static inline bool tr_bandwidthAreParentLimitsHonored(tr_bandwidth const* bandwidth, tr_direction direction)
 {
     assert(tr_isBandwidth(bandwidth));
     assert(tr_isDirection(direction));

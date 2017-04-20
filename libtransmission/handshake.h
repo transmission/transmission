@@ -26,13 +26,13 @@ typedef struct tr_handshake tr_handshake;
 
 /* returns true on success, false on error */
 typedef bool (* handshakeDoneCB)(struct tr_handshake* handshake, struct tr_peerIo* io, bool readAnythingFromPeer,
-    bool isConnected, const uint8_t* peerId, void* userData);
+    bool isConnected, uint8_t const* peerId, void* userData);
 
 /** @brief instantiate a new handshake */
 tr_handshake* tr_handshakeNew(struct tr_peerIo* io, tr_encryption_mode encryptionMode, handshakeDoneCB doneCB,
     void* doneUserData);
 
-const tr_address* tr_handshakeGetAddr(const struct tr_handshake* handshake, tr_port* port);
+tr_address const* tr_handshakeGetAddr(struct tr_handshake const* handshake, tr_port* port);
 
 void tr_handshakeAbort(tr_handshake* handshake);
 

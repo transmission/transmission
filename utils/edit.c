@@ -23,10 +23,10 @@
 
 static int fileCount = 0;
 static bool showVersion = false;
-static const char** files = NULL;
-static const char* add = NULL;
-static const char* deleteme = NULL;
-static const char* replace[2] = { NULL, NULL };
+static char const** files = NULL;
+static char const* add = NULL;
+static char const* deleteme = NULL;
+static char const* replace[2] = { NULL, NULL };
 
 static tr_option options[] =
 {
@@ -37,15 +37,15 @@ static tr_option options[] =
     { 0, NULL, NULL, NULL, 0, NULL }
 };
 
-static const char* getUsage(void)
+static char const* getUsage(void)
 {
     return "Usage: " MY_NAME " [options] torrent-file(s)";
 }
 
-static int parseCommandLine(int argc, const char* const* argv)
+static int parseCommandLine(int argc, char const* const* argv)
 {
     int c;
-    const char* optarg;
+    char const* optarg;
 
     while ((c = tr_getopt(getUsage(), argc, argv, options, &optarg)))
     {
@@ -87,9 +87,9 @@ static int parseCommandLine(int argc, const char* const* argv)
     return 0;
 }
 
-static bool removeURL(tr_variant* metainfo, const char* url)
+static bool removeURL(tr_variant* metainfo, char const* url)
 {
-    const char* str;
+    char const* str;
     tr_variant* announce_list;
     bool changed = false;
 
@@ -165,12 +165,12 @@ static bool removeURL(tr_variant* metainfo, const char* url)
     return changed;
 }
 
-static char* replaceSubstr(const char* str, const char* in, const char* out)
+static char* replaceSubstr(char const* str, char const* in, char const* out)
 {
     char* walk;
     struct evbuffer* buf = evbuffer_new();
-    const size_t inlen = strlen(in);
-    const size_t outlen = strlen(out);
+    size_t const inlen = strlen(in);
+    size_t const outlen = strlen(out);
 
     while ((walk = strstr(str, in)))
     {
@@ -184,9 +184,9 @@ static char* replaceSubstr(const char* str, const char* in, const char* out)
     return evbuffer_free_to_str(buf, NULL);
 }
 
-static bool replaceURL(tr_variant* metainfo, const char* in, const char* out)
+static bool replaceURL(tr_variant* metainfo, char const* in, char const* out)
 {
-    const char* str;
+    char const* str;
     tr_variant* announce_list;
     bool changed = false;
 
@@ -227,7 +227,7 @@ static bool replaceURL(tr_variant* metainfo, const char* in, const char* out)
     return changed;
 }
 
-static bool announce_list_has_url(tr_variant* announce_list, const char* url)
+static bool announce_list_has_url(tr_variant* announce_list, char const* url)
 {
     tr_variant* tier;
     int tierCount = 0;
@@ -235,7 +235,7 @@ static bool announce_list_has_url(tr_variant* announce_list, const char* url)
     while ((tier = tr_variantListChild(announce_list, tierCount++)))
     {
         tr_variant* node;
-        const char* str;
+        char const* str;
         int nodeCount = 0;
 
         while ((node = tr_variantListChild(tier, nodeCount++)))
@@ -250,13 +250,13 @@ static bool announce_list_has_url(tr_variant* announce_list, const char* url)
     return false;
 }
 
-static bool addURL(tr_variant* metainfo, const char* url)
+static bool addURL(tr_variant* metainfo, char const* url)
 {
-    const char* announce = NULL;
+    char const* announce = NULL;
     tr_variant* announce_list = NULL;
     bool changed = false;
-    const bool had_announce = tr_variantDictFindStr(metainfo, TR_KEY_announce, &announce, NULL);
-    const bool had_announce_list = tr_variantDictFindList(metainfo, TR_KEY_announce_list, &announce_list);
+    bool const had_announce = tr_variantDictFindStr(metainfo, TR_KEY_announce, &announce, NULL);
+    bool const had_announce_list = tr_variantDictFindList(metainfo, TR_KEY_announce_list, &announce_list);
 
     if (!had_announce && !had_announce_list)
     {
@@ -299,11 +299,11 @@ int tr_main(int argc, char* argv[])
     int i;
     int changedCount = 0;
 
-    files = tr_new0(const char*, argc);
+    files = tr_new0(char const*, argc);
 
     tr_logSetLevel(TR_LOG_ERROR);
 
-    if (parseCommandLine(argc, (const char* const*)argv))
+    if (parseCommandLine(argc, (char const* const*)argv))
     {
         return EXIT_FAILURE;
     }
@@ -334,7 +334,7 @@ int tr_main(int argc, char* argv[])
     {
         tr_variant top;
         bool changed = false;
-        const char* filename = files[i];
+        char const* filename = files[i];
         tr_error* error = NULL;
 
         printf("%s\n", filename);

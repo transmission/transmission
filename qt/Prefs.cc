@@ -125,7 +125,7 @@ Prefs::PrefItem Prefs::myItems[] =
 ****
 ***/
 
-Prefs::Prefs(const QString& configDir) :
+Prefs::Prefs(QString const& configDir) :
     myConfigDir(configDir)
 {
     assert(sizeof(myItems) / sizeof(myItems[0]) == PREFS_COUNT);
@@ -153,7 +153,7 @@ Prefs::Prefs(const QString& configDir) :
         double d;
         bool boolVal;
         int64_t intVal;
-        const char* str;
+        char const* str;
         size_t strLen;
         tr_variant* b(tr_variantDictFind(&top, myItems[i].key));
 
@@ -237,8 +237,8 @@ Prefs::~Prefs()
             continue;
         }
 
-        const tr_quark key = myItems[i].key;
-        const QVariant& val = myValues[i];
+        tr_quark const key = myItems[i].key;
+        QVariant const& val = myValues[i];
 
         switch (myItems[i].type)
         {
@@ -256,8 +256,8 @@ Prefs::~Prefs()
 
         case QVariant::String:
             {
-                const QByteArray ba(val.toByteArray());
-                const char* s = ba.constData();
+                QByteArray const ba(val.toByteArray());
+                char const* s = ba.constData();
 
                 if (Utils::isValidUtf8(s))
                 {
@@ -291,7 +291,7 @@ Prefs::~Prefs()
 
     // update settings.json with our settings
     tr_variant file_settings;
-    const QFile file(QDir(myConfigDir).absoluteFilePath(QLatin1String("settings.json")));
+    QFile const file(QDir(myConfigDir).absoluteFilePath(QLatin1String("settings.json")));
 
     if (!tr_variantFromFile(&file_settings, TR_VARIANT_FMT_JSON, file.fileName().toUtf8().constData(), NULL))
     {
@@ -367,7 +367,7 @@ bool Prefs::getBool(int key) const
 QString Prefs::getString(int key) const
 {
     assert(myItems[key].type == QVariant::String);
-    const QByteArray b = myValues[key].toByteArray();
+    QByteArray const b = myValues[key].toByteArray();
 
     if (Utils::isValidUtf8(b.constData()))
     {

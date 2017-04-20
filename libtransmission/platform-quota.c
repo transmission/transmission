@@ -73,7 +73,7 @@
 
 #ifndef _WIN32
 
-static const char* getdev(const char* path)
+static char const* getdev(char const* path)
 {
 #ifdef HAVE_GETMNTENT
 
@@ -150,7 +150,7 @@ static const char* getdev(const char* path)
 #endif
 }
 
-static const char* getfstype(const char* device)
+static char const* getfstype(char const* device)
 {
 #ifdef HAVE_GETMNTENT
 
@@ -227,11 +227,11 @@ static const char* getfstype(const char* device)
 #endif
 }
 
-static const char* getblkdev(const char* path)
+static char const* getblkdev(char const* path)
 {
     char* c;
     char* dir;
-    const char* device;
+    char const* device;
 
     dir = tr_strdup(path);
 
@@ -264,7 +264,7 @@ static const char* getblkdev(const char* path)
 
 #include <quota.h>
 
-static int64_t getquota(const char* device)
+static int64_t getquota(char const* device)
 {
     struct quotahandle* qh;
     struct quotakey qk;
@@ -313,7 +313,7 @@ static int64_t getquota(const char* device)
 
 #else
 
-static int64_t getquota(const char* device)
+static int64_t getquota(char const* device)
 {
     struct dqblk dq;
     int64_t limit;
@@ -431,7 +431,7 @@ static int64_t getxfsquota(char* device)
 
 #endif /* _WIN32 */
 
-static int64_t tr_getQuotaFreeSpace(const struct tr_device_info* info)
+static int64_t tr_getQuotaFreeSpace(struct tr_device_info const* info)
 {
     int64_t ret = -1;
 
@@ -457,7 +457,7 @@ static int64_t tr_getQuotaFreeSpace(const struct tr_device_info* info)
     return ret;
 }
 
-static int64_t tr_getDiskFreeSpace(const char* path)
+static int64_t tr_getDiskFreeSpace(char const* path)
 {
 #ifdef _WIN32
 
@@ -494,7 +494,7 @@ static int64_t tr_getDiskFreeSpace(const char* path)
 #endif
 }
 
-struct tr_device_info* tr_device_info_create(const char* path)
+struct tr_device_info* tr_device_info_create(char const* path)
 {
     struct tr_device_info* info;
 
@@ -520,7 +520,7 @@ void tr_device_info_free(struct tr_device_info* info)
     }
 }
 
-int64_t tr_device_info_get_free_space(const struct tr_device_info* info)
+int64_t tr_device_info_get_free_space(struct tr_device_info const* info)
 {
     int64_t free_space;
 

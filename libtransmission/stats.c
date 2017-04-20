@@ -18,7 +18,7 @@
 ****
 ***/
 
-static const struct tr_session_stats STATS_INIT = { 0.0f, 0, 0, 0, 0, 0 };
+static struct tr_session_stats const STATS_INIT = { 0.0f, 0, 0, 0, 0, 0 };
 
 /** @brief Opaque, per-session data structure for bandwidth use statistics */
 struct tr_stats_handle
@@ -29,17 +29,17 @@ struct tr_stats_handle
     bool isDirty;
 };
 
-static char* getOldFilename(const tr_session* session)
+static char* getOldFilename(tr_session const* session)
 {
     return tr_buildPath(tr_sessionGetConfigDir(session), "stats.benc", NULL);
 }
 
-static char* getFilename(const tr_session* session)
+static char* getFilename(tr_session const* session)
 {
     return tr_buildPath(tr_sessionGetConfigDir(session), "stats.json", NULL);
 }
 
-static void loadCumulativeStats(const tr_session* session, tr_session_stats* setme)
+static void loadCumulativeStats(tr_session const* session, tr_session_stats* setme)
 {
     tr_variant top;
     char* filename;
@@ -89,7 +89,7 @@ static void loadCumulativeStats(const tr_session* session, tr_session_stats* set
     }
 }
 
-static void saveCumulativeStats(const tr_session* session, const tr_session_stats* s)
+static void saveCumulativeStats(tr_session const* session, tr_session_stats const* s)
 {
     char* filename;
     tr_variant top;
@@ -123,7 +123,7 @@ void tr_statsInit(tr_session* session)
     session->sessionStats = stats;
 }
 
-static struct tr_stats_handle* getStats(const tr_session* session)
+static struct tr_stats_handle* getStats(tr_session const* session)
 {
     return session ? session->sessionStats : NULL;
 }
@@ -158,7 +158,7 @@ static void updateRatio(tr_session_stats* setme)
     setme->ratio = tr_getRatio(setme->uploadedBytes, setme->downloadedBytes);
 }
 
-static void addStats(tr_session_stats* setme, const tr_session_stats* a, const tr_session_stats* b)
+static void addStats(tr_session_stats* setme, tr_session_stats const* a, tr_session_stats const* b)
 {
     setme->uploadedBytes = a->uploadedBytes + b->uploadedBytes;
     setme->downloadedBytes = a->downloadedBytes + b->downloadedBytes;
@@ -168,9 +168,9 @@ static void addStats(tr_session_stats* setme, const tr_session_stats* a, const t
     updateRatio(setme);
 }
 
-void tr_sessionGetStats(const tr_session* session, tr_session_stats* setme)
+void tr_sessionGetStats(tr_session const* session, tr_session_stats* setme)
 {
-    const struct tr_stats_handle* stats = getStats(session);
+    struct tr_stats_handle const* stats = getStats(session);
 
     if (stats)
     {
@@ -180,9 +180,9 @@ void tr_sessionGetStats(const tr_session* session, tr_session_stats* setme)
     }
 }
 
-void tr_sessionGetCumulativeStats(const tr_session* session, tr_session_stats* setme)
+void tr_sessionGetCumulativeStats(tr_session const* session, tr_session_stats* setme)
 {
-    const struct tr_stats_handle* stats = getStats(session);
+    struct tr_stats_handle const* stats = getStats(session);
     tr_session_stats current = STATS_INIT;
 
     if (stats)

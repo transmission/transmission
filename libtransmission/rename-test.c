@@ -29,7 +29,7 @@ static tr_session* session = NULL;
 #define check_have_none(tor, totalSize) \
     do \
     { \
-        const tr_stat* tst = tr_torrentStat(tor); \
+        tr_stat const* tst = tr_torrentStat(tor); \
         check_int_eq(TR_STATUS_STOPPED, tst->activity); \
         check_int_eq(TR_STAT_OK, tst->error); \
         check_uint_eq(totalSize, tst->sizeWhenDone); \
@@ -39,10 +39,10 @@ static tr_session* session = NULL;
     } \
     while (0)
 
-static bool testFileExistsAndConsistsOfThisString(const tr_torrent* tor, tr_file_index_t fileIndex, const char* str)
+static bool testFileExistsAndConsistsOfThisString(tr_torrent const* tor, tr_file_index_t fileIndex, char const* str)
 {
     char* path;
-    const size_t str_len = strlen(str);
+    size_t const str_len = strlen(str);
     bool success = false;
 
     path = tr_torrentFindFile(tor, fileIndex);
@@ -65,13 +65,13 @@ static bool testFileExistsAndConsistsOfThisString(const tr_torrent* tor, tr_file
     return success;
 }
 
-static void onRenameDone(tr_torrent* tor UNUSED, const char* oldpath UNUSED, const char* newname UNUSED, int error,
+static void onRenameDone(tr_torrent* tor UNUSED, char const* oldpath UNUSED, char const* newname UNUSED, int error,
     void* user_data)
 {
     *(int*)user_data = error;
 }
 
-static int torrentRenameAndWait(tr_torrent* tor, const char* oldpath, const char* newname)
+static int torrentRenameAndWait(tr_torrent* tor, char const* oldpath, char const* newname)
 {
     int error = -1;
     tr_torrentRenamePath(tor, oldpath, newname, onRenameDone, &error);
@@ -99,14 +99,14 @@ static void torrentRemoveAndWait(tr_torrent* tor, int expected_torrent_count)
 ****
 ***/
 
-static void create_single_file_torrent_contents(const char* top)
+static void create_single_file_torrent_contents(char const* top)
 {
     char* path = tr_buildPath(top, "hello-world.txt", NULL);
     libtest_create_file_with_string_contents(path, "hello, world!\n");
     tr_free(path);
 }
 
-static tr_torrent* create_torrent_from_base64_metainfo(tr_ctor* ctor, const char* metainfo_base64)
+static tr_torrent* create_torrent_from_base64_metainfo(tr_ctor* ctor, char const* metainfo_base64)
 {
     int err;
     size_t metainfo_len;
@@ -135,9 +135,9 @@ static int test_single_filename_torrent(void)
     uint64_t loaded;
     tr_torrent* tor;
     char* tmpstr;
-    const size_t totalSize = 14;
+    size_t const totalSize = 14;
     tr_ctor* ctor;
-    const tr_stat* st;
+    tr_stat const* st;
 
     /* this is a single-file torrent whose file is hello-world.txt, holding the string "hello, world!" */
     ctor = tr_ctorNew(session);
@@ -239,7 +239,7 @@ static int test_single_filename_torrent(void)
 ****
 ***/
 
-static void create_multifile_torrent_contents(const char* top)
+static void create_multifile_torrent_contents(char const* top)
 {
     char* path;
 
@@ -270,18 +270,18 @@ static int test_multifile_torrent(void)
     tr_ctor* ctor;
     char* str;
     char* tmp;
-    static const size_t totalSize = 67;
-    const tr_stat* st;
-    const tr_file* files;
-    const char* strings[4];
-    const char* expected_files[4] =
+    static size_t const totalSize = 67;
+    tr_stat const* st;
+    tr_file const* files;
+    char const* strings[4];
+    char const* expected_files[4] =
     {
         "Felidae/Felinae/Acinonyx/Cheetah/Chester",
         "Felidae/Felinae/Felis/catus/Kyphi",
         "Felidae/Felinae/Felis/catus/Saffron",
         "Felidae/Pantherinae/Panthera/Tiger/Tony"
     };
-    const char* expected_contents[4] =
+    char const* expected_contents[4] =
     {
         "It ain't easy bein' cheesy.\n",
         "Inquisitive\n",
@@ -508,13 +508,13 @@ static int test_partial_file(void)
 {
     tr_file_index_t i;
     tr_torrent* tor;
-    const tr_stat* st;
+    tr_stat const* st;
     tr_file_stat* fst;
-    const uint32_t pieceCount = 33;
-    const uint32_t pieceSize = 32768;
-    const uint32_t length[] = { 1048576, 4096, 512 };
-    const uint64_t totalSize = length[0] + length[1] + length[2];
-    const char* strings[3];
+    uint32_t const pieceCount = 33;
+    uint32_t const pieceSize = 32768;
+    uint32_t const length[] = { 1048576, 4096, 512 };
+    uint64_t const totalSize = length[0] + length[1] + length[2];
+    char const* strings[3];
 
     /***
     ****  create our test torrent with an incomplete .part file
@@ -575,7 +575,7 @@ static int test_partial_file(void)
 int main(void)
 {
     int ret;
-    const testFunc tests[] =
+    testFunc const tests[] =
     {
         test_single_filename_torrent,
         test_multifile_torrent,

@@ -15,7 +15,7 @@
 namespace
 {
 
-int itemColumnSpan(QGridLayout* layout, const QLayoutItem* item)
+int itemColumnSpan(QGridLayout* layout, QLayoutItem const* item)
 {
     for (int i = 0, count = layout->count(); i < count; ++i)
     {

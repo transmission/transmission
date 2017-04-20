@@ -24,21 +24,21 @@ public:
     virtual ~TorrentDelegate();
 
     // QAbstractItemDelegate
-    virtual QSize sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const;
-    virtual void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const;
+    virtual QSize sizeHint(QStyleOptionViewItem const& option, QModelIndex const& index) const;
+    virtual void paint(QPainter* painter, QStyleOptionViewItem const& option, QModelIndex const& index) const;
 
 protected:
-    QSize margin(const QStyle& style) const;
-    void setProgressBarPercentDone(const QStyleOptionViewItem& option, const Torrent&) const;
+    QSize margin(QStyle const& style) const;
+    void setProgressBarPercentDone(QStyleOptionViewItem const& option, Torrent const&) const;
 
     // Our own overridables
-    virtual QSize sizeHint(const QStyleOptionViewItem&, const Torrent&) const;
-    virtual void drawTorrent(QPainter* painter, const QStyleOptionViewItem& option, const Torrent&) const;
+    virtual QSize sizeHint(QStyleOptionViewItem const&, Torrent const&) const;
+    virtual void drawTorrent(QPainter* painter, QStyleOptionViewItem const& option, Torrent const&) const;
 
-    static QString statusString(const Torrent& tor);
-    static QString progressString(const Torrent& tor);
-    static QString shortStatusString(const Torrent& tor);
-    static QString shortTransferString(const Torrent& tor);
+    static QString statusString(Torrent const& tor);
+    static QString progressString(Torrent const& tor);
+    static QString shortStatusString(Torrent const& tor);
+    static QString shortTransferString(Torrent const& tor);
 
 protected:
     QStyleOptionProgressBar* myProgressBarStyle;

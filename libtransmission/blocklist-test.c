@@ -19,20 +19,20 @@
 
 #include "libtransmission-test.h"
 
-static const char* contents1 =
+static char const* contents1 =
     "Austin Law Firm:216.16.1.144-216.16.1.151\n"
     "Sargent Controls and Aerospace:216.19.18.0-216.19.18.255\n"
     "Corel Corporation:216.21.157.192-216.21.157.223\n"
     "Fox Speed Channel:216.79.131.192-216.79.131.223\n";
 
-static const char* contents2 =
+static char const* contents2 =
     "Austin Law Firm:216.16.1.144-216.16.1.151\n"
     "Sargent Controls and Aerospace:216.19.18.0-216.19.18.255\n"
     "Corel Corporation:216.21.157.192-216.21.157.223\n"
     "Fox Speed Channel:216.79.131.192-216.79.131.223\n"
     "Evilcorp:216.88.88.0-216.88.88.255\n";
 
-static void create_text_file(const char* path, const char* contents)
+static void create_text_file(char const* path, char const* contents)
 {
     tr_sys_file_t fd;
     char* dir;
@@ -48,7 +48,7 @@ static void create_text_file(const char* path, const char* contents)
     libttest_sync();
 }
 
-static bool address_is_blocked(tr_session* session, const char* address_str)
+static bool address_is_blocked(tr_session* session, char const* address_str)
 {
     struct tr_address addr;
     tr_address_from_string(&addr, address_str);
@@ -146,7 +146,7 @@ static int test_updating(void)
 
 int main(void)
 {
-    const testFunc tests[] =
+    testFunc const tests[] =
     {
         test_parsing,
         test_updating

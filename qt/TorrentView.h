@@ -18,7 +18,7 @@ public:
     TorrentView(QWidget* parent = nullptr);
 
 public slots:
-    void setHeaderText(const QString& text);
+    void setHeaderText(QString const& text);
 
 signals:
     void headerDoubleClicked();

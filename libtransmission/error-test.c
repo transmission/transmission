@@ -72,7 +72,7 @@ static int test_error_propagate(void)
 
 int main(void)
 {
-    const testFunc tests[] =
+    testFunc const tests[] =
     {
         test_error_set,
         test_error_propagate

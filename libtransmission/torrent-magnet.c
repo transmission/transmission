@@ -80,7 +80,7 @@ bool tr_torrentSetMetadataSizeHint(tr_torrent* tor, int64_t size)
         return false;
     }
 
-    const int n = (size <= 0 || size > INT_MAX) ? -1 : size / METADATA_PIECE_SIZE + (size % METADATA_PIECE_SIZE != 0 ? 1 : 0);
+    int const n = (size <= 0 || size > INT_MAX) ? -1 : size / METADATA_PIECE_SIZE + (size % METADATA_PIECE_SIZE != 0 ? 1 : 0);
 
     dbgmsg(tor, "metadata is %" PRId64 " bytes in %d pieces", size, n);
 
@@ -118,7 +118,7 @@ bool tr_torrentSetMetadataSizeHint(tr_torrent* tor, int64_t size)
     return true;
 }
 
-static size_t findInfoDictOffset(const tr_torrent* tor)
+static size_t findInfoDictOffset(tr_torrent const* tor)
 {
     size_t fileLen;
     uint8_t* fileContents;
@@ -137,7 +137,7 @@ static size_t findInfoDictOffset(const tr_torrent* tor)
             {
                 size_t infoLen;
                 char* infoContents = tr_variantToStr(infoDict, TR_VARIANT_FMT_BENC, &infoLen);
-                const uint8_t* i = (const uint8_t*)tr_memmem((char*)fileContents, fileLen, infoContents, infoLen);
+                uint8_t const* i = (uint8_t const*)tr_memmem((char*)fileContents, fileLen, infoContents, infoLen);
                 offset = i != NULL ? i - fileContents : 0;
                 tr_free(infoContents);
             }
@@ -182,11 +182,11 @@ void* tr_torrentGetMetadataPiece(tr_torrent* tor, int piece, size_t* len)
 
         if (fd != TR_BAD_SYS_FILE)
         {
-            const size_t o = piece * METADATA_PIECE_SIZE;
+            size_t const o = piece * METADATA_PIECE_SIZE;
 
             if (tr_sys_file_seek(fd, tor->infoDictOffset + o, TR_SEEK_SET, NULL, NULL))
             {
-                const size_t l = o + METADATA_PIECE_SIZE <= tor->infoDictLength ? METADATA_PIECE_SIZE : tor->infoDictLength - o;
+                size_t const l = o + METADATA_PIECE_SIZE <= tor->infoDictLength ? METADATA_PIECE_SIZE : tor->infoDictLength - o;
 
                 if (0 < l && l <= METADATA_PIECE_SIZE)
                 {
@@ -213,11 +213,11 @@ void* tr_torrentGetMetadataPiece(tr_torrent* tor, int piece, size_t* len)
     return ret;
 }
 
-void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, const void* data, int len)
+void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, int len)
 {
     int i;
     struct tr_incomplete_metadata* m;
-    const int offset = piece * METADATA_PIECE_SIZE;
+    int const offset = piece * METADATA_PIECE_SIZE;
 
     assert(tr_isTorrent(tor));
     assert(data != NULL);
@@ -287,7 +287,7 @@ void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, const void* data, in
         {
             /* checksum passed; now try to parse it as benc */
             tr_variant infoDict;
-            const int err = tr_variantFromBenc(&infoDict, m->metadata, m->metadata_size);
+            int const err = tr_variantFromBenc(&infoDict, m->metadata, m->metadata_size);
             dbgmsg(tor, "err is %d", err);
 
             if ((metainfoParsed = !err))
@@ -350,7 +350,7 @@ void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, const void* data, in
         }
         else /* drat. */
         {
-            const int n = m->pieceCount;
+            int const n = m->pieceCount;
 
             for (i = 0; i < n; ++i)
             {
@@ -378,7 +378,7 @@ bool tr_torrentGetNextMetadataRequest(tr_torrent* tor, time_t now, int* setme_pi
     if ((m != NULL) && (m->piecesNeededCount > 0) && (m->piecesNeeded[0].requestedAt + MIN_REPEAT_INTERVAL_SECS < now))
     {
         int i;
-        const int piece = m->piecesNeeded[0].piece;
+        int const piece = m->piecesNeeded[0].piece;
 
         tr_removeElementFromArray(m->piecesNeeded, 0, sizeof(struct metadata_node), m->piecesNeededCount--);
 
@@ -394,7 +394,7 @@ bool tr_torrentGetNextMetadataRequest(tr_torrent* tor, time_t now, int* setme_pi
     return have_request;
 }
 
-double tr_torrentGetMetadataPercent(const tr_torrent* tor)
+double tr_torrentGetMetadataPercent(tr_torrent const* tor)
 {
     double ret;
 
@@ -404,7 +404,7 @@ double tr_torrentGetMetadataPercent(const tr_torrent* tor)
     }
     else
     {
-        const struct tr_incomplete_metadata* m = tor->incompleteMetadata;
+        struct tr_incomplete_metadata const* m = tor->incompleteMetadata;
 
         if (!m || !m->pieceCount)
         {
@@ -420,10 +420,10 @@ double tr_torrentGetMetadataPercent(const tr_torrent* tor)
 }
 
 /* FIXME: this should be renamed tr_metainfoGetMagnetLink() and moved to metainfo.c for consistency */
-char* tr_torrentInfoGetMagnetLink(const tr_info* inf)
+char* tr_torrentInfoGetMagnetLink(tr_info const* inf)
 {
     unsigned int i;
-    const char* name;
+    char const* name;
     struct evbuffer* s = evbuffer_new();
 
     evbuffer_add_printf(s, "magnet:?xt=urn:btih:%s", inf->hashString);

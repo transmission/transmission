@@ -66,7 +66,7 @@ struct locale_context
 #endif
 };
 
-static void use_numeric_locale(struct locale_context* context, const char* locale_name)
+static void use_numeric_locale(struct locale_context* context, char const* locale_name)
 {
 #ifdef HAVE_USELOCALE
 
@@ -108,12 +108,12 @@ static void restore_locale(struct locale_context* context)
 ****
 ***/
 
-static bool tr_variantIsContainer(const tr_variant* v)
+static bool tr_variantIsContainer(tr_variant const* v)
 {
     return tr_variantIsList(v) || tr_variantIsDict(v);
 }
 
-static bool tr_variantIsSomething(const tr_variant* v)
+static bool tr_variantIsSomething(tr_variant const* v)
 {
     return tr_variantIsContainer(v) || tr_variantIsInt(v) || tr_variantIsString(v) || tr_variantIsReal(v) ||
            tr_variantIsBool(v);
@@ -129,7 +129,7 @@ void tr_variantInit(tr_variant* v, char type)
 ****
 ***/
 
-static const struct tr_variant_string STRING_INIT =
+static struct tr_variant_string const STRING_INIT =
 {
     .type = TR_STRING_TYPE_QUARK,
     .quark = TR_KEY_NONE,
@@ -148,9 +148,9 @@ static void tr_variant_string_clear(struct tr_variant_string* str)
 }
 
 /* returns a const pointer to the variant's string */
-static const char* tr_variant_string_get_string(const struct tr_variant_string* str)
+static char const* tr_variant_string_get_string(struct tr_variant_string const* str)
 {
-    const char* ret;
+    char const* ret;
 
     switch (str->type)
     {
@@ -173,7 +173,7 @@ static const char* tr_variant_string_get_string(const struct tr_variant_string* 
     return ret;
 }
 
-static void tr_variant_string_set_quark(struct tr_variant_string* str, const tr_quark quark)
+static void tr_variant_string_set_quark(struct tr_variant_string* str, tr_quark const quark)
 {
     tr_variant_string_clear(str);
 
@@ -182,7 +182,7 @@ static void tr_variant_string_set_quark(struct tr_variant_string* str, const tr_
     str->str.str = tr_quark_get_string(quark, &str->len);
 }
 
-static void tr_variant_string_set_string(struct tr_variant_string* str, const char* bytes, size_t len)
+static void tr_variant_string_set_string(struct tr_variant_string* str, char const* bytes, size_t len)
 {
     tr_variant_string_clear(str);
 
@@ -217,20 +217,20 @@ static void tr_variant_string_set_string(struct tr_variant_string* str, const ch
 ****
 ***/
 
-static inline const char* getStr(const tr_variant* v)
+static inline char const* getStr(tr_variant const* v)
 {
     assert(tr_variantIsString(v));
 
     return tr_variant_string_get_string(&v->val.s);
 }
 
-static int dictIndexOf(const tr_variant* dict, const tr_quark key)
+static int dictIndexOf(tr_variant const* dict, tr_quark const key)
 {
     if (tr_variantIsDict(dict))
     {
-        const tr_variant* walk;
-        const tr_variant* const begin = dict->val.l.vals;
-        const tr_variant* const end = begin + dict->val.l.count;
+        tr_variant const* walk;
+        tr_variant const* const begin = dict->val.l.vals;
+        tr_variant const* const end = begin + dict->val.l.count;
 
         for (walk = begin; walk != end; ++walk)
         {
@@ -244,19 +244,19 @@ static int dictIndexOf(const tr_variant* dict, const tr_quark key)
     return -1;
 }
 
-tr_variant* tr_variantDictFind(tr_variant* dict, const tr_quark key)
+tr_variant* tr_variantDictFind(tr_variant* dict, tr_quark const key)
 {
-    const int i = dictIndexOf(dict, key);
+    int const i = dictIndexOf(dict, key);
 
     return i < 0 ? NULL : dict->val.l.vals + i;
 }
 
-static bool tr_variantDictFindType(tr_variant* dict, const tr_quark key, int type, tr_variant** setme)
+static bool tr_variantDictFindType(tr_variant* dict, tr_quark const key, int type, tr_variant** setme)
 {
     return tr_variantIsType(*setme = tr_variantDictFind(dict, key), type);
 }
 
-size_t tr_variantListSize(const tr_variant* list)
+size_t tr_variantListSize(tr_variant const* list)
 {
     return tr_variantIsList(list) ? list->val.l.count : 0;
 }
@@ -287,7 +287,7 @@ bool tr_variantListRemove(tr_variant* list, size_t i)
     return removed;
 }
 
-bool tr_variantGetInt(const tr_variant* v, int64_t* setme)
+bool tr_variantGetInt(tr_variant const* v, int64_t* setme)
 {
     bool success = false;
 
@@ -310,9 +310,9 @@ bool tr_variantGetInt(const tr_variant* v, int64_t* setme)
     return success;
 }
 
-bool tr_variantGetStr(const tr_variant* v, const char** setme, size_t* len)
+bool tr_variantGetStr(tr_variant const* v, char const** setme, size_t* len)
 {
-    const bool success = tr_variantIsString(v);
+    bool const success = tr_variantIsString(v);
 
     if (success)
     {
@@ -327,9 +327,9 @@ bool tr_variantGetStr(const tr_variant* v, const char** setme, size_t* len)
     return success;
 }
 
-bool tr_variantGetRaw(const tr_variant* v, const uint8_t** setme_raw, size_t* setme_len)
+bool tr_variantGetRaw(tr_variant const* v, uint8_t const** setme_raw, size_t* setme_len)
 {
-    const bool success = tr_variantIsString(v);
+    bool const success = tr_variantIsString(v);
 
     if (success)
     {
@@ -340,9 +340,9 @@ bool tr_variantGetRaw(const tr_variant* v, const uint8_t** setme_raw, size_t* se
     return success;
 }
 
-bool tr_variantGetBool(const tr_variant* v, bool* setme)
+bool tr_variantGetBool(tr_variant const* v, bool* setme)
 {
-    const char* str;
+    char const* str;
     bool success = false;
 
     if ((success = tr_variantIsBool(v)))
@@ -369,7 +369,7 @@ bool tr_variantGetBool(const tr_variant* v, bool* setme)
     return success;
 }
 
-bool tr_variantGetReal(const tr_variant* v, double* setme)
+bool tr_variantGetReal(tr_variant const* v, double* setme)
 {
     bool success = false;
 
@@ -403,41 +403,41 @@ bool tr_variantGetReal(const tr_variant* v, double* setme)
     return success;
 }
 
-bool tr_variantDictFindInt(tr_variant* dict, const tr_quark key, int64_t* setme)
+bool tr_variantDictFindInt(tr_variant* dict, tr_quark const key, int64_t* setme)
 {
     tr_variant* child = tr_variantDictFind(dict, key);
     return tr_variantGetInt(child, setme);
 }
 
-bool tr_variantDictFindBool(tr_variant* dict, const tr_quark key, bool* setme)
+bool tr_variantDictFindBool(tr_variant* dict, tr_quark const key, bool* setme)
 {
     tr_variant* child = tr_variantDictFind(dict, key);
     return tr_variantGetBool(child, setme);
 }
 
-bool tr_variantDictFindReal(tr_variant* dict, const tr_quark key, double* setme)
+bool tr_variantDictFindReal(tr_variant* dict, tr_quark const key, double* setme)
 {
     tr_variant* child = tr_variantDictFind(dict, key);
     return tr_variantGetReal(child, setme);
 }
 
-bool tr_variantDictFindStr(tr_variant* dict, const tr_quark key, const char** setme, size_t* len)
+bool tr_variantDictFindStr(tr_variant* dict, tr_quark const key, char const** setme, size_t* len)
 {
     tr_variant* child = tr_variantDictFind(dict, key);
     return tr_variantGetStr(child, setme, len);
 }
 
-bool tr_variantDictFindList(tr_variant* dict, const tr_quark key, tr_variant** setme)
+bool tr_variantDictFindList(tr_variant* dict, tr_quark const key, tr_variant** setme)
 {
     return tr_variantDictFindType(dict, key, TR_VARIANT_TYPE_LIST, setme);
 }
 
-bool tr_variantDictFindDict(tr_variant* dict, const tr_quark key, tr_variant** setme)
+bool tr_variantDictFindDict(tr_variant* dict, tr_quark const key, tr_variant** setme)
 {
     return tr_variantDictFindType(dict, key, TR_VARIANT_TYPE_DICT, setme);
 }
 
-bool tr_variantDictFindRaw(tr_variant* dict, const tr_quark key, const uint8_t** setme_raw, size_t* setme_len)
+bool tr_variantDictFindRaw(tr_variant* dict, tr_quark const key, uint8_t const** setme_raw, size_t* setme_len)
 {
     tr_variant* child = tr_variantDictFind(dict, key);
     return tr_variantGetRaw(child, setme_raw, setme_len);
@@ -447,19 +447,19 @@ bool tr_variantDictFindRaw(tr_variant* dict, const tr_quark key, const uint8_t**
 ****
 ***/
 
-void tr_variantInitRaw(tr_variant* v, const void* src, size_t byteCount)
+void tr_variantInitRaw(tr_variant* v, void const* src, size_t byteCount)
 {
     tr_variantInit(v, TR_VARIANT_TYPE_STR);
     tr_variant_string_set_string(&v->val.s, src, byteCount);
 }
 
-void tr_variantInitQuark(tr_variant* v, const tr_quark q)
+void tr_variantInitQuark(tr_variant* v, tr_quark const q)
 {
     tr_variantInit(v, TR_VARIANT_TYPE_STR);
     tr_variant_string_set_quark(&v->val.s, q);
 }
 
-void tr_variantInitStr(tr_variant* v, const void* str, size_t len)
+void tr_variantInitStr(tr_variant* v, void const* str, size_t len)
 {
     tr_variantInit(v, TR_VARIANT_TYPE_STR);
     tr_variant_string_set_string(&v->val.s, str, len);
@@ -491,7 +491,7 @@ void tr_variantInitList(tr_variant* v, size_t reserve_count)
 
 static void containerReserve(tr_variant* v, size_t count)
 {
-    const size_t needed = v->val.l.count + count;
+    size_t const needed = v->val.l.count + count;
 
     assert(tr_variantIsContainer(v));
 
@@ -563,21 +563,21 @@ tr_variant* tr_variantListAddBool(tr_variant* list, bool val)
     return child;
 }
 
-tr_variant* tr_variantListAddStr(tr_variant* list, const char* val)
+tr_variant* tr_variantListAddStr(tr_variant* list, char const* val)
 {
     tr_variant* child = tr_variantListAdd(list);
     tr_variantInitStr(child, val, TR_BAD_SIZE);
     return child;
 }
 
-tr_variant* tr_variantListAddQuark(tr_variant* list, const tr_quark val)
+tr_variant* tr_variantListAddQuark(tr_variant* list, tr_quark const val)
 {
     tr_variant* child = tr_variantListAdd(list);
     tr_variantInitQuark(child, val);
     return child;
 }
 
-tr_variant* tr_variantListAddRaw(tr_variant* list, const void* val, size_t len)
+tr_variant* tr_variantListAddRaw(tr_variant* list, void const* val, size_t len)
 {
     tr_variant* child = tr_variantListAdd(list);
     tr_variantInitRaw(child, val, len);
@@ -598,7 +598,7 @@ tr_variant* tr_variantListAddDict(tr_variant* list, size_t reserve_count)
     return child;
 }
 
-tr_variant* tr_variantDictAdd(tr_variant* dict, const tr_quark key)
+tr_variant* tr_variantDictAdd(tr_variant* dict, tr_quark const key)
 {
     tr_variant* val;
 
@@ -612,7 +612,7 @@ tr_variant* tr_variantDictAdd(tr_variant* dict, const tr_quark key)
     return val;
 }
 
-static tr_variant* dictFindOrAdd(tr_variant* dict, const tr_quark key, int type)
+static tr_variant* dictFindOrAdd(tr_variant* dict, tr_quark const key, int type)
 {
     tr_variant* child;
 
@@ -639,63 +639,63 @@ static tr_variant* dictFindOrAdd(tr_variant* dict, const tr_quark key, int type)
     return child;
 }
 
-tr_variant* tr_variantDictAddInt(tr_variant* dict, const tr_quark key, int64_t val)
+tr_variant* tr_variantDictAddInt(tr_variant* dict, tr_quark const key, int64_t val)
 {
     tr_variant* child = dictFindOrAdd(dict, key, TR_VARIANT_TYPE_INT);
     tr_variantInitInt(child, val);
     return child;
 }
 
-tr_variant* tr_variantDictAddBool(tr_variant* dict, const tr_quark key, bool val)
+tr_variant* tr_variantDictAddBool(tr_variant* dict, tr_quark const key, bool val)
 {
     tr_variant* child = dictFindOrAdd(dict, key, TR_VARIANT_TYPE_BOOL);
     tr_variantInitBool(child, val);
     return child;
 }
 
-tr_variant* tr_variantDictAddReal(tr_variant* dict, const tr_quark key, double val)
+tr_variant* tr_variantDictAddReal(tr_variant* dict, tr_quark const key, double val)
 {
     tr_variant* child = dictFindOrAdd(dict, key, TR_VARIANT_TYPE_REAL);
     tr_variantInitReal(child, val);
     return child;
 }
 
-tr_variant* tr_variantDictAddQuark(tr_variant* dict, const tr_quark key, const tr_quark val)
+tr_variant* tr_variantDictAddQuark(tr_variant* dict, tr_quark const key, tr_quark const val)
 {
     tr_variant* child = dictFindOrAdd(dict, key, TR_VARIANT_TYPE_STR);
     tr_variantInitQuark(child, val);
     return child;
 }
 
-tr_variant* tr_variantDictAddStr(tr_variant* dict, const tr_quark key, const char* val)
+tr_variant* tr_variantDictAddStr(tr_variant* dict, tr_quark const key, char const* val)
 {
     tr_variant* child = dictFindOrAdd(dict, key, TR_VARIANT_TYPE_STR);
     tr_variantInitStr(child, val, TR_BAD_SIZE);
     return child;
 }
 
-tr_variant* tr_variantDictAddRaw(tr_variant* dict, const tr_quark key, const void* src, size_t len)
+tr_variant* tr_variantDictAddRaw(tr_variant* dict, tr_quark const key, void const* src, size_t len)
 {
     tr_variant* child = dictFindOrAdd(dict, key, TR_VARIANT_TYPE_STR);
     tr_variantInitRaw(child, src, len);
     return child;
 }
 
-tr_variant* tr_variantDictAddList(tr_variant* dict, const tr_quark key, size_t reserve_count)
+tr_variant* tr_variantDictAddList(tr_variant* dict, tr_quark const key, size_t reserve_count)
 {
     tr_variant* child = tr_variantDictAdd(dict, key);
     tr_variantInitList(child, reserve_count);
     return child;
 }
 
-tr_variant* tr_variantDictAddDict(tr_variant* dict, const tr_quark key, size_t reserve_count)
+tr_variant* tr_variantDictAddDict(tr_variant* dict, tr_quark const key, size_t reserve_count)
 {
     tr_variant* child = tr_variantDictAdd(dict, key);
     tr_variantInitDict(child, reserve_count);
     return child;
 }
 
-tr_variant* tr_variantDictSteal(tr_variant* dict, const tr_quark key, tr_variant* value)
+tr_variant* tr_variantDictSteal(tr_variant* dict, tr_quark const key, tr_variant* value)
 {
     tr_variant* child = tr_variantDictAdd(dict, key);
     *child = *value;
@@ -704,14 +704,14 @@ tr_variant* tr_variantDictSteal(tr_variant* dict, const tr_quark key, tr_variant
     return child;
 }
 
-bool tr_variantDictRemove(tr_variant* dict, const tr_quark key)
+bool tr_variantDictRemove(tr_variant* dict, tr_quark const key)
 {
     bool removed = false;
-    const int i = dictIndexOf(dict, key);
+    int const i = dictIndexOf(dict, key);
 
     if (i >= 0)
     {
-        const int last = dict->val.l.count - 1;
+        int const last = dict->val.l.count - 1;
 
         tr_variantFree(&dict->val.l.vals[i]);
 
@@ -734,27 +734,27 @@ bool tr_variantDictRemove(tr_variant* dict, const tr_quark key)
 
 struct KeyIndex
 {
-    const char* keystr;
+    char const* keystr;
     tr_variant* val;
 };
 
-static int compareKeyIndex(const void* va, const void* vb)
+static int compareKeyIndex(void const* va, void const* vb)
 {
-    const struct KeyIndex* a = va;
-    const struct KeyIndex* b = vb;
+    struct KeyIndex const* a = va;
+    struct KeyIndex const* b = vb;
 
     return strcmp(a->keystr, b->keystr);
 }
 
 struct SaveNode
 {
-    const tr_variant* v;
+    tr_variant const* v;
     tr_variant sorted;
     size_t childIndex;
     bool isVisited;
 };
 
-static void nodeConstruct(struct SaveNode* node, const tr_variant* v, bool sort_dicts)
+static void nodeConstruct(struct SaveNode* node, tr_variant const* v, bool sort_dicts)
 {
     node->isVisited = false;
     node->childIndex = 0;
@@ -764,7 +764,7 @@ static void nodeConstruct(struct SaveNode* node, const tr_variant* v, bool sort_
         /* make node->sorted a sorted version of this dictionary */
 
         size_t i;
-        const size_t n = v->val.l.count;
+        size_t const n = v->val.l.count;
         struct KeyIndex* tmp = tr_new(struct KeyIndex, n);
 
         for (i = 0; i < n; i++)
@@ -807,7 +807,7 @@ static void nodeDestruct(struct SaveNode* node)
  * easier to read, but was vulnerable to a smash-stacking
  * attack via maliciously-crafted data. (#667)
  */
-void tr_variantWalk(const tr_variant* v, const struct VariantWalkFuncs* walkFuncs, void* user_data, bool sort_dicts)
+void tr_variantWalk(tr_variant const* v, struct VariantWalkFuncs const* walkFuncs, void* user_data, bool sort_dicts)
 {
     int stackSize = 0;
     int stackAlloc = 64;
@@ -818,7 +818,7 @@ void tr_variantWalk(const tr_variant* v, const struct VariantWalkFuncs* walkFunc
     while (stackSize > 0)
     {
         struct SaveNode* node = &stack[stackSize - 1];
-        const tr_variant* v;
+        tr_variant const* v;
 
         if (!node->isVisited)
         {
@@ -827,7 +827,7 @@ void tr_variantWalk(const tr_variant* v, const struct VariantWalkFuncs* walkFunc
         }
         else if (tr_variantIsContainer(node->v) && (node->childIndex < node->v->val.l.count))
         {
-            const int index = node->childIndex++;
+            int const index = node->childIndex++;
             v = node->v->val.l.vals + index;
 
             if (tr_variantIsDict(node->v))
@@ -920,21 +920,21 @@ void tr_variantWalk(const tr_variant* v, const struct VariantWalkFuncs* walkFunc
 *****
 ****/
 
-static void freeDummyFunc(const tr_variant* v UNUSED, void* buf UNUSED)
+static void freeDummyFunc(tr_variant const* v UNUSED, void* buf UNUSED)
 {
 }
 
-static void freeStringFunc(const tr_variant* v, void* unused UNUSED)
+static void freeStringFunc(tr_variant const* v, void* unused UNUSED)
 {
     tr_variant_string_clear(&((tr_variant*)v)->val.s);
 }
 
-static void freeContainerEndFunc(const tr_variant* v, void* unused UNUSED)
+static void freeContainerEndFunc(tr_variant const* v, void* unused UNUSED)
 {
     tr_free(v->val.l.vals);
 }
 
-static const struct VariantWalkFuncs freeWalkFuncs =
+static struct VariantWalkFuncs const freeWalkFuncs =
 {
     freeDummyFunc,
     freeDummyFunc,
@@ -957,10 +957,10 @@ void tr_variantFree(tr_variant* v)
 ****
 ***/
 
-static void tr_variantListCopy(tr_variant* target, const tr_variant* src)
+static void tr_variantListCopy(tr_variant* target, tr_variant const* src)
 {
     int i = 0;
-    const tr_variant* val;
+    tr_variant const* val;
 
     while ((val = tr_variantListChild((tr_variant*)src, i++)))
     {
@@ -985,7 +985,7 @@ static void tr_variantListCopy(tr_variant* target, const tr_variant* src)
         else if (tr_variantIsString(val))
         {
             size_t len;
-            const char* str;
+            char const* str;
             tr_variantGetStr(val, &str, &len);
             tr_variantListAddRaw(target, str, len);
         }
@@ -1004,7 +1004,7 @@ static void tr_variantListCopy(tr_variant* target, const tr_variant* src)
     }
 }
 
-static size_t tr_variantDictSize(const tr_variant* dict)
+static size_t tr_variantDictSize(tr_variant const* dict)
 {
     return tr_variantIsDict(dict) ? dict->val.l.count : 0;
 }
@@ -1025,10 +1025,10 @@ bool tr_variantDictChild(tr_variant* dict, size_t n, tr_quark* key, tr_variant**
     return success;
 }
 
-void tr_variantMergeDicts(tr_variant* target, const tr_variant* source)
+void tr_variantMergeDicts(tr_variant* target, tr_variant const* source)
 {
     size_t i;
-    const size_t sourceCount = tr_variantDictSize(source);
+    size_t const sourceCount = tr_variantDictSize(source);
 
     assert(tr_variantIsDict(target));
     assert(tr_variantIsDict(source));
@@ -1064,7 +1064,7 @@ void tr_variantMergeDicts(tr_variant* target, const tr_variant* source)
             else if (tr_variantIsString(val))
             {
                 size_t len;
-                const char* str;
+                char const* str;
                 tr_variantGetStr(val, &str, &len);
                 tr_variantDictAddRaw(target, key, str, len);
             }
@@ -1105,7 +1105,7 @@ void tr_variantMergeDicts(tr_variant* target, const tr_variant* source)
 ****
 ***/
 
-struct evbuffer* tr_variantToBuf(const tr_variant* v, tr_variant_fmt fmt)
+struct evbuffer* tr_variantToBuf(tr_variant const* v, tr_variant_fmt fmt)
 {
     struct locale_context locale_ctx;
     struct evbuffer* buf = evbuffer_new();
@@ -1135,13 +1135,13 @@ struct evbuffer* tr_variantToBuf(const tr_variant* v, tr_variant_fmt fmt)
     return buf;
 }
 
-char* tr_variantToStr(const tr_variant* v, tr_variant_fmt fmt, size_t* len)
+char* tr_variantToStr(tr_variant const* v, tr_variant_fmt fmt, size_t* len)
 {
     struct evbuffer* buf = tr_variantToBuf(v, fmt);
     return evbuffer_free_to_str(buf, len);
 }
 
-int tr_variantToFile(const tr_variant* v, tr_variant_fmt fmt, const char* filename)
+int tr_variantToFile(tr_variant const* v, tr_variant_fmt fmt, char const* filename)
 {
     char* tmp;
     tr_sys_file_t fd;
@@ -1167,7 +1167,7 @@ int tr_variantToFile(const tr_variant* v, tr_variant_fmt fmt, const char* filena
         /* save the variant to a temporary file */
         {
             struct evbuffer* buf = tr_variantToBuf(v, fmt);
-            const char* walk = (const char*)evbuffer_pullup(buf, -1);
+            char const* walk = (char const*)evbuffer_pullup(buf, -1);
             nleft = evbuffer_get_length(buf);
 
             while (nleft > 0)
@@ -1228,7 +1228,7 @@ int tr_variantToFile(const tr_variant* v, tr_variant_fmt fmt, const char* filena
 ****
 ***/
 
-bool tr_variantFromFile(tr_variant* setme, tr_variant_fmt fmt, const char* filename, tr_error** error)
+bool tr_variantFromFile(tr_variant* setme, tr_variant_fmt fmt, char const* filename, tr_error** error)
 {
     bool ret = false;
     uint8_t* buf;
@@ -1253,8 +1253,8 @@ bool tr_variantFromFile(tr_variant* setme, tr_variant_fmt fmt, const char* filen
     return ret;
 }
 
-int tr_variantFromBuf(tr_variant* setme, tr_variant_fmt fmt, const void* buf, size_t buflen, const char* optional_source,
-    const char** setme_end)
+int tr_variantFromBuf(tr_variant* setme, tr_variant_fmt fmt, void const* buf, size_t buflen, char const* optional_source,
+    char const** setme_end)
 {
     int err;
     struct locale_context locale_ctx;
@@ -1270,7 +1270,7 @@ int tr_variantFromBuf(tr_variant* setme, tr_variant_fmt fmt, const void* buf, si
         break;
 
     default /* TR_VARIANT_FMT_BENC */:
-        err = tr_variantParseBenc(buf, ((const char*)buf) + buflen, setme, setme_end);
+        err = tr_variantParseBenc(buf, ((char const*)buf) + buflen, setme, setme_end);
         break;
     }
 

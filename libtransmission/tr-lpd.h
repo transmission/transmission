@@ -28,8 +28,8 @@ THE SOFTWARE.
 
 int tr_lpdInit(tr_session*, tr_address*);
 void tr_lpdUninit(tr_session*);
-bool tr_lpdEnabled(const tr_session*);
-bool tr_lpdSendAnnounce(const tr_torrent*);
+bool tr_lpdEnabled(tr_session const*);
+bool tr_lpdSendAnnounce(tr_torrent const*);
 
 /**
 * @defgroup Preproc Helper macros

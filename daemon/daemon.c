@@ -38,11 +38,11 @@
 
 #else
 
-static void sd_notify(int status UNUSED, const char* str UNUSED)
+static void sd_notify(int status UNUSED, char const* str UNUSED)
 {
 }
 
-static void sd_notifyf(int status UNUSED, const char* fmt UNUSED, ...)
+static void sd_notifyf(int status UNUSED, char const* fmt UNUSED, ...)
 {
 }
 
@@ -73,7 +73,7 @@ static void sd_notifyf(int status UNUSED, const char* fmt UNUSED, ...)
 #define SPEED_T_STR "TB/s"
 
 static bool seenHUP = false;
-static const char* logfileName = NULL;
+static char const* logfileName = NULL;
 static tr_sys_file_t logfile = TR_BAD_SYS_FILE;
 static tr_session* mySession = NULL;
 static tr_quark key_pidfile = 0;
@@ -84,7 +84,7 @@ static struct event_base* ev_base = NULL;
 ****  Config File
 ***/
 
-static const char* getUsage(void)
+static char const* getUsage(void)
 {
     return "Transmission " LONG_VERSION_STRING "  https://transmissionbt.com/\n"
            "A fast and easy BitTorrent client\n"
@@ -96,7 +96,7 @@ static const char* getUsage(void)
            "Usage: " MY_NAME " [options]";
 }
 
-static const struct tr_option options[] =
+static struct tr_option const options[] =
 {
     { 'a', "allowed", "Allowed IP addresses. (Default: " TR_DEFAULT_RPC_WHITELIST ")", "a", 1, "<list>" },
     { 'b', "blocklist", "Enable peer blocklists", "b", 0, NULL },
@@ -143,11 +143,11 @@ static const struct tr_option options[] =
     { 0, NULL, NULL, NULL, 0, NULL }
 };
 
-static bool reopen_log_file(const char* filename)
+static bool reopen_log_file(char const* filename)
 {
     tr_error* error = NULL;
-    const tr_sys_file_t old_log_file = logfile;
-    const tr_sys_file_t new_log_file = tr_sys_file_open(filename, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_APPEND, 0666,
+    tr_sys_file_t const old_log_file = logfile;
+    tr_sys_file_t const new_log_file = tr_sys_file_open(filename, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_APPEND, 0666,
         &error);
 
     if (new_log_file == TR_BAD_SYS_FILE)
@@ -167,12 +167,12 @@ static bool reopen_log_file(const char* filename)
     return true;
 }
 
-static const char* getConfigDir(int argc, const char* const* argv)
+static char const* getConfigDir(int argc, char const* const* argv)
 {
     int c;
-    const char* configDir = NULL;
-    const char* optarg;
-    const int ind = tr_optind;
+    char const* configDir = NULL;
+    char const* optarg;
+    int const ind = tr_optind;
 
     while ((c = tr_getopt(getUsage(), argc, argv, options, &optarg)))
     {
@@ -193,7 +193,7 @@ static const char* getConfigDir(int argc, const char* const* argv)
     return configDir;
 }
 
-static tr_watchdir_status onFileAdded(tr_watchdir_t dir, const char* name, void* context)
+static tr_watchdir_status onFileAdded(tr_watchdir_t dir, char const* name, void* context)
 {
     tr_session* session = context;
 
@@ -217,7 +217,7 @@ static tr_watchdir_status onFileAdded(tr_watchdir_t dir, const char* name, void*
         else
         {
             bool trash = false;
-            const bool test = tr_ctorGetDeleteSource(ctor, &trash);
+            bool const test = tr_ctorGetDeleteSource(ctor, &trash);
 
             tr_logAddInfo("Parsing .torrent file successful \"%s\"", name);
 
@@ -252,7 +252,7 @@ static tr_watchdir_status onFileAdded(tr_watchdir_t dir, const char* name, void*
     return err == TR_PARSE_ERR ? TR_WATCHDIR_RETRY : TR_WATCHDIR_ACCEPT;
 }
 
-static void printMessage(tr_sys_file_t logfile, int level, const char* name, const char* message, const char* file, int line)
+static void printMessage(tr_sys_file_t logfile, int level, char const* name, char const* message, char const* file, int line)
 {
     if (logfile != TR_BAD_SYS_FILE)
     {
@@ -307,7 +307,7 @@ static void printMessage(tr_sys_file_t logfile, int level, const char* name, con
 
 static void pumpLogMessages(tr_sys_file_t logfile)
 {
-    const tr_log_message* l;
+    tr_log_message const* l;
     tr_log_message* list = tr_logGetQueue();
 
     for (l = list; l != NULL; l = l->next)
@@ -325,8 +325,8 @@ static void pumpLogMessages(tr_sys_file_t logfile)
 
 static void reportStatus(void)
 {
-    const double up = tr_sessionGetRawSpeed_KBps(mySession, TR_UP);
-    const double dn = tr_sessionGetRawSpeed_KBps(mySession, TR_DOWN);
+    double const up = tr_sessionGetRawSpeed_KBps(mySession, TR_UP);
+    double const dn = tr_sessionGetRawSpeed_KBps(mySession, TR_DOWN);
 
     if (up > 0 || dn > 0)
     {
@@ -355,11 +355,11 @@ static tr_rpc_callback_status on_rpc_callback(tr_session* session UNUSED, tr_rpc
     return TR_RPC_OK;
 }
 
-static bool parse_args(int argc, const char** argv, tr_variant* settings, bool* paused, bool* dump_settings, bool* foreground,
+static bool parse_args(int argc, char const** argv, tr_variant* settings, bool* paused, bool* dump_settings, bool* foreground,
     int* exit_code)
 {
     int c;
-    const char* optarg;
+    char const* optarg;
 
     *paused = false;
     *dump_settings = false;
@@ -560,7 +560,7 @@ static bool parse_args(int argc, const char** argv, tr_variant* settings, bool* 
 struct daemon_data
 {
     tr_variant settings;
-    const char* configDir;
+    char const* configDir;
     bool paused;
 };
 
@@ -574,7 +574,7 @@ static void daemon_reconfigure(void* arg UNUSED)
     else
     {
         tr_variant settings;
-        const char* configDir;
+        char const* configDir;
 
         /* reopen the logfile to allow for log rotation */
         if (logfileName != NULL)
@@ -601,7 +601,7 @@ static void daemon_stop(void* arg UNUSED)
 static int daemon_start(void* raw_arg, bool foreground)
 {
     bool boolVal;
-    const char* pid_filename;
+    char const* pid_filename;
     bool pidfile_created = false;
     tr_session* session = NULL;
     struct event* status_ev = NULL;
@@ -609,7 +609,7 @@ static int daemon_start(void* raw_arg, bool foreground)
 
     struct daemon_data* const arg = raw_arg;
     tr_variant* const settings = &arg->settings;
-    const char* const configDir = arg->configDir;
+    char const* const configDir = arg->configDir;
 
 #ifndef HAVE_SYSLOG
     (void)foreground;
@@ -678,7 +678,7 @@ static int daemon_start(void* raw_arg, bool foreground)
     /* maybe add a watchdir */
     if (tr_variantDictFindBool(settings, TR_KEY_watch_dir_enabled, &boolVal) && boolVal)
     {
-        const char* dir;
+        char const* dir;
         bool force_generic;
 
         if (!tr_variantDictFindBool(settings, key_watch_dir_force_generic, &force_generic))
@@ -791,7 +791,7 @@ cleanup:
 
 int tr_main(int argc, char* argv[])
 {
-    const dtr_callbacks cb =
+    dtr_callbacks const cb =
     {
         .on_start = &daemon_start,
         .on_stop = &daemon_stop,
@@ -804,7 +804,7 @@ int tr_main(int argc, char* argv[])
 
     struct daemon_data arg;
     tr_variant* const settings = &arg.settings;
-    const char** const configDir = &arg.configDir;
+    char const** const configDir = &arg.configDir;
 
     key_pidfile = tr_quark_new("pidfile", 7);
     key_watch_dir_force_generic = tr_quark_new("watch-dir-force-generic", 23);
@@ -812,11 +812,11 @@ int tr_main(int argc, char* argv[])
     /* load settings from defaults + config file */
     tr_variantInitDict(settings, 0);
     tr_variantDictAddBool(settings, TR_KEY_rpc_enabled, true);
-    *configDir = getConfigDir(argc, (const char* const*)argv);
+    *configDir = getConfigDir(argc, (char const* const*)argv);
     loaded = tr_sessionLoadSettings(settings, *configDir, MY_NAME);
 
     /* overwrite settings from the comamndline */
-    if (!parse_args(argc, (const char**)argv, settings, &arg.paused, &dumpSettings, &foreground, &ret))
+    if (!parse_args(argc, (char const**)argv, settings, &arg.paused, &dumpSettings, &foreground, &ret))
     {
         goto cleanup;
     }

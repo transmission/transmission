@@ -21,7 +21,7 @@
 #define PRIME_LEN 96
 #define DH_PRIVKEY_LEN 20
 
-static const uint8_t dh_P[PRIME_LEN] =
+static uint8_t const dh_P[PRIME_LEN] =
 {
     0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xC9, 0x0F, 0xDA, 0xA2,
     0x21, 0x68, 0xC2, 0x34, 0xC4, 0xC6, 0x62, 0x8B, 0x80, 0xDC, 0x1C, 0xD1,
@@ -33,7 +33,7 @@ static const uint8_t dh_P[PRIME_LEN] =
     0xA6, 0x3A, 0x36, 0x21, 0x00, 0x00, 0x00, 0x00, 0x00, 0x09, 0x05, 0x63,
 };
 
-static const uint8_t dh_G[] = { 2 };
+static uint8_t const dh_G[] = { 2 };
 
 /**
 ***
@@ -52,7 +52,7 @@ static void ensureKeyExists(tr_crypto* crypto)
     }
 }
 
-void tr_cryptoConstruct(tr_crypto* crypto, const uint8_t* torrentHash, bool isIncoming)
+void tr_cryptoConstruct(tr_crypto* crypto, uint8_t const* torrentHash, bool isIncoming)
 {
     memset(crypto, 0, sizeof(tr_crypto));
 
@@ -72,14 +72,14 @@ void tr_cryptoDestruct(tr_crypto* crypto)
 ***
 **/
 
-bool tr_cryptoComputeSecret(tr_crypto* crypto, const uint8_t* peerPublicKey)
+bool tr_cryptoComputeSecret(tr_crypto* crypto, uint8_t const* peerPublicKey)
 {
     ensureKeyExists(crypto);
     crypto->mySecret = tr_dh_agree(crypto->dh, peerPublicKey, KEY_LEN);
     return crypto->mySecret != NULL;
 }
 
-const uint8_t* tr_cryptoGetMyPublicKey(const tr_crypto* crypto, int* setme_len)
+uint8_t const* tr_cryptoGetMyPublicKey(tr_crypto const* crypto, int* setme_len)
 {
     ensureKeyExists((tr_crypto*)crypto);
     *setme_len = KEY_LEN;
@@ -90,7 +90,7 @@ const uint8_t* tr_cryptoGetMyPublicKey(const tr_crypto* crypto, int* setme_len)
 ***
 **/
 
-static void initRC4(tr_crypto* crypto, tr_rc4_ctx_t* setme, const char* key)
+static void initRC4(tr_crypto* crypto, tr_rc4_ctx_t* setme, char const* key)
 {
     uint8_t buf[SHA_DIGEST_LENGTH];
 
@@ -110,13 +110,13 @@ static void initRC4(tr_crypto* crypto, tr_rc4_ctx_t* setme, const char* key)
 void tr_cryptoDecryptInit(tr_crypto* crypto)
 {
     uint8_t discard[1024];
-    const char* txt = crypto->isIncoming ? "keyA" : "keyB";
+    char const* txt = crypto->isIncoming ? "keyA" : "keyB";
 
     initRC4(crypto, &crypto->dec_key, txt);
     tr_rc4_process(crypto->dec_key, discard, discard, sizeof(discard));
 }
 
-void tr_cryptoDecrypt(tr_crypto* crypto, size_t buf_len, const void* buf_in, void* buf_out)
+void tr_cryptoDecrypt(tr_crypto* crypto, size_t buf_len, void const* buf_in, void* buf_out)
 {
     /* FIXME: someone calls this function with uninitialized key */
     if (crypto->dec_key == NULL)
@@ -135,13 +135,13 @@ void tr_cryptoDecrypt(tr_crypto* crypto, size_t buf_len, const void* buf_in, voi
 void tr_cryptoEncryptInit(tr_crypto* crypto)
 {
     uint8_t discard[1024];
-    const char* txt = crypto->isIncoming ? "keyB" : "keyA";
+    char const* txt = crypto->isIncoming ? "keyB" : "keyA";
 
     initRC4(crypto, &crypto->enc_key, txt);
     tr_rc4_process(crypto->enc_key, discard, discard, sizeof(discard));
 }
 
-void tr_cryptoEncrypt(tr_crypto* crypto, size_t buf_len, const void* buf_in, void* buf_out)
+void tr_cryptoEncrypt(tr_crypto* crypto, size_t buf_len, void const* buf_in, void* buf_out)
 {
     /* FIXME: someone calls this function with uninitialized key */
     if (crypto->enc_key == NULL)
@@ -157,8 +157,8 @@ void tr_cryptoEncrypt(tr_crypto* crypto, size_t buf_len, const void* buf_in, voi
     tr_rc4_process(crypto->enc_key, buf_in, buf_out, buf_len);
 }
 
-bool tr_cryptoSecretKeySha1(const tr_crypto* crypto, const void* prepend_data, size_t prepend_data_size,
-    const void* append_data, size_t append_data_size, uint8_t* hash)
+bool tr_cryptoSecretKeySha1(tr_crypto const* crypto, void const* prepend_data, size_t prepend_data_size,
+    void const* append_data, size_t append_data_size, uint8_t* hash)
 {
     assert(crypto != NULL);
     assert(crypto->mySecret != NULL);
@@ -170,7 +170,7 @@ bool tr_cryptoSecretKeySha1(const tr_crypto* crypto, const void* prepend_data, s
 ***
 **/
 
-void tr_cryptoSetTorrentHash(tr_crypto* crypto, const uint8_t* hash)
+void tr_cryptoSetTorrentHash(tr_crypto* crypto, uint8_t const* hash)
 {
     crypto->torrentHashIsSet = hash != NULL;
 
@@ -184,14 +184,14 @@ void tr_cryptoSetTorrentHash(tr_crypto* crypto, const uint8_t* hash)
     }
 }
 
-const uint8_t* tr_cryptoGetTorrentHash(const tr_crypto* crypto)
+uint8_t const* tr_cryptoGetTorrentHash(tr_crypto const* crypto)
 {
     assert(crypto);
 
     return crypto->torrentHashIsSet ? crypto->torrentHash : NULL;
 }
 
-bool tr_cryptoHasTorrentHash(const tr_crypto* crypto)
+bool tr_cryptoHasTorrentHash(tr_crypto const* crypto)
 {
     assert(crypto);
 

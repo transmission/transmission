@@ -25,7 +25,7 @@ class FilterBar : public QWidget
     Q_OBJECT
 
 public:
-    FilterBar(Prefs& prefs, const TorrentModel& torrents, const TorrentFilter& filter, QWidget* parent = nullptr);
+    FilterBar(Prefs& prefs, TorrentModel const& torrents, TorrentFilter const& filter, QWidget* parent = nullptr);
     virtual ~FilterBar();
 
 public slots:
@@ -43,12 +43,12 @@ private slots:
     void refreshPref(int key);
     void onActivityIndexChanged(int index);
     void onTrackerIndexChanged(int index);
-    void onTextChanged(const QString&);
+    void onTextChanged(QString const&);
 
 private:
     Prefs& myPrefs;
-    const TorrentModel& myTorrents;
-    const TorrentFilter& myFilter;
+    TorrentModel const& myTorrents;
+    TorrentFilter const& myFilter;
 
     FilterBarComboBox* myActivityCombo;
     FilterBarComboBox* myTrackerCombo;

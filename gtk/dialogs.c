@@ -66,7 +66,7 @@ void gtr_confirm_remove(GtkWindow* parent, TrCore* core, GSList* torrent_ids, gb
     struct delete_data* dd;
     int connected = 0;
     int incomplete = 0;
-    const int count = g_slist_length(torrent_ids);
+    int const count = g_slist_length(torrent_ids);
 
     if (!count)
     {
@@ -80,9 +80,9 @@ void gtr_confirm_remove(GtkWindow* parent, TrCore* core, GSList* torrent_ids, gb
 
     for (l = torrent_ids; l != NULL; l = l->next)
     {
-        const int id = GPOINTER_TO_INT(l->data);
+        int const id = GPOINTER_TO_INT(l->data);
         tr_torrent* tor = gtr_core_find_torrent(core, id);
-        const tr_stat* stat = tr_torrentStat(tor);
+        tr_stat const* stat = tr_torrentStat(tor);
 
         if (stat->leftUntilDone)
         {

@@ -12,7 +12,7 @@
 #include "FileTreeDelegate.h"
 #include "FileTreeModel.h"
 
-QSize FileTreeDelegate::sizeHint(const QStyleOptionViewItem& item, const QModelIndex& index) const
+QSize FileTreeDelegate::sizeHint(QStyleOptionViewItem const& item, QModelIndex const& index) const
 {
     QSize size;
 
@@ -31,9 +31,9 @@ QSize FileTreeDelegate::sizeHint(const QStyleOptionViewItem& item, const QModelI
     return size;
 }
 
-void FileTreeDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const
+void FileTreeDelegate::paint(QPainter* painter, QStyleOptionViewItem const& option, QModelIndex const& index) const
 {
-    const int column(index.column());
+    int const column(index.column());
 
     if ((column != FileTreeModel::COL_PROGRESS) && (column != FileTreeModel::COL_WANTED))
     {

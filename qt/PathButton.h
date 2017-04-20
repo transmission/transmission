@@ -25,17 +25,17 @@ public:
     PathButton(QWidget* parent = nullptr);
 
     void setMode(Mode mode);
-    void setTitle(const QString& title);
-    void setNameFilter(const QString& nameFilter);
+    void setTitle(QString const& title);
+    void setNameFilter(QString const& nameFilter);
 
-    void setPath(const QString& path);
-    const QString& path() const;
+    void setPath(QString const& path);
+    QString const& path() const;
 
     // QWidget
     virtual QSize sizeHint() const;
 
 signals:
-    void pathChanged(const QString& path);
+    void pathChanged(QString const& path);
 
 protected:
     // QWidget
@@ -49,7 +49,7 @@ private:
 
 private slots:
     void onClicked();
-    void onFileSelected(const QString& path);
+    void onFileSelected(QString const& path);
 
 private:
     Mode myMode;

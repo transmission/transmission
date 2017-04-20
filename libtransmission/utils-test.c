@@ -34,9 +34,9 @@
 
 static int test_strip_positional_args(void)
 {
-    const char* in;
-    const char* out;
-    const char* expected;
+    char const* in;
+    char const* out;
+    char const* expected;
 
     in = "Hello %1$s foo %2$.*f";
     expected = "Hello %s foo %.*f";
@@ -96,7 +96,7 @@ static int test_buildpath(void)
 
 static int test_utf8(void)
 {
-    const char* in;
+    char const* in;
     char* out;
 
     in = "hello world";
@@ -184,25 +184,25 @@ static int test_numbers(void)
     return 0;
 }
 
-static int compareInts(const void* va, const void* vb)
+static int compareInts(void const* va, void const* vb)
 {
-    const int a = *(const int*)va;
-    const int b = *(const int*)vb;
+    int const a = *(int const*)va;
+    int const b = *(int const*)vb;
     return a - b;
 }
 
 static int test_lowerbound(void)
 {
     int i;
-    const int A[] = { 1, 2, 3, 3, 3, 5, 8 };
-    const int expected_pos[] = { 0, 1, 2, 5, 5, 6, 6, 6, 7, 7 };
-    const bool expected_exact[] = { true, true, true, false, true, false, false, true, false, false };
-    const int N = sizeof(A) / sizeof(A[0]);
+    int const A[] = { 1, 2, 3, 3, 3, 5, 8 };
+    int const expected_pos[] = { 0, 1, 2, 5, 5, 6, 6, 6, 7, 7 };
+    bool const expected_exact[] = { true, true, true, false, true, false, false, true, false, false };
+    int const N = sizeof(A) / sizeof(A[0]);
 
     for (i = 1; i <= 10; i++)
     {
         bool exact;
-        const int pos = tr_lowerBound(&i, A, N, sizeof(int), compareInts, &exact);
+        int const pos = tr_lowerBound(&i, A, N, sizeof(int), compareInts, &exact);
 
 #if 0
 
@@ -227,7 +227,7 @@ static int test_lowerbound(void)
     return 0;
 }
 
-static int test_quickFindFirst_Iteration(const size_t k, const size_t n, int* buf, int range)
+static int test_quickFindFirst_Iteration(size_t const k, size_t const n, int* buf, int range)
 {
     size_t i;
     int highest_low;
@@ -272,9 +272,9 @@ static int test_quickFindFirst_Iteration(const size_t k, const size_t n, int* bu
 static int test_quickfindFirst(void)
 {
     size_t i;
-    const size_t k = 10;
-    const size_t n = 100;
-    const size_t n_trials = 1000;
+    size_t const k = 10;
+    size_t const n = 100;
+    size_t const n_trials = 1000;
     int* buf = tr_new(int, n);
 
     for (i = 0; i < n_trials; ++i)
@@ -350,7 +350,7 @@ static int test_url(void)
     char* host;
     char* path;
     char* str;
-    const char* url;
+    char const* url;
 
     url = "http://1";
     check(tr_urlParse(url, TR_BAD_SIZE, &scheme, &host, &port, &path));
@@ -393,7 +393,7 @@ static int test_url(void)
 static int test_truncd(void)
 {
     char buf[32];
-    const double nan = sqrt(-1);
+    double const nan = sqrt(-1);
 
     tr_snprintf(buf, sizeof(buf), "%.2f%%", 99.999);
     check_streq("100.00%", buf);
@@ -427,7 +427,7 @@ static int test_truncd(void)
     return 0;
 }
 
-static char* test_strdup_printf_valist(const char* fmt, ...)
+static char* test_strdup_printf_valist(char const* fmt, ...)
 {
     va_list args;
     char* ret;
@@ -484,7 +484,7 @@ static int test_strdup_printf(void)
 
 static int test_env(void)
 {
-    const char* test_key = "TR_TEST_ENV";
+    char const* test_key = "TR_TEST_ENV";
     int x;
     char* s;
 
@@ -528,7 +528,7 @@ static int test_env(void)
 
 int main(void)
 {
-    const testFunc tests[] =
+    testFunc const tests[] =
     {
         test_array,
         test_buildpath,

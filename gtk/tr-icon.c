@@ -10,7 +10,7 @@
 #include <glib/gi18n.h>
 #include <gtk/gtk.h>
 #ifdef HAVE_LIBAPPINDICATOR
-    #include <libappindicator/app-indicator.h>
+#include <libappindicator/app-indicator.h>
 #endif
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h>
@@ -51,7 +51,7 @@ void gtr_icon_refresh(gpointer vicon)
     char down[64];
     char downLimit[64];
     char tip[1024];
-    const char* idle = _("Idle");
+    char const* idle = _("Idle");
     GtkStatusIcon* icon = GTK_STATUS_ICON(vicon);
     tr_session* session = gtr_core_session(g_object_get_qdata(G_OBJECT(icon), core_quark()));
 
@@ -110,9 +110,9 @@ void gtr_icon_refresh(gpointer vicon)
 
 #endif
 
-static const char* getIconName(void)
+static char const* getIconName(void)
 {
-    const char* icon_name;
+    char const* icon_name;
 
     GtkIconTheme* theme = gtk_icon_theme_get_default();
 
@@ -125,7 +125,7 @@ static const char* getIconName(void)
     else
     {
         GtkIconInfo* icon_info = gtk_icon_theme_lookup_icon(theme, TRAY_ICON, 48, GTK_ICON_LOOKUP_USE_BUILTIN);
-        const gboolean icon_is_builtin = gtk_icon_info_get_filename(icon_info) == NULL;
+        gboolean const icon_is_builtin = gtk_icon_info_get_filename(icon_info) == NULL;
 
 #if GTK_CHECK_VERSION(3, 8, 0)
         g_object_unref(icon_info);
@@ -144,7 +144,7 @@ gpointer gtr_icon_new(TrCore* core)
 #ifdef HAVE_LIBAPPINDICATOR
 
     GtkWidget* w;
-    const char* icon_name = getIconName();
+    char const* icon_name = getIconName();
     AppIndicator* indicator = app_indicator_new(ICON_NAME, icon_name, APP_INDICATOR_CATEGORY_SYSTEM_SERVICES);
     app_indicator_set_status(indicator, APP_INDICATOR_STATUS_ACTIVE);
     w = gtr_action_get_widget("/icon-popup");
@@ -155,7 +155,7 @@ gpointer gtr_icon_new(TrCore* core)
 
 #else
 
-    const char* icon_name = getIconName();
+    char const* icon_name = getIconName();
     GtkStatusIcon* icon = gtk_status_icon_new_from_icon_name(icon_name);
     g_signal_connect(icon, "activate", G_CALLBACK(activated), NULL);
     g_signal_connect(icon, "popup-menu", G_CALLBACK(popup), NULL);

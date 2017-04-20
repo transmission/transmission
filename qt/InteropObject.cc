@@ -21,7 +21,7 @@ bool InteropObject::PresentWindow()
     return true;
 }
 
-bool InteropObject::AddMetainfo(const QString& metainfo)
+bool InteropObject::AddMetainfo(QString const& metainfo)
 {
     AddData addme(metainfo);
 

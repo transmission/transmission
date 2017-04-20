@@ -190,7 +190,7 @@ public:
     typedef QList<tr_quark> KeyList;
 
 public:
-    Torrent(const Prefs&, int id);
+    Torrent(Prefs const&, int id);
     virtual ~Torrent();
 
     int getBandwidthPriority() const
@@ -342,10 +342,10 @@ public:
         return getSize(FAILED_EVER);
     }
 
-    int compareTracker(const Torrent&) const;
-    int compareSeedRatio(const Torrent&) const;
-    int compareRatio(const Torrent&) const;
-    int compareETA(const Torrent&) const;
+    int compareTracker(Torrent const&) const;
+    int compareSeedRatio(Torrent const&) const;
+    int compareRatio(Torrent const&) const;
+    int compareETA(Torrent const&) const;
 
     bool hasETA() const
     {
@@ -432,8 +432,8 @@ public:
         return getDouble(PERCENT_VERIFIED);
     }
 
-    bool hasFileSubstring(const QString& substr) const;
-    bool hasTrackerSubstring(const QString& substr) const;
+    bool hasFileSubstring(QString const& substr) const;
+    bool hasTrackerSubstring(QString const& substr) const;
 
     Speed uploadLimit() const
     {
@@ -505,7 +505,7 @@ public:
         return myValues[PEERS].value<PeerList>();
     }
 
-    const FileList& files() const
+    FileList const& files() const
     {
         return myFiles;
     }
@@ -591,9 +591,9 @@ public:
         return getIcon(MIME_ICON);
     }
 
-    static const KeyList& getInfoKeys();
-    static const KeyList& getStatKeys();
-    static const KeyList& getExtraStatKeys();
+    static KeyList const& getInfoKeys();
+    static KeyList const& getStatKeys();
+    static KeyList const& getExtraStatKeys();
 
 signals:
     void torrentChanged(int id);
@@ -628,19 +628,19 @@ private:
 
     bool setInt(int key, int value);
     bool setBool(int key, bool value);
-    bool setIcon(int key, const QIcon&);
+    bool setIcon(int key, QIcon const&);
     bool setDouble(int key, double);
-    bool setString(int key, const char*);
+    bool setString(int key, char const*);
     bool setSize(int key, qulonglong);
-    bool setDateTime(int key, const QDateTime&);
+    bool setDateTime(int key, QDateTime const&);
 
-    const char* getMimeTypeString() const;
+    char const* getMimeTypeString() const;
     void updateMimeIcon();
 
     static KeyList buildKeyList(Group group);
 
 private:
-    const Prefs& myPrefs;
+    Prefs const& myPrefs;
 
     QVariant myValues[PROPERTY_COUNT];
     bool magnetTorrent;
@@ -649,4 +649,4 @@ private:
     static Property myProperties[];
 };
 
-Q_DECLARE_METATYPE(const Torrent*)
+Q_DECLARE_METATYPE(Torrent const*)

@@ -17,7 +17,7 @@
 namespace
 {
 
-int getHSpacing(const QWidget* w)
+int getHSpacing(QWidget const* w)
 {
     return qMax(3, w->style()->pixelMetric(QStyle::PM_LayoutHorizontalSpacing, 0, w));
 }
@@ -34,7 +34,7 @@ int FilterBarComboBox::currentCount() const
 {
     int count = 0;
 
-    const QModelIndex modelIndex = model()->index(currentIndex(), 0, rootModelIndex());
+    QModelIndex const modelIndex = model()->index(currentIndex(), 0, rootModelIndex());
 
     if (modelIndex.isValid())
     {
@@ -47,8 +47,8 @@ int FilterBarComboBox::currentCount() const
 QSize FilterBarComboBox::minimumSizeHint() const
 {
     QFontMetrics fm(fontMetrics());
-    const QSize textSize = fm.boundingRect(itemText(0)).size();
-    const QSize countSize = fm.boundingRect(itemData(0, CountStringRole).toString()).size();
+    QSize const textSize = fm.boundingRect(itemText(0)).size();
+    QSize const countSize = fm.boundingRect(itemData(0, CountStringRole).toString()).size();
     return calculateSize(textSize, countSize);
 }
 
@@ -60,11 +60,11 @@ QSize FilterBarComboBox::sizeHint() const
 
     for (int i = 0, n = count(); i < n; ++i)
     {
-        const QSize textSize = fm.boundingRect(itemText(i)).size();
+        QSize const textSize = fm.boundingRect(itemText(i)).size();
         maxTextSize.setHeight(qMax(maxTextSize.height(), textSize.height()));
         maxTextSize.setWidth(qMax(maxTextSize.width(), textSize.width()));
 
-        const QSize countSize = fm.boundingRect(itemData(i, CountStringRole).toString()).size();
+        QSize const countSize = fm.boundingRect(itemData(i, CountStringRole).toString()).size();
         maxCountSize.setHeight(qMax(maxCountSize.height(), countSize.height()));
         maxCountSize.setWidth(qMax(maxCountSize.width(), countSize.width()));
     }
@@ -72,9 +72,9 @@ QSize FilterBarComboBox::sizeHint() const
     return calculateSize(maxTextSize, maxCountSize);
 }
 
-QSize FilterBarComboBox::calculateSize(const QSize& textSize, const QSize& countSize) const
+QSize FilterBarComboBox::calculateSize(QSize const& textSize, QSize const& countSize) const
 {
-    const int hmargin = getHSpacing(this);
+    int const hmargin = getHSpacing(this);
 
     QStyleOptionComboBox option;
     initStyleOption(&option);
@@ -100,22 +100,22 @@ void FilterBarComboBox::paintEvent(QPaintEvent* e)
     painter.drawComplexControl(QStyle::CC_ComboBox, opt);
 
     // draw the icon and text
-    const QModelIndex modelIndex = model()->index(currentIndex(), 0, rootModelIndex());
+    QModelIndex const modelIndex = model()->index(currentIndex(), 0, rootModelIndex());
 
     if (modelIndex.isValid())
     {
         QStyle* s = style();
-        const int hmargin = getHSpacing(this);
+        int const hmargin = getHSpacing(this);
 
         QRect rect = s->subControlRect(QStyle::CC_ComboBox, &opt, QStyle::SC_ComboBoxEditField, this);
         rect.adjust(2, 1, -2, -1);
 
         // draw the icon
-        const QIcon icon = Utils::getIconFromIndex(modelIndex);
+        QIcon const icon = Utils::getIconFromIndex(modelIndex);
 
         if (!icon.isNull())
         {
-            const QRect iconRect = QStyle::alignedRect(opt.direction, Qt::AlignLeft | Qt::AlignVCenter, opt.iconSize, rect);
+            QRect const iconRect = QStyle::alignedRect(opt.direction, Qt::AlignLeft | Qt::AlignVCenter, opt.iconSize, rect);
             icon.paint(&painter, iconRect, Qt::AlignCenter, StyleHelper::getIconMode(opt.state), QIcon::Off);
             Utils::narrowRect(rect, iconRect.width() + hmargin, 0, opt.direction);
         }
@@ -125,9 +125,9 @@ void FilterBarComboBox::paintEvent(QPaintEvent* e)
 
         if (!text.isEmpty())
         {
-            const QPen pen = painter.pen();
+            QPen const pen = painter.pen();
             painter.setPen(Utils::getFadedColor(pen.color()));
-            const QRect textRect = QStyle::alignedRect(opt.direction, Qt::AlignRight | Qt::AlignVCenter,
+            QRect const textRect = QStyle::alignedRect(opt.direction, Qt::AlignRight | Qt::AlignVCenter,
                 QSize(opt.fontMetrics.width(text), rect.height()), rect);
             painter.drawText(textRect, Qt::AlignRight | Qt::AlignVCenter, text);
             Utils::narrowRect(rect, 0, textRect.width() + hmargin, opt.direction);

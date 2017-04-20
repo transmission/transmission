@@ -31,13 +31,13 @@ public:
     virtual ~Application();
 
     void raise();
-    bool notifyApp(const QString& title, const QString& body) const;
+    bool notifyApp(QString const& title, QString const& body) const;
 
     FaviconCache& faviconCache();
 
 public slots:
-    void addTorrent(const QString&);
-    void addTorrent(const AddData&);
+    void addTorrent(QString const&);
+    void addTorrent(AddData const&);
 
 private:
     void maybeUpdateBlocklist();
@@ -49,7 +49,7 @@ private slots:
     void onSessionSourceChanged();
     void refreshPref(int key);
     void refreshTorrents();
-    void onTorrentsAdded(const QSet<int>& torrents);
+    void onTorrentsAdded(QSet<int> const& torrents);
     void onTorrentCompleted(int);
     void onNewTorrentChanged(int);
 

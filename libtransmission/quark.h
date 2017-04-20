@@ -410,19 +410,19 @@ enum
  *
  * @return true if the specified string exists as a quark
  */
-bool tr_quark_lookup(const void* str, size_t len, tr_quark* setme);
+bool tr_quark_lookup(void const* str, size_t len, tr_quark* setme);
 
 /**
  * Get the string that corresponds to the specified quark
  */
-const char* tr_quark_get_string(tr_quark quark, size_t* len);
+char const* tr_quark_get_string(tr_quark quark, size_t* len);
 
 /**
  * Create a new quark for the specified string. If a quark already
  * exists for that string, it is returned so that no duplicates are
  * created.
  */
-tr_quark tr_quark_new(const void* str, size_t len);
+tr_quark tr_quark_new(void const* str, size_t len);
 
 /***
 ****

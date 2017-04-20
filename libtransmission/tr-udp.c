@@ -57,7 +57,7 @@ static void set_socket_buffers(tr_socket_t fd, int large)
     char err_buf[512];
 
     size = large ? RECV_BUFFER_SIZE : SMALL_BUFFER_SIZE;
-    rc = setsockopt(fd, SOL_SOCKET, SO_RCVBUF, (const void*)&size, sizeof(size));
+    rc = setsockopt(fd, SOL_SOCKET, SO_RCVBUF, (void const*)&size, sizeof(size));
 
     if (rc < 0)
     {
@@ -65,7 +65,7 @@ static void set_socket_buffers(tr_socket_t fd, int large)
     }
 
     size = large ? SEND_BUFFER_SIZE : SMALL_BUFFER_SIZE;
-    rc = setsockopt(fd, SOL_SOCKET, SO_SNDBUF, (const void*)&size, sizeof(size));
+    rc = setsockopt(fd, SOL_SOCKET, SO_SNDBUF, (void const*)&size, sizeof(size));
 
     if (rc < 0)
     {
@@ -127,9 +127,9 @@ void tr_udpSetSocketBuffers(tr_session* session)
 static void rebind_ipv6(tr_session* ss, bool force)
 {
     bool is_default;
-    const struct tr_address* public_addr;
+    struct tr_address const* public_addr;
     struct sockaddr_in6 sin6;
-    const unsigned char* ipv6 = tr_globalIPv6();
+    unsigned char const* ipv6 = tr_globalIPv6();
     tr_socket_t s = TR_BAD_SOCKET;
     int rc;
     int one = 1;
@@ -162,7 +162,7 @@ static void rebind_ipv6(tr_session* ss, bool force)
 #ifdef IPV6_V6ONLY
     /* Since we always open an IPv4 socket on the same port, this
        shouldn't matter.  But I'm superstitious. */
-    setsockopt(s, IPPROTO_IPV6, IPV6_V6ONLY, (const void*)&one, sizeof(one));
+    setsockopt(s, IPPROTO_IPV6, IPV6_V6ONLY, (void const*)&one, sizeof(one));
 #endif
 
     memset(&sin6, 0, sizeof(sin6));
@@ -292,7 +292,7 @@ static void event_callback(evutil_socket_t s, short type UNUSED, void* sv)
 void tr_udpInit(tr_session* ss)
 {
     bool is_default;
-    const struct tr_address* public_addr;
+    struct tr_address const* public_addr;
     struct sockaddr_in sin;
     int rc;
 

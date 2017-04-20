@@ -19,9 +19,9 @@
 
 int tr_optind = 1;
 
-static const char* getArgName(const tr_option* opt)
+static char const* getArgName(tr_option const* opt)
 {
-    const char* arg;
+    char const* arg;
 
     if (!opt->has_arg)
     {
@@ -39,7 +39,7 @@ static const char* getArgName(const tr_option* opt)
     return arg;
 }
 
-static int get_next_line_len(const char* description, int maxlen)
+static int get_next_line_len(char const* description, int maxlen)
 {
     int end;
     int len = strlen(description);
@@ -59,16 +59,16 @@ static int get_next_line_len(const char* description, int maxlen)
     return end ? end : len;
 }
 
-static void getopts_usage_line(const tr_option* opt, int longWidth, int shortWidth, int argWidth)
+static void getopts_usage_line(tr_option const* opt, int longWidth, int shortWidth, int argWidth)
 {
     int len;
-    const char* longName = opt->longName ? opt->longName : "";
-    const char* shortName = opt->shortName ? opt->shortName : "";
-    const char* arg = getArgName(opt);
+    char const* longName = opt->longName ? opt->longName : "";
+    char const* shortName = opt->shortName ? opt->shortName : "";
+    char const* arg = getArgName(opt);
 
-    const int d_indent = shortWidth + longWidth + argWidth + 7;
-    const int d_width = 80 - d_indent;
-    const char* d = opt->description;
+    int const d_indent = shortWidth + longWidth + argWidth + 7;
+    int const d_width = 80 - d_indent;
+    char const* d = opt->description;
 
     printf(" %s%-*s %s%-*s %-*s ", (shortName && *shortName ? "-" : " "), shortWidth, shortName,
         (longName && *longName ? "--" : "  "), longWidth, longName, argWidth, arg);
@@ -94,9 +94,9 @@ static void getopts_usage_line(const tr_option* opt, int longWidth, int shortWid
     }
 }
 
-static void maxWidth(const struct tr_option* o, int* longWidth, int* shortWidth, int* argWidth)
+static void maxWidth(struct tr_option const* o, int* longWidth, int* shortWidth, int* argWidth)
 {
-    const char* arg;
+    char const* arg;
 
     if (o->longName)
     {
@@ -114,13 +114,13 @@ static void maxWidth(const struct tr_option* o, int* longWidth, int* shortWidth,
     }
 }
 
-void tr_getopt_usage(const char* progName, const char* description, const struct tr_option opts[])
+void tr_getopt_usage(char const* progName, char const* description, struct tr_option const opts[])
 {
     int longWidth = 0;
     int shortWidth = 0;
     int argWidth = 0;
     struct tr_option help;
-    const struct tr_option* o;
+    struct tr_option const* o;
 
     for (o = opts; o->val; ++o)
     {
@@ -149,12 +149,12 @@ void tr_getopt_usage(const char* progName, const char* description, const struct
     }
 }
 
-static const tr_option* findOption(const tr_option* opts, const char* str, const char** setme_arg)
+static tr_option const* findOption(tr_option const* opts, char const* str, char const** setme_arg)
 {
     size_t matchlen = 0;
-    const char* arg = NULL;
-    const tr_option* o;
-    const tr_option* match = NULL;
+    char const* arg = NULL;
+    tr_option const* o;
+    tr_option const* match = NULL;
 
     /* find the longest matching option */
     for (o = opts; o->val; ++o)
@@ -202,11 +202,11 @@ static const tr_option* findOption(const tr_option* opts, const char* str, const
     return match;
 }
 
-int tr_getopt(const char* usage, int argc, const char* const* argv, const tr_option* opts, const char** setme_optarg)
+int tr_getopt(char const* usage, int argc, char const* const* argv, tr_option const* opts, char const** setme_optarg)
 {
     int i;
-    const char* arg = NULL;
-    const tr_option* o = NULL;
+    char const* arg = NULL;
+    tr_option const* o = NULL;
 
     *setme_optarg = NULL;
 

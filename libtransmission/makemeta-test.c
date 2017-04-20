@@ -16,8 +16,8 @@
 #include <stdlib.h> /* mktemp() */
 #include <string.h> /* strlen() */
 
-static int test_single_file_impl(const tr_tracker_info* trackers, const size_t trackerCount, const void* payload,
-    const size_t payloadSize, const char* comment, bool isPrivate)
+static int test_single_file_impl(tr_tracker_info const* trackers, size_t const trackerCount, void const* payload,
+    size_t const payloadSize, char const* comment, bool isPrivate)
 {
     char* sandbox;
     char* input_file;
@@ -90,8 +90,8 @@ static int test_single_file(void)
     tr_tracker_info trackers[16];
     size_t trackerCount;
     bool isPrivate;
-    const char* comment;
-    const char* payload;
+    char const* comment;
+    char const* payload;
     size_t payloadSize;
 
     trackerCount = 0;
@@ -110,8 +110,8 @@ static int test_single_file(void)
     return 0;
 }
 
-static int test_single_directory_impl(const tr_tracker_info* trackers, const size_t trackerCount, const void** payloads,
-    const size_t* payloadSizes, const size_t payloadCount, const char* comment, const bool isPrivate)
+static int test_single_directory_impl(tr_tracker_info const* trackers, size_t const trackerCount, void const** payloads,
+    size_t const* payloadSizes, size_t const payloadCount, char const* comment, bool const isPrivate)
 {
     char* sandbox;
     char* torrent_file;
@@ -211,8 +211,8 @@ static int test_single_directory_impl(const tr_tracker_info* trackers, const siz
     return 0;
 }
 
-static int test_single_directory_random_payload_impl(const tr_tracker_info* trackers, const size_t trackerCount,
-    const size_t maxFileCount, const size_t maxFileSize, const char* comment, const bool isPrivate)
+static int test_single_directory_random_payload_impl(tr_tracker_info const* trackers, size_t const trackerCount,
+    size_t const maxFileCount, size_t const maxFileSize, char const* comment, bool const isPrivate)
 {
     size_t i;
     void** payloads;
@@ -226,14 +226,14 @@ static int test_single_directory_random_payload_impl(const tr_tracker_info* trac
 
     for (i = 0; i < payloadCount; i++)
     {
-        const size_t n = 1 + tr_rand_int_weak(maxFileSize);
+        size_t const n = 1 + tr_rand_int_weak(maxFileSize);
         payloads[i] = tr_new(char, n);
         tr_rand_buffer(payloads[i], n);
         payloadSizes[i] = n;
     }
 
     /* run the test */
-    test_single_directory_impl(trackers, trackerCount, (const void**)payloads, payloadSizes, payloadCount, comment, isPrivate);
+    test_single_directory_impl(trackers, trackerCount, (void const**)payloads, payloadSizes, payloadCount, comment, isPrivate);
 
     /* cleanup */
     for (i = 0; i < payloadCount; i++)
@@ -255,7 +255,7 @@ static int test_single_directory_random_payload(void)
     tr_tracker_info trackers[16];
     size_t trackerCount;
     bool isPrivate;
-    const char* comment;
+    char const* comment;
     size_t i;
 
     trackerCount = 0;
@@ -279,7 +279,7 @@ static int test_single_directory_random_payload(void)
 
 int main(void)
 {
-    const testFunc tests[] =
+    testFunc const tests[] =
     {
         test_single_file,
         test_single_directory_random_payload

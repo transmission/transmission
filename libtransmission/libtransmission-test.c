@@ -50,9 +50,9 @@ bool should_print(bool pass)
 #endif
 }
 
-bool check_condition_impl(const char* file, int line, bool condition)
+bool check_condition_impl(char const* file, int line, bool condition)
 {
-    const bool pass = condition;
+    bool const pass = condition;
 
     if (should_print(pass))
     {
@@ -62,9 +62,9 @@ bool check_condition_impl(const char* file, int line, bool condition)
     return pass;
 }
 
-bool check_streq_impl(const char* file, int line, const char* expected, const char* actual)
+bool check_streq_impl(char const* file, int line, char const* expected, char const* actual)
 {
-    const bool pass = tr_strcmp0(expected, actual) == 0;
+    bool const pass = tr_strcmp0(expected, actual) == 0;
 
     if (should_print(pass))
     {
@@ -82,9 +82,9 @@ bool check_streq_impl(const char* file, int line, const char* expected, const ch
     return pass;
 }
 
-bool check_int_eq_impl(const char* file, int line, int64_t expected, int64_t actual)
+bool check_int_eq_impl(char const* file, int line, int64_t expected, int64_t actual)
 {
-    const bool pass = expected == actual;
+    bool const pass = expected == actual;
 
     if (should_print(pass))
     {
@@ -101,9 +101,9 @@ bool check_int_eq_impl(const char* file, int line, int64_t expected, int64_t act
     return pass;
 }
 
-bool check_uint_eq_impl(const char* file, int line, uint64_t expected, uint64_t actual)
+bool check_uint_eq_impl(char const* file, int line, uint64_t expected, uint64_t actual)
 {
-    const bool pass = expected == actual;
+    bool const pass = expected == actual;
 
     if (should_print(pass))
     {
@@ -120,9 +120,9 @@ bool check_uint_eq_impl(const char* file, int line, uint64_t expected, uint64_t 
     return pass;
 }
 
-bool check_ptr_eq_impl(const char* file, int line, const void* expected, const void* actual)
+bool check_ptr_eq_impl(char const* file, int line, void const* expected, void const* actual)
 {
-    const bool pass = expected == actual;
+    bool const pass = expected == actual;
 
     if (should_print(pass))
     {
@@ -139,7 +139,7 @@ bool check_ptr_eq_impl(const char* file, int line, const void* expected, const v
     return pass;
 }
 
-int runTests(const testFunc* const tests, int numTests)
+int runTests(testFunc const* const tests, int numTests)
 {
     int i;
     int ret;
@@ -187,7 +187,7 @@ char* libtest_sandbox_create(void)
     return sandbox;
 }
 
-static void rm_rf(const char* killme)
+static void rm_rf(char const* killme)
 {
     tr_sys_path_info info;
 
@@ -197,7 +197,7 @@ static void rm_rf(const char* killme)
 
         if (info.type == TR_SYS_PATH_IS_DIRECTORY && (odir = tr_sys_dir_open(killme, NULL)) != TR_BAD_SYS_DIR)
         {
-            const char* name;
+            char const* name;
 
             while ((name = tr_sys_dir_read_name(odir, NULL)) != NULL)
             {
@@ -221,7 +221,7 @@ static void rm_rf(const char* killme)
     }
 }
 
-void libtest_sandbox_destroy(const char* sandbox)
+void libtest_sandbox_destroy(char const* sandbox)
 {
     rm_rf(sandbox);
 }
@@ -251,7 +251,7 @@ void libtest_sandbox_destroy(const char* sandbox)
 tr_session* libttest_session_init(tr_variant* settings)
 {
     size_t len;
-    const char* str;
+    char const* str;
     char* sandbox;
     char* path;
     tr_quark q;
@@ -361,7 +361,7 @@ tr_torrent* libttest_zero_torrent_init(tr_session* session)
     int err;
     size_t metainfo_len;
     char* metainfo;
-    const char* metainfo_base64;
+    char const* metainfo_base64;
     tr_torrent* tor;
     tr_ctor* ctor;
 
@@ -421,7 +421,7 @@ void libttest_zero_torrent_populate(tr_torrent* tor, bool complete)
         tr_sys_file_t fd;
         char* path;
         char* dirname;
-        const tr_file* file = &tor->info.files[i];
+        tr_file const* file = &tor->info.files[i];
 
         if (!complete && (i == 0))
         {
@@ -491,11 +491,11 @@ void libttest_blockingTorrentVerify(tr_torrent* tor)
     }
 }
 
-static void build_parent_dir(const char* path)
+static void build_parent_dir(char const* path)
 {
     char* dir;
     tr_error* error = NULL;
-    const int tmperr = errno;
+    int const tmperr = errno;
 
     dir = tr_sys_path_dirname(path, NULL);
     tr_sys_dir_create(dir, TR_SYS_DIR_CREATE_PARENTS, 0700, &error);
@@ -505,10 +505,10 @@ static void build_parent_dir(const char* path)
     errno = tmperr;
 }
 
-void libtest_create_file_with_contents(const char* path, const void* payload, size_t n)
+void libtest_create_file_with_contents(char const* path, void const* payload, size_t n)
 {
     tr_sys_file_t fd;
-    const int tmperr = errno;
+    int const tmperr = errno;
 
     build_parent_dir(path);
 
@@ -521,15 +521,15 @@ void libtest_create_file_with_contents(const char* path, const void* payload, si
     errno = tmperr;
 }
 
-void libtest_create_file_with_string_contents(const char* path, const char* str)
+void libtest_create_file_with_string_contents(char const* path, char const* str)
 {
     libtest_create_file_with_contents(path, str, strlen(str));
 }
 
-void libtest_create_tmpfile_with_contents(char* tmpl, const void* payload, size_t n)
+void libtest_create_tmpfile_with_contents(char* tmpl, void const* payload, size_t n)
 {
     tr_sys_file_t fd;
-    const int tmperr = errno;
+    int const tmperr = errno;
     uint64_t n_left = n;
     tr_error* error = NULL;
 

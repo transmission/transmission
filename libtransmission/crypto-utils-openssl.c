@@ -35,9 +35,9 @@
 
 #define MY_NAME "tr_crypto_utils"
 
-static void log_openssl_error(const char* file, int line)
+static void log_openssl_error(char const* file, int line)
 {
-    const unsigned long error_code = ERR_get_error();
+    unsigned long const error_code = ERR_get_error();
 
     if (tr_logLevelIsActive(TR_LOG_ERROR))
     {
@@ -67,9 +67,9 @@ static void log_openssl_error(const char* file, int line)
 
 #define log_error() log_openssl_error(__FILE__, __LINE__)
 
-static bool check_openssl_result(int result, int expected_result, bool expected_equal, const char* file, int line)
+static bool check_openssl_result(int result, int expected_result, bool expected_equal, char const* file, int line)
 {
-    const bool ret = (result == expected_result) == expected_equal;
+    bool const ret = (result == expected_result) == expected_equal;
 
     if (!ret)
     {
@@ -83,9 +83,9 @@ static bool check_openssl_result(int result, int expected_result, bool expected_
 #define check_result_eq(result, x_result) check_openssl_result((result), (x_result), true, __FILE__, __LINE__)
 #define check_result_neq(result, x_result) check_openssl_result((result), (x_result), false, __FILE__, __LINE__)
 
-static bool check_openssl_pointer(void* pointer, const char* file, int line)
+static bool check_openssl_pointer(void* pointer, char const* file, int line)
 {
-    const bool ret = pointer != NULL;
+    bool const ret = pointer != NULL;
 
     if (!ret)
     {
@@ -114,7 +114,7 @@ tr_sha1_ctx_t tr_sha1_init(void)
     return NULL;
 }
 
-bool tr_sha1_update(tr_sha1_ctx_t handle, const void* data, size_t data_length)
+bool tr_sha1_update(tr_sha1_ctx_t handle, void const* data, size_t data_length)
 {
     assert(handle != NULL);
 
@@ -204,7 +204,7 @@ void tr_rc4_free(tr_rc4_ctx_t handle)
     EVP_CIPHER_CTX_free(handle);
 }
 
-void tr_rc4_set_key(tr_rc4_ctx_t handle, const uint8_t* key, size_t key_length)
+void tr_rc4_set_key(tr_rc4_ctx_t handle, uint8_t const* key, size_t key_length)
 {
     assert(handle != NULL);
     assert(key != NULL);
@@ -217,7 +217,7 @@ void tr_rc4_set_key(tr_rc4_ctx_t handle, const uint8_t* key, size_t key_length)
     check_result(EVP_CipherInit_ex(handle, NULL, NULL, key, NULL, -1));
 }
 
-void tr_rc4_process(tr_rc4_ctx_t handle, const void* input, void* output, size_t length)
+void tr_rc4_process(tr_rc4_ctx_t handle, void const* input, void* output, size_t length)
 {
     int output_length;
 
@@ -282,7 +282,7 @@ static inline int DH_set_length(DH* dh, long length)
     return 1;
 }
 
-static inline void DH_get0_key(const DH* dh, const BIGNUM** pub_key, const BIGNUM** priv_key)
+static inline void DH_get0_key(DH const* dh, BIGNUM const** pub_key, BIGNUM const** priv_key)
 {
     if (pub_key != NULL)
     {
@@ -297,7 +297,7 @@ static inline void DH_get0_key(const DH* dh, const BIGNUM** pub_key, const BIGNU
 
 #endif
 
-tr_dh_ctx_t tr_dh_new(const uint8_t* prime_num, size_t prime_num_length, const uint8_t* generator_num,
+tr_dh_ctx_t tr_dh_new(uint8_t const* prime_num, size_t prime_num_length, uint8_t const* generator_num,
     size_t generator_num_length)
 {
     DH* handle = DH_new();
@@ -334,7 +334,7 @@ bool tr_dh_make_key(tr_dh_ctx_t raw_handle, size_t private_key_length, uint8_t* 
 {
     DH* handle = raw_handle;
     int dh_size, my_public_key_length;
-    const BIGNUM* my_public_key;
+    BIGNUM const* my_public_key;
 
     assert(handle != NULL);
     assert(public_key != NULL);
@@ -361,7 +361,7 @@ bool tr_dh_make_key(tr_dh_ctx_t raw_handle, size_t private_key_length, uint8_t* 
     return true;
 }
 
-tr_dh_secret_t tr_dh_agree(tr_dh_ctx_t handle, const uint8_t* other_public_key, size_t other_public_key_length)
+tr_dh_secret_t tr_dh_agree(tr_dh_ctx_t handle, uint8_t const* other_public_key, size_t other_public_key_length)
 {
     struct tr_dh_secret* ret;
     int dh_size, secret_key_length;

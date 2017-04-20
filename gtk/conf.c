@@ -43,7 +43,7 @@
 
 static char* gl_confdir = NULL;
 
-void gtr_pref_init(const char* config_dir)
+void gtr_pref_init(char const* config_dir)
 {
     gl_confdir = g_strdup(config_dir);
 }
@@ -60,7 +60,7 @@ void gtr_pref_init(const char* config_dir)
  */
 static void tr_prefs_init_defaults(tr_variant* d)
 {
-    const char* dir;
+    char const* dir;
 
     dir = g_get_user_special_dir(G_USER_DIRECTORY_DOWNLOAD);
 
@@ -132,26 +132,26 @@ tr_variant* gtr_pref_get_all(void)
     return getPrefs();
 }
 
-int64_t gtr_pref_int_get(const tr_quark key)
+int64_t gtr_pref_int_get(tr_quark const key)
 {
     int64_t i;
 
     return tr_variantDictFindInt(getPrefs(), key, &i) ? i : 0;
 }
 
-void gtr_pref_int_set(const tr_quark key, int64_t value)
+void gtr_pref_int_set(tr_quark const key, int64_t value)
 {
     tr_variantDictAddInt(getPrefs(), key, value);
 }
 
-double gtr_pref_double_get(const tr_quark key)
+double gtr_pref_double_get(tr_quark const key)
 {
     double d;
 
     return tr_variantDictFindReal(getPrefs(), key, &d) ? d : 0.0;
 }
 
-void gtr_pref_double_set(const tr_quark key, double value)
+void gtr_pref_double_set(tr_quark const key, double value)
 {
     tr_variantDictAddReal(getPrefs(), key, value);
 }
@@ -160,14 +160,14 @@ void gtr_pref_double_set(const tr_quark key, double value)
 ****
 ***/
 
-gboolean gtr_pref_flag_get(const tr_quark key)
+gboolean gtr_pref_flag_get(tr_quark const key)
 {
     bool boolVal;
 
     return tr_variantDictFindBool(getPrefs(), key, &boolVal) ? boolVal : false;
 }
 
-void gtr_pref_flag_set(const tr_quark key, gboolean value)
+void gtr_pref_flag_set(tr_quark const key, gboolean value)
 {
     tr_variantDictAddBool(getPrefs(), key, value);
 }
@@ -176,14 +176,14 @@ void gtr_pref_flag_set(const tr_quark key, gboolean value)
 ****
 ***/
 
-const char* gtr_pref_string_get(const tr_quark key)
+char const* gtr_pref_string_get(tr_quark const key)
 {
-    const char* str;
+    char const* str;
 
     return tr_variantDictFindStr(getPrefs(), key, &str, NULL) ? str : NULL;
 }
 
-void gtr_pref_string_set(const tr_quark key, const char* value)
+void gtr_pref_string_set(tr_quark const key, char const* value)
 {
     tr_variantDictAddStr(getPrefs(), key, value);
 }

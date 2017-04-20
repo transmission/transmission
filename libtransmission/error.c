@@ -12,7 +12,7 @@
 #include "error.h"
 #include "utils.h"
 
-tr_error* tr_error_new(int code, const char* message_format, ...)
+tr_error* tr_error_new(int code, char const* message_format, ...)
 {
     tr_error* error;
     va_list args;
@@ -26,7 +26,7 @@ tr_error* tr_error_new(int code, const char* message_format, ...)
     return error;
 }
 
-tr_error* tr_error_new_literal(int code, const char* message)
+tr_error* tr_error_new_literal(int code, char const* message)
 {
     tr_error* error;
 
@@ -39,7 +39,7 @@ tr_error* tr_error_new_literal(int code, const char* message)
     return error;
 }
 
-tr_error* tr_error_new_valist(int code, const char* message_format, va_list args)
+tr_error* tr_error_new_valist(int code, char const* message_format, va_list args)
 {
     tr_error* error;
 
@@ -63,7 +63,7 @@ void tr_error_free(tr_error* error)
     tr_free(error);
 }
 
-void tr_error_set(tr_error** error, int code, const char* message_format, ...)
+void tr_error_set(tr_error** error, int code, char const* message_format, ...)
 {
     va_list args;
 
@@ -80,7 +80,7 @@ void tr_error_set(tr_error** error, int code, const char* message_format, ...)
     va_end(args);
 }
 
-void tr_error_set_literal(tr_error** error, int code, const char* message)
+void tr_error_set_literal(tr_error** error, int code, char const* message)
 {
     if (error == NULL)
     {
@@ -123,7 +123,7 @@ void tr_error_clear(tr_error** error)
     *error = NULL;
 }
 
-static void error_prefix_valist(tr_error** error, const char* prefix_format, va_list args)
+static void error_prefix_valist(tr_error** error, char const* prefix_format, va_list args)
 {
     char* prefix;
     char* new_message;
@@ -141,7 +141,7 @@ static void error_prefix_valist(tr_error** error, const char* prefix_format, va_
     tr_free(prefix);
 }
 
-void tr_error_prefix(tr_error** error, const char* prefix_format, ...)
+void tr_error_prefix(tr_error** error, char const* prefix_format, ...)
 {
     va_list args;
 
@@ -157,7 +157,7 @@ void tr_error_prefix(tr_error** error, const char* prefix_format, ...)
     va_end(args);
 }
 
-void tr_error_propagate_prefixed(tr_error** new_error, tr_error** old_error, const char* prefix_format, ...)
+void tr_error_propagate_prefixed(tr_error** new_error, tr_error** old_error, char const* prefix_format, ...)
 {
     va_list args;
 

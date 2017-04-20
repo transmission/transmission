@@ -57,7 +57,7 @@ tr_watchdir_inotify;
 
 static void tr_watchdir_inotify_on_first_scan(evutil_socket_t fd UNUSED, short type UNUSED, void* context)
 {
-    const tr_watchdir_t handle = context;
+    tr_watchdir_t const handle = context;
 
     tr_watchdir_scan(handle, NULL);
 }
@@ -66,7 +66,7 @@ static void tr_watchdir_inotify_on_event(struct bufferevent* event, void* contex
 {
     assert(context != NULL);
 
-    const tr_watchdir_t handle = context;
+    tr_watchdir_t const handle = context;
     tr_watchdir_inotify* const backend = BACKEND_UPCAST(tr_watchdir_get_backend(handle));
     struct inotify_event ev;
     size_t nread;
@@ -150,7 +150,7 @@ static void tr_watchdir_inotify_free(tr_watchdir_backend* backend_base)
 
 tr_watchdir_backend* tr_watchdir_inotify_new(tr_watchdir_t handle)
 {
-    const char* const path = tr_watchdir_get_path(handle);
+    char const* const path = tr_watchdir_get_path(handle);
     tr_watchdir_inotify* backend;
 
     backend = tr_new0(tr_watchdir_inotify, 1);

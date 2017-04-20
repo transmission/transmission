@@ -33,15 +33,15 @@ public:
     void setShowMore(bool b);
 
     // QAbstractItemDelegate
-    virtual QSize sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const;
-    virtual void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const;
+    virtual QSize sizeHint(QStyleOptionViewItem const& option, QModelIndex const& index) const;
+    virtual void paint(QPainter* painter, QStyleOptionViewItem const& option, QModelIndex const& index) const;
 
 protected:
-    QString getText(const TrackerInfo&) const;
-    QSize margin(const QStyle& style) const;
+    QString getText(TrackerInfo const&) const;
+    QSize margin(QStyle const& style) const;
 
-    QSize sizeHint(const QStyleOptionViewItem&, const TrackerInfo&) const;
-    void drawTracker(QPainter*, const QStyleOptionViewItem&, const TrackerInfo&) const;
+    QSize sizeHint(QStyleOptionViewItem const&, TrackerInfo const&) const;
+    void drawTracker(QPainter*, QStyleOptionViewItem const&, TrackerInfo const&) const;
 
 private:
     bool myShowMore;

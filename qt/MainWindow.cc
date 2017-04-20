@@ -50,10 +50,10 @@
 namespace
 {
 
-const QLatin1String TotalRatioStatsModeName("total-ratio");
-const QLatin1String TotalTransferStatsModeName("total-transfer");
-const QLatin1String SessionRatioStatsModeName("session-ratio");
-const QLatin1String SessionTransferStatsModeName("session-transfer");
+QLatin1String const TotalRatioStatsModeName("total-ratio");
+QLatin1String const TotalTransferStatsModeName("total-transfer");
+QLatin1String const SessionRatioStatsModeName("session-ratio");
+QLatin1String const SessionTransferStatsModeName("session-transfer");
 
 } // namespace
 
@@ -65,7 +65,7 @@ const QLatin1String SessionTransferStatsModeName("session-transfer");
 class ListViewProxyStyle : public QProxyStyle
 {
 public:
-    int styleHint(StyleHint hint, const QStyleOption* option = 0, const QWidget* widget = 0,
+    int styleHint(StyleHint hint, QStyleOption const* option = 0, QWidget const* widget = 0,
         QStyleHintReturn* returnData = 0) const
     {
         if (hint == QStyle::SH_ItemView_ActivateItemOnSingleClick)
@@ -77,7 +77,7 @@ public:
     }
 };
 
-QIcon MainWindow::getStockIcon(const QString& name, int fallback)
+QIcon MainWindow::getStockIcon(QString const& name, int fallback)
 {
     QIcon icon = QIcon::fromTheme(name);
 
@@ -89,7 +89,7 @@ QIcon MainWindow::getStockIcon(const QString& name, int fallback)
     return icon;
 }
 
-QIcon MainWindow::getStockIcon(const QString& name, int fallback, const QStringList& emblemNames)
+QIcon MainWindow::getStockIcon(QString const& name, int fallback, QStringList const& emblemNames)
 {
     QIcon baseIcon = getStockIcon(name, fallback);
 
@@ -100,7 +100,7 @@ QIcon MainWindow::getStockIcon(const QString& name, int fallback, const QStringL
 
     QIcon emblemIcon;
 
-    for (const QString& emblemName : emblemNames)
+    for (QString const& emblemName : emblemNames)
     {
         emblemIcon = QIcon::fromTheme(emblemName);
 
@@ -117,10 +117,10 @@ QIcon MainWindow::getStockIcon(const QString& name, int fallback, const QStringL
 
     QIcon icon;
 
-    for (const QSize& size : baseIcon.availableSizes())
+    for (QSize const& size : baseIcon.availableSizes())
     {
-        const QSize emblemSize = size / 2;
-        const QRect emblemRect = QStyle::alignedRect(layoutDirection(), Qt::AlignBottom | Qt::AlignRight, emblemSize,
+        QSize const emblemSize = size / 2;
+        QRect const emblemRect = QStyle::alignedRect(layoutDirection(), Qt::AlignBottom | Qt::AlignRight, emblemSize,
             QRect(QPoint(0, 0), size));
 
         QPixmap pixmap = baseIcon.pixmap(size);
@@ -248,7 +248,7 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     connect(ui.listView->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this,
         SLOT(refreshActionSensitivitySoon()));
 
-    const QPair<QAction*, int> sortModes[] =
+    QPair<QAction*, int> const sortModes[] =
     {
         qMakePair(ui.action_SortByActivity, static_cast<int>(SortMode::SORT_BY_ACTIVITY)),
         qMakePair(ui.action_SortByAge, static_cast<int>(SortMode::SORT_BY_AGE)),
@@ -263,7 +263,7 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
 
     QActionGroup* actionGroup = new QActionGroup(this);
 
-    for (const auto& mode : sortModes)
+    for (auto const& mode : sortModes)
     {
         mode.first->setProperty(SORT_MODE_KEY, mode.second);
         actionGroup->addAction(mode.first);
@@ -315,7 +315,7 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
         Prefs::COMPACT_VIEW << Prefs::DSPEED << Prefs::DSPEED_ENABLED << Prefs::USPEED << Prefs::USPEED_ENABLED <<
         Prefs::RATIO << Prefs::RATIO_ENABLED;
 
-    for (const int key : initKeys)
+    for (int const key : initKeys)
     {
         refreshPref(key);
     }
@@ -375,7 +375,7 @@ void MainWindow::onModelReset()
 
 void MainWindow::onSetPrefs()
 {
-    const QVariantList p = sender()->property(PREF_VARIANTS_KEY).toList();
+    QVariantList const p = sender()->property(PREF_VARIANTS_KEY).toList();
     assert((p.size() % 2) == 0);
 
     for (int i = 0, n = p.size(); i < n; i += 2)
@@ -396,7 +396,7 @@ void MainWindow::initStatusBar()
 {
     ui.optionsButton->setMenu(createOptionsMenu());
 
-    const int minimumSpeedWidth = ui.downloadSpeedLabel->fontMetrics().width(Formatter::uploadSpeedToString(Speed::fromKBps(
+    int const minimumSpeedWidth = ui.downloadSpeedLabel->fontMetrics().width(Formatter::uploadSpeedToString(Speed::fromKBps(
         999.99)));
     ui.downloadSpeedLabel->setMinimumWidth(minimumSpeedWidth);
     ui.uploadSpeedLabel->setMinimumWidth(minimumSpeedWidth);
@@ -408,10 +408,10 @@ void MainWindow::initStatusBar()
 
 QMenu* MainWindow::createOptionsMenu()
 {
-    const auto initSpeedSubMenu = [this](QMenu* menu, QAction*& offAction, QAction*& onAction, int pref, int enabledPref)
+    auto const initSpeedSubMenu = [this](QMenu* menu, QAction*& offAction, QAction*& onAction, int pref, int enabledPref)
         {
-            const int stockSpeeds[] = { 5, 10, 20, 30, 40, 50, 75, 100, 150, 200, 250, 500, 750 };
-            const int currentValue = myPrefs.get<int>(pref);
+            int const stockSpeeds[] = { 5, 10, 20, 30, 40, 50, 75, 100, 150, 200, 250, 500, 750 };
+            int const currentValue = myPrefs.get<int>(pref);
 
             QActionGroup* actionGroup = new QActionGroup(this);
 
@@ -429,7 +429,7 @@ QMenu* MainWindow::createOptionsMenu()
 
             menu->addSeparator();
 
-            for (const int i : stockSpeeds)
+            for (int const i : stockSpeeds)
             {
                 QAction* action = menu->addAction(Formatter::speedToString(Speed::fromKBps(i)));
                 action->setProperty(PREF_VARIANTS_KEY, QVariantList() << pref << i << enabledPref << true);
@@ -437,10 +437,10 @@ QMenu* MainWindow::createOptionsMenu()
             }
         };
 
-    const auto initSeedRatioSubMenu = [this](QMenu* menu, QAction*& offAction, QAction*& onAction, int pref, int enabledPref)
+    auto const initSeedRatioSubMenu = [this](QMenu* menu, QAction*& offAction, QAction*& onAction, int pref, int enabledPref)
         {
-            const double stockRatios[] = { 0.25, 0.50, 0.75, 1, 1.5, 2, 3 };
-            const double currentValue = myPrefs.get<double>(pref);
+            double const stockRatios[] = { 0.25, 0.50, 0.75, 1, 1.5, 2, 3 };
+            double const currentValue = myPrefs.get<double>(pref);
 
             QActionGroup* actionGroup = new QActionGroup(this);
 
@@ -458,7 +458,7 @@ QMenu* MainWindow::createOptionsMenu()
 
             menu->addSeparator();
 
-            for (const double i : stockRatios)
+            for (double const i : stockRatios)
             {
                 QAction* action = menu->addAction(Formatter::ratioToString(i));
                 action->setProperty(PREF_VARIANTS_KEY, QVariantList() << pref << i << enabledPref << true);
@@ -483,7 +483,7 @@ QMenu* MainWindow::createOptionsMenu()
 
 QMenu* MainWindow::createStatsModeMenu()
 {
-    const QPair<QAction*, QLatin1String> statsModes[] =
+    QPair<QAction*, QLatin1String> const statsModes[] =
     {
         qMakePair(ui.action_TotalRatio, TotalRatioStatsModeName),
         qMakePair(ui.action_TotalTransfer, TotalTransferStatsModeName),
@@ -494,7 +494,7 @@ QMenu* MainWindow::createStatsModeMenu()
     QActionGroup* actionGroup = new QActionGroup(this);
     QMenu* menu = new QMenu(this);
 
-    for (const auto& mode : statsModes)
+    for (auto const& mode : statsModes)
     {
         mode.first->setProperty(STATS_MODE_KEY, QString(mode.second));
         actionGroup->addAction(mode.first);
@@ -579,9 +579,9 @@ void MainWindow::setLocation()
 
 #define HAVE_OPEN_SELECT
 
-static void openSelect(const QString& path)
+static void openSelect(QString const& path)
 {
-    const QString explorer = QLatin1String("explorer");
+    QString const explorer = QLatin1String("explorer");
     QString param;
 
     if (!QFileInfo(path).isDir())
@@ -597,7 +597,7 @@ static void openSelect(const QString& path)
 
 #define HAVE_OPEN_SELECT
 
-static void openSelect(const QString& path)
+static void openSelect(QString const& path)
 {
     QStringList scriptArgs;
     scriptArgs << QLatin1String("-e") <<
@@ -613,15 +613,15 @@ static void openSelect(const QString& path)
 
 void MainWindow::openFolder()
 {
-    const QSet<int> selectedTorrents = getSelectedTorrents();
+    QSet<int> const selectedTorrents = getSelectedTorrents();
 
     if (selectedTorrents.size() != 1)
     {
         return;
     }
 
-    const int torrentId(*selectedTorrents.begin());
-    const Torrent* tor(myModel.getTorrentFromId(torrentId));
+    int const torrentId(*selectedTorrents.begin());
+    Torrent const* tor(myModel.getTorrentFromId(torrentId));
 
     if (tor == nullptr)
     {
@@ -629,14 +629,14 @@ void MainWindow::openFolder()
     }
 
     QString path(tor->getPath());
-    const FileList& files = tor->files();
+    FileList const& files = tor->files();
 
     if (files.isEmpty())
     {
         return;
     }
 
-    const QString firstfile = files.at(0).filename;
+    QString const firstfile = files.at(0).filename;
     int slashIndex = firstfile.indexOf(QLatin1Char('/'));
 
     if (slashIndex > -1)
@@ -659,7 +659,7 @@ void MainWindow::openFolder()
 
 void MainWindow::copyMagnetLinkToClipboard()
 {
-    const int id(*getSelectedTorrents().begin());
+    int const id(*getSelectedTorrents().begin());
     mySession.copyMagnetLinkToClipboard(id);
 }
 
@@ -687,7 +687,7 @@ void MainWindow::openHelp()
 void MainWindow::refreshTitle()
 {
     QString title(QLatin1String("Transmission"));
-    const QUrl url(mySession.getRemoteUrl());
+    QUrl const url(mySession.getRemoteUrl());
 
     if (!url.isEmpty())
     {
@@ -749,7 +749,7 @@ void MainWindow::refreshStatusBar()
 
     ui.networkLabel->setVisible(!mySession.isServer());
 
-    const QString mode(myPrefs.getString(Prefs::STATUSBAR_STATS));
+    QString const mode(myPrefs.getString(Prefs::STATUSBAR_STATS));
     QString str;
 
     if (mode == SessionRatioStatsModeName)
@@ -758,13 +758,13 @@ void MainWindow::refreshStatusBar()
     }
     else if (mode == SessionTransferStatsModeName)
     {
-        const tr_session_stats& stats(mySession.getStats());
+        tr_session_stats const& stats(mySession.getStats());
         str = tr("Down: %1, Up: %2").arg(Formatter::sizeToString(stats.downloadedBytes)).
                 arg(Formatter::sizeToString(stats.uploadedBytes));
     }
     else if (mode == TotalTransferStatsModeName)
     {
-        const tr_session_stats& stats(mySession.getCumulativeStats());
+        tr_session_stats const& stats(mySession.getCumulativeStats());
         str = tr("Down: %1, Up: %2").arg(Formatter::sizeToString(stats.downloadedBytes)).
                 arg(Formatter::sizeToString(stats.uploadedBytes));
     }
@@ -779,8 +779,8 @@ void MainWindow::refreshStatusBar()
 
 void MainWindow::refreshTorrentViewHeader()
 {
-    const int totalCount = myModel.rowCount();
-    const int visibleCount = myFilterModel.rowCount();
+    int const totalCount = myModel.rowCount();
+    int const visibleCount = myFilterModel.rowCount();
 
     if (visibleCount == totalCount)
     {
@@ -810,22 +810,22 @@ void MainWindow::refreshActionSensitivity()
     int selectedAndQueued(0);
     int selectedWithMetadata(0);
     int canAnnounce(0);
-    const QAbstractItemModel* model(ui.listView->model());
-    const QItemSelectionModel* selectionModel(ui.listView->selectionModel());
-    const int rowCount(model->rowCount());
+    QAbstractItemModel const* model(ui.listView->model());
+    QItemSelectionModel const* selectionModel(ui.listView->selectionModel());
+    int const rowCount(model->rowCount());
 
     // count how many torrents are selected, paused, etc
     for (int row = 0; row < rowCount; ++row)
     {
-        const QModelIndex modelIndex(model->index(row, 0));
+        QModelIndex const modelIndex(model->index(row, 0));
         assert(model == modelIndex.model());
-        const Torrent* tor(model->data(modelIndex, TorrentModel::TorrentRole).value<const Torrent*>());
+        Torrent const* tor(model->data(modelIndex, TorrentModel::TorrentRole).value<Torrent const*>());
 
         if (tor)
         {
-            const bool isSelected(selectionModel->isSelected(modelIndex));
-            const bool isPaused(tor->isPaused());
-            const bool isQueued(tor->isQueued());
+            bool const isSelected(selectionModel->isSelected(modelIndex));
+            bool const isPaused(tor->isPaused());
+            bool const isQueued(tor->isQueued());
 
             if (isSelected)
             {
@@ -864,9 +864,9 @@ void MainWindow::refreshActionSensitivity()
         }
     }
 
-    const bool haveSelection(selected > 0);
-    const bool haveSelectionWithMetadata = selectedWithMetadata > 0;
-    const bool oneSelection(selected == 1);
+    bool const haveSelection(selected > 0);
+    bool const haveSelectionWithMetadata = selectedWithMetadata > 0;
+    bool const oneSelection(selected == 1);
 
     ui.action_Verify->setEnabled(haveSelectionWithMetadata);
     ui.action_Remove->setEnabled(haveSelection);
@@ -910,9 +910,9 @@ QSet<int> MainWindow::getSelectedTorrents(bool withMetadataOnly) const
 {
     QSet<int> ids;
 
-    for (const QModelIndex& index : ui.listView->selectionModel()->selectedRows())
+    for (QModelIndex const& index : ui.listView->selectionModel()->selectedRows())
     {
-        const Torrent* tor(index.data(TorrentModel::TorrentRole).value<const Torrent*>());
+        Torrent const* tor(index.data(TorrentModel::TorrentRole).value<Torrent const*>());
 
         if (tor != nullptr && (!withMetadataOnly || tor->hasMetadata()))
         {
@@ -1009,7 +1009,7 @@ void MainWindow::setCompactView(bool visible)
 void MainWindow::toggleSpeedMode()
 {
     myPrefs.toggleBool(Prefs::ALT_SPEED_LIMIT_ENABLED);
-    const bool mode = myPrefs.get<bool>(Prefs::ALT_SPEED_LIMIT_ENABLED);
+    bool const mode = myPrefs.get<bool>(Prefs::ALT_SPEED_LIMIT_ENABLED);
     myAltSpeedAction->setChecked(mode);
 }
 
@@ -1164,8 +1164,8 @@ void MainWindow::refreshPref(int key)
 #if QT_VERSION < QT_VERSION_CHECK(5, 4, 0) // QTBUG-33537
 
             QItemSelectionModel* selectionModel(ui.listView->selectionModel());
-            const QItemSelection selection(selectionModel->selection());
-            const QModelIndex currentIndex(selectionModel->currentIndex());
+            QItemSelection const selection(selectionModel->selection());
+            QModelIndex const currentIndex(selectionModel->currentIndex());
 
 #endif
 
@@ -1200,10 +1200,10 @@ void MainWindow::refreshPref(int key)
             b = myPrefs.getBool(Prefs::ALT_SPEED_LIMIT_ENABLED);
             myAltSpeedAction->setChecked(b);
             ui.altSpeedButton->setChecked(b);
-            const QString fmt = b ? tr("Click to disable Temporary Speed Limits\n (%1 down, %2 up)") :
+            QString const fmt = b ? tr("Click to disable Temporary Speed Limits\n (%1 down, %2 up)") :
                 tr("Click to enable Temporary Speed Limits\n (%1 down, %2 up)");
-            const Speed d = Speed::fromKBps(myPrefs.getInt(Prefs::ALT_SPEED_LIMIT_DOWN));
-            const Speed u = Speed::fromKBps(myPrefs.getInt(Prefs::ALT_SPEED_LIMIT_UP));
+            Speed const d = Speed::fromKBps(myPrefs.getInt(Prefs::ALT_SPEED_LIMIT_DOWN));
+            Speed const u = Speed::fromKBps(myPrefs.getInt(Prefs::ALT_SPEED_LIMIT_UP));
             ui.altSpeedButton->setToolTip(fmt.arg(Formatter::speedToString(d)).arg(Formatter::speedToString(u)));
             break;
         }
@@ -1220,7 +1220,7 @@ void MainWindow::refreshPref(int key)
 namespace
 {
 
-const QLatin1String SHOW_OPTIONS_CHECKBOX_NAME("show-options-checkbox");
+QLatin1String const SHOW_OPTIONS_CHECKBOX_NAME("show-options-checkbox");
 
 } // namespace
 
@@ -1239,7 +1239,7 @@ void MainWindow::openTorrent()
     d->setFileMode(QFileDialog::ExistingFiles);
     d->setAttribute(Qt::WA_DeleteOnClose);
 
-    const auto l = qobject_cast<QGridLayout*>(d->layout());
+    auto const l = qobject_cast<QGridLayout*>(d->layout());
 
     if (l != nullptr)
     {
@@ -1271,15 +1271,15 @@ void MainWindow::openURL()
     addTorrent(str, true);
 }
 
-void MainWindow::addTorrents(const QStringList& filenames)
+void MainWindow::addTorrents(QStringList const& filenames)
 {
     bool showOptions = myPrefs.getBool(Prefs::OPTIONS_PROMPT);
 
-    const QFileDialog* const fileDialog = qobject_cast<const QFileDialog*>(sender());
+    QFileDialog const* const fileDialog = qobject_cast<QFileDialog const*>(sender());
 
     if (fileDialog != NULL)
     {
-        const QCheckBox* const b = fileDialog->findChild<const QCheckBox*>(SHOW_OPTIONS_CHECKBOX_NAME);
+        QCheckBox const* const b = fileDialog->findChild<QCheckBox const*>(SHOW_OPTIONS_CHECKBOX_NAME);
 
         if (b != NULL)
         {
@@ -1287,13 +1287,13 @@ void MainWindow::addTorrents(const QStringList& filenames)
         }
     }
 
-    for (const QString& filename : filenames)
+    for (QString const& filename : filenames)
     {
         addTorrent(filename, showOptions);
     }
 }
 
-void MainWindow::addTorrent(const AddData& addMe, bool showOptions)
+void MainWindow::addTorrent(AddData const& addMe, bool showOptions)
 {
     if (showOptions)
     {
@@ -1308,7 +1308,7 @@ void MainWindow::addTorrent(const AddData& addMe, bool showOptions)
     }
 }
 
-void MainWindow::removeTorrents(const bool deleteFiles)
+void MainWindow::removeTorrents(bool const deleteFiles)
 {
     QSet<int> ids;
     QMessageBox msgBox(this);
@@ -1317,9 +1317,9 @@ void MainWindow::removeTorrents(const bool deleteFiles)
     int connected = 0;
     int count;
 
-    for (const QModelIndex& index : ui.listView->selectionModel()->selectedRows())
+    for (QModelIndex const& index : ui.listView->selectionModel()->selectedRows())
     {
-        const Torrent* tor(index.data(TorrentModel::TorrentRole).value<const Torrent*>());
+        Torrent const* tor(index.data(TorrentModel::TorrentRole).value<Torrent const*>());
         ids.insert(tor->id());
 
         if (tor->connectedPeers())
@@ -1417,13 +1417,13 @@ void MainWindow::removeTorrents(const bool deleteFiles)
 
 void MainWindow::updateNetworkIcon()
 {
-    const time_t now = time(NULL);
-    const int period = 3;
-    const time_t secondsSinceLastSend = now - myLastSendTime;
-    const time_t secondsSinceLastRead = now - myLastReadTime;
-    const bool isSending = secondsSinceLastSend <= period;
-    const bool isReading = secondsSinceLastRead <= period;
-    const char* key;
+    time_t const now = time(NULL);
+    int const period = 3;
+    time_t const secondsSinceLastSend = now - myLastSendTime;
+    time_t const secondsSinceLastRead = now - myLastReadTime;
+    bool const isSending = secondsSinceLastSend <= period;
+    bool const isReading = secondsSinceLastRead <= period;
+    char const* key;
 
     if (myNetworkError)
     {
@@ -1446,11 +1446,11 @@ void MainWindow::updateNetworkIcon()
         key = "network-idle";
     }
 
-    const QIcon icon = getStockIcon(QLatin1String(key), QStyle::SP_DriveNetIcon);
-    const QPixmap pixmap = icon.pixmap(16, 16);
+    QIcon const icon = getStockIcon(QLatin1String(key), QStyle::SP_DriveNetIcon);
+    QPixmap const pixmap = icon.pixmap(16, 16);
 
     QString tip;
-    const QString url = mySession.getRemoteUrl().host();
+    QString const url = mySession.getRemoteUrl().host();
 
     if (!myLastReadTime)
     {
@@ -1495,10 +1495,10 @@ void MainWindow::dataSendProgress()
     myLastSendTime = time(NULL);
 }
 
-void MainWindow::onNetworkResponse(QNetworkReply::NetworkError code, const QString& message)
+void MainWindow::onNetworkResponse(QNetworkReply::NetworkError code, QString const& message)
 {
-    const bool hadError = myNetworkError;
-    const bool haveError = (code != QNetworkReply::NoError) && (code != QNetworkReply::UnknownContentError);
+    bool const hadError = myNetworkError;
+    bool const haveError = (code != QNetworkReply::NoError) && (code != QNetworkReply::UnknownContentError);
 
     myNetworkError = haveError;
     myErrorMessage = message;
@@ -1525,7 +1525,7 @@ void MainWindow::wrongAuthentication()
 
 void MainWindow::dragEnterEvent(QDragEnterEvent* event)
 {
-    const QMimeData* mime = event->mimeData();
+    QMimeData const* mime = event->mimeData();
 
     if (mime->hasFormat(QLatin1String("application/x-bittorrent")) || mime->hasUrls() ||
         mime->text().trimmed().endsWith(QLatin1String(".torrent"), Qt::CaseInsensitive) ||
@@ -1545,19 +1545,19 @@ void MainWindow::dropEvent(QDropEvent* event)
     }
     else if (event->mimeData()->hasUrls())
     {
-        for (const QUrl& url : event->mimeData()->urls())
+        for (QUrl const& url : event->mimeData()->urls())
         {
             list.append(url.toLocalFile());
         }
     }
 
-    for (const QString& entry : list)
+    for (QString const& entry : list)
     {
         QString key = entry.trimmed();
 
         if (!key.isEmpty())
         {
-            const QUrl url(key);
+            QUrl const url(key);
 
             if (url.isLocalFile())
             {

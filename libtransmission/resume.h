@@ -41,10 +41,10 @@ enum
 /**
  * Returns a bitwise-or'ed set of the loaded resume data
  */
-uint64_t tr_torrentLoadResume(tr_torrent* tor, uint64_t fieldsToLoad, const tr_ctor* ctor);
+uint64_t tr_torrentLoadResume(tr_torrent* tor, uint64_t fieldsToLoad, tr_ctor const* ctor);
 
 void tr_torrentSaveResume(tr_torrent* tor);
 
-void tr_torrentRemoveResume(const tr_torrent* tor);
+void tr_torrentRemoveResume(tr_torrent const* tor);
 
-int tr_torrentRenameResume(const tr_torrent* tor, const char* newname);
+int tr_torrentRenameResume(tr_torrent const* tor, char const* newname);

@@ -82,7 +82,7 @@ struct tr_thread
 #endif
 };
 
-bool tr_amInThread(const tr_thread* t)
+bool tr_amInThread(tr_thread const* t)
 {
     return tr_areThreadsEqual(tr_getCurrentThread(), t->thread);
 }
@@ -197,7 +197,7 @@ void tr_lockLock(tr_lock* l)
     ++l->depth;
 }
 
-bool tr_lockHave(const tr_lock* l)
+bool tr_lockHave(tr_lock const* l)
 {
     return (l->depth > 0) && (tr_areThreadsEqual(l->lockThread, tr_getCurrentThread()));
 }
@@ -248,7 +248,7 @@ static char* win32_get_known_folder(REFKNOWNFOLDERID folder_id)
 
 #endif
 
-static const char* getHomeDir(void)
+static char const* getHomeDir(void)
 {
     static char* home = NULL;
 
@@ -293,7 +293,7 @@ static const char* getHomeDir(void)
 #define TORRENT_SUBDIR "torrents"
 #endif
 
-void tr_setConfigDir(tr_session* session, const char* configDir)
+void tr_setConfigDir(tr_session* session, char const* configDir)
 {
     char* path;
 
@@ -308,22 +308,22 @@ void tr_setConfigDir(tr_session* session, const char* configDir)
     session->torrentDir = path;
 }
 
-const char* tr_sessionGetConfigDir(const tr_session* session)
+char const* tr_sessionGetConfigDir(tr_session const* session)
 {
     return session->configDir;
 }
 
-const char* tr_getTorrentDir(const tr_session* session)
+char const* tr_getTorrentDir(tr_session const* session)
 {
     return session->torrentDir;
 }
 
-const char* tr_getResumeDir(const tr_session* session)
+char const* tr_getResumeDir(tr_session const* session)
 {
     return session->resumeDir;
 }
 
-const char* tr_getDefaultConfigDir(const char* appname)
+char const* tr_getDefaultConfigDir(char const* appname)
 {
     static char* s = NULL;
 
@@ -375,7 +375,7 @@ const char* tr_getDefaultConfigDir(const char* appname)
     return s;
 }
 
-const char* tr_getDefaultDownloadDir(void)
+char const* tr_getDefaultDownloadDir(void)
 {
     static char* user_dir = NULL;
 
@@ -405,7 +405,7 @@ const char* tr_getDefaultDownloadDir(void)
 
         if (content && content_len > 0)
         {
-            const char* key = "XDG_DOWNLOAD_DIR=\"";
+            char const* key = "XDG_DOWNLOAD_DIR=\"";
             char* line = strstr(content, key);
 
             if (line != NULL)
@@ -462,17 +462,17 @@ const char* tr_getDefaultDownloadDir(void)
 ****
 ***/
 
-static bool isWebClientDir(const char* path)
+static bool isWebClientDir(char const* path)
 {
     char* tmp = tr_buildPath(path, "index.html", NULL);
-    const bool ret = tr_sys_path_exists(tmp, NULL);
+    bool const ret = tr_sys_path_exists(tmp, NULL);
     tr_logAddInfo(_("Searching for web interface file \"%s\""), tmp);
     tr_free(tmp);
 
     return ret;
 }
 
-const char* tr_getWebClientDir(const tr_session* session UNUSED)
+char const* tr_getWebClientDir(tr_session const* session UNUSED)
 {
     static char* s = NULL;
 
@@ -498,10 +498,10 @@ const char* tr_getWebClientDir(const tr_session* session UNUSED)
 
                 CFURLRef appURL = CFBundleCopyBundleURL(CFBundleGetMainBundle());
                 CFStringRef appRef = CFURLCopyFileSystemPath(appURL, kCFURLPOSIXPathStyle);
-                const CFIndex appStringLength = CFStringGetMaximumSizeOfFileSystemRepresentation(appRef);
+                CFIndex const appStringLength = CFStringGetMaximumSizeOfFileSystemRepresentation(appRef);
 
                 char* appString = tr_malloc(appStringLength);
-                const bool success = CFStringGetFileSystemRepresentation(appRef, appString, appStringLength);
+                bool const success = CFStringGetFileSystemRepresentation(appRef, appString, appStringLength);
                 assert(success);
 
                 CFRelease(appURL);
@@ -588,16 +588,16 @@ const char* tr_getWebClientDir(const tr_session* session UNUSED)
 
             /* XDG_DATA_DIRS are the backup directories */
             {
-                const char* pkg = PACKAGE_DATA_DIR;
+                char const* pkg = PACKAGE_DATA_DIR;
                 char* xdg = tr_env_get_string("XDG_DATA_DIRS", NULL);
-                const char* fallback = "/usr/local/share:/usr/share";
+                char const* fallback = "/usr/local/share:/usr/share";
                 char* buf = tr_strdup_printf("%s:%s:%s", (pkg ? pkg : ""), (xdg ? xdg : ""), fallback);
                 tr_free(xdg);
                 tmp = buf;
 
                 while (tmp && *tmp)
                 {
-                    const char* end = strchr(tmp, ':');
+                    char const* end = strchr(tmp, ':');
 
                     if (end)
                     {
@@ -622,7 +622,7 @@ const char* tr_getWebClientDir(const tr_session* session UNUSED)
             for (l = candidates; l; l = l->next)
             {
                 char* path = tr_buildPath(l->data, "transmission", "web", NULL);
-                const int found = isWebClientDir(path);
+                int const found = isWebClientDir(path);
 
                 if (found)
                 {

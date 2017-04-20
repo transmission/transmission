@@ -34,7 +34,7 @@ public:
     {
     }
 
-    FilterMode(const QString& name) :
+    FilterMode(QString const& name) :
         myMode(modeFromName(name))
     {
     }
@@ -44,14 +44,14 @@ public:
         return myMode;
     }
 
-    const QString& name() const
+    QString const& name() const
     {
         return names[myMode];
     }
 
-    static int modeFromName(const QString& name);
+    static int modeFromName(QString const& name);
 
-    static const QString& nameFromMode(int mode)
+    static QString const& nameFromMode(int mode)
     {
         return names[mode];
     }
@@ -59,7 +59,7 @@ public:
 private:
     int myMode;
 
-    static const QString names[];
+    static QString const names[];
 };
 
 Q_DECLARE_METATYPE(FilterMode)
@@ -88,7 +88,7 @@ public:
     {
     }
 
-    SortMode(const QString& name) :
+    SortMode(QString const& name) :
         myMode(modeFromName(name))
     {
     }
@@ -98,18 +98,18 @@ public:
         return myMode;
     }
 
-    const QString& name() const
+    QString const& name() const
     {
         return names[myMode];
     }
 
-    static int modeFromName(const QString& name);
-    static const QString& nameFromMode(int mode);
+    static int modeFromName(QString const& name);
+    static QString const& nameFromMode(int mode);
 
 private:
     int myMode;
 
-    static const QString names[];
+    static QString const names[];
 };
 
 Q_DECLARE_METATYPE(SortMode)

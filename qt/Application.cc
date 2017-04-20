@@ -41,10 +41,10 @@
 namespace
 {
 
-const QLatin1String MY_CONFIG_NAME("transmission");
-const QLatin1String MY_READABLE_NAME("transmission-qt");
+QLatin1String const MY_CONFIG_NAME("transmission");
+QLatin1String const MY_READABLE_NAME("transmission-qt");
 
-const tr_option opts[] =
+tr_option const opts[] =
 {
     { 'g', "config-dir", "Where to look for configuration files", "g", 1, "<path>" },
     { 'm', "minimized", "Start minimized in system tray", "m", 0, NULL },
@@ -56,7 +56,7 @@ const tr_option opts[] =
     { 0, NULL, NULL, NULL, 0, NULL }
 };
 
-const char* getUsage()
+char const* getUsage()
 {
     return "Usage:\n"
            "  transmission [OPTIONS...] [torrent files]";
@@ -69,9 +69,9 @@ enum
     MODEL_REFRESH_INTERVAL_MSEC = 3000
 };
 
-bool loadTranslation(QTranslator& translator, const QString& name, const QLocale& locale, const QStringList& searchDirectories)
+bool loadTranslation(QTranslator& translator, QString const& name, QLocale const& locale, QStringList const& searchDirectories)
 {
-    for (const QString& directory : searchDirectories)
+    for (QString const& directory : searchDirectories)
     {
         if (translator.load(locale, name, QLatin1String("_"), directory))
         {
@@ -115,7 +115,7 @@ Application::Application(int& argc, char** argv) :
         QList<int> sizes;
         sizes << 16 << 22 << 24 << 32 << 48 << 64 << 72 << 96 << 128 << 192 << 256;
 
-        for (const int size : sizes)
+        for (int const size : sizes)
         {
             icon.addPixmap(QPixmap(QString::fromLatin1(":/icons/transmission-%1.png").arg(size)));
         }
@@ -130,7 +130,7 @@ Application::Application(int& argc, char** argv) :
     // parse the command-line arguments
     int c;
     bool minimized = false;
-    const char* optarg;
+    char const* optarg;
     QString host;
     QString port;
     QString username;
@@ -138,7 +138,7 @@ Application::Application(int& argc, char** argv) :
     QString configDir;
     QStringList filenames;
 
-    while ((c = tr_getopt(getUsage(), argc, const_cast<const char**>(argv), opts, &optarg)))
+    while ((c = tr_getopt(getUsage(), argc, const_cast<char const**>(argv), opts, &optarg)))
     {
         switch (c)
         {
@@ -191,7 +191,7 @@ Application::Application(int& argc, char** argv) :
     {
         bool delegated = false;
 
-        for (const QString& filename : filenames)
+        for (QString const& filename : filenames)
         {
             QString metainfo;
 
@@ -247,7 +247,7 @@ Application::Application(int& argc, char** argv) :
     }
 
     // is this the first time we've run transmission?
-    const bool firstTime = !dir.exists(QLatin1String("settings.json"));
+    bool const firstTime = !dir.exists(QLatin1String("settings.json"));
 
     // initialize the prefs
     myPrefs = new Prefs(configDir);
@@ -313,12 +313,12 @@ Application::Application(int& argc, char** argv) :
     QList<int> initKeys;
     initKeys << Prefs::DIR_WATCH;
 
-    for (const int key : initKeys)
+    for (int const key : initKeys)
     {
         refreshPref(key);
     }
 
-    connect(myPrefs, SIGNAL(changed(int)), this, SLOT(refreshPref(const int)));
+    connect(myPrefs, SIGNAL(changed(int)), this, SLOT(refreshPref(int const)));
 
     QTimer* timer = &myModelTimer;
     connect(timer, SIGNAL(timeout()), this, SLOT(refreshTorrents()));
@@ -365,7 +365,7 @@ Application::Application(int& argc, char** argv) :
         dialog->show();
     }
 
-    for (const QString& filename : filenames)
+    for (QString const& filename : filenames)
     {
         addTorrent(filename);
     }
@@ -375,22 +375,22 @@ Application::Application(int& argc, char** argv) :
 
 void Application::loadTranslations()
 {
-    const QStringList qtQmDirs = QStringList() << QLibraryInfo::location(QLibraryInfo::TranslationsPath) <<
+    QStringList const qtQmDirs = QStringList() << QLibraryInfo::location(QLibraryInfo::TranslationsPath) <<
 #ifdef TRANSLATIONS_DIR
         QString::fromUtf8(TRANSLATIONS_DIR) <<
 #endif
         (applicationDirPath() + QLatin1String("/translations"));
 
-    const QStringList appQmDirs = QStringList() <<
+    QStringList const appQmDirs = QStringList() <<
 #ifdef TRANSLATIONS_DIR
         QString::fromUtf8(TRANSLATIONS_DIR) <<
 #endif
         (applicationDirPath() + QLatin1String("/translations"));
 
-    const QString qtFileName = QLatin1String("qtbase");
+    QString const qtFileName = QLatin1String("qtbase");
 
-    const QLocale locale;
-    const QLocale englishLocale(QLocale::English, QLocale::UnitedStates);
+    QLocale const locale;
+    QLocale const englishLocale(QLocale::English, QLocale::UnitedStates);
 
     if (loadTranslation(myQtTranslator, qtFileName, locale, qtQmDirs) ||
         loadTranslation(myQtTranslator, qtFileName, englishLocale, qtQmDirs))
@@ -412,14 +412,14 @@ void Application::quitLater()
 
 /* these functions are for popping up desktop notifications */
 
-void Application::onTorrentsAdded(const QSet<int>& torrents)
+void Application::onTorrentsAdded(QSet<int> const& torrents)
 {
     if (!myPrefs->getBool(Prefs::SHOW_NOTIFICATION_ON_ADD))
     {
         return;
     }
 
-    for (const int id : torrents)
+    for (int const id : torrents)
     {
         Torrent* tor = myModel->getTorrentFromId(id);
 
@@ -469,7 +469,7 @@ void Application::onNewTorrentChanged(int id)
 
     if (tor && !tor->name().isEmpty())
     {
-        const int age_secs = tor->dateAdded().secsTo(QDateTime::currentDateTime());
+        int const age_secs = tor->dateAdded().secsTo(QDateTime::currentDateTime());
 
         if (age_secs < 30)
         {
@@ -505,7 +505,7 @@ Application::~Application()
 {
     if (myPrefs != nullptr && myWindow != nullptr)
     {
-        const QRect mainwinRect(myWindow->geometry());
+        QRect const mainwinRect(myWindow->geometry());
         myPrefs->set(Prefs::MAIN_WINDOW_HEIGHT, std::max(100, mainwinRect.height()));
         myPrefs->set(Prefs::MAIN_WINDOW_WIDTH, std::max(100, mainwinRect.width()));
         myPrefs->set(Prefs::MAIN_WINDOW_X, mainwinRect.x());
@@ -534,8 +534,8 @@ void Application::refreshPref(int key)
     case Prefs::DIR_WATCH:
     case Prefs::DIR_WATCH_ENABLED:
         {
-            const QString path(myPrefs->getString(Prefs::DIR_WATCH));
-            const bool isEnabled(myPrefs->getBool(Prefs::DIR_WATCH_ENABLED));
+            QString const path(myPrefs->getString(Prefs::DIR_WATCH));
+            bool const isEnabled(myPrefs->getBool(Prefs::DIR_WATCH_ENABLED));
             myWatchDir->setPath(path, isEnabled);
             break;
         }
@@ -552,9 +552,9 @@ void Application::maybeUpdateBlocklist()
         return;
     }
 
-    const QDateTime lastUpdatedAt = myPrefs->getDateTime(Prefs::BLOCKLIST_DATE);
-    const QDateTime nextUpdateAt = lastUpdatedAt.addDays(7);
-    const QDateTime now = QDateTime::currentDateTime();
+    QDateTime const lastUpdatedAt = myPrefs->getDateTime(Prefs::BLOCKLIST_DATE);
+    QDateTime const nextUpdateAt = lastUpdatedAt.addDays(7);
+    QDateTime const now = QDateTime::currentDateTime();
 
     if (now < nextUpdateAt)
     {
@@ -575,7 +575,7 @@ void Application::refreshTorrents()
     // usually we just poll the torrents that have shown recent activity,
     // but we also periodically ask for updates on the others to ensure
     // nothing's falling through the cracks.
-    const time_t now = time(NULL);
+    time_t const now = time(NULL);
 
     if (myLastFullUpdateTime + 60 >= now)
     {
@@ -592,9 +592,9 @@ void Application::refreshTorrents()
 ****
 ***/
 
-void Application::addTorrent(const QString& key)
+void Application::addTorrent(QString const& key)
 {
-    const AddData addme(key);
+    AddData const addme(key);
 
     if (addme.type != addme.NONE)
     {
@@ -602,7 +602,7 @@ void Application::addTorrent(const QString& key)
     }
 }
 
-void Application::addTorrent(const AddData& addme)
+void Application::addTorrent(AddData const& addme)
 {
     if (!myPrefs->getBool(Prefs::OPTIONS_PROMPT))
     {
@@ -626,13 +626,13 @@ void Application::raise()
     alert(myWindow);
 }
 
-bool Application::notifyApp(const QString& title, const QString& body) const
+bool Application::notifyApp(QString const& title, QString const& body) const
 {
 #ifdef QT_DBUS_LIB
 
-    const QLatin1String dbusServiceName("org.freedesktop.Notifications");
-    const QLatin1String dbusInterfaceName("org.freedesktop.Notifications");
-    const QLatin1String dbusPath("/org/freedesktop/Notifications");
+    QLatin1String const dbusServiceName("org.freedesktop.Notifications");
+    QLatin1String const dbusInterfaceName("org.freedesktop.Notifications");
+    QLatin1String const dbusPath("/org/freedesktop/Notifications");
 
     QDBusConnection bus = QDBusConnection::sessionBus();
 
@@ -649,7 +649,7 @@ bool Application::notifyApp(const QString& title, const QString& body) const
         args.append(QVariantMap()); // hints - unused atm
         args.append(static_cast<int32_t>(-1)); // use the default timeout period
         m.setArguments(args);
-        const QDBusReply<quint32> replyMsg = bus.call(m);
+        QDBusReply<quint32> const replyMsg = bus.call(m);
 
         if (replyMsg.isValid() && replyMsg.value() > 0)
         {

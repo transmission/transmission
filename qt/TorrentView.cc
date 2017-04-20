@@ -22,7 +22,7 @@ public:
         setFont(qApp->font("QMiniFont"));
     }
 
-    void setText(const QString& text)
+    void setText(QString const& text)
     {
         myText = text;
         update();
@@ -34,7 +34,7 @@ public:
         QStyleOptionHeader option;
         option.rect = QRect(0, 0, 100, 100);
 
-        const QRect labelRect = style()->subElementRect(QStyle::SE_HeaderLabel, &option, this);
+        QRect const labelRect = style()->subElementRect(QStyle::SE_HeaderLabel, &option, this);
 
         return QSize(100, fontMetrics().height() + (option.rect.height() - labelRect.height()));
     }
@@ -70,9 +70,9 @@ TorrentView::TorrentView(QWidget* parent) :
 {
 }
 
-void TorrentView::setHeaderText(const QString& text)
+void TorrentView::setHeaderText(QString const& text)
 {
-    const bool headerVisible = !text.isEmpty();
+    bool const headerVisible = !text.isEmpty();
 
     myHeaderWidget->setText(text);
     myHeaderWidget->setVisible(headerVisible);

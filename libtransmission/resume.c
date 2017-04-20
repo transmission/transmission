@@ -27,7 +27,7 @@ enum
     MAX_REMEMBERED_PEERS = 200
 };
 
-static char* getResumeFilename(const tr_torrent* tor)
+static char* getResumeFilename(tr_torrent const* tor)
 {
     char* base = tr_metainfoGetBasename(tr_torrentInfo(tor));
     char* filename = tr_strdup_printf("%s" TR_PATH_DELIMITER_STR "%s.resume", tr_getResumeDir(tor->session), base);
@@ -39,7 +39,7 @@ static char* getResumeFilename(const tr_torrent* tor)
 ****
 ***/
 
-static void savePeers(tr_variant* dict, const tr_torrent* tor)
+static void savePeers(tr_variant* dict, tr_torrent const* tor)
 {
     int count;
     tr_pex* pex;
@@ -63,11 +63,11 @@ static void savePeers(tr_variant* dict, const tr_torrent* tor)
     tr_free(pex);
 }
 
-static int addPeers(tr_torrent* tor, const uint8_t* buf, int buflen)
+static int addPeers(tr_torrent* tor, uint8_t const* buf, int buflen)
 {
     int i;
     int numAdded = 0;
-    const int count = buflen / sizeof(tr_pex);
+    int const count = buflen / sizeof(tr_pex);
 
     for (i = 0; i < count && numAdded < MAX_REMEMBERED_PEERS; ++i)
     {
@@ -86,20 +86,20 @@ static int addPeers(tr_torrent* tor, const uint8_t* buf, int buflen)
 
 static uint64_t loadPeers(tr_variant* dict, tr_torrent* tor)
 {
-    const uint8_t* str;
+    uint8_t const* str;
     size_t len;
     uint64_t ret = 0;
 
     if (tr_variantDictFindRaw(dict, TR_KEY_peers2, &str, &len))
     {
-        const int numAdded = addPeers(tor, str, len);
+        int const numAdded = addPeers(tor, str, len);
         tr_logAddTorDbg(tor, "Loaded %d IPv4 peers from resume file", numAdded);
         ret = TR_FR_PEERS;
     }
 
     if (tr_variantDictFindRaw(dict, TR_KEY_peers2_6, &str, &len))
     {
-        const int numAdded = addPeers(tor, str, len);
+        int const numAdded = addPeers(tor, str, len);
         tr_logAddTorDbg(tor, "Loaded %d IPv6 peers from resume file", numAdded);
         ret = TR_FR_PEERS;
     }
@@ -111,12 +111,12 @@ static uint64_t loadPeers(tr_variant* dict, tr_torrent* tor)
 ****
 ***/
 
-static void saveDND(tr_variant* dict, const tr_torrent* tor)
+static void saveDND(tr_variant* dict, tr_torrent const* tor)
 {
     tr_variant* list;
     tr_file_index_t i;
-    const tr_info* const inf = tr_torrentInfo(tor);
-    const tr_file_index_t n = inf->fileCount;
+    tr_info const* const inf = tr_torrentInfo(tor);
+    tr_file_index_t const n = inf->fileCount;
 
     list = tr_variantDictAddList(dict, TR_KEY_dnd, n);
 
@@ -130,7 +130,7 @@ static uint64_t loadDND(tr_variant* dict, tr_torrent* tor)
 {
     uint64_t ret = 0;
     tr_variant* list = NULL;
-    const tr_file_index_t n = tor->info.fileCount;
+    tr_file_index_t const n = tor->info.fileCount;
 
     if (tr_variantDictFindList(dict, TR_KEY_dnd, &list) && (tr_variantListSize(list) == n))
     {
@@ -180,12 +180,12 @@ static uint64_t loadDND(tr_variant* dict, tr_torrent* tor)
 ****
 ***/
 
-static void saveFilePriorities(tr_variant* dict, const tr_torrent* tor)
+static void saveFilePriorities(tr_variant* dict, tr_torrent const* tor)
 {
     tr_variant* list;
     tr_file_index_t i;
-    const tr_info* const inf = tr_torrentInfo(tor);
-    const tr_file_index_t n = inf->fileCount;
+    tr_info const* const inf = tr_torrentInfo(tor);
+    tr_file_index_t const n = inf->fileCount;
 
     list = tr_variantDictAddList(dict, TR_KEY_priority, n);
 
@@ -199,7 +199,7 @@ static uint64_t loadFilePriorities(tr_variant* dict, tr_torrent* tor)
 {
     tr_variant* list;
     uint64_t ret = 0;
-    const tr_file_index_t n = tor->info.fileCount;
+    tr_file_index_t const n = tor->info.fileCount;
 
     if (tr_variantDictFindList(dict, TR_KEY_priority, &list) && (tr_variantListSize(list) == n))
     {
@@ -353,7 +353,7 @@ static uint64_t loadIdleLimits(tr_variant* dict, tr_torrent* tor)
 ****
 ***/
 
-static void saveName(tr_variant* dict, const tr_torrent* tor)
+static void saveName(tr_variant* dict, tr_torrent const* tor)
 {
     tr_variantDictAddStr(dict, TR_KEY_name, tr_torrentName(tor));
 }
@@ -361,7 +361,7 @@ static void saveName(tr_variant* dict, const tr_torrent* tor)
 static uint64_t loadName(tr_variant* dict, tr_torrent* tor)
 {
     uint64_t ret = 0;
-    const char* name;
+    char const* name;
 
     if (tr_variantDictFindStr(dict, TR_KEY_name, &name, NULL))
     {
@@ -381,12 +381,12 @@ static uint64_t loadName(tr_variant* dict, tr_torrent* tor)
 ****
 ***/
 
-static void saveFilenames(tr_variant* dict, const tr_torrent* tor)
+static void saveFilenames(tr_variant* dict, tr_torrent const* tor)
 {
     tr_file_index_t i;
     bool any_renamed;
-    const tr_file_index_t n = tor->info.fileCount;
-    const tr_file* files = tor->info.files;
+    tr_file_index_t const n = tor->info.fileCount;
+    tr_file const* files = tor->info.files;
 
     any_renamed = false;
 
@@ -414,12 +414,12 @@ static uint64_t loadFilenames(tr_variant* dict, tr_torrent* tor)
     if (tr_variantDictFindList(dict, TR_KEY_files, &list))
     {
         size_t i;
-        const size_t n = tr_variantListSize(list);
+        size_t const n = tr_variantListSize(list);
         tr_file* files = tor->info.files;
 
         for (i = 0; i < tor->info.fileCount && i < n; ++i)
         {
-            const char* str;
+            char const* str;
             size_t str_len;
 
             if (tr_variantGetStr(tr_variantListChild(list, i), &str, &str_len) && str && str_len)
@@ -440,7 +440,7 @@ static uint64_t loadFilenames(tr_variant* dict, tr_torrent* tor)
 ****
 ***/
 
-static void bitfieldToBenc(const tr_bitfield* b, tr_variant* benc)
+static void bitfieldToBenc(tr_bitfield const* b, tr_variant* benc)
 {
     if (tr_bitfieldHasAll(b))
     {
@@ -464,8 +464,8 @@ static void saveProgress(tr_variant* dict, tr_torrent* tor)
     tr_variant* l;
     tr_variant* prog;
     tr_file_index_t fi;
-    const tr_info* inf = tr_torrentInfo(tor);
-    const time_t now = tr_time();
+    tr_info const* inf = tr_torrentInfo(tor);
+    time_t const now = tr_time();
 
     prog = tr_variantDictAddDict(dict, TR_KEY_progress, 3);
 
@@ -474,13 +474,13 @@ static void saveProgress(tr_variant* dict, tr_torrent* tor)
 
     for (fi = 0; fi < inf->fileCount; ++fi)
     {
-        const tr_piece* p;
-        const tr_piece* pend;
+        tr_piece const* p;
+        tr_piece const* pend;
         time_t oldest_nonzero = now;
         time_t newest = 0;
         bool has_zero = false;
-        const time_t mtime = tr_torrentGetFileMTime(tor, fi);
-        const tr_file* f = &inf->files[fi];
+        time_t const mtime = tr_torrentGetFileMTime(tor, fi);
+        tr_file const* f = &inf->files[fi];
 
         /* get the oldest and newest nonzero timestamps for pieces in this file */
         for (p = &inf->pieces[f->firstPiece], pend = &inf->pieces[f->lastPiece]; p != pend; ++p)
@@ -519,7 +519,7 @@ static void saveProgress(tr_variant* dict, tr_torrent* tor)
         }
         else /* some are checked, some aren't... so list piece by piece */
         {
-            const int offset = oldest_nonzero - 1;
+            int const offset = oldest_nonzero - 1;
             tr_variant* ll = tr_variantListAddList(l, 2 + f->lastPiece - f->firstPiece);
             tr_variantListAddInt(ll, offset);
 
@@ -545,7 +545,7 @@ static uint64_t loadProgress(tr_variant* dict, tr_torrent* tor)
     size_t i, n;
     uint64_t ret = 0;
     tr_variant* prog;
-    const tr_info* inf = tr_torrentInfo(tor);
+    tr_info const* inf = tr_torrentInfo(tor);
 
     for (i = 0, n = inf->pieceCount; i < n; ++i)
     {
@@ -554,9 +554,9 @@ static uint64_t loadProgress(tr_variant* dict, tr_torrent* tor)
 
     if (tr_variantDictFindDict(dict, TR_KEY_progress, &prog))
     {
-        const char* err;
-        const char* str;
-        const uint8_t* raw;
+        char const* err;
+        char const* str;
+        uint8_t const* raw;
         size_t rawlen;
         tr_variant* l;
         tr_variant* b;
@@ -580,9 +580,9 @@ static uint64_t loadProgress(tr_variant* dict, tr_torrent* tor)
             for (fi = 0; fi < inf->fileCount; ++fi)
             {
                 tr_variant* b = tr_variantListChild(l, fi);
-                const tr_file* f = &inf->files[fi];
+                tr_file const* f = &inf->files[fi];
                 tr_piece* p = &inf->pieces[f->firstPiece];
-                const tr_piece* pend = &inf->pieces[f->lastPiece] + 1;
+                tr_piece const* pend = &inf->pieces[f->lastPiece] + 1;
 
                 if (tr_variantIsInt(b))
                 {
@@ -598,7 +598,7 @@ static uint64_t loadProgress(tr_variant* dict, tr_torrent* tor)
                 {
                     int i = 0;
                     int64_t offset = 0;
-                    const int pieces = f->lastPiece + 1 - f->firstPiece;
+                    int const pieces = f->lastPiece + 1 - f->firstPiece;
 
                     tr_variantGetInt(tr_variantListChild(b, 0), &offset);
 
@@ -625,11 +625,11 @@ static uint64_t loadProgress(tr_variant* dict, tr_torrent* tor)
 
                 if (tr_variantGetInt(tr_variantListChild(l, fi), &t))
                 {
-                    const tr_file* f = &inf->files[fi];
+                    tr_file const* f = &inf->files[fi];
                     tr_piece* p = &inf->pieces[f->firstPiece];
-                    const tr_piece* pend = &inf->pieces[f->lastPiece];
-                    const time_t mtime = tr_torrentGetFileMTime(tor, fi);
-                    const time_t timeChecked = mtime == t ? mtime : 0;
+                    tr_piece const* pend = &inf->pieces[f->lastPiece];
+                    time_t const mtime = tr_torrentGetFileMTime(tor, fi);
+                    time_t const timeChecked = mtime == t ? mtime : 0;
 
                     for (; p != pend; ++p)
                     {
@@ -645,7 +645,7 @@ static uint64_t loadProgress(tr_variant* dict, tr_torrent* tor)
         if ((b = tr_variantDictFind(prog, TR_KEY_blocks)))
         {
             size_t buflen;
-            const uint8_t* buf;
+            uint8_t const* buf;
 
             if (!tr_variantGetRaw(b, &buf, &buflen))
             {
@@ -765,12 +765,12 @@ static uint64_t loadFromFile(tr_torrent* tor, uint64_t fieldsToLoad)
 {
     size_t len;
     int64_t i;
-    const char* str;
+    char const* str;
     char* filename;
     tr_variant top;
     bool boolVal;
     uint64_t fieldsLoaded = 0;
-    const bool wasDirty = tor->isDirty;
+    bool const wasDirty = tor->isDirty;
     tr_error* error = NULL;
 
     assert(tr_isTorrent(tor));
@@ -797,7 +797,7 @@ static uint64_t loadFromFile(tr_torrent* tor, uint64_t fieldsToLoad)
     if ((fieldsToLoad & (TR_FR_PROGRESS | TR_FR_DOWNLOAD_DIR)) &&
         (tr_variantDictFindStr(&top, TR_KEY_destination, &str, &len)) && (str && *str))
     {
-        const bool is_current_dir = tor->currentDir == tor->downloadDir;
+        bool const is_current_dir = tor->currentDir == tor->downloadDir;
         tr_free(tor->downloadDir);
         tor->downloadDir = tr_strndup(str, len);
 
@@ -812,7 +812,7 @@ static uint64_t loadFromFile(tr_torrent* tor, uint64_t fieldsToLoad)
     if ((fieldsToLoad & (TR_FR_PROGRESS | TR_FR_INCOMPLETE_DIR)) &&
         (tr_variantDictFindStr(&top, TR_KEY_incomplete_dir, &str, &len)) && (str && *str))
     {
-        const bool is_current_dir = tor->currentDir == tor->incompleteDir;
+        bool const is_current_dir = tor->currentDir == tor->incompleteDir;
         tr_free(tor->incompleteDir);
         tor->incompleteDir = tr_strndup(str, len);
 
@@ -940,7 +940,7 @@ static uint64_t loadFromFile(tr_torrent* tor, uint64_t fieldsToLoad)
     return fieldsLoaded;
 }
 
-static uint64_t setFromCtor(tr_torrent* tor, uint64_t fields, const tr_ctor* ctor, int mode)
+static uint64_t setFromCtor(tr_torrent* tor, uint64_t fields, tr_ctor const* ctor, int mode)
 {
     uint64_t ret = 0;
 
@@ -965,7 +965,7 @@ static uint64_t setFromCtor(tr_torrent* tor, uint64_t fields, const tr_ctor* cto
 
     if (fields & TR_FR_DOWNLOAD_DIR)
     {
-        const char* path;
+        char const* path;
 
         if (tr_ctorGetDownloadDir(ctor, mode, &path) && path && *path)
         {
@@ -978,17 +978,17 @@ static uint64_t setFromCtor(tr_torrent* tor, uint64_t fields, const tr_ctor* cto
     return ret;
 }
 
-static uint64_t useManditoryFields(tr_torrent* tor, uint64_t fields, const tr_ctor* ctor)
+static uint64_t useManditoryFields(tr_torrent* tor, uint64_t fields, tr_ctor const* ctor)
 {
     return setFromCtor(tor, fields, ctor, TR_FORCE);
 }
 
-static uint64_t useFallbackFields(tr_torrent* tor, uint64_t fields, const tr_ctor* ctor)
+static uint64_t useFallbackFields(tr_torrent* tor, uint64_t fields, tr_ctor const* ctor)
 {
     return setFromCtor(tor, fields, ctor, TR_FALLBACK);
 }
 
-uint64_t tr_torrentLoadResume(tr_torrent* tor, uint64_t fieldsToLoad, const tr_ctor* ctor)
+uint64_t tr_torrentLoadResume(tr_torrent* tor, uint64_t fieldsToLoad, tr_ctor const* ctor)
 {
     uint64_t ret = 0;
 
@@ -1003,7 +1003,7 @@ uint64_t tr_torrentLoadResume(tr_torrent* tor, uint64_t fieldsToLoad, const tr_c
     return ret;
 }
 
-void tr_torrentRemoveResume(const tr_torrent* tor)
+void tr_torrentRemoveResume(tr_torrent const* tor)
 {
     char* filename = getResumeFilename(tor);
     tr_sys_path_remove(filename, NULL);

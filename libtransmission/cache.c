@@ -77,17 +77,17 @@ struct run_info
 };
 
 /* return a count of how many contiguous blocks there are starting at this pos */
-static int getBlockRun(const tr_cache* cache, int pos, struct run_info* info)
+static int getBlockRun(tr_cache const* cache, int pos, struct run_info* info)
 {
     int i;
-    const int n = tr_ptrArraySize(&cache->blocks);
-    const struct cache_block* const* blocks = (const struct cache_block* const*)tr_ptrArrayBase(&cache->blocks);
-    const struct cache_block* ref = blocks[pos];
+    int const n = tr_ptrArraySize(&cache->blocks);
+    struct cache_block const* const* blocks = (struct cache_block const* const*)tr_ptrArrayBase(&cache->blocks);
+    struct cache_block const* ref = blocks[pos];
     tr_block_index_t block = ref->block;
 
     for (i = pos; i < n; ++i, ++block)
     {
-        const struct cache_block* b = blocks[i];
+        struct cache_block const* b = blocks[i];
 
         if (b->block != block)
         {
@@ -106,7 +106,7 @@ static int getBlockRun(const tr_cache* cache, int pos, struct run_info* info)
 
     if (info != NULL)
     {
-        const struct cache_block* b = blocks[i - 1];
+        struct cache_block const* b = blocks[i - 1];
         info->last_block_time = b->time;
         info->is_piece_done = tr_torrentPieceIsComplete(b->tor, b->piece);
         info->is_multi_piece = b->piece != blocks[pos]->piece;
@@ -118,10 +118,10 @@ static int getBlockRun(const tr_cache* cache, int pos, struct run_info* info)
 }
 
 /* higher rank comes before lower rank */
-static int compareRuns(const void* va, const void* vb)
+static int compareRuns(void const* va, void const* vb)
 {
-    const struct run_info* a = va;
-    const struct run_info* b = vb;
+    struct run_info const* a = va;
+    struct run_info const* b = vb;
     return b->rank - a->rank;
 }
 
@@ -138,9 +138,9 @@ enum
  */
 static int calcRuns(tr_cache* cache, struct run_info* runs)
 {
-    const int n = tr_ptrArraySize(&cache->blocks);
+    int const n = tr_ptrArraySize(&cache->blocks);
     int i = 0, pos;
-    const time_t now = tr_time();
+    time_t const now = tr_time();
 
     for (pos = 0; pos < n; pos += runs[i++].len)
     {
@@ -179,8 +179,8 @@ static int flushContiguous(tr_cache* cache, int pos, int n)
 
     struct cache_block* b = blocks[pos];
     tr_torrent* tor = b->tor;
-    const tr_piece_index_t piece = b->piece;
-    const uint32_t offset = b->offset;
+    tr_piece_index_t const piece = b->piece;
+    uint32_t const offset = b->offset;
 
     for (i = pos; i < pos + n; ++i)
     {
@@ -232,7 +232,7 @@ static int cacheTrim(tr_cache* cache)
     {
         /* Amount of cache that should be removed by the flush. This influences how large
          * runs can grow as well as how often flushes will happen. */
-        const int cacheCutoff = 1 + cache->max_blocks / 4;
+        int const cacheCutoff = 1 + cache->max_blocks / 4;
         struct run_info* runs = tr_new(struct run_info, tr_ptrArraySize(&cache->blocks));
         int i = 0, j = 0;
 
@@ -272,7 +272,7 @@ int tr_cacheSetLimit(tr_cache* cache, int64_t max_bytes)
     return cacheTrim(cache);
 }
 
-int64_t tr_cacheGetLimit(const tr_cache* cache)
+int64_t tr_cacheGetLimit(tr_cache const* cache)
 {
     return cache->max_bytes;
 }
@@ -297,10 +297,10 @@ void tr_cacheFree(tr_cache* cache)
 ****
 ***/
 
-static int cache_block_compare(const void* va, const void* vb)
+static int cache_block_compare(void const* va, void const* vb)
 {
-    const struct cache_block* a = va;
-    const struct cache_block* b = vb;
+    struct cache_block const* a = va;
+    struct cache_block const* b = vb;
 
     /* primary key: torrent id */
     if (a->tor->uniqueId != b->tor->uniqueId)
@@ -439,7 +439,7 @@ int tr_cacheFlushFile(tr_cache* cache, tr_torrent* torrent, tr_file_index_t i)
     /* flush out all the blocks in that file */
     while (!err && (pos < tr_ptrArraySize(&cache->blocks)))
     {
-        const struct cache_block* b = tr_ptrArrayNth(&cache->blocks, pos);
+        struct cache_block const* b = tr_ptrArrayNth(&cache->blocks, pos);
 
         if (b->tor != torrent)
         {
@@ -460,12 +460,12 @@ int tr_cacheFlushFile(tr_cache* cache, tr_torrent* torrent, tr_file_index_t i)
 int tr_cacheFlushTorrent(tr_cache* cache, tr_torrent* torrent)
 {
     int err = 0;
-    const int pos = findBlockPos(cache, torrent, 0);
+    int const pos = findBlockPos(cache, torrent, 0);
 
     /* flush out all the blocks in that torrent */
     while (!err && (pos < tr_ptrArraySize(&cache->blocks)))
     {
-        const struct cache_block* b = tr_ptrArrayNth(&cache->blocks, pos);
+        struct cache_block const* b = tr_ptrArrayNth(&cache->blocks, pos);
 
         if (b->tor != torrent)
         {

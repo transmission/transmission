@@ -22,14 +22,14 @@
 #define MY_NAME "transmission-create"
 
 #define MAX_TRACKERS 128
-static const uint32_t KiB = 1024;
+static uint32_t const KiB = 1024;
 static tr_tracker_info trackers[MAX_TRACKERS];
 static int trackerCount = 0;
 static bool isPrivate = false;
 static bool showVersion = false;
-static const char* comment = NULL;
-static const char* outfile = NULL;
-static const char* infile = NULL;
+static char const* comment = NULL;
+static char const* outfile = NULL;
+static char const* infile = NULL;
 static uint32_t piecesize_kib = 0;
 
 static tr_option options[] =
@@ -43,15 +43,15 @@ static tr_option options[] =
     { 0, NULL, NULL, NULL, 0, NULL }
 };
 
-static const char* getUsage(void)
+static char const* getUsage(void)
 {
     return "Usage: " MY_NAME " [options] <file|directory>";
 }
 
-static int parseCommandLine(int argc, const char* const* argv)
+static int parseCommandLine(int argc, char const* const* argv)
 {
     int c;
-    const char* optarg;
+    char const* optarg;
 
     while ((c = tr_getopt(getUsage(), argc, argv, options, &optarg)))
     {
@@ -136,7 +136,7 @@ int tr_main(int argc, char* argv[])
     tr_formatter_size_init(DISK_K, DISK_K_STR, DISK_M_STR, DISK_G_STR, DISK_T_STR);
     tr_formatter_speed_init(SPEED_K, SPEED_K_STR, SPEED_M_STR, SPEED_G_STR, SPEED_T_STR);
 
-    if (parseCommandLine(argc, (const char* const*)argv))
+    if (parseCommandLine(argc, (char const* const*)argv))
     {
         return EXIT_FAILURE;
     }

@@ -103,7 +103,7 @@ static gboolean refreshFilesForeach(GtkTreeModel* model, GtkTreePath* path UNUSE
     int old_prog;
     int old_priority;
     int old_enabled;
-    const gboolean is_file = !gtk_tree_model_iter_has_child(model, iter);
+    gboolean const is_file = !gtk_tree_model_iter_has_child(model, iter);
 
     gtk_tree_model_get(model, iter,
         FC_ENABLED, &old_enabled,
@@ -117,11 +117,11 @@ static gboolean refreshFilesForeach(GtkTreeModel* model, GtkTreePath* path UNUSE
     if (is_file)
     {
         tr_torrent* tor = refresh_data->tor;
-        const tr_info* inf = tr_torrentInfo(tor);
-        const int enabled = !inf->files[index].dnd;
-        const int priority = inf->files[index].priority;
-        const uint64_t have = refresh_data->refresh_file_stat[index].bytesCompleted;
-        const int prog = size ? (int)((100.0 * have) / size) : 1;
+        tr_info const* inf = tr_torrentInfo(tor);
+        int const enabled = !inf->files[index].dnd;
+        int const priority = inf->files[index].priority;
+        uint64_t const have = refresh_data->refresh_file_stat[index].bytesCompleted;
+        int const prog = size ? (int)((100.0 * have) / size) : 1;
 
         if ((priority != old_priority) || (enabled != old_enabled) || (have != old_have) || (prog != old_prog))
         {
@@ -309,7 +309,7 @@ struct ActiveData
 
 static gboolean getSelectedFilesForeach(GtkTreeModel* model, GtkTreePath* path UNUSED, GtkTreeIter* iter, gpointer gdata)
 {
-    const gboolean is_file = !gtk_tree_model_iter_has_child(model, iter);
+    gboolean const is_file = !gtk_tree_model_iter_has_child(model, iter);
 
     if (is_file)
     {
@@ -359,7 +359,7 @@ struct SubtreeForeachData
 
 static gboolean getSubtreeForeach(GtkTreeModel* model, GtkTreePath* path, GtkTreeIter* iter, gpointer gdata)
 {
-    const gboolean is_file = !gtk_tree_model_iter_has_child(model, iter);
+    gboolean const is_file = !gtk_tree_model_iter_has_child(model, iter);
 
     if (is_file)
     {
@@ -438,13 +438,13 @@ static void buildTree(GNode* node, gpointer gdata)
     GtkTreeIter child_iter;
     struct build_data* build = gdata;
     struct row_struct* child_data = node->data;
-    const gboolean isLeaf = node->children == NULL;
+    gboolean const isLeaf = node->children == NULL;
 
-    const char* mime_type = isLeaf ? gtr_get_mime_type_from_filename(child_data->name) : DIRECTORY_MIME_TYPE;
+    char const* mime_type = isLeaf ? gtr_get_mime_type_from_filename(child_data->name) : DIRECTORY_MIME_TYPE;
     GdkPixbuf* icon = gtr_get_mime_type_icon(mime_type, GTK_ICON_SIZE_MENU, build->w);
-    const tr_info* inf = tr_torrentInfo(build->tor);
-    const int priority = isLeaf ? inf->files[ child_data->index ].priority : 0;
-    const gboolean enabled = isLeaf ? !inf->files[ child_data->index ].dnd : TRUE;
+    tr_info const* inf = tr_torrentInfo(build->tor);
+    int const priority = isLeaf ? inf->files[ child_data->index ].priority : 0;
+    gboolean const enabled = isLeaf ? !inf->files[ child_data->index ].dnd : TRUE;
     char* name_esc = g_markup_escape_text(child_data->name, -1);
 
     tr_strlsize(size_str, child_data->length, sizeof size_str);
@@ -475,13 +475,13 @@ static void buildTree(GNode* node, gpointer gdata)
     g_free(child_data);
 }
 
-static GNode* find_child(GNode* parent, const char* name)
+static GNode* find_child(GNode* parent, char const* name)
 {
     GNode* child = parent->children;
 
     while (child)
     {
-        const struct row_struct* child_data = child->data;
+        struct row_struct const* child_data = child->data;
 
         if (*child_data->name == *name && g_strcmp0(child_data->name, name) == 0)
         {
@@ -527,7 +527,7 @@ void gtr_file_list_set_torrent(GtkWidget* w, int torrentId)
         if (tor != NULL)
         {
             tr_file_index_t i;
-            const tr_info* inf = tr_torrentInfo(tor);
+            tr_info const* inf = tr_torrentInfo(tor);
             struct row_struct* root_data;
             GNode* root;
             struct build_data build;
@@ -543,13 +543,13 @@ void gtr_file_list_set_torrent(GtkWidget* w, int torrentId)
             {
                 int j;
                 GNode* parent = root;
-                const tr_file* file = &inf->files[i];
+                tr_file const* file = &inf->files[i];
                 char** tokens = g_strsplit(file->name, G_DIR_SEPARATOR_S, 0);
 
                 for (j = 0; tokens[j]; ++j)
                 {
-                    const gboolean isLeaf = tokens[j + 1] == NULL;
-                    const char* name = tokens[j];
+                    gboolean const isLeaf = tokens[j + 1] == NULL;
+                    char const* name = tokens[j];
                     GNode* node = find_child(parent, name);
 
                     if (node == NULL)
@@ -606,7 +606,7 @@ static void renderPriority(GtkTreeViewColumn* column UNUSED, GtkCellRenderer* re
     gpointer data UNUSED)
 {
     int priority;
-    const char* text;
+    char const* text;
     gtk_tree_model_get(model, iter, FC_PRIORITY, &priority, -1);
 
     switch (priority)
@@ -815,8 +815,8 @@ static int on_rename_done_idle(struct rename_data* data)
 
         if (gtk_tree_model_get_iter_from_string(data->file_data->model, &iter, data->path_string))
         {
-            const gboolean isLeaf = !gtk_tree_model_iter_has_child(data->file_data->model, &iter);
-            const char* mime_type = isLeaf ? gtr_get_mime_type_from_filename(data->newname) : DIRECTORY_MIME_TYPE;
+            gboolean const isLeaf = !gtk_tree_model_iter_has_child(data->file_data->model, &iter);
+            char const* mime_type = isLeaf ? gtr_get_mime_type_from_filename(data->newname) : DIRECTORY_MIME_TYPE;
             GdkPixbuf* icon = gtr_get_mime_type_icon(mime_type, GTK_ICON_SIZE_MENU, data->file_data->view);
 
             gtk_tree_store_set(data->file_data->store, &iter, FC_LABEL, data->newname, FC_ICON, icon, -1);
@@ -845,7 +845,7 @@ static int on_rename_done_idle(struct rename_data* data)
     return G_SOURCE_REMOVE;
 }
 
-static void on_rename_done(tr_torrent* tor G_GNUC_UNUSED, const char* oldpath G_GNUC_UNUSED, const char* newname G_GNUC_UNUSED,
+static void on_rename_done(tr_torrent* tor G_GNUC_UNUSED, char const* oldpath G_GNUC_UNUSED, char const* newname G_GNUC_UNUSED,
     int error, struct rename_data* rename_data)
 {
     rename_data->error = error;
@@ -915,7 +915,7 @@ GtkWidget* gtr_file_list_new(TrCore* core, int torrentId)
     GtkTreeSelection* sel;
     GtkTreeViewColumn* col;
     GtkTreeView* tree_view;
-    const char* title;
+    char const* title;
     PangoLayout* pango_layout;
     PangoContext* pango_context;
     PangoFontDescription* pango_font_description;

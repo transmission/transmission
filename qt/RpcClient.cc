@@ -72,7 +72,7 @@ void RpcClient::start(tr_session* session)
     mySession = session;
 }
 
-void RpcClient::start(const QUrl& url)
+void RpcClient::start(QUrl const& url)
 {
     myUrl = url;
 }
@@ -92,7 +92,7 @@ bool RpcClient::isLocal() const
     return false;
 }
 
-const QUrl& RpcClient::url() const
+QUrl const& RpcClient::url() const
 {
     return myUrl;
 }
@@ -102,7 +102,7 @@ RpcResponseFuture RpcClient::exec(tr_quark method, tr_variant* args)
     return exec(tr_quark_get_string(method, nullptr), args);
 }
 
-RpcResponseFuture RpcClient::exec(const char* method, tr_variant* args)
+RpcResponseFuture RpcClient::exec(char const* method, tr_variant* args)
 {
     TrVariantPtr json = createVariant();
     tr_variantInitDict(json.get(), 3);
@@ -121,7 +121,7 @@ int64_t RpcClient::getNextTag()
     return myNextTag++;
 }
 
-void RpcClient::sendNetworkRequest(TrVariantPtr json, const QFutureInterface<RpcResponse>& promise)
+void RpcClient::sendNetworkRequest(TrVariantPtr json, QFutureInterface<RpcResponse> const& promise)
 {
     QNetworkRequest request;
     request.setUrl(myUrl);
@@ -149,7 +149,7 @@ void RpcClient::sendNetworkRequest(TrVariantPtr json, const QFutureInterface<Rpc
 #ifdef DEBUG_HTTP
     std::cerr << "sending " << "POST " << qPrintable(myUrl.path()) << std::endl;
 
-    for (const QByteArray& b : request.rawHeaderList())
+    for (QByteArray const& b : request.rawHeaderList())
     {
         std::cerr << b.constData() << ": " << request.rawHeader(b).constData() << std::endl;
     }
@@ -158,7 +158,7 @@ void RpcClient::sendNetworkRequest(TrVariantPtr json, const QFutureInterface<Rpc
 #endif
 }
 
-void RpcClient::sendLocalRequest(TrVariantPtr json, const QFutureInterface<RpcResponse>& promise, int64_t tag)
+void RpcClient::sendLocalRequest(TrVariantPtr json, QFutureInterface<RpcResponse> const& promise, int64_t tag)
 {
     myLocalRequests.insert(tag, promise);
     tr_rpc_request_exec_json(mySession, json.get(), localSessionCallback, this);
@@ -227,7 +227,7 @@ void RpcClient::networkRequestFinished(QNetworkReply* reply)
 #ifdef DEBUG_HTTP
     std::cerr << "http response header: " << std::endl;
 
-    for (const QByteArray& b : reply->rawHeaderList())
+    for (QByteArray const& b : reply->rawHeaderList())
     {
         std::cerr << b.constData() << ": " << reply->rawHeader(b).constData() << std::endl;
     }
@@ -260,7 +260,7 @@ void RpcClient::networkRequestFinished(QNetworkReply* reply)
     {
         RpcResponse result;
 
-        const QByteArray jsonData = reply->readAll().trimmed();
+        QByteArray const jsonData = reply->readAll().trimmed();
         TrVariantPtr json = createVariant();
 
         if (tr_variantFromJson(json.get(), jsonData.constData(), jsonData.size()) == 0)
@@ -300,7 +300,7 @@ RpcResponse RpcClient::parseResponseData(tr_variant& json)
 {
     RpcResponse ret;
 
-    const char* result;
+    char const* result;
 
     if (tr_variantDictFindStr(&json, TR_KEY_result, &result, nullptr))
     {

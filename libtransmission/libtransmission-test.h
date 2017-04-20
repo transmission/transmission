@@ -22,11 +22,11 @@ extern bool verbose;
 
 bool should_print(bool pass);
 
-bool check_condition_impl(const char* file, int line, bool condition);
-bool check_int_eq_impl(const char* file, int line, int64_t expected, int64_t actual);
-bool check_uint_eq_impl(const char* file, int line, uint64_t expected, uint64_t actual);
-bool check_ptr_eq_impl(const char* file, int line, const void* expected, const void* actual);
-bool check_streq_impl(const char* file, int line, const char* expected, const char* actual);
+bool check_condition_impl(char const* file, int line, bool condition);
+bool check_int_eq_impl(char const* file, int line, int64_t expected, int64_t actual);
+bool check_uint_eq_impl(char const* file, int line, uint64_t expected, uint64_t actual);
+bool check_ptr_eq_impl(char const* file, int line, void const* expected, void const* actual);
+bool check_streq_impl(char const* file, int line, char const* expected, char const* actual);
 
 /***
 ****
@@ -100,12 +100,12 @@ typedef int (* testFunc)(void);
 
 #define NUM_TESTS(tarray) ((int)(sizeof(tarray) / sizeof(tarray[0])))
 
-int runTests(const testFunc* const tests, int numTests);
+int runTests(testFunc const* const tests, int numTests);
 
 #define MAIN_SINGLE_TEST(test) \
     int main(void) \
     { \
-        const testFunc tests[] = { test }; \
+        testFunc const tests[] = { test }; \
         return runTests(tests, 1); \
     }
 
@@ -117,11 +117,11 @@ tr_torrent* libttest_zero_torrent_init(tr_session* session);
 
 void libttest_blockingTorrentVerify(tr_torrent* tor);
 
-void libtest_create_file_with_contents(const char* path, const void* contents, size_t n);
-void libtest_create_tmpfile_with_contents(char* tmpl, const void* payload, size_t n);
-void libtest_create_file_with_string_contents(const char* path, const char* str);
+void libtest_create_file_with_contents(char const* path, void const* contents, size_t n);
+void libtest_create_tmpfile_with_contents(char* tmpl, void const* payload, size_t n);
+void libtest_create_file_with_string_contents(char const* path, char const* str);
 
 char* libtest_sandbox_create(void);
-void libtest_sandbox_destroy(const char* sandbox);
+void libtest_sandbox_destroy(char const* sandbox);
 
 void libttest_sync(void);

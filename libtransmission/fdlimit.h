@@ -38,7 +38,7 @@
  *
  * @see tr_fdFileClose
  */
-tr_sys_file_t tr_fdFileCheckout(tr_session* session, int torrent_id, tr_file_index_t file_num, const char* filename,
+tr_sys_file_t tr_fdFileCheckout(tr_session* session, int torrent_id, tr_file_index_t file_num, char const* filename,
     bool do_write, tr_preallocation_mode preallocation_mode, uint64_t preallocation_file_size);
 
 tr_sys_file_t tr_fdFileGetCached(tr_session* session, int torrent_id, tr_file_index_t file_num, bool doWrite);
@@ -53,7 +53,7 @@ bool tr_fdFileGetCachedMTime(tr_session* session, int torrent_id, tr_file_index_
  *
  * @see tr_fdFileCheckout
  */
-void tr_fdFileClose(tr_session* session, const tr_torrent* tor, tr_file_index_t file_num);
+void tr_fdFileClose(tr_session* session, tr_torrent const* tor, tr_file_index_t file_num);
 
 /**
  * Closes all the files associated with a given torrent id

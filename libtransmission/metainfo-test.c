@@ -16,7 +16,7 @@ static int test_magnet_link(void)
 {
     tr_info inf;
     tr_ctor* ctor;
-    const char* magnet_link;
+    char const* magnet_link;
     tr_parse_result parse_result;
 
     /* background info @ http://wiki.theory.org/BitTorrent_Magnet-URI_Webseeding */
@@ -52,13 +52,13 @@ static int test_magnet_link(void)
 static int test_metainfo(void)
 {
     size_t i;
-    const struct
+    struct
     {
         int expected_benc_err;
         int expected_parse_result;
         const void* benc;
     }
-    metainfo[] =
+    const metainfo[] =
     {
         { 0, TR_PARSE_OK, BEFORE_PATH "5:a.txt" AFTER_PATH },
 
@@ -86,12 +86,12 @@ static int test_metainfo(void)
     for (i = 0; i < (sizeof(metainfo) / sizeof(metainfo[0])); i++)
     {
         tr_ctor* ctor = tr_ctorNew(NULL);
-        const int err = tr_ctorSetMetainfo(ctor, metainfo[i].benc, strlen(metainfo[i].benc));
+        int const err = tr_ctorSetMetainfo(ctor, metainfo[i].benc, strlen(metainfo[i].benc));
         check_int_eq(metainfo[i].expected_benc_err, err);
 
         if (!err)
         {
-            const tr_parse_result parse_result = tr_torrentParse(ctor, NULL);
+            tr_parse_result const parse_result = tr_torrentParse(ctor, NULL);
             check_int_eq(metainfo[i].expected_parse_result, parse_result);
         }
 
@@ -103,7 +103,7 @@ static int test_metainfo(void)
 
 int main(void)
 {
-    const testFunc tests[] =
+    testFunc const tests[] =
     {
         test_magnet_link,
         test_metainfo

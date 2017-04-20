@@ -62,14 +62,14 @@ static void test_incomplete_dir_threadfunc(void* vdata)
     data->done = true;
 }
 
-static int test_incomplete_dir_impl(const char* incomplete_dir, const char* download_dir)
+static int test_incomplete_dir_impl(char const* incomplete_dir, char const* download_dir)
 {
     tr_file_index_t file_index;
     tr_session* session;
     tr_torrent* tor;
     tr_completeness completeness;
-    const tr_completeness completeness_unset = -1;
-    const time_t deadline = time(NULL) + 300;
+    tr_completeness const completeness_unset = -1;
+    time_t const deadline = time(NULL) + 300;
     tr_variant settings;
 
     /* init the session */
@@ -184,7 +184,7 @@ static int test_set_location(void)
     char* target_dir;
     tr_torrent* tor;
     tr_session* session;
-    const time_t deadline = time(NULL) + 300;
+    time_t const deadline = time(NULL) + 300;
 
     /* init the session */
     session = libttest_session_init(NULL);
@@ -233,7 +233,7 @@ static int test_set_location(void)
 
 int main(void)
 {
-    const testFunc tests[] =
+    testFunc const tests[] =
     {
         test_incomplete_dir,
         test_set_location

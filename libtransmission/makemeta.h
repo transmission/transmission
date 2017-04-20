@@ -85,7 +85,7 @@ typedef struct tr_metainfo_builder
 }
 tr_metainfo_builder;
 
-tr_metainfo_builder* tr_metaInfoBuilderCreate(const char* topFile);
+tr_metainfo_builder* tr_metaInfoBuilderCreate(char const* topFile);
 
 /**
  * Call this before tr_makeMetaInfo() to override the builder.pieceSize
@@ -114,8 +114,8 @@ void tr_metaInfoBuilderFree(tr_metainfo_builder*);
  *
  * @param trackerCount size of the `trackers' array
  */
-void tr_makeMetaInfo(tr_metainfo_builder* builder, const char* outputFile, const tr_tracker_info* trackers, int trackerCount,
-    const char* comment, bool isPrivate);
+void tr_makeMetaInfo(tr_metainfo_builder* builder, char const* outputFile, tr_tracker_info const* trackers, int trackerCount,
+    char const* comment, bool isPrivate);
 
 #ifdef __cplusplus
 }

@@ -42,7 +42,7 @@
 *****
 ****/
 
-static const char* get_event_string(const tr_announce_request* req)
+static char const* get_event_string(tr_announce_request const* req)
 {
     if (req->partial_seed)
     {
@@ -55,10 +55,10 @@ static const char* get_event_string(const tr_announce_request* req)
     return tr_announce_event_get_string(req->event);
 }
 
-static char* announce_url_new(const tr_session* session, const tr_announce_request* req)
+static char* announce_url_new(tr_session const* session, tr_announce_request const* req)
 {
-    const char* str;
-    const unsigned char* ipv6;
+    char const* str;
+    unsigned char const* ipv6;
     struct evbuffer* buf = evbuffer_new();
     char escaped_info_hash[SHA_DIGEST_LENGTH * 3 + 1];
 
@@ -140,13 +140,13 @@ static tr_pex* listToPex(tr_variant* peerList, size_t* setme_len)
 {
     size_t i;
     size_t n;
-    const size_t len = tr_variantListSize(peerList);
+    size_t const len = tr_variantListSize(peerList);
     tr_pex* pex = tr_new0(tr_pex, len);
 
     for (i = n = 0; i < len; ++i)
     {
         int64_t port;
-        const char* ip;
+        char const* ip;
         tr_address addr;
         tr_variant* peer = tr_variantListChild(peerList, i);
 
@@ -214,7 +214,7 @@ static void on_announce_done_eventthread(void* vdata)
     tr_free(data);
 }
 
-static void on_announce_done(tr_session* session, bool did_connect, bool did_timeout, long response_code, const void* msg,
+static void on_announce_done(tr_session* session, bool did_connect, bool did_timeout, long response_code, void const* msg,
     size_t msglen, void* vdata)
 {
     tr_announce_response* response;
@@ -227,14 +227,14 @@ static void on_announce_done(tr_session* session, bool did_connect, bool did_tim
 
     if (response_code != HTTP_OK)
     {
-        const char* fmt = _("Tracker gave HTTP response code %1$ld (%2$s)");
-        const char* response_str = tr_webGetResponseStr(response_code);
+        char const* fmt = _("Tracker gave HTTP response code %1$ld (%2$s)");
+        char const* response_str = tr_webGetResponseStr(response_code);
         response->errmsg = tr_strdup_printf(fmt, response_code, response_str);
     }
     else
     {
         tr_variant benc;
-        const bool variant_loaded = !tr_variantFromBenc(&benc, msg, msglen);
+        bool const variant_loaded = !tr_variantFromBenc(&benc, msg, msglen);
 
         if (tr_env_key_exists("TR_CURL_VERBOSE"))
         {
@@ -263,8 +263,8 @@ static void on_announce_done(tr_session* session, bool did_connect, bool did_tim
             int64_t i;
             size_t len;
             tr_variant* tmp;
-            const char* str;
-            const uint8_t* raw;
+            char const* str;
+            uint8_t const* raw;
 
             if (tr_variantDictFindStr(&benc, TR_KEY_failure_reason, &str, &len))
             {
@@ -333,7 +333,7 @@ static void on_announce_done(tr_session* session, bool did_connect, bool did_tim
     tr_runInEventThread(session, on_announce_done_eventthread, data);
 }
 
-void tr_tracker_http_announce(tr_session* session, const tr_announce_request* request, tr_announce_response_func response_func,
+void tr_tracker_http_announce(tr_session* session, tr_announce_request const* request, tr_announce_response_func response_func,
     void* response_func_user_data)
 {
     struct announce_data* d;
@@ -382,7 +382,7 @@ static void on_scrape_done_eventthread(void* vdata)
     tr_free(data);
 }
 
-static void on_scrape_done(tr_session* session, bool did_connect, bool did_timeout, long response_code, const void* msg,
+static void on_scrape_done(tr_session* session, bool did_connect, bool did_timeout, long response_code, void const* msg,
     size_t msglen, void* vdata)
 {
     tr_scrape_response* response;
@@ -395,8 +395,8 @@ static void on_scrape_done(tr_session* session, bool did_connect, bool did_timeo
 
     if (response_code != HTTP_OK)
     {
-        const char* fmt = _("Tracker gave HTTP response code %1$ld (%2$s)");
-        const char* response_str = tr_webGetResponseStr(response_code);
+        char const* fmt = _("Tracker gave HTTP response code %1$ld (%2$s)");
+        char const* response_str = tr_webGetResponseStr(response_code);
         response->errmsg = tr_strdup_printf(fmt, response_code, response_str);
     }
     else
@@ -406,8 +406,8 @@ static void on_scrape_done(tr_session* session, bool did_connect, bool did_timeo
         tr_variant* files;
         tr_variant* flags;
         size_t len;
-        const char* str;
-        const bool variant_loaded = !tr_variantFromBenc(&top, msg, msglen);
+        char const* str;
+        bool const variant_loaded = !tr_variantFromBenc(&top, msg, msglen);
 
         if (tr_env_key_exists("TR_CURL_VERBOSE"))
         {
@@ -502,7 +502,7 @@ static void on_scrape_done(tr_session* session, bool did_connect, bool did_timeo
     tr_runInEventThread(session, on_scrape_done_eventthread, data);
 }
 
-static char* scrape_url_new(const tr_scrape_request* req)
+static char* scrape_url_new(tr_scrape_request const* req)
 {
     int i;
     char delimiter;
@@ -522,7 +522,7 @@ static char* scrape_url_new(const tr_scrape_request* req)
     return evbuffer_free_to_str(buf, NULL);
 }
 
-void tr_tracker_http_scrape(tr_session* session, const tr_scrape_request* request, tr_scrape_response_func response_func,
+void tr_tracker_http_scrape(tr_session* session, tr_scrape_request const* request, tr_scrape_response_func response_func,
     void* response_func_user_data)
 {
     int i;

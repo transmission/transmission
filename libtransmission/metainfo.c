@@ -36,11 +36,11 @@ static inline bool char_is_path_separator(char c)
     return strchr(PATH_DELIMITER_CHARS, c) != NULL;
 }
 
-char* tr_metainfoGetBasename(const tr_info* inf)
+char* tr_metainfoGetBasename(tr_info const* inf)
 {
     size_t i;
-    const char* name = inf->originalName;
-    const size_t name_len = strlen(name);
+    char const* name = inf->originalName;
+    size_t const name_len = strlen(name);
     char* ret = tr_strdup_printf("%s.%16.16s", name, inf->hashString);
 
     for (i = 0; i < name_len; ++i)
@@ -54,7 +54,7 @@ char* tr_metainfoGetBasename(const tr_info* inf)
     return ret;
 }
 
-static char* getTorrentFilename(const tr_session* session, const tr_info* inf)
+static char* getTorrentFilename(tr_session const* session, tr_info const* inf)
 {
     char* base = tr_metainfoGetBasename(inf);
     char* filename = tr_strdup_printf("%s" TR_PATH_DELIMITER_STR "%s.torrent", tr_getTorrentDir(session), base);
@@ -66,13 +66,13 @@ static char* getTorrentFilename(const tr_session* session, const tr_info* inf)
 ****
 ***/
 
-static bool path_component_is_suspicious(const char* component)
+static bool path_component_is_suspicious(char const* component)
 {
     return (component == NULL) || (strpbrk(component, PATH_DELIMITER_CHARS) != NULL) || (strcmp(component, ".") == 0) ||
            (strcmp(component, "..") == 0);
 }
 
-static bool getfile(char** setme, const char* root, tr_variant* path, struct evbuffer* buf)
+static bool getfile(char** setme, char const* root, tr_variant* path, struct evbuffer* buf)
 {
     bool success = false;
     size_t root_len = 0;
@@ -85,7 +85,7 @@ static bool getfile(char** setme, const char* root, tr_variant* path, struct evb
     if (tr_variantIsList(path))
     {
         int i;
-        const int n = tr_variantListSize(path);
+        int const n = tr_variantListSize(path);
 
         success = true;
         evbuffer_drain(buf, evbuffer_get_length(buf));
@@ -95,7 +95,7 @@ static bool getfile(char** setme, const char* root, tr_variant* path, struct evb
         for (i = 0; i < n; i++)
         {
             size_t len;
-            const char* str;
+            char const* str;
 
             if (!tr_variantGetStr(tr_variantListChild(path, i), &str, &len) || path_component_is_suspicious(str))
             {
@@ -127,7 +127,7 @@ static bool getfile(char** setme, const char* root, tr_variant* path, struct evb
     return success;
 }
 
-static const char* parseFiles(tr_info* inf, tr_variant* files, const tr_variant* length)
+static char const* parseFiles(tr_info* inf, tr_variant* files, tr_variant const* length)
 {
     int64_t len;
 
@@ -137,7 +137,7 @@ static const char* parseFiles(tr_info* inf, tr_variant* files, const tr_variant*
     {
         tr_file_index_t i;
         struct evbuffer* buf;
-        const char* result;
+        char const* result;
 
         if (path_component_is_suspicious(inf->name))
         {
@@ -214,10 +214,10 @@ static const char* parseFiles(tr_info* inf, tr_variant* files, const tr_variant*
     return NULL;
 }
 
-static char* tr_convertAnnounceToScrape(const char* announce)
+static char* tr_convertAnnounceToScrape(char const* announce)
 {
     char* scrape = NULL;
-    const char* s;
+    char const* s;
 
     /* To derive the scrape URL use the following steps:
      * Begin with the announce URL. Find the last '/' in it.
@@ -227,11 +227,11 @@ static char* tr_convertAnnounceToScrape(const char* announce)
      * 'announce' to find the scrape page. */
     if (((s = strrchr(announce, '/')) != NULL) && strncmp(++s, "announce", 8) == 0)
     {
-        const char* prefix = announce;
-        const size_t prefix_len = s - announce;
-        const char* suffix = s + 8;
-        const size_t suffix_len = strlen(suffix);
-        const size_t alloc_len = prefix_len + 6 + suffix_len + 1;
+        char const* prefix = announce;
+        size_t const prefix_len = s - announce;
+        char const* suffix = s + 8;
+        size_t const suffix_len = strlen(suffix);
+        size_t const alloc_len = prefix_len + 6 + suffix_len + 1;
         char* walk = scrape = tr_new(char, alloc_len);
         memcpy(walk, prefix, prefix_len);
         walk += prefix_len;
@@ -251,10 +251,10 @@ static char* tr_convertAnnounceToScrape(const char* announce)
     return scrape;
 }
 
-static const char* getannounce(tr_info* inf, tr_variant* meta)
+static char const* getannounce(tr_info* inf, tr_variant* meta)
 {
     size_t len;
-    const char* str;
+    char const* str;
     tr_tracker_info* trackers = NULL;
     int trackerCount = 0;
     tr_variant* tiers;
@@ -264,7 +264,7 @@ static const char* getannounce(tr_info* inf, tr_variant* meta)
     {
         int n;
         int i, j, validTiers;
-        const int numTiers = tr_variantListSize(tiers);
+        int const numTiers = tr_variantListSize(tiers);
 
         n = 0;
 
@@ -278,7 +278,7 @@ static const char* getannounce(tr_info* inf, tr_variant* meta)
         for (i = 0, validTiers = 0; i < numTiers; i++)
         {
             tr_variant* tier = tr_variantListChild(tiers, i);
-            const int tierSize = tr_variantListSize(tier);
+            int const tierSize = tr_variantListSize(tier);
             bool anyAdded = false;
 
             for (j = 0; j < tierSize; j++)
@@ -357,7 +357,7 @@ static const char* getannounce(tr_info* inf, tr_variant* meta)
  * mktorrent and very old versions of utorrent, that don't add the
  * trailing slash for multifile torrents if omitted by the end user.
  */
-static char* fix_webseed_url(const tr_info* inf, const char* url_in)
+static char* fix_webseed_url(tr_info const* inf, char const* url_in)
 {
     size_t len;
     char* url;
@@ -386,12 +386,12 @@ static char* fix_webseed_url(const tr_info* inf, const char* url_in)
 static void geturllist(tr_info* inf, tr_variant* meta)
 {
     tr_variant* urls;
-    const char* url;
+    char const* url;
 
     if (tr_variantDictFindList(meta, TR_KEY_url_list, &urls))
     {
         int i;
-        const int n = tr_variantListSize(urls);
+        int const n = tr_variantListSize(urls);
 
         inf->webseedCount = 0;
         inf->webseeds = tr_new0(char*, n);
@@ -422,13 +422,13 @@ static void geturllist(tr_info* inf, tr_variant* meta)
     }
 }
 
-static const char* tr_metainfoParseImpl(const tr_session* session, tr_info* inf, bool* hasInfoDict, size_t* infoDictLength,
-    const tr_variant* meta_in)
+static char const* tr_metainfoParseImpl(tr_session const* session, tr_info* inf, bool* hasInfoDict, size_t* infoDictLength,
+    tr_variant const* meta_in)
 {
     int64_t i;
     size_t len;
-    const char* str;
-    const uint8_t* raw;
+    char const* str;
+    uint8_t const* raw;
     tr_variant* d;
     tr_variant* infoDict = NULL;
     tr_variant* meta = (tr_variant*)meta_in;
@@ -644,11 +644,11 @@ static const char* tr_metainfoParseImpl(const tr_session* session, tr_info* inf,
     return NULL;
 }
 
-bool tr_metainfoParse(const tr_session* session, const tr_variant* meta_in, tr_info* inf, bool* hasInfoDict,
+bool tr_metainfoParse(tr_session const* session, tr_variant const* meta_in, tr_info* inf, bool* hasInfoDict,
     size_t* infoDictLength)
 {
-    const char* badTag = tr_metainfoParseImpl(session, inf, hasInfoDict, infoDictLength, meta_in);
-    const bool success = badTag == NULL;
+    char const* badTag = tr_metainfoParseImpl(session, inf, hasInfoDict, infoDictLength, meta_in);
+    bool const success = badTag == NULL;
 
     if (badTag)
     {
@@ -694,7 +694,7 @@ void tr_metainfoFree(tr_info* inf)
     memset(inf, '\0', sizeof(tr_info));
 }
 
-void tr_metainfoRemoveSaved(const tr_session* session, const tr_info* inf)
+void tr_metainfoRemoveSaved(tr_session const* session, tr_info const* inf)
 {
     char* filename;
 

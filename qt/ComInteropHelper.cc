@@ -41,7 +41,7 @@ bool ComInteropHelper::isConnected() const
     return !m_client->isNull();
 }
 
-QVariant ComInteropHelper::addMetainfo(const QString& metainfo)
+QVariant ComInteropHelper::addMetainfo(QString const& metainfo)
 {
     return m_client->dynamicCall("AddMetainfo(QString)", metainfo);
 }

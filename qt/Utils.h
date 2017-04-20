@@ -23,13 +23,13 @@ class QModelIndex;
 class Utils
 {
 public:
-    static QIcon guessMimeIcon(const QString& filename);
-    static QIcon getIconFromIndex(const QModelIndex& index);
+    static QIcon guessMimeIcon(QString const& filename);
+    static QIcon getIconFromIndex(QModelIndex const& index);
 
     // Test if string is UTF-8 or not
-    static bool isValidUtf8(const char* s);
+    static bool isValidUtf8(char const* s);
 
-    static QString removeTrailingDirSeparator(const QString& path);
+    static QString removeTrailingDirSeparator(QString const& path);
 
     static void narrowRect(QRect& rect, int dx1, int dx2, Qt::LayoutDirection direction)
     {
@@ -41,10 +41,10 @@ public:
         rect.adjust(dx1, 0, -dx2, 0);
     }
 
-    static int measureViewItem(QAbstractItemView* view, const QString& text);
-    static int measureHeaderItem(QHeaderView* view, const QString& text);
+    static int measureViewItem(QAbstractItemView* view, QString const& text);
+    static int measureHeaderItem(QHeaderView* view, QString const& text);
 
-    static QColor getFadedColor(const QColor& color);
+    static QColor getFadedColor(QColor const& color);
 
     template<typename DialogT, typename... ArgsT>
     static void openDialog(QPointer<DialogT>& dialog, ArgsT&& ... args)
@@ -66,19 +66,19 @@ public:
     /// URLs
     ///
 
-    static bool isMagnetLink(const QString& s)
+    static bool isMagnetLink(QString const& s)
     {
         return s.startsWith(QString::fromUtf8("magnet:?"));
     }
 
-    static bool isHexHashcode(const QString& s)
+    static bool isHexHashcode(QString const& s)
     {
         if (s.length() != 40)
         {
             return false;
         }
 
-        for (const QChar ch : s)
+        for (QChar const ch : s)
         {
             if (!isxdigit(ch.unicode()))
             {
@@ -89,11 +89,11 @@ public:
         return true;
     }
 
-    static bool isUriWithSupportedScheme(const QString& s)
+    static bool isUriWithSupportedScheme(QString const& s)
     {
-        static const QString ftp = QString::fromUtf8("ftp://");
-        static const QString http = QString::fromUtf8("http://");
-        static const QString https = QString::fromUtf8("https://");
+        static QString const ftp = QString::fromUtf8("ftp://");
+        static QString const http = QString::fromUtf8("http://");
+        static QString const https = QString::fromUtf8("https://");
         return s.startsWith(http) || s.startsWith(https) || s.startsWith(ftp);
     }
 };

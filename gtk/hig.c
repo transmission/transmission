@@ -36,7 +36,7 @@ void hig_workarea_add_section_title_widget(GtkWidget* t, guint* row, GtkWidget* 
     ++*row;
 }
 
-void hig_workarea_add_section_title(GtkWidget* t, guint* row, const char* section_title)
+void hig_workarea_add_section_title(GtkWidget* t, guint* row, char const* section_title)
 {
     char buf[512];
     GtkWidget* l;
@@ -62,7 +62,7 @@ void hig_workarea_add_wide_tall_control(GtkWidget* t, guint* row, GtkWidget* w)
     hig_workarea_add_wide_control(t, row, w);
 }
 
-GtkWidget* hig_workarea_add_wide_checkbutton(GtkWidget* t, guint* row, const char* mnemonic_string, gboolean is_active)
+GtkWidget* hig_workarea_add_wide_checkbutton(GtkWidget* t, guint* row, char const* mnemonic_string, gboolean is_active)
 {
     GtkWidget* w = gtk_check_button_new_with_mnemonic(mnemonic_string);
 
@@ -123,7 +123,7 @@ void hig_workarea_add_row_w(GtkWidget* t, guint* row, GtkWidget* label, GtkWidge
     ++*row;
 }
 
-GtkWidget* hig_workarea_add_row(GtkWidget* t, guint* row, const char* mnemonic_string, GtkWidget* control, GtkWidget* mnemonic)
+GtkWidget* hig_workarea_add_row(GtkWidget* t, guint* row, char const* mnemonic_string, GtkWidget* control, GtkWidget* mnemonic)
 {
     GtkWidget* l = gtk_label_new_with_mnemonic(mnemonic_string);
 
@@ -131,7 +131,7 @@ GtkWidget* hig_workarea_add_row(GtkWidget* t, guint* row, const char* mnemonic_s
     return l;
 }
 
-GtkWidget* hig_workarea_add_tall_row(GtkWidget* table, guint* row, const char* mnemonic_string, GtkWidget* control,
+GtkWidget* hig_workarea_add_tall_row(GtkWidget* table, guint* row, char const* mnemonic_string, GtkWidget* control,
     GtkWidget* mnemonic)
 {
     GtkWidget* l = gtk_label_new_with_mnemonic(mnemonic_string);

@@ -92,8 +92,8 @@ static bool bootstrap_done(tr_session* session, int af)
 
 static void nap(int roughly_sec)
 {
-    const int roughly_msec = roughly_sec * 1000;
-    const int msec = roughly_msec / 2 + tr_rand_int_weak(roughly_msec);
+    int const roughly_msec = roughly_sec * 1000;
+    int const msec = roughly_msec / 2 + tr_rand_int_weak(roughly_msec);
     tr_wait_msec(msec);
 }
 
@@ -113,7 +113,7 @@ static int bootstrap_af(tr_session* session)
     }
 }
 
-static void bootstrap_from_name(const char* name, tr_port port, int af)
+static void bootstrap_from_name(char const* name, tr_port port, int af)
 {
     struct addrinfo hints, * info, * infop;
     char pp[10];
@@ -320,7 +320,7 @@ int tr_dhtInit(tr_session* ss)
     bool have_id = false;
     char* dat_file;
     uint8_t* nodes = NULL, * nodes6 = NULL;
-    const uint8_t* raw;
+    uint8_t const* raw;
     size_t len, len6;
     struct bootstrap_closure* cl;
 
@@ -492,7 +492,7 @@ void tr_dhtUninit(tr_session* ss)
     session = NULL;
 }
 
-bool tr_dhtEnabled(const tr_session* ss)
+bool tr_dhtEnabled(tr_session const* ss)
 {
     return ss && (ss == session);
 }
@@ -566,7 +566,7 @@ tr_port tr_dhtPort(tr_session* ss)
     return tr_dhtEnabled(ss) ? ss->udp_port : 0;
 }
 
-bool tr_dhtAddNode(tr_session* ss, const tr_address* address, tr_port port, bool bootstrap)
+bool tr_dhtAddNode(tr_session* ss, tr_address const* address, tr_port port, bool bootstrap)
 {
     int af = address->type == TR_AF_INET ? AF_INET : AF_INET6;
 
@@ -610,7 +610,7 @@ bool tr_dhtAddNode(tr_session* ss, const tr_address* address, tr_port port, bool
     return false;
 }
 
-const char* tr_dhtPrintableStatus(int status)
+char const* tr_dhtPrintableStatus(int status)
 {
     switch (status)
     {
@@ -634,7 +634,7 @@ const char* tr_dhtPrintableStatus(int status)
     }
 }
 
-static void callback(void* ignore UNUSED, int event, const unsigned char* info_hash, const void* data, size_t data_len)
+static void callback(void* ignore UNUSED, int event, unsigned char const* info_hash, void const* data, size_t data_len)
 {
     if (event == DHT_EVENT_VALUES || event == DHT_EVENT_VALUES6)
     {
@@ -742,7 +742,7 @@ static int tr_dhtAnnounce(tr_torrent* tor, int af, bool announce)
 void tr_dhtUpkeep(tr_session* session)
 {
     tr_torrent* tor = NULL;
-    const time_t now = tr_time();
+    time_t const now = tr_time();
 
     while ((tor = tr_torrentNext(session, tor)))
     {
@@ -753,14 +753,14 @@ void tr_dhtUpkeep(tr_session* session)
 
         if (tor->dhtAnnounceAt <= now)
         {
-            const int rc = tr_dhtAnnounce(tor, AF_INET, 1);
+            int const rc = tr_dhtAnnounce(tor, AF_INET, 1);
 
             tor->dhtAnnounceAt = now + ((rc == 0) ? 5 + tr_rand_int_weak(5) : 25 * 60 + tr_rand_int_weak(3 * 60));
         }
 
         if (tor->dhtAnnounce6At <= now)
         {
-            const int rc = tr_dhtAnnounce(tor, AF_INET6, 1);
+            int const rc = tr_dhtAnnounce(tor, AF_INET6, 1);
 
             tor->dhtAnnounce6At = now + ((rc == 0) ? 5 + tr_rand_int_weak(5) : 25 * 60 + tr_rand_int_weak(3 * 60));
         }
@@ -816,12 +816,12 @@ static void timer_callback(evutil_socket_t s UNUSED, short type UNUSED, void* se
    free to add support to your private copy as long as you don't
    redistribute it. */
 
-int dht_blacklisted(const struct sockaddr* sa UNUSED, int salen UNUSED)
+int dht_blacklisted(struct sockaddr const* sa UNUSED, int salen UNUSED)
 {
     return 0;
 }
 
-void dht_hash(void* hash_return, int hash_size, const void* v1, int len1, const void* v2, int len2, const void* v3, int len3)
+void dht_hash(void* hash_return, int hash_size, void const* v1, int len1, void const* v2, int len2, void const* v3, int len3)
 {
     unsigned char sha1[SHA_DIGEST_LENGTH];
     tr_sha1(sha1, v1, len1, v2, len2, v3, len3, NULL);

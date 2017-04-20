@@ -25,16 +25,16 @@ typedef enum
 }
 tr_watchdir_status;
 
-typedef tr_watchdir_status (* tr_watchdir_cb)(tr_watchdir_t handle, const char* name, void* user_data);
+typedef tr_watchdir_status (* tr_watchdir_cb)(tr_watchdir_t handle, char const* name, void* user_data);
 
 /* ... */
 
-tr_watchdir_t tr_watchdir_new(const char* path, tr_watchdir_cb callback, void* callback_user_data,
+tr_watchdir_t tr_watchdir_new(char const* path, tr_watchdir_cb callback, void* callback_user_data,
     struct event_base* event_base, bool force_generic);
 
 void tr_watchdir_free(tr_watchdir_t handle);
 
-const char* tr_watchdir_get_path(tr_watchdir_t handle);
+char const* tr_watchdir_get_path(tr_watchdir_t handle);
 
 #ifdef __cplusplus
 }

@@ -37,11 +37,11 @@
  * but to handle it as a signed 64bit integer is mandatory to handle
  * "large files" aka .torrent for more that 4Gbyte
  */
-int tr_bencParseInt(const uint8_t* buf, const uint8_t* bufend, const uint8_t** setme_end, int64_t* setme_val)
+int tr_bencParseInt(uint8_t const* buf, uint8_t const* bufend, uint8_t const** setme_end, int64_t* setme_val)
 {
     char* endptr;
-    const void* begin;
-    const void* end;
+    void const* begin;
+    void const* end;
     int64_t val;
 
     if (buf >= bufend)
@@ -70,12 +70,12 @@ int tr_bencParseInt(const uint8_t* buf, const uint8_t* bufend, const uint8_t** s
         return EILSEQ;
     }
 
-    if (val && *(const char*)begin == '0') /* no leading zeroes! */
+    if (val && *(char const*)begin == '0') /* no leading zeroes! */
     {
         return EILSEQ;
     }
 
-    *setme_end = (const uint8_t*)end + 1;
+    *setme_end = (uint8_t const*)end + 1;
     *setme_val = val;
     return 0;
 }
@@ -86,14 +86,14 @@ int tr_bencParseInt(const uint8_t* buf, const uint8_t* bufend, const uint8_t** s
  * Note that there is no constant beginning delimiter, and no ending delimiter.
  * Example: 4:spam represents the string "spam"
  */
-int tr_bencParseStr(const uint8_t* buf, const uint8_t* bufend, const uint8_t** setme_end, const uint8_t** setme_str,
+int tr_bencParseStr(uint8_t const* buf, uint8_t const* bufend, uint8_t const** setme_end, uint8_t const** setme_str,
     size_t* setme_strlen)
 {
-    const void* end;
+    void const* end;
     size_t len;
     char* ulend;
-    const uint8_t* strbegin;
-    const uint8_t* strend;
+    uint8_t const* strbegin;
+    uint8_t const* strend;
 
     if (buf >= bufend)
     {
@@ -113,14 +113,14 @@ int tr_bencParseStr(const uint8_t* buf, const uint8_t* bufend, const uint8_t** s
     }
 
     errno = 0;
-    len = strtoul((const char*)buf, &ulend, 10);
+    len = strtoul((char const*)buf, &ulend, 10);
 
     if (errno || ulend != end)
     {
         goto err;
     }
 
-    strbegin = (const uint8_t*)end + 1;
+    strbegin = (uint8_t const*)end + 1;
     strend = strbegin + len;
 
     if ((strend < strbegin) || (strend > bufend))
@@ -128,8 +128,8 @@ int tr_bencParseStr(const uint8_t* buf, const uint8_t* bufend, const uint8_t** s
         goto err;
     }
 
-    *setme_end = (const uint8_t*)end + 1 + len;
-    *setme_str = (const uint8_t*)end + 1;
+    *setme_end = (uint8_t const*)end + 1 + len;
+    *setme_str = (uint8_t const*)end + 1;
     *setme_strlen = len;
     return 0;
 
@@ -175,11 +175,11 @@ static tr_variant* get_node(tr_ptrArray* stack, tr_quark* key, tr_variant* top, 
  * easier to read, but was vulnerable to a smash-stacking
  * attack via maliciously-crafted bencoded data. (#667)
  */
-int tr_variantParseBenc(const void* buf_in, const void* bufend_in, tr_variant* top, const char** setme_end)
+int tr_variantParseBenc(void const* buf_in, void const* bufend_in, tr_variant* top, char const** setme_end)
 {
     int err = 0;
-    const uint8_t* buf = buf_in;
-    const uint8_t* bufend = bufend_in;
+    uint8_t const* buf = buf_in;
+    uint8_t const* bufend = bufend_in;
     tr_ptrArray stack = TR_PTR_ARRAY_INIT;
     tr_quark key = 0;
 
@@ -200,7 +200,7 @@ int tr_variantParseBenc(const void* buf_in, const void* bufend_in, tr_variant* t
         if (*buf == 'i') /* int */
         {
             int64_t val;
-            const uint8_t* end;
+            uint8_t const* end;
             tr_variant* v;
 
             if ((err = tr_bencParseInt(buf, bufend, &end, &val)))
@@ -261,8 +261,8 @@ int tr_variantParseBenc(const void* buf_in, const void* bufend_in, tr_variant* t
         else if (isdigit(*buf)) /* string? */
         {
             tr_variant* v;
-            const uint8_t* end;
-            const uint8_t* str;
+            uint8_t const* end;
+            uint8_t const* str;
             size_t str_len;
 
             if ((err = tr_bencParseStr(buf, bufend, &end, &str, &str_len)))
@@ -301,7 +301,7 @@ int tr_variantParseBenc(const void* buf_in, const void* bufend_in, tr_variant* t
     {
         if (setme_end != NULL)
         {
-            *setme_end = (const char*)buf;
+            *setme_end = (char const*)buf;
         }
     }
     else if (top->type != 0)
@@ -318,12 +318,12 @@ int tr_variantParseBenc(const void* buf_in, const void* bufend_in, tr_variant* t
 *****
 ****/
 
-static void saveIntFunc(const tr_variant* val, void* evbuf)
+static void saveIntFunc(tr_variant const* val, void* evbuf)
 {
     evbuffer_add_printf(evbuf, "i%" PRId64 "e", val->val.i);
 }
 
-static void saveBoolFunc(const tr_variant* val, void* evbuf)
+static void saveBoolFunc(tr_variant const* val, void* evbuf)
 {
     if (val->val.b)
     {
@@ -335,7 +335,7 @@ static void saveBoolFunc(const tr_variant* val, void* evbuf)
     }
 }
 
-static void saveRealFunc(const tr_variant* val, void* evbuf)
+static void saveRealFunc(tr_variant const* val, void* evbuf)
 {
     int len;
     char buf[128];
@@ -345,31 +345,31 @@ static void saveRealFunc(const tr_variant* val, void* evbuf)
     evbuffer_add(evbuf, buf, len);
 }
 
-static void saveStringFunc(const tr_variant* v, void* evbuf)
+static void saveStringFunc(tr_variant const* v, void* evbuf)
 {
     size_t len;
-    const char* str;
+    char const* str;
     tr_variantGetStr(v, &str, &len);
     evbuffer_add_printf(evbuf, "%zu:", len);
     evbuffer_add(evbuf, str, len);
 }
 
-static void saveDictBeginFunc(const tr_variant* val UNUSED, void* evbuf)
+static void saveDictBeginFunc(tr_variant const* val UNUSED, void* evbuf)
 {
     evbuffer_add(evbuf, "d", 1);
 }
 
-static void saveListBeginFunc(const tr_variant* val UNUSED, void* evbuf)
+static void saveListBeginFunc(tr_variant const* val UNUSED, void* evbuf)
 {
     evbuffer_add(evbuf, "l", 1);
 }
 
-static void saveContainerEndFunc(const tr_variant* val UNUSED, void* evbuf)
+static void saveContainerEndFunc(tr_variant const* val UNUSED, void* evbuf)
 {
     evbuffer_add(evbuf, "e", 1);
 }
 
-static const struct VariantWalkFuncs walk_funcs =
+static struct VariantWalkFuncs const walk_funcs =
 {
     saveIntFunc,
     saveBoolFunc,
@@ -380,7 +380,7 @@ static const struct VariantWalkFuncs walk_funcs =
     saveContainerEndFunc
 };
 
-void tr_variantToBufBenc(const tr_variant* top, struct evbuffer* buf)
+void tr_variantToBufBenc(tr_variant const* top, struct evbuffer* buf)
 {
     tr_variantWalk(top, &walk_funcs, buf, true);
 }

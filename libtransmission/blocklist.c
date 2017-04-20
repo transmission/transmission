@@ -60,7 +60,7 @@ static void blocklistLoad(tr_blocklistFile* b)
     tr_sys_path_info info;
     char* base;
     tr_error* error = NULL;
-    const char* err_fmt = _("Couldn't read \"%1$s\": %2$s");
+    char const* err_fmt = _("Couldn't read \"%1$s\": %2$s");
 
     blocklistClose(b);
 
@@ -112,10 +112,10 @@ static void blocklistEnsureLoaded(tr_blocklistFile* b)
     }
 }
 
-static int compareAddressToRange(const void* va, const void* vb)
+static int compareAddressToRange(void const* va, void const* vb)
 {
-    const uint32_t* a = va;
-    const struct tr_ipv4_range* b = vb;
+    uint32_t const* a = va;
+    struct tr_ipv4_range const* b = vb;
 
     if (*a < b->begin)
     {
@@ -140,7 +140,7 @@ static void blocklistDelete(tr_blocklistFile* b)
 ****  PACKAGE-VISIBLE
 ***/
 
-tr_blocklistFile* tr_blocklistFileNew(const char* filename, bool isEnabled)
+tr_blocklistFile* tr_blocklistFileNew(char const* filename, bool isEnabled)
 {
     tr_blocklistFile* b;
 
@@ -152,7 +152,7 @@ tr_blocklistFile* tr_blocklistFileNew(const char* filename, bool isEnabled)
     return b;
 }
 
-const char* tr_blocklistFileGetFilename(const tr_blocklistFile* b)
+char const* tr_blocklistFileGetFilename(tr_blocklistFile const* b)
 {
     return b->filename;
 }
@@ -164,12 +164,12 @@ void tr_blocklistFileFree(tr_blocklistFile* b)
     tr_free(b);
 }
 
-bool tr_blocklistFileExists(const tr_blocklistFile* b)
+bool tr_blocklistFileExists(tr_blocklistFile const* b)
 {
     return tr_sys_path_exists(b->filename, NULL);
 }
 
-int tr_blocklistFileGetRuleCount(const tr_blocklistFile* b)
+int tr_blocklistFileGetRuleCount(tr_blocklistFile const* b)
 {
     blocklistEnsureLoaded((tr_blocklistFile*)b);
 
@@ -189,10 +189,10 @@ void tr_blocklistFileSetEnabled(tr_blocklistFile* b, bool isEnabled)
     b->isEnabled = isEnabled;
 }
 
-bool tr_blocklistFileHasAddress(tr_blocklistFile* b, const tr_address* addr)
+bool tr_blocklistFileHasAddress(tr_blocklistFile* b, tr_address const* addr)
 {
     uint32_t needle;
-    const struct tr_ipv4_range* range;
+    struct tr_ipv4_range const* range;
 
     assert(tr_address_is_valid(addr));
 
@@ -220,7 +220,7 @@ bool tr_blocklistFileHasAddress(tr_blocklistFile* b, const tr_address* addr)
  * http://wiki.phoenixlabs.org/wiki/P2P_Format
  * http://en.wikipedia.org/wiki/PeerGuardian#P2P_plaintext_format
  */
-static bool parseLine1(const char* line, struct tr_ipv4_range* range)
+static bool parseLine1(char const* line, struct tr_ipv4_range* range)
 {
     char* walk;
     int b[4];
@@ -267,7 +267,7 @@ static bool parseLine1(const char* line, struct tr_ipv4_range* range)
  * DAT format: "000.000.000.000 - 000.255.255.255 , 000 , invalid ip"
  * http://wiki.phoenixlabs.org/wiki/DAT_Format
  */
-static bool parseLine2(const char* line, struct tr_ipv4_range* range)
+static bool parseLine2(char const* line, struct tr_ipv4_range* range)
 {
     int unk;
     int a[4];
@@ -302,15 +302,15 @@ static bool parseLine2(const char* line, struct tr_ipv4_range* range)
     return true;
 }
 
-static bool parseLine(const char* line, struct tr_ipv4_range* range)
+static bool parseLine(char const* line, struct tr_ipv4_range* range)
 {
     return parseLine1(line, range) || parseLine2(line, range);
 }
 
-static int compareAddressRangesByFirstAddress(const void* va, const void* vb)
+static int compareAddressRangesByFirstAddress(void const* va, void const* vb)
 {
-    const struct tr_ipv4_range* a = va;
-    const struct tr_ipv4_range* b = vb;
+    struct tr_ipv4_range const* a = va;
+    struct tr_ipv4_range const* b = vb;
 
     if (a->begin != b->begin)
     {
@@ -320,13 +320,13 @@ static int compareAddressRangesByFirstAddress(const void* va, const void* vb)
     return 0;
 }
 
-int tr_blocklistFileSetContent(tr_blocklistFile* b, const char* filename)
+int tr_blocklistFileSetContent(tr_blocklistFile* b, char const* filename)
 {
     tr_sys_file_t in;
     tr_sys_file_t out;
     int inCount = 0;
     char line[2048];
-    const char* err_fmt = _("Couldn't read \"%1$s\": %2$s");
+    char const* err_fmt = _("Couldn't read \"%1$s\": %2$s");
     struct tr_ipv4_range* ranges = NULL;
     size_t ranges_alloc = 0;
     size_t ranges_count = 0;
@@ -386,7 +386,7 @@ int tr_blocklistFileSetContent(tr_blocklistFile* b, const char* filename)
     {
         struct tr_ipv4_range* r;
         struct tr_ipv4_range* keep = ranges;
-        const struct tr_ipv4_range* end;
+        struct tr_ipv4_range const* end;
 
         /* sort */
         qsort(ranges, ranges_count, sizeof(struct tr_ipv4_range), compareAddressRangesByFirstAddress);

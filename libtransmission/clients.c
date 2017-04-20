@@ -38,8 +38,8 @@ static int charint(uint8_t ch)
 
 static bool getShadowInt(uint8_t ch, int* setme)
 {
-    const char* str = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.-";
-    const char* pch = strchr(str, ch);
+    char const* str = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.-";
+    char const* pch = strchr(str, ch);
 
     if (!pch)
     {
@@ -50,7 +50,7 @@ static bool getShadowInt(uint8_t ch, int* setme)
     return true;
 }
 
-static int strint(const void* pch, int span)
+static int strint(void const* pch, int span)
 {
     char tmp[64];
     memcpy(tmp, pch, span);
@@ -58,7 +58,7 @@ static int strint(const void* pch, int span)
     return strtol(tmp, NULL, 0);
 }
 
-static const char* getMnemonicEnd(uint8_t ch)
+static char const* getMnemonicEnd(uint8_t ch)
 {
     switch (ch)
     {
@@ -79,28 +79,28 @@ static const char* getMnemonicEnd(uint8_t ch)
     }
 }
 
-static void three_digits(char* buf, size_t buflen, const char* name, const uint8_t* digits)
+static void three_digits(char* buf, size_t buflen, char const* name, uint8_t const* digits)
 {
     tr_snprintf(buf, buflen, "%s %d.%d.%d", name, charint(digits[0]), charint(digits[1]), charint(digits[2]));
 }
 
-static void four_digits(char* buf, size_t buflen, const char* name, const uint8_t* digits)
+static void four_digits(char* buf, size_t buflen, char const* name, uint8_t const* digits)
 {
     tr_snprintf(buf, buflen, "%s %d.%d.%d.%d", name, charint(digits[0]), charint(digits[1]), charint(digits[2]),
         charint(digits[3]));
 }
 
-static void two_major_two_minor(char* buf, size_t buflen, const char* name, const uint8_t* digits)
+static void two_major_two_minor(char* buf, size_t buflen, char const* name, uint8_t const* digits)
 {
     tr_snprintf(buf, buflen, "%s %d.%02d", name, strint(digits, 2), strint(digits + 2, 2));
 }
 
-static void no_version(char* buf, size_t buflen, const char* name)
+static void no_version(char* buf, size_t buflen, char const* name)
 {
     tr_strlcpy(buf, name, buflen);
 }
 
-static void mainline_style(char* buf, size_t buflen, const char* name, const uint8_t* id)
+static void mainline_style(char* buf, size_t buflen, char const* name, uint8_t const* id)
 {
     if (id[4] == '-' && id[6] == '-')
     {
@@ -112,7 +112,7 @@ static void mainline_style(char* buf, size_t buflen, const char* name, const uin
     }
 }
 
-static bool isMainlineStyle(const uint8_t* peer_id)
+static bool isMainlineStyle(uint8_t const* peer_id)
 {
     /**
      * One of the following styles will be used:
@@ -122,13 +122,13 @@ static bool isMainlineStyle(const uint8_t* peer_id)
     return peer_id[2] == '-' && peer_id[7] == '-' && (peer_id[4] == '-' || peer_id[5] == '-');
 }
 
-static bool decodeBitCometClient(char* buf, size_t buflen, const uint8_t* id)
+static bool decodeBitCometClient(char* buf, size_t buflen, uint8_t const* id)
 {
-    const char* chid = (char*)id;
+    char const* chid = (char*)id;
     bool is_bitlord;
     int major, minor;
-    const char* name;
-    const char* mod = NULL;
+    char const* name;
+    char const* mod = NULL;
 
     if (strncmp(chid, "exbc", 4) == 0)
     {
@@ -168,10 +168,10 @@ static bool decodeBitCometClient(char* buf, size_t buflen, const uint8_t* id)
     return true;
 }
 
-char* tr_clientForId(char* buf, size_t buflen, const void* id_in)
+char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
 {
-    const uint8_t* id = id_in;
-    const char* chid = (char*)id;
+    uint8_t const* id = id_in;
+    char const* chid = (char*)id;
 
     *buf = '\0';
 
@@ -761,7 +761,7 @@ char* tr_clientForId(char* buf, size_t buflen, const void* id_in)
 
         if (strchr("AOQRSTU", id[0]) && getShadowInt(id[1], &a) && getShadowInt(id[2], &b) && getShadowInt(id[3], &c))
         {
-            const char* name = NULL;
+            char const* name = NULL;
 
             switch (id[0])
             {
@@ -806,9 +806,9 @@ char* tr_clientForId(char* buf, size_t buflen, const void* id_in)
     if (!*buf)
     {
         char out[32], * walk = out;
-        const char* in, * in_end;
+        char const* in, * in_end;
 
-        for (in = (const char*)id, in_end = in + 8; in != in_end; ++in)
+        for (in = (char const*)id, in_end = in + 8; in != in_end; ++in)
         {
             if (isprint((unsigned char)*in))
             {

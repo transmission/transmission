@@ -60,27 +60,27 @@ public:
 
     void stop();
     void start(tr_session* session);
-    void start(const QUrl& url);
+    void start(QUrl const& url);
 
     bool isLocal() const;
-    const QUrl& url() const;
+    QUrl const& url() const;
 
     RpcResponseFuture exec(tr_quark method, tr_variant* args);
-    RpcResponseFuture exec(const char* method, tr_variant* args);
+    RpcResponseFuture exec(char const* method, tr_variant* args);
 
 signals:
     void httpAuthenticationRequired();
     void dataReadProgress();
     void dataSendProgress();
-    void networkResponse(QNetworkReply::NetworkError code, const QString& message);
+    void networkResponse(QNetworkReply::NetworkError code, QString const& message);
 
 private:
     RpcResponseFuture sendRequest(TrVariantPtr json);
     QNetworkAccessManager* networkAccessManager();
     int64_t getNextTag();
 
-    void sendNetworkRequest(TrVariantPtr json, const QFutureInterface<RpcResponse>& promise);
-    void sendLocalRequest(TrVariantPtr json, const QFutureInterface<RpcResponse>& promise, int64_t tag);
+    void sendNetworkRequest(TrVariantPtr json, QFutureInterface<RpcResponse> const& promise);
+    void sendLocalRequest(TrVariantPtr json, QFutureInterface<RpcResponse> const& promise, int64_t tag);
     int64_t parseResponseTag(tr_variant& response);
     RpcResponse parseResponseData(tr_variant& response);
 

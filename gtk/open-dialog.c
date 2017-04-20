@@ -35,7 +35,7 @@ static GSList* get_recent_destinations(void)
     for (i = 0; i < N_RECENT; ++i)
     {
         char key[64];
-        const char* val;
+        char const* val;
         g_snprintf(key, sizeof(key), "recent-download-dir-%d", i + 1);
 
         if ((val = gtr_pref_string_get(tr_quark_new(key, TR_BAD_SIZE))))
@@ -47,7 +47,7 @@ static GSList* get_recent_destinations(void)
     return list;
 }
 
-static void save_recent_destination(TrCore* core, const char* dir)
+static void save_recent_destination(TrCore* core, char const* dir)
 {
     int i;
     GSList* l;
@@ -156,7 +156,7 @@ static void addResponseCB(GtkDialog* dialog, gint response, gpointer gdata)
 
 static void updateTorrent(struct OpenData* o)
 {
-    const gboolean isLocalFile = tr_ctorGetSourceFile(o->ctor) != NULL;
+    gboolean const isLocalFile = tr_ctorGetSourceFile(o->ctor) != NULL;
     gtk_widget_set_sensitive(o->trash_check, isLocalFile);
 
     if (!o->tor)
@@ -270,7 +270,7 @@ static void addTorrentFilters(GtkFileChooser* chooser)
 
 GtkWidget* gtr_torrent_options_dialog_new(GtkWindow* parent, TrCore* core, tr_ctor* ctor)
 {
-    const char* str;
+    char const* str;
     GtkWidget* w;
     GtkWidget* d;
     GtkGrid* grid;
@@ -436,9 +436,9 @@ static void onOpenDialogResponse(GtkDialog* dialog, int response, gpointer core)
         GtkFileChooser* chooser = GTK_FILE_CHOOSER(dialog);
         GtkWidget* w = gtk_file_chooser_get_extra_widget(chooser);
         GtkToggleButton* tb = GTK_TOGGLE_BUTTON(w);
-        const gboolean do_start = gtr_pref_flag_get(TR_KEY_start_added_torrents);
-        const gboolean do_prompt = gtk_toggle_button_get_active(tb);
-        const gboolean do_notify = FALSE;
+        gboolean const do_start = gtr_pref_flag_get(TR_KEY_start_added_torrents);
+        gboolean const do_prompt = gtk_toggle_button_get_active(tb);
+        gboolean const do_notify = FALSE;
         GSList* files = gtk_file_chooser_get_files(chooser);
 
         gtr_core_add_files(core, files, do_start, do_prompt, do_notify);
@@ -453,7 +453,7 @@ GtkWidget* gtr_torrent_open_from_file_dialog_new(GtkWindow* parent, TrCore* core
 {
     GtkWidget* w;
     GtkWidget* c;
-    const char* folder;
+    char const* folder;
 
     w = gtk_file_chooser_dialog_new(_("Open a Torrent"), parent, GTK_FILE_CHOOSER_ACTION_OPEN, GTK_STOCK_CANCEL,
             GTK_RESPONSE_CANCEL, GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT, NULL);

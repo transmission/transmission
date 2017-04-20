@@ -230,32 +230,32 @@ struct tr_session
     struct tr_bindinfo* public_ipv6;
 };
 
-static inline tr_port tr_sessionGetPublicPeerPort(const tr_session* session)
+static inline tr_port tr_sessionGetPublicPeerPort(tr_session const* session)
 {
     return session->public_peer_port;
 }
 
-bool tr_sessionAllowsDHT(const tr_session* session);
+bool tr_sessionAllowsDHT(tr_session const* session);
 
-bool tr_sessionAllowsLPD(const tr_session* session);
+bool tr_sessionAllowsLPD(tr_session const* session);
 
-const char* tr_sessionFindTorrentFile(const tr_session* session, const char* hashString);
+char const* tr_sessionFindTorrentFile(tr_session const* session, char const* hashString);
 
-void tr_sessionSetTorrentFile(tr_session* session, const char* hashString, const char* filename);
+void tr_sessionSetTorrentFile(tr_session* session, char const* hashString, char const* filename);
 
-bool tr_sessionIsAddressBlocked(const tr_session* session, const struct tr_address* addr);
+bool tr_sessionIsAddressBlocked(tr_session const* session, struct tr_address const* addr);
 
 void tr_sessionLock(tr_session*);
 
 void tr_sessionUnlock(tr_session*);
 
-bool tr_sessionIsLocked(const tr_session*);
+bool tr_sessionIsLocked(tr_session const*);
 
-const struct tr_address* tr_sessionGetPublicAddress(const tr_session* session, int tr_af_type, bool* is_default_value);
+struct tr_address const* tr_sessionGetPublicAddress(tr_session const* session, int tr_af_type, bool* is_default_value);
 
 struct tr_bindsockets* tr_sessionGetBindSockets(tr_session*);
 
-int tr_sessionCountTorrents(const tr_session* session);
+int tr_sessionCountTorrents(tr_session const* session);
 
 tr_torrent** tr_sessionGetTorrents(tr_session* session, int* setme_n);
 
@@ -264,7 +264,7 @@ enum
     SESSION_MAGIC_NUMBER = 3845,
 };
 
-static inline bool tr_isSession(const tr_session* session)
+static inline bool tr_isSession(tr_session const* session)
 {
     return (session != NULL) && (session->magicNumber == SESSION_MAGIC_NUMBER);
 }
@@ -313,15 +313,15 @@ static inline int toMemMB(uint64_t B)
 /**
 **/
 
-unsigned int tr_sessionGetSpeedLimit_Bps(const tr_session*, tr_direction);
-unsigned int tr_sessionGetAltSpeed_Bps(const tr_session*, tr_direction);
-unsigned int tr_sessionGetRawSpeed_Bps(const tr_session*, tr_direction);
-unsigned int tr_sessionGetPieceSpeed_Bps(const tr_session*, tr_direction);
+unsigned int tr_sessionGetSpeedLimit_Bps(tr_session const*, tr_direction);
+unsigned int tr_sessionGetAltSpeed_Bps(tr_session const*, tr_direction);
+unsigned int tr_sessionGetRawSpeed_Bps(tr_session const*, tr_direction);
+unsigned int tr_sessionGetPieceSpeed_Bps(tr_session const*, tr_direction);
 
 void tr_sessionSetSpeedLimit_Bps(tr_session*, tr_direction, unsigned int Bps);
 void tr_sessionSetAltSpeed_Bps(tr_session*, tr_direction, unsigned int Bps);
 
-bool tr_sessionGetActiveSpeedLimit_Bps(const tr_session* session, tr_direction dir, unsigned int* setme);
+bool tr_sessionGetActiveSpeedLimit_Bps(tr_session const* session, tr_direction dir, unsigned int* setme);
 
 void tr_sessionGetNextQueuedTorrents(tr_session* session, tr_direction dir, size_t numwanted, tr_ptrArray* setme);
 

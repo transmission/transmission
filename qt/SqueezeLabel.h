@@ -49,7 +49,7 @@ class SqueezeLabel : public QLabel
 
 public:
     SqueezeLabel(QWidget* parent = nullptr);
-    SqueezeLabel(const QString& text, QWidget* parent = nullptr);
+    SqueezeLabel(QString const& text, QWidget* parent = nullptr);
 
 protected:
     // QWidget

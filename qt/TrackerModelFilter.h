@@ -26,7 +26,7 @@ public:
 
 protected:
     // QSortFilterProxyModel
-    virtual bool filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const;
+    virtual bool filterAcceptsRow(int sourceRow, QModelIndex const& sourceParent) const;
 
 private:
     bool myShowBackups;

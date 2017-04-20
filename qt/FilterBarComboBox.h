@@ -36,5 +36,5 @@ protected:
     virtual void paintEvent(QPaintEvent* e);
 
 private:
-    QSize calculateSize(const QSize& textSize, const QSize& countSize) const;
+    QSize calculateSize(QSize const& textSize, QSize const& countSize) const;
 };

@@ -115,8 +115,8 @@ static void g_signal_callback(GDBusProxy* proxy UNUSED, char* sender_name UNUSED
         }
         else if (g_strcmp0(action, "file") == 0)
         {
-            const tr_info* inf = tr_torrentInfo(tor);
-            const char* dir = tr_torrentGetDownloadDir(tor);
+            tr_info const* inf = tr_torrentInfo(tor);
+            char const* dir = tr_torrentGetDownloadDir(tor);
             char* path = g_build_filename(dir, inf->files[0].name, NULL);
             gtr_open_file(path);
             g_free(path);
@@ -175,7 +175,7 @@ void gtr_notify_torrent_completed(TrCore* core, int torrent_id)
     GVariantBuilder actions_builder;
     TrNotification* n;
     tr_torrent* tor;
-    const char* cmd = gtr_pref_string_get(TR_KEY_torrent_complete_sound_command);
+    char const* cmd = gtr_pref_string_get(TR_KEY_torrent_complete_sound_command);
 
     if (gtr_pref_flag_get(TR_KEY_torrent_complete_sound_enabled))
     {
@@ -199,7 +199,7 @@ void gtr_notify_torrent_completed(TrCore* core, int torrent_id)
 
     if (server_supports_actions)
     {
-        const tr_info* inf = tr_torrentInfo(tor);
+        tr_info const* inf = tr_torrentInfo(tor);
 
         if (inf->fileCount == 1)
         {
@@ -217,7 +217,7 @@ void gtr_notify_torrent_completed(TrCore* core, int torrent_id)
             _("Torrent Complete"), tr_torrentName(tor), &actions_builder, NULL, -1), G_DBUS_CALL_FLAGS_NONE, -1, NULL, notify_callback, n);
 }
 
-void gtr_notify_torrent_added(const char* name)
+void gtr_notify_torrent_added(char const* name)
 {
     TrNotification* n;
 

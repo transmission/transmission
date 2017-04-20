@@ -17,11 +17,11 @@
 
 struct tr_key_struct
 {
-    const char* str;
+    char const* str;
     size_t len;
 };
 
-static const struct tr_key_struct my_static[] =
+static struct tr_key_struct const my_static[] =
 {
     { "", 0 },
     { "activeTorrentCount", 18 },
@@ -402,11 +402,11 @@ static const struct tr_key_struct my_static[] =
     { "webseedsSendingToUs", 19 }
 };
 
-static int compareKeys(const void* va, const void* vb)
+static int compareKeys(void const* va, void const* vb)
 {
     int ret;
-    const struct tr_key_struct* a = va;
-    const struct tr_key_struct* b = vb;
+    struct tr_key_struct const* a = va;
+    struct tr_key_struct const* b = vb;
 
     ret = memcmp(a->str, b->str, MIN(a->len, b->len));
 
@@ -420,11 +420,11 @@ static int compareKeys(const void* va, const void* vb)
 
 static tr_ptrArray my_runtime = TR_PTR_ARRAY_INIT_STATIC;
 
-bool tr_quark_lookup(const void* str, size_t len, tr_quark* setme)
+bool tr_quark_lookup(void const* str, size_t len, tr_quark* setme)
 {
     struct tr_key_struct tmp;
     struct tr_key_struct* match;
-    static const size_t n_static = sizeof(my_static) / sizeof(struct tr_key_struct);
+    static size_t const n_static = sizeof(my_static) / sizeof(struct tr_key_struct);
     bool success = false;
 
     assert(n_static == TR_N_KEYS);
@@ -446,7 +446,7 @@ bool tr_quark_lookup(const void* str, size_t len, tr_quark* setme)
     {
         size_t i;
         struct tr_key_struct** runtime = (struct tr_key_struct**)tr_ptrArrayBase(&my_runtime);
-        const size_t n_runtime = tr_ptrArraySize(&my_runtime);
+        size_t const n_runtime = tr_ptrArraySize(&my_runtime);
 
         for (i = 0; i < n_runtime; ++i)
         {
@@ -462,7 +462,7 @@ bool tr_quark_lookup(const void* str, size_t len, tr_quark* setme)
     return success;
 }
 
-static tr_quark append_new_quark(const void* str, size_t len)
+static tr_quark append_new_quark(void const* str, size_t len)
 {
     tr_quark ret;
     struct tr_key_struct* tmp;
@@ -474,7 +474,7 @@ static tr_quark append_new_quark(const void* str, size_t len)
     return ret;
 }
 
-tr_quark tr_quark_new(const void* str, size_t len)
+tr_quark tr_quark_new(void const* str, size_t len)
 {
     tr_quark ret = TR_KEY_NONE;
 
@@ -495,9 +495,9 @@ tr_quark tr_quark_new(const void* str, size_t len)
     return ret;
 }
 
-const char* tr_quark_get_string(tr_quark q, size_t* len)
+char const* tr_quark_get_string(tr_quark q, size_t* len)
 {
-    const struct tr_key_struct* tmp;
+    struct tr_key_struct const* tmp;
 
     if (q < TR_N_KEYS)
     {

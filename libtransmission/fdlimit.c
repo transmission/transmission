@@ -59,7 +59,7 @@ static bool preallocate_file_sparse(tr_sys_file_t fd, uint64_t length, tr_error*
 
     if (!TR_ERROR_IS_ENOSPC(my_error->code))
     {
-        const char zero = '\0';
+        char const zero = '\0';
 
         tr_error_clear(&my_error);
 
@@ -103,7 +103,7 @@ static bool preallocate_file_full(tr_sys_file_t fd, uint64_t length, tr_error** 
         /* fallback: the old-fashioned way */
         while (success && length > 0)
         {
-            const uint64_t thisPass = MIN(length, sizeof(buf));
+            uint64_t const thisPass = MIN(length, sizeof(buf));
             uint64_t bytes_written;
             success = tr_sys_file_write(fd, buf, thisPass, &bytes_written, &my_error);
             length -= bytes_written;
@@ -136,7 +136,7 @@ struct tr_cached_file
     time_t used_at;
 };
 
-static inline bool cached_file_is_open(const struct tr_cached_file* o)
+static inline bool cached_file_is_open(struct tr_cached_file const* o)
 {
     assert(o != NULL);
 
@@ -156,7 +156,7 @@ static void cached_file_close(struct tr_cached_file* o)
  * errno values include ENOENT if the parent folder doesn't exist,
  * plus the errno values set by tr_sys_dir_create () and tr_sys_file_open ().
  */
-static int cached_file_open(struct tr_cached_file* o, const char* filename, bool writable, tr_preallocation_mode allocation,
+static int cached_file_open(struct tr_cached_file* o, char const* filename, bool writable, tr_preallocation_mode allocation,
     uint64_t file_size)
 {
     int flags;
@@ -207,7 +207,7 @@ static int cached_file_open(struct tr_cached_file* o, const char* filename, bool
     if (writable && !already_existed && allocation != TR_PREALLOCATE_NONE)
     {
         bool success = false;
-        const char* type = NULL;
+        char const* type = NULL;
 
         if (allocation == TR_PREALLOCATE_FULL)
         {
@@ -249,7 +249,7 @@ static int cached_file_open(struct tr_cached_file* o, const char* filename, bool
 
 fail:
     {
-        const int err = error->code;
+        int const err = error->code;
         tr_error_free(error);
 
         if (fd != TR_BAD_SYS_FILE)
@@ -268,13 +268,13 @@ fail:
 struct tr_fileset
 {
     struct tr_cached_file* begin;
-    const struct tr_cached_file* end;
+    struct tr_cached_file const* end;
 };
 
 static void fileset_construct(struct tr_fileset* set, int n)
 {
     struct tr_cached_file* o;
-    const struct tr_cached_file TR_CACHED_FILE_INIT = { false, TR_BAD_SYS_FILE, 0, 0, 0 };
+    struct tr_cached_file const TR_CACHED_FILE_INIT = { false, TR_BAD_SYS_FILE, 0, 0, 0 };
 
     set->begin = tr_new(struct tr_cached_file, n);
     set->end = set->begin + n;
@@ -393,7 +393,7 @@ static void ensureSessionFdInfoExists(tr_session* session)
     if (session->fdInfo == NULL)
     {
         struct tr_fdInfo* i;
-        const int FILE_CACHE_SIZE = 32;
+        int const FILE_CACHE_SIZE = 32;
 
         /* Create the local file cache */
         i = tr_new0(struct tr_fdInfo, 1);
@@ -407,8 +407,8 @@ static void ensureSessionFdInfoExists(tr_session* session)
 
         if (!getrlimit(RLIMIT_NOFILE, &limit))
         {
-            const int old_limit = (int)limit.rlim_cur;
-            const int new_limit = MIN(limit.rlim_max, FD_SETSIZE);
+            int const old_limit = (int)limit.rlim_cur;
+            int const new_limit = MIN(limit.rlim_max, FD_SETSIZE);
 
             if (new_limit != old_limit)
             {
@@ -449,7 +449,7 @@ static struct tr_fileset* get_fileset(tr_session* session)
     return &session->fdInfo->fileset;
 }
 
-void tr_fdFileClose(tr_session* s, const tr_torrent* tor, tr_file_index_t i)
+void tr_fdFileClose(tr_session* s, tr_torrent const* tor, tr_file_index_t i)
 {
     struct tr_cached_file* o;
 
@@ -501,7 +501,7 @@ void tr_fdTorrentClose(tr_session* session, int torrent_id)
 }
 
 /* returns an fd on success, or a TR_BAD_SYS_FILE on failure and sets errno */
-tr_sys_file_t tr_fdFileCheckout(tr_session* session, int torrent_id, tr_file_index_t i, const char* filename, bool writable,
+tr_sys_file_t tr_fdFileCheckout(tr_session* session, int torrent_id, tr_file_index_t i, char const* filename, bool writable,
     tr_preallocation_mode allocation, uint64_t file_size)
 {
     struct tr_fileset* set = get_fileset(session);
@@ -518,7 +518,7 @@ tr_sys_file_t tr_fdFileCheckout(tr_session* session, int torrent_id, tr_file_ind
 
     if (!cached_file_is_open(o))
     {
-        const int err = cached_file_open(o, filename, writable, allocation, file_size);
+        int const err = cached_file_open(o, filename, writable, allocation, file_size);
 
         if (err)
         {

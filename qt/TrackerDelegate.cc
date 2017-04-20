@@ -29,8 +29,8 @@
 namespace
 {
 
-const int mySpacing = 6;
-const QSize myMargin(10, 10);
+int const mySpacing = 6;
+QSize const myMargin(10, 10);
 
 class ItemLayout
 {
@@ -42,7 +42,7 @@ public:
     QRect textRect;
 
 public:
-    ItemLayout(const QString& text, bool suppressColors, Qt::LayoutDirection direction, const QPoint& topLeft, int width);
+    ItemLayout(QString const& text, bool suppressColors, Qt::LayoutDirection direction, QPoint const& topLeft, int width);
 
     QSize size() const
     {
@@ -55,11 +55,11 @@ public:
     }
 };
 
-ItemLayout::ItemLayout(const QString& text, bool suppressColors, Qt::LayoutDirection direction, const QPoint& topLeft,
+ItemLayout::ItemLayout(QString const& text, bool suppressColors, Qt::LayoutDirection direction, QPoint const& topLeft,
     int width)
 {
-    const QStyle* style(qApp->style());
-    const QSize iconSize = FaviconCache::getIconSize();
+    QStyle const* style(qApp->style());
+    QSize const iconSize = FaviconCache::getIconSize();
 
     QRect baseRect(topLeft, QSize(width, 0));
 
@@ -86,7 +86,7 @@ ItemLayout::ItemLayout(const QString& text, bool suppressColors, Qt::LayoutDirec
 
 } // namespace
 
-QSize TrackerDelegate::margin(const QStyle& style) const
+QSize TrackerDelegate::margin(QStyle const& style) const
 {
     Q_UNUSED(style);
 
@@ -97,21 +97,21 @@ QSize TrackerDelegate::margin(const QStyle& style) const
 ****
 ***/
 
-QSize TrackerDelegate::sizeHint(const QStyleOptionViewItem& option, const TrackerInfo& info) const
+QSize TrackerDelegate::sizeHint(QStyleOptionViewItem const& option, TrackerInfo const& info) const
 {
-    const ItemLayout layout(getText(info), true, option.direction, QPoint(0, 0), option.rect.width() - myMargin.width() * 2);
+    ItemLayout const layout(getText(info), true, option.direction, QPoint(0, 0), option.rect.width() - myMargin.width() * 2);
     return layout.size() + myMargin * 2;
 }
 
-QSize TrackerDelegate::sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const
+QSize TrackerDelegate::sizeHint(QStyleOptionViewItem const& option, QModelIndex const& index) const
 {
-    const TrackerInfo trackerInfo = index.data(TrackerModel::TrackerRole).value<TrackerInfo>();
+    TrackerInfo const trackerInfo = index.data(TrackerModel::TrackerRole).value<TrackerInfo>();
     return sizeHint(option, trackerInfo);
 }
 
-void TrackerDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const
+void TrackerDelegate::paint(QPainter* painter, QStyleOptionViewItem const& option, QModelIndex const& index) const
 {
-    const TrackerInfo trackerInfo = index.data(TrackerModel::TrackerRole).value<TrackerInfo>();
+    TrackerInfo const trackerInfo = index.data(TrackerModel::TrackerRole).value<TrackerInfo>();
     painter->save();
     painter->setClipRect(option.rect);
     drawBackground(painter, option, index);
@@ -120,16 +120,16 @@ void TrackerDelegate::paint(QPainter* painter, const QStyleOptionViewItem& optio
     painter->restore();
 }
 
-void TrackerDelegate::drawTracker(QPainter* painter, const QStyleOptionViewItem& option, const TrackerInfo& inf) const
+void TrackerDelegate::drawTracker(QPainter* painter, QStyleOptionViewItem const& option, TrackerInfo const& inf) const
 {
-    const bool isItemSelected((option.state & QStyle::State_Selected) != 0);
-    const bool isItemEnabled((option.state & QStyle::State_Enabled) != 0);
-    const bool isItemActive((option.state & QStyle::State_Active) != 0);
+    bool const isItemSelected((option.state & QStyle::State_Selected) != 0);
+    bool const isItemEnabled((option.state & QStyle::State_Enabled) != 0);
+    bool const isItemActive((option.state & QStyle::State_Active) != 0);
 
     QIcon trackerIcon(inf.st.getFavicon());
 
-    const QRect contentRect(option.rect.adjusted(myMargin.width(), myMargin.height(), -myMargin.width(), -myMargin.height()));
-    const ItemLayout layout(getText(inf), isItemSelected, option.direction, contentRect.topLeft(), contentRect.width());
+    QRect const contentRect(option.rect.adjusted(myMargin.width(), myMargin.height(), -myMargin.width(), -myMargin.height()));
+    ItemLayout const layout(getText(inf), isItemSelected, option.direction, contentRect.topLeft(), contentRect.width());
 
     painter->save();
 
@@ -177,17 +177,17 @@ QString timeToStringRounded(int seconds)
 
 } // namespace
 
-QString TrackerDelegate::getText(const TrackerInfo& inf) const
+QString TrackerDelegate::getText(TrackerInfo const& inf) const
 {
     QString key;
     QString str;
-    const time_t now(time(0));
-    const QString err_markup_begin = QLatin1String("<span style=\"color:red\">");
-    const QString err_markup_end = QLatin1String("</span>");
-    const QString timeout_markup_begin = QLatin1String("<span style=\"color:#224466\">");
-    const QString timeout_markup_end = QLatin1String("</span>");
-    const QString success_markup_begin = QLatin1String("<span style=\"color:#008B00\">");
-    const QString success_markup_end = QLatin1String("</span>");
+    time_t const now(time(0));
+    QString const err_markup_begin = QLatin1String("<span style=\"color:red\">");
+    QString const err_markup_end = QLatin1String("</span>");
+    QString const timeout_markup_begin = QLatin1String("<span style=\"color:#224466\">");
+    QString const timeout_markup_end = QLatin1String("</span>");
+    QString const success_markup_begin = QLatin1String("<span style=\"color:#008B00\">");
+    QString const success_markup_end = QLatin1String("</span>");
 
     // hostname
     str += inf.st.isBackup ? QLatin1String("<i>") : QLatin1String("<b>");
@@ -209,7 +209,7 @@ QString TrackerDelegate::getText(const TrackerInfo& inf) const
     {
         if (inf.st.hasAnnounced && inf.st.announceState != TR_TRACKER_INACTIVE)
         {
-            const QString tstr(timeToStringRounded(now - inf.st.lastAnnounceTime));
+            QString const tstr(timeToStringRounded(now - inf.st.lastAnnounceTime));
             str += QLatin1String("<br/>\n");
 
             if (inf.st.lastAnnounceSucceeded)
@@ -241,7 +241,7 @@ QString TrackerDelegate::getText(const TrackerInfo& inf) const
 
         case TR_TRACKER_WAITING:
             {
-                const QString tstr(timeToStringRounded(inf.st.nextAnnounceTime - now));
+                QString const tstr(timeToStringRounded(inf.st.nextAnnounceTime - now));
                 str += QLatin1String("<br/>\n");
                 //: %1 is duration
                 str += tr("Asking for more peers in %1").arg(tstr);
@@ -255,7 +255,7 @@ QString TrackerDelegate::getText(const TrackerInfo& inf) const
 
         case TR_TRACKER_ACTIVE:
             {
-                const QString tstr(timeToStringRounded(now - inf.st.lastAnnounceStartTime));
+                QString const tstr(timeToStringRounded(now - inf.st.lastAnnounceStartTime));
                 str += QLatin1String("<br/>\n");
                 //: %1 is duration
                 str += tr("Asking for more peers now... <small>%1</small>").arg(tstr);
@@ -268,7 +268,7 @@ QString TrackerDelegate::getText(const TrackerInfo& inf) const
             if (inf.st.hasScraped)
             {
                 str += QLatin1String("<br/>\n");
-                const QString tstr(timeToStringRounded(now - inf.st.lastScrapeTime));
+                QString const tstr(timeToStringRounded(now - inf.st.lastScrapeTime));
 
                 if (inf.st.lastScrapeSucceeded)
                 {
@@ -307,7 +307,7 @@ QString TrackerDelegate::getText(const TrackerInfo& inf) const
             case TR_TRACKER_WAITING:
                 {
                     str += QLatin1String("<br/>\n");
-                    const QString tstr(timeToStringRounded(inf.st.nextScrapeTime - now));
+                    QString const tstr(timeToStringRounded(inf.st.nextScrapeTime - now));
                     //: %1 is duration
                     str += tr("Asking for peer counts in %1").arg(tstr);
                     break;
@@ -323,7 +323,7 @@ QString TrackerDelegate::getText(const TrackerInfo& inf) const
             case TR_TRACKER_ACTIVE:
                 {
                     str += QLatin1String("<br/>\n");
-                    const QString tstr(timeToStringRounded(now - inf.st.lastScrapeStartTime));
+                    QString const tstr(timeToStringRounded(now - inf.st.lastScrapeStartTime));
                     //: %1 is duration
                     str += tr("Asking for peer counts now... <small>%1</small>").arg(tstr);
                     break;

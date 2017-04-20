@@ -26,16 +26,16 @@
  * @see tr_getTorrentDir ()
  * @see tr_getWebClientDir ()
  */
-void tr_setConfigDir(tr_session* session, const char* configDir);
+void tr_setConfigDir(tr_session* session, char const* configDir);
 
 /** @brief return the directory where .resume files are stored */
-const char* tr_getResumeDir(const tr_session*);
+char const* tr_getResumeDir(tr_session const*);
 
 /** @brief return the directory where .torrent files are stored */
-const char* tr_getTorrentDir(const tr_session*);
+char const* tr_getTorrentDir(tr_session const*);
 
 /** @brief return the directory where the Web Client's web ui files are kept */
-const char* tr_getWebClientDir(const tr_session*);
+char const* tr_getWebClientDir(tr_session const*);
 
 /** @brief return the directory where session id lock files are stored */
 char* tr_getSessionIdDir(void);
@@ -54,7 +54,7 @@ tr_thread* tr_threadNew(void (* func)(void*), void* arg);
 
 /** @brief Return nonzero if this function is being called from `thread'
     @param thread the thread being tested */
-bool tr_amInThread(const tr_thread* thread);
+bool tr_amInThread(tr_thread const* thread);
 
 /***
 ****
@@ -75,6 +75,6 @@ void tr_lockLock(tr_lock*);
 void tr_lockUnlock(tr_lock*);
 
 /** @brief return nonzero if the specified lock is locked */
-bool tr_lockHave(const tr_lock*);
+bool tr_lockHave(tr_lock const*);
 
 /* @} */

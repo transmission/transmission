@@ -19,7 +19,7 @@
 namespace
 {
 
-int getHSpacing(const QWidget* w)
+int getHSpacing(QWidget const* w)
 {
     return qMax(3, w->style()->pixelMetric(QStyle::PM_LayoutHorizontalSpacing, 0, w));
 }
@@ -32,12 +32,12 @@ FilterBarComboBoxDelegate::FilterBarComboBoxDelegate(QObject* parent, QComboBox*
 {
 }
 
-bool FilterBarComboBoxDelegate::isSeparator(const QModelIndex& index)
+bool FilterBarComboBoxDelegate::isSeparator(QModelIndex const& index)
 {
     return index.data(Qt::AccessibleDescriptionRole).toString() == QLatin1String("separator");
 }
 
-void FilterBarComboBoxDelegate::setSeparator(QAbstractItemModel* model, const QModelIndex& index)
+void FilterBarComboBoxDelegate::setSeparator(QAbstractItemModel* model, QModelIndex const& index)
 {
     model->setData(index, QString::fromLatin1("separator"), Qt::AccessibleDescriptionRole);
 
@@ -50,13 +50,13 @@ void FilterBarComboBoxDelegate::setSeparator(QAbstractItemModel* model, const QM
     }
 }
 
-void FilterBarComboBoxDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const
+void FilterBarComboBoxDelegate::paint(QPainter* painter, QStyleOptionViewItem const& option, QModelIndex const& index) const
 {
     if (isSeparator(index))
     {
         QRect rect = option.rect;
 
-        if (const QAbstractItemView* view = qobject_cast<const QAbstractItemView*>(option.widget))
+        if (QAbstractItemView const* view = qobject_cast<QAbstractItemView const*>(option.widget))
         {
             rect.setWidth(view->viewport()->width());
         }
@@ -68,14 +68,14 @@ void FilterBarComboBoxDelegate::paint(QPainter* painter, const QStyleOptionViewI
     else
     {
         QStyleOptionViewItem disabledOption = option;
-        const QPalette::ColorRole disabledColorRole = (disabledOption.state & QStyle::State_Selected) ?
+        QPalette::ColorRole const disabledColorRole = (disabledOption.state & QStyle::State_Selected) ?
             QPalette::HighlightedText : QPalette::Text;
         disabledOption.palette.setColor(disabledColorRole, Utils::getFadedColor(disabledOption.palette.color(
             disabledColorRole)));
 
         QRect boundingBox = option.rect;
 
-        const int hmargin = getHSpacing(myCombo);
+        int const hmargin = getHSpacing(myCombo);
         boundingBox.adjust(hmargin, 0, -hmargin, 0);
 
         QRect decorationRect = rect(option, index, Qt::DecorationRole);
@@ -87,9 +87,9 @@ void FilterBarComboBoxDelegate::paint(QPainter* painter, const QStyleOptionViewI
         QRect countRect = rect(option, index, FilterBarComboBox::CountStringRole);
         countRect = QStyle::alignedRect(option.direction, Qt::AlignRight | Qt::AlignVCenter, countRect.size(), boundingBox);
         Utils::narrowRect(boundingBox, 0, countRect.width() + hmargin, option.direction);
-        const QRect displayRect = boundingBox;
+        QRect const displayRect = boundingBox;
 
-        const QIcon icon = Utils::getIconFromIndex(index);
+        QIcon const icon = Utils::getIconFromIndex(index);
 
         drawBackground(painter, option, index);
         icon.paint(painter, decorationRect, Qt::AlignCenter, StyleHelper::getIconMode(option.state), QIcon::Off);
@@ -99,17 +99,17 @@ void FilterBarComboBoxDelegate::paint(QPainter* painter, const QStyleOptionViewI
     }
 }
 
-QSize FilterBarComboBoxDelegate::sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const
+QSize FilterBarComboBoxDelegate::sizeHint(QStyleOptionViewItem const& option, QModelIndex const& index) const
 {
     if (isSeparator(index))
     {
-        const int pm = myCombo->style()->pixelMetric(QStyle::PM_DefaultFrameWidth, 0, myCombo);
+        int const pm = myCombo->style()->pixelMetric(QStyle::PM_DefaultFrameWidth, 0, myCombo);
         return QSize(pm, pm + 10);
     }
     else
     {
         QStyle* s = myCombo->style();
-        const int hmargin = getHSpacing(myCombo);
+        int const hmargin = getHSpacing(myCombo);
 
         QSize size = QItemDelegate::sizeHint(option, index);
         size.setHeight(qMax(size.height(), myCombo->iconSize().height() + 6));

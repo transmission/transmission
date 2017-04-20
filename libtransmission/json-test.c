@@ -19,9 +19,9 @@
 
 static int test_elements(void)
 {
-    const char* in;
+    char const* in;
     tr_variant top;
-    const char* str;
+    char const* str;
     bool f;
     double d;
     int64_t i;
@@ -70,12 +70,12 @@ static int test_elements(void)
 
 static int test_utf8(void)
 {
-    const char* in = "{ \"key\": \"Letöltések\" }";
+    char const* in = "{ \"key\": \"Letöltések\" }";
     tr_variant top;
-    const char* str;
+    char const* str;
     char* json;
     int err;
-    const tr_quark key = tr_quark_new("key", 3);
+    tr_quark const key = tr_quark_new("key", 3);
 
     err = tr_variantFromJson(&top, in, strlen(in));
     check(!err);
@@ -142,7 +142,7 @@ static int test_utf8(void)
 
 static int test1(void)
 {
-    const char* in =
+    char const* in =
         "{\n"
         "    \"headers\": {\n"
         "        \"type\": \"request\",\n"
@@ -156,9 +156,9 @@ static int test1(void)
         "    }\n"
         "}\n";
     tr_variant top, * headers, * body, * args, * ids;
-    const char* str;
+    char const* str;
     int64_t i;
-    const int err = tr_variantFromJson(&top, in, strlen(in));
+    int const err = tr_variantFromJson(&top, in, strlen(in));
 
     check(!err);
     check(tr_variantIsDict(&top));
@@ -188,7 +188,7 @@ static int test1(void)
 static int test2(void)
 {
     tr_variant top;
-    const char* in = " ";
+    char const* in = " ";
     int err;
 
     top.type = 0;
@@ -202,16 +202,16 @@ static int test2(void)
 
 static int test3(void)
 {
-    const char* in =
+    char const* in =
         "{ \"error\": 2,"
         "  \"errorString\": \"torrent not registered with this tracker 6UHsVW'*C\","
         "  \"eta\": 262792,"
         "  \"id\": 25,"
         "  \"leftUntilDone\": 2275655680 }";
     tr_variant top;
-    const char* str;
+    char const* str;
 
-    const int err = tr_variantFromJson(&top, in, strlen(in));
+    int const err = tr_variantFromJson(&top, in, strlen(in));
     check(!err);
     check(tr_variantDictFindStr(&top, TR_KEY_errorString, &str, NULL));
     check_streq("torrent not registered with this tracker 6UHsVW'*C", str);
@@ -222,11 +222,11 @@ static int test3(void)
 
 static int test_unescape(void)
 {
-    const char* in = "{ \"string-1\": \"\\/usr\\/lib\" }";
+    char const* in = "{ \"string-1\": \"\\/usr\\/lib\" }";
     tr_variant top;
-    const char* str;
+    char const* str;
 
-    const int err = tr_variantFromJson(&top, in, strlen(in));
+    int const err = tr_variantFromJson(&top, in, strlen(in));
     check_int_eq(0, err);
     check(tr_variantDictFindStr(&top, tr_quark_new("string-1", 8), &str, NULL));
     check_streq("/usr/lib", str);
@@ -241,14 +241,14 @@ int main(void)
     int n;
     int rv;
 
-    const char* comma_locales[] =
+    char const* comma_locales[] =
     {
         "da_DK.UTF-8",
         "fr_FR.UTF-8",
         "ru_RU.UTF-8"
     };
 
-    const testFunc tests[] =
+    testFunc const tests[] =
     {
         test_elements,
         test_utf8,

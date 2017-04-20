@@ -25,7 +25,7 @@
 ****
 ***/
 
-OptionsDialog::OptionsDialog(Session& session, const Prefs& prefs, const AddData& addme, QWidget* parent) :
+OptionsDialog::OptionsDialog(Session& session, Prefs const& prefs, AddData const& addme, QWidget* parent) :
     BaseDialog(parent),
     mySession(session),
     myAdd(addme),
@@ -75,11 +75,11 @@ OptionsDialog::OptionsDialog(Session& session, const Prefs& prefs, const AddData
     ui.sourceStack->setFixedHeight(ui.sourceStack->currentWidget()->sizeHint().height());
     ui.sourceLabel->setBuddy(ui.sourceStack->currentWidget());
 
-    const QFontMetrics fontMetrics(font());
-    const int width = fontMetrics.size(0, QString::fromUtf8("This is a pretty long torrent filename indeed.torrent")).width();
+    QFontMetrics const fontMetrics(font());
+    int const width = fontMetrics.size(0, QString::fromUtf8("This is a pretty long torrent filename indeed.torrent")).width();
     ui.sourceStack->setMinimumWidth(width);
 
-    const QString downloadDir(Utils::removeTrailingDirSeparator(prefs.getString(Prefs::DOWNLOAD_DIR)));
+    QString const downloadDir(Utils::removeTrailingDirSeparator(prefs.getString(Prefs::DOWNLOAD_DIR)));
     ui.freeSpaceLabel->setSession(mySession);
     ui.freeSpaceLabel->setPath(downloadDir);
 
@@ -162,14 +162,14 @@ void OptionsDialog::reload()
         break;
 
     case AddData::METAINFO:
-        tr_ctorSetMetainfo(ctor, reinterpret_cast<const quint8*>(myAdd.metainfo.constData()), myAdd.metainfo.size());
+        tr_ctorSetMetainfo(ctor, reinterpret_cast<quint8 const*>(myAdd.metainfo.constData()), myAdd.metainfo.size());
         break;
 
     default:
         break;
     }
 
-    const int err = tr_torrentParse(ctor, &myInfo);
+    int const err = tr_torrentParse(ctor, &myInfo);
     myHaveInfo = !err;
     tr_ctorFree(ctor);
 
@@ -178,7 +178,7 @@ void OptionsDialog::reload()
     myPriorities.clear();
     myWanted.clear();
 
-    const bool haveFilesToShow = myHaveInfo && myInfo.fileCount > 0;
+    bool const haveFilesToShow = myHaveInfo && myInfo.fileCount > 0;
 
     ui.filesView->setVisible(haveFilesToShow);
     myVerifyButton->setEnabled(haveFilesToShow);
@@ -219,7 +219,7 @@ void OptionsDialog::updateWidgetsLocality()
 
 void OptionsDialog::onSessionUpdated()
 {
-    const bool isLocal = mySession.isLocal();
+    bool const isLocal = mySession.isLocal();
 
     if (myIsLocal != isLocal)
     {
@@ -228,17 +228,17 @@ void OptionsDialog::onSessionUpdated()
     }
 }
 
-void OptionsDialog::onPriorityChanged(const QSet<int>& fileIndices, int priority)
+void OptionsDialog::onPriorityChanged(QSet<int> const& fileIndices, int priority)
 {
-    for (const int i : fileIndices)
+    for (int const i : fileIndices)
     {
         myPriorities[i] = priority;
     }
 }
 
-void OptionsDialog::onWantedChanged(const QSet<int>& fileIndices, bool isWanted)
+void OptionsDialog::onWantedChanged(QSet<int> const& fileIndices, bool isWanted)
 {
-    for (const int i : fileIndices)
+    for (int const i : fileIndices)
     {
         myWanted[i] = isWanted;
     }
@@ -268,8 +268,8 @@ void OptionsDialog::onAccepted()
     tr_variantDictAddBool(&args, TR_KEY_paused, !ui.startCheck->isChecked());
 
     // priority
-    const int index = ui.priorityCombo->currentIndex();
-    const int priority = ui.priorityCombo->itemData(index).toInt();
+    int const index = ui.priorityCombo->currentIndex();
+    int const priority = ui.priorityCombo->itemData(index).toInt();
     tr_variantDictAddInt(&args, TR_KEY_bandwidthPriority, priority);
 
     // files-unwanted
@@ -388,7 +388,7 @@ void OptionsDialog::onVerify()
 namespace
 {
 
-uint64_t getPieceSize(const tr_info* info, tr_piece_index_t pieceIndex)
+uint64_t getPieceSize(tr_info const* info, tr_piece_index_t pieceIndex)
 {
     if (pieceIndex != info->pieceCount - 1)
     {
@@ -408,11 +408,11 @@ void OptionsDialog::onTimeout()
         return;
     }
 
-    const tr_file* file = &myInfo.files[myVerifyFileIndex];
+    tr_file const* file = &myInfo.files[myVerifyFileIndex];
 
     if (!myVerifyFilePos && !myVerifyFile.isOpen())
     {
-        const QFileInfo fileInfo(myLocalDestination, QString::fromUtf8(file->name));
+        QFileInfo const fileInfo(myLocalDestination, QString::fromUtf8(file->name));
         myVerifyFile.setFileName(fileInfo.absoluteFilePath());
         myVerifyFile.open(QIODevice::ReadOnly);
     }
@@ -441,8 +441,8 @@ void OptionsDialog::onTimeout()
 
     if (leftInPiece == 0)
     {
-        const QByteArray result(myVerifyHash.result());
-        const bool matches = memcmp(result.constData(), myInfo.pieces[myVerifyPieceIndex].hash, SHA_DIGEST_LENGTH) == 0;
+        QByteArray const result(myVerifyHash.result());
+        bool const matches = memcmp(result.constData(), myInfo.pieces[myVerifyPieceIndex].hash, SHA_DIGEST_LENGTH) == 0;
         myVerifyFlags[myVerifyPieceIndex] = matches;
         myVerifyPiecePos = 0;
         ++myVerifyPieceIndex;
@@ -477,7 +477,7 @@ void OptionsDialog::onTimeout()
     {
         uint64_t have = 0;
 
-        for (const TorrentFile& f : myFiles)
+        for (TorrentFile const& f : myFiles)
         {
             have += f.have;
         }
@@ -485,7 +485,7 @@ void OptionsDialog::onTimeout()
         if (!have) // everything failed
         {
             // did the user accidentally specify the child directory instead of the parent?
-            const QStringList tokens = QString::fromUtf8(file->name).split(QLatin1Char('/'));
+            QStringList const tokens = QString::fromUtf8(file->name).split(QLatin1Char('/'));
 
             if (!tokens.empty() && myLocalDestination.dirName() == tokens.at(0))
             {

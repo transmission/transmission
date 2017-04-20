@@ -22,7 +22,7 @@ static int test_bitfield_count_range(void)
     int end;
     int count1;
     int count2;
-    const int bitCount = 100 + tr_rand_int_weak(1000);
+    int const bitCount = 100 + tr_rand_int_weak(1000);
     tr_bitfield bf;
 
     /* generate a random bitfield */
@@ -44,7 +44,7 @@ static int test_bitfield_count_range(void)
     /* ensure end <= begin */
     if (end < begin)
     {
-        const int tmp = begin;
+        int const tmp = begin;
         begin = end;
         end = tmp;
     }
@@ -228,7 +228,7 @@ int main(void)
 {
     int l;
     int ret;
-    const testFunc tests[] =
+    testFunc const tests[] =
     {
         test_bitfields,
         test_bitfield_has_all_none

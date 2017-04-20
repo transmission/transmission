@@ -46,17 +46,17 @@ void PathButton::setMode(Mode mode)
     updateAppearance();
 }
 
-void PathButton::setTitle(const QString& title)
+void PathButton::setTitle(QString const& title)
 {
     myTitle = title;
 }
 
-void PathButton::setNameFilter(const QString& nameFilter)
+void PathButton::setNameFilter(QString const& nameFilter)
 {
     myNameFilter = nameFilter;
 }
 
-void PathButton::setPath(const QString& path)
+void PathButton::setPath(QString const& path)
 {
     if (myPath == path)
     {
@@ -70,14 +70,14 @@ void PathButton::setPath(const QString& path)
     emit pathChanged(myPath);
 }
 
-const QString& PathButton::path() const
+QString const& PathButton::path() const
 {
     return myPath;
 }
 
 QSize PathButton::sizeHint() const
 {
-    const QSize sh(QToolButton::sizeHint());
+    QSize const sh(QToolButton::sizeHint());
     return QSize(qMin(sh.width(), 150), sh.height());
 }
 
@@ -87,8 +87,8 @@ void PathButton::paintEvent(QPaintEvent* /*event*/)
     QStyleOptionToolButton option;
     initStyleOption(&option);
 
-    const QSize fakeContentSize(qMax(100, qApp->globalStrut().width()), qMax(100, qApp->globalStrut().height()));
-    const QSize fakeSizeHint = style()->sizeFromContents(QStyle::CT_ToolButton, &option, fakeContentSize, this);
+    QSize const fakeContentSize(qMax(100, qApp->globalStrut().width()), qMax(100, qApp->globalStrut().height()));
+    QSize const fakeSizeHint = style()->sizeFromContents(QStyle::CT_ToolButton, &option, fakeContentSize, this);
 
     int textWidth = width() - (fakeSizeHint.width() - fakeContentSize.width()) - iconSize().width() - 6;
 
@@ -97,7 +97,7 @@ void PathButton::paintEvent(QPaintEvent* /*event*/)
         textWidth -= style()->pixelMetric(QStyle::PM_MenuButtonIndicator, &option, this);
     }
 
-    const QFileInfo pathInfo(myPath);
+    QFileInfo const pathInfo(myPath);
     option.text = myPath.isEmpty() ? tr("(None)") : (pathInfo.fileName().isEmpty() ? myPath : pathInfo.fileName());
     option.text = fontMetrics().elidedText(option.text, Qt::ElideMiddle, textWidth);
 
@@ -119,7 +119,7 @@ void PathButton::onClicked()
         dialog->setNameFilter(myNameFilter);
     }
 
-    const QFileInfo pathInfo(myPath);
+    QFileInfo const pathInfo(myPath);
 
     if (!myPath.isEmpty() && pathInfo.exists())
     {
@@ -140,7 +140,7 @@ void PathButton::onClicked()
     dialog->open();
 }
 
-void PathButton::onFileSelected(const QString& path)
+void PathButton::onFileSelected(QString const& path)
 {
     if (!path.isEmpty())
     {
@@ -150,10 +150,10 @@ void PathButton::onFileSelected(const QString& path)
 
 void PathButton::updateAppearance()
 {
-    const QFileInfo pathInfo(myPath);
+    QFileInfo const pathInfo(myPath);
 
-    const int iconSize(style()->pixelMetric(QStyle::PM_SmallIconSize));
-    const QFileIconProvider iconProvider;
+    int const iconSize(style()->pixelMetric(QStyle::PM_SmallIconSize));
+    QFileIconProvider const iconProvider;
 
     QIcon icon;
 

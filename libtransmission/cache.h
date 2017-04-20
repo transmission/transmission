@@ -30,7 +30,7 @@ void tr_cacheFree(tr_cache*);
 
 int tr_cacheSetLimit(tr_cache* cache, int64_t max_bytes);
 
-int64_t tr_cacheGetLimit(const tr_cache*);
+int64_t tr_cacheGetLimit(tr_cache const*);
 
 int tr_cacheWriteBlock(tr_cache* cache, tr_torrent* torrent, tr_piece_index_t piece, uint32_t offset, uint32_t len,
     struct evbuffer* writeme);

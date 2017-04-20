@@ -18,4 +18,4 @@ typedef struct dtr_callbacks
 }
 dtr_callbacks;
 
-bool dtr_daemon(const dtr_callbacks* cb, void* cb_arg, bool foreground, int* exit_code, struct tr_error** error);
+bool dtr_daemon(dtr_callbacks const* cb, void* cb_arg, bool foreground, int* exit_code, struct tr_error** error);

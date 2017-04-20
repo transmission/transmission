@@ -31,7 +31,7 @@ public:
     };
 
 public:
-    FileTreeItem(const QString& name = QString(), int fileIndex = -1, uint64_t size = 0) :
+    FileTreeItem(QString const& name = QString(), int fileIndex = -1, uint64_t size = 0) :
         myName(name),
         myFileIndex(fileIndex),
         myTotalSize(size),
@@ -47,7 +47,7 @@ public:
 
 public:
     void appendChild(FileTreeItem* child);
-    FileTreeItem* child(const QString& filename);
+    FileTreeItem* child(QString const& filename);
 
     FileTreeItem* child(int row)
     {
@@ -64,20 +64,20 @@ public:
         return myParent;
     }
 
-    const FileTreeItem* parent() const
+    FileTreeItem const* parent() const
     {
         return myParent;
     }
 
     int row() const;
 
-    const QString& name() const
+    QString const& name() const
     {
         return myName;
     }
 
     QVariant data(int column, int role) const;
-    std::pair<int, int> update(const QString& name, bool want, int priority, uint64_t have, bool updateFields);
+    std::pair<int, int> update(QString const& name, bool want, int priority, uint64_t have, bool updateFields);
     void setSubtreeWanted(bool, QSet<int>& fileIds);
     void setSubtreePriority(int priority, QSet<int>& fileIds);
 
@@ -102,12 +102,12 @@ private:
     void getSubtreeWantedSize(uint64_t& have, uint64_t& total) const;
     double progress() const;
     uint64_t size() const;
-    const QHash<QString, int>& getMyChildRows();
+    QHash<QString, int> const& getMyChildRows();
 
 private:
     QString myName;
-    const int myFileIndex;
-    const uint64_t myTotalSize;
+    int const myFileIndex;
+    uint64_t const myTotalSize;
 
     FileTreeItem* myParent;
     QList<FileTreeItem*> myChildren;

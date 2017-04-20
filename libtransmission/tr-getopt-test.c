@@ -11,7 +11,7 @@
 
 #include "libtransmission-test.h"
 
-static const struct tr_option options[] =
+static struct tr_option const options[] =
 {
     { 'p', "private", "Allow this torrent to only be used with the specified tracker(s)", "p", 0, NULL },
     { 'o', "outfile", "Save the generated .torrent to this filename", "o", 1, "<file>" },
@@ -23,11 +23,11 @@ static const struct tr_option options[] =
     { 0, NULL, NULL, NULL, 0, NULL }
 };
 
-static int run_test(int argc, const char** argv, int expected_n, int* expected_c, const char** expected_optarg)
+static int run_test(int argc, char const** argv, int expected_n, int* expected_c, char const** expected_optarg)
 {
     int c;
     int n;
-    const char* optarg;
+    char const* optarg;
 
     n = 0;
     tr_optind = 1;
@@ -51,100 +51,100 @@ static int run_test(int argc, const char** argv, int expected_n, int* expected_c
 static int test_no_options(void)
 {
     int argc = 1;
-    const char* argv[] = { "/some/path/tr-getopt-test" };
+    char const* argv[] = { "/some/path/tr-getopt-test" };
     int expected_n = 0;
     int expected_c[] = { 0 };
-    const char* expected_optarg[] = { NULL };
+    char const* expected_optarg[] = { NULL };
     return run_test(argc, argv, expected_n, expected_c, expected_optarg);
 }
 
 static int test_short_noarg(void)
 {
     int argc = 2;
-    const char* argv[] = { "/some/path/tr-getopt-test", "-p" };
+    char const* argv[] = { "/some/path/tr-getopt-test", "-p" };
     int expected_n = 1;
     int expected_c[] = { 'p' };
-    const char* expected_optarg[] = { NULL };
+    char const* expected_optarg[] = { NULL };
     return run_test(argc, argv, expected_n, expected_c, expected_optarg);
 }
 
 static int test_long_noarg(void)
 {
     int argc = 2;
-    const char* argv[] = { "/some/path/tr-getopt-test", "--private" };
+    char const* argv[] = { "/some/path/tr-getopt-test", "--private" };
     int expected_n = 1;
     int expected_c[] = { 'p' };
-    const char* expected_optarg[] = { NULL };
+    char const* expected_optarg[] = { NULL };
     return run_test(argc, argv, expected_n, expected_c, expected_optarg);
 }
 
 static int test_short_with_arg(void)
 {
     int argc = 3;
-    const char* argv[] = { "/some/path/tr-getopt-test", "-o", "/tmp/outfile" };
+    char const* argv[] = { "/some/path/tr-getopt-test", "-o", "/tmp/outfile" };
     int expected_n = 1;
     int expected_c[] = { 'o' };
-    const char* expected_optarg[] = { "/tmp/outfile" };
+    char const* expected_optarg[] = { "/tmp/outfile" };
     return run_test(argc, argv, expected_n, expected_c, expected_optarg);
 }
 
 static int test_long_with_arg(void)
 {
     int argc = 3;
-    const char* argv[] = { "/some/path/tr-getopt-test", "--outfile", "/tmp/outfile" };
+    char const* argv[] = { "/some/path/tr-getopt-test", "--outfile", "/tmp/outfile" };
     int expected_n = 1;
     int expected_c[] = { 'o' };
-    const char* expected_optarg[] = { "/tmp/outfile" };
+    char const* expected_optarg[] = { "/tmp/outfile" };
     return run_test(argc, argv, expected_n, expected_c, expected_optarg);
 }
 
 static int test_short_with_arg_after_eq(void)
 {
     int argc = 2;
-    const char* argv[] = { "/some/path/tr-getopt-test", "-o=/tmp/outfile" };
+    char const* argv[] = { "/some/path/tr-getopt-test", "-o=/tmp/outfile" };
     int expected_n = 1;
     int expected_c[] = { 'o' };
-    const char* expected_optarg[] = { "/tmp/outfile" };
+    char const* expected_optarg[] = { "/tmp/outfile" };
     return run_test(argc, argv, expected_n, expected_c, expected_optarg);
 }
 
 static int test_long_with_arg_after_eq(void)
 {
     int argc = 2;
-    const char* argv[] = { "/some/path/tr-getopt-test", "--outfile=/tmp/outfile" };
+    char const* argv[] = { "/some/path/tr-getopt-test", "--outfile=/tmp/outfile" };
     int expected_n = 1;
     int expected_c[] = { 'o' };
-    const char* expected_optarg[] = { "/tmp/outfile" };
+    char const* expected_optarg[] = { "/tmp/outfile" };
     return run_test(argc, argv, expected_n, expected_c, expected_optarg);
 }
 
 static int test_unknown_option(void)
 {
     int argc = 2;
-    const char* argv[] = { "/some/path/tr-getopt-test", "-z" };
+    char const* argv[] = { "/some/path/tr-getopt-test", "-z" };
     int expected_n = 1;
     int expected_c[] = { TR_OPT_UNK };
-    const char* expected_optarg[] = { "-z" };
+    char const* expected_optarg[] = { "-z" };
     return run_test(argc, argv, expected_n, expected_c, expected_optarg);
 }
 
 static int test_missing_arg(void)
 {
     int argc = 2;
-    const char* argv[] = { "/some/path/tr-getopt-test", "-o" };
+    char const* argv[] = { "/some/path/tr-getopt-test", "-o" };
     int expected_n = 1;
     int expected_c[] = { TR_OPT_ERR };
-    const char* expected_optarg[] = { NULL };
+    char const* expected_optarg[] = { NULL };
     return run_test(argc, argv, expected_n, expected_c, expected_optarg);
 }
 
 static int test_lots_of_options(void)
 {
     int argc = 6;
-    const char* argv[] = { "/some/path/tr-getopt-test", "--piecesize=4", "-c", "hello world", "-p", "--tracker=foo" };
+    char const* argv[] = { "/some/path/tr-getopt-test", "--piecesize=4", "-c", "hello world", "-p", "--tracker=foo" };
     int expected_n = 4;
     int expected_c[] = { 's', 'c', 'p', 't' };
-    const char* expected_optarg[] = { "4", "hello world", NULL, "foo" };
+    char const* expected_optarg[] = { "4", "hello world", NULL, "foo" };
     return run_test(argc, argv, expected_n, expected_c, expected_optarg);
 }
 
@@ -152,10 +152,10 @@ static int test_match_longer_key(void)
 {
     /* confirm that this resolves to 'q' and not 'p' */
     int argc = 2;
-    const char* argv[] = { "/some/path/tr-getopt-test", "-pk" };
+    char const* argv[] = { "/some/path/tr-getopt-test", "-pk" };
     int expected_n = 1;
     int expected_c[] = { 'q' };
-    const char* expected_optarg[] = { NULL };
+    char const* expected_optarg[] = { NULL };
     return run_test(argc, argv, expected_n, expected_c, expected_optarg);
 }
 
@@ -165,7 +165,7 @@ static int test_match_longer_key(void)
 
 int main(void)
 {
-    const testFunc tests[] =
+    testFunc const tests[] =
     {
         test_no_options,
         test_short_noarg,

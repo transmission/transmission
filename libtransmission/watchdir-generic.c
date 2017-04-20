@@ -51,7 +51,7 @@ struct timeval tr_watchdir_generic_interval = { 10, 0 };
 
 static void tr_watchdir_generic_on_event(evutil_socket_t fd UNUSED, short type UNUSED, void* context)
 {
-    const tr_watchdir_t handle = context;
+    tr_watchdir_t const handle = context;
     tr_watchdir_generic* const backend = BACKEND_UPCAST(tr_watchdir_get_backend(handle));
 
     tr_watchdir_scan(handle, &backend->dir_entries);

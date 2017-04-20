@@ -15,7 +15,7 @@
 #include "AddData.h"
 #include "Utils.h"
 
-int AddData::set(const QString& key)
+int AddData::set(QString const& key)
 {
     if (Utils::isMagnetLink(key))
     {
@@ -49,7 +49,7 @@ int AddData::set(const QString& key)
 
         if (raw)
         {
-            metainfo.append(static_cast<const char*>(raw), int(len));
+            metainfo.append(static_cast<char const*>(raw), int(len));
             tr_free(raw);
             type = METAINFO;
         }
@@ -70,7 +70,7 @@ QByteArray AddData::toBase64() const
     {
         size_t len;
         void* b64 = tr_base64_encode(metainfo.constData(), metainfo.size(), &len);
-        ret = QByteArray(static_cast<const char*>(b64), int(len));
+        ret = QByteArray(static_cast<char const*>(b64), int(len));
         tr_free(b64);
     }
 
@@ -100,7 +100,7 @@ QString AddData::readableName() const
             tr_info inf;
             tr_ctor* ctor = tr_ctorNew(NULL);
 
-            tr_ctorSetMetainfo(ctor, reinterpret_cast<const quint8*>(metainfo.constData()), metainfo.size());
+            tr_ctorSetMetainfo(ctor, reinterpret_cast<quint8 const*>(metainfo.constData()), metainfo.size());
 
             if (tr_torrentParse(ctor, &inf) == TR_PARSE_OK)
             {

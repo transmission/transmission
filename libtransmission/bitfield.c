@@ -13,13 +13,13 @@
 #include "bitfield.h"
 #include "utils.h" /* tr_new0 () */
 
-const tr_bitfield TR_BITFIELD_INIT = { NULL, 0, 0, 0, false, false };
+tr_bitfield const TR_BITFIELD_INIT = { NULL, 0, 0, 0, false, false };
 
 /****
 *****
 ****/
 
-static const int8_t trueBitCount[256] =
+static int8_t const trueBitCount[256] =
 {
     0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4,
     1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5,
@@ -39,7 +39,7 @@ static const int8_t trueBitCount[256] =
     4, 5, 5, 6, 5, 6, 6, 7, 5, 6, 6, 7, 6, 7, 7, 8
 };
 
-static size_t countArray(const tr_bitfield* b)
+static size_t countArray(tr_bitfield const* b)
 {
     size_t ret = 0;
     size_t i = b->alloc_count;
@@ -52,11 +52,11 @@ static size_t countArray(const tr_bitfield* b)
     return ret;
 }
 
-static size_t countRange(const tr_bitfield* b, size_t begin, size_t end)
+static size_t countRange(tr_bitfield const* b, size_t begin, size_t end)
 {
     size_t ret = 0;
-    const size_t first_byte = begin >> 3u;
-    const size_t last_byte = (end - 1) >> 3u;
+    size_t const first_byte = begin >> 3u;
+    size_t const last_byte = (end - 1) >> 3u;
 
     if (!b->bit_count)
     {
@@ -89,7 +89,7 @@ static size_t countRange(const tr_bitfield* b, size_t begin, size_t end)
     {
         size_t i;
         uint8_t val;
-        const size_t walk_end = MIN(b->alloc_count, last_byte);
+        size_t const walk_end = MIN(b->alloc_count, last_byte);
 
         /* first byte */
         i = begin - (first_byte * 8);
@@ -119,7 +119,7 @@ static size_t countRange(const tr_bitfield* b, size_t begin, size_t end)
     return ret;
 }
 
-size_t tr_bitfieldCountRange(const tr_bitfield* b, size_t begin, size_t end)
+size_t tr_bitfieldCountRange(tr_bitfield const* b, size_t begin, size_t end)
 {
     if (tr_bitfieldHasAll(b))
     {
@@ -134,7 +134,7 @@ size_t tr_bitfieldCountRange(const tr_bitfield* b, size_t begin, size_t end)
     return countRange(b, begin, end);
 }
 
-bool tr_bitfieldHas(const tr_bitfield* b, size_t n)
+bool tr_bitfieldHas(tr_bitfield const* b, size_t n)
 {
     if (tr_bitfieldHasAll(b))
     {
@@ -160,7 +160,7 @@ bool tr_bitfieldHas(const tr_bitfield* b, size_t n)
 
 #ifndef NDEBUG
 
-static bool tr_bitfieldIsValid(const tr_bitfield* b)
+static bool tr_bitfieldIsValid(tr_bitfield const* b)
 {
     assert(b != NULL);
     assert((b->alloc_count == 0) == (b->bits == 0));
@@ -171,7 +171,7 @@ static bool tr_bitfieldIsValid(const tr_bitfield* b)
 
 #endif
 
-size_t tr_bitfieldCountTrueBits(const tr_bitfield* b)
+size_t tr_bitfieldCountTrueBits(tr_bitfield const* b)
 {
     assert(tr_bitfieldIsValid(b));
 
@@ -185,8 +185,8 @@ static size_t get_bytes_needed(size_t bit_count)
 
 static void set_all_true(uint8_t* array, size_t bit_count)
 {
-    const uint8_t val = 0xFF;
-    const size_t n = get_bytes_needed(bit_count);
+    uint8_t const val = 0xFF;
+    size_t const n = get_bytes_needed(bit_count);
 
     if (n > 0)
     {
@@ -196,9 +196,9 @@ static void set_all_true(uint8_t* array, size_t bit_count)
     }
 }
 
-void* tr_bitfieldGetRaw(const tr_bitfield* b, size_t* byte_count)
+void* tr_bitfieldGetRaw(tr_bitfield const* b, size_t* byte_count)
 {
-    const size_t n = get_bytes_needed(b->bit_count);
+    size_t const n = get_bytes_needed(b->bit_count);
     uint8_t* bits = tr_new0(uint8_t, n);
 
     assert(b->bit_count > 0);
@@ -220,7 +220,7 @@ void* tr_bitfieldGetRaw(const tr_bitfield* b, size_t* byte_count)
 static void tr_bitfieldEnsureBitsAlloced(tr_bitfield* b, size_t n)
 {
     size_t bytes_needed;
-    const bool has_all = tr_bitfieldHasAll(b);
+    bool const has_all = tr_bitfieldHasAll(b);
 
     if (has_all)
     {
@@ -335,7 +335,7 @@ void tr_bitfieldSetHasAll(tr_bitfield* b)
     assert(tr_bitfieldIsValid(b));
 }
 
-void tr_bitfieldSetFromBitfield(tr_bitfield* b, const tr_bitfield* src)
+void tr_bitfieldSetFromBitfield(tr_bitfield* b, tr_bitfield const* src)
 {
     if (tr_bitfieldHasAll(src))
     {
@@ -351,7 +351,7 @@ void tr_bitfieldSetFromBitfield(tr_bitfield* b, const tr_bitfield* src)
     }
 }
 
-void tr_bitfieldSetRaw(tr_bitfield* b, const void* bits, size_t byte_count, bool bounded)
+void tr_bitfieldSetRaw(tr_bitfield* b, void const* bits, size_t byte_count, bool bounded)
 {
     tr_bitfieldFreeArray(b);
     b->true_count = 0;
@@ -367,7 +367,7 @@ void tr_bitfieldSetRaw(tr_bitfield* b, const void* bits, size_t byte_count, bool
     if (bounded)
     {
         /* ensure the excess bits are set to '0' */
-        const int excess_bit_count = byte_count * 8 - b->bit_count;
+        int const excess_bit_count = byte_count * 8 - b->bit_count;
         assert(excess_bit_count >= 0);
         assert(excess_bit_count <= 7);
 
@@ -380,7 +380,7 @@ void tr_bitfieldSetRaw(tr_bitfield* b, const void* bits, size_t byte_count, bool
     tr_bitfieldRebuildTrueCount(b);
 }
 
-void tr_bitfieldSetFromFlags(tr_bitfield* b, const bool* flags, size_t n)
+void tr_bitfieldSetFromFlags(tr_bitfield* b, bool const* flags, size_t n)
 {
     size_t i;
     size_t trueCount = 0;
@@ -414,7 +414,7 @@ void tr_bitfieldAddRange(tr_bitfield* b, size_t begin, size_t end)
 {
     size_t sb, eb;
     unsigned char sm, em;
-    const size_t diff = (end - begin) - tr_bitfieldCountRange(b, begin, end);
+    size_t const diff = (end - begin) - tr_bitfieldCountRange(b, begin, end);
 
     if (diff == 0)
     {
@@ -472,7 +472,7 @@ void tr_bitfieldRemRange(tr_bitfield* b, size_t begin, size_t end)
 {
     size_t sb, eb;
     unsigned char sm, em;
-    const size_t diff = tr_bitfieldCountRange(b, begin, end);
+    size_t const diff = tr_bitfieldCountRange(b, begin, end);
 
     if (!diff)
     {

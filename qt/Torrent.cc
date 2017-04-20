@@ -27,7 +27,7 @@
 #include "Torrent.h"
 #include "Utils.h"
 
-Torrent::Torrent(const Prefs& prefs, int id) :
+Torrent::Torrent(Prefs const& prefs, int id) :
     myPrefs(prefs),
     magnetTorrent(false)
 {
@@ -130,7 +130,7 @@ Torrent::KeyList Torrent::buildKeyList(Group group)
     return keys;
 }
 
-const Torrent::KeyList& Torrent::getInfoKeys()
+Torrent::KeyList const& Torrent::getInfoKeys()
 {
     static KeyList keys;
 
@@ -142,13 +142,13 @@ const Torrent::KeyList& Torrent::getInfoKeys()
     return keys;
 }
 
-const Torrent::KeyList& Torrent::getStatKeys()
+Torrent::KeyList const& Torrent::getStatKeys()
 {
     static KeyList keys(buildKeyList(STAT));
     return keys;
 }
 
-const Torrent::KeyList& Torrent::getExtraStatKeys()
+Torrent::KeyList const& Torrent::getExtraStatKeys()
 {
     static KeyList keys;
 
@@ -208,7 +208,7 @@ bool Torrent::setDouble(int i, double value)
     return changed;
 }
 
-bool Torrent::setDateTime(int i, const QDateTime& value)
+bool Torrent::setDateTime(int i, QDateTime const& value)
 {
     bool changed = false;
 
@@ -240,7 +240,7 @@ bool Torrent::setSize(int i, qulonglong value)
     return changed;
 }
 
-bool Torrent::setString(int i, const char* value)
+bool Torrent::setString(int i, char const* value)
 {
     bool changed = false;
 
@@ -256,7 +256,7 @@ bool Torrent::setString(int i, const char* value)
     return changed;
 }
 
-bool Torrent::setIcon(int i, const QIcon& value)
+bool Torrent::setIcon(int i, QIcon const& value)
 {
     assert(0 <= i && i < PROPERTY_COUNT);
     assert(myProperties[i].type == QVariant::Icon);
@@ -349,9 +349,9 @@ bool Torrent::getSeedRatio(double& ratio) const
     return isLimited;
 }
 
-bool Torrent::hasFileSubstring(const QString& substr) const
+bool Torrent::hasFileSubstring(QString const& substr) const
 {
-    for (const TorrentFile& file : myFiles)
+    for (TorrentFile const& file : myFiles)
     {
         if (file.filename.contains(substr, Qt::CaseInsensitive))
         {
@@ -362,9 +362,9 @@ bool Torrent::hasFileSubstring(const QString& substr) const
     return false;
 }
 
-bool Torrent::hasTrackerSubstring(const QString& substr) const
+bool Torrent::hasTrackerSubstring(QString const& substr) const
 {
-    for (const QString& s : myValues[TRACKERS].toStringList())
+    for (QString const& s : myValues[TRACKERS].toStringList())
     {
         if (s.contains(substr, Qt::CaseInsensitive))
         {
@@ -375,12 +375,12 @@ bool Torrent::hasTrackerSubstring(const QString& substr) const
     return false;
 }
 
-int Torrent::compareSeedRatio(const Torrent& that) const
+int Torrent::compareSeedRatio(Torrent const& that) const
 {
     double a;
     double b;
-    const bool has_a = getSeedRatio(a);
-    const bool has_b = that.getSeedRatio(b);
+    bool const has_a = getSeedRatio(a);
+    bool const has_b = that.getSeedRatio(b);
 
     if (!has_a && !has_b)
     {
@@ -405,10 +405,10 @@ int Torrent::compareSeedRatio(const Torrent& that) const
     return 0;
 }
 
-int Torrent::compareRatio(const Torrent& that) const
+int Torrent::compareRatio(Torrent const& that) const
 {
-    const double a = ratio();
-    const double b = that.ratio();
+    double const a = ratio();
+    double const b = that.ratio();
 
     if (static_cast<int>(a) == TR_RATIO_INF && static_cast<int>(b) == TR_RATIO_INF)
     {
@@ -438,10 +438,10 @@ int Torrent::compareRatio(const Torrent& that) const
     return 0;
 }
 
-int Torrent::compareETA(const Torrent& that) const
+int Torrent::compareETA(Torrent const& that) const
 {
-    const bool haveA(hasETA());
-    const bool haveB(that.hasETA());
+    bool const haveA(hasETA());
+    bool const haveB(that.hasETA());
 
     if (haveA && haveB)
     {
@@ -461,7 +461,7 @@ int Torrent::compareETA(const Torrent& that) const
     return 0;
 }
 
-int Torrent::compareTracker(const Torrent& that) const
+int Torrent::compareTracker(Torrent const& that) const
 {
     Q_UNUSED(that);
 
@@ -475,7 +475,7 @@ int Torrent::compareTracker(const Torrent& that) const
 
 void Torrent::updateMimeIcon()
 {
-    const FileList& files(myFiles);
+    FileList const& files(myFiles);
 
     QIcon icon;
 
@@ -513,8 +513,8 @@ void Torrent::update(tr_variant* d)
     static bool lookup_initialized = false;
     static int key_to_property_index[TR_N_KEYS];
     bool changed = false;
-    const bool was_seed = isSeed();
-    const uint64_t old_verified_size = haveVerified();
+    bool const was_seed = isSeed();
+    uint64_t const old_verified_size = haveVerified();
 
     if (!lookup_initialized)
     {
@@ -537,7 +537,7 @@ void Torrent::update(tr_variant* d)
 
     while (tr_variantDictChild(d, pos++, &key, &child))
     {
-        const int property_index = key_to_property_index[key];
+        int const property_index = key_to_property_index[key];
 
         if (property_index == -1) // we're not interested in this one
         {
@@ -574,7 +574,7 @@ void Torrent::update(tr_variant* d)
 
         case QVariant::String:
             {
-                const char* val;
+                char const* val;
 
                 if (tr_variantGetStr(child, &val, NULL))
                 {
@@ -635,7 +635,7 @@ void Torrent::update(tr_variant* d)
 
     if (tr_variantDictFindList(d, TR_KEY_files, &files))
     {
-        const char* str;
+        char const* str;
         int64_t intVal;
         int i = 0;
         tr_variant* child;
@@ -668,7 +668,7 @@ void Torrent::update(tr_variant* d)
 
     if (tr_variantDictFindList(d, TR_KEY_fileStats, &files))
     {
-        const int n = tr_variantListSize(files);
+        int const n = tr_variantListSize(files);
 
         for (int i = 0; i < n && i < myFiles.size(); ++i)
         {
@@ -701,7 +701,7 @@ void Torrent::update(tr_variant* d)
     if (tr_variantDictFindList(d, TR_KEY_trackers, &trackers))
     {
         size_t len;
-        const char* str;
+        char const* str;
         int i = 0;
         QStringList list;
         tr_variant* child;
@@ -719,9 +719,9 @@ void Torrent::update(tr_variant* d)
         {
             QStringList hosts;
 
-            for (const QString& tracker : list)
+            for (QString const& tracker : list)
             {
-                const QString host = FaviconCache::getHost(QUrl(tracker));
+                QString const host = FaviconCache::getHost(QUrl(tracker));
 
                 if (!host.isEmpty())
                 {
@@ -750,7 +750,7 @@ void Torrent::update(tr_variant* d)
             bool b;
             int64_t i;
             size_t len;
-            const char* str;
+            char const* str;
             TrackerStat trackerStat;
 
             if (tr_variantDictFindStr(child, TR_KEY_announce, &str, &len))
@@ -900,7 +900,7 @@ void Torrent::update(tr_variant* d)
             bool b;
             int64_t i;
             size_t len;
-            const char* str;
+            char const* str;
             Peer peer;
 
             if (tr_variantDictFindStr(child, TR_KEY_address, &str, &len))

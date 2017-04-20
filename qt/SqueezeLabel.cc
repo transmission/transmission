@@ -45,7 +45,7 @@
 
 #include "SqueezeLabel.h"
 
-SqueezeLabel::SqueezeLabel(const QString& text, QWidget* parent) :
+SqueezeLabel::SqueezeLabel(QString const& text, QWidget* parent) :
     QLabel(text, parent)
 {
 }
@@ -66,8 +66,8 @@ void SqueezeLabel::paintEvent(QPaintEvent* paintEvent)
     QFontMetrics fm = fontMetrics();
     QStyleOption opt;
     opt.initFrom(this);
-    const QString fullText = text();
-    const QString elidedText = fm.elidedText(fullText, Qt::ElideRight, width());
+    QString const fullText = text();
+    QString const elidedText = fm.elidedText(fullText, Qt::ElideRight, width());
     style()->drawItemText(&painter, contentsRect(), alignment(), opt.palette, isEnabled(), elidedText, foregroundRole());
 
 #ifndef QT_NO_TOOLTIP

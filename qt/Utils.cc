@@ -45,7 +45,7 @@ namespace
 {
 
 #ifdef _WIN32
-void addAssociatedFileIcon(const QFileInfo& fileInfo, UINT iconSize, QIcon& icon)
+void addAssociatedFileIcon(QFileInfo const& fileInfo, UINT iconSize, QIcon& icon)
 {
     QString const pixmapCacheKey = QLatin1String("tr_file_ext_") + QString::number(iconSize) + QLatin1Char('_') +
         fileInfo.suffix();
@@ -54,11 +54,11 @@ void addAssociatedFileIcon(const QFileInfo& fileInfo, UINT iconSize, QIcon& icon
 
     if (!QPixmapCache::find(pixmapCacheKey, &pixmap))
     {
-        const QString filename = fileInfo.fileName();
+        QString const filename = fileInfo.fileName();
 
         SHFILEINFO shellFileInfo;
 
-        if (::SHGetFileInfoW(reinterpret_cast<const wchar_t*>(filename.utf16()), FILE_ATTRIBUTE_NORMAL, &shellFileInfo,
+        if (::SHGetFileInfoW(reinterpret_cast<wchar_t const*>(filename.utf16()), FILE_ATTRIBUTE_NORMAL, &shellFileInfo,
             sizeof(shellFileInfo), SHGFI_ICON | iconSize | SHGFI_USEFILEATTRIBUTES) != 0)
         {
             if (shellFileInfo.hIcon != NULL)
@@ -78,16 +78,16 @@ void addAssociatedFileIcon(const QFileInfo& fileInfo, UINT iconSize, QIcon& icon
 }
 #endif
 
-bool isSlashChar(const QChar& c)
+bool isSlashChar(QChar const& c)
 {
     return c == QLatin1Char('/') || c == QLatin1Char('\\');
 }
 
 } // namespace
 
-QIcon Utils::guessMimeIcon(const QString& filename)
+QIcon Utils::guessMimeIcon(QString const& filename)
 {
-    static const QIcon fallback = qApp->style()->standardIcon(QStyle::SP_FileIcon);
+    static QIcon const fallback = qApp->style()->standardIcon(QStyle::SP_FileIcon);
 
 #ifdef _WIN32
 
@@ -95,7 +95,7 @@ QIcon Utils::guessMimeIcon(const QString& filename)
 
     if (!filename.isEmpty())
     {
-        const QFileInfo fileInfo(filename);
+        QFileInfo const fileInfo(filename);
 
         addAssociatedFileIcon(fileInfo, SHGFI_SMALLICON, icon);
         addAssociatedFileIcon(fileInfo, 0, icon);
@@ -120,9 +120,9 @@ QIcon Utils::guessMimeIcon(const QString& filename)
     return fallback;
 }
 
-QIcon Utils::getIconFromIndex(const QModelIndex& index)
+QIcon Utils::getIconFromIndex(QModelIndex const& index)
 {
-    const QVariant variant = index.data(Qt::DecorationRole);
+    QVariant const variant = index.data(Qt::DecorationRole);
 
     switch (variant.type())
     {
@@ -137,11 +137,11 @@ QIcon Utils::getIconFromIndex(const QModelIndex& index)
     }
 }
 
-bool Utils::isValidUtf8(const char* s)
+bool Utils::isValidUtf8(char const* s)
 {
     int n; // number of bytes in a UTF-8 sequence
 
-    for (const char* c = s; *c; c += n)
+    for (char const* c = s; *c; c += n)
     {
         if ((*c & 0x80) == 0x00)
         {
@@ -188,7 +188,7 @@ bool Utils::isValidUtf8(const char* s)
     return true;
 }
 
-QString Utils::removeTrailingDirSeparator(const QString& path)
+QString Utils::removeTrailingDirSeparator(QString const& path)
 {
     int i = path.size();
 
@@ -200,7 +200,7 @@ QString Utils::removeTrailingDirSeparator(const QString& path)
     return path.left(i);
 }
 
-int Utils::measureViewItem(QAbstractItemView* view, const QString& text)
+int Utils::measureViewItem(QAbstractItemView* view, QString const& text)
 {
     QStyleOptionViewItem option;
     option.initFrom(view);
@@ -213,7 +213,7 @@ int Utils::measureViewItem(QAbstractItemView* view, const QString& text)
                width();
 }
 
-int Utils::measureHeaderItem(QHeaderView* view, const QString& text)
+int Utils::measureHeaderItem(QHeaderView* view, QString const& text)
 {
     QStyleOptionHeader option;
     option.initFrom(view);
@@ -223,7 +223,7 @@ int Utils::measureHeaderItem(QHeaderView* view, const QString& text)
     return view->style()->sizeFromContents(QStyle::CT_HeaderSection, &option, QSize(), view).width();
 }
 
-QColor Utils::getFadedColor(const QColor& color)
+QColor Utils::getFadedColor(QColor const& color)
 {
     QColor fadedColor(color);
     fadedColor.setAlpha(128);

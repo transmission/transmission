@@ -46,7 +46,7 @@ static void data_free(gpointer gdata)
 static void startMovingNextTorrent(struct relocate_dialog_data* data)
 {
     char* str;
-    const int id = GPOINTER_TO_INT(data->torrent_ids->data);
+    int const id = GPOINTER_TO_INT(data->torrent_ids->data);
 
     tr_torrent* tor = gtr_core_find_torrent(data->core, id);
 
@@ -67,11 +67,11 @@ static void startMovingNextTorrent(struct relocate_dialog_data* data)
 static gboolean onTimer(gpointer gdata)
 {
     struct relocate_dialog_data* data = gdata;
-    const int done = data->done;
+    int const done = data->done;
 
     if (done == TR_LOC_ERROR)
     {
-        const int flags = GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT;
+        int const flags = GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT;
         GtkWidget* w = gtk_message_dialog_new(GTK_WINDOW(data->message_dialog), flags, GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, "%s",
                 _("Couldn't move torrent"));
         gtk_dialog_run(GTK_DIALOG(w));

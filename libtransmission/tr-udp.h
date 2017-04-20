@@ -31,4 +31,4 @@ void tr_udpInit(tr_session*);
 void tr_udpUninit(tr_session*);
 void tr_udpSetSocketBuffers(tr_session*);
 
-bool tau_handle_message(tr_session* session, const uint8_t* msg, size_t msglen);
+bool tau_handle_message(tr_session* session, uint8_t const* msg, size_t msglen);

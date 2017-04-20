@@ -32,29 +32,29 @@
 ****  UNITS
 ***/
 
-const int mem_K = 1024;
-const char* mem_K_str = N_("KiB");
-const char* mem_M_str = N_("MiB");
-const char* mem_G_str = N_("GiB");
-const char* mem_T_str = N_("TiB");
+int const mem_K = 1024;
+char const* mem_K_str = N_("KiB");
+char const* mem_M_str = N_("MiB");
+char const* mem_G_str = N_("GiB");
+char const* mem_T_str = N_("TiB");
 
-const int disk_K = 1000;
-const char* disk_K_str = N_("kB");
-const char* disk_M_str = N_("MB");
-const char* disk_G_str = N_("GB");
-const char* disk_T_str = N_("TB");
+int const disk_K = 1000;
+char const* disk_K_str = N_("kB");
+char const* disk_M_str = N_("MB");
+char const* disk_G_str = N_("GB");
+char const* disk_T_str = N_("TB");
 
-const int speed_K = 1000;
-const char* speed_K_str = N_("kB/s");
-const char* speed_M_str = N_("MB/s");
-const char* speed_G_str = N_("GB/s");
-const char* speed_T_str = N_("TB/s");
+int const speed_K = 1000;
+char const* speed_K_str = N_("kB/s");
+char const* speed_M_str = N_("MB/s");
+char const* speed_G_str = N_("GB/s");
+char const* speed_T_str = N_("TB/s");
 
 /***
 ****
 ***/
 
-const char* gtr_get_unicode_string(int i)
+char const* gtr_get_unicode_string(int i)
 {
     switch (i)
     {
@@ -161,15 +161,15 @@ char* tr_strltime(char* buf, int seconds, size_t buflen)
 }
 
 /* pattern-matching text; ie, legaltorrents.com */
-void gtr_get_host_from_url(char* buf, size_t buflen, const char* url)
+void gtr_get_host_from_url(char* buf, size_t buflen, char const* url)
 {
     char host[1024];
-    const char* pch;
+    char const* pch;
 
     if ((pch = strstr(url, "://")))
     {
-        const size_t hostlen = strcspn(pch + 3, ":/");
-        const size_t copylen = MIN(hostlen, sizeof(host) - 1);
+        size_t const hostlen = strcspn(pch + 3, ":/");
+        size_t const copylen = MIN(hostlen, sizeof(host) - 1);
         memcpy(host, pch + 3, copylen);
         host[copylen] = '\0';
     }
@@ -184,8 +184,8 @@ void gtr_get_host_from_url(char* buf, size_t buflen, const char* url)
     }
     else
     {
-        const char* first_dot = strchr(host, '.');
-        const char* last_dot = strrchr(host, '.');
+        char const* first_dot = strchr(host, '.');
+        char const* last_dot = strrchr(host, '.');
 
         if ((first_dot) && (last_dot) && (first_dot != last_dot))
         {
@@ -198,18 +198,18 @@ void gtr_get_host_from_url(char* buf, size_t buflen, const char* url)
     }
 }
 
-static gboolean gtr_is_supported_url(const char* str)
+static gboolean gtr_is_supported_url(char const* str)
 {
     return ((str != NULL) && (g_str_has_prefix(str, "ftp://") || g_str_has_prefix(str, "http://") ||
                 g_str_has_prefix(str, "https://")));
 }
 
-gboolean gtr_is_magnet_link(const char* str)
+gboolean gtr_is_magnet_link(char const* str)
 {
     return (str != NULL) && (g_str_has_prefix(str, "magnet:?"));
 }
 
-gboolean gtr_is_hex_hashcode(const char* str)
+gboolean gtr_is_hex_hashcode(char const* str)
 {
     int i;
 
@@ -244,7 +244,7 @@ static GtkWindow* getWindow(GtkWidget* w)
     return GTK_WINDOW(gtk_widget_get_ancestor(w, GTK_TYPE_WINDOW));
 }
 
-void gtr_add_torrent_error_dialog(GtkWidget* child, int err, tr_torrent* duplicate_torrent, const char* filename)
+void gtr_add_torrent_error_dialog(GtkWidget* child, int err, tr_torrent* duplicate_torrent, char const* filename)
 {
     char* secondary;
     GtkWidget* w;
@@ -323,7 +323,7 @@ gboolean on_tree_view_button_released(GtkWidget* view, GdkEventButton* event, gp
     return FALSE;
 }
 
-bool gtr_file_trash_or_remove(const char* filename, tr_error** error)
+bool gtr_file_trash_or_remove(char const* filename, tr_error** error)
 {
     GFile* file;
     gboolean trashed = FALSE;
@@ -365,20 +365,20 @@ bool gtr_file_trash_or_remove(const char* filename, tr_error** error)
     return result;
 }
 
-const char* gtr_get_help_uri(void)
+char const* gtr_get_help_uri(void)
 {
     static char* uri = NULL;
 
     if (!uri)
     {
-        const char* fmt = "https://transmissionbt.com/help/gtk/%d.%dx";
+        char const* fmt = "https://transmissionbt.com/help/gtk/%d.%dx";
         uri = g_strdup_printf(fmt, MAJOR_VERSION, MINOR_VERSION / 10);
     }
 
     return uri;
 }
 
-void gtr_open_file(const char* path)
+void gtr_open_file(char const* path)
 {
     GFile* file = g_file_new_for_path(path);
     gchar* uri = g_file_get_uri(file);
@@ -387,7 +387,7 @@ void gtr_open_file(const char* path)
     g_object_unref(file);
 }
 
-void gtr_open_uri(const char* uri)
+void gtr_open_uri(char const* uri)
 {
     if (uri)
     {
@@ -424,7 +424,7 @@ void gtr_combo_box_set_active_enum(GtkComboBox* combo_box, int value)
 {
     int i;
     int currentValue;
-    const int column = 0;
+    int const column = 0;
     GtkTreeIter iter;
     GtkTreeModel* model = gtk_combo_box_get_model(combo_box);
 
@@ -455,12 +455,12 @@ void gtr_combo_box_set_active_enum(GtkComboBox* combo_box, int value)
 }
 
 
-GtkWidget* gtr_combo_box_new_enum(const char* text_1, ...)
+GtkWidget* gtr_combo_box_new_enum(char const* text_1, ...)
 {
     GtkWidget* w;
     GtkCellRenderer* r;
     GtkListStore* store;
-    const char* text;
+    char const* text;
 
     store = gtk_list_store_new(2, G_TYPE_INT, G_TYPE_STRING);
 
@@ -474,9 +474,9 @@ GtkWidget* gtr_combo_box_new_enum(const char* text_1, ...)
 
         do
         {
-            const int val = va_arg(vl, int);
+            int const val = va_arg(vl, int);
             gtk_list_store_insert_with_values(store, NULL, INT_MAX, 0, val, 1, text, -1);
-            text = va_arg(vl, const char*);
+            text = va_arg(vl, char const*);
         }
         while (text != NULL);
 
@@ -576,7 +576,7 @@ void gtr_dialog_set_content(GtkDialog* dialog, GtkWidget* content)
 ****
 ***/
 
-void gtr_http_failure_dialog(GtkWidget* parent, const char* url, long response_code)
+void gtr_http_failure_dialog(GtkWidget* parent, char const* url, long response_code)
 {
     GtkWindow* window = getWindow(parent);
 
@@ -589,9 +589,9 @@ void gtr_http_failure_dialog(GtkWidget* parent, const char* url, long response_c
     gtk_widget_show(w);
 }
 
-void gtr_unrecognized_url_dialog(GtkWidget* parent, const char* url)
+void gtr_unrecognized_url_dialog(GtkWidget* parent, char const* url)
 {
-    const char* xt = "xt=urn:btih";
+    char const* xt = "xt=urn:btih";
 
     GtkWindow* window = getWindow(parent);
 
@@ -650,9 +650,9 @@ void gtr_paste_clipboard_url_into_entry(GtkWidget* e)
 ****
 ***/
 
-void gtr_label_set_text(GtkLabel* lb, const char* newstr)
+void gtr_label_set_text(GtkLabel* lb, char const* newstr)
 {
-    const char* oldstr = gtk_label_get_text(lb);
+    char const* oldstr = gtk_label_get_text(lb);
 
     if (g_strcmp0(oldstr, newstr) != 0)
     {
@@ -738,7 +738,7 @@ static gboolean on_freespace_timer(gpointer gdata)
     return G_SOURCE_CONTINUE;
 }
 
-GtkWidget* gtr_freespace_label_new(struct _TrCore* core, const char* dir)
+GtkWidget* gtr_freespace_label_new(struct _TrCore* core, char const* dir)
 {
     struct freespace_label_data* data;
 
@@ -757,7 +757,7 @@ GtkWidget* gtr_freespace_label_new(struct _TrCore* core, const char* dir)
     return GTK_WIDGET(data->label);
 }
 
-void gtr_freespace_label_set_dir(GtkWidget* label, const char* dir)
+void gtr_freespace_label_set_dir(GtkWidget* label, char const* dir)
 {
     struct freespace_label_data* data;
 

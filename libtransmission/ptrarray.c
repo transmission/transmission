@@ -14,7 +14,7 @@
 
 #define FLOOR 32
 
-const tr_ptrArray TR_PTR_ARRAY_INIT = TR_PTR_ARRAY_INIT_STATIC;
+tr_ptrArray const TR_PTR_ARRAY_INIT = TR_PTR_ARRAY_INIT_STATIC;
 
 void tr_ptrArrayDestruct(tr_ptrArray* p, PtrArrayForeachFunc func)
 {
@@ -103,7 +103,7 @@ void tr_ptrArrayErase(tr_ptrArray* t, int begin, int end)
 ***
 **/
 
-int tr_ptrArrayLowerBound(const tr_ptrArray* t, const void* ptr, int (* compare)(const void*, const void*), bool* exact_match)
+int tr_ptrArrayLowerBound(tr_ptrArray const* t, void const* ptr, int (* compare)(void const*, void const*), bool* exact_match)
 {
     int pos = -1;
     bool match = false;
@@ -119,12 +119,12 @@ int tr_ptrArrayLowerBound(const tr_ptrArray* t, const void* ptr, int (* compare)
 
         for (;;)
         {
-            const int half = (last - first) / 2;
-            const int c = compare(t->items[first + half], ptr);
+            int const half = (last - first) / 2;
+            int const c = compare(t->items[first + half], ptr);
 
             if (c < 0)
             {
-                const int new_first = first + half + 1;
+                int const new_first = first + half + 1;
 
                 if (new_first > last)
                 {
@@ -136,7 +136,7 @@ int tr_ptrArrayLowerBound(const tr_ptrArray* t, const void* ptr, int (* compare)
             }
             else if (c > 0)
             {
-                const int new_last = first + half - 1;
+                int const new_last = first + half - 1;
 
                 if (new_last < first)
                 {
@@ -170,7 +170,7 @@ int tr_ptrArrayLowerBound(const tr_ptrArray* t, const void* ptr, int (* compare)
 
 #else
 
-static void assertArrayIsSortedAndUnique(const tr_ptrArray* t, int (* compare)(const void*, const void*))
+static void assertArrayIsSortedAndUnique(tr_ptrArray const* t, int (* compare)(void const*, void const*))
 {
     int i;
 
@@ -180,7 +180,7 @@ static void assertArrayIsSortedAndUnique(const tr_ptrArray* t, int (* compare)(c
     }
 }
 
-static void assertIndexIsSortedAndUnique(const tr_ptrArray* t, int pos, int (* compare)(const void*, const void*))
+static void assertIndexIsSortedAndUnique(tr_ptrArray const* t, int pos, int (* compare)(void const*, void const*))
 {
     if (pos > 0)
     {
@@ -195,7 +195,7 @@ static void assertIndexIsSortedAndUnique(const tr_ptrArray* t, int pos, int (* c
 
 #endif
 
-int tr_ptrArrayInsertSorted(tr_ptrArray* t, void* ptr, int (* compare)(const void*, const void*))
+int tr_ptrArrayInsertSorted(tr_ptrArray* t, void* ptr, int (* compare)(void const*, void const*))
 {
     int pos;
     int ret;
@@ -208,14 +208,14 @@ int tr_ptrArrayInsertSorted(tr_ptrArray* t, void* ptr, int (* compare)(const voi
     return ret;
 }
 
-void* tr_ptrArrayFindSorted(tr_ptrArray* t, const void* ptr, int (* compare)(const void*, const void*))
+void* tr_ptrArrayFindSorted(tr_ptrArray* t, void const* ptr, int (* compare)(void const*, void const*))
 {
     bool match = false;
-    const int pos = tr_ptrArrayLowerBound(t, ptr, compare, &match);
+    int const pos = tr_ptrArrayLowerBound(t, ptr, compare, &match);
     return match ? t->items[pos] : NULL;
 }
 
-static void* tr_ptrArrayRemoveSortedValue(tr_ptrArray* t, const void* ptr, int (* compare)(const void*, const void*))
+static void* tr_ptrArrayRemoveSortedValue(tr_ptrArray* t, void const* ptr, int (* compare)(void const*, void const*))
 {
     int pos;
     bool match;
@@ -236,7 +236,7 @@ static void* tr_ptrArrayRemoveSortedValue(tr_ptrArray* t, const void* ptr, int (
     return ret;
 }
 
-void tr_ptrArrayRemoveSortedPointer(tr_ptrArray* t, const void* ptr, int (* compare)(const void*, const void*))
+void tr_ptrArrayRemoveSortedPointer(tr_ptrArray* t, void const* ptr, int (* compare)(void const*, void const*))
 {
 #ifdef NDEBUG
 
