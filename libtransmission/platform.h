@@ -21,10 +21,10 @@
  */
 
 /**
- * @brief invoked by tr_sessionInit () to set up the locations of the resume, torrent, and clutch directories.
- * @see tr_getResumeDir ()
- * @see tr_getTorrentDir ()
- * @see tr_getWebClientDir ()
+ * @brief invoked by tr_sessionInit() to set up the locations of the resume, torrent, and clutch directories.
+ * @see tr_getResumeDir()
+ * @see tr_getTorrentDir()
+ * @see tr_getWebClientDir()
  */
 void tr_setConfigDir(tr_session* session, char const* configDir);
 

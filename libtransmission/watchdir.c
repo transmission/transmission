@@ -7,7 +7,7 @@
  */
 
 #include <assert.h>
-#include <string.h> /* strcmp () */
+#include <string.h> /* strcmp() */
 
 #include <event2/event.h>
 #include <event2/util.h>

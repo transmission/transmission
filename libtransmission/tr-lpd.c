@@ -23,11 +23,11 @@ THE SOFTWARE.
 /* ansi */
 #include <errno.h>
 #include <stdio.h>
-#include <string.h> /* strlen (), strncpy (), strstr (), memset () */
+#include <string.h> /* strlen(), strncpy(), strstr(), memset() */
 
 /* posix */
 #include <signal.h> /* sig_atomic_t */
-#include <ctype.h> /* toupper () */
+#include <ctype.h> /* toupper() */
 
 #ifdef _WIN32
 #include <inttypes.h>
@@ -35,9 +35,9 @@ THE SOFTWARE.
 typedef uint16_t in_port_t; /* all missing */
 #else
 #include <sys/time.h>
-#include <unistd.h> /* close () */
+#include <unistd.h> /* close() */
 #include <sys/types.h>
-#include <sys/socket.h> /* socket (), bind () */
+#include <sys/socket.h> /* socket(), bind() */
 #include <netinet/in.h> /* sockaddr_in */
 #endif
 
@@ -49,9 +49,9 @@ typedef uint16_t in_port_t; /* all missing */
 #include "transmission.h"
 #include "log.h"
 #include "net.h"
-#include "peer-mgr.h" /* tr_peerMgrAddPex () */
+#include "peer-mgr.h" /* tr_peerMgrAddPex() */
 #include "session.h"
-#include "torrent.h" /* tr_torrentFindFromHash () */
+#include "torrent.h" /* tr_torrentFindFromHash() */
 #include "tr-lpd.h"
 #include "utils.h"
 #include "version.h"
@@ -511,7 +511,7 @@ bool tr_lpdSendAnnounce(tr_torrent const* t)
     {
         int const len = strlen(query);
 
-        /* destination address info has already been set up in tr_lpdInit (),
+        /* destination address info has already been set up in tr_lpdInit(),
          * so we refrain from preparing another sockaddr_in here */
         int res = sendto(lpd_socket2, (void const*)query, len, 0, (struct sockaddr const*)&lpd_mcastAddr, sizeof lpd_mcastAddr);
 
@@ -593,7 +593,7 @@ static int tr_lpdConsiderAnnounce(tr_pex* peer, char const* const msg)
             tr_peerMgrAddPex(tor, TR_PEER_FROM_LPD, peer, -1);
             tr_logAddTorDbg(tor, "Learned %d local peer from LPD (%s:%u)", 1, tr_address_to_string(&peer->addr), peerPort);
 
-            /* periodic reconnectPulse () deals with the rest... */
+            /* periodic reconnectPulse() deals with the rest... */
 
             return 1;
         }

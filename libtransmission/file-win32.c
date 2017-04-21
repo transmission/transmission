@@ -7,13 +7,13 @@
  */
 
 #include <assert.h>
-#include <ctype.h> /* isalpha () */
+#include <ctype.h> /* isalpha() */
 
-#include <shlobj.h> /* SHCreateDirectoryEx () */
+#include <shlobj.h> /* SHCreateDirectoryEx() */
 #include <winioctl.h> /* FSCTL_SET_SPARSE */
 
 #include "transmission.h"
-#include "crypto-utils.h" /* tr_rand_int () */
+#include "crypto-utils.h" /* tr_rand_int() */
 #include "error.h"
 #include "file.h"
 #include "utils.h"
@@ -156,7 +156,7 @@ static wchar_t* path_to_native_path_ex(char const* path, int extra_chars_after, 
     /* `-2` for UNC since we overwrite existing prefix slashes */
     int const extra_chars_before = is_relative ? 0 : (is_unc ? ARRAYSIZE(unc_prefix) - 2 : ARRAYSIZE(local_prefix));
 
-    /* TODO (?): assert (!is_relative); */
+    /* TODO (?): assert(!is_relative); */
 
     wchar_t* const wide_path = tr_win32_utf8_to_native_ex(path, -1, extra_chars_before, extra_chars_after, real_result_size);
 

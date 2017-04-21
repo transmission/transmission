@@ -20,9 +20,9 @@
 #endif
 
 #ifdef _WIN32
-#include <process.h> /* _beginthreadex (), _endthreadex () */
+#include <process.h> /* _beginthreadex(), _endthreadex() */
 #include <windows.h>
-#include <shlobj.h> /* SHGetKnownFolderPath (), FOLDERID_... */
+#include <shlobj.h> /* SHGetKnownFolderPath(), FOLDERID_... */
 #else
 #include <unistd.h> /* getuid() */
 #ifdef BUILD_MAC_CLIENT

@@ -8,7 +8,7 @@
 
 #include <assert.h>
 #include <stdio.h>
-#include <string.h> /* strlen () */
+#include <string.h> /* strlen() */
 
 #include "transmission.h"
 #include "blocklist.h"

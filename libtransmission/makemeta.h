@@ -33,8 +33,8 @@ tr_metainfo_builder_err;
 typedef struct tr_metainfo_builder
 {
     /**
-    ***  These are set by tr_makeMetaInfoBuilderCreate ()
-    ***  and cleaned up by tr_metaInfoBuilderFree ()
+    ***  These are set by tr_makeMetaInfoBuilderCreate()
+    ***  and cleaned up by tr_metaInfoBuilderFree()
     **/
 
     char* top;
@@ -46,9 +46,9 @@ typedef struct tr_metainfo_builder
     bool isFolder;
 
     /**
-    ***  These are set inside tr_makeMetaInfo ()
+    ***  These are set inside tr_makeMetaInfo()
     ***  by copying the arguments passed to it,
-    ***  and cleaned up by tr_metaInfoBuilderFree ()
+    ***  and cleaned up by tr_metaInfoBuilderFree()
     **/
 
     tr_tracker_info* trackers;
@@ -58,10 +58,10 @@ typedef struct tr_metainfo_builder
     bool isPrivate;
 
     /**
-    ***  These are set inside tr_makeMetaInfo () so the client
+    ***  These are set inside tr_makeMetaInfo() so the client
     ***  can poll periodically to see what the status is.
     ***  The client can also set abortFlag to nonzero to
-    ***  tell tr_makeMetaInfo () to abort and clean up after itself.
+    ***  tell tr_makeMetaInfo() to abort and clean up after itself.
     **/
 
     uint32_t pieceIndex;
@@ -105,7 +105,7 @@ void tr_metaInfoBuilderFree(tr_metainfo_builder*);
  *
  * It is the caller's responsibility to poll builder->isDone
  * from time to time!  When the worker thread sets that flag,
- * the caller must pass the builder to tr_metaInfoBuilderFree ().
+ * the caller must pass the builder to tr_metaInfoBuilderFree().
  *
  * @param outputFile if NULL, builder->top + ".torrent" will be used.
 

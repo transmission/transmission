@@ -6,9 +6,9 @@
  *
  */
 
-#include <stdio.h> /* fprintf () */
-#include <string.h> /* strcmp (), strchr (), memcmp () */
-#include <stdlib.h> /* qsort () */
+#include <stdio.h> /* fprintf() */
+#include <string.h> /* strcmp(), strchr(), memcmp() */
+#include <stdlib.h> /* qsort() */
 #include <time.h>
 
 #define CURL_DISABLE_TYPECHECK /* otherwise -Wunreachable-code goes insane */
@@ -19,7 +19,7 @@
 #include <libtransmission/transmission.h>
 #include <libtransmission/tr-getopt.h>
 #include <libtransmission/utils.h>
-#include <libtransmission/web.h> /* tr_webGetResponseStr () */
+#include <libtransmission/web.h> /* tr_webGetResponseStr() */
 #include <libtransmission/variant.h>
 #include <libtransmission/version.h>
 

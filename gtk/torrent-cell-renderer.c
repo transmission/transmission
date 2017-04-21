@@ -10,7 +10,7 @@
 #include <gtk/gtk.h>
 #include <glib/gi18n.h>
 #include <libtransmission/transmission.h>
-#include <libtransmission/utils.h> /* tr_truncd () */
+#include <libtransmission/utils.h> /* tr_truncd() */
 #include "hig.h"
 #include "icons.h"
 #include "torrent-cell-renderer.h"
@@ -235,6 +235,7 @@ static void getStatusString(GString* gstr, tr_torrent const* tor, tr_stat const*
         g_string_append_printf(gstr, _(fmt[st->error]), st->errorString);
     }
     else
+    {
         switch (st->activity)
         {
         case TR_STATUS_STOPPED:
@@ -258,8 +259,8 @@ static void getStatusString(GString* gstr, tr_torrent const* tor, tr_stat const*
                 else if (st->peersSendingToUs && st->webseedsSendingToUs)
                 {
                     /* Downloading from 2 of 3 peer (s) and 2 webseed (s) */
-                    g_string_append_printf(gstr, _("Downloading from %1$'d of %2$'d %3$s and %4$'d %5$s"), st->peersSendingToUs, st->peersConnected,
-                        ngettext("peer", "peers", st->peersConnected), st->webseedsSendingToUs,
+                    g_string_append_printf(gstr, _("Downloading from %1$'d of %2$'d %3$s and %4$'d %5$s"), st->peersSendingToUs,
+                        st->peersConnected, ngettext("peer", "peers", st->peersConnected), st->webseedsSendingToUs,
                         ngettext("web seed", "web seeds", st->webseedsSendingToUs));
                 }
                 else if (st->webseedsSendingToUs)
@@ -271,21 +272,23 @@ static void getStatusString(GString* gstr, tr_torrent const* tor, tr_stat const*
                 else
                 {
                     /* Downloading from 2 of 3 peer (s) */
-                    g_string_append_printf(gstr, _("Downloading from %1$'d of %2$'d %3$s"), st->peersSendingToUs, st->peersConnected,
-                        ngettext("peer", "peers", st->peersConnected));
+                    g_string_append_printf(gstr, _("Downloading from %1$'d of %2$'d %3$s"), st->peersSendingToUs,
+                        st->peersConnected, ngettext("peer", "peers", st->peersConnected));
                 }
 
                 break;
             }
 
         case TR_STATUS_SEED:
-            g_string_append_printf(gstr, ngettext("Seeding to %1$'d of %2$'d connected peer", "Seeding to %1$'d of %2$'d connected peers",
-                    st->peersConnected), st->peersGettingFromUs, st->peersConnected);
+            g_string_append_printf(gstr, ngettext("Seeding to %1$'d of %2$'d connected peer",
+                "Seeding to %1$'d of %2$'d connected peers", st->peersConnected), st->peersGettingFromUs, st->peersConnected);
             break;
         }
+    }
 
-    if ((st->activity != TR_STATUS_CHECK_WAIT) && (st->activity != TR_STATUS_CHECK) && (st->activity != TR_STATUS_DOWNLOAD_WAIT) &&
-        (st->activity != TR_STATUS_SEED_WAIT) && (st->activity != TR_STATUS_STOPPED))
+    if ((st->activity != TR_STATUS_CHECK_WAIT) && (st->activity != TR_STATUS_CHECK) &&
+        (st->activity != TR_STATUS_DOWNLOAD_WAIT) && (st->activity != TR_STATUS_SEED_WAIT) &&
+        (st->activity != TR_STATUS_STOPPED))
     {
         char buf[256];
         getShortTransferString(tor, st, uploadSpeed_KBps, downloadSpeed_KBps, buf, sizeof(buf));
@@ -385,7 +388,7 @@ static void get_size_compact(TorrentCellRenderer* cell, GtkWidget* widget, gint*
     /* get the idealized cell dimensions */
     g_object_set(p->icon_renderer, "pixbuf", icon, NULL);
     gtr_cell_renderer_get_preferred_size(p->icon_renderer, widget, NULL, &icon_size);
-    g_object_set(p->text_renderer, "text", name, "ellipsize", PANGO_ELLIPSIZE_NONE,  "scale", 1.0, NULL);
+    g_object_set(p->text_renderer, "text", name, "ellipsize", PANGO_ELLIPSIZE_NONE, "scale", 1.0, NULL);
     gtr_cell_renderer_get_preferred_size(p->text_renderer, widget, NULL, &name_size);
     g_object_set(p->text_renderer, "text", gstr_stat->str, "scale", SMALL_SCALE, NULL);
     gtr_cell_renderer_get_preferred_size(p->text_renderer, widget, NULL, &stat_size);
@@ -459,7 +462,8 @@ static void get_size_full(TorrentCellRenderer* cell, GtkWidget* widget, gint* wi
 
     if (height != NULL)
     {
-        *height = ypad * 2 + name_size.height + prog_size.height + GUI_PAD_SMALL + p->bar_height + GUI_PAD_SMALL + stat_size.height;
+        *height = ypad * 2 + name_size.height + prog_size.height + GUI_PAD_SMALL + p->bar_height + GUI_PAD_SMALL +
+            stat_size.height;
     }
 
     /* cleanup */
@@ -529,7 +533,6 @@ static void get_text_color(GtkWidget* w, tr_stat const* st, GtrColor* setme)
         gtk_style_context_get_color(gtk_widget_get_style_context(w), GTK_STATE_FLAG_NORMAL, setme);
     }
 }
-
 
 static double get_percent_done(tr_torrent const* tor, tr_stat const* st, bool* seed)
 {
@@ -727,8 +730,8 @@ static void render_full(TorrentCellRenderer* cell, GtrDrawable* window, GtkWidge
 
     g_object_set(p->icon_renderer, "pixbuf", icon, "sensitive", sensitive, NULL);
     gtr_cell_renderer_render(p->icon_renderer, window, widget, &icon_area, flags);
-    g_object_set(p->text_renderer, "text", name, "scale", 1.0, FOREGROUND_COLOR_KEY, &text_color, "ellipsize", PANGO_ELLIPSIZE_END,
-        "weight", PANGO_WEIGHT_BOLD, NULL);
+    g_object_set(p->text_renderer, "text", name, "scale", 1.0, FOREGROUND_COLOR_KEY, &text_color, "ellipsize",
+        PANGO_ELLIPSIZE_END, "weight", PANGO_WEIGHT_BOLD, NULL);
     gtr_cell_renderer_render(p->text_renderer, window, widget, &name_area, flags);
     g_object_set(p->text_renderer, "text", gstr_prog->str, "scale", SMALL_SCALE, "weight", PANGO_WEIGHT_NORMAL, NULL);
     gtr_cell_renderer_render(p->text_renderer, window, widget, &prog_area, flags);
@@ -903,7 +906,6 @@ static void torrent_cell_renderer_init(TorrentCellRenderer* self)
 
     p->bar_height = DEFAULT_BAR_HEIGHT;
 }
-
 
 GtkCellRenderer* torrent_cell_renderer_new(void)
 {

@@ -6,7 +6,7 @@
  *
  */
 
-#include <process.h> /* _beginthreadex () */
+#include <process.h> /* _beginthreadex() */
 
 #include <windows.h>
 

@@ -59,12 +59,12 @@ static inline void* tr_ptrArrayNth(tr_ptrArray* array, int i)
 
 /** @brief Remove the last item from the array and return it
     @return the pointer that's been removed from the array
-    @see tr_ptrArrayBack () */
+    @see tr_ptrArrayBack() */
 void* tr_ptrArrayPop(tr_ptrArray* array);
 
 /** @brief Return the last item in a tr_ptrArray
     @return the last item in a tr_ptrArray, or NULL if the array is empty
-    @see tr_ptrArrayPop () */
+    @see tr_ptrArrayPop() */
 static inline void* tr_ptrArrayBack(tr_ptrArray* array)
 {
     return array->n_items > 0 ? tr_ptrArrayNth(array, array->n_items - 1) : NULL;

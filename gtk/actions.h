@@ -19,8 +19,8 @@ void gtr_actions_init(GtkUIManager* ui_manager, gpointer callback_user_data);
 void gtr_actions_set_core(TrCore* core);
 void gtr_actions_handler(char const* action_name, gpointer user_data);
 
-void  gtr_action_activate(char const* action_name);
-void  gtr_action_set_sensitive(char const* action_name, gboolean is_sensitive);
-void  gtr_action_set_toggled(char const* action_name, gboolean is_toggled);
-void  gtr_action_set_important(char const* action_name, gboolean is_important);
+void gtr_action_activate(char const* action_name);
+void gtr_action_set_sensitive(char const* action_name, gboolean is_sensitive);
+void gtr_action_set_toggled(char const* action_name, gboolean is_toggled);
+void gtr_action_set_important(char const* action_name, gboolean is_important);
 GtkWidget* gtr_action_get_widget(char const* path);

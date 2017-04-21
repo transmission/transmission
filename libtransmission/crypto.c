@@ -7,7 +7,7 @@
  */
 
 #include <assert.h>
-#include <string.h> /* memcpy (), memmove (), memset () */
+#include <string.h> /* memcpy(), memmove(), memset() */
 
 #include "transmission.h"
 #include "crypto.h"

@@ -6,7 +6,7 @@
  *
  */
 
-#include <stdlib.h> /* qsort () */
+#include <stdlib.h> /* qsort() */
 
 #include <event2/buffer.h>
 

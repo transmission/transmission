@@ -25,8 +25,8 @@
 /* ansi */
 #include <errno.h>
 #include <stdio.h>
-#include <string.h> /* memcpy (), memset (), memchr (), strlen () */
-#include <stdlib.h> /* atoi () */
+#include <string.h> /* memcpy(), memset(), memchr(), strlen() */
+#include <stdlib.h> /* atoi() */
 
 /* posix */
 #include <signal.h> /* sig_atomic_t */
@@ -39,7 +39,7 @@
 #else
 #include <sys/time.h>
 #include <sys/types.h>
-#include <sys/socket.h> /* socket (), bind () */
+#include <sys/socket.h> /* socket(), bind() */
 #include <netdb.h>
 #include <netinet/in.h> /* sockaddr_in */
 #endif
@@ -54,12 +54,12 @@
 #include "file.h"
 #include "log.h"
 #include "net.h"
-#include "peer-mgr.h" /* tr_peerMgrCompactToPex () */
-#include "platform.h" /* tr_threadNew () */
+#include "peer-mgr.h" /* tr_peerMgrCompactToPex() */
+#include "platform.h" /* tr_threadNew() */
 #include "session.h"
-#include "torrent.h" /* tr_torrentFindFromHash () */
+#include "torrent.h" /* tr_torrentFindFromHash() */
 #include "tr-dht.h"
-#include "trevent.h" /* tr_runInEventThread () */
+#include "trevent.h" /* tr_runInEventThread() */
 #include "utils.h"
 #include "variant.h"
 

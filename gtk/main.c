@@ -24,7 +24,7 @@
 #include <signal.h>
 #include <string.h>
 #include <stdio.h>
-#include <stdlib.h> /* exit () */
+#include <stdlib.h> /* exit() */
 #include <time.h>
 
 #include <glib/gi18n.h>
@@ -623,7 +623,7 @@ int main(int argc, char** argv)
 
     /* default settings */
     memset(&cbdata, 0, sizeof(struct cbdata));
-    cbdata.config_dir = (char*) tr_getDefaultConfigDir(MY_CONFIG_NAME);
+    cbdata.config_dir = (char*)tr_getDefaultConfigDir(MY_CONFIG_NAME);
 
     /* init i18n */
     setlocale(LC_ALL, "");
@@ -676,7 +676,8 @@ int main(int argc, char** argv)
 
     /* init the application for the specified config dir */
     stat(cbdata.config_dir, &sb);
-    application_id = g_strdup_printf("com.transmissionbt.transmission_%lu_%lu", (unsigned long)sb.st_dev, (unsigned long)sb.st_ino);
+    application_id = g_strdup_printf("com.transmissionbt.transmission_%lu_%lu", (unsigned long)sb.st_dev,
+        (unsigned long)sb.st_ino);
     app = gtk_application_new(application_id, G_APPLICATION_HANDLES_OPEN);
     g_signal_connect(app, "open", G_CALLBACK(on_open), &cbdata);
     g_signal_connect(app, "startup", G_CALLBACK(on_startup), &cbdata);
@@ -742,8 +743,9 @@ static void app_setup(GtkWindow* wind, struct cbdata* cbdata)
 
     if (!gtr_pref_flag_get(TR_KEY_user_has_given_informed_consent))
     {
-        GtkWidget* w = gtk_message_dialog_new(GTK_WINDOW(wind), GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_OTHER, GTK_BUTTONS_NONE,
-                "%s", _("Transmission is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility."));
+        GtkWidget* w = gtk_message_dialog_new(GTK_WINDOW(wind), GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_OTHER,
+            GTK_BUTTONS_NONE, "%s", _("Transmission is a file sharing program. When you run a torrent, its data will be "
+            "made available to others by means of upload. Any content you share is your sole responsibility."));
         gtk_dialog_add_button(GTK_DIALOG(w), GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT);
         gtk_dialog_add_button(GTK_DIALOG(w), _("I _Agree"), GTK_RESPONSE_ACCEPT);
         gtk_dialog_set_default_response(GTK_DIALOG(w), GTK_RESPONSE_ACCEPT);
@@ -938,7 +940,7 @@ static void exit_now_cb(GtkWidget* w UNUSED, gpointer data UNUSED)
 
 static void on_app_exit(gpointer vdata)
 {
-    GtkWidget* r, *p, *b, *w, *c;
+    GtkWidget* r, * p, * b, * w, * c;
     struct cbdata* cbdata = vdata;
     struct session_close_struct* session_close_data;
 
@@ -1038,13 +1040,13 @@ static void flush_torrent_errors(struct cbdata* cbdata)
     if (cbdata->error_list)
     {
         show_torrent_errors(cbdata->wind, ngettext("Couldn't add corrupt torrent", "Couldn't add corrupt torrents",
-                g_slist_length(cbdata->error_list)), &cbdata->error_list);
+            g_slist_length(cbdata->error_list)), &cbdata->error_list);
     }
 
     if (cbdata->duplicates_list)
     {
         show_torrent_errors(cbdata->wind, ngettext("Couldn't add duplicate torrent", "Couldn't add duplicate torrents",
-                g_slist_length(cbdata->duplicates_list)), &cbdata->duplicates_list);
+            g_slist_length(cbdata->duplicates_list)), &cbdata->duplicates_list);
     }
 }
 
@@ -1087,7 +1089,7 @@ static void on_add_torrent(TrCore* core, tr_ctor* ctor, gpointer gdata)
     struct cbdata* cbdata = gdata;
     GtkWidget* w = gtr_torrent_options_dialog_new(cbdata->wind, core, ctor);
 
-    g_signal_connect(w, "focus-in-event", G_CALLBACK(on_main_window_focus_in),  cbdata);
+    g_signal_connect(w, "focus-in-event", G_CALLBACK(on_main_window_focus_in), cbdata);
 
     if (cbdata->wind)
     {
@@ -1389,7 +1391,7 @@ static void append_id_to_benc_list(GtkTreeModel* m, GtkTreePath* path UNUSED, Gt
 
 static gboolean call_rpc_for_selected_torrents(struct cbdata* data, char const* method)
 {
-    tr_variant top, *args, *ids;
+    tr_variant top, * args, * ids;
     gboolean invoked = FALSE;
     GtkTreeSelection* s = data->sel;
     tr_session* session = gtr_core_session(data->core);

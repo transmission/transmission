@@ -6,7 +6,6 @@
  *
  */
 
-
 #pragma once
 
 #include "tr-core.h"

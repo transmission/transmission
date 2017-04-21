@@ -7,8 +7,8 @@
  */
 
 #include <limits.h> /* USHRT_MAX */
-#include <stdio.h> /* fprintf () */
-#include <string.h> /* strchr (), memcmp (), memcpy () */
+#include <stdio.h> /* fprintf() */
+#include <string.h> /* strchr(), memcmp(), memcpy() */
 
 #include <event2/buffer.h>
 #include <event2/http.h> /* for HTTP_OK */
@@ -18,13 +18,13 @@
 #include "transmission.h"
 #include "announcer-common.h"
 #include "log.h"
-#include "net.h" /* tr_globalIPv6 () */
+#include "net.h" /* tr_globalIPv6() */
 #include "peer-mgr.h" /* pex */
 #include "torrent.h"
-#include "trevent.h" /* tr_runInEventThread () */
+#include "trevent.h" /* tr_runInEventThread() */
 #include "utils.h"
 #include "variant.h"
-#include "web.h" /* tr_http_escape () */
+#include "web.h" /* tr_http_escape() */
 
 #define dbgmsg(name, ...) \
     do \

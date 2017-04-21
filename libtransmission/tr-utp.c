@@ -31,7 +31,7 @@ THE SOFTWARE.
 #include "log.h"
 #include "net.h"
 #include "session.h"
-#include "crypto-utils.h" /* tr_rand_int_weak () */
+#include "crypto-utils.h" /* tr_rand_int_weak() */
 #include "peer-mgr.h"
 #include "tr-utp.h"
 #include "utils.h"
@@ -52,22 +52,22 @@ THE SOFTWARE.
 
 void UTP_Close(struct UTPSocket* socket)
 {
-    tr_logAddNamedError(MY_NAME, "UTP_Close (%p) was called.", socket);
-    dbgmsg("UTP_Close (%p) was called.", socket);
+    tr_logAddNamedError(MY_NAME, "UTP_Close(%p) was called.", socket);
+    dbgmsg("UTP_Close(%p) was called.", socket);
     assert(0); /* FIXME: this is too much for the long term, but probably needed in the short term */
 }
 
 void UTP_RBDrained(struct UTPSocket* socket)
 {
-    tr_logAddNamedError(MY_NAME, "UTP_RBDrained (%p) was called.", socket);
-    dbgmsg("UTP_RBDrained (%p) was called.", socket);
+    tr_logAddNamedError(MY_NAME, "UTP_RBDrained(%p) was called.", socket);
+    dbgmsg("UTP_RBDrained(%p) was called.", socket);
     assert(0); /* FIXME: this is too much for the long term, but probably needed in the short term */
 }
 
 bool UTP_Write(struct UTPSocket* socket, size_t count)
 {
-    tr_logAddNamedError(MY_NAME, "UTP_RBDrained (%p, %zu) was called.", socket, count);
-    dbgmsg("UTP_RBDrained (%p, %zu) was called.", socket, count);
+    tr_logAddNamedError(MY_NAME, "UTP_RBDrained(%p, %zu) was called.", socket, count);
+    dbgmsg("UTP_RBDrained(%p, %zu) was called.", socket, count);
     assert(0); /* FIXME: this is too much for the long term, but probably needed in the short term */
     return false;
 }

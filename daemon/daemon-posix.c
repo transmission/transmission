@@ -10,9 +10,9 @@
 #include <errno.h>
 #include <pthread.h>
 #include <signal.h>
-#include <stdlib.h> /* abort (), daemon (), exit () */
-#include <fcntl.h> /* open () */
-#include <unistd.h> /* fork (), setsid (), chdir (), dup2 (), close (), pipe () */
+#include <stdlib.h> /* abort(), daemon(), exit() */
+#include <fcntl.h> /* open() */
+#include <unistd.h> /* fork(), setsid(), chdir(), dup2(), close(), pipe() */
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/error.h>
@@ -162,7 +162,7 @@ bool dtr_daemon(dtr_callbacks const* cb, void* cb_arg, bool foreground, int* exi
 
 #else
 
-        /* this is loosely based off of glibc's daemon () implementation
+        /* this is loosely based off of glibc's daemon() implementation
          * http://sourceware.org/git/?p=glibc.git;a=blob_plain;f=misc/daemon.c */
 
         switch (fork())

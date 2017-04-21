@@ -36,7 +36,6 @@ struct prefs_dialog_data
     GtkWidget* port_spin;
 };
 
-
 /**
 ***
 **/
@@ -223,7 +222,7 @@ static GtkWidget* new_path_chooser_button(tr_quark const key, gpointer core)
 
 static GtkWidget* new_file_chooser_button(tr_quark const key, gpointer core)
 {
-    GtkWidget*   w = gtk_file_chooser_button_new(NULL, GTK_FILE_CHOOSER_ACTION_OPEN);
+    GtkWidget* w = gtk_file_chooser_button_new(NULL, GTK_FILE_CHOOSER_ACTION_OPEN);
     char const* path = gtr_pref_string_get(key);
     g_object_set_data(G_OBJECT(w), PREF_KEY, GINT_TO_POINTER(key));
 
@@ -458,8 +457,8 @@ static void onBlocklistUpdate(GtkButton* w, gpointer gdata)
 {
     GtkWidget* d;
     struct blocklist_data* data = gdata;
-    d = gtk_message_dialog_new(GTK_WINDOW(gtk_widget_get_toplevel(GTK_WIDGET(w))), GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_INFO,
-            GTK_BUTTONS_CLOSE, "%s", _("Update Blocklist"));
+    d = gtk_message_dialog_new(GTK_WINDOW(gtk_widget_get_toplevel(GTK_WIDGET(w))), GTK_DIALOG_DESTROY_WITH_PARENT,
+        GTK_MESSAGE_INFO, GTK_BUTTONS_CLOSE, "%s", _("Update Blocklist"));
     gtk_widget_set_sensitive(data->updateBlocklistButton, FALSE);
     gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(d), "%s", _("Getting new blocklist…"));
     data->updateBlocklistDialog = d;
@@ -486,8 +485,8 @@ static void onIntComboChanged(GtkComboBox* combo_box, gpointer core)
 
 static GtkWidget* new_encryption_combo(GObject* core, tr_quark const key)
 {
-    GtkWidget* w = gtr_combo_box_new_enum(_("Allow encryption"),   TR_CLEAR_PREFERRED, _("Prefer encryption"),
-            TR_ENCRYPTION_PREFERRED, _("Require encryption"), TR_ENCRYPTION_REQUIRED, NULL);
+    GtkWidget* w = gtr_combo_box_new_enum(_("Allow encryption"), TR_CLEAR_PREFERRED, _("Prefer encryption"),
+        TR_ENCRYPTION_PREFERRED, _("Require encryption"), TR_ENCRYPTION_REQUIRED, NULL);
     gtr_combo_box_set_active_enum(GTK_COMBO_BOX(w), gtr_pref_int_get(key));
     g_object_set_data(G_OBJECT(w), PREF_KEY, GINT_TO_POINTER(key));
     g_signal_connect(w, "changed", G_CALLBACK(onIntComboChanged), core);
@@ -569,8 +568,8 @@ static GtkTreeModel* whitelist_tree_model_new(char const* whitelist)
     int i;
     char** rules;
     GtkListStore* store = gtk_list_store_new(N_COLS,
-            G_TYPE_STRING,
-            G_TYPE_STRING);
+        G_TYPE_STRING,
+        G_TYPE_STRING);
 
     rules = g_strsplit(whitelist, ",", 0);
 
@@ -625,7 +624,7 @@ static void refreshWhitelist(struct remote_page* page)
         while (gtk_tree_model_iter_next(model, &iter));
     }
 
-    g_string_truncate(gstr, gstr->len - 1);  /* remove the trailing comma */
+    g_string_truncate(gstr, gstr->len - 1); /* remove the trailing comma */
 
     gtr_core_set_pref(page->core, TR_KEY_rpc_whitelist, gstr->str);
 
@@ -655,7 +654,7 @@ static void onAddWhitelistClicked(GtkButton* b UNUSED, gpointer gpage)
     struct remote_page* page = gpage;
 
     gtk_list_store_append(page->store, &iter);
-    gtk_list_store_set(page->store, &iter, COL_ADDRESS,  "0.0.0.0", -1);
+    gtk_list_store_set(page->store, &iter, COL_ADDRESS, "0.0.0.0", -1);
 
     path = gtk_tree_model_get_path(GTK_TREE_MODEL(page->store), &iter);
     gtk_tree_view_set_cursor(page->view, path, gtk_tree_view_get_column(page->view, COL_ADDRESS), TRUE);
@@ -939,17 +938,17 @@ static GtkWidget* new_time_combo(GObject* core, tr_quark const key)
 static GtkWidget* new_week_combo(GObject* core, tr_quark const key)
 {
     GtkWidget* w = gtr_combo_box_new_enum(
-            _("Every Day"), TR_SCHED_ALL,
-            _("Weekdays"), TR_SCHED_WEEKDAY,
-            _("Weekends"), TR_SCHED_WEEKEND,
-            _("Sunday"), TR_SCHED_SUN,
-            _("Monday"), TR_SCHED_MON,
-            _("Tuesday"), TR_SCHED_TUES,
-            _("Wednesday"), TR_SCHED_WED,
-            _("Thursday"), TR_SCHED_THURS,
-            _("Friday"), TR_SCHED_FRI,
-            _("Saturday"), TR_SCHED_SAT,
-            NULL);
+        _("Every Day"), TR_SCHED_ALL,
+        _("Weekdays"), TR_SCHED_WEEKDAY,
+        _("Weekends"), TR_SCHED_WEEKEND,
+        _("Sunday"), TR_SCHED_SUN,
+        _("Monday"), TR_SCHED_MON,
+        _("Tuesday"), TR_SCHED_TUES,
+        _("Wednesday"), TR_SCHED_WED,
+        _("Thursday"), TR_SCHED_THURS,
+        _("Friday"), TR_SCHED_FRI,
+        _("Saturday"), TR_SCHED_SAT,
+        NULL);
     gtr_combo_box_set_active_enum(GTK_COMBO_BOX(w), gtr_pref_int_get(key));
     g_object_set_data(G_OBJECT(w), PREF_KEY, GINT_TO_POINTER(key));
     g_signal_connect(w, "changed", G_CALLBACK(onIntComboChanged), core);
@@ -1094,11 +1093,11 @@ static void onPortTested(TrCore* core UNUSED, gboolean isOpen, gpointer vdata)
     struct network_page_data* data = vdata;
     char const* markup = isOpen ? _("Port is <b>open</b>") : _("Port is <b>closed</b>");
 
-    //gdk_threads_enter ();
+    // gdk_threads_enter();
     gtk_label_set_markup(GTK_LABEL(data->portLabel), markup);
     gtk_widget_set_sensitive(data->portButton, TRUE);
     gtk_widget_set_sensitive(data->portSpin, TRUE);
-    //gdk_threads_leave ();
+    // gdk_threads_leave();
 }
 
 static void onPortTest(GtkButton* button UNUSED, gpointer vdata)
@@ -1248,7 +1247,7 @@ GtkWidget* gtr_prefs_dialog_new(GtkWindow* parent, GObject* core)
     data->core_prefs_tag = g_signal_connect(TR_CORE(core), "prefs-changed", G_CALLBACK(on_core_prefs_changed), data);
 
     d = gtk_dialog_new_with_buttons(_("Transmission Preferences"), parent, GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_HELP,
-            GTK_RESPONSE_HELP, GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE, NULL);
+        GTK_RESPONSE_HELP, GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE, NULL);
     g_object_weak_ref(G_OBJECT(d), on_prefs_dialog_destroyed, data);
     gtk_window_set_role(GTK_WINDOW(d), "transmission-preferences-dialog");
     gtk_container_set_border_width(GTK_CONTAINER(d), GUI_PAD);

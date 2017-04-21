@@ -12,14 +12,14 @@
 #include <string.h>
 
 #include <libtransmission/transmission.h>
-#include <libtransmission/file.h> /* tr_sys_path_is_same () */
+#include <libtransmission/file.h> /* tr_sys_path_is_same() */
 
 #include "conf.h"
 #include "file-list.h"
 #include "hig.h"
 #include "open-dialog.h"
 #include "tr-prefs.h"
-#include "util.h" /* gtr_priority_combo_get_value () */
+#include "util.h" /* gtr_priority_combo_get_value() */
 
 /****
 *****
@@ -68,7 +68,7 @@ static void save_recent_destination(TrCore* core, char const* dir)
     list = g_slist_prepend(list, (void*)dir);
 
     /* make local copies of the strings that aren't
-     * invalidated by gtr_pref_string_set () */
+     * invalidated by gtr_pref_string_set() */
     for (l = list; l; l = l->next)
     {
         l->data = g_strdup(l->data);
@@ -284,7 +284,7 @@ GtkWidget* gtr_torrent_options_dialog_new(GtkWindow* parent, TrCore* core, tr_ct
 
     /* make the dialog */
     d = gtk_dialog_new_with_buttons(_("Torrent Options"), parent, GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_CANCEL,
-            GTK_RESPONSE_CANCEL, GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT, NULL);
+        GTK_RESPONSE_CANCEL, GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT, NULL);
     gtk_dialog_set_default_response(GTK_DIALOG(d), GTK_RESPONSE_ACCEPT);
     gtk_dialog_set_alternative_button_order(GTK_DIALOG(d), GTK_RESPONSE_ACCEPT, GTK_RESPONSE_CANCEL, -1);
 
@@ -456,7 +456,7 @@ GtkWidget* gtr_torrent_open_from_file_dialog_new(GtkWindow* parent, TrCore* core
     char const* folder;
 
     w = gtk_file_chooser_dialog_new(_("Open a Torrent"), parent, GTK_FILE_CHOOSER_ACTION_OPEN, GTK_STOCK_CANCEL,
-            GTK_RESPONSE_CANCEL, GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT, NULL);
+        GTK_RESPONSE_CANCEL, GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT, NULL);
     gtk_dialog_set_alternative_button_order(GTK_DIALOG(w), GTK_RESPONSE_ACCEPT, GTK_RESPONSE_CANCEL, -1);
     gtk_file_chooser_set_select_multiple(GTK_FILE_CHOOSER(w), TRUE);
     addTorrentFilters(GTK_FILE_CHOOSER(w));
@@ -519,8 +519,8 @@ GtkWidget* gtr_torrent_open_from_url_dialog_new(GtkWindow* parent, TrCore* core)
     GtkWidget* t;
     GtkWidget* w;
 
-    w = gtk_dialog_new_with_buttons(_("Open URL"), parent, GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-            GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT, NULL);
+    w = gtk_dialog_new_with_buttons(_("Open URL"), parent, GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_CANCEL,
+        GTK_RESPONSE_CANCEL, GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT, NULL);
     gtk_dialog_set_alternative_button_order(GTK_DIALOG(w), GTK_RESPONSE_ACCEPT, GTK_RESPONSE_CANCEL, -1);
     g_signal_connect(w, "response", G_CALLBACK(onOpenURLResponse), core);
 

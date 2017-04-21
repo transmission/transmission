@@ -16,7 +16,7 @@
 
 #include "transmission.h"
 #include "ptrarray.h"
-#include "utils.h" /* tr_new (), tr_free () */
+#include "utils.h" /* tr_new(), tr_free() */
 
 struct tr_peerIo;
 
@@ -89,16 +89,16 @@ struct tr_band
  *
  * CONSTRAINING
  *
- *   Call tr_bandwidthAllocate () periodically. tr_bandwidth knows its current
+ *   Call tr_bandwidthAllocate() periodically. tr_bandwidth knows its current
  *   speed and will decide how many bytes to make available over the
  *   user-specified period to reach the user-specified desired speed.
  *   If appropriate, it notifies its peer-ios that new bandwidth is available.
  *
- *   tr_bandwidthAllocate () operates on the tr_bandwidth subtree, so usually
+ *   tr_bandwidthAllocate() operates on the tr_bandwidth subtree, so usually
  *   you'll only need to invoke it for the top-level tr_session bandwidth.
  *
  *   The peer-ios all have a pointer to their associated tr_bandwidth object,
- *   and call tr_bandwidthClamp () before performing I/O to see how much
+ *   and call tr_bandwidthClamp() before performing I/O to see how much
  *   bandwidth they can safely use.
  */
 typedef struct tr_bandwidth

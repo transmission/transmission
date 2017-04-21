@@ -14,7 +14,7 @@
 
 #include "bandwidth.h" /* tr_bandwidth */
 #include "completion.h" /* tr_completion */
-#include "session.h" /* tr_sessionLock (), tr_sessionUnlock () */
+#include "session.h" /* tr_sessionLock(), tr_sessionUnlock() */
 #include "utils.h" /* TR_GNUC_PRINTF */
 
 struct tr_torrent_tiers;
@@ -93,7 +93,7 @@ tr_verify_state;
 
 void tr_torrentSetVerifyState(tr_torrent* tor, tr_verify_state state);
 
-tr_torrent_activity tr_torrentGetActivity(tr_torrent const* tor); 
+tr_torrent_activity tr_torrentGetActivity(tr_torrent const* tor);
 
 struct tr_incomplete_metadata;
 
@@ -345,9 +345,9 @@ uint32_t tr_getBlockSize(uint32_t pieceSize);
 void tr_torrentGotBlock(tr_torrent* tor, tr_block_index_t blockIndex);
 
 /**
- * @brief Like tr_torrentFindFile (), but splits the filename into base and subpath;
+ * @brief Like tr_torrentFindFile(), but splits the filename into base and subpath;
  *
- * If the file is found, "tr_buildPath (base, subpath, NULL)"
+ * If the file is found, "tr_buildPath(base, subpath, NULL)"
  * will generate the complete filename.
  *
  * @return true if the file is found, false otherwise.

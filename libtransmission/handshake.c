@@ -8,7 +8,7 @@
 
 #include <assert.h>
 #include <errno.h>
-#include <string.h> /* strcmp (), strlen (), strncmp () */
+#include <string.h> /* strcmp(), strlen(), strncmp() */
 
 #include <event2/buffer.h>
 #include <event2/event.h>
@@ -437,18 +437,18 @@ static ReadState readYb(tr_handshake* handshake, struct evbuffer* inbuf)
         return tr_handshakeDone(handshake, false);
     }
 
-    /* now send these: HASH ('req1', S), HASH ('req2', SKEY) xor HASH ('req3', S),
-     * ENCRYPT (VC, crypto_provide, len (PadC), PadC, len (IA)), ENCRYPT (IA) */
+    /* now send these: HASH('req1', S), HASH('req2', SKEY) xor HASH('req3', S),
+     * ENCRYPT(VC, crypto_provide, len(PadC), PadC, len(IA)), ENCRYPT(IA) */
     outbuf = evbuffer_new();
 
-    /* HASH ('req1', S) */
+    /* HASH('req1', S) */
     {
         uint8_t req1[SHA_DIGEST_LENGTH];
         computeRequestHash(handshake, "req1", req1);
         evbuffer_add(outbuf, req1, SHA_DIGEST_LENGTH);
     }
 
-    /* HASH ('req2', SKEY) xor HASH ('req3', S) */
+    /* HASH('req2', SKEY) xor HASH('req3', S) */
     {
         int i;
         uint8_t req2[SHA_DIGEST_LENGTH];
@@ -466,7 +466,7 @@ static ReadState readYb(tr_handshake* handshake, struct evbuffer* inbuf)
         evbuffer_add(outbuf, buf, SHA_DIGEST_LENGTH);
     }
 
-    /* ENCRYPT (VC, crypto_provide, len (PadC), PadC
+    /* ENCRYPT(VC, crypto_provide, len(PadC), PadC
      * PadC is reserved for future extensions to the handshake...
      * standard practice at this time is for it to be zero-length */
     {
@@ -481,7 +481,7 @@ static ReadState readYb(tr_handshake* handshake, struct evbuffer* inbuf)
         evbuffer_add_uint16(outbuf, 0);
     }
 
-    /* ENCRYPT len (IA)), ENCRYPT (IA) */
+    /* ENCRYPT len(IA)), ENCRYPT(IA) */
     {
         uint8_t msg[HANDSHAKE_SIZE];
 
@@ -788,7 +788,7 @@ static ReadState readYa(tr_handshake* handshake, struct evbuffer* inbuf)
 
 static ReadState readPadA(tr_handshake* handshake, struct evbuffer* inbuf)
 {
-    /* resynchronizing on HASH ('req1',S) */
+    /* resynchronizing on HASH('req1',S) */
     struct evbuffer_ptr ptr = evbuffer_search(inbuf, (char const*)handshake->myReq1, SHA_DIGEST_LENGTH, NULL);
 
     if (ptr.pos != -1) /* match */
@@ -813,7 +813,7 @@ static ReadState readPadA(tr_handshake* handshake, struct evbuffer* inbuf)
 
 static ReadState readCryptoProvide(tr_handshake* handshake, struct evbuffer* inbuf)
 {
-    /* HASH ('req2', SKEY) xor HASH ('req3', S), ENCRYPT (VC, crypto_provide, len (PadC)) */
+    /* HASH('req2', SKEY) xor HASH('req3', S), ENCRYPT(VC, crypto_provide, len(PadC)) */
 
     int i;
     uint8_t vc_in[VC_LENGTH];
@@ -823,8 +823,8 @@ static ReadState readCryptoProvide(tr_handshake* handshake, struct evbuffer* inb
     uint16_t padc_len = 0;
     uint32_t crypto_provide = 0;
     tr_torrent* tor;
-    size_t const needlen = SHA_DIGEST_LENGTH + /* HASH ('req1',s) */
-        SHA_DIGEST_LENGTH + /* HASH ('req2', SKEY) xor HASH ('req3', S) */
+    size_t const needlen = SHA_DIGEST_LENGTH + /* HASH('req1',s) */
+        SHA_DIGEST_LENGTH + /* HASH('req2', SKEY) xor HASH('req3', S) */
         VC_LENGTH + sizeof(crypto_provide) + sizeof(padc_len);
 
     if (evbuffer_get_length(inbuf) < needlen)
@@ -832,10 +832,10 @@ static ReadState readCryptoProvide(tr_handshake* handshake, struct evbuffer* inb
         return READ_LATER;
     }
 
-    /* TODO: confirm they sent HASH ('req1',S) here? */
+    /* TODO: confirm they sent HASH('req1',S) here? */
     evbuffer_drain(inbuf, SHA_DIGEST_LENGTH);
 
-    /* This next piece is HASH ('req2', SKEY) xor HASH ('req3', S) ...
+    /* This next piece is HASH('req2', SKEY) xor HASH('req3', S) ...
      * we can get the first half of that (the obufscatedTorrentHash)
      * by building the latter and xor'ing it with what the peer sent us */
     dbgmsg(handshake, "reading obfuscated torrent hash...");
@@ -866,7 +866,7 @@ static ReadState readCryptoProvide(tr_handshake* handshake, struct evbuffer* inb
         return tr_handshakeDone(handshake, false);
     }
 
-    /* next part: ENCRYPT (VC, crypto_provide, len (PadC), */
+    /* next part: ENCRYPT(VC, crypto_provide, len(PadC), */
 
     tr_cryptoDecryptInit(handshake->crypto);
 
@@ -921,7 +921,7 @@ static ReadState readIA(tr_handshake* handshake, struct evbuffer* inbuf)
     }
 
     /**
-    ***  B->A: ENCRYPT (VC, crypto_select, len (padD), padD), ENCRYPT2 (Payload Stream)
+    ***  B->A: ENCRYPT(VC, crypto_select, len(padD), padD), ENCRYPT2(Payload Stream)
     **/
 
     tr_cryptoEncryptInit(handshake->crypto);
@@ -952,7 +952,7 @@ static ReadState readIA(tr_handshake* handshake, struct evbuffer* inbuf)
 
     dbgmsg(handshake, "sending pad d");
 
-    /* ENCRYPT (VC, crypto_provide, len (PadD), PadD
+    /* ENCRYPT(VC, crypto_provide, len(PadD), PadD
      * PadD is reserved for future extensions to the handshake...
      * standard practice at this time is for it to be zero-length */
     {

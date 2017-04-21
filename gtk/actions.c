@@ -76,16 +76,16 @@ static GtkToggleActionEntry pref_toggle_entries[] =
 
 static GtkActionEntry entries[] =
 {
-    { "file-menu", NULL, N_("_File"), NULL, NULL, NULL  },
-    { "torrent-menu", NULL, N_("_Torrent"), NULL, NULL, NULL  },
-    { "view-menu", NULL, N_("_View"), NULL, NULL, NULL  },
+    { "file-menu", NULL, N_("_File"), NULL, NULL, NULL },
+    { "torrent-menu", NULL, N_("_Torrent"), NULL, NULL, NULL },
+    { "view-menu", NULL, N_("_View"), NULL, NULL, NULL },
     { "sort-menu", NULL, N_("_Sort Torrents By"), NULL, NULL, NULL },
     { "queue-menu", NULL, N_("_Queue"), NULL, NULL, NULL },
     { "edit-menu", NULL, N_("_Edit"), NULL, NULL, NULL },
     { "help-menu", NULL, N_("_Help"), NULL, NULL, NULL },
-    { "copy-magnet-link-to-clipboard",  GTK_STOCK_COPY, N_("Copy _Magnet Link to Clipboard"), "", NULL,  G_CALLBACK(action_cb) },
-    { "open-torrent-from-url",  GTK_STOCK_OPEN, N_("Open _URL…"), "<control>U", N_("Open URL…"),  G_CALLBACK(action_cb) },
-    { "open-torrent-toolbar",  GTK_STOCK_OPEN, NULL, NULL, N_("Open a torrent"),  G_CALLBACK(action_cb) },
+    { "copy-magnet-link-to-clipboard", GTK_STOCK_COPY, N_("Copy _Magnet Link to Clipboard"), "", NULL, G_CALLBACK(action_cb) },
+    { "open-torrent-from-url", GTK_STOCK_OPEN, N_("Open _URL…"), "<control>U", N_("Open URL…"), G_CALLBACK(action_cb) },
+    { "open-torrent-toolbar", GTK_STOCK_OPEN, NULL, NULL, N_("Open a torrent"), G_CALLBACK(action_cb) },
     { "open-torrent-menu", GTK_STOCK_OPEN, NULL, NULL, N_("Open a torrent"), G_CALLBACK(action_cb) },
     { "torrent-start", GTK_STOCK_MEDIA_PLAY, N_("_Start"), "<control>S", N_("Start torrent"), G_CALLBACK(action_cb) },
     { "torrent-start-now", GTK_STOCK_MEDIA_PLAY, N_("Start _Now"), "<shift><control>S", N_("Start torrent now"), G_CALLBACK(action_cb) },
@@ -104,7 +104,7 @@ static GtkActionEntry entries[] =
     { "deselect-all", NULL, N_("Dese_lect All"), "<shift><control>A", NULL, G_CALLBACK(action_cb) },
     { "edit-preferences", GTK_STOCK_PREFERENCES, NULL, NULL, NULL, G_CALLBACK(action_cb) },
     { "show-torrent-properties", GTK_STOCK_PROPERTIES, NULL, "<alt>Return", N_("Torrent properties"), G_CALLBACK(action_cb) },
-    { "open-torrent-folder",  GTK_STOCK_OPEN, N_("Open Fold_er"), "<control>E", NULL, G_CALLBACK(action_cb) },
+    { "open-torrent-folder", GTK_STOCK_OPEN, N_("Open Fold_er"), "<control>E", NULL, G_CALLBACK(action_cb) },
     { "show-about-dialog", GTK_STOCK_ABOUT, NULL, NULL, NULL, G_CALLBACK(action_cb) },
     { "help", GTK_STOCK_HELP, N_("_Contents"), "F1", NULL, G_CALLBACK(action_cb) },
     { "torrent-reannounce", GTK_STOCK_NETWORK, N_("Ask Tracker for _More Peers"), NULL, NULL, G_CALLBACK(action_cb) },
@@ -246,11 +246,11 @@ static void ensure_action_map_loaded(GtkUIManager* uim)
     for (l = gtk_ui_manager_get_action_groups(uim); l != NULL; l = l->next)
     {
         GtkActionGroup* action_group = GTK_ACTION_GROUP(l->data);
-        GList* ait, *actions = gtk_action_group_list_actions(action_group);
+        GList* ait, * actions = gtk_action_group_list_actions(action_group);
 
         for (ait = actions; ait != NULL; ait = ait->next)
         {
-            GtkAction*   action = GTK_ACTION(ait->data);
+            GtkAction* action = GTK_ACTION(ait->data);
             char const* name = gtk_action_get_name(action);
             g_hash_table_insert(key_to_action, g_strdup(name), action);
         }
@@ -262,7 +262,7 @@ static void ensure_action_map_loaded(GtkUIManager* uim)
 static GtkAction* get_action(char const* name)
 {
     ensure_action_map_loaded(myUIManager);
-    return (GtkAction*) g_hash_table_lookup(key_to_action, name);
+    return (GtkAction*)g_hash_table_lookup(key_to_action, name);
 }
 
 void gtr_action_activate(char const* name)
@@ -300,4 +300,3 @@ GtkWidget* gtr_action_get_widget(char const* path)
 {
     return gtk_ui_manager_get_widget(myUIManager, path);
 }
-

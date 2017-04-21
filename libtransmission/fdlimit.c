@@ -23,7 +23,7 @@
 #include "file.h"
 #include "log.h"
 #include "session.h"
-#include "torrent.h" /* tr_isTorrent () */
+#include "torrent.h" /* tr_isTorrent() */
 
 #define dbgmsg(...) \
     do \

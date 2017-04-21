@@ -14,7 +14,7 @@
 #include <errno.h> /* EILSEQ, EINVAL */
 
 #include <event2/buffer.h> /* evbuffer_add() */
-#include <event2/util.h> /* evutil_strtoll () */
+#include <event2/util.h> /* evutil_strtoll() */
 
 #define JSONSL_STATE_USER_FIELDS /* no fields */
 #include "jsonsl.h"

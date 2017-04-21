@@ -9,7 +9,7 @@
 #define __LIBTRANSMISSION_ANNOUNCER_MODULE__
 
 #include <errno.h> /* errno, EAFNOSUPPORT */
-#include <string.h> /* memcpy (), memset () */
+#include <string.h> /* memcpy(), memset() */
 
 #include <event2/buffer.h>
 #include <event2/dns.h>
@@ -18,10 +18,10 @@
 #include "transmission.h"
 #include "announcer.h"
 #include "announcer-common.h"
-#include "crypto-utils.h" /* tr_rand_buffer () */
+#include "crypto-utils.h" /* tr_rand_buffer() */
 #include "log.h"
 #include "peer-io.h"
-#include "peer-mgr.h" /* tr_peerMgrCompactToPex () */
+#include "peer-mgr.h" /* tr_peerMgrCompactToPex() */
 #include "ptrarray.h"
 #include "tr-udp.h"
 #include "utils.h"
@@ -913,7 +913,7 @@ bool tau_handle_message(tr_session* session, uint8_t const* msg, size_t msglen)
     tau_transaction_t transaction_id;
     struct evbuffer* buf;
 
-    /*fprintf (stderr, "got an incoming udp message w/len %zu\n", msglen);*/
+    /*fprintf(stderr, "got an incoming udp message w/len %zu\n", msglen);*/
 
     if (!session || !session->announcer_udp)
     {
@@ -940,7 +940,7 @@ bool tau_handle_message(tr_session* session, uint8_t const* msg, size_t msglen)
     tau = session->announcer_udp;
     transaction_id = evbuffer_read_ntoh_32(buf);
 
-    /*fprintf (stderr, "UDP got a transaction_id %u...\n", transaction_id);*/
+    /*fprintf(stderr, "UDP got a transaction_id %u...\n", transaction_id);*/
     for (i = 0, n = tr_ptrArraySize(&tau->trackers); i < n; ++i)
     {
         int j, jn;

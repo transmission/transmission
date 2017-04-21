@@ -29,7 +29,7 @@
 #include <QTreeWidgetItem>
 
 #include <libtransmission/transmission.h>
-#include <libtransmission/utils.h> // tr_getRatio ()
+#include <libtransmission/utils.h> // tr_getRatio()
 
 #include "ColumnResizer.h"
 #include "DetailsDialog.h"

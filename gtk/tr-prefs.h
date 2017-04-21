@@ -13,7 +13,7 @@
 GtkWidget* gtr_prefs_dialog_new(GtkWindow* parent, GObject* core);
 
 /* if you add a key here,  you /must/ add its
- * default in tr_prefs_init_defaults (void) */
+ * default in tr_prefs_init_defaults(void) */
 
 #define PREF_KEY_BLOCKLIST_UPDATES_ENABLED "blocklist-updates-enabled"
 #define PREF_KEY_COMPACT_VIEW "compact-view"
@@ -47,6 +47,5 @@ GtkWidget* gtr_prefs_dialog_new(GtkWindow* parent, GObject* core);
 enum
 {
     MAIN_WINDOW_REFRESH_INTERVAL_SECONDS = 2,
-
     SECONDARY_WINDOW_REFRESH_INTERVAL_SECONDS = 2
 };

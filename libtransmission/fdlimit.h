@@ -48,7 +48,7 @@ bool tr_fdFileGetCachedMTime(tr_session* session, int torrent_id, tr_file_index_
 /**
  * Closes a file that's being held by our file repository.
  *
- * If the file isn't checked out, it's fsync ()ed and close ()d immediately.
+ * If the file isn't checked out, it's fsync()ed and close()d immediately.
  * If the file is currently checked out, it will be closed upon its return.
  *
  * @see tr_fdFileCheckout

@@ -2892,7 +2892,7 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
     return status;
 }
 
-/* [host:port] or [host] or [port] or [http (s?)://host:port/transmission/] */
+/* [host:port] or [host] or [port] or [http(s?)://host:port/transmission/] */
 static void getHostAndPortAndRpcUrl(int* argc, char** argv, char** host, int* port, char** rpcurl)
 {
     if (*argv[1] != '-')

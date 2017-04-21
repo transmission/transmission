@@ -7,11 +7,11 @@
  */
 
 #include <assert.h>
-#include <string.h> /* memset () */
+#include <string.h> /* memset() */
 
 #include "transmission.h"
 #include "bandwidth.h"
-#include "crypto-utils.h" /* tr_rand_int_weak () */
+#include "crypto-utils.h" /* tr_rand_int_weak() */
 #include "log.h"
 #include "peer-io.h"
 #include "utils.h"

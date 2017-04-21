@@ -14,7 +14,7 @@
 
 #include "transmission.h"
 #include "bitfield.h"
-#include "utils.h" /* tr_getRatio () */
+#include "utils.h" /* tr_getRatio() */
 
 typedef struct tr_completion
 {
@@ -24,7 +24,7 @@ typedef struct tr_completion
 
     /* number of bytes we'll have when done downloading. [0..info.totalSize]
        DON'T access this directly; it's a lazy field.
-       use tr_cpSizeWhenDone () instead! */
+       use tr_cpSizeWhenDone() instead! */
     uint64_t sizeWhenDoneLazy;
 
     /* whether or not sizeWhenDone needs to be recalculated */
@@ -32,7 +32,7 @@ typedef struct tr_completion
 
     /* number of bytes we'll have when done downloading. [0..info.totalSize]
        DON'T access this directly; it's a lazy field.
-       use tr_cpHaveValid () instead! */
+       use tr_cpHaveValid() instead! */
     uint64_t haveValidLazy;
 
     /* whether or not haveValidLazy needs to be recalculated */

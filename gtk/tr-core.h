@@ -54,13 +54,13 @@ typedef struct _TrCoreClass
 {
     GObjectClass parent_class;
 
-    void (*add_error)(TrCore*, enum tr_core_err, char const* name);
-    void (*add_prompt)(TrCore*, gpointer ctor);
-    void (*blocklist_updated)(TrCore*, int ruleCount);
-    void (*busy)(TrCore*, gboolean is_busy);
-    void (*prefs_changed)(TrCore*, tr_quark const key);
-    void (*port_tested)(TrCore*, gboolean is_open);
-    void (*quit)(TrCore*);
+    void (* add_error)(TrCore*, enum tr_core_err, char const* name);
+    void (* add_prompt)(TrCore*, gpointer ctor);
+    void (* blocklist_updated)(TrCore*, int ruleCount);
+    void (* busy)(TrCore*, gboolean is_busy);
+    void (* prefs_changed)(TrCore*, tr_quark const key);
+    void (* port_tested)(TrCore*, gboolean is_open);
+    void (* quit)(TrCore*);
 }
 TrCoreClass;
 
@@ -84,7 +84,6 @@ size_t gtr_core_get_torrent_count(TrCore* self);
 tr_torrent* gtr_core_find_torrent(TrCore* core, int id);
 
 void gtr_core_pref_changed(TrCore* core, tr_quark const key);
-
 
 /******
 *******
@@ -159,7 +158,7 @@ void gtr_core_open_folder(TrCore* core, int torrent_id);
 **/
 
 /* column names for the model used to store torrent information */
-/* keep this in sync with the type array in tr_core_init () in tr_core.c */
+/* keep this in sync with the type array in tr_core_init() in tr_core.c */
 enum
 {
     MC_NAME_COLLATED,
@@ -176,15 +175,13 @@ enum
     MC_PRIORITY,
     MC_QUEUE_POSITION,
     MC_TRACKERS,
-
     /* tr_stat.error
      * Tracked because ACTIVITY_FILTER_ERROR needs the row-changed events */
     MC_ERROR,
-
     /* tr_stat.{ peersSendingToUs + peersGettingFromUs + webseedsSendingToUs }
      * Tracked because ACTIVITY_FILTER_ACTIVE needs the row-changed events */
     MC_ACTIVE_PEER_COUNT,
-
+    /* */
     MC_ROW_COUNT
 };
 

@@ -71,7 +71,7 @@ public:
     /** returns true if the transmission session is being run inside this client */
     bool isServer() const;
 
-    /** returns true if isServer () is true or if the remote address is the localhost */
+    /** returns true if isServer() is true or if the remote address is the localhost */
     bool isLocal() const;
 
     RpcResponseFuture exec(tr_quark method, tr_variant* args);

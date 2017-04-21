@@ -39,7 +39,7 @@ extern char const* speed_T_str;
 #else
 
 #define TR_DEFINE_QUARK(QN, q_n) \
-    GQuark q_n##_quark(void) \
+    GQuark q_n ## _quark(void) \
     { \
         static GQuark q; \
         \
@@ -55,7 +55,7 @@ extern char const* speed_T_str;
 
 /* macro to shut up "unused parameter" warnings */
 #ifndef UNUSED
-    #define UNUSED G_GNUC_UNUSED
+#define UNUSED G_GNUC_UNUSED
 #endif
 
 enum
@@ -72,7 +72,7 @@ char const* gtr_get_unicode_string(int);
 char* tr_strlpercent(char* buf, double x, size_t buflen);
 
 /* return a human-readable string for the size given in bytes. */
-char* tr_strlsize(char* buf, guint64  size, size_t buflen);
+char* tr_strlsize(char* buf, guint64 size, size_t buflen);
 
 /* return a human-readable string for the given ratio. */
 char* tr_strlratio(char* buf, double ratio, size_t buflen);
@@ -105,7 +105,7 @@ char const* gtr_get_help_uri(void);
 ****
 ***/
 
-/* backwards-compatible wrapper around gtk_widget_set_visible () */
+/* backwards-compatible wrapper around gtk_widget_set_visible() */
 void gtr_widget_set_visible(GtkWidget*, gboolean);
 
 void gtr_dialog_set_content(GtkDialog* dialog, GtkWidget* content);
@@ -116,7 +116,7 @@ void gtr_dialog_set_content(GtkDialog* dialog, GtkWidget* content);
 
 GtkWidget* gtr_priority_combo_new(void);
 #define gtr_priority_combo_get_value(w) gtr_combo_box_get_active_enum(w)
-#define gtr_priority_combo_set_value(w,val) gtr_combo_box_set_active_enum(w,val)
+#define gtr_priority_combo_set_value(w, val) gtr_combo_box_set_active_enum(w, val)
 
 GtkWidget* gtr_combo_box_new_enum(char const* text_1, ...);
 int gtr_combo_box_get_active_enum(GtkComboBox*);
@@ -154,7 +154,7 @@ bool gtr_file_trash_or_remove(char const* filename, struct tr_error** error);
 
 void gtr_paste_clipboard_url_into_entry(GtkWidget* entry);
 
-/* Only call gtk_label_set_text () if the new text differs from the old.
+/* Only call gtk_label_set_text() if the new text differs from the old.
  * This prevents the label from having to recalculate its size
  * and prevents selected text in the label from being deselected */
 void gtr_label_set_text(GtkLabel* lb, char const* text);

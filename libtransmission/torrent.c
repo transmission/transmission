@@ -7,13 +7,13 @@
  */
 
 #include <errno.h> /* EINVAL */
-#include <signal.h> /* signal () */
+#include <signal.h> /* signal() */
 
 #ifndef _WIN32
-#include <sys/wait.h> /* wait () */
-#include <unistd.h> /* fork (), execvp (), _exit () */
+#include <sys/wait.h> /* wait() */
+#include <unistd.h> /* fork(), execvp(), _exit() */
 #else
-#include <windows.h> /* CreateProcess (), GetLastError () */
+#include <windows.h> /* CreateProcess(), GetLastError() */
 #endif
 
 #include <assert.h>
@@ -23,7 +23,7 @@
 #include <stdlib.h> /* qsort */
 #include <limits.h> /* INT_MAX */
 
-#include <event2/util.h> /* evutil_vsnprintf () */
+#include <event2/util.h> /* evutil_vsnprintf() */
 
 #include "transmission.h"
 #include "announcer.h"
@@ -34,7 +34,7 @@
 #include "error.h"
 #include "fdlimit.h" /* tr_fdTorrentClose */
 #include "file.h"
-#include "inout.h" /* tr_ioTestPiece () */
+#include "inout.h" /* tr_ioTestPiece() */
 #include "log.h"
 #include "magnet.h"
 #include "metainfo.h"
@@ -46,7 +46,7 @@
 #include "session.h"
 #include "torrent.h"
 #include "torrent-magnet.h"
-#include "trevent.h" /* tr_runInEventThread () */
+#include "trevent.h" /* tr_runInEventThread() */
 #include "utils.h"
 #include "variant.h"
 #include "verify.h"

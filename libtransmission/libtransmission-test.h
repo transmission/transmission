@@ -14,7 +14,7 @@
 #include <string.h> /* strlen() */
 
 #include "transmission.h"
-#include "utils.h" /* tr_strcmp0 () */
+#include "utils.h" /* tr_strcmp0() */
 
 extern int current_test;
 

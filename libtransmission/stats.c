@@ -9,7 +9,7 @@
 #include "transmission.h"
 #include "session.h"
 #include "log.h"
-#include "platform.h" /* tr_sessionGetConfigDir () */
+#include "platform.h" /* tr_sessionGetConfigDir() */
 #include "stats.h"
 #include "utils.h" /* tr_buildPath */
 #include "variant.h"

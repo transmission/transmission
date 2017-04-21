@@ -8,13 +8,13 @@
 
 /* thanks amc1! */
 
-#include <ctype.h> /* isprint () */
-#include <stdlib.h> /* strtol () */
+#include <ctype.h> /* isprint() */
+#include <stdlib.h> /* strtol() */
 #include <string.h>
 
 #include "transmission.h"
 #include "clients.h"
-#include "utils.h" /* tr_snprintf (), tr_strlcpy () */
+#include "utils.h" /* tr_snprintf(), tr_strlcpy() */
 
 static int charint(uint8_t ch)
 {

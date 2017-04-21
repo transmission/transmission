@@ -200,7 +200,7 @@ static int test_random(void)
 {
     int i;
 
-    /* test that tr_rand_int () stays in-bounds */
+    /* test that tr_rand_int() stays in-bounds */
     for (i = 0; i < 100000; ++i)
     {
         int const val = tr_rand_int(100);

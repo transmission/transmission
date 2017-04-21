@@ -11,7 +11,7 @@
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/makemeta.h>
-#include <libtransmission/utils.h> /* tr_formatter_mem_B () */
+#include <libtransmission/utils.h> /* tr_formatter_mem_B() */
 
 #include "hig.h"
 #include "makemeta-ui.h"
@@ -174,10 +174,10 @@ static void onProgressDialogResponse(GtkDialog* d, int response, gpointer data)
 
 static void makeProgressDialog(GtkWidget* parent, MakeMetaUI* ui)
 {
-    GtkWidget* d, *l, *w, *v, *fr;
+    GtkWidget* d, * l, * w, * v, * fr;
 
     d = gtk_dialog_new_with_buttons(_("New Torrent"), GTK_WINDOW(parent), GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
-            GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE, GTK_STOCK_ADD, GTK_RESPONSE_ACCEPT, NULL);
+        GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE, GTK_STOCK_ADD, GTK_RESPONSE_ACCEPT, NULL);
     ui->progress_dialog = d;
     g_signal_connect(d, "response", G_CALLBACK(onProgressDialogResponse), ui);
 
@@ -306,12 +306,13 @@ static void updatePiecesLabel(MakeMetaUI* ui)
     {
         char buf[128];
         tr_strlsize(buf, builder->totalSize, sizeof(buf));
-        g_string_append_printf(gstr, ngettext("%1$s; %2$'d File", "%1$s; %2$'d Files", builder->fileCount), buf, builder->fileCount);
+        g_string_append_printf(gstr, ngettext("%1$s; %2$'d File", "%1$s; %2$'d Files", builder->fileCount), buf,
+            builder->fileCount);
         g_string_append(gstr, "; ");
 
         tr_formatter_mem_B(buf, builder->pieceSize, sizeof(buf));
-        g_string_append_printf(gstr, ngettext("%1$'d Piece @ %2$s", "%1$'d Pieces @ %2$s", builder->pieceCount), builder->pieceCount,
-            buf);
+        g_string_append_printf(gstr, ngettext("%1$'d Piece @ %2$s", "%1$'d Pieces @ %2$s", builder->pieceCount),
+            builder->pieceCount, buf);
     }
 
     g_string_append(gstr, "</i>");
@@ -388,7 +389,7 @@ static void on_drag_data_received(GtkWidget* widget UNUSED, GdkDragContext* drag
 
     if (uris && uris[0])
     {
-        char const* uri = uris[ 0 ];
+        char const* uri = uris[0];
         gchar* filename = g_filename_from_uri(uri, NULL, NULL);
 
         if (g_file_test(filename, G_FILE_TEST_IS_DIR))
@@ -413,18 +414,18 @@ static void on_drag_data_received(GtkWidget* widget UNUSED, GdkDragContext* drag
     gtk_drag_finish(drag_context, success, FALSE, time_);
 }
 
-GtkWidget* gtr_torrent_creation_dialog_new(GtkWindow*   parent, TrCore* core)
+GtkWidget* gtr_torrent_creation_dialog_new(GtkWindow* parent, TrCore* core)
 {
     char const* str;
-    GtkWidget* d, *t, *w, *l, *fr, *sw, *v;
+    GtkWidget* d, * t, * w, * l, * fr, * sw, * v;
     GSList* slist;
     guint row = 0;
     MakeMetaUI* ui = g_new0(MakeMetaUI, 1);
 
     ui->core = core;
 
-    d = gtk_dialog_new_with_buttons(_("New Torrent"), parent, GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
-            GTK_STOCK_NEW, GTK_RESPONSE_ACCEPT, NULL);
+    d = gtk_dialog_new_with_buttons(_("New Torrent"), parent, GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_CLOSE,
+        GTK_RESPONSE_CLOSE, GTK_STOCK_NEW, GTK_RESPONSE_ACCEPT, NULL);
     ui->dialog = d;
     g_signal_connect(d, "response", G_CALLBACK(onResponse), ui);
     g_object_set_data_full(G_OBJECT(d), "ui", ui, freeMetaUI);
@@ -483,7 +484,7 @@ GtkWidget* gtr_torrent_creation_dialog_new(GtkWindow*   parent, TrCore* core)
     gtk_box_pack_start(GTK_BOX(v), fr, TRUE, TRUE, 0);
     l = gtk_label_new(NULL);
     gtk_label_set_markup(GTK_LABEL(l), _("To add a backup URL, add it on the line after the primary URL.\n"
-            "To add another primary URL, add it after a blank line."));
+        "To add another primary URL, add it after a blank line."));
     gtk_label_set_justify(GTK_LABEL(l), GTK_JUSTIFY_LEFT);
     gtk_misc_set_alignment(GTK_MISC(l), 0.0, 0.5);
     gtk_box_pack_start(GTK_BOX(v), l, FALSE, FALSE, 0);

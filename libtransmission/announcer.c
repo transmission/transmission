@@ -9,8 +9,8 @@
 #include <assert.h>
 #include <limits.h> /* INT_MAX */
 #include <stdio.h>
-#include <stdlib.h> /* qsort () */
-#include <string.h> /* strcmp (), memcpy (), strncmp () */
+#include <stdlib.h> /* qsort() */
+#include <string.h> /* strcmp(), memcpy(), strncmp() */
 
 #include <event2/buffer.h>
 #include <event2/event.h> /* evtimer */
@@ -20,9 +20,9 @@
 #include "transmission.h"
 #include "announcer.h"
 #include "announcer-common.h"
-#include "crypto-utils.h" /* tr_rand_int (), tr_rand_int_weak () */
+#include "crypto-utils.h" /* tr_rand_int(), tr_rand_int_weak() */
 #include "log.h"
-#include "peer-mgr.h" /* tr_peerMgrCompactToPex () */
+#include "peer-mgr.h" /* tr_peerMgrCompactToPex() */
 #include "ptrarray.h"
 #include "session.h"
 #include "torrent.h"
@@ -573,7 +573,12 @@ static tr_tracker_info* filter_trackers(tr_tracker_info* input, int input_count,
     struct tr_tracker_info* ret;
     struct ann_tracker_info* tmp = tr_new0(struct ann_tracker_info, input_count);
 
-    /*for (i=0, in=input_count; i<in; ++i) fprintf (stderr, "IN: [%d][%s]\n", input[i].tier, input[i].announce);*/
+    /*
+    for (i = 0, in = input_count; i < in; ++i)
+    {
+        fprintf(stderr, "IN: [%d][%s]\n", input[i].tier, input[i].announce);
+    }
+    */
 
     /* build a list of valid trackers */
     for (i = 0, in = input_count; i < in; ++i)

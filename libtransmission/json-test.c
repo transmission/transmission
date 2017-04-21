@@ -6,7 +6,7 @@
  *
  */
 
-#include <string.h> /* strlen () */
+#include <string.h> /* strlen() */
 
 #include <locale.h> /* setlocale() */
 

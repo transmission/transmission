@@ -68,7 +68,7 @@ static IconCache* icon_cache_new(GtkWidget* for_widget, int icon_size)
     icon_cache->cache = g_hash_table_new_full(g_str_hash, g_str_equal, NULL, g_object_unref);
 
     g_hash_table_insert(icon_cache->cache, (void*)VOID_PIXBUF_KEY, create_void_pixbuf(icon_cache->icon_size,
-            icon_cache->icon_size));
+        icon_cache->icon_size));
 
     return icon_cache;
 }
@@ -80,7 +80,7 @@ static char const* _icon_cache_get_icon_key(GIcon* icon)
     if (G_IS_THEMED_ICON(icon))
     {
         char** icon_names;
-        char*   name;
+        char* name;
 
         g_object_get(icon, "names", &icon_names, NULL);
         name = g_strjoinv(",", icon_names);
@@ -93,7 +93,7 @@ static char const* _icon_cache_get_icon_key(GIcon* icon)
     else if (G_IS_FILE_ICON(icon))
     {
         GFile* file;
-        char*   filename;
+        char* filename;
 
         file = g_file_icon_get_file(G_FILE_ICON(icon));
         filename = g_file_get_path(file);
@@ -135,7 +135,7 @@ static GdkPixbuf* get_themed_icon_pixbuf(GThemedIcon* icon, int size, GtkIconThe
         g_clear_error(&error);
     }
 
-#if GTK_CHECK_VERSION(3,8,0)
+#if GTK_CHECK_VERSION(3, 8, 0)
     g_object_unref(icon_info);
 #else
     gtk_icon_info_free(icon_info);
@@ -208,7 +208,7 @@ static GdkPixbuf* icon_cache_get_mime_type_icon(IconCache* icon_cache, char cons
 
     if (pixbuf != NULL)
     {
-        g_hash_table_insert(icon_cache->cache, (gpointer) key, g_object_ref(pixbuf));
+        g_hash_table_insert(icon_cache->cache, (gpointer)key, g_object_ref(pixbuf));
     }
 
     g_object_unref(G_OBJECT(icon));

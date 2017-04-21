@@ -22,7 +22,7 @@
 
 #include <errno.h>
 #include <stdio.h>
-#include <stdlib.h> /* strtol () */
+#include <stdlib.h> /* strtol() */
 #include <string.h>
 
 #include <unistd.h>

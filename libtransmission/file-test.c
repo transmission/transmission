@@ -767,7 +767,7 @@ static int test_path_basename_dirname(void)
         return 1;
     }
 
-    /* TODO: is_same (dirname (x) + '/' + basename (x), x) */
+    /* TODO: is_same(dirname(x) + '/' + basename(x), x) */
 
     return 0;
 }

@@ -12,17 +12,17 @@
 #include <assert.h>
 #include <dirent.h>
 #include <errno.h>
-#include <fcntl.h> /* O_LARGEFILE, posix_fadvise (), [posix_]fallocate () */
-#include <libgen.h> /* basename (), dirname () */
+#include <fcntl.h> /* O_LARGEFILE, posix_fadvise(), [posix_]fallocate() */
+#include <libgen.h> /* basename(), dirname() */
 #include <limits.h> /* PATH_MAX */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
-#include <sys/file.h> /* flock () */
-#include <sys/mman.h> /* mmap (), munmap () */
+#include <sys/file.h> /* flock() */
+#include <sys/mman.h> /* mmap(), munmap() */
 #include <sys/stat.h>
-#include <unistd.h> /* lseek (), write (), ftruncate (), pread (), pwrite (), pathconf (), etc */
+#include <unistd.h> /* lseek(), write(), ftruncate(), pread(), pwrite(), pathconf(), etc */
 
 #ifdef HAVE_XFS_XFS_H
 #include <xfs/xfs.h>
@@ -304,7 +304,7 @@ char* tr_sys_path_resolve(char const* path, tr_error** error)
 
 #if defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE >= 200809L
 
-    /* Better safe than sorry: realpath () officially supports NULL as destination
+    /* Better safe than sorry: realpath() officially supports NULL as destination
        starting off POSIX.1-2008. */
 
     if (ret == NULL)

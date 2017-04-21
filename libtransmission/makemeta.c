@@ -11,7 +11,7 @@
 #include <stdlib.h> /* qsort */
 #include <string.h> /* strcmp, strlen */
 
-#include <event2/util.h> /* evutil_ascii_strcasecmp () */
+#include <event2/util.h> /* evutil_ascii_strcasecmp() */
 
 #include "transmission.h"
 #include "crypto-utils.h" /* tr_sha1 */

@@ -123,7 +123,7 @@ static void level_combo_changed_cb(GtkComboBox* combo_box, gpointer gdata)
 /* similar to asctime, but is utf8-clean */
 static char* gtr_localtime(time_t time)
 {
-    char buf[256], *eoln;
+    char buf[256], * eoln;
     struct tm const tm = *localtime(&time);
 
     g_strlcpy(buf, asctime(&tm), sizeof(buf));
@@ -142,7 +142,8 @@ static void doSave(GtkWindow* parent, struct MsgData* data, char const* filename
 
     if (!fp)
     {
-        GtkWidget* w = gtk_message_dialog_new(parent, 0, GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, _("Couldn't save \"%s\""), filename);
+        GtkWidget* w = gtk_message_dialog_new(parent, 0, GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, _(
+            "Couldn't save \"%s\""), filename);
         gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(w), "%s", g_strerror(errno));
         g_signal_connect_swapped(w, "response", G_CALLBACK(gtk_widget_destroy), w);
         gtk_widget_show(w);
@@ -178,7 +179,8 @@ static void doSave(GtkWindow* parent, struct MsgData* data, char const* filename
                     break;
                 }
 
-                fprintf(fp, "%s\t%s\t%s\t%s\n", date, levelStr, (node->name ? node->name : ""), (node->message ? node->message : ""));
+                fprintf(fp, "%s\t%s\t%s\t%s\n", date, levelStr, (node->name ? node->name : ""),
+                    (node->message ? node->message : ""));
                 g_free(date);
             }
             while (gtk_tree_model_iter_next(model, &iter));
@@ -204,7 +206,7 @@ static void onSaveRequest(GtkWidget* w, gpointer data)
 {
     GtkWindow* window = GTK_WINDOW(gtk_widget_get_toplevel(w));
     GtkWidget* d = gtk_file_chooser_dialog_new(_("Save Log"), window, GTK_FILE_CHOOSER_ACTION_SAVE, GTK_STOCK_CANCEL,
-            GTK_RESPONSE_CANCEL, GTK_STOCK_SAVE, GTK_RESPONSE_ACCEPT, NULL);
+        GTK_RESPONSE_CANCEL, GTK_STOCK_SAVE, GTK_RESPONSE_ACCEPT, NULL);
 
     gtk_dialog_set_alternative_button_order(GTK_DIALOG(d), GTK_RESPONSE_ACCEPT, GTK_RESPONSE_CANCEL, -1);
     g_signal_connect(d, "response", G_CALLBACK(onSaveDialogResponse), data);
@@ -272,7 +274,7 @@ static void renderTime(GtkTreeViewColumn* column UNUSED, GtkCellRenderer* render
 
 static void appendColumn(GtkTreeView* view, int col)
 {
-    GtkCellRenderer*    r;
+    GtkCellRenderer* r;
     GtkTreeViewColumn* c;
     char const* title = NULL;
 
@@ -425,10 +427,10 @@ static gboolean onRefresh(gpointer gdata)
 static GtkWidget* debug_level_combo_new(void)
 {
     GtkWidget* w = gtr_combo_box_new_enum(
-            _("Error"), TR_LOG_ERROR,
-            _("Information"), TR_LOG_INFO,
-            _("Debug"), TR_LOG_DEBUG,
-            NULL);
+        _("Error"), TR_LOG_ERROR,
+        _("Information"), TR_LOG_INFO,
+        _("Debug"), TR_LOG_DEBUG,
+        NULL);
     gtr_combo_box_set_active_enum(GTK_COMBO_BOX(w), gtr_pref_int_get(TR_KEY_message_level));
     return w;
 }
@@ -505,13 +507,13 @@ GtkWidget* gtr_message_log_window_new(GtkWindow* parent, TrCore* core)
     **/
 
     data->store = gtk_list_store_new(N_COLUMNS,
-            G_TYPE_UINT, /* sequence */
-            G_TYPE_POINTER, /* category */
-            G_TYPE_POINTER, /* message */
-            G_TYPE_POINTER); /* struct tr_log_message */
+        G_TYPE_UINT, /* sequence */
+        G_TYPE_POINTER, /* category */
+        G_TYPE_POINTER, /* message */
+        G_TYPE_POINTER); /* struct tr_log_message */
 
     addMessages(data->store, myHead);
-    onRefresh(data);  /* much faster to populate *before* it has listeners */
+    onRefresh(data); /* much faster to populate *before* it has listeners */
 
     data->filter = gtk_tree_model_filter_new(GTK_TREE_MODEL(data->store), NULL);
     data->sort = gtk_tree_model_sort_new_with_model(data->filter);
@@ -519,7 +521,6 @@ GtkWidget* gtr_message_log_window_new(GtkWindow* parent, TrCore* core)
     gtk_tree_sortable_set_sort_column_id(GTK_TREE_SORTABLE(data->sort), COL_SEQUENCE, GTK_SORT_ASCENDING);
     data->maxLevel = gtr_pref_int_get(TR_KEY_message_level);
     gtk_tree_model_filter_set_visible_func(GTK_TREE_MODEL_FILTER(data->filter), isRowVisible, data, NULL);
-
 
     view = gtk_tree_view_new_with_model(data->sort);
     g_object_unref(data->sort);

@@ -22,13 +22,13 @@ THE SOFTWARE.
 */
 
 #include <assert.h>
-#include <string.h> /* memcmp (), memcpy (), memset () */
-#include <stdlib.h> /* malloc (), free () */
+#include <string.h> /* memcmp(), memcpy(), memset() */
+#include <stdlib.h> /* malloc(), free() */
 
 #ifdef _WIN32
-#include <io.h> /* dup2 () */
+#include <io.h> /* dup2() */
 #else
-#include <unistd.h> /* dup2 () */
+#include <unistd.h> /* dup2() */
 #endif
 
 #include <event2/event.h>

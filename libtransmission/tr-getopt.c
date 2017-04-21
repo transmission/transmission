@@ -6,9 +6,9 @@
  *
  */
 
-#include <ctype.h> /* isspace () */
+#include <ctype.h> /* isspace() */
 #include <stdio.h>
-#include <stdlib.h> /* exit () */
+#include <stdlib.h> /* exit() */
 #include <string.h>
 
 #include "tr-getopt.h"

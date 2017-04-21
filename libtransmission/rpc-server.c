@@ -18,14 +18,14 @@
 #include <event2/http_struct.h> /* TODO: eventually remove this */
 
 #include "transmission.h"
-#include "crypto.h" /* tr_ssha1_matches () */
-#include "crypto-utils.h" /* tr_rand_buffer () */
+#include "crypto.h" /* tr_ssha1_matches() */
+#include "crypto-utils.h" /* tr_rand_buffer() */
 #include "error.h"
 #include "fdlimit.h"
 #include "list.h"
 #include "log.h"
 #include "net.h"
-#include "platform.h" /* tr_getWebClientDir () */
+#include "platform.h" /* tr_getWebClientDir() */
 #include "ptrarray.h"
 #include "rpcimpl.h"
 #include "rpc-server.h"
@@ -347,9 +347,9 @@ static void add_response(struct evhttp_request* req, struct tr_rpc_server* serve
         server->stream.next_in = content_ptr;
         server->stream.avail_in = content_len;
 
-        /* allocate space for the raw data and call deflate () just once --
+        /* allocate space for the raw data and call deflate() just once --
          * we won't use the deflated data if it's longer than the raw data,
-         * so it's okay to let deflate () run out of output buffer space */
+         * so it's okay to let deflate() run out of output buffer space */
         evbuffer_reserve_space(out, content_len, iovec, 1);
         server->stream.next_out = iovec[0].iov_base;
         server->stream.avail_out = iovec[0].iov_len;
@@ -454,7 +454,7 @@ static void handle_web_client(struct evhttp_request* req, struct tr_rpc_server* 
             "index.html is located.</p>"
             "<p>Package Builders: to set a custom default at compile time, "
             "#define PACKAGE_DATA_DIR in libtransmission/platform.c "
-            "or tweak tr_getClutchDir () by hand.</p>");
+            "or tweak tr_getClutchDir() by hand.</p>");
     }
     else
     {

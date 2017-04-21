@@ -8,10 +8,10 @@
 
 #include <assert.h>
 #include <errno.h>
-#include <string.h> /* strcmp () */
+#include <string.h> /* strcmp() */
 
-#include <fcntl.h> /* open () */
-#include <unistd.h> /* close () */
+#include <fcntl.h> /* open() */
+#include <unistd.h> /* close() */
 
 #include <sys/types.h>
 #include <sys/event.h>

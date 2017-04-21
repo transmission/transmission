@@ -72,7 +72,7 @@ enum
     /* idle seconds before we send a keepalive */
     KEEPALIVE_INTERVAL_SECS = 100,
     /* */
-    PEX_INTERVAL_SECS = 90, /* sec between sendPex () calls */
+    PEX_INTERVAL_SECS = 90, /* sec between sendPex() calls */
     /* */
     REQQ = 512,
     /* */
@@ -1328,7 +1328,7 @@ static void updatePeerProgress(tr_peerMsgs* msgs)
 {
     tr_peerUpdateProgress(msgs->torrent, &msgs->peer);
 
-    /*updateFastSet (msgs);*/
+    /* updateFastSet(msgs); */
     updateInterest(msgs);
 }
 
@@ -2550,7 +2550,7 @@ static void sendPex(tr_peerMsgs* msgs)
         tr_free(diffs6.dropped);
         tr_free(newPex6);
 
-        /*msgs->clientSentPexAt = tr_time ();*/
+        /* msgs->clientSentPexAt = tr_time(); */
     }
 }
 
@@ -2609,7 +2609,7 @@ static void peermsgs_destruct(tr_peer* peer)
     if (msgs->io)
     {
         tr_peerIoClear(msgs->io);
-        tr_peerIoUnref(msgs->io); /* balanced by the ref in handshakeDoneCB () */
+        tr_peerIoUnref(msgs->io); /* balanced by the ref in handshakeDoneCB() */
     }
 
     evbuffer_free(msgs->outMessages);

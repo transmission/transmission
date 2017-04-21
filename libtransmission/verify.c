@@ -11,11 +11,11 @@
 #define _XOPEN_SOURCE 600
 #endif
 
-#include <string.h> /* memcmp () */
-#include <stdlib.h> /* free () */
+#include <string.h> /* memcmp() */
+#include <stdlib.h> /* free() */
 
 #ifdef HAVE_POSIX_FADVISE
-#include <fcntl.h> /* posix_fadvise () */
+#include <fcntl.h> /* posix_fadvise() */
 #endif
 
 #include "transmission.h"
@@ -24,9 +24,9 @@
 #include "file.h"
 #include "list.h"
 #include "log.h"
-#include "platform.h" /* tr_lock () */
+#include "platform.h" /* tr_lock() */
 #include "torrent.h"
-#include "utils.h" /* tr_valloc (), tr_free () */
+#include "utils.h" /* tr_valloc(), tr_free() */
 #include "verify.h"
 
 /***

@@ -6,9 +6,9 @@
  *
  */
 
-#include <ctype.h> /* isspace () */
+#include <ctype.h> /* isspace() */
 #include <errno.h> /* EILSEQ */
-#include <string.h> /* strlen (), strncmp () */
+#include <string.h> /* strlen(), strncmp() */
 
 #include <event2/buffer.h>
 

@@ -22,7 +22,7 @@
 #include "bandwidth.h"
 #include "crypto.h"
 #include "net.h" /* tr_address */
-#include "utils.h" /* tr_time () */
+#include "utils.h" /* tr_time() */
 
 struct evbuffer;
 struct tr_bandwidth;

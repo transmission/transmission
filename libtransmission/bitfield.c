@@ -11,7 +11,7 @@
 
 #include "transmission.h"
 #include "bitfield.h"
-#include "utils.h" /* tr_new0 () */
+#include "utils.h" /* tr_new0() */
 
 tr_bitfield const TR_BITFIELD_INIT = { NULL, 0, 0, 0, false, false };
 

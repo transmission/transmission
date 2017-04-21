@@ -16,23 +16,23 @@
 #endif
 
 #include <assert.h>
-#include <ctype.h> /* isdigit (), tolower () */
+#include <ctype.h> /* isdigit(), tolower() */
 #include <errno.h>
 #include <float.h> /* DBL_EPSILON */
-#include <locale.h> /* localeconv () */
-#include <math.h> /* pow (), fabs (), floor () */
+#include <locale.h> /* localeconv() */
+#include <math.h> /* pow(), fabs(), floor() */
 #include <stdio.h>
-#include <stdlib.h> /* getenv () */
-#include <string.h> /* strerror (), memset (), memmem () */
-#include <time.h> /* nanosleep () */
+#include <stdlib.h> /* getenv() */
+#include <string.h> /* strerror(), memset(), memmem() */
+#include <time.h> /* nanosleep() */
 
 #ifdef _WIN32
-#include <ws2tcpip.h> /* WSAStartup () */
-#include <windows.h> /* Sleep (), GetSystemTimeAsFileTime (), GetEnvironmentVariable () */
-#include <shellapi.h> /* CommandLineToArgv () */
+#include <ws2tcpip.h> /* WSAStartup() */
+#include <windows.h> /* Sleep(), GetSystemTimeAsFileTime(), GetEnvironmentVariable() */
+#include <shellapi.h> /* CommandLineToArgv() */
 #else
 #include <sys/time.h>
-#include <unistd.h> /* getpagesize () */
+#include <unistd.h> /* getpagesize() */
 #endif
 
 #ifdef HAVE_ICONV
@@ -51,7 +51,7 @@
 #include "log.h"
 #include "net.h"
 #include "utils.h"
-#include "platform.h" /* tr_lockLock () */
+#include "platform.h" /* tr_lockLock() */
 #include "platform-quota.h" /* tr_device_info_create(), tr_device_info_get_free_space(), tr_device_info_free() */
 #include "variant.h"
 #include "version.h"

@@ -23,7 +23,7 @@
 #include "session-id.h"
 #include "utils.h"
 
-#define SESSION_ID_SIZE         48
+#define SESSION_ID_SIZE 48
 #define SESSION_ID_DURATION_SEC (60 * 60) /* expire in an hour */
 
 struct tr_session_id

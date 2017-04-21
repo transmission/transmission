@@ -23,7 +23,7 @@
 #include "net.h"
 #include "peer-common.h" /* MAX_BLOCK_SIZE */
 #include "peer-io.h"
-#include "trevent.h" /* tr_runInEventThread () */
+#include "trevent.h" /* tr_runInEventThread() */
 #include "tr-utp.h"
 #include "utils.h"
 
@@ -364,7 +364,7 @@ static void event_write_cb(evutil_socket_t fd, short event UNUSED, void* vio)
 
     dbgmsg(io, "libevent says this peer is ready to write");
 
-    /* Write as much as possible, since the socket is non-blocking, write () will
+    /* Write as much as possible, since the socket is non-blocking, write() will
      * return if it can't write any more data without blocking */
     howmuch = tr_bandwidthClamp(&io->bandwidth, dir, evbuffer_get_length(io->outbuf));
 

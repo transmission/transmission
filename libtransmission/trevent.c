@@ -15,7 +15,7 @@
 #ifdef _WIN32
 #include <winsock2.h>
 #else
-#include <unistd.h> /* read (), write (), pipe () */
+#include <unistd.h> /* read(), write(), pipe() */
 #endif
 
 #include <event2/dns.h>
@@ -27,7 +27,7 @@
 #include "session.h"
 
 #include "transmission.h"
-#include "platform.h" /* tr_lockLock () */
+#include "platform.h" /* tr_lockLock() */
 #include "trevent.h"
 #include "utils.h"
 

@@ -139,7 +139,7 @@ tr_sys_path_info;
 /* Path-related wrappers */
 
 /**
- * @brief Portability wrapper for `stat ()`.
+ * @brief Portability wrapper for `stat()`.
  *
  * @param[in]  path  Path to file or directory.
  * @param[in]  flags Combination of @ref tr_sys_path_get_info_flags_t values.
@@ -152,7 +152,7 @@ tr_sys_path_info;
 bool tr_sys_path_get_info(char const* path, int flags, tr_sys_path_info* info, struct tr_error** error);
 
 /**
- * @brief Portability wrapper for `access ()`.
+ * @brief Portability wrapper for `access()`.
  *
  * @param[in]  path  Path to file or directory.
  * @param[out] error Pointer to error object. Optional, pass `NULL` if you are
@@ -191,7 +191,7 @@ bool tr_sys_path_is_relative(char const* path);
 bool tr_sys_path_is_same(char const* path1, char const* path2, struct tr_error** error);
 
 /**
- * @brief Portability wrapper for `realpath ()`.
+ * @brief Portability wrapper for `realpath()`.
  *
  * @param[in]  path  Path to file or directory.
  * @param[out] error Pointer to error object. Optional, pass `NULL` if you are
@@ -205,7 +205,7 @@ bool tr_sys_path_is_same(char const* path1, char const* path2, struct tr_error**
 char* tr_sys_path_resolve(char const* path, struct tr_error** error);
 
 /**
- * @brief Portability wrapper for `basename ()`.
+ * @brief Portability wrapper for `basename()`.
  *
  * @param[in]  path  Path to file or directory.
  * @param[out] error Pointer to error object. Optional, pass `NULL` if you are
@@ -219,7 +219,7 @@ char* tr_sys_path_resolve(char const* path, struct tr_error** error);
 char* tr_sys_path_basename(char const* path, struct tr_error** error);
 
 /**
- * @brief Portability wrapper for `dirname ()`.
+ * @brief Portability wrapper for `dirname()`.
  *
  * @param[in]  path  Path to file or directory.
  * @param[out] error Pointer to error object. Optional, pass `NULL` if you are
@@ -233,7 +233,7 @@ char* tr_sys_path_basename(char const* path, struct tr_error** error);
 char* tr_sys_path_dirname(char const* path, struct tr_error** error);
 
 /**
- * @brief Portability wrapper for `rename ()`.
+ * @brief Portability wrapper for `rename()`.
  *
  * @param[in]  src_path Path to source file or directory.
  * @param[in]  dst_path Path to destination file or directory.
@@ -247,7 +247,7 @@ char* tr_sys_path_dirname(char const* path, struct tr_error** error);
 bool tr_sys_path_rename(char const* src_path, char const* dst_path, struct tr_error** error);
 
 /**
- * @brief Portability wrapper for `remove ()`.
+ * @brief Portability wrapper for `remove()`.
  *
  * @param[in]  path  Path to file or directory.
  * @param[out] error Pointer to error object. Optional, pass `NULL` if you are
@@ -275,7 +275,7 @@ bool tr_sys_path_remove(char const* path, struct tr_error** error);
 tr_sys_file_t tr_sys_file_get_std(tr_std_sys_file_t std_file, struct tr_error** error);
 
 /**
- * @brief Portability wrapper for `open ()`.
+ * @brief Portability wrapper for `open()`.
  *
  * @param[in]  path        Path to file.
  * @param[in]  flags       Combination of @ref tr_sys_file_open_flags_t values.
@@ -290,7 +290,7 @@ tr_sys_file_t tr_sys_file_get_std(tr_std_sys_file_t std_file, struct tr_error** 
 tr_sys_file_t tr_sys_file_open(char const* path, int flags, int permissions, struct tr_error** error);
 
 /**
- * @brief Portability wrapper for `mkstemp ()`.
+ * @brief Portability wrapper for `mkstemp()`.
  *
  * @param[in,out] path_template Template path to file. Should end with at least
  *                              six 'X' characters. Upon success, trailing 'X'
@@ -306,7 +306,7 @@ tr_sys_file_t tr_sys_file_open(char const* path, int flags, int permissions, str
 tr_sys_file_t tr_sys_file_open_temp(char* path_template, struct tr_error** error);
 
 /**
- * @brief Portability wrapper for `close ()`.
+ * @brief Portability wrapper for `close()`.
  *
  * @param[in]  handle Valid file descriptor.
  * @param[out] error  Pointer to error object. Optional, pass `NULL` if you are
@@ -317,7 +317,7 @@ tr_sys_file_t tr_sys_file_open_temp(char* path_template, struct tr_error** error
 bool tr_sys_file_close(tr_sys_file_t handle, struct tr_error** error);
 
 /**
- * @brief Portability wrapper for `fstat ()`.
+ * @brief Portability wrapper for `fstat()`.
  *
  * @param[in]  handle Valid file descriptor.
  * @param[out] info   Result buffer.
@@ -329,7 +329,7 @@ bool tr_sys_file_close(tr_sys_file_t handle, struct tr_error** error);
 bool tr_sys_file_get_info(tr_sys_file_t handle, tr_sys_path_info* info, struct tr_error** error);
 
 /**
- * @brief Portability wrapper for `lseek ()`.
+ * @brief Portability wrapper for `lseek()`.
  *
  * @param[in]  handle     Valid file descriptor.
  * @param[in]  offset     Relative file offset in bytes to seek to.
@@ -345,7 +345,7 @@ bool tr_sys_file_seek(tr_sys_file_t handle, int64_t offset, tr_seek_origin_t ori
     struct tr_error** error);
 
 /**
- * @brief Portability wrapper for `read ()`.
+ * @brief Portability wrapper for `read()`.
  *
  * @param[in]  handle     Valid file descriptor.
  * @param[out] buffer     Buffer to store read data to.
@@ -360,7 +360,7 @@ bool tr_sys_file_seek(tr_sys_file_t handle, int64_t offset, tr_seek_origin_t ori
 bool tr_sys_file_read(tr_sys_file_t handle, void* buffer, uint64_t size, uint64_t* bytes_read, struct tr_error** error);
 
 /**
- * @brief Like `pread ()`, except that the position is undefined afterwards.
+ * @brief Like `pread()`, except that the position is undefined afterwards.
  *        Not thread-safe.
  *
  * @param[in]  handle     Valid file descriptor.
@@ -378,7 +378,7 @@ bool tr_sys_file_read_at(tr_sys_file_t handle, void* buffer, uint64_t size, uint
     struct tr_error** error);
 
 /**
- * @brief Portability wrapper for `write ()`.
+ * @brief Portability wrapper for `write()`.
  *
  * @param[in]  handle        Valid file descriptor.
  * @param[in]  buffer        Buffer to get data being written from.
@@ -394,7 +394,7 @@ bool tr_sys_file_write(tr_sys_file_t handle, void const* buffer, uint64_t size, 
     struct tr_error** error);
 
 /**
- * @brief Like `pwrite ()`, except that the position is undefined afterwards.
+ * @brief Like `pwrite()`, except that the position is undefined afterwards.
  *        Not thread-safe.
  *
  * @param[in]  handle        Valid file descriptor.
@@ -412,7 +412,7 @@ bool tr_sys_file_write_at(tr_sys_file_t handle, void const* buffer, uint64_t siz
     struct tr_error** error);
 
 /**
- * @brief Portability wrapper for `fsync ()`.
+ * @brief Portability wrapper for `fsync()`.
  *
  * @param[in]  handle Valid file descriptor.
  * @param[out] error  Pointer to error object. Optional, pass `NULL` if you are
@@ -423,7 +423,7 @@ bool tr_sys_file_write_at(tr_sys_file_t handle, void const* buffer, uint64_t siz
 bool tr_sys_file_flush(tr_sys_file_t handle, struct tr_error** error);
 
 /**
- * @brief Portability wrapper for `ftruncate ()`.
+ * @brief Portability wrapper for `ftruncate()`.
  *
  * @param[in]  handle Valid file descriptor.
  * @param[in]  size   Number of bytes to truncate (or extend) file to.
@@ -461,7 +461,7 @@ bool tr_sys_file_prefetch(tr_sys_file_t handle, uint64_t offset, uint64_t size, 
 bool tr_sys_file_preallocate(tr_sys_file_t handle, uint64_t size, int flags, struct tr_error** error);
 
 /**
- * @brief Portability wrapper for `mmap ()` for files.
+ * @brief Portability wrapper for `mmap()` for files.
  *
  * @param[in]  handle Valid file descriptor.
  * @param[in]  offset Offset in file to map from.
@@ -475,7 +475,7 @@ bool tr_sys_file_preallocate(tr_sys_file_t handle, uint64_t size, int flags, str
 void* tr_sys_file_map_for_reading(tr_sys_file_t handle, uint64_t offset, uint64_t size, struct tr_error** error);
 
 /**
- * @brief Portability wrapper for `munmap ()` for files.
+ * @brief Portability wrapper for `munmap()` for files.
  *
  * @param[in]  address Pointer to mapped file data.
  * @param[in]  size    Size of mapped data in bytes.
@@ -487,7 +487,7 @@ void* tr_sys_file_map_for_reading(tr_sys_file_t handle, uint64_t offset, uint64_
 bool tr_sys_file_unmap(void const* address, uint64_t size, struct tr_error** error);
 
 /**
- * @brief Portability wrapper for `flock ()`.
+ * @brief Portability wrapper for `flock()`.
  *
  * Don't try to upgrade or downgrade the lock unless you know what you are
  * doing, as behavior varies a bit between platforms.
@@ -504,7 +504,7 @@ bool tr_sys_file_lock(tr_sys_file_t handle, int operation, struct tr_error** err
 /* File-related wrappers (utility) */
 
 /**
- * @brief Portability wrapper for `fgets ()`, removing EOL internally.
+ * @brief Portability wrapper for `fgets()`, removing EOL internally.
  *
  * Special care should be taken when reading from one of standard input streams
  * (@ref tr_std_sys_file_t) since no UTF-8 conversion is currently being made.
@@ -527,7 +527,7 @@ bool tr_sys_file_lock(tr_sys_file_t handle, int operation, struct tr_error** err
 bool tr_sys_file_read_line(tr_sys_file_t handle, char* buffer, size_t buffer_size, struct tr_error** error);
 
 /**
- * @brief Portability wrapper for `fputs ()`, appending EOL internally.
+ * @brief Portability wrapper for `fputs()`, appending EOL internally.
  *
  * Special care should be taken when writing to one of standard output streams
  * (@ref tr_std_sys_file_t) since no UTF-8 conversion is currently being made.
@@ -545,7 +545,7 @@ bool tr_sys_file_read_line(tr_sys_file_t handle, char* buffer, size_t buffer_siz
 bool tr_sys_file_write_line(tr_sys_file_t handle, char const* buffer, struct tr_error** error);
 
 /**
- * @brief Portability wrapper for `fprintf ()`.
+ * @brief Portability wrapper for `fprintf()`.
  *
  * Special care should be taken when writing to one of standard output streams
  * (@ref tr_std_sys_file_t) since no UTF-8 conversion is currently being made.
@@ -566,7 +566,7 @@ bool tr_sys_file_write_fmt(tr_sys_file_t handle, char const* format, struct tr_e
 /* Directory-related wrappers */
 
 /**
- * @brief Portability wrapper for `getcwd ()`.
+ * @brief Portability wrapper for `getcwd()`.
  *
  * @param[out] error Pointer to error object. Optional, pass `NULL` if you are
  *                   not interested in error details.
@@ -578,7 +578,7 @@ bool tr_sys_file_write_fmt(tr_sys_file_t handle, char const* format, struct tr_e
 char* tr_sys_dir_get_current(struct tr_error** error);
 
 /**
- * @brief Like `mkdir ()`, but makes parent directories if needed.
+ * @brief Like `mkdir()`, but makes parent directories if needed.
  *
  * @param[in]  path        Path to directory.
  * @param[in]  flags       Combination of @ref tr_sys_dir_create_flags_t values.
@@ -592,7 +592,7 @@ char* tr_sys_dir_get_current(struct tr_error** error);
 bool tr_sys_dir_create(char const* path, int flags, int permissions, struct tr_error** error);
 
 /**
- * @brief Portability wrapper for `mkdtemp ()`.
+ * @brief Portability wrapper for `mkdtemp()`.
  *
  * @param[in,out] path_template Template path to directory. Should end with at
  *                              least six 'X' characters. Upon success, trailing
@@ -607,7 +607,7 @@ bool tr_sys_dir_create(char const* path, int flags, int permissions, struct tr_e
 bool tr_sys_dir_create_temp(char* path_template, struct tr_error** error);
 
 /**
- * @brief Portability wrapper for `opendir ()`.
+ * @brief Portability wrapper for `opendir()`.
  *
  * @param[in]  path  Path to directory.
  * @param[out] error Pointer to error object. Optional, pass `NULL` if you are
@@ -619,7 +619,7 @@ bool tr_sys_dir_create_temp(char* path_template, struct tr_error** error);
 tr_sys_dir_t tr_sys_dir_open(char const* path, struct tr_error** error);
 
 /**
- * @brief Portability wrapper for `readdir ()`.
+ * @brief Portability wrapper for `readdir()`.
  *
  * @param[in]  handle Valid directory descriptor.
  * @param[out] error  Pointer to error object. Optional, pass `NULL` if you are
@@ -634,7 +634,7 @@ tr_sys_dir_t tr_sys_dir_open(char const* path, struct tr_error** error);
 char const* tr_sys_dir_read_name(tr_sys_dir_t handle, struct tr_error** error);
 
 /**
- * @brief Portability wrapper for `closedir ()`.
+ * @brief Portability wrapper for `closedir()`.
  *
  * @param[in]  handle Valid directory descriptor.
  * @param[out] error  Pointer to error object. Optional, pass `NULL` if you are

@@ -7,12 +7,12 @@
  */
 
 #include <assert.h>
-#include <string.h> /* memcpy (), memset (), memcmp () */
+#include <string.h> /* memcpy(), memset(), memcmp() */
 
 #include <event2/buffer.h>
 
 #include "transmission.h"
-#include "crypto-utils.h" /* tr_sha1 () */
+#include "crypto-utils.h" /* tr_sha1() */
 #include "file.h"
 #include "log.h"
 #include "magnet.h"

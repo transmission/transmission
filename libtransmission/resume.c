@@ -13,9 +13,9 @@
 #include "error.h"
 #include "file.h"
 #include "log.h"
-#include "metainfo.h" /* tr_metainfoGetBasename () */
+#include "metainfo.h" /* tr_metainfoGetBasename() */
 #include "peer-mgr.h" /* pex */
-#include "platform.h" /* tr_getResumeDir () */
+#include "platform.h" /* tr_getResumeDir() */
 #include "resume.h"
 #include "session.h"
 #include "torrent.h"

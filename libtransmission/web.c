@@ -7,7 +7,7 @@
  */
 
 #include <assert.h>
-#include <string.h> /* strlen (), strstr () */
+#include <string.h> /* strlen(), strstr() */
 
 #ifdef _WIN32
 #include <ws2tcpip.h>
@@ -27,7 +27,7 @@
 #include "torrent.h"
 #include "platform.h" /* mutex */
 #include "session.h"
-#include "trevent.h" /* tr_runInEventThread () */
+#include "trevent.h" /* tr_runInEventThread() */
 #include "utils.h"
 #include "version.h" /* User-Agent */
 #include "web.h"
@@ -337,7 +337,7 @@ struct tr_web_task* tr_webRunWebseed(tr_torrent* tor, char const* url, char cons
 }
 
 /**
- * Portability wrapper for select ().
+ * Portability wrapper for select().
  *
  * http://msdn.microsoft.com/en-us/library/ms740141%28VS.85%29.aspx
  * On win32, any two of the parameters, readfds, writefds, or exceptfds,
@@ -467,7 +467,7 @@ static void tr_webThreadFunc(void* vsession)
             }
         }
 
-        /* maybe wait a little while before calling curl_multi_perform () */
+        /* maybe wait a little while before calling curl_multi_perform() */
         msec = 0;
         curl_multi_timeout(multi, &msec);
 
@@ -478,7 +478,7 @@ static void tr_webThreadFunc(void* vsession)
 
         if (session->isClosed)
         {
-            msec = 100; /* on shutdown, call perform () more frequently */
+            msec = 100; /* on shutdown, call perform() more frequently */
         }
 
         if (msec > 0)
@@ -505,7 +505,7 @@ static void tr_webThreadFunc(void* vsession)
             tr_select(max_fd + 1, &r_fd_set, &w_fd_set, &c_fd_set, &t);
         }
 
-        /* call curl_multi_perform () */
+        /* call curl_multi_perform() */
         do
         {
             mcode = curl_multi_perform(multi, &unused);

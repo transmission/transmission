@@ -15,11 +15,11 @@
 #include <signal.h>
 
 #ifndef _WIN32
-#include <sys/types.h> /* umask () */
-#include <sys/stat.h> /* umask () */
+#include <sys/types.h> /* umask() */
+#include <sys/stat.h> /* umask() */
 #endif
 
-#include <event2/dns.h> /* evdns_base_free () */
+#include <event2/dns.h> /* evdns_base_free() */
 #include <event2/event.h>
 
 #include <libutp/utp.h>
@@ -40,7 +40,7 @@
 #include "net.h"
 #include "peer-io.h"
 #include "peer-mgr.h"
-#include "platform.h" /* tr_lock, tr_getTorrentDir () */
+#include "platform.h" /* tr_lock, tr_getTorrentDir() */
 #include "platform-quota.h" /* tr_device_info_free() */
 #include "port-forwarding.h"
 #include "rpc-server.h"
@@ -48,7 +48,7 @@
 #include "session-id.h"
 #include "stats.h"
 #include "torrent.h"
-#include "tr-dht.h" /* tr_dhtUpkeep () */
+#include "tr-dht.h" /* tr_dhtUpkeep() */
 #include "tr-udp.h"
 #include "tr-utp.h"
 #include "tr-lpd.h"
@@ -1972,7 +1972,7 @@ static void sessionCloseImplStart(tr_session* session)
 
     /* Close the announcer *after* closing the torrents
        so that all the &event=stopped messages will be
-       queued to be sent by tr_announcerClose () */
+       queued to be sent by tr_announcerClose() */
     tr_announcerClose(session);
 
     /* and this goes *after* announcer close so that
@@ -2087,7 +2087,7 @@ void tr_sessionClose(tr_session* session)
 
         if (deadlineReached(deadline) && !forced)
         {
-            dbgmsg("calling event_loopbreak ()");
+            dbgmsg("calling event_loopbreak()");
             forced = true;
             event_base_loopbreak(session->event_base);
         }
@@ -2721,7 +2721,7 @@ char const* tr_sessionFindTorrentFile(tr_session const* session, char const* has
 void tr_sessionSetTorrentFile(tr_session* session, char const* hashString, char const* filename)
 {
     /* since we walk session->configDir/torrents/ to build the lookup table,
-     * and tr_sessionSetTorrentFile () is just to tell us there's a new file
+     * and tr_sessionSetTorrentFile() is just to tell us there's a new file
      * in that same directory, we don't need to do anything here if the
      * lookup table hasn't been built yet */
     if (session->metainfoLookup)

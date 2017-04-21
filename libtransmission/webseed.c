@@ -6,7 +6,7 @@
  *
  */
 
-#include <string.h> /* strlen () */
+#include <string.h> /* strlen() */
 
 #include <event2/buffer.h>
 #include <event2/event.h>
@@ -14,11 +14,11 @@
 #include "transmission.h"
 #include "bandwidth.h"
 #include "cache.h"
-#include "inout.h" /* tr_ioFindFileLocation () */
+#include "inout.h" /* tr_ioFindFileLocation() */
 #include "list.h"
 #include "peer-mgr.h"
 #include "torrent.h"
-#include "trevent.h" /* tr_runInEventThread () */
+#include "trevent.h" /* tr_runInEventThread() */
 #include "utils.h"
 #include "web.h"
 #include "webseed.h"
@@ -425,7 +425,7 @@ static void web_response_func(tr_session* session, bool did_connect UNUSED, bool
             {
                 if (buf_len && !tr_torrentPieceIsComplete(tor, t->piece_index))
                 {
-                    /* on_content_changed () will not write a block if it is smaller than
+                    /* on_content_changed() will not write a block if it is smaller than
                        the torrent's block size, i.e. the torrent's very last block */
                     tr_cacheWriteBlock(session->cache, tor, t->piece_index, t->piece_offset + bytes_done, buf_len, t->content);
 

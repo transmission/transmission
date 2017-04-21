@@ -6,7 +6,7 @@
  *
  */
 
-#include <stdlib.h> /* qsort () */
+#include <stdlib.h> /* qsort() */
 
 #include <gtk/gtk.h>
 #include <glib/gi18n.h>
@@ -14,11 +14,11 @@
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h>
 
-#include "favicon.h" /* gtr_get_favicon () */
+#include "favicon.h" /* gtr_get_favicon() */
 #include "filter.h"
 #include "hig.h" /* GUI_PAD */
 #include "tr-core.h" /* MC_TORRENT */
-#include "util.h" /* gtr_get_host_from_url () */
+#include "util.h" /* gtr_get_host_from_url() */
 
 static GQuark DIRTY_KEY = 0;
 static GQuark SESSION_KEY = 0;
@@ -50,7 +50,7 @@ enum
 
 static int pstrcmp(void const* a, void const* b)
 {
-    return g_strcmp0(* (char const* const*)a, * (char const* const*)b);
+    return g_strcmp0(*(char const* const*)a, *(char const* const*)b);
 }
 
 /* human-readable name; ie, Legaltorrents */
@@ -202,7 +202,7 @@ static gboolean tracker_filter_model_update(gpointer gstore)
 
     store_pos = first_tracker_pos;
 
-    for (i = 0, n = hosts->len ; ;)
+    for (i = 0, n = hosts->len;;)
     {
         gboolean const new_hosts_done = i >= n;
         gboolean const old_hosts_done = !gtk_tree_model_iter_nth_child(model, &iter, NULL, store_pos);
@@ -228,7 +228,7 @@ static gboolean tracker_filter_model_update(gpointer gstore)
         {
             int cmp;
             char* host;
-            gtk_tree_model_get(model, &iter, TRACKER_FILTER_COL_HOST, &host,  -1);
+            gtk_tree_model_get(model, &iter, TRACKER_FILTER_COL_HOST, &host, -1);
             cmp = g_strcmp0(host, hosts->pdata[i]);
 
             if (cmp < 0)
@@ -257,7 +257,7 @@ static gboolean tracker_filter_model_update(gpointer gstore)
             tr_session* session = g_object_get_qdata(G_OBJECT(store), SESSION_KEY);
             char const* host = hosts->pdata[i];
             char* name = get_name_from_host(host);
-            int const count = * (int*)g_hash_table_lookup(hosts_hash, host);
+            int const count = *(int*)g_hash_table_lookup(hosts_hash, host);
             gtk_tree_store_insert_with_values(store, &add, NULL, store_pos,
                 TRACKER_FILTER_COL_HOST, host,
                 TRACKER_FILTER_COL_NAME, name,
@@ -275,7 +275,7 @@ static gboolean tracker_filter_model_update(gpointer gstore)
         else /* update row */
         {
             char const* host = hosts->pdata[i];
-            int const count = * (int*)g_hash_table_lookup(hosts_hash, host);
+            int const count = *(int*)g_hash_table_lookup(hosts_hash, host);
             tracker_model_update_count(store, &iter, count);
             ++store_pos;
             ++i;
@@ -292,11 +292,11 @@ static gboolean tracker_filter_model_update(gpointer gstore)
 static GtkTreeModel* tracker_filter_model_new(GtkTreeModel* tmodel)
 {
     GtkTreeStore* store = gtk_tree_store_new(TRACKER_FILTER_N_COLS,
-            G_TYPE_STRING,
-            G_TYPE_INT,
-            G_TYPE_INT,
-            G_TYPE_STRING,
-            GDK_TYPE_PIXBUF);
+        G_TYPE_STRING,
+        G_TYPE_INT,
+        G_TYPE_INT,
+        G_TYPE_STRING,
+        GDK_TYPE_PIXBUF);
 
     gtk_tree_store_insert_with_values(store, NULL, NULL, -1,
         TRACKER_FILTER_COL_NAME, _("All"),
@@ -501,7 +501,7 @@ static gboolean test_torrent_activity(tr_torrent* tor, int type)
 
     case ACTIVITY_FILTER_ACTIVE:
         return (st->peersSendingToUs > 0) || (st->peersGettingFromUs > 0) || (st->webseedsSendingToUs > 0) ||
-            (st->activity == TR_STATUS_CHECK);
+               (st->activity == TR_STATUS_CHECK);
 
     case ACTIVITY_FILTER_PAUSED:
         return st->activity == TR_STATUS_STOPPED;
@@ -601,10 +601,10 @@ static GtkTreeModel* activity_filter_model_new(GtkTreeModel* tmodel)
     };
 
     GtkListStore* store = gtk_list_store_new(ACTIVITY_FILTER_N_COLS,
-            G_TYPE_STRING,
-            G_TYPE_INT,
-            G_TYPE_INT,
-            G_TYPE_STRING);
+        G_TYPE_STRING,
+        G_TYPE_INT,
+        G_TYPE_INT,
+        G_TYPE_STRING);
 
     for (i = 0, n = G_N_ELEMENTS(types); i < n; ++i)
     {
@@ -789,7 +789,7 @@ static gboolean is_row_visible(GtkTreeModel* model, GtkTreeIter* iter, gpointer 
     text = (char const*)g_object_get_qdata(o, TEXT_KEY);
 
     return (tor != NULL) && test_tracker(tor, data->active_tracker_type, data->active_tracker_host) &&
-        test_torrent_activity(tor, data->active_activity_type) && testText(tor, text);
+           test_torrent_activity(tor, data->active_activity_type) && testText(tor, text);
 }
 
 static void selection_changed_cb(GtkComboBox* combo, gpointer vdata)

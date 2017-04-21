@@ -9,9 +9,9 @@
 #include <assert.h>
 #include <errno.h>
 #include <stddef.h> /* offsetof */
-#include <stdlib.h> /* realloc () */
+#include <stdlib.h> /* realloc() */
 
-#include <process.h> /* _beginthreadex () */
+#include <process.h> /* _beginthreadex() */
 
 #include <windows.h>
 
@@ -149,7 +149,7 @@ static void tr_watchdir_win32_on_event(struct bufferevent* event, void* context)
     size_t const header_size = offsetof(FILE_NOTIFY_INFORMATION, FileName);
 
     /* Read the size of the struct excluding name into buf. Guaranteed to have at
-       least sizeof (*ev) available */
+       least sizeof(*ev) available */
     while ((nread = bufferevent_read(event, ev, header_size)) != 0)
     {
         if (nread == (size_t)-1)

@@ -10,7 +10,7 @@
 #include <time.h>
 #include <inttypes.h>
 
-#include <event2/util.h> /* evutil_inet_ntop () */
+#include <event2/util.h> /* evutil_inet_ntop() */
 
 #define ENABLE_STRNATPMPERR
 #include "natpmp.h"

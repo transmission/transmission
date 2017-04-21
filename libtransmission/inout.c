@@ -8,11 +8,11 @@
 
 #include <assert.h>
 #include <errno.h>
-#include <stdlib.h> /* bsearch () */
-#include <string.h> /* memcmp () */
+#include <stdlib.h> /* bsearch() */
+#include <string.h> /* memcmp() */
 
 #include "transmission.h"
-#include "cache.h" /* tr_cacheReadBlock () */
+#include "cache.h" /* tr_cacheReadBlock() */
 #include "crypto-utils.h"
 #include "error.h"
 #include "fdlimit.h"
@@ -20,7 +20,7 @@
 #include "inout.h"
 #include "log.h"
 #include "peer-common.h" /* MAX_BLOCK_SIZE */
-#include "stats.h" /* tr_statsFileCreated () */
+#include "stats.h" /* tr_statsFileCreated() */
 #include "torrent.h"
 #include "utils.h"
 

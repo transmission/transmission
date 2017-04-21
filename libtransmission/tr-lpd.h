@@ -37,7 +37,7 @@ bool tr_lpdSendAnnounce(tr_torrent const*);
 *
 * @def lengthof
 * @brief returns the static length of a C array type
-* @note A lower case macro name is tolerable here since this definition of lengthof ()
+* @note A lower case macro name is tolerable here since this definition of lengthof()
 * is intimately related to sizeof semantics.
 * Meaningful return values are only guaranteed for true array types. */
 #define lengthof(arr) (sizeof(*(arr)) > 0 ? sizeof(arr) / sizeof(*(arr)) : 0)

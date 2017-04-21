@@ -7,11 +7,11 @@
  */
 
 #include <assert.h>
-#include <string.h> /* strchr () */
-#include <stdio.h> /* sscanf () */
+#include <string.h> /* strchr() */
+#include <stdio.h> /* sscanf() */
 
 #include "transmission.h"
-#include "crypto-utils.h" /* tr_hex_to_sha1 () */
+#include "crypto-utils.h" /* tr_hex_to_sha1() */
 #include "magnet.h"
 #include "variant.h"
 #include "web.h"

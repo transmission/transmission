@@ -45,7 +45,7 @@ enum
     /* how frequently to change which peers are choked */
     RECHOKE_PERIOD_MSEC = (10 * 1000),
     /* an optimistically unchoked peer is immune from rechoking
-       for this many calls to rechokeUploads (). */
+       for this many calls to rechokeUploads(). */
     OPTIMISTIC_UNCHOKE_MULTIPLIER = 4,
     /* how frequently to reallocate bandwidth */
     BANDWIDTH_PERIOD_MSEC = 500,
@@ -551,7 +551,7 @@ void tr_peerMgrFree(tr_peerMgr* manager)
 
     deleteTimers(manager);
 
-    /* free the handshakes. Abort invokes handshakeDoneCB (), which removes
+    /* free the handshakes. Abort invokes handshakeDoneCB(), which removes
      * the item from manager->handshakes, so this is a little roundabout... */
     while (!tr_ptrArrayEmpty(&manager->incomingHandshakes))
     {
@@ -682,7 +682,7 @@ void tr_peerMgrSetUtpFailed(tr_torrent* tor, tr_address const* addr, bool failed
 ***
 *** 2. tr_swarm::pieces, an array of "struct weighted_piece" which lists the
 ***    pieces that we want to request. It's used to decide which blocks to
-***    return next when tr_peerMgrGetBlockRequests () is called.
+***    return next when tr_peerMgrGetBlockRequests() is called.
 **/
 
 /**
@@ -1997,7 +1997,7 @@ static int getMaxPeerCount(tr_torrent const* tor)
 
 static int getPeerCount(tr_swarm const* s)
 {
-    return tr_ptrArraySize(&s->peers); /* + tr_ptrArraySize (&t->outgoingHandshakes); */
+    return tr_ptrArraySize(&s->peers); /* + tr_ptrArraySize(&t->outgoingHandshakes); */
 }
 
 static void createBitTorrentPeer(tr_torrent* tor, struct tr_peerIo* io, struct peer_atom* atom, tr_quark client)
@@ -2135,7 +2135,7 @@ static bool myHandshakeDoneCB(tr_handshake* handshake, tr_peerIo* io, bool readA
                     client = TR_KEY_NONE;
                 }
 
-                io = tr_handshakeStealIO(handshake); /* this steals its refcount too, which is balanced by our unref in peerDelete ()  */
+                io = tr_handshakeStealIO(handshake); /* this steals its refcount too, which is balanced by our unref in peerDelete() */
                 tr_peerIoSetParent(io, &s->tor->bandwidth);
                 createBitTorrentPeer(s->tor, io, atom, client);
 
@@ -2195,7 +2195,7 @@ void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_address* addr, tr_port port, 
 
         handshake = tr_handshakeNew(io, session->encryptionMode, myHandshakeDoneCB, manager);
 
-        tr_peerIoUnref(io); /* balanced by the implicit ref in tr_peerIoNewIncoming () */
+        tr_peerIoUnref(io); /* balanced by the implicit ref in tr_peerIoNewIncoming() */
 
         tr_ptrArrayInsertSorted(&manager->incomingHandshakes, handshake, handshakeCompare);
     }
@@ -2554,7 +2554,7 @@ static void stopSwarm(tr_swarm* swarm)
 
     removeAllPeers(swarm);
 
-    /* disconnect the handshakes. handshakeAbort calls handshakeDoneCB (),
+    /* disconnect the handshakes. handshakeAbort calls handshakeDoneCB(),
      * which removes the handshake from t->outgoingHandshakes... */
     while (!tr_ptrArrayEmpty(&swarm->outgoingHandshakes))
     {
@@ -3299,7 +3299,7 @@ static void rechokeUploads(tr_swarm* s, uint64_t const now)
     assert(swarmIsLocked(s));
 
     /* an optimistic unchoke peer's "optimistic"
-     * state lasts for N calls to rechokeUploads (). */
+     * state lasts for N calls to rechokeUploads(). */
     if (s->optimisticUnchokeTimeScaler > 0)
     {
         s->optimisticUnchokeTimeScaler--;
@@ -3477,7 +3477,12 @@ static bool shouldPeerBeClosed(tr_swarm const* s, tr_peer const* peer, int peerC
         int const limit = hi - ((hi - lo) * strictness);
         int const idleTime = now - MAX(atom->time, atom->piece_data_time);
 
-        /*fprintf (stderr, "strictness is %.3f, limit is %d seconds... time since connect is %d, time since piece is %d ... idleTime is %d, doPurge is %d\n", (double)strictness, limit, (int)(now - atom->time), (int)(now - atom->piece_data_time), idleTime, idleTime > limit);*/
+        /*
+        fprintf(stderr, "strictness is %.3f, limit is %d seconds... time since connect is %d, time since piece is %d ... "
+            "idleTime is %d, doPurge is %d\n", (double)strictness, limit, (int)(now - atom->time),
+            (int)(now - atom->piece_data_time), idleTime, idleTime > limit);
+        */
+
         if (idleTime > limit)
         {
             tordbg(s, "purging peer %s because it's been %d secs since we shared anything", tr_atomAddrStr(atom), idleTime);
@@ -4410,7 +4415,7 @@ static void initiateConnection(tr_peerMgr* mgr, tr_swarm* s, struct peer_atom* a
 
         assert(tr_peerIoGetTorrentHash(io));
 
-        tr_peerIoUnref(io); /* balanced by the initial ref in tr_peerIoNewOutgoing () */
+        tr_peerIoUnref(io); /* balanced by the initial ref in tr_peerIoNewOutgoing() */
 
         tr_ptrArrayInsertSorted(&s->outgoingHandshakes, handshake, handshakeCompare);
     }

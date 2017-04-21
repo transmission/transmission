@@ -7,7 +7,7 @@
  */
 
 #include <assert.h>
-#include <string.h> /* strlen () */
+#include <string.h> /* strlen() */
 
 #include <event2/buffer.h>
 
@@ -16,7 +16,7 @@
 #include "file.h"
 #include "log.h"
 #include "metainfo.h"
-#include "platform.h" /* tr_getTorrentDir () */
+#include "platform.h" /* tr_getTorrentDir() */
 #include "session.h"
 #include "utils.h"
 #include "variant.h"
@@ -121,7 +121,7 @@ static bool getfile(char** setme, char const* root, tr_variant* path, struct evb
     if (success)
     {
         *setme = tr_utf8clean((char*)evbuffer_pullup(buf, -1), evbuffer_get_length(buf));
-        /*fprintf (stderr, "[%s]\n", *setme);*/
+        /* fprintf(stderr, "[%s]\n", *setme); */
     }
 
     return success;
@@ -336,7 +336,7 @@ static char const* getannounce(tr_info* inf, tr_variant* meta)
             trackers[trackerCount].scrape = tr_convertAnnounceToScrape(url);
             trackers[trackerCount].id = 0;
             trackerCount++;
-            /*fprintf (stderr, "single announce: [%s]\n", url);*/
+            /* fprintf(stderr, "single announce: [%s]\n", url); */
         }
     }
 

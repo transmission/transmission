@@ -120,8 +120,8 @@ int tr_rand_int(int upper_bound);
 /**
  * @brief Returns a pseudorandom number in the range of [0...upper_bound).
  *
- * This is faster, BUT WEAKER, than tr_rand_int () and never be used in sensitive cases.
- * @see tr_rand_int ()
+ * This is faster, BUT WEAKER, than tr_rand_int() and never be used in sensitive cases.
+ * @see tr_rand_int()
  */
 int tr_rand_int_weak(int upper_bound);
 
@@ -142,30 +142,30 @@ bool tr_ssha1_matches(char const* ssha1, char const* plain_text);
 
 /**
  * @brief Translate a block of bytes into base64.
- * @return a newly-allocated null-terminated string that can be freed with tr_free ()
+ * @return a newly-allocated null-terminated string that can be freed with tr_free()
  */
 void* tr_base64_encode(void const* input, size_t input_length, size_t* output_length) TR_GNUC_MALLOC;
 
 /**
  * @brief Translate null-terminated string into base64.
- * @return a newly-allocated null-terminated string that can be freed with tr_free ()
+ * @return a newly-allocated null-terminated string that can be freed with tr_free()
  */
 void* tr_base64_encode_str(char const* input, size_t* output_length) TR_GNUC_MALLOC;
 
 /**
  * @brief Translate a block of bytes from base64 into raw form.
- * @return a newly-allocated null-terminated string that can be freed with tr_free ()
+ * @return a newly-allocated null-terminated string that can be freed with tr_free()
  */
 void* tr_base64_decode(void const* input, size_t input_length, size_t* output_length) TR_GNUC_MALLOC;
 
 /**
  * @brief Translate null-terminated string from base64 into raw form.
- * @return a newly-allocated null-terminated string that can be freed with tr_free ()
+ * @return a newly-allocated null-terminated string that can be freed with tr_free()
  */
 void* tr_base64_decode_str(char const* input, size_t* output_length) TR_GNUC_MALLOC;
 
 /**
- * @brief Wrapper around tr_binary_to_hex () for SHA_DIGEST_LENGTH.
+ * @brief Wrapper around tr_binary_to_hex() for SHA_DIGEST_LENGTH.
  */
 static inline void tr_sha1_to_hex(char* hex, uint8_t const* sha1)
 {
@@ -173,7 +173,7 @@ static inline void tr_sha1_to_hex(char* hex, uint8_t const* sha1)
 }
 
 /**
- * @brief Wrapper around tr_hex_to_binary () for SHA_DIGEST_LENGTH.
+ * @brief Wrapper around tr_hex_to_binary() for SHA_DIGEST_LENGTH.
  */
 static inline void tr_hex_to_sha1(uint8_t* sha1, char const* hex)
 {

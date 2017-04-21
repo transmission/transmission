@@ -37,13 +37,13 @@
 #include <libutp/utp.h>
 
 #include "transmission.h"
-#include "fdlimit.h" /* tr_fdSocketClose () */
+#include "fdlimit.h" /* tr_fdSocketClose() */
 #include "net.h"
-#include "peer-io.h" /* tr_peerIoAddrStr () FIXME this should be moved to net.h */
-#include "session.h" /* tr_sessionGetPublicAddress () */
-#include "tr-utp.h" /* tr_utpSendTo () */
+#include "peer-io.h" /* tr_peerIoAddrStr() FIXME this should be moved to net.h */
+#include "session.h" /* tr_sessionGetPublicAddress() */
+#include "tr-utp.h" /* tr_utpSendTo() */
 #include "log.h"
-#include "utils.h" /* tr_time (), tr_logAddDebug () */
+#include "utils.h" /* tr_time(), tr_logAddDebug() */
 
 #ifndef IN_MULTICAST
 #define IN_MULTICAST(a) (((a) & 0xf0000000) == 0xe0000000)
@@ -89,7 +89,7 @@ char const* tr_address_to_string_with_buf(tr_address const* addr, char* buf, siz
 }
 
 /*
- * Non-threadsafe version of tr_address_to_string_with_buf ()
+ * Non-threadsafe version of tr_address_to_string_with_buf()
  * and uses a static memory area for a buffer.
  * This function is suitable to be called from libTransmission's networking code,
  * which is single-threaded.
@@ -494,7 +494,7 @@ void tr_netClose(tr_session* session, tr_socket_t s)
 }
 
 /*
-   get_source_address () and global_unicast_address () were written by
+   get_source_address() and global_unicast_address() were written by
    Juliusz Chroboczek, and are covered under the same license as dht.c.
    Please feel free to copy them into your software if it can help
    unbreaking the double-stack Internet. */

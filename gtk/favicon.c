@@ -6,14 +6,14 @@
  *
  */
 
-#include <glib/gstdio.h> /* g_remove () */
+#include <glib/gstdio.h> /* g_remove() */
 #include <gtk/gtk.h>
 
 #include <libtransmission/transmission.h>
-#include <libtransmission/web.h> /* tr_webRun () */
+#include <libtransmission/web.h> /* tr_webRun() */
 
 #include "favicon.h"
-#include "util.h" /* gtr_get_host_from_url () */
+#include "util.h" /* gtr_get_host_from_url() */
 
 #define IMAGE_TYPES 4
 static char const* image_types[IMAGE_TYPES] = { "ico", "png", "gif", "jpg" };

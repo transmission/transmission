@@ -89,7 +89,7 @@ static void dialogResponse(GtkDialog* dialog, gint response, gpointer gdata)
     {
         char const* primary = _("Reset your statistics?");
         char const* secondary = _("These statistics are for your information only. "
-                "Resetting them doesn't affect the statistics logged by your BitTorrent trackers.");
+            "Resetting them doesn't affect the statistics logged by your BitTorrent trackers.");
         int const flags = GTK_DIALOG_DESTROY_WITH_PARENT | GTK_DIALOG_MODAL;
         GtkWidget* w = gtk_message_dialog_new(GTK_WINDOW(dialog), flags, GTK_MESSAGE_QUESTION, GTK_BUTTONS_NONE, "%s", primary);
         gtk_dialog_add_buttons(GTK_DIALOG(w), GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, _("_Reset"), TR_RESPONSE_RESET, NULL);
@@ -119,7 +119,8 @@ GtkWidget* gtr_stats_dialog_new(GtkWindow* parent, TrCore* core)
     guint row = 0;
     struct stat_ui* ui = g_new0(struct stat_ui, 1);
 
-    d = gtk_dialog_new_with_buttons(_("Statistics"), parent, GTK_DIALOG_DESTROY_WITH_PARENT, _("_Reset"), TR_RESPONSE_RESET, GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE, NULL);
+    d = gtk_dialog_new_with_buttons(_("Statistics"), parent, GTK_DIALOG_DESTROY_WITH_PARENT, _("_Reset"), TR_RESPONSE_RESET,
+        GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE, NULL);
     gtk_dialog_set_default_response(GTK_DIALOG(d), GTK_RESPONSE_CLOSE);
     gtk_dialog_set_alternative_button_order(GTK_DIALOG(d), GTK_RESPONSE_CLOSE, TR_RESPONSE_RESET, -1);
     t = hig_workarea_create();

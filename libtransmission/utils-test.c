@@ -7,9 +7,9 @@
  */
 
 #include <limits.h> /* INT_MAX */
-#include <math.h> /* sqrt () */
-#include <string.h> /* strlen () */
-#include <stdlib.h> /* setenv (), unsetenv () */
+#include <math.h> /* sqrt() */
+#include <string.h> /* strlen() */
+#include <stdlib.h> /* setenv(), unsetenv() */
 
 #ifdef _WIN32
 #include <windows.h>

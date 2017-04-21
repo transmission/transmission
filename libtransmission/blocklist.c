@@ -9,7 +9,7 @@
 #include <assert.h>
 #include <errno.h>
 #include <stdio.h>
-#include <stdlib.h> /* bsearch (), qsort () */
+#include <stdlib.h> /* bsearch(), qsort() */
 #include <string.h>
 
 #include "transmission.h"

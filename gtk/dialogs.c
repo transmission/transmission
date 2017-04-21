@@ -103,33 +103,34 @@ void gtr_confirm_remove(GtkWindow* parent, TrCore* core, GSList* torrent_ids, gb
     }
     else
     {
-        g_string_printf(primary_text, ngettext("Delete this torrent's downloaded files?", "Delete these %d torrents' downloaded files?",
-                count), count);
+        g_string_printf(primary_text, ngettext("Delete this torrent's downloaded files?",
+            "Delete these %d torrents' downloaded files?", count), count);
     }
 
     secondary_text = g_string_new(NULL);
 
     if (!incomplete && !connected)
     {
-        g_string_assign(secondary_text, ngettext("Once removed, continuing the transfer will require the torrent file or magnet link.",
-                "Once removed, continuing the transfers will require the torrent files or magnet links.", count));
+        g_string_assign(secondary_text,
+            ngettext("Once removed, continuing the transfer will require the torrent file or magnet link.",
+            "Once removed, continuing the transfers will require the torrent files or magnet links.", count));
     }
     else if (count == incomplete)
     {
         g_string_assign(secondary_text, ngettext("This torrent has not finished downloading.",
-                "These torrents have not finished downloading.", count));
+            "These torrents have not finished downloading.", count));
     }
     else if (count == connected)
     {
-        g_string_assign(secondary_text, ngettext("This torrent is connected to peers.", "These torrents are connected to peers.",
-                count));
+        g_string_assign(secondary_text, ngettext("This torrent is connected to peers.",
+            "These torrents are connected to peers.", count));
     }
     else
     {
         if (connected)
         {
             g_string_append(secondary_text, ngettext("One of these torrents is connected to peers.",
-                    "Some of these torrents are connected to peers.", connected));
+                "Some of these torrents are connected to peers.", connected));
         }
 
         if (connected && incomplete)
@@ -140,12 +141,12 @@ void gtr_confirm_remove(GtkWindow* parent, TrCore* core, GSList* torrent_ids, gb
         if (incomplete)
         {
             g_string_assign(secondary_text, ngettext("One of these torrents has not finished downloading.",
-                    "Some of these torrents have not finished downloading.", incomplete));
+                "Some of these torrents have not finished downloading.", incomplete));
         }
     }
 
     d = gtk_message_dialog_new_with_markup(parent, GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_QUESTION, GTK_BUTTONS_NONE,
-            "<big><b>%s</b></big>", primary_text->str);
+        "<big><b>%s</b></big>", primary_text->str);
 
     if (secondary_text->len)
     {

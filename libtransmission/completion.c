@@ -267,7 +267,7 @@ size_t tr_cpMissingBytesInPiece(tr_completion const* cp, tr_piece_index_t piece)
 
         if (f != l)
         {
-            /* nb: we don't pass the usual l+1 here to tr_bitfieldCountRange ().
+            /* nb: we don't pass the usual l+1 here to tr_bitfieldCountRange().
                It's faster to handle the last block separately because its size
                needs to be checked separately. */
             haveBytes = tr_bitfieldCountRange(&cp->blockBitfield, f, l);

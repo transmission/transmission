@@ -157,7 +157,7 @@ char* tr_buildPath(char const* first_element, ...) TR_GNUC_NULL_TERMINATED TR_GN
 int64_t tr_getDirFreeSpace(char const* path);
 
 /**
- * @brief Convenience wrapper around timer_add () to have a timer wake up in a number of seconds and microseconds
+ * @brief Convenience wrapper around timer_add() to have a timer wake up in a number of seconds and microseconds
  * @param timer         the timer to set
  * @param seconds       seconds to wait
  * @param microseconds  microseconds to wait
@@ -165,7 +165,7 @@ int64_t tr_getDirFreeSpace(char const* path);
 void tr_timerAdd(struct event* timer, int seconds, int microseconds) TR_GNUC_NONNULL(1);
 
 /**
- * @brief Convenience wrapper around timer_add () to have a timer wake up in a number of milliseconds
+ * @brief Convenience wrapper around timer_add() to have a timer wake up in a number of milliseconds
  * @param timer         the timer to set
  * @param milliseconds  milliseconds to wait
  */
@@ -179,7 +179,7 @@ void tr_wait_msec(long int delay_milliseconds);
 
 /**
  * @brief make a copy of 'str' whose non-utf8 content has been corrected or stripped
- * @return a newly-allocated string that must be freed with tr_free ()
+ * @return a newly-allocated string that must be freed with tr_free()
  * @param str the string to make a clean copy of
  * @param len the length of the string to copy. If -1, the entire string is used.
  */
@@ -228,23 +228,23 @@ int tr_main_win32(int argc, char** argv, int (* real_main)(int, char**));
 ****
 ***/
 
-/** @brief Portability wrapper around malloc () in which `0' is a safe argument */
+/** @brief Portability wrapper around malloc() in which `0' is a safe argument */
 void* tr_malloc(size_t size);
 
-/** @brief Portability wrapper around calloc () in which `0' is a safe argument */
+/** @brief Portability wrapper around calloc() in which `0' is a safe argument */
 void* tr_malloc0(size_t size);
 
-/** @brief Portability wrapper around reallocf () in which `0' is a safe argument */
+/** @brief Portability wrapper around reallocf() in which `0' is a safe argument */
 void* tr_realloc(void* p, size_t size);
 
-/** @brief Portability wrapper around free () in which `NULL' is a safe argument */
+/** @brief Portability wrapper around free() in which `NULL' is a safe argument */
 void tr_free(void* p);
 
 /**
  * @brief make a newly-allocated copy of a chunk of memory
  * @param src the memory to copy
  * @param byteCount the number of bytes to copy
- * @return a newly-allocated copy of `src' that can be freed with tr_free ()
+ * @return a newly-allocated copy of `src' that can be freed with tr_free()
  */
 void* tr_memdup(void const* src, size_t byteCount);
 
@@ -262,26 +262,26 @@ void* tr_valloc(size_t bufLen);
 /**
  * @brief make a newly-allocated copy of a substring
  * @param in is a void* so that callers can pass in both signed & unsigned without a cast
- * @param len length of the substring to copy. if a length less than zero is passed in, strlen (len) is used
- * @return a newly-allocated copy of `in' that can be freed with tr_free ()
+ * @param len length of the substring to copy. if a length less than zero is passed in, strlen(len) is used
+ * @return a newly-allocated copy of `in' that can be freed with tr_free()
  */
 char* tr_strndup(void const* in, size_t len) TR_GNUC_MALLOC;
 
 /**
  * @brief make a newly-allocated copy of a string
  * @param in is a void* so that callers can pass in both signed & unsigned without a cast
- * @return a newly-allocated copy of `in' that can be freed with tr_free ()
+ * @return a newly-allocated copy of `in' that can be freed with tr_free()
  */
 char* tr_strdup(void const* in);
 
 /**
- * @brief like strcmp () but gracefully handles NULL strings
+ * @brief like strcmp() but gracefully handles NULL strings
  */
 int tr_strcmp0(char const* str1, char const* str2);
 
 char* evbuffer_free_to_str(struct evbuffer* buf, size_t* result_len);
 
-/** @brief similar to bsearch () but returns the index of the lower bound */
+/** @brief similar to bsearch() but returns the index of the lower bound */
 int tr_lowerBound(void const* key, void const* base, size_t nmemb, size_t size, int (* compar)(void const* key,
     void const* arrayMember), bool* exact_match) TR_GNUC_HOT TR_GNUC_NONNULL(1, 5, 6);
 
@@ -289,19 +289,19 @@ int tr_lowerBound(void const* key, void const* base, size_t nmemb, size_t size, 
 void tr_quickfindFirstK(void* base, size_t nmemb, size_t size, int (* compar)(void const*, void const*), size_t k);
 
 /**
- * @brief sprintf () a string into a newly-allocated buffer large enough to hold it
- * @return a newly-allocated string that can be freed with tr_free ()
+ * @brief sprintf() a string into a newly-allocated buffer large enough to hold it
+ * @return a newly-allocated string that can be freed with tr_free()
  */
 char* tr_strdup_printf(char const* fmt, ...) TR_GNUC_PRINTF(1, 2) TR_GNUC_MALLOC;
 char* tr_strdup_vprintf(char const* fmt, va_list args) TR_GNUC_MALLOC;
 
-/** @brief Portability wrapper for strlcpy () that uses the system implementation if available */
+/** @brief Portability wrapper for strlcpy() that uses the system implementation if available */
 size_t tr_strlcpy(char* dst, void const* src, size_t siz);
 
-/** @brief Portability wrapper for snprintf () that uses the system implementation if available */
+/** @brief Portability wrapper for snprintf() that uses the system implementation if available */
 int tr_snprintf(char* buf, size_t buflen, char const* fmt, ...) TR_GNUC_PRINTF(3, 4) TR_GNUC_NONNULL(1, 3);
 
-/** @brief Convenience wrapper around strerorr () guaranteed to not return NULL
+/** @brief Convenience wrapper around strerorr() guaranteed to not return NULL
     @param errnum the error number to describe */
 char const* tr_strerror(int errnum);
 
@@ -312,10 +312,10 @@ char* tr_strstrip(char* str);
 /** @brief Returns true if the string ends with the specified case-insensitive suffix */
 bool tr_str_has_suffix(char const* str, char const* suffix);
 
-/** @brief Portability wrapper for memmem () that uses the system implementation if available */
+/** @brief Portability wrapper for memmem() that uses the system implementation if available */
 char const* tr_memmem(char const* haystack, size_t haystack_len, char const* needle, size_t needle_len);
 
-/** @brief Portability wrapper for strsep () that uses the system implementation if available */
+/** @brief Portability wrapper for strsep() that uses the system implementation if available */
 char* tr_strsep(char** str, char const* delim);
 
 /***
@@ -348,7 +348,7 @@ double tr_getRatio(uint64_t numerator, uint64_t denominator);
 /**
  * @brief Given a string like "1-4" or "1-4,6,9,14-51", this returns a
  *        newly-allocated array of all the integers in the set.
- * @return a newly-allocated array of integers that must be freed with tr_free (),
+ * @return a newly-allocated array of integers that must be freed with tr_free(),
  *         or NULL if a fragment of the string can't be parsed.
  *
  * For example, "5-8" will return [ 5, 6, 7, 8 ] and setmeCount will be 4.
@@ -358,13 +358,13 @@ int* tr_parseNumberRange(char const* str, size_t str_len, int* setmeCount) TR_GN
 /**
  * @brief truncate a double value at a given number of decimal places.
  *
- * this can be used to prevent a printf () call from rounding up:
+ * this can be used to prevent a printf() call from rounding up:
  * call with the decimal_places argument equal to the number of
- * decimal places in the printf ()'s precision:
+ * decimal places in the printf()'s precision:
  *
- * - printf ("%.2f%%",           99.999  ) ==> "100.00%"
+ * - printf("%.2f%%", 99.999) ==> "100.00%"
  *
- * - printf ("%.2f%%", tr_truncd (99.999, 2)) ==>  "99.99%"
+ * - printf("%.2f%%", tr_truncd(99.999, 2)) ==> "99.99%"
  *             ^                        ^
  *             |   These should match   |
  *             +------------------------+
@@ -382,10 +382,10 @@ char* tr_strpercent(char* buf, double x, size_t buflen);
  */
 char* tr_strratio(char* buf, size_t buflen, double ratio, char const* infinity) TR_GNUC_NONNULL(1, 4);
 
-/** @brief Portability wrapper for localtime_r () that uses the system implementation if available */
+/** @brief Portability wrapper for localtime_r() that uses the system implementation if available */
 struct tm* tr_localtime_r(time_t const* _clock, struct tm* _result);
 
-/** @brief Portability wrapper for gettimeofday (), with tz argument dropped */
+/** @brief Portability wrapper for gettimeofday(), with tz argument dropped */
 int tr_gettimeofday(struct timeval* tv);
 
 /**
@@ -401,11 +401,11 @@ void tr_removeElementFromArray(void* array, unsigned int index_to_remove, size_t
 ****
 ***/
 
-/** @brief Private libtransmission variable that's visible only for inlining in tr_time () */
+/** @brief Private libtransmission variable that's visible only for inlining in tr_time() */
 extern time_t __tr_current_time;
 
 /**
- * @brief very inexpensive form of time (NULL)
+ * @brief very inexpensive form of time(NULL)
  * @return the current epoch time in seconds
  *
  * This function returns a second counter that is updated once per second.
@@ -419,23 +419,23 @@ static inline time_t tr_time(void)
     return __tr_current_time;
 }
 
-/** @brief Private libtransmission function to update tr_time ()'s counter */
+/** @brief Private libtransmission function to update tr_time()'s counter */
 static inline void tr_timeUpdate(time_t now)
 {
     __tr_current_time = now;
 }
 
-/** @brief Portability wrapper for htonll () that uses the system implementation if available */
+/** @brief Portability wrapper for htonll() that uses the system implementation if available */
 uint64_t tr_htonll(uint64_t);
 
-/** @brief Portability wrapper for htonll () that uses the system implementation if available */
+/** @brief Portability wrapper for htonll() that uses the system implementation if available */
 uint64_t tr_ntohll(uint64_t);
 
 /***
 ****
 ***/
 
-/* example: tr_formatter_size_init (1024, _ ("KiB"), _ ("MiB"), _ ("GiB"), _ ("TiB")); */
+/* example: tr_formatter_size_init(1024, _("KiB"), _("MiB"), _("GiB"), _("TiB")); */
 
 void tr_formatter_size_init(unsigned int kilo, char const* kb, char const* mb, char const* gb, char const* tb);
 

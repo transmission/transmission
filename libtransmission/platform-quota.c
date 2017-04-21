@@ -10,7 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <event2/util.h> /* evutil_ascii_strcasecmp () */
+#include <event2/util.h> /* evutil_ascii_strcasecmp() */
 
 #ifndef _WIN32
 #include <unistd.h> /* getuid() */
@@ -380,7 +380,7 @@ static int64_t getquota(char const* device)
 #ifdef __APPLE__
         return (freespace < 0) ? 0 : freespace;
 #else
-        return (freespace < 0) ? 0 : freespace* 1024;
+        return (freespace < 0) ? 0 : freespace * 1024;
 #endif
     }
 
@@ -420,7 +420,7 @@ static int64_t getxfsquota(char* device)
         }
 
         freespace = limit - (dq.d_bcount >> 1);
-        return (freespace < 0) ? 0 : freespace* 1024;
+        return (freespace < 0) ? 0 : freespace * 1024;
     }
 
     /* something went wrong */

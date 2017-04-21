@@ -26,7 +26,7 @@
 #include <glib/gi18n.h>
 
 #include <libtransmission/transmission.h>
-#include <libtransmission/utils.h> /* tr_formatter_speed_KBps () */
+#include <libtransmission/utils.h> /* tr_formatter_speed_KBps() */
 
 #include "actions.h"
 #include "conf.h"
@@ -66,7 +66,7 @@ PrivateData;
 
 static TR_DEFINE_QUARK(private_data, private_data)
 
-static PrivateData* get_private_data(GtkWindow* w)
+static PrivateData* get_private_data(GtkWindow * w)
 {
     return g_object_get_qdata(G_OBJECT(w), private_data_quark());
 }
@@ -121,7 +121,7 @@ static GtkWidget* makeview(PrivateData* p)
     p->selection = gtk_tree_view_get_selection(tree_view);
 
     p->column = col = GTK_TREE_VIEW_COLUMN(g_object_new(GTK_TYPE_TREE_VIEW_COLUMN, "title", _("Torrent"), "resizable", TRUE,
-                    "sizing", GTK_TREE_VIEW_COLUMN_FIXED, NULL));
+        "sizing", GTK_TREE_VIEW_COLUMN_FIXED, NULL));
 
     p->renderer = r = torrent_cell_renderer_new();
     gtk_tree_view_column_pack_start(col, r, FALSE);
@@ -137,7 +137,7 @@ static GtkWidget* makeview(PrivateData* p)
     gtk_tree_selection_set_mode(GTK_TREE_SELECTION(sel), GTK_SELECTION_MULTIPLE);
 
     g_signal_connect(view, "popup-menu", G_CALLBACK(on_popup_menu), NULL);
-    g_signal_connect(view, "button-press-event", G_CALLBACK(on_tree_view_button_pressed), (void*) on_popup_menu);
+    g_signal_connect(view, "button-press-event", G_CALLBACK(on_tree_view_button_pressed), (void*)on_popup_menu);
     g_signal_connect(view, "button-release-event", G_CALLBACK(on_tree_view_button_released), NULL);
     g_signal_connect(view, "row-activated", G_CALLBACK(view_row_activated), NULL);
 
@@ -212,7 +212,7 @@ static void onYinYangReleased(GtkWidget* w UNUSED, gpointer vprivate)
 
 static struct
 {
-    char const* val, *i18n;
+    char const* val, * i18n;
 }
 stats_modes[] =
 {
@@ -260,7 +260,7 @@ static void alt_speed_toggled_cb(GtkToggleButton* button, gpointer vprivate)
 {
     PrivateData* p = vprivate;
     gboolean const b = gtk_toggle_button_get_active(button);
-    gtr_core_set_pref_bool(p->core, TR_KEY_alt_speed_enabled,  b);
+    gtr_core_set_pref_bool(p->core, TR_KEY_alt_speed_enabled, b);
 }
 
 /***
@@ -434,7 +434,7 @@ static void onRatioSet(GtkCheckMenuItem* check, gpointer vp)
 static GtkWidget* createRatioMenu(PrivateData* p)
 {
     int i, n;
-    GtkWidget* m, *w;
+    GtkWidget* m, * w;
     GtkMenuShell* menu_shell;
 
     m = gtk_menu_new();
@@ -542,8 +542,8 @@ GtkWidget* gtr_window_new(GtkApplication* app, GtkUIManager* ui_mgr, TrCore* cor
     PrivateData* p;
     GtkWidget* sibling = NULL;
     GtkWidget* ul_lb, * dl_lb;
-    GtkWidget* mainmenu, *toolbar, *filter, *list, *status;
-    GtkWidget* vbox, *w, *self, *menu;
+    GtkWidget* mainmenu, * toolbar, * filter, * list, * status;
+    GtkWidget* vbox, * w, * self, * menu;
     GtkWidget* grid_w;
     GtkWindow* win;
     GtkCssProvider* css_provider;

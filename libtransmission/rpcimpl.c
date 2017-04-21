@@ -1560,7 +1560,7 @@ static void gotNewBlocklist(tr_session* session, bool did_connect UNUSED, bool d
         tr_error* error = NULL;
 
         /* this is an odd Magic Number required by zlib to enable gz support.
-           See zlib's inflateInit2 () documentation for a full description */
+           See zlib's inflateInit2() documentation for a full description */
         int const windowBits = 15 + 32;
 
         stream.zalloc = (alloc_func)Z_NULL;

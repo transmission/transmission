@@ -7,7 +7,7 @@
  */
 
 #include <assert.h>
-#include <string.h> /* strlen () */
+#include <string.h> /* strlen() */
 
 #include "transmission.h"
 #include "error.h"

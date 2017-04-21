@@ -9,9 +9,9 @@
 #include <assert.h>
 #include <errno.h>
 #include <limits.h> /* NAME_MAX */
-#include <stdlib.h> /* realloc () */
+#include <stdlib.h> /* realloc() */
 
-#include <unistd.h> /* close () */
+#include <unistd.h> /* close() */
 
 #include <sys/inotify.h>
 
@@ -74,7 +74,7 @@ static void tr_watchdir_inotify_on_event(struct bufferevent* event, void* contex
     char* name = tr_new(char, name_size);
 
     /* Read the size of the struct excluding name into buf. Guaranteed to have at
-       least sizeof (ev) available */
+       least sizeof(ev) available */
     while ((nread = bufferevent_read(event, &ev, sizeof(ev))) != 0)
     {
         if (nread == (size_t)-1)

@@ -8,8 +8,8 @@
 
 #include <assert.h>
 #include <stdarg.h>
-#include <stdlib.h> /* abs (), srand (), rand () */
-#include <string.h> /* memcpy (), memmove (), memset (), strcmp (), strlen () */
+#include <stdlib.h> /* abs(), srand(), rand() */
+#include <string.h> /* memcpy(), memmove(), memset(), strcmp(), strlen() */
 
 #include <b64/cdecode.h>
 #include <b64/cencode.h>
