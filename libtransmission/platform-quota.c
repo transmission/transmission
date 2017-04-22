@@ -89,7 +89,7 @@ static char const* getdev(char const* path)
         return NULL;
     }
 
-    while (getmntent(fp, &mnt))
+    while (getmntent(fp, &mnt) != -1)
     {
         if (tr_strcmp0(path, mnt.mnt_mountp) == 0)
         {
@@ -166,7 +166,7 @@ static char const* getfstype(char const* device)
         return NULL;
     }
 
-    while (getmntent(fp, &mnt))
+    while (getmntent(fp, &mnt) != -1)
     {
         if (tr_strcmp0(device, mnt.mnt_mountp) == 0)
         {
