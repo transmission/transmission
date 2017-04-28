@@ -30,6 +30,12 @@ int main(void)
     TEST_CLIENT("-BT791\0-", "BitTorrent 7.9.1");
     TEST_CLIENT("-BT791B-", "BitTorrent 7.9.1 (Beta)");
 
+    /* Xfplay 9.9.92 to 9.9.94 uses "-XF9992-" */
+    TEST_CLIENT("-XF9992-", "Xfplay 9.9.92");
+
+    /* Older Xfplay versions have three digit version number */
+    TEST_CLIENT("-XF9990-", "Xfplay 9.9.9");
+
     /* gobbledygook */
     TEST_CLIENT("-IIO\x10\x2D\x04-", "-IIO%10-%04-");
     TEST_CLIENT("-I\05O\x08\x03\x01-", "-I%05O%08%03%01-");

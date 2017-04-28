@@ -587,6 +587,17 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
         {
             tr_snprintf(buf, buflen, "MediaGet %d.%02d", charint(id[3]), charint(id[4]));
         }
+        else if (strncmp(chid + 1, "XF", 2) == 0)
+        {
+            if (chid[6] == '0')
+            {
+                three_digits(buf, buflen, "Xfplay", id + 3);
+            }
+            else
+            {
+                tr_snprintf(buf, buflen, "Xfplay %d.%d.%d", strint(id + 3, 1), strint(id + 4, 1), strint(id + 5, 2));
+            }
+        }
 
         if (*buf)
         {
