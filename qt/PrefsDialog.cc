@@ -51,17 +51,51 @@
 namespace
 {
 
-char const* PREF_KEY("pref-key");
-
-void setPrefKey(QObject* object, int key)
+class PreferenceWidget
 {
-    object->setProperty(PREF_KEY, key);
-}
+    static char const* const PREF_KEY;
 
-int getPrefKey(QObject const* object)
-{
-    return object->property(PREF_KEY).toInt();
-}
+public:
+    explicit PreferenceWidget(QObject* object) :
+        m_object(object)
+    {
+    }
+
+    template<typename T>
+    bool is() const
+    {
+        return qobject_cast<T*>(m_object) != nullptr;
+    }
+
+    template<typename T>
+    T const* as() const
+    {
+        assert(is<T>());
+        return static_cast<T const*>(m_object);
+    }
+
+    template<typename T>
+    T* as()
+    {
+        assert(is<T>());
+        return static_cast<T*>(m_object);
+    }
+
+    void setPrefKey(int key)
+    {
+        m_object->setProperty(PREF_KEY, key);
+    }
+
+    int getPrefKey() const
+    {
+        return m_object->property(PREF_KEY).toInt();
+    }
+
+private:
+    QObject* const m_object;
+};
+
+char const* const PreferenceWidget::PREF_KEY = "pref-key";
 
 int qtDayToTrDay(int day)
 {
@@ -129,33 +163,35 @@ QString qtDayName(int day)
 
 bool PrefsDialog::updateWidgetValue(QWidget* widget, int prefKey)
 {
-    if (auto w = qobject_cast<QCheckBox*>(widget))
+    PreferenceWidget prefWidget(widget);
+
+    if (prefWidget.is<QCheckBox>())
     {
-        w->setChecked(myPrefs.getBool(prefKey));
+        prefWidget.as<QCheckBox>()->setChecked(myPrefs.getBool(prefKey));
     }
-    else if (auto w = qobject_cast<QSpinBox*>(widget))
+    else if (prefWidget.is<QSpinBox>())
     {
-        w->setValue(myPrefs.getInt(prefKey));
+        prefWidget.as<QSpinBox>()->setValue(myPrefs.getInt(prefKey));
     }
-    else if (auto w = qobject_cast<QDoubleSpinBox*>(widget))
+    else if (prefWidget.is<QDoubleSpinBox>())
     {
-        w->setValue(myPrefs.getDouble(prefKey));
+        prefWidget.as<QDoubleSpinBox>()->setValue(myPrefs.getDouble(prefKey));
     }
-    else if (auto w = qobject_cast<QTimeEdit*>(widget))
+    else if (prefWidget.is<QTimeEdit>())
     {
-        w->setTime(QTime(0, 0).addSecs(myPrefs.getInt(prefKey) * 60));
+        prefWidget.as<QTimeEdit>()->setTime(QTime(0, 0).addSecs(myPrefs.getInt(prefKey) * 60));
     }
-    else if (auto w = qobject_cast<QLineEdit*>(widget))
+    else if (prefWidget.is<QLineEdit>())
     {
-        w->setText(myPrefs.getString(prefKey));
+        prefWidget.as<QLineEdit>()->setText(myPrefs.getString(prefKey));
     }
-    else if (auto w = qobject_cast<PathButton*>(widget))
+    else if (prefWidget.is<PathButton>())
     {
-        w->setPath(myPrefs.getString(prefKey));
+        prefWidget.as<PathButton>()->setPath(myPrefs.getString(prefKey));
     }
-    else if (auto w = qobject_cast<FreeSpaceLabel*>(widget))
+    else if (prefWidget.is<FreeSpaceLabel>())
     {
-        w->setPath(myPrefs.getString(prefKey));
+        prefWidget.as<FreeSpaceLabel>()->setPath(myPrefs.getString(prefKey));
     }
     else
     {
@@ -167,27 +203,29 @@ bool PrefsDialog::updateWidgetValue(QWidget* widget, int prefKey)
 
 void PrefsDialog::linkWidgetToPref(QWidget* widget, int prefKey)
 {
-    setPrefKey(widget, prefKey);
+    PreferenceWidget prefWidget(widget);
+
+    prefWidget.setPrefKey(prefKey);
     updateWidgetValue(widget, prefKey);
     myWidgets.insert(prefKey, widget);
 
-    if (widget->inherits("QCheckBox"))
+    if (prefWidget.is<QCheckBox>())
     {
         connect(widget, SIGNAL(toggled(bool)), SLOT(checkBoxToggled(bool)));
     }
-    else if (widget->inherits("QTimeEdit"))
+    else if (prefWidget.is<QTimeEdit>())
     {
         connect(widget, SIGNAL(editingFinished()), SLOT(timeEditingFinished()));
     }
-    else if (widget->inherits("QLineEdit"))
+    else if (prefWidget.is<QLineEdit>())
     {
         connect(widget, SIGNAL(editingFinished()), SLOT(lineEditingFinished()));
     }
-    else if (widget->inherits("PathButton"))
+    else if (prefWidget.is<PathButton>())
     {
         connect(widget, SIGNAL(pathChanged(QString)), SLOT(pathChanged(QString)));
     }
-    else if (widget->inherits("QAbstractSpinBox"))
+    else if (prefWidget.is<QAbstractSpinBox>())
     {
         connect(widget, SIGNAL(editingFinished()), SLOT(spinBoxEditingFinished()));
     }
@@ -195,51 +233,60 @@ void PrefsDialog::linkWidgetToPref(QWidget* widget, int prefKey)
 
 void PrefsDialog::checkBoxToggled(bool checked)
 {
-    if (auto c = qobject_cast<QCheckBox*>(sender()))
+    PreferenceWidget const prefWidget(sender());
+
+    if (prefWidget.is<QCheckBox>())
     {
-        setPref(getPrefKey(c), checked);
+        setPref(prefWidget.getPrefKey(), checked);
     }
 }
 
 void PrefsDialog::spinBoxEditingFinished()
 {
-    QObject const* spin = sender();
-    int const key = getPrefKey(spin);
+    PreferenceWidget const prefWidget(sender());
 
-    if (auto e = qobject_cast<QDoubleSpinBox const*>(spin))
+    if (prefWidget.is<QDoubleSpinBox>())
     {
-        setPref(key, e->value());
+        setPref(prefWidget.getPrefKey(), prefWidget.as<QDoubleSpinBox>()->value());
     }
-    else if (auto e = qobject_cast<QSpinBox const*>(spin))
+    else if (prefWidget.is<QSpinBox>())
     {
-        setPref(key, e->value());
+        setPref(prefWidget.getPrefKey(), prefWidget.as<QSpinBox>()->value());
     }
 }
 
 void PrefsDialog::timeEditingFinished()
 {
-    if (auto e = qobject_cast<QTimeEdit const*>(sender()))
+    PreferenceWidget const prefWidget(sender());
+
+    if (prefWidget.is<QTimeEdit>())
     {
-        setPref(getPrefKey(e), QTime(0, 0).secsTo(e->time()) / 60);
+        setPref(prefWidget.getPrefKey(), QTime(0, 0).secsTo(prefWidget.as<QTimeEdit>()->time()) / 60);
     }
 }
 
 void PrefsDialog::lineEditingFinished()
 {
-    if (auto e = qobject_cast<QLineEdit const*>(sender()))
+    PreferenceWidget const prefWidget(sender());
+
+    if (prefWidget.is<QLineEdit>())
     {
-        if (e->isModified())
+        QLineEdit const* const lineEdit = prefWidget.as<QLineEdit>();
+
+        if (lineEdit->isModified())
         {
-            setPref(getPrefKey(e), e->text());
+            setPref(prefWidget.getPrefKey(), lineEdit->text());
         }
     }
 }
 
 void PrefsDialog::pathChanged(QString const& path)
 {
-    if (auto b = qobject_cast<PathButton const*>(sender()))
+    PreferenceWidget const prefWidget(sender());
+
+    if (prefWidget.is<PathButton>())
     {
-        setPref(getPrefKey(b), path);
+        setPref(prefWidget.getPrefKey(), path);
     }
 }
 
