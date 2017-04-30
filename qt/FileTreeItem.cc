@@ -37,7 +37,7 @@ FileTreeItem::~FileTreeItem()
 {
     assert(myChildren.isEmpty());
 
-    if (myParent != 0)
+    if (myParent != nullptr)
     {
         int const pos = row();
         assert((pos >= 0) && "couldn't find child in parent's lookup");
@@ -57,7 +57,7 @@ void FileTreeItem::appendChild(FileTreeItem* child)
 
 FileTreeItem* FileTreeItem::child(QString const& filename)
 {
-    FileTreeItem* item(0);
+    FileTreeItem* item(nullptr);
 
     int const row = getMyChildRows().value(filename, -1);
 
@@ -401,7 +401,7 @@ QString FileTreeItem::path() const
     QString itemPath;
     FileTreeItem const* item = this;
 
-    while (item != NULL && !item->name().isEmpty())
+    while (item != nullptr && !item->name().isEmpty())
     {
         if (itemPath.isEmpty())
         {

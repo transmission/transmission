@@ -60,9 +60,9 @@ QVariant TorrentModel::data(QModelIndex const& index, int role) const
 {
     QVariant var;
 
-    Torrent const* t = myTorrents.value(index.row(), 0);
+    Torrent const* t = myTorrents.value(index.row(), nullptr);
 
-    if (t != 0)
+    if (t != nullptr)
     {
         switch (role)
         {
@@ -214,7 +214,7 @@ void TorrentModel::updateTorrents(tr_variant* torrents, bool isCompleteList)
 
                 Torrent* tor = getTorrentFromId(id);
 
-                if (tor == 0)
+                if (tor == nullptr)
                 {
                     tor = new Torrent(myPrefs, id);
                     tor->update(child);

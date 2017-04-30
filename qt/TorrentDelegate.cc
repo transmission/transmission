@@ -328,7 +328,7 @@ QString TorrentDelegate::statusString(Torrent const& tor)
         case TR_STATUS_DOWNLOAD:
             if (!tor.hasMetadata())
             {
-                str = tr("Downloading metadata from %Ln peer(s) (%1% done)", 0, tor.peersWeAreDownloadingFrom()).
+                str = tr("Downloading metadata from %Ln peer(s) (%1% done)", nullptr, tor.peersWeAreDownloadingFrom()).
                         arg(Formatter::percentToString(100.0 * tor.metadataPercentDone()));
             }
             else
@@ -338,12 +338,12 @@ QString TorrentDelegate::statusString(Torrent const& tor)
                 if (tor.connectedPeersAndWebseeds() == 0)
                 {
                     //: First part of phrase "Downloading from ... peer(s) and ... web seed(s)"
-                    str = tr("Downloading from %Ln peer(s)", 0, tor.peersWeAreDownloadingFrom());
+                    str = tr("Downloading from %Ln peer(s)", nullptr, tor.peersWeAreDownloadingFrom());
                 }
                 else
                 {
                     //: First part of phrase "Downloading from ... of ... connected peer(s) and ... web seed(s)"
-                    str = tr("Downloading from %1 of %Ln connected peer(s)", 0, tor.connectedPeersAndWebseeds()).
+                    str = tr("Downloading from %1 of %Ln connected peer(s)", nullptr, tor.connectedPeersAndWebseeds()).
                             arg(tor.peersWeAreDownloadingFrom());
                 }
 
@@ -352,7 +352,7 @@ QString TorrentDelegate::statusString(Torrent const& tor)
                     //: Second (optional) part of phrase "Downloading from ... of ... connected peer(s) and ... web
                     // seed(s)";
                     //: notice that leading space (before "and") is included here
-                    str += tr(" and %Ln web seed(s)", 0, tor.webseedsWeAreDownloadingFrom());
+                    str += tr(" and %Ln web seed(s)", nullptr, tor.webseedsWeAreDownloadingFrom());
                 }
             }
 
@@ -361,11 +361,11 @@ QString TorrentDelegate::statusString(Torrent const& tor)
         case TR_STATUS_SEED:
             if (tor.connectedPeers() == 0)
             {
-                str = tr("Seeding to %Ln peer(s)", 0, tor.peersWeAreUploadingTo());
+                str = tr("Seeding to %Ln peer(s)", nullptr, tor.peersWeAreUploadingTo());
             }
             else
             {
-                str = tr("Seeding to %1 of %Ln connected peer(s)", 0, tor.connectedPeers()).arg(tor.peersWeAreUploadingTo());
+                str = tr("Seeding to %1 of %Ln connected peer(s)", nullptr, tor.connectedPeers()).arg(tor.peersWeAreUploadingTo());
             }
 
             break;

@@ -576,7 +576,7 @@ void Torrent::update(tr_variant* d)
             {
                 char const* val;
 
-                if (tr_variantGetStr(child, &val, NULL))
+                if (tr_variantGetStr(child, &val, nullptr))
                 {
                     changed |= setString(property_index, val);
                 }
@@ -626,7 +626,7 @@ void Torrent::update(tr_variant* d)
             break;
 
         default:
-            std::cerr << __FILE__ << ':' << __LINE__ << "unhandled type: " << tr_quark_get_string(key, NULL) << std::endl;
+            std::cerr << __FILE__ << ':' << __LINE__ << "unhandled type: " << tr_quark_get_string(key, nullptr) << std::endl;
             assert(0 && "unhandled type");
         }
     }

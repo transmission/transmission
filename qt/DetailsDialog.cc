@@ -200,7 +200,7 @@ QIcon DetailsDialog::getStockIcon(QString const& freedesktop_name, int fallback)
 
     if (icon.isNull())
     {
-        icon = style()->standardIcon(QStyle::StandardPixmap(fallback), 0, this);
+        icon = style()->standardIcon(QStyle::StandardPixmap(fallback), nullptr, this);
     }
 
     return icon;
@@ -1067,9 +1067,9 @@ void DetailsDialog::refresh()
         for (Peer const& peer : peers)
         {
             QString const key = idStr + QLatin1Char(':') + peer.address;
-            PeerItem* item = static_cast<PeerItem*>(myPeers.value(key, 0));
+            PeerItem* item = static_cast<PeerItem*>(myPeers.value(key, nullptr));
 
-            if (item == 0) // new peer has connected
+            if (item == nullptr) // new peer has connected
             {
                 static QIcon const myEncryptionIcon(QLatin1String(":/icons/encrypted.png"));
                 static QIcon const myEmptyIcon;
@@ -1173,7 +1173,7 @@ void DetailsDialog::refresh()
     {
         if (!peers2.contains(key)) // old peer has disconnected
         {
-            QTreeWidgetItem* item = myPeers.value(key, 0);
+            QTreeWidgetItem* item = myPeers.value(key, nullptr);
             ui.peersView->takeTopLevelItem(ui.peersView->indexOfTopLevelItem(item));
             delete item;
         }
@@ -1273,7 +1273,7 @@ void DetailsDialog::onIdleModeChanged(int index)
 void DetailsDialog::onIdleLimitChanged()
 {
     //: Spin box suffix, "Stop seeding if idle for: [ 5 minutes ]" (includes leading space after the number, if needed)
-    QString const unitsSuffix = tr(" minute(s)", 0, ui.idleSpin->value());
+    QString const unitsSuffix = tr(" minute(s)", nullptr, ui.idleSpin->value());
 
     if (ui.idleSpin->suffix() != unitsSuffix)
     {
@@ -1557,7 +1557,7 @@ void DetailsDialog::onOpenRequested(QString const& path)
     {
         Torrent const* const tor = myModel.getTorrentFromId(id);
 
-        if (tor == NULL)
+        if (tor == nullptr)
         {
             continue;
         }

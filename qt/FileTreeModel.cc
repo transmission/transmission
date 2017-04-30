@@ -318,7 +318,7 @@ void FileTreeModel::clearSubtree(QModelIndex const& top)
 
     FileTreeItem* const item = itemFromIndex(top);
 
-    if (item == 0)
+    if (item == nullptr)
     {
         return;
     }
@@ -342,7 +342,7 @@ void FileTreeModel::clear()
 
 FileTreeItem* FileTreeModel::findItemForFileIndex(int fileIndex) const
 {
-    return myIndexCache.value(fileIndex, 0);
+    return myIndexCache.value(fileIndex, nullptr);
 }
 
 void FileTreeModel::addFile(int fileIndex, QString const& filename, bool wanted, int priority, uint64_t totalSize,

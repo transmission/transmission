@@ -79,7 +79,7 @@ void RpcClient::start(QUrl const& url)
 
 bool RpcClient::isLocal() const
 {
-    if (mySession != 0)
+    if (mySession != nullptr)
     {
         return true;
     }
@@ -189,7 +189,7 @@ RpcResponseFuture RpcClient::sendRequest(TrVariantPtr json)
 
 QNetworkAccessManager* RpcClient::networkAccessManager()
 {
-    if (myNAM == 0)
+    if (myNAM == nullptr)
     {
         myNAM = new QNetworkAccessManager();
 

@@ -89,7 +89,7 @@ void TrackerModel::refresh(TorrentModel const& torrentModel, QSet<int> const& id
     {
         Torrent const* tor = torrentModel.getTorrentFromId(id);
 
-        if (tor != 0)
+        if (tor != nullptr)
         {
             TrackerStatsList const trackerList = tor->trackerStats();
 

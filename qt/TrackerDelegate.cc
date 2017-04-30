@@ -181,7 +181,7 @@ QString TrackerDelegate::getText(TrackerInfo const& inf) const
 {
     QString key;
     QString str;
-    time_t const now(time(0));
+    time_t const now(time(nullptr));
     QString const err_markup_begin = QLatin1String("<span style=\"color:red\">");
     QString const err_markup_end = QLatin1String("</span>");
     QString const timeout_markup_begin = QLatin1String("<span style=\"color:#224466\">");
@@ -191,9 +191,9 @@ QString TrackerDelegate::getText(TrackerInfo const& inf) const
 
     // hostname
     str += inf.st.isBackup ? QLatin1String("<i>") : QLatin1String("<b>");
-    char* host = NULL;
+    char* host = nullptr;
     int port = 0;
-    tr_urlParse(inf.st.announce.toUtf8().constData(), TR_BAD_SIZE, NULL, &host, &port, NULL);
+    tr_urlParse(inf.st.announce.toUtf8().constData(), TR_BAD_SIZE, nullptr, &host, &port, nullptr);
     str += QString::fromLatin1("%1:%2").arg(QString::fromUtf8(host)).arg(port);
     tr_free(host);
 
@@ -215,7 +215,7 @@ QString TrackerDelegate::getText(TrackerInfo const& inf) const
             if (inf.st.lastAnnounceSucceeded)
             {
                 //: %1 and %2 are replaced with HTML markup, %3 is duration
-                str += tr("Got a list of%1 %Ln peer(s)%2 %3 ago", 0, inf.st.lastAnnouncePeerCount).arg(success_markup_begin).
+                str += tr("Got a list of%1 %Ln peer(s)%2 %3 ago", nullptr, inf.st.lastAnnouncePeerCount).arg(success_markup_begin).
                         arg(success_markup_end).arg(tstr);
             }
             else if (inf.st.lastAnnounceTimedOut)
@@ -276,12 +276,12 @@ QString TrackerDelegate::getText(TrackerInfo const& inf) const
                     {
                         //: First part of phrase "Tracker had ... seeder(s) and ... leecher(s) ... ago";
                         //: %1 and %2 are replaced with HTML markup
-                        str += tr("Tracker had%1 %Ln seeder(s)%2", 0, inf.st.seederCount).arg(success_markup_begin).
+                        str += tr("Tracker had%1 %Ln seeder(s)%2", nullptr, inf.st.seederCount).arg(success_markup_begin).
                                 arg(success_markup_end);
                         //: Second part of phrase "Tracker had ... seeder(s) and ... leecher(s) ... ago";
                         //: %1 and %2 are replaced with HTML markup, %3 is duration;
                         //: notice that leading space (before "and") is included here
-                        str += tr(" and%1 %Ln leecher(s)%2 %3 ago", 0, inf.st.leecherCount).arg(success_markup_begin).
+                        str += tr(" and%1 %Ln leecher(s)%2 %3 ago", nullptr, inf.st.leecherCount).arg(success_markup_begin).
                                 arg(success_markup_end).arg(tstr);
                     }
                     else

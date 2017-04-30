@@ -24,7 +24,7 @@
 
 WatchDir::WatchDir(TorrentModel const& model) :
     myModel(model),
-    myWatcher(0)
+    myWatcher(nullptr)
 {
 }
 
@@ -40,7 +40,7 @@ int WatchDir::metainfoTest(QString const& filename) const
 {
     int ret;
     tr_info inf;
-    tr_ctor* ctor = tr_ctorNew(0);
+    tr_ctor* ctor = tr_ctorNew(nullptr);
 
     // parse
     tr_ctorSetMetainfoFromFile(ctor, filename.toUtf8().constData());
@@ -90,7 +90,7 @@ void WatchDir::setPath(QString const& path, bool isEnabled)
     if (myWatcher)
     {
         delete myWatcher;
-        myWatcher = 0;
+        myWatcher = nullptr;
     }
 
     // maybe create a new watcher

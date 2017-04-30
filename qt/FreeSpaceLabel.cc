@@ -93,7 +93,7 @@ void FreeSpaceLabel::onTimer()
 
             // update the tooltip
             size_t len = 0;
-            char const* path = 0;
+            char const* path = nullptr;
             tr_variantDictFindStr(r.args.get(), TR_KEY_path, &path, &len);
             str = QString::fromUtf8(path, len);
             setToolTip(QDir::toNativeSeparators(str));

@@ -435,7 +435,7 @@ void PrefsDialog::onBlocklistDialogDestroyed(QObject* o)
 {
     Q_UNUSED(o);
 
-    myBlocklistDialog = 0;
+    myBlocklistDialog = nullptr;
 }
 
 void PrefsDialog::onUpdateBlocklistCancelled()
@@ -446,7 +446,7 @@ void PrefsDialog::onUpdateBlocklistCancelled()
 
 void PrefsDialog::onBlocklistUpdated(int n)
 {
-    myBlocklistDialog->setText(tr("<b>Update succeeded!</b><p>Blocklist now has %Ln rule(s).", 0, n));
+    myBlocklistDialog->setText(tr("<b>Update succeeded!</b><p>Blocklist now has %Ln rule(s).", nullptr, n));
     myBlocklistDialog->setTextFormat(Qt::RichText);
 }
 
@@ -497,7 +497,7 @@ void PrefsDialog::initPrivacyTab()
 void PrefsDialog::onIdleLimitChanged()
 {
     //: Spin box suffix, "Stop seeding if idle for: [ 5 minutes ]" (includes leading space after the number, if needed)
-    QString const unitsSuffix = tr(" minute(s)", 0, ui.idleLimitSpin->value());
+    QString const unitsSuffix = tr(" minute(s)", nullptr, ui.idleLimitSpin->value());
 
     if (ui.idleLimitSpin->suffix() != unitsSuffix)
     {
@@ -520,7 +520,7 @@ void PrefsDialog::initSeedingTab()
 void PrefsDialog::onQueueStalledMinutesChanged()
 {
     //: Spin box suffix, "Download is inactive if data sharing stopped: [ 5 minutes ago ]" (includes leading space after the number, if needed)
-    QString const unitsSuffix = tr(" minute(s) ago", 0, ui.queueStalledMinutesSpin->value());
+    QString const unitsSuffix = tr(" minute(s) ago", nullptr, ui.queueStalledMinutesSpin->value());
 
     if (ui.queueStalledMinutesSpin->suffix() != unitsSuffix)
     {
@@ -669,7 +669,7 @@ void PrefsDialog::sessionUpdated()
 void PrefsDialog::updateBlocklistLabel()
 {
     int const n = mySession.blocklistSize();
-    ui.blocklistStatusLabel->setText(tr("<i>Blocklist contains %Ln rule(s)</i>", 0, n));
+    ui.blocklistStatusLabel->setText(tr("<i>Blocklist contains %Ln rule(s)</i>", nullptr, n));
 }
 
 void PrefsDialog::refreshPref(int key)

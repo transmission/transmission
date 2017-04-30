@@ -149,7 +149,7 @@ void OptionsDialog::reload()
     clearInfo();
     clearVerify();
 
-    tr_ctor* ctor = tr_ctorNew(0);
+    tr_ctor* ctor = tr_ctorNew(nullptr);
 
     switch (myAdd.type)
     {

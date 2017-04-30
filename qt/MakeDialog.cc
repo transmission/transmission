@@ -177,8 +177,8 @@ void MakeDialog::makeTorrent()
     }
 
     // start making the torrent
-    tr_makeMetaInfo(myBuilder.get(), target.toUtf8().constData(), trackers.isEmpty() ? NULL : trackers.data(), trackers.size(),
-        comment.isEmpty() ? NULL : comment.toUtf8().constData(), ui.privateCheck->isChecked());
+    tr_makeMetaInfo(myBuilder.get(), target.toUtf8().constData(), trackers.isEmpty() ? nullptr : trackers.data(),
+        trackers.size(), comment.isEmpty() ? nullptr : comment.toUtf8().constData(), ui.privateCheck->isChecked());
 
     // pop up the dialog
     MakeProgressDialog* dialog = new MakeProgressDialog(mySession, *myBuilder, this);
@@ -218,8 +218,8 @@ void MakeDialog::onSourceChanged()
     }
     else
     {
-        QString files = tr("%Ln File(s)", 0, myBuilder->fileCount);
-        QString pieces = tr("%Ln Piece(s)", 0, myBuilder->pieceCount);
+        QString files = tr("%Ln File(s)", nullptr, myBuilder->fileCount);
+        QString pieces = tr("%Ln Piece(s)", nullptr, myBuilder->pieceCount);
         text = tr("%1 in %2; %3 @ %4").arg(Formatter::sizeToString(myBuilder->totalSize)).arg(files).arg(pieces).
                 arg(Formatter::sizeToString(myBuilder->pieceSize));
     }

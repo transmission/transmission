@@ -144,7 +144,7 @@ public:
 
     char const* keyStr(int i) const
     {
-        return tr_quark_get_string(myItems[i].key, NULL);
+        return tr_quark_get_string(myItems[i].key, nullptr);
     }
 
     tr_quark getKey(int i) const

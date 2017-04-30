@@ -61,7 +61,7 @@ void addAssociatedFileIcon(QFileInfo const& fileInfo, UINT iconSize, QIcon& icon
         if (::SHGetFileInfoW(reinterpret_cast<wchar_t const*>(filename.utf16()), FILE_ATTRIBUTE_NORMAL, &shellFileInfo,
             sizeof(shellFileInfo), SHGFI_ICON | iconSize | SHGFI_USEFILEATTRIBUTES) != 0)
         {
-            if (shellFileInfo.hIcon != NULL)
+            if (shellFileInfo.hIcon != nullptr)
             {
                 pixmap = QtWin::fromHICON(shellFileInfo.hIcon);
                 ::DestroyIcon(shellFileInfo.hIcon);

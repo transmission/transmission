@@ -69,5 +69,5 @@ void StatsDialog::updateStats()
     ui.totalRatioValueLabel->setText(Formatter::ratioToString(total.ratio));
     ui.totalDurationValueLabel->setText(Formatter::timeToString(total.secondsActive));
 
-    ui.startCountLabel->setText(tr("Started %Ln time(s)", 0, total.sessionCount));
+    ui.startCountLabel->setText(tr("Started %Ln time(s)", nullptr, total.sessionCount));
 }

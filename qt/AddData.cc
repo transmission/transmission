@@ -98,7 +98,7 @@ QString AddData::readableName() const
     case METAINFO:
         {
             tr_info inf;
-            tr_ctor* ctor = tr_ctorNew(NULL);
+            tr_ctor* ctor = tr_ctorNew(nullptr);
 
             tr_ctorSetMetainfo(ctor, reinterpret_cast<quint8 const*>(metainfo.constData()), metainfo.size());
 

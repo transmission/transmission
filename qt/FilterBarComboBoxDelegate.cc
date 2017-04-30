@@ -21,7 +21,7 @@ namespace
 
 int getHSpacing(QWidget const* w)
 {
-    return qMax(3, w->style()->pixelMetric(QStyle::PM_LayoutHorizontalSpacing, 0, w));
+    return qMax(3, w->style()->pixelMetric(QStyle::PM_LayoutHorizontalSpacing, nullptr, w));
 }
 
 } // namespace
@@ -103,7 +103,7 @@ QSize FilterBarComboBoxDelegate::sizeHint(QStyleOptionViewItem const& option, QM
 {
     if (isSeparator(index))
     {
-        int const pm = myCombo->style()->pixelMetric(QStyle::PM_DefaultFrameWidth, 0, myCombo);
+        int const pm = myCombo->style()->pixelMetric(QStyle::PM_DefaultFrameWidth, nullptr, myCombo);
         return QSize(pm, pm + 10);
     }
     else
@@ -113,7 +113,7 @@ QSize FilterBarComboBoxDelegate::sizeHint(QStyleOptionViewItem const& option, QM
 
         QSize size = QItemDelegate::sizeHint(option, index);
         size.setHeight(qMax(size.height(), myCombo->iconSize().height() + 6));
-        size.rwidth() += s->pixelMetric(QStyle::PM_FocusFrameHMargin, 0, myCombo);
+        size.rwidth() += s->pixelMetric(QStyle::PM_FocusFrameHMargin, nullptr, myCombo);
         size.rwidth() += rect(option, index, FilterBarComboBox::CountStringRole).width();
         size.rwidth() += hmargin * 4;
         return size;

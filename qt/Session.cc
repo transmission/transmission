@@ -151,7 +151,7 @@ void Session::copyMagnetLinkToClipboard(int torrentId)
             char const* str;
 
             if (tr_variantDictFindList(r.args.get(), TR_KEY_torrents, &torrents) &&
-                (child = tr_variantListChild(torrents, 0)) && tr_variantDictFindStr(child, TR_KEY_magnetLink, &str, NULL))
+                (child = tr_variantListChild(torrents, 0)) && tr_variantDictFindStr(child, TR_KEY_magnetLink, &str, nullptr))
             {
                 qApp->clipboard()->setText(QString::fromUtf8(str));
             }
@@ -310,7 +310,7 @@ Session::Session(QString const& configDir, Prefs& prefs) :
     myConfigDir(configDir),
     myPrefs(prefs),
     myBlocklistSize(-1),
-    mySession(0),
+    mySession(nullptr),
     myIsDefinitelyLocalSession(true)
 {
     myStats.ratio = TR_RATIO_NA;
@@ -345,7 +345,7 @@ void Session::stop()
     if (mySession)
     {
         tr_sessionClose(mySession);
-        mySession = 0;
+        mySession = nullptr;
     }
 }
 
@@ -395,7 +395,7 @@ void Session::start()
 
 bool Session::isServer() const
 {
-    return mySession != 0;
+    return mySession != nullptr;
 }
 
 bool Session::isLocal() const
@@ -808,7 +808,7 @@ void Session::updateInfo(tr_variant* d)
         {
             char const* val;
 
-            if (tr_variantGetStr(b, &val, NULL))
+            if (tr_variantGetStr(b, &val, nullptr))
             {
                 if (qstrcmp(val, "required") == 0)
                 {
@@ -871,7 +871,7 @@ void Session::updateInfo(tr_variant* d)
             {
                 char const* val;
 
-                if (tr_variantGetStr(b, &val, NULL))
+                if (tr_variantGetStr(b, &val, nullptr))
                 {
                     myPrefs.set(i, QString::fromUtf8(val));
                 }
@@ -898,7 +898,7 @@ void Session::updateInfo(tr_variant* d)
     }
 
     /* Use the C API to get settings that, for security reasons, aren't supported by RPC */
-    if (mySession != 0)
+    if (mySession != nullptr)
     {
         myPrefs.set(Prefs::RPC_ENABLED, tr_sessionIsRPCEnabled(mySession));
         myPrefs.set(Prefs::RPC_AUTH_REQUIRED, tr_sessionIsRPCPasswordEnabled(mySession));
@@ -914,12 +914,12 @@ void Session::updateInfo(tr_variant* d)
         setBlocklistSize(i);
     }
 
-    if (tr_variantDictFindStr(d, TR_KEY_version, &str, NULL) && (mySessionVersion != QString::fromUtf8(str)))
+    if (tr_variantDictFindStr(d, TR_KEY_version, &str, nullptr) && (mySessionVersion != QString::fromUtf8(str)))
     {
         mySessionVersion = QString::fromUtf8(str);
     }
 
-    if (tr_variantDictFindStr(d, TR_KEY_session_id, &str, NULL))
+    if (tr_variantDictFindStr(d, TR_KEY_session_id, &str, nullptr))
     {
         QString const sessionId = QString::fromUtf8(str);
 
@@ -1001,7 +1001,7 @@ void Session::addTorrent(AddData const& addMe, tr_variant* args, bool trashOrigi
             char const* str;
 
             if (tr_variantDictFindDict(r.args.get(), TR_KEY_torrent_duplicate, &dup) &&
-                tr_variantDictFindStr(dup, TR_KEY_name, &str, NULL))
+                tr_variantDictFindStr(dup, TR_KEY_name, &str, nullptr))
             {
                 QString const name = QString::fromUtf8(str);
                 QMessageBox* d = new QMessageBox(QMessageBox::Warning, tr("Add Torrent"),

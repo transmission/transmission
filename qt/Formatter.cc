@@ -158,10 +158,10 @@ QString Formatter::timeToString(int seconds)
     minutes = (seconds % 3600) / 60;
     seconds %= 60;
 
-    d = tr("%Ln day(s)", 0, days);
-    h = tr("%Ln hour(s)", 0, hours);
-    m = tr("%Ln minute(s)", 0, minutes);
-    s = tr("%Ln second(s)", 0, seconds);
+    d = tr("%Ln day(s)", nullptr, days);
+    h = tr("%Ln hour(s)", nullptr, hours);
+    m = tr("%Ln minute(s)", nullptr, minutes);
+    s = tr("%Ln second(s)", nullptr, seconds);
 
     if (days)
     {

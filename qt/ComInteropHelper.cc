@@ -49,10 +49,10 @@ QVariant ComInteropHelper::addMetainfo(QString const& metainfo)
 void ComInteropHelper::initialize()
 {
     qAxOutProcServer = true;
-    ::GetModuleFileNameW(0, qAxModuleFilename, MAX_PATH);
-    qAxInstance = ::GetModuleHandleW(NULL);
+    ::GetModuleFileNameW(nullptr, qAxModuleFilename, MAX_PATH);
+    qAxInstance = ::GetModuleHandleW(nullptr);
 
-    ::CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
+    ::CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
     qAxInit();
 }
 

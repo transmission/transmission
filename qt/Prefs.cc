@@ -146,7 +146,7 @@ Prefs::Prefs(QString const& configDir) :
     tr_variant top;
     tr_variantInitDict(&top, 0);
     initDefaults(&top);
-    tr_sessionLoadSettings(&top, myConfigDir.toUtf8().constData(), NULL);
+    tr_sessionLoadSettings(&top, myConfigDir.toUtf8().constData(), nullptr);
 
     for (int i = 0; i < PREFS_COUNT; ++i)
     {
@@ -168,7 +168,7 @@ Prefs::Prefs(QString const& configDir) :
             break;
 
         case CustomVariantType::SortModeType:
-            if (tr_variantGetStr(b, &str, NULL))
+            if (tr_variantGetStr(b, &str, nullptr))
             {
                 myValues[i] = QVariant::fromValue(SortMode(QString::fromUtf8(str)));
             }
@@ -176,7 +176,7 @@ Prefs::Prefs(QString const& configDir) :
             break;
 
         case CustomVariantType::FilterModeType:
-            if (tr_variantGetStr(b, &str, NULL))
+            if (tr_variantGetStr(b, &str, nullptr))
             {
                 myValues[i] = QVariant::fromValue(FilterMode(QString::fromUtf8(str)));
             }
@@ -293,7 +293,7 @@ Prefs::~Prefs()
     tr_variant file_settings;
     QFile const file(QDir(myConfigDir).absoluteFilePath(QLatin1String("settings.json")));
 
-    if (!tr_variantFromFile(&file_settings, TR_VARIANT_FMT_JSON, file.fileName().toUtf8().constData(), NULL))
+    if (!tr_variantFromFile(&file_settings, TR_VARIANT_FMT_JSON, file.fileName().toUtf8().constData(), nullptr))
     {
         tr_variantInitDict(&file_settings, PREFS_COUNT);
     }

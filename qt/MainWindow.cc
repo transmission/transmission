@@ -65,8 +65,8 @@ QLatin1String const SessionTransferStatsModeName("session-transfer");
 class ListViewProxyStyle : public QProxyStyle
 {
 public:
-    int styleHint(StyleHint hint, QStyleOption const* option = 0, QWidget const* widget = 0,
-        QStyleHintReturn* returnData = 0) const
+    int styleHint(StyleHint hint, QStyleOption const* option = nullptr, QWidget const* widget = nullptr,
+        QStyleHintReturn* returnData = nullptr) const
     {
         if (hint == QStyle::SH_ItemView_ActivateItemOnSingleClick)
         {
@@ -788,7 +788,7 @@ void MainWindow::refreshTorrentViewHeader()
     }
     else
     {
-        ui.listView->setHeaderText(tr("Showing %L1 of %Ln torrent(s)", 0, totalCount).arg(visibleCount));
+        ui.listView->setHeaderText(tr("Showing %L1 of %Ln torrent(s)", nullptr, totalCount).arg(visibleCount));
     }
 }
 
@@ -1277,11 +1277,11 @@ void MainWindow::addTorrents(QStringList const& filenames)
 
     QFileDialog const* const fileDialog = qobject_cast<QFileDialog const*>(sender());
 
-    if (fileDialog != NULL)
+    if (fileDialog != nullptr)
     {
         QCheckBox const* const b = fileDialog->findChild<QCheckBox const*>(SHOW_OPTIONS_CHECKBOX_NAME);
 
-        if (b != NULL)
+        if (b != nullptr)
         {
             showOptions = b->isChecked();
         }
@@ -1342,12 +1342,12 @@ void MainWindow::removeTorrents(bool const deleteFiles)
 
     if (!deleteFiles)
     {
-        primary_text = (count == 1) ? tr("Remove torrent?") : tr("Remove %Ln torrent(s)?", 0, count);
+        primary_text = (count == 1) ? tr("Remove torrent?") : tr("Remove %Ln torrent(s)?", nullptr, count);
     }
     else
     {
         primary_text = (count == 1) ? tr("Delete this torrent's downloaded files?") :
-            tr("Delete these %Ln torrent(s)' downloaded files?", 0, count);
+            tr("Delete these %Ln torrent(s)' downloaded files?", nullptr, count);
     }
 
     if (!incomplete && !connected)
@@ -1417,7 +1417,7 @@ void MainWindow::removeTorrents(bool const deleteFiles)
 
 void MainWindow::updateNetworkIcon()
 {
-    time_t const now = time(NULL);
+    time_t const now = time(nullptr);
     int const period = 3;
     time_t const secondsSinceLastSend = now - myLastSendTime;
     time_t const secondsSinceLastRead = now - myLastReadTime;

@@ -47,13 +47,13 @@ QLatin1String const MY_READABLE_NAME("transmission-qt");
 tr_option const opts[] =
 {
     { 'g', "config-dir", "Where to look for configuration files", "g", 1, "<path>" },
-    { 'm', "minimized", "Start minimized in system tray", "m", 0, NULL },
+    { 'm', "minimized", "Start minimized in system tray", "m", 0, nullptr },
     { 'p', "port", "Port to use when connecting to an existing session", "p", 1, "<port>" },
     { 'r', "remote", "Connect to an existing session at the specified hostname", "r", 1, "<host>" },
     { 'u', "username", "Username to use when connecting to an existing session", "u", 1, "<username>" },
-    { 'v', "version", "Show version number and exit", "v", 0, NULL },
+    { 'v', "version", "Show version number and exit", "v", 0, nullptr },
     { 'w', "password", "Password to use when connecting to an existing session", "w", 1, "<password>" },
-    { 0, NULL, NULL, NULL, 0, NULL }
+    { 0, nullptr, nullptr, nullptr, 0, nullptr }
 };
 
 char const* getUsage()
@@ -575,7 +575,7 @@ void Application::refreshTorrents()
     // usually we just poll the torrents that have shown recent activity,
     // but we also periodically ask for updates on the others to ensure
     // nothing's falling through the cracks.
-    time_t const now = time(NULL);
+    time_t const now = time(nullptr);
 
     if (myLastFullUpdateTime + 60 >= now)
     {
