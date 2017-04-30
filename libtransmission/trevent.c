@@ -106,7 +106,7 @@ static int piperead(tr_pipe_end_t s, void* buf, int len)
 {
     int ret = recv(s, buf, len, 0);
 
-    if (ret < 0)
+    if (ret == -1)
     {
         int const werror = WSAGetLastError();
 
@@ -191,7 +191,7 @@ static void readFromPipe(evutil_socket_t fd, short eventType, void* veh)
     {
         ret = piperead(fd, &ch, 1);
     }
-    while (!eh->die && ret < 0 && errno == EAGAIN);
+    while (!eh->die && ret == -1 && errno == EAGAIN);
 
     dbgmsg("command is [%c], ret is %d, errno is %d", ch, ret, (int)errno);
 

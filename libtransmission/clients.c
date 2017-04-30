@@ -599,7 +599,7 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
             }
         }
 
-        if (*buf)
+        if (*buf != '\0')
         {
             return buf;
         }
@@ -624,7 +624,7 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
                 strint(id + 5, 2), getMnemonicEnd(id[7]));
         }
 
-        if (*buf)
+        if (*buf != '\0')
         {
             return buf;
         }
@@ -643,7 +643,7 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
             mainline_style(buf, buflen, "Queen Bee", id);
         }
 
-        if (*buf)
+        if (*buf != '\0')
         {
             return buf;
         }

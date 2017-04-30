@@ -261,14 +261,14 @@ tr_socket_t tr_netOpenPeerSocket(tr_session* session, tr_address const* addr, tr
     {
         int n = 8192;
 
-        if (setsockopt(s, SOL_SOCKET, SO_RCVBUF, (void const*)&n, sizeof(n)) != 0)
+        if (setsockopt(s, SOL_SOCKET, SO_RCVBUF, (void const*)&n, sizeof(n)) == -1)
         {
             tr_logAddInfo("Unable to set SO_RCVBUF on socket %" PRIdMAX ": %s", (intmax_t)s,
                 tr_net_strerror(err_buf, sizeof(err_buf), sockerrno));
         }
     }
 
-    if (evutil_make_socket_nonblocking(s) < 0)
+    if (evutil_make_socket_nonblocking(s) == -1)
     {
         tr_netClose(session, s);
         return TR_BAD_SOCKET;
@@ -281,7 +281,7 @@ tr_socket_t tr_netOpenPeerSocket(tr_session* session, tr_address const* addr, tr
     assert(source_addr);
     sourcelen = setup_sockaddr(source_addr, 0, &source_sock);
 
-    if (bind(s, (struct sockaddr*)&source_sock, sourcelen) != 0)
+    if (bind(s, (struct sockaddr*)&source_sock, sourcelen) == -1)
     {
         tr_logAddError(_("Couldn't set source address %s on %" PRIdMAX ": %s"), tr_address_to_string(source_addr), (intmax_t)s,
             tr_net_strerror(err_buf, sizeof(err_buf), sockerrno));
@@ -289,7 +289,7 @@ tr_socket_t tr_netOpenPeerSocket(tr_session* session, tr_address const* addr, tr
         return TR_BAD_SOCKET; /* -errno */
     }
 
-    if (connect(s, (struct sockaddr*)&sock, addrlen) < 0 &&
+    if (connect(s, (struct sockaddr*)&sock, addrlen) == -1 &&
 #ifdef _WIN32
         sockerrno != WSAEWOULDBLOCK &&
 #endif
@@ -346,7 +346,7 @@ static tr_socket_t tr_netBindTCPImpl(tr_address const* addr, tr_port port, bool 
         return TR_BAD_SOCKET;
     }
 
-    if (evutil_make_socket_nonblocking(fd) < 0)
+    if (evutil_make_socket_nonblocking(fd) == -1)
     {
         *errOut = sockerrno;
         tr_netCloseSocket(fd);
@@ -376,7 +376,7 @@ static tr_socket_t tr_netBindTCPImpl(tr_address const* addr, tr_port port, bool 
 
     addrlen = setup_sockaddr(addr, htons(port), &sock);
 
-    if (bind(fd, (struct sockaddr*)&sock, addrlen) != 0)
+    if (bind(fd, (struct sockaddr*)&sock, addrlen) == -1)
     {
         int const err = sockerrno;
 
@@ -474,7 +474,7 @@ tr_socket_t tr_netAccept(tr_session* session, tr_socket_t b, tr_address* addr, t
 {
     tr_socket_t fd = tr_fdSocketAccept(session, b, addr, port);
 
-    if (fd != TR_BAD_SOCKET && evutil_make_socket_nonblocking(fd) < 0)
+    if (fd != TR_BAD_SOCKET && evutil_make_socket_nonblocking(fd) == -1)
     {
         tr_netClose(session, fd);
         fd = TR_BAD_SOCKET;
@@ -518,14 +518,14 @@ static int get_source_address(struct sockaddr const* dst, socklen_t dst_len, str
     /* Since it's a UDP socket, this doesn't actually send any packets. */
     rc = connect(s, dst, dst_len);
 
-    if (rc < 0)
+    if (rc == -1)
     {
         goto fail;
     }
 
     rc = getsockname(s, src, src_len);
 
-    if (rc < 0)
+    if (rc == -1)
     {
         goto fail;
     }

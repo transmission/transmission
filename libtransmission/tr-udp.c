@@ -183,7 +183,7 @@ static void rebind_ipv6(tr_session* ss, bool force)
 
     rc = bind(s, (struct sockaddr*)&sin6, sizeof(sin6));
 
-    if (rc < 0)
+    if (rc == -1)
     {
         goto fail;
     }
@@ -197,7 +197,7 @@ static void rebind_ipv6(tr_session* ss, bool force)
         /* FIXME: dup2 doesn't work for sockets on Windows */
         rc = dup2(s, ss->udp6_socket);
 
-        if (rc < 0)
+        if (rc == -1)
         {
             goto fail;
         }
@@ -326,7 +326,7 @@ void tr_udpInit(tr_session* ss)
     sin.sin_port = htons(ss->udp_port);
     rc = bind(ss->udp_socket, (struct sockaddr*)&sin, sizeof(sin));
 
-    if (rc < 0)
+    if (rc == -1)
     {
         tr_logAddNamedError("UDP", "Couldn't bind IPv4 socket");
         tr_netCloseSocket(ss->udp_socket);

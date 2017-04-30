@@ -356,7 +356,7 @@ static void tr_select(int nfds, fd_set* r_fd_set, fd_set* w_fd_set, fd_set* c_fd
         tr_wait_msec(msec);
     }
     else if (select(0, r_fd_set->fd_count != 0 ? r_fd_set : NULL, w_fd_set->fd_count != 0 ? w_fd_set : NULL,
-        c_fd_set->fd_count != 0 ? c_fd_set : NULL, t) < 0)
+        c_fd_set->fd_count != 0 ? c_fd_set : NULL, t) == -1)
     {
         char errstr[512];
         int const e = EVUTIL_SOCKET_ERROR();
