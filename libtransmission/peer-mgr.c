@@ -1480,7 +1480,7 @@ void tr_peerMgrGetNextRequests(tr_torrent* tor, tr_peer* peer, int numwant, tr_b
     }
 
     /* In most cases we've just changed the weights of a small number of pieces.
-     * So rather than qsort ()ing the entire array, it's faster to apply an
+     * So rather than qsort()ing the entire array, it's faster to apply an
      * adaptive insertion sort algorithm. */
     if (got > 0)
     {
@@ -3467,14 +3467,14 @@ static bool shouldPeerBeClosed(tr_swarm const* s, tr_peer const* peer, int peerC
     /* disconnect if it's been too long since piece data has been transferred.
      * this is on a sliding scale based on number of available peers... */
     {
-        int const relaxStrictnessIfFewerThanN = (int)((getMaxPeerCount(tor) * 0.9) + 0.5);
+        int const relaxStrictnessIfFewerThanN = (int)(getMaxPeerCount(tor) * 0.9 + 0.5);
         /* if we have >= relaxIfFewerThan, strictness is 100%.
          * if we have zero connections, strictness is 0% */
         float const strictness = peerCount >= relaxStrictnessIfFewerThanN ? 1.0 :
             peerCount / (float)relaxStrictnessIfFewerThanN;
         int const lo = MIN_UPLOAD_IDLE_SECS;
         int const hi = MAX_UPLOAD_IDLE_SECS;
-        int const limit = hi - ((hi - lo) * strictness);
+        int const limit = hi - (hi - lo) * strictness;
         int const idleTime = now - MAX(atom->time, atom->piece_data_time);
 
         /*
@@ -4160,7 +4160,7 @@ static bool torrentWasRecentlyStarted(tr_torrent const* tor)
 
 static inline uint64_t addValToKey(uint64_t value, int width, uint64_t addme)
 {
-    value = (value << (uint64_t)width);
+    value = value << (uint64_t)width;
     value |= addme;
     return value;
 }

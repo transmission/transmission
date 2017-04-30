@@ -1000,19 +1000,19 @@ static int getRetryInterval(tr_tracker const* t)
         return 20;
 
     case 2:
-        return tr_rand_int_weak(60) + (60 * 5);
+        return tr_rand_int_weak(60) + 60 * 5;
 
     case 3:
-        return tr_rand_int_weak(60) + (60 * 15);
+        return tr_rand_int_weak(60) + 60 * 15;
 
     case 4:
-        return tr_rand_int_weak(60) + (60 * 30);
+        return tr_rand_int_weak(60) + 60 * 30;
 
     case 5:
-        return tr_rand_int_weak(60) + (60 * 60);
+        return tr_rand_int_weak(60) + 60 * 60;
 
     default:
-        return tr_rand_int_weak(60) + (60 * 120);
+        return tr_rand_int_weak(60) + 60 * 120;
     }
 }
 

@@ -272,7 +272,7 @@ void gtr_add_torrent_error_dialog(GtkWidget* child, int err, tr_torrent* duplica
     g_free(secondary);
 }
 
-typedef void (PopupFunc)(GtkWidget*, GdkEventButton*);
+typedef void (* PopupFunc)(GtkWidget*, GdkEventButton*);
 
 /* pop up the context menu if a user right-clicks.
    if the row they right-click on isn't selected, select it. */
@@ -299,7 +299,7 @@ gboolean on_tree_view_button_pressed(GtkWidget* view, GdkEventButton* event, gpo
 
         if (func != NULL)
         {
-            ((PopupFunc*)func)(view, event);
+            (*(PopupFunc)func)(view, event);
         }
 
         return TRUE;

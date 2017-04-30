@@ -72,7 +72,7 @@ static int addPeers(tr_torrent* tor, uint8_t const* buf, int buflen)
     for (i = 0; i < count && numAdded < MAX_REMEMBERED_PEERS; ++i)
     {
         tr_pex pex;
-        memcpy(&pex, buf + (i * sizeof(tr_pex)), sizeof(tr_pex));
+        memcpy(&pex, buf + i * sizeof(tr_pex), sizeof(tr_pex));
 
         if (tr_isPex(&pex))
         {

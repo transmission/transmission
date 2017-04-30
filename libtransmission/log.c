@@ -164,7 +164,7 @@ bool tr_logGetDeepEnabled(void)
 
     if (deepLoggingIsActive < 0)
     {
-        deepLoggingIsActive = IsDebuggerPresent() || (tr_logGetFile() != TR_BAD_SYS_FILE);
+        deepLoggingIsActive = IsDebuggerPresent() || tr_logGetFile() != TR_BAD_SYS_FILE;
     }
 
     return deepLoggingIsActive != 0;

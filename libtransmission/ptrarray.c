@@ -96,7 +96,7 @@ void tr_ptrArrayErase(tr_ptrArray* t, int begin, int end)
 
     memmove(t->items + begin, t->items + end, sizeof(void*) * (t->n_items - end));
 
-    t->n_items -= (end - begin);
+    t->n_items -= end - begin;
 }
 
 /**

@@ -859,8 +859,8 @@ static bool requestIsValid(tr_peerMsgs const* msgs, struct peer_request const* r
 void tr_peerMsgsCancel(tr_peerMsgs* msgs, tr_block_index_t block)
 {
     struct peer_request req;
-    // fprintf(stderr, "SENDING CANCEL MESSAGE FOR BLOCK %zu\n\t\tFROM PEER %p ------------------------------------\n", (size_t)block,
-    //     msgs->peer);
+    // fprintf(stderr, "SENDING CANCEL MESSAGE FOR BLOCK %zu\n\t\tFROM PEER %p ------------------------------------\n",
+    //     (size_t)block, msgs->peer);
     blockToReq(msgs->torrent, block, &req);
     protocolSendCancel(msgs, &req);
 }
@@ -1516,7 +1516,7 @@ static int readBtMessage(tr_peerMsgs* msgs, struct evbuffer* inbuf, size_t inlen
     uint32_t msglen = msgs->incoming.length;
     uint8_t const id = msgs->incoming.id;
 #ifndef NDEBUG
-     size_t const startBufLen = evbuffer_get_length(inbuf);
+    size_t const startBufLen = evbuffer_get_length(inbuf);
 #endif
     bool const fext = tr_peerIoSupportsFEXT(msgs->io);
 
@@ -2316,7 +2316,7 @@ static inline void pexElementCb(void* vpex, void* userData)
     diffs->elements[diffs->elementCount++] = *pex;
 }
 
-typedef void (tr_set_func)(void* element, void* userData);
+typedef void (* tr_set_func)(void* element, void* userData);
 
 /**
  * @brief find the differences and commonalities in two sorted sets

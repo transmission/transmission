@@ -364,6 +364,7 @@ void DetailsDialog::onTorrentChanged()
 
 namespace
 {
+
 void setIfIdle(QComboBox* box, int i)
 {
     if (!box->hasFocus())
@@ -393,7 +394,8 @@ void setIfIdle(QSpinBox* spin, int value)
         spin->blockSignals(false);
     }
 }
-}
+
+} // namespace
 
 void DetailsDialog::refresh()
 {

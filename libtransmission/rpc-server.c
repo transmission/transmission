@@ -142,7 +142,7 @@ static void extract_parts_from_multipart(struct evkeyvalq const* headers, struct
         size_t part_len;
         char const* part = delim + boundary_len;
 
-        inlen -= (part - in);
+        inlen -= part - in;
         in = part;
 
         delim = tr_memmem(in, inlen, boundary, boundary_len);
@@ -366,8 +366,7 @@ static void add_response(struct evhttp_request* req, struct tr_rpc_server* serve
 
 #endif
 
-            evhttp_add_header(req->output_headers,
-                "Content-Encoding", "gzip");
+            evhttp_add_header(req->output_headers, "Content-Encoding", "gzip");
         }
         else
         {

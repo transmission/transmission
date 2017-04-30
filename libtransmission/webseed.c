@@ -78,7 +78,7 @@ static void publish(tr_webseed* w, tr_peer_event* e)
 {
     if (w->callback != NULL)
     {
-        w->callback(&w->parent, e, w->callback_data);
+        (*w->callback)(&w->parent, e, w->callback_data);
     }
 }
 
@@ -254,7 +254,7 @@ static void on_content_changed(struct evbuffer* buf, struct evbuffer_cb_info con
                 data->webseed = w;
                 data->real_url = tr_strdup(url);
                 data->piece_index = task->piece_index;
-                data->piece_offset = task->piece_offset + (task->blocks_done * task->block_size) + (len - 1);
+                data->piece_offset = task->piece_offset + task->blocks_done * task->block_size + len - 1;
 
                 /* processing this uses a tr_torrent pointer,
                    so push the work to the libevent thread... */
@@ -345,7 +345,7 @@ static void on_idle(tr_webseed* w)
             task->webseed = w;
             task->block = b;
             task->piece_index = tr_torBlockPiece(tor, b);
-            task->piece_offset = (tor->blockSize * b) - (tor->info.pieceSize * task->piece_index);
+            task->piece_offset = tor->blockSize * b - tor->info.pieceSize * task->piece_index;
             task->length = (be - b) * tor->blockSize + tr_torBlockCountBytes(tor, be);
             task->blocks_done = 0;
             task->response_code = 0;
@@ -474,7 +474,7 @@ static void task_request_next_chunk(struct tr_webseed_task* t)
 
         uint64_t const total_offset = tr_pieceOffset(tor, t->piece_index, t->piece_offset, t->length - remain);
         tr_piece_index_t const step_piece = total_offset / inf->pieceSize;
-        uint64_t const step_piece_offset = total_offset - (inf->pieceSize * step_piece);
+        uint64_t const step_piece_offset = total_offset - inf->pieceSize * step_piece;
 
         tr_file_index_t file_index;
         tr_file const* file;

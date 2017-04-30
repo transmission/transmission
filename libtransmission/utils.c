@@ -1016,7 +1016,7 @@ static size_t quickfindPartition(char* base, size_t left, size_t right, size_t s
 
     for (i = left; i <= right - 1; ++i)
     {
-        if (compar(base + (size * i), base + (size * right)) <= 0)
+        if ((*compar)(base + (size * i), base + (size * right)) <= 0)
         {
             SWAP(base + (size * storeIndex), base + (size * i), size);
             ++storeIndex;
@@ -1034,12 +1034,12 @@ static size_t quickfindPartition(char* base, size_t left, size_t right, size_t s
 
     for (i = left; i < storeIndex; ++i)
     {
-        assert(compar(base + (size * i), base + (size * storeIndex)) <= 0);
+        assert((*compar)(base + (size * i), base + (size * storeIndex)) <= 0);
     }
 
     for (i = storeIndex + 1; i <= right; ++i)
     {
-        assert(compar(base + (size * i), base + (size * storeIndex)) >= 0);
+        assert((*compar)(base + (size * i), base + (size * storeIndex)) >= 0);
     }
 
 #endif
@@ -1076,7 +1076,7 @@ static void checkBestScoresComeFirst(char* base, size_t nmemb, size_t size, int 
 
     for (i = 1; i < k; ++i)
     {
-        if (compar(base + (size * worstFirstPos), base + (size * i)) < 0)
+        if ((*compar)(base + (size * worstFirstPos), base + (size * i)) < 0)
         {
             worstFirstPos = i;
         }
@@ -1084,12 +1084,12 @@ static void checkBestScoresComeFirst(char* base, size_t nmemb, size_t size, int 
 
     for (i = 0; i < k; ++i)
     {
-        assert(compar(base + (size * i), base + (size * worstFirstPos)) <= 0);
+        assert((*compar)(base + (size * i), base + (size * worstFirstPos)) <= 0);
     }
 
     for (i = k; i < nmemb; ++i)
     {
-        assert(compar(base + (size * i), base + (size * worstFirstPos)) >= 0);
+        assert((*compar)(base + (size * i), base + (size * worstFirstPos)) >= 0);
     }
 }
 
@@ -1372,7 +1372,7 @@ int tr_main_win32(int argc, char** argv, int (* real_main)(int, char**))
     tr_win32_make_args_utf8(&argc, &argv);
     SetConsoleCP(CP_UTF8);
     SetConsoleOutputCP(CP_UTF8);
-    return real_main(argc, argv);
+    return (*real_main)(argc, argv);
 }
 
 #endif

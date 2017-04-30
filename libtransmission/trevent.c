@@ -206,7 +206,7 @@ static void readFromPipe(evutil_socket_t fd, short eventType, void* veh)
             if (!eh->die && ngot == (ev_ssize_t)nwant)
             {
                 dbgmsg("invoking function in libevent thread");
-                (data.func)(data.user_data);
+                (*data.func)(data.user_data);
             }
 
             break;

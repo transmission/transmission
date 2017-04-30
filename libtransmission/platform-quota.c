@@ -324,6 +324,7 @@ static int64_t getquota(char const* device)
 
     if (quotactl(device, QCMD(Q_GETQUOTA, USRQUOTA), getuid(), (caddr_t)&dq) == 0)
     {
+
 #elif defined(__sun)
 
     struct quotctl op;
@@ -346,6 +347,7 @@ static int64_t getquota(char const* device)
 
     if (quotactl(QCMD(Q_GETQUOTA, USRQUOTA), device, getuid(), (caddr_t)&dq) == 0)
     {
+
 #endif
 
         if (dq.dqb_bsoftlimit > 0)

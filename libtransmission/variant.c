@@ -1270,7 +1270,7 @@ int tr_variantFromBuf(tr_variant* setme, tr_variant_fmt fmt, void const* buf, si
         break;
 
     default /* TR_VARIANT_FMT_BENC */:
-        err = tr_variantParseBenc(buf, ((char const*)buf) + buflen, setme, setme_end);
+        err = tr_variantParseBenc(buf, (char const*)buf + buflen, setme, setme_end);
         break;
     }
 

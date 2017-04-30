@@ -1446,6 +1446,7 @@ bool tr_sessionGetActiveSpeedLimit_Bps(tr_session const* session, tr_direction d
 
     return isLimited;
 }
+
 bool tr_sessionGetActiveSpeedLimit_KBps(tr_session const* session, tr_direction dir, double* setme_KBps)
 {
     unsigned int Bps = 0;

@@ -36,7 +36,8 @@ typedef struct tr_recentHistory
     {
         unsigned int n;
         time_t date;
-    } slices[TR_RECENT_HISTORY_PERIOD_SEC];
+    }
+    slices[TR_RECENT_HISTORY_PERIOD_SEC];
 }
 tr_recentHistory;
 

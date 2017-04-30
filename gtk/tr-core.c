@@ -1778,7 +1778,7 @@ static void core_read_rpc_response(tr_session* session UNUSED, tr_variant* respo
     gdk_threads_add_idle(core_read_rpc_response_idle, response_copy);
 }
 
-static void core_send_rpc_request(TrCore* core, tr_variant const* request, int tag, server_response_func* response_func,
+static void core_send_rpc_request(TrCore* core, tr_variant const* request, int tag, server_response_func response_func,
     void* response_func_user_data)
 {
     tr_session* session = gtr_core_session(core);

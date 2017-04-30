@@ -89,7 +89,7 @@ static void base32_to_sha1(uint8_t* out, char const* in, size_t const inlen)
         else
         {
             index = (index + 5) % 8;
-            out[offset] |= (digit >> index);
+            out[offset] |= digit >> index;
             offset++;
 
             if (offset >= outlen)

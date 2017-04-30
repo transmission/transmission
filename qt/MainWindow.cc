@@ -572,6 +572,9 @@ void MainWindow::setLocation()
     d->show();
 }
 
+namespace
+{
+
 // Open Folder & select torrent's file or top folder
 #undef HAVE_OPEN_SELECT
 
@@ -610,6 +613,8 @@ static void openSelect(QString const& path)
 }
 
 #endif
+
+} // namespace
 
 void MainWindow::openFolder()
 {

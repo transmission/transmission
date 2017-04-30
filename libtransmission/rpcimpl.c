@@ -38,7 +38,7 @@
 
 #define RECENTLY_ACTIVE_SECONDS 60
 
-#define TR_N_ELEMENTS(ary)(sizeof(ary) / sizeof(*ary))
+#define TR_N_ELEMENTS(ary) (sizeof(ary) / sizeof(*ary))
 
 #if 0
 
@@ -74,7 +74,7 @@ static tr_rpc_callback_status notify(tr_session* session, int type, tr_torrent* 
 
     if (session->rpc_func != NULL)
     {
-        status = session->rpc_func(session, type, tor, session->rpc_func_user_data);
+        status = (*session->rpc_func)(session, type, tor, session->rpc_func_user_data);
     }
 
     return status;

@@ -788,7 +788,7 @@ static ReadState readYa(tr_handshake* handshake, struct evbuffer* inbuf)
 
 static ReadState readPadA(tr_handshake* handshake, struct evbuffer* inbuf)
 {
-    /* resynchronizing on HASH('req1',S) */
+    /* resynchronizing on HASH('req1', S) */
     struct evbuffer_ptr ptr = evbuffer_search(inbuf, (char const*)handshake->myReq1, SHA_DIGEST_LENGTH, NULL);
 
     if (ptr.pos != -1) /* match */

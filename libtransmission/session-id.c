@@ -187,10 +187,8 @@ bool tr_session_id_is_local(char const* session_id)
             if (!tr_sys_file_lock(lock_file, TR_SYS_FILE_LOCK_SH | TR_SYS_FILE_LOCK_NB, &error))
             {
 #ifndef _WIN32
-
                 if (error->code == EWOULDBLOCK)
 #else
-
                 if (error->code == ERROR_LOCK_VIOLATION)
 #endif
                 {

@@ -201,7 +201,7 @@ int tr_main_win32(int argc, char** argv, int (* real_main)(int, char**));
     main_impl(__VA_ARGS__); \
     int main(int argc, char* argv[]) \
     { \
-        return tr_main_win32(argc, argv, & main_impl); \
+        return tr_main_win32(argc, argv, &main_impl); \
     } \
     int main_impl(__VA_ARGS__)
 
@@ -249,13 +249,13 @@ void tr_free(void* p);
 void* tr_memdup(void const* src, size_t byteCount);
 
 #define tr_new(struct_type, n_structs) \
-    ((struct_type*)tr_malloc(sizeof(struct_type)* ((size_t)(n_structs))))
+    ((struct_type*)tr_malloc(sizeof(struct_type) * (size_t)(n_structs)))
 
 #define tr_new0(struct_type, n_structs) \
-    ((struct_type*)tr_malloc0(sizeof(struct_type)* ((size_t)(n_structs))))
+    ((struct_type*)tr_malloc0(sizeof(struct_type) * (size_t)(n_structs)))
 
 #define tr_renew(struct_type, mem, n_structs) \
-    ((struct_type*)tr_realloc((mem), sizeof(struct_type)* ((size_t)(n_structs))))
+    ((struct_type*)tr_realloc((mem), sizeof(struct_type) * (size_t)(n_structs)))
 
 void* tr_valloc(size_t bufLen);
 

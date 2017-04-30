@@ -827,7 +827,7 @@ static char* getStatusString(tr_variant* t, char* buf, size_t buflen)
 
                 if (tr_variantDictFindReal(t, TR_KEY_recheckProgress, &percent))
                 {
-                    tr_snprintf(buf, buflen, "%s (%.0f%%)", str, floor(percent * 100.0));
+                    tr_snprintf(buf, buflen, "%s (%.0f%%)", str, (floor)(percent * 100.0));
                 }
                 else
                 {
@@ -1252,7 +1252,7 @@ static void printFileList(tr_variant* top)
                             break;
                         }
 
-                        printf("%3d: %3.0f%% %-8s %-3s %9s  %s\n", j, floor(100.0 * percent), pristr, wanted ? "Yes" : "No",
+                        printf("%3d: %3.0f%% %-8s %-3s %9s  %s\n", j, (floor)(100.0 * percent), pristr, wanted ? "Yes" : "No",
                             sizestr, filename);
                     }
                 }

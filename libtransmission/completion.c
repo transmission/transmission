@@ -188,7 +188,7 @@ uint64_t tr_cpSizeWhenDone(tr_completion const* ccp)
 
                     if (l == cp->tor->blockCount - 1 && tr_bitfieldHas(&cp->blockBitfield, l))
                     {
-                        n -= (cp->tor->blockSize - cp->tor->lastBlockSize);
+                        n -= cp->tor->blockSize - cp->tor->lastBlockSize;
                     }
                 }
 

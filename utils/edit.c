@@ -114,7 +114,7 @@ static bool removeURL(tr_variant* metainfo, char const* url)
             {
                 if (tr_variantGetStr(node, &str, NULL) && strcmp(str, url) == 0)
                 {
-                    printf("\tRemoved \"%s\" from \"announce-list\" tier #%d\n", str, (tierIndex + 1));
+                    printf("\tRemoved \"%s\" from \"announce-list\" tier #%d\n", str, tierIndex + 1);
                     tr_variantListRemove(tier, nodeIndex);
                     changed = true;
                 }
@@ -126,7 +126,7 @@ static bool removeURL(tr_variant* metainfo, char const* url)
 
             if (tr_variantListSize(tier) == 0)
             {
-                printf("\tNo URLs left in tier #%d... removing tier\n", (tierIndex + 1));
+                printf("\tNo URLs left in tier #%d... removing tier\n", tierIndex + 1);
                 tr_variantListRemove(announce_list, tierIndex);
             }
             else

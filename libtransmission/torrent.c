@@ -207,7 +207,7 @@ static int peerIdTTL(tr_torrent const* tor)
     }
     else
     {
-        ttl = (int)difftime(tor->peer_id_creation_time + (tor->session->peer_id_ttl_hours * 3600), tr_time());
+        ttl = (int)difftime(tor->peer_id_creation_time + tor->session->peer_id_ttl_hours * 3600, tr_time());
     }
 
     return ttl;
@@ -541,7 +541,7 @@ void tr_torrentCheckSeedLimit(tr_torrent* tor)
         /* maybe notify the client */
         if (tor->ratio_limit_hit_func != NULL)
         {
-            tor->ratio_limit_hit_func(tor, tor->ratio_limit_hit_func_user_data);
+            (*tor->ratio_limit_hit_func)(tor, tor->ratio_limit_hit_func_user_data);
         }
     }
     /* if we're seeding and reach our inactiviy limit, stop the torrent */
@@ -555,7 +555,7 @@ void tr_torrentCheckSeedLimit(tr_torrent* tor)
         /* maybe notify the client */
         if (tor->idle_limit_hit_func != NULL)
         {
-            tor->idle_limit_hit_func(tor, tor->idle_limit_hit_func_user_data);
+            (*tor->idle_limit_hit_func)(tor, tor->idle_limit_hit_func_user_data);
         }
     }
 }
@@ -920,9 +920,8 @@ static bool setLocalErrorIfFilesDisappeared(tr_torrent* tor)
     if (disappeared)
     {
         tr_deeplog_tor(tor, "%s", "[LAZY] uh oh, the files disappeared");
-        tr_torrentSetLocalError(tor, "%s",
-            _(
-            "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, remove the torrent and re-add it."));
+        tr_torrentSetLocalError(tor, "%s", _("No data found! Ensure your drives are connected or use \"Set Location\". "
+            "To re-download, remove the torrent and re-add it."));
     }
 
     return disappeared;
@@ -1545,7 +1544,7 @@ static uint64_t countFileBytesCompleted(tr_torrent const* tor, tr_file_index_t i
             /* the first block */
             if (tr_torrentBlockIsComplete(tor, first))
             {
-                total += tor->blockSize - (f->offset % tor->blockSize);
+                total += tor->blockSize - f->offset % tor->blockSize;
             }
 
             /* the middle blocks */
@@ -1559,7 +1558,7 @@ static uint64_t countFileBytesCompleted(tr_torrent const* tor, tr_file_index_t i
             /* the last block */
             if (tr_torrentBlockIsComplete(tor, last))
             {
-                total += (f->offset + f->length) - ((uint64_t)tor->blockSize * last);
+                total += f->offset + f->length - (uint64_t)tor->blockSize * last;
             }
         }
     }
@@ -2171,7 +2170,7 @@ static void fireCompletenessChange(tr_torrent* tor, tr_completeness status, bool
 
     if (tor->completeness_func != NULL)
     {
-        tor->completeness_func(tor, status, wasRunning, tor->completeness_func_user_data);
+        (*tor->completeness_func)(tor, status, wasRunning, tor->completeness_func_user_data);
     }
 }
 
@@ -2434,7 +2433,7 @@ static void tr_torrentFireMetadataCompleted(tr_torrent* tor)
 
     if (tor->metadata_func != NULL)
     {
-        tor->metadata_func(tor, tor->metadata_func_user_data);
+        (*tor->metadata_func)(tor, tor->metadata_func_user_data);
     }
 }
 
@@ -2668,7 +2667,7 @@ void tr_torrentGetBlockLocation(tr_torrent const* tor, tr_block_index_t block, t
     uint64_t pos = block;
     pos *= tor->blockSize;
     *piece = pos / tor->info.pieceSize;
-    *offset = pos - (*piece * tor->info.pieceSize);
+    *offset = pos - *piece * tor->info.pieceSize;
     *length = tr_torBlockCountBytes(tor, block);
 }
 
@@ -2679,7 +2678,7 @@ tr_block_index_t _tr_block(tr_torrent const* tor, tr_piece_index_t index, uint32
     assert(tr_isTorrent(tor));
 
     ret = index;
-    ret *= (tor->info.pieceSize / tor->blockSize);
+    ret *= tor->info.pieceSize / tor->blockSize;
     ret += offset / tor->blockSize;
     return ret;
 }
@@ -2757,7 +2756,7 @@ void tr_torGetPieceBlockRange(tr_torrent const* tor, tr_piece_index_t const piec
     uint64_t offset = tor->info.pieceSize;
     offset *= piece;
     *first = offset / tor->blockSize;
-    offset += (tr_torPieceCountBytes(tor, piece) - 1);
+    offset += tr_torPieceCountBytes(tor, piece) - 1;
     *last = offset / tor->blockSize;
 }
 
@@ -3195,7 +3194,7 @@ static void deleteLocalData(tr_torrent* tor, tr_fileFunc func)
             if (strcmp(name, ".") != 0 && strcmp(name, "..") != 0)
             {
                 char* file = tr_buildPath(tmpdir, name, NULL);
-                func(file, NULL);
+                (*func)(file, NULL);
                 tr_free(file);
             }
         }
@@ -3211,7 +3210,7 @@ static void deleteLocalData(tr_torrent* tor, tr_fileFunc func)
         while (tr_sys_path_exists(walk, NULL) && !tr_sys_path_is_same(tmpdir, walk, NULL))
         {
             char* tmp = tr_sys_path_dirname(walk, NULL);
-            func(walk, NULL);
+            (*func)(walk, NULL);
             tr_free(walk);
             walk = tmp;
         }
@@ -3789,7 +3788,7 @@ void tr_torrentSetQueuePosition(tr_torrent* tor, int pos)
         }
     }
 
-    tor->queuePosition = MIN(pos, (back + 1));
+    tor->queuePosition = MIN(pos, back + 1);
     tor->anyDate = now;
 
     assert(queueIsSequenced(tor->session));

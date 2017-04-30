@@ -157,8 +157,8 @@ void FilterBar::refreshTrackers()
 
     // update the "All" row
     myTrackerModel->setData(myTrackerModel->index(0, 0), myTorrents.rowCount(), FilterBarComboBox::CountRole);
-    myTrackerModel->setData(myTrackerModel->index(0, 0), getCountString(
-        myTorrents.rowCount()), FilterBarComboBox::CountStringRole);
+    myTrackerModel->setData(myTrackerModel->index(0, 0), getCountString(myTorrents.rowCount()),
+        FilterBarComboBox::CountStringRole);
 
     // rows to update
     for (QString const& host : oldHosts & newHosts)

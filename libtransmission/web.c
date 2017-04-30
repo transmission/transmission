@@ -269,7 +269,7 @@ static void task_finish_func(void* vtask)
 
     if (task->done_func != NULL)
     {
-        task->done_func(task->session, task->did_connect, task->did_timeout, task->code, evbuffer_pullup(task->response, -1),
+        (*task->done_func)(task->session, task->did_connect, task->did_timeout, task->code, evbuffer_pullup(task->response, -1),
             evbuffer_get_length(task->response), task->done_func_user_data);
     }
 

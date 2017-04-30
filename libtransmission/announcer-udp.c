@@ -531,7 +531,7 @@ static void tau_tracker_on_dns(int errcode, struct evutil_addrinfo* addr, void* 
     {
         dbgmsg(tracker->key, "DNS lookup succeeded");
         tracker->addr = addr;
-        tracker->addr_expiration_time = tr_time() + (60 * 60); /* one hour */
+        tracker->addr_expiration_time = tr_time() + 60 * 60; /* one hour */
         tau_tracker_upkeep(tracker);
     }
 }
@@ -940,7 +940,7 @@ bool tau_handle_message(tr_session* session, uint8_t const* msg, size_t msglen)
     tau = session->announcer_udp;
     transaction_id = evbuffer_read_ntoh_32(buf);
 
-    /*fprintf(stderr, "UDP got a transaction_id %u...\n", transaction_id);*/
+    /* fprintf(stderr, "UDP got a transaction_id %u...\n", transaction_id); */
     for (i = 0, n = tr_ptrArraySize(&tau->trackers); i < n; ++i)
     {
         int j, jn;

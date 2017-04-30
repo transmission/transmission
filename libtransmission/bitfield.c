@@ -373,7 +373,7 @@ void tr_bitfieldSetRaw(tr_bitfield* b, void const* bits, size_t byte_count, bool
 
         if (excess_bit_count)
         {
-            b->bits[b->alloc_count - 1] &= ((0xff) << excess_bit_count);
+            b->bits[b->alloc_count - 1] &= 0xff << excess_bit_count;
         }
     }
 
@@ -404,7 +404,7 @@ void tr_bitfieldAdd(tr_bitfield* b, size_t nth)
 {
     if (!tr_bitfieldHas(b, nth) && tr_bitfieldEnsureNthBitAlloced(b, nth))
     {
-        b->bits[nth >> 3u] |= (0x80 >> (nth & 7u));
+        b->bits[nth >> 3u] |= 0x80 >> (nth & 7u);
         tr_bitfieldIncTrueCount(b, 1);
     }
 }
@@ -440,7 +440,7 @@ void tr_bitfieldAddRange(tr_bitfield* b, size_t begin, size_t end)
 
     if (sb == eb)
     {
-        b->bits[sb] |= (sm & em);
+        b->bits[sb] |= sm & em;
     }
     else
     {
@@ -462,7 +462,7 @@ void tr_bitfieldRem(tr_bitfield* b, size_t nth)
 
     if (tr_bitfieldHas(b, nth) && tr_bitfieldEnsureNthBitAlloced(b, nth))
     {
-        b->bits[nth >> 3u] &= (0xff7f >> (nth & 7u));
+        b->bits[nth >> 3u] &= 0xff7f >> (nth & 7u);
         tr_bitfieldDecTrueCount(b, 1);
     }
 }
@@ -498,7 +498,7 @@ void tr_bitfieldRemRange(tr_bitfield* b, size_t begin, size_t end)
 
     if (sb == eb)
     {
-        b->bits[sb] &= (sm | em);
+        b->bits[sb] &= sm | em;
     }
     else
     {

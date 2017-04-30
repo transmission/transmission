@@ -64,7 +64,7 @@ static unsigned int getSpeed_Bps(struct bratecontrol const* r, unsigned int inte
             }
         }
 
-        rvolatile->cache_val = (unsigned int)((bytes * 1000u) / interval_msec);
+        rvolatile->cache_val = (unsigned int)(bytes * 1000u / interval_msec);
         rvolatile->cache_time = now;
     }
 

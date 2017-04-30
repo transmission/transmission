@@ -141,15 +141,15 @@ static bool decode_hex_string(char const* in, unsigned int* setme)
 
         if ('0' <= *in && *in <= '9')
         {
-            val += (*in - '0');
+            val += *in - '0';
         }
         else if ('a' <= *in && *in <= 'f')
         {
-            val += (*in - 'a') + 10u;
+            val += *in - 'a' + 10u;
         }
         else if ('A' <= *in && *in <= 'F')
         {
-            val += (*in - 'A') + 10u;
+            val += *in - 'A' + 10u;
         }
         else
         {
