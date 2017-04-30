@@ -74,7 +74,6 @@ static char* announce_url_new(tr_session const* session, tr_announce_request con
         "&port=%d"
         "&uploaded=%" PRIu64
         "&downloaded=%" PRIu64
-        "&left=%" PRIu64
         "&numwant=%d"
         "&key=%x"
         "&compact=1"
@@ -86,9 +85,18 @@ static char* announce_url_new(tr_session const* session, tr_announce_request con
         req->port,
         req->up,
         req->down,
-        req->leftUntilComplete,
         req->numwant,
         req->key);
+
+    if (req->leftUntilComplete != ~(uint64_t)0)
+    {
+        evbuffer_add_printf(buf, "&left=%" PRIu64, req->leftUntilComplete);
+    }
+    else
+    {
+        // Support trackers which don't react to huge numbers well (e.g. Amazon S3)
+        evbuffer_add_printf(buf, "&left=-1");
+    }
 
     if (session->encryptionMode == TR_ENCRYPTION_REQUIRED)
     {
