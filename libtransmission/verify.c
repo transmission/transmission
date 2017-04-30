@@ -60,7 +60,7 @@ static bool verifyTorrent(tr_torrent* tor, bool* stopFlag)
     tr_logAddTorDbg(tor, "%s", "verifying torrent...");
     tr_torrentSetChecked(tor, 0);
 
-    while (!*stopFlag && (pieceIndex < tor->info.pieceCount))
+    while (!*stopFlag && pieceIndex < tor->info.pieceCount)
     {
         uint64_t leftInPiece;
         uint64_t bytesThisPass;
@@ -207,13 +207,13 @@ static void verifyThreadFunc(void* unused UNUSED)
 {
     for (;;)
     {
-        int changed = 0;
+        bool changed = false;
         tr_torrent* tor;
         struct verify_node* node;
 
         tr_lockLock(getVerifyLock());
         stopCurrent = false;
-        node = (struct verify_node*)verifyList ? verifyList->data : NULL;
+        node = verifyList != NULL ? verifyList->data : NULL;
 
         if (node == NULL)
         {
@@ -238,7 +238,7 @@ static void verifyThreadFunc(void* unused UNUSED)
             tr_torrentSetDirty(tor);
         }
 
-        if (currentNode.callback_func)
+        if (currentNode.callback_func != NULL)
         {
             (*currentNode.callback_func)(tor, stopCurrent, currentNode.callback_data);
         }

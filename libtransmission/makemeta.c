@@ -91,32 +91,32 @@ static uint32_t bestPieceSize(uint64_t totalSize)
     uint32_t const MiB = 1048576;
     uint32_t const GiB = 1073741824;
 
-    if (totalSize >= (2 * GiB))
+    if (totalSize >= 2 * GiB)
     {
         return 2 * MiB;
     }
 
-    if (totalSize >= (1 * GiB))
+    if (totalSize >= 1 * GiB)
     {
         return 1 * MiB;
     }
 
-    if (totalSize >= (512 * MiB))
+    if (totalSize >= 512 * MiB)
     {
         return 512 * KiB;
     }
 
-    if (totalSize >= (350 * MiB))
+    if (totalSize >= 350 * MiB)
     {
         return 256 * KiB;
     }
 
-    if (totalSize >= (150 * MiB))
+    if (totalSize >= 150 * MiB)
     {
         return 128 * KiB;
     }
 
-    if (totalSize >= (50 * MiB))
+    if (totalSize >= 50 * MiB)
     {
         return 64 * KiB;
     }
@@ -183,7 +183,7 @@ tr_metainfo_builder* tr_metaInfoBuilderCreate(char const* topFileArg)
 
 static bool isValidPieceSize(uint32_t n)
 {
-    bool const isPowerOfTwo = !(n == 0) && !(n & (n - 1));
+    bool const isPowerOfTwo = n != 0 && (n & (n - 1)) == 0;
 
     return isPowerOfTwo;
 }
@@ -203,7 +203,7 @@ bool tr_metaInfoBuilderSetPieceSize(tr_metainfo_builder* b, uint32_t bytes)
     b->pieceSize = bytes;
     b->pieceCount = (int)(b->totalSize / b->pieceSize);
 
-    if (b->totalSize % b->pieceSize)
+    if (b->totalSize % b->pieceSize != 0)
     {
         ++b->pieceCount;
     }
@@ -213,7 +213,7 @@ bool tr_metaInfoBuilderSetPieceSize(tr_metainfo_builder* b, uint32_t bytes)
 
 void tr_metaInfoBuilderFree(tr_metainfo_builder* builder)
 {
-    if (builder)
+    if (builder != NULL)
     {
         int i;
         tr_file_index_t t;
@@ -253,7 +253,7 @@ static uint8_t* getHashInfo(tr_metainfo_builder* b)
     tr_sys_file_t fd;
     tr_error* error = NULL;
 
-    if (!b->totalSize)
+    if (b->totalSize == 0)
     {
         return ret;
     }
@@ -282,7 +282,7 @@ static uint8_t* getHashInfo(tr_metainfo_builder* b)
 
         assert(b->pieceIndex < b->pieceCount);
 
-        while (leftInPiece)
+        while (leftInPiece != 0)
         {
             uint64_t const n_this_pass = MIN(b->files[fileIndex].size - off, leftInPiece);
             uint64_t n_read = 0;
@@ -330,7 +330,7 @@ static uint8_t* getHashInfo(tr_metainfo_builder* b)
         ++b->pieceIndex;
     }
 
-    assert(b->abortFlag || (walk - ret == (int)(SHA_DIGEST_LENGTH * b->pieceCount)));
+    assert(b->abortFlag || walk - ret == (int)(SHA_DIGEST_LENGTH * b->pieceCount));
     assert(b->abortFlag || !totalRemain);
 
     if (fd != TR_BAD_SYS_FILE)
@@ -367,9 +367,9 @@ static void getFileInfo(char const* topFile, tr_metainfo_builder_file const* fil
         char* walk = filename;
         char const* token;
 
-        while ((token = tr_strsep(&walk, TR_PATH_DELIMITER_STR)))
+        while ((token = tr_strsep(&walk, TR_PATH_DELIMITER_STR)) != NULL)
         {
-            if (*token)
+            if (*token != '\0')
             {
                 tr_variantListAddStr(uninitialized_path, token);
             }
@@ -414,7 +414,7 @@ static void makeInfoDict(tr_variant* dict, tr_metainfo_builder* builder)
 
     tr_variantDictAddInt(dict, TR_KEY_piece_length, builder->pieceSize);
 
-    if ((pch = getHashInfo(builder)))
+    if ((pch = getHashInfo(builder)) != NULL)
     {
         tr_variantDictAddRaw(dict, TR_KEY_pieces, pch, SHA_DIGEST_LENGTH * builder->pieceCount);
         tr_free(pch);
@@ -440,7 +440,7 @@ static void tr_realMakeMetaInfo(tr_metainfo_builder* builder)
 
     tr_variantInitDict(&top, 6);
 
-    if (!builder->fileCount || !builder->totalSize || !builder->pieceSize || !builder->pieceCount)
+    if (builder->fileCount == 0 || builder->totalSize == 0 || builder->pieceSize == 0 || builder->pieceCount == 0)
     {
         builder->errfile[0] = '\0';
         builder->my_errno = ENOENT;
@@ -448,7 +448,7 @@ static void tr_realMakeMetaInfo(tr_metainfo_builder* builder)
         builder->isDone = true;
     }
 
-    if (!builder->result && builder->trackerCount)
+    if (builder->result == TR_MAKEMETA_OK && builder->trackerCount != 0)
     {
         int prevTier = -1;
         tr_variant* tier = NULL;
@@ -472,9 +472,9 @@ static void tr_realMakeMetaInfo(tr_metainfo_builder* builder)
         tr_variantDictAddStr(&top, TR_KEY_announce, builder->trackers[0].announce);
     }
 
-    if (!builder->result && !builder->abortFlag)
+    if (builder->result == TR_MAKEMETA_OK && !builder->abortFlag)
     {
-        if (builder->comment && *builder->comment)
+        if (builder->comment != NULL && *builder->comment != '\0')
         {
             tr_variantDictAddStr(&top, TR_KEY_comment, builder->comment);
         }
@@ -486,9 +486,9 @@ static void tr_realMakeMetaInfo(tr_metainfo_builder* builder)
     }
 
     /* save the file */
-    if (!builder->result && !builder->abortFlag)
+    if (builder->result == TR_MAKEMETA_OK && !builder->abortFlag)
     {
-        if (tr_variantToFile(&top, TR_VARIANT_FMT_BENC, builder->outputFile))
+        if (tr_variantToFile(&top, TR_VARIANT_FMT_BENC, builder->outputFile) != 0)
         {
             builder->my_errno = errno;
             tr_strlcpy(builder->errfile, builder->outputFile, sizeof(builder->errfile));
@@ -521,7 +521,7 @@ static tr_lock* getQueueLock(void)
 {
     static tr_lock* lock = NULL;
 
-    if (!lock)
+    if (lock == NULL)
     {
         lock = tr_lockNew();
     }
@@ -539,7 +539,7 @@ static void makeMetaWorkerFunc(void* unused UNUSED)
         tr_lock* lock = getQueueLock();
         tr_lockLock(lock);
 
-        if (queue)
+        if (queue != NULL)
         {
             builder = queue;
             queue = queue->nextBuilder;
@@ -594,7 +594,7 @@ void tr_makeMetaInfo(tr_metainfo_builder* builder, char const* outputFile, tr_tr
     builder->comment = tr_strdup(comment);
     builder->isPrivate = isPrivate;
 
-    if (outputFile && *outputFile)
+    if (outputFile != NULL && *outputFile != '\0')
     {
         builder->outputFile = tr_strdup(outputFile);
     }
@@ -609,7 +609,7 @@ void tr_makeMetaInfo(tr_metainfo_builder* builder, char const* outputFile, tr_tr
     builder->nextBuilder = queue;
     queue = builder;
 
-    if (!workerThread)
+    if (workerThread == NULL)
     {
         workerThread = tr_threadNew(makeMetaWorkerFunc, NULL);
     }

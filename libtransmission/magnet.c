@@ -124,7 +124,7 @@ tr_magnet_info* tr_magnetParse(char const* uri)
     {
         char const* walk;
 
-        for (walk = uri + 8; walk && *walk;)
+        for (walk = uri + 8; walk != NULL && *walk != '\0';)
         {
             char const* key = walk;
             char const* delim = strchr(key, '=');
@@ -180,7 +180,7 @@ tr_magnet_info* tr_magnetParse(char const* uri)
                 displayName = tr_http_unescape(val, vallen);
             }
 
-            if ((vallen > 0) && (trCount < MAX_TRACKERS))
+            if (vallen > 0 && trCount < MAX_TRACKERS)
             {
                 int i;
 
@@ -188,7 +188,7 @@ tr_magnet_info* tr_magnetParse(char const* uri)
                 {
                     tr[trCount++] = tr_http_unescape(val, vallen);
                 }
-                else if ((sscanf(key, "tr.%d=", &i) == 1) && (i >= 0)) /* ticket #3341 and #5134 */
+                else if (sscanf(key, "tr.%d=", &i) == 1 && i >= 0) /* ticket #3341 and #5134 */
                 {
                     tr[trCount++] = tr_http_unescape(val, vallen);
                 }

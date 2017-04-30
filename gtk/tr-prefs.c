@@ -187,7 +187,7 @@ static GtkWidget* new_entry(tr_quark const key, gpointer core)
     GtkWidget* w = gtk_entry_new();
     char const* value = gtr_pref_string_get(key);
 
-    if (value)
+    if (value != NULL)
     {
         gtk_entry_set_text(GTK_ENTRY(w), value);
     }
@@ -573,7 +573,7 @@ static GtkTreeModel* whitelist_tree_model_new(char const* whitelist)
 
     rules = g_strsplit(whitelist, ",", 0);
 
-    for (i = 0; rules && rules[i]; ++i)
+    for (i = 0; rules != NULL && rules[i] != NULL; ++i)
     {
         GtkTreeIter iter;
         char const* s = rules[i];
@@ -1107,7 +1107,7 @@ static void onPortTest(GtkButton* button UNUSED, gpointer vdata)
     gtk_widget_set_sensitive(data->portSpin, FALSE);
     gtk_label_set_markup(GTK_LABEL(data->portLabel), _("<i>Testing TCP port…</i>"));
 
-    if (!data->portTag)
+    if (data->portTag == 0)
     {
         data->portTag = g_signal_connect(data->core, "port-tested", G_CALLBACK(onPortTested), data);
     }

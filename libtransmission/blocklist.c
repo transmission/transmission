@@ -87,7 +87,7 @@ static void blocklistLoad(tr_blocklistFile* b)
 
     b->rules = tr_sys_file_map_for_reading(fd, 0, byteCount, &error);
 
-    if (!b->rules)
+    if (b->rules == NULL)
     {
         tr_logAddError(err_fmt, b->filename, error->message);
         tr_sys_file_close(fd, NULL);
@@ -203,7 +203,7 @@ bool tr_blocklistFileHasAddress(tr_blocklistFile* b, tr_address const* addr)
 
     blocklistEnsureLoaded(b);
 
-    if (!b->rules || !b->ruleCount)
+    if (b->rules == NULL || b->ruleCount == 0)
     {
         return false;
     }
@@ -230,7 +230,7 @@ static bool parseLine1(char const* line, struct tr_ipv4_range* range)
 
     walk = strrchr(line, ':');
 
-    if (!walk)
+    if (walk == NULL)
     {
         return false;
     }
@@ -332,7 +332,7 @@ int tr_blocklistFileSetContent(tr_blocklistFile* b, char const* filename)
     size_t ranges_count = 0;
     tr_error* error = NULL;
 
-    if (!filename)
+    if (filename == NULL)
     {
         blocklistDelete(b);
         return 0;

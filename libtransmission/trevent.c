@@ -150,7 +150,7 @@ typedef int tr_pipe_end_t;
 
 typedef struct tr_event_handle
 {
-    uint8_t die;
+    bool die;
     tr_pipe_end_t fds[2];
     tr_lock* lock;
     tr_session* session;
@@ -203,7 +203,7 @@ static void readFromPipe(evutil_socket_t fd, short eventType, void* veh)
             size_t const nwant = sizeof(data);
             ev_ssize_t const ngot = piperead(fd, &data, nwant);
 
-            if (!eh->die && (ngot == (ev_ssize_t)nwant))
+            if (!eh->die && ngot == (ev_ssize_t)nwant)
             {
                 dbgmsg("invoking function in libevent thread");
                 (data.func)(data.user_data);
@@ -363,7 +363,7 @@ void tr_runInEventThread(tr_session* session, void (* func)(void*), void* user_d
 
         tr_lockUnlock(e->lock);
 
-        if ((res_1 == -1) || (res_2 == -1))
+        if (res_1 == -1 || res_2 == -1)
         {
             tr_logAddError("Unable to write to libtransmisison event queue: %s", tr_strerror(errno));
         }

@@ -113,7 +113,7 @@ static int test_utf8(void)
     in = "\x92\xE0\xE3\xA4\xAD\xAE \xA1\xEB\xE2\xEC \x81\xAE\xA3\xAE\xAC";
     out = tr_utf8clean(in, 17);
     check(out != NULL);
-    check((strlen(out) == 17) || (strlen(out) == 33));
+    check(strlen(out) == 17 || strlen(out) == 33);
     check(tr_utf8_validate(out, TR_BAD_SIZE, NULL));
     tr_free(out);
 
@@ -128,14 +128,14 @@ static int test_utf8(void)
     in = "\xF4\x00\x81\x82";
     out = tr_utf8clean(in, 4);
     check(out != NULL);
-    check((strlen(out) == 1) || (strlen(out) == 2));
+    check(strlen(out) == 1 || strlen(out) == 2);
     check(tr_utf8_validate(out, TR_BAD_SIZE, NULL));
     tr_free(out);
 
     in = "\xF4\x33\x81\x82";
     out = tr_utf8clean(in, 4);
     check(out != NULL);
-    check((strlen(out) == 4) || (strlen(out) == 7));
+    check(strlen(out) == 4 || strlen(out) == 7);
     check(tr_utf8_validate(out, TR_BAD_SIZE, NULL));
     tr_free(out);
 
@@ -322,14 +322,14 @@ static int test_array(void)
 
     for (i = 0; i < n; ++i)
     {
-        check_int_eq((i < 5 ? i : i + 1), array[i]);
+        check_int_eq(i < 5 ? i : i + 1, array[i]);
     }
 
     tr_removeElementFromArray(array, 0u, sizeof(size_t), n--);
 
     for (i = 0; i < n; ++i)
     {
-        check_int_eq((i < 4 ? i + 1 : i + 2), array[i]);
+        check_int_eq(i < 4 ? i + 1 : i + 2, array[i]);
     }
 
     tr_removeElementFromArray(array, n - 1, sizeof(size_t), n);
@@ -337,7 +337,7 @@ static int test_array(void)
 
     for (i = 0; i < n; ++i)
     {
-        check_int_eq((i < 4 ? i + 1 : i + 2), array[i]);
+        check_int_eq(i < 4 ? i + 1 : i + 2, array[i]);
     }
 
     return 0;

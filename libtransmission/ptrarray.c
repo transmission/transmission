@@ -19,9 +19,9 @@ tr_ptrArray const TR_PTR_ARRAY_INIT = TR_PTR_ARRAY_INIT_STATIC;
 void tr_ptrArrayDestruct(tr_ptrArray* p, PtrArrayForeachFunc func)
 {
     assert(p != NULL);
-    assert(p->items || !p->n_items);
+    assert(p->items != NULL || p->n_items == 0);
 
-    if (func)
+    if (func != NULL)
     {
         tr_ptrArrayForeach(p, func);
     }
@@ -33,9 +33,9 @@ void tr_ptrArrayForeach(tr_ptrArray* t, PtrArrayForeachFunc func)
 {
     int i;
 
-    assert(t);
-    assert(t->items || !t->n_items);
-    assert(func);
+    assert(t != NULL);
+    assert(t->items != NULL || t->n_items == 0);
+    assert(func != NULL);
 
     for (i = 0; i < t->n_items; ++i)
     {
@@ -75,7 +75,7 @@ void* tr_ptrArrayPop(tr_ptrArray* t)
 {
     void* ret = NULL;
 
-    if (t->n_items)
+    if (t->n_items != 0)
     {
         ret = t->items[--t->n_items];
     }
@@ -187,7 +187,7 @@ static void assertIndexIsSortedAndUnique(tr_ptrArray const* t, int pos, int (* c
         assert(compare(t->items[pos - 1], t->items[pos]) < 0);
     }
 
-    if ((pos + 1) < t->n_items)
+    if (pos + 1 < t->n_items)
     {
         assert(compare(t->items[pos], t->items[pos + 1]) < 0);
     }

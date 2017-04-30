@@ -191,7 +191,7 @@ static char const* getConfigDir(int argc, char const** argv)
     char const* optarg;
     int const ind = tr_optind;
 
-    while ((c = tr_getopt(getUsage(), argc, argv, options, &optarg)))
+    while ((c = tr_getopt(getUsage(), argc, argv, options, &optarg)) != TR_OPT_DONE)
     {
         if (c == 'g')
         {
@@ -240,7 +240,7 @@ int tr_main(int argc, char* argv[])
     tr_sessionLoadSettings(&settings, configDir, MY_CONFIG_NAME);
 
     /* the command line overrides defaults */
-    if (parseCommandLine(&settings, argc, (char const**)argv))
+    if (parseCommandLine(&settings, argc, (char const**)argv) != 0)
     {
         return EXIT_FAILURE;
     }
@@ -251,7 +251,7 @@ int tr_main(int argc, char* argv[])
     }
 
     /* Check the options for validity */
-    if (!torrentPath)
+    if (torrentPath == NULL)
     {
         fprintf(stderr, "No torrent specified!\n");
         return EXIT_FAILURE;
@@ -311,7 +311,7 @@ int tr_main(int argc, char* argv[])
     tor = tr_torrentNew(ctor, NULL, NULL);
     tr_ctorFree(ctor);
 
-    if (!tor)
+    if (tor == NULL)
     {
         fprintf(stderr, "Failed opening torrent file `%s'\n", torrentPath);
         tr_sessionClose(h);
@@ -400,7 +400,7 @@ static int parseCommandLine(tr_variant* d, int argc, char const** argv)
     int c;
     char const* optarg;
 
-    while ((c = tr_getopt(getUsage(), argc, argv, options, &optarg)))
+    while ((c = tr_getopt(getUsage(), argc, argv, options, &optarg)) != TR_OPT_DONE)
     {
         switch (c)
         {

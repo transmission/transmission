@@ -89,7 +89,7 @@ static int test_metainfo(void)
         int const err = tr_ctorSetMetainfo(ctor, metainfo[i].benc, strlen(metainfo[i].benc));
         check_int_eq(metainfo[i].expected_benc_err, err);
 
-        if (!err)
+        if (err == 0)
         {
             tr_parse_result const parse_result = tr_torrentParse(ctor, NULL);
             check_int_eq(metainfo[i].expected_parse_result, parse_result);

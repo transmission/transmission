@@ -316,7 +316,7 @@ static void fileset_close_torrent(struct tr_fileset* set, int torrent_id)
     {
         for (o = set->begin; o != set->end; ++o)
         {
-            if ((o->torrent_id == torrent_id) && cached_file_is_open(o))
+            if (o->torrent_id == torrent_id && cached_file_is_open(o))
             {
                 cached_file_close(o);
             }
@@ -332,7 +332,7 @@ static struct tr_cached_file* fileset_lookup(struct tr_fileset* set, int torrent
     {
         for (o = set->begin; o != set->end; ++o)
         {
-            if ((torrent_id == o->torrent_id) && (i == o->file_index) && cached_file_is_open(o))
+            if (torrent_id == o->torrent_id && i == o->file_index && cached_file_is_open(o))
             {
                 return o;
             }
@@ -362,7 +362,7 @@ static struct tr_cached_file* fileset_get_empty_slot(struct tr_fileset* set)
         /* all slots are full... recycle the least recently used */
         for (cull = NULL, o = set->begin; o != set->end; ++o)
         {
-            if (!cull || o->used_at < cull->used_at)
+            if (cull == NULL || o->used_at < cull->used_at)
             {
                 cull = o;
             }
@@ -425,7 +425,7 @@ static void ensureSessionFdInfoExists(tr_session* session)
 
 void tr_fdClose(tr_session* session)
 {
-    if (session && session->fdInfo)
+    if (session != NULL && session->fdInfo != NULL)
     {
         struct tr_fdInfo* i = session->fdInfo;
         fileset_destruct(&i->fileset);
@@ -440,7 +440,7 @@ void tr_fdClose(tr_session* session)
 
 static struct tr_fileset* get_fileset(tr_session* session)
 {
-    if (!session)
+    if (session == NULL)
     {
         return NULL;
     }
@@ -453,7 +453,7 @@ void tr_fdFileClose(tr_session* s, tr_torrent const* tor, tr_file_index_t i)
 {
     struct tr_cached_file* o;
 
-    if ((o = fileset_lookup(get_fileset(s), tr_torrentId(tor), i)))
+    if ((o = fileset_lookup(get_fileset(s), tr_torrentId(tor), i)) != NULL)
     {
         /* flush writable files so that their mtimes will be
          * up-to-date when this function returns to the caller... */
@@ -470,7 +470,7 @@ tr_sys_file_t tr_fdFileGetCached(tr_session* s, int torrent_id, tr_file_index_t 
 {
     struct tr_cached_file* o = fileset_lookup(get_fileset(s), torrent_id, i);
 
-    if (!o || (writable && !o->is_writable))
+    if (o == NULL || (writable && !o->is_writable))
     {
         return TR_BAD_SYS_FILE;
     }
@@ -485,7 +485,7 @@ bool tr_fdFileGetCachedMTime(tr_session* s, int torrent_id, tr_file_index_t i, t
     tr_sys_path_info info;
     struct tr_cached_file* o = fileset_lookup(get_fileset(s), torrent_id, i);
 
-    if ((success = (o != NULL) && tr_sys_file_get_info(o->fd, &info, NULL)))
+    if ((success = o != NULL && tr_sys_file_get_info(o->fd, &info, NULL)))
     {
         *mtime = info.last_modified_at;
     }
@@ -507,11 +507,11 @@ tr_sys_file_t tr_fdFileCheckout(tr_session* session, int torrent_id, tr_file_ind
     struct tr_fileset* set = get_fileset(session);
     struct tr_cached_file* o = fileset_lookup(set, torrent_id, i);
 
-    if (o && writable && !o->is_writable)
+    if (o != NULL && writable && !o->is_writable)
     {
         cached_file_close(o); /* close it so we can reopen in rw mode */
     }
-    else if (!o)
+    else if (o == NULL)
     {
         o = fileset_get_empty_slot(set);
     }
@@ -520,7 +520,7 @@ tr_sys_file_t tr_fdFileCheckout(tr_session* session, int torrent_id, tr_file_ind
     {
         int const err = cached_file_open(o, filename, writable, allocation, file_size);
 
-        if (err)
+        if (err != 0)
         {
             errno = err;
             return TR_BAD_SYS_FILE;
@@ -609,7 +609,7 @@ tr_socket_t tr_fdSocketAccept(tr_session* s, tr_socket_t sockfd, tr_address* add
 
     if (fd != TR_BAD_SOCKET)
     {
-        if ((gFd->peerCount < s->peerLimit) && tr_address_from_sockaddr_storage(addr, port, &sock))
+        if (gFd->peerCount < s->peerLimit && tr_address_from_sockaddr_storage(addr, port, &sock))
         {
             ++gFd->peerCount;
         }

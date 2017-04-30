@@ -81,7 +81,7 @@ QIcon MainWindow::getStockIcon(QString const& name, int fallback)
 {
     QIcon icon = QIcon::fromTheme(name);
 
-    if (icon.isNull() && (fallback >= 0))
+    if (icon.isNull() && fallback >= 0)
     {
         icon = style()->standardIcon(QStyle::StandardPixmap(fallback), 0, this);
     }
@@ -376,7 +376,7 @@ void MainWindow::onModelReset()
 void MainWindow::onSetPrefs()
 {
     QVariantList const p = sender()->property(PREF_VARIANTS_KEY).toList();
-    assert((p.size() % 2) == 0);
+    assert(p.size() % 2 == 0);
 
     for (int i = 0, n = p.size(); i < n; i += 2)
     {
@@ -720,15 +720,15 @@ void MainWindow::refreshTrayIcon()
     {
         tip = tr("Network Error");
     }
-    else if (!upCount && !downCount)
+    else if (upCount == 0 && downCount == 0)
     {
         tip = tr("Idle");
     }
-    else if (downCount)
+    else if (downCount != 0)
     {
         tip = Formatter::downloadSpeedToString(downSpeed) + QLatin1String("   ") + Formatter::uploadSpeedToString(upSpeed);
     }
-    else if (upCount)
+    else if (upCount != 0)
     {
         tip = Formatter::uploadSpeedToString(upSpeed);
     }
@@ -821,7 +821,7 @@ void MainWindow::refreshActionSensitivity()
         assert(model == modelIndex.model());
         Torrent const* tor(model->data(modelIndex, TorrentModel::TorrentRole).value<Torrent const*>());
 
-        if (tor)
+        if (tor != nullptr)
         {
             bool const isSelected(selectionModel->isSelected(modelIndex));
             bool const isPaused(tor->isPaused());
@@ -1058,7 +1058,7 @@ void MainWindow::toggleWindows(bool doShow)
 
 void MainWindow::trayActivated(QSystemTrayIcon::ActivationReason reason)
 {
-    if ((reason == QSystemTrayIcon::Trigger) || (reason == QSystemTrayIcon::DoubleClick))
+    if (reason == QSystemTrayIcon::Trigger || reason == QSystemTrayIcon::DoubleClick)
     {
         if (isMinimized())
         {
@@ -1342,46 +1342,46 @@ void MainWindow::removeTorrents(bool const deleteFiles)
 
     if (!deleteFiles)
     {
-        primary_text = (count == 1) ? tr("Remove torrent?") : tr("Remove %Ln torrent(s)?", nullptr, count);
+        primary_text = count == 1 ? tr("Remove torrent?") : tr("Remove %Ln torrent(s)?", nullptr, count);
     }
     else
     {
-        primary_text = (count == 1) ? tr("Delete this torrent's downloaded files?") :
+        primary_text = count == 1 ? tr("Delete this torrent's downloaded files?") :
             tr("Delete these %Ln torrent(s)' downloaded files?", nullptr, count);
     }
 
     if (!incomplete && !connected)
     {
-        secondary_text = (count == 1) ?
+        secondary_text = count == 1 ?
             tr("Once removed, continuing the transfer will require the torrent file or magnet link.") :
             tr("Once removed, continuing the transfers will require the torrent files or magnet links.");
     }
     else if (count == incomplete)
     {
-        secondary_text = (count == 1) ? tr("This torrent has not finished downloading.") :
+        secondary_text = count == 1 ? tr("This torrent has not finished downloading.") :
             tr("These torrents have not finished downloading.");
     }
     else if (count == connected)
     {
-        secondary_text = (count == 1) ? tr("This torrent is connected to peers.") :
+        secondary_text = count == 1 ? tr("This torrent is connected to peers.") :
             tr("These torrents are connected to peers.");
     }
     else
     {
-        if (connected)
+        if (connected != 0)
         {
-            secondary_text = (connected == 1) ? tr("One of these torrents is connected to peers.") :
+            secondary_text = connected == 1 ? tr("One of these torrents is connected to peers.") :
                 tr("Some of these torrents are connected to peers.");
         }
 
-        if (connected && incomplete)
+        if (connected != 0 && incomplete != 0)
         {
             secondary_text += QLatin1Char('\n');
         }
 
-        if (incomplete)
+        if (incomplete != 0)
         {
-            secondary_text += (incomplete == 1) ? tr("One of these torrents has not finished downloading.") :
+            secondary_text += incomplete == 1 ? tr("One of these torrents has not finished downloading.") :
                 tr("Some of these torrents have not finished downloading.");
         }
     }
@@ -1452,7 +1452,7 @@ void MainWindow::updateNetworkIcon()
     QString tip;
     QString const url = mySession.getRemoteUrl().host();
 
-    if (!myLastReadTime)
+    if (myLastReadTime == 0)
     {
         tip = tr("%1 has not responded yet").arg(url);
     }
@@ -1464,7 +1464,7 @@ void MainWindow::updateNetworkIcon()
     {
         tip = tr("%1 is responding").arg(url);
     }
-    else if (secondsSinceLastRead < (60 * 2))
+    else if (secondsSinceLastRead < 60 * 2)
     {
         tip = tr("%1 last responded %2 ago").arg(url).arg(Formatter::timeToString(secondsSinceLastRead));
     }
@@ -1486,19 +1486,19 @@ void MainWindow::dataReadProgress()
 {
     if (!myNetworkError)
     {
-        myLastReadTime = time(NULL);
+        myLastReadTime = time(nullptr);
     }
 }
 
 void MainWindow::dataSendProgress()
 {
-    myLastSendTime = time(NULL);
+    myLastSendTime = time(nullptr);
 }
 
 void MainWindow::onNetworkResponse(QNetworkReply::NetworkError code, QString const& message)
 {
     bool const hadError = myNetworkError;
-    bool const haveError = (code != QNetworkReply::NoError) && (code != QNetworkReply::UnknownContentError);
+    bool const haveError = code != QNetworkReply::NoError && code != QNetworkReply::UnknownContentError;
 
     myNetworkError = haveError;
     myErrorMessage = message;

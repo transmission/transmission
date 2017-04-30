@@ -127,8 +127,8 @@ void tr_peerIoUnrefImpl(char const* file, int line, tr_peerIo* io);
 
 static inline bool tr_isPeerIo(tr_peerIo const* io)
 {
-    return (io != NULL) && (io->magicNumber == PEER_IO_MAGIC_NUMBER) && (io->refCount >= 0) &&
-           (tr_isBandwidth(&io->bandwidth)) && (tr_address_is_valid(&io->addr));
+    return io != NULL && io->magicNumber == PEER_IO_MAGIC_NUMBER && io->refCount >= 0 && tr_isBandwidth(&io->bandwidth) &&
+           tr_address_is_valid(&io->addr);
 }
 
 /**
@@ -177,7 +177,7 @@ static inline bool tr_peerIoSupportsUTP(tr_peerIo const* io)
 static inline tr_session* tr_peerIoGetSession(tr_peerIo* io)
 {
     assert(tr_isPeerIo(io));
-    assert(io->session);
+    assert(io->session != NULL);
 
     return io->session;
 }
@@ -249,7 +249,7 @@ void tr_peerIoSetEncryption(tr_peerIo* io, tr_encryption_type encryption_type);
 
 static inline bool tr_peerIoIsEncrypted(tr_peerIo const* io)
 {
-    return (io != NULL) && (io->encryption_type == PEER_ENCRYPTION_RC4);
+    return io != NULL && io->encryption_type == PEER_ENCRYPTION_RC4;
 }
 
 void evbuffer_add_uint8(struct evbuffer* outbuf, uint8_t byte);

@@ -173,7 +173,7 @@ void TorrentModel::removeTorrents(tr_variant* torrents)
     int i = 0;
     tr_variant* child;
 
-    while ((child = tr_variantListChild(torrents, i++)))
+    while ((child = tr_variantListChild(torrents, i++)) != nullptr)
     {
         int64_t intVal;
 
@@ -201,7 +201,7 @@ void TorrentModel::updateTorrents(tr_variant* torrents, bool isCompleteList)
         size_t i(0);
         tr_variant* child;
 
-        while ((child = tr_variantListChild(torrents, i++)))
+        while ((child = tr_variantListChild(torrents, i++)) != nullptr)
         {
             int64_t id;
 

@@ -32,7 +32,7 @@ static int run_test(int argc, char const** argv, int expected_n, int* expected_c
     n = 0;
     tr_optind = 1;
 
-    while ((c = tr_getopt("summary", argc, argv, options, &optarg)))
+    while ((c = tr_getopt("summary", argc, argv, options, &optarg)) != TR_OPT_DONE)
     {
         check(n < expected_n);
         check_int_eq(expected_c[n], c);

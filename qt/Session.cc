@@ -241,7 +241,7 @@ void Session::updatePref(int key)
             }
 
         case Prefs::RPC_AUTH_REQUIRED:
-            if (mySession)
+            if (mySession != nullptr)
             {
                 tr_sessionSetRPCPasswordEnabled(mySession, myPrefs.getBool(key));
             }
@@ -249,7 +249,7 @@ void Session::updatePref(int key)
             break;
 
         case Prefs::RPC_ENABLED:
-            if (mySession)
+            if (mySession != nullptr)
             {
                 tr_sessionSetRPCEnabled(mySession, myPrefs.getBool(key));
             }
@@ -257,7 +257,7 @@ void Session::updatePref(int key)
             break;
 
         case Prefs::RPC_PASSWORD:
-            if (mySession)
+            if (mySession != nullptr)
             {
                 tr_sessionSetRPCPassword(mySession, myPrefs.getString(key).toUtf8().constData());
             }
@@ -265,7 +265,7 @@ void Session::updatePref(int key)
             break;
 
         case Prefs::RPC_PORT:
-            if (mySession)
+            if (mySession != nullptr)
             {
                 tr_sessionSetRPCPort(mySession, myPrefs.getInt(key));
             }
@@ -273,7 +273,7 @@ void Session::updatePref(int key)
             break;
 
         case Prefs::RPC_USERNAME:
-            if (mySession)
+            if (mySession != nullptr)
             {
                 tr_sessionSetRPCUsername(mySession, myPrefs.getString(key).toUtf8().constData());
             }
@@ -281,7 +281,7 @@ void Session::updatePref(int key)
             break;
 
         case Prefs::RPC_WHITELIST_ENABLED:
-            if (mySession)
+            if (mySession != nullptr)
             {
                 tr_sessionSetRPCWhitelistEnabled(mySession, myPrefs.getBool(key));
             }
@@ -289,7 +289,7 @@ void Session::updatePref(int key)
             break;
 
         case Prefs::RPC_WHITELIST:
-            if (mySession)
+            if (mySession != nullptr)
             {
                 tr_sessionSetRPCWhitelist(mySession, myPrefs.getString(key).toUtf8().constData());
             }
@@ -342,7 +342,7 @@ void Session::stop()
 {
     myRpc.stop();
 
-    if (mySession)
+    if (mySession != nullptr)
     {
         tr_sessionClose(mySession);
         mySession = nullptr;
@@ -799,7 +799,7 @@ void Session::updateInfo(tr_variant* d)
     {
         tr_variant const* b(tr_variantDictFind(d, myPrefs.getKey(i)));
 
-        if (!b)
+        if (b == nullptr)
         {
             continue;
         }
@@ -914,7 +914,7 @@ void Session::updateInfo(tr_variant* d)
         setBlocklistSize(i);
     }
 
-    if (tr_variantDictFindStr(d, TR_KEY_version, &str, nullptr) && (mySessionVersion != QString::fromUtf8(str)))
+    if (tr_variantDictFindStr(d, TR_KEY_version, &str, nullptr) && mySessionVersion != QString::fromUtf8(str))
     {
         mySessionVersion = QString::fromUtf8(str);
     }
@@ -1091,7 +1091,7 @@ void Session::launchWebInterface()
 {
     QUrl url;
 
-    if (!mySession) // remote session
+    if (mySession == nullptr) // remote session
     {
         url = myRpc.url();
         url.setPath(QLatin1String("/transmission/web/"));

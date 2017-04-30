@@ -74,8 +74,8 @@ bool check_streq_impl(char const* file, int line, char const* expected, char con
         }
         else
         {
-            fprintf(stderr, "FAIL %s:%d, expected \"%s\", got \"%s\"\n", file, line, expected ? expected : " (null)",
-                actual ? actual : " (null)");
+            fprintf(stderr, "FAIL %s:%d, expected \"%s\", got \"%s\"\n", file, line, expected != NULL ? expected : "(null)",
+                actual != NULL ? actual : "(null)");
         }
     }
 
@@ -148,7 +148,7 @@ int runTests(testFunc const* const tests, int numTests)
 
     for (i = 0; i < numTests; i++)
     {
-        if ((ret = (*tests[i])()))
+        if ((ret = (*tests[i])()) != 0)
         {
             return ret;
         }
@@ -313,21 +313,21 @@ tr_session* libttest_session_init(tr_variant* settings)
 
     q = TR_KEY_port_forwarding_enabled;
 
-    if (!tr_variantDictFind(settings, q))
+    if (tr_variantDictFind(settings, q) == NULL)
     {
         tr_variantDictAddBool(settings, q, false);
     }
 
     q = TR_KEY_dht_enabled;
 
-    if (!tr_variantDictFind(settings, q))
+    if (tr_variantDictFind(settings, q) == NULL)
     {
         tr_variantDictAddBool(settings, q, false);
     }
 
     q = TR_KEY_message_level;
 
-    if (!tr_variantDictFind(settings, q))
+    if (tr_variantDictFind(settings, q) == NULL)
     {
         tr_variantDictAddInt(settings, q, verbose ? TR_LOG_DEBUG : TR_LOG_ERROR);
     }
@@ -402,7 +402,7 @@ tr_torrent* libttest_zero_torrent_init(tr_session* session)
     /* create the torrent */
     err = 0;
     tor = tr_torrentNew(ctor, &err, NULL);
-    assert(!err);
+    assert(err == 0);
 
     /* cleanup */
     tr_free(metainfo);
@@ -423,7 +423,7 @@ void libttest_zero_torrent_populate(tr_torrent* tor, bool complete)
         char* dirname;
         tr_file const* file = &tor->info.files[i];
 
-        if (!complete && (i == 0))
+        if (!complete && i == 0)
         {
             path = tr_strdup_printf("%s%c%s.part", tor->currentDir, TR_PATH_DELIMITER, file->name);
         }

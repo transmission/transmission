@@ -192,14 +192,14 @@ void tr_lockLock(tr_lock* l)
 #endif
 
     assert(l->depth >= 0);
-    assert(!l->depth || tr_areThreadsEqual(l->lockThread, tr_getCurrentThread()));
+    assert(l->depth == 0 || tr_areThreadsEqual(l->lockThread, tr_getCurrentThread()));
     l->lockThread = tr_getCurrentThread();
     ++l->depth;
 }
 
 bool tr_lockHave(tr_lock const* l)
 {
-    return (l->depth > 0) && (tr_areThreadsEqual(l->lockThread, tr_getCurrentThread()));
+    return l->depth > 0 && tr_areThreadsEqual(l->lockThread, tr_getCurrentThread());
 }
 
 void tr_lockUnlock(tr_lock* l)
@@ -252,11 +252,11 @@ static char const* getHomeDir(void)
 {
     static char* home = NULL;
 
-    if (!home)
+    if (home == NULL)
     {
         home = tr_env_get_string("HOME", NULL);
 
-        if (!home)
+        if (home == NULL)
         {
 #ifdef _WIN32
 
@@ -266,7 +266,7 @@ static char const* getHomeDir(void)
 
             struct passwd* pw = getpwuid(getuid());
 
-            if (pw)
+            if (pw != NULL)
             {
                 home = tr_strdup(pw->pw_dir);
             }
@@ -276,7 +276,7 @@ static char const* getHomeDir(void)
 #endif
         }
 
-        if (!home)
+        if (home == NULL)
         {
             home = tr_strdup("");
         }
@@ -327,12 +327,12 @@ char const* tr_getDefaultConfigDir(char const* appname)
 {
     static char* s = NULL;
 
-    if (!appname || !*appname)
+    if (appname == NULL || *appname == '\0')
     {
         appname = "Transmission";
     }
 
-    if (!s)
+    if (s == NULL)
     {
         s = tr_env_get_string("TRANSMISSION_HOME", NULL);
 
@@ -389,7 +389,7 @@ char const* tr_getDefaultDownloadDir(void)
         /* figure out where to look for user-dirs.dirs */
         config_home = tr_env_get_string("XDG_CONFIG_HOME", NULL);
 
-        if (config_home && *config_home)
+        if (config_home != NULL && *config_home != '\0')
         {
             config_file = tr_buildPath(config_home, "user-dirs.dirs", NULL);
         }
@@ -403,7 +403,7 @@ char const* tr_getDefaultDownloadDir(void)
         /* read in user-dirs.dirs and look for the download dir entry */
         content = (char*)tr_loadFile(config_file, &content_len, NULL);
 
-        if (content && content_len > 0)
+        if (content != NULL && content_len > 0)
         {
             char const* key = "XDG_DOWNLOAD_DIR=\"";
             char* line = strstr(content, key);
@@ -413,7 +413,7 @@ char const* tr_getDefaultDownloadDir(void)
                 char* value = line + strlen(key);
                 char* end = strchr(value, '"');
 
-                if (end)
+                if (end != NULL)
                 {
                     *end = '\0';
 
@@ -476,7 +476,7 @@ char const* tr_getWebClientDir(tr_session const* session UNUSED)
 {
     static char* s = NULL;
 
-    if (!s)
+    if (s == NULL)
     {
         s = tr_env_get_string("CLUTCH_HOME", NULL);
 
@@ -575,7 +575,7 @@ char const* tr_getWebClientDir(tr_session const* session UNUSED)
             /* XDG_DATA_HOME should be the first in the list of candidates */
             tmp = tr_env_get_string("XDG_DATA_HOME", NULL);
 
-            if (tmp && *tmp)
+            if (tmp != NULL && *tmp != '\0')
             {
                 tr_list_append(&candidates, tmp);
             }
@@ -595,20 +595,20 @@ char const* tr_getWebClientDir(tr_session const* session UNUSED)
                 tr_free(xdg);
                 tmp = buf;
 
-                while (tmp && *tmp)
+                while (tmp != NULL && *tmp != '\0')
                 {
                     char const* end = strchr(tmp, ':');
 
-                    if (end)
+                    if (end != NULL)
                     {
-                        if ((end - tmp) > 1)
+                        if (end - tmp > 1)
                         {
                             tr_list_append(&candidates, tr_strndup(tmp, (size_t)(end - tmp)));
                         }
 
                         tmp = (char*)end + 1;
                     }
-                    else if (tmp && *tmp)
+                    else if (tmp != NULL && *tmp != '\0')
                     {
                         tr_list_append(&candidates, tr_strdup(tmp));
                         break;
@@ -619,10 +619,10 @@ char const* tr_getWebClientDir(tr_session const* session UNUSED)
             }
 
             /* walk through the candidates & look for a match */
-            for (l = candidates; l; l = l->next)
+            for (l = candidates; l != NULL; l = l->next)
             {
                 char* path = tr_buildPath(l->data, "transmission", "web", NULL);
-                int const found = isWebClientDir(path);
+                bool const found = isWebClientDir(path);
 
                 if (found)
                 {

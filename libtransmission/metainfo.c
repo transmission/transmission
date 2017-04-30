@@ -68,8 +68,8 @@ static char* getTorrentFilename(tr_session const* session, tr_info const* inf)
 
 static bool path_component_is_suspicious(char const* component)
 {
-    return (component == NULL) || (strpbrk(component, PATH_DELIMITER_CHARS) != NULL) || (strcmp(component, ".") == 0) ||
-           (strcmp(component, "..") == 0);
+    return component == NULL || strpbrk(component, PATH_DELIMITER_CHARS) != NULL || strcmp(component, ".") == 0 ||
+           strcmp(component, "..") == 0;
 }
 
 static bool getfile(char** setme, char const* root, tr_variant* path, struct evbuffer* buf)
@@ -103,7 +103,7 @@ static bool getfile(char** setme, char const* root, tr_variant* path, struct evb
                 break;
             }
 
-            if (!*str)
+            if (*str == '\0')
             {
                 continue;
             }
@@ -113,7 +113,7 @@ static bool getfile(char** setme, char const* root, tr_variant* path, struct evb
         }
     }
 
-    if (success && (evbuffer_get_length(buf) <= root_len))
+    if (success && evbuffer_get_length(buf) <= root_len)
     {
         success = false;
     }
@@ -225,7 +225,7 @@ static char* tr_convertAnnounceToScrape(char const* announce)
      * it will be taken as a sign that that tracker doesn't support
      * the scrape convention. If it does, substitute 'scrape' for
      * 'announce' to find the scrape page. */
-    if (((s = strrchr(announce, '/')) != NULL) && strncmp(++s, "announce", 8) == 0)
+    if ((s = strrchr(announce, '/')) != NULL && strncmp(++s, "announce", 8) == 0)
     {
         char const* prefix = announce;
         size_t const prefix_len = s - announce;
@@ -312,7 +312,7 @@ static char const* getannounce(tr_info* inf, tr_variant* meta)
         }
 
         /* did we use any of the tiers? */
-        if (!trackerCount)
+        if (trackerCount == 0)
         {
             tr_free(trackers);
             trackers = NULL;
@@ -320,7 +320,7 @@ static char const* getannounce(tr_info* inf, tr_variant* meta)
     }
 
     /* Regular announce value */
-    if (!trackerCount && tr_variantDictFindStr(meta, TR_KEY_announce, &str, &len))
+    if (trackerCount == 0 && tr_variantDictFindStr(meta, TR_KEY_announce, &str, &len))
     {
         char* url = tr_strstrip(tr_strndup(str, len));
 
@@ -369,7 +369,7 @@ static char* fix_webseed_url(tr_info const* inf, char const* url_in)
 
     if (tr_urlIsValid(url, len))
     {
-        if ((inf->fileCount > 1) && (len > 0) && (url[len - 1] != '/'))
+        if (inf->fileCount > 1 && len > 0 && url[len - 1] != '/')
         {
             ret = tr_strdup_printf("%*.*s/", (int)len, (int)len, url);
         }
@@ -475,12 +475,12 @@ static char const* tr_metainfoParseImpl(tr_session const* session, tr_info* inf,
                 inf->originalName = tr_strndup(str, len);
             }
 
-            if (!inf->name)
+            if (inf->name == NULL)
             {
                 inf->name = tr_strdup(inf->hashString);
             }
 
-            if (!inf->originalName)
+            if (inf->originalName == NULL)
             {
                 inf->originalName = tr_strdup(inf->hashString);
             }
@@ -518,7 +518,7 @@ static char const* tr_metainfoParseImpl(tr_session const* session, tr_info* inf,
             }
         }
 
-        if (!str || !*str)
+        if (str == NULL || *str == '\0')
         {
             return "name";
         }
@@ -612,12 +612,12 @@ static char const* tr_metainfoParseImpl(tr_session const* session, tr_info* inf,
     /* files */
     if (!isMagnet)
     {
-        if ((str = parseFiles(inf, tr_variantDictFind(infoDict, TR_KEY_files), tr_variantDictFind(infoDict, TR_KEY_length))))
+        if ((str = parseFiles(inf, tr_variantDictFind(infoDict, TR_KEY_files), tr_variantDictFind(infoDict, TR_KEY_length))) != NULL)
         {
             return str;
         }
 
-        if (!inf->fileCount || !inf->totalSize)
+        if (inf->fileCount == 0 || inf->totalSize == 0)
         {
             return "files";
         }
@@ -629,7 +629,7 @@ static char const* tr_metainfoParseImpl(tr_session const* session, tr_info* inf,
     }
 
     /* get announce or announce-list */
-    if ((str = getannounce(inf, meta)))
+    if ((str = getannounce(inf, meta)) != NULL)
     {
         return str;
     }
@@ -639,7 +639,7 @@ static char const* tr_metainfoParseImpl(tr_session const* session, tr_info* inf,
 
     /* filename of Transmission's copy */
     tr_free(inf->torrent);
-    inf->torrent = session ? getTorrentFilename(session, inf) : NULL;
+    inf->torrent = session != NULL ? getTorrentFilename(session, inf) : NULL;
 
     return NULL;
 }
@@ -650,7 +650,7 @@ bool tr_metainfoParse(tr_session const* session, tr_variant const* meta_in, tr_i
     char const* badTag = tr_metainfoParseImpl(session, inf, hasInfoDict, infoDictLength, meta_in);
     bool const success = badTag == NULL;
 
-    if (badTag)
+    if (badTag != NULL)
     {
         tr_logAddNamedError(inf->name, _("Invalid metadata entry \"%s\""), badTag);
         tr_metainfoFree(inf);

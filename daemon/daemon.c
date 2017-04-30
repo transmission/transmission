@@ -174,7 +174,7 @@ static char const* getConfigDir(int argc, char const* const* argv)
     char const* optarg;
     int const ind = tr_optind;
 
-    while ((c = tr_getopt(getUsage(), argc, argv, options, &optarg)))
+    while ((c = tr_getopt(getUsage(), argc, argv, options, &optarg)) != TR_OPT_DONE)
     {
         if (c == 'g')
         {
@@ -206,7 +206,7 @@ static tr_watchdir_status onFileAdded(tr_watchdir_t dir, char const* name, void*
     tr_ctor* ctor = tr_ctorNew(session);
     int err = tr_ctorSetMetainfoFromFile(ctor, filename);
 
-    if (!err)
+    if (err == 0)
     {
         tr_torrentNew(ctor, &err, NULL);
 
@@ -259,7 +259,7 @@ static void printMessage(tr_sys_file_t logfile, int level, char const* name, cha
         char timestr[64];
         tr_logGetTimeStr(timestr, sizeof(timestr));
 
-        if (name)
+        if (name != NULL)
         {
             tr_sys_file_write_fmt(logfile, "[%s] %s %s (%s:%d)" TR_NATIVE_EOL_STR, NULL, timestr, name, message, file, line);
         }
@@ -270,6 +270,7 @@ static void printMessage(tr_sys_file_t logfile, int level, char const* name, cha
     }
 
 #ifdef HAVE_SYSLOG
+
     else /* daemon... write to syslog */
     {
         int priority;
@@ -290,7 +291,7 @@ static void printMessage(tr_sys_file_t logfile, int level, char const* name, cha
             break;
         }
 
-        if (name)
+        if (name != NULL)
         {
             syslog(priority, "%s %s (%s:%d)", name, message, file, line);
         }
@@ -301,7 +302,9 @@ static void printMessage(tr_sys_file_t logfile, int level, char const* name, cha
     }
 
 #else
+
     (void)level;
+
 #endif
 }
 
@@ -367,7 +370,7 @@ static bool parse_args(int argc, char const** argv, tr_variant* settings, bool* 
 
     tr_optind = 1;
 
-    while ((c = tr_getopt(getUsage(), argc, argv, options, &optarg)))
+    while ((c = tr_getopt(getUsage(), argc, argv, options, &optarg)) != TR_OPT_DONE)
     {
         switch (c)
         {
@@ -566,7 +569,7 @@ struct daemon_data
 
 static void daemon_reconfigure(void* arg UNUSED)
 {
-    if (!mySession)
+    if (mySession == NULL)
     {
         tr_logAddInfo("Deferring reload until session is fully started.");
         seenHUP = true;
@@ -643,7 +646,7 @@ static int daemon_start(void* raw_arg, bool foreground)
     pid_filename = NULL;
     tr_variantDictFindStr(settings, key_pidfile, &pid_filename, NULL);
 
-    if (pid_filename && *pid_filename)
+    if (pid_filename != NULL && *pid_filename != '\0')
     {
         tr_error* error = NULL;
         tr_sys_file_t fp = tr_sys_file_open(pid_filename, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE, 0666, &error);
@@ -754,7 +757,7 @@ cleanup:
 
     tr_watchdir_free(watchdir);
 
-    if (status_ev)
+    if (status_ev != NULL)
     {
         event_del(status_ev);
         event_free(status_ev);

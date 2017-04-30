@@ -65,12 +65,12 @@ int tr_bencParseInt(uint8_t const* buf, uint8_t const* bufend, uint8_t const** s
     errno = 0;
     val = evutil_strtoll(begin, &endptr, 10);
 
-    if (errno || (endptr != end)) /* incomplete parse */
+    if (errno != 0 || endptr != end) /* incomplete parse */
     {
         return EILSEQ;
     }
 
-    if (val && *(char const*)begin == '0') /* no leading zeroes! */
+    if (val != 0 && *(char const*)begin == '0') /* no leading zeroes! */
     {
         return EILSEQ;
     }
@@ -115,7 +115,7 @@ int tr_bencParseStr(uint8_t const* buf, uint8_t const* bufend, uint8_t const** s
     errno = 0;
     len = strtoul((char const*)buf, &ulend, 10);
 
-    if (errno || ulend != end)
+    if (errno != 0 || ulend != end)
     {
         goto err;
     }
@@ -123,7 +123,7 @@ int tr_bencParseStr(uint8_t const* buf, uint8_t const* bufend, uint8_t const** s
     strbegin = (uint8_t const*)end + 1;
     strend = strbegin + len;
 
-    if ((strend < strbegin) || (strend > bufend))
+    if (strend < strbegin || strend > bufend)
     {
         goto err;
     }
@@ -156,7 +156,7 @@ static tr_variant* get_node(tr_ptrArray* stack, tr_quark* key, tr_variant* top, 
         {
             node = tr_variantListAdd(parent);
         }
-        else if (*key && tr_variantIsDict(parent))
+        else if (*key != 0 && tr_variantIsDict(parent))
         {
             node = tr_variantDictAdd(parent, *key);
             *key = 0;
@@ -192,7 +192,7 @@ int tr_variantParseBenc(void const* buf_in, void const* bufend_in, tr_variant* t
             err = EILSEQ;
         }
 
-        if (err)
+        if (err != 0)
         {
             break;
         }
@@ -203,14 +203,14 @@ int tr_variantParseBenc(void const* buf_in, void const* bufend_in, tr_variant* t
             uint8_t const* end;
             tr_variant* v;
 
-            if ((err = tr_bencParseInt(buf, bufend, &end, &val)))
+            if ((err = tr_bencParseInt(buf, bufend, &end, &val)) != 0)
             {
                 break;
             }
 
             buf = end;
 
-            if ((v = get_node(&stack, &key, top, &err)))
+            if ((v = get_node(&stack, &key, top, &err)) != NULL)
             {
                 tr_variantInitInt(v, val);
             }
@@ -221,7 +221,7 @@ int tr_variantParseBenc(void const* buf_in, void const* bufend_in, tr_variant* t
 
             ++buf;
 
-            if ((v = get_node(&stack, &key, top, &err)))
+            if ((v = get_node(&stack, &key, top, &err)) != NULL)
             {
                 tr_variantInitList(v, 0);
                 tr_ptrArrayAppend(&stack, v);
@@ -233,7 +233,7 @@ int tr_variantParseBenc(void const* buf_in, void const* bufend_in, tr_variant* t
 
             ++buf;
 
-            if ((v = get_node(&stack, &key, top, &err)))
+            if ((v = get_node(&stack, &key, top, &err)) != NULL)
             {
                 tr_variantInitDict(v, 0);
                 tr_ptrArrayAppend(&stack, v);
@@ -243,7 +243,7 @@ int tr_variantParseBenc(void const* buf_in, void const* bufend_in, tr_variant* t
         {
             ++buf;
 
-            if (tr_ptrArrayEmpty(&stack) || (key != 0))
+            if (tr_ptrArrayEmpty(&stack) || key != 0)
             {
                 err = EILSEQ;
                 break;
@@ -265,18 +265,18 @@ int tr_variantParseBenc(void const* buf_in, void const* bufend_in, tr_variant* t
             uint8_t const* str;
             size_t str_len;
 
-            if ((err = tr_bencParseStr(buf, bufend, &end, &str, &str_len)))
+            if ((err = tr_bencParseStr(buf, bufend, &end, &str, &str_len)) != 0)
             {
                 break;
             }
 
             buf = end;
 
-            if (!key && !tr_ptrArrayEmpty(&stack) && tr_variantIsDict(tr_ptrArrayBack(&stack)))
+            if (key == 0 && !tr_ptrArrayEmpty(&stack) && tr_variantIsDict(tr_ptrArrayBack(&stack)))
             {
                 key = tr_quark_new(str, str_len);
             }
-            else if ((v = get_node(&stack, &key, top, &err)))
+            else if ((v = get_node(&stack, &key, top, &err)) != NULL)
             {
                 tr_variantInitStr(v, str, str_len);
             }

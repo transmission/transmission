@@ -56,7 +56,7 @@ static tr_lock* getMessageLock(void)
 {
     static tr_lock* l = NULL;
 
-    if (!l)
+    if (l == NULL)
     {
         l = tr_lockNew();
     }
@@ -125,7 +125,7 @@ void tr_logFreeQueue(tr_log_message* list)
 {
     tr_log_message* next;
 
-    while (NULL != list)
+    while (list != NULL)
     {
         next = list->next;
         tr_free(list->message);
@@ -185,7 +185,7 @@ void tr_logAddDeep(char const* file, int line, char const* name, char const* fmt
 
         evbuffer_add_printf(buf, "[%s] ", tr_logGetTimeStr(timestr, sizeof(timestr)));
 
-        if (name)
+        if (name != NULL)
         {
             evbuffer_add_printf(buf, "%s ", name);
         }
@@ -248,7 +248,7 @@ void tr_logAddMessage(char const* file, int line, tr_log_level level, char const
 
 #endif
 
-    if (*buf)
+    if (*buf != '\0')
     {
         if (tr_logGetQueueEnabled())
         {
@@ -289,7 +289,7 @@ void tr_logAddMessage(char const* file, int line, tr_log_level level, char const
 
             tr_logGetTimeStr(timestr, sizeof(timestr));
 
-            if (name)
+            if (name != NULL)
             {
                 tr_sys_file_write_fmt(fp, "[%s] %s: %s" TR_NATIVE_EOL_STR, NULL, timestr, name, buf);
             }

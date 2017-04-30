@@ -196,13 +196,13 @@ static void connection_succeeded(void* vdata)
     struct connection_succeeded_data* data = vdata;
     struct tr_webseed* w = data->webseed;
 
-    if (++w->active_transfers >= w->retry_challenge && w->retry_challenge)
+    if (++w->active_transfers >= w->retry_challenge && w->retry_challenge != 0)
     {
         /* the server seems to be accepting more connections now */
         w->consecutive_failures = w->retry_tickcount = w->retry_challenge = 0;
     }
 
-    if (data->real_url && (tor = tr_torrentFindFromId(w->session, w->torrent_id)))
+    if (data->real_url != NULL && (tor = tr_torrentFindFromId(w->session, w->torrent_id)) != NULL)
     {
         uint64_t file_offset;
         tr_file_index_t file_index;
@@ -229,7 +229,7 @@ static void on_content_changed(struct evbuffer* buf, struct evbuffer_cb_info con
 
     tr_sessionLock(session);
 
-    if (!task->dead && (n_added > 0))
+    if (!task->dead && n_added > 0)
     {
         uint32_t len;
         struct tr_webseed* w = task->webseed;
@@ -238,7 +238,7 @@ static void on_content_changed(struct evbuffer* buf, struct evbuffer_cb_info con
         fire_client_got_piece_data(w, n_added);
         len = evbuffer_get_length(buf);
 
-        if (!task->response_code)
+        if (task->response_code == 0)
         {
             tr_webGetTaskInfo(task->web_task, TR_WEB_GET_CODE, &task->response_code);
 
@@ -262,7 +262,7 @@ static void on_content_changed(struct evbuffer* buf, struct evbuffer_cb_info con
             }
         }
 
-        if ((task->response_code == 206) && (len >= task->block_size))
+        if (task->response_code == 206 && len >= task->block_size)
         {
             /* once we've got at least one full block, save it */
 
@@ -318,7 +318,7 @@ static void on_idle(tr_webseed* w)
         w->retry_challenge = running_tasks + w->idle_connections + 1;
     }
 
-    if (tor && tor->isRunning && !tr_torrentIsSeed(tor) && (want > 0))
+    if (tor != NULL && tor->isRunning && !tr_torrentIsSeed(tor) && want > 0)
     {
         int i;
         int got = 0;
@@ -390,16 +390,16 @@ static void web_response_func(tr_session* session, bool did_connect UNUSED, bool
         {
             tr_block_index_t const blocks_remain = (t->length + tor->blockSize - 1) / tor->blockSize - t->blocks_done;
 
-            if (blocks_remain)
+            if (blocks_remain != 0)
             {
                 fire_client_got_rejs(tor, w, t->block + t->blocks_done, blocks_remain);
             }
 
-            if (t->blocks_done)
+            if (t->blocks_done != 0)
             {
                 ++w->idle_connections;
             }
-            else if (++w->consecutive_failures >= MAX_CONSECUTIVE_FAILURES && !w->retry_tickcount)
+            else if (++w->consecutive_failures >= MAX_CONSECUTIVE_FAILURES && w->retry_tickcount == 0)
             {
                 /* now wait a while until retrying to establish a connection */
                 ++w->retry_tickcount;
@@ -423,7 +423,7 @@ static void web_response_func(tr_session* session, bool did_connect UNUSED, bool
             }
             else
             {
-                if (buf_len && !tr_torrentPieceIsComplete(tor, t->piece_index))
+                if (buf_len != 0 && !tr_torrentPieceIsComplete(tor, t->piece_index))
                 {
                     /* on_content_changed() will not write a block if it is smaller than
                        the torrent's block size, i.e. the torrent's very last block */
@@ -451,7 +451,7 @@ static struct evbuffer* make_url(tr_webseed* w, tr_file const* file)
     evbuffer_add(buf, w->base_url, w->base_url_len);
 
     /* if url ends with a '/', add the torrent name */
-    if (w->base_url[w->base_url_len - 1] == '/' && file->name)
+    if (w->base_url[w->base_url_len - 1] == '/' && file->name != NULL)
     {
         tr_http_escape(buf, file->name, strlen(file->name), false);
     }
@@ -504,7 +504,7 @@ static void webseed_timer_func(evutil_socket_t foo UNUSED, short bar UNUSED, voi
 {
     tr_webseed* w = vw;
 
-    if (w->retry_tickcount)
+    if (w->retry_tickcount != 0)
     {
         ++w->retry_tickcount;
     }

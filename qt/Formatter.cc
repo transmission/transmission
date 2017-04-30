@@ -82,7 +82,7 @@ QString Formatter::memToString(int64_t bytes)
         return tr("Unknown");
     }
 
-    if (!bytes)
+    if (bytes == 0)
     {
         return tr("None");
     }
@@ -99,7 +99,7 @@ QString Formatter::sizeToString(int64_t bytes)
         return tr("Unknown");
     }
 
-    if (!bytes)
+    if (bytes == 0)
     {
         return tr("None");
     }
@@ -163,9 +163,9 @@ QString Formatter::timeToString(int seconds)
     m = tr("%Ln minute(s)", nullptr, minutes);
     s = tr("%Ln second(s)", nullptr, seconds);
 
-    if (days)
+    if (days != 0)
     {
-        if (days >= 4 || !hours)
+        if (days >= 4 || hours == 0)
         {
             str = d;
         }
@@ -174,9 +174,9 @@ QString Formatter::timeToString(int seconds)
             str = tr("%1, %2").arg(d).arg(h);
         }
     }
-    else if (hours)
+    else if (hours != 0)
     {
-        if (hours >= 4 || !minutes)
+        if (hours >= 4 || minutes == 0)
         {
             str = h;
         }
@@ -185,9 +185,9 @@ QString Formatter::timeToString(int seconds)
             str = tr("%1, %2").arg(h).arg(m);
         }
     }
-    else if (minutes)
+    else if (minutes != 0)
     {
-        if (minutes >= 4 || !seconds)
+        if (minutes >= 4 || seconds == 0)
         {
             str = m;
         }

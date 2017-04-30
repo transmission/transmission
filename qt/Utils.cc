@@ -141,7 +141,7 @@ bool Utils::isValidUtf8(char const* s)
 {
     int n; // number of bytes in a UTF-8 sequence
 
-    for (char const* c = s; *c; c += n)
+    for (char const* c = s; *c != '\0'; c += n)
     {
         if ((*c & 0x80) == 0x00)
         {

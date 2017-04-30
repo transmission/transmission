@@ -46,7 +46,7 @@ int WatchDir::metainfoTest(QString const& filename) const
     tr_ctorSetMetainfoFromFile(ctor, filename.toUtf8().constData());
     int const err = tr_torrentParse(ctor, &inf);
 
-    if (err)
+    if (err != 0)
     {
         ret = ERROR;
     }
@@ -60,7 +60,7 @@ int WatchDir::metainfoTest(QString const& filename) const
     }
 
     // cleanup
-    if (!err)
+    if (err == 0)
     {
         tr_metainfoFree(&inf);
     }

@@ -243,7 +243,7 @@ struct tr_torrent
 
 static inline tr_torrent* tr_torrentNext(tr_session* session, tr_torrent* current)
 {
-    return current ? current->next : session->torrentList;
+    return current != NULL ? current->next : session->torrentList;
 }
 
 /* what piece index is this block in? */
@@ -296,22 +296,22 @@ static inline bool tr_torrentIsSeed(tr_torrent const* tor)
 
 static inline bool tr_torrentIsPrivate(tr_torrent const* tor)
 {
-    return (tor != NULL) && tor->info.isPrivate;
+    return tor != NULL && tor->info.isPrivate;
 }
 
 static inline bool tr_torrentAllowsPex(tr_torrent const* tor)
 {
-    return (tor != NULL) && (tor->session->isPexEnabled) && (!tr_torrentIsPrivate(tor));
+    return tor != NULL && tor->session->isPexEnabled && !tr_torrentIsPrivate(tor);
 }
 
 static inline bool tr_torrentAllowsDHT(tr_torrent const* tor)
 {
-    return (tor != NULL) && (tr_sessionAllowsDHT(tor->session)) && (!tr_torrentIsPrivate(tor));
+    return tor != NULL && tr_sessionAllowsDHT(tor->session) && !tr_torrentIsPrivate(tor);
 }
 
 static inline bool tr_torrentAllowsLPD(tr_torrent const* tor)
 {
-    return (tor != NULL) && (tr_sessionAllowsLPD(tor->session)) && (!tr_torrentIsPrivate(tor));
+    return tor != NULL && tr_sessionAllowsLPD(tor->session) && !tr_torrentIsPrivate(tor);
 }
 
 /***
@@ -325,7 +325,7 @@ enum
 
 static inline bool tr_isTorrent(tr_torrent const* tor)
 {
-    return (tor != NULL) && (tor->magicNumber == TORRENT_MAGIC_NUMBER) && (tr_isSession(tor->session));
+    return tor != NULL && tor->magicNumber == TORRENT_MAGIC_NUMBER && tr_isSession(tor->session);
 }
 
 /* set a flag indicating that the torrent's .resume file

@@ -186,7 +186,7 @@ uint64_t tr_cpSizeWhenDone(tr_completion const* ccp)
                     n = tr_bitfieldCountRange(&cp->blockBitfield, f, l + 1);
                     n *= cp->tor->blockSize;
 
-                    if (l == (cp->tor->blockCount - 1) && tr_bitfieldHas(&cp->blockBitfield, l))
+                    if (l == cp->tor->blockCount - 1 && tr_bitfieldHas(&cp->blockBitfield, l))
                     {
                         n -= (cp->tor->blockSize - cp->tor->lastBlockSize);
                     }
@@ -354,5 +354,5 @@ double tr_cpPercentDone(tr_completion const* cp)
 {
     double const ratio = tr_getRatio(cp->sizeNow, tr_cpSizeWhenDone(cp));
     int const iratio = (int)ratio;
-    return ((iratio == TR_RATIO_NA) || (iratio == TR_RATIO_INF)) ? 0.0 : ratio;
+    return (iratio == TR_RATIO_NA || iratio == TR_RATIO_INF) ? 0.0 : ratio;
 }

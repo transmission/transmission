@@ -72,7 +72,7 @@ QString FaviconCache::getHost(QUrl const& url)
     int const first_dot = host.indexOf(QLatin1Char('.'));
     int const last_dot = host.lastIndexOf(QLatin1Char('.'));
 
-    if ((first_dot != -1) && (last_dot != -1) && (first_dot != last_dot))
+    if (first_dot != -1 && last_dot != -1 && first_dot != last_dot)
     {
         host.remove(0, first_dot + 1);
     }
@@ -128,7 +128,7 @@ void FaviconCache::onRequestFinished(QNetworkReply* reply)
 
     QByteArray const content = reply->readAll();
 
-    if (!reply->error())
+    if (reply->error() == QNetworkReply::NoError)
     {
         pixmap.loadFromData(content);
     }

@@ -168,7 +168,7 @@ Qt::ItemFlags FileTreeModel::flags(QModelIndex const& index) const
 {
     int i(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
 
-    if (myIsEditable && (index.column() == COL_NAME))
+    if (myIsEditable && index.column() == COL_NAME)
     {
         i |= Qt::ItemIsEditable;
     }
@@ -248,7 +248,7 @@ QModelIndex FileTreeModel::index(int row, int column, QModelIndex const& parent)
 
         FileTreeItem* childItem = parentItem->child(row);
 
-        if (childItem)
+        if (childItem != nullptr)
         {
             i = createIndex(row, column, childItem);
         }
@@ -299,7 +299,7 @@ int FileTreeModel::columnCount(QModelIndex const& parent) const
 
 QModelIndex FileTreeModel::indexOf(FileTreeItem* item, int column) const
 {
-    if (!item || item == myRootItem)
+    if (item == nullptr || item == myRootItem)
     {
         return QModelIndex();
     }
@@ -352,7 +352,7 @@ void FileTreeModel::addFile(int fileIndex, QString const& filename, bool wanted,
 
     item = findItemForFileIndex(fileIndex);
 
-    if (item) // this file is already in the tree, we've added this
+    if (item != nullptr) // this file is already in the tree, we've added this
     {
         QModelIndex indexWithChangedParents;
         ForwardPathIterator filenameIt(filename);
@@ -394,7 +394,7 @@ void FileTreeModel::addFile(int fileIndex, QString const& filename, bool wanted,
             QString const& token = filenameIt.next();
             FileTreeItem* child(item->child(token));
 
-            if (!child)
+            if (child == nullptr)
             {
                 added = true;
                 QModelIndex parentIndex(indexOf(item, 0));
@@ -471,7 +471,7 @@ void FileTreeModel::emitSubtreeChanged(QModelIndex const& index, int firstColumn
 
     int const childCount = rowCount(index);
 
-    if (!childCount)
+    if (childCount == 0)
     {
         return;
     }

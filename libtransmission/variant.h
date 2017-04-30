@@ -150,7 +150,7 @@ static inline int tr_variantFromJson(tr_variant* setme, void const* buf, size_t 
 
 static inline bool tr_variantIsType(tr_variant const* b, int type)
 {
-    return (b != NULL) && (b->type == type);
+    return b != NULL && b->type == type;
 }
 
 /***
@@ -159,7 +159,7 @@ static inline bool tr_variantIsType(tr_variant const* b, int type)
 
 static inline bool tr_variantIsString(tr_variant const* b)
 {
-    return (b != NULL) && (b->type == TR_VARIANT_TYPE_STR);
+    return b != NULL && b->type == TR_VARIANT_TYPE_STR;
 }
 
 bool tr_variantGetStr(tr_variant const* variant, char const** setme_str, size_t* setme_len);
@@ -176,7 +176,7 @@ bool tr_variantGetRaw(tr_variant const* variant, uint8_t const** raw_setme, size
 
 static inline bool tr_variantIsReal(tr_variant const* v)
 {
-    return (v != NULL) && (v->type == TR_VARIANT_TYPE_REAL);
+    return v != NULL && v->type == TR_VARIANT_TYPE_REAL;
 }
 
 void tr_variantInitReal(tr_variant* initme, double value);
@@ -188,7 +188,7 @@ bool tr_variantGetReal(tr_variant const* variant, double* value_setme);
 
 static inline bool tr_variantIsBool(tr_variant const* v)
 {
-    return (v != NULL) && (v->type == TR_VARIANT_TYPE_BOOL);
+    return v != NULL && v->type == TR_VARIANT_TYPE_BOOL;
 }
 
 void tr_variantInitBool(tr_variant* initme, bool value);
@@ -200,7 +200,7 @@ bool tr_variantGetBool(tr_variant const* variant, bool* setme);
 
 static inline bool tr_variantIsInt(tr_variant const* v)
 {
-    return (v != NULL) && (v->type == TR_VARIANT_TYPE_INT);
+    return v != NULL && v->type == TR_VARIANT_TYPE_INT;
 }
 
 void tr_variantInitInt(tr_variant* variant, int64_t value);
@@ -212,7 +212,7 @@ bool tr_variantGetInt(tr_variant const* val, int64_t* setme);
 
 static inline bool tr_variantIsList(tr_variant const* v)
 {
-    return (v != NULL) && (v->type == TR_VARIANT_TYPE_LIST);
+    return v != NULL && v->type == TR_VARIANT_TYPE_LIST;
 }
 
 void tr_variantInitList(tr_variant* list, size_t reserve_count);
@@ -238,7 +238,7 @@ size_t tr_variantListSize(tr_variant const* list);
 
 static inline bool tr_variantIsDict(tr_variant const* v)
 {
-    return (v != NULL) && (v->type == TR_VARIANT_TYPE_DICT);
+    return v != NULL && v->type == TR_VARIANT_TYPE_DICT;
 }
 
 void tr_variantInitDict(tr_variant* initme, size_t reserve_count);

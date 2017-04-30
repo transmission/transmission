@@ -98,7 +98,7 @@ static void send_simple_response(struct evhttp_request* req, int code, char cons
 
     evbuffer_add_printf(body, "<h1>%d: %s</h1>", code, code_text);
 
-    if (text)
+    if (text != NULL)
     {
         evbuffer_add_printf(body, "%s", text);
     }
@@ -130,14 +130,14 @@ static void extract_parts_from_multipart(struct evkeyvalq const* headers, struct
     size_t inlen = evbuffer_get_length(body);
 
     char const* boundary_key = "boundary=";
-    char const* boundary_key_begin = content_type ? strstr(content_type, boundary_key) : NULL;
-    char const* boundary_val = boundary_key_begin ? boundary_key_begin + strlen(boundary_key) : "arglebargle";
+    char const* boundary_key_begin = content_type != NULL ? strstr(content_type, boundary_key) : NULL;
+    char const* boundary_val = boundary_key_begin != NULL ? boundary_key_begin + strlen(boundary_key) : "arglebargle";
     char* boundary = tr_strdup_printf("--%s", boundary_val);
     size_t const boundary_len = strlen(boundary);
 
     char const* delim = tr_memmem(in, inlen, boundary, boundary_len);
 
-    while (delim)
+    while (delim != NULL)
     {
         size_t part_len;
         char const* part = delim + boundary_len;
@@ -146,13 +146,13 @@ static void extract_parts_from_multipart(struct evkeyvalq const* headers, struct
         in = part;
 
         delim = tr_memmem(in, inlen, boundary, boundary_len);
-        part_len = delim ? (size_t)(delim - part) : inlen;
+        part_len = delim != NULL ? (size_t)(delim - part) : inlen;
 
-        if (part_len)
+        if (part_len != 0)
         {
             char const* rnrn = tr_memmem(part, part_len, "\r\n\r\n", 4);
 
-            if (rnrn)
+            if (rnrn != NULL)
             {
                 struct tr_mimepart* p = tr_new(struct tr_mimepart, 1);
                 p->headers_len = (size_t)(rnrn - part);
@@ -181,7 +181,7 @@ static void handle_upload(struct evhttp_request* req, struct tr_rpc_server* serv
         tr_ptrArray parts = TR_PTR_ARRAY_INIT;
 
         char const* query = strchr(req->uri, '?');
-        bool const paused = query && strstr(query + 1, "paused=true");
+        bool const paused = query != NULL && strstr(query + 1, "paused=true") != NULL;
 
         extract_parts_from_multipart(req->input_headers, req->input_buffer, &parts);
         n = tr_ptrArraySize(&parts);
@@ -191,7 +191,7 @@ static void handle_upload(struct evhttp_request* req, struct tr_rpc_server* serv
         {
             struct tr_mimepart* p = tr_ptrArrayNth(&parts, i);
 
-            if (tr_memmem(p->headers, p->headers_len, TR_RPC_SESSION_ID_HEADER, strlen(TR_RPC_SESSION_ID_HEADER)))
+            if (tr_memmem(p->headers, p->headers_len, TR_RPC_SESSION_ID_HEADER, strlen(TR_RPC_SESSION_ID_HEADER)) != NULL)
             {
                 break;
             }
@@ -240,7 +240,7 @@ static void handle_upload(struct evhttp_request* req, struct tr_rpc_server* serv
                     tr_variantDictAddRaw(args, TR_KEY_filename, body, body_len);
                     have_source = true;
                 }
-                else if (!tr_variantFromBenc(&test, body, body_len))
+                else if (tr_variantFromBenc(&test, body, body_len) == 0)
                 {
                     char* b64 = tr_base64_encode(body, body_len, NULL);
                     tr_variantDictAddStr(args, TR_KEY_metainfo, b64);
@@ -296,7 +296,7 @@ static char const* mimetype_guess(char const* path)
     };
     char const* dot = strrchr(path, '.');
 
-    for (i = 0; dot && i < TR_N_ELEMENTS(types); ++i)
+    for (i = 0; dot != NULL && i < TR_N_ELEMENTS(types); ++i)
     {
         if (strcmp(dot + 1, types[i].suffix) == 0)
         {
@@ -312,7 +312,7 @@ static void add_response(struct evhttp_request* req, struct tr_rpc_server* serve
 {
     char const* key = "Accept-Encoding";
     char const* encoding = evhttp_find_header(req->input_headers, key);
-    int const do_compress = encoding && strstr(encoding, "gzip");
+    bool const do_compress = encoding != NULL && strstr(encoding, "gzip") != NULL;
 
     if (!do_compress)
     {
@@ -444,7 +444,7 @@ static void handle_web_client(struct evhttp_request* req, struct tr_rpc_server* 
 {
     char const* webClientDir = tr_getWebClientDir(server->session);
 
-    if (!webClientDir || !*webClientDir)
+    if (webClientDir == NULL || *webClientDir == '\0')
     {
         send_simple_response(req, HTTP_NOTFOUND,
             "<p>Couldn't find Transmission's web interface files!</p>"
@@ -463,12 +463,12 @@ static void handle_web_client(struct evhttp_request* req, struct tr_rpc_server* 
 
         subpath = tr_strdup(req->uri + strlen(server->url) + 4);
 
-        if ((pch = strchr(subpath, '?')))
+        if ((pch = strchr(subpath, '?')) != NULL)
         {
             *pch = '\0';
         }
 
-        if (strstr(subpath, ".."))
+        if (strstr(subpath, "..") != NULL)
         {
             send_simple_response(req, HTTP_NOTFOUND, "<p>Tsk, tsk.</p>");
         }
@@ -532,7 +532,7 @@ static void handle_rpc(struct evhttp_request* req, struct tr_rpc_server* server)
         handle_rpc_from_json(req, server, (char const*)evbuffer_pullup(req->input_buffer, -1),
             evbuffer_get_length(req->input_buffer));
     }
-    else if ((req->type == EVHTTP_REQ_GET) && ((q = strchr(req->uri, '?'))))
+    else if (req->type == EVHTTP_REQ_GET && (q = strchr(req->uri, '?')) != NULL)
     {
         struct rpc_response_data* data = tr_new0(struct rpc_response_data, 1);
         data->req = req;
@@ -577,7 +577,7 @@ static void handle_request(struct evhttp_request* req, void* arg)
 {
     struct tr_rpc_server* server = arg;
 
-    if (req && req->evcon)
+    if (req != NULL && req->evcon != NULL)
     {
         char const* auth;
         char* user = NULL;
@@ -587,7 +587,7 @@ static void handle_request(struct evhttp_request* req, void* arg)
 
         auth = evhttp_find_header(req->input_headers, "Authorization");
 
-        if (auth && !evutil_ascii_strncasecmp(auth, "basic ", 6))
+        if (auth != NULL && evutil_ascii_strncasecmp(auth, "basic ", 6) == 0)
         {
             size_t plen;
             char* p = tr_base64_decode_str(auth + 6, &plen);
@@ -843,7 +843,7 @@ void tr_rpcSetUrl(tr_rpc_server* server, char const* url)
 
 char const* tr_rpcGetUrl(tr_rpc_server const* server)
 {
-    return server->url ? server->url : "";
+    return server->url != NULL ? server->url : "";
 }
 
 void tr_rpcSetWhitelist(tr_rpc_server* server, char const* whitelistStr)
@@ -857,13 +857,13 @@ void tr_rpcSetWhitelist(tr_rpc_server* server, char const* whitelistStr)
     tr_free(tmp);
 
     /* clear out the old whitelist entries */
-    while ((tmp = tr_list_pop_front(&server->whitelist)))
+    while ((tmp = tr_list_pop_front(&server->whitelist)) != NULL)
     {
         tr_free(tmp);
     }
 
     /* build the new whitelist entries */
-    for (walk = whitelistStr; walk && *walk;)
+    for (walk = whitelistStr; walk != NULL && *walk != '\0';)
     {
         char const* delimiters = " ,;";
         size_t const len = strcspn(walk, delimiters);
@@ -891,7 +891,7 @@ void tr_rpcSetWhitelist(tr_rpc_server* server, char const* whitelistStr)
 
 char const* tr_rpcGetWhitelist(tr_rpc_server const* server)
 {
-    return server->whitelistStr ? server->whitelistStr : "";
+    return server->whitelistStr != NULL ? server->whitelistStr : "";
 }
 
 void tr_rpcSetWhitelistEnabled(tr_rpc_server* server, bool isEnabled)
@@ -920,7 +920,7 @@ void tr_rpcSetUsername(tr_rpc_server* server, char const* username)
 
 char const* tr_rpcGetUsername(tr_rpc_server const* server)
 {
-    return server->username ? server->username : "";
+    return server->username != NULL ? server->username : "";
 }
 
 void tr_rpcSetPassword(tr_rpc_server* server, char const* password)
@@ -941,7 +941,7 @@ void tr_rpcSetPassword(tr_rpc_server* server, char const* password)
 
 char const* tr_rpcGetPassword(tr_rpc_server const* server)
 {
-    return server->password ? server->password : "";
+    return server->password != NULL ? server->password : "";
 }
 
 void tr_rpcSetPasswordEnabled(tr_rpc_server* server, bool isEnabled)
@@ -974,7 +974,7 @@ static void closeServer(void* vserver)
 
     stopServer(s);
 
-    while ((tmp = tr_list_pop_front(&s->whitelist)))
+    while ((tmp = tr_list_pop_front(&s->whitelist)) != NULL)
     {
         tr_free(tmp);
     }
@@ -1072,7 +1072,7 @@ tr_rpc_server* tr_rpcInit(tr_session* session, tr_variant* settings)
 
     key = TR_KEY_rpc_whitelist;
 
-    if (!tr_variantDictFindStr(settings, key, &str, NULL) && str)
+    if (!tr_variantDictFindStr(settings, key, &str, NULL) && str != NULL)
     {
         missing_settings_key(key);
     }

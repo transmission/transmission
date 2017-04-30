@@ -265,7 +265,7 @@ tr_variant* tr_variantListChild(tr_variant* v, size_t i)
 {
     tr_variant* ret = NULL;
 
-    if (tr_variantIsList(v) && (i < v->val.l.count))
+    if (tr_variantIsList(v) && i < v->val.l.count)
     {
         ret = v->val.l.vals + i;
     }
@@ -277,7 +277,7 @@ bool tr_variantListRemove(tr_variant* list, size_t i)
 {
     bool removed = false;
 
-    if (tr_variantIsList(list) && (i < list->val.l.count))
+    if (tr_variantIsList(list) && i < list->val.l.count)
     {
         removed = true;
         tr_variantFree(&list->val.l.vals[i]);
@@ -291,17 +291,17 @@ bool tr_variantGetInt(tr_variant const* v, int64_t* setme)
 {
     bool success = false;
 
-    if (!success && ((success = tr_variantIsInt(v))))
+    if (!success && (success = tr_variantIsInt(v)))
     {
-        if (setme)
+        if (setme != NULL)
         {
             *setme = v->val.i;
         }
     }
 
-    if (!success && ((success = tr_variantIsBool(v))))
+    if (!success && (success = tr_variantIsBool(v)))
     {
-        if (setme)
+        if (setme != NULL)
         {
             *setme = v->val.b ? 1 : 0;
         }
@@ -352,7 +352,7 @@ bool tr_variantGetBool(tr_variant const* v, bool* setme)
 
     if (!success && tr_variantIsInt(v))
     {
-        if ((success = (v->val.i == 0 || v->val.i == 1)))
+        if ((success = v->val.i == 0 || v->val.i == 1))
         {
             *setme = v->val.i != 0;
         }
@@ -360,7 +360,7 @@ bool tr_variantGetBool(tr_variant const* v, bool* setme)
 
     if (!success && tr_variantGetStr(v, &str, NULL))
     {
-        if ((success = (strcmp(str, "true") == 0 || strcmp(str, "false") == 0)))
+        if ((success = strcmp(str, "true") == 0 || strcmp(str, "false") == 0))
         {
             *setme = strcmp(str, "true") == 0;
         }
@@ -373,12 +373,12 @@ bool tr_variantGetReal(tr_variant const* v, double* setme)
 {
     bool success = false;
 
-    if (!success && ((success = tr_variantIsReal(v))))
+    if (!success && (success = tr_variantIsReal(v)))
     {
         *setme = v->val.d;
     }
 
-    if (!success && ((success = tr_variantIsInt(v))))
+    if (!success && (success = tr_variantIsInt(v)))
     {
         *setme = v->val.i;
     }
@@ -394,7 +394,7 @@ bool tr_variantGetReal(tr_variant const* v, double* setme)
         d = strtod(getStr(v), &endptr);
         restore_locale(&locale_ctx);
 
-        if ((success = (getStr(v) != endptr) && !*endptr))
+        if ((success = getStr(v) != endptr && *endptr == '\0'))
         {
             *setme = d;
         }
@@ -498,7 +498,7 @@ static void containerReserve(tr_variant* v, size_t count)
     if (needed > v->val.l.alloc)
     {
         /* scale the alloc size in powers-of-2 */
-        size_t n = v->val.l.alloc ? v->val.l.alloc : 8;
+        size_t n = v->val.l.alloc != 0 ? v->val.l.alloc : 8;
 
         while (n < needed)
         {
@@ -617,7 +617,7 @@ static tr_variant* dictFindOrAdd(tr_variant* dict, tr_quark const key, int type)
     tr_variant* child;
 
     /* see if it already exists, and if so, try to reuse it */
-    if ((child = tr_variantDictFind(dict, key)))
+    if ((child = tr_variantDictFind(dict, key)) != NULL)
     {
         if (!tr_variantIsType(child, type))
         {
@@ -825,7 +825,7 @@ void tr_variantWalk(tr_variant const* v, struct VariantWalkFuncs const* walkFunc
             v = node->v;
             node->isVisited = true;
         }
-        else if (tr_variantIsContainer(node->v) && (node->childIndex < node->v->val.l.count))
+        else if (tr_variantIsContainer(node->v) && node->childIndex < node->v->val.l.count)
         {
             int const index = node->childIndex++;
             v = node->v->val.l.vals + index;
@@ -849,7 +849,7 @@ void tr_variantWalk(tr_variant const* v, struct VariantWalkFuncs const* walkFunc
             continue;
         }
 
-        if (v)
+        if (v != NULL)
         {
             switch (v->type)
             {
@@ -962,7 +962,7 @@ static void tr_variantListCopy(tr_variant* target, tr_variant const* src)
     int i = 0;
     tr_variant const* val;
 
-    while ((val = tr_variantListChild((tr_variant*)src, i++)))
+    while ((val = tr_variantListChild((tr_variant*)src, i++)) != NULL)
     {
         if (tr_variantIsBool(val))
         {
@@ -1015,7 +1015,7 @@ bool tr_variantDictChild(tr_variant* dict, size_t n, tr_quark* key, tr_variant**
 
     assert(tr_variantIsDict(dict));
 
-    if (tr_variantIsDict(dict) && (n < dict->val.l.count))
+    if (tr_variantIsDict(dict) && n < dict->val.l.count)
     {
         *key = dict->val.l.vals[n].key;
         *val = dict->val.l.vals + n;

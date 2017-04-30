@@ -128,7 +128,7 @@ static char* gtr_localtime(time_t time)
 
     g_strlcpy(buf, asctime(&tm), sizeof(buf));
 
-    if ((eoln = strchr(buf, '\n')))
+    if ((eoln = strchr(buf, '\n')) != NULL)
     {
         *eoln = '\0';
     }
@@ -140,10 +140,10 @@ static void doSave(GtkWindow* parent, struct MsgData* data, char const* filename
 {
     FILE* fp = fopen(filename, "w+");
 
-    if (!fp)
+    if (fp == NULL)
     {
-        GtkWidget* w = gtk_message_dialog_new(parent, 0, GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, _(
-            "Couldn't save \"%s\""), filename);
+        GtkWidget* w = gtk_message_dialog_new(parent, 0, GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, _("Couldn't save \"%s\""),
+            filename);
         gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(w), "%s", g_strerror(errno));
         g_signal_connect_swapped(w, "response", G_CALLBACK(gtk_widget_destroy), w);
         gtk_widget_show(w);
@@ -179,8 +179,8 @@ static void doSave(GtkWindow* parent, struct MsgData* data, char const* filename
                     break;
                 }
 
-                fprintf(fp, "%s\t%s\t%s\t%s\n", date, levelStr, (node->name ? node->name : ""),
-                    (node->message ? node->message : ""));
+                fprintf(fp, "%s\t%s\t%s\t%s\n", date, levelStr, node->name != NULL ? node->name : "",
+                    node->message != NULL ? node->message : "");
                 g_free(date);
             }
             while (gtk_tree_model_iter_next(model, &iter));
@@ -358,9 +358,9 @@ static tr_log_message* addMessages(GtkListStore* store, struct tr_log_message* h
     static unsigned int sequence = 0;
     char const* default_name = g_get_application_name();
 
-    for (i = head; i && i->next; i = i->next)
+    for (i = head; i != NULL && i->next != NULL; i = i->next)
     {
-        char const* name = i->name ? i->name : default_name;
+        char const* name = i->name != NULL ? i->name : default_name;
 
         gtk_list_store_insert_with_values(store, NULL, 0,
             COL_TR_MSG, i,
@@ -397,13 +397,13 @@ static gboolean onRefresh(gpointer gdata)
     {
         tr_log_message* msgs = tr_logGetQueue();
 
-        if (msgs)
+        if (msgs != NULL)
         {
             /* add the new messages and append them to the end of
              * our persistent list */
             tr_log_message* tail = addMessages(data->store, msgs);
 
-            if (myTail)
+            if (myTail != NULL)
             {
                 myTail->next = msgs;
             }

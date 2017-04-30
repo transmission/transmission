@@ -176,7 +176,7 @@ static void timer_callback(evutil_socket_t s UNUSED, short type UNUSED, void* cl
 
 int tr_utpPacket(unsigned char const* buf, size_t buflen, struct sockaddr const* from, socklen_t fromlen, tr_session* ss)
 {
-    if (!ss->isClosed && !utp_timer)
+    if (!ss->isClosed && utp_timer == NULL)
     {
         utp_timer = evtimer_new(ss->event_base, timer_callback, ss);
 
@@ -193,7 +193,7 @@ int tr_utpPacket(unsigned char const* buf, size_t buflen, struct sockaddr const*
 
 void tr_utpClose(tr_session* session UNUSED)
 {
-    if (utp_timer)
+    if (utp_timer != NULL)
     {
         evtimer_del(utp_timer);
         utp_timer = NULL;

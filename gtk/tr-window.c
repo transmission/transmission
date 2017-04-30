@@ -79,7 +79,7 @@ static void on_popup_menu(GtkWidget* self UNUSED, GdkEventButton* event)
 {
     GtkWidget* menu = gtr_action_get_widget("/main-window-popup");
 
-    gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL, (event ? event->button : 0), (event ? event->time : 0));
+    gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL, event != NULL ? event->button : 0, event != NULL ? event->time : 0);
 }
 
 static void view_row_activated(GtkTreeView* tree_view UNUSED, GtkTreePath* path UNUSED, GtkTreeViewColumn* column UNUSED,
@@ -821,7 +821,7 @@ void gtr_window_refresh(GtkWindow* self)
 {
     PrivateData* p = get_private_data(self);
 
-    if (p && p->core && gtr_core_session(p->core))
+    if (p != NULL && p->core != NULL && gtr_core_session(p->core) != NULL)
     {
         updateSpeeds(p);
         updateStats(p);
@@ -837,7 +837,7 @@ void gtr_window_set_busy(GtkWindow* win, gboolean isBusy)
 {
     GtkWidget* w = GTK_WIDGET(win);
 
-    if (w && gtk_widget_get_realized(w))
+    if (w != NULL && gtk_widget_get_realized(w))
     {
         GdkDisplay* display = gtk_widget_get_display(w);
         GdkCursor* cursor = isBusy ? gdk_cursor_new_for_display(display, GDK_WATCH) : NULL;

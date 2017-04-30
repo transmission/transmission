@@ -46,7 +46,7 @@ struct tr_upnp
     struct IGDdatas data;
     int port;
     char lanaddr[16];
-    unsigned int isMapped;
+    bool isMapped;
     tr_upnp_state state;
 };
 
@@ -66,7 +66,7 @@ tr_upnp* tr_upnpInit(void)
 void tr_upnpClose(tr_upnp* handle)
 {
     assert(!handle->isMapped);
-    assert((handle->state == TR_UPNP_IDLE) || (handle->state == TR_UPNP_ERR) || (handle->state == TR_UPNP_DISCOVER));
+    assert(handle->state == TR_UPNP_IDLE || handle->state == TR_UPNP_ERR || handle->state == TR_UPNP_DISCOVER);
 
     if (handle->hasDiscovered)
     {
@@ -151,7 +151,7 @@ static int tr_upnpAddPortMapping(tr_upnp const* handle, char const* proto, tr_po
         proto, NULL);
 #endif
 
-    if (err)
+    if (err != 0)
     {
         tr_logAddNamedDbg(getKey(), "%s Port forwarding failed with error %d (errno %d - %s)", proto, err, errno,
             tr_strerror(errno));
@@ -182,11 +182,11 @@ enum
     UPNP_IGD_INVALID = 3
 };
 
-int tr_upnpPulse(tr_upnp* handle, int port, int isEnabled, int doPortCheck)
+int tr_upnpPulse(tr_upnp* handle, int port, bool isEnabled, bool doPortCheck)
 {
     int ret;
 
-    if (isEnabled && (handle->state == TR_UPNP_DISCOVER))
+    if (isEnabled && handle->state == TR_UPNP_DISCOVER)
     {
         struct UPNPDev* devlist;
 
@@ -214,7 +214,7 @@ int tr_upnpPulse(tr_upnp* handle, int port, int isEnabled, int doPortCheck)
 
     if (handle->state == TR_UPNP_IDLE)
     {
-        if (handle->isMapped && (!isEnabled || (handle->port != port)))
+        if (handle->isMapped && (!isEnabled || handle->port != port))
         {
             handle->state = TR_UPNP_UNMAP;
         }
@@ -222,8 +222,8 @@ int tr_upnpPulse(tr_upnp* handle, int port, int isEnabled, int doPortCheck)
 
     if (isEnabled && handle->isMapped && doPortCheck)
     {
-        if ((tr_upnpGetSpecificPortMappingEntry(handle, "TCP") != UPNPCOMMAND_SUCCESS) ||
-            (tr_upnpGetSpecificPortMappingEntry(handle, "UDP") != UPNPCOMMAND_SUCCESS))
+        if (tr_upnpGetSpecificPortMappingEntry(handle, "TCP") != UPNPCOMMAND_SUCCESS ||
+            tr_upnpGetSpecificPortMappingEntry(handle, "UDP") != UPNPCOMMAND_SUCCESS)
         {
             tr_logAddNamedInfo(getKey(), _("Port %d isn't forwarded"), handle->port);
             handle->isMapped = false;
@@ -238,7 +238,7 @@ int tr_upnpPulse(tr_upnp* handle, int port, int isEnabled, int doPortCheck)
         tr_logAddNamedInfo(getKey(), _("Stopping port forwarding through \"%s\", service \"%s\""), handle->urls.controlURL,
             handle->data.first.servicetype);
 
-        handle->isMapped = 0;
+        handle->isMapped = false;
         handle->state = TR_UPNP_IDLE;
         handle->port = -1;
     }
@@ -257,7 +257,7 @@ int tr_upnpPulse(tr_upnp* handle, int port, int isEnabled, int doPortCheck)
         int err_udp = -1;
         errno = 0;
 
-        if (!handle->urls.controlURL)
+        if (handle->urls.controlURL == NULL)
         {
             handle->isMapped = 0;
         }
@@ -269,7 +269,7 @@ int tr_upnpPulse(tr_upnp* handle, int port, int isEnabled, int doPortCheck)
             err_tcp = tr_upnpAddPortMapping(handle, "TCP", port, desc);
             err_udp = tr_upnpAddPortMapping(handle, "UDP", port, desc);
 
-            handle->isMapped = !err_tcp | !err_udp;
+            handle->isMapped = err_tcp == 0 || err_udp == 0;
         }
 
         tr_logAddNamedInfo(getKey(), _("Port forwarding through \"%s\", service \"%s\". (local address: %s:%d)"),

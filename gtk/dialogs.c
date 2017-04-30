@@ -68,7 +68,7 @@ void gtr_confirm_remove(GtkWindow* parent, TrCore* core, GSList* torrent_ids, gb
     int incomplete = 0;
     int const count = g_slist_length(torrent_ids);
 
-    if (!count)
+    if (count == 0)
     {
         return;
     }
@@ -84,12 +84,12 @@ void gtr_confirm_remove(GtkWindow* parent, TrCore* core, GSList* torrent_ids, gb
         tr_torrent* tor = gtr_core_find_torrent(core, id);
         tr_stat const* stat = tr_torrentStat(tor);
 
-        if (stat->leftUntilDone)
+        if (stat->leftUntilDone != 0)
         {
             ++incomplete;
         }
 
-        if (stat->peersConnected)
+        if (stat->peersConnected != 0)
         {
             ++connected;
         }
@@ -109,7 +109,7 @@ void gtr_confirm_remove(GtkWindow* parent, TrCore* core, GSList* torrent_ids, gb
 
     secondary_text = g_string_new(NULL);
 
-    if (!incomplete && !connected)
+    if (incomplete == 0 && connected == 0)
     {
         g_string_assign(secondary_text,
             ngettext("Once removed, continuing the transfer will require the torrent file or magnet link.",
@@ -127,18 +127,18 @@ void gtr_confirm_remove(GtkWindow* parent, TrCore* core, GSList* torrent_ids, gb
     }
     else
     {
-        if (connected)
+        if (connected != 0)
         {
             g_string_append(secondary_text, ngettext("One of these torrents is connected to peers.",
                 "Some of these torrents are connected to peers.", connected));
         }
 
-        if (connected && incomplete)
+        if (connected != 0 && incomplete != 0)
         {
             g_string_append(secondary_text, "\n");
         }
 
-        if (incomplete)
+        if (incomplete != 0)
         {
             g_string_assign(secondary_text, ngettext("One of these torrents has not finished downloading.",
                 "Some of these torrents have not finished downloading.", incomplete));
@@ -148,13 +148,13 @@ void gtr_confirm_remove(GtkWindow* parent, TrCore* core, GSList* torrent_ids, gb
     d = gtk_message_dialog_new_with_markup(parent, GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_QUESTION, GTK_BUTTONS_NONE,
         "<big><b>%s</b></big>", primary_text->str);
 
-    if (secondary_text->len)
+    if (secondary_text->len != 0)
     {
         gtk_message_dialog_format_secondary_markup(GTK_MESSAGE_DIALOG(d), "%s", secondary_text->str);
     }
 
     gtk_dialog_add_buttons(GTK_DIALOG(d), GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-        (delete_files ? GTK_STOCK_DELETE : GTK_STOCK_REMOVE), GTK_RESPONSE_ACCEPT, NULL);
+        delete_files ? GTK_STOCK_DELETE : GTK_STOCK_REMOVE, GTK_RESPONSE_ACCEPT, NULL);
     gtk_dialog_set_default_response(GTK_DIALOG(d), GTK_RESPONSE_CANCEL);
     gtk_dialog_set_alternative_button_order(GTK_DIALOG(d), GTK_RESPONSE_ACCEPT, GTK_RESPONSE_CANCEL, -1);
     g_signal_connect(d, "response", G_CALLBACK(on_remove_dialog_response), dd);

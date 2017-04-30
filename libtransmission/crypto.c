@@ -174,7 +174,7 @@ void tr_cryptoSetTorrentHash(tr_crypto* crypto, uint8_t const* hash)
 {
     crypto->torrentHashIsSet = hash != NULL;
 
-    if (hash)
+    if (hash != NULL)
     {
         memcpy(crypto->torrentHash, hash, SHA_DIGEST_LENGTH);
     }

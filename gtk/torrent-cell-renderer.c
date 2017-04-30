@@ -38,12 +38,12 @@ enum
 
 static void getProgressString(GString* gstr, tr_torrent const* tor, tr_info const* info, tr_stat const* st)
 {
-    int const isDone = st->leftUntilDone == 0;
+    bool const isDone = st->leftUntilDone == 0;
     uint64_t const haveTotal = st->haveUnchecked + st->haveValid;
-    int const isSeed = st->haveValid >= info->totalSize;
+    bool const isSeed = st->haveValid >= info->totalSize;
     char buf1[32], buf2[32], buf3[32], buf4[32], buf5[32], buf6[32];
     double seedRatio;
-    gboolean const hasSeedRatio = tr_torrentGetSeedRatio(tor, &seedRatio);
+    bool const hasSeedRatio = tr_torrentGetSeedRatio(tor, &seedRatio);
 
     if (!isDone) /* downloading */
     {
@@ -120,7 +120,7 @@ static void getProgressString(GString* gstr, tr_torrent const* tor, tr_info cons
     }
 
     /* add time when downloading */
-    if ((st->activity == TR_STATUS_DOWNLOAD) || (hasSeedRatio && (st->activity == TR_STATUS_SEED)))
+    if (st->activity == TR_STATUS_DOWNLOAD || (hasSeedRatio && st->activity == TR_STATUS_SEED))
     {
         int const eta = st->eta;
         g_string_append(gstr, " - ");
@@ -142,9 +142,9 @@ static void getProgressString(GString* gstr, tr_torrent const* tor, tr_info cons
 static char* getShortTransferString(tr_torrent const* tor, tr_stat const* st, double uploadSpeed_KBps,
     double downloadSpeed_KBps, char* buf, size_t buflen)
 {
-    int const haveMeta = tr_torrentHasMetadata(tor);
-    int const haveUp = haveMeta && st->peersGettingFromUs > 0;
-    int const haveDown = haveMeta && ((st->peersSendingToUs > 0) || (st->webseedsSendingToUs > 0));
+    bool const haveMeta = tr_torrentHasMetadata(tor);
+    bool const haveUp = haveMeta && st->peersGettingFromUs > 0;
+    bool const haveDown = haveMeta && (st->peersSendingToUs > 0 || st->webseedsSendingToUs > 0);
 
     if (haveDown)
     {
@@ -222,7 +222,7 @@ static void getShortStatusString(GString* gstr, tr_torrent const* tor, tr_stat c
 static void getStatusString(GString* gstr, tr_torrent const* tor, tr_stat const* st, double const uploadSpeed_KBps,
     double const downloadSpeed_KBps)
 {
-    if (st->error)
+    if (st->error != 0)
     {
         char const* fmt[] =
         {
@@ -256,14 +256,14 @@ static void getStatusString(GString* gstr, tr_torrent const* tor, tr_stat const*
                     g_string_append_printf(gstr, _("Downloading metadata from %1$'d %2$s (%3$d%% done)"), st->peersConnected,
                         ngettext("peer", "peers", st->peersConnected), (int)(100.0 * st->metadataPercentComplete));
                 }
-                else if (st->peersSendingToUs && st->webseedsSendingToUs)
+                else if (st->peersSendingToUs != 0 && st->webseedsSendingToUs != 0)
                 {
                     /* Downloading from 2 of 3 peer (s) and 2 webseed (s) */
                     g_string_append_printf(gstr, _("Downloading from %1$'d of %2$'d %3$s and %4$'d %5$s"), st->peersSendingToUs,
                         st->peersConnected, ngettext("peer", "peers", st->peersConnected), st->webseedsSendingToUs,
                         ngettext("web seed", "web seeds", st->webseedsSendingToUs));
                 }
-                else if (st->webseedsSendingToUs)
+                else if (st->webseedsSendingToUs != 0)
                 {
                     /* Downloading from 3 web seed (s) */
                     g_string_append_printf(gstr, _("Downloading from %1$'d %2$s"), st->webseedsSendingToUs,
@@ -286,14 +286,13 @@ static void getStatusString(GString* gstr, tr_torrent const* tor, tr_stat const*
         }
     }
 
-    if ((st->activity != TR_STATUS_CHECK_WAIT) && (st->activity != TR_STATUS_CHECK) &&
-        (st->activity != TR_STATUS_DOWNLOAD_WAIT) && (st->activity != TR_STATUS_SEED_WAIT) &&
-        (st->activity != TR_STATUS_STOPPED))
+    if (st->activity != TR_STATUS_CHECK_WAIT && st->activity != TR_STATUS_CHECK && st->activity != TR_STATUS_DOWNLOAD_WAIT &&
+        st->activity != TR_STATUS_SEED_WAIT && st->activity != TR_STATUS_STOPPED)
     {
         char buf[256];
         getShortTransferString(tor, st, uploadSpeed_KBps, downloadSpeed_KBps, buf, sizeof(buf));
 
-        if (*buf)
+        if (*buf != '\0')
         {
             g_string_append_printf(gstr, " - %s", buf);
         }
@@ -475,7 +474,7 @@ static void torrent_cell_renderer_get_size(GtkCellRenderer* cell, GtkWidget* wid
 {
     TorrentCellRenderer* self = TORRENT_CELL_RENDERER(cell);
 
-    if (self && self->priv->tor)
+    if (self != NULL && self->priv->tor != NULL)
     {
         int w, h;
         struct TorrentCellRendererPrivate* p = self->priv;
@@ -489,22 +488,22 @@ static void torrent_cell_renderer_get_size(GtkCellRenderer* cell, GtkWidget* wid
             get_size_full(TORRENT_CELL_RENDERER(cell), widget, &w, &h);
         }
 
-        if (width)
+        if (width != NULL)
         {
             *width = w;
         }
 
-        if (height)
+        if (height != NULL)
         {
             *height = h;
         }
 
-        if (x_offset)
+        if (x_offset != NULL)
         {
             *x_offset = cell_area ? cell_area->x : 0;
         }
 
-        if (y_offset)
+        if (y_offset != NULL)
         {
             int xpad, ypad;
             gtk_cell_renderer_get_padding(cell, &xpad, &ypad);
@@ -520,7 +519,7 @@ static void get_text_color(GtkWidget* w, tr_stat const* st, GtrColor* setme)
 {
     static GdkRGBA const red = { 1.0, 0, 0, 0 };
 
-    if (st->error)
+    if (st->error != 0)
     {
         *setme = red;
     }
@@ -538,7 +537,7 @@ static double get_percent_done(tr_torrent const* tor, tr_stat const* st, bool* s
 {
     double d;
 
-    if ((st->activity == TR_STATUS_SEED) && tr_torrentGetSeedRatio(tor, &d))
+    if (st->activity == TR_STATUS_SEED && tr_torrentGetSeedRatio(tor, &d))
     {
         *seed = true;
         d = MAX(0.0, st->seedRatioPercentDone);
@@ -578,8 +577,8 @@ static void render_compact(TorrentCellRenderer* cell, GtrDrawable* window, GtkWi
     struct TorrentCellRendererPrivate* p = cell->priv;
     tr_torrent const* tor = p->tor;
     tr_stat const* st = tr_torrentStatCached((tr_torrent*)tor);
-    gboolean const active = (st->activity != TR_STATUS_STOPPED) && (st->activity != TR_STATUS_DOWNLOAD_WAIT) &&
-        (st->activity != TR_STATUS_SEED_WAIT);
+    gboolean const active = st->activity != TR_STATUS_STOPPED && st->activity != TR_STATUS_DOWNLOAD_WAIT &&
+        st->activity != TR_STATUS_SEED_WAIT;
     double const percentDone = get_percent_done(tor, st, &seed);
     gboolean const sensitive = active || st->error;
     GString* gstr_stat = p->gstr1;
@@ -654,8 +653,8 @@ static void render_full(TorrentCellRenderer* cell, GtrDrawable* window, GtkWidge
     tr_torrent const* tor = p->tor;
     tr_stat const* st = tr_torrentStatCached((tr_torrent*)tor);
     tr_info const* inf = tr_torrentInfo(tor);
-    gboolean const active = (st->activity != TR_STATUS_STOPPED) && (st->activity != TR_STATUS_DOWNLOAD_WAIT) &&
-        (st->activity != TR_STATUS_SEED_WAIT);
+    gboolean const active = st->activity != TR_STATUS_STOPPED && st->activity != TR_STATUS_DOWNLOAD_WAIT &&
+        st->activity != TR_STATUS_SEED_WAIT;
     double const percentDone = get_percent_done(tor, st, &seed);
     gboolean const sensitive = active || st->error;
     GString* gstr_prog = p->gstr1;
@@ -754,7 +753,7 @@ static void torrent_cell_renderer_render(GtkCellRenderer* cell, GtrDrawable* win
     gtk_widget_set_direction(widget, GTK_TEXT_DIR_RTL);
 #endif
 
-    if (self && self->priv->tor)
+    if (self != NULL && self->priv->tor != NULL)
     {
         struct TorrentCellRendererPrivate* p = self->priv;
 
@@ -845,7 +844,7 @@ static void torrent_cell_renderer_dispose(GObject* o)
 {
     TorrentCellRenderer* r = TORRENT_CELL_RENDERER(o);
 
-    if (r && r->priv)
+    if (r != NULL && r->priv != NULL)
     {
         g_string_free(r->priv->gstr1, TRUE);
         g_string_free(r->priv->gstr2, TRUE);

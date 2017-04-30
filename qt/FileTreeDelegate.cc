@@ -35,7 +35,7 @@ void FileTreeDelegate::paint(QPainter* painter, QStyleOptionViewItem const& opti
 {
     int const column(index.column());
 
-    if ((column != FileTreeModel::COL_PROGRESS) && (column != FileTreeModel::COL_WANTED))
+    if (column != FileTreeModel::COL_PROGRESS && column != FileTreeModel::COL_WANTED)
     {
         QItemDelegate::paint(painter, option, index);
         return;

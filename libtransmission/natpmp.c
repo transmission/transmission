@@ -93,7 +93,7 @@ struct tr_natpmp* tr_natpmpInit(void)
 
 void tr_natpmpClose(tr_natpmp* nat)
 {
-    if (nat)
+    if (nat != NULL)
     {
         closenatpmp(&nat->natpmp);
         tr_free(nat);
@@ -114,7 +114,7 @@ int tr_natpmpPulse(struct tr_natpmp* nat, tr_port private_port, bool is_enabled,
 {
     int ret;
 
-    if (is_enabled && (nat->state == TR_NATPMP_DISCOVER))
+    if (is_enabled && nat->state == TR_NATPMP_DISCOVER)
     {
         int val = initnatpmp(&nat->natpmp, 0, 0);
         logVal("initnatpmp", val);
@@ -125,7 +125,7 @@ int tr_natpmpPulse(struct tr_natpmp* nat, tr_port private_port, bool is_enabled,
         setCommandTime(nat);
     }
 
-    if ((nat->state == TR_NATPMP_RECV_PUB) && canSendCommand(nat))
+    if (nat->state == TR_NATPMP_RECV_PUB && canSendCommand(nat))
     {
         natpmpresp_t response;
         int const val = readnatpmpresponseorretry(&nat->natpmp, &response);
@@ -144,15 +144,15 @@ int tr_natpmpPulse(struct tr_natpmp* nat, tr_port private_port, bool is_enabled,
         }
     }
 
-    if ((nat->state == TR_NATPMP_IDLE) || (nat->state == TR_NATPMP_ERR))
+    if (nat->state == TR_NATPMP_IDLE || nat->state == TR_NATPMP_ERR)
     {
-        if (nat->is_mapped && (!is_enabled || (nat->private_port != private_port)))
+        if (nat->is_mapped && (!is_enabled || nat->private_port != private_port))
         {
             nat->state = TR_NATPMP_SEND_UNMAP;
         }
     }
 
-    if ((nat->state == TR_NATPMP_SEND_UNMAP) && canSendCommand(nat))
+    if (nat->state == TR_NATPMP_SEND_UNMAP && canSendCommand(nat))
     {
         int const val = sendnewportmappingrequest(&nat->natpmp, NATPMP_PROTOCOL_TCP, nat->private_port, nat->public_port, 0);
         logVal("sendnewportmappingrequest", val);
@@ -198,7 +198,7 @@ int tr_natpmpPulse(struct tr_natpmp* nat, tr_port private_port, bool is_enabled,
         }
     }
 
-    if ((nat->state == TR_NATPMP_SEND_MAP) && canSendCommand(nat))
+    if (nat->state == TR_NATPMP_SEND_MAP && canSendCommand(nat))
     {
         int const val = sendnewportmappingrequest(&nat->natpmp, NATPMP_PROTOCOL_TCP, private_port, private_port, LIFETIME_SECS);
         logVal("sendnewportmappingrequest", val);

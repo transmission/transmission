@@ -19,7 +19,7 @@ static tr_lock* getRecycledNodesLock(void)
 {
     static tr_lock* l = NULL;
 
-    if (!l)
+    if (l == NULL)
     {
         l = tr_lockNew();
     }
@@ -71,12 +71,12 @@ static void node_free(tr_list* node)
 
 void tr_list_free(tr_list** list, TrListForeachFunc data_free_func)
 {
-    while (*list)
+    while (*list != NULL)
     {
         tr_list* node = *list;
         *list = (*list)->next;
 
-        if (data_free_func)
+        if (data_free_func != NULL)
         {
             data_free_func(node->data);
         }
@@ -92,7 +92,7 @@ void tr_list_prepend(tr_list** list, void* data)
     node->data = data;
     node->next = *list;
 
-    if (*list)
+    if (*list != NULL)
     {
         (*list)->prev = node;
     }
@@ -106,7 +106,7 @@ void tr_list_append(tr_list** list, void* data)
 
     node->data = data;
 
-    if (!*list)
+    if (*list == NULL)
     {
         *list = node;
     }
@@ -114,7 +114,7 @@ void tr_list_append(tr_list** list, void* data)
     {
         tr_list* l = *list;
 
-        while (l->next)
+        while (l->next != NULL)
         {
             l = l->next;
         }
@@ -126,7 +126,7 @@ void tr_list_append(tr_list** list, void* data)
 
 static tr_list* tr_list_find_data(tr_list* list, void const* data)
 {
-    for (; list; list = list->next)
+    for (; list != NULL; list = list->next)
     {
         if (list->data == data)
         {
@@ -140,15 +140,15 @@ static tr_list* tr_list_find_data(tr_list* list, void const* data)
 static void* tr_list_remove_node(tr_list** list, tr_list* node)
 {
     void* data;
-    tr_list* prev = node ? node->prev : NULL;
-    tr_list* next = node ? node->next : NULL;
+    tr_list* prev = node != NULL ? node->prev : NULL;
+    tr_list* next = node != NULL ? node->next : NULL;
 
-    if (prev)
+    if (prev != NULL)
     {
         prev->next = next;
     }
 
-    if (next)
+    if (next != NULL)
     {
         next->prev = prev;
     }
@@ -167,7 +167,7 @@ void* tr_list_pop_front(tr_list** list)
 {
     void* ret = NULL;
 
-    if (*list)
+    if (*list != NULL)
     {
         ret = (*list)->data;
         tr_list_remove_node(list, *list);
@@ -188,9 +188,9 @@ void* tr_list_remove(tr_list** list, void const* b, TrListCompareFunc compare_fu
 
 tr_list* tr_list_find(tr_list* list, void const* b, TrListCompareFunc func)
 {
-    for (; list; list = list->next)
+    for (; list != NULL; list = list->next)
     {
-        if (!func(list->data, b))
+        if (func(list->data, b) == 0)
         {
             return list;
         }
@@ -237,7 +237,7 @@ int tr_list_size(tr_list const* list)
 {
     int size = 0;
 
-    while (list)
+    while (list != NULL)
     {
         ++size;
         list = list->next;

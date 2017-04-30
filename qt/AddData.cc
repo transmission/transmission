@@ -47,7 +47,7 @@ int AddData::set(QString const& key)
         size_t len;
         void* raw = tr_base64_decode(key.toUtf8().constData(), key.toUtf8().size(), &len);
 
-        if (raw)
+        if (raw != nullptr)
         {
             metainfo.append(static_cast<char const*>(raw), int(len));
             tr_free(raw);

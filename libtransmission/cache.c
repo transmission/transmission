@@ -206,7 +206,7 @@ static int flushRuns(tr_cache* cache, struct run_info* runs, int n)
     int i;
     int err = 0;
 
-    for (i = 0; !err && i < n; i++)
+    for (i = 0; err == 0 && i < n; i++)
     {
         int j;
 
@@ -363,7 +363,7 @@ int tr_cacheReadBlock(tr_cache* cache, tr_torrent* torrent, tr_piece_index_t pie
     int err = 0;
     struct cache_block* cb = findBlock(cache, torrent, piece, offset);
 
-    if (cb)
+    if (cb != NULL)
     {
         evbuffer_copyout(cb->evbuf, setme, len);
     }
@@ -437,7 +437,7 @@ int tr_cacheFlushFile(tr_cache* cache, tr_torrent* torrent, tr_file_index_t i)
     dbgmsg("flushing file %d from cache to disk: blocks [%zu...%zu]", (int)i, (size_t)first, (size_t)last);
 
     /* flush out all the blocks in that file */
-    while (!err && (pos < tr_ptrArraySize(&cache->blocks)))
+    while (err == 0 && pos < tr_ptrArraySize(&cache->blocks))
     {
         struct cache_block const* b = tr_ptrArrayNth(&cache->blocks, pos);
 
@@ -446,7 +446,7 @@ int tr_cacheFlushFile(tr_cache* cache, tr_torrent* torrent, tr_file_index_t i)
             break;
         }
 
-        if ((b->block < first) || (b->block > last))
+        if (b->block < first || b->block > last)
         {
             break;
         }
@@ -463,7 +463,7 @@ int tr_cacheFlushTorrent(tr_cache* cache, tr_torrent* torrent)
     int const pos = findBlockPos(cache, torrent, 0);
 
     /* flush out all the blocks in that torrent */
-    while (!err && (pos < tr_ptrArraySize(&cache->blocks)))
+    while (err == 0 && pos < tr_ptrArraySize(&cache->blocks))
     {
         struct cache_block const* b = tr_ptrArrayNth(&cache->blocks, pos);
 

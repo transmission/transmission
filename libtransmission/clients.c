@@ -41,7 +41,7 @@ static bool getShadowInt(uint8_t ch, int* setme)
     char const* str = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.-";
     char const* pch = strchr(str, ch);
 
-    if (!pch)
+    if (pch == NULL)
     {
         return false;
     }
@@ -175,7 +175,7 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
 
     *buf = '\0';
 
-    if (!id)
+    if (id == NULL)
     {
         return buf;
     }
@@ -196,7 +196,7 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
             else /* current client style: -TR111Z- is 1.11+ */
             {
                 tr_snprintf(buf, buflen, "Transmission %d.%02d%s", strint(id + 3, 1), strint(id + 4, 2),
-                    id[6] == 'Z' || id[6] == 'X' ? "+" : "");
+                    (id[6] == 'Z' || id[6] == 'X') ? "+" : "");
             }
         }
         else if (strncmp(chid + 1, "UT", 2) == 0)
@@ -755,11 +755,11 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
     }
 
     /* Shad0w-style */
-    if (!*buf)
+    if (*buf == '\0')
     {
         int a, b, c;
 
-        if (strchr("AOQRSTU", id[0]) && getShadowInt(id[1], &a) && getShadowInt(id[2], &b) && getShadowInt(id[3], &c))
+        if (strchr("AOQRSTU", id[0]) != NULL && getShadowInt(id[1], &a) && getShadowInt(id[2], &b) && getShadowInt(id[3], &c))
         {
             char const* name = NULL;
 
@@ -794,7 +794,7 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
                 break;
             }
 
-            if (name)
+            if (name != NULL)
             {
                 tr_snprintf(buf, buflen, "%s %d.%d.%d", name, a, b, c);
                 return buf;
@@ -803,7 +803,7 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
     }
 
     /* No match */
-    if (!*buf)
+    if (*buf == '\0')
     {
         char out[32], * walk = out;
         char const* in, * in_end;

@@ -63,7 +63,7 @@ static char* get_name_from_host(char const* host)
     {
         name = g_strdup(host);
     }
-    else if (dot)
+    else if (dot != NULL)
     {
         name = g_strndup(host, dot - host);
     }
@@ -494,14 +494,14 @@ static gboolean test_torrent_activity(tr_torrent* tor, int type)
     switch (type)
     {
     case ACTIVITY_FILTER_DOWNLOADING:
-        return (st->activity == TR_STATUS_DOWNLOAD) || (st->activity == TR_STATUS_DOWNLOAD_WAIT);
+        return st->activity == TR_STATUS_DOWNLOAD || st->activity == TR_STATUS_DOWNLOAD_WAIT;
 
     case ACTIVITY_FILTER_SEEDING:
-        return (st->activity == TR_STATUS_SEED) || (st->activity == TR_STATUS_SEED_WAIT);
+        return st->activity == TR_STATUS_SEED || st->activity == TR_STATUS_SEED_WAIT;
 
     case ACTIVITY_FILTER_ACTIVE:
-        return (st->peersSendingToUs > 0) || (st->peersGettingFromUs > 0) || (st->webseedsSendingToUs > 0) ||
-               (st->activity == TR_STATUS_CHECK);
+        return st->peersSendingToUs > 0 || st->peersGettingFromUs > 0 || st->webseedsSendingToUs > 0 ||
+               st->activity == TR_STATUS_CHECK;
 
     case ACTIVITY_FILTER_PAUSED:
         return st->activity == TR_STATUS_STOPPED;
@@ -510,7 +510,7 @@ static gboolean test_torrent_activity(tr_torrent* tor, int type)
         return st->finished == TRUE;
 
     case ACTIVITY_FILTER_VERIFYING:
-        return (st->activity == TR_STATUS_CHECK) || (st->activity == TR_STATUS_CHECK_WAIT);
+        return st->activity == TR_STATUS_CHECK || st->activity == TR_STATUS_CHECK_WAIT;
 
     case ACTIVITY_FILTER_ERROR:
         return st->error != 0;
@@ -712,7 +712,7 @@ static gboolean testText(tr_torrent const* tor, char const* key)
 {
     gboolean ret = FALSE;
 
-    if (!key || !*key)
+    if (key == NULL || *key == '\0')
     {
         ret = TRUE;
     }
@@ -788,7 +788,7 @@ static gboolean is_row_visible(GtkTreeModel* model, GtkTreeIter* iter, gpointer 
 
     text = (char const*)g_object_get_qdata(o, TEXT_KEY);
 
-    return (tor != NULL) && test_tracker(tor, data->active_tracker_type, data->active_tracker_host) &&
+    return tor != NULL && test_tracker(tor, data->active_tracker_type, data->active_tracker_host) &&
            test_torrent_activity(tor, data->active_activity_type) && testText(tor, text);
 }
 

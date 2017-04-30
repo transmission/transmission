@@ -39,7 +39,7 @@ static int testPeerId(void)
             val += strtoul(tmp, NULL, 36);
         }
 
-        check((val % 36) == 0);
+        check(val % 36 == 0);
     }
 
     return 0;

@@ -109,9 +109,9 @@ static char* tr_strltime(char* buf, int seconds, size_t buflen)
     tr_snprintf(s, sizeof(s), "%d %s", seconds, seconds == 1 ? "second" : "seconds");
     tr_snprintf(t, sizeof(t), "%d %s", total_seconds, total_seconds == 1 ? "second" : "seconds");
 
-    if (days)
+    if (days != 0)
     {
-        if (days >= 4 || !hours)
+        if (days >= 4 || hours == 0)
         {
             tr_strlcpy(b, d, sizeof(b));
         }
@@ -120,9 +120,9 @@ static char* tr_strltime(char* buf, int seconds, size_t buflen)
             tr_snprintf(b, sizeof(b), "%s, %s", d, h);
         }
     }
-    else if (hours)
+    else if (hours != 0)
     {
-        if (hours >= 4 || !minutes)
+        if (hours >= 4 || minutes == 0)
         {
             tr_strlcpy(b, h, sizeof(b));
         }
@@ -131,9 +131,9 @@ static char* tr_strltime(char* buf, int seconds, size_t buflen)
             tr_snprintf(b, sizeof(b), "%s, %s", h, m);
         }
     }
-    else if (minutes)
+    else if (minutes != 0)
     {
-        if (minutes >= 4 || !seconds)
+        if (minutes >= 4 || seconds == 0)
         {
             tr_strlcpy(b, m, sizeof(b));
         }
@@ -183,7 +183,7 @@ static char* strlratio(char* buf, int64_t numerator, int64_t denominator, size_t
 
 static char* strlmem(char* buf, int64_t bytes, size_t buflen)
 {
-    if (!bytes)
+    if (bytes == 0)
     {
         tr_strlcpy(buf, "None", buflen);
     }
@@ -347,7 +347,7 @@ static int numarg(char const* arg)
     char* end = NULL;
     long const num = strtol(arg, &end, 10);
 
-    if (*end)
+    if (*end != '\0')
     {
         fprintf(stderr, "Not a number: \"%s\"\n", arg);
         showUsage();
@@ -522,7 +522,7 @@ static char* getEncodedMetainfo(char const* filename)
     char* b64 = NULL;
     uint8_t* buf = tr_loadFile(filename, &len, NULL);
 
-    if (buf)
+    if (buf != NULL)
     {
         b64 = tr_base64_encode(buf, len, NULL);
         tr_free(buf);
@@ -533,11 +533,11 @@ static char* getEncodedMetainfo(char const* filename)
 
 static void addIdArg(tr_variant* args, char const* id, char const* fallback)
 {
-    if (!id || !*id)
+    if (id == NULL || *id == '\0')
     {
         id = fallback;
 
-        if (!id || !*id)
+        if (id == NULL || *id == '\0')
         {
             fprintf(stderr, "No torrent specified!  Please use the -t option first.\n");
             id = "-1"; /* no torrent will have this ID, so will act as a no-op */
@@ -551,10 +551,10 @@ static void addIdArg(tr_variant* args, char const* id, char const* fallback)
     else if (strcmp(id, "all") != 0)
     {
         char const* pch;
-        bool isList = strchr(id, ',') || strchr(id, '-');
+        bool isList = strchr(id, ',') != NULL || strchr(id, '-') != NULL;
         bool isNum = true;
 
-        for (pch = id; isNum && *pch; ++pch)
+        for (pch = id; isNum && *pch != '\0'; ++pch)
         {
             if (!isdigit(*pch))
             {
@@ -578,7 +578,7 @@ static void addTime(tr_variant* args, tr_quark const key, char const* arg)
     int time;
     bool success = false;
 
-    if (arg && (strlen(arg) == 4))
+    if (arg != NULL && strlen(arg) == 4)
     {
         char const hh[3] = { arg[0], arg[1], '\0' };
         char const mm[3] = { arg[2], arg[3], '\0' };
@@ -606,7 +606,7 @@ static void addDays(tr_variant* args, tr_quark const key, char const* arg)
 {
     int days = 0;
 
-    if (arg)
+    if (arg != NULL)
     {
         int i;
         int valueCount;
@@ -632,7 +632,7 @@ static void addDays(tr_variant* args, tr_quark const key, char const* arg)
         tr_free(values);
     }
 
-    if (days)
+    if (days != 0)
     {
         tr_variantDictAddInt(args, key, days);
     }
@@ -646,7 +646,7 @@ static void addFiles(tr_variant* args, tr_quark const key, char const* arg)
 {
     tr_variant* files = tr_variantDictAddList(args, key, 100);
 
-    if (!*arg)
+    if (*arg == '\0')
     {
         fprintf(stderr, "No files specified!\n");
         arg = "-1"; /* no file will have this index, so should be a no-op */
@@ -845,15 +845,15 @@ static char* getStatusString(tr_variant* t, char* buf, size_t buflen)
                 tr_variantDictFindInt(t, TR_KEY_peersGettingFromUs, &fromUs);
                 tr_variantDictFindInt(t, TR_KEY_peersSendingToUs, &toUs);
 
-                if (fromUs && toUs)
+                if (fromUs != 0 && toUs != 0)
                 {
                     tr_strlcpy(buf, "Up & Down", buflen);
                 }
-                else if (toUs)
+                else if (toUs != 0)
                 {
                     tr_strlcpy(buf, "Downloading", buflen);
                 }
-                else if (fromUs)
+                else if (fromUs != 0)
                 {
                     int64_t leftUntilDone = 0;
                     tr_variantDictFindInt(t, TR_KEY_leftUntilDone, &leftUntilDone);
@@ -896,7 +896,7 @@ static void printDetails(tr_variant* top)
 {
     tr_variant* args, * torrents;
 
-    if ((tr_variantDictFindDict(top, TR_KEY_arguments, &args)) && (tr_variantDictFindList(args, TR_KEY_torrents, &torrents)))
+    if (tr_variantDictFindDict(top, TR_KEY_arguments, &args) && tr_variantDictFindList(args, TR_KEY_torrents, &torrents))
     {
         int ti, tCount;
 
@@ -1010,7 +1010,8 @@ static void printDetails(tr_variant* top)
                 printf("  Corrupt DL: %s\n", buf);
             }
 
-            if (tr_variantDictFindStr(t, TR_KEY_errorString, &str, NULL) && str && *str && tr_variantDictFindInt(t, TR_KEY_error, &i) && i)
+            if (tr_variantDictFindStr(t, TR_KEY_errorString, &str, NULL) && str != NULL && *str != '\0' &&
+                tr_variantDictFindInt(t, TR_KEY_error, &i) && i != 0)
             {
                 switch (i)
                 {
@@ -1051,36 +1052,36 @@ static void printDetails(tr_variant* top)
 
             printf("HISTORY\n");
 
-            if (tr_variantDictFindInt(t, TR_KEY_addedDate, &i) && i)
+            if (tr_variantDictFindInt(t, TR_KEY_addedDate, &i) && i != 0)
             {
                 time_t const tt = i;
                 printf("  Date added:       %s", ctime(&tt));
             }
 
-            if (tr_variantDictFindInt(t, TR_KEY_doneDate, &i) && i)
+            if (tr_variantDictFindInt(t, TR_KEY_doneDate, &i) && i != 0)
             {
                 time_t const tt = i;
                 printf("  Date finished:    %s", ctime(&tt));
             }
 
-            if (tr_variantDictFindInt(t, TR_KEY_startDate, &i) && i)
+            if (tr_variantDictFindInt(t, TR_KEY_startDate, &i) && i != 0)
             {
                 time_t const tt = i;
                 printf("  Date started:     %s", ctime(&tt));
             }
 
-            if (tr_variantDictFindInt(t, TR_KEY_activityDate, &i) && i)
+            if (tr_variantDictFindInt(t, TR_KEY_activityDate, &i) && i != 0)
             {
                 time_t const tt = i;
                 printf("  Latest activity:  %s", ctime(&tt));
             }
 
-            if (tr_variantDictFindInt(t, TR_KEY_secondsDownloading, &i) && (i > 0))
+            if (tr_variantDictFindInt(t, TR_KEY_secondsDownloading, &i) && i > 0)
             {
                 printf("  Downloading Time: %s\n", tr_strltime(buf, i, sizeof(buf)));
             }
 
-            if (tr_variantDictFindInt(t, TR_KEY_secondsSeeding, &i) && (i > 0))
+            if (tr_variantDictFindInt(t, TR_KEY_secondsSeeding, &i) && i > 0)
             {
                 printf("  Seeding Time:     %s\n", tr_strltime(buf, i, sizeof(buf)));
             }
@@ -1089,7 +1090,7 @@ static void printDetails(tr_variant* top)
 
             printf("ORIGINS\n");
 
-            if (tr_variantDictFindInt(t, TR_KEY_dateCreated, &i) && i)
+            if (tr_variantDictFindInt(t, TR_KEY_dateCreated, &i) && i != 0)
             {
                 time_t const tt = i;
                 printf("  Date created: %s", ctime(&tt));
@@ -1100,12 +1101,12 @@ static void printDetails(tr_variant* top)
                 printf("  Public torrent: %s\n", (boolVal ? "No" : "Yes"));
             }
 
-            if (tr_variantDictFindStr(t, TR_KEY_comment, &str, NULL) && str && *str)
+            if (tr_variantDictFindStr(t, TR_KEY_comment, &str, NULL) && str != NULL && *str != '\0')
             {
                 printf("  Comment: %s\n", str);
             }
 
-            if (tr_variantDictFindStr(t, TR_KEY_creator, &str, NULL) && str && *str)
+            if (tr_variantDictFindStr(t, TR_KEY_creator, &str, NULL) && str != NULL && *str != '\0')
             {
                 printf("  Creator: %s\n", str);
             }
@@ -1201,7 +1202,7 @@ static void printFileList(tr_variant* top)
 {
     tr_variant* args, * torrents;
 
-    if ((tr_variantDictFindDict(top, TR_KEY_arguments, &args)) && (tr_variantDictFindList(args, TR_KEY_torrents, &torrents)))
+    if (tr_variantDictFindDict(top, TR_KEY_arguments, &args) && tr_variantDictFindList(args, TR_KEY_torrents, &torrents))
     {
         int i, in;
 
@@ -1251,7 +1252,8 @@ static void printFileList(tr_variant* top)
                             break;
                         }
 
-                        printf("%3d: %3.0f%% %-8s %-3s %9s  %s\n", j, floor(100.0 * percent), pristr, (wanted ? "Yes" : "No"), sizestr, filename);
+                        printf("%3d: %3.0f%% %-8s %-3s %9s  %s\n", j, floor(100.0 * percent), pristr, wanted ? "Yes" : "No",
+                            sizestr, filename);
                     }
                 }
             }
@@ -1324,7 +1326,7 @@ static void printPiecesImpl(uint8_t const* raw, size_t rawlen, size_t j)
 
         printf(" ");
 
-        if (!(i % 64))
+        if (i % 64 == 0)
         {
             printf("\n  ");
         }
@@ -1373,7 +1375,7 @@ static void printPortTest(tr_variant* top)
 
         if (tr_variantDictFindBool(args, TR_KEY_port_is_open, &boolVal))
         {
-            printf("Port is open: %s\n", (boolVal ? "Yes" : "No"));
+            printf("Port is open: %s\n", boolVal ? "Yes" : "No");
         }
     }
 }
@@ -1382,7 +1384,7 @@ static void printTorrentList(tr_variant* top)
 {
     tr_variant* args, * list;
 
-    if ((tr_variantDictFindDict(top, TR_KEY_arguments, &args)) && (tr_variantDictFindList(args, TR_KEY_torrents, &list)))
+    if (tr_variantDictFindDict(top, TR_KEY_arguments, &args) && tr_variantDictFindList(args, TR_KEY_torrents, &list))
     {
         int i, n;
         int64_t total_size = 0;
@@ -1413,7 +1415,7 @@ static void printTorrentList(tr_variant* top)
                 int64_t error;
                 char errorMark;
 
-                if (sizeWhenDone)
+                if (sizeWhenDone != 0)
                 {
                     tr_snprintf(doneStr, sizeof(doneStr), "%d%%", (int)(100.0 * (sizeWhenDone - leftUntilDone) / sizeWhenDone));
                 }
@@ -1424,7 +1426,7 @@ static void printTorrentList(tr_variant* top)
 
                 strlsize(haveStr, sizeWhenDone - leftUntilDone, sizeof(haveStr));
 
-                if (leftUntilDone || eta != -1)
+                if (leftUntilDone != 0 || eta != -1)
                 {
                     etaToString(etaStr, sizeof(etaStr), eta);
                 }
@@ -1463,7 +1465,7 @@ static void printTrackersImpl(tr_variant* trackerStats)
     char buf[512];
     tr_variant* t;
 
-    for (i = 0; ((t = tr_variantListChild(trackerStats, i))); ++i)
+    for (i = 0; (t = tr_variantListChild(trackerStats, i)) != NULL; ++i)
     {
         int64_t downloadCount;
         bool hasAnnounced;
@@ -1642,7 +1644,7 @@ static void printSession(tr_variant* top)
 {
     tr_variant* args;
 
-    if ((tr_variantDictFindDict(top, TR_KEY_arguments, &args)))
+    if (tr_variantDictFindDict(top, TR_KEY_arguments, &args))
     {
         int64_t i;
         char buf[64];
@@ -1687,7 +1689,7 @@ static void printSession(tr_variant* top)
 
         if (tr_variantDictFindBool(args, TR_KEY_port_forwarding_enabled, &boolVal))
         {
-            printf("  Portforwarding enabled: %s\n", (boolVal ? "Yes" : "No"));
+            printf("  Portforwarding enabled: %s\n", boolVal ? "Yes" : "No");
         }
 
         if (tr_variantDictFindBool(args, TR_KEY_utp_enabled, &boolVal))
@@ -1697,17 +1699,17 @@ static void printSession(tr_variant* top)
 
         if (tr_variantDictFindBool(args, TR_KEY_dht_enabled, &boolVal))
         {
-            printf("  Distributed hash table enabled: %s\n", (boolVal ? "Yes" : "No"));
+            printf("  Distributed hash table enabled: %s\n", boolVal ? "Yes" : "No");
         }
 
         if (tr_variantDictFindBool(args, TR_KEY_lpd_enabled, &boolVal))
         {
-            printf("  Local peer discovery enabled: %s\n", (boolVal ? "Yes" : "No"));
+            printf("  Local peer discovery enabled: %s\n", boolVal ? "Yes" : "No");
         }
 
         if (tr_variantDictFindBool(args, TR_KEY_pex_enabled, &boolVal))
         {
-            printf("  Peer exchange allowed: %s\n", (boolVal ? "Yes" : "No"));
+            printf("  Peer exchange allowed: %s\n", boolVal ? "Yes" : "No");
         }
 
         if (tr_variantDictFindStr(args, TR_KEY_encryption, &str, NULL))
@@ -1799,37 +1801,37 @@ static void printSession(tr_variant* top)
                     printf("  Turtle schedule: %02d:%02d - %02d:%02d  ", (int)(altBegin / 60), (int)(altBegin % 60), (int)(altEnd / 60),
                         (int)(altEnd % 60));
 
-                    if (altDay & TR_SCHED_SUN)
+                    if ((altDay & TR_SCHED_SUN) != 0)
                     {
                         printf("Sun ");
                     }
 
-                    if (altDay & TR_SCHED_MON)
+                    if ((altDay & TR_SCHED_MON) != 0)
                     {
                         printf("Mon ");
                     }
 
-                    if (altDay & TR_SCHED_TUES)
+                    if ((altDay & TR_SCHED_TUES) != 0)
                     {
                         printf("Tue ");
                     }
 
-                    if (altDay & TR_SCHED_WED)
+                    if ((altDay & TR_SCHED_WED) != 0)
                     {
                         printf("Wed ");
                     }
 
-                    if (altDay & TR_SCHED_THURS)
+                    if ((altDay & TR_SCHED_THURS) != 0)
                     {
                         printf("Thu ");
                     }
 
-                    if (altDay & TR_SCHED_FRI)
+                    if ((altDay & TR_SCHED_FRI) != 0)
                     {
                         printf("Fri ");
                     }
 
-                    if (altDay & TR_SCHED_SAT)
+                    if ((altDay & TR_SCHED_SAT) != 0)
                     {
                         printf("Sat ");
                     }
@@ -1845,12 +1847,12 @@ static void printSession(tr_variant* top)
 
         if (tr_variantDictFindBool(args, TR_KEY_start_added_torrents, &boolVal))
         {
-            printf("  Autostart added torrents: %s\n", (boolVal ? "Yes" : "No"));
+            printf("  Autostart added torrents: %s\n", boolVal ? "Yes" : "No");
         }
 
         if (tr_variantDictFindBool(args, TR_KEY_trash_original_torrent_files, &boolVal))
         {
-            printf("  Delete automatically added torrents: %s\n", (boolVal ? "Yes" : "No"));
+            printf("  Delete automatically added torrents: %s\n", boolVal ? "Yes" : "No");
         }
     }
 }
@@ -1859,7 +1861,7 @@ static void printSessionStats(tr_variant* top)
 {
     tr_variant* args, * d;
 
-    if ((tr_variantDictFindDict(top, TR_KEY_arguments, &args)))
+    if (tr_variantDictFindDict(top, TR_KEY_arguments, &args))
     {
         char buf[512];
         int64_t up, down, secs, sessions;
@@ -1900,7 +1902,7 @@ static int processResponse(char const* rpcurl, void const* response, size_t len)
         fprintf(stderr, "got response (len %d):\n--------\n%*.*s\n--------\n", (int)len, (int)len, (int)len, (char const*)response);
     }
 
-    if (tr_variantFromJson(&top, response, len))
+    if (tr_variantFromJson(&top, response, len) != 0)
     {
         tr_logAddNamedError(MY_NAME, "Unable to parse response \"%*.*s\"", (int)len, (int)len, (char const*)response);
         status |= EXIT_FAILURE;
@@ -2014,12 +2016,12 @@ static CURL* tr_curl_easy_init(struct evbuffer* writebuf)
     curl_easy_setopt(curl, CURLOPT_VERBOSE, debug);
     curl_easy_setopt(curl, CURLOPT_ENCODING, ""); /* "" tells curl to fill in the blanks with what it was compiled to support */
 
-    if (netrc)
+    if (netrc != NULL)
     {
         curl_easy_setopt(curl, CURLOPT_NETRC_FILE, netrc);
     }
 
-    if (auth)
+    if (auth != NULL)
     {
         curl_easy_setopt(curl, CURLOPT_USERPWD, auth);
     }
@@ -2030,7 +2032,7 @@ static CURL* tr_curl_easy_init(struct evbuffer* writebuf)
         curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0); /* since most certs will be self-signed, do not verify against CA */
     }
 
-    if (sessionId)
+    if (sessionId != NULL)
     {
         char* h = tr_strdup_printf("%s: %s", TR_RPC_SESSION_ID_HEADER, sessionId);
         struct curl_slist* custom_headers = curl_slist_append(NULL, h);
@@ -2060,7 +2062,7 @@ static int flush(char const* rpcurl, tr_variant** benc)
         fprintf(stderr, "posting:\n--------\n%s\n--------\n", json);
     }
 
-    if ((res = curl_easy_perform(curl)))
+    if ((res = curl_easy_perform(curl)) != CURLE_OK)
     {
         tr_logAddNamedError(MY_NAME, " (%s) %s", rpcurl_http, curl_easy_strerror(res));
         status |= EXIT_FAILURE;
@@ -2098,7 +2100,7 @@ static int flush(char const* rpcurl, tr_variant** benc)
     tr_free(json);
     evbuffer_free(buf);
 
-    if (curl != 0)
+    if (curl != NULL)
     {
         curl_easy_cleanup(curl);
     }
@@ -2106,7 +2108,7 @@ static int flush(char const* rpcurl, tr_variant** benc)
     if (benc != NULL)
     {
         tr_variantFree(*benc);
-        *benc = 0;
+        *benc = NULL;
     }
 
     return status;
@@ -2116,7 +2118,7 @@ static tr_variant* ensure_sset(tr_variant** sset)
 {
     tr_variant* args;
 
-    if (*sset)
+    if (*sset != NULL)
     {
         args = tr_variantDictFind(*sset, ARGUMENTS);
     }
@@ -2135,7 +2137,7 @@ static tr_variant* ensure_tset(tr_variant** tset)
 {
     tr_variant* args;
 
-    if (*tset)
+    if (*tset != NULL)
     {
         args = tr_variantDictFind(*tset, ARGUMENTS);
     }
@@ -2155,32 +2157,32 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
     int c;
     int status = EXIT_SUCCESS;
     char const* optarg;
-    tr_variant* sset = 0;
-    tr_variant* tset = 0;
-    tr_variant* tadd = 0;
+    tr_variant* sset = NULL;
+    tr_variant* tset = NULL;
+    tr_variant* tadd = NULL;
 
     *id = '\0';
 
-    while ((c = tr_getopt(getUsage(), argc, argv, opts, &optarg)))
+    while ((c = tr_getopt(getUsage(), argc, argv, opts, &optarg)) != TR_OPT_DONE)
     {
         int const stepMode = getOptMode(c);
 
-        if (!stepMode) /* meta commands */
+        if (stepMode == 0) /* meta commands */
         {
             switch (c)
             {
             case 'a': /* add torrent */
-                if (sset != 0)
+                if (sset != NULL)
                 {
                     status |= flush(rpcurl, &sset);
                 }
 
-                if (tadd != 0)
+                if (tadd != NULL)
                 {
                     status |= flush(rpcurl, &tadd);
                 }
 
-                if (tset != 0)
+                if (tset != NULL)
                 {
                     addIdArg(tr_variantDictFind(tset, ARGUMENTS), id, NULL);
                     status |= flush(rpcurl, &tset);
@@ -2221,12 +2223,12 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
                 break;
 
             case 't': /* set current torrent */
-                if (tadd != 0)
+                if (tadd != NULL)
                 {
                     status |= flush(rpcurl, &tadd);
                 }
 
-                if (tset != 0)
+                if (tset != NULL)
                 {
                     addIdArg(tr_variantDictFind(tset, ARGUMENTS), id, NULL);
                     status |= flush(rpcurl, &tset);
@@ -2247,12 +2249,12 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
                 break;
 
             case TR_OPT_UNK:
-                if (tadd)
+                if (tadd != NULL)
                 {
                     tr_variant* args = tr_variantDictFind(tadd, ARGUMENTS);
                     char* tmp = getEncodedMetainfo(optarg);
 
-                    if (tmp)
+                    if (tmp != NULL)
                     {
                         tr_variantDictAddStr(args, TR_KEY_metainfo, tmp);
                     }
@@ -2283,7 +2285,7 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
             args = tr_variantDictAddDict(top, ARGUMENTS, 0);
             fields = tr_variantDictAddList(args, TR_KEY_fields, 0);
 
-            if (tset != 0)
+            if (tset != NULL)
             {
                 addIdArg(tr_variantDictFind(tset, ARGUMENTS), id, NULL);
                 status |= flush(rpcurl, &tset);
@@ -2508,10 +2510,10 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
         }
         else if (stepMode == (MODE_SESSION_SET | MODE_TORRENT_SET))
         {
-            tr_variant* targs = 0;
-            tr_variant* sargs = 0;
+            tr_variant* targs = NULL;
+            tr_variant* sargs = NULL;
 
-            if (*id)
+            if (*id != '\0')
             {
                 targs = ensure_tset(&tset);
             }
@@ -2523,7 +2525,7 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
             switch (c)
             {
             case 'd':
-                if (targs)
+                if (targs != NULL)
                 {
                     tr_variantDictAddInt(targs, TR_KEY_downloadLimit, numarg(optarg));
                     tr_variantDictAddBool(targs, TR_KEY_downloadLimited, true);
@@ -2537,7 +2539,7 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
                 break;
 
             case 'D':
-                if (targs)
+                if (targs != NULL)
                 {
                     tr_variantDictAddBool(targs, TR_KEY_downloadLimited, false);
                 }
@@ -2549,7 +2551,7 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
                 break;
 
             case 'u':
-                if (targs)
+                if (targs != NULL)
                 {
                     tr_variantDictAddInt(targs, TR_KEY_uploadLimit, numarg(optarg));
                     tr_variantDictAddBool(targs, TR_KEY_uploadLimited, true);
@@ -2563,7 +2565,7 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
                 break;
 
             case 'U':
-                if (targs)
+                if (targs != NULL)
                 {
                     tr_variantDictAddBool(targs, TR_KEY_uploadLimited, false);
                 }
@@ -2575,7 +2577,7 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
                 break;
 
             case 930:
-                if (targs)
+                if (targs != NULL)
                 {
                     tr_variantDictAddInt(targs, TR_KEY_peer_limit, atoi(optarg));
                 }
@@ -2631,7 +2633,7 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
         {
             tr_variant* args;
 
-            if (tadd)
+            if (tadd != NULL)
             {
                 args = tr_variantDictFind(tadd, ARGUMENTS);
             }
@@ -2685,7 +2687,7 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
         }
         else if (c == 961) /* set location */
         {
-            if (tadd)
+            if (tadd != NULL)
             {
                 tr_variant* args = tr_variantDictFind(tadd, ARGUMENTS);
                 tr_variantDictAddStr(args, TR_KEY_download_dir, optarg);
@@ -2720,7 +2722,7 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
 
             case 's': /* start */
                 {
-                    if (tadd)
+                    if (tadd != NULL)
                     {
                         tr_variantDictAddBool(tr_variantDictFind(tadd, TR_KEY_arguments), TR_KEY_paused, false);
                     }
@@ -2738,7 +2740,7 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
 
             case 'S': /* stop */
                 {
-                    if (tadd)
+                    if (tadd != NULL)
                     {
                         tr_variantDictAddBool(tr_variantDictFind(tadd, TR_KEY_arguments), TR_KEY_paused, true);
                     }
@@ -2803,7 +2805,7 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
                 {
                     tr_variant* top;
 
-                    if (tset != 0)
+                    if (tset != NULL)
                     {
                         addIdArg(tr_variantDictFind(tset, ARGUMENTS), id, NULL);
                         status |= flush(rpcurl, &tset);
@@ -2821,7 +2823,7 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
                 {
                     tr_variant* top;
 
-                    if (tset != 0)
+                    if (tset != NULL)
                     {
                         addIdArg(tr_variantDictFind(tset, ARGUMENTS), id, NULL);
                         status |= flush(rpcurl, &tset);
@@ -2873,18 +2875,18 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
         }
     }
 
-    if (tadd != 0)
+    if (tadd != NULL)
     {
         status |= flush(rpcurl, &tadd);
     }
 
-    if (tset != 0)
+    if (tset != NULL)
     {
         addIdArg(tr_variantDictFind(tset, ARGUMENTS), id, NULL);
         status |= flush(rpcurl, &tset);
     }
 
-    if (sset != 0)
+    if (sset != NULL)
     {
         status |= flush(rpcurl, &sset);
     }
@@ -2910,7 +2912,7 @@ static void getHostAndPortAndRpcUrl(int* argc, char** argv, char** host, int* po
             UseSSL = true;
             *rpcurl = tr_strdup_printf("%s/rpc/", s + 8);
         }
-        else if (delim) /* user passed in both host and port */
+        else if (delim != NULL) /* user passed in both host and port */
         {
             *host = tr_strndup(s, delim - s);
             *port = atoi(delim + 1);
@@ -2920,7 +2922,7 @@ static void getHostAndPortAndRpcUrl(int* argc, char** argv, char** host, int* po
             char* end;
             int const i = strtol(s, &end, 10);
 
-            if (!*end) /* user passed in a port */
+            if (*end == '\0') /* user passed in a port */
             {
                 *port = i;
             }

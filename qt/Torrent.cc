@@ -627,7 +627,7 @@ void Torrent::update(tr_variant* d)
 
         default:
             std::cerr << __FILE__ << ':' << __LINE__ << "unhandled type: " << tr_quark_get_string(key, nullptr) << std::endl;
-            assert(0 && "unhandled type");
+            assert(false && "unhandled type");
         }
     }
 
@@ -643,7 +643,7 @@ void Torrent::update(tr_variant* d)
         myFiles.clear();
         myFiles.reserve(tr_variantListSize(files));
 
-        while ((child = tr_variantListChild(files, i)))
+        while ((child = tr_variantListChild(files, i)) != nullptr)
         {
             TorrentFile file;
             size_t len;
@@ -706,7 +706,7 @@ void Torrent::update(tr_variant* d)
         QStringList list;
         tr_variant* child;
 
-        while ((child = tr_variantListChild(trackers, i++)))
+        while ((child = tr_variantListChild(trackers, i++)) != nullptr)
         {
             if (tr_variantDictFindStr(child, TR_KEY_announce, &str, &len))
             {
@@ -745,7 +745,7 @@ void Torrent::update(tr_variant* d)
         TrackerStatsList trackerStatsList;
         int childNum = 0;
 
-        while ((child = tr_variantListChild(trackerStats, childNum++)))
+        while ((child = tr_variantListChild(trackerStats, childNum++)) != nullptr)
         {
             bool b;
             int64_t i;
@@ -894,7 +894,7 @@ void Torrent::update(tr_variant* d)
         PeerList peerList;
         int childNum = 0;
 
-        while ((child = tr_variantListChild(peers, childNum++)))
+        while ((child = tr_variantListChild(peers, childNum++)) != nullptr)
         {
             double d;
             bool b;
@@ -990,7 +990,7 @@ void Torrent::update(tr_variant* d)
         emit torrentChanged(id());
     }
 
-    if (!was_seed && isSeed() && (old_verified_size > 0))
+    if (!was_seed && isSeed() && old_verified_size > 0)
     {
         emit torrentCompleted(id());
     }

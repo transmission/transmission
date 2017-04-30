@@ -86,7 +86,7 @@ void MakeProgressDialog::onProgress()
 {
     // progress bar
     tr_metainfo_builder const& b = myBuilder;
-    double const denom = b.pieceCount ? b.pieceCount : 1;
+    double const denom = b.pieceCount != 0 ? b.pieceCount : 1;
     ui.progressBar->setValue(static_cast<int>((100.0 * b.pieceIndex) / denom));
 
     // progress label

@@ -50,7 +50,7 @@ THE SOFTWARE.
 #define SEND_BUFFER_SIZE (1 * 1024 * 1024)
 #define SMALL_BUFFER_SIZE (32 * 1024)
 
-static void set_socket_buffers(tr_socket_t fd, int large)
+static void set_socket_buffers(tr_socket_t fd, bool large)
 {
     int size, rbuf, sbuf, rc;
     socklen_t rbuf_len = sizeof(rbuf), sbuf_len = sizeof(sbuf);
@@ -138,7 +138,7 @@ static void rebind_ipv6(tr_session* ss, bool force)
        No way to fix that without some surgery to the DHT code itself. */
     if (ipv6 == NULL || (!force && ss->udp6_socket == TR_BAD_SOCKET))
     {
-        if (ss->udp6_bound)
+        if (ss->udp6_bound != NULL)
         {
             free(ss->udp6_bound);
             ss->udp6_bound = NULL;
@@ -168,7 +168,7 @@ static void rebind_ipv6(tr_session* ss, bool force)
     memset(&sin6, 0, sizeof(sin6));
     sin6.sin6_family = AF_INET6;
 
-    if (ipv6)
+    if (ipv6 != NULL)
     {
         memcpy(&sin6.sin6_addr, ipv6, 16);
     }
@@ -176,7 +176,7 @@ static void rebind_ipv6(tr_session* ss, bool force)
     sin6.sin6_port = htons(ss->udp_port);
     public_addr = tr_sessionGetPublicAddress(ss, TR_AF_INET6, &is_default);
 
-    if (public_addr && !is_default)
+    if (public_addr != NULL && !is_default)
     {
         sin6.sin6_addr = public_addr->addr.addr6;
     }
@@ -210,7 +210,7 @@ static void rebind_ipv6(tr_session* ss, bool force)
         ss->udp6_bound = malloc(16);
     }
 
-    if (ss->udp6_bound)
+    if (ss->udp6_bound != NULL)
     {
         memcpy(ss->udp6_bound, ipv6, 16);
     }
@@ -227,7 +227,7 @@ fail:
         tr_netCloseSocket(s);
     }
 
-    if (ss->udp6_bound)
+    if (ss->udp6_bound != NULL)
     {
         free(ss->udp6_bound);
         ss->udp6_bound = NULL;
@@ -269,7 +269,7 @@ static void event_callback(evutil_socket_t s, short type UNUSED, void* sv)
         {
             rc = tau_handle_message(ss, buf, rc);
 
-            if (!rc)
+            if (rc == 0)
             {
                 tr_logAddNamedDbg("UDP", "Couldn't parse UDP tracker packet.");
             }
@@ -280,7 +280,7 @@ static void event_callback(evutil_socket_t s, short type UNUSED, void* sv)
             {
                 rc = tr_utpPacket(buf, rc, (struct sockaddr*)&from, fromlen, ss);
 
-                if (!rc)
+                if (rc == 0)
                 {
                     tr_logAddNamedDbg("UDP", "Unexpected UDP packet");
                 }
@@ -318,7 +318,7 @@ void tr_udpInit(tr_session* ss)
     sin.sin_family = AF_INET;
     public_addr = tr_sessionGetPublicAddress(ss, TR_AF_INET, &is_default);
 
-    if (public_addr && !is_default)
+    if (public_addr != NULL && !is_default)
     {
         memcpy(&sin.sin_addr, &public_addr->addr.addr4, sizeof(struct in_addr));
     }
@@ -365,12 +365,12 @@ ipv6:
         tr_dhtInit(ss);
     }
 
-    if (ss->udp_event)
+    if (ss->udp_event != NULL)
     {
         event_add(ss->udp_event, NULL);
     }
 
-    if (ss->udp6_event)
+    if (ss->udp6_event != NULL)
     {
         event_add(ss->udp6_event, NULL);
     }
@@ -386,7 +386,7 @@ void tr_udpUninit(tr_session* ss)
         ss->udp_socket = TR_BAD_SOCKET;
     }
 
-    if (ss->udp_event)
+    if (ss->udp_event != NULL)
     {
         event_free(ss->udp_event);
         ss->udp_event = NULL;
@@ -398,13 +398,13 @@ void tr_udpUninit(tr_session* ss)
         ss->udp6_socket = TR_BAD_SOCKET;
     }
 
-    if (ss->udp6_event)
+    if (ss->udp6_event != NULL)
     {
         event_free(ss->udp6_event);
         ss->udp6_event = NULL;
     }
 
-    if (ss->udp6_bound)
+    if (ss->udp6_bound != NULL)
     {
         free(ss->udp6_bound);
         ss->udp6_bound = NULL;

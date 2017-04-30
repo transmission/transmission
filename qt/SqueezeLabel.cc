@@ -57,7 +57,7 @@ SqueezeLabel::SqueezeLabel(QWidget* parent) :
 
 void SqueezeLabel::paintEvent(QPaintEvent* paintEvent)
 {
-    if (hasFocus() && (textInteractionFlags() & (Qt::TextSelectableByKeyboard | Qt::TextSelectableByMouse)))
+    if (hasFocus() && (textInteractionFlags() & (Qt::TextSelectableByKeyboard | Qt::TextSelectableByMouse)) != 0)
     {
         return QLabel::paintEvent(paintEvent);
     }

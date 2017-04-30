@@ -34,7 +34,7 @@ static void tr_notification_free(gpointer data)
 {
     TrNotification* n = data;
 
-    if (n->core)
+    if (n->core != NULL)
     {
         g_object_unref(G_OBJECT(n->core));
     }
@@ -50,9 +50,9 @@ static void get_capabilities_callback(GObject* source, GAsyncResult* res, gpoint
 
     result = g_dbus_proxy_call_finish(G_DBUS_PROXY(source), res, NULL);
 
-    if (!result || !g_variant_is_of_type(result, G_VARIANT_TYPE("(as)")))
+    if (result == NULL || !g_variant_is_of_type(result, G_VARIANT_TYPE("(as)")))
     {
-        if (result)
+        if (result != NULL)
         {
             g_variant_unref(result);
         }
@@ -62,7 +62,7 @@ static void get_capabilities_callback(GObject* source, GAsyncResult* res, gpoint
 
     g_variant_get(result, "(^a&s)", &caps);
 
-    for (i = 0; caps[i]; i++)
+    for (i = 0; caps[i] != NULL; i++)
     {
         if (g_strcmp0(caps[i], "actions") == 0)
         {
@@ -153,9 +153,9 @@ static void notify_callback(GObject* source, GAsyncResult* res, gpointer user_da
 
     result = g_dbus_proxy_call_finish(G_DBUS_PROXY(source), res, NULL);
 
-    if (!result || !g_variant_is_of_type(result, G_VARIANT_TYPE("(u)")))
+    if (result == NULL || !g_variant_is_of_type(result, G_VARIANT_TYPE("(u)")))
     {
-        if (result)
+        if (result != NULL)
         {
             g_variant_unref(result);
         }

@@ -50,7 +50,7 @@ void tr_ptrArrayForeach(tr_ptrArray* array, PtrArrayForeachFunc func);
     @return the nth item in a tr_ptrArray */
 static inline void* tr_ptrArrayNth(tr_ptrArray* array, int i)
 {
-    assert(array);
+    assert(array != NULL);
     assert(i >= 0);
     assert(i < array->n_items);
 

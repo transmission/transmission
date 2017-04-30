@@ -40,7 +40,7 @@ FileTreeItem::~FileTreeItem()
     if (myParent != nullptr)
     {
         int const pos = row();
-        assert((pos >= 0) && "couldn't find child in parent's lookup");
+        assert(pos >= 0 && "couldn't find child in parent's lookup");
         myParent->myChildren.removeAt(pos);
         myParent->myChildRows.remove(name());
         myParent->myFirstUnhashedRow = pos;
@@ -74,7 +74,7 @@ int FileTreeItem::row() const
 {
     int i(-1);
 
-    if (myParent)
+    if (myParent != nullptr)
     {
         i = myParent->getMyChildRows().value(name(), -1);
         assert(this == myParent->myChildren[i]);
@@ -200,7 +200,7 @@ double FileTreeItem::progress() const
 
     getSubtreeWantedSize(have, total);
 
-    if (total)
+    if (total != 0)
     {
         d = have / double(total);
     }
@@ -233,7 +233,7 @@ std::pair<int, int> FileTreeItem::update(QString const& name, bool wanted, int p
 
     if (myName != name)
     {
-        if (myParent)
+        if (myParent != nullptr)
         {
             myParent->myFirstUnhashedRow = row();
         }

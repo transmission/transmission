@@ -76,7 +76,7 @@ static void natPulse(tr_shared* s, bool do_check)
     int newStatus;
     tr_port public_peer_port;
     tr_port const private_peer_port = s->session->private_peer_port;
-    int const is_enabled = s->isEnabled && !s->isShuttingDown;
+    bool const is_enabled = s->isEnabled && !s->isShuttingDown;
 
     if (s->natpmp == NULL)
     {
@@ -143,8 +143,8 @@ static void onTimer(evutil_socket_t fd UNUSED, short what UNUSED, void* vshared)
 {
     tr_shared* s = vshared;
 
-    assert(s);
-    assert(s->timer);
+    assert(s != NULL);
+    assert(s->timer != NULL);
 
     /* do something */
     natPulse(s, s->doPortCheck);

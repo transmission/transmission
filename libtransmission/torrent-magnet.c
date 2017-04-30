@@ -125,11 +125,11 @@ static size_t findInfoDictOffset(tr_torrent const* tor)
     size_t offset = 0;
 
     /* load the file, and find the info dict's offset inside the file */
-    if ((fileContents = tr_loadFile(tor->info.torrent, &fileLen, NULL)))
+    if ((fileContents = tr_loadFile(tor->info.torrent, &fileLen, NULL)) != NULL)
     {
         tr_variant top;
 
-        if (!tr_variantFromBenc(&top, fileContents, fileLen))
+        if (tr_variantFromBenc(&top, fileContents, fileLen) == 0)
         {
             tr_variant* infoDict;
 
@@ -290,7 +290,7 @@ void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, in
             int const err = tr_variantFromBenc(&infoDict, m->metadata, m->metadata_size);
             dbgmsg(tor, "err is %d", err);
 
-            if ((metainfoParsed = !err))
+            if ((metainfoParsed = err == 0))
             {
                 /* yay we have bencoded metainfo... merge it into our .torrent file */
                 tr_variant newMetainfo;
@@ -375,7 +375,7 @@ bool tr_torrentGetNextMetadataRequest(tr_torrent* tor, time_t now, int* setme_pi
 
     m = tor->incompleteMetadata;
 
-    if ((m != NULL) && (m->piecesNeededCount > 0) && (m->piecesNeeded[0].requestedAt + MIN_REPEAT_INTERVAL_SECS < now))
+    if (m != NULL && m->piecesNeededCount > 0 && m->piecesNeeded[0].requestedAt + MIN_REPEAT_INTERVAL_SECS < now)
     {
         int i;
         int const piece = m->piecesNeeded[0].piece;
@@ -406,7 +406,7 @@ double tr_torrentGetMetadataPercent(tr_torrent const* tor)
     {
         struct tr_incomplete_metadata const* m = tor->incompleteMetadata;
 
-        if (!m || !m->pieceCount)
+        if (m == NULL || m->pieceCount == 0)
         {
             ret = 0.0;
         }
@@ -430,7 +430,7 @@ char* tr_torrentInfoGetMagnetLink(tr_info const* inf)
 
     name = inf->name;
 
-    if (name && *name)
+    if (name != NULL && *name != '\0')
     {
         evbuffer_add_printf(s, "%s", "&dn=");
         tr_http_escape(s, name, TR_BAD_SIZE, true);

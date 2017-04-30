@@ -160,7 +160,7 @@ static void set_double_spin_if_different(GtkWidget* w, gulong tag, double value)
     GtkSpinButton* spin = GTK_SPIN_BUTTON(w);
     double const currentValue = gtk_spin_button_get_value(spin);
 
-    if (((int)(currentValue * 100) != (int)(value * 100)))
+    if ((int)(currentValue * 100) != (int)(value * 100))
     {
         g_signal_handler_block(spin, tag);
         gtk_spin_button_set_value(spin, value);
@@ -184,7 +184,7 @@ static void refreshOptions(struct DetailsImpl* di, tr_torrent** torrents, int n)
     ***/
 
     /* honor_limits_check */
-    if (n)
+    if (n != 0)
     {
         int i;
         bool const baseline = tr_torrentUsesSessionLimits(torrents[0]);
@@ -204,7 +204,7 @@ static void refreshOptions(struct DetailsImpl* di, tr_torrent** torrents, int n)
     }
 
     /* down_limited_check */
-    if (n)
+    if (n != 0)
     {
         int i;
         bool const baseline = tr_torrentUsesSpeedLimit(torrents[0], TR_DOWN);
@@ -224,14 +224,14 @@ static void refreshOptions(struct DetailsImpl* di, tr_torrent** torrents, int n)
     }
 
     /* down_limit_spin */
-    if (n)
+    if (n != 0)
     {
         int i;
-        unsigned const int baseline = tr_torrentGetSpeedLimit_KBps(torrents[0], TR_DOWN);
+        unsigned int const baseline = tr_torrentGetSpeedLimit_KBps(torrents[0], TR_DOWN);
 
         for (i = 1; i < n; ++i)
         {
-            if (baseline != (tr_torrentGetSpeedLimit_KBps(torrents[i], TR_DOWN)))
+            if (baseline != tr_torrentGetSpeedLimit_KBps(torrents[i], TR_DOWN))
             {
                 break;
             }
@@ -244,7 +244,7 @@ static void refreshOptions(struct DetailsImpl* di, tr_torrent** torrents, int n)
     }
 
     /* up_limited_check */
-    if (n)
+    if (n != 0)
     {
         int i;
         bool const baseline = tr_torrentUsesSpeedLimit(torrents[0], TR_UP);
@@ -264,14 +264,14 @@ static void refreshOptions(struct DetailsImpl* di, tr_torrent** torrents, int n)
     }
 
     /* up_limit_sping */
-    if (n)
+    if (n != 0)
     {
         int i;
         unsigned int const baseline = tr_torrentGetSpeedLimit_KBps(torrents[0], TR_UP);
 
         for (i = 1; i < n; ++i)
         {
-            if (baseline != (tr_torrentGetSpeedLimit_KBps(torrents[i], TR_UP)))
+            if (baseline != tr_torrentGetSpeedLimit_KBps(torrents[i], TR_UP))
             {
                 break;
             }
@@ -284,7 +284,7 @@ static void refreshOptions(struct DetailsImpl* di, tr_torrent** torrents, int n)
     }
 
     /* bandwidth_combo */
-    if (n)
+    if (n != 0)
     {
         int i;
         int const baseline = tr_torrentGetPriority(torrents[0]);
@@ -311,7 +311,7 @@ static void refreshOptions(struct DetailsImpl* di, tr_torrent** torrents, int n)
     }
 
     /* ratio_combo */
-    if (n)
+    if (n != 0)
     {
         int i;
         int const baseline = tr_torrentGetRatioMode(torrents[0]);
@@ -335,14 +335,14 @@ static void refreshOptions(struct DetailsImpl* di, tr_torrent** torrents, int n)
     }
 
     /* ratio_spin */
-    if (n)
+    if (n != 0)
     {
         double const baseline = tr_torrentGetRatioLimit(torrents[0]);
         set_double_spin_if_different(di->ratio_spin, di->ratio_spin_tag, baseline);
     }
 
     /* idle_combo */
-    if (n)
+    if (n != 0)
     {
         int i;
         int const baseline = tr_torrentGetIdleMode(torrents[0]);
@@ -366,14 +366,14 @@ static void refreshOptions(struct DetailsImpl* di, tr_torrent** torrents, int n)
     }
 
     /* idle_spin */
-    if (n)
+    if (n != 0)
     {
         int const baseline = tr_torrentGetIdleLimit(torrents[0]);
         set_int_spin_if_different(di->idle_spin, di->idle_spin_tag, baseline);
     }
 
     /* max_peers_spin */
-    if (n)
+    if (n != 0)
     {
         int const baseline = tr_torrentGetPeerLimit(torrents[0]);
         set_int_spin_if_different(di->max_peers_spin, di->max_peers_spin_tag, baseline);
@@ -391,7 +391,7 @@ static void torrent_set_bool(struct DetailsImpl* di, tr_quark const key, gboolea
     tr_variantDictAddBool(args, key, value);
     ids = tr_variantDictAddList(args, TR_KEY_ids, g_slist_length(di->ids));
 
-    for (l = di->ids; l; l = l->next)
+    for (l = di->ids; l != NULL; l = l->next)
     {
         tr_variantListAddInt(ids, GPOINTER_TO_INT(l->data));
     }
@@ -411,7 +411,7 @@ static void torrent_set_int(struct DetailsImpl* di, tr_quark const key, int valu
     tr_variantDictAddInt(args, key, value);
     ids = tr_variantDictAddList(args, TR_KEY_ids, g_slist_length(di->ids));
 
-    for (l = di->ids; l; l = l->next)
+    for (l = di->ids; l != NULL; l = l->next)
     {
         tr_variantListAddInt(ids, GPOINTER_TO_INT(l->data));
     }
@@ -431,7 +431,7 @@ static void torrent_set_real(struct DetailsImpl* di, tr_quark const key, double 
     tr_variantDictAddReal(args, key, value);
     ids = tr_variantDictAddList(args, TR_KEY_ids, g_slist_length(di->ids));
 
-    for (l = di->ids; l; l = l->next)
+    for (l = di->ids; l != NULL; l = l->next)
     {
         tr_variantListAddInt(ids, GPOINTER_TO_INT(l->data));
     }
@@ -666,7 +666,7 @@ static char* get_short_date_string(time_t t)
     char buf[64];
     struct tm tm;
 
-    if (!t)
+    if (t == 0)
     {
         return g_strdup(_("N/A"));
     }
@@ -746,7 +746,7 @@ static void refreshInfo(struct DetailsImpl* di, tr_torrent** torrents, int n)
             mixed_date |= (date != infos[i]->dateCreated);
         }
 
-        gboolean const empty_creator = !*creator;
+        gboolean const empty_creator = *creator == '\0';
         gboolean const empty_date = date == 0;
 
         if (mixed_date || mixed_creator)
@@ -857,7 +857,7 @@ static void refreshInfo(struct DetailsImpl* di, tr_torrent** torrents, int n)
 
             if (!stats[i]->finished)
             {
-                allFinished = FALSE;
+                allFinished = false;
             }
         }
 
@@ -888,7 +888,7 @@ static void refreshInfo(struct DetailsImpl* di, tr_torrent** torrents, int n)
         {
             str = mixed;
         }
-        else if ((baseline <= 0) || (stats[0]->activity == TR_STATUS_STOPPED))
+        else if (baseline <= 0 || stats[0]->activity == TR_STATUS_STOPPED)
         {
             str = stateString;
         }
@@ -945,7 +945,7 @@ static void refreshInfo(struct DetailsImpl* di, tr_torrent** torrents, int n)
             size += infos[i]->totalSize;
             pieces += infos[i]->pieceCount;
 
-            if (!pieceSize)
+            if (pieceSize == 0)
             {
                 pieceSize = infos[i]->pieceSize;
             }
@@ -957,7 +957,7 @@ static void refreshInfo(struct DetailsImpl* di, tr_torrent** torrents, int n)
 
         tr_strlsize(sizebuf, size, sizeof(sizebuf));
 
-        if (!size)
+        if (size == 0)
         {
             str = "";
         }
@@ -965,8 +965,8 @@ static void refreshInfo(struct DetailsImpl* di, tr_torrent** torrents, int n)
         {
             char piecebuf[128];
             tr_formatter_mem_B(piecebuf, pieceSize, sizeof(piecebuf));
-            g_snprintf(buf, sizeof(buf), ngettext("%1$s (%2$'d piece @ %3$s)", "%1$s (%2$'d pieces @ %3$s)",
-                pieces), sizebuf, pieces, piecebuf);
+            g_snprintf(buf, sizeof(buf), ngettext("%1$s (%2$'d piece @ %3$s)", "%1$s (%2$'d pieces @ %3$s)", pieces), sizebuf,
+                pieces, piecebuf);
             str = buf;
         }
         else
@@ -1010,11 +1010,11 @@ static void refreshInfo(struct DetailsImpl* di, tr_torrent** torrents, int n)
             tr_strlsize(total, haveUnchecked + haveValid, sizeof(total));
             tr_strlsize(unver, haveUnchecked, sizeof(unver));
 
-            if (!haveUnchecked && !leftUntilDone)
+            if (haveUnchecked == 0 && leftUntilDone == 0)
             {
                 g_snprintf(buf, sizeof(buf), _("%1$s (%2$s%%)"), total, buf2);
             }
-            else if (!haveUnchecked)
+            else if (haveUnchecked == 0)
             {
                 g_snprintf(buf, sizeof(buf), _("%1$s (%2$s%% of %3$s%% Available)"), total, buf2, avail);
             }
@@ -1049,7 +1049,7 @@ static void refreshInfo(struct DetailsImpl* di, tr_torrent** torrents, int n)
         tr_strlsize(dbuf, d, sizeof(dbuf));
         tr_strlsize(fbuf, f, sizeof(fbuf));
 
-        if (f)
+        if (f != 0)
         {
             g_snprintf(buf, sizeof(buf), _("%1$s (+%2$s corrupt)"), dbuf, fbuf);
         }
@@ -1132,7 +1132,7 @@ static void refreshInfo(struct DetailsImpl* di, tr_torrent** torrents, int n)
         }
     }
 
-    if (!str || !*str)
+    if (str == NULL || *str == '\0')
     {
         str = _("No errors");
     }
@@ -1817,7 +1817,7 @@ static gboolean onPeerViewQueryTooltip(GtkWidget* widget, gint x, gint y, gboole
         g_string_append_printf(gstr, "<b>%s</b>\n%s\n \n", markup, addr);
         g_free(markup);
 
-        for (pch = flagstr; pch && *pch; ++pch)
+        for (pch = flagstr; pch != NULL && *pch != '\0'; ++pch)
         {
             char const* s = NULL;
 
@@ -1872,13 +1872,13 @@ static gboolean onPeerViewQueryTooltip(GtkWidget* widget, gint x, gint y, gboole
                 break;
             }
 
-            if (s)
+            if (s != NULL)
             {
                 g_string_append_printf(gstr, "%c: %s\n", *pch, s);
             }
         }
 
-        if (gstr->len) /* remove the last linefeed */
+        if (gstr->len != 0) /* remove the last linefeed */
         {
             g_string_set_size(gstr, gstr->len - 1);
         }
@@ -1945,7 +1945,7 @@ static void setPeerViewColumns(GtkTreeView* peer_view)
     view_columns[n++] = PEER_COL_CLIENT;
 
     /* remove any existing columns */
-    while ((c = gtk_tree_view_get_column(peer_view, 0)))
+    while ((c = gtk_tree_view_get_column(peer_view, 0)) != NULL)
     {
         gtk_tree_view_remove_column(peer_view, c);
     }
@@ -2185,7 +2185,7 @@ static void buildTrackerSummary(GString* gstr, char const* key, tr_tracker_stat 
     {
         g_string_append(gstr, st->isBackup ? "<i>" : "<b>");
 
-        if (key)
+        if (key != NULL)
         {
             str = g_markup_printf_escaped("%s - %s", st->host, key);
         }
@@ -2716,7 +2716,7 @@ static void on_add_tracker_response(GtkDialog* dialog, int response, gpointer gd
         char* url = g_strdup(gtk_entry_get_text(GTK_ENTRY(e)));
         g_strstrip(url);
 
-        if (url && *url)
+        if (url != NULL && *url != '\0')
         {
             if (tr_urlIsValidTracker(url))
             {
@@ -2842,8 +2842,7 @@ static GtkWidget* tracker_page_new(struct DetailsImpl* di)
         (GDestroyNotify)gtk_tree_row_reference_free);
 
     di->trackers_filtered = gtk_tree_model_filter_new(GTK_TREE_MODEL(di->tracker_store), NULL);
-    gtk_tree_model_filter_set_visible_func(GTK_TREE_MODEL_FILTER(di->trackers_filtered),
-        trackerVisibleFunc, di, NULL);
+    gtk_tree_model_filter_set_visible_func(GTK_TREE_MODEL_FILTER(di->trackers_filtered), trackerVisibleFunc, di, NULL);
 
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, GUI_PAD_BIG);
 

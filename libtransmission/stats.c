@@ -132,7 +132,7 @@ void tr_statsSaveDirty(tr_session* session)
 {
     struct tr_stats_handle* h = getStats(session);
 
-    if ((h != NULL) && h->isDirty)
+    if (h != NULL && h->isDirty)
     {
         tr_session_stats cumulative = STATS_INIT;
         tr_sessionGetCumulativeStats(session, &cumulative);
@@ -172,7 +172,7 @@ void tr_sessionGetStats(tr_session const* session, tr_session_stats* setme)
 {
     struct tr_stats_handle const* stats = getStats(session);
 
-    if (stats)
+    if (stats != NULL)
     {
         *setme = stats->single;
         setme->secondsActive = tr_time() - stats->startTime;
@@ -185,7 +185,7 @@ void tr_sessionGetCumulativeStats(tr_session const* session, tr_session_stats* s
     struct tr_stats_handle const* stats = getStats(session);
     tr_session_stats current = STATS_INIT;
 
-    if (stats)
+    if (stats != NULL)
     {
         tr_sessionGetStats(session, &current);
         addStats(setme, &stats->old, &current);
@@ -216,7 +216,7 @@ void tr_statsAddUploaded(tr_session* session, uint32_t bytes)
 {
     struct tr_stats_handle* s;
 
-    if ((s = getStats(session)))
+    if ((s = getStats(session)) != NULL)
     {
         s->single.uploadedBytes += bytes;
         s->isDirty = true;
@@ -227,7 +227,7 @@ void tr_statsAddDownloaded(tr_session* session, uint32_t bytes)
 {
     struct tr_stats_handle* s;
 
-    if ((s = getStats(session)))
+    if ((s = getStats(session)) != NULL)
     {
         s->single.downloadedBytes += bytes;
         s->isDirty = true;
@@ -238,7 +238,7 @@ void tr_statsFileCreated(tr_session* session)
 {
     struct tr_stats_handle* s;
 
-    if ((s = getStats(session)))
+    if ((s = getStats(session)) != NULL)
     {
         s->single.filesAdded++;
     }

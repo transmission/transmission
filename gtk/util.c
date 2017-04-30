@@ -87,7 +87,7 @@ char* tr_strlpercent(char* buf, double x, size_t buflen)
 
 char* tr_strlsize(char* buf, guint64 bytes, size_t buflen)
 {
-    if (!bytes)
+    if (bytes == 0)
     {
         g_strlcpy(buf, Q_("None"), buflen);
     }
@@ -119,9 +119,9 @@ char* tr_strltime(char* buf, int seconds, size_t buflen)
     g_snprintf(m, sizeof(m), ngettext("%'d minute", "%'d minutes", minutes), minutes);
     g_snprintf(s, sizeof(s), ngettext("%'d second", "%'d seconds", seconds), seconds);
 
-    if (days)
+    if (days != 0)
     {
-        if (days >= 4 || !hours)
+        if (days >= 4 || hours == 0)
         {
             g_strlcpy(buf, d, buflen);
         }
@@ -130,9 +130,9 @@ char* tr_strltime(char* buf, int seconds, size_t buflen)
             g_snprintf(buf, buflen, "%s, %s", d, h);
         }
     }
-    else if (hours)
+    else if (hours != 0)
     {
-        if (hours >= 4 || !minutes)
+        if (hours >= 4 || minutes == 0)
         {
             g_strlcpy(buf, h, buflen);
         }
@@ -141,9 +141,9 @@ char* tr_strltime(char* buf, int seconds, size_t buflen)
             g_snprintf(buf, buflen, "%s, %s", h, m);
         }
     }
-    else if (minutes)
+    else if (minutes != 0)
     {
-        if (minutes >= 4 || !seconds)
+        if (minutes >= 4 || seconds == 0)
         {
             g_strlcpy(buf, m, buflen);
         }
@@ -166,7 +166,7 @@ void gtr_get_host_from_url(char* buf, size_t buflen, char const* url)
     char host[1024];
     char const* pch;
 
-    if ((pch = strstr(url, "://")))
+    if ((pch = strstr(url, "://")) != NULL)
     {
         size_t const hostlen = strcspn(pch + 3, ":/");
         size_t const copylen = MIN(hostlen, sizeof(host) - 1);
@@ -187,7 +187,7 @@ void gtr_get_host_from_url(char* buf, size_t buflen, char const* url)
         char const* first_dot = strchr(host, '.');
         char const* last_dot = strrchr(host, '.');
 
-        if ((first_dot) && (last_dot) && (first_dot != last_dot))
+        if (first_dot != NULL && last_dot != NULL && first_dot != last_dot)
         {
             g_strlcpy(buf, first_dot + 1, buflen);
         }
@@ -200,20 +200,20 @@ void gtr_get_host_from_url(char* buf, size_t buflen, char const* url)
 
 static gboolean gtr_is_supported_url(char const* str)
 {
-    return (str != NULL) && (g_str_has_prefix(str, "ftp://") || g_str_has_prefix(str, "http://") ||
+    return str != NULL && (g_str_has_prefix(str, "ftp://") || g_str_has_prefix(str, "http://") ||
            g_str_has_prefix(str, "https://"));
 }
 
 gboolean gtr_is_magnet_link(char const* str)
 {
-    return (str != NULL) && (g_str_has_prefix(str, "magnet:?"));
+    return str != NULL && g_str_has_prefix(str, "magnet:?");
 }
 
 gboolean gtr_is_hex_hashcode(char const* str)
 {
     int i;
 
-    if (!str || (strlen(str) != 40))
+    if (str == NULL || strlen(str) != 40)
     {
         return FALSE;
     }
@@ -338,7 +338,7 @@ bool gtr_file_trash_or_remove(char const* filename, tr_error** error)
         GError* err = NULL;
         trashed = g_file_trash(file, NULL, &err);
 
-        if (err)
+        if (err != NULL)
         {
             g_message("Unable to trash file \"%s\": %s", filename, err->message);
             tr_error_set_literal(error, err->code, err->message);
@@ -351,7 +351,7 @@ bool gtr_file_trash_or_remove(char const* filename, tr_error** error)
         GError* err = NULL;
         g_file_delete(file, NULL, &err);
 
-        if (err)
+        if (err != NULL)
         {
             g_message("Unable to delete file \"%s\": %s", filename, err->message);
             tr_error_clear(error);
@@ -369,7 +369,7 @@ char const* gtr_get_help_uri(void)
 {
     static char* uri = NULL;
 
-    if (!uri)
+    if (uri == NULL)
     {
         char const* fmt = "https://transmissionbt.com/help/gtk/%d.%dx";
         uri = g_strdup_printf(fmt, MAJOR_VERSION, MINOR_VERSION / 10);
@@ -389,7 +389,7 @@ void gtr_open_file(char const* path)
 
 void gtr_open_uri(char const* uri)
 {
-    if (uri)
+    if (uri != NULL)
     {
         gboolean opened = FALSE;
 
@@ -600,7 +600,7 @@ void gtr_unrecognized_url_dialog(GtkWidget* parent, char const* url)
 
     g_string_append_printf(gstr, _("Transmission doesn't know how to use \"%s\""), url);
 
-    if (gtr_is_magnet_link(url) && (strstr(url, xt) == NULL))
+    if (gtr_is_magnet_link(url) && strstr(url, xt) == NULL)
     {
         g_string_append_printf(gstr, "\n \n");
         g_string_append_printf(gstr, _("This magnet link appears to be intended for something other than BitTorrent. "
@@ -631,7 +631,7 @@ void gtr_paste_clipboard_url_into_entry(GtkWidget* e)
     {
         char* s = text[i];
 
-        if (s && (gtr_is_supported_url(s) || gtr_is_magnet_link(s) || gtr_is_hex_hashcode(s)))
+        if (s != NULL && (gtr_is_supported_url(s) || gtr_is_magnet_link(s) || gtr_is_hex_hashcode(s)))
         {
             gtk_entry_set_text(GTK_ENTRY(e), s);
             break;

@@ -38,7 +38,7 @@ static int testInt(void)
     err = tr_bencParseInt(buf, buf + 4, &end, &val);
     check_int_eq(0, err);
     check_int_eq(64, val);
-    check((buf + 4) == end);
+    check(buf + 4 == end);
 
     /* missing 'e' */
     end = NULL;
@@ -66,14 +66,14 @@ static int testInt(void)
     err = tr_bencParseInt(buf, buf + 4, &end, &val);
     check_int_eq(0, err);
     check_int_eq(-3, val);
-    check((buf + 4) == end);
+    check(buf + 4 == end);
 
     /* zero */
     tr_snprintf((char*)buf, sizeof(buf), "i0e");
     err = tr_bencParseInt(buf, buf + 4, &end, &val);
     check_int_eq(0, err);
     check_int_eq(0, val);
-    check((buf + 3) == end);
+    check(buf + 3 == end);
 
     /* no leading zeroes allowed */
     val = 0;
@@ -103,7 +103,7 @@ static int testStr(void)
     check_uint_eq(0, len);
     check(str == NULL);
     check(end == NULL);
-    check(!len);
+    check(len == 0);
 
     /* good string */
     n = tr_snprintf((char*)buf, sizeof(buf), "4:boat");
@@ -122,14 +122,14 @@ static int testStr(void)
     check_uint_eq(0, len);
     check(str == NULL);
     check(end == NULL);
-    check(!len);
+    check(len == 0);
 
     /* empty string */
     n = tr_snprintf((char*)buf, sizeof(buf), "0:");
     err = tr_bencParseStr(buf, buf + n, &end, &str, &len);
     check_int_eq(0, err);
     check_uint_eq(0, len);
-    check(!*str);
+    check(*str == '\0');
     check(end == buf + 2);
     str = NULL;
     end = NULL;
@@ -162,11 +162,11 @@ static int testString(char const* str, bool isGood)
 
     if (!isGood)
     {
-        check(err);
+        check(err != 0);
     }
     else
     {
-        check(!err);
+        check(err == 0);
 #if 0
         fprintf(stderr, "in: [%s]\n", str);
         fprintf(stderr, "out:\n%s", tr_variantToStr(&val, TR_VARIANT_FMT_JSON, NULL));
@@ -196,7 +196,7 @@ static int testParse(void)
 
     tr_snprintf((char*)buf, sizeof(buf), "i64e");
     err = tr_variantFromBencFull(&val, buf, sizeof(buf), NULL, &end);
-    check(!err);
+    check(err == 0);
     check(tr_variantGetInt(&val, &i));
     check_int_eq(64, i);
     check(end == buf + 4);
@@ -204,7 +204,7 @@ static int testParse(void)
 
     tr_snprintf((char*)buf, sizeof(buf), "li64ei32ei16ee");
     err = tr_variantFromBencFull(&val, buf, sizeof(buf), NULL, &end);
-    check(!err);
+    check(err == 0);
     check(end == buf + strlen((char*)buf));
     check(val.val.l.count == 3);
     check(tr_variantGetInt(&val.val.l.vals[0], &i));
@@ -221,60 +221,60 @@ static int testParse(void)
     end = NULL;
     tr_snprintf((char*)buf, sizeof(buf), "lllee");
     err = tr_variantFromBencFull(&val, buf, sizeof(buf), NULL, &end);
-    check(err);
+    check(err != 0);
     check(end == NULL);
 
     end = NULL;
     tr_snprintf((char*)buf, sizeof(buf), "le");
     err = tr_variantFromBencFull(&val, buf, sizeof(buf), NULL, &end);
-    check(!err);
+    check(err == 0);
     check(end == buf + 2);
     saved = tr_variantToStr(&val, TR_VARIANT_FMT_BENC, &len);
     check_streq("le", saved);
     tr_free(saved);
     tr_variantFree(&val);
 
-    if ((err = testString("llleee", true)))
+    if ((err = testString("llleee", true)) != 0)
     {
         return err;
     }
 
-    if ((err = testString("d3:cow3:moo4:spam4:eggse", true)))
+    if ((err = testString("d3:cow3:moo4:spam4:eggse", true)) != 0)
     {
         return err;
     }
 
-    if ((err = testString("d4:spaml1:a1:bee", true)))
+    if ((err = testString("d4:spaml1:a1:bee", true)) != 0)
     {
         return err;
     }
 
-    if ((err = testString("d5:greenli1ei2ei3ee4:spamd1:ai123e3:keyi214eee", true)))
+    if ((err = testString("d5:greenli1ei2ei3ee4:spamd1:ai123e3:keyi214eee", true)) != 0)
     {
         return err;
     }
 
-    if ((err = testString("d9:publisher3:bob17:publisher-webpage15:www.example.com18:publisher.location4:homee", true)))
+    if ((err = testString("d9:publisher3:bob17:publisher-webpage15:www.example.com18:publisher.location4:homee", true)) != 0)
     {
         return err;
     }
 
-    if ((err = testString("d8:completei1e8:intervali1800e12:min intervali1800e5:peers0:e", true)))
+    if ((err = testString("d8:completei1e8:intervali1800e12:min intervali1800e5:peers0:e", true)) != 0)
     {
         return err;
     }
 
-    if ((err = testString("d1:ai0e1:be", false))) /* odd number of children */
+    if ((err = testString("d1:ai0e1:be", false)) != 0) /* odd number of children */
     {
         return err;
     }
 
-    if ((err = testString("", false)))
+    if ((err = testString("", false)) != 0)
     {
         return err;
     }
 
-    if ((err = testString(" ", false)))
+    if ((err = testString(" ", false)) != 0)
     {
         return err;
     }
@@ -285,10 +285,10 @@ static int testParse(void)
     end = NULL;
     tr_snprintf((char*)buf, sizeof(buf), "lld1:bi32e1:ai64eeee");
     err = tr_variantFromBencFull(&val, buf, sizeof(buf), NULL, &end);
-    check(!err);
+    check(err == 0);
     check(end == buf + strlen((char const*)buf));
-    check((child = tr_variantListChild(&val, 0)));
-    check((child2 = tr_variantListChild(child, 0)));
+    check((child = tr_variantListChild(&val, 0)) != NULL);
+    check((child2 = tr_variantListChild(child, 0)) != NULL);
     saved = tr_variantToStr(&val, TR_VARIANT_FMT_BENC, &len);
     check_streq("lld1:ai64e1:bi32eeee", saved);
     tr_free(saved);
@@ -298,7 +298,7 @@ static int testParse(void)
     end = NULL;
     tr_snprintf((char*)buf, sizeof(buf), "leee");
     err = tr_variantFromBencFull(&val, buf, sizeof(buf), NULL, &end);
-    check(!err);
+    check(err == 0);
     check(end == buf + 2);
     saved = tr_variantToStr(&val, TR_VARIANT_FMT_BENC, &len);
     check_streq("le", saved);
@@ -309,13 +309,13 @@ static int testParse(void)
     end = NULL;
     tr_snprintf((char*)buf, sizeof(buf), "l1:a1:b1:c");
     err = tr_variantFromBencFull(&val, buf, strlen(buf), NULL, &end);
-    check(err);
+    check(err != 0);
 
     /* incomplete string */
     end = NULL;
     tr_snprintf((char*)buf, sizeof(buf), "1:");
     err = tr_variantFromBencFull(&val, buf, strlen(buf), NULL, &end);
-    check(err);
+    check(err != 0);
 
     return 0;
 }
@@ -324,7 +324,7 @@ static void stripWhitespace(char* in)
 {
     char* out;
 
-    for (out = in; in && *in; ++in)
+    for (out = in; in != NULL && *in != '\0'; ++in)
     {
         if (!isspace(*in))
         {
@@ -365,7 +365,7 @@ static int testJSON(void)
     benc_str = "i6e";
     expected = "6";
 
-    if ((val = testJSONSnippet(benc_str, expected)))
+    if ((val = testJSONSnippet(benc_str, expected)) != 0)
     {
         return val;
     }
@@ -373,7 +373,7 @@ static int testJSON(void)
     benc_str = "d5:helloi1e5:worldi2ee";
     expected = "{\"hello\":1,\"world\":2}";
 
-    if ((val = testJSONSnippet(benc_str, expected)))
+    if ((val = testJSONSnippet(benc_str, expected)) != 0)
     {
         return val;
     }
@@ -381,7 +381,7 @@ static int testJSON(void)
     benc_str = "d5:helloi1e5:worldi2e3:fooli1ei2ei3eee";
     expected = "{\"foo\":[1,2,3],\"hello\":1,\"world\":2}";
 
-    if ((val = testJSONSnippet(benc_str, expected)))
+    if ((val = testJSONSnippet(benc_str, expected)) != 0)
     {
         return val;
     }
@@ -389,7 +389,7 @@ static int testJSON(void)
     benc_str = "d5:helloi1e5:worldi2e3:fooli1ei2ei3ed1:ai0eeee";
     expected = "{\"foo\":[1,2,3,{\"a\":0}],\"hello\":1,\"world\":2}";
 
-    if ((val = testJSONSnippet(benc_str, expected)))
+    if ((val = testJSONSnippet(benc_str, expected)) != 0)
     {
         return val;
     }
@@ -397,7 +397,7 @@ static int testJSON(void)
     benc_str = "d4:argsd6:statusle7:status2lee6:result7:successe";
     expected = "{\"args\":{\"status\":[],\"status2\":[]},\"result\":\"success\"}";
 
-    if ((val = testJSONSnippet(benc_str, expected)))
+    if ((val = testJSONSnippet(benc_str, expected)) != 0)
     {
         return val;
     }
@@ -488,7 +488,7 @@ static int testStackSmash(void)
     in[depth * 2] = '\0';
     err = tr_variantFromBencFull(&val, in, depth * 2, NULL, &end);
     check_int_eq(0, err);
-    check(end == in + (depth * 2));
+    check(end == in + depth * 2);
     saved = tr_variantToStr(&val, TR_VARIANT_FMT_BENC, &len);
     check_streq((char*)in, saved);
     tr_free(in);
@@ -523,13 +523,13 @@ static int testBool(void)
     check(tr_variantDictFindBool(&top, key4, &boolVal));
     check(boolVal);
     check(tr_variantDictFindInt(&top, key1, &intVal));
-    check(!intVal);
+    check(intVal == 0);
     check(tr_variantDictFindInt(&top, key2, &intVal));
-    check(!intVal);
+    check(intVal == 0);
     check(tr_variantDictFindInt(&top, key3, &intVal));
-    check(intVal);
+    check(intVal != 0);
     check(tr_variantDictFindInt(&top, key4, &intVal));
-    check(intVal);
+    check(intVal != 0);
 
     tr_variantFree(&top);
     return 0;
@@ -561,7 +561,7 @@ static int testParse2(void)
     benc = tr_variantToStr(&top, TR_VARIANT_FMT_BENC, &len);
     check_streq("d14:this-is-a-booli1e14:this-is-a-real8:0.50000016:this-is-a-string16:this-is-a-string14:this-is-an-int"
         "i1234ee", benc);
-    check(!tr_variantFromBencFull(&top2, benc, len, NULL, &end));
+    check(tr_variantFromBencFull(&top2, benc, len, NULL, &end) == 0);
     check(end == benc + len);
     check(tr_variantIsDict(&top2));
     check(tr_variantDictFindInt(&top, key_int, &intVal));

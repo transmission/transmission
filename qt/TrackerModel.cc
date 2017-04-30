@@ -27,7 +27,7 @@ QVariant TrackerModel::data(QModelIndex const& index, int role) const
 
     int const row = index.row();
 
-    if ((0 <= row) && (row < myRows.size()))
+    if (0 <= row && row < myRows.size())
     {
         TrackerInfo const& trackerInfo = myRows.at(row);
 
@@ -148,7 +148,7 @@ int TrackerModel::find(int torrentId, QString const& url) const
     {
         TrackerInfo const& inf = myRows.at(i);
 
-        if ((inf.torrentId == torrentId) && (url == inf.st.announce))
+        if (inf.torrentId == torrentId && url == inf.st.announce)
         {
             return i;
         }

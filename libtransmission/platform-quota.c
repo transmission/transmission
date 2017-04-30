@@ -120,7 +120,7 @@ static char const* getdev(char const* path)
     }
 
     endmntent(fp);
-    return mnt ? mnt->mnt_fsname : NULL;
+    return mnt != NULL ? mnt->mnt_fsname : NULL;
 
 #endif
 
@@ -132,7 +132,7 @@ static char const* getdev(char const* path)
 
     n = getmntinfo(&mnt, MNT_WAIT);
 
-    if (!n)
+    if (n == 0)
     {
         return NULL;
     }
@@ -145,7 +145,7 @@ static char const* getdev(char const* path)
         }
     }
 
-    return (i < n) ? mnt[i].f_mntfromname : NULL;
+    return i < n ? mnt[i].f_mntfromname : NULL;
 
 #endif
 }
@@ -197,7 +197,7 @@ static char const* getfstype(char const* device)
     }
 
     endmntent(fp);
-    return mnt ? mnt->mnt_type : NULL;
+    return mnt != NULL ? mnt->mnt_type : NULL;
 
 #endif
 
@@ -209,7 +209,7 @@ static char const* getfstype(char const* device)
 
     n = getmntinfo(&mnt, MNT_WAIT);
 
-    if (!n)
+    if (n == 0)
     {
         return NULL;
     }
@@ -222,7 +222,7 @@ static char const* getfstype(char const* device)
         }
     }
 
-    return (i < n) ? mnt[i].f_fstypename : NULL;
+    return i < n ? mnt[i].f_fstypename : NULL;
 
 #endif
 }
@@ -260,7 +260,7 @@ static char const* getblkdev(char const* path)
     return device;
 }
 
-#if defined(__NetBSD__) && (__NetBSD_Version__ >= 600000000)
+#if defined(__NetBSD__) && __NetBSD_Version__ >= 600000000
 
 #include <quota.h>
 
@@ -308,7 +308,7 @@ static int64_t getquota(char const* device)
     quota_close(qh);
 
     freespace = limit - spaceused;
-    return (freespace < 0) ? 0 : freespace;
+    return freespace < 0 ? 0 : freespace;
 }
 
 #else
@@ -378,9 +378,9 @@ static int64_t getquota(char const* device)
         freespace = limit - spaceused;
 
 #ifdef __APPLE__
-        return (freespace < 0) ? 0 : freespace;
+        return freespace < 0 ? 0 : freespace;
 #else
-        return (freespace < 0) ? 0 : freespace * 1024;
+        return freespace < 0 ? 0 : freespace * 1024;
 #endif
     }
 
@@ -420,7 +420,7 @@ static int64_t getxfsquota(char* device)
         }
 
         freespace = limit - (dq.d_bcount >> 1);
-        return (freespace < 0) ? 0 : freespace * 1024;
+        return freespace < 0 ? 0 : freespace * 1024;
     }
 
     /* something went wrong */
@@ -437,7 +437,7 @@ static int64_t tr_getQuotaFreeSpace(struct tr_device_info const* info)
 
 #ifndef _WIN32
 
-    if (info->fstype && !evutil_ascii_strcasecmp(info->fstype, "xfs"))
+    if (info->fstype != NULL && evutil_ascii_strcasecmp(info->fstype, "xfs") == 0)
     {
 #ifdef HAVE_XQM
         ret = getxfsquota(info->device);
@@ -524,7 +524,7 @@ int64_t tr_device_info_get_free_space(struct tr_device_info const* info)
 {
     int64_t free_space;
 
-    if ((info == NULL) || (info->path == NULL))
+    if (info == NULL || info->path == NULL)
     {
         errno = EINVAL;
         free_space = -1;

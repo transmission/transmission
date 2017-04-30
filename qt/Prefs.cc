@@ -216,7 +216,7 @@ Prefs::Prefs(QString const& configDir) :
             break;
 
         default:
-            assert("unhandled type" && 0);
+            assert(false && "unhandled type");
             break;
         }
     }
@@ -284,7 +284,7 @@ Prefs::~Prefs()
             break;
 
         default:
-            assert("unhandled type" && 0);
+            assert(false && "unhandled type");
             break;
         }
     }

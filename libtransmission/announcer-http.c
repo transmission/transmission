@@ -80,7 +80,7 @@ static char* announce_url_new(tr_session const* session, tr_announce_request con
         "&compact=1"
         "&supportcrypto=1",
         req->url,
-        strchr(req->url, '?') ? '&' : '?',
+        strchr(req->url, '?') != NULL ? '&' : '?',
         escaped_info_hash,
         PEER_ID_LEN, PEER_ID_LEN, req->peer_id,
         req->port,
@@ -95,21 +95,21 @@ static char* announce_url_new(tr_session const* session, tr_announce_request con
         evbuffer_add_printf(buf, "&requirecrypto=1");
     }
 
-    if (req->corrupt)
+    if (req->corrupt != 0)
     {
         evbuffer_add_printf(buf, "&corrupt=%" PRIu64, req->corrupt);
     }
 
     str = get_event_string(req);
 
-    if (str && *str)
+    if (str != NULL && *str != '\0')
     {
         evbuffer_add_printf(buf, "&event=%s", str);
     }
 
     str = req->tracker_id_str;
 
-    if (str && *str)
+    if (str != NULL && *str != '\0')
     {
         evbuffer_add_printf(buf, "&trackerid=%s", str);
     }
@@ -125,7 +125,7 @@ static char* announce_url_new(tr_session const* session, tr_announce_request con
 
     ipv6 = tr_globalIPv6();
 
-    if (ipv6)
+    if (ipv6 != NULL)
     {
         char ipv6_readable[INET6_ADDRSTRLEN];
         evutil_inet_ntop(AF_INET6, ipv6, ipv6_readable, INET6_ADDRSTRLEN);
@@ -170,7 +170,7 @@ static tr_pex* listToPex(tr_variant* peerList, size_t* setme_len)
             continue;
         }
 
-        if ((port < 0) || (port > USHRT_MAX))
+        if (port < 0 || port > USHRT_MAX)
         {
             continue;
         }
@@ -234,7 +234,7 @@ static void on_announce_done(tr_session* session, bool did_connect, bool did_tim
     else
     {
         tr_variant benc;
-        bool const variant_loaded = !tr_variantFromBenc(&benc, msg, msglen);
+        bool const variant_loaded = tr_variantFromBenc(&benc, msg, msglen) == 0;
 
         if (tr_env_key_exists("TR_CURL_VERBOSE"))
         {
@@ -407,7 +407,7 @@ static void on_scrape_done(tr_session* session, bool did_connect, bool did_timeo
         tr_variant* flags;
         size_t len;
         char const* str;
-        bool const variant_loaded = !tr_variantFromBenc(&top, msg, msglen);
+        bool const variant_loaded = tr_variantFromBenc(&top, msg, msglen) == 0;
 
         if (tr_env_key_exists("TR_CURL_VERBOSE"))
         {
@@ -509,7 +509,7 @@ static char* scrape_url_new(tr_scrape_request const* req)
     struct evbuffer* buf = evbuffer_new();
 
     evbuffer_add_printf(buf, "%s", req->url);
-    delimiter = strchr(req->url, '?') ? '&' : '?';
+    delimiter = strchr(req->url, '?') != NULL ? '&' : '?';
 
     for (i = 0; i < req->info_hash_count; ++i)
     {

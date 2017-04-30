@@ -51,7 +51,7 @@ static int parseCommandLine(int argc, char const* const* argv)
     int c;
     char const* optarg;
 
-    while ((c = tr_getopt(getUsage(), argc, argv, options, &optarg)))
+    while ((c = tr_getopt(getUsage(), argc, argv, options, &optarg)) != TR_OPT_DONE)
     {
         switch (c)
         {
@@ -109,7 +109,7 @@ static void showInfo(tr_info const* inf)
     printf("  Hash: %s\n", inf->hashString);
     printf("  Created by: %s\n", inf->creator ? inf->creator : "Unknown");
 
-    if (!inf->dateCreated)
+    if (inf->dateCreated == 0)
     {
         printf("  Created on: Unknown\n");
     }
@@ -119,7 +119,7 @@ static void showInfo(tr_info const* inf)
         printf("  Created on: %s", asctime(&tm));
     }
 
-    if (inf->comment && *inf->comment)
+    if (inf->comment != NULL && *inf->comment != '\0')
     {
         printf("  Comment: %s\n", inf->comment);
     }
@@ -221,7 +221,7 @@ static void doScrape(tr_info const* inf)
 
         tr_http_escape_sha1(escaped, inf->hash);
 
-        url = tr_strdup_printf("%s%cinfo_hash=%s", scrape, strchr(scrape, '?') ? '&' : '?', escaped);
+        url = tr_strdup_printf("%s%cinfo_hash=%s", scrape, strchr(scrape, '?') != NULL ? '&' : '?', escaped);
 
         printf("%s ... ", url);
         fflush(stdout);
@@ -231,7 +231,7 @@ static void doScrape(tr_info const* inf)
         curl_easy_setopt(curl, CURLOPT_URL, url);
         curl_easy_setopt(curl, CURLOPT_TIMEOUT, TIMEOUT_SECS);
 
-        if ((res = curl_easy_perform(curl)))
+        if ((res = curl_easy_perform(curl)) != CURLE_OK)
         {
             printf("error: %s\n", curl_easy_strerror(res));
         }
@@ -251,7 +251,7 @@ static void doScrape(tr_info const* inf)
                 bool matched = false;
                 char const* begin = (char const*)evbuffer_pullup(buf, -1);
 
-                if (!tr_variantFromBenc(&top, begin, evbuffer_get_length(buf)))
+                if (tr_variantFromBenc(&top, begin, evbuffer_get_length(buf)) == 0)
                 {
                     if (tr_variantDictFindDict(&top, TR_KEY_files, &files))
                     {
@@ -300,7 +300,7 @@ int tr_main(int argc, char* argv[])
     tr_formatter_size_init(DISK_K, DISK_K_STR, DISK_M_STR, DISK_G_STR, DISK_T_STR);
     tr_formatter_speed_init(SPEED_K, SPEED_K_STR, SPEED_M_STR, SPEED_G_STR, SPEED_T_STR);
 
-    if (parseCommandLine(argc, (char const* const*)argv))
+    if (parseCommandLine(argc, (char const* const*)argv) != 0)
     {
         return EXIT_FAILURE;
     }
@@ -312,7 +312,7 @@ int tr_main(int argc, char* argv[])
     }
 
     /* make sure the user specified a filename */
-    if (!filename)
+    if (filename == NULL)
     {
         fprintf(stderr, "ERROR: No .torrent file specified.\n");
         tr_getopt_usage(MY_NAME, getUsage(), options);
@@ -326,7 +326,7 @@ int tr_main(int argc, char* argv[])
     err = tr_torrentParse(ctor, &inf);
     tr_ctorFree(ctor);
 
-    if (err)
+    if (err != TR_PARSE_OK)
     {
         fprintf(stderr, "Error parsing .torrent file \"%s\"\n", filename);
         return EXIT_FAILURE;

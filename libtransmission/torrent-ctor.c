@@ -129,7 +129,7 @@ int tr_ctorSetMetainfoFromFile(tr_ctor* ctor, char const* filename)
 
     metainfo = tr_loadFile(filename, &len, NULL);
 
-    if (metainfo && len)
+    if (metainfo != NULL && len != 0)
     {
         err = tr_ctorSetMetainfo(ctor, metainfo, len);
     }
@@ -158,7 +158,7 @@ int tr_ctorSetMetainfoFromFile(tr_ctor* ctor, char const* filename)
                 }
             }
 
-            if (!name || !*name)
+            if (name == NULL || *name == '\0')
             {
                 char* base = tr_sys_path_basename(filename, NULL);
 
@@ -182,7 +182,7 @@ int tr_ctorSetMetainfoFromHash(tr_ctor* ctor, char const* hashString)
 
     filename = tr_sessionFindTorrentFile(ctor->session, hashString);
 
-    if (!filename)
+    if (filename == NULL)
     {
         err = EINVAL;
     }
@@ -258,12 +258,12 @@ void tr_ctorSetFilesWanted(tr_ctor* ctor, tr_file_index_t const* files, tr_file_
 
 void tr_ctorInitTorrentWanted(tr_ctor const* ctor, tr_torrent* tor)
 {
-    if (ctor->notWantSize)
+    if (ctor->notWantSize != 0)
     {
         tr_torrentInitFileDLs(tor, ctor->notWant, ctor->notWantSize, false);
     }
 
-    if (ctor->wantSize)
+    if (ctor->wantSize != 0)
     {
         tr_torrentInitFileDLs(tor, ctor->want, ctor->wantSize, true);
     }
@@ -289,7 +289,7 @@ bool tr_ctorGetDeleteSource(tr_ctor const* ctor, bool* setme)
     {
         ret = false;
     }
-    else if (setme)
+    else if (setme != NULL)
     {
         *setme = ctor->doDelete;
     }
@@ -318,7 +318,7 @@ void tr_ctorSetPaused(tr_ctor* ctor, tr_ctorMode mode, bool isPaused)
     struct optional_args* args;
 
     assert(ctor != NULL);
-    assert((mode == TR_FALLBACK) || (mode == TR_FORCE));
+    assert(mode == TR_FALLBACK || mode == TR_FORCE);
     assert(tr_isBool(isPaused));
 
     args = &ctor->optionalArgs[mode];
@@ -331,7 +331,7 @@ void tr_ctorSetPeerLimit(tr_ctor* ctor, tr_ctorMode mode, uint16_t peerLimit)
     struct optional_args* args;
 
     assert(ctor != NULL);
-    assert((mode == TR_FALLBACK) || (mode == TR_FORCE));
+    assert(mode == TR_FALLBACK || mode == TR_FORCE);
 
     args = &ctor->optionalArgs[mode];
     args->isSet_connected = true;
@@ -343,14 +343,14 @@ void tr_ctorSetDownloadDir(tr_ctor* ctor, tr_ctorMode mode, char const* director
     struct optional_args* args;
 
     assert(ctor != NULL);
-    assert((mode == TR_FALLBACK) || (mode == TR_FORCE));
+    assert(mode == TR_FALLBACK || mode == TR_FORCE);
 
     args = &ctor->optionalArgs[mode];
     tr_free(args->downloadDir);
     args->downloadDir = NULL;
     args->isSet_downloadDir = false;
 
-    if (directory && *directory)
+    if (directory != NULL && *directory != '\0')
     {
         args->isSet_downloadDir = true;
         args->downloadDir = tr_strdup(directory);
@@ -372,7 +372,7 @@ bool tr_ctorGetPeerLimit(tr_ctor const* ctor, tr_ctorMode mode, uint16_t* setmeC
     {
         ret = false;
     }
-    else if (setmeCount)
+    else if (setmeCount != NULL)
     {
         *setmeCount = args->peerLimit;
     }
@@ -389,7 +389,7 @@ bool tr_ctorGetPaused(tr_ctor const* ctor, tr_ctorMode mode, bool* setmeIsPaused
     {
         ret = false;
     }
-    else if (setmeIsPaused)
+    else if (setmeIsPaused != NULL)
     {
         *setmeIsPaused = args->isPaused;
     }
@@ -406,7 +406,7 @@ bool tr_ctorGetDownloadDir(tr_ctor const* ctor, tr_ctorMode mode, char const** s
     {
         ret = false;
     }
-    else if (setmeDownloadDir)
+    else if (setmeDownloadDir != NULL)
     {
         *setmeDownloadDir = args->downloadDir;
     }
@@ -438,7 +438,7 @@ bool tr_ctorGetMetainfo(tr_ctor const* ctor, tr_variant const** setme)
     {
         ret = false;
     }
-    else if (setme)
+    else if (setme != NULL)
     {
         *setme = &ctor->metainfo;
     }
@@ -457,7 +457,7 @@ tr_session* tr_ctorGetSession(tr_ctor const* ctor)
 
 static bool isPriority(int i)
 {
-    return (i == TR_PRI_LOW) || (i == TR_PRI_NORMAL) || (i == TR_PRI_HIGH);
+    return i == TR_PRI_LOW || i == TR_PRI_NORMAL || i == TR_PRI_HIGH;
 }
 
 void tr_ctorSetBandwidthPriority(tr_ctor* ctor, tr_priority_t priority)

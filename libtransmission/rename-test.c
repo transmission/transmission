@@ -123,7 +123,7 @@ static tr_torrent* create_torrent_from_base64_metainfo(tr_ctor* ctor, char const
     /* create the torrent */
     err = 0;
     tor = tr_torrentNew(ctor, &err, NULL);
-    assert(!err);
+    assert(err == 0);
 
     /* cleanup */
     tr_free(metainfo);
@@ -352,10 +352,10 @@ static int test_multifile_torrent(void)
     check_streq(expected_files[3], files[3].name);
     check(testFileExistsAndConsistsOfThisString(tor, 1, expected_contents[1]));
     check(testFileExistsAndConsistsOfThisString(tor, 2, expected_contents[2]));
-    check(files[0].is_renamed == false);
-    check(files[1].is_renamed == true);
-    check(files[2].is_renamed == true);
-    check(files[3].is_renamed == false);
+    check(!files[0].is_renamed);
+    check(files[1].is_renamed);
+    check(files[2].is_renamed);
+    check(!files[3].is_renamed);
 
     /* (while the branch is renamed: confirm that the .resume file remembers the changes) */
     tr_torrentSaveResume(tor);
@@ -378,10 +378,10 @@ static int test_multifile_torrent(void)
         check(testFileExistsAndConsistsOfThisString(tor, i, expected_contents[i]));
     }
 
-    check(files[0].is_renamed == false);
-    check(files[1].is_renamed == true);
-    check(files[2].is_renamed == true);
-    check(files[3].is_renamed == false);
+    check(!files[0].is_renamed);
+    check(files[1].is_renamed);
+    check(files[2].is_renamed);
+    check(!files[3].is_renamed);
 
     /***
     ****  Test it an incomplete torrent...
@@ -477,18 +477,18 @@ static int test_multifile_torrent(void)
     /* rename prefix of top */
     check_int_eq(EINVAL, torrentRenameAndWait(tor, "Feli", "FelidaeX"));
     check_streq(tor->info.name, "Felidae");
-    check(files[0].is_renamed == false);
-    check(files[1].is_renamed == false);
-    check(files[2].is_renamed == false);
-    check(files[3].is_renamed == false);
+    check(!files[0].is_renamed);
+    check(!files[1].is_renamed);
+    check(!files[2].is_renamed);
+    check(!files[3].is_renamed);
 
     /* rename false path */
     check_int_eq(EINVAL, torrentRenameAndWait(tor, "Felidae/FelinaeX", "Genus Felinae"));
     check_streq(tor->info.name, "Felidae");
-    check(files[0].is_renamed == false);
-    check(files[1].is_renamed == false);
-    check(files[2].is_renamed == false);
-    check(files[3].is_renamed == false);
+    check(!files[0].is_renamed);
+    check(!files[1].is_renamed);
+    check(!files[2].is_renamed);
+    check(!files[3].is_renamed);
 
     /***
     ****

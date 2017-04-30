@@ -61,7 +61,7 @@ static gboolean onProgressDialogRefresh(gpointer data)
     tr_metainfo_builder const* b = ui->builder;
     GtkDialog* d = GTK_DIALOG(ui->progress_dialog);
     GtkProgressBar* p = GTK_PROGRESS_BAR(ui->progress_bar);
-    double const fraction = b->pieceCount ? ((double)b->pieceIndex / b->pieceCount) : 0;
+    double const fraction = b->pieceCount != 0 ? (double)b->pieceIndex / b->pieceCount : 0;
     char* base = g_path_get_basename(b->top);
 
     /* progress label */
@@ -101,7 +101,7 @@ static gboolean onProgressDialogRefresh(gpointer data)
     }
 
     /* progress bar */
-    if (!b->pieceIndex)
+    if (b->pieceIndex == 0)
     {
         str = g_strdup("");
     }
@@ -240,18 +240,18 @@ static void onResponse(GtkDialog* d, int response, gpointer user_data)
             tracker_text = gtk_text_buffer_get_text(ui->announce_text_buffer, &start, &end, FALSE);
             tracker_strings = g_strsplit(tracker_text, "\n", 0);
 
-            for (i = 0; tracker_strings[i];)
+            for (i = 0; tracker_strings[i] != NULL;)
             {
                 ++i;
             }
 
             trackers = g_new0(tr_tracker_info, i);
 
-            for (i = n = tier = 0; tracker_strings[i]; ++i)
+            for (i = n = tier = 0; tracker_strings[i] != NULL; ++i)
             {
                 char const* str = tracker_strings[i];
 
-                if (!*str)
+                if (*str == '\0')
                 {
                     ++tier;
                 }
@@ -298,7 +298,7 @@ static void updatePiecesLabel(MakeMetaUI* ui)
 
     g_string_append(gstr, "<i>");
 
-    if (!filename)
+    if (filename == NULL)
     {
         g_string_append(gstr, _("No source selected"));
     }
@@ -387,7 +387,7 @@ static void on_drag_data_received(GtkWidget* widget UNUSED, GdkDragContext* drag
     MakeMetaUI* ui = user_data;
     char** uris = gtk_selection_data_get_uris(selection_data);
 
-    if (uris && uris[0])
+    if (uris != NULL && uris[0] != NULL)
     {
         char const* uri = uris[0];
         gchar* filename = g_filename_from_uri(uri, NULL, NULL);

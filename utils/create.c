@@ -53,7 +53,7 @@ static int parseCommandLine(int argc, char const* const* argv)
     int c;
     char const* optarg;
 
-    while ((c = tr_getopt(getUsage(), argc, argv, options, &optarg)))
+    while ((c = tr_getopt(getUsage(), argc, argv, options, &optarg)) != TR_OPT_DONE)
     {
         switch (c)
         {
@@ -84,12 +84,12 @@ static int parseCommandLine(int argc, char const* const* argv)
             break;
 
         case 's':
-            if (optarg)
+            if (optarg != NULL)
             {
                 char* endptr = NULL;
                 piecesize_kib = strtoul(optarg, &endptr, 10);
 
-                if (endptr && *endptr == 'M')
+                if (endptr != NULL && *endptr == 'M')
                 {
                     piecesize_kib *= KiB;
                 }
@@ -136,7 +136,7 @@ int tr_main(int argc, char* argv[])
     tr_formatter_size_init(DISK_K, DISK_K_STR, DISK_M_STR, DISK_G_STR, DISK_T_STR);
     tr_formatter_speed_init(SPEED_K, SPEED_K_STR, SPEED_M_STR, SPEED_G_STR, SPEED_T_STR);
 
-    if (parseCommandLine(argc, (char const* const*)argv))
+    if (parseCommandLine(argc, (char const* const*)argv) != 0)
     {
         return EXIT_FAILURE;
     }
@@ -147,7 +147,7 @@ int tr_main(int argc, char* argv[])
         return EXIT_SUCCESS;
     }
 
-    if (!infile)
+    if (infile == NULL)
     {
         fprintf(stderr, "ERROR: No input file or directory specified.\n");
         tr_getopt_usage(MY_NAME, getUsage(), options);
@@ -174,7 +174,7 @@ int tr_main(int argc, char* argv[])
         tr_free(base);
     }
 
-    if (!trackerCount)
+    if (trackerCount == 0)
     {
         if (isPrivate)
         {

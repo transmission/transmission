@@ -72,7 +72,7 @@ struct tm* tr_localtime_r(time_t const* _clock, struct tm* _result)
 
     struct tm* p = localtime(_clock);
 
-    if (p)
+    if (p != NULL)
     {
         *(_result) = *p;
     }
@@ -124,12 +124,12 @@ int tr_gettimeofday(struct timeval* tv)
 
 void* tr_malloc(size_t size)
 {
-    return size ? malloc(size) : NULL;
+    return size != 0 ? malloc(size) : NULL;
 }
 
 void* tr_malloc0(size_t size)
 {
-    return size ? calloc(1, size) : NULL;
+    return size != 0 ? calloc(1, size) : NULL;
 }
 
 void* tr_realloc(void* p, size_t size)
@@ -167,9 +167,9 @@ char const* tr_strip_positional_args(char const* str)
     static size_t bufsize = 0;
     static char* buf = NULL;
     char const* in = str;
-    size_t const len = str ? strlen(str) : 0;
+    size_t const len = str != NULL ? strlen(str) : 0;
 
-    if (!buf || (bufsize < len))
+    if (buf == NULL || bufsize < len)
     {
         bufsize = len * 2 + 1;
         buf = tr_renew(char, buf, bufsize);
@@ -179,7 +179,7 @@ char const* tr_strip_positional_args(char const* str)
     {
         *out++ = *str;
 
-        if ((*str == '%') && isdigit(str[1]))
+        if (*str == '%' && isdigit(str[1]))
         {
             char const* tmp = str + 1;
 
@@ -194,7 +194,7 @@ char const* tr_strip_positional_args(char const* str)
             }
         }
 
-        if ((*str == '%') && (str[1] == '\''))
+        if (*str == '%' && str[1] == '\'')
         {
             str = str + 1;
         }
@@ -300,7 +300,7 @@ char* tr_buildPath(char const* first_element, ...)
     va_start(vl, first_element);
     element = first_element;
 
-    while (element)
+    while (element != NULL)
     {
         bufLen += strlen(element) + 1;
         element = va_arg(vl, char const*);
@@ -318,7 +318,7 @@ char* tr_buildPath(char const* first_element, ...)
     va_start(vl, first_element);
     element = first_element;
 
-    while (element)
+    while (element != NULL)
     {
         size_t const elementLen = strlen(element);
         memcpy(pch, element, elementLen);
@@ -346,7 +346,7 @@ int64_t tr_getDirFreeSpace(char const* dir)
 {
     int64_t free_space;
 
-    if (!dir || !*dir)
+    if (dir == NULL || *dir == '\0')
     {
         errno = EINVAL;
         free_space = -1;
@@ -395,7 +395,7 @@ char* tr_strndup(void const* in, size_t len)
     {
         out = tr_strdup(in);
     }
-    else if (in)
+    else if (in != NULL)
     {
         out = tr_malloc(len + 1);
 
@@ -416,14 +416,15 @@ char const* tr_memmem(char const* haystack, size_t haystacklen, char const* need
     return memmem(haystack, haystacklen, needle, needlelen);
 
 #else
+
     size_t i;
 
-    if (!needlelen)
+    if (needlelen == 0)
     {
         return haystack;
     }
 
-    if (needlelen > haystacklen || !haystack || !needle)
+    if (needlelen > haystacklen || haystack == NULL || needle == NULL)
     {
         return NULL;
     }
@@ -474,17 +475,17 @@ char const* tr_strerror(int i)
 
 int tr_strcmp0(char const* str1, char const* str2)
 {
-    if (str1 && str2)
+    if (str1 != NULL && str2 != NULL)
     {
         return strcmp(str1, str2);
     }
 
-    if (str1)
+    if (str1 != NULL)
     {
         return 1;
     }
 
-    if (str2)
+    if (str2 != NULL)
     {
         return -1;
     }
@@ -541,7 +542,7 @@ char* tr_strstrip(char* str)
         size_t pos;
         size_t len = strlen(str);
 
-        while (len && isspace(str[len - 1]))
+        while (len != 0 && isspace(str[len - 1]))
         {
             --len;
         }
@@ -564,12 +565,12 @@ bool tr_str_has_suffix(char const* str, char const* suffix)
     size_t str_len;
     size_t suffix_len;
 
-    if (!str)
+    if (str == NULL)
     {
         return false;
     }
 
-    if (!suffix)
+    if (suffix == NULL)
     {
         return true;
     }
@@ -668,7 +669,7 @@ size_t tr_strlcpy(char* dst, void const* src, size_t siz)
             *d = '\0'; /* NUL-terminate dst */
         }
 
-        while (*s++)
+        while (*s++ != '\0')
         {
         }
     }
@@ -1141,7 +1142,7 @@ static char* to_utf8(const char* in, size_t inlen)
     size_t const buflen = inlen * 4 + 10;
     char* out = tr_new(char, buflen);
 
-    for (i = 0; !ret && i < encoding_count; ++i)
+    for (i = 0; ret == NULL && i < encoding_count; ++i)
     {
 #ifdef ICONV_SECOND_ARGUMENT_IS_CONST
         char const* inbuf = in;
@@ -1401,7 +1402,7 @@ static bool parseNumberSection(char const* str, size_t len, struct number_range*
     errno = 0;
     a = b = strtol(tmp, &end, 10);
 
-    if (errno || (end == tmp))
+    if (errno != 0 || end == tmp)
     {
         success = false;
     }
@@ -1414,11 +1415,11 @@ static bool parseNumberSection(char const* str, size_t len, struct number_range*
         char const* pch = end + 1;
         b = strtol(pch, &end, 10);
 
-        if (errno || (pch == end))
+        if (errno != 0 || pch == end)
         {
             success = false;
         }
-        else if (*end) /* trailing data */
+        else if (*end != '\0') /* trailing data */
         {
             success = false;
         }
@@ -1462,12 +1463,12 @@ int* tr_parseNumberRange(char const* str_in, size_t len, int* setmeCount)
 
     walk = str;
 
-    while (walk && *walk && success)
+    while (walk != NULL && *walk != '\0' && success)
     {
         struct number_range range;
         char const* pch = strchr(walk, ',');
 
-        if (pch)
+        if (pch != NULL)
         {
             success = parseNumberSection(walk, (size_t)(pch - walk), &range);
             walk = pch + 1;
@@ -1539,7 +1540,7 @@ int* tr_parseNumberRange(char const* str_in, size_t len, int* setmeCount)
             {
                 for (i = n = 0; i < n2; ++i)
                 {
-                    if (!n || uniq[n - 1] != sorted[i])
+                    if (n == 0 || uniq[n - 1] != sorted[i])
                     {
                         uniq[n++] = sorted[i];
                     }
@@ -1570,9 +1571,9 @@ double tr_truncd(double x, int precision)
     int const max_precision = (int)log10(1.0 / DBL_EPSILON) - 1;
     tr_snprintf(buf, sizeof(buf), "%.*f", max_precision, x);
 
-    if ((pt = strstr(buf, localeconv()->decimal_point)))
+    if ((pt = strstr(buf, localeconv()->decimal_point)) != NULL)
     {
-        pt[precision ? precision + 1 : 0] = '\0';
+        pt[precision != 0 ? precision + 1 : 0] = '\0';
     }
 
     return atof(buf);
@@ -1737,7 +1738,7 @@ void* tr_valloc(size_t bufLen)
     void* buf = NULL;
     static size_t pageSize = 0;
 
-    if (!pageSize)
+    if (pageSize == 0)
     {
 #if defined(HAVE_GETPAGESIZE) && !defined(_WIN32)
         pageSize = (size_t)getpagesize();
@@ -1755,9 +1756,9 @@ void* tr_valloc(size_t bufLen)
 
 #ifdef HAVE_POSIX_MEMALIGN
 
-    if (!buf)
+    if (buf == NULL)
     {
-        if (posix_memalign(&buf, pageSize, allocLen))
+        if (posix_memalign(&buf, pageSize, allocLen) != 0)
         {
             buf = NULL; /* just retry with valloc/malloc */
         }
@@ -1767,14 +1768,14 @@ void* tr_valloc(size_t bufLen)
 
 #ifdef HAVE_VALLOC
 
-    if (!buf)
+    if (buf == NULL)
     {
         buf = valloc(allocLen);
     }
 
 #endif
 
-    if (!buf)
+    if (buf == NULL)
     {
         buf = tr_malloc(allocLen);
     }

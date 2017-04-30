@@ -47,7 +47,7 @@ static int parseCommandLine(int argc, char const* const* argv)
     int c;
     char const* optarg;
 
-    while ((c = tr_getopt(getUsage(), argc, argv, options, &optarg)))
+    while ((c = tr_getopt(getUsage(), argc, argv, options, &optarg)) != TR_OPT_DONE)
     {
         switch (c)
         {
@@ -105,12 +105,12 @@ static bool removeURL(tr_variant* metainfo, char const* url)
         tr_variant* tier;
         int tierIndex = 0;
 
-        while ((tier = tr_variantListChild(announce_list, tierIndex)))
+        while ((tier = tr_variantListChild(announce_list, tierIndex)) != NULL)
         {
             tr_variant* node;
             int nodeIndex = 0;
 
-            while ((node = tr_variantListChild(tier, nodeIndex)))
+            while ((node = tr_variantListChild(tier, nodeIndex)) != NULL)
             {
                 if (tr_variantGetStr(node, &str, NULL) && strcmp(str, url) == 0)
                 {
@@ -149,9 +149,9 @@ static bool removeURL(tr_variant* metainfo, char const* url)
         tr_variant* tier;
         tr_variant* node;
 
-        if ((tier = tr_variantListChild(announce_list, 0)))
+        if ((tier = tr_variantListChild(announce_list, 0)) != NULL)
         {
-            if ((node = tr_variantListChild(tier, 0)))
+            if ((node = tr_variantListChild(tier, 0)) != NULL)
             {
                 if (tr_variantGetStr(node, &str, NULL))
                 {
@@ -172,7 +172,7 @@ static char* replaceSubstr(char const* str, char const* in, char const* out)
     size_t const inlen = strlen(in);
     size_t const outlen = strlen(out);
 
-    while ((walk = strstr(str, in)))
+    while ((walk = strstr(str, in)) != NULL)
     {
         evbuffer_add(buf, str, walk - str);
         evbuffer_add(buf, out, outlen);
@@ -190,7 +190,7 @@ static bool replaceURL(tr_variant* metainfo, char const* in, char const* out)
     tr_variant* announce_list;
     bool changed = false;
 
-    if (tr_variantDictFindStr(metainfo, TR_KEY_announce, &str, NULL) && strstr(str, in))
+    if (tr_variantDictFindStr(metainfo, TR_KEY_announce, &str, NULL) && strstr(str, in) != NULL)
     {
         char* newstr = replaceSubstr(str, in, out);
         printf("\tReplaced in \"announce\": \"%s\" --> \"%s\"\n", str, newstr);
@@ -204,14 +204,14 @@ static bool replaceURL(tr_variant* metainfo, char const* in, char const* out)
         tr_variant* tier;
         int tierCount = 0;
 
-        while ((tier = tr_variantListChild(announce_list, tierCount++)))
+        while ((tier = tr_variantListChild(announce_list, tierCount++)) != NULL)
         {
             tr_variant* node;
             int nodeCount = 0;
 
-            while ((node = tr_variantListChild(tier, nodeCount++)))
+            while ((node = tr_variantListChild(tier, nodeCount++)) != NULL)
             {
-                if (tr_variantGetStr(node, &str, NULL) && strstr(str, in))
+                if (tr_variantGetStr(node, &str, NULL) && strstr(str, in) != NULL)
                 {
                     char* newstr = replaceSubstr(str, in, out);
                     printf("\tReplaced in \"announce-list\" tier %d: \"%s\" --> \"%s\"\n", tierCount, str, newstr);
@@ -232,13 +232,13 @@ static bool announce_list_has_url(tr_variant* announce_list, char const* url)
     tr_variant* tier;
     int tierCount = 0;
 
-    while ((tier = tr_variantListChild(announce_list, tierCount++)))
+    while ((tier = tr_variantListChild(announce_list, tierCount++)) != NULL)
     {
         tr_variant* node;
         char const* str;
         int nodeCount = 0;
 
-        while ((node = tr_variantListChild(tier, nodeCount++)))
+        while ((node = tr_variantListChild(tier, nodeCount++)) != NULL)
         {
             if (tr_variantGetStr(node, &str, NULL) && strcmp(str, url) == 0)
             {
@@ -303,7 +303,7 @@ int tr_main(int argc, char* argv[])
 
     tr_logSetLevel(TR_LOG_ERROR);
 
-    if (parseCommandLine(argc, (char const* const*)argv))
+    if (parseCommandLine(argc, (char const* const*)argv) != 0)
     {
         return EXIT_FAILURE;
     }
@@ -322,7 +322,7 @@ int tr_main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
-    if (!add && !deleteme && !replace[0])
+    if (add == NULL && deleteme == NULL && replace[0] == 0)
     {
         fprintf(stderr, "ERROR: Must specify -a, -d or -r\n");
         tr_getopt_usage(MY_NAME, getUsage(), options);
@@ -356,7 +356,7 @@ int tr_main(int argc, char* argv[])
             changed = addURL(&top, add);
         }
 
-        if (replace[0] && replace[1])
+        if (replace[0] != NULL && replace[1] != NULL)
         {
             changed |= replaceURL(&top, replace[0], replace[1]);
         }

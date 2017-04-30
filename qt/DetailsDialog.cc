@@ -122,7 +122,7 @@ public:
     {
         PeerItem const* i = dynamic_cast<PeerItem const*>(&other);
         QTreeWidget* tw(treeWidget());
-        int const column = tw ? tw->sortColumn() : 0;
+        int const column = tw != nullptr ? tw->sortColumn() : 0;
 
         assert(i != nullptr);
 
@@ -262,7 +262,7 @@ void DetailsDialog::setIds(QSet<int> const& ids)
     {
         Torrent const* tor = myModel.getTorrentFromId(id);
 
-        if (tor)
+        if (tor != nullptr)
         {
             disconnect(tor, SIGNAL(torrentChanged(int)), this, SLOT(onTorrentChanged()));
         }
@@ -277,7 +277,7 @@ void DetailsDialog::setIds(QSet<int> const& ids)
     {
         Torrent const* tor = myModel.getTorrentFromId(id);
 
-        if (tor)
+        if (tor != nullptr)
         {
             connect(tor, SIGNAL(torrentChanged(int)), this, SLOT(onTorrentChanged()));
         }
@@ -412,7 +412,7 @@ void DetailsDialog::refresh()
     {
         Torrent const* tor = myModel.getTorrentFromId(id);
 
-        if (tor)
+        if (tor != nullptr)
         {
             torrents << tor;
         }
@@ -511,16 +511,16 @@ void DetailsDialog::refresh()
             }
         }
 
-        double const d = 100.0 * (sizeWhenDone ? (sizeWhenDone - leftUntilDone) / sizeWhenDone : 1);
+        double const d = 100.0 * (sizeWhenDone != 0 ? (sizeWhenDone - leftUntilDone) / sizeWhenDone : 1);
         QString pct = Formatter::percentToString(d);
 
-        if (!haveUnverified && !leftUntilDone)
+        if (haveUnverified == 0 && leftUntilDone == 0)
         {
             //: Text following the "Have:" label in torrent properties dialog;
             //: %1 is amount of downloaded and verified data
             string = tr("%1 (100%)").arg(Formatter::sizeToString(haveVerified));
         }
-        else if (!haveUnverified)
+        else if (haveUnverified == 0)
         {
             //: Text following the "Have:" label in torrent properties dialog;
             //: %1 is amount of downloaded and verified data,
@@ -578,7 +578,7 @@ void DetailsDialog::refresh()
         QString const dstr = Formatter::sizeToString(d);
         QString const fstr = Formatter::sizeToString(f);
 
-        if (f)
+        if (f != 0)
         {
             string = tr("%1 (%2 corrupt)").arg(dstr).arg(fstr);
         }
@@ -775,7 +775,7 @@ void DetailsDialog::refresh()
             }
         }
 
-        if (!size)
+        if (size == 0)
         {
             string = none;
         }
@@ -1022,7 +1022,7 @@ void DetailsDialog::refresh()
         }
 
         setIfIdle(ui.ratioCombo, uniform ? ui.ratioCombo->findData(baselineInt) : -1);
-        ui.ratioSpin->setVisible(uniform && (baselineInt == TR_RATIOLIMIT_SINGLE));
+        ui.ratioSpin->setVisible(uniform && baselineInt == TR_RATIOLIMIT_SINGLE);
 
         setIfIdle(ui.ratioSpin, baseline.seedRatioLimit());
 
@@ -1040,7 +1040,7 @@ void DetailsDialog::refresh()
         }
 
         setIfIdle(ui.idleCombo, uniform ? ui.idleCombo->findData(baselineInt) : -1);
-        ui.idleSpin->setVisible(uniform && (baselineInt == TR_RATIOLIMIT_SINGLE));
+        ui.idleSpin->setVisible(uniform && baselineInt == TR_RATIOLIMIT_SINGLE);
 
         setIfIdle(ui.idleSpin, baseline.seedIdleLimit());
         onIdleLimitChanged();
@@ -1245,7 +1245,7 @@ void DetailsDialog::onSpinBoxEditingFinished()
     tr_quark const key = spin->property(PREF_KEY).toInt();
     QDoubleSpinBox const* d = qobject_cast<QDoubleSpinBox const*>(spin);
 
-    if (d)
+    if (d != nullptr)
     {
         mySession.torrentSet(myIds, key, d->value());
     }

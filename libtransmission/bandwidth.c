@@ -32,7 +32,7 @@
 
 static unsigned int getSpeed_Bps(struct bratecontrol const* r, unsigned int interval_msec, uint64_t now)
 {
-    if (!now)
+    if (now == 0)
     {
         now = tr_time_msec();
     }
@@ -140,14 +140,14 @@ void tr_bandwidthSetParent(tr_bandwidth* b, tr_bandwidth* parent)
     assert(tr_isBandwidth(b));
     assert(b != parent);
 
-    if (b->parent)
+    if (b->parent != NULL)
     {
         assert(tr_isBandwidth(b->parent));
         tr_ptrArrayRemoveSortedPointer(&b->parent->children, b, compareBandwidth);
         b->parent = NULL;
     }
 
-    if (parent)
+    if (parent != NULL)
     {
         assert(tr_isBandwidth(parent));
         assert(parent->parent != b);
@@ -210,7 +210,7 @@ static void phaseOne(tr_ptrArray* peerArray, tr_direction dir)
      * small chunk of bandwidth. Keep looping until we run out of bandwidth
      * and/or peers that can use it */
     n = peerCount;
-    dbgmsg("%d peers to go round-robin for %s", n, (dir == TR_UP ? "upload" : "download"));
+    dbgmsg("%d peers to go round-robin for %s", n, dir == TR_UP ? "upload" : "download");
 
     while (n > 0)
     {
@@ -304,7 +304,7 @@ void tr_bandwidthAllocate(tr_bandwidth* b, tr_direction dir, unsigned int period
 void tr_bandwidthSetPeer(tr_bandwidth* b, tr_peerIo* peer)
 {
     assert(tr_isBandwidth(b));
-    assert((peer == NULL) || tr_isPeerIo(peer));
+    assert(peer == NULL || tr_isPeerIo(peer));
 
     b->peer = peer;
 }
@@ -318,7 +318,7 @@ static unsigned int bandwidthClamp(tr_bandwidth const* b, uint64_t now, tr_direc
     assert(tr_isBandwidth(b));
     assert(tr_isDirection(dir));
 
-    if (b)
+    if (b != NULL)
     {
         if (b->band[dir].isLimited)
         {
@@ -356,7 +356,7 @@ static unsigned int bandwidthClamp(tr_bandwidth const* b, uint64_t now, tr_direc
             }
         }
 
-        if (b->parent && b->band[dir].honorParentLimits && (byteCount > 0))
+        if (b->parent != NULL && b->band[dir].honorParentLimits && byteCount > 0)
         {
             byteCount = bandwidthClamp(b->parent, now, dir, byteCount);
         }
@@ -402,10 +402,10 @@ void tr_bandwidthUsed(tr_bandwidth* b, tr_direction dir, size_t byteCount, bool 
 
 #ifdef DEBUG_DIRECTION
 
-    if ((dir == DEBUG_DIRECTION) && (band->isLimited))
+    if (dir == DEBUG_DIRECTION && band->isLimited)
     {
         fprintf(stderr, "%p consumed %5zu bytes of %5s data... was %6zu, now %6zu left\n", b, byteCount,
-            (isPieceData ? "piece" : "raw"), oldBytesLeft, band->bytesLeft);
+            isPieceData ? "piece" : "raw", oldBytesLeft, band->bytesLeft);
     }
 
 #endif

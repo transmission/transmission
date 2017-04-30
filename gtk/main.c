@@ -201,7 +201,7 @@ static void get_selected_torrent_counts_foreach(GtkTreeModel* model, GtkTreePath
 
     gtk_tree_model_get(model, iter, MC_ACTIVITY, &activity, -1);
 
-    if ((activity == TR_STATUS_DOWNLOAD_WAIT) || (activity == TR_STATUS_SEED_WAIT))
+    if (activity == TR_STATUS_DOWNLOAD_WAIT || activity == TR_STATUS_SEED_WAIT)
     {
         ++counts->queued_count;
     }
@@ -278,7 +278,7 @@ static void refresh_actions_soon(gpointer gdata)
 {
     struct cbdata* data = gdata;
 
-    if (!data->is_closing && !data->refresh_actions_tag)
+    if (!data->is_closing && data->refresh_actions_tag == 0)
     {
         data->refresh_actions_tag = gdk_threads_add_idle(refresh_actions, data);
     }
@@ -330,7 +330,7 @@ static void ensure_magnet_handler_exists(void)
 static void on_main_window_size_allocated(GtkWidget* gtk_window, GtkAllocation* alloc UNUSED, gpointer gdata UNUSED)
 {
     GdkWindow* gdk_window = gtk_widget_get_window(gtk_window);
-    gboolean const isMaximized = (gdk_window != NULL) && (gdk_window_get_state(gdk_window) & GDK_WINDOW_STATE_MAXIMIZED);
+    gboolean const isMaximized = gdk_window != NULL && (gdk_window_get_state(gdk_window) & GDK_WINDOW_STATE_MAXIMIZED) != 0;
 
     gtr_pref_int_set(TR_KEY_main_window_is_maximized, isMaximized);
 
@@ -369,7 +369,7 @@ static gboolean on_rpc_changed_idle(gpointer gdata)
         break;
 
     case TR_RPC_TORRENT_ADDED:
-        if ((tor = gtr_core_find_torrent(data->core, data->torrent_id)))
+        if ((tor = gtr_core_find_torrent(data->core, data->torrent_id)) != NULL)
         {
             gtr_core_add_torrent(data->core, tor, true);
         }
@@ -402,7 +402,7 @@ static gboolean on_rpc_changed_idle(gpointer gdata)
                 bool changed;
                 tr_variant* oldval = tr_variantDictFind(oldvals, key);
 
-                if (!oldval)
+                if (oldval == NULL)
                 {
                     changed = true;
                 }
@@ -475,7 +475,7 @@ static void signal_handler(int sig)
         signal(sig, SIG_DFL);
         raise(sig);
     }
-    else if ((sig == SIGINT) || (sig == SIGTERM))
+    else if (sig == SIGINT || sig == SIGTERM)
     {
         g_message(_("Got signal %d; trying to shut down cleanly. Do it again if it gets stuck."), sig);
         gtr_actions_handler("quit", sighandler_cbdata);
@@ -504,12 +504,12 @@ static void on_startup(GApplication* application, gpointer user_data)
     sighandler_cbdata = cbdata;
 
     /* ensure the directories are created */
-    if ((str = gtr_pref_string_get(TR_KEY_download_dir)))
+    if ((str = gtr_pref_string_get(TR_KEY_download_dir)) != NULL)
     {
         g_mkdir_with_parents(str, 0777);
     }
 
-    if ((str = gtr_pref_string_get(TR_KEY_incomplete_dir)))
+    if ((str = gtr_pref_string_get(TR_KEY_incomplete_dir)) != NULL)
     {
         g_mkdir_with_parents(str, 0777);
     }
@@ -564,7 +564,7 @@ static void on_activate(GApplication* app UNUSED, struct cbdata* cbdata)
     /* GApplication emits an 'activate' signal when bootstrapping the primary.
      * Ordinarily we handle that by presenting the main window, but if the user
      * user started Transmission minimized, ignore that initial signal... */
-    if (cbdata->is_iconified && (cbdata->activation_count == 1))
+    if (cbdata->is_iconified && cbdata->activation_count == 1)
     {
         return;
     }
@@ -890,19 +890,19 @@ static gboolean on_session_closed(gpointer gdata)
     g_slist_foreach(tmp, (GFunc)gtk_widget_destroy, NULL);
     g_slist_free(tmp);
 
-    if (cbdata->prefs)
+    if (cbdata->prefs != NULL)
     {
         gtk_widget_destroy(GTK_WIDGET(cbdata->prefs));
     }
 
-    if (cbdata->wind)
+    if (cbdata->wind != NULL)
     {
         gtk_widget_destroy(GTK_WIDGET(cbdata->wind));
     }
 
     g_object_unref(cbdata->core);
 
-    if (cbdata->icon)
+    if (cbdata->icon != NULL)
     {
         g_object_unref(cbdata->icon);
     }
@@ -952,14 +952,14 @@ static void on_app_exit(gpointer vdata)
     cbdata->is_closing = true;
 
     /* stop the update timer */
-    if (cbdata->timer)
+    if (cbdata->timer != 0)
     {
         g_source_remove(cbdata->timer);
         cbdata->timer = 0;
     }
 
     /* stop the refresh-actions timer */
-    if (cbdata->refresh_actions_tag)
+    if (cbdata->refresh_actions_tag != 0)
     {
         g_source_remove(cbdata->refresh_actions_tag);
         cbdata->refresh_actions_tag = 0;
@@ -1037,13 +1037,13 @@ static void show_torrent_errors(GtkWindow* window, char const* primary, GSList**
 
 static void flush_torrent_errors(struct cbdata* cbdata)
 {
-    if (cbdata->error_list)
+    if (cbdata->error_list != NULL)
     {
         show_torrent_errors(cbdata->wind, ngettext("Couldn't add corrupt torrent", "Couldn't add corrupt torrents",
             g_slist_length(cbdata->error_list)), &cbdata->error_list);
     }
 
-    if (cbdata->duplicates_list)
+    if (cbdata->duplicates_list != NULL)
     {
         show_torrent_errors(cbdata->wind, ngettext("Couldn't add duplicate torrent", "Couldn't add duplicate torrents",
             g_slist_length(cbdata->duplicates_list)), &cbdata->duplicates_list);
@@ -1076,7 +1076,7 @@ static gboolean on_main_window_focus_in(GtkWidget* widget UNUSED, GdkEventFocus*
 {
     struct cbdata* cbdata = gdata;
 
-    if (cbdata->wind)
+    if (cbdata->wind != NULL)
     {
         gtk_window_set_urgency_hint(cbdata->wind, FALSE);
     }
@@ -1091,7 +1091,7 @@ static void on_add_torrent(TrCore* core, tr_ctor* ctor, gpointer gdata)
 
     g_signal_connect(w, "focus-in-event", G_CALLBACK(on_main_window_focus_in), cbdata);
 
-    if (cbdata->wind)
+    if (cbdata->wind != NULL)
     {
         gtk_window_set_urgency_hint(cbdata->wind, TRUE);
     }
@@ -1134,11 +1134,11 @@ static void on_prefs_changed(TrCore* core UNUSED, tr_quark const key, gpointer d
         {
             bool const show = gtr_pref_flag_get(key);
 
-            if (show && !cbdata->icon)
+            if (show && cbdata->icon == NULL)
             {
                 cbdata->icon = gtr_icon_new(cbdata->core);
             }
-            else if (!show && cbdata->icon)
+            else if (!show && cbdata->icon != NULL)
             {
                 g_clear_object(&cbdata->icon);
             }
@@ -1341,7 +1341,7 @@ static void update_model_soon(gpointer gdata)
 
 static gboolean update_model_loop(gpointer gdata)
 {
-    gboolean const done = global_sigcount;
+    gboolean const done = global_sigcount != 0;
 
     if (!done)
     {
@@ -1606,7 +1606,7 @@ void gtr_actions_handler(char const* action_name, gpointer user_data)
     }
     else if (g_strcmp0(action_name, "edit-preferences") == 0)
     {
-        if (NULL == data->prefs)
+        if (data->prefs == NULL)
         {
             data->prefs = gtr_prefs_dialog_new(data->wind, G_OBJECT(data->core));
             g_signal_connect(data->prefs, "destroy", G_CALLBACK(gtk_widget_destroyed), &data->prefs);
@@ -1616,7 +1616,7 @@ void gtr_actions_handler(char const* action_name, gpointer user_data)
     }
     else if (g_strcmp0(action_name, "toggle-message-log") == 0)
     {
-        if (!data->msgwin)
+        if (data->msgwin == NULL)
         {
             GtkWidget* win = gtr_message_log_window_new(data->wind, data->core);
             g_signal_connect(win, "destroy", G_CALLBACK(on_message_window_closed), NULL);

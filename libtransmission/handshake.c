@@ -186,9 +186,9 @@ static bool buildHandshakeMessage(tr_handshake* handshake, uint8_t* buf)
     tr_torrent* tor;
     bool success;
 
-    if ((torrentHash = tr_cryptoGetTorrentHash(handshake->crypto)))
+    if ((torrentHash = tr_cryptoGetTorrentHash(handshake->crypto)) != NULL)
     {
-        if ((tor = tr_torrentFindFromHash(handshake->session, torrentHash)))
+        if ((tor = tr_torrentFindFromHash(handshake->session, torrentHash)) != NULL)
         {
             peer_id = tr_torrentGetPeerId(tor);
         }
@@ -321,7 +321,7 @@ static void sendYa(tr_handshake* handshake)
     /* add our public key (Ya) */
     public_key = tr_cryptoGetMyPublicKey(handshake->crypto, &len);
     assert(len == KEY_LEN);
-    assert(public_key);
+    assert(public_key != NULL);
     memcpy(walk, public_key, len);
     walk += len;
 
@@ -556,7 +556,7 @@ static ReadState readCryptoSelect(tr_handshake* handshake, struct evbuffer* inbu
     handshake->crypto_select = crypto_select;
     dbgmsg(handshake, "crypto select is %d", (int)crypto_select);
 
-    if (!(crypto_select & getCryptoProvide(handshake)))
+    if ((crypto_select & getCryptoProvide(handshake)) == 0)
     {
         dbgmsg(handshake, "peer selected an encryption option we didn't offer");
         return tr_handshakeDone(handshake, false);
@@ -742,7 +742,7 @@ static ReadState readPeerId(tr_handshake* handshake, struct evbuffer* inbuf)
 
     /* if we've somehow connected to ourselves, don't keep the connection */
     tor = tr_torrentFindFromHash(handshake->session, tr_peerIoGetTorrentHash(handshake->io));
-    connected_to_self = (tor != NULL) && memcmp(peer_id, tr_torrentGetPeerId(tor), PEER_ID_LEN) == 0;
+    connected_to_self = tor != NULL && memcmp(peer_id, tr_torrentGetPeerId(tor), PEER_ID_LEN) == 0;
 
     return tr_handshakeDone(handshake, !connected_to_self);
 }
@@ -938,7 +938,7 @@ static ReadState readIA(tr_handshake* handshake, struct evbuffer* inbuf)
     /* send crypto_select */
     crypto_select = getCryptoSelect(handshake, handshake->crypto_provide);
 
-    if (crypto_select)
+    if (crypto_select != 0)
     {
         dbgmsg(handshake, "selecting crypto mode '%d'", (int)crypto_select);
         evbuffer_add_uint32(outbuf, crypto_select);
@@ -1115,7 +1115,7 @@ static ReadState canRead(struct tr_peerIo* io, void* arg, size_t* piece)
 
 static bool fireDoneFunc(tr_handshake* handshake, bool isConnected)
 {
-    uint8_t const* peer_id = isConnected && handshake->havePeerID ? tr_peerIoGetPeersId(handshake->io) : NULL;
+    uint8_t const* peer_id = (isConnected && handshake->havePeerID) ? tr_peerIoGetPeersId(handshake->io) : NULL;
     bool const success = (*handshake->doneCB)(handshake, handshake->io, handshake->haveReadAnythingFromPeer, isConnected,
         peer_id, handshake->doneUserData);
 
@@ -1124,7 +1124,7 @@ static bool fireDoneFunc(tr_handshake* handshake, bool isConnected)
 
 static void tr_handshakeFree(tr_handshake* handshake)
 {
-    if (handshake->io)
+    if (handshake->io != NULL)
     {
         tr_peerIoUnref(handshake->io); /* balanced by the ref in tr_handshakeNew */
     }
@@ -1160,7 +1160,7 @@ static void gotError(tr_peerIo* io, short what, void* vhandshake)
     int errcode = errno;
     tr_handshake* handshake = vhandshake;
 
-    if (io->utp_socket && !io->isIncoming && handshake->state == AWAITING_YB)
+    if (io->utp_socket != NULL && !io->isIncoming && handshake->state == AWAITING_YB)
     {
         /* This peer probably doesn't speak uTP. */
 
@@ -1194,8 +1194,8 @@ static void gotError(tr_peerIo* io, short what, void* vhandshake)
     /* if the error happened while we were sending a public key, we might
      * have encountered a peer that doesn't do encryption... reconnect and
      * try a plaintext handshake */
-    if (((handshake->state == AWAITING_YB) || (handshake->state == AWAITING_VC)) &&
-        (handshake->encryptionMode != TR_ENCRYPTION_REQUIRED) && (!tr_peerIoReconnect(handshake->io)))
+    if ((handshake->state == AWAITING_YB || handshake->state == AWAITING_VC) &&
+        handshake->encryptionMode != TR_ENCRYPTION_REQUIRED && tr_peerIoReconnect(handshake->io) == 0)
     {
         uint8_t msg[HANDSHAKE_SIZE];
 

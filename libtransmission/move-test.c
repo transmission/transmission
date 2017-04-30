@@ -130,7 +130,7 @@ static int test_incomplete_dir_impl(char const* incomplete_dir, char const* down
     libttest_blockingTorrentVerify(tor);
     check_uint_eq(0, tr_torrentStat(tor)->leftUntilDone);
 
-    while ((completeness == completeness_unset) && (time(NULL) <= deadline))
+    while (completeness == completeness_unset && time(NULL) <= deadline)
     {
         tr_wait_msec(50);
     }
@@ -153,19 +153,19 @@ static int test_incomplete_dir(void)
     int rv;
 
     /* test what happens when incompleteDir is a subdir of downloadDir*/
-    if ((rv = test_incomplete_dir_impl("Downloads/Incomplete", "Downloads")))
+    if ((rv = test_incomplete_dir_impl("Downloads/Incomplete", "Downloads")) != 0)
     {
         return rv;
     }
 
     /* test what happens when downloadDir is a subdir of incompleteDir */
-    if ((rv = test_incomplete_dir_impl("Downloads", "Downloads/Complete")))
+    if ((rv = test_incomplete_dir_impl("Downloads", "Downloads/Complete")) != 0)
     {
         return rv;
     }
 
     /* test what happens when downloadDir and incompleteDir are siblings */
-    if ((rv = test_incomplete_dir_impl("Incomplete", "Downloads")))
+    if ((rv = test_incomplete_dir_impl("Incomplete", "Downloads")) != 0)
     {
         return rv;
     }

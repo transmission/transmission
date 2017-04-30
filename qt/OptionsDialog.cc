@@ -170,7 +170,7 @@ void OptionsDialog::reload()
     }
 
     int const err = tr_torrentParse(ctor, &myInfo);
-    myHaveInfo = !err;
+    myHaveInfo = err == 0;
     tr_ctorFree(ctor);
 
     ui.filesView->clear();
@@ -410,7 +410,7 @@ void OptionsDialog::onTimeout()
 
     tr_file const* file = &myInfo.files[myVerifyFileIndex];
 
-    if (!myVerifyFilePos && !myVerifyFile.isOpen())
+    if (myVerifyFilePos == 0 && !myVerifyFile.isOpen())
     {
         QFileInfo const fileInfo(myLocalDestination, QString::fromUtf8(file->name));
         myVerifyFile.setFileName(fileInfo.absoluteFilePath());
@@ -482,7 +482,7 @@ void OptionsDialog::onTimeout()
             have += f.have;
         }
 
-        if (!have) // everything failed
+        if (have == 0) // everything failed
         {
             // did the user accidentally specify the child directory instead of the parent?
             QStringList const tokens = QString::fromUtf8(file->name).split(QLatin1Char('/'));

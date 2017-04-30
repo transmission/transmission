@@ -132,7 +132,7 @@ static uint64_t loadDND(tr_variant* dict, tr_torrent* tor)
     tr_variant* list = NULL;
     tr_file_index_t const n = tor->info.fileCount;
 
-    if (tr_variantDictFindList(dict, TR_KEY_dnd, &list) && (tr_variantListSize(list) == n))
+    if (tr_variantDictFindList(dict, TR_KEY_dnd, &list) && tr_variantListSize(list) == n)
     {
         int64_t tmp;
         tr_file_index_t* dl = tr_new(tr_file_index_t, n);
@@ -141,7 +141,7 @@ static uint64_t loadDND(tr_variant* dict, tr_torrent* tor)
 
         for (i = 0; i < n; ++i)
         {
-            if (tr_variantGetInt(tr_variantListChild(list, i), &tmp) && tmp)
+            if (tr_variantGetInt(tr_variantListChild(list, i), &tmp) && tmp != 0)
             {
                 dnd[dndCount++] = i;
             }
@@ -151,13 +151,13 @@ static uint64_t loadDND(tr_variant* dict, tr_torrent* tor)
             }
         }
 
-        if (dndCount)
+        if (dndCount != 0)
         {
             tr_torrentInitFileDLs(tor, dnd, dndCount, false);
             tr_logAddTorDbg(tor, "Resume file found %d files listed as dnd", dndCount);
         }
 
-        if (dlCount)
+        if (dlCount != 0)
         {
             tr_torrentInitFileDLs(tor, dl, dlCount, true);
             tr_logAddTorDbg(tor, "Resume file found %d files marked for download", dlCount);
@@ -201,7 +201,7 @@ static uint64_t loadFilePriorities(tr_variant* dict, tr_torrent* tor)
     uint64_t ret = 0;
     tr_file_index_t const n = tor->info.fileCount;
 
-    if (tr_variantDictFindList(dict, TR_KEY_priority, &list) && (tr_variantListSize(list) == n))
+    if (tr_variantDictFindList(dict, TR_KEY_priority, &list) && tr_variantListSize(list) == n)
     {
         int64_t priority;
         tr_file_index_t i;
@@ -422,7 +422,7 @@ static uint64_t loadFilenames(tr_variant* dict, tr_torrent* tor)
             char const* str;
             size_t str_len;
 
-            if (tr_variantGetStr(tr_variantListChild(list, i), &str, &str_len) && str && str_len)
+            if (tr_variantGetStr(tr_variantListChild(list, i), &str, &str_len) && str != NULL && str_len != 0)
             {
                 tr_free(files[i].name);
                 files[i].name = tr_strndup(str, str_len);
@@ -485,7 +485,7 @@ static void saveProgress(tr_variant* dict, tr_torrent* tor)
         /* get the oldest and newest nonzero timestamps for pieces in this file */
         for (p = &inf->pieces[f->firstPiece], pend = &inf->pieces[f->lastPiece]; p != pend; ++p)
         {
-            if (!p->timeChecked)
+            if (p->timeChecked == 0)
             {
                 has_zero = true;
             }
@@ -509,7 +509,7 @@ static void saveProgress(tr_variant* dict, tr_torrent* tor)
            only a single timestamp is saved for the file if *all* or *none*
            of the pieces were tested more recently than the file's mtime. */
 
-        if (!has_zero && (mtime <= oldest_nonzero)) /* all checked */
+        if (!has_zero && mtime <= oldest_nonzero) /* all checked */
         {
             tr_variantListAddInt(l, oldest_nonzero);
         }
@@ -525,7 +525,7 @@ static void saveProgress(tr_variant* dict, tr_torrent* tor)
 
             for (p = &inf->pieces[f->firstPiece], pend = &inf->pieces[f->lastPiece] + 1; p != pend; ++p)
             {
-                tr_variantListAddInt(ll, p->timeChecked ? p->timeChecked - offset : 0);
+                tr_variantListAddInt(ll, p->timeChecked != 0 ? p->timeChecked - offset : 0);
             }
         }
     }
@@ -606,7 +606,7 @@ static uint64_t loadProgress(tr_variant* dict, tr_torrent* tor)
                     {
                         int64_t t = 0;
                         tr_variantGetInt(tr_variantListChild(b, i + 1), &t);
-                        inf->pieces[f->firstPiece + i].timeChecked = (time_t)(t ? t + offset : 0);
+                        inf->pieces[f->firstPiece + i].timeChecked = (time_t)(t != 0 ? t + offset : 0);
                     }
                 }
             }
@@ -642,7 +642,7 @@ static uint64_t loadProgress(tr_variant* dict, tr_torrent* tor)
         err = NULL;
         tr_bitfieldConstruct(&blocks, tor->blockCount);
 
-        if ((b = tr_variantDictFind(prog, TR_KEY_blocks)))
+        if ((b = tr_variantDictFind(prog, TR_KEY_blocks)) != NULL)
         {
             size_t buflen;
             uint8_t const* buf;
@@ -751,7 +751,7 @@ void tr_torrentSaveResume(tr_torrent* tor)
 
     filename = getResumeFilename(tor);
 
-    if ((err = tr_variantToFile(&top, TR_VARIANT_FMT_BENC, filename)))
+    if ((err = tr_variantToFile(&top, TR_VARIANT_FMT_BENC, filename)) != 0)
     {
         tr_torrentSetLocalError(tor, "Unable to save resume file: %s", tr_strerror(err));
     }
@@ -788,14 +788,14 @@ static uint64_t loadFromFile(tr_torrent* tor, uint64_t fieldsToLoad)
 
     tr_logAddTorDbg(tor, "Read resume file \"%s\"", filename);
 
-    if ((fieldsToLoad & TR_FR_CORRUPT) && tr_variantDictFindInt(&top, TR_KEY_corrupt, &i))
+    if ((fieldsToLoad & TR_FR_CORRUPT) != 0 && tr_variantDictFindInt(&top, TR_KEY_corrupt, &i))
     {
         tor->corruptPrev = i;
         fieldsLoaded |= TR_FR_CORRUPT;
     }
 
-    if ((fieldsToLoad & (TR_FR_PROGRESS | TR_FR_DOWNLOAD_DIR)) &&
-        (tr_variantDictFindStr(&top, TR_KEY_destination, &str, &len)) && (str && *str))
+    if ((fieldsToLoad & (TR_FR_PROGRESS | TR_FR_DOWNLOAD_DIR)) != 0 &&
+        tr_variantDictFindStr(&top, TR_KEY_destination, &str, &len) && str != NULL && *str != '\0')
     {
         bool const is_current_dir = tor->currentDir == tor->downloadDir;
         tr_free(tor->downloadDir);
@@ -809,8 +809,8 @@ static uint64_t loadFromFile(tr_torrent* tor, uint64_t fieldsToLoad)
         fieldsLoaded |= TR_FR_DOWNLOAD_DIR;
     }
 
-    if ((fieldsToLoad & (TR_FR_PROGRESS | TR_FR_INCOMPLETE_DIR)) &&
-        (tr_variantDictFindStr(&top, TR_KEY_incomplete_dir, &str, &len)) && (str && *str))
+    if ((fieldsToLoad & (TR_FR_PROGRESS | TR_FR_INCOMPLETE_DIR)) != 0 &&
+        tr_variantDictFindStr(&top, TR_KEY_incomplete_dir, &str, &len) && str != NULL && *str != '\0')
     {
         bool const is_current_dir = tor->currentDir == tor->incompleteDir;
         tr_free(tor->incompleteDir);
@@ -824,108 +824,108 @@ static uint64_t loadFromFile(tr_torrent* tor, uint64_t fieldsToLoad)
         fieldsLoaded |= TR_FR_INCOMPLETE_DIR;
     }
 
-    if ((fieldsToLoad & TR_FR_DOWNLOADED) && tr_variantDictFindInt(&top, TR_KEY_downloaded, &i))
+    if ((fieldsToLoad & TR_FR_DOWNLOADED) != 0 && tr_variantDictFindInt(&top, TR_KEY_downloaded, &i))
     {
         tor->downloadedPrev = i;
         fieldsLoaded |= TR_FR_DOWNLOADED;
     }
 
-    if ((fieldsToLoad & TR_FR_UPLOADED) && tr_variantDictFindInt(&top, TR_KEY_uploaded, &i))
+    if ((fieldsToLoad & TR_FR_UPLOADED) != 0 && tr_variantDictFindInt(&top, TR_KEY_uploaded, &i))
     {
         tor->uploadedPrev = i;
         fieldsLoaded |= TR_FR_UPLOADED;
     }
 
-    if ((fieldsToLoad & TR_FR_MAX_PEERS) && tr_variantDictFindInt(&top, TR_KEY_max_peers, &i))
+    if ((fieldsToLoad & TR_FR_MAX_PEERS) != 0 && tr_variantDictFindInt(&top, TR_KEY_max_peers, &i))
     {
         tor->maxConnectedPeers = i;
         fieldsLoaded |= TR_FR_MAX_PEERS;
     }
 
-    if ((fieldsToLoad & TR_FR_RUN) && tr_variantDictFindBool(&top, TR_KEY_paused, &boolVal))
+    if ((fieldsToLoad & TR_FR_RUN) != 0 && tr_variantDictFindBool(&top, TR_KEY_paused, &boolVal))
     {
         tor->isRunning = !boolVal;
         fieldsLoaded |= TR_FR_RUN;
     }
 
-    if ((fieldsToLoad & TR_FR_ADDED_DATE) && tr_variantDictFindInt(&top, TR_KEY_added_date, &i))
+    if ((fieldsToLoad & TR_FR_ADDED_DATE) != 0 && tr_variantDictFindInt(&top, TR_KEY_added_date, &i))
     {
         tor->addedDate = i;
         fieldsLoaded |= TR_FR_ADDED_DATE;
     }
 
-    if ((fieldsToLoad & TR_FR_DONE_DATE) && tr_variantDictFindInt(&top, TR_KEY_done_date, &i))
+    if ((fieldsToLoad & TR_FR_DONE_DATE) != 0 && tr_variantDictFindInt(&top, TR_KEY_done_date, &i))
     {
         tor->doneDate = i;
         fieldsLoaded |= TR_FR_DONE_DATE;
     }
 
-    if ((fieldsToLoad & TR_FR_ACTIVITY_DATE) && tr_variantDictFindInt(&top, TR_KEY_activity_date, &i))
+    if ((fieldsToLoad & TR_FR_ACTIVITY_DATE) != 0 && tr_variantDictFindInt(&top, TR_KEY_activity_date, &i))
     {
         tr_torrentSetActivityDate(tor, i);
         fieldsLoaded |= TR_FR_ACTIVITY_DATE;
     }
 
-    if ((fieldsToLoad & TR_FR_TIME_SEEDING) && tr_variantDictFindInt(&top, TR_KEY_seeding_time_seconds, &i))
+    if ((fieldsToLoad & TR_FR_TIME_SEEDING) != 0 && tr_variantDictFindInt(&top, TR_KEY_seeding_time_seconds, &i))
     {
         tor->secondsSeeding = i;
         fieldsLoaded |= TR_FR_TIME_SEEDING;
     }
 
-    if ((fieldsToLoad & TR_FR_TIME_DOWNLOADING) && tr_variantDictFindInt(&top, TR_KEY_downloading_time_seconds, &i))
+    if ((fieldsToLoad & TR_FR_TIME_DOWNLOADING) != 0 && tr_variantDictFindInt(&top, TR_KEY_downloading_time_seconds, &i))
     {
         tor->secondsDownloading = i;
         fieldsLoaded |= TR_FR_TIME_DOWNLOADING;
     }
 
-    if ((fieldsToLoad & TR_FR_BANDWIDTH_PRIORITY) &&
+    if ((fieldsToLoad & TR_FR_BANDWIDTH_PRIORITY) != 0 &&
         tr_variantDictFindInt(&top, TR_KEY_bandwidth_priority, &i) && tr_isPriority(i))
     {
         tr_torrentSetPriority(tor, i);
         fieldsLoaded |= TR_FR_BANDWIDTH_PRIORITY;
     }
 
-    if (fieldsToLoad & TR_FR_PEERS)
+    if ((fieldsToLoad & TR_FR_PEERS) != 0)
     {
         fieldsLoaded |= loadPeers(&top, tor);
     }
 
-    if (fieldsToLoad & TR_FR_FILE_PRIORITIES)
+    if ((fieldsToLoad & TR_FR_FILE_PRIORITIES) != 0)
     {
         fieldsLoaded |= loadFilePriorities(&top, tor);
     }
 
-    if (fieldsToLoad & TR_FR_PROGRESS)
+    if ((fieldsToLoad & TR_FR_PROGRESS) != 0)
     {
         fieldsLoaded |= loadProgress(&top, tor);
     }
 
-    if (fieldsToLoad & TR_FR_DND)
+    if ((fieldsToLoad & TR_FR_DND) != 0)
     {
         fieldsLoaded |= loadDND(&top, tor);
     }
 
-    if (fieldsToLoad & TR_FR_SPEEDLIMIT)
+    if ((fieldsToLoad & TR_FR_SPEEDLIMIT) != 0)
     {
         fieldsLoaded |= loadSpeedLimits(&top, tor);
     }
 
-    if (fieldsToLoad & TR_FR_RATIOLIMIT)
+    if ((fieldsToLoad & TR_FR_RATIOLIMIT) != 0)
     {
         fieldsLoaded |= loadRatioLimits(&top, tor);
     }
 
-    if (fieldsToLoad & TR_FR_IDLELIMIT)
+    if ((fieldsToLoad & TR_FR_IDLELIMIT) != 0)
     {
         fieldsLoaded |= loadIdleLimits(&top, tor);
     }
 
-    if (fieldsToLoad & TR_FR_FILENAMES)
+    if ((fieldsToLoad & TR_FR_FILENAMES) != 0)
     {
         fieldsLoaded |= loadFilenames(&top, tor);
     }
 
-    if (fieldsToLoad & TR_FR_NAME)
+    if ((fieldsToLoad & TR_FR_NAME) != 0)
     {
         fieldsLoaded |= loadName(&top, tor);
     }
@@ -944,7 +944,7 @@ static uint64_t setFromCtor(tr_torrent* tor, uint64_t fields, tr_ctor const* cto
 {
     uint64_t ret = 0;
 
-    if (fields & TR_FR_RUN)
+    if ((fields & TR_FR_RUN) != 0)
     {
         bool isPaused;
 
@@ -955,7 +955,7 @@ static uint64_t setFromCtor(tr_torrent* tor, uint64_t fields, tr_ctor const* cto
         }
     }
 
-    if (fields & TR_FR_MAX_PEERS)
+    if ((fields & TR_FR_MAX_PEERS) != 0)
     {
         if (tr_ctorGetPeerLimit(ctor, mode, &tor->maxConnectedPeers))
         {
@@ -963,11 +963,11 @@ static uint64_t setFromCtor(tr_torrent* tor, uint64_t fields, tr_ctor const* cto
         }
     }
 
-    if (fields & TR_FR_DOWNLOAD_DIR)
+    if ((fields & TR_FR_DOWNLOAD_DIR) != 0)
     {
         char const* path;
 
-        if (tr_ctorGetDownloadDir(ctor, mode, &path) && path && *path)
+        if (tr_ctorGetDownloadDir(ctor, mode, &path) && path != NULL && *path != '\0')
         {
             ret |= TR_FR_DOWNLOAD_DIR;
             tr_free(tor->downloadDir);

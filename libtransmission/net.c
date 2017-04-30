@@ -261,7 +261,7 @@ tr_socket_t tr_netOpenPeerSocket(tr_session* session, tr_address const* addr, tr
     {
         int n = 8192;
 
-        if (setsockopt(s, SOL_SOCKET, SO_RCVBUF, (void const*)&n, sizeof(n)))
+        if (setsockopt(s, SOL_SOCKET, SO_RCVBUF, (void const*)&n, sizeof(n)) != 0)
         {
             tr_logAddInfo("Unable to set SO_RCVBUF on socket %" PRIdMAX ": %s", (intmax_t)s,
                 tr_net_strerror(err_buf, sizeof(err_buf), sockerrno));
@@ -281,7 +281,7 @@ tr_socket_t tr_netOpenPeerSocket(tr_session* session, tr_address const* addr, tr
     assert(source_addr);
     sourcelen = setup_sockaddr(source_addr, 0, &source_sock);
 
-    if (bind(s, (struct sockaddr*)&source_sock, sourcelen))
+    if (bind(s, (struct sockaddr*)&source_sock, sourcelen) != 0)
     {
         tr_logAddError(_("Couldn't set source address %s on %" PRIdMAX ": %s"), tr_address_to_string(source_addr), (intmax_t)s,
             tr_net_strerror(err_buf, sizeof(err_buf), sockerrno));
@@ -289,11 +289,11 @@ tr_socket_t tr_netOpenPeerSocket(tr_session* session, tr_address const* addr, tr
         return TR_BAD_SOCKET; /* -errno */
     }
 
-    if ((connect(s, (struct sockaddr*)&sock, addrlen) < 0) &&
+    if (connect(s, (struct sockaddr*)&sock, addrlen) < 0 &&
 #ifdef _WIN32
-        (sockerrno != WSAEWOULDBLOCK) &&
+        sockerrno != WSAEWOULDBLOCK &&
 #endif
-        (sockerrno != EINPROGRESS))
+        sockerrno != EINPROGRESS)
     {
         int tmperrno;
         tmperrno = sockerrno;
@@ -376,7 +376,7 @@ static tr_socket_t tr_netBindTCPImpl(tr_address const* addr, tr_port port, bool 
 
     addrlen = setup_sockaddr(addr, htons(port), &sock);
 
-    if (bind(fd, (struct sockaddr*)&sock, addrlen))
+    if (bind(fd, (struct sockaddr*)&sock, addrlen) != 0)
     {
         int const err = sockerrno;
 
@@ -560,7 +560,7 @@ static int global_unicast_address(struct sockaddr* sa)
     {
         unsigned char const* a = (unsigned char*)&((struct sockaddr_in6*)sa)->sin6_addr;
         /* 2000::/3 */
-        return (a[0] & 0xE0) == 0x20;
+        return (a[0] & 0xE0) == 0x20 ? 1 : 0;
     }
     else
     {
@@ -612,7 +612,7 @@ static int tr_globalAddress(int af, void* addr, int* addr_len)
         return -1;
     }
 
-    if (!global_unicast_address((struct sockaddr*)&ss))
+    if (global_unicast_address((struct sockaddr*)&ss) == 0)
     {
         return -1;
     }
@@ -657,7 +657,7 @@ unsigned char const* tr_globalIPv6(void)
     {
         int addrlen = 16;
         int const rc = tr_globalAddress(AF_INET6, ipv6, &addrlen);
-        have_ipv6 = (rc >= 0) && (addrlen == 16);
+        have_ipv6 = rc >= 0 && addrlen == 16;
         last_time = now;
     }
 
@@ -671,12 +671,12 @@ unsigned char const* tr_globalIPv6(void)
 
 static bool isIPv4MappedAddress(tr_address const* addr)
 {
-    return (addr->type == TR_AF_INET6) && IN6_IS_ADDR_V4MAPPED(&addr->addr.addr6);
+    return addr->type == TR_AF_INET6 && IN6_IS_ADDR_V4MAPPED(&addr->addr.addr6);
 }
 
 static bool isIPv6LinkLocalAddress(tr_address const* addr)
 {
-    return (addr->type == TR_AF_INET6) && IN6_IS_ADDR_LINKLOCAL(&addr->addr.addr6);
+    return addr->type == TR_AF_INET6 && IN6_IS_ADDR_LINKLOCAL(&addr->addr.addr6);
 }
 
 /* isMartianAddr was written by Juliusz Chroboczek,
@@ -692,13 +692,13 @@ static bool isMartianAddr(struct tr_address const* a)
     case TR_AF_INET:
         {
             unsigned char const* address = (unsigned char const*)&a->addr.addr4;
-            return (address[0] == 0) || (address[0] == 127) || ((address[0] & 0xE0) == 0xE0);
+            return address[0] == 0 || address[0] == 127 || (address[0] & 0xE0) == 0xE0;
         }
 
     case TR_AF_INET6:
         {
             unsigned char const* address = (unsigned char const*)&a->addr.addr6;
-            return (address[0] == 0xFF) || (memcmp(address, zeroes, 15) == 0 && (address[15] == 0 || address[15] == 1));
+            return address[0] == 0xFF || (memcmp(address, zeroes, 15) == 0 && (address[15] == 0 || address[15] == 1));
         }
 
     default:
@@ -708,6 +708,6 @@ static bool isMartianAddr(struct tr_address const* a)
 
 bool tr_address_is_valid_for_peers(tr_address const* addr, tr_port port)
 {
-    return (port != 0) && (tr_address_is_valid(addr)) && (!isIPv6LinkLocalAddress(addr)) && (!isIPv4MappedAddress(addr)) &&
-           (!isMartianAddr(addr));
+    return port != 0 && tr_address_is_valid(addr) && !isIPv6LinkLocalAddress(addr) && !isIPv4MappedAddress(addr) &&
+           !isMartianAddr(addr);
 }

@@ -83,7 +83,7 @@ struct TrCorePrivate
 
 static int core_is_disposed(TrCore const* core)
 {
-    return !core || !core->priv->sorted_model;
+    return core == NULL || core->priv->sorted_model == NULL;
 }
 
 G_DEFINE_TYPE(TrCore, tr_core, G_TYPE_OBJECT)
@@ -253,6 +253,7 @@ static void core_inc_busy(TrCore* core)
 {
     core_add_to_busy(core, 1);
 }
+
 static void core_dec_busy(TrCore* core)
 {
     core_add_to_busy(core, -1);
@@ -266,7 +267,7 @@ static void core_dec_busy(TrCore* core)
 
 static gboolean is_valid_eta(int t)
 {
-    return (t != TR_ETA_NOT_AVAIL) && (t != TR_ETA_UNKNOWN);
+    return t != TR_ETA_NOT_AVAIL && t != TR_ETA_UNKNOWN;
 }
 
 static int compare_eta(int a, int b)
@@ -432,12 +433,12 @@ static int compare_by_ratio(GtkTreeModel* m, GtkTreeIter* a, GtkTreeIter* b, gpo
     gtk_tree_model_get(m, b, MC_TORRENT, &tb, -1);
     sb = tr_torrentStatCached(tb);
 
-    if (!ret)
+    if (ret == 0)
     {
         ret = compare_ratio(sa->ratio, sb->ratio);
     }
 
-    if (!ret)
+    if (ret == 0)
     {
         ret = compare_by_queue(m, a, b, user_data);
     }
@@ -456,14 +457,14 @@ static int compare_by_activity(GtkTreeModel* m, GtkTreeIter* a, GtkTreeIter* b, 
 
     ret = compare_double(aUp + aDown, bUp + bDown);
 
-    if (!ret)
+    if (ret == 0)
     {
         tr_stat const* const sa = tr_torrentStatCached(ta);
         tr_stat const* const sb = tr_torrentStatCached(tb);
         ret = compare_uint64(sa->peersSendingToUs + sa->peersGettingFromUs, sb->peersSendingToUs + sb->peersGettingFromUs);
     }
 
-    if (!ret)
+    if (ret == 0)
     {
         ret = compare_by_queue(m, a, b, user_data);
     }
@@ -479,12 +480,12 @@ static int compare_by_age(GtkTreeModel* m, GtkTreeIter* a, GtkTreeIter* b, gpoin
     gtk_tree_model_get(m, a, MC_TORRENT, &ta, -1);
     gtk_tree_model_get(m, b, MC_TORRENT, &tb, -1);
 
-    if (!ret)
+    if (ret == 0)
     {
         ret = compare_time(tr_torrentStatCached(ta)->addedDate, tr_torrentStatCached(tb)->addedDate);
     }
 
-    if (!ret)
+    if (ret == 0)
     {
         ret = compare_by_name(m, a, b, u);
     }
@@ -503,12 +504,12 @@ static int compare_by_size(GtkTreeModel* m, GtkTreeIter* a, GtkTreeIter* b, gpoi
     gtk_tree_model_get(m, b, MC_TORRENT, &t, -1);
     ib = tr_torrentInfo(t);
 
-    if (!ret)
+    if (ret == 0)
     {
         ret = compare_uint64(ia->totalSize, ib->totalSize);
     }
 
-    if (!ret)
+    if (ret == 0)
     {
         ret = compare_by_name(m, a, b, u);
     }
@@ -527,17 +528,17 @@ static int compare_by_progress(GtkTreeModel* m, GtkTreeIter* a, GtkTreeIter* b, 
     gtk_tree_model_get(m, b, MC_TORRENT, &t, -1);
     sb = tr_torrentStatCached(t);
 
-    if (!ret)
+    if (ret == 0)
     {
         ret = compare_double(sa->percentComplete, sb->percentComplete);
     }
 
-    if (!ret)
+    if (ret == 0)
     {
         ret = compare_double(sa->seedRatioPercentDone, sb->seedRatioPercentDone);
     }
 
-    if (!ret)
+    if (ret == 0)
     {
         ret = compare_by_ratio(m, a, b, u);
     }
@@ -553,12 +554,12 @@ static int compare_by_eta(GtkTreeModel* m, GtkTreeIter* a, GtkTreeIter* b, gpoin
     gtk_tree_model_get(m, a, MC_TORRENT, &ta, -1);
     gtk_tree_model_get(m, b, MC_TORRENT, &tb, -1);
 
-    if (!ret)
+    if (ret == 0)
     {
         ret = compare_eta(tr_torrentStatCached(ta)->eta, tr_torrentStatCached(tb)->eta);
     }
 
-    if (!ret)
+    if (ret == 0)
     {
         ret = compare_by_name(m, a, b, u);
     }
@@ -575,12 +576,12 @@ static int compare_by_state(GtkTreeModel* m, GtkTreeIter* a, GtkTreeIter* b, gpo
     gtk_tree_model_get(m, a, MC_ACTIVITY, &sa, MC_TORRENT, &ta, -1);
     gtk_tree_model_get(m, b, MC_ACTIVITY, &sb, MC_TORRENT, &tb, -1);
 
-    if (!ret)
+    if (ret == 0)
     {
         ret = compare_int(sa, sb);
     }
 
-    if (!ret)
+    if (ret == 0)
     {
         ret = compare_by_queue(m, a, b, u);
     }
@@ -801,7 +802,7 @@ static void core_watchdir_scan(TrCore* core)
     {
         char const* name;
 
-        while ((name = g_dir_read_name(dir)))
+        while ((name = g_dir_read_name(dir)) != NULL)
         {
             char* filename = g_build_filename(dirname, name, NULL);
             GFile* file = g_file_new_for_path(filename);
@@ -820,7 +821,7 @@ static void core_watchdir_update(TrCore* core)
     GFile* dir = g_file_new_for_path(gtr_pref_string_get(TR_KEY_watch_dir));
     struct TrCorePrivate* p = core->priv;
 
-    if (p->monitor && (!is_enabled || !g_file_equal(dir, p->monitor_dir)))
+    if (p->monitor != NULL && (!is_enabled || !g_file_equal(dir, p->monitor_dir)))
     {
         g_signal_handler_disconnect(p->monitor, p->monitor_tag);
         g_file_monitor_cancel(p->monitor);
@@ -832,7 +833,7 @@ static void core_watchdir_update(TrCore* core)
         p->monitor_tag = 0;
     }
 
-    if (is_enabled && !p->monitor)
+    if (is_enabled && p->monitor == NULL)
     {
         GFileMonitor* m = g_file_monitor_directory(dir, 0, NULL, NULL);
         core_watchdir_scan(core);
@@ -910,7 +911,7 @@ tr_session* gtr_core_close(TrCore* core)
 {
     tr_session* session = gtr_core_session(core);
 
-    if (session)
+    if (session != NULL)
     {
         core->priv->session = NULL;
         gtr_pref_save(session);
@@ -942,7 +943,7 @@ static gboolean on_torrent_completeness_changed_idle(gpointer gdata)
    so delegate to the GTK+ thread before calling notify's dbus code... */
 static void on_torrent_completeness_changed(tr_torrent* tor, tr_completeness completeness, bool was_running, void* gcore)
 {
-    if (was_running && (completeness != TR_LEECH) && (tr_torrentStat(tor)->sizeWhenDone != 0))
+    if (was_running && completeness != TR_LEECH && tr_torrentStat(tor)->sizeWhenDone != 0)
     {
         struct notify_callback_data* data = g_new(struct notify_callback_data, 1);
         data->core = gcore;
@@ -1049,7 +1050,7 @@ static unsigned int build_torrent_trackers_hash(tr_torrent* tor)
 
     for (i = 0; i < inf->trackerCount; ++i)
     {
-        for (pch = inf->trackers[i].announce; *pch; ++pch)
+        for (pch = inf->trackers[i].announce; *pch != '\0'; ++pch)
         {
             hash = (hash << 4) ^ (hash >> 28) ^ *pch;
         }
@@ -1060,7 +1061,7 @@ static unsigned int build_torrent_trackers_hash(tr_torrent* tor)
 
 static gboolean is_torrent_active(tr_stat const* st)
 {
-    return (st->peersSendingToUs > 0) || (st->peersGettingFromUs > 0) || (st->activity == TR_STATUS_CHECK);
+    return st->peersSendingToUs > 0 || st->peersGettingFromUs > 0 || st->activity == TR_STATUS_CHECK;
 }
 
 void gtr_core_add_torrent(TrCore* core, tr_torrent* tor, gboolean do_notify)
@@ -1112,7 +1113,7 @@ static tr_torrent* core_create_new_torrent(TrCore* core, tr_ctor* ctor)
     tr_ctorSetDeleteSource(ctor, FALSE);
     tor = tr_torrentNew(ctor, NULL, NULL);
 
-    if (tor && do_trash)
+    if (tor != NULL && do_trash)
     {
         char const* config = tr_sessionGetConfigDir(session);
         char const* source = tr_ctorGetSourceFile(ctor);
@@ -1120,7 +1121,7 @@ static tr_torrent* core_create_new_torrent(TrCore* core, tr_ctor* ctor)
         if (source != NULL)
         {
             /* #1294: don't delete the .torrent file if it's our internal copy */
-            int const is_internal = (strstr(source, config) == source);
+            bool const is_internal = strstr(source, config) == source;
 
             if (!is_internal)
             {
@@ -1147,7 +1148,7 @@ static int core_add_ctor(TrCore* core, tr_ctor* ctor, gboolean do_prompt, gboole
         /* don't complain about .torrent files in the watch directory
          * that have already been added... that gets annoying and we
          * don't want to be nagging users to clean up their watch dirs */
-        if (!tr_ctorGetSourceFile(ctor) || !core->priv->adding_from_watch_dir)
+        if (tr_ctorGetSourceFile(ctor) == NULL || !core->priv->adding_from_watch_dir)
         {
             core_emit_err(core, err, inf.name);
         }
@@ -1230,7 +1231,7 @@ static void add_file_async_callback(GObject* file, GAsyncResult* result, gpointe
         g_message(_("Couldn't read \"%s\": %s"), g_file_get_parse_name(G_FILE(file)), error->message);
         g_error_free(error);
     }
-    else if (!tr_ctorSetMetainfo(data->ctor, (uint8_t const*)contents, length))
+    else if (tr_ctorSetMetainfo(data->ctor, (uint8_t const*)contents, length) == 0)
     {
         core_add_ctor(data->core, data->ctor, data->do_prompt, data->do_notify);
     }
@@ -1507,12 +1508,12 @@ static void update_foreach(GtkTreeModel* model, GtkTreeIter* iter)
 
     /* updating the model triggers off resort/refresh,
        so don't do it unless something's actually changed... */
-    if ((newActive != oldActive) || (newActivity != oldActivity) || (newFinished != oldFinished) ||
-        (newPriority != oldPriority) || (newQueuePosition != oldQueuePosition) || (newError != oldError) ||
-        (newActivePeerCount != oldActivePeerCount) || (newDownloadPeerCount != oldDownloadPeerCount) ||
-        (newUploadPeerCount != oldUploadPeerCount) || (newTrackers != oldTrackers) ||
-        gtr_compare_double(newUpSpeed, oldUpSpeed, 2) || gtr_compare_double(newDownSpeed, oldDownSpeed, 2) ||
-        gtr_compare_double(newRecheckProgress, oldRecheckProgress, 2))
+    if (newActive != oldActive || newActivity != oldActivity || newFinished != oldFinished || newPriority != oldPriority ||
+        newQueuePosition != oldQueuePosition || newError != oldError || newActivePeerCount != oldActivePeerCount ||
+        newDownloadPeerCount != oldDownloadPeerCount || newUploadPeerCount != oldUploadPeerCount ||
+        newTrackers != oldTrackers || gtr_compare_double(newUpSpeed, oldUpSpeed, 2) != 0 ||
+        gtr_compare_double(newDownSpeed, oldDownSpeed, 2) != 0 ||
+        gtr_compare_double(newRecheckProgress, oldRecheckProgress, 2) != 0)
     {
         gtk_list_store_set(GTK_LIST_STORE(model), iter,
             MC_ACTIVE, newActive,
@@ -1583,7 +1584,7 @@ static gboolean gtr_inhibit_hibernation(guint* cookie)
         *cookie = g_variant_get_uint32(g_variant_get_child_value(response, 0));
     }
 
-    success = (response != NULL) && (err == NULL);
+    success = response != NULL && err == NULL;
 
     /* logging */
     if (success)
@@ -1751,7 +1752,7 @@ static gboolean core_read_rpc_response_idle(void* vresponse)
         int const tag = (int)intVal;
         struct pending_request_data* data = g_hash_table_lookup(pendingRequests, &tag);
 
-        if (data)
+        if (data != NULL)
         {
             if (data->response_func)
             {
@@ -1928,7 +1929,7 @@ tr_torrent* gtr_core_find_torrent(TrCore* core, int id)
     tr_session* session;
     tr_torrent* tor = NULL;
 
-    if ((session = gtr_core_session(core)))
+    if ((session = gtr_core_session(core)) != NULL)
     {
         tor = tr_torrentFindFromId(session, id);
     }

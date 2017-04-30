@@ -256,7 +256,7 @@ static void on_scrape_response(struct tau_scrape_request* request, tau_action_t 
         {
             struct tr_scrape_response_row* row;
 
-            if (evbuffer_get_length(buf) < (sizeof(uint32_t) * 3))
+            if (evbuffer_get_length(buf) < sizeof(uint32_t) * 3)
             {
                 break;
             }
@@ -274,7 +274,7 @@ static void on_scrape_response(struct tau_scrape_request* request, tau_action_t 
         char* errmsg;
         size_t const buflen = evbuffer_get_length(buf);
 
-        if ((action == TAU_ACTION_ERROR) && (buflen > 0))
+        if (action == TAU_ACTION_ERROR && buflen > 0)
         {
             errmsg = tr_strndup(evbuffer_pullup(buf, -1), buflen);
         }
@@ -410,7 +410,7 @@ static void on_announce_response(struct tau_announce_request* request, tau_actio
     request->response.did_connect = true;
     request->response.did_timeout = false;
 
-    if ((action == TAU_ACTION_ANNOUNCE) && (buflen >= 3 * sizeof(uint32_t)))
+    if (action == TAU_ACTION_ANNOUNCE && buflen >= 3 * sizeof(uint32_t))
     {
         tr_announce_response* resp = &request->response;
         resp->interval = evbuffer_read_ntoh_32(buf);
@@ -424,7 +424,7 @@ static void on_announce_response(struct tau_announce_request* request, tau_actio
     {
         char* errmsg;
 
-        if ((action == TAU_ACTION_ERROR) && (buflen > 0))
+        if (action == TAU_ACTION_ERROR && buflen > 0)
         {
             errmsg = tr_strndup(evbuffer_pullup(buf, -1), buflen);
         }
@@ -473,7 +473,7 @@ static void tau_tracker_free(struct tau_tracker* t)
 {
     assert(t->dns_request == NULL);
 
-    if (t->addr)
+    if (t->addr != NULL)
     {
         evutil_freeaddrinfo(t->addr);
     }
@@ -520,7 +520,7 @@ static void tau_tracker_on_dns(int errcode, struct evutil_addrinfo* addr, void* 
 
     tracker->dns_request = NULL;
 
-    if (errcode)
+    if (errcode != 0)
     {
         char* errmsg = tr_strdup_printf(_("DNS Lookup failed: %s"), evutil_gai_strerror(errcode));
         dbgmsg(tracker->key, "%s", errmsg);
@@ -563,7 +563,7 @@ static void tau_tracker_send_reqs(struct tau_tracker* tracker)
     {
         struct tau_announce_request* req = tr_ptrArrayNth(reqs, i);
 
-        if (!req->sent_at)
+        if (req->sent_at == 0)
         {
             dbgmsg(tracker->key, "sending announce req %p", (void*)req);
             req->sent_at = now;
@@ -585,7 +585,7 @@ static void tau_tracker_send_reqs(struct tau_tracker* tracker)
     {
         struct tau_scrape_request* req = tr_ptrArrayNth(reqs, i);
 
-        if (!req->sent_at)
+        if (req->sent_at == 0)
         {
             dbgmsg(tracker->key, "sending scrape req %p", (void*)req);
             req->sent_at = now;
@@ -620,7 +620,7 @@ static void on_tracker_connection_response(struct tau_tracker* tracker, tau_acti
         char* errmsg;
         size_t const buflen = buf ? evbuffer_get_length(buf) : 0;
 
-        if ((action == TAU_ACTION_ERROR) && (buflen > 0))
+        if (action == TAU_ACTION_ERROR && buflen > 0)
         {
             errmsg = tr_strndup(evbuffer_pullup(buf, -1), buflen);
         }
@@ -644,7 +644,7 @@ static void tau_tracker_timeout_reqs(struct tau_tracker* tracker)
     time_t const now = time(NULL);
     bool const cancel_all = tracker->close_at && (tracker->close_at <= now);
 
-    if (tracker->connecting_at && (tracker->connecting_at + TAU_REQUEST_TTL < now))
+    if (tracker->connecting_at != 0 && tracker->connecting_at + TAU_REQUEST_TTL < now)
     {
         on_tracker_connection_response(tracker, TAU_ACTION_ERROR, NULL);
     }
@@ -655,7 +655,7 @@ static void tau_tracker_timeout_reqs(struct tau_tracker* tracker)
     {
         struct tau_announce_request* req = tr_ptrArrayNth(reqs, i);
 
-        if (cancel_all || (req->created_at + TAU_REQUEST_TTL < now))
+        if (cancel_all || req->created_at + TAU_REQUEST_TTL < now)
         {
             dbgmsg(tracker->key, "timeout announce req %p", (void*)req);
             tau_announce_request_fail(req, false, true, NULL);
@@ -672,7 +672,7 @@ static void tau_tracker_timeout_reqs(struct tau_tracker* tracker)
     {
         struct tau_scrape_request* req = tr_ptrArrayNth(reqs, i);
 
-        if (cancel_all || (req->created_at + TAU_REQUEST_TTL < now))
+        if (cancel_all || req->created_at + TAU_REQUEST_TTL < now)
         {
             dbgmsg(tracker->key, "timeout scrape req %p", (void*)req);
             tau_scrape_request_fail(req, false, true, NULL);
@@ -727,7 +727,7 @@ static void tau_tracker_upkeep(struct tau_tracker* tracker)
         (size_t)tracker->connecting_at);
 
     /* also need a valid connection ID... */
-    if (tracker->addr && (tracker->connection_expiration_time <= now) && (!tracker->connecting_at))
+    if (tracker->addr != NULL && tracker->connection_expiration_time <= now && tracker->connecting_at == 0)
     {
         struct evbuffer* buf = evbuffer_new();
         tracker->connecting_at = now;
@@ -743,7 +743,7 @@ static void tau_tracker_upkeep(struct tau_tracker* tracker)
 
     tau_tracker_timeout_reqs(tracker);
 
-    if ((tracker->addr != NULL) && (tracker->connection_expiration_time > now))
+    if (tracker->addr != NULL && tracker->connection_expiration_time > now)
     {
         tau_tracker_send_reqs(tracker);
     }
@@ -915,12 +915,12 @@ bool tau_handle_message(tr_session* session, uint8_t const* msg, size_t msglen)
 
     /*fprintf(stderr, "got an incoming udp message w/len %zu\n", msglen);*/
 
-    if (!session || !session->announcer_udp)
+    if (session == NULL || session->announcer_udp == NULL)
     {
         return false;
     }
 
-    if (msglen < (sizeof(uint32_t) * 2))
+    if (msglen < sizeof(uint32_t) * 2)
     {
         return false;
     }
@@ -948,7 +948,7 @@ bool tau_handle_message(tr_session* session, uint8_t const* msg, size_t msglen)
         struct tau_tracker* tracker = tr_ptrArrayNth(&tau->trackers, i);
 
         /* is it a connection response? */
-        if (tracker->connecting_at && (transaction_id == tracker->connection_transaction_id))
+        if (tracker->connecting_at != 0 && transaction_id == tracker->connection_transaction_id)
         {
             dbgmsg(tracker->key, "%" PRIu32 " is my connection request!", transaction_id);
             on_tracker_connection_response(tracker, action_id, buf);
@@ -963,7 +963,7 @@ bool tau_handle_message(tr_session* session, uint8_t const* msg, size_t msglen)
         {
             struct tau_announce_request* req = tr_ptrArrayNth(reqs, j);
 
-            if (req->sent_at && (transaction_id == req->transaction_id))
+            if (req->sent_at != 0 && transaction_id == req->transaction_id)
             {
                 dbgmsg(tracker->key, "%" PRIu32 " is an announce request!", transaction_id);
                 tr_ptrArrayRemove(reqs, j);
@@ -981,7 +981,7 @@ bool tau_handle_message(tr_session* session, uint8_t const* msg, size_t msglen)
         {
             struct tau_scrape_request* req = tr_ptrArrayNth(reqs, j);
 
-            if (req->sent_at && (transaction_id == req->transaction_id))
+            if (req->sent_at != 0 && transaction_id == req->transaction_id)
             {
                 dbgmsg(tracker->key, "%" PRIu32 " is a scrape request!", transaction_id);
                 tr_ptrArrayRemove(reqs, j);

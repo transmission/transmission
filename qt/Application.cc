@@ -138,7 +138,7 @@ Application::Application(int& argc, char** argv) :
     QString configDir;
     QStringList filenames;
 
-    while ((c = tr_getopt(getUsage(), argc, const_cast<char const**>(argv), opts, &optarg)))
+    while ((c = tr_getopt(getUsage(), argc, const_cast<char const**>(argv), opts, &optarg)) != TR_OPT_DONE)
     {
         switch (c)
         {
@@ -443,7 +443,7 @@ void Application::onTorrentCompleted(int id)
 {
     Torrent* tor = myModel->getTorrentFromId(id);
 
-    if (tor)
+    if (tor != nullptr)
     {
         if (myPrefs->getBool(Prefs::SHOW_NOTIFICATION_ON_COMPLETE))
         {
@@ -467,7 +467,7 @@ void Application::onNewTorrentChanged(int id)
 {
     Torrent* tor = myModel->getTorrentFromId(id);
 
-    if (tor && !tor->name().isEmpty())
+    if (tor != nullptr && !tor->name().isEmpty())
     {
         int const age_secs = tor->dateAdded().secsTo(QDateTime::currentDateTime());
 

@@ -90,7 +90,7 @@ struct tr_web_task
 
 static void task_free(struct tr_web_task* task)
 {
-    if (task->freebuf)
+    if (task->freebuf != NULL)
     {
         evbuffer_free(task->freebuf);
     }
@@ -132,7 +132,7 @@ static size_t writeFunc(void* ptr, size_t size, size_t nmemb, void* vtask)
     {
         tr_torrent* tor = tr_torrentFindFromId(task->session, task->torrentId);
 
-        if (tor && !tr_bandwidthClamp(&tor->bandwidth, TR_DOWN, nmemb))
+        if (tor != NULL && tr_bandwidthClamp(&tor->bandwidth, TR_DOWN, nmemb) == 0)
         {
             tr_list_append(&paused_easy_handles, task->curl_easy);
             return CURL_WRITEFUNC_PAUSE;
@@ -172,7 +172,7 @@ static long getTimeoutFromURL(struct tr_web_task const* task)
     long timeout;
     tr_session const* session = task->session;
 
-    if (!session || session->isClosed)
+    if (session == NULL || session->isClosed)
     {
         timeout = 20L;
     }
@@ -229,11 +229,11 @@ static CURL* createEasy(tr_session* s, struct tr_web* web, struct tr_web_task* t
     curl_easy_setopt(e, CURLOPT_WRITEDATA, task);
     curl_easy_setopt(e, CURLOPT_WRITEFUNCTION, writeFunc);
 
-    if (((addr = tr_sessionGetPublicAddress(s, TR_AF_INET, &is_default_value))) && !is_default_value)
+    if ((addr = tr_sessionGetPublicAddress(s, TR_AF_INET, &is_default_value)) != NULL && !is_default_value)
     {
         curl_easy_setopt(e, CURLOPT_INTERFACE, tr_address_to_string(addr));
     }
-    else if (((addr = tr_sessionGetPublicAddress(s, TR_AF_INET6, &is_default_value))) && !is_default_value)
+    else if ((addr = tr_sessionGetPublicAddress(s, TR_AF_INET6, &is_default_value)) != NULL && !is_default_value)
     {
         curl_easy_setopt(e, CURLOPT_INTERFACE, tr_address_to_string(addr));
     }
@@ -307,8 +307,8 @@ static struct tr_web_task* tr_webRunImpl(tr_session* session, int torrentId, cha
         task->cookies = tr_strdup(cookies);
         task->done_func = done_func;
         task->done_func_user_data = done_func_user_data;
-        task->response = buffer ? buffer : evbuffer_new();
-        task->freebuf = buffer ? NULL : task->response;
+        task->response = buffer != NULL ? buffer : evbuffer_new();
+        task->freebuf = buffer != NULL ? NULL : task->response;
 
         tr_lockLock(session->web->taskLock);
         task->next = session->web->tasks;
@@ -350,13 +350,13 @@ static void tr_select(int nfds, fd_set* r_fd_set, fd_set* w_fd_set, fd_set* c_fd
 
     (void)nfds;
 
-    if (!r_fd_set->fd_count && !w_fd_set->fd_count && !c_fd_set->fd_count)
+    if (r_fd_set->fd_count == 0 && w_fd_set->fd_count == 0 && c_fd_set->fd_count == 0)
     {
         long int const msec = t->tv_sec * 1000 + t->tv_usec / 1000;
         tr_wait_msec(msec);
     }
-    else if (select(0, r_fd_set->fd_count ? r_fd_set : NULL, w_fd_set->fd_count ? w_fd_set : NULL,
-        c_fd_set->fd_count ? c_fd_set : NULL, t) < 0)
+    else if (select(0, r_fd_set->fd_count != 0 ? r_fd_set : NULL, w_fd_set->fd_count != 0 ? w_fd_set : NULL,
+        c_fd_set->fd_count != 0 ? c_fd_set : NULL, t) < 0)
     {
         char errstr[512];
         int const e = EVUTIL_SOCKET_ERROR();
@@ -382,7 +382,7 @@ static void tr_webThreadFunc(void* vsession)
 
     /* try to enable ssl for https support; but if that fails,
      * try a plain vanilla init */
-    if (curl_global_init(CURL_GLOBAL_SSL))
+    if (curl_global_init(CURL_GLOBAL_SSL) != CURLE_OK)
     {
         curl_global_init(0);
     }
@@ -427,7 +427,7 @@ static void tr_webThreadFunc(void* vsession)
             break;
         }
 
-        if ((web->close_mode == TR_WEB_CLOSE_WHEN_IDLE) && (web->tasks == NULL))
+        if (web->close_mode == TR_WEB_CLOSE_WHEN_IDLE && web->tasks == NULL)
         {
             break;
         }
@@ -461,7 +461,7 @@ static void tr_webThreadFunc(void* vsession)
             tmp = paused_easy_handles;
             paused_easy_handles = NULL;
 
-            while ((handle = tr_list_pop_front(&tmp)))
+            while ((handle = tr_list_pop_front(&tmp)) != NULL)
             {
                 curl_easy_pause(handle, CURLPAUSE_CONT);
             }
@@ -513,9 +513,9 @@ static void tr_webThreadFunc(void* vsession)
         while (mcode == CURLM_CALL_MULTI_PERFORM);
 
         /* pump completed tasks from the multi */
-        while ((msg = curl_multi_info_read(multi, &unused)))
+        while ((msg = curl_multi_info_read(multi, &unused)) != NULL)
         {
-            if ((msg->msg == CURLMSG_DONE) && (msg->easy_handle != NULL))
+            if (msg->msg == CURLMSG_DONE && msg->easy_handle != NULL)
             {
                 double total_time;
                 struct tr_web_task* task;
@@ -527,7 +527,7 @@ static void tr_webThreadFunc(void* vsession)
                 curl_easy_getinfo(e, CURLINFO_REQUEST_SIZE, &req_bytes_sent);
                 curl_easy_getinfo(e, CURLINFO_TOTAL_TIME, &total_time);
                 task->did_connect = task->code > 0 || req_bytes_sent > 0;
-                task->did_timeout = !task->code && (total_time >= task->timeout_secs);
+                task->did_timeout = task->code == 0 && total_time >= task->timeout_secs;
                 curl_multi_remove_handle(multi, e);
                 tr_list_remove_data(&paused_easy_handles, e);
                 curl_easy_cleanup(e);
@@ -729,8 +729,8 @@ void tr_http_escape(struct evbuffer* out, char const* str, size_t len, bool esca
 
     for (char const* end = str + len; str != end; ++str)
     {
-        if ((*str == ',') || (*str == '-') || (*str == '.') || (('0' <= *str) && (*str <= '9')) ||
-            (('A' <= *str) && (*str <= 'Z')) || (('a' <= *str) && (*str <= 'z')) || ((*str == '/') && (!escape_slashes)))
+        if (*str == ',' || *str == '-' || *str == '.' || ('0' <= *str && *str <= '9') || ('A' <= *str && *str <= 'Z') ||
+            ('a' <= *str && *str <= 'z') || (*str == '/' && !escape_slashes))
         {
             evbuffer_add_printf(out, "%c", *str);
         }

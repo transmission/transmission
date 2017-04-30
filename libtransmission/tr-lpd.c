@@ -296,7 +296,7 @@ int tr_lpdInit(tr_session* ss, tr_address* tr_addr UNUSED)
     struct ip_mreq mcastReq;
     int const opt_on = 1, opt_off = 0;
 
-    if (session) /* already initialized */
+    if (session != NULL) /* already initialized */
     {
         return -1;
     }
@@ -444,7 +444,7 @@ void tr_lpdUninit(tr_session* ss)
 
 bool tr_lpdEnabled(tr_session const* ss)
 {
-    return ss && (ss == session);
+    return ss != NULL && ss == session;
 }
 
 /**
@@ -499,7 +499,7 @@ bool tr_lpdSendAnnounce(tr_torrent const* t)
     }
 
     /* make sure the hash string is normalized, just in case */
-    for (i = 0; i < sizeof hashString; i++)
+    for (i = 0; i < sizeof(hashString); i++)
     {
         hashString[i] = toupper(t->info.hashString[i]);
     }
@@ -629,7 +629,7 @@ static int tr_lpdAnnounceMore(time_t const now, int const interval)
         return -1;
     }
 
-    while ((tor = tr_torrentNext(session, tor)) && tr_sessionAllowsLPD(session))
+    while ((tor = tr_torrentNext(session, tor)) != NULL && tr_sessionAllowsLPD(session))
     {
         if (tr_isTorrent(tor))
         {

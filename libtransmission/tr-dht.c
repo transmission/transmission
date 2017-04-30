@@ -135,7 +135,7 @@ static void bootstrap_from_name(char const* name, tr_port port, int af)
 
     infop = info;
 
-    while (infop)
+    while (infop != NULL)
     {
         dht_ping_node(infop->ai_addr, infop->ai_addrlen);
 
@@ -226,7 +226,7 @@ static void dht_bootstrap(void* closure)
 
         bootstrap_file = tr_buildPath(cl->session->configDir, "dht.bootstrap", NULL);
 
-        if (bootstrap_file)
+        if (bootstrap_file != NULL)
         {
             f = tr_sys_file_open(bootstrap_file, TR_SYS_FILE_READ, 0, NULL);
         }
@@ -299,12 +299,12 @@ static void dht_bootstrap(void* closure)
         }
     }
 
-    if (cl->nodes)
+    if (cl->nodes != NULL)
     {
         tr_free(cl->nodes);
     }
 
-    if (cl->nodes6)
+    if (cl->nodes6 != NULL)
     {
         tr_free(cl->nodes6);
     }
@@ -324,7 +324,7 @@ int tr_dhtInit(tr_session* ss)
     size_t len, len6;
     struct bootstrap_closure* cl;
 
-    if (session) /* already initialized */
+    if (session != NULL) /* already initialized */
     {
         return -1;
     }
@@ -349,14 +349,12 @@ int tr_dhtInit(tr_session* ss)
             memcpy(myid, raw, len);
         }
 
-        if (ss->udp_socket != TR_BAD_SOCKET &&
-            tr_variantDictFindRaw(&benc, TR_KEY_nodes, &raw, &len) && !(len % 6))
+        if (ss->udp_socket != TR_BAD_SOCKET && tr_variantDictFindRaw(&benc, TR_KEY_nodes, &raw, &len) && len % 6 == 0)
         {
             nodes = tr_memdup(raw, len);
         }
 
-        if (ss->udp6_socket != TR_BAD_SOCKET &&
-            tr_variantDictFindRaw(&benc, TR_KEY_nodes6, &raw, &len6) && !(len6 % 18))
+        if (ss->udp6_socket != TR_BAD_SOCKET && tr_variantDictFindRaw(&benc, TR_KEY_nodes6, &raw, &len6) && len6 % 18 == 0)
         {
             nodes6 = tr_memdup(raw, len6);
         }
@@ -433,7 +431,7 @@ void tr_dhtUninit(tr_session* ss)
 
     /* Since we only save known good nodes, avoid erasing older data if we
        don't know enough nodes. */
-    if ((tr_dhtStatus(ss, AF_INET, NULL) < TR_DHT_FIREWALLED) && (tr_dhtStatus(ss, AF_INET6, NULL) < TR_DHT_FIREWALLED))
+    if (tr_dhtStatus(ss, AF_INET, NULL) < TR_DHT_FIREWALLED && tr_dhtStatus(ss, AF_INET6, NULL) < TR_DHT_FIREWALLED)
     {
         tr_logAddNamedInfo("DHT", "Not saving nodes, DHT not ready");
     }
@@ -494,7 +492,7 @@ void tr_dhtUninit(tr_session* ss)
 
 bool tr_dhtEnabled(tr_session const* ss)
 {
-    return ss && (ss == session);
+    return ss != NULL && ss == session;
 }
 
 struct getstatus_closure
@@ -538,7 +536,7 @@ int tr_dhtStatus(tr_session* session, int af, int* nodes_return)
     if (!tr_dhtEnabled(session) || (af == AF_INET && session->udp_socket == TR_BAD_SOCKET) ||
         (af == AF_INET6 && session->udp6_socket == TR_BAD_SOCKET))
     {
-        if (nodes_return)
+        if (nodes_return != NULL)
         {
             *nodes_return = 0;
         }
@@ -553,7 +551,7 @@ int tr_dhtStatus(tr_session* session, int af, int* nodes_return)
         tr_wait_msec(50 /*msec*/);
     }
 
-    if (nodes_return)
+    if (nodes_return != NULL)
     {
         *nodes_return = closure.count;
     }
@@ -642,7 +640,7 @@ static void callback(void* ignore UNUSED, int event, unsigned char const* info_h
         tr_sessionLock(session);
         tor = tr_torrentFindFromHash(session, info_hash);
 
-        if (tor && tr_torrentAllowsDHT(tor))
+        if (tor != NULL && tr_torrentAllowsDHT(tor))
         {
             size_t i, n;
             tr_pex* pex;
@@ -671,7 +669,7 @@ static void callback(void* ignore UNUSED, int event, unsigned char const* info_h
     {
         tr_torrent* tor = tr_torrentFindFromHash(session, info_hash);
 
-        if (tor)
+        if (tor != NULL)
         {
             if (event == DHT_EVENT_SEARCH_DONE)
             {
@@ -744,7 +742,7 @@ void tr_dhtUpkeep(tr_session* session)
     tr_torrent* tor = NULL;
     time_t const now = tr_time();
 
-    while ((tor = tr_torrentNext(session, tor)))
+    while ((tor = tr_torrentNext(session, tor)) != NULL)
     {
         if (!tor->isRunning || !tr_torrentAllowsDHT(tor))
         {

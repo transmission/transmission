@@ -123,7 +123,7 @@ int qtDayToTrDay(int day)
         return TR_SCHED_SUN;
 
     default:
-        assert(0 && "Invalid day of week");
+        assert(false && "Invalid day of week");
         return 0;
     }
 }
@@ -154,7 +154,7 @@ QString qtDayName(int day)
         return PrefsDialog::tr("Sunday");
 
     default:
-        assert(0 && "Invalid day of week");
+        assert(false && "Invalid day of week");
         return QString();
     }
 }
