@@ -314,7 +314,7 @@ public:
 
     double percentComplete() const
     {
-        return haveTotal() / static_cast<double>(totalSize());
+        return totalSize() != 0 ? haveTotal() / static_cast<double>(totalSize()) : 0;
     }
 
     double percentDone() const
