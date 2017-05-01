@@ -109,8 +109,8 @@ static GtkActionEntry entries[] =
     { "help", GTK_STOCK_HELP, N_("_Contents"), "F1", NULL, G_CALLBACK(action_cb) },
     { "torrent-reannounce", GTK_STOCK_NETWORK, N_("Ask Tracker for _More Peers"), NULL, NULL, G_CALLBACK(action_cb) },
     { "queue-move-top", GTK_STOCK_GOTO_TOP, N_("Move to _Top"), NULL, NULL, G_CALLBACK(action_cb) },
-    { "queue-move-up", GTK_STOCK_GO_UP, N_("Move _Up"), NULL, NULL, G_CALLBACK(action_cb) },
-    { "queue-move-down", GTK_STOCK_GO_DOWN, N_("Move _Down"), NULL, NULL, G_CALLBACK(action_cb) },
+    { "queue-move-up", GTK_STOCK_GO_UP, N_("Move _Up"), "<control>Up", NULL, G_CALLBACK(action_cb) },
+    { "queue-move-down", GTK_STOCK_GO_DOWN, N_("Move _Down"), "<control>Down", NULL, G_CALLBACK(action_cb) },
     { "queue-move-bottom", GTK_STOCK_GOTO_BOTTOM, N_("Move to _Bottom"), NULL, NULL, G_CALLBACK(action_cb) },
     { "present-main-window", NULL, N_("Present Main Window"), NULL, NULL, G_CALLBACK(action_cb) }
 };
