@@ -403,7 +403,8 @@ static int compare_time(time_t a, time_t b)
 
 static int compare_by_name(GtkTreeModel* m, GtkTreeIter* a, GtkTreeIter* b, gpointer user_data UNUSED)
 {
-    char const* ca, * cb;
+    char const* ca;
+    char const* cb;
     gtk_tree_model_get(m, a, MC_NAME_COLLATED, &ca, -1);
     gtk_tree_model_get(m, b, MC_NAME_COLLATED, &cb, -1);
     return g_strcmp0(ca, cb);
@@ -411,8 +412,10 @@ static int compare_by_name(GtkTreeModel* m, GtkTreeIter* a, GtkTreeIter* b, gpoi
 
 static int compare_by_queue(GtkTreeModel* m, GtkTreeIter* a, GtkTreeIter* b, gpointer user_data UNUSED)
 {
-    tr_torrent* ta, * tb;
-    tr_stat const* sa, * sb;
+    tr_torrent* ta;
+    tr_torrent* tb;
+    tr_stat const* sa;
+    tr_stat const* sb;
 
     gtk_tree_model_get(m, a, MC_TORRENT, &ta, -1);
     sa = tr_torrentStatCached(ta);
@@ -425,8 +428,10 @@ static int compare_by_queue(GtkTreeModel* m, GtkTreeIter* a, GtkTreeIter* b, gpo
 static int compare_by_ratio(GtkTreeModel* m, GtkTreeIter* a, GtkTreeIter* b, gpointer user_data)
 {
     int ret = 0;
-    tr_torrent* ta, * tb;
-    tr_stat const* sa, * sb;
+    tr_torrent* ta;
+    tr_torrent* tb;
+    tr_stat const* sa;
+    tr_stat const* sb;
 
     gtk_tree_model_get(m, a, MC_TORRENT, &ta, -1);
     sa = tr_torrentStatCached(ta);
@@ -449,8 +454,12 @@ static int compare_by_ratio(GtkTreeModel* m, GtkTreeIter* a, GtkTreeIter* b, gpo
 static int compare_by_activity(GtkTreeModel* m, GtkTreeIter* a, GtkTreeIter* b, gpointer user_data)
 {
     int ret = 0;
-    tr_torrent* ta, * tb;
-    double aUp, aDown, bUp, bDown;
+    tr_torrent* ta;
+    tr_torrent* tb;
+    double aUp;
+    double aDown;
+    double bUp;
+    double bDown;
 
     gtk_tree_model_get(m, a, MC_SPEED_UP, &aUp, MC_SPEED_DOWN, &aDown, MC_TORRENT, &ta, -1);
     gtk_tree_model_get(m, b, MC_SPEED_UP, &bUp, MC_SPEED_DOWN, &bDown, MC_TORRENT, &tb, -1);
@@ -475,7 +484,8 @@ static int compare_by_activity(GtkTreeModel* m, GtkTreeIter* a, GtkTreeIter* b, 
 static int compare_by_age(GtkTreeModel* m, GtkTreeIter* a, GtkTreeIter* b, gpointer u)
 {
     int ret = 0;
-    tr_torrent* ta, * tb;
+    tr_torrent* ta;
+    tr_torrent* tb;
 
     gtk_tree_model_get(m, a, MC_TORRENT, &ta, -1);
     gtk_tree_model_get(m, b, MC_TORRENT, &tb, -1);
@@ -497,7 +507,8 @@ static int compare_by_size(GtkTreeModel* m, GtkTreeIter* a, GtkTreeIter* b, gpoi
 {
     int ret = 0;
     tr_torrent* t;
-    tr_info const* ia, * ib;
+    tr_info const* ia;
+    tr_info const* ib;
 
     gtk_tree_model_get(m, a, MC_TORRENT, &t, -1);
     ia = tr_torrentInfo(t);
@@ -521,7 +532,8 @@ static int compare_by_progress(GtkTreeModel* m, GtkTreeIter* a, GtkTreeIter* b, 
 {
     int ret = 0;
     tr_torrent* t;
-    tr_stat const* sa, * sb;
+    tr_stat const* sa;
+    tr_stat const* sb;
 
     gtk_tree_model_get(m, a, MC_TORRENT, &t, -1);
     sa = tr_torrentStatCached(t);
@@ -549,7 +561,8 @@ static int compare_by_progress(GtkTreeModel* m, GtkTreeIter* a, GtkTreeIter* b, 
 static int compare_by_eta(GtkTreeModel* m, GtkTreeIter* a, GtkTreeIter* b, gpointer u)
 {
     int ret = 0;
-    tr_torrent* ta, * tb;
+    tr_torrent* ta;
+    tr_torrent* tb;
 
     gtk_tree_model_get(m, a, MC_TORRENT, &ta, -1);
     gtk_tree_model_get(m, b, MC_TORRENT, &tb, -1);
@@ -570,8 +583,10 @@ static int compare_by_eta(GtkTreeModel* m, GtkTreeIter* a, GtkTreeIter* b, gpoin
 static int compare_by_state(GtkTreeModel* m, GtkTreeIter* a, GtkTreeIter* b, gpointer u)
 {
     int ret = 0;
-    int sa, sb;
-    tr_torrent* ta, * tb;
+    int sa;
+    int sb;
+    tr_torrent* ta;
+    tr_torrent* tb;
 
     gtk_tree_model_get(m, a, MC_ACTIVITY, &sa, MC_TORRENT, &ta, -1);
     gtk_tree_model_get(m, b, MC_ACTIVITY, &sb, MC_TORRENT, &tb, -1);
@@ -1456,19 +1471,32 @@ static int gtr_compare_double(double const a, double const b, int decimal_places
 
 static void update_foreach(GtkTreeModel* model, GtkTreeIter* iter)
 {
-    int oldActivity, newActivity;
-    int oldActivePeerCount, newActivePeerCount;
-    int oldError, newError;
-    bool oldFinished, newFinished;
-    int oldQueuePosition, newQueuePosition;
-    int oldDownloadPeerCount, newDownloadPeerCount;
-    int oldUploadPeerCount, newUploadPeerCount;
-    tr_priority_t oldPriority, newPriority;
-    unsigned int oldTrackers, newTrackers;
-    double oldUpSpeed, newUpSpeed;
-    double oldDownSpeed, newDownSpeed;
-    double oldRecheckProgress, newRecheckProgress;
-    gboolean oldActive, newActive;
+    int oldActivity;
+    int newActivity;
+    int oldActivePeerCount;
+    int newActivePeerCount;
+    int oldError;
+    int newError;
+    bool oldFinished;
+    bool newFinished;
+    int oldQueuePosition;
+    int newQueuePosition;
+    int oldDownloadPeerCount;
+    int newDownloadPeerCount;
+    int oldUploadPeerCount;
+    int newUploadPeerCount;
+    tr_priority_t oldPriority;
+    tr_priority_t newPriority;
+    unsigned int oldTrackers;
+    unsigned int newTrackers;
+    double oldUpSpeed;
+    double newUpSpeed;
+    double oldDownSpeed;
+    double newDownSpeed;
+    double oldRecheckProgress;
+    double newRecheckProgress;
+    gboolean oldActive;
+    gboolean newActive;
     tr_stat const* st;
     tr_torrent* tor;
 

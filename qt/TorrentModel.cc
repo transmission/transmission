@@ -285,8 +285,10 @@ void TorrentModel::removeTorrent(int id)
 void TorrentModel::getTransferSpeed(Speed& uploadSpeed, size_t& uploadPeerCount, Speed& downloadSpeed,
     size_t& downloadPeerCount)
 {
-    Speed upSpeed, downSpeed;
-    size_t upCount = 0, downCount = 0;
+    Speed upSpeed;
+    Speed downSpeed;
+    size_t upCount = 0;
+    size_t downCount = 0;
 
     for (Torrent const* const tor : myTorrents)
     {

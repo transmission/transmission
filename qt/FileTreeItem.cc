@@ -196,7 +196,8 @@ void FileTreeItem::getSubtreeWantedSize(uint64_t& have, uint64_t& total) const
 double FileTreeItem::progress() const
 {
     double d(0);
-    uint64_t have(0), total(0);
+    uint64_t have(0);
+    uint64_t total(0);
 
     getSubtreeWantedSize(have, total);
 

@@ -185,7 +185,8 @@ void gtr_actions_set_core(TrCore* core)
 
 void gtr_actions_init(GtkUIManager* ui_manager, gpointer callback_user_data)
 {
-    int i, n;
+    int i;
+    int n;
     int active;
     char const* match;
     int const n_entries = G_N_ELEMENTS(entries);

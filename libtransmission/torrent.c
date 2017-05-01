@@ -669,7 +669,8 @@ static tr_piece_index_t getBytePiece(tr_info const* info, uint64_t byteOffset)
 static void initFilePieces(tr_info* info, tr_file_index_t fileIndex)
 {
     tr_file* file;
-    uint64_t firstByte, lastByte;
+    uint64_t firstByte;
+    uint64_t lastByte;
 
     assert(info);
     assert(fileIndex < info->fileCount);
@@ -1324,7 +1325,8 @@ static double getVerifyProgress(tr_torrent const* tor)
 
     if (tr_torrentHasMetadata(tor))
     {
-        tr_piece_index_t i, n;
+        tr_piece_index_t i;
+        tr_piece_index_t n;
         tr_piece_index_t checked = 0;
 
         for (i = 0, n = tor->info.pieceCount; i != n; ++i)
@@ -2230,7 +2232,8 @@ static void onSigCHLD(int i UNUSED)
 
 static void torrentCallScript(tr_torrent const* tor, char const* script)
 {
-    char timeStr[128], * newlinePos;
+    char timeStr[128];
+    char* newlinePos;
     time_t const now = tr_time();
 
     tr_strlcpy(timeStr, ctime(&now), sizeof(timeStr));
@@ -2774,7 +2777,8 @@ void tr_torrentSetPieceChecked(tr_torrent* tor, tr_piece_index_t pieceIndex)
 
 void tr_torrentSetChecked(tr_torrent* tor, time_t when)
 {
-    tr_piece_index_t i, n;
+    tr_piece_index_t i;
+    tr_piece_index_t n;
 
     assert(tr_isTorrent(tor));
 
@@ -3113,7 +3117,8 @@ static void removeEmptyFoldersAndJunkFiles(char const* folder)
  */
 static void deleteLocalData(tr_torrent* tor, tr_fileFunc func)
 {
-    int i, n;
+    int i;
+    int n;
     tr_file_index_t f;
     char* base;
     tr_sys_dir_t odir;

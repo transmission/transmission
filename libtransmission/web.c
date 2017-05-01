@@ -486,7 +486,9 @@ static void tr_webThreadFunc(void* vsession)
             int usec;
             int max_fd;
             struct timeval t;
-            fd_set r_fd_set, w_fd_set, c_fd_set;
+            fd_set r_fd_set;
+            fd_set w_fd_set;
+            fd_set c_fd_set;
 
             max_fd = 0;
             FD_ZERO(&r_fd_set);

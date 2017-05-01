@@ -238,7 +238,8 @@ static void phaseOne(tr_ptrArray* peerArray, tr_direction dir)
 
 void tr_bandwidthAllocate(tr_bandwidth* b, tr_direction dir, unsigned int period_msec)
 {
-    int i, peerCount;
+    int i;
+    int peerCount;
     tr_ptrArray tmp = TR_PTR_ARRAY_INIT;
     tr_ptrArray low = TR_PTR_ARRAY_INIT;
     tr_ptrArray high = TR_PTR_ARRAY_INIT;

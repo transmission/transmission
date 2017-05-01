@@ -244,7 +244,8 @@ static void on_announce_done(tr_session* session, bool did_connect, bool did_tim
             }
             else
             {
-                size_t i, len;
+                size_t i;
+                size_t len;
                 char* str = tr_variantToStr(&benc, TR_VARIANT_FMT_JSON, &len);
                 fprintf(stderr, "%s", "Announce response:\n< ");
 
@@ -417,7 +418,8 @@ static void on_scrape_done(tr_session* session, bool did_connect, bool did_timeo
             }
             else
             {
-                size_t i, len;
+                size_t i;
+                size_t len;
                 char* str = tr_variantToStr(&top, TR_VARIANT_FMT_JSON, &len);
                 fprintf(stderr, "%s", "Scrape response:\n< ");
 

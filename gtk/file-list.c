@@ -166,7 +166,8 @@ static gboolean refreshFilesForeach(GtkTreeModel* model, GtkTreePath* path UNUSE
             {
                 int child_enabled;
                 int child_priority;
-                int64_t child_have, child_size;
+                int64_t child_have;
+                int64_t child_size;
 
                 gtk_tree_model_get(model, &child,
                     FC_SIZE, &child_size,

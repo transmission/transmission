@@ -65,9 +65,11 @@ static int test_encrypt_decrypt(void)
     tr_crypto_ b;
     uint8_t hash[SHA_DIGEST_LENGTH];
     char const test1[] = { "test1" };
-    char buf11[sizeof(test1)], buf12[sizeof(test1)];
+    char buf11[sizeof(test1)];
+    char buf12[sizeof(test1)];
     char const test2[] = { "@#)C$@)#(*%bvkdjfhwbc039bc4603756VB3)" };
-    char buf21[sizeof(test2)], buf22[sizeof(test2)];
+    char buf21[sizeof(test2)];
+    char buf22[sizeof(test2)];
     int i;
 
     for (i = 0; i < SHA_DIGEST_LENGTH; ++i)
@@ -237,7 +239,8 @@ static bool base64_eq(char const* a, char const* b)
 static int test_base64(void)
 {
     size_t len;
-    char* in, * out;
+    char* in;
+    char* out;
     size_t i;
 
     out = tr_base64_encode_str("YOYO!", &len);

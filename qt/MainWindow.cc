@@ -715,8 +715,10 @@ void MainWindow::refreshTrayIconSoon()
 
 void MainWindow::refreshTrayIcon()
 {
-    Speed upSpeed, downSpeed;
-    size_t upCount, downCount;
+    Speed upSpeed;
+    Speed downSpeed;
+    size_t upCount;
+    size_t downCount;
     QString tip;
 
     myModel.getTransferSpeed(upSpeed, upCount, downSpeed, downCount);
@@ -743,8 +745,10 @@ void MainWindow::refreshTrayIcon()
 
 void MainWindow::refreshStatusBar()
 {
-    Speed upSpeed, downSpeed;
-    size_t upCount, downCount;
+    Speed upSpeed;
+    Speed downSpeed;
+    size_t upCount;
+    size_t downCount;
     myModel.getTransferSpeed(upSpeed, upCount, downSpeed, downCount);
 
     ui.uploadSpeedLabel->setText(Formatter::uploadSpeedToString(upSpeed));
@@ -1317,7 +1321,8 @@ void MainWindow::removeTorrents(bool const deleteFiles)
 {
     QSet<int> ids;
     QMessageBox msgBox(this);
-    QString primary_text, secondary_text;
+    QString primary_text;
+    QString secondary_text;
     int incomplete = 0;
     int connected = 0;
     int count;

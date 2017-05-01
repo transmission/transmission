@@ -383,7 +383,9 @@ static void refreshOptions(struct DetailsImpl* di, tr_torrent** torrents, int n)
 static void torrent_set_bool(struct DetailsImpl* di, tr_quark const key, gboolean value)
 {
     GSList* l;
-    tr_variant top, * args, * ids;
+    tr_variant top;
+    tr_variant* args;
+    tr_variant* ids;
 
     tr_variantInitDict(&top, 2);
     tr_variantDictAddStr(&top, TR_KEY_method, "torrent-set");
@@ -403,7 +405,9 @@ static void torrent_set_bool(struct DetailsImpl* di, tr_quark const key, gboolea
 static void torrent_set_int(struct DetailsImpl* di, tr_quark const key, int value)
 {
     GSList* l;
-    tr_variant top, * args, * ids;
+    tr_variant top;
+    tr_variant* args;
+    tr_variant* ids;
 
     tr_variantInitDict(&top, 2);
     tr_variantDictAddStr(&top, TR_KEY_method, "torrent-set");
@@ -423,7 +427,9 @@ static void torrent_set_int(struct DetailsImpl* di, tr_quark const key, int valu
 static void torrent_set_real(struct DetailsImpl* di, tr_quark const key, double value)
 {
     GSList* l;
-    tr_variant top, * args, * ids;
+    tr_variant top;
+    tr_variant* args;
+    tr_variant* ids;
 
     tr_variantInitDict(&top, 2);
     tr_variantDictAddStr(&top, TR_KEY_method, "torrent-set");
@@ -529,7 +535,10 @@ static GtkWidget* options_page_new(struct DetailsImpl* d)
     guint row;
     gulong tag;
     char buf[128];
-    GtkWidget* t, * w, * tb, * h;
+    GtkWidget* t;
+    GtkWidget* w;
+    GtkWidget* tb;
+    GtkWidget* h;
 
     row = 0;
     t = hig_workarea_create();
@@ -643,7 +652,8 @@ static char const* activityString(int activity, bool finished)
 static void gtr_text_buffer_set_text(GtkTextBuffer* b, char const* str)
 {
     char* old_str;
-    GtkTextIter start, end;
+    GtkTextIter start;
+    GtkTextIter end;
 
     if (str == NULL)
     {
@@ -1001,7 +1011,10 @@ static void refreshInfo(struct DetailsImpl* di, tr_torrent** torrents, int n)
         }
 
         {
-            char buf2[32], unver[64], total[64], avail[32];
+            char buf2[32];
+            char unver[64];
+            char total[64];
+            char avail[32];
             double const d = sizeWhenDone ? (100.0 * available) / sizeWhenDone : 0;
             double const ratio = 100.0 * (sizeWhenDone ? (haveValid + haveUnchecked) / (double)sizeWhenDone : 1);
 
@@ -1037,8 +1050,10 @@ static void refreshInfo(struct DetailsImpl* di, tr_torrent** torrents, int n)
     }
     else
     {
-        char dbuf[64], fbuf[64];
-        uint64_t d = 0, f = 0;
+        char dbuf[64];
+        char fbuf[64];
+        uint64_t d = 0;
+        uint64_t f = 0;
 
         for (i = 0; i < n; ++i)
         {
@@ -1189,7 +1204,10 @@ static GtkWidget* info_page_new(struct DetailsImpl* di)
 {
     guint row = 0;
     GtkTextBuffer* b;
-    GtkWidget* l, * w, * fr, * sw;
+    GtkWidget* l;
+    GtkWidget* w;
+    GtkWidget* fr;
+    GtkWidget* sw;
     GtkWidget* t = hig_workarea_create();
 
     hig_workarea_add_section_title(t, &row, _("Activity"));
@@ -2071,7 +2089,11 @@ static GtkWidget* peer_page_new(struct DetailsImpl* di)
     gboolean b;
     char const* str;
     GtkListStore* store;
-    GtkWidget* v, * w, * ret, * sw, * vbox;
+    GtkWidget* v;
+    GtkWidget* w;
+    GtkWidget* ret;
+    GtkWidget* sw;
+    GtkWidget* vbox;
     GtkWidget* webtree = NULL;
     GtkTreeModel* m;
     GtkTreeViewColumn* c;
@@ -2545,9 +2567,11 @@ static void on_edit_trackers_response(GtkDialog* dialog, int response, gpointer 
 
     if (response == GTK_RESPONSE_ACCEPT)
     {
-        int i, n;
+        int i;
+        int n;
         int tier;
-        GtkTextIter start, end;
+        GtkTextIter start;
+        GtkTextIter end;
         int const torrent_id = GPOINTER_TO_INT(g_object_get_qdata(G_OBJECT(dialog), TORRENT_ID_KEY));
         GtkTextBuffer* text_buffer = g_object_get_qdata(G_OBJECT(dialog), TEXT_BUFFER_KEY);
         tr_torrent* tor = gtr_core_find_torrent(di->core, torrent_id);
@@ -2650,7 +2674,12 @@ static void on_edit_trackers(GtkButton* button, gpointer data)
     if (tor != NULL)
     {
         guint row;
-        GtkWidget* w, * d, * fr, * t, * l, * sw;
+        GtkWidget* w;
+        GtkWidget* d;
+        GtkWidget* fr;
+        GtkWidget* t;
+        GtkWidget* l;
+        GtkWidget* sw;
         GtkWindow* win = GTK_WINDOW(gtk_widget_get_toplevel(GTK_WIDGET(button)));
         GString* gstr = di->gstr; /* buffer for temporary strings */
         int const torrent_id = tr_torrentId(tor);
@@ -2720,7 +2749,9 @@ static void on_add_tracker_response(GtkDialog* dialog, int response, gpointer gd
         {
             if (tr_urlIsValidTracker(url))
             {
-                tr_variant top, * args, * trackers;
+                tr_variant top;
+                tr_variant* args;
+                tr_variant* trackers;
 
                 tr_variantInitDict(&top, 2);
                 tr_variantDictAddStr(&top, TR_KEY_method, "torrent-set");
@@ -2796,7 +2827,9 @@ static void on_tracker_list_remove_button_clicked(GtkButton* button UNUSED, gpoi
     {
         int torrent_id;
         int tracker_id;
-        tr_variant top, * args, * trackers;
+        tr_variant top;
+        tr_variant* args;
+        tr_variant* trackers;
 
         gtk_tree_model_get(model, &iter,
             TRACKER_COL_TRACKER_ID, &tracker_id,
@@ -2823,7 +2856,11 @@ static GtkWidget* tracker_page_new(struct DetailsImpl* di)
     GtkCellRenderer* r;
     GtkTreeViewColumn* c;
     GtkTreeSelection* sel;
-    GtkWidget* vbox, * sw, * w, * v, * hbox;
+    GtkWidget* vbox;
+    GtkWidget* sw;
+    GtkWidget* w;
+    GtkWidget* v;
+    GtkWidget* hbox;
     int const pad = (GUI_PAD + GUI_PAD_BIG) / 2;
 
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, GUI_PAD);
@@ -2961,7 +2998,11 @@ static void details_free(gpointer gdata)
 
 GtkWidget* gtr_torrent_details_dialog_new(GtkWindow* parent, TrCore* core)
 {
-    GtkWidget* d, * n, * v, * w, * l;
+    GtkWidget* d;
+    GtkWidget* n;
+    GtkWidget* v;
+    GtkWidget* w;
+    GtkWidget* l;
     struct DetailsImpl* di = g_new0(struct DetailsImpl, 1);
 
     /* one-time setup */

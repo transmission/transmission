@@ -506,7 +506,8 @@ void tr_netClose(tr_session* session, tr_socket_t s)
 static int get_source_address(struct sockaddr const* dst, socklen_t dst_len, struct sockaddr* src, socklen_t* src_len)
 {
     tr_socket_t s;
-    int rc, save;
+    int rc;
+    int save;
 
     s = socket(dst->sa_family, SOCK_DGRAM, 0);
 

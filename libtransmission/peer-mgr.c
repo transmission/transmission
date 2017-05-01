@@ -772,7 +772,8 @@ static struct block_request* requestListLookup(tr_swarm* s, tr_block_index_t blo
 static void getBlockRequestPeers(tr_swarm* s, tr_block_index_t block, tr_ptrArray* peerArr)
 {
     bool exact;
-    int i, pos;
+    int i;
+    int pos;
     struct block_request key;
 
     key.block = block;
@@ -916,7 +917,10 @@ static int comparePieceByWeight(void const* va, void const* vb)
 {
     struct weighted_piece const* a = va;
     struct weighted_piece const* b = vb;
-    int ia, ib, missing, pending;
+    int ia;
+    int ib;
+    int missing;
+    int pending;
     tr_torrent const* tor = weightTorrent;
     uint16_t const* rep = weightReplication;
 
@@ -1688,7 +1692,8 @@ static void removeRequestFromTables(tr_swarm* s, tr_block_index_t block, tr_peer
    either way we need to remove all its requests */
 static void peerDeclinedAllRequests(tr_swarm* s, tr_peer const* peer)
 {
-    int i, n;
+    int i;
+    int n;
     tr_block_index_t* blocks = tr_new(tr_block_index_t, s->requestCount);
 
     for (i = n = 0; i < s->requestCount; ++i)
@@ -2979,7 +2984,8 @@ void tr_peerMgrClearInterest(tr_torrent* tor)
 /* does this peer have any pieces that we want? */
 static bool isPeerInteresting(tr_torrent* const tor, bool const* const piece_is_interesting, tr_peer const* const peer)
 {
-    tr_piece_index_t i, n;
+    tr_piece_index_t i;
+    tr_piece_index_t n;
 
     /* these cases should have already been handled by the calling code... */
     assert(!tr_torrentIsSeed(tor));
@@ -3288,7 +3294,9 @@ static inline bool isBandwidthMaxedOut(tr_bandwidth const* b, uint64_t const now
 
 static void rechokeUploads(tr_swarm* s, uint64_t const now)
 {
-    int i, size, unchokedInterested;
+    int i;
+    int size;
+    int unchokedInterested;
     int const peerCount = tr_ptrArraySize(&s->peers);
     tr_peer** peers = (tr_peer**)tr_ptrArrayBase(&s->peers);
     struct ChokeData* choke = tr_new0(struct ChokeData, peerCount);
@@ -3380,7 +3388,8 @@ static void rechokeUploads(tr_swarm* s, uint64_t const now)
             if (choke[i].isInterested)
             {
                 tr_peerMsgs const* msgs = choke[i].msgs;
-                int x = 1, y;
+                int x = 1;
+                int y;
 
                 if (isNew(msgs))
                 {
@@ -3702,7 +3711,8 @@ static void sortPeersByLivelinessImpl(tr_peer** peers, void** clientData, int n,
     void const* vb))
 {
     int i;
-    struct peer_liveliness* lives, * l;
+    struct peer_liveliness* lives;
+    struct peer_liveliness* l;
 
     /* build a sortable array of peer + extra info */
     lives = l = tr_new0(struct peer_liveliness, n);
@@ -4336,7 +4346,8 @@ static struct peer_candidate* getPeerCandidates(tr_session* session, int* candid
 
     while ((tor = tr_torrentNext(session, tor)) != NULL)
     {
-        int i, nAtoms;
+        int i;
+        int nAtoms;
         struct peer_atom** atoms;
 
         if (!tor->swarm->isRunning)
@@ -4439,7 +4450,8 @@ static void initiateCandidateConnection(tr_peerMgr* mgr, struct peer_candidate* 
 
 static void makeNewPeerConnections(struct tr_peerMgr* mgr, int const max)
 {
-    int i, n;
+    int i;
+    int n;
     struct peer_candidate* candidates;
 
     candidates = getPeerCandidates(mgr->session, &n, max);

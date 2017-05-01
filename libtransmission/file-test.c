@@ -159,7 +159,8 @@ static int test_get_info(void)
     tr_sys_path_info info;
     tr_sys_file_t fd;
     tr_error* err = NULL;
-    char* path1, * path2;
+    char* path1;
+    char* path2;
     time_t t;
 
     path1 = tr_buildPath(test_dir, "a", NULL);
@@ -263,7 +264,8 @@ static int test_path_exists(void)
 {
     char* const test_dir = create_test_dir(__FUNCTION__);
     tr_error* err = NULL;
-    char* path1, * path2;
+    char* path1;
+    char* path2;
 
     path1 = tr_buildPath(test_dir, "a", NULL);
     path2 = tr_buildPath(test_dir, "b", NULL);
@@ -371,7 +373,9 @@ static int test_path_is_same(void)
 {
     char* const test_dir = create_test_dir(__FUNCTION__);
     tr_error* err = NULL;
-    char* path1, * path2, * path3;
+    char* path1;
+    char* path2;
+    char* path3;
 
     path1 = tr_buildPath(test_dir, "a", NULL);
     path2 = tr_buildPath(test_dir, "b", NULL);
@@ -583,7 +587,8 @@ static int test_path_resolve(void)
 {
     char* const test_dir = create_test_dir(__FUNCTION__);
     tr_error* err = NULL;
-    char* path1, * path2;
+    char* path1;
+    char* path2;
 
     path1 = tr_buildPath(test_dir, "a", NULL);
     path2 = tr_buildPath(test_dir, "b", NULL);
@@ -776,7 +781,9 @@ static int test_path_rename(void)
 {
     char* const test_dir = create_test_dir(__FUNCTION__);
     tr_error* err = NULL;
-    char* path1, * path2, * path3;
+    char* path1;
+    char* path2;
+    char* path3;
 
     path1 = tr_buildPath(test_dir, "a", NULL);
     path2 = tr_buildPath(test_dir, "b", NULL);
@@ -892,7 +899,9 @@ static int test_path_remove(void)
 {
     char* const test_dir = create_test_dir(__FUNCTION__);
     tr_error* err = NULL;
-    char* path1, * path2, * path3;
+    char* path1;
+    char* path2;
+    char* path3;
 
     path1 = tr_buildPath(test_dir, "a", NULL);
     path2 = tr_buildPath(test_dir, "b", NULL);
@@ -1377,7 +1386,8 @@ static int test_dir_create(void)
 {
     char* const test_dir = create_test_dir(__FUNCTION__);
     tr_error* err = NULL;
-    char* path1, * path2;
+    char* path1;
+    char* path2;
 
     path1 = tr_buildPath(test_dir, "a", NULL);
     path2 = tr_buildPath(path1, "b", NULL);
@@ -1477,8 +1487,10 @@ static int test_dir_read_impl(char const* path, bool* have1, bool* have2)
 static int test_dir_read(void)
 {
     char* const test_dir = create_test_dir(__FUNCTION__);
-    char* path1, * path2;
-    bool have1, have2;
+    char* path1;
+    char* path2;
+    bool have1;
+    bool have2;
 
     path1 = tr_buildPath(test_dir, "a", NULL);
     path2 = tr_buildPath(test_dir, "b", NULL);

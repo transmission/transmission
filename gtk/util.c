@@ -101,8 +101,13 @@ char* tr_strlsize(char* buf, guint64 bytes, size_t buflen)
 
 char* tr_strltime(char* buf, int seconds, size_t buflen)
 {
-    int days, hours, minutes;
-    char d[128], h[128], m[128], s[128];
+    int days;
+    int hours;
+    int minutes;
+    char d[128];
+    char h[128];
+    char m[128];
+    char s[128];
 
     if (seconds < 0)
     {

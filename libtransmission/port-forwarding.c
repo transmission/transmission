@@ -110,7 +110,8 @@ static void natPulse(tr_shared* s, bool do_check)
 
 static void set_evtimer_from_status(tr_shared* s)
 {
-    int sec = 0, msec = 0;
+    int sec = 0;
+    int msec = 0;
 
     /* when to wake up again */
     switch (tr_sharedTraversalStatus(s))

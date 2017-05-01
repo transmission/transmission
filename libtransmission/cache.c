@@ -139,7 +139,8 @@ enum
 static int calcRuns(tr_cache* cache, struct run_info* runs)
 {
     int const n = tr_ptrArraySize(&cache->blocks);
-    int i = 0, pos;
+    int i = 0;
+    int pos;
     time_t const now = tr_time();
 
     for (pos = 0; pos < n; pos += runs[i++].len)
@@ -234,7 +235,8 @@ static int cacheTrim(tr_cache* cache)
          * runs can grow as well as how often flushes will happen. */
         int const cacheCutoff = 1 + cache->max_blocks / 4;
         struct run_info* runs = tr_new(struct run_info, tr_ptrArraySize(&cache->blocks));
-        int i = 0, j = 0;
+        int i = 0;
+        int j = 0;
 
         calcRuns(cache, runs);
 
@@ -406,7 +408,8 @@ int tr_cacheFlushDone(tr_cache* cache)
 
     if (tr_ptrArraySize(&cache->blocks) > 0)
     {
-        int i, n;
+        int i;
+        int n;
         struct run_info* runs;
 
         runs = tr_new(struct run_info, tr_ptrArraySize(&cache->blocks));

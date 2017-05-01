@@ -123,7 +123,8 @@ static void level_combo_changed_cb(GtkComboBox* combo_box, gpointer gdata)
 /* similar to asctime, but is utf8-clean */
 static char* gtr_localtime(time_t time)
 {
-    char buf[256], * eoln;
+    char buf[256];
+    char* eoln;
     struct tm const tm = *localtime(&time);
 
     g_strlcpy(buf, asctime(&tm), sizeof(buf));

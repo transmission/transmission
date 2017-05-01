@@ -95,7 +95,8 @@ static struct sockaddr_in lpd_mcastAddr; /**<initialized from the above constant
 * @brief Protocol-related information carried by a Local Peer Discovery packet */
 struct lpd_protocolVersion
 {
-    int major, minor;
+    int major;
+    int minor;
 };
 
 enum lpd_enumTimeToLive
@@ -169,7 +170,8 @@ static int lpd_unsolicitedMsgCounter;
 */
 static char const* lpd_extractHeader(char const* s, struct lpd_protocolVersion* const ver)
 {
-    int major = -1, minor = -1;
+    int major = -1;
+    int minor = -1;
     size_t len;
 
     assert(s != NULL);
@@ -294,7 +296,8 @@ static void on_upkeep_timer(evutil_socket_t, short, void*);
 int tr_lpdInit(tr_session* ss, tr_address* tr_addr UNUSED)
 {
     struct ip_mreq mcastReq;
-    int const opt_on = 1, opt_off = 0;
+    int const opt_on = 1;
+    int const opt_off = 0;
 
     if (session != NULL) /* already initialized */
     {
@@ -551,7 +554,8 @@ static int tr_lpdConsiderAnnounce(tr_pex* peer, char const* const msg)
     struct lpd_protocolVersion ver = { -1, -1 };
     char value[maxValueLen] = { 0 };
     char hashString[maxHashLen] = { 0 };
-    int res = 0, peerPort = 0;
+    int res = 0;
+    int peerPort = 0;
 
     if (peer != NULL && msg != NULL)
     {

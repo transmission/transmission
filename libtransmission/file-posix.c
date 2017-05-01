@@ -272,7 +272,8 @@ bool tr_sys_path_is_relative(char const* path)
 bool tr_sys_path_is_same(char const* path1, char const* path2, tr_error** error)
 {
     bool ret = false;
-    struct stat sb1, sb2;
+    struct stat sb1;
+    struct stat sb2;
 
     assert(path1 != NULL);
     assert(path2 != NULL);

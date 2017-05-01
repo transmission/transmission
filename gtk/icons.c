@@ -50,7 +50,8 @@ static GdkPixbuf* create_void_pixbuf(int width, int height)
 
 static int get_size_in_pixels(GtkWidget* widget, GtkIconSize icon_size)
 {
-    int width, height;
+    int width;
+    int height;
 
     gtk_icon_size_lookup_for_settings(gtk_widget_get_settings(widget), icon_size, &width, &height);
     return MAX(width, height);

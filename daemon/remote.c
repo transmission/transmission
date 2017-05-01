@@ -89,8 +89,16 @@ static void etaToString(char* buf, size_t buflen, int64_t eta)
 
 static char* tr_strltime(char* buf, int seconds, size_t buflen)
 {
-    int days, hours, minutes, total_seconds;
-    char b[128], d[128], h[128], m[128], s[128], t[128];
+    int days;
+    int hours;
+    int minutes;
+    int total_seconds;
+    char b[128];
+    char d[128];
+    char h[128];
+    char m[128];
+    char s[128];
+    char t[128];
 
     if (seconds < 0)
     {
@@ -894,11 +902,13 @@ static char const* bandwidthPriorityNames[] =
 
 static void printDetails(tr_variant* top)
 {
-    tr_variant* args, * torrents;
+    tr_variant* args;
+    tr_variant* torrents;
 
     if (tr_variantDictFindDict(top, TR_KEY_arguments, &args) && tr_variantDictFindList(args, TR_KEY_torrents, &torrents))
     {
-        int ti, tCount;
+        int ti;
+        int tCount;
 
         for (ti = 0, tCount = tr_variantListSize(torrents); ti < tCount; ++ti)
         {
@@ -907,7 +917,9 @@ static void printDetails(tr_variant* top)
             char const* str;
             char buf[512];
             char buf2[512];
-            int64_t i, j, k;
+            int64_t i;
+            int64_t j;
+            int64_t k;
             bool boolVal;
             double d;
 
@@ -1200,22 +1212,27 @@ static void printDetails(tr_variant* top)
 
 static void printFileList(tr_variant* top)
 {
-    tr_variant* args, * torrents;
+    tr_variant* args;
+    tr_variant* torrents;
 
     if (tr_variantDictFindDict(top, TR_KEY_arguments, &args) && tr_variantDictFindList(args, TR_KEY_torrents, &torrents))
     {
-        int i, in;
+        int i;
+        int in;
 
         for (i = 0, in = tr_variantListSize(torrents); i < in; ++i)
         {
             tr_variant* d = tr_variantListChild(torrents, i);
-            tr_variant* files, * priorities, * wanteds;
+            tr_variant* files;
+            tr_variant* priorities;
+            tr_variant* wanteds;
             char const* name;
 
             if (tr_variantDictFindStr(d, TR_KEY_name, &name, NULL) && tr_variantDictFindList(d, TR_KEY_files, &files) &&
                 tr_variantDictFindList(d, TR_KEY_priorities, &priorities) && tr_variantDictFindList(d, TR_KEY_wanted, &wanteds))
             {
-                int j = 0, jn = tr_variantListSize(files);
+                int j = 0;
+                int jn = tr_variantListSize(files);
                 printf("%s (%d files):\n", name, jn);
                 printf("%3s  %4s %8s %3s %9s  %s\n", "#", "Done", "Priority", "Get", "Size", "Name");
 
@@ -1263,14 +1280,18 @@ static void printFileList(tr_variant* top)
 
 static void printPeersImpl(tr_variant* peers)
 {
-    int i, n;
+    int i;
+    int n;
     printf("%-40s  %-12s  %-5s %-6s  %-6s  %s\n", "Address", "Flags", "Done", "Down", "Up", "Client");
 
     for (i = 0, n = tr_variantListSize(peers); i < n; ++i)
     {
         double progress;
-        char const* address, * client, * flagstr;
-        int64_t rateToClient, rateToPeer;
+        char const* address;
+        char const* client;
+        char const* flagstr;
+        int64_t rateToClient;
+        int64_t rateToPeer;
         tr_variant* d = tr_variantListChild(peers, i);
 
         if (tr_variantDictFindStr(d, TR_KEY_address, &address, NULL) && tr_variantDictFindStr(d, TR_KEY_clientName, &client, NULL) &&
@@ -1285,11 +1306,13 @@ static void printPeersImpl(tr_variant* peers)
 
 static void printPeers(tr_variant* top)
 {
-    tr_variant* args, * torrents;
+    tr_variant* args;
+    tr_variant* torrents;
 
     if (tr_variantDictFindDict(top, TR_KEY_arguments, &args) && tr_variantDictFindList(args, TR_KEY_torrents, &torrents))
     {
-        int i, n;
+        int i;
+        int n;
 
         for (i = 0, n = tr_variantListSize(torrents); i < n; ++i)
         {
@@ -1311,7 +1334,9 @@ static void printPeers(tr_variant* top)
 
 static void printPiecesImpl(uint8_t const* raw, size_t rawlen, size_t j)
 {
-    size_t i, k, len;
+    size_t i;
+    size_t k;
+    size_t len;
     char* str = tr_base64_decode(raw, rawlen, &len);
     printf("  ");
 
@@ -1338,11 +1363,13 @@ static void printPiecesImpl(uint8_t const* raw, size_t rawlen, size_t j)
 
 static void printPieces(tr_variant* top)
 {
-    tr_variant* args, * torrents;
+    tr_variant* args;
+    tr_variant* torrents;
 
     if (tr_variantDictFindDict(top, TR_KEY_arguments, &args) && tr_variantDictFindList(args, TR_KEY_torrents, &torrents))
     {
-        int i, n;
+        int i;
+        int n;
 
         for (i = 0, n = tr_variantListSize(torrents); i < n; ++i)
         {
@@ -1382,13 +1409,16 @@ static void printPortTest(tr_variant* top)
 
 static void printTorrentList(tr_variant* top)
 {
-    tr_variant* args, * list;
+    tr_variant* args;
+    tr_variant* list;
 
     if (tr_variantDictFindDict(top, TR_KEY_arguments, &args) && tr_variantDictFindList(args, TR_KEY_torrents, &list))
     {
-        int i, n;
+        int i;
+        int n;
         int64_t total_size = 0;
-        double total_up = 0, total_down = 0;
+        double total_up = 0;
+        double total_down = 0;
         char haveStr[32];
 
         printf("%-4s   %-4s  %9s  %-8s  %6s  %6s  %-5s  %-11s  %s\n", "ID", "Done", "Have", "ETA", "Up", "Down", "Ratio", "Status",
@@ -1396,8 +1426,13 @@ static void printTorrentList(tr_variant* top)
 
         for (i = 0, n = tr_variantListSize(list); i < n; ++i)
         {
-            int64_t id, eta, status, up, down;
-            int64_t sizeWhenDone, leftUntilDone;
+            int64_t id;
+            int64_t eta;
+            int64_t status;
+            int64_t up;
+            int64_t down;
+            int64_t sizeWhenDone;
+            int64_t leftUntilDone;
             double ratio;
             char const* name;
             tr_variant* d = tr_variantListChild(list, i);
@@ -1616,11 +1651,13 @@ static void printTrackersImpl(tr_variant* trackerStats)
 
 static void printTrackers(tr_variant* top)
 {
-    tr_variant* args, * torrents;
+    tr_variant* args;
+    tr_variant* torrents;
 
     if (tr_variantDictFindDict(top, TR_KEY_arguments, &args) && tr_variantDictFindList(args, TR_KEY_torrents, &torrents))
     {
-        int i, n;
+        int i;
+        int n;
 
         for (i = 0, n = tr_variantListSize(torrents); i < n; ++i)
         {
@@ -1725,8 +1762,19 @@ static void printSession(tr_variant* top)
         printf("\n");
 
         {
-            bool altEnabled, altTimeEnabled, upEnabled, downEnabled, seedRatioLimited;
-            int64_t altDown, altUp, altBegin, altEnd, altDay, upLimit, downLimit, peerLimit;
+            bool altEnabled;
+            bool altTimeEnabled;
+            bool upEnabled;
+            bool downEnabled;
+            bool seedRatioLimited;
+            int64_t altDown;
+            int64_t altUp;
+            int64_t altBegin;
+            int64_t altEnd;
+            int64_t altDay;
+            int64_t upLimit;
+            int64_t downLimit;
+            int64_t peerLimit;
             double seedRatioLimit;
 
             if (tr_variantDictFindInt(args, TR_KEY_alt_speed_down, &altDown) &&
@@ -1859,12 +1907,16 @@ static void printSession(tr_variant* top)
 
 static void printSessionStats(tr_variant* top)
 {
-    tr_variant* args, * d;
+    tr_variant* args;
+    tr_variant* d;
 
     if (tr_variantDictFindDict(top, TR_KEY_arguments, &args))
     {
         char buf[512];
-        int64_t up, down, secs, sessions;
+        int64_t up;
+        int64_t down;
+        int64_t secs;
+        int64_t sessions;
 
         if (tr_variantDictFindDict(args, TR_KEY_current_stats, &d) && tr_variantDictFindInt(d, TR_KEY_uploadedBytes, &up) &&
             tr_variantDictFindInt(d, TR_KEY_downloadedBytes, &down) && tr_variantDictFindInt(d, TR_KEY_secondsActive, &secs))
@@ -2276,7 +2328,8 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
         }
         else if (stepMode == MODE_TORRENT_GET)
         {
-            size_t i, n;
+            size_t i;
+            size_t n;
             tr_variant* top = tr_new0(tr_variant, 1);
             tr_variant* args;
             tr_variant* fields;

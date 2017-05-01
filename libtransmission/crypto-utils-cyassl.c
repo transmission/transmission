@@ -240,7 +240,8 @@ void tr_dh_free(tr_dh_ctx_t raw_handle)
 bool tr_dh_make_key(tr_dh_ctx_t raw_handle, size_t private_key_length UNUSED, uint8_t* public_key, size_t* public_key_length)
 {
     struct tr_dh_ctx* handle = raw_handle;
-    word32 my_private_key_length, my_public_key_length;
+    word32 my_private_key_length;
+    word32 my_public_key_length;
     tr_lock* rng_lock = get_rng_lock();
 
     assert(handle != NULL);

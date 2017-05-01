@@ -412,8 +412,10 @@ void tr_bitfieldAdd(tr_bitfield* b, size_t nth)
 /* Sets bit range [begin, end) to 1 */
 void tr_bitfieldAddRange(tr_bitfield* b, size_t begin, size_t end)
 {
-    size_t sb, eb;
-    unsigned char sm, em;
+    size_t sb;
+    size_t eb;
+    unsigned char sm;
+    unsigned char em;
     size_t const diff = (end - begin) - tr_bitfieldCountRange(b, begin, end);
 
     if (diff == 0)
@@ -470,8 +472,10 @@ void tr_bitfieldRem(tr_bitfield* b, size_t nth)
 /* Clears bit range [begin, end) to 0 */
 void tr_bitfieldRemRange(tr_bitfield* b, size_t begin, size_t end)
 {
-    size_t sb, eb;
-    unsigned char sm, em;
+    size_t sb;
+    size_t eb;
+    unsigned char sm;
+    unsigned char em;
     size_t const diff = tr_bitfieldCountRange(b, begin, end);
 
     if (diff == 0)

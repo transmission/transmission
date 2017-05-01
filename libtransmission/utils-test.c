@@ -53,7 +53,8 @@ static int test_strip_positional_args(void)
 
 static int test_strstrip(void)
 {
-    char* in, * out;
+    char* in;
+    char* out;
 
     /* strstrip */
     in = tr_strdup("   test    ");
@@ -441,7 +442,9 @@ static char* test_strdup_printf_valist(char const* fmt, ...)
 
 static int test_strdup_printf(void)
 {
-    char* s, * s2, * s3;
+    char* s;
+    char* s2;
+    char* s3;
 
     s = tr_strdup_printf("%s", "test");
     check_streq("test", s);

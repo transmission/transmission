@@ -548,7 +548,8 @@ static void tau_tracker_send_request(struct tau_tracker* tracker, void const* pa
 
 static void tau_tracker_send_reqs(struct tau_tracker* tracker)
 {
-    int i, n;
+    int i;
+    int n;
     tr_ptrArray* reqs;
     time_t const now = tr_time();
 
@@ -639,7 +640,8 @@ static void on_tracker_connection_response(struct tau_tracker* tracker, tau_acti
 
 static void tau_tracker_timeout_reqs(struct tau_tracker* tracker)
 {
-    int i, n;
+    int i;
+    int n;
     tr_ptrArray* reqs;
     time_t const now = time(NULL);
     bool const cancel_all = tracker->close_at && (tracker->close_at <= now);

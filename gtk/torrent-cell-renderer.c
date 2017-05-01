@@ -41,7 +41,12 @@ static void getProgressString(GString* gstr, tr_torrent const* tor, tr_info cons
     bool const isDone = st->leftUntilDone == 0;
     uint64_t const haveTotal = st->haveUnchecked + st->haveValid;
     bool const isSeed = st->haveValid >= info->totalSize;
-    char buf1[32], buf2[32], buf3[32], buf4[32], buf5[32], buf6[32];
+    char buf1[32];
+    char buf2[32];
+    char buf3[32];
+    char buf4[32];
+    char buf5[32];
+    char buf6[32];
     double seedRatio;
     bool const hasSeedRatio = tr_torrentGetSeedRatio(tor, &seedRatio);
 
@@ -366,7 +371,8 @@ static void gtr_cell_renderer_get_preferred_size(GtkCellRenderer* renderer, GtkW
 
 static void get_size_compact(TorrentCellRenderer* cell, GtkWidget* widget, gint* width, gint* height)
 {
-    int xpad, ypad;
+    int xpad;
+    int ypad;
     GtkRequisition icon_size;
     GtkRequisition name_size;
     GtkRequisition stat_size;
@@ -416,7 +422,8 @@ static void get_size_compact(TorrentCellRenderer* cell, GtkWidget* widget, gint*
 
 static void get_size_full(TorrentCellRenderer* cell, GtkWidget* widget, gint* width, gint* height)
 {
-    int xpad, ypad;
+    int xpad;
+    int ypad;
     GtkRequisition icon_size;
     GtkRequisition name_size;
     GtkRequisition stat_size;
@@ -476,7 +483,8 @@ static void torrent_cell_renderer_get_size(GtkCellRenderer* cell, GtkWidget* wid
 
     if (self != NULL && self->priv->tor != NULL)
     {
-        int w, h;
+        int w;
+        int h;
         struct TorrentCellRendererPrivate* p = self->priv;
 
         if (p->compact)
@@ -562,7 +570,8 @@ static void gtr_cell_renderer_render(GtkCellRenderer* renderer, GtrDrawable* dra
 static void render_compact(TorrentCellRenderer* cell, GtrDrawable* window, GtkWidget* widget,
     GdkRectangle const* background_area, GdkRectangle const* cell_area UNUSED, GtkCellRendererState flags)
 {
-    int xpad, ypad;
+    int xpad;
+    int ypad;
     GtkRequisition size;
     GdkRectangle icon_area;
     GdkRectangle name_area;
@@ -636,7 +645,8 @@ static void render_compact(TorrentCellRenderer* cell, GtrDrawable* window, GtkWi
 static void render_full(TorrentCellRenderer* cell, GtrDrawable* window, GtkWidget* widget, GdkRectangle const* background_area,
     GdkRectangle const* cell_area UNUSED, GtkCellRendererState flags)
 {
-    int xpad, ypad;
+    int xpad;
+    int ypad;
     GtkRequisition size;
     GdkRectangle fill_area;
     GdkRectangle icon_area;

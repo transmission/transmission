@@ -968,7 +968,9 @@ static GtkWidget* speedPage(GObject* core)
     char const* s;
     GtkWidget* t;
     GtkWidget* l;
-    GtkWidget* w, * w2, * h;
+    GtkWidget* w;
+    GtkWidget* w2;
+    GtkWidget* h;
     char buf[512];
     guint row = 0;
     struct BandwidthPage* page = tr_new0(struct BandwidthPage, 1);

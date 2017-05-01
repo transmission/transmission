@@ -580,7 +580,8 @@ size_t tr_generateAllowedSet(tr_piece_index_t* setmePieces, size_t desiredSetSiz
 
     if (addr->type == TR_AF_INET)
     {
-        uint8_t w[SHA_DIGEST_LENGTH + 4], * walk = w;
+        uint8_t w[SHA_DIGEST_LENGTH + 4];
+        uint8_t* walk = w;
         uint8_t x[SHA_DIGEST_LENGTH];
 
         uint32_t ui32 = ntohl(htonl(addr->addr.addr4.s_addr) & 0xffffff00); /* (1) */
@@ -966,7 +967,8 @@ static void sendLtepHandshake(tr_peerMsgs* msgs)
 static void parseLtepHandshake(tr_peerMsgs* msgs, uint32_t len, struct evbuffer* inbuf)
 {
     int64_t i;
-    tr_variant val, * sub;
+    tr_variant val;
+    tr_variant* sub;
     uint8_t* tmp = tr_new(uint8_t, len);
     uint8_t const* addr;
     size_t addr_len;
@@ -1168,7 +1170,8 @@ static void parseUtPex(tr_peerMsgs* msgs, uint32_t msglen, struct evbuffer* inbu
         if (tr_variantDictFindRaw(&val, TR_KEY_added, &added, &added_len))
         {
             tr_pex* pex;
-            size_t i, n;
+            size_t i;
+            size_t n;
             size_t added_f_len = 0;
             uint8_t const* added_f = NULL;
 
@@ -1195,7 +1198,8 @@ static void parseUtPex(tr_peerMsgs* msgs, uint32_t msglen, struct evbuffer* inbu
         if (tr_variantDictFindRaw(&val, TR_KEY_added6, &added, &added_len))
         {
             tr_pex* pex;
-            size_t i, n;
+            size_t i;
+            size_t n;
             size_t added_f_len = 0;
             uint8_t const* added_f = NULL;
 

@@ -566,8 +566,10 @@ static int filter_trackers_compare_func(void const* va, void const* vb)
  */
 static tr_tracker_info* filter_trackers(tr_tracker_info* input, int input_count, int* setme_count)
 {
-    int i, in;
-    int j, jn;
+    int i;
+    int in;
+    int j;
+    int jn;
     int n = 0;
     struct tr_tracker_info* ret;
     struct ann_tracker_info* tmp = tr_new0(struct ann_tracker_info, input_count);
@@ -663,7 +665,8 @@ static tr_tracker_info* filter_trackers(tr_tracker_info* input, int input_count,
 
 static void addTorrentToTier(tr_torrent_tiers* tt, tr_torrent* tor)
 {
-    int i, n;
+    int i;
+    int n;
     int tier_count;
     tr_tier* tier;
     tr_tracker_info* infos = filter_trackers(tor->info.trackers, tor->info.trackerCount, &n);
@@ -1827,7 +1830,8 @@ static void copy_tier_attributes_impl(struct tr_tier* tgt, int trackerIndex, tr_
 
 static void copy_tier_attributes(struct tr_torrent_tiers* tt, tr_tier const* src)
 {
-    int i, j;
+    int i;
+    int j;
     bool found = false;
 
     /* find a tier (if any) which has a match for src->currentTracker */

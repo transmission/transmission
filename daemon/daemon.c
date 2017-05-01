@@ -802,7 +802,9 @@ int tr_main(int argc, char* argv[])
     };
 
     int ret;
-    bool loaded, dumpSettings, foreground;
+    bool loaded;
+    bool dumpSettings;
+    bool foreground;
     tr_error* error = NULL;
 
     struct daemon_data arg;

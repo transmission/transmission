@@ -1933,7 +1933,8 @@ static void sessionCloseImplWaitForIdleUdp(evutil_socket_t foo UNUSED, short bar
 
 static void sessionCloseImplStart(tr_session* session)
 {
-    int i, n;
+    int i;
+    int n;
     tr_torrent** torrents;
 
     session->isClosing = true;

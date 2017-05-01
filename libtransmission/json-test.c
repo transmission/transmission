@@ -155,7 +155,11 @@ static int test1(void)
         "        }\n"
         "    }\n"
         "}\n";
-    tr_variant top, * headers, * body, * args, * ids;
+    tr_variant top;
+    tr_variant* headers;
+    tr_variant* body;
+    tr_variant* args;
+    tr_variant* ids;
     char const* str;
     int64_t i;
     int const err = tr_variantFromJson(&top, in, strlen(in));

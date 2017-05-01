@@ -263,7 +263,9 @@ static char const* getannounce(tr_info* inf, tr_variant* meta)
     if (tr_variantDictFindList(meta, TR_KEY_announce_list, &tiers))
     {
         int n;
-        int i, j, validTiers;
+        int i;
+        int j;
+        int validTiers;
         int const numTiers = tr_variantListSize(tiers);
 
         n = 0;

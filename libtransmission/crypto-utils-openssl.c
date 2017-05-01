@@ -301,7 +301,8 @@ tr_dh_ctx_t tr_dh_new(uint8_t const* prime_num, size_t prime_num_length, uint8_t
     size_t generator_num_length)
 {
     DH* handle = DH_new();
-    BIGNUM* p, * g;
+    BIGNUM* p;
+    BIGNUM* g;
 
     assert(prime_num != NULL);
     assert(generator_num != NULL);
@@ -333,7 +334,8 @@ void tr_dh_free(tr_dh_ctx_t handle)
 bool tr_dh_make_key(tr_dh_ctx_t raw_handle, size_t private_key_length, uint8_t* public_key, size_t* public_key_length)
 {
     DH* handle = raw_handle;
-    int dh_size, my_public_key_length;
+    int dh_size;
+    int my_public_key_length;
     BIGNUM const* my_public_key;
 
     assert(handle != NULL);
@@ -364,7 +366,8 @@ bool tr_dh_make_key(tr_dh_ctx_t raw_handle, size_t private_key_length, uint8_t* 
 tr_dh_secret_t tr_dh_agree(tr_dh_ctx_t handle, uint8_t const* other_public_key, size_t other_public_key_length)
 {
     struct tr_dh_secret* ret;
-    int dh_size, secret_key_length;
+    int dh_size;
+    int secret_key_length;
     BIGNUM* other_key;
 
     assert(handle != NULL);

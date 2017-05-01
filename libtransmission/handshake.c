@@ -750,7 +750,8 @@ static ReadState readPeerId(tr_handshake* handshake, struct evbuffer* inbuf)
 static ReadState readYa(tr_handshake* handshake, struct evbuffer* inbuf)
 {
     uint8_t ya[KEY_LEN];
-    uint8_t* walk, outbuf[KEY_LEN + PadB_MAXLEN];
+    uint8_t* walk;
+    uint8_t outbuf[KEY_LEN + PadB_MAXLEN];
     uint8_t const* myKey;
     int len;
 

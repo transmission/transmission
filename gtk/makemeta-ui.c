@@ -174,7 +174,11 @@ static void onProgressDialogResponse(GtkDialog* d, int response, gpointer data)
 
 static void makeProgressDialog(GtkWidget* parent, MakeMetaUI* ui)
 {
-    GtkWidget* d, * l, * w, * v, * fr;
+    GtkWidget* d;
+    GtkWidget* l;
+    GtkWidget* w;
+    GtkWidget* v;
+    GtkWidget* fr;
 
     d = gtk_dialog_new_with_buttons(_("New Torrent"), GTK_WINDOW(parent), GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
         GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE, GTK_STOCK_ADD, GTK_RESPONSE_ACCEPT, NULL);
@@ -417,7 +421,13 @@ static void on_drag_data_received(GtkWidget* widget UNUSED, GdkDragContext* drag
 GtkWidget* gtr_torrent_creation_dialog_new(GtkWindow* parent, TrCore* core)
 {
     char const* str;
-    GtkWidget* d, * t, * w, * l, * fr, * sw, * v;
+    GtkWidget* d;
+    GtkWidget* t;
+    GtkWidget* w;
+    GtkWidget* l;
+    GtkWidget* fr;
+    GtkWidget* sw;
+    GtkWidget* v;
     GSList* slist;
     guint row = 0;
     MakeMetaUI* ui = g_new0(MakeMetaUI, 1);

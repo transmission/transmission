@@ -989,7 +989,8 @@ int tr_lowerBound(void const* key, void const* base, size_t nmemb, size_t size, 
     do \
     { \
         register size_t __size = (size); \
-        register char* __a = (a), * __b = (b); \
+        register char* __a = (a); \
+        register char* __b = (b); \
         if (__a != __b) \
         { \
             do \
@@ -1318,7 +1319,8 @@ char* tr_win32_format_message(uint32_t code)
 
 void tr_win32_make_args_utf8(int* argc, char*** argv)
 {
-    int my_argc, i;
+    int my_argc;
+    int i;
     char** my_argv;
     wchar_t** my_wide_argv;
 
@@ -1393,7 +1395,8 @@ struct number_range
  */
 static bool parseNumberSection(char const* str, size_t len, struct number_range* setme)
 {
-    long a, b;
+    long a;
+    long b;
     bool success;
     char* end;
     int const error = errno;

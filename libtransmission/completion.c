@@ -78,7 +78,9 @@ tr_completeness tr_cpGetStatus(tr_completion const* cp)
 
 void tr_cpPieceRem(tr_completion* cp, tr_piece_index_t piece)
 {
-    tr_block_index_t i, f, l;
+    tr_block_index_t i;
+    tr_block_index_t f;
+    tr_block_index_t l;
     tr_torrent const* tor = cp->tor;
 
     tr_torGetPieceBlockRange(cp->tor, piece, &f, &l);
@@ -98,7 +100,9 @@ void tr_cpPieceRem(tr_completion* cp, tr_piece_index_t piece)
 
 void tr_cpPieceAdd(tr_completion* cp, tr_piece_index_t piece)
 {
-    tr_block_index_t i, f, l;
+    tr_block_index_t i;
+    tr_block_index_t f;
+    tr_block_index_t l;
     tr_torGetPieceBlockRange(cp->tor, piece, &f, &l);
 
     for (i = f; i <= l; ++i)
@@ -180,7 +184,8 @@ uint64_t tr_cpSizeWhenDone(tr_completion const* ccp)
                 }
                 else
                 {
-                    tr_block_index_t f, l;
+                    tr_block_index_t f;
+                    tr_block_index_t l;
                     tr_torGetPieceBlockRange(cp->tor, p, &f, &l);
 
                     n = tr_bitfieldCountRange(&cp->blockBitfield, f, l + 1);
@@ -230,7 +235,8 @@ void tr_cpGetAmountDone(tr_completion const* cp, float* tab, int tabCount)
         }
         else
         {
-            tr_block_index_t f, l;
+            tr_block_index_t f;
+            tr_block_index_t l;
             tr_piece_index_t const piece = (tr_piece_index_t)i * interval;
             tr_torGetPieceBlockRange(cp->tor, piece, &f, &l);
             tab[i] = tr_bitfieldCountRange(&cp->blockBitfield, f, l + 1) / (float)(l + 1 - f);
@@ -246,7 +252,8 @@ size_t tr_cpMissingBlocksInPiece(tr_completion const* cp, tr_piece_index_t piece
     }
     else
     {
-        tr_block_index_t f, l;
+        tr_block_index_t f;
+        tr_block_index_t l;
         tr_torGetPieceBlockRange(cp->tor, piece, &f, &l);
         return (l + 1 - f) - tr_bitfieldCountRange(&cp->blockBitfield, f, l + 1);
     }
@@ -261,7 +268,8 @@ size_t tr_cpMissingBytesInPiece(tr_completion const* cp, tr_piece_index_t piece)
     else
     {
         size_t haveBytes = 0;
-        tr_block_index_t f, l;
+        tr_block_index_t f;
+        tr_block_index_t l;
         size_t const pieceByteSize = tr_torPieceCountBytes(cp->tor, piece);
         tr_torGetPieceBlockRange(cp->tor, piece, &f, &l);
 
@@ -292,7 +300,8 @@ bool tr_cpFileIsComplete(tr_completion const* cp, tr_file_index_t i)
     }
     else
     {
-        tr_block_index_t f, l;
+        tr_block_index_t f;
+        tr_block_index_t l;
         tr_torGetFileBlockRange(cp->tor, i, &f, &l);
         return tr_bitfieldCountRange(&cp->blockBitfield, f, l + 1) == (l + 1 - f);
     }

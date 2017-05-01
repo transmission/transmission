@@ -220,7 +220,8 @@ static void handle_upload(struct evhttp_request* req, struct tr_rpc_server* serv
             {
                 struct tr_mimepart* p = tr_ptrArrayNth(&parts, i);
                 size_t body_len = p->body_len;
-                tr_variant top, * args;
+                tr_variant top;
+                tr_variant* args;
                 tr_variant test;
                 bool have_source = false;
                 char* body = p->body;

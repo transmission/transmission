@@ -43,7 +43,8 @@ struct bratecontrol
     int newest;
     struct
     {
-        uint64_t date, size;
+        uint64_t date;
+        uint64_t size;
     }
     transfers[HISTORY_SIZE];
     uint64_t cache_time;

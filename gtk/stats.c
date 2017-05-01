@@ -53,7 +53,8 @@ static gboolean updateStats(gpointer gdata)
 {
     char buf[128];
     char const* fmt;
-    tr_session_stats one, all;
+    tr_session_stats one;
+    tr_session_stats all;
     size_t const buflen = sizeof(buf);
     struct stat_ui* ui = gdata;
 

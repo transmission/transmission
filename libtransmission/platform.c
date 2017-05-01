@@ -569,7 +569,8 @@ char const* tr_getWebClientDir(tr_session const* session UNUSED)
 
 #else /* everyone else, follow the XDG spec */
 
-            tr_list* candidates = NULL, * l;
+            tr_list* candidates = NULL;
+            tr_list* l;
             char* tmp;
 
             /* XDG_DATA_HOME should be the first in the list of candidates */

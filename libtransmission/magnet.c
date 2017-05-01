@@ -42,7 +42,9 @@ static int const base32LookupLen = sizeof(base32Lookup) / sizeof(base32Lookup[0]
 static void base32_to_sha1(uint8_t* out, char const* in, size_t const inlen)
 {
     size_t const outlen = 20;
-    size_t i, index, offset;
+    size_t i;
+    size_t index;
+    size_t offset;
 
     memset(out, 0, 20);
 
@@ -130,7 +132,8 @@ tr_magnet_info* tr_magnetParse(char const* uri)
             char const* delim = strchr(key, '=');
             char const* val = delim == NULL ? NULL : delim + 1;
             char const* next = strchr(delim == NULL ? key : val, '&');
-            size_t keylen, vallen;
+            size_t keylen;
+            size_t vallen;
 
             if (delim != NULL)
             {

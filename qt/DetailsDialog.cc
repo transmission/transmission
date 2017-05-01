@@ -864,7 +864,8 @@ void DetailsDialog::refresh()
 
     if (!torrents.empty())
     {
-        bool mixed_creator = false, mixed_date = false;
+        bool mixed_creator = false;
+        bool mixed_date = false;
         QString const creator = torrents[0]->creator();
         QString const date = torrents[0]->dateCreated().toString();
 

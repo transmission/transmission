@@ -336,7 +336,10 @@ static void on_main_window_size_allocated(GtkWidget* gtk_window, GtkAllocation* 
 
     if (!isMaximized)
     {
-        int x, y, w, h;
+        int x;
+        int y;
+        int w;
+        int h;
         gtk_window_get_position(GTK_WINDOW(gtk_window), &x, &y);
         gtk_window_get_size(GTK_WINDOW(gtk_window), &w, &h);
         gtr_pref_int_set(TR_KEY_main_window_x, x);
@@ -940,7 +943,11 @@ static void exit_now_cb(GtkWidget* w UNUSED, gpointer data UNUSED)
 
 static void on_app_exit(gpointer vdata)
 {
-    GtkWidget* r, * p, * b, * w, * c;
+    GtkWidget* r;
+    GtkWidget* p;
+    GtkWidget* b;
+    GtkWidget* w;
+    GtkWidget* c;
     struct cbdata* cbdata = vdata;
     struct session_close_struct* session_close_data;
 
@@ -1391,7 +1398,9 @@ static void append_id_to_benc_list(GtkTreeModel* m, GtkTreePath* path UNUSED, Gt
 
 static gboolean call_rpc_for_selected_torrents(struct cbdata* data, char const* method)
 {
-    tr_variant top, * args, * ids;
+    tr_variant top;
+    tr_variant* args;
+    tr_variant* ids;
     gboolean invoked = FALSE;
     GtkTreeSelection* s = data->sel;
     tr_session* session = gtr_core_session(data->core);

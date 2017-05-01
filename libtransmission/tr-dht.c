@@ -74,7 +74,8 @@ struct bootstrap_closure
     tr_session* session;
     uint8_t* nodes;
     uint8_t* nodes6;
-    size_t len, len6;
+    size_t len;
+    size_t len6;
 };
 
 static bool bootstrap_done(tr_session* session, int af)
@@ -115,7 +116,9 @@ static int bootstrap_af(tr_session* session)
 
 static void bootstrap_from_name(char const* name, tr_port port, int af)
 {
-    struct addrinfo hints, * info, * infop;
+    struct addrinfo hints;
+    struct addrinfo* info;
+    struct addrinfo* infop;
     char pp[10];
     int rc;
 
@@ -156,7 +159,8 @@ static void dht_bootstrap(void* closure)
 {
     struct bootstrap_closure* cl = closure;
     int i;
-    int num = cl->len / 6, num6 = cl->len6 / 18;
+    int num = cl->len / 6;
+    int num6 = cl->len6 / 18;
 
     if (session != cl->session)
     {
@@ -319,9 +323,11 @@ int tr_dhtInit(tr_session* ss)
     int rc;
     bool have_id = false;
     char* dat_file;
-    uint8_t* nodes = NULL, * nodes6 = NULL;
+    uint8_t* nodes = NULL;
+    uint8_t* nodes6 = NULL;
     uint8_t const* raw;
-    size_t len, len6;
+    size_t len;
+    size_t len6;
     struct bootstrap_closure* cl;
 
     if (session != NULL) /* already initialized */
@@ -440,9 +446,13 @@ void tr_dhtUninit(tr_session* ss)
         tr_variant benc;
         struct sockaddr_in sins[300];
         struct sockaddr_in6 sins6[300];
-        char compact[300 * 6], compact6[300 * 18];
+        char compact[300 * 6];
+        char compact6[300 * 18];
         char* dat_file;
-        int i, j, num = 300, num6 = 300;
+        int i;
+        int j;
+        int num = 300;
+        int num6 = 300;
         int n = dht_get_nodes(sins, &num, sins6, &num6);
 
         tr_logAddNamedInfo("DHT", "Saving %d (%d + %d) nodes", n, num, num6);
@@ -505,7 +515,9 @@ struct getstatus_closure
 static void getstatus(void* cl)
 {
     struct getstatus_closure* closure = cl;
-    int good, dubious, incoming;
+    int good;
+    int dubious;
+    int incoming;
 
     dht_nodes(closure->af, &good, &dubious, NULL, &incoming);
 
@@ -687,7 +699,10 @@ static void callback(void* ignore UNUSED, int event, unsigned char const* info_h
 
 static int tr_dhtAnnounce(tr_torrent* tor, int af, bool announce)
 {
-    int rc, status, numnodes, ret = 0;
+    int rc;
+    int status;
+    int numnodes;
+    int ret = 0;
 
     if (!tr_torrentAllowsDHT(tor))
     {

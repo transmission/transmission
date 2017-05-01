@@ -408,7 +408,8 @@ static int testJSON(void)
 static int testMerge(void)
 {
     size_t len;
-    tr_variant dest, src;
+    tr_variant dest;
+    tr_variant src;
     int64_t i;
     char const* s;
     tr_quark const i1 = tr_quark_new("i1", 2);

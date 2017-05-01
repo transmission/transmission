@@ -1424,7 +1424,8 @@ static char const* torrentSetLocation(tr_session* session, tr_variant* args_in, 
     }
 
     bool move;
-    int i, torrentCount;
+    int i;
+    int torrentCount;
     tr_torrent** torrents = getTorrents(session, args_in, &torrentCount);
 
     if (!tr_variantDictFindBool(args_in, TR_KEY_move, &move))

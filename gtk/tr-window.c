@@ -212,7 +212,8 @@ static void onYinYangReleased(GtkWidget* w UNUSED, gpointer vprivate)
 
 static struct
 {
-    char const* val, * i18n;
+    char const* val;
+    char const* i18n;
 }
 stats_modes[] =
 {
@@ -360,7 +361,8 @@ static void onSpeedSet(GtkCheckMenuItem* check, gpointer vp)
 
 static GtkWidget* createSpeedMenu(PrivateData* p, tr_direction dir)
 {
-    int i, n;
+    int i;
+    int n;
     GObject* o;
     GtkWidget* w;
     GtkWidget* m;
@@ -433,8 +435,10 @@ static void onRatioSet(GtkCheckMenuItem* check, gpointer vp)
 
 static GtkWidget* createRatioMenu(PrivateData* p)
 {
-    int i, n;
-    GtkWidget* m, * w;
+    int i;
+    int n;
+    GtkWidget* m;
+    GtkWidget* w;
     GtkMenuShell* menu_shell;
 
     m = gtk_menu_new();
@@ -538,12 +542,21 @@ static void onOptionsClicked(GtkButton* button UNUSED, gpointer vp)
 GtkWidget* gtr_window_new(GtkApplication* app, GtkUIManager* ui_mgr, TrCore* core)
 {
     int i, n;
-    char const* pch, * style;
+    char const* pch;
+    char const* style;
     PrivateData* p;
     GtkWidget* sibling = NULL;
-    GtkWidget* ul_lb, * dl_lb;
-    GtkWidget* mainmenu, * toolbar, * filter, * list, * status;
-    GtkWidget* vbox, * w, * self, * menu;
+    GtkWidget* ul_lb;
+    GtkWidget* dl_lb;
+    GtkWidget* mainmenu;
+    GtkWidget* toolbar;
+    GtkWidget* filter;
+    GtkWidget* list;
+    GtkWidget* status;
+    GtkWidget* vbox;
+    GtkWidget* w;
+    GtkWidget* self;
+    GtkWidget* menu;
     GtkWidget* grid_w;
     GtkWindow* win;
     GtkCssProvider* css_provider;
@@ -691,7 +704,8 @@ GtkWidget* gtr_window_new(GtkApplication* app, GtkUIManager* ui_mgr, TrCore* cor
 
     {
         /* this is to determine the maximum width/height for the label */
-        int w = 0, h = 0;
+        int w = 0;
+        int h = 0;
         PangoLayout* pango_layout;
         pango_layout = gtk_widget_create_pango_layout(ul_lb, "999.99 kB/s");
         pango_layout_get_pixel_size(pango_layout, &w, &h);
@@ -789,8 +803,10 @@ static void updateSpeeds(PrivateData* p)
         {
             do
             {
-                int uc, dc;
-                double us, ds;
+                int uc;
+                int dc;
+                double us;
+                double ds;
                 gtk_tree_model_get(model, &iter,
                     MC_SPEED_UP, &us,
                     MC_SPEED_DOWN, &ds,

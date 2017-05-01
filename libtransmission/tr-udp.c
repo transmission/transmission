@@ -52,8 +52,12 @@ THE SOFTWARE.
 
 static void set_socket_buffers(tr_socket_t fd, bool large)
 {
-    int size, rbuf, sbuf, rc;
-    socklen_t rbuf_len = sizeof(rbuf), sbuf_len = sizeof(sbuf);
+    int size;
+    int rbuf;
+    int sbuf;
+    int rc;
+    socklen_t rbuf_len = sizeof(rbuf);
+    socklen_t sbuf_len = sizeof(sbuf);
     char err_buf[512];
 
     size = large ? RECV_BUFFER_SIZE : SMALL_BUFFER_SIZE;

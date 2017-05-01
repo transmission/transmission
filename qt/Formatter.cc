@@ -144,8 +144,13 @@ QString Formatter::ratioToString(double ratio)
 
 QString Formatter::timeToString(int seconds)
 {
-    int days, hours, minutes;
-    QString d, h, m, s;
+    int days;
+    int hours;
+    int minutes;
+    QString d;
+    QString h;
+    QString m;
+    QString s;
     QString str;
 
     if (seconds < 0)

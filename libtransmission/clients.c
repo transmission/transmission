@@ -126,7 +126,8 @@ static bool decodeBitCometClient(char* buf, size_t buflen, uint8_t const* id)
 {
     char const* chid = (char*)id;
     bool is_bitlord;
-    int major, minor;
+    int major;
+    int minor;
     char const* name;
     char const* mod = NULL;
 
@@ -768,7 +769,9 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
     /* Shad0w-style */
     if (*buf == '\0')
     {
-        int a, b, c;
+        int a;
+        int b;
+        int c;
 
         if (strchr("AOQRSTU", id[0]) != NULL && getShadowInt(id[1], &a) && getShadowInt(id[2], &b) && getShadowInt(id[3], &c))
         {
@@ -816,8 +819,10 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
     /* No match */
     if (*buf == '\0')
     {
-        char out[32], * walk = out;
-        char const* in, * in_end;
+        char out[32];
+        char* walk = out;
+        char const* in;
+        char const* in_end;
 
         for (in = (char const*)id, in_end = in + 8; in != in_end; ++in)
         {

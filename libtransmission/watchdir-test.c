@@ -229,8 +229,10 @@ static int test_watch_two_dirs(void)
     char* const test_dir = libtest_sandbox_create();
     char* const dir1 = tr_buildPath(test_dir, "a", NULL);
     char* const dir2 = tr_buildPath(test_dir, "b", NULL);
-    callback_data wd1_data = CB_DATA_STATIC_INIT, wd2_data = CB_DATA_STATIC_INIT;
-    tr_watchdir_t wd1, wd2;
+    callback_data wd1_data = CB_DATA_STATIC_INIT;
+    callback_data wd2_data = CB_DATA_STATIC_INIT;
+    tr_watchdir_t wd1;
+    tr_watchdir_t wd2;
 
     ev_base = event_base_new();
 
