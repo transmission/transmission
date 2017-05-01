@@ -608,7 +608,7 @@ static GtkTreeModel* activity_filter_model_new(GtkTreeModel* tmodel)
 
     for (i = 0, n = G_N_ELEMENTS(types); i < n; ++i)
     {
-        char const* name = types[i].context ? g_dpgettext2(NULL, types[i].context, types[i].name) : _(types[i].name);
+        char const* name = types[i].context != NULL ? g_dpgettext2(NULL, types[i].context, types[i].name) : _(types[i].name);
         gtk_list_store_insert_with_values(store, NULL, -1,
             ACTIVITY_FILTER_COL_NAME, name,
             ACTIVITY_FILTER_COL_TYPE, types[i].type,
@@ -724,7 +724,7 @@ static gboolean testText(tr_torrent const* tor, char const* key)
         /* test the torrent name... */
         {
             char* pch = g_utf8_casefold(tr_torrentName(tor), -1);
-            ret = !key || strstr(pch, key) != NULL;
+            ret = key == NULL || strstr(pch, key) != NULL;
             g_free(pch);
         }
 
@@ -732,7 +732,7 @@ static gboolean testText(tr_torrent const* tor, char const* key)
         for (i = 0; i < inf->fileCount && !ret; ++i)
         {
             char* pch = g_utf8_casefold(inf->files[i].name, -1);
-            ret = !key || strstr(pch, key) != NULL;
+            ret = key == NULL || strstr(pch, key) != NULL;
             g_free(pch);
         }
     }

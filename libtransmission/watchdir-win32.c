@@ -76,7 +76,7 @@ static BOOL tr_get_overlapped_result_ex(HANDLE handle, LPOVERLAPPED overlapped, 
 
     if (real_impl != NULL)
     {
-        return real_impl(handle, overlapped, bytes_transferred, timeout, alertable);
+        return (*real_impl)(handle, overlapped, bytes_transferred, timeout, alertable);
     }
 
     DWORD const wait_result = WaitForSingleObjectEx(handle, timeout, alertable);

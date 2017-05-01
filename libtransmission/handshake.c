@@ -824,7 +824,7 @@ static ReadState readCryptoProvide(tr_handshake* handshake, struct evbuffer* inb
     uint16_t padc_len = 0;
     uint32_t crypto_provide = 0;
     tr_torrent* tor;
-    size_t const needlen = SHA_DIGEST_LENGTH + /* HASH('req1',s) */
+    size_t const needlen = SHA_DIGEST_LENGTH + /* HASH('req1', s) */
         SHA_DIGEST_LENGTH + /* HASH('req2', SKEY) xor HASH('req3', S) */
         VC_LENGTH + sizeof(crypto_provide) + sizeof(padc_len);
 

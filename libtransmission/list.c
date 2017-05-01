@@ -206,7 +206,7 @@ void tr_list_insert_sorted(tr_list** list, void* data, TrListCompareFunc compare
 
     for (l = *list; l != NULL; l = l->next)
     {
-        int const c = (compare)(data, l->data);
+        int const c = (*compare)(data, l->data);
 
         if (c <= 0)
         {

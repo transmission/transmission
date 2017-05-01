@@ -598,8 +598,8 @@ tr_socket_t tr_fdSocketAccept(tr_session* s, tr_socket_t sockfd, tr_address* add
     struct sockaddr_storage sock;
 
     assert(tr_isSession(s));
-    assert(addr);
-    assert(port);
+    assert(addr != NULL);
+    assert(port != NULL);
 
     ensureSessionFdInfoExists(s);
     gFd = s->fdInfo;

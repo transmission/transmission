@@ -135,7 +135,7 @@ static tr_lock* get_rng_lock(void)
 
 tr_sha1_ctx_t tr_sha1_init(void)
 {
-    API(sha1_context) * handle = tr_new0(API(sha1_context), 1);
+    API(sha1_context)* handle = tr_new0(API(sha1_context), 1);
 
 #if API_VERSION_NUMBER >= 0x01030800
     API(sha1_init)(handle);
@@ -183,7 +183,7 @@ bool tr_sha1_final(tr_sha1_ctx_t handle, uint8_t* hash)
 
 tr_rc4_ctx_t tr_rc4_new(void)
 {
-    API(arc4_context) * handle = tr_new0(API(arc4_context), 1);
+    API(arc4_context)* handle = tr_new0(API(arc4_context), 1);
 
 #if API_VERSION_NUMBER >= 0x01030800
     API(arc4_init)(handle);
@@ -231,7 +231,7 @@ void tr_rc4_process(tr_rc4_ctx_t handle, void const* input, void* output, size_t
 tr_dh_ctx_t tr_dh_new(uint8_t const* prime_num, size_t prime_num_length, uint8_t const* generator_num,
     size_t generator_num_length)
 {
-    API(dhm_context) * handle = tr_new0(API(dhm_context), 1);
+    API(dhm_context)* handle = tr_new0(API(dhm_context), 1);
 
     assert(prime_num != NULL);
     assert(generator_num != NULL);
@@ -264,7 +264,7 @@ void tr_dh_free(tr_dh_ctx_t handle)
 
 bool tr_dh_make_key(tr_dh_ctx_t raw_handle, size_t private_key_length, uint8_t* public_key, size_t* public_key_length)
 {
-    API(dhm_context) * handle = raw_handle;
+    API(dhm_context)* handle = raw_handle;
 
     assert(handle != NULL);
     assert(public_key != NULL);
@@ -279,7 +279,7 @@ bool tr_dh_make_key(tr_dh_ctx_t raw_handle, size_t private_key_length, uint8_t* 
 
 tr_dh_secret_t tr_dh_agree(tr_dh_ctx_t raw_handle, uint8_t const* other_public_key, size_t other_public_key_length)
 {
-    API(dhm_context) * handle = raw_handle;
+    API(dhm_context)* handle = raw_handle;
     struct tr_dh_secret* ret;
     size_t secret_key_length;
 

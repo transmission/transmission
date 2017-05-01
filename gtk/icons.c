@@ -34,7 +34,8 @@ typedef struct
     GtkIconTheme* icon_theme;
     int icon_size;
     GHashTable* cache;
-} IconCache;
+}
+IconCache;
 
 static IconCache* icon_cache[7] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL };
 
@@ -128,7 +129,7 @@ static GdkPixbuf* get_themed_icon_pixbuf(GThemedIcon* icon, int size, GtkIconThe
 
     if (pixbuf == NULL)
     {
-        if (error && error->message)
+        if (error != NULL && error->message != NULL)
         {
             g_warning("could not load icon pixbuf: %s\n", error->message);
         }

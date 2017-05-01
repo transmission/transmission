@@ -1159,7 +1159,6 @@ static int core_add_ctor(TrCore* core, tr_ctor* ctor, gboolean do_prompt, gboole
         break;
 
     case TR_PARSE_DUPLICATE:
-
         /* don't complain about .torrent files in the watch directory
          * that have already been added... that gets annoying and we
          * don't want to be nagging users to clean up their watch dirs */
@@ -1173,7 +1172,6 @@ static int core_add_ctor(TrCore* core, tr_ctor* ctor, gboolean do_prompt, gboole
         break;
 
     default:
-
         if (do_prompt)
         {
             g_signal_emit(core, signals[ADD_PROMPT_SIGNAL], 0, ctor);

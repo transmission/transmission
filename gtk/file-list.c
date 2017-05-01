@@ -118,10 +118,10 @@ static gboolean refreshFilesForeach(GtkTreeModel* model, GtkTreePath* path UNUSE
     {
         tr_torrent* tor = refresh_data->tor;
         tr_info const* inf = tr_torrentInfo(tor);
-        int const enabled = !inf->files[index].dnd;
+        int const enabled = inf->files[index].dnd ? 0 : 1;
         int const priority = inf->files[index].priority;
         uint64_t const have = refresh_data->refresh_file_stat[index].bytesCompleted;
-        int const prog = size ? (int)((100.0 * have) / size) : 1;
+        int const prog = size != 0 ? (int)(100.0 * have / size) : 1;
 
         if (priority != old_priority || enabled != old_enabled || have != old_have || prog != old_prog)
         {
@@ -480,7 +480,7 @@ static GNode* find_child(GNode* parent, char const* name)
 {
     GNode* child = parent->children;
 
-    while (child)
+    while (child != NULL)
     {
         struct row_struct const* child_data = child->data;
 

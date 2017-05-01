@@ -2811,7 +2811,7 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
 
             case 'w':
                 {
-                    tr_variant* args = tadd ? tr_variantDictFind(tadd, TR_KEY_arguments) : ensure_sset(&sset);
+                    tr_variant* args = tadd != NULL ? tr_variantDictFind(tadd, TR_KEY_arguments) : ensure_sset(&sset);
                     tr_variantDictAddStr(args, TR_KEY_download_dir, optarg);
                     break;
                 }

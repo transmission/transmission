@@ -619,7 +619,7 @@ static void on_tracker_connection_response(struct tau_tracker* tracker, tau_acti
     else
     {
         char* errmsg;
-        size_t const buflen = buf ? evbuffer_get_length(buf) : 0;
+        size_t const buflen = buf != NULL ? evbuffer_get_length(buf) : 0;
 
         if (action == TAU_ACTION_ERROR && buflen > 0)
         {
@@ -644,7 +644,7 @@ static void tau_tracker_timeout_reqs(struct tau_tracker* tracker)
     int n;
     tr_ptrArray* reqs;
     time_t const now = time(NULL);
-    bool const cancel_all = tracker->close_at && (tracker->close_at <= now);
+    bool const cancel_all = tracker->close_at != 0 && (tracker->close_at <= now);
 
     if (tracker->connecting_at != 0 && tracker->connecting_at + TAU_REQUEST_TTL < now)
     {

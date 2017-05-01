@@ -68,7 +68,7 @@ void FilterBarComboBoxDelegate::paint(QPainter* painter, QStyleOptionViewItem co
     else
     {
         QStyleOptionViewItem disabledOption = option;
-        QPalette::ColorRole const disabledColorRole = (disabledOption.state & QStyle::State_Selected) ?
+        QPalette::ColorRole const disabledColorRole = (disabledOption.state & QStyle::State_Selected) != 0 ?
             QPalette::HighlightedText : QPalette::Text;
         disabledOption.palette.setColor(disabledColorRole, Utils::getFadedColor(disabledOption.palette.color(
             disabledColorRole)));

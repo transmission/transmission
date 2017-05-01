@@ -186,7 +186,7 @@ static void allocateBandwidth(tr_bandwidth* b, tr_priority_t parent_priority, tr
     }
 
     /* traverse & repeat for the subtree */
-    if (1)
+    if (true)
     {
         int i;
         struct tr_bandwidth** children = (struct tr_bandwidth**)tr_ptrArrayBase(&b->children);

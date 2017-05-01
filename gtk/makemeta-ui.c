@@ -297,7 +297,7 @@ static void onSourceToggled(GtkToggleButton* tb, gpointer user_data)
 static void updatePiecesLabel(MakeMetaUI* ui)
 {
     tr_metainfo_builder const* builder = ui->builder;
-    char const* filename = builder ? builder->top : NULL;
+    char const* filename = builder != NULL ? builder->top : NULL;
     GString* gstr = g_string_new(NULL);
 
     g_string_append(gstr, "<i>");

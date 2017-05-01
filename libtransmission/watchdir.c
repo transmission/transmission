@@ -103,7 +103,7 @@ static tr_watchdir_status tr_watchdir_process_impl(tr_watchdir_t handle, char co
         return TR_WATCHDIR_IGNORE;
     }
 
-    tr_watchdir_status const ret = handle->callback(handle, name, handle->callback_user_data);
+    tr_watchdir_status const ret = (*handle->callback)(handle, name, handle->callback_user_data);
 
     assert(ret == TR_WATCHDIR_ACCEPT || ret == TR_WATCHDIR_IGNORE || ret == TR_WATCHDIR_RETRY);
 
@@ -347,7 +347,7 @@ void tr_watchdir_scan(tr_watchdir_t handle, tr_ptrArray* dir_entries)
     tr_sys_dir_t dir;
     char const* name;
     tr_ptrArray new_dir_entries = TR_PTR_ARRAY_INIT_STATIC;
-    PtrArrayCompareFunc const name_compare_func = (PtrArrayCompareFunc) & strcmp;
+    PtrArrayCompareFunc const name_compare_func = (PtrArrayCompareFunc)&strcmp;
     tr_error* error = NULL;
 
     if ((dir = tr_sys_dir_open(handle->path, &error)) == TR_BAD_SYS_DIR)

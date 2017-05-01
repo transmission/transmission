@@ -713,7 +713,7 @@ static void event_callback(evutil_socket_t s UNUSED, short type, void* ignore UN
     if ((type & EV_READ) != 0)
     {
         struct sockaddr_in foreignAddr;
-        int addrLen = sizeof foreignAddr;
+        int addrLen = sizeof(foreignAddr);
         char foreignMsg[lpd_maxDatagramLength + 1];
 
         /* process local announcement from foreign peer */

@@ -87,7 +87,7 @@ void WatchDir::setPath(QString const& path, bool isEnabled)
     // clear out any remnants of the previous watcher, if any
     myWatchDirFiles.clear();
 
-    if (myWatcher)
+    if (myWatcher != nullptr)
     {
         delete myWatcher;
         myWatcher = nullptr;

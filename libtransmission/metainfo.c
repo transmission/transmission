@@ -597,7 +597,7 @@ static char const* tr_metainfoParseImpl(tr_session const* session, tr_info* inf,
             return "pieces";
         }
 
-        if (len % SHA_DIGEST_LENGTH)
+        if (len % SHA_DIGEST_LENGTH != 0)
         {
             return "pieces";
         }

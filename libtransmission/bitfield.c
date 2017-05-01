@@ -247,7 +247,6 @@ static void tr_bitfieldEnsureBitsAlloced(tr_bitfield* b, size_t n)
 static bool tr_bitfieldEnsureNthBitAlloced(tr_bitfield* b, size_t nth)
 {
     /* count is zero-based, so we need to allocate nth+1 bits before setting the nth */
-
     if (nth == SIZE_MAX)
     {
         return false;

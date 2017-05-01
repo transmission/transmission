@@ -461,7 +461,7 @@ static void swarmFree(void* vs)
 {
     tr_swarm* s = vs;
 
-    assert(s);
+    assert(s != NULL);
     assert(!s->isRunning);
     assert(swarmIsLocked(s));
     assert(tr_ptrArrayEmpty(&s->outgoingHandshakes));
@@ -1630,9 +1630,9 @@ static void peerSuggestedPiece(tr_swarm* s UNUSED, tr_peer* peer UNUSED, tr_piec
 {
 #if 0
 
-    assert(t);
-    assert(peer);
-    assert(peer->msgs);
+    assert(t != NULL);
+    assert(peer != NULL);
+    assert(peer->msgs != NULL);
 
     /* is this a valid piece? */
     if (pieceIndex >= t->tor->info.pieceCount)
@@ -2487,7 +2487,7 @@ int tr_peerMgrGetPeers(tr_torrent* tor, tr_pex** setme_pex, uint8_t af, uint8_t 
 
     qsort(pex, count, sizeof(tr_pex), tr_pexCompare);
 
-    assert((walk - pex) == count);
+    assert(walk - pex == count);
     *setme_pex = pex;
 
     /* cleanup */

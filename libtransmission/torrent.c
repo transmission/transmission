@@ -409,7 +409,7 @@ static bool tr_torrentGetSeedRatioBytes(tr_torrent const* tor, uint64_t* setmeLe
     {
         uint64_t const u = tor->uploadedCur + tor->uploadedPrev;
         uint64_t const d = tor->downloadedCur + tor->downloadedPrev;
-        uint64_t const baseline = d ? d : tr_cpSizeWhenDone(&tor->completion);
+        uint64_t const baseline = d != 0 ? d : tr_cpSizeWhenDone(&tor->completion);
         uint64_t const goal = baseline * seedRatio;
 
         if (setmeLeft != NULL)
@@ -431,7 +431,7 @@ static bool tr_torrentGetSeedRatioBytes(tr_torrent const* tor, uint64_t* setmeLe
 static bool tr_torrentIsSeedRatioDone(tr_torrent const* tor)
 {
     uint64_t bytesLeft;
-    return tr_torrentGetSeedRatioBytes(tor, &bytesLeft, NULL) && !bytesLeft;
+    return tr_torrentGetSeedRatioBytes(tor, &bytesLeft, NULL) && bytesLeft == 0;
 }
 
 /***
@@ -1637,7 +1637,7 @@ void tr_torrentAvailability(tr_torrent const* tor, int8_t* tab, int size)
 {
     assert(tr_isTorrent(tor));
 
-    if ((tab != NULL) && (size > 0))
+    if (tab != NULL && size > 0)
     {
         tr_peerMgrTorrentAvailability(tor, tab, size);
     }
@@ -2719,7 +2719,7 @@ bool tr_torrentReqIsValid(tr_torrent const* tor, tr_piece_index_t index, uint32_
             (unsigned long)length, err);
     }
 
-    return !err;
+    return err == 0;
 }
 
 uint64_t tr_pieceOffset(tr_torrent const* tor, tr_piece_index_t index, uint32_t offset, uint32_t length)

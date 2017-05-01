@@ -808,30 +808,30 @@ tr_sys_file_t tr_sys_file_open(char const* path, int flags, int permissions, tr_
 
     (void)permissions;
 
-    if (flags & TR_SYS_FILE_READ)
+    if ((flags & TR_SYS_FILE_READ) != 0)
     {
         native_access |= GENERIC_READ;
     }
 
-    if (flags & TR_SYS_FILE_WRITE)
+    if ((flags & TR_SYS_FILE_WRITE)) != 0
     {
         native_access |= GENERIC_WRITE;
     }
 
-    if (flags & TR_SYS_FILE_CREATE_NEW)
+    if ((flags & TR_SYS_FILE_CREATE_NEW)) != 0
     {
         native_disposition = CREATE_NEW;
     }
-    else if (flags & TR_SYS_FILE_CREATE)
+    else if ((flags & TR_SYS_FILE_CREATE)) != 0
     {
-        native_disposition = flags & TR_SYS_FILE_TRUNCATE ? CREATE_ALWAYS : OPEN_ALWAYS;
+        native_disposition = (flags & TR_SYS_FILE_TRUNCATE) != 0 ? CREATE_ALWAYS : OPEN_ALWAYS;
     }
-    else if (flags & TR_SYS_FILE_TRUNCATE)
+    else if ((flags & TR_SYS_FILE_TRUNCATE)) != 0
     {
         native_disposition = TRUNCATE_EXISTING;
     }
 
-    if (flags & TR_SYS_FILE_SEQUENTIAL)
+    if ((flags & TR_SYS_FILE_SEQUENTIAL)) != 0
     {
         native_flags |= FILE_FLAG_SEQUENTIAL_SCAN;
     }
@@ -840,7 +840,7 @@ tr_sys_file_t tr_sys_file_open(char const* path, int flags, int permissions, tr_
 
     success = ret != TR_BAD_SYS_FILE;
 
-    if (success && (flags & TR_SYS_FILE_APPEND))
+    if (success && (flags & TR_SYS_FILE_APPEND) != 0)
     {
         success = SetFilePointer(ret, 0, NULL, FILE_END) != INVALID_SET_FILE_POINTER;
     }

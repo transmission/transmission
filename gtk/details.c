@@ -797,11 +797,11 @@ static void refreshInfo(struct DetailsImpl* di, tr_torrent** torrents, int n)
     }
     else
     {
-        char const* baseline = infos[0]->comment ? infos[0]->comment : "";
+        char const* baseline = infos[0]->comment != NULL ? infos[0]->comment : "";
 
         for (i = 1; i < n; ++i)
         {
-            if (g_strcmp0(baseline, infos[i]->comment ? infos[i]->comment : "") != 0)
+            if (g_strcmp0(baseline, infos[i]->comment != NULL ? infos[i]->comment : "") != 0)
             {
                 break;
             }
@@ -1015,8 +1015,8 @@ static void refreshInfo(struct DetailsImpl* di, tr_torrent** torrents, int n)
             char unver[64];
             char total[64];
             char avail[32];
-            double const d = sizeWhenDone ? (100.0 * available) / sizeWhenDone : 0;
-            double const ratio = 100.0 * (sizeWhenDone ? (haveValid + haveUnchecked) / (double)sizeWhenDone : 1);
+            double const d = sizeWhenDone != 0 ? (100.0 * available) / sizeWhenDone : 0;
+            double const ratio = 100.0 * (sizeWhenDone != 0 ? (haveValid + haveUnchecked) / (double)sizeWhenDone : 1);
 
             tr_strlpercent(avail, d, sizeof(avail));
             tr_strlpercent(buf2, ratio, sizeof(buf2));

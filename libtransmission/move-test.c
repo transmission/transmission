@@ -201,7 +201,7 @@ static int test_set_location(void)
     state = -1;
     tr_torrentSetLocation(tor, target_dir, true, NULL, &state);
 
-    while ((state == TR_LOC_MOVING) && (time(NULL) <= deadline))
+    while (state == TR_LOC_MOVING && time(NULL) <= deadline)
     {
         tr_wait_msec(50);
     }

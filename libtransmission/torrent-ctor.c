@@ -310,7 +310,7 @@ void tr_ctorSetSave(tr_ctor* ctor, bool saveInOurTorrentsDir)
 
 bool tr_ctorGetSave(tr_ctor const* ctor)
 {
-    return ctor && ctor->saveInOurTorrentsDir;
+    return ctor != NULL && ctor->saveInOurTorrentsDir;
 }
 
 void tr_ctorSetPaused(tr_ctor* ctor, tr_ctorMode mode, bool isPaused)

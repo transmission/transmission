@@ -430,8 +430,8 @@ void TorrentDelegate::setProgressBarPercentDone(QStyleOptionViewItem const& opti
     {
         bool const isMagnet(!tor.hasMetadata());
         myProgressBarStyle->direction = option.direction;
-        myProgressBarStyle->progress = static_cast<int>(myProgressBarStyle->minimum + (((isMagnet ? tor.metadataPercentDone() :
-            tor.percentDone()) * (myProgressBarStyle->maximum - myProgressBarStyle->minimum))));
+        myProgressBarStyle->progress = static_cast<int>(myProgressBarStyle->minimum + (isMagnet ? tor.metadataPercentDone() :
+            tor.percentDone()) * (myProgressBarStyle->maximum - myProgressBarStyle->minimum));
     }
 }
 
