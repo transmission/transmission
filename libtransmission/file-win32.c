@@ -813,25 +813,25 @@ tr_sys_file_t tr_sys_file_open(char const* path, int flags, int permissions, tr_
         native_access |= GENERIC_READ;
     }
 
-    if ((flags & TR_SYS_FILE_WRITE)) != 0
+    if ((flags & TR_SYS_FILE_WRITE) != 0)
     {
         native_access |= GENERIC_WRITE;
     }
 
-    if ((flags & TR_SYS_FILE_CREATE_NEW)) != 0
+    if ((flags & TR_SYS_FILE_CREATE_NEW) != 0)
     {
         native_disposition = CREATE_NEW;
     }
-    else if ((flags & TR_SYS_FILE_CREATE)) != 0
+    else if ((flags & TR_SYS_FILE_CREATE) != 0)
     {
         native_disposition = (flags & TR_SYS_FILE_TRUNCATE) != 0 ? CREATE_ALWAYS : OPEN_ALWAYS;
     }
-    else if ((flags & TR_SYS_FILE_TRUNCATE)) != 0
+    else if ((flags & TR_SYS_FILE_TRUNCATE) != 0)
     {
         native_disposition = TRUNCATE_EXISTING;
     }
 
-    if ((flags & TR_SYS_FILE_SEQUENTIAL)) != 0
+    if ((flags & TR_SYS_FILE_SEQUENTIAL) != 0)
     {
         native_flags |= FILE_FLAG_SEQUENTIAL_SCAN;
     }
