@@ -136,7 +136,7 @@ static struct tr_option const options[] =
     { 912, "encryption-tolerated", "Prefer unencrypted peer connections", "et", 0, NULL },
     { 'i', "bind-address-ipv4", "Where to listen for peer connections", "i", 1, "<ipv4 addr>" },
     { 'I', "bind-address-ipv6", "Where to listen for peer connections", "I", 1, "<ipv6 addr>" },
-    { 'r', "rpc-bind-address", "Where to listen for RPC connections", "r", 1, "<ipv4 addr>" },
+    { 'r', "rpc-bind-address", "Where to listen for RPC connections", "r", 1, "<ip addr>" },
     { 953, "global-seedratio", "All torrents, unless overridden by a per-torrent setting, should seed until a specific ratio", "gsr", 1, "ratio" },
     { 954, "no-global-seedratio", "All torrents, unless overridden by a per-torrent setting, should seed regardless of ratio", "GSR", 0, NULL },
     { 'x', "pid-file", "Enable PID file", "x", 1, "<pid-file>" },
