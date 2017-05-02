@@ -57,7 +57,7 @@ static void startMovingNextTorrent(struct relocate_dialog_data* data)
 
     data->torrent_ids = g_slist_delete_link(data->torrent_ids, data->torrent_ids);
 
-    str = g_strdup_printf(_("Moving \"%s\""), tr_torrentName(tor));
+    str = g_strdup_printf(_("Moving “%s”"), tr_torrentName(tor));
     gtk_message_dialog_set_markup(GTK_MESSAGE_DIALOG(data->message_dialog), str);
     g_free(str);
 }
@@ -73,7 +73,7 @@ static gboolean onTimer(gpointer gdata)
     {
         int const flags = GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT;
         GtkWidget* w = gtk_message_dialog_new(GTK_WINDOW(data->message_dialog), flags, GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE,
-            "%s", _("Couldn't move torrent"));
+            "%s", _("Couldn’t move torrent"));
         gtk_dialog_run(GTK_DIALOG(w));
         gtk_widget_destroy(GTK_WIDGET(data->message_dialog));
     }

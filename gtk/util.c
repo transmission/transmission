@@ -257,16 +257,16 @@ void gtr_add_torrent_error_dialog(GtkWidget* child, int err, tr_torrent* duplica
 
     if (err == TR_PARSE_ERR)
     {
-        secondary = g_strdup_printf(_("The torrent file \"%s\" contains invalid data."), filename);
+        secondary = g_strdup_printf(_("The torrent file “%s” contains invalid data."), filename);
     }
     else if (err == TR_PARSE_DUPLICATE)
     {
-        secondary = g_strdup_printf(_("The torrent file \"%s\" is already in use by \"%s.\""), filename,
+        secondary = g_strdup_printf(_("The torrent file “%s” is already in use by “%s.”"), filename,
             tr_torrentName(duplicate_torrent));
     }
     else
     {
-        secondary = g_strdup_printf(_("The torrent file \"%s\" encountered an unknown error."), filename);
+        secondary = g_strdup_printf(_("The torrent file “%s” encountered an unknown error."), filename);
     }
 
     w = gtk_message_dialog_new(win, GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, "%s",
@@ -584,9 +584,9 @@ void gtr_http_failure_dialog(GtkWidget* parent, char const* url, long response_c
 {
     GtkWindow* window = getWindow(parent);
 
-    GtkWidget* w = gtk_message_dialog_new(window, 0, GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, _("Error opening \"%s\""), url);
+    GtkWidget* w = gtk_message_dialog_new(window, 0, GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, _("Error opening “%s”"), url);
 
-    gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(w), _("Server returned \"%1$ld %2$s\""), response_code,
+    gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(w), _("Server returned “%1$ld %2$s”"), response_code,
         tr_webGetResponseStr(response_code));
 
     g_signal_connect_swapped(w, "response", G_CALLBACK(gtk_widget_destroy), w);
@@ -603,13 +603,13 @@ void gtr_unrecognized_url_dialog(GtkWidget* parent, char const* url)
 
     GtkWidget* w = gtk_message_dialog_new(window, 0, GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, "%s", _("Unrecognized URL"));
 
-    g_string_append_printf(gstr, _("Transmission doesn't know how to use \"%s\""), url);
+    g_string_append_printf(gstr, _("Transmission doesn’t know how to use “%s”"), url);
 
     if (gtr_is_magnet_link(url) && strstr(url, xt) == NULL)
     {
         g_string_append_printf(gstr, "\n \n");
         g_string_append_printf(gstr, _("This magnet link appears to be intended for something other than BitTorrent. "
-            "BitTorrent magnet links have a section containing \"%s\"."), xt);
+            "BitTorrent magnet links have a section containing “%s”."), xt);
     }
 
     gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(w), "%s", gstr->str);

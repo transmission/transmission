@@ -67,15 +67,15 @@ static gboolean onProgressDialogRefresh(gpointer data)
     /* progress label */
     if (!b->isDone)
     {
-        str = g_strdup_printf(_("Creating \"%s\""), base);
+        str = g_strdup_printf(_("Creating “%s”"), base);
     }
     else if (b->result == TR_MAKEMETA_OK)
     {
-        str = g_strdup_printf(_("Created \"%s\"!"), base);
+        str = g_strdup_printf(_("Created “%s”!"), base);
     }
     else if (b->result == TR_MAKEMETA_URL)
     {
-        str = g_strdup_printf(_("Error: invalid announce URL \"%s\""), b->errfile);
+        str = g_strdup_printf(_("Error: invalid announce URL “%s”"), b->errfile);
     }
     else if (b->result == TR_MAKEMETA_CANCELLED)
     {
@@ -83,11 +83,11 @@ static gboolean onProgressDialogRefresh(gpointer data)
     }
     else if (b->result == TR_MAKEMETA_IO_READ)
     {
-        str = g_strdup_printf(_("Error reading \"%s\": %s"), b->errfile, g_strerror(b->my_errno));
+        str = g_strdup_printf(_("Error reading “%s”: %s"), b->errfile, g_strerror(b->my_errno));
     }
     else if (b->result == TR_MAKEMETA_IO_WRITE)
     {
-        str = g_strdup_printf(_("Error writing \"%s\": %s"), b->errfile, g_strerror(b->my_errno));
+        str = g_strdup_printf(_("Error writing “%s”: %s"), b->errfile, g_strerror(b->my_errno));
     }
     else
     {

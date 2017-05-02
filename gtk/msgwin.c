@@ -143,7 +143,7 @@ static void doSave(GtkWindow* parent, struct MsgData* data, char const* filename
 
     if (fp == NULL)
     {
-        GtkWidget* w = gtk_message_dialog_new(parent, 0, GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, _("Couldn't save \"%s\""),
+        GtkWidget* w = gtk_message_dialog_new(parent, 0, GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, _("Couldn’t save “%s”"),
             filename);
         gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(w), "%s", g_strerror(errno));
         g_signal_connect_swapped(w, "response", G_CALLBACK(gtk_widget_destroy), w);

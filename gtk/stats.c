@@ -90,7 +90,7 @@ static void dialogResponse(GtkDialog* dialog, gint response, gpointer gdata)
     {
         char const* primary = _("Reset your statistics?");
         char const* secondary = _("These statistics are for your information only. "
-            "Resetting them doesn't affect the statistics logged by your BitTorrent trackers.");
+            "Resetting them doesn’t affect the statistics logged by your BitTorrent trackers.");
         int const flags = GTK_DIALOG_DESTROY_WITH_PARENT | GTK_DIALOG_MODAL;
         GtkWidget* w = gtk_message_dialog_new(GTK_WINDOW(dialog), flags, GTK_MESSAGE_QUESTION, GTK_BUTTONS_NONE, "%s", primary);
         gtk_dialog_add_buttons(GTK_DIALOG(w), GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, _("_Reset"), TR_RESPONSE_RESET, NULL);

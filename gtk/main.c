@@ -70,7 +70,7 @@ static char const* LICENSE =
     "but WITHOUT ANY WARRANTY; without even the implied warranty of "
     "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n"
     "\n"
-    "Some of Transmission's source files have more permissive licenses. "
+    "Some of Transmission’s source files have more permissive licenses. "
     "Those files may, of course, be used on their own under their own terms.\n";
 
 struct cbdata
@@ -648,7 +648,7 @@ int main(int argc, char** argv)
 
     if (!g_option_context_parse(option_context, &argc, &argv, &error))
     {
-        g_print(_("%s\nRun '%s --help' to see a full list of available command line options.\n"), error->message, argv[0]);
+        g_print(_("%s\nRun “%s --help” to see a full list of available command line options.\n"), error->message, argv[0]);
         g_error_free(error);
         g_option_context_free(option_context);
         return 1;
@@ -1046,13 +1046,13 @@ static void flush_torrent_errors(struct cbdata* cbdata)
 {
     if (cbdata->error_list != NULL)
     {
-        show_torrent_errors(cbdata->wind, ngettext("Couldn't add corrupt torrent", "Couldn't add corrupt torrents",
+        show_torrent_errors(cbdata->wind, ngettext("Couldn’t add corrupt torrent", "Couldn’t add corrupt torrents",
             g_slist_length(cbdata->error_list)), &cbdata->error_list);
     }
 
     if (cbdata->duplicates_list != NULL)
     {
-        show_torrent_errors(cbdata->wind, ngettext("Couldn't add duplicate torrent", "Couldn't add duplicate torrents",
+        show_torrent_errors(cbdata->wind, ngettext("Couldn’t add duplicate torrent", "Couldn’t add duplicate torrents",
             g_slist_length(cbdata->duplicates_list)), &cbdata->duplicates_list);
     }
 }
@@ -1372,7 +1372,7 @@ static void show_about_dialog(GtkWindow* parent)
     gtk_show_about_dialog(parent,
         "authors", authors,
         "comments", _("A fast and easy BitTorrent client"),
-        "copyright", _("Copyright (c) The Transmission Project"),
+        "copyright", _("Copyright © The Transmission Project"),
         "logo-icon-name", MY_CONFIG_NAME,
         "name", g_get_application_name(),
         /* Translators: translate "translator-credits" as your name
