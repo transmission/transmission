@@ -174,7 +174,7 @@ QString TorrentDelegate::progressString(Torrent const& tor)
     {
         //: First part of torrent progress string;
         //: %1 is the percentage of torrent metadata downloaded
-        str = tr("Magnetized transfer - retrieving metadata (%1%)").
+        str = tr("Magnetized transfer — retrieving metadata (%1%)").
                 arg(Formatter::percentToString(tor.metadataPercentDone() * 100.0));
     }
     else if (!isDone) // downloading
@@ -249,13 +249,13 @@ QString TorrentDelegate::progressString(Torrent const& tor)
             //: Second (optional) part of torrent progress string;
             //: %1 is duration;
             //: notice that leading space (before the dash) is included here
-            str += tr(" - %1 left").arg(Formatter::timeToString(tor.getETA()));
+            str += tr(" — %1 left").arg(Formatter::timeToString(tor.getETA()));
         }
         else
         {
             //: Second (optional) part of torrent progress string;
             //: notice that leading space (before the dash) is included here
-            str += tr(" - Remaining time unknown");
+            str += tr(" — Remaining time unknown");
         }
     }
 
@@ -382,7 +382,7 @@ QString TorrentDelegate::statusString(Torrent const& tor)
 
         if (!s.isEmpty())
         {
-            str += tr(" - ") + s;
+            str += tr(" — ") + s;
         }
     }
 

@@ -96,15 +96,15 @@ void MakeProgressDialog::onProgress()
 
     if (!b.isDone)
     {
-        str = tr("Creating \"%1\"").arg(base);
+        str = tr("Creating “%1”").arg(base);
     }
     else if (b.result == TR_MAKEMETA_OK)
     {
-        str = tr("Created \"%1\"!").arg(base);
+        str = tr("Created “%1”!").arg(base);
     }
     else if (b.result == TR_MAKEMETA_URL)
     {
-        str = tr("Error: invalid announce URL \"%1\"").arg(QString::fromUtf8(b.errfile));
+        str = tr("Error: invalid announce URL “%1”").arg(QString::fromUtf8(b.errfile));
     }
     else if (b.result == TR_MAKEMETA_CANCELLED)
     {
@@ -112,12 +112,12 @@ void MakeProgressDialog::onProgress()
     }
     else if (b.result == TR_MAKEMETA_IO_READ)
     {
-        str = tr("Error reading \"%1\": %2").arg(QString::fromUtf8(b.errfile)).
+        str = tr("Error reading “%1”: %2").arg(QString::fromUtf8(b.errfile)).
                 arg(QString::fromLocal8Bit(tr_strerror(b.my_errno)));
     }
     else if (b.result == TR_MAKEMETA_IO_WRITE)
     {
-        str = tr("Error writing \"%1\": %2").arg(QString::fromUtf8(b.errfile)).
+        str = tr("Error writing “%1”: %2").arg(QString::fromUtf8(b.errfile)).
                 arg(QString::fromLocal8Bit(tr_strerror(b.my_errno)));
     }
 

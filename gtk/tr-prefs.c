@@ -297,7 +297,7 @@ static GtkWidget* downloadingPage(GObject* core, struct prefs_dialog_data* data)
     hig_workarea_add_section_divider(t, &row);
     hig_workarea_add_section_title(t, &row, _("Incomplete"));
 
-    s = _("Append \"._part\" to incomplete files' names");
+    s = _("Append “._part” to incomplete files’ names");
     w = new_check_button(s, TR_KEY_rename_partial_files, core);
     hig_workarea_add_wide_control(t, &row, w);
 
@@ -1170,16 +1170,16 @@ static GtkWidget* networkPage(GObject* core)
     hig_workarea_add_section_title(t, &row, _("Options"));
 
 #ifdef WITH_UTP
-    s = _("Enable _uTP for peer communication");
+    s = _("Enable µTP for peer comm_unication");
     w = new_check_button(s, TR_KEY_utp_enabled, core);
-    s = _("uTP is a tool for reducing network congestion.");
+    s = _("µTP is a tool for reducing network congestion.");
     gtk_widget_set_tooltip_text(w, s);
     hig_workarea_add_wide_control(t, &row, w);
 #endif
 
     s = _("Use PE_X to find more peers");
     w = new_check_button(s, TR_KEY_pex_enabled, core);
-    s = _("PEX is a tool for exchanging peer lists with the peers you're connected to.");
+    s = _("PEX is a tool for exchanging peer lists with the peers you’re connected to.");
     gtk_widget_set_tooltip_text(w, s);
     hig_workarea_add_wide_control(t, &row, w);
 

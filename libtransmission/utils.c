@@ -238,7 +238,7 @@ uint8_t* tr_loadFile(char const* path, size_t* size, tr_error** error)
     tr_sys_path_info info;
     tr_sys_file_t fd;
     tr_error* my_error = NULL;
-    char const* const err_fmt = _("Couldn't read \"%1$s\": %2$s");
+    char const* const err_fmt = _("Couldn’t read “%1$s”: %2$s");
 
     /* try to stat the file */
     if (!tr_sys_path_get_info(path, 0, &info, &my_error))

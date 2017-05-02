@@ -1576,7 +1576,7 @@ static void gotNewBlocklist(tr_session* session, bool did_connect UNUSED, bool d
 
         if (fd == TR_BAD_SYS_FILE)
         {
-            tr_snprintf(result, sizeof(result), _("Couldn't save file \"%1$s\": %2$s"), filename, error->message);
+            tr_snprintf(result, sizeof(result), _("Couldn’t save file “%1$s”: %2$s"), filename, error->message);
             tr_error_clear(&error);
         }
 
@@ -1590,7 +1590,7 @@ static void gotNewBlocklist(tr_session* session, bool did_connect UNUSED, bool d
             {
                 if (!tr_sys_file_write(fd, buf, buflen - stream.avail_out, NULL, &error))
                 {
-                    tr_snprintf(result, sizeof(result), _("Couldn't save file \"%1$s\": %2$s"), filename, error->message);
+                    tr_snprintf(result, sizeof(result), _("Couldn’t save file “%1$s”: %2$s"), filename, error->message);
                     tr_error_clear(&error);
                     break;
                 }
@@ -1613,7 +1613,7 @@ static void gotNewBlocklist(tr_session* session, bool did_connect UNUSED, bool d
         {
             if (!tr_sys_file_write(fd, response, response_byte_count, NULL, &error))
             {
-                tr_snprintf(result, sizeof(result), _("Couldn't save file \"%1$s\": %2$s"), filename, error->message);
+                tr_snprintf(result, sizeof(result), _("Couldn’t save file “%1$s”: %2$s"), filename, error->message);
                 tr_error_clear(&error);
             }
         }

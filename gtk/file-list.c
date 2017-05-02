@@ -833,7 +833,7 @@ static int on_rename_done_idle(struct rename_data* data)
     else
     {
         GtkWidget* w = gtk_message_dialog_new(GTK_WINDOW(gtk_widget_get_toplevel(data->file_data->top)), GTK_DIALOG_MODAL,
-            GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, _("Unable to rename file as \"%s\": %s"), data->newname,
+            GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, _("Unable to rename file as “%s”: %s"), data->newname,
             tr_strerror(data->error));
         gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(w), "%s", _("Please correct the errors and try again."));
         gtk_dialog_run(GTK_DIALOG(w));

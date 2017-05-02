@@ -566,7 +566,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
         [alert setMessageText: NSLocalizedString(@"A folder cannot be moved to inside itself.",
                                                     "Move inside itself alert -> title")];
         [alert setInformativeText: [NSString stringWithFormat:
-                        NSLocalizedString(@"The move operation of \"%@\" cannot be done.",
+                        NSLocalizedString(@"The move operation of “%@” cannot be done.",
                                             "Move inside itself alert -> message"), [self name]]];
         [alert addButtonWithTitle: NSLocalizedString(@"OK", "Move inside itself alert -> button")];
 
@@ -589,7 +589,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
         NSAlert * alert = [[NSAlert alloc] init];
         [alert setMessageText: NSLocalizedString(@"There was an error moving the data file.", "Move error alert -> title")];
         [alert setInformativeText: [NSString stringWithFormat:
-                NSLocalizedString(@"The move operation of \"%@\" cannot be done.", "Move error alert -> message"), [self name]]];
+                NSLocalizedString(@"The move operation of “%@” cannot be done.", "Move error alert -> message"), [self name]]];
         [alert addButtonWithTitle: NSLocalizedString(@"OK", "Move error alert -> button")];
 
         [alert runModal];
@@ -622,7 +622,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
 
             NSAlert * alert = [[NSAlert alloc] init];
             [alert setMessageText: [NSString stringWithFormat:
-                                    NSLocalizedString(@"Not enough remaining disk space to download \"%@\" completely.",
+                                    NSLocalizedString(@"Not enough remaining disk space to download “%@” completely.",
                                         "Torrent disk space alert -> title"), [self name]]];
             [alert setInformativeText: [NSString stringWithFormat: NSLocalizedString(@"The transfer will be paused."
                                         " Clear up space on %@ or deselect files in the torrent inspector to continue.",

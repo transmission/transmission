@@ -466,7 +466,7 @@ static bool isWebClientDir(char const* path)
 {
     char* tmp = tr_buildPath(path, "index.html", NULL);
     bool const ret = tr_sys_path_exists(tmp, NULL);
-    tr_logAddInfo(_("Searching for web interface file \"%s\""), tmp);
+    tr_logAddInfo(_("Searching for web interface file “%s”"), tmp);
     tr_free(tmp);
 
     return ret;

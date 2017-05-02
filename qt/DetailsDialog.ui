@@ -61,7 +61,7 @@
             </sizepolicy>
            </property>
            <property name="text">
-            <string notr="true">...</string>
+            <string notr="true">…</string>
            </property>
            <property name="textFormat">
             <enum>Qt::PlainText</enum>
@@ -87,7 +87,7 @@
             </sizepolicy>
            </property>
            <property name="text">
-            <string notr="true">...</string>
+            <string notr="true">…</string>
            </property>
            <property name="textFormat">
             <enum>Qt::PlainText</enum>
@@ -113,7 +113,7 @@
             </sizepolicy>
            </property>
            <property name="text">
-            <string notr="true">...</string>
+            <string notr="true">…</string>
            </property>
            <property name="textFormat">
             <enum>Qt::PlainText</enum>
@@ -139,7 +139,7 @@
             </sizepolicy>
            </property>
            <property name="text">
-            <string notr="true">...</string>
+            <string notr="true">…</string>
            </property>
            <property name="textFormat">
             <enum>Qt::PlainText</enum>
@@ -165,7 +165,7 @@
             </sizepolicy>
            </property>
            <property name="text">
-            <string notr="true">...</string>
+            <string notr="true">…</string>
            </property>
            <property name="textFormat">
             <enum>Qt::PlainText</enum>
@@ -191,7 +191,7 @@
             </sizepolicy>
            </property>
            <property name="text">
-            <string notr="true">...</string>
+            <string notr="true">…</string>
            </property>
            <property name="textFormat">
             <enum>Qt::PlainText</enum>
@@ -217,7 +217,7 @@
             </sizepolicy>
            </property>
            <property name="text">
-            <string notr="true">...</string>
+            <string notr="true">…</string>
            </property>
            <property name="textFormat">
             <enum>Qt::PlainText</enum>
@@ -243,7 +243,7 @@
             </sizepolicy>
            </property>
            <property name="text">
-            <string notr="true">...</string>
+            <string notr="true">…</string>
            </property>
            <property name="textFormat">
             <enum>Qt::PlainText</enum>
@@ -269,7 +269,7 @@
             </sizepolicy>
            </property>
            <property name="text">
-            <string notr="true">...</string>
+            <string notr="true">…</string>
            </property>
            <property name="textFormat">
             <enum>Qt::PlainText</enum>
@@ -321,7 +321,7 @@
             </sizepolicy>
            </property>
            <property name="text">
-            <string notr="true">...</string>
+            <string notr="true">…</string>
            </property>
            <property name="textFormat">
             <enum>Qt::PlainText</enum>
@@ -340,7 +340,7 @@
             </sizepolicy>
            </property>
            <property name="text">
-            <string notr="true">...</string>
+            <string notr="true">…</string>
            </property>
            <property name="textFormat">
             <enum>Qt::PlainText</enum>
@@ -380,7 +380,7 @@
             </sizepolicy>
            </property>
            <property name="text">
-            <string notr="true">...</string>
+            <string notr="true">…</string>
            </property>
            <property name="textFormat">
             <enum>Qt::PlainText</enum>
@@ -399,7 +399,7 @@
             </sizepolicy>
            </property>
            <property name="text">
-            <string notr="true">...</string>
+            <string notr="true">…</string>
            </property>
            <property name="textFormat">
             <enum>Qt::PlainText</enum>
@@ -432,7 +432,7 @@
             </sizepolicy>
            </property>
            <property name="text">
-            <string notr="true">...</string>
+            <string notr="true">…</string>
            </property>
            <property name="textFormat">
             <enum>Qt::PlainText</enum>

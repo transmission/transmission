@@ -103,7 +103,7 @@ static void natPulse(tr_shared* s, bool do_check)
 
     if (newStatus != oldStatus)
     {
-        tr_logAddNamedInfo(getKey(), _("State changed from \"%1$s\" to \"%2$s\""), getNatStateStr(oldStatus),
+        tr_logAddNamedInfo(getKey(), _("State changed from “%1$s” to “%2$s”"), getNatStateStr(oldStatus),
             getNatStateStr(newStatus));
     }
 }

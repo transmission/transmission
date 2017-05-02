@@ -338,7 +338,7 @@
          <item row="5" column="1">
           <widget class="FreeSpaceLabel" name="downloadDirFreeSpaceLabel">
            <property name="text">
-            <string notr="true">...</string>
+            <string notr="true">…</string>
            </property>
            <property name="alignment">
             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -460,7 +460,7 @@
          <item row="0" column="0" colspan="2">
           <widget class="QCheckBox" name="renamePartialFilesCheck">
            <property name="text">
-            <string>Append &quot;.&amp;part&quot; to incomplete files' names</string>
+            <string>Append “.&amp;part” to incomplete files’ names</string>
            </property>
           </widget>
          </item>
@@ -690,7 +690,7 @@
          <item row="1" column="0" colspan="2">
           <widget class="QLabel" name="blocklistStatusLabel">
            <property name="text">
-            <string notr="true">...</string>
+            <string notr="true">…</string>
            </property>
           </widget>
          </item>
@@ -914,17 +914,17 @@
          <item>
           <widget class="QCheckBox" name="enableUtpCheck">
            <property name="toolTip">
-            <string>uTP is a tool for reducing network congestion.</string>
+            <string>µTP is a tool for reducing network congestion.</string>
            </property>
            <property name="text">
-            <string>Enable &amp;uTP for peer connections</string>
+            <string>Enable µ&amp;TP for peer connections</string>
            </property>
           </widget>
          </item>
          <item>
           <widget class="QCheckBox" name="enablePexCheck">
            <property name="toolTip">
-            <string>PEX is a tool for exchanging peer lists with the peers you're connected to.</string>
+            <string>PEX is a tool for exchanging peer lists with the peers you’re connected to.</string>
            </property>
            <property name="text">
             <string>Use PE&amp;X to find more peers</string>

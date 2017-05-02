@@ -60,7 +60,7 @@ static void blocklistLoad(tr_blocklistFile* b)
     tr_sys_path_info info;
     char* base;
     tr_error* error = NULL;
-    char const* err_fmt = _("Couldn't read \"%1$s\": %2$s");
+    char const* err_fmt = _("Couldn’t read “%1$s”: %2$s");
 
     blocklistClose(b);
 
@@ -100,7 +100,7 @@ static void blocklistLoad(tr_blocklistFile* b)
     b->ruleCount = byteCount / sizeof(struct tr_ipv4_range);
 
     base = tr_sys_path_basename(b->filename, NULL);
-    tr_logAddInfo(_("Blocklist \"%s\" contains %zu entries"), base, b->ruleCount);
+    tr_logAddInfo(_("Blocklist “%s” contains %zu entries"), base, b->ruleCount);
     tr_free(base);
 }
 
@@ -326,7 +326,7 @@ int tr_blocklistFileSetContent(tr_blocklistFile* b, char const* filename)
     tr_sys_file_t out;
     int inCount = 0;
     char line[2048];
-    char const* err_fmt = _("Couldn't read \"%1$s\": %2$s");
+    char const* err_fmt = _("Couldn’t read “%1$s”: %2$s");
     struct tr_ipv4_range* ranges = NULL;
     size_t ranges_alloc = 0;
     size_t ranges_count = 0;
@@ -429,13 +429,13 @@ int tr_blocklistFileSetContent(tr_blocklistFile* b, char const* filename)
 
     if (!tr_sys_file_write(out, ranges, sizeof(struct tr_ipv4_range) * ranges_count, NULL, &error))
     {
-        tr_logAddError(_("Couldn't save file \"%1$s\": %2$s"), b->filename, error->message);
+        tr_logAddError(_("Couldn’t save file “%1$s”: %2$s"), b->filename, error->message);
         tr_error_free(error);
     }
     else
     {
         char* base = tr_sys_path_basename(b->filename, NULL);
-        tr_logAddInfo(_("Blocklist \"%s\" updated with %zu entries"), base, ranges_count);
+        tr_logAddInfo(_("Blocklist “%s” updated with %zu entries"), base, ranges_count);
         tr_free(base);
     }
 

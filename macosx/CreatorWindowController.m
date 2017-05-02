@@ -495,7 +495,7 @@
         [alert setMessageText: NSLocalizedString(@"The chosen torrent file location does not exist.",
                                                 "Create torrent -> directory doesn't exist warning -> title")];
         [alert setInformativeText: [NSString stringWithFormat:
-                NSLocalizedString(@"The directory \"%@\" does not currently exist. "
+                NSLocalizedString(@"The directory “%@” does not currently exist. "
                     "Create this directory or choose a different one to create the torrent file.",
                     "Create torrent -> directory doesn't exist warning -> warning"),
                     [[fLocation URLByDeletingLastPathComponent] path]]];
@@ -516,7 +516,7 @@
         [alert setMessageText: NSLocalizedString(@"A torrent file with this name and directory cannot be created.",
                                                 "Create torrent -> file already exists warning -> title")];
         [alert setInformativeText: [NSString stringWithFormat:
-                NSLocalizedString(@"A file with the name \"%@\" already exists in the directory \"%@\". "
+                NSLocalizedString(@"A file with the name “%@” already exists in the directory “%@”. "
                     "Choose a new name or directory to create the torrent file.",
                     "Create torrent -> file already exists warning -> warning"),
                     [pathComponents objectAtIndex: count-1], [pathComponents objectAtIndex: count-2]]];
@@ -580,15 +580,15 @@
             default:
                 alert = [[[NSAlert alloc] init] autorelease];
                 [alert addButtonWithTitle: NSLocalizedString(@"OK", "Create torrent -> failed -> button")];
-                [alert setMessageText: [NSString stringWithFormat: NSLocalizedString(@"Creation of \"%@\" failed.",
+                [alert setMessageText: [NSString stringWithFormat: NSLocalizedString(@"Creation of “%@” failed.",
                                                 "Create torrent -> failed -> title"), [fLocation lastPathComponent]]];
                 [alert setAlertStyle: NSWarningAlertStyle];
 
                 if (fInfo->result == TR_MAKEMETA_IO_READ)
-                    [alert setInformativeText: [NSString stringWithFormat: NSLocalizedString(@"Could not read \"%s\": %s.",
+                    [alert setInformativeText: [NSString stringWithFormat: NSLocalizedString(@"Could not read “%s”: %s.",
                         "Create torrent -> failed -> warning"), fInfo->errfile, strerror(fInfo->my_errno)]];
                 else if (fInfo->result == TR_MAKEMETA_IO_WRITE)
-                    [alert setInformativeText: [NSString stringWithFormat: NSLocalizedString(@"Could not write \"%s\": %s.",
+                    [alert setInformativeText: [NSString stringWithFormat: NSLocalizedString(@"Could not write “%s”: %s.",
                         "Create torrent -> failed -> warning"), fInfo->errfile, strerror(fInfo->my_errno)]];
                 else //invalid url should have been caught before creating
                     [alert setInformativeText: [NSString stringWithFormat: @"%@ (%d)",

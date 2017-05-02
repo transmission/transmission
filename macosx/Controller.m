@@ -709,7 +709,7 @@ static void removeKeRangerRansomware()
             const BOOL allowNeverAgain = lastDonateDate != nil; //hide the "don't show again" check the first time - give them time to try the app
             [alert setShowsSuppressionButton: allowNeverAgain];
             if (allowNeverAgain)
-                [[alert suppressionButton] setTitle: NSLocalizedString(@"Don't bug me about this ever again.", "Donation beg -> button")];
+                [[alert suppressionButton] setTitle: NSLocalizedString(@"Don’t bug me about this ever again.", "Donation beg -> button")];
 
             const NSInteger donateResult = [alert runModal];
             if (donateResult == NSAlertFirstButtonReturn)
@@ -890,7 +890,7 @@ static void removeKeRangerRansomware()
         }
 
         NSRunAlertPanel(NSLocalizedString(@"Torrent download failed", "Download not a torrent -> title"),
-            [NSString stringWithFormat: NSLocalizedString(@"It appears that the file \"%@\" from %@ is not a torrent file.",
+            [NSString stringWithFormat: NSLocalizedString(@"It appears that the file “%@” from %@ is not a torrent file.",
             "Download not a torrent -> message"), suggestedName,
             [[[[download request] URL] absoluteString] stringByReplacingPercentEscapesUsingEncoding: NSUTF8StringEncoding]],
             NSLocalizedString(@"OK", "Download not a torrent -> button"), nil, nil);
@@ -1233,7 +1233,7 @@ static void removeKeRangerRansomware()
         return;
 
     NSAlert * alert = [[NSAlert alloc] init];
-    [alert setMessageText: [NSString stringWithFormat: NSLocalizedString(@"\"%@\" is not a valid torrent file.",
+    [alert setMessageText: [NSString stringWithFormat: NSLocalizedString(@"“%@” is not a valid torrent file.",
                             "Open invalid alert -> title"), filename]];
     [alert setInformativeText:
             NSLocalizedString(@"The torrent file cannot be opened because it contains invalid data.",
@@ -1254,7 +1254,7 @@ static void removeKeRangerRansomware()
 
     NSAlert * alert = [[NSAlert alloc] init];
     [alert setMessageText: NSLocalizedString(@"Adding magnetized transfer failed.", "Magnet link failed -> title")];
-    [alert setInformativeText: [NSString stringWithFormat: NSLocalizedString(@"There was an error when adding the magnet link \"%@\"."
+    [alert setInformativeText: [NSString stringWithFormat: NSLocalizedString(@"There was an error when adding the magnet link “%@”."
                                 " The transfer will not occur.", "Magnet link failed -> message"), address]];
     [alert setAlertStyle: NSWarningAlertStyle];
     [alert addButtonWithTitle: NSLocalizedString(@"OK", "Magnet link failed -> button")];
@@ -1271,7 +1271,7 @@ static void removeKeRangerRansomware()
         return;
 
     NSAlert * alert = [[NSAlert alloc] init];
-    [alert setMessageText: [NSString stringWithFormat: NSLocalizedString(@"A transfer of \"%@\" already exists.",
+    [alert setMessageText: [NSString stringWithFormat: NSLocalizedString(@"A transfer of “%@” already exists.",
                             "Open duplicate alert -> title"), name]];
     [alert setInformativeText:
             NSLocalizedString(@"The transfer cannot be added because it is a duplicate of an already existing transfer.",
@@ -1293,13 +1293,13 @@ static void removeKeRangerRansomware()
 
     NSAlert * alert = [[NSAlert alloc] init];
     if (name)
-        [alert setMessageText: [NSString stringWithFormat: NSLocalizedString(@"A transfer of \"%@\" already exists.",
+        [alert setMessageText: [NSString stringWithFormat: NSLocalizedString(@"A transfer of “%@” already exists.",
                                 "Open duplicate magnet alert -> title"), name]];
     else
         [alert setMessageText: NSLocalizedString(@"Magnet link is a duplicate of an existing transfer.",
                                 "Open duplicate magnet alert -> title")];
     [alert setInformativeText: [NSString stringWithFormat:
-            NSLocalizedString(@"The magnet link  \"%@\" cannot be added because it is a duplicate of an already existing transfer.",
+            NSLocalizedString(@"The magnet link  “%@” cannot be added because it is a duplicate of an already existing transfer.",
                             "Open duplicate magnet alert -> message"), address]];
     [alert setAlertStyle: NSWarningAlertStyle];
     [alert addButtonWithTitle: NSLocalizedString(@"OK", "Open duplicate magnet alert -> button")];
@@ -1476,11 +1476,11 @@ static void removeKeRangerRansomware()
 
                 if (deleteData)
                     title = [NSString stringWithFormat:
-                                NSLocalizedString(@"Are you sure you want to remove \"%@\" from the transfer list"
+                                NSLocalizedString(@"Are you sure you want to remove “%@” from the transfer list"
                                 " and trash the data file?", "Removal confirm panel -> title"), torrentName];
                 else
                     title = [NSString stringWithFormat:
-                                NSLocalizedString(@"Are you sure you want to remove \"%@\" from the transfer list?",
+                                NSLocalizedString(@"Are you sure you want to remove “%@” from the transfer list?",
                                 "Removal confirm panel -> title"), torrentName];
 
                 message = NSLocalizedString(@"This transfer is active."
@@ -1643,7 +1643,7 @@ static void removeKeRangerRansomware()
         if ([torrents count] == 1)
         {
             NSString * torrentName = [(Torrent *)[torrents objectAtIndex: 0] name];
-            message = [NSString stringWithFormat: NSLocalizedString(@"Are you sure you want to remove \"%@\" from the transfer list?",
+            message = [NSString stringWithFormat: NSLocalizedString(@"Are you sure you want to remove “%@” from the transfer list?",
                                                                   "Remove completed confirm panel -> title"), torrentName];
 
             info = NSLocalizedString(@"Once removed, continuing the transfer will require the torrent file or magnet link.",
@@ -1693,7 +1693,7 @@ static void removeKeRangerRansomware()
 
     NSInteger count = [torrents count];
     if (count == 1)
-        [panel setMessage: [NSString stringWithFormat: NSLocalizedString(@"Select the new folder for \"%@\".",
+        [panel setMessage: [NSString stringWithFormat: NSLocalizedString(@"Select the new folder for “%@”.",
                             "Move torrent -> select destination folder"), [(Torrent *)[torrents objectAtIndex: 0] name]]];
     else
         [panel setMessage: [NSString stringWithFormat: NSLocalizedString(@"Select the new folder for %d data files.",
@@ -1746,7 +1746,7 @@ static void removeKeRangerRansomware()
         {
             NSAlert * alert = [[NSAlert alloc] init];
             [alert addButtonWithTitle: NSLocalizedString(@"OK", "Torrent file copy alert -> button")];
-            [alert setMessageText: [NSString stringWithFormat: NSLocalizedString(@"Copy of \"%@\" Cannot Be Created",
+            [alert setMessageText: [NSString stringWithFormat: NSLocalizedString(@"Copy of “%@” Cannot Be Created",
                                     "Torrent file copy alert -> title"), [torrent name]]];
             [alert setInformativeText: [NSString stringWithFormat:
                     NSLocalizedString(@"The torrent file (%@) cannot be found.", "Torrent file copy alert -> message"),

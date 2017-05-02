@@ -654,7 +654,7 @@ bool tr_metainfoParse(tr_session const* session, tr_variant const* meta_in, tr_i
 
     if (badTag != NULL)
     {
-        tr_logAddNamedError(inf->name, _("Invalid metadata entry \"%s\""), badTag);
+        tr_logAddNamedError(inf->name, _("Invalid metadata entry “%s”"), badTag);
         tr_metainfoFree(inf);
     }
 

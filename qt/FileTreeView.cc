@@ -399,7 +399,7 @@ void FileTreeView::initContextMenu()
     myContextMenu->addSeparator();
 
     myOpenAction = myContextMenu->addAction(tr("Open"), this, SLOT(openSelectedItem()));
-    myRenameAction = myContextMenu->addAction(tr("Rename..."), this, SLOT(renameSelectedItem()));
+    myRenameAction = myContextMenu->addAction(tr("Rename…"), this, SLOT(renameSelectedItem()));
 
     connect(myContextMenu, SIGNAL(aboutToShow()), SLOT(refreshContextMenuActionsSensitivity()));
 }

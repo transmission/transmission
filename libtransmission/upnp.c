@@ -197,8 +197,8 @@ int tr_upnpPulse(tr_upnp* handle, int port, bool isEnabled, bool doPortCheck)
         if (UPNP_GetValidIGD(devlist, &handle->urls, &handle->data, handle->lanaddr,
             sizeof(handle->lanaddr)) == UPNP_IGD_VALID_CONNECTED)
         {
-            tr_logAddNamedInfo(getKey(), _("Found Internet Gateway Device \"%s\""), handle->urls.controlURL);
-            tr_logAddNamedInfo(getKey(), _("Local Address is \"%s\""), handle->lanaddr);
+            tr_logAddNamedInfo(getKey(), _("Found Internet Gateway Device “%s”"), handle->urls.controlURL);
+            tr_logAddNamedInfo(getKey(), _("Local Address is “%s”"), handle->lanaddr);
             handle->state = TR_UPNP_IDLE;
             handle->hasDiscovered = true;
         }
@@ -225,7 +225,7 @@ int tr_upnpPulse(tr_upnp* handle, int port, bool isEnabled, bool doPortCheck)
         if (tr_upnpGetSpecificPortMappingEntry(handle, "TCP") != UPNPCOMMAND_SUCCESS ||
             tr_upnpGetSpecificPortMappingEntry(handle, "UDP") != UPNPCOMMAND_SUCCESS)
         {
-            tr_logAddNamedInfo(getKey(), _("Port %d isn't forwarded"), handle->port);
+            tr_logAddNamedInfo(getKey(), _("Port %d isn’t forwarded"), handle->port);
             handle->isMapped = false;
         }
     }
@@ -235,7 +235,7 @@ int tr_upnpPulse(tr_upnp* handle, int port, bool isEnabled, bool doPortCheck)
         tr_upnpDeletePortMapping(handle, "TCP", handle->port);
         tr_upnpDeletePortMapping(handle, "UDP", handle->port);
 
-        tr_logAddNamedInfo(getKey(), _("Stopping port forwarding through \"%s\", service \"%s\""), handle->urls.controlURL,
+        tr_logAddNamedInfo(getKey(), _("Stopping port forwarding through “%s”, service “%s”"), handle->urls.controlURL,
             handle->data.first.servicetype);
 
         handle->isMapped = false;
@@ -272,7 +272,7 @@ int tr_upnpPulse(tr_upnp* handle, int port, bool isEnabled, bool doPortCheck)
             handle->isMapped = err_tcp == 0 || err_udp == 0;
         }
 
-        tr_logAddNamedInfo(getKey(), _("Port forwarding through \"%s\", service \"%s\". (local address: %s:%d)"),
+        tr_logAddNamedInfo(getKey(), _("Port forwarding through “%s”, service “%s”. (local address: %s:%d)"),
             handle->urls.controlURL, handle->data.first.servicetype, handle->lanaddr, port);
 
         if (handle->isMapped)

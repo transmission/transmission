@@ -52,7 +52,7 @@ static struct FileList* getFiles(char const* dir, char const* base, struct FileL
 
     if (!tr_sys_path_get_info(buf, 0, &info, &error))
     {
-        tr_logAddError(_("Torrent Creator is skipping file \"%s\": %s"), buf, error->message);
+        tr_logAddError(_("Torrent Creator is skipping file “%s”: %s"), buf, error->message);
         tr_free(buf);
         tr_error_free(error);
         return list;

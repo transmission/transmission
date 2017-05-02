@@ -819,7 +819,7 @@ void DetailsDialog::refresh()
     if (!torrents.empty())
     {
         bool b = torrents[0]->isPrivate();
-        string = b ? tr("Private to this tracker -- DHT and PEX disabled") : tr("Public torrent");
+        string = b ? tr("Private to this tracker — DHT and PEX disabled") : tr("Public torrent");
 
         for (Torrent const* const t : torrents)
         {
@@ -1120,11 +1120,11 @@ void DetailsDialog::refresh()
                     break;
 
                 case 'K':
-                    txt = tr("Peer has unchoked us, but we're not interested");
+                    txt = tr("Peer has unchoked us, but we’re not interested");
                     break;
 
                 case '?':
-                    txt = tr("We unchoked this peer, but they're not interested");
+                    txt = tr("We unchoked this peer, but they’re not interested");
                     break;
 
                 case 'E':
@@ -1144,7 +1144,7 @@ void DetailsDialog::refresh()
                     break;
 
                 case 'T':
-                    txt = tr("Peer is connected over uTP");
+                    txt = tr("Peer is connected over µTP");
                     break;
                 }
 
@@ -1319,7 +1319,7 @@ void DetailsDialog::onAddTrackerClicked()
     }
     else if (!QUrl(url).isValid())
     {
-        QMessageBox::warning(this, tr("Error"), tr("Invalid URL \"%1\"").arg(url));
+        QMessageBox::warning(this, tr("Error"), tr("Invalid URL “%1”").arg(url));
     }
     else
     {
@@ -1365,7 +1365,7 @@ void DetailsDialog::onEditTrackerClicked()
     }
     else if (!QUrl(newval).isValid())
     {
-        QMessageBox::warning(this, tr("Error"), tr("Invalid URL \"%1\"").arg(newval));
+        QMessageBox::warning(this, tr("Error"), tr("Invalid URL “%1”").arg(newval));
     }
     else
     {

@@ -727,7 +727,7 @@ static void refreshInfo(struct DetailsImpl* di, tr_torrent** torrents, int n)
         }
         else if (baseline)
         {
-            str = _("Private to this tracker -- DHT and PEX disabled");
+            str = _("Private to this tracker — DHT and PEX disabled");
         }
         else
         {
@@ -1862,11 +1862,11 @@ static gboolean onPeerViewQueryTooltip(GtkWidget* widget, gint x, gint y, gboole
                 break;
 
             case 'K':
-                s = _("Peer has unchoked us, but we're not interested");
+                s = _("Peer has unchoked us, but we’re not interested");
                 break;
 
             case '?':
-                s = _("We unchoked this peer, but they're not interested");
+                s = _("We unchoked this peer, but they’re not interested");
                 break;
 
             case 'E':
@@ -2209,7 +2209,7 @@ static void buildTrackerSummary(GString* gstr, char const* key, tr_tracker_stat 
 
         if (key != NULL)
         {
-            str = g_markup_printf_escaped("%s - %s", st->host, key);
+            str = g_markup_printf_escaped("%s — %s", st->host, key);
         }
         else
         {
@@ -2240,7 +2240,7 @@ static void buildTrackerSummary(GString* gstr, char const* key, tr_tracker_stat 
             }
             else
             {
-                g_string_append_printf(gstr, _("Got an error %1$s\"%2$s\"%3$s %4$s ago"), err_markup_begin,
+                g_string_append_printf(gstr, _("Got an error %1$s“%2$s”%3$s %4$s ago"), err_markup_begin,
                     st->lastAnnounceResult, err_markup_end, timebuf);
             }
         }
@@ -2284,7 +2284,7 @@ static void buildTrackerSummary(GString* gstr, char const* key, tr_tracker_stat 
                 }
                 else
                 {
-                    g_string_append_printf(gstr, _("Got a scrape error \"%s%s%s\" %s ago"), err_markup_begin,
+                    g_string_append_printf(gstr, _("Got a scrape error “%s%s%s” %s ago"), err_markup_begin,
                         st->lastScrapeResult, err_markup_end, timebuf);
                 }
             }
@@ -2685,7 +2685,7 @@ static void on_edit_trackers(GtkButton* button, gpointer data)
         int const torrent_id = tr_torrentId(tor);
 
         g_string_truncate(gstr, 0);
-        g_string_append_printf(gstr, _("%s - Edit Trackers"), tr_torrentName(tor));
+        g_string_append_printf(gstr, _("%s — Edit Trackers"), tr_torrentName(tor));
         d = gtk_dialog_new_with_buttons(gstr->str, win, GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_CANCEL,
             GTK_RESPONSE_CANCEL, GTK_STOCK_SAVE, GTK_RESPONSE_ACCEPT, NULL);
         g_signal_connect(d, "response", G_CALLBACK(on_edit_trackers_response), data);
@@ -2795,7 +2795,7 @@ static void on_tracker_list_add_button_clicked(GtkButton* button UNUSED, gpointe
         GString* gstr = di->gstr; /* buffer for temporary strings */
 
         g_string_truncate(gstr, 0);
-        g_string_append_printf(gstr, _("%s - Add Tracker"), tr_torrentName(tor));
+        g_string_append_printf(gstr, _("%s — Add Tracker"), tr_torrentName(tor));
         w = gtk_dialog_new_with_buttons(gstr->str, GTK_WINDOW(di->dialog), GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_CANCEL,
             GTK_RESPONSE_CANCEL, GTK_STOCK_ADD, GTK_RESPONSE_ACCEPT, NULL);
         gtk_dialog_set_alternative_button_order(GTK_DIALOG(w), GTK_RESPONSE_ACCEPT, GTK_RESPONSE_CANCEL, -1);

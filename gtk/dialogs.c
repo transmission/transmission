@@ -103,8 +103,8 @@ void gtr_confirm_remove(GtkWindow* parent, TrCore* core, GSList* torrent_ids, gb
     }
     else
     {
-        g_string_printf(primary_text, ngettext("Delete this torrent's downloaded files?",
-            "Delete these %d torrents' downloaded files?", count), count);
+        g_string_printf(primary_text, ngettext("Delete this torrent’s downloaded files?",
+            "Delete these %d torrents’ downloaded files?", count), count);
     }
 
     secondary_text = g_string_new(NULL);

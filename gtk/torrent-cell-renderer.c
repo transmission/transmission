@@ -128,7 +128,7 @@ static void getProgressString(GString* gstr, tr_torrent const* tor, tr_info cons
     if (st->activity == TR_STATUS_DOWNLOAD || (hasSeedRatio && st->activity == TR_STATUS_SEED))
     {
         int const eta = st->eta;
-        g_string_append(gstr, " - ");
+        g_string_append(gstr, " — ");
 
         if (eta < 0)
         {
@@ -232,8 +232,8 @@ static void getStatusString(GString* gstr, tr_torrent const* tor, tr_stat const*
         char const* fmt[] =
         {
             NULL,
-            N_("Tracker gave a warning: \"%s\""),
-            N_("Tracker gave an error: \"%s\""),
+            N_("Tracker gave a warning: “%s”"),
+            N_("Tracker gave an error: “%s”"),
             N_("Error: %s")
         };
 
@@ -299,7 +299,7 @@ static void getStatusString(GString* gstr, tr_torrent const* tor, tr_stat const*
 
         if (*buf != '\0')
         {
-            g_string_append_printf(gstr, " - %s", buf);
+            g_string_append_printf(gstr, " — %s", buf);
         }
     }
 }

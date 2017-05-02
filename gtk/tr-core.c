@@ -1241,7 +1241,7 @@ static void add_file_async_callback(GObject* file, GAsyncResult* result, gpointe
 
     if (!g_file_load_contents_finish(G_FILE(file), result, &contents, &length, NULL, &error))
     {
-        g_message(_("Couldn't read \"%s\": %s"), g_file_get_parse_name(G_FILE(file)), error->message);
+        g_message(_("Couldn’t read “%s”: %s"), g_file_get_parse_name(G_FILE(file)), error->message);
         g_error_free(error);
     }
     else if (tr_ctorSetMetainfo(data->ctor, (uint8_t const*)contents, length) == 0)
@@ -1337,7 +1337,7 @@ static bool add_file(TrCore* core, GFile* file, gboolean do_start, gboolean do_p
         else
         {
             tr_ctorFree(ctor);
-            g_message(_("Skipping unknown torrent \"%s\""), g_file_get_parse_name(file));
+            g_message(_("Skipping unknown torrent “%s”"), g_file_get_parse_name(file));
         }
     }
 
@@ -1619,7 +1619,7 @@ static gboolean gtr_inhibit_hibernation(guint* cookie)
     }
     else
     {
-        tr_logAddError(_("Couldn't inhibit desktop hibernation: %s"), err->message);
+        tr_logAddError(_("Couldn’t inhibit desktop hibernation: %s"), err->message);
         g_error_free(err);
     }
 
