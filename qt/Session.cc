@@ -995,7 +995,7 @@ void Session::addTorrent(AddData const& addMe, tr_variant* args, bool trashOrigi
             d->show();
         });
 
-    q->add([this, addMe](RpcResponse const& r)
+    q->add([this, addMe, trashOriginal](RpcResponse const& r)
         {
             tr_variant* dup;
             char const* str;
@@ -1010,17 +1010,13 @@ void Session::addTorrent(AddData const& addMe, tr_variant* args, bool trashOrigi
                 connect(d, SIGNAL(rejected()), d, SLOT(deleteLater()));
                 d->show();
             }
-        });
-
-    if (trashOriginal && addMe.type == AddData::FILENAME)
-    {
-        q->add([this, addMe]()
+            else if (trashOriginal && addMe.type == AddData::FILENAME)
             {
                 QFile original(addMe.filename);
                 original.setPermissions(QFile::ReadOwner | QFile::WriteOwner);
                 original.remove();
-            });
-    }
+            }
+        });
 
     q->run();
 }
