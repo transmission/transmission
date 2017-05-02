@@ -283,7 +283,7 @@ tr_socket_t tr_netOpenPeerSocket(tr_session* session, tr_address const* addr, tr
 
     if (bind(s, (struct sockaddr*)&source_sock, sourcelen) == -1)
     {
-        tr_logAddError(_("Couldn't set source address %s on %" PRIdMAX ": %s"), tr_address_to_string(source_addr), (intmax_t)s,
+        tr_logAddError(_("Couldn’t set source address %s on %" PRIdMAX ": %s"), tr_address_to_string(source_addr), (intmax_t)s,
             tr_net_strerror(err_buf, sizeof(err_buf), sockerrno));
         tr_netClose(session, s);
         return TR_BAD_SOCKET; /* -errno */
@@ -300,7 +300,7 @@ tr_socket_t tr_netOpenPeerSocket(tr_session* session, tr_address const* addr, tr
 
         if ((tmperrno != ENETUNREACH && tmperrno != EHOSTUNREACH) || addr->type == TR_AF_INET)
         {
-            tr_logAddError(_("Couldn't connect socket %" PRIdMAX " to %s, port %d (errno %d - %s)"), (intmax_t)s,
+            tr_logAddError(_("Couldn’t connect socket %" PRIdMAX " to %s, port %d (errno %d — %s)"), (intmax_t)s,
                 tr_address_to_string(addr), (int)ntohs(port), tmperrno, tr_net_strerror(err_buf, sizeof(err_buf), tmperrno));
         }
 
@@ -397,11 +397,11 @@ static tr_socket_t tr_netBindTCPImpl(tr_address const* addr, tr_port port, bool 
 
             if (hint == NULL)
             {
-                fmt = _("Couldn't bind port %d on %s: %s");
+                fmt = _("Couldn’t bind port %d on %s: %s");
             }
             else
             {
-                fmt = _("Couldn't bind port %d on %s: %s (%s)");
+                fmt = _("Couldn’t bind port %d on %s: %s (%s)");
             }
 
             tr_logAddError(fmt, port, tr_address_to_string(addr), tr_net_strerror(err_buf, sizeof(err_buf), err), hint);

@@ -184,7 +184,7 @@ static bool create_path(char const* path_in, int permissions, tr_error** error)
             /* Folder doesn't exist yet */
             if (!tr_sys_dir_create(path, 0, permissions, &my_error))
             {
-                tr_logAddError(_("Couldn't create \"%1$s\": %2$s"), path, my_error->message);
+                tr_logAddError(_("Couldn’t create “%1$s”: %2$s"), path, my_error->message);
                 tr_free(path);
                 tr_error_propagate(error, &my_error);
                 return false;
@@ -193,8 +193,8 @@ static bool create_path(char const* path_in, int permissions, tr_error** error)
         else if ((sb.st_mode & S_IFMT) != S_IFDIR)
         {
             /* Node exists but isn't a folder */
-            char* const buf = tr_strdup_printf(_("File \"%s\" is in the way"), path);
-            tr_logAddError(_("Couldn't create \"%1$s\": %2$s"), path_in, buf);
+            char* const buf = tr_strdup_printf(_("File “%s” is in the way"), path);
+            tr_logAddError(_("Couldn’t create “%1$s”: %2$s"), path_in, buf);
             tr_free(buf);
             tr_free(path);
             set_system_error(error, ENOTDIR);

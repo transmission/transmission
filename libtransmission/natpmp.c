@@ -135,7 +135,7 @@ int tr_natpmpPulse(struct tr_natpmp* nat, tr_port private_port, bool is_enabled,
         {
             char str[128];
             evutil_inet_ntop(AF_INET, &response.pnu.publicaddress.addr, str, sizeof(str));
-            tr_logAddNamedInfo(getKey(), _("Found public address \"%s\""), str);
+            tr_logAddNamedInfo(getKey(), _("Found public address “%s”"), str);
             nat->state = TR_NATPMP_IDLE;
         }
         else if (val != NATPMP_TRYAGAIN)

@@ -619,14 +619,14 @@ static void onTrackerResponse(tr_torrent* tor, tr_tracker_event const* event, vo
         }
 
     case TR_TRACKER_WARNING:
-        tr_logAddTorErr(tor, _("Tracker warning: \"%s\""), event->text);
+        tr_logAddTorErr(tor, _("Tracker warning: “%s”"), event->text);
         tor->error = TR_STAT_TRACKER_WARNING;
         tr_strlcpy(tor->errorTracker, event->tracker, sizeof(tor->errorTracker));
         tr_strlcpy(tor->errorString, event->text, sizeof(tor->errorString));
         break;
 
     case TR_TRACKER_ERROR:
-        tr_logAddTorErr(tor, _("Tracker error: \"%s\""), event->text);
+        tr_logAddTorErr(tor, _("Tracker error: “%s”"), event->text);
         tor->error = TR_STAT_TRACKER_ERROR;
         tr_strlcpy(tor->errorTracker, event->tracker, sizeof(tor->errorTracker));
         tr_strlcpy(tor->errorString, event->text, sizeof(tor->errorString));
@@ -921,7 +921,7 @@ static bool setLocalErrorIfFilesDisappeared(tr_torrent* tor)
     if (disappeared)
     {
         tr_deeplog_tor(tor, "%s", "[LAZY] uh oh, the files disappeared");
-        tr_torrentSetLocalError(tor, "%s", _("No data found! Ensure your drives are connected or use \"Set Location\". "
+        tr_torrentSetLocalError(tor, "%s", _("No data found! Ensure your drives are connected or use “Set Location”. "
             "To re-download, remove the torrent and re-add it."));
     }
 
@@ -1862,7 +1862,7 @@ static void torrentStart(tr_torrent* tor, bool bypass_queue)
     /* allow finished torrents to be resumed */
     if (tr_torrentIsSeedRatioDone(tor))
     {
-        tr_logAddTorInfo(tor, "%s", _("Restarted manually -- disabling its seed ratio"));
+        tr_logAddTorInfo(tor, "%s", _("Restarted manually — disabling its seed ratio"));
         tr_torrentSetRatioMode(tor, TR_RATIOLIMIT_UNLIMITED);
     }
 
@@ -2377,7 +2377,7 @@ void tr_torrentRecheckCompleteness(tr_torrent* tor)
 
         if (recentChange)
         {
-            tr_logAddTorInfo(tor, _("State changed from \"%1$s\" to \"%2$s\""), getCompletionString(tor->completeness),
+            tr_logAddTorInfo(tor, _("State changed from “%1$s” to “%2$s”"), getCompletionString(tor->completeness),
                 getCompletionString(completeness));
         }
 

@@ -173,13 +173,13 @@ static int cached_file_open(struct tr_cached_file* o, char const* filename, bool
 
         if (dir == NULL)
         {
-            tr_logAddError(_("Couldn't get directory for \"%1$s\": %2$s"), filename, error->message);
+            tr_logAddError(_("Couldn’t get directory for “%1$s”: %2$s"), filename, error->message);
             goto fail;
         }
 
         if (!tr_sys_dir_create(dir, TR_SYS_DIR_CREATE_PARENTS, 0777, &error))
         {
-            tr_logAddError(_("Couldn't create \"%1$s\": %2$s"), dir, error->message);
+            tr_logAddError(_("Couldn’t create “%1$s”: %2$s"), dir, error->message);
             tr_free(dir);
             goto fail;
         }
@@ -200,7 +200,7 @@ static int cached_file_open(struct tr_cached_file* o, char const* filename, bool
 
     if (fd == TR_BAD_SYS_FILE)
     {
-        tr_logAddError(_("Couldn't open \"%1$s\": %2$s"), filename, error->message);
+        tr_logAddError(_("Couldn’t open “%1$s”: %2$s"), filename, error->message);
         goto fail;
     }
 
@@ -224,12 +224,12 @@ static int cached_file_open(struct tr_cached_file* o, char const* filename, bool
 
         if (!success)
         {
-            tr_logAddError(_("Couldn't preallocate file \"%1$s\" (%2$s, size: %3$" PRIu64 "): %4$s"),
+            tr_logAddError(_("Couldn’t preallocate file “%1$s” (%2$s, size: %3$" PRIu64 "): %4$s"),
                 filename, type, file_size, error->message);
             goto fail;
         }
 
-        tr_logAddDebug(_("Preallocated file \"%1$s\" (%2$s, size: %3$" PRIu64 ")"), filename, type, file_size);
+        tr_logAddDebug(_("Preallocated file “%1$s” (%2$s, size: %3$" PRIu64 ")"), filename, type, file_size);
     }
 
     /* If the file already exists and it's too large, truncate it.
@@ -240,7 +240,7 @@ static int cached_file_open(struct tr_cached_file* o, char const* filename, bool
      */
     if (resize_needed && !tr_sys_file_truncate(fd, file_size, &error))
     {
-        tr_logAddError(_("Couldn't truncate \"%1$s\": %2$s"), filename, error->message);
+        tr_logAddError(_("Couldn’t truncate “%1$s”: %2$s"), filename, error->message);
         goto fail;
     }
 
@@ -559,7 +559,7 @@ tr_socket_t tr_fdSocketCreate(tr_session* session, int domain, int type)
             if (sockerrno != EAFNOSUPPORT)
             {
                 char err_buf[512];
-                tr_logAddError(_("Couldn't create socket: %s"), tr_net_strerror(err_buf, sizeof(err_buf), sockerrno));
+                tr_logAddError(_("Couldn’t create socket: %s"), tr_net_strerror(err_buf, sizeof(err_buf), sockerrno));
             }
         }
     }
