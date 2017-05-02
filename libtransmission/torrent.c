@@ -2150,12 +2150,12 @@ static char const* getCompletionString(int type)
 {
     switch (type)
     {
-    /* Translators: this is a minor point that's safe to skip over, but FYI:
-       "Complete" and "Done" are specific, different terms in Transmission:
-       "Complete" means we've downloaded every file in the torrent.
-       "Done" means we're done downloading the files we wanted, but NOT all
-       that exist */
     case TR_PARTIAL_SEED:
+        /* Translators: this is a minor point that's safe to skip over, but FYI:
+           "Complete" and "Done" are specific, different terms in Transmission:
+           "Complete" means we've downloaded every file in the torrent.
+           "Done" means we're done downloading the files we wanted, but NOT all
+           that exist */
         return _("Done");
 
     case TR_SEED:
