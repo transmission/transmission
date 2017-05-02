@@ -185,7 +185,7 @@
     [panel setCanChooseDirectories: YES];
     [panel setCanCreateDirectories: YES];
 
-    [panel setMessage: [NSString stringWithFormat: NSLocalizedString(@"Select the download folder for \"%@\"",
+    [panel setMessage: [NSString stringWithFormat: NSLocalizedString(@"Select the download folder for “%@”",
                         "Add -> select destination folder"), [fTorrent name]]];
 
     [panel beginSheetModalForWindow: [self window] completionHandler: ^(NSInteger result) {

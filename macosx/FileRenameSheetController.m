@@ -87,7 +87,7 @@ typedef void (^CompletionBlock)(BOOL);
     [super windowDidLoad];
 
     self.originalName = [self.node name] ?: [self.torrent name];
-    NSString * label = [NSString stringWithFormat: NSLocalizedString(@"Rename the file \"%@\":", "rename sheet label"), self.originalName];
+    NSString * label = [NSString stringWithFormat: NSLocalizedString(@"Rename the file “%@”:", "rename sheet label"), self.originalName];
     [self.labelField setStringValue: label];
 
     [self.inputField setStringValue: self.originalName];

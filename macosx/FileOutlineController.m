@@ -298,7 +298,7 @@ typedef enum
         switch ([cell state])
         {
             case NSOffState:
-                return NSLocalizedString(@"Don't Download", "files tab -> tooltip");
+                return NSLocalizedString(@"Don’t Download", "files tab -> tooltip");
             case NSOnState:
                 return NSLocalizedString(@"Download", "files tab -> tooltip");
             case NSMixedState:

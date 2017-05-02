@@ -424,7 +424,7 @@
                 [alert addButtonWithTitle: NSLocalizedString(@"OK", "Save log alert panel -> button")];
                 [alert setMessageText: NSLocalizedString(@"Log Could Not Be Saved", "Save log alert panel -> title")];
                 [alert setInformativeText: [NSString stringWithFormat:
-                                            NSLocalizedString(@"There was a problem creating the file \"%@\".",
+                                            NSLocalizedString(@"There was a problem creating the file “%@”.",
                                                               "Save log alert panel -> message"), [[[panel URL] path] lastPathComponent]]];
                 [alert setAlertStyle: NSWarningAlertStyle];
 
