@@ -312,7 +312,7 @@
   </widget>
   <action name="action_OpenFile">
    <property name="text">
-    <string>&amp;Open...</string>
+    <string>&amp;Open…</string>
    </property>
    <property name="iconText">
     <string>Open</string>
@@ -326,7 +326,7 @@
   </action>
   <action name="action_New">
    <property name="text">
-    <string>&amp;New...</string>
+    <string>&amp;New…</string>
    </property>
    <property name="toolTip">
     <string>Create a new torrent</string>
@@ -351,7 +351,7 @@
     <string>Open Fold&amp;er</string>
    </property>
    <property name="toolTip">
-    <string>Open the torrent's folder</string>
+    <string>Open the torrent’s folder</string>
    </property>
    <property name="shortcut">
     <string notr="true">Ctrl+E</string>
@@ -701,7 +701,7 @@
   </action>
   <action name="action_SessionDialog">
    <property name="text">
-    <string>&amp;Change Session...</string>
+    <string>&amp;Change Session…</string>
    </property>
    <property name="toolTip">
     <string extracomment="Start a local session or connect to a running session">Choose Session</string>
@@ -709,7 +709,7 @@
   </action>
   <action name="action_SetLocation">
    <property name="text">
-    <string>Set &amp;Location...</string>
+    <string>Set &amp;Location…</string>
    </property>
   </action>
   <action name="action_CopyMagnetToClipboard">
@@ -719,7 +719,7 @@
   </action>
   <action name="action_AddURL">
    <property name="text">
-    <string>Open &amp;URL...</string>
+    <string>Open &amp;URL…</string>
    </property>
    <property name="shortcut">
     <string notr="true">Ctrl+U</string>

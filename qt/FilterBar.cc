@@ -274,7 +274,7 @@ FilterBar::FilterBar(Prefs& prefs, TorrentModel const& torrents, TorrentFilter c
 
     myLineEdit = new QLineEdit(this);
     myLineEdit->setClearButtonEnabled(true);
-    myLineEdit->setPlaceholderText(tr("Search..."));
+    myLineEdit->setPlaceholderText(tr("Search…"));
     myLineEdit->setMaximumWidth(250);
     h->addWidget(myLineEdit, 1);
     connect(myLineEdit, SIGNAL(textChanged(QString)), this, SLOT(onTextChanged(QString)));

@@ -696,9 +696,9 @@ void MainWindow::refreshTitle()
 
     if (!url.isEmpty())
     {
-        //: Second (optional) part of main window title "Transmission - host:port" (added when connected to remote session);
-        //: notice that leading space (before the dash) is included here
-        title += tr(" - %1:%2").arg(url.host()).arg(url.port());
+        //: Second (optional) part of main window title "Transmission — host:port" (added when connected to remote session);
+        //: notice that leading space (before the em-dash) is included here
+        title += tr(" — %1:%2").arg(url.host()).arg(url.port());
     }
 
     setWindowTitle(title);
@@ -1356,8 +1356,8 @@ void MainWindow::removeTorrents(bool const deleteFiles)
     }
     else
     {
-        primary_text = count == 1 ? tr("Delete this torrent's downloaded files?") :
-            tr("Delete these %Ln torrent(s)' downloaded files?", nullptr, count);
+        primary_text = count == 1 ? tr("Delete this torrent’s downloaded files?") :
+            tr("Delete these %Ln torrent(s)’ downloaded files?", nullptr, count);
     }
 
     if (!incomplete && !connected)

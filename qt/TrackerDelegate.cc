@@ -227,7 +227,7 @@ QString TrackerDelegate::getText(TrackerInfo const& inf) const
             else
             {
                 //: %1 and %3 are replaced with HTML markup, %2 is error message, %4 is duration
-                str += tr("Got an error %1\"%2\"%3 %4 ago").arg(err_markup_begin).arg(inf.st.lastAnnounceResult).
+                str += tr("Got an error %1“%2”%3 %4 ago").arg(err_markup_begin).arg(inf.st.lastAnnounceResult).
                         arg(err_markup_end).arg(tstr);
             }
         }
@@ -258,7 +258,7 @@ QString TrackerDelegate::getText(TrackerInfo const& inf) const
                 QString const tstr(timeToStringRounded(now - inf.st.lastAnnounceStartTime));
                 str += QLatin1String("<br/>\n");
                 //: %1 is duration
-                str += tr("Asking for more peers now... <small>%1</small>").arg(tstr);
+                str += tr("Asking for more peers now… <small>%1</small>").arg(tstr);
                 break;
             }
         }
@@ -294,7 +294,7 @@ QString TrackerDelegate::getText(TrackerInfo const& inf) const
                 else
                 {
                     //: %1 and %3 are replaced with HTML markup, %2 is error message, %4 is duration
-                    str += tr("Got a scrape error %1\"%2\"%3 %4 ago").arg(err_markup_begin).arg(inf.st.lastScrapeResult).
+                    str += tr("Got a scrape error %1“%2”%3 %4 ago").arg(err_markup_begin).arg(inf.st.lastScrapeResult).
                             arg(err_markup_end).arg(tstr);
                 }
             }
@@ -325,7 +325,7 @@ QString TrackerDelegate::getText(TrackerInfo const& inf) const
                     str += QLatin1String("<br/>\n");
                     QString const tstr(timeToStringRounded(now - inf.st.lastScrapeStartTime));
                     //: %1 is duration
-                    str += tr("Asking for peer counts now... <small>%1</small>").arg(tstr);
+                    str += tr("Asking for peer counts now… <small>%1</small>").arg(tstr);
                     break;
                 }
             }

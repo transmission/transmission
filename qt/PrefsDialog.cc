@@ -397,7 +397,7 @@ void PrefsDialog::onPortTested(bool isOpen)
 
 void PrefsDialog::onPortTest()
 {
-    ui.peerPortStatusLabel->setText(tr("Testing TCP Port..."));
+    ui.peerPortStatusLabel->setText(tr("Testing TCP Port…"));
     ui.testPeerPortButton->setEnabled(false);
     myWidgets[Prefs::PEER_PORT]->setEnabled(false);
     mySession.portTest();
@@ -453,7 +453,7 @@ void PrefsDialog::onBlocklistUpdated(int n)
 void PrefsDialog::onUpdateBlocklistClicked()
 {
     myBlocklistDialog = new QMessageBox(QMessageBox::Information, QString(),
-        tr("<b>Update Blocklist</b><p>Getting new blocklist..."), QMessageBox::Close, this);
+        tr("<b>Update Blocklist</b><p>Getting new blocklist…"), QMessageBox::Close, this);
     connect(myBlocklistDialog, SIGNAL(rejected()), this, SLOT(onUpdateBlocklistCancelled()));
     connect(&mySession, SIGNAL(blocklistUpdated(int)), this, SLOT(onBlocklistUpdated(int)));
     myBlocklistDialog->show();
@@ -538,7 +538,7 @@ void PrefsDialog::initDownloadingTab()
     ui.watchDirButton->setTitle(tr("Select Watch Directory"));
     ui.downloadDirButton->setTitle(tr("Select Destination"));
     ui.incompleteDirButton->setTitle(tr("Select Incomplete Directory"));
-    ui.completionScriptButton->setTitle(tr("Select \"Torrent Done\" Script"));
+    ui.completionScriptButton->setTitle(tr("Select “Torrent Done” Script"));
 
     ui.watchDirStack->setMinimumWidth(200);
 
