@@ -317,6 +317,8 @@ enum
     TR_KEY_script_torrent_added_filename,
     TR_KEY_script_torrent_done_enabled,
     TR_KEY_script_torrent_done_filename,
+    TR_KEY_script_torrent_done_seeding_enabled,
+    TR_KEY_script_torrent_done_seeding_filename,
     TR_KEY_seconds_active,
     TR_KEY_secondsActive,
     TR_KEY_secondsDownloading,
