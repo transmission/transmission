@@ -382,6 +382,8 @@ void tr_sessionGetDefaultSettings(tr_variant* d)
     tr_variantDictAddBool(d, TR_KEY_script_torrent_added_enabled, false);
     tr_variantDictAddStr(d, TR_KEY_script_torrent_done_filename, "");
     tr_variantDictAddBool(d, TR_KEY_script_torrent_done_enabled, false);
+    tr_variantDictAddStr(d, TR_KEY_script_torrent_done_seeding_filename, "");
+    tr_variantDictAddBool(d, TR_KEY_script_torrent_done_seeding_enabled, false);
     tr_variantDictAddInt(d, TR_KEY_seed_queue_size, 10);
     tr_variantDictAddBool(d, TR_KEY_seed_queue_enabled, false);
     tr_variantDictAddBool(d, TR_KEY_alt_speed_enabled, false);
