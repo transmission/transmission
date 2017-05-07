@@ -1,0 +1,81 @@
+
+/* Class = "NSWindow"; title = "Window"; ObjectID = "1"; */
+"1.title" = "Window";
+
+/* Class = "NSTextFieldCell"; title = "Nome do ficheiro"; ObjectID = "6"; */
+"6.title" = "Nome do ficheiro";
+
+/* Class = "NSTextFieldCell"; title = "informação de estado"; ObjectID = "7"; */
+"7.title" = "informação de estado";
+
+/* Class = "NSTextFieldCell"; title = "Ficheiro"; ObjectID = "13"; */
+"13.title" = "Ficheiro";
+
+/* Class = "NSTextFieldCell"; title = "Guardar em:"; ObjectID = "15"; */
+"15.title" = "Guardar em:";
+
+/* Class = "NSButtonCell"; title = "Alterar…"; ObjectID = "16"; */
+"16.title" = "Alterar…";
+
+/* Class = "NSButtonCell"; title = "Iniciar ao adicionar"; ObjectID = "18"; */
+"18.title" = "Iniciar ao adicionar";
+
+/* Class = "NSButtonCell"; title = "Adicionar"; ObjectID = "20"; */
+"20.title" = "Adicionar";
+
+/* Class = "NSButtonCell"; title = "Cancelar"; ObjectID = "22"; */
+"22.title" = "Cancelar";
+
+/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "35"; */
+"35.title" = "OtherViews";
+
+/* Class = "NSTextFieldCell"; title = "Grupo:"; ObjectID = "41"; */
+"41.title" = "Grupo:";
+
+/* Class = "NSTableColumn"; headerCell.title = "Rank"; ObjectID = "47"; */
+"47.headerCell.title" = "Rank";
+
+/* Class = "NSTableColumn"; headerCell.title = "REC"; ObjectID = "48"; */
+"48.headerCell.title" = "REC";
+
+/* Class = "NSTableColumn"; headerCell.title = "Nome"; ObjectID = "49"; */
+"49.headerCell.title" = "Nome";
+
+/* Class = "NSTextFieldCell"; title = "Text Cell"; ObjectID = "50"; */
+"50.title" = "Text Cell";
+
+/* Class = "NSTextFieldCell"; title = "Text Cell"; ObjectID = "52"; */
+"52.title" = "Text Cell";
+
+/* Class = "NSButtonCell"; title = "Eliminar ficheiro torrent"; ObjectID = "59"; */
+"59.title" = "Eliminar ficheiro torrent";
+
+/* Class = "NSButtonCell"; title = "Verificar dados locais"; ObjectID = "66"; */
+"66.title" = "Verificar dados locais";
+
+/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "87"; */
+"87.title" = "OtherViews";
+
+/* Class = "NSMenuItem"; title = "Baixa"; ObjectID = "88"; */
+"88.title" = "Baixa";
+
+/* Class = "NSMenuItem"; title = "Normal"; ObjectID = "89"; */
+"89.title" = "Normal";
+
+/* Class = "NSMenuItem"; title = "Alta"; ObjectID = "90"; */
+"90.title" = "Alta";
+
+/* Class = "NSTextFieldCell"; title = "Prioridade:"; ObjectID = "91"; */
+"91.title" = "Prioridade:";
+
+/* Class = "NSBox"; title = "Box"; ObjectID = "100"; */
+"100.title" = "Box";
+
+/* Class = "NSButtonCell"; title = "Todos"; ObjectID = "104"; */
+"104.title" = "Todos";
+
+/* Class = "NSButtonCell"; title = "Nenhum"; ObjectID = "105"; */
+"105.title" = "Nenhum";
+
+/* Class = "NSSearchFieldCell"; placeholderString = "Filtro"; ObjectID = "113"; */
+"113.placeholderString" = "Filtro";
