@@ -483,7 +483,7 @@ static void saveProgress(tr_variant* dict, tr_torrent* tor)
         tr_file const* f = &inf->files[fi];
 
         /* get the oldest and newest nonzero timestamps for pieces in this file */
-        for (p = &inf->pieces[f->firstPiece], pend = &inf->pieces[f->lastPiece]; p != pend; ++p)
+        for (p = &inf->pieces[f->firstPiece], pend = &inf->pieces[f->lastPiece] + 1; p != pend; ++p)
         {
             if (p->timeChecked == 0)
             {
@@ -627,7 +627,7 @@ static uint64_t loadProgress(tr_variant* dict, tr_torrent* tor)
                 {
                     tr_file const* f = &inf->files[fi];
                     tr_piece* p = &inf->pieces[f->firstPiece];
-                    tr_piece const* pend = &inf->pieces[f->lastPiece];
+                    tr_piece const* pend = &inf->pieces[f->lastPiece] + 1;
                     time_t const mtime = tr_torrentGetFileMTime(tor, fi);
                     time_t const timeChecked = mtime == t ? mtime : 0;
 

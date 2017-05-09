@@ -3456,7 +3456,7 @@ static void tr_torrentFileCompleted(tr_torrent* tor, tr_file_index_t fileIndex)
 
     /* now that the file is complete and closed, we can start watching its
      * mtime timestamp for changes to know if we need to reverify pieces */
-    for (p = &inf->pieces[f->firstPiece], pend = &inf->pieces[f->lastPiece]; p != pend; ++p)
+    for (p = &inf->pieces[f->firstPiece], pend = &inf->pieces[f->lastPiece] + 1; p != pend; ++p)
     {
         p->timeChecked = now;
     }
