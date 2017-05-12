@@ -35,6 +35,8 @@ extern "C"
 
 #include <inttypes.h> /* uintN_t */
 #include <time.h> /* time_t */
+#include <fcntl.h> /* off_t */
+#include <stdio.h> /* ssize_t */
 
 #if !defined(__cplusplus)
 #ifdef HAVE_STDBOOL_H
