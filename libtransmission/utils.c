@@ -175,7 +175,9 @@ char const* tr_strip_positional_args(char const* str)
         buf = tr_renew(char, buf, bufsize);
     }
 
-    for (out = buf; str && *str; ++str)
+    out = buf;
+
+    for (; str != NULL && *str != '\0'; ++str)
     {
         *out++ = *str;
 
@@ -417,8 +419,6 @@ char const* tr_memmem(char const* haystack, size_t haystacklen, char const* need
 
 #else
 
-    size_t i;
-
     if (needlelen == 0)
     {
         return haystack;
@@ -429,7 +429,7 @@ char const* tr_memmem(char const* haystack, size_t haystacklen, char const* need
         return NULL;
     }
 
-    for (i = 0; i <= haystacklen - needlelen; ++i)
+    for (size_t i = 0; i <= haystacklen - needlelen; ++i)
     {
         if (memcmp(haystack + i, needle, needlelen) == 0)
         {
@@ -539,7 +539,6 @@ char* tr_strstrip(char* str)
 {
     if (str != NULL)
     {
-        size_t pos;
         size_t len = strlen(str);
 
         while (len != 0 && isspace(str[len - 1]))
@@ -547,7 +546,9 @@ char* tr_strstrip(char* str)
             --len;
         }
 
-        for (pos = 0; pos < len && isspace(str[pos]);)
+        size_t pos = 0;
+
+        while (pos < len && isspace(str[pos]))
         {
             ++pos;
         }
@@ -726,9 +727,8 @@ void tr_hex_to_binary(char const* input, void* output, size_t byte_length)
 {
     static char const hex[] = "0123456789abcdef";
     uint8_t* output_octets = output;
-    size_t i;
 
-    for (i = 0; i < byte_length; ++i)
+    for (size_t i = 0; i < byte_length; ++i)
     {
         int const hi = strchr(hex, tolower(*input++)) - hex;
         int const lo = strchr(hex, tolower(*input++)) - hex;
@@ -1007,7 +1007,6 @@ int tr_lowerBound(void const* key, void const* base, size_t nmemb, size_t size, 
 static size_t quickfindPartition(char* base, size_t left, size_t right, size_t size, int (* compar)(void const*, void const*),
     size_t pivotIndex)
 {
-    size_t i;
     size_t storeIndex;
 
     /* move pivot to the end */
@@ -1015,7 +1014,7 @@ static size_t quickfindPartition(char* base, size_t left, size_t right, size_t s
 
     storeIndex = left;
 
-    for (i = left; i <= right - 1; ++i)
+    for (size_t i = left; i < right; ++i)
     {
         if ((*compar)(base + (size * i), base + (size * right)) <= 0)
         {
@@ -1033,12 +1032,12 @@ static size_t quickfindPartition(char* base, size_t left, size_t right, size_t s
     assert(storeIndex >= left);
     assert(storeIndex <= right);
 
-    for (i = left; i < storeIndex; ++i)
+    for (size_t i = left; i < storeIndex; ++i)
     {
         assert((*compar)(base + (size * i), base + (size * storeIndex)) <= 0);
     }
 
-    for (i = storeIndex + 1; i <= right; ++i)
+    for (size_t i = storeIndex + 1; i <= right; ++i)
     {
         assert((*compar)(base + (size * i), base + (size * storeIndex)) >= 0);
     }
@@ -1072,10 +1071,9 @@ static void quickfindFirstK(char* base, size_t left, size_t right, size_t size, 
 
 static void checkBestScoresComeFirst(char* base, size_t nmemb, size_t size, int (* compar)(void const*, void const*), size_t k)
 {
-    size_t i;
     size_t worstFirstPos = 0;
 
-    for (i = 1; i < k; ++i)
+    for (size_t i = 1; i < k; ++i)
     {
         if ((*compar)(base + (size * worstFirstPos), base + (size * i)) < 0)
         {
@@ -1083,12 +1081,12 @@ static void checkBestScoresComeFirst(char* base, size_t nmemb, size_t size, int 
         }
     }
 
-    for (i = 0; i < k; ++i)
+    for (size_t i = 0; i < k; ++i)
     {
         assert((*compar)(base + (size * i), base + (size * worstFirstPos)) <= 0);
     }
 
-    for (i = k; i < nmemb; ++i)
+    for (size_t i = k; i < nmemb; ++i)
     {
         assert((*compar)(base + (size * i), base + (size * worstFirstPos)) >= 0);
     }
@@ -1137,13 +1135,11 @@ static char* to_utf8(const char* in, size_t inlen)
 
 #ifdef HAVE_ICONV
 
-    int i;
     char const* encodings[] = { "CURRENT", "ISO-8859-15" };
-    int const encoding_count = sizeof(encodings) / sizeof(encodings[1]);
     size_t const buflen = inlen * 4 + 10;
     char* out = tr_new(char, buflen);
 
-    for (i = 0; ret == NULL && i < encoding_count; ++i)
+    for (size_t i = 0; ret == NULL && i < TR_N_ELEMENTS(encodings); ++i)
     {
 #ifdef ICONV_SECOND_ARGUMENT_IS_CONST
         char const* inbuf = in;
@@ -1320,8 +1316,6 @@ char* tr_win32_format_message(uint32_t code)
 void tr_win32_make_args_utf8(int* argc, char*** argv)
 {
     int my_argc;
-    int i;
-    char** my_argv;
     wchar_t** my_wide_argv;
 
     my_wide_argv = CommandLineToArgvW(GetCommandLineW(), &my_argc);
@@ -1333,9 +1327,10 @@ void tr_win32_make_args_utf8(int* argc, char*** argv)
 
     assert(*argc == my_argc);
 
-    my_argv = tr_new(char*, my_argc + 1);
+    char** my_argv = tr_new(char*, my_argc + 1);
+    int processed_argc = 0;
 
-    for (i = 0; i < my_argc; ++i)
+    for (int i = 0; i < my_argc; ++i, ++processed_argc)
     {
         my_argv[i] = tr_win32_native_to_utf8(my_wide_argv[i], -1);
 
@@ -1345,13 +1340,11 @@ void tr_win32_make_args_utf8(int* argc, char*** argv)
         }
     }
 
-    if (i < my_argc)
+    if (processed_argc < my_argc)
     {
-        int j;
-
-        for (j = 0; j < i; ++j)
+        for (int i = 0; i < processed_argc; ++i)
         {
-            tr_free(my_argv[j]);
+            tr_free(my_argv[i]);
         }
 
         tr_free(my_argv);
@@ -1495,15 +1488,13 @@ int* tr_parseNumberRange(char const* str_in, size_t len, int* setmeCount)
     }
     else
     {
-        int i;
         int n2;
-        tr_list* l;
         int* sorted = NULL;
 
         /* build a sorted number array */
         n = n2 = 0;
 
-        for (l = ranges; l != NULL; l = l->next)
+        for (tr_list* l = ranges; l != NULL; l = l->next)
         {
             struct number_range const* r = l->data;
             n += r->high + 1 - r->low;
@@ -1518,12 +1509,11 @@ int* tr_parseNumberRange(char const* str_in, size_t len, int* setmeCount)
         }
         else
         {
-            for (l = ranges; l != NULL; l = l->next)
+            for (tr_list* l = ranges; l != NULL; l = l->next)
             {
-                int i;
                 struct number_range const* r = l->data;
 
-                for (i = r->low; i <= r->high; ++i)
+                for (int i = r->low; i <= r->high; ++i)
                 {
                     sorted[n2++] = i;
                 }
@@ -1534,14 +1524,11 @@ int* tr_parseNumberRange(char const* str_in, size_t len, int* setmeCount)
 
             /* remove duplicates */
             uniq = tr_new(int, n);
+            n = 0;
 
-            if (uniq == NULL)
+            if (uniq != NULL)
             {
-                n = 0;
-            }
-            else
-            {
-                for (i = n = 0; i < n2; ++i)
+                for (int i = 0; i < n2; ++i)
                 {
                     if (n == 0 || uniq[n - 1] != sorted[i])
                     {
@@ -1993,7 +1980,6 @@ char* tr_formatter_mem_B(char* buf, int64_t bytes_per_second, size_t buflen)
 
 void tr_formatter_get_units(void* vdict)
 {
-    int i;
     tr_variant* l;
     tr_variant* dict = vdict;
 
@@ -2002,7 +1988,7 @@ void tr_formatter_get_units(void* vdict)
     tr_variantDictAddInt(dict, TR_KEY_memory_bytes, mem_units.units[TR_FMT_KB].value);
     l = tr_variantDictAddList(dict, TR_KEY_memory_units, 4);
 
-    for (i = 0; i < 4; i++)
+    for (int i = 0; i < 4; i++)
     {
         tr_variantListAddStr(l, mem_units.units[i].name);
     }
@@ -2010,7 +1996,7 @@ void tr_formatter_get_units(void* vdict)
     tr_variantDictAddInt(dict, TR_KEY_size_bytes, size_units.units[TR_FMT_KB].value);
     l = tr_variantDictAddList(dict, TR_KEY_size_units, 4);
 
-    for (i = 0; i < 4; i++)
+    for (int i = 0; i < 4; i++)
     {
         tr_variantListAddStr(l, size_units.units[i].name);
     }
@@ -2018,7 +2004,7 @@ void tr_formatter_get_units(void* vdict)
     tr_variantDictAddInt(dict, TR_KEY_speed_bytes, speed_units.units[TR_FMT_KB].value);
     l = tr_variantDictAddList(dict, TR_KEY_speed_units, 4);
 
-    for (i = 0; i < 4; i++)
+    for (int i = 0; i < 4; i++)
     {
         tr_variantListAddStr(l, speed_units.units[i].name);
     }
@@ -2047,7 +2033,7 @@ int tr_env_get_int(char const* key, int default_value)
 
     assert(key != NULL);
 
-    if (GetEnvironmentVariableA(key, value, ARRAYSIZE(value)) > 1)
+    if (GetEnvironmentVariableA(key, value, TR_N_ELEMENTS(value)) > 1)
     {
         return atoi(value);
     }

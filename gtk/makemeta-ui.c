@@ -217,7 +217,6 @@ static void onResponse(GtkDialog* d, int response, gpointer user_data)
     {
         if (ui->builder != NULL)
         {
-            int i;
             int n;
             int tier;
             GtkTextIter start, end;
@@ -244,16 +243,13 @@ static void onResponse(GtkDialog* d, int response, gpointer user_data)
             tracker_text = gtk_text_buffer_get_text(ui->announce_text_buffer, &start, &end, FALSE);
             tracker_strings = g_strsplit(tracker_text, "\n", 0);
 
-            for (i = 0; tracker_strings[i] != NULL;)
-            {
-                ++i;
-            }
+            trackers = g_new0(tr_tracker_info, g_strv_length(tracker_strings));
+            n = 0;
+            tier = 0;
 
-            trackers = g_new0(tr_tracker_info, i);
-
-            for (i = n = tier = 0; tracker_strings[i] != NULL; ++i)
+            for (int i = 0; tracker_strings[i] != NULL; ++i)
             {
-                char const* str = tracker_strings[i];
+                char* const str = tracker_strings[i];
 
                 if (*str == '\0')
                 {
@@ -262,7 +258,7 @@ static void onResponse(GtkDialog* d, int response, gpointer user_data)
                 else
                 {
                     trackers[n].tier = tier;
-                    trackers[n].announce = tracker_strings[i];
+                    trackers[n].announce = str;
                     ++n;
                 }
             }

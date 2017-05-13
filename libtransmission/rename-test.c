@@ -264,7 +264,6 @@ static void create_multifile_torrent_contents(char const* top)
 
 static int test_multifile_torrent(void)
 {
-    tr_file_index_t i;
     uint64_t loaded;
     tr_torrent* tor;
     tr_ctor* ctor;
@@ -307,7 +306,7 @@ static int test_multifile_torrent(void)
     check_uint_eq(totalSize, tor->info.totalSize);
     check_uint_eq(4, tor->info.fileCount);
 
-    for (i = 0; i < 4; ++i)
+    for (tr_file_index_t i = 0; i < 4; ++i)
     {
         check_streq(expected_files[i], files[i].name);
     }
@@ -372,7 +371,7 @@ static int test_multifile_torrent(void)
     /* ...and back again */
     check_int_eq(0, torrentRenameAndWait(tor, "Felidae/Felinae/Felis/placeholder", "catus"));
 
-    for (i = 0; i < 4; ++i)
+    for (tr_file_index_t i = 0; i < 4; ++i)
     {
         check_streq(expected_files[i], files[i].name);
         check(testFileExistsAndConsistsOfThisString(tor, i, expected_contents[i]));
@@ -403,7 +402,7 @@ static int test_multifile_torrent(void)
     libttest_blockingTorrentVerify(tor);
     testFileExistsAndConsistsOfThisString(tor, 0, expected_contents[0]);
 
-    for (i = 1; i <= 2; ++i)
+    for (tr_file_index_t i = 1; i <= 2; ++i)
     {
         str = tr_torrentFindFile(tor, i);
         check_streq(NULL, str);
@@ -422,7 +421,7 @@ static int test_multifile_torrent(void)
     /* ...and back again */
     check_int_eq(0, torrentRenameAndWait(tor, "Felidae/Felinae/Felis/foo", "catus"));
 
-    for (i = 0; i < 4; ++i)
+    for (tr_file_index_t i = 0; i < 4; ++i)
     {
         check_streq(expected_files[i], files[i].name);
     }
@@ -433,7 +432,7 @@ static int test_multifile_torrent(void)
     strings[2] = "gabba/Felinae/Felis/catus/Saffron";
     strings[3] = "gabba/Pantherinae/Panthera/Tiger/Tony";
 
-    for (i = 0; i < 4; ++i)
+    for (tr_file_index_t i = 0; i < 4; ++i)
     {
         check_streq(strings[i], files[i].name);
         testFileExistsAndConsistsOfThisString(tor, i, expected_contents[i]);
@@ -448,7 +447,7 @@ static int test_multifile_torrent(void)
     strings[2] = "Felidae/Felinae/Felis/catus/Saffron";
     strings[3] = "Felidae/Pantherinae/Panthera/Snow Leopard/10.6";
 
-    for (i = 0; i < 4; ++i)
+    for (tr_file_index_t i = 0; i < 4; ++i)
     {
         check_streq(strings[i], files[i].name);
         testFileExistsAndConsistsOfThisString(tor, i, expected_contents[i]);
@@ -506,7 +505,6 @@ static int test_multifile_torrent(void)
 
 static int test_partial_file(void)
 {
-    tr_file_index_t i;
     tr_torrent* tor;
     tr_stat const* st;
     tr_file_stat* fst;
@@ -548,14 +546,14 @@ static int test_partial_file(void)
     strings[1] = "foo/4096";
     strings[2] = "foo/512";
 
-    for (i = 0; i < 3; ++i)
+    for (tr_file_index_t i = 0; i < 3; ++i)
     {
         check_streq(strings[i], tor->info.files[i].name);
     }
 
     strings[0] = "foo/bar.part";
 
-    for (i = 0; i < 3; ++i)
+    for (tr_file_index_t i = 0; i < 3; ++i)
     {
         char* expected = tr_buildPath(tor->currentDir, strings[i], NULL);
         char* path = tr_torrentFindFile(tor, i);

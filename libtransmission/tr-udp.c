@@ -346,7 +346,7 @@ void tr_udpInit(tr_session* ss)
     }
 
 ipv6:
-    if (tr_globalIPv6())
+    if (tr_globalIPv6() != NULL)
     {
         rebind_ipv6(ss, true);
     }

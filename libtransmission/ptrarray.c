@@ -31,13 +31,11 @@ void tr_ptrArrayDestruct(tr_ptrArray* p, PtrArrayForeachFunc func)
 
 void tr_ptrArrayForeach(tr_ptrArray* t, PtrArrayForeachFunc func)
 {
-    int i;
-
     assert(t != NULL);
     assert(t->items != NULL || t->n_items == 0);
     assert(func != NULL);
 
-    for (i = 0; i < t->n_items; ++i)
+    for (int i = 0; i < t->n_items; ++i)
     {
         func(t->items[i]);
     }
@@ -172,9 +170,7 @@ int tr_ptrArrayLowerBound(tr_ptrArray const* t, void const* ptr, int (* compare)
 
 static void assertArrayIsSortedAndUnique(tr_ptrArray const* t, int (* compare)(void const*, void const*))
 {
-    int i;
-
-    for (i = 0; i < t->n_items - 2; ++i)
+    for (int i = 0; i < t->n_items - 2; ++i)
     {
         assert(compare(t->items[i], t->items[i + 1]) < 0);
     }

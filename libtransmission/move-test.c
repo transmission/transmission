@@ -64,7 +64,6 @@ static void test_incomplete_dir_threadfunc(void* vdata)
 
 static int test_incomplete_dir_impl(char const* incomplete_dir, char const* download_dir)
 {
-    tr_file_index_t file_index;
     tr_session* session;
     tr_torrent* tor;
     tr_completeness completeness;
@@ -96,8 +95,8 @@ static int test_incomplete_dir_impl(char const* incomplete_dir, char const* down
 
     /* now finish writing it */
     {
-        tr_block_index_t block_index;
-        tr_block_index_t first, last;
+        tr_block_index_t first;
+        tr_block_index_t last;
         char* zero_block = tr_new0(char, tor->blockSize);
         struct test_incomplete_dir_data data;
 
@@ -108,7 +107,7 @@ static int test_incomplete_dir_impl(char const* incomplete_dir, char const* down
 
         tr_torGetPieceBlockRange(tor, data.pieceIndex, &first, &last);
 
-        for (block_index = first; block_index <= last; ++block_index)
+        for (tr_block_index_t block_index = first; block_index <= last; ++block_index)
         {
             evbuffer_add(data.buf, zero_block, tor->blockSize);
             data.block = block_index;
@@ -137,7 +136,7 @@ static int test_incomplete_dir_impl(char const* incomplete_dir, char const* down
 
     check_int_eq(TR_SEED, completeness);
 
-    for (file_index = 0; file_index < tor->info.fileCount; ++file_index)
+    for (tr_file_index_t file_index = 0; file_index < tor->info.fileCount; ++file_index)
     {
         check_file_location(tor, file_index, tr_buildPath(download_dir, tor->info.files[file_index].name, NULL));
     }
@@ -179,7 +178,6 @@ static int test_incomplete_dir(void)
 
 static int test_set_location(void)
 {
-    tr_file_index_t file_index;
     int state;
     char* target_dir;
     tr_torrent* tor;
@@ -215,7 +213,7 @@ static int test_set_location(void)
     /* confirm the filest really got moved */
     libttest_sync();
 
-    for (file_index = 0; file_index < tor->info.fileCount; ++file_index)
+    for (tr_file_index_t file_index = 0; file_index < tor->info.fileCount; ++file_index)
     {
         check_file_location(tor, file_index, tr_buildPath(target_dir, tor->info.files[file_index].name, NULL));
     }

@@ -410,16 +410,14 @@ static tr_torrent_tiers* tiersNew(void)
 
 static void tiersDestruct(tr_torrent_tiers* tt)
 {
-    int i;
-
-    for (i = 0; i < tt->tracker_count; ++i)
+    for (int i = 0; i < tt->tracker_count; ++i)
     {
         trackerDestruct(&tt->trackers[i]);
     }
 
     tr_free(tt->trackers);
 
-    for (i = 0; i < tt->tier_count; ++i)
+    for (int i = 0; i < tt->tier_count; ++i)
     {
         tierDestruct(&tt->tiers[i]);
     }
@@ -444,10 +442,9 @@ static tr_tier* getTier(tr_announcer* announcer, uint8_t const* info_hash, int t
 
         if (tor != NULL && tor->tiers != NULL)
         {
-            int i;
             tr_torrent_tiers* tt = tor->tiers;
 
-            for (i = 0; tier == NULL && i < tt->tier_count; ++i)
+            for (int i = 0; tier == NULL && i < tt->tier_count; ++i)
             {
                 if (tt->tiers[i].key == tierId)
                 {
@@ -566,23 +563,19 @@ static int filter_trackers_compare_func(void const* va, void const* vb)
  */
 static tr_tracker_info* filter_trackers(tr_tracker_info* input, int input_count, int* setme_count)
 {
-    int i;
-    int in;
-    int j;
-    int jn;
     int n = 0;
     struct tr_tracker_info* ret;
     struct ann_tracker_info* tmp = tr_new0(struct ann_tracker_info, input_count);
 
     /*
-    for (i = 0, in = input_count; i < in; ++i)
+    for (int i = 0; i < input_count; ++i)
     {
         fprintf(stderr, "IN: [%d][%s]\n", input[i].tier, input[i].announce);
     }
     */
 
     /* build a list of valid trackers */
-    for (i = 0, in = input_count; i < in; ++i)
+    for (int i = 0; i < input_count; ++i)
     {
         if (tr_urlIsValidTracker(input[i].announce))
         {
@@ -597,7 +590,7 @@ static tr_tracker_info* filter_trackers(tr_tracker_info* input, int input_count,
              * "http://tracker/announce" +
              * "http://tracker:80/announce"
              */
-            for (j = 0, jn = n; !is_duplicate && j < jn; ++j)
+            for (int j = 0; !is_duplicate && j < n; ++j)
             {
                 is_duplicate = tmp[j].port == port && strcmp(tmp[j].scheme, scheme) == 0 && strcmp(tmp[j].host, host) == 0 &&
                     strcmp(tmp[j].path, path) == 0;
@@ -623,9 +616,9 @@ static tr_tracker_info* filter_trackers(tr_tracker_info* input, int input_count,
     /* if two announce URLs differ only by scheme, put them in the same tier.
      * (note: this can leave gaps in the `tier' values, but since the calling
      * function doesn't care, there's no point in removing the gaps...) */
-    for (i = 0, in = n; i < in; ++i)
+    for (int i = 0; i < n; ++i)
     {
-        for (j = i + 1, jn = n; j < jn; ++j)
+        for (int j = i + 1; j < n; ++j)
         {
             if (tmp[i].info.tier != tmp[j].info.tier && tmp[i].port == tmp[j].port &&
                 tr_strcmp0(tmp[i].host, tmp[j].host) == 0 && tr_strcmp0(tmp[i].path, tmp[j].path) == 0)
@@ -644,13 +637,13 @@ static tr_tracker_info* filter_trackers(tr_tracker_info* input, int input_count,
     *setme_count = n;
     ret = tr_new0(tr_tracker_info, n);
 
-    for (i = 0, in = n; i < in; ++i)
+    for (int i = 0; i < n; ++i)
     {
         ret[i] = tmp[i].info;
     }
 
     /* cleanup */
-    for (i = 0, in = n; i < in; ++i)
+    for (int i = 0; i < n; ++i)
     {
         tr_free(tmp[i].path);
         tr_free(tmp[i].host);
@@ -659,13 +652,18 @@ static tr_tracker_info* filter_trackers(tr_tracker_info* input, int input_count,
 
     tr_free(tmp);
 
-    /*for (i=0, in=n; i<in; ++i) fprintf (stderr, "OUT: [%d][%s]\n", ret[i].tier, ret[i].announce);*/
+    /*
+    for (int i = 0; i < n; ++i)
+    {
+        fprintf (stderr, "OUT: [%d][%s]\n", ret[i].tier, ret[i].announce);
+    }
+    */
+
     return ret;
 }
 
 static void addTorrentToTier(tr_torrent_tiers* tt, tr_torrent* tor)
 {
-    int i;
     int n;
     int tier_count;
     tr_tier* tier;
@@ -675,7 +673,7 @@ static void addTorrentToTier(tr_torrent_tiers* tt, tr_torrent* tor)
     tt->trackers = tr_new0(tr_tracker, n);
     tt->tracker_count = n;
 
-    for (i = 0; i < n; ++i)
+    for (int i = 0; i < n; ++i)
     {
         trackerConstruct(&tt->trackers[i], &infos[i]);
     }
@@ -683,7 +681,7 @@ static void addTorrentToTier(tr_torrent_tiers* tt, tr_torrent* tor)
     /* count how many tiers there are */
     tier_count = 0;
 
-    for (i = 0; i < n; ++i)
+    for (int i = 0; i < n; ++i)
     {
         if (i == 0 || infos[i].tier != infos[i - 1].tier)
         {
@@ -696,7 +694,7 @@ static void addTorrentToTier(tr_torrent_tiers* tt, tr_torrent* tor)
     tt->tiers = tr_new0(tr_tier, tier_count);
     tt->tier_count = 0;
 
-    for (i = 0; i < n; ++i)
+    for (int i = 0; i < n; ++i)
     {
         if (i != 0 && infos[i].tier == infos[i - 1].tier)
         {
@@ -742,7 +740,6 @@ static bool tierCanManualAnnounce(tr_tier const* tier)
 
 bool tr_announcerCanManualAnnounce(tr_torrent const* tor)
 {
-    int i;
     struct tr_torrent_tiers* tt = NULL;
 
     assert(tr_isTorrent(tor));
@@ -754,7 +751,7 @@ bool tr_announcerCanManualAnnounce(tr_torrent const* tor)
     }
 
     /* return true if any tier can manual announce */
-    for (i = 0; tt && i < tt->tier_count; ++i)
+    for (int i = 0; tt != NULL && i < tt->tier_count; ++i)
     {
         if (tierCanManualAnnounce(&tt->tiers[i]))
         {
@@ -767,12 +764,11 @@ bool tr_announcerCanManualAnnounce(tr_torrent const* tor)
 
 time_t tr_announcerNextManualAnnounce(tr_torrent const* tor)
 {
-    int i;
     time_t ret = ~(time_t)0;
     struct tr_torrent_tiers* tt = tor->tiers;
 
     /* find the earliest manual announce time from all peers */
-    for (i = 0; tt && i < tt->tier_count; ++i)
+    for (int i = 0; tt != NULL && i < tt->tier_count; ++i)
     {
         if (tt->tiers[i].isRunning)
         {
@@ -787,14 +783,13 @@ static void dbgmsg_tier_announce_queue(tr_tier const* tier)
 {
     if (tr_logGetDeepEnabled())
     {
-        int i;
         char name[128];
         char* message;
         struct evbuffer* buf = evbuffer_new();
 
         tier_build_log_name(tier, name, sizeof(name));
 
-        for (i = 0; i < tier->announce_event_count; ++i)
+        for (int i = 0; i < tier->announce_event_count; ++i)
         {
             tr_announce_event const e = tier->announce_events[i];
             char const* str = tr_announce_event_get_string(e);
@@ -817,8 +812,6 @@ static void tier_announce_remove_trailing(tr_tier* tier, tr_announce_event e)
 
 static void tier_announce_event_push(tr_tier* tier, tr_announce_event e, time_t announceAt)
 {
-    int i;
-
     assert(tier != NULL);
 
     dbgmsg_tier_announce_queue(tier);
@@ -833,7 +826,7 @@ static void tier_announce_event_push(tr_tier* tier, tr_announce_event e, time_t 
             bool has_completed = false;
             tr_announce_event const c = TR_ANNOUNCE_EVENT_COMPLETED;
 
-            for (i = 0; !has_completed && i < tier->announce_event_count; ++i)
+            for (int i = 0; !has_completed && i < tier->announce_event_count; ++i)
             {
                 has_completed = c == tier->announce_events[i];
             }
@@ -879,11 +872,10 @@ static tr_announce_event tier_announce_event_pull(tr_tier* tier)
 
 static void torrentAddAnnounce(tr_torrent* tor, tr_announce_event e, time_t announceAt)
 {
-    int i;
     struct tr_torrent_tiers* tt = tor->tiers;
 
     /* walk through each tier and tell them to announce */
-    for (i = 0; i < tt->tier_count; ++i)
+    for (int i = 0; i < tt->tier_count; ++i)
     {
         tier_announce_event_push(&tt->tiers[i], e, announceAt);
     }
@@ -920,13 +912,12 @@ void tr_announcerChangeMyPort(tr_torrent* tor)
 
 void tr_announcerAddBytes(tr_torrent* tor, int type, uint32_t byteCount)
 {
-    int i;
     struct tr_torrent_tiers* tt = tor->tiers;
 
     assert(tr_isTorrent(tor));
     assert(type == TR_ANN_UP || type == TR_ANN_DOWN || type == TR_ANN_CORRUPT);
 
-    for (i = 0; i < tt->tier_count; ++i)
+    for (int i = 0; i < tt->tier_count; ++i)
     {
         tt->tiers[i].byteCounts[type] += byteCount;
     }
@@ -965,9 +956,7 @@ void tr_announcerRemoveTorrent(tr_announcer* announcer, tr_torrent* tor)
 
     if (tt != NULL)
     {
-        int i;
-
-        for (i = 0; i < tt->tier_count; ++i)
+        for (int i = 0; i < tt->tier_count; ++i)
         {
             tr_tier* tier = &tt->tiers[i];
 
@@ -1341,10 +1330,9 @@ static void on_scrape_error(tr_session* session, tr_tier* tier, char const* errm
 
 static tr_tier* find_tier(tr_torrent* tor, char const* scrape)
 {
-    int i;
     struct tr_torrent_tiers* tt = tor->tiers;
 
-    for (i = 0; tt && i < tt->tier_count; ++i)
+    for (int i = 0; tt != NULL && i < tt->tier_count; ++i)
     {
         tr_tracker const* const tracker = tt->tiers[i].currentTracker;
 
@@ -1359,12 +1347,11 @@ static tr_tier* find_tier(tr_torrent* tor, char const* scrape)
 
 static void on_scrape_done(tr_scrape_response const* response, void* vsession)
 {
-    int i;
     time_t const now = tr_time();
     tr_session* session = vsession;
     tr_announcer* announcer = session->announcer;
 
-    for (i = 0; i < response->row_count; ++i)
+    for (int i = 0; i < response->row_count; ++i)
     {
         struct tr_scrape_response_row const* row = &response->rows[i];
         tr_torrent* tor = tr_torrentFindFromHash(session, row->info_hash);
@@ -1473,7 +1460,6 @@ static void scrape_request_delegate(tr_announcer* announcer, tr_scrape_request c
 
 static void multiscrape(tr_announcer* announcer, tr_ptrArray* tiers)
 {
-    int i;
     int request_count = 0;
     time_t const now = tr_time();
     int const tier_count = tr_ptrArraySize(tiers);
@@ -1481,15 +1467,15 @@ static void multiscrape(tr_announcer* announcer, tr_ptrArray* tiers)
     tr_scrape_request* requests = tr_new0(tr_scrape_request, max_request_count);
 
     /* batch as many info_hashes into a request as we can */
-    for (i = 0; i < tier_count; ++i)
+    for (int i = 0; i < tier_count; ++i)
     {
-        int j;
         tr_tier* tier = tr_ptrArrayNth(tiers, i);
         char* url = tier->currentTracker->scrape;
         uint8_t const* hash = tier->tor->info.hash;
+        bool found = false;
 
         /* if there's a request with this scrape URL and a free slot, use it */
-        for (j = 0; j < request_count; ++j)
+        for (int j = 0; !found && j < request_count; ++j)
         {
             tr_scrape_request* req = &requests[j];
 
@@ -1506,11 +1492,11 @@ static void multiscrape(tr_announcer* announcer, tr_ptrArray* tiers)
             memcpy(req->info_hash[req->info_hash_count++], hash, SHA_DIGEST_LENGTH);
             tier->isScraping = true;
             tier->lastScrapeStartTime = now;
-            break;
+            found = true;
         }
 
         /* otherwise, if there's room for another request, build a new one */
-        if (j == request_count && request_count < max_request_count)
+        if (!found && request_count < max_request_count)
         {
             tr_scrape_request* req = &requests[request_count++];
             req->url = url;
@@ -1523,7 +1509,7 @@ static void multiscrape(tr_announcer* announcer, tr_ptrArray* tiers)
     }
 
     /* send the requests we just built */
-    for (i = 0; i < request_count; ++i)
+    for (int i = 0; i < request_count; ++i)
     {
         scrape_request_delegate(announcer, &requests[i], on_scrape_done, announcer->session);
     }
@@ -1534,10 +1520,7 @@ static void multiscrape(tr_announcer* announcer, tr_ptrArray* tiers)
 
 static void flushCloseMessages(tr_announcer* announcer)
 {
-    int i;
-    int const n = tr_ptrArraySize(&announcer->stops);
-
-    for (i = 0; i < n; ++i)
+    for (int i = 0, n = tr_ptrArraySize(&announcer->stops); i < n; ++i)
     {
         announce_request_delegate(announcer, tr_ptrArrayNth(&announcer->stops, i), NULL, NULL);
     }
@@ -1578,7 +1561,6 @@ static int compareTiers(void const* va, void const* vb)
 
 static void announceMore(tr_announcer* announcer)
 {
-    int i;
     int n;
     tr_torrent* tor;
     tr_ptrArray announceMe = TR_PTR_ARRAY_INIT;
@@ -1599,7 +1581,7 @@ static void announceMore(tr_announcer* announcer)
     {
         struct tr_torrent_tiers* tt = tor->tiers;
 
-        for (i = 0; tt != NULL && i < tt->tier_count; ++i)
+        for (int i = 0; tt != NULL && i < tt->tier_count; ++i)
         {
             tr_tier* tier = &tt->tiers[i];
 
@@ -1614,18 +1596,17 @@ static void announceMore(tr_announcer* announcer)
         }
     }
 
-    /* if there are more tiers than slots available, prioritize */
     n = tr_ptrArraySize(&announceMe);
 
+    /* if there are more tiers than slots available, prioritize */
     if (n > announcer->slotsAvailable)
     {
         qsort(tr_ptrArrayBase(&announceMe), n, sizeof(tr_tier*), compareTiers);
+        n = announcer->slotsAvailable;
     }
 
     /* announce some */
-    n = MIN(tr_ptrArraySize(&announceMe), announcer->slotsAvailable);
-
-    for (i = 0; i < n; ++i)
+    for (int i = 0; i < n; ++i)
     {
         tr_tier* tier = tr_ptrArrayNth(&announceMe, i);
         tr_logAddTorDbg(tier->tor, "%s", "Announcing to tracker");
@@ -1678,7 +1659,6 @@ static void onUpkeepTimer(evutil_socket_t foo UNUSED, short bar UNUSED, void* va
 
 tr_tracker_stat* tr_announcerStats(tr_torrent const* torrent, int* setmeTrackerCount)
 {
-    int i;
     int out = 0;
     tr_tracker_stat* ret;
     struct tr_torrent_tiers* tt;
@@ -1693,12 +1673,11 @@ tr_tracker_stat* tr_announcerStats(tr_torrent const* torrent, int* setmeTrackerC
     ret = tr_new0(tr_tracker_stat, tt->tracker_count);
 
     /* populate the stats */
-    for (i = 0; i < tt->tier_count; ++i)
+    for (int i = 0; i < tt->tier_count; ++i)
     {
-        int j;
         tr_tier const* const tier = &tt->tiers[i];
 
-        for (j = 0; j < tier->tracker_count; ++j)
+        for (int j = 0; j < tier->tracker_count; ++j)
         {
             tr_tracker const* const tracker = &tier->trackers[j];
             tr_tracker_stat* st = &ret[out++];
@@ -1830,14 +1809,12 @@ static void copy_tier_attributes_impl(struct tr_tier* tgt, int trackerIndex, tr_
 
 static void copy_tier_attributes(struct tr_torrent_tiers* tt, tr_tier const* src)
 {
-    int i;
-    int j;
     bool found = false;
 
     /* find a tier (if any) which has a match for src->currentTracker */
-    for (i = 0; !found && i < tt->tier_count; ++i)
+    for (int i = 0; !found && i < tt->tier_count; ++i)
     {
-        for (j = 0; !found && j < tt->tiers[i].tracker_count; ++j)
+        for (int j = 0; !found && j < tt->tiers[i].tracker_count; ++j)
         {
             if ((found = tr_strcmp0(src->currentTracker->announce, tt->tiers[i].trackers[j].announce) == 0))
             {
@@ -1849,7 +1826,6 @@ static void copy_tier_attributes(struct tr_torrent_tiers* tt, tr_tier const* src
 
 void tr_announcerResetTorrent(tr_announcer* announcer UNUSED, tr_torrent* tor)
 {
-    int i;
     time_t const now = tr_time();
     struct tr_torrent_tiers* tt = tor->tiers;
     tr_torrent_tiers old = *tt;
@@ -1866,7 +1842,7 @@ void tr_announcerResetTorrent(tr_announcer* announcer UNUSED, tr_torrent* tor)
     addTorrentToTier(tt, tor);
 
     /* copy the old tiers' states into their replacements */
-    for (i = 0; i < old.tier_count; ++i)
+    for (int i = 0; i < old.tier_count; ++i)
     {
         if (old.tiers[i].currentTracker != NULL)
         {
@@ -1877,7 +1853,7 @@ void tr_announcerResetTorrent(tr_announcer* announcer UNUSED, tr_torrent* tor)
     /* kickstart any tiers that didn't get started */
     if (tor->isRunning)
     {
-        for (i = 0; i < tt->tier_count; ++i)
+        for (int i = 0; i < tt->tier_count; ++i)
         {
             if (!tt->tiers[i].wasCopied)
             {

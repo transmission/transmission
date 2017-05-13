@@ -558,16 +558,12 @@ static void addIdArg(tr_variant* args, char const* id, char const* fallback)
     }
     else if (strcmp(id, "all") != 0)
     {
-        char const* pch;
         bool isList = strchr(id, ',') != NULL || strchr(id, '-') != NULL;
         bool isNum = true;
 
-        for (pch = id; isNum && *pch != '\0'; ++pch)
+        for (char const* pch = id; isNum && *pch != '\0'; ++pch)
         {
-            if (!isdigit(*pch))
-            {
-                isNum = false;
-            }
+            isNum = isdigit(*pch);
         }
 
         if (isNum || isList)
@@ -616,13 +612,12 @@ static void addDays(tr_variant* args, tr_quark const key, char const* arg)
 
     if (arg != NULL)
     {
-        int i;
         int valueCount;
         int* values;
 
         values = tr_parseNumberRange(arg, TR_BAD_SIZE, &valueCount);
 
-        for (i = 0; i < valueCount; ++i)
+        for (int i = 0; i < valueCount; ++i)
         {
             if (values[i] < 0 || values[i] > 7)
             {
@@ -662,11 +657,10 @@ static void addFiles(tr_variant* args, tr_quark const key, char const* arg)
 
     if (strcmp(arg, "all") != 0)
     {
-        int i;
         int valueCount;
         int* values = tr_parseNumberRange(arg, TR_BAD_SIZE, &valueCount);
 
-        for (i = 0; i < valueCount; ++i)
+        for (int i = 0; i < valueCount; ++i)
         {
             tr_variantListAddInt(files, values[i]);
         }
@@ -674,8 +668,6 @@ static void addFiles(tr_variant* args, tr_quark const key, char const* arg)
         tr_free(values);
     }
 }
-
-#define TR_N_ELEMENTS(ary) (sizeof(ary) / sizeof(*ary))
 
 static tr_quark const files_keys[] =
 {
@@ -907,10 +899,7 @@ static void printDetails(tr_variant* top)
 
     if (tr_variantDictFindDict(top, TR_KEY_arguments, &args) && tr_variantDictFindList(args, TR_KEY_torrents, &torrents))
     {
-        int ti;
-        int tCount;
-
-        for (ti = 0, tCount = tr_variantListSize(torrents); ti < tCount; ++ti)
+        for (int ti = 0, tCount = tr_variantListSize(torrents); ti < tCount; ++ti)
         {
             tr_variant* t = tr_variantListChild(torrents, ti);
             tr_variant* l;
@@ -1217,10 +1206,7 @@ static void printFileList(tr_variant* top)
 
     if (tr_variantDictFindDict(top, TR_KEY_arguments, &args) && tr_variantDictFindList(args, TR_KEY_torrents, &torrents))
     {
-        int i;
-        int in;
-
-        for (i = 0, in = tr_variantListSize(torrents); i < in; ++i)
+        for (int i = 0, in = tr_variantListSize(torrents); i < in; ++i)
         {
             tr_variant* d = tr_variantListChild(torrents, i);
             tr_variant* files;
@@ -1231,12 +1217,11 @@ static void printFileList(tr_variant* top)
             if (tr_variantDictFindStr(d, TR_KEY_name, &name, NULL) && tr_variantDictFindList(d, TR_KEY_files, &files) &&
                 tr_variantDictFindList(d, TR_KEY_priorities, &priorities) && tr_variantDictFindList(d, TR_KEY_wanted, &wanteds))
             {
-                int j = 0;
-                int jn = tr_variantListSize(files);
+                int const jn = tr_variantListSize(files);
                 printf("%s (%d files):\n", name, jn);
                 printf("%3s  %4s %8s %3s %9s  %s\n", "#", "Done", "Priority", "Get", "Size", "Name");
 
-                for (j = 0, jn = tr_variantListSize(files); j < jn; ++j)
+                for (int j = 0; j < jn; ++j)
                 {
                     int64_t have;
                     int64_t length;
@@ -1280,11 +1265,9 @@ static void printFileList(tr_variant* top)
 
 static void printPeersImpl(tr_variant* peers)
 {
-    int i;
-    int n;
     printf("%-40s  %-12s  %-5s %-6s  %-6s  %s\n", "Address", "Flags", "Done", "Down", "Up", "Client");
 
-    for (i = 0, n = tr_variantListSize(peers); i < n; ++i)
+    for (int i = 0, n = tr_variantListSize(peers); i < n; ++i)
     {
         double progress;
         char const* address;
@@ -1311,10 +1294,7 @@ static void printPeers(tr_variant* top)
 
     if (tr_variantDictFindDict(top, TR_KEY_arguments, &args) && tr_variantDictFindList(args, TR_KEY_torrents, &torrents))
     {
-        int i;
-        int n;
-
-        for (i = 0, n = tr_variantListSize(torrents); i < n; ++i)
+        for (int i = 0, n = tr_variantListSize(torrents); i < n; ++i)
         {
             tr_variant* peers;
             tr_variant* torrent = tr_variantListChild(torrents, i);
@@ -1334,17 +1314,13 @@ static void printPeers(tr_variant* top)
 
 static void printPiecesImpl(uint8_t const* raw, size_t rawlen, size_t j)
 {
-    size_t i;
-    size_t k;
     size_t len;
     char* str = tr_base64_decode(raw, rawlen, &len);
     printf("  ");
 
-    for (i = k = 0; k < len; ++k)
+    for (size_t i = 0, k = 0; k < len; ++k)
     {
-        int e;
-
-        for (e = 0; i < j && e < 8; ++e, ++i)
+        for (int e = 0; i < j && e < 8; ++e, ++i)
         {
             printf("%c", str[k] & (1 << (7 - e)) ? '1' : '0');
         }
@@ -1368,10 +1344,7 @@ static void printPieces(tr_variant* top)
 
     if (tr_variantDictFindDict(top, TR_KEY_arguments, &args) && tr_variantDictFindList(args, TR_KEY_torrents, &torrents))
     {
-        int i;
-        int n;
-
-        for (i = 0, n = tr_variantListSize(torrents); i < n; ++i)
+        for (int i = 0, n = tr_variantListSize(torrents); i < n; ++i)
         {
             int64_t j;
             uint8_t const* raw;
@@ -1414,8 +1387,6 @@ static void printTorrentList(tr_variant* top)
 
     if (tr_variantDictFindDict(top, TR_KEY_arguments, &args) && tr_variantDictFindList(args, TR_KEY_torrents, &list))
     {
-        int i;
-        int n;
         int64_t total_size = 0;
         double total_up = 0;
         double total_down = 0;
@@ -1424,7 +1395,7 @@ static void printTorrentList(tr_variant* top)
         printf("%-4s   %-4s  %9s  %-8s  %6s  %6s  %-5s  %-11s  %s\n", "ID", "Done", "Have", "ETA", "Up", "Down", "Ratio", "Status",
             "Name");
 
-        for (i = 0, n = tr_variantListSize(list); i < n; ++i)
+        for (int i = 0, n = tr_variantListSize(list); i < n; ++i)
         {
             int64_t id;
             int64_t eta;
@@ -1496,11 +1467,10 @@ static void printTorrentList(tr_variant* top)
 
 static void printTrackersImpl(tr_variant* trackerStats)
 {
-    int i;
     char buf[512];
     tr_variant* t;
 
-    for (i = 0; (t = tr_variantListChild(trackerStats, i)) != NULL; ++i)
+    for (int i = 0; (t = tr_variantListChild(trackerStats, i)) != NULL; ++i)
     {
         int64_t downloadCount;
         bool hasAnnounced;
@@ -1656,10 +1626,7 @@ static void printTrackers(tr_variant* top)
 
     if (tr_variantDictFindDict(top, TR_KEY_arguments, &args) && tr_variantDictFindList(args, TR_KEY_torrents, &torrents))
     {
-        int i;
-        int n;
-
-        for (i = 0, n = tr_variantListSize(torrents); i < n; ++i)
+        for (int i = 0, n = tr_variantListSize(torrents); i < n; ++i)
         {
             tr_variant* trackerStats;
             tr_variant* torrent = tr_variantListChild(torrents, i);
@@ -2328,8 +2295,6 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
         }
         else if (stepMode == MODE_TORRENT_GET)
         {
-            size_t i;
-            size_t n;
             tr_variant* top = tr_new0(tr_variant, 1);
             tr_variant* args;
             tr_variant* fields;
@@ -2348,9 +2313,8 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
             {
             case 'i':
                 tr_variantDictAddInt(top, TR_KEY_tag, TAG_DETAILS);
-                n = TR_N_ELEMENTS(details_keys);
 
-                for (i = 0; i < n; ++i)
+                for (size_t i = 0; i < TR_N_ELEMENTS(details_keys); ++i)
                 {
                     tr_variantListAddQuark(fields, details_keys[i]);
                 }
@@ -2360,9 +2324,8 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
 
             case 'l':
                 tr_variantDictAddInt(top, TR_KEY_tag, TAG_LIST);
-                n = TR_N_ELEMENTS(list_keys);
 
-                for (i = 0; i < n; ++i)
+                for (size_t i = 0; i < TR_N_ELEMENTS(list_keys); ++i)
                 {
                     tr_variantListAddQuark(fields, list_keys[i]);
                 }
@@ -2372,9 +2335,8 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
 
             case 940:
                 tr_variantDictAddInt(top, TR_KEY_tag, TAG_FILES);
-                n = TR_N_ELEMENTS(files_keys);
 
-                for (i = 0; i < n; ++i)
+                for (size_t i = 0; i < TR_N_ELEMENTS(files_keys); ++i)
                 {
                     tr_variantListAddQuark(fields, files_keys[i]);
                 }
@@ -2952,7 +2914,6 @@ static void getHostAndPortAndRpcUrl(int* argc, char** argv, char** host, int* po
 {
     if (*argv[1] != '-')
     {
-        int i;
         char const* s = argv[1];
         char const* delim = strchr(s, ':');
 
@@ -2987,7 +2948,7 @@ static void getHostAndPortAndRpcUrl(int* argc, char** argv, char** host, int* po
 
         *argc -= 1;
 
-        for (i = 1; i < *argc; ++i)
+        for (int i = 1; i < *argc; ++i)
         {
             argv[i] = argv[i + 1];
         }

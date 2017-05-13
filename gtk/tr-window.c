@@ -361,8 +361,6 @@ static void onSpeedSet(GtkCheckMenuItem* check, gpointer vp)
 
 static GtkWidget* createSpeedMenu(PrivateData* p, tr_direction dir)
 {
-    int i;
-    int n;
     GObject* o;
     GtkWidget* w;
     GtkWidget* m;
@@ -391,7 +389,7 @@ static GtkWidget* createSpeedMenu(PrivateData* p, tr_direction dir)
     w = gtk_separator_menu_item_new();
     gtk_menu_shell_append(menu_shell, w);
 
-    for (i = 0, n = G_N_ELEMENTS(speeds_KBps); i < n; ++i)
+    for (size_t i = 0; i < G_N_ELEMENTS(speeds_KBps); ++i)
     {
         char buf[128];
         tr_formatter_speed_KBps(buf, speeds_KBps[i], sizeof(buf));
@@ -435,8 +433,6 @@ static void onRatioSet(GtkCheckMenuItem* check, gpointer vp)
 
 static GtkWidget* createRatioMenu(PrivateData* p)
 {
-    int i;
-    int n;
     GtkWidget* m;
     GtkWidget* w;
     GtkMenuShell* menu_shell;
@@ -459,7 +455,7 @@ static GtkWidget* createRatioMenu(PrivateData* p)
     w = gtk_separator_menu_item_new();
     gtk_menu_shell_append(menu_shell, w);
 
-    for (i = 0, n = G_N_ELEMENTS(stockRatios); i < n; ++i)
+    for (size_t i = 0; i < G_N_ELEMENTS(stockRatios); ++i)
     {
         char buf[128];
         tr_strlratio(buf, stockRatios[i], sizeof(buf));
@@ -541,7 +537,6 @@ static void onOptionsClicked(GtkButton* button UNUSED, gpointer vp)
 
 GtkWidget* gtr_window_new(GtkApplication* app, GtkUIManager* ui_mgr, TrCore* core)
 {
-    int i, n;
     char const* pch;
     char const* style;
     PrivateData* p;
@@ -612,7 +607,7 @@ GtkWidget* gtr_window_new(GtkApplication* app, GtkUIManager* ui_mgr, TrCore* cor
     l = NULL;
     pch = gtr_pref_string_get(TR_KEY_statusbar_stats);
 
-    for (i = 0, n = G_N_ELEMENTS(stats_modes); i < n; ++i)
+    for (size_t i = 0; i < G_N_ELEMENTS(stats_modes); ++i)
     {
         char const* val = stats_modes[i].val;
         w = gtk_radio_menu_item_new_with_label(l, _(stats_modes[i].i18n));

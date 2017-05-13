@@ -16,8 +16,6 @@
 
 static int test_bitfield_count_range(void)
 {
-    int i;
-    int n;
     int begin;
     int end;
     int count1;
@@ -28,7 +26,7 @@ static int test_bitfield_count_range(void)
     /* generate a random bitfield */
     tr_bitfieldConstruct(&bf, bitCount);
 
-    for (i = 0, n = tr_rand_int_weak(bitCount); i < n; ++i)
+    for (int i = 0, n = tr_rand_int_weak(bitCount); i < n; ++i)
     {
         tr_bitfieldAdd(&bf, tr_rand_int_weak(bitCount));
     }
@@ -52,7 +50,7 @@ static int test_bitfield_count_range(void)
     /* test the bitfield */
     count1 = 0;
 
-    for (i = begin; i < end; ++i)
+    for (int i = begin; i < end; ++i)
     {
         if (tr_bitfieldHas(&bf, i))
         {
@@ -70,14 +68,13 @@ static int test_bitfield_count_range(void)
 
 static int test_bitfields(void)
 {
-    unsigned int i;
     unsigned int bitcount = 500;
     tr_bitfield field;
 
     tr_bitfieldConstruct(&field, bitcount);
 
     /* test tr_bitfieldAdd */
-    for (i = 0; i < bitcount; i++)
+    for (unsigned int i = 0; i < bitcount; i++)
     {
         if (i % 7 == 0)
         {
@@ -85,7 +82,7 @@ static int test_bitfields(void)
         }
     }
 
-    for (i = 0; i < bitcount; i++)
+    for (unsigned int i = 0; i < bitcount; i++)
     {
         check(tr_bitfieldHas(&field, i) == (i % 7 == 0));
     }
@@ -93,13 +90,13 @@ static int test_bitfields(void)
     /* test tr_bitfieldAddRange */
     tr_bitfieldAddRange(&field, 0, bitcount);
 
-    for (i = 0; i < bitcount; i++)
+    for (unsigned int i = 0; i < bitcount; i++)
     {
         check(tr_bitfieldHas(&field, i));
     }
 
     /* test tr_bitfieldRem */
-    for (i = 0; i < bitcount; i++)
+    for (unsigned int i = 0; i < bitcount; i++)
     {
         if (i % 7 != 0)
         {
@@ -107,7 +104,7 @@ static int test_bitfields(void)
         }
     }
 
-    for (i = 0; i < bitcount; i++)
+    for (unsigned int i = 0; i < bitcount; i++)
     {
         check(tr_bitfieldHas(&field, i) == (i % 7 == 0));
     }
@@ -116,7 +113,7 @@ static int test_bitfields(void)
     tr_bitfieldAddRange(&field, 0, 64);
     tr_bitfieldRemRange(&field, 4, 21);
 
-    for (i = 0; i < 64; i++)
+    for (unsigned int i = 0; i < 64; i++)
     {
         check(tr_bitfieldHas(&field, i) == (i < 4 || i >= 21));
     }
@@ -125,7 +122,7 @@ static int test_bitfields(void)
     tr_bitfieldAddRange(&field, 0, 64);
     tr_bitfieldRemRange(&field, 8, 24);
 
-    for (i = 0; i < 64; i++)
+    for (unsigned int i = 0; i < 64; i++)
     {
         check(tr_bitfieldHas(&field, i) == (i < 8 || i >= 24));
     }
@@ -134,7 +131,7 @@ static int test_bitfields(void)
     tr_bitfieldAddRange(&field, 0, 64);
     tr_bitfieldRemRange(&field, 4, 5);
 
-    for (i = 0; i < 64; i++)
+    for (unsigned int i = 0; i < 64; i++)
     {
         check(tr_bitfieldHas(&field, i) == (i < 4 || i >= 5));
     }
@@ -143,7 +140,7 @@ static int test_bitfields(void)
     tr_bitfieldRemRange(&field, 0, 64);
     tr_bitfieldAddRange(&field, 4, 21);
 
-    for (i = 0; i < 64; i++)
+    for (unsigned int i = 0; i < 64; i++)
     {
         check(tr_bitfieldHas(&field, i) == (4 <= i && i < 21));
     }
@@ -152,7 +149,7 @@ static int test_bitfields(void)
     tr_bitfieldRemRange(&field, 0, 64);
     tr_bitfieldAddRange(&field, 8, 24);
 
-    for (i = 0; i < 64; i++)
+    for (unsigned int i = 0; i < 64; i++)
     {
         check(tr_bitfieldHas(&field, i) == (8 <= i && i < 24));
     }
@@ -161,7 +158,7 @@ static int test_bitfields(void)
     tr_bitfieldRemRange(&field, 0, 64);
     tr_bitfieldAddRange(&field, 4, 5);
 
-    for (i = 0; i < 64; i++)
+    for (unsigned int i = 0; i < 64; i++)
     {
         check(tr_bitfieldHas(&field, i) == (4 <= i && i < 5));
     }
@@ -226,7 +223,6 @@ static int test_bitfield_has_all_none(void)
 
 int main(void)
 {
-    int l;
     int ret;
     testFunc const tests[] =
     {
@@ -240,7 +236,7 @@ int main(void)
     }
 
     /* bitfield count range */
-    for (l = 0; l < 10000; ++l)
+    for (int l = 0; l < 10000; ++l)
     {
         if ((ret = test_bitfield_count_range()) != 0)
         {

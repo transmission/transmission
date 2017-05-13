@@ -141,14 +141,13 @@ char* tr_ssha1(char const* plain_text)
 
     assert(plain_text != NULL);
 
-    size_t i;
     unsigned char salt[saltval_len];
     uint8_t sha[SHA_DIGEST_LENGTH];
     char buf[2 * SHA_DIGEST_LENGTH + saltval_len + 2];
 
     tr_rand_buffer(salt, saltval_len);
 
-    for (i = 0; i < saltval_len; ++i)
+    for (size_t i = 0; i < saltval_len; ++i)
     {
         salt[i] = salter[salt[i] % salter_len];
     }

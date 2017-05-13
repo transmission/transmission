@@ -357,7 +357,6 @@ static uint32_t getCryptoProvide(tr_handshake const* handshake)
 static uint32_t getCryptoSelect(tr_handshake const* handshake, uint32_t crypto_provide)
 {
     uint32_t choices[2];
-    int i;
     int nChoices = 0;
 
     switch (handshake->encryptionMode)
@@ -377,7 +376,7 @@ static uint32_t getCryptoSelect(tr_handshake const* handshake, uint32_t crypto_p
         break;
     }
 
-    for (i = 0; i < nChoices; ++i)
+    for (int i = 0; i < nChoices; ++i)
     {
         if (crypto_provide & choices[i])
         {
@@ -450,7 +449,6 @@ static ReadState readYb(tr_handshake* handshake, struct evbuffer* inbuf)
 
     /* HASH('req2', SKEY) xor HASH('req3', S) */
     {
-        int i;
         uint8_t req2[SHA_DIGEST_LENGTH];
         uint8_t req3[SHA_DIGEST_LENGTH];
         uint8_t buf[SHA_DIGEST_LENGTH];
@@ -458,7 +456,7 @@ static ReadState readYb(tr_handshake* handshake, struct evbuffer* inbuf)
         tr_sha1(req2, "req2", 4, tr_cryptoGetTorrentHash(handshake->crypto), SHA_DIGEST_LENGTH, NULL);
         computeRequestHash(handshake, "req3", req3);
 
-        for (i = 0; i < SHA_DIGEST_LENGTH; ++i)
+        for (int i = 0; i < SHA_DIGEST_LENGTH; ++i)
         {
             buf[i] = req2[i] ^ req3[i];
         }
@@ -816,7 +814,6 @@ static ReadState readCryptoProvide(tr_handshake* handshake, struct evbuffer* inb
 {
     /* HASH('req2', SKEY) xor HASH('req3', S), ENCRYPT(VC, crypto_provide, len(PadC)) */
 
-    int i;
     uint8_t vc_in[VC_LENGTH];
     uint8_t req2[SHA_DIGEST_LENGTH];
     uint8_t req3[SHA_DIGEST_LENGTH];
@@ -843,7 +840,7 @@ static ReadState readCryptoProvide(tr_handshake* handshake, struct evbuffer* inb
     evbuffer_remove(inbuf, req2, SHA_DIGEST_LENGTH);
     computeRequestHash(handshake, "req3", req3);
 
-    for (i = 0; i < SHA_DIGEST_LENGTH; ++i)
+    for (int i = 0; i < SHA_DIGEST_LENGTH; ++i)
     {
         obfuscatedTorrentHash[i] = req2[i] ^ req3[i];
     }

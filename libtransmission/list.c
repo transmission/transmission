@@ -201,24 +201,25 @@ tr_list* tr_list_find(tr_list* list, void const* b, TrListCompareFunc func)
 
 void tr_list_insert_sorted(tr_list** list, void* data, TrListCompareFunc compare)
 {
-    /* find l, the node that we'll insert this data before */
-    tr_list* l;
+    /* find the node that we'll insert this data before */
+    tr_list* next_node = NULL;
 
-    for (l = *list; l != NULL; l = l->next)
+    for (tr_list* l = *list; l != NULL; l = l->next)
     {
         int const c = (*compare)(data, l->data);
 
         if (c <= 0)
         {
+            next_node = l;
             break;
         }
     }
 
-    if (l == NULL)
+    if (next_node == NULL)
     {
         tr_list_append(list, data);
     }
-    else if (l == *list)
+    else if (next_node == *list)
     {
         tr_list_prepend(list, data);
     }
@@ -226,8 +227,8 @@ void tr_list_insert_sorted(tr_list** list, void* data, TrListCompareFunc compare
     {
         tr_list* node = node_alloc();
         node->data = data;
-        node->prev = l->prev;
-        node->next = l;
+        node->prev = next_node->prev;
+        node->next = next_node;
         node->prev->next = node;
         node->next->prev = node;
     }

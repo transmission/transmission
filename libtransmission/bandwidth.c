@@ -39,18 +39,12 @@ static unsigned int getSpeed_Bps(struct bratecontrol const* r, unsigned int inte
 
     if (now != r->cache_time)
     {
-        int i = r->newest;
         uint64_t bytes = 0;
         uint64_t const cutoff = now - interval_msec;
         struct bratecontrol* rvolatile = (struct bratecontrol*)r;
 
-        for (;;)
+        for (int i = r->newest; r->transfers[i].date > cutoff;)
         {
-            if (r->transfers[i].date <= cutoff)
-            {
-                break;
-            }
-
             bytes += r->transfers[i].size;
 
             if (--i == -1)
@@ -188,11 +182,9 @@ static void allocateBandwidth(tr_bandwidth* b, tr_priority_t parent_priority, tr
     /* traverse & repeat for the subtree */
     if (true)
     {
-        int i;
         struct tr_bandwidth** children = (struct tr_bandwidth**)tr_ptrArrayBase(&b->children);
-        int const n = tr_ptrArraySize(&b->children);
 
-        for (i = 0; i < n; ++i)
+        for (int i = 0, n = tr_ptrArraySize(&b->children); i < n; ++i)
         {
             allocateBandwidth(children[i], priority, dir, period_msec, peer_pool);
         }
@@ -238,7 +230,6 @@ static void phaseOne(tr_ptrArray* peerArray, tr_direction dir)
 
 void tr_bandwidthAllocate(tr_bandwidth* b, tr_direction dir, unsigned int period_msec)
 {
-    int i;
     int peerCount;
     tr_ptrArray tmp = TR_PTR_ARRAY_INIT;
     tr_ptrArray low = TR_PTR_ARRAY_INIT;
@@ -253,7 +244,7 @@ void tr_bandwidthAllocate(tr_bandwidth* b, tr_direction dir, unsigned int period
     peers = (struct tr_peerIo**)tr_ptrArrayBase(&tmp);
     peerCount = tr_ptrArraySize(&tmp);
 
-    for (i = 0; i < peerCount; ++i)
+    for (int i = 0; i < peerCount; ++i)
     {
         tr_peerIo* io = peers[i];
         tr_peerIoRef(io);
@@ -285,12 +276,12 @@ void tr_bandwidthAllocate(tr_bandwidth* b, tr_direction dir, unsigned int period
      * enable on-demand IO for peers with bandwidth left to burn.
      * This on-demand IO is enabled until (1) the peer runs out of bandwidth,
      * or (2) the next tr_bandwidthAllocate () call, when we start over again. */
-    for (i = 0; i < peerCount; ++i)
+    for (int i = 0; i < peerCount; ++i)
     {
         tr_peerIoSetEnabled(peers[i], dir, tr_peerIoHasBandwidthLeft(peers[i], dir));
     }
 
-    for (i = 0; i < peerCount; ++i)
+    for (int i = 0; i < peerCount; ++i)
     {
         tr_peerIoUnref(peers[i]);
     }

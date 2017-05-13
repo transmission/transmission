@@ -78,14 +78,13 @@ tr_completeness tr_cpGetStatus(tr_completion const* cp)
 
 void tr_cpPieceRem(tr_completion* cp, tr_piece_index_t piece)
 {
-    tr_block_index_t i;
     tr_block_index_t f;
     tr_block_index_t l;
     tr_torrent const* tor = cp->tor;
 
     tr_torGetPieceBlockRange(cp->tor, piece, &f, &l);
 
-    for (i = f; i <= l; ++i)
+    for (tr_block_index_t i = f; i <= l; ++i)
     {
         if (tr_cpBlockIsComplete(cp, i))
         {
@@ -100,12 +99,11 @@ void tr_cpPieceRem(tr_completion* cp, tr_piece_index_t piece)
 
 void tr_cpPieceAdd(tr_completion* cp, tr_piece_index_t piece)
 {
-    tr_block_index_t i;
     tr_block_index_t f;
     tr_block_index_t l;
     tr_torGetPieceBlockRange(cp->tor, piece, &f, &l);
 
-    for (i = f; i <= l; ++i)
+    for (tr_block_index_t i = f; i <= l; ++i)
     {
         tr_cpBlockAdd(cp, i);
     }
@@ -135,13 +133,12 @@ uint64_t tr_cpHaveValid(tr_completion const* ccp)
 {
     if (ccp->haveValidIsDirty)
     {
-        tr_piece_index_t i;
         uint64_t size = 0;
         tr_completion* cp = (tr_completion*)ccp; /* mutable */
         tr_torrent const* tor = ccp->tor;
         tr_info const* info = &tor->info;
 
-        for (i = 0; i < info->pieceCount; ++i)
+        for (tr_piece_index_t i = 0; i < info->pieceCount; ++i)
         {
             if (tr_cpPieceIsComplete(ccp, i))
             {
@@ -171,9 +168,7 @@ uint64_t tr_cpSizeWhenDone(tr_completion const* ccp)
         }
         else
         {
-            tr_piece_index_t p;
-
-            for (p = 0; p < inf->pieceCount; ++p)
+            for (tr_piece_index_t p = 0; p < inf->pieceCount; ++p)
             {
                 uint64_t n = 0;
                 uint64_t const pieceSize = tr_torPieceCountBytes(tor, p);
@@ -223,11 +218,10 @@ uint64_t tr_cpLeftUntilDone(tr_completion const* cp)
 
 void tr_cpGetAmountDone(tr_completion const* cp, float* tab, int tabCount)
 {
-    int i;
     bool const seed = tr_cpHasAll(cp);
     float const interval = cp->tor->info.pieceCount / (float)tabCount;
 
-    for (i = 0; i < tabCount; ++i)
+    for (int i = 0; i < tabCount; ++i)
     {
         if (seed)
         {
@@ -324,10 +318,9 @@ void* tr_cpCreatePieceBitfield(tr_completion const* cp, size_t* byte_count)
     }
     else if (!tr_cpHasNone(cp))
     {
-        tr_piece_index_t i;
         bool* flags = tr_new(bool, n);
 
-        for (i = 0; i < n; ++i)
+        for (tr_piece_index_t i = 0; i < n; ++i)
         {
             flags[i] = tr_cpPieceIsComplete(cp, i);
         }

@@ -113,11 +113,10 @@ static int compare_integers(gconstpointer a, gconstpointer b)
 
 static char* get_details_dialog_key(GSList* id_list)
 {
-    GSList* l;
     GSList* tmp = g_slist_sort(g_slist_copy(id_list), compare_integers);
     GString* gstr = g_string_new(NULL);
 
-    for (l = tmp; l != NULL; l = l->next)
+    for (GSList* l = tmp; l != NULL; l = l->next)
     {
         g_string_append_printf(gstr, "%d ", GPOINTER_TO_INT(l->data));
     }
@@ -151,11 +150,10 @@ static void on_details_dialog_closed(gpointer gdata, GObject* dead)
 static void show_details_dialog_for_selected_torrents(struct cbdata* data)
 {
     GtkWidget* dialog = NULL;
-    GSList* l;
     GSList* ids = get_selected_torrent_ids(data);
     char* key = get_details_dialog_key(ids);
 
-    for (l = data->details; dialog == NULL && l != NULL; l = l->next)
+    for (GSList* l = data->details; dialog == NULL && l != NULL; l = l->next)
     {
         if (g_strcmp0(key, g_object_get_data(l->data, "key")) == 0)
         {
@@ -389,18 +387,16 @@ static gboolean on_rpc_changed_idle(gpointer gdata)
 
     case TR_RPC_SESSION_CHANGED:
         {
-            int i;
             tr_variant tmp;
             tr_variant* newval;
             tr_variant* oldvals = gtr_pref_get_all();
             tr_quark key;
-            GSList* l;
             GSList* changed_keys = NULL;
             tr_session* session = gtr_core_session(data->core);
             tr_variantInitDict(&tmp, 100);
             tr_sessionGetSettings(session, &tmp);
 
-            for (i = 0; tr_variantDictChild(&tmp, i, &key, &newval); ++i)
+            for (int i = 0; tr_variantDictChild(&tmp, i, &key, &newval); ++i)
             {
                 bool changed;
                 tr_variant* oldval = tr_variantDictFind(oldvals, key);
@@ -426,7 +422,7 @@ static gboolean on_rpc_changed_idle(gpointer gdata)
 
             tr_sessionGetSettings(session, oldvals);
 
-            for (l = changed_keys; l != NULL; l = l->next)
+            for (GSList* l = changed_keys; l != NULL; l = l->next)
             {
                 gtr_core_pref_changed(data->core, GPOINTER_TO_INT(l->data));
             }
@@ -587,10 +583,9 @@ static void open_files(GSList* files, gpointer gdata)
 
 static void on_open(GApplication* application UNUSED, GFile** f, gint file_count, gchar* hint UNUSED, gpointer gdata)
 {
-    int i;
     GSList* files = NULL;
 
-    for (i = 0; i < file_count; i++)
+    for (gint i = 0; i < file_count; i++)
     {
         files = g_slist_prepend(files, f[i]);
     }
@@ -840,12 +835,11 @@ static void rowChangedCB(GtkTreeModel* model UNUSED, GtkTreePath* path, GtkTreeI
 static void on_drag_data_received(GtkWidget* widget UNUSED, GdkDragContext* drag_context, gint x UNUSED, gint y UNUSED,
     GtkSelectionData* selection_data, guint info UNUSED, guint time_, gpointer gdata)
 {
-    guint i;
     char** uris = gtk_selection_data_get_uris(selection_data);
     guint const file_count = g_strv_length(uris);
     GSList* files = NULL;
 
-    for (i = 0; i < file_count; ++i)
+    for (guint i = 0; i < file_count; ++i)
     {
         files = g_slist_prepend(files, g_file_new_for_uri(uris[i]));
     }
@@ -1021,12 +1015,11 @@ static void on_app_exit(gpointer vdata)
 
 static void show_torrent_errors(GtkWindow* window, char const* primary, GSList** files)
 {
-    GSList* l;
     GtkWidget* w;
     GString* s = g_string_new(NULL);
     char const* leader = g_slist_length(*files) > 1 ? gtr_get_unicode_string(GTR_UNICODE_BULLET) : "";
 
-    for (l = *files; l != NULL; l = l->next)
+    for (GSList* l = *files; l != NULL; l = l->next)
     {
         g_string_append_printf(s, "%s %s\n", leader, (char const*)l->data);
     }

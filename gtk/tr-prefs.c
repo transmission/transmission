@@ -565,7 +565,6 @@ enum
 
 static GtkTreeModel* whitelist_tree_model_new(char const* whitelist)
 {
-    int i;
     char** rules;
     GtkListStore* store = gtk_list_store_new(N_COLS,
         G_TYPE_STRING,
@@ -573,7 +572,7 @@ static GtkTreeModel* whitelist_tree_model_new(char const* whitelist)
 
     rules = g_strsplit(whitelist, ",", 0);
 
-    for (i = 0; rules != NULL && rules[i] != NULL; ++i)
+    for (int i = 0; rules != NULL && rules[i] != NULL; ++i)
     {
         GtkTreeIter iter;
         char const* s = rules[i];
@@ -676,7 +675,6 @@ static void onRemoveWhitelistClicked(GtkButton* b UNUSED, gpointer gpage)
 
 static void refreshRPCSensitivity(struct remote_page* page)
 {
-    GSList* l;
     int const rpc_active = gtk_toggle_button_get_active(page->rpc_tb);
     int const auth_active = gtk_toggle_button_get_active(page->auth_tb);
     int const whitelist_active = gtk_toggle_button_get_active(page->whitelist_tb);
@@ -684,17 +682,17 @@ static void refreshRPCSensitivity(struct remote_page* page)
     int const have_addr = gtk_tree_selection_get_selected(sel, NULL, NULL);
     int const n_rules = gtk_tree_model_iter_n_children(GTK_TREE_MODEL(page->store), NULL);
 
-    for (l = page->widgets; l != NULL; l = l->next)
+    for (GSList* l = page->widgets; l != NULL; l = l->next)
     {
         gtk_widget_set_sensitive(GTK_WIDGET(l->data), rpc_active);
     }
 
-    for (l = page->auth_widgets; l != NULL; l = l->next)
+    for (GSList* l = page->auth_widgets; l != NULL; l = l->next)
     {
         gtk_widget_set_sensitive(GTK_WIDGET(l->data), rpc_active && auth_active);
     }
 
-    for (l = page->whitelist_widgets; l != NULL; l = l->next)
+    for (GSList* l = page->whitelist_widgets; l != NULL; l = l->next)
     {
         gtk_widget_set_sensitive(GTK_WIDGET(l->data), rpc_active && whitelist_active);
     }
@@ -872,10 +870,9 @@ struct BandwidthPage
 
 static void refreshSchedSensitivity(struct BandwidthPage* p)
 {
-    GSList* l;
     gboolean const sched_enabled = gtr_pref_flag_get(TR_KEY_alt_speed_time_enabled);
 
-    for (l = p->sched_widgets; l != NULL; l = l->next)
+    for (GSList* l = p->sched_widgets; l != NULL; l = l->next)
     {
         gtk_widget_set_sensitive(GTK_WIDGET(l->data), sched_enabled);
     }
@@ -902,7 +899,6 @@ static void onTimeComboChanged(GtkComboBox* w, gpointer core)
 static GtkWidget* new_time_combo(GObject* core, tr_quark const key)
 {
     int val;
-    int i;
     GtkWidget* w;
     GtkCellRenderer* r;
     GtkListStore* store;
@@ -910,7 +906,7 @@ static GtkWidget* new_time_combo(GObject* core, tr_quark const key)
     /* build a store at 15 minute intervals */
     store = gtk_list_store_new(2, G_TYPE_INT, G_TYPE_STRING);
 
-    for (i = 0; i < 60 * 24; i += 15)
+    for (int i = 0; i < 60 * 24; i += 15)
     {
         char buf[128];
         GtkTreeIter iter;
@@ -1238,7 +1234,6 @@ static void on_core_prefs_changed(TrCore* core, tr_quark const key, gpointer gda
 
 GtkWidget* gtr_prefs_dialog_new(GtkWindow* parent, GObject* core)
 {
-    size_t i;
     GtkWidget* d;
     GtkWidget* n;
     struct prefs_dialog_data* data;
@@ -1266,7 +1261,7 @@ GtkWidget* gtr_prefs_dialog_new(GtkWindow* parent, GObject* core)
     gtk_notebook_append_page(GTK_NOTEBOOK(n), remotePage(core), gtk_label_new(_("Remote")));
 
     /* init from prefs keys */
-    for (i = 0; i < sizeof(prefs_quarks) / sizeof(prefs_quarks[0]); ++i)
+    for (size_t i = 0; i < G_N_ELEMENTS(prefs_quarks); ++i)
     {
         on_core_prefs_changed(TR_CORE(core), prefs_quarks[i], data);
     }

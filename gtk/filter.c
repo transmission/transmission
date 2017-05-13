@@ -114,7 +114,6 @@ static void favicon_ready_cb(gpointer pixbuf, gpointer vreference)
 
 static gboolean tracker_filter_model_update(gpointer gstore)
 {
-    int i, n;
     int all = 0;
     int store_pos;
     GtkTreeIter iter;
@@ -146,9 +145,8 @@ static gboolean tracker_filter_model_update(gpointer gstore)
             keyCount = 0;
             keys = g_new(char*, inf->trackerCount);
 
-            for (i = 0, n = inf->trackerCount; i < n; ++i)
+            for (unsigned int i = 0; i < inf->trackerCount; ++i)
             {
-                int k;
                 int* count;
                 char buf[1024];
                 char* key;
@@ -165,21 +163,20 @@ static gboolean tracker_filter_model_update(gpointer gstore)
                     g_ptr_array_add(hosts, key);
                 }
 
-                for (k = 0; k < keyCount; ++k)
+                bool found = false;
+
+                for (int k = 0; !found && k < keyCount; ++k)
                 {
-                    if (g_strcmp0(keys[k], key) == 0)
-                    {
-                        break;
-                    }
+                    found = g_strcmp0(keys[k], key) == 0;
                 }
 
-                if (k == keyCount)
+                if (!found)
                 {
                     keys[keyCount++] = key;
                 }
             }
 
-            for (i = 0; i < keyCount; ++i)
+            for (int i = 0; i < keyCount; ++i)
             {
                 int* incrementme = g_hash_table_lookup(hosts_hash, keys[i]);
                 ++*incrementme;
@@ -202,7 +199,7 @@ static gboolean tracker_filter_model_update(gpointer gstore)
 
     store_pos = first_tracker_pos;
 
-    for (i = 0, n = hosts->len;;)
+    for (int i = 0, n = hosts->len;;)
     {
         gboolean const new_hosts_done = i >= n;
         gboolean const old_hosts_done = !gtk_tree_model_iter_nth_child(model, &iter, NULL, store_pos);
@@ -432,21 +429,16 @@ static gboolean test_tracker(tr_torrent* tor, int active_tracker_type, char cons
 
     if (active_tracker_type == TRACKER_FILTER_TYPE_HOST)
     {
-        unsigned int i;
         char tmp[1024];
         tr_info const* const inf = tr_torrentInfo(tor);
 
-        for (i = 0; i < inf->trackerCount; ++i)
+        matches = FALSE;
+
+        for (unsigned int i = 0; !matches && i < inf->trackerCount; ++i)
         {
             gtr_get_host_from_url(tmp, sizeof(tmp), inf->trackers[i].announce);
-
-            if (g_strcmp0(tmp, host) == 0)
-            {
-                break;
-            }
+            matches = g_strcmp0(tmp, host) == 0;
         }
-
-        matches = i < inf->trackerCount;
     }
 
     return matches;
@@ -579,7 +571,6 @@ static gboolean activity_filter_model_update(gpointer gstore)
 
 static GtkTreeModel* activity_filter_model_new(GtkTreeModel* tmodel)
 {
-    int i, n;
     struct
     {
         int type;
@@ -606,7 +597,7 @@ static GtkTreeModel* activity_filter_model_new(GtkTreeModel* tmodel)
         G_TYPE_INT,
         G_TYPE_STRING);
 
-    for (i = 0, n = G_N_ELEMENTS(types); i < n; ++i)
+    for (size_t i = 0; i < G_N_ELEMENTS(types); ++i)
     {
         char const* name = types[i].context != NULL ? g_dpgettext2(NULL, types[i].context, types[i].name) : _(types[i].name);
         gtk_list_store_insert_with_values(store, NULL, -1,
@@ -718,7 +709,6 @@ static gboolean testText(tr_torrent const* tor, char const* key)
     }
     else
     {
-        tr_file_index_t i;
         tr_info const* inf = tr_torrentInfo(tor);
 
         /* test the torrent name... */
@@ -729,7 +719,7 @@ static gboolean testText(tr_torrent const* tor, char const* key)
         }
 
         /* test the files... */
-        for (i = 0; i < inf->fileCount && !ret; ++i)
+        for (tr_file_index_t i = 0; i < inf->fileCount && !ret; ++i)
         {
             char* pch = g_utf8_casefold(inf->files[i].name, -1);
             ret = key == NULL || strstr(pch, key) != NULL;

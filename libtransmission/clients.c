@@ -821,18 +821,18 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
     {
         char out[32];
         char* walk = out;
-        char const* in;
-        char const* in_end;
 
-        for (in = (char const*)id, in_end = in + 8; in != in_end; ++in)
+        for (size_t i = 0; i < 8; ++i)
         {
-            if (isprint((unsigned char)*in))
+            char const c = chid[i];
+
+            if (isprint((unsigned char)c))
             {
-                *walk++ = *in;
+                *walk++ = c;
             }
             else
             {
-                tr_snprintf(walk, out + sizeof(out) - walk, "%%%02X", (unsigned int)*in);
+                tr_snprintf(walk, out + sizeof(out) - walk, "%%%02X", (unsigned int)c);
                 walk += 3;
             }
         }

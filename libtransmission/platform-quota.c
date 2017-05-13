@@ -126,7 +126,6 @@ static char const* getdev(char const* path)
 
 #else /* BSD derived systems */
 
-    int i;
     int n;
     struct statfs* mnt;
 
@@ -137,15 +136,15 @@ static char const* getdev(char const* path)
         return NULL;
     }
 
-    for (i = 0; i < n; i++)
+    for (int i = 0; i < n; i++)
     {
         if (tr_strcmp0(path, mnt[i].f_mntonname) == 0)
         {
-            break;
+            return mnt[i].f_mntfromname;
         }
     }
 
-    return i < n ? mnt[i].f_mntfromname : NULL;
+    return NULL;
 
 #endif
 }
@@ -203,7 +202,6 @@ static char const* getfstype(char const* device)
 
 #else /* BSD derived systems */
 
-    int i;
     int n;
     struct statfs* mnt;
 
@@ -214,15 +212,15 @@ static char const* getfstype(char const* device)
         return NULL;
     }
 
-    for (i = 0; i < n; i++)
+    for (int i = 0; i < n; i++)
     {
         if (tr_strcmp0(device, mnt[i].f_mntfromname) == 0)
         {
-            break;
+            return mnt[i].f_fstypename;
         }
     }
 
-    return i < n ? mnt[i].f_fstypename : NULL;
+    return NULL;
 
 #endif
 }

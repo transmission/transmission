@@ -322,9 +322,9 @@ static int testParse(void)
 
 static void stripWhitespace(char* in)
 {
-    char* out;
+    char* out = in;
 
-    for (out = in; in != NULL && *in != '\0'; ++in)
+    for (; in != NULL && *in != '\0'; ++in)
     {
         if (!isspace(*in))
         {
@@ -469,7 +469,6 @@ static int testMerge(void)
 
 static int testStackSmash(void)
 {
-    int i;
     size_t len;
     int err;
     char* in;
@@ -480,7 +479,7 @@ static int testStackSmash(void)
 
     in = tr_new(char, depth * 2 + 1);
 
-    for (i = 0; i < depth; ++i)
+    for (int i = 0; i < depth; ++i)
     {
         in[i] = 'l';
         in[depth + i] = 'e';

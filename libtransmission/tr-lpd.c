@@ -484,7 +484,6 @@ UNUSED static inline void lpd_consistencyCheck(void)
 */
 bool tr_lpdSendAnnounce(tr_torrent const* t)
 {
-    size_t i;
     char const fmt[] =
         "BT-SEARCH * HTTP/%u.%u" CRLF
         "Host: %s:%u" CRLF
@@ -502,7 +501,7 @@ bool tr_lpdSendAnnounce(tr_torrent const* t)
     }
 
     /* make sure the hash string is normalized, just in case */
-    for (i = 0; i < sizeof(hashString); i++)
+    for (size_t i = 0; i < TR_N_ELEMENTS(hashString); ++i)
     {
         hashString[i] = toupper(t->info.hashString[i]);
     }

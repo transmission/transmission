@@ -241,8 +241,6 @@ static int test_unescape(void)
 
 int main(void)
 {
-    int i;
-    int n;
     int rv;
 
     char const* comma_locales[] =
@@ -271,17 +269,14 @@ int main(void)
     }
 
     /* run the tests in a locale with a decimal point of ',' */
-    n = sizeof(comma_locales) / sizeof(comma_locales[0]);
+    bool is_locale_set = false;
 
-    for (i = 0; i < n; ++i)
+    for (size_t i = 0; !is_locale_set && i < TR_N_ELEMENTS(comma_locales); ++i)
     {
-        if (setlocale(LC_NUMERIC, comma_locales[i]) != NULL)
-        {
-            break;
-        }
+        is_locale_set = setlocale(LC_NUMERIC, comma_locales[i]) != NULL;
     }
 
-    if (i == n)
+    if (!is_locale_set)
     {
         fprintf(stderr, "WARNING: unable to run locale-specific json tests. add a locale like %s or %s\n", comma_locales[0],
             comma_locales[1]);

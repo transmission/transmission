@@ -134,6 +134,8 @@ char const* tr_strip_positional_args(char const* fmt);
 *****
 ****/
 
+#define TR_N_ELEMENTS(ary) (sizeof(ary) / sizeof(*(ary)))
+
 /**
  * @brief Rich Salz's classic implementation of shell-style pattern matching for ?, \, [], and * characters.
  * @return 1 if the pattern matches, 0 if it doesn't, or -1 if an error occured

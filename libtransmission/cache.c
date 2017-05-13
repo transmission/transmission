@@ -79,13 +79,13 @@ struct run_info
 /* return a count of how many contiguous blocks there are starting at this pos */
 static int getBlockRun(tr_cache const* cache, int pos, struct run_info* info)
 {
-    int i;
     int const n = tr_ptrArraySize(&cache->blocks);
     struct cache_block const* const* blocks = (struct cache_block const* const*)tr_ptrArrayBase(&cache->blocks);
     struct cache_block const* ref = blocks[pos];
     tr_block_index_t block = ref->block;
+    int len = 0;
 
-    for (i = pos; i < n; ++i, ++block)
+    for (int i = pos; i < n; ++i, ++block, ++len)
     {
         struct cache_block const* b = blocks[i];
 
@@ -102,19 +102,19 @@ static int getBlockRun(tr_cache const* cache, int pos, struct run_info* info)
         // fprintf(stderr, "pos %d tor %d block %zu time %zu\n", i, b->tor->uniqueId, (size_t)b->block, (size_t)b->time);
     }
 
-    // fprintf(stderr, "run is %d long from [%d to %d)\n", (int)(i - pos), i, (int)pos);
+    // fprintf(stderr, "run is %d long from [%d to %d)\n", len, pos, pos + len);
 
     if (info != NULL)
     {
-        struct cache_block const* b = blocks[i - 1];
+        struct cache_block const* b = blocks[pos + len - 1];
         info->last_block_time = b->time;
         info->is_piece_done = tr_torrentPieceIsComplete(b->tor, b->piece);
         info->is_multi_piece = b->piece != blocks[pos]->piece;
-        info->len = i - pos;
+        info->len = len;
         info->pos = pos;
     }
 
-    return i - pos;
+    return len;
 }
 
 /* higher rank comes before lower rank */
@@ -140,10 +140,9 @@ static int calcRuns(tr_cache* cache, struct run_info* runs)
 {
     int const n = tr_ptrArraySize(&cache->blocks);
     int i = 0;
-    int pos;
     time_t const now = tr_time();
 
-    for (pos = 0; pos < n; pos += runs[i++].len)
+    for (int pos = 0; pos < n; pos += runs[i++].len)
     {
         int rank = getBlockRun(cache, pos, &runs[i]);
 
@@ -172,7 +171,6 @@ static int calcRuns(tr_cache* cache, struct run_info* runs)
 
 static int flushContiguous(tr_cache* cache, int pos, int n)
 {
-    int i;
     int err = 0;
     uint8_t* buf = tr_new(uint8_t, n * MAX_BLOCK_SIZE);
     uint8_t* walk = buf;
@@ -183,9 +181,9 @@ static int flushContiguous(tr_cache* cache, int pos, int n)
     tr_piece_index_t const piece = b->piece;
     uint32_t const offset = b->offset;
 
-    for (i = pos; i < pos + n; ++i)
+    for (int i = 0; i < n; ++i)
     {
-        b = blocks[i];
+        b = blocks[pos + i];
         evbuffer_copyout(b->evbuf, walk, b->length);
         walk += b->length;
         evbuffer_free(b->evbuf);
@@ -204,16 +202,13 @@ static int flushContiguous(tr_cache* cache, int pos, int n)
 
 static int flushRuns(tr_cache* cache, struct run_info* runs, int n)
 {
-    int i;
     int err = 0;
 
-    for (i = 0; err == 0 && i < n; i++)
+    for (int i = 0; err == 0 && i < n; i++)
     {
-        int j;
-
         err = flushContiguous(cache, runs[i].pos, runs[i].len);
 
-        for (j = i + 1; j < n; j++)
+        for (int j = i + 1; j < n; j++)
         {
             if (runs[j].pos > runs[i].pos)
             {

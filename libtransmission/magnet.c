@@ -13,6 +13,7 @@
 #include "transmission.h"
 #include "crypto-utils.h" /* tr_hex_to_sha1() */
 #include "magnet.h"
+#include "utils.h"
 #include "variant.h"
 #include "web.h"
 
@@ -37,20 +38,17 @@ static int const base32Lookup[] =
     0x17, 0x18, 0x19, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF /* 'x', 'y', 'z', '{', '|', '}', '~', 'DEL' */
 };
 
-static int const base32LookupLen = sizeof(base32Lookup) / sizeof(base32Lookup[0]);
+static int const base32LookupLen = TR_N_ELEMENTS(base32Lookup);
 
 static void base32_to_sha1(uint8_t* out, char const* in, size_t const inlen)
 {
     size_t const outlen = 20;
-    size_t i;
-    size_t index;
-    size_t offset;
 
     memset(out, 0, 20);
 
     assert(inlen == 32);
 
-    for (i = 0, index = 0, offset = 0; i < inlen; ++i)
+    for (size_t i = 0, index = 0, offset = 0; i < inlen; ++i)
     {
         int digit;
         int lookup = in[i] - '0';
@@ -124,9 +122,7 @@ tr_magnet_info* tr_magnetParse(char const* uri)
 
     if (uri != NULL && strncmp(uri, "magnet:?", 8) == 0)
     {
-        char const* walk;
-
-        for (walk = uri + 8; walk != NULL && *walk != '\0';)
+        for (char const* walk = uri + 8; walk != NULL && *walk != '\0';)
         {
             char const* key = walk;
             char const* delim = strchr(key, '=');
@@ -224,16 +220,14 @@ void tr_magnetFree(tr_magnet_info* info)
 {
     if (info != NULL)
     {
-        int i;
-
-        for (i = 0; i < info->trackerCount; ++i)
+        for (int i = 0; i < info->trackerCount; ++i)
         {
             tr_free(info->trackers[i]);
         }
 
         tr_free(info->trackers);
 
-        for (i = 0; i < info->webseedCount; ++i)
+        for (int i = 0; i < info->webseedCount; ++i)
         {
             tr_free(info->webseeds[i]);
         }
@@ -247,7 +241,6 @@ void tr_magnetFree(tr_magnet_info* info)
 
 void tr_magnetCreateMetainfo(tr_magnet_info const* info, tr_variant* top)
 {
-    int i;
     tr_variant* d;
     tr_variantInitDict(top, 4);
 
@@ -260,7 +253,7 @@ void tr_magnetCreateMetainfo(tr_magnet_info const* info, tr_variant* top)
     {
         tr_variant* trackers = tr_variantDictAddList(top, TR_KEY_announce_list, info->trackerCount);
 
-        for (i = 0; i < info->trackerCount; ++i)
+        for (int i = 0; i < info->trackerCount; ++i)
         {
             tr_variantListAddStr(tr_variantListAddList(trackers, 1), info->trackers[i]);
         }
@@ -271,7 +264,7 @@ void tr_magnetCreateMetainfo(tr_magnet_info const* info, tr_variant* top)
     {
         tr_variant* urls = tr_variantDictAddList(top, TR_KEY_url_list, info->webseedCount);
 
-        for (i = 0; i < info->webseedCount; ++i)
+        for (int i = 0; i < info->webseedCount; ++i)
         {
             tr_variantListAddStr(urls, info->webseeds[i]);
         }

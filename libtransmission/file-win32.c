@@ -154,7 +154,7 @@ static wchar_t* path_to_native_path_ex(char const* path, int extra_chars_after, 
     bool const is_unc = is_unc_path(path);
 
     /* `-2` for UNC since we overwrite existing prefix slashes */
-    int const extra_chars_before = is_relative ? 0 : (is_unc ? ARRAYSIZE(unc_prefix) - 2 : ARRAYSIZE(local_prefix));
+    int const extra_chars_before = is_relative ? 0 : (is_unc ? TR_N_ELEMENTS(unc_prefix) - 2 : TR_N_ELEMENTS(local_prefix));
 
     /* TODO (?): assert(!is_relative); */
 
@@ -280,7 +280,6 @@ static void create_temp_path(char* path_template, void (* callback)(char const* 
 {
     char* path;
     size_t path_size;
-    int attempt;
     tr_error* my_error = NULL;
 
     assert(path_template != NULL);
@@ -291,7 +290,7 @@ static void create_temp_path(char* path_template, void (* callback)(char const* 
 
     assert(path_size > 0);
 
-    for (attempt = 0; attempt < 100; ++attempt)
+    for (int attempt = 0; attempt < 100; ++attempt)
     {
         size_t i = path_size;
 

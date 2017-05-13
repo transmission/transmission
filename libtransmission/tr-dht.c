@@ -158,7 +158,6 @@ static void bootstrap_from_name(char const* name, tr_port port, int af)
 static void dht_bootstrap(void* closure)
 {
     struct bootstrap_closure* cl = closure;
-    int i;
     int num = cl->len / 6;
     int num6 = cl->len6 / 18;
 
@@ -177,7 +176,7 @@ static void dht_bootstrap(void* closure)
         tr_logAddNamedInfo("DHT", "Bootstrapping from %d IPv6 nodes", num6);
     }
 
-    for (i = 0; i < MAX(num, num6); i++)
+    for (int i = 0; i < MAX(num, num6); ++i)
     {
         if (i < num && !bootstrap_done(cl->session, AF_INET))
         {
@@ -281,7 +280,7 @@ static void dht_bootstrap(void* closure)
 
     if (!bootstrap_done(cl->session, 0))
     {
-        for (i = 0; i < 6; i++)
+        for (int i = 0; i < 6; ++i)
         {
             /* We don't want to abuse our bootstrap nodes, so be very
                slow.  The initial wait is to give other nodes a chance
@@ -449,30 +448,22 @@ void tr_dhtUninit(tr_session* ss)
         char compact[300 * 6];
         char compact6[300 * 18];
         char* dat_file;
-        int i;
-        int j;
         int num = 300;
         int num6 = 300;
         int n = dht_get_nodes(sins, &num, sins6, &num6);
 
         tr_logAddNamedInfo("DHT", "Saving %d (%d + %d) nodes", n, num, num6);
 
-        j = 0;
-
-        for (i = 0; i < num; ++i)
+        for (int i = 0, j = 0; i < num; ++i, j += 6)
         {
             memcpy(compact + j, &sins[i].sin_addr, 4);
             memcpy(compact + j + 4, &sins[i].sin_port, 2);
-            j += 6;
         }
 
-        j = 0;
-
-        for (i = 0; i < num6; ++i)
+        for (int i = 0, j = 0; i < num6; ++i, j += 18)
         {
             memcpy(compact6 + j, &sins6[i].sin6_addr, 16);
             memcpy(compact6 + j + 16, &sins6[i].sin6_port, 2);
-            j += 18;
         }
 
         tr_variantInitDict(&benc, 3);
@@ -654,7 +645,7 @@ static void callback(void* ignore UNUSED, int event, unsigned char const* info_h
 
         if (tor != NULL && tr_torrentAllowsDHT(tor))
         {
-            size_t i, n;
+            size_t n;
             tr_pex* pex;
 
             if (event == DHT_EVENT_VALUES)
@@ -666,7 +657,7 @@ static void callback(void* ignore UNUSED, int event, unsigned char const* info_h
                 pex = tr_peerMgrCompact6ToPex(data, data_len, NULL, 0, &n);
             }
 
-            for (i = 0; i < n; ++i)
+            for (size_t i = 0; i < n; ++i)
             {
                 tr_peerMgrAddPex(tor, TR_PEER_FROM_DHT, pex + i, -1);
             }

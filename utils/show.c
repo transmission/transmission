@@ -95,7 +95,6 @@ static int compare_files_by_name(void const* va, void const* vb)
 
 static void showInfo(tr_info const* inf)
 {
-    unsigned int i;
     char buf[128];
     tr_file** files;
     int prevTier = -1;
@@ -135,7 +134,7 @@ static void showInfo(tr_info const* inf)
 
     printf("\nTRACKERS\n");
 
-    for (i = 0; i < inf->trackerCount; ++i)
+    for (unsigned int i = 0; i < inf->trackerCount; ++i)
     {
         if (prevTier != inf->trackers[i].tier)
         {
@@ -154,7 +153,7 @@ static void showInfo(tr_info const* inf)
     {
         printf("\nWEBSEEDS\n\n");
 
-        for (i = 0; i < inf->webseedCount; ++i)
+        for (unsigned int i = 0; i < inf->webseedCount; ++i)
         {
             printf("  %s\n", inf->webseeds[i]);
         }
@@ -167,14 +166,14 @@ static void showInfo(tr_info const* inf)
     printf("\nFILES\n\n");
     files = tr_new(tr_file*, inf->fileCount);
 
-    for (i = 0; i < inf->fileCount; ++i)
+    for (unsigned int i = 0; i < inf->fileCount; ++i)
     {
         files[i] = &inf->files[i];
     }
 
     qsort(files, inf->fileCount, sizeof(tr_file*), compare_files_by_name);
 
-    for (i = 0; i < inf->fileCount; ++i)
+    for (unsigned int i = 0; i < inf->fileCount; ++i)
     {
         printf("  %s (%s)\n", files[i]->name, tr_formatter_size_B(buf, files[i]->length, sizeof(buf)));
     }
@@ -203,9 +202,7 @@ static CURL* tr_curl_easy_init(struct evbuffer* writebuf)
 
 static void doScrape(tr_info const* inf)
 {
-    unsigned int i;
-
-    for (i = 0; i < inf->trackerCount; ++i)
+    for (unsigned int i = 0; i < inf->trackerCount; ++i)
     {
         CURL* curl;
         CURLcode res;

@@ -424,7 +424,7 @@ bool tr_quark_lookup(void const* str, size_t len, tr_quark* setme)
 {
     struct tr_key_struct tmp;
     struct tr_key_struct* match;
-    static size_t const n_static = sizeof(my_static) / sizeof(struct tr_key_struct);
+    static size_t const n_static = TR_N_ELEMENTS(my_static);
     bool success = false;
 
     assert(n_static == TR_N_KEYS);
@@ -444,11 +444,10 @@ bool tr_quark_lookup(void const* str, size_t len, tr_quark* setme)
     /* was it added during runtime? */
     if (!success && !tr_ptrArrayEmpty(&my_runtime))
     {
-        size_t i;
         struct tr_key_struct** runtime = (struct tr_key_struct**)tr_ptrArrayBase(&my_runtime);
         size_t const n_runtime = tr_ptrArraySize(&my_runtime);
 
-        for (i = 0; i < n_runtime; ++i)
+        for (size_t i = 0; i < n_runtime; ++i)
         {
             if (compareKeys(&tmp, runtime[i]) == 0)
             {

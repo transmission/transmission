@@ -228,19 +228,17 @@ void tr_ctorSetFilePriorities(tr_ctor* ctor, tr_file_index_t const* files, tr_fi
 
 void tr_ctorInitTorrentPriorities(tr_ctor const* ctor, tr_torrent* tor)
 {
-    tr_file_index_t i;
-
-    for (i = 0; i < ctor->lowSize; ++i)
+    for (tr_file_index_t i = 0; i < ctor->lowSize; ++i)
     {
         tr_torrentInitFilePriority(tor, ctor->low[i], TR_PRI_LOW);
     }
 
-    for (i = 0; i < ctor->normalSize; ++i)
+    for (tr_file_index_t i = 0; i < ctor->normalSize; ++i)
     {
         tr_torrentInitFilePriority(tor, ctor->normal[i], TR_PRI_NORMAL);
     }
 
-    for (i = 0; i < ctor->highSize; ++i)
+    for (tr_file_index_t i = 0; i < ctor->highSize; ++i)
     {
         tr_torrentInitFilePriority(tor, ctor->high[i], TR_PRI_HIGH);
     }

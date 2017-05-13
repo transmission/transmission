@@ -310,10 +310,9 @@ static void printMessage(tr_sys_file_t logfile, int level, char const* name, cha
 
 static void pumpLogMessages(tr_sys_file_t logfile)
 {
-    tr_log_message const* l;
     tr_log_message* list = tr_logGetQueue();
 
-    for (l = list; l != NULL; l = l->next)
+    for (tr_log_message const* l = list; l != NULL; l = l->next)
     {
         printMessage(logfile, l->level, l->name, l->message, l->file, l->line);
     }

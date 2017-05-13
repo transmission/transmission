@@ -273,13 +273,12 @@ struct tr_fileset
 
 static void fileset_construct(struct tr_fileset* set, int n)
 {
-    struct tr_cached_file* o;
     struct tr_cached_file const TR_CACHED_FILE_INIT = { false, TR_BAD_SYS_FILE, 0, 0, 0 };
 
     set->begin = tr_new(struct tr_cached_file, n);
     set->end = set->begin + n;
 
-    for (o = set->begin; o != set->end; ++o)
+    for (struct tr_cached_file* o = set->begin; o != set->end; ++o)
     {
         *o = TR_CACHED_FILE_INIT;
     }
@@ -287,11 +286,9 @@ static void fileset_construct(struct tr_fileset* set, int n)
 
 static void fileset_close_all(struct tr_fileset* set)
 {
-    struct tr_cached_file* o;
-
     if (set != NULL)
     {
-        for (o = set->begin; o != set->end; ++o)
+        for (struct tr_cached_file* o = set->begin; o != set->end; ++o)
         {
             if (cached_file_is_open(o))
             {
@@ -310,11 +307,9 @@ static void fileset_destruct(struct tr_fileset* set)
 
 static void fileset_close_torrent(struct tr_fileset* set, int torrent_id)
 {
-    struct tr_cached_file* o;
-
     if (set != NULL)
     {
-        for (o = set->begin; o != set->end; ++o)
+        for (struct tr_cached_file* o = set->begin; o != set->end; ++o)
         {
             if (o->torrent_id == torrent_id && cached_file_is_open(o))
             {
@@ -326,11 +321,9 @@ static void fileset_close_torrent(struct tr_fileset* set, int torrent_id)
 
 static struct tr_cached_file* fileset_lookup(struct tr_fileset* set, int torrent_id, tr_file_index_t i)
 {
-    struct tr_cached_file* o;
-
     if (set != NULL)
     {
-        for (o = set->begin; o != set->end; ++o)
+        for (struct tr_cached_file* o = set->begin; o != set->end; ++o)
         {
             if (torrent_id == o->torrent_id && i == o->file_index && cached_file_is_open(o))
             {
@@ -348,10 +341,8 @@ static struct tr_cached_file* fileset_get_empty_slot(struct tr_fileset* set)
 
     if (set->begin != NULL)
     {
-        struct tr_cached_file* o;
-
         /* try to find an unused slot */
-        for (o = set->begin; o != set->end; ++o)
+        for (struct tr_cached_file* o = set->begin; o != set->end; ++o)
         {
             if (!cached_file_is_open(o))
             {
@@ -360,7 +351,7 @@ static struct tr_cached_file* fileset_get_empty_slot(struct tr_fileset* set)
         }
 
         /* all slots are full... recycle the least recently used */
-        for (cull = NULL, o = set->begin; o != set->end; ++o)
+        for (struct tr_cached_file* o = set->begin; o != set->end; ++o)
         {
             if (cull == NULL || o->used_at < cull->used_at)
             {

@@ -45,7 +45,6 @@
 
 #define MY_NAME "RPC Server"
 #define MY_REALM "Transmission"
-#define TR_N_ELEMENTS(ary) (sizeof(ary) / sizeof(*ary))
 
 struct tr_rpc_server
 {
@@ -175,7 +174,6 @@ static void handle_upload(struct evhttp_request* req, struct tr_rpc_server* serv
     }
     else
     {
-        int i;
         int n;
         bool hasSessionId = false;
         tr_ptrArray parts = TR_PTR_ARRAY_INIT;
@@ -187,22 +185,17 @@ static void handle_upload(struct evhttp_request* req, struct tr_rpc_server* serv
         n = tr_ptrArraySize(&parts);
 
         /* first look for the session id */
-        for (i = 0; i < n; ++i)
+        for (int i = 0; i < n; ++i)
         {
             struct tr_mimepart* p = tr_ptrArrayNth(&parts, i);
 
             if (tr_memmem(p->headers, p->headers_len, TR_RPC_SESSION_ID_HEADER, strlen(TR_RPC_SESSION_ID_HEADER)) != NULL)
             {
+                char const* ours = get_current_session_id(server);
+                size_t const ourlen = strlen(ours);
+                hasSessionId = ourlen <= p->body_len && memcmp(p->body, ours, ourlen) == 0;
                 break;
             }
-        }
-
-        if (i < n)
-        {
-            struct tr_mimepart const* p = tr_ptrArrayNth(&parts, i);
-            char const* ours = get_current_session_id(server);
-            size_t const ourlen = strlen(ours);
-            hasSessionId = ourlen <= p->body_len && memcmp(p->body, ours, ourlen) == 0;
         }
 
         if (!hasSessionId)
@@ -216,7 +209,7 @@ static void handle_upload(struct evhttp_request* req, struct tr_rpc_server* serv
         }
         else
         {
-            for (i = 0; i < n; ++i)
+            for (int i = 0; i < n; ++i)
             {
                 struct tr_mimepart* p = tr_ptrArrayNth(&parts, i);
                 size_t body_len = p->body_len;
@@ -278,8 +271,6 @@ static void handle_upload(struct evhttp_request* req, struct tr_rpc_server* serv
 
 static char const* mimetype_guess(char const* path)
 {
-    unsigned int i;
-
     struct
     {
         char const* suffix;
@@ -297,7 +288,7 @@ static char const* mimetype_guess(char const* path)
     };
     char const* dot = strrchr(path, '.');
 
-    for (i = 0; dot != NULL && i < TR_N_ELEMENTS(types); ++i)
+    for (unsigned int i = 0; dot != NULL && i < TR_N_ELEMENTS(types); ++i)
     {
         if (strcmp(dot + 1, types[i].suffix) == 0)
         {
@@ -547,14 +538,12 @@ static void handle_rpc(struct evhttp_request* req, struct tr_rpc_server* server)
 
 static bool isAddressAllowed(tr_rpc_server const* server, char const* address)
 {
-    tr_list* l;
-
     if (!server->isWhitelistEnabled)
     {
         return true;
     }
 
-    for (l = server->whitelist; l != NULL; l = l->next)
+    for (tr_list* l = server->whitelist; l != NULL; l = l->next)
     {
         if (tr_wildmat(address, l->data))
         {
@@ -849,7 +838,6 @@ char const* tr_rpcGetUrl(tr_rpc_server const* server)
 void tr_rpcSetWhitelist(tr_rpc_server* server, char const* whitelistStr)
 {
     void* tmp;
-    char const* walk;
 
     /* keep the string */
     tmp = server->whitelistStr;
@@ -863,7 +851,7 @@ void tr_rpcSetWhitelist(tr_rpc_server* server, char const* whitelistStr)
     }
 
     /* build the new whitelist entries */
-    for (walk = whitelistStr; walk != NULL && *walk != '\0';)
+    for (char const* walk = whitelistStr; walk != NULL && *walk != '\0';)
     {
         char const* delimiters = " ,;";
         size_t const len = strcspn(walk, delimiters);

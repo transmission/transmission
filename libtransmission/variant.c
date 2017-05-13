@@ -228,15 +228,11 @@ static int dictIndexOf(tr_variant const* dict, tr_quark const key)
 {
     if (tr_variantIsDict(dict))
     {
-        tr_variant const* walk;
-        tr_variant const* const begin = dict->val.l.vals;
-        tr_variant const* const end = begin + dict->val.l.count;
-
-        for (walk = begin; walk != end; ++walk)
+        for (size_t i = 0; i < dict->val.l.count; ++i)
         {
-            if (walk->key == key)
+            if (dict->val.l.vals[i].key == key)
             {
-                return walk - begin;
+                return (int)i;
             }
         }
     }
@@ -763,11 +759,10 @@ static void nodeConstruct(struct SaveNode* node, tr_variant const* v, bool sort_
     {
         /* make node->sorted a sorted version of this dictionary */
 
-        size_t i;
         size_t const n = v->val.l.count;
         struct KeyIndex* tmp = tr_new(struct KeyIndex, n);
 
-        for (i = 0; i < n; i++)
+        for (size_t i = 0; i < n; i++)
         {
             tmp[i].val = v->val.l.vals + i;
             tmp[i].keystr = tr_quark_get_string(tmp[i].val->key, NULL);
@@ -777,7 +772,7 @@ static void nodeConstruct(struct SaveNode* node, tr_variant const* v, bool sort_
 
         tr_variantInitDict(&node->sorted, n);
 
-        for (i = 0; i < n; ++i)
+        for (size_t i = 0; i < n; ++i)
         {
             node->sorted.val.l.vals[i] = *tmp[i].val;
         }
@@ -1027,7 +1022,6 @@ bool tr_variantDictChild(tr_variant* dict, size_t n, tr_quark* key, tr_variant**
 
 void tr_variantMergeDicts(tr_variant* target, tr_variant const* source)
 {
-    size_t i;
     size_t const sourceCount = tr_variantDictSize(source);
 
     assert(tr_variantIsDict(target));
@@ -1035,7 +1029,7 @@ void tr_variantMergeDicts(tr_variant* target, tr_variant const* source)
 
     tr_variantDictReserve(target, sourceCount + tr_variantDictSize(target));
 
-    for (i = 0; i < sourceCount; ++i)
+    for (size_t i = 0; i < sourceCount; ++i)
     {
         tr_quark key;
         tr_variant* val;

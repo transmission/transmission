@@ -136,14 +136,12 @@ static BuiltinIconInfo const my_fallback_icons[] =
 
 static void register_my_icons(void)
 {
-    int i;
-    int const n = G_N_ELEMENTS(my_fallback_icons);
     GtkIconTheme* theme = gtk_icon_theme_get_default();
     GtkIconFactory* factory = gtk_icon_factory_new();
 
     gtk_icon_factory_add_default(factory);
 
-    for (i = 0; i < n; ++i)
+    for (size_t i = 0; i < G_N_ELEMENTS(my_fallback_icons); ++i)
     {
         char const* name = my_fallback_icons[i].name;
 
@@ -185,9 +183,7 @@ void gtr_actions_set_core(TrCore* core)
 
 void gtr_actions_init(GtkUIManager* ui_manager, gpointer callback_user_data)
 {
-    int i;
-    int n;
-    int active;
+    int active = -1;
     char const* match;
     int const n_entries = G_N_ELEMENTS(entries);
     GtkActionGroup* action_group;
@@ -201,7 +197,7 @@ void gtr_actions_init(GtkUIManager* ui_manager, gpointer callback_user_data)
 
     match = gtr_pref_string_get(TR_KEY_sort_mode);
 
-    for (i = 0, n = G_N_ELEMENTS(sort_radio_entries), active = -1; active == -1 && i < n; ++i)
+    for (size_t i = 0; active == -1 && i < G_N_ELEMENTS(sort_radio_entries); ++i)
     {
         if (g_strcmp0(sort_radio_entries[i].name, match) == 0)
         {
@@ -214,7 +210,7 @@ void gtr_actions_init(GtkUIManager* ui_manager, gpointer callback_user_data)
 
     gtk_action_group_add_toggle_actions(action_group, show_toggle_entries, G_N_ELEMENTS(show_toggle_entries), callback_user_data);
 
-    for (i = 0, n = G_N_ELEMENTS(pref_toggle_entries); i < n; ++i)
+    for (size_t i = 0; i < G_N_ELEMENTS(pref_toggle_entries); ++i)
     {
         pref_toggle_entries[i].is_active = gtr_pref_flag_get(tr_quark_new(pref_toggle_entries[i].name, TR_BAD_SIZE));
     }
@@ -235,8 +231,6 @@ static GHashTable* key_to_action = NULL;
 
 static void ensure_action_map_loaded(GtkUIManager* uim)
 {
-    GList* l;
-
     if (key_to_action != NULL)
     {
         return;
@@ -244,12 +238,12 @@ static void ensure_action_map_loaded(GtkUIManager* uim)
 
     key_to_action = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, NULL);
 
-    for (l = gtk_ui_manager_get_action_groups(uim); l != NULL; l = l->next)
+    for (GList* l = gtk_ui_manager_get_action_groups(uim); l != NULL; l = l->next)
     {
         GtkActionGroup* action_group = GTK_ACTION_GROUP(l->data);
-        GList* ait, * actions = gtk_action_group_list_actions(action_group);
+        GList* actions = gtk_action_group_list_actions(action_group);
 
-        for (ait = actions; ait != NULL; ait = ait->next)
+        for (GList* ait = actions; ait != NULL; ait = ait->next)
         {
             GtkAction* action = GTK_ACTION(ait->data);
             char const* name = gtk_action_get_name(action);

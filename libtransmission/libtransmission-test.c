@@ -141,12 +141,11 @@ bool check_ptr_eq_impl(char const* file, int line, void const* expected, void co
 
 int runTests(testFunc const* const tests, int numTests)
 {
-    int i;
     int ret;
 
     (void)current_test; /* Use test even if we don't have any tests to run */
 
-    for (i = 0; i < numTests; i++)
+    for (int i = 0; i < numTests; i++)
     {
         if ((ret = (*tests[i])()) != 0)
         {
@@ -412,12 +411,9 @@ tr_torrent* libttest_zero_torrent_init(tr_session* session)
 
 void libttest_zero_torrent_populate(tr_torrent* tor, bool complete)
 {
-    tr_file_index_t i;
-
-    for (i = 0; i < tor->info.fileCount; ++i)
+    for (tr_file_index_t i = 0; i < tor->info.fileCount; ++i)
     {
         int err;
-        uint64_t j;
         tr_sys_file_t fd;
         char* path;
         char* dirname;
@@ -436,9 +432,9 @@ void libttest_zero_torrent_populate(tr_torrent* tor, bool complete)
         tr_sys_dir_create(dirname, TR_SYS_DIR_CREATE_PARENTS, 0700, NULL);
         fd = tr_sys_file_open(path, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE, 0600, NULL);
 
-        for (j = 0; j < file->length; ++j)
+        for (uint64_t j = 0; j < file->length; ++j)
         {
-            tr_sys_file_write(fd, ((!complete) && (i == 0) && (j < tor->info.pieceSize)) ? "\1" : "\0", 1, NULL, NULL);
+            tr_sys_file_write(fd, (!complete && i == 0 && j < tor->info.pieceSize) ? "\1" : "\0", 1, NULL, NULL);
         }
 
         tr_sys_file_close(fd, NULL);

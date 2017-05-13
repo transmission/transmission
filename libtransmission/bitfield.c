@@ -87,19 +87,18 @@ static size_t countRange(tr_bitfield const* b, size_t begin, size_t end)
     }
     else
     {
-        size_t i;
         uint8_t val;
         size_t const walk_end = MIN(b->alloc_count, last_byte);
 
         /* first byte */
-        i = begin - (first_byte * 8);
+        size_t const first_shift = begin - (first_byte * 8);
         val = b->bits[first_byte];
-        val <<= i;
-        val >>= i;
+        val <<= first_shift;
+        val >>= first_shift;
         ret += trueBitCount[val];
 
         /* middle bytes */
-        for (i = first_byte + 1; i < walk_end; ++i)
+        for (size_t i = first_byte + 1; i < walk_end; ++i)
         {
             ret += trueBitCount[b->bits[i]];
         }
@@ -107,10 +106,10 @@ static size_t countRange(tr_bitfield const* b, size_t begin, size_t end)
         /* last byte */
         if (last_byte < b->alloc_count)
         {
-            i = (last_byte + 1) * 8 - end;
+            size_t const last_shift = (last_byte + 1) * 8 - end;
             val = b->bits[last_byte];
-            val >>= i;
-            val <<= i;
+            val >>= last_shift;
+            val <<= last_shift;
             ret += trueBitCount[val];
         }
     }
@@ -381,13 +380,12 @@ void tr_bitfieldSetRaw(tr_bitfield* b, void const* bits, size_t byte_count, bool
 
 void tr_bitfieldSetFromFlags(tr_bitfield* b, bool const* flags, size_t n)
 {
-    size_t i;
     size_t trueCount = 0;
 
     tr_bitfieldFreeArray(b);
     tr_bitfieldEnsureBitsAlloced(b, n);
 
-    for (i = 0; i < n; ++i)
+    for (size_t i = 0; i < n; ++i)
     {
         if (flags[i])
         {

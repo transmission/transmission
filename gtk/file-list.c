@@ -527,7 +527,6 @@ void gtr_file_list_set_torrent(GtkWidget* w, int torrentId)
 
         if (tor != NULL)
         {
-            tr_file_index_t i;
             tr_info const* inf = tr_torrentInfo(tor);
             struct row_struct* root_data;
             GNode* root;
@@ -540,14 +539,13 @@ void gtr_file_list_set_torrent(GtkWidget* w, int torrentId)
             root_data->length = 0;
             root = g_node_new(root_data);
 
-            for (i = 0; i < inf->fileCount; ++i)
+            for (tr_file_index_t i = 0; i < inf->fileCount; ++i)
             {
-                int j;
                 GNode* parent = root;
                 tr_file const* file = &inf->files[i];
                 char** tokens = g_strsplit(file->name, G_DIR_SEPARATOR_S, 0);
 
-                for (j = 0; tokens[j]; ++j)
+                for (int j = 0; tokens[j] != NULL; ++j)
                 {
                     gboolean const isLeaf = tokens[j + 1] == NULL;
                     char const* name = tokens[j];

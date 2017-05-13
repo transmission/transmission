@@ -1376,11 +1376,10 @@ int tr_peerIoFlush(tr_peerIo* io, tr_direction dir, size_t limit)
 int tr_peerIoFlushOutgoingProtocolMsgs(tr_peerIo* io)
 {
     size_t byteCount = 0;
-    struct tr_datatype const* it;
 
     /* count up how many bytes are used by non-piece-data messages
        at the front of our outbound queue */
-    for (it = io->outbuf_datatypes; it != NULL; it = it->next)
+    for (struct tr_datatype const* it = io->outbuf_datatypes; it != NULL; it = it->next)
     {
         if (it->isPieceData)
         {

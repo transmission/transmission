@@ -698,13 +698,12 @@ static int test_path_basename_dirname(void)
 #endif
     };
 
-    if (test_path_xname(common_xname_tests, sizeof(common_xname_tests) / sizeof(*common_xname_tests),
-        tr_sys_path_basename) != 0)
+    if (test_path_xname(common_xname_tests, TR_N_ELEMENTS(common_xname_tests), tr_sys_path_basename) != 0)
     {
         return 1;
     }
 
-    if (test_path_xname(common_xname_tests, sizeof(common_xname_tests) / sizeof(*common_xname_tests), tr_sys_path_dirname) != 0)
+    if (test_path_xname(common_xname_tests, TR_N_ELEMENTS(common_xname_tests), tr_sys_path_dirname) != 0)
     {
         return 1;
     }
@@ -733,7 +732,7 @@ static int test_path_basename_dirname(void)
 #endif
     };
 
-    if (test_path_xname(basename_tests, sizeof(basename_tests) / sizeof(*basename_tests), tr_sys_path_basename) != 0)
+    if (test_path_xname(basename_tests, TR_N_ELEMENTS(basename_tests), tr_sys_path_basename) != 0)
     {
         return 1;
     }
@@ -767,7 +766,7 @@ static int test_path_basename_dirname(void)
 #endif
     };
 
-    if (test_path_xname(dirname_tests, sizeof(dirname_tests) / sizeof(*dirname_tests), tr_sys_path_dirname) != 0)
+    if (test_path_xname(dirname_tests, TR_N_ELEMENTS(dirname_tests), tr_sys_path_dirname) != 0)
     {
         return 1;
     }
@@ -1298,31 +1297,31 @@ static int test_file_utilities(void)
 
     fd = tr_sys_file_open(path1, TR_SYS_FILE_READ, 0, NULL);
 
-    check(tr_sys_file_read_line(fd, buffer, sizeof(buffer) / sizeof(*buffer), &err));
+    check(tr_sys_file_read_line(fd, buffer, TR_N_ELEMENTS(buffer), &err));
     check(err == NULL);
     check_streq("a", buffer);
-    check(tr_sys_file_read_line(fd, buffer, sizeof(buffer) / sizeof(*buffer), &err));
+    check(tr_sys_file_read_line(fd, buffer, TR_N_ELEMENTS(buffer), &err));
     check(err == NULL);
     check_streq("bc", buffer);
-    check(tr_sys_file_read_line(fd, buffer, sizeof(buffer) / sizeof(*buffer), &err));
+    check(tr_sys_file_read_line(fd, buffer, TR_N_ELEMENTS(buffer), &err));
     check(err == NULL);
     check_streq("def", buffer);
-    check(tr_sys_file_read_line(fd, buffer, sizeof(buffer) / sizeof(*buffer), &err));
+    check(tr_sys_file_read_line(fd, buffer, TR_N_ELEMENTS(buffer), &err));
     check(err == NULL);
     check_streq("ghij", buffer);
-    check(tr_sys_file_read_line(fd, buffer, sizeof(buffer) / sizeof(*buffer), &err));
+    check(tr_sys_file_read_line(fd, buffer, TR_N_ELEMENTS(buffer), &err));
     check(err == NULL);
     check_streq("", buffer);
-    check(tr_sys_file_read_line(fd, buffer, sizeof(buffer) / sizeof(*buffer), &err));
+    check(tr_sys_file_read_line(fd, buffer, TR_N_ELEMENTS(buffer), &err));
     check(err == NULL);
     check_streq("", buffer);
     check(tr_sys_file_read_line(fd, buffer, 4, &err));
     check(err == NULL);
     check_streq("klmn", buffer);
-    check(tr_sys_file_read_line(fd, buffer, sizeof(buffer) / sizeof(*buffer), &err));
+    check(tr_sys_file_read_line(fd, buffer, TR_N_ELEMENTS(buffer), &err));
     check(err == NULL);
     check_streq("o", buffer);
-    check(!tr_sys_file_read_line(fd, buffer, sizeof(buffer) / sizeof(*buffer), &err));
+    check(!tr_sys_file_read_line(fd, buffer, TR_N_ELEMENTS(buffer), &err));
     check(err == NULL);
     check_streq("o", buffer); /* on EOF, buffer stays unchanged */
 
@@ -1347,28 +1346,28 @@ static int test_file_utilities(void)
 
     tr_sys_file_seek(fd, 0, TR_SEEK_SET, NULL, NULL);
 
-    check(tr_sys_file_read_line(fd, buffer, sizeof(buffer) / sizeof(*buffer), &err));
+    check(tr_sys_file_read_line(fd, buffer, TR_N_ELEMENTS(buffer), &err));
     check(err == NULL);
     check_streq("p", buffer);
-    check(tr_sys_file_read_line(fd, buffer, sizeof(buffer) / sizeof(*buffer), &err));
+    check(tr_sys_file_read_line(fd, buffer, TR_N_ELEMENTS(buffer), &err));
     check(err == NULL);
     check_streq("", buffer);
-    check(tr_sys_file_read_line(fd, buffer, sizeof(buffer) / sizeof(*buffer), &err));
+    check(tr_sys_file_read_line(fd, buffer, TR_N_ELEMENTS(buffer), &err));
     check(err == NULL);
     check_streq("qr", buffer);
-    check(tr_sys_file_read_line(fd, buffer, sizeof(buffer) / sizeof(*buffer), &err));
+    check(tr_sys_file_read_line(fd, buffer, TR_N_ELEMENTS(buffer), &err));
     check(err == NULL);
     check_streq("stu", buffer);
-    check(tr_sys_file_read_line(fd, buffer, sizeof(buffer) / sizeof(*buffer), &err));
+    check(tr_sys_file_read_line(fd, buffer, TR_N_ELEMENTS(buffer), &err));
     check(err == NULL);
     check_streq("", buffer);
-    check(tr_sys_file_read_line(fd, buffer, sizeof(buffer) / sizeof(*buffer), &err));
+    check(tr_sys_file_read_line(fd, buffer, TR_N_ELEMENTS(buffer), &err));
     check(err == NULL);
     check_streq("", buffer);
-    check(tr_sys_file_read_line(fd, buffer, sizeof(buffer) / sizeof(*buffer), &err));
+    check(tr_sys_file_read_line(fd, buffer, TR_N_ELEMENTS(buffer), &err));
     check(err == NULL);
     check_streq("vwxy2", buffer);
-    check(!tr_sys_file_read_line(fd, buffer, sizeof(buffer) / sizeof(*buffer), &err));
+    check(!tr_sys_file_read_line(fd, buffer, TR_N_ELEMENTS(buffer), &err));
     check(err == NULL);
     check_streq("vwxy2", buffer); /* on EOF, buffer stays unchanged */
 

@@ -145,7 +145,6 @@ static int test_utf8(void)
 
 static int test_numbers(void)
 {
-    int i;
     int count;
     int* numbers;
 
@@ -163,7 +162,7 @@ static int test_numbers(void)
     check(count == 7);
     check(numbers != NULL);
 
-    for (i = 0; i < count; ++i)
+    for (int i = 0; i < count; ++i)
     {
         check_int_eq(i + 1, numbers[i]);
     }
@@ -194,13 +193,12 @@ static int compareInts(void const* va, void const* vb)
 
 static int test_lowerbound(void)
 {
-    int i;
     int const A[] = { 1, 2, 3, 3, 3, 5, 8 };
     int const expected_pos[] = { 0, 1, 2, 5, 5, 6, 6, 6, 7, 7 };
     bool const expected_exact[] = { true, true, true, false, true, false, false, true, false, false };
-    int const N = sizeof(A) / sizeof(A[0]);
+    int const N = TR_N_ELEMENTS(A);
 
-    for (i = 1; i <= 10; i++)
+    for (int i = 1; i <= 10; i++)
     {
         bool exact;
         int const pos = tr_lowerBound(&i, A, N, sizeof(int), compareInts, &exact);
@@ -230,12 +228,11 @@ static int test_lowerbound(void)
 
 static int test_quickFindFirst_Iteration(size_t const k, size_t const n, int* buf, int range)
 {
-    size_t i;
     int highest_low;
     int lowest_high;
 
     /* populate buf with random ints */
-    for (i = 0; i < n; ++i)
+    for (size_t i = 0; i < n; ++i)
     {
         buf[i] = tr_rand_int_weak(range);
     }
@@ -247,7 +244,7 @@ static int test_quickFindFirst_Iteration(size_t const k, size_t const n, int* bu
 
     highest_low = INT_MIN;
 
-    for (i = 0; i < k; ++i)
+    for (size_t i = 0; i < k; ++i)
     {
         if (highest_low < buf[i])
         {
@@ -257,7 +254,7 @@ static int test_quickFindFirst_Iteration(size_t const k, size_t const n, int* bu
 
     lowest_high = INT_MAX;
 
-    for (i = k; i < n; ++i)
+    for (size_t i = k; i < n; ++i)
     {
         if (lowest_high > buf[i])
         {
@@ -272,13 +269,12 @@ static int test_quickFindFirst_Iteration(size_t const k, size_t const n, int* bu
 
 static int test_quickfindFirst(void)
 {
-    size_t i;
     size_t const k = 10;
     size_t const n = 100;
     size_t const n_trials = 1000;
     int* buf = tr_new(int, n);
 
-    for (i = 0; i < n_trials; ++i)
+    for (size_t i = 0; i < n_trials; ++i)
     {
         check_int_eq(0, test_quickFindFirst_Iteration(k, n, buf, 100));
     }
@@ -315,20 +311,19 @@ static int test_hex(void)
 
 static int test_array(void)
 {
-    size_t i;
     size_t array[10] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
-    size_t n = sizeof(array) / sizeof(array[0]);
+    size_t n = TR_N_ELEMENTS(array);
 
     tr_removeElementFromArray(array, 5u, sizeof(size_t), n--);
 
-    for (i = 0; i < n; ++i)
+    for (size_t i = 0; i < n; ++i)
     {
         check_int_eq(i < 5 ? i : i + 1, array[i]);
     }
 
     tr_removeElementFromArray(array, 0u, sizeof(size_t), n--);
 
-    for (i = 0; i < n; ++i)
+    for (size_t i = 0; i < n; ++i)
     {
         check_int_eq(i < 4 ? i + 1 : i + 2, array[i]);
     }
@@ -336,7 +331,7 @@ static int test_array(void)
     tr_removeElementFromArray(array, n - 1, sizeof(size_t), n);
     n--;
 
-    for (i = 0; i < n; ++i)
+    for (size_t i = 0; i < n; ++i)
     {
         check_int_eq(i < 4 ? i + 1 : i + 2, array[i]);
     }

@@ -14,7 +14,6 @@
 
 static int test1(void)
 {
-    int i;
     char const* uri;
     tr_magnet_info* info;
     int const dec[] =
@@ -39,7 +38,7 @@ static int test1(void)
     check_streq("http://server.webseed.org/path/to/file", info->webseeds[0]);
     check_streq("Display Name", info->displayName);
 
-    for (i = 0; i < 20; ++i)
+    for (int i = 0; i < 20; ++i)
     {
         check(info->hash[i] == dec[i]);
     }
@@ -64,7 +63,7 @@ static int test1(void)
     check_streq("http://server.webseed.org/path/to/file", info->webseeds[0]);
     check_streq("Display Name", info->displayName);
 
-    for (i = 0; i < 20; ++i)
+    for (int i = 0; i < 20; ++i)
     {
         check(info->hash[i] == dec[i]);
     }

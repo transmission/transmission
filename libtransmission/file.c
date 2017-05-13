@@ -26,9 +26,6 @@ bool tr_sys_file_read_line(tr_sys_file_t handle, char* buffer, size_t buffer_siz
 
     while (buffer_size > 0)
     {
-        size_t i;
-        bool found_eol = false;
-
         ret = tr_sys_file_read(handle, buffer + offset, MIN(buffer_size, 1024u), &bytes_read, error);
 
         if (!ret || (offset == 0 && bytes_read == 0))
@@ -37,19 +34,19 @@ bool tr_sys_file_read_line(tr_sys_file_t handle, char* buffer, size_t buffer_siz
             break;
         }
 
-        for (i = 0; i < bytes_read; ++i, ++offset, --buffer_size)
+        int64_t delta = 0;
+
+        for (size_t i = 0; i < bytes_read; ++i, ++offset, --buffer_size)
         {
             if (buffer[offset] == '\n')
             {
-                found_eol = true;
+                delta = i - (int64_t)bytes_read + 1;
                 break;
             }
         }
 
-        if (found_eol || buffer_size == 0 || bytes_read == 0)
+        if (delta != 0 || buffer_size == 0 || bytes_read == 0)
         {
-            int64_t const delta = -(int64_t)bytes_read + i + (found_eol ? 1 : 0);
-
             if (delta != 0)
             {
                 ret = tr_sys_file_seek(handle, delta, TR_SEEK_CUR, NULL, error);

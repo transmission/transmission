@@ -9,6 +9,7 @@
 #include "libtransmission-test.h"
 
 #include "transmission.h"
+#include "utils.h"
 
 #include <errno.h>
 
@@ -51,7 +52,6 @@ static int test_magnet_link(void)
 
 static int test_metainfo(void)
 {
-    size_t i;
     struct
     {
         int expected_benc_err;
@@ -83,7 +83,7 @@ static int test_metainfo(void)
 
     tr_logSetLevel(0); /* yes, we already know these will generate errors, thank you... */
 
-    for (i = 0; i < (sizeof(metainfo) / sizeof(metainfo[0])); i++)
+    for (size_t i = 0; i < TR_N_ELEMENTS(metainfo); i++)
     {
         tr_ctor* ctor = tr_ctorNew(NULL);
         int const err = tr_ctorSetMetainfo(ctor, metainfo[i].benc, strlen(metainfo[i].benc));

@@ -594,24 +594,19 @@ size_t tr_generateAllowedSet(tr_piece_index_t* setmePieces, size_t desiredSetSiz
 
         while (setSize < desiredSetSize)
         {
-            int i;
-
-            for (i = 0; i < 5 && setSize < desiredSetSize; ++i) /* (4) */
+            for (int i = 0; i < 5 && setSize < desiredSetSize; ++i) /* (4) */
             {
-                size_t k;
                 uint32_t j = i * 4; /* (5) */
                 uint32_t y = ntohl(*(uint32_t*)(x + j)); /* (6) */
                 uint32_t index = y % pieceCount; /* (7) */
+                bool found = false;
 
-                for (k = 0; k < setSize; ++k) /* (8) */
+                for (size_t k = 0; !found && k < setSize; ++k) /* (8) */
                 {
-                    if (setmePieces[k] == index)
-                    {
-                        break;
-                    }
+                    found = setmePieces[k] == index;
                 }
 
-                if (k == setSize)
+                if (!found)
                 {
                     setmePieces[setSize++] = index; /* (9) */
                 }
@@ -631,7 +626,6 @@ static void updateFastSet(tr_peerMsgs* msgs UNUSED)
 
     if (fext && peerIsNeedy && !msgs->haveFastSet)
     {
-        size_t i;
         struct tr_address const* addr = tr_peerIoGetAddress(msgs->io, NULL);
         tr_info const* inf = &msgs->torrent->info;
         size_t const numwant = MIN(MAX_FAST_SET_SIZE, inf->pieceCount);
@@ -641,7 +635,7 @@ static void updateFastSet(tr_peerMsgs* msgs UNUSED)
         msgs->haveFastSet = true;
 
         /* send it to the peer */
-        for (i = 0; i < msgs->fastsetSize; ++i)
+        for (size_t i = 0; i < msgs->fastsetSize; ++i)
         {
             protocolSendAllowedFast(msgs, msgs->fastset[i]);
         }
@@ -1170,7 +1164,6 @@ static void parseUtPex(tr_peerMsgs* msgs, uint32_t msglen, struct evbuffer* inbu
         if (tr_variantDictFindRaw(&val, TR_KEY_added, &added, &added_len))
         {
             tr_pex* pex;
-            size_t i;
             size_t n;
             size_t added_f_len = 0;
             uint8_t const* added_f = NULL;
@@ -1180,7 +1173,7 @@ static void parseUtPex(tr_peerMsgs* msgs, uint32_t msglen, struct evbuffer* inbu
 
             n = MIN(n, MAX_PEX_PEER_COUNT);
 
-            for (i = 0; i < n; ++i)
+            for (size_t i = 0; i < n; ++i)
             {
                 int seedProbability = -1;
 
@@ -1198,7 +1191,6 @@ static void parseUtPex(tr_peerMsgs* msgs, uint32_t msglen, struct evbuffer* inbu
         if (tr_variantDictFindRaw(&val, TR_KEY_added6, &added, &added_len))
         {
             tr_pex* pex;
-            size_t i;
             size_t n;
             size_t added_f_len = 0;
             uint8_t const* added_f = NULL;
@@ -1208,7 +1200,7 @@ static void parseUtPex(tr_peerMsgs* msgs, uint32_t msglen, struct evbuffer* inbu
 
             n = MIN(n, MAX_PEX_PEER_COUNT);
 
-            for (i = 0; i < n; ++i)
+            for (size_t i = 0; i < n; ++i)
             {
                 int seedProbability = -1;
 
@@ -1338,14 +1330,12 @@ static void updatePeerProgress(tr_peerMsgs* msgs)
 
 static void prefetchPieces(tr_peerMsgs* msgs)
 {
-    int i;
-
     if (!getSession(msgs)->isPrefetchEnabled)
     {
         return;
     }
 
-    for (i = msgs->prefetchCount; i < msgs->peer.pendingReqsToClient && i < PREFETCH_SIZE; ++i)
+    for (int i = msgs->prefetchCount; i < msgs->peer.pendingReqsToClient && i < PREFETCH_SIZE; ++i)
     {
         struct peer_request const* req = msgs->peerAskedFor + i;
 
@@ -1620,7 +1610,6 @@ static int readBtMessage(tr_peerMsgs* msgs, struct evbuffer* inbuf, size_t inlen
 
     case BT_CANCEL:
         {
-            int i;
             struct peer_request r;
             tr_peerIoReadUint32(msgs->io, inbuf, &r.index);
             tr_peerIoReadUint32(msgs->io, inbuf, &r.offset);
@@ -1628,19 +1617,16 @@ static int readBtMessage(tr_peerMsgs* msgs, struct evbuffer* inbuf, size_t inlen
             tr_historyAdd(&msgs->peer.cancelsSentToClient, tr_time(), 1);
             dbgmsg(msgs, "got a Cancel %u:%u->%u", r.index, r.offset, r.length);
 
-            for (i = 0; i < msgs->peer.pendingReqsToClient; ++i)
+            for (int i = 0; i < msgs->peer.pendingReqsToClient; ++i)
             {
                 struct peer_request const* req = msgs->peerAskedFor + i;
 
                 if (req->index == r.index && req->offset == r.offset && req->length == r.length)
                 {
+                    tr_removeElementFromArray(msgs->peerAskedFor, i, sizeof(struct peer_request),
+                        msgs->peer.pendingReqsToClient--);
                     break;
                 }
-            }
-
-            if (i < msgs->peer.pendingReqsToClient)
-            {
-                tr_removeElementFromArray(msgs->peerAskedFor, i, sizeof(struct peer_request), msgs->peer.pendingReqsToClient--);
             }
 
             break;
@@ -1979,7 +1965,6 @@ static void updateBlockRequests(tr_peerMsgs* msgs)
     if (tr_torrentIsPieceTransferAllowed(msgs->torrent, TR_PEER_TO_CLIENT) && msgs->desiredRequestCount > 0 &&
         msgs->peer.pendingReqsToPeer <= msgs->desiredRequestCount * 0.66)
     {
-        int i;
         int n;
         tr_block_index_t* blocks;
         int const numwant = msgs->desiredRequestCount - msgs->peer.pendingReqsToPeer;
@@ -1990,7 +1975,7 @@ static void updateBlockRequests(tr_peerMsgs* msgs)
         blocks = tr_new(tr_block_index_t, numwant);
         tr_peerMgrGetNextRequests(msgs->torrent, &msgs->peer, numwant, blocks, &n, false);
 
-        for (i = 0; i < n; ++i)
+        for (int i = 0; i < n; ++i)
         {
             struct peer_request req;
             blockToReq(msgs->torrent, blocks[i], &req);
@@ -2417,9 +2402,9 @@ static void sendPex(tr_peerMsgs* msgs)
         }
         else
         {
-            int i;
             tr_variant val;
-            uint8_t* tmp, * walk;
+            uint8_t* tmp;
+            uint8_t* walk;
             struct evbuffer* payload;
             struct evbuffer* out = msgs->outMessages;
 
@@ -2439,7 +2424,7 @@ static void sendPex(tr_peerMsgs* msgs)
                 /* "added" */
                 tmp = walk = tr_new(uint8_t, diffs.addedCount * 6);
 
-                for (i = 0; i < diffs.addedCount; ++i)
+                for (int i = 0; i < diffs.addedCount; ++i)
                 {
                     memcpy(walk, &diffs.added[i].addr.addr, 4);
                     walk += 4;
@@ -2455,7 +2440,7 @@ static void sendPex(tr_peerMsgs* msgs)
                  * unset each holepunch flag because we don't support it. */
                 tmp = walk = tr_new(uint8_t, diffs.addedCount);
 
-                for (i = 0; i < diffs.addedCount; ++i)
+                for (int i = 0; i < diffs.addedCount; ++i)
                 {
                     *walk++ = diffs.added[i].flags & ~ADDED_F_HOLEPUNCH;
                 }
@@ -2470,7 +2455,7 @@ static void sendPex(tr_peerMsgs* msgs)
                 /* "dropped" */
                 tmp = walk = tr_new(uint8_t, diffs.droppedCount * 6);
 
-                for (i = 0; i < diffs.droppedCount; ++i)
+                for (int i = 0; i < diffs.droppedCount; ++i)
                 {
                     memcpy(walk, &diffs.dropped[i].addr.addr, 4);
                     walk += 4;
@@ -2488,7 +2473,7 @@ static void sendPex(tr_peerMsgs* msgs)
                 /* "added6" */
                 tmp = walk = tr_new(uint8_t, diffs6.addedCount * 18);
 
-                for (i = 0; i < diffs6.addedCount; ++i)
+                for (int i = 0; i < diffs6.addedCount; ++i)
                 {
                     memcpy(walk, &diffs6.added[i].addr.addr.addr6.s6_addr, 16);
                     walk += 16;
@@ -2504,7 +2489,7 @@ static void sendPex(tr_peerMsgs* msgs)
                  * unset each holepunch flag because we don't support it. */
                 tmp = walk = tr_new(uint8_t, diffs6.addedCount);
 
-                for (i = 0; i < diffs6.addedCount; ++i)
+                for (int i = 0; i < diffs6.addedCount; ++i)
                 {
                     *walk++ = diffs6.added[i].flags & ~ADDED_F_HOLEPUNCH;
                 }
@@ -2519,7 +2504,7 @@ static void sendPex(tr_peerMsgs* msgs)
                 /* "dropped6" */
                 tmp = walk = tr_new(uint8_t, diffs6.droppedCount * 18);
 
-                for (i = 0; i < diffs6.droppedCount; ++i)
+                for (int i = 0; i < diffs6.droppedCount; ++i)
                 {
                     memcpy(walk, &diffs6.dropped[i].addr.addr.addr6.s6_addr, 16);
                     walk += 16;

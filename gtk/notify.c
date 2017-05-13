@@ -44,7 +44,6 @@ static void tr_notification_free(gpointer data)
 
 static void get_capabilities_callback(GObject* source, GAsyncResult* res, gpointer user_data UNUSED)
 {
-    int i;
     char** caps;
     GVariant* result;
 
@@ -62,7 +61,7 @@ static void get_capabilities_callback(GObject* source, GAsyncResult* res, gpoint
 
     g_variant_get(result, "(^a&s)", &caps);
 
-    for (i = 0; caps[i] != NULL; i++)
+    for (int i = 0; caps[i] != NULL; i++)
     {
         if (g_strcmp0(caps[i], "actions") == 0)
         {

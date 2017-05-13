@@ -38,12 +38,11 @@ static inline bool char_is_path_separator(char c)
 
 char* tr_metainfoGetBasename(tr_info const* inf)
 {
-    size_t i;
     char const* name = inf->originalName;
     size_t const name_len = strlen(name);
     char* ret = tr_strdup_printf("%s.%16.16s", name, inf->hashString);
 
-    for (i = 0; i < name_len; ++i)
+    for (size_t i = 0; i < name_len; ++i)
     {
         if (char_is_path_separator(ret[i]))
         {
@@ -84,15 +83,12 @@ static bool getfile(char** setme, char const* root, tr_variant* path, struct evb
 
     if (tr_variantIsList(path))
     {
-        int i;
-        int const n = tr_variantListSize(path);
-
         success = true;
         evbuffer_drain(buf, evbuffer_get_length(buf));
         root_len = strlen(root);
         evbuffer_add(buf, root, root_len);
 
-        for (i = 0; i < n; i++)
+        for (int i = 0, n = tr_variantListSize(path); i < n; i++)
         {
             size_t len;
             char const* str;
@@ -135,7 +131,6 @@ static char const* parseFiles(tr_info* inf, tr_variant* files, tr_variant const*
 
     if (tr_variantIsList(files)) /* multi-file mode */
     {
-        tr_file_index_t i;
         struct evbuffer* buf;
         char const* result;
 
@@ -151,7 +146,7 @@ static char const* parseFiles(tr_info* inf, tr_variant* files, tr_variant const*
         inf->fileCount = tr_variantListSize(files);
         inf->files = tr_new0(tr_file, inf->fileCount);
 
-        for (i = 0; i < inf->fileCount; i++)
+        for (tr_file_index_t i = 0; i < inf->fileCount; i++)
         {
             tr_variant* file;
             tr_variant* path;
@@ -263,27 +258,24 @@ static char const* getannounce(tr_info* inf, tr_variant* meta)
     if (tr_variantDictFindList(meta, TR_KEY_announce_list, &tiers))
     {
         int n;
-        int i;
-        int j;
-        int validTiers;
         int const numTiers = tr_variantListSize(tiers);
 
         n = 0;
 
-        for (i = 0; i < numTiers; i++)
+        for (int i = 0; i < numTiers; i++)
         {
             n += tr_variantListSize(tr_variantListChild(tiers, i));
         }
 
         trackers = tr_new0(tr_tracker_info, n);
 
-        for (i = 0, validTiers = 0; i < numTiers; i++)
+        for (int i = 0, validTiers = 0; i < numTiers; i++)
         {
             tr_variant* tier = tr_variantListChild(tiers, i);
             int const tierSize = tr_variantListSize(tier);
             bool anyAdded = false;
 
-            for (j = 0; j < tierSize; j++)
+            for (int j = 0; j < tierSize; j++)
             {
                 if (tr_variantGetStr(tr_variantListChild(tier, j), &str, &len))
                 {
@@ -392,13 +384,12 @@ static void geturllist(tr_info* inf, tr_variant* meta)
 
     if (tr_variantDictFindList(meta, TR_KEY_url_list, &urls))
     {
-        int i;
         int const n = tr_variantListSize(urls);
 
         inf->webseedCount = 0;
         inf->webseeds = tr_new0(char*, n);
 
-        for (i = 0; i < n; i++)
+        for (int i = 0; i < n; i++)
         {
             if (tr_variantGetStr(tr_variantListChild(urls, i), &url, NULL))
             {
@@ -605,7 +596,7 @@ static char const* tr_metainfoParseImpl(tr_session const* session, tr_info* inf,
         inf->pieceCount = len / SHA_DIGEST_LENGTH;
         inf->pieces = tr_new0(tr_piece, inf->pieceCount);
 
-        for (i = 0; i < inf->pieceCount; i++)
+        for (tr_piece_index_t i = 0; i < inf->pieceCount; i++)
         {
             memcpy(inf->pieces[i].hash, &raw[i * SHA_DIGEST_LENGTH], SHA_DIGEST_LENGTH);
         }
@@ -663,15 +654,12 @@ bool tr_metainfoParse(tr_session const* session, tr_variant const* meta_in, tr_i
 
 void tr_metainfoFree(tr_info* inf)
 {
-    unsigned int i;
-    tr_file_index_t ff;
-
-    for (i = 0; i < inf->webseedCount; i++)
+    for (unsigned int i = 0; i < inf->webseedCount; i++)
     {
         tr_free(inf->webseeds[i]);
     }
 
-    for (ff = 0; ff < inf->fileCount; ff++)
+    for (tr_file_index_t ff = 0; ff < inf->fileCount; ff++)
     {
         tr_free(inf->files[ff].name);
     }
@@ -685,7 +673,7 @@ void tr_metainfoFree(tr_info* inf)
     tr_free(inf->originalName);
     tr_free(inf->name);
 
-    for (i = 0; i < inf->trackerCount; i++)
+    for (unsigned int i = 0; i < inf->trackerCount; i++)
     {
         tr_free(inf->trackers[i].announce);
         tr_free(inf->trackers[i].scrape);

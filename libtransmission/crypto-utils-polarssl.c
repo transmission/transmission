@@ -82,9 +82,7 @@ static bool check_polarssl_result(int result, int expected_result, char const* f
 
 static int my_rand(void* context UNUSED, unsigned char* buffer, size_t buffer_size)
 {
-    size_t i;
-
-    for (i = 0; i < buffer_size; ++i)
+    for (size_t i = 0; i < buffer_size; ++i)
     {
         buffer[i] = tr_rand_int_weak(256);
     }

@@ -296,7 +296,6 @@ static bool addURL(tr_variant* metainfo, char const* url)
 
 int tr_main(int argc, char* argv[])
 {
-    int i;
     int changedCount = 0;
 
     files = tr_new0(char const*, argc);
@@ -330,7 +329,7 @@ int tr_main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
-    for (i = 0; i < fileCount; ++i)
+    for (int i = 0; i < fileCount; ++i)
     {
         tr_variant top;
         bool changed = false;

@@ -180,7 +180,6 @@ struct tau_scrape_request
 static struct tau_scrape_request* tau_scrape_request_new(tr_scrape_request const* in, tr_scrape_response_func callback,
     void* user_data)
 {
-    int i;
     struct evbuffer* buf;
     struct tau_scrape_request* req;
     tau_transaction_t const transaction_id = tau_transaction_new();
@@ -190,7 +189,7 @@ static struct tau_scrape_request* tau_scrape_request_new(tr_scrape_request const
     evbuffer_add_hton_32(buf, TAU_ACTION_SCRAPE);
     evbuffer_add_hton_32(buf, transaction_id);
 
-    for (i = 0; i < in->info_hash_count; ++i)
+    for (int i = 0; i < in->info_hash_count; ++i)
     {
         evbuffer_add(buf, in->info_hash[i], SHA_DIGEST_LENGTH);
     }
@@ -206,7 +205,7 @@ static struct tau_scrape_request* tau_scrape_request_new(tr_scrape_request const
     req->payload_len = evbuffer_get_length(buf);
     req->payload = tr_memdup(evbuffer_pullup(buf, -1), req->payload_len);
 
-    for (i = 0; i < req->response.row_count; ++i)
+    for (int i = 0; i < req->response.row_count; ++i)
     {
         req->response.rows[i].seeders = -1;
         req->response.rows[i].leechers = -1;
@@ -250,9 +249,7 @@ static void on_scrape_response(struct tau_scrape_request* request, tau_action_t 
 
     if (action == TAU_ACTION_SCRAPE)
     {
-        int i;
-
-        for (i = 0; i < request->response.row_count; ++i)
+        for (int i = 0; i < request->response.row_count; ++i)
         {
             struct tr_scrape_response_row* row;
 
@@ -487,14 +484,12 @@ static void tau_tracker_free(struct tau_tracker* t)
 
 static void tau_tracker_fail_all(struct tau_tracker* tracker, bool did_connect, bool did_timeout, char const* errmsg)
 {
-    int i;
-    int n;
     tr_ptrArray* reqs;
 
     /* fail all the scrapes */
     reqs = &tracker->scrapes;
 
-    for (i = 0, n = tr_ptrArraySize(reqs); i < n; ++i)
+    for (int i = 0, n = tr_ptrArraySize(reqs); i < n; ++i)
     {
         tau_scrape_request_fail(tr_ptrArrayNth(reqs, i), did_connect, did_timeout, errmsg);
     }
@@ -505,7 +500,7 @@ static void tau_tracker_fail_all(struct tau_tracker* tracker, bool did_connect, 
     /* fail all the announces */
     reqs = &tracker->announces;
 
-    for (i = 0, n = tr_ptrArraySize(reqs); i < n; ++i)
+    for (int i = 0, n = tr_ptrArraySize(reqs); i < n; ++i)
     {
         tau_announce_request_fail(tr_ptrArrayNth(reqs, i), did_connect, did_timeout, errmsg);
     }
@@ -548,8 +543,6 @@ static void tau_tracker_send_request(struct tau_tracker* tracker, void const* pa
 
 static void tau_tracker_send_reqs(struct tau_tracker* tracker)
 {
-    int i;
-    int n;
     tr_ptrArray* reqs;
     time_t const now = tr_time();
 
@@ -560,7 +553,7 @@ static void tau_tracker_send_reqs(struct tau_tracker* tracker)
 
     reqs = &tracker->announces;
 
-    for (i = 0, n = tr_ptrArraySize(reqs); i < n; ++i)
+    for (int i = 0, n = tr_ptrArraySize(reqs); i < n; ++i)
     {
         struct tau_announce_request* req = tr_ptrArrayNth(reqs, i);
 
@@ -582,7 +575,7 @@ static void tau_tracker_send_reqs(struct tau_tracker* tracker)
 
     reqs = &tracker->scrapes;
 
-    for (i = 0, n = tr_ptrArraySize(reqs); i < n; ++i)
+    for (int i = 0, n = tr_ptrArraySize(reqs); i < n; ++i)
     {
         struct tau_scrape_request* req = tr_ptrArrayNth(reqs, i);
 
@@ -640,8 +633,6 @@ static void on_tracker_connection_response(struct tau_tracker* tracker, tau_acti
 
 static void tau_tracker_timeout_reqs(struct tau_tracker* tracker)
 {
-    int i;
-    int n;
     tr_ptrArray* reqs;
     time_t const now = time(NULL);
     bool const cancel_all = tracker->close_at != 0 && (tracker->close_at <= now);
@@ -653,7 +644,7 @@ static void tau_tracker_timeout_reqs(struct tau_tracker* tracker)
 
     reqs = &tracker->announces;
 
-    for (i = 0, n = tr_ptrArraySize(reqs); i < n; ++i)
+    for (int i = 0, n = tr_ptrArraySize(reqs); i < n; ++i)
     {
         struct tau_announce_request* req = tr_ptrArrayNth(reqs, i);
 
@@ -670,7 +661,7 @@ static void tau_tracker_timeout_reqs(struct tau_tracker* tracker)
 
     reqs = &tracker->scrapes;
 
-    for (i = 0, n = tr_ptrArraySize(reqs); i < n; ++i)
+    for (int i = 0, n = tr_ptrArraySize(reqs); i < n; ++i)
     {
         struct tau_scrape_request* req = tr_ptrArrayNth(reqs, i);
 
@@ -785,8 +776,6 @@ static struct tr_announcer_udp* announcer_udp_get(tr_session* session)
    If it doesn't exist yet, create one. */
 static struct tau_tracker* tau_session_get_tracker(struct tr_announcer_udp* tau, char const* url)
 {
-    int i;
-    int n;
     int port;
     char* host;
     char* key;
@@ -796,7 +785,7 @@ static struct tau_tracker* tau_session_get_tracker(struct tr_announcer_udp* tau,
     tr_urlParse(url, TR_BAD_SIZE, NULL, &host, &port, NULL);
     key = tr_strdup_printf("%s:%d", host, port);
 
-    for (i = 0, n = tr_ptrArraySize(&tau->trackers); !tracker && i < n; ++i)
+    for (int i = 0, n = tr_ptrArraySize(&tau->trackers); tracker == NULL && i < n; ++i)
     {
         struct tau_tracker* tmp = tr_ptrArrayNth(&tau->trackers, i);
 
@@ -846,13 +835,11 @@ void tr_tracker_udp_upkeep(tr_session* session)
 
 bool tr_tracker_udp_is_idle(tr_session const* session)
 {
-    int i;
-    int n;
     struct tr_announcer_udp* tau = session->announcer_udp;
 
     if (tau != NULL)
     {
-        for (i = 0, n = tr_ptrArraySize(&tau->trackers); i < n; ++i)
+        for (int i = 0, n = tr_ptrArraySize(&tau->trackers); i < n; ++i)
         {
             if (!tau_tracker_is_idle(tr_ptrArrayNth(&tau->trackers, i)))
             {
@@ -887,9 +874,7 @@ void tr_tracker_udp_start_shutdown(tr_session* session)
 
     if (tau != NULL)
     {
-        int i, n;
-
-        for (i = 0, n = tr_ptrArraySize(&tau->trackers); i < n; ++i)
+        for (int i = 0, n = tr_ptrArraySize(&tau->trackers); i < n; ++i)
         {
             struct tau_tracker* tracker = tr_ptrArrayNth(&tau->trackers, i);
 
@@ -908,8 +893,6 @@ void tr_tracker_udp_start_shutdown(tr_session* session)
  * @return true if msg was a tracker response; false otherwise */
 bool tau_handle_message(tr_session* session, uint8_t const* msg, size_t msglen)
 {
-    int i;
-    int n;
     struct tr_announcer_udp* tau;
     tau_action_t action_id;
     tau_transaction_t transaction_id;
@@ -943,9 +926,8 @@ bool tau_handle_message(tr_session* session, uint8_t const* msg, size_t msglen)
     transaction_id = evbuffer_read_ntoh_32(buf);
 
     /* fprintf(stderr, "UDP got a transaction_id %u...\n", transaction_id); */
-    for (i = 0, n = tr_ptrArraySize(&tau->trackers); i < n; ++i)
+    for (int i = 0, n = tr_ptrArraySize(&tau->trackers); i < n; ++i)
     {
-        int j, jn;
         tr_ptrArray* reqs;
         struct tau_tracker* tracker = tr_ptrArrayNth(&tau->trackers, i);
 
@@ -961,7 +943,7 @@ bool tau_handle_message(tr_session* session, uint8_t const* msg, size_t msglen)
         /* is it a response to one of this tracker's announces? */
         reqs = &tracker->announces;
 
-        for (j = 0, jn = tr_ptrArraySize(reqs); j < jn; ++j)
+        for (int j = 0, jn = tr_ptrArraySize(reqs); j < jn; ++j)
         {
             struct tau_announce_request* req = tr_ptrArrayNth(reqs, j);
 
@@ -979,7 +961,7 @@ bool tau_handle_message(tr_session* session, uint8_t const* msg, size_t msglen)
         /* is it a response to one of this tracker's scrapes? */
         reqs = &tracker->scrapes;
 
-        for (j = 0, jn = tr_ptrArraySize(reqs); j < jn; ++j)
+        for (int j = 0, jn = tr_ptrArraySize(reqs); j < jn; ++j)
         {
             struct tau_scrape_request* req = tr_ptrArrayNth(reqs, j);
 

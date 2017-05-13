@@ -20,12 +20,10 @@
 
 static int testPeerId(void)
 {
-    int i;
     uint8_t peer_id[PEER_ID_LEN + 1];
 
-    for (i = 0; i < 100000; ++i)
+    for (int i = 0; i < 100000; ++i)
     {
-        int j;
         int val = 0;
 
         tr_peerIdInit(peer_id);
@@ -33,7 +31,7 @@ static int testPeerId(void)
         check(strlen((char*)peer_id) == PEER_ID_LEN);
         check(memcmp(peer_id, PEERID_PREFIX, 8) == 0);
 
-        for (j = 8; j < PEER_ID_LEN; ++j)
+        for (int j = 8; j < PEER_ID_LEN; ++j)
         {
             char tmp[2] = { (char)peer_id[j], '\0' };
             val += strtoul(tmp, NULL, 36);
