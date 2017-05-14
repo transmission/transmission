@@ -81,6 +81,7 @@ public:
         SORT_BY_SIZE,
         SORT_BY_STATE,
         SORT_BY_ID,
+        SORT_BY_UPLOADED,
         NUM_MODES
     };
 

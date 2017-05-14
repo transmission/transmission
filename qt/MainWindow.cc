@@ -249,7 +249,7 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     ui_.listView->setModel(&filter_model_);
     connect(ui_.listView->selectionModel(), &QItemSelectionModel::selectionChanged, refresh_action_sensitivity_soon);
 
-    std::array<std::pair<QAction*, int>, 9> const sort_modes =
+    std::array<std::pair<QAction*, int>, 10> const sort_modes =
     {{
         { ui_.action_SortByActivity, SortMode::SORT_BY_ACTIVITY },
         { ui_.action_SortByAge, SortMode::SORT_BY_AGE },
@@ -258,6 +258,7 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
         { ui_.action_SortByProgress, SortMode::SORT_BY_PROGRESS },
         { ui_.action_SortByQueue, SortMode::SORT_BY_QUEUE },
         { ui_.action_SortByRatio, SortMode::SORT_BY_RATIO },
+        { ui_.action_SortByUploaded, SortMode::SORT_BY_UPLOADED },
         { ui_.action_SortBySize, SortMode::SORT_BY_SIZE },
         { ui_.action_SortByState, SortMode::SORT_BY_STATE }
     }};

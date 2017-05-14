@@ -252,6 +252,7 @@
     <addaction name="action_SortByProgress"/>
     <addaction name="action_SortByQueue"/>
     <addaction name="action_SortByRatio"/>
+    <addaction name="action_SortByUploaded"/>
     <addaction name="action_SortBySize"/>
     <addaction name="action_SortByState"/>
     <addaction name="action_SortByETA"/>
@@ -561,6 +562,14 @@
    </property>
    <property name="text">
     <string>Sort by Rati&amp;o</string>
+   </property>
+  </action>
+  <action name="action_SortByUploaded">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Sort by &amp;Uploaded</string>
    </property>
   </action>
   <action name="action_SortBySize">
