@@ -856,6 +856,7 @@ void tr_rpcSetWhitelist(tr_rpc_server* server, char const* whitelistStr)
         char const* delimiters = " ,;";
         size_t const len = strcspn(walk, delimiters);
         char* token = tr_strndup(walk, len);
+
         tr_list_append(&server->whitelist, token);
 
         if (strcspn(token, "+-") < len)
@@ -868,12 +869,14 @@ void tr_rpcSetWhitelist(tr_rpc_server* server, char const* whitelistStr)
             tr_logAddNamedInfo(MY_NAME, "Adding address to whitelist: %s", token);
         }
 
-        if (walk[len] == '\0')
+        walk += len;
+
+        if (*walk == '\0')
         {
             break;
         }
 
-        walk += len + 1;
+        ++walk;
     }
 }
 
