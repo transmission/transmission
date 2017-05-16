@@ -129,12 +129,14 @@ BUILT_SOURCES += \
 
 EXTRA_DIST = \
 	$(DESKTOP_IN_FILES) \
+	$(APPDATA_IN_FILES) \
 	$(UI_FILES) \
 	transmission.gresource.xml \
 	transmission.png
 
 DISTCLEANFILES = \
-	transmission-gtk.desktop
+	$(DESKTOP_FILES) \
+	$(APPDATA_FILES)
 
 if WIN32
 
