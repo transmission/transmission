@@ -563,7 +563,7 @@ msgstr "플래그"
 
 #: ../gtk/details.c:1624
 msgid "Optimistic unchoke"
-msgstr "낙관 적인 제한 해제"
+msgstr "낙관적인 제한 해제"
 
 #: ../gtk/details.c:1625
 msgid "Downloading from this peer"
@@ -599,7 +599,7 @@ msgstr "피어 교환(PEX)으로 찾은 피어"
 
 #: ../gtk/details.c:1633
 msgid "Peer was found through DHT"
-msgstr "DTH로 찾은 피어"
+msgstr "DHT로 찾은 피어"
 
 #: ../gtk/details.c:1634
 msgid "Peer is an incoming connection"
@@ -922,7 +922,7 @@ msgstr ""
 
 #: ../gtk/main.c:755
 msgid "I _Agree"
-msgstr ""
+msgstr "동의함(_A)"
 
 #: ../gtk/main.c:986
 msgid "<b>Closing Connections</b>"
@@ -976,7 +976,9 @@ msgstr ""
 "  Shin Hungjae https://launchpad.net/~xfp\n"
 "  Sungjin Kang https://launchpad.net/~sungjin\n"
 "  Thedis https://launchpad.net/~levy27\n"
-"  sungyup https://launchpad.net/~nhamfnad"
+"  sungyup https://launchpad.net/~nhamfnad\n"
+"GitHub Contributions:\n"
+"  LockRing https://github.com/LockRing"
 
 #: ../gtk/makemeta-ui.c:71
 #, c-format
@@ -1395,11 +1397,11 @@ msgstr "비트토렌트를 이용하여 파일을 다운로드 및 공유합니�
 
 #: ../gtk/transmission-gtk.desktop.in.h:5
 msgid "Start Transmission with All Torrents Paused"
-msgstr ""
+msgstr "모든 토렌트를 중단한 채로 트랜스미션 시작"
 
 #: ../gtk/transmission-gtk.desktop.in.h:6
 msgid "Start Transmission Minimized"
-msgstr ""
+msgstr "창을 최소화하여 트랜스미션 시작"
 
 #: ../gtk/tr-core.c:1216
 #, c-format
@@ -1431,7 +1433,7 @@ msgstr "대기 중"
 #: ../gtk/tr-icon.c:77 ../gtk/tr-icon.c:93
 #, c-format
 msgid " (Limit: %s)"
-msgstr ""
+msgstr " (제한: %s)"
 
 #. %1$s: current upload speed
 #. * %2$s: current upload limit, if any
@@ -1459,11 +1461,11 @@ msgstr ""
 
 #: ../gtk/tr-prefs.c:287
 msgid "Show the Torrent Options _dialog"
-msgstr ""
+msgstr "토렌트 옵션창 보기(_D)"
 
 #: ../gtk/tr-prefs.c:291
 msgid "_Start added torrents"
-msgstr ""
+msgstr "추가된 토렌트 시작(_S)"
 
 #: ../gtk/tr-prefs.c:300
 msgid "Save to _Location:"
@@ -1603,12 +1605,12 @@ msgstr "자동 업데이트 사용(_A)"
 
 #: ../gtk/tr-prefs.c:796
 msgid "Remote Control"
-msgstr ""
+msgstr "원격 조정"
 
 #. "enabled" checkbutton
 #: ../gtk/tr-prefs.c:799
 msgid "Allow _remote access"
-msgstr ""
+msgstr "원격 조정 허용(_R)"
 
 #: ../gtk/tr-prefs.c:805
 msgid "_Open web client"
@@ -1636,7 +1638,7 @@ msgstr "암호(_W):"
 #. require authentication
 #: ../gtk/tr-prefs.c:841
 msgid "Only allow these IP a_ddresses:"
-msgstr ""
+msgstr "이 IP만 허용:"
 
 #: ../gtk/tr-prefs.c:866
 msgid "IP addresses may use wildcards, such as 192.168.*.*"
@@ -1831,7 +1833,7 @@ msgstr "네트워크"
 
 #: ../gtk/tr-prefs.c:1326
 msgid "Remote"
-msgstr ""
+msgstr "원격"
 
 #: ../gtk/tr-window.c:139
 msgid "Torrent"
@@ -2038,15 +2040,15 @@ msgstr ""
 
 #: ../libtransmission/announcer.c:1059 ../libtransmission/announcer.c:1352
 msgid "Could not connect to tracker"
-msgstr ""
+msgstr "트래커에 연결하지 못함"
 
 #: ../libtransmission/announcer.c:1063 ../libtransmission/announcer.c:1356
 msgid "Tracker did not respond"
-msgstr ""
+msgstr "트래커가 응답하지 않음"
 
 #: ../libtransmission/announcer.c:1125
 msgid "Success"
-msgstr ""
+msgstr "성공"
 
 #: ../libtransmission/announcer-http.c:203
 #: ../libtransmission/announcer-http.c:353
@@ -2057,16 +2059,16 @@ msgstr ""
 #: ../libtransmission/announcer-udp.c:262
 #: ../libtransmission/announcer-udp.c:412
 msgid "Unknown error"
-msgstr ""
+msgstr "알 수 없는 오류"
 
 #: ../libtransmission/announcer-udp.c:501
 #, c-format
 msgid "DNS Lookup failed: %s"
-msgstr ""
+msgstr "DNS 조회 실패: %s"
 
 #: ../libtransmission/announcer-udp.c:602
 msgid "Connection failed"
-msgstr ""
+msgstr "연결 실패"
 
 #: ../libtransmission/blocklist.c:66 ../libtransmission/blocklist.c:308
 #: ../libtransmission/utils.c:232
@@ -2218,7 +2220,7 @@ msgstr "로컬 데이터를 확인해주십시오. #%zu 조각에 오류가 있�
 #: ../libtransmission/platform.c:434
 #, c-format
 msgid "Searching for web interface file \"%s\""
-msgstr ""
+msgstr "웹 인터페이스 파일 \"%s\" 찾는 중"
 
 #: ../libtransmission/port-forwarding.c:28
 msgid "Port Forwarding"
@@ -2252,7 +2254,7 @@ msgstr "정지함"
 #: ../libtransmission/rpcimpl.c:1536
 #, c-format
 msgid "Error uncompressing blocklist: %s (%d)"
-msgstr ""
+msgstr "블록리스트 압축 해제 오류: %s (%d)"
 
 #: ../libtransmission/rpc-server.c:1001
 #, c-format
@@ -2262,12 +2264,12 @@ msgstr ""
 #: ../libtransmission/rpc-server.c:1073
 #, c-format
 msgid "%s is not a valid address"
-msgstr ""
+msgstr "%s 은(는) 올바른 주소가 아닙니다"
 
 #: ../libtransmission/rpc-server.c:1078
 #, c-format
 msgid "%s is not an IPv4 address. RPC listeners must be IPv4"
-msgstr ""
+msgstr "%s 은(는) IPv4가 아닙니다. RPC 리스너는 IPv4를 사용해야 합니다"
 
 #: ../libtransmission/rpc-server.c:1085
 #, c-format
@@ -2276,7 +2278,7 @@ msgstr ""
 
 #: ../libtransmission/rpc-server.c:1089
 msgid "Whitelist enabled"
-msgstr ""
+msgstr "화이트리스트 활성화됨"
 
 #: ../libtransmission/rpc-server.c:1092
 msgid "Password required"
@@ -2335,7 +2337,7 @@ msgstr ""
 
 #: ../libtransmission/torrent-magnet.c:296
 msgid "Magnet torrent's metadata is not usable"
-msgstr ""
+msgstr "마그넷 토렌트의 메타 정보를 사용할 수 없음"
 
 #: ../libtransmission/upnp.c:28
 msgid "Port Forwarding (UPnP)"
@@ -2392,7 +2394,7 @@ msgstr "\"%s\" 저장함"
 
 #: ../libtransmission/variant.c:1308
 msgid "Unable to parse file content"
-msgstr ""
+msgstr "파일 내용을 해독할 수 없음"
 
 #: ../libtransmission/verify.c:223
 msgid "Verifying torrent"
