@@ -10,7 +10,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-05-19 22:53+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2017\n"
+"Last-Translator: Baurzhan Muftakhidinov <baurthefirst@gmail.com>, 2017\n"
 "Language-Team: Kazakh (https://www.transifex.com/transmissionbt/teams/33778/kk/)\n"
 "Language: kk\n"
 "MIME-Version: 1.0\n"
@@ -510,7 +510,7 @@ msgstr "Түсініктемесі:"
 
 #: ../gtk/details.c:1256
 msgid "Web Seeds"
-msgstr ""
+msgstr "Веб-сидерлер"
 
 #: ../gtk/details.c:1260 ../gtk/details.c:1316
 msgid "Down"
@@ -757,38 +757,38 @@ msgstr "%'d Торрент қасиеттері"
 #, c-format
 msgid "Remove torrent?"
 msgid_plural "Remove %d torrents?"
-msgstr[0] ""
+msgstr[0] "%d торрентті өшіру керек пе?"
 
 #: ../gtk/dialogs.c:104
 #, c-format
 msgid "Delete this torrent's downloaded files?"
 msgid_plural "Delete these %d torrents' downloaded files?"
-msgstr[0] ""
+msgstr[0] "Бұл %d торренттің жүктелген файлдарын өшіру керек пе?"
 
 #: ../gtk/dialogs.c:113
 msgid "Once removed, continuing the transfer will require the torrent file or magnet link."
 msgid_plural "Once removed, continuing the transfers will require the torrent files or magnet links."
-msgstr[0] ""
+msgstr[0] "Өшірілсе, торренті қайта жалғастыру үшін торрент файлдар не сілтемесі керек болады."
 
 #: ../gtk/dialogs.c:118
 msgid "This torrent has not finished downloading."
 msgid_plural "These torrents have not finished downloading."
-msgstr[0] ""
+msgstr[0] "Бұл торренттердің жүктелуі аяқталмаған."
 
 #: ../gtk/dialogs.c:123
 msgid "This torrent is connected to peers."
 msgid_plural "These torrents are connected to peers."
-msgstr[0] ""
+msgstr[0] "Бұл торренттер тораптарға қосулы тұр."
 
 #: ../gtk/dialogs.c:130
 msgid "One of these torrents is connected to peers."
 msgid_plural "Some of these torrents are connected to peers."
-msgstr[0] ""
+msgstr[0] "Бұл торренттердің кейбіреулері тораптарға қосулы тұр."
 
 #: ../gtk/dialogs.c:141
 msgid "One of these torrents has not finished downloading."
 msgid_plural "Some of these torrents have not finished downloading."
-msgstr[0] ""
+msgstr[0] "Бұл торренттердің кейбіреулерінің жүктелуі аяқталмаған."
 
 #: ../gtk/file-list.c:614 ../gtk/util.c:514
 msgid "High"
@@ -911,7 +911,7 @@ msgstr ""
 
 #: ../gtk/main.c:748
 msgid "I _Agree"
-msgstr ""
+msgstr "Мен к_елісемін"
 
 #: ../gtk/main.c:983
 msgid "<b>Closing Connections</b>"
@@ -928,12 +928,12 @@ msgstr "Қазір _шығу"
 #: ../gtk/main.c:1042
 msgid "Couldn't add corrupt torrent"
 msgid_plural "Couldn't add corrupt torrents"
-msgstr[0] ""
+msgstr[0] "Зақымдалған торренттерді қосу мүмкін емес"
 
 #: ../gtk/main.c:1048
 msgid "Couldn't add duplicate torrent"
 msgid_plural "Couldn't add duplicate torrents"
-msgstr[0] ""
+msgstr[0] "Қайталанатын торренттерді қосу мүмкін емес"
 
 #: ../gtk/main.c:1367
 msgid "A fast and easy BitTorrent client"
@@ -1283,13 +1283,13 @@ msgstr "%s қалды"
 #: ../gtk/torrent-cell-renderer.c:161
 #, c-format
 msgid "%1$s %2$s  %3$s %4$s"
-msgstr ""
+msgstr "%1$s %2$s  %3$s %4$s"
 
 #. up speed, up symbol
 #: ../gtk/torrent-cell-renderer.c:170
 #, c-format
 msgid "%1$s  %2$s"
-msgstr ""
+msgstr "%1$s  %2$s"
 
 #: ../gtk/torrent-cell-renderer.c:174
 msgid "Stalled"
@@ -1325,7 +1325,7 @@ msgstr ""
 #: ../gtk/torrent-cell-renderer.c:281
 msgid "peer"
 msgid_plural "peers"
-msgstr[0] ""
+msgstr[0] "торап"
 
 #. Downloading from 2 of 3 peer (s) and 2 webseed (s)
 #: ../gtk/torrent-cell-renderer.c:267
@@ -1336,7 +1336,7 @@ msgstr ""
 #: ../gtk/torrent-cell-renderer.c:269 ../gtk/torrent-cell-renderer.c:275
 msgid "web seed"
 msgid_plural "web seeds"
-msgstr[0] ""
+msgstr[0] "веб-сидерлер"
 
 #. Downloading from 3 web seed (s)
 #: ../gtk/torrent-cell-renderer.c:274
@@ -1421,7 +1421,7 @@ msgstr "Іссіз"
 #: ../gtk/tr-icon.c:76 ../gtk/tr-icon.c:98
 #, c-format
 msgid " (Limit: %s)"
-msgstr ""
+msgstr "(Шегі: %s)"
 
 #. %1$s: current upload speed
 #. * %2$s: current upload limit, if any
@@ -1461,7 +1461,7 @@ msgstr "Қай_да сақтау:"
 
 #: ../gtk/tr-prefs.c:287
 msgid "Download Queue"
-msgstr ""
+msgstr "Жүктеп алу кезегі"
 
 #: ../gtk/tr-prefs.c:289
 msgid "Ma_ximum active downloads:"
@@ -1593,7 +1593,7 @@ msgstr "_Автожаңартуға рұқсат беру"
 
 #: ../gtk/tr-prefs.c:747
 msgid "Remote Control"
-msgstr ""
+msgstr "Қашықтан басқару"
 
 #. "enabled" checkbutton
 #: ../gtk/tr-prefs.c:750
@@ -1820,7 +1820,7 @@ msgstr "Желі"
 
 #: ../gtk/tr-prefs.c:1261
 msgid "Remote"
-msgstr ""
+msgstr "Қашықтағы"
 
 #: ../gtk/tr-window.c:123
 msgid "Torrent"
@@ -2025,7 +2025,7 @@ msgstr "Бұл магнет сілтемесі BitTorrent үшін емес, б�
 #: ../gtk/util.c:730
 #, c-format
 msgid "%s free"
-msgstr ""
+msgstr "%s бос"
 
 #: ../libtransmission/announcer.c:1099 ../libtransmission/announcer.c:1392
 msgid "Could not connect to tracker"
@@ -2033,11 +2033,11 @@ msgstr ""
 
 #: ../libtransmission/announcer.c:1103 ../libtransmission/announcer.c:1396
 msgid "Tracker did not respond"
-msgstr ""
+msgstr "Трекер жауап бермеді"
 
 #: ../libtransmission/announcer.c:1167
 msgid "Success"
-msgstr ""
+msgstr "Сәтті"
 
 #: ../libtransmission/announcer-http.c:229
 #: ../libtransmission/announcer-http.c:397
@@ -2048,7 +2048,7 @@ msgstr ""
 #: ../libtransmission/announcer-udp.c:280
 #: ../libtransmission/announcer-udp.c:430
 msgid "Unknown error"
-msgstr ""
+msgstr "Белгісіз қате"
 
 #: ../libtransmission/announcer-udp.c:520
 #, c-format
@@ -2057,7 +2057,7 @@ msgstr ""
 
 #: ../libtransmission/announcer-udp.c:623
 msgid "Connection failed"
-msgstr ""
+msgstr "Байланысты орнату сәтсіз аяқталды"
 
 #: ../libtransmission/blocklist.c:63 ../libtransmission/blocklist.c:329
 #: ../libtransmission/utils.c:243
@@ -2106,11 +2106,11 @@ msgstr "«%1$s» ашу сәтсіз аяқталды: %2$s"
 
 #: ../libtransmission/fdlimit.c:215
 msgid "full"
-msgstr ""
+msgstr "толық"
 
 #: ../libtransmission/fdlimit.c:220
 msgid "sparse"
-msgstr ""
+msgstr "сиретілген"
 
 #: ../libtransmission/fdlimit.c:227
 #, c-format
@@ -2271,7 +2271,7 @@ msgstr ""
 
 #: ../libtransmission/rpc-server.c:1126
 msgid "Password required"
-msgstr ""
+msgstr "Пароль керек"
 
 #. first %s is the application name
 #. second %s is the version number

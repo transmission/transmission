@@ -10,7 +10,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-05-19 22:53+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2017\n"
+"Last-Translator: Moo <moose@mail.ru>, 2017\n"
 "Language-Team: Lithuanian (https://www.transifex.com/transmissionbt/teams/33778/lt/)\n"
 "Language: lt\n"
 "MIME-Version: 1.0\n"
@@ -514,7 +514,7 @@ msgstr "Komentaras:"
 
 #: ../gtk/details.c:1256
 msgid "Web Seeds"
-msgstr ""
+msgstr "Saityno skleidėjai"
 
 #: ../gtk/details.c:1260 ../gtk/details.c:1316
 msgid "Down"
@@ -823,7 +823,7 @@ msgstr "žemas"
 #: ../gtk/file-list.c:834
 #, c-format
 msgid "Unable to rename file as \"%s\": %s"
-msgstr ""
+msgstr "Nepavyko pervadinti failą kaip \"%s\": %s"
 
 #. add file column
 #: ../gtk/file-list.c:947 ../gtk/msgwin.c:290
@@ -929,7 +929,7 @@ msgstr ""
 
 #: ../gtk/main.c:748
 msgid "I _Agree"
-msgstr ""
+msgstr "Aš _sutinku"
 
 #: ../gtk/main.c:983
 msgid "<b>Closing Connections</b>"
@@ -1321,13 +1321,13 @@ msgstr "liko %s"
 #: ../gtk/torrent-cell-renderer.c:161
 #, c-format
 msgid "%1$s %2$s  %3$s %4$s"
-msgstr ""
+msgstr "%1$s %2$s  %3$s %4$s"
 
 #. up speed, up symbol
 #: ../gtk/torrent-cell-renderer.c:170
 #, c-format
 msgid "%1$s  %2$s"
-msgstr ""
+msgstr "%1$s  %2$s"
 
 #: ../gtk/torrent-cell-renderer.c:174
 msgid "Stalled"
@@ -1376,9 +1376,9 @@ msgstr ""
 #: ../gtk/torrent-cell-renderer.c:269 ../gtk/torrent-cell-renderer.c:275
 msgid "web seed"
 msgid_plural "web seeds"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "saityno skleidėjas"
+msgstr[1] "saityno skleidėjai"
+msgstr[2] "saityno skleidėjų"
 
 #. Downloading from 3 web seed (s)
 #: ../gtk/torrent-cell-renderer.c:274
@@ -1429,11 +1429,11 @@ msgstr ""
 
 #: ../gtk/transmission-gtk.desktop.in.h:6
 msgid "Start Transmission with All Torrents Paused"
-msgstr ""
+msgstr "Paleisti Transmission pristabdžius visus torentus"
 
 #: ../gtk/transmission-gtk.desktop.in.h:7
 msgid "Start Transmission Minimized"
-msgstr ""
+msgstr "Paleisti Transmission suskleistą"
 
 #: ../gtk/tr-core.c:1238
 #, c-format
@@ -1465,7 +1465,7 @@ msgstr "pasyvus"
 #: ../gtk/tr-icon.c:76 ../gtk/tr-icon.c:98
 #, c-format
 msgid " (Limit: %s)"
-msgstr ""
+msgstr " (Riba: %s)"
 
 #. %1$s: current upload speed
 #. * %2$s: current upload limit, if any
@@ -1489,7 +1489,7 @@ msgstr "Pridedama"
 
 #: ../gtk/tr-prefs.c:260
 msgid "Automatically add .torrent files _from:"
-msgstr ""
+msgstr "Automatiškai pridėti .torrent failus _iš:"
 
 #: ../gtk/tr-prefs.c:267
 msgid "Show the Torrent Options _dialog"
@@ -1497,7 +1497,7 @@ msgstr ""
 
 #: ../gtk/tr-prefs.c:271
 msgid "_Start added torrents"
-msgstr ""
+msgstr "_Paleisti pridėtus torentus"
 
 #: ../gtk/tr-prefs.c:280
 msgid "Save to _Location:"
@@ -1505,11 +1505,11 @@ msgstr "Įrašyti _vietoje:"
 
 #: ../gtk/tr-prefs.c:287
 msgid "Download Queue"
-msgstr ""
+msgstr "Atsiuntimų eilė"
 
 #: ../gtk/tr-prefs.c:289
 msgid "Ma_ximum active downloads:"
-msgstr ""
+msgstr "Dau_giausia aktyvių atsiuntimų:"
 
 #: ../gtk/tr-prefs.c:293
 msgid "Downloads sharing data in the last _N minutes are active:"
@@ -1641,12 +1641,12 @@ msgstr "Įjungti _automatinius atnaujinimus"
 
 #: ../gtk/tr-prefs.c:747
 msgid "Remote Control"
-msgstr ""
+msgstr "Nuotolinis valdymas"
 
 #. "enabled" checkbutton
 #: ../gtk/tr-prefs.c:750
 msgid "Allow _remote access"
-msgstr ""
+msgstr "Leisti _nuotolinę prieigą"
 
 #: ../gtk/tr-prefs.c:756
 msgid "_Open web client"
@@ -2043,7 +2043,7 @@ msgstr "Torento faile „%s“ yra netinkamų duomenų."
 #: ../gtk/util.c:262
 #, c-format
 msgid "The torrent file \"%s\" is already in use by \"%s.\""
-msgstr ""
+msgstr "Torento failą \"%s\" jau naudoja \"%s.\""
 
 #: ../gtk/util.c:267
 #, c-format
@@ -2081,30 +2081,30 @@ msgstr "Atrodo, kad ši magnet nuoroda yra skirta ne „BitTorrent“ programai.
 #: ../gtk/util.c:730
 #, c-format
 msgid "%s free"
-msgstr ""
+msgstr "%s laisva"
 
 #: ../libtransmission/announcer.c:1099 ../libtransmission/announcer.c:1392
 msgid "Could not connect to tracker"
-msgstr ""
+msgstr "Nepavyko prisijungti prie sekiklio"
 
 #: ../libtransmission/announcer.c:1103 ../libtransmission/announcer.c:1396
 msgid "Tracker did not respond"
-msgstr ""
+msgstr "Sekiklis neatsakė"
 
 #: ../libtransmission/announcer.c:1167
 msgid "Success"
-msgstr ""
+msgstr "Pavyko"
 
 #: ../libtransmission/announcer-http.c:229
 #: ../libtransmission/announcer-http.c:397
 #, c-format
 msgid "Tracker gave HTTP response code %1$ld (%2$s)"
-msgstr ""
+msgstr "Sekiklis grąžino HTTP atsakymo kodą %1$ld (%2$s)"
 
 #: ../libtransmission/announcer-udp.c:280
 #: ../libtransmission/announcer-udp.c:430
 msgid "Unknown error"
-msgstr ""
+msgstr "Nežinoma klaida"
 
 #: ../libtransmission/announcer-udp.c:520
 #, c-format
@@ -2113,7 +2113,7 @@ msgstr ""
 
 #: ../libtransmission/announcer-udp.c:623
 msgid "Connection failed"
-msgstr ""
+msgstr "Ryšys patyrė nesėkmę"
 
 #: ../libtransmission/blocklist.c:63 ../libtransmission/blocklist.c:329
 #: ../libtransmission/utils.c:243
@@ -2265,7 +2265,7 @@ msgstr "Patikrinkite vietinius duomenis! %zu-oji dalis yra sugadinta."
 #: ../libtransmission/platform.c:469
 #, c-format
 msgid "Searching for web interface file \"%s\""
-msgstr ""
+msgstr "Ieškoma saityno sąsajos failo \"%s\""
 
 #: ../libtransmission/port-forwarding.c:29
 msgid "Port Forwarding"
@@ -2309,7 +2309,7 @@ msgstr ""
 #: ../libtransmission/rpc-server.c:1103
 #, c-format
 msgid "%s is not a valid address"
-msgstr ""
+msgstr "%s yra netinkamas adresas"
 
 #: ../libtransmission/rpc-server.c:1108
 #, c-format
@@ -2327,7 +2327,7 @@ msgstr ""
 
 #: ../libtransmission/rpc-server.c:1126
 msgid "Password required"
-msgstr ""
+msgstr "Reikalingas slaptažodis"
 
 #. first %s is the application name
 #. second %s is the version number
@@ -2439,7 +2439,7 @@ msgstr "Įrašyta „%s“"
 
 #: ../libtransmission/variant.c:1241
 msgid "Unable to parse file content"
-msgstr ""
+msgstr "Nepavyko išanalizuoti failo turinio"
 
 #: ../libtransmission/verify.c:230
 msgid "Verifying torrent"

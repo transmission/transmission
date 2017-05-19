@@ -10,7 +10,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-05-19 22:53+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2017\n"
+"Last-Translator: Xabier Martin <Iparra@iparra.eus>, 2017\n"
 "Language-Team: Basque (https://www.transifex.com/transmissionbt/teams/33778/eu/)\n"
 "Language: eu\n"
 "MIME-Version: 1.0\n"
@@ -88,15 +88,15 @@ msgstr "_Egoera-barra"
 
 #: ../gtk/actions.c:74
 msgid "_Toolbar"
-msgstr "_Tresna-barra"
+msgstr "_Tresnabarra"
 
 #: ../gtk/actions.c:79
 msgid "_File"
-msgstr "_Fitxategia"
+msgstr "_Agiria"
 
 #: ../gtk/actions.c:80
 msgid "_Torrent"
-msgstr "_Torrent-a"
+msgstr "_Torrenta"
 
 #: ../gtk/actions.c:81
 msgid "_View"
@@ -104,11 +104,11 @@ msgstr "_Ikusi"
 
 #: ../gtk/actions.c:82
 msgid "_Sort Torrents By"
-msgstr "_Ordenatu torrent-ak honen arabera:"
+msgstr "_Antolatu torrentak honela:"
 
 #: ../gtk/actions.c:83
 msgid "_Queue"
-msgstr "_Ilara"
+msgstr "_Lerroa"
 
 #: ../gtk/actions.c:84 ../gtk/details.c:2842
 msgid "_Edit"
@@ -120,15 +120,15 @@ msgstr "_Laguntza"
 
 #: ../gtk/actions.c:86
 msgid "Copy _Magnet Link to Clipboard"
-msgstr "Kopiatu _magnet esteka arbelera"
+msgstr "Kopiatu _Magnet Lotura Gakora"
 
 #: ../gtk/actions.c:87
 msgid "Open _URL…"
-msgstr "Ireki _URLa..."
+msgstr "Ireki _URL-a..."
 
 #: ../gtk/actions.c:87
 msgid "Open URL…"
-msgstr "Ireki URLa..."
+msgstr "Ireki URL-a..."
 
 #: ../gtk/actions.c:88 ../gtk/actions.c:89
 msgid "Open a torrent"
@@ -140,15 +140,15 @@ msgstr "_Abiarazi"
 
 #: ../gtk/actions.c:90
 msgid "Start torrent"
-msgstr "Abiarazi torrent-a"
+msgstr "Abiarazi torrenta"
 
 #: ../gtk/actions.c:91
 msgid "Start _Now"
-msgstr "Abiarazi _orain"
+msgstr "Abiarazi _Orain"
 
 #: ../gtk/actions.c:91
 msgid "Start torrent now"
-msgstr "Abiarazi torrent-a orain"
+msgstr "Abiarazi torrenta orain"
 
 #: ../gtk/actions.c:92
 msgid "_Statistics"
@@ -156,11 +156,11 @@ msgstr "_Estatistikak"
 
 #: ../gtk/actions.c:93
 msgid "_Donate"
-msgstr "_Diruz lagundu"
+msgstr "_Dirulaguntza"
 
 #: ../gtk/actions.c:94
 msgid "_Verify Local Data"
-msgstr "_Egiaztatu datu lokalak"
+msgstr "_Egiaztatu Tokiko Datuak"
 
 #: ../gtk/actions.c:95
 msgid "_Pause"
@@ -168,11 +168,11 @@ msgstr "_Pausatu"
 
 #: ../gtk/actions.c:95
 msgid "Pause torrent"
-msgstr "Pausatu torrent-a"
+msgstr "Pausatu torrenta"
 
 #: ../gtk/actions.c:96
 msgid "_Pause All"
-msgstr "_Pausatu guztia"
+msgstr "_Pausatu Guztiak"
 
 #: ../gtk/actions.c:96
 msgid "Pause all torrents"
@@ -180,7 +180,7 @@ msgstr "Pausatu torrent guztiak"
 
 #: ../gtk/actions.c:97
 msgid "_Start All"
-msgstr "_Abiarazi guztia"
+msgstr "_Abiarazi Guztiak"
 
 #: ../gtk/actions.c:97
 msgid "Start all torrents"
@@ -188,15 +188,15 @@ msgstr "Abiarazi torrent guztiak"
 
 #: ../gtk/actions.c:98
 msgid "Set _Location…"
-msgstr "Ezarri _kokapena..."
+msgstr "Ezarri _Kokalekua..."
 
 #: ../gtk/actions.c:99
 msgid "Remove torrent"
-msgstr "Kendu torrent-a"
+msgstr "Kendu torrenta"
 
 #: ../gtk/actions.c:100
 msgid "_Delete Files and Remove"
-msgstr "_Ezabatu fitxategiak eta kendu"
+msgstr "_Ezabatu Agiriak eta Kendu"
 
 #: ../gtk/actions.c:101
 msgid "_New…"
@@ -204,27 +204,27 @@ msgstr "_Berria..."
 
 #: ../gtk/actions.c:101
 msgid "Create a torrent"
-msgstr "Sortu torrent-a"
+msgstr "Sortu torrenta"
 
 #: ../gtk/actions.c:102
 msgid "_Quit"
-msgstr "_Irten"
+msgstr "_Utzi"
 
 #: ../gtk/actions.c:103
 msgid "Select _All"
-msgstr "Hautatu _dena"
+msgstr "Hautatu _Guztiak"
 
 #: ../gtk/actions.c:104
 msgid "Dese_lect All"
-msgstr "Ken_du hautapena guztietatik"
+msgstr "_Deshautatu Guztiak"
 
 #: ../gtk/actions.c:106
 msgid "Torrent properties"
-msgstr "Torrent-aren ezaugarriak"
+msgstr "Torrentaren ezaugarriak"
 
 #: ../gtk/actions.c:107
 msgid "Open Fold_er"
-msgstr "Ireki karp_eta"
+msgstr "Ireki Agiri_tegia"
 
 #: ../gtk/actions.c:109
 msgid "_Contents"
@@ -232,23 +232,23 @@ msgstr "_Edukiak"
 
 #: ../gtk/actions.c:110
 msgid "Ask Tracker for _More Peers"
-msgstr "Eskatu pare _gehiago aztarnariari"
+msgstr "Galdetu Aztarnariari _Hartzaile Gehiagorako"
 
 #: ../gtk/actions.c:111
 msgid "Move to _Top"
-msgstr "Mugitu _goraino"
+msgstr "Mugitu _Goren"
 
 #: ../gtk/actions.c:112
 msgid "Move _Up"
-msgstr "Mugitu go_ra"
+msgstr "Mugitu G_ora"
 
 #: ../gtk/actions.c:113
 msgid "Move _Down"
-msgstr "Mugitu be_hera"
+msgstr "Mugitu _Behera"
 
 #: ../gtk/actions.c:114
 msgid "Move to _Bottom"
-msgstr "Mugitu _beheraino"
+msgstr "Mugitu Be_heren"
 
 #: ../gtk/actions.c:115
 msgid "Present Main Window"
@@ -256,23 +256,23 @@ msgstr "Erakutsi leiho nagusia"
 
 #: ../gtk/details.c:486 ../gtk/details.c:497
 msgid "Use global settings"
-msgstr "Erabili ezarpen globalak"
+msgstr "Erabili ezarpen orokorrak"
 
 #: ../gtk/details.c:487
 msgid "Seed regardless of ratio"
-msgstr "Aletu partekatze-tasa kontuan hartu gabe"
+msgstr "Emaritu maila kontuan izan gabe"
 
 #: ../gtk/details.c:488
 msgid "Stop seeding at ratio:"
-msgstr "Gelditu aletzea tasa honetan:"
+msgstr "Gelditu emaritza maila honetan:"
 
 #: ../gtk/details.c:498
 msgid "Seed regardless of activity"
-msgstr "Aletu jarduera kontuan hartu gabe"
+msgstr "Emaritu jarduera kontuan izan gabe"
 
 #: ../gtk/details.c:499
 msgid "Stop seeding if idle for N minutes:"
-msgstr "Gelditu aletzea N minutuz inaktibo egon ondoren:"
+msgstr "Gelditu emaritza jardungabe badago N minutuz:"
 
 #: ../gtk/details.c:517 ../gtk/tr-prefs.c:1255
 msgid "Speed"
@@ -2132,7 +2132,7 @@ msgstr "Ezin izan da \"%1$s\" ireki: %2$s"
 
 #: ../libtransmission/fdlimit.c:215
 msgid "full"
-msgstr ""
+msgstr "beteta"
 
 #: ../libtransmission/fdlimit.c:220
 msgid "sparse"
@@ -2247,7 +2247,7 @@ msgstr "Abiarazten"
 
 #: ../libtransmission/port-forwarding.c:60
 msgid "Forwarded"
-msgstr "Birbidalia"
+msgstr "Berbidalia"
 
 #: ../libtransmission/port-forwarding.c:63
 msgid "Stopping"
@@ -2255,16 +2255,16 @@ msgstr "Gelditzen"
 
 #: ../libtransmission/port-forwarding.c:66
 msgid "Not forwarded"
-msgstr "Birbidali gabea"
+msgstr "Berbidali gabe"
 
 #: ../libtransmission/port-forwarding.c:106 ../libtransmission/torrent.c:2372
 #, c-format
 msgid "State changed from \"%1$s\" to \"%2$s\""
-msgstr "Egoera aldatu egin da \"%1$s\"-(e)tik \"%2$s\"-(e)ra"
+msgstr "Egoera aldatu egin da \"%1$s\"-tik \"%2$s\"-ra"
 
 #: ../libtransmission/port-forwarding.c:196
 msgid "Stopped"
-msgstr "Gelditua"
+msgstr "Geldituta"
 
 #: ../libtransmission/rpcimpl.c:1567
 #, c-format
@@ -2297,7 +2297,7 @@ msgstr ""
 
 #: ../libtransmission/rpc-server.c:1126
 msgid "Password required"
-msgstr ""
+msgstr "Pasahitza beharrezkoa da"
 
 #. first %s is the application name
 #. second %s is the version number

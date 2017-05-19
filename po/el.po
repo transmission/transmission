@@ -10,7 +10,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-05-19 22:53+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2017\n"
+"Last-Translator: stematlin <wertalg@nym.hush.com>, 2017\n"
 "Language-Team: Greek (https://www.transifex.com/transmissionbt/teams/33778/el/)\n"
 "Language: el\n"
 "MIME-Version: 1.0\n"
@@ -512,7 +512,7 @@ msgstr "Σχόλιο:"
 
 #: ../gtk/details.c:1256
 msgid "Web Seeds"
-msgstr ""
+msgstr "Διαμοιραστές δικτύου"
 
 #: ../gtk/details.c:1260 ../gtk/details.c:1316
 msgid "Down"
@@ -1365,8 +1365,8 @@ msgstr ""
 #: ../gtk/torrent-cell-renderer.c:281
 msgid "peer"
 msgid_plural "peers"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Ομότιμος χρήστης"
+msgstr[1] "Ομότιμοι χρήστες"
 
 #. Downloading from 2 of 3 peer (s) and 2 webseed (s)
 #: ../gtk/torrent-cell-renderer.c:267
@@ -1377,8 +1377,8 @@ msgstr ""
 #: ../gtk/torrent-cell-renderer.c:269 ../gtk/torrent-cell-renderer.c:275
 msgid "web seed"
 msgid_plural "web seeds"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Διαμοιραστής δικτύου"
+msgstr[1] "Διαμοιραστές δικτύου"
 
 #. Downloading from 3 web seed (s)
 #: ../gtk/torrent-cell-renderer.c:274
@@ -1464,7 +1464,7 @@ msgstr "Αδρανές"
 #: ../gtk/tr-icon.c:76 ../gtk/tr-icon.c:98
 #, c-format
 msgid " (Limit: %s)"
-msgstr ""
+msgstr "(Όριο: %s)"
 
 #. %1$s: current upload speed
 #. * %2$s: current upload limit, if any
@@ -1638,7 +1638,7 @@ msgstr "Ενεργοποίηση _αυτόματων ενημερώσεων"
 
 #: ../gtk/tr-prefs.c:747
 msgid "Remote Control"
-msgstr ""
+msgstr "Απομακρυσμένος Έλεγχος"
 
 #. "enabled" checkbutton
 #: ../gtk/tr-prefs.c:750
@@ -2078,7 +2078,7 @@ msgstr ""
 
 #: ../libtransmission/announcer.c:1099 ../libtransmission/announcer.c:1392
 msgid "Could not connect to tracker"
-msgstr ""
+msgstr "Αδυναμία σύνδεσης με τον ιχνηλάτη"
 
 #: ../libtransmission/announcer.c:1103 ../libtransmission/announcer.c:1396
 msgid "Tracker did not respond"

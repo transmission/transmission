@@ -10,7 +10,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-05-19 22:53+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2017\n"
+"Last-Translator: jmontane <joan@montane.cat>, 2017\n"
 "Language-Team: Catalan (https://www.transifex.com/transmissionbt/teams/33778/ca/)\n"
 "Language: ca\n"
 "MIME-Version: 1.0\n"
@@ -2079,7 +2079,7 @@ msgstr ""
 #: ../libtransmission/announcer-udp.c:280
 #: ../libtransmission/announcer-udp.c:430
 msgid "Unknown error"
-msgstr ""
+msgstr "Error desconegut"
 
 #: ../libtransmission/announcer-udp.c:520
 #, c-format
@@ -2088,7 +2088,7 @@ msgstr ""
 
 #: ../libtransmission/announcer-udp.c:623
 msgid "Connection failed"
-msgstr ""
+msgstr "La connexió ha fallat"
 
 #: ../libtransmission/blocklist.c:63 ../libtransmission/blocklist.c:329
 #: ../libtransmission/utils.c:243

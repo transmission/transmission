@@ -1,23 +1,22 @@
-# Kurdish (Sorani) translation for transmission
-# Copyright (c) 2008 Rosetta Contributors and Canonical Ltd 2008
-# This file is distributed under the same license as the transmission package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2008.
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
+#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: transmission\n"
+"Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-05-19 22:53+0300\n"
-"PO-Revision-Date: 2009-11-23 11:43+0000\n"
-"Last-Translator: Ara Qadir <arastein@gmail.com>\n"
-"Language-Team: Kurdish (Sorani) <ckb@li.org>\n"
-"Language: \n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2017\n"
+"Language-Team: Central Kurdish (https://www.transifex.com/transmissionbt/teams/33778/ckb/)\n"
+"Language: ckb\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2017-01-26 18:48+0000\n"
-"X-Generator: Launchpad (build 18315)\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: ../cli/cli.c:114 ../gtk/util.c:92 ../libtransmission/utils.c:1597
 msgid "None"
@@ -1294,9 +1293,9 @@ msgstr ""
 
 #. up speed, up symbol
 #: ../gtk/torrent-cell-renderer.c:170
-#, fuzzy, c-format
+#, c-format
 msgid "%1$s  %2$s"
-msgstr "%1$s @ %2$s"
+msgstr ""
 
 #: ../gtk/torrent-cell-renderer.c:174
 msgid "Stalled"
@@ -1324,9 +1323,9 @@ msgstr ""
 
 #. Downloading metadata from 2 peer (s)(50% done)
 #: ../gtk/torrent-cell-renderer.c:261
-#, fuzzy, c-format
+#, c-format
 msgid "Downloading metadata from %1$'d %2$s (%3$d%% done)"
-msgstr "داگرتن له‌ %1$'d له‌ %2$'d هاوه‌ڵی  په‌یوه‌ندی به‌ستراوه‌وه‌"
+msgstr ""
 
 #: ../gtk/torrent-cell-renderer.c:262 ../gtk/torrent-cell-renderer.c:268
 #: ../gtk/torrent-cell-renderer.c:281
@@ -1337,9 +1336,9 @@ msgstr[1] ""
 
 #. Downloading from 2 of 3 peer (s) and 2 webseed (s)
 #: ../gtk/torrent-cell-renderer.c:267
-#, fuzzy, c-format
+#, c-format
 msgid "Downloading from %1$'d of %2$'d %3$s and %4$'d %5$s"
-msgstr "داگرتن له‌ %1$'d له‌ %2$'d هاوه‌ڵی  په‌یوه‌ندی به‌ستراوه‌وه‌"
+msgstr ""
 
 #: ../gtk/torrent-cell-renderer.c:269 ../gtk/torrent-cell-renderer.c:275
 msgid "web seed"
@@ -1349,15 +1348,15 @@ msgstr[1] ""
 
 #. Downloading from 3 web seed (s)
 #: ../gtk/torrent-cell-renderer.c:274
-#, fuzzy, c-format
+#, c-format
 msgid "Downloading from %1$'d %2$s"
-msgstr "داگرتن له‌ %1$'d له‌ %2$'d هاوه‌ڵی  په‌یوه‌ندی به‌ستراوه‌وه‌"
+msgstr ""
 
 #. Downloading from 2 of 3 peer (s)
 #: ../gtk/torrent-cell-renderer.c:280
-#, fuzzy, c-format
+#, c-format
 msgid "Downloading from %1$'d of %2$'d %3$s"
-msgstr "داگرتن له‌ %1$'d له‌ %2$'d هاوه‌ڵی  په‌یوه‌ندی به‌ستراوه‌وه‌"
+msgstr ""
 
 #: ../gtk/torrent-cell-renderer.c:288
 #, c-format
@@ -1394,14 +1393,12 @@ msgid "torrents;downloading;uploading;share;sharing;"
 msgstr ""
 
 #: ../gtk/transmission-gtk.desktop.in.h:6
-#, fuzzy
 msgid "Start Transmission with All Torrents Paused"
-msgstr "ده‌ستپێبکه‌ له‌گه‌ڵ هه‌موو تۆرێنته‌ ڕاگیراوه‌کان"
+msgstr ""
 
 #: ../gtk/transmission-gtk.desktop.in.h:7
-#, fuzzy
 msgid "Start Transmission Minimized"
-msgstr "Transmission"
+msgstr ""
 
 #: ../gtk/tr-core.c:1238
 #, c-format
@@ -1453,28 +1450,24 @@ msgid "Adding"
 msgstr ""
 
 #: ../gtk/tr-prefs.c:260
-#, fuzzy
 msgid "Automatically add .torrent files _from:"
-msgstr "خۆکارانه‌ تۆرێنته‌کان _زیادبکه‌ له‌:"
+msgstr ""
 
 #: ../gtk/tr-prefs.c:267
-#, fuzzy
 msgid "Show the Torrent Options _dialog"
-msgstr "هه‌ڵبژاردنه‌کانی تۆرێنت"
+msgstr ""
 
 #: ../gtk/tr-prefs.c:271
-#, fuzzy
 msgid "_Start added torrents"
-msgstr "ده‌ستپێکردنی تۆرێنت"
+msgstr ""
 
 #: ../gtk/tr-prefs.c:280
 msgid "Save to _Location:"
 msgstr ""
 
 #: ../gtk/tr-prefs.c:287
-#, fuzzy
 msgid "Download Queue"
-msgstr "داگیراوه‌:"
+msgstr ""
 
 #: ../gtk/tr-prefs.c:289
 msgid "Ma_ximum active downloads:"
@@ -1607,9 +1600,8 @@ msgid "Enable _automatic updates"
 msgstr ""
 
 #: ../gtk/tr-prefs.c:747
-#, fuzzy
 msgid "Remote Control"
-msgstr "لابردنی تۆرێنت"
+msgstr ""
 
 #. "enabled" checkbutton
 #: ../gtk/tr-prefs.c:750
@@ -1835,9 +1827,8 @@ msgid "Network"
 msgstr ""
 
 #: ../gtk/tr-prefs.c:1261
-#, fuzzy
 msgid "Remote"
-msgstr "لابردنی تۆرێنت"
+msgstr ""
 
 #: ../gtk/tr-window.c:123
 msgid "Torrent"
@@ -2068,9 +2059,8 @@ msgstr ""
 
 #: ../libtransmission/announcer-udp.c:280
 #: ../libtransmission/announcer-udp.c:430
-#, fuzzy
 msgid "Unknown error"
-msgstr "نه‌زانراو"
+msgstr ""
 
 #: ../libtransmission/announcer-udp.c:520
 #, c-format
@@ -2078,9 +2068,8 @@ msgid "DNS Lookup failed: %s"
 msgstr ""
 
 #: ../libtransmission/announcer-udp.c:623
-#, fuzzy
 msgid "Connection failed"
-msgstr "دروستکردنی تۆرێنت سه‌رکه‌وتوو نه‌بوو: %s"
+msgstr ""
 
 #: ../libtransmission/blocklist.c:63 ../libtransmission/blocklist.c:329
 #: ../libtransmission/utils.c:243
@@ -2112,9 +2101,9 @@ msgid "Blocklist \"%s\" updated with %zu entries"
 msgstr ""
 
 #: ../libtransmission/fdlimit.c:176
-#, fuzzy, c-format
+#, c-format
 msgid "Couldn't get directory for \"%1$s\": %2$s"
-msgstr "نه‌توانرا \"%1$s\" دروستبکرێت: %2$s"
+msgstr ""
 
 #: ../libtransmission/fdlimit.c:182 ../libtransmission/file-posix.c:187
 #: ../libtransmission/file-posix.c:197
@@ -2411,158 +2400,3 @@ msgstr ""
 #: ../libtransmission/verify.c:230
 msgid "Verifying torrent"
 msgstr ""
-
-#, fuzzy
-#~ msgid "Couldn't connect socket %"
-#~ msgstr "نه‌توانرا \"%1$s\" دروستبکرێت: %2$s"
-
-#~ msgid "Sort by _Ratio"
-#~ msgstr "ڕیزکردن به‌پێی _ڕێژه‌"
-
-#~ msgid "Sort by _State"
-#~ msgstr "ڕیزکردن به‌پێی با_ر"
-
-#~ msgid "_Main Window"
-#~ msgstr "په‌نجه‌ره‌ی _سه‌ره‌کی"
-
-#~ msgid "_Minimal View"
-#~ msgstr "بینین به‌ شێوه‌ی _بچوککراوه‌یی"
-
-#~ msgid "_Reverse Sort Order"
-#~ msgstr "_پێچه‌وانه‌کردنه‌وه‌ی ڕیزکردن"
-
-#~ msgid "Add a torrent"
-#~ msgstr "تۆرێنتێک زیادبکه‌"
-
-#~ msgid "_Add..."
-#~ msgstr "_زیادکردن..."
-
-#~ msgid "_Open Folder"
-#~ msgstr "_کردنه‌وه‌ی بوخچه‌"
-
-#~ msgid "_New..."
-#~ msgstr "_نوێ..."
-
-#~ msgid "_Move source file to Trash"
-#~ msgstr "په‌ڕگه‌کانی سه‌رچاوه‌ بگوازه‌وه‌ بۆ زبڵدان"
-
-#~ msgid "Add a Torrent"
-#~ msgstr "تۆرێنتێک زیادبکه‌"
-
-#~ msgid "%s is already running."
-#~ msgstr "%s کارده‌کات"
-
-#~ msgid "Display _options dialog"
-#~ msgstr "گفتوگۆی _هه‌ڵبژاردنه‌کان پیشانبده‌"
-
-#~ msgid "Status"
-#~ msgstr "دۆخ"
-
-#~ msgid "Peer was discovered through Peer Exchange (PEX)"
-#~ msgstr "هاوه‌ڵ دۆزرایه‌وه‌ به‌ هۆی ئاڵوگۆڕکردنی هاوه‌ڵه‌وه‌ (PEX)"
-
-#~ msgid "%'d Piece"
-#~ msgid_plural "%'d Pieces"
-#~ msgstr[0] "%'d پارچه‌"
-#~ msgstr[1] "%'d پارچه‌"
-
-#~ msgid "<b>Times Completed:</b>"
-#~ msgstr "<b>کاتی ته‌واوبوون:</b>"
-
-#~ msgid "Pieces:"
-#~ msgstr "پارچه‌کان:"
-
-#~ msgid "<b>Seeders:</b>"
-#~ msgstr "<b>پێبه‌خشه‌کان:</b>"
-
-#~ msgid "Date:"
-#~ msgstr "ڕێكه‌وت:"
-
-#~ msgid "Creator:"
-#~ msgstr "دروستکه‌ر:"
-
-#~ msgid "Origins"
-#~ msgstr "ڕه‌سه‌نه‌کان"
-
-#~ msgid "Progress:"
-#~ msgstr "به‌ره‌وپێشچوون"
-
-#~ msgid "Torrent file:"
-#~ msgstr "په‌ڕگه‌ی تۆرێنت:"
-
-#~ msgid "%.1f%%"
-#~ msgstr "%.1f%%"
-
-#~ msgid "Transfer"
-#~ msgstr "گواستنه‌وه‌"
-
-#~ msgid "Dates"
-#~ msgstr "ڕێکه‌وته‌کان"
-
-#~ msgid "Started at:"
-#~ msgstr "ده‌ستیپێکردووه‌ له‌:"
-
-#~ msgid "Last activity at:"
-#~ msgstr "دواترین چالاکی له‌:"
-
-#~ msgid "Failed DL:"
-#~ msgstr "داگیراوی سه‌رنه‌که‌وتوو:"
-
-#~ msgid "Down: %s"
-#~ msgstr "داگرتن: %s"
-
-#~ msgid "Up: %s"
-#~ msgstr "بارکردن: %s"
-
-#~ msgid "BitTorrent Activity"
-#~ msgstr "چالاکی BitTorrent"
-
-#~ msgid "Adding Torrents"
-#~ msgstr "زیادکردنی تۆرێنت"
-
-#~ msgid "Torrent created!"
-#~ msgstr "تۆرێنت دروستکرا!"
-
-#~ msgid "Invalid URL"
-#~ msgstr "URL نه‌گونجاوه‌"
-
-#~ msgid "Now"
-#~ msgstr "ئێستا"
-
-#~ msgid "<big><b>Quit Transmission?</b></big>"
-#~ msgstr "<big><b>ده‌رچوون له‌ Transmission؟</b></big>"
-
-#~ msgid "_Don't ask me again"
-#~ msgstr "_پرسیارم لێ مه‌که‌ره‌وه‌"
-
-#~ msgid "Choose File"
-#~ msgstr "په‌ڕگه‌یه‌ک هه‌ڵبژێره‌"
-
-#~ msgid "Choose Directory"
-#~ msgstr "بوخچه‌یه‌ک هه‌ڵبژێره‌"
-
-#~ msgid "<i>%1$s; %2$'d File</i>"
-#~ msgid_plural "<i>%1$s; %2$'d Files</i>"
-#~ msgstr[0] "<i>%1$s; %2$'d په‌ڕگه‌</i>"
-#~ msgstr[1] "<i>%1$s; %2$'d په‌ڕگه‌</i>"
-
-#~ msgid "Source"
-#~ msgstr "سەرچاوە"
-
-#~ msgid "F_older"
-#~ msgstr "_بوخچه‌"
-
-#~ msgid "<b>E_xtras</b>"
-#~ msgstr "<b>_زیاده‌کان</b>"
-
-#~ msgid "Commen_t:"
-#~ msgstr "_لێدوان:"
-
-#~ msgid "speed|Down: %1$s, Up: %2$s"
-#~ msgstr "داگرتن: %1$s، بارکردن: %2$s"
-
-#~ msgid "Torrent creation cancelled"
-#~ msgstr "وازهێنرا له‌ دروستکردنی تۆرێنت"
-
-#~ msgid "In progress"
-#~ msgstr "له‌ به‌ڕێوه‌چووندایه‌"

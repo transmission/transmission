@@ -10,7 +10,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-05-19 22:53+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2017\n"
+"Last-Translator: Ömer Akın <omrakin@gmail.com>, 2017\n"
 "Language-Team: Turkish (https://www.transifex.com/transmissionbt/teams/33778/tr/)\n"
 "Language: tr\n"
 "MIME-Version: 1.0\n"
@@ -512,7 +512,7 @@ msgstr "Yorum:"
 
 #: ../gtk/details.c:1256
 msgid "Web Seeds"
-msgstr ""
+msgstr "Web Beslemeleri"
 
 #: ../gtk/details.c:1260 ../gtk/details.c:1316
 msgid "Down"
@@ -867,7 +867,7 @@ msgstr "_Göster"
 #: ../gtk/filter.c:884
 #, c-format
 msgid "_Show %'d of:"
-msgstr ""
+msgstr "_Göster %'d :"
 
 #: ../gtk/main.c:314
 #, c-format
@@ -916,11 +916,11 @@ msgstr ""
 
 #: ../gtk/main.c:745
 msgid "Transmission is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility."
-msgstr ""
+msgstr "Transmission bir dosya paylaşım programıdır. Bir torrent dosyasını çalıştırdığınızda, bu veriler gönderim yoluyla diğer insanlar tarafından da erişilebilir hale gelecektir. Tabii ki, her türlü içeriğin paylaşımı sizin sorumluluğunuzdadır."
 
 #: ../gtk/main.c:748
 msgid "I _Agree"
-msgstr ""
+msgstr "_Kabul Ediyorum"
 
 #: ../gtk/main.c:983
 msgid "<b>Closing Connections</b>"
@@ -1343,13 +1343,13 @@ msgstr "Kalan: %s"
 #: ../gtk/torrent-cell-renderer.c:161
 #, c-format
 msgid "%1$s %2$s  %3$s %4$s"
-msgstr ""
+msgstr "%1$s %2$s  %3$s %4$s"
 
 #. up speed, up symbol
 #: ../gtk/torrent-cell-renderer.c:170
 #, c-format
 msgid "%1$s  %2$s"
-msgstr ""
+msgstr "%1$s  %2$s"
 
 #: ../gtk/torrent-cell-renderer.c:174
 msgid "Stalled"
@@ -1385,8 +1385,8 @@ msgstr ""
 #: ../gtk/torrent-cell-renderer.c:281
 msgid "peer"
 msgid_plural "peers"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "eş"
+msgstr[1] "eşler"
 
 #. Downloading from 2 of 3 peer (s) and 2 webseed (s)
 #: ../gtk/torrent-cell-renderer.c:267
@@ -1397,8 +1397,8 @@ msgstr ""
 #: ../gtk/torrent-cell-renderer.c:269 ../gtk/torrent-cell-renderer.c:275
 msgid "web seed"
 msgid_plural "web seeds"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "web beslemesi"
+msgstr[1] "web beslemeleri"
 
 #. Downloading from 3 web seed (s)
 #: ../gtk/torrent-cell-renderer.c:274
@@ -1484,7 +1484,7 @@ msgstr "Boşta"
 #: ../gtk/tr-icon.c:76 ../gtk/tr-icon.c:98
 #, c-format
 msgid " (Limit: %s)"
-msgstr ""
+msgstr " (Sınır: %s)"
 
 #. %1$s: current upload speed
 #. * %2$s: current upload limit, if any
@@ -1524,7 +1524,7 @@ msgstr "Şu _konuma kaydet:"
 
 #: ../gtk/tr-prefs.c:287
 msgid "Download Queue"
-msgstr ""
+msgstr "İndirme Sırası"
 
 #: ../gtk/tr-prefs.c:289
 msgid "Ma_ximum active downloads:"
@@ -1658,12 +1658,12 @@ msgstr "_Otomatik güncelleştirmeleri etkinleştir"
 
 #: ../gtk/tr-prefs.c:747
 msgid "Remote Control"
-msgstr ""
+msgstr "Uzaktan Denetim"
 
 #. "enabled" checkbutton
 #: ../gtk/tr-prefs.c:750
 msgid "Allow _remote access"
-msgstr ""
+msgstr "Uzaktan erişime izin ver"
 
 #: ../gtk/tr-prefs.c:756
 msgid "_Open web client"
@@ -1691,7 +1691,7 @@ msgstr "_Parola:"
 #. require authentication
 #: ../gtk/tr-prefs.c:792
 msgid "Only allow these IP a_ddresses:"
-msgstr ""
+msgstr "Sadece şu IP a_dreslerine bağlanma izni ver:"
 
 #: ../gtk/tr-prefs.c:816
 msgid "IP addresses may use wildcards, such as 192.168.*.*"
@@ -1885,7 +1885,7 @@ msgstr "Ağ"
 
 #: ../gtk/tr-prefs.c:1261
 msgid "Remote"
-msgstr ""
+msgstr "Uzaktan Kontrol"
 
 #: ../gtk/tr-window.c:123
 msgid "Torrent"
@@ -2094,7 +2094,7 @@ msgstr "Bu magnet bağlantısını BitTorrent için tasarlanmış gibi görünm�
 #: ../gtk/util.c:730
 #, c-format
 msgid "%s free"
-msgstr ""
+msgstr "%s boş"
 
 #: ../libtransmission/announcer.c:1099 ../libtransmission/announcer.c:1392
 msgid "Could not connect to tracker"
@@ -2102,11 +2102,11 @@ msgstr ""
 
 #: ../libtransmission/announcer.c:1103 ../libtransmission/announcer.c:1396
 msgid "Tracker did not respond"
-msgstr ""
+msgstr "İzleyici yanıt vermiyor"
 
 #: ../libtransmission/announcer.c:1167
 msgid "Success"
-msgstr ""
+msgstr "Başarılı"
 
 #: ../libtransmission/announcer-http.c:229
 #: ../libtransmission/announcer-http.c:397
@@ -2117,7 +2117,7 @@ msgstr ""
 #: ../libtransmission/announcer-udp.c:280
 #: ../libtransmission/announcer-udp.c:430
 msgid "Unknown error"
-msgstr ""
+msgstr "Bilinmeyen hata"
 
 #: ../libtransmission/announcer-udp.c:520
 #, c-format
@@ -2126,7 +2126,7 @@ msgstr ""
 
 #: ../libtransmission/announcer-udp.c:623
 msgid "Connection failed"
-msgstr ""
+msgstr "Bağlantı başarısız oldu"
 
 #: ../libtransmission/blocklist.c:63 ../libtransmission/blocklist.c:329
 #: ../libtransmission/utils.c:243
@@ -2322,7 +2322,7 @@ msgstr ""
 #: ../libtransmission/rpc-server.c:1103
 #, c-format
 msgid "%s is not a valid address"
-msgstr ""
+msgstr "%s geçerli bir adres değil"
 
 #: ../libtransmission/rpc-server.c:1108
 #, c-format
@@ -2336,11 +2336,11 @@ msgstr ""
 
 #: ../libtransmission/rpc-server.c:1121
 msgid "Whitelist enabled"
-msgstr ""
+msgstr "Beyaz liste etkin"
 
 #: ../libtransmission/rpc-server.c:1126
 msgid "Password required"
-msgstr ""
+msgstr "Parola gerekli"
 
 #. first %s is the application name
 #. second %s is the version number

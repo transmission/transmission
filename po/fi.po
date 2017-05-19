@@ -10,7 +10,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-05-19 22:53+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2017\n"
+"Last-Translator: Otto Koskelah <otto@nise.fi>, 2017\n"
 "Language-Team: Finnish (https://www.transifex.com/transmissionbt/teams/33778/fi/)\n"
 "Language: fi\n"
 "MIME-Version: 1.0\n"
@@ -294,7 +294,7 @@ msgstr "Rajoita _lähetysnopeus (%s):"
 
 #: ../gtk/details.c:550 ../gtk/open-dialog.c:369
 msgid "Torrent _priority:"
-msgstr "Torrentin _tärkeys:"
+msgstr "Torrentin _prioriteetti:"
 
 #: ../gtk/details.c:554
 msgid "Seeding Limits"
@@ -306,7 +306,7 @@ msgstr "_Suhde:"
 
 #: ../gtk/details.c:573
 msgid "_Idle:"
-msgstr "_Joutava:"
+msgstr "_Toimeton:"
 
 #: ../gtk/details.c:576
 msgid "Peer Connections"
@@ -422,7 +422,7 @@ msgstr "%1$s (%2$s%% / %3$s%% saatavilla); %4$s vahvistamatta"
 #: ../gtk/details.c:1010
 #, c-format
 msgid "%1$s (+%2$s corrupt)"
-msgstr "%1$s (+%2$s tuhoutunut)"
+msgstr "%1$s (+%2$s vioittunut)"
 
 #: ../gtk/details.c:1042
 #, c-format
@@ -512,7 +512,7 @@ msgstr "Kommentti:"
 
 #: ../gtk/details.c:1256
 msgid "Web Seeds"
-msgstr ""
+msgstr "Verkkolähteet"
 
 #: ../gtk/details.c:1260 ../gtk/details.c:1316
 msgid "Down"
@@ -528,7 +528,7 @@ msgstr "Lähetetty"
 
 #: ../gtk/details.c:1323
 msgid "Client"
-msgstr "Ohjelma"
+msgstr "Asiakasohjelmisto"
 
 #: ../gtk/details.c:1326
 msgid "%"
@@ -753,7 +753,7 @@ msgstr "%s:n ominaisuudet"
 #: ../gtk/details.c:3002
 #, c-format
 msgid "%'d Torrent Properties"
-msgstr "%'d torrentin ominaisuudet"
+msgstr "%'d:n torrentin ominaisuudet"
 
 #: ../gtk/dialogs.c:100
 #, c-format
@@ -814,7 +814,7 @@ msgstr "Matala"
 #: ../gtk/file-list.c:834
 #, c-format
 msgid "Unable to rename file as \"%s\": %s"
-msgstr ""
+msgstr "Ei voida uudelleennimetä tiedstoa \"%s\": %s"
 
 #. add file column
 #: ../gtk/file-list.c:947 ../gtk/msgwin.c:290
@@ -839,7 +839,7 @@ msgstr "Lataus"
 #. add priority column
 #: ../gtk/file-list.c:1002
 msgid "Priority"
-msgstr "Tärkeys"
+msgstr "Prioriteetti"
 
 #: ../gtk/filter.c:299 ../gtk/filter.c:583
 msgid "All"
@@ -867,7 +867,7 @@ msgstr "_Näytä:"
 #: ../gtk/filter.c:884
 #, c-format
 msgid "_Show %'d of:"
-msgstr ""
+msgstr "Näytetään %'d:"
 
 #: ../gtk/main.c:314
 #, c-format
@@ -903,7 +903,7 @@ msgstr "Transmission"
 #. parse the command line
 #: ../gtk/main.c:639
 msgid "[torrent files or urls]"
-msgstr "[torrent-tiedostot tai URL-osoitteet]"
+msgstr "[torrent-tiedostot tai verkko-osoitteet]"
 
 #: ../gtk/main.c:646
 #, c-format
@@ -916,11 +916,11 @@ msgstr ""
 
 #: ../gtk/main.c:745
 msgid "Transmission is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility."
-msgstr ""
+msgstr "Transmission on tiedostonjako-ohjelmisto. Kun käytät torrenttia, niin sen data lähetetään muille käyttäjille. Kaiken sisällön jakaminen tapahtuu omalla vastuullasi."
 
 #: ../gtk/main.c:748
 msgid "I _Agree"
-msgstr ""
+msgstr "_Hyväksyn"
 
 #: ../gtk/main.c:983
 msgid "<b>Closing Connections</b>"

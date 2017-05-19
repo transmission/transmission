@@ -10,7 +10,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-05-19 22:53+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2017\n"
+"Last-Translator: Matteo Sechi <inactive+tomateschie.transifex@transifex.com>, 2017\n"
 "Language-Team: Italian (https://www.transifex.com/transmissionbt/teams/33778/it/)\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
@@ -512,7 +512,7 @@ msgstr "Commento:"
 
 #: ../gtk/details.c:1256
 msgid "Web Seeds"
-msgstr ""
+msgstr "Seeder Web"
 
 #: ../gtk/details.c:1260 ../gtk/details.c:1316
 msgid "Down"
@@ -814,7 +814,7 @@ msgstr "Bassa"
 #: ../gtk/file-list.c:834
 #, c-format
 msgid "Unable to rename file as \"%s\": %s"
-msgstr ""
+msgstr "Impossibile rinominare file come \"%s\": %s"
 
 #. add file column
 #: ../gtk/file-list.c:947 ../gtk/msgwin.c:290
@@ -867,12 +867,12 @@ msgstr "Mo_stra:"
 #: ../gtk/filter.c:884
 #, c-format
 msgid "_Show %'d of:"
-msgstr ""
+msgstr "_Mostra %'d di:"
 
 #: ../gtk/main.c:314
 #, c-format
 msgid "Error registering Transmission as a %s handler: %s"
-msgstr ""
+msgstr "Impossibile registrare Transmission come un %s gestore: %s"
 
 #: ../gtk/main.c:479
 #, c-format

@@ -10,7 +10,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-05-19 22:53+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2017\n"
+"Last-Translator: Kaj Printz Madsen <kajprintz@gmail.com>, 2017\n"
 "Language-Team: Danish (https://www.transifex.com/transmissionbt/teams/33778/da/)\n"
 "Language: da\n"
 "MIME-Version: 1.0\n"
@@ -68,7 +68,7 @@ msgstr "Meddelelses_log"
 
 #: ../gtk/actions.c:69
 msgid "Enable Alternative Speed _Limits"
-msgstr "S_lå alternativ hastighedsbegrænsning til"
+msgstr "_Aktivlér alternative hastighedsbegrænsninger"
 
 #: ../gtk/actions.c:70
 msgid "_Compact View"
@@ -336,12 +336,12 @@ msgstr "Henter"
 
 #: ../gtk/details.c:610 ../gtk/torrent-cell-renderer.c:202
 msgid "Queued for seeding"
-msgstr ""
+msgstr "I kø til seeding"
 
 #: ../gtk/details.c:613 ../gtk/filter.c:587
 msgctxt "Verb"
 msgid "Seeding"
-msgstr ""
+msgstr "Seeder"
 
 #: ../gtk/details.c:616 ../gtk/filter.c:589 ../gtk/torrent-cell-renderer.c:190
 msgid "Finished"
@@ -512,7 +512,7 @@ msgstr "Kommentar:"
 
 #: ../gtk/details.c:1256
 msgid "Web Seeds"
-msgstr ""
+msgstr "Web Seeds"
 
 #: ../gtk/details.c:1260 ../gtk/details.c:1316
 msgid "Down"
@@ -560,7 +560,7 @@ msgstr "De annullerede"
 
 #: ../gtk/details.c:1353
 msgid "Flags"
-msgstr ""
+msgstr "Flag"
 
 #: ../gtk/details.c:1770
 msgid "Optimistic unchoke"
@@ -682,7 +682,7 @@ msgstr "Vær venlig at afhjælpe fejlen og prøv igen."
 #: ../gtk/details.c:2604
 #, c-format
 msgid "%s - Edit Trackers"
-msgstr ""
+msgstr "%s - Rediger Trackers"
 
 #: ../gtk/details.c:2611
 msgid "Tracker Announce URLs"
@@ -699,7 +699,7 @@ msgstr ""
 #: ../gtk/details.c:2714
 #, c-format
 msgid "%s - Add Tracker"
-msgstr ""
+msgstr "%s Tilføj Tracker"
 
 #: ../gtk/details.c:2722
 msgid "Tracker"
@@ -814,7 +814,7 @@ msgstr "Lav"
 #: ../gtk/file-list.c:834
 #, c-format
 msgid "Unable to rename file as \"%s\": %s"
-msgstr ""
+msgstr "Kunne ikke omdøbe fil til \"%s\": %s"
 
 #. add file column
 #: ../gtk/file-list.c:947 ../gtk/msgwin.c:290
@@ -829,7 +829,7 @@ msgstr "Størrelse"
 #. add "progress" column
 #: ../gtk/file-list.c:974
 msgid "Have"
-msgstr ""
+msgstr "Har"
 
 #. add "enabled" column
 #: ../gtk/file-list.c:987
@@ -852,7 +852,7 @@ msgstr "Aktiv"
 #: ../gtk/filter.c:590
 msgctxt "Verb"
 msgid "Verifying"
-msgstr ""
+msgstr "Verificerer"
 
 #: ../gtk/filter.c:591 ../gtk/msgwin.c:431 ../gtk/util.c:724
 #, c-format
@@ -867,12 +867,12 @@ msgstr "V_is:"
 #: ../gtk/filter.c:884
 #, c-format
 msgid "_Show %'d of:"
-msgstr ""
+msgstr "_Vis %'d af:"
 
 #: ../gtk/main.c:314
 #, c-format
 msgid "Error registering Transmission as a %s handler: %s"
-msgstr ""
+msgstr "Fejl ved registrering af Transmission som en %s arbejder: %s"
 
 #: ../gtk/main.c:479
 #, c-format
@@ -914,11 +914,11 @@ msgstr ""
 
 #: ../gtk/main.c:745
 msgid "Transmission is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility."
-msgstr ""
+msgstr "Transmission er et fildelingsprogram. Når du åbner en torrent, vil dens data stilles til rådighed for andre ved hjælp af upload. Alt data du deler er selvfølgelig dit eget ansvar."
 
 #: ../gtk/main.c:748
 msgid "I _Agree"
-msgstr ""
+msgstr "Jeg er _Enig"
 
 #: ../gtk/main.c:983
 msgid "<b>Closing Connections</b>"
@@ -1320,7 +1320,7 @@ msgstr ""
 #: ../gtk/torrent-cell-renderer.c:170
 #, c-format
 msgid "%1$s  %2$s"
-msgstr ""
+msgstr "%1$s  %2$s"
 
 #: ../gtk/torrent-cell-renderer.c:174
 msgid "Stalled"
@@ -1350,38 +1350,38 @@ msgstr "Fejl: %s"
 #: ../gtk/torrent-cell-renderer.c:261
 #, c-format
 msgid "Downloading metadata from %1$'d %2$s (%3$d%% done)"
-msgstr ""
+msgstr "Downloader metadata fra %1$'d %2$s (%3$d%% færdig)"
 
 #: ../gtk/torrent-cell-renderer.c:262 ../gtk/torrent-cell-renderer.c:268
 #: ../gtk/torrent-cell-renderer.c:281
 msgid "peer"
 msgid_plural "peers"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "peer"
+msgstr[1] "peers"
 
 #. Downloading from 2 of 3 peer (s) and 2 webseed (s)
 #: ../gtk/torrent-cell-renderer.c:267
 #, c-format
 msgid "Downloading from %1$'d of %2$'d %3$s and %4$'d %5$s"
-msgstr ""
+msgstr "Downloader fra %1$'d af %2$'d %3$s og %4$'d %5$s"
 
 #: ../gtk/torrent-cell-renderer.c:269 ../gtk/torrent-cell-renderer.c:275
 msgid "web seed"
 msgid_plural "web seeds"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "web seed"
+msgstr[1] "web seeds"
 
 #. Downloading from 3 web seed (s)
 #: ../gtk/torrent-cell-renderer.c:274
 #, c-format
 msgid "Downloading from %1$'d %2$s"
-msgstr ""
+msgstr "Downloader fra %1$'d %2$s"
 
 #. Downloading from 2 of 3 peer (s)
 #: ../gtk/torrent-cell-renderer.c:280
 #, c-format
 msgid "Downloading from %1$'d of %2$'d %3$s"
-msgstr ""
+msgstr "Downloader fra %1$'d af %2$'d %3$s"
 
 #: ../gtk/torrent-cell-renderer.c:288
 #, c-format
@@ -1419,11 +1419,11 @@ msgstr ""
 
 #: ../gtk/transmission-gtk.desktop.in.h:6
 msgid "Start Transmission with All Torrents Paused"
-msgstr ""
+msgstr "Start Transmission med alle torrents sat på pause"
 
 #: ../gtk/transmission-gtk.desktop.in.h:7
 msgid "Start Transmission Minimized"
-msgstr ""
+msgstr "Start Transmission Minimeret"
 
 #: ../gtk/tr-core.c:1238
 #, c-format
@@ -1433,16 +1433,16 @@ msgstr "Kunne ikke læse \"%s\": %s"
 #: ../gtk/tr-core.c:1334
 #, c-format
 msgid "Skipping unknown torrent \"%s\""
-msgstr ""
+msgstr "Skipper ukendt torrent \"%s\""
 
 #: ../gtk/tr-core.c:1609
 msgid "Inhibiting desktop hibernation"
-msgstr ""
+msgstr "Forhindrer desktop dvaletilstand"
 
 #: ../gtk/tr-core.c:1613
 #, c-format
 msgid "Couldn't inhibit desktop hibernation: %s"
-msgstr ""
+msgstr "Kunne ikke forhindre desktop dvaletilstand: %s"
 
 #: ../gtk/tr-core.c:1646
 msgid "Allowing desktop hibernation"
@@ -1455,7 +1455,7 @@ msgstr "Inaktiv"
 #: ../gtk/tr-icon.c:76 ../gtk/tr-icon.c:98
 #, c-format
 msgid " (Limit: %s)"
-msgstr ""
+msgstr " (Grænse: %s)"
 
 #. %1$s: current upload speed
 #. * %2$s: current upload limit, if any
@@ -1475,19 +1475,19 @@ msgstr ""
 #: ../gtk/tr-prefs.c:258
 msgctxt "Gerund"
 msgid "Adding"
-msgstr ""
+msgstr "Tilføjer"
 
 #: ../gtk/tr-prefs.c:260
 msgid "Automatically add .torrent files _from:"
-msgstr ""
+msgstr "Tilføj automatisk .torrent filer _fra:"
 
 #: ../gtk/tr-prefs.c:267
 msgid "Show the Torrent Options _dialog"
-msgstr ""
+msgstr "Vis Torrent Indstillings_dialogen"
 
 #: ../gtk/tr-prefs.c:271
 msgid "_Start added torrents"
-msgstr ""
+msgstr "_Start tilføjede torrents"
 
 #: ../gtk/tr-prefs.c:280
 msgid "Save to _Location:"
@@ -1495,15 +1495,15 @@ msgstr "Gem på denne _placering:"
 
 #: ../gtk/tr-prefs.c:287
 msgid "Download Queue"
-msgstr ""
+msgstr "Download Kø"
 
 #: ../gtk/tr-prefs.c:289
 msgid "Ma_ximum active downloads:"
-msgstr ""
+msgstr "Mak_simale aktive downloads:"
 
 #: ../gtk/tr-prefs.c:293
 msgid "Downloads sharing data in the last _N minutes are active:"
-msgstr ""
+msgstr "Downloads der deler data i de sidste _N minutter er aktive:"
 
 #: ../gtk/tr-prefs.c:298 ../libtransmission/torrent.c:2158
 msgid "Incomplete"
@@ -1539,7 +1539,7 @@ msgstr "Skrivebord"
 
 #: ../gtk/tr-prefs.c:367
 msgid "_Inhibit hibernation when torrents are active"
-msgstr ""
+msgstr "_Forhindrer dvaletilstand når torrents are aktive"
 
 #: ../gtk/tr-prefs.c:371
 msgid "Show Transmission icon in the _notification area"
@@ -1547,7 +1547,7 @@ msgstr "Vis Transmissioniko_n i statusfelt"
 
 #: ../gtk/tr-prefs.c:376
 msgid "Notification"
-msgstr ""
+msgstr "Notifikation"
 
 #: ../gtk/tr-prefs.c:378
 msgid "Show a notification when torrents are a_dded"
@@ -1565,15 +1565,15 @@ msgstr "Af_spil en lyd når torrents bliver færdige"
 #, c-format
 msgid "Blocklist contains %'d rule"
 msgid_plural "Blocklist contains %'d rules"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Blokeringslisten indeholder %'d regel"
+msgstr[1] "Blokeringslisten indeholder %'d regler"
 
 #: ../gtk/tr-prefs.c:446
 #, c-format
 msgid "Blocklist has %'d rule."
 msgid_plural "Blocklist has %'d rules."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Blokeringslisten har %'d regel."
+msgstr[1] "Blokeringslisten har %'d regler."
 
 #: ../gtk/tr-prefs.c:450
 msgid "<b>Update succeeded!</b>"
@@ -1589,7 +1589,7 @@ msgstr "Opdater blokeringsliste"
 
 #: ../gtk/tr-prefs.c:463
 msgid "Getting new blocklist…"
-msgstr ""
+msgstr "Downloader ny blokeringsliste..."
 
 #: ../gtk/tr-prefs.c:488
 msgid "Allow encryption"
@@ -1617,7 +1617,7 @@ msgstr "Blokeringsliste"
 
 #: ../gtk/tr-prefs.c:520
 msgid "Enable _blocklist:"
-msgstr "Aktiver _blokeringsliste:"
+msgstr "Aktivér _blokeringsliste:"
 
 #: ../gtk/tr-prefs.c:534
 msgid "_Update"
@@ -1625,16 +1625,16 @@ msgstr "_Opdatér"
 
 #: ../gtk/tr-prefs.c:546
 msgid "Enable _automatic updates"
-msgstr "Slå _automatiske opdateringer til"
+msgstr "Aktivér _automatiske opdateringer"
 
 #: ../gtk/tr-prefs.c:747
 msgid "Remote Control"
-msgstr ""
+msgstr "Fjernbetjening"
 
 #. "enabled" checkbutton
 #: ../gtk/tr-prefs.c:750
 msgid "Allow _remote access"
-msgstr ""
+msgstr "Tillad _fjernadgang"
 
 #: ../gtk/tr-prefs.c:756
 msgid "_Open web client"
@@ -1662,7 +1662,7 @@ msgstr "Adgangs_kode:"
 #. require authentication
 #: ../gtk/tr-prefs.c:792
 msgid "Only allow these IP a_ddresses:"
-msgstr ""
+msgstr "Tillad kun disse IP a_dresser:"
 
 #: ../gtk/tr-prefs.c:816
 msgid "IP addresses may use wildcards, such as 192.168.*.*"
@@ -1719,12 +1719,12 @@ msgstr "Hastighedsgrænser"
 #: ../gtk/tr-prefs.c:979
 #, c-format
 msgid "_Upload (%s):"
-msgstr ""
+msgstr "_Upload (%s):"
 
 #: ../gtk/tr-prefs.c:986
 #, c-format
 msgid "_Download (%s):"
-msgstr ""
+msgstr "_Download (%s):"
 
 #: ../gtk/tr-prefs.c:995
 msgid "Alternative Speed Limits"
@@ -1737,12 +1737,12 @@ msgstr "Tilsidesæt normale hastighedsgrænser manuelt eller på planlagte tidsp
 #: ../gtk/tr-prefs.c:1011
 #, c-format
 msgid "U_pload (%s):"
-msgstr ""
+msgstr "U_pload (%s):"
 
 #: ../gtk/tr-prefs.c:1015
 #, c-format
 msgid "Do_wnload (%s):"
-msgstr ""
+msgstr "Do_wnload (%s):"
 
 #: ../gtk/tr-prefs.c:1019
 msgid "_Scheduled times:"
@@ -1774,7 +1774,7 @@ msgstr "<i>Tester TCP-port…</i>"
 
 #: ../gtk/tr-prefs.c:1132
 msgid "Listening Port"
-msgstr ""
+msgstr "Lytte Port"
 
 #: ../gtk/tr-prefs.c:1134
 msgid "_Port used for incoming connections:"
@@ -1806,7 +1806,7 @@ msgstr "Maksimalt antal peers i _alt:"
 
 #: ../gtk/tr-prefs.c:1169
 msgid "Enable _uTP for peer communication"
-msgstr ""
+msgstr "Aktivér _uTP for peer kommunikation"
 
 #: ../gtk/tr-prefs.c:1171
 msgid "uTP is a tool for reducing network congestion."
@@ -1843,12 +1843,12 @@ msgstr "Indstillinger for Transmission"
 #: ../gtk/tr-prefs.c:1256
 msgctxt "Gerund"
 msgid "Downloading"
-msgstr ""
+msgstr "Downloader"
 
 #: ../gtk/tr-prefs.c:1257
 msgctxt "Gerund"
 msgid "Seeding"
-msgstr ""
+msgstr "Seeder"
 
 #: ../gtk/tr-prefs.c:1259
 msgid "Network"
@@ -1856,7 +1856,7 @@ msgstr "Netværk"
 
 #: ../gtk/tr-prefs.c:1261
 msgid "Remote"
-msgstr ""
+msgstr "Fjern"
 
 #: ../gtk/tr-window.c:123
 msgid "Torrent"
@@ -1891,6 +1891,8 @@ msgid ""
 "Click to enable Alternative Speed Limits\n"
 " (%1$s down, %2$s up)"
 msgstr ""
+"Klik for at aktivere alternative hastighedsbegrænsninger\n"
+"(%1$s nede, %2$s op)"
 
 #: ../gtk/tr-window.c:303
 #, c-format
@@ -1961,35 +1963,35 @@ msgstr "TiB"
 
 #: ../gtk/util.c:42
 msgid "kB"
-msgstr ""
+msgstr "kB"
 
 #: ../gtk/util.c:43
 msgid "MB"
-msgstr ""
+msgstr "MB"
 
 #: ../gtk/util.c:44
 msgid "GB"
-msgstr ""
+msgstr "GB"
 
 #: ../gtk/util.c:45
 msgid "TB"
-msgstr ""
+msgstr "TB"
 
 #: ../gtk/util.c:48
 msgid "kB/s"
-msgstr ""
+msgstr "kB/s"
 
 #: ../gtk/util.c:49
 msgid "MB/s"
-msgstr ""
+msgstr "MB/s"
 
 #: ../gtk/util.c:50
 msgid "GB/s"
-msgstr ""
+msgstr "GB/s"
 
 #: ../gtk/util.c:51
 msgid "TB/s"
-msgstr ""
+msgstr "TB/s"
 
 #: ../gtk/util.c:122
 #, c-format
@@ -2027,7 +2029,7 @@ msgstr "Torrentfilen \"%s\" indeholder ugyldig data."
 #: ../gtk/util.c:262
 #, c-format
 msgid "The torrent file \"%s\" is already in use by \"%s.\""
-msgstr ""
+msgstr "Torrent filen \"%s\" er allerede i brug af \"%s.\""
 
 #: ../gtk/util.c:267
 #, c-format
@@ -2065,39 +2067,39 @@ msgstr ""
 #: ../gtk/util.c:730
 #, c-format
 msgid "%s free"
-msgstr ""
+msgstr "%s fri"
 
 #: ../libtransmission/announcer.c:1099 ../libtransmission/announcer.c:1392
 msgid "Could not connect to tracker"
-msgstr ""
+msgstr "Kunne ikke forbinde til tracker"
 
 #: ../libtransmission/announcer.c:1103 ../libtransmission/announcer.c:1396
 msgid "Tracker did not respond"
-msgstr ""
+msgstr "Tracker svarede ikke"
 
 #: ../libtransmission/announcer.c:1167
 msgid "Success"
-msgstr ""
+msgstr "Succes"
 
 #: ../libtransmission/announcer-http.c:229
 #: ../libtransmission/announcer-http.c:397
 #, c-format
 msgid "Tracker gave HTTP response code %1$ld (%2$s)"
-msgstr ""
+msgstr "Tracker gav HTTP-svarkode %1$ld (%2$s)"
 
 #: ../libtransmission/announcer-udp.c:280
 #: ../libtransmission/announcer-udp.c:430
 msgid "Unknown error"
-msgstr ""
+msgstr "Ukendt fejl"
 
 #: ../libtransmission/announcer-udp.c:520
 #, c-format
 msgid "DNS Lookup failed: %s"
-msgstr ""
+msgstr "DNS-opslag mislykkedes: %s"
 
 #: ../libtransmission/announcer-udp.c:623
 msgid "Connection failed"
-msgstr ""
+msgstr "Forbindelsen fejlede"
 
 #: ../libtransmission/blocklist.c:63 ../libtransmission/blocklist.c:329
 #: ../libtransmission/utils.c:243
@@ -2131,7 +2133,7 @@ msgstr "Blokeringslisten \"%s\" opdateret med %zu poster"
 #: ../libtransmission/fdlimit.c:176
 #, c-format
 msgid "Couldn't get directory for \"%1$s\": %2$s"
-msgstr ""
+msgstr "Kunne ikke læse mappen til \"%1$s\": %2$s"
 
 #: ../libtransmission/fdlimit.c:182 ../libtransmission/file-posix.c:187
 #: ../libtransmission/file-posix.c:197
@@ -2146,7 +2148,7 @@ msgstr "Kunne ikke åbne \"%1$s\": %2$s"
 
 #: ../libtransmission/fdlimit.c:215
 msgid "full"
-msgstr ""
+msgstr "fuld"
 
 #: ../libtransmission/fdlimit.c:220
 msgid "sparse"
@@ -2155,17 +2157,17 @@ msgstr ""
 #: ../libtransmission/fdlimit.c:227
 #, c-format
 msgid "Couldn't preallocate file \"%1$s\" (%2$s, size: %3$<PRIu64>): %4$s"
-msgstr ""
+msgstr "Kunne ikke præallokere fil \"%1$s\" (%2$s, størrelse: %3$<PRIu64>): %4$s"
 
 #: ../libtransmission/fdlimit.c:232
 #, c-format
 msgid "Preallocated file \"%1$s\" (%2$s, size: %3$<PRIu64>)"
-msgstr ""
+msgstr "Præallokeret fil \"%1$s\" (%2$s, størrelse: %3$<PRIu64>)"
 
 #: ../libtransmission/fdlimit.c:243
 #, c-format
 msgid "Couldn't truncate \"%1$s\": %2$s"
-msgstr ""
+msgstr "Kunne ikke afkorte \"%1$s\": %2$s"
 
 #: ../libtransmission/fdlimit.c:553
 #, c-format
@@ -2186,7 +2188,7 @@ msgstr "Torrentopretteren springer filen \"%s\" over: %s"
 #: ../libtransmission/makemeta.c:200
 #, c-format
 msgid "Failed to set piece size to %s, leaving it at %s"
-msgstr ""
+msgstr "Kunne ikke sætte stykstørrelse til %s, lader den være %s"
 
 #: ../libtransmission/metainfo.c:648
 #, c-format
@@ -2244,12 +2246,12 @@ msgstr "Kunne ikke forbinde port %d på %s: %s (%s)"
 #: ../libtransmission/peer-msgs.c:2118
 #, c-format
 msgid "Please Verify Local Data! Piece #%zu is corrupt."
-msgstr ""
+msgstr "Bekræft Venligst Lokal Data! Stykke #%zu er korrupt."
 
 #: ../libtransmission/platform.c:469
 #, c-format
 msgid "Searching for web interface file \"%s\""
-msgstr ""
+msgstr "Søger efter web interface fil \"%s\""
 
 #: ../libtransmission/port-forwarding.c:29
 msgid "Port Forwarding"
@@ -2283,22 +2285,22 @@ msgstr "Stoppet"
 #: ../libtransmission/rpcimpl.c:1567
 #, c-format
 msgid "Error uncompressing blocklist: %s (%d)"
-msgstr ""
+msgstr "Fejl ved dekomprimering af blokeringslist: %s (%d)"
 
 #: ../libtransmission/rpc-server.c:991
 #, c-format
 msgid "Couldn't find settings key \"%s\""
-msgstr ""
+msgstr "Kunne ikke finde indstillingsnøgle \"%s\""
 
 #: ../libtransmission/rpc-server.c:1103
 #, c-format
 msgid "%s is not a valid address"
-msgstr ""
+msgstr "%s er ikke en gyldig adresse"
 
 #: ../libtransmission/rpc-server.c:1108
-#, c-format
+#, fuzzy, c-format
 msgid "%s is not an IPv4 or IPv6 address. RPC listeners must be IPv4 or IPv6"
-msgstr ""
+msgstr "%s er ikke en IPv4-adresse. RPC lyttere skal være IPv4"
 
 #: ../libtransmission/rpc-server.c:1116
 #, c-format
@@ -2307,11 +2309,11 @@ msgstr ""
 
 #: ../libtransmission/rpc-server.c:1121
 msgid "Whitelist enabled"
-msgstr ""
+msgstr "Whitelist aktiveret"
 
 #: ../libtransmission/rpc-server.c:1126
 msgid "Password required"
-msgstr ""
+msgstr "Adgangskode krævet"
 
 #. first %s is the application name
 #. second %s is the version number
@@ -2341,7 +2343,7 @@ msgstr ""
 
 #: ../libtransmission/torrent.c:1858
 msgid "Restarted manually -- disabling its seed ratio"
-msgstr ""
+msgstr "Genstarted manuelt -- deaktivere dens seed forhold"
 
 #: ../libtransmission/torrent.c:2067
 msgid "Removing torrent"
@@ -2367,7 +2369,7 @@ msgstr ""
 
 #: ../libtransmission/torrent-magnet.c:318
 msgid "Magnet torrent's metadata is not usable"
-msgstr ""
+msgstr "Magnet torrenten's metadata er ikke brugbar"
 
 #: ../libtransmission/upnp.c:29
 msgid "Port Forwarding (UPnP)"
@@ -2423,7 +2425,7 @@ msgstr "Gemte \"%s\""
 
 #: ../libtransmission/variant.c:1241
 msgid "Unable to parse file content"
-msgstr ""
+msgstr "Filen's indhold kan ikke parses"
 
 #: ../libtransmission/verify.c:230
 msgid "Verifying torrent"
