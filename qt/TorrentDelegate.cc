@@ -349,8 +349,7 @@ QString TorrentDelegate::statusString(Torrent const& tor)
 
                 if (tor.webseedsWeAreDownloadingFrom())
                 {
-                    //: Second (optional) part of phrase "Downloading from ... of ... connected peer(s) and ... web
-                    // seed(s)";
+                    //: Second (optional) part of phrase "Downloading from ... of ... connected peer(s) and ... web seed(s)";
                     //: notice that leading space (before "and") is included here
                     str += tr(" and %Ln web seed(s)", nullptr, tor.webseedsWeAreDownloadingFrom());
                 }
