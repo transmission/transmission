@@ -149,7 +149,7 @@ set(${PROJECT_NAME}_LINGUAS
     pt_BR
     ru
     sv
-    tr_TR
+    tr
     uk
     zh_CN
 )
