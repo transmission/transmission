@@ -54,7 +54,7 @@ TRANSLATIONS += translations/transmission_de.ts \
                 translations/transmission_ko.ts \
                 translations/transmission_lt.ts \
                 translations/transmission_nl.ts \
-                translations/transmission_pl_PL.ts \
+                translations/transmission_pl.ts \
                 translations/transmission_pt_BR.ts \
                 translations/transmission_ru.ts \
                 translations/transmission_sv.ts \
