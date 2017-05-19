@@ -2228,7 +2228,7 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
     <message>
         <location line="+449"/>
         <source>Error Adding Torrent</source>
-        <translation type="unfinished">Klaida pridedant torentą</translation>
+        <translation>Klaida pridedant torentą</translation>
     </message>
     <message>
         <location line="+16"/>
@@ -2238,7 +2238,7 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
     <message>
         <location line="+1"/>
         <source>&lt;p&gt;&lt;b&gt;Unable to add &quot;%1&quot;.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;It is a duplicate of &quot;%2&quot; which is already added.&lt;/p&gt;</source>
-        <translation type="unfinished">&lt;p&gt;&lt;b&gt;Nepavyko pridėti &quot;%1&quot;.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Tai yra jau pridėto &quot;%2&quot; dublikatas.&lt;/p&gt;</translation>
+        <translation>&lt;p&gt;&lt;b&gt;Nepavyko pridėti &quot;%1&quot;.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Tai yra jau pridėto &quot;%2&quot; dublikatas.&lt;/p&gt;</translation>
     </message>
 </context>
 <context>

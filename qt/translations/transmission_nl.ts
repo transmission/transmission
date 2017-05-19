@@ -16,17 +16,17 @@
     <message>
         <location filename="../AboutDialog.ui" line="+26"/>
         <source>A fast and easy BitTorrent client</source>
-        <translation>Een snelle en makkelijke BitTorrent client</translation>
+        <translation>Een eenvoudige en snelle BitTorrent-cliënt</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Copyright (c) The Transmission Project</source>
-        <translation>Auteursrecht (c) The Transmission Project</translation>
+        <translation>Auteursrecht (c) het Transmission-project</translation>
     </message>
     <message>
         <location filename="../AboutDialog.cc" line="+4"/>
         <source>C&amp;redits</source>
-        <translation>C&amp;redits</translation>
+        <translation>M&amp;et dank aan</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -36,7 +36,7 @@
     <message>
         <location line="+8"/>
         <source>Credits</source>
-        <translation>Credits</translation>
+        <translation>Met dank aan</translation>
     </message>
 </context>
 <context>
@@ -49,7 +49,7 @@
     <message>
         <location line="+1"/>
         <source>When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility.</source>
-        <translation>Wanneer je een torrent uitvoert, wordt de data daarvan beschikbaar gemaakt door middel van uploaden. Alle inhoud die je deelt is jouw verantwoordelijkheid.</translation>
+        <translation>Wanneer je een torrent uitvoert, worden de gegevens daarvan beschikbaar gemaakt door middel van uploaden. Alle inhoud die je deelt is jouw verantwoordelijkheid.</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -190,12 +190,12 @@
     <message>
         <location line="+8"/>
         <source>Peer was discovered through DHT</source>
-        <translation>Peer was ontdekt via DHT</translation>
+        <translation>Peer is ontdekt via DHT</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Peer was discovered through Peer Exchange (PEX)</source>
-        <translation>Peer was ontdekt via Peer Exchange (PEX)</translation>
+        <translation>Peer is ontdekt via peeruitwisseling (PEX)</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -221,7 +221,7 @@
     <message>
         <location line="-30"/>
         <source>Tracker already exists.</source>
-        <translation>Tracker bestaat al</translation>
+        <translation>Tracker bestaat al.</translation>
     </message>
     <message>
         <location line="-815"/>
@@ -239,7 +239,7 @@
         <location line="+10"/>
         <source>%1 of %2 (%3%), %4 Unverified</source>
         <extracomment>Text following the &quot;Have:&quot; label in torrent properties dialog; %1 is amount of downloaded data (both verified and unverified), %2 is overall size of torrent data, %3 is percentage (%1/%2*100), %4 is amount of downloaded but not yet verified data</extracomment>
-        <translation>%1 van %2 (%3), %4 ongeverifiëerd</translation>
+        <translation>%1 van %2 (%3), %4 niet geverifieerd</translation>
     </message>
     <message>
         <location line="+44"/>
@@ -249,12 +249,12 @@
     <message>
         <location line="+26"/>
         <source>%1 (Ratio: %2)</source>
-        <translation>%1 (Verhouding: %2)</translation>
+        <translation>%1 (verhouding: %2)</translation>
     </message>
     <message>
         <location line="+276"/>
         <source>N/A</source>
-        <translation>Niet beschikbaar</translation>
+        <translation>n.v.t.</translation>
     </message>
     <message>
         <location line="+260"/>
@@ -269,7 +269,7 @@
     <message>
         <location line="+0"/>
         <source>Add tracker announce URL:</source>
-        <translation>Voeg announce-URL van tracker toe:</translation>
+        <translation>Voeg aankondigings-URL van tracker toe:</translation>
     </message>
     <message>
         <location line="+9"/>
@@ -285,7 +285,7 @@
     <message>
         <location line="+0"/>
         <source>Edit tracker announce URL:</source>
-        <translation>Wijzig announce-URL van tracker:</translation>
+        <translation>Wijzig aankondigings-URL van tracker:</translation>
     </message>
     <message>
         <location line="+61"/>
@@ -356,12 +356,12 @@
     <message>
         <location line="+0"/>
         <source>Client</source>
-        <translation>Client</translation>
+        <translation>Cliënt</translation>
     </message>
     <message>
         <location filename="../DetailsDialog.ui" line="+14"/>
         <source>Torrent Properties</source>
-        <translation>Eigenschappen torrent</translation>
+        <translation>Torrenteigenschappen</translation>
     </message>
     <message>
         <location line="+16"/>
@@ -376,7 +376,7 @@
     <message>
         <location line="+12"/>
         <source>Have:</source>
-        <translation>Bezit: </translation>
+        <translation>In bezit:</translation>
     </message>
     <message>
         <location line="+26"/>
@@ -481,12 +481,12 @@
     <message>
         <location line="+23"/>
         <source>Show &amp;more details</source>
-        <translation>Laat &amp;meer details zien</translation>
+        <translation>&amp;Meer details tonen</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Show &amp;backup trackers</source>
-        <translation>Laat &amp;backuptrackers zien</translation>
+        <translation>&amp;Back-uptrackers tonen</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -526,7 +526,7 @@
     <message>
         <location line="+34"/>
         <source>Seeding Limits</source>
-        <translation>Seed-limieten</translation>
+        <translation>Seedlimieten</translation>
     </message>
     <message>
         <location line="+12"/>
@@ -961,12 +961,12 @@
     <message>
         <location line="+11"/>
         <source>&amp;Verify Local Data</source>
-        <translation>&amp;Verifiëer lokale data</translation>
+        <translation>&amp;Verifieer lokale gegevens</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Verify local data</source>
-        <translation>Verifiëer lokale data</translation>
+        <translation>Verifieer lokale gegevens</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -1362,12 +1362,12 @@
     <message>
         <location line="+6"/>
         <source>Once removed, continuing the transfer will require the torrent file or magnet link.</source>
-        <translation>Eenmaal verwijderd, zal om verder te gaan met de overdracht het torrentbestand of magnet-link nodig zijn.</translation>
+        <translation>Eenmaal verwijderd, zal om verder te gaan met de overdracht het torrentbestand of magnetlink nodig zijn.</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Once removed, continuing the transfers will require the torrent files or magnet links.</source>
-        <translation>Eenmaal verwijderd, zullen om verder te gaan met de overdrachten, de torrentbestanden of magnet-links nodig zijn</translation>
+        <translation>Eenmaal verwijderd, zullen om verder te gaan met de overdrachten, de torrentbestanden of magnetlinks nodig zijn</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -1604,7 +1604,7 @@ Om een andere hoofd-URL toe te voegen, plaats deze na een lege regel</translatio
     <message>
         <location filename="../OptionsDialog.cc" line="-70"/>
         <source>&amp;Verify Local Data</source>
-        <translation>&amp;Verifiëer lokale data</translation>
+        <translation>&amp;Verifieer lokale gegevens</translation>
     </message>
     <message>
         <location filename="../OptionsDialog.ui" line="+7"/>
@@ -2098,7 +2098,7 @@ Om een andere hoofd-URL toe te voegen, plaats deze na een lege regel</translatio
         <location line="+137"/>
         <source>Download is i&amp;nactive if data sharing stopped:</source>
         <extracomment>Please keep this phrase as short as possible, it&apos;s curently the longest and influences dialog width</extracomment>
-        <translation>Download is i&amp;nactief als datadeling zou stoppen:</translation>
+        <translation>Download is i&amp;nactief als gegevensdeling zou stoppen:</translation>
     </message>
     <message>
         <location line="-146"/>
@@ -2194,7 +2194,7 @@ Om een andere hoofd-URL toe te voegen, plaats deze na een lege regel</translatio
     <message>
         <location line="+7"/>
         <source>Local data is &amp;already there</source>
-        <translation>Lokale data is &amp;al aanwezig</translation>
+        <translation>Lokale gegevens zijn &amp;al aanwezig</translation>
     </message>
 </context>
 <context>
@@ -2212,7 +2212,7 @@ Om een andere hoofd-URL toe te voegen, plaats deze na een lege regel</translatio
     <message>
         <location line="+449"/>
         <source>Error Adding Torrent</source>
-        <translation type="unfinished">Fout bij het toevoegen van torrent</translation>
+        <translation>Fout bij toevoegen van torrent</translation>
     </message>
     <message>
         <location line="+16"/>
@@ -2222,7 +2222,7 @@ Om een andere hoofd-URL toe te voegen, plaats deze na een lege regel</translatio
     <message>
         <location line="+1"/>
         <source>&lt;p&gt;&lt;b&gt;Unable to add &quot;%1&quot;.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;It is a duplicate of &quot;%2&quot; which is already added.&lt;/p&gt;</source>
-        <translation type="unfinished">&lt;p&gt;&lt;b&gt;Kan &quot;%1&quot; niet toevoegen.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Het is dezelfde als &quot;%2&quot;, die al is toegevoegd.&lt;/p&gt;</translation>
+        <translation>&lt;p&gt;&lt;b&gt;Kan &quot;%1&quot; niet toevoegen.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Het is dezelfde als &quot;%2&quot;, die al is toegevoegd.&lt;/p&gt;</translation>
     </message>
 </context>
 <context>
@@ -2328,7 +2328,7 @@ Om een andere hoofd-URL toe te voegen, plaats deze na een lege regel</translatio
     <message>
         <location filename="../Torrent.cc" line="+1014"/>
         <source>Verifying local data</source>
-        <translation>Lokale data verifiëren</translation>
+        <translation>Lokale gegevens verifiëren</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -2387,7 +2387,7 @@ Om een andere hoofd-URL toe te voegen, plaats deze na een lege regel</translatio
         <location filename="../TorrentDelegate.cc" line="+177"/>
         <source>Magnetized transfer - retrieving metadata (%1%)</source>
         <extracomment>First part of torrent progress string; %1 is the percentage of torrent metadata downloaded</extracomment>
-        <translation>Magneet-overdracht - bezig met ontvangen van metadata (%1%)</translation>
+        <translation>Magneetoverdracht - bezig met ontvangen van metagegevens (%1%)</translation>
     </message>
     <message>
         <location line="+9"/>
@@ -2462,8 +2462,8 @@ Om een andere hoofd-URL toe te voegen, plaats deze na een lege regel</translatio
         <location line="-53"/>
         <source>Downloading metadata from %Ln peer(s) (%1% done)</source>
         <translation>
-            <numerusform>Metadata van %Ln peer downloaden (%1 % voltooid)</numerusform>
-            <numerusform>Metadata van %Ln peers downloaden (%1 % voltooid)</numerusform>
+            <numerusform>Metagegevens van %Ln peer downloaden (%1 % voltooid)</numerusform>
+            <numerusform>Metagegevens van %Ln peers downloaden (%1 % voltooid)</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -2500,7 +2500,7 @@ Om een andere hoofd-URL toe te voegen, plaats deze na een lege regel</translatio
     <message>
         <location line="-81"/>
         <source>Verifying local data (%1% tested)</source>
-        <translation>Lokale data geverifiëerd (%1 % getest)</translation>
+        <translation>Lokale gegevens verifiëren (%1 % getest)</translation>
     </message>
 </context>
 <context>

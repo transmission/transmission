@@ -1755,7 +1755,7 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
     <message>
         <location line="+44"/>
         <source>Use UPnP or NAT-PMP port &amp;forwarding from my router</source>
-        <translation>UPnP vagy NAT-PMP port &amp;forward a routerhez</translation>
+        <translation>UPnP vagy NAT-PMP portát&amp;irányítás a routertől</translation>
     </message>
     <message>
         <location line="+107"/>
@@ -2196,7 +2196,7 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
     <message>
         <location line="+449"/>
         <source>Error Adding Torrent</source>
-        <translation type="unfinished">Hiba a torrent hozzáadásakor</translation>
+        <translation>Hiba a torrent hozzáadásakor</translation>
     </message>
     <message>
         <location line="+16"/>
@@ -2206,7 +2206,7 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
     <message>
         <location line="+1"/>
         <source>&lt;p&gt;&lt;b&gt;Unable to add &quot;%1&quot;.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;It is a duplicate of &quot;%2&quot; which is already added.&lt;/p&gt;</source>
-        <translation type="unfinished">&lt;p&gt;&lt;b&gt;&quot;%1&quot; hozzáadása sikertelen.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Megegyezik a &quot;%2&quot; torrenttel, ami pedig már hozzá lett adva.&lt;/p&gt;</translation>
+        <translation>&lt;p&gt;&lt;b&gt;„%1” hozzáadása sikertelen.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Megegyezik a(z) „%2” torrenttel, ami pedig már hozzá lett adva.&lt;/p&gt;</translation>
     </message>
 </context>
 <context>

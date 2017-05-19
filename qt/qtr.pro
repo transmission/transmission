@@ -56,6 +56,7 @@ TRANSLATIONS += translations/transmission_de.ts \
                 translations/transmission_nl.ts \
                 translations/transmission_pl.ts \
                 translations/transmission_pt_BR.ts \
+                translations/transmission_pt_PT.ts \
                 translations/transmission_ru.ts \
                 translations/transmission_sv.ts \
                 translations/transmission_tr.ts \

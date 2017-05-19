@@ -147,6 +147,7 @@ set(${PROJECT_NAME}_LINGUAS
     nl
     pl
     pt_BR
+    pt_PT
     ru
     sv
     tr

@@ -6,7 +6,7 @@
     <message>
         <location filename="../AboutDialog.ui" line="+14"/>
         <source>About Transmission</source>
-        <translation>О «Transmission»</translation>
+        <translation>О приложении</translation>
     </message>
     <message>
         <location filename="../AboutDialog.cc" line="+28"/>
@@ -16,12 +16,12 @@
     <message>
         <location filename="../AboutDialog.ui" line="+26"/>
         <source>A fast and easy BitTorrent client</source>
-        <translation>Простой и быстрый BitTorrent-клиент</translation>
+        <translation>Быстрый и простой BitTorrent-клиент</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Copyright (c) The Transmission Project</source>
-        <translation>© Transmission Project, 2005-2015</translation>
+        <translation>Авторское право (©) The Transmission Project</translation>
     </message>
     <message>
         <location filename="../AboutDialog.cc" line="+4"/>
@@ -98,29 +98,29 @@
     <message>
         <location line="+250"/>
         <source>Active now</source>
-        <translation>Активен сейчас</translation>
+        <translation>Сейчас активен</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>%1 ago</source>
-        <translation>%1 тому назад</translation>
+        <translation>%1 назад</translation>
     </message>
     <message numerus="yes">
         <location line="+63"/>
         <source>%1 (%Ln pieces @ %2)</source>
         <translation>
-            <numerusform>%1 (%Ln часть @ %2)</numerusform>
-            <numerusform>%1 (%Ln части @ %2)</numerusform>
-            <numerusform>%1 (%Ln частей @ %2)</numerusform>
+            <numerusform>%1 (%Ln фрагмент @ %2)</numerusform>
+            <numerusform>%1 (%Ln фрагмента @ %2)</numerusform>
+            <numerusform>%1 (%Ln фрагментов @ %2)</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+5"/>
         <source>%1 (%Ln pieces)</source>
         <translation>
-            <numerusform>%1 (%Ln часть)</numerusform>
-            <numerusform>%1 (%Ln части)</numerusform>
-            <numerusform>%1 (%Ln частей)</numerusform>
+            <numerusform>%1 (%Ln фрагмент)</numerusform>
+            <numerusform>%1 (%Ln фрагмента)</numerusform>
+            <numerusform>%1 (%Ln фрагментов)</numerusform>
         </translation>
     </message>
     <message>
@@ -162,47 +162,47 @@
     <message>
         <location line="+4"/>
         <source>Downloading from this peer</source>
-        <translation>Загрузка с этого пира</translation>
+        <translation>Загрузка от этого участника</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>We would download from this peer if they would let us</source>
-        <translation>Возможен прием данных от этого пира, если он позволит</translation>
+        <translation>Возможна загрузка данных от этого участника, если он позволит</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Uploading to peer</source>
-        <translation>Отдача пиру</translation>
+        <translation>Раздача участнику</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>We would upload to this peer if they asked</source>
-        <translation>Возможна отдача данных этому пиру, если он будет заинтересован</translation>
+        <translation>Возможна раздача данных этому участнику, если он будет заинтересован</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Peer has unchoked us, but we&apos;re not interested</source>
-        <translation>Пир согласен передавать данные, но мы не заинтересованы</translation>
+        <translation>Участник согласен передавать данные, но мы не заинтересованы</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>We unchoked this peer, but they&apos;re not interested</source>
-        <translation>Передача пиру была разрешена, но он не заинтересован</translation>
+        <translation>Передача участнику была разрешена, но он не заинтересован</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Peer was discovered through DHT</source>
-        <translation>Пир был обнаружен через DHT</translation>
+        <translation>Участник был найден через DHT</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Peer was discovered through Peer Exchange (PEX)</source>
-        <translation>Пир был обнаружен через Peer Exchange (PEX)</translation>
+        <translation>Участник был найден с помощью обмена участниками (PEX)</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Peer is an incoming connection</source>
-        <translation>Пир работает в режиме приема</translation>
+        <translation>Участник открыл соединение с нами</translation>
     </message>
     <message numerus="yes">
         <location line="+136"/>
@@ -262,7 +262,7 @@
     <message>
         <location line="+260"/>
         <source>Peer is connected over uTP</source>
-        <translation>Пир подключен через uTP</translation>
+        <translation>Участник подключён через uTP</translation>
     </message>
     <message>
         <location line="+166"/>
@@ -339,7 +339,7 @@
     <message>
         <location line="+0"/>
         <source>Down</source>
-        <translation>Прием</translation>
+        <translation>Загрузка</translation>
     </message>
     <message>
         <location line="+0"/>
@@ -459,7 +459,7 @@
     <message>
         <location line="+20"/>
         <source>Peers</source>
-        <translation>Пиры</translation>
+        <translation>Участники</translation>
     </message>
     <message>
         <location line="+32"/>
@@ -544,12 +544,12 @@
     <message>
         <location line="+50"/>
         <source>Peer Connections</source>
-        <translation>Соединения с пирами</translation>
+        <translation>Соединения с участниками</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>&amp;Maximum peers:</source>
-        <translation>&amp;Максимальное количество пиров:</translation>
+        <translation>&amp;Максимальное количество участников:</translation>
     </message>
 </context>
 <context>
@@ -948,12 +948,12 @@
     <message>
         <location line="+11"/>
         <source>Ask Tracker for &amp;More Peers</source>
-        <translation>Зап&amp;росить у трекера больше пиров</translation>
+        <translation>Запросить у трекера &amp;больше участников</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Ask tracker for more peers</source>
-        <translation>Запросить у трекера больше пиров</translation>
+        <translation>Запросить у трекера больше участников</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -1008,7 +1008,7 @@
     <message>
         <location line="+5"/>
         <source>&amp;Quit</source>
-        <translation>В&amp;ыход</translation>
+        <translation>В&amp;ыйти</translation>
     </message>
     <message>
         <location line="+11"/>
@@ -1274,7 +1274,7 @@
         <location line="-441"/>
         <source> - %1:%2</source>
         <extracomment>Second (optional) part of main window title &quot;Transmission - host:port&quot; (added when connected to remote session); notice that leading space (before the dash) is included here</extracomment>
-        <translation> - %1:%2</translation>
+        <translation> — %1:%2</translation>
     </message>
     <message>
         <location line="+31"/>
@@ -1392,22 +1392,22 @@
     <message>
         <location line="+4"/>
         <source>This torrent is connected to peers.</source>
-        <translation>Этот торрент подключен к пирам.</translation>
+        <translation>Этот торрент подключён к участникам.</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>These torrents are connected to peers.</source>
-        <translation>Эти торренты подключены к пирам.</translation>
+        <translation>Эти торренты подключены к участникам.</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>One of these torrents is connected to peers.</source>
-        <translation>Один из этих торрентов подключен к узлам.</translation>
+        <translation>Один из этих торрентов подключён к участникам.</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Some of these torrents are connected to peers.</source>
-        <translation>Некоторые из этих торрентов подключены к пирам.</translation>
+        <translation>Некоторые из этих торрентов подключены к участникам.</translation>
     </message>
     <message>
         <location line="+10"/>
@@ -1465,9 +1465,9 @@
         <location line="+1"/>
         <source>%Ln Piece(s)</source>
         <translation>
-            <numerusform>%Ln часть</numerusform>
-            <numerusform>%Ln части</numerusform>
-            <numerusform>%Ln частей</numerusform>
+            <numerusform>%Ln фрагмент</numerusform>
+            <numerusform>%Ln фрагмента</numerusform>
+            <numerusform>%Ln фрагментов</numerusform>
         </translation>
     </message>
     <message>
@@ -1708,7 +1708,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+1"/>
         <source>Weekdays</source>
-        <translation>По рабочим дням</translation>
+        <translation>Будни</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -1789,12 +1789,12 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+15"/>
         <source>Enable &amp;uTP for peer connections</source>
-        <translation>Включить uTP для соединения с пирами</translation>
+        <translation>Исп&amp;ользовать uTP для связи с другими участниками</translation>
     </message>
     <message>
         <location line="-3"/>
         <source>uTP is a tool for reducing network congestion.</source>
-        <translation>uTP — технология снижения нагрузки на сеть</translation>
+        <translation>uTP — это инструмент для снижения нагрузки на сеть.</translation>
     </message>
     <message numerus="yes">
         <location filename="../PrefsDialog.cc" line="-230"/>
@@ -1844,7 +1844,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+12"/>
         <source>Ma&amp;ximum active downloads:</source>
-        <translation>Маскимальное количество активных скачиваний:</translation>
+        <translation>&amp;Максимальное количество одновременных загрузок:</translation>
     </message>
     <message>
         <location line="+67"/>
@@ -1883,12 +1883,12 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+299"/>
         <source>Maximum peers per &amp;torrent:</source>
-        <translation>&amp;Максимальное количество пиров на торрент:</translation>
+        <translation>М&amp;аксимальное количество участников на торрент:</translation>
     </message>
     <message>
         <location line="+23"/>
         <source>Maximum peers &amp;overall:</source>
-        <translation>&amp;Общее максимальное количество пиров:</translation>
+        <translation>&amp;Общее максимальное количество участников:</translation>
     </message>
     <message numerus="yes">
         <location filename="../PrefsDialog.cc" line="-223"/>
@@ -1902,12 +1902,12 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+7"/>
         <source>&lt;b&gt;Update Blocklist&lt;/b&gt;&lt;p&gt;Getting new blocklist...</source>
-        <translation>&lt;b&gt;Обновление «чёрного списка»&lt;/b&gt;&lt;p&gt;Получение нового «черного списка»...</translation>
+        <translation>&lt;b&gt;Обновление чёрного списка&lt;/b&gt;&lt;p&gt;Получение нового чёрного списка...</translation>
     </message>
     <message>
         <location filename="../PrefsDialog.ui" line="-193"/>
         <source>Blocklist</source>
-        <translation>«Чёрный список»</translation>
+        <translation>Чёрный список</translation>
     </message>
     <message>
         <location line="+42"/>
@@ -2003,7 +2003,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+53"/>
         <source>Alternative Speed Limits</source>
-        <translation>Альтернативные ограничения скорости</translation>
+        <translation>Расширенное ограничение скорости</translation>
     </message>
     <message>
         <location line="+21"/>
@@ -2048,37 +2048,37 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location filename="../PrefsDialog.ui" line="-229"/>
         <source>Peer Limits</source>
-        <translation>Ограничения пиров</translation>
+        <translation>Ограничения участников</translation>
     </message>
     <message>
         <location line="+104"/>
         <source>Use PE&amp;X to find more peers</source>
-        <translation>Исполь&amp;зовать PEX-протокол для поиска пиров</translation>
+        <translation>&amp;Использовать PEX для обмена списками участников</translation>
     </message>
     <message>
         <location line="-3"/>
         <source>PEX is a tool for exchanging peer lists with the peers you&apos;re connected to.</source>
-        <translation>PEX — это технология обмена списками пиров с теми, к кому вы подключаетесь.</translation>
+        <translation>PEX — это технология обмена списками участников с теми, к кому вы подключаетесь.</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Use &amp;DHT to find more peers</source>
-        <translation>Испо&amp;льзовать DHT для обнаружения пиров</translation>
+        <translation>И&amp;спользовать DHT для обнаружения участников</translation>
     </message>
     <message>
         <location line="-3"/>
         <source>DHT is a tool for finding peers without a tracker.</source>
-        <translation>DHT — это технология поиска пиров без использования трекера.</translation>
+        <translation>DHT — это технология поиска участников без использования трекера.</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Use &amp;Local Peer Discovery to find more peers</source>
-        <translation>&amp;Использовать LPD для поиска пиров</translation>
+        <translation>Ис&amp;пользовать LPD для обнаружения участников</translation>
     </message>
     <message>
         <location line="-3"/>
         <source>LPD is a tool for finding peers on your local network.</source>
-        <translation>LPD — это технология поиска пиров в вашей локальной сети.</translation>
+        <translation>LPD — это технология поиска участников в локальной сети</translation>
     </message>
     <message>
         <location line="-325"/>
@@ -2228,7 +2228,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+449"/>
         <source>Error Adding Torrent</source>
-        <translation type="unfinished">Ошибка добавления торрента</translation>
+        <translation>Ошибка при добавлении торрента</translation>
     </message>
     <message>
         <location line="+16"/>
@@ -2238,7 +2238,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+1"/>
         <source>&lt;p&gt;&lt;b&gt;Unable to add &quot;%1&quot;.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;It is a duplicate of &quot;%2&quot; which is already added.&lt;/p&gt;</source>
-        <translation type="unfinished">&lt;p&gt;&lt;b&gt;Невозможно добавить &quot;%1&quot;.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Он дублирует &quot;%2&quot;, который уже добавлен.&lt;/p&gt;</translation>
+        <translation>&lt;p&gt;&lt;b&gt;Не удалось добавить «%1».&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Это дубликат «%2» который уже добавлен.&lt;/p&gt;</translation>
     </message>
 </context>
 <context>
@@ -2458,32 +2458,32 @@ To add another primary URL, add it after a blank line.</source>
         <source>Downloading from %Ln peer(s)</source>
         <extracomment>First part of phrase &quot;Downloading from ... peer(s) and ... web seed(s)&quot;</extracomment>
         <translation>
-            <numerusform>Приём от %Ln пира</numerusform>
-            <numerusform>Приём от %Ln пиров</numerusform>
-            <numerusform>Приём от %Ln пиров</numerusform>
+            <numerusform>Приём от %Ln участника</numerusform>
+            <numerusform>Приём от %Ln участников</numerusform>
+            <numerusform>Приём от %Ln участников</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+22"/>
         <source>Seeding to %Ln peer(s)</source>
         <translation>
-            <numerusform>Раздача к %Ln пиру</numerusform>
-            <numerusform>Раздача к %Ln пирам</numerusform>
-            <numerusform>Раздача к %Ln пирам</numerusform>
+            <numerusform>Раздача к %Ln участнику</numerusform>
+            <numerusform>Раздача к %Ln участникам</numerusform>
+            <numerusform>Раздача к %Ln участникам</numerusform>
         </translation>
     </message>
     <message>
         <location line="+21"/>
         <source> - </source>
-        <translation> - </translation>
+        <translation> — </translation>
     </message>
     <message numerus="yes">
         <location line="-53"/>
         <source>Downloading metadata from %Ln peer(s) (%1% done)</source>
         <translation>
-            <numerusform>Загрузка метаданных от %Ln пира (%1% завершено)</numerusform>
-            <numerusform>Загрузка метаданных от %Ln пиров (%1% завершено)</numerusform>
-            <numerusform>Загрузка метаданных от %Ln пиров (%1% завершено)</numerusform>
+            <numerusform>Загрузка метаданных от %Ln участника (%1% завершено)</numerusform>
+            <numerusform>Загрузка метаданных от %Ln участников (%1% завершено)</numerusform>
+            <numerusform>Загрузка метаданных от %Ln участников (%1% завершено)</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -2491,9 +2491,9 @@ To add another primary URL, add it after a blank line.</source>
         <source>Downloading from %1 of %Ln connected peer(s)</source>
         <extracomment>First part of phrase &quot;Downloading from ... of ... connected peer(s) and ... web seed(s)&quot;</extracomment>
         <translation>
-            <numerusform>Приём от %1 из %Ln подключённого пира</numerusform>
-            <numerusform>Приём от %1 из %Ln подключённых пиров</numerusform>
-            <numerusform>Приём от %1 из %Ln подключённых пиров</numerusform>
+            <numerusform>Приём от %1 из %Ln подключённого участника</numerusform>
+            <numerusform>Приём от %1 из %Ln подключённых участников</numerusform>
+            <numerusform>Приём от %1 из %Ln подключённых участников</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -2510,9 +2510,9 @@ To add another primary URL, add it after a blank line.</source>
         <location line="+13"/>
         <source>Seeding to %1 of %Ln connected peer(s)</source>
         <translation>
-            <numerusform>Раздача к %1 из %Ln подключённого пира</numerusform>
-            <numerusform>Раздача к %1 из %Ln подключённых пиров</numerusform>
-            <numerusform>Раздача к %1 из %Ln подключённых пиров</numerusform>
+            <numerusform>Раздача к %1 из %Ln подключённого участника</numerusform>
+            <numerusform>Раздача к %1 из %Ln подключённых участников</numerusform>
+            <numerusform>Раздача к %1 из %Ln подключённых участников</numerusform>
         </translation>
     </message>
     <message>
@@ -2523,7 +2523,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="-81"/>
         <source>Verifying local data (%1% tested)</source>
-        <translation>Проверка локальных данных (%1% проверено)</translation>
+        <translation>Проверка локальных данных (проверено %1%)</translation>
     </message>
 </context>
 <context>
@@ -2542,35 +2542,35 @@ To add another primary URL, add it after a blank line.</source>
         <location line="+6"/>
         <source>Peer list request %1timed out%2 %3 ago; will retry</source>
         <extracomment>%1 and %2 are replaced with HTML markup, %3 is duration</extracomment>
-        <translation>Время запроса списка пиров %1 истекло %2 %3 тому назад, повтор попытки</translation>
+        <translation>Время запроса списка участников %1истекло%2 %3 назад; повтор попытки</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Got an error %1&quot;%2&quot;%3 %4 ago</source>
         <extracomment>%1 and %3 are replaced with HTML markup, %2 is error message, %4 is duration</extracomment>
-        <translation>Получена ошибка %1&quot;%2&quot;%3 %4 тому назад </translation>
+        <translation>Получена ошибка %1&quot;%2&quot;%3 %4 назад </translation>
     </message>
     <message>
         <location line="+9"/>
         <source>No updates scheduled</source>
-        <translation>Обновления не запланированы</translation>
+        <translation>Нет запланированных обновлений</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Asking for more peers in %1</source>
         <extracomment>%1 is duration</extracomment>
-        <translation>Запрос дополнительных пиров через %1</translation>
+        <translation>Запрос дополнительных участников через %1</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Queued to ask for more peers</source>
-        <translation>Запрос дополнительных пиров поставлен в очередь</translation>
+        <translation>Запрос дополнительных участников поставлен в очередь</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Asking for more peers now... &lt;small&gt;%1&lt;/small&gt;</source>
         <extracomment>%1 is duration</extracomment>
-        <translation>Запрос дополнительных пиров... &lt;small&gt;%1&lt;/small&gt;</translation>
+        <translation>Запрос дополнительных участников… &lt;small&gt;%1&lt;/small&gt;</translation>
     </message>
     <message numerus="yes">
         <location line="+18"/>
@@ -2596,30 +2596,30 @@ To add another primary URL, add it after a blank line.</source>
         <location line="+6"/>
         <source>Tracker had %1no information%2 on peer counts %3 ago</source>
         <extracomment>%1 and %2 are replaced with HTML markup, %3 is duration</extracomment>
-        <translation>От трекера %1не было информации%2 о количестве пиров %3 тому назад</translation>
+        <translation>От трекера %1не было информации%2 о количестве участников %3 назад</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Got a scrape error %1&quot;%2&quot;%3 %4 ago</source>
         <extracomment>%1 and %3 are replaced with HTML markup, %2 is error message, %4 is duration</extracomment>
-        <translation>Получена ошибка при запросе к трекеру %1&quot;%2&quot;%3 %4 тому назад</translation>
+        <translation>Ошибка при запросе к трекеру %1&quot;%2&quot;%3 %4 назад</translation>
     </message>
     <message>
         <location line="+15"/>
         <source>Asking for peer counts in %1</source>
         <extracomment>%1 is duration</extracomment>
-        <translation>Запрос количества пиров через %1</translation>
+        <translation>Запрос количества участников через %1</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Queued to ask for peer counts</source>
-        <translation>Запрос количества пиров поставлен в очередь</translation>
+        <translation>Запрос количества участников поставлен в очередь</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Asking for peer counts now... &lt;small&gt;%1&lt;/small&gt;</source>
         <extracomment>%1 is duration</extracomment>
-        <translation>Запрос количества пиров... &lt;small&gt;%1&lt;/small&gt;</translation>
+        <translation>Запрос количества участников… &lt;small&gt;%1&lt;/small&gt;</translation>
     </message>
 </context>
 </TS>

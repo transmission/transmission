@@ -54,7 +54,7 @@
     <message>
         <location line="+2"/>
         <source>I &amp;Agree</source>
-        <translation>Yo &amp;acepto</translation>
+        <translation>&amp;Acepto</translation>
     </message>
     <message>
         <location line="+92"/>
@@ -931,12 +931,12 @@
     <message>
         <location line="+11"/>
         <source>&amp;Start</source>
-        <translation>&amp;Arrancar</translation>
+        <translation>&amp;Iniciar</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Start torrent</source>
-        <translation>Arrancar el torrent</translation>
+        <translation>Iniciar torrent</translation>
     </message>
     <message>
         <location line="+11"/>
@@ -991,7 +991,7 @@
     <message>
         <location line="+8"/>
         <source>&amp;Start All</source>
-        <translation>Arrancar &amp;Todos</translation>
+        <translation>Iniciar &amp;Todos</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -1052,7 +1052,7 @@
     <message>
         <location line="+8"/>
         <source>Sort by A&amp;ge</source>
-        <translation>Ordenar por &amp;edad</translation>
+        <translation>Ordenar por &amp;antigüedad</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -1609,7 +1609,7 @@ Para añadir otra URL primaria, añádela después de una línea en blanco.</tra
     <message>
         <location filename="../OptionsDialog.ui" line="+7"/>
         <source>Mo&amp;ve .torrent file to the trash</source>
-        <translation>M&amp;over archivo .torrent al basurero</translation>
+        <translation>M&amp;over archivo .torrent a la papelera</translation>
     </message>
     <message>
         <location filename="../OptionsDialog.cc" line="+29"/>
@@ -1858,7 +1858,7 @@ Para añadir otra URL primaria, añádela después de una línea en blanco.</tra
     <message>
         <location filename="../PrefsDialog.ui" line="-287"/>
         <source>Pick a &amp;random port every time Transmission is started</source>
-        <translation>Seleccionar un puerto &amp;aleatoriamente cada vez que arranque Transmission</translation>
+        <translation>Seleccionar un puerto &amp;aleatorio al iniciar Transmission</translation>
     </message>
     <message>
         <location line="-252"/>
@@ -2212,7 +2212,7 @@ Para añadir otra URL primaria, añádela después de una línea en blanco.</tra
     <message>
         <location line="+449"/>
         <source>Error Adding Torrent</source>
-        <translation type="unfinished">Error al añadir torrent</translation>
+        <translation>Error al añadir torrent</translation>
     </message>
     <message>
         <location line="+16"/>
@@ -2222,7 +2222,7 @@ Para añadir otra URL primaria, añádela después de una línea en blanco.</tra
     <message>
         <location line="+1"/>
         <source>&lt;p&gt;&lt;b&gt;Unable to add &quot;%1&quot;.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;It is a duplicate of &quot;%2&quot; which is already added.&lt;/p&gt;</source>
-        <translation type="unfinished">&lt;p&gt;&lt;b&gt;No se puede añadir &quot;%1&quot;.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;es un duplicado de &quot;%2&quot; que ya está en la lista.&lt;/p&gt;</translation>
+        <translation>&lt;p&gt;&lt;b&gt;No se puede añadir &quot;%1&quot;.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;es un duplicado de &quot;%2&quot; que ya está en la lista.&lt;/p&gt;</translation>
     </message>
 </context>
 <context>

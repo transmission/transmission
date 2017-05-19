@@ -2212,7 +2212,7 @@ För att lägga till en till primär URL, lägg den efter en tom rad.</translati
     <message>
         <location line="+449"/>
         <source>Error Adding Torrent</source>
-        <translation type="unfinished">Fel när torrent lades till</translation>
+        <translation>Fel vi tillägg av torrent</translation>
     </message>
     <message>
         <location line="+16"/>
@@ -2222,7 +2222,7 @@ För att lägga till en till primär URL, lägg den efter en tom rad.</translati
     <message>
         <location line="+1"/>
         <source>&lt;p&gt;&lt;b&gt;Unable to add &quot;%1&quot;.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;It is a duplicate of &quot;%2&quot; which is already added.&lt;/p&gt;</source>
-        <translation type="unfinished">&lt;p&gt;&lt;b&gt;Kunde inte lägga till &quot;%1&quot;.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Det är en kopia av &quot;%2&quot; som redan är tillagd.&lt;/p&gt;</translation>
+        <translation>&lt;p&gt;&lt;b&gt;Kunde inte lägga till &quot;%1&quot;.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Det är en kopia av &quot;%2&quot; som redan är tillagd.&lt;/p&gt;</translation>
     </message>
 </context>
 <context>

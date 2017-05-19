@@ -155,7 +155,7 @@
     <message>
         <location line="-28"/>
         <source>Optimistic unchoke</source>
-        <translation type="unfinished"></translation>
+        <translation>Optimistisches Entdrosseln</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -180,12 +180,12 @@
     <message>
         <location line="+4"/>
         <source>Peer has unchoked us, but we&apos;re not interested</source>
-        <translation type="unfinished"></translation>
+        <translation>Peer hat uns entdrosselt, aber wir sind nicht interessiert.</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>We unchoked this peer, but they&apos;re not interested</source>
-        <translation type="unfinished"></translation>
+        <translation>Wir haben diesen Peer entdrosselt, aber dieser ist nicht interessiert.</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -316,7 +316,7 @@
     <message>
         <location line="+1"/>
         <source>Stop seeding at ratio:</source>
-        <translation>Verteilung bei diesem Verhältnis stoppen:</translation>
+        <translation>Verteilen bei diesem Verhältnis stoppen:</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -612,17 +612,17 @@
     <message>
         <location filename="../FileTreeView.cc" line="+275"/>
         <source>Check Selected</source>
-        <translation type="unfinished"></translation>
+        <translation>Ausgewählte Dateien downloaden</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Uncheck Selected</source>
-        <translation type="unfinished"></translation>
+        <translation>Ausgewählte Dateien nicht downloaden</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Only Check Selected</source>
-        <translation type="unfinished"></translation>
+        <translation>Nur ausgewählte Dateien downloaden</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -1316,14 +1316,14 @@
         <source>Click to disable Temporary Speed Limits
  (%1 down, %2 up)</source>
         <translation>Klicken um temporäre Geschwindigkeitsbegrenzungen zu deaktivieren
-(%1 hoch, %2 runter)</translation>
+(%1 runter, %2 hoch)</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Click to enable Temporary Speed Limits
  (%1 down, %2 up)</source>
         <translation>Klicken um temporäre Geschwindigkeitsbegrenzungen zu aktivieren
-(%1 hoch, %2 runter)</translation>
+(%1 runter, %2 hoch)</translation>
     </message>
     <message>
         <location line="+142"/>
@@ -1820,7 +1820,7 @@ Um eine weitere primäre URL hinzuzufügen, muss diese nach einer Leerzeile eing
     <message>
         <location line="+7"/>
         <source>Mo&amp;ve the .torrent file to the trash</source>
-        <translation>Wi&amp;rf die .Torrentdatei in den Müll</translation>
+        <translation>&amp;Verschiebe die .Torrent-Datei in den Müll</translation>
     </message>
     <message>
         <location line="+57"/>
@@ -1830,7 +1830,7 @@ Um eine weitere primäre URL hinzuzufügen, muss diese nach einer Leerzeile eing
     <message>
         <location line="+12"/>
         <source>Ma&amp;ximum active downloads:</source>
-        <translation>Downloads mit ma&amp;ximaler Aktivität</translation>
+        <translation>Ma&amp;ximale Anzahl aktiver Downloads:</translation>
     </message>
     <message>
         <location line="+67"/>
@@ -1906,7 +1906,7 @@ Um eine weitere primäre URL hinzuzufügen, muss diese nach einer Leerzeile eing
     <message>
         <location line="+1"/>
         <source>Prefer encryption</source>
-        <translation>Ziehe Verschlüsselung vor</translation>
+        <translation>Bevorzuge Verschlüsselung</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -1916,12 +1916,12 @@ Um eine weitere primäre URL hinzuzufügen, muss diese nach einer Leerzeile eing
     <message>
         <location filename="../PrefsDialog.ui" line="-97"/>
         <source>Privacy</source>
-        <translation>Privatssphäre / Datenschutz</translation>
+        <translation>Datenschutz</translation>
     </message>
     <message>
         <location line="-403"/>
         <source>&amp;to</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;bis</translation>
     </message>
     <message>
         <location line="+763"/>
@@ -1987,7 +1987,7 @@ Um eine weitere primäre URL hinzuzufügen, muss diese nach einer Leerzeile eing
     <message>
         <location line="+53"/>
         <source>Alternative Speed Limits</source>
-        <translation>Alternatie Geschwindigkeitsbegrenzungen</translation>
+        <translation>Alternative Geschwindigkeitsbegrenzungen</translation>
     </message>
     <message>
         <location line="+21"/>
@@ -2098,7 +2098,7 @@ Um eine weitere primäre URL hinzuzufügen, muss diese nach einer Leerzeile eing
         <location line="+137"/>
         <source>Download is i&amp;nactive if data sharing stopped:</source>
         <extracomment>Please keep this phrase as short as possible, it&apos;s curently the longest and influences dialog width</extracomment>
-        <translation>Herunterladen ist i&amp;naktiv, wenn momentan keine Dateien getauscht werden:</translation>
+        <translation>Herunterladen ist i&amp;naktiv, wenn keine Dateien getauscht wurden seit:</translation>
     </message>
     <message>
         <location line="-146"/>
@@ -2212,7 +2212,7 @@ Um eine weitere primäre URL hinzuzufügen, muss diese nach einer Leerzeile eing
     <message>
         <location line="+449"/>
         <source>Error Adding Torrent</source>
-        <translation type="unfinished">Fehler beim Hinzufügen eines Torrents</translation>
+        <translation>Fehler beim Hinzufügen des Torrents</translation>
     </message>
     <message>
         <location line="+16"/>
@@ -2222,7 +2222,7 @@ Um eine weitere primäre URL hinzuzufügen, muss diese nach einer Leerzeile eing
     <message>
         <location line="+1"/>
         <source>&lt;p&gt;&lt;b&gt;Unable to add &quot;%1&quot;.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;It is a duplicate of &quot;%2&quot; which is already added.&lt;/p&gt;</source>
-        <translation type="unfinished">&lt;p&gt;&lt;b&gt;Konnte &quot;%1&quot; nicht hinzufügen.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Es handelt sich um ein Duplikat von &quot;%2&quot;, welche bereits hinzugefügt wurde.&lt;/p&gt;</translation>
+        <translation>&lt;p&gt;&lt;b&gt;Konnte &quot;%1&quot; nicht hinzufügen.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Es handelt sich um ein Duplikat von &quot;%2&quot;, welches bereits hinzugefügt wurde.&lt;/p&gt;</translation>
     </message>
 </context>
 <context>
@@ -2387,7 +2387,7 @@ Um eine weitere primäre URL hinzuzufügen, muss diese nach einer Leerzeile eing
         <location filename="../TorrentDelegate.cc" line="+177"/>
         <source>Magnetized transfer - retrieving metadata (%1%)</source>
         <extracomment>First part of torrent progress string; %1 is the percentage of torrent metadata downloaded</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Magnetischer Transfer - Lade Metadaten herunter (%1%)</translation>
     </message>
     <message>
         <location line="+9"/>
@@ -2576,7 +2576,7 @@ Um eine weitere primäre URL hinzuzufügen, muss diese nach einer Leerzeile eing
         <location line="+7"/>
         <source>Got a scrape error %1&quot;%2&quot;%3 %4 ago</source>
         <extracomment>%1 and %3 are replaced with HTML markup, %2 is error message, %4 is duration</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>»Scrape«-Fehler %1»%2«%3 erhalten vor %4</translation>
     </message>
     <message>
         <location line="+15"/>

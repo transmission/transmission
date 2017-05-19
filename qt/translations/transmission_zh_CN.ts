@@ -163,7 +163,7 @@
     <message>
         <location line="+4"/>
         <source>We would download from this peer if they would let us</source>
-        <translation>如果他们允许，我们将从该用户下载</translation>
+        <translation>如果对方允许，我方将从该用户下载</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -173,17 +173,17 @@
     <message>
         <location line="+4"/>
         <source>We would upload to this peer if they asked</source>
-        <translation>如果他们请求，我们将上传给该用户</translation>
+        <translation>如果对方请求，我方将上传给该用户</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Peer has unchoked us, but we&apos;re not interested</source>
-        <translation>该用户已对我们解锁，但我们不感兴趣</translation>
+        <translation>该用户已对我方解锁，但我方不感兴趣</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>We unchoked this peer, but they&apos;re not interested</source>
-        <translation>我们已对该用户解锁，但他们不感兴趣</translation>
+        <translation>我方已对该用户解锁，但对方不感兴趣</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -609,17 +609,17 @@
     <message>
         <location filename="../FileTreeView.cc" line="+275"/>
         <source>Check Selected</source>
-        <translation>勾选选择</translation>
+        <translation>勾选</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Uncheck Selected</source>
-        <translation>取消勾选选择</translation>
+        <translation>取消勾选</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Only Check Selected</source>
-        <translation>仅勾选选择</translation>
+        <translation>仅勾选</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -1791,7 +1791,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location filename="../PrefsDialog.ui" line="-638"/>
         <source>Automatically add .torrent files &amp;from:</source>
-        <translation>自动添加 .torrent 文件从(&amp;F):</translation>
+        <translation>从此文件夹自动添加 .torrent 文件(&amp;F):</translation>
     </message>
     <message>
         <location line="+22"/>
@@ -2082,7 +2082,7 @@ To add another primary URL, add it after a blank line.</source>
         <location line="+137"/>
         <source>Download is i&amp;nactive if data sharing stopped:</source>
         <extracomment>Please keep this phrase as short as possible, it&apos;s curently the longest and influences dialog width</extracomment>
-        <translation>下载是非活动的如果停止分享数据在(&amp;N):</translation>
+        <translation>下载是属于非活动的如果停止分享数据在(&amp;N):</translation>
     </message>
     <message>
         <location line="-146"/>
@@ -2196,7 +2196,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+449"/>
         <source>Error Adding Torrent</source>
-        <translation type="unfinished">添加 Torrent 错误</translation>
+        <translation>添加 Torrent 时错误</translation>
     </message>
     <message>
         <location line="+16"/>
@@ -2206,7 +2206,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+1"/>
         <source>&lt;p&gt;&lt;b&gt;Unable to add &quot;%1&quot;.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;It is a duplicate of &quot;%2&quot; which is already added.&lt;/p&gt;</source>
-        <translation type="unfinished">&lt;p&gt;&lt;b&gt;无法添加 &quot;%1&quot;。&lt;/b&gt;&lt;/p&gt;&lt;p&gt;它与已经添加的 &quot;%2&quot; 重复。&lt;/p&gt;</translation>
+        <translation>&lt;p&gt;&lt;b&gt;无法添加 &quot;%1&quot;。&lt;/b&gt;&lt;/p&gt;&lt;p&gt;它与已经添加的 &quot;%2&quot; 重复了。&lt;/p&gt;</translation>
     </message>
 </context>
 <context>

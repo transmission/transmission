@@ -2197,7 +2197,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+449"/>
         <source>Error Adding Torrent</source>
-        <translation type="unfinished">토런트 추가 오류</translation>
+        <translation>토런트 추가 오류</translation>
     </message>
     <message>
         <location line="+16"/>
@@ -2207,7 +2207,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+1"/>
         <source>&lt;p&gt;&lt;b&gt;Unable to add &quot;%1&quot;.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;It is a duplicate of &quot;%2&quot; which is already added.&lt;/p&gt;</source>
-        <translation type="unfinished">&lt;p&gt;&lt;b&gt;&quot;%1&quot;를 추가할수 없습니다.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;이미 추가된 &quot;%2&quot;와 중복됩니다 .&lt;/p&gt;</translation>
+        <translation>&lt;p&gt;&lt;b&gt;&quot;%1&quot;를 추가할수 없습니다.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;이미 추가된 &quot;%2&quot;와 중복됩니다.&lt;/p&gt;</translation>
     </message>
 </context>
 <context>

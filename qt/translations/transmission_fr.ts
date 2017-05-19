@@ -2222,7 +2222,7 @@ Pour ajouter une autre URL primaire, placez-la après une ligne vide.</translati
     <message>
         <location line="+1"/>
         <source>&lt;p&gt;&lt;b&gt;Unable to add &quot;%1&quot;.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;It is a duplicate of &quot;%2&quot; which is already added.&lt;/p&gt;</source>
-        <translation type="unfinished">&lt;p&gt;&lt;b&gt;Impossible d&apos;ajouter &quot;%1&quot;.&lt;/b&gt;&lt;/p&gt;&lt;p&gt; c&apos;est un double de  &quot;%2&quot; qui est déjà ajouté.&lt;/p&gt;</translation>
+        <translation type="unfinished">&lt;p&gt;&lt;b&gt;Impossible d&apos;ajouter &quot;%1&quot;.&lt;/b&gt;&lt;/p&gt;&lt;p&gt; c&apos;est un double de &quot;%2&quot; qui est déjà ajouté.&lt;/p&gt;</translation>
     </message>
 </context>
 <context>
