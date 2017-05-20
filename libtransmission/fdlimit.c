@@ -568,13 +568,23 @@ tr_socket_t tr_fdSocketCreate(tr_session* session, int domain, int type)
 
         if (!buf_logged)
         {
-            int i;
-            socklen_t size = sizeof(int);
+            int i = 0;
+            socklen_t size = sizeof(i);
+
+            if (getsockopt(s, SOL_SOCKET, SO_SNDBUF, (void*)&i, &size) != -1)
+            {
+                tr_logAddDebug("SO_SNDBUF size is %d", i);
+            }
+
+            i = 0;
+            size = sizeof(i);
+
+            if (getsockopt(s, SOL_SOCKET, SO_RCVBUF, (void*)&i, &size) != -1)
+            {
+                tr_logAddDebug("SO_RCVBUF size is %d", i);
+            }
+
             buf_logged = true;
-            getsockopt(s, SOL_SOCKET, SO_SNDBUF, (void*)&i, &size);
-            tr_logAddDebug("SO_SNDBUF size is %d", i);
-            getsockopt(s, SOL_SOCKET, SO_RCVBUF, (void*)&i, &size);
-            tr_logAddDebug("SO_RCVBUF size is %d", i);
         }
     }
 

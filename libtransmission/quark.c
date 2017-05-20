@@ -479,9 +479,10 @@ tr_quark tr_quark_new(void const* str, size_t len)
 
     if (str == NULL)
     {
-        len = 0;
+        goto finish;
     }
-    else if (len == TR_BAD_SIZE)
+
+    if (len == TR_BAD_SIZE)
     {
         len = strlen(str);
     }
@@ -491,6 +492,7 @@ tr_quark tr_quark_new(void const* str, size_t len)
         ret = append_new_quark(str, len);
     }
 
+finish:
     return ret;
 }
 

@@ -1546,6 +1546,9 @@ static void refillUpkeep(evutil_socket_t foo UNUSED, short bar UNUSED, void* vmg
 
                 if (msgs != NULL && request->sentAt <= too_old && !tr_peerMsgsIsReadingBlock(msgs, request->block))
                 {
+                    assert(cancel != NULL);
+                    assert(cancelCount < cancel_buflen);
+
                     cancel[cancelCount++] = *request;
                 }
                 else
