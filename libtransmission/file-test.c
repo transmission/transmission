@@ -28,6 +28,10 @@
 #define NATIVE_PATH_SEP "\\"
 #endif
 
+#if !defined(__OpenBSD__)
+#define HAVE_UNIFIED_BUFFER_CACHE
+#endif
+
 static tr_session* session;
 
 static char* create_test_dir(char const* name)
@@ -1266,9 +1270,13 @@ static int test_file_map(void)
 
     check_int_eq(0, memcmp(view, "test", 4));
 
+#ifdef HAVE_UNIFIED_BUFFER_CACHE
+
     tr_sys_file_write_at(fd, "E", 1, 1, NULL, NULL);
 
     check_int_eq(0, memcmp(view, "tEst", 4));
+
+#endif
 
     check(tr_sys_file_unmap(view, 4, &err));
     check(err == NULL);
