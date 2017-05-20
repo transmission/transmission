@@ -36,6 +36,10 @@ int main(void)
     /* Older Xfplay versions have three digit version number */
     TEST_CLIENT("-XF9990-", "Xfplay 9.9.9");
 
+    /* PicoTorrent */
+    TEST_CLIENT("-PI0091-", "PicoTorrent 0.09.1");
+    TEST_CLIENT("-PI0120-", "PicoTorrent 0.12.0");
+
     /* gobbledygook */
     TEST_CLIENT("-IIO\x10\x2D\x04-", "-IIO%10-%04-");
     TEST_CLIENT("-I\05O\x08\x03\x01-", "-I%05O%08%03%01-");
