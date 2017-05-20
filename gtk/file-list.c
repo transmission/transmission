@@ -208,7 +208,7 @@ static gboolean refreshFilesForeach(GtkTreeModel* model, GtkTreePath* path UNUSE
         if (size != sub_size || have != old_have || priority != old_priority || enabled != old_enabled || prog != old_prog)
         {
             char size_str[64];
-            tr_strlsize(size_str, sub_size, sizeof size_str);
+            tr_strlsize(size_str, sub_size, sizeof(size_str));
             gtk_tree_store_set(data->store, iter,
                 FC_SIZE, sub_size,
                 FC_SIZE_STR, size_str,
@@ -448,7 +448,7 @@ static void buildTree(GNode* node, gpointer gdata)
     gboolean const enabled = isLeaf ? !inf->files[child_data->index].dnd : TRUE;
     char* name_esc = g_markup_escape_text(child_data->name, -1);
 
-    tr_strlsize(size_str, child_data->length, sizeof size_str);
+    tr_strlsize(size_str, child_data->length, sizeof(size_str));
 
     gtk_tree_store_insert_with_values(build->store, &child_iter, build->iter, INT_MAX,
         FC_INDEX, child_data->index,
