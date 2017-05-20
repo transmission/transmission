@@ -50,7 +50,7 @@ log_openssl_error (const char * file,
       static bool strings_loaded = false;
       if (!strings_loaded)
         {
-#if OPENSSL_VERSION_NUMBER < 0x10100000
+#if OPENSSL_VERSION_NUMBER < 0x10100000 || defined (LIBRESSL_VERSION_NUMBER)
           ERR_load_crypto_strings ();
 #else
           OPENSSL_init_crypto (OPENSSL_INIT_LOAD_CRYPTO_STRINGS, NULL);
@@ -236,7 +236,7 @@ tr_rc4_process (tr_rc4_ctx_t   handle,
 ****
 ***/
 
-#if OPENSSL_VERSION_NUMBER < 0x10100000
+#if OPENSSL_VERSION_NUMBER < 0x10100000 || defined (LIBRESSL_VERSION_NUMBER)
 
 static inline int
 DH_set0_pqg (DH     * dh,
