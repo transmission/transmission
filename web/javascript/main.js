@@ -34,7 +34,7 @@ function main() {
             // so the footer appears in the right place
             document.getElementById("torrent_container").style["min-height"] = "338px";
         };
-        document.querySelector("label[for=torrent_upload_url]").textContent("URL: ");
+        document.querySelector("label[for=torrent_upload_url]").textContent = "URL: ";
     } else {
         // Fix for non-Safari-3 browsers: dark borders to replace shadows.
         Array.from(document.getElementsByClassName("dialog_window")).forEach(function (e) {
