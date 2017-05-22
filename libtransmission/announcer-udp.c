@@ -26,15 +26,7 @@
 #include "tr-udp.h"
 #include "utils.h"
 
-#define dbgmsg(name, ...) \
-    do \
-    { \
-        if (tr_logGetDeepEnabled()) \
-        { \
-            tr_logAddDeep(__FILE__, __LINE__, name, __VA_ARGS__); \
-        } \
-    } \
-    while (0)
+#define dbgmsg(name, ...) tr_logAddDeepNamed(name, __VA_ARGS__)
 
 /****
 *****

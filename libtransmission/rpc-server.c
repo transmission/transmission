@@ -67,15 +67,7 @@ struct tr_rpc_server
     z_stream stream;
 };
 
-#define dbgmsg(...) \
-    do \
-    { \
-        if (tr_logGetDeepEnabled()) \
-        { \
-            tr_logAddDeep(__FILE__, __LINE__, MY_NAME, __VA_ARGS__); \
-        } \
-    } \
-    while (0)
+#define dbgmsg(...) tr_logAddDeepNamed(MY_NAME, __VA_ARGS__)
 
 /***
 ****

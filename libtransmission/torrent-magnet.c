@@ -24,15 +24,7 @@
 #include "variant.h"
 #include "web.h"
 
-#define dbgmsg(tor, ...) \
-    do \
-    { \
-        if (tr_logGetDeepEnabled()) \
-        { \
-            tr_logAddDeep(__FILE__, __LINE__, tr_torrentName(tor), __VA_ARGS__); \
-        } \
-    } \
-    while (0)
+#define dbgmsg(tor, ...) tr_logAddDeepNamed(tr_torrentName(tor), __VA_ARGS__)
 
 /***
 ****

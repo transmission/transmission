@@ -42,27 +42,9 @@ enum
 };
 
 #if 0
-
-#define dbgmsg(...) \
-    do \
-    { \
-        fprintf(stderr, __VA_ARGS__); \
-        fprintf(stderr, "\n"); \
-    } \
-    while (0)
-
+#define dbgmsg(fmt, ...) fprintf(stderr, fmt "\n", __VA_ARGS__)
 #else
-
-#define dbgmsg(...) \
-    do \
-    { \
-        if (tr_logGetDeepEnabled()) \
-        { \
-            tr_logAddDeep(__FILE__, __LINE__, "web", __VA_ARGS__); \
-        } \
-    } \
-    while (0)
-
+#define dbgmsg(...) tr_logAddDeepNamed("web", __VA_ARGS__)
 #endif
 
 /***

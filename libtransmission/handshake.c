@@ -137,15 +137,7 @@ struct tr_handshake
 ***
 **/
 
-#define dbgmsg(handshake, ...) \
-    do \
-    { \
-        if (tr_logGetDeepEnabled()) \
-        { \
-            tr_logAddDeep(__FILE__, __LINE__, tr_peerIoGetAddrStr(handshake->io), __VA_ARGS__); \
-        } \
-    } \
-    while (0)
+#define dbgmsg(handshake, ...) tr_logAddDeepNamed(tr_peerIoGetAddrStr((handshake)->io), __VA_ARGS__)
 
 static char const* getStateName(handshake_state_t const state)
 {

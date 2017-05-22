@@ -39,27 +39,9 @@
 #define RECENTLY_ACTIVE_SECONDS 60
 
 #if 0
-
-#define dbgmsg(fmt, ...) \
-    do \
-    { \
-        fprintf(stderr, "%s:%d"#fmt, __FILE__, __LINE__, __VA_ARGS__); \
-        fprintf(stderr, "\n"); \
-    } \
-    while (0)
-
+#define dbgmsg(fmt, ...) fprintf(stderr, "%s:%d " fmt "\n", __FILE__, __LINE__, __VA_ARGS__)
 #else
-
-#define dbgmsg(...) \
-    do \
-    { \
-        if (tr_logGetDeepEnabled()) \
-        { \
-            tr_logAddDeep(__FILE__, __LINE__, "RPC", __VA_ARGS__); \
-        } \
-    } \
-    while (0)
-
+#define dbgmsg(...) tr_logAddDeepNamed("RPC", __VA_ARGS__)
 #endif
 
 /***

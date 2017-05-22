@@ -69,15 +69,7 @@ static size_t guessPacketOverhead(size_t d)
 ***
 **/
 
-#define dbgmsg(io, ...) \
-    do \
-    { \
-        if (tr_logGetDeepEnabled()) \
-        { \
-            tr_logAddDeep(__FILE__, __LINE__, tr_peerIoGetAddrStr(io), __VA_ARGS__); \
-        } \
-    } \
-    while (0)
+#define dbgmsg(io, ...) tr_logAddDeepNamed(tr_peerIoGetAddrStr(io), __VA_ARGS__)
 
 /**
 ***

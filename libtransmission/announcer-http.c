@@ -26,15 +26,7 @@
 #include "variant.h"
 #include "web.h" /* tr_http_escape() */
 
-#define dbgmsg(name, ...) \
-    do \
-    { \
-        if (tr_logGetDeepEnabled()) \
-        { \
-            tr_logAddDeep(__FILE__, __LINE__, name, __VA_ARGS__); \
-        } \
-    } \
-    while (0)
+#define dbgmsg(name, ...) tr_logAddDeepNamed(name, __VA_ARGS__)
 
 /****
 *****

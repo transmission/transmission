@@ -166,15 +166,7 @@ struct tr_run_data
     void* user_data;
 };
 
-#define dbgmsg(...) \
-    do \
-    { \
-        if (tr_logGetDeepEnabled()) \
-        { \
-            tr_logAddDeep(__FILE__, __LINE__, "event", __VA_ARGS__); \
-        } \
-    } \
-    while (0)
+#define dbgmsg(...) tr_logAddDeepNamed("event", __VA_ARGS__)
 
 static void readFromPipe(evutil_socket_t fd, short eventType, void* veh)
 {
