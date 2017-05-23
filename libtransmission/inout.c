@@ -200,7 +200,7 @@ static int readOrWritePiece(tr_torrent* tor, int ioMode, tr_piece_index_t pieceI
 
     tr_ioFindFileLocation(tor, pieceIndex, pieceOffset, &fileIndex, &fileOffset);
 
-    while (buflen && !err)
+    while (buflen != 0 && err == 0)
     {
         tr_file const* file = &info->files[fileIndex];
         uint64_t const bytesThisPass = MIN(buflen, file->length - fileOffset);
@@ -261,7 +261,7 @@ static bool recalculateHash(tr_torrent* tor, tr_piece_index_t pieceIndex, uint8_
 
     tr_ioPrefetch(tor, pieceIndex, offset, bytesLeft);
 
-    while (bytesLeft)
+    while (bytesLeft != 0)
     {
         size_t const len = MIN(bytesLeft, buflen);
         success = tr_cacheReadBlock(tor->session->cache, tor, pieceIndex, offset, len, buffer) == 0;

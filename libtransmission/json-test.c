@@ -121,7 +121,7 @@ static int test_utf8(void)
         tr_variantFree(&top);
     }
 
-    check(json);
+    check(json != NULL);
     check(strstr(json, "\\u00f6") != NULL);
     check(strstr(json, "\\u00e9") != NULL);
     err = tr_variantFromJson(&top, json, strlen(json));
