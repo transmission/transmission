@@ -97,8 +97,6 @@ void tr_logSetLevel(tr_log_level level)
 
 void tr_logSetQueueEnabled(bool isEnabled)
 {
-    assert(tr_isBool(isEnabled));
-
     myQueueEnabled = isEnabled;
 }
 

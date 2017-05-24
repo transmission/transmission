@@ -619,8 +619,6 @@ static tr_peerIo* tr_peerIoNew(tr_session* session, tr_bandwidth* parent, tr_add
 
     assert(session != NULL);
     assert(session->events != NULL);
-    assert(tr_isBool(isIncoming));
-    assert(tr_isBool(isSeed));
     assert(tr_amInEventThread(session));
     assert((socket == TR_BAD_SOCKET) == (utp_socket != NULL));
 #ifndef WITH_UTP

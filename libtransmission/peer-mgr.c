@@ -575,7 +575,6 @@ static bool isAtomBlocklisted(tr_session* session, struct peer_atom* atom)
         atom->blocklisted = tr_sessionIsAddressBlocked(session, &atom->addr);
     }
 
-    assert(tr_isBool(atom->blocklisted));
     return atom->blocklisted;
 }
 
@@ -2007,7 +2006,6 @@ static bool myHandshakeDoneCB(tr_handshake* handshake, tr_peerIo* io, bool readA
     tr_swarm* s;
 
     assert(io != NULL);
-    assert(tr_isBool(ok));
 
     s = tr_peerIoHasTorrentHash(io) ? getExistingSwarm(manager, tr_peerIoGetTorrentHash(io)) : NULL;
 

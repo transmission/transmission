@@ -1200,7 +1200,6 @@ int64_t tr_sessionGetDirFreeSpace(tr_session* session, char const* dir)
 void tr_sessionSetIncompleteFileNamingEnabled(tr_session* session, bool b)
 {
     assert(tr_isSession(session));
-    assert(tr_isBool(b));
 
     session->isIncompleteFileNamingEnabled = b;
 }
@@ -1238,7 +1237,6 @@ char const* tr_sessionGetIncompleteDir(tr_session const* session)
 void tr_sessionSetIncompleteDirEnabled(tr_session* session, bool b)
 {
     assert(tr_isSession(session));
-    assert(tr_isBool(b));
 
     session->isIncompleteDirEnabled = b;
 }
@@ -1510,8 +1508,6 @@ static void useAltSpeed(tr_session* s, struct tr_turtle_info* t, bool enabled, b
 {
     assert(tr_isSession(s));
     assert(t != NULL);
-    assert(tr_isBool(enabled));
-    assert(tr_isBool(byUser));
 
     if (t->isEnabled != enabled)
     {
@@ -1624,7 +1620,6 @@ void tr_sessionLimitSpeed(tr_session* s, tr_direction d, bool b)
 {
     assert(tr_isSession(s));
     assert(tr_isDirection(d));
-    assert(tr_isBool(b));
 
     s->speedLimitEnabled[d] = b;
 
@@ -1692,7 +1687,6 @@ void tr_sessionUseAltSpeedTime(tr_session* s, bool b)
     struct tr_turtle_info* t = &s->turtle;
 
     assert(tr_isSession(s));
-    assert(tr_isBool(b));
 
     if (t->isClockEnabled != b)
     {
@@ -2214,7 +2208,6 @@ tr_torrent** tr_sessionLoadTorrents(tr_session* session, tr_ctor* ctor, int* set
 void tr_sessionSetPexEnabled(tr_session* session, bool enabled)
 {
     assert(tr_isSession(session));
-    assert(tr_isBool(enabled));
 
     session->isPexEnabled = enabled;
 }
@@ -2251,7 +2244,6 @@ static void toggleDHTImpl(void* data)
 void tr_sessionSetDHTEnabled(tr_session* session, bool enabled)
 {
     assert(tr_isSession(session));
-    assert(tr_isBool(enabled));
 
     if (enabled != session->isDHTEnabled)
     {
@@ -2291,7 +2283,6 @@ static void toggle_utp(void* data)
 void tr_sessionSetUTPEnabled(tr_session* session, bool enabled)
 {
     assert(tr_isSession(session));
-    assert(tr_isBool(enabled));
 
     if (enabled != session->isUTPEnabled)
     {
@@ -2324,7 +2315,6 @@ static void toggleLPDImpl(void* data)
 void tr_sessionSetLPDEnabled(tr_session* session, bool enabled)
 {
     assert(tr_isSession(session));
-    assert(tr_isBool(enabled));
 
     if (enabled != session->isLPDEnabled)
     {
@@ -2560,7 +2550,6 @@ bool tr_blocklistIsEnabled(tr_session const* session)
 void tr_blocklistSetEnabled(tr_session* session, bool isEnabled)
 {
     assert(tr_isSession(session));
-    assert(tr_isBool(isEnabled));
 
     session->isBlocklistEnabled = isEnabled;
 
@@ -2858,7 +2847,6 @@ bool tr_sessionIsTorrentDoneScriptEnabled(tr_session const* session)
 void tr_sessionSetTorrentDoneScriptEnabled(tr_session* session, bool isEnabled)
 {
     assert(tr_isSession(session));
-    assert(tr_isBool(isEnabled));
 
     session->isTorrentDoneScriptEnabled = isEnabled;
 }
@@ -2905,7 +2893,6 @@ void tr_sessionSetQueueEnabled(tr_session* session, tr_direction dir, bool is_en
 {
     assert(tr_isSession(session));
     assert(tr_isDirection(dir));
-    assert(tr_isBool(is_enabled));
 
     session->queueEnabled[dir] = is_enabled;
 }
@@ -2929,7 +2916,6 @@ void tr_sessionSetQueueStalledMinutes(tr_session* session, int minutes)
 void tr_sessionSetQueueStalledEnabled(tr_session* session, bool is_enabled)
 {
     assert(tr_isSession(session));
-    assert(tr_isBool(is_enabled));
 
     session->stalledEnabled = is_enabled;
 }

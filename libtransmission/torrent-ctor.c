@@ -273,8 +273,6 @@ void tr_ctorInitTorrentWanted(tr_ctor const* ctor, tr_torrent* tor)
 
 void tr_ctorSetDeleteSource(tr_ctor* ctor, bool deleteSource)
 {
-    assert(tr_isBool(deleteSource));
-
     ctor->doDelete = deleteSource;
     ctor->isSet_delete = true;
 }
@@ -301,8 +299,6 @@ bool tr_ctorGetDeleteSource(tr_ctor const* ctor, bool* setme)
 
 void tr_ctorSetSave(tr_ctor* ctor, bool saveInOurTorrentsDir)
 {
-    assert(tr_isBool(saveInOurTorrentsDir));
-
     ctor->saveInOurTorrentsDir = saveInOurTorrentsDir;
 }
 
@@ -317,7 +313,6 @@ void tr_ctorSetPaused(tr_ctor* ctor, tr_ctorMode mode, bool isPaused)
 
     assert(ctor != NULL);
     assert(mode == TR_FALLBACK || mode == TR_FORCE);
-    assert(tr_isBool(isPaused));
 
     args = &ctor->optionalArgs[mode];
     args->isSet_paused = true;

@@ -728,7 +728,6 @@ static void sendInterest(tr_peerMsgs* msgs, bool b)
     struct evbuffer* out = msgs->outMessages;
 
     assert(msgs != NULL);
-    assert(tr_isBool(b));
 
     msgs->client_is_interested = b;
     dbgmsg(msgs, "Sending %s", b ? "Interested" : "Not Interested");
@@ -746,8 +745,6 @@ static void updateInterest(tr_peerMsgs* msgs UNUSED)
 
 void tr_peerMsgsSetInterested(tr_peerMsgs* msgs, bool b)
 {
-    assert(tr_isBool(b));
-
     if (msgs->client_is_interested != b)
     {
         sendInterest(msgs, b);
@@ -804,7 +801,6 @@ void tr_peerMsgsSetChoke(tr_peerMsgs* msgs, bool peer_is_choked)
     time_t const fibrillationTime = now - MIN_CHOKE_PERIOD_SEC;
 
     assert(msgs != NULL);
-    assert(tr_isBool(peer_is_choked));
 
     if (msgs->chokeChangedAt > fibrillationTime)
     {

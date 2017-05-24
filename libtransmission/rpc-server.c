@@ -879,8 +879,6 @@ char const* tr_rpcGetWhitelist(tr_rpc_server const* server)
 
 void tr_rpcSetWhitelistEnabled(tr_rpc_server* server, bool isEnabled)
 {
-    assert(tr_isBool(isEnabled));
-
     server->isWhitelistEnabled = isEnabled;
 }
 

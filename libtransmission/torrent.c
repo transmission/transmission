@@ -3817,7 +3817,6 @@ void tr_torrentsQueueMoveBottom(tr_torrent** torrents_in, int n)
 static void torrentSetQueued(tr_torrent* tor, bool queued)
 {
     assert(tr_isTorrent(tor));
-    assert(tr_isBool(queued));
 
     if (tr_torrentIsQueued(tor) != queued)
     {

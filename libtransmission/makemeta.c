@@ -560,8 +560,6 @@ void tr_makeMetaInfo(tr_metainfo_builder* builder, char const* outputFile, tr_tr
 {
     tr_lock* lock;
 
-    assert(tr_isBool(isPrivate));
-
     /* free any variables from a previous run */
     for (int i = 0; i < builder->trackerCount; ++i)
     {
