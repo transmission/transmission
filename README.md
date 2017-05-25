@@ -8,6 +8,16 @@ Transmission is a fast, easy, and free BitTorrent client. It comes in several fl
 
 Visit https://transmissionbt.com/ for more information.
 
+## Command line interface notes
+
+Transmission is fully supported in transmission-remote, the preferred cli client.
+
+Three standalone tools to examine, create, and edit .torrent files exist: transmission-show, transmission-create, and transmission-edit, respectively.
+
+Prior to development of transmission-remote, the standalone client transmission-cli was created. Limited to a single torrent at a time, transmission-cli is deprecated and exists primarily to support older hardware dependent upon it. In almost all instances, transmission-remote should be used instead.
+
+Different distributions may choose to package any or all of these tools in one or more separate packages.
+
 ## Building
 
 Transmission has an Xcode project file (Transmission.xcodeproj) for building in Xcode.
