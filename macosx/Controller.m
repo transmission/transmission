@@ -677,10 +677,11 @@ static void removeKeRangerRansomware()
         [[BonjourController defaultController] startWithPort: [fDefaults integerForKey: @"RPCPort"]];
     
     //setup TouchBar stuff
-    [self setupTouchBar];
-    [NSApp setAutomaticCustomizeTouchBarMenuItemEnabled: YES];
-    
-    shareTouchBarButton.delegate = self;
+    if (NSClassFromString(@"NSTouchBar") != nil) {
+        [self setupTouchBar];
+        [NSApp setAutomaticCustomizeTouchBarMenuItemEnabled: YES];
+        shareTouchBarButton.delegate = self;
+    }
 
     //shamelessly ask for donations
     if ([fDefaults boolForKey: @"WarningDonate"])
@@ -4108,7 +4109,10 @@ static void removeKeRangerRansomware()
     NSString * ident = [toolbarItem itemIdentifier];
     BOOL enabled = [self isToolbarItemValid: toolbarItem];
     
-    [self syncToTouchBarForItem: ident withValue: enabled];
+    if (NSClassFromString(@"NSTouchBar") != nil) {
+        [self syncToTouchBarForItem: ident withValue: enabled];
+    }
+    
     return enabled;
 }
 
