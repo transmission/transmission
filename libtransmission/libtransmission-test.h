@@ -23,8 +23,8 @@ extern bool verbose;
 bool should_print(bool pass);
 
 bool check_condition_impl(char const* file, int line, bool condition);
-bool check_int_eq_impl(char const* file, int line, int64_t expected, int64_t actual);
-bool check_uint_eq_impl(char const* file, int line, uint64_t expected, uint64_t actual);
+bool check_int_eq_impl(char const* file, int line, intmax_t expected, intmax_t actual);
+bool check_uint_eq_impl(char const* file, int line, uintmax_t expected, uintmax_t actual);
 bool check_ptr_eq_impl(char const* file, int line, void const* expected, void const* actual);
 bool check_str_eq_impl(char const* file, int line, char const* expected, char const* actual);
 

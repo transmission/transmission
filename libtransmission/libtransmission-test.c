@@ -82,7 +82,7 @@ bool check_str_eq_impl(char const* file, int line, char const* expected, char co
     return pass;
 }
 
-bool check_int_eq_impl(char const* file, int line, int64_t expected, int64_t actual)
+bool check_int_eq_impl(char const* file, int line, intmax_t expected, intmax_t actual)
 {
     bool const pass = expected == actual;
 
@@ -94,14 +94,14 @@ bool check_int_eq_impl(char const* file, int line, int64_t expected, int64_t act
         }
         else
         {
-            fprintf(stderr, "FAIL %s:%d, expected \"%" PRId64 "\", got \"%" PRId64 "\"\n", file, line, expected, actual);
+            fprintf(stderr, "FAIL %s:%d, expected \"%jd\", got \"%jd\"\n", file, line, expected, actual);
         }
     }
 
     return pass;
 }
 
-bool check_uint_eq_impl(char const* file, int line, uint64_t expected, uint64_t actual)
+bool check_uint_eq_impl(char const* file, int line, uintmax_t expected, uintmax_t actual)
 {
     bool const pass = expected == actual;
 
@@ -113,7 +113,7 @@ bool check_uint_eq_impl(char const* file, int line, uint64_t expected, uint64_t 
         }
         else
         {
-            fprintf(stderr, "FAIL %s:%d, expected \"%" PRIu64 "\", got \"%" PRIu64 "\"\n", file, line, expected, actual);
+            fprintf(stderr, "FAIL %s:%d, expected \"%ju\", got \"%ju\"\n", file, line, expected, actual);
         }
     }
 
