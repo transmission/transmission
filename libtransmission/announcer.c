@@ -1191,7 +1191,7 @@ static void on_announce_done(tr_announce_response const* response, void* vdata)
 
             /* if the tracker included scrape fields in its announce response,
                then a separate scrape isn't needed */
-            if (scrape_fields >= 3 || (scrape_fields >= 1 && tracker->scrape != NULL))
+            if (scrape_fields >= 3 || (scrape_fields >= 1 && tracker->scrape == NULL))
             {
                 tr_logAddTorDbg(tier->tor, "Announce response contained scrape info; "
                     "rescheduling next scrape to %d seconds from now.", tier->scrapeIntervalSec);
