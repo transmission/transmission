@@ -62,21 +62,16 @@ bool check_condition_impl(char const* file, int line, bool condition)
     return pass;
 }
 
-bool check_str_eq_impl(char const* file, int line, char const* expected, char const* actual)
+bool libtest_check_str(char const* file, int line, bool pass, char const* lhs, char const* rhs, char const* lhs_str,
+    char const* op_str, char const* rhs_str)
 {
-    bool const pass = tr_strcmp0(expected, actual) == 0;
-
     if (should_print(pass))
     {
-        if (pass)
-        {
-            fprintf(stderr, "PASS %s:%d\n", file, line);
-        }
-        else
-        {
-            fprintf(stderr, "FAIL %s:%d, expected \"%s\", got \"%s\"\n", file, line, expected != NULL ? expected : "(null)",
-                actual != NULL ? actual : "(null)");
-        }
+        char const* const lhs_quote = lhs != NULL ? "\"" : "";
+        char const* const rhs_quote = rhs != NULL ? "\"" : "";
+
+        fprintf(stderr, "%s %s:%d: %s %s %s (%s%s%s %s %s%s%s)\n", pass ? "PASS" : "FAIL", file, line, lhs_str, op_str, rhs_str,
+            lhs_quote, lhs != NULL ? lhs : "NULL", lhs_quote, op_str, rhs_quote, rhs != NULL ? rhs : "NULL", rhs_quote);
     }
 
     return pass;

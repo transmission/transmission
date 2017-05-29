@@ -41,12 +41,12 @@ static int test_strip_positional_args(void)
     in = "Hello %1$s foo %2$.*f";
     expected = "Hello %s foo %.*f";
     out = tr_strip_positional_args(in);
-    check_str_eq(expected, out);
+    check_str(out, ==, expected);
 
     in = "Hello %1$'d foo %2$'f";
     expected = "Hello %d foo %f";
     out = tr_strip_positional_args(in);
-    check_str_eq(expected, out);
+    check_str(out, ==, expected);
 
     return 0;
 }
@@ -60,21 +60,21 @@ static int test_strstrip(void)
     in = tr_strdup("   test    ");
     out = tr_strstrip(in);
     check(in == out);
-    check_str_eq("test", out);
+    check_str(out, ==, "test");
     tr_free(in);
 
     /* strstrip */
     in = tr_strdup(" test test ");
     out = tr_strstrip(in);
     check(in == out);
-    check_str_eq("test test", out);
+    check_str(out, ==, "test test");
     tr_free(in);
 
     /* strstrip */
     in = tr_strdup("test");
     out = tr_strstrip(in);
     check(in == out);
-    check_str_eq("test", out);
+    check_str(out, ==, "test");
     tr_free(in);
 
     return 0;
@@ -85,11 +85,11 @@ static int test_buildpath(void)
     char* out;
 
     out = tr_buildPath("foo", "bar", NULL);
-    check_str_eq("foo" TR_PATH_DELIMITER_STR "bar", out);
+    check_str(out, ==, "foo" TR_PATH_DELIMITER_STR "bar");
     tr_free(out);
 
     out = tr_buildPath("", "foo", "bar", NULL);
-    check_str_eq(TR_PATH_DELIMITER_STR "foo" TR_PATH_DELIMITER_STR "bar", out);
+    check_str(out, ==, TR_PATH_DELIMITER_STR "foo" TR_PATH_DELIMITER_STR "bar");
     tr_free(out);
 
     return 0;
@@ -102,12 +102,12 @@ static int test_utf8(void)
 
     in = "hello world";
     out = tr_utf8clean(in, TR_BAD_SIZE);
-    check_str_eq(in, out);
+    check_str(out, ==, in);
     tr_free(out);
 
     in = "hello world";
     out = tr_utf8clean(in, 5);
-    check_str_eq("hello", out);
+    check_str(out, ==, "hello");
     tr_free(out);
 
     /* this version is not utf-8 (but cp866) */
@@ -123,7 +123,7 @@ static int test_utf8(void)
     out = tr_utf8clean(in, TR_BAD_SIZE);
     check(out != NULL);
     check(tr_utf8_validate(out, TR_BAD_SIZE, NULL));
-    check_str_eq(in, out);
+    check_str(out, ==, in);
     tr_free(out);
 
     in = "\xF4\x00\x81\x82";
@@ -304,7 +304,7 @@ static int test_hex(void)
     memcpy(hex1, "fb5ef5507427b17e04b69cef31fa3379b456735a", 41);
     tr_hex_to_binary(hex1, binary, 20);
     tr_binary_to_hex(binary, hex2, 20);
-    check_str_eq(hex1, hex2);
+    check_str(hex1, ==, hex2);
 
     return 0;
 }
@@ -350,9 +350,9 @@ static int test_url(void)
 
     url = "http://1";
     check(tr_urlParse(url, TR_BAD_SIZE, &scheme, &host, &port, &path));
-    check_str_eq("http", scheme);
-    check_str_eq("1", host);
-    check_str_eq("/", path);
+    check_str(scheme, ==, "http");
+    check_str(host, ==, "1");
+    check_str(path, ==, "/");
     check_int_eq(80, port);
     tr_free(scheme);
     tr_free(path);
@@ -360,9 +360,9 @@ static int test_url(void)
 
     url = "http://www.some-tracker.org/some/path";
     check(tr_urlParse(url, TR_BAD_SIZE, &scheme, &host, &port, &path));
-    check_str_eq("http", scheme);
-    check_str_eq("www.some-tracker.org", host);
-    check_str_eq("/some/path", path);
+    check_str(scheme, ==, "http");
+    check_str(host, ==, "www.some-tracker.org");
+    check_str(path, ==, "/some/path");
     check_int_eq(80, port);
     tr_free(scheme);
     tr_free(path);
@@ -370,9 +370,9 @@ static int test_url(void)
 
     url = "http://www.some-tracker.org:80/some/path";
     check(tr_urlParse(url, TR_BAD_SIZE, &scheme, &host, &port, &path));
-    check_str_eq("http", scheme);
-    check_str_eq("www.some-tracker.org", host);
-    check_str_eq("/some/path", path);
+    check_str(scheme, ==, "http");
+    check_str(host, ==, "www.some-tracker.org");
+    check_str(path, ==, "/some/path");
     check_int_eq(80, port);
     tr_free(scheme);
     tr_free(path);
@@ -380,7 +380,7 @@ static int test_url(void)
 
     url = "http%3A%2F%2Fwww.example.com%2F~user%2F%3Ftest%3D1%26test1%3D2";
     str = tr_http_unescape(url, strlen(url));
-    check_str_eq("http://www.example.com/~user/?test=1&test1=2", str);
+    check_str(str, ==, "http://www.example.com/~user/?test=1&test1=2");
     tr_free(str);
 
     return 0;
@@ -392,25 +392,25 @@ static int test_truncd(void)
     double const nan = sqrt(-1);
 
     tr_snprintf(buf, sizeof(buf), "%.2f%%", 99.999);
-    check_str_eq("100.00%", buf);
+    check_str(buf, ==, "100.00%");
 
     tr_snprintf(buf, sizeof(buf), "%.2f%%", tr_truncd(99.999, 2));
-    check_str_eq("99.99%", buf);
+    check_str(buf, ==, "99.99%");
 
     tr_snprintf(buf, sizeof(buf), "%.4f", tr_truncd(403650.656250, 4));
-    check_str_eq("403650.6562", buf);
+    check_str(buf, ==, "403650.6562");
 
     tr_snprintf(buf, sizeof(buf), "%.2f", tr_truncd(2.15, 2));
-    check_str_eq("2.15", buf);
+    check_str(buf, ==, "2.15");
 
     tr_snprintf(buf, sizeof(buf), "%.2f", tr_truncd(2.05, 2));
-    check_str_eq("2.05", buf);
+    check_str(buf, ==, "2.05");
 
     tr_snprintf(buf, sizeof(buf), "%.2f", tr_truncd(3.3333, 2));
-    check_str_eq("3.33", buf);
+    check_str(buf, ==, "3.33");
 
     tr_snprintf(buf, sizeof(buf), "%.0f", tr_truncd(3.3333, 0));
-    check_str_eq("3", buf);
+    check_str(buf, ==, "3");
 
 #if !(defined(_MSC_VER) || (defined(__MINGW32__) && defined(__MSVCRT__)))
     /* FIXME: MSCVRT behaves differently in case of nan */
@@ -442,11 +442,11 @@ static int test_strdup_printf(void)
     char* s3;
 
     s = tr_strdup_printf("%s", "test");
-    check_str_eq("test", s);
+    check_str(s, ==, "test");
     tr_free(s);
 
     s = tr_strdup_printf("%d %s %c %u", -1, "0", '1', 2);
-    check_str_eq("-1 0 1 2", s);
+    check_str(s, ==, "-1 0 1 2");
     tr_free(s);
 
     s3 = tr_malloc0(4098);
@@ -462,19 +462,19 @@ static int test_strdup_printf(void)
     s2[2048] = 's';
 
     s = tr_strdup_printf(s2, "test");
-    check_str_eq(s3, s);
+    check_str(s, ==, s3);
     tr_free(s);
 
     tr_free(s2);
 
     s = tr_strdup_printf("%s", s3);
-    check_str_eq(s3, s);
+    check_str(s, ==, s3);
     tr_free(s);
 
     tr_free(s3);
 
     s = test_strdup_printf_valist("\n-%s-%s-%s-\n", "\r", "\t", "\b");
-    check_str_eq("\n-\r-\t-\b-\n", s);
+    check_str(s, ==, "\n-\r-\t-\b-\n");
     tr_free(s);
 
     return 0;
@@ -494,7 +494,7 @@ static int test_env(void)
     s = tr_env_get_string(test_key, NULL);
     check(s == NULL);
     s = tr_env_get_string(test_key, "a");
-    check_str_eq("a", s);
+    check_str(s, ==, "a");
     tr_free(s);
 
     setenv(test_key, "", 1);
@@ -503,10 +503,10 @@ static int test_env(void)
     x = tr_env_get_int(test_key, 456);
     check_int_eq(456, x);
     s = tr_env_get_string(test_key, NULL);
-    check_str_eq("", s);
+    check_str(s, ==, "");
     tr_free(s);
     s = tr_env_get_string(test_key, "b");
-    check_str_eq("", s);
+    check_str(s, ==, "");
     tr_free(s);
 
     setenv(test_key, "135", 1);
@@ -515,10 +515,10 @@ static int test_env(void)
     x = tr_env_get_int(test_key, 789);
     check_int_eq(135, x);
     s = tr_env_get_string(test_key, NULL);
-    check_str_eq("135", s);
+    check_str(s, ==, "135");
     tr_free(s);
     s = tr_env_get_string(test_key, "c");
-    check_str_eq("135", s);
+    check_str(s, ==, "135");
     tr_free(s);
 
     return 0;

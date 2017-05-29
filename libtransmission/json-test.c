@@ -43,9 +43,9 @@ static int test_elements(void)
     str = NULL;
     key = tr_quark_new("string", 6);
     check(tr_variantDictFindStr(&top, key, &str, NULL));
-    check_str_eq("hello world", str);
+    check_str(str, ==, "hello world");
     check(tr_variantDictFindStr(&top, tr_quark_new("escaped", 7), &str, NULL));
-    check_str_eq("bell \b formfeed \f linefeed \n carriage return \r tab \t", str);
+    check_str(str, ==, "bell \b formfeed \f linefeed \n carriage return \r tab \t");
     i = 0;
     check(tr_variantDictFindInt(&top, tr_quark_new("int", 3), &i));
     check_int_eq(5, i);
@@ -58,7 +58,7 @@ static int test_elements(void)
     check(tr_variantDictFindBool(&top, tr_quark_new("false", 5), &f));
     check_int_eq(false, f);
     check(tr_variantDictFindStr(&top, tr_quark_new("null", 4), &str, NULL));
-    check_str_eq("", str);
+    check_str(str, ==, "");
 
     if (err == 0)
     {
@@ -81,7 +81,7 @@ static int test_utf8(void)
     check(err == 0);
     check(tr_variantIsDict(&top));
     check(tr_variantDictFindStr(&top, key, &str, NULL));
-    check_str_eq("Letöltések", str);
+    check_str(str, ==, "Letöltések");
 
     if (err == 0)
     {
@@ -93,7 +93,7 @@ static int test_utf8(void)
     check(err == 0);
     check(tr_variantIsDict(&top));
     check(tr_variantDictFindStr(&top, key, &str, NULL));
-    check_str_eq("\\", str);
+    check_str(str, ==, "\\");
 
     if (err == 0)
     {
@@ -113,7 +113,7 @@ static int test_utf8(void)
     check(err == 0);
     check(tr_variantIsDict(&top));
     check(tr_variantDictFindStr(&top, key, &str, NULL));
-    check_str_eq("Letöltések", str);
+    check_str(str, ==, "Letöltések");
     json = tr_variantToStr(&top, TR_VARIANT_FMT_JSON, NULL);
 
     if (err == 0)
@@ -128,7 +128,7 @@ static int test_utf8(void)
     check(err == 0);
     check(tr_variantIsDict(&top));
     check(tr_variantDictFindStr(&top, key, &str, NULL));
-    check_str_eq("Letöltések", str);
+    check_str(str, ==, "Letöltések");
 
     if (err == 0)
     {
@@ -169,12 +169,12 @@ static int test1(void)
     check((headers = tr_variantDictFind(&top, tr_quark_new("headers", 7))) != NULL);
     check(tr_variantIsDict(headers));
     check(tr_variantDictFindStr(headers, tr_quark_new("type", 4), &str, NULL));
-    check_str_eq("request", str);
+    check_str(str, ==, "request");
     check(tr_variantDictFindInt(headers, TR_KEY_tag, &i));
     check_int_eq(666, i);
     check((body = tr_variantDictFind(&top, tr_quark_new("body", 4))) != NULL);
     check(tr_variantDictFindStr(body, TR_KEY_name, &str, NULL));
-    check_str_eq("torrent-info", str);
+    check_str(str, ==, "torrent-info");
     check((args = tr_variantDictFind(body, tr_quark_new("arguments", 9))) != NULL);
     check(tr_variantIsDict(args));
     check((ids = tr_variantDictFind(args, TR_KEY_ids)) != NULL);
@@ -218,7 +218,7 @@ static int test3(void)
     int const err = tr_variantFromJson(&top, in, strlen(in));
     check(err == 0);
     check(tr_variantDictFindStr(&top, TR_KEY_errorString, &str, NULL));
-    check_str_eq("torrent not registered with this tracker 6UHsVW'*C", str);
+    check_str(str, ==, "torrent not registered with this tracker 6UHsVW'*C");
 
     tr_variantFree(&top);
     return 0;
@@ -233,7 +233,7 @@ static int test_unescape(void)
     int const err = tr_variantFromJson(&top, in, strlen(in));
     check_int_eq(0, err);
     check(tr_variantDictFindStr(&top, tr_quark_new("string-1", 8), &str, NULL));
-    check_str_eq("/usr/lib", str);
+    check_str(str, ==, "/usr/lib");
 
     tr_variantFree(&top);
     return 0;

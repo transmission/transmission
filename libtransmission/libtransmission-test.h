@@ -26,7 +26,9 @@ bool check_condition_impl(char const* file, int line, bool condition);
 bool check_int_eq_impl(char const* file, int line, intmax_t expected, intmax_t actual);
 bool check_uint_eq_impl(char const* file, int line, uintmax_t expected, uintmax_t actual);
 bool check_ptr_eq_impl(char const* file, int line, void const* expected, void const* actual);
-bool check_str_eq_impl(char const* file, int line, char const* expected, char const* actual);
+
+bool libtest_check_str(char const* file, int line, bool pass, char const* lhs, char const* rhs, char const* lhs_str,
+    char const* op_str, char const* rhs_str);
 
 /***
 ****
@@ -44,12 +46,16 @@ bool check_str_eq_impl(char const* file, int line, char const* expected, char co
     } \
     while (0)
 
-#define check_str_eq(expected, actual) \
+#define check_str(lhs, op, rhs) \
     do \
     { \
         ++current_test; \
         \
-        if (!check_str_eq_impl(__FILE__, __LINE__, (expected), (actual))) \
+        char const* const check_str_lhs = (lhs); \
+        char const* const check_str_rhs = (rhs); \
+        \
+        if (!libtest_check_str(__FILE__, __LINE__, tr_strcmp0(check_str_lhs, check_str_rhs) op 0, check_str_lhs, \
+            check_str_rhs, #lhs, #op, #rhs)) \
         { \
             return current_test; \
         } \

@@ -650,7 +650,7 @@ static int test_path_xname(struct xname_test_data const* data, size_t data_size,
         {
             check(name != NULL);
             check(err == NULL);
-            check_str_eq(data[i].output, name);
+            check_str(name, ==, data[i].output);
             tr_free(name);
         }
         else
@@ -1307,31 +1307,31 @@ static int test_file_utilities(void)
 
     check(tr_sys_file_read_line(fd, buffer, TR_N_ELEMENTS(buffer), &err));
     check(err == NULL);
-    check_str_eq("a", buffer);
+    check_str(buffer, ==, "a");
     check(tr_sys_file_read_line(fd, buffer, TR_N_ELEMENTS(buffer), &err));
     check(err == NULL);
-    check_str_eq("bc", buffer);
+    check_str(buffer, ==, "bc");
     check(tr_sys_file_read_line(fd, buffer, TR_N_ELEMENTS(buffer), &err));
     check(err == NULL);
-    check_str_eq("def", buffer);
+    check_str(buffer, ==, "def");
     check(tr_sys_file_read_line(fd, buffer, TR_N_ELEMENTS(buffer), &err));
     check(err == NULL);
-    check_str_eq("ghij", buffer);
+    check_str(buffer, ==, "ghij");
     check(tr_sys_file_read_line(fd, buffer, TR_N_ELEMENTS(buffer), &err));
     check(err == NULL);
-    check_str_eq("", buffer);
+    check_str(buffer, ==, "");
     check(tr_sys_file_read_line(fd, buffer, TR_N_ELEMENTS(buffer), &err));
     check(err == NULL);
-    check_str_eq("", buffer);
+    check_str(buffer, ==, "");
     check(tr_sys_file_read_line(fd, buffer, 4, &err));
     check(err == NULL);
-    check_str_eq("klmn", buffer);
+    check_str(buffer, ==, "klmn");
     check(tr_sys_file_read_line(fd, buffer, TR_N_ELEMENTS(buffer), &err));
     check(err == NULL);
-    check_str_eq("o", buffer);
+    check_str(buffer, ==, "o");
     check(!tr_sys_file_read_line(fd, buffer, TR_N_ELEMENTS(buffer), &err));
     check(err == NULL);
-    check_str_eq("o", buffer); /* on EOF, buffer stays unchanged */
+    check_str(buffer, ==, "o"); /* on EOF, buffer stays unchanged */
 
     tr_sys_file_close(fd, NULL);
 
@@ -1356,28 +1356,28 @@ static int test_file_utilities(void)
 
     check(tr_sys_file_read_line(fd, buffer, TR_N_ELEMENTS(buffer), &err));
     check(err == NULL);
-    check_str_eq("p", buffer);
+    check_str(buffer, ==, "p");
     check(tr_sys_file_read_line(fd, buffer, TR_N_ELEMENTS(buffer), &err));
     check(err == NULL);
-    check_str_eq("", buffer);
+    check_str(buffer, ==, "");
     check(tr_sys_file_read_line(fd, buffer, TR_N_ELEMENTS(buffer), &err));
     check(err == NULL);
-    check_str_eq("qr", buffer);
+    check_str(buffer, ==, "qr");
     check(tr_sys_file_read_line(fd, buffer, TR_N_ELEMENTS(buffer), &err));
     check(err == NULL);
-    check_str_eq("stu", buffer);
+    check_str(buffer, ==, "stu");
     check(tr_sys_file_read_line(fd, buffer, TR_N_ELEMENTS(buffer), &err));
     check(err == NULL);
-    check_str_eq("", buffer);
+    check_str(buffer, ==, "");
     check(tr_sys_file_read_line(fd, buffer, TR_N_ELEMENTS(buffer), &err));
     check(err == NULL);
-    check_str_eq("", buffer);
+    check_str(buffer, ==, "");
     check(tr_sys_file_read_line(fd, buffer, TR_N_ELEMENTS(buffer), &err));
     check(err == NULL);
-    check_str_eq("vwxy2", buffer);
+    check_str(buffer, ==, "vwxy2");
     check(!tr_sys_file_read_line(fd, buffer, TR_N_ELEMENTS(buffer), &err));
     check(err == NULL);
-    check_str_eq("vwxy2", buffer); /* on EOF, buffer stays unchanged */
+    check_str(buffer, ==, "vwxy2"); /* on EOF, buffer stays unchanged */
 
     tr_sys_file_close(fd, NULL);
 

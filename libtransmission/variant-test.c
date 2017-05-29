@@ -173,7 +173,7 @@ static int testString(char const* str, bool isGood)
 #endif
         check(end == str + len);
         saved = tr_variantToStr(&val, TR_VARIANT_FMT_BENC, &savedLen);
-        check_str_eq(str, saved);
+        check_str(saved, ==, str);
         check_uint_eq(savedLen, len);
         tr_free(saved);
         tr_variantFree(&val);
@@ -214,7 +214,7 @@ static int testParse(void)
     check(tr_variantGetInt(&val.val.l.vals[2], &i));
     check_int_eq(16, i);
     saved = tr_variantToStr(&val, TR_VARIANT_FMT_BENC, &len);
-    check_str_eq((char*)buf, saved);
+    check_str(saved, ==, buf);
     tr_free(saved);
     tr_variantFree(&val);
 
@@ -230,7 +230,7 @@ static int testParse(void)
     check(err == 0);
     check(end == buf + 2);
     saved = tr_variantToStr(&val, TR_VARIANT_FMT_BENC, &len);
-    check_str_eq("le", saved);
+    check_str(saved, ==, "le");
     tr_free(saved);
     tr_variantFree(&val);
 
@@ -290,7 +290,7 @@ static int testParse(void)
     check((child = tr_variantListChild(&val, 0)) != NULL);
     check((child2 = tr_variantListChild(child, 0)) != NULL);
     saved = tr_variantToStr(&val, TR_VARIANT_FMT_BENC, &len);
-    check_str_eq("lld1:ai64e1:bi32eeee", saved);
+    check_str(saved, ==, "lld1:ai64e1:bi32eeee");
     tr_free(saved);
     tr_variantFree(&val);
 
@@ -301,7 +301,7 @@ static int testParse(void)
     check(err == 0);
     check(end == buf + 2);
     saved = tr_variantToStr(&val, TR_VARIANT_FMT_BENC, &len);
-    check_str_eq("le", saved);
+    check_str(saved, ==, "le");
     tr_free(saved);
     tr_variantFree(&val);
 
@@ -350,7 +350,7 @@ static int testJSONSnippet(char const* benc_str, char const* expected)
     fprintf(stderr, "json: %s\n", serialized);
     fprintf(stderr, "want: %s\n", expected);
 #endif
-    check_str_eq(expected, serialized);
+    check_str(serialized, ==, expected);
     tr_variantFree(&top);
     evbuffer_free(buf);
     return 0;
@@ -451,16 +451,16 @@ static int testMerge(void)
     check_int_eq(-35, i);
     check(tr_variantDictFindStr(&dest, s5, &s, &len));
     check_uint_eq(3, len);
-    check_str_eq("abc", s);
+    check_str(s, ==, "abc");
     check(tr_variantDictFindStr(&dest, s6, &s, &len));
     check_uint_eq(3, len);
-    check_str_eq("xyz", s);
+    check_str(s, ==, "xyz");
     check(tr_variantDictFindStr(&dest, s7, &s, &len));
     check_uint_eq(9, len);
-    check_str_eq("127.0.0.1", s);
+    check_str(s, ==, "127.0.0.1");
     check(tr_variantDictFindStr(&dest, s8, &s, &len));
     check_uint_eq(3, len);
-    check_str_eq("ghi", s);
+    check_str(s, ==, "ghi");
 
     tr_variantFree(&dest);
     tr_variantFree(&src);
@@ -490,7 +490,7 @@ static int testStackSmash(void)
     check_int_eq(0, err);
     check(end == in + depth * 2);
     saved = tr_variantToStr(&val, TR_VARIANT_FMT_BENC, &len);
-    check_str_eq((char*)in, saved);
+    check_str(saved, ==, in);
     tr_free(in);
     tr_free(saved);
     tr_variantFree(&val);
@@ -559,8 +559,8 @@ static int testParse2(void)
     tr_variantDictAddStr(&top, key_str, "this-is-a-string");
 
     benc = tr_variantToStr(&top, TR_VARIANT_FMT_BENC, &len);
-    check_str_eq("d14:this-is-a-booli1e14:this-is-a-real8:0.50000016:this-is-a-string16:this-is-a-string14:this-is-an-int"
-        "i1234ee", benc);
+    check_str(benc, ==, "d14:this-is-a-booli1e14:this-is-a-real8:0.50000016:this-is-a-string16:this-is-a-string14:this-is-an-"
+        "inti1234ee");
     check(tr_variantFromBencFull(&top2, benc, len, NULL, &end) == 0);
     check(end == benc + len);
     check(tr_variantIsDict(&top2));
@@ -570,7 +570,7 @@ static int testParse2(void)
     check(boolVal == true);
     check(tr_variantDictFindStr(&top, key_str, &strVal, &strLen));
     check_uint_eq(16, strLen);
-    check_str_eq("this-is-a-string", strVal);
+    check_str(strVal, ==, "this-is-a-string");
     check(tr_variantDictFindReal(&top, key_real, &realVal));
     check_int_eq(50, (int)(realVal * 100));
 

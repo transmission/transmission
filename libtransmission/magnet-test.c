@@ -32,11 +32,11 @@ static int test1(void)
     info = tr_magnetParse(uri);
     check(info != NULL);
     check_int_eq(2, info->trackerCount);
-    check_str_eq(info->trackers[0], "http://tracker.openbittorrent.com/announce");
-    check_str_eq(info->trackers[1], "http://tracker.opentracker.org/announce");
+    check_str(info->trackers[0], ==, "http://tracker.openbittorrent.com/announce");
+    check_str(info->trackers[1], ==, "http://tracker.opentracker.org/announce");
     check_int_eq(1, info->webseedCount);
-    check_str_eq("http://server.webseed.org/path/to/file", info->webseeds[0]);
-    check_str_eq("Display Name", info->displayName);
+    check_str(info->webseeds[0], ==, "http://server.webseed.org/path/to/file");
+    check_str(info->displayName, ==, "Display Name");
 
     for (int i = 0; i < 20; ++i)
     {
@@ -57,11 +57,11 @@ static int test1(void)
     info = tr_magnetParse(uri);
     check(info != NULL);
     check_int_eq(2, info->trackerCount);
-    check_str_eq("http://tracker.openbittorrent.com/announce", info->trackers[0]);
-    check_str_eq("http://tracker.opentracker.org/announce", info->trackers[1]);
+    check_str(info->trackers[0], ==, "http://tracker.openbittorrent.com/announce");
+    check_str(info->trackers[1], ==, "http://tracker.opentracker.org/announce");
     check_int_eq(1, info->webseedCount);
-    check_str_eq("http://server.webseed.org/path/to/file", info->webseeds[0]);
-    check_str_eq("Display Name", info->displayName);
+    check_str(info->webseeds[0], ==, "http://server.webseed.org/path/to/file");
+    check_str(info->displayName, ==, "Display Name");
 
     for (int i = 0; i < 20; ++i)
     {

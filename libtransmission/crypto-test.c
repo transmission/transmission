@@ -86,13 +86,13 @@ static int test_encrypt_decrypt(void)
     tr_cryptoEncrypt(&a, sizeof(test1), test1, buf11);
     tr_cryptoDecryptInit_(&b);
     tr_cryptoDecrypt_(&b, sizeof(test1), buf11, buf12);
-    check_str_eq(test1, buf12);
+    check_str(buf12, ==, test1);
 
     tr_cryptoEncryptInit_(&b);
     tr_cryptoEncrypt_(&b, sizeof(test2), test2, buf21);
     tr_cryptoDecryptInit(&a);
     tr_cryptoDecrypt(&a, sizeof(test2), buf21, buf22);
-    check_str_eq(test2, buf22);
+    check_str(buf22, ==, test2);
 
     tr_cryptoDestruct_(&b);
     tr_cryptoDestruct(&a);
@@ -240,17 +240,17 @@ static int test_base64(void)
     check(base64_eq("WU9ZTyE=", out));
     in = tr_base64_decode_str(out, &len);
     check_uint_eq(5, len);
-    check_str_eq("YOYO!", in);
+    check_str(in, ==, "YOYO!");
     tr_free(in);
     tr_free(out);
 
     out = tr_base64_encode("", 0, &len);
     check_uint_eq(0, len);
-    check_str_eq("", out);
+    check_str(out, ==, "");
     tr_free(out);
     out = tr_base64_decode("", 0, &len);
     check_uint_eq(0, len);
-    check_str_eq("", out);
+    check_str(out, ==, "");
     tr_free(out);
 
     out = tr_base64_encode(NULL, 0, &len);
@@ -290,7 +290,7 @@ static int test_base64(void)
         check_uint_eq(strlen(out), len);
         in = tr_base64_decode_str(out, &len);
         check_uint_eq(i, len);
-        check_str_eq(in, buf);
+        check_str(buf, ==, in);
         tr_free(in);
         tr_free(out);
     }
