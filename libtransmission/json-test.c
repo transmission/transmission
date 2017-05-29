@@ -38,7 +38,7 @@ static int test_elements(void)
         "  \"null\": null }";
 
     err = tr_variantFromJson(&top, in, strlen(in));
-    check_int_eq(0, err);
+    check_int(err, ==, 0);
     check(tr_variantIsDict(&top));
     str = NULL;
     key = tr_quark_new("string", 6);
@@ -48,15 +48,15 @@ static int test_elements(void)
     check_str(str, ==, "bell \b formfeed \f linefeed \n carriage return \r tab \t");
     i = 0;
     check(tr_variantDictFindInt(&top, tr_quark_new("int", 3), &i));
-    check_int_eq(5, i);
+    check_int(i, ==, 5);
     d = 0;
     check(tr_variantDictFindReal(&top, tr_quark_new("float", 5), &d));
-    check_int_eq(65, ((int)(d * 10)));
+    check_int(((int)(d * 10)), ==, 65);
     f = false;
     check(tr_variantDictFindBool(&top, tr_quark_new("true", 4), &f));
-    check_int_eq(true, f);
+    check_int(f, ==, true);
     check(tr_variantDictFindBool(&top, tr_quark_new("false", 5), &f));
-    check_int_eq(false, f);
+    check_int(f, ==, false);
     check(tr_variantDictFindStr(&top, tr_quark_new("null", 4), &str, NULL));
     check_str(str, ==, "");
 
@@ -171,7 +171,7 @@ static int test1(void)
     check(tr_variantDictFindStr(headers, tr_quark_new("type", 4), &str, NULL));
     check_str(str, ==, "request");
     check(tr_variantDictFindInt(headers, TR_KEY_tag, &i));
-    check_int_eq(666, i);
+    check_int(i, ==, 666);
     check((body = tr_variantDictFind(&top, tr_quark_new("body", 4))) != NULL);
     check(tr_variantDictFindStr(body, TR_KEY_name, &str, NULL));
     check_str(str, ==, "torrent-info");
@@ -181,9 +181,9 @@ static int test1(void)
     check(tr_variantIsList(ids));
     check_uint_eq(2, tr_variantListSize(ids));
     check(tr_variantGetInt(tr_variantListChild(ids, 0), &i));
-    check_int_eq(7, i);
+    check_int(i, ==, 7);
     check(tr_variantGetInt(tr_variantListChild(ids, 1), &i));
-    check_int_eq(10, i);
+    check_int(i, ==, 10);
 
     tr_variantFree(&top);
     return 0;
@@ -231,7 +231,7 @@ static int test_unescape(void)
     char const* str;
 
     int const err = tr_variantFromJson(&top, in, strlen(in));
-    check_int_eq(0, err);
+    check_int(err, ==, 0);
     check(tr_variantDictFindStr(&top, tr_quark_new("string-1", 8), &str, NULL));
     check_str(str, ==, "/usr/lib");
 

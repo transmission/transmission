@@ -149,13 +149,13 @@ static int test_numbers(void)
     int* numbers;
 
     numbers = tr_parseNumberRange("1-10,13,16-19", TR_BAD_SIZE, &count);
-    check_int_eq(15, count);
-    check_int_eq(1, numbers[0]);
-    check_int_eq(6, numbers[5]);
-    check_int_eq(10, numbers[9]);
-    check_int_eq(13, numbers[10]);
-    check_int_eq(16, numbers[11]);
-    check_int_eq(19, numbers[14]);
+    check_int(count, ==, 15);
+    check_int(numbers[0], ==, 1);
+    check_int(numbers[5], ==, 6);
+    check_int(numbers[9], ==, 10);
+    check_int(numbers[10], ==, 13);
+    check_int(numbers[11], ==, 16);
+    check_int(numbers[14], ==, 19);
     tr_free(numbers);
 
     numbers = tr_parseNumberRange("1-5,3-7,2-6", TR_BAD_SIZE, &count);
@@ -164,21 +164,21 @@ static int test_numbers(void)
 
     for (int i = 0; i < count; ++i)
     {
-        check_int_eq(i + 1, numbers[i]);
+        check_int(numbers[i], ==, i + 1);
     }
 
     tr_free(numbers);
 
     numbers = tr_parseNumberRange("1-Hello", TR_BAD_SIZE, &count);
-    check_int_eq(0, count);
+    check_int(count, ==, 0);
     check(numbers == NULL);
 
     numbers = tr_parseNumberRange("1-", TR_BAD_SIZE, &count);
-    check_int_eq(0, count);
+    check_int(count, ==, 0);
     check(numbers == NULL);
 
     numbers = tr_parseNumberRange("Hello", TR_BAD_SIZE, &count);
-    check_int_eq(0, count);
+    check_int(count, ==, 0);
     check(numbers == NULL);
 
     return 0;
@@ -219,8 +219,8 @@ static int test_lowerbound(void)
 
 #endif
 
-        check_int_eq(expected_pos[i - 1], pos);
-        check_int_eq(expected_exact[i - 1], exact);
+        check_int(pos, ==, expected_pos[i - 1]);
+        check_int(exact, ==, expected_exact[i - 1]);
     }
 
     return 0;
@@ -276,7 +276,7 @@ static int test_quickfindFirst(void)
 
     for (size_t i = 0; i < n_trials; ++i)
     {
-        check_int_eq(0, test_quickFindFirst_Iteration(k, n, buf, 100));
+        check_int(test_quickFindFirst_Iteration(k, n, buf, 100), ==, 0);
     }
 
     tr_free(buf);
@@ -318,14 +318,14 @@ static int test_array(void)
 
     for (size_t i = 0; i < n; ++i)
     {
-        check_int_eq(i < 5 ? i : i + 1, array[i]);
+        check_int(array[i], ==, i < 5 ? i : i + 1);
     }
 
     tr_removeElementFromArray(array, 0u, sizeof(size_t), n--);
 
     for (size_t i = 0; i < n; ++i)
     {
-        check_int_eq(i < 4 ? i + 1 : i + 2, array[i]);
+        check_int(array[i], ==, i < 4 ? i + 1 : i + 2);
     }
 
     tr_removeElementFromArray(array, n - 1, sizeof(size_t), n);
@@ -333,7 +333,7 @@ static int test_array(void)
 
     for (size_t i = 0; i < n; ++i)
     {
-        check_int_eq(i < 4 ? i + 1 : i + 2, array[i]);
+        check_int(array[i], ==, i < 4 ? i + 1 : i + 2);
     }
 
     return 0;
@@ -353,7 +353,7 @@ static int test_url(void)
     check_str(scheme, ==, "http");
     check_str(host, ==, "1");
     check_str(path, ==, "/");
-    check_int_eq(80, port);
+    check_int(port, ==, 80);
     tr_free(scheme);
     tr_free(path);
     tr_free(host);
@@ -363,7 +363,7 @@ static int test_url(void)
     check_str(scheme, ==, "http");
     check_str(host, ==, "www.some-tracker.org");
     check_str(path, ==, "/some/path");
-    check_int_eq(80, port);
+    check_int(port, ==, 80);
     tr_free(scheme);
     tr_free(path);
     tr_free(host);
@@ -373,7 +373,7 @@ static int test_url(void)
     check_str(scheme, ==, "http");
     check_str(host, ==, "www.some-tracker.org");
     check_str(path, ==, "/some/path");
-    check_int_eq(80, port);
+    check_int(port, ==, 80);
     tr_free(scheme);
     tr_free(path);
     tr_free(host);
@@ -490,7 +490,7 @@ static int test_env(void)
 
     check(!tr_env_key_exists(test_key));
     x = tr_env_get_int(test_key, 123);
-    check_int_eq(123, x);
+    check_int(x, ==, 123);
     s = tr_env_get_string(test_key, NULL);
     check(s == NULL);
     s = tr_env_get_string(test_key, "a");
@@ -501,7 +501,7 @@ static int test_env(void)
 
     check(tr_env_key_exists(test_key));
     x = tr_env_get_int(test_key, 456);
-    check_int_eq(456, x);
+    check_int(x, ==, 456);
     s = tr_env_get_string(test_key, NULL);
     check_str(s, ==, "");
     tr_free(s);
@@ -513,7 +513,7 @@ static int test_env(void)
 
     check(tr_env_key_exists(test_key));
     x = tr_env_get_int(test_key, 789);
-    check_int_eq(135, x);
+    check_int(x, ==, 135);
     s = tr_env_get_string(test_key, NULL);
     check_str(s, ==, "135");
     tr_free(s);

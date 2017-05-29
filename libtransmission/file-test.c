@@ -182,7 +182,7 @@ static int test_get_info(void)
     clear_path_info(&info);
     check(tr_sys_path_get_info(path1, 0, &info, &err));
     check(err == NULL);
-    check_int_eq(TR_SYS_PATH_IS_FILE, info.type);
+    check_int(info.type, ==, TR_SYS_PATH_IS_FILE);
     check_uint_eq(4, info.size);
     check(info.last_modified_at >= t && info.last_modified_at <= time(NULL));
 
@@ -191,7 +191,7 @@ static int test_get_info(void)
     clear_path_info(&info);
     check(tr_sys_file_get_info(fd, &info, &err));
     check(err == NULL);
-    check_int_eq(TR_SYS_PATH_IS_FILE, info.type);
+    check_int(info.type, ==, TR_SYS_PATH_IS_FILE);
     check_uint_eq(4, info.size);
     check(info.last_modified_at >= t && info.last_modified_at <= time(NULL));
     tr_sys_file_close(fd, NULL);
@@ -204,7 +204,7 @@ static int test_get_info(void)
     clear_path_info(&info);
     check(tr_sys_path_get_info(path1, 0, &info, &err));
     check(err == NULL);
-    check_int_eq(TR_SYS_PATH_IS_DIRECTORY, info.type);
+    check_int(info.type, ==, TR_SYS_PATH_IS_DIRECTORY);
     check(info.size != (uint64_t)-1);
     check(info.last_modified_at >= t && info.last_modified_at <= time(NULL));
     tr_sys_path_remove(path1, NULL);
@@ -223,7 +223,7 @@ static int test_get_info(void)
         clear_path_info(&info);
         check(tr_sys_path_get_info(path1, 0, &info, &err));
         check(err == NULL);
-        check_int_eq(TR_SYS_PATH_IS_FILE, info.type);
+        check_int(info.type, ==, TR_SYS_PATH_IS_FILE);
         check_uint_eq(4, info.size);
         check(info.last_modified_at >= t && info.last_modified_at <= time(NULL));
 
@@ -232,7 +232,7 @@ static int test_get_info(void)
         clear_path_info(&info);
         check(tr_sys_file_get_info(fd, &info, &err));
         check(err == NULL);
-        check_int_eq(TR_SYS_PATH_IS_FILE, info.type);
+        check_int(info.type, ==, TR_SYS_PATH_IS_FILE);
         check_uint_eq(4, info.size);
         check(info.last_modified_at >= t && info.last_modified_at <= time(NULL));
         tr_sys_file_close(fd, NULL);
@@ -245,7 +245,7 @@ static int test_get_info(void)
         clear_path_info(&info);
         check(tr_sys_path_get_info(path1, 0, &info, &err));
         check(err == NULL);
-        check_int_eq(TR_SYS_PATH_IS_DIRECTORY, info.type);
+        check_int(info.type, ==, TR_SYS_PATH_IS_DIRECTORY);
         check(info.size != (uint64_t)-1);
         check(info.last_modified_at >= t && info.last_modified_at <= time(NULL));
 
@@ -1085,7 +1085,7 @@ static int test_file_read_write_seek(void)
     check(err == NULL);
     check_uint_eq(4, n);
 
-    check_int_eq(0, memcmp(buf, "test", 4));
+    check_int(memcmp(buf, "test", 4), ==, 0);
 
     check(tr_sys_file_seek(fd, -3, TR_SEEK_CUR, &n, &err));
     check(err == NULL);
@@ -1103,7 +1103,7 @@ static int test_file_read_write_seek(void)
     check(err == NULL);
     check_uint_eq(4, n);
 
-    check_int_eq(0, memcmp(buf, "tEst", 4));
+    check_int(memcmp(buf, "tEst", 4), ==, 0);
 
     check(tr_sys_file_seek(fd, 0, TR_SEEK_END, &n, &err));
     check(err == NULL);
@@ -1121,7 +1121,7 @@ static int test_file_read_write_seek(void)
     check(err == NULL);
     check_uint_eq(7, n);
 
-    check_int_eq(0, memcmp(buf, "tEst ok", 7));
+    check_int(memcmp(buf, "tEst ok", 7), ==, 0);
 
     check(tr_sys_file_write_at(fd, "-", 1, 4, &n, &err));
     check(err == NULL);
@@ -1131,7 +1131,7 @@ static int test_file_read_write_seek(void)
     check(err == NULL);
     check_uint_eq(5, n);
 
-    check_int_eq(0, memcmp(buf, "st-ok", 5));
+    check_int(memcmp(buf, "st-ok", 5), ==, 0);
 
     tr_sys_file_close(fd, NULL);
 
@@ -1268,13 +1268,13 @@ static int test_file_map(void)
     check(view != NULL);
     check(err == NULL);
 
-    check_int_eq(0, memcmp(view, "test", 4));
+    check_int(memcmp(view, "test", 4), ==, 0);
 
 #ifdef HAVE_UNIFIED_BUFFER_CACHE
 
     tr_sys_file_write_at(fd, "E", 1, 1, NULL, NULL);
 
-    check_int_eq(0, memcmp(view, "tEst", 4));
+    check_int(memcmp(view, "tEst", 4), ==, 0);
 
 #endif
 

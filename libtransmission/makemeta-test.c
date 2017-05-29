@@ -36,10 +36,10 @@ static int test_single_file_impl(tr_tracker_info const* trackers, size_t const t
     libtest_create_tmpfile_with_contents(input_file, payload, payloadSize);
     builder = tr_metaInfoBuilderCreate(input_file);
     check_str(builder->top, ==, input_file);
-    check_int_eq(1, builder->fileCount);
+    check_int(builder->fileCount, ==, 1);
     check_str(builder->files[0].filename, ==, input_file);
-    check_int_eq(payloadSize, builder->files[0].size);
-    check_int_eq(payloadSize, builder->totalSize);
+    check_int(builder->files[0].size, ==, payloadSize);
+    check_int(builder->totalSize, ==, payloadSize);
     check(!builder->isFolder);
     check(!builder->abortFlag);
 
@@ -49,7 +49,7 @@ static int test_single_file_impl(tr_tracker_info const* trackers, size_t const t
     check(isPrivate == builder->isPrivate);
     check_str(builder->outputFile, ==, torrent_file);
     check_str(builder->comment, ==, comment);
-    check_int_eq(trackerCount, builder->trackerCount);
+    check_int(builder->trackerCount, ==, trackerCount);
 
     while (!builder->isDone)
     {
@@ -61,18 +61,18 @@ static int test_single_file_impl(tr_tracker_info const* trackers, size_t const t
     libttest_sync();
     tr_ctorSetMetainfoFromFile(ctor, torrent_file);
     parse_result = tr_torrentParse(ctor, &inf);
-    check_int_eq(TR_PARSE_OK, parse_result);
+    check_int(parse_result, ==, TR_PARSE_OK);
 
     /* quick check of some of the parsed metainfo */
-    check_int_eq(payloadSize, inf.totalSize);
+    check_int(inf.totalSize, ==, payloadSize);
     tmpstr = tr_sys_path_basename(input_file, NULL);
     check_str(inf.name, ==, tmpstr);
     tr_free(tmpstr);
     check_str(inf.comment, ==, comment);
-    check_int_eq(1, inf.fileCount);
-    check_int_eq(isPrivate, inf.isPrivate);
+    check_int(inf.fileCount, ==, 1);
+    check_int(inf.isPrivate, ==, isPrivate);
     check(!inf.isFolder);
-    check_int_eq(trackerCount, inf.trackerCount);
+    check_int(inf.trackerCount, ==, trackerCount);
 
     /* cleanup */
     tr_free(torrent_file);
@@ -150,14 +150,14 @@ static int test_single_directory_impl(tr_tracker_info const* trackers, size_t co
     builder = tr_metaInfoBuilderCreate(top);
     check(!builder->abortFlag);
     check_str(builder->top, ==, top);
-    check_int_eq(payloadCount, builder->fileCount);
-    check_int_eq(totalSize, builder->totalSize);
+    check_int(builder->fileCount, ==, payloadCount);
+    check_int(builder->totalSize, ==, totalSize);
     check(builder->isFolder);
 
     for (size_t i = 0; i < builder->fileCount; i++)
     {
         check_str(builder->files[i].filename, ==, files[i]);
-        check_int_eq(payloadSizes[i], builder->files[i].size);
+        check_int(builder->files[i].size, ==, payloadSizes[i]);
     }
 
     /* call tr_makeMetaInfo() to build the .torrent file */
@@ -166,7 +166,7 @@ static int test_single_directory_impl(tr_tracker_info const* trackers, size_t co
     check(isPrivate == builder->isPrivate);
     check_str(builder->outputFile, ==, torrent_file);
     check_str(builder->comment, ==, comment);
-    check_int_eq(trackerCount, builder->trackerCount);
+    check_int(builder->trackerCount, ==, trackerCount);
 
     while (!builder->isDone)
     {
@@ -178,18 +178,18 @@ static int test_single_directory_impl(tr_tracker_info const* trackers, size_t co
     libttest_sync();
     tr_ctorSetMetainfoFromFile(ctor, torrent_file);
     parse_result = tr_torrentParse(ctor, &inf);
-    check_int_eq(TR_PARSE_OK, parse_result);
+    check_int(parse_result, ==, TR_PARSE_OK);
 
     /* quick check of some of the parsed metainfo */
-    check_int_eq(totalSize, inf.totalSize);
+    check_int(inf.totalSize, ==, totalSize);
     tmpstr = tr_sys_path_basename(top, NULL);
     check_str(inf.name, ==, tmpstr);
     tr_free(tmpstr);
     check_str(inf.comment, ==, comment);
-    check_int_eq(payloadCount, inf.fileCount);
-    check_int_eq(isPrivate, inf.isPrivate);
-    check_int_eq(builder->isFolder, inf.isFolder);
-    check_int_eq(trackerCount, inf.trackerCount);
+    check_int(inf.fileCount, ==, payloadCount);
+    check_int(inf.isPrivate, ==, isPrivate);
+    check_int(inf.isFolder, ==, builder->isFolder);
+    check_int(inf.trackerCount, ==, trackerCount);
 
     /* cleanup */
     tr_free(torrent_file);

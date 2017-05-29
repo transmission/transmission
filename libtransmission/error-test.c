@@ -20,19 +20,19 @@ static int test_error_set(void)
 
     tr_error_set(&err, 1, "error: %s (%d)", "oops", 2);
     check(err != NULL);
-    check_int_eq(1, err->code);
+    check_int(err->code, ==, 1);
     check_str(err->message, ==, "error: oops (2)");
     tr_error_clear(&err);
     check(err == NULL);
 
     tr_error_set_literal(&err, 2, "oops");
     check(err != NULL);
-    check_int_eq(2, err->code);
+    check_int(err->code, ==, 2);
     check_str(err->message, ==, "oops");
 
     tr_error_prefix(&err, "error: ");
     check(err != NULL);
-    check_int_eq(2, err->code);
+    check_int(err->code, ==, 2);
     check_str(err->message, ==, "error: oops");
 
     tr_error_free(err);
@@ -47,18 +47,18 @@ static int test_error_propagate(void)
 
     tr_error_set_literal(&err, 1, "oops");
     check(err != NULL);
-    check_int_eq(1, err->code);
+    check_int(err->code, ==, 1);
     check_str(err->message, ==, "oops");
 
     tr_error_propagate(&err2, &err);
     check(err2 != NULL);
-    check_int_eq(1, err2->code);
+    check_int(err2->code, ==, 1);
     check_str(err2->message, ==, "oops");
     check(err == NULL);
 
     tr_error_propagate_prefixed(&err, &err2, "error: ");
     check(err != NULL);
-    check_int_eq(1, err->code);
+    check_int(err->code, ==, 1);
     check_str(err->message, ==, "error: oops");
     check(err2 == NULL);
 

@@ -36,43 +36,43 @@ static int testInt(void)
     /* good int string */
     tr_snprintf((char*)buf, sizeof(buf), "i64e");
     err = tr_bencParseInt(buf, buf + 4, &end, &val);
-    check_int_eq(0, err);
-    check_int_eq(64, val);
+    check_int(err, ==, 0);
+    check_int(val, ==, 64);
     check(buf + 4 == end);
 
     /* missing 'e' */
     end = NULL;
     val = 888;
     err = tr_bencParseInt(buf, buf + 3, &end, &val);
-    check_int_eq(EILSEQ, err);
-    check_int_eq(888, val);
+    check_int(err, ==, EILSEQ);
+    check_int(val, ==, 888);
     check(end == NULL);
 
     /* empty buffer */
     err = tr_bencParseInt(buf, buf + 0, &end, &val);
-    check_int_eq(EILSEQ, err);
-    check_int_eq(888, val);
+    check_int(err, ==, EILSEQ);
+    check_int(val, ==, 888);
     check(end == NULL);
 
     /* bad number */
     tr_snprintf((char*)buf, sizeof(buf), "i6z4e");
     err = tr_bencParseInt(buf, buf + 5, &end, &val);
-    check_int_eq(EILSEQ, err);
-    check_int_eq(888, val);
+    check_int(err, ==, EILSEQ);
+    check_int(val, ==, 888);
     check(end == NULL);
 
     /* negative number */
     tr_snprintf((char*)buf, sizeof(buf), "i-3e");
     err = tr_bencParseInt(buf, buf + 4, &end, &val);
-    check_int_eq(0, err);
-    check_int_eq(-3, val);
+    check_int(err, ==, 0);
+    check_int(val, ==, -3);
     check(buf + 4 == end);
 
     /* zero */
     tr_snprintf((char*)buf, sizeof(buf), "i0e");
     err = tr_bencParseInt(buf, buf + 4, &end, &val);
-    check_int_eq(0, err);
-    check_int_eq(0, val);
+    check_int(err, ==, 0);
+    check_int(val, ==, 0);
     check(buf + 3 == end);
 
     /* no leading zeroes allowed */
@@ -80,8 +80,8 @@ static int testInt(void)
     end = NULL;
     tr_snprintf((char*)buf, sizeof(buf), "i04e");
     err = tr_bencParseInt(buf, buf + 4, &end, &val);
-    check_int_eq(EILSEQ, err);
-    check_int_eq(0, val);
+    check_int(err, ==, EILSEQ);
+    check_int(val, ==, 0);
     check(NULL == end);
 
     return 0;
@@ -99,7 +99,7 @@ static int testStr(void)
     /* string len is designed to overflow */
     n = tr_snprintf((char*)buf, sizeof(buf), "%zu:boat", (size_t)(SIZE_MAX - 2));
     err = tr_bencParseStr(buf, buf + n, &end, &str, &len);
-    check_int_eq(EILSEQ, err);
+    check_int(err, ==, EILSEQ);
     check_uint_eq(0, len);
     check(str == NULL);
     check(end == NULL);
@@ -108,7 +108,7 @@ static int testStr(void)
     /* good string */
     n = tr_snprintf((char*)buf, sizeof(buf), "4:boat");
     err = tr_bencParseStr(buf, buf + n, &end, &str, &len);
-    check_int_eq(0, err);
+    check_int(err, ==, 0);
     check_uint_eq(4, len);
     check(strncmp((char const*)str, "boat", len) == 0);
     check(end == buf + 6);
@@ -118,7 +118,7 @@ static int testStr(void)
 
     /* string goes past end of buffer */
     err = tr_bencParseStr(buf, buf + (n - 1), &end, &str, &len);
-    check_int_eq(EILSEQ, err);
+    check_int(err, ==, EILSEQ);
     check_uint_eq(0, len);
     check(str == NULL);
     check(end == NULL);
@@ -127,7 +127,7 @@ static int testStr(void)
     /* empty string */
     n = tr_snprintf((char*)buf, sizeof(buf), "0:");
     err = tr_bencParseStr(buf, buf + n, &end, &str, &len);
-    check_int_eq(0, err);
+    check_int(err, ==, 0);
     check_uint_eq(0, len);
     check(*str == '\0');
     check(end == buf + 2);
@@ -138,7 +138,7 @@ static int testStr(void)
     /* short string */
     n = tr_snprintf((char*)buf, sizeof(buf), "3:boat");
     err = tr_bencParseStr(buf, buf + n, &end, &str, &len);
-    check_int_eq(0, err);
+    check_int(err, ==, 0);
     check_uint_eq(3, len);
     check(strncmp((char const*)str, "boa", len) == 0);
     check(end == buf + 5);
@@ -198,7 +198,7 @@ static int testParse(void)
     err = tr_variantFromBencFull(&val, buf, sizeof(buf), NULL, &end);
     check(err == 0);
     check(tr_variantGetInt(&val, &i));
-    check_int_eq(64, i);
+    check_int(i, ==, 64);
     check(end == buf + 4);
     tr_variantFree(&val);
 
@@ -208,11 +208,11 @@ static int testParse(void)
     check(end == buf + strlen((char*)buf));
     check(val.val.l.count == 3);
     check(tr_variantGetInt(&val.val.l.vals[0], &i));
-    check_int_eq(64, i);
+    check_int(i, ==, 64);
     check(tr_variantGetInt(&val.val.l.vals[1], &i));
-    check_int_eq(32, i);
+    check_int(i, ==, 32);
     check(tr_variantGetInt(&val.val.l.vals[2], &i));
-    check_int_eq(16, i);
+    check_int(i, ==, 16);
     saved = tr_variantToStr(&val, TR_VARIANT_FMT_BENC, &len);
     check_str(saved, ==, buf);
     tr_free(saved);
@@ -442,13 +442,13 @@ static int testMerge(void)
     tr_variantMergeDicts(&dest, /*const*/ &src);
 
     check(tr_variantDictFindInt(&dest, i1, &i));
-    check_int_eq(1, i);
+    check_int(i, ==, 1);
     check(tr_variantDictFindInt(&dest, i2, &i));
-    check_int_eq(4, i);
+    check_int(i, ==, 4);
     check(tr_variantDictFindInt(&dest, i3, &i));
-    check_int_eq(3, i);
+    check_int(i, ==, 3);
     check(tr_variantDictFindInt(&dest, i4, &i));
-    check_int_eq(-35, i);
+    check_int(i, ==, -35);
     check(tr_variantDictFindStr(&dest, s5, &s, &len));
     check_uint_eq(3, len);
     check_str(s, ==, "abc");
@@ -487,7 +487,7 @@ static int testStackSmash(void)
 
     in[depth * 2] = '\0';
     err = tr_variantFromBencFull(&val, in, depth * 2, NULL, &end);
-    check_int_eq(0, err);
+    check_int(err, ==, 0);
     check(end == in + depth * 2);
     saved = tr_variantToStr(&val, TR_VARIANT_FMT_BENC, &len);
     check_str(saved, ==, in);
@@ -565,14 +565,14 @@ static int testParse2(void)
     check(end == benc + len);
     check(tr_variantIsDict(&top2));
     check(tr_variantDictFindInt(&top, key_int, &intVal));
-    check_int_eq(1234, intVal);
+    check_int(intVal, ==, 1234);
     check(tr_variantDictFindBool(&top, key_bool, &boolVal));
     check(boolVal == true);
     check(tr_variantDictFindStr(&top, key_str, &strVal, &strLen));
     check_uint_eq(16, strLen);
     check_str(strVal, ==, "this-is-a-string");
     check(tr_variantDictFindReal(&top, key_real, &realVal));
-    check_int_eq(50, (int)(realVal * 100));
+    check_int((int)(realVal * 100), ==, 50);
 
     tr_variantFree(&top2);
     tr_free(benc);

@@ -23,7 +23,7 @@ static int test_static_quarks(void)
         str = tr_quark_get_string((tr_quark)i, &len);
         check_uint_eq(strlen(str), len);
         check(tr_quark_lookup(str, len, &q));
-        check_int_eq(i, (int)q);
+        check_int((int)q, ==, i);
     }
 
     for (int i = 0; i + 1 < TR_N_KEYS; i++)
@@ -40,7 +40,7 @@ static int test_static_quarks(void)
     }
 
     tr_quark const q = tr_quark_new(NULL, TR_BAD_SIZE);
-    check_int_eq(TR_KEY_NONE, (int)q);
+    check_int((int)q, ==, TR_KEY_NONE);
     check_str(tr_quark_get_string(q, NULL), ==, "");
 
     return 0;

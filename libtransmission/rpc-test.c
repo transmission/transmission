@@ -23,22 +23,22 @@ static int test_list(void)
     tr_rpc_parse_list_str(&top, "12", TR_BAD_SIZE);
     check(tr_variantIsInt(&top));
     check(tr_variantGetInt(&top, &i));
-    check_int_eq(12, i);
+    check_int(i, ==, 12);
     tr_variantFree(&top);
 
     tr_rpc_parse_list_str(&top, "12", 1);
     check(tr_variantIsInt(&top));
     check(tr_variantGetInt(&top, &i));
-    check_int_eq(1, i);
+    check_int(i, ==, 1);
     tr_variantFree(&top);
 
     tr_rpc_parse_list_str(&top, "6,7", TR_BAD_SIZE);
     check(tr_variantIsList(&top));
     check(tr_variantListSize(&top) == 2);
     check(tr_variantGetInt(tr_variantListChild(&top, 0), &i));
-    check_int_eq(6, i);
+    check_int(i, ==, 6);
     check(tr_variantGetInt(tr_variantListChild(&top, 1), &i));
-    check_int_eq(7, i);
+    check_int(i, ==, 7);
     tr_variantFree(&top);
 
     tr_rpc_parse_list_str(&top, "asdf", TR_BAD_SIZE);
@@ -52,13 +52,13 @@ static int test_list(void)
     check(tr_variantIsList(&top));
     check(tr_variantListSize(&top) == 4);
     check(tr_variantGetInt(tr_variantListChild(&top, 0), &i));
-    check_int_eq(1, i);
+    check_int(i, ==, 1);
     check(tr_variantGetInt(tr_variantListChild(&top, 1), &i));
-    check_int_eq(3, i);
+    check_int(i, ==, 3);
     check(tr_variantGetInt(tr_variantListChild(&top, 2), &i));
-    check_int_eq(4, i);
+    check_int(i, ==, 4);
     check(tr_variantGetInt(tr_variantListChild(&top, 3), &i));
-    check_int_eq(5, i);
+    check_int(i, ==, 5);
     tr_variantFree(&top);
 
     return 0;

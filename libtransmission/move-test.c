@@ -134,7 +134,7 @@ static int test_incomplete_dir_impl(char const* incomplete_dir, char const* down
         tr_wait_msec(50);
     }
 
-    check_int_eq(TR_SEED, completeness);
+    check_int(completeness, ==, TR_SEED);
 
     for (tr_file_index_t file_index = 0; file_index < tor->info.fileCount; ++file_index)
     {
@@ -204,7 +204,7 @@ static int test_set_location(void)
         tr_wait_msec(50);
     }
 
-    check_int_eq(TR_LOC_DONE, state);
+    check_int(state, ==, TR_LOC_DONE);
 
     /* confirm the torrent is still complete after being moved */
     libttest_blockingTorrentVerify(tor);

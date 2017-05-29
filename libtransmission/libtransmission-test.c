@@ -77,20 +77,13 @@ bool libtest_check_str(char const* file, int line, bool pass, char const* lhs, c
     return pass;
 }
 
-bool check_int_eq_impl(char const* file, int line, intmax_t expected, intmax_t actual)
+bool libtest_check_int(char const* file, int line, bool pass, intmax_t lhs, intmax_t rhs, char const* lhs_str,
+    char const* op_str, char const* rhs_str)
 {
-    bool const pass = expected == actual;
-
     if (should_print(pass))
     {
-        if (pass)
-        {
-            fprintf(stderr, "PASS %s:%d\n", file, line);
-        }
-        else
-        {
-            fprintf(stderr, "FAIL %s:%d, expected \"%jd\", got \"%jd\"\n", file, line, expected, actual);
-        }
+        fprintf(stderr, "%s %s:%d: %s %s %s (%jd %s %jd)\n", pass ? "PASS" : "FAIL", file, line, lhs_str, op_str, rhs_str, lhs,
+            op_str, rhs);
     }
 
     return pass;

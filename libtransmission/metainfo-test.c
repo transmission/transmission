@@ -31,12 +31,12 @@ static int test_magnet_link(void)
     ctor = tr_ctorNew(NULL);
     tr_ctorSetMetainfoFromMagnetLink(ctor, magnet_link);
     parse_result = tr_torrentParse(ctor, &inf);
-    check_int_eq(inf.fileCount, 0); /* cos it's a magnet link */
-    check_int_eq(parse_result, TR_PARSE_OK);
-    check_int_eq(inf.trackerCount, 2);
+    check_int(inf.fileCount, ==, 0); /* cos it's a magnet link */
+    check_int(parse_result, ==, TR_PARSE_OK);
+    check_int(inf.trackerCount, ==, 2);
     check_str(inf.trackers[0].announce, ==, "http://tracker.publicbt.com/announce");
     check_str(inf.trackers[1].announce, ==, "udp://tracker.publicbt.com:80");
-    check_int_eq(inf.webseedCount, 1);
+    check_int(inf.webseedCount, ==, 1);
     check_str(inf.webseeds[0], ==, "http://transmissionbt.com");
 
     /* cleanup */
@@ -87,12 +87,12 @@ static int test_metainfo(void)
     {
         tr_ctor* ctor = tr_ctorNew(NULL);
         int const err = tr_ctorSetMetainfo(ctor, metainfo[i].benc, strlen(metainfo[i].benc));
-        check_int_eq(metainfo[i].expected_benc_err, err);
+        check_int(err, ==, metainfo[i].expected_benc_err);
 
         if (err == 0)
         {
             tr_parse_result const parse_result = tr_torrentParse(ctor, NULL);
-            check_int_eq(metainfo[i].expected_parse_result, parse_result);
+            check_int(parse_result, ==, metainfo[i].expected_parse_result);
         }
 
         tr_ctorFree(ctor);

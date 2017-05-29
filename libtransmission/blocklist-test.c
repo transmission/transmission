@@ -63,7 +63,7 @@ static int test_parsing(void)
     /* init the session */
     session = libttest_session_init(NULL);
     check(!tr_blocklistExists(session));
-    check_int_eq(0, tr_blocklistGetRuleCount(session));
+    check_int(tr_blocklistGetRuleCount(session), ==, 0);
 
     /* init the blocklist */
     path = tr_buildPath(tr_sessionGetConfigDir(session), "blocklists", "level1", NULL);
@@ -71,7 +71,7 @@ static int test_parsing(void)
     tr_free(path);
     tr_sessionReloadBlocklists(session);
     check(tr_blocklistExists(session));
-    check_int_eq(4, tr_blocklistGetRuleCount(session));
+    check_int(tr_blocklistGetRuleCount(session), ==, 4);
 
     /* enable the blocklist */
     check(!tr_blocklistIsEnabled(session));
@@ -112,27 +112,27 @@ static int test_updating(void)
     path = tr_buildPath(tr_sessionGetConfigDir(session), "blocklists", "level1", NULL);
 
     /* no blocklist to start with... */
-    check_int_eq(0, tr_blocklistGetRuleCount(session));
+    check_int(tr_blocklistGetRuleCount(session), ==, 0);
 
     /* test that updated source files will get loaded */
     create_text_file(path, contents1);
     tr_sessionReloadBlocklists(session);
-    check_int_eq(4, tr_blocklistGetRuleCount(session));
+    check_int(tr_blocklistGetRuleCount(session), ==, 4);
 
     /* test that updated source files will get loaded */
     create_text_file(path, contents2);
     tr_sessionReloadBlocklists(session);
-    check_int_eq(5, tr_blocklistGetRuleCount(session));
+    check_int(tr_blocklistGetRuleCount(session), ==, 5);
 
     /* test that updated source files will get loaded */
     create_text_file(path, contents1);
     tr_sessionReloadBlocklists(session);
-    check_int_eq(4, tr_blocklistGetRuleCount(session));
+    check_int(tr_blocklistGetRuleCount(session), ==, 4);
 
     /* ensure that new files, if bad, get skipped */
     create_text_file(path, "# nothing useful\n");
     tr_sessionReloadBlocklists(session);
-    check_int_eq(4, tr_blocklistGetRuleCount(session));
+    check_int(tr_blocklistGetRuleCount(session), ==, 4);
 
     /* cleanup */
     libttest_session_close(session);

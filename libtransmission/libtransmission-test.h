@@ -23,11 +23,12 @@ extern bool verbose;
 bool should_print(bool pass);
 
 bool check_condition_impl(char const* file, int line, bool condition);
-bool check_int_eq_impl(char const* file, int line, intmax_t expected, intmax_t actual);
 bool check_uint_eq_impl(char const* file, int line, uintmax_t expected, uintmax_t actual);
 bool check_ptr_eq_impl(char const* file, int line, void const* expected, void const* actual);
 
 bool libtest_check_str(char const* file, int line, bool pass, char const* lhs, char const* rhs, char const* lhs_str,
+    char const* op_str, char const* rhs_str);
+bool libtest_check_int(char const* file, int line, bool pass, intmax_t lhs, intmax_t rhs, char const* lhs_str,
     char const* op_str, char const* rhs_str);
 
 /***
@@ -62,12 +63,16 @@ bool libtest_check_str(char const* file, int line, bool pass, char const* lhs, c
     } \
     while (0)
 
-#define check_int_eq(expected, actual) \
+#define check_int(lhs, op, rhs) \
     do \
     { \
         ++current_test; \
         \
-        if (!check_int_eq_impl(__FILE__, __LINE__, (expected), (actual))) \
+        intmax_t const check_int_lhs = (lhs); \
+        intmax_t const check_int_rhs = (rhs); \
+        \
+        if (!libtest_check_int(__FILE__, __LINE__, check_int_lhs op check_int_rhs, check_int_lhs, check_int_rhs, #lhs, #op, \
+            #rhs)) \
         { \
             return current_test; \
         } \

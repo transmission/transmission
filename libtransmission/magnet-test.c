@@ -31,10 +31,10 @@ static int test1(void)
         "&ws=http%3A%2F%2Fserver.webseed.org%2Fpath%2Fto%2Ffile";
     info = tr_magnetParse(uri);
     check(info != NULL);
-    check_int_eq(2, info->trackerCount);
+    check_int(info->trackerCount, ==, 2);
     check_str(info->trackers[0], ==, "http://tracker.openbittorrent.com/announce");
     check_str(info->trackers[1], ==, "http://tracker.opentracker.org/announce");
-    check_int_eq(1, info->webseedCount);
+    check_int(info->webseedCount, ==, 1);
     check_str(info->webseeds[0], ==, "http://server.webseed.org/path/to/file");
     check_str(info->displayName, ==, "Display Name");
 
@@ -56,10 +56,10 @@ static int test1(void)
         "&tr=http%3A%2F%2Ftracker.opentracker.org%2Fannounce";
     info = tr_magnetParse(uri);
     check(info != NULL);
-    check_int_eq(2, info->trackerCount);
+    check_int(info->trackerCount, ==, 2);
     check_str(info->trackers[0], ==, "http://tracker.openbittorrent.com/announce");
     check_str(info->trackers[1], ==, "http://tracker.opentracker.org/announce");
-    check_int_eq(1, info->webseedCount);
+    check_int(info->webseedCount, ==, 1);
     check_str(info->webseeds[0], ==, "http://server.webseed.org/path/to/file");
     check_str(info->displayName, ==, "Display Name");
 
