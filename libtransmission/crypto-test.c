@@ -236,28 +236,28 @@ static int test_base64(void)
     char* out;
 
     out = tr_base64_encode_str("YOYO!", &len);
-    check_uint_eq(strlen(out), len);
+    check_uint(len, ==, strlen(out));
     check(base64_eq("WU9ZTyE=", out));
     in = tr_base64_decode_str(out, &len);
-    check_uint_eq(5, len);
+    check_uint(len, ==, 5);
     check_str(in, ==, "YOYO!");
     tr_free(in);
     tr_free(out);
 
     out = tr_base64_encode("", 0, &len);
-    check_uint_eq(0, len);
+    check_uint(len, ==, 0);
     check_str(out, ==, "");
     tr_free(out);
     out = tr_base64_decode("", 0, &len);
-    check_uint_eq(0, len);
+    check_uint(len, ==, 0);
     check_str(out, ==, "");
     tr_free(out);
 
     out = tr_base64_encode(NULL, 0, &len);
-    check_uint_eq(0, len);
+    check_uint(len, ==, 0);
     check(out == NULL);
     out = tr_base64_decode(NULL, 0, &len);
-    check_uint_eq(0, len);
+    check_uint(len, ==, 0);
     check(out == NULL);
 
 #define MAX_BUF_SIZE 1024
@@ -272,9 +272,9 @@ static int test_base64(void)
         }
 
         out = tr_base64_encode(buf, i, &len);
-        check_uint_eq(strlen(out), len);
+        check_uint(len, ==, strlen(out));
         in = tr_base64_decode(out, len, &len);
-        check_uint_eq(i, len);
+        check_uint(len, ==, i);
         check(memcmp(in, buf, len) == 0);
         tr_free(in);
         tr_free(out);
@@ -287,9 +287,9 @@ static int test_base64(void)
         buf[i] = '\0';
 
         out = tr_base64_encode_str(buf, &len);
-        check_uint_eq(strlen(out), len);
+        check_uint(len, ==, strlen(out));
         in = tr_base64_decode_str(out, &len);
-        check_uint_eq(i, len);
+        check_uint(len, ==, i);
         check_str(buf, ==, in);
         tr_free(in);
         tr_free(out);

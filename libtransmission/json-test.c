@@ -179,7 +179,7 @@ static int test1(void)
     check(tr_variantIsDict(args));
     check((ids = tr_variantDictFind(args, TR_KEY_ids)) != NULL);
     check(tr_variantIsList(ids));
-    check_uint_eq(2, tr_variantListSize(ids));
+    check_uint(tr_variantListSize(ids), ==, 2);
     check(tr_variantGetInt(tr_variantListChild(ids, 0), &i));
     check_int(i, ==, 7);
     check(tr_variantGetInt(tr_variantListChild(ids, 1), &i));

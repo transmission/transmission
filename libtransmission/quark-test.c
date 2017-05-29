@@ -21,7 +21,7 @@ static int test_static_quarks(void)
         char const* str;
 
         str = tr_quark_get_string((tr_quark)i, &len);
-        check_uint_eq(strlen(str), len);
+        check_uint(len, ==, strlen(str));
         check(tr_quark_lookup(str, len, &q));
         check_int((int)q, ==, i);
     }

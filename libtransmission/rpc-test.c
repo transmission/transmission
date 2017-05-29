@@ -44,7 +44,7 @@ static int test_list(void)
     tr_rpc_parse_list_str(&top, "asdf", TR_BAD_SIZE);
     check(tr_variantIsString(&top));
     check(tr_variantGetStr(&top, &str, &len));
-    check_uint_eq(4, len);
+    check_uint(len, ==, 4);
     check_str(str, ==, "asdf");
     tr_variantFree(&top);
 

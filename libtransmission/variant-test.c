@@ -100,7 +100,7 @@ static int testStr(void)
     n = tr_snprintf((char*)buf, sizeof(buf), "%zu:boat", (size_t)(SIZE_MAX - 2));
     err = tr_bencParseStr(buf, buf + n, &end, &str, &len);
     check_int(err, ==, EILSEQ);
-    check_uint_eq(0, len);
+    check_uint(len, ==, 0);
     check(str == NULL);
     check(end == NULL);
     check(len == 0);
@@ -109,7 +109,7 @@ static int testStr(void)
     n = tr_snprintf((char*)buf, sizeof(buf), "4:boat");
     err = tr_bencParseStr(buf, buf + n, &end, &str, &len);
     check_int(err, ==, 0);
-    check_uint_eq(4, len);
+    check_uint(len, ==, 4);
     check(strncmp((char const*)str, "boat", len) == 0);
     check(end == buf + 6);
     str = NULL;
@@ -119,7 +119,7 @@ static int testStr(void)
     /* string goes past end of buffer */
     err = tr_bencParseStr(buf, buf + (n - 1), &end, &str, &len);
     check_int(err, ==, EILSEQ);
-    check_uint_eq(0, len);
+    check_uint(len, ==, 0);
     check(str == NULL);
     check(end == NULL);
     check(len == 0);
@@ -128,7 +128,7 @@ static int testStr(void)
     n = tr_snprintf((char*)buf, sizeof(buf), "0:");
     err = tr_bencParseStr(buf, buf + n, &end, &str, &len);
     check_int(err, ==, 0);
-    check_uint_eq(0, len);
+    check_uint(len, ==, 0);
     check(*str == '\0');
     check(end == buf + 2);
     str = NULL;
@@ -139,7 +139,7 @@ static int testStr(void)
     n = tr_snprintf((char*)buf, sizeof(buf), "3:boat");
     err = tr_bencParseStr(buf, buf + n, &end, &str, &len);
     check_int(err, ==, 0);
-    check_uint_eq(3, len);
+    check_uint(len, ==, 3);
     check(strncmp((char const*)str, "boa", len) == 0);
     check(end == buf + 5);
     str = NULL;
@@ -174,7 +174,7 @@ static int testString(char const* str, bool isGood)
         check(end == str + len);
         saved = tr_variantToStr(&val, TR_VARIANT_FMT_BENC, &savedLen);
         check_str(saved, ==, str);
-        check_uint_eq(savedLen, len);
+        check_uint(savedLen, ==, len);
         tr_free(saved);
         tr_variantFree(&val);
     }
@@ -450,16 +450,16 @@ static int testMerge(void)
     check(tr_variantDictFindInt(&dest, i4, &i));
     check_int(i, ==, -35);
     check(tr_variantDictFindStr(&dest, s5, &s, &len));
-    check_uint_eq(3, len);
+    check_uint(len, ==, 3);
     check_str(s, ==, "abc");
     check(tr_variantDictFindStr(&dest, s6, &s, &len));
-    check_uint_eq(3, len);
+    check_uint(len, ==, 3);
     check_str(s, ==, "xyz");
     check(tr_variantDictFindStr(&dest, s7, &s, &len));
-    check_uint_eq(9, len);
+    check_uint(len, ==, 9);
     check_str(s, ==, "127.0.0.1");
     check(tr_variantDictFindStr(&dest, s8, &s, &len));
-    check_uint_eq(3, len);
+    check_uint(len, ==, 3);
     check_str(s, ==, "ghi");
 
     tr_variantFree(&dest);
@@ -569,7 +569,7 @@ static int testParse2(void)
     check(tr_variantDictFindBool(&top, key_bool, &boolVal));
     check(boolVal == true);
     check(tr_variantDictFindStr(&top, key_str, &strVal, &strLen));
-    check_uint_eq(16, strLen);
+    check_uint(strLen, ==, 16);
     check_str(strVal, ==, "this-is-a-string");
     check(tr_variantDictFindReal(&top, key_real, &realVal));
     check_int((int)(realVal * 100), ==, 50);

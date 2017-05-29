@@ -32,10 +32,10 @@ static tr_session* session = NULL;
         tr_stat const* tst = tr_torrentStat(tor); \
         check_int(tst->activity, ==, TR_STATUS_STOPPED); \
         check_int(tst->error, ==, TR_STAT_OK); \
-        check_uint_eq(totalSize, tst->sizeWhenDone); \
-        check_uint_eq(totalSize, tst->leftUntilDone); \
-        check_uint_eq(totalSize, tor->info.totalSize); \
-        check_uint_eq(0, tst->haveValid); \
+        check_uint(tst->sizeWhenDone, ==, totalSize); \
+        check_uint(tst->leftUntilDone, ==, totalSize); \
+        check_uint(tor->info.totalSize, ==, totalSize); \
+        check_uint(tst->haveValid, ==, 0); \
     } \
     while (0)
 
@@ -164,11 +164,11 @@ static int test_single_filename_torrent(void)
     st = tr_torrentStat(tor);
     check_int(st->activity, ==, TR_STATUS_STOPPED);
     check_int(st->error, ==, TR_STAT_OK);
-    check_uint_eq(0, st->leftUntilDone);
-    check_uint_eq(0, st->haveUnchecked);
-    check_uint_eq(0, st->desiredAvailable);
-    check_uint_eq(totalSize, st->sizeWhenDone);
-    check_uint_eq(totalSize, st->haveValid);
+    check_uint(st->leftUntilDone, ==, 0);
+    check_uint(st->haveUnchecked, ==, 0);
+    check_uint(st->desiredAvailable, ==, 0);
+    check_uint(st->sizeWhenDone, ==, totalSize);
+    check_uint(st->haveValid, ==, totalSize);
 
     /**
     ***  okay! we've finally put together all the scaffolding to test
@@ -303,8 +303,8 @@ static int test_multifile_torrent(void)
 
     /* sanity check the info */
     check_str(tor->info.name, ==, "Felidae");
-    check_uint_eq(totalSize, tor->info.totalSize);
-    check_uint_eq(4, tor->info.fileCount);
+    check_uint(tor->info.totalSize, ==, totalSize);
+    check_uint(tor->info.fileCount, ==, 4);
 
     for (tr_file_index_t i = 0; i < 4; ++i)
     {
@@ -323,11 +323,11 @@ static int test_multifile_torrent(void)
     st = tr_torrentStat(tor);
     check_int(st->activity, ==, TR_STATUS_STOPPED);
     check_int(st->error, ==, TR_STAT_OK);
-    check_uint_eq(0, st->leftUntilDone);
-    check_uint_eq(0, st->haveUnchecked);
-    check_uint_eq(0, st->desiredAvailable);
-    check_uint_eq(totalSize, st->sizeWhenDone);
-    check_uint_eq(totalSize, st->haveValid);
+    check_uint(st->leftUntilDone, ==, 0);
+    check_uint(st->haveUnchecked, ==, 0);
+    check_uint(st->desiredAvailable, ==, 0);
+    check_uint(st->sizeWhenDone, ==, totalSize);
+    check_uint(st->haveValid, ==, totalSize);
 
     /**
     ***  okay! let's test renaming.
@@ -519,22 +519,22 @@ static int test_partial_file(void)
     ***/
 
     tor = libttest_zero_torrent_init(session);
-    check_uint_eq(totalSize, tor->info.totalSize);
-    check_uint_eq(pieceSize, tor->info.pieceSize);
-    check_uint_eq(pieceCount, tor->info.pieceCount);
+    check_uint(tor->info.totalSize, ==, totalSize);
+    check_uint(tor->info.pieceSize, ==, pieceSize);
+    check_uint(tor->info.pieceCount, ==, pieceCount);
     check_str(tor->info.files[0].name, ==, "files-filled-with-zeroes/1048576");
     check_str(tor->info.files[1].name, ==, "files-filled-with-zeroes/4096");
     check_str(tor->info.files[2].name, ==, "files-filled-with-zeroes/512");
 
     libttest_zero_torrent_populate(tor, false);
     fst = tr_torrentFiles(tor, NULL);
-    check_uint_eq(length[0] - pieceSize, fst[0].bytesCompleted);
-    check_uint_eq(length[1], fst[1].bytesCompleted);
-    check_uint_eq(length[2], fst[2].bytesCompleted);
+    check_uint(fst[0].bytesCompleted, ==, length[0] - pieceSize);
+    check_uint(fst[1].bytesCompleted, ==, length[1]);
+    check_uint(fst[2].bytesCompleted, ==, length[2]);
     tr_torrentFilesFree(fst, tor->info.fileCount);
     st = tr_torrentStat(tor);
-    check_uint_eq(totalSize, st->sizeWhenDone);
-    check_uint_eq(pieceSize, st->leftUntilDone);
+    check_uint(st->sizeWhenDone, ==, totalSize);
+    check_uint(st->leftUntilDone, ==, pieceSize);
 
     /***
     ****

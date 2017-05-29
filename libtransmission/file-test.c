@@ -183,7 +183,7 @@ static int test_get_info(void)
     check(tr_sys_path_get_info(path1, 0, &info, &err));
     check(err == NULL);
     check_int(info.type, ==, TR_SYS_PATH_IS_FILE);
-    check_uint_eq(4, info.size);
+    check_uint(info.size, ==, 4);
     check(info.last_modified_at >= t && info.last_modified_at <= time(NULL));
 
     /* Good file info (by handle) */
@@ -192,7 +192,7 @@ static int test_get_info(void)
     check(tr_sys_file_get_info(fd, &info, &err));
     check(err == NULL);
     check_int(info.type, ==, TR_SYS_PATH_IS_FILE);
-    check_uint_eq(4, info.size);
+    check_uint(info.size, ==, 4);
     check(info.last_modified_at >= t && info.last_modified_at <= time(NULL));
     tr_sys_file_close(fd, NULL);
 
@@ -224,7 +224,7 @@ static int test_get_info(void)
         check(tr_sys_path_get_info(path1, 0, &info, &err));
         check(err == NULL);
         check_int(info.type, ==, TR_SYS_PATH_IS_FILE);
-        check_uint_eq(4, info.size);
+        check_uint(info.size, ==, 4);
         check(info.last_modified_at >= t && info.last_modified_at <= time(NULL));
 
         /* Good file info (by handle) */
@@ -233,7 +233,7 @@ static int test_get_info(void)
         check(tr_sys_file_get_info(fd, &info, &err));
         check(err == NULL);
         check_int(info.type, ==, TR_SYS_PATH_IS_FILE);
-        check_uint_eq(4, info.size);
+        check_uint(info.size, ==, 4);
         check(info.last_modified_at >= t && info.last_modified_at <= time(NULL));
         tr_sys_file_close(fd, NULL);
 
@@ -1017,30 +1017,30 @@ static int test_file_open(void)
     check(err != NULL);
     tr_error_clear(&err);
     tr_sys_path_get_info(path1, TR_SYS_PATH_NO_FOLLOW, &info, NULL);
-    check_uint_eq(4, info.size);
+    check_uint(info.size, ==, 4);
 
     /* Pointer is at the end of file */
     tr_sys_path_get_info(path1, TR_SYS_PATH_NO_FOLLOW, &info, NULL);
-    check_uint_eq(4, info.size);
+    check_uint(info.size, ==, 4);
     fd = tr_sys_file_open(path1, TR_SYS_FILE_WRITE | TR_SYS_FILE_APPEND, 0600, &err);
     check(fd != TR_BAD_SYS_FILE);
     check(err == NULL);
     tr_sys_file_write(fd, "s", 1, NULL, NULL); /* On *NIX, pointer is positioned on each write but not initially */
     tr_sys_file_seek(fd, 0, TR_SEEK_CUR, &n, NULL);
-    check_uint_eq(5, n);
+    check_uint(n, ==, 5);
     tr_sys_file_close(fd, NULL);
 
     /* File gets truncated */
     tr_sys_path_get_info(path1, TR_SYS_PATH_NO_FOLLOW, &info, NULL);
-    check_uint_eq(5, info.size);
+    check_uint(info.size, ==, 5);
     fd = tr_sys_file_open(path1, TR_SYS_FILE_WRITE | TR_SYS_FILE_TRUNCATE, 0600, &err);
     check(fd != TR_BAD_SYS_FILE);
     check(err == NULL);
     tr_sys_file_get_info(fd, &info, NULL);
-    check_uint_eq(0, info.size);
+    check_uint(info.size, ==, 0);
     tr_sys_file_close(fd, NULL);
     tr_sys_path_get_info(path1, TR_SYS_PATH_NO_FOLLOW, &info, NULL);
-    check_uint_eq(0, info.size);
+    check_uint(info.size, ==, 0);
 
     /* TODO: symlink and hardlink tests */
 
@@ -1067,69 +1067,69 @@ static int test_file_read_write_seek(void)
 
     check(tr_sys_file_seek(fd, 0, TR_SEEK_CUR, &n, &err));
     check(err == NULL);
-    check_uint_eq(0, n);
+    check_uint(n, ==, 0);
 
     check(tr_sys_file_write(fd, "test", 4, &n, &err));
     check(err == NULL);
-    check_uint_eq(4, n);
+    check_uint(n, ==, 4);
 
     check(tr_sys_file_seek(fd, 0, TR_SEEK_CUR, &n, &err));
     check(err == NULL);
-    check_uint_eq(4, n);
+    check_uint(n, ==, 4);
 
     check(tr_sys_file_seek(fd, 0, TR_SEEK_SET, &n, &err));
     check(err == NULL);
-    check_uint_eq(0, n);
+    check_uint(n, ==, 0);
 
     check(tr_sys_file_read(fd, buf, sizeof(buf), &n, &err));
     check(err == NULL);
-    check_uint_eq(4, n);
+    check_uint(n, ==, 4);
 
     check_int(memcmp(buf, "test", 4), ==, 0);
 
     check(tr_sys_file_seek(fd, -3, TR_SEEK_CUR, &n, &err));
     check(err == NULL);
-    check_uint_eq(1, n);
+    check_uint(n, ==, 1);
 
     check(tr_sys_file_write(fd, "E", 1, &n, &err));
     check(err == NULL);
-    check_uint_eq(1, n);
+    check_uint(n, ==, 1);
 
     check(tr_sys_file_seek(fd, -2, TR_SEEK_CUR, &n, &err));
     check(err == NULL);
-    check_uint_eq(0, n);
+    check_uint(n, ==, 0);
 
     check(tr_sys_file_read(fd, buf, sizeof(buf), &n, &err));
     check(err == NULL);
-    check_uint_eq(4, n);
+    check_uint(n, ==, 4);
 
     check_int(memcmp(buf, "tEst", 4), ==, 0);
 
     check(tr_sys_file_seek(fd, 0, TR_SEEK_END, &n, &err));
     check(err == NULL);
-    check_uint_eq(4, n);
+    check_uint(n, ==, 4);
 
     check(tr_sys_file_write(fd, " ok", 3, &n, &err));
     check(err == NULL);
-    check_uint_eq(3, n);
+    check_uint(n, ==, 3);
 
     check(tr_sys_file_seek(fd, 0, TR_SEEK_SET, &n, &err));
     check(err == NULL);
-    check_uint_eq(0, n);
+    check_uint(n, ==, 0);
 
     check(tr_sys_file_read(fd, buf, sizeof(buf), &n, &err));
     check(err == NULL);
-    check_uint_eq(7, n);
+    check_uint(n, ==, 7);
 
     check_int(memcmp(buf, "tEst ok", 7), ==, 0);
 
     check(tr_sys_file_write_at(fd, "-", 1, 4, &n, &err));
     check(err == NULL);
-    check_uint_eq(1, n);
+    check_uint(n, ==, 1);
 
     check(tr_sys_file_read_at(fd, buf, 5, 2, &n, &err));
     check(err == NULL);
-    check_uint_eq(5, n);
+    check_uint(n, ==, 5);
 
     check_int(memcmp(buf, "st-ok", 5), ==, 0);
 
@@ -1158,17 +1158,17 @@ static int test_file_truncate(void)
     check(tr_sys_file_truncate(fd, 10, &err));
     check(err == NULL);
     tr_sys_file_get_info(fd, &info, NULL);
-    check_uint_eq(10, info.size);
+    check_uint(info.size, ==, 10);
 
     check(tr_sys_file_truncate(fd, 20, &err));
     check(err == NULL);
     tr_sys_file_get_info(fd, &info, NULL);
-    check_uint_eq(20, info.size);
+    check_uint(info.size, ==, 20);
 
     check(tr_sys_file_truncate(fd, 0, &err));
     check(err == NULL);
     tr_sys_file_get_info(fd, &info, NULL);
-    check_uint_eq(0, info.size);
+    check_uint(info.size, ==, 0);
 
     check(tr_sys_file_truncate(fd, 50, &err));
     check(err == NULL);
@@ -1176,7 +1176,7 @@ static int test_file_truncate(void)
     tr_sys_file_close(fd, NULL);
 
     tr_sys_path_get_info(path1, 0, &info, NULL);
-    check_uint_eq(50, info.size);
+    check_uint(info.size, ==, 50);
 
     fd = tr_sys_file_open(path1, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE, 0600, NULL);
 
@@ -1186,7 +1186,7 @@ static int test_file_truncate(void)
     tr_sys_file_close(fd, NULL);
 
     tr_sys_path_get_info(path1, 0, &info, NULL);
-    check_uint_eq(25, info.size);
+    check_uint(info.size, ==, 25);
 
     tr_sys_path_remove(path1, NULL);
 
@@ -1212,7 +1212,7 @@ static int test_file_preallocate(void)
     {
         check(err == NULL);
         tr_sys_file_get_info(fd, &info, NULL);
-        check_uint_eq(50, info.size);
+        check_uint(info.size, ==, 50);
     }
     else
     {
@@ -1231,7 +1231,7 @@ static int test_file_preallocate(void)
     {
         check(err == NULL);
         tr_sys_file_get_info(fd, &info, NULL);
-        check_uint_eq(500 * 1024 * 1024, info.size);
+        check_uint(info.size, ==, 500 * 1024 * 1024);
     }
     else
     {
