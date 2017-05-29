@@ -223,26 +223,22 @@ static int test_bitfield_has_all_none(void)
 
 int main(void)
 {
-    int ret;
     testFunc const tests[] =
     {
         test_bitfields,
         test_bitfield_has_all_none
     };
 
-    if ((ret = runTests(tests, NUM_TESTS(tests))) != 0)
-    {
-        return ret;
-    }
+    int ret = runTests(tests, NUM_TESTS(tests));
 
     /* bitfield count range */
     for (int l = 0; l < 10000; ++l)
     {
-        if ((ret = test_bitfield_count_range()) != 0)
+        if (test_bitfield_count_range() != 0)
         {
-            return ret;
+            ++ret;
         }
     }
 
-    return 0;
+    return ret;
 }

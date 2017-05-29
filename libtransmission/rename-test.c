@@ -572,7 +572,6 @@ static int test_partial_file(void)
 
 int main(void)
 {
-    int ret;
     testFunc const tests[] =
     {
         test_single_filename_torrent,
@@ -581,7 +580,9 @@ int main(void)
     };
 
     session = libttest_session_init(NULL);
-    ret = runTests(tests, NUM_TESTS(tests));
+
+    int ret = runTests(tests, NUM_TESTS(tests));
+
     libttest_session_close(session);
 
     return ret;

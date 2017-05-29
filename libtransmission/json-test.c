@@ -241,8 +241,6 @@ static int test_unescape(void)
 
 int main(void)
 {
-    int rv;
-
     char const* comma_locales[] =
     {
         "da_DK.UTF-8",
@@ -263,10 +261,7 @@ int main(void)
     /* run the tests in a locale with a decimal point of '.' */
     setlocale(LC_NUMERIC, "C");
 
-    if ((rv = runTests(tests, NUM_TESTS(tests))) != 0)
-    {
-        return rv;
-    }
+    int ret = runTests(tests, NUM_TESTS(tests));
 
     /* run the tests in a locale with a decimal point of ',' */
     bool is_locale_set = false;
@@ -281,11 +276,10 @@ int main(void)
         fprintf(stderr, "WARNING: unable to run locale-specific json tests. add a locale like %s or %s\n", comma_locales[0],
             comma_locales[1]);
     }
-    else if ((rv = runTests(tests, NUM_TESTS(tests))) != 0)
+    else
     {
-        return rv;
+        ret += runTests(tests, NUM_TESTS(tests));
     }
 
-    /* success */
-    return 0;
+    return ret;
 }

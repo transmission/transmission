@@ -1568,17 +1568,13 @@ int main(void)
         test_dir_create,
         test_dir_read
     };
-    int ret;
 
     /* init the session */
     session = libttest_session_init(NULL);
 
-    ret = runTests(tests, NUM_TESTS(tests));
+    int ret = runTests(tests, NUM_TESTS(tests));
 
-    if (ret == 0)
-    {
-        libttest_session_close(session);
-    }
+    libttest_session_close(session);
 
     return ret;
 }

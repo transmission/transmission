@@ -141,19 +141,19 @@ bool check_ptr_eq_impl(char const* file, int line, void const* expected, void co
 
 int runTests(testFunc const* const tests, int numTests)
 {
-    int ret;
+    int ret = 0;
 
     (void)current_test; /* Use test even if we don't have any tests to run */
 
     for (int i = 0; i < numTests; i++)
     {
-        if ((ret = (*tests[i])()) != 0)
+        if ((*tests[i])() != 0)
         {
-            return ret;
+            ++ret;
         }
     }
 
-    return 0; /* All tests passed */
+    return ret;
 }
 
 /***
