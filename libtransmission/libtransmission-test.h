@@ -26,7 +26,7 @@ bool check_condition_impl(char const* file, int line, bool condition);
 bool check_int_eq_impl(char const* file, int line, int64_t expected, int64_t actual);
 bool check_uint_eq_impl(char const* file, int line, uint64_t expected, uint64_t actual);
 bool check_ptr_eq_impl(char const* file, int line, void const* expected, void const* actual);
-bool check_streq_impl(char const* file, int line, char const* expected, char const* actual);
+bool check_str_eq_impl(char const* file, int line, char const* expected, char const* actual);
 
 /***
 ****
@@ -44,12 +44,12 @@ bool check_streq_impl(char const* file, int line, char const* expected, char con
     } \
     while (0)
 
-#define check_streq(expected, actual) \
+#define check_str_eq(expected, actual) \
     do \
     { \
         ++current_test; \
         \
-        if (!check_streq_impl(__FILE__, __LINE__, (expected), (actual))) \
+        if (!check_str_eq_impl(__FILE__, __LINE__, (expected), (actual))) \
         { \
             return current_test; \
         } \

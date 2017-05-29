@@ -34,10 +34,10 @@ static int test_magnet_link(void)
     check_int_eq(inf.fileCount, 0); /* cos it's a magnet link */
     check_int_eq(parse_result, TR_PARSE_OK);
     check_int_eq(inf.trackerCount, 2);
-    check_streq("http://tracker.publicbt.com/announce", inf.trackers[0].announce);
-    check_streq("udp://tracker.publicbt.com:80", inf.trackers[1].announce);
+    check_str_eq("http://tracker.publicbt.com/announce", inf.trackers[0].announce);
+    check_str_eq("udp://tracker.publicbt.com:80", inf.trackers[1].announce);
     check_int_eq(inf.webseedCount, 1);
-    check_streq("http://transmissionbt.com", inf.webseeds[0]);
+    check_str_eq("http://transmissionbt.com", inf.webseeds[0]);
 
     /* cleanup */
     tr_metainfoFree(&inf);

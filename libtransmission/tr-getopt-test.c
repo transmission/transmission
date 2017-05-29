@@ -36,7 +36,7 @@ static int run_test(int argc, char const** argv, int expected_n, int* expected_c
     {
         check(n < expected_n);
         check_int_eq(expected_c[n], c);
-        check_streq(optarg, expected_optarg[n]);
+        check_str_eq(optarg, expected_optarg[n]);
         ++n;
     }
 

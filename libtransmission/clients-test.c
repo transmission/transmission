@@ -13,7 +13,7 @@
 
 #define TEST_CLIENT(A, B) \
     tr_clientForId(buf, sizeof(buf), A); \
-    check_streq(B, buf);
+    check_str_eq(B, buf);
 
 int main(void)
 {

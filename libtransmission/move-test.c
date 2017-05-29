@@ -37,7 +37,7 @@ static void zeroes_completeness_func(tr_torrent* torrent UNUSED, tr_completeness
     { \
         char* path = tr_torrentFindFile(tor, i); \
         char* expected = expected_path; \
-        check_streq(expected, path); \
+        check_str_eq(expected, path); \
         tr_free(expected); \
         tr_free(path); \
     } \

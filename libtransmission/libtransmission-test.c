@@ -62,7 +62,7 @@ bool check_condition_impl(char const* file, int line, bool condition)
     return pass;
 }
 
-bool check_streq_impl(char const* file, int line, char const* expected, char const* actual)
+bool check_str_eq_impl(char const* file, int line, char const* expected, char const* actual)
 {
     bool const pass = tr_strcmp0(expected, actual) == 0;
 

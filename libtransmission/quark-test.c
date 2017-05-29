@@ -41,7 +41,7 @@ static int test_static_quarks(void)
 
     tr_quark const q = tr_quark_new(NULL, TR_BAD_SIZE);
     check_int_eq(TR_KEY_NONE, (int)q);
-    check_streq("", tr_quark_get_string(q, NULL));
+    check_str_eq("", tr_quark_get_string(q, NULL));
 
     return 0;
 }
