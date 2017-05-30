@@ -281,6 +281,11 @@ char* tr_strdup(void const* in);
  */
 int tr_strcmp0(char const* str1, char const* str2);
 
+/**
+ * @brief like memcmp() but gracefully handles NULL pointers
+ */
+int tr_memcmp0(void const* lhs, void const* rhs, size_t size);
+
 char* evbuffer_free_to_str(struct evbuffer* buf, size_t* result_len);
 
 /** @brief similar to bsearch() but returns the index of the lower bound */

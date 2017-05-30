@@ -87,6 +87,47 @@ bool libtest_check_str(char const* file, int line, bool pass, char const* lhs, c
     return pass;
 }
 
+static void print_mem(FILE* stream, void const* data, size_t size)
+{
+    if (data == NULL)
+    {
+        fprintf(stream, "NULL");
+        return;
+    }
+
+    if (size == 0)
+    {
+        fprintf(stream, "(no bytes)");
+        return;
+    }
+
+    uint8_t const* byte_data = data;
+
+    fprintf(stream, "x'");
+
+    for (size_t i = 0; i < size; ++i)
+    {
+        fprintf(stream, "%02x", (unsigned int)byte_data[i]);
+    }
+
+    fprintf(stream, "'");
+}
+
+bool libtest_check_mem(char const* file, int line, bool pass, void const* lhs, void const* rhs, size_t size,
+    char const* lhs_str, char const* op_str, char const* rhs_str)
+{
+    if (should_print(pass))
+    {
+        fprintf(stderr, "%s %s:%d: %s %s %s (", pass ? "PASS" : "FAIL", file, line, lhs_str, op_str, rhs_str);
+        print_mem(stderr, lhs, size);
+        fprintf(stderr, " %s ", op_str);
+        print_mem(stderr, rhs, size);
+        fprintf(stderr, ")\n");
+    }
+
+    return pass;
+}
+
 bool libtest_check_int(char const* file, int line, bool pass, intmax_t lhs, intmax_t rhs, char const* lhs_str,
     char const* op_str, char const* rhs_str)
 {

@@ -493,6 +493,26 @@ int tr_strcmp0(char const* str1, char const* str2)
     return 0;
 }
 
+int tr_memcmp0(void const* lhs, void const* rhs, size_t size)
+{
+    if (lhs != NULL && rhs != NULL)
+    {
+        return memcmp(lhs, rhs, size);
+    }
+
+    if (lhs != NULL)
+    {
+        return 1;
+    }
+
+    if (rhs != NULL)
+    {
+        return -1;
+    }
+
+    return 0;
+}
+
 /****
 *****
 ****/

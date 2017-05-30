@@ -27,6 +27,8 @@ bool libtest_check_bool(char const* file, int line, bool pass, bool lhs, bool rh
     char const* rhs_str);
 bool libtest_check_str(char const* file, int line, bool pass, char const* lhs, char const* rhs, char const* lhs_str,
     char const* op_str, char const* rhs_str);
+bool libtest_check_mem(char const* file, int line, bool pass, void const* lhs, void const* rhs, size_t size,
+    char const* lhs_str, char const* op_str, char const* rhs_str);
 bool libtest_check_int(char const* file, int line, bool pass, intmax_t lhs, intmax_t rhs, char const* lhs_str,
     char const* op_str, char const* rhs_str);
 bool libtest_check_uint(char const* file, int line, bool pass, uintmax_t lhs, uintmax_t rhs, char const* lhs_str,
@@ -78,6 +80,23 @@ bool libtest_check_ptr(char const* file, int line, bool pass, void const* lhs, v
         \
         if (!libtest_check_str(__FILE__, __LINE__, tr_strcmp0(check_str_lhs, check_str_rhs) op 0, check_str_lhs, \
             check_str_rhs, #lhs, #op, #rhs)) \
+        { \
+            return current_test; \
+        } \
+    } \
+    while (0)
+
+#define check_mem(lhs, op, rhs, size) \
+    do \
+    { \
+        ++current_test; \
+        \
+        void const* const check_mem_lhs = (lhs); \
+        void const* const check_mem_rhs = (rhs); \
+        size_t const check_mem_size = (size);\
+        \
+        if (!libtest_check_mem(__FILE__, __LINE__, tr_memcmp0(check_mem_lhs, check_mem_rhs, check_mem_size) op 0, \
+            check_mem_lhs, check_mem_rhs, check_mem_size, #lhs, #op, #rhs)) \
         { \
             return current_test; \
         } \
