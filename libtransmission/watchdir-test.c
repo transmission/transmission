@@ -144,8 +144,8 @@ static int test_initial_scan(void)
         check(wd != NULL);
 
         process_events();
-        check_ptr_eq(NULL, wd_data.dir);
-        check_ptr_eq(NULL, wd_data.name);
+        check_ptr(wd_data.dir, ==, NULL);
+        check_ptr(wd_data.name, ==, NULL);
 
         tr_watchdir_free(wd);
         reset_callback_data(&wd_data, TR_WATCHDIR_ACCEPT);
@@ -161,7 +161,7 @@ static int test_initial_scan(void)
         check(wd != NULL);
 
         process_events();
-        check_ptr_eq(wd, wd_data.dir);
+        check_ptr(wd_data.dir, ==, wd);
         check_str(wd_data.name, ==, "test");
 
         tr_watchdir_free(wd);
@@ -191,28 +191,28 @@ static int test_watch(void)
     check(wd != NULL);
 
     process_events();
-    check_ptr_eq(NULL, wd_data.dir);
-    check_ptr_eq(NULL, wd_data.name);
+    check_ptr(wd_data.dir, ==, NULL);
+    check_ptr(wd_data.name, ==, NULL);
 
     create_file(test_dir, "test");
 
     process_events();
-    check_ptr_eq(wd, wd_data.dir);
+    check_ptr(wd_data.dir, ==, wd);
     check_str(wd_data.name, ==, "test");
 
     reset_callback_data(&wd_data, TR_WATCHDIR_IGNORE);
     create_file(test_dir, "test2");
 
     process_events();
-    check_ptr_eq(wd, wd_data.dir);
+    check_ptr(wd_data.dir, ==, wd);
     check_str(wd_data.name, ==, "test2");
 
     reset_callback_data(&wd_data, TR_WATCHDIR_IGNORE);
     create_dir(test_dir, "test3");
 
     process_events();
-    check_ptr_eq(NULL, wd_data.dir);
-    check_ptr_eq(NULL, wd_data.name);
+    check_ptr(wd_data.dir, ==, NULL);
+    check_ptr(wd_data.name, ==, NULL);
 
     tr_watchdir_free(wd);
     reset_callback_data(&wd_data, TR_WATCHDIR_ACCEPT);
@@ -251,27 +251,27 @@ static int test_watch_two_dirs(void)
     check(wd2 != NULL);
 
     process_events();
-    check_ptr_eq(NULL, wd1_data.dir);
-    check_ptr_eq(NULL, wd1_data.name);
-    check_ptr_eq(NULL, wd2_data.dir);
-    check_ptr_eq(NULL, wd2_data.name);
+    check_ptr(wd1_data.dir, ==, NULL);
+    check_ptr(wd1_data.name, ==, NULL);
+    check_ptr(wd2_data.dir, ==, NULL);
+    check_ptr(wd2_data.name, ==, NULL);
 
     create_file(dir1, "test");
 
     process_events();
-    check_ptr_eq(wd1, wd1_data.dir);
+    check_ptr(wd1_data.dir, ==, wd1);
     check_str(wd1_data.name, ==, "test");
-    check_ptr_eq(NULL, wd2_data.dir);
-    check_ptr_eq(NULL, wd2_data.name);
+    check_ptr(wd2_data.dir, ==, NULL);
+    check_ptr(wd2_data.name, ==, NULL);
 
     reset_callback_data(&wd1_data, TR_WATCHDIR_ACCEPT);
     reset_callback_data(&wd2_data, TR_WATCHDIR_ACCEPT);
     create_file(dir2, "test2");
 
     process_events();
-    check_ptr_eq(NULL, wd1_data.dir);
-    check_ptr_eq(NULL, wd1_data.name);
-    check_ptr_eq(wd2, wd2_data.dir);
+    check_ptr(wd1_data.dir, ==, NULL);
+    check_ptr(wd1_data.name, ==, NULL);
+    check_ptr(wd2_data.dir, ==, wd2);
     check_str(wd2_data.name, ==, "test2");
 
     reset_callback_data(&wd1_data, TR_WATCHDIR_IGNORE);
@@ -280,9 +280,9 @@ static int test_watch_two_dirs(void)
     create_file(dir2, "test4");
 
     process_events();
-    check_ptr_eq(wd1, wd1_data.dir);
+    check_ptr(wd1_data.dir, ==, wd1);
     check_str(wd1_data.name, ==, "test3");
-    check_ptr_eq(wd2, wd2_data.dir);
+    check_ptr(wd2_data.dir, ==, wd2);
     check_str(wd2_data.name, ==, "test4");
 
     reset_callback_data(&wd1_data, TR_WATCHDIR_ACCEPT);
@@ -291,10 +291,10 @@ static int test_watch_two_dirs(void)
     create_dir(dir2, "test5");
 
     process_events();
-    check_ptr_eq(wd1, wd1_data.dir);
+    check_ptr(wd1_data.dir, ==, wd1);
     check_str(wd1_data.name, ==, "test5");
-    check_ptr_eq(NULL, wd2_data.dir);
-    check_ptr_eq(NULL, wd2_data.name);
+    check_ptr(wd2_data.dir, ==, NULL);
+    check_ptr(wd2_data.name, ==, NULL);
 
     reset_callback_data(&wd1_data, TR_WATCHDIR_ACCEPT);
     reset_callback_data(&wd2_data, TR_WATCHDIR_ACCEPT);
@@ -302,9 +302,9 @@ static int test_watch_two_dirs(void)
     create_file(dir2, "test6");
 
     process_events();
-    check_ptr_eq(NULL, wd1_data.dir);
-    check_ptr_eq(NULL, wd1_data.name);
-    check_ptr_eq(wd2, wd2_data.dir);
+    check_ptr(wd1_data.dir, ==, NULL);
+    check_ptr(wd1_data.name, ==, NULL);
+    check_ptr(wd2_data.dir, ==, wd2);
     check_str(wd2_data.name, ==, "test6");
 
     reset_callback_data(&wd1_data, TR_WATCHDIR_ACCEPT);
@@ -313,10 +313,10 @@ static int test_watch_two_dirs(void)
     create_dir(dir2, "test7");
 
     process_events();
-    check_ptr_eq(NULL, wd1_data.dir);
-    check_ptr_eq(NULL, wd1_data.name);
-    check_ptr_eq(NULL, wd2_data.dir);
-    check_ptr_eq(NULL, wd2_data.name);
+    check_ptr(wd1_data.dir, ==, NULL);
+    check_ptr(wd1_data.name, ==, NULL);
+    check_ptr(wd2_data.dir, ==, NULL);
+    check_ptr(wd2_data.name, ==, NULL);
 
     tr_watchdir_free(wd2);
     reset_callback_data(&wd2_data, TR_WATCHDIR_ACCEPT);
@@ -354,19 +354,19 @@ static int test_retry(void)
     check(wd != NULL);
 
     process_events();
-    check_ptr_eq(NULL, wd_data.dir);
-    check_ptr_eq(NULL, wd_data.name);
+    check_ptr(wd_data.dir, ==, NULL);
+    check_ptr(wd_data.name, ==, NULL);
 
     create_file(test_dir, "test");
 
     process_events();
-    check_ptr_eq(NULL, wd_data.dir);
-    check_ptr_eq(NULL, wd_data.name);
+    check_ptr(wd_data.dir, ==, NULL);
+    check_ptr(wd_data.name, ==, NULL);
 
     reset_callback_data(&wd_data, TR_WATCHDIR_ACCEPT);
 
     process_events();
-    check_ptr_eq(wd, wd_data.dir);
+    check_ptr(wd_data.dir, ==, wd);
     check_str(wd_data.name, ==, "test");
 
     tr_watchdir_free(wd);

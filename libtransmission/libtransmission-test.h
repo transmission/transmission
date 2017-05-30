@@ -23,13 +23,14 @@ extern bool verbose;
 bool should_print(bool pass);
 
 bool check_condition_impl(char const* file, int line, bool condition);
-bool check_ptr_eq_impl(char const* file, int line, void const* expected, void const* actual);
 
 bool libtest_check_str(char const* file, int line, bool pass, char const* lhs, char const* rhs, char const* lhs_str,
     char const* op_str, char const* rhs_str);
 bool libtest_check_int(char const* file, int line, bool pass, intmax_t lhs, intmax_t rhs, char const* lhs_str,
     char const* op_str, char const* rhs_str);
 bool libtest_check_uint(char const* file, int line, bool pass, uintmax_t lhs, uintmax_t rhs, char const* lhs_str,
+    char const* op_str, char const* rhs_str);
+bool libtest_check_ptr(char const* file, int line, bool pass, void const* lhs, void const* rhs, char const* lhs_str,
     char const* op_str, char const* rhs_str);
 
 /***
@@ -96,12 +97,16 @@ bool libtest_check_uint(char const* file, int line, bool pass, uintmax_t lhs, ui
     } \
     while (0)
 
-#define check_ptr_eq(expected, actual) \
+#define check_ptr(lhs, op, rhs) \
     do \
     { \
         ++current_test; \
         \
-        if (!check_ptr_eq_impl(__FILE__, __LINE__, (expected), (actual))) \
+        void const* const check_ptr_lhs = (lhs); \
+        void const* const check_ptr_rhs = (rhs); \
+        \
+        if (!libtest_check_ptr(__FILE__, __LINE__, check_ptr_lhs op check_ptr_rhs, check_ptr_lhs, check_ptr_rhs, #lhs, #op, \
+            #rhs)) \
         { \
             return current_test; \
         } \
