@@ -16,7 +16,7 @@ static int test1(void)
 {
     char const* uri;
     tr_magnet_info* info;
-    int const dec[] =
+    uint8_t const dec[] =
     {
         210, 53, 64, 16, 163, 202, 74, 222, 91, 116,
         39, 187, 9, 58, 98, 163, 137, 159, 243, 129
@@ -30,18 +30,14 @@ static int test1(void)
         "&tr=http%3A%2F%2Ftracker.opentracker.org%2Fannounce"
         "&ws=http%3A%2F%2Fserver.webseed.org%2Fpath%2Fto%2Ffile";
     info = tr_magnetParse(uri);
-    check(info != NULL);
+    check_ptr(info, !=, NULL);
     check_int(info->trackerCount, ==, 2);
     check_str(info->trackers[0], ==, "http://tracker.openbittorrent.com/announce");
     check_str(info->trackers[1], ==, "http://tracker.opentracker.org/announce");
     check_int(info->webseedCount, ==, 1);
     check_str(info->webseeds[0], ==, "http://server.webseed.org/path/to/file");
     check_str(info->displayName, ==, "Display Name");
-
-    for (int i = 0; i < 20; ++i)
-    {
-        check(info->hash[i] == dec[i]);
-    }
+    check_mem(info->hash, ==, dec, 20);
 
     tr_magnetFree(info);
     info = NULL;
@@ -62,11 +58,7 @@ static int test1(void)
     check_int(info->webseedCount, ==, 1);
     check_str(info->webseeds[0], ==, "http://server.webseed.org/path/to/file");
     check_str(info->displayName, ==, "Display Name");
-
-    for (int i = 0; i < 20; ++i)
-    {
-        check(info->hash[i] == dec[i]);
-    }
+    check_mem(info->hash, ==, dec, 20);
 
     tr_magnetFree(info);
     info = NULL;

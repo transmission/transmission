@@ -46,7 +46,7 @@ static int test_single_file_impl(tr_tracker_info const* trackers, size_t const t
     /* have tr_makeMetaInfo() build the .torrent file */
     torrent_file = tr_strdup_printf("%s.torrent", input_file);
     tr_makeMetaInfo(builder, torrent_file, trackers, trackerCount, comment, isPrivate);
-    check(isPrivate == builder->isPrivate);
+    check_bool(isPrivate, ==, builder->isPrivate);
     check_str(builder->outputFile, ==, torrent_file);
     check_str(builder->comment, ==, comment);
     check_int(builder->trackerCount, ==, trackerCount);
@@ -163,7 +163,7 @@ static int test_single_directory_impl(tr_tracker_info const* trackers, size_t co
     /* call tr_makeMetaInfo() to build the .torrent file */
     torrent_file = tr_strdup_printf("%s.torrent", top);
     tr_makeMetaInfo(builder, torrent_file, trackers, trackerCount, comment, isPrivate);
-    check(isPrivate == builder->isPrivate);
+    check_bool(isPrivate, ==, builder->isPrivate);
     check_str(builder->outputFile, ==, torrent_file);
     check_str(builder->comment, ==, comment);
     check_int(builder->trackerCount, ==, trackerCount);

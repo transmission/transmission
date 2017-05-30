@@ -30,12 +30,12 @@ static int test_torrent_hash(void)
     tr_cryptoConstruct(&a, NULL, true);
 
     check(!tr_cryptoHasTorrentHash(&a));
-    check(tr_cryptoGetTorrentHash(&a) == NULL);
+    check_ptr(tr_cryptoGetTorrentHash(&a), ==, NULL);
 
     tr_cryptoSetTorrentHash(&a, hash);
     check(tr_cryptoHasTorrentHash(&a));
-    check(tr_cryptoGetTorrentHash(&a) != NULL);
-    check(memcmp(tr_cryptoGetTorrentHash(&a), hash, SHA_DIGEST_LENGTH) == 0);
+    check_ptr(tr_cryptoGetTorrentHash(&a), !=, NULL);
+    check_mem(tr_cryptoGetTorrentHash(&a), ==, hash, SHA_DIGEST_LENGTH);
 
     tr_cryptoDestruct(&a);
 
@@ -47,12 +47,12 @@ static int test_torrent_hash(void)
     tr_cryptoConstruct(&a, hash, false);
 
     check(tr_cryptoHasTorrentHash(&a));
-    check(tr_cryptoGetTorrentHash(&a) != NULL);
-    check(memcmp(tr_cryptoGetTorrentHash(&a), hash, SHA_DIGEST_LENGTH) == 0);
+    check_ptr(tr_cryptoGetTorrentHash(&a), !=, NULL);
+    check_mem(tr_cryptoGetTorrentHash(&a), ==, hash, SHA_DIGEST_LENGTH);
 
     tr_cryptoSetTorrentHash(&a, NULL);
     check(!tr_cryptoHasTorrentHash(&a));
-    check(tr_cryptoGetTorrentHash(&a) == NULL);
+    check_ptr(tr_cryptoGetTorrentHash(&a), ==, NULL);
 
     tr_cryptoDestruct(&a);
 
@@ -107,15 +107,13 @@ static int test_sha1(void)
 
     check(tr_sha1(hash, "test", 4, NULL));
     check(tr_sha1_(hash_, "test", 4, NULL));
-    check(memcmp(hash, "\xa9\x4a\x8f\xe5\xcc\xb1\x9b\xa6\x1c\x4c\x08\x73\xd3\x91\xe9\x87\x98\x2f\xbb\xd3",
-        SHA_DIGEST_LENGTH) == 0);
-    check(memcmp(hash, hash_, SHA_DIGEST_LENGTH) == 0);
+    check_mem(hash, ==, "\xa9\x4a\x8f\xe5\xcc\xb1\x9b\xa6\x1c\x4c\x08\x73\xd3\x91\xe9\x87\x98\x2f\xbb\xd3", SHA_DIGEST_LENGTH);
+    check_mem(hash, ==, hash_, SHA_DIGEST_LENGTH);
 
     check(tr_sha1(hash, "1", 1, "22", 2, "333", 3, NULL));
     check(tr_sha1_(hash_, "1", 1, "22", 2, "333", 3, NULL));
-    check(memcmp(hash, "\x1f\x74\x64\x8e\x50\xa6\xa6\x70\x8e\xc5\x4a\xb3\x27\xa1\x63\xd5\x53\x6b\x7c\xed",
-        SHA_DIGEST_LENGTH) == 0);
-    check(memcmp(hash, hash_, SHA_DIGEST_LENGTH) == 0);
+    check_mem(hash, ==, "\x1f\x74\x64\x8e\x50\xa6\xa6\x70\x8e\xc5\x4a\xb3\x27\xa1\x63\xd5\x53\x6b\x7c\xed", SHA_DIGEST_LENGTH);
+    check_mem(hash, ==, hash_, SHA_DIGEST_LENGTH);
 
     return 0;
 }
@@ -147,7 +145,7 @@ static int test_ssha1(void)
         {
             hashes[j] = j % 2 == 0 ? tr_ssha1(phrase) : tr_ssha1_(phrase);
 
-            check(hashes[j] != NULL);
+            check_ptr(hashes[j], !=, NULL);
 
             /* phrase matches each of generated hashes */
             check(tr_ssha1_matches(hashes[j], phrase));
@@ -159,7 +157,10 @@ static int test_ssha1(void)
             /* all hashes are different */
             for (size_t k = 0; k < HASH_COUNT; ++k)
             {
-                check(k == j || strcmp(hashes[j], hashes[k]) != 0);
+                if (k != j)
+                {
+                    check_str(hashes[j], !=, hashes[k]);
+                }
             }
         }
 
@@ -199,8 +200,8 @@ static int test_random(void)
     for (int i = 0; i < 100000; ++i)
     {
         int const val = tr_rand_int(100);
-        check(val >= 0);
-        check(val < 100);
+        check_int(val, >=, 0);
+        check_int(val, <, 100);
     }
 
     return 0;
@@ -255,10 +256,10 @@ static int test_base64(void)
 
     out = tr_base64_encode(NULL, 0, &len);
     check_uint(len, ==, 0);
-    check(out == NULL);
+    check_str(out, ==, NULL);
     out = tr_base64_decode(NULL, 0, &len);
     check_uint(len, ==, 0);
-    check(out == NULL);
+    check_str(out, ==, NULL);
 
 #define MAX_BUF_SIZE 1024
 
@@ -275,7 +276,7 @@ static int test_base64(void)
         check_uint(len, ==, strlen(out));
         in = tr_base64_decode(out, len, &len);
         check_uint(len, ==, i);
-        check(memcmp(in, buf, len) == 0);
+        check_mem(in, ==, buf, len);
         tr_free(in);
         tr_free(out);
 

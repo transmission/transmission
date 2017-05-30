@@ -6,7 +6,9 @@
  *
  */
 
+#include <memory.h>
 #include <stdio.h>
+
 #include "transmission.h"
 #include "peer-msgs.h"
 #include "utils.h"
@@ -25,30 +27,19 @@ int main(void)
     tr_piece_index_t pieces[] = { 1059, 431, 808, 1217, 287, 376, 1188, 353, 508 };
     tr_piece_index_t buf[16];
 
-    for (uint32_t i = 0; i < SHA_DIGEST_LENGTH; ++i)
-    {
-        infohash[i] = 0xaa;
-    }
+    memset(infohash, 0xaa, SHA_DIGEST_LENGTH);
 
     tr_address_from_string(&addr, "80.4.4.200");
 
     numwant = 7;
     numgot = tr_generateAllowedSet(buf, numwant, pieceCount, infohash, &addr);
-    check(numgot == numwant);
-
-    for (uint32_t i = 0; i < numgot; ++i)
-    {
-        check(buf[i] == pieces[i]);
-    }
+    check_uint(numgot, ==, numwant);
+    check_mem(buf, ==, pieces, numgot);
 
     numwant = 9;
     numgot = tr_generateAllowedSet(buf, numwant, pieceCount, infohash, &addr);
-    check(numgot == numwant);
-
-    for (uint32_t i = 0; i < numgot; ++i)
-    {
-        check(buf[i] == pieces[i]);
-    }
+    check_uint(numgot, ==, numwant);
+    check_mem(buf, ==, pieces, numgot);
 
 #endif
 

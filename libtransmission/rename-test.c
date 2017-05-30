@@ -200,7 +200,7 @@ static int test_single_filename_torrent(void)
     check(tor->info.files[0].is_renamed); /* confirm the file's 'renamed' flag is set */
     check_str(tr_torrentName(tor), ==, "foobar"); /* confirm the torrent's name is now 'foobar' */
     check_str(tor->info.files[0].name, ==, "foobar"); /* confirm the file's name is now 'foobar' in our struct */
-    check(strstr(tor->info.torrent, "foobar") == NULL); /* confirm the name in the .torrent file hasn't changed */
+    check_str(strstr(tor->info.torrent, "foobar"), ==, NULL); /* confirm the name in the .torrent file hasn't changed */
     tmpstr = tr_buildPath(tor->currentDir, "foobar", NULL);
     check(tr_sys_path_exists(tmpstr, NULL)); /* confirm the file's name is now 'foobar' on the disk */
     tr_free(tmpstr);
@@ -211,7 +211,7 @@ static int test_single_filename_torrent(void)
     libttest_sync();
     loaded = tr_torrentLoadResume(tor, ~0, ctor);
     check_str(tr_torrentName(tor), ==, "foobar");
-    check((loaded & TR_FR_NAME) != 0);
+    check_uint((loaded & TR_FR_NAME), !=, 0);
 
     /***
     ****  ...and rename it back again
@@ -362,7 +362,7 @@ static int test_multifile_torrent(void)
     tr_free(files[1].name);
     tor->info.files[1].name = tr_strdup("gabba gabba hey");
     loaded = tr_torrentLoadResume(tor, ~0, ctor);
-    check((loaded & TR_FR_FILENAMES) != 0);
+    check_uint((loaded & TR_FR_FILENAMES), !=, 0);
     check_str(files[0].name, ==, expected_files[0]);
     check_str(files[1].name, ==, "Felidae/Felinae/Felis/placeholder/Kyphi");
     check_str(files[2].name, ==, "Felidae/Felinae/Felis/placeholder/Saffron");
@@ -388,11 +388,11 @@ static int test_multifile_torrent(void)
 
     /* remove the directory Felidae/Felinae/Felis/catus */
     str = tr_torrentFindFile(tor, 1);
-    check(str != NULL);
+    check_str(str, !=, NULL);
     tr_sys_path_remove(str, NULL);
     tr_free(str);
     str = tr_torrentFindFile(tor, 2);
-    check(str != NULL);
+    check_str(str, !=, NULL);
     tr_sys_path_remove(str, NULL);
     tmp = tr_sys_path_dirname(str, NULL);
     tr_sys_path_remove(tmp, NULL);

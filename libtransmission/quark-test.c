@@ -36,7 +36,7 @@ static int test_static_quarks(void)
         str1 = tr_quark_get_string((tr_quark)i, &len1);
         str2 = tr_quark_get_string((tr_quark)(i + 1), &len2);
 
-        check(strcmp(str1, str2) < 0);
+        check_str(str1, <, str2);
     }
 
     tr_quark const q = tr_quark_new(NULL, TR_BAD_SIZE);

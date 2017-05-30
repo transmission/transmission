@@ -78,7 +78,7 @@ static int test_utf8(void)
     tr_quark const key = tr_quark_new("key", 3);
 
     err = tr_variantFromJson(&top, in, strlen(in));
-    check(err == 0);
+    check_int(err, ==, 0);
     check(tr_variantIsDict(&top));
     check(tr_variantDictFindStr(&top, key, &str, NULL));
     check_str(str, ==, "Letöltések");
@@ -90,7 +90,7 @@ static int test_utf8(void)
 
     in = "{ \"key\": \"\\u005C\" }";
     err = tr_variantFromJson(&top, in, strlen(in));
-    check(err == 0);
+    check_int(err, ==, 0);
     check(tr_variantIsDict(&top));
     check(tr_variantDictFindStr(&top, key, &str, NULL));
     check_str(str, ==, "\\");
@@ -110,7 +110,7 @@ static int test_utf8(void)
      */
     in = "{ \"key\": \"Let\\u00f6lt\\u00e9sek\" }";
     err = tr_variantFromJson(&top, in, strlen(in));
-    check(err == 0);
+    check_int(err, ==, 0);
     check(tr_variantIsDict(&top));
     check(tr_variantDictFindStr(&top, key, &str, NULL));
     check_str(str, ==, "Letöltések");
@@ -121,11 +121,11 @@ static int test_utf8(void)
         tr_variantFree(&top);
     }
 
-    check(json != NULL);
-    check(strstr(json, "\\u00f6") != NULL);
-    check(strstr(json, "\\u00e9") != NULL);
+    check_ptr(json, !=, NULL);
+    check_str(strstr(json, "\\u00f6"), !=, NULL);
+    check_str(strstr(json, "\\u00e9"), !=, NULL);
     err = tr_variantFromJson(&top, json, strlen(json));
-    check(err == 0);
+    check_int(err, ==, 0);
     check(tr_variantIsDict(&top));
     check(tr_variantDictFindStr(&top, key, &str, NULL));
     check_str(str, ==, "Letöltések");
@@ -164,20 +164,20 @@ static int test1(void)
     int64_t i;
     int const err = tr_variantFromJson(&top, in, strlen(in));
 
-    check(err == 0);
+    check_int(err, ==, 0);
     check(tr_variantIsDict(&top));
-    check((headers = tr_variantDictFind(&top, tr_quark_new("headers", 7))) != NULL);
+    check_ptr((headers = tr_variantDictFind(&top, tr_quark_new("headers", 7))), !=, NULL);
     check(tr_variantIsDict(headers));
     check(tr_variantDictFindStr(headers, tr_quark_new("type", 4), &str, NULL));
     check_str(str, ==, "request");
     check(tr_variantDictFindInt(headers, TR_KEY_tag, &i));
     check_int(i, ==, 666);
-    check((body = tr_variantDictFind(&top, tr_quark_new("body", 4))) != NULL);
+    check_ptr((body = tr_variantDictFind(&top, tr_quark_new("body", 4))), !=, NULL);
     check(tr_variantDictFindStr(body, TR_KEY_name, &str, NULL));
     check_str(str, ==, "torrent-info");
-    check((args = tr_variantDictFind(body, tr_quark_new("arguments", 9))) != NULL);
+    check_ptr((args = tr_variantDictFind(body, tr_quark_new("arguments", 9))), !=, NULL);
     check(tr_variantIsDict(args));
-    check((ids = tr_variantDictFind(args, TR_KEY_ids)) != NULL);
+    check_ptr((ids = tr_variantDictFind(args, TR_KEY_ids)), !=, NULL);
     check(tr_variantIsList(ids));
     check_uint(tr_variantListSize(ids), ==, 2);
     check(tr_variantGetInt(tr_variantListChild(ids, 0), &i));
@@ -198,7 +198,7 @@ static int test2(void)
     top.type = 0;
     err = tr_variantFromJson(&top, in, strlen(in));
 
-    check(err != 0);
+    check_int(err, !=, 0);
     check(!tr_variantIsDict(&top));
 
     return 0;
@@ -216,7 +216,7 @@ static int test3(void)
     char const* str;
 
     int const err = tr_variantFromJson(&top, in, strlen(in));
-    check(err == 0);
+    check_int(err, ==, 0);
     check(tr_variantDictFindStr(&top, TR_KEY_errorString, &str, NULL));
     check_str(str, ==, "torrent not registered with this tracker 6UHsVW'*C");
 

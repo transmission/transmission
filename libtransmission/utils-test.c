@@ -59,21 +59,21 @@ static int test_strstrip(void)
     /* strstrip */
     in = tr_strdup("   test    ");
     out = tr_strstrip(in);
-    check(in == out);
+    check_ptr(in, ==, out);
     check_str(out, ==, "test");
     tr_free(in);
 
     /* strstrip */
     in = tr_strdup(" test test ");
     out = tr_strstrip(in);
-    check(in == out);
+    check_ptr(in, ==, out);
     check_str(out, ==, "test test");
     tr_free(in);
 
     /* strstrip */
     in = tr_strdup("test");
     out = tr_strstrip(in);
-    check(in == out);
+    check_ptr(in, ==, out);
     check_str(out, ==, "test");
     tr_free(in);
 
@@ -113,7 +113,7 @@ static int test_utf8(void)
     /* this version is not utf-8 (but cp866) */
     in = "\x92\xE0\xE3\xA4\xAD\xAE \xA1\xEB\xE2\xEC \x81\xAE\xA3\xAE\xAC";
     out = tr_utf8clean(in, 17);
-    check(out != NULL);
+    check_ptr(out, !=, NULL);
     check(strlen(out) == 17 || strlen(out) == 33);
     check(tr_utf8_validate(out, TR_BAD_SIZE, NULL));
     tr_free(out);
@@ -121,21 +121,21 @@ static int test_utf8(void)
     /* same string, but utf-8 clean */
     in = "Трудно быть Богом";
     out = tr_utf8clean(in, TR_BAD_SIZE);
-    check(out != NULL);
+    check_ptr(out, !=, NULL);
     check(tr_utf8_validate(out, TR_BAD_SIZE, NULL));
     check_str(out, ==, in);
     tr_free(out);
 
     in = "\xF4\x00\x81\x82";
     out = tr_utf8clean(in, 4);
-    check(out != NULL);
+    check_ptr(out, !=, NULL);
     check(strlen(out) == 1 || strlen(out) == 2);
     check(tr_utf8_validate(out, TR_BAD_SIZE, NULL));
     tr_free(out);
 
     in = "\xF4\x33\x81\x82";
     out = tr_utf8clean(in, 4);
-    check(out != NULL);
+    check_ptr(out, !=, NULL);
     check(strlen(out) == 4 || strlen(out) == 7);
     check(tr_utf8_validate(out, TR_BAD_SIZE, NULL));
     tr_free(out);
@@ -159,8 +159,8 @@ static int test_numbers(void)
     tr_free(numbers);
 
     numbers = tr_parseNumberRange("1-5,3-7,2-6", TR_BAD_SIZE, &count);
-    check(count == 7);
-    check(numbers != NULL);
+    check_int(count, ==, 7);
+    check_ptr(numbers, !=, NULL);
 
     for (int i = 0; i < count; ++i)
     {
@@ -171,15 +171,15 @@ static int test_numbers(void)
 
     numbers = tr_parseNumberRange("1-Hello", TR_BAD_SIZE, &count);
     check_int(count, ==, 0);
-    check(numbers == NULL);
+    check_ptr(numbers, ==, NULL);
 
     numbers = tr_parseNumberRange("1-", TR_BAD_SIZE, &count);
     check_int(count, ==, 0);
-    check(numbers == NULL);
+    check_ptr(numbers, ==, NULL);
 
     numbers = tr_parseNumberRange("Hello", TR_BAD_SIZE, &count);
     check_int(count, ==, 0);
-    check(numbers == NULL);
+    check_ptr(numbers, ==, NULL);
 
     return 0;
 }
@@ -262,7 +262,7 @@ static int test_quickFindFirst_Iteration(size_t const k, size_t const n, int* bu
         }
     }
 
-    check(highest_low <= lowest_high);
+    check_int(highest_low, <=, lowest_high);
 
     return 0;
 }
@@ -288,9 +288,9 @@ static int test_memmem(void)
     char const haystack[12] = "abcabcabcabc";
     char const needle[3] = "cab";
 
-    check(tr_memmem(haystack, sizeof(haystack), haystack, sizeof(haystack)) == haystack);
-    check(tr_memmem(haystack, sizeof(haystack), needle, sizeof(needle)) == haystack + 2);
-    check(tr_memmem(needle, sizeof(needle), haystack, sizeof(haystack)) == NULL);
+    check_ptr(tr_memmem(haystack, sizeof(haystack), haystack, sizeof(haystack)), ==, haystack);
+    check_ptr(tr_memmem(haystack, sizeof(haystack), needle, sizeof(needle)), ==, haystack + 2);
+    check_ptr(tr_memmem(needle, sizeof(needle), haystack, sizeof(haystack)), ==, NULL);
 
     return 0;
 }
@@ -492,7 +492,7 @@ static int test_env(void)
     x = tr_env_get_int(test_key, 123);
     check_int(x, ==, 123);
     s = tr_env_get_string(test_key, NULL);
-    check(s == NULL);
+    check_str(s, ==, NULL);
     s = tr_env_get_string(test_key, "a");
     check_str(s, ==, "a");
     tr_free(s);

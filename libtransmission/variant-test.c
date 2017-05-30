@@ -38,7 +38,7 @@ static int testInt(void)
     err = tr_bencParseInt(buf, buf + 4, &end, &val);
     check_int(err, ==, 0);
     check_int(val, ==, 64);
-    check(buf + 4 == end);
+    check_ptr(end, ==, buf + 4);
 
     /* missing 'e' */
     end = NULL;
@@ -46,34 +46,34 @@ static int testInt(void)
     err = tr_bencParseInt(buf, buf + 3, &end, &val);
     check_int(err, ==, EILSEQ);
     check_int(val, ==, 888);
-    check(end == NULL);
+    check_ptr(end, ==, NULL);
 
     /* empty buffer */
     err = tr_bencParseInt(buf, buf + 0, &end, &val);
     check_int(err, ==, EILSEQ);
     check_int(val, ==, 888);
-    check(end == NULL);
+    check_ptr(end, ==, NULL);
 
     /* bad number */
     tr_snprintf((char*)buf, sizeof(buf), "i6z4e");
     err = tr_bencParseInt(buf, buf + 5, &end, &val);
     check_int(err, ==, EILSEQ);
     check_int(val, ==, 888);
-    check(end == NULL);
+    check_ptr(end, ==, NULL);
 
     /* negative number */
     tr_snprintf((char*)buf, sizeof(buf), "i-3e");
     err = tr_bencParseInt(buf, buf + 4, &end, &val);
     check_int(err, ==, 0);
     check_int(val, ==, -3);
-    check(buf + 4 == end);
+    check_ptr(end, ==, buf + 4);
 
     /* zero */
     tr_snprintf((char*)buf, sizeof(buf), "i0e");
     err = tr_bencParseInt(buf, buf + 4, &end, &val);
     check_int(err, ==, 0);
     check_int(val, ==, 0);
-    check(buf + 3 == end);
+    check_ptr(end, ==, buf + 3);
 
     /* no leading zeroes allowed */
     val = 0;
@@ -82,7 +82,7 @@ static int testInt(void)
     err = tr_bencParseInt(buf, buf + 4, &end, &val);
     check_int(err, ==, EILSEQ);
     check_int(val, ==, 0);
-    check(NULL == end);
+    check_ptr(end, ==, NULL);
 
     return 0;
 }
@@ -101,17 +101,16 @@ static int testStr(void)
     err = tr_bencParseStr(buf, buf + n, &end, &str, &len);
     check_int(err, ==, EILSEQ);
     check_uint(len, ==, 0);
-    check(str == NULL);
-    check(end == NULL);
-    check(len == 0);
+    check_ptr(str, ==, NULL);
+    check_ptr(end, ==, NULL);
 
     /* good string */
     n = tr_snprintf((char*)buf, sizeof(buf), "4:boat");
     err = tr_bencParseStr(buf, buf + n, &end, &str, &len);
     check_int(err, ==, 0);
     check_uint(len, ==, 4);
-    check(strncmp((char const*)str, "boat", len) == 0);
-    check(end == buf + 6);
+    check_mem(str, ==, "boat", len);
+    check_ptr(end, ==, buf + 6);
     str = NULL;
     end = NULL;
     len = 0;
@@ -120,17 +119,16 @@ static int testStr(void)
     err = tr_bencParseStr(buf, buf + (n - 1), &end, &str, &len);
     check_int(err, ==, EILSEQ);
     check_uint(len, ==, 0);
-    check(str == NULL);
-    check(end == NULL);
-    check(len == 0);
+    check_ptr(str, ==, NULL);
+    check_ptr(end, ==, NULL);
 
     /* empty string */
     n = tr_snprintf((char*)buf, sizeof(buf), "0:");
     err = tr_bencParseStr(buf, buf + n, &end, &str, &len);
     check_int(err, ==, 0);
     check_uint(len, ==, 0);
-    check(*str == '\0');
-    check(end == buf + 2);
+    check_uint(*str, ==, '\0');
+    check_ptr(end, ==, buf + 2);
     str = NULL;
     end = NULL;
     len = 0;
@@ -140,8 +138,8 @@ static int testStr(void)
     err = tr_bencParseStr(buf, buf + n, &end, &str, &len);
     check_int(err, ==, 0);
     check_uint(len, ==, 3);
-    check(strncmp((char const*)str, "boa", len) == 0);
-    check(end == buf + 5);
+    check_mem(str, ==, "boa", len);
+    check_ptr(end, ==, buf + 5);
     str = NULL;
     end = NULL;
     len = 0;
@@ -162,16 +160,16 @@ static int testString(char const* str, bool isGood)
 
     if (!isGood)
     {
-        check(err != 0);
+        check_int(err, !=, 0);
     }
     else
     {
-        check(err == 0);
+        check_int(err, ==, 0);
 #if 0
         fprintf(stderr, "in: [%s]\n", str);
         fprintf(stderr, "out:\n%s", tr_variantToStr(&val, TR_VARIANT_FMT_JSON, NULL));
 #endif
-        check(end == str + len);
+        check_ptr(end, ==, str + len);
         saved = tr_variantToStr(&val, TR_VARIANT_FMT_BENC, &savedLen);
         check_str(saved, ==, str);
         check_uint(savedLen, ==, len);
@@ -196,17 +194,17 @@ static int testParse(void)
 
     tr_snprintf((char*)buf, sizeof(buf), "i64e");
     err = tr_variantFromBencFull(&val, buf, sizeof(buf), NULL, &end);
-    check(err == 0);
+    check_int(err, ==, 0);
     check(tr_variantGetInt(&val, &i));
     check_int(i, ==, 64);
-    check(end == buf + 4);
+    check_ptr(end, ==, buf + 4);
     tr_variantFree(&val);
 
     tr_snprintf((char*)buf, sizeof(buf), "li64ei32ei16ee");
     err = tr_variantFromBencFull(&val, buf, sizeof(buf), NULL, &end);
-    check(err == 0);
-    check(end == buf + strlen((char*)buf));
-    check(val.val.l.count == 3);
+    check_int(err, ==, 0);
+    check_ptr(end, ==, buf + strlen((char*)buf));
+    check_uint(val.val.l.count, ==, 3);
     check(tr_variantGetInt(&val.val.l.vals[0], &i));
     check_int(i, ==, 64);
     check(tr_variantGetInt(&val.val.l.vals[1], &i));
@@ -221,14 +219,14 @@ static int testParse(void)
     end = NULL;
     tr_snprintf((char*)buf, sizeof(buf), "lllee");
     err = tr_variantFromBencFull(&val, buf, sizeof(buf), NULL, &end);
-    check(err != 0);
-    check(end == NULL);
+    check_int(err, !=, 0);
+    check_ptr(end, ==, NULL);
 
     end = NULL;
     tr_snprintf((char*)buf, sizeof(buf), "le");
     err = tr_variantFromBencFull(&val, buf, sizeof(buf), NULL, &end);
-    check(err == 0);
-    check(end == buf + 2);
+    check_int(err, ==, 0);
+    check_ptr(end, ==, buf + 2);
     saved = tr_variantToStr(&val, TR_VARIANT_FMT_BENC, &len);
     check_str(saved, ==, "le");
     tr_free(saved);
@@ -285,10 +283,10 @@ static int testParse(void)
     end = NULL;
     tr_snprintf((char*)buf, sizeof(buf), "lld1:bi32e1:ai64eeee");
     err = tr_variantFromBencFull(&val, buf, sizeof(buf), NULL, &end);
-    check(err == 0);
-    check(end == buf + strlen((char const*)buf));
-    check((child = tr_variantListChild(&val, 0)) != NULL);
-    check((child2 = tr_variantListChild(child, 0)) != NULL);
+    check_int(err, ==, 0);
+    check_ptr(end, ==, buf + strlen((char const*)buf));
+    check_ptr((child = tr_variantListChild(&val, 0)), !=, NULL);
+    check_ptr((child2 = tr_variantListChild(child, 0)), !=, NULL);
     saved = tr_variantToStr(&val, TR_VARIANT_FMT_BENC, &len);
     check_str(saved, ==, "lld1:ai64e1:bi32eeee");
     tr_free(saved);
@@ -298,8 +296,8 @@ static int testParse(void)
     end = NULL;
     tr_snprintf((char*)buf, sizeof(buf), "leee");
     err = tr_variantFromBencFull(&val, buf, sizeof(buf), NULL, &end);
-    check(err == 0);
-    check(end == buf + 2);
+    check_int(err, ==, 0);
+    check_ptr(end, ==, buf + 2);
     saved = tr_variantToStr(&val, TR_VARIANT_FMT_BENC, &len);
     check_str(saved, ==, "le");
     tr_free(saved);
@@ -309,13 +307,13 @@ static int testParse(void)
     end = NULL;
     tr_snprintf((char*)buf, sizeof(buf), "l1:a1:b1:c");
     err = tr_variantFromBencFull(&val, buf, strlen(buf), NULL, &end);
-    check(err != 0);
+    check_int(err, !=, 0);
 
     /* incomplete string */
     end = NULL;
     tr_snprintf((char*)buf, sizeof(buf), "1:");
     err = tr_variantFromBencFull(&val, buf, strlen(buf), NULL, &end);
-    check(err != 0);
+    check_int(err, !=, 0);
 
     return 0;
 }
@@ -488,7 +486,7 @@ static int testStackSmash(void)
     in[depth * 2] = '\0';
     err = tr_variantFromBencFull(&val, in, depth * 2, NULL, &end);
     check_int(err, ==, 0);
-    check(end == in + depth * 2);
+    check_ptr(end, ==, in + depth * 2);
     saved = tr_variantToStr(&val, TR_VARIANT_FMT_BENC, &len);
     check_str(saved, ==, in);
     tr_free(in);
@@ -523,13 +521,13 @@ static int testBool(void)
     check(tr_variantDictFindBool(&top, key4, &boolVal));
     check(boolVal);
     check(tr_variantDictFindInt(&top, key1, &intVal));
-    check(intVal == 0);
+    check_int(intVal, ==, 0);
     check(tr_variantDictFindInt(&top, key2, &intVal));
-    check(intVal == 0);
+    check_int(intVal, ==, 0);
     check(tr_variantDictFindInt(&top, key3, &intVal));
-    check(intVal != 0);
+    check_int(intVal, !=, 0);
     check(tr_variantDictFindInt(&top, key4, &intVal));
-    check(intVal != 0);
+    check_int(intVal, !=, 0);
 
     tr_variantFree(&top);
     return 0;
@@ -561,13 +559,13 @@ static int testParse2(void)
     benc = tr_variantToStr(&top, TR_VARIANT_FMT_BENC, &len);
     check_str(benc, ==, "d14:this-is-a-booli1e14:this-is-a-real8:0.50000016:this-is-a-string16:this-is-a-string14:this-is-an-"
         "inti1234ee");
-    check(tr_variantFromBencFull(&top2, benc, len, NULL, &end) == 0);
-    check(end == benc + len);
+    check_int(tr_variantFromBencFull(&top2, benc, len, NULL, &end), ==, 0);
+    check_ptr(end, ==, benc + len);
     check(tr_variantIsDict(&top2));
     check(tr_variantDictFindInt(&top, key_int, &intVal));
     check_int(intVal, ==, 1234);
     check(tr_variantDictFindBool(&top, key_bool, &boolVal));
-    check(boolVal == true);
+    check(boolVal);
     check(tr_variantDictFindStr(&top, key_str, &strVal, &strLen));
     check_uint(strLen, ==, 16);
     check_str(strVal, ==, "this-is-a-string");

@@ -59,7 +59,7 @@ static int test_bitfield_count_range(void)
     }
 
     count2 = tr_bitfieldCountRange(&bf, begin, end);
-    check(count1 == count2);
+    check_int(count1, ==, count2);
 
     /* cleanup */
     tr_bitfieldDestruct(&bf);
@@ -84,7 +84,7 @@ static int test_bitfields(void)
 
     for (unsigned int i = 0; i < bitcount; i++)
     {
-        check(tr_bitfieldHas(&field, i) == (i % 7 == 0));
+        check_bool(tr_bitfieldHas(&field, i), ==, (i % 7 == 0));
     }
 
     /* test tr_bitfieldAddRange */
@@ -106,7 +106,7 @@ static int test_bitfields(void)
 
     for (unsigned int i = 0; i < bitcount; i++)
     {
-        check(tr_bitfieldHas(&field, i) == (i % 7 == 0));
+        check_bool(tr_bitfieldHas(&field, i), ==, (i % 7 == 0));
     }
 
     /* test tr_bitfieldRemRange in the middle of a boundary */
@@ -115,7 +115,7 @@ static int test_bitfields(void)
 
     for (unsigned int i = 0; i < 64; i++)
     {
-        check(tr_bitfieldHas(&field, i) == (i < 4 || i >= 21));
+        check_bool(tr_bitfieldHas(&field, i), ==, (i < 4 || i >= 21));
     }
 
     /* test tr_bitfieldRemRange on the boundaries */
@@ -124,7 +124,7 @@ static int test_bitfields(void)
 
     for (unsigned int i = 0; i < 64; i++)
     {
-        check(tr_bitfieldHas(&field, i) == (i < 8 || i >= 24));
+        check_bool(tr_bitfieldHas(&field, i), ==, (i < 8 || i >= 24));
     }
 
     /* test tr_bitfieldRemRange when begin & end is on the same word */
@@ -133,7 +133,7 @@ static int test_bitfields(void)
 
     for (unsigned int i = 0; i < 64; i++)
     {
-        check(tr_bitfieldHas(&field, i) == (i < 4 || i >= 5));
+        check_bool(tr_bitfieldHas(&field, i), ==, (i < 4 || i >= 5));
     }
 
     /* test tr_bitfieldAddRange */
@@ -142,7 +142,7 @@ static int test_bitfields(void)
 
     for (unsigned int i = 0; i < 64; i++)
     {
-        check(tr_bitfieldHas(&field, i) == (4 <= i && i < 21));
+        check_bool(tr_bitfieldHas(&field, i), ==, (4 <= i && i < 21));
     }
 
     /* test tr_bitfieldAddRange on the boundaries */
@@ -151,7 +151,7 @@ static int test_bitfields(void)
 
     for (unsigned int i = 0; i < 64; i++)
     {
-        check(tr_bitfieldHas(&field, i) == (8 <= i && i < 24));
+        check_bool(tr_bitfieldHas(&field, i), ==, (8 <= i && i < 24));
     }
 
     /* test tr_bitfieldAddRange when begin & end is on the same word */
@@ -160,7 +160,7 @@ static int test_bitfields(void)
 
     for (unsigned int i = 0; i < 64; i++)
     {
-        check(tr_bitfieldHas(&field, i) == (4 <= i && i < 5));
+        check_bool(tr_bitfieldHas(&field, i), ==, (4 <= i && i < 5));
     }
 
     tr_bitfieldDestruct(&field);

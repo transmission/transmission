@@ -85,7 +85,7 @@ static int test_incomplete_dir_impl(char const* incomplete_dir, char const* down
        the test zero_torrent will be missing its first piece */
     tor = libttest_zero_torrent_init(session);
     libttest_zero_torrent_populate(tor, false);
-    check(tr_torrentStat(tor)->leftUntilDone == tor->info.pieceSize);
+    check_uint(tr_torrentStat(tor)->leftUntilDone, ==, tor->info.pieceSize);
     check_file_location(tor, 0, tr_strdup_printf("%s/%s.part", incomplete_dir, tor->info.files[0].name));
     check_file_location(tor, 1, tr_buildPath(incomplete_dir, tor->info.files[1].name, NULL));
     check_uint(tr_torrentStat(tor)->leftUntilDone, ==, tor->info.pieceSize);

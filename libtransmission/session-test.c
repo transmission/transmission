@@ -28,8 +28,8 @@ static int testPeerId(void)
 
         tr_peerIdInit(peer_id);
 
-        check(strlen((char*)peer_id) == PEER_ID_LEN);
-        check(memcmp(peer_id, PEERID_PREFIX, 8) == 0);
+        check_uint(strlen((char*)peer_id), ==, PEER_ID_LEN);
+        check_mem(peer_id, ==, PEERID_PREFIX, 8);
 
         for (int j = 8; j < PEER_ID_LEN; ++j)
         {
@@ -37,7 +37,7 @@ static int testPeerId(void)
             val += strtoul(tmp, NULL, 36);
         }
 
-        check(val % 36 == 0);
+        check_int(val % 36, ==, 0);
     }
 
     return 0;
@@ -55,13 +55,13 @@ static int test_session_id(void)
     check(!tr_session_id_is_local("test"));
 
     session_id = tr_session_id_new();
-    check(session_id != NULL);
+    check_ptr(session_id, !=, NULL);
 
     tr_timeUpdate(0);
 
     session_id_str_1 = tr_session_id_get_current(session_id);
-    check(session_id_str_1 != NULL);
-    check(strlen(session_id_str_1) == 48);
+    check_str(session_id_str_1, !=, NULL);
+    check_uint(strlen(session_id_str_1), ==, 48);
     session_id_str_1 = tr_strdup(session_id_str_1);
 
     check(tr_session_id_is_local(session_id_str_1));
@@ -71,18 +71,18 @@ static int test_session_id(void)
     check(tr_session_id_is_local(session_id_str_1));
 
     session_id_str_2 = tr_session_id_get_current(session_id);
-    check(session_id_str_2 != NULL);
-    check(strlen(session_id_str_2) == 48);
-    check(strcmp(session_id_str_2, session_id_str_1) == 0);
+    check_str(session_id_str_2, !=, NULL);
+    check_uint(strlen(session_id_str_2), ==, 48);
+    check_str(session_id_str_2, ==, session_id_str_1);
 
     tr_timeUpdate(60 * 60);
 
     check(tr_session_id_is_local(session_id_str_1));
 
     session_id_str_2 = tr_session_id_get_current(session_id);
-    check(session_id_str_2 != NULL);
-    check(strlen(session_id_str_2) == 48);
-    check(strcmp(session_id_str_2, session_id_str_1) != 0);
+    check_str(session_id_str_2, !=, NULL);
+    check_uint(strlen(session_id_str_2), ==, 48);
+    check_str(session_id_str_2, !=, session_id_str_1);
     session_id_str_2 = tr_strdup(session_id_str_2);
 
     check(tr_session_id_is_local(session_id_str_2));
@@ -94,10 +94,10 @@ static int test_session_id(void)
     check(tr_session_id_is_local(session_id_str_1));
 
     session_id_str_3 = tr_session_id_get_current(session_id);
-    check(session_id_str_3 != NULL);
-    check(strlen(session_id_str_3) == 48);
-    check(strcmp(session_id_str_3, session_id_str_2) != 0);
-    check(strcmp(session_id_str_3, session_id_str_1) != 0);
+    check_str(session_id_str_3, !=, NULL);
+    check_uint(strlen(session_id_str_3), ==, 48);
+    check_str(session_id_str_3, !=, session_id_str_2);
+    check_str(session_id_str_3, !=, session_id_str_1);
     session_id_str_3 = tr_strdup(session_id_str_3);
 
     check(tr_session_id_is_local(session_id_str_3));
@@ -120,9 +120,9 @@ static int test_session_id(void)
     check(!tr_session_id_is_local(session_id_str_2));
     check(!tr_session_id_is_local(session_id_str_1));
 
-    tr_free(session_id_str_3);
-    tr_free(session_id_str_2);
-    tr_free(session_id_str_1);
+    tr_free((char*)session_id_str_3);
+    tr_free((char*)session_id_str_2);
+    tr_free((char*)session_id_str_1);
 
     return 0;
 }

@@ -113,7 +113,7 @@ static int test_construct(void)
     ev_base = event_base_new();
 
     wd = create_watchdir(test_dir, &callback, NULL, ev_base);
-    check(wd != NULL);
+    check_ptr(wd, !=, NULL);
     check(tr_sys_path_is_same(test_dir, tr_watchdir_get_path(wd), NULL));
 
     process_events();
@@ -141,7 +141,7 @@ static int test_initial_scan(void)
         reset_callback_data(&wd_data, TR_WATCHDIR_ACCEPT);
 
         tr_watchdir_t wd = create_watchdir(test_dir, &callback, &wd_data, ev_base);
-        check(wd != NULL);
+        check_ptr(wd, !=, NULL);
 
         process_events();
         check_ptr(wd_data.dir, ==, NULL);
@@ -158,7 +158,7 @@ static int test_initial_scan(void)
         reset_callback_data(&wd_data, TR_WATCHDIR_ACCEPT);
 
         tr_watchdir_t wd = create_watchdir(test_dir, &callback, &wd_data, ev_base);
-        check(wd != NULL);
+        check_ptr(wd, !=, NULL);
 
         process_events();
         check_ptr(wd_data.dir, ==, wd);
@@ -188,7 +188,7 @@ static int test_watch(void)
 
     reset_callback_data(&wd_data, TR_WATCHDIR_ACCEPT);
     wd = create_watchdir(test_dir, &callback, &wd_data, ev_base);
-    check(wd != NULL);
+    check_ptr(wd, !=, NULL);
 
     process_events();
     check_ptr(wd_data.dir, ==, NULL);
@@ -244,11 +244,11 @@ static int test_watch_two_dirs(void)
 
     reset_callback_data(&wd1_data, TR_WATCHDIR_ACCEPT);
     wd1 = create_watchdir(dir1, &callback, &wd1_data, ev_base);
-    check(wd1 != NULL);
+    check_ptr(wd1, !=, NULL);
 
     reset_callback_data(&wd2_data, TR_WATCHDIR_ACCEPT);
     wd2 = create_watchdir(dir2, &callback, &wd2_data, ev_base);
-    check(wd2 != NULL);
+    check_ptr(wd2, !=, NULL);
 
     process_events();
     check_ptr(wd1_data.dir, ==, NULL);
@@ -351,7 +351,7 @@ static int test_retry(void)
 
     reset_callback_data(&wd_data, TR_WATCHDIR_RETRY);
     wd = create_watchdir(test_dir, &callback, &wd_data, ev_base);
-    check(wd != NULL);
+    check_ptr(wd, !=, NULL);
 
     process_events();
     check_ptr(wd_data.dir, ==, NULL);
