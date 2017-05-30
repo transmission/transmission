@@ -22,8 +22,9 @@ extern bool verbose;
 
 bool should_print(bool pass);
 
-bool check_condition_impl(char const* file, int line, bool condition);
-
+bool libtest_check(char const* file, int line, bool pass, bool condition, char const* condition_str);
+bool libtest_check_bool(char const* file, int line, bool pass, bool lhs, bool rhs, char const* lhs_str, char const* op_str,
+    char const* rhs_str);
 bool libtest_check_str(char const* file, int line, bool pass, char const* lhs, char const* rhs, char const* lhs_str,
     char const* op_str, char const* rhs_str);
 bool libtest_check_int(char const* file, int line, bool pass, intmax_t lhs, intmax_t rhs, char const* lhs_str,
@@ -42,7 +43,25 @@ bool libtest_check_ptr(char const* file, int line, bool pass, void const* lhs, v
     { \
         ++current_test; \
         \
-        if (!check_condition_impl(__FILE__, __LINE__, (condition))) \
+        bool const check_result = (condition); \
+        \
+        if (!libtest_check(__FILE__, __LINE__, check_result, check_result, #condition)) \
+        { \
+            return current_test; \
+        } \
+    } \
+    while (0)
+
+#define check_bool(lhs, op, rhs) \
+    do \
+    { \
+        ++current_test; \
+        \
+        bool const check_bool_lhs = (lhs); \
+        bool const check_bool_rhs = (rhs); \
+        \
+        if (!libtest_check_bool(__FILE__, __LINE__, check_bool_lhs op check_bool_rhs, check_bool_lhs, check_bool_rhs, #lhs, \
+            #op, #rhs)) \
         { \
             return current_test; \
         } \

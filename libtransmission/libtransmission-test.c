@@ -50,13 +50,23 @@ bool should_print(bool pass)
 #endif
 }
 
-bool check_condition_impl(char const* file, int line, bool condition)
+bool libtest_check(char const* file, int line, bool pass, bool condition, char const* condition_str)
 {
-    bool const pass = condition;
-
     if (should_print(pass))
     {
-        fprintf(stderr, "%s %s:%d\n", pass ? "PASS" : "FAIL", file, line);
+        fprintf(stderr, "%s %s:%d: %s (%s)\n", pass ? "PASS" : "FAIL", file, line, condition_str, condition ? "true": "false");
+    }
+
+    return pass;
+}
+
+bool libtest_check_bool(char const* file, int line, bool pass, bool lhs, bool rhs, char const* lhs_str, char const* op_str,
+    char const* rhs_str)
+{
+    if (should_print(pass))
+    {
+        fprintf(stderr, "%s %s:%d: %s %s %s (%s %s %s)\n", pass ? "PASS" : "FAIL", file, line, lhs_str, op_str, rhs_str,
+            lhs ? "true" : "false", op_str, rhs ? "true" : "false");
     }
 
     return pass;
