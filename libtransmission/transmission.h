@@ -36,6 +36,8 @@ extern "C"
 #include <inttypes.h> /* uintN_t */
 #include <stdbool.h> /* bool */
 #include <time.h> /* time_t */
+#include <fcntl.h> /* off_t */
+#include <stdio.h> /* ssize_t */
 
 #define SHA_DIGEST_LENGTH 20
 #define TR_INET6_ADDRSTRLEN 46
