@@ -504,6 +504,14 @@ Transmission.prototype = {
         if (ev.keyCode === 16) { // shift key pressed
             delete this._shift_index;
         };
+				if ($('body').hasClass('open_showing')) {
+						if (ev.keyCode === 27) {
+								this.hideUploadDialog();
+						};
+						if (ev.keyCode === 13) {
+								this.confirmUploadClicked();
+						};
+				};
     },
 
     isButtonEnabled: function (ev) {
