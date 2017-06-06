@@ -248,7 +248,7 @@ msgstr "Déplacer vers le _bas"
 
 #: ../gtk/actions.c:114
 msgid "Move to _Bottom"
-msgstr "Déplacer vers le _bas"
+msgstr "Déplacer tout _en bas"
 
 #: ../gtk/actions.c:115
 msgid "Present Main Window"
