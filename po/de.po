@@ -1808,7 +1808,7 @@ msgstr "Port ist <b>geschlossen</b>"
 
 #: ../gtk/tr-prefs.c:1106
 msgid "<i>Testing TCP port…</i>"
-msgstr "<i>TCP-Port wird getestet …<i>"
+msgstr "<i>TCP-Port wird getestet …</i>"
 
 #: ../gtk/tr-prefs.c:1132
 msgid "Listening Port"
