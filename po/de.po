@@ -188,7 +188,7 @@ msgstr "Alle Torrents starten"
 
 #: ../gtk/actions.c:98
 msgid "Set _Location…"
-msgstr "Ort fest_legen …"
+msgstr "Speicherort fest_legen …"
 
 #: ../gtk/actions.c:99
 msgid "Remove torrent"
