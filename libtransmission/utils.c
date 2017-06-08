@@ -15,7 +15,6 @@
 #define HAVE_VALLOC
 #endif
 
-#include <assert.h>
 #include <ctype.h> /* isdigit(), tolower() */
 #include <errno.h>
 #include <float.h> /* DBL_EPSILON */
@@ -50,9 +49,10 @@
 #include "list.h"
 #include "log.h"
 #include "net.h"
-#include "utils.h"
 #include "platform.h" /* tr_lockLock() */
 #include "platform-quota.h" /* tr_device_info_create(), tr_device_info_get_free_space(), tr_device_info_free() */
+#include "tr-assert.h"
+#include "utils.h"
 #include "variant.h"
 #include "version.h"
 
@@ -216,9 +216,9 @@ void tr_timerAdd(struct event* timer, int seconds, int microseconds)
     tv.tv_sec = seconds;
     tv.tv_usec = microseconds;
 
-    assert(tv.tv_sec >= 0);
-    assert(tv.tv_usec >= 0);
-    assert(tv.tv_usec < 1000000);
+    TR_ASSERT(tv.tv_sec >= 0);
+    TR_ASSERT(tv.tv_usec >= 0);
+    TR_ASSERT(tv.tv_usec < 1000000);
 
     evtimer_add(timer, &tv);
 }
@@ -260,7 +260,7 @@ uint8_t* tr_loadFile(char const* path, size_t* size, tr_error** error)
     /* file size should be able to fit into size_t */
     if (sizeof(info.size) > sizeof(*size))
     {
-        assert(info.size <= SIZE_MAX);
+        TR_ASSERT(info.size <= SIZE_MAX);
     }
 
     /* Load the torrent file into our buffer */
@@ -340,7 +340,7 @@ char* tr_buildPath(char const* first_element, ...)
     *pch++ = '\0';
 
     /* sanity checks & return */
-    assert(pch - buf == (ptrdiff_t)bufLen);
+    TR_ASSERT(pch - buf == (ptrdiff_t)bufLen);
     return buf;
 }
 
@@ -667,8 +667,8 @@ size_t tr_strlcpy(char* dst, void const* src, size_t siz)
     char const* s = src;
     size_t n = siz;
 
-    assert(s);
-    assert(d);
+    TR_ASSERT(s != NULL);
+    TR_ASSERT(d != NULL);
 
     /* Copy as many bytes as will fit */
     if (n != 0)
@@ -1047,19 +1047,19 @@ static size_t quickfindPartition(char* base, size_t left, size_t right, size_t s
     SWAP(base + (size * right), base + (size * storeIndex), size);
 
     /* sanity check the partition */
-#ifndef NDEBUG
+#ifdef TR_ENABLE_ASSERTS
 
-    assert(storeIndex >= left);
-    assert(storeIndex <= right);
+    TR_ASSERT(storeIndex >= left);
+    TR_ASSERT(storeIndex <= right);
 
     for (size_t i = left; i < storeIndex; ++i)
     {
-        assert((*compar)(base + (size * i), base + (size * storeIndex)) <= 0);
+        TR_ASSERT((*compar)(base + (size * i), base + (size * storeIndex)) <= 0);
     }
 
     for (size_t i = storeIndex + 1; i <= right; ++i)
     {
-        assert((*compar)(base + (size * i), base + (size * storeIndex)) >= 0);
+        TR_ASSERT((*compar)(base + (size * i), base + (size * storeIndex)) >= 0);
     }
 
 #endif
@@ -1087,7 +1087,7 @@ static void quickfindFirstK(char* base, size_t left, size_t right, size_t size, 
     }
 }
 
-#ifndef NDEBUG
+#ifdef TR_ENABLE_ASSERTS
 
 static void checkBestScoresComeFirst(char* base, size_t nmemb, size_t size, int (* compar)(void const*, void const*), size_t k)
 {
@@ -1103,12 +1103,12 @@ static void checkBestScoresComeFirst(char* base, size_t nmemb, size_t size, int 
 
     for (size_t i = 0; i < k; ++i)
     {
-        assert((*compar)(base + (size * i), base + (size * worstFirstPos)) <= 0);
+        TR_ASSERT((*compar)(base + (size * i), base + (size * worstFirstPos)) <= 0);
     }
 
     for (size_t i = k; i < nmemb; ++i)
     {
-        assert((*compar)(base + (size * i), base + (size * worstFirstPos)) >= 0);
+        TR_ASSERT((*compar)(base + (size * i), base + (size * worstFirstPos)) >= 0);
     }
 }
 
@@ -1120,7 +1120,7 @@ void tr_quickfindFirstK(void* base, size_t nmemb, size_t size, int (* compar)(vo
     {
         quickfindFirstK(base, 0, nmemb - 1, size, compar, k);
 
-#ifndef NDEBUG
+#ifdef TR_ENABLE_ASSERTS
         checkBestScoresComeFirst(base, nmemb, size, compar, k);
 #endif
     }
@@ -1215,7 +1215,7 @@ char* tr_utf8clean(char const* str, size_t max_len)
         ret = to_utf8(str, max_len);
     }
 
-    assert(tr_utf8_validate(ret, TR_BAD_SIZE, NULL));
+    TR_ASSERT(tr_utf8_validate(ret, TR_BAD_SIZE, NULL));
     return ret;
 }
 
@@ -1345,7 +1345,7 @@ void tr_win32_make_args_utf8(int* argc, char*** argv)
         return;
     }
 
-    assert(*argc == my_argc);
+    TR_ASSERT(*argc == my_argc);
 
     char** my_argv = tr_new(char*, my_argc + 1);
     int processed_argc = 0;
@@ -1540,7 +1540,7 @@ int* tr_parseNumberRange(char const* str_in, size_t len, int* setmeCount)
             }
 
             qsort(sorted, n, sizeof(int), compareInt);
-            assert(n == n2);
+            TR_ASSERT(n == n2);
 
             /* remove duplicates */
             uniq = tr_new(int, n);
@@ -1709,8 +1709,8 @@ bool tr_moveFile(char const* oldpath, char const* newpath, tr_error** error)
             break;
         }
 
-        assert(numRead == bytesWritten);
-        assert(bytesWritten <= bytesLeft);
+        TR_ASSERT(numRead == bytesWritten);
+        TR_ASSERT(bytesWritten <= bytesLeft);
         bytesLeft -= bytesWritten;
     }
 
@@ -2036,7 +2036,7 @@ void tr_formatter_get_units(void* vdict)
 
 bool tr_env_key_exists(char const* key)
 {
-    assert(key != NULL);
+    TR_ASSERT(key != NULL);
 
 #ifdef _WIN32
     return GetEnvironmentVariableA(key, NULL, 0) != 0;
@@ -2051,7 +2051,7 @@ int tr_env_get_int(char const* key, int default_value)
 
     char value[16];
 
-    assert(key != NULL);
+    TR_ASSERT(key != NULL);
 
     if (GetEnvironmentVariableA(key, value, TR_N_ELEMENTS(value)) > 1)
     {
@@ -2062,7 +2062,7 @@ int tr_env_get_int(char const* key, int default_value)
 
     char const* value;
 
-    assert(key != NULL);
+    TR_ASSERT(key != NULL);
 
     value = getenv(key);
 
@@ -2115,7 +2115,7 @@ char* tr_env_get_string(char const* key, char const* default_value)
 
     char* value;
 
-    assert(key != NULL);
+    TR_ASSERT(key != NULL);
 
     value = getenv(key);
 

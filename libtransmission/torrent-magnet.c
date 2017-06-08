@@ -6,7 +6,6 @@
  *
  */
 
-#include <assert.h>
 #include <string.h> /* memcpy(), memset(), memcmp() */
 
 #include <event2/buffer.h>
@@ -20,6 +19,7 @@
 #include "resume.h"
 #include "torrent.h"
 #include "torrent-magnet.h"
+#include "tr-assert.h"
 #include "utils.h"
 #include "variant.h"
 #include "web.h"
@@ -145,7 +145,7 @@ static size_t findInfoDictOffset(tr_torrent const* tor)
 
 static void ensureInfoDictOffsetIsCached(tr_torrent* tor)
 {
-    assert(tr_torrentHasMetadata(tor));
+    TR_ASSERT(tr_torrentHasMetadata(tor));
 
     if (!tor->infoDictOffsetIsCached)
     {
@@ -158,9 +158,9 @@ void* tr_torrentGetMetadataPiece(tr_torrent* tor, int piece, size_t* len)
 {
     char* ret = NULL;
 
-    assert(tr_isTorrent(tor));
-    assert(piece >= 0);
-    assert(len != NULL);
+    TR_ASSERT(tr_isTorrent(tor));
+    TR_ASSERT(piece >= 0);
+    TR_ASSERT(len != NULL);
 
     if (tr_torrentHasMetadata(tor))
     {
@@ -168,7 +168,7 @@ void* tr_torrentGetMetadataPiece(tr_torrent* tor, int piece, size_t* len)
 
         ensureInfoDictOffsetIsCached(tor);
 
-        assert(tor->infoDictLength > 0);
+        TR_ASSERT(tor->infoDictLength > 0);
 
         fd = tr_sys_file_open(tor->info.torrent, TR_SYS_FILE_READ, 0, NULL);
 
@@ -200,7 +200,7 @@ void* tr_torrentGetMetadataPiece(tr_torrent* tor, int piece, size_t* len)
         }
     }
 
-    assert(ret == NULL || *len > 0);
+    TR_ASSERT(ret == NULL || *len > 0);
 
     return ret;
 }
@@ -210,9 +210,9 @@ void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, in
     struct tr_incomplete_metadata* m;
     int const offset = piece * METADATA_PIECE_SIZE;
 
-    assert(tr_isTorrent(tor));
-    assert(data != NULL);
-    assert(len >= 0);
+    TR_ASSERT(tr_isTorrent(tor));
+    TR_ASSERT(data != NULL);
+    TR_ASSERT(len >= 0);
 
     dbgmsg(tor, "got metadata piece %d of %d bytes", piece, len);
 
@@ -235,7 +235,7 @@ void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, in
         return;
     }
 
-    assert(offset <= m->metadata_size);
+    TR_ASSERT(offset <= m->metadata_size);
 
     if (len == 0 || len > m->metadata_size - offset)
     {
@@ -364,7 +364,7 @@ bool tr_torrentGetNextMetadataRequest(tr_torrent* tor, time_t now, int* setme_pi
     bool have_request = false;
     struct tr_incomplete_metadata* m;
 
-    assert(tr_isTorrent(tor));
+    TR_ASSERT(tr_isTorrent(tor));
 
     m = tor->incompleteMetadata;
 

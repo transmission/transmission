@@ -17,6 +17,7 @@
 #include "peer-common.h" /* MAX_BLOCK_SIZE */
 #include "ptrarray.h"
 #include "torrent.h"
+#include "tr-assert.h"
 #include "trevent.h"
 #include "utils.h"
 
@@ -277,7 +278,7 @@ tr_cache* tr_cacheNew(int64_t max_bytes)
 
 void tr_cacheFree(tr_cache* cache)
 {
-    assert(tr_ptrArrayEmpty(&cache->blocks));
+    TR_ASSERT(tr_ptrArrayEmpty(&cache->blocks));
     tr_ptrArrayDestruct(&cache->blocks, NULL);
     tr_free(cache);
 }
@@ -320,7 +321,7 @@ int tr_cacheWriteBlock(tr_cache* cache, tr_torrent* torrent, tr_piece_index_t pi
 {
     struct cache_block* cb = findBlock(cache, torrent, piece, offset);
 
-    assert(tr_amInEventThread(torrent->session));
+    TR_ASSERT(tr_amInEventThread(torrent->session));
 
     if (cb == NULL)
     {
@@ -336,7 +337,7 @@ int tr_cacheWriteBlock(tr_cache* cache, tr_torrent* torrent, tr_piece_index_t pi
 
     cb->time = tr_time();
 
-    assert(cb->length == length);
+    TR_ASSERT(cb->length == length);
     evbuffer_drain(cb->evbuf, evbuffer_get_length(cb->evbuf));
     evbuffer_remove_buffer(writeme, cb->evbuf, cb->length);
 

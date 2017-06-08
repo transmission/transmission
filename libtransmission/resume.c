@@ -19,6 +19,7 @@
 #include "resume.h"
 #include "session.h"
 #include "torrent.h"
+#include "tr-assert.h"
 #include "utils.h" /* tr_buildPath */
 #include "variant.h"
 
@@ -759,7 +760,7 @@ static uint64_t loadFromFile(tr_torrent* tor, uint64_t fieldsToLoad)
     bool const wasDirty = tor->isDirty;
     tr_error* error = NULL;
 
-    assert(tr_isTorrent(tor));
+    TR_ASSERT(tr_isTorrent(tor));
 
     filename = getResumeFilename(tor);
 
@@ -978,7 +979,7 @@ uint64_t tr_torrentLoadResume(tr_torrent* tor, uint64_t fieldsToLoad, tr_ctor co
 {
     uint64_t ret = 0;
 
-    assert(tr_isTorrent(tor));
+    TR_ASSERT(tr_isTorrent(tor));
 
     ret |= useManditoryFields(tor, fieldsToLoad, ctor);
     fieldsToLoad &= ~ret;

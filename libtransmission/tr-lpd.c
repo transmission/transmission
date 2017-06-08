@@ -52,6 +52,7 @@ typedef uint16_t in_port_t; /* all missing */
 #include "peer-mgr.h" /* tr_peerMgrAddPex() */
 #include "session.h"
 #include "torrent.h" /* tr_torrentFindFromHash() */
+#include "tr-assert.h"
 #include "tr-lpd.h"
 #include "utils.h"
 #include "version.h"
@@ -174,7 +175,7 @@ static char const* lpd_extractHeader(char const* s, struct lpd_protocolVersion* 
     int minor = -1;
     size_t len;
 
-    assert(s != NULL);
+    TR_ASSERT(s != NULL);
     len = strlen(s);
 
     /* something might be rotten with this chunk of data */
@@ -239,8 +240,9 @@ static bool lpd_extractParam(char const* const str, char const* const name, int 
     char sstr[maxLength] = { 0 };
     char const* pos;
 
-    assert(str != NULL && name != NULL);
-    assert(val != NULL);
+    TR_ASSERT(str != NULL);
+    TR_ASSERT(name != NULL);
+    TR_ASSERT(val != NULL);
 
     if (strlen(name) > maxLength - strlen(CRLF ": "))
     {
@@ -304,8 +306,8 @@ int tr_lpdInit(tr_session* ss, tr_address* tr_addr UNUSED)
         return -1;
     }
 
-    assert(lpd_announceInterval > 0);
-    assert(lpd_announceScope > 0);
+    TR_ASSERT(lpd_announceInterval > 0);
+    TR_ASSERT(lpd_announceScope > 0);
 
     lpd_port = tr_sessionGetPeerPort(ss);
 
@@ -701,7 +703,7 @@ static void on_upkeep_timer(evutil_socket_t foo UNUSED, short bar UNUSED, void* 
 * @see DoS */
 static void event_callback(evutil_socket_t s UNUSED, short type, void* ignore UNUSED)
 {
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     /* do not allow announces to be processed if LPD is disabled */
     if (!tr_sessionAllowsLPD(session))

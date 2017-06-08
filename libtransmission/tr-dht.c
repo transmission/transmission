@@ -58,6 +58,7 @@
 #include "platform.h" /* tr_threadNew() */
 #include "session.h"
 #include "torrent.h" /* tr_torrentFindFromHash() */
+#include "tr-assert.h"
 #include "tr-dht.h"
 #include "trevent.h" /* tr_runInEventThread() */
 #include "utils.h"
@@ -776,7 +777,7 @@ void tr_dhtCallback(unsigned char* buf, int buflen, struct sockaddr* from, sockl
     time_t tosleep;
     int rc;
 
-    assert(tr_isSession(sv));
+    TR_ASSERT(tr_isSession(sv));
 
     if (sv != session)
     {
@@ -843,7 +844,7 @@ int dht_random_bytes(void* buf, size_t size)
 
 int dht_gettimeofday(struct timeval* tv, struct timezone* tz)
 {
-    assert(tz == NULL);
+    TR_ASSERT(tz == NULL);
     return tr_gettimeofday(tv);
 }
 

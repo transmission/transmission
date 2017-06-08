@@ -23,6 +23,7 @@
 #include "peer-io.h"
 #include "peer-mgr.h" /* tr_peerMgrCompactToPex() */
 #include "ptrarray.h"
+#include "tr-assert.h"
 #include "tr-udp.h"
 #include "utils.h"
 
@@ -460,7 +461,7 @@ static void tau_tracker_upkeep(struct tau_tracker*);
 
 static void tau_tracker_free(struct tau_tracker* t)
 {
-    assert(t->dns_request == NULL);
+    TR_ASSERT(t->dns_request == NULL);
 
     if (t->addr != NULL)
     {
@@ -538,10 +539,10 @@ static void tau_tracker_send_reqs(struct tau_tracker* tracker)
     tr_ptrArray* reqs;
     time_t const now = tr_time();
 
-    assert(tracker->dns_request == NULL);
-    assert(tracker->connecting_at == 0);
-    assert(tracker->addr != NULL);
-    assert(tracker->connection_expiration_time > now);
+    TR_ASSERT(tracker->dns_request == NULL);
+    TR_ASSERT(tracker->connecting_at == 0);
+    TR_ASSERT(tracker->addr != NULL);
+    TR_ASSERT(tracker->connection_expiration_time > now);
 
     reqs = &tracker->announces;
 

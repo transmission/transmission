@@ -6,7 +6,6 @@
  *
  */
 
-#include <assert.h>
 #include <ctype.h>
 #include <math.h> /* fabs() */
 #include <stdio.h>
@@ -26,6 +25,7 @@
 #include "list.h"
 #include "log.h"
 #include "ptrarray.h"
+#include "tr-assert.h"
 #include "utils.h"
 #include "variant.h"
 #include "variant-common.h"
@@ -130,9 +130,9 @@ static bool decode_hex_string(char const* in, unsigned int* setme)
     unsigned int val = 0;
     char const* const end = in + 6;
 
-    assert(in != NULL);
-    assert(in[0] == '\\');
-    assert(in[1] == 'u');
+    TR_ASSERT(in != NULL);
+    TR_ASSERT(in[0] == '\\');
+    TR_ASSERT(in[1] == 'u');
     in += 2;
 
     do

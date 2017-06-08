@@ -26,6 +26,7 @@
 #include "log.h"
 #include "platform.h" /* tr_lock() */
 #include "torrent.h"
+#include "tr-assert.h"
 #include "utils.h" /* tr_valloc(), tr_free() */
 #include "verify.h"
 
@@ -231,7 +232,7 @@ static void verifyThreadFunc(void* unused UNUSED)
         tr_torrentSetVerifyState(tor, TR_VERIFY_NOW);
         changed = verifyTorrent(tor, &stopCurrent);
         tr_torrentSetVerifyState(tor, TR_VERIFY_NONE);
-        assert(tr_isTorrent(tor));
+        TR_ASSERT(tr_isTorrent(tor));
 
         if (!stopCurrent && changed)
         {
@@ -280,7 +281,7 @@ void tr_verifyAdd(tr_torrent* tor, tr_verify_done_func callback_func, void* call
 {
     struct verify_node* node;
 
-    assert(tr_isTorrent(tor));
+    TR_ASSERT(tr_isTorrent(tor));
     tr_logAddTorInfo(tor, "%s", _("Queued for verification"));
 
     node = tr_new(struct verify_node, 1);
@@ -313,7 +314,7 @@ void tr_verifyRemove(tr_torrent* tor)
     tr_lock* lock = getVerifyLock();
     tr_lockLock(lock);
 
-    assert(tr_isTorrent(tor));
+    TR_ASSERT(tr_isTorrent(tor));
 
     if (tor == currentNode.torrent)
     {

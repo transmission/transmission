@@ -6,7 +6,6 @@
  *
  */
 
-#include <assert.h>
 #include <stdio.h>
 
 #include <sys/types.h>
@@ -21,6 +20,7 @@
 #include "port-forwarding.h"
 #include "session.h"
 #include "torrent.h"
+#include "tr-assert.h"
 #include "upnp.h"
 #include "utils.h"
 
@@ -144,8 +144,8 @@ static void onTimer(evutil_socket_t fd UNUSED, short what UNUSED, void* vshared)
 {
     tr_shared* s = vshared;
 
-    assert(s != NULL);
-    assert(s->timer != NULL);
+    TR_ASSERT(s != NULL);
+    TR_ASSERT(s->timer != NULL);
 
     /* do something */
     natPulse(s, s->doPortCheck);

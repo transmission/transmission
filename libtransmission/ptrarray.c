@@ -6,10 +6,10 @@
  *
  */
 
-#include <assert.h>
 #include <string.h> /* memmove */
 
 #include "ptrarray.h"
+#include "tr-assert.h"
 #include "utils.h"
 
 #define FLOOR 32
@@ -18,8 +18,8 @@ tr_ptrArray const TR_PTR_ARRAY_INIT = TR_PTR_ARRAY_INIT_STATIC;
 
 void tr_ptrArrayDestruct(tr_ptrArray* p, PtrArrayForeachFunc func)
 {
-    assert(p != NULL);
-    assert(p->items != NULL || p->n_items == 0);
+    TR_ASSERT(p != NULL);
+    TR_ASSERT(p->items != NULL || p->n_items == 0);
 
     if (func != NULL)
     {
@@ -31,9 +31,9 @@ void tr_ptrArrayDestruct(tr_ptrArray* p, PtrArrayForeachFunc func)
 
 void tr_ptrArrayForeach(tr_ptrArray* t, PtrArrayForeachFunc func)
 {
-    assert(t != NULL);
-    assert(t->items != NULL || t->n_items == 0);
-    assert(func != NULL);
+    TR_ASSERT(t != NULL);
+    TR_ASSERT(t->items != NULL || t->n_items == 0);
+    TR_ASSERT(func != NULL);
 
     for (int i = 0; i < t->n_items; ++i)
     {
@@ -88,9 +88,9 @@ void tr_ptrArrayErase(tr_ptrArray* t, int begin, int end)
         end = t->n_items;
     }
 
-    assert(begin >= 0);
-    assert(begin < end);
-    assert(end <= t->n_items);
+    TR_ASSERT(begin >= 0);
+    TR_ASSERT(begin < end);
+    TR_ASSERT(end <= t->n_items);
 
     memmove(t->items + begin, t->items + end, sizeof(void*) * (t->n_items - end));
 
@@ -161,7 +161,7 @@ int tr_ptrArrayLowerBound(tr_ptrArray const* t, void const* ptr, int (* compare)
     return pos;
 }
 
-#ifdef NDEBUG
+#ifndef TR_ENABLE_ASSERTS
 
 #define assertArrayIsSortedAndUnique(array, compare) /* no-op */
 #define assertIndexIsSortedAndUnique(array, pos, compare) /* no-op */
@@ -172,7 +172,7 @@ static void assertArrayIsSortedAndUnique(tr_ptrArray const* t, int (* compare)(v
 {
     for (int i = 0; i < t->n_items - 2; ++i)
     {
-        assert(compare(t->items[i], t->items[i + 1]) < 0);
+        TR_ASSERT(compare(t->items[i], t->items[i + 1]) < 0);
     }
 }
 
@@ -180,12 +180,12 @@ static void assertIndexIsSortedAndUnique(tr_ptrArray const* t, int pos, int (* c
 {
     if (pos > 0)
     {
-        assert(compare(t->items[pos - 1], t->items[pos]) < 0);
+        TR_ASSERT(compare(t->items[pos - 1], t->items[pos]) < 0);
     }
 
     if (pos + 1 < t->n_items)
     {
-        assert(compare(t->items[pos], t->items[pos + 1]) < 0);
+        TR_ASSERT(compare(t->items[pos], t->items[pos + 1]) < 0);
     }
 }
 
@@ -224,26 +224,26 @@ static void* tr_ptrArrayRemoveSortedValue(tr_ptrArray* t, void const* ptr, int (
     if (match)
     {
         ret = t->items[pos];
-        assert(compare(ret, ptr) == 0);
+        TR_ASSERT(compare(ret, ptr) == 0);
         tr_ptrArrayErase(t, pos, pos + 1);
     }
 
-    assert((ret == NULL) || (compare(ret, ptr) == 0));
+    TR_ASSERT((ret == NULL) || (compare(ret, ptr) == 0));
     return ret;
 }
 
 void tr_ptrArrayRemoveSortedPointer(tr_ptrArray* t, void const* ptr, int (* compare)(void const*, void const*))
 {
-#ifdef NDEBUG
+#ifndef TR_ENABLE_ASSERTS
 
     tr_ptrArrayRemoveSortedValue(t, ptr, compare);
 
 #else
 
     void* removed = tr_ptrArrayRemoveSortedValue(t, ptr, compare);
-    assert(removed != NULL);
-    assert(removed == ptr);
-    assert(tr_ptrArrayFindSorted(t, ptr, compare) == NULL);
+    TR_ASSERT(removed != NULL);
+    TR_ASSERT(removed == ptr);
+    TR_ASSERT(tr_ptrArrayFindSorted(t, ptr, compare) == NULL);
 
 #endif
 }

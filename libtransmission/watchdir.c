@@ -6,7 +6,6 @@
  *
  */
 
-#include <assert.h>
 #include <string.h> /* strcmp() */
 
 #include <event2/event.h>
@@ -20,6 +19,7 @@
 #include "file.h"
 #include "log.h"
 #include "ptrarray.h"
+#include "tr-assert.h"
 #include "utils.h"
 #include "watchdir.h"
 #include "watchdir-common.h"
@@ -105,7 +105,7 @@ static tr_watchdir_status tr_watchdir_process_impl(tr_watchdir_t handle, char co
 
     tr_watchdir_status const ret = (*handle->callback)(handle, name, handle->callback_user_data);
 
-    assert(ret == TR_WATCHDIR_ACCEPT || ret == TR_WATCHDIR_IGNORE || ret == TR_WATCHDIR_RETRY);
+    TR_ASSERT(ret == TR_WATCHDIR_ACCEPT || ret == TR_WATCHDIR_IGNORE || ret == TR_WATCHDIR_RETRY);
 
     log_debug("Callback decided to %s file \"%s\"", watchdir_status_to_string(ret), name);
 
@@ -146,7 +146,7 @@ static void tr_watchdir_retry_free(tr_watchdir_retry* retry);
 
 static void tr_watchdir_on_retry_timer(evutil_socket_t fd UNUSED, short type UNUSED, void* context)
 {
-    assert(context != NULL);
+    TR_ASSERT(context != NULL);
 
     tr_watchdir_retry* const retry = context;
     tr_watchdir_t const handle = retry->handle;
@@ -208,7 +208,7 @@ static void tr_watchdir_retry_free(tr_watchdir_retry* retry)
 
 static void tr_watchdir_retry_restart(tr_watchdir_retry* retry)
 {
-    assert(retry != NULL);
+    TR_ASSERT(retry != NULL);
 
     evtimer_del(retry->timer);
 
@@ -276,7 +276,7 @@ tr_watchdir_t tr_watchdir_new(char const* path, tr_watchdir_cb callback, void* c
     }
     else
     {
-        assert(handle->backend->free_func != NULL);
+        TR_ASSERT(handle->backend->free_func != NULL);
     }
 
     return handle;
@@ -302,19 +302,19 @@ void tr_watchdir_free(tr_watchdir_t handle)
 
 char const* tr_watchdir_get_path(tr_watchdir_t handle)
 {
-    assert(handle != NULL);
+    TR_ASSERT(handle != NULL);
     return handle->path;
 }
 
 tr_watchdir_backend* tr_watchdir_get_backend(tr_watchdir_t handle)
 {
-    assert(handle != NULL);
+    TR_ASSERT(handle != NULL);
     return handle->backend;
 }
 
 struct event_base* tr_watchdir_get_event_base(tr_watchdir_t handle)
 {
-    assert(handle != NULL);
+    TR_ASSERT(handle != NULL);
     return handle->event_base;
 }
 
@@ -327,7 +327,7 @@ void tr_watchdir_process(tr_watchdir_t handle, char const* name)
     tr_watchdir_retry const search_key = { .name = (char*)name };
     tr_watchdir_retry* existing_retry;
 
-    assert(handle != NULL);
+    TR_ASSERT(handle != NULL);
 
     if ((existing_retry = tr_watchdir_retries_find(&handle->active_retries, &search_key)) != NULL)
     {

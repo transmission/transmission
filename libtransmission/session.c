@@ -6,7 +6,6 @@
  *
  */
 
-#include <assert.h>
 #include <errno.h> /* ENOENT */
 #include <limits.h> /* INT_MAX */
 #include <stdlib.h>
@@ -48,6 +47,7 @@
 #include "session-id.h"
 #include "stats.h"
 #include "torrent.h"
+#include "tr-assert.h"
 #include "tr-dht.h" /* tr_dhtUpkeep() */
 #include "tr-udp.h"
 #include "tr-utp.h"
@@ -111,15 +111,15 @@ void tr_peerIdInit(uint8_t* buf)
 
 tr_encryption_mode tr_sessionGetEncryption(tr_session* session)
 {
-    assert(session != NULL);
+    TR_ASSERT(session != NULL);
 
     return session->encryptionMode;
 }
 
 void tr_sessionSetEncryption(tr_session* session, tr_encryption_mode mode)
 {
-    assert(session != NULL);
-    assert(mode == TR_ENCRYPTION_PREFERRED || mode == TR_ENCRYPTION_REQUIRED || mode == TR_CLEAR_PREFERRED);
+    TR_ASSERT(session != NULL);
+    TR_ASSERT(mode == TR_ENCRYPTION_PREFERRED || mode == TR_ENCRYPTION_REQUIRED || mode == TR_CLEAR_PREFERRED);
 
     session->encryptionMode = mode;
 }
@@ -327,7 +327,7 @@ static char const* format_tos(int value)
 
 void tr_sessionGetDefaultSettings(tr_variant* d)
 {
-    assert(tr_variantIsDict(d));
+    TR_ASSERT(tr_variantIsDict(d));
 
     tr_variantDictReserve(d, 63);
     tr_variantDictAddBool(d, TR_KEY_blocklist_enabled, false);
@@ -397,7 +397,7 @@ void tr_sessionGetDefaultSettings(tr_variant* d)
 
 void tr_sessionGetSettings(tr_session* s, tr_variant* d)
 {
-    assert(tr_variantIsDict(d));
+    TR_ASSERT(tr_variantIsDict(d));
 
     tr_variantDictReserve(d, 63);
     tr_variantDictAddBool(d, TR_KEY_blocklist_enabled, tr_blocklistIsEnabled(s));
@@ -474,7 +474,7 @@ bool tr_sessionLoadSettings(tr_variant* dict, char const* configDir, char const*
     bool success;
     tr_error* error = NULL;
 
-    assert(tr_variantIsDict(dict));
+    TR_ASSERT(tr_variantIsDict(dict));
 
     /* initializing the defaults: caller may have passed in some app-level defaults.
      * preserve those and use the session defaults to fill in any missing gaps. */
@@ -515,7 +515,7 @@ void tr_sessionSaveSettings(tr_session* session, char const* configDir, tr_varia
     tr_variant settings;
     char* filename = tr_buildPath(configDir, "settings.json", NULL);
 
-    assert(tr_variantIsDict(clientSettings));
+    TR_ASSERT(tr_variantIsDict(clientSettings));
 
     tr_variantInitDict(&settings, 0);
 
@@ -600,7 +600,7 @@ tr_session* tr_sessionInit(char const* configDir, bool messageQueuingEnabled, tr
     tr_session* session;
     struct init_data data;
 
-    assert(tr_variantIsDict(clientSettings));
+    TR_ASSERT(tr_variantIsDict(clientSettings));
 
     tr_timeUpdate(time(NULL));
 
@@ -624,7 +624,7 @@ tr_session* tr_sessionInit(char const* configDir, bool messageQueuingEnabled, tr
     /* start the libtransmission thread */
     tr_net_init(); /* must go before tr_eventInit */
     tr_eventInit(session);
-    assert(session->events != NULL);
+    TR_ASSERT(session->events != NULL);
 
     /* run the rest in the libtransmission thread */
     data.done = false;
@@ -654,8 +654,8 @@ static void onNowTimer(evutil_socket_t foo UNUSED, short bar UNUSED, void* vsess
     tr_session* session = vsession;
     time_t const now = time(NULL);
 
-    assert(tr_isSession(session));
-    assert(session->nowTimer != NULL);
+    TR_ASSERT(tr_isSession(session));
+    TR_ASSERT(session->nowTimer != NULL);
 
     /**
     ***  tr_session things to do once per second
@@ -716,8 +716,8 @@ static void tr_sessionInitImpl(void* vdata)
     tr_variant* clientSettings = data->clientSettings;
     tr_session* session = data->session;
 
-    assert(tr_amInEventThread(session));
-    assert(tr_variantIsDict(clientSettings));
+    TR_ASSERT(tr_amInEventThread(session));
+    TR_ASSERT(tr_variantIsDict(clientSettings));
 
     dbgmsg("tr_sessionInit: the session's top-level bandwidth object is %p", (void*)&session->bandwidth);
 
@@ -725,7 +725,7 @@ static void tr_sessionInitImpl(void* vdata)
     tr_sessionGetDefaultSettings(&settings);
     tr_variantMergeDicts(&settings, clientSettings);
 
-    assert(session->event_base != NULL);
+    TR_ASSERT(session->event_base != NULL);
     session->nowTimer = evtimer_new(session->event_base, onNowTimer, session);
     onNowTimer(0, 0, session);
 
@@ -753,7 +753,7 @@ static void tr_sessionInitImpl(void* vdata)
         loadBlocklists(session);
     }
 
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     session->saveTimer = evtimer_new(session->event_base, onSaveTimer, session);
     tr_timerAdd(session->saveTimer, SAVE_INTERVAL_SECS, 0);
@@ -795,9 +795,9 @@ static void sessionSetImpl(void* vdata)
     tr_variant* settings = data->clientSettings;
     struct tr_turtle_info* turtle = &session->turtle;
 
-    assert(tr_isSession(session));
-    assert(tr_variantIsDict(settings));
-    assert(tr_amInEventThread(session));
+    TR_ASSERT(tr_isSession(session));
+    TR_ASSERT(tr_variantIsDict(settings));
+    TR_ASSERT(tr_amInEventThread(session));
 
     if (tr_variantDictFindInt(settings, TR_KEY_message_level, &i))
     {
@@ -1152,7 +1152,7 @@ void tr_sessionSetDownloadDir(tr_session* session, char const* dir)
 {
     struct tr_device_info* info = NULL;
 
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     if (dir != NULL)
     {
@@ -1167,7 +1167,7 @@ char const* tr_sessionGetDownloadDir(tr_session const* session)
 {
     char const* dir = NULL;
 
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     if (session != NULL && session->downloadDir != NULL)
     {
@@ -1199,14 +1199,14 @@ int64_t tr_sessionGetDirFreeSpace(tr_session* session, char const* dir)
 
 void tr_sessionSetIncompleteFileNamingEnabled(tr_session* session, bool b)
 {
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     session->isIncompleteFileNamingEnabled = b;
 }
 
 bool tr_sessionIsIncompleteFileNamingEnabled(tr_session const* session)
 {
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     return session->isIncompleteFileNamingEnabled;
 }
@@ -1217,7 +1217,7 @@ bool tr_sessionIsIncompleteFileNamingEnabled(tr_session const* session)
 
 void tr_sessionSetIncompleteDir(tr_session* session, char const* dir)
 {
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     if (session->incompleteDir != dir)
     {
@@ -1229,21 +1229,21 @@ void tr_sessionSetIncompleteDir(tr_session* session, char const* dir)
 
 char const* tr_sessionGetIncompleteDir(tr_session const* session)
 {
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     return session->incompleteDir;
 }
 
 void tr_sessionSetIncompleteDirEnabled(tr_session* session, bool b)
 {
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     session->isIncompleteDirEnabled = b;
 }
 
 bool tr_sessionIsIncompleteDirEnabled(tr_session const* session)
 {
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     return session->isIncompleteDirEnabled;
 }
@@ -1254,14 +1254,14 @@ bool tr_sessionIsIncompleteDirEnabled(tr_session const* session)
 
 void tr_sessionLock(tr_session* session)
 {
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     tr_lockLock(session->lock);
 }
 
 void tr_sessionUnlock(tr_session* session)
 {
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     tr_lockUnlock(session->lock);
 }
@@ -1279,7 +1279,7 @@ static void peerPortChanged(void* session)
 {
     tr_torrent* tor = NULL;
 
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     close_incoming_peer_port(session);
     open_incoming_peer_port(session);
@@ -1314,7 +1314,7 @@ tr_port tr_sessionGetPeerPort(tr_session const* session)
 
 tr_port tr_sessionSetPeerPortRandom(tr_session* session)
 {
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     tr_sessionSetPeerPort(session, getRandomPort(session));
     return session->private_peer_port;
@@ -1322,21 +1322,21 @@ tr_port tr_sessionSetPeerPortRandom(tr_session* session)
 
 void tr_sessionSetPeerPortRandomOnStart(tr_session* session, bool random)
 {
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     session->isPortRandom = random;
 }
 
 bool tr_sessionGetPeerPortRandomOnStart(tr_session* session)
 {
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     return session->isPortRandom;
 }
 
 tr_port_forwarding tr_sessionGetPortForwarding(tr_session const* session)
 {
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     return tr_sharedTraversalStatus(session->shared);
 }
@@ -1347,28 +1347,28 @@ tr_port_forwarding tr_sessionGetPortForwarding(tr_session const* session)
 
 void tr_sessionSetRatioLimited(tr_session* session, bool isLimited)
 {
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     session->isRatioLimited = isLimited;
 }
 
 void tr_sessionSetRatioLimit(tr_session* session, double desiredRatio)
 {
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     session->desiredRatio = desiredRatio;
 }
 
 bool tr_sessionIsRatioLimited(tr_session const* session)
 {
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     return session->isRatioLimited;
 }
 
 double tr_sessionGetRatioLimit(tr_session const* session)
 {
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     return session->desiredRatio;
 }
@@ -1379,28 +1379,28 @@ double tr_sessionGetRatioLimit(tr_session const* session)
 
 void tr_sessionSetIdleLimited(tr_session* session, bool isLimited)
 {
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     session->isIdleLimited = isLimited;
 }
 
 void tr_sessionSetIdleLimit(tr_session* session, uint16_t idleMinutes)
 {
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     session->idleLimitMinutes = idleMinutes;
 }
 
 bool tr_sessionIsIdleLimited(tr_session const* session)
 {
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     return session->isIdleLimited;
 }
 
 uint16_t tr_sessionGetIdleLimit(tr_session const* session)
 {
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     return session->idleLimitMinutes;
 }
@@ -1493,7 +1493,7 @@ static void altSpeedToggled(void* vsession)
     tr_session* session = vsession;
     struct tr_turtle_info* t = &session->turtle;
 
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     updateBandwidth(session, TR_UP);
     updateBandwidth(session, TR_DOWN);
@@ -1506,8 +1506,8 @@ static void altSpeedToggled(void* vsession)
 
 static void useAltSpeed(tr_session* s, struct tr_turtle_info* t, bool enabled, bool byUser)
 {
-    assert(tr_isSession(s));
-    assert(t != NULL);
+    TR_ASSERT(tr_isSession(s));
+    TR_ASSERT(t != NULL);
 
     if (t->isEnabled != enabled)
     {
@@ -1549,7 +1549,7 @@ static void turtleCheckClock(tr_session* s, struct tr_turtle_info* t)
     bool alreadySwitched;
     tr_auto_switch_state_t newAutoTurtleState;
 
-    assert(t->isClockEnabled);
+    TR_ASSERT(t->isClockEnabled);
 
     enabled = getInTurtleTime(t);
     newAutoTurtleState = autoSwitchState(enabled);
@@ -1590,8 +1590,8 @@ static void turtleBootstrap(tr_session* session, struct tr_turtle_info* turtle)
 
 void tr_sessionSetSpeedLimit_Bps(tr_session* s, tr_direction d, unsigned int Bps)
 {
-    assert(tr_isSession(s));
-    assert(tr_isDirection(d));
+    TR_ASSERT(tr_isSession(s));
+    TR_ASSERT(tr_isDirection(d));
 
     s->speedLimit_Bps[d] = Bps;
 
@@ -1605,8 +1605,8 @@ void tr_sessionSetSpeedLimit_KBps(tr_session* s, tr_direction d, unsigned int KB
 
 unsigned int tr_sessionGetSpeedLimit_Bps(tr_session const* s, tr_direction d)
 {
-    assert(tr_isSession(s));
-    assert(tr_isDirection(d));
+    TR_ASSERT(tr_isSession(s));
+    TR_ASSERT(tr_isDirection(d));
 
     return s->speedLimit_Bps[d];
 }
@@ -1618,8 +1618,8 @@ unsigned int tr_sessionGetSpeedLimit_KBps(tr_session const* s, tr_direction d)
 
 void tr_sessionLimitSpeed(tr_session* s, tr_direction d, bool b)
 {
-    assert(tr_isSession(s));
-    assert(tr_isDirection(d));
+    TR_ASSERT(tr_isSession(s));
+    TR_ASSERT(tr_isDirection(d));
 
     s->speedLimitEnabled[d] = b;
 
@@ -1628,8 +1628,8 @@ void tr_sessionLimitSpeed(tr_session* s, tr_direction d, bool b)
 
 bool tr_sessionIsSpeedLimited(tr_session const* s, tr_direction d)
 {
-    assert(tr_isSession(s));
-    assert(tr_isDirection(d));
+    TR_ASSERT(tr_isSession(s));
+    TR_ASSERT(tr_isDirection(d));
 
     return s->speedLimitEnabled[d];
 }
@@ -1640,8 +1640,8 @@ bool tr_sessionIsSpeedLimited(tr_session const* s, tr_direction d)
 
 void tr_sessionSetAltSpeed_Bps(tr_session* s, tr_direction d, unsigned int Bps)
 {
-    assert(tr_isSession(s));
-    assert(tr_isDirection(d));
+    TR_ASSERT(tr_isSession(s));
+    TR_ASSERT(tr_isDirection(d));
 
     s->turtle.speedLimit_Bps[d] = Bps;
 
@@ -1655,8 +1655,8 @@ void tr_sessionSetAltSpeed_KBps(tr_session* s, tr_direction d, unsigned int KBps
 
 unsigned int tr_sessionGetAltSpeed_Bps(tr_session const* s, tr_direction d)
 {
-    assert(tr_isSession(s));
-    assert(tr_isDirection(d));
+    TR_ASSERT(tr_isSession(s));
+    TR_ASSERT(tr_isDirection(d));
 
     return s->turtle.speedLimit_Bps[d];
 }
@@ -1686,7 +1686,7 @@ void tr_sessionUseAltSpeedTime(tr_session* s, bool b)
 {
     struct tr_turtle_info* t = &s->turtle;
 
-    assert(tr_isSession(s));
+    TR_ASSERT(tr_isSession(s));
 
     if (t->isClockEnabled != b)
     {
@@ -1697,15 +1697,16 @@ void tr_sessionUseAltSpeedTime(tr_session* s, bool b)
 
 bool tr_sessionUsesAltSpeedTime(tr_session const* s)
 {
-    assert(tr_isSession(s));
+    TR_ASSERT(tr_isSession(s));
 
     return s->turtle.isClockEnabled;
 }
 
 void tr_sessionSetAltSpeedBegin(tr_session* s, int minute)
 {
-    assert(tr_isSession(s));
-    assert(0 <= minute && minute < 60 * 24);
+    TR_ASSERT(tr_isSession(s));
+    TR_ASSERT(minute >= 0);
+    TR_ASSERT(minute < 60 * 24);
 
     if (s->turtle.beginMinute != minute)
     {
@@ -1716,15 +1717,16 @@ void tr_sessionSetAltSpeedBegin(tr_session* s, int minute)
 
 int tr_sessionGetAltSpeedBegin(tr_session const* s)
 {
-    assert(tr_isSession(s));
+    TR_ASSERT(tr_isSession(s));
 
     return s->turtle.beginMinute;
 }
 
 void tr_sessionSetAltSpeedEnd(tr_session* s, int minute)
 {
-    assert(tr_isSession(s));
-    assert(0 <= minute && minute < 60 * 24);
+    TR_ASSERT(tr_isSession(s));
+    TR_ASSERT(minute >= 0);
+    TR_ASSERT(minute < 60 * 24);
 
     if (s->turtle.endMinute != minute)
     {
@@ -1735,14 +1737,14 @@ void tr_sessionSetAltSpeedEnd(tr_session* s, int minute)
 
 int tr_sessionGetAltSpeedEnd(tr_session const* s)
 {
-    assert(tr_isSession(s));
+    TR_ASSERT(tr_isSession(s));
 
     return s->turtle.endMinute;
 }
 
 void tr_sessionSetAltSpeedDay(tr_session* s, tr_sched_day days)
 {
-    assert(tr_isSession(s));
+    TR_ASSERT(tr_isSession(s));
 
     if (s->turtle.days != days)
     {
@@ -1753,7 +1755,7 @@ void tr_sessionSetAltSpeedDay(tr_session* s, tr_sched_day days)
 
 tr_sched_day tr_sessionGetAltSpeedDay(tr_session const* s)
 {
-    assert(tr_isSession(s));
+    TR_ASSERT(tr_isSession(s));
 
     return s->turtle.days;
 }
@@ -1765,14 +1767,14 @@ void tr_sessionUseAltSpeed(tr_session* session, bool enabled)
 
 bool tr_sessionUsesAltSpeed(tr_session const* s)
 {
-    assert(tr_isSession(s));
+    TR_ASSERT(tr_isSession(s));
 
     return s->turtle.isEnabled;
 }
 
 void tr_sessionSetAltSpeedFunc(tr_session* session, tr_altSpeedFunc func, void* userData)
 {
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     session->turtle.callback = func;
     session->turtle.callbackUserData = userData;
@@ -1789,28 +1791,28 @@ void tr_sessionClearAltSpeedFunc(tr_session* session)
 
 void tr_sessionSetPeerLimit(tr_session* session, uint16_t n)
 {
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     session->peerLimit = n;
 }
 
 uint16_t tr_sessionGetPeerLimit(tr_session const* session)
 {
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     return session->peerLimit;
 }
 
 void tr_sessionSetPeerLimitPerTorrent(tr_session* session, uint16_t n)
 {
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     session->peerLimitPerTorrent = n;
 }
 
 uint16_t tr_sessionGetPeerLimitPerTorrent(tr_session const* session)
 {
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     return session->peerLimitPerTorrent;
 }
@@ -1821,28 +1823,28 @@ uint16_t tr_sessionGetPeerLimitPerTorrent(tr_session const* session)
 
 void tr_sessionSetPaused(tr_session* session, bool isPaused)
 {
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     session->pauseAddedTorrent = isPaused;
 }
 
 bool tr_sessionGetPaused(tr_session const* session)
 {
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     return session->pauseAddedTorrent;
 }
 
 void tr_sessionSetDeleteSource(tr_session* session, bool deleteSource)
 {
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     session->deleteSourceTorrent = deleteSource;
 }
 
 bool tr_sessionGetDeleteSource(tr_session const* session)
 {
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     return session->deleteSourceTorrent;
 }
@@ -1877,8 +1879,8 @@ tr_torrent** tr_sessionGetTorrents(tr_session* session, int* setme_n)
     tr_torrent** torrents;
     tr_torrent* tor;
 
-    assert(tr_isSession(session));
-    assert(setme_n != NULL);
+    TR_ASSERT(tr_isSession(session));
+    TR_ASSERT(setme_n != NULL);
 
     n = tr_sessionCountTorrents(session);
     *setme_n = n;
@@ -1966,7 +1968,7 @@ static void sessionCloseImplStart(tr_session* session)
     session->cache = NULL;
 
     /* saveTimer is not used at this point, reusing for UDP shutdown wait */
-    assert(session->saveTimer == NULL);
+    TR_ASSERT(session->saveTimer == NULL);
     session->saveTimer = evtimer_new(session->event_base, sessionCloseImplWaitForIdleUdp, session);
     tr_timerAdd(session->saveTimer, 0, 0);
 }
@@ -1977,7 +1979,7 @@ static void sessionCloseImplWaitForIdleUdp(evutil_socket_t foo UNUSED, short bar
 {
     tr_session* session = vsession;
 
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     /* gotta keep udp running long enough to send out all
        the &event=stopped UDP tracker messages */
@@ -2016,7 +2018,7 @@ static void sessionCloseImpl(void* vsession)
 {
     tr_session* session = vsession;
 
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     sessionCloseImplStart(session);
 }
@@ -2032,7 +2034,7 @@ void tr_sessionClose(tr_session* session)
 {
     time_t const deadline = time(NULL) + SHUTDOWN_MAX_SECONDS;
 
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     dbgmsg("shutting down transmission session %p... now is %zu, deadline is %zu", (void*)session, (size_t)time(NULL),
         (size_t)deadline);
@@ -2126,7 +2128,7 @@ static void sessionLoadTorrents(void* vdata)
     struct sessionLoadTorrentsData* data = vdata;
     char const* dirname = tr_getTorrentDir(data->session);
 
-    assert(tr_isSession(data->session));
+    TR_ASSERT(tr_isSession(data->session));
 
     tr_ctorSetSave(data->ctor, false); /* since we already have them */
 
@@ -2164,7 +2166,7 @@ static void sessionLoadTorrents(void* vdata)
         data->torrents[i++] = (tr_torrent*)l->data;
     }
 
-    assert(i == n);
+    TR_ASSERT(i == n);
 
     tr_list_free(&list, NULL);
 
@@ -2207,14 +2209,14 @@ tr_torrent** tr_sessionLoadTorrents(tr_session* session, tr_ctor* ctor, int* set
 
 void tr_sessionSetPexEnabled(tr_session* session, bool enabled)
 {
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     session->isPexEnabled = enabled;
 }
 
 bool tr_sessionIsPexEnabled(tr_session const* session)
 {
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     return session->isPexEnabled;
 }
@@ -2226,7 +2228,7 @@ bool tr_sessionAllowsDHT(tr_session const* session)
 
 bool tr_sessionIsDHTEnabled(tr_session const* session)
 {
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     return session->isDHTEnabled;
 }
@@ -2234,7 +2236,7 @@ bool tr_sessionIsDHTEnabled(tr_session const* session)
 static void toggleDHTImpl(void* data)
 {
     tr_session* session = data;
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     tr_udpUninit(session);
     session->isDHTEnabled = !session->isDHTEnabled;
@@ -2243,7 +2245,7 @@ static void toggleDHTImpl(void* data)
 
 void tr_sessionSetDHTEnabled(tr_session* session, bool enabled)
 {
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     if (enabled != session->isDHTEnabled)
     {
@@ -2257,7 +2259,7 @@ void tr_sessionSetDHTEnabled(tr_session* session, bool enabled)
 
 bool tr_sessionIsUTPEnabled(tr_session const* session)
 {
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
 #ifdef WITH_UTP
     return session->isUTPEnabled;
@@ -2270,7 +2272,7 @@ static void toggle_utp(void* data)
 {
     tr_session* session = data;
 
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     session->isUTPEnabled = !session->isUTPEnabled;
 
@@ -2282,7 +2284,7 @@ static void toggle_utp(void* data)
 
 void tr_sessionSetUTPEnabled(tr_session* session, bool enabled)
 {
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     if (enabled != session->isUTPEnabled)
     {
@@ -2297,7 +2299,7 @@ void tr_sessionSetUTPEnabled(tr_session* session, bool enabled)
 static void toggleLPDImpl(void* data)
 {
     tr_session* session = data;
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     if (session->isLPDEnabled)
     {
@@ -2314,7 +2316,7 @@ static void toggleLPDImpl(void* data)
 
 void tr_sessionSetLPDEnabled(tr_session* session, bool enabled)
 {
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     if (enabled != session->isLPDEnabled)
     {
@@ -2324,7 +2326,7 @@ void tr_sessionSetLPDEnabled(tr_session* session, bool enabled)
 
 bool tr_sessionIsLPDEnabled(tr_session const* session)
 {
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     return session->isLPDEnabled;
 }
@@ -2340,14 +2342,14 @@ bool tr_sessionAllowsLPD(tr_session const* session)
 
 void tr_sessionSetCacheLimit_MB(tr_session* session, int max_bytes)
 {
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     tr_cacheSetLimit(session->cache, toMemBytes(max_bytes));
 }
 
 int tr_sessionGetCacheLimit_MB(tr_session const* session)
 {
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     return toMemMB(tr_cacheGetLimit(session->cache));
 }
@@ -2380,7 +2382,7 @@ void tr_sessionSetPortForwardingEnabled(tr_session* session, bool enabled)
 
 bool tr_sessionIsPortForwardingEnabled(tr_session const* session)
 {
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     return tr_sharedTraversalIsEnabled(session->shared);
 }
@@ -2530,7 +2532,7 @@ int tr_blocklistGetRuleCount(tr_session const* session)
 {
     int n = 0;
 
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     for (tr_list* l = session->blocklists; l != NULL; l = l->next)
     {
@@ -2542,14 +2544,14 @@ int tr_blocklistGetRuleCount(tr_session const* session)
 
 bool tr_blocklistIsEnabled(tr_session const* session)
 {
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     return session->isBlocklistEnabled;
 }
 
 void tr_blocklistSetEnabled(tr_session* session, bool isEnabled)
 {
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     session->isBlocklistEnabled = isEnabled;
 
@@ -2561,7 +2563,7 @@ void tr_blocklistSetEnabled(tr_session* session, bool isEnabled)
 
 bool tr_blocklistExists(tr_session const* session)
 {
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     return session->blocklists != NULL;
 }
@@ -2596,7 +2598,7 @@ int tr_blocklistSetContent(tr_session* session, char const* contentFilename)
 
 bool tr_sessionIsAddressBlocked(tr_session const* session, tr_address const* addr)
 {
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     for (tr_list* l = session->blocklists; l != NULL; l = l->next)
     {
@@ -2636,7 +2638,7 @@ static void metainfoLookupInit(tr_session* session)
     tr_variant* lookup;
     int n = 0;
 
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     /* walk through the directory and find the mappings */
     lookup = tr_new0(tr_variant, 1);
@@ -2708,49 +2710,49 @@ void tr_sessionSetTorrentFile(tr_session* session, char const* hashString, char 
 
 void tr_sessionSetRPCEnabled(tr_session* session, bool isEnabled)
 {
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     tr_rpcSetEnabled(session->rpcServer, isEnabled);
 }
 
 bool tr_sessionIsRPCEnabled(tr_session const* session)
 {
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     return tr_rpcIsEnabled(session->rpcServer);
 }
 
 void tr_sessionSetRPCPort(tr_session* session, tr_port port)
 {
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     tr_rpcSetPort(session->rpcServer, port);
 }
 
 tr_port tr_sessionGetRPCPort(tr_session const* session)
 {
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     return tr_rpcGetPort(session->rpcServer);
 }
 
 void tr_sessionSetRPCUrl(tr_session* session, char const* url)
 {
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     tr_rpcSetUrl(session->rpcServer, url);
 }
 
 char const* tr_sessionGetRPCUrl(tr_session const* session)
 {
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     return tr_rpcGetUrl(session->rpcServer);
 }
 
 void tr_sessionSetRPCCallback(tr_session* session, tr_rpc_func func, void* user_data)
 {
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     session->rpc_func = func;
     session->rpc_func_user_data = user_data;
@@ -2758,77 +2760,77 @@ void tr_sessionSetRPCCallback(tr_session* session, tr_rpc_func func, void* user_
 
 void tr_sessionSetRPCWhitelist(tr_session* session, char const* whitelist)
 {
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     tr_rpcSetWhitelist(session->rpcServer, whitelist);
 }
 
 char const* tr_sessionGetRPCWhitelist(tr_session const* session)
 {
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     return tr_rpcGetWhitelist(session->rpcServer);
 }
 
 void tr_sessionSetRPCWhitelistEnabled(tr_session* session, bool isEnabled)
 {
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     tr_rpcSetWhitelistEnabled(session->rpcServer, isEnabled);
 }
 
 bool tr_sessionGetRPCWhitelistEnabled(tr_session const* session)
 {
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     return tr_rpcGetWhitelistEnabled(session->rpcServer);
 }
 
 void tr_sessionSetRPCPassword(tr_session* session, char const* password)
 {
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     tr_rpcSetPassword(session->rpcServer, password);
 }
 
 char const* tr_sessionGetRPCPassword(tr_session const* session)
 {
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     return tr_rpcGetPassword(session->rpcServer);
 }
 
 void tr_sessionSetRPCUsername(tr_session* session, char const* username)
 {
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     tr_rpcSetUsername(session->rpcServer, username);
 }
 
 char const* tr_sessionGetRPCUsername(tr_session const* session)
 {
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     return tr_rpcGetUsername(session->rpcServer);
 }
 
 void tr_sessionSetRPCPasswordEnabled(tr_session* session, bool isEnabled)
 {
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     tr_rpcSetPasswordEnabled(session->rpcServer, isEnabled);
 }
 
 bool tr_sessionIsRPCPasswordEnabled(tr_session const* session)
 {
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     return tr_rpcIsPasswordEnabled(session->rpcServer);
 }
 
 char const* tr_sessionGetRPCBindAddress(tr_session const* session)
 {
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     return tr_rpcGetBindAddress(session->rpcServer);
 }
@@ -2839,28 +2841,28 @@ char const* tr_sessionGetRPCBindAddress(tr_session const* session)
 
 bool tr_sessionIsTorrentDoneScriptEnabled(tr_session const* session)
 {
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     return session->isTorrentDoneScriptEnabled;
 }
 
 void tr_sessionSetTorrentDoneScriptEnabled(tr_session* session, bool isEnabled)
 {
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     session->isTorrentDoneScriptEnabled = isEnabled;
 }
 
 char const* tr_sessionGetTorrentDoneScript(tr_session const* session)
 {
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     return session->torrentDoneScript;
 }
 
 void tr_sessionSetTorrentDoneScript(tr_session* session, char const* scriptFilename)
 {
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     if (session->torrentDoneScript != scriptFilename)
     {
@@ -2875,61 +2877,61 @@ void tr_sessionSetTorrentDoneScript(tr_session* session, char const* scriptFilen
 
 void tr_sessionSetQueueSize(tr_session* session, tr_direction dir, int n)
 {
-    assert(tr_isSession(session));
-    assert(tr_isDirection(dir));
+    TR_ASSERT(tr_isSession(session));
+    TR_ASSERT(tr_isDirection(dir));
 
     session->queueSize[dir] = n;
 }
 
 int tr_sessionGetQueueSize(tr_session const* session, tr_direction dir)
 {
-    assert(tr_isSession(session));
-    assert(tr_isDirection(dir));
+    TR_ASSERT(tr_isSession(session));
+    TR_ASSERT(tr_isDirection(dir));
 
     return session->queueSize[dir];
 }
 
 void tr_sessionSetQueueEnabled(tr_session* session, tr_direction dir, bool is_enabled)
 {
-    assert(tr_isSession(session));
-    assert(tr_isDirection(dir));
+    TR_ASSERT(tr_isSession(session));
+    TR_ASSERT(tr_isDirection(dir));
 
     session->queueEnabled[dir] = is_enabled;
 }
 
 bool tr_sessionGetQueueEnabled(tr_session const* session, tr_direction dir)
 {
-    assert(tr_isSession(session));
-    assert(tr_isDirection(dir));
+    TR_ASSERT(tr_isSession(session));
+    TR_ASSERT(tr_isDirection(dir));
 
     return session->queueEnabled[dir];
 }
 
 void tr_sessionSetQueueStalledMinutes(tr_session* session, int minutes)
 {
-    assert(tr_isSession(session));
-    assert(minutes > 0);
+    TR_ASSERT(tr_isSession(session));
+    TR_ASSERT(minutes > 0);
 
     session->queueStalledMinutes = minutes;
 }
 
 void tr_sessionSetQueueStalledEnabled(tr_session* session, bool is_enabled)
 {
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     session->stalledEnabled = is_enabled;
 }
 
 bool tr_sessionGetQueueStalledEnabled(tr_session const* session)
 {
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     return session->stalledEnabled;
 }
 
 int tr_sessionGetQueueStalledMinutes(tr_session const* session)
 {
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     return session->queueStalledMinutes;
 }
@@ -2969,8 +2971,8 @@ void tr_sessionGetNextQueuedTorrents(tr_session* session, tr_direction direction
     struct TorrentAndPosition* candidates;
     size_t num_candidates;
 
-    assert(tr_isSession(session));
-    assert(tr_isDirection(direction));
+    TR_ASSERT(tr_isSession(session));
+    TR_ASSERT(tr_isDirection(direction));
 
     /* build an array of the candidates */
     n = tr_sessionCountTorrents(session);

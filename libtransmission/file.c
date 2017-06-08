@@ -6,12 +6,12 @@
  *
  */
 
-#include <assert.h>
 #include <string.h> /* strlen() */
 
 #include "transmission.h"
 #include "error.h"
 #include "file.h"
+#include "tr-assert.h"
 #include "utils.h"
 
 bool tr_sys_file_read_line(tr_sys_file_t handle, char* buffer, size_t buffer_size, tr_error** error)
@@ -20,9 +20,9 @@ bool tr_sys_file_read_line(tr_sys_file_t handle, char* buffer, size_t buffer_siz
     size_t offset = 0;
     uint64_t bytes_read;
 
-    assert(handle != TR_BAD_SYS_FILE);
-    assert(buffer != NULL);
-    assert(buffer_size > 0);
+    TR_ASSERT(handle != TR_BAD_SYS_FILE);
+    TR_ASSERT(buffer != NULL);
+    TR_ASSERT(buffer_size > 0);
 
     while (buffer_size > 0)
     {
@@ -77,8 +77,8 @@ bool tr_sys_file_write_line(tr_sys_file_t handle, char const* buffer, tr_error**
 {
     bool ret;
 
-    assert(handle != TR_BAD_SYS_FILE);
-    assert(buffer != NULL);
+    TR_ASSERT(handle != TR_BAD_SYS_FILE);
+    TR_ASSERT(buffer != NULL);
 
     ret = tr_sys_file_write(handle, buffer, strlen(buffer), NULL, error);
 
@@ -96,8 +96,8 @@ bool tr_sys_file_write_fmt(tr_sys_file_t handle, char const* format, tr_error** 
     char* buffer;
     va_list args;
 
-    assert(handle != TR_BAD_SYS_FILE);
-    assert(format != NULL);
+    TR_ASSERT(handle != TR_BAD_SYS_FILE);
+    TR_ASSERT(format != NULL);
 
     va_start(args, error);
     buffer = tr_strdup_vprintf(format, args);

@@ -6,7 +6,6 @@
  *
  */
 
-#include <assert.h>
 #include <ctype.h> /* isdigit */
 #include <errno.h>
 #include <stdlib.h> /* strtol */
@@ -28,6 +27,7 @@
 #include "session.h"
 #include "session-id.h"
 #include "torrent.h"
+#include "tr-assert.h"
 #include "utils.h"
 #include "variant.h"
 #include "version.h"
@@ -251,7 +251,7 @@ static char const* torrentStart(tr_session* session, tr_variant* args_in, tr_var
     int torrentCount;
     tr_torrent** torrents;
 
-    assert(idle_data == NULL);
+    TR_ASSERT(idle_data == NULL);
 
     torrents = getTorrents(session, args_in, &torrentCount);
     qsort(torrents, torrentCount, sizeof(tr_torrent*), compareTorrentByQueuePosition);
@@ -277,7 +277,7 @@ static char const* torrentStartNow(tr_session* session, tr_variant* args_in, tr_
     int torrentCount;
     tr_torrent** torrents;
 
-    assert(idle_data == NULL);
+    TR_ASSERT(idle_data == NULL);
 
     torrents = getTorrents(session, args_in, &torrentCount);
     qsort(torrents, torrentCount, sizeof(tr_torrent*), compareTorrentByQueuePosition);
@@ -303,7 +303,7 @@ static char const* torrentStop(tr_session* session, tr_variant* args_in, tr_vari
     int torrentCount;
     tr_torrent** torrents;
 
-    assert(idle_data == NULL);
+    TR_ASSERT(idle_data == NULL);
 
     torrents = getTorrents(session, args_in, &torrentCount);
 
@@ -330,7 +330,7 @@ static char const* torrentRemove(tr_session* session, tr_variant* args_in, tr_va
     bool deleteFlag;
     tr_torrent** torrents;
 
-    assert(idle_data == NULL);
+    TR_ASSERT(idle_data == NULL);
 
     if (!tr_variantDictFindBool(args_in, TR_KEY_delete_local_data, &deleteFlag))
     {
@@ -362,7 +362,7 @@ static char const* torrentReannounce(tr_session* session, tr_variant* args_in, t
     int torrentCount;
     tr_torrent** torrents;
 
-    assert(idle_data == NULL);
+    TR_ASSERT(idle_data == NULL);
 
     torrents = getTorrents(session, args_in, &torrentCount);
 
@@ -387,7 +387,7 @@ static char const* torrentVerify(tr_session* session, tr_variant* args_in, tr_va
     int torrentCount;
     tr_torrent** torrents;
 
-    assert(idle_data == NULL);
+    TR_ASSERT(idle_data == NULL);
 
     torrents = getTorrents(session, args_in, &torrentCount);
 
@@ -894,7 +894,7 @@ static char const* torrentGet(tr_session* session, tr_variant* args_in, tr_varia
     char const* strVal;
     char const* errmsg = NULL;
 
-    assert(idle_data == NULL);
+    TR_ASSERT(idle_data == NULL);
 
     if (tr_variantDictFindStr(args_in, TR_KEY_ids, &strVal, NULL) && strcmp(strVal, "recently-active") == 0)
     {
@@ -1228,7 +1228,7 @@ static char const* torrentSet(tr_session* session, tr_variant* args_in, tr_varia
     tr_torrent** torrents;
     char const* errmsg = NULL;
 
-    assert(idle_data == NULL);
+    TR_ASSERT(idle_data == NULL);
 
     torrents = getTorrents(session, args_in, &torrentCount);
 
@@ -1358,7 +1358,7 @@ static char const* torrentSetLocation(tr_session* session, tr_variant* args_in, 
 {
     char const* location = NULL;
 
-    assert(idle_data == NULL);
+    TR_ASSERT(idle_data == NULL);
 
     if (!tr_variantDictFindStr(args_in, TR_KEY_location, &location, NULL))
     {
@@ -1714,7 +1714,7 @@ static char const* torrentAdd(tr_session* session, tr_variant* args_in, tr_varia
     char const* filename = NULL;
     char const* metainfo_base64 = NULL;
 
-    assert(idle_data != NULL);
+    TR_ASSERT(idle_data != NULL);
 
     tr_variantDictFindStr(args_in, TR_KEY_filename, &filename, NULL);
     tr_variantDictFindStr(args_in, TR_KEY_metainfo, &metainfo_base64, NULL);
@@ -1848,7 +1848,7 @@ static char const* torrentAdd(tr_session* session, tr_variant* args_in, tr_varia
 static char const* sessionSet(tr_session* session, tr_variant* args_in, tr_variant* args_out UNUSED,
     struct tr_rpc_idle_data* idle_data UNUSED)
 {
-    assert(idle_data == NULL);
+    TR_ASSERT(idle_data == NULL);
 
     char const* download_dir = NULL;
     char const* incomplete_dir = NULL;
@@ -2110,7 +2110,7 @@ static char const* sessionStats(tr_session* session, tr_variant* args_in UNUSED,
     tr_session_stats cumulativeStats = { 0.0f, 0, 0, 0, 0, 0 };
     tr_torrent* tor = NULL;
 
-    assert(idle_data == NULL);
+    TR_ASSERT(idle_data == NULL);
 
     while ((tor = tr_torrentNext(session, tor)) != NULL)
     {
@@ -2378,7 +2378,7 @@ static char const* sessionGet(tr_session* s, tr_variant* args_in, tr_variant* ar
 {
     tr_variant* fields;
 
-    assert(idle_data == NULL);
+    TR_ASSERT(idle_data == NULL);
 
     if (tr_variantDictFindList(args_in, TR_KEY_fields, &fields))
     {

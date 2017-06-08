@@ -176,8 +176,8 @@ static inline bool tr_peerIoSupportsUTP(tr_peerIo const* io)
 
 static inline tr_session* tr_peerIoGetSession(tr_peerIo* io)
 {
-    assert(tr_isPeerIo(io));
-    assert(io->session != NULL);
+    TR_ASSERT(tr_isPeerIo(io));
+    TR_ASSERT(io->session != NULL);
 
     return io->session;
 }
@@ -214,8 +214,8 @@ void tr_peerIoSetPeersId(tr_peerIo* io, uint8_t const* peer_id);
 
 static inline uint8_t const* tr_peerIoGetPeersId(tr_peerIo const* io)
 {
-    assert(tr_isPeerIo(io));
-    assert(io->peerIdIsSet);
+    TR_ASSERT(tr_isPeerIo(io));
+    TR_ASSERT(io->peerIdIsSet);
 
     return io->peerId;
 }
@@ -295,7 +295,7 @@ size_t tr_peerIoGetWriteBufferSpace(tr_peerIo const* io, uint64_t now);
 
 static inline void tr_peerIoSetParent(tr_peerIo* io, struct tr_bandwidth* parent)
 {
-    assert(tr_isPeerIo(io));
+    TR_ASSERT(tr_isPeerIo(io));
 
     tr_bandwidthSetParent(&io->bandwidth, parent);
 }

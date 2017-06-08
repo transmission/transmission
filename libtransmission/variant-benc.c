@@ -6,7 +6,6 @@
  *
  */
 
-#include <assert.h>
 #include <ctype.h> /* isdigit() */
 #include <errno.h>
 #include <stdlib.h> /* strtoul() */

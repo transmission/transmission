@@ -6,13 +6,13 @@
  *
  */
 
-#include <assert.h>
 #include <string.h> /* strchr() */
 #include <stdio.h> /* sscanf() */
 
 #include "transmission.h"
 #include "crypto-utils.h" /* tr_hex_to_sha1() */
 #include "magnet.h"
+#include "tr-assert.h"
 #include "utils.h"
 #include "variant.h"
 #include "web.h"
@@ -46,7 +46,7 @@ static void base32_to_sha1(uint8_t* out, char const* in, size_t const inlen)
 
     memset(out, 0, 20);
 
-    assert(inlen == 32);
+    TR_ASSERT(inlen == 32);
 
     for (size_t i = 0, index = 0, offset = 0; i < inlen; ++i)
     {

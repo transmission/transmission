@@ -10,10 +10,9 @@
    implement missing (or duplicate) functionality without exposing internal
    details in header files. */
 
-#include <assert.h>
-
 #include "transmission.h"
 #include "crypto-utils.h"
+#include "tr-assert.h"
 #include "utils.h"
 
 /***
@@ -48,8 +47,8 @@ bool tr_dh_secret_derive(tr_dh_secret_t raw_handle, void const* prepend_data, si
 {
     struct tr_dh_secret* handle = raw_handle;
 
-    assert(handle != NULL);
-    assert(hash != NULL);
+    TR_ASSERT(handle != NULL);
+    TR_ASSERT(hash != NULL);
 
     return tr_sha1(hash, prepend_data == NULL ? "" : prepend_data, prepend_data == NULL ? 0 : (int)prepend_data_size,
         handle->key, (int)handle->key_length, append_data, append_data == NULL ? 0 : (int)append_data_size, NULL);

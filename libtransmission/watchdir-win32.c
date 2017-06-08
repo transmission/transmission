@@ -6,7 +6,6 @@
  *
  */
 
-#include <assert.h>
 #include <errno.h>
 #include <stddef.h> /* offsetof */
 #include <stdlib.h> /* realloc() */
@@ -24,6 +23,7 @@
 #include "transmission.h"
 #include "log.h"
 #include "net.h"
+#include "tr-assert.h"
 #include "utils.h"
 #include "watchdir.h"
 #include "watchdir-common.h"
@@ -92,7 +92,7 @@ static BOOL tr_get_overlapped_result_ex(HANDLE handle, LPOVERLAPPED overlapped, 
         return FALSE;
     }
 
-    assert(wait_result == WAIT_OBJECT_0);
+    TR_ASSERT(wait_result == WAIT_OBJECT_0);
 
     return GetOverlappedResult(handle, overlapped, bytes_transferred, FALSE);
 }
@@ -166,9 +166,9 @@ static void tr_watchdir_win32_on_event(struct bufferevent* event, void* context)
 
         size_t const nleft = ev->NextEntryOffset - nread;
 
-        assert(ev->FileNameLength % sizeof(WCHAR) == 0);
-        assert(ev->FileNameLength > 0);
-        assert(ev->FileNameLength <= nleft);
+        TR_ASSERT(ev->FileNameLength % sizeof(WCHAR) == 0);
+        TR_ASSERT(ev->FileNameLength > 0);
+        TR_ASSERT(ev->FileNameLength <= nleft);
 
         if (nleft > name_size)
         {
@@ -214,7 +214,7 @@ static void tr_watchdir_win32_free(tr_watchdir_backend* backend_base)
         return;
     }
 
-    assert(backend->base.free_func == &tr_watchdir_win32_free);
+    TR_ASSERT(backend->base.free_func == &tr_watchdir_win32_free);
 
     if (backend->fd != INVALID_HANDLE_VALUE)
     {

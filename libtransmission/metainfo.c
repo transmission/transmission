@@ -6,7 +6,6 @@
  *
  */
 
-#include <assert.h>
 #include <string.h> /* strlen() */
 
 #include <event2/buffer.h>
@@ -18,6 +17,7 @@
 #include "metainfo.h"
 #include "platform.h" /* tr_getTorrentDir() */
 #include "session.h"
+#include "tr-assert.h"
 #include "utils.h"
 #include "variant.h"
 
@@ -79,7 +79,7 @@ static bool getfile(char** setme, char const* root, tr_variant* path, struct evb
     *setme = NULL;
 
     /* root's already been checked by caller */
-    assert(!path_component_is_suspicious(root));
+    TR_ASSERT(!path_component_is_suspicious(root));
 
     if (tr_variantIsList(path))
     {
@@ -235,7 +235,7 @@ static char* tr_convertAnnounceToScrape(char const* announce)
         memcpy(walk, suffix, suffix_len);
         walk += suffix_len;
         *walk++ = '\0';
-        assert(walk - scrape == (int)alloc_len);
+        TR_ASSERT(walk - scrape == (int)alloc_len);
     }
     /* Some torrents with UDP annouce URLs don't have /announce. */
     else if (strncmp(announce, "udp:", 4) == 0)

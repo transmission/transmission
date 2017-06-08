@@ -21,7 +21,6 @@ THE SOFTWARE.
 
 */
 
-#include <assert.h>
 #include <string.h> /* memcmp(), memcpy(), memset() */
 #include <stdlib.h> /* malloc(), free() */
 
@@ -39,6 +38,7 @@ THE SOFTWARE.
 #include "log.h"
 #include "net.h"
 #include "session.h"
+#include "tr-assert.h"
 #include "tr-dht.h"
 #include "tr-utp.h"
 #include "tr-udp.h"
@@ -246,8 +246,8 @@ static void event_callback(evutil_socket_t s, short type UNUSED, void* sv)
     struct sockaddr_storage from;
     tr_session* ss = sv;
 
-    assert(tr_isSession(sv));
-    assert(type == EV_READ);
+    TR_ASSERT(tr_isSession(sv));
+    TR_ASSERT(type == EV_READ);
 
     fromlen = sizeof(from);
     rc = recvfrom(s, (void*)buf, 4096 - 1, 0, (struct sockaddr*)&from, &fromlen);
@@ -300,8 +300,8 @@ void tr_udpInit(tr_session* ss)
     struct sockaddr_in sin;
     int rc;
 
-    assert(ss->udp_socket == TR_BAD_SOCKET);
-    assert(ss->udp6_socket == TR_BAD_SOCKET);
+    TR_ASSERT(ss->udp_socket == TR_BAD_SOCKET);
+    TR_ASSERT(ss->udp6_socket == TR_BAD_SOCKET);
 
     ss->udp_port = tr_sessionGetPeerPort(ss);
 

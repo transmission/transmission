@@ -11,8 +11,6 @@
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
 
-#include <assert.h>
-
 #include <openssl/bn.h>
 #include <openssl/crypto.h>
 #include <openssl/dh.h>
@@ -24,6 +22,7 @@
 #include "transmission.h"
 #include "crypto-utils.h"
 #include "log.h"
+#include "tr-assert.h"
 #include "utils.h"
 
 #define TR_CRYPTO_DH_SECRET_FALLBACK
@@ -116,14 +115,14 @@ tr_sha1_ctx_t tr_sha1_init(void)
 
 bool tr_sha1_update(tr_sha1_ctx_t handle, void const* data, size_t data_length)
 {
-    assert(handle != NULL);
+    TR_ASSERT(handle != NULL);
 
     if (data_length == 0)
     {
         return true;
     }
 
-    assert(data != NULL);
+    TR_ASSERT(data != NULL);
 
     return check_result(EVP_DigestUpdate(handle, data, data_length));
 }
@@ -136,11 +135,11 @@ bool tr_sha1_final(tr_sha1_ctx_t handle, uint8_t* hash)
     {
         unsigned int hash_length;
 
-        assert(handle != NULL);
+        TR_ASSERT(handle != NULL);
 
         ret = check_result(EVP_DigestFinal_ex(handle, hash, &hash_length));
 
-        assert(!ret || hash_length == SHA_DIGEST_LENGTH);
+        TR_ASSERT(!ret || hash_length == SHA_DIGEST_LENGTH);
     }
 
     EVP_MD_CTX_destroy(handle);
@@ -206,8 +205,8 @@ void tr_rc4_free(tr_rc4_ctx_t handle)
 
 void tr_rc4_set_key(tr_rc4_ctx_t handle, uint8_t const* key, size_t key_length)
 {
-    assert(handle != NULL);
-    assert(key != NULL);
+    TR_ASSERT(handle != NULL);
+    TR_ASSERT(key != NULL);
 
     if (!check_result(EVP_CIPHER_CTX_set_key_length(handle, key_length)))
     {
@@ -221,15 +220,15 @@ void tr_rc4_process(tr_rc4_ctx_t handle, void const* input, void* output, size_t
 {
     int output_length;
 
-    assert(handle != NULL);
+    TR_ASSERT(handle != NULL);
 
     if (length == 0)
     {
         return;
     }
 
-    assert(input != NULL);
-    assert(output != NULL);
+    TR_ASSERT(input != NULL);
+    TR_ASSERT(output != NULL);
 
     check_result(EVP_CipherUpdate(handle, output, &output_length, input, length));
 }
@@ -304,8 +303,8 @@ tr_dh_ctx_t tr_dh_new(uint8_t const* prime_num, size_t prime_num_length, uint8_t
     BIGNUM* p;
     BIGNUM* g;
 
-    assert(prime_num != NULL);
-    assert(generator_num != NULL);
+    TR_ASSERT(prime_num != NULL);
+    TR_ASSERT(generator_num != NULL);
 
     p = BN_bin2bn(prime_num, prime_num_length, NULL);
     g = BN_bin2bn(generator_num, generator_num_length, NULL);
@@ -338,8 +337,8 @@ bool tr_dh_make_key(tr_dh_ctx_t raw_handle, size_t private_key_length, uint8_t* 
     int my_public_key_length;
     BIGNUM const* my_public_key;
 
-    assert(handle != NULL);
-    assert(public_key != NULL);
+    TR_ASSERT(handle != NULL);
+    TR_ASSERT(public_key != NULL);
 
     DH_set_length(handle, private_key_length * 8);
 
@@ -370,8 +369,8 @@ tr_dh_secret_t tr_dh_agree(tr_dh_ctx_t handle, uint8_t const* other_public_key, 
     int secret_key_length;
     BIGNUM* other_key;
 
-    assert(handle != NULL);
-    assert(other_public_key != NULL);
+    TR_ASSERT(handle != NULL);
+    TR_ASSERT(other_public_key != NULL);
 
     if (!check_pointer(other_key = BN_bin2bn(other_public_key, other_public_key_length, NULL)))
     {
@@ -403,7 +402,7 @@ tr_dh_secret_t tr_dh_agree(tr_dh_ctx_t handle, uint8_t const* other_public_key, 
 
 bool tr_rand_buffer(void* buffer, size_t length)
 {
-    assert(buffer != NULL);
+    TR_ASSERT(buffer != NULL);
 
     return check_result(RAND_bytes(buffer, (int)length));
 }

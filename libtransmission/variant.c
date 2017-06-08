@@ -15,7 +15,6 @@
 #define _GNU_SOURCE
 #endif
 
-#include <assert.h>
 #include <errno.h>
 #include <stdlib.h> /* strtod(), realloc(), qsort() */
 #include <string.h>
@@ -38,6 +37,7 @@
 #include "error.h"
 #include "file.h"
 #include "log.h"
+#include "tr-assert.h"
 #include "utils.h" /* tr_new(), tr_free() */
 #include "variant.h"
 #include "variant-common.h"
@@ -219,7 +219,7 @@ static void tr_variant_string_set_string(struct tr_variant_string* str, char con
 
 static inline char const* getStr(tr_variant const* v)
 {
-    assert(tr_variantIsString(v));
+    TR_ASSERT(tr_variantIsString(v));
 
     return tr_variant_string_get_string(&v->val.s);
 }
@@ -489,7 +489,7 @@ static void containerReserve(tr_variant* v, size_t count)
 {
     size_t const needed = v->val.l.count + count;
 
-    assert(tr_variantIsContainer(v));
+    TR_ASSERT(tr_variantIsContainer(v));
 
     if (needed > v->val.l.alloc)
     {
@@ -508,7 +508,7 @@ static void containerReserve(tr_variant* v, size_t count)
 
 void tr_variantListReserve(tr_variant* list, size_t count)
 {
-    assert(tr_variantIsList(list));
+    TR_ASSERT(tr_variantIsList(list));
     containerReserve(list, count);
 }
 
@@ -520,7 +520,7 @@ void tr_variantInitDict(tr_variant* v, size_t reserve_count)
 
 void tr_variantDictReserve(tr_variant* dict, size_t reserve_count)
 {
-    assert(tr_variantIsDict(dict));
+    TR_ASSERT(tr_variantIsDict(dict));
     containerReserve(dict, reserve_count);
 }
 
@@ -528,7 +528,7 @@ tr_variant* tr_variantListAdd(tr_variant* list)
 {
     tr_variant* child;
 
-    assert(tr_variantIsList(list));
+    TR_ASSERT(tr_variantIsList(list));
 
     containerReserve(list, 1);
     child = &list->val.l.vals[list->val.l.count++];
@@ -598,7 +598,7 @@ tr_variant* tr_variantDictAdd(tr_variant* dict, tr_quark const key)
 {
     tr_variant* val;
 
-    assert(tr_variantIsDict(dict));
+    TR_ASSERT(tr_variantIsDict(dict));
 
     containerReserve(dict, 1);
 
@@ -1008,7 +1008,7 @@ bool tr_variantDictChild(tr_variant* dict, size_t n, tr_quark* key, tr_variant**
 {
     bool success = 0;
 
-    assert(tr_variantIsDict(dict));
+    TR_ASSERT(tr_variantIsDict(dict));
 
     if (tr_variantIsDict(dict) && n < dict->val.l.count)
     {
@@ -1024,8 +1024,8 @@ void tr_variantMergeDicts(tr_variant* target, tr_variant const* source)
 {
     size_t const sourceCount = tr_variantDictSize(source);
 
-    assert(tr_variantIsDict(target));
-    assert(tr_variantIsDict(source));
+    TR_ASSERT(tr_variantIsDict(target));
+    TR_ASSERT(tr_variantIsDict(source));
 
     tr_variantDictReserve(target, sourceCount + tr_variantDictSize(target));
 

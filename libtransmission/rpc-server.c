@@ -6,7 +6,6 @@
  *
  */
 
-#include <assert.h>
 #include <errno.h>
 #include <string.h> /* memcpy */
 
@@ -31,6 +30,7 @@
 #include "rpc-server.h"
 #include "session.h"
 #include "session-id.h"
+#include "tr-assert.h"
 #include "trevent.h"
 #include "utils.h"
 #include "variant.h"
@@ -796,7 +796,7 @@ static void restartServer(void* vserver)
 
 void tr_rpcSetPort(tr_rpc_server* server, tr_port port)
 {
-    assert(server != NULL);
+    TR_ASSERT(server != NULL);
 
     if (server->port != port)
     {

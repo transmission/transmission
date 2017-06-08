@@ -6,13 +6,13 @@
  *
  */
 
-#include <assert.h>
 #include <stdlib.h> /* bsearch() */
 #include <string.h> /* memcmp() */
 
 #include "transmission.h"
 #include "ptrarray.h"
 #include "quark.h"
+#include "tr-assert.h"
 #include "utils.h" /* tr_memdup(), tr_strndup() */
 
 struct tr_key_struct
@@ -427,7 +427,7 @@ bool tr_quark_lookup(void const* str, size_t len, tr_quark* setme)
     static size_t const n_static = TR_N_ELEMENTS(my_static);
     bool success = false;
 
-    assert(n_static == TR_N_KEYS);
+    TR_ASSERT(n_static == TR_N_KEYS);
 
     tmp.str = str;
     tmp.len = len;

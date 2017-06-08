@@ -13,6 +13,7 @@
 #include "magnet.h"
 #include "session.h" /* tr_sessionFindTorrentFile() */
 #include "torrent.h" /* tr_ctorGetSave() */
+#include "tr-assert.h"
 #include "utils.h" /* tr_new0 */
 #include "variant.h"
 
@@ -311,8 +312,8 @@ void tr_ctorSetPaused(tr_ctor* ctor, tr_ctorMode mode, bool isPaused)
 {
     struct optional_args* args;
 
-    assert(ctor != NULL);
-    assert(mode == TR_FALLBACK || mode == TR_FORCE);
+    TR_ASSERT(ctor != NULL);
+    TR_ASSERT(mode == TR_FALLBACK || mode == TR_FORCE);
 
     args = &ctor->optionalArgs[mode];
     args->isSet_paused = true;
@@ -323,8 +324,8 @@ void tr_ctorSetPeerLimit(tr_ctor* ctor, tr_ctorMode mode, uint16_t peerLimit)
 {
     struct optional_args* args;
 
-    assert(ctor != NULL);
-    assert(mode == TR_FALLBACK || mode == TR_FORCE);
+    TR_ASSERT(ctor != NULL);
+    TR_ASSERT(mode == TR_FALLBACK || mode == TR_FORCE);
 
     args = &ctor->optionalArgs[mode];
     args->isSet_connected = true;
@@ -335,8 +336,8 @@ void tr_ctorSetDownloadDir(tr_ctor* ctor, tr_ctorMode mode, char const* director
 {
     struct optional_args* args;
 
-    assert(ctor != NULL);
-    assert(mode == TR_FALLBACK || mode == TR_FORCE);
+    TR_ASSERT(ctor != NULL);
+    TR_ASSERT(mode == TR_FALLBACK || mode == TR_FORCE);
 
     args = &ctor->optionalArgs[mode];
     tr_free(args->downloadDir);

@@ -12,10 +12,9 @@
 
 #pragma once
 
-#include <assert.h>
-
 #include "transmission.h"
 #include "ptrarray.h"
+#include "tr-assert.h"
 #include "utils.h" /* tr_new(), tr_free() */
 
 struct tr_peerIo;
@@ -225,8 +224,8 @@ static inline bool tr_bandwidthHonorParentLimits(tr_bandwidth* bandwidth, tr_dir
 
 static inline bool tr_bandwidthAreParentLimitsHonored(tr_bandwidth const* bandwidth, tr_direction direction)
 {
-    assert(tr_isBandwidth(bandwidth));
-    assert(tr_isDirection(direction));
+    TR_ASSERT(tr_isBandwidth(bandwidth));
+    TR_ASSERT(tr_isDirection(direction));
 
     return bandwidth->band[direction].honorParentLimits;
 }

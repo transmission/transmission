@@ -53,6 +53,7 @@ set(${PROJECT_NAME}_SOURCES
     torrent-magnet.c
     tr-dht.c
     trevent.c
+    tr-assert.c
     tr-getopt.c
     tr-lpd.c
     tr-udp.c
@@ -107,6 +108,7 @@ set(${PROJECT_NAME}_PUBLIC_HEADERS
     quark.h
     rpcimpl.h
     session-id.h
+    tr-assert.h
     tr-getopt.h
     transmission.h
     utils.h

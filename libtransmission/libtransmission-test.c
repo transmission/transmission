@@ -6,7 +6,6 @@
  *
  */
 
-#include <assert.h>
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h> /* mkstemp() */
@@ -22,6 +21,7 @@
 #include "file.h"
 #include "platform.h" /* TR_PATH_DELIMETER */
 #include "torrent.h"
+#include "tr-assert.h"
 #include "trevent.h"
 #include "variant.h"
 #include "libtransmission-test.h"
@@ -416,9 +416,9 @@ tr_torrent* libttest_zero_torrent_init(tr_session* session)
 
     /* create the torrent ctor */
     metainfo = tr_base64_decode_str(metainfo_base64, &metainfo_len);
-    assert(metainfo != NULL);
-    assert(metainfo_len > 0);
-    assert(session != NULL);
+    TR_ASSERT(metainfo != NULL);
+    TR_ASSERT(metainfo_len > 0);
+    TR_ASSERT(session != NULL);
     ctor = tr_ctorNew(session);
     tr_ctorSetMetainfo(ctor, (uint8_t*)metainfo, metainfo_len);
     tr_ctorSetPaused(ctor, TR_FORCE, true);
@@ -426,7 +426,7 @@ tr_torrent* libttest_zero_torrent_init(tr_session* session)
     /* create the torrent */
     err = 0;
     tor = tr_torrentNew(ctor, &err, NULL);
-    assert(err == 0);
+    TR_ASSERT(err == 0);
 
     /* cleanup */
     tr_free(metainfo);
@@ -468,9 +468,9 @@ void libttest_zero_torrent_populate(tr_torrent* tor, bool complete)
         tr_free(path);
 
         path = tr_torrentFindFile(tor, i);
-        assert(path != NULL);
+        TR_ASSERT(path != NULL);
         err = errno;
-        assert(tr_sys_path_exists(path, NULL));
+        TR_ASSERT(tr_sys_path_exists(path, NULL));
         errno = err;
         tr_free(path);
     }
@@ -480,11 +480,11 @@ void libttest_zero_torrent_populate(tr_torrent* tor, bool complete)
 
     if (complete)
     {
-        assert(tr_torrentStat(tor)->leftUntilDone == 0);
+        TR_ASSERT(tr_torrentStat(tor)->leftUntilDone == 0);
     }
     else
     {
-        assert(tr_torrentStat(tor)->leftUntilDone == tor->info.pieceSize);
+        TR_ASSERT(tr_torrentStat(tor)->leftUntilDone == tor->info.pieceSize);
     }
 }
 
@@ -501,8 +501,8 @@ void libttest_blockingTorrentVerify(tr_torrent* tor)
 {
     bool done = false;
 
-    assert(tor->session != NULL);
-    assert(!tr_amInEventThread(tor->session));
+    TR_ASSERT(tor->session != NULL);
+    TR_ASSERT(!tr_amInEventThread(tor->session));
 
     tr_torrentVerify(tor, onVerifyDone, &done);
 
@@ -520,7 +520,7 @@ static void build_parent_dir(char const* path)
 
     dir = tr_sys_path_dirname(path, NULL);
     tr_sys_dir_create(dir, TR_SYS_DIR_CREATE_PARENTS, 0700, &error);
-    assert(error == NULL);
+    TR_ASSERT(error == NULL);
     tr_free(dir);
 
     errno = tmperr;

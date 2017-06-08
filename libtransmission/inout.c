@@ -6,7 +6,6 @@
  *
  */
 
-#include <assert.h>
 #include <errno.h>
 #include <stdlib.h> /* bsearch() */
 #include <string.h> /* memcmp() */
@@ -22,6 +21,7 @@
 #include "peer-common.h" /* MAX_BLOCK_SIZE */
 #include "stats.h" /* tr_statsFileCreated() */
 #include "torrent.h"
+#include "tr-assert.h"
 #include "utils.h"
 
 /****
@@ -46,9 +46,9 @@ static int readOrWriteBytes(tr_session* session, tr_torrent* tor, int ioMode, tr
     tr_info const* const info = &tor->info;
     tr_file const* const file = &info->files[fileIndex];
 
-    assert(fileIndex < info->fileCount);
-    assert(file->length == 0 || fileOffset < file->length);
-    assert(fileOffset + buflen <= file->length);
+    TR_ASSERT(fileIndex < info->fileCount);
+    TR_ASSERT(file->length == 0 || fileOffset < file->length);
+    TR_ASSERT(fileOffset + buflen <= file->length);
 
     if (file->length == 0)
     {
@@ -169,19 +169,19 @@ void tr_ioFindFileLocation(tr_torrent const* tor, tr_piece_index_t pieceIndex, u
     uint64_t const offset = tr_pieceOffset(tor, pieceIndex, pieceOffset, 0);
     tr_file const* file;
 
-    assert(tr_isTorrent(tor));
-    assert(offset < tor->info.totalSize);
+    TR_ASSERT(tr_isTorrent(tor));
+    TR_ASSERT(offset < tor->info.totalSize);
 
     file = bsearch(&offset, tor->info.files, tor->info.fileCount, sizeof(tr_file), compareOffsetToFile);
 
-    assert(file != NULL);
+    TR_ASSERT(file != NULL);
 
     *fileIndex = file - tor->info.files;
     *fileOffset = offset - file->offset;
 
-    assert(*fileIndex < tor->info.fileCount);
-    assert(*fileOffset < file->length);
-    assert(tor->info.files[*fileIndex].offset + *fileOffset == offset);
+    TR_ASSERT(*fileIndex < tor->info.fileCount);
+    TR_ASSERT(*fileOffset < file->length);
+    TR_ASSERT(tor->info.files[*fileIndex].offset + *fileOffset == offset);
 }
 
 /* returns 0 on success, or an errno on failure */
@@ -250,11 +250,11 @@ static bool recalculateHash(tr_torrent* tor, tr_piece_index_t pieceIndex, uint8_
     void* buffer = tr_valloc(buflen);
     tr_sha1_ctx_t sha;
 
-    assert(tor != NULL);
-    assert(pieceIndex < tor->info.pieceCount);
-    assert(buffer != NULL);
-    assert(buflen > 0);
-    assert(setme != NULL);
+    TR_ASSERT(tor != NULL);
+    TR_ASSERT(pieceIndex < tor->info.pieceCount);
+    TR_ASSERT(buffer != NULL);
+    TR_ASSERT(buflen > 0);
+    TR_ASSERT(setme != NULL);
 
     sha = tr_sha1_init();
     bytesLeft = tr_torPieceCountBytes(tor, pieceIndex);

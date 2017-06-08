@@ -11,7 +11,6 @@
 #define __USE_UNIX98 /* some older Linuxes need it spelt out for them */
 #endif
 
-#include <assert.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -40,6 +39,7 @@
 #include "log.h"
 #include "platform.h"
 #include "session.h"
+#include "tr-assert.h"
 #include "utils.h"
 
 /***
@@ -191,8 +191,8 @@ void tr_lockLock(tr_lock* l)
     pthread_mutex_lock(&l->lock);
 #endif
 
-    assert(l->depth >= 0);
-    assert(l->depth == 0 || tr_areThreadsEqual(l->lockThread, tr_getCurrentThread()));
+    TR_ASSERT(l->depth >= 0);
+    TR_ASSERT(l->depth == 0 || tr_areThreadsEqual(l->lockThread, tr_getCurrentThread()));
     l->lockThread = tr_getCurrentThread();
     ++l->depth;
 }
@@ -204,11 +204,11 @@ bool tr_lockHave(tr_lock const* l)
 
 void tr_lockUnlock(tr_lock* l)
 {
-    assert(l->depth > 0);
-    assert(tr_areThreadsEqual(l->lockThread, tr_getCurrentThread()));
+    TR_ASSERT(l->depth > 0);
+    TR_ASSERT(tr_areThreadsEqual(l->lockThread, tr_getCurrentThread()));
 
     --l->depth;
-    assert(l->depth >= 0);
+    TR_ASSERT(l->depth >= 0);
 
 #ifdef _WIN32
     LeaveCriticalSection(&l->lock);
@@ -502,7 +502,7 @@ char const* tr_getWebClientDir(tr_session const* session UNUSED)
 
                 char* appString = tr_malloc(appStringLength);
                 bool const success = CFStringGetFileSystemRepresentation(appRef, appString, appStringLength);
-                assert(success);
+                TR_ASSERT(success);
 
                 CFRelease(appURL);
                 CFRelease(appRef);

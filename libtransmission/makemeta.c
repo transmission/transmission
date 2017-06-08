@@ -6,7 +6,6 @@
  *
  */
 
-#include <assert.h>
 #include <errno.h>
 #include <stdlib.h> /* qsort */
 #include <string.h> /* strcmp, strlen */
@@ -21,6 +20,7 @@
 #include "session.h"
 #include "makemeta.h"
 #include "platform.h" /* threads, locks */
+#include "tr-assert.h"
 #include "utils.h" /* buildpath */
 #include "variant.h"
 #include "version.h"
@@ -278,7 +278,7 @@ static uint8_t* getHashInfo(tr_metainfo_builder* b)
         uint32_t const thisPieceSize = (uint32_t)MIN(b->pieceSize, totalRemain);
         uint64_t leftInPiece = thisPieceSize;
 
-        assert(b->pieceIndex < b->pieceCount);
+        TR_ASSERT(b->pieceIndex < b->pieceCount);
 
         while (leftInPiece != 0)
         {
@@ -313,8 +313,8 @@ static uint8_t* getHashInfo(tr_metainfo_builder* b)
             }
         }
 
-        assert(bufptr - buf == (int)thisPieceSize);
-        assert(leftInPiece == 0);
+        TR_ASSERT(bufptr - buf == (int)thisPieceSize);
+        TR_ASSERT(leftInPiece == 0);
         tr_sha1(walk, buf, (int)thisPieceSize, NULL);
         walk += SHA_DIGEST_LENGTH;
 
@@ -328,8 +328,8 @@ static uint8_t* getHashInfo(tr_metainfo_builder* b)
         ++b->pieceIndex;
     }
 
-    assert(b->abortFlag || walk - ret == (int)(SHA_DIGEST_LENGTH * b->pieceCount));
-    assert(b->abortFlag || !totalRemain);
+    TR_ASSERT(b->abortFlag || walk - ret == (int)(SHA_DIGEST_LENGTH * b->pieceCount));
+    TR_ASSERT(b->abortFlag || !totalRemain);
 
     if (fd != TR_BAD_SYS_FILE)
     {

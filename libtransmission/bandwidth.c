@@ -6,7 +6,6 @@
  *
  */
 
-#include <assert.h>
 #include <string.h> /* memset() */
 
 #include "transmission.h"
@@ -14,6 +13,7 @@
 #include "crypto-utils.h" /* tr_rand_int_weak() */
 #include "log.h"
 #include "peer-io.h"
+#include "tr-assert.h"
 #include "utils.h"
 
 #define dbgmsg(...) tr_logAddDeepNamed(NULL, __VA_ARGS__)
@@ -109,7 +109,7 @@ void tr_bandwidthConstruct(tr_bandwidth* b, tr_session* session, tr_bandwidth* p
 
 void tr_bandwidthDestruct(tr_bandwidth* b)
 {
-    assert(tr_isBandwidth(b));
+    TR_ASSERT(tr_isBandwidth(b));
 
     tr_bandwidthSetParent(b, NULL);
     tr_ptrArrayDestruct(&b->children, NULL);
@@ -123,24 +123,24 @@ void tr_bandwidthDestruct(tr_bandwidth* b)
 
 void tr_bandwidthSetParent(tr_bandwidth* b, tr_bandwidth* parent)
 {
-    assert(tr_isBandwidth(b));
-    assert(b != parent);
+    TR_ASSERT(tr_isBandwidth(b));
+    TR_ASSERT(b != parent);
 
     if (b->parent != NULL)
     {
-        assert(tr_isBandwidth(b->parent));
+        TR_ASSERT(tr_isBandwidth(b->parent));
         tr_ptrArrayRemoveSortedPointer(&b->parent->children, b, compareBandwidth);
         b->parent = NULL;
     }
 
     if (parent != NULL)
     {
-        assert(tr_isBandwidth(parent));
-        assert(parent->parent != b);
+        TR_ASSERT(tr_isBandwidth(parent));
+        TR_ASSERT(parent->parent != b);
 
-        assert(tr_ptrArrayFindSorted(&parent->children, b, compareBandwidth) == NULL);
+        TR_ASSERT(tr_ptrArrayFindSorted(&parent->children, b, compareBandwidth) == NULL);
         tr_ptrArrayInsertSorted(&parent->children, b, compareBandwidth);
-        assert(tr_ptrArrayFindSorted(&parent->children, b, compareBandwidth) == b);
+        TR_ASSERT(tr_ptrArrayFindSorted(&parent->children, b, compareBandwidth) == b);
         b->parent = parent;
     }
 }
@@ -154,8 +154,8 @@ static void allocateBandwidth(tr_bandwidth* b, tr_priority_t parent_priority, tr
 {
     tr_priority_t const priority = MAX(parent_priority, b->priority);
 
-    assert(tr_isBandwidth(b));
-    assert(tr_isDirection(dir));
+    TR_ASSERT(tr_isBandwidth(b));
+    TR_ASSERT(tr_isDirection(dir));
 
     /* set the available bandwidth */
     if (b->band[dir].isLimited)
@@ -287,8 +287,8 @@ void tr_bandwidthAllocate(tr_bandwidth* b, tr_direction dir, unsigned int period
 
 void tr_bandwidthSetPeer(tr_bandwidth* b, tr_peerIo* peer)
 {
-    assert(tr_isBandwidth(b));
-    assert(peer == NULL || tr_isPeerIo(peer));
+    TR_ASSERT(tr_isBandwidth(b));
+    TR_ASSERT(peer == NULL || tr_isPeerIo(peer));
 
     b->peer = peer;
 }
@@ -299,8 +299,8 @@ void tr_bandwidthSetPeer(tr_bandwidth* b, tr_peerIo* peer)
 
 static unsigned int bandwidthClamp(tr_bandwidth const* b, uint64_t now, tr_direction dir, unsigned int byteCount)
 {
-    assert(tr_isBandwidth(b));
-    assert(tr_isDirection(dir));
+    TR_ASSERT(tr_isBandwidth(b));
+    TR_ASSERT(tr_isDirection(dir));
 
     if (b != NULL)
     {
@@ -356,16 +356,16 @@ unsigned int tr_bandwidthClamp(tr_bandwidth const* b, tr_direction dir, unsigned
 
 unsigned int tr_bandwidthGetRawSpeed_Bps(tr_bandwidth const* b, uint64_t const now, tr_direction const dir)
 {
-    assert(tr_isBandwidth(b));
-    assert(tr_isDirection(dir));
+    TR_ASSERT(tr_isBandwidth(b));
+    TR_ASSERT(tr_isDirection(dir));
 
     return getSpeed_Bps(&b->band[dir].raw, HISTORY_MSEC, now);
 }
 
 unsigned int tr_bandwidthGetPieceSpeed_Bps(tr_bandwidth const* b, uint64_t const now, tr_direction const dir)
 {
-    assert(tr_isBandwidth(b));
-    assert(tr_isDirection(dir));
+    TR_ASSERT(tr_isBandwidth(b));
+    TR_ASSERT(tr_isDirection(dir));
 
     return getSpeed_Bps(&b->band[dir].piece, HISTORY_MSEC, now);
 }
@@ -374,8 +374,8 @@ void tr_bandwidthUsed(tr_bandwidth* b, tr_direction dir, size_t byteCount, bool 
 {
     struct tr_band* band;
 
-    assert(tr_isBandwidth(b));
-    assert(tr_isDirection(dir));
+    TR_ASSERT(tr_isBandwidth(b));
+    TR_ASSERT(tr_isDirection(dir));
 
     band = &b->band[dir];
 

@@ -6,7 +6,6 @@
  *
  */
 
-#include <assert.h>
 #include <errno.h>
 #include <string.h> /* strcmp() */
 
@@ -27,6 +26,7 @@
 #include "transmission.h"
 #include "log.h"
 #include "ptrarray.h"
+#include "tr-assert.h"
 #include "utils.h"
 #include "watchdir.h"
 #include "watchdir-common.h"
@@ -87,7 +87,7 @@ static void tr_watchdir_kqueue_free(tr_watchdir_backend* backend_base)
         return;
     }
 
-    assert(backend->base.free_func == &tr_watchdir_kqueue_free);
+    TR_ASSERT(backend->base.free_func == &tr_watchdir_kqueue_free);
 
     if (backend->event != NULL)
     {

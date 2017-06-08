@@ -6,7 +6,6 @@
  *
  */
 
-#include <assert.h>
 #include <limits.h> /* INT_MAX */
 #include <stdio.h>
 #include <stdlib.h> /* qsort() */
@@ -26,6 +25,7 @@
 #include "ptrarray.h"
 #include "session.h"
 #include "torrent.h"
+#include "tr-assert.h"
 #include "utils.h"
 
 struct tr_tier;
@@ -164,7 +164,7 @@ void tr_announcerInit(tr_session* session)
 {
     tr_announcer* a;
 
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     a = tr_new0(tr_announcer, 1);
     a->stops = TR_PTR_ARRAY_INIT;
@@ -718,7 +718,7 @@ tr_torrent_tiers* tr_announcerAddTorrent(tr_torrent* tor, tr_tracker_callback ca
 {
     tr_torrent_tiers* tiers;
 
-    assert(tr_isTorrent(tor));
+    TR_ASSERT(tr_isTorrent(tor));
 
     tiers = tiersNew();
     tiers->callback = callback;
@@ -742,8 +742,8 @@ bool tr_announcerCanManualAnnounce(tr_torrent const* tor)
 {
     struct tr_torrent_tiers* tt = NULL;
 
-    assert(tr_isTorrent(tor));
-    assert(tor->tiers != NULL);
+    TR_ASSERT(tr_isTorrent(tor));
+    TR_ASSERT(tor->tiers != NULL);
 
     if (tor->isRunning)
     {
@@ -812,7 +812,7 @@ static void tier_announce_remove_trailing(tr_tier* tier, tr_announce_event e)
 
 static void tier_announce_event_push(tr_tier* tier, tr_announce_event e, time_t announceAt)
 {
-    assert(tier != NULL);
+    TR_ASSERT(tier != NULL);
 
     dbgmsg_tier_announce_queue(tier);
     dbgmsg(tier, "queued \"%s\"", tr_announce_event_get_string(e));
@@ -914,8 +914,8 @@ void tr_announcerAddBytes(tr_torrent* tor, int type, uint32_t byteCount)
 {
     struct tr_torrent_tiers* tt = tor->tiers;
 
-    assert(tr_isTorrent(tor));
-    assert(type == TR_ANN_UP || type == TR_ANN_DOWN || type == TR_ANN_CORRUPT);
+    TR_ASSERT(tr_isTorrent(tor));
+    TR_ASSERT(type == TR_ANN_UP || type == TR_ANN_DOWN || type == TR_ANN_CORRUPT);
 
     for (int i = 0; i < tt->tier_count; ++i)
     {
@@ -1276,8 +1276,8 @@ static void tierAnnounce(tr_announcer* announcer, tr_tier* tier)
     tr_torrent* tor = tier->tor;
     time_t const now = tr_time();
 
-    assert(!tier->isAnnouncing);
-    assert(tier->announce_event_count > 0);
+    TR_ASSERT(!tier->isAnnouncing);
+    TR_ASSERT(tier->announce_event_count > 0);
 
     announce_event = tier_announce_event_pull(tier);
     req = announce_request_new(announcer, tor, tier, announce_event);
@@ -1664,7 +1664,7 @@ tr_tracker_stat* tr_announcerStats(tr_torrent const* torrent, int* setmeTrackerC
     struct tr_torrent_tiers* tt;
     time_t const now = tr_time();
 
-    assert(tr_isTorrent(torrent));
+    TR_ASSERT(tr_isTorrent(torrent));
 
     tt = torrent->tiers;
 
@@ -1786,8 +1786,8 @@ static void copy_tier_attributes_impl(struct tr_tier* tgt, int trackerIndex, tr_
     tr_tier const keep = *tgt;
 
     /* sanity clause */
-    assert(trackerIndex < tgt->tracker_count);
-    assert(tr_strcmp0(tgt->trackers[trackerIndex].announce, src->currentTracker->announce) == 0);
+    TR_ASSERT(trackerIndex < tgt->tracker_count);
+    TR_ASSERT(tr_strcmp0(tgt->trackers[trackerIndex].announce, src->currentTracker->announce) == 0);
 
     /* bitwise copy will handle most of tr_tier's fields... */
     *tgt = *src;
@@ -1830,7 +1830,7 @@ void tr_announcerResetTorrent(tr_announcer* announcer UNUSED, tr_torrent* tor)
     struct tr_torrent_tiers* tt = tor->tiers;
     tr_torrent_tiers old = *tt;
 
-    assert(tt != NULL);
+    TR_ASSERT(tt != NULL);
 
     /* remove the old tiers / trackers */
     tt->tiers = NULL;

@@ -6,11 +6,11 @@
  *
  */
 
-#include <assert.h>
 #include <string.h> /* memset */
 
 #include "transmission.h"
 #include "bitfield.h"
+#include "tr-assert.h"
 #include "utils.h" /* tr_new0() */
 
 tr_bitfield const TR_BITFIELD_INIT = { NULL, 0, 0, 0, false, false };
@@ -68,8 +68,8 @@ static size_t countRange(tr_bitfield const* b, size_t begin, size_t end)
         return 0;
     }
 
-    assert(begin < end);
-    assert(b->bits != NULL);
+    TR_ASSERT(begin < end);
+    TR_ASSERT(b->bits != NULL);
 
     if (first_byte == last_byte)
     {
@@ -114,7 +114,7 @@ static size_t countRange(tr_bitfield const* b, size_t begin, size_t end)
         }
     }
 
-    assert(ret <= (begin - end));
+    TR_ASSERT(ret <= (begin - end));
     return ret;
 }
 
@@ -157,13 +157,13 @@ bool tr_bitfieldHas(tr_bitfield const* b, size_t n)
 ****
 ***/
 
-#ifndef NDEBUG
+#ifdef TR_ENABLE_ASSERTS
 
 static bool tr_bitfieldIsValid(tr_bitfield const* b)
 {
-    assert(b != NULL);
-    assert((b->alloc_count == 0) == (b->bits == NULL));
-    assert(b->bits == NULL || b->true_count == countArray(b));
+    TR_ASSERT(b != NULL);
+    TR_ASSERT((b->alloc_count == 0) == (b->bits == NULL));
+    TR_ASSERT(b->bits == NULL || b->true_count == countArray(b));
 
     return true;
 }
@@ -172,7 +172,7 @@ static bool tr_bitfieldIsValid(tr_bitfield const* b)
 
 size_t tr_bitfieldCountTrueBits(tr_bitfield const* b)
 {
-    assert(tr_bitfieldIsValid(b));
+    TR_ASSERT(tr_bitfieldIsValid(b));
 
     return b->true_count;
 }
@@ -200,11 +200,11 @@ void* tr_bitfieldGetRaw(tr_bitfield const* b, size_t* byte_count)
     size_t const n = get_bytes_needed(b->bit_count);
     uint8_t* bits = tr_new0(uint8_t, n);
 
-    assert(b->bit_count > 0);
+    TR_ASSERT(b->bit_count > 0);
 
     if (b->alloc_count != 0)
     {
-        assert(b->alloc_count <= n);
+        TR_ASSERT(b->alloc_count <= n);
         memcpy(bits, b->bits, b->alloc_count);
     }
     else if (tr_bitfieldHasAll(b))
@@ -264,7 +264,7 @@ static void tr_bitfieldFreeArray(tr_bitfield* b)
 
 static void tr_bitfieldSetTrueCount(tr_bitfield* b, size_t n)
 {
-    assert(b->bit_count == 0 || n <= b->bit_count);
+    TR_ASSERT(b->bit_count == 0 || n <= b->bit_count);
 
     b->true_count = n;
 
@@ -273,7 +273,7 @@ static void tr_bitfieldSetTrueCount(tr_bitfield* b, size_t n)
         tr_bitfieldFreeArray(b);
     }
 
-    assert(tr_bitfieldIsValid(b));
+    TR_ASSERT(tr_bitfieldIsValid(b));
 }
 
 static void tr_bitfieldRebuildTrueCount(tr_bitfield* b)
@@ -283,16 +283,16 @@ static void tr_bitfieldRebuildTrueCount(tr_bitfield* b)
 
 static void tr_bitfieldIncTrueCount(tr_bitfield* b, size_t i)
 {
-    assert(b->bit_count == 0 || i <= b->bit_count);
-    assert(b->bit_count == 0 || b->true_count <= b->bit_count - i);
+    TR_ASSERT(b->bit_count == 0 || i <= b->bit_count);
+    TR_ASSERT(b->bit_count == 0 || b->true_count <= b->bit_count - i);
 
     tr_bitfieldSetTrueCount(b, b->true_count + i);
 }
 
 static void tr_bitfieldDecTrueCount(tr_bitfield* b, size_t i)
 {
-    assert(b->bit_count == 0 || i <= b->bit_count);
-    assert(b->bit_count == 0 || b->true_count >= i);
+    TR_ASSERT(b->bit_count == 0 || i <= b->bit_count);
+    TR_ASSERT(b->bit_count == 0 || b->true_count >= i);
 
     tr_bitfieldSetTrueCount(b, b->true_count - i);
 }
@@ -310,7 +310,7 @@ void tr_bitfieldConstruct(tr_bitfield* b, size_t bit_count)
     b->have_all_hint = false;
     b->have_none_hint = false;
 
-    assert(tr_bitfieldIsValid(b));
+    TR_ASSERT(tr_bitfieldIsValid(b));
 }
 
 void tr_bitfieldSetHasNone(tr_bitfield* b)
@@ -320,7 +320,7 @@ void tr_bitfieldSetHasNone(tr_bitfield* b)
     b->have_all_hint = false;
     b->have_none_hint = true;
 
-    assert(tr_bitfieldIsValid(b));
+    TR_ASSERT(tr_bitfieldIsValid(b));
 }
 
 void tr_bitfieldSetHasAll(tr_bitfield* b)
@@ -330,7 +330,7 @@ void tr_bitfieldSetHasAll(tr_bitfield* b)
     b->have_all_hint = true;
     b->have_none_hint = false;
 
-    assert(tr_bitfieldIsValid(b));
+    TR_ASSERT(tr_bitfieldIsValid(b));
 }
 
 void tr_bitfieldSetFromBitfield(tr_bitfield* b, tr_bitfield const* src)
@@ -366,8 +366,8 @@ void tr_bitfieldSetRaw(tr_bitfield* b, void const* bits, size_t byte_count, bool
     {
         /* ensure the excess bits are set to '0' */
         int const excess_bit_count = byte_count * 8 - b->bit_count;
-        assert(excess_bit_count >= 0);
-        assert(excess_bit_count <= 7);
+        TR_ASSERT(excess_bit_count >= 0);
+        TR_ASSERT(excess_bit_count <= 7);
 
         if (excess_bit_count)
         {
@@ -457,7 +457,7 @@ void tr_bitfieldAddRange(tr_bitfield* b, size_t begin, size_t end)
 
 void tr_bitfieldRem(tr_bitfield* b, size_t nth)
 {
-    assert(tr_bitfieldIsValid(b));
+    TR_ASSERT(tr_bitfieldIsValid(b));
 
     if (tr_bitfieldHas(b, nth) && tr_bitfieldEnsureNthBitAlloced(b, nth))
     {

@@ -22,7 +22,6 @@
 
 #include <errno.h>
 #include <string.h>
-#include <assert.h>
 
 #include <sys/types.h>
 
@@ -38,11 +37,12 @@
 
 #include "transmission.h"
 #include "fdlimit.h" /* tr_fdSocketClose() */
+#include "log.h"
 #include "net.h"
 #include "peer-io.h" /* tr_peerIoAddrStr() FIXME this should be moved to net.h */
 #include "session.h" /* tr_sessionGetPublicAddress() */
+#include "tr-assert.h"
 #include "tr-utp.h" /* tr_utpSendTo() */
-#include "log.h"
 #include "utils.h" /* tr_time(), tr_logAddDebug() */
 
 #ifndef IN_MULTICAST
@@ -76,7 +76,7 @@ char* tr_net_strerror(char* buf, size_t buflen, int err)
 
 char const* tr_address_to_string_with_buf(tr_address const* addr, char* buf, size_t buflen)
 {
-    assert(tr_address_is_valid(addr));
+    TR_ASSERT(tr_address_is_valid(addr));
 
     if (addr->type == TR_AF_INET)
     {
@@ -206,7 +206,7 @@ bool tr_address_from_sockaddr_storage(tr_address* setme_addr, tr_port* setme_por
 
 static socklen_t setup_sockaddr(tr_address const* addr, tr_port port, struct sockaddr_storage* sockaddr)
 {
-    assert(tr_address_is_valid(addr));
+    TR_ASSERT(tr_address_is_valid(addr));
 
     if (addr->type == TR_AF_INET)
     {
@@ -242,7 +242,7 @@ tr_socket_t tr_netOpenPeerSocket(tr_session* session, tr_address const* addr, tr
     struct sockaddr_storage source_sock;
     char err_buf[512];
 
-    assert(tr_address_is_valid(addr));
+    TR_ASSERT(tr_address_is_valid(addr));
 
     if (!tr_address_is_valid_for_peers(addr, port))
     {
@@ -278,7 +278,7 @@ tr_socket_t tr_netOpenPeerSocket(tr_session* session, tr_address const* addr, tr
 
     /* set source address */
     source_addr = tr_sessionGetPublicAddress(session, addr->type, NULL);
-    assert(source_addr);
+    TR_ASSERT(source_addr);
     sourcelen = setup_sockaddr(source_addr, 0, &source_sock);
 
     if (bind(s, (struct sockaddr*)&source_sock, sourcelen) == -1)
@@ -336,7 +336,7 @@ static tr_socket_t tr_netBindTCPImpl(tr_address const* addr, tr_port port, bool 
     int addrlen;
     int optval;
 
-    assert(tr_address_is_valid(addr));
+    TR_ASSERT(tr_address_is_valid(addr));
 
     fd = socket(domains[addr->type], SOCK_STREAM, 0);
 
@@ -686,7 +686,7 @@ static bool isMartianAddr(struct tr_address const* a)
 {
     static unsigned char const zeroes[16] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
-    assert(tr_address_is_valid(a));
+    TR_ASSERT(tr_address_is_valid(a));
 
     switch (a->type)
     {

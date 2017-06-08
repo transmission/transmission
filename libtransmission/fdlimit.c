@@ -6,7 +6,6 @@
  *
  */
 
-#include <assert.h>
 #include <errno.h>
 #include <inttypes.h>
 #include <string.h>
@@ -24,6 +23,7 @@
 #include "log.h"
 #include "session.h"
 #include "torrent.h" /* tr_isTorrent() */
+#include "tr-assert.h"
 
 #define dbgmsg(...) tr_logAddDeepNamed(NULL, __VA_ARGS__)
 
@@ -130,14 +130,14 @@ struct tr_cached_file
 
 static inline bool cached_file_is_open(struct tr_cached_file const* o)
 {
-    assert(o != NULL);
+    TR_ASSERT(o != NULL);
 
     return o->fd != TR_BAD_SYS_FILE;
 }
 
 static void cached_file_close(struct tr_cached_file* o)
 {
-    assert(cached_file_is_open(o));
+    TR_ASSERT(cached_file_is_open(o));
 
     tr_sys_file_close(o->fd, NULL);
     o->fd = TR_BAD_SYS_FILE;
@@ -212,7 +212,7 @@ static int cached_file_open(struct tr_cached_file* o, char const* filename, bool
             type = _("sparse");
         }
 
-        assert(type != NULL);
+        TR_ASSERT(type != NULL);
 
         if (!success)
         {
@@ -371,7 +371,7 @@ struct tr_fdInfo
 
 static void ensureSessionFdInfoExists(tr_session* session)
 {
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     if (session->fdInfo == NULL)
     {
@@ -478,7 +478,7 @@ bool tr_fdFileGetCachedMTime(tr_session* s, int torrent_id, tr_file_index_t i, t
 
 void tr_fdTorrentClose(tr_session* session, int torrent_id)
 {
-    assert(tr_sessionIsLocked(session));
+    TR_ASSERT(tr_sessionIsLocked(session));
 
     fileset_close_torrent(get_fileset(session), torrent_id);
 }
@@ -530,7 +530,7 @@ tr_socket_t tr_fdSocketCreate(tr_session* session, int domain, int type)
 {
     tr_socket_t s = TR_BAD_SOCKET;
     struct tr_fdInfo* gFd;
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     ensureSessionFdInfoExists(session);
     gFd = session->fdInfo;
@@ -552,7 +552,7 @@ tr_socket_t tr_fdSocketCreate(tr_session* session, int domain, int type)
         ++gFd->peerCount;
     }
 
-    assert(gFd->peerCount >= 0);
+    TR_ASSERT(gFd->peerCount >= 0);
 
     if (s != TR_BAD_SOCKET)
     {
@@ -590,9 +590,9 @@ tr_socket_t tr_fdSocketAccept(tr_session* s, tr_socket_t sockfd, tr_address* add
     struct tr_fdInfo* gFd;
     struct sockaddr_storage sock;
 
-    assert(tr_isSession(s));
-    assert(addr != NULL);
-    assert(port != NULL);
+    TR_ASSERT(tr_isSession(s));
+    TR_ASSERT(addr != NULL);
+    TR_ASSERT(port != NULL);
 
     ensureSessionFdInfoExists(s);
     gFd = s->fdInfo;
@@ -618,7 +618,7 @@ tr_socket_t tr_fdSocketAccept(tr_session* s, tr_socket_t sockfd, tr_address* add
 
 void tr_fdSocketClose(tr_session* session, tr_socket_t fd)
 {
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     if (session->fdInfo != NULL)
     {
@@ -630,6 +630,6 @@ void tr_fdSocketClose(tr_session* session, tr_socket_t fd)
             --gFd->peerCount;
         }
 
-        assert(gFd->peerCount >= 0);
+        TR_ASSERT(gFd->peerCount >= 0);
     }
 }

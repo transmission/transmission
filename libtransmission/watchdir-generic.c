@@ -6,7 +6,6 @@
  *
  */
 
-#include <assert.h>
 #include <errno.h>
 
 #include <event2/event.h>
@@ -16,6 +15,7 @@
 #include "transmission.h"
 #include "log.h"
 #include "ptrarray.h"
+#include "tr-assert.h"
 #include "utils.h"
 #include "watchdir.h"
 #include "watchdir-common.h"
@@ -66,7 +66,7 @@ static void tr_watchdir_generic_free(tr_watchdir_backend* backend_base)
         return;
     }
 
-    assert(backend->base.free_func == &tr_watchdir_generic_free);
+    TR_ASSERT(backend->base.free_func == &tr_watchdir_generic_free);
 
     if (backend->event != NULL)
     {

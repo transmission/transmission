@@ -6,7 +6,6 @@
  *
  */
 
-#include <assert.h>
 #include <errno.h>
 #include <stdio.h>
 
@@ -16,6 +15,7 @@
 #include "file.h"
 #include "log.h"
 #include "platform.h" /* tr_lock */
+#include "tr-assert.h"
 #include "utils.h"
 
 tr_log_level __tr_message_level = TR_LOG_ERROR;
@@ -270,7 +270,7 @@ void tr_logAddMessage(char const* file, int line, tr_log_level level, char const
                 old->next = NULL;
                 tr_logFreeQueue(old);
                 --myQueueLength;
-                assert(myQueueLength == TR_LOG_MAX_QUEUE_LENGTH);
+                TR_ASSERT(myQueueLength == TR_LOG_MAX_QUEUE_LENGTH);
             }
         }
         else

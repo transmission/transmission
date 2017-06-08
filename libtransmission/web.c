@@ -6,7 +6,6 @@
  *
  */
 
-#include <assert.h>
 #include <string.h> /* strlen(), strstr() */
 
 #ifdef _WIN32
@@ -27,6 +26,7 @@
 #include "torrent.h"
 #include "platform.h" /* mutex */
 #include "session.h"
+#include "tr-assert.h"
 #include "trevent.h" /* tr_runInEventThread() */
 #include "utils.h"
 #include "version.h" /* User-Agent */
@@ -506,7 +506,7 @@ static void tr_webThreadFunc(void* vsession)
                 long req_bytes_sent;
                 CURL* e = msg->easy_handle;
                 curl_easy_getinfo(e, CURLINFO_PRIVATE, (void*)&task);
-                assert(e == task->curl_easy);
+                TR_ASSERT(e == task->curl_easy);
                 curl_easy_getinfo(e, CURLINFO_RESPONSE_CODE, &task->code);
                 curl_easy_getinfo(e, CURLINFO_REQUEST_SIZE, &req_bytes_sent);
                 curl_easy_getinfo(e, CURLINFO_TOTAL_TIME, &total_time);

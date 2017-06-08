@@ -6,7 +6,6 @@
  *
  */
 
-#include <assert.h>
 #include <errno.h>
 #include <stdio.h> /* fopen() */
 #include <string.h> /* strcmp() */
@@ -16,6 +15,7 @@
 #include "file.h"
 #include "resume.h"
 #include "torrent.h" /* tr_isTorrent() */
+#include "tr-assert.h"
 #include "variant.h"
 
 #include "libtransmission-test.h"
@@ -52,7 +52,7 @@ static bool testFileExistsAndConsistsOfThisString(tr_torrent const* tor, tr_file
         uint8_t* contents;
         size_t contents_len;
 
-        assert(tr_sys_path_exists(path, NULL));
+        TR_ASSERT(tr_sys_path_exists(path, NULL));
 
         contents = tr_loadFile(path, &contents_len, NULL);
 
@@ -115,15 +115,15 @@ static tr_torrent* create_torrent_from_base64_metainfo(tr_ctor* ctor, char const
 
     /* create the torrent ctor */
     metainfo = tr_base64_decode_str(metainfo_base64, &metainfo_len);
-    assert(metainfo != NULL);
-    assert(metainfo_len > 0);
+    TR_ASSERT(metainfo != NULL);
+    TR_ASSERT(metainfo_len > 0);
     tr_ctorSetMetainfo(ctor, (uint8_t*)metainfo, metainfo_len);
     tr_ctorSetPaused(ctor, TR_FORCE, true);
 
     /* create the torrent */
     err = 0;
     tor = tr_torrentNew(ctor, &err, NULL);
-    assert(err == 0);
+    TR_ASSERT(err == 0);
 
     /* cleanup */
     tr_free(metainfo);
