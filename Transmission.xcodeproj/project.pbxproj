@@ -345,6 +345,8 @@
 		C12F19791E1AE3C30005E93F /* upnperrors.c in Sources */ = {isa = PBXBuildFile; fileRef = C12F19771E1AE3C30005E93F /* upnperrors.c */; };
 		C12F197B1E1AE4460005E93F /* upnperrors.h in Headers */ = {isa = PBXBuildFile; fileRef = C12F197A1E1AE4460005E93F /* upnperrors.h */; };
 		C1305EBE186A13B100F03351 /* file.c in Sources */ = {isa = PBXBuildFile; fileRef = C1305EB8186A134000F03351 /* file.c */; };
+		C1425B351EE9C5F5001DB85F /* tr-assert.c in Sources */ = {isa = PBXBuildFile; fileRef = C1425B321EE9C5EA001DB85F /* tr-assert.c */; };
+		C1425B361EE9C605001DB85F /* tr-assert.h in Headers */ = {isa = PBXBuildFile; fileRef = C1425B331EE9C5EA001DB85F /* tr-assert.h */; };
 		C1639A741A55F4E000E42033 /* libb64.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C1639A6F1A55F4D600E42033 /* libb64.a */; };
 		C1639A781A55F56600E42033 /* cdecode.c in Sources */ = {isa = PBXBuildFile; fileRef = C1639A761A55F56600E42033 /* cdecode.c */; };
 		C1639A791A55F56600E42033 /* cencode.c in Sources */ = {isa = PBXBuildFile; fileRef = C1639A771A55F56600E42033 /* cencode.c */; };
@@ -986,6 +988,8 @@
 		C12F19771E1AE3C30005E93F /* upnperrors.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = upnperrors.c; path = "third-party/miniupnpc/upnperrors.c"; sourceTree = "<group>"; };
 		C12F197A1E1AE4460005E93F /* upnperrors.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = upnperrors.h; path = "third-party/miniupnpc/upnperrors.h"; sourceTree = "<group>"; };
 		C1305EB8186A134000F03351 /* file.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = file.c; path = libtransmission/file.c; sourceTree = "<group>"; };
+		C1425B321EE9C5EA001DB85F /* tr-assert.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "tr-assert.c"; path = "libtransmission/tr-assert.c"; sourceTree = "<group>"; };
+		C1425B331EE9C5EA001DB85F /* tr-assert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "tr-assert.h"; path = "libtransmission/tr-assert.h"; sourceTree = "<group>"; };
 		C1639A6F1A55F4D600E42033 /* libb64.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libb64.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		C1639A761A55F56600E42033 /* cdecode.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = cdecode.c; path = "third-party/libb64/src/cdecode.c"; sourceTree = "<group>"; };
 		C1639A771A55F56600E42033 /* cencode.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = cencode.c; path = "third-party/libb64/src/cencode.c"; sourceTree = "<group>"; };
@@ -1353,6 +1357,8 @@
 				4D8017E910BBC073008A4AF2 /* torrent-magnet.h */,
 				0A6169A50FE5C9A200C66CE6 /* bitfield.c */,
 				0A6169A60FE5C9A200C66CE6 /* bitfield.h */,
+				C1425B321EE9C5EA001DB85F /* tr-assert.c */,
+				C1425B331EE9C5EA001DB85F /* tr-assert.h */,
 				A22CFCA60FC24ED80009BD3E /* tr-dht.c */,
 				A22CFCA70FC24ED80009BD3E /* tr-dht.h */,
 				A284214212DA663E00FBDDBB /* tr-udp.c */,
@@ -1774,6 +1780,7 @@
 				A2AAB65E0DE0CF6200E04DDA /* rpc-server.h in Headers */,
 				BEFC1E350C07861A00B0BB3C /* port-forwarding.h in Headers */,
 				BEFC1E3B0C07861A00B0BB3C /* platform.h in Headers */,
+				C1425B361EE9C605001DB85F /* tr-assert.h in Headers */,
 				BEFC1E450C07861A00B0BB3C /* net.h in Headers */,
 				BEFC1E490C07861A00B0BB3C /* metainfo.h in Headers */,
 				BEFC1E4D0C07861A00B0BB3C /* session.h in Headers */,
@@ -2370,6 +2377,7 @@
 				C1FEE57A1C3223CC00D62832 /* watchdir.c in Sources */,
 				A23547E211CD0B090046EAE6 /* cache.c in Sources */,
 				A284214412DA663E00FBDDBB /* tr-udp.c in Sources */,
+				C1425B351EE9C5F5001DB85F /* tr-assert.c in Sources */,
 				A2679294130E00A000CB7464 /* tr-utp.c in Sources */,
 				A23F29A2132A447400E9A83B /* announcer-http.c in Sources */,
 				C1FEE5791C3223CC00D62832 /* watchdir-kqueue.c in Sources */,
