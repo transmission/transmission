@@ -774,9 +774,6 @@ void tr_dhtUpkeep(tr_session* session)
 
 void tr_dhtCallback(unsigned char* buf, int buflen, struct sockaddr* from, socklen_t fromlen, void* sv)
 {
-    time_t tosleep;
-    int rc;
-
     TR_ASSERT(tr_isSession(sv));
 
     if (sv != session)
@@ -784,7 +781,8 @@ void tr_dhtCallback(unsigned char* buf, int buflen, struct sockaddr* from, sockl
         return;
     }
 
-    rc = dht_periodic(buf, buflen, from, fromlen, &tosleep, callback, NULL);
+    time_t tosleep;
+    int rc = dht_periodic(buf, buflen, from, fromlen, &tosleep, callback, NULL);
 
     if (rc < 0)
     {
@@ -845,6 +843,7 @@ int dht_random_bytes(void* buf, size_t size)
 int dht_gettimeofday(struct timeval* tv, struct timezone* tz)
 {
     TR_ASSERT(tz == NULL);
+
     return tr_gettimeofday(tv);
 }
 

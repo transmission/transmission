@@ -133,9 +133,9 @@ bool tr_sha1_final(tr_sha1_ctx_t handle, uint8_t* hash)
 
     if (hash != NULL)
     {
-        unsigned int hash_length;
-
         TR_ASSERT(handle != NULL);
+
+        unsigned int hash_length;
 
         ret = check_result(EVP_DigestFinal_ex(handle, hash, &hash_length));
 
@@ -218,8 +218,6 @@ void tr_rc4_set_key(tr_rc4_ctx_t handle, uint8_t const* key, size_t key_length)
 
 void tr_rc4_process(tr_rc4_ctx_t handle, void const* input, void* output, size_t length)
 {
-    int output_length;
-
     TR_ASSERT(handle != NULL);
 
     if (length == 0)
@@ -229,6 +227,8 @@ void tr_rc4_process(tr_rc4_ctx_t handle, void const* input, void* output, size_t
 
     TR_ASSERT(input != NULL);
     TR_ASSERT(output != NULL);
+
+    int output_length;
 
     check_result(EVP_CipherUpdate(handle, output, &output_length, input, length));
 }
@@ -299,12 +299,12 @@ static inline void DH_get0_key(DH const* dh, BIGNUM const** pub_key, BIGNUM cons
 tr_dh_ctx_t tr_dh_new(uint8_t const* prime_num, size_t prime_num_length, uint8_t const* generator_num,
     size_t generator_num_length)
 {
+    TR_ASSERT(prime_num != NULL);
+    TR_ASSERT(generator_num != NULL);
+
     DH* handle = DH_new();
     BIGNUM* p;
     BIGNUM* g;
-
-    TR_ASSERT(prime_num != NULL);
-    TR_ASSERT(generator_num != NULL);
 
     p = BN_bin2bn(prime_num, prime_num_length, NULL);
     g = BN_bin2bn(generator_num, generator_num_length, NULL);
@@ -332,13 +332,13 @@ void tr_dh_free(tr_dh_ctx_t handle)
 
 bool tr_dh_make_key(tr_dh_ctx_t raw_handle, size_t private_key_length, uint8_t* public_key, size_t* public_key_length)
 {
+    TR_ASSERT(raw_handle != NULL);
+    TR_ASSERT(public_key != NULL);
+
     DH* handle = raw_handle;
     int dh_size;
     int my_public_key_length;
     BIGNUM const* my_public_key;
-
-    TR_ASSERT(handle != NULL);
-    TR_ASSERT(public_key != NULL);
 
     DH_set_length(handle, private_key_length * 8);
 
@@ -364,13 +364,13 @@ bool tr_dh_make_key(tr_dh_ctx_t raw_handle, size_t private_key_length, uint8_t* 
 
 tr_dh_secret_t tr_dh_agree(tr_dh_ctx_t handle, uint8_t const* other_public_key, size_t other_public_key_length)
 {
+    TR_ASSERT(handle != NULL);
+    TR_ASSERT(other_public_key != NULL);
+
     struct tr_dh_secret* ret;
     int dh_size;
     int secret_key_length;
     BIGNUM* other_key;
-
-    TR_ASSERT(handle != NULL);
-    TR_ASSERT(other_public_key != NULL);
 
     if (!check_pointer(other_key = BN_bin2bn(other_public_key, other_public_key_length, NULL)))
     {

@@ -303,18 +303,21 @@ void tr_watchdir_free(tr_watchdir_t handle)
 char const* tr_watchdir_get_path(tr_watchdir_t handle)
 {
     TR_ASSERT(handle != NULL);
+
     return handle->path;
 }
 
 tr_watchdir_backend* tr_watchdir_get_backend(tr_watchdir_t handle)
 {
     TR_ASSERT(handle != NULL);
+
     return handle->backend;
 }
 
 struct event_base* tr_watchdir_get_event_base(tr_watchdir_t handle)
 {
     TR_ASSERT(handle != NULL);
+
     return handle->event_base;
 }
 
@@ -324,10 +327,10 @@ struct event_base* tr_watchdir_get_event_base(tr_watchdir_t handle)
 
 void tr_watchdir_process(tr_watchdir_t handle, char const* name)
 {
+    TR_ASSERT(handle != NULL);
+
     tr_watchdir_retry const search_key = { .name = (char*)name };
     tr_watchdir_retry* existing_retry;
-
-    TR_ASSERT(handle != NULL);
 
     if ((existing_retry = tr_watchdir_retries_find(&handle->active_retries, &search_key)) != NULL)
     {

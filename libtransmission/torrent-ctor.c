@@ -310,36 +310,30 @@ bool tr_ctorGetSave(tr_ctor const* ctor)
 
 void tr_ctorSetPaused(tr_ctor* ctor, tr_ctorMode mode, bool isPaused)
 {
-    struct optional_args* args;
-
     TR_ASSERT(ctor != NULL);
     TR_ASSERT(mode == TR_FALLBACK || mode == TR_FORCE);
 
-    args = &ctor->optionalArgs[mode];
+    struct optional_args* args = &ctor->optionalArgs[mode];
     args->isSet_paused = true;
     args->isPaused = isPaused;
 }
 
 void tr_ctorSetPeerLimit(tr_ctor* ctor, tr_ctorMode mode, uint16_t peerLimit)
 {
-    struct optional_args* args;
-
     TR_ASSERT(ctor != NULL);
     TR_ASSERT(mode == TR_FALLBACK || mode == TR_FORCE);
 
-    args = &ctor->optionalArgs[mode];
+    struct optional_args* args = &ctor->optionalArgs[mode];
     args->isSet_connected = true;
     args->peerLimit = peerLimit;
 }
 
 void tr_ctorSetDownloadDir(tr_ctor* ctor, tr_ctorMode mode, char const* directory)
 {
-    struct optional_args* args;
-
     TR_ASSERT(ctor != NULL);
     TR_ASSERT(mode == TR_FALLBACK || mode == TR_FORCE);
 
-    args = &ctor->optionalArgs[mode];
+    struct optional_args* args = &ctor->optionalArgs[mode];
     tr_free(args->downloadDir);
     args->downloadDir = NULL;
     args->isSet_downloadDir = false;

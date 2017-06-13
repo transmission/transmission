@@ -302,11 +302,11 @@ bool tr_cpFileIsComplete(tr_completion const* cp, tr_file_index_t i)
 
 void* tr_cpCreatePieceBitfield(tr_completion const* cp, size_t* byte_count)
 {
+    TR_ASSERT(tr_torrentHasMetadata(cp->tor));
+
     void* ret;
     tr_piece_index_t n;
     tr_bitfield pieces;
-
-    TR_ASSERT(tr_torrentHasMetadata(cp->tor));
 
     n = cp->tor->info.pieceCount;
     tr_bitfieldConstruct(&pieces, n);

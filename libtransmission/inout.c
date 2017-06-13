@@ -166,13 +166,13 @@ static int compareOffsetToFile(void const* a, void const* b)
 void tr_ioFindFileLocation(tr_torrent const* tor, tr_piece_index_t pieceIndex, uint32_t pieceOffset, tr_file_index_t* fileIndex,
     uint64_t* fileOffset)
 {
-    uint64_t const offset = tr_pieceOffset(tor, pieceIndex, pieceOffset, 0);
-    tr_file const* file;
-
     TR_ASSERT(tr_isTorrent(tor));
+
+    uint64_t const offset = tr_pieceOffset(tor, pieceIndex, pieceOffset, 0);
+
     TR_ASSERT(offset < tor->info.totalSize);
 
-    file = bsearch(&offset, tor->info.files, tor->info.fileCount, sizeof(tr_file), compareOffsetToFile);
+    tr_file const* file = bsearch(&offset, tor->info.files, tor->info.fileCount, sizeof(tr_file), compareOffsetToFile);
 
     TR_ASSERT(file != NULL);
 
@@ -243,6 +243,10 @@ int tr_ioWrite(tr_torrent* tor, tr_piece_index_t pieceIndex, uint32_t begin, uin
 
 static bool recalculateHash(tr_torrent* tor, tr_piece_index_t pieceIndex, uint8_t* setme)
 {
+    TR_ASSERT(tor != NULL);
+    TR_ASSERT(pieceIndex < tor->info.pieceCount);
+    TR_ASSERT(setme != NULL);
+
     size_t bytesLeft;
     uint32_t offset = 0;
     bool success = true;
@@ -250,11 +254,8 @@ static bool recalculateHash(tr_torrent* tor, tr_piece_index_t pieceIndex, uint8_
     void* buffer = tr_valloc(buflen);
     tr_sha1_ctx_t sha;
 
-    TR_ASSERT(tor != NULL);
-    TR_ASSERT(pieceIndex < tor->info.pieceCount);
     TR_ASSERT(buffer != NULL);
     TR_ASSERT(buflen > 0);
-    TR_ASSERT(setme != NULL);
 
     sha = tr_sha1_init();
     bytesLeft = tr_torPieceCountBytes(tor, pieceIndex);

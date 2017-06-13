@@ -499,10 +499,10 @@ static void onVerifyDone(tr_torrent* tor UNUSED, bool aborted UNUSED, void* done
 
 void libttest_blockingTorrentVerify(tr_torrent* tor)
 {
-    bool done = false;
-
     TR_ASSERT(tor->session != NULL);
     TR_ASSERT(!tr_amInEventThread(tor->session));
+
+    bool done = false;
 
     tr_torrentVerify(tor, onVerifyDone, &done);
 

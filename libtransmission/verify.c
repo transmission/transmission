@@ -279,12 +279,10 @@ static int compareVerifyByPriorityAndSize(void const* va, void const* vb)
 
 void tr_verifyAdd(tr_torrent* tor, tr_verify_done_func callback_func, void* callback_data)
 {
-    struct verify_node* node;
-
     TR_ASSERT(tr_isTorrent(tor));
     tr_logAddTorInfo(tor, "%s", _("Queued for verification"));
 
-    node = tr_new(struct verify_node, 1);
+    struct verify_node* node = tr_new(struct verify_node, 1);
     node->torrent = tor;
     node->callback_func = callback_func;
     node->callback_data = callback_data;
@@ -311,10 +309,10 @@ static int compareVerifyByTorrent(void const* va, void const* vb)
 
 void tr_verifyRemove(tr_torrent* tor)
 {
+    TR_ASSERT(tr_isTorrent(tor));
+
     tr_lock* lock = getVerifyLock();
     tr_lockLock(lock);
-
-    TR_ASSERT(tr_isTorrent(tor));
 
     if (tor == currentNode.torrent)
     {

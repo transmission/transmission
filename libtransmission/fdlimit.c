@@ -528,9 +528,10 @@ tr_sys_file_t tr_fdFileCheckout(tr_session* session, int torrent_id, tr_file_ind
 
 tr_socket_t tr_fdSocketCreate(tr_session* session, int domain, int type)
 {
+    TR_ASSERT(tr_isSession(session));
+
     tr_socket_t s = TR_BAD_SOCKET;
     struct tr_fdInfo* gFd;
-    TR_ASSERT(tr_isSession(session));
 
     ensureSessionFdInfoExists(session);
     gFd = session->fdInfo;
@@ -585,14 +586,14 @@ tr_socket_t tr_fdSocketCreate(tr_session* session, int domain, int type)
 
 tr_socket_t tr_fdSocketAccept(tr_session* s, tr_socket_t sockfd, tr_address* addr, tr_port* port)
 {
+    TR_ASSERT(tr_isSession(s));
+    TR_ASSERT(addr != NULL);
+    TR_ASSERT(port != NULL);
+
     tr_socket_t fd;
     socklen_t len;
     struct tr_fdInfo* gFd;
     struct sockaddr_storage sock;
-
-    TR_ASSERT(tr_isSession(s));
-    TR_ASSERT(addr != NULL);
-    TR_ASSERT(port != NULL);
 
     ensureSessionFdInfoExists(s);
     gFd = s->fdInfo;

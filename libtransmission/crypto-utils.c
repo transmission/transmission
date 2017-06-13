@@ -87,9 +87,9 @@ bool tr_sha1(uint8_t* hash, void const* data1, int data1_length, ...)
 
 int tr_rand_int(int upper_bound)
 {
-    int noise;
-
     TR_ASSERT(upper_bound > 0);
+
+    int noise;
 
     while (tr_rand_buffer(&noise, sizeof(noise)))
     {
@@ -108,9 +108,9 @@ int tr_rand_int(int upper_bound)
 
 int tr_rand_int_weak(int upper_bound)
 {
-    static bool init = false;
-
     TR_ASSERT(upper_bound > 0);
+
+    static bool init = false;
 
     if (!init)
     {
@@ -127,6 +127,8 @@ int tr_rand_int_weak(int upper_bound)
 
 char* tr_ssha1(char const* plain_text)
 {
+    TR_ASSERT(plain_text != NULL);
+
     enum
     {
         saltval_len = 8,
@@ -138,8 +140,6 @@ char* tr_ssha1(char const* plain_text)
         "abcdefghijklmnopqrstuvwxyz"
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
         "./";
-
-    TR_ASSERT(plain_text != NULL);
 
     unsigned char salt[saltval_len];
     uint8_t sha[SHA_DIGEST_LENGTH];

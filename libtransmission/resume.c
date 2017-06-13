@@ -750,6 +750,8 @@ void tr_torrentSaveResume(tr_torrent* tor)
 
 static uint64_t loadFromFile(tr_torrent* tor, uint64_t fieldsToLoad)
 {
+    TR_ASSERT(tr_isTorrent(tor));
+
     size_t len;
     int64_t i;
     char const* str;
@@ -759,8 +761,6 @@ static uint64_t loadFromFile(tr_torrent* tor, uint64_t fieldsToLoad)
     uint64_t fieldsLoaded = 0;
     bool const wasDirty = tor->isDirty;
     tr_error* error = NULL;
-
-    TR_ASSERT(tr_isTorrent(tor));
 
     filename = getResumeFilename(tor);
 
@@ -977,9 +977,9 @@ static uint64_t useFallbackFields(tr_torrent* tor, uint64_t fields, tr_ctor cons
 
 uint64_t tr_torrentLoadResume(tr_torrent* tor, uint64_t fieldsToLoad, tr_ctor const* ctor)
 {
-    uint64_t ret = 0;
-
     TR_ASSERT(tr_isTorrent(tor));
+
+    uint64_t ret = 0;
 
     ret |= useManditoryFields(tor, fieldsToLoad, ctor);
     fieldsToLoad &= ~ret;

@@ -274,11 +274,11 @@ static uint8_t* getHashInfo(tr_metainfo_builder* b)
 
     while (totalRemain)
     {
+        TR_ASSERT(b->pieceIndex < b->pieceCount);
+
         uint8_t* bufptr = buf;
         uint32_t const thisPieceSize = (uint32_t)MIN(b->pieceSize, totalRemain);
         uint64_t leftInPiece = thisPieceSize;
-
-        TR_ASSERT(b->pieceIndex < b->pieceCount);
 
         while (leftInPiece != 0)
         {

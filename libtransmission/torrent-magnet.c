@@ -156,11 +156,11 @@ static void ensureInfoDictOffsetIsCached(tr_torrent* tor)
 
 void* tr_torrentGetMetadataPiece(tr_torrent* tor, int piece, size_t* len)
 {
-    char* ret = NULL;
-
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(piece >= 0);
     TR_ASSERT(len != NULL);
+
+    char* ret = NULL;
 
     if (tr_torrentHasMetadata(tor))
     {
@@ -207,9 +207,6 @@ void* tr_torrentGetMetadataPiece(tr_torrent* tor, int piece, size_t* len)
 
 void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, int len)
 {
-    struct tr_incomplete_metadata* m;
-    int const offset = piece * METADATA_PIECE_SIZE;
-
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(data != NULL);
     TR_ASSERT(len >= 0);
@@ -217,7 +214,7 @@ void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, in
     dbgmsg(tor, "got metadata piece %d of %d bytes", piece, len);
 
     /* are we set up to download metadata? */
-    m = tor->incompleteMetadata;
+    struct tr_incomplete_metadata* m = tor->incompleteMetadata;
 
     if (m == NULL)
     {
@@ -234,6 +231,8 @@ void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, in
     {
         return;
     }
+
+    int const offset = piece * METADATA_PIECE_SIZE;
 
     TR_ASSERT(offset <= m->metadata_size);
 
@@ -361,12 +360,10 @@ void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, in
 
 bool tr_torrentGetNextMetadataRequest(tr_torrent* tor, time_t now, int* setme_piece)
 {
-    bool have_request = false;
-    struct tr_incomplete_metadata* m;
-
     TR_ASSERT(tr_isTorrent(tor));
 
-    m = tor->incompleteMetadata;
+    bool have_request = false;
+    struct tr_incomplete_metadata* m = tor->incompleteMetadata;
 
     if (m != NULL && m->piecesNeededCount > 0 && m->piecesNeeded[0].requestedAt + MIN_REPEAT_INTERVAL_SECS < now)
     {

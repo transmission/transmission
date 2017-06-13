@@ -193,6 +193,7 @@ void tr_lockLock(tr_lock* l)
 
     TR_ASSERT(l->depth >= 0);
     TR_ASSERT(l->depth == 0 || tr_areThreadsEqual(l->lockThread, tr_getCurrentThread()));
+
     l->lockThread = tr_getCurrentThread();
     ++l->depth;
 }

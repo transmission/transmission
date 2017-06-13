@@ -279,6 +279,7 @@ tr_cache* tr_cacheNew(int64_t max_bytes)
 void tr_cacheFree(tr_cache* cache)
 {
     TR_ASSERT(tr_ptrArrayEmpty(&cache->blocks));
+
     tr_ptrArrayDestruct(&cache->blocks, NULL);
     tr_free(cache);
 }
@@ -319,9 +320,9 @@ static struct cache_block* findBlock(tr_cache* cache, tr_torrent* torrent, tr_pi
 int tr_cacheWriteBlock(tr_cache* cache, tr_torrent* torrent, tr_piece_index_t piece, uint32_t offset, uint32_t length,
     struct evbuffer* writeme)
 {
-    struct cache_block* cb = findBlock(cache, torrent, piece, offset);
-
     TR_ASSERT(tr_amInEventThread(torrent->session));
+
+    struct cache_block* cb = findBlock(cache, torrent, piece, offset);
 
     if (cb == NULL)
     {
@@ -335,9 +336,10 @@ int tr_cacheWriteBlock(tr_cache* cache, tr_torrent* torrent, tr_piece_index_t pi
         tr_ptrArrayInsertSorted(&cache->blocks, cb, cache_block_compare);
     }
 
+    TR_ASSERT(cb->length == length);
+
     cb->time = tr_time();
 
-    TR_ASSERT(cb->length == length);
     evbuffer_drain(cb->evbuf, evbuffer_get_length(cb->evbuf));
     evbuffer_remove_buffer(writeme, cb->evbuf, cb->length);
 

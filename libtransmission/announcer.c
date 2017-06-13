@@ -162,11 +162,9 @@ static void onUpkeepTimer(evutil_socket_t foo UNUSED, short bar UNUSED, void* va
 
 void tr_announcerInit(tr_session* session)
 {
-    tr_announcer* a;
-
     TR_ASSERT(tr_isSession(session));
 
-    a = tr_new0(tr_announcer, 1);
+    tr_announcer* a = tr_new0(tr_announcer, 1);
     a->stops = TR_PTR_ARRAY_INIT;
     a->key = tr_rand_int(INT_MAX);
     a->session = session;
@@ -716,11 +714,9 @@ static void addTorrentToTier(tr_torrent_tiers* tt, tr_torrent* tor)
 
 tr_torrent_tiers* tr_announcerAddTorrent(tr_torrent* tor, tr_tracker_callback callback, void* callbackData)
 {
-    tr_torrent_tiers* tiers;
-
     TR_ASSERT(tr_isTorrent(tor));
 
-    tiers = tiersNew();
+    tr_torrent_tiers* tiers = tiersNew();
     tiers->callback = callback;
     tiers->callbackData = callbackData;
 
@@ -740,10 +736,10 @@ static bool tierCanManualAnnounce(tr_tier const* tier)
 
 bool tr_announcerCanManualAnnounce(tr_torrent const* tor)
 {
-    struct tr_torrent_tiers* tt = NULL;
-
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(tor->tiers != NULL);
+
+    struct tr_torrent_tiers* tt = NULL;
 
     if (tor->isRunning)
     {
@@ -912,10 +908,10 @@ void tr_announcerChangeMyPort(tr_torrent* tor)
 
 void tr_announcerAddBytes(tr_torrent* tor, int type, uint32_t byteCount)
 {
-    struct tr_torrent_tiers* tt = tor->tiers;
-
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(type == TR_ANN_UP || type == TR_ANN_DOWN || type == TR_ANN_CORRUPT);
+
+    struct tr_torrent_tiers* tt = tor->tiers;
 
     for (int i = 0; i < tt->tier_count; ++i)
     {
@@ -1270,19 +1266,16 @@ static void announce_request_delegate(tr_announcer* announcer, tr_announce_reque
 
 static void tierAnnounce(tr_announcer* announcer, tr_tier* tier)
 {
-    tr_announce_event announce_event;
-    tr_announce_request* req;
-    struct announce_data* data;
-    tr_torrent* tor = tier->tor;
-    time_t const now = tr_time();
-
     TR_ASSERT(!tier->isAnnouncing);
     TR_ASSERT(tier->announce_event_count > 0);
 
-    announce_event = tier_announce_event_pull(tier);
-    req = announce_request_new(announcer, tor, tier, announce_event);
+    time_t const now = tr_time();
 
-    data = tr_new0(struct announce_data, 1);
+    tr_torrent* tor = tier->tor;
+    tr_announce_event announce_event = tier_announce_event_pull(tier);
+    tr_announce_request* req = announce_request_new(announcer, tor, tier, announce_event);
+
+    struct announce_data* data = tr_new0(struct announce_data, 1);
     data->session = announcer->session;
     data->tierId = tier->key;
     data->isRunningOnSuccess = tor->isRunning;
@@ -1659,14 +1652,13 @@ static void onUpkeepTimer(evutil_socket_t foo UNUSED, short bar UNUSED, void* va
 
 tr_tracker_stat* tr_announcerStats(tr_torrent const* torrent, int* setmeTrackerCount)
 {
-    int out = 0;
-    tr_tracker_stat* ret;
-    struct tr_torrent_tiers* tt;
-    time_t const now = tr_time();
-
     TR_ASSERT(tr_isTorrent(torrent));
 
-    tt = torrent->tiers;
+    time_t const now = tr_time();
+
+    int out = 0;
+    tr_tracker_stat* ret;
+    struct tr_torrent_tiers* tt = torrent->tiers;
 
     /* alloc the stats */
     *setmeTrackerCount = tt->tracker_count;
@@ -1783,11 +1775,11 @@ void tr_announcerStatsFree(tr_tracker_stat* trackers, int trackerCount UNUSED)
 
 static void copy_tier_attributes_impl(struct tr_tier* tgt, int trackerIndex, tr_tier const* src)
 {
-    tr_tier const keep = *tgt;
-
     /* sanity clause */
     TR_ASSERT(trackerIndex < tgt->tracker_count);
     TR_ASSERT(tr_strcmp0(tgt->trackers[trackerIndex].announce, src->currentTracker->announce) == 0);
+
+    tr_tier const keep = *tgt;
 
     /* bitwise copy will handle most of tr_tier's fields... */
     *tgt = *src;
@@ -1826,11 +1818,12 @@ static void copy_tier_attributes(struct tr_torrent_tiers* tt, tr_tier const* src
 
 void tr_announcerResetTorrent(tr_announcer* announcer UNUSED, tr_torrent* tor)
 {
+    TR_ASSERT(tor->tiers != NULL);
+
     time_t const now = tr_time();
+
     struct tr_torrent_tiers* tt = tor->tiers;
     tr_torrent_tiers old = *tt;
-
-    TR_ASSERT(tt != NULL);
 
     /* remove the old tiers / trackers */
     tt->tiers = NULL;

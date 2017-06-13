@@ -127,10 +127,11 @@ static void action_callback_PUSH(jsonsl_t jsn, jsonsl_action_t action UNUSED, st
 /* like sscanf(in+2, "%4x", &val) but less slow */
 static bool decode_hex_string(char const* in, unsigned int* setme)
 {
+    TR_ASSERT(in != NULL);
+
     unsigned int val = 0;
     char const* const end = in + 6;
 
-    TR_ASSERT(in != NULL);
     TR_ASSERT(in[0] == '\\');
     TR_ASSERT(in[1] == 'u');
     in += 2;

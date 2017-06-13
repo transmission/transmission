@@ -228,10 +228,10 @@ void tr_rc4_process(tr_rc4_ctx_t handle, void const* input, void* output, size_t
 tr_dh_ctx_t tr_dh_new(uint8_t const* prime_num, size_t prime_num_length, uint8_t const* generator_num,
     size_t generator_num_length)
 {
-    API(dhm_context)* handle = tr_new0(API(dhm_context), 1);
-
     TR_ASSERT(prime_num != NULL);
     TR_ASSERT(generator_num != NULL);
+
+    API(dhm_context)* handle = tr_new0(API(dhm_context), 1);
 
 #if API_VERSION_NUMBER >= 0x01030800
     API(dhm_init)(handle);
@@ -261,10 +261,10 @@ void tr_dh_free(tr_dh_ctx_t handle)
 
 bool tr_dh_make_key(tr_dh_ctx_t raw_handle, size_t private_key_length, uint8_t* public_key, size_t* public_key_length)
 {
-    API(dhm_context)* handle = raw_handle;
-
-    TR_ASSERT(handle != NULL);
+    TR_ASSERT(raw_handle != NULL);
     TR_ASSERT(public_key != NULL);
+
+    API(dhm_context)* handle = raw_handle;
 
     if (public_key_length != NULL)
     {
@@ -276,12 +276,12 @@ bool tr_dh_make_key(tr_dh_ctx_t raw_handle, size_t private_key_length, uint8_t* 
 
 tr_dh_secret_t tr_dh_agree(tr_dh_ctx_t raw_handle, uint8_t const* other_public_key, size_t other_public_key_length)
 {
+    TR_ASSERT(raw_handle != NULL);
+    TR_ASSERT(other_public_key != NULL);
+
     API(dhm_context)* handle = raw_handle;
     struct tr_dh_secret* ret;
     size_t secret_key_length;
-
-    TR_ASSERT(handle != NULL);
-    TR_ASSERT(other_public_key != NULL);
 
     if (!check_result(API(dhm_read_public)(handle, other_public_key, other_public_key_length)))
     {
@@ -318,10 +318,10 @@ tr_dh_secret_t tr_dh_agree(tr_dh_ctx_t raw_handle, uint8_t const* other_public_k
 
 bool tr_rand_buffer(void* buffer, size_t length)
 {
+    TR_ASSERT(buffer != NULL);
+
     bool ret;
     tr_lock* rng_lock = get_rng_lock();
-
-    TR_ASSERT(buffer != NULL);
 
     tr_lockLock(rng_lock);
     ret = check_result(API(ctr_drbg_random)(get_rng(), buffer, length));

@@ -152,10 +152,10 @@ void tr_bandwidthSetParent(tr_bandwidth* b, tr_bandwidth* parent)
 static void allocateBandwidth(tr_bandwidth* b, tr_priority_t parent_priority, tr_direction dir, unsigned int period_msec,
     tr_ptrArray* peer_pool)
 {
-    tr_priority_t const priority = MAX(parent_priority, b->priority);
-
     TR_ASSERT(tr_isBandwidth(b));
     TR_ASSERT(tr_isDirection(dir));
+
+    tr_priority_t const priority = MAX(parent_priority, b->priority);
 
     /* set the available bandwidth */
     if (b->band[dir].isLimited)
@@ -372,12 +372,10 @@ unsigned int tr_bandwidthGetPieceSpeed_Bps(tr_bandwidth const* b, uint64_t const
 
 void tr_bandwidthUsed(tr_bandwidth* b, tr_direction dir, size_t byteCount, bool isPieceData, uint64_t now)
 {
-    struct tr_band* band;
-
     TR_ASSERT(tr_isBandwidth(b));
     TR_ASSERT(tr_isDirection(dir));
 
-    band = &b->band[dir];
+    struct tr_band* band = &b->band[dir];
 
     if (band->isLimited && isPieceData)
     {

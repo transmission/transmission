@@ -233,6 +233,8 @@ static socklen_t setup_sockaddr(tr_address const* addr, tr_port port, struct soc
 
 tr_socket_t tr_netOpenPeerSocket(tr_session* session, tr_address const* addr, tr_port port, bool clientIsSeed)
 {
+    TR_ASSERT(tr_address_is_valid(addr));
+
     static int const domains[NUM_TR_AF_INET_TYPES] = { AF_INET, AF_INET6 };
     tr_socket_t s;
     struct sockaddr_storage sock;
@@ -241,8 +243,6 @@ tr_socket_t tr_netOpenPeerSocket(tr_session* session, tr_address const* addr, tr
     socklen_t sourcelen;
     struct sockaddr_storage source_sock;
     char err_buf[512];
-
-    TR_ASSERT(tr_address_is_valid(addr));
 
     if (!tr_address_is_valid_for_peers(addr, port))
     {
@@ -278,7 +278,7 @@ tr_socket_t tr_netOpenPeerSocket(tr_session* session, tr_address const* addr, tr
 
     /* set source address */
     source_addr = tr_sessionGetPublicAddress(session, addr->type, NULL);
-    TR_ASSERT(source_addr);
+    TR_ASSERT(source_addr != NULL);
     sourcelen = setup_sockaddr(source_addr, 0, &source_sock);
 
     if (bind(s, (struct sockaddr*)&source_sock, sourcelen) == -1)
@@ -330,13 +330,13 @@ struct UTPSocket* tr_netOpenPeerUTPSocket(tr_session* session, tr_address const*
 
 static tr_socket_t tr_netBindTCPImpl(tr_address const* addr, tr_port port, bool suppressMsgs, int* errOut)
 {
+    TR_ASSERT(tr_address_is_valid(addr));
+
     static int const domains[NUM_TR_AF_INET_TYPES] = { AF_INET, AF_INET6 };
     struct sockaddr_storage sock;
     tr_socket_t fd;
     int addrlen;
     int optval;
-
-    TR_ASSERT(tr_address_is_valid(addr));
 
     fd = socket(domains[addr->type], SOCK_STREAM, 0);
 
@@ -684,9 +684,9 @@ static bool isIPv6LinkLocalAddress(tr_address const* addr)
    and is covered under the same license as third-party/dht/dht.c. */
 static bool isMartianAddr(struct tr_address const* a)
 {
-    static unsigned char const zeroes[16] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-
     TR_ASSERT(tr_address_is_valid(a));
+
+    static unsigned char const zeroes[16] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
     switch (a->type)
     {

@@ -197,10 +197,10 @@ static void set_all_true(uint8_t* array, size_t bit_count)
 
 void* tr_bitfieldGetRaw(tr_bitfield const* b, size_t* byte_count)
 {
+    TR_ASSERT(b->bit_count > 0);
+
     size_t const n = get_bytes_needed(b->bit_count);
     uint8_t* bits = tr_new0(uint8_t, n);
-
-    TR_ASSERT(b->bit_count > 0);
 
     if (b->alloc_count != 0)
     {
@@ -366,6 +366,7 @@ void tr_bitfieldSetRaw(tr_bitfield* b, void const* bits, size_t byte_count, bool
     {
         /* ensure the excess bits are set to '0' */
         int const excess_bit_count = byte_count * 8 - b->bit_count;
+
         TR_ASSERT(excess_bit_count >= 0);
         TR_ASSERT(excess_bit_count <= 7);
 

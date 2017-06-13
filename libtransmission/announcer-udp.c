@@ -536,15 +536,15 @@ static void tau_tracker_send_request(struct tau_tracker* tracker, void const* pa
 
 static void tau_tracker_send_reqs(struct tau_tracker* tracker)
 {
-    tr_ptrArray* reqs;
-    time_t const now = tr_time();
-
     TR_ASSERT(tracker->dns_request == NULL);
     TR_ASSERT(tracker->connecting_at == 0);
     TR_ASSERT(tracker->addr != NULL);
+
+    time_t const now = tr_time();
+
     TR_ASSERT(tracker->connection_expiration_time > now);
 
-    reqs = &tracker->announces;
+    tr_ptrArray* reqs = &tracker->announces;
 
     for (int i = 0, n = tr_ptrArraySize(reqs); i < n; ++i)
     {

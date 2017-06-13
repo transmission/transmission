@@ -468,13 +468,13 @@ void tr_sessionGetSettings(tr_session* s, tr_variant* d)
 
 bool tr_sessionLoadSettings(tr_variant* dict, char const* configDir, char const* appName)
 {
+    TR_ASSERT(tr_variantIsDict(dict));
+
     char* filename;
     tr_variant oldDict;
     tr_variant fileSettings;
     bool success;
     tr_error* error = NULL;
-
-    TR_ASSERT(tr_variantIsDict(dict));
 
     /* initializing the defaults: caller may have passed in some app-level defaults.
      * preserve those and use the session defaults to fill in any missing gaps. */
@@ -512,10 +512,10 @@ bool tr_sessionLoadSettings(tr_variant* dict, char const* configDir, char const*
 
 void tr_sessionSaveSettings(tr_session* session, char const* configDir, tr_variant const* clientSettings)
 {
+    TR_ASSERT(tr_variantIsDict(clientSettings));
+
     tr_variant settings;
     char* filename = tr_buildPath(configDir, "settings.json", NULL);
-
-    TR_ASSERT(tr_variantIsDict(clientSettings));
 
     tr_variantInitDict(&settings, 0);
 
@@ -596,11 +596,11 @@ struct init_data
 
 tr_session* tr_sessionInit(char const* configDir, bool messageQueuingEnabled, tr_variant* clientSettings)
 {
+    TR_ASSERT(tr_variantIsDict(clientSettings));
+
     int64_t i;
     tr_session* session;
     struct init_data data;
-
-    TR_ASSERT(tr_variantIsDict(clientSettings));
 
     tr_timeUpdate(time(NULL));
 
@@ -646,16 +646,17 @@ static void turtleCheckClock(tr_session* s, struct tr_turtle_info* t);
 
 static void onNowTimer(evutil_socket_t foo UNUSED, short bar UNUSED, void* vsession)
 {
+    tr_session* session = vsession;
+
+    TR_ASSERT(tr_isSession(session));
+    TR_ASSERT(session->nowTimer != NULL);
+
     int usec;
     int const min = 100;
     int const max = 999999;
     struct timeval tv;
     tr_torrent* tor = NULL;
-    tr_session* session = vsession;
     time_t const now = time(NULL);
-
-    TR_ASSERT(tr_isSession(session));
-    TR_ASSERT(session->nowTimer != NULL);
 
     /**
     ***  tr_session things to do once per second
@@ -711,7 +712,6 @@ static void loadBlocklists(tr_session* session);
 
 static void tr_sessionInitImpl(void* vdata)
 {
-    tr_variant settings;
     struct init_data* data = vdata;
     tr_variant* clientSettings = data->clientSettings;
     tr_session* session = data->session;
@@ -720,6 +720,8 @@ static void tr_sessionInitImpl(void* vdata)
     TR_ASSERT(tr_variantIsDict(clientSettings));
 
     dbgmsg("tr_sessionInit: the session's top-level bandwidth object is %p", (void*)&session->bandwidth);
+
+    tr_variant settings;
 
     tr_variantInitDict(&settings, 0);
     tr_sessionGetDefaultSettings(&settings);
@@ -785,19 +787,20 @@ static void setPeerPort(tr_session* session, tr_port port);
 
 static void sessionSetImpl(void* vdata)
 {
+    struct init_data* data = vdata;
+    tr_session* session = data->session;
+    tr_variant* settings = data->clientSettings;
+
+    TR_ASSERT(tr_isSession(session));
+    TR_ASSERT(tr_variantIsDict(settings));
+    TR_ASSERT(tr_amInEventThread(session));
+
     int64_t i;
     double d;
     bool boolVal;
     char const* str;
     struct tr_bindinfo b;
-    struct init_data* data = vdata;
-    tr_session* session = data->session;
-    tr_variant* settings = data->clientSettings;
     struct tr_turtle_info* turtle = &session->turtle;
-
-    TR_ASSERT(tr_isSession(session));
-    TR_ASSERT(tr_variantIsDict(settings));
-    TR_ASSERT(tr_amInEventThread(session));
 
     if (tr_variantDictFindInt(settings, TR_KEY_message_level, &i))
     {
@@ -1150,9 +1153,9 @@ void tr_sessionSet(tr_session* session, tr_variant* settings)
 
 void tr_sessionSetDownloadDir(tr_session* session, char const* dir)
 {
-    struct tr_device_info* info = NULL;
-
     TR_ASSERT(tr_isSession(session));
+
+    struct tr_device_info* info = NULL;
 
     if (dir != NULL)
     {
@@ -1165,9 +1168,9 @@ void tr_sessionSetDownloadDir(tr_session* session, char const* dir)
 
 char const* tr_sessionGetDownloadDir(tr_session const* session)
 {
-    char const* dir = NULL;
-
     TR_ASSERT(tr_isSession(session));
+
+    char const* dir = NULL;
 
     if (session != NULL && session->downloadDir != NULL)
     {
@@ -1277,9 +1280,9 @@ bool tr_sessionIsLocked(tr_session const* session)
 
 static void peerPortChanged(void* session)
 {
-    tr_torrent* tor = NULL;
-
     TR_ASSERT(tr_isSession(session));
+
+    tr_torrent* tor = NULL;
 
     close_incoming_peer_port(session);
     open_incoming_peer_port(session);
@@ -1491,12 +1494,13 @@ static void turtleUpdateTable(struct tr_turtle_info* t)
 static void altSpeedToggled(void* vsession)
 {
     tr_session* session = vsession;
-    struct tr_turtle_info* t = &session->turtle;
 
     TR_ASSERT(tr_isSession(session));
 
     updateBandwidth(session, TR_UP);
     updateBandwidth(session, TR_DOWN);
+
+    struct tr_turtle_info* t = &session->turtle;
 
     if (t->callback != NULL)
     {
@@ -1545,15 +1549,11 @@ static inline tr_auto_switch_state_t autoSwitchState(bool enabled)
 
 static void turtleCheckClock(tr_session* s, struct tr_turtle_info* t)
 {
-    bool enabled;
-    bool alreadySwitched;
-    tr_auto_switch_state_t newAutoTurtleState;
-
     TR_ASSERT(t->isClockEnabled);
 
-    enabled = getInTurtleTime(t);
-    newAutoTurtleState = autoSwitchState(enabled);
-    alreadySwitched = t->autoTurtleState == newAutoTurtleState;
+    bool enabled = getInTurtleTime(t);
+    tr_auto_switch_state_t newAutoTurtleState = autoSwitchState(enabled);
+    bool alreadySwitched = t->autoTurtleState == newAutoTurtleState;
 
     if (!alreadySwitched)
     {
@@ -1684,9 +1684,9 @@ static void userPokedTheClock(tr_session* s, struct tr_turtle_info* t)
 
 void tr_sessionUseAltSpeedTime(tr_session* s, bool b)
 {
-    struct tr_turtle_info* t = &s->turtle;
-
     TR_ASSERT(tr_isSession(s));
+
+    struct tr_turtle_info* t = &s->turtle;
 
     if (t->isClockEnabled != b)
     {
@@ -1875,18 +1875,14 @@ int tr_sessionCountTorrents(tr_session const* session)
 
 tr_torrent** tr_sessionGetTorrents(tr_session* session, int* setme_n)
 {
-    int n;
-    tr_torrent** torrents;
-    tr_torrent* tor;
-
     TR_ASSERT(tr_isSession(session));
     TR_ASSERT(setme_n != NULL);
 
-    n = tr_sessionCountTorrents(session);
+    int n = tr_sessionCountTorrents(session);
     *setme_n = n;
 
-    torrents = tr_new(tr_torrent*, n);
-    tor = NULL;
+    tr_torrent** torrents = tr_new(tr_torrent*, n);
+    tr_torrent* tor = NULL;
 
     for (int i = 0; i < n; ++i)
     {
@@ -2032,9 +2028,9 @@ static int deadlineReached(time_t const deadline)
 
 void tr_sessionClose(tr_session* session)
 {
-    time_t const deadline = time(NULL) + SHUTDOWN_MAX_SECONDS;
-
     TR_ASSERT(tr_isSession(session));
+
+    time_t const deadline = time(NULL) + SHUTDOWN_MAX_SECONDS;
 
     dbgmsg("shutting down transmission session %p... now is %zu, deadline is %zu", (void*)session, (size_t)time(NULL),
         (size_t)deadline);
@@ -2120,15 +2116,16 @@ struct sessionLoadTorrentsData
 
 static void sessionLoadTorrents(void* vdata)
 {
+    struct sessionLoadTorrentsData* data = vdata;
+
+    TR_ASSERT(tr_isSession(data->session));
+
     int i;
     int n = 0;
     tr_sys_path_info info;
     tr_sys_dir_t odir = NULL;
     tr_list* list = NULL;
-    struct sessionLoadTorrentsData* data = vdata;
     char const* dirname = tr_getTorrentDir(data->session);
-
-    TR_ASSERT(tr_isSession(data->session));
 
     tr_ctorSetSave(data->ctor, false); /* since we already have them */
 
@@ -2236,6 +2233,7 @@ bool tr_sessionIsDHTEnabled(tr_session const* session)
 static void toggleDHTImpl(void* data)
 {
     tr_session* session = data;
+
     TR_ASSERT(tr_isSession(session));
 
     tr_udpUninit(session);
@@ -2299,6 +2297,7 @@ void tr_sessionSetUTPEnabled(tr_session* session, bool enabled)
 static void toggleLPDImpl(void* data)
 {
     tr_session* session = data;
+
     TR_ASSERT(tr_isSession(session));
 
     if (session->isLPDEnabled)
@@ -2530,9 +2529,9 @@ void tr_sessionReloadBlocklists(tr_session* session)
 
 int tr_blocklistGetRuleCount(tr_session const* session)
 {
-    int n = 0;
-
     TR_ASSERT(tr_isSession(session));
+
+    int n = 0;
 
     for (tr_list* l = session->blocklists; l != NULL; l = l->next)
     {
@@ -2631,14 +2630,14 @@ char const* tr_blocklistGetURL(tr_session const* session)
 
 static void metainfoLookupInit(tr_session* session)
 {
+    TR_ASSERT(tr_isSession(session));
+
     tr_sys_path_info info;
     char const* dirname = tr_getTorrentDir(session);
     tr_sys_dir_t odir;
     tr_ctor* ctor = NULL;
     tr_variant* lookup;
     int n = 0;
-
-    TR_ASSERT(tr_isSession(session));
 
     /* walk through the directory and find the mappings */
     lookup = tr_new0(tr_variant, 1);
@@ -2966,19 +2965,14 @@ static int compareTorrentAndPositions(void const* va, void const* vb)
 
 void tr_sessionGetNextQueuedTorrents(tr_session* session, tr_direction direction, size_t num_wanted, tr_ptrArray* setme)
 {
-    size_t n;
-    tr_torrent* tor;
-    struct TorrentAndPosition* candidates;
-    size_t num_candidates;
-
     TR_ASSERT(tr_isSession(session));
     TR_ASSERT(tr_isDirection(direction));
 
     /* build an array of the candidates */
-    n = tr_sessionCountTorrents(session);
-    candidates = tr_new(struct TorrentAndPosition, n);
-    num_candidates = 0;
-    tor = NULL;
+    size_t n = tr_sessionCountTorrents(session);
+    struct TorrentAndPosition* candidates = tr_new(struct TorrentAndPosition, n);
+    size_t num_candidates = 0;
+    tr_torrent* tor = NULL;
 
     while ((tor = tr_torrentNext(session, tor)) != NULL)
     {

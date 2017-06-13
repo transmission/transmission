@@ -240,14 +240,14 @@ fail:
 
 static void event_callback(evutil_socket_t s, short type UNUSED, void* sv)
 {
+    TR_ASSERT(tr_isSession(sv));
+    TR_ASSERT(type == EV_READ);
+
     int rc;
     socklen_t fromlen;
     unsigned char buf[4096];
     struct sockaddr_storage from;
     tr_session* ss = sv;
-
-    TR_ASSERT(tr_isSession(sv));
-    TR_ASSERT(type == EV_READ);
 
     fromlen = sizeof(from);
     rc = recvfrom(s, (void*)buf, 4096 - 1, 0, (struct sockaddr*)&from, &fromlen);
@@ -295,13 +295,13 @@ static void event_callback(evutil_socket_t s, short type UNUSED, void* sv)
 
 void tr_udpInit(tr_session* ss)
 {
+    TR_ASSERT(ss->udp_socket == TR_BAD_SOCKET);
+    TR_ASSERT(ss->udp6_socket == TR_BAD_SOCKET);
+
     bool is_default;
     struct tr_address const* public_addr;
     struct sockaddr_in sin;
     int rc;
-
-    TR_ASSERT(ss->udp_socket == TR_BAD_SOCKET);
-    TR_ASSERT(ss->udp6_socket == TR_BAD_SOCKET);
 
     ss->udp_port = tr_sessionGetPeerPort(ss);
 

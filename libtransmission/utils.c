@@ -657,6 +657,9 @@ int tr_snprintf(char* buf, size_t buflen, char const* fmt, ...)
  */
 size_t tr_strlcpy(char* dst, void const* src, size_t siz)
 {
+    TR_ASSERT(dst != NULL);
+    TR_ASSERT(src != NULL);
+
 #ifdef HAVE_STRLCPY
 
     return strlcpy(dst, src, siz);
@@ -666,9 +669,6 @@ size_t tr_strlcpy(char* dst, void const* src, size_t siz)
     char* d = dst;
     char const* s = src;
     size_t n = siz;
-
-    TR_ASSERT(s != NULL);
-    TR_ASSERT(d != NULL);
 
     /* Copy as many bytes as will fit */
     if (n != 0)
@@ -2047,11 +2047,11 @@ bool tr_env_key_exists(char const* key)
 
 int tr_env_get_int(char const* key, int default_value)
 {
+    TR_ASSERT(key != NULL);
+
 #ifdef _WIN32
 
     char value[16];
-
-    TR_ASSERT(key != NULL);
 
     if (GetEnvironmentVariableA(key, value, TR_N_ELEMENTS(value)) > 1)
     {
@@ -2060,11 +2060,7 @@ int tr_env_get_int(char const* key, int default_value)
 
 #else
 
-    char const* value;
-
-    TR_ASSERT(key != NULL);
-
-    value = getenv(key);
+    char const* value = getenv(key);
 
     if (value != NULL && *value != '\0')
     {
@@ -2078,12 +2074,12 @@ int tr_env_get_int(char const* key, int default_value)
 
 char* tr_env_get_string(char const* key, char const* default_value)
 {
+    TR_ASSERT(key != NULL);
+
 #ifdef _WIN32
 
-    wchar_t* wide_key;
+    wchar_t* wide_key = tr_win32_utf8_to_native(key, -1);
     char* value = NULL;
-
-    wide_key = tr_win32_utf8_to_native(key, -1);
 
     if (wide_key != NULL)
     {
@@ -2113,11 +2109,7 @@ char* tr_env_get_string(char const* key, char const* default_value)
 
 #else
 
-    char* value;
-
-    TR_ASSERT(key != NULL);
-
-    value = getenv(key);
+    char* value = getenv(key);
 
     if (value == NULL)
     {

@@ -1014,12 +1014,12 @@ static ReadState readPayloadStream(tr_handshake* handshake, struct evbuffer* inb
 
 static ReadState canRead(struct tr_peerIo* io, void* arg, size_t* piece)
 {
+    TR_ASSERT(tr_isPeerIo(io));
+
     ReadState ret;
     tr_handshake* handshake = arg;
     struct evbuffer* inbuf = tr_peerIoGetReadBuffer(io);
     bool readyForMore = true;
-
-    TR_ASSERT(tr_isPeerIo(io));
 
     /* no piece data in handshake */
     *piece = 0;
@@ -1261,12 +1261,10 @@ struct tr_peerIo* tr_handshakeGetIO(tr_handshake* handshake)
 
 struct tr_peerIo* tr_handshakeStealIO(tr_handshake* handshake)
 {
-    struct tr_peerIo* io;
-
     TR_ASSERT(handshake != NULL);
     TR_ASSERT(handshake->io != NULL);
 
-    io = handshake->io;
+    struct tr_peerIo* io = handshake->io;
     handshake->io = NULL;
     return io;
 }

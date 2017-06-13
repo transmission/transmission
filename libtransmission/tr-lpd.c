@@ -171,12 +171,11 @@ static int lpd_unsolicitedMsgCounter;
 */
 static char const* lpd_extractHeader(char const* s, struct lpd_protocolVersion* const ver)
 {
+    TR_ASSERT(s != NULL);
+
     int major = -1;
     int minor = -1;
-    size_t len;
-
-    TR_ASSERT(s != NULL);
-    len = strlen(s);
+    size_t len = strlen(s);
 
     /* something might be rotten with this chunk of data */
     if (len == 0 || len > lpd_maxDatagramLength)
@@ -232,17 +231,18 @@ static char const* lpd_extractHeader(char const* s, struct lpd_protocolVersion* 
 */
 static bool lpd_extractParam(char const* const str, char const* const name, int n, char* const val)
 {
-    /* configure maximum length of search string here */
-    enum
-    {
-        maxLength = 30
-    };
-    char sstr[maxLength] = { 0 };
-    char const* pos;
-
     TR_ASSERT(str != NULL);
     TR_ASSERT(name != NULL);
     TR_ASSERT(val != NULL);
+
+    enum
+    {
+        /* configure maximum length of search string here */
+        maxLength = 30
+    };
+
+    char sstr[maxLength] = { 0 };
+    char const* pos;
 
     if (strlen(name) > maxLength - strlen(CRLF ": "))
     {

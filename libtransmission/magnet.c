@@ -42,11 +42,11 @@ static int const base32LookupLen = TR_N_ELEMENTS(base32Lookup);
 
 static void base32_to_sha1(uint8_t* out, char const* in, size_t const inlen)
 {
+    TR_ASSERT(inlen == 32);
+
     size_t const outlen = 20;
 
     memset(out, 0, 20);
-
-    TR_ASSERT(inlen == 32);
 
     for (size_t i = 0, index = 0, offset = 0; i < inlen; ++i)
     {

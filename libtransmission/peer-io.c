@@ -256,18 +256,19 @@ static void canReadWrapper(tr_peerIo* io)
 
 static void event_read_cb(evutil_socket_t fd, short event UNUSED, void* vio)
 {
+    tr_peerIo* io = vio;
+
+    TR_ASSERT(tr_isPeerIo(io));
+    TR_ASSERT(io->socket != TR_BAD_SOCKET);
+
     int res;
     int e;
-    tr_peerIo* io = vio;
 
     /* Limit the input buffer to 256K, so it doesn't grow too large */
     unsigned int howmuch;
     unsigned int curlen;
     tr_direction const dir = TR_DOWN;
     unsigned int const max = 256 * 1024;
-
-    TR_ASSERT(tr_isPeerIo(io));
-    TR_ASSERT(io->socket != TR_BAD_SOCKET);
 
     io->pendingEvents &= ~EV_READ;
 
@@ -341,16 +342,17 @@ static int tr_evbuffer_write(tr_peerIo* io, int fd, size_t howmuch)
 
 static void event_write_cb(evutil_socket_t fd, short event UNUSED, void* vio)
 {
-    int res = 0;
-    int e;
-    short what = BEV_EVENT_WRITING;
     tr_peerIo* io = vio;
-    size_t howmuch;
-    tr_direction const dir = TR_UP;
-    char errstr[1024];
 
     TR_ASSERT(tr_isPeerIo(io));
     TR_ASSERT(io->socket != TR_BAD_SOCKET);
+
+    int res = 0;
+    int e;
+    short what = BEV_EVENT_WRITING;
+    size_t howmuch;
+    tr_direction const dir = TR_UP;
+    char errstr[1024];
 
     io->pendingEvents &= ~EV_WRITE;
 
@@ -435,11 +437,11 @@ static void maybeSetCongestionAlgorithm(tr_socket_t socket, char const* algorith
 
 static void utp_on_read(void* closure, unsigned char const* buf, size_t buflen)
 {
-    int rc;
     tr_peerIo* io = closure;
+
     TR_ASSERT(tr_isPeerIo(io));
 
-    rc = evbuffer_add(io->inbuf, buf, buflen);
+    int rc = evbuffer_add(io->inbuf, buf, buflen);
     dbgmsg(io, "utp_on_read got %zu bytes", buflen);
 
     if (rc < 0)
@@ -454,11 +456,11 @@ static void utp_on_read(void* closure, unsigned char const* buf, size_t buflen)
 
 static void utp_on_write(void* closure, unsigned char* buf, size_t buflen)
 {
-    int rc;
     tr_peerIo* io = closure;
+
     TR_ASSERT(tr_isPeerIo(io));
 
-    rc = evbuffer_remove(io->outbuf, buf, buflen);
+    int rc = evbuffer_remove(io->outbuf, buf, buflen);
     dbgmsg(io, "utp_on_write sending %zu bytes... evbuffer_remove returned %d", buflen, rc);
     TR_ASSERT(rc == (int)buflen); /* if this fails, we've corrupted our bookkeeping somewhere */
 
@@ -472,11 +474,11 @@ static void utp_on_write(void* closure, unsigned char* buf, size_t buflen)
 
 static size_t utp_get_rb_size(void* closure)
 {
-    size_t bytes;
     tr_peerIo* io = closure;
+
     TR_ASSERT(tr_isPeerIo(io));
 
-    bytes = tr_bandwidthClamp(&io->bandwidth, TR_DOWN, UTP_READ_BUFFER_SIZE);
+    size_t bytes = tr_bandwidthClamp(&io->bandwidth, TR_DOWN, UTP_READ_BUFFER_SIZE);
 
     dbgmsg(io, "utp_get_rb_size is saying it's ready to read %zu bytes", bytes);
     return UTP_READ_BUFFER_SIZE - bytes;
@@ -497,6 +499,7 @@ static void utp_on_writable(tr_peerIo* io)
 static void utp_on_state_change(void* closure, int state)
 {
     tr_peerIo* io = closure;
+
     TR_ASSERT(tr_isPeerIo(io));
 
     if (state == UTP_STATE_CONNECT)
@@ -534,6 +537,7 @@ static void utp_on_state_change(void* closure, int state)
 static void utp_on_error(void* closure, int errcode)
 {
     tr_peerIo* io = closure;
+
     TR_ASSERT(tr_isPeerIo(io));
 
     dbgmsg(io, "utp_on_error -- errcode is %d", errcode);
@@ -548,6 +552,7 @@ static void utp_on_error(void* closure, int errcode)
 static void utp_on_overhead(void* closure, uint8_t /* bool */ send, size_t count, int type UNUSED)
 {
     tr_peerIo* io = closure;
+
     TR_ASSERT(tr_isPeerIo(io));
 
     dbgmsg(io, "utp_on_overhead -- count is %zu", count);
@@ -615,8 +620,6 @@ static struct UTPFunctionTable dummy_utp_function_table =
 static tr_peerIo* tr_peerIoNew(tr_session* session, tr_bandwidth* parent, tr_address const* addr, tr_port port,
     uint8_t const* torrentHash, bool isIncoming, bool isSeed, tr_socket_t socket, struct UTPSocket* utp_socket)
 {
-    tr_peerIo* io;
-
     TR_ASSERT(session != NULL);
     TR_ASSERT(session->events != NULL);
     TR_ASSERT(tr_amInEventThread(session));
@@ -631,7 +634,7 @@ static tr_peerIo* tr_peerIoNew(tr_session* session, tr_bandwidth* parent, tr_add
         maybeSetCongestionAlgorithm(socket, session->peer_congestion_algorithm);
     }
 
-    io = tr_new0(tr_peerIo, 1);
+    tr_peerIo* io = tr_new0(tr_peerIo, 1);
     io->magicNumber = PEER_IO_MAGIC_NUMBER;
     io->refCount = 1;
     tr_cryptoConstruct(&io->crypto, torrentHash, isIncoming);
@@ -688,12 +691,12 @@ tr_peerIo* tr_peerIoNewIncoming(tr_session* session, tr_bandwidth* parent, tr_ad
 tr_peerIo* tr_peerIoNewOutgoing(tr_session* session, tr_bandwidth* parent, tr_address const* addr, tr_port port,
     uint8_t const* torrentHash, bool isSeed, bool utp)
 {
-    tr_socket_t fd = TR_BAD_SOCKET;
-    struct UTPSocket* utp_socket = NULL;
-
     TR_ASSERT(session != NULL);
     TR_ASSERT(tr_address_is_valid(addr));
     TR_ASSERT(torrentHash != NULL);
+
+    tr_socket_t fd = TR_BAD_SOCKET;
+    struct UTPSocket* utp_socket = NULL;
 
     if (utp)
     {
@@ -794,12 +797,12 @@ static void event_disable(struct tr_peerIo* io, short event)
 
 void tr_peerIoSetEnabled(tr_peerIo* io, tr_direction dir, bool isEnabled)
 {
-    short const event = dir == TR_UP ? EV_WRITE : EV_READ;
-
     TR_ASSERT(tr_isPeerIo(io));
     TR_ASSERT(tr_isDirection(dir));
     TR_ASSERT(tr_amInEventThread(io->session));
     TR_ASSERT(io->session->events != NULL);
+
+    short const event = dir == TR_UP ? EV_WRITE : EV_READ;
 
     if (isEnabled)
     {
@@ -947,15 +950,12 @@ void tr_peerIoClear(tr_peerIo* io)
 
 int tr_peerIoReconnect(tr_peerIo* io)
 {
-    short int pendingEvents;
-    tr_session* session;
-
     TR_ASSERT(tr_isPeerIo(io));
     TR_ASSERT(!tr_peerIoIsIncoming(io));
 
-    session = tr_peerIoGetSession(io);
+    tr_session* session = tr_peerIoGetSession(io);
 
-    pendingEvents = io->pendingEvents;
+    short int pendingEvents = io->pendingEvents;
     event_disable(io, EV_READ | EV_WRITE);
 
     io_close_socket(io);
@@ -1177,14 +1177,13 @@ static inline void maybeDecryptBuffer(tr_peerIo* io, struct evbuffer* buf, size_
 
 void tr_peerIoReadBytesToBuf(tr_peerIo* io, struct evbuffer* inbuf, struct evbuffer* outbuf, size_t byteCount)
 {
-    struct evbuffer* tmp;
-    size_t const old_length = evbuffer_get_length(outbuf);
-
     TR_ASSERT(tr_isPeerIo(io));
     TR_ASSERT(evbuffer_get_length(inbuf) >= byteCount);
 
+    size_t const old_length = evbuffer_get_length(outbuf);
+
     /* append it to outbuf */
-    tmp = evbuffer_new();
+    struct evbuffer* tmp = evbuffer_new();
     evbuffer_remove_buffer(inbuf, tmp, byteCount);
     evbuffer_add_buffer(outbuf, tmp);
     evbuffer_free(tmp);
@@ -1345,10 +1344,10 @@ static int tr_peerIoTryWrite(tr_peerIo* io, size_t howmuch)
 
 int tr_peerIoFlush(tr_peerIo* io, tr_direction dir, size_t limit)
 {
-    int bytesUsed = 0;
-
     TR_ASSERT(tr_isPeerIo(io));
     TR_ASSERT(tr_isDirection(dir));
+
+    int bytesUsed = 0;
 
     if (dir == TR_DOWN)
     {

@@ -49,12 +49,10 @@ static bool testFileExistsAndConsistsOfThisString(tr_torrent const* tor, tr_file
 
     if (path != NULL)
     {
-        uint8_t* contents;
-        size_t contents_len;
-
         TR_ASSERT(tr_sys_path_exists(path, NULL));
 
-        contents = tr_loadFile(path, &contents_len, NULL);
+        size_t contents_len;
+        uint8_t* contents = tr_loadFile(path, &contents_len, NULL);
 
         success = contents != NULL && str_len == contents_len && memcmp(contents, str, contents_len) == 0;
 

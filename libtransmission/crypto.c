@@ -92,14 +92,14 @@ uint8_t const* tr_cryptoGetMyPublicKey(tr_crypto const* crypto, int* setme_len)
 
 static void initRC4(tr_crypto* crypto, tr_rc4_ctx_t* setme, char const* key)
 {
-    uint8_t buf[SHA_DIGEST_LENGTH];
-
     TR_ASSERT(crypto->torrentHashIsSet);
 
     if (*setme == NULL)
     {
         *setme = tr_rc4_new();
     }
+
+    uint8_t buf[SHA_DIGEST_LENGTH];
 
     if (tr_cryptoSecretKeySha1(crypto, key, 4, crypto->torrentHash, SHA_DIGEST_LENGTH, buf))
     {

@@ -190,10 +190,10 @@ void tr_blocklistFileSetEnabled(tr_blocklistFile* b, bool isEnabled)
 
 bool tr_blocklistFileHasAddress(tr_blocklistFile* b, tr_address const* addr)
 {
+    TR_ASSERT(tr_address_is_valid(addr));
+
     uint32_t needle;
     struct tr_ipv4_range const* range;
-
-    TR_ASSERT(tr_address_is_valid(addr));
 
     if (!b->isEnabled || addr->type == TR_AF_INET6)
     {
@@ -407,8 +407,7 @@ int tr_blocklistFileSetContent(tr_blocklistFile* b, char const* filename)
 
 #ifdef TR_ENABLE_ASSERTS
 
-        /* sanity checks: make sure the rules are sorted
-         * in ascending order and don't overlap */
+        /* sanity checks: make sure the rules are sorted in ascending order and don't overlap */
         {
             for (size_t i = 0; i < ranges_count; ++i)
             {

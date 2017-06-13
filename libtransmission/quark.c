@@ -422,12 +422,13 @@ static tr_ptrArray my_runtime = TR_PTR_ARRAY_INIT_STATIC;
 
 bool tr_quark_lookup(void const* str, size_t len, tr_quark* setme)
 {
-    struct tr_key_struct tmp;
-    struct tr_key_struct* match;
     static size_t const n_static = TR_N_ELEMENTS(my_static);
-    bool success = false;
 
     TR_ASSERT(n_static == TR_N_KEYS);
+
+    struct tr_key_struct tmp;
+    struct tr_key_struct* match;
+    bool success = false;
 
     tmp.str = str;
     tmp.len = len;

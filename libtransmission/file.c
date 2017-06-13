@@ -16,13 +16,13 @@
 
 bool tr_sys_file_read_line(tr_sys_file_t handle, char* buffer, size_t buffer_size, tr_error** error)
 {
-    bool ret = false;
-    size_t offset = 0;
-    uint64_t bytes_read;
-
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
     TR_ASSERT(buffer != NULL);
     TR_ASSERT(buffer_size > 0);
+
+    bool ret = false;
+    size_t offset = 0;
+    uint64_t bytes_read;
 
     while (buffer_size > 0)
     {
@@ -75,12 +75,10 @@ bool tr_sys_file_read_line(tr_sys_file_t handle, char* buffer, size_t buffer_siz
 
 bool tr_sys_file_write_line(tr_sys_file_t handle, char const* buffer, tr_error** error)
 {
-    bool ret;
-
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
     TR_ASSERT(buffer != NULL);
 
-    ret = tr_sys_file_write(handle, buffer, strlen(buffer), NULL, error);
+    bool ret = tr_sys_file_write(handle, buffer, strlen(buffer), NULL, error);
 
     if (ret)
     {
@@ -92,12 +90,12 @@ bool tr_sys_file_write_line(tr_sys_file_t handle, char const* buffer, tr_error**
 
 bool tr_sys_file_write_fmt(tr_sys_file_t handle, char const* format, tr_error** error, ...)
 {
+    TR_ASSERT(handle != TR_BAD_SYS_FILE);
+    TR_ASSERT(format != NULL);
+
     bool ret = false;
     char* buffer;
     va_list args;
-
-    TR_ASSERT(handle != TR_BAD_SYS_FILE);
-    TR_ASSERT(format != NULL);
 
     va_start(args, error);
     buffer = tr_strdup_vprintf(format, args);

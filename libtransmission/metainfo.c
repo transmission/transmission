@@ -73,13 +73,13 @@ static bool path_component_is_suspicious(char const* component)
 
 static bool getfile(char** setme, char const* root, tr_variant* path, struct evbuffer* buf)
 {
+    /* root's already been checked by caller */
+    TR_ASSERT(!path_component_is_suspicious(root));
+
     bool success = false;
     size_t root_len = 0;
 
     *setme = NULL;
-
-    /* root's already been checked by caller */
-    TR_ASSERT(!path_component_is_suspicious(root));
 
     if (tr_variantIsList(path))
     {

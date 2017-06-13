@@ -487,9 +487,9 @@ void tr_variantInitList(tr_variant* v, size_t reserve_count)
 
 static void containerReserve(tr_variant* v, size_t count)
 {
-    size_t const needed = v->val.l.count + count;
-
     TR_ASSERT(tr_variantIsContainer(v));
+
+    size_t const needed = v->val.l.count + count;
 
     if (needed > v->val.l.alloc)
     {
@@ -509,6 +509,7 @@ static void containerReserve(tr_variant* v, size_t count)
 void tr_variantListReserve(tr_variant* list, size_t count)
 {
     TR_ASSERT(tr_variantIsList(list));
+
     containerReserve(list, count);
 }
 
@@ -521,17 +522,17 @@ void tr_variantInitDict(tr_variant* v, size_t reserve_count)
 void tr_variantDictReserve(tr_variant* dict, size_t reserve_count)
 {
     TR_ASSERT(tr_variantIsDict(dict));
+
     containerReserve(dict, reserve_count);
 }
 
 tr_variant* tr_variantListAdd(tr_variant* list)
 {
-    tr_variant* child;
-
     TR_ASSERT(tr_variantIsList(list));
 
     containerReserve(list, 1);
-    child = &list->val.l.vals[list->val.l.count++];
+
+    tr_variant* child = &list->val.l.vals[list->val.l.count++];
     child->key = 0;
     tr_variantInit(child, TR_VARIANT_TYPE_INT);
 
@@ -596,15 +597,14 @@ tr_variant* tr_variantListAddDict(tr_variant* list, size_t reserve_count)
 
 tr_variant* tr_variantDictAdd(tr_variant* dict, tr_quark const key)
 {
-    tr_variant* val;
-
     TR_ASSERT(tr_variantIsDict(dict));
 
     containerReserve(dict, 1);
 
-    val = dict->val.l.vals + dict->val.l.count++;
+    tr_variant* val = dict->val.l.vals + dict->val.l.count++;
     tr_variantInit(val, TR_VARIANT_TYPE_INT);
     val->key = key;
+
     return val;
 }
 
@@ -1006,9 +1006,9 @@ static size_t tr_variantDictSize(tr_variant const* dict)
 
 bool tr_variantDictChild(tr_variant* dict, size_t n, tr_quark* key, tr_variant** val)
 {
-    bool success = 0;
-
     TR_ASSERT(tr_variantIsDict(dict));
+
+    bool success = false;
 
     if (tr_variantIsDict(dict) && n < dict->val.l.count)
     {
@@ -1022,10 +1022,10 @@ bool tr_variantDictChild(tr_variant* dict, size_t n, tr_quark* key, tr_variant**
 
 void tr_variantMergeDicts(tr_variant* target, tr_variant const* source)
 {
-    size_t const sourceCount = tr_variantDictSize(source);
-
     TR_ASSERT(tr_variantIsDict(target));
     TR_ASSERT(tr_variantIsDict(source));
+
+    size_t const sourceCount = tr_variantDictSize(source);
 
     tr_variantDictReserve(target, sourceCount + tr_variantDictSize(target));
 

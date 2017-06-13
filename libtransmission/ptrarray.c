@@ -228,19 +228,20 @@ static void* tr_ptrArrayRemoveSortedValue(tr_ptrArray* t, void const* ptr, int (
         tr_ptrArrayErase(t, pos, pos + 1);
     }
 
-    TR_ASSERT((ret == NULL) || (compare(ret, ptr) == 0));
+    TR_ASSERT(ret == NULL || compare(ret, ptr) == 0);
     return ret;
 }
 
 void tr_ptrArrayRemoveSortedPointer(tr_ptrArray* t, void const* ptr, int (* compare)(void const*, void const*))
 {
+    void* removed = tr_ptrArrayRemoveSortedValue(t, ptr, compare);
+
 #ifndef TR_ENABLE_ASSERTS
 
-    tr_ptrArrayRemoveSortedValue(t, ptr, compare);
+    (void)removed;
 
 #else
 
-    void* removed = tr_ptrArrayRemoveSortedValue(t, ptr, compare);
     TR_ASSERT(removed != NULL);
     TR_ASSERT(removed == ptr);
     TR_ASSERT(tr_ptrArrayFindSorted(t, ptr, compare) == NULL);
