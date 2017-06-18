@@ -18,8 +18,6 @@
 #include "tr-core.h"
 #include "tr-prefs.h"
 
-#define UNUSED G_GNUC_UNUSED
-
 static TrCore* myCore = NULL;
 static GtkActionGroup* myGroup = NULL;
 

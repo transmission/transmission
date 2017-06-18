@@ -19,28 +19,18 @@ extern "C"
 {
 #endif
 
-#if defined(__GNUC__)
-#define TR_DEPRECATED __attribute__((deprecated))
-#elif defined(_MSC_VER)
-#define TR_DEPRECATED __declspec(deprecated)
-#else
-#define TR_DEPRECATED
-#endif
-
 /***
 ****
 ****  Basic Types
 ****
 ***/
 
-#include <inttypes.h> /* uintN_t */
 #include <stdbool.h> /* bool */
+#include <stddef.h> /* size_t */
+#include <stdint.h> /* uintN_t */
 #include <time.h> /* time_t */
 
-#define SHA_DIGEST_LENGTH 20
-#define TR_INET6_ADDRSTRLEN 46
-
-#define TR_BAD_SIZE ((size_t)-1)
+#include "tr-macros.h"
 
 typedef uint32_t tr_file_index_t;
 typedef uint32_t tr_piece_index_t;

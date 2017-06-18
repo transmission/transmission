@@ -347,6 +347,7 @@
 		C1305EBE186A13B100F03351 /* file.c in Sources */ = {isa = PBXBuildFile; fileRef = C1305EB8186A134000F03351 /* file.c */; };
 		C1425B351EE9C5F5001DB85F /* tr-assert.c in Sources */ = {isa = PBXBuildFile; fileRef = C1425B321EE9C5EA001DB85F /* tr-assert.c */; };
 		C1425B361EE9C605001DB85F /* tr-assert.h in Headers */ = {isa = PBXBuildFile; fileRef = C1425B331EE9C5EA001DB85F /* tr-assert.h */; };
+		C1425B371EE9C705001DB85F /* tr-macros.h in Headers */ = {isa = PBXBuildFile; fileRef = C1425B341EE9C5EA001DB85F /* tr-macros.h */; };
 		C1639A741A55F4E000E42033 /* libb64.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C1639A6F1A55F4D600E42033 /* libb64.a */; };
 		C1639A781A55F56600E42033 /* cdecode.c in Sources */ = {isa = PBXBuildFile; fileRef = C1639A761A55F56600E42033 /* cdecode.c */; };
 		C1639A791A55F56600E42033 /* cencode.c in Sources */ = {isa = PBXBuildFile; fileRef = C1639A771A55F56600E42033 /* cencode.c */; };
@@ -990,6 +991,7 @@
 		C1305EB8186A134000F03351 /* file.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = file.c; path = libtransmission/file.c; sourceTree = "<group>"; };
 		C1425B321EE9C5EA001DB85F /* tr-assert.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "tr-assert.c"; path = "libtransmission/tr-assert.c"; sourceTree = "<group>"; };
 		C1425B331EE9C5EA001DB85F /* tr-assert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "tr-assert.h"; path = "libtransmission/tr-assert.h"; sourceTree = "<group>"; };
+		C1425B341EE9C5EA001DB85F /* tr-macros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "tr-macros.h"; path = "libtransmission/tr-macros.h"; sourceTree = "<group>"; };
 		C1639A6F1A55F4D600E42033 /* libb64.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libb64.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		C1639A761A55F56600E42033 /* cdecode.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = cdecode.c; path = "third-party/libb64/src/cdecode.c"; sourceTree = "<group>"; };
 		C1639A771A55F56600E42033 /* cencode.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = cencode.c; path = "third-party/libb64/src/cencode.c"; sourceTree = "<group>"; };
@@ -1361,6 +1363,7 @@
 				C1425B331EE9C5EA001DB85F /* tr-assert.h */,
 				A22CFCA60FC24ED80009BD3E /* tr-dht.c */,
 				A22CFCA70FC24ED80009BD3E /* tr-dht.h */,
+				C1425B341EE9C5EA001DB85F /* tr-macros.h */,
 				A284214212DA663E00FBDDBB /* tr-udp.c */,
 				A284214312DA663E00FBDDBB /* tr-udp.h */,
 				A2679292130E00A000CB7464 /* tr-utp.c */,
@@ -1781,6 +1784,7 @@
 				BEFC1E350C07861A00B0BB3C /* port-forwarding.h in Headers */,
 				BEFC1E3B0C07861A00B0BB3C /* platform.h in Headers */,
 				C1425B361EE9C605001DB85F /* tr-assert.h in Headers */,
+				C1425B371EE9C705001DB85F /* tr-macros.h in Headers */,
 				BEFC1E450C07861A00B0BB3C /* net.h in Headers */,
 				BEFC1E490C07861A00B0BB3C /* metainfo.h in Headers */,
 				BEFC1E4D0C07861A00B0BB3C /* session.h in Headers */,

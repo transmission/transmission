@@ -110,6 +110,7 @@ set(${PROJECT_NAME}_PUBLIC_HEADERS
     session-id.h
     tr-assert.h
     tr-getopt.h
+    tr-macros.h
     transmission.h
     utils.h
     variant.h

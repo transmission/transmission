@@ -162,6 +162,7 @@ noinst_HEADERS = \
   transmission.h \
   tr-assert.h \
   tr-dht.h \
+  tr-macros.h \
   tr-udp.h \
   tr-utp.h \
   tr-lpd.h \

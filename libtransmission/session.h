@@ -14,14 +14,6 @@
 
 #define TR_NAME "Transmission"
 
-#ifndef UNUSED
-#ifdef __GNUC__
-#define UNUSED __attribute__((unused))
-#else
-#define UNUSED
-#endif
-#endif
-
 #include "bandwidth.h"
 #include "bitfield.h"
 #include "net.h"

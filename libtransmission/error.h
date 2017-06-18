@@ -10,17 +10,11 @@
 
 #include <stdarg.h>
 
+#include "tr-macros.h"
+
 #ifdef __cplusplus
 extern "C"
 {
-#endif
-
-#ifndef TR_GNUC_PRINTF
-#ifdef __GNUC__
-#define TR_GNUC_PRINTF(fmt, args) __attribute__((format(printf, fmt, args)))
-#else
-#define TR_GNUC_PRINTF(fmt, args)
-#endif
 #endif
 
 /**

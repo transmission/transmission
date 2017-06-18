@@ -12,10 +12,7 @@
 #include <string.h>
 
 #include "tr-getopt.h"
-
-#ifndef MAX
-#define MAX(a, b) (((a) > (b)) ? (a) : (b))
-#endif
+#include "tr-macros.h"
 
 int tr_optind = 1;
 

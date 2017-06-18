@@ -12,31 +12,7 @@
 
 #include <stdbool.h>
 
-#ifndef TR_LIKELY
-#if defined(__GNUC__)
-#define TR_LIKELY(x) __builtin_expect(!!(x), true)
-#else
-#define TR_LIKELY(x) (x)
-#endif
-#endif
-
-#ifndef TR_NORETURN
-#if defined(__GNUC__)
-#define TR_NORETURN __attribute__((noreturn))
-#elif defined(_MSC_VER)
-#define TR_NORETURN __declspec(noreturn)
-#else
-#define TR_NORETURN
-#endif
-#endif
-
-#ifndef TR_GNUC_PRINTF
-#if defined(__GNUC__)
-#define TR_GNUC_PRINTF(fmt, args) __attribute__((format(printf, fmt, args)))
-#else
-#define TR_GNUC_PRINTF(fmt, args)
-#endif
-#endif
+#include "tr-macros.h"
 
 bool TR_NORETURN tr_assert_report(char const* file, int line, char const* message_fmt, ...) TR_GNUC_PRINTF(3, 4);
 

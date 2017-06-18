@@ -33,81 +33,6 @@ struct tr_error;
  * @{
  */
 
-#ifndef UNUSED
-#ifdef __GNUC__
-#define UNUSED __attribute__((unused))
-#else
-#define UNUSED
-#endif
-#endif
-
-#ifndef TR_GNUC_PRINTF
-#ifdef __GNUC__
-#define TR_GNUC_PRINTF(fmt, args) __attribute__((format(printf, fmt, args)))
-#else
-#define TR_GNUC_PRINTF(fmt, args)
-#endif
-#endif
-
-#ifndef TR_GNUC_NONNULL
-#ifdef __GNUC__
-#define TR_GNUC_NONNULL(...) __attribute__((nonnull(__VA_ARGS__)))
-#else
-#define TR_GNUC_NONNULL(...)
-#endif
-#endif
-
-#ifndef TR_GNUC_NULL_TERMINATED
-#if __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 3)
-#define TR_GNUC_NULL_TERMINATED __attribute__((__sentinel__))
-#define TR_GNUC_HOT __attribute((hot))
-#else
-#define TR_GNUC_NULL_TERMINATED
-#define TR_GNUC_HOT
-#endif
-#endif
-
-#if __GNUC__ > 2 || (__GNUC__ == 2 && __GNUC_MINOR__ >= 96)
-#define TR_GNUC_MALLOC __attribute__((__malloc__))
-#else
-#define TR_GNUC_MALLOC
-#endif
-
-#ifndef __has_feature
-#define __has_feature(x) 0
-#endif
-#ifndef __has_extension
-#define __has_extension __has_feature
-#endif
-
-#ifdef __UCLIBC__
-#define TR_UCLIBC_CHECK_VERSION(major, minor, micro) \
-    (__UCLIBC_MAJOR__ > (major) || \
-    (__UCLIBC_MAJOR__ == (major) && __UCLIBC_MINOR__ > (minor)) || \
-    (__UCLIBC_MAJOR__ == (major) && __UCLIBC_MINOR__ == (minor) && __UCLIBC_SUBLEVEL__ >= (micro)))
-#else
-#define TR_UCLIBC_CHECK_VERSION(major, minor, micro) 0
-#endif
-
-/**
- * @def TR_STATIC_ASSERT
- * @brief This helper allows to perform static checks at compile time
- */
-#if defined(static_assert)
-#define TR_STATIC_ASSERT static_assert
-#elif __has_feature(c_static_assert) || __has_extension(c_static_assert)
-#define TR_STATIC_ASSERT _Static_assert
-#else
-#define TR_STATIC_ASSERT(x, msg) \
-    { \
-        typedef char __tr_static_check__[(x) ? 1 : -1] UNUSED; \
-    }
-#endif
-
-/***
-****
-***/
-
 char const* tr_strip_positional_args(char const* fmt);
 
 #if !defined(_)
@@ -211,19 +136,6 @@ int tr_main_win32(int argc, char** argv, int (* real_main)(int, char**));
 
 #define tr_main main
 
-#endif
-
-/***
-****
-***/
-
-/* Sometimes the system defines MAX/MIN, sometimes not.
-   In the latter case, define those here since we will use them */
-#ifndef MAX
-#define MAX(a, b) ((a) > (b) ? (a) : (b))
-#endif
-#ifndef MIN
-#define MIN(a, b) ((a) > (b) ? (b) : (a))
 #endif
 
 /***
