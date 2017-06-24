@@ -265,7 +265,14 @@ struct tr_fileset
 
 static void fileset_construct(struct tr_fileset* set, int n)
 {
-    struct tr_cached_file const TR_CACHED_FILE_INIT = { false, TR_BAD_SYS_FILE, 0, 0, 0 };
+    struct tr_cached_file const TR_CACHED_FILE_INIT =
+    {
+        .is_writable = false,
+        .fd = TR_BAD_SYS_FILE,
+        .torrent_id = 0,
+        .file_index = 0,
+        .used_at = 0
+    };
 
     set->begin = tr_new(struct tr_cached_file, n);
     set->end = set->begin + n;

@@ -459,7 +459,15 @@ static tr_tier* getTier(tr_announcer* announcer, uint8_t const* info_hash, int t
 ****  PUBLISH
 ***/
 
-static tr_tracker_event const TRACKER_EVENT_INIT = { 0, 0, 0, 0, 0, 0 };
+static tr_tracker_event const TRACKER_EVENT_INIT =
+{
+    .messageType = TR_TRACKER_WARNING,
+    .text = NULL,
+    .tracker = NULL,
+    .pex = NULL,
+    .pexCount = 0,
+    .seedProbability = 0
+};
 
 static void publishMessage(tr_tier* tier, char const* msg, int type)
 {

@@ -37,9 +37,9 @@ extern unsigned int tr_watchdir_retry_limit;
 extern struct timeval tr_watchdir_retry_start_interval;
 extern struct timeval tr_watchdir_retry_max_interval;
 
-static struct timeval const FIFTY_MSEC = { 0, 50000 };
-static struct timeval const ONE_HUNDRED_MSEC = { 0, 100000 };
-static struct timeval const TWO_HUNDRED_MSEC = { 0, 200000 };
+static struct timeval const FIFTY_MSEC = { .tv_sec = 0, .tv_usec = 50000 };
+static struct timeval const ONE_HUNDRED_MSEC = { .tv_sec = 0, .tv_usec = 100000 };
+static struct timeval const TWO_HUNDRED_MSEC = { .tv_sec = 0, .tv_usec = 200000 };
 
 static void process_events(void)
 {

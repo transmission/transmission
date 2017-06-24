@@ -26,6 +26,7 @@
 #include "rpcimpl.h"
 #include "session.h"
 #include "session-id.h"
+#include "stats.h"
 #include "torrent.h"
 #include "tr-assert.h"
 #include "utils.h"
@@ -2097,8 +2098,8 @@ static char const* sessionStats(tr_session* session, tr_variant* args_in UNUSED,
     int running = 0;
     int total = 0;
     tr_variant* d;
-    tr_session_stats currentStats = { 0.0f, 0, 0, 0, 0, 0 };
-    tr_session_stats cumulativeStats = { 0.0f, 0, 0, 0, 0, 0 };
+    tr_session_stats currentStats = TR_SESSION_STATS_INIT;
+    tr_session_stats cumulativeStats = TR_SESSION_STATS_INIT;
     tr_torrent* tor = NULL;
 
     while ((tor = tr_torrentNext(session, tor)) != NULL)

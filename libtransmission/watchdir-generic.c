@@ -43,7 +43,7 @@ tr_watchdir_generic;
 #define BACKEND_UPCAST(b) ((tr_watchdir_generic*)(b))
 
 /* Non-static and mutable for unit tests */
-struct timeval tr_watchdir_generic_interval = { 10, 0 };
+struct timeval tr_watchdir_generic_interval = { .tv_sec = 10, .tv_usec = 0 };
 
 /***
 ****

@@ -128,8 +128,8 @@ tr_watchdir_retry;
 
 /* Non-static and mutable for unit tests */
 unsigned int tr_watchdir_retry_limit = 3;
-struct timeval tr_watchdir_retry_start_interval = { 1, 0 };
-struct timeval tr_watchdir_retry_max_interval = { 10, 0 };
+struct timeval tr_watchdir_retry_start_interval = { .tv_sec = 1, .tv_usec = 0 };
+struct timeval tr_watchdir_retry_max_interval = { .tv_sec = 10, .tv_usec = 0 };
 
 #define tr_watchdir_retries_init(r) (void)0
 #define tr_watchdir_retries_destroy(r) tr_ptrArrayDestruct((r), (PtrArrayForeachFunc) & tr_watchdir_retry_free)

@@ -83,9 +83,24 @@ enum
     CANCEL_HISTORY_SEC = 60
 };
 
-tr_peer_event const TR_PEER_EVENT_INIT = { 0, 0, NULL, 0, 0, 0, 0 };
+tr_peer_event const TR_PEER_EVENT_INIT =
+{
+    .eventType = TR_PEER_CLIENT_GOT_BLOCK,
+    .pieceIndex = 0,
+    .bitfield = NULL,
+    .offset = 0,
+    .length = 0,
+    .err = 0,
+    .port = 0
+};
 
-tr_swarm_stats const TR_SWARM_STATS_INIT = { { 0, 0 }, 0, 0, { 0, 0, 0, 0, 0, 0, 0 } };
+tr_swarm_stats const TR_SWARM_STATS_INIT =
+{
+    .activePeerCount = { 0, 0 },
+    .activeWebseedCount = 0,
+    .peerCount = 0,
+    .peerFromCount = { 0, 0, 0, 0, 0, 0, 0 }
+};
 
 /**
 ***

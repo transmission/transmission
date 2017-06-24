@@ -84,7 +84,12 @@ struct tr_datatype
 
 static struct tr_datatype* datatype_pool = NULL;
 
-static struct tr_datatype const TR_DATATYPE_INIT = { NULL, 0, false };
+static struct tr_datatype const TR_DATATYPE_INIT =
+{
+    .next = NULL,
+    .length = 0,
+    .isPieceData = false
+};
 
 static struct tr_datatype* datatype_new(void)
 {

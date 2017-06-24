@@ -535,7 +535,7 @@ static void getstatus(void* cl)
 
 int tr_dhtStatus(tr_session* session, int af, int* nodes_return)
 {
-    struct getstatus_closure closure = { af, -1, -1 };
+    struct getstatus_closure closure = { .af = af, .status = -1, .count = -1 };
 
     if (!tr_dhtEnabled(session) || (af == AF_INET && session->udp_socket == TR_BAD_SOCKET) ||
         (af == AF_INET6 && session->udp6_socket == TR_BAD_SOCKET))

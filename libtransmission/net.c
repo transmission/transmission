@@ -49,8 +49,17 @@
 #define IN_MULTICAST(a) (((a) & 0xf0000000) == 0xe0000000)
 #endif
 
-tr_address const tr_in6addr_any = { TR_AF_INET6, { IN6ADDR_ANY_INIT } };
-tr_address const tr_inaddr_any = { TR_AF_INET, { { { { INADDR_ANY, 0x00, 0x00, 0x00 } } } } };
+tr_address const tr_in6addr_any =
+{
+    .type = TR_AF_INET6,
+    .addr.addr6 = IN6ADDR_ANY_INIT
+};
+
+tr_address const tr_inaddr_any =
+{
+    .type = TR_AF_INET,
+    .addr.addr4.s_addr = INADDR_ANY
+};
 
 char* tr_net_strerror(char* buf, size_t buflen, int err)
 {

@@ -13,7 +13,15 @@
 #include "tr-assert.h"
 #include "utils.h" /* tr_new0() */
 
-tr_bitfield const TR_BITFIELD_INIT = { NULL, 0, 0, 0, false, false };
+tr_bitfield const TR_BITFIELD_INIT =
+{
+    .bits = NULL,
+    .alloc_count = 0,
+    .bit_count = 0,
+    .true_count = 0,
+    .have_all_hint = false,
+    .have_none_hint = false
+};
 
 /****
 *****

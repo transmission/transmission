@@ -725,7 +725,7 @@ static int daemon_start(void* raw_arg, bool foreground)
 
     /* Create new timer event to report daemon status */
     {
-        struct timeval one_sec = { 1, 0 };
+        struct timeval one_sec = { .tv_sec = 1, .tv_usec = 0 };
         status_ev = event_new(ev_base, -1, EV_PERSIST, &periodicUpdate, NULL);
 
         if (status_ev == NULL)

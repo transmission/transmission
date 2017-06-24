@@ -552,7 +552,7 @@ static int tr_lpdConsiderAnnounce(tr_pex* peer, char const* const msg)
         maxHashLen = lengthof(lpd_torStaticType->info.hashString)
     };
 
-    struct lpd_protocolVersion ver = { -1, -1 };
+    struct lpd_protocolVersion ver = { .major = -1, .minor = -1 };
     char value[maxValueLen] = { 0 };
     char hashString[maxHashLen] = { 0 };
     int res = 0;
