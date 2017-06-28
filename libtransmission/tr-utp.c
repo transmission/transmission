@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "session.h"
 #include "crypto-utils.h" /* tr_rand_int_weak() */
 #include "peer-mgr.h"
+#include "peer-socket.h"
 #include "tr-assert.h"
 #include "tr-utp.h"
 #include "utils.h"
@@ -117,7 +118,7 @@ static void incoming(void* closure, struct UTPSocket* s)
         return;
     }
 
-    tr_peerMgrAddIncoming(ss->peerMgr, &addr, port, TR_BAD_SOCKET, s);
+    tr_peerMgrAddIncoming(ss->peerMgr, &addr, port, tr_peer_socket_utp_create(s));
 }
 
 void tr_utpSendTo(void* closure, unsigned char const* buf, size_t buflen, struct sockaddr const* to, socklen_t tolen)

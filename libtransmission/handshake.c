@@ -1150,7 +1150,7 @@ static void gotError(tr_peerIo* io, short what, void* vhandshake)
     int errcode = errno;
     tr_handshake* handshake = vhandshake;
 
-    if (io->utp_socket != NULL && !io->isIncoming && handshake->state == AWAITING_YB)
+    if (io->socket.type == TR_PEER_SOCKET_TYPE_UTP && !io->isIncoming && handshake->state == AWAITING_YB)
     {
         /* This peer probably doesn't speak uTP. */
 
@@ -1171,7 +1171,7 @@ static void gotError(tr_peerIo* io, short what, void* vhandshake)
             tr_peerMgrSetUtpFailed(tor, tr_peerIoGetAddress(io, NULL), true);
         }
 
-        if (!tr_peerIoReconnect(handshake->io))
+        if (tr_peerIoReconnect(handshake->io) == 0)
         {
             uint8_t msg[HANDSHAKE_SIZE];
             buildHandshakeMessage(handshake, msg);

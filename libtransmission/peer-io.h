@@ -22,6 +22,7 @@
 #include "bandwidth.h"
 #include "crypto.h"
 #include "net.h" /* tr_address */
+#include "peer-socket.h"
 #include "utils.h" /* tr_time() */
 
 struct evbuffer;
@@ -76,8 +77,7 @@ typedef struct tr_peerIo
     bool isSeed;
 
     tr_port port;
-    tr_socket_t socket;
-    struct UTPSocket* utp_socket;
+    struct tr_peer_socket socket;
 
     int refCount;
 
@@ -113,7 +113,7 @@ tr_peerIo* tr_peerIoNewOutgoing(tr_session* session, struct tr_bandwidth* parent
     uint8_t const* torrentHash, bool isSeed, bool utp);
 
 tr_peerIo* tr_peerIoNewIncoming(tr_session* session, struct tr_bandwidth* parent, struct tr_address const* addr, tr_port port,
-    tr_socket_t socket, struct UTPSocket* utp_socket);
+    struct tr_peer_socket socket);
 
 void tr_peerIoRefImpl(char const* file, int line, tr_peerIo* io);
 

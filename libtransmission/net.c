@@ -240,9 +240,11 @@ static socklen_t setup_sockaddr(tr_address const* addr, tr_port port, struct soc
     }
 }
 
-tr_socket_t tr_netOpenPeerSocket(tr_session* session, tr_address const* addr, tr_port port, bool clientIsSeed)
+struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const* addr, tr_port port, bool clientIsSeed)
 {
     TR_ASSERT(tr_address_is_valid(addr));
+
+    struct tr_peer_socket ret = TR_PEER_SOCKET_INIT;
 
     static int const domains[NUM_TR_AF_INET_TYPES] = { AF_INET, AF_INET6 };
     tr_socket_t s;
@@ -255,14 +257,14 @@ tr_socket_t tr_netOpenPeerSocket(tr_session* session, tr_address const* addr, tr
 
     if (!tr_address_is_valid_for_peers(addr, port))
     {
-        return TR_BAD_SOCKET; /* -EINVAL */
+        return ret;
     }
 
     s = tr_fdSocketCreate(session, domains[addr->type], SOCK_STREAM);
 
     if (s == TR_BAD_SOCKET)
     {
-        return TR_BAD_SOCKET;
+        return ret;
     }
 
     /* seeds don't need much of a read buffer... */
@@ -280,7 +282,7 @@ tr_socket_t tr_netOpenPeerSocket(tr_session* session, tr_address const* addr, tr
     if (evutil_make_socket_nonblocking(s) == -1)
     {
         tr_netClose(session, s);
-        return TR_BAD_SOCKET;
+        return ret;
     }
 
     addrlen = setup_sockaddr(addr, port, &sock);
@@ -295,7 +297,7 @@ tr_socket_t tr_netOpenPeerSocket(tr_session* session, tr_address const* addr, tr
         tr_logAddError(_("Couldn't set source address %s on %" PRIdMAX ": %s"), tr_address_to_string(source_addr), (intmax_t)s,
             tr_net_strerror(err_buf, sizeof(err_buf), sockerrno));
         tr_netClose(session, s);
-        return TR_BAD_SOCKET; /* -errno */
+        return ret;
     }
 
     if (connect(s, (struct sockaddr*)&sock, addrlen) == -1 &&
@@ -304,8 +306,7 @@ tr_socket_t tr_netOpenPeerSocket(tr_session* session, tr_address const* addr, tr
 #endif
         sockerrno != EINPROGRESS)
     {
-        int tmperrno;
-        tmperrno = sockerrno;
+        int const tmperrno = sockerrno;
 
         if ((tmperrno != ENETUNREACH && tmperrno != EHOSTUNREACH) || addr->type == TR_AF_INET)
         {
@@ -314,24 +315,32 @@ tr_socket_t tr_netOpenPeerSocket(tr_session* session, tr_address const* addr, tr
         }
 
         tr_netClose(session, s);
-        s = TR_BAD_SOCKET; /* -tmperrno */
+    }
+    else
+    {
+        ret = tr_peer_socket_tcp_create(s);
     }
 
     tr_logAddDeep(__FILE__, __LINE__, NULL, "New OUTGOING connection %" PRIdMAX " (%s)", (intmax_t)s,
         tr_peerIoAddrStr(addr, port));
 
-    return s;
+    return ret;
 }
 
-struct UTPSocket* tr_netOpenPeerUTPSocket(tr_session* session, tr_address const* addr, tr_port port, bool clientIsSeed UNUSED)
+struct tr_peer_socket tr_netOpenPeerUTPSocket(tr_session* session, tr_address const* addr, tr_port port, bool clientIsSeed UNUSED)
 {
-    struct UTPSocket* ret = NULL;
+    struct tr_peer_socket ret = TR_PEER_SOCKET_INIT;
 
     if (tr_address_is_valid_for_peers(addr, port))
     {
         struct sockaddr_storage ss;
         socklen_t const sslen = setup_sockaddr(addr, port, &ss);
-        ret = UTP_Create(tr_utpSendTo, session, (struct sockaddr*)&ss, sslen);
+        struct UTPSocket* const socket = UTP_Create(tr_utpSendTo, session, (struct sockaddr*)&ss, sslen);
+
+        if (socket != NULL)
+        {
+            ret = tr_peer_socket_utp_create(socket);
+        }
     }
 
     return ret;

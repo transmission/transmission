@@ -145,6 +145,7 @@ noinst_HEADERS = \
   peer-io.h \
   peer-mgr.h \
   peer-msgs.h \
+  peer-socket.h \
   platform.h \
   platform-quota.h \
   port-forwarding.h \

@@ -2071,7 +2071,7 @@ static bool myHandshakeDoneCB(tr_handshake* handshake, tr_peerIo* io, bool readA
 
         /* In principle, this flag specifies whether the peer groks uTP,
            not whether it's currently connected over uTP. */
-        if (io->utp_socket != NULL)
+        if (io->socket.type == TR_PEER_SOCKET_TYPE_UTP)
         {
             atom->flags |= ADDED_F_UTP_FLAGS;
         }
@@ -2123,8 +2123,31 @@ static bool myHandshakeDoneCB(tr_handshake* handshake, tr_peerIo* io, bool readA
     return success;
 }
 
-void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_address* addr, tr_port port, tr_socket_t socket,
-    struct UTPSocket* utp_socket)
+static void close_peer_socket(struct tr_peer_socket const socket, tr_session* session)
+{
+    switch (socket.type)
+    {
+    case TR_PEER_SOCKET_TYPE_NONE:
+        break;
+
+    case TR_PEER_SOCKET_TYPE_TCP:
+        tr_netClose(session, socket.handle.tcp);
+        break;
+
+#ifdef WITH_UTP
+
+    case TR_PEER_SOCKET_TYPE_UTP:
+        UTP_Close(socket.handle.utp);
+        break;
+
+#endif
+
+    default:
+        TR_ASSERT_MSG(false, "unsupported peer socket type %d", socket.type);
+    }
+}
+
+void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_address* addr, tr_port port, struct tr_peer_socket const socket)
 {
     TR_ASSERT(tr_isSession(manager->session));
 
@@ -2135,33 +2158,18 @@ void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_address* addr, tr_port port, 
     if (tr_sessionIsAddressBlocked(session, addr))
     {
         tr_logAddDebug("Banned IP address \"%s\" tried to connect to us", tr_address_to_string(addr));
-
-        if (socket != TR_BAD_SOCKET)
-        {
-            tr_netClose(session, socket);
-        }
-        else
-        {
-            UTP_Close(utp_socket);
-        }
+        close_peer_socket(socket, session);
     }
     else if (getExistingHandshake(&manager->incomingHandshakes, addr) != NULL)
     {
-        if (socket != TR_BAD_SOCKET)
-        {
-            tr_netClose(session, socket);
-        }
-        else
-        {
-            UTP_Close(utp_socket);
-        }
+        close_peer_socket(socket, session);
     }
     else /* we don't have a connection to them yet... */
     {
         tr_peerIo* io;
         tr_handshake* handshake;
 
-        io = tr_peerIoNewIncoming(session, &session->bandwidth, addr, port, socket, utp_socket);
+        io = tr_peerIoNewIncoming(session, &session->bandwidth, addr, port, socket);
 
         handshake = tr_handshakeNew(io, session->encryptionMode, myHandshakeDoneCB, manager);
 

@@ -2655,7 +2655,7 @@ bool tr_peerMsgsIsUtpConnection(tr_peerMsgs const* msgs)
 {
     TR_ASSERT(tr_isPeerMsgs(msgs));
 
-    return msgs->io->utp_socket != NULL;
+    return msgs->io->socket.type == TR_PEER_SOCKET_TYPE_UTP;
 }
 
 bool tr_peerMsgsIsEncrypted(tr_peerMsgs const* msgs)
