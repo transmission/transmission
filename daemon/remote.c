@@ -2912,24 +2912,32 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
 /* [host:port] or [host] or [port] or [http(s?)://host:port/transmission/] */
 static void getHostAndPortAndRpcUrl(int* argc, char** argv, char** host, int* port, char** rpcurl)
 {
-    if (*argv[1] != '-')
+    if (*argv[1] == '-')
     {
-        char const* s = argv[1];
-        char const* delim = strchr(s, ':');
+        return;
+    }
 
-        if (strncmp(s, "http://", 7) == 0) /* user passed in http rpc url */
+    char const* const s = argv[1];
+
+    if (strncmp(s, "http://", 7) == 0) /* user passed in http rpc url */
+    {
+        *rpcurl = tr_strdup_printf("%s/rpc/", s + 7);
+    }
+    else if (strncmp(s, "https://", 8) == 0) /* user passed in https rpc url */
+    {
+        UseSSL = true;
+        *rpcurl = tr_strdup_printf("%s/rpc/", s + 8);
+    }
+    else
+    {
+        char const* const first_colon = strchr(s, ':');
+        char const* const last_colon = strrchr(s, ':');
+
+        if (last_colon != NULL && ((*s == '[' && *(last_colon - 1) == ']') || first_colon == last_colon))
         {
-            *rpcurl = tr_strdup_printf("%s/rpc/", s + 7);
-        }
-        else if (strncmp(s, "https://", 8) == 0) /* user passed in https rpc url */
-        {
-            UseSSL = true;
-            *rpcurl = tr_strdup_printf("%s/rpc/", s + 8);
-        }
-        else if (delim != NULL) /* user passed in both host and port */
-        {
-            *host = tr_strndup(s, delim - s);
-            *port = atoi(delim + 1);
+            /* user passed in both host and port */
+            *host = tr_strndup(s, last_colon - s);
+            *port = atoi(last_colon + 1);
         }
         else
         {
@@ -2942,16 +2950,24 @@ static void getHostAndPortAndRpcUrl(int* argc, char** argv, char** host, int* po
             }
             else /* user passed in a host */
             {
-                *host = tr_strdup(s);
+                if (last_colon != NULL && first_colon != last_colon && (*s != '[' || *(s + strlen(s) - 1) != ']'))
+                {
+                    /* looks like IPv6; let's add brackets as we'll be appending the port later on */
+                    *host = tr_strdup_printf("[%s]", s);
+                }
+                else
+                {
+                    *host = tr_strdup(s);
+                }
             }
         }
+    }
 
-        *argc -= 1;
+    *argc -= 1;
 
-        for (int i = 1; i < *argc; ++i)
-        {
-            argv[i] = argv[i + 1];
-        }
+    for (int i = 1; i < *argc; ++i)
+    {
+        argv[i] = argv[i + 1];
     }
 }
 
