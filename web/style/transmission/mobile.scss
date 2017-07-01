@@ -733,13 +733,6 @@ div.torrent_footer
 		@include roundedBox(5px);
 		@include buttonImage('images/compact.png', $idle-color-top, $idle-color-bottom, $active-color-top, $active-color-bottom);
 	}
-
-	#freespace-info	{
-		float: right;
-                text-align: right;
-                border: 0px;
-                width: 100px;
-	}
 }
 
 /****
