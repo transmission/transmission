@@ -237,7 +237,7 @@ static char* tr_convertAnnounceToScrape(char const* announce)
         *walk++ = '\0';
         TR_ASSERT(walk - scrape == (int)alloc_len);
     }
-    /* Some torrents with UDP annouce URLs don't have /announce. */
+    /* Some torrents with UDP announce URLs don't have /announce. */
     else if (strncmp(announce, "udp:", 4) == 0)
     {
         scrape = tr_strdup(announce);
