@@ -498,7 +498,7 @@ static void utp_on_writable(tr_peerIo* io)
     dbgmsg(io, "libutp says this peer is ready to write");
 
     n = tr_peerIoTryWrite(io, SIZE_MAX);
-    tr_peerIoSetEnabled(io, TR_UP, n && evbuffer_get_length(io->outbuf));
+    tr_peerIoSetEnabled(io, TR_UP, n != 0 && evbuffer_get_length(io->outbuf) != 0);
 }
 
 static void utp_on_state_change(void* closure, int state)
@@ -1297,7 +1297,7 @@ static int tr_peerIoTryRead(tr_peerIo* io, size_t howmuch)
 
                 dbgmsg(io, "read %d from peer (%s)", res, res == -1 ? tr_net_strerror(err_buf, sizeof(err_buf), e) : "");
 
-                if (evbuffer_get_length(io->inbuf))
+                if (evbuffer_get_length(io->inbuf) != 0)
                 {
                     canReadWrapper(io);
                 }
