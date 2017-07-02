@@ -92,8 +92,6 @@ void tr_utpSendTo(void* closure UNUSED, unsigned char const* buf UNUSED, size_t 
 
 #define UTP_INTERVAL_US 50000
 
-static struct event* utp_timer = NULL;
-
 static void incoming(void* closure, struct UTPSocket* s)
 {
     tr_session* ss = closure;
@@ -156,7 +154,7 @@ static void reset_timer(tr_session* ss)
         usec = tr_rand_int_weak(1000000);
     }
 
-    tr_timerAdd(utp_timer, sec, usec);
+    tr_timerAdd(ss->utp_timer, sec, usec);
 }
 
 static void timer_callback(evutil_socket_t s UNUSED, short type UNUSED, void* closure)
@@ -168,11 +166,11 @@ static void timer_callback(evutil_socket_t s UNUSED, short type UNUSED, void* cl
 
 int tr_utpPacket(unsigned char const* buf, size_t buflen, struct sockaddr const* from, socklen_t fromlen, tr_session* ss)
 {
-    if (!ss->isClosed && utp_timer == NULL)
+    if (!ss->isClosed && ss->utp_timer == NULL)
     {
-        utp_timer = evtimer_new(ss->event_base, timer_callback, ss);
+        ss->utp_timer = evtimer_new(ss->event_base, timer_callback, ss);
 
-        if (utp_timer == NULL)
+        if (ss->utp_timer == NULL)
         {
             return -1;
         }
@@ -183,12 +181,12 @@ int tr_utpPacket(unsigned char const* buf, size_t buflen, struct sockaddr const*
     return UTP_IsIncomingUTP(incoming, tr_utpSendTo, ss, buf, buflen, from, fromlen);
 }
 
-void tr_utpClose(tr_session* session UNUSED)
+void tr_utpClose(tr_session* session)
 {
-    if (utp_timer != NULL)
+    if (session->utp_timer != NULL)
     {
-        evtimer_del(utp_timer);
-        utp_timer = NULL;
+        evtimer_del(session->utp_timer);
+        session->utp_timer = NULL;
     }
 }
 
