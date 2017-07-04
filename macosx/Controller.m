@@ -3163,10 +3163,15 @@ static void removeKeRangerRansomware()
         {
             Torrent * torrent = [fTableView itemAtRow: i];
             [movingTorrents addObject: torrent];
+        }
 
-            //change groups
-            if (item)
-                [torrent setGroupValue: [item groupIndex] determinationType: TorrentDeterminationUserSpecified];
+        //change groups
+        if (item)
+        {
+            const NSInteger groupIndex = [item groupIndex];
+
+            for (Torrent * torrent in movingTorrents)
+                [torrent setGroupValue: groupIndex determinationType: TorrentDeterminationUserSpecified];
         }
 
         //reorder queue order
