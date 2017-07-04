@@ -659,7 +659,8 @@ tau_tracker_is_idle (const struct tau_tracker * tracker)
 }
 
 static void
-tau_tracker_upkeep (struct tau_tracker * tracker)
+tau_tracker_upkeep_ex (struct tau_tracker * tracker,
+                       bool                 timeout_reqs)
 {
     const time_t now = tr_time ();
     const bool closing = tracker->close_at != 0;
@@ -717,10 +718,17 @@ tau_tracker_upkeep (struct tau_tracker * tracker)
         return;
     }
 
-    tau_tracker_timeout_reqs (tracker);
+    if (timeout_reqs)
+      tau_tracker_timeout_reqs (tracker);
 
     if ((tracker->addr != NULL) && (tracker->connection_expiration_time > now))
         tau_tracker_send_reqs (tracker);
+}
+
+static void
+tau_tracker_upkeep (struct tau_tracker * tracker)
+{
+    tau_tracker_upkeep_ex (tracker, true);
 }
 
 /****
@@ -957,7 +965,7 @@ tr_tracker_udp_announce (tr_session                 * session,
                                                                 response_func,
                                                                 user_data);
     tr_ptrArrayAppend (&tracker->announces, r);
-    tau_tracker_upkeep (tracker);
+    tau_tracker_upkeep_ex (tracker, false);
 }
 
 void
@@ -972,5 +980,5 @@ tr_tracker_udp_scrape (tr_session               * session,
                                                             response_func,
                                                             user_data);
     tr_ptrArrayAppend (&tracker->scrapes, r);
-    tau_tracker_upkeep (tracker);
+    tau_tracker_upkeep_ex (tracker, false);
 }

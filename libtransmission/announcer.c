@@ -1425,6 +1425,8 @@ multiscrape (tr_announcer * announcer, tr_ptrArray * tiers)
         char * url = tier->currentTracker->scrape;
         const uint8_t * hash = tier->tor->info.hash;
 
+        assert (url != NULL);
+
         /* if there's a request with this scrape URL and a free slot, use it */
         for (j=0; j<request_count; ++j)
         {
