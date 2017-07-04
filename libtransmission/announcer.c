@@ -1475,6 +1475,8 @@ static void multiscrape(tr_announcer* announcer, tr_ptrArray* tiers)
         uint8_t const* hash = tier->tor->info.hash;
         bool found = false;
 
+        TR_ASSERT(url != NULL);
+
         /* if there's a request with this scrape URL and a free slot, use it */
         for (int j = 0; !found && j < request_count; ++j)
         {
