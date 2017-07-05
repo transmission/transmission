@@ -567,7 +567,7 @@ static GtkWidget* options_page_new(struct DetailsImpl* d)
     w = d->idle_combo = idle_combo_new();
     d->idle_combo_tag = g_signal_connect(w, "changed", G_CALLBACK(onComboEnumChanged), d);
     gtk_box_pack_start(GTK_BOX(h), w, TRUE, TRUE, 0);
-    w = d->idle_spin = gtk_spin_button_new_with_range(1, INT_MAX, 5);
+    w = d->idle_spin = gtk_spin_button_new_with_range(1, 40320, 5);
     d->idle_spin_tag = g_signal_connect(w, "value-changed", G_CALLBACK(idle_spun_cb), d);
     gtk_box_pack_start(GTK_BOX(h), w, FALSE, FALSE, 0);
     hig_workarea_add_row(t, &row, _("_Idle:"), h, NULL);

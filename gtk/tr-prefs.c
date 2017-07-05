@@ -342,7 +342,7 @@ static GtkWidget* seedingPage(GObject* core)
 
     s = _("Stop seeding if idle for _N minutes:");
     w = new_check_button(s, TR_KEY_idle_seeding_limit_enabled, core);
-    w2 = new_spin_button(TR_KEY_idle_seeding_limit, core, 1, 9999, 5);
+    w2 = new_spin_button(TR_KEY_idle_seeding_limit, core, 1, 40320, 5);
     gtk_widget_set_sensitive(GTK_WIDGET(w2), gtr_pref_flag_get(TR_KEY_idle_seeding_limit_enabled));
     g_signal_connect(w, "toggled", G_CALLBACK(target_cb), w2);
     hig_workarea_add_row_w(t, &row, w, w2, NULL);
