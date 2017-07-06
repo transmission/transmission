@@ -495,6 +495,21 @@ static GNode* find_child(GNode* parent, char const* name)
     return child;
 }
 
+static gboolean search_func (GtkTreeModel *model, gint column, const gchar *key, GtkTreeIter *iter, gpointer search_data)
+{
+    gchar *iter_string = NULL;
+    gchar *lowercase = NULL;
+    gboolean result = TRUE;
+    gtk_tree_model_get(model, iter, column, &iter_string, -1);
+    if (iter_string != NULL) {
+        lowercase = g_utf8_strdown(iter_string, -1);
+        result = g_strrstr(lowercase, key) == NULL;
+    }
+    g_free(lowercase);
+    g_free(iter_string);
+    return result;
+}
+
 void gtr_file_list_set_torrent(GtkWidget* w, int torrentId)
 {
     GtkTreeStore* store;
@@ -586,6 +601,7 @@ void gtr_file_list_set_torrent(GtkWidget* w, int torrentId)
 
     gtk_tree_view_set_model(GTK_TREE_VIEW(data->view), data->model);
     gtk_tree_view_expand_all(GTK_TREE_VIEW(data->view));
+    gtk_tree_view_set_search_equal_func(GTK_TREE_VIEW(data->view), (GtkTreeViewSearchEqualFunc) search_func, data->model, NULL);
     g_object_unref(data->model);
 }
 
