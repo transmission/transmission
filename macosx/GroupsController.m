@@ -65,37 +65,37 @@ GroupsController * fGroupsInstance = nil;
             NSMutableDictionary * red = [NSMutableDictionary dictionaryWithObjectsAndKeys:
                                             [NSColor redColor], @"Color",
                                             NSLocalizedString(@"Red", "Groups -> Name"), @"Name",
-                                            [NSNumber numberWithInteger: 0], @"Index", nil];
+                                            @0, @"Index", nil];
 
             NSMutableDictionary * orange = [NSMutableDictionary dictionaryWithObjectsAndKeys:
                                             [NSColor orangeColor], @"Color",
                                             NSLocalizedString(@"Orange", "Groups -> Name"), @"Name",
-                                            [NSNumber numberWithInteger: 1], @"Index", nil];
+                                            @1, @"Index", nil];
 
             NSMutableDictionary * yellow = [NSMutableDictionary dictionaryWithObjectsAndKeys:
                                             [NSColor yellowColor], @"Color",
                                             NSLocalizedString(@"Yellow", "Groups -> Name"), @"Name",
-                                            [NSNumber numberWithInteger: 2], @"Index", nil];
+                                            @2, @"Index", nil];
 
             NSMutableDictionary * green = [NSMutableDictionary dictionaryWithObjectsAndKeys:
                                             [NSColor greenColor], @"Color",
                                             NSLocalizedString(@"Green", "Groups -> Name"), @"Name",
-                                            [NSNumber numberWithInteger: 3], @"Index", nil];
+                                            @3, @"Index", nil];
 
             NSMutableDictionary * blue = [NSMutableDictionary dictionaryWithObjectsAndKeys:
                                             [NSColor blueColor], @"Color",
                                             NSLocalizedString(@"Blue", "Groups -> Name"), @"Name",
-                                            [NSNumber numberWithInteger: 4], @"Index", nil];
+                                            @4, @"Index", nil];
 
             NSMutableDictionary * purple = [NSMutableDictionary dictionaryWithObjectsAndKeys:
                                             [NSColor purpleColor], @"Color",
                                             NSLocalizedString(@"Purple", "Groups -> Name"), @"Name",
-                                            [NSNumber numberWithInteger: 5], @"Index", nil];
+                                            @5, @"Index", nil];
 
             NSMutableDictionary * gray = [NSMutableDictionary dictionaryWithObjectsAndKeys:
                                             [NSColor grayColor], @"Color",
                                             NSLocalizedString(@"Gray", "Groups -> Name"), @"Name",
-                                            [NSNumber numberWithInteger: 6], @"Index", nil];
+                                            @6, @"Index", nil];
 
             fGroups = [[NSMutableArray alloc] initWithObjects: red, orange, yellow, green, blue, purple, gray, nil];
             [self saveGroups]; //make sure this is saved right away
@@ -184,7 +184,7 @@ GroupsController * fGroupsInstance = nil;
 {
     NSMutableDictionary * dict = [fGroups objectAtIndex: [self rowValueForIndex: index]];
 
-    [dict setObject: [NSNumber numberWithBool: useCustomLocation] forKey: @"UsesCustomDownloadLocation"];
+    [dict setObject: @(useCustomLocation) forKey: @"UsesCustomDownloadLocation"];
 
     [[GroupsController groups] saveGroups];
 }
@@ -217,7 +217,7 @@ GroupsController * fGroupsInstance = nil;
 {
     NSMutableDictionary * dict = [fGroups objectAtIndex: [self rowValueForIndex: index]];
 
-    [dict setObject: [NSNumber numberWithBool: useAutoAssignRules] forKey: @"UsesAutoGroupRules"];
+    [dict setObject: @(useAutoAssignRules) forKey: @"UsesAutoGroupRules"];
 
     [[GroupsController groups] saveGroups];
 }
@@ -256,7 +256,7 @@ GroupsController * fGroupsInstance = nil;
 
     const NSInteger index = [candidates firstIndex];
 
-    [fGroups addObject: [NSMutableDictionary dictionaryWithObjectsAndKeys: [NSNumber numberWithInteger: index], @"Index",
+    [fGroups addObject: [NSMutableDictionary dictionaryWithObjectsAndKeys: @(index), @"Index",
                             [NSColor colorWithCalibratedRed: 0.0 green: 0.65 blue: 1.0 alpha: 1.0], @"Color", @"", @"Name", nil]];
 
     [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateGroups" object: self];
@@ -269,7 +269,7 @@ GroupsController * fGroupsInstance = nil;
     [fGroups removeObjectAtIndex: row];
 
     [[NSNotificationCenter defaultCenter] postNotificationName: @"GroupValueRemoved" object: self userInfo:
-        [NSDictionary dictionaryWithObject: [NSNumber numberWithInteger: index] forKey: @"Index"]];
+        [NSDictionary dictionaryWithObject: @(index) forKey: @"Index"]];
 
     if (index == [[NSUserDefaults standardUserDefaults] integerForKey: @"FilterGroup"])
         [[NSUserDefaults standardUserDefaults] setInteger: -2 forKey: @"FilterGroup"];

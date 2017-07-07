@@ -260,7 +260,7 @@
     [numberFormatter setMinimumFractionDigits: 0];
     [numberFormatter setMaximumFractionDigits: decimals];
 
-    NSString * fileSizeString = [numberFormatter stringFromNumber: [NSNumber numberWithFloat: convertedSize]];
+    NSString * fileSizeString = [numberFormatter stringFromNumber: @(convertedSize)];
     [numberFormatter release];
 
     if (!notAllowedUnit || ![unit isEqualToString: notAllowedUnit])

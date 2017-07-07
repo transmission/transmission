@@ -1199,7 +1199,7 @@ static void removeKeRangerRansomware()
 - (void) open: (NSArray *) files
 {
     NSDictionary * dict = [[NSDictionary alloc] initWithObjectsAndKeys: files, @"Filenames",
-                                [NSNumber numberWithInt: ADD_MANUAL], @"AddType", nil];
+                                @(ADD_MANUAL), @"AddType", nil];
     [self performSelectorOnMainThread: @selector(openFilesWithDict:) withObject: dict waitUntilDone: NO];
 }
 
@@ -1221,7 +1221,7 @@ static void removeKeRangerRansomware()
                 [filenames addObject: [url path]];
 
             NSDictionary * dictionary = [[NSDictionary alloc] initWithObjectsAndKeys: filenames, @"Filenames",
-                                         [NSNumber numberWithInt: sender == fOpenIgnoreDownloadFolder ? ADD_SHOW_OPTIONS : ADD_MANUAL], @"AddType", nil];
+                sender == fOpenIgnoreDownloadFolder ? @(ADD_SHOW_OPTIONS) : @(ADD_MANUAL), @"AddType", nil];
             [self performSelectorOnMainThread: @selector(openFilesWithDict:) withObject: dictionary waitUntilDone: NO];
         }
     }];
@@ -2581,7 +2581,7 @@ static void removeKeRangerRansomware()
 
         NSMutableDictionary * groupsByIndex = [NSMutableDictionary dictionaryWithCapacity: [fDisplayedTorrents count]];
         for (TorrentGroup * group in fDisplayedTorrents)
-            [groupsByIndex setObject: group forKey: [NSNumber numberWithInteger: [group groupIndex]]];
+            [groupsByIndex setObject: group forKey: @([group groupIndex])];
 
         const NSUInteger originalGroupCount = [fDisplayedTorrents count];
         for (NSUInteger index = 0; index < originalGroupCount; ++index)
@@ -2606,11 +2606,11 @@ static void removeKeRangerRansomware()
                     const NSInteger groupValue = [torrent groupValue];
                     if (groupValue != [group groupIndex])
                     {
-                        TorrentGroup * newGroup = [groupsByIndex objectForKey: [NSNumber numberWithInteger: groupValue]];
+                        TorrentGroup * newGroup = [groupsByIndex objectForKey: @(groupValue)];
                         if (!newGroup)
                         {
                             newGroup = [[[TorrentGroup alloc] initWithGroup: groupValue] autorelease];
-                            [groupsByIndex setObject: newGroup forKey: [NSNumber numberWithInteger: groupValue]];
+                            [groupsByIndex setObject: newGroup forKey: @(groupValue)];
                             [fDisplayedTorrents addObject: newGroup];
 
                             [fTableView insertItemsAtIndexes: [NSIndexSet indexSetWithIndex: [fDisplayedTorrents count]-1] inParent: nil withAnimation: NSTableViewAnimationEffectFade];
@@ -2647,11 +2647,11 @@ static void removeKeRangerRansomware()
         for (Torrent * torrent in [allTorrents objectsAtIndexes: unusedAllTorrentsIndexes])
         {
             const NSInteger groupValue = [torrent groupValue];
-            TorrentGroup * group = [groupsByIndex objectForKey: [NSNumber numberWithInteger: groupValue]];
+            TorrentGroup * group = [groupsByIndex objectForKey: @(groupValue)];
             if (!group)
             {
                 group = [[[TorrentGroup alloc] initWithGroup: groupValue] autorelease];
-                [groupsByIndex setObject: group forKey: [NSNumber numberWithInteger: groupValue]];
+                [groupsByIndex setObject: group forKey: @(groupValue)];
                 [fDisplayedTorrents addObject: group];
 
                 [fTableView insertItemsAtIndexes: [NSIndexSet indexSetWithIndex: [fDisplayedTorrents count]-1] inParent: nil withAnimation: NSTableViewAnimationEffectFade];
@@ -2702,11 +2702,11 @@ static void removeKeRangerRansomware()
             for (Torrent * torrent in allTorrents)
             {
                 const NSInteger groupValue = [torrent groupValue];
-                TorrentGroup * group = [groupsByIndex objectForKey: [NSNumber numberWithInteger: groupValue]];
+                TorrentGroup * group = [groupsByIndex objectForKey: @(groupValue)];
                 if (!group)
                 {
                     group = [[[TorrentGroup alloc] initWithGroup: groupValue] autorelease];
-                    [groupsByIndex setObject: group forKey: [NSNumber numberWithInteger: groupValue]];
+                    [groupsByIndex setObject: group forKey: @(groupValue)];
                 }
 
                 [[group torrents] addObject: torrent];

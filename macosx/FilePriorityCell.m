@@ -116,9 +116,9 @@
     const NSUInteger count = [priorities count];
     if (fHoverRow && count > 0)
     {
-        [super setSelected: [priorities containsObject: [NSNumber numberWithInteger: TR_PRI_LOW]] forSegment: 0];
-        [super setSelected: [priorities containsObject: [NSNumber numberWithInteger: TR_PRI_NORMAL]] forSegment: 1];
-        [super setSelected: [priorities containsObject: [NSNumber numberWithInteger: TR_PRI_HIGH]] forSegment: 2];
+        [super setSelected: [priorities containsObject: @(TR_PRI_LOW)] forSegment: 0];
+        [super setSelected: [priorities containsObject: @(TR_PRI_NORMAL)] forSegment: 1];
+        [super setSelected: [priorities containsObject: @(TR_PRI_HIGH)] forSegment: 2];
 
         [super drawWithFrame: cellFrame inView: controlView];
     }
@@ -141,19 +141,19 @@
             NSColor * priorityColor = [self backgroundStyle] == NSBackgroundStyleDark ? [NSColor whiteColor] : [NSColor darkGrayColor];
 
             totalWidth = 0.0;
-            if ([priorities containsObject: [NSNumber numberWithInteger: TR_PRI_LOW]])
+            if ([priorities containsObject: @(TR_PRI_LOW)])
             {
                 NSImage * image = [[NSImage imageNamed: @"PriorityLowTemplate"] imageWithColor: priorityColor];
                 [images addObject: image];
                 totalWidth += [image size].width;
             }
-            if ([priorities containsObject: [NSNumber numberWithInteger: TR_PRI_NORMAL]])
+            if ([priorities containsObject: @(TR_PRI_NORMAL)])
             {
                 NSImage * image = [[NSImage imageNamed: @"PriorityNormalTemplate"] imageWithColor: priorityColor];
                 [images addObject: image];
                 totalWidth += [image size].width;
             }
-            if ([priorities containsObject: [NSNumber numberWithInteger: TR_PRI_HIGH]])
+            if ([priorities containsObject: @(TR_PRI_HIGH)])
             {
                 NSImage * image = [[NSImage imageNamed: @"PriorityHighTemplate"] imageWithColor: priorityColor];
                 [images addObject: image];

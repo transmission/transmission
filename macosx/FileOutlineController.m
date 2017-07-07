@@ -239,7 +239,7 @@ typedef enum
 - (id) outlineView: (NSOutlineView *) outlineView objectValueForTableColumn: (NSTableColumn *) tableColumn byItem: (id) item
 {
     if ([[tableColumn identifier] isEqualToString: @"Check"])
-        return [NSNumber numberWithInteger: [fTorrent checkForFiles: [(FileListNode *)item indexes]]];
+        return @([fTorrent checkForFiles: [(FileListNode *)item indexes]]);
     else
         return item;
 }

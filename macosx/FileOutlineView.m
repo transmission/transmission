@@ -100,7 +100,7 @@
     {
         FilePriorityCell * cell = (FilePriorityCell *)[self preparedCellAtColumn: col row: row];
 
-        NSDictionary * userInfo = [NSDictionary dictionaryWithObject: [NSNumber numberWithInt: row] forKey: @"Row"];
+        NSDictionary * userInfo = [NSDictionary dictionaryWithObject: @(row) forKey: @"Row"];
         [cell addTrackingAreasForView: self inRect: [self frameOfCellAtColumn: col row: row] withUserInfo: userInfo
                 mouseLocation: mouseLocation];
     }

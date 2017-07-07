@@ -1148,7 +1148,7 @@
             {
                 int num = [component intValue];
                 if (num >= 0 && num < 256)
-                    [newComponents addObject: [[NSNumber numberWithInt: num] stringValue]];
+                    [newComponents addObject: [@(num) stringValue]];
                 else
                 {
                     valid = false;

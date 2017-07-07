@@ -214,8 +214,8 @@
         NSDictionary * message  = [NSDictionary dictionaryWithObjectsAndKeys:
                                     [NSString stringWithUTF8String: currentMessage->message], @"Message",
                                     [NSDate dateWithTimeIntervalSince1970: currentMessage->when], @"Date",
-                                    [NSNumber numberWithUnsignedInteger: currentIndex++], @"Index", //more accurate when sorting by date
-                                    [NSNumber numberWithInteger: currentMessage->level], @"Level",
+                                    @(currentIndex++), @"Index", //more accurate when sorting by date
+                                    @(currentMessage->level), @"Level",
                                     name, @"Name",
                                     file, @"File", nil];
 

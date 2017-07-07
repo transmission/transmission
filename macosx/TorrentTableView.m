@@ -238,7 +238,7 @@
         if (![[self itemAtRow: row] isKindOfClass: [Torrent class]])
             continue;
 
-        NSDictionary * userInfo = [NSDictionary dictionaryWithObject: [NSNumber numberWithInteger: row] forKey: @"Row"];
+        NSDictionary * userInfo = [NSDictionary dictionaryWithObject: @(row) forKey: @"Row"];
         TorrentCell * cell = (TorrentCell *)[self preparedCellAtColumn: -1 row: row];
         [cell addTrackingAreasForView: self inRect: [self rectOfRow: row] withUserInfo: userInfo mouseLocation: mouseLocation];
     }
@@ -655,7 +655,7 @@
                         "Action menu -> upload/download limit"), speedLimitActionValue[i]] action: @selector(setQuickLimit:)
                         keyEquivalent: @""];
                 [item setTarget: self];
-                [item setRepresentedObject: [NSNumber numberWithInt: speedLimitActionValue[i]]];
+                [item setRepresentedObject: @(speedLimitActionValue[i])];
                 [menu addItem: item];
                 [item release];
             }
@@ -684,7 +684,7 @@
                 item = [[NSMenuItem alloc] initWithTitle: [NSString localizedStringWithFormat: @"%.2f", ratioLimitActionValue[i]]
                         action: @selector(setQuickRatio:) keyEquivalent: @""];
                 [item setTarget: self];
-                [item setRepresentedObject: [NSNumber numberWithFloat: ratioLimitActionValue[i]]];
+                [item setRepresentedObject: @(ratioLimitActionValue[i])];
                 [menu addItem: item];
                 [item release];
             }
@@ -802,7 +802,7 @@
 {
     NSMutableArray * progressMarks = [NSMutableArray arrayWithCapacity: 16];
     for (NSAnimationProgress i = 0.0625; i <= 1.0; i += 0.0625)
-        [progressMarks addObject: [NSNumber numberWithFloat: i]];
+        [progressMarks addObject: @(i)];
 
     //this stops a previous animation
     [fPiecesBarAnimation release];

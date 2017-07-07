@@ -227,10 +227,10 @@ bool trashDataFile(const char * filename, tr_error ** error)
     return [NSDictionary dictionaryWithObjectsAndKeys:
             [self torrentLocation], @"InternalTorrentPath",
             [self hashString], @"TorrentHash",
-            [NSNumber numberWithBool: [self isActive]], @"Active",
-            [NSNumber numberWithBool: [self waitingToStart]], @"WaitToStart",
-            [NSNumber numberWithInt: fGroupValue], @"GroupValue",
-            [NSNumber numberWithBool: fRemoveWhenFinishSeeding], @"RemoveWhenFinishSeeding", nil];
+            @([self isActive]), @"Active",
+            @([self waitingToStart]), @"WaitToStart",
+            @(fGroupValue), @"GroupValue",
+            @(fRemoveWhenFinishSeeding), @"RemoveWhenFinishSeeding", nil];
 }
 
 - (void) dealloc
@@ -969,20 +969,20 @@ bool trashDataFile(const char * filename, tr_error ** error)
         NSMutableDictionary * dict = [NSMutableDictionary dictionaryWithCapacity: 12];
 
         [dict setObject: [self name] forKey: @"Name"];
-        [dict setObject: [NSNumber numberWithInt: peer->from] forKey: @"From"];
+        [dict setObject: @(peer->from) forKey: @"From"];
         [dict setObject: [NSString stringWithUTF8String: peer->addr] forKey: @"IP"];
-        [dict setObject: [NSNumber numberWithInt: peer->port] forKey: @"Port"];
-        [dict setObject: [NSNumber numberWithFloat: peer->progress] forKey: @"Progress"];
-        [dict setObject: [NSNumber numberWithBool: peer->isSeed] forKey: @"Seed"];
-        [dict setObject: [NSNumber numberWithBool: peer->isEncrypted] forKey: @"Encryption"];
-        [dict setObject: [NSNumber numberWithBool: peer->isUTP] forKey: @"uTP"];
+        [dict setObject: @(peer->port) forKey: @"Port"];
+        [dict setObject: @(peer->progress) forKey: @"Progress"];
+        [dict setObject: @(peer->isSeed) forKey: @"Seed"];
+        [dict setObject: @(peer->isEncrypted) forKey: @"Encryption"];
+        [dict setObject: @(peer->isUTP) forKey: @"uTP"];
         [dict setObject: [NSString stringWithUTF8String: peer->client] forKey: @"Client"];
         [dict setObject: [NSString stringWithUTF8String: peer->flagStr] forKey: @"Flags"];
 
         if (peer->isUploadingTo)
-            [dict setObject: [NSNumber numberWithDouble: peer->rateToPeer_KBps] forKey: @"UL To Rate"];
+            [dict setObject: @(peer->rateToPeer_KBps) forKey: @"UL To Rate"];
         if (peer->isDownloadingFrom)
-            [dict setObject: [NSNumber numberWithDouble: peer->rateToClient_KBps] forKey: @"DL From Rate"];
+            [dict setObject: @(peer->rateToClient_KBps) forKey: @"DL From Rate"];
 
         [peerDicts addObject: dict];
     }
@@ -1011,7 +1011,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
         [dict setObject: [NSString stringWithUTF8String: fInfo->webseeds[i]] forKey: @"Address"];
 
         if (dlSpeeds[i] != -1.0)
-            [dict setObject: [NSNumber numberWithDouble: dlSpeeds[i]] forKey: @"DL From Rate"];
+            [dict setObject: @(dlSpeeds[i]) forKey: @"DL From Rate"];
 
         [webSeeds addObject: dict];
     }
@@ -1552,7 +1552,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
                 NSAssert2(NO, @"Unknown priority %d for file index %ld", priority, index);
         }
 
-        [priorities addObject: [NSNumber numberWithInteger: priority]];
+        [priorities addObject: @(priority)];
         if (low && normal && high)
             break;
     }
