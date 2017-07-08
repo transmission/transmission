@@ -140,8 +140,8 @@ typedef enum
 
 static void altSpeedToggledCallback(tr_session * handle UNUSED, bool active, bool byUser, void * controller)
 {
-    NSDictionary * dict = [[NSDictionary alloc] initWithObjectsAndKeys: [[NSNumber alloc] initWithBool: active], @"Active",
-                                [[NSNumber alloc] initWithBool: byUser], @"ByUser", nil];
+    NSDictionary * dict = @{@"Active": @(active),
+                            @"ByUser": @(byUser)};
     [(Controller *)controller performSelectorOnMainThread: @selector(altSpeedToggledCallbackIsLimited:)
         withObject: dict waitUntilDone: NO];
 }
@@ -1199,8 +1199,8 @@ static void removeKeRangerRansomware()
 //called on by applescript
 - (void) open: (NSArray *) files
 {
-    NSDictionary * dict = [[NSDictionary alloc] initWithObjectsAndKeys: files, @"Filenames",
-                                @(ADD_MANUAL), @"AddType", nil];
+    NSDictionary * dict = @{@"Filenames": files,
+                            @"AddType": @(ADD_MANUAL)};
     [self performSelectorOnMainThread: @selector(openFilesWithDict:) withObject: dict waitUntilDone: NO];
 }
 
@@ -1221,8 +1221,8 @@ static void removeKeRangerRansomware()
             for (NSURL * url in [panel URLs])
                 [filenames addObject: [url path]];
 
-            NSDictionary * dictionary = [[NSDictionary alloc] initWithObjectsAndKeys: filenames, @"Filenames",
-                sender == fOpenIgnoreDownloadFolder ? @(ADD_SHOW_OPTIONS) : @(ADD_MANUAL), @"AddType", nil];
+            NSDictionary * dictionary = @{@"Filenames": filenames,
+                                          @"AddType": sender == fOpenIgnoreDownloadFolder ? @(ADD_SHOW_OPTIONS) : @(ADD_MANUAL)};
             [self performSelectorOnMainThread: @selector(openFilesWithDict:) withObject: dictionary waitUntilDone: NO];
         }
     }];

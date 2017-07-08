@@ -296,7 +296,7 @@
 
     NSAssert1([fTorrents count] == 1, @"Attempting to add tracker with %ld transfers selected", [fTorrents count]);
 
-    [fTrackers addObject: [NSDictionary dictionaryWithObject: @-1 forKey: @"Tier"]];
+    [fTrackers addObject: @{@"Tier": @-1}];
     [fTrackers addObject: @""];
 
     [fTrackerTable setTrackers: fTrackers];

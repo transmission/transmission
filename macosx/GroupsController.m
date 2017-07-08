@@ -269,7 +269,7 @@ GroupsController * fGroupsInstance = nil;
     [fGroups removeObjectAtIndex: row];
 
     [[NSNotificationCenter defaultCenter] postNotificationName: @"GroupValueRemoved" object: self userInfo:
-        [NSDictionary dictionaryWithObject: @(index) forKey: @"Index"]];
+     @{@"Index": @(index)}];
 
     if (index == [[NSUserDefaults standardUserDefaults] integerForKey: @"FilterGroup"])
         [[NSUserDefaults standardUserDefaults] setInteger: -2 forKey: @"FilterGroup"];

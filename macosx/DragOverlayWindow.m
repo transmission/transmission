@@ -52,14 +52,16 @@
         [self setIgnoresMouseEvents: YES];
 
         fFadeInAnimation = [[NSViewAnimation alloc] initWithViewAnimations: @[
-                                [NSDictionary dictionaryWithObjectsAndKeys: self, NSViewAnimationTargetKey,
-                                NSViewAnimationFadeInEffect, NSViewAnimationEffectKey, nil]]];
+                                                                              @{NSViewAnimationTargetKey: self,
+                                                                                NSViewAnimationEffectKey: NSViewAnimationFadeInEffect}
+                                                                              ]];
         [fFadeInAnimation setDuration: 0.15];
         [fFadeInAnimation setAnimationBlockingMode: NSAnimationNonblockingThreaded];
 
         fFadeOutAnimation = [[NSViewAnimation alloc] initWithViewAnimations: @[
-                                [NSDictionary dictionaryWithObjectsAndKeys: self, NSViewAnimationTargetKey,
-                                NSViewAnimationFadeOutEffect, NSViewAnimationEffectKey, nil]]];
+                                                                               @{NSViewAnimationTargetKey: self,
+                                                                                 NSViewAnimationEffectKey: NSViewAnimationFadeOutEffect}
+                                                                               ]];
         [fFadeOutAnimation setDuration: 0.5];
         [fFadeOutAnimation setAnimationBlockingMode: NSAnimationNonblockingThreaded];
 

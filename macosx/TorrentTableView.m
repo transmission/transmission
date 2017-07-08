@@ -238,7 +238,7 @@
         if (![[self itemAtRow: row] isKindOfClass: [Torrent class]])
             continue;
 
-        NSDictionary * userInfo = [NSDictionary dictionaryWithObject: @(row) forKey: @"Row"];
+        NSDictionary * userInfo = @{@"Row": @(row)};
         TorrentCell * cell = (TorrentCell *)[self preparedCellAtColumn: -1 row: row];
         [cell addTrackingAreasForView: self inRect: [self rectOfRow: row] withUserInfo: userInfo mouseLocation: mouseLocation];
     }

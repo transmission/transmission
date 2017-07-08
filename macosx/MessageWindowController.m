@@ -211,14 +211,13 @@
         NSString * file = [[@(currentMessage->file) lastPathComponent] stringByAppendingFormat: @":%d",
                             currentMessage->line];
 
-        NSDictionary * message  = [NSDictionary dictionaryWithObjectsAndKeys:
-                                    @(currentMessage->message), @"Message",
-                                    [NSDate dateWithTimeIntervalSince1970: currentMessage->when], @"Date",
-                                    @(currentIndex++), @"Index", //more accurate when sorting by date
-                                    @(currentMessage->level), @"Level",
-                                    name, @"Name",
-                                    file, @"File", nil];
-
+        NSDictionary * message  = @{
+                                    @"Message": @(currentMessage->message),
+                                    @"Date": [NSDate dateWithTimeIntervalSince1970: currentMessage->when],
+                                    @"Index": @(currentIndex++), //more accurate when sorting by date
+                                    @"Level": @(currentMessage->level),
+                                    @"Name": name,
+                                    @"File": file};
         [fMessages addObject: message];
 
         if (currentMessage->level <= maxLevel && [self shouldIncludeMessageForFilter: filterString message: message])
@@ -407,7 +406,7 @@
         {
             //make the array sorted by date
             NSSortDescriptor * descriptor = [NSSortDescriptor sortDescriptorWithKey: @"Index" ascending: YES];
-            NSArray * descriptors = [[NSArray alloc] initWithObjects: descriptor, nil];
+            NSArray * descriptors = @[descriptor];
             NSArray * sortedMessages = [fDisplayedMessages sortedArrayUsingDescriptors: descriptors];
             [descriptors release];
 

@@ -224,13 +224,13 @@ bool trashDataFile(const char * filename, tr_error ** error)
 
 - (NSDictionary *) history
 {
-    return [NSDictionary dictionaryWithObjectsAndKeys:
-            [self torrentLocation], @"InternalTorrentPath",
-            [self hashString], @"TorrentHash",
-            @([self isActive]), @"Active",
-            @([self waitingToStart]), @"WaitToStart",
-            @(fGroupValue), @"GroupValue",
-            @(fRemoveWhenFinishSeeding), @"RemoveWhenFinishSeeding", nil];
+    return @{
+            @"InternalTorrentPath": [self torrentLocation],
+            @"TorrentHash": [self hashString],
+            @"Active": @([self isActive]),
+            @"WaitToStart": @([self waitingToStart]),
+            @"GroupValue": @(fGroupValue),
+            @"RemoveWhenFinishSeeding": @(fRemoveWhenFinishSeeding)};
 }
 
 - (void) dealloc
