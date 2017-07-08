@@ -47,7 +47,7 @@
 
     NSPasteboard * pb = [NSPasteboard generalPasteboard];
     [pb clearContents];
-    [pb writeObjects: [NSArray arrayWithObject: text]];
+    [pb writeObjects: @[text]];
 }
 
 - (BOOL) validateMenuItem: (NSMenuItem *) menuItem

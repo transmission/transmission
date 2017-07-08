@@ -54,7 +54,7 @@
 
 - (void) awakeFromNib
 {
-    [fTableView registerForDraggedTypes: [NSArray arrayWithObject: GROUP_TABLE_VIEW_DATA_TYPE]];
+    [fTableView registerForDraggedTypes: @[GROUP_TABLE_VIEW_DATA_TYPE]];
 
     [fSelectedColorView addObserver: self forKeyPath: @"color" options: 0 context: NULL];
 
@@ -105,7 +105,7 @@
 
 - (BOOL) tableView: (NSTableView *) tableView writeRowsWithIndexes: (NSIndexSet *) rowIndexes toPasteboard: (NSPasteboard *) pboard
 {
-    [pboard declareTypes: [NSArray arrayWithObject: GROUP_TABLE_VIEW_DATA_TYPE] owner: self];
+    [pboard declareTypes: @[GROUP_TABLE_VIEW_DATA_TYPE] owner: self];
     [pboard setData: [NSKeyedArchiver archivedDataWithRootObject: rowIndexes] forType: GROUP_TABLE_VIEW_DATA_TYPE];
     return YES;
 }

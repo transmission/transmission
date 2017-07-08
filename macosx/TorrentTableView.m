@@ -533,7 +533,7 @@
         [fController openURL: [url absoluteString]];
     else
     {
-        NSArray * items = [[NSPasteboard generalPasteboard] readObjectsForClasses: [NSArray arrayWithObject: [NSString class]] options: nil];
+        NSArray * items = [[NSPasteboard generalPasteboard] readObjectsForClasses: @[[NSString class]] options: nil];
         if (items)
         {
             NSDataDetector * detector = [NSDataDetector dataDetectorWithTypes: NSTextCheckingTypeLink error: nil];
@@ -562,7 +562,7 @@
         if ([[[NSPasteboard generalPasteboard] types] containsObject: NSURLPboardType])
             return YES;
 
-        NSArray * items = [[NSPasteboard generalPasteboard] readObjectsForClasses: [NSArray arrayWithObject: [NSString class]] options: nil];
+        NSArray * items = [[NSPasteboard generalPasteboard] readObjectsForClasses: @[[NSString class]] options: nil];
         if (items)
         {
             NSDataDetector * detector = [NSDataDetector dataDetectorWithTypes: NSTextCheckingTypeLink error: nil];
@@ -584,15 +584,15 @@
 - (void) toggleControlForTorrent: (Torrent *) torrent
 {
     if ([torrent isActive])
-        [fController stopTorrents: [NSArray arrayWithObject: torrent]];
+        [fController stopTorrents: @[torrent]];
     else
     {
         if ([NSEvent modifierFlags] & NSAlternateKeyMask)
-            [fController resumeTorrentsNoWait: [NSArray arrayWithObject: torrent]];
+            [fController resumeTorrentsNoWait: @[torrent]];
         else if ([torrent waitingToStart])
-            [fController stopTorrents: [NSArray arrayWithObject: torrent]];
+            [fController stopTorrents: @[torrent]];
         else
-            [fController resumeTorrents: [NSArray arrayWithObject: torrent]];
+            [fController resumeTorrents: @[torrent]];
     }
 }
 
@@ -616,7 +616,7 @@
     [popover setDelegate: self];
 
     [popover showRelativeToRect: rect ofView: self preferredEdge: NSMaxYEdge];
-    [infoViewController setInfoForTorrents: [NSArray arrayWithObject: torrent]];
+    [infoViewController setInfoForTorrents: @[torrent]];
     [infoViewController updateInfo];
 
     [infoViewController release];

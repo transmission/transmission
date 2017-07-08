@@ -325,7 +325,7 @@
 
     NSPasteboard * pb = [NSPasteboard generalPasteboard];
     [pb clearContents];
-    [pb writeObjects: [NSArray arrayWithObject: messageString]];
+    [pb writeObjects: @[messageString]];
 }
 
 - (BOOL) validateMenuItem: (NSMenuItem *) menuItem
@@ -397,7 +397,7 @@
 - (void) writeToFile: (id) sender
 {
     NSSavePanel * panel = [NSSavePanel savePanel];
-    [panel setAllowedFileTypes: [NSArray arrayWithObject: @"txt"]];
+    [panel setAllowedFileTypes: @[@"txt"]];
     [panel setCanSelectHiddenExtension: YES];
 
     [panel setNameFieldStringValue: NSLocalizedString(@"untitled", "Save log panel -> default file name")];

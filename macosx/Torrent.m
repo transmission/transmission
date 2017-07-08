@@ -528,7 +528,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
     //attempt to move to trash
     if (![[NSWorkspace sharedWorkspace] performFileOperation: NSWorkspaceRecycleOperation
                                                       source: [path stringByDeletingLastPathComponent] destination: @""
-                                                       files: [NSArray arrayWithObject: [path lastPathComponent]] tag: nil])
+                                                       files: @[[path lastPathComponent]] tag: nil])
     {
         //if cannot trash, just delete it (will work if it's on a remote volume)
         NSError * localError;
@@ -1781,7 +1781,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
     else
     {
         FileListNode * node = [[FileListNode alloc] initWithFileName: [self name] path: @"" size: [self size] index: 0 torrent: self];
-        fFileList = [[NSArray arrayWithObject: node] retain];
+        fFileList = [@[node] retain];
         fFlatFileList = [fFileList retain];
         [node release];
     }
@@ -1835,7 +1835,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
 - (void) sortFileList: (NSMutableArray *) fileNodes
 {
     NSSortDescriptor * descriptor = [NSSortDescriptor sortDescriptorWithKey: @"name" ascending: YES selector: @selector(localizedStandardCompare:)];
-    [fileNodes sortUsingDescriptors: [NSArray arrayWithObject: descriptor]];
+    [fileNodes sortUsingDescriptors: @[descriptor]];
 
     [fileNodes enumerateObjectsWithOptions: NSEnumerationConcurrent usingBlock: ^(FileListNode * node, NSUInteger idx, BOOL * stop) {
         if ([node isFolder])

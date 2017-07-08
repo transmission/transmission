@@ -211,7 +211,7 @@
         if (location)
         {
             NSURL * file = [NSURL fileURLWithPath: location];
-            [[NSWorkspace sharedWorkspace] activateFileViewerSelectingURLs: [NSArray arrayWithObject: file]];
+            [[NSWorkspace sharedWorkspace] activateFileViewerSelectingURLs: @[file]];
         }
     }
     else;

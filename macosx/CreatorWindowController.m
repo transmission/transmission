@@ -254,7 +254,7 @@
     [panel setMessage: NSLocalizedString(@"Select the name and location for the torrent file.",
                                         "Create torrent -> location sheet -> message")];
 
-    [panel setAllowedFileTypes: [NSArray arrayWithObjects: @"org.bittorrent.torrent", @"torrent", nil]];
+    [panel setAllowedFileTypes: @[@"org.bittorrent.torrent", @"torrent"]];
     [panel setCanSelectHiddenExtension: YES];
 
     [panel setDirectoryURL: [fLocation URLByDeletingLastPathComponent]];
@@ -387,7 +387,7 @@
 
     NSPasteboard * pb = [NSPasteboard generalPasteboard];
     [pb clearContents];
-    [pb writeObjects: [NSArray arrayWithObject: text]];
+    [pb writeObjects: @[text]];
 }
 
 - (BOOL) validateMenuItem: (NSMenuItem *) menuItem
@@ -399,7 +399,7 @@
 
     if (action == @selector(paste:))
         return [[self window] firstResponder] == fTrackerTable
-            && [[NSPasteboard generalPasteboard] canReadObjectForClasses: [NSArray arrayWithObject: [NSString class]] options: nil];
+            && [[NSPasteboard generalPasteboard] canReadObjectForClasses: @[[NSString class]] options: nil];
 
     return YES;
 }
@@ -408,7 +408,7 @@
 {
     NSMutableArray * tempTrackers = [NSMutableArray array];
 
-    NSArray * items = [[NSPasteboard generalPasteboard] readObjectsForClasses: [NSArray arrayWithObject: [NSString class]] options: nil];
+    NSArray * items = [[NSPasteboard generalPasteboard] readObjectsForClasses: @[[NSString class]] options: nil];
     NSAssert(items != nil, @"no string items to paste; should not be able to call this method");
 
     for (NSString * pbItem in items)
