@@ -108,7 +108,7 @@
     if ([fTorrents count] != 1)
         return;
 
-    Torrent * torrent = [fTorrents objectAtIndex: 0];
+    Torrent * torrent = fTorrents[0];
 
     NSString * location = [torrent dataLocation];
     [fDataLocationField setStringValue: location ? [location stringByAbbreviatingWithTildeInPath] : @""];
@@ -119,7 +119,7 @@
 
 - (void) revealDataFile: (id) sender
 {
-    Torrent * torrent = [fTorrents objectAtIndex: 0];
+    Torrent * torrent = fTorrents[0];
     NSString * location = [torrent dataLocation];
     if (!location)
         return;
@@ -136,7 +136,7 @@
 {
     if ([fTorrents count] == 1)
     {
-        Torrent * torrent = [fTorrents objectAtIndex: 0];
+        Torrent * torrent = fTorrents[0];
 
         #warning candidate for localizedStringWithFormat (although then we'll get two commas)
         NSString * piecesString = ![torrent isMagnet] ? [NSString stringWithFormat: @"%ld, %@", [torrent pieceCount],

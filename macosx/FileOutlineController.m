@@ -233,7 +233,7 @@ typedef enum
 
 - (id) outlineView: (NSOutlineView *) outlineView child: (NSInteger) index ofItem: (id) item
 {
-    return [(item ? [(FileListNode *)item children] : fFileList) objectAtIndex: index];
+    return (item ? [(FileListNode *)item children] : fFileList)[index];
 }
 
 - (id) outlineView: (NSOutlineView *) outlineView objectValueForTableColumn: (NSTableColumn *) tableColumn byItem: (id) item

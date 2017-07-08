@@ -198,7 +198,7 @@ NSMutableSet * fTrackerIconLoading;
         NSString * baseAddress;
         if (separable && [hostComponents count] > 1)
             baseAddress = [NSString stringWithFormat: @"http://%@.%@",
-                            [hostComponents objectAtIndex: [hostComponents count]-2], [hostComponents lastObject]];
+                            hostComponents[[hostComponents count]-2], [hostComponents lastObject]];
         else
             baseAddress = [NSString stringWithFormat: @"http://%@", host];
 

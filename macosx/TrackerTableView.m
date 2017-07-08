@@ -48,11 +48,11 @@
     NSIndexSet * indexes = [self selectedRowIndexes];
     for (NSUInteger i = [indexes firstIndex]; i != NSNotFound; i = [indexes indexGreaterThanIndex: i])
     {
-        id item = [fTrackers objectAtIndex: i];
+        id item = fTrackers[i];
         if (![item isKindOfClass: [TrackerNode class]])
         {
-            for (++i; i < [fTrackers count] && [[fTrackers objectAtIndex: i] isKindOfClass: [TrackerNode class]]; ++i)
-                [addresses addObject: [(TrackerNode *)[fTrackers objectAtIndex: i] fullAnnounceAddress]];
+            for (++i; i < [fTrackers count] && [fTrackers[i] isKindOfClass: [TrackerNode class]]; ++i)
+                [addresses addObject: [(TrackerNode *)fTrackers[i] fullAnnounceAddress]];
             --i;
         }
         else

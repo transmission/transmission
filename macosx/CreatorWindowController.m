@@ -129,7 +129,7 @@
         //remove potentially invalid addresses
         for (NSInteger i = [fTrackers count]-1; i >= 0; i--)
         {
-            if (!tr_urlIsValidTracker([[fTrackers objectAtIndex: i] UTF8String]))
+            if (!tr_urlIsValidTracker([fTrackers[i] UTF8String]))
                 [fTrackers removeObjectAtIndex: i];
         }
     }
@@ -326,7 +326,7 @@
 
 - (id) tableView: (NSTableView *) tableView objectValueForTableColumn: (NSTableColumn *) tableColumn row: (NSInteger) row
 {
-    return [fTrackers objectAtIndex: row];
+    return fTrackers[row];
 }
 
 - (IBAction) addRemoveTracker: (id) sender
@@ -369,7 +369,7 @@
         [fTrackers removeObjectAtIndex: row];
     }
     else
-        [fTrackers replaceObjectAtIndex: row withObject: tracker];
+        fTrackers[row] = tracker;
 
     [fTrackerTable deselectAll: self];
     [fTrackerTable reloadData];
@@ -467,7 +467,7 @@
     [panel setMessage: NSLocalizedString(@"Select a file or folder for the torrent file.", "Create torrent -> select file")];
 
     BOOL success = [panel runModal] == NSOKButton;
-    return success ? [[panel URLs] objectAtIndex: 0] : nil;
+    return success ? [panel URLs][0] : nil;
 }
 
 - (void) createBlankAddressAlertDidEnd: (NSAlert *) alert returnCode: (NSInteger) returnCode contextInfo: (void *) contextInfo
@@ -519,7 +519,7 @@
                 NSLocalizedString(@"A file with the name \"%@\" already exists in the directory \"%@\". "
                     "Choose a new name or directory to create the torrent file.",
                     "Create torrent -> file already exists warning -> warning"),
-                    [pathComponents objectAtIndex: count-1], [pathComponents objectAtIndex: count-2]]];
+                    pathComponents[count-1], pathComponents[count-2]]];
         [alert setAlertStyle: NSWarningAlertStyle];
 
         [alert beginSheetModalForWindow: [self window] modalDelegate: self didEndSelector: nil contextInfo: nil];
@@ -531,7 +531,7 @@
 
     for (NSUInteger i = 0; i < [fTrackers count]; i++)
     {
-        trackerInfo[i].announce = (char *)[[fTrackers objectAtIndex: i] UTF8String];
+        trackerInfo[i].announce = (char *)[fTrackers[i] UTF8String];
         trackerInfo[i].tier = i;
     }
 

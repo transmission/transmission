@@ -264,7 +264,7 @@
     if (tableView == fWebSeedTable)
     {
         NSString * ident = [column identifier];
-        NSDictionary * webSeed = [fWebSeeds objectAtIndex: row];
+        NSDictionary * webSeed = fWebSeeds[row];
 
         if ([ident isEqualToString: @"DL From"])
         {
@@ -277,7 +277,7 @@
     else
     {
         NSString * ident = [column identifier];
-        NSDictionary * peer = [fPeers objectAtIndex: row];
+        NSDictionary * peer = fPeers[row];
 
         if ([ident isEqualToString: @"Encryption"])
             return [[peer objectForKey: @"Encryption"] boolValue] ? [NSImage imageNamed: @"Lock"] : nil;
@@ -309,7 +309,7 @@
 
         if  ([ident isEqualToString: @"Progress"])
         {
-            NSDictionary * peer = [fPeers objectAtIndex: row];
+            NSDictionary * peer = fPeers[row];
             [(PeerProgressIndicatorCell *)cell setSeed: [[peer objectForKey: @"Seed"] boolValue]];
         }
     }
@@ -347,7 +347,7 @@
     {
         const BOOL multiple = [fTorrents count] > 1;
 
-        NSDictionary * peer = [fPeers objectAtIndex: row];
+        NSDictionary * peer = fPeers[row];
         NSMutableArray * components = [NSMutableArray arrayWithCapacity: multiple ? 6 : 5];
 
         if (multiple)
@@ -442,7 +442,7 @@
     else
     {
         if ([fTorrents count] > 1)
-            return [[fWebSeeds objectAtIndex: row] objectForKey: @"Name"];
+            return [fWebSeeds[row] objectForKey: @"Name"];
     }
 
     return nil;
@@ -522,7 +522,7 @@
     BOOL useSecond = YES, asc = YES;
     if ([oldDescriptors count] > 0)
     {
-        NSSortDescriptor * descriptor = [oldDescriptors objectAtIndex: 0];
+        NSSortDescriptor * descriptor = oldDescriptors[0];
         [descriptors addObject: descriptor];
 
         if ((useSecond = ![[descriptor key] isEqualToString: @"IP"]))

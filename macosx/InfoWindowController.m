@@ -480,7 +480,7 @@ typedef enum
     }
     else
     {
-        Torrent * torrent = [fTorrents objectAtIndex: 0];
+        Torrent * torrent = fTorrents[0];
 
         [fImageView setImage: [torrent icon]];
 

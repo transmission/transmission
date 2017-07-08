@@ -121,7 +121,7 @@ GroupsController * fGroupsInstance = nil;
     if (index != -1)
     {
         for (NSUInteger i = 0; i < [fGroups count]; i++)
-            if (index == [[[fGroups objectAtIndex: i] objectForKey: @"Index"] integerValue])
+            if (index == [[fGroups[i] objectForKey: @"Index"] integerValue])
                 return i;
     }
     return -1;
@@ -129,19 +129,19 @@ GroupsController * fGroupsInstance = nil;
 
 - (NSInteger) indexForRow: (NSInteger) row
 {
-    return [[[fGroups objectAtIndex: row] objectForKey: @"Index"] integerValue];
+    return [[fGroups[row] objectForKey: @"Index"] integerValue];
 }
 
 - (NSString *) nameForIndex: (NSInteger) index
 {
     NSInteger orderIndex = [self rowValueForIndex: index];
-    return orderIndex != -1 ? [[fGroups objectAtIndex: orderIndex] objectForKey: @"Name"] : nil;
+    return orderIndex != -1 ? [fGroups[orderIndex] objectForKey: @"Name"] : nil;
 }
 
 - (void) setName: (NSString *) name forIndex: (NSInteger) index
 {
     NSInteger orderIndex = [self rowValueForIndex: index];
-    [[fGroups objectAtIndex: orderIndex] setObject: name forKey: @"Name"];
+    [fGroups[orderIndex] setObject: name forKey: @"Name"];
     [self saveGroups];
 
     [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateGroups" object: self];
@@ -150,19 +150,19 @@ GroupsController * fGroupsInstance = nil;
 - (NSImage *) imageForIndex: (NSInteger) index
 {
     NSInteger orderIndex = [self rowValueForIndex: index];
-    return orderIndex != -1 ? [self imageForGroup: [fGroups objectAtIndex: orderIndex]]
+    return orderIndex != -1 ? [self imageForGroup: fGroups[orderIndex]]
                             : [NSImage imageNamed: @"GroupsNoneTemplate"];
 }
 
 - (NSColor *) colorForIndex: (NSInteger) index
 {
     NSInteger orderIndex = [self rowValueForIndex: index];
-    return orderIndex != -1 ? [[fGroups objectAtIndex: orderIndex] objectForKey: @"Color"] : nil;
+    return orderIndex != -1 ? [fGroups[orderIndex] objectForKey: @"Color"] : nil;
 }
 
 - (void) setColor: (NSColor *) color forIndex: (NSInteger) index
 {
-    NSMutableDictionary * dict = [fGroups objectAtIndex: [self rowValueForIndex: index]];
+    NSMutableDictionary * dict = fGroups[[self rowValueForIndex: index]];
     [dict removeObjectForKey: @"Icon"];
 
     [dict setObject: color forKey: @"Color"];
@@ -177,12 +177,12 @@ GroupsController * fGroupsInstance = nil;
         return NO;
 
     NSInteger orderIndex = [self rowValueForIndex: index];
-    return [[[fGroups objectAtIndex: orderIndex] objectForKey: @"UsesCustomDownloadLocation"] boolValue];
+    return [[fGroups[orderIndex] objectForKey: @"UsesCustomDownloadLocation"] boolValue];
 }
 
 - (void) setUsesCustomDownloadLocation: (BOOL) useCustomLocation forIndex: (NSInteger) index
 {
-    NSMutableDictionary * dict = [fGroups objectAtIndex: [self rowValueForIndex: index]];
+    NSMutableDictionary * dict = fGroups[[self rowValueForIndex: index]];
 
     [dict setObject: @(useCustomLocation) forKey: @"UsesCustomDownloadLocation"];
 
@@ -192,12 +192,12 @@ GroupsController * fGroupsInstance = nil;
 - (NSString *) customDownloadLocationForIndex: (NSInteger) index
 {
     NSInteger orderIndex = [self rowValueForIndex: index];
-    return orderIndex != -1 ? [[fGroups objectAtIndex: orderIndex] objectForKey: @"CustomDownloadLocation"] : nil;
+    return orderIndex != -1 ? [fGroups[orderIndex] objectForKey: @"CustomDownloadLocation"] : nil;
 }
 
 - (void) setCustomDownloadLocation: (NSString *) location forIndex: (NSInteger) index
 {
-    NSMutableDictionary * dict = [fGroups objectAtIndex: [self rowValueForIndex: index]];
+    NSMutableDictionary * dict = fGroups[[self rowValueForIndex: index]];
     [dict setObject: location forKey: @"CustomDownloadLocation"];
 
     [[GroupsController groups] saveGroups];
@@ -209,13 +209,13 @@ GroupsController * fGroupsInstance = nil;
     if (orderIndex == -1)
         return NO;
 
-    NSNumber * assignRules = [[fGroups objectAtIndex: orderIndex] objectForKey: @"UsesAutoGroupRules"];
+    NSNumber * assignRules = [fGroups[orderIndex] objectForKey: @"UsesAutoGroupRules"];
     return assignRules && [assignRules boolValue];
 }
 
 - (void) setUsesAutoAssignRules: (BOOL) useAutoAssignRules forIndex: (NSInteger) index
 {
-    NSMutableDictionary * dict = [fGroups objectAtIndex: [self rowValueForIndex: index]];
+    NSMutableDictionary * dict = fGroups[[self rowValueForIndex: index]];
 
     [dict setObject: @(useAutoAssignRules) forKey: @"UsesAutoGroupRules"];
 
@@ -228,12 +228,12 @@ GroupsController * fGroupsInstance = nil;
     if (orderIndex == -1)
         return nil;
 
-    return [[fGroups objectAtIndex: orderIndex] objectForKey: @"AutoGroupRules"];
+    return [fGroups[orderIndex] objectForKey: @"AutoGroupRules"];
 }
 
 - (void) setAutoAssignRules: (NSPredicate *) predicate forIndex: (NSInteger) index
 {
-    NSMutableDictionary * dict = [fGroups objectAtIndex: [self rowValueForIndex: index]];
+    NSMutableDictionary * dict = fGroups[[self rowValueForIndex: index]];
 
     if (predicate)
     {
@@ -265,7 +265,7 @@ GroupsController * fGroupsInstance = nil;
 
 - (void) removeGroupWithRowIndex: (NSInteger) row
 {
-    NSInteger index = [[[fGroups objectAtIndex: row] objectForKey: @"Index"] integerValue];
+    NSInteger index = [[fGroups[row] objectForKey: @"Index"] integerValue];
     [fGroups removeObjectAtIndex: row];
 
     [[NSNotificationCenter defaultCenter] postNotificationName: @"GroupValueRemoved" object: self userInfo:

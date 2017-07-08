@@ -263,7 +263,7 @@
 - (id) tableView: (NSTableView *) tableView objectValueForTableColumn: (NSTableColumn *) column row: (NSInteger) row
 {
     NSString * ident = [column identifier];
-    NSDictionary * message = [fDisplayedMessages objectAtIndex: row];
+    NSDictionary * message = fDisplayedMessages[row];
 
     if ([ident isEqualToString: @"Date"])
         return [message objectForKey: @"Date"];
@@ -292,7 +292,7 @@
 #warning don't cut off end
 - (CGFloat) tableView: (NSTableView *) tableView heightOfRow: (NSInteger) row
 {
-    NSString * message = [[fDisplayedMessages objectAtIndex: row] objectForKey: @"Message"];
+    NSString * message = [fDisplayedMessages[row] objectForKey: @"Message"];
 
     NSTableColumn * column = [tableView tableColumnWithIdentifier: @"Message"];
     const CGFloat count = floorf([message sizeWithAttributes: fAttributes].width / [column width]);
@@ -309,7 +309,7 @@
 - (NSString *) tableView: (NSTableView *) tableView toolTipForCell: (NSCell *) cell rect: (NSRectPointer) rect
                 tableColumn: (NSTableColumn *) column row: (NSInteger) row mouseLocation: (NSPoint) mouseLocation
 {
-    NSDictionary * message = [fDisplayedMessages objectAtIndex: row];
+    NSDictionary * message = fDisplayedMessages[row];
     return [message objectForKey: @"File"];
 }
 

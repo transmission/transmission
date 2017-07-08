@@ -559,7 +559,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
             * newComponents = [folder pathComponents];
     const NSUInteger oldCount = [oldComponents count];
 
-    if (oldCount < [newComponents count] && [[newComponents objectAtIndex: oldCount] isEqualToString: [self name]]
+    if (oldCount < [newComponents count] && [newComponents[oldCount] isEqualToString: [self name]]
         && [folder hasPrefix: oldFolder])
     {
         NSAlert * alert = [[NSAlert alloc] init];
@@ -618,7 +618,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
         //if the remaining space is greater than the size left, then there is enough space regardless of preallocation
         if (remainingSpace < [self sizeLeft] && remainingSpace < tr_torrentGetBytesLeftToAllocate(fHandle))
         {
-            NSString * volumeName = [[[NSFileManager defaultManager] componentsToDisplayForPath: downloadFolder] objectAtIndex: 0];
+            NSString * volumeName = [[NSFileManager defaultManager] componentsToDisplayForPath: downloadFolder][0];
 
             NSAlert * alert = [[NSAlert alloc] init];
             [alert setMessageText: [NSString stringWithFormat:
@@ -1766,7 +1766,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
             NSArray * pathComponents = [fullPath pathComponents];
 
             if (!tempNode)
-                tempNode = [[FileListNode alloc] initWithFolderName:[pathComponents objectAtIndex: 0] path:@"" torrent:self];
+                tempNode = [[FileListNode alloc] initWithFolderName:pathComponents[0] path:@"" torrent:self];
 
             [self insertPathForComponents: pathComponents withComponentIndex: 1 forParent: tempNode fileSize: file->length index: i flatList: flatFileList];
         }
@@ -1793,7 +1793,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
     NSParameterAssert([components count] > 0);
     NSParameterAssert(componentIndex < [components count]);
 
-    NSString * name = [components objectAtIndex: componentIndex];
+    NSString * name = components[componentIndex];
     const BOOL isFolder = componentIndex < ([components count]-1);
 
     //determine if folder node already exists

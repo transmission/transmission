@@ -869,7 +869,7 @@
     if (row < 0 || [[self itemAtRow: row] isKindOfClass: [Torrent class]])
         return NO;
 
-    NSString * ident = [[[self tableColumns] objectAtIndex: [self columnAtPoint: point]] identifier];
+    NSString * ident = [[self tableColumns][[self columnAtPoint: point]] identifier];
     return [ident isEqualToString: @"UL"] || [ident isEqualToString: @"UL Image"]
             || [ident isEqualToString: @"DL"] || [ident isEqualToString: @"DL Image"];
 }
