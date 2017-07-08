@@ -205,14 +205,14 @@
 
     for (tr_log_message * currentMessage = messages; currentMessage != NULL; currentMessage = currentMessage->next)
     {
-        NSString * name = currentMessage->name != NULL ? [NSString stringWithUTF8String: currentMessage->name]
+        NSString * name = currentMessage->name != NULL ? @(currentMessage->name)
                             : [[NSProcessInfo processInfo] processName];
 
-        NSString * file = [[[NSString stringWithUTF8String: currentMessage->file] lastPathComponent] stringByAppendingFormat: @":%d",
+        NSString * file = [[@(currentMessage->file) lastPathComponent] stringByAppendingFormat: @":%d",
                             currentMessage->line];
 
         NSDictionary * message  = [NSDictionary dictionaryWithObjectsAndKeys:
-                                    [NSString stringWithUTF8String: currentMessage->message], @"Message",
+                                    @(currentMessage->message), @"Message",
                                     [NSDate dateWithTimeIntervalSince1970: currentMessage->when], @"Date",
                                     @(currentIndex++), @"Index", //more accurate when sorting by date
                                     @(currentMessage->level), @"Level",

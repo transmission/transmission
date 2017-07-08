@@ -100,8 +100,8 @@ void metadataCallback(tr_torrent * torrent, void * torrentData)
 void renameCallback(tr_torrent * torrent, const char * oldPathCharString, const char * newNameCharString, int error, void * contextInfo)
 {
     @autoreleasepool {
-        NSString * oldPath = [NSString stringWithUTF8String: oldPathCharString];
-        NSString * newName = [NSString stringWithUTF8String: newNameCharString];
+        NSString * oldPath = @(oldPathCharString);
+        NSString * newName = @(newNameCharString);
 
         dispatch_async(dispatch_get_main_queue(), ^{
             NSDictionary * contextDict = [(NSDictionary *)contextInfo autorelease];
@@ -119,7 +119,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
     @autoreleasepool
     {
         NSError * localError;
-        if (![Torrent trashFile: [NSString stringWithUTF8String: filename] error: &localError])
+        if (![Torrent trashFile: @(filename) error: &localError])
         {
             tr_error_set_literal(error, [localError code], [[localError description] UTF8String]);
             return false;
@@ -283,7 +283,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
 
 - (NSString *) currentDirectory
 {
-    return [NSString stringWithUTF8String: tr_torrentGetCurrentDir(fHandle)];
+    return @(tr_torrentGetCurrentDir(fHandle));
 }
 
 - (void) getAvailability: (int8_t *) tab size: (NSInteger) size
@@ -410,7 +410,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
 
 - (NSString *) magnetLink
 {
-    return [NSString stringWithUTF8String: tr_torrentGetMagnetLink(fHandle)];
+    return @(tr_torrentGetMagnetLink(fHandle));
 }
 
 - (CGFloat) ratio
@@ -658,7 +658,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
 
 - (NSString *) name
 {
-    return fInfo->name != NULL ? [NSString stringWithUTF8String: fInfo->name] : fHashString;
+    return fInfo->name != NULL ? @(fInfo->name) : fHashString;
 }
 
 - (BOOL) isFolder
@@ -706,7 +706,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
     NSMutableArray * allTrackers = [NSMutableArray arrayWithCapacity: fInfo->trackerCount];
 
     for (NSInteger i=0; i < fInfo->trackerCount; i++)
-        [allTrackers addObject: [NSString stringWithUTF8String: fInfo->trackers[i].announce]];
+        [allTrackers addObject: @(fInfo->trackers[i].announce)];
 
     return allTrackers;
 }
@@ -742,7 +742,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
     NSUInteger newCount = 0;
     for (NSUInteger i = 0; i < fInfo->trackerCount; i++)
     {
-        if (![trackers containsObject: [NSString stringWithUTF8String: fInfo->trackers[i].announce]])
+        if (![trackers containsObject: @(fInfo->trackers[i].announce)])
             trackerStructs[newCount++] = fInfo->trackers[i];
     }
 
@@ -754,12 +754,12 @@ bool trashDataFile(const char * filename, tr_error ** error)
 
 - (NSString *) comment
 {
-    return fInfo->comment ? [NSString stringWithUTF8String: fInfo->comment] : @"";
+    return fInfo->comment ? @(fInfo->comment) : @"";
 }
 
 - (NSString *) creator
 {
-    return fInfo->creator ? [NSString stringWithUTF8String: fInfo->creator] : @"";
+    return fInfo->creator ? @(fInfo->creator) : @"";
 }
 
 - (NSDate *) dateCreated
@@ -790,7 +790,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
 
 - (NSString *) torrentLocation
 {
-    return fInfo->torrent ? [NSString stringWithUTF8String: fInfo->torrent] : @"";
+    return fInfo->torrent ? @(fInfo->torrent) : @"";
 }
 
 - (NSString *) dataLocation
@@ -813,7 +813,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
         if (location == NULL)
             return nil;
 
-        NSString * dataLocation = [NSString stringWithUTF8String: location];
+        NSString * dataLocation = @(location);
         free(location);
 
         return dataLocation;
@@ -838,7 +838,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
         if (location == NULL)
             return nil;
 
-        NSString * dataLocation = [NSString stringWithUTF8String: location];
+        NSString * dataLocation = @(location);
         free(location);
 
         return dataLocation;
@@ -946,7 +946,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
         return @"";
 
     NSString * error;
-    if (!(error = [NSString stringWithUTF8String: fStat->errorString])
+    if (!(error = @(fStat->errorString))
         && !(error = [NSString stringWithCString: fStat->errorString encoding: NSISOLatin1StringEncoding]))
         error = [NSString stringWithFormat: @"(%@)", NSLocalizedString(@"unreadable error", "Torrent -> error string unreadable")];
 
@@ -970,14 +970,14 @@ bool trashDataFile(const char * filename, tr_error ** error)
 
         [dict setObject: [self name] forKey: @"Name"];
         [dict setObject: @(peer->from) forKey: @"From"];
-        [dict setObject: [NSString stringWithUTF8String: peer->addr] forKey: @"IP"];
+        [dict setObject: @(peer->addr) forKey: @"IP"];
         [dict setObject: @(peer->port) forKey: @"Port"];
         [dict setObject: @(peer->progress) forKey: @"Progress"];
         [dict setObject: @(peer->isSeed) forKey: @"Seed"];
         [dict setObject: @(peer->isEncrypted) forKey: @"Encryption"];
         [dict setObject: @(peer->isUTP) forKey: @"uTP"];
-        [dict setObject: [NSString stringWithUTF8String: peer->client] forKey: @"Client"];
-        [dict setObject: [NSString stringWithUTF8String: peer->flagStr] forKey: @"Flags"];
+        [dict setObject: @(peer->client) forKey: @"Client"];
+        [dict setObject: @(peer->flagStr) forKey: @"Flags"];
 
         if (peer->isUploadingTo)
             [dict setObject: @(peer->rateToPeer_KBps) forKey: @"UL To Rate"];
@@ -1008,7 +1008,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
         NSMutableDictionary * dict = [NSMutableDictionary dictionaryWithCapacity: 3];
 
         [dict setObject: [self name] forKey: @"Name"];
-        [dict setObject: [NSString stringWithUTF8String: fInfo->webseeds[i]] forKey: @"Address"];
+        [dict setObject: @(fInfo->webseeds[i]) forKey: @"Address"];
 
         if (dlSpeeds[i] != -1.0)
             [dict setObject: @(dlSpeeds[i]) forKey: @"DL From Rate"];
@@ -1635,7 +1635,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
 
     for (int i=0; i < count; ++i)
     {
-        NSString * tracker = [NSString stringWithUTF8String: stats[i].host];
+        NSString * tracker = @(stats[i].host);
         if (!best || [tracker localizedCaseInsensitiveCompare: best] == NSOrderedAscending)
             best = tracker;
     }
@@ -1762,7 +1762,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
         {
             tr_file * file = &fInfo->files[i];
 
-            NSString * fullPath = [NSString stringWithUTF8String: file->name];
+            NSString * fullPath = @(file->name);
             NSArray * pathComponents = [fullPath pathComponents];
 
             if (!tempNode)

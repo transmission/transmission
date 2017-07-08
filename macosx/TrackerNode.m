@@ -67,12 +67,12 @@
 
 - (NSString *) host
 {
-    return [NSString stringWithUTF8String: fStat.host];
+    return @(fStat.host);
 }
 
 - (NSString *) fullAnnounceAddress
 {
-    return [NSString stringWithUTF8String: fStat.announce];
+    return @(fStat.announce);
 }
 
 - (NSInteger) tier
@@ -123,7 +123,7 @@
     {
         baseString = NSLocalizedString(@"Announce error", "Tracker last announce");
 
-        NSString * errorString = [NSString stringWithUTF8String: fStat.lastAnnounceResult];
+        NSString * errorString = @(fStat.lastAnnounceResult);
         if ([errorString isEqualToString: @""])
             baseString = [baseString stringByAppendingFormat: @": %@", dateString];
         else
@@ -213,7 +213,7 @@
     {
         baseString = NSLocalizedString(@"Scrape error", "Tracker last scrape");
 
-        NSString * errorString = [NSString stringWithUTF8String: fStat.lastScrapeResult];
+        NSString * errorString = @(fStat.lastScrapeResult);
         if ([errorString isEqualToString: @""])
             baseString = [baseString stringByAppendingFormat: @": %@", dateString];
         else

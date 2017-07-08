@@ -978,7 +978,7 @@ static void removeKeRangerRansomware()
         if (result != TR_PARSE_OK)
         {
             if (result == TR_PARSE_DUPLICATE)
-                [self duplicateOpenAlert: [NSString stringWithUTF8String: info.name]];
+                [self duplicateOpenAlert: @(info.name)];
             else if (result == TR_PARSE_ERR)
             {
                 if (type != ADD_AUTO)
@@ -1097,7 +1097,7 @@ static void removeKeRangerRansomware()
     if ((duplicateTorrent = tr_torrentFindFromMagnetLink(fLib, [address UTF8String])))
     {
         const tr_info * info = tr_torrentInfo(duplicateTorrent);
-        NSString * name = (info != NULL && info->name != NULL) ? [NSString stringWithUTF8String: info->name] : nil;
+        NSString * name = (info != NULL && info->name != NULL) ? @(info->name) : nil;
         [self duplicateOpenMagnetAlert: address transferName: name];
         return;
     }
@@ -4716,7 +4716,7 @@ static void removeKeRangerRansomware()
 {
     NSString * location = nil;
     if (tr_torrentGetDownloadDir(torrentStruct) != NULL)
-        location = [NSString stringWithUTF8String: tr_torrentGetDownloadDir(torrentStruct)];
+        location = @(tr_torrentGetDownloadDir(torrentStruct));
 
     Torrent * torrent = [[Torrent alloc] initWithTorrentStruct: torrentStruct location: location lib: fLib];
 

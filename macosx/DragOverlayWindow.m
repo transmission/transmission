@@ -107,7 +107,7 @@
                 //only useful when one torrent
                 if (count == 1)
                 {
-                    name = [NSString stringWithUTF8String: info.name];
+                    name = @(info.name);
                     folder = info.isFolder;
                 }
             }

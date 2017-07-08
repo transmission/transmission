@@ -1224,10 +1224,10 @@
     [fDefaults setBool: encryptionMode == TR_ENCRYPTION_REQUIRED forKey: @"EncryptionRequire"];
 
     //download directory
-    NSString * downloadLocation = [[NSString stringWithUTF8String: tr_sessionGetDownloadDir(fHandle)] stringByStandardizingPath];
+    NSString * downloadLocation = [@(tr_sessionGetDownloadDir(fHandle)) stringByStandardizingPath];
     [fDefaults setObject: downloadLocation forKey: @"DownloadFolder"];
 
-    NSString * incompleteLocation = [[NSString stringWithUTF8String: tr_sessionGetIncompleteDir(fHandle)] stringByStandardizingPath];
+    NSString * incompleteLocation = [@(tr_sessionGetIncompleteDir(fHandle)) stringByStandardizingPath];
     [fDefaults setObject: incompleteLocation forKey: @"IncompleteDownloadFolder"];
 
     const BOOL useIncomplete = tr_sessionIsIncompleteDirEnabled(fHandle);
@@ -1320,7 +1320,7 @@
     const BOOL blocklist = tr_blocklistIsEnabled(fHandle);
     [fDefaults setBool: blocklist forKey: @"BlocklistNew"];
 
-    NSString * blocklistURL = [NSString stringWithUTF8String: tr_blocklistGetURL(fHandle)];
+    NSString * blocklistURL = @(tr_blocklistGetURL(fHandle));
     [fDefaults setObject: blocklistURL forKey: @"BlocklistURL"];
 
     //seed ratio
@@ -1360,7 +1360,7 @@
     const BOOL doneScriptEnabled = tr_sessionIsTorrentDoneScriptEnabled(fHandle);
     [fDefaults setBool: doneScriptEnabled forKey: @"DoneScriptEnabled"];
 
-    NSString * doneScriptPath = [NSString stringWithUTF8String: tr_sessionGetTorrentDoneScript(fHandle)];
+    NSString * doneScriptPath = @(tr_sessionGetTorrentDoneScript(fHandle));
     [fDefaults setObject: doneScriptPath forKey: @"DoneScriptPath"];
 
     //update gui if loaded

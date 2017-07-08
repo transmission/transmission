@@ -38,7 +38,7 @@
 
 + (NSString *) ellipsis
 {
-    return [NSString stringWithUTF8String: "\xE2\x80\xA6"];
+    return @"\xE2\x80\xA6";
 }
 
 - (NSString *) stringByAppendingEllipsis
@@ -103,7 +103,7 @@
     if ((int)ratio == TR_RATIO_NA)
         return NSLocalizedString(@"N/A", "No Ratio");
     else if ((int)ratio == TR_RATIO_INF)
-        return [NSString stringWithUTF8String: "\xE2\x88\x9E"];
+        return @"\xE2\x88\x9E";
     else
     {
         if (ratio < 10.0)
