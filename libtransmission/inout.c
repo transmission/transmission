@@ -134,7 +134,7 @@ static int readOrWriteBytes(tr_session* session, tr_torrent* tor, int ioMode, tr
         }
         else if (ioMode == TR_IO_PREFETCH)
         {
-            tr_sys_file_prefetch(fd, fileOffset, buflen, NULL);
+            tr_sys_file_advise(fd, fileOffset, buflen, TR_SYS_FILE_ADVICE_WILL_NEED, NULL);
         }
         else
         {

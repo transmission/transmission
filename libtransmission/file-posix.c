@@ -743,16 +743,22 @@ bool tr_sys_file_truncate(tr_sys_file_t handle, uint64_t size, tr_error** error)
     return ret;
 }
 
-bool tr_sys_file_prefetch(tr_sys_file_t handle, uint64_t offset, uint64_t size, tr_error** error)
+bool tr_sys_file_advise(tr_sys_file_t handle, uint64_t offset, uint64_t size, tr_sys_file_advice_t advice, tr_error** error)
 {
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
     TR_ASSERT(size > 0);
+    TR_ASSERT(advice == TR_SYS_FILE_ADVICE_WILL_NEED || advice == TR_SYS_FILE_ADVICE_DONT_NEED);
 
     bool ret = true;
 
 #if defined(HAVE_POSIX_FADVISE)
 
-    int code = posix_fadvise(handle, offset, size, POSIX_FADV_WILLNEED);
+    int const native_advice = advice == TR_SYS_FILE_ADVICE_WILL_NEED ? POSIX_FADV_WILLNEED :
+        (advice == TR_SYS_FILE_ADVICE_DONT_NEED ? POSIX_FADV_DONTNEED : POSIX_FADV_NORMAL);
+
+    TR_ASSERT(native_advice != POSIX_FADV_NORMAL);
+
+    int const code = posix_fadvise(handle, offset, size, native_advice);
 
     if (code != 0)
     {
@@ -762,9 +768,16 @@ bool tr_sys_file_prefetch(tr_sys_file_t handle, uint64_t offset, uint64_t size, 
 
 #elif defined(__APPLE__)
 
-    struct radvisory radv;
-    radv.ra_offset = offset;
-    radv.ra_count = size;
+    if (advice != TR_SYS_FILE_ADVICE_WILL_NEED)
+    {
+        goto skip_darwin_fcntl;
+    }
+
+    struct radvisory const radv =
+    {
+        .ra_offset = offset,
+        .ra_count = size
+    };
 
     ret = fcntl(handle, F_RDADVISE, &radv) != -1;
 
@@ -772,6 +785,16 @@ bool tr_sys_file_prefetch(tr_sys_file_t handle, uint64_t offset, uint64_t size, 
     {
         set_system_error(error, errno);
     }
+
+skip_darwin_fcntl:
+
+#else
+
+    (void)handle;
+    (void)offset;
+    (void)size;
+    (void)advice;
+    (void)error;
 
 #endif
 
