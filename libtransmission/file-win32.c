@@ -1108,7 +1108,7 @@ bool tr_sys_file_prefetch(tr_sys_file_t handle, uint64_t offset, uint64_t size, 
     (void)size;
     (void)error;
 
-    bool ret = false;
+    bool ret = true;
 
     /* ??? */
 

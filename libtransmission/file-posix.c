@@ -748,19 +748,16 @@ bool tr_sys_file_prefetch(tr_sys_file_t handle, uint64_t offset, uint64_t size, 
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
     TR_ASSERT(size > 0);
 
-    bool ret = false;
+    bool ret = true;
 
 #if defined(HAVE_POSIX_FADVISE)
 
     int code = posix_fadvise(handle, offset, size, POSIX_FADV_WILLNEED);
 
-    if (code == 0)
-    {
-        ret = true;
-    }
-    else
+    if (code != 0)
     {
         set_system_error(error, code);
+        ret = false;
     }
 
 #elif defined(__APPLE__)
