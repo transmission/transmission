@@ -36,7 +36,7 @@ AboutWindowController * fAboutBoxInstance = nil;
 {
     NSDictionary * info = [[NSBundle mainBundle] infoDictionary];
     [fVersionField setStringValue: [NSString stringWithFormat: @"%@ (%@)",
-        [info objectForKey: @"CFBundleShortVersionString"], [info objectForKey: (NSString *)kCFBundleVersionKey]]];
+        info[@"CFBundleShortVersionString"], info[(NSString *)kCFBundleVersionKey]]];
 
     [fCopyrightField setStringValue: [[NSBundle mainBundle] localizedStringForKey: @"NSHumanReadableCopyright"
                                         value: nil table: @"InfoPlist"]];

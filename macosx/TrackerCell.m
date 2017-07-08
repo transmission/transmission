@@ -119,8 +119,8 @@ NSMutableSet * fTrackerIconLoading;
         statusColor = [NSColor darkGrayColor];
     }
 
-    [fNameAttributes setObject: nameColor forKey: NSForegroundColorAttributeName];
-    [fStatusAttributes setObject: statusColor forKey: NSForegroundColorAttributeName];
+    fNameAttributes[NSForegroundColorAttributeName] = nameColor;
+    fStatusAttributes[NSForegroundColorAttributeName] = statusColor;
 
     TrackerNode * node = (TrackerNode *)[self objectValue];
 

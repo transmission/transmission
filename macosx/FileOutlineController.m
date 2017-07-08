@@ -161,11 +161,11 @@ typedef enum
                     if (!removedIndexesForParents)
                         removedIndexesForParents = [NSMutableDictionary dictionary];
 
-                    NSMutableIndexSet * removedIndexes = [removedIndexesForParents objectForKey: parent];
+                    NSMutableIndexSet * removedIndexes = removedIndexesForParents[parent];
                     if (!removedIndexes)
                     {
                         removedIndexes = [NSMutableIndexSet indexSetWithIndex: previousIndex];
-                        [removedIndexesForParents setObject: removedIndexes forKey: parent];
+                        removedIndexesForParents[parent] = removedIndexes;
                     }
                     else
                     {

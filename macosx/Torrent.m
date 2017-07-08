@@ -105,8 +105,8 @@ void renameCallback(tr_torrent * torrent, const char * oldPathCharString, const 
 
         dispatch_async(dispatch_get_main_queue(), ^{
             NSDictionary * contextDict = [(NSDictionary *)contextInfo autorelease];
-            Torrent * torrentObject = [contextDict objectForKey: @"Torrent"];
-            [torrentObject renameFinished: error == 0 nodes: [contextDict objectForKey: @"Nodes"] completionHandler: [contextDict objectForKey: @"CompletionHandler"] oldPath: oldPath newName: newName];
+            Torrent * torrentObject = contextDict[@"Torrent"];
+            [torrentObject renameFinished: error == 0 nodes: contextDict[@"Nodes"] completionHandler: contextDict[@"CompletionHandler"] oldPath: oldPath newName: newName];
         });
     }
 }
@@ -174,22 +174,22 @@ bool trashDataFile(const char * filename, tr_error ** error)
 
 - (id) initWithHistory: (NSDictionary *) history lib: (tr_session *) lib forcePause: (BOOL) pause
 {
-    self = [self initWithPath: [history objectForKey: @"InternalTorrentPath"]
-                hash: [history objectForKey: @"TorrentHash"]
+    self = [self initWithPath: history[@"InternalTorrentPath"]
+                hash: history[@"TorrentHash"]
                 torrentStruct: NULL
                 magnetAddress: nil
                 lib: lib
-                groupValue: [history objectForKey: @"GroupValue"]
-                removeWhenFinishSeeding: [history objectForKey: @"RemoveWhenFinishSeeding"]
-                downloadFolder: [history objectForKey: @"DownloadFolder"] //upgrading from versions < 1.80
-                legacyIncompleteFolder: [[history objectForKey: @"UseIncompleteFolder"] boolValue] //upgrading from versions < 1.80
-                                        ? [history objectForKey: @"IncompleteFolder"] : nil];
+                groupValue: history[@"GroupValue"]
+                removeWhenFinishSeeding: history[@"RemoveWhenFinishSeeding"]
+                downloadFolder: history[@"DownloadFolder"] //upgrading from versions < 1.80
+                legacyIncompleteFolder: [history[@"UseIncompleteFolder"] boolValue] //upgrading from versions < 1.80
+                                        ? history[@"IncompleteFolder"] : nil];
 
     if (self)
     {
         //start transfer
         NSNumber * active;
-        if (!pause && (active = [history objectForKey: @"Active"]) && [active boolValue])
+        if (!pause && (active = history[@"Active"]) && [active boolValue])
         {
             fStat = tr_torrentStat(fHandle);
             [self startTransferNoQueue];
@@ -197,16 +197,16 @@ bool trashDataFile(const char * filename, tr_error ** error)
 
         //upgrading from versions < 1.30: get old added, activity, and done dates
         NSDate * date;
-        if ((date = [history objectForKey: @"Date"]))
+        if ((date = history[@"Date"]))
             tr_torrentSetAddedDate(fHandle, [date timeIntervalSince1970]);
-        if ((date = [history objectForKey: @"DateActivity"]))
+        if ((date = history[@"DateActivity"]))
             tr_torrentSetActivityDate(fHandle, [date timeIntervalSince1970]);
-        if ((date = [history objectForKey: @"DateCompleted"]))
+        if ((date = history[@"DateCompleted"]))
             tr_torrentSetDoneDate(fHandle, [date timeIntervalSince1970]);
 
         //upgrading from versions < 1.60: get old stop ratio settings
         NSNumber * ratioSetting;
-        if ((ratioSetting = [history objectForKey: @"RatioSetting"]))
+        if ((ratioSetting = history[@"RatioSetting"]))
         {
             switch ([ratioSetting intValue])
             {
@@ -216,7 +216,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
             }
         }
         NSNumber * ratioLimit;
-        if ((ratioLimit = [history objectForKey: @"RatioLimit"]))
+        if ((ratioLimit = history[@"RatioLimit"]))
             [self setRatioLimit: [ratioLimit floatValue]];
     }
     return self;
@@ -613,7 +613,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
     NSDictionary * systemAttributes;
     if ((systemAttributes = [[NSFileManager defaultManager] attributesOfFileSystemForPath: downloadFolder error: NULL]))
     {
-        const uint64_t remainingSpace = [[systemAttributes objectForKey: NSFileSystemFreeSize] unsignedLongLongValue];
+        const uint64_t remainingSpace = [systemAttributes[NSFileSystemFreeSize] unsignedLongLongValue];
 
         //if the remaining space is greater than the size left, then there is enough space regardless of preallocation
         if (remainingSpace < [self sizeLeft] && remainingSpace < tr_torrentGetBytesLeftToAllocate(fHandle))
@@ -968,21 +968,21 @@ bool trashDataFile(const char * filename, tr_error ** error)
         tr_peer_stat * peer = &peers[i];
         NSMutableDictionary * dict = [NSMutableDictionary dictionaryWithCapacity: 12];
 
-        [dict setObject: [self name] forKey: @"Name"];
-        [dict setObject: @(peer->from) forKey: @"From"];
-        [dict setObject: @(peer->addr) forKey: @"IP"];
-        [dict setObject: @(peer->port) forKey: @"Port"];
-        [dict setObject: @(peer->progress) forKey: @"Progress"];
-        [dict setObject: @(peer->isSeed) forKey: @"Seed"];
-        [dict setObject: @(peer->isEncrypted) forKey: @"Encryption"];
-        [dict setObject: @(peer->isUTP) forKey: @"uTP"];
-        [dict setObject: @(peer->client) forKey: @"Client"];
-        [dict setObject: @(peer->flagStr) forKey: @"Flags"];
+        dict[@"Name"] = [self name];
+        dict[@"From"] = @(peer->from);
+        dict[@"IP"] = @(peer->addr);
+        dict[@"Port"] = @(peer->port);
+        dict[@"Progress"] = @(peer->progress);
+        dict[@"Seed"] = @(peer->isSeed);
+        dict[@"Encryption"] = @(peer->isEncrypted);
+        dict[@"uTP"] = @(peer->isUTP);
+        dict[@"Client"] = @(peer->client);
+        dict[@"Flags"] = @(peer->flagStr);
 
         if (peer->isUploadingTo)
-            [dict setObject: @(peer->rateToPeer_KBps) forKey: @"UL To Rate"];
+            dict[@"UL To Rate"] = @(peer->rateToPeer_KBps);
         if (peer->isDownloadingFrom)
-            [dict setObject: @(peer->rateToClient_KBps) forKey: @"DL From Rate"];
+            dict[@"DL From Rate"] = @(peer->rateToClient_KBps);
 
         [peerDicts addObject: dict];
     }
@@ -1007,11 +1007,11 @@ bool trashDataFile(const char * filename, tr_error ** error)
     {
         NSMutableDictionary * dict = [NSMutableDictionary dictionaryWithCapacity: 3];
 
-        [dict setObject: [self name] forKey: @"Name"];
-        [dict setObject: @(fInfo->webseeds[i]) forKey: @"Address"];
+        dict[@"Name"] = [self name];
+        dict[@"Address"] = @(fInfo->webseeds[i]);
 
         if (dlSpeeds[i] != -1.0)
-            [dict setObject: @(dlSpeeds[i]) forKey: @"DL From Rate"];
+            dict[@"DL From Rate"] = @(dlSpeeds[i]);
 
         [webSeeds addObject: dict];
     }
@@ -1393,7 +1393,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
 
 - (void) checkGroupValueForRemoval: (NSNotification *) notification
 {
-    if (fGroupValue != -1 && [[[notification userInfo] objectForKey: @"Index"] integerValue] == fGroupValue)
+    if (fGroupValue != -1 && [[notification userInfo][@"Index"] integerValue] == fGroupValue)
         fGroupValue = -1;
 }
 

@@ -266,10 +266,10 @@
     NSDictionary * message = fDisplayedMessages[row];
 
     if ([ident isEqualToString: @"Date"])
-        return [message objectForKey: @"Date"];
+        return message[@"Date"];
     else if ([ident isEqualToString: @"Level"])
     {
-        const NSInteger level = [[message objectForKey: @"Level"] integerValue];
+        const NSInteger level = [message[@"Level"] integerValue];
         switch (level)
         {
             case TR_LOG_ERROR:
@@ -284,15 +284,15 @@
         }
     }
     else if ([ident isEqualToString: @"Name"])
-        return [message objectForKey: @"Name"];
+        return message[@"Name"];
     else
-        return [message objectForKey: @"Message"];
+        return message[@"Message"];
 }
 
 #warning don't cut off end
 - (CGFloat) tableView: (NSTableView *) tableView heightOfRow: (NSInteger) row
 {
-    NSString * message = [fDisplayedMessages[row] objectForKey: @"Message"];
+    NSString * message = fDisplayedMessages[row][@"Message"];
 
     NSTableColumn * column = [tableView tableColumnWithIdentifier: @"Message"];
     const CGFloat count = floorf([message sizeWithAttributes: fAttributes].width / [column width]);
@@ -310,7 +310,7 @@
                 tableColumn: (NSTableColumn *) column row: (NSInteger) row mouseLocation: (NSPoint) mouseLocation
 {
     NSDictionary * message = fDisplayedMessages[row];
-    return [message objectForKey: @"File"];
+    return message[@"File"];
 }
 
 - (void) copy: (id) sender
@@ -451,8 +451,8 @@
         return YES;
 
     const NSStringCompareOptions searchOptions = NSCaseInsensitiveSearch | NSDiacriticInsensitiveSearch;
-    return [[message objectForKey: @"Name"] rangeOfString: filterString options: searchOptions].location != NSNotFound
-            || [[message objectForKey: @"Message"] rangeOfString: filterString options: searchOptions].location != NSNotFound;
+    return [message[@"Name"] rangeOfString: filterString options: searchOptions].location != NSNotFound
+            || [message[@"Message"] rangeOfString: filterString options: searchOptions].location != NSNotFound;
 }
 
 - (void) updateListForFilter
@@ -461,7 +461,7 @@
     NSString * filterString = [fFilterField stringValue];
 
     NSIndexSet * indexes = [fMessages indexesOfObjectsWithOptions: NSEnumerationConcurrent passingTest: ^BOOL(id message, NSUInteger idx, BOOL * stop) {
-        return [[(NSDictionary *)message objectForKey: @"Level"] integerValue] <= level && [self shouldIncludeMessageForFilter: filterString message: message];
+        return [((NSDictionary *)message)[@"Level"] integerValue] <= level && [self shouldIncludeMessageForFilter: filterString message: message];
     }];
 
     NSArray * tempMessages = [[fMessages objectsAtIndexes: indexes] sortedArrayUsingDescriptors: [fMessageTable sortDescriptors]];
@@ -514,7 +514,7 @@
 - (NSString *) stringForMessage: (NSDictionary *) message
 {
     NSString * levelString;
-    const NSInteger level = [[message objectForKey: @"Level"] integerValue];
+    const NSInteger level = [message[@"Level"] integerValue];
     switch (level)
     {
         case TR_LOG_ERROR:
@@ -531,9 +531,9 @@
             levelString = @"?";
     }
 
-    return [NSString stringWithFormat: @"%@ %@ [%@] %@: %@", [message objectForKey: @"Date"],
-            [message objectForKey: @"File"], levelString,
-            [message objectForKey: @"Name"], [message objectForKey: @"Message"], nil];
+    return [NSString stringWithFormat: @"%@ %@ [%@] %@: %@", message[@"Date"],
+            message[@"File"], levelString,
+            message[@"Name"], message[@"Message"], nil];
 }
 
 @end

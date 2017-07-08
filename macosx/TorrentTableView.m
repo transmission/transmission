@@ -253,7 +253,7 @@
 
     for (NSTrackingArea * area in [self trackingAreas])
     {
-        if ([area owner] == self && [[area userInfo] objectForKey: @"Row"])
+        if ([area owner] == self && [area userInfo][@"Row"])
             [self removeTrackingArea: area];
     }
 }
@@ -293,10 +293,10 @@
     NSDictionary * dict = (NSDictionary *)[event userData];
 
     NSNumber * row;
-    if ((row = [dict objectForKey: @"Row"]))
+    if ((row = dict[@"Row"]))
     {
         NSInteger rowVal = [row integerValue];
-        NSString * type = [dict objectForKey: @"Type"];
+        NSString * type = dict[@"Type"];
         if ([type isEqualToString: @"Action"])
             fMouseActionRow = rowVal;
         else if ([type isEqualToString: @"Control"])
@@ -319,9 +319,9 @@
     NSDictionary * dict = (NSDictionary *)[event userData];
 
     NSNumber * row;
-    if ((row = [dict objectForKey: @"Row"]))
+    if ((row = dict[@"Row"]))
     {
-        NSString * type = [dict objectForKey: @"Type"];
+        NSString * type = dict[@"Type"];
         if ([type isEqualToString: @"Action"])
             fMouseActionRow = -1;
         else if ([type isEqualToString: @"Control"])
@@ -349,7 +349,7 @@
 
 - (void) outlineViewItemDidExpand: (NSNotification *) notification
 {
-    NSInteger value = [[[notification userInfo] objectForKey: @"NSObject"] groupIndex];
+    NSInteger value = [[notification userInfo][@"NSObject"] groupIndex];
     if (value < 0)
         value = MAX_GROUP;
 
@@ -362,7 +362,7 @@
 
 - (void) outlineViewItemDidCollapse: (NSNotification *) notification
 {
-    NSInteger value = [[[notification userInfo] objectForKey: @"NSObject"] groupIndex];
+    NSInteger value = [[notification userInfo][@"NSObject"] groupIndex];
     if (value < 0)
         value = MAX_GROUP;
 

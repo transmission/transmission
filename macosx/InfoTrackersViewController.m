@@ -162,12 +162,12 @@
 
     if ([item isKindOfClass: [NSDictionary class]])
     {
-        const NSInteger tier = [[item objectForKey: @"Tier"] integerValue];
+        const NSInteger tier = [item[@"Tier"] integerValue];
         NSString * tierString = tier == -1 ? NSLocalizedString(@"New Tier", "Inspector -> tracker table")
                                 : [NSString stringWithFormat: NSLocalizedString(@"Tier %d", "Inspector -> tracker table"), tier];
 
         if ([fTorrents count] > 1)
-            tierString = [tierString stringByAppendingFormat: @" - %@", [item objectForKey: @"Name"]];
+            tierString = [tierString stringByAppendingFormat: @" - %@", item[@"Name"]];
         return tierString;
     }
     else
@@ -323,10 +323,10 @@
             {
                 Torrent * torrent = [(TrackerNode *)object torrent];
                 NSMutableSet * removeSet;
-                if (!(removeSet = [removeIdentifiers objectForKey: torrent]))
+                if (!(removeSet = removeIdentifiers[torrent]))
                 {
                     removeSet = [NSMutableSet set];
-                    [removeIdentifiers setObject: removeSet forKey: torrent];
+                    removeIdentifiers[torrent] = removeSet;
                 }
 
                 [removeSet addObject: [(TrackerNode *)object fullAnnounceAddress]];
@@ -401,7 +401,7 @@
     [fTrackerTable beginUpdates];
 
     for (Torrent * torrent in removeIdentifiers)
-        [torrent removeTrackers: [removeIdentifiers objectForKey: torrent]];
+        [torrent removeTrackers: removeIdentifiers[torrent]];
 
     //reset table with either new or old value
     [fTrackers release];
