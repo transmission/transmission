@@ -733,13 +733,6 @@ div.torrent_footer
 		@include roundedBox(5px);
 		@include buttonImage('images/compact.png', $idle-color-top, $idle-color-bottom, $active-color-top, $active-color-bottom);
 	}
-
-	#freespace-info	{
-		float: right;
-                text-align: right;
-                border: 0px;
-                width: 100px;
-	}
 }
 
 /****
@@ -758,8 +751,23 @@ div#dialog_message.dialog_message {
 	padding-bottom: 0;
 }
 
-#torrent_upload_file, label[for="torrent_upload_file"]{
-	display:none;
+div#upload_container div.dialog_window div.dialog_message {
+	label {
+  		margin-top: 15px;
+  		display: block;
+	}
+	input {
+		margin: 3px auto;
+		display: block;
+	}
+	input[type=checkbox] {
+		margin: 15px 3px 0 0;
+		display: inline;
+		width: auto;
+	}
+	#auto_start_label {
+		display: inline;
+	}
 }
 
 h2.dialog_heading {
