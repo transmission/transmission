@@ -53,8 +53,8 @@
             NSMutableParagraphStyle * paragraphStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
             [paragraphStyle setAlignment: NSRightTextAlignment];
 
-            fAttributes = @{NSFontAttributeName: [NSFont systemFontOfSize: 11.0],
-                            NSParagraphStyleAttributeName: paragraphStyle};
+            fAttributes = [[NSDictionary alloc] initWithObjects: @[[NSFont systemFontOfSize: 11.0], paragraphStyle]
+                forKeys: @[NSFontAttributeName, NSParagraphStyleAttributeName]];
             [paragraphStyle release];
         }
 

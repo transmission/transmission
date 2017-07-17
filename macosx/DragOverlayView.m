@@ -42,17 +42,15 @@
         NSMutableParagraphStyle * paragraphStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
         [paragraphStyle setLineBreakMode: NSLineBreakByTruncatingMiddle];
 
-        fMainLineAttributes = @{
-                                NSForegroundColorAttributeName: [NSColor whiteColor],
-                                NSFontAttributeName: bigFont,
-                                NSShadowAttributeName: stringShadow,
-                                NSParagraphStyleAttributeName: paragraphStyle};
+        fMainLineAttributes = [[NSDictionary alloc] initWithObjects: @[[NSColor whiteColor],
+                                bigFont, stringShadow, paragraphStyle]
+                                forKeys: @[NSForegroundColorAttributeName, NSFontAttributeName,
+                                NSShadowAttributeName, NSParagraphStyleAttributeName]];
 
-        fSubLineAttributes = @{
-                               NSForegroundColorAttributeName: [NSColor whiteColor],
-                               NSFontAttributeName: smallFont,
-                               NSShadowAttributeName: stringShadow,
-                               NSParagraphStyleAttributeName: paragraphStyle};
+        fSubLineAttributes = [[NSDictionary alloc] initWithObjects: @[[NSColor whiteColor],
+                                smallFont, stringShadow, paragraphStyle]
+                                forKeys: @[NSForegroundColorAttributeName, NSFontAttributeName,
+                                NSShadowAttributeName, NSParagraphStyleAttributeName]];
 
         [stringShadow release];
         [paragraphStyle release];

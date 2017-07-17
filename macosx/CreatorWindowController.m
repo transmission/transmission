@@ -565,8 +565,10 @@
             case TR_MAKEMETA_OK:
                 if (fOpenWhenCreated)
                 {
-                    NSDictionary * dict = @{@"File": [fLocation path],
-                                            @"Path": [[fPath URLByDeletingLastPathComponent] path]};
+                    NSDictionary * dict = [[NSDictionary alloc] initWithObjects: @[
+                        [fLocation path],
+                        [[fPath URLByDeletingLastPathComponent] path]]
+                        forKeys: @[@"File", @"Path"]];
                     [[NSNotificationCenter defaultCenter] postNotificationName: @"OpenCreatedTorrentFile" object: self userInfo: dict];
                 }
 

@@ -140,8 +140,7 @@ typedef enum
 
 static void altSpeedToggledCallback(tr_session * handle UNUSED, bool active, bool byUser, void * controller)
 {
-    NSDictionary * dict = @{@"Active": @(active),
-                            @"ByUser": @(byUser)};
+    NSDictionary * dict = [[NSDictionary alloc] initWithObjects: @[@(active), @(byUser)] forKeys: @[@"Active", @"ByUser"]];
     [(Controller *)controller performSelectorOnMainThread: @selector(altSpeedToggledCallbackIsLimited:)
         withObject: dict waitUntilDone: NO];
 }
@@ -665,7 +664,7 @@ static void removeKeRangerRansomware()
         forEventClass: kCoreEventClass andEventID: kAEOpenContents];
 
     //if we were opened from a user notification, do the corresponding action
-    NSUserNotification * launchNotification = [notification userInfo][ NSApplicationLaunchUserNotificationKey];
+    NSUserNotification * launchNotification = [notification userInfo][NSApplicationLaunchUserNotificationKey];
     if (launchNotification)
         [self userNotificationCenter: nil didActivateNotification: launchNotification];
 
@@ -904,7 +903,7 @@ static void removeKeRangerRansomware()
 
 -(void) download: (NSURLDownload *) download didCreateDestination: (NSString *) path
 {
-    NSMutableDictionary *dict = (NSMutableDictionary *)fPendingTorrentDownloads[[[download request] URL]];
+    NSMutableDictionary * dict = fPendingTorrentDownloads[[[download request] URL]];
     dict[@"Path"] = path;
 }
 
@@ -1199,8 +1198,7 @@ static void removeKeRangerRansomware()
 //called on by applescript
 - (void) open: (NSArray *) files
 {
-    NSDictionary * dict = @{@"Filenames": files,
-                            @"AddType": @(ADD_MANUAL)};
+    NSDictionary * dict = [[NSDictionary alloc] initWithObjects: @[files, @(ADD_MANUAL)] forKeys: @[@"Filenames", @"AddType"]];
     [self performSelectorOnMainThread: @selector(openFilesWithDict:) withObject: dict waitUntilDone: NO];
 }
 
@@ -1221,8 +1219,10 @@ static void removeKeRangerRansomware()
             for (NSURL * url in [panel URLs])
                 [filenames addObject: [url path]];
 
-            NSDictionary * dictionary = @{@"Filenames": filenames,
-                                          @"AddType": sender == fOpenIgnoreDownloadFolder ? @(ADD_SHOW_OPTIONS) : @(ADD_MANUAL)};
+            NSDictionary * dictionary = [[NSDictionary alloc] initWithObjects: @[
+                filenames,
+                sender == fOpenIgnoreDownloadFolder ? @(ADD_SHOW_OPTIONS) : @(ADD_MANUAL)]
+                forKeys: @[@"Filenames", @"AddType"]];
             [self performSelectorOnMainThread: @selector(openFilesWithDict:) withObject: dictionary waitUntilDone: NO];
         }
     }];
@@ -1347,7 +1347,7 @@ static void removeKeRangerRansomware()
 
         if (!fPendingTorrentDownloads)
             fPendingTorrentDownloads = [[NSMutableDictionary alloc] init];
-        NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithObject: download forKey: @"Download"];
+        NSMutableDictionary * dict = [NSMutableDictionary dictionaryWithObject: download forKey: @"Download"];
         fPendingTorrentDownloads[[request URL]] = dict;
     }
 }

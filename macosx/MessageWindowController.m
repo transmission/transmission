@@ -406,7 +406,7 @@
         {
             //make the array sorted by date
             NSSortDescriptor * descriptor = [NSSortDescriptor sortDescriptorWithKey: @"Index" ascending: YES];
-            NSArray * descriptors = @[descriptor];
+            NSArray * descriptors = [[NSArray alloc] initWithObjects: descriptor, nil];
             NSArray * sortedMessages = [fDisplayedMessages sortedArrayUsingDescriptors: descriptors];
             [descriptors release];
 
