@@ -184,8 +184,8 @@ static int test_get_info(void)
     check_ptr(err, ==, NULL);
     check_int(info.type, ==, TR_SYS_PATH_IS_FILE);
     check_uint(info.size, ==, 4);
-    check_int(info.last_modified_at, >=, t);
-    check_int(info.last_modified_at, <=, time(NULL));
+    check_int(info.last_modified_at, >=, t - 1);
+    check_int(info.last_modified_at, <=, time(NULL) + 1);
 
     /* Good file info (by handle) */
     fd = tr_sys_file_open(path1, TR_SYS_FILE_READ, 0, NULL);
@@ -194,8 +194,8 @@ static int test_get_info(void)
     check_ptr(err, ==, NULL);
     check_int(info.type, ==, TR_SYS_PATH_IS_FILE);
     check_uint(info.size, ==, 4);
-    check_int(info.last_modified_at, >=, t);
-    check_int(info.last_modified_at, <=, time(NULL));
+    check_int(info.last_modified_at, >=, t - 1);
+    check_int(info.last_modified_at, <=, time(NULL) + 1);
     tr_sys_file_close(fd, NULL);
 
     tr_sys_path_remove(path1, NULL);
@@ -208,8 +208,8 @@ static int test_get_info(void)
     check_ptr(err, ==, NULL);
     check_int(info.type, ==, TR_SYS_PATH_IS_DIRECTORY);
     check_uint(info.size, !=, (uint64_t)-1);
-    check_int(info.last_modified_at, >=, t);
-    check_int(info.last_modified_at, <=, time(NULL));
+    check_int(info.last_modified_at, >=, t - 1);
+    check_int(info.last_modified_at, <=, time(NULL) + 1);
     tr_sys_path_remove(path1, NULL);
 
     if (create_symlink(path1, path2, false))
@@ -228,8 +228,8 @@ static int test_get_info(void)
         check_ptr(err, ==, NULL);
         check_int(info.type, ==, TR_SYS_PATH_IS_FILE);
         check_uint(info.size, ==, 4);
-        check_int(info.last_modified_at, >=, t);
-        check_int(info.last_modified_at, <=, time(NULL));
+        check_int(info.last_modified_at, >=, t - 1);
+        check_int(info.last_modified_at, <=, time(NULL) + 1);
 
         /* Good file info (by handle) */
         fd = tr_sys_file_open(path1, TR_SYS_FILE_READ, 0, NULL);
@@ -238,8 +238,8 @@ static int test_get_info(void)
         check_ptr(err, ==, NULL);
         check_int(info.type, ==, TR_SYS_PATH_IS_FILE);
         check_uint(info.size, ==, 4);
-        check_int(info.last_modified_at, >=, t);
-        check_int(info.last_modified_at, <=, time(NULL));
+        check_int(info.last_modified_at, >=, t - 1);
+        check_int(info.last_modified_at, <=, time(NULL) + 1);
         tr_sys_file_close(fd, NULL);
 
         tr_sys_path_remove(path2, NULL);
@@ -252,8 +252,8 @@ static int test_get_info(void)
         check_ptr(err, ==, NULL);
         check_int(info.type, ==, TR_SYS_PATH_IS_DIRECTORY);
         check_uint(info.size, !=, (uint64_t)-1);
-        check_int(info.last_modified_at, >=, t);
-        check_int(info.last_modified_at, <=, time(NULL));
+        check_int(info.last_modified_at, >=, t - 1);
+        check_int(info.last_modified_at, <=, time(NULL) + 1);
 
         tr_sys_path_remove(path2, NULL);
         tr_sys_path_remove(path1, NULL);
