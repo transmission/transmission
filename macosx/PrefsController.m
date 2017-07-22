@@ -93,7 +93,7 @@
             [fDefaults setObject: blocklistDate forKey: @"BlocklistNewLastUpdate"];
             [fDefaults removeObjectForKey: @"BlocklistLastUpdate"];
 
-            NSURL * blocklistDir = [[[[NSFileManager defaultManager] URLsForDirectory: NSApplicationDirectory inDomains: NSUserDomainMask] objectAtIndex: 0] URLByAppendingPathComponent: @"Transmission/blocklists/"];
+            NSURL * blocklistDir = [[[NSFileManager defaultManager] URLsForDirectory: NSApplicationDirectory inDomains: NSUserDomainMask][0] URLByAppendingPathComponent: @"Transmission/blocklists/"];
             [[NSFileManager defaultManager] moveItemAtURL: [blocklistDir URLByAppendingPathComponent: @"level1.bin"]
                 toURL: [blocklistDir URLByAppendingPathComponent: [NSString stringWithUTF8String: DEFAULT_BLOCKLIST_FILENAME]]
                 error: nil];
@@ -315,8 +315,8 @@
 
 - (NSArray *) toolbarAllowedItemIdentifiers: (NSToolbar *) toolbar
 {
-    return [NSArray arrayWithObjects: TOOLBAR_GENERAL, TOOLBAR_TRANSFERS, TOOLBAR_GROUPS, TOOLBAR_BANDWIDTH,
-                                        TOOLBAR_PEERS, TOOLBAR_NETWORK, TOOLBAR_REMOTE, nil];
+    return @[TOOLBAR_GENERAL, TOOLBAR_TRANSFERS, TOOLBAR_GROUPS, TOOLBAR_BANDWIDTH,
+                                        TOOLBAR_PEERS, TOOLBAR_NETWORK, TOOLBAR_REMOTE];
 }
 
 - (NSArray *) toolbarSelectableItemIdentifiers: (NSToolbar *) toolbar
@@ -838,7 +838,7 @@
         {
             [fFolderPopUp selectItemAtIndex: DOWNLOAD_FOLDER];
 
-            NSString * folder = [[[panel URLs] objectAtIndex: 0] path];
+            NSString * folder = [[panel URLs][0] path];
             [fDefaults setObject: folder forKey: @"DownloadFolder"];
             [fDefaults setBool: YES forKey: @"DownloadLocationConstant"];
             [self updateShowAddMagnetWindowField];
@@ -867,7 +867,7 @@
     [panel beginSheetModalForWindow: [self window] completionHandler: ^(NSInteger result) {
         if (result == NSFileHandlingPanelOKButton)
         {
-            NSString * folder = [[[panel URLs] objectAtIndex: 0] path];
+            NSString * folder = [[panel URLs][0] path];
             [fDefaults setObject: folder forKey: @"IncompleteDownloadFolder"];
 
             assert(folder.length > 0);
@@ -890,7 +890,7 @@
     [panel beginSheetModalForWindow: [self window] completionHandler: ^(NSInteger result) {
         if (result == NSFileHandlingPanelOKButton)
         {
-            NSString * filePath = [[[panel URLs] objectAtIndex: 0] path];
+            NSString * filePath = [[panel URLs][0] path];
 
             assert(filePath.length > 0);
 
@@ -981,7 +981,7 @@
             VDKQueue * watcherQueue = [(Controller *)[NSApp delegate] fileWatcherQueue];
             [watcherQueue removeAllPaths];
 
-            NSString * path = [[[panel URLs] objectAtIndex: 0] path];
+            NSString * path = [[panel URLs][0] path];
             [fDefaults setObject: path forKey: @"AutoImportDirectory"];
             [watcherQueue addPath: [path stringByExpandingTildeInPath] notifyingAbout: VDKQueueNotifyAboutWrite];
 
@@ -1126,7 +1126,7 @@
 
 - (id) tableView: (NSTableView *) tableView objectValueForTableColumn: (NSTableColumn *) tableColumn row: (NSInteger) row
 {
-    return [fRPCWhitelistArray objectAtIndex: row];
+    return fRPCWhitelistArray[row];
 }
 
 - (void) tableView: (NSTableView *) tableView setObjectValue: (id) object forTableColumn: (NSTableColumn *) tableColumn
@@ -1148,7 +1148,7 @@
             {
                 int num = [component intValue];
                 if (num >= 0 && num < 256)
-                    [newComponents addObject: [[NSNumber numberWithInt: num] stringValue]];
+                    [newComponents addObject: [@(num) stringValue]];
                 else
                 {
                     valid = false;
@@ -1164,19 +1164,19 @@
         newIP = [newComponents componentsJoinedByString: @"."];
 
         //don't allow the same ip address
-        if ([fRPCWhitelistArray containsObject: newIP] && ![[fRPCWhitelistArray objectAtIndex: row] isEqualToString: newIP])
+        if ([fRPCWhitelistArray containsObject: newIP] && ![fRPCWhitelistArray[row] isEqualToString: newIP])
             valid = false;
     }
 
     if (valid)
     {
-        [fRPCWhitelistArray replaceObjectAtIndex: row withObject: newIP];
+        fRPCWhitelistArray[row] = newIP;
         [fRPCWhitelistArray sortUsingSelector: @selector(compareNumeric:)];
     }
     else
     {
         NSBeep();
-        if ([[fRPCWhitelistArray objectAtIndex: row] isEqualToString: @""])
+        if ([fRPCWhitelistArray[row] isEqualToString: @""])
             [fRPCWhitelistArray removeObjectAtIndex: row];
     }
 
@@ -1224,10 +1224,10 @@
     [fDefaults setBool: encryptionMode == TR_ENCRYPTION_REQUIRED forKey: @"EncryptionRequire"];
 
     //download directory
-    NSString * downloadLocation = [[NSString stringWithUTF8String: tr_sessionGetDownloadDir(fHandle)] stringByStandardizingPath];
+    NSString * downloadLocation = [@(tr_sessionGetDownloadDir(fHandle)) stringByStandardizingPath];
     [fDefaults setObject: downloadLocation forKey: @"DownloadFolder"];
 
-    NSString * incompleteLocation = [[NSString stringWithUTF8String: tr_sessionGetIncompleteDir(fHandle)] stringByStandardizingPath];
+    NSString * incompleteLocation = [@(tr_sessionGetIncompleteDir(fHandle)) stringByStandardizingPath];
     [fDefaults setObject: incompleteLocation forKey: @"IncompleteDownloadFolder"];
 
     const BOOL useIncomplete = tr_sessionIsIncompleteDirEnabled(fHandle);
@@ -1320,7 +1320,7 @@
     const BOOL blocklist = tr_blocklistIsEnabled(fHandle);
     [fDefaults setBool: blocklist forKey: @"BlocklistNew"];
 
-    NSString * blocklistURL = [NSString stringWithUTF8String: tr_blocklistGetURL(fHandle)];
+    NSString * blocklistURL = @(tr_blocklistGetURL(fHandle));
     [fDefaults setObject: blocklistURL forKey: @"BlocklistURL"];
 
     //seed ratio
@@ -1360,7 +1360,7 @@
     const BOOL doneScriptEnabled = tr_sessionIsTorrentDoneScriptEnabled(fHandle);
     [fDefaults setBool: doneScriptEnabled forKey: @"DoneScriptEnabled"];
 
-    NSString * doneScriptPath = [NSString stringWithUTF8String: tr_sessionGetTorrentDoneScript(fHandle)];
+    NSString * doneScriptPath = @(tr_sessionGetTorrentDoneScript(fHandle));
     [fDefaults setObject: doneScriptPath forKey: @"DoneScriptPath"];
 
     //update gui if loaded

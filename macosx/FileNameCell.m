@@ -127,8 +127,8 @@
         statusColor = [NSColor darkGrayColor];
     }
 
-    [fTitleAttributes setObject: titleColor forKey: NSForegroundColorAttributeName];
-    [fStatusAttributes setObject: statusColor forKey: NSForegroundColorAttributeName];
+    fTitleAttributes[NSForegroundColorAttributeName] = titleColor;
+    fStatusAttributes[NSForegroundColorAttributeName] = statusColor;
 
     //title
     NSAttributedString * titleString = [self attributedTitle];
@@ -161,7 +161,7 @@
     cellFrame.origin.x += PADDING_EXPANSION_FRAME;
     cellFrame.origin.y += PADDING_EXPANSION_FRAME;
 
-    [fTitleAttributes setObject: [NSColor controlTextColor] forKey: NSForegroundColorAttributeName];
+    fTitleAttributes[NSForegroundColorAttributeName] = [NSColor controlTextColor];
     NSAttributedString * titleString = [self attributedTitle];
     [titleString drawInRect: cellFrame];
 }

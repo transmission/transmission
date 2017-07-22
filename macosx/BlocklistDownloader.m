@@ -204,12 +204,12 @@ BlocklistDownloader * fBLDownloader = nil;
         NSTask  * unzip = [[NSTask alloc] init];
         [unzip setLaunchPath: @"/usr/bin/unzip"];
         [unzip setCurrentDirectoryPath: workingDirectory];
-        [unzip setArguments: [NSArray arrayWithObjects:
+        [unzip setArguments: @[
                                 @"-o",  /* overwrite */
                                 @"-q", /* quiet! */
                                 fDestination, /* source zip file */
-                                @"-d", workingDirectory, /*destination*/
-                                nil]];
+                                @"-d", workingDirectory /*destination*/
+                                ]];
 
         @try
         {
@@ -231,10 +231,10 @@ BlocklistDownloader * fBLDownloader = nil;
 
             zipinfo = [[NSTask alloc] init];
             [zipinfo setLaunchPath: @"/usr/bin/zipinfo"];
-            [zipinfo setArguments: [NSArray arrayWithObjects:
+            [zipinfo setArguments: @[
                                     @"-1",  /* just the filename */
-                                    fDestination, /* source zip file */
-                                    nil]];
+                                    fDestination /* source zip file */
+                                    ]];
             [zipinfo setStandardOutput: [NSPipe pipe]];
 
             @try

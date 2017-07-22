@@ -34,20 +34,20 @@
     if (fromIndex == toIndex)
         return;
 
-    id object = [[self objectAtIndex: fromIndex] retain];
+    id object = [self[fromIndex] retain];
 
     //shift objects - more efficient than simply removing the object and re-inserting the object
     if (fromIndex < toIndex)
     {
         for (NSUInteger i = fromIndex; i < toIndex; ++i)
-            [self replaceObjectAtIndex: i withObject: [self objectAtIndex: i+1]];
+            self[i] = self[i+1];
     }
     else
     {
         for (NSUInteger i = fromIndex; i > toIndex; --i)
-            [self replaceObjectAtIndex: i withObject: [self objectAtIndex: i-1]];
+            self[i] = self[i-1];
     }
-    [self replaceObjectAtIndex: toIndex withObject: object];
+    self[toIndex] = object;
 
     [object release];
 }

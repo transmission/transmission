@@ -43,7 +43,7 @@
 
         fStatus = PORT_STATUS_CHECKING;
 
-        fTimer = [[NSTimer scheduledTimerWithTimeInterval: CHECK_FIRE target: self selector: @selector(startProbe:) userInfo: [NSNumber numberWithInteger: portNumber] repeats: NO] retain];
+        fTimer = [[NSTimer scheduledTimerWithTimeInterval: CHECK_FIRE target: self selector: @selector(startProbe:) userInfo: @(portNumber) repeats: NO] retain];
         if (!delay)
             [fTimer fire];
     }

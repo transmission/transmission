@@ -190,7 +190,7 @@
 
     [panel beginSheetModalForWindow: [self window] completionHandler: ^(NSInteger result) {
         if (result == NSFileHandlingPanelOKButton)
-            [self setDestinationPath: [[[panel URLs] objectAtIndex: 0] path] determinationType:TorrentDeterminationUserSpecified];
+            [self setDestinationPath: [[panel URLs][0] path] determinationType:TorrentDeterminationUserSpecified];
         else
         {
             if (!fDestination)
