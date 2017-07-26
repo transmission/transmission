@@ -36,7 +36,7 @@ static inline bool char_is_path_separator(char c)
     return strchr(PATH_DELIMITER_CHARS, c) != NULL;
 }
 
-char* tr_metainfoGetBasename(tr_info const* inf)
+static char* metainfoGetBasenameNameAndPartialHash(tr_info const* inf)
 {
     char const* name = inf->originalName;
     size_t const name_len = strlen(name);
@@ -53,9 +53,30 @@ char* tr_metainfoGetBasename(tr_info const* inf)
     return ret;
 }
 
-static char* getTorrentFilename(tr_session const* session, tr_info const* inf)
+static char* metainfoGetBasenameHashOnly(tr_info const* inf)
 {
-    char* base = tr_metainfoGetBasename(inf);
+    return tr_strdup(inf->hashString);
+}
+
+char* tr_metainfoGetBasename(tr_info const* inf, enum tr_metainfo_basename_format format)
+{
+    switch (format)
+    {
+    case TR_METAINFO_BASENAME_NAME_AND_PARTIAL_HASH:
+        return metainfoGetBasenameNameAndPartialHash(inf);
+
+    case TR_METAINFO_BASENAME_HASH:
+        return metainfoGetBasenameHashOnly(inf);
+
+    default:
+        TR_ASSERT_MSG(false, "unknown metainfo basename format %d", (int)format);
+        return NULL;
+    }
+}
+
+static char* getTorrentFilename(tr_session const* session, tr_info const* inf, enum tr_metainfo_basename_format format)
+{
+    char* base = tr_metainfoGetBasename(inf, format);
     char* filename = tr_strdup_printf("%s" TR_PATH_DELIMITER_STR "%s.torrent", tr_getTorrentDir(session), base);
     tr_free(base);
     return filename;
@@ -632,7 +653,7 @@ static char const* tr_metainfoParseImpl(tr_session const* session, tr_info* inf,
 
     /* filename of Transmission's copy */
     tr_free(inf->torrent);
-    inf->torrent = session != NULL ? getTorrentFilename(session, inf) : NULL;
+    inf->torrent = session != NULL ? getTorrentFilename(session, inf, TR_METAINFO_BASENAME_HASH) : NULL;
 
     return NULL;
 }
@@ -688,7 +709,26 @@ void tr_metainfoRemoveSaved(tr_session const* session, tr_info const* inf)
 {
     char* filename;
 
-    filename = getTorrentFilename(session, inf);
+    filename = getTorrentFilename(session, inf, TR_METAINFO_BASENAME_HASH);
     tr_sys_path_remove(filename, NULL);
     tr_free(filename);
+
+    filename = getTorrentFilename(session, inf, TR_METAINFO_BASENAME_NAME_AND_PARTIAL_HASH);
+    tr_sys_path_remove(filename, NULL);
+    tr_free(filename);
+}
+
+void tr_metainfoMigrateFile(tr_session const* session, tr_info const* info, enum tr_metainfo_basename_format old_format,
+    enum tr_metainfo_basename_format new_format)
+{
+    char* old_filename = getTorrentFilename(session, info, old_format);
+    char* new_filename = getTorrentFilename(session, info, new_format);
+
+    if (tr_sys_path_rename(old_filename, new_filename, NULL))
+    {
+        tr_logAddNamedError(info->name, "Migrated torrent file from \"%s\" to \"%s\"", old_filename, new_filename);
+    }
+
+    tr_free(new_filename);
+    tr_free(old_filename);
 }

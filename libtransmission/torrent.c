@@ -968,7 +968,16 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     tr_torrentSetAddedDate(tor, tr_time()); /* this is a default value to be overwritten by the resume file */
 
     torrentInitFromInfo(tor);
-    loaded = tr_torrentLoadResume(tor, ~0, ctor);
+
+    bool didRenameResumeFileToHashOnlyName = false;
+    loaded = tr_torrentLoadResume(tor, ~0, ctor, &didRenameResumeFileToHashOnlyName);
+
+    if (didRenameResumeFileToHashOnlyName)
+    {
+        /* Rename torrent file as well */
+        tr_metainfoMigrateFile(session, &tor->info, TR_METAINFO_BASENAME_NAME_AND_PARTIAL_HASH, TR_METAINFO_BASENAME_HASH);
+    }
+
     tor->completeness = tr_cpGetStatus(&tor->completion);
     setLocalErrorIfFilesDisappeared(tor);
 

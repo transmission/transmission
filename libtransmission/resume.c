@@ -28,9 +28,9 @@ enum
     MAX_REMEMBERED_PEERS = 200
 };
 
-static char* getResumeFilename(tr_torrent const* tor)
+static char* getResumeFilename(tr_torrent const* tor, enum tr_metainfo_basename_format format)
 {
-    char* base = tr_metainfoGetBasename(tr_torrentInfo(tor));
+    char* base = tr_metainfoGetBasename(tr_torrentInfo(tor), format);
     char* filename = tr_strdup_printf("%s" TR_PATH_DELIMITER_STR "%s.resume", tr_getResumeDir(tor->session), base);
     tr_free(base);
     return filename;
@@ -736,7 +736,7 @@ void tr_torrentSaveResume(tr_torrent* tor)
     saveFilenames(&top, tor);
     saveName(&top, tor);
 
-    filename = getResumeFilename(tor);
+    filename = getResumeFilename(tor, TR_METAINFO_BASENAME_HASH);
 
     if ((err = tr_variantToFile(&top, TR_VARIANT_FMT_BENC, filename)) != 0)
     {
@@ -748,7 +748,7 @@ void tr_torrentSaveResume(tr_torrent* tor)
     tr_variantFree(&top);
 }
 
-static uint64_t loadFromFile(tr_torrent* tor, uint64_t fieldsToLoad)
+static uint64_t loadFromFile(tr_torrent* tor, uint64_t fieldsToLoad, bool* didRenameToHashOnlyName)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
@@ -762,15 +762,41 @@ static uint64_t loadFromFile(tr_torrent* tor, uint64_t fieldsToLoad)
     bool const wasDirty = tor->isDirty;
     tr_error* error = NULL;
 
-    filename = getResumeFilename(tor);
+    if (didRenameToHashOnlyName != NULL)
+    {
+        *didRenameToHashOnlyName = false;
+    }
+
+    filename = getResumeFilename(tor, TR_METAINFO_BASENAME_HASH);
 
     if (!tr_variantFromFile(&top, TR_VARIANT_FMT_BENC, filename, &error))
     {
         tr_logAddTorDbg(tor, "Couldn't read \"%s\": %s", filename, error->message);
-        tr_error_free(error);
+        tr_error_clear(&error);
 
-        tr_free(filename);
-        return fieldsLoaded;
+        char* old_filename = getResumeFilename(tor, TR_METAINFO_BASENAME_NAME_AND_PARTIAL_HASH);
+
+        if (!tr_variantFromFile(&top, TR_VARIANT_FMT_BENC, old_filename, &error))
+        {
+            tr_logAddTorDbg(tor, "Couldn't read \"%s\" either: %s", old_filename, error->message);
+            tr_error_free(error);
+
+            tr_free(old_filename);
+            tr_free(filename);
+            return fieldsLoaded;
+        }
+
+        if (tr_sys_path_rename(old_filename, filename, NULL))
+        {
+            tr_logAddTorDbg(tor, "Migrated resume file from \"%s\" to \"%s\"", old_filename, filename);
+
+            if (didRenameToHashOnlyName != NULL)
+            {
+                *didRenameToHashOnlyName = true;
+            }
+        }
+
+        tr_free(old_filename);
     }
 
     tr_logAddTorDbg(tor, "Read resume file \"%s\"", filename);
@@ -975,7 +1001,7 @@ static uint64_t useFallbackFields(tr_torrent* tor, uint64_t fields, tr_ctor cons
     return setFromCtor(tor, fields, ctor, TR_FALLBACK);
 }
 
-uint64_t tr_torrentLoadResume(tr_torrent* tor, uint64_t fieldsToLoad, tr_ctor const* ctor)
+uint64_t tr_torrentLoadResume(tr_torrent* tor, uint64_t fieldsToLoad, tr_ctor const* ctor, bool* didRenameToHashOnlyName)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
@@ -983,7 +1009,7 @@ uint64_t tr_torrentLoadResume(tr_torrent* tor, uint64_t fieldsToLoad, tr_ctor co
 
     ret |= useManditoryFields(tor, fieldsToLoad, ctor);
     fieldsToLoad &= ~ret;
-    ret |= loadFromFile(tor, fieldsToLoad);
+    ret |= loadFromFile(tor, fieldsToLoad, didRenameToHashOnlyName);
     fieldsToLoad &= ~ret;
     ret |= useFallbackFields(tor, fieldsToLoad, ctor);
 
@@ -992,7 +1018,13 @@ uint64_t tr_torrentLoadResume(tr_torrent* tor, uint64_t fieldsToLoad, tr_ctor co
 
 void tr_torrentRemoveResume(tr_torrent const* tor)
 {
-    char* filename = getResumeFilename(tor);
+    char* filename;
+
+    filename = getResumeFilename(tor, TR_METAINFO_BASENAME_HASH);
+    tr_sys_path_remove(filename, NULL);
+    tr_free(filename);
+
+    filename = getResumeFilename(tor, TR_METAINFO_BASENAME_NAME_AND_PARTIAL_HASH);
     tr_sys_path_remove(filename, NULL);
     tr_free(filename);
 }

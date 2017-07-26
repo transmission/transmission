@@ -207,7 +207,7 @@ static int test_single_filename_torrent(void)
     /* (while it's renamed: confirm that the .resume file remembers the changes) */
     tr_torrentSaveResume(tor);
     libttest_sync();
-    loaded = tr_torrentLoadResume(tor, ~0, ctor);
+    loaded = tr_torrentLoadResume(tor, ~0, ctor, NULL);
     check_str(tr_torrentName(tor), ==, "foobar");
     check_uint((loaded & TR_FR_NAME), !=, 0);
 
@@ -359,7 +359,7 @@ static int test_multifile_torrent(void)
     /* this is a bit dodgy code-wise, but let's make sure the .resume file got the name */
     tr_free(files[1].name);
     tor->info.files[1].name = tr_strdup("gabba gabba hey");
-    loaded = tr_torrentLoadResume(tor, ~0, ctor);
+    loaded = tr_torrentLoadResume(tor, ~0, ctor, NULL);
     check_uint((loaded & TR_FR_FILENAMES), !=, 0);
     check_str(files[0].name, ==, expected_files[0]);
     check_str(files[1].name, ==, "Felidae/Felinae/Felis/placeholder/Kyphi");
