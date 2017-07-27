@@ -246,21 +246,26 @@ fileUpload (  tr_session               * session,
 {
     const char * datosArchivo;
     const char * nombreArchivo;
-
+    char * archivoDecodificado;
+    int len ;
+    char * result;
+    char * mensaje;
+    
     tr_bencDictFindStr(args_in, "filename", &nombreArchivo);
     if(tr_bencDictFindStr(args_in, "datos", &datosArchivo))
     {
         FILE *f = fopen(nombreArchivo, "w");
         if(f == NULL)
         {
-            return "NO SE PUDO ABRIR FILE";
+            return "Can not open the file";
         }
-        int len = 0;
-        fprintf(f, tr_base64_decode(datosArchivo,-1,&len));
+        len = 0;
+        archivoDecodificado = tr_base64_decode(datosArchivo, -1, &len);
+        fwrite(archivoDecodificado, 1, len, f);
         fclose(f);
         char * result;
         char * mensaje;
-        mensaje = "SE GUARDO EL ARCHIVO: ";
+        mensaje = "XX BYTES WRITTEN. This file was saved: ";
         result = (char *) malloc(1 + strlen(mensaje) + strlen(nombreArchivo));
         strcpy(result, mensaje);
         strcat(result, nombreArchivo);
@@ -269,7 +274,7 @@ fileUpload (  tr_session               * session,
     }
     else
     {
-        return "NO SE ENCONTRO DATOS";
+        return "No data found";
     }
     return "NO-OPERATION";
 }
