@@ -238,6 +238,17 @@ static char const* queueMoveBottom(tr_session* session, tr_variant* args_in, tr_
     return NULL;
 }
 
+static const char*
+fileUpload (  tr_session               * session,
+              tr_benc                  * args_in UNUSED,
+              tr_benc                  * args_out UNUSED,
+              struct tr_rpc_idle_data  * idle_data UNUSED)
+{
+
+
+    return "Hello World!";
+}
+
 static int compareTorrentByQueuePosition(void const* va, void const* vb)
 {
     tr_torrent const* a = *(tr_torrent const**)va;
@@ -2490,7 +2501,8 @@ methods[] =
     { "queue-move-top", true, queueMoveTop },
     { "queue-move-up", true, queueMoveUp },
     { "queue-move-down", true, queueMoveDown },
-    { "queue-move-bottom", true, queueMoveBottom }
+    { "queue-move-bottom", true, queueMoveBottom },
+    { "file-upload", true, fileUpload }
 };
 
 static void noop_response_callback(tr_session* session UNUSED, tr_variant* response UNUSED, void* user_data UNUSED)
