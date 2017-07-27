@@ -51,6 +51,9 @@ Transmission.prototype = {
         $('#upload_confirm_button').click($.proxy(this.confirmUploadClicked, this));
         $('#upload_cancel_button').click($.proxy(this.hideUploadDialog, this));
 
+        $('#file_upload_confirm_button').click($.proxy(this.uploadFile().confirmUpload, this));
+		$('#file_upload_cancel_button').click($.proxy(this.uploadFile().cancelUpload, this));
+        
         $('#rename_confirm_button').click($.proxy(this.confirmRenameClicked, this));
         $('#rename_cancel_button').click($.proxy(this.hideRenameDialog, this));
 
@@ -549,7 +552,7 @@ Transmission.prototype = {
     },
     
     uploadFileClicked: function(ev){
-			this.uploadFile();
+        this.uploadFile().openUploadDialog();
 	},
 
     dragenter: function (ev) {
@@ -1018,19 +1021,76 @@ Transmission.prototype = {
             }
         }
     },
-
-    uploadFile: function(){
-		var datosArchivo = btoa("ESTO ES UNA PRUEBA");
-		//alert(datosArchivo);
+    
+	uploadFile: function(){
 		
-		var datos = { method: "file-upload", arguments: { datos: datosArchivo, filename: "/datitos.txt"}};
+		var self = this;
 		
-		var successFn = function(response)
+		self.openUploadDialog = function()
 		{
-			alert(response.result);
+		
+			$('#upload_file_container').show();
+			
 		};
 		
-		$.ajax({url: '../rpc', data: JSON.stringify(datos), type: 'POST', success: successFn, dataType: 'json' });
+		self.createFormData = function (target) {
+			
+			var file = $('#fileUploader')[0].files[0];
+			
+			var reader = new FileReader();
+		
+			reader.onload = function(evt)
+			{
+				var datos = evt.target.result;
+				var arrayDatos = datos.split(",");
+				var valorArchivo = arrayDatos[1];
+				target({data: valorArchivo, fileName: file.name});
+				
+			};
+			
+			reader.readAsDataURL(file);
+			
+		};
+		
+		self.confirmUpload = function()
+		{
+			
+			$('#upload_file_container').hide();
+
+			self.createFormData(function(filedata)
+			{
+				var datosArchivo = filedata.data;
+				var nombreArchivo = filedata.fileName;
+				
+				var datos = { 
+								method:    "file-upload", 
+								arguments: {
+												datos: datosArchivo, 
+												filename: "/media/storage/Soft/" + nombreArchivo
+											}
+							};
+				
+				var successFn = function(response)
+				{
+					
+					alert(response.result);
+				};
+				$.ajax({url: '../rpc', data: JSON.stringify(datos), type: 'POST', success: successFn, dataType: 'json' });
+				
+			});
+			
+		};
+		
+		self.cancelUpload = function()
+		{
+			
+			$('#upload_file_container').hide();
+		
+			alert("CANCELED");
+		};
+		
+
+		return self;
 	},
     
     promptSetLocation: function (confirmed, torrents) {

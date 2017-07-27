@@ -305,6 +305,23 @@
 			</div>
 		</div>
 
+		<div class="dialog_container" id="upload_file_container" style="display:none;">
+			<div class="dialog_top_bar"></div>
+			<div class="dialog_window">
+				<div class="dialog_logo" id="upload_dialog_logo"></div>
+				<h2 class="dialog_heading">Upload File</h2>
+				<form action="#" method="post" id="file-upload-form"
+					enctype="multipart/form-data" target="torrent_upload_frame">
+					<div class="dialog_message">
+						<label for="torrent_upload_file">Select the file:</label>
+                        <input type="file" name="torrent_files[]" id="fileUploader" multiple="multiple" />
+					</div>
+					<a href="#" id="file_upload_confirm_button">Upload</a>
+					<a href="#" id="file_upload_cancel_button">Cancel</a>
+				</form>
+			</div>
+		</div>
+
         <div class="dialog_container ui-helper-hidden" id="rename_container">
             <div class="dialog_top_bar"></div>
             <div class="dialog_window">
