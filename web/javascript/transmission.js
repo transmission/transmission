@@ -59,6 +59,10 @@ Transmission.prototype = {
         $('#turtle-button').click($.proxy(this.toggleTurtleClicked, this));
         $('#compact-button').click($.proxy(this.toggleCompactClicked, this));
 
+        $("#add-magnet-handler").click($.proxy(this.onAddMagnetHandlerClicked, this));
+        $("#remove-magnet-handler").click($.proxy(this.onRemoveMagnetHandlerClicked, this));
+        $('#open-dialog-for-magnet-handler').click($.proxy(this.toggleOpenDialogForMagnetHandler, this));
+
         // tell jQuery to copy the dataTransfer property from events over if it exists
         jQuery.event.props.push("dataTransfer");
 
@@ -107,6 +111,10 @@ Transmission.prototype = {
         this.loadDaemonPrefs(async);
         this.loadDaemonStats(async);
         this.initializeTorrents();
+
+        // Check for a new torrent provided using the url (#2404)
+        this.checkForAddTorrentInUrl();
+
         this.refreshTorrents();
         this.togglePeriodicSessionRefresh(true);
 
@@ -147,6 +155,7 @@ Transmission.prototype = {
         }
 
         this.initCompactMode();
+        this.initOpenDialogForMagnetHandler();
     },
 
     /*
@@ -1764,5 +1773,56 @@ Transmission.prototype = {
     onStatsDialogClosed: function () {
         this.hideMobileAddressbar();
         this.togglePeriodicStatsRefresh(false);
+    },
+
+    // Magnet: URI web protocol handler
+    onAddMagnetHandlerClicked: function (event) {
+        if ("registerProtocolHandler" in navigator) {
+            navigator.registerProtocolHandler("magnet", getBaseURL() + "?addtorrent=%s", "Transmission Web");
+        }
+        /* The following is not yet implemented in any browser */
+        if ("registerContentHandler" in navigator) {
+            navigator.registerContentHandler("application/x-bittorrent", getBaseURL() + "?addtorrent=%s", "Transmission Web");
+        }
+        $("#add-magnet-handler,#remove-magnet-handler").parent().toggleClass("ui-helper-hidden");
+    },
+
+    onRemoveMagnetHandlerClicked: function (event) {
+        if ("unregisterProtocolHandler" in navigator) {
+            navigator.unregisterProtocolHandler("magnet", getBaseURL() + "?addtorrent=%s");
+        }
+        /* The following is not yet implemented in any browser */
+        if ("unregisterContentHandler" in navigator) {
+            navigator.unregisterContentHandler("application/x-bittorrent", getBaseURL() + "?addtorrent=%s");
+        }        
+        $("#add-magnet-handler,#remove-magnet-handler").parent().toggleClass("ui-helper-hidden");
+    },
+
+    toggleOpenDialogForMagnetHandler: function() {
+        this.setPref(Prefs._OpenDialogForMagnetHandler, this.prefsDialog.shouldOpenDialogForMagnetHandler());
+    },
+
+    initOpenDialogForMagnetHandler: function() {
+        var openDialog = this[Prefs._OpenDialogForMagnetHandler];
+        $("#open-dialog-for-magnet-handler").prop('checked', openDialog);
+    },
+
+    checkForAddTorrentInUrl: function () {
+        var url = getURLParameter("addtorrent");
+
+        if (url /*&& url.lastIndexOf("magnet:") === 0*/) {
+            if (this.shouldOpenDialogForMagnetHandler()) {
+                // let the user confirm
+                this.uploadTorrentFile();
+                $('#torrent_upload_url').val(url);
+                $('#add-dialog-folder-input').focus();
+            } else {
+                // add torrent immediately
+                var paused = this.shouldAddedTorrentsStart();
+                this.remote.addTorrentByUrl(url, { paused: paused });
+            }
+            history.replaceState(null, "", getBaseURL());
+        }
     }
+    
 };

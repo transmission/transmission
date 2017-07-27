@@ -297,6 +297,10 @@ function PrefsDialog(remote) {
         return data.elements.root.find('#start-added-torrents')[0].checked;
     };
 
+    this.shouldOpenDialogForMagnetHandler = function() {
+        return data.elements.root.find("#open-dialog-for-magnet-handler")[0].checked;
+    };
+
     data.dialog = this;
     initialize(remote);
 };

@@ -103,6 +103,14 @@
 						<div class="row"><div class="key"><input type="checkbox" id="idle-seeding-limit-enabled"/><label for="idle-seeding-limit-enabled">Stop seeding if idle for (min):</label></div>
                                                                  <div class="value"><input type="number" min="1" max="40320" id="idle-seeding-limit"/></div></div>
 					</div>
+					<div class="prefs-section">
+						<div class="title">Magnet Protocol Handler</div>
+						<div class="row"><div class="key">Transmission:</div>
+											<div class="value"><input type="button" id="add-magnet-handler" value="Add Browser Handler"/></div>
+											<div class="value ui-helper-hidden"><input type="button" id="remove-magnet-handler" value="Remove Browser Handler"/></div>
+						</div>
+						<div class="checkbox-row"><input type="checkbox" id="open-dialog-for-magnet-handler"/><label for="open-dialog-for-magnet-handler">Open dialog to pick destination folder</label></div>
+					</div>
 				</div>
 				<div id="prefs-page-speed">
 					<div class="prefs-section">

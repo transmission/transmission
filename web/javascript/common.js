@@ -64,7 +64,7 @@ function setTextContent(e, text) {
     };
 };
 
-/*
+/**
  *   Given a numerator and denominator, return a ratio string
  */
 Math.ratio = function (numerator, denominator) {
@@ -92,12 +92,32 @@ Number.prototype.toStringWithCommas = function () {
     return this.toString().replace(/\B(?=(?:\d{3})+(?!\d))/g, ",");
 };
 
-/*
+/**
  * Trim whitespace from a string
  */
 String.prototype.trim = function () {
     return this.replace(/^\s*/, "").replace(/\s*$/, "");
 };
+
+/**
+ * Give us the base path of transmission web
+ * Used for our content / protocol handlers
+ *
+ * @returns string
+ */
+function getBaseURL() {
+    return (location.origin||(location.protocol+"//"+location.host))+location.pathname; // no query string, no hash
+}
+
+/**
+ * Extracts a single query string parameter for a given key.
+ * 
+ * @param {string} key 
+ * @returns string
+ */
+function getURLParameter(key) {
+    return decodeURIComponent(parseUri(location.href).queryKey[key]);
+}
 
 /***
  ****  Preferences
@@ -131,6 +151,7 @@ Prefs._SortByRatio = 'ratio';
 Prefs._SortByState = 'state';
 
 Prefs._CompactDisplayState = 'compact_display_state';
+Prefs._OpenDialogForMagnetHandler = 'open_dialog_for_magnet_handler';
 
 Prefs._Defaults = {
     'filter': 'all',
@@ -138,10 +159,11 @@ Prefs._Defaults = {
     'sort_direction': 'ascending',
     'sort_method': 'name',
     'turtle-state': false,
-    'compact_display_state': false
+    'compact_display_state': false,
+    'open_dialog_for_magnet_handler': true
 };
 
-/*
+/**
  * Set a preference option
  */
 Prefs.setValue = function (key, val) {
