@@ -1073,17 +1073,16 @@ Transmission.prototype = {
 				
 				var successFn = function(response)
 				{
+                    if (response.result != 'success')
+                    {
+                        alert('Error uploading the file');
+                        return;
+                    }
                     $('#toolbar-file-upload-animation').hide();
 					$('#toolbar-file-upload').show();
                     alert(response.result);
 				};
-				$.ajax({url: '../rpc', 
-					data: JSON.stringify(datos), 
-					type: 'POST', 
-					success: successFn,
-					contentType: 'json',
-					dataType: 'json',
-					processData: false });
+                remote.sendRequest(datos, successFn);
 			});
 			
 		};
