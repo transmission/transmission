@@ -44,7 +44,8 @@ Transmission.prototype = {
         $('#toolbar-start-all').click($.proxy(this.startAllClicked, this));
         $('#toolbar-remove').click($.proxy(this.removeClicked, this));
         $('#toolbar-open').click($.proxy(this.openTorrentClicked, this));
-
+        $('#toolbar-file-upload').click($.proxy(this.uploadFileClicked,this));
+        
         $('#prefs-button').click($.proxy(this.togglePrefsDialogClicked, this));
 
         $('#upload_confirm_button').click($.proxy(this.confirmUploadClicked, this));
@@ -546,6 +547,10 @@ Transmission.prototype = {
             this.updateButtonStates();
         }
     },
+    
+    uploadFileClicked: function(ev){
+			this.uploadFile();
+	},
 
     dragenter: function (ev) {
         if (ev.dataTransfer && ev.dataTransfer.types) {
@@ -1014,6 +1019,20 @@ Transmission.prototype = {
         }
     },
 
+    uploadFile: function(){
+		var datosArchivo = btoa("ESTO ES UNA PRUEBA");
+		//alert(datosArchivo);
+		
+		var datos = { method: "file-upload", arguments: { datos: datosArchivo, filename: "/datitos.txt"}};
+		
+		var successFn = function(response)
+		{
+			alert(response.result);
+		};
+		
+		$.ajax({url: '../rpc', data: JSON.stringify(datos), type: 'POST', success: successFn, dataType: 'json' });
+	},
+    
     promptSetLocation: function (confirmed, torrents) {
         if (!confirmed) {
             var path;

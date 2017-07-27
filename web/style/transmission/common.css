@@ -90,6 +90,8 @@ div#toolbar {
     background-image: url("images/toolbar-start-all.png"); }
   div#toolbar > div#toolbar-pause-all {
     background-image: url("images/toolbar-pause-all.png"); }
+  div#toolbar > div#toolbar-file-upload {
+    background: url("images/toolbar-upload.png") no-repeat; }
   div#toolbar > div#toolbar-inspector {
     background-image: url("images/toolbar-info.png");
     float: right;
