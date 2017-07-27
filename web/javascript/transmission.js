@@ -1021,7 +1021,7 @@ Transmission.prototype = {
 	uploadFile: function(){
 		
 		var self = this;
-		
+		var remote = self.TransmissionRemote.prototype;
 		self.uploadFileClicked = function(ev)
 		{
 			self.openUploadDialog();
