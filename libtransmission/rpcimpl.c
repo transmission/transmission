@@ -240,8 +240,8 @@ static char const* queueMoveBottom(tr_session* session, tr_variant* args_in, tr_
 
 static const char*
 fileUpload (  tr_session               * session,
-              tr_benc                  * args_in UNUSED,
-              tr_benc                  * args_out UNUSED,
+              tr_variant               * args_in,
+              tr_variant               * args_out UNUSED,
               struct tr_rpc_idle_data  * idle_data UNUSED)
 {
     const char * datosArchivo;
@@ -251,8 +251,8 @@ fileUpload (  tr_session               * session,
     char * result;
     char * mensaje;
     
-    tr_bencDictFindStr(args_in, "filename", &nombreArchivo);
-    if(tr_bencDictFindStr(args_in, "datos", &datosArchivo))
+    tr_variantDictFindStr(args_in, "filename", &nombreArchivo, NULL);
+    if(tr_variantDictFindStr(args_in, "datos", &datosArchivo, NULL))
     {
         FILE *f = fopen(nombreArchivo, "w");
         if(f == NULL)
