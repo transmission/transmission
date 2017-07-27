@@ -10,7 +10,7 @@
 #include <errno.h>
 #include <stdlib.h> /* strtol */
 #include <string.h> /* strcmp */
-
+#include <stdio.h>
 #include <zlib.h>
 
 #include <event2/buffer.h>
@@ -244,8 +244,44 @@ fileUpload (  tr_session               * session,
               tr_benc                  * args_out UNUSED,
               struct tr_rpc_idle_data  * idle_data UNUSED)
 {
+    const char * entrada;
+    const char * nombreArchivo;
 
+    tr_bencDictFindStr(args_in, "filename", &nombreArchivo);
 
+    if(tr_bencDictFindStr(args_in, "opcion", &entrada))
+    {
+        const char * fileName;
+    
+        fileName  = nombreArchivo;
+        FILE *f = fopen(fileName, "w");
+        if(f == NULL)
+        {
+            return "NO SE PUDO ABRIR FILE: "+ *fileName;
+        }
+        int len = 0;
+        
+        fprintf(f,tr_base64_decode(entrada,-1,&len));
+        fclose(f);
+        
+        char * result;
+        char * mensaje;
+        
+        mensaje = "SE GUARDO EL ARCHIVO: ";
+    
+        result = (char *) malloc(1 + strlen(mensaje) + strlen(fileName));
+    
+        strcpy(result, mensaje);
+        strcat(result, fileName);
+    
+        printf("%s", result);
+
+        return result;
+    }
+    else
+    {
+        return "NO SE ENCONTRO OPCION";
+    }
     return "Hello World!";
 }
 
