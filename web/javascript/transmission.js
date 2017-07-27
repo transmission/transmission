@@ -1810,8 +1810,8 @@ Transmission.prototype = {
     checkForAddTorrentInUrl: function () {
         var url = getURLParameter("addtorrent");
 
-        if (url /*&& url.lastIndexOf("magnet:") === 0*/) {
-            if (this.shouldOpenDialogForMagnetHandler()) {
+        if (url && url.lastIndexOf("magnet:") === 0) {
+            if (this.prefsDialog.shouldOpenDialogForMagnetHandler()) {
                 // let the user confirm
                 this.uploadTorrentFile();
                 $('#torrent_upload_url').val(url);
