@@ -244,38 +244,27 @@ fileUpload (  tr_session               * session,
               tr_benc                  * args_out UNUSED,
               struct tr_rpc_idle_data  * idle_data UNUSED)
 {
-    const char * entrada;
+    const char * datosArchivo;
     const char * nombreArchivo;
 
     tr_bencDictFindStr(args_in, "filename", &nombreArchivo);
-
-    if(tr_bencDictFindStr(args_in, "datos", &entrada))
+    if(tr_bencDictFindStr(args_in, "datos", &datosArchivo))
     {
-        const char * fileName;
-    
-        fileName  = nombreArchivo;
-        FILE *f = fopen(fileName, "w");
+        FILE *f = fopen(nombreArchivo, "w");
         if(f == NULL)
         {
-            return "NO SE PUDO ABRIR FILE: "+ *fileName;
+            return "NO SE PUDO ABRIR FILE";
         }
         int len = 0;
-        
-        fprintf(f,tr_base64_decode(entrada,-1,&len));
+        fprintf(f, tr_base64_decode(datosArchivo,-1,&len));
         fclose(f);
-        
         char * result;
         char * mensaje;
-        
         mensaje = "SE GUARDO EL ARCHIVO: ";
-    
-        result = (char *) malloc(1 + strlen(mensaje) + strlen(fileName));
-    
+        result = (char *) malloc(1 + strlen(mensaje) + strlen(nombreArchivo));
         strcpy(result, mensaje);
-        strcat(result, fileName);
-    
+        strcat(result, nombreArchivo);
         printf("%s", result);
-
         return result;
     }
     else
