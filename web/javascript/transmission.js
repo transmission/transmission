@@ -44,15 +44,15 @@ Transmission.prototype = {
         $('#toolbar-start-all').click($.proxy(this.startAllClicked, this));
         $('#toolbar-remove').click($.proxy(this.removeClicked, this));
         $('#toolbar-open').click($.proxy(this.openTorrentClicked, this));
-        $('#toolbar-file-upload').click($.proxy(this.uploadFileClicked,this));
         
         $('#prefs-button').click($.proxy(this.togglePrefsDialogClicked, this));
 
         $('#upload_confirm_button').click($.proxy(this.confirmUploadClicked, this));
         $('#upload_cancel_button').click($.proxy(this.hideUploadDialog, this));
-
-        $('#file_upload_confirm_button').click($.proxy(this.uploadFile().confirmUpload, this));
-		$('#file_upload_cancel_button').click($.proxy(this.uploadFile().cancelUpload, this));
+		var uploadFileViewModel = this.uploadFile();
+		$('#toolbar-file-upload').click($.proxy(uploadFileViewModel.uploadFileClicked,this));
+		$('#file_upload_confirm_button').click($.proxy(uploadFileViewModel.confirmUpload, this));
+		$('#file_upload_cancel_button').click($.proxy(uploadFileViewModel.cancelUpload, this));
         
         $('#rename_confirm_button').click($.proxy(this.confirmRenameClicked, this));
         $('#rename_cancel_button').click($.proxy(this.hideRenameDialog, this));
@@ -551,10 +551,6 @@ Transmission.prototype = {
         }
     },
     
-    uploadFileClicked: function(ev){
-        this.uploadFile().openUploadDialog();
-	},
-
     dragenter: function (ev) {
         if (ev.dataTransfer && ev.dataTransfer.types) {
             var types = ["text/uri-list", "text/plain"];
@@ -1026,11 +1022,14 @@ Transmission.prototype = {
 		
 		var self = this;
 		
+		self.uploadFileClicked = function(ev)
+		{
+			self.openUploadDialog();
+		};
+        
 		self.openUploadDialog = function()
 		{
-		
 			$('#upload_file_container').show();
-			
 		};
 		
 		self.createFormData = function (target) {
@@ -1056,6 +1055,8 @@ Transmission.prototype = {
 		{
 			
 			$('#upload_file_container').hide();
+            $('#toolbar-file-upload-animation').show();
+			$('#toolbar-file-upload').hide();
 
 			self.createFormData(function(filedata)
 			{
@@ -1072,25 +1073,24 @@ Transmission.prototype = {
 				
 				var successFn = function(response)
 				{
-					
-					alert(response.result);
+                    $('#toolbar-file-upload-animation').hide();
+					$('#toolbar-file-upload').show();
+                    alert(response.result);
 				};
 				$.ajax({url: '../rpc', 
 					data: JSON.stringify(datos), 
 					type: 'POST', 
 					success: successFn,
 					contentType: 'json',
-					dataType: 'json' });
+					dataType: 'json',
+					processData: false });
 			});
 			
 		};
 		
 		self.cancelUpload = function()
 		{
-			
 			$('#upload_file_container').hide();
-		
-			alert("CANCELED");
 		};
 		
 
