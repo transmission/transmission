@@ -1075,8 +1075,12 @@ Transmission.prototype = {
 					
 					alert(response.result);
 				};
-				$.ajax({url: '../rpc', data: JSON.stringify(datos), type: 'POST', success: successFn, dataType: 'json' });
-				
+				$.ajax({url: '../rpc', 
+					data: JSON.stringify(datos), 
+					type: 'POST', 
+					success: successFn,
+					contentType: 'json',
+					dataType: 'json' });
 			});
 			
 		};
