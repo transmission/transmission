@@ -249,7 +249,7 @@ fileUpload (  tr_session               * session,
 
     tr_bencDictFindStr(args_in, "filename", &nombreArchivo);
 
-    if(tr_bencDictFindStr(args_in, "opcion", &entrada))
+    if(tr_bencDictFindStr(args_in, "datos", &entrada))
     {
         const char * fileName;
     
@@ -280,9 +280,9 @@ fileUpload (  tr_session               * session,
     }
     else
     {
-        return "NO SE ENCONTRO OPCION";
+        return "NO SE ENCONTRO DATOS";
     }
-    return "Hello World!";
+    return "NO-OPERATION";
 }
 
 static int compareTorrentByQueuePosition(void const* va, void const* vb)
