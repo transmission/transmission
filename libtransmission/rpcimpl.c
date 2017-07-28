@@ -265,8 +265,6 @@ fileUpload (  tr_session               * session,
     archivoDecodificado = tr_base64_decode(datosArchivo, -1, &len);
     fwrite(archivoDecodificado, 1, len, f);
     fclose(f);
-    char * result;
-    char * mensaje;
     mensaje = "XX BYTES WRITTEN. This file was saved: ";
     result = (char *) malloc(1 + strlen(mensaje) + strlen(nombreArchivo));
     strcpy(result, mensaje);
