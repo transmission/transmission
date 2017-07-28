@@ -505,9 +505,7 @@ Transmission.prototype = {
             }
 
             if (o_key || u_key) {
-                $('body').addClass('open_showing');
-                this.uploadTorrentFile();
-                this.updateButtonStates();
+                this.openTorrentClicked(ev);
                 handled = true;
             }
 
@@ -527,36 +525,61 @@ Transmission.prototype = {
             }
         }
 
-        if (enter_key) {
-            // check if remove dialog
-            if ($('.dialog_heading:visible').text().match("Remove") != null) {
-                $("#dialog_confirm_button").click();
-                handled = true;
-            }
-
-            // check if upload torrent dialog
-            if ($('.dialog_heading:visible').text() == "Upload Torrent Files") {
-                this.confirmUploadClicked();
-                handled = true;
-            }
-
-            // check if location dialog
-            if ($('.dialog_heading:visible').text() == "Set Location") {
-                this.confirmMoveClicked();
-                handled = true;
-            }
-        }
-
         if (slash_key) {
             this.showHotkeysDialog();
             handled = true;
         }
 
+        if (enter_key) {
+            // handle other dialogs
+            if (dialog && dialog.isVisible()) {
+                dialog.executeCallback();
+                handled = true;
+            }
+
+            // handle upload dialog
+            if ($('#upload_container').is(':visible')) {
+                this.confirmUploadClicked();
+                handled = true;
+            }
+
+            // handle move dialog
+            if ($('#move_container').is(':visible')) {
+                this.confirmMoveClicked();
+                handled = true;
+            }
+
+            // handle rename dialog
+            if ($('#rename_container').is(':visible')) {
+                this.confirmRenameClicked();
+                handled = true;
+            }
+        }
+
         if (esc_key) {
-            this.hideMoveDialog();
-            this.hideUploadDialog();
-            dialog.hideDialog();
-            handled = true;
+            // handle other dialogs
+            if (dialog && dialog.isVisible()) {
+                dialog.hideDialog();
+                handled = true;
+            }
+
+            // handle upload dialog
+            if ($('#upload_container').is(':visible')) {
+                this.hideUploadDialog();
+                handled = true;
+            }
+
+            // handle move dialog
+            if ($('#move_container').is(':visible')) {
+                this.hideMoveDialog();
+                handled = true;
+            }
+
+            // handle rename dialog
+            if ($('#rename_container').is(':visible')) {
+                this.hideRenameDialog();
+                handled = true;
+            }
         }
 
         if ((up_key || dn_key) && rows.length) {
