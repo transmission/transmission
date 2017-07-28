@@ -399,7 +399,8 @@ static struct tr_key_struct const my_static[] =
     { "watch-dir", 9 },
     { "watch-dir-enabled", 17 },
     { "webseeds", 8 },
-    { "webseedsSendingToUs", 19 }
+    { "webseedsSendingToUs", 19 },
+    { "datos", 5 }
 };
 
 static int compareKeys(void const* va, void const* vb)

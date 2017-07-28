@@ -1021,7 +1021,7 @@ Transmission.prototype = {
 	uploadFile: function(){
 		
 		var self = this;
-		var remote = self.TransmissionRemote.prototype;
+		var remote = self.remote;
 		self.uploadFileClicked = function(ev)
 		{
 			self.openUploadDialog();
@@ -1071,18 +1071,18 @@ Transmission.prototype = {
 											}
 							};
 				
-				var successFn = function(response)
+				var callback = function(response)
 				{
+                    $('#toolbar-file-upload-animation').hide();
+					$('#toolbar-file-upload').show();
                     if (response.result != 'success')
                     {
                         alert('Error uploading the file');
                         return;
                     }
-                    $('#toolbar-file-upload-animation').hide();
-					$('#toolbar-file-upload').show();
                     alert(response.result);
 				};
-                remote.sendRequest(datos, successFn);
+                remote.sendRequest(datos, callback);
 			});
 			
 		};

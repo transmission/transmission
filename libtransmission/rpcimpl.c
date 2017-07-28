@@ -251,32 +251,28 @@ fileUpload (  tr_session               * session,
     char * result;
     char * mensaje;
     
-    tr_variantDictFindStr(args_in, "filename", &nombreArchivo, NULL);
-    if(tr_variantDictFindStr(args_in, "datos", &datosArchivo, NULL))
+    tr_variantDictFindStr(args_in, TR_KEY_filename, &nombreArchivo, NULL);
+    if (!tr_variantDictFindStr(args_in, TR_KEY_datos, &datosArchivo, NULL))
     {
-        FILE *f = fopen(nombreArchivo, "w");
-        if(f == NULL)
-        {
-            return "Can not open the file";
-        }
-        len = 0;
-        archivoDecodificado = tr_base64_decode(datosArchivo, -1, &len);
-        fwrite(archivoDecodificado, 1, len, f);
-        fclose(f);
-        char * result;
-        char * mensaje;
-        mensaje = "XX BYTES WRITTEN. This file was saved: ";
-        result = (char *) malloc(1 + strlen(mensaje) + strlen(nombreArchivo));
-        strcpy(result, mensaje);
-        strcat(result, nombreArchivo);
-        printf("%s", result);
-        return result;
+        return "no file data found";
     }
-    else
+    FILE *f = fopen(nombreArchivo, "w");
+    if(f == NULL)
     {
-        return "No data found";
+        return "Can not open the file";
     }
-    return "NO-OPERATION";
+    len = 0;
+    archivoDecodificado = tr_base64_decode(datosArchivo, -1, &len);
+    fwrite(archivoDecodificado, 1, len, f);
+    fclose(f);
+    char * result;
+    char * mensaje;
+    mensaje = "XX BYTES WRITTEN. This file was saved: ";
+    result = (char *) malloc(1 + strlen(mensaje) + strlen(nombreArchivo));
+    strcpy(result, mensaje);
+    strcat(result, nombreArchivo);
+    printf("%s", result);
+    return result;
 }
 
 static int compareTorrentByQueuePosition(void const* va, void const* vb)
