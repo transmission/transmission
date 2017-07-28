@@ -455,11 +455,111 @@ Transmission.prototype = {
     keyDown: function (ev) {
         var handled = false;
         var rows = this._rows;
-        var up = ev.keyCode === 38; // up key pressed
-        var dn = ev.keyCode === 40; // down key pressed
-        var shift = ev.keyCode === 16; // shift key pressed
+        var up_key = ev.keyCode === 38; // up key pressed
+        var dn_key = ev.keyCode === 40; // down key pressed
+        var a_key = ev.keyCode === 65; // a key pressed
+        var c_key = ev.keyCode === 67; // c key pressed
+        var d_key = ev.keyCode === 68; // d key pressed
+        var m_key = ev.keyCode === 77; // m key pressed
+        var o_key = ev.keyCode === 79; // o key pressed
+        var p_key = ev.keyCode === 80; // p key pressed
+        var r_key = ev.keyCode === 82; // r key pressed
+        var t_key = ev.keyCode === 84; // t key pressed
+        var u_key = ev.keyCode === 85; // u key pressed
+        var shift_key = ev.keyCode === 16; // shift key pressed
+        var slash_key = ev.keyCode === 191; // slash (/) key pressed
+        var backspace_key = ev.keyCode === 8; // backspace key pressed
+        var del_key = ev.keyCode === 46; // delete key pressed
+        var enter_key = ev.keyCode === 13; // enter key pressed
+        var esc_key = ev.keyCode === 27; // esc key pressed
+        var comma_key = ev.keyCode === 188; // comma key pressed
 
-        if ((up || dn) && rows.length) {
+        if ($('.dialog_heading:visible').length == 0) {
+            if (comma_key) {
+                this.togglePrefsDialogClicked();
+                handled = true;
+            }
+
+            if (a_key) {
+                if (ev.shiftKey) {
+                    this.deselectAll();
+                } else {
+                    this.selectAll();
+                }
+                handled = true;
+            }
+
+            if (c_key) {
+                this.toggleCompactClicked();
+                handled = true;
+            }
+
+            if ((backspace_key || del_key || d_key) && rows.length) {
+                this.removeSelectedTorrents();
+                handled = true;
+            }
+
+            if (m_key) {
+                this.moveSelectedTorrents()
+                handled = true;
+            }
+
+            if (o_key || u_key) {
+                $('body').addClass('open_showing');
+                this.uploadTorrentFile();
+                this.updateButtonStates();
+                handled = true;
+            }
+
+            if (p_key) {
+                this.stopSelectedTorrents();
+                handled = true;
+            }
+
+            if (r_key) {
+                this.startSelectedTorrents();
+                handled = true;
+            }
+
+            if (t_key) {
+                this.toggleTurtleClicked();
+                handled = true;
+            }
+        }
+
+        if (enter_key) {
+            // check if remove dialog
+            if ($('.dialog_heading:visible').text().match("Remove") != null) {
+                $("#dialog_confirm_button").click();
+                handled = true;
+            }
+
+            // check if upload torrent dialog
+            if ($('.dialog_heading:visible').text() == "Upload Torrent Files") {
+                this.confirmUploadClicked();
+                handled = true;
+            }
+
+            // check if location dialog
+            if ($('.dialog_heading:visible').text() == "Set Location") {
+                this.confirmMoveClicked();
+                handled = true;
+            }
+        }
+
+        if (slash_key) {
+            this.showHotkeysDialog();
+            handled = true;
+        }
+
+        if (esc_key) {
+            this.hideMoveDialog();
+            this.hideUploadDialog();
+            dialog.hideDialog();
+            handled = true;
+        }
+
+        if ((up_key || dn_key) && rows.length) {
             var last = this.indexOfLastTorrent(),
                 i = last,
                 anchor = this._shift_index,
@@ -467,9 +567,9 @@ Transmission.prototype = {
                 min = 0,
                 max = rows.length - 1;
 
-            if (dn && (i + 1 <= max)) {
+            if (dn_key && (i + 1 <= max)) {
                 ++i;
-            } else if (up && (i - 1 >= min)) {
+            } else if (up_key && (i - 1 >= min)) {
                 --i;
             };
 
@@ -493,7 +593,7 @@ Transmission.prototype = {
             this._last_torrent_clicked = r.getTorrentId();
             this.scrollToRow(r);
             handled = true;
-        } else if (shift) {
+        } else if (shift_key) {
             this._shift_index = this.indexOfLastTorrent();
         }
 
@@ -720,6 +820,10 @@ Transmission.prototype = {
             switch (id) {
             case 'statistics':
                 this.showStatsDialog();
+                break;
+
+            case 'hotkeys':
+                this.showHotkeysDialog();
                 break;
 
             case 'about-button':
@@ -1764,5 +1868,18 @@ Transmission.prototype = {
     onStatsDialogClosed: function () {
         this.hideMobileAddressbar();
         this.togglePeriodicStatsRefresh(false);
+    },
+
+    /***
+     ****
+     ****  Hotkeys
+     ****
+     ***/
+    showHotkeysDialog: function () {
+        $('#hotkeys-dialog').dialog({
+            title: 'Hotkeys',
+            show: 'fade',
+            hide: 'fade'
+        });
     }
 };
