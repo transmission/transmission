@@ -43,7 +43,7 @@
 
         fStatus = PORT_STATUS_CHECKING;
 
-        fTimer = [[NSTimer scheduledTimerWithTimeInterval: CHECK_FIRE target: self selector: @selector(startProbe:) userInfo: @(portNumber) repeats: NO] retain];
+        fTimer = [NSTimer scheduledTimerWithTimeInterval: CHECK_FIRE target: self selector: @selector(startProbe:) userInfo: @(portNumber) repeats: NO];
         if (!delay)
             [fTimer fire];
     }
@@ -54,11 +54,7 @@
 - (void) dealloc
 {
     [fTimer invalidate];
-    [fTimer release];
 
-    [fConnection release];
-    [fPortProbeData release];
-    [super dealloc];
 }
 
 - (port_status_t) status
@@ -69,7 +65,6 @@
 - (void) cancelProbe
 {
     [fTimer invalidate];
-    [fTimer release];
     fTimer = nil;
 
     [fConnection cancel];
@@ -94,7 +89,6 @@
 - (void) connectionDidFinishLoading: (NSURLConnection *) connection
 {
     NSString * probeString = [[NSString alloc] initWithData: fPortProbeData encoding: NSUTF8StringEncoding];
-    [fPortProbeData release];
     fPortProbeData = nil;
 
     if (probeString)
@@ -108,7 +102,6 @@
             NSLog(@"Unable to get port status: invalid response (%@)", probeString);
             [self callBackWithStatus: PORT_STATUS_ERROR];
         }
-        [probeString release];
     }
     else
     {
@@ -123,7 +116,6 @@
 
 - (void) startProbe: (NSTimer *) timer
 {
-    [fTimer release];
     fTimer = nil;
 
     NSURLRequest * portProbeRequest = [NSURLRequest requestWithURL: [NSURL URLWithString: CHECKER_URL([[timer userInfo] integerValue])]

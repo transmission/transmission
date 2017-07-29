@@ -117,7 +117,7 @@ extern NSString * VDKQueueAccessRevocationNotification;
 
 @interface VDKQueue : NSObject
 {
-    id<VDKQueueDelegate>    _delegate;
+    id<VDKQueueDelegate>    __weak _delegate;
     BOOL                    _alwaysPostNotifications;               // By default, notifications are posted only if there is no delegate set. Set this value to YES to have notes posted even when there is a delegate.
     
 @private
@@ -144,7 +144,7 @@ extern NSString * VDKQueueAccessRevocationNotification;
 
 
 
-@property (assign) id<VDKQueueDelegate> delegate;
+@property (weak) id<VDKQueueDelegate> delegate;
 @property (assign) BOOL alwaysPostNotifications;
 
 @end

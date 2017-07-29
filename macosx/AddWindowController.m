@@ -58,12 +58,12 @@
     if ((self = [super initWithWindowNibName: @"AddWindow"]))
     {
         fTorrent = torrent;
-        fDestination = [[path stringByExpandingTildeInPath] retain];
+        fDestination = [path stringByExpandingTildeInPath];
         fLockDestination = lockDestination;
 
         fController = controller;
 
-        fTorrentFile = [[torrentFile stringByExpandingTildeInPath] retain];
+        fTorrentFile = [torrentFile stringByExpandingTildeInPath];
 
         fDeleteTorrentEnableInitially = deleteTorrent;
         fCanToggleDelete = canToggleDelete;
@@ -134,8 +134,8 @@
         [fLocationImageView setImage: nil];
     }
 
-    fTimer = [[NSTimer scheduledTimerWithTimeInterval: UPDATE_SECONDS target: self
-                selector: @selector(updateFiles) userInfo: nil repeats: YES] retain];
+    fTimer = [NSTimer scheduledTimerWithTimeInterval: UPDATE_SECONDS target: self
+                selector: @selector(updateFiles) userInfo: nil repeats: YES];
     [self updateFiles];
 }
 
@@ -151,12 +151,8 @@
     [[NSNotificationCenter defaultCenter] removeObserver: self];
 
     [fTimer invalidate];
-    [fTimer release];
 
-    [fDestination release];
-    [fTorrentFile release];
 
-    [super dealloc];
 }
 
 - (Torrent *) torrent
@@ -222,7 +218,6 @@
 - (BOOL) windowShouldClose: (id) window
 {
     [fTimer invalidate];
-    [fTimer release];
     fTimer = nil;
 
     [fFileController setTorrent: nil]; //avoid a crash when window tries to update
@@ -337,7 +332,6 @@
 - (void) confirmAdd
 {
     [fTimer invalidate];
-    [fTimer release];
     fTimer = nil;
     [fTorrent setGroupValue: fGroupValue  determinationType: fGroupValueDetermination];
 
@@ -350,7 +344,7 @@
     [fFileController setTorrent: nil]; //avoid a crash when window tries to update
 
     [self close];
-    [fController askOpenConfirmed: self add: YES]; //ensure last, since it releases this controller
+    [fController askOpenConfirmed: self add: YES];
 }
 
 - (void) setDestinationPath: (NSString *) destination determinationType: (TorrentDeterminationType) determinationType
@@ -358,8 +352,7 @@
     destination = [destination stringByExpandingTildeInPath];
     if (!fDestination || ![fDestination isEqualToString: destination])
     {
-        [fDestination release];
-        fDestination = [destination retain];
+        fDestination = destination;
 
         [fTorrent changeDownloadFolderBeforeUsing: fDestination determinationType: determinationType];
     }
@@ -369,7 +362,6 @@
 
     ExpandedPathToIconTransformer * iconTransformer = [[ExpandedPathToIconTransformer alloc] init];
     [fLocationImageView setImage: [iconTransformer transformedValue: fDestination]];
-    [iconTransformer release];
 }
 
 - (void) setGroupsMenu
@@ -399,7 +391,6 @@
     if ([[alert suppressionButton] state] == NSOnState)
         [[NSUserDefaults standardUserDefaults] setBool: NO forKey: @"WarningFolderDataSameName"];
 
-    [alert release];
 
     if (returnCode == NSAlertSecondButtonReturn)
         [self performSelectorOnMainThread: @selector(confirmAdd) withObject: nil waitUntilDone: NO];

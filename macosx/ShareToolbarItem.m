@@ -25,7 +25,6 @@
         }
 
         [menuItem setSubmenu:servicesMenu];
-        [servicesMenu release]; // can't believe we're not using ARC yet!
     }
 
     return menuItem;

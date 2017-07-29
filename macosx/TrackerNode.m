@@ -48,7 +48,7 @@
 - (id) copyWithZone: (NSZone *) zone
 {
     //this object is essentially immutable after initial setup
-    return [self retain];
+    return self;
 }
 
 - (BOOL) isEqual: (id) object
@@ -111,7 +111,6 @@
         [dateFormatter setDoesRelativeDateFormatting: YES];
 
         dateString = [dateFormatter stringFromDate: [NSDate dateWithTimeIntervalSince1970: fStat.lastAnnounceTime]];
-        [dateFormatter release];
     }
     else
         dateString = NSLocalizedString(@"N/A", "Tracker last announce");
@@ -201,7 +200,6 @@
         [dateFormatter setDoesRelativeDateFormatting: YES];
 
         dateString = [dateFormatter stringFromDate: [NSDate dateWithTimeIntervalSince1970: fStat.lastScrapeTime]];
-        [dateFormatter release];
     }
     else
         dateString = NSLocalizedString(@"N/A", "Tracker last scrape");

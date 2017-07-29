@@ -35,7 +35,6 @@
 
         BadgeView * view = [[BadgeView alloc] initWithLib: lib];
         [[NSApp dockTile] setContentView: view];
-        [view release];
 
         fHashes = [[NSMutableSet alloc] init];
     }
@@ -43,11 +42,6 @@
     return self;
 }
 
-- (void) dealloc
-{
-    [fHashes release];
-    [super dealloc];
-}
 
 - (void) updateBadgeWithDownload: (CGFloat) downloadRate upload: (CGFloat) uploadRate
 {

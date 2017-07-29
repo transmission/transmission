@@ -86,16 +86,10 @@
 {
     [[NSNotificationCenter defaultCenter] removeObserver: self];
 
-    [fCollapsedGroups release];
 
-    [fPiecesBarAnimation release];
-    [fMenuTorrent release];
 
-    [fSelectedValues release];
 
-    [fTorrentCell release];
 
-    [super dealloc];
 }
 
 - (void) awakeFromNib
@@ -388,11 +382,10 @@
 
     //if pushing a button, don't change the selected rows
     if (pushed)
-        fSelectedValues = [[self selectedValues] retain];
+        fSelectedValues = [self selectedValues];
 
     [super mouseDown: event];
 
-    [fSelectedValues release];
     fSelectedValues = nil;
 
     //avoid weird behavior when showing menu by doing this after mouse down
@@ -537,7 +530,7 @@
         if (items)
         {
             NSDataDetector * detector = [NSDataDetector dataDetectorWithTypes: NSTextCheckingTypeLink error: nil];
-            for (NSString * pbItem in items)
+            for (__strong NSString * pbItem in items)
             {
                 pbItem = [pbItem stringByTrimmingCharactersInSet: [NSCharacterSet whitespaceAndNewlineCharacterSet]];
                 if ([pbItem rangeOfString: @"magnet:" options: (NSAnchoredSearch | NSCaseInsensitiveSearch)].location != NSNotFound)
@@ -566,7 +559,7 @@
         if (items)
         {
             NSDataDetector * detector = [NSDataDetector dataDetectorWithTypes: NSTextCheckingTypeLink error: nil];
-            for (NSString * pbItem in items)
+            for (__strong NSString * pbItem in items)
             {
                 pbItem = [pbItem stringByTrimmingCharactersInSet: [NSCharacterSet whitespaceAndNewlineCharacterSet]];
                 if (([pbItem rangeOfString: @"magnet:" options: (NSAnchoredSearch | NSCaseInsensitiveSearch)].location != NSNotFound)
@@ -619,8 +612,6 @@
     [infoViewController setInfoForTorrents: @[torrent]];
     [infoViewController updateInfo];
 
-    [infoViewController release];
-    [popover release];
 }
 
 //don't show multiple popovers when clicking the gear button repeatedly
@@ -657,7 +648,6 @@
                 [item setTarget: self];
                 [item setRepresentedObject: @(speedLimitActionValue[i])];
                 [menu addItem: item];
-                [item release];
             }
         }
 
@@ -686,7 +676,6 @@
                 [item setTarget: self];
                 [item setRepresentedObject: @(ratioLimitActionValue[i])];
                 [menu addItem: item];
-                [item release];
             }
         }
 
@@ -805,7 +794,6 @@
         [progressMarks addObject: @(i)];
 
     //this stops a previous animation
-    [fPiecesBarAnimation release];
     fPiecesBarAnimation = [[NSAnimation alloc] initWithDuration: TOGGLE_PROGRESS_SECONDS animationCurve: NSAnimationEaseIn];
     [fPiecesBarAnimation setAnimationBlockingMode: NSAnimationNonblocking];
     [fPiecesBarAnimation setProgressMarks: progressMarks];
@@ -818,7 +806,6 @@
 {
     if (animation == fPiecesBarAnimation)
     {
-        [fPiecesBarAnimation release];
         fPiecesBarAnimation = nil;
     }
 }

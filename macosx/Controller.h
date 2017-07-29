@@ -174,7 +174,7 @@ typedef enum
 
 - (NSArray *)selectedTorrents;
 
-@property (retain, readonly) PrefsController * prefsController;
+@property (nonatomic, readonly) PrefsController * prefsController;
 - (void) showPreferenceWindow: (id) sender;
 
 - (void) showAboutWindow: (id) sender;
@@ -183,7 +183,7 @@ typedef enum
 - (void) resetInfo;
 - (void) setInfoTab: (id) sender;
 
-@property (retain, readonly) MessageWindowController * messageWindowController;
+@property (nonatomic, readonly) MessageWindowController * messageWindowController;
 - (void) showMessageWindow: (id) sender;
 - (void) showStatsWindow: (id) sender;
 
@@ -226,7 +226,7 @@ typedef enum
 
 - (void) sleepCallback: (natural_t) messageType argument: (void *) messageArgument;
 
-@property (retain, readonly) VDKQueue * fileWatcherQueue;
+@property (nonatomic, readonly) VDKQueue * fileWatcherQueue;
 
 - (void) torrentTableViewSelectionDidChange: (NSNotification *) notification;
 
