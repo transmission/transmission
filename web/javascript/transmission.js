@@ -856,74 +856,74 @@ Transmission.prototype = {
             remote.savePrefs(o);
         } else {
             switch (id) {
-                case 'statistics':
-                    this.showStatsDialog();
-                    break;
+            case 'statistics':
+                this.showStatsDialog();
+                break;
 
-                case 'hotkeys':
-                    this.showHotkeysDialog();
-                    break;
+            case 'hotkeys':
+                this.showHotkeysDialog();
+                break;
 
-                case 'about-button':
-                    o = 'Transmission ' + this.serverVersion;
-                    $('#about-dialog #about-title').html(o);
-                    $('#about-dialog').dialog({
-                        title: 'About',
-                        show: 'fade',
-                        hide: 'fade'
-                    });
-                    break;
+            case 'about-button':
+                o = 'Transmission ' + this.serverVersion;
+                $('#about-dialog #about-title').html(o);
+                $('#about-dialog').dialog({
+                    title: 'About',
+                    show: 'fade',
+                    hide: 'fade'
+                });
+                break;
 
-                case 'homepage':
-                    window.open('https://transmissionbt.com/');
-                    break;
+            case 'homepage':
+                window.open('https://transmissionbt.com/');
+                break;
 
-                case 'tipjar':
-                    window.open('https://transmissionbt.com/donate/');
-                    break;
+            case 'tipjar':
+                window.open('https://transmissionbt.com/donate/');
+                break;
 
-                case 'unlimited_download_rate':
-                    o = {};
-                    o[RPC._DownSpeedLimited] = false;
-                    remote.savePrefs(o);
-                    break;
+            case 'unlimited_download_rate':
+                o = {};
+                o[RPC._DownSpeedLimited] = false;
+                remote.savePrefs(o);
+                break;
 
-                case 'limited_download_rate':
-                    o = {};
-                    o[RPC._DownSpeedLimited] = true;
-                    remote.savePrefs(o);
-                    break;
+            case 'limited_download_rate':
+                o = {};
+                o[RPC._DownSpeedLimited] = true;
+                remote.savePrefs(o);
+                break;
 
-                case 'unlimited_upload_rate':
-                    o = {};
-                    o[RPC._UpSpeedLimited] = false;
-                    remote.savePrefs(o);
-                    break;
+            case 'unlimited_upload_rate':
+                o = {};
+                o[RPC._UpSpeedLimited] = false;
+                remote.savePrefs(o);
+                break;
 
-                case 'limited_upload_rate':
-                    o = {};
-                    o[RPC._UpSpeedLimited] = true;
-                    remote.savePrefs(o);
-                    break;
+            case 'limited_upload_rate':
+                o = {};
+                o[RPC._UpSpeedLimited] = true;
+                remote.savePrefs(o);
+                break;
 
-                case 'reverse_sort_order':
-                    if (element.menuItemIsSelected()) {
-                        dir = Prefs._SortAscending;
-                        element.deselectMenuItem();
-                    } else {
-                        dir = Prefs._SortDescending;
-                        element.selectMenuItem();
-                    }
-                    this.setSortDirection(dir);
-                    break;
+            case 'reverse_sort_order':
+                if (element.menuItemIsSelected()) {
+                    dir = Prefs._SortAscending;
+                    element.deselectMenuItem();
+                } else {
+                    dir = Prefs._SortDescending;
+                    element.selectMenuItem();
+                }
+                this.setSortDirection(dir);
+                break;
 
-                case 'toggle_notifications':
-                    Notifications && Notifications.toggle();
-                    break;
+            case 'toggle_notifications':
+                Notifications && Notifications.toggle();
+                break;
 
-                default:
-                    console.log('unhandled: ' + id);
-                    break;
+            default:
+                console.log('unhandled: ' + id);
+                break;
             };
         };
     },
