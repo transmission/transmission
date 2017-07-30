@@ -455,46 +455,184 @@ Transmission.prototype = {
     keyDown: function (ev) {
         var handled = false;
         var rows = this._rows;
-        var up = ev.keyCode === 38; // up key pressed
-        var dn = ev.keyCode === 40; // down key pressed
-        var shift = ev.keyCode === 16; // shift key pressed
+        var isInputFocused = $(ev.target).is('input');
+        var isDialogVisible = ($('.dialog_heading:visible').length > 0 || $('.ui-dialog:visible').length > 0);
 
-        if ((up || dn) && rows.length) {
-            var last = this.indexOfLastTorrent(),
-                i = last,
-                anchor = this._shift_index,
-                r,
-                min = 0,
-                max = rows.length - 1;
+        // hotkeys
+        var up_key = ev.keyCode === 38; // up key pressed
+        var dn_key = ev.keyCode === 40; // down key pressed
+        var a_key = ev.keyCode === 65; // a key pressed
+        var c_key = ev.keyCode === 67; // c key pressed
+        var d_key = ev.keyCode === 68; // d key pressed
+        var i_key = ev.keyCode === 73; // i key pressed
+        var l_key = ev.keyCode === 76; // l key pressed
+        var m_key = ev.keyCode === 77; // m key pressed
+        var o_key = ev.keyCode === 79; // o key pressed
+        var p_key = ev.keyCode === 80; // p key pressed
+        var r_key = ev.keyCode === 82; // r key pressed
+        var t_key = ev.keyCode === 84; // t key pressed
+        var u_key = ev.keyCode === 85; // u key pressed
+        var shift_key = ev.keyCode === 16; // shift key pressed
+        var slash_key = ev.keyCode === 191; // slash (/) key pressed
+        var backspace_key = ev.keyCode === 8; // backspace key pressed
+        var del_key = ev.keyCode === 46; // delete key pressed
+        var enter_key = ev.keyCode === 13; // enter key pressed
+        var esc_key = ev.keyCode === 27; // esc key pressed
+        var comma_key = ev.keyCode === 188; // comma key pressed
 
-            if (dn && (i + 1 <= max)) {
-                ++i;
-            } else if (up && (i - 1 >= min)) {
-                --i;
-            };
-
-            var r = rows[i];
-
-            if (anchor >= 0) {
-                // user is extending the selection
-                // with the shift + arrow keys...
-                if (((anchor <= last) && (last < i)) || ((anchor >= last) && (last > i))) {
-                    this.selectRow(r);
-                } else if (((anchor >= last) && (i > last)) || ((anchor <= last) && (last > i))) {
-                    this.deselectRow(rows[last]);
-                }
-            } else {
-                if (ev.shiftKey) {
-                    this.selectRange(r);
-                } else {
-                    this.setSelectedRow(r);
-                };
+        if (enter_key) {
+            // handle other dialogs
+            if (dialog && dialog.isVisible()) {
+                dialog.executeCallback();
+                handled = true;
             }
-            this._last_torrent_clicked = r.getTorrentId();
-            this.scrollToRow(r);
-            handled = true;
-        } else if (shift) {
-            this._shift_index = this.indexOfLastTorrent();
+
+            // handle upload dialog
+            if ($('#upload_container').is(':visible')) {
+                this.confirmUploadClicked();
+                handled = true;
+            }
+
+            // handle move dialog
+            if ($('#move_container').is(':visible')) {
+                this.confirmMoveClicked();
+                handled = true;
+            }
+
+            // handle rename dialog
+            if ($('#rename_container').is(':visible')) {
+                this.confirmRenameClicked();
+                handled = true;
+            }
+        }
+
+        if (esc_key) {
+            // handle other dialogs
+            if (dialog && dialog.isVisible()) {
+                dialog.hideDialog();
+                handled = true;
+            }
+
+            // handle upload dialog
+            if ($('#upload_container').is(':visible')) {
+                this.hideUploadDialog();
+                handled = true;
+            }
+
+            // handle move dialog
+            if ($('#move_container').is(':visible')) {
+                this.hideMoveDialog();
+                handled = true;
+            }
+
+            // handle rename dialog
+            if ($('#rename_container').is(':visible')) {
+                this.hideRenameDialog();
+                handled = true;
+            }
+        }
+
+        // Some hotkeys can only be used if the following conditions are met:
+        // 1. when no input fields are focused
+        // 2. when no other dialogs are visible
+        // 3. when the meta or ctrl key isn't pressed (i.e. opening dev tools shouldn't trigger the info panel)
+        if (!isInputFocused && !isDialogVisible && !ev.metaKey && !ev.ctrlKey) {
+            if (comma_key) {
+                this.togglePrefsDialogClicked();
+                handled = true;
+            }
+
+            if (slash_key) {
+                this.showHotkeysDialog();
+                handled = true;
+            }
+
+            if (a_key) {
+                if (ev.shiftKey) {
+                    this.deselectAll();
+                } else {
+                    this.selectAll();
+                }
+                handled = true;
+            }
+
+            if (c_key) {
+                this.toggleCompactClicked();
+                handled = true;
+            }
+
+            if ((backspace_key || del_key || d_key) && rows.length) {
+                this.removeSelectedTorrents();
+                handled = true;
+            }
+
+            if (i_key) {
+                this.toggleInspector();
+                handled = true;
+            }
+
+            if (m_key || l_key) {
+                this.moveSelectedTorrents()
+                handled = true;
+            }
+
+            if (o_key || u_key) {
+                this.openTorrentClicked(ev);
+                handled = true;
+            }
+
+            if (p_key) {
+                this.stopSelectedTorrents();
+                handled = true;
+            }
+
+            if (r_key) {
+                this.startSelectedTorrents();
+                handled = true;
+            }
+
+            if (t_key) {
+                this.toggleTurtleClicked();
+                handled = true;
+            }
+
+            if ((up_key || dn_key) && rows.length) {
+                var last = this.indexOfLastTorrent(),
+                    i = last,
+                    anchor = this._shift_index,
+                    r,
+                    min = 0,
+                    max = rows.length - 1;
+
+                if (dn_key && (i + 1 <= max)) {
+                    ++i;
+                } else if (up_key && (i - 1 >= min)) {
+                    --i;
+                };
+
+                var r = rows[i];
+
+                if (anchor >= 0) {
+                    // user is extending the selection
+                    // with the shift + arrow keys...
+                    if (((anchor <= last) && (last < i)) || ((anchor >= last) && (last > i))) {
+                        this.selectRow(r);
+                    } else if (((anchor >= last) && (i > last)) || ((anchor <= last) && (last > i))) {
+                        this.deselectRow(rows[last]);
+                    }
+                } else {
+                    if (ev.shiftKey) {
+                        this.selectRange(r);
+                    } else {
+                        this.setSelectedRow(r);
+                    };
+                }
+                this._last_torrent_clicked = r.getTorrentId();
+                this.scrollToRow(r);
+                handled = true;
+            } else if (shift_key) {
+                this._shift_index = this.indexOfLastTorrent();
+            }
         }
 
         return !handled;
@@ -720,6 +858,10 @@ Transmission.prototype = {
             switch (id) {
             case 'statistics':
                 this.showStatsDialog();
+                break;
+
+            case 'hotkeys':
+                this.showHotkeysDialog();
                 break;
 
             case 'about-button':
@@ -1764,5 +1906,18 @@ Transmission.prototype = {
     onStatsDialogClosed: function () {
         this.hideMobileAddressbar();
         this.togglePeriodicStatsRefresh(false);
+    },
+
+    /***
+     ****
+     ****  Hotkeys
+     ****
+     ***/
+    showHotkeysDialog: function () {
+        $('#hotkeys-dialog').dialog({
+            title: 'Hotkeys',
+            show: 'fade',
+            hide: 'fade'
+        });
     }
 };

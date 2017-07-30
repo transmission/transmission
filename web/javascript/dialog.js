@@ -41,6 +41,11 @@ Dialog.prototype = {
      *
      *--------------------------------------------*/
 
+    executeCallback: function () {
+        this._callback();
+        dialog.hideDialog();
+    },
+
     hideDialog: function () {
         $('body.dialog_showing').removeClass('dialog_showing');
         this._container.hide();
@@ -48,14 +53,16 @@ Dialog.prototype = {
         transmission.updateButtonStates();
     },
 
+    isVisible: function () {
+        return this._container.is(':visible');
+    },
+
     onCancelClicked: function (event) {
         event.data.dialog.hideDialog();
     },
 
     onConfirmClicked: function (event) {
-        var dialog = event.data.dialog;
-        dialog._callback();
-        dialog.hideDialog();
+        event.data.dialog.executeCallback();
     },
 
     /*--------------------------------------------
