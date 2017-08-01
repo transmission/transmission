@@ -151,9 +151,6 @@
     {
         [fPortChecker cancelProbe];
     }
-
-
-
 }
 
 - (void) awakeFromNib

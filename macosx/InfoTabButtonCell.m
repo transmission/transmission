@@ -39,7 +39,6 @@
 - (void) dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver: self];
-
 }
 
 - (void) setControlView: (NSView *) controlView

@@ -151,8 +151,6 @@
     [[NSNotificationCenter defaultCenter] removeObserver: self];
 
     [fTimer invalidate];
-
-
 }
 
 - (Torrent *) torrent

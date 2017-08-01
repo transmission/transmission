@@ -139,11 +139,7 @@
 - (void) dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver: self];
-
     [fTimer invalidate];
-
-
-
 }
 
 - (void) windowDidBecomeKey: (NSNotification *) notification

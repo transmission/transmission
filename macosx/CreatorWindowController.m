@@ -197,13 +197,10 @@ NSMutableSet *creatorWindowControllerSet = nil;
 
 - (void) dealloc
 {
-
-
     if (fInfo)
         tr_metaInfoBuilderFree(fInfo);
 
     [fTimer invalidate];
-
 }
 
 + (void) restoreWindowWithIdentifier: (NSString *) identifier state: (NSCoder *) state completionHandler: (void (^)(NSWindow *, NSError *)) completionHandler

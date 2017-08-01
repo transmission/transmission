@@ -139,9 +139,6 @@ typedef enum
 
     if ([fViewController respondsToSelector: @selector(saveViewSize)])
         [fViewController saveViewSize];
-
-
-
 }
 
 - (void) setInfoForTorrents: (NSArray *) torrents

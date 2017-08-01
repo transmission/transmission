@@ -145,7 +145,6 @@ NSString * VDKQueueAccessRevocationNotification = @"VDKQueueAccessWasRevokedNoti
     [self removeAllPaths];
     
     _watchedPathEntries = nil;
-    
 }
 
 

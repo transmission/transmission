@@ -56,8 +56,6 @@ enum
 - (void) dealloc
 {
     tr_free(fPieces);
-
-
 }
 
 - (void) setTorrent: (Torrent *) torrent

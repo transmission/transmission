@@ -100,8 +100,6 @@
 - (void) dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver: self];
-
-
 }
 
 - (void) setInfoForTorrents: (NSArray *) torrents

@@ -118,6 +118,7 @@ tr_session * fLib = NULL;
 {
     [fTimer invalidate];
     fTimer = nil;
+    fStatsWindowInstance = nil;
 }
 
 + (void) restoreWindowWithIdentifier: (NSString *) identifier state: (NSCoder *) state completionHandler: (void (^)(NSWindow *, NSError *)) completionHandler

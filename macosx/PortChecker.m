@@ -54,7 +54,6 @@
 - (void) dealloc
 {
     [fTimer invalidate];
-
 }
 
 - (port_status_t) status

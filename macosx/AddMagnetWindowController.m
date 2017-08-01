@@ -164,8 +164,6 @@
 - (void) dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver: self];
-
-
 }
 
 - (Torrent *) torrent

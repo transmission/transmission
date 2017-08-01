@@ -239,11 +239,6 @@ bool trashDataFile(const char * filename, tr_error ** error)
 
     if (fFileStat)
         tr_torrentFilesFree(fFileStat, [self fileCount]);
-
-
-
-
-
 }
 
 - (NSString *) description
