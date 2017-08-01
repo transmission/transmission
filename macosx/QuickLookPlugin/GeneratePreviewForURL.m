@@ -22,7 +22,6 @@ NSString * generateIconData(NSString * fileExtension, NSUInteger width, NSMutabl
         [renderedIcon unlockFocus];
 
         NSData * iconData = [renderedIcon TIFFRepresentation];
-        [renderedIcon release];
 
         NSDictionary * imgProps = @{
             (NSString *)kQLPreviewPropertyMIMETypeKey : @"image/png",
@@ -45,7 +44,7 @@ OSStatus GeneratePreviewForURL(void *thisInterface, QLPreviewRequestRef preview,
     //try to parse the torrent file
     tr_info inf;
     tr_ctor * ctor = tr_ctorNew(NULL);
-    tr_ctorSetMetainfoFromFile(ctor, [[(NSURL *)url path] UTF8String]);
+    tr_ctorSetMetainfoFromFile(ctor, [[(__bridge NSURL *)url path] UTF8String]);
     const int err = tr_torrentParse(ctor, &inf);
     tr_ctorFree(ctor);
     if (err)
@@ -171,7 +170,7 @@ OSStatus GeneratePreviewForURL(void *thisInterface, QLPreviewRequestRef preview,
                                 (NSString *)kQLPreviewPropertyMIMETypeKey : @"text/html",
                                 (NSString *)kQLPreviewPropertyAttachmentsKey : allImgProps };
 
-    QLPreviewRequestSetDataRepresentation(preview, (CFDataRef)[htmlString dataUsingEncoding: NSUTF8StringEncoding], kUTTypeHTML, (CFDictionaryRef)props);
+    QLPreviewRequestSetDataRepresentation(preview, (__bridge CFDataRef)[htmlString dataUsingEncoding: NSUTF8StringEncoding], kUTTypeHTML, (__bridge CFDictionaryRef)props);
 
     return noErr;
 }
