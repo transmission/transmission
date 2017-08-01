@@ -1448,7 +1448,7 @@ static void removeKeRangerRansomware()
 
             NSBeginAlertSheet(title, NSLocalizedString(@"Remove", "Removal confirm panel -> button"),
                 NSLocalizedString(@"Cancel", "Removal confirm panel -> button"), nil, fWindow, self,
-                nil, @selector(removeSheetDidEnd:returnCode:contextInfo:), (__bridge void *)(dict), @"%@", message);
+                nil, @selector(removeSheetDidEnd:returnCode:contextInfo:), (__bridge_retained void *)(dict), @"%@", message);
             return;
         }
     }
@@ -1456,8 +1456,9 @@ static void removeKeRangerRansomware()
     [self confirmRemoveTorrents: torrents deleteData: deleteData];
 }
 
-- (void) removeSheetDidEnd: (NSWindow *) sheet returnCode: (NSInteger) returnCode contextInfo: (NSDictionary *) dict
+- (void) removeSheetDidEnd: (NSWindow *) sheet returnCode: (NSInteger) returnCode contextInfo: (void *) contextInfo
 {
+    NSDictionary * dict = (__bridge_transfer NSDictionary *)contextInfo;
     NSArray * torrents = dict[@"Torrents"];
     if (returnCode == NSAlertDefaultReturn)
         [self confirmRemoveTorrents: torrents deleteData: [dict[@"DeleteData"] boolValue]];

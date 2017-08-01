@@ -44,7 +44,7 @@ typedef void (^CompletionBlock)(BOOL);
     renamer.torrent = torrent;
     renamer.completionHandler = completionHandler;
 
-    [NSApp beginSheet: [renamer window] modalForWindow: window modalDelegate: self didEndSelector: @selector(sheetDidEnd:returnCode:contextInfo:) contextInfo: (__bridge void *)(renamer)];
+    [NSApp beginSheet: [renamer window] modalForWindow: window modalDelegate: self didEndSelector: @selector(sheetDidEnd:returnCode:contextInfo:) contextInfo: (__bridge_retained void *)(renamer)];
 }
 
 + (void) presentSheetForFileListNode: (FileListNode *) node modalForWindow: (NSWindow *) window completionHandler: (void (^)(BOOL didRename)) completionHandler
@@ -58,12 +58,12 @@ typedef void (^CompletionBlock)(BOOL);
     renamer.node = node;
     renamer.completionHandler = completionHandler;
 
-    [NSApp beginSheet: [renamer window] modalForWindow: window modalDelegate: self didEndSelector: @selector(sheetDidEnd:returnCode:contextInfo:) contextInfo: (__bridge void *)(renamer)];
+    [NSApp beginSheet: [renamer window] modalForWindow: window modalDelegate: self didEndSelector: @selector(sheetDidEnd:returnCode:contextInfo:) contextInfo: (__bridge_retained void *)(renamer)];
 }
 
 + (void) sheetDidEnd: (NSWindow *) sheet returnCode: (NSInteger) returnCode contextInfo: (void *) contextInfo
 {
-    FileRenameSheetController * renamer = (__bridge FileRenameSheetController *)(contextInfo);
+    FileRenameSheetController * renamer = (__bridge_transfer FileRenameSheetController *)(contextInfo);
     NSParameterAssert([renamer isKindOfClass:[FileRenameSheetController class]]);
 
     renamer.completionHandler(returnCode == NSOKButton);

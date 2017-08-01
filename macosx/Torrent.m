@@ -104,7 +104,7 @@ void renameCallback(tr_torrent * torrent, const char * oldPathCharString, const 
         NSString * newName = @(newNameCharString);
 
         dispatch_async(dispatch_get_main_queue(), ^{
-            NSDictionary * contextDict = (__bridge NSDictionary *)contextInfo;
+            NSDictionary * contextDict = (__bridge_transfer NSDictionary *)contextInfo;
             Torrent * torrentObject = contextDict[@"Torrent"];
             [torrentObject renameFinished: error == 0 nodes: contextDict[@"Nodes"] completionHandler: contextDict[@"CompletionHandler"] oldPath: oldPath newName: newName];
         });
@@ -839,7 +839,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
 
     NSDictionary * contextInfo = @{ @"Torrent" : self, @"CompletionHandler" : [completionHandler copy] };
 
-    tr_torrentRenamePath(fHandle, fInfo->name, [newName UTF8String], renameCallback, (__bridge void *)(contextInfo));
+    tr_torrentRenamePath(fHandle, fInfo->name, [newName UTF8String], renameCallback, (__bridge_retained void *)(contextInfo));
 }
 
 - (void) renameFileNode: (FileListNode *) node withName: (NSString *) newName completionHandler: (void (^)(BOOL didRename)) completionHandler
@@ -851,7 +851,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
     NSDictionary * contextInfo = @{ @"Torrent" : self, @"Nodes" : @[ node ], @"CompletionHandler" : [completionHandler copy] };
 
     NSString * oldPath = [[node path] stringByAppendingPathComponent: [node name]];
-    tr_torrentRenamePath(fHandle, [oldPath UTF8String], [newName UTF8String], renameCallback, (__bridge void *)(contextInfo));
+    tr_torrentRenamePath(fHandle, [oldPath UTF8String], [newName UTF8String], renameCallback, (__bridge_retained void *)(contextInfo));
 }
 
 - (CGFloat) progress
