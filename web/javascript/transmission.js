@@ -1080,7 +1080,6 @@ Transmission.prototype = {
                         alert('Error uploading the file');
                         return;
                     }
-                    alert(response.result);
 				};
                 remote.sendRequest(datos, callback);
 			});

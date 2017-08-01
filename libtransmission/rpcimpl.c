@@ -247,7 +247,7 @@ fileUpload (  tr_session               * session,
     const char * datosArchivo;
     const char * nombreArchivo;
     char * archivoDecodificado;
-    int len ;
+    size_t len ;
     char * result;
     char * mensaje;
     
@@ -261,8 +261,7 @@ fileUpload (  tr_session               * session,
     {
         return "Can not open the file";
     }
-    len = 0;
-    archivoDecodificado = tr_base64_decode(datosArchivo, -1, &len);
+    archivoDecodificado = tr_base64_decode(datosArchivo, datosArchivo == NULL ? 0 : strlen(datosArchivo), &len);
     fwrite(archivoDecodificado, 1, len, f);
     fclose(f);
     mensaje = "XX BYTES WRITTEN. This file was saved: ";
@@ -270,7 +269,7 @@ fileUpload (  tr_session               * session,
     strcpy(result, mensaje);
     strcat(result, nombreArchivo);
     printf("%s", result);
-    return result;
+    return NULL;
 }
 
 static int compareTorrentByQueuePosition(void const* va, void const* vb)
