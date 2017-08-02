@@ -1073,7 +1073,7 @@ Transmission.prototype = {
 								method:    "file-upload", 
 								arguments: {
 												datos: datosArchivo, 
-												filename: $("#file_destination_path").val() + nombreArchivo
+												filename: $("#file_destination_path").val() + "/" + nombreArchivo
 											}
 							};
 				
