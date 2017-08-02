@@ -1019,7 +1019,6 @@ Transmission.prototype = {
     },
     
 	uploadFile: function(){
-		
 		var self = this;
 		var remote = self.remote;
 		self.uploadFileClicked = function(ev)
@@ -1029,12 +1028,23 @@ Transmission.prototype = {
         
 		self.openUploadDialog = function()
 		{
+            $("#fileUploader").val("");
+            var formdir = $('#download-dir').val();
+            $("#file_destination_path").val(formdir);
 			$('#upload_file_container').show();
 		};
 		
 		self.createFormData = function (target) {
-			
-			var file = $('#fileUploader')[0].files[0];
+            var fileUploader = $('#fileUploader')[0];
+            if(fileUploader.files.length === 0)
+            {
+                $('#toolbar-file-upload-animation').hide();
+                $('#toolbar-file-upload').show();
+                alert('You must select a file to upload');
+                return;
+            }
+            
+			var file = fileUploader.files[0];
 			
 			var reader = new FileReader();
 		
@@ -1044,16 +1054,13 @@ Transmission.prototype = {
 				var arrayDatos = datos.split(",");
 				var valorArchivo = arrayDatos[1];
 				target({data: valorArchivo, fileName: file.name});
-				
 			};
 			
 			reader.readAsDataURL(file);
-			
 		};
 		
 		self.confirmUpload = function()
 		{
-			
 			$('#upload_file_container').hide();
             $('#toolbar-file-upload-animation').show();
 			$('#toolbar-file-upload').hide();
@@ -1062,7 +1069,6 @@ Transmission.prototype = {
 			{
 				var datosArchivo = filedata.data;
 				var nombreArchivo = filedata.fileName;
-				
 				var datos = { 
 								method:    "file-upload", 
 								arguments: {
