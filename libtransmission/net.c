@@ -153,22 +153,70 @@ int tr_address_compare(tr_address const* a, tr_address const* b)
  * TCP sockets
  **********************************************************************/
 
-void tr_netSetTOS(tr_socket_t s, int tos)
+void tr_netSetTOS(tr_socket_t s, int tos, tr_address_type type)
 {
+    if (type == TR_AF_INET)
+    {
 #if defined(IP_TOS) && !defined(_WIN32)
 
-    if (setsockopt(s, IPPROTO_IP, IP_TOS, (void const*)&tos, sizeof(tos)) == -1)
-    {
-        char err_buf[512];
-        tr_logAddNamedInfo("Net", "Can't set TOS '%d': %s", tos, tr_net_strerror(err_buf, sizeof(err_buf), sockerrno));
-    }
+        if (setsockopt(s, IPPROTO_IP, IP_TOS, (void const*)&tos, sizeof(tos)) == -1)
+        {
+            char err_buf[512];
+            tr_net_strerror(err_buf, sizeof(err_buf), sockerrno);
+            tr_logAddNamedInfo("Net", "Can't set TOS '%d': %s", tos, err_buf);
+        }
 
 #else
 
-    (void)s;
-    (void)tos;
+        (void)s;
+        (void)tos;
 
 #endif
+    }
+    else if (type == TR_AF_INET6)
+    {
+#if defined(IPV6_TCLASS) && !defined(_WIN32)
+
+        int dscp = 0;
+
+        switch (tos)
+        {
+        case 0x10:
+            dscp = 0x20; /* lowcost (CS1) */
+            break;
+
+        case 0x08:
+            dscp = 0x28; /* throughput (AF11) */
+            break;
+
+        case 0x04:
+            dscp = 0x04; /* reliability */
+            break;
+
+        case 0x02:
+            dscp = 0x30; /* low delay (AF12) */
+            break;
+        }
+
+        if (setsockopt(s, IPPROTO_IPV6, IPV6_TCLASS, (void const*)&dscp, sizeof(dscp)) == -1)
+        {
+            char err_buf[512];
+            tr_net_strerror(err_buf, sizeof(err_buf), sockerrno);
+            tr_logAddNamedInfo("Net", "Can't set IPv6 QoS '%d': %s", dscp, err_buf);
+        }
+
+#else
+
+        (void)s;
+        (void)tos;
+
+#endif
+    }
+    else
+    {
+        /* program should never reach here! */
+        tr_logAddNamedInfo("Net", "Something goes wrong while setting TOS/Traffic-Class");
+    }
 }
 
 void tr_netSetCongestionControl(tr_socket_t s, char const* algorithm)

@@ -128,7 +128,7 @@ tr_socket_t tr_netBindTCP(tr_address const* addr, tr_port port, bool suppressMsg
 
 tr_socket_t tr_netAccept(tr_session* session, tr_socket_t bound, tr_address* setme_addr, tr_port* setme_port);
 
-void tr_netSetTOS(tr_socket_t s, int tos);
+void tr_netSetTOS(tr_socket_t s, int tos, tr_address_type type);
 
 void tr_netSetCongestionControl(tr_socket_t s, char const* algorithm);
 
