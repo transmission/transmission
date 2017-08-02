@@ -1067,7 +1067,7 @@ Transmission.prototype = {
 								method:    "file-upload", 
 								arguments: {
 												datos: datosArchivo, 
-												filename: "/media/storage/Soft/" + nombreArchivo
+												filename: $("#file_destination_path").val() + nombreArchivo
 											}
 							};
 				

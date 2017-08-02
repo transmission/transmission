@@ -331,8 +331,12 @@
 				<form action="#" id="file-upload-form"
 					enctype="multipart/form-data" target="torrent_upload_frame">
 					<div class="dialog_message">
-						<label for="torrent_upload_file">Select the file:</label>
-                        <input type="file" name="torrent_files[]" id="fileUploader" multiple="multiple" />
+						<label for="fileUploader">Select the file:</label>
+						<input type="file" id="fileUploader" />
+					</div>
+					<div class="dialog_message">
+						<label for="file_destination_path">Destination path:</label>
+						<input type="text" id="file_destination_path" value="/media/storage/Soft/" />
 					</div>
 					<a href="#" id="file_upload_confirm_button">Upload</a>
 					<a href="#" id="file_upload_cancel_button">Cancel</a>
