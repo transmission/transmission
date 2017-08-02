@@ -50,6 +50,20 @@ static bool getShadowInt(uint8_t ch, int* setme)
     return true;
 }
 
+static bool getFDMInt(uint8_t ch, int* setme)
+{
+    char const* str = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_.!~*()";
+    char const* pch = strchr(str, ch);
+
+    if (pch == NULL)
+    {
+        return false;
+    }
+
+    *setme = pch - str;
+    return true;
+}
+
 static int strint(void const* pch, int span)
 {
     char tmp[64];
@@ -602,6 +616,19 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
         else if (strncmp(chid + 1, "PI", 2) == 0)
         {
             tr_snprintf(buf, buflen, "PicoTorrent %d.%d%d.%d", charint(id[3]), charint(id[4]), charint(id[5]), charint(id[6]));
+        }
+        else if (strncmp(chid + 1, "FD", 2) == 0)
+        {
+            int c;
+
+            if (getFDMInt(id[5], &c))
+            {
+                tr_snprintf(buf, buflen, "Free Download Manager %d.%d.%d", charint(id[3]), charint(id[4]), c);
+            }
+            else
+            {
+                tr_snprintf(buf, buflen, "Free Download Manager %d.%d.x", charint(id[3]), charint(id[4]));
+            }
         }
 
         if (*buf != '\0')
