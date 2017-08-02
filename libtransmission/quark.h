@@ -79,6 +79,7 @@ enum
     TR_KEY_current_stats,
     TR_KEY_date,
     TR_KEY_dateCreated,
+    TR_KEY_datos,
     TR_KEY_delete_local_data,
     TR_KEY_desiredAvailable,
     TR_KEY_destination,

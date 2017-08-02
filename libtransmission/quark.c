@@ -77,6 +77,7 @@ static struct tr_key_struct const my_static[] =
     { "current-stats", 13 },
     { "date", 4 },
     { "dateCreated", 11 },
+    { "datos", 5 },
     { "delete-local-data", 17 },
     { "desiredAvailable", 16 },
     { "destination", 11 },

@@ -18,6 +18,7 @@
 -->
 		<link media="only screen and (max-device-width: 480px)" href="./style/transmission/mobile.css" type= "text/css" rel="stylesheet" />
 		<link media="screen and (min-device-width: 481px)" href="./style/transmission/common.css" type="text/css" rel="stylesheet" />
+        <link href="./style/spinner/spinner.css" type="text/css" rel="stylesheet" />
 		<!--[if IE 8]>
 		<link media="screen" href="./style/transmission/common.css" type="text/css" rel="stylesheet" />
 		<![endif]-->
@@ -49,6 +50,24 @@
 			<div id="toolbar-separator"></div>
 			<div id="toolbar-start-all" title="Start All Torrents"></div>
 			<div id="toolbar-pause-all" title="Pause All Torrents"></div>
+            <div id="toolbar-file-upload" title="Upload File"></div>
+			<div id="toolbar-file-upload-animation" style="display:none;" class="windows8">
+				<div class="wBall" id="wBall_1">
+					<div class="wInnerBall"></div>
+				</div>
+				<div class="wBall" id="wBall_2">
+					<div class="wInnerBall"></div>
+				</div>
+				<div class="wBall" id="wBall_3">
+					<div class="wInnerBall"></div>
+				</div>
+				<div class="wBall" id="wBall_4">
+					<div class="wInnerBall"></div>
+				</div>
+				<div class="wBall" id="wBall_5">
+					<div class="wInnerBall"></div>
+				</div>
+			</div>
 			<div id="toolbar-inspector" title="Toggle Inspector"></div>
 		</div>
 
@@ -385,6 +404,27 @@
 					</div>
 					<a href="#upload" id="upload_confirm_button">Upload</a>
 					<a href="#cancel" id="upload_cancel_button">Cancel</a>
+				</form>
+			</div>
+		</div>
+
+		<div class="dialog_container" id="upload_file_container" style="display:none;">
+			<div class="dialog_top_bar"></div>
+			<div class="dialog_window">
+				<div class="dialog_logo" id="upload_dialog_logo"></div>
+				<h2 class="dialog_heading">Upload File</h2>
+				<form action="#" id="file-upload-form"
+					enctype="multipart/form-data" target="torrent_upload_frame">
+					<div class="dialog_message">
+						<label for="fileUploader">Select the file:</label>
+						<input type="file" id="fileUploader" />
+					</div>
+					<div class="dialog_message">
+						<label for="file_destination_path">Destination folder:</label>
+						<input type="text" id="file_destination_path" />
+					</div>
+					<a href="#" id="file_upload_confirm_button">Upload</a>
+					<a href="#" id="file_upload_cancel_button">Cancel</a>
 				</form>
 			</div>
 		</div>

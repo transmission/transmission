@@ -10,7 +10,7 @@
 #include <errno.h>
 #include <stdlib.h> /* strtol */
 #include <string.h> /* strcmp */
-
+#include <stdio.h>
 #include <zlib.h>
 
 #include <event2/buffer.h>
@@ -235,6 +235,40 @@ static char const* queueMoveBottom(tr_session* session, tr_variant* args_in, tr_
     tr_torrentsQueueMoveBottom(torrents, n);
     notifyBatchQueueChange(session, torrents, n);
     tr_free(torrents);
+    return NULL;
+}
+
+static const char*
+fileUpload (  tr_session               * session,
+              tr_variant               * args_in,
+              tr_variant               * args_out UNUSED,
+              struct tr_rpc_idle_data  * idle_data UNUSED)
+{
+    const char * datosArchivo;
+    const char * nombreArchivo;
+    char * archivoDecodificado;
+    size_t len ;
+    char * result;
+    char * mensaje;
+    
+    tr_variantDictFindStr(args_in, TR_KEY_filename, &nombreArchivo, NULL);
+    if (!tr_variantDictFindStr(args_in, TR_KEY_datos, &datosArchivo, NULL))
+    {
+        return "no file data found";
+    }
+    FILE *f = fopen(nombreArchivo, "w");
+    if(f == NULL)
+    {
+        return "Can not open the file";
+    }
+    archivoDecodificado = tr_base64_decode(datosArchivo, datosArchivo == NULL ? 0 : strlen(datosArchivo), &len);
+    fwrite(archivoDecodificado, 1, len, f);
+    fclose(f);
+    mensaje = "XX BYTES WRITTEN. This file was saved: ";
+    result = (char *) malloc(1 + strlen(mensaje) + strlen(nombreArchivo));
+    strcpy(result, mensaje);
+    strcat(result, nombreArchivo);
+    printf("%s", result);
     return NULL;
 }
 
@@ -2490,7 +2524,8 @@ methods[] =
     { "queue-move-top", true, queueMoveTop },
     { "queue-move-up", true, queueMoveUp },
     { "queue-move-down", true, queueMoveDown },
-    { "queue-move-bottom", true, queueMoveBottom }
+    { "queue-move-bottom", true, queueMoveBottom },
+    { "file-upload", true, fileUpload }
 };
 
 static void noop_response_callback(tr_session* session UNUSED, tr_variant* response UNUSED, void* user_data UNUSED)
