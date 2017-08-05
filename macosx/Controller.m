@@ -809,6 +809,8 @@ static void removeKeRangerRansomware()
     //save history
     [self updateTorrentHistory];
     [fTableView saveCollapsedGroups];
+    
+    fFileWatcherQueue = nil;
 
     //complete cleanup
     tr_sessionClose(fLib);
