@@ -1,5 +1,11 @@
 project(trmac)
 
+if(CMAKE_GENERATOR STREQUAL "Xcode")
+    set(CMAKE_XCODE_ATTRIBUTE_CLANG_ENABLE_OBJC_ARC ON)
+else()
+    add_definitions(-fobjc-arc)
+endif()
+
 find_program(IBTOOL_EXECUTABLE ibtool REQUIRED)
 find_program(TIFFUTIL_EXECUTABLE tiffutil REQUIRED)
 find_program(INSTALL_NAME_TOOL_EXECUTABLE install_name_tool REQUIRED)
