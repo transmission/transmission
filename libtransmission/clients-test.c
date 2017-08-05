@@ -45,6 +45,9 @@ int main(void)
     TEST_CLIENT("-FD51W\xFF-", "Free Download Manager 5.1.32");
     TEST_CLIENT("-FD51@\xFF-", "Free Download Manager 5.1.x"); /* Negative test case */
 
+    /* Folx */
+    TEST_CLIENT("-FL51FF-", "Folx 5.x"); /* Folx v5.2.1.13690 */
+
     /* gobbledygook */
     TEST_CLIENT("-IIO\x10\x2D\x04-", "-IIO%10-%04-");
     TEST_CLIENT("-I\05O\x08\x03\x01-", "-I%05O%08%03%01-");
