@@ -630,6 +630,10 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
                 tr_snprintf(buf, buflen, "Free Download Manager %d.%d.x", charint(id[3]), charint(id[4]));
             }
         }
+        else if (strncmp(chid + 1, "FL", 2) == 0)
+        {
+            tr_snprintf(buf, buflen, "Folx %d.x", charint(id[3]));
+        }
 
         if (*buf != '\0')
         {
