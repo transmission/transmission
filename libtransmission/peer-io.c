@@ -637,7 +637,7 @@ static tr_peerIo* tr_peerIoNew(tr_session* session, tr_bandwidth* parent, tr_add
 
     if (socket.type == TR_PEER_SOCKET_TYPE_TCP)
     {
-        tr_netSetTOS(socket.handle.tcp, session->peerSocketTOS);
+        tr_netSetTOS(socket.handle.tcp, session->peerSocketTOS, addr->type);
         maybeSetCongestionAlgorithm(socket.handle.tcp, session->peer_congestion_algorithm);
     }
 
@@ -993,7 +993,7 @@ int tr_peerIoReconnect(tr_peerIo* io)
     io->event_write = event_new(session->event_base, io->socket.handle.tcp, EV_WRITE, event_write_cb, io);
 
     event_enable(io, pendingEvents);
-    tr_netSetTOS(io->socket.handle.tcp, session->peerSocketTOS);
+    tr_netSetTOS(io->socket.handle.tcp, session->peerSocketTOS, io->addr.type);
     maybeSetCongestionAlgorithm(io->socket.handle.tcp, session->peer_congestion_algorithm);
 
     return 0;
