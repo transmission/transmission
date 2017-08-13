@@ -62,6 +62,7 @@ struct tr_rpc_server
     char* password;
     char* whitelistStr;
     tr_list* whitelist;
+    int loginattempts;
 
     bool isStreamInitialized;
     z_stream stream;
@@ -560,18 +561,15 @@ static void handle_request(struct evhttp_request* req, void* arg)
 
     if (req != NULL && req->evcon != NULL)
     {
-        static int attempts = 0;
         char const* auth;
         char* user = NULL;
         char* pass = NULL;
 
         evhttp_add_header(req->output_headers, "Server", MY_REALM);
 
-        if (attempts == 100)
+        if (server->loginattempts == 100)
         {
-            send_simple_response (req, 403,
-                "Too many unsuccessful login attempts. "
-                "Please restart transmission-daemon.");
+            send_simple_response(req, 403, "<p>Too many unsuccessful login attempts. Please restart transmission-daemon.</p>");
             return;
         }
 
@@ -610,20 +608,15 @@ static void handle_request(struct evhttp_request* req, void* arg)
             !tr_ssha1_matches(server->password, pass)))
         {
             evhttp_add_header(req->output_headers, "WWW-Authenticate", "Basic realm=\"" MY_REALM "\"");
-            attempts++;
-            char* unauthuser = tr_strdup_printf(
-                "Unauthorized User. "
-                "%i unsuccessful login attempts.",
-                attempts);
+            server->loginattempts++;
+            char* unauthuser = tr_strdup_printf("<p>Unauthorized User. %d unsuccessful login attempts.</p>", server->loginattempts);
             send_simple_response(req, 401, unauthuser);
-            tr_free (unauthuser);
-            tr_free (user);
+            tr_free(unauthuser);
+            tr_free(user);
             return;
         }
-        else
-        {
-            attempts = 0;
-        }
+
+        server->loginattempts = 0;
 
         if (strncmp(req->uri, server->url, strlen(server->url)) != 0)
         {
