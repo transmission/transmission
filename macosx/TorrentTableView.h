@@ -21,6 +21,7 @@
  *****************************************************************************/
 
 #import <Cocoa/Cocoa.h>
+#import "Controller.h"
 #import <transmission.h>
 
 @class Controller;
@@ -31,14 +32,14 @@
 
 @interface TorrentTableView : NSOutlineView <NSOutlineViewDelegate, NSAnimationDelegate, NSPopoverDelegate>
 {
-    IBOutlet Controller * fController;
-
+    
     TorrentCell * fTorrentCell;
 
     NSUserDefaults * fDefaults;
 
     NSMutableIndexSet * fCollapsedGroups;
 
+    IBOutlet Controller * fController;
     IBOutlet NSMenu * fContextRow, * fContextNoRow;
 
     NSInteger fMouseRow, fMouseControlRow, fMouseRevealRow, fMouseActionRow;
@@ -53,6 +54,8 @@
 
     BOOL fActionPopoverShown;
 }
+
+@property(strong, readonly) Controller * controller;
 
 - (BOOL) isGroupCollapsed: (NSInteger) value;
 - (void) removeCollapsedGroup: (NSInteger) value;

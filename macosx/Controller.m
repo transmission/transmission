@@ -239,6 +239,8 @@ static void removeKeRangerRansomware()
 @synthesize prefsController = fPrefsController;
 @synthesize messageWindowController = fMessageController;
 @synthesize fileWatcherQueue = fFileWatcherQueue;
+@synthesize infoController = fInfoController;
+@synthesize torrentTableView = fTableView;
 
 + (void) initialize
 {
@@ -674,6 +676,12 @@ static void removeKeRangerRansomware()
     //registering the Web UI to Bonjour
     if ([fDefaults boolForKey: @"RPC"] && [fDefaults boolForKey: @"RPCWebDiscovery"])
         [[BonjourController defaultController] startWithPort: [fDefaults integerForKey: @"RPCPort"]];
+    
+    //registering to TouchBar customizations
+    if ([[NSApplication sharedApplication] respondsToSelector:@selector(isAutomaticCustomizeTouchBarMenuItemEnabled)])
+    {
+        [NSApplication sharedApplication].automaticCustomizeTouchBarMenuItemEnabled = YES;
+    }
 
     //shamelessly ask for donations
     if ([fDefaults boolForKey: @"WarningDonate"])

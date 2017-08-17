@@ -283,6 +283,8 @@
 		A2F8CD430F3D0F4A00DB356A /* miniupnpcstrings.h in Headers */ = {isa = PBXBuildFile; fileRef = A2F8CD420F3D0F4A00DB356A /* miniupnpcstrings.h */; };
 		A2FB057F0BFEB6800095564D /* DragOverlayView.m in Sources */ = {isa = PBXBuildFile; fileRef = A2FB057D0BFEB6800095564D /* DragOverlayView.m */; };
 		A2FB701C0D95CAEA0001F331 /* GroupsController.m in Sources */ = {isa = PBXBuildFile; fileRef = A2FB701B0D95CAEA0001F331 /* GroupsController.m */; };
+		ACB7C7C61F44F6D90025DAB6 /* Transmission+TouchBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACB7C7C51F44F6D90025DAB6 /* Transmission+TouchBar.swift */; };
+		ACB7C7CA1F451AB30025DAB6 /* NSTouchBar+Validation.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACB7C7C91F451AB30025DAB6 /* NSTouchBar+Validation.swift */; };
 		BE1183580CE160C50002D0F3 /* miniupnpc_declspec.h in Headers */ = {isa = PBXBuildFile; fileRef = BE11834E0CE160C50002D0F3 /* miniupnpc_declspec.h */; };
 		BE1183590CE160C50002D0F3 /* igd_desc_parse.h in Headers */ = {isa = PBXBuildFile; fileRef = BE11834F0CE160C50002D0F3 /* igd_desc_parse.h */; };
 		BE11835A0CE160C50002D0F3 /* minixml.h in Headers */ = {isa = PBXBuildFile; fileRef = BE1183500CE160C50002D0F3 /* minixml.h */; };
@@ -928,6 +930,9 @@
 		A2FB07F115F8208300933543 /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = macosx/QuickLookPlugin/nl.lproj/Localizable.strings; sourceTree = SOURCE_ROOT; };
 		A2FB701A0D95CAEA0001F331 /* GroupsController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = GroupsController.h; path = macosx/GroupsController.h; sourceTree = "<group>"; };
 		A2FB701B0D95CAEA0001F331 /* GroupsController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = GroupsController.m; path = macosx/GroupsController.m; sourceTree = "<group>"; };
+		AC980CE21F43AE5C001D102A /* Transmission-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "Transmission-Bridging-Header.h"; path = "macosx/Transmission-Bridging-Header.h"; sourceTree = "<group>"; };
+		ACB7C7C51F44F6D90025DAB6 /* Transmission+TouchBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Transmission+TouchBar.swift"; path = "macosx/Transmission+TouchBar.swift"; sourceTree = "<group>"; };
+		ACB7C7C91F451AB30025DAB6 /* NSTouchBar+Validation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "NSTouchBar+Validation.swift"; path = "macosx/NSTouchBar+Validation.swift"; sourceTree = "<group>"; };
 		BE1183480CE160960002D0F3 /* libminiupnp.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libminiupnp.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		BE11834E0CE160C50002D0F3 /* miniupnpc_declspec.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = miniupnpc_declspec.h; path = "third-party/miniupnpc/miniupnpc_declspec.h"; sourceTree = "<group>"; };
 		BE11834F0CE160C50002D0F3 /* igd_desc_parse.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = igd_desc_parse.h; path = "third-party/miniupnpc/igd_desc_parse.h"; sourceTree = "<group>"; };
@@ -1235,6 +1240,8 @@
 				A222EA790E6C32C4009FB003 /* BlocklistScheduler.h */,
 				A222EA7A0E6C32C4009FB003 /* BlocklistScheduler.m */,
 				A2AB883916A399A6008FAD50 /* VDKQueue */,
+				AC980CE21F43AE5C001D102A /* Transmission-Bridging-Header.h */,
+				ACB7C7CB1F451AE10025DAB6 /* TouchBar */,
 			);
 			name = Sources;
 			sourceTree = "<group>";
@@ -1611,6 +1618,15 @@
 				A2F35BCF15C5A0A100EBF632 /* QuickLookPlugin-Prefix.pch */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		ACB7C7CB1F451AE10025DAB6 /* TouchBar */ = {
+			isa = PBXGroup;
+			children = (
+				ACB7C7C91F451AB30025DAB6 /* NSTouchBar+Validation.swift */,
+				ACB7C7C51F44F6D90025DAB6 /* Transmission+TouchBar.swift */,
+			);
+			name = TouchBar;
 			sourceTree = "<group>";
 		};
 		BE1183410CE15DF00002D0F3 /* libminiupnp */ = {
@@ -2141,6 +2157,9 @@
 				LastUpgradeCheck = 0420;
 				ORGANIZATIONNAME = "The Transmission Project";
 				TargetAttributes = {
+					8D1107260486CEB800E47090 = {
+						LastSwiftMigration = 0900;
+					};
 					C1639A6E1A55F4D600E42033 = {
 						CreatedOnToolsVersion = 6.1.1;
 					};
@@ -2485,8 +2504,10 @@
 				A22BAE281388040500FB022F /* NSMutableArrayAdditions.m in Sources */,
 				A2966E8713DAF74C007B52DF /* GlobalOptionsPopoverViewController.m in Sources */,
 				A234EA541453563B000F3E97 /* NSImageAdditions.m in Sources */,
-				A2AB883E16A399A6008FAD50 /* VDKQueue.m in Sources */,
 				A2451E6916ACE4EB00586E0E /* FileRenameSheetController.m in Sources */,
+				A2AB883E16A399A6008FAD50 /* VDKQueue.m in Sources */,
+				ACB7C7C61F44F6D90025DAB6 /* Transmission+TouchBar.swift in Sources */,
+				ACB7C7CA1F451AB30025DAB6 /* NSTouchBar+Validation.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2937,6 +2958,7 @@
 		0053D3D50C86774200545606 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				FRAMEWORK_SEARCH_PATHS = macosx;
 				GCC_PREFIX_HEADER = macosx/Transmission_Prefix.pch;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks";
@@ -2945,6 +2967,9 @@
 					"\"$(SRCROOT)/third-party/curl/lib\"",
 				);
 				PRODUCT_NAME = Transmission;
+				SWIFT_OBJC_BRIDGING_HEADER = "macosx/Transmission-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 3.0;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -3117,6 +3142,7 @@
 		4DF0C599089918A300DD8943 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				FRAMEWORK_SEARCH_PATHS = macosx;
 				GCC_PREFIX_HEADER = macosx/Transmission_Prefix.pch;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks";
@@ -3125,6 +3151,8 @@
 					"\"$(SRCROOT)/third-party/curl/lib\"",
 				);
 				PRODUCT_NAME = Transmission;
+				SWIFT_OBJC_BRIDGING_HEADER = "macosx/Transmission-Bridging-Header.h";
+				SWIFT_VERSION = 3.0;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
@@ -3265,6 +3293,7 @@
 		A250CFEC0CDA19680068B4B6 /* Release - Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				FRAMEWORK_SEARCH_PATHS = macosx;
 				GCC_PREFIX_HEADER = macosx/Transmission_Prefix.pch;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks";
@@ -3273,6 +3302,8 @@
 					"\"$(SRCROOT)/third-party/curl/lib\"",
 				);
 				PRODUCT_NAME = Transmission;
+				SWIFT_OBJC_BRIDGING_HEADER = "macosx/Transmission-Bridging-Header.h";
+				SWIFT_VERSION = 3.0;
 				WRAPPER_EXTENSION = app;
 			};
 			name = "Release - Debug";

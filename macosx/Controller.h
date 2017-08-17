@@ -25,6 +25,8 @@
 #import <Quartz/Quartz.h>
 #import <Growl/Growl.h>
 #import "VDKQueue.h"
+#import "InfoWindowController.h"
+#import "TorrentTableView.h"
 
 @class AddMagnetWindowController;
 @class AddWindowController;
@@ -54,8 +56,8 @@ typedef enum
 
     NSMutableArray                  * fTorrents, * fDisplayedTorrents;
 
-    PrefsController                 * fPrefsController;
     InfoWindowController            * fInfoController;
+    PrefsController                 * fPrefsController;
     MessageWindowController         * fMessageController;
 
     NSUserDefaults                  * fDefaults;
@@ -174,6 +176,8 @@ typedef enum
 
 - (NSArray *)selectedTorrents;
 
+@property (strong, readonly) InfoWindowController * infoController;
+@property (strong, readonly) TorrentTableView     * torrentTableView;
 @property (retain, readonly) PrefsController * prefsController;
 - (void) showPreferenceWindow: (id) sender;
 

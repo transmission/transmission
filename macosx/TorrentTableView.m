@@ -53,6 +53,8 @@
 
 @implementation TorrentTableView
 
+@synthesize controller = fController;
+
 - (id) initWithCoder: (NSCoder *) decoder
 {
     if ((self = [super initWithCoder: decoder]))
