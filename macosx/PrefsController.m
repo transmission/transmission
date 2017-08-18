@@ -734,7 +734,14 @@
 
 - (IBAction) openGrowlApp: (id) sender
 {
-    // [GrowlApplicationBridge openGrowlPreferences: YES];
+    SEL selector = NSSelectorFromString(@"openGrowlPreferences:");
+    NSMethodSignature * signature = [GrowlApplicationBridge methodSignatureForSelector:selector];
+    NSInvocation * invocation = [NSInvocation invocationWithMethodSignature:signature];
+    invocation.selector = selector;
+    invocation.target = GrowlApplicationBridge.class;
+    BOOL yes = YES;
+    [invocation setArgument:&yes atIndex:0];
+    [invocation invoke];
 }
 
 - (void) openNotificationSystemPrefs: (id) sender
