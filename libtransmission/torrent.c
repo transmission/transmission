@@ -1188,7 +1188,7 @@ tr_torrent* tr_torrentNew(tr_ctor const* ctor, int* setme_error, int* setme_dupl
 
 void tr_torrentSetDownloadGroup(tr_torrent* tor, char const* group)
 {
-    assert(tr_isTorrent(tor));
+    TR_ASSERT(tr_isTorrent(tor));
 
     if (group == NULL || tor->downloadGroup == NULL || strcmp(group, tor->downloadGroup) != 0)
     {
@@ -1201,7 +1201,7 @@ void tr_torrentSetDownloadGroup(tr_torrent* tor, char const* group)
 
 char const* tr_torrentGetDownloadGroup(tr_torrent const* tor)
 {
-    assert(tr_isTorrent(tor));
+    TR_ASSERT(tr_isTorrent(tor));
 
     return tor->downloadGroup;
 }
