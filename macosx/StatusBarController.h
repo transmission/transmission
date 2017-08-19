@@ -29,9 +29,9 @@
     IBOutlet NSButton * fStatusButton;
     IBOutlet NSTextField * fTotalDLField, * fTotalULField;
     IBOutlet NSImageView * fTotalDLImageView, * fTotalULImageView;
-    
+
     tr_session * fLib;
-    
+
     CGFloat fPreviousDownloadRate, fPreviousUploadRate;
 }
 

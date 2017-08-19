@@ -10,10 +10,9 @@
    implement missing (or duplicate) functionality without exposing internal
    details in header files. */
 
-#include <assert.h>
-
 #include "transmission.h"
 #include "crypto-utils.h"
+#include "tr-assert.h"
 #include "utils.h"
 
 /***
@@ -27,50 +26,37 @@
 
 struct tr_dh_secret
 {
-  size_t  key_length;
-  uint8_t key[];
+    size_t key_length;
+    uint8_t key[];
 };
 
-static struct tr_dh_secret *
-tr_dh_secret_new (size_t key_length)
+static struct tr_dh_secret* tr_dh_secret_new(size_t key_length)
 {
-  struct tr_dh_secret * handle = tr_malloc (sizeof (struct tr_dh_secret) + key_length);
-  handle->key_length = key_length;
-  return handle;
+    struct tr_dh_secret* handle = tr_malloc(sizeof(struct tr_dh_secret) + key_length);
+    handle->key_length = key_length;
+    return handle;
 }
 
-static void
-tr_dh_secret_align (struct tr_dh_secret * handle,
-                    size_t                current_key_length)
+static void tr_dh_secret_align(struct tr_dh_secret* handle, size_t current_key_length)
 {
-  tr_dh_align_key (handle->key, current_key_length, handle->key_length);
+    tr_dh_align_key(handle->key, current_key_length, handle->key_length);
 }
 
-bool
-tr_dh_secret_derive (tr_dh_secret_t   raw_handle,
-                     const void     * prepend_data,
-                     size_t           prepend_data_size,
-                     const void     * append_data,
-                     size_t           append_data_size,
-                     uint8_t        * hash)
+bool tr_dh_secret_derive(tr_dh_secret_t raw_handle, void const* prepend_data, size_t prepend_data_size, void const* append_data,
+    size_t append_data_size, uint8_t* hash)
 {
-  struct tr_dh_secret * handle = raw_handle;
+    TR_ASSERT(raw_handle != NULL);
+    TR_ASSERT(hash != NULL);
 
-  assert (handle != NULL);
-  assert (hash != NULL);
+    struct tr_dh_secret* handle = raw_handle;
 
-  return tr_sha1 (hash,
-                  prepend_data == NULL ? "" : prepend_data,
-                  prepend_data == NULL ? 0 : (int) prepend_data_size,
-                  handle->key, (int) handle->key_length,
-                  append_data, append_data == NULL ? 0 : (int) append_data_size,
-                  NULL);
+    return tr_sha1(hash, prepend_data == NULL ? "" : prepend_data, prepend_data == NULL ? 0 : (int)prepend_data_size,
+        handle->key, (int)handle->key_length, append_data, append_data == NULL ? 0 : (int)append_data_size, NULL);
 }
 
-void
-tr_dh_secret_free (tr_dh_secret_t handle)
+void tr_dh_secret_free(tr_dh_secret_t handle)
 {
-  tr_free (handle);
+    tr_free(handle);
 }
 
 #endif /* TR_CRYPTO_DH_SECRET_FALLBACK */

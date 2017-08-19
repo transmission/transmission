@@ -9,24 +9,25 @@
 #pragma once
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-typedef struct tr_session_id * tr_session_id_t;
+typedef struct tr_session_id* tr_session_id_t;
 
 /**
  * Create new session identifier object.
  *
  * @return New session identifier object.
  */
-tr_session_id_t tr_session_id_new (void);
+tr_session_id_t tr_session_id_new(void);
 
 /**
  * Free session identifier object.
  *
  * @param[in] session_id Session identifier object.
  */
-void tr_session_id_free (tr_session_id_t session_id);
+void tr_session_id_free(tr_session_id_t session_id);
 
 /**
  * Get current session identifier as string.
@@ -35,7 +36,7 @@ void tr_session_id_free (tr_session_id_t session_id);
  *
  * @return String representation of current session identifier.
  */
-const char * tr_session_id_get_current (tr_session_id_t session_id);
+char const* tr_session_id_get_current(tr_session_id_t session_id);
 
 /**
  * Check if session ID corresponds to session running on the same machine as
@@ -49,9 +50,8 @@ const char * tr_session_id_get_current (tr_session_id_t session_id);
  *
  * @return `True` if session is valid and local, `false` otherwise.
  */
-bool tr_session_id_is_local (const char * session_id);
+bool tr_session_id_is_local(char const* session_id);
 
 #ifdef __cplusplus
 }
 #endif
-

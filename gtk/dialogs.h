@@ -28,8 +28,4 @@
 /**
  * Prompt the user to confirm removing a torrent.
  */
-void gtr_confirm_remove (GtkWindow * parent,
-                          TrCore    * core,
-                          GSList    * gtorrents,
-                          gboolean    doDelete);
-
+void gtr_confirm_remove(GtkWindow* parent, TrCore* core, GSList* gtorrents, gboolean doDelete);

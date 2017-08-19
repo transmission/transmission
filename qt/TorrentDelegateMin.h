@@ -10,17 +10,22 @@
 
 #include "TorrentDelegate.h"
 
-class TorrentDelegateMin: public TorrentDelegate
+class TorrentDelegateMin : public TorrentDelegate
 {
     Q_OBJECT
 
-  public:
-    explicit TorrentDelegateMin (QObject * parent = nullptr): TorrentDelegate (parent) {}
-    virtual ~TorrentDelegateMin () {}
+public:
+    explicit TorrentDelegateMin(QObject* parent = nullptr) :
+        TorrentDelegate(parent)
+    {
+    }
 
-  protected:
+    virtual ~TorrentDelegateMin()
+    {
+    }
+
+protected:
     // TorrentDelegate
-    virtual QSize sizeHint (const QStyleOptionViewItem&, const Torrent&) const;
-    virtual void drawTorrent (QPainter * painter, const QStyleOptionViewItem& option, const Torrent&) const;
+    virtual QSize sizeHint(QStyleOptionViewItem const&, Torrent const&) const;
+    virtual void drawTorrent(QPainter* painter, QStyleOptionViewItem const& option, Torrent const&) const;
 };
-

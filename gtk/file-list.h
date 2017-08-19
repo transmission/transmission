@@ -11,7 +11,6 @@
 #include <gtk/gtk.h>
 #include "tr-core.h"
 
-GtkWidget * gtr_file_list_new       (TrCore *, int torrent_id);
-void        gtr_file_list_clear     (GtkWidget *);
-void        gtr_file_list_set_torrent (GtkWidget *, int torrent_id);
-
+GtkWidget* gtr_file_list_new(TrCore*, int torrent_id);
+void gtr_file_list_clear(GtkWidget*);
+void gtr_file_list_set_torrent(GtkWidget*, int torrent_id);

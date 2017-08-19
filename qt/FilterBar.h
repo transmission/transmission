@@ -11,51 +11,50 @@
 #include <QWidget>
 
 class QLabel;
+class QLineEdit;
 class QStandardItemModel;
 class QTimer;
 
 class FilterBarComboBox;
-class FilterBarLineEdit;
 class Prefs;
 class TorrentFilter;
 class TorrentModel;
 
-class FilterBar: public QWidget
+class FilterBar : public QWidget
 {
     Q_OBJECT
 
-  public:
-    FilterBar (Prefs& prefs, const TorrentModel& torrents, const TorrentFilter& filter, QWidget * parent = nullptr);
-    virtual ~FilterBar ();
+public:
+    FilterBar(Prefs& prefs, TorrentModel const& torrents, TorrentFilter const& filter, QWidget* parent = nullptr);
+    virtual ~FilterBar();
 
-  public slots:
-    void clear ();
+public slots:
+    void clear();
 
-  private:
-    FilterBarComboBox * createTrackerCombo (QStandardItemModel *);
-    FilterBarComboBox * createActivityCombo ();
-    void refreshTrackers ();
-    QString getCountString (int n) const;
+private:
+    FilterBarComboBox* createTrackerCombo(QStandardItemModel*);
+    FilterBarComboBox* createActivityCombo();
+    void refreshTrackers();
+    QString getCountString(int n) const;
 
-  private slots:
-    void recountSoon ();
-    void recount ();
-    void refreshPref (int key);
-    void onActivityIndexChanged (int index);
-    void onTrackerIndexChanged (int index);
-    void onTextChanged (const QString&);
+private slots:
+    void recountSoon();
+    void recount();
+    void refreshPref(int key);
+    void onActivityIndexChanged(int index);
+    void onTrackerIndexChanged(int index);
+    void onTextChanged(QString const&);
 
-  private:
+private:
     Prefs& myPrefs;
-    const TorrentModel& myTorrents;
-    const TorrentFilter& myFilter;
+    TorrentModel const& myTorrents;
+    TorrentFilter const& myFilter;
 
-    FilterBarComboBox * myActivityCombo;
-    FilterBarComboBox * myTrackerCombo;
-    QLabel * myCountLabel;
-    QStandardItemModel * myTrackerModel;
-    QTimer * myRecountTimer;
+    FilterBarComboBox* myActivityCombo;
+    FilterBarComboBox* myTrackerCombo;
+    QLabel* myCountLabel;
+    QStandardItemModel* myTrackerModel;
+    QTimer* myRecountTimer;
     bool myIsBootstrapping;
-    FilterBarLineEdit * myLineEdit;
+    QLineEdit* myLineEdit;
 };
-

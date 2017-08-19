@@ -1,10 +1,10 @@
 @mixin verticalGradient($topColor, $bottomColor) {
 	background-color: mix($topColor, $bottomColor);
-	background-image: -webkit-gradient(linear, left top, left bottom, from($topColor), to($bottomColor)); 
-	background-image: -webkit-linear-gradient(top, $topColor, $bottomColor); 
-	background-image:    -moz-linear-gradient(top, $topColor, $bottomColor); 
-	background-image:     -ms-linear-gradient(top, $topColor, $bottomColor); 
-	background-image:      -o-linear-gradient(top, $topColor, $bottomColor); 
+	background-image: -webkit-gradient(linear, left top, left bottom, from($topColor), to($bottomColor));
+	background-image: -webkit-linear-gradient(top, $topColor, $bottomColor);
+	background-image:    -moz-linear-gradient(top, $topColor, $bottomColor);
+	background-image:     -ms-linear-gradient(top, $topColor, $bottomColor);
+	background-image:      -o-linear-gradient(top, $topColor, $bottomColor);
 	background-image:         linear-gradient(top, $topColor, $bottomColor);
 }
 
@@ -112,6 +112,24 @@ body {
 		font-weight: bold;
 	}
 }
+
+/***
+****
+****  HOTKEYS DIALOG
+****
+***/
+
+#hotkeys-dialog {
+	table {
+		width: 100%;
+		border-collapse: collapse;
+
+		th, td {
+			border: 1px solid #AAA;
+		}
+	}
+}
+
 
 /***
 ****
@@ -305,10 +323,10 @@ ul.torrent_list
 				height: 14px;
 				width: 14px;
 			}
-	
+
 			div.torrent_pause { background-position: left top; }
 			div.torrent_resume { background-position: center top; }
-	
+
 			&:active {
 				div.torrent_pause { background-position: left bottom; }
 				div.torrent_resume { background-position: center bottom; }
@@ -641,7 +659,7 @@ div#torrent_inspector
 
 	div.inspector_torrent_file_list_entry_name {
 		font-size: 1.2em;
-		color: black; 
+		color: black;
 		display: inline;
 		margin-left: 0px;
 	}

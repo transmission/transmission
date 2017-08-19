@@ -22,17 +22,13 @@ THE SOFTWARE.
 */
 
 #ifndef __TRANSMISSION__
- #error only libtransmission should #include this header.
+#error only libtransmission should #include this header.
 #endif
 
 #pragma once
 
-int tr_utpPacket (const unsigned char *buf, size_t buflen,
-                 const struct sockaddr *from, socklen_t fromlen,
-                 tr_session *ss);
+int tr_utpPacket(unsigned char const* buf, size_t buflen, struct sockaddr const* from, socklen_t fromlen, tr_session* ss);
 
-void tr_utpClose (tr_session *);
+void tr_utpClose(tr_session*);
 
-void tr_utpSendTo (void *closure, const unsigned char *buf, size_t buflen,
-                  const struct sockaddr *to, socklen_t tolen);
-
+void tr_utpSendTo(void* closure, unsigned char const* buf, size_t buflen, struct sockaddr const* to, socklen_t tolen);

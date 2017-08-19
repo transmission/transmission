@@ -6,7 +6,6 @@
  *
  */
 
-#include <assert.h>
 #include <ctype.h> /* isdigit() */
 #include <errno.h>
 #include <stdlib.h> /* strtoul() */
@@ -23,6 +22,8 @@
 #include "variant.h"
 #include "variant-common.h"
 
+#define MAX_BENC_STR_LENGTH (128 * 1024 * 1024) /* arbitrary */
+
 /***
 ****  tr_variantParse()
 ****  tr_variantLoad()
@@ -37,37 +38,47 @@
  * but to handle it as a signed 64bit integer is mandatory to handle
  * "large files" aka .torrent for more that 4Gbyte
  */
-int
-tr_bencParseInt (const uint8_t  * buf,
-                 const uint8_t  * bufend,
-                 const uint8_t ** setme_end,
-                 int64_t        * setme_val)
+int tr_bencParseInt(uint8_t const* buf, uint8_t const* bufend, uint8_t const** setme_end, int64_t* setme_val)
 {
-  char * endptr;
-  const void * begin;
-  const void * end;
-  int64_t val;
+    char* endptr;
+    void const* begin;
+    void const* end;
+    int64_t val;
 
-  if (buf >= bufend)
-    return EILSEQ;
-  if (*buf != 'i')
-    return EILSEQ;
+    if (buf >= bufend)
+    {
+        return EILSEQ;
+    }
 
-  begin = buf + 1;
-  end = memchr (begin, 'e', (bufend - buf) - 1);
-  if (end == NULL)
-    return EILSEQ;
+    if (*buf != 'i')
+    {
+        return EILSEQ;
+    }
 
-  errno = 0;
-  val = evutil_strtoll (begin, &endptr, 10);
-  if (errno || (endptr != end)) /* incomplete parse */
-    return EILSEQ;
-  if (val && * (const char*)begin == '0') /* no leading zeroes! */
-    return EILSEQ;
+    begin = buf + 1;
+    end = memchr(begin, 'e', (bufend - buf) - 1);
 
-  *setme_end = (const uint8_t*)end + 1;
-  *setme_val = val;
-  return 0;
+    if (end == NULL)
+    {
+        return EILSEQ;
+    }
+
+    errno = 0;
+    val = evutil_strtoll(begin, &endptr, 10);
+
+    if (errno != 0 || endptr != end) /* incomplete parse */
+    {
+        return EILSEQ;
+    }
+
+    if (val != 0 && *(char const*)begin == '0') /* no leading zeroes! */
+    {
+        return EILSEQ;
+    }
+
+    *setme_end = (uint8_t const*)end + 1;
+    *setme_val = val;
+    return 0;
 }
 
 /**
@@ -76,80 +87,88 @@ tr_bencParseInt (const uint8_t  * buf,
  * Note that there is no constant beginning delimiter, and no ending delimiter.
  * Example: 4:spam represents the string "spam"
  */
-int
-tr_bencParseStr (const uint8_t  * buf,
-                 const uint8_t  * bufend,
-                 const uint8_t ** setme_end,
-                 const uint8_t ** setme_str,
-                 size_t *         setme_strlen)
+int tr_bencParseStr(uint8_t const* buf, uint8_t const* bufend, uint8_t const** setme_end, uint8_t const** setme_str,
+    size_t* setme_strlen)
 {
-  const void * end;
-  size_t len;
-  char * ulend;
-  const uint8_t * strbegin;
-  const uint8_t * strend;
+    void const* end;
+    size_t len;
+    char* ulend;
+    uint8_t const* strbegin;
+    uint8_t const* strend;
 
-  if (buf >= bufend)
-    goto err;
+    if (buf >= bufend)
+    {
+        goto err;
+    }
 
-  if (!isdigit (*buf))
-    goto err;
+    if (!isdigit(*buf))
+    {
+        goto err;
+    }
 
-  end = memchr (buf, ':', bufend - buf);
-  if (end == NULL)
-    goto err;
+    end = memchr(buf, ':', bufend - buf);
 
-  errno = 0;
-  len = strtoul ((const char*)buf, &ulend, 10);
-  if (errno || ulend != end)
-    goto err;
+    if (end == NULL)
+    {
+        goto err;
+    }
 
-  strbegin = (const uint8_t*)end + 1;
-  strend = strbegin + len;
-  if ((strend<strbegin) || (strend>bufend))
-    goto err;
+    errno = 0;
+    len = strtoul((char const*)buf, &ulend, 10);
 
-  *setme_end = (const uint8_t*)end + 1 + len;
-  *setme_str = (const uint8_t*)end + 1;
-  *setme_strlen = len;
-  return 0;
+    if (errno != 0 || ulend != end || len > MAX_BENC_STR_LENGTH)
+    {
+        goto err;
+    }
+
+    strbegin = (uint8_t const*)end + 1;
+    strend = strbegin + len;
+
+    if (strend < strbegin || strend > bufend)
+    {
+        goto err;
+    }
+
+    *setme_end = (uint8_t const*)end + 1 + len;
+    *setme_str = (uint8_t const*)end + 1;
+    *setme_strlen = len;
+    return 0;
 
 err:
-  *setme_end = NULL;
-  *setme_str = NULL;
-  *setme_strlen= 0;
-  return EILSEQ;
+    *setme_end = NULL;
+    *setme_str = NULL;
+    *setme_strlen = 0;
+    return EILSEQ;
 }
 
-static tr_variant*
-get_node (tr_ptrArray * stack, tr_quark * key, tr_variant * top, int * err)
+static tr_variant* get_node(tr_ptrArray* stack, tr_quark* key, tr_variant* top, int* err)
 {
-  tr_variant * node = NULL;
+    tr_variant* node = NULL;
 
-  if (tr_ptrArrayEmpty (stack))
+    if (tr_ptrArrayEmpty(stack))
     {
-      node = top;
+        node = top;
     }
-  else
+    else
     {
-      tr_variant * parent = tr_ptrArrayBack (stack);
+        tr_variant* parent = tr_ptrArrayBack(stack);
 
-      if (tr_variantIsList (parent))
+        if (tr_variantIsList(parent))
         {
-          node = tr_variantListAdd (parent);
+            node = tr_variantListAdd(parent);
         }
-      else if (*key && tr_variantIsDict (parent))
+        else if (*key != 0 && tr_variantIsDict(parent))
         {
-          node = tr_variantDictAdd (parent, *key);
-          *key = 0;
+            node = tr_variantDictAdd(parent, *key);
+            *key = 0;
         }
-      else
+        else
         {
-          *err = EILSEQ;
+            *err = EILSEQ;
         }
     }
 
-  return node;
+    return node;
 }
 
 /**
@@ -157,185 +176,212 @@ get_node (tr_ptrArray * stack, tr_quark * key, tr_variant * top, int * err)
  * easier to read, but was vulnerable to a smash-stacking
  * attack via maliciously-crafted bencoded data. (#667)
  */
-int
-tr_variantParseBenc (const void    * buf_in,
-                     const void    * bufend_in,
-                     tr_variant    * top,
-                     const char   ** setme_end)
+int tr_variantParseBenc(void const* buf_in, void const* bufend_in, tr_variant* top, char const** setme_end)
 {
-  int err = 0;
-  const uint8_t * buf = buf_in;
-  const uint8_t * bufend = bufend_in;
-  tr_ptrArray stack = TR_PTR_ARRAY_INIT;
-  tr_quark key = 0;
+    int err = 0;
+    uint8_t const* buf = buf_in;
+    uint8_t const* bufend = bufend_in;
+    tr_ptrArray stack = TR_PTR_ARRAY_INIT;
+    tr_quark key = 0;
 
-  tr_variantInit (top, 0);
+    tr_variantInit(top, 0);
 
-  while (buf != bufend)
+    while (buf != bufend)
     {
-      if (buf > bufend) /* no more text to parse... */
-        err = EILSEQ;
-
-      if (err)
-        break;
-
-      if (*buf == 'i') /* int */
+        if (buf > bufend) /* no more text to parse... */
         {
-          int64_t val;
-          const uint8_t * end;
-          tr_variant * v;
+            err = EILSEQ;
+        }
 
-          if ((err = tr_bencParseInt (buf, bufend, &end, &val)))
+        if (err != 0)
+        {
             break;
-          buf = end;
-
-          if ((v = get_node (&stack, &key, top, &err)))
-            tr_variantInitInt (v, val);
         }
-      else if (*buf == 'l') /* list */
+
+        if (*buf == 'i') /* int */
         {
-          tr_variant * v;
+            int64_t val;
+            uint8_t const* end;
+            tr_variant* v;
 
-          ++buf;
-
-          if ((v = get_node (&stack, &key, top, &err)))
+            if ((err = tr_bencParseInt(buf, bufend, &end, &val)) != 0)
             {
-              tr_variantInitList (v, 0);
-              tr_ptrArrayAppend (&stack, v);
-            }
-        }
-      else if (*buf == 'd') /* dict */
-        {
-          tr_variant * v;
-
-          ++buf;
-
-          if ((v = get_node (&stack, &key, top, &err)))
-            {
-              tr_variantInitDict (v, 0);
-              tr_ptrArrayAppend (&stack, v);
-            }
-        }
-      else if (*buf == 'e') /* end of list or dict */
-        {
-          ++buf;
-
-          if (tr_ptrArrayEmpty (&stack) || (key != 0))
-            {
-              err = EILSEQ;
-              break;
-            }
-          else
-            {
-              tr_ptrArrayPop (&stack);
-              if (tr_ptrArrayEmpty (&stack))
                 break;
             }
-        }
-      else if (isdigit (*buf)) /* string? */
-        {
-          tr_variant * v;
-          const uint8_t * end;
-          const uint8_t * str;
-          size_t str_len;
 
-          if ((err = tr_bencParseStr (buf, bufend, &end, &str, &str_len)))
+            buf = end;
+
+            if ((v = get_node(&stack, &key, top, &err)) != NULL)
+            {
+                tr_variantInitInt(v, val);
+            }
+        }
+        else if (*buf == 'l') /* list */
+        {
+            tr_variant* v;
+
+            ++buf;
+
+            if ((v = get_node(&stack, &key, top, &err)) != NULL)
+            {
+                tr_variantInitList(v, 0);
+                tr_ptrArrayAppend(&stack, v);
+            }
+        }
+        else if (*buf == 'd') /* dict */
+        {
+            tr_variant* v;
+
+            ++buf;
+
+            if ((v = get_node(&stack, &key, top, &err)) != NULL)
+            {
+                tr_variantInitDict(v, 0);
+                tr_ptrArrayAppend(&stack, v);
+            }
+        }
+        else if (*buf == 'e') /* end of list or dict */
+        {
+            ++buf;
+
+            if (tr_ptrArrayEmpty(&stack) || key != 0)
+            {
+                err = EILSEQ;
+                break;
+            }
+            else
+            {
+                tr_ptrArrayPop(&stack);
+
+                if (tr_ptrArrayEmpty(&stack))
+                {
+                    break;
+                }
+            }
+        }
+        else if (isdigit(*buf)) /* string? */
+        {
+            tr_variant* v;
+            uint8_t const* end;
+            uint8_t const* str;
+            size_t str_len;
+
+            if ((err = tr_bencParseStr(buf, bufend, &end, &str, &str_len)) != 0)
+            {
+                break;
+            }
+
+            buf = end;
+
+            if (key == 0 && !tr_ptrArrayEmpty(&stack) && tr_variantIsDict(tr_ptrArrayBack(&stack)))
+            {
+                key = tr_quark_new(str, str_len);
+            }
+            else if ((v = get_node(&stack, &key, top, &err)) != NULL)
+            {
+                tr_variantInitStr(v, str, str_len);
+            }
+        }
+        else /* invalid bencoded text... march past it */
+        {
+            ++buf;
+        }
+
+        if (tr_ptrArrayEmpty(&stack))
+        {
             break;
-          buf = end;
-
-          if (!key && !tr_ptrArrayEmpty(&stack) && tr_variantIsDict(tr_ptrArrayBack(&stack)))
-            key = tr_quark_new (str, str_len);
-          else if ((v = get_node (&stack, &key, top, &err)))
-            tr_variantInitStr (v, str, str_len);
         }
-      else /* invalid bencoded text... march past it */
-        {
-          ++buf;
-        }
-
-      if (tr_ptrArrayEmpty (&stack))
-        break;
     }
 
-  if (!err && (!top->type || !tr_ptrArrayEmpty(&stack)))
-    err = EILSEQ;
+    if (err == 0 && (top->type == 0 || !tr_ptrArrayEmpty(&stack)))
+    {
+        err = EILSEQ;
+    }
 
-  if (!err && setme_end)
-    *setme_end = (const char*) buf;
+    if (err == 0)
+    {
+        if (setme_end != NULL)
+        {
+            *setme_end = (char const*)buf;
+        }
+    }
+    else if (top->type != 0)
+    {
+        tr_variantFree(top);
+        tr_variantInit(top, 0);
+    }
 
-  tr_ptrArrayDestruct (&stack, NULL);
-  return err;
+    tr_ptrArrayDestruct(&stack, NULL);
+    return err;
 }
 
 /****
 *****
 ****/
 
-static void
-saveIntFunc (const tr_variant * val, void * evbuf)
+static void saveIntFunc(tr_variant const* val, void* evbuf)
 {
-  evbuffer_add_printf (evbuf, "i%" PRId64 "e", val->val.i);
+    evbuffer_add_printf(evbuf, "i%" PRId64 "e", val->val.i);
 }
 
-static void
-saveBoolFunc (const tr_variant * val, void * evbuf)
+static void saveBoolFunc(tr_variant const* val, void* evbuf)
 {
-  if (val->val.b)
-    evbuffer_add (evbuf, "i1e", 3);
-  else
-    evbuffer_add (evbuf, "i0e", 3);
+    if (val->val.b)
+    {
+        evbuffer_add(evbuf, "i1e", 3);
+    }
+    else
+    {
+        evbuffer_add(evbuf, "i0e", 3);
+    }
 }
 
-static void
-saveRealFunc (const tr_variant * val, void * evbuf)
+static void saveRealFunc(tr_variant const* val, void* evbuf)
 {
-  int len;
-  char buf[128];
+    int len;
+    char buf[128];
 
-  len = tr_snprintf (buf, sizeof (buf), "%f", val->val.d);
-  evbuffer_add_printf (evbuf, "%d:", len);
-  evbuffer_add (evbuf, buf, len);
+    len = tr_snprintf(buf, sizeof(buf), "%f", val->val.d);
+    evbuffer_add_printf(evbuf, "%d:", len);
+    evbuffer_add(evbuf, buf, len);
 }
 
-static void
-saveStringFunc (const tr_variant * v, void * evbuf)
+static void saveStringFunc(tr_variant const* v, void* evbuf)
 {
-  size_t len;
-  const char * str;
-  tr_variantGetStr (v, &str, &len);
-  evbuffer_add_printf (evbuf, "%zu:", len);
-  evbuffer_add (evbuf, str, len);
+    size_t len;
+    char const* str;
+    tr_variantGetStr(v, &str, &len);
+    evbuffer_add_printf(evbuf, "%zu:", len);
+    evbuffer_add(evbuf, str, len);
 }
 
-static void
-saveDictBeginFunc (const tr_variant * val UNUSED, void * evbuf)
+static void saveDictBeginFunc(tr_variant const* val UNUSED, void* evbuf)
 {
-  evbuffer_add (evbuf, "d", 1);
+    evbuffer_add(evbuf, "d", 1);
 }
 
-static void
-saveListBeginFunc (const tr_variant * val UNUSED, void * evbuf)
+static void saveListBeginFunc(tr_variant const* val UNUSED, void* evbuf)
 {
-  evbuffer_add (evbuf, "l", 1);
+    evbuffer_add(evbuf, "l", 1);
 }
 
-static void
-saveContainerEndFunc (const tr_variant * val UNUSED, void * evbuf)
+static void saveContainerEndFunc(tr_variant const* val UNUSED, void* evbuf)
 {
-  evbuffer_add (evbuf, "e", 1);
+    evbuffer_add(evbuf, "e", 1);
 }
 
-static const struct VariantWalkFuncs walk_funcs = { saveIntFunc,
-                                                    saveBoolFunc,
-                                                    saveRealFunc,
-                                                    saveStringFunc,
-                                                    saveDictBeginFunc,
-                                                    saveListBeginFunc,
-                                                    saveContainerEndFunc };
-
-void
-tr_variantToBufBenc (const tr_variant * top, struct evbuffer * buf)
+static struct VariantWalkFuncs const walk_funcs =
 {
-  tr_variantWalk (top, &walk_funcs, buf, true);
-}
+    saveIntFunc,
+    saveBoolFunc,
+    saveRealFunc,
+    saveStringFunc,
+    saveDictBeginFunc,
+    saveListBeginFunc,
+    saveContainerEndFunc
+};
 
+void tr_variantToBufBenc(tr_variant const* top, struct evbuffer* buf)
+{
+    tr_variantWalk(top, &walk_funcs, buf, true);
+}

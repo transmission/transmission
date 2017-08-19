@@ -20,6 +20,8 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#import <AppKit/AppKit.h>
+
 #import "ExpandedPathToIconTransformer.h"
 
 @implementation ExpandedPathToIconTransformer
@@ -38,7 +40,7 @@
 {
     if (!value)
         return nil;
-    
+
     NSString * path = [value stringByExpandingTildeInPath];
     NSImage * icon;
     //show a folder icon if the folder doesn't exist
@@ -46,9 +48,9 @@
         icon = [[NSWorkspace sharedWorkspace] iconForFileType: NSFileTypeForHFSTypeCode(kGenericFolderIcon)];
     else
         icon = [[NSWorkspace sharedWorkspace] iconForFile: path];
-    
+
     [icon setSize: NSMakeSize(16.0, 16.0)];
-    
+
     return icon;
 }
 

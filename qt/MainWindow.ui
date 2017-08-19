@@ -753,10 +753,16 @@
    <property name="text">
     <string>Move &amp;Up</string>
    </property>
+   <property name="shortcut">
+    <string notr="true">Ctrl+Up</string>
+   </property>
   </action>
   <action name="action_QueueMoveDown">
    <property name="text">
     <string>Move &amp;Down</string>
+   </property>
+   <property name="shortcut">
+    <string notr="true">Ctrl+Down</string>
    </property>
   </action>
   <action name="action_QueueMoveBottom">

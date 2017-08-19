@@ -14,33 +14,42 @@
 
 class AddData
 {
-  public:
+public:
     enum
     {
-      NONE,
-      MAGNET,
-      URL,
-      FILENAME,
-      METAINFO
+        NONE,
+        MAGNET,
+        URL,
+        FILENAME,
+        METAINFO
     };
 
-  public:
-    AddData (): type (NONE) {}
-    AddData (const QString& str) { set (str); }
+public:
+    AddData() :
+        type(NONE)
+    {
+    }
 
-    int set (const QString&);
+    AddData(QString const& str)
+    {
+        set(str);
+    }
 
-    QByteArray toBase64 () const;
-    QString readableName () const;
-    QString readableShortName () const;
+    int set(QString const&);
 
-    static bool isSupported (const QString& str) { return AddData (str).type != NONE; }
+    QByteArray toBase64() const;
+    QString readableName() const;
+    QString readableShortName() const;
 
-  public:
+    static bool isSupported(QString const& str)
+    {
+        return AddData(str).type != NONE;
+    }
+
+public:
     int type;
     QByteArray metainfo;
     QString filename;
     QString magnet;
     QUrl url;
 };
-

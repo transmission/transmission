@@ -23,15 +23,17 @@ minor_version=`echo ${user_agent_prefix} | awk -F . '{print $2 + 0}'`
 vcs_revision=
 vcs_revision_file=REVISION
 
-if [ -n "$JENKINS_URL" -a -n "$VCS_REVISION" ]; then
-    # Jenkins automated build, use the set environment variables to avoid
-    # version mismatches between java's svn and command line's svn
-    vcs_revision=$VCS_REVISION
+if [ -n "$JENKINS_URL" -a -n "$GIT_COMMIT" ]; then
+    vcs_revision=$GIT_COMMIT
+elif [ -n "$TEAMCITY_PROJECT_NAME" -a -n "$BUILD_VCS_NUMBER" ]; then
+    vcs_revision=$BUILD_VCS_NUMBER
 elif [ -d ".git" ] && type git >/dev/null 2>&1; then
-    vcs_revision=`git rev-list --max-count=1 --abbrev-commit HEAD`
+    vcs_revision=`git rev-list --max-count=1 HEAD`
 elif [ -f "$vcs_revision_file" ]; then
     vcs_revision=`cat "$vcs_revision_file"`
 fi
+
+vcs_revision=`echo $vcs_revision`
 
 if [ -n "$vcs_revision" ]; then
     [ -f "$vcs_revision_file" ] && [ "`cat "$vcs_revision_file"`" = "$vcs_revision" ] || echo "$vcs_revision" > "$vcs_revision_file"
@@ -40,7 +42,11 @@ else
     rm -f "$vcs_revision_file"
 fi
 
+vcs_revision=`echo $vcs_revision | head -c10`
+
 cat > libtransmission/version.h.new << EOF
+#pragma once
+
 #define PEERID_PREFIX             "${peer_id_prefix}"
 #define USERAGENT_PREFIX          "${user_agent_prefix}"
 #define VCS_REVISION              "${vcs_revision}"

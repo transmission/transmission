@@ -1,15 +1,11 @@
 /* Inspector -> selected torrents
    stats -> bytes */
-
 "%@ bytes" = "%@ byte";
 
 /* Add torrent -> info
    Create torrent -> info
    Drag overlay -> torrents
    Inspector -> selected torrents */
-
-
-
 "%@ files" = "%@ file";
 
 /* Prefs -> blocklist -> message */
@@ -21,8 +17,6 @@
 /* file size string
    Inspector -> Files tab -> file status string
    Status bar transfer count */
-
-
 "%@ of %@" = "%1$@ su %2$@";
 
 /* Torrent -> progress string */
@@ -34,8 +28,6 @@
 /* Add torrent -> info
    Inspector -> Activity tab -> progress
    Torrent -> progress string */
-
-
 "%@ selected" = "selezionati %@";
 
 /* stats window -> times opened */
@@ -49,14 +41,11 @@
 
 /* Inspector -> selected torrents
    stats total */
-
 "%@ total" = "totale %@";
 
 /* Filter Bar Button -> tool tip
    Status bar transfer count
    Torrent table -> group row -> tooltip */
-
-
 "%@ transfers" = "%@ trasferimenti";
 
 /* Inspector -> Activity tab -> have */
@@ -79,7 +68,6 @@
 
 /* Action menu -> upload/download limit
    Status Bar -> speed tooltip */
-
 "%d KB/s" = "%d KB/s";
 
 /* Inspector -> Peers tab -> peers */
@@ -128,9 +116,6 @@
    Create torrent -> info
    Drag overlay -> torrents
    Inspector -> selected torrents */
-
-
-
 "1 file" = "1 file";
 
 /* Inspector -> selected torrents */
@@ -148,8 +133,6 @@
 /* Filter Button -> tool tip
    Status bar transfer count
    Torrent table -> group row -> tooltip */
-
-
 "1 transfer" = "1 trasferimento";
 
 /* time string */
@@ -178,7 +161,6 @@
 
 /* Open duplicate alert -> title
    Open duplicate magnet alert -> title */
-
 "A transfer of \"%@\" already exists." = "Esiste già un trasferimento di \"%@\".";
 
 /* Filter Bar -> filter button */
@@ -186,7 +168,6 @@
 
 /* Inspector -> tab
    Inspector view -> title */
-
 "Activity" = "Attività";
 
 /* Add torrent -> same name -> button */
@@ -200,12 +181,10 @@
 
 /* Filter Bar -> filter button
    inspector -> check all */
-
 "All" = "Tutti";
 
 /* Filter Bar -> group filter menu
    Groups -> Button */
-
 "All Groups" = "Tutti i gruppi";
 
 /* Create torrent -> failed -> warning */
@@ -252,7 +231,6 @@
 
 /* Removal confirm panel -> title
    Remove completed confirm panel -> title */
-
 "Are you sure you want to remove \"%@\" from the transfer list?" = "Sei sicuro di voler rimuovere \"%@\" dalla lista?";
 
 /* Remove trackers alert -> title */
@@ -283,15 +261,6 @@
    rename sheet button
    Stats reset -> button
    URL sheet button */
-
-
-
-
-
-
-
-
-
 "Cancel" = "Annulla";
 
 /* Torrent Table -> tooltip */
@@ -332,7 +301,6 @@
 
 /* Create toolbar item -> label
    Create torrent -> blank address -> button */
-
 "Create" = "Crea";
 
 /* Drag overlay -> file */
@@ -343,7 +311,6 @@
 
 /* Create toolbar item -> palette label
    Create torrent -> select file */
-
 "Create Torrent File" = "Crea file torrent";
 
 /* Create torrent -> failed -> title */
@@ -360,7 +327,6 @@
 
 /* Message window -> level
    Message window -> level string */
-
 "Debug" = "Debug";
 
 /* Info options -> global setting */
@@ -370,9 +336,6 @@
    inspector -> web seed table -> header
    status bar -> status label
    Torrent -> status string */
-
-
-
 "DL" = "Ricezione";
 
 /* Inspector -> Peers tab -> peers */
@@ -395,7 +358,6 @@
 
 /* file table -> header tool tip
    files tab -> tooltip */
-
 "Download" = "Ricezione";
 
 /* Torrent disk space alert -> button */
@@ -415,12 +377,10 @@
 
 /* Stats window -> label
    tracker peer stat */
-
 "Downloaded" = "Ricevuti";
 
 /* Filter Bar -> filter button
    Torrent -> status string */
-
 "Downloading" = "In ricezione";
 
 /* Blocklist -> message */
@@ -447,20 +407,15 @@
 /* Message window -> level
    Message window -> level string
    Torrent -> status string */
-
-
 "Error" = "Errore";
 
 /* Inspector -> tab
    Inspector view -> title */
-
 "Files" = "File";
 
 /* Filter toolbar item -> label
    inspector -> file filter
    Message window -> filter field */
-
-
 "Filter" = "Filtri";
 
 /* Inspector -> Peers tab -> table row tooltip */
@@ -486,7 +441,6 @@
 
 /* File size - gigabytes
    file/memory size - gigabytes */
-
 "GB" = "GB";
 
 /* Transfer speed (gigabytes per second) */
@@ -497,7 +451,6 @@
 
 /* Inspector -> tab
    Inspector view -> title */
-
 "General Info" = "Informazioni generali";
 
 /* Status Bar -> speed tooltip */
@@ -550,7 +503,6 @@
 
 /* Message window -> level
    Message window -> level string */
-
 "Info" = "Info";
 
 /* Inspector toolbar item -> label */
@@ -567,7 +519,6 @@
 
 /* File size - kilobytes
    file/memory size - kilobytes */
-
 "KB" = "KB";
 
 /* Transfer speed (kilobytes per second) */
@@ -590,7 +541,6 @@
 
 /* Action menu -> upload/download limit
    torrent action menu -> upload/download limit */
-
 "Limit (%d KB/s)" = "Limitata (%d KB/s)";
 
 /* Save log alert panel -> title */
@@ -607,12 +557,10 @@
 
 /* Inspector -> selected torrents
    Torrent -> progress string */
-
 "Magnetized transfer" = "Trasferimento magnetico";
 
 /* File size - megabytes
    file/memory size - megabytes */
-
 "MB" = "MB";
 
 /* Transfer speed (megabytes per second) */
@@ -633,11 +581,6 @@
    Tracker last announce
    Tracker last scrape
    tracker peer stat */
-
-
-
-
-
 "N/A" = "N/D";
 
 /* Filter Bar -> filter menu */
@@ -664,8 +607,6 @@
 /* Groups -> Button
    Groups -> Menu
    inspector -> check all */
-
-
 "None" = "Nessuno";
 
 /* Donation beg -> button */
@@ -699,24 +640,6 @@
    Torrent download failed -> button
    Torrent file copy alert -> button
    Transmission already running alert -> button */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 "OK" = "Ok";
 
 /* Remove completed confirm panel -> message */
@@ -724,7 +647,6 @@
 
 /* Removal confirm panel -> message part 2
    Remove completed confirm panel -> message */
-
 "Once removed, continuing the transfers will require the torrent files or magnet links." = "Dopo averli rimossi, continuare i trasferimenti richiederà i file torrent o i collegamenti magnetici.";
 
 /* Remove trackers alert -> message */
@@ -738,7 +660,6 @@
 
 /* Open toolbar item -> label
    URL sheet button */
-
 "Open" = "Apri";
 
 /* Open address toolbar item -> label */
@@ -758,7 +679,6 @@
 
 /* Inspector -> tab
    Inspector view -> title */
-
 "Options" = "Opzioni";
 
 /* Groups -> Name */
@@ -775,7 +695,6 @@
 
 /* All toolbar item -> label
    Dock item */
-
 "Pause All" = "Metti tutti in pausa";
 
 /* All toolbar item -> tooltip */
@@ -792,7 +711,6 @@
 
 /* Filter Bar -> filter button
    Torrent -> status string */
-
 "Paused" = "In pausa";
 
 /* Inspector -> peer -> status */
@@ -804,8 +722,6 @@
 /* Inspector -> tab
    Inspector view -> title
    Preferences -> toolbar item title */
-
-
 "Peers" = "Peer";
 
 /* Inspector -> Peers tab -> table row tooltip */
@@ -822,7 +738,6 @@
 
 /* File Outline -> Menu
    file table -> header tool tip */
-
 "Priority" = "Priorità";
 
 /* files tab -> tooltip */
@@ -856,14 +771,10 @@
    QuickLook toolbar item -> palette label
    QuickLook toolbar item -> tooltip
    View menu -> Quick Look */
-
-
-
 "Quick Look" = "Visualizzazione rapida";
 
 /* Confirm Quit panel -> button
    Legal alert -> button */
-
 "Quit" = "Esci";
 
 /* Dock Badger -> quit */
@@ -873,9 +784,6 @@
    status bar -> status label
    Torrent -> status string
    Torrent table -> group row -> tooltip */
-
-
-
 "Ratio" = "Rapporto";
 
 /* Groups -> Name */
@@ -894,9 +802,6 @@
    Remove completed confirm panel -> button
    Remove toolbar item -> label
    Remove trackers alert -> button */
-
-
-
 "Remove" = "Rimuovi";
 
 /* Main window -> 3rd bottom left button (remove all) tooltip */
@@ -922,12 +827,10 @@
 
 /* Stats reset -> button
    Stats window -> reset button */
-
 "Reset" = "Reset";
 
 /* All toolbar item -> label
    Dock item */
-
 "Resume All" = "Riprendi tutti";
 
 /* All toolbar item -> tooltip */
@@ -962,7 +865,6 @@
 
 /* Filter Bar -> filter button
    Torrent -> status string */
-
 "Seeding" = "In distribuzione";
 
 /* Torrent -> status string */
@@ -982,10 +884,6 @@
    Move torrent -> prompt
    Open torrent -> prompt
    Preferences -> Open panel prompt */
-
-
-
-
 "Select" = "Seleziona";
 
 /* Create torrent -> select file */
@@ -1011,7 +909,6 @@
 
 /* Share toolbar item -> label
    Share toolbar item -> palette label */
-
 "Share" = "Condividi";
 
 /* Share toolbar item -> tooltip */
@@ -1040,7 +937,6 @@
 
 /* Dock item
    Status Bar -> speed tooltip */
-
 "Speed Limit" = "Limite velocità";
 
 /* Growl notification title */
@@ -1063,7 +959,6 @@
 
 /* Action menu -> ratio stop
    torrent action menu -> ratio stop */
-
 "Stop at Ratio (%.2f)" = "Ferma al rapporto (%.2f)";
 
 /* Torrent cell -> button info */
@@ -1074,7 +969,6 @@
 
 /* File size - terabytes
    file/memory size - terabytes */
-
 "TB" = "TB";
 
 /* Transfer speed (terabytes per second) */
@@ -1094,7 +988,6 @@
 
 /* Move error alert -> message
    Move inside itself alert -> message */
-
 "The move operation of \"%@\" cannot be done." = "Impossibile eseguire l'operazione di spostamento di \"%@\".";
 
 /* blocklist fail message */
@@ -1177,7 +1070,6 @@
 
 /* Download not a torrent -> title
    Torrent download error -> title */
-
 "Torrent download failed" = "Ricezione torrent fallita";
 
 /* notification title */
@@ -1212,7 +1104,6 @@
 
 /* Inspector -> tab
    Inspector view -> title */
-
 "Trackers" = "Server traccia";
 
 /* Inspector -> Peers tab -> peers */
@@ -1236,8 +1127,6 @@
 /* inspector -> peer table -> header
    status bar -> status label
    Torrent -> status string */
-
-
 "UL" = "Invio";
 
 /* Inspector -> Peers tab -> peers */
@@ -1296,3 +1185,4 @@
 
 /* Inspector -> peer -> status */
 "You want to download, but peer does not want to send (interested and choked)" = "Vuoi scaricare dati, ma il peer non vuole inviarli (interessato e limitato)";
+

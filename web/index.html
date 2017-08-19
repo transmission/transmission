@@ -101,7 +101,7 @@
 						<div class="row"><div class="key"><input type="checkbox" id="seedRatioLimited"/><label for="seedRatioLimited">Stop seeding at ratio:</label></div>
                                                                  <div class="value"><input type="number" min="0" id="seedRatioLimit"/></div></div>
 						<div class="row"><div class="key"><input type="checkbox" id="idle-seeding-limit-enabled"/><label for="idle-seeding-limit-enabled">Stop seeding if idle for (min):</label></div>
-                                                                 <div class="value"><input type="number" min="0" id="idle-seeding-limit"/></div></div>
+                                                                 <div class="value"><input type="number" min="1" max="40320" id="idle-seeding-limit"/></div></div>
 					</div>
 				</div>
 				<div id="prefs-page-speed">
@@ -281,13 +281,98 @@
 			</div>
 		</div>
 
+		<div class="ui-helper-hidden" id="hotkeys-dialog">
+			<table>
+				<thead>
+				<tr>
+					<th>Key</th>
+					<th>Action</th>
+				</tr>
+				</thead>
+				<tbody>
+				<tr>
+					<td>/</td>
+					<td>Show hotkeys dialog</td>
+				</tr>
+				<tr>
+					<td>,</td>
+					<td>Open preferences</td>
+				</tr>
+				<tr>
+					<td>Enter</td>
+					<td>Confirm dialog</td>
+				</tr>
+				<tr>
+					<td>ESC</td>
+					<td>Close/cancel dialog</td>
+				</tr>
+				<tr>
+					<td>a</td>
+					<td>Select all torrents</td>
+				</tr>
+				<tr>
+					<td>SHIFT + a</td>
+					<td>Deselect all torrents</td>
+				</tr>
+				<tr>
+					<td>c</td>
+					<td>Toggle compact view</td>
+				</tr>
+				<tr>
+					<td>d</td>
+					<td>Delete selected torrents</td>
+				</tr>
+				<tr>
+					<td>Backspace</td>
+					<td>Delete selected torrents</td>
+				</tr>
+				<tr>
+					<td>DEL</td>
+					<td>Delete selected torrents</td>
+				</tr>
+				<tr>
+					<td>i</td>
+					<td>Toggle inspector</td>
+				</tr>
+				<tr>
+					<td>l</td>
+					<td>Move torrent/Set location</td>
+				</tr>
+				<tr>
+					<td>m</td>
+					<td>Move torrent/Set location</td>
+				</tr>
+				<tr>
+					<td>o</td>
+					<td>Add/open a torrent</td>
+				</tr>
+				<tr>
+					<td>u</td>
+					<td>Add/open a torrent</td>
+				</tr>
+				<tr>
+					<td>p</td>
+					<td>Pause selected torrents</td>
+				</tr>
+				<tr>
+					<td>r</td>
+					<td>Resume selected torrents</td>
+				</tr>
+				<tr>
+					<td>t</td>
+					<td>Toggle turtle mode</td>
+				</tr>
+				</tbody>
+			</table>
+		</div>
+
 		<div class="dialog_container ui-helper-hidden" id="upload_container">
 			<div class="dialog_top_bar"></div>
 			<div class="dialog_window">
 				<div class="dialog_logo" id="upload_dialog_logo"></div>
 				<h2 class="dialog_heading">Upload Torrent Files</h2>
 				<form action="#" method="post" id="torrent_upload_form"
-					enctype="multipart/form-data" target="torrent_upload_frame">
+					enctype="multipart/form-data" target="torrent_upload_frame" autocomplete="off">
 					<div class="dialog_message">
 						<label for="torrent_upload_file">Please select a torrent file to upload:</label>
 							<input type="file" name="torrent_files[]" id="torrent_upload_file" multiple="multiple" />
@@ -348,6 +433,7 @@
 				<li id="tipjar">Transmission Tip Jar</li>
 				<li>---</li>
 				<li id="statistics">Statistics</li>
+				<li id="hotkeys">Hotkeys</li>
 				<!--
 				<li id="toggle_notifications">Notifcations</li>
 				-->

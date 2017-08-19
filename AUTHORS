@@ -4,6 +4,7 @@ https://transmissionbt.com/
 Lead Developers <dev@transmissionbt.com>
   Jordan Lee, Mnemosyne LLC <jordan@transmissionbt.com> (Daemon, Backend, GTK+ client)
   Mitchell Livingston, Digital Ignition LLC <livings124@transmissionbt.com> (Mac OS X client)
+  Mike Gelfand <mike@transmissionbt.com>
 
 Project Contributors
   John Clay <john@transmissionbt.com> (Website maintenance and troubleshooting, Mac OS X help documentation)
@@ -11,7 +12,7 @@ Project Contributors
   Juliusz Chroboczek (DHT, network code, BitTorrent code improvements)
   Daniel Lee (Patches)
   Tomas Carnecky (Profiling, patches, and detection of sneaky bugs)
-  Diego Jiménez (Patches)
+  Diego JimÃ©nez (Patches)
   Kendall Hopkins <SoftwareElves@gmail.com> (Web client)
   Malcolm Jarvis <mjarvis@transmissionbt.com> (Web client)
   Kevin Glowacz <kjg@transmissionbt.com> (Web client)
@@ -40,8 +41,8 @@ Mac OS X Translators, current release:
   Guilherme Fernandes (Brazilian Portuguese)
   Sven-S. Porst (German)
   Tianhao He (Simplified Chinese)
-  Sérgio Miranda (European Portuguese)
-  Daniel ¯stergaard Nielsen (Danish)
+  SÃ©rgio Miranda (European Portuguese)
+  Daniel Ã˜stergaard Nielsen (Danish)
   Emir SARI (Turkish)
 
 GTK+ Translators:

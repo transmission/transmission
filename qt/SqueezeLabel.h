@@ -43,16 +43,15 @@
 
 #include <QLabel>
 
-class SqueezeLabel: public QLabel
+class SqueezeLabel : public QLabel
 {
     Q_OBJECT
 
-  public:
-    SqueezeLabel (QWidget * parent = nullptr);
-    SqueezeLabel (const QString& text, QWidget * parent = nullptr);
+public:
+    SqueezeLabel(QWidget* parent = nullptr);
+    SqueezeLabel(QString const& text, QWidget* parent = nullptr);
 
-  protected:
+protected:
     // QWidget
-    virtual void paintEvent (QPaintEvent * paintEvent);
+    virtual void paintEvent(QPaintEvent* paintEvent);
 };
-

@@ -17,18 +17,17 @@ class QVariant;
 
 class ComInteropHelper
 {
-  public:
-    ComInteropHelper ();
-    ~ComInteropHelper ();
+public:
+    ComInteropHelper();
+    ~ComInteropHelper();
 
-    bool isConnected () const;
+    bool isConnected() const;
 
-    QVariant addMetainfo (const QString& metainfo);
+    QVariant addMetainfo(QString const& metainfo);
 
-    static void initialize ();
-    static void registerObject (QObject * parent);
+    static void initialize();
+    static void registerObject(QObject* parent);
 
-  private:
+private:
     std::unique_ptr<QAxObject> m_client;
 };
-

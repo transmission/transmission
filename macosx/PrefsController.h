@@ -30,15 +30,15 @@
     tr_session * fHandle;
     NSUserDefaults * fDefaults;
     BOOL fHasLoaded;
-    
+
     IBOutlet NSView * fGeneralView, * fTransfersView, * fBandwidthView, * fPeersView, * fNetworkView, * fRemoteView, * fGroupsView;
-    
+
     NSString * fInitialString;
-    
+
     IBOutlet NSButton * fBuiltInGrowlButton, *fGrowlAppButton;
     IBOutlet NSTextField * fCheckForUpdatesLabel;
     IBOutlet NSButton * fCheckForUpdatesButton, * fCheckForUpdatesBetaButton;
-    
+
     IBOutlet NSPopUpButton * fFolderPopUp, * fIncompleteFolderPopUp, * fImportFolderPopUp, * fDoneScriptPopUp;
     IBOutlet NSButton * fShowMagnetAddWindowCheck;
     IBOutlet NSTextField * fRatioStopField, * fIdleStopField, * fQueueDownloadField, * fQueueSeedField, * fStalledField;
@@ -46,11 +46,11 @@
     IBOutlet NSTextField * fUploadField, * fDownloadField,
                         * fSpeedLimitUploadField, * fSpeedLimitDownloadField;
     IBOutlet NSPopUpButton * fAutoSpeedDayTypePopUp;
-    
+
     IBOutlet NSTextField * fPeersGlobalField, * fPeersTorrentField,
                         * fBlocklistURLField, * fBlocklistMessageField, * fBlocklistDateField;
     IBOutlet NSButton * fBlocklistButton;
-    
+
     PortChecker * fPortChecker;
     IBOutlet NSTextField * fPortField, * fPortStatusField;
     IBOutlet NSButton * fNatCheck;
@@ -58,7 +58,7 @@
     IBOutlet NSProgressIndicator * fPortStatusProgress;
     NSTimer * fPortStatusTimer;
     int fPeerPort, fNatStatus;
-    
+
     IBOutlet NSTextField * fRPCPortField, * fRPCPasswordField;
     IBOutlet NSTableView * fRPCWhitelistTable;
     NSMutableArray * fRPCWhitelistArray;

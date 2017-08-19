@@ -7,7 +7,7 @@
  */
 
 #ifndef __TRANSMISSION__
- #error only libtransmission should #include this header.
+#error only libtransmission should #include this header.
 #endif
 
 #pragma once
@@ -21,27 +21,26 @@
  */
 
 /**
- * @brief invoked by tr_sessionInit () to set up the locations of the resume, torrent, and clutch directories.
- * @see tr_getResumeDir ()
- * @see tr_getTorrentDir ()
- * @see tr_getWebClientDir ()
+ * @brief invoked by tr_sessionInit() to set up the locations of the resume, torrent, and clutch directories.
+ * @see tr_getResumeDir()
+ * @see tr_getTorrentDir()
+ * @see tr_getWebClientDir()
  */
-void tr_setConfigDir (tr_session * session, const char * configDir);
+void tr_setConfigDir(tr_session* session, char const* configDir);
 
 /** @brief return the directory where .resume files are stored */
-const char * tr_getResumeDir (const tr_session *);
+char const* tr_getResumeDir(tr_session const*);
 
 /** @brief return the directory where .torrent files are stored */
-const char * tr_getTorrentDir (const tr_session *);
+char const* tr_getTorrentDir(tr_session const*);
 
 /** @brief return the directory where the Web Client's web ui files are kept */
-const char * tr_getWebClientDir (const tr_session *);
+char const* tr_getWebClientDir(tr_session const*);
 
 /** @brief return the directory where session id lock files are stored */
-char * tr_getSessionIdDir (void);
+char* tr_getSessionIdDir(void);
 
 /** @} */
-
 
 /**
  * @addtogroup utils Utilities
@@ -51,11 +50,11 @@ char * tr_getSessionIdDir (void);
 typedef struct tr_thread tr_thread;
 
 /** @brief Instantiate a new process thread */
-tr_thread* tr_threadNew (void (*func)(void *), void * arg);
+tr_thread* tr_threadNew(void (* func)(void*), void* arg);
 
 /** @brief Return nonzero if this function is being called from `thread'
     @param thread the thread being tested */
-bool tr_amInThread (const tr_thread * thread);
+bool tr_amInThread(tr_thread const* thread);
 
 /***
 ****
@@ -64,19 +63,18 @@ bool tr_amInThread (const tr_thread * thread);
 typedef struct tr_lock tr_lock;
 
 /** @brief Create a new thread mutex object */
-tr_lock * tr_lockNew (void);
+tr_lock* tr_lockNew(void);
 
 /** @brief Destroy a thread mutex object */
-void tr_lockFree (tr_lock *);
+void tr_lockFree(tr_lock*);
 
 /** @brief Attempt to lock a thread mutex object */
-void tr_lockLock (tr_lock *);
+void tr_lockLock(tr_lock*);
 
 /** @brief Unlock a thread mutex object */
-void tr_lockUnlock (tr_lock *);
+void tr_lockUnlock(tr_lock*);
 
 /** @brief return nonzero if the specified lock is locked */
-bool tr_lockHave (const tr_lock *);
+bool tr_lockHave(tr_lock const*);
 
 /* @} */
-

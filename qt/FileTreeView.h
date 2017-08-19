@@ -20,66 +20,65 @@ class QSortFilterProxyModel;
 class FileTreeDelegate;
 class FileTreeModel;
 
-class FileTreeView: public QTreeView
+class FileTreeView : public QTreeView
 {
     Q_OBJECT
 
-  public:
-    FileTreeView (QWidget * parent = nullptr, bool editable = true);
+public:
+    FileTreeView(QWidget* parent = nullptr, bool editable = true);
 
-    void clear ();
-    void update (const FileList& files, bool updateProperties = true);
+    void clear();
+    void update(FileList const& files, bool updateProperties = true);
 
-    void setEditable (bool editable);
+    void setEditable(bool editable);
 
-  signals:
-    void priorityChanged (const QSet<int>& fileIndices, int priority);
-    void wantedChanged (const QSet<int>& fileIndices, bool wanted);
-    void pathEdited (const QString& oldpath, const QString& newname);
-    void openRequested (const QString& path);
+signals:
+    void priorityChanged(QSet<int> const& fileIndices, int priority);
+    void wantedChanged(QSet<int> const& fileIndices, bool wanted);
+    void pathEdited(QString const& oldpath, QString const& newname);
+    void openRequested(QString const& path);
 
-  protected:
+protected:
     // QWidget
-    virtual void resizeEvent (QResizeEvent * event);
-    virtual void keyPressEvent (QKeyEvent * event);
-    virtual void mouseDoubleClickEvent (QMouseEvent * event);
-    virtual void contextMenuEvent (QContextMenuEvent * event);
+    virtual void resizeEvent(QResizeEvent* event);
+    virtual void keyPressEvent(QKeyEvent* event);
+    virtual void mouseDoubleClickEvent(QMouseEvent* event);
+    virtual void contextMenuEvent(QContextMenuEvent* event);
 
     // QAbstractItemView
-    virtual bool edit (const QModelIndex& index, EditTrigger trigger, QEvent * event);
+    virtual bool edit(QModelIndex const& index, EditTrigger trigger, QEvent* event);
 
-  private slots:
-    void onClicked (const QModelIndex& index);
+private slots:
+    void onClicked(QModelIndex const& index);
 
-    void checkSelectedItems ();
-    void uncheckSelectedItems ();
-    void onlyCheckSelectedItems ();
-    void setSelectedItemsPriority ();
-    bool openSelectedItem ();
-    void renameSelectedItem ();
+    void checkSelectedItems();
+    void uncheckSelectedItems();
+    void onlyCheckSelectedItems();
+    void setSelectedItemsPriority();
+    bool openSelectedItem();
+    void renameSelectedItem();
 
-    void refreshContextMenuActionsSensitivity ();
+    void refreshContextMenuActionsSensitivity();
 
-  private:
-    void initContextMenu ();
-    QModelIndexList selectedSourceRows (int column = 0) const;
+private:
+    void initContextMenu();
+    QModelIndexList selectedSourceRows(int column = 0) const;
 
-    static Qt::CheckState getCumulativeCheckState (const QModelIndexList& indices);
+    static Qt::CheckState getCumulativeCheckState(QModelIndexList const& indices);
 
-  private:
-    FileTreeModel * myModel;
-    QSortFilterProxyModel * myProxy;
-    FileTreeDelegate * myDelegate;
+private:
+    FileTreeModel* myModel;
+    QSortFilterProxyModel* myProxy;
+    FileTreeDelegate* myDelegate;
 
-    QMenu * myContextMenu = nullptr;
-    QMenu * myPriorityMenu = nullptr;
-    QAction * myCheckSelectedAction = nullptr;
-    QAction * myUncheckSelectedAction = nullptr;
-    QAction * myOnlyCheckSelectedAction = nullptr;
-    QAction * myHighPriorityAction = nullptr;
-    QAction * myNormalPriorityAction = nullptr;
-    QAction * myLowPriorityAction = nullptr;
-    QAction * myOpenAction = nullptr;
-    QAction * myRenameAction = nullptr;
+    QMenu* myContextMenu = nullptr;
+    QMenu* myPriorityMenu = nullptr;
+    QAction* myCheckSelectedAction = nullptr;
+    QAction* myUncheckSelectedAction = nullptr;
+    QAction* myOnlyCheckSelectedAction = nullptr;
+    QAction* myHighPriorityAction = nullptr;
+    QAction* myNormalPriorityAction = nullptr;
+    QAction* myLowPriorityAction = nullptr;
+    QAction* myOpenAction = nullptr;
+    QAction* myRenameAction = nullptr;
 };
-

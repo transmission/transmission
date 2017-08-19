@@ -36,7 +36,7 @@
         fStat = *stat;
         fTorrent = torrent; //weak reference
     }
-    
+
     return self;
 }
 
@@ -55,24 +55,24 @@
 {
     if (self == object)
         return YES;
-    
+
     if (![object isKindOfClass: [self class]])
         return NO;
-    
+
     if ([self torrent] != [object torrent])
         return NO;
-    
+
     return [self tier] == [object tier] && [[self fullAnnounceAddress] isEqualToString: [object fullAnnounceAddress]];
 }
 
 - (NSString *) host
 {
-    return [NSString stringWithUTF8String: fStat.host];
+    return @(fStat.host);
 }
 
 - (NSString *) fullAnnounceAddress
 {
-    return [NSString stringWithUTF8String: fStat.announce];
+    return @(fStat.announce);
 }
 
 - (NSInteger) tier
@@ -109,21 +109,21 @@
         [dateFormatter setDateStyle: NSDateFormatterFullStyle];
         [dateFormatter setTimeStyle: NSDateFormatterShortStyle];
         [dateFormatter setDoesRelativeDateFormatting: YES];
-        
+
         dateString = [dateFormatter stringFromDate: [NSDate dateWithTimeIntervalSince1970: fStat.lastAnnounceTime]];
         [dateFormatter release];
     }
     else
         dateString = NSLocalizedString(@"N/A", "Tracker last announce");
-    
+
     NSString * baseString;
     if (fStat.hasAnnounced && fStat.lastAnnounceTimedOut)
         baseString = [NSLocalizedString(@"Announce timed out", "Tracker last announce") stringByAppendingFormat: @": %@", dateString];
     else if (fStat.hasAnnounced && !fStat.lastAnnounceSucceeded)
     {
         baseString = NSLocalizedString(@"Announce error", "Tracker last announce");
-        
-        NSString * errorString = [NSString stringWithUTF8String: fStat.lastAnnounceResult];
+
+        NSString * errorString = @(fStat.lastAnnounceResult);
         if ([errorString isEqualToString: @""])
             baseString = [baseString stringByAppendingFormat: @": %@", dateString];
         else
@@ -143,7 +143,7 @@
             baseString = [baseString stringByAppendingFormat: @" (%@)", peerString];
         }
     }
-    
+
     return baseString;
 }
 
@@ -153,11 +153,11 @@
     {
         case TR_TRACKER_ACTIVE:
             return [NSLocalizedString(@"Announce in progress", "Tracker next announce") stringByAppendingEllipsis];
-        
+
         case TR_TRACKER_WAITING:
         {
             const NSTimeInterval nextAnnounceTimeLeft = fStat.nextAnnounceTime - [[NSDate date] timeIntervalSince1970];
-            
+
             NSString *timeString;
             if ([NSApp isOnYosemiteOrBetter]) {
                 static NSDateComponentsFormatter *formatter;
@@ -168,7 +168,7 @@
                     formatter.zeroFormattingBehavior = NSDateComponentsFormatterZeroFormattingBehaviorDropLeading;
                     formatter.collapsesLargestUnit = YES;
                 });
-                
+
                 timeString = [formatter stringFromTimeInterval: nextAnnounceTimeLeft];
             }
             else {
@@ -179,11 +179,11 @@
         }
         case TR_TRACKER_QUEUED:
             return [NSLocalizedString(@"Announce is queued", "Tracker next announce") stringByAppendingEllipsis];
-        
+
         case TR_TRACKER_INACTIVE:
             return fStat.isBackup ? NSLocalizedString(@"Tracker will be used as a backup", "Tracker next announce")
                                     : NSLocalizedString(@"Announce not scheduled", "Tracker next announce");
-        
+
         default:
             NSAssert1(NO, @"unknown announce state: %d", fStat.announceState);
             return nil;
@@ -199,21 +199,21 @@
         [dateFormatter setDateStyle: NSDateFormatterFullStyle];
         [dateFormatter setTimeStyle: NSDateFormatterShortStyle];
         [dateFormatter setDoesRelativeDateFormatting: YES];
-        
+
         dateString = [dateFormatter stringFromDate: [NSDate dateWithTimeIntervalSince1970: fStat.lastScrapeTime]];
         [dateFormatter release];
     }
     else
         dateString = NSLocalizedString(@"N/A", "Tracker last scrape");
-    
+
     NSString * baseString;
     if (fStat.hasScraped && fStat.lastScrapeTimedOut)
         baseString = [NSLocalizedString(@"Scrape timed out", "Tracker last scrape") stringByAppendingFormat: @": %@", dateString];
     else if (fStat.hasScraped && !fStat.lastScrapeSucceeded)
     {
         baseString = NSLocalizedString(@"Scrape error", "Tracker last scrape");
-        
-        NSString * errorString = [NSString stringWithUTF8String: fStat.lastScrapeResult];
+
+        NSString * errorString = @(fStat.lastScrapeResult);
         if ([errorString isEqualToString: @""])
             baseString = [baseString stringByAppendingFormat: @": %@", dateString];
         else
@@ -221,7 +221,7 @@
     }
     else
         baseString = [NSLocalizedString(@"Last Scrape", "Tracker last scrape") stringByAppendingFormat: @": %@", dateString];
-    
+
     return baseString;
 }
 

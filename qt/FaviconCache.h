@@ -17,38 +17,37 @@ class QNetworkAccessManager;
 class QNetworkReply;
 class QUrl;
 
-class FaviconCache: public QObject
+class FaviconCache : public QObject
 {
     Q_OBJECT
 
-  public:
-    FaviconCache ();
-    virtual ~FaviconCache ();
+public:
+    FaviconCache();
+    virtual ~FaviconCache();
 
     // returns a cached pixmap, or a NULL pixmap if there's no match in the cache
-    QPixmap find (const QUrl& url);
+    QPixmap find(QUrl const& url);
 
     // returns a cached pixmap, or a NULL pixmap if there's no match in the cache
-    QPixmap findFromHost (const QString& host);
+    QPixmap findFromHost(QString const& host);
 
     // this will emit a signal when (if) the icon becomes ready
-    void add (const QUrl& url);
+    void add(QUrl const& url);
 
-    static QString getHost (const QUrl& url);
-    static QSize getIconSize ();
+    static QString getHost(QUrl const& url);
+    static QSize getIconSize();
 
-  signals:
-    void pixmapReady (const QString& host);
+signals:
+    void pixmapReady(QString const& host);
 
-  private:
-    QString getCacheDir ();
-    void ensureCacheDirHasBeenScanned ();
+private:
+    QString getCacheDir();
+    void ensureCacheDirHasBeenScanned();
 
-  private slots:
-    void onRequestFinished (QNetworkReply * reply);
+private slots:
+    void onRequestFinished(QNetworkReply* reply);
 
-  private:
-    QNetworkAccessManager * myNAM;
+private:
+    QNetworkAccessManager* myNAM;
     QMap<QString, QPixmap> myPixmaps;
 };
-

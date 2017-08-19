@@ -100,6 +100,9 @@
       <Component Id="dll.qt5.widgets">
         <File DiskId="1" KeyPath="yes" Name="Qt5Widgets.dll" />
       </Component>
+      <Component Id="dll.qt5.winextras">
+        <File DiskId="1" KeyPath="yes" Name="Qt5WinExtras.dll" />
+      </Component>
 
     </DirectoryRef>
     <DirectoryRef Id="INSTALLDIR" FileSource="$(var.QtDir)\plugins">
@@ -132,6 +135,7 @@
       <ComponentRef Id="dll.qt5.gui" />
       <ComponentRef Id="dll.qt5.network" />
       <ComponentRef Id="dll.qt5.widgets" />
+      <ComponentRef Id="dll.qt5.winextras" />
       <ComponentRef Id="dll.qt5.plugins.platforms.windows" />
       <ComponentRef Id="dll.dbus" />
       <ComponentRef Id="dll.expat" />

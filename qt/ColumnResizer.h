@@ -14,26 +14,25 @@
 class QGridLayout;
 class QTimer;
 
-class ColumnResizer: public QObject
+class ColumnResizer : public QObject
 {
     Q_OBJECT
 
-  public:
-    ColumnResizer (QObject * parent = nullptr);
+public:
+    ColumnResizer(QObject* parent = nullptr);
 
-    void addLayout (QGridLayout * layout);
+    void addLayout(QGridLayout* layout);
 
     // QObject
-    virtual bool eventFilter (QObject * object, QEvent * event);
+    virtual bool eventFilter(QObject* object, QEvent* event);
 
-  public slots:
-    void update ();
+public slots:
+    void update();
 
-  private:
-    void scheduleUpdate ();
+private:
+    void scheduleUpdate();
 
-  private:
-    QTimer * myTimer;
-    QSet<QGridLayout *> myLayouts;
+private:
+    QTimer* myTimer;
+    QSet<QGridLayout*> myLayouts;
 };
-

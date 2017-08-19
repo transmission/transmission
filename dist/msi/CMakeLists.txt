@@ -17,11 +17,7 @@ if(NOT TR_THIRD_PARTY_DIR)
 endif()
 
 if(NOT TR_QT_DIR)
-    if(USE_QT5)
-        set(TR_QT_DIR "$<TARGET_FILE_DIR:Qt5::Core>/..")
-    else()
-        set(TR_QT_DIR "$<TARGET_FILE_DIR:Qt4::Core>/..")
-    endif()
+    set(TR_QT_DIR "$<TARGET_FILE_DIR:Qt5::Core>/..")
 endif()
 
 set(ICONS_DIR "${CMAKE_SOURCE_DIR}/qt/icons/hicolor")

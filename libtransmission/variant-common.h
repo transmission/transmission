@@ -7,58 +7,40 @@
  */
 
 #ifndef __LIBTRANSMISSION_VARIANT_MODULE__
- #error only libtransmission/variant-*.c should #include this header.
+#error only libtransmission/variant-*.c should #include this header.
 #endif
 
 #pragma once
 
-typedef void (*VariantWalkFunc)(const tr_variant * val, void * user_data);
+typedef void (* VariantWalkFunc)(tr_variant const* val, void* user_data);
 
 struct VariantWalkFuncs
 {
-  VariantWalkFunc intFunc;
-  VariantWalkFunc boolFunc;
-  VariantWalkFunc realFunc;
-  VariantWalkFunc stringFunc;
-  VariantWalkFunc dictBeginFunc;
-  VariantWalkFunc listBeginFunc;
-  VariantWalkFunc containerEndFunc;
+    VariantWalkFunc intFunc;
+    VariantWalkFunc boolFunc;
+    VariantWalkFunc realFunc;
+    VariantWalkFunc stringFunc;
+    VariantWalkFunc dictBeginFunc;
+    VariantWalkFunc listBeginFunc;
+    VariantWalkFunc containerEndFunc;
 };
 
-void
-tr_variantWalk (const tr_variant               * top,
-                const struct VariantWalkFuncs  * walkFuncs,
-                void                           * user_data,
-                bool                             sort_dicts);
+void tr_variantWalk(tr_variant const* top, struct VariantWalkFuncs const* walkFuncs, void* user_data, bool sort_dicts);
 
-void tr_variantToBufJson (const tr_variant * top, struct evbuffer * buf, bool lean);
+void tr_variantToBufJson(tr_variant const* top, struct evbuffer* buf, bool lean);
 
-void tr_variantToBufBenc (const tr_variant * top, struct evbuffer * buf);
+void tr_variantToBufBenc(tr_variant const* top, struct evbuffer* buf);
 
-void tr_variantInit (tr_variant * v, char type);
+void tr_variantInit(tr_variant* v, char type);
 
-int tr_jsonParse (const char    * source, /* Such as a filename. Only when logging an error */
-                  const void    * vbuf,
-                  size_t          len,
-                  tr_variant    * setme_benc,
-                  const char   ** setme_end);
+/* source - such as a filename. Only when logging an error */
+int tr_jsonParse(char const* source, void const* vbuf, size_t len, tr_variant* setme_benc, char const** setme_end);
 
 /** @brief Private function that's exposed here only for unit tests */
-int tr_bencParseInt (const uint8_t *  buf,
-                     const uint8_t *  bufend,
-                     const uint8_t ** setme_end,
-                     int64_t *        setme_val);
+int tr_bencParseInt(uint8_t const* buf, uint8_t const* bufend, uint8_t const** setme_end, int64_t* setme_val);
 
 /** @brief Private function that's exposed here only for unit tests */
-int tr_bencParseStr (const uint8_t *  buf,
-                     const uint8_t *  bufend,
-                     const uint8_t ** setme_end,
-                     const uint8_t ** setme_str,
-                     size_t *         setme_strlen);
+int tr_bencParseStr(uint8_t const* buf, uint8_t const* bufend, uint8_t const** setme_end, uint8_t const** setme_str,
+    size_t* setme_strlen);
 
-int tr_variantParseBenc (const void     * buf,
-                         const void     * end,
-                         tr_variant     * top,
-                         const char ** setme_end);
-
-
+int tr_variantParseBenc(void const* buf, void const* end, tr_variant* top, char const** setme_end);

@@ -1,27 +1,5 @@
 project(trqt)
 
-if(USE_QT5)
-    macro(tr_qt_wrap_ui)
-        qt5_wrap_ui(${ARGN})
-    endmacro()
-    macro(tr_qt_add_resources)
-        qt5_add_resources(${ARGN})
-    endmacro()
-    macro(tr_qt_add_translation)
-        qt5_add_translation(${ARGN})
-    endmacro()
-else()
-    macro(tr_qt_wrap_ui)
-        qt4_wrap_ui(${ARGN})
-    endmacro()
-    macro(tr_qt_add_resources)
-        qt4_add_resources(${ARGN})
-    endmacro()
-    macro(tr_qt_add_translation)
-        qt4_add_translation(${ARGN})
-    endmacro()
-endif()
-
 set(${PROJECT_NAME}_SOURCES
     AboutDialog.cc
     AddData.cc
@@ -38,7 +16,6 @@ set(${PROJECT_NAME}_SOURCES
     FilterBar.cc
     FilterBarComboBox.cc
     FilterBarComboBoxDelegate.cc
-    FilterBarLineEdit.cc
     Filters.cc
     Formatter.cc
     FreeSpaceLabel.cc
@@ -59,6 +36,7 @@ set(${PROJECT_NAME}_SOURCES
     SessionDialog.cc
     SqueezeLabel.cc
     StatsDialog.cc
+    StyleHelper.cc
     Torrent.cc
     TorrentDelegate.cc
     TorrentDelegateMin.cc
@@ -97,7 +75,6 @@ set(${PROJECT_NAME}_HEADERS
     FilterBar.h
     FilterBarComboBox.h
     FilterBarComboBoxDelegate.h
-    FilterBarLineEdit.h
     Filters.h
     Formatter.h
     FreeSpaceLabel.h
@@ -119,6 +96,7 @@ set(${PROJECT_NAME}_HEADERS
     Speed.h
     SqueezeLabel.h
     StatsDialog.h
+    StyleHelper.h
     Torrent.h
     TorrentDelegate.h
     TorrentDelegateMin.h
@@ -162,12 +140,17 @@ set(${PROJECT_NAME}_LINGUAS
     hu
     id
     it_IT
+    ka
     kk
     ko
     lt
-    pl_PL
+    nl
+    pl
     pt_BR
+    pt_PT
     ru
+    sv
+    tr
     uk
     zh_CN
 )

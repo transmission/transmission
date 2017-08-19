@@ -28,7 +28,7 @@
 @interface Badger : NSObject
 {
     tr_session * fLib;
-    
+
     NSMutableSet * fHashes;
 }
 

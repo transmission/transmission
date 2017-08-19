@@ -10,17 +10,22 @@
 
 #include <QItemDelegate>
 
-class FileTreeDelegate: public QItemDelegate
+class FileTreeDelegate : public QItemDelegate
 {
     Q_OBJECT
 
-  public:
-    FileTreeDelegate (QObject * parent = nullptr): QItemDelegate (parent) {}
-    virtual ~FileTreeDelegate () {}
+public:
+    FileTreeDelegate(QObject* parent = nullptr) :
+        QItemDelegate(parent)
+    {
+    }
 
-  public:
+    virtual ~FileTreeDelegate()
+    {
+    }
+
+public:
     // QAbstractItemDelegate
-    virtual QSize sizeHint (const QStyleOptionViewItem&, const QModelIndex&) const;
-    virtual void paint (QPainter *, const QStyleOptionViewItem&, const QModelIndex&) const;
+    virtual QSize sizeHint(QStyleOptionViewItem const&, QModelIndex const&) const;
+    virtual void paint(QPainter*, QStyleOptionViewItem const&, QModelIndex const&) const;
 };
-

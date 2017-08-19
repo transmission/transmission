@@ -11,5 +11,4 @@
 #include <gtk/gtk.h>
 #include "tr-core.h"
 
-GtkWidget* gtr_stats_dialog_new (GtkWindow * parent, TrCore * core);
-
+GtkWidget* gtr_stats_dialog_new(GtkWindow* parent, TrCore* core);

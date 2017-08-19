@@ -9,10 +9,10 @@
 #pragma once
 
 #ifdef ENABLE_COM_INTEROP
-  #include "ComInteropHelper.h"
+#include "ComInteropHelper.h"
 #endif
 #ifdef ENABLE_DBUS_INTEROP
-  #include "DBusInteropHelper.h"
+#include "DBusInteropHelper.h"
 #endif
 
 class QAxObject;
@@ -21,15 +21,15 @@ class QVariant;
 
 class InteropHelper
 {
-  public:
-    bool isConnected () const;
+public:
+    bool isConnected() const;
 
-    bool addMetainfo (const QString& metainfo);
+    bool addMetainfo(QString const& metainfo);
 
-    static void initialize ();
-    static void registerObject (QObject * parent);
+    static void initialize();
+    static void registerObject(QObject* parent);
 
-  private:
+private:
 #ifdef ENABLE_DBUS_INTEROP
     DBusInteropHelper myDbusClient;
 #endif
@@ -37,4 +37,3 @@ class InteropHelper
     ComInteropHelper myComClient;
 #endif
 };
-

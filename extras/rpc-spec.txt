@@ -18,7 +18,7 @@
    The command-line utility "transmission-remote" uses this RPC API.
    Several developers have reported using its --debug JSON output as
    a reference when developing/debugging their own code.
-   
+
 2.  Message Format
 
    Messages are formatted as objects.  There are two types:
@@ -145,7 +145,7 @@
    in libtransmission/transmission.h.  The "source" column here
    corresponds to the data structure there.
 
-   key                         | type                        | source 
+   key                         | type                        | source
    ----------------------------+-----------------------------+---------
    activityDate                | number                      | tr_stat
    addedDate                   | number                      | tr_stat
@@ -320,7 +320,7 @@
 
    Say we want to get the name and total size of torrents #7 and #10.
 
-   Request: 
+   Request:
 
       {
          "arguments": {
@@ -336,8 +336,8 @@
 
       {
          "arguments": {
-            "torrents": [ 
-               { 
+            "torrents": [
+               {
                    "id": 10,
                    "name": "Fedora x86_64 DVD",
                    "totalSize": 34983493932,
@@ -346,7 +346,7 @@
                    "id": 7,
                    "name": "Ubuntu x86_64 DVD",
                    "totalSize", 9923890123,
-               } 
+               }
             ]
          },
          "result": "success",
@@ -367,7 +367,7 @@
    "metainfo"           | string      base64-encoded .torrent content
    "paused"             | boolean     if true, don't start the torrent
    "peer-limit"         | number      maximum number of peers
-   "bandwidthPriority"  | number      torrent's bandwidth tr_priority_t 
+   "bandwidthPriority"  | number      torrent's bandwidth tr_priority_t
    "files-wanted"       | array       indices of file(s) to download
    "files-unwanted"     | array       indices of file(s) to not download
    "priority-high"      | array       indices of high-priority file(s)
@@ -379,7 +379,7 @@
 
    The format of the "cookies" should be NAME=CONTENTS, where NAME is the
    cookie name and CONTENTS is what the cookie should contain.
-   Set multiple cookies like this: "name1=content1; name2=content2;" etc. 
+   Set multiple cookies like this: "name1=content1; name2=content2;" etc.
    <http://curl.haxx.se/libcurl/c/curl_easy_setopt.html#CURLOPTCOOKIE>
 
    Response arguments: On success, a "torrent-added" object in the
@@ -671,12 +671,12 @@
          |         |           |                      |
          |         | yes       | torrent-set          | new arg "bandwidthPriority"
          |         | yes       | torrent-set          | new arg "honorsSessionLimits"
-         |         | yes       | torrent-set          | new arg "seedRatioLimit" 
-         |         | yes       | torrent-set          | new arg "seedRatioLimited" 
-         |         |        NO | torrent-set          | renamed "speed-limit-down" to "downloadLimit" 
-         |         |        NO | torrent-set          | renamed "speed-limit-down-enabled" to "downloadLimited" 
-         |         |        NO | torrent-set          | renamed "speed-limit-up" to "uploadLimit" 
-         |         |        NO | torrent-set          | renamed "speed-limit-up-enabled" to "uploadLimited" 
+         |         | yes       | torrent-set          | new arg "seedRatioLimit"
+         |         | yes       | torrent-set          | new arg "seedRatioLimited"
+         |         |        NO | torrent-set          | renamed "speed-limit-down" to "downloadLimit"
+         |         |        NO | torrent-set          | renamed "speed-limit-down-enabled" to "downloadLimited"
+         |         |        NO | torrent-set          | renamed "speed-limit-up" to "uploadLimit"
+         |         |        NO | torrent-set          | renamed "speed-limit-up-enabled" to "uploadLimited"
          |         |           |                      |
          |         | yes       | torrent-get          | new arg "bandwidthPriority"
          |         | yes       | torrent-get          | new arg "fileStats"

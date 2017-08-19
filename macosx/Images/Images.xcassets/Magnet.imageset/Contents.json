@@ -1,0 +1,21 @@
+{
+  "images" : [
+    {
+      "idiom" : "mac",
+      "filename" : "Magnet.png",
+      "scale" : "1x"
+    },
+    {
+      "idiom" : "mac",
+      "filename" : "Magnet@2x.png",
+      "scale" : "2x"
+    }
+  ],
+  "info" : {
+    "version" : 1,
+    "author" : "xcode"
+  },
+  "properties" : {
+    "template-rendering-intent" : "original"
+  }
+}

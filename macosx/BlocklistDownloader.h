@@ -34,13 +34,13 @@ typedef enum
 @interface BlocklistDownloader : NSObject <NSURLDownloadDelegate>
 {
     NSURLDownload * fDownload;
-    
+
     BlocklistDownloaderViewController * fViewController;
-    
+
     NSString * fDestination;
     NSUInteger fCurrentSize;
     long long fExpectedSize;
-    
+
     blocklistDownloadState fState;
 }
 

@@ -16,39 +16,38 @@ class FilterMode;
 class Prefs;
 class Torrent;
 
-class TorrentFilter: public QSortFilterProxyModel
+class TorrentFilter : public QSortFilterProxyModel
 {
     Q_OBJECT
 
-  public:
+public:
     enum TextMode
     {
-      FILTER_BY_NAME,
-      FILTER_BY_FILES,
-      FILTER_BY_TRACKER
+        FILTER_BY_NAME,
+        FILTER_BY_FILES,
+        FILTER_BY_TRACKER
     };
 
-  public:
-    TorrentFilter (const Prefs& prefs);
-    virtual ~TorrentFilter ();
+public:
+    TorrentFilter(Prefs const& prefs);
+    virtual ~TorrentFilter();
 
-    int hiddenRowCount () const;
+    int hiddenRowCount() const;
 
-    void countTorrentsPerMode (int * setmeCounts) const;
+    void countTorrentsPerMode(int* setmeCounts) const;
 
-  protected:
+protected:
     // QSortFilterProxyModel
-    virtual bool filterAcceptsRow (int, const QModelIndex&) const;
-    virtual bool lessThan (const QModelIndex&, const QModelIndex&) const;
+    virtual bool filterAcceptsRow(int, QModelIndex const&) const;
+    virtual bool lessThan(QModelIndex const&, QModelIndex const&) const;
 
-  private:
-    bool activityFilterAcceptsTorrent (const Torrent * tor, const FilterMode& mode) const;
-    bool trackerFilterAcceptsTorrent (const Torrent * tor, const QString& tracker) const;
+private:
+    bool activityFilterAcceptsTorrent(Torrent const* tor, FilterMode const& mode) const;
+    bool trackerFilterAcceptsTorrent(Torrent const* tor, QString const& tracker) const;
 
-  private slots:
-    void refreshPref (int key);
+private slots:
+    void refreshPref(int key);
 
-  private:
-    const Prefs& myPrefs;
+private:
+    Prefs const& myPrefs;
 };
-

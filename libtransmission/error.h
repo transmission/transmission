@@ -10,16 +10,11 @@
 
 #include <stdarg.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include "tr-macros.h"
 
-#ifndef TR_GNUC_PRINTF
- #ifdef __GNUC__
-  #define TR_GNUC_PRINTF(fmt, args) __attribute__ ((format (printf, fmt, args)))
- #else
-  #define TR_GNUC_PRINTF(fmt, args)
- #endif
+#ifdef __cplusplus
+extern "C"
+{
 #endif
 
 /**
@@ -30,10 +25,10 @@ extern "C" {
 /** @brief Structure holding error information. */
 typedef struct tr_error
 {
-  /** @brief Error code, platform-specific */
-  int    code;
-  /** @brief Error message */
-  char * message;
+    /** @brief Error code, platform-specific */
+    int code;
+    /** @brief Error message */
+    char* message;
 }
 tr_error;
 
@@ -46,9 +41,7 @@ tr_error;
  *
  * @return Newly allocated error object on success, `NULL` otherwise.
  */
-tr_error * tr_error_new                (int           code,
-                                        const char  * message_format,
-                                                      ...) TR_GNUC_PRINTF (2, 3);
+tr_error* tr_error_new(int code, char const* message_format, ...) TR_GNUC_PRINTF(2, 3);
 
 /**
  * @brief Create new error object using literal error message.
@@ -58,8 +51,7 @@ tr_error * tr_error_new                (int           code,
  *
  * @return Newly allocated error object on success, `NULL` otherwise.
  */
-tr_error * tr_error_new_literal        (int           code,
-                                        const char  * message);
+tr_error* tr_error_new_literal(int code, char const* message);
 
 /**
  * @brief Create new error object using `vprintf`-style formatting.
@@ -70,16 +62,14 @@ tr_error * tr_error_new_literal        (int           code,
  *
  * @return Newly allocated error object on success, `NULL` otherwise.
  */
-tr_error * tr_error_new_valist         (int           code,
-                                        const char  * message_format,
-                                        va_list       args);
+tr_error* tr_error_new_valist(int code, char const* message_format, va_list args);
 
 /**
  * @brief Free memory used by error object.
  *
  * @param[in] error Error object to be freed.
  */
-void       tr_error_free               (tr_error    * error);
+void tr_error_free(tr_error* error);
 
 /**
  * @brief Create and set new error object using `printf`-style formatting.
@@ -91,10 +81,7 @@ void       tr_error_free               (tr_error    * error);
  * @param[in]     message_format Error message format string.
  * @param[in]     ...            Format arguments.
  */
-void       tr_error_set                (tr_error   ** error,
-                                        int           code,
-                                        const char  * message_format,
-                                                      ...) TR_GNUC_PRINTF (3, 4);
+void tr_error_set(tr_error** error, int code, char const* message_format, ...) TR_GNUC_PRINTF(3, 4);
 
 /**
  * @brief Create and set new error object using literal error message.
@@ -105,9 +92,7 @@ void       tr_error_set                (tr_error   ** error,
  * @param[in]     code    Error code (platform-specific).
  * @param[in]     message Error message.
  */
-void       tr_error_set_literal        (tr_error   ** error,
-                                        int           code,
-                                        const char  * message);
+void tr_error_set_literal(tr_error** error, int code, char const* message);
 
 /**
  * @brief Propagate existing error object upwards.
@@ -119,8 +104,7 @@ void       tr_error_set_literal        (tr_error   ** error,
  * @param[in,out] new_error Pointer to error object to be set.
  * @param[in,out] old_error Error object to be propagated. Cleared on return.
  */
-void       tr_error_propagate          (tr_error   ** new_error,
-                                        tr_error   ** old_error);
+void tr_error_propagate(tr_error** new_error, tr_error** old_error);
 
 /**
  * @brief Clear error object.
@@ -130,7 +114,7 @@ void       tr_error_propagate          (tr_error   ** new_error,
  *
  * @param[in,out] error Pointer to error object to be cleared.
  */
-void       tr_error_clear              (tr_error   ** error);
+void tr_error_clear(tr_error** error);
 
 /**
  * @brief Prefix message of exising error object.
@@ -142,9 +126,7 @@ void       tr_error_clear              (tr_error   ** error);
  * @param[in]     prefix_format Prefix format string.
  * @param[in]     ...           Format arguments.
  */
-void       tr_error_prefix             (tr_error   ** error,
-                                        const char  * prefix_format,
-                                                      ...) TR_GNUC_PRINTF (2, 3);
+void tr_error_prefix(tr_error** error, char const* prefix_format, ...) TR_GNUC_PRINTF(2, 3);
 
 /**
  * @brief Prefix message and propagate existing error object upwards.
@@ -158,14 +140,11 @@ void       tr_error_prefix             (tr_error   ** error,
  * @param[in] prefix_format Prefix format string.
  * @param[in] ... Format arguments.
  */
-void       tr_error_propagate_prefixed (tr_error   ** new_error,
-                                        tr_error   ** old_error,
-                                        const char  * prefix_format,
-                                                      ...) TR_GNUC_PRINTF (3, 4);
+void tr_error_propagate_prefixed(tr_error** new_error, tr_error** old_error, char const* prefix_format, ...) TR_GNUC_PRINTF(3,
+    4);
 
 /** @} */
 
 #ifdef __cplusplus
 }
 #endif
-

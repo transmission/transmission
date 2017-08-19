@@ -10,29 +10,28 @@
 
 #include <QListView>
 
-class TorrentView: public QListView
+class TorrentView : public QListView
 {
     Q_OBJECT
 
-  public:
-    TorrentView (QWidget * parent = nullptr);
+public:
+    TorrentView(QWidget* parent = nullptr);
 
-  public slots:
-    void setHeaderText (const QString& text);
+public slots:
+    void setHeaderText(QString const& text);
 
-  signals:
-    void headerDoubleClicked ();
+signals:
+    void headerDoubleClicked();
 
-  protected:
-    virtual void resizeEvent (QResizeEvent * event);
+protected:
+    virtual void resizeEvent(QResizeEvent* event);
 
-  private:
+private:
     class HeaderWidget;
 
-  private:
-    void adjustHeaderPosition ();
+private:
+    void adjustHeaderPosition();
 
-  private:
-    HeaderWidget * const myHeaderWidget;
+private:
+    HeaderWidget* const myHeaderWidget;
 };
-

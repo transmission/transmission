@@ -53,6 +53,7 @@ set(${PROJECT_NAME}_SOURCES
     torrent-magnet.c
     tr-dht.c
     trevent.c
+    tr-assert.c
     tr-getopt.c
     tr-lpd.c
     tr-udp.c
@@ -107,7 +108,9 @@ set(${PROJECT_NAME}_PUBLIC_HEADERS
     quark.h
     rpcimpl.h
     session-id.h
+    tr-assert.h
     tr-getopt.h
+    tr-macros.h
     transmission.h
     utils.h
     variant.h
@@ -141,6 +144,7 @@ set(${PROJECT_NAME}_PRIVATE_HEADERS
     peer-io.h
     peer-mgr.h
     peer-msgs.h
+    peer-socket.h
     platform.h
     platform-quota.h
     port-forwarding.h
@@ -274,8 +278,8 @@ if(ENABLE_TESTS)
 
     set(watchdir@generic-test_DEFINITIONS WATCHDIR_TEST_FORCE_GENERIC)
 
-    foreach(T bitfield blocklist clients crypto error file history json magnet metainfo move peer-msgs quark rename rpc session
-              tr-getopt utils variant watchdir watchdir@generic)
+    foreach(T bitfield blocklist clients crypto error file history json magnet makemeta metainfo move peer-msgs quark rename rpc
+              session tr-getopt utils variant watchdir watchdir@generic)
         set(TP ${TR_NAME}-test-${T})
         if(T MATCHES "^([^@]+)@.+$")
             string(REPLACE "@" "_" TP "${TP}")

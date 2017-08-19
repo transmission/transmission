@@ -1,8 +1,9 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="9531" systemVersion="15B42" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11762" systemVersion="16D32" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="9531"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11762"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="InfoOptionsViewController">
@@ -70,7 +71,7 @@
                     </connections>
                 </button>
                 <button translatesAutoresizingMaskIntoConstraints="NO" id="6">
-                    <rect key="frame" x="9" y="139" width="267" height="18"/>
+                    <rect key="frame" x="9" y="139" width="268" height="18"/>
                     <buttonCell key="cell" type="check" title="Не превышать общее ограничение скорости" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" allowsMixedState="YES" inset="2" id="45">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                         <font key="font" metaFont="smallSystem"/>
@@ -90,7 +91,7 @@
                     </connections>
                 </button>
                 <button translatesAutoresizingMaskIntoConstraints="NO" id="8">
-                    <rect key="frame" x="9" y="160" width="191" height="18"/>
+                    <rect key="frame" x="9" y="160" width="192" height="18"/>
                     <buttonCell key="cell" type="check" title="Ограничить скорость раздачи:" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" allowsMixedState="YES" inset="2" id="43">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                         <font key="font" metaFont="smallSystem"/>
@@ -137,7 +138,7 @@
                     </textFieldCell>
                 </textField>
                 <textField verticalHuggingPriority="750" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="14">
-                    <rect key="frame" x="10" y="34" width="95" height="14"/>
+                    <rect key="frame" x="10" y="34" width="96" height="14"/>
                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Дополнительно" id="31">
                         <font key="font" metaFont="smallSystemBold"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -257,7 +258,7 @@
                     </connections>
                 </textField>
                 <textField verticalHuggingPriority="750" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="5">
-                    <rect key="frame" x="10" y="249" width="67" height="14"/>
+                    <rect key="frame" x="10" y="249" width="68" height="14"/>
                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Приоритет" id="46">
                         <font key="font" metaFont="smallSystemBold"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -331,7 +332,7 @@
                     <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" drawsBackground="YES" id="82">
                         <numberFormatter key="formatter" formatterBehavior="default10_4" usesGroupingSeparator="NO" groupingSize="0" minimumIntegerDigits="0" maximumIntegerDigits="42" id="83">
                             <real key="minimum" value="1"/>
-                            <real key="maximum" value="99999"/>
+                            <real key="maximum" value="40320"/>
                         </numberFormatter>
                         <font key="font" metaFont="smallSystem"/>
                         <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>

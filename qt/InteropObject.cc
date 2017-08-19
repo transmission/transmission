@@ -10,25 +10,25 @@
 #include "Application.h"
 #include "InteropObject.h"
 
-InteropObject::InteropObject (QObject * parent):
-  QObject (parent)
+InteropObject::InteropObject(QObject* parent) :
+    QObject(parent)
 {
 }
 
-bool
-InteropObject::PresentWindow ()
+bool InteropObject::PresentWindow()
 {
-  qApp->raise ();
-  return true;
+    qApp->raise();
+    return true;
 }
 
-bool
-InteropObject::AddMetainfo (const QString& metainfo)
+bool InteropObject::AddMetainfo(QString const& metainfo)
 {
-  AddData addme (metainfo);
+    AddData addme(metainfo);
 
-  if (addme.type != addme.NONE)
-    qApp->addTorrent (addme);
+    if (addme.type != addme.NONE)
+    {
+        qApp->addTorrent(addme);
+    }
 
-  return true;
+    return true;
 }

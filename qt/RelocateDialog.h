@@ -17,27 +17,29 @@
 class Session;
 class TorrentModel;
 
-class RelocateDialog: public BaseDialog
+class RelocateDialog : public BaseDialog
 {
     Q_OBJECT
 
-  public:
-    RelocateDialog (Session&, const TorrentModel&, const QSet<int>& ids, QWidget * parent = nullptr);
-    virtual ~RelocateDialog () {}
+public:
+    RelocateDialog(Session&, TorrentModel const&, QSet<int> const& ids, QWidget* parent = nullptr);
 
-  private:
-    QString newLocation () const;
+    virtual ~RelocateDialog()
+    {
+    }
 
-  private slots:
-    void onSetLocation ();
-    void onMoveToggled (bool);
+private:
+    QString newLocation() const;
 
-  private:
+private slots:
+    void onSetLocation();
+    void onMoveToggled(bool);
+
+private:
     Session& mySession;
-    const QSet<int> myIds;
+    QSet<int> const myIds;
 
     Ui::RelocateDialog ui;
 
     static bool myMoveFlag;
 };
-

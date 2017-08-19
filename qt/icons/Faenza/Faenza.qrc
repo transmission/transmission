@@ -71,8 +71,8 @@
     <file>categories/16/preferences-system.png</file>
     <file>categories/22/preferences-system.png</file>
     <file>categories/24/preferences-system.png</file>
-    <file>emblems/16/emblem-important.icon</file>
     <file>emblems/16/emblem-important.png</file>
+    <file>emblems/16/emblem-web.png</file>
     <file>status/16/network-error.png</file>
     <file>status/16/network-idle.png</file>
     <file>status/16/network-receive.png</file>

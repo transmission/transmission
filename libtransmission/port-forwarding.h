@@ -7,7 +7,7 @@
  */
 
 #ifndef __TRANSMISSION__
- #error only libtransmission should #include this header.
+#error only libtransmission should #include this header.
 #endif
 
 #pragma once
@@ -23,18 +23,18 @@ struct tr_bindsockets;
 
 typedef struct tr_shared tr_shared;
 
-tr_shared* tr_sharedInit (tr_session*);
+tr_shared* tr_sharedInit(tr_session*);
 
-void       tr_sharedClose (tr_session *);
+void tr_sharedClose(tr_session*);
 
-void       tr_sharedPortChanged (tr_session *);
+void tr_sharedPortChanged(tr_session*);
 
-void       tr_sharedTraversalEnable (tr_shared *, bool isEnabled);
+void tr_sharedTraversalEnable(tr_shared*, bool isEnabled);
 
-tr_port    tr_sharedGetPeerPort (const tr_shared * s);
+tr_port tr_sharedGetPeerPort(tr_shared const* s);
 
-bool       tr_sharedTraversalIsEnabled (const tr_shared * s);
+bool tr_sharedTraversalIsEnabled(tr_shared const* s);
 
-int        tr_sharedTraversalStatus (const tr_shared *);
+int tr_sharedTraversalStatus(tr_shared const*);
 
 /** @} */

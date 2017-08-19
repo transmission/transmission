@@ -7,7 +7,7 @@
  */
 
 #ifndef __TRANSMISSION__
- #error only libtransmission should #include this header.
+#error only libtransmission should #include this header.
 #endif
 
 #pragma once
@@ -16,5 +16,4 @@
  * @brief parse a peer-id into a human-readable client name and version number
  * @ingroup utils
  */
-char* tr_clientForId (char * buf, size_t buflen, const void * peer_id);
-
+char* tr_clientForId(char* buf, size_t buflen, void const* peer_id);

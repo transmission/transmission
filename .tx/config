@@ -1,7 +1,22 @@
 [main]
 host = https://www.transifex.com
 
-[transmissionbt.transmission-qt]
+[transmissionbt.qt]
 file_filter = qt/translations/transmission_<lang>.ts
 source_lang = en
 type = QT
+
+[transmissionbt.gtk]
+file_filter = po/<lang>.po
+source_lang = en
+type = PO
+
+[transmissionbt.mac]
+file_filter = macosx/<lang>.lproj/Localizable.strings
+source_lang = en
+type = STRINGS
+
+[transmissionbt.mac-ql]
+file_filter = macosx/QuickLookPlugin/<lang>.lproj/Localizable.strings
+source_lang = en
+type = STRINGS

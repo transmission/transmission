@@ -6,118 +6,110 @@
  *
  */
 
-#include <assert.h>
-#include <string.h> /* strlen () */
+#include <string.h> /* strlen() */
 
 #include "transmission.h"
 #include "error.h"
 #include "file.h"
+#include "tr-assert.h"
 #include "utils.h"
 
-bool
-tr_sys_file_read_line (tr_sys_file_t    handle,
-                       char           * buffer,
-                       size_t           buffer_size,
-                       tr_error      ** error)
+bool tr_sys_file_read_line(tr_sys_file_t handle, char* buffer, size_t buffer_size, tr_error** error)
 {
-  bool ret = false;
-  size_t offset = 0;
-  uint64_t bytes_read;
+    TR_ASSERT(handle != TR_BAD_SYS_FILE);
+    TR_ASSERT(buffer != NULL);
+    TR_ASSERT(buffer_size > 0);
 
-  assert (handle != TR_BAD_SYS_FILE);
-  assert (buffer != NULL);
-  assert (buffer_size > 0);
+    bool ret = false;
+    size_t offset = 0;
+    uint64_t bytes_read;
 
-  while (buffer_size > 0)
+    while (buffer_size > 0)
     {
-      size_t i;
-      bool found_eol = false;
+        ret = tr_sys_file_read(handle, buffer + offset, MIN(buffer_size, 1024u), &bytes_read, error);
 
-      ret = tr_sys_file_read (handle, buffer + offset, MIN(buffer_size, 1024u),
-                              &bytes_read, error);
-      if (!ret || (offset == 0 && bytes_read == 0))
+        if (!ret || (offset == 0 && bytes_read == 0))
         {
-          ret = false;
-          break;
+            ret = false;
+            break;
         }
 
-      for (i = 0; i < bytes_read; ++i, ++offset, --buffer_size)
-        {
-          if (buffer[offset] == '\n')
-            {
-              found_eol = true;
-              break;
-            }
-        }
+        int64_t delta = 0;
 
-      if (found_eol || buffer_size == 0 || bytes_read == 0)
+        for (size_t i = 0; i < bytes_read; ++i, ++offset, --buffer_size)
         {
-          const int64_t delta = -(int64_t) bytes_read + i + (found_eol ? 1 : 0);
-
-          if (delta != 0)
+            if (buffer[offset] == '\n')
             {
-              ret = tr_sys_file_seek (handle, delta, TR_SEEK_CUR, NULL, error);
-              if (!ret)
+                delta = i - (int64_t)bytes_read + 1;
                 break;
             }
+        }
 
-          if (offset > 0 && buffer[offset - 1] == '\r')
-            buffer[offset - 1] = '\0';
-          else
-            buffer[offset] = '\0';
+        if (delta != 0 || buffer_size == 0 || bytes_read == 0)
+        {
+            if (delta != 0)
+            {
+                ret = tr_sys_file_seek(handle, delta, TR_SEEK_CUR, NULL, error);
 
-          break;
+                if (!ret)
+                {
+                    break;
+                }
+            }
+
+            if (offset > 0 && buffer[offset - 1] == '\r')
+            {
+                buffer[offset - 1] = '\0';
+            }
+            else
+            {
+                buffer[offset] = '\0';
+            }
+
+            break;
         }
     }
 
-  return ret;
+    return ret;
 }
 
-bool
-tr_sys_file_write_line (tr_sys_file_t    handle,
-                        const char     * buffer,
-                        tr_error      ** error)
+bool tr_sys_file_write_line(tr_sys_file_t handle, char const* buffer, tr_error** error)
 {
-  bool ret;
+    TR_ASSERT(handle != TR_BAD_SYS_FILE);
+    TR_ASSERT(buffer != NULL);
 
-  assert (handle != TR_BAD_SYS_FILE);
-  assert (buffer != NULL);
+    bool ret = tr_sys_file_write(handle, buffer, strlen(buffer), NULL, error);
 
-  ret = tr_sys_file_write (handle, buffer, strlen (buffer), NULL, error);
+    if (ret)
+    {
+        ret = tr_sys_file_write(handle, TR_NATIVE_EOL_STR, TR_NATIVE_EOL_STR_SIZE, NULL, error);
+    }
 
-  if (ret)
-    ret = tr_sys_file_write (handle, TR_NATIVE_EOL_STR, TR_NATIVE_EOL_STR_SIZE,
-                             NULL, error);
-
-  return ret;
+    return ret;
 }
 
-bool
-tr_sys_file_write_fmt (tr_sys_file_t    handle,
-                       const char     * format,
-                       tr_error      ** error,
-                                        ...)
+bool tr_sys_file_write_fmt(tr_sys_file_t handle, char const* format, tr_error** error, ...)
 {
-  bool ret = false;
-  char * buffer;
-  va_list args;
+    TR_ASSERT(handle != TR_BAD_SYS_FILE);
+    TR_ASSERT(format != NULL);
 
-  assert (handle != TR_BAD_SYS_FILE);
-  assert (format != NULL);
+    bool ret = false;
+    char* buffer;
+    va_list args;
 
-  va_start (args, error);
-  buffer = tr_strdup_vprintf (format, args);
-  va_end (args);
+    va_start(args, error);
+    buffer = tr_strdup_vprintf(format, args);
+    va_end(args);
 
-  if (buffer != NULL)
+    if (buffer != NULL)
     {
-      ret = tr_sys_file_write (handle, buffer, strlen (buffer), NULL, error);
-      tr_free (buffer);
+        ret = tr_sys_file_write(handle, buffer, strlen(buffer), NULL, error);
+        tr_free(buffer);
     }
-  else
+    else
     {
-      tr_error_set_literal (error, 0, "Unable to format message.");
+        tr_error_set_literal(error, 0, "Unable to format message.");
     }
 
-  return ret;
+    return ret;
 }

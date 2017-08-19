@@ -39,9 +39,9 @@
 {
     IBOutlet FilterButton * fNoFilterButton, * fActiveFilterButton, * fDownloadFilterButton,
                             * fSeedFilterButton, * fPauseFilterButton;
-    
+
     IBOutlet NSSearchField * fSearchField;
-    
+
     IBOutlet NSPopUpButton * fGroupsButton;
 }
 

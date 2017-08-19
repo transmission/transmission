@@ -31,7 +31,7 @@
     {
         [[NSUserDefaults standardUserDefaults] setBool: ![[NSUserDefaults standardUserDefaults]
             boolForKey: @"DisplayPeerProgressBarNumber"] forKey: @"DisplayPeerProgressBarNumber"];
-        
+
         NSIndexSet * rowIndexes = [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [self numberOfRows])],
                     * columnIndexes = [NSIndexSet indexSetWithIndex: [self columnAtPoint: point]];
         [self reloadDataForRowIndexes: rowIndexes columnIndexes: columnIndexes];

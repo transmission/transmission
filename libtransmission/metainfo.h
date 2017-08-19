@@ -7,7 +7,7 @@
  */
 
 #ifndef __TRANSMISSION__
- #error only libtransmission should #include this header.
+#error only libtransmission should #include this header.
 #endif
 
 #pragma once
@@ -15,14 +15,18 @@
 #include "transmission.h"
 #include "variant.h"
 
-bool  tr_metainfoParse (const tr_session  * session,
-                        const tr_variant  * variant,
-                        tr_info           * setmeInfo,
-                        bool              * setmeHasInfoDict,
-                        size_t            * setmeInfoDictLength);
+enum tr_metainfo_basename_format
+{
+    TR_METAINFO_BASENAME_NAME_AND_PARTIAL_HASH,
+    TR_METAINFO_BASENAME_HASH
+};
 
-void tr_metainfoRemoveSaved (const tr_session * session,
-                             const tr_info    * info);
+bool tr_metainfoParse(tr_session const* session, tr_variant const* variant, tr_info* setmeInfo, bool* setmeHasInfoDict,
+    size_t* setmeInfoDictLength);
 
-char* tr_metainfoGetBasename (const tr_info *);
+void tr_metainfoRemoveSaved(tr_session const* session, tr_info const* info);
 
+char* tr_metainfoGetBasename(tr_info const*, enum tr_metainfo_basename_format format);
+
+void tr_metainfoMigrateFile(tr_session const* session, tr_info const* info, enum tr_metainfo_basename_format old_format,
+    enum tr_metainfo_basename_format new_format);

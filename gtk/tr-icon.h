@@ -11,6 +11,5 @@
 #include <gtk/gtk.h>
 #include "tr-core.h"
 
-gpointer  gtr_icon_new    (TrCore * core);
-void      gtr_icon_refresh (gpointer);
-
+gpointer gtr_icon_new(TrCore* core);
+void gtr_icon_refresh(gpointer);

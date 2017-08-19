@@ -18,37 +18,41 @@ class TorrentModel;
 
 struct TrackerInfo
 {
-  TrackerStat st;
-  int torrentId;
+    TrackerStat st;
+    int torrentId;
 };
 
 Q_DECLARE_METATYPE(TrackerInfo)
 
-class TrackerModel: public QAbstractListModel
+class TrackerModel : public QAbstractListModel
 {
     Q_OBJECT
 
-  public:
+public:
     enum Role
     {
-      TrackerRole = Qt::UserRole
+        TrackerRole = Qt::UserRole
     };
 
-  public:
-    TrackerModel () {}
-    virtual ~TrackerModel () {}
+public:
+    TrackerModel()
+    {
+    }
 
-    void refresh (const TorrentModel&, const QSet<int>& ids);
-    int find (int torrentId, const QString& url) const;
+    virtual ~TrackerModel()
+    {
+    }
+
+    void refresh(TorrentModel const&, QSet<int> const& ids);
+    int find(int torrentId, QString const& url) const;
 
     // QAbstractItemModel
-    virtual int rowCount (const QModelIndex& parent = QModelIndex ()) const;
-    virtual QVariant data (const QModelIndex& index, int role = Qt::DisplayRole) const;
+    virtual int rowCount(QModelIndex const& parent = QModelIndex()) const;
+    virtual QVariant data(QModelIndex const& index, int role = Qt::DisplayRole) const;
 
-  private:
+private:
     typedef QVector<TrackerInfo> rows_t;
 
-  private:
+private:
     rows_t myRows;
 };
-

@@ -22,43 +22,43 @@ class TorrentModel;
 class MainWindow;
 class WatchDir;
 
-class Application: public QApplication
+class Application : public QApplication
 {
     Q_OBJECT
 
-  public:
-    Application (int& argc, char ** argv);
-    virtual ~Application ();
+public:
+    Application(int& argc, char** argv);
+    virtual ~Application();
 
-    void raise ();
-    bool notifyApp (const QString& title, const QString& body) const;
+    void raise();
+    bool notifyApp(QString const& title, QString const& body) const;
 
-    FaviconCache& faviconCache ();
+    FaviconCache& faviconCache();
 
-  public slots:
-    void addTorrent (const QString&);
-    void addTorrent (const AddData&);
+public slots:
+    void addTorrent(QString const&);
+    void addTorrent(AddData const&);
 
-  private:
-    void maybeUpdateBlocklist ();
-    void loadTranslations ();
-    void quitLater ();
+private:
+    void maybeUpdateBlocklist();
+    void loadTranslations();
+    void quitLater();
 
-  private slots:
-    void consentGiven (int result);
-    void onSessionSourceChanged ();
-    void refreshPref (int key);
-    void refreshTorrents ();
-    void onTorrentsAdded (const QSet<int>& torrents);
-    void onTorrentCompleted (int);
-    void onNewTorrentChanged (int);
+private slots:
+    void consentGiven(int result);
+    void onSessionSourceChanged();
+    void refreshPref(int key);
+    void refreshTorrents();
+    void onTorrentsAdded(QSet<int> const& torrents);
+    void onTorrentCompleted(int);
+    void onNewTorrentChanged(int);
 
-  private:
-    Prefs * myPrefs;
-    Session * mySession;
-    TorrentModel * myModel;
-    MainWindow * myWindow;
-    WatchDir * myWatchDir;
+private:
+    Prefs* myPrefs;
+    Session* mySession;
+    TorrentModel* myModel;
+    MainWindow* myWindow;
+    WatchDir* myWatchDir;
     QTimer myModelTimer;
     QTimer myStatsTimer;
     QTimer mySessionTimer;
@@ -69,5 +69,4 @@ class Application: public QApplication
 };
 
 #undef qApp
-#define qApp static_cast<Application*> (Application::instance ())
-
+#define qApp static_cast<Application*>(Application::instance())

@@ -26,10 +26,10 @@
 
 @interface URLSheetWindowController : NSWindowController
 {
-	IBOutlet NSTextField * fLabelField;
+    IBOutlet NSTextField * fLabelField;
     IBOutlet NSTextField * fTextField;
     IBOutlet NSButton * fOpenButton, * fCancelButton;
-    
+
     Controller * fController;
 }
 

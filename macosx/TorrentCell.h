@@ -20,15 +20,17 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#import <AppKit/AppKit.h>
+
 @interface TorrentCell : NSActionCell
 {
     NSUserDefaults * fDefaults;
-    
+
     NSMutableDictionary * fTitleAttributes, * fStatusAttributes;
-    
+
     BOOL fTracking, fMouseDownControlButton, fMouseDownRevealButton, fMouseDownActionButton,
             fHover, fHoverControl, fHoverReveal, fHoverAction;
-    
+
     NSColor * fBarBorderColor, * fBluePieceColor, * fBarMinimalBorderColor;
 }
 

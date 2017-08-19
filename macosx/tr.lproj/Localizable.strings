@@ -908,7 +908,7 @@
 "Session Transfer" = "Oturum Aktarımı";
 
 /* Share toolbar item -> label
- Share toolbar item -> palette label */
+   Share toolbar item -> palette label */
 "Share" = "Paylaş";
 
 /* Share toolbar item -> tooltip */

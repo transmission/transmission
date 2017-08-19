@@ -29,19 +29,19 @@
 @interface InfoActivityViewController : NSViewController <InfoViewController>
 {
     NSArray * fTorrents;
-    
+
     BOOL fSet;
-    
+
     IBOutlet NSTextField * fDateAddedField, * fDateCompletedField, * fDateActivityField,
                         * fStateField, * fProgressField,
                         * fHaveField, * fDownloadedTotalField, * fUploadedTotalField, * fFailedHashField,
                         * fRatioField,
                         * fDownloadTimeField, * fSeedTimeField;
     IBOutlet NSTextView * fErrorMessageView;
-    
+
     IBOutlet PiecesView * fPiecesView;
     IBOutlet NSSegmentedControl * fPiecesControl;
-    
+
     //remove when we switch to auto layout on 10.7
     IBOutlet NSTextField * fTransferSectionLabel, * fDatesSectionLabel, * fTimeSectionLabel;
     IBOutlet NSTextField * fStateLabel, * fProgressLabel, * fHaveLabel, * fDownloadedLabel, * fUploadedLabel,

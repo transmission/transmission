@@ -24,14 +24,14 @@ if(ICONV_FOUND AND NOT DEFINED ICONV_SECOND_ARGUMENT_IS_CONST)
 
     check_c_source_compiles("
         #include <iconv.h>
-        int main ()
+        int main()
         {
             iconv_t conv = 0;
             const char * in = 0;
             size_t ilen = 0;
             char * out = 0;
             size_t olen = 0;
-            iconv (conv, &in, &ilen, &out, &olen);
+            iconv(conv, &in, &ilen, &out, &olen);
             return 0;
         }"
         ICONV_SECOND_ARGUMENT_IS_CONST

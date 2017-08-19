@@ -7,7 +7,7 @@
  */
 
 #ifndef __TRANSMISSION__
- #error only libtransmission should #include this header.
+#error only libtransmission should #include this header.
 #endif
 
 #pragma once
@@ -25,27 +25,19 @@ struct tr_peerIo;
 typedef struct tr_handshake tr_handshake;
 
 /* returns true on success, false on error */
-typedef bool (*handshakeDoneCB)(struct tr_handshake * handshake,
-                                   struct tr_peerIo    * io,
-                                   bool                  readAnythingFromPeer,
-                                   bool                  isConnected,
-                                   const uint8_t       * peerId,
-                                   void                * userData);
+typedef bool (* handshakeDoneCB)(struct tr_handshake* handshake, struct tr_peerIo* io, bool readAnythingFromPeer,
+    bool isConnected, uint8_t const* peerId, void* userData);
 
 /** @brief instantiate a new handshake */
-tr_handshake *         tr_handshakeNew (struct tr_peerIo * io,
-                                        tr_encryption_mode encryptionMode,
-                                        handshakeDoneCB    doneCB,
-                                        void *             doneUserData);
+tr_handshake* tr_handshakeNew(struct tr_peerIo* io, tr_encryption_mode encryptionMode, handshakeDoneCB doneCB,
+    void* doneUserData);
 
-const tr_address *     tr_handshakeGetAddr (const struct tr_handshake  * handshake,
-                                            tr_port                    * port);
+tr_address const* tr_handshakeGetAddr(struct tr_handshake const* handshake, tr_port* port);
 
-void                   tr_handshakeAbort (tr_handshake * handshake);
+void tr_handshakeAbort(tr_handshake* handshake);
 
-struct tr_peerIo*      tr_handshakeGetIO (tr_handshake * handshake);
+struct tr_peerIo* tr_handshakeGetIO(tr_handshake* handshake);
 
-struct tr_peerIo*      tr_handshakeStealIO (tr_handshake * handshake);
-
+struct tr_peerIo* tr_handshakeStealIO(tr_handshake* handshake);
 
 /** @} */

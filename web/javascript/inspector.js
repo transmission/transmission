@@ -23,7 +23,7 @@ function Inspector(controller) {
             return false;
         },
 
-        refreshTorrents = function () {
+        refreshTorrents = function (callback) {
             var fields,
                 ids = $.map(data.torrents.slice(0), function (t) {
                     return t.getId();
@@ -36,7 +36,7 @@ function Inspector(controller) {
                     $.merge(fields, Torrent.Fields.InfoExtra);
                 }
 
-                data.controller.updateTorrents(ids, fields);
+                data.controller.updateTorrents(ids, fields, callback);
             }
         },
 
@@ -423,7 +423,7 @@ function Inspector(controller) {
                 str = none;
             }
             uri = parseUri(str);
-            if (uri.protocol == 'http' || uri.parseUri == 'https') {
+            if (uri.protocol == 'http' || uri.protocol == 'https') {
                 str = encodeURI(str);
                 setInnerHTML(e.comment_lb, '<a href="' + str + '" target="_blank" >' + str + '</a>');
             } else {
@@ -851,7 +851,8 @@ function Inspector(controller) {
      ****/
 
     this.setTorrents = function (torrents) {
-        var d = data;
+        var d = data,
+            that = this;
 
         // update the inspector when a selected torrent's data changes.
         $(d.torrents).unbind('dataChanged.inspector');
@@ -859,8 +860,17 @@ function Inspector(controller) {
         d.torrents = torrents;
 
         // periodically ask for updates to the inspector's torrents
-        clearInterval(d.refreshInterval);
-        d.refreshInterval = setInterval($.proxy(refreshTorrents, this), 2000);
+        clearTimeout(d.refreshTimeout);
+
+        function callback() {
+            refreshTorrents(rescheduleTimeout);
+        }
+
+        function rescheduleTimeout() {
+            d.refreshTimeout = setTimeout(callback, 2000);
+        }
+
+        rescheduleTimeout();
         refreshTorrents();
 
         // refresh the inspector's UI

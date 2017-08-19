@@ -16,26 +16,28 @@ class Session;
 
 extern "C"
 {
-  struct tr_variant;
+struct tr_variant;
 }
 
-class FreeSpaceLabel: public QLabel
+class FreeSpaceLabel : public QLabel
 {
     Q_OBJECT
 
-  public:
-    FreeSpaceLabel (QWidget * parent = nullptr);
-    virtual ~FreeSpaceLabel () {}
+public:
+    FreeSpaceLabel(QWidget* parent = nullptr);
 
-    void setSession (Session& session);
-    void setPath (const QString& folder);
+    virtual ~FreeSpaceLabel()
+    {
+    }
 
-  private slots:
-    void onTimer ();
+    void setSession(Session& session);
+    void setPath(QString const& folder);
 
-  private:
-    Session * mySession;
+private slots:
+    void onTimer();
+
+private:
+    Session* mySession;
     QString myPath;
     QTimer myTimer;
 };
-

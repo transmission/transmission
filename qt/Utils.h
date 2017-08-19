@@ -18,42 +18,47 @@ class QAbstractItemView;
 class QColor;
 class QHeaderView;
 class QIcon;
+class QModelIndex;
 
 class Utils
 {
-  public:
-    static QIcon guessMimeIcon (const QString& filename);
+public:
+    static QIcon guessMimeIcon(QString const& filename);
+    static QIcon getIconFromIndex(QModelIndex const& index);
+
     // Test if string is UTF-8 or not
-    static bool isValidUtf8 (const char * s);
+    static bool isValidUtf8(char const* s);
 
-    static QString removeTrailingDirSeparator (const QString& path);
+    static QString removeTrailingDirSeparator(QString const& path);
 
-    static void narrowRect (QRect& rect, int dx1, int dx2, Qt::LayoutDirection direction)
+    static void narrowRect(QRect& rect, int dx1, int dx2, Qt::LayoutDirection direction)
     {
-      if (direction == Qt::RightToLeft)
-        qSwap (dx1, dx2);
-      rect.adjust (dx1, 0, -dx2, 0);
+        if (direction == Qt::RightToLeft)
+        {
+            qSwap(dx1, dx2);
+        }
+
+        rect.adjust(dx1, 0, -dx2, 0);
     }
 
-    static int measureViewItem (QAbstractItemView * view, const QString& text);
-    static int measureHeaderItem (QHeaderView * view, const QString& text);
+    static int measureViewItem(QAbstractItemView* view, QString const& text);
+    static int measureHeaderItem(QHeaderView* view, QString const& text);
 
-    static QColor getFadedColor (const QColor& color);
+    static QColor getFadedColor(QColor const& color);
 
     template<typename DialogT, typename... ArgsT>
-    static void
-    openDialog (QPointer<DialogT>& dialog, ArgsT&&... args)
+    static void openDialog(QPointer<DialogT>& dialog, ArgsT&& ... args)
     {
-      if (dialog.isNull ())
+        if (dialog.isNull())
         {
-          dialog = new DialogT (std::forward<ArgsT> (args)...);
-          dialog->setAttribute (Qt::WA_DeleteOnClose);
-          dialog->show ();
+            dialog = new DialogT(std::forward<ArgsT>(args) ...);
+            dialog->setAttribute(Qt::WA_DeleteOnClose);
+            dialog->show();
         }
-      else
+        else
         {
-          dialog->raise ();
-          dialog->activateWindow ();
+            dialog->raise();
+            dialog->activateWindow();
         }
     }
 
@@ -61,25 +66,34 @@ class Utils
     /// URLs
     ///
 
-    static bool isMagnetLink (const QString& s)
+    static bool isMagnetLink(QString const& s)
     {
-      return s.startsWith (QString::fromUtf8 ("magnet:?"));
+        return s.startsWith(QString::fromUtf8("magnet:?"));
     }
 
-    static bool isHexHashcode (const QString& s)
+    static bool isHexHashcode(QString const& s)
     {
-      if (s.length() != 40)
-        return false;
-      for (const QChar ch: s) if (!isxdigit (ch.unicode())) return false;
-      return true;
+        if (s.length() != 40)
+        {
+            return false;
+        }
+
+        for (QChar const ch : s)
+        {
+            if (!isxdigit(ch.unicode()))
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
-    static bool isUriWithSupportedScheme (const QString& s)
+    static bool isUriWithSupportedScheme(QString const& s)
     {
-      static const QString ftp = QString::fromUtf8 ("ftp://");
-      static const QString http = QString::fromUtf8 ("http://");
-      static const QString https = QString::fromUtf8 ("https://");
-      return s.startsWith(http) || s.startsWith(https) || s.startsWith(ftp);
+        static QString const ftp = QString::fromUtf8("ftp://");
+        static QString const http = QString::fromUtf8("http://");
+        static QString const https = QString::fromUtf8("https://");
+        return s.startsWith(http) || s.startsWith(https) || s.startsWith(ftp);
     }
 };
-
