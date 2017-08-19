@@ -6,12 +6,12 @@
  *
  */
 
-#include <assert.h>
 #include <string.h> /* memcpy(), memmove(), memset() */
 
 #include "transmission.h"
 #include "crypto.h"
 #include "crypto-utils.h"
+#include "tr-assert.h"
 #include "utils.h"
 
 /**
@@ -48,7 +48,7 @@ static void ensureKeyExists(tr_crypto* crypto)
         crypto->dh = tr_dh_new(dh_P, sizeof(dh_P), dh_G, sizeof(dh_G));
         tr_dh_make_key(crypto->dh, DH_PRIVKEY_LEN, crypto->myPublicKey, &public_key_length);
 
-        assert(public_key_length == KEY_LEN);
+        TR_ASSERT(public_key_length == KEY_LEN);
     }
 }
 
@@ -92,14 +92,14 @@ uint8_t const* tr_cryptoGetMyPublicKey(tr_crypto const* crypto, int* setme_len)
 
 static void initRC4(tr_crypto* crypto, tr_rc4_ctx_t* setme, char const* key)
 {
-    uint8_t buf[SHA_DIGEST_LENGTH];
-
-    assert(crypto->torrentHashIsSet);
+    TR_ASSERT(crypto->torrentHashIsSet);
 
     if (*setme == NULL)
     {
         *setme = tr_rc4_new();
     }
+
+    uint8_t buf[SHA_DIGEST_LENGTH];
 
     if (tr_cryptoSecretKeySha1(crypto, key, 4, crypto->torrentHash, SHA_DIGEST_LENGTH, buf))
     {
@@ -160,8 +160,8 @@ void tr_cryptoEncrypt(tr_crypto* crypto, size_t buf_len, void const* buf_in, voi
 bool tr_cryptoSecretKeySha1(tr_crypto const* crypto, void const* prepend_data, size_t prepend_data_size,
     void const* append_data, size_t append_data_size, uint8_t* hash)
 {
-    assert(crypto != NULL);
-    assert(crypto->mySecret != NULL);
+    TR_ASSERT(crypto != NULL);
+    TR_ASSERT(crypto->mySecret != NULL);
 
     return tr_dh_secret_derive(crypto->mySecret, prepend_data, prepend_data_size, append_data, append_data_size, hash);
 }
@@ -186,14 +186,14 @@ void tr_cryptoSetTorrentHash(tr_crypto* crypto, uint8_t const* hash)
 
 uint8_t const* tr_cryptoGetTorrentHash(tr_crypto const* crypto)
 {
-    assert(crypto);
+    TR_ASSERT(crypto != NULL);
 
     return crypto->torrentHashIsSet ? crypto->torrentHash : NULL;
 }
 
 bool tr_cryptoHasTorrentHash(tr_crypto const* crypto)
 {
-    assert(crypto);
+    TR_ASSERT(crypto != NULL);
 
     return crypto->torrentHashIsSet;
 }

@@ -6,7 +6,6 @@
  *
  */
 
-#include <assert.h>
 #include <string.h> /* strlen(), strstr() */
 
 #ifdef _WIN32
@@ -27,6 +26,7 @@
 #include "torrent.h"
 #include "platform.h" /* mutex */
 #include "session.h"
+#include "tr-assert.h"
 #include "trevent.h" /* tr_runInEventThread() */
 #include "utils.h"
 #include "version.h" /* User-Agent */
@@ -42,27 +42,9 @@ enum
 };
 
 #if 0
-
-#define dbgmsg(...) \
-    do \
-    { \
-        fprintf(stderr, __VA_ARGS__); \
-        fprintf(stderr, "\n"); \
-    } \
-    while (0)
-
+#define dbgmsg(fmt, ...) fprintf(stderr, fmt "\n", __VA_ARGS__)
 #else
-
-#define dbgmsg(...) \
-    do \
-    { \
-        if (tr_logGetDeepEnabled()) \
-        { \
-            tr_logAddDeep(__FILE__, __LINE__, "web", __VA_ARGS__); \
-        } \
-    } \
-    while (0)
-
+#define dbgmsg(...) tr_logAddDeepNamed("web", __VA_ARGS__)
 #endif
 
 /***
@@ -392,7 +374,7 @@ static void tr_webThreadFunc(void* vsession)
     web->taskLock = tr_lockNew();
     web->tasks = NULL;
     web->curl_verbose = tr_env_key_exists("TR_CURL_VERBOSE");
-    web->curl_ssl_verify = tr_env_key_exists("TR_CURL_SSL_VERIFY");
+    web->curl_ssl_verify = !tr_env_key_exists("TR_CURL_SSL_NO_VERIFY");
     web->curl_ca_bundle = tr_env_get_string("CURL_CA_BUNDLE", NULL);
 
     if (web->curl_ssl_verify)
@@ -524,7 +506,9 @@ static void tr_webThreadFunc(void* vsession)
                 long req_bytes_sent;
                 CURL* e = msg->easy_handle;
                 curl_easy_getinfo(e, CURLINFO_PRIVATE, (void*)&task);
-                assert(e == task->curl_easy);
+
+                TR_ASSERT(e == task->curl_easy);
+
                 curl_easy_getinfo(e, CURLINFO_RESPONSE_CODE, &task->code);
                 curl_easy_getinfo(e, CURLINFO_REQUEST_SIZE, &req_bytes_sent);
                 curl_easy_getinfo(e, CURLINFO_TOTAL_TIME, &total_time);

@@ -16,8 +16,6 @@
 #define API_VERSION_NUMBER POLARSSL_VERSION_NUMBER
 #endif
 
-#include <assert.h>
-
 #include API_HEADER(arc4.h)
 #include API_HEADER(base64.h)
 #include API_HEADER(ctr_drbg.h)
@@ -30,6 +28,7 @@
 #include "crypto-utils.h"
 #include "log.h"
 #include "platform.h"
+#include "tr-assert.h"
 #include "utils.h"
 
 #define TR_CRYPTO_DH_SECRET_FALLBACK
@@ -82,9 +81,7 @@ static bool check_polarssl_result(int result, int expected_result, char const* f
 
 static int my_rand(void* context UNUSED, unsigned char* buffer, size_t buffer_size)
 {
-    size_t i;
-
-    for (i = 0; i < buffer_size; ++i)
+    for (size_t i = 0; i < buffer_size; ++i)
     {
         buffer[i] = tr_rand_int_weak(256);
     }
@@ -147,14 +144,14 @@ tr_sha1_ctx_t tr_sha1_init(void)
 
 bool tr_sha1_update(tr_sha1_ctx_t handle, void const* data, size_t data_length)
 {
-    assert(handle != NULL);
+    TR_ASSERT(handle != NULL);
 
     if (data_length == 0)
     {
         return true;
     }
 
-    assert(data != NULL);
+    TR_ASSERT(data != NULL);
 
     API(sha1_update)(handle, data, data_length);
     return true;
@@ -164,7 +161,7 @@ bool tr_sha1_final(tr_sha1_ctx_t handle, uint8_t* hash)
 {
     if (hash != NULL)
     {
-        assert(handle != NULL);
+        TR_ASSERT(handle != NULL);
 
         API(sha1_finish)(handle, hash);
     }
@@ -203,23 +200,23 @@ void tr_rc4_free(tr_rc4_ctx_t handle)
 
 void tr_rc4_set_key(tr_rc4_ctx_t handle, uint8_t const* key, size_t key_length)
 {
-    assert(handle != NULL);
-    assert(key != NULL);
+    TR_ASSERT(handle != NULL);
+    TR_ASSERT(key != NULL);
 
     API(arc4_setup)(handle, key, key_length);
 }
 
 void tr_rc4_process(tr_rc4_ctx_t handle, void const* input, void* output, size_t length)
 {
-    assert(handle != NULL);
+    TR_ASSERT(handle != NULL);
 
     if (length == 0)
     {
         return;
     }
 
-    assert(input != NULL);
-    assert(output != NULL);
+    TR_ASSERT(input != NULL);
+    TR_ASSERT(output != NULL);
 
     API(arc4_crypt)(handle, length, input, output);
 }
@@ -231,10 +228,10 @@ void tr_rc4_process(tr_rc4_ctx_t handle, void const* input, void* output, size_t
 tr_dh_ctx_t tr_dh_new(uint8_t const* prime_num, size_t prime_num_length, uint8_t const* generator_num,
     size_t generator_num_length)
 {
-    API(dhm_context)* handle = tr_new0(API(dhm_context), 1);
+    TR_ASSERT(prime_num != NULL);
+    TR_ASSERT(generator_num != NULL);
 
-    assert(prime_num != NULL);
-    assert(generator_num != NULL);
+    API(dhm_context)* handle = tr_new0(API(dhm_context), 1);
 
 #if API_VERSION_NUMBER >= 0x01030800
     API(dhm_init)(handle);
@@ -264,10 +261,10 @@ void tr_dh_free(tr_dh_ctx_t handle)
 
 bool tr_dh_make_key(tr_dh_ctx_t raw_handle, size_t private_key_length, uint8_t* public_key, size_t* public_key_length)
 {
-    API(dhm_context)* handle = raw_handle;
+    TR_ASSERT(raw_handle != NULL);
+    TR_ASSERT(public_key != NULL);
 
-    assert(handle != NULL);
-    assert(public_key != NULL);
+    API(dhm_context)* handle = raw_handle;
 
     if (public_key_length != NULL)
     {
@@ -279,12 +276,12 @@ bool tr_dh_make_key(tr_dh_ctx_t raw_handle, size_t private_key_length, uint8_t* 
 
 tr_dh_secret_t tr_dh_agree(tr_dh_ctx_t raw_handle, uint8_t const* other_public_key, size_t other_public_key_length)
 {
+    TR_ASSERT(raw_handle != NULL);
+    TR_ASSERT(other_public_key != NULL);
+
     API(dhm_context)* handle = raw_handle;
     struct tr_dh_secret* ret;
     size_t secret_key_length;
-
-    assert(handle != NULL);
-    assert(other_public_key != NULL);
 
     if (!check_result(API(dhm_read_public)(handle, other_public_key, other_public_key_length)))
     {
@@ -321,10 +318,10 @@ tr_dh_secret_t tr_dh_agree(tr_dh_ctx_t raw_handle, uint8_t const* other_public_k
 
 bool tr_rand_buffer(void* buffer, size_t length)
 {
+    TR_ASSERT(buffer != NULL);
+
     bool ret;
     tr_lock* rng_lock = get_rng_lock();
-
-    assert(buffer != NULL);
 
     tr_lockLock(rng_lock);
     ret = check_result(API(ctr_drbg_random)(get_rng(), buffer, length));

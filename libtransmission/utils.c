@@ -15,7 +15,6 @@
 #define HAVE_VALLOC
 #endif
 
-#include <assert.h>
 #include <ctype.h> /* isdigit(), tolower() */
 #include <errno.h>
 #include <float.h> /* DBL_EPSILON */
@@ -50,9 +49,10 @@
 #include "list.h"
 #include "log.h"
 #include "net.h"
-#include "utils.h"
 #include "platform.h" /* tr_lockLock() */
 #include "platform-quota.h" /* tr_device_info_create(), tr_device_info_get_free_space(), tr_device_info_free() */
+#include "tr-assert.h"
+#include "utils.h"
 #include "variant.h"
 #include "version.h"
 
@@ -175,7 +175,9 @@ char const* tr_strip_positional_args(char const* str)
         buf = tr_renew(char, buf, bufsize);
     }
 
-    for (out = buf; str && *str; ++str)
+    out = buf;
+
+    for (; str != NULL && *str != '\0'; ++str)
     {
         *out++ = *str;
 
@@ -214,9 +216,9 @@ void tr_timerAdd(struct event* timer, int seconds, int microseconds)
     tv.tv_sec = seconds;
     tv.tv_usec = microseconds;
 
-    assert(tv.tv_sec >= 0);
-    assert(tv.tv_usec >= 0);
-    assert(tv.tv_usec < 1000000);
+    TR_ASSERT(tv.tv_sec >= 0);
+    TR_ASSERT(tv.tv_usec >= 0);
+    TR_ASSERT(tv.tv_usec < 1000000);
 
     evtimer_add(timer, &tv);
 }
@@ -258,7 +260,7 @@ uint8_t* tr_loadFile(char const* path, size_t* size, tr_error** error)
     /* file size should be able to fit into size_t */
     if (sizeof(info.size) > sizeof(*size))
     {
-        assert(info.size <= SIZE_MAX);
+        TR_ASSERT(info.size <= SIZE_MAX);
     }
 
     /* Load the torrent file into our buffer */
@@ -338,7 +340,7 @@ char* tr_buildPath(char const* first_element, ...)
     *pch++ = '\0';
 
     /* sanity checks & return */
-    assert(pch - buf == (ptrdiff_t)bufLen);
+    TR_ASSERT(pch - buf == (ptrdiff_t)bufLen);
     return buf;
 }
 
@@ -417,8 +419,6 @@ char const* tr_memmem(char const* haystack, size_t haystacklen, char const* need
 
 #else
 
-    size_t i;
-
     if (needlelen == 0)
     {
         return haystack;
@@ -429,7 +429,7 @@ char const* tr_memmem(char const* haystack, size_t haystacklen, char const* need
         return NULL;
     }
 
-    for (i = 0; i <= haystacklen - needlelen; ++i)
+    for (size_t i = 0; i <= haystacklen - needlelen; ++i)
     {
         if (memcmp(haystack + i, needle, needlelen) == 0)
         {
@@ -493,6 +493,26 @@ int tr_strcmp0(char const* str1, char const* str2)
     return 0;
 }
 
+int tr_memcmp0(void const* lhs, void const* rhs, size_t size)
+{
+    if (lhs != NULL && rhs != NULL)
+    {
+        return memcmp(lhs, rhs, size);
+    }
+
+    if (lhs != NULL)
+    {
+        return 1;
+    }
+
+    if (rhs != NULL)
+    {
+        return -1;
+    }
+
+    return 0;
+}
+
 /****
 *****
 ****/
@@ -539,7 +559,6 @@ char* tr_strstrip(char* str)
 {
     if (str != NULL)
     {
-        size_t pos;
         size_t len = strlen(str);
 
         while (len != 0 && isspace(str[len - 1]))
@@ -547,7 +566,9 @@ char* tr_strstrip(char* str)
             --len;
         }
 
-        for (pos = 0; pos < len && isspace(str[pos]);)
+        size_t pos = 0;
+
+        while (pos < len && isspace(str[pos]))
         {
             ++pos;
         }
@@ -636,6 +657,9 @@ int tr_snprintf(char* buf, size_t buflen, char const* fmt, ...)
  */
 size_t tr_strlcpy(char* dst, void const* src, size_t siz)
 {
+    TR_ASSERT(dst != NULL);
+    TR_ASSERT(src != NULL);
+
 #ifdef HAVE_STRLCPY
 
     return strlcpy(dst, src, siz);
@@ -645,9 +669,6 @@ size_t tr_strlcpy(char* dst, void const* src, size_t siz)
     char* d = dst;
     char const* s = src;
     size_t n = siz;
-
-    assert(s);
-    assert(d);
 
     /* Copy as many bytes as will fit */
     if (n != 0)
@@ -726,9 +747,8 @@ void tr_hex_to_binary(char const* input, void* output, size_t byte_length)
 {
     static char const hex[] = "0123456789abcdef";
     uint8_t* output_octets = output;
-    size_t i;
 
-    for (i = 0; i < byte_length; ++i)
+    for (size_t i = 0; i < byte_length; ++i)
     {
         int const hi = strchr(hex, tolower(*input++)) - hex;
         int const lo = strchr(hex, tolower(*input++)) - hex;
@@ -1007,7 +1027,6 @@ int tr_lowerBound(void const* key, void const* base, size_t nmemb, size_t size, 
 static size_t quickfindPartition(char* base, size_t left, size_t right, size_t size, int (* compar)(void const*, void const*),
     size_t pivotIndex)
 {
-    size_t i;
     size_t storeIndex;
 
     /* move pivot to the end */
@@ -1015,7 +1034,7 @@ static size_t quickfindPartition(char* base, size_t left, size_t right, size_t s
 
     storeIndex = left;
 
-    for (i = left; i <= right - 1; ++i)
+    for (size_t i = left; i < right; ++i)
     {
         if ((*compar)(base + (size * i), base + (size * right)) <= 0)
         {
@@ -1028,19 +1047,19 @@ static size_t quickfindPartition(char* base, size_t left, size_t right, size_t s
     SWAP(base + (size * right), base + (size * storeIndex), size);
 
     /* sanity check the partition */
-#ifndef NDEBUG
+#ifdef TR_ENABLE_ASSERTS
 
-    assert(storeIndex >= left);
-    assert(storeIndex <= right);
+    TR_ASSERT(storeIndex >= left);
+    TR_ASSERT(storeIndex <= right);
 
-    for (i = left; i < storeIndex; ++i)
+    for (size_t i = left; i < storeIndex; ++i)
     {
-        assert((*compar)(base + (size * i), base + (size * storeIndex)) <= 0);
+        TR_ASSERT((*compar)(base + (size * i), base + (size * storeIndex)) <= 0);
     }
 
-    for (i = storeIndex + 1; i <= right; ++i)
+    for (size_t i = storeIndex + 1; i <= right; ++i)
     {
-        assert((*compar)(base + (size * i), base + (size * storeIndex)) >= 0);
+        TR_ASSERT((*compar)(base + (size * i), base + (size * storeIndex)) >= 0);
     }
 
 #endif
@@ -1068,14 +1087,13 @@ static void quickfindFirstK(char* base, size_t left, size_t right, size_t size, 
     }
 }
 
-#ifndef NDEBUG
+#ifdef TR_ENABLE_ASSERTS
 
 static void checkBestScoresComeFirst(char* base, size_t nmemb, size_t size, int (* compar)(void const*, void const*), size_t k)
 {
-    size_t i;
     size_t worstFirstPos = 0;
 
-    for (i = 1; i < k; ++i)
+    for (size_t i = 1; i < k; ++i)
     {
         if ((*compar)(base + (size * worstFirstPos), base + (size * i)) < 0)
         {
@@ -1083,14 +1101,14 @@ static void checkBestScoresComeFirst(char* base, size_t nmemb, size_t size, int 
         }
     }
 
-    for (i = 0; i < k; ++i)
+    for (size_t i = 0; i < k; ++i)
     {
-        assert((*compar)(base + (size * i), base + (size * worstFirstPos)) <= 0);
+        TR_ASSERT((*compar)(base + (size * i), base + (size * worstFirstPos)) <= 0);
     }
 
-    for (i = k; i < nmemb; ++i)
+    for (size_t i = k; i < nmemb; ++i)
     {
-        assert((*compar)(base + (size * i), base + (size * worstFirstPos)) >= 0);
+        TR_ASSERT((*compar)(base + (size * i), base + (size * worstFirstPos)) >= 0);
     }
 }
 
@@ -1102,7 +1120,7 @@ void tr_quickfindFirstK(void* base, size_t nmemb, size_t size, int (* compar)(vo
     {
         quickfindFirstK(base, 0, nmemb - 1, size, compar, k);
 
-#ifndef NDEBUG
+#ifdef TR_ENABLE_ASSERTS
         checkBestScoresComeFirst(base, nmemb, size, compar, k);
 #endif
     }
@@ -1137,13 +1155,11 @@ static char* to_utf8(const char* in, size_t inlen)
 
 #ifdef HAVE_ICONV
 
-    int i;
     char const* encodings[] = { "CURRENT", "ISO-8859-15" };
-    int const encoding_count = sizeof(encodings) / sizeof(encodings[1]);
     size_t const buflen = inlen * 4 + 10;
     char* out = tr_new(char, buflen);
 
-    for (i = 0; ret == NULL && i < encoding_count; ++i)
+    for (size_t i = 0; ret == NULL && i < TR_N_ELEMENTS(encodings); ++i)
     {
 #ifdef ICONV_SECOND_ARGUMENT_IS_CONST
         char const* inbuf = in;
@@ -1199,7 +1215,7 @@ char* tr_utf8clean(char const* str, size_t max_len)
         ret = to_utf8(str, max_len);
     }
 
-    assert(tr_utf8_validate(ret, TR_BAD_SIZE, NULL));
+    TR_ASSERT(tr_utf8_validate(ret, TR_BAD_SIZE, NULL));
     return ret;
 }
 
@@ -1320,8 +1336,6 @@ char* tr_win32_format_message(uint32_t code)
 void tr_win32_make_args_utf8(int* argc, char*** argv)
 {
     int my_argc;
-    int i;
-    char** my_argv;
     wchar_t** my_wide_argv;
 
     my_wide_argv = CommandLineToArgvW(GetCommandLineW(), &my_argc);
@@ -1331,11 +1345,12 @@ void tr_win32_make_args_utf8(int* argc, char*** argv)
         return;
     }
 
-    assert(*argc == my_argc);
+    TR_ASSERT(*argc == my_argc);
 
-    my_argv = tr_new(char*, my_argc + 1);
+    char** my_argv = tr_new(char*, my_argc + 1);
+    int processed_argc = 0;
 
-    for (i = 0; i < my_argc; ++i)
+    for (int i = 0; i < my_argc; ++i, ++processed_argc)
     {
         my_argv[i] = tr_win32_native_to_utf8(my_wide_argv[i], -1);
 
@@ -1345,13 +1360,11 @@ void tr_win32_make_args_utf8(int* argc, char*** argv)
         }
     }
 
-    if (i < my_argc)
+    if (processed_argc < my_argc)
     {
-        int j;
-
-        for (j = 0; j < i; ++j)
+        for (int i = 0; i < processed_argc; ++i)
         {
-            tr_free(my_argv[j]);
+            tr_free(my_argv[i]);
         }
 
         tr_free(my_argv);
@@ -1495,15 +1508,13 @@ int* tr_parseNumberRange(char const* str_in, size_t len, int* setmeCount)
     }
     else
     {
-        int i;
         int n2;
-        tr_list* l;
         int* sorted = NULL;
 
         /* build a sorted number array */
         n = n2 = 0;
 
-        for (l = ranges; l != NULL; l = l->next)
+        for (tr_list* l = ranges; l != NULL; l = l->next)
         {
             struct number_range const* r = l->data;
             n += r->high + 1 - r->low;
@@ -1518,30 +1529,26 @@ int* tr_parseNumberRange(char const* str_in, size_t len, int* setmeCount)
         }
         else
         {
-            for (l = ranges; l != NULL; l = l->next)
+            for (tr_list* l = ranges; l != NULL; l = l->next)
             {
-                int i;
                 struct number_range const* r = l->data;
 
-                for (i = r->low; i <= r->high; ++i)
+                for (int i = r->low; i <= r->high; ++i)
                 {
                     sorted[n2++] = i;
                 }
             }
 
             qsort(sorted, n, sizeof(int), compareInt);
-            assert(n == n2);
+            TR_ASSERT(n == n2);
 
             /* remove duplicates */
             uniq = tr_new(int, n);
+            n = 0;
 
-            if (uniq == NULL)
+            if (uniq != NULL)
             {
-                n = 0;
-            }
-            else
-            {
-                for (i = n = 0; i < n2; ++i)
+                for (int i = 0; i < n2; ++i)
                 {
                     if (n == 0 || uniq[n - 1] != sorted[i])
                     {
@@ -1702,8 +1709,8 @@ bool tr_moveFile(char const* oldpath, char const* newpath, tr_error** error)
             break;
         }
 
-        assert(numRead == bytesWritten);
-        assert(bytesWritten <= bytesLeft);
+        TR_ASSERT(numRead == bytesWritten);
+        TR_ASSERT(bytesWritten <= bytesLeft);
         bytesLeft -= bytesWritten;
     }
 
@@ -1993,7 +2000,6 @@ char* tr_formatter_mem_B(char* buf, int64_t bytes_per_second, size_t buflen)
 
 void tr_formatter_get_units(void* vdict)
 {
-    int i;
     tr_variant* l;
     tr_variant* dict = vdict;
 
@@ -2002,7 +2008,7 @@ void tr_formatter_get_units(void* vdict)
     tr_variantDictAddInt(dict, TR_KEY_memory_bytes, mem_units.units[TR_FMT_KB].value);
     l = tr_variantDictAddList(dict, TR_KEY_memory_units, 4);
 
-    for (i = 0; i < 4; i++)
+    for (int i = 0; i < 4; i++)
     {
         tr_variantListAddStr(l, mem_units.units[i].name);
     }
@@ -2010,7 +2016,7 @@ void tr_formatter_get_units(void* vdict)
     tr_variantDictAddInt(dict, TR_KEY_size_bytes, size_units.units[TR_FMT_KB].value);
     l = tr_variantDictAddList(dict, TR_KEY_size_units, 4);
 
-    for (i = 0; i < 4; i++)
+    for (int i = 0; i < 4; i++)
     {
         tr_variantListAddStr(l, size_units.units[i].name);
     }
@@ -2018,7 +2024,7 @@ void tr_formatter_get_units(void* vdict)
     tr_variantDictAddInt(dict, TR_KEY_speed_bytes, speed_units.units[TR_FMT_KB].value);
     l = tr_variantDictAddList(dict, TR_KEY_speed_units, 4);
 
-    for (i = 0; i < 4; i++)
+    for (int i = 0; i < 4; i++)
     {
         tr_variantListAddStr(l, speed_units.units[i].name);
     }
@@ -2030,7 +2036,7 @@ void tr_formatter_get_units(void* vdict)
 
 bool tr_env_key_exists(char const* key)
 {
-    assert(key != NULL);
+    TR_ASSERT(key != NULL);
 
 #ifdef _WIN32
     return GetEnvironmentVariableA(key, NULL, 0) != 0;
@@ -2041,24 +2047,20 @@ bool tr_env_key_exists(char const* key)
 
 int tr_env_get_int(char const* key, int default_value)
 {
+    TR_ASSERT(key != NULL);
+
 #ifdef _WIN32
 
     char value[16];
 
-    assert(key != NULL);
-
-    if (GetEnvironmentVariableA(key, value, ARRAYSIZE(value)) > 1)
+    if (GetEnvironmentVariableA(key, value, TR_N_ELEMENTS(value)) > 1)
     {
         return atoi(value);
     }
 
 #else
 
-    char const* value;
-
-    assert(key != NULL);
-
-    value = getenv(key);
+    char const* value = getenv(key);
 
     if (value != NULL && *value != '\0')
     {
@@ -2072,12 +2074,12 @@ int tr_env_get_int(char const* key, int default_value)
 
 char* tr_env_get_string(char const* key, char const* default_value)
 {
+    TR_ASSERT(key != NULL);
+
 #ifdef _WIN32
 
-    wchar_t* wide_key;
+    wchar_t* wide_key = tr_win32_utf8_to_native(key, -1);
     char* value = NULL;
-
-    wide_key = tr_win32_utf8_to_native(key, -1);
 
     if (wide_key != NULL)
     {
@@ -2107,11 +2109,7 @@ char* tr_env_get_string(char const* key, char const* default_value)
 
 #else
 
-    char* value;
-
-    assert(key != NULL);
-
-    value = getenv(key);
+    char* value = getenv(key);
 
     if (value == NULL)
     {

@@ -52,6 +52,7 @@ typedef uint16_t in_port_t; /* all missing */
 #include "peer-mgr.h" /* tr_peerMgrAddPex() */
 #include "session.h"
 #include "torrent.h" /* tr_torrentFindFromHash() */
+#include "tr-assert.h"
 #include "tr-lpd.h"
 #include "utils.h"
 #include "version.h"
@@ -170,12 +171,11 @@ static int lpd_unsolicitedMsgCounter;
 */
 static char const* lpd_extractHeader(char const* s, struct lpd_protocolVersion* const ver)
 {
+    TR_ASSERT(s != NULL);
+
     int major = -1;
     int minor = -1;
-    size_t len;
-
-    assert(s != NULL);
-    len = strlen(s);
+    size_t len = strlen(s);
 
     /* something might be rotten with this chunk of data */
     if (len == 0 || len > lpd_maxDatagramLength)
@@ -231,16 +231,18 @@ static char const* lpd_extractHeader(char const* s, struct lpd_protocolVersion* 
 */
 static bool lpd_extractParam(char const* const str, char const* const name, int n, char* const val)
 {
-    /* configure maximum length of search string here */
+    TR_ASSERT(str != NULL);
+    TR_ASSERT(name != NULL);
+    TR_ASSERT(val != NULL);
+
     enum
     {
+        /* configure maximum length of search string here */
         maxLength = 30
     };
+
     char sstr[maxLength] = { 0 };
     char const* pos;
-
-    assert(str != NULL && name != NULL);
-    assert(val != NULL);
 
     if (strlen(name) > maxLength - strlen(CRLF ": "))
     {
@@ -304,8 +306,8 @@ int tr_lpdInit(tr_session* ss, tr_address* tr_addr UNUSED)
         return -1;
     }
 
-    assert(lpd_announceInterval > 0);
-    assert(lpd_announceScope > 0);
+    TR_ASSERT(lpd_announceInterval > 0);
+    TR_ASSERT(lpd_announceScope > 0);
 
     lpd_port = tr_sessionGetPeerPort(ss);
 
@@ -330,12 +332,12 @@ int tr_lpdInit(tr_session* ss, tr_address* tr_addr UNUSED)
             goto fail;
         }
 
-        if (setsockopt(lpd_socket, SOL_SOCKET, SO_REUSEADDR, (void const*)&opt_on, sizeof opt_on) == -1)
+        if (setsockopt(lpd_socket, SOL_SOCKET, SO_REUSEADDR, (void const*)&opt_on, sizeof(opt_on)) == -1)
         {
             goto fail;
         }
 
-        memset(&lpd_mcastAddr, 0, sizeof lpd_mcastAddr);
+        memset(&lpd_mcastAddr, 0, sizeof(lpd_mcastAddr));
         lpd_mcastAddr.sin_family = AF_INET;
         lpd_mcastAddr.sin_port = htons(lpd_mcastPort);
 
@@ -344,22 +346,22 @@ int tr_lpdInit(tr_session* ss, tr_address* tr_addr UNUSED)
             goto fail;
         }
 
-        if (bind(lpd_socket, (struct sockaddr*)&lpd_mcastAddr, sizeof lpd_mcastAddr) == -1)
+        if (bind(lpd_socket, (struct sockaddr*)&lpd_mcastAddr, sizeof(lpd_mcastAddr)) == -1)
         {
             goto fail;
         }
 
         /* we want to join that LPD multicast group */
-        memset(&mcastReq, 0, sizeof mcastReq);
+        memset(&mcastReq, 0, sizeof(mcastReq));
         mcastReq.imr_multiaddr = lpd_mcastAddr.sin_addr;
         mcastReq.imr_interface.s_addr = htonl(INADDR_ANY);
 
-        if (setsockopt(lpd_socket, IPPROTO_IP, IP_ADD_MEMBERSHIP, (void const*)&mcastReq, sizeof mcastReq) == -1)
+        if (setsockopt(lpd_socket, IPPROTO_IP, IP_ADD_MEMBERSHIP, (void const*)&mcastReq, sizeof(mcastReq)) == -1)
         {
             goto fail;
         }
 
-        if (setsockopt(lpd_socket, IPPROTO_IP, IP_MULTICAST_LOOP, (void const*)&opt_off, sizeof opt_off) == -1)
+        if (setsockopt(lpd_socket, IPPROTO_IP, IP_MULTICAST_LOOP, (void const*)&opt_off, sizeof(opt_off)) == -1)
         {
             goto fail;
         }
@@ -382,12 +384,12 @@ int tr_lpdInit(tr_session* ss, tr_address* tr_addr UNUSED)
         }
 
         /* configure outbound multicast TTL */
-        if (setsockopt(lpd_socket2, IPPROTO_IP, IP_MULTICAST_TTL, (void const*)&scope, sizeof scope) == -1)
+        if (setsockopt(lpd_socket2, IPPROTO_IP, IP_MULTICAST_TTL, (void const*)&scope, sizeof(scope)) == -1)
         {
             goto fail;
         }
 
-        if (setsockopt(lpd_socket2, IPPROTO_IP, IP_MULTICAST_LOOP, (void const*)&opt_off, sizeof opt_off) == -1)
+        if (setsockopt(lpd_socket2, IPPROTO_IP, IP_MULTICAST_LOOP, (void const*)&opt_off, sizeof(opt_off)) == -1)
         {
             goto fail;
         }
@@ -484,7 +486,6 @@ UNUSED static inline void lpd_consistencyCheck(void)
 */
 bool tr_lpdSendAnnounce(tr_torrent const* t)
 {
-    size_t i;
     char const fmt[] =
         "BT-SEARCH * HTTP/%u.%u" CRLF
         "Host: %s:%u" CRLF
@@ -502,7 +503,7 @@ bool tr_lpdSendAnnounce(tr_torrent const* t)
     }
 
     /* make sure the hash string is normalized, just in case */
-    for (i = 0; i < sizeof(hashString); i++)
+    for (size_t i = 0; i < TR_N_ELEMENTS(hashString); ++i)
     {
         hashString[i] = toupper(t->info.hashString[i]);
     }
@@ -516,7 +517,7 @@ bool tr_lpdSendAnnounce(tr_torrent const* t)
 
         /* destination address info has already been set up in tr_lpdInit(),
          * so we refrain from preparing another sockaddr_in here */
-        int res = sendto(lpd_socket2, (void const*)query, len, 0, (struct sockaddr const*)&lpd_mcastAddr, sizeof lpd_mcastAddr);
+        int res = sendto(lpd_socket2, (void const*)query, len, 0, (struct sockaddr const*)&lpd_mcastAddr, sizeof(lpd_mcastAddr));
 
         if (res != len)
         {
@@ -551,7 +552,7 @@ static int tr_lpdConsiderAnnounce(tr_pex* peer, char const* const msg)
         maxHashLen = lengthof(lpd_torStaticType->info.hashString)
     };
 
-    struct lpd_protocolVersion ver = { -1, -1 };
+    struct lpd_protocolVersion ver = { .major = -1, .minor = -1 };
     char value[maxValueLen] = { 0 };
     char hashString[maxHashLen] = { 0 };
     int res = 0;
@@ -702,7 +703,7 @@ static void on_upkeep_timer(evutil_socket_t foo UNUSED, short bar UNUSED, void* 
 * @see DoS */
 static void event_callback(evutil_socket_t s UNUSED, short type, void* ignore UNUSED)
 {
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     /* do not allow announces to be processed if LPD is disabled */
     if (!tr_sessionAllowsLPD(session))

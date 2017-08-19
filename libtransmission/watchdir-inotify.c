@@ -6,7 +6,6 @@
  *
  */
 
-#include <assert.h>
 #include <errno.h>
 #include <limits.h> /* NAME_MAX */
 #include <stdlib.h> /* realloc() */
@@ -22,6 +21,7 @@
 
 #include "transmission.h"
 #include "log.h"
+#include "tr-assert.h"
 #include "utils.h"
 #include "watchdir.h"
 #include "watchdir-common.h"
@@ -64,7 +64,7 @@ static void tr_watchdir_inotify_on_first_scan(evutil_socket_t fd UNUSED, short t
 
 static void tr_watchdir_inotify_on_event(struct bufferevent* event, void* context)
 {
-    assert(context != NULL);
+    TR_ASSERT(context != NULL);
 
     tr_watchdir_t const handle = context;
     tr_watchdir_inotify* const backend = BACKEND_UPCAST(tr_watchdir_get_backend(handle));
@@ -89,9 +89,9 @@ static void tr_watchdir_inotify_on_event(struct bufferevent* event, void* contex
             break;
         }
 
-        assert(ev.wd == backend->inwd);
-        assert((ev.mask & INOTIFY_WATCH_MASK) != 0);
-        assert(ev.len > 0);
+        TR_ASSERT(ev.wd == backend->inwd);
+        TR_ASSERT((ev.mask & INOTIFY_WATCH_MASK) != 0);
+        TR_ASSERT(ev.len > 0);
 
         if (ev.len > name_size)
         {
@@ -127,7 +127,7 @@ static void tr_watchdir_inotify_free(tr_watchdir_backend* backend_base)
         return;
     }
 
-    assert(backend->base.free_func == &tr_watchdir_inotify_free);
+    TR_ASSERT(backend->base.free_func == &tr_watchdir_inotify_free);
 
     if (backend->event != NULL)
     {

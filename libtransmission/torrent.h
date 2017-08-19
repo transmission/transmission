@@ -15,6 +15,7 @@
 #include "bandwidth.h" /* tr_bandwidth */
 #include "completion.h" /* tr_completion */
 #include "session.h" /* tr_sessionLock(), tr_sessionUnlock() */
+#include "tr-assert.h"
 #include "utils.h" /* TR_GNUC_PRINTF */
 
 struct tr_torrent_tiers;
@@ -336,7 +337,7 @@ static inline bool tr_isTorrent(tr_torrent const* tor)
  * needs to be saved when the torrent is closed */
 static inline void tr_torrentSetDirty(tr_torrent* tor)
 {
-    assert(tr_isTorrent(tor));
+    TR_ASSERT(tr_isTorrent(tor));
 
     tor->isDirty = true;
 }

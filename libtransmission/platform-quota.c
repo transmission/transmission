@@ -17,6 +17,8 @@
 #include <sys/types.h> /* types needed by quota.h */
 #if defined(__FreeBSD__) || defined(__OpenBSD__)
 #include <ufs/ufs/quota.h> /* quotactl() */
+#elif defined(__DragonFly__)
+#include <vfs/ufs/quota.h> /* quotactl */
 #elif defined(__NetBSD__)
 #include <sys/param.h>
 #ifndef statfs
@@ -126,7 +128,6 @@ static char const* getdev(char const* path)
 
 #else /* BSD derived systems */
 
-    int i;
     int n;
     struct statfs* mnt;
 
@@ -137,15 +138,15 @@ static char const* getdev(char const* path)
         return NULL;
     }
 
-    for (i = 0; i < n; i++)
+    for (int i = 0; i < n; i++)
     {
         if (tr_strcmp0(path, mnt[i].f_mntonname) == 0)
         {
-            break;
+            return mnt[i].f_mntfromname;
         }
     }
 
-    return i < n ? mnt[i].f_mntfromname : NULL;
+    return NULL;
 
 #endif
 }
@@ -203,7 +204,6 @@ static char const* getfstype(char const* device)
 
 #else /* BSD derived systems */
 
-    int i;
     int n;
     struct statfs* mnt;
 
@@ -214,15 +214,15 @@ static char const* getfstype(char const* device)
         return NULL;
     }
 
-    for (i = 0; i < n; i++)
+    for (int i = 0; i < n; i++)
     {
         if (tr_strcmp0(device, mnt[i].f_mntfromname) == 0)
         {
-            break;
+            return mnt[i].f_fstypename;
         }
     }
 
-    return i < n ? mnt[i].f_fstypename : NULL;
+    return NULL;
 
 #endif
 }
@@ -315,12 +315,16 @@ static int64_t getquota(char const* device)
 
 static int64_t getquota(char const* device)
 {
+#if defined(__DragonFly__)
+    struct ufs_dqblk dq;
+#else
     struct dqblk dq;
+#endif
     int64_t limit;
     int64_t freespace;
     int64_t spaceused;
 
-#if defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__APPLE__)
+#if defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__DragonFly__) || defined(__APPLE__)
 
     if (quotactl(device, QCMD(Q_GETQUOTA, USRQUOTA), getuid(), (caddr_t)&dq) == 0)
     {
@@ -365,7 +369,7 @@ static int64_t getquota(char const* device)
             return -1;
         }
 
-#if defined(__FreeBSD__) || defined(__OpenBSD__)
+#if defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__DragonFly__)
         spaceused = (int64_t)dq.dqb_curblocks >> 1;
 #elif defined(__APPLE__)
         spaceused = (int64_t)dq.dqb_curbytes;

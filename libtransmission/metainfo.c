@@ -6,7 +6,6 @@
  *
  */
 
-#include <assert.h>
 #include <string.h> /* strlen() */
 
 #include <event2/buffer.h>
@@ -18,6 +17,7 @@
 #include "metainfo.h"
 #include "platform.h" /* tr_getTorrentDir() */
 #include "session.h"
+#include "tr-assert.h"
 #include "utils.h"
 #include "variant.h"
 
@@ -36,14 +36,13 @@ static inline bool char_is_path_separator(char c)
     return strchr(PATH_DELIMITER_CHARS, c) != NULL;
 }
 
-char* tr_metainfoGetBasename(tr_info const* inf)
+static char* metainfoGetBasenameNameAndPartialHash(tr_info const* inf)
 {
-    size_t i;
     char const* name = inf->originalName;
     size_t const name_len = strlen(name);
     char* ret = tr_strdup_printf("%s.%16.16s", name, inf->hashString);
 
-    for (i = 0; i < name_len; ++i)
+    for (size_t i = 0; i < name_len; ++i)
     {
         if (char_is_path_separator(ret[i]))
         {
@@ -54,9 +53,30 @@ char* tr_metainfoGetBasename(tr_info const* inf)
     return ret;
 }
 
-static char* getTorrentFilename(tr_session const* session, tr_info const* inf)
+static char* metainfoGetBasenameHashOnly(tr_info const* inf)
 {
-    char* base = tr_metainfoGetBasename(inf);
+    return tr_strdup(inf->hashString);
+}
+
+char* tr_metainfoGetBasename(tr_info const* inf, enum tr_metainfo_basename_format format)
+{
+    switch (format)
+    {
+    case TR_METAINFO_BASENAME_NAME_AND_PARTIAL_HASH:
+        return metainfoGetBasenameNameAndPartialHash(inf);
+
+    case TR_METAINFO_BASENAME_HASH:
+        return metainfoGetBasenameHashOnly(inf);
+
+    default:
+        TR_ASSERT_MSG(false, "unknown metainfo basename format %d", (int)format);
+        return NULL;
+    }
+}
+
+static char* getTorrentFilename(tr_session const* session, tr_info const* inf, enum tr_metainfo_basename_format format)
+{
+    char* base = tr_metainfoGetBasename(inf, format);
     char* filename = tr_strdup_printf("%s" TR_PATH_DELIMITER_STR "%s.torrent", tr_getTorrentDir(session), base);
     tr_free(base);
     return filename;
@@ -74,25 +94,22 @@ static bool path_component_is_suspicious(char const* component)
 
 static bool getfile(char** setme, char const* root, tr_variant* path, struct evbuffer* buf)
 {
+    /* root's already been checked by caller */
+    TR_ASSERT(!path_component_is_suspicious(root));
+
     bool success = false;
     size_t root_len = 0;
 
     *setme = NULL;
 
-    /* root's already been checked by caller */
-    assert(!path_component_is_suspicious(root));
-
     if (tr_variantIsList(path))
     {
-        int i;
-        int const n = tr_variantListSize(path);
-
         success = true;
         evbuffer_drain(buf, evbuffer_get_length(buf));
         root_len = strlen(root);
         evbuffer_add(buf, root, root_len);
 
-        for (i = 0; i < n; i++)
+        for (int i = 0, n = tr_variantListSize(path); i < n; i++)
         {
             size_t len;
             char const* str;
@@ -135,7 +152,6 @@ static char const* parseFiles(tr_info* inf, tr_variant* files, tr_variant const*
 
     if (tr_variantIsList(files)) /* multi-file mode */
     {
-        tr_file_index_t i;
         struct evbuffer* buf;
         char const* result;
 
@@ -151,7 +167,7 @@ static char const* parseFiles(tr_info* inf, tr_variant* files, tr_variant const*
         inf->fileCount = tr_variantListSize(files);
         inf->files = tr_new0(tr_file, inf->fileCount);
 
-        for (i = 0; i < inf->fileCount; i++)
+        for (tr_file_index_t i = 0; i < inf->fileCount; i++)
         {
             tr_variant* file;
             tr_variant* path;
@@ -240,9 +256,9 @@ static char* tr_convertAnnounceToScrape(char const* announce)
         memcpy(walk, suffix, suffix_len);
         walk += suffix_len;
         *walk++ = '\0';
-        assert(walk - scrape == (int)alloc_len);
+        TR_ASSERT(walk - scrape == (int)alloc_len);
     }
-    /* Some torrents with UDP annouce URLs don't have /announce. */
+    /* Some torrents with UDP announce URLs don't have /announce. */
     else if (strncmp(announce, "udp:", 4) == 0)
     {
         scrape = tr_strdup(announce);
@@ -263,27 +279,24 @@ static char const* getannounce(tr_info* inf, tr_variant* meta)
     if (tr_variantDictFindList(meta, TR_KEY_announce_list, &tiers))
     {
         int n;
-        int i;
-        int j;
-        int validTiers;
         int const numTiers = tr_variantListSize(tiers);
 
         n = 0;
 
-        for (i = 0; i < numTiers; i++)
+        for (int i = 0; i < numTiers; i++)
         {
             n += tr_variantListSize(tr_variantListChild(tiers, i));
         }
 
         trackers = tr_new0(tr_tracker_info, n);
 
-        for (i = 0, validTiers = 0; i < numTiers; i++)
+        for (int i = 0, validTiers = 0; i < numTiers; i++)
         {
             tr_variant* tier = tr_variantListChild(tiers, i);
             int const tierSize = tr_variantListSize(tier);
             bool anyAdded = false;
 
-            for (j = 0; j < tierSize; j++)
+            for (int j = 0; j < tierSize; j++)
             {
                 if (tr_variantGetStr(tr_variantListChild(tier, j), &str, &len))
                 {
@@ -392,13 +405,12 @@ static void geturllist(tr_info* inf, tr_variant* meta)
 
     if (tr_variantDictFindList(meta, TR_KEY_url_list, &urls))
     {
-        int i;
         int const n = tr_variantListSize(urls);
 
         inf->webseedCount = 0;
         inf->webseeds = tr_new0(char*, n);
 
-        for (i = 0; i < n; i++)
+        for (int i = 0; i < n; i++)
         {
             if (tr_variantGetStr(tr_variantListChild(urls, i), &url, NULL))
             {
@@ -605,7 +617,7 @@ static char const* tr_metainfoParseImpl(tr_session const* session, tr_info* inf,
         inf->pieceCount = len / SHA_DIGEST_LENGTH;
         inf->pieces = tr_new0(tr_piece, inf->pieceCount);
 
-        for (i = 0; i < inf->pieceCount; i++)
+        for (tr_piece_index_t i = 0; i < inf->pieceCount; i++)
         {
             memcpy(inf->pieces[i].hash, &raw[i * SHA_DIGEST_LENGTH], SHA_DIGEST_LENGTH);
         }
@@ -641,7 +653,7 @@ static char const* tr_metainfoParseImpl(tr_session const* session, tr_info* inf,
 
     /* filename of Transmission's copy */
     tr_free(inf->torrent);
-    inf->torrent = session != NULL ? getTorrentFilename(session, inf) : NULL;
+    inf->torrent = session != NULL ? getTorrentFilename(session, inf, TR_METAINFO_BASENAME_HASH) : NULL;
 
     return NULL;
 }
@@ -663,15 +675,12 @@ bool tr_metainfoParse(tr_session const* session, tr_variant const* meta_in, tr_i
 
 void tr_metainfoFree(tr_info* inf)
 {
-    unsigned int i;
-    tr_file_index_t ff;
-
-    for (i = 0; i < inf->webseedCount; i++)
+    for (unsigned int i = 0; i < inf->webseedCount; i++)
     {
         tr_free(inf->webseeds[i]);
     }
 
-    for (ff = 0; ff < inf->fileCount; ff++)
+    for (tr_file_index_t ff = 0; ff < inf->fileCount; ff++)
     {
         tr_free(inf->files[ff].name);
     }
@@ -685,7 +694,7 @@ void tr_metainfoFree(tr_info* inf)
     tr_free(inf->originalName);
     tr_free(inf->name);
 
-    for (i = 0; i < inf->trackerCount; i++)
+    for (unsigned int i = 0; i < inf->trackerCount; i++)
     {
         tr_free(inf->trackers[i].announce);
         tr_free(inf->trackers[i].scrape);
@@ -700,7 +709,26 @@ void tr_metainfoRemoveSaved(tr_session const* session, tr_info const* inf)
 {
     char* filename;
 
-    filename = getTorrentFilename(session, inf);
+    filename = getTorrentFilename(session, inf, TR_METAINFO_BASENAME_HASH);
     tr_sys_path_remove(filename, NULL);
     tr_free(filename);
+
+    filename = getTorrentFilename(session, inf, TR_METAINFO_BASENAME_NAME_AND_PARTIAL_HASH);
+    tr_sys_path_remove(filename, NULL);
+    tr_free(filename);
+}
+
+void tr_metainfoMigrateFile(tr_session const* session, tr_info const* info, enum tr_metainfo_basename_format old_format,
+    enum tr_metainfo_basename_format new_format)
+{
+    char* old_filename = getTorrentFilename(session, info, old_format);
+    char* new_filename = getTorrentFilename(session, info, new_format);
+
+    if (tr_sys_path_rename(old_filename, new_filename, NULL))
+    {
+        tr_logAddNamedError(info->name, "Migrated torrent file from \"%s\" to \"%s\"", old_filename, new_filename);
+    }
+
+    tr_free(new_filename);
+    tr_free(old_filename);
 }

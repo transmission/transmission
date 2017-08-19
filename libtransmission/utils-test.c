@@ -41,12 +41,12 @@ static int test_strip_positional_args(void)
     in = "Hello %1$s foo %2$.*f";
     expected = "Hello %s foo %.*f";
     out = tr_strip_positional_args(in);
-    check_streq(expected, out);
+    check_str(out, ==, expected);
 
     in = "Hello %1$'d foo %2$'f";
     expected = "Hello %d foo %f";
     out = tr_strip_positional_args(in);
-    check_streq(expected, out);
+    check_str(out, ==, expected);
 
     return 0;
 }
@@ -59,22 +59,22 @@ static int test_strstrip(void)
     /* strstrip */
     in = tr_strdup("   test    ");
     out = tr_strstrip(in);
-    check(in == out);
-    check_streq("test", out);
+    check_ptr(in, ==, out);
+    check_str(out, ==, "test");
     tr_free(in);
 
     /* strstrip */
     in = tr_strdup(" test test ");
     out = tr_strstrip(in);
-    check(in == out);
-    check_streq("test test", out);
+    check_ptr(in, ==, out);
+    check_str(out, ==, "test test");
     tr_free(in);
 
     /* strstrip */
     in = tr_strdup("test");
     out = tr_strstrip(in);
-    check(in == out);
-    check_streq("test", out);
+    check_ptr(in, ==, out);
+    check_str(out, ==, "test");
     tr_free(in);
 
     return 0;
@@ -85,11 +85,11 @@ static int test_buildpath(void)
     char* out;
 
     out = tr_buildPath("foo", "bar", NULL);
-    check_streq("foo" TR_PATH_DELIMITER_STR "bar", out);
+    check_str(out, ==, "foo" TR_PATH_DELIMITER_STR "bar");
     tr_free(out);
 
     out = tr_buildPath("", "foo", "bar", NULL);
-    check_streq(TR_PATH_DELIMITER_STR "foo" TR_PATH_DELIMITER_STR "bar", out);
+    check_str(out, ==, TR_PATH_DELIMITER_STR "foo" TR_PATH_DELIMITER_STR "bar");
     tr_free(out);
 
     return 0;
@@ -102,18 +102,18 @@ static int test_utf8(void)
 
     in = "hello world";
     out = tr_utf8clean(in, TR_BAD_SIZE);
-    check_streq(in, out);
+    check_str(out, ==, in);
     tr_free(out);
 
     in = "hello world";
     out = tr_utf8clean(in, 5);
-    check_streq("hello", out);
+    check_str(out, ==, "hello");
     tr_free(out);
 
     /* this version is not utf-8 (but cp866) */
     in = "\x92\xE0\xE3\xA4\xAD\xAE \xA1\xEB\xE2\xEC \x81\xAE\xA3\xAE\xAC";
     out = tr_utf8clean(in, 17);
-    check(out != NULL);
+    check_ptr(out, !=, NULL);
     check(strlen(out) == 17 || strlen(out) == 33);
     check(tr_utf8_validate(out, TR_BAD_SIZE, NULL));
     tr_free(out);
@@ -121,21 +121,21 @@ static int test_utf8(void)
     /* same string, but utf-8 clean */
     in = "Трудно быть Богом";
     out = tr_utf8clean(in, TR_BAD_SIZE);
-    check(out != NULL);
+    check_ptr(out, !=, NULL);
     check(tr_utf8_validate(out, TR_BAD_SIZE, NULL));
-    check_streq(in, out);
+    check_str(out, ==, in);
     tr_free(out);
 
     in = "\xF4\x00\x81\x82";
     out = tr_utf8clean(in, 4);
-    check(out != NULL);
+    check_ptr(out, !=, NULL);
     check(strlen(out) == 1 || strlen(out) == 2);
     check(tr_utf8_validate(out, TR_BAD_SIZE, NULL));
     tr_free(out);
 
     in = "\xF4\x33\x81\x82";
     out = tr_utf8clean(in, 4);
-    check(out != NULL);
+    check_ptr(out, !=, NULL);
     check(strlen(out) == 4 || strlen(out) == 7);
     check(tr_utf8_validate(out, TR_BAD_SIZE, NULL));
     tr_free(out);
@@ -145,42 +145,41 @@ static int test_utf8(void)
 
 static int test_numbers(void)
 {
-    int i;
     int count;
     int* numbers;
 
     numbers = tr_parseNumberRange("1-10,13,16-19", TR_BAD_SIZE, &count);
-    check_int_eq(15, count);
-    check_int_eq(1, numbers[0]);
-    check_int_eq(6, numbers[5]);
-    check_int_eq(10, numbers[9]);
-    check_int_eq(13, numbers[10]);
-    check_int_eq(16, numbers[11]);
-    check_int_eq(19, numbers[14]);
+    check_int(count, ==, 15);
+    check_int(numbers[0], ==, 1);
+    check_int(numbers[5], ==, 6);
+    check_int(numbers[9], ==, 10);
+    check_int(numbers[10], ==, 13);
+    check_int(numbers[11], ==, 16);
+    check_int(numbers[14], ==, 19);
     tr_free(numbers);
 
     numbers = tr_parseNumberRange("1-5,3-7,2-6", TR_BAD_SIZE, &count);
-    check(count == 7);
-    check(numbers != NULL);
+    check_int(count, ==, 7);
+    check_ptr(numbers, !=, NULL);
 
-    for (i = 0; i < count; ++i)
+    for (int i = 0; i < count; ++i)
     {
-        check_int_eq(i + 1, numbers[i]);
+        check_int(numbers[i], ==, i + 1);
     }
 
     tr_free(numbers);
 
     numbers = tr_parseNumberRange("1-Hello", TR_BAD_SIZE, &count);
-    check_int_eq(0, count);
-    check(numbers == NULL);
+    check_int(count, ==, 0);
+    check_ptr(numbers, ==, NULL);
 
     numbers = tr_parseNumberRange("1-", TR_BAD_SIZE, &count);
-    check_int_eq(0, count);
-    check(numbers == NULL);
+    check_int(count, ==, 0);
+    check_ptr(numbers, ==, NULL);
 
     numbers = tr_parseNumberRange("Hello", TR_BAD_SIZE, &count);
-    check_int_eq(0, count);
-    check(numbers == NULL);
+    check_int(count, ==, 0);
+    check_ptr(numbers, ==, NULL);
 
     return 0;
 }
@@ -194,13 +193,12 @@ static int compareInts(void const* va, void const* vb)
 
 static int test_lowerbound(void)
 {
-    int i;
     int const A[] = { 1, 2, 3, 3, 3, 5, 8 };
     int const expected_pos[] = { 0, 1, 2, 5, 5, 6, 6, 6, 7, 7 };
     bool const expected_exact[] = { true, true, true, false, true, false, false, true, false, false };
-    int const N = sizeof(A) / sizeof(A[0]);
+    int const N = TR_N_ELEMENTS(A);
 
-    for (i = 1; i <= 10; i++)
+    for (int i = 1; i <= 10; i++)
     {
         bool exact;
         int const pos = tr_lowerBound(&i, A, N, sizeof(int), compareInts, &exact);
@@ -221,8 +219,8 @@ static int test_lowerbound(void)
 
 #endif
 
-        check_int_eq(expected_pos[i - 1], pos);
-        check_int_eq(expected_exact[i - 1], exact);
+        check_int(pos, ==, expected_pos[i - 1]);
+        check_int(exact, ==, expected_exact[i - 1]);
     }
 
     return 0;
@@ -230,12 +228,11 @@ static int test_lowerbound(void)
 
 static int test_quickFindFirst_Iteration(size_t const k, size_t const n, int* buf, int range)
 {
-    size_t i;
     int highest_low;
     int lowest_high;
 
     /* populate buf with random ints */
-    for (i = 0; i < n; ++i)
+    for (size_t i = 0; i < n; ++i)
     {
         buf[i] = tr_rand_int_weak(range);
     }
@@ -247,7 +244,7 @@ static int test_quickFindFirst_Iteration(size_t const k, size_t const n, int* bu
 
     highest_low = INT_MIN;
 
-    for (i = 0; i < k; ++i)
+    for (size_t i = 0; i < k; ++i)
     {
         if (highest_low < buf[i])
         {
@@ -257,7 +254,7 @@ static int test_quickFindFirst_Iteration(size_t const k, size_t const n, int* bu
 
     lowest_high = INT_MAX;
 
-    for (i = k; i < n; ++i)
+    for (size_t i = k; i < n; ++i)
     {
         if (lowest_high > buf[i])
         {
@@ -265,22 +262,21 @@ static int test_quickFindFirst_Iteration(size_t const k, size_t const n, int* bu
         }
     }
 
-    check(highest_low <= lowest_high);
+    check_int(highest_low, <=, lowest_high);
 
     return 0;
 }
 
 static int test_quickfindFirst(void)
 {
-    size_t i;
     size_t const k = 10;
     size_t const n = 100;
     size_t const n_trials = 1000;
     int* buf = tr_new(int, n);
 
-    for (i = 0; i < n_trials; ++i)
+    for (size_t i = 0; i < n_trials; ++i)
     {
-        check_int_eq(0, test_quickFindFirst_Iteration(k, n, buf, 100));
+        check_int(test_quickFindFirst_Iteration(k, n, buf, 100), ==, 0);
     }
 
     tr_free(buf);
@@ -292,9 +288,9 @@ static int test_memmem(void)
     char const haystack[12] = "abcabcabcabc";
     char const needle[3] = "cab";
 
-    check(tr_memmem(haystack, sizeof haystack, haystack, sizeof haystack) == haystack);
-    check(tr_memmem(haystack, sizeof haystack, needle, sizeof needle) == haystack + 2);
-    check(tr_memmem(needle, sizeof needle, haystack, sizeof haystack) == NULL);
+    check_ptr(tr_memmem(haystack, sizeof(haystack), haystack, sizeof(haystack)), ==, haystack);
+    check_ptr(tr_memmem(haystack, sizeof(haystack), needle, sizeof(needle)), ==, haystack + 2);
+    check_ptr(tr_memmem(needle, sizeof(needle), haystack, sizeof(haystack)), ==, NULL);
 
     return 0;
 }
@@ -308,37 +304,36 @@ static int test_hex(void)
     memcpy(hex1, "fb5ef5507427b17e04b69cef31fa3379b456735a", 41);
     tr_hex_to_binary(hex1, binary, 20);
     tr_binary_to_hex(binary, hex2, 20);
-    check_streq(hex1, hex2);
+    check_str(hex1, ==, hex2);
 
     return 0;
 }
 
 static int test_array(void)
 {
-    size_t i;
     size_t array[10] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
-    size_t n = sizeof(array) / sizeof(array[0]);
+    size_t n = TR_N_ELEMENTS(array);
 
     tr_removeElementFromArray(array, 5u, sizeof(size_t), n--);
 
-    for (i = 0; i < n; ++i)
+    for (size_t i = 0; i < n; ++i)
     {
-        check_int_eq(i < 5 ? i : i + 1, array[i]);
+        check_int(array[i], ==, i < 5 ? i : i + 1);
     }
 
     tr_removeElementFromArray(array, 0u, sizeof(size_t), n--);
 
-    for (i = 0; i < n; ++i)
+    for (size_t i = 0; i < n; ++i)
     {
-        check_int_eq(i < 4 ? i + 1 : i + 2, array[i]);
+        check_int(array[i], ==, i < 4 ? i + 1 : i + 2);
     }
 
     tr_removeElementFromArray(array, n - 1, sizeof(size_t), n);
     n--;
 
-    for (i = 0; i < n; ++i)
+    for (size_t i = 0; i < n; ++i)
     {
-        check_int_eq(i < 4 ? i + 1 : i + 2, array[i]);
+        check_int(array[i], ==, i < 4 ? i + 1 : i + 2);
     }
 
     return 0;
@@ -355,37 +350,37 @@ static int test_url(void)
 
     url = "http://1";
     check(tr_urlParse(url, TR_BAD_SIZE, &scheme, &host, &port, &path));
-    check_streq("http", scheme);
-    check_streq("1", host);
-    check_streq("/", path);
-    check_int_eq(80, port);
+    check_str(scheme, ==, "http");
+    check_str(host, ==, "1");
+    check_str(path, ==, "/");
+    check_int(port, ==, 80);
     tr_free(scheme);
     tr_free(path);
     tr_free(host);
 
     url = "http://www.some-tracker.org/some/path";
     check(tr_urlParse(url, TR_BAD_SIZE, &scheme, &host, &port, &path));
-    check_streq("http", scheme);
-    check_streq("www.some-tracker.org", host);
-    check_streq("/some/path", path);
-    check_int_eq(80, port);
+    check_str(scheme, ==, "http");
+    check_str(host, ==, "www.some-tracker.org");
+    check_str(path, ==, "/some/path");
+    check_int(port, ==, 80);
     tr_free(scheme);
     tr_free(path);
     tr_free(host);
 
     url = "http://www.some-tracker.org:80/some/path";
     check(tr_urlParse(url, TR_BAD_SIZE, &scheme, &host, &port, &path));
-    check_streq("http", scheme);
-    check_streq("www.some-tracker.org", host);
-    check_streq("/some/path", path);
-    check_int_eq(80, port);
+    check_str(scheme, ==, "http");
+    check_str(host, ==, "www.some-tracker.org");
+    check_str(path, ==, "/some/path");
+    check_int(port, ==, 80);
     tr_free(scheme);
     tr_free(path);
     tr_free(host);
 
     url = "http%3A%2F%2Fwww.example.com%2F~user%2F%3Ftest%3D1%26test1%3D2";
     str = tr_http_unescape(url, strlen(url));
-    check_streq("http://www.example.com/~user/?test=1&test1=2", str);
+    check_str(str, ==, "http://www.example.com/~user/?test=1&test1=2");
     tr_free(str);
 
     return 0;
@@ -397,25 +392,25 @@ static int test_truncd(void)
     double const nan = sqrt(-1);
 
     tr_snprintf(buf, sizeof(buf), "%.2f%%", 99.999);
-    check_streq("100.00%", buf);
+    check_str(buf, ==, "100.00%");
 
     tr_snprintf(buf, sizeof(buf), "%.2f%%", tr_truncd(99.999, 2));
-    check_streq("99.99%", buf);
+    check_str(buf, ==, "99.99%");
 
     tr_snprintf(buf, sizeof(buf), "%.4f", tr_truncd(403650.656250, 4));
-    check_streq("403650.6562", buf);
+    check_str(buf, ==, "403650.6562");
 
     tr_snprintf(buf, sizeof(buf), "%.2f", tr_truncd(2.15, 2));
-    check_streq("2.15", buf);
+    check_str(buf, ==, "2.15");
 
     tr_snprintf(buf, sizeof(buf), "%.2f", tr_truncd(2.05, 2));
-    check_streq("2.05", buf);
+    check_str(buf, ==, "2.05");
 
     tr_snprintf(buf, sizeof(buf), "%.2f", tr_truncd(3.3333, 2));
-    check_streq("3.33", buf);
+    check_str(buf, ==, "3.33");
 
     tr_snprintf(buf, sizeof(buf), "%.0f", tr_truncd(3.3333, 0));
-    check_streq("3", buf);
+    check_str(buf, ==, "3");
 
 #if !(defined(_MSC_VER) || (defined(__MINGW32__) && defined(__MSVCRT__)))
     /* FIXME: MSCVRT behaves differently in case of nan */
@@ -447,11 +442,11 @@ static int test_strdup_printf(void)
     char* s3;
 
     s = tr_strdup_printf("%s", "test");
-    check_streq("test", s);
+    check_str(s, ==, "test");
     tr_free(s);
 
     s = tr_strdup_printf("%d %s %c %u", -1, "0", '1', 2);
-    check_streq("-1 0 1 2", s);
+    check_str(s, ==, "-1 0 1 2");
     tr_free(s);
 
     s3 = tr_malloc0(4098);
@@ -467,19 +462,19 @@ static int test_strdup_printf(void)
     s2[2048] = 's';
 
     s = tr_strdup_printf(s2, "test");
-    check_streq(s3, s);
+    check_str(s, ==, s3);
     tr_free(s);
 
     tr_free(s2);
 
     s = tr_strdup_printf("%s", s3);
-    check_streq(s3, s);
+    check_str(s, ==, s3);
     tr_free(s);
 
     tr_free(s3);
 
     s = test_strdup_printf_valist("\n-%s-%s-%s-\n", "\r", "\t", "\b");
-    check_streq("\n-\r-\t-\b-\n", s);
+    check_str(s, ==, "\n-\r-\t-\b-\n");
     tr_free(s);
 
     return 0;
@@ -495,35 +490,35 @@ static int test_env(void)
 
     check(!tr_env_key_exists(test_key));
     x = tr_env_get_int(test_key, 123);
-    check_int_eq(123, x);
+    check_int(x, ==, 123);
     s = tr_env_get_string(test_key, NULL);
-    check(s == NULL);
+    check_str(s, ==, NULL);
     s = tr_env_get_string(test_key, "a");
-    check_streq("a", s);
+    check_str(s, ==, "a");
     tr_free(s);
 
     setenv(test_key, "", 1);
 
     check(tr_env_key_exists(test_key));
     x = tr_env_get_int(test_key, 456);
-    check_int_eq(456, x);
+    check_int(x, ==, 456);
     s = tr_env_get_string(test_key, NULL);
-    check_streq("", s);
+    check_str(s, ==, "");
     tr_free(s);
     s = tr_env_get_string(test_key, "b");
-    check_streq("", s);
+    check_str(s, ==, "");
     tr_free(s);
 
     setenv(test_key, "135", 1);
 
     check(tr_env_key_exists(test_key));
     x = tr_env_get_int(test_key, 789);
-    check_int_eq(135, x);
+    check_int(x, ==, 135);
     s = tr_env_get_string(test_key, NULL);
-    check_streq("135", s);
+    check_str(s, ==, "135");
     tr_free(s);
     s = tr_env_get_string(test_key, "c");
-    check_streq("135", s);
+    check_str(s, ==, "135");
     tr_free(s);
 
     return 0;

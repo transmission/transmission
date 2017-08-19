@@ -87,12 +87,12 @@ typedef struct tr_address
     tr_address_type type;
     union
     {
-        /* The order here is important for tr_in{,6}addr_any initialization,
-         * since we can't use C99 designated initializers */
         struct in6_addr addr6;
         struct in_addr addr4;
-    } addr;
-} tr_address;
+    }
+    addr;
+}
+tr_address;
 
 extern tr_address const tr_inaddr_any;
 extern tr_address const tr_in6addr_any;
@@ -111,7 +111,7 @@ bool tr_address_is_valid_for_peers(tr_address const* addr, tr_port port);
 
 static inline bool tr_address_is_valid(tr_address const* a)
 {
-    return (a != NULL) && (a->type == TR_AF_INET || a->type == TR_AF_INET6);
+    return a != NULL && (a->type == TR_AF_INET || a->type == TR_AF_INET6);
 }
 
 /***********************************************************************
@@ -120,15 +120,15 @@ static inline bool tr_address_is_valid(tr_address const* a)
 
 struct tr_session;
 
-tr_socket_t tr_netOpenPeerSocket(tr_session* session, tr_address const* addr, tr_port port, bool clientIsSeed);
+struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const* addr, tr_port port, bool clientIsSeed);
 
-struct UTPSocket* tr_netOpenPeerUTPSocket(tr_session* session, tr_address const* addr, tr_port port, bool clientIsSeed);
+struct tr_peer_socket tr_netOpenPeerUTPSocket(tr_session* session, tr_address const* addr, tr_port port, bool clientIsSeed);
 
 tr_socket_t tr_netBindTCP(tr_address const* addr, tr_port port, bool suppressMsgs);
 
 tr_socket_t tr_netAccept(tr_session* session, tr_socket_t bound, tr_address* setme_addr, tr_port* setme_port);
 
-void tr_netSetTOS(tr_socket_t s, int tos);
+void tr_netSetTOS(tr_socket_t s, int tos, tr_address_type type);
 
 void tr_netSetCongestionControl(tr_socket_t s, char const* algorithm);
 

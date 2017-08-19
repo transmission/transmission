@@ -6,7 +6,6 @@
  *
  */
 
-#include <assert.h>
 #include <ctype.h> /* isalpha() */
 
 #include <shlobj.h> /* SHCreateDirectoryEx() */
@@ -16,6 +15,7 @@
 #include "crypto-utils.h" /* tr_rand_int() */
 #include "error.h"
 #include "file.h"
+#include "tr-assert.h"
 #include "utils.h"
 
 #ifndef MAXSIZE_T
@@ -66,10 +66,9 @@ static void set_system_error_if_file_found(tr_error** error, DWORD code)
 
 static time_t filetime_to_unix_time(FILETIME const* t)
 {
+    TR_ASSERT(t != NULL);
+
     uint64_t tmp = 0;
-
-    assert(t != NULL);
-
     tmp |= t->dwHighDateTime;
     tmp <<= 32;
     tmp |= t->dwLowDateTime;
@@ -82,8 +81,8 @@ static time_t filetime_to_unix_time(FILETIME const* t)
 static void stat_to_sys_path_info(DWORD attributes, DWORD size_low, DWORD size_high, FILETIME const* mtime,
     tr_sys_path_info* info)
 {
-    assert(mtime != NULL);
-    assert(info != NULL);
+    TR_ASSERT(mtime != NULL);
+    TR_ASSERT(info != NULL);
 
     if (attributes & FILE_ATTRIBUTE_DIRECTORY)
     {
@@ -154,9 +153,9 @@ static wchar_t* path_to_native_path_ex(char const* path, int extra_chars_after, 
     bool const is_unc = is_unc_path(path);
 
     /* `-2` for UNC since we overwrite existing prefix slashes */
-    int const extra_chars_before = is_relative ? 0 : (is_unc ? ARRAYSIZE(unc_prefix) - 2 : ARRAYSIZE(local_prefix));
+    int const extra_chars_before = is_relative ? 0 : (is_unc ? TR_N_ELEMENTS(unc_prefix) - 2 : TR_N_ELEMENTS(local_prefix));
 
-    /* TODO (?): assert(!is_relative); */
+    /* TODO (?): TR_ASSERT(!is_relative); */
 
     wchar_t* const wide_path = tr_win32_utf8_to_native_ex(path, -1, extra_chars_before, extra_chars_after, real_result_size);
 
@@ -204,12 +203,10 @@ static wchar_t* path_to_native_path(char const* path)
 
 static tr_sys_file_t open_file(char const* path, DWORD access, DWORD disposition, DWORD flags, tr_error** error)
 {
+    TR_ASSERT(path != NULL);
+
     tr_sys_file_t ret = TR_BAD_SYS_FILE;
-    wchar_t* wide_path;
-
-    assert(path != NULL);
-
-    wide_path = path_to_native_path(path);
+    wchar_t* wide_path = path_to_native_path(path);
 
     if (wide_path != NULL)
     {
@@ -229,15 +226,13 @@ static tr_sys_file_t open_file(char const* path, DWORD access, DWORD disposition
 
 static bool create_dir(char const* path, int flags, int permissions, bool okay_if_exists, tr_error** error)
 {
-    bool ret;
-    wchar_t* wide_path;
-    DWORD error_code = ERROR_SUCCESS;
-
-    assert(path != NULL);
+    TR_ASSERT(path != NULL);
 
     (void)permissions;
 
-    wide_path = path_to_native_path(path);
+    bool ret;
+    DWORD error_code = ERROR_SUCCESS;
+    wchar_t* wide_path = path_to_native_path(path);
 
     if ((flags & TR_SYS_DIR_CREATE_PARENTS) != 0)
     {
@@ -278,20 +273,17 @@ static bool create_dir(char const* path, int flags, int permissions, bool okay_i
 static void create_temp_path(char* path_template, void (* callback)(char const* path, void* param,
     tr_error** error), void* callback_param, tr_error** error)
 {
-    char* path;
-    size_t path_size;
-    int attempt;
+    TR_ASSERT(path_template != NULL);
+    TR_ASSERT(callback != NULL);
+
+    char* path = tr_strdup(path_template);
+    size_t path_size = strlen(path);
+
+    TR_ASSERT(path_size > 0);
+
     tr_error* my_error = NULL;
 
-    assert(path_template != NULL);
-    assert(callback != NULL);
-
-    path = tr_strdup(path_template);
-    path_size = strlen(path);
-
-    assert(path_size > 0);
-
-    for (attempt = 0; attempt < 100; ++attempt)
+    for (int attempt = 0; attempt < 100; ++attempt)
     {
         size_t i = path_size;
 
@@ -302,7 +294,7 @@ static void create_temp_path(char* path_template, void (* callback)(char const* 
             --i;
         }
 
-        assert(path_size >= i + 6);
+        TR_ASSERT(path_size >= i + 6);
 
         tr_error_clear(&my_error);
 
@@ -328,13 +320,11 @@ static void create_temp_path(char* path_template, void (* callback)(char const* 
 
 bool tr_sys_path_exists(char const* path, tr_error** error)
 {
+    TR_ASSERT(path != NULL);
+
     bool ret = false;
-    wchar_t* wide_path;
     HANDLE handle = INVALID_HANDLE_VALUE;
-
-    assert(path != NULL);
-
-    wide_path = path_to_native_path(path);
+    wchar_t* wide_path = path_to_native_path(path);
 
     if (wide_path != NULL)
     {
@@ -371,13 +361,11 @@ bool tr_sys_path_exists(char const* path, tr_error** error)
 
 bool tr_sys_path_get_info(char const* path, int flags, tr_sys_path_info* info, tr_error** error)
 {
+    TR_ASSERT(path != NULL);
+    TR_ASSERT(info != NULL);
+
     bool ret = false;
-    wchar_t* wide_path;
-
-    assert(path != NULL);
-    assert(info != NULL);
-
-    wide_path = path_to_native_path(path);
+    wchar_t* wide_path = path_to_native_path(path);
 
     if ((flags & TR_SYS_PATH_NO_FOLLOW) == 0)
     {
@@ -432,7 +420,7 @@ bool tr_sys_path_get_info(char const* path, int flags, tr_sys_path_info* info, t
 
 bool tr_sys_path_is_relative(char const* path)
 {
-    assert(path != NULL);
+    TR_ASSERT(path != NULL);
 
     /* UNC path: `\\...`. */
     if (is_unc_path(path))
@@ -451,15 +439,15 @@ bool tr_sys_path_is_relative(char const* path)
 
 bool tr_sys_path_is_same(char const* path1, char const* path2, tr_error** error)
 {
+    TR_ASSERT(path1 != NULL);
+    TR_ASSERT(path2 != NULL);
+
     bool ret = false;
     wchar_t* wide_path1 = NULL;
     wchar_t* wide_path2 = NULL;
     HANDLE handle1 = INVALID_HANDLE_VALUE;
     HANDLE handle2 = INVALID_HANDLE_VALUE;
     BY_HANDLE_FILE_INFORMATION fi1, fi2;
-
-    assert(path1 != NULL);
-    assert(path2 != NULL);
 
     wide_path1 = path_to_native_path(path1);
 
@@ -516,13 +504,13 @@ cleanup:
 
 char* tr_sys_path_resolve(char const* path, tr_error** error)
 {
+    TR_ASSERT(path != NULL);
+
     char* ret = NULL;
     wchar_t* wide_path;
     wchar_t* wide_ret = NULL;
     HANDLE handle = INVALID_HANDLE_VALUE;
     DWORD wide_ret_size;
-
-    assert(path != NULL);
 
     wide_path = path_to_native_path(path);
 
@@ -678,15 +666,12 @@ char* tr_sys_path_dirname(char const* path, tr_error** error)
 
 bool tr_sys_path_rename(char const* src_path, char const* dst_path, tr_error** error)
 {
+    TR_ASSERT(src_path != NULL);
+    TR_ASSERT(dst_path != NULL);
+
     bool ret = false;
-    wchar_t* wide_src_path;
-    wchar_t* wide_dst_path;
-
-    assert(src_path != NULL);
-    assert(dst_path != NULL);
-
-    wide_src_path = path_to_native_path(src_path);
-    wide_dst_path = path_to_native_path(dst_path);
+    wchar_t* wide_src_path = path_to_native_path(src_path);
+    wchar_t* wide_dst_path = path_to_native_path(dst_path);
 
     if (wide_src_path != NULL && wide_dst_path != NULL)
     {
@@ -725,12 +710,10 @@ bool tr_sys_path_rename(char const* src_path, char const* dst_path, tr_error** e
 
 bool tr_sys_path_remove(char const* path, tr_error** error)
 {
+    TR_ASSERT(path != NULL);
+
     bool ret = false;
-    wchar_t* wide_path;
-
-    assert(path != NULL);
-
-    wide_path = path_to_native_path(path);
+    wchar_t* wide_path = path_to_native_path(path);
 
     if (wide_path != NULL)
     {
@@ -778,7 +761,7 @@ tr_sys_file_t tr_sys_file_get_std(tr_std_sys_file_t std_file, tr_error** error)
         break;
 
     default:
-        assert(0 && "Unknown standard file");
+        TR_ASSERT_MSG(false, "unknown standard file %d", (int)std_file);
         set_system_error(error, ERROR_INVALID_PARAMETER);
         return TR_BAD_SYS_FILE;
     }
@@ -797,16 +780,16 @@ tr_sys_file_t tr_sys_file_get_std(tr_std_sys_file_t std_file, tr_error** error)
 
 tr_sys_file_t tr_sys_file_open(char const* path, int flags, int permissions, tr_error** error)
 {
+    TR_ASSERT(path != NULL);
+    TR_ASSERT((flags & (TR_SYS_FILE_READ | TR_SYS_FILE_WRITE)) != 0);
+
+    (void)permissions;
+
     tr_sys_file_t ret;
     DWORD native_access = 0;
     DWORD native_disposition = OPEN_EXISTING;
     DWORD native_flags = FILE_ATTRIBUTE_NORMAL;
     bool success;
-
-    assert(path != NULL);
-    assert((flags & (TR_SYS_FILE_READ | TR_SYS_FILE_WRITE)) != 0);
-
-    (void)permissions;
 
     if ((flags & TR_SYS_FILE_READ) != 0)
     {
@@ -863,16 +846,16 @@ static void file_open_temp_callback(char const* path, void* param, tr_error** er
 {
     tr_sys_file_t* result = (tr_sys_file_t*)param;
 
-    assert(result != NULL);
+    TR_ASSERT(result != NULL);
 
     *result = open_file(path, GENERIC_READ | GENERIC_WRITE, CREATE_NEW, FILE_ATTRIBUTE_TEMPORARY, error);
 }
 
 tr_sys_file_t tr_sys_file_open_temp(char* path_template, tr_error** error)
 {
-    tr_sys_file_t ret = TR_BAD_SYS_FILE;
+    TR_ASSERT(path_template != NULL);
 
-    assert(path_template != NULL);
+    tr_sys_file_t ret = TR_BAD_SYS_FILE;
 
     create_temp_path(path_template, file_open_temp_callback, &ret, error);
 
@@ -881,11 +864,9 @@ tr_sys_file_t tr_sys_file_open_temp(char* path_template, tr_error** error)
 
 bool tr_sys_file_close(tr_sys_file_t handle, tr_error** error)
 {
-    bool ret;
+    TR_ASSERT(handle != TR_BAD_SYS_FILE);
 
-    assert(handle != TR_BAD_SYS_FILE);
-
-    ret = CloseHandle(handle);
+    bool ret = CloseHandle(handle);
 
     if (!ret)
     {
@@ -897,13 +878,11 @@ bool tr_sys_file_close(tr_sys_file_t handle, tr_error** error)
 
 bool tr_sys_file_get_info(tr_sys_file_t handle, tr_sys_path_info* info, tr_error** error)
 {
-    bool ret;
+    TR_ASSERT(handle != TR_BAD_SYS_FILE);
+    TR_ASSERT(info != NULL);
+
     BY_HANDLE_FILE_INFORMATION attributes;
-
-    assert(handle != TR_BAD_SYS_FILE);
-    assert(info != NULL);
-
-    ret = GetFileInformationByHandle(handle, &attributes);
+    bool ret = GetFileInformationByHandle(handle, &attributes);
 
     if (ret)
     {
@@ -920,15 +899,16 @@ bool tr_sys_file_get_info(tr_sys_file_t handle, tr_sys_path_info* info, tr_error
 
 bool tr_sys_file_seek(tr_sys_file_t handle, int64_t offset, tr_seek_origin_t origin, uint64_t* new_offset, tr_error** error)
 {
-    bool ret = false;
-    LARGE_INTEGER native_offset, new_native_pointer;
-
     TR_STATIC_ASSERT(TR_SEEK_SET == FILE_BEGIN, "values should match");
     TR_STATIC_ASSERT(TR_SEEK_CUR == FILE_CURRENT, "values should match");
     TR_STATIC_ASSERT(TR_SEEK_END == FILE_END, "values should match");
 
-    assert(handle != TR_BAD_SYS_FILE);
-    assert(origin == TR_SEEK_SET || origin == TR_SEEK_CUR || origin == TR_SEEK_END);
+    TR_ASSERT(handle != TR_BAD_SYS_FILE);
+    TR_ASSERT(origin == TR_SEEK_SET || origin == TR_SEEK_CUR || origin == TR_SEEK_END);
+
+    bool ret = false;
+    LARGE_INTEGER native_offset;
+    LARGE_INTEGER new_native_pointer;
 
     native_offset.QuadPart = offset;
 
@@ -951,17 +931,17 @@ bool tr_sys_file_seek(tr_sys_file_t handle, int64_t offset, tr_seek_origin_t ori
 
 bool tr_sys_file_read(tr_sys_file_t handle, void* buffer, uint64_t size, uint64_t* bytes_read, tr_error** error)
 {
-    bool ret = false;
-    DWORD my_bytes_read;
-
-    assert(handle != TR_BAD_SYS_FILE);
-    assert(buffer != NULL || size == 0);
+    TR_ASSERT(handle != TR_BAD_SYS_FILE);
+    TR_ASSERT(buffer != NULL || size == 0);
 
     if (size > MAXDWORD)
     {
         set_system_error(error, ERROR_INVALID_PARAMETER);
         return false;
     }
+
+    bool ret = false;
+    DWORD my_bytes_read;
 
     if (ReadFile(handle, buffer, (DWORD)size, &my_bytes_read, NULL))
     {
@@ -983,18 +963,18 @@ bool tr_sys_file_read(tr_sys_file_t handle, void* buffer, uint64_t size, uint64_
 bool tr_sys_file_read_at(tr_sys_file_t handle, void* buffer, uint64_t size, uint64_t offset, uint64_t* bytes_read,
     tr_error** error)
 {
-    bool ret = false;
-    OVERLAPPED overlapped;
-    DWORD my_bytes_read;
-
-    assert(handle != TR_BAD_SYS_FILE);
-    assert(buffer != NULL || size == 0);
+    TR_ASSERT(handle != TR_BAD_SYS_FILE);
+    TR_ASSERT(buffer != NULL || size == 0);
 
     if (size > MAXDWORD)
     {
         set_system_error(error, ERROR_INVALID_PARAMETER);
         return false;
     }
+
+    bool ret = false;
+    OVERLAPPED overlapped;
+    DWORD my_bytes_read;
 
     overlapped.Offset = (DWORD)offset;
     offset >>= 32;
@@ -1020,17 +1000,17 @@ bool tr_sys_file_read_at(tr_sys_file_t handle, void* buffer, uint64_t size, uint
 
 bool tr_sys_file_write(tr_sys_file_t handle, void const* buffer, uint64_t size, uint64_t* bytes_written, tr_error** error)
 {
-    bool ret = false;
-    DWORD my_bytes_written;
-
-    assert(handle != TR_BAD_SYS_FILE);
-    assert(buffer != NULL || size == 0);
+    TR_ASSERT(handle != TR_BAD_SYS_FILE);
+    TR_ASSERT(buffer != NULL || size == 0);
 
     if (size > MAXDWORD)
     {
         set_system_error(error, ERROR_INVALID_PARAMETER);
         return false;
     }
+
+    bool ret = false;
+    DWORD my_bytes_written;
 
     if (WriteFile(handle, buffer, (DWORD)size, &my_bytes_written, NULL))
     {
@@ -1052,18 +1032,18 @@ bool tr_sys_file_write(tr_sys_file_t handle, void const* buffer, uint64_t size, 
 bool tr_sys_file_write_at(tr_sys_file_t handle, void const* buffer, uint64_t size, uint64_t offset, uint64_t* bytes_written,
     tr_error** error)
 {
-    bool ret = false;
-    OVERLAPPED overlapped;
-    DWORD my_bytes_written;
-
-    assert(handle != TR_BAD_SYS_FILE);
-    assert(buffer != NULL || size == 0);
+    TR_ASSERT(handle != TR_BAD_SYS_FILE);
+    TR_ASSERT(buffer != NULL || size == 0);
 
     if (size > MAXDWORD)
     {
         set_system_error(error, ERROR_INVALID_PARAMETER);
         return false;
     }
+
+    bool ret = false;
+    OVERLAPPED overlapped;
+    DWORD my_bytes_written;
 
     overlapped.Offset = (DWORD)offset;
     offset >>= 32;
@@ -1089,11 +1069,9 @@ bool tr_sys_file_write_at(tr_sys_file_t handle, void const* buffer, uint64_t siz
 
 bool tr_sys_file_flush(tr_sys_file_t handle, tr_error** error)
 {
-    bool ret;
+    TR_ASSERT(handle != TR_BAD_SYS_FILE);
 
-    assert(handle != TR_BAD_SYS_FILE);
-
-    ret = FlushFileBuffers(handle);
+    bool ret = FlushFileBuffers(handle);
 
     if (!ret)
     {
@@ -1105,14 +1083,12 @@ bool tr_sys_file_flush(tr_sys_file_t handle, tr_error** error)
 
 bool tr_sys_file_truncate(tr_sys_file_t handle, uint64_t size, tr_error** error)
 {
-    bool ret = false;
+    TR_ASSERT(handle != TR_BAD_SYS_FILE);
+
     FILE_END_OF_FILE_INFO info;
-
-    assert(handle != TR_BAD_SYS_FILE);
-
     info.EndOfFile.QuadPart = size;
 
-    ret = SetFileInformationByHandle(handle, FileEndOfFileInfo, &info, sizeof(info));
+    bool ret = SetFileInformationByHandle(handle, FileEndOfFileInfo, &info, sizeof(info));
 
     if (!ret)
     {
@@ -1122,17 +1098,19 @@ bool tr_sys_file_truncate(tr_sys_file_t handle, uint64_t size, tr_error** error)
     return ret;
 }
 
-bool tr_sys_file_prefetch(tr_sys_file_t handle, uint64_t offset, uint64_t size, tr_error** error)
+bool tr_sys_file_advise(tr_sys_file_t handle, uint64_t offset, uint64_t size, tr_sys_file_advice_t advice, tr_error** error)
 {
-    bool ret = false;
-
-    assert(handle != TR_BAD_SYS_FILE);
-    assert(size > 0);
+    TR_ASSERT(handle != TR_BAD_SYS_FILE);
+    TR_ASSERT(size > 0);
+    TR_ASSERT(advice == TR_SYS_FILE_ADVICE_WILL_NEED || advice == TR_SYS_FILE_ADVICE_DONT_NEED);
 
     (void)handle;
     (void)offset;
     (void)size;
+    (void)advice;
     (void)error;
+
+    bool ret = true;
 
     /* ??? */
 
@@ -1141,7 +1119,7 @@ bool tr_sys_file_prefetch(tr_sys_file_t handle, uint64_t offset, uint64_t size, 
 
 bool tr_sys_file_preallocate(tr_sys_file_t handle, uint64_t size, int flags, tr_error** error)
 {
-    assert(handle != TR_BAD_SYS_FILE);
+    TR_ASSERT(handle != TR_BAD_SYS_FILE);
 
     if ((flags & TR_SYS_FILE_PREALLOC_SPARSE) != 0)
     {
@@ -1159,11 +1137,8 @@ bool tr_sys_file_preallocate(tr_sys_file_t handle, uint64_t size, int flags, tr_
 
 void* tr_sys_file_map_for_reading(tr_sys_file_t handle, uint64_t offset, uint64_t size, tr_error** error)
 {
-    void* ret = NULL;
-    HANDLE mappingHandle;
-
-    assert(handle != TR_BAD_SYS_FILE);
-    assert(size > 0);
+    TR_ASSERT(handle != TR_BAD_SYS_FILE);
+    TR_ASSERT(size > 0);
 
     if (size > MAXSIZE_T)
     {
@@ -1171,7 +1146,8 @@ void* tr_sys_file_map_for_reading(tr_sys_file_t handle, uint64_t offset, uint64_
         return false;
     }
 
-    mappingHandle = CreateFileMappingW(handle, NULL, PAGE_READONLY, 0, 0, NULL);
+    void* ret = NULL;
+    HANDLE mappingHandle = CreateFileMappingW(handle, NULL, PAGE_READONLY, 0, 0, NULL);
 
     if (mappingHandle != NULL)
     {
@@ -1194,14 +1170,12 @@ void* tr_sys_file_map_for_reading(tr_sys_file_t handle, uint64_t offset, uint64_
 
 bool tr_sys_file_unmap(void const* address, uint64_t size, tr_error** error)
 {
-    bool ret;
-
-    assert(address != NULL);
-    assert(size > 0);
+    TR_ASSERT(address != NULL);
+    TR_ASSERT(size > 0);
 
     (void)size;
 
-    ret = UnmapViewOfFile(address);
+    bool ret = UnmapViewOfFile(address);
 
     if (!ret)
     {
@@ -1213,13 +1187,13 @@ bool tr_sys_file_unmap(void const* address, uint64_t size, tr_error** error)
 
 bool tr_sys_file_lock(tr_sys_file_t handle, int operation, tr_error** error)
 {
+    TR_ASSERT(handle != TR_BAD_SYS_FILE);
+    TR_ASSERT((operation & ~(TR_SYS_FILE_LOCK_SH | TR_SYS_FILE_LOCK_EX | TR_SYS_FILE_LOCK_NB | TR_SYS_FILE_LOCK_UN)) == 0);
+    TR_ASSERT(!!(operation & TR_SYS_FILE_LOCK_SH) + !!(operation & TR_SYS_FILE_LOCK_EX) +
+        !!(operation & TR_SYS_FILE_LOCK_UN) == 1);
+
     bool ret;
     OVERLAPPED overlapped = { .Pointer = 0, .hEvent = NULL };
-
-    assert(handle != TR_BAD_SYS_FILE);
-    assert((operation & ~(TR_SYS_FILE_LOCK_SH | TR_SYS_FILE_LOCK_EX | TR_SYS_FILE_LOCK_NB | TR_SYS_FILE_LOCK_UN)) == 0);
-    assert(!!(operation & TR_SYS_FILE_LOCK_SH) + !!(operation & TR_SYS_FILE_LOCK_EX) +
-        !!(operation & TR_SYS_FILE_LOCK_UN) == 1);
 
     if ((operation & TR_SYS_FILE_LOCK_UN) == 0)
     {
@@ -1287,16 +1261,16 @@ static void dir_create_temp_callback(char const* path, void* param, tr_error** e
 {
     bool* result = (bool*)param;
 
-    assert(result != NULL);
+    TR_ASSERT(result != NULL);
 
     *result = create_dir(path, 0, 0, false, error);
 }
 
 bool tr_sys_dir_create_temp(char* path_template, tr_error** error)
 {
-    bool ret = false;
+    TR_ASSERT(path_template != NULL);
 
-    assert(path_template != NULL);
+    bool ret = false;
 
     create_temp_path(path_template, dir_create_temp_callback, &ret, error);
 
@@ -1305,17 +1279,16 @@ bool tr_sys_dir_create_temp(char* path_template, tr_error** error)
 
 tr_sys_dir_t tr_sys_dir_open(char const* path, tr_error** error)
 {
-    tr_sys_dir_t ret;
-    int pattern_size;
-
 #ifndef __clang__
     /* Clang gives "static_assert expression is not an integral constant expression" error */
     TR_STATIC_ASSERT(TR_BAD_SYS_DIR == NULL, "values should match");
 #endif
 
-    assert(path != NULL);
+    TR_ASSERT(path != NULL);
 
-    ret = tr_new(struct tr_sys_dir_win32, 1);
+    tr_sys_dir_t ret = tr_new(struct tr_sys_dir_win32, 1);
+
+    int pattern_size;
     ret->pattern = path_to_native_path_ex(path, 2, &pattern_size);
 
     if (ret->pattern != NULL)
@@ -1341,10 +1314,9 @@ tr_sys_dir_t tr_sys_dir_open(char const* path, tr_error** error)
 
 char const* tr_sys_dir_read_name(tr_sys_dir_t handle, tr_error** error)
 {
-    char* ret;
-    DWORD error_code = ERROR_SUCCESS;
+    TR_ASSERT(handle != TR_BAD_SYS_DIR);
 
-    assert(handle != TR_BAD_SYS_DIR);
+    DWORD error_code = ERROR_SUCCESS;
 
     if (handle->find_handle == INVALID_HANDLE_VALUE)
     {
@@ -1369,7 +1341,7 @@ char const* tr_sys_dir_read_name(tr_sys_dir_t handle, tr_error** error)
         return NULL;
     }
 
-    ret = tr_win32_native_to_utf8(handle->find_data.cFileName, -1);
+    char* ret = tr_win32_native_to_utf8(handle->find_data.cFileName, -1);
 
     if (ret != NULL)
     {
@@ -1386,11 +1358,9 @@ char const* tr_sys_dir_read_name(tr_sys_dir_t handle, tr_error** error)
 
 bool tr_sys_dir_close(tr_sys_dir_t handle, tr_error** error)
 {
-    bool ret;
+    TR_ASSERT(handle != TR_BAD_SYS_DIR);
 
-    assert(handle != TR_BAD_SYS_DIR);
-
-    ret = FindClose(handle->find_handle);
+    bool ret = FindClose(handle->find_handle);
 
     if (!ret)
     {

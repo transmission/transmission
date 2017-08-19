@@ -22,6 +22,7 @@
 #include "bandwidth.h"
 #include "crypto.h"
 #include "net.h" /* tr_address */
+#include "peer-socket.h"
 #include "utils.h" /* tr_time() */
 
 struct evbuffer;
@@ -76,8 +77,7 @@ typedef struct tr_peerIo
     bool isSeed;
 
     tr_port port;
-    tr_socket_t socket;
-    struct UTPSocket* utp_socket;
+    struct tr_peer_socket socket;
 
     int refCount;
 
@@ -113,7 +113,7 @@ tr_peerIo* tr_peerIoNewOutgoing(tr_session* session, struct tr_bandwidth* parent
     uint8_t const* torrentHash, bool isSeed, bool utp);
 
 tr_peerIo* tr_peerIoNewIncoming(tr_session* session, struct tr_bandwidth* parent, struct tr_address const* addr, tr_port port,
-    tr_socket_t socket, struct UTPSocket* utp_socket);
+    struct tr_peer_socket socket);
 
 void tr_peerIoRefImpl(char const* file, int line, tr_peerIo* io);
 
@@ -176,8 +176,8 @@ static inline bool tr_peerIoSupportsUTP(tr_peerIo const* io)
 
 static inline tr_session* tr_peerIoGetSession(tr_peerIo* io)
 {
-    assert(tr_isPeerIo(io));
-    assert(io->session != NULL);
+    TR_ASSERT(tr_isPeerIo(io));
+    TR_ASSERT(io->session != NULL);
 
     return io->session;
 }
@@ -214,8 +214,8 @@ void tr_peerIoSetPeersId(tr_peerIo* io, uint8_t const* peer_id);
 
 static inline uint8_t const* tr_peerIoGetPeersId(tr_peerIo const* io)
 {
-    assert(tr_isPeerIo(io));
-    assert(io->peerIdIsSet);
+    TR_ASSERT(tr_isPeerIo(io));
+    TR_ASSERT(io->peerIdIsSet);
 
     return io->peerId;
 }
@@ -295,7 +295,7 @@ size_t tr_peerIoGetWriteBufferSpace(tr_peerIo const* io, uint64_t now);
 
 static inline void tr_peerIoSetParent(tr_peerIo* io, struct tr_bandwidth* parent)
 {
-    assert(tr_isPeerIo(io));
+    TR_ASSERT(tr_isPeerIo(io));
 
     tr_bandwidthSetParent(&io->bandwidth, parent);
 }

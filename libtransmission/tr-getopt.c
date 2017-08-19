@@ -12,10 +12,7 @@
 #include <string.h>
 
 #include "tr-getopt.h"
-
-#ifndef MAX
-#define MAX(a, b) (((a) > (b)) ? (a) : (b))
-#endif
+#include "tr-macros.h"
 
 int tr_optind = 1;
 
@@ -120,9 +117,8 @@ void tr_getopt_usage(char const* progName, char const* description, struct tr_op
     int shortWidth = 0;
     int argWidth = 0;
     struct tr_option help;
-    struct tr_option const* o;
 
-    for (o = opts; o->val != 0; ++o)
+    for (tr_option const* o = opts; o->val != 0; ++o)
     {
         maxWidth(o, &longWidth, &shortWidth, &argWidth);
     }
@@ -143,7 +139,7 @@ void tr_getopt_usage(char const* progName, char const* description, struct tr_op
     printf("\n\nOptions:\n");
     getopts_usage_line(&help, longWidth, shortWidth, argWidth);
 
-    for (o = opts; o->val != 0; ++o)
+    for (tr_option const* o = opts; o->val != 0; ++o)
     {
         getopts_usage_line(o, longWidth, shortWidth, argWidth);
     }
@@ -153,11 +149,10 @@ static tr_option const* findOption(tr_option const* opts, char const* str, char 
 {
     size_t matchlen = 0;
     char const* arg = NULL;
-    tr_option const* o;
     tr_option const* match = NULL;
 
     /* find the longest matching option */
-    for (o = opts; o->val != 0; ++o)
+    for (tr_option const* o = opts; o->val != 0; ++o)
     {
         size_t len = o->longName != NULL ? strlen(o->longName) : 0;
 
@@ -203,14 +198,13 @@ static tr_option const* findOption(tr_option const* opts, char const* str, char 
 
 int tr_getopt(char const* usage, int argc, char const* const* argv, tr_option const* opts, char const** setme_optarg)
 {
-    int i;
     char const* arg = NULL;
     tr_option const* o = NULL;
 
     *setme_optarg = NULL;
 
     /* handle the builtin 'help' option */
-    for (i = 1; i < argc; ++i)
+    for (int i = 1; i < argc; ++i)
     {
         if (strcmp(argv[i], "-h") == 0 || strcmp(argv[i], "--help") == 0)
         {

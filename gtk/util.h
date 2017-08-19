@@ -53,11 +53,6 @@ extern char const* speed_T_str;
 
 #endif
 
-/* macro to shut up "unused parameter" warnings */
-#ifndef UNUSED
-#define UNUSED G_GNUC_UNUSED
-#endif
-
 enum
 {
     GTR_UNICODE_UP,

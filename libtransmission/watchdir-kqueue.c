@@ -6,7 +6,6 @@
  *
  */
 
-#include <assert.h>
 #include <errno.h>
 #include <string.h> /* strcmp() */
 
@@ -27,6 +26,7 @@
 #include "transmission.h"
 #include "log.h"
 #include "ptrarray.h"
+#include "tr-assert.h"
 #include "utils.h"
 #include "watchdir.h"
 #include "watchdir-common.h"
@@ -66,7 +66,7 @@ static void tr_watchdir_kqueue_on_event(evutil_socket_t fd UNUSED, short type UN
     tr_watchdir_t const handle = context;
     tr_watchdir_kqueue* const backend = BACKEND_UPCAST(tr_watchdir_get_backend(handle));
     struct kevent ke;
-    struct timespec const ts = { 0, 0 };
+    struct timespec const ts = { .tv_sec = 0, .tv_nsec = 0 };
 
     if (kevent(backend->kq, NULL, 0, &ke, 1, &ts) == -1)
     {
@@ -87,7 +87,7 @@ static void tr_watchdir_kqueue_free(tr_watchdir_backend* backend_base)
         return;
     }
 
-    assert(backend->base.free_func == &tr_watchdir_kqueue_free);
+    TR_ASSERT(backend->base.free_func == &tr_watchdir_kqueue_free);
 
     if (backend->event != NULL)
     {

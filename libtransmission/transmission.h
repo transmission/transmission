@@ -19,37 +19,18 @@ extern "C"
 {
 #endif
 
-#if defined(__GNUC__)
-#define TR_DEPRECATED __attribute__((deprecated))
-#elif defined(_MSC_VER)
-#define TR_DEPRECATED __declspec(deprecated)
-#else
-#define TR_DEPRECATED
-#endif
-
 /***
 ****
 ****  Basic Types
 ****
 ***/
 
-#include <inttypes.h> /* uintN_t */
+#include <stdbool.h> /* bool */
+#include <stddef.h> /* size_t */
+#include <stdint.h> /* uintN_t */
 #include <time.h> /* time_t */
 
-#if !defined(__cplusplus)
-#ifdef HAVE_STDBOOL_H
-#include <stdbool.h>
-#elif !defined(__bool_true_false_are_defined)
-#define bool uint8_t
-#define true 1
-#define false 0
-#endif
-#endif
-
-#define SHA_DIGEST_LENGTH 20
-#define TR_INET6_ADDRSTRLEN 46
-
-#define TR_BAD_SIZE ((size_t)-1)
+#include "tr-macros.h"
 
 typedef uint32_t tr_file_index_t;
 typedef uint32_t tr_piece_index_t;
@@ -1951,12 +1932,6 @@ TR_DEPRECATED void tr_torrentSetDoneDate(tr_torrent* torrent, time_t doneDate);
 static inline bool tr_isDirection(tr_direction d)
 {
     return d == TR_UP || d == TR_DOWN;
-}
-
-/** @brief Sanity checker to test that a bool is true or false */
-static inline bool tr_isBool(bool b)
-{
-    return b == 1 || b == 0;
 }
 
 #ifdef __cplusplus

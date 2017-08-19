@@ -11,7 +11,6 @@
 #define __USE_UNIX98 /* some older Linuxes need it spelt out for them */
 #endif
 
-#include <assert.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -40,6 +39,7 @@
 #include "log.h"
 #include "platform.h"
 #include "session.h"
+#include "tr-assert.h"
 #include "utils.h"
 
 /***
@@ -191,8 +191,9 @@ void tr_lockLock(tr_lock* l)
     pthread_mutex_lock(&l->lock);
 #endif
 
-    assert(l->depth >= 0);
-    assert(l->depth == 0 || tr_areThreadsEqual(l->lockThread, tr_getCurrentThread()));
+    TR_ASSERT(l->depth >= 0);
+    TR_ASSERT(l->depth == 0 || tr_areThreadsEqual(l->lockThread, tr_getCurrentThread()));
+
     l->lockThread = tr_getCurrentThread();
     ++l->depth;
 }
@@ -204,11 +205,11 @@ bool tr_lockHave(tr_lock const* l)
 
 void tr_lockUnlock(tr_lock* l)
 {
-    assert(l->depth > 0);
-    assert(tr_areThreadsEqual(l->lockThread, tr_getCurrentThread()));
+    TR_ASSERT(l->depth > 0);
+    TR_ASSERT(tr_areThreadsEqual(l->lockThread, tr_getCurrentThread()));
 
     --l->depth;
-    assert(l->depth >= 0);
+    TR_ASSERT(l->depth >= 0);
 
 #ifdef _WIN32
     LeaveCriticalSection(&l->lock);
@@ -538,7 +539,7 @@ char const* tr_getWebClientDir(tr_session const* session UNUSED)
 
                 char* appString = tr_malloc(appStringLength);
                 bool const success = CFStringGetFileSystemRepresentation(appRef, appString, appStringLength);
-                assert(success);
+                TR_ASSERT(success);
 
                 CFRelease(appURL);
                 CFRelease(appRef);
@@ -567,7 +568,7 @@ char const* tr_getWebClientDir(tr_session const* session UNUSED)
                 &FOLDERID_ProgramData
             };
 
-            for (size_t i = 0; s == NULL && i < ARRAYSIZE(known_folder_ids); ++i)
+            for (size_t i = 0; s == NULL && i < TR_N_ELEMENTS(known_folder_ids); ++i)
             {
                 char* dir = win32_get_known_folder(known_folder_ids[i]);
                 s = tr_buildPath(dir, "Transmission", "Web", NULL);
@@ -585,7 +586,7 @@ char const* tr_getWebClientDir(tr_session const* session UNUSED)
                 wchar_t wide_module_path[MAX_PATH];
                 char* module_path;
                 char* dir;
-                GetModuleFileNameW(NULL, wide_module_path, sizeof(wide_module_path) / sizeof(*wide_module_path));
+                GetModuleFileNameW(NULL, wide_module_path, TR_N_ELEMENTS(wide_module_path));
                 module_path = tr_win32_native_to_utf8(wide_module_path, -1);
                 dir = tr_sys_path_dirname(module_path, NULL);
                 tr_free(module_path);
@@ -606,7 +607,6 @@ char const* tr_getWebClientDir(tr_session const* session UNUSED)
 #else /* everyone else, follow the XDG spec */
 
             tr_list* candidates = NULL;
-            tr_list* l;
             char* tmp;
 
             /* XDG_DATA_HOME should be the first in the list of candidates */
@@ -656,7 +656,7 @@ char const* tr_getWebClientDir(tr_session const* session UNUSED)
             }
 
             /* walk through the candidates & look for a match */
-            for (l = candidates; l != NULL; l = l->next)
+            for (tr_list* l = candidates; l != NULL; l = l->next)
             {
                 char* path = tr_buildPath(l->data, "transmission", "web", NULL);
                 bool const found = isWebClientDir(path);

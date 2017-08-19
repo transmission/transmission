@@ -108,8 +108,8 @@
         [stringShadow setShadowBlurRadius: 4.0];
 
         fAttributes = [[NSMutableDictionary alloc] initWithCapacity: 3];
-        [fAttributes setObject: [NSColor whiteColor] forKey: NSForegroundColorAttributeName];
-        [fAttributes setObject: stringShadow forKey: NSShadowAttributeName];
+        fAttributes[NSForegroundColorAttributeName] = [NSColor whiteColor];
+        fAttributes[NSShadowAttributeName] = stringShadow;
 
         [stringShadow release];
     }
@@ -126,7 +126,7 @@
     NSSize stringSize;
     do
     {
-        [fAttributes setObject: [NSFont boldSystemFontOfSize: fontSize] forKey: NSFontAttributeName];
+        fAttributes[NSFontAttributeName] = [NSFont boldSystemFontOfSize: fontSize];
         stringSize = [string sizeWithAttributes: fAttributes];
         fontSize -= 1.0;
     } while (NSWidth(badgeRect) < stringSize.width);

@@ -121,7 +121,7 @@ void Session::portTest()
 
             if (r.success)
             {
-                tr_variantDictFindBool(r.args.get(), TR_KEY_port_is_open, &isOpen);
+                (void)tr_variantDictFindBool(r.args.get(), TR_KEY_port_is_open, &isOpen);
             }
 
             emit portTested(isOpen);

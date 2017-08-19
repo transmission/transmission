@@ -13,6 +13,7 @@
 #include "magnet.h"
 #include "session.h" /* tr_sessionFindTorrentFile() */
 #include "torrent.h" /* tr_ctorGetSave() */
+#include "tr-assert.h"
 #include "utils.h" /* tr_new0 */
 #include "variant.h"
 
@@ -230,19 +231,17 @@ void tr_ctorSetFilePriorities(tr_ctor* ctor, tr_file_index_t const* files, tr_fi
 
 void tr_ctorInitTorrentPriorities(tr_ctor const* ctor, tr_torrent* tor)
 {
-    tr_file_index_t i;
-
-    for (i = 0; i < ctor->lowSize; ++i)
+    for (tr_file_index_t i = 0; i < ctor->lowSize; ++i)
     {
         tr_torrentInitFilePriority(tor, ctor->low[i], TR_PRI_LOW);
     }
 
-    for (i = 0; i < ctor->normalSize; ++i)
+    for (tr_file_index_t i = 0; i < ctor->normalSize; ++i)
     {
         tr_torrentInitFilePriority(tor, ctor->normal[i], TR_PRI_NORMAL);
     }
 
-    for (i = 0; i < ctor->highSize; ++i)
+    for (tr_file_index_t i = 0; i < ctor->highSize; ++i)
     {
         tr_torrentInitFilePriority(tor, ctor->high[i], TR_PRI_HIGH);
     }
@@ -277,8 +276,6 @@ void tr_ctorInitTorrentWanted(tr_ctor const* ctor, tr_torrent* tor)
 
 void tr_ctorSetDeleteSource(tr_ctor* ctor, bool deleteSource)
 {
-    assert(tr_isBool(deleteSource));
-
     ctor->doDelete = deleteSource;
     ctor->isSet_delete = true;
 }
@@ -305,8 +302,6 @@ bool tr_ctorGetDeleteSource(tr_ctor const* ctor, bool* setme)
 
 void tr_ctorSetSave(tr_ctor* ctor, bool saveInOurTorrentsDir)
 {
-    assert(tr_isBool(saveInOurTorrentsDir));
-
     ctor->saveInOurTorrentsDir = saveInOurTorrentsDir;
 }
 
@@ -317,37 +312,30 @@ bool tr_ctorGetSave(tr_ctor const* ctor)
 
 void tr_ctorSetPaused(tr_ctor* ctor, tr_ctorMode mode, bool isPaused)
 {
-    struct optional_args* args;
+    TR_ASSERT(ctor != NULL);
+    TR_ASSERT(mode == TR_FALLBACK || mode == TR_FORCE);
 
-    assert(ctor != NULL);
-    assert(mode == TR_FALLBACK || mode == TR_FORCE);
-    assert(tr_isBool(isPaused));
-
-    args = &ctor->optionalArgs[mode];
+    struct optional_args* args = &ctor->optionalArgs[mode];
     args->isSet_paused = true;
     args->isPaused = isPaused;
 }
 
 void tr_ctorSetPeerLimit(tr_ctor* ctor, tr_ctorMode mode, uint16_t peerLimit)
 {
-    struct optional_args* args;
+    TR_ASSERT(ctor != NULL);
+    TR_ASSERT(mode == TR_FALLBACK || mode == TR_FORCE);
 
-    assert(ctor != NULL);
-    assert(mode == TR_FALLBACK || mode == TR_FORCE);
-
-    args = &ctor->optionalArgs[mode];
+    struct optional_args* args = &ctor->optionalArgs[mode];
     args->isSet_connected = true;
     args->peerLimit = peerLimit;
 }
 
 void tr_ctorSetDownloadDir(tr_ctor* ctor, tr_ctorMode mode, char const* directory)
 {
-    struct optional_args* args;
+    TR_ASSERT(ctor != NULL);
+    TR_ASSERT(mode == TR_FALLBACK || mode == TR_FORCE);
 
-    assert(ctor != NULL);
-    assert(mode == TR_FALLBACK || mode == TR_FORCE);
-
-    args = &ctor->optionalArgs[mode];
+    struct optional_args* args = &ctor->optionalArgs[mode];
     tr_free(args->downloadDir);
     args->downloadDir = NULL;
     args->isSet_downloadDir = false;

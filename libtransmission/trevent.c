@@ -6,7 +6,6 @@
  *
  */
 
-#include <assert.h>
 #include <errno.h>
 #include <string.h>
 
@@ -28,6 +27,7 @@
 
 #include "transmission.h"
 #include "platform.h" /* tr_lockLock() */
+#include "tr-assert.h"
 #include "trevent.h"
 #include "utils.h"
 
@@ -166,15 +166,7 @@ struct tr_run_data
     void* user_data;
 };
 
-#define dbgmsg(...) \
-    do \
-    { \
-        if (tr_logGetDeepEnabled()) \
-        { \
-            tr_logAddDeep(__FILE__, __LINE__, "event", __VA_ARGS__); \
-        } \
-    } \
-    while (0)
+#define dbgmsg(...) tr_logAddDeepNamed("event", __VA_ARGS__)
 
 static void readFromPipe(evutil_socket_t fd, short eventType, void* veh)
 {
@@ -223,7 +215,7 @@ static void readFromPipe(evutil_socket_t fd, short eventType, void* veh)
 
     default:
         {
-            assert(0 && "unhandled command type!");
+            TR_ASSERT_MSG(false, "unhandled command type %d", (int)ch);
             break;
         }
     }
@@ -305,7 +297,7 @@ void tr_eventInit(tr_session* session)
 
 void tr_eventClose(tr_session* session)
 {
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     if (session->events == NULL)
     {
@@ -323,8 +315,8 @@ void tr_eventClose(tr_session* session)
 
 bool tr_amInEventThread(tr_session const* session)
 {
-    assert(tr_isSession(session));
-    assert(session->events != NULL);
+    TR_ASSERT(tr_isSession(session));
+    TR_ASSERT(session->events != NULL);
 
     return tr_amInThread(session->events->thread);
 }
@@ -335,8 +327,8 @@ bool tr_amInEventThread(tr_session const* session)
 
 void tr_runInEventThread(tr_session* session, void (* func)(void*), void* user_data)
 {
-    assert(tr_isSession(session));
-    assert(session->events != NULL);
+    TR_ASSERT(tr_isSession(session));
+    TR_ASSERT(session->events != NULL);
 
     if (tr_amInThread(session->events->thread))
     {

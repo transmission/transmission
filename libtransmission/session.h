@@ -14,14 +14,6 @@
 
 #define TR_NAME "Transmission"
 
-#ifndef UNUSED
-#ifdef __GNUC__
-#define UNUSED __attribute__((unused))
-#else
-#define UNUSED
-#endif
-#endif
-
 #include "bandwidth.h"
 #include "bitfield.h"
 #include "net.h"
@@ -163,6 +155,8 @@ struct tr_session
     struct event* udp_event;
     struct event* udp6_event;
 
+    struct event* utp_timer;
+
     /* The open port on the local machine for incoming peer requests */
     tr_port private_peer_port;
 
@@ -303,7 +297,7 @@ static inline double toSpeedKBps(unsigned int Bps)
 
 static inline uint64_t toMemBytes(unsigned int MB)
 {
-    uint64_t B = tr_mem_K * tr_mem_K;
+    uint64_t B = (uint64_t)tr_mem_K * tr_mem_K;
     B *= MB;
     return B;
 }

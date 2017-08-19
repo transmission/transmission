@@ -61,6 +61,7 @@ libtransmission_a_SOURCES = \
   torrent.c \
   torrent-ctor.c \
   torrent-magnet.c \
+  tr-assert.c \
   tr-dht.c \
   tr-lpd.c \
   tr-udp.c \
@@ -144,6 +145,7 @@ noinst_HEADERS = \
   peer-io.h \
   peer-mgr.h \
   peer-msgs.h \
+  peer-socket.h \
   platform.h \
   platform-quota.h \
   port-forwarding.h \
@@ -159,7 +161,9 @@ noinst_HEADERS = \
   torrent-magnet.h \
   tr-getopt.h \
   transmission.h \
+  tr-assert.h \
   tr-dht.h \
+  tr-macros.h \
   tr-udp.h \
   tr-utp.h \
   tr-lpd.h \

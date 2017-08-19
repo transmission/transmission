@@ -50,6 +50,20 @@ static bool getShadowInt(uint8_t ch, int* setme)
     return true;
 }
 
+static bool getFDMInt(uint8_t ch, int* setme)
+{
+    char const* str = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_.!~*()";
+    char const* pch = strchr(str, ch);
+
+    if (pch == NULL)
+    {
+        return false;
+    }
+
+    *setme = pch - str;
+    return true;
+}
+
 static int strint(void const* pch, int span)
 {
     char tmp[64];
@@ -599,6 +613,27 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
                 tr_snprintf(buf, buflen, "Xfplay %d.%d.%d", strint(id + 3, 1), strint(id + 4, 1), strint(id + 5, 2));
             }
         }
+        else if (strncmp(chid + 1, "PI", 2) == 0)
+        {
+            tr_snprintf(buf, buflen, "PicoTorrent %d.%d%d.%d", charint(id[3]), charint(id[4]), charint(id[5]), charint(id[6]));
+        }
+        else if (strncmp(chid + 1, "FD", 2) == 0)
+        {
+            int c;
+
+            if (getFDMInt(id[5], &c))
+            {
+                tr_snprintf(buf, buflen, "Free Download Manager %d.%d.%d", charint(id[3]), charint(id[4]), c);
+            }
+            else
+            {
+                tr_snprintf(buf, buflen, "Free Download Manager %d.%d.x", charint(id[3]), charint(id[4]));
+            }
+        }
+        else if (strncmp(chid + 1, "FL", 2) == 0)
+        {
+            tr_snprintf(buf, buflen, "Folx %d.x", charint(id[3]));
+        }
 
         if (*buf != '\0')
         {
@@ -821,18 +856,18 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
     {
         char out[32];
         char* walk = out;
-        char const* in;
-        char const* in_end;
 
-        for (in = (char const*)id, in_end = in + 8; in != in_end; ++in)
+        for (size_t i = 0; i < 8; ++i)
         {
-            if (isprint((unsigned char)*in))
+            char const c = chid[i];
+
+            if (isprint((unsigned char)c))
             {
-                *walk++ = *in;
+                *walk++ = c;
             }
             else
             {
-                tr_snprintf(walk, out + sizeof(out) - walk, "%%%02X", (unsigned int)*in);
+                tr_snprintf(walk, out + sizeof(out) - walk, "%%%02X", (unsigned int)c);
                 walk += 3;
             }
         }

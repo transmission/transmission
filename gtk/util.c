@@ -216,14 +216,12 @@ gboolean gtr_is_magnet_link(char const* str)
 
 gboolean gtr_is_hex_hashcode(char const* str)
 {
-    int i;
-
     if (str == NULL || strlen(str) != 40)
     {
         return FALSE;
     }
 
-    for (i = 0; i < 40; ++i)
+    for (int i = 0; i < 40; ++i)
     {
         if (!isxdigit(str[i]))
         {
@@ -530,11 +528,10 @@ void gtr_widget_set_visible(GtkWidget* w, gboolean b)
     /* toggle the transient children, too */
     if (GTK_IS_WINDOW(w))
     {
-        GList* l;
         GList* windows = gtk_window_list_toplevels();
         GtkWindow* window = GTK_WINDOW(w);
 
-        for (l = windows; l != NULL; l = l->next)
+        for (GList* l = windows; l != NULL; l = l->next)
         {
             if (!GTK_IS_WINDOW(l->data))
             {
@@ -624,15 +621,13 @@ void gtr_unrecognized_url_dialog(GtkWidget* parent, char const* url)
 
 void gtr_paste_clipboard_url_into_entry(GtkWidget* e)
 {
-    size_t i;
-
     char* text[] =
     {
         g_strstrip(gtk_clipboard_wait_for_text(gtk_clipboard_get(GDK_SELECTION_PRIMARY))),
         g_strstrip(gtk_clipboard_wait_for_text(gtk_clipboard_get(GDK_SELECTION_CLIPBOARD)))
     };
 
-    for (i = 0; i < G_N_ELEMENTS(text); ++i)
+    for (size_t i = 0; i < G_N_ELEMENTS(text); ++i)
     {
         char* s = text[i];
 
@@ -643,7 +638,7 @@ void gtr_paste_clipboard_url_into_entry(GtkWidget* e)
         }
     }
 
-    for (i = 0; i < G_N_ELEMENTS(text); ++i)
+    for (size_t i = 0; i < G_N_ELEMENTS(text); ++i)
     {
         g_free(text[i]);
     }

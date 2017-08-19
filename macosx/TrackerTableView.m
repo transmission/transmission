@@ -48,11 +48,11 @@
     NSIndexSet * indexes = [self selectedRowIndexes];
     for (NSUInteger i = [indexes firstIndex]; i != NSNotFound; i = [indexes indexGreaterThanIndex: i])
     {
-        id item = [fTrackers objectAtIndex: i];
+        id item = fTrackers[i];
         if (![item isKindOfClass: [TrackerNode class]])
         {
-            for (++i; i < [fTrackers count] && [[fTrackers objectAtIndex: i] isKindOfClass: [TrackerNode class]]; ++i)
-                [addresses addObject: [(TrackerNode *)[fTrackers objectAtIndex: i] fullAnnounceAddress]];
+            for (++i; i < [fTrackers count] && [fTrackers[i] isKindOfClass: [TrackerNode class]]; ++i)
+                [addresses addObject: [(TrackerNode *)fTrackers[i] fullAnnounceAddress]];
             --i;
         }
         else
@@ -63,7 +63,7 @@
 
     NSPasteboard * pb = [NSPasteboard generalPasteboard];
     [pb clearContents];
-    [pb writeObjects: [NSArray arrayWithObject: text]];
+    [pb writeObjects: @[text]];
 }
 
 - (void) paste: (id) sender
@@ -72,7 +72,7 @@
 
     BOOL added = NO;
 
-    NSArray * items = [[NSPasteboard generalPasteboard] readObjectsForClasses: [NSArray arrayWithObject: [NSString class]] options: nil];
+    NSArray * items = [[NSPasteboard generalPasteboard] readObjectsForClasses: @[[NSString class]] options: nil];
     NSAssert(items != nil, @"no string items to paste; should not be able to call this method");
 
     for (NSString * pbItem in items)
@@ -95,7 +95,7 @@
         return [self numberOfSelectedRows] > 0;
 
     if (action == @selector(paste:))
-        return fTorrent && [[NSPasteboard generalPasteboard] canReadObjectForClasses: [NSArray arrayWithObject: [NSString class]] options: nil];
+        return fTorrent && [[NSPasteboard generalPasteboard] canReadObjectForClasses: @[[NSString class]] options: nil];
 
     return YES;
 }

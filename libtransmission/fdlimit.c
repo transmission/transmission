@@ -6,7 +6,6 @@
  *
  */
 
-#include <assert.h>
 #include <errno.h>
 #include <inttypes.h>
 #include <string.h>
@@ -24,16 +23,9 @@
 #include "log.h"
 #include "session.h"
 #include "torrent.h" /* tr_isTorrent() */
+#include "tr-assert.h"
 
-#define dbgmsg(...) \
-    do \
-    { \
-        if (tr_logGetDeepEnabled()) \
-        { \
-            tr_logAddDeep(__FILE__, __LINE__, NULL, __VA_ARGS__); \
-        } \
-    } \
-    while (0)
+#define dbgmsg(...) tr_logAddDeepNamed(NULL, __VA_ARGS__)
 
 /***
 ****
@@ -138,14 +130,14 @@ struct tr_cached_file
 
 static inline bool cached_file_is_open(struct tr_cached_file const* o)
 {
-    assert(o != NULL);
+    TR_ASSERT(o != NULL);
 
     return o->fd != TR_BAD_SYS_FILE;
 }
 
 static void cached_file_close(struct tr_cached_file* o)
 {
-    assert(cached_file_is_open(o));
+    TR_ASSERT(cached_file_is_open(o));
 
     tr_sys_file_close(o->fd, NULL);
     o->fd = TR_BAD_SYS_FILE;
@@ -220,7 +212,7 @@ static int cached_file_open(struct tr_cached_file* o, char const* filename, bool
             type = _("sparse");
         }
 
-        assert(type != NULL);
+        TR_ASSERT(type != NULL);
 
         if (!success)
         {
@@ -273,13 +265,19 @@ struct tr_fileset
 
 static void fileset_construct(struct tr_fileset* set, int n)
 {
-    struct tr_cached_file* o;
-    struct tr_cached_file const TR_CACHED_FILE_INIT = { false, TR_BAD_SYS_FILE, 0, 0, 0 };
+    struct tr_cached_file const TR_CACHED_FILE_INIT =
+    {
+        .is_writable = false,
+        .fd = TR_BAD_SYS_FILE,
+        .torrent_id = 0,
+        .file_index = 0,
+        .used_at = 0
+    };
 
     set->begin = tr_new(struct tr_cached_file, n);
     set->end = set->begin + n;
 
-    for (o = set->begin; o != set->end; ++o)
+    for (struct tr_cached_file* o = set->begin; o != set->end; ++o)
     {
         *o = TR_CACHED_FILE_INIT;
     }
@@ -287,11 +285,9 @@ static void fileset_construct(struct tr_fileset* set, int n)
 
 static void fileset_close_all(struct tr_fileset* set)
 {
-    struct tr_cached_file* o;
-
     if (set != NULL)
     {
-        for (o = set->begin; o != set->end; ++o)
+        for (struct tr_cached_file* o = set->begin; o != set->end; ++o)
         {
             if (cached_file_is_open(o))
             {
@@ -310,11 +306,9 @@ static void fileset_destruct(struct tr_fileset* set)
 
 static void fileset_close_torrent(struct tr_fileset* set, int torrent_id)
 {
-    struct tr_cached_file* o;
-
     if (set != NULL)
     {
-        for (o = set->begin; o != set->end; ++o)
+        for (struct tr_cached_file* o = set->begin; o != set->end; ++o)
         {
             if (o->torrent_id == torrent_id && cached_file_is_open(o))
             {
@@ -326,11 +320,9 @@ static void fileset_close_torrent(struct tr_fileset* set, int torrent_id)
 
 static struct tr_cached_file* fileset_lookup(struct tr_fileset* set, int torrent_id, tr_file_index_t i)
 {
-    struct tr_cached_file* o;
-
     if (set != NULL)
     {
-        for (o = set->begin; o != set->end; ++o)
+        for (struct tr_cached_file* o = set->begin; o != set->end; ++o)
         {
             if (torrent_id == o->torrent_id && i == o->file_index && cached_file_is_open(o))
             {
@@ -348,10 +340,8 @@ static struct tr_cached_file* fileset_get_empty_slot(struct tr_fileset* set)
 
     if (set->begin != NULL)
     {
-        struct tr_cached_file* o;
-
         /* try to find an unused slot */
-        for (o = set->begin; o != set->end; ++o)
+        for (struct tr_cached_file* o = set->begin; o != set->end; ++o)
         {
             if (!cached_file_is_open(o))
             {
@@ -360,7 +350,7 @@ static struct tr_cached_file* fileset_get_empty_slot(struct tr_fileset* set)
         }
 
         /* all slots are full... recycle the least recently used */
-        for (cull = NULL, o = set->begin; o != set->end; ++o)
+        for (struct tr_cached_file* o = set->begin; o != set->end; ++o)
         {
             if (cull == NULL || o->used_at < cull->used_at)
             {
@@ -388,7 +378,7 @@ struct tr_fdInfo
 
 static void ensureSessionFdInfoExists(tr_session* session)
 {
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     if (session->fdInfo == NULL)
     {
@@ -495,7 +485,7 @@ bool tr_fdFileGetCachedMTime(tr_session* s, int torrent_id, tr_file_index_t i, t
 
 void tr_fdTorrentClose(tr_session* session, int torrent_id)
 {
-    assert(tr_sessionIsLocked(session));
+    TR_ASSERT(tr_sessionIsLocked(session));
 
     fileset_close_torrent(get_fileset(session), torrent_id);
 }
@@ -545,9 +535,10 @@ tr_sys_file_t tr_fdFileCheckout(tr_session* session, int torrent_id, tr_file_ind
 
 tr_socket_t tr_fdSocketCreate(tr_session* session, int domain, int type)
 {
+    TR_ASSERT(tr_isSession(session));
+
     tr_socket_t s = TR_BAD_SOCKET;
     struct tr_fdInfo* gFd;
-    assert(tr_isSession(session));
 
     ensureSessionFdInfoExists(session);
     gFd = session->fdInfo;
@@ -569,7 +560,7 @@ tr_socket_t tr_fdSocketCreate(tr_session* session, int domain, int type)
         ++gFd->peerCount;
     }
 
-    assert(gFd->peerCount >= 0);
+    TR_ASSERT(gFd->peerCount >= 0);
 
     if (s != TR_BAD_SOCKET)
     {
@@ -577,13 +568,23 @@ tr_socket_t tr_fdSocketCreate(tr_session* session, int domain, int type)
 
         if (!buf_logged)
         {
-            int i;
-            socklen_t size = sizeof(int);
+            int i = 0;
+            socklen_t size = sizeof(i);
+
+            if (getsockopt(s, SOL_SOCKET, SO_SNDBUF, (void*)&i, &size) != -1)
+            {
+                tr_logAddDebug("SO_SNDBUF size is %d", i);
+            }
+
+            i = 0;
+            size = sizeof(i);
+
+            if (getsockopt(s, SOL_SOCKET, SO_RCVBUF, (void*)&i, &size) != -1)
+            {
+                tr_logAddDebug("SO_RCVBUF size is %d", i);
+            }
+
             buf_logged = true;
-            getsockopt(s, SOL_SOCKET, SO_SNDBUF, (void*)&i, &size);
-            tr_logAddDebug("SO_SNDBUF size is %d", i);
-            getsockopt(s, SOL_SOCKET, SO_RCVBUF, (void*)&i, &size);
-            tr_logAddDebug("SO_RCVBUF size is %d", i);
         }
     }
 
@@ -592,14 +593,14 @@ tr_socket_t tr_fdSocketCreate(tr_session* session, int domain, int type)
 
 tr_socket_t tr_fdSocketAccept(tr_session* s, tr_socket_t sockfd, tr_address* addr, tr_port* port)
 {
+    TR_ASSERT(tr_isSession(s));
+    TR_ASSERT(addr != NULL);
+    TR_ASSERT(port != NULL);
+
     tr_socket_t fd;
     socklen_t len;
     struct tr_fdInfo* gFd;
     struct sockaddr_storage sock;
-
-    assert(tr_isSession(s));
-    assert(addr != NULL);
-    assert(port != NULL);
 
     ensureSessionFdInfoExists(s);
     gFd = s->fdInfo;
@@ -625,7 +626,7 @@ tr_socket_t tr_fdSocketAccept(tr_session* s, tr_socket_t sockfd, tr_address* add
 
 void tr_fdSocketClose(tr_session* session, tr_socket_t fd)
 {
-    assert(tr_isSession(session));
+    TR_ASSERT(tr_isSession(session));
 
     if (session->fdInfo != NULL)
     {
@@ -637,6 +638,6 @@ void tr_fdSocketClose(tr_session* session, tr_socket_t fd)
             --gFd->peerCount;
         }
 
-        assert(gFd->peerCount >= 0);
+        TR_ASSERT(gFd->peerCount >= 0);
     }
 }

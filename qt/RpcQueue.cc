@@ -72,9 +72,25 @@ void RpcQueue::runNext(RpcResponseFuture const& response)
 {
     assert(!myQueue.isEmpty());
 
-    auto next = myQueue.dequeue();
-    myNextErrorHandler = next.second;
-    myFutureWatcher.setFuture((next.first)(response));
+    RpcResponseFuture const oldFuture = myFutureWatcher.future();
+
+    while (true)
+    {
+        auto next = myQueue.dequeue();
+        myNextErrorHandler = next.second;
+        myFutureWatcher.setFuture((next.first)(response));
+
+        if (oldFuture != myFutureWatcher.future())
+        {
+            break;
+        }
+
+        if (myQueue.isEmpty())
+        {
+            deleteLater();
+            break;
+        }
+    }
 }
 
 void RpcQueue::run()

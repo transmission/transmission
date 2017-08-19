@@ -86,7 +86,7 @@
 
     for (NSTrackingArea * area in [self trackingAreas])
     {
-        if ([area owner] == self && [[area userInfo] objectForKey: @"Row"])
+        if ([area owner] == self && [area userInfo][@"Row"])
             [self removeTrackingArea: area];
     }
 
@@ -100,7 +100,7 @@
     {
         FilePriorityCell * cell = (FilePriorityCell *)[self preparedCellAtColumn: col row: row];
 
-        NSDictionary * userInfo = [NSDictionary dictionaryWithObject: [NSNumber numberWithInt: row] forKey: @"Row"];
+        NSDictionary * userInfo = @{@"Row": @(row)};
         [cell addTrackingAreasForView: self inRect: [self frameOfCellAtColumn: col row: row] withUserInfo: userInfo
                 mouseLocation: mouseLocation];
     }
@@ -114,7 +114,7 @@
 - (void) mouseEntered: (NSEvent *) event
 {
     NSNumber * row;
-    if ((row = [(NSDictionary *)[event userData] objectForKey: @"Row"]))
+    if ((row = ((NSDictionary *)[event userData])[@"Row"]))
     {
         fMouseRow = [row intValue];
         [self setNeedsDisplayInRect: [self frameOfCellAtColumn: [self columnWithIdentifier: @"Priority"] row: fMouseRow]];
@@ -124,7 +124,7 @@
 - (void) mouseExited: (NSEvent *) event
 {
     NSNumber * row;
-    if ((row = [(NSDictionary *)[event userData] objectForKey: @"Row"]))
+    if ((row = ((NSDictionary *)[event userData])[@"Row"]))
     {
         [self setNeedsDisplayInRect: [self frameOfCellAtColumn: [self columnWithIdentifier: @"Priority"] row: [row intValue]]];
         fMouseRow = -1;

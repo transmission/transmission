@@ -310,10 +310,9 @@ static void printMessage(tr_sys_file_t logfile, int level, char const* name, cha
 
 static void pumpLogMessages(tr_sys_file_t logfile)
 {
-    tr_log_message const* l;
     tr_log_message* list = tr_logGetQueue();
 
-    for (l = list; l != NULL; l = l->next)
+    for (tr_log_message const* l = list; l != NULL; l = l->next)
     {
         printMessage(logfile, l->level, l->name, l->message, l->file, l->line);
     }
@@ -726,7 +725,7 @@ static int daemon_start(void* raw_arg, bool foreground)
 
     /* Create new timer event to report daemon status */
     {
-        struct timeval one_sec = { 1, 0 };
+        struct timeval one_sec = { .tv_sec = 1, .tv_usec = 0 };
         status_ev = event_new(ev_base, -1, EV_PERSIST, &periodicUpdate, NULL);
 
         if (status_ev == NULL)

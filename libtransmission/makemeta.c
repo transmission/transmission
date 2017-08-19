@@ -6,7 +6,6 @@
  *
  */
 
-#include <assert.h>
 #include <errno.h>
 #include <stdlib.h> /* qsort */
 #include <string.h> /* strcmp, strlen */
@@ -21,6 +20,7 @@
 #include "session.h"
 #include "makemeta.h"
 #include "platform.h" /* threads, locks */
+#include "tr-assert.h"
 #include "utils.h" /* buildpath */
 #include "variant.h"
 #include "version.h"
@@ -134,9 +134,7 @@ static int builderFileCompare(void const* va, void const* vb)
 
 tr_metainfo_builder* tr_metaInfoBuilderCreate(char const* topFileArg)
 {
-    int i;
     struct FileList* files;
-    struct FileList* walk;
     tr_metainfo_builder* ret = tr_new0(tr_metainfo_builder, 1);
 
     ret->top = tr_sys_path_resolve(topFileArg, NULL);
@@ -156,21 +154,24 @@ tr_metainfo_builder* tr_metaInfoBuilderCreate(char const* topFileArg)
         tr_free(dir);
     }
 
-    for (walk = files; walk != NULL; walk = walk->next)
+    for (struct FileList* walk = files; walk != NULL; walk = walk->next)
     {
         ++ret->fileCount;
     }
 
     ret->files = tr_new0(tr_metainfo_builder_file, ret->fileCount);
 
-    for (i = 0, walk = files; walk != NULL; ++i)
+    for (int i = 0; files != NULL; ++i)
     {
-        struct FileList* tmp = walk;
+        struct FileList* tmp = files;
+        files = files->next;
+
         tr_metainfo_builder_file* file = &ret->files[i];
-        walk = walk->next;
         file->filename = tmp->filename;
         file->size = tmp->size;
+
         ret->totalSize += tmp->size;
+
         tr_free(tmp);
     }
 
@@ -215,19 +216,16 @@ void tr_metaInfoBuilderFree(tr_metainfo_builder* builder)
 {
     if (builder != NULL)
     {
-        int i;
-        tr_file_index_t t;
-
-        for (t = 0; t < builder->fileCount; ++t)
+        for (uint32_t i = 0; i < builder->fileCount; ++i)
         {
-            tr_free(builder->files[t].filename);
+            tr_free(builder->files[i].filename);
         }
 
         tr_free(builder->files);
         tr_free(builder->top);
         tr_free(builder->comment);
 
-        for (i = 0; i < builder->trackerCount; ++i)
+        for (int i = 0; i < builder->trackerCount; ++i)
         {
             tr_free(builder->trackers[i].announce);
         }
@@ -276,11 +274,11 @@ static uint8_t* getHashInfo(tr_metainfo_builder* b)
 
     while (totalRemain)
     {
+        TR_ASSERT(b->pieceIndex < b->pieceCount);
+
         uint8_t* bufptr = buf;
         uint32_t const thisPieceSize = (uint32_t)MIN(b->pieceSize, totalRemain);
         uint64_t leftInPiece = thisPieceSize;
-
-        assert(b->pieceIndex < b->pieceCount);
 
         while (leftInPiece != 0)
         {
@@ -315,8 +313,8 @@ static uint8_t* getHashInfo(tr_metainfo_builder* b)
             }
         }
 
-        assert(bufptr - buf == (int)thisPieceSize);
-        assert(leftInPiece == 0);
+        TR_ASSERT(bufptr - buf == (int)thisPieceSize);
+        TR_ASSERT(leftInPiece == 0);
         tr_sha1(walk, buf, (int)thisPieceSize, NULL);
         walk += SHA_DIGEST_LENGTH;
 
@@ -330,8 +328,8 @@ static uint8_t* getHashInfo(tr_metainfo_builder* b)
         ++b->pieceIndex;
     }
 
-    assert(b->abortFlag || walk - ret == (int)(SHA_DIGEST_LENGTH * b->pieceCount));
-    assert(b->abortFlag || !totalRemain);
+    TR_ASSERT(b->abortFlag || walk - ret == (int)(SHA_DIGEST_LENGTH * b->pieceCount));
+    TR_ASSERT(b->abortFlag || !totalRemain);
 
     if (fd != TR_BAD_SYS_FILE)
     {
@@ -388,10 +386,9 @@ static void makeInfoDict(tr_variant* dict, tr_metainfo_builder* builder)
 
     if (builder->isFolder) /* root node is a directory */
     {
-        uint32_t i;
         tr_variant* list = tr_variantDictAddList(dict, TR_KEY_files, builder->fileCount);
 
-        for (i = 0; i < builder->fileCount; ++i)
+        for (uint32_t i = 0; i < builder->fileCount; ++i)
         {
             tr_variant* d = tr_variantListAddDict(list, 2);
             tr_variant* length = tr_variantDictAdd(d, TR_KEY_length);
@@ -425,11 +422,10 @@ static void makeInfoDict(tr_variant* dict, tr_metainfo_builder* builder)
 
 static void tr_realMakeMetaInfo(tr_metainfo_builder* builder)
 {
-    int i;
     tr_variant top;
 
     /* allow an empty set, but if URLs *are* listed, verify them. #814, #971 */
-    for (i = 0; i < builder->trackerCount && !builder->result; ++i)
+    for (int i = 0; i < builder->trackerCount && builder->result == TR_MAKEMETA_OK; ++i)
     {
         if (!tr_urlIsValidTracker(builder->trackers[i].announce))
         {
@@ -457,7 +453,7 @@ static void tr_realMakeMetaInfo(tr_metainfo_builder* builder)
         {
             tr_variant* annList = tr_variantDictAddList(&top, TR_KEY_announce_list, 0);
 
-            for (i = 0; i < builder->trackerCount; ++i)
+            for (int i = 0; i < builder->trackerCount; ++i)
             {
                 if (prevTier != builder->trackers[i].tier)
                 {
@@ -562,13 +558,10 @@ static void makeMetaWorkerFunc(void* unused UNUSED)
 void tr_makeMetaInfo(tr_metainfo_builder* builder, char const* outputFile, tr_tracker_info const* trackers, int trackerCount,
     char const* comment, bool isPrivate)
 {
-    int i;
     tr_lock* lock;
 
-    assert(tr_isBool(isPrivate));
-
     /* free any variables from a previous run */
-    for (i = 0; i < builder->trackerCount; ++i)
+    for (int i = 0; i < builder->trackerCount; ++i)
     {
         tr_free(builder->trackers[i].announce);
     }
@@ -585,7 +578,7 @@ void tr_makeMetaInfo(tr_metainfo_builder* builder, char const* outputFile, tr_tr
     builder->trackerCount = trackerCount;
     builder->trackers = tr_new0(tr_tracker_info, builder->trackerCount);
 
-    for (i = 0; i < builder->trackerCount; ++i)
+    for (int i = 0; i < builder->trackerCount; ++i)
     {
         builder->trackers[i].tier = trackers[i].tier;
         builder->trackers[i].announce = tr_strdup(trackers[i].announce);

@@ -6,17 +6,8 @@
  *
  */
 
-#if defined(HAVE_POSIX_FADVISE) && (!defined(_XOPEN_SOURCE) || _XOPEN_SOURCE < 600)
-#undef _XOPEN_SOURCE
-#define _XOPEN_SOURCE 600
-#endif
-
 #include <string.h> /* memcmp() */
 #include <stdlib.h> /* free() */
-
-#ifdef HAVE_POSIX_FADVISE
-#include <fcntl.h> /* posix_fadvise() */
-#endif
 
 #include "transmission.h"
 #include "completion.h"
@@ -26,6 +17,7 @@
 #include "log.h"
 #include "platform.h" /* tr_lock() */
 #include "torrent.h"
+#include "tr-assert.h"
 #include "utils.h" /* tr_valloc(), tr_free() */
 #include "verify.h"
 
@@ -98,9 +90,7 @@ static bool verifyTorrent(tr_torrent* tor, bool* stopFlag)
             {
                 bytesThisPass = numRead;
                 tr_sha1_update(sha, buffer, bytesThisPass);
-#if defined HAVE_POSIX_FADVISE && defined POSIX_FADV_DONTNEED
-                (void)posix_fadvise(fd, filePos, bytesThisPass, POSIX_FADV_DONTNEED);
-#endif
+                tr_sys_file_advise(fd, filePos, bytesThisPass, TR_SYS_FILE_ADVICE_DONT_NEED, NULL);
             }
         }
 
@@ -231,7 +221,7 @@ static void verifyThreadFunc(void* unused UNUSED)
         tr_torrentSetVerifyState(tor, TR_VERIFY_NOW);
         changed = verifyTorrent(tor, &stopCurrent);
         tr_torrentSetVerifyState(tor, TR_VERIFY_NONE);
-        assert(tr_isTorrent(tor));
+        TR_ASSERT(tr_isTorrent(tor));
 
         if (!stopCurrent && changed)
         {
@@ -278,12 +268,10 @@ static int compareVerifyByPriorityAndSize(void const* va, void const* vb)
 
 void tr_verifyAdd(tr_torrent* tor, tr_verify_done_func callback_func, void* callback_data)
 {
-    struct verify_node* node;
-
-    assert(tr_isTorrent(tor));
+    TR_ASSERT(tr_isTorrent(tor));
     tr_logAddTorInfo(tor, "%s", _("Queued for verification"));
 
-    node = tr_new(struct verify_node, 1);
+    struct verify_node* node = tr_new(struct verify_node, 1);
     node->torrent = tor;
     node->callback_func = callback_func;
     node->callback_data = callback_data;
@@ -310,10 +298,10 @@ static int compareVerifyByTorrent(void const* va, void const* vb)
 
 void tr_verifyRemove(tr_torrent* tor)
 {
+    TR_ASSERT(tr_isTorrent(tor));
+
     tr_lock* lock = getVerifyLock();
     tr_lockLock(lock);
-
-    assert(tr_isTorrent(tor));
 
     if (tor == currentNode.torrent)
     {

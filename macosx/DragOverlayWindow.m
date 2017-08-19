@@ -51,15 +51,17 @@
         [self setReleasedWhenClosed: NO];
         [self setIgnoresMouseEvents: YES];
 
-        fFadeInAnimation = [[NSViewAnimation alloc] initWithViewAnimations: [NSArray arrayWithObject:
-                                [NSDictionary dictionaryWithObjectsAndKeys: self, NSViewAnimationTargetKey,
-                                NSViewAnimationFadeInEffect, NSViewAnimationEffectKey, nil]]];
+        fFadeInAnimation = [[NSViewAnimation alloc] initWithViewAnimations: @[
+                                                                              @{NSViewAnimationTargetKey: self,
+                                                                                NSViewAnimationEffectKey: NSViewAnimationFadeInEffect}
+                                                                              ]];
         [fFadeInAnimation setDuration: 0.15];
         [fFadeInAnimation setAnimationBlockingMode: NSAnimationNonblockingThreaded];
 
-        fFadeOutAnimation = [[NSViewAnimation alloc] initWithViewAnimations: [NSArray arrayWithObject:
-                                [NSDictionary dictionaryWithObjectsAndKeys: self, NSViewAnimationTargetKey,
-                                NSViewAnimationFadeOutEffect, NSViewAnimationEffectKey, nil]]];
+        fFadeOutAnimation = [[NSViewAnimation alloc] initWithViewAnimations: @[
+                                                                               @{NSViewAnimationTargetKey: self,
+                                                                                 NSViewAnimationEffectKey: NSViewAnimationFadeOutEffect}
+                                                                               ]];
         [fFadeOutAnimation setDuration: 0.5];
         [fFadeOutAnimation setAnimationBlockingMode: NSAnimationNonblockingThreaded];
 
@@ -107,7 +109,7 @@
                 //only useful when one torrent
                 if (count == 1)
                 {
-                    name = [NSString stringWithUTF8String: info.name];
+                    name = @(info.name);
                     folder = info.isFolder;
                 }
             }

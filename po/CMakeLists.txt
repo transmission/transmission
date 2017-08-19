@@ -79,14 +79,14 @@ set(${PROJECT_NAME}_LINGUAS
     sr
     sv
     sw
-    ta_LK
+    ta
     te
     th
     tl
     tr
-    ur
     ug
     uk
+    ur
     uz
     vi
     zh_CN

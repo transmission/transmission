@@ -13,7 +13,7 @@
 
 #define TEST_CLIENT(A, B) \
     tr_clientForId(buf, sizeof(buf), A); \
-    check_streq(B, buf);
+    check_str(buf, ==, B);
 
 int main(void)
 {
@@ -35,6 +35,18 @@ int main(void)
 
     /* Older Xfplay versions have three digit version number */
     TEST_CLIENT("-XF9990-", "Xfplay 9.9.9");
+
+    /* PicoTorrent */
+    TEST_CLIENT("-PI0091-", "PicoTorrent 0.09.1");
+    TEST_CLIENT("-PI0120-", "PicoTorrent 0.12.0");
+
+    /* Free Download Manager */
+    TEST_CLIENT("-FD51R\xFF-", "Free Download Manager 5.1.27");
+    TEST_CLIENT("-FD51W\xFF-", "Free Download Manager 5.1.32");
+    TEST_CLIENT("-FD51@\xFF-", "Free Download Manager 5.1.x"); /* Negative test case */
+
+    /* Folx */
+    TEST_CLIENT("-FL51FF-", "Folx 5.x"); /* Folx v5.2.1.13690 */
 
     /* gobbledygook */
     TEST_CLIENT("-IIO\x10\x2D\x04-", "-IIO%10-%04-");

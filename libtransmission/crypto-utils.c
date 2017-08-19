@@ -6,7 +6,6 @@
  *
  */
 
-#include <assert.h>
 #include <stdarg.h>
 #include <stdlib.h> /* abs(), srand(), rand() */
 #include <string.h> /* memcpy(), memmove(), memset(), strcmp(), strlen() */
@@ -16,6 +15,7 @@
 
 #include "transmission.h"
 #include "crypto-utils.h"
+#include "tr-assert.h"
 #include "utils.h"
 
 /***
@@ -24,7 +24,7 @@
 
 void tr_dh_align_key(uint8_t* key_buffer, size_t key_size, size_t buffer_size)
 {
-    assert(key_size <= buffer_size);
+    TR_ASSERT(key_size <= buffer_size);
 
     /* DH can generate key sizes that are smaller than the size of
        key buffer with exponentially decreasing probability, in which case
@@ -60,7 +60,7 @@ bool tr_sha1(uint8_t* hash, void const* data1, int data1_length, ...)
         while ((data = va_arg(vl, void const*)) != NULL)
         {
             int const data_length = va_arg(vl, int);
-            assert(data_length >= 0);
+            TR_ASSERT(data_length >= 0);
 
             if (!tr_sha1_update(sha, data, data_length))
             {
@@ -87,9 +87,9 @@ bool tr_sha1(uint8_t* hash, void const* data1, int data1_length, ...)
 
 int tr_rand_int(int upper_bound)
 {
-    int noise;
+    TR_ASSERT(upper_bound > 0);
 
-    assert(upper_bound > 0);
+    int noise;
 
     while (tr_rand_buffer(&noise, sizeof(noise)))
     {
@@ -108,9 +108,9 @@ int tr_rand_int(int upper_bound)
 
 int tr_rand_int_weak(int upper_bound)
 {
-    static bool init = false;
+    TR_ASSERT(upper_bound > 0);
 
-    assert(upper_bound > 0);
+    static bool init = false;
 
     if (!init)
     {
@@ -127,6 +127,8 @@ int tr_rand_int_weak(int upper_bound)
 
 char* tr_ssha1(char const* plain_text)
 {
+    TR_ASSERT(plain_text != NULL);
+
     enum
     {
         saltval_len = 8,
@@ -139,16 +141,13 @@ char* tr_ssha1(char const* plain_text)
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
         "./";
 
-    assert(plain_text != NULL);
-
-    size_t i;
     unsigned char salt[saltval_len];
     uint8_t sha[SHA_DIGEST_LENGTH];
     char buf[2 * SHA_DIGEST_LENGTH + saltval_len + 2];
 
     tr_rand_buffer(salt, saltval_len);
 
-    for (i = 0; i < saltval_len; ++i)
+    for (size_t i = 0; i < saltval_len; ++i)
     {
         salt[i] = salter[salt[i] % salter_len];
     }
@@ -164,8 +163,8 @@ char* tr_ssha1(char const* plain_text)
 
 bool tr_ssha1_matches(char const* ssha1, char const* plain_text)
 {
-    assert(ssha1 != NULL);
-    assert(plain_text != NULL);
+    TR_ASSERT(ssha1 != NULL);
+    TR_ASSERT(plain_text != NULL);
 
     size_t const brace_len = 1;
     size_t const brace_and_hash_len = brace_len + 2 * SHA_DIGEST_LENGTH;

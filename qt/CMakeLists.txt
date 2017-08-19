@@ -145,11 +145,12 @@ set(${PROJECT_NAME}_LINGUAS
     ko
     lt
     nl
-    pl_PL
+    pl
     pt_BR
+    pt_PT
     ru
     sv
-    tr_TR
+    tr
     uk
     zh_CN
 )

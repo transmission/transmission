@@ -22,7 +22,6 @@
 
 #include <errno.h>
 #include <string.h>
-#include <assert.h>
 
 #include <sys/types.h>
 
@@ -38,19 +37,29 @@
 
 #include "transmission.h"
 #include "fdlimit.h" /* tr_fdSocketClose() */
+#include "log.h"
 #include "net.h"
 #include "peer-io.h" /* tr_peerIoAddrStr() FIXME this should be moved to net.h */
 #include "session.h" /* tr_sessionGetPublicAddress() */
+#include "tr-assert.h"
 #include "tr-utp.h" /* tr_utpSendTo() */
-#include "log.h"
 #include "utils.h" /* tr_time(), tr_logAddDebug() */
 
 #ifndef IN_MULTICAST
 #define IN_MULTICAST(a) (((a) & 0xf0000000) == 0xe0000000)
 #endif
 
-tr_address const tr_in6addr_any = { TR_AF_INET6, { IN6ADDR_ANY_INIT } };
-tr_address const tr_inaddr_any = { TR_AF_INET, { { { { INADDR_ANY, 0x00, 0x00, 0x00 } } } } };
+tr_address const tr_in6addr_any =
+{
+    .type = TR_AF_INET6,
+    .addr.addr6 = IN6ADDR_ANY_INIT
+};
+
+tr_address const tr_inaddr_any =
+{
+    .type = TR_AF_INET,
+    .addr.addr4.s_addr = INADDR_ANY
+};
 
 char* tr_net_strerror(char* buf, size_t buflen, int err)
 {
@@ -76,7 +85,7 @@ char* tr_net_strerror(char* buf, size_t buflen, int err)
 
 char const* tr_address_to_string_with_buf(tr_address const* addr, char* buf, size_t buflen)
 {
-    assert(tr_address_is_valid(addr));
+    TR_ASSERT(tr_address_is_valid(addr));
 
     if (addr->type == TR_AF_INET)
     {
@@ -144,22 +153,70 @@ int tr_address_compare(tr_address const* a, tr_address const* b)
  * TCP sockets
  **********************************************************************/
 
-void tr_netSetTOS(tr_socket_t s, int tos)
+void tr_netSetTOS(tr_socket_t s, int tos, tr_address_type type)
 {
+    if (type == TR_AF_INET)
+    {
 #if defined(IP_TOS) && !defined(_WIN32)
 
-    if (setsockopt(s, IPPROTO_IP, IP_TOS, (void const*)&tos, sizeof(tos)) == -1)
-    {
-        char err_buf[512];
-        tr_logAddNamedInfo("Net", "Can't set TOS '%d': %s", tos, tr_net_strerror(err_buf, sizeof(err_buf), sockerrno));
-    }
+        if (setsockopt(s, IPPROTO_IP, IP_TOS, (void const*)&tos, sizeof(tos)) == -1)
+        {
+            char err_buf[512];
+            tr_net_strerror(err_buf, sizeof(err_buf), sockerrno);
+            tr_logAddNamedInfo("Net", "Can't set TOS '%d': %s", tos, err_buf);
+        }
 
 #else
 
-    (void)s;
-    (void)tos;
+        (void)s;
+        (void)tos;
 
 #endif
+    }
+    else if (type == TR_AF_INET6)
+    {
+#if defined(IPV6_TCLASS) && !defined(_WIN32)
+
+        int dscp = 0;
+
+        switch (tos)
+        {
+        case 0x10:
+            dscp = 0x20; /* lowcost (CS1) */
+            break;
+
+        case 0x08:
+            dscp = 0x28; /* throughput (AF11) */
+            break;
+
+        case 0x04:
+            dscp = 0x04; /* reliability */
+            break;
+
+        case 0x02:
+            dscp = 0x30; /* low delay (AF12) */
+            break;
+        }
+
+        if (setsockopt(s, IPPROTO_IPV6, IPV6_TCLASS, (void const*)&dscp, sizeof(dscp)) == -1)
+        {
+            char err_buf[512];
+            tr_net_strerror(err_buf, sizeof(err_buf), sockerrno);
+            tr_logAddNamedInfo("Net", "Can't set IPv6 QoS '%d': %s", dscp, err_buf);
+        }
+
+#else
+
+        (void)s;
+        (void)tos;
+
+#endif
+    }
+    else
+    {
+        /* program should never reach here! */
+        tr_logAddNamedInfo("Net", "Something goes wrong while setting TOS/Traffic-Class");
+    }
 }
 
 void tr_netSetCongestionControl(tr_socket_t s, char const* algorithm)
@@ -206,7 +263,7 @@ bool tr_address_from_sockaddr_storage(tr_address* setme_addr, tr_port* setme_por
 
 static socklen_t setup_sockaddr(tr_address const* addr, tr_port port, struct sockaddr_storage* sockaddr)
 {
-    assert(tr_address_is_valid(addr));
+    TR_ASSERT(tr_address_is_valid(addr));
 
     if (addr->type == TR_AF_INET)
     {
@@ -231,8 +288,12 @@ static socklen_t setup_sockaddr(tr_address const* addr, tr_port port, struct soc
     }
 }
 
-tr_socket_t tr_netOpenPeerSocket(tr_session* session, tr_address const* addr, tr_port port, bool clientIsSeed)
+struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const* addr, tr_port port, bool clientIsSeed)
 {
+    TR_ASSERT(tr_address_is_valid(addr));
+
+    struct tr_peer_socket ret = TR_PEER_SOCKET_INIT;
+
     static int const domains[NUM_TR_AF_INET_TYPES] = { AF_INET, AF_INET6 };
     tr_socket_t s;
     struct sockaddr_storage sock;
@@ -242,18 +303,16 @@ tr_socket_t tr_netOpenPeerSocket(tr_session* session, tr_address const* addr, tr
     struct sockaddr_storage source_sock;
     char err_buf[512];
 
-    assert(tr_address_is_valid(addr));
-
     if (!tr_address_is_valid_for_peers(addr, port))
     {
-        return TR_BAD_SOCKET; /* -EINVAL */
+        return ret;
     }
 
     s = tr_fdSocketCreate(session, domains[addr->type], SOCK_STREAM);
 
     if (s == TR_BAD_SOCKET)
     {
-        return TR_BAD_SOCKET;
+        return ret;
     }
 
     /* seeds don't need much of a read buffer... */
@@ -271,14 +330,14 @@ tr_socket_t tr_netOpenPeerSocket(tr_session* session, tr_address const* addr, tr
     if (evutil_make_socket_nonblocking(s) == -1)
     {
         tr_netClose(session, s);
-        return TR_BAD_SOCKET;
+        return ret;
     }
 
     addrlen = setup_sockaddr(addr, port, &sock);
 
     /* set source address */
     source_addr = tr_sessionGetPublicAddress(session, addr->type, NULL);
-    assert(source_addr);
+    TR_ASSERT(source_addr != NULL);
     sourcelen = setup_sockaddr(source_addr, 0, &source_sock);
 
     if (bind(s, (struct sockaddr*)&source_sock, sourcelen) == -1)
@@ -286,7 +345,7 @@ tr_socket_t tr_netOpenPeerSocket(tr_session* session, tr_address const* addr, tr
         tr_logAddError(_("Couldn't set source address %s on %" PRIdMAX ": %s"), tr_address_to_string(source_addr), (intmax_t)s,
             tr_net_strerror(err_buf, sizeof(err_buf), sockerrno));
         tr_netClose(session, s);
-        return TR_BAD_SOCKET; /* -errno */
+        return ret;
     }
 
     if (connect(s, (struct sockaddr*)&sock, addrlen) == -1 &&
@@ -295,8 +354,7 @@ tr_socket_t tr_netOpenPeerSocket(tr_session* session, tr_address const* addr, tr
 #endif
         sockerrno != EINPROGRESS)
     {
-        int tmperrno;
-        tmperrno = sockerrno;
+        int const tmperrno = sockerrno;
 
         if ((tmperrno != ENETUNREACH && tmperrno != EHOSTUNREACH) || addr->type == TR_AF_INET)
         {
@@ -305,24 +363,32 @@ tr_socket_t tr_netOpenPeerSocket(tr_session* session, tr_address const* addr, tr
         }
 
         tr_netClose(session, s);
-        s = TR_BAD_SOCKET; /* -tmperrno */
+    }
+    else
+    {
+        ret = tr_peer_socket_tcp_create(s);
     }
 
     tr_logAddDeep(__FILE__, __LINE__, NULL, "New OUTGOING connection %" PRIdMAX " (%s)", (intmax_t)s,
         tr_peerIoAddrStr(addr, port));
 
-    return s;
+    return ret;
 }
 
-struct UTPSocket* tr_netOpenPeerUTPSocket(tr_session* session, tr_address const* addr, tr_port port, bool clientIsSeed UNUSED)
+struct tr_peer_socket tr_netOpenPeerUTPSocket(tr_session* session, tr_address const* addr, tr_port port, bool clientIsSeed UNUSED)
 {
-    struct UTPSocket* ret = NULL;
+    struct tr_peer_socket ret = TR_PEER_SOCKET_INIT;
 
     if (tr_address_is_valid_for_peers(addr, port))
     {
         struct sockaddr_storage ss;
         socklen_t const sslen = setup_sockaddr(addr, port, &ss);
-        ret = UTP_Create(tr_utpSendTo, session, (struct sockaddr*)&ss, sslen);
+        struct UTPSocket* const socket = UTP_Create(tr_utpSendTo, session, (struct sockaddr*)&ss, sslen);
+
+        if (socket != NULL)
+        {
+            ret = tr_peer_socket_utp_create(socket);
+        }
     }
 
     return ret;
@@ -330,13 +396,13 @@ struct UTPSocket* tr_netOpenPeerUTPSocket(tr_session* session, tr_address const*
 
 static tr_socket_t tr_netBindTCPImpl(tr_address const* addr, tr_port port, bool suppressMsgs, int* errOut)
 {
+    TR_ASSERT(tr_address_is_valid(addr));
+
     static int const domains[NUM_TR_AF_INET_TYPES] = { AF_INET, AF_INET6 };
     struct sockaddr_storage sock;
     tr_socket_t fd;
     int addrlen;
     int optval;
-
-    assert(tr_address_is_valid(addr));
 
     fd = socket(domains[addr->type], SOCK_STREAM, 0);
 
@@ -684,9 +750,9 @@ static bool isIPv6LinkLocalAddress(tr_address const* addr)
    and is covered under the same license as third-party/dht/dht.c. */
 static bool isMartianAddr(struct tr_address const* a)
 {
-    static unsigned char const zeroes[16] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+    TR_ASSERT(tr_address_is_valid(a));
 
-    assert(tr_address_is_valid(a));
+    static unsigned char const zeroes[16] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
     switch (a->type)
     {

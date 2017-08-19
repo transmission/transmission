@@ -6,7 +6,6 @@
  *
  */
 
-#include <assert.h>
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h> /* bsearch(), qsort() */
@@ -18,6 +17,7 @@
 #include "file.h"
 #include "log.h"
 #include "net.h"
+#include "tr-assert.h"
 #include "utils.h"
 
 /***
@@ -183,18 +183,17 @@ bool tr_blocklistFileIsEnabled(tr_blocklistFile* b)
 
 void tr_blocklistFileSetEnabled(tr_blocklistFile* b, bool isEnabled)
 {
-    assert(b != NULL);
-    assert(tr_isBool(isEnabled));
+    TR_ASSERT(b != NULL);
 
     b->isEnabled = isEnabled;
 }
 
 bool tr_blocklistFileHasAddress(tr_blocklistFile* b, tr_address const* addr)
 {
+    TR_ASSERT(tr_address_is_valid(addr));
+
     uint32_t needle;
     struct tr_ipv4_range const* range;
-
-    assert(tr_address_is_valid(addr));
 
     if (!b->isEnabled || addr->type == TR_AF_INET6)
     {
@@ -384,16 +383,16 @@ int tr_blocklistFileSetContent(tr_blocklistFile* b, char const* filename)
 
     if (ranges_count > 0) /* sort and merge */
     {
-        struct tr_ipv4_range* r;
         struct tr_ipv4_range* keep = ranges;
-        struct tr_ipv4_range const* end;
 
         /* sort */
         qsort(ranges, ranges_count, sizeof(struct tr_ipv4_range), compareAddressRangesByFirstAddress);
 
         /* merge */
-        for (r = ranges + 1, end = ranges + ranges_count; r != end; ++r)
+        for (size_t i = 1; i < ranges_count; ++i)
         {
+            struct tr_ipv4_range const* r = &ranges[i];
+
             if (keep->end < r->begin)
             {
                 *++keep = *r;
@@ -406,21 +405,18 @@ int tr_blocklistFileSetContent(tr_blocklistFile* b, char const* filename)
 
         ranges_count = keep + 1 - ranges;
 
-#ifndef NDEBUG
+#ifdef TR_ENABLE_ASSERTS
 
-        /* sanity checks: make sure the rules are sorted
-         * in ascending order and don't overlap */
+        /* sanity checks: make sure the rules are sorted in ascending order and don't overlap */
         {
-            size_t i;
-
-            for (i = 0; i < ranges_count; ++i)
+            for (size_t i = 0; i < ranges_count; ++i)
             {
-                assert(ranges[i].begin <= ranges[i].end);
+                TR_ASSERT(ranges[i].begin <= ranges[i].end);
             }
 
-            for (i = 1; i < ranges_count; ++i)
+            for (size_t i = 1; i < ranges_count; ++i)
             {
-                assert(ranges[i - 1].end < ranges[i].begin);
+                TR_ASSERT(ranges[i - 1].end < ranges[i].begin);
             }
         }
 

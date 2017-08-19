@@ -712,7 +712,6 @@ static void rename_torrent_and_unref_file(GFile* file)
 
 static gboolean core_watchdir_idle(gpointer gcore)
 {
-    GSList* l;
     GSList* changing = NULL;
     GSList* unchanging = NULL;
     TrCore* core = TR_CORE(gcore);
@@ -720,7 +719,7 @@ static gboolean core_watchdir_idle(gpointer gcore)
     struct TrCorePrivate* p = core->priv;
 
     /* separate the files into two lists: changing and unchanging */
-    for (l = p->monitor_files; l != NULL; l = l->next)
+    for (GSList* l = p->monitor_files; l != NULL; l = l->next)
     {
         GFile* file = l->data;
         time_t const mtime = get_file_mtime(file);
@@ -770,19 +769,16 @@ static void core_watchdir_monitor_file(TrCore* core, GFile* file)
 
     if (is_torrent)
     {
-        GSList* l;
         struct TrCorePrivate* p = core->priv;
+        bool found = false;
 
         /* if we're not already watching this file, start watching it now */
-        for (l = p->monitor_files; l != NULL; l = l->next)
+        for (GSList* l = p->monitor_files; !found && l != NULL; l = l->next)
         {
-            if (g_file_equal(file, l->data))
-            {
-                break;
-            }
+            found = g_file_equal(file, l->data);
         }
 
-        if (l == NULL)
+        if (!found)
         {
             g_object_ref(file);
             p->monitor_files = g_slist_prepend(p->monitor_files, file);
@@ -1058,14 +1054,12 @@ static void on_torrent_metadata_changed(tr_torrent* tor, void* gcore)
 
 static unsigned int build_torrent_trackers_hash(tr_torrent* tor)
 {
-    unsigned int i;
-    char const* pch;
     uint64_t hash = 0;
     tr_info const* const inf = tr_torrentInfo(tor);
 
-    for (i = 0; i < inf->trackerCount; ++i)
+    for (unsigned int i = 0; i < inf->trackerCount; ++i)
     {
-        for (pch = inf->trackers[i].announce; *pch != '\0'; ++pch)
+        for (char const* pch = inf->trackers[i].announce; *pch != '\0'; ++pch)
         {
             hash = (hash << 4) ^ (hash >> 28) ^ *pch;
         }
@@ -1361,9 +1355,7 @@ bool gtr_core_add_from_url(TrCore* core, char const* uri)
 
 void gtr_core_add_files(TrCore* core, GSList* files, gboolean do_start, gboolean do_prompt, gboolean do_notify)
 {
-    GSList* l;
-
-    for (l = files; l != NULL; l = l->next)
+    for (GSList* l = files; l != NULL; l = l->next)
     {
         add_file(core, l->data, do_start, do_prompt, do_notify);
     }
@@ -1411,7 +1403,6 @@ void gtr_core_remove_torrent(TrCore* core, int id, gboolean delete_local_data)
 
 void gtr_core_load(TrCore* self, gboolean forcePaused)
 {
-    int i;
     tr_ctor* ctor;
     tr_torrent** torrents;
     int count = 0;
@@ -1427,7 +1418,7 @@ void gtr_core_load(TrCore* self, gboolean forcePaused)
 
     torrents = tr_sessionLoadTorrents(gtr_core_session(self), ctor, &count);
 
-    for (i = 0; i < count; ++i)
+    for (int i = 0; i < count; ++i)
     {
         gtr_core_add_torrent(self, torrents[i], FALSE);
     }

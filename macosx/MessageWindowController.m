@@ -205,20 +205,19 @@
 
     for (tr_log_message * currentMessage = messages; currentMessage != NULL; currentMessage = currentMessage->next)
     {
-        NSString * name = currentMessage->name != NULL ? [NSString stringWithUTF8String: currentMessage->name]
+        NSString * name = currentMessage->name != NULL ? @(currentMessage->name)
                             : [[NSProcessInfo processInfo] processName];
 
-        NSString * file = [[[NSString stringWithUTF8String: currentMessage->file] lastPathComponent] stringByAppendingFormat: @":%d",
+        NSString * file = [[@(currentMessage->file) lastPathComponent] stringByAppendingFormat: @":%d",
                             currentMessage->line];
 
-        NSDictionary * message  = [NSDictionary dictionaryWithObjectsAndKeys:
-                                    [NSString stringWithUTF8String: currentMessage->message], @"Message",
-                                    [NSDate dateWithTimeIntervalSince1970: currentMessage->when], @"Date",
-                                    [NSNumber numberWithUnsignedInteger: currentIndex++], @"Index", //more accurate when sorting by date
-                                    [NSNumber numberWithInteger: currentMessage->level], @"Level",
-                                    name, @"Name",
-                                    file, @"File", nil];
-
+        NSDictionary * message  = @{
+                                    @"Message": @(currentMessage->message),
+                                    @"Date": [NSDate dateWithTimeIntervalSince1970: currentMessage->when],
+                                    @"Index": @(currentIndex++), //more accurate when sorting by date
+                                    @"Level": @(currentMessage->level),
+                                    @"Name": name,
+                                    @"File": file};
         [fMessages addObject: message];
 
         if (currentMessage->level <= maxLevel && [self shouldIncludeMessageForFilter: filterString message: message])
@@ -263,13 +262,13 @@
 - (id) tableView: (NSTableView *) tableView objectValueForTableColumn: (NSTableColumn *) column row: (NSInteger) row
 {
     NSString * ident = [column identifier];
-    NSDictionary * message = [fDisplayedMessages objectAtIndex: row];
+    NSDictionary * message = fDisplayedMessages[row];
 
     if ([ident isEqualToString: @"Date"])
-        return [message objectForKey: @"Date"];
+        return message[@"Date"];
     else if ([ident isEqualToString: @"Level"])
     {
-        const NSInteger level = [[message objectForKey: @"Level"] integerValue];
+        const NSInteger level = [message[@"Level"] integerValue];
         switch (level)
         {
             case TR_LOG_ERROR:
@@ -284,15 +283,15 @@
         }
     }
     else if ([ident isEqualToString: @"Name"])
-        return [message objectForKey: @"Name"];
+        return message[@"Name"];
     else
-        return [message objectForKey: @"Message"];
+        return message[@"Message"];
 }
 
 #warning don't cut off end
 - (CGFloat) tableView: (NSTableView *) tableView heightOfRow: (NSInteger) row
 {
-    NSString * message = [[fDisplayedMessages objectAtIndex: row] objectForKey: @"Message"];
+    NSString * message = fDisplayedMessages[row][@"Message"];
 
     NSTableColumn * column = [tableView tableColumnWithIdentifier: @"Message"];
     const CGFloat count = floorf([message sizeWithAttributes: fAttributes].width / [column width]);
@@ -309,8 +308,8 @@
 - (NSString *) tableView: (NSTableView *) tableView toolTipForCell: (NSCell *) cell rect: (NSRectPointer) rect
                 tableColumn: (NSTableColumn *) column row: (NSInteger) row mouseLocation: (NSPoint) mouseLocation
 {
-    NSDictionary * message = [fDisplayedMessages objectAtIndex: row];
-    return [message objectForKey: @"File"];
+    NSDictionary * message = fDisplayedMessages[row];
+    return message[@"File"];
 }
 
 - (void) copy: (id) sender
@@ -325,7 +324,7 @@
 
     NSPasteboard * pb = [NSPasteboard generalPasteboard];
     [pb clearContents];
-    [pb writeObjects: [NSArray arrayWithObject: messageString]];
+    [pb writeObjects: @[messageString]];
 }
 
 - (BOOL) validateMenuItem: (NSMenuItem *) menuItem
@@ -397,7 +396,7 @@
 - (void) writeToFile: (id) sender
 {
     NSSavePanel * panel = [NSSavePanel savePanel];
-    [panel setAllowedFileTypes: [NSArray arrayWithObject: @"txt"]];
+    [panel setAllowedFileTypes: @[@"txt"]];
     [panel setCanSelectHiddenExtension: YES];
 
     [panel setNameFieldStringValue: NSLocalizedString(@"untitled", "Save log panel -> default file name")];
@@ -451,8 +450,8 @@
         return YES;
 
     const NSStringCompareOptions searchOptions = NSCaseInsensitiveSearch | NSDiacriticInsensitiveSearch;
-    return [[message objectForKey: @"Name"] rangeOfString: filterString options: searchOptions].location != NSNotFound
-            || [[message objectForKey: @"Message"] rangeOfString: filterString options: searchOptions].location != NSNotFound;
+    return [message[@"Name"] rangeOfString: filterString options: searchOptions].location != NSNotFound
+            || [message[@"Message"] rangeOfString: filterString options: searchOptions].location != NSNotFound;
 }
 
 - (void) updateListForFilter
@@ -461,7 +460,7 @@
     NSString * filterString = [fFilterField stringValue];
 
     NSIndexSet * indexes = [fMessages indexesOfObjectsWithOptions: NSEnumerationConcurrent passingTest: ^BOOL(id message, NSUInteger idx, BOOL * stop) {
-        return [[(NSDictionary *)message objectForKey: @"Level"] integerValue] <= level && [self shouldIncludeMessageForFilter: filterString message: message];
+        return [((NSDictionary *)message)[@"Level"] integerValue] <= level && [self shouldIncludeMessageForFilter: filterString message: message];
     }];
 
     NSArray * tempMessages = [[fMessages objectsAtIndexes: indexes] sortedArrayUsingDescriptors: [fMessageTable sortDescriptors]];
@@ -514,7 +513,7 @@
 - (NSString *) stringForMessage: (NSDictionary *) message
 {
     NSString * levelString;
-    const NSInteger level = [[message objectForKey: @"Level"] integerValue];
+    const NSInteger level = [message[@"Level"] integerValue];
     switch (level)
     {
         case TR_LOG_ERROR:
@@ -531,9 +530,9 @@
             levelString = @"?";
     }
 
-    return [NSString stringWithFormat: @"%@ %@ [%@] %@: %@", [message objectForKey: @"Date"],
-            [message objectForKey: @"File"], levelString,
-            [message objectForKey: @"Name"], [message objectForKey: @"Message"], nil];
+    return [NSString stringWithFormat: @"%@ %@ [%@] %@: %@", message[@"Date"],
+            message[@"File"], levelString,
+            message[@"Name"], message[@"Message"], nil];
 }
 
 @end

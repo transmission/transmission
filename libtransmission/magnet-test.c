@@ -14,10 +14,9 @@
 
 static int test1(void)
 {
-    int i;
     char const* uri;
     tr_magnet_info* info;
-    int const dec[] =
+    uint8_t const dec[] =
     {
         210, 53, 64, 16, 163, 202, 74, 222, 91, 116,
         39, 187, 9, 58, 98, 163, 137, 159, 243, 129
@@ -31,18 +30,14 @@ static int test1(void)
         "&tr=http%3A%2F%2Ftracker.opentracker.org%2Fannounce"
         "&ws=http%3A%2F%2Fserver.webseed.org%2Fpath%2Fto%2Ffile";
     info = tr_magnetParse(uri);
-    check(info != NULL);
-    check_int_eq(2, info->trackerCount);
-    check_streq(info->trackers[0], "http://tracker.openbittorrent.com/announce");
-    check_streq(info->trackers[1], "http://tracker.opentracker.org/announce");
-    check_int_eq(1, info->webseedCount);
-    check_streq("http://server.webseed.org/path/to/file", info->webseeds[0]);
-    check_streq("Display Name", info->displayName);
-
-    for (i = 0; i < 20; ++i)
-    {
-        check(info->hash[i] == dec[i]);
-    }
+    check_ptr(info, !=, NULL);
+    check_int(info->trackerCount, ==, 2);
+    check_str(info->trackers[0], ==, "http://tracker.openbittorrent.com/announce");
+    check_str(info->trackers[1], ==, "http://tracker.opentracker.org/announce");
+    check_int(info->webseedCount, ==, 1);
+    check_str(info->webseeds[0], ==, "http://server.webseed.org/path/to/file");
+    check_str(info->displayName, ==, "Display Name");
+    check_mem(info->hash, ==, dec, 20);
 
     tr_magnetFree(info);
     info = NULL;
@@ -57,17 +52,13 @@ static int test1(void)
         "&tr=http%3A%2F%2Ftracker.opentracker.org%2Fannounce";
     info = tr_magnetParse(uri);
     check(info != NULL);
-    check_int_eq(2, info->trackerCount);
-    check_streq("http://tracker.openbittorrent.com/announce", info->trackers[0]);
-    check_streq("http://tracker.opentracker.org/announce", info->trackers[1]);
-    check_int_eq(1, info->webseedCount);
-    check_streq("http://server.webseed.org/path/to/file", info->webseeds[0]);
-    check_streq("Display Name", info->displayName);
-
-    for (i = 0; i < 20; ++i)
-    {
-        check(info->hash[i] == dec[i]);
-    }
+    check_int(info->trackerCount, ==, 2);
+    check_str(info->trackers[0], ==, "http://tracker.openbittorrent.com/announce");
+    check_str(info->trackers[1], ==, "http://tracker.opentracker.org/announce");
+    check_int(info->webseedCount, ==, 1);
+    check_str(info->webseeds[0], ==, "http://server.webseed.org/path/to/file");
+    check_str(info->displayName, ==, "Display Name");
+    check_mem(info->hash, ==, dec, 20);
 
     tr_magnetFree(info);
     info = NULL;

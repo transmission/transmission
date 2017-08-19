@@ -283,7 +283,7 @@
 		A2F8CD430F3D0F4A00DB356A /* miniupnpcstrings.h in Headers */ = {isa = PBXBuildFile; fileRef = A2F8CD420F3D0F4A00DB356A /* miniupnpcstrings.h */; };
 		A2FB057F0BFEB6800095564D /* DragOverlayView.m in Sources */ = {isa = PBXBuildFile; fileRef = A2FB057D0BFEB6800095564D /* DragOverlayView.m */; };
 		A2FB701C0D95CAEA0001F331 /* GroupsController.m in Sources */ = {isa = PBXBuildFile; fileRef = A2FB701B0D95CAEA0001F331 /* GroupsController.m */; };
-		BE1183580CE160C50002D0F3 /* declspec.h in Headers */ = {isa = PBXBuildFile; fileRef = BE11834E0CE160C50002D0F3 /* declspec.h */; };
+		BE1183580CE160C50002D0F3 /* miniupnpc_declspec.h in Headers */ = {isa = PBXBuildFile; fileRef = BE11834E0CE160C50002D0F3 /* miniupnpc_declspec.h */; };
 		BE1183590CE160C50002D0F3 /* igd_desc_parse.h in Headers */ = {isa = PBXBuildFile; fileRef = BE11834F0CE160C50002D0F3 /* igd_desc_parse.h */; };
 		BE11835A0CE160C50002D0F3 /* minixml.h in Headers */ = {isa = PBXBuildFile; fileRef = BE1183500CE160C50002D0F3 /* minixml.h */; };
 		BE11835B0CE160C50002D0F3 /* miniwget.h in Headers */ = {isa = PBXBuildFile; fileRef = BE1183510CE160C50002D0F3 /* miniwget.h */; };
@@ -341,15 +341,20 @@
 		C1077A51183EB29600634C22 /* file.h in Headers */ = {isa = PBXBuildFile; fileRef = C1077A4D183EB29600634C22 /* file.h */; };
 		C10C644D1D9AF328003C1B4C /* session-id.c in Sources */ = {isa = PBXBuildFile; fileRef = C10C644B1D9AF328003C1B4C /* session-id.c */; };
 		C10C644E1D9AF328003C1B4C /* session-id.h in Headers */ = {isa = PBXBuildFile; fileRef = C10C644C1D9AF328003C1B4C /* session-id.h */; };
-		C12F19781E1AE3C30005E93F /* upnpc.c in Sources */ = {isa = PBXBuildFile; fileRef = C12F19761E1AE3C30005E93F /* upnpc.c */; };
 		C12F19791E1AE3C30005E93F /* upnperrors.c in Sources */ = {isa = PBXBuildFile; fileRef = C12F19771E1AE3C30005E93F /* upnperrors.c */; };
 		C12F197B1E1AE4460005E93F /* upnperrors.h in Headers */ = {isa = PBXBuildFile; fileRef = C12F197A1E1AE4460005E93F /* upnperrors.h */; };
 		C1305EBE186A13B100F03351 /* file.c in Sources */ = {isa = PBXBuildFile; fileRef = C1305EB8186A134000F03351 /* file.c */; };
+		C1425B351EE9C5F5001DB85F /* tr-assert.c in Sources */ = {isa = PBXBuildFile; fileRef = C1425B321EE9C5EA001DB85F /* tr-assert.c */; };
+		C1425B361EE9C605001DB85F /* tr-assert.h in Headers */ = {isa = PBXBuildFile; fileRef = C1425B331EE9C5EA001DB85F /* tr-assert.h */; };
+		C1425B371EE9C705001DB85F /* tr-macros.h in Headers */ = {isa = PBXBuildFile; fileRef = C1425B341EE9C5EA001DB85F /* tr-macros.h */; };
+		C1425B381EE9C805001DB85F /* peer-socket.h in Headers */ = {isa = PBXBuildFile; fileRef = C1425B351EE9C5EA001DB85F /* peer-socket.h */; };
 		C1639A741A55F4E000E42033 /* libb64.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C1639A6F1A55F4D600E42033 /* libb64.a */; };
 		C1639A781A55F56600E42033 /* cdecode.c in Sources */ = {isa = PBXBuildFile; fileRef = C1639A761A55F56600E42033 /* cdecode.c */; };
 		C1639A791A55F56600E42033 /* cencode.c in Sources */ = {isa = PBXBuildFile; fileRef = C1639A771A55F56600E42033 /* cencode.c */; };
 		C1639A7C1A55F57200E42033 /* cdecode.h in Headers */ = {isa = PBXBuildFile; fileRef = C1639A7A1A55F57200E42033 /* cdecode.h */; };
 		C1639A7D1A55F57200E42033 /* cencode.h in Headers */ = {isa = PBXBuildFile; fileRef = C1639A7B1A55F57200E42033 /* cencode.h */; };
+		C1BF7BA81F2A3CB7008E88A7 /* upnpdev.c in Sources */ = {isa = PBXBuildFile; fileRef = C1BF7BA71F2A3CB7008E88A7 /* upnpdev.c */; };
+		C1BF7BAA1F2A3CCE008E88A7 /* upnpdev.h in Headers */ = {isa = PBXBuildFile; fileRef = C1BF7BA91F2A3CCE008E88A7 /* upnpdev.h */; };
 		C1F690FD1AD0627500D95CF0 /* daemon-posix.c in Sources */ = {isa = PBXBuildFile; fileRef = C1F690FC1AD0627500D95CF0 /* daemon-posix.c */; };
 		C1FEE5771C3223CC00D62832 /* watchdir-common.h in Headers */ = {isa = PBXBuildFile; fileRef = C1FEE5721C3223CC00D62832 /* watchdir-common.h */; };
 		C1FEE5781C3223CC00D62832 /* watchdir-generic.c in Sources */ = {isa = PBXBuildFile; fileRef = C1FEE5731C3223CC00D62832 /* watchdir-generic.c */; };
@@ -924,7 +929,7 @@
 		A2FB701A0D95CAEA0001F331 /* GroupsController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = GroupsController.h; path = macosx/GroupsController.h; sourceTree = "<group>"; };
 		A2FB701B0D95CAEA0001F331 /* GroupsController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = GroupsController.m; path = macosx/GroupsController.m; sourceTree = "<group>"; };
 		BE1183480CE160960002D0F3 /* libminiupnp.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libminiupnp.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		BE11834E0CE160C50002D0F3 /* declspec.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = declspec.h; path = "third-party/miniupnpc/declspec.h"; sourceTree = "<group>"; };
+		BE11834E0CE160C50002D0F3 /* miniupnpc_declspec.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = miniupnpc_declspec.h; path = "third-party/miniupnpc/miniupnpc_declspec.h"; sourceTree = "<group>"; };
 		BE11834F0CE160C50002D0F3 /* igd_desc_parse.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = igd_desc_parse.h; path = "third-party/miniupnpc/igd_desc_parse.h"; sourceTree = "<group>"; };
 		BE1183500CE160C50002D0F3 /* minixml.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = minixml.h; path = "third-party/miniupnpc/minixml.h"; sourceTree = "<group>"; };
 		BE1183510CE160C50002D0F3 /* miniwget.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = miniwget.h; path = "third-party/miniupnpc/miniwget.h"; sourceTree = "<group>"; };
@@ -982,15 +987,20 @@
 		C1077A4D183EB29600634C22 /* file.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = file.h; path = libtransmission/file.h; sourceTree = "<group>"; };
 		C10C644B1D9AF328003C1B4C /* session-id.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "session-id.c"; path = "libtransmission/session-id.c"; sourceTree = "<group>"; };
 		C10C644C1D9AF328003C1B4C /* session-id.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "session-id.h"; path = "libtransmission/session-id.h"; sourceTree = "<group>"; };
-		C12F19761E1AE3C30005E93F /* upnpc.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = upnpc.c; path = "third-party/miniupnpc/upnpc.c"; sourceTree = "<group>"; };
 		C12F19771E1AE3C30005E93F /* upnperrors.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = upnperrors.c; path = "third-party/miniupnpc/upnperrors.c"; sourceTree = "<group>"; };
 		C12F197A1E1AE4460005E93F /* upnperrors.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = upnperrors.h; path = "third-party/miniupnpc/upnperrors.h"; sourceTree = "<group>"; };
 		C1305EB8186A134000F03351 /* file.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = file.c; path = libtransmission/file.c; sourceTree = "<group>"; };
+		C1425B321EE9C5EA001DB85F /* tr-assert.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "tr-assert.c"; path = "libtransmission/tr-assert.c"; sourceTree = "<group>"; };
+		C1425B331EE9C5EA001DB85F /* tr-assert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "tr-assert.h"; path = "libtransmission/tr-assert.h"; sourceTree = "<group>"; };
+		C1425B341EE9C5EA001DB85F /* tr-macros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "tr-macros.h"; path = "libtransmission/tr-macros.h"; sourceTree = "<group>"; };
+		C1425B351EE9C5EA001DB85F /* peer-socket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "peer-socket.h"; path = "libtransmission/peer-socket.h"; sourceTree = "<group>"; };
 		C1639A6F1A55F4D600E42033 /* libb64.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libb64.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		C1639A761A55F56600E42033 /* cdecode.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = cdecode.c; path = "third-party/libb64/src/cdecode.c"; sourceTree = "<group>"; };
 		C1639A771A55F56600E42033 /* cencode.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = cencode.c; path = "third-party/libb64/src/cencode.c"; sourceTree = "<group>"; };
 		C1639A7A1A55F57200E42033 /* cdecode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = cdecode.h; path = "third-party/libb64/include/b64/cdecode.h"; sourceTree = "<group>"; };
 		C1639A7B1A55F57200E42033 /* cencode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = cencode.h; path = "third-party/libb64/include/b64/cencode.h"; sourceTree = "<group>"; };
+		C1BF7BA71F2A3CB7008E88A7 /* upnpdev.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = upnpdev.c; path = "third-party/miniupnpc/upnpdev.c"; sourceTree = "<group>"; };
+		C1BF7BA91F2A3CCE008E88A7 /* upnpdev.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = upnpdev.h; path = "third-party/miniupnpc/upnpdev.h"; sourceTree = "<group>"; };
 		C1F690FC1AD0627500D95CF0 /* daemon-posix.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "daemon-posix.c"; path = "daemon/daemon-posix.c"; sourceTree = "<group>"; };
 		C1F690FE1AD0628400D95CF0 /* daemon.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = daemon.h; path = daemon/daemon.h; sourceTree = "<group>"; };
 		C1FEE5721C3223CC00D62832 /* watchdir-common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "watchdir-common.h"; path = "libtransmission/watchdir-common.h"; sourceTree = "<group>"; };
@@ -1353,8 +1363,12 @@
 				4D8017E910BBC073008A4AF2 /* torrent-magnet.h */,
 				0A6169A50FE5C9A200C66CE6 /* bitfield.c */,
 				0A6169A60FE5C9A200C66CE6 /* bitfield.h */,
+				C1425B321EE9C5EA001DB85F /* tr-assert.c */,
+				C1425B331EE9C5EA001DB85F /* tr-assert.h */,
 				A22CFCA60FC24ED80009BD3E /* tr-dht.c */,
 				A22CFCA70FC24ED80009BD3E /* tr-dht.h */,
+				C1425B341EE9C5EA001DB85F /* tr-macros.h */,
+				C1425B351EE9C5EA001DB85F /* peer-socket.h */,
 				A284214212DA663E00FBDDBB /* tr-udp.c */,
 				A284214312DA663E00FBDDBB /* tr-udp.h */,
 				A2679292130E00A000CB7464 /* tr-utp.c */,
@@ -1613,10 +1627,10 @@
 				BE1183680CE160D50002D0F3 /* miniupnpc.c */,
 				A20162CB13DE497000E15488 /* portlistingparse.c */,
 				A20162C713DE48BF00E15488 /* receivedata.c */,
-				C12F19761E1AE3C30005E93F /* upnpc.c */,
+				C1BF7BA71F2A3CB7008E88A7 /* upnpdev.c */,
 				C12F19771E1AE3C30005E93F /* upnperrors.c */,
 				A22B00AF116A9E90003315FC /* connecthostport.h */,
-				BE11834E0CE160C50002D0F3 /* declspec.h */,
+				BE11834E0CE160C50002D0F3 /* miniupnpc_declspec.h */,
 				BE11834F0CE160C50002D0F3 /* igd_desc_parse.h */,
 				BE1183500CE160C50002D0F3 /* minixml.h */,
 				BE1183510CE160C50002D0F3 /* miniwget.h */,
@@ -1630,6 +1644,7 @@
 				A25485390EB66CBB004539DA /* codelength.h */,
 				A20162CC13DE497000E15488 /* portlistingparse.h */,
 				A20162C813DE48BF00E15488 /* receivedata.h */,
+				C1BF7BA91F2A3CCE008E88A7 /* upnpdev.h */,
 				C12F197A1E1AE4460005E93F /* upnperrors.h */,
 			);
 			name = libminiupnp;
@@ -1774,6 +1789,9 @@
 				A2AAB65E0DE0CF6200E04DDA /* rpc-server.h in Headers */,
 				BEFC1E350C07861A00B0BB3C /* port-forwarding.h in Headers */,
 				BEFC1E3B0C07861A00B0BB3C /* platform.h in Headers */,
+				C1425B361EE9C605001DB85F /* tr-assert.h in Headers */,
+				C1425B371EE9C705001DB85F /* tr-macros.h in Headers */,
+				C1425B381EE9C805001DB85F /* peer-socket.h in Headers */,
 				BEFC1E450C07861A00B0BB3C /* net.h in Headers */,
 				BEFC1E490C07861A00B0BB3C /* metainfo.h in Headers */,
 				BEFC1E4D0C07861A00B0BB3C /* session.h in Headers */,
@@ -1852,7 +1870,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BE1183580CE160C50002D0F3 /* declspec.h in Headers */,
+				BE1183580CE160C50002D0F3 /* miniupnpc_declspec.h in Headers */,
 				BE1183590CE160C50002D0F3 /* igd_desc_parse.h in Headers */,
 				BE11835A0CE160C50002D0F3 /* minixml.h in Headers */,
 				BE11835B0CE160C50002D0F3 /* miniwget.h in Headers */,
@@ -1860,6 +1878,7 @@
 				C12F197B1E1AE4460005E93F /* upnperrors.h in Headers */,
 				BE11835D0CE160C50002D0F3 /* upnpreplyparse.h in Headers */,
 				BE11835E0CE160C50002D0F3 /* upnpcommands.h in Headers */,
+				C1BF7BAA1F2A3CCE008E88A7 /* upnpdev.h in Headers */,
 				BE11835F0CE160C50002D0F3 /* miniupnpc.h in Headers */,
 				BE1183600CE160C50002D0F3 /* minissdpc.h in Headers */,
 				A254853C0EB66CD4004539DA /* codelength.h in Headers */,
@@ -2370,6 +2389,7 @@
 				C1FEE57A1C3223CC00D62832 /* watchdir.c in Sources */,
 				A23547E211CD0B090046EAE6 /* cache.c in Sources */,
 				A284214412DA663E00FBDDBB /* tr-udp.c in Sources */,
+				C1425B351EE9C5F5001DB85F /* tr-assert.c in Sources */,
 				A2679294130E00A000CB7464 /* tr-utp.c in Sources */,
 				A23F29A2132A447400E9A83B /* announcer-http.c in Sources */,
 				C1FEE5791C3223CC00D62832 /* watchdir-kqueue.c in Sources */,
@@ -2508,9 +2528,9 @@
 				BE11836B0CE160D50002D0F3 /* miniwget.c in Sources */,
 				BE11836C0CE160D50002D0F3 /* minissdpc.c in Sources */,
 				BE11836D0CE160D50002D0F3 /* minisoap.c in Sources */,
-				C12F19781E1AE3C30005E93F /* upnpc.c in Sources */,
 				C12F19791E1AE3C30005E93F /* upnperrors.c in Sources */,
 				BE11836E0CE160D50002D0F3 /* upnpreplyparse.c in Sources */,
+				C1BF7BA81F2A3CB7008E88A7 /* upnpdev.c in Sources */,
 				BE11836F0CE160D50002D0F3 /* upnpcommands.c in Sources */,
 				BE1183700CE160D50002D0F3 /* miniupnpc.c in Sources */,
 				A22B00B3116A9EA4003315FC /* connecthostport.c in Sources */,

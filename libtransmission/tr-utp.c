@@ -21,8 +21,6 @@ THE SOFTWARE.
 
 */
 
-#include <assert.h>
-
 #include <event2/event.h>
 
 #include <libutp/utp.h>
@@ -33,20 +31,14 @@ THE SOFTWARE.
 #include "session.h"
 #include "crypto-utils.h" /* tr_rand_int_weak() */
 #include "peer-mgr.h"
+#include "peer-socket.h"
+#include "tr-assert.h"
 #include "tr-utp.h"
 #include "utils.h"
 
 #define MY_NAME "UTP"
 
-#define dbgmsg(...) \
-    do \
-    { \
-        if (tr_logGetDeepEnabled()) \
-        { \
-            tr_logAddDeep(__FILE__, __LINE__, MY_NAME, __VA_ARGS__); \
-        } \
-    } \
-    while (0)
+#define dbgmsg(...) tr_logAddDeepNamed(MY_NAME, __VA_ARGS__)
 
 #ifndef WITH_UTP
 
@@ -54,21 +46,21 @@ void UTP_Close(struct UTPSocket* socket)
 {
     tr_logAddNamedError(MY_NAME, "UTP_Close(%p) was called.", socket);
     dbgmsg("UTP_Close(%p) was called.", socket);
-    assert(0); /* FIXME: this is too much for the long term, but probably needed in the short term */
+    TR_ASSERT(false); /* FIXME: this is too much for the long term, but probably needed in the short term */
 }
 
 void UTP_RBDrained(struct UTPSocket* socket)
 {
     tr_logAddNamedError(MY_NAME, "UTP_RBDrained(%p) was called.", socket);
     dbgmsg("UTP_RBDrained(%p) was called.", socket);
-    assert(0); /* FIXME: this is too much for the long term, but probably needed in the short term */
+    TR_ASSERT(false); /* FIXME: this is too much for the long term, but probably needed in the short term */
 }
 
 bool UTP_Write(struct UTPSocket* socket, size_t count)
 {
     tr_logAddNamedError(MY_NAME, "UTP_RBDrained(%p, %zu) was called.", socket, count);
     dbgmsg("UTP_RBDrained(%p, %zu) was called.", socket, count);
-    assert(0); /* FIXME: this is too much for the long term, but probably needed in the short term */
+    TR_ASSERT(false); /* FIXME: this is too much for the long term, but probably needed in the short term */
     return false;
 }
 
@@ -100,8 +92,6 @@ void tr_utpSendTo(void* closure UNUSED, unsigned char const* buf UNUSED, size_t 
 
 #define UTP_INTERVAL_US 50000
 
-static struct event* utp_timer = NULL;
-
 static void incoming(void* closure, struct UTPSocket* s)
 {
     tr_session* ss = closure;
@@ -126,7 +116,7 @@ static void incoming(void* closure, struct UTPSocket* s)
         return;
     }
 
-    tr_peerMgrAddIncoming(ss->peerMgr, &addr, port, TR_BAD_SOCKET, s);
+    tr_peerMgrAddIncoming(ss->peerMgr, &addr, port, tr_peer_socket_utp_create(s));
 }
 
 void tr_utpSendTo(void* closure, unsigned char const* buf, size_t buflen, struct sockaddr const* to, socklen_t tolen)
@@ -164,7 +154,7 @@ static void reset_timer(tr_session* ss)
         usec = tr_rand_int_weak(1000000);
     }
 
-    tr_timerAdd(utp_timer, sec, usec);
+    tr_timerAdd(ss->utp_timer, sec, usec);
 }
 
 static void timer_callback(evutil_socket_t s UNUSED, short type UNUSED, void* closure)
@@ -176,11 +166,11 @@ static void timer_callback(evutil_socket_t s UNUSED, short type UNUSED, void* cl
 
 int tr_utpPacket(unsigned char const* buf, size_t buflen, struct sockaddr const* from, socklen_t fromlen, tr_session* ss)
 {
-    if (!ss->isClosed && utp_timer == NULL)
+    if (!ss->isClosed && ss->utp_timer == NULL)
     {
-        utp_timer = evtimer_new(ss->event_base, timer_callback, ss);
+        ss->utp_timer = evtimer_new(ss->event_base, timer_callback, ss);
 
-        if (utp_timer == NULL)
+        if (ss->utp_timer == NULL)
         {
             return -1;
         }
@@ -191,12 +181,12 @@ int tr_utpPacket(unsigned char const* buf, size_t buflen, struct sockaddr const*
     return UTP_IsIncomingUTP(incoming, tr_utpSendTo, ss, buf, buflen, from, fromlen);
 }
 
-void tr_utpClose(tr_session* session UNUSED)
+void tr_utpClose(tr_session* session)
 {
-    if (utp_timer != NULL)
+    if (session->utp_timer != NULL)
     {
-        evtimer_del(utp_timer);
-        utp_timer = NULL;
+        evtimer_del(session->utp_timer);
+        session->utp_timer = NULL;
     }
 }
 

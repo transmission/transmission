@@ -6,7 +6,6 @@
  *
  */
 
-#include <assert.h>
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h> /* mkstemp() */
@@ -22,6 +21,7 @@
 #include "file.h"
 #include "platform.h" /* TR_PATH_DELIMETER */
 #include "torrent.h"
+#include "tr-assert.h"
 #include "trevent.h"
 #include "variant.h"
 #include "libtransmission-test.h"
@@ -50,90 +50,115 @@ bool should_print(bool pass)
 #endif
 }
 
-bool check_condition_impl(char const* file, int line, bool condition)
+bool libtest_check(char const* file, int line, bool pass, bool condition, char const* condition_str)
 {
-    bool const pass = condition;
-
     if (should_print(pass))
     {
-        fprintf(stderr, "%s %s:%d\n", pass ? "PASS" : "FAIL", file, line);
+        fprintf(stderr, "%s %s:%d: %s (%s)\n", pass ? "PASS" : "FAIL", file, line, condition_str, condition ? "true": "false");
     }
 
     return pass;
 }
 
-bool check_streq_impl(char const* file, int line, char const* expected, char const* actual)
+bool libtest_check_bool(char const* file, int line, bool pass, bool lhs, bool rhs, char const* lhs_str, char const* op_str,
+    char const* rhs_str)
 {
-    bool const pass = tr_strcmp0(expected, actual) == 0;
-
     if (should_print(pass))
     {
-        if (pass)
-        {
-            fprintf(stderr, "PASS %s:%d\n", file, line);
-        }
-        else
-        {
-            fprintf(stderr, "FAIL %s:%d, expected \"%s\", got \"%s\"\n", file, line, expected != NULL ? expected : "(null)",
-                actual != NULL ? actual : "(null)");
-        }
+        fprintf(stderr, "%s %s:%d: %s %s %s (%s %s %s)\n", pass ? "PASS" : "FAIL", file, line, lhs_str, op_str, rhs_str,
+            lhs ? "true" : "false", op_str, rhs ? "true" : "false");
     }
 
     return pass;
 }
 
-bool check_int_eq_impl(char const* file, int line, int64_t expected, int64_t actual)
+bool libtest_check_str(char const* file, int line, bool pass, char const* lhs, char const* rhs, char const* lhs_str,
+    char const* op_str, char const* rhs_str)
 {
-    bool const pass = expected == actual;
-
     if (should_print(pass))
     {
-        if (pass)
-        {
-            fprintf(stderr, "PASS %s:%d\n", file, line);
-        }
-        else
-        {
-            fprintf(stderr, "FAIL %s:%d, expected \"%" PRId64 "\", got \"%" PRId64 "\"\n", file, line, expected, actual);
-        }
+        char const* const lhs_quote = lhs != NULL ? "\"" : "";
+        char const* const rhs_quote = rhs != NULL ? "\"" : "";
+
+        fprintf(stderr, "%s %s:%d: %s %s %s (%s%s%s %s %s%s%s)\n", pass ? "PASS" : "FAIL", file, line, lhs_str, op_str, rhs_str,
+            lhs_quote, lhs != NULL ? lhs : "NULL", lhs_quote, op_str, rhs_quote, rhs != NULL ? rhs : "NULL", rhs_quote);
     }
 
     return pass;
 }
 
-bool check_uint_eq_impl(char const* file, int line, uint64_t expected, uint64_t actual)
+static void print_mem(FILE* stream, void const* data, size_t size)
 {
-    bool const pass = expected == actual;
+    if (data == NULL)
+    {
+        fprintf(stream, "NULL");
+        return;
+    }
 
+    if (size == 0)
+    {
+        fprintf(stream, "(no bytes)");
+        return;
+    }
+
+    uint8_t const* byte_data = data;
+
+    fprintf(stream, "x'");
+
+    for (size_t i = 0; i < size; ++i)
+    {
+        fprintf(stream, "%02x", (unsigned int)byte_data[i]);
+    }
+
+    fprintf(stream, "'");
+}
+
+bool libtest_check_mem(char const* file, int line, bool pass, void const* lhs, void const* rhs, size_t size,
+    char const* lhs_str, char const* op_str, char const* rhs_str)
+{
     if (should_print(pass))
     {
-        if (pass)
-        {
-            fprintf(stderr, "PASS %s:%d\n", file, line);
-        }
-        else
-        {
-            fprintf(stderr, "FAIL %s:%d, expected \"%" PRIu64 "\", got \"%" PRIu64 "\"\n", file, line, expected, actual);
-        }
+        fprintf(stderr, "%s %s:%d: %s %s %s (", pass ? "PASS" : "FAIL", file, line, lhs_str, op_str, rhs_str);
+        print_mem(stderr, lhs, size);
+        fprintf(stderr, " %s ", op_str);
+        print_mem(stderr, rhs, size);
+        fprintf(stderr, ")\n");
     }
 
     return pass;
 }
 
-bool check_ptr_eq_impl(char const* file, int line, void const* expected, void const* actual)
+bool libtest_check_int(char const* file, int line, bool pass, intmax_t lhs, intmax_t rhs, char const* lhs_str,
+    char const* op_str, char const* rhs_str)
 {
-    bool const pass = expected == actual;
-
     if (should_print(pass))
     {
-        if (pass)
-        {
-            fprintf(stderr, "PASS %s:%d\n", file, line);
-        }
-        else
-        {
-            fprintf(stderr, "FAIL %s:%d, expected \"%p\", got \"%p\"\n", file, line, expected, actual);
-        }
+        fprintf(stderr, "%s %s:%d: %s %s %s (%jd %s %jd)\n", pass ? "PASS" : "FAIL", file, line, lhs_str, op_str, rhs_str, lhs,
+            op_str, rhs);
+    }
+
+    return pass;
+}
+
+bool libtest_check_uint(char const* file, int line, bool pass, uintmax_t lhs, uintmax_t rhs, char const* lhs_str,
+    char const* op_str, char const* rhs_str)
+{
+    if (should_print(pass))
+    {
+        fprintf(stderr, "%s %s:%d: %s %s %s (%ju %s %ju)\n", pass ? "PASS" : "FAIL", file, line, lhs_str, op_str, rhs_str, lhs,
+            op_str, rhs);
+    }
+
+    return pass;
+}
+
+bool libtest_check_ptr(char const* file, int line, bool pass, void const* lhs, void const* rhs, char const* lhs_str,
+    char const* op_str, char const* rhs_str)
+{
+    if (should_print(pass))
+    {
+        fprintf(stderr, "%s %s:%d: %s %s %s (%p %s %p)\n", pass ? "PASS" : "FAIL", file, line, lhs_str, op_str, rhs_str, lhs,
+            op_str, rhs);
     }
 
     return pass;
@@ -141,20 +166,19 @@ bool check_ptr_eq_impl(char const* file, int line, void const* expected, void co
 
 int runTests(testFunc const* const tests, int numTests)
 {
-    int i;
-    int ret;
+    int ret = 0;
 
     (void)current_test; /* Use test even if we don't have any tests to run */
 
-    for (i = 0; i < numTests; i++)
+    for (int i = 0; i < numTests; i++)
     {
-        if ((ret = (*tests[i])()) != 0)
+        if ((*tests[i])() != 0)
         {
-            return ret;
+            ++ret;
         }
     }
 
-    return 0; /* All tests passed */
+    return ret;
 }
 
 /***
@@ -392,9 +416,9 @@ tr_torrent* libttest_zero_torrent_init(tr_session* session)
 
     /* create the torrent ctor */
     metainfo = tr_base64_decode_str(metainfo_base64, &metainfo_len);
-    assert(metainfo != NULL);
-    assert(metainfo_len > 0);
-    assert(session != NULL);
+    TR_ASSERT(metainfo != NULL);
+    TR_ASSERT(metainfo_len > 0);
+    TR_ASSERT(session != NULL);
     ctor = tr_ctorNew(session);
     tr_ctorSetMetainfo(ctor, (uint8_t*)metainfo, metainfo_len);
     tr_ctorSetPaused(ctor, TR_FORCE, true);
@@ -402,7 +426,7 @@ tr_torrent* libttest_zero_torrent_init(tr_session* session)
     /* create the torrent */
     err = 0;
     tor = tr_torrentNew(ctor, &err, NULL);
-    assert(err == 0);
+    TR_ASSERT(err == 0);
 
     /* cleanup */
     tr_free(metainfo);
@@ -412,12 +436,9 @@ tr_torrent* libttest_zero_torrent_init(tr_session* session)
 
 void libttest_zero_torrent_populate(tr_torrent* tor, bool complete)
 {
-    tr_file_index_t i;
-
-    for (i = 0; i < tor->info.fileCount; ++i)
+    for (tr_file_index_t i = 0; i < tor->info.fileCount; ++i)
     {
         int err;
-        uint64_t j;
         tr_sys_file_t fd;
         char* path;
         char* dirname;
@@ -436,9 +457,9 @@ void libttest_zero_torrent_populate(tr_torrent* tor, bool complete)
         tr_sys_dir_create(dirname, TR_SYS_DIR_CREATE_PARENTS, 0700, NULL);
         fd = tr_sys_file_open(path, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE, 0600, NULL);
 
-        for (j = 0; j < file->length; ++j)
+        for (uint64_t j = 0; j < file->length; ++j)
         {
-            tr_sys_file_write(fd, ((!complete) && (i == 0) && (j < tor->info.pieceSize)) ? "\1" : "\0", 1, NULL, NULL);
+            tr_sys_file_write(fd, (!complete && i == 0 && j < tor->info.pieceSize) ? "\1" : "\0", 1, NULL, NULL);
         }
 
         tr_sys_file_close(fd, NULL);
@@ -447,9 +468,9 @@ void libttest_zero_torrent_populate(tr_torrent* tor, bool complete)
         tr_free(path);
 
         path = tr_torrentFindFile(tor, i);
-        assert(path != NULL);
+        TR_ASSERT(path != NULL);
         err = errno;
-        assert(tr_sys_path_exists(path, NULL));
+        TR_ASSERT(tr_sys_path_exists(path, NULL));
         errno = err;
         tr_free(path);
     }
@@ -459,11 +480,11 @@ void libttest_zero_torrent_populate(tr_torrent* tor, bool complete)
 
     if (complete)
     {
-        assert(tr_torrentStat(tor)->leftUntilDone == 0);
+        TR_ASSERT(tr_torrentStat(tor)->leftUntilDone == 0);
     }
     else
     {
-        assert(tr_torrentStat(tor)->leftUntilDone == tor->info.pieceSize);
+        TR_ASSERT(tr_torrentStat(tor)->leftUntilDone == tor->info.pieceSize);
     }
 }
 
@@ -478,10 +499,10 @@ static void onVerifyDone(tr_torrent* tor UNUSED, bool aborted UNUSED, void* done
 
 void libttest_blockingTorrentVerify(tr_torrent* tor)
 {
-    bool done = false;
+    TR_ASSERT(tor->session != NULL);
+    TR_ASSERT(!tr_amInEventThread(tor->session));
 
-    assert(tor->session != NULL);
-    assert(!tr_amInEventThread(tor->session));
+    bool done = false;
 
     tr_torrentVerify(tor, onVerifyDone, &done);
 
@@ -499,7 +520,7 @@ static void build_parent_dir(char const* path)
 
     dir = tr_sys_path_dirname(path, NULL);
     tr_sys_dir_create(dir, TR_SYS_DIR_CREATE_PARENTS, 0700, &error);
-    assert(error == NULL);
+    TR_ASSERT(error == NULL);
     tr_free(dir);
 
     errno = tmperr;

@@ -18,7 +18,15 @@
 ****
 ***/
 
-static struct tr_session_stats const STATS_INIT = { 0.0f, 0, 0, 0, 0, 0 };
+struct tr_session_stats const TR_SESSION_STATS_INIT =
+{
+    .ratio = 0.0f,
+    .uploadedBytes = 0,
+    .downloadedBytes = 0,
+    .filesAdded = 0,
+    .sessionCount = 0,
+    .secondsActive = 0
+};
 
 /** @brief Opaque, per-session data structure for bandwidth use statistics */
 struct tr_stats_handle
@@ -134,7 +142,7 @@ void tr_statsSaveDirty(tr_session* session)
 
     if (h != NULL && h->isDirty)
     {
-        tr_session_stats cumulative = STATS_INIT;
+        tr_session_stats cumulative = TR_SESSION_STATS_INIT;
         tr_sessionGetCumulativeStats(session, &cumulative);
         saveCumulativeStats(session, &cumulative);
         h->isDirty = false;
@@ -183,7 +191,7 @@ void tr_sessionGetStats(tr_session const* session, tr_session_stats* setme)
 void tr_sessionGetCumulativeStats(tr_session const* session, tr_session_stats* setme)
 {
     struct tr_stats_handle const* stats = getStats(session);
-    tr_session_stats current = STATS_INIT;
+    tr_session_stats current = TR_SESSION_STATS_INIT;
 
     if (stats != NULL)
     {

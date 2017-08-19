@@ -48,6 +48,8 @@ void TorrentFilter::refreshPref(int key)
         /* force a re-sort */
         sort(0, !myPrefs.getBool(Prefs::SORT_REVERSED) ? Qt::AscendingOrder : Qt::DescendingOrder);
 
+    // fall through
+
     case Prefs::SORT_MODE:
     case Prefs::SORT_REVERSED:
         sort(0, myPrefs.getBool(Prefs::SORT_REVERSED) ? Qt::AscendingOrder : Qt::DescendingOrder);

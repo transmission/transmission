@@ -29,10 +29,9 @@
 
 static GSList* get_recent_destinations(void)
 {
-    int i;
     GSList* list = NULL;
 
-    for (i = 0; i < N_RECENT; ++i)
+    for (int i = 0; i < N_RECENT; ++i)
     {
         char key[64];
         char const* val;
@@ -280,7 +279,6 @@ GtkWidget* gtr_torrent_options_dialog_new(GtkWindow* parent, TrCore* core, tr_ct
     struct OpenData* data;
     bool flag;
     GSList* list;
-    GSList* walk;
 
     /* make the dialog */
     d = gtk_dialog_new_with_buttons(_("Torrent Options"), parent, GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_CANCEL,
@@ -343,7 +341,7 @@ GtkWidget* gtr_torrent_options_dialog_new(GtkWindow* parent, TrCore* core, tr_ct
 
     list = get_recent_destinations();
 
-    for (walk = list; walk != NULL; walk = walk->next)
+    for (GSList* walk = list; walk != NULL; walk = walk->next)
     {
         gtk_file_chooser_add_shortcut_folder(GTK_FILE_CHOOSER(w), walk->data, NULL);
     }

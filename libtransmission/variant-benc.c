@@ -6,7 +6,6 @@
  *
  */
 
-#include <assert.h>
 #include <ctype.h> /* isdigit() */
 #include <errno.h>
 #include <stdlib.h> /* strtoul() */
@@ -22,6 +21,8 @@
 #include "utils.h" /* tr_snprintf() */
 #include "variant.h"
 #include "variant-common.h"
+
+#define MAX_BENC_STR_LENGTH (128 * 1024 * 1024) /* arbitrary */
 
 /***
 ****  tr_variantParse()
@@ -115,7 +116,7 @@ int tr_bencParseStr(uint8_t const* buf, uint8_t const* bufend, uint8_t const** s
     errno = 0;
     len = strtoul((char const*)buf, &ulend, 10);
 
-    if (errno != 0 || ulend != end)
+    if (errno != 0 || ulend != end || len > MAX_BENC_STR_LENGTH)
     {
         goto err;
     }

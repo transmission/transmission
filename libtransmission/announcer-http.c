@@ -26,15 +26,7 @@
 #include "variant.h"
 #include "web.h" /* tr_http_escape() */
 
-#define dbgmsg(name, ...) \
-    do \
-    { \
-        if (tr_logGetDeepEnabled()) \
-        { \
-            tr_logAddDeep(__FILE__, __LINE__, name, __VA_ARGS__); \
-        } \
-    } \
-    while (0)
+#define dbgmsg(name, ...) tr_logAddDeepNamed(name, __VA_ARGS__)
 
 /****
 *****
@@ -138,12 +130,11 @@ static char* announce_url_new(tr_session const* session, tr_announce_request con
 
 static tr_pex* listToPex(tr_variant* peerList, size_t* setme_len)
 {
-    size_t i;
-    size_t n;
+    size_t n = 0;
     size_t const len = tr_variantListSize(peerList);
     tr_pex* pex = tr_new0(tr_pex, len);
 
-    for (i = n = 0; i < len; ++i)
+    for (size_t i = 0; i < len; ++i)
     {
         int64_t port;
         char const* ip;
@@ -244,12 +235,11 @@ static void on_announce_done(tr_session* session, bool did_connect, bool did_tim
             }
             else
             {
-                size_t i;
                 size_t len;
                 char* str = tr_variantToStr(&benc, TR_VARIANT_FMT_JSON, &len);
                 fprintf(stderr, "%s", "Announce response:\n< ");
 
-                for (i = 0; i < len; ++i)
+                for (size_t i = 0; i < len; ++i)
                 {
                     fputc(str[i], stderr);
                 }
@@ -418,12 +408,11 @@ static void on_scrape_done(tr_session* session, bool did_connect, bool did_timeo
             }
             else
             {
-                size_t i;
                 size_t len;
                 char* str = tr_variantToStr(&top, TR_VARIANT_FMT_JSON, &len);
                 fprintf(stderr, "%s", "Scrape response:\n< ");
 
-                for (i = 0; i < len; ++i)
+                for (size_t i = 0; i < len; ++i)
                 {
                     fputc(str[i], stderr);
                 }
@@ -450,22 +439,13 @@ static void on_scrape_done(tr_session* session, bool did_connect, bool did_timeo
 
             if (tr_variantDictFindDict(&top, TR_KEY_files, &files))
             {
-                int i = 0;
+                tr_quark key;
+                tr_variant* val;
 
-                for (;;)
+                for (int i = 0; tr_variantDictChild(files, i, &key, &val); ++i)
                 {
-                    int j;
-                    tr_quark key;
-                    tr_variant* val;
-
-                    /* get the next "file" */
-                    if (!tr_variantDictChild(files, i++, &key, &val))
-                    {
-                        break;
-                    }
-
                     /* populate the corresponding row in our response array */
-                    for (j = 0; j < response->row_count; ++j)
+                    for (int j = 0; j < response->row_count; ++j)
                     {
                         struct tr_scrape_response_row* row = &response->rows[j];
 
@@ -506,14 +486,13 @@ static void on_scrape_done(tr_session* session, bool did_connect, bool did_timeo
 
 static char* scrape_url_new(tr_scrape_request const* req)
 {
-    int i;
     char delimiter;
     struct evbuffer* buf = evbuffer_new();
 
     evbuffer_add_printf(buf, "%s", req->url);
     delimiter = strchr(req->url, '?') != NULL ? '&' : '?';
 
-    for (i = 0; i < req->info_hash_count; ++i)
+    for (int i = 0; i < req->info_hash_count; ++i)
     {
         char str[SHA_DIGEST_LENGTH * 3 + 1];
         tr_http_escape_sha1(str, req->info_hash[i]);
@@ -527,7 +506,6 @@ static char* scrape_url_new(tr_scrape_request const* req)
 void tr_tracker_http_scrape(tr_session* session, tr_scrape_request const* request, tr_scrape_response_func response_func,
     void* response_func_user_data)
 {
-    int i;
     struct scrape_data* d;
     char* url = scrape_url_new(request);
 
@@ -537,7 +515,7 @@ void tr_tracker_http_scrape(tr_session* session, tr_scrape_request const* reques
     d->response_func_user_data = response_func_user_data;
     d->response.row_count = request->info_hash_count;
 
-    for (i = 0; i < d->response.row_count; ++i)
+    for (int i = 0; i < d->response.row_count; ++i)
     {
         memcpy(d->response.rows[i].info_hash, request->info_hash[i], SHA_DIGEST_LENGTH);
         d->response.rows[i].seeders = -1;

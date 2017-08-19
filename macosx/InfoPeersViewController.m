@@ -264,39 +264,39 @@
     if (tableView == fWebSeedTable)
     {
         NSString * ident = [column identifier];
-        NSDictionary * webSeed = [fWebSeeds objectAtIndex: row];
+        NSDictionary * webSeed = fWebSeeds[row];
 
         if ([ident isEqualToString: @"DL From"])
         {
             NSNumber * rate;
-            return (rate = [webSeed objectForKey: @"DL From Rate"]) ? [NSString stringForSpeedAbbrev: [rate doubleValue]] : @"";
+            return (rate = webSeed[@"DL From Rate"]) ? [NSString stringForSpeedAbbrev: [rate doubleValue]] : @"";
         }
         else
-            return [webSeed objectForKey: @"Address"];
+            return webSeed[@"Address"];
     }
     else
     {
         NSString * ident = [column identifier];
-        NSDictionary * peer = [fPeers objectAtIndex: row];
+        NSDictionary * peer = fPeers[row];
 
         if ([ident isEqualToString: @"Encryption"])
-            return [[peer objectForKey: @"Encryption"] boolValue] ? [NSImage imageNamed: @"Lock"] : nil;
+            return [peer[@"Encryption"] boolValue] ? [NSImage imageNamed: @"Lock"] : nil;
         else if ([ident isEqualToString: @"Client"])
-            return [peer objectForKey: @"Client"];
+            return peer[@"Client"];
         else if  ([ident isEqualToString: @"Progress"])
-            return [peer objectForKey: @"Progress"];
+            return peer[@"Progress"];
         else if ([ident isEqualToString: @"UL To"])
         {
             NSNumber * rate;
-            return (rate = [peer objectForKey: @"UL To Rate"]) ? [NSString stringForSpeedAbbrev: [rate doubleValue]] : @"";
+            return (rate = peer[@"UL To Rate"]) ? [NSString stringForSpeedAbbrev: [rate doubleValue]] : @"";
         }
         else if ([ident isEqualToString: @"DL From"])
         {
             NSNumber * rate;
-            return (rate = [peer objectForKey: @"DL From Rate"]) ? [NSString stringForSpeedAbbrev: [rate doubleValue]] : @"";
+            return (rate = peer[@"DL From Rate"]) ? [NSString stringForSpeedAbbrev: [rate doubleValue]] : @"";
         }
         else
-            return [peer objectForKey: @"IP"];
+            return peer[@"IP"];
     }
 }
 
@@ -309,8 +309,8 @@
 
         if  ([ident isEqualToString: @"Progress"])
         {
-            NSDictionary * peer = [fPeers objectAtIndex: row];
-            [(PeerProgressIndicatorCell *)cell setSeed: [[peer objectForKey: @"Seed"] boolValue]];
+            NSDictionary * peer = fPeers[row];
+            [(PeerProgressIndicatorCell *)cell setSeed: [peer[@"Seed"] boolValue]];
         }
     }
 }
@@ -347,23 +347,23 @@
     {
         const BOOL multiple = [fTorrents count] > 1;
 
-        NSDictionary * peer = [fPeers objectAtIndex: row];
+        NSDictionary * peer = fPeers[row];
         NSMutableArray * components = [NSMutableArray arrayWithCapacity: multiple ? 6 : 5];
 
         if (multiple)
-            [components addObject: [peer objectForKey: @"Name"]];
+            [components addObject: peer[@"Name"]];
 
-        const CGFloat progress = [[peer objectForKey: @"Progress"] floatValue];
+        const CGFloat progress = [peer[@"Progress"] floatValue];
         NSString * progressString = [NSString stringWithFormat: NSLocalizedString(@"Progress: %@",
                                         "Inspector -> Peers tab -> table row tooltip"),
                                         [NSString percentString: progress longDecimals: NO]];
-        if (progress < 1.0 && [[peer objectForKey: @"Seed"] boolValue])
+        if (progress < 1.0 && [peer[@"Seed"] boolValue])
             progressString = [progressString stringByAppendingFormat: @" (%@)", NSLocalizedString(@"Partial Seed",
                                 "Inspector -> Peers tab -> table row tooltip")];
         [components addObject: progressString];
 
-        NSString * protocolString = [[peer objectForKey: @"uTP"] boolValue] ? @"\u00b5TP" : @"TCP";
-        if ([[peer objectForKey: @"Encryption"] boolValue])
+        NSString * protocolString = [peer[@"uTP"] boolValue] ? @"\u00b5TP" : @"TCP";
+        if ([peer[@"Encryption"] boolValue])
             protocolString = [protocolString stringByAppendingFormat: @" (%@)",
                                 NSLocalizedString(@"encrypted", "Inspector -> Peers tab -> table row tooltip")];
         [components addObject: [NSString stringWithFormat:
@@ -372,14 +372,14 @@
 
         NSString * portString;
         NSInteger port;
-        if ((port = [[peer objectForKey: @"Port"] intValue]) > 0)
+        if ((port = [peer[@"Port"] intValue]) > 0)
             portString = [NSString stringWithFormat: @"%ld", port];
         else
             portString = NSLocalizedString(@"N/A", "Inspector -> Peers tab -> table row tooltip");
         [components addObject: [NSString stringWithFormat: @"%@: %@", NSLocalizedString(@"Port",
             "Inspector -> Peers tab -> table row tooltip"), portString]];
 
-        const NSInteger peerFrom = [[peer objectForKey: @"From"] integerValue];
+        const NSInteger peerFrom = [peer[@"From"] integerValue];
         switch (peerFrom)
         {
             case TR_PEER_FROM_TRACKER:
@@ -410,7 +410,7 @@
 
         //determing status strings from flags
         NSMutableArray * statusArray = [NSMutableArray arrayWithCapacity: 6];
-        NSString * flags = [peer objectForKey: @"Flags"];
+        NSString * flags = peer[@"Flags"];
 
         if ([flags rangeOfString: @"D"].location != NSNotFound)
             [statusArray addObject: NSLocalizedString(@"Currently downloading (interested and not choked)",
@@ -442,7 +442,7 @@
     else
     {
         if ([fTorrents count] > 1)
-            return [[fWebSeeds objectAtIndex: row] objectForKey: @"Name"];
+            return fWebSeeds[row][@"Name"];
     }
 
     return nil;
@@ -522,7 +522,7 @@
     BOOL useSecond = YES, asc = YES;
     if ([oldDescriptors count] > 0)
     {
-        NSSortDescriptor * descriptor = [oldDescriptors objectAtIndex: 0];
+        NSSortDescriptor * descriptor = oldDescriptors[0];
         [descriptors addObject: descriptor];
 
         if ((useSecond = ![[descriptor key] isEqualToString: @"IP"]))

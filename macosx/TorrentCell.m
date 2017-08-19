@@ -100,12 +100,12 @@
         [paragraphStyle setLineBreakMode: NSLineBreakByTruncatingMiddle];
 
         fTitleAttributes = [[NSMutableDictionary alloc] initWithCapacity: 3];
-        [fTitleAttributes setObject: [NSFont messageFontOfSize: 12.0] forKey: NSFontAttributeName];
-        [fTitleAttributes setObject: paragraphStyle forKey: NSParagraphStyleAttributeName];
+        fTitleAttributes[NSFontAttributeName] = [NSFont messageFontOfSize: 12.0];
+        fTitleAttributes[NSParagraphStyleAttributeName] = paragraphStyle;
 
         fStatusAttributes = [[NSMutableDictionary alloc] initWithCapacity: 3];
-        [fStatusAttributes setObject: [NSFont messageFontOfSize: 9.0] forKey: NSFontAttributeName];
-        [fStatusAttributes setObject: paragraphStyle forKey: NSParagraphStyleAttributeName];
+        fStatusAttributes[NSFontAttributeName] = [NSFont messageFontOfSize: 9.0];
+        fStatusAttributes[NSParagraphStyleAttributeName] = paragraphStyle;
 
         [paragraphStyle release];
 
@@ -211,7 +211,7 @@
         if (location)
         {
             NSURL * file = [NSURL fileURLWithPath: location];
-            [[NSWorkspace sharedWorkspace] activateFileViewerSelectingURLs: [NSArray arrayWithObject: file]];
+            [[NSWorkspace sharedWorkspace] activateFileViewerSelectingURLs: @[file]];
         }
     }
     else;
@@ -233,11 +233,11 @@
         if (NSMouseInRect(mouseLocation, cellFrame, [controlView isFlipped]))
         {
             rowOptions |= NSTrackingAssumeInside;
-            [(TorrentTableView *)controlView setRowHover: [[userInfo objectForKey: @"Row"] integerValue]];
+            [(TorrentTableView *)controlView setRowHover: [userInfo[@"Row"] integerValue]];
         }
 
         NSMutableDictionary * rowInfo = [userInfo mutableCopy];
-        [rowInfo setObject: @"Row" forKey: @"Type"];
+        rowInfo[@"Type"] = @"Row";
         NSTrackingArea * area = [[NSTrackingArea alloc] initWithRect: cellFrame options: rowOptions owner: controlView userInfo: rowInfo];
         [controlView addTrackingArea: area];
         [rowInfo release];
@@ -250,11 +250,11 @@
     if (NSMouseInRect(mouseLocation, controlButtonRect, [controlView isFlipped]))
     {
         controlOptions |= NSTrackingAssumeInside;
-        [(TorrentTableView *)controlView setControlButtonHover: [[userInfo objectForKey: @"Row"] integerValue]];
+        [(TorrentTableView *)controlView setControlButtonHover: [userInfo[@"Row"] integerValue]];
     }
 
     NSMutableDictionary * controlInfo = [userInfo mutableCopy];
-    [controlInfo setObject: @"Control" forKey: @"Type"];
+    controlInfo[@"Type"] = @"Control";
     NSTrackingArea * area = [[NSTrackingArea alloc] initWithRect: controlButtonRect options: controlOptions owner: controlView
                                 userInfo: controlInfo];
     [controlView addTrackingArea: area];
@@ -267,11 +267,11 @@
     if (NSMouseInRect(mouseLocation, revealButtonRect, [controlView isFlipped]))
     {
         revealOptions |= NSTrackingAssumeInside;
-        [(TorrentTableView *)controlView setRevealButtonHover: [[userInfo objectForKey: @"Row"] integerValue]];
+        [(TorrentTableView *)controlView setRevealButtonHover: [userInfo[@"Row"] integerValue]];
     }
 
     NSMutableDictionary * revealInfo = [userInfo mutableCopy];
-    [revealInfo setObject: @"Reveal" forKey: @"Type"];
+    revealInfo[@"Type"] = @"Reveal";
     area = [[NSTrackingArea alloc] initWithRect: revealButtonRect options: revealOptions owner: controlView
                                 userInfo: revealInfo];
     [controlView addTrackingArea: area];
@@ -284,11 +284,11 @@
     if (NSMouseInRect(mouseLocation, actionButtonRect, [controlView isFlipped]))
     {
         actionOptions |= NSTrackingAssumeInside;
-        [(TorrentTableView *)controlView setActionButtonHover: [[userInfo objectForKey: @"Row"] integerValue]];
+        [(TorrentTableView *)controlView setActionButtonHover: [userInfo[@"Row"] integerValue]];
     }
 
     NSMutableDictionary * actionInfo = [userInfo mutableCopy];
-    [actionInfo setObject: @"Action" forKey: @"Type"];
+    actionInfo[@"Type"] = @"Action";
     area = [[NSTrackingArea alloc] initWithRect: actionButtonRect options: actionOptions owner: controlView userInfo: actionInfo];
     [controlView addTrackingArea: area];
     [actionInfo release];
@@ -389,8 +389,8 @@
         statusColor = [NSColor darkGrayColor];
     }
 
-    [fTitleAttributes setObject: titleColor forKey: NSForegroundColorAttributeName];
-    [fStatusAttributes setObject: statusColor forKey: NSForegroundColorAttributeName];
+    fTitleAttributes[NSForegroundColorAttributeName] = titleColor;
+    fStatusAttributes[NSForegroundColorAttributeName] = statusColor;
 
     //minimal status
     CGFloat minimalTitleRightBound;
@@ -537,7 +537,7 @@
     cellFrame.origin.x += PADDING_EXPANSION_FRAME;
     cellFrame.origin.y += PADDING_EXPANSION_FRAME;
 
-    [fTitleAttributes setObject: [NSColor controlTextColor] forKey: NSForegroundColorAttributeName];
+    fTitleAttributes[NSForegroundColorAttributeName] = [NSColor controlTextColor];
     NSAttributedString * titleString = [self attributedTitle];
     [titleString drawInRect: cellFrame];
 }

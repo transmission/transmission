@@ -12,9 +12,8 @@
 
 #pragma once
 
-#include <assert.h>
-
 #include "transmission.h"
+#include "tr-assert.h"
 
 /**
  * @addtogroup utils Utilities
@@ -50,9 +49,9 @@ void tr_ptrArrayForeach(tr_ptrArray* array, PtrArrayForeachFunc func);
     @return the nth item in a tr_ptrArray */
 static inline void* tr_ptrArrayNth(tr_ptrArray* array, int i)
 {
-    assert(array != NULL);
-    assert(i >= 0);
-    assert(i < array->n_items);
+    TR_ASSERT(array != NULL);
+    TR_ASSERT(i >= 0);
+    TR_ASSERT(i < array->n_items);
 
     return array->items[i];
 }

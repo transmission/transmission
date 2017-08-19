@@ -41,12 +41,11 @@ struct delete_data
 
 static void on_remove_dialog_response(GtkDialog* dialog, gint response, gpointer gdd)
 {
-    GSList* l;
     struct delete_data* dd = gdd;
 
     if (response == GTK_RESPONSE_ACCEPT)
     {
-        for (l = dd->torrent_ids; l != NULL; l = l->next)
+        for (GSList* l = dd->torrent_ids; l != NULL; l = l->next)
         {
             gtr_core_remove_torrent(dd->core, GPOINTER_TO_INT(l->data), dd->delete_files);
         }
@@ -59,7 +58,6 @@ static void on_remove_dialog_response(GtkDialog* dialog, gint response, gpointer
 
 void gtr_confirm_remove(GtkWindow* parent, TrCore* core, GSList* torrent_ids, gboolean delete_files)
 {
-    GSList* l;
     GtkWidget* d;
     GString* primary_text;
     GString* secondary_text;
@@ -78,7 +76,7 @@ void gtr_confirm_remove(GtkWindow* parent, TrCore* core, GSList* torrent_ids, gb
     dd->torrent_ids = torrent_ids;
     dd->delete_files = delete_files;
 
-    for (l = torrent_ids; l != NULL; l = l->next)
+    for (GSList* l = torrent_ids; l != NULL; l = l->next)
     {
         int const id = GPOINTER_TO_INT(l->data);
         tr_torrent* tor = gtr_core_find_torrent(core, id);

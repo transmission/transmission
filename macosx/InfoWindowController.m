@@ -480,7 +480,7 @@ typedef enum
     }
     else
     {
-        Torrent * torrent = [fTorrents objectAtIndex: 0];
+        Torrent * torrent = fTorrents[0];
 
         [fImageView setImage: [torrent icon]];
 
@@ -532,7 +532,7 @@ typedef enum
 
 - (void) resetInfoForTorrent: (NSNotification *) notification
 {
-    Torrent * torrent = [[notification userInfo] objectForKey: @"Torrent"];
+    Torrent * torrent = [notification userInfo][@"Torrent"];
     if (fTorrents && (!torrent || [fTorrents containsObject: torrent]))
         [self resetInfo];
 }

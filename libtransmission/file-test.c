@@ -28,6 +28,10 @@
 #define NATIVE_PATH_SEP "\\"
 #endif
 
+#if !defined(__OpenBSD__)
+#define HAVE_UNIFIED_BUFFER_CACHE
+#endif
+
 static tr_session* session;
 
 static char* create_test_dir(char const* name)
@@ -168,7 +172,7 @@ static int test_get_info(void)
 
     /* Can't get info of non-existent file/directory */
     check(!tr_sys_path_get_info(path1, 0, &info, &err));
-    check(err != NULL);
+    check_ptr(err, !=, NULL);
     tr_error_clear(&err);
 
     t = time(NULL);
@@ -177,19 +181,21 @@ static int test_get_info(void)
     /* Good file info */
     clear_path_info(&info);
     check(tr_sys_path_get_info(path1, 0, &info, &err));
-    check(err == NULL);
-    check_int_eq(TR_SYS_PATH_IS_FILE, info.type);
-    check_uint_eq(4, info.size);
-    check(info.last_modified_at >= t && info.last_modified_at <= time(NULL));
+    check_ptr(err, ==, NULL);
+    check_int(info.type, ==, TR_SYS_PATH_IS_FILE);
+    check_uint(info.size, ==, 4);
+    check_int(info.last_modified_at, >=, t - 1);
+    check_int(info.last_modified_at, <=, time(NULL) + 1);
 
     /* Good file info (by handle) */
     fd = tr_sys_file_open(path1, TR_SYS_FILE_READ, 0, NULL);
     clear_path_info(&info);
     check(tr_sys_file_get_info(fd, &info, &err));
-    check(err == NULL);
-    check_int_eq(TR_SYS_PATH_IS_FILE, info.type);
-    check_uint_eq(4, info.size);
-    check(info.last_modified_at >= t && info.last_modified_at <= time(NULL));
+    check_ptr(err, ==, NULL);
+    check_int(info.type, ==, TR_SYS_PATH_IS_FILE);
+    check_uint(info.size, ==, 4);
+    check_int(info.last_modified_at, >=, t - 1);
+    check_int(info.last_modified_at, <=, time(NULL) + 1);
     tr_sys_file_close(fd, NULL);
 
     tr_sys_path_remove(path1, NULL);
@@ -199,17 +205,18 @@ static int test_get_info(void)
     tr_sys_dir_create(path1, 0, 0777, NULL);
     clear_path_info(&info);
     check(tr_sys_path_get_info(path1, 0, &info, &err));
-    check(err == NULL);
-    check_int_eq(TR_SYS_PATH_IS_DIRECTORY, info.type);
-    check(info.size != (uint64_t)-1);
-    check(info.last_modified_at >= t && info.last_modified_at <= time(NULL));
+    check_ptr(err, ==, NULL);
+    check_int(info.type, ==, TR_SYS_PATH_IS_DIRECTORY);
+    check_uint(info.size, !=, (uint64_t)-1);
+    check_int(info.last_modified_at, >=, t - 1);
+    check_int(info.last_modified_at, <=, time(NULL) + 1);
     tr_sys_path_remove(path1, NULL);
 
     if (create_symlink(path1, path2, false))
     {
         /* Can't get info of non-existent file/directory */
         check(!tr_sys_path_get_info(path1, 0, &info, &err));
-        check(err != NULL);
+        check_ptr(err, !=, NULL);
         tr_error_clear(&err);
 
         t = time(NULL);
@@ -218,19 +225,21 @@ static int test_get_info(void)
         /* Good file info */
         clear_path_info(&info);
         check(tr_sys_path_get_info(path1, 0, &info, &err));
-        check(err == NULL);
-        check_int_eq(TR_SYS_PATH_IS_FILE, info.type);
-        check_uint_eq(4, info.size);
-        check(info.last_modified_at >= t && info.last_modified_at <= time(NULL));
+        check_ptr(err, ==, NULL);
+        check_int(info.type, ==, TR_SYS_PATH_IS_FILE);
+        check_uint(info.size, ==, 4);
+        check_int(info.last_modified_at, >=, t - 1);
+        check_int(info.last_modified_at, <=, time(NULL) + 1);
 
         /* Good file info (by handle) */
         fd = tr_sys_file_open(path1, TR_SYS_FILE_READ, 0, NULL);
         clear_path_info(&info);
         check(tr_sys_file_get_info(fd, &info, &err));
-        check(err == NULL);
-        check_int_eq(TR_SYS_PATH_IS_FILE, info.type);
-        check_uint_eq(4, info.size);
-        check(info.last_modified_at >= t && info.last_modified_at <= time(NULL));
+        check_ptr(err, ==, NULL);
+        check_int(info.type, ==, TR_SYS_PATH_IS_FILE);
+        check_uint(info.size, ==, 4);
+        check_int(info.last_modified_at, >=, t - 1);
+        check_int(info.last_modified_at, <=, time(NULL) + 1);
         tr_sys_file_close(fd, NULL);
 
         tr_sys_path_remove(path2, NULL);
@@ -240,10 +249,11 @@ static int test_get_info(void)
         tr_sys_dir_create(path2, 0, 0777, NULL);
         clear_path_info(&info);
         check(tr_sys_path_get_info(path1, 0, &info, &err));
-        check(err == NULL);
-        check_int_eq(TR_SYS_PATH_IS_DIRECTORY, info.type);
-        check(info.size != (uint64_t)-1);
-        check(info.last_modified_at >= t && info.last_modified_at <= time(NULL));
+        check_ptr(err, ==, NULL);
+        check_int(info.type, ==, TR_SYS_PATH_IS_DIRECTORY);
+        check_uint(info.size, !=, (uint64_t)-1);
+        check_int(info.last_modified_at, >=, t - 1);
+        check_int(info.last_modified_at, <=, time(NULL) + 1);
 
         tr_sys_path_remove(path2, NULL);
         tr_sys_path_remove(path1, NULL);
@@ -272,19 +282,19 @@ static int test_path_exists(void)
 
     /* Non-existent file does not exist */
     check(!tr_sys_path_exists(path1, &err));
-    check(err == NULL);
+    check_ptr(err, ==, NULL);
 
     /* Create file and see that it exists */
     libtest_create_file_with_string_contents(path1, "test");
     check(tr_sys_path_exists(path1, &err));
-    check(err == NULL);
+    check_ptr(err, ==, NULL);
 
     tr_sys_path_remove(path1, NULL);
 
     /* Create directory and see that it exists */
     tr_sys_dir_create(path1, 0, 0777, NULL);
     check(tr_sys_path_exists(path1, &err));
-    check(err == NULL);
+    check_ptr(err, ==, NULL);
 
     tr_sys_path_remove(path1, NULL);
 
@@ -292,19 +302,19 @@ static int test_path_exists(void)
     {
         /* Non-existent file does not exist (via symlink) */
         check(!tr_sys_path_exists(path1, &err));
-        check(err == NULL);
+        check_ptr(err, ==, NULL);
 
         /* Create file and see that it exists (via symlink) */
         libtest_create_file_with_string_contents(path2, "test");
         check(tr_sys_path_exists(path1, &err));
-        check(err == NULL);
+        check_ptr(err, ==, NULL);
 
         tr_sys_path_remove(path2, NULL);
 
         /* Create directory and see that it exists (via symlink) */
         tr_sys_dir_create(path2, 0, 0777, NULL);
         check(tr_sys_path_exists(path1, &err));
-        check(err == NULL);
+        check_ptr(err, ==, NULL);
 
         tr_sys_path_remove(path2, NULL);
         tr_sys_path_remove(path1, NULL);
@@ -383,45 +393,45 @@ static int test_path_is_same(void)
 
     /* Two non-existent files are not the same */
     check(!tr_sys_path_is_same(path1, path1, &err));
-    check(err == NULL);
+    check_ptr(err, ==, NULL);
     check(!tr_sys_path_is_same(path1, path2, &err));
-    check(err == NULL);
+    check_ptr(err, ==, NULL);
 
     /* Two same files are the same */
     libtest_create_file_with_string_contents(path1, "test");
     check(tr_sys_path_is_same(path1, path1, &err));
-    check(err == NULL);
+    check_ptr(err, ==, NULL);
 
     /* Existent and non-existent files are not the same */
     check(!tr_sys_path_is_same(path1, path2, &err));
-    check(err == NULL);
+    check_ptr(err, ==, NULL);
     check(!tr_sys_path_is_same(path2, path1, &err));
-    check(err == NULL);
+    check_ptr(err, ==, NULL);
 
     /* Two separate files (even with same content) are not the same */
     libtest_create_file_with_string_contents(path2, "test");
     check(!tr_sys_path_is_same(path1, path2, &err));
-    check(err == NULL);
+    check_ptr(err, ==, NULL);
 
     tr_sys_path_remove(path1, NULL);
 
     /* Two same directories are the same */
     tr_sys_dir_create(path1, 0, 0777, NULL);
     check(tr_sys_path_is_same(path1, path1, &err));
-    check(err == NULL);
+    check_ptr(err, ==, NULL);
 
     /* File and directory are not the same */
     check(!tr_sys_path_is_same(path1, path2, &err));
-    check(err == NULL);
+    check_ptr(err, ==, NULL);
     check(!tr_sys_path_is_same(path2, path1, &err));
-    check(err == NULL);
+    check_ptr(err, ==, NULL);
 
     tr_sys_path_remove(path2, NULL);
 
     /* Two separate directories are not the same */
     tr_sys_dir_create(path2, 0, 0777, NULL);
     check(!tr_sys_path_is_same(path1, path2, &err));
-    check(err == NULL);
+    check_ptr(err, ==, NULL);
 
     tr_sys_path_remove(path1, NULL);
     tr_sys_path_remove(path2, NULL);
@@ -430,61 +440,61 @@ static int test_path_is_same(void)
     {
         /* Directory and symlink pointing to it are the same */
         check(tr_sys_path_is_same(path1, test_dir, &err));
-        check(err == NULL);
+        check_ptr(err, ==, NULL);
         check(tr_sys_path_is_same(test_dir, path1, &err));
-        check(err == NULL);
+        check_ptr(err, ==, NULL);
 
         /* Non-existent file and symlink are not the same */
         check(!tr_sys_path_is_same(path1, path2, &err));
-        check(err == NULL);
+        check_ptr(err, ==, NULL);
         check(!tr_sys_path_is_same(path2, path1, &err));
-        check(err == NULL);
+        check_ptr(err, ==, NULL);
 
         /* Symlinks pointing to different directories are not the same */
         create_symlink(path2, "..", true);
         check(!tr_sys_path_is_same(path1, path2, &err));
-        check(err == NULL);
+        check_ptr(err, ==, NULL);
         check(!tr_sys_path_is_same(path2, path1, &err));
-        check(err == NULL);
+        check_ptr(err, ==, NULL);
 
         tr_sys_path_remove(path2, NULL);
 
         /* Symlinks pointing to same directory are the same */
         create_symlink(path2, ".", true);
         check(tr_sys_path_is_same(path1, path2, &err));
-        check(err == NULL);
+        check_ptr(err, ==, NULL);
 
         tr_sys_path_remove(path2, NULL);
 
         /* Directory and symlink pointing to another directory are not the same */
         tr_sys_dir_create(path2, 0, 0777, NULL);
         check(!tr_sys_path_is_same(path1, path2, &err));
-        check(err == NULL);
+        check_ptr(err, ==, NULL);
         check(!tr_sys_path_is_same(path2, path1, &err));
-        check(err == NULL);
+        check_ptr(err, ==, NULL);
 
         /* Symlinks pointing to same directory are the same */
         create_symlink(path3, "..", true);
         check(tr_sys_path_is_same(path1, path3, &err));
-        check(err == NULL);
+        check_ptr(err, ==, NULL);
 
         tr_sys_path_remove(path1, NULL);
 
         /* File and symlink pointing to directory are not the same */
         libtest_create_file_with_string_contents(path1, "test");
         check(!tr_sys_path_is_same(path1, path3, &err));
-        check(err == NULL);
+        check_ptr(err, ==, NULL);
         check(!tr_sys_path_is_same(path3, path1, &err));
-        check(err == NULL);
+        check_ptr(err, ==, NULL);
 
         tr_sys_path_remove(path3, NULL);
 
         /* File and symlink pointing to same file are the same */
         create_symlink(path3, path1, false);
         check(tr_sys_path_is_same(path1, path3, &err));
-        check(err == NULL);
+        check_ptr(err, ==, NULL);
         check(tr_sys_path_is_same(path3, path1, &err));
-        check(err == NULL);
+        check_ptr(err, ==, NULL);
 
         /* Symlinks pointing to non-existent files are not the same */
         tr_sys_path_remove(path1, NULL);
@@ -492,25 +502,25 @@ static int test_path_is_same(void)
         tr_sys_path_remove(path3, NULL);
         create_symlink(path3, "missing", false);
         check(!tr_sys_path_is_same(path1, path3, &err));
-        check(err == NULL);
+        check_ptr(err, ==, NULL);
         check(!tr_sys_path_is_same(path3, path1, &err));
-        check(err == NULL);
+        check_ptr(err, ==, NULL);
 
         tr_sys_path_remove(path3, NULL);
 
         /* Symlinks pointing to same non-existent file are not the same */
         create_symlink(path3, ".." NATIVE_PATH_SEP "missing", false);
         check(!tr_sys_path_is_same(path1, path3, &err));
-        check(err == NULL);
+        check_ptr(err, ==, NULL);
         check(!tr_sys_path_is_same(path3, path1, &err));
-        check(err == NULL);
+        check_ptr(err, ==, NULL);
 
         /* Non-existent file and symlink pointing to non-existent file are not the same */
         tr_sys_path_remove(path3, NULL);
         check(!tr_sys_path_is_same(path1, path3, &err));
-        check(err == NULL);
+        check_ptr(err, ==, NULL);
         check(!tr_sys_path_is_same(path3, path1, &err));
-        check(err == NULL);
+        check_ptr(err, ==, NULL);
 
         tr_sys_path_remove(path2, NULL);
         tr_sys_path_remove(path1, NULL);
@@ -529,19 +539,19 @@ static int test_path_is_same(void)
     {
         /* File and hardlink to it are the same */
         check(tr_sys_path_is_same(path1, path2, &err));
-        check(err == NULL);
+        check_ptr(err, ==, NULL);
 
         /* Two hardlinks to the same file are the same */
         create_hardlink(path3, path2);
         check(tr_sys_path_is_same(path2, path3, &err));
-        check(err == NULL);
+        check_ptr(err, ==, NULL);
         check(tr_sys_path_is_same(path1, path3, &err));
-        check(err == NULL);
+        check_ptr(err, ==, NULL);
 
         tr_sys_path_remove(path2, NULL);
 
         check(tr_sys_path_is_same(path1, path3, &err));
-        check(err == NULL);
+        check_ptr(err, ==, NULL);
 
         tr_sys_path_remove(path3, NULL);
 
@@ -549,9 +559,9 @@ static int test_path_is_same(void)
         libtest_create_file_with_string_contents(path3, "test");
         create_hardlink(path2, path3);
         check(!tr_sys_path_is_same(path1, path2, &err));
-        check(err == NULL);
+        check_ptr(err, ==, NULL);
         check(!tr_sys_path_is_same(path2, path1, &err));
-        check(err == NULL);
+        check_ptr(err, ==, NULL);
 
         tr_sys_path_remove(path3, NULL);
         tr_sys_path_remove(path2, NULL);
@@ -564,7 +574,7 @@ static int test_path_is_same(void)
     if (create_symlink(path2, path1, false) && create_hardlink(path3, path1))
     {
         check(tr_sys_path_is_same(path2, path3, &err));
-        check(err == NULL);
+        check_ptr(err, ==, NULL);
     }
     else
     {
@@ -600,8 +610,8 @@ static int test_path_resolve(void)
         char* tmp;
 
         tmp = tr_sys_path_resolve(path2, &err);
-        check(tmp != NULL);
-        check(err == NULL);
+        check_str(tmp, !=, NULL);
+        check_ptr(err, ==, NULL);
         check(path_contains_no_symlinks(tmp));
         tr_free(tmp);
 
@@ -609,8 +619,8 @@ static int test_path_resolve(void)
         tr_sys_dir_create(path1, 0, 0755, NULL);
 
         tmp = tr_sys_path_resolve(path2, &err);
-        check(tmp != NULL);
-        check(err == NULL);
+        check_str(tmp, !=, NULL);
+        check_ptr(err, ==, NULL);
         check(path_contains_no_symlinks(tmp));
         tr_free(tmp);
     }
@@ -644,15 +654,15 @@ static int test_path_xname(struct xname_test_data const* data, size_t data_size,
 
         if (data[i].output != NULL)
         {
-            check(name != NULL);
-            check(err == NULL);
-            check_streq(data[i].output, name);
+            check_str(name, !=, NULL);
+            check_ptr(err, ==, NULL);
+            check_str(name, ==, data[i].output);
             tr_free(name);
         }
         else
         {
-            check(name == NULL);
-            check(err != NULL);
+            check_str(name, ==, NULL);
+            check_ptr(err, !=, NULL);
             tr_error_clear(&err);
         }
     }
@@ -698,13 +708,12 @@ static int test_path_basename_dirname(void)
 #endif
     };
 
-    if (test_path_xname(common_xname_tests, sizeof(common_xname_tests) / sizeof(*common_xname_tests),
-        tr_sys_path_basename) != 0)
+    if (test_path_xname(common_xname_tests, TR_N_ELEMENTS(common_xname_tests), tr_sys_path_basename) != 0)
     {
         return 1;
     }
 
-    if (test_path_xname(common_xname_tests, sizeof(common_xname_tests) / sizeof(*common_xname_tests), tr_sys_path_dirname) != 0)
+    if (test_path_xname(common_xname_tests, TR_N_ELEMENTS(common_xname_tests), tr_sys_path_dirname) != 0)
     {
         return 1;
     }
@@ -733,7 +742,7 @@ static int test_path_basename_dirname(void)
 #endif
     };
 
-    if (test_path_xname(basename_tests, sizeof(basename_tests) / sizeof(*basename_tests), tr_sys_path_basename) != 0)
+    if (test_path_xname(basename_tests, TR_N_ELEMENTS(basename_tests), tr_sys_path_basename) != 0)
     {
         return 1;
     }
@@ -767,7 +776,7 @@ static int test_path_basename_dirname(void)
 #endif
     };
 
-    if (test_path_xname(dirname_tests, sizeof(dirname_tests) / sizeof(*dirname_tests), tr_sys_path_dirname) != 0)
+    if (test_path_xname(dirname_tests, TR_N_ELEMENTS(dirname_tests), tr_sys_path_dirname) != 0)
     {
         return 1;
     }
@@ -799,43 +808,43 @@ static int test_path_rename(void)
     check(tr_sys_path_rename(path1, path2, &err));
     check(!tr_sys_path_exists(path1, NULL));
     check(tr_sys_path_exists(path2, NULL));
-    check(err == NULL);
+    check_ptr(err, ==, NULL);
 
     /* Backward rename works */
     check(tr_sys_path_rename(path2, path1, &err));
     check(tr_sys_path_exists(path1, NULL));
     check(!tr_sys_path_exists(path2, NULL));
-    check(err == NULL);
+    check_ptr(err, ==, NULL);
 
     /* Another backward rename [of non-existent file] does not work */
     check(!tr_sys_path_rename(path2, path1, &err));
-    check(err != NULL);
+    check_ptr(err, !=, NULL);
     tr_error_clear(&err);
 
     /* Rename to file which couldn't be created does not work */
     check(!tr_sys_path_rename(path1, path3, &err));
-    check(err != NULL);
+    check_ptr(err, !=, NULL);
     tr_error_clear(&err);
 
     /* Rename of non-existent file does not work */
     check(!tr_sys_path_rename(path3, path2, &err));
-    check(err != NULL);
+    check_ptr(err, !=, NULL);
     tr_error_clear(&err);
 
     libtest_create_file_with_string_contents(path2, "test");
 
     /* Renaming file does overwrite existing file */
     check(tr_sys_path_rename(path2, path1, &err));
-    check(err == NULL);
+    check_ptr(err, ==, NULL);
 
     tr_sys_dir_create(path2, 0, 0777, NULL);
 
     /* Renaming file does not overwrite existing directory, and vice versa */
     check(!tr_sys_path_rename(path1, path2, &err));
-    check(err != NULL);
+    check_ptr(err, !=, NULL);
     tr_error_clear(&err);
     check(!tr_sys_path_rename(path2, path1, &err));
-    check(err != NULL);
+    check_ptr(err, !=, NULL);
     tr_error_clear(&err);
 
     tr_sys_path_remove(path2, NULL);
@@ -852,7 +861,7 @@ static int test_path_rename(void)
 
         /* Rename of symlink works, files stay the same */
         check(tr_sys_path_rename(path2, path3, &err));
-        check(err == NULL);
+        check_ptr(err, ==, NULL);
         check(!tr_sys_path_exists(path2, NULL));
         check(tr_sys_path_exists(path3, NULL));
         check(tr_sys_path_is_same(path1, path3, NULL));
@@ -873,7 +882,7 @@ static int test_path_rename(void)
 
         /* Rename of hardlink works, files stay the same */
         check(tr_sys_path_rename(path2, path3, &err));
-        check(err == NULL);
+        check_ptr(err, ==, NULL);
         check(!tr_sys_path_exists(path2, NULL));
         check(tr_sys_path_exists(path3, NULL));
         check(tr_sys_path_is_same(path1, path3, NULL));
@@ -910,7 +919,7 @@ static int test_path_remove(void)
     /* Can't remove non-existent file/directory */
     check(!tr_sys_path_exists(path1, NULL));
     check(!tr_sys_path_remove(path1, &err));
-    check(err != NULL);
+    check_ptr(err, !=, NULL);
     check(!tr_sys_path_exists(path1, NULL));
     tr_error_clear(&err);
 
@@ -918,14 +927,14 @@ static int test_path_remove(void)
     libtest_create_file_with_string_contents(path1, "test");
     check(tr_sys_path_exists(path1, NULL));
     check(tr_sys_path_remove(path1, &err));
-    check(err == NULL);
+    check_ptr(err, ==, NULL);
     check(!tr_sys_path_exists(path1, NULL));
 
     /* Removing empty directory works */
     tr_sys_dir_create(path1, 0, 0777, NULL);
     check(tr_sys_path_exists(path1, NULL));
     check(tr_sys_path_remove(path1, &err));
-    check(err == NULL);
+    check_ptr(err, ==, NULL);
     check(!tr_sys_path_exists(path1, NULL));
 
     /* Removing non-empty directory fails */
@@ -934,7 +943,7 @@ static int test_path_remove(void)
     check(tr_sys_path_exists(path2, NULL));
     check(tr_sys_path_exists(path3, NULL));
     check(!tr_sys_path_remove(path2, &err));
-    check(err != NULL);
+    check_ptr(err, !=, NULL);
     check(tr_sys_path_exists(path2, NULL));
     check(tr_sys_path_exists(path3, NULL));
     tr_error_clear(&err);
@@ -964,11 +973,11 @@ static int test_file_open(void)
     /* Can't open non-existent file */
     check(!tr_sys_path_exists(path1, NULL));
     check(tr_sys_file_open(path1, TR_SYS_FILE_READ, 0600, &err) == TR_BAD_SYS_FILE);
-    check(err != NULL);
+    check_ptr(err, !=, NULL);
     check(!tr_sys_path_exists(path1, NULL));
     tr_error_clear(&err);
     check(tr_sys_file_open(path1, TR_SYS_FILE_WRITE, 0600, &err) == TR_BAD_SYS_FILE);
-    check(err != NULL);
+    check_ptr(err, !=, NULL);
     check(!tr_sys_path_exists(path1, NULL));
     tr_error_clear(&err);
 
@@ -977,19 +986,19 @@ static int test_file_open(void)
 #ifdef _WIN32
     /* This works on *NIX */
     check(tr_sys_file_open(path1, TR_SYS_FILE_READ, 0600, &err) == TR_BAD_SYS_FILE);
-    check(err != NULL);
+    check_ptr(err, !=, NULL);
     tr_error_clear(&err);
 #endif
     check(tr_sys_file_open(path1, TR_SYS_FILE_WRITE, 0600, &err) == TR_BAD_SYS_FILE);
-    check(err != NULL);
+    check_ptr(err, !=, NULL);
     tr_error_clear(&err);
 
     tr_sys_path_remove(path1, NULL);
 
     /* Can create non-existent file */
     fd = tr_sys_file_open(path1, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE, 0640, &err);
-    check(fd != TR_BAD_SYS_FILE);
-    check(err == NULL);
+    check_int(fd, !=, TR_BAD_SYS_FILE);
+    check_ptr(err, ==, NULL);
     tr_sys_file_close(fd, NULL);
     check(tr_sys_path_exists(path1, NULL));
     check(validate_permissions(path1, 0640));
@@ -997,12 +1006,12 @@ static int test_file_open(void)
     /* Can open existing file */
     check(tr_sys_path_exists(path1, NULL));
     fd = tr_sys_file_open(path1, TR_SYS_FILE_READ, 0600, &err);
-    check(fd != TR_BAD_SYS_FILE);
-    check(err == NULL);
+    check_int(fd, !=, TR_BAD_SYS_FILE);
+    check_ptr(err, ==, NULL);
     tr_sys_file_close(fd, NULL);
     fd = tr_sys_file_open(path1, TR_SYS_FILE_WRITE, 0600, &err);
-    check(fd != TR_BAD_SYS_FILE);
-    check(err == NULL);
+    check_int(fd, !=, TR_BAD_SYS_FILE);
+    check_ptr(err, ==, NULL);
     tr_sys_file_close(fd, NULL);
 
     tr_sys_path_remove(path1, NULL);
@@ -1010,34 +1019,34 @@ static int test_file_open(void)
 
     /* Can't create new file if it already exists */
     fd = tr_sys_file_open(path1, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE_NEW, 0640, &err);
-    check(fd == TR_BAD_SYS_FILE);
-    check(err != NULL);
+    check_int(fd, ==, TR_BAD_SYS_FILE);
+    check_ptr(err, !=, NULL);
     tr_error_clear(&err);
     tr_sys_path_get_info(path1, TR_SYS_PATH_NO_FOLLOW, &info, NULL);
-    check_uint_eq(4, info.size);
+    check_uint(info.size, ==, 4);
 
     /* Pointer is at the end of file */
     tr_sys_path_get_info(path1, TR_SYS_PATH_NO_FOLLOW, &info, NULL);
-    check_uint_eq(4, info.size);
+    check_uint(info.size, ==, 4);
     fd = tr_sys_file_open(path1, TR_SYS_FILE_WRITE | TR_SYS_FILE_APPEND, 0600, &err);
-    check(fd != TR_BAD_SYS_FILE);
-    check(err == NULL);
+    check_int(fd, !=, TR_BAD_SYS_FILE);
+    check_ptr(err, ==, NULL);
     tr_sys_file_write(fd, "s", 1, NULL, NULL); /* On *NIX, pointer is positioned on each write but not initially */
     tr_sys_file_seek(fd, 0, TR_SEEK_CUR, &n, NULL);
-    check_uint_eq(5, n);
+    check_uint(n, ==, 5);
     tr_sys_file_close(fd, NULL);
 
     /* File gets truncated */
     tr_sys_path_get_info(path1, TR_SYS_PATH_NO_FOLLOW, &info, NULL);
-    check_uint_eq(5, info.size);
+    check_uint(info.size, ==, 5);
     fd = tr_sys_file_open(path1, TR_SYS_FILE_WRITE | TR_SYS_FILE_TRUNCATE, 0600, &err);
-    check(fd != TR_BAD_SYS_FILE);
-    check(err == NULL);
+    check_int(fd, !=, TR_BAD_SYS_FILE);
+    check_ptr(err, ==, NULL);
     tr_sys_file_get_info(fd, &info, NULL);
-    check_uint_eq(0, info.size);
+    check_uint(info.size, ==, 0);
     tr_sys_file_close(fd, NULL);
     tr_sys_path_get_info(path1, TR_SYS_PATH_NO_FOLLOW, &info, NULL);
-    check_uint_eq(0, info.size);
+    check_uint(info.size, ==, 0);
 
     /* TODO: symlink and hardlink tests */
 
@@ -1063,72 +1072,72 @@ static int test_file_read_write_seek(void)
     fd = tr_sys_file_open(path1, TR_SYS_FILE_READ | TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE, 0600, NULL);
 
     check(tr_sys_file_seek(fd, 0, TR_SEEK_CUR, &n, &err));
-    check(err == NULL);
-    check_uint_eq(0, n);
+    check_ptr(err, ==, NULL);
+    check_uint(n, ==, 0);
 
     check(tr_sys_file_write(fd, "test", 4, &n, &err));
-    check(err == NULL);
-    check_uint_eq(4, n);
+    check_ptr(err, ==, NULL);
+    check_uint(n, ==, 4);
 
     check(tr_sys_file_seek(fd, 0, TR_SEEK_CUR, &n, &err));
-    check(err == NULL);
-    check_uint_eq(4, n);
+    check_ptr(err, ==, NULL);
+    check_uint(n, ==, 4);
 
     check(tr_sys_file_seek(fd, 0, TR_SEEK_SET, &n, &err));
-    check(err == NULL);
-    check_uint_eq(0, n);
+    check_ptr(err, ==, NULL);
+    check_uint(n, ==, 0);
 
     check(tr_sys_file_read(fd, buf, sizeof(buf), &n, &err));
-    check(err == NULL);
-    check_uint_eq(4, n);
+    check_ptr(err, ==, NULL);
+    check_uint(n, ==, 4);
 
-    check_int_eq(0, memcmp(buf, "test", 4));
+    check_mem(buf, ==, "test", 4);
 
     check(tr_sys_file_seek(fd, -3, TR_SEEK_CUR, &n, &err));
-    check(err == NULL);
-    check_uint_eq(1, n);
+    check_ptr(err, ==, NULL);
+    check_uint(n, ==, 1);
 
     check(tr_sys_file_write(fd, "E", 1, &n, &err));
-    check(err == NULL);
-    check_uint_eq(1, n);
+    check_ptr(err, ==, NULL);
+    check_uint(n, ==, 1);
 
     check(tr_sys_file_seek(fd, -2, TR_SEEK_CUR, &n, &err));
-    check(err == NULL);
-    check_uint_eq(0, n);
+    check_ptr(err, ==, NULL);
+    check_uint(n, ==, 0);
 
     check(tr_sys_file_read(fd, buf, sizeof(buf), &n, &err));
-    check(err == NULL);
-    check_uint_eq(4, n);
+    check_ptr(err, ==, NULL);
+    check_uint(n, ==, 4);
 
-    check_int_eq(0, memcmp(buf, "tEst", 4));
+    check_mem(buf, ==, "tEst", 4);
 
     check(tr_sys_file_seek(fd, 0, TR_SEEK_END, &n, &err));
-    check(err == NULL);
-    check_uint_eq(4, n);
+    check_ptr(err, ==, NULL);
+    check_uint(n, ==, 4);
 
     check(tr_sys_file_write(fd, " ok", 3, &n, &err));
-    check(err == NULL);
-    check_uint_eq(3, n);
+    check_ptr(err, ==, NULL);
+    check_uint(n, ==, 3);
 
     check(tr_sys_file_seek(fd, 0, TR_SEEK_SET, &n, &err));
-    check(err == NULL);
-    check_uint_eq(0, n);
+    check_ptr(err, ==, NULL);
+    check_uint(n, ==, 0);
 
     check(tr_sys_file_read(fd, buf, sizeof(buf), &n, &err));
-    check(err == NULL);
-    check_uint_eq(7, n);
+    check_ptr(err, ==, NULL);
+    check_uint(n, ==, 7);
 
-    check_int_eq(0, memcmp(buf, "tEst ok", 7));
+    check_mem(buf, ==, "tEst ok", 7);
 
     check(tr_sys_file_write_at(fd, "-", 1, 4, &n, &err));
-    check(err == NULL);
-    check_uint_eq(1, n);
+    check_ptr(err, ==, NULL);
+    check_uint(n, ==, 1);
 
     check(tr_sys_file_read_at(fd, buf, 5, 2, &n, &err));
-    check(err == NULL);
-    check_uint_eq(5, n);
+    check_ptr(err, ==, NULL);
+    check_uint(n, ==, 5);
 
-    check_int_eq(0, memcmp(buf, "st-ok", 5));
+    check_mem(buf, ==, "st-ok", 5);
 
     tr_sys_file_close(fd, NULL);
 
@@ -1153,37 +1162,37 @@ static int test_file_truncate(void)
     fd = tr_sys_file_open(path1, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE, 0600, NULL);
 
     check(tr_sys_file_truncate(fd, 10, &err));
-    check(err == NULL);
+    check_ptr(err, ==, NULL);
     tr_sys_file_get_info(fd, &info, NULL);
-    check_uint_eq(10, info.size);
+    check_uint(info.size, ==, 10);
 
     check(tr_sys_file_truncate(fd, 20, &err));
-    check(err == NULL);
+    check_ptr(err, ==, NULL);
     tr_sys_file_get_info(fd, &info, NULL);
-    check_uint_eq(20, info.size);
+    check_uint(info.size, ==, 20);
 
     check(tr_sys_file_truncate(fd, 0, &err));
-    check(err == NULL);
+    check_ptr(err, ==, NULL);
     tr_sys_file_get_info(fd, &info, NULL);
-    check_uint_eq(0, info.size);
+    check_uint(info.size, ==, 0);
 
     check(tr_sys_file_truncate(fd, 50, &err));
-    check(err == NULL);
+    check_ptr(err, ==, NULL);
 
     tr_sys_file_close(fd, NULL);
 
     tr_sys_path_get_info(path1, 0, &info, NULL);
-    check_uint_eq(50, info.size);
+    check_uint(info.size, ==, 50);
 
     fd = tr_sys_file_open(path1, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE, 0600, NULL);
 
     check(tr_sys_file_truncate(fd, 25, &err));
-    check(err == NULL);
+    check_ptr(err, ==, NULL);
 
     tr_sys_file_close(fd, NULL);
 
     tr_sys_path_get_info(path1, 0, &info, NULL);
-    check_uint_eq(25, info.size);
+    check_uint(info.size, ==, 25);
 
     tr_sys_path_remove(path1, NULL);
 
@@ -1207,13 +1216,13 @@ static int test_file_preallocate(void)
 
     if (tr_sys_file_preallocate(fd, 50, 0, &err))
     {
-        check(err == NULL);
+        check_ptr(err, ==, NULL);
         tr_sys_file_get_info(fd, &info, NULL);
-        check_uint_eq(50, info.size);
+        check_uint(info.size, ==, 50);
     }
     else
     {
-        check(err != NULL);
+        check_ptr(err, !=, NULL);
         fprintf(stderr, "WARNING: [%s] unable to preallocate file (full): %s (%d)\n", __FUNCTION__, err->message, err->code);
         tr_error_clear(&err);
     }
@@ -1226,13 +1235,13 @@ static int test_file_preallocate(void)
 
     if (tr_sys_file_preallocate(fd, 500 * 1024 * 1024, TR_SYS_FILE_PREALLOC_SPARSE, &err))
     {
-        check(err == NULL);
+        check_ptr(err, ==, NULL);
         tr_sys_file_get_info(fd, &info, NULL);
-        check_uint_eq(500 * 1024 * 1024, info.size);
+        check_uint(info.size, ==, 500 * 1024 * 1024);
     }
     else
     {
-        check(err != NULL);
+        check_ptr(err, !=, NULL);
         fprintf(stderr, "WARNING: [%s] unable to preallocate file (sparse): %s (%d)\n", __FUNCTION__, err->message, err->code);
         tr_error_clear(&err);
     }
@@ -1262,17 +1271,21 @@ static int test_file_map(void)
     fd = tr_sys_file_open(path1, TR_SYS_FILE_READ | TR_SYS_FILE_WRITE, 0600, NULL);
 
     view = tr_sys_file_map_for_reading(fd, 0, 4, &err);
-    check(view != NULL);
-    check(err == NULL);
+    check_ptr(view, !=, NULL);
+    check_ptr(err, ==, NULL);
 
-    check_int_eq(0, memcmp(view, "test", 4));
+    check_mem(view, ==, "test", 4);
+
+#ifdef HAVE_UNIFIED_BUFFER_CACHE
 
     tr_sys_file_write_at(fd, "E", 1, 1, NULL, NULL);
 
-    check_int_eq(0, memcmp(view, "tEst", 4));
+    check_mem(view, ==, "tEst", 4);
+
+#endif
 
     check(tr_sys_file_unmap(view, 4, &err));
-    check(err == NULL);
+    check_ptr(err, ==, NULL);
 
     tr_sys_file_close(fd, NULL);
 
@@ -1298,79 +1311,79 @@ static int test_file_utilities(void)
 
     fd = tr_sys_file_open(path1, TR_SYS_FILE_READ, 0, NULL);
 
-    check(tr_sys_file_read_line(fd, buffer, sizeof(buffer) / sizeof(*buffer), &err));
-    check(err == NULL);
-    check_streq("a", buffer);
-    check(tr_sys_file_read_line(fd, buffer, sizeof(buffer) / sizeof(*buffer), &err));
-    check(err == NULL);
-    check_streq("bc", buffer);
-    check(tr_sys_file_read_line(fd, buffer, sizeof(buffer) / sizeof(*buffer), &err));
-    check(err == NULL);
-    check_streq("def", buffer);
-    check(tr_sys_file_read_line(fd, buffer, sizeof(buffer) / sizeof(*buffer), &err));
-    check(err == NULL);
-    check_streq("ghij", buffer);
-    check(tr_sys_file_read_line(fd, buffer, sizeof(buffer) / sizeof(*buffer), &err));
-    check(err == NULL);
-    check_streq("", buffer);
-    check(tr_sys_file_read_line(fd, buffer, sizeof(buffer) / sizeof(*buffer), &err));
-    check(err == NULL);
-    check_streq("", buffer);
+    check(tr_sys_file_read_line(fd, buffer, TR_N_ELEMENTS(buffer), &err));
+    check_ptr(err, ==, NULL);
+    check_str(buffer, ==, "a");
+    check(tr_sys_file_read_line(fd, buffer, TR_N_ELEMENTS(buffer), &err));
+    check_ptr(err, ==, NULL);
+    check_str(buffer, ==, "bc");
+    check(tr_sys_file_read_line(fd, buffer, TR_N_ELEMENTS(buffer), &err));
+    check_ptr(err, ==, NULL);
+    check_str(buffer, ==, "def");
+    check(tr_sys_file_read_line(fd, buffer, TR_N_ELEMENTS(buffer), &err));
+    check_ptr(err, ==, NULL);
+    check_str(buffer, ==, "ghij");
+    check(tr_sys_file_read_line(fd, buffer, TR_N_ELEMENTS(buffer), &err));
+    check_ptr(err, ==, NULL);
+    check_str(buffer, ==, "");
+    check(tr_sys_file_read_line(fd, buffer, TR_N_ELEMENTS(buffer), &err));
+    check_ptr(err, ==, NULL);
+    check_str(buffer, ==, "");
     check(tr_sys_file_read_line(fd, buffer, 4, &err));
-    check(err == NULL);
-    check_streq("klmn", buffer);
-    check(tr_sys_file_read_line(fd, buffer, sizeof(buffer) / sizeof(*buffer), &err));
-    check(err == NULL);
-    check_streq("o", buffer);
-    check(!tr_sys_file_read_line(fd, buffer, sizeof(buffer) / sizeof(*buffer), &err));
-    check(err == NULL);
-    check_streq("o", buffer); /* on EOF, buffer stays unchanged */
+    check_ptr(err, ==, NULL);
+    check_str(buffer, ==, "klmn");
+    check(tr_sys_file_read_line(fd, buffer, TR_N_ELEMENTS(buffer), &err));
+    check_ptr(err, ==, NULL);
+    check_str(buffer, ==, "o");
+    check(!tr_sys_file_read_line(fd, buffer, TR_N_ELEMENTS(buffer), &err));
+    check_ptr(err, ==, NULL);
+    check_str(buffer, ==, "o"); /* on EOF, buffer stays unchanged */
 
     tr_sys_file_close(fd, NULL);
 
     fd = tr_sys_file_open(path1, TR_SYS_FILE_READ | TR_SYS_FILE_WRITE | TR_SYS_FILE_TRUNCATE, 0, NULL);
 
     check(tr_sys_file_write_line(fd, "p", &err));
-    check(err == NULL);
+    check_ptr(err, ==, NULL);
     check(tr_sys_file_write_line(fd, "", &err));
-    check(err == NULL);
+    check_ptr(err, ==, NULL);
     check(tr_sys_file_write_line(fd, "qr", &err));
-    check(err == NULL);
+    check_ptr(err, ==, NULL);
     check(tr_sys_file_write_fmt(fd, "s%cu\r\n", &err, 't'));
-    check(err == NULL);
+    check_ptr(err, ==, NULL);
     check(tr_sys_file_write_line(fd, "", &err));
-    check(err == NULL);
+    check_ptr(err, ==, NULL);
     check(tr_sys_file_write_line(fd, "", &err));
-    check(err == NULL);
+    check_ptr(err, ==, NULL);
     check(tr_sys_file_write_fmt(fd, "v%sy%d", &err, "wx", 2));
-    check(err == NULL);
+    check_ptr(err, ==, NULL);
 
     tr_sys_file_seek(fd, 0, TR_SEEK_SET, NULL, NULL);
 
-    check(tr_sys_file_read_line(fd, buffer, sizeof(buffer) / sizeof(*buffer), &err));
-    check(err == NULL);
-    check_streq("p", buffer);
-    check(tr_sys_file_read_line(fd, buffer, sizeof(buffer) / sizeof(*buffer), &err));
-    check(err == NULL);
-    check_streq("", buffer);
-    check(tr_sys_file_read_line(fd, buffer, sizeof(buffer) / sizeof(*buffer), &err));
-    check(err == NULL);
-    check_streq("qr", buffer);
-    check(tr_sys_file_read_line(fd, buffer, sizeof(buffer) / sizeof(*buffer), &err));
-    check(err == NULL);
-    check_streq("stu", buffer);
-    check(tr_sys_file_read_line(fd, buffer, sizeof(buffer) / sizeof(*buffer), &err));
-    check(err == NULL);
-    check_streq("", buffer);
-    check(tr_sys_file_read_line(fd, buffer, sizeof(buffer) / sizeof(*buffer), &err));
-    check(err == NULL);
-    check_streq("", buffer);
-    check(tr_sys_file_read_line(fd, buffer, sizeof(buffer) / sizeof(*buffer), &err));
-    check(err == NULL);
-    check_streq("vwxy2", buffer);
-    check(!tr_sys_file_read_line(fd, buffer, sizeof(buffer) / sizeof(*buffer), &err));
-    check(err == NULL);
-    check_streq("vwxy2", buffer); /* on EOF, buffer stays unchanged */
+    check(tr_sys_file_read_line(fd, buffer, TR_N_ELEMENTS(buffer), &err));
+    check_ptr(err, ==, NULL);
+    check_str(buffer, ==, "p");
+    check(tr_sys_file_read_line(fd, buffer, TR_N_ELEMENTS(buffer), &err));
+    check_ptr(err, ==, NULL);
+    check_str(buffer, ==, "");
+    check(tr_sys_file_read_line(fd, buffer, TR_N_ELEMENTS(buffer), &err));
+    check_ptr(err, ==, NULL);
+    check_str(buffer, ==, "qr");
+    check(tr_sys_file_read_line(fd, buffer, TR_N_ELEMENTS(buffer), &err));
+    check_ptr(err, ==, NULL);
+    check_str(buffer, ==, "stu");
+    check(tr_sys_file_read_line(fd, buffer, TR_N_ELEMENTS(buffer), &err));
+    check_ptr(err, ==, NULL);
+    check_str(buffer, ==, "");
+    check(tr_sys_file_read_line(fd, buffer, TR_N_ELEMENTS(buffer), &err));
+    check_ptr(err, ==, NULL);
+    check_str(buffer, ==, "");
+    check(tr_sys_file_read_line(fd, buffer, TR_N_ELEMENTS(buffer), &err));
+    check_ptr(err, ==, NULL);
+    check_str(buffer, ==, "vwxy2");
+    check(!tr_sys_file_read_line(fd, buffer, TR_N_ELEMENTS(buffer), &err));
+    check_ptr(err, ==, NULL);
+    check_str(buffer, ==, "vwxy2"); /* on EOF, buffer stays unchanged */
 
     tr_sys_file_close(fd, NULL);
 
@@ -1394,7 +1407,7 @@ static int test_dir_create(void)
 
     /* Can create directory which has parent */
     check(tr_sys_dir_create(path1, 0, 0700, &err));
-    check(err == NULL);
+    check_ptr(err, ==, NULL);
     check(tr_sys_path_exists(path1, NULL));
     check(validate_permissions(path1, 0700));
 
@@ -1403,23 +1416,23 @@ static int test_dir_create(void)
 
     /* Can't create directory where file already exists */
     check(!tr_sys_dir_create(path1, 0, 0700, &err));
-    check(err != NULL);
+    check_ptr(err, !=, NULL);
     tr_error_clear(&err);
     check(!tr_sys_dir_create(path1, TR_SYS_DIR_CREATE_PARENTS, 0700, &err));
-    check(err != NULL);
+    check_ptr(err, !=, NULL);
     tr_error_clear(&err);
 
     tr_sys_path_remove(path1, NULL);
 
     /* Can't create directory which has no parent */
     check(!tr_sys_dir_create(path2, 0, 0700, &err));
-    check(err != NULL);
+    check_ptr(err, !=, NULL);
     check(!tr_sys_path_exists(path2, NULL));
     tr_error_clear(&err);
 
     /* Can create directory with parent directories */
     check(tr_sys_dir_create(path2, TR_SYS_DIR_CREATE_PARENTS, 0751, &err));
-    check(err == NULL);
+    check_ptr(err, ==, NULL);
     check(tr_sys_path_exists(path1, NULL));
     check(tr_sys_path_exists(path2, NULL));
     check(validate_permissions(path1, 0751));
@@ -1427,9 +1440,9 @@ static int test_dir_create(void)
 
     /* Can create existing directory (no-op) */
     check(tr_sys_dir_create(path1, 0, 0700, &err));
-    check(err == NULL);
+    check_ptr(err, ==, NULL);
     check(tr_sys_dir_create(path1, TR_SYS_DIR_CREATE_PARENTS, 0700, &err));
-    check(err == NULL);
+    check_ptr(err, ==, NULL);
 
     tr_sys_path_remove(path2, NULL);
     tr_sys_path_remove(path1, NULL);
@@ -1450,12 +1463,12 @@ static int test_dir_read_impl(char const* path, bool* have1, bool* have2)
     *have1 = *have2 = false;
 
     dd = tr_sys_dir_open(path, &err);
-    check(dd != TR_BAD_SYS_DIR);
-    check(err == NULL);
+    check_ptr(dd, !=, TR_BAD_SYS_DIR);
+    check_ptr(err, ==, NULL);
 
     while ((name = tr_sys_dir_read_name(dd, &err)) != NULL)
     {
-        check(err == NULL);
+        check_ptr(err, ==, NULL);
 
         if (strcmp(name, ".") == 0 || strcmp(name, "..") == 0)
         {
@@ -1476,10 +1489,10 @@ static int test_dir_read_impl(char const* path, bool* have1, bool* have2)
         }
     }
 
-    check(err == NULL);
+    check_ptr(err, ==, NULL);
 
     check(tr_sys_dir_close(dd, &err));
-    check(err == NULL);
+    check_ptr(err, ==, NULL);
 
     return 0;
 }
@@ -1561,17 +1574,13 @@ int main(void)
         test_dir_create,
         test_dir_read
     };
-    int ret;
 
     /* init the session */
     session = libttest_session_init(NULL);
 
-    ret = runTests(tests, NUM_TESTS(tests));
+    int ret = runTests(tests, NUM_TESTS(tests));
 
-    if (ret == 0)
-    {
-        libttest_session_close(session);
-    }
+    libttest_session_close(session);
 
     return ret;
 }

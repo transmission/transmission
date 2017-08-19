@@ -161,11 +161,11 @@ typedef enum
                     if (!removedIndexesForParents)
                         removedIndexesForParents = [NSMutableDictionary dictionary];
 
-                    NSMutableIndexSet * removedIndexes = [removedIndexesForParents objectForKey: parent];
+                    NSMutableIndexSet * removedIndexes = removedIndexesForParents[parent];
                     if (!removedIndexes)
                     {
                         removedIndexes = [NSMutableIndexSet indexSetWithIndex: previousIndex];
-                        [removedIndexesForParents setObject: removedIndexes forKey: parent];
+                        removedIndexesForParents[parent] = removedIndexes;
                     }
                     else
                     {
@@ -233,13 +233,13 @@ typedef enum
 
 - (id) outlineView: (NSOutlineView *) outlineView child: (NSInteger) index ofItem: (id) item
 {
-    return [(item ? [(FileListNode *)item children] : fFileList) objectAtIndex: index];
+    return (item ? [(FileListNode *)item children] : fFileList)[index];
 }
 
 - (id) outlineView: (NSOutlineView *) outlineView objectValueForTableColumn: (NSTableColumn *) tableColumn byItem: (id) item
 {
     if ([[tableColumn identifier] isEqualToString: @"Check"])
-        return [NSNumber numberWithInteger: [fTorrent checkForFiles: [(FileListNode *)item indexes]]];
+        return @([fTorrent checkForFiles: [(FileListNode *)item indexes]]);
     else
         return item;
 }

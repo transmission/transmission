@@ -11,7 +11,7 @@ unix: INSTALLS += man
 man.path = /share/man/man1/
 man.files = transmission-qt.1
 
-CONFIG += qt thread debug link_pkgconfig c++11 warn_on
+CONFIG += qt thread link_pkgconfig c++11 warn_on
 QT += network dbus
 win32:QT += winextras
 PKGCONFIG = fontconfig libcurl openssl libevent
@@ -49,12 +49,17 @@ TRANSLATIONS += translations/transmission_de.ts \
                 translations/transmission_hu.ts \
                 translations/transmission_id.ts \
                 translations/transmission_it_IT.ts \
+                translations/transmission_ka.ts \
                 translations/transmission_kk.ts \
                 translations/transmission_ko.ts \
                 translations/transmission_lt.ts \
-                translations/transmission_pl_PL.ts \
+                translations/transmission_nl.ts \
+                translations/transmission_pl.ts \
                 translations/transmission_pt_BR.ts \
+                translations/transmission_pt_PT.ts \
                 translations/transmission_ru.ts \
+                translations/transmission_sv.ts \
+                translations/transmission_tr.ts \
                 translations/transmission_uk.ts \
                 translations/transmission_zh_CN.ts
 
