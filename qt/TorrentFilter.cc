@@ -15,6 +15,8 @@
 #include "TorrentModel.h"
 #include "Utils.h"
 
+const QString TorrentFilter::TRACKERLESS_FILTER = tr("(trackerless)");
+
 TorrentFilter::TorrentFilter(Prefs const& prefs) :
     myPrefs(prefs)
 {
@@ -218,7 +220,14 @@ bool TorrentFilter::lessThan(QModelIndex const& left, QModelIndex const& right) 
 
 bool TorrentFilter::trackerFilterAcceptsTorrent(Torrent const* tor, QString const& tracker) const
 {
-    return tracker.isEmpty() || tor->hasTrackerSubstring(tracker);
+    if (tracker == TRACKERLESS_FILTER)
+    {
+        return tor->hosts().empty();
+    }
+    else
+    {
+        return tracker.isEmpty() || tor->hasTrackerSubstring(tracker);
+    }
 }
 
 bool TorrentFilter::activityFilterAcceptsTorrent(Torrent const* tor, FilterMode const& m) const

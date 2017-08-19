@@ -35,6 +35,8 @@ public:
     int hiddenRowCount() const;
 
     void countTorrentsPerMode(int* setmeCounts) const;
+    
+    static const QString TRACKERLESS_FILTER;
 
 protected:
     // QSortFilterProxyModel

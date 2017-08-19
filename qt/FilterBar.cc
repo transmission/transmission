@@ -143,10 +143,16 @@ void FilterBar::refreshTrackers()
         Torrent const* tor = index.data(TorrentModel::TorrentRole).value<Torrent const*>();
         QSet<QString> torrentNames;
 
-        for (QString const& host : tor->hosts())
+        auto hosts = tor->hosts();
+        for (QString const& host : hosts)
         {
             newHosts.insert(host);
             torrentNames.insert(readableHostName(host));
+        }
+        if (hosts.empty())
+        {
+            newHosts.insert(TorrentFilter::TRACKERLESS_FILTER);
+            torrentNames.insert(TorrentFilter::TRACKERLESS_FILTER);
         }
 
         for (QString const& name : torrentNames)
