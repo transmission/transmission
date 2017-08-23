@@ -52,7 +52,7 @@
             [monochromeFilter setValue: fNoiseImage forKey: @"inputImage"];
             CIColor * monoFilterColor = [CIColor colorWithRed: 1.0 green: 1.0 blue: 1.0];
             [monochromeFilter setValue: monoFilterColor forKey: @"inputColor"];
-            fNoiseImage = [[monochromeFilter valueForKey:@"outputImage"] retain];
+            fNoiseImage = [monochromeFilter valueForKey:@"outputImage"];
         }
         else
             fNoiseImage = nil;
@@ -66,9 +66,6 @@
 - (void) dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver: self];
-    [fNoiseImage release];
-    [fGradient release];
-    [super dealloc];
 }
 
 - (BOOL) mouseDownCanMoveWindow

@@ -29,10 +29,10 @@
 {
     tr_tracker_stat fStat;
 
-    Torrent * fTorrent;
+    Torrent * __weak fTorrent;
 }
 
-@property (nonatomic, readonly) Torrent * torrent;
+@property (nonatomic, weak, readonly) Torrent * torrent;
 
 - (id) initWithTrackerStat: (tr_tracker_stat *) stat torrent: (Torrent *) torrent;
 

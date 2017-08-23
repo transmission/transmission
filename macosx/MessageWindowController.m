@@ -110,8 +110,8 @@
     filterButtonFrame.origin.x -= NSWidth(clearButtonFrame) - oldClearButtonWidth;
     [fFilterField setFrame: filterButtonFrame];
 
-    fAttributes = [[[[[fMessageTable tableColumnWithIdentifier: @"Message"] dataCell] attributedStringValue]
-                    attributesAtIndex: 0 effectiveRange: NULL] retain];
+    fAttributes = [[[[fMessageTable tableColumnWithIdentifier: @"Message"] dataCell] attributedStringValue]
+                    attributesAtIndex: 0 effectiveRange: NULL];
 
     //select proper level in popup button
     switch ([[NSUserDefaults standardUserDefaults] integerForKey: @"MessageLevel"])
@@ -139,24 +139,14 @@
 - (void) dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver: self];
-
     [fTimer invalidate];
-    [fTimer release];
-    [fLock release];
-
-    [fMessages release];
-    [fDisplayedMessages release];
-
-    [fAttributes release];
-
-    [super dealloc];
 }
 
 - (void) windowDidBecomeKey: (NSNotification *) notification
 {
     if (!fTimer)
     {
-        fTimer = [[NSTimer scheduledTimerWithTimeInterval: UPDATE_SECONDS target: self selector: @selector(updateLog:) userInfo: nil repeats: YES] retain];
+        fTimer = [NSTimer scheduledTimerWithTimeInterval: UPDATE_SECONDS target: self selector: @selector(updateLog:) userInfo: nil repeats: YES];
         [self updateLog: nil];
     }
 }
@@ -164,7 +154,6 @@
 - (void) windowWillClose: (id)sender
 {
     [fTimer invalidate];
-    [fTimer release];
     fTimer = nil;
 }
 
@@ -179,8 +168,7 @@
 - (void) window: (NSWindow *) window didDecodeRestorableState: (NSCoder *) coder
 {
     [fTimer invalidate];
-    [fTimer release];
-    fTimer = [[NSTimer scheduledTimerWithTimeInterval: UPDATE_SECONDS target: self selector: @selector(updateLog:) userInfo: nil repeats: YES] retain];
+    fTimer = [NSTimer scheduledTimerWithTimeInterval: UPDATE_SECONDS target: self selector: @selector(updateLog:) userInfo: nil repeats: YES];
     [self updateLog: nil];
 }
 
@@ -408,7 +396,6 @@
             NSSortDescriptor * descriptor = [NSSortDescriptor sortDescriptorWithKey: @"Index" ascending: YES];
             NSArray * descriptors = [[NSArray alloc] initWithObjects: descriptor, nil];
             NSArray * sortedMessages = [fDisplayedMessages sortedArrayUsingDescriptors: descriptors];
-            [descriptors release];
 
             //create the text to output
             NSMutableArray * messageStrings = [NSMutableArray arrayWithCapacity: [sortedMessages count]];
@@ -428,7 +415,6 @@
                 [alert setAlertStyle: NSWarningAlertStyle];
 
                 [alert runModal];
-                [alert release];
             }
         }
     }];

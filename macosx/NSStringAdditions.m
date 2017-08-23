@@ -79,7 +79,6 @@
     [fileSizeFormatter setIncludesUnit: !partialUnitsSame];
     NSString * partialString = [fileSizeFormatter stringFromByteCount: partialSize];
 
-    [fileSizeFormatter release];
 
     return [NSString stringWithFormat: NSLocalizedString(@"%@ of %@", "file size string"), partialString, fullString];
 }
@@ -261,7 +260,6 @@
     [numberFormatter setMaximumFractionDigits: decimals];
 
     NSString * fileSizeString = [numberFormatter stringFromNumber: @(convertedSize)];
-    [numberFormatter release];
 
     if (!notAllowedUnit || ![unit isEqualToString: notAllowedUnit])
         fileSizeString = [fileSizeString stringByAppendingFormat: @" %@", unit];

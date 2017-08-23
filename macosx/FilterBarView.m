@@ -38,11 +38,6 @@
     return self;
 }
 
-- (void) dealloc
-{
-    [fGradient release];
-    [super dealloc];
-}
 
 - (BOOL) mouseDownCanMoveWindow
 {

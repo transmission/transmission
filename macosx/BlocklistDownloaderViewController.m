@@ -104,7 +104,6 @@ BlocklistDownloaderViewController * fBLViewController = nil;
     [fStatusWindow orderOut: self];
 
     fBLViewController = nil;
-    [self release];
 }
 
 - (void) setFailed: (NSString *) error
@@ -112,7 +111,7 @@ BlocklistDownloaderViewController * fBLViewController = nil;
     [NSApp endSheet: fStatusWindow];
     [fStatusWindow orderOut: self];
 
-    NSAlert * alert = [[[NSAlert alloc] init] autorelease];
+    NSAlert * alert = [[NSAlert alloc] init];
     [alert addButtonWithTitle: NSLocalizedString(@"OK", "Blocklist -> button")];
     [alert setMessageText: NSLocalizedString(@"Download of the blocklist failed.", "Blocklist -> message")];
     [alert setAlertStyle: NSWarningAlertStyle];
@@ -153,7 +152,6 @@ BlocklistDownloaderViewController * fBLViewController = nil;
     [[alert window] orderOut: self];
 
     fBLViewController = nil;
-    [self release];
 }
 
 @end
