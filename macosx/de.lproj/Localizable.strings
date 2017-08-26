@@ -245,7 +245,7 @@
 /* Preferences -> toolbar item title */
 "Bandwidth" = "Durchsatz";
 
-/* Growl notification description */
+/* notification description */
 "Bandwidth settings changed" = "Bandbreiteneinstellung verändert";
 
 /* Groups -> Name */
@@ -280,12 +280,6 @@
 
 /* View menu -> Quick Look */
 "Close Quick Look" = "Übersicht schließen";
-
-/* Prefs -> Notifications */
-"Configure In Growl" = "In Growl konfigurieren";
-
-/* Prefs -> Notifications */
-"Configure In System Preferences" = "In Systemeinstellungen konfigurieren";
 
 /* Blocklist -> message */
 "Connecting to site" = "Mit Server verbinden ";
@@ -939,10 +933,10 @@
    Status Bar -> speed tooltip */
 "Speed Limit" = "Begrenzte Übertragungsgeschwindigkeit";
 
-/* Growl notification title */
+/* notification title */
 "Speed Limit Auto Disabled" = "Die Begrenzte Übertragungsgeschwindigkeit wurde automatisch abgeschaltet.";
 
-/* Growl notification title */
+/* notification title */
 "Speed Limit Auto Enabled" = "Die Begrenzte Übertragungsgeschwindigkeit wurde automatisch eingeschaltet.";
 
 /* Main window -> 2nd bottom left button (turtle) tooltip */

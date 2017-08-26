@@ -245,7 +245,7 @@
 /* Preferences -> toolbar item title */
 "Bandwidth" = "Bant Genişliği";
 
-/* Growl notification description */
+/* notification description */
 "Bandwidth settings changed" = "Bant genişliği ayarları değiştirildi";
 
 /* Groups -> Name */
@@ -280,12 +280,6 @@
 
 /* View menu -> Quick Look */
 "Close Quick Look" = "Göz At'ı kapat";
-
-/* Prefs -> Notifications */
-"Configure In Growl" = "Growl'da Yapılandır";
-
-/* Prefs -> Notifications */
-"Configure In System Preferences" = "Sistem Tercihlerinde Yapılandır";
 
 /* Blocklist -> message */
 "Connecting to site" = "Alana bağlanıyor";
@@ -939,10 +933,10 @@
    Status Bar -> speed tooltip */
 "Speed Limit" = "Hız Limiti";
 
-/* Growl notification title */
+/* notification title */
 "Speed Limit Auto Disabled" = "Hız Limiti Etkin Değil";
 
-/* Growl notification title */
+/* notification title */
 "Speed Limit Auto Enabled" = "Hız Limiti Etkin";
 
 /* Main window -> 2nd bottom left button (turtle) tooltip */
