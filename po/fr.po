@@ -1627,7 +1627,7 @@ msgstr "_Empêcher la mise en veille lorsque des torrents sont actifs"
 
 #: ../gtk/tr-prefs.c:371
 msgid "Show Transmission icon in the _notification area"
-msgstr "Afficher l'icône de Transmission dans le zone de _notification"
+msgstr "Afficher l'icône de Transmission dans la zone de _notification"
 
 #: ../gtk/tr-prefs.c:376
 msgid "Notification"
