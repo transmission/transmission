@@ -218,7 +218,7 @@ static bool create_path(char const* path_in, int permissions, tr_error** error)
     }
 
     /* Go one level down on each iteration and attempt to create */
-    for (; pp < path_end; pp += strlen(pp))
+    for (pp = pp == NULL ? p + strlen(p) : pp; pp < path_end; pp += strlen(pp))
     {
         *pp = TR_PATH_DELIMITER;
 
