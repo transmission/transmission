@@ -617,7 +617,7 @@ typedef enum
 
     __block NSUInteger retIndex = NSNotFound;
 
-    [list enumerateObjectsAtIndexes: indexes options: NSEnumerationConcurrent usingBlock: ^(id checkNode, NSUInteger index, BOOL * stop) {
+    [list enumerateObjectsAtIndexes: indexes options: NSEnumerationConcurrent usingBlock: ^(FileListNode * checkNode, NSUInteger index, BOOL * stop) {
         if ([[checkNode indexes] containsIndex: [[node indexes] firstIndex]])
         {
             if (![checkNode isFolder])
