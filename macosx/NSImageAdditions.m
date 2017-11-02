@@ -37,7 +37,7 @@
 
     [coloredImage unlockFocus];
 
-    return [coloredImage autorelease];
+    return coloredImage;
 }
 
 @end

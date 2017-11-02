@@ -61,7 +61,7 @@ tr_session * fLib = NULL;
 {
     [self updateStats];
 
-    fTimer = [[NSTimer scheduledTimerWithTimeInterval: UPDATE_SECONDS target: self selector: @selector(updateStats) userInfo: nil repeats: YES] retain];
+    fTimer = [NSTimer scheduledTimerWithTimeInterval: UPDATE_SECONDS target: self selector: @selector(updateStats) userInfo: nil repeats: YES];
     [[NSRunLoop currentRunLoop] addTimer: fTimer forMode: NSModalPanelRunLoopMode];
     [[NSRunLoop currentRunLoop] addTimer: fTimer forMode: NSEventTrackingRunLoopMode];
 
@@ -117,10 +117,7 @@ tr_session * fLib = NULL;
 - (void) windowWillClose: (id) sender
 {
     [fTimer invalidate];
-    [fTimer release];
     fTimer = nil;
-
-    [fStatsWindowInstance autorelease];
     fStatsWindowInstance = nil;
 }
 
@@ -180,7 +177,6 @@ tr_session * fLib = NULL;
     [fDownloadedAllField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%@ total", "stats total"), [NSString stringForFileSize: statsAll.downloadedBytes]]];
     [fDownloadedAllField setToolTip: [byteFormatter stringFromByteCount: statsAll.downloadedBytes]];
 
-    [byteFormatter release];
 
     [fRatioField setStringValue: [NSString stringForRatio: statsSession.ratio]];
 

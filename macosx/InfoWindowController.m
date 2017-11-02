@@ -139,17 +139,6 @@ typedef enum
 
     if ([fViewController respondsToSelector: @selector(saveViewSize)])
         [fViewController saveViewSize];
-
-    [fGeneralViewController release];
-    [fActivityViewController release];
-    [fTrackersViewController release];
-    [fPeersViewController release];
-    [fFileViewController release];
-    [fOptionsViewController release];
-
-    [fTorrents release];
-
-    [super dealloc];
 }
 
 - (void) setInfoForTorrents: (NSArray *) torrents
@@ -157,8 +146,7 @@ typedef enum
     if (fTorrents && [fTorrents isEqualToArray: torrents])
         return;
 
-    [fTorrents release];
-    fTorrents = [torrents retain];
+    fTorrents = torrents;
 
     [self resetInfo];
 }
@@ -456,7 +444,6 @@ typedef enum
                 NSByteCountFormatter * formatter = [[NSByteCountFormatter alloc] init];
                 [formatter setAllowedUnits: NSByteCountFormatterUseBytes];
                 [fBasicInfoField setToolTip: [formatter stringFromByteCount: size]];
-                [formatter release];
             }
             else
             {
@@ -508,7 +495,6 @@ typedef enum
             NSByteCountFormatter * formatter = [[NSByteCountFormatter alloc] init];
             [formatter setAllowedUnits: NSByteCountFormatterUseBytes];
             [fBasicInfoField setToolTip: [formatter stringFromByteCount: [torrent size]]];
-            [formatter release];
         }
         else
         {

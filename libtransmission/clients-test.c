@@ -48,6 +48,9 @@ int main(void)
     /* Folx */
     TEST_CLIENT("-FL51FF-", "Folx 5.x"); /* Folx v5.2.1.13690 */
 
+    /* Baidu Netdisk */
+    TEST_CLIENT("-BN0001-", "Baidu Netdisk"); /* Baidu Netdisk Client v5.5.4 */
+
     /* gobbledygook */
     TEST_CLIENT("-IIO\x10\x2D\x04-", "-IIO%10-%04-");
     TEST_CLIENT("-I\05O\x08\x03\x01-", "-I%05O%08%03%01-");

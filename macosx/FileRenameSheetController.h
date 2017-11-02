@@ -18,19 +18,19 @@
     void (^_completionHandler)(BOOL);
     NSString * _originalName;
 
-    IBOutlet NSTextField * _labelField;
-    IBOutlet NSTextField * _inputField;
-    IBOutlet NSButton * _renameButton;
-    IBOutlet NSButton * _cancelButton;
+    IBOutlet NSTextField * __weak _labelField;
+    IBOutlet NSTextField * __weak _inputField;
+    IBOutlet NSButton * __weak _renameButton;
+    IBOutlet NSButton * __weak _cancelButton;
 }
 
 + (void) presentSheetForTorrent: (Torrent *) torrent modalForWindow: (NSWindow *) window completionHandler: (void (^)(BOOL didRename)) completionHandler;
 + (void) presentSheetForFileListNode: (FileListNode *) node modalForWindow: (NSWindow *) window completionHandler: (void (^)(BOOL didRename)) completionHandler;
 
-@property (assign) IBOutlet NSTextField * labelField;
-@property (assign) IBOutlet NSTextField * inputField;
-@property (assign) IBOutlet NSButton * renameButton;
-@property (assign) IBOutlet NSButton * cancelButton;
+@property (weak) IBOutlet NSTextField * labelField;
+@property (weak) IBOutlet NSTextField * inputField;
+@property (weak) IBOutlet NSButton * renameButton;
+@property (weak) IBOutlet NSButton * cancelButton;
 
 - (IBAction) rename: (id) sender;
 - (IBAction) cancelRename: (id) sender;

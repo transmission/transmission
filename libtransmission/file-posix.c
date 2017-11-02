@@ -138,81 +138,117 @@ static void set_file_for_single_pass(tr_sys_file_t handle)
 
 #ifndef HAVE_MKDIRP
 
+static bool create_path_require_dir(char const* path, tr_error** error)
+{
+    struct stat sb;
+
+    if (stat(path, &sb) == -1)
+    {
+        set_system_error(error, errno);
+        return false;
+    }
+
+    if ((sb.st_mode & S_IFMT) != S_IFDIR)
+    {
+        tr_error_set(error, ENOTDIR, _("File \"%s\" is in the way"), path);
+        return false;
+    }
+
+    return true;
+}
+
 static bool create_path(char const* path_in, int permissions, tr_error** error)
 {
-    char* p;
-    char* pp;
-    bool done;
-    int tmperr;
-    int rv;
-    struct stat sb;
-    char* path;
-
     /* make a temporary copy of path */
-    path = tr_strdup(path_in);
+    char* path = tr_strdup(path_in);
 
     /* walk past the root */
-    p = path;
+    char* p = path;
 
     while (*p == TR_PATH_DELIMITER)
     {
         ++p;
     }
 
-    pp = p;
-    done = false;
+    char* path_end = p + strlen(p);
 
-    while ((p = strchr(pp, TR_PATH_DELIMITER)) || (p = strchr(pp, '\0')))
+    while (path_end > path && *path_end == TR_PATH_DELIMITER)
     {
-        if (!*p)
-        {
-            done = true;
-        }
-        else
-        {
-            *p = '\0';
-        }
+        --path_end;
+    }
 
-        tmperr = errno;
-        rv = stat(path, &sb);
-        errno = tmperr;
+    char* pp;
+    bool ret = false;
+    tr_error* my_error = NULL;
 
-        if (rv)
-        {
-            tr_error* my_error = NULL;
+    /* Go one level up on each iteration and attempt to create */
+    for (pp = path_end; pp != NULL; pp = strrchr(p, TR_PATH_DELIMITER))
+    {
+        *pp = '\0';
 
-            /* Folder doesn't exist yet */
-            if (!tr_sys_dir_create(path, 0, permissions, &my_error))
-            {
-                tr_logAddError(_("Couldn't create \"%1$s\": %2$s"), path, my_error->message);
-                tr_free(path);
-                tr_error_propagate(error, &my_error);
-                return false;
-            }
-        }
-        else if ((sb.st_mode & S_IFMT) != S_IFDIR)
-        {
-            /* Node exists but isn't a folder */
-            char* const buf = tr_strdup_printf(_("File \"%s\" is in the way"), path);
-            tr_logAddError(_("Couldn't create \"%1$s\": %2$s"), path_in, buf);
-            tr_free(buf);
-            tr_free(path);
-            set_system_error(error, ENOTDIR);
-            return false;
-        }
+        ret = mkdir(path, permissions) != -1;
 
-        if (done)
+        if (ret)
         {
             break;
         }
 
-        *p = TR_PATH_DELIMITER;
-        p++;
-        pp = p;
+        if (errno == EEXIST)
+        {
+            ret = create_path_require_dir(path, &my_error);
+
+            if (ret)
+            {
+                break;
+            }
+
+            goto failure;
+        }
+
+        if (errno != ENOENT)
+        {
+            set_system_error(&my_error, errno);
+            goto failure;
+        }
     }
 
+    if (ret && pp == path_end)
+    {
+        goto cleanup;
+    }
+
+    /* Go one level down on each iteration and attempt to create */
+    for (pp = pp == NULL ? p + strlen(p) : pp; pp < path_end; pp += strlen(pp))
+    {
+        *pp = TR_PATH_DELIMITER;
+
+        if (mkdir(path, permissions) == -1)
+        {
+            break;
+        }
+    }
+
+    ret = create_path_require_dir(path, &my_error);
+
+    if (ret)
+    {
+        goto cleanup;
+    }
+
+failure:
+
+    TR_ASSERT(!ret);
+    TR_ASSERT(my_error != NULL);
+
+    tr_logAddError(_("Couldn't create \"%1$s\": %2$s"), path, my_error->message);
+    tr_error_propagate(error, &my_error);
+
+cleanup:
+
+    TR_ASSERT(my_error == NULL);
+
     tr_free(path);
-    return true;
+    return ret;
 }
 
 #endif
