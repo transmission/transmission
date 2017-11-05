@@ -532,10 +532,6 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
         {
             three_digits(buf, buflen, "pbTorrent", id + 3);
         }
-        else if (strncmp(chid + 1, "TT", 2) == 0)
-        {
-            three_digits(buf, buflen, "TuoTu", id + 3);
-        }
         else if (strncmp(chid + 1, "qB", 2) == 0)
         {
             three_digits(buf, buflen, "qBittorrent", id + 3);
