@@ -46,11 +46,6 @@
     return self;
 }
 
-- (void) dealloc
-{
-    [fAttributes release];
-    [super dealloc];
-}
 
 - (BOOL) setRatesWithDownload: (CGFloat) downloadRate upload: (CGFloat) uploadRate
 {
@@ -111,7 +106,6 @@
         fAttributes[NSForegroundColorAttributeName] = [NSColor whiteColor];
         fAttributes[NSShadowAttributeName] = stringShadow;
 
-        [stringShadow release];
     }
 
     NSRect badgeRect;

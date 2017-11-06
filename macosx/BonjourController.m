@@ -42,11 +42,6 @@ BonjourController * fDefaultController = nil;
     return fDefaultController != nil;
 }
 
-- (void) dealloc
-{
-    [fService release];
-    [super dealloc];
-}
 
 - (void) startWithPort: (int) port
 {
@@ -65,7 +60,6 @@ BonjourController * fDefaultController = nil;
 - (void) stop
 {
     [fService stop];
-    [fService release];
     fService = nil;
 }
 

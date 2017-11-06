@@ -24,16 +24,10 @@
 
 @implementation GroupToolbarItem
 
-- (void) dealloc
-{
-    [fIdentifiers release];
-    [super dealloc];
-}
 
 - (void) setIdentifiers: (NSArray *) identifiers
 {
-    [fIdentifiers release];
-    fIdentifiers = [identifiers retain];
+    fIdentifiers = identifiers;
 }
 
 - (void) validate
@@ -42,7 +36,7 @@
 
     for (NSInteger i = 0; i < [control segmentCount]; i++)
         [control setEnabled: [[self target] validateToolbarItem:
-            [[[NSToolbarItem alloc] initWithItemIdentifier: fIdentifiers[i]] autorelease]] forSegment: i];
+            [[NSToolbarItem alloc] initWithItemIdentifier: fIdentifiers[i]]] forSegment: i];
 }
 
 - (void) createMenu: (NSArray *) labels
@@ -61,12 +55,9 @@
         [addItem setTag: i];
 
         [menu addItem: addItem];
-        [addItem release];
     }
 
-    [menu release];
     [self setMenuFormRepresentation: menuItem];
-    [menuItem release];
 }
 
 - (NSMenuItem *) menuFormRepresentation
@@ -76,7 +67,7 @@
     const NSInteger count = [(NSSegmentedControl *)[self view] segmentCount];
     for (NSInteger i = 0; i < count; i++)
         [[[menuItem submenu] itemAtIndex: i] setEnabled: [[self target] validateToolbarItem:
-            [[[NSToolbarItem alloc] initWithItemIdentifier: fIdentifiers[i]] autorelease]]];
+            [[NSToolbarItem alloc] initWithItemIdentifier: fIdentifiers[i]]]];
 
     return menuItem;
 }

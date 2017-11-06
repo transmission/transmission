@@ -80,18 +80,9 @@
 - (id) copyWithZone: (NSZone *) zone
 {
     //this object is essentially immutable after initial setup
-    return [self retain];
+    return self;
 }
 
-- (void) dealloc
-{
-    [fName release];
-    [fPath release];
-    [fIndexes release];
-    [fIcon release];
-    [fChildren release];
-    [super dealloc];
-}
 
 - (NSString *) description
 {
@@ -104,8 +95,8 @@
 - (NSImage *) icon
 {
     if (!fIcon)
-        fIcon = [[[NSWorkspace sharedWorkspace] iconForFileType: fIsFolder ? NSFileTypeForHFSTypeCode(kGenericFolderIcon)
-                                                                            : [fName pathExtension]] retain];
+        fIcon = [[NSWorkspace sharedWorkspace] iconForFileType: fIsFolder ? NSFileTypeForHFSTypeCode(kGenericFolderIcon)
+                                                                            : [fName pathExtension]];
     return fIcon;
 }
 
@@ -129,9 +120,7 @@
     {
         if ([oldName isEqualToString: self.name])
         {
-            [fName release];
             fName = [newName copy];
-            [fIcon release];
             fIcon = nil;
             return YES;
         }
@@ -148,8 +137,7 @@
             NSString * oldPathPrefix = [path stringByAppendingPathComponent: oldName];
             NSString * newPathPrefix = [path stringByAppendingPathComponent: newName];
 
-            [fPath autorelease];
-            fPath = [[fPath stringByReplacingCharactersInRange: NSMakeRange(0, [oldPathPrefix length]) withString: newPathPrefix] retain];
+            fPath = [fPath stringByReplacingCharactersInRange: NSMakeRange(0, [oldPathPrefix length]) withString: newPathPrefix];
             return YES;
         }
     }

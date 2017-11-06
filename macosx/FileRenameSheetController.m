@@ -14,8 +14,8 @@ typedef void (^CompletionBlock)(BOOL);
 
 @interface FileRenameSheetController ()
 
-@property (nonatomic, retain) Torrent * torrent;
-@property (nonatomic, retain) FileListNode * node;
+@property (nonatomic, strong) Torrent * torrent;
+@property (nonatomic, strong) FileListNode * node;
 @property (nonatomic, copy) CompletionBlock completionHandler;
 
 @property (nonatomic, copy) NSString * originalName;
@@ -44,7 +44,7 @@ typedef void (^CompletionBlock)(BOOL);
     renamer.torrent = torrent;
     renamer.completionHandler = completionHandler;
 
-    [NSApp beginSheet: [renamer window] modalForWindow: window modalDelegate: self didEndSelector: @selector(sheetDidEnd:returnCode:contextInfo:) contextInfo: renamer];
+    [NSApp beginSheet: [renamer window] modalForWindow: window modalDelegate: self didEndSelector: @selector(sheetDidEnd:returnCode:contextInfo:) contextInfo: (__bridge_retained void *)(renamer)];
 }
 
 + (void) presentSheetForFileListNode: (FileListNode *) node modalForWindow: (NSWindow *) window completionHandler: (void (^)(BOOL didRename)) completionHandler
@@ -58,29 +58,19 @@ typedef void (^CompletionBlock)(BOOL);
     renamer.node = node;
     renamer.completionHandler = completionHandler;
 
-    [NSApp beginSheet: [renamer window] modalForWindow: window modalDelegate: self didEndSelector: @selector(sheetDidEnd:returnCode:contextInfo:) contextInfo: renamer];
+    [NSApp beginSheet: [renamer window] modalForWindow: window modalDelegate: self didEndSelector: @selector(sheetDidEnd:returnCode:contextInfo:) contextInfo: (__bridge_retained void *)(renamer)];
 }
 
 + (void) sheetDidEnd: (NSWindow *) sheet returnCode: (NSInteger) returnCode contextInfo: (void *) contextInfo
 {
-    FileRenameSheetController * renamer = contextInfo;
+    FileRenameSheetController * renamer = (__bridge_transfer FileRenameSheetController *)(contextInfo);
     NSParameterAssert([renamer isKindOfClass:[FileRenameSheetController class]]);
 
     renamer.completionHandler(returnCode == NSOKButton);
 
-    //TODO: retain/release logic needs to be figured out for ARC (when ARC is enabled)
-    [renamer release];
     [sheet orderOut: self];
 }
 
-- (void) dealloc
-{
-    [_torrent release];
-    [_node release];
-    [_completionHandler release];
-    [_originalName release];
-    [super dealloc];
-}
 
 - (void) windowDidLoad
 {

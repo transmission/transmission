@@ -122,7 +122,7 @@
 
         fRPCWhitelistArray = [[fDefaults arrayForKey: @"RPCWhitelist"] mutableCopy];
         if (!fRPCWhitelistArray)
-            fRPCWhitelistArray = [[NSMutableArray arrayWithObject: @"127.0.0.1"] retain];
+            fRPCWhitelistArray = [NSMutableArray arrayWithObject: @"127.0.0.1"];
         [self updateRPCWhitelist];
 
         //reset old Sparkle settings from previous versions
@@ -147,18 +147,10 @@
     [[NSNotificationCenter defaultCenter] removeObserver: self];
 
     [fPortStatusTimer invalidate];
-    [fPortStatusTimer release];
     if (fPortChecker)
     {
         [fPortChecker cancelProbe];
-        [fPortChecker release];
     }
-
-    [fRPCWhitelistArray release];
-
-    [fRPCPassword release];
-
-    [super dealloc];
 }
 
 - (void) awakeFromNib
@@ -174,7 +166,6 @@
     [toolbar setSizeMode: NSToolbarSizeModeRegular];
     [toolbar setSelectedItemIdentifier: TOOLBAR_GENERAL];
     [[self window] setToolbar: toolbar];
-    [toolbar release];
 
     [self setPrefView: nil];
 
@@ -202,7 +193,7 @@
     fNatStatus = -1;
 
     [self updatePortStatus];
-    fPortStatusTimer = [[NSTimer scheduledTimerWithTimeInterval: 5.0 target: self selector: @selector(updatePortStatus) userInfo: nil repeats: YES] retain];
+    fPortStatusTimer = [NSTimer scheduledTimerWithTimeInterval: 5.0 target: self selector: @selector(updatePortStatus) userInfo: nil repeats: YES];
 
     //set peer connections
     [fPeersGlobalField setIntValue: [fDefaults integerForKey: @"PeersTotal"]];
@@ -306,11 +297,10 @@
     }
     else
     {
-        [item release];
         return nil;
     }
 
-    return [item autorelease];
+    return item;
 }
 
 - (NSArray *) toolbarAllowedItemIdentifiers: (NSToolbar *) toolbar
@@ -404,7 +394,6 @@
         if (fPortChecker)
         {
             [fPortChecker cancelProbe];
-            [fPortChecker release];
         }
         BOOL delay = natStatusChanged || tr_sessionIsPortForwardingEnabled(fHandle);
         fPortChecker = [[PortChecker alloc] initForPort: fPeerPort delay: delay withDelegate: self];
@@ -432,7 +421,6 @@
             NSAssert1(NO, @"Port checker returned invalid status: %d", [fPortChecker status]);
             break;
     }
-    [fPortChecker release];
     fPortChecker = nil;
 }
 
@@ -442,7 +430,7 @@
 
     NSArray * directories = NSSearchPathForDirectoriesInDomains(NSAllLibrariesDirectory, NSUserDomainMask | NSLocalDomainMask | NSSystemDomainMask, YES);
 
-    for (NSString * directory in directories)
+    for (__strong NSString * directory in directories)
     {
         directory = [directory stringByAppendingPathComponent: @"Sounds"];
 
@@ -450,7 +438,7 @@
         if ([[NSFileManager defaultManager] fileExistsAtPath: directory isDirectory: &isDirectory] && isDirectory)
         {
             NSArray * directoryContents = [[NSFileManager defaultManager] contentsOfDirectoryAtPath: directory error: NULL];
-            for (NSString * sound in directoryContents)
+            for (__strong NSString * sound in directoryContents)
             {
                 sound = [sound stringByDeletingPathExtension];
                 if ([NSSound soundNamed: sound])
@@ -707,7 +695,7 @@
 
 + (NSDate *) timeSumToDate: (NSInteger) sum
 {
-    NSDateComponents * comps = [[[NSDateComponents alloc] init] autorelease];
+    NSDateComponents * comps = [[NSDateComponents alloc] init];
     [comps setHour: sum / 60];
     [comps setMinute: sum % 60];
 
@@ -716,8 +704,7 @@
 
 - (BOOL) control: (NSControl *) control textShouldBeginEditing: (NSText *) fieldEditor
 {
-    [fInitialString release];
-    fInitialString = [[control stringValue] retain];
+    fInitialString = [control stringValue];
 
     return YES;
 }
@@ -728,7 +715,6 @@
     if (fInitialString)
     {
         [control setStringValue: fInitialString];
-        [fInitialString release];
         fInitialString = nil;
     }
     return NO;
@@ -748,7 +734,14 @@
 
 - (IBAction) openGrowlApp: (id) sender
 {
-    [GrowlApplicationBridge openGrowlPreferences: YES];
+    SEL selector = NSSelectorFromString(@"openGrowlPreferences:");
+    NSMethodSignature * signature = [GrowlApplicationBridge methodSignatureForSelector:selector];
+    NSInvocation * invocation = [NSInvocation invocationWithMethodSignature:signature];
+    invocation.selector = selector;
+    invocation.target = GrowlApplicationBridge.class;
+    BOOL yes = YES;
+    [invocation setArgument:&yes atIndex:0];
+    [invocation invoke];
 }
 
 - (void) openNotificationSystemPrefs: (id) sender
@@ -774,7 +767,7 @@
 - (void) setDefaultForMagnets: (id) sender
 {
     NSString * bundleID = [[NSBundle mainBundle] bundleIdentifier];
-    const OSStatus result = LSSetDefaultHandlerForURLScheme((CFStringRef)@"magnet", (CFStringRef)bundleID);
+    const OSStatus result = LSSetDefaultHandlerForURLScheme((CFStringRef)@"magnet", (__bridge CFStringRef)bundleID);
     if (result != noErr)
         NSLog(@"Failed setting default magnet link handler");
 }
@@ -1029,7 +1022,6 @@
 
 - (void) setRPCPassword: (id) sender
 {
-    [fRPCPassword release];
     fRPCPassword = [[sender stringValue] copy];
 
     const char * password = [[sender stringValue] UTF8String];
@@ -1045,7 +1037,6 @@
     SecKeychainFindGenericPassword(NULL, strlen(RPC_KEYCHAIN_SERVICE), RPC_KEYCHAIN_SERVICE,
         strlen(RPC_KEYCHAIN_NAME), RPC_KEYCHAIN_NAME, &passwordLength, (void **)&password, NULL);
 
-    [fRPCPassword release];
     if (password != NULL)
     {
         char fullPassword[passwordLength+1];
@@ -1497,7 +1488,7 @@
         [fGrowlAppButton setHidden: NO];
 
 #warning remove NO
-        [fGrowlAppButton setEnabled: NO && [GrowlApplicationBridge isGrowlURLSchemeAvailable]];
+        [fGrowlAppButton setEnabled: NO /*&& [GrowlApplicationBridge isGrowlURLSchemeAvailable] */];
         [fGrowlAppButton setTitle: NSLocalizedString(@"Configure In Growl", "Prefs -> Notifications")];
         [fGrowlAppButton sizeToFit];
 

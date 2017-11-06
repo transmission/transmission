@@ -62,6 +62,7 @@ struct tr_rpc_server
     char* password;
     char* whitelistStr;
     tr_list* whitelist;
+    int loginattempts;
 
     bool isStreamInitialized;
     z_stream stream;
@@ -566,6 +567,22 @@ static void handle_request(struct evhttp_request* req, void* arg)
 
         evhttp_add_header(req->output_headers, "Server", MY_REALM);
 
+        if (server->loginattempts == 100)
+        {
+            send_simple_response(req, 403, "<p>Too many unsuccessful login attempts. Please restart transmission-daemon.</p>");
+            return;
+        }
+
+        if (!isAddressAllowed(server, req->remote_host))
+        {
+            send_simple_response(req, 403,
+                "<p>Unauthorized IP Address.</p>"
+                "<p>Either disable the IP address whitelist or add your address to it.</p>"
+                "<p>If you're editing settings.json, see the 'rpc-whitelist' and 'rpc-whitelist-enabled' entries.</p>"
+                "<p>If you're still using ACLs, use a whitelist instead. See the transmission-daemon manpage for details.</p>");
+            return;
+        }
+
         auth = evhttp_find_header(req->input_headers, "Authorization");
 
         if (auth != NULL && evutil_ascii_strncasecmp(auth, "basic ", 6) == 0)
@@ -587,21 +604,21 @@ static void handle_request(struct evhttp_request* req, void* arg)
             }
         }
 
-        if (!isAddressAllowed(server, req->remote_host))
-        {
-            send_simple_response(req, 403,
-                "<p>Unauthorized IP Address.</p>"
-                "<p>Either disable the IP address whitelist or add your address to it.</p>"
-                "<p>If you're editing settings.json, see the 'rpc-whitelist' and 'rpc-whitelist-enabled' entries.</p>"
-                "<p>If you're still using ACLs, use a whitelist instead. See the transmission-daemon manpage for details.</p>");
-        }
-        else if (server->isPasswordEnabled && (pass == NULL || user == NULL || strcmp(server->username, user) != 0 ||
+        if (server->isPasswordEnabled && (pass == NULL || user == NULL || strcmp(server->username, user) != 0 ||
             !tr_ssha1_matches(server->password, pass)))
         {
             evhttp_add_header(req->output_headers, "WWW-Authenticate", "Basic realm=\"" MY_REALM "\"");
-            send_simple_response(req, 401, "Unauthorized User");
+            server->loginattempts++;
+            char* unauthuser = tr_strdup_printf("<p>Unauthorized User. %d unsuccessful login attempts.</p>", server->loginattempts);
+            send_simple_response(req, 401, unauthuser);
+            tr_free(unauthuser);
+            tr_free(user);
+            return;
         }
-        else if (strncmp(req->uri, server->url, strlen(server->url)) != 0)
+
+        server->loginattempts = 0;
+
+        if (strncmp(req->uri, server->url, strlen(server->url)) != 0)
         {
             char* location = tr_strdup_printf("%sweb/", server->url);
             evhttp_add_header(req->output_headers, "Location", location);
