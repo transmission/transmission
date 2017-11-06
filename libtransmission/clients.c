@@ -634,6 +634,10 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
         {
             tr_snprintf(buf, buflen, "Folx %d.x", charint(id[3]));
         }
+        else if (strncmp(chid + 1, "BN", 2) == 0)
+        {
+            tr_snprintf(buf, buflen, "Baidu Netdisk");
+        }
 
         if (*buf != '\0')
         {

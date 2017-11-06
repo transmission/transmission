@@ -79,7 +79,6 @@ BlocklistScheduler * fScheduler = nil;
 - (void) cancelSchedule
 {
     [fTimer invalidate];
-    [fTimer release];
     fTimer = nil;
 }
 
@@ -89,7 +88,6 @@ BlocklistScheduler * fScheduler = nil;
 
 - (void) runUpdater
 {
-    [fTimer release];
     fTimer = nil;
     [BlocklistDownloader downloader];
 }

@@ -34,7 +34,7 @@
     if (fromIndex == toIndex)
         return;
 
-    id object = [self[fromIndex] retain];
+    id object = self[fromIndex];
 
     //shift objects - more efficient than simply removing the object and re-inserting the object
     if (fromIndex < toIndex)
@@ -49,7 +49,6 @@
     }
     self[toIndex] = object;
 
-    [object release];
 }
 
 @end

@@ -28,16 +28,11 @@
 - (id) copyWithZone: (NSZone *) zone
 {
     PeerProgressIndicatorCell * copy = [super copyWithZone: zone];
-    copy->fAttributes = [fAttributes retain];
+    copy->fAttributes = fAttributes;
 
     return copy;
 }
 
-- (void) dealloc
-{
-    [fAttributes release];
-    [super dealloc];
-}
 
 - (void) setSeed: (BOOL) seed
 {
@@ -55,7 +50,6 @@
 
             fAttributes = [[NSDictionary alloc] initWithObjects: @[[NSFont systemFontOfSize: 11.0], paragraphStyle]
                 forKeys: @[NSFontAttributeName, NSParagraphStyleAttributeName]];
-            [paragraphStyle release];
         }
 
         [[NSString percentString: [self floatValue] longDecimals: NO] drawInRect: cellFrame withAttributes: fAttributes];
@@ -65,7 +59,6 @@
         //attributes not needed anymore
         if (fAttributes)
         {
-            [fAttributes release];
             fAttributes = nil;
         }
 

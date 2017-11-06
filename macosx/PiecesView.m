@@ -46,8 +46,8 @@ enum
 - (void) awakeFromNib
 {
     //store box colors
-    fGreenAvailabilityColor = [[NSColor colorWithCalibratedRed: 0.0 green: 1.0 blue: 0.4 alpha: 1.0] retain];
-    fBluePieceColor = [[NSColor colorWithCalibratedRed: 0.0 green: 0.4 blue: 0.8 alpha: 1.0] retain];
+    fGreenAvailabilityColor = [NSColor colorWithCalibratedRed: 0.0 green: 1.0 blue: 0.4 alpha: 1.0];
+    fBluePieceColor = [NSColor colorWithCalibratedRed: 0.0 green: 0.4 blue: 0.8 alpha: 1.0];
 
     //actually draw the box
     [self setTorrent: nil];
@@ -56,11 +56,6 @@ enum
 - (void) dealloc
 {
     tr_free(fPieces);
-
-    [fGreenAvailabilityColor release];
-    [fBluePieceColor release];
-
-    [super dealloc];
 }
 
 - (void) setTorrent: (Torrent *) torrent
@@ -85,11 +80,9 @@ enum
     NSGradient * gradient = [[NSGradient alloc] initWithStartingColor: [NSColor colorWithCalibratedWhite: 0.0 alpha: 0.4]
                                 endingColor: [NSColor colorWithCalibratedWhite: 0.2 alpha: 0.4]];
     [gradient drawInRect: [self bounds] angle: 90.0];
-    [gradient release];
     [back unlockFocus];
 
     [self setImage: back];
-    [back release];
 
     [self setNeedsDisplay];
 }
