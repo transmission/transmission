@@ -24,6 +24,7 @@ export LIBTOOLIZE
 
 ./update-version-h.sh
 
+rm m4/glib-gettext.m4 || die
 autoreconf -fi || exit 1;
 
 
