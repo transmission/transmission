@@ -6,11 +6,11 @@
  *
  */
 
+#pragma once
+
 #ifndef __TRANSMISSION__
 #error only libtransmission should #include this header.
 #endif
-
-#pragma once
 
 /**
  * @brief parse a peer-id into a human-readable client name and version number
