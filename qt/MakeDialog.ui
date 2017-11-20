@@ -157,7 +157,21 @@ To add another primary URL, add it after a blank line.</string>
        </property>
       </widget>
      </item>
-     <item row="3" column="0" colspan="2">
+     <item row="3" column="0">
+      <widget class="QCheckBox" name="sourceFlagCheck">
+       <property name="text">
+        <string>&amp;Source flag:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QLineEdit" name="sourceFlagEdit">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="0" colspan="2">
       <widget class="QCheckBox" name="privateCheck">
        <property name="text">
         <string>&amp;Private torrent</string>
@@ -232,6 +246,22 @@ To add another primary URL, add it after a blank line.</string>
     <hint type="destinationlabel">
      <x>360</x>
      <y>118</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sourceFlagCheck</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>sourceFlagEdit</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>75</x>
+     <y>347</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>342</x>
+     <y>347</y>
     </hint>
    </hints>
   </connection>

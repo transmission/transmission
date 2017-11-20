@@ -17,7 +17,7 @@
 #include <string.h> /* strlen() */
 
 static int test_single_file_impl(tr_tracker_info const* trackers, size_t const trackerCount, void const* payload,
-    size_t const payloadSize, char const* comment, bool isPrivate)
+    size_t const payloadSize, char const* comment, bool isPrivate, char const* sourceFlag)
 {
     char* sandbox;
     char* input_file;
@@ -45,10 +45,11 @@ static int test_single_file_impl(tr_tracker_info const* trackers, size_t const t
 
     /* have tr_makeMetaInfo() build the .torrent file */
     torrent_file = tr_strdup_printf("%s.torrent", input_file);
-    tr_makeMetaInfo(builder, torrent_file, trackers, trackerCount, comment, isPrivate);
+    tr_makeMetaInfo(builder, torrent_file, trackers, trackerCount, comment, isPrivate, sourceFlag);
     check_bool(isPrivate, ==, builder->isPrivate);
     check_str(builder->outputFile, ==, torrent_file);
     check_str(builder->comment, ==, comment);
+    check_str(builder->sourceFlag, ==, sourceFlag);
     check_int(builder->trackerCount, ==, trackerCount);
 
     while (!builder->isDone)
@@ -71,6 +72,7 @@ static int test_single_file_impl(tr_tracker_info const* trackers, size_t const t
     check_str(inf.comment, ==, comment);
     check_int(inf.fileCount, ==, 1);
     check_int(inf.isPrivate, ==, isPrivate);
+    check_str(inf.sourceFlag, ==, sourceFlag);
     check(!inf.isFolder);
     check_int(inf.trackerCount, ==, trackerCount);
 
@@ -92,6 +94,7 @@ static int test_single_file(void)
     bool isPrivate;
     char const* comment;
     char const* payload;
+    char const* sourceFlag;
     size_t payloadSize;
 
     trackerCount = 0;
@@ -105,13 +108,14 @@ static int test_single_file(void)
     payloadSize = strlen(payload);
     comment = "This is the comment";
     isPrivate = false;
-    test_single_file_impl(trackers, trackerCount, payload, payloadSize, comment, isPrivate);
+    sourceFlag = "FOOBAR";
+    test_single_file_impl(trackers, trackerCount, payload, payloadSize, comment, isPrivate, sourceFlag);
 
     return 0;
 }
 
 static int test_single_directory_impl(tr_tracker_info const* trackers, size_t const trackerCount, void const** payloads,
-    size_t const* payloadSizes, size_t const payloadCount, char const* comment, bool const isPrivate)
+    size_t const* payloadSizes, size_t const payloadCount, char const* comment, bool const isPrivate, char const* sourceFlag)
 {
     char* sandbox;
     char* torrent_file;
@@ -162,10 +166,11 @@ static int test_single_directory_impl(tr_tracker_info const* trackers, size_t co
 
     /* call tr_makeMetaInfo() to build the .torrent file */
     torrent_file = tr_strdup_printf("%s.torrent", top);
-    tr_makeMetaInfo(builder, torrent_file, trackers, trackerCount, comment, isPrivate);
+    tr_makeMetaInfo(builder, torrent_file, trackers, trackerCount, comment, isPrivate, sourceFlag);
     check_bool(isPrivate, ==, builder->isPrivate);
     check_str(builder->outputFile, ==, torrent_file);
     check_str(builder->comment, ==, comment);
+    check_str(builder->sourceFlag, ==, sourceFlag);
     check_int(builder->trackerCount, ==, trackerCount);
 
     while (!builder->isDone)
@@ -186,6 +191,7 @@ static int test_single_directory_impl(tr_tracker_info const* trackers, size_t co
     check_str(inf.name, ==, tmpstr);
     tr_free(tmpstr);
     check_str(inf.comment, ==, comment);
+    check_str(inf.sourceFlag, ==, sourceFlag);
     check_int(inf.fileCount, ==, payloadCount);
     check_int(inf.isPrivate, ==, isPrivate);
     check_int(inf.isFolder, ==, builder->isFolder);
@@ -211,7 +217,7 @@ static int test_single_directory_impl(tr_tracker_info const* trackers, size_t co
 }
 
 static int test_single_directory_random_payload_impl(tr_tracker_info const* trackers, size_t const trackerCount,
-    size_t const maxFileCount, size_t const maxFileSize, char const* comment, bool const isPrivate)
+    size_t const maxFileCount, size_t const maxFileSize, char const* comment, bool const isPrivate, char const* sourceFlag)
 {
     void** payloads;
     size_t* payloadSizes;
@@ -231,7 +237,7 @@ static int test_single_directory_random_payload_impl(tr_tracker_info const* trac
     }
 
     /* run the test */
-    test_single_directory_impl(trackers, trackerCount, (void const**)payloads, payloadSizes, payloadCount, comment, isPrivate);
+    test_single_directory_impl(trackers, trackerCount, (void const**)payloads, payloadSizes, payloadCount, comment, isPrivate, sourceFlag);
 
     /* cleanup */
     for (size_t i = 0; i < payloadCount; i++)
@@ -254,6 +260,7 @@ static int test_single_directory_random_payload(void)
     size_t trackerCount;
     bool isPrivate;
     char const* comment;
+    char const* sourceFlag;
 
     trackerCount = 0;
     trackers[trackerCount].tier = trackerCount;
@@ -264,11 +271,12 @@ static int test_single_directory_random_payload(void)
     ++trackerCount;
     comment = "This is the comment";
     isPrivate = false;
+    sourceFlag = "TESTME";
 
     for (size_t i = 0; i < 10; i++)
     {
         test_single_directory_random_payload_impl(trackers, trackerCount, DEFAULT_MAX_FILE_COUNT, DEFAULT_MAX_FILE_SIZE,
-            comment, isPrivate);
+            comment, isPrivate, sourceFlag);
     }
 
     return 0;

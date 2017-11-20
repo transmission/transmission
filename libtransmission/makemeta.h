@@ -56,6 +56,7 @@ typedef struct tr_metainfo_builder
     char* comment;
     char* outputFile;
     bool isPrivate;
+    char* sourceFlag;
 
     /**
     ***  These are set inside tr_makeMetaInfo() so the client
@@ -115,7 +116,7 @@ void tr_metaInfoBuilderFree(tr_metainfo_builder*);
  * @param trackerCount size of the `trackers' array
  */
 void tr_makeMetaInfo(tr_metainfo_builder* builder, char const* outputFile, tr_tracker_info const* trackers, int trackerCount,
-    char const* comment, bool isPrivate);
+    char const* comment, bool isPrivate, char const* sourceFlag);
 
 #ifdef __cplusplus
 }

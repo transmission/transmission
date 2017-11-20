@@ -34,6 +34,8 @@ typedef struct
     GtkWidget* comment_check;
     GtkWidget* comment_entry;
     GtkWidget* private_check;
+    GtkWidget* source_flag_check;
+    GtkWidget* source_flag_entry;
     GtkWidget* progress_label;
     GtkWidget* progress_bar;
     GtkWidget* progress_dialog;
@@ -225,11 +227,15 @@ static void onResponse(GtkDialog* d, int response, gpointer user_data)
             char* tracker_text;
             char** tracker_strings;
             GtkEntry* c_entry = GTK_ENTRY(ui->comment_entry);
+            GtkEntry* s_entry = GTK_ENTRY(ui->source_flag_entry);
             GtkToggleButton* p_check = GTK_TOGGLE_BUTTON(ui->private_check);
             GtkToggleButton* c_check = GTK_TOGGLE_BUTTON(ui->comment_check);
+            GtkToggleButton* s_check = GTK_TOGGLE_BUTTON(ui->source_flag_check);
             char const* comment = gtk_entry_get_text(c_entry);
+            char const* sourceFlag = gtk_entry_get_text(s_entry);
             gboolean const isPrivate = gtk_toggle_button_get_active(p_check);
             gboolean const useComment = gtk_toggle_button_get_active(c_check);
+            gboolean const useSourceFlag = gtk_toggle_button_get_active(s_check);
             tr_tracker_info* trackers;
 
             /* destination file */
@@ -265,7 +271,8 @@ static void onResponse(GtkDialog* d, int response, gpointer user_data)
 
             /* build the .torrent */
             makeProgressDialog(GTK_WIDGET(d), ui);
-            tr_makeMetaInfo(ui->builder, ui->target, trackers, n, useComment ? comment : NULL, isPrivate);
+            tr_makeMetaInfo(ui->builder, ui->target, trackers, n, useComment ? comment : NULL,
+                            isPrivate, useSourceFlag ? sourceFlag : NULL);
 
             /* cleanup */
             g_free(trackers);
@@ -501,6 +508,15 @@ GtkWidget* gtr_torrent_creation_dialog_new(GtkWindow* parent, TrCore* core)
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(l), FALSE);
     w = gtk_entry_new();
     ui->comment_entry = w;
+    gtk_widget_set_sensitive(GTK_WIDGET(w), FALSE);
+    g_signal_connect(l, "toggled", G_CALLBACK(onSourceToggled), w);
+    hig_workarea_add_row_w(t, &row, l, w, NULL);
+    
+    l = gtk_check_button_new_with_mnemonic(_("_Source flag:"));
+    ui->source_flag_check = l;
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(l), FALSE);
+    w = gtk_entry_new();
+    ui->source_flag_entry = w;
     gtk_widget_set_sensitive(GTK_WIDGET(w), FALSE);
     g_signal_connect(l, "toggled", G_CALLBACK(onSourceToggled), w);
     hig_workarea_add_row_w(t, &row, l, w, NULL);

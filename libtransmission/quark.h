@@ -334,6 +334,7 @@ enum
     TR_KEY_sizeWhenDone,
     TR_KEY_sort_mode,
     TR_KEY_sort_reversed,
+    TR_KEY_source,
     TR_KEY_speed,
     TR_KEY_speed_Bps,
     TR_KEY_speed_bytes,

@@ -590,6 +590,16 @@ static char const* tr_metainfoParseImpl(tr_session const* session, tr_info* inf,
 
     inf->isPrivate = i != 0;
 
+    /* source flag */
+    len = 0;
+    if (!tr_variantDictFindStr(meta, TR_KEY_source, &str, &len))
+    {
+        str = "";
+    }
+
+    tr_free(inf->sourceFlag);
+    inf->sourceFlag = tr_utf8clean(str, len);
+    
     /* piece length */
     if (!isMagnet)
     {

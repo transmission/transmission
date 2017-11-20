@@ -1632,6 +1632,7 @@ struct tr_info
     /* Flags */
     bool isPrivate;
     bool isFolder;
+    char* sourceFlag;
 };
 
 static inline bool tr_torrentHasMetadata(tr_torrent const* tor)
