@@ -427,6 +427,10 @@ static void makeInfoDict(tr_variant* dict, tr_metainfo_builder* builder)
     }
 
     tr_variantDictAddInt(dict, TR_KEY_private, builder->isPrivate ? 1 : 0);
+    if (builder->sourceFlag != NULL && *builder->sourceFlag != '\0')
+    {
+        tr_variantDictAddStr(dict, TR_KEY_source, builder->sourceFlag);
+    }
 }
 
 static void tr_realMakeMetaInfo(tr_metainfo_builder* builder)
@@ -482,10 +486,6 @@ static void tr_realMakeMetaInfo(tr_metainfo_builder* builder)
         if (builder->comment != NULL && *builder->comment != '\0')
         {
             tr_variantDictAddStr(&top, TR_KEY_comment, builder->comment);
-        }
-        if (builder->sourceFlag != NULL && *builder->sourceFlag != '\0')
-        {
-            tr_variantDictAddStr(&top, TR_KEY_source, builder->sourceFlag);
         }
 
         tr_variantDictAddStr(&top, TR_KEY_created_by, TR_NAME "/" LONG_VERSION_STRING);
