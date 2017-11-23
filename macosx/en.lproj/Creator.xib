@@ -17,6 +17,7 @@
                 <outlet property="fPrivateCheck" destination="22" id="33"/>
                 <outlet property="fProgressIndicator" destination="57" id="61"/>
                 <outlet property="fProgressView" destination="56" id="60"/>
+                <outlet property="fSourceFlag" destination="R2K-fl-edv" id="bqE-sb-RJZ"/>
                 <outlet property="fStatusField" destination="10" id="34"/>
                 <outlet property="fTrackerAddRemoveControl" destination="103" id="105"/>
                 <outlet property="fTrackerTable" destination="92" id="99"/>
@@ -28,20 +29,20 @@
         <window title="Torrent Creator" allowsToolTipsWhenApplicationIsInactive="NO" releasedWhenClosed="NO" frameAutosaveName="CreatorWindow" animationBehavior="default" tabbingMode="disallowed" id="5" userLabel="Window">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" topStrut="YES"/>
-            <rect key="contentRect" x="244" y="423" width="708" height="408"/>
+            <rect key="contentRect" x="244" y="423" width="708" height="492"/>
             <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1440"/>
             <value key="minSize" type="size" width="440" height="350"/>
             <view key="contentView" id="6">
-                <rect key="frame" x="0.0" y="0.0" width="708" height="408"/>
+                <rect key="frame" x="0.0" y="0.0" width="708" height="492"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <imageView id="8">
-                        <rect key="frame" x="20" y="334" width="64" height="64"/>
+                        <rect key="frame" x="20" y="418" width="64" height="64"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyUpOrDown" image="NSApplicationIcon" id="67"/>
                     </imageView>
                     <textField verticalHuggingPriority="750" id="9">
-                        <rect key="frame" x="89" y="367" width="602" height="22"/>
+                        <rect key="frame" x="89" y="451" width="602" height="22"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="File Name" id="68">
                             <font key="font" metaFont="system" size="18"/>
@@ -50,7 +51,7 @@
                         </textFieldCell>
                     </textField>
                     <textField verticalHuggingPriority="750" id="10">
-                        <rect key="frame" x="89" y="342" width="602" height="17"/>
+                        <rect key="frame" x="89" y="426" width="602" height="17"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="status info" id="69">
                             <font key="font" metaFont="system"/>
@@ -59,17 +60,17 @@
                         </textFieldCell>
                     </textField>
                     <scrollView horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" id="11">
-                        <rect key="frame" x="103" y="121" width="585" height="75"/>
+                        <rect key="frame" x="103" y="145" width="585" height="51"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                         <clipView key="contentView" id="08t-X6-SLo">
-                            <rect key="frame" x="1" y="1" width="568" height="73"/>
+                            <rect key="frame" x="1" y="1" width="568" height="49"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <textView importsGraphics="NO" richText="NO" continuousSpellChecking="YES" allowsUndo="YES" spellingCorrection="YES" smartInsertDelete="YES" id="12">
-                                    <rect key="frame" x="0.0" y="0.0" width="568" height="73"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="568" height="49"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                    <size key="minSize" width="568" height="73"/>
+                                    <size key="minSize" width="568" height="49"/>
                                     <size key="maxSize" width="1027" height="10000000"/>
                                     <color key="insertionPointColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                 </textView>
@@ -81,7 +82,7 @@
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                         <scroller key="verticalScroller" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="84">
-                            <rect key="frame" x="569" y="1" width="15" height="73"/>
+                            <rect key="frame" x="569" y="1" width="15" height="49"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                     </scrollView>
@@ -95,7 +96,7 @@
                         </textFieldCell>
                     </textField>
                     <textField verticalHuggingPriority="750" id="14">
-                        <rect key="frame" x="35" y="309" width="63" height="17"/>
+                        <rect key="frame" x="35" y="393" width="63" height="17"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Trackers:" id="71">
                             <font key="font" metaFont="system"/>
@@ -197,14 +198,14 @@ Gw
                         </buttonCell>
                     </button>
                     <scrollView horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" id="89">
-                        <rect key="frame" x="103" y="230" width="585" height="96"/>
+                        <rect key="frame" x="103" y="230" width="585" height="180"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <clipView key="contentView" id="cIJ-8J-EGs">
-                            <rect key="frame" x="1" y="1" width="568" height="94"/>
+                            <rect key="frame" x="1" y="1" width="568" height="178"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" columnResizing="NO" autosaveColumns="NO" typeSelect="NO" id="92">
-                                    <rect key="frame" x="0.0" y="0.0" width="568" height="94"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="568" height="178"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <size key="intercellSpacing" width="3" height="2"/>
                                     <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -236,7 +237,7 @@ Gw
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                         <scroller key="verticalScroller" verticalHuggingPriority="750" horizontal="NO" id="90">
-                            <rect key="frame" x="569" y="1" width="15" height="94"/>
+                            <rect key="frame" x="569" y="1" width="15" height="178"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                     </scrollView>
@@ -260,6 +261,24 @@ Gw
                         <textFieldCell key="cell" controlSize="small" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Each tracker will be placed into its own tier" id="108">
                             <font key="font" metaFont="smallSystem"/>
                             <color key="textColor" name="disabledControlTextColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                    <textField verticalHuggingPriority="750" misplaced="YES" id="R2K-fl-edv">
+                        <rect key="frame" x="103" y="120" width="585" height="22"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="sNv-mo-m3a">
+                            <font key="font" metaFont="system"/>
+                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="YES" id="faa-JK-W9Q">
+                        <rect key="frame" x="21" y="123" width="77" height="17"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Source flag:" id="f1g-Kk-weU">
+                            <font key="font" metaFont="system"/>
+                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
