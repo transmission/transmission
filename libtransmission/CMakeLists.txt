@@ -47,6 +47,8 @@ set(${PROJECT_NAME}_SOURCES
     rpc-server.c
     session.c
     session-id.c
+    subprocess-posix.c
+    subprocess-win32.c
     stats.c
     torrent.c
     torrent-ctor.c
@@ -94,9 +96,9 @@ else()
 endif()
 
 if(WIN32)
-    set_source_files_properties(file-posix.c PROPERTIES HEADER_FILE_ONLY ON)
+    set_source_files_properties(file-posix.c subprocess-posix.c PROPERTIES HEADER_FILE_ONLY ON)
 else()
-    set_source_files_properties(file-win32.c watchdir-win32.c PROPERTIES HEADER_FILE_ONLY ON)
+    set_source_files_properties(file-win32.c subprocess-win32.c watchdir-win32.c PROPERTIES HEADER_FILE_ONLY ON)
 endif()
 
 set(${PROJECT_NAME}_PUBLIC_HEADERS
@@ -152,6 +154,7 @@ set(${PROJECT_NAME}_PRIVATE_HEADERS
     resume.h
     rpc-server.h
     session.h
+    subprocess.h
     stats.h
     torrent.h
     torrent-magnet.h
@@ -275,11 +278,12 @@ if(ENABLE_TESTS)
     set_property(TARGET ${TR_NAME}-test PROPERTY FOLDER "UnitTests")
 
     set(crypto-test_ADD_SOURCES crypto-test-ref.h)
+    set(subprocess-test_ADD_SOURCES subprocess-test.cmd)
 
     set(watchdir@generic-test_DEFINITIONS WATCHDIR_TEST_FORCE_GENERIC)
 
     foreach(T bitfield blocklist clients crypto error file history json magnet makemeta metainfo move peer-msgs quark rename rpc
-              session tr-getopt utils variant watchdir watchdir@generic)
+              session subprocess tr-getopt utils variant watchdir watchdir@generic)
         set(TP ${TR_NAME}-test-${T})
         if(T MATCHES "^([^@]+)@.+$")
             string(REPLACE "@" "_" TP "${TP}")
@@ -295,6 +299,12 @@ if(ENABLE_TESTS)
         add_test(NAME ${T} COMMAND ${TP})
         set_property(TARGET ${TP} PROPERTY FOLDER "UnitTests")
     endforeach()
+
+    if(WIN32)
+        add_custom_command(TARGET ${TR_NAME}-test-subprocess PRE_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${PROJECT_SOURCE_DIR}/subprocess-test.cmd
+                $<TARGET_FILE_DIR:${TR_NAME}-test-subprocess>/${TR_NAME}-test-subprocess.cmd)
+    endif()
 endif()
 
 if(INSTALL_LIB)

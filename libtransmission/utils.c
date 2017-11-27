@@ -1,5 +1,5 @@
 /*
- * This file Copyright (C) 2009-2014 Mnemosyne LLC
+ * This file Copyright (C) 2009-2017 Mnemosyne LLC
  *
  * It may be used under the GNU GPL versions 2 or 3
  * or any future license endorsed by Mnemosyne LLC.
@@ -149,6 +149,20 @@ void tr_free(void* p)
     if (p != NULL)
     {
         free(p);
+    }
+}
+
+void tr_free_ptrv(void* const* p)
+{
+    if (p == NULL)
+    {
+        return;
+    }
+
+    while (*p != NULL)
+    {
+        tr_free(*p);
+        ++p;
     }
 }
 

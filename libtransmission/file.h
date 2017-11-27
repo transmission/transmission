@@ -1,5 +1,5 @@
 /*
- * This file Copyright (C) 2013-2014 Mnemosyne LLC
+ * This file Copyright (C) 2013-2017 Mnemosyne LLC
  *
  * It may be used under the GNU GPL versions 2 or 3
  * or any future license endorsed by Mnemosyne LLC.
@@ -265,6 +265,15 @@ bool tr_sys_path_rename(char const* src_path, char const* dst_path, struct tr_er
  *         files and directories).
  */
 bool tr_sys_path_remove(char const* path, struct tr_error** error);
+
+/**
+ * @brief Transform path separators to native ones, in-place.
+ *
+ * @param[in,out] path Path to transform.
+ *
+ * @return Same path but with native (and uniform) separators.
+ */
+char* tr_sys_path_native_separators(char* path);
 
 /* File-related wrappers */
 

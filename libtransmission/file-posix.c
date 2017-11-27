@@ -1,5 +1,5 @@
 /*
- * This file Copyright (C) 2013-2014 Mnemosyne LLC
+ * This file Copyright (C) 2013-2017 Mnemosyne LLC
  *
  * It may be used under the GNU GPL versions 2 or 3
  * or any future license endorsed by Mnemosyne LLC.
@@ -442,6 +442,11 @@ bool tr_sys_path_remove(char const* path, tr_error** error)
     }
 
     return ret;
+}
+
+char* tr_sys_path_native_separators(char* path)
+{
+    return path;
 }
 
 tr_sys_file_t tr_sys_file_get_std(tr_std_sys_file_t std_file, tr_error** error)

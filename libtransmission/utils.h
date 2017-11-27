@@ -1,5 +1,5 @@
 /*
- * This file Copyright (C) 2009-2014 Mnemosyne LLC
+ * This file Copyright (C) 2009-2017 Mnemosyne LLC
  *
  * It may be used under the GNU GPL versions 2 or 3
  * or any future license endorsed by Mnemosyne LLC.
@@ -153,6 +153,9 @@ void* tr_realloc(void* p, size_t size);
 
 /** @brief Portability wrapper around free() in which `NULL' is a safe argument */
 void tr_free(void* p);
+
+/** @brief Free pointers in a NULL-terminated array (the array itself is not freed) */
+void tr_free_ptrv(void* const* p);
 
 /**
  * @brief make a newly-allocated copy of a chunk of memory
