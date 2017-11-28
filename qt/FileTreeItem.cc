@@ -101,6 +101,7 @@ QVariant FileTreeItem::data(int column, int role) const
         value.setValue(isComplete());
         break;
 
+    case Qt::ToolTipRole:
     case Qt::EditRole:
         if (column == FileTreeModel::COL_NAME)
         {
