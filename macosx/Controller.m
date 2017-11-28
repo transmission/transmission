@@ -113,11 +113,6 @@ typedef enum
     SORT_DESC_TAG = 1
 } sortOrderTag;
 
-#define GROWL_DOWNLOAD_COMPLETE @"Download Complete"
-#define GROWL_SEEDING_COMPLETE  @"Seeding Complete"
-#define GROWL_AUTO_ADD          @"Torrent Auto Added"
-#define GROWL_AUTO_SPEED_LIMIT  @"Speed Limit Auto Changed"
-
 #define TORRENT_TABLE_VIEW_DATA_TYPE    @"TorrentTableViewDataType"
 
 #define ROW_HEIGHT_REGULAR      62.0
@@ -452,8 +447,6 @@ static void removeKeRangerRansomware()
             [fDefaults setBool: tr_sessionUsesAltSpeed(fLib) forKey: @"SpeedLimit"];
 
         tr_sessionSetRPCCallback(fLib, rpcCallback, (__bridge void *)(self));
-
-        [GrowlApplicationBridge setGrowlDelegate: self];
 
         [[SUUpdater sharedUpdater] setDelegate: self];
         fQuitRequested = NO;
@@ -2039,16 +2032,6 @@ static void removeKeRangerRansomware()
 
         [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification: notification];
 
-        NSMutableDictionary * clickContext = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                              GROWL_DOWNLOAD_COMPLETE, @"Type", nil];
-
-        if (location)
-            clickContext[@"Location"] = location;
-
-        [GrowlApplicationBridge notifyWithTitle: notificationTitle
-                                    description: [torrent name] notificationName: GROWL_DOWNLOAD_COMPLETE
-                                    iconData: nil priority: 0 isSticky: NO clickContext: clickContext];
-
         if (![fWindow isMainWindow])
             [fBadger addCompletedTorrent: torrent];
 
@@ -2096,15 +2079,6 @@ static void removeKeRangerRansomware()
     [userNotification setUserInfo: userInfo];
 
     [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification: userNotification];
-
-    NSMutableDictionary * clickContext = [NSMutableDictionary dictionaryWithObject: GROWL_SEEDING_COMPLETE forKey: @"Type"];
-
-    if (location)
-        clickContext[@"Location"] = location;
-
-    [GrowlApplicationBridge notifyWithTitle: notificationTitle
-                                description: [torrent name] notificationName: GROWL_SEEDING_COMPLETE
-                                   iconData: nil priority: 0 isSticky: NO clickContext: clickContext];
 
     //removing from the list calls fullUpdateUI
     if ([torrent removeWhenFinishSeeding])
@@ -2781,16 +2755,14 @@ static void removeKeRangerRansomware()
     [fDefaults setBool: isLimited forKey: @"SpeedLimit"];
     [fStatusBar updateSpeedFieldsToolTips];
 
-    if (![dict[@"ByUser"] boolValue])
-        [GrowlApplicationBridge notifyWithTitle: isLimited ? NSLocalizedString(@"Speed Limit Auto Enabled", "Growl notification title") : NSLocalizedString(@"Speed Limit Auto Disabled", "Growl notification title")
-                                    description: NSLocalizedString(@"Bandwidth settings changed", "Growl notification description")
-                               notificationName: GROWL_AUTO_SPEED_LIMIT
-                                       iconData: nil
-                                       priority: 0
-                                       isSticky: NO
-                                   clickContext: nil
-                                     identifier: GROWL_AUTO_SPEED_LIMIT];
+    if (![dict[@"ByUser"] boolValue]) {
+        NSUserNotification * notification = [[NSUserNotification alloc] init];
+        notification.title = isLimited ? NSLocalizedString(@"Speed Limit Auto Enabled", "notification title") : NSLocalizedString(@"Speed Limit Auto Disabled", "notification title");
+        notification.informativeText = NSLocalizedString(@"Bandwidth settings changed", "notification description");
+        notification.hasActionButton = NO;
 
+        [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notification];
+    }
 }
 
 - (void) sound: (NSSound *) sound didFinishPlaying: (BOOL) finishedPlaying
@@ -2874,10 +2846,6 @@ static void removeKeRangerRansomware()
                 [notification setHasActionButton: NO];
 
                 [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification: notification];
-
-                [GrowlApplicationBridge notifyWithTitle: notificationTitle
-                    description: file notificationName: GROWL_AUTO_ADD iconData: nil priority: 0 isSticky: NO
-                    clickContext: nil];
                 break;
             }
             case TR_PARSE_ERR:
@@ -4533,28 +4501,6 @@ static void removeKeRangerRansomware()
 - (void) updaterWillRelaunchApplication: (SUUpdater *) updater
 {
     fQuitRequested = YES;
-}
-
-- (NSDictionary *) registrationDictionaryForGrowl
-{
-    NSArray * notifications = @[GROWL_DOWNLOAD_COMPLETE, GROWL_SEEDING_COMPLETE, GROWL_AUTO_ADD, GROWL_AUTO_SPEED_LIMIT];
-
-    return @{GROWL_NOTIFICATIONS_ALL : notifications,
-                GROWL_NOTIFICATIONS_DEFAULT : notifications };
-}
-
-- (void) growlNotificationWasClicked: (id) clickContext
-{
-    if (![clickContext isKindOfClass: [NSDictionary class]])
-        return;
-
-    NSString * type = [clickContext objectForKey: @"Type"], * location;
-    if (([type isEqualToString: GROWL_DOWNLOAD_COMPLETE] || [type isEqualToString: GROWL_SEEDING_COMPLETE])
-            && (location = [clickContext objectForKey: @"Location"]))
-    {
-        NSURL * file = [NSURL fileURLWithPath: location];
-        [[NSWorkspace sharedWorkspace] activateFileViewerSelectingURLs: @[file]];
-    }
 }
 
 - (void) rpcCallback: (tr_rpc_callback_type) type forTorrentStruct: (struct tr_torrent *) torrentStruct
