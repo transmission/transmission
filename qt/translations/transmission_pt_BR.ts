@@ -139,7 +139,7 @@
     <message>
         <location line="+4"/>
         <source>Created on %1</source>
-        <translation>Criado em</translation>
+        <translation>Criado em %1</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -2449,8 +2449,8 @@ Adicione outra URL primária depois de uma linha em branco.</translation>
         <location line="+22"/>
         <source>Seeding to %Ln peer(s)</source>
         <translation>
-            <numerusform>Semeando para %1 fonte</numerusform>
-            <numerusform>Semeando para %1 fontes</numerusform>
+            <numerusform>Semeando para %Ln fonte</numerusform>
+            <numerusform>Semeando para %Ln fontes</numerusform>
         </translation>
     </message>
     <message>
