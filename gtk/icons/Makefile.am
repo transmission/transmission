@@ -12,6 +12,7 @@ public_icons = \
 	hicolor_apps_48x48_transmission.png \
 	hicolor_apps_256x256_transmission.png \
 	hicolor_apps_scalable_transmission.svg \
+	hicolor_apps_symbolic_transmission-symbolic.svg \
 	$(NULL)
 
 private_icons = \
