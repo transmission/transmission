@@ -39,6 +39,8 @@ static int test_spawn_async_missing_exe(void)
     check_int(error->code, != , 0);
     check_str(error->message, != , NULL);
 
+    tr_error_clear(&error);
+
     return 0;
 }
 
@@ -171,15 +173,12 @@ static int test_spawn_async_env(void)
 
     check(tr_sys_file_read_line(fd, buffer, sizeof(buffer), NULL));
     check_str(buffer, ==, test_env_value_1);
-    tr_free(env[0]);
 
     check(tr_sys_file_read_line(fd, buffer, sizeof(buffer), NULL));
     check_str(buffer, ==, test_env_value_2);
-    tr_free(env[1]);
 
     check(tr_sys_file_read_line(fd, buffer, sizeof(buffer), NULL));
     check_str(buffer, ==, test_env_value_3);
-    tr_free(env[2]);
 
     check(tr_sys_file_read_line(fd, buffer, sizeof(buffer), NULL));
     check_str(buffer, ==, test_env_value_4);
@@ -194,6 +193,7 @@ static int test_spawn_async_env(void)
 
     tr_sys_file_close(fd, NULL);
 
+    tr_free_ptrv((void* const*)env);
     tr_free(result_path);
     libtest_sandbox_destroy(test_dir);
     tr_free(test_dir);
@@ -305,6 +305,8 @@ static int test_spawn_async_cwd_missing(void)
     check_int(error->code, !=, 0);
     check_str(error->message, !=, NULL);
 
+    tr_error_clear(&error);
+
     tr_free(result_path);
     libtest_sandbox_destroy(test_dir);
     tr_free(test_dir);
@@ -327,6 +329,7 @@ int main(int argc, char** argv)
 
         if (fd == TR_BAD_SYS_FILE)
         {
+            tr_free(tmp_result_path);
             return 1;
         }
 
@@ -341,7 +344,9 @@ int main(int argc, char** argv)
         {
             for (int i = 3; i < argc; ++i)
             {
-                tr_sys_file_write_line(fd, tr_env_get_string(argv[i], "<null>"), NULL);
+                char* const value = tr_env_get_string(argv[i], "<null>");
+                tr_sys_file_write_line(fd, value, NULL);
+                tr_free(value);
             }
         }
         else if (strcmp(test_action, arg_dump_cwd) == 0)
@@ -354,11 +359,15 @@ int main(int argc, char** argv)
         {
             tr_sys_file_close(fd, NULL);
             tr_sys_path_remove(tmp_result_path, NULL);
+
+            tr_free(tmp_result_path);
             return 1;
         }
 
         tr_sys_file_close(fd, NULL);
         tr_sys_path_rename(tmp_result_path, result_path, NULL);
+
+        tr_free(tmp_result_path);
         return 0;
     }
 
