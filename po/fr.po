@@ -1459,7 +1459,7 @@ msgstr[1] ""
 #: ../gtk/torrent-cell-renderer.c:274
 #, c-format
 msgid "Downloading from %1$'d %2$s"
-msgstr ""
+msgstr "Téléchargement depuis %1$'d %2$s"
 
 #. Downloading from 2 of 3 peer (s)
 #: ../gtk/torrent-cell-renderer.c:280
@@ -1482,15 +1482,16 @@ msgstr "Téléchargement et partage des fichiers via BitTorrent"
 #. Translators: these are the application description paragraphs in the AppData file.
 #: ../gtk/transmission-gtk.appdata.xml.in.h:4
 msgid "BitTorrent is a peer-to-peer file-sharing protocol that is commonly used to distribute large amounts of data between multiple users."
-msgstr ""
+msgstr "BitTorrent est un logiciel de partage pair-à-pair qui est communément utilisé pour distribuer une large quantitée de donnée entre plusieurs utilisateurs"
 
 #: ../gtk/transmission-gtk.appdata.xml.in.h:5
 msgid "Transmission is a BitTorrent client with an easy-to-use frontend on top a cross-platform backend. Native frontends are available for OS X and Windows, as well as command line and web frontends."
-msgstr ""
+msgstr "Transmission est un client BitTorrent qui est composé d'une interface facile à utiliser et multi-plateforme. Transmission est aussi bien disponible pour OS X que Windows, 
+que ce soit en ligne de commande ou sous forme d'interface web"
 
 #: ../gtk/transmission-gtk.appdata.xml.in.h:6
 msgid "Notable features of Transmission include support for Local Peer Discovery, encryption, DHT, µTP, PEX and Magnet Link."
-msgstr ""
+msgstr "Les majeures fonctions de Transmission incluent le support pour la découverte de pairs locaux, l'encryption, DHT, µTP, PEX et les liens Magnet"
 
 #: ../gtk/transmission-gtk.desktop.in.h:2
 msgid "BitTorrent Client"
@@ -1499,15 +1500,15 @@ msgstr "Client BitTorrent"
 #. Translators: Search terms to find this application. Do NOT translate or localize the semicolons! The list MUST also end with a semicolon!
 #: ../gtk/transmission-gtk.desktop.in.h:5
 msgid "torrents;downloading;uploading;share;sharing;"
-msgstr ""
+msgstr "torrents;téléchargement;envoi;partage;partager"
 
 #: ../gtk/transmission-gtk.desktop.in.h:6
 msgid "Start Transmission with All Torrents Paused"
-msgstr ""
+msgstr "Démarrer Transmission avec tous les torrents en pause"
 
 #: ../gtk/transmission-gtk.desktop.in.h:7
 msgid "Start Transmission Minimized"
-msgstr ""
+msgstr "Démarrer Transmission minimisé"
 
 #: ../gtk/tr-core.c:1238
 #, c-format
@@ -1563,15 +1564,15 @@ msgstr "Ajout"
 
 #: ../gtk/tr-prefs.c:260
 msgid "Automatically add .torrent files _from:"
-msgstr ""
+msgstr "Ajouter automatiquement les fichiers .torrent _from:"
 
 #: ../gtk/tr-prefs.c:267
 msgid "Show the Torrent Options _dialog"
-msgstr ""
+msgstr "Afficher les options du torrent _dialog"
 
 #: ../gtk/tr-prefs.c:271
 msgid "_Start added torrents"
-msgstr ""
+msgstr "Démarrer les torrents ajoutés"
 
 #: ../gtk/tr-prefs.c:280
 msgid "Save to _Location:"
@@ -1579,7 +1580,7 @@ msgstr "Enregistrer _vers :"
 
 #: ../gtk/tr-prefs.c:287
 msgid "Download Queue"
-msgstr ""
+msgstr "File d'attente des téléchargements"
 
 #: ../gtk/tr-prefs.c:289
 msgid "Ma_ximum active downloads:"
