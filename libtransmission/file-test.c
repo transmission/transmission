@@ -53,7 +53,7 @@ static bool create_symlink(char const* dst_path, char const* src_path, bool dst_
 
     wchar_t* wide_src_path;
     wchar_t* wide_dst_path;
-    bool ret = false;
+    bool ret;
 
     wide_src_path = tr_win32_utf8_to_native(src_path, -1);
     wide_dst_path = tr_win32_utf8_to_native(dst_path, -1);

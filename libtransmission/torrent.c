@@ -171,7 +171,7 @@ bool tr_torrentIsPieceTransferAllowed(tr_torrent const* tor, tr_direction direct
 
         if (tr_sessionGetActiveSpeedLimit_Bps(tor->session, direction, &limit))
         {
-            if (limit <= 0)
+            if (limit == 0)
             {
                 allowed = false;
             }

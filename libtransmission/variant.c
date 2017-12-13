@@ -349,7 +349,7 @@ bool tr_variantGetBool(tr_variant const* v, bool* setme)
 
     if (!success && tr_variantIsInt(v))
     {
-        if ((success = v->val.i == 0 || v->val.i == 1))
+        if ((success = v->val.i) == 0 || v->val.i == 1)
         {
             *setme = v->val.i != 0;
         }
@@ -357,7 +357,7 @@ bool tr_variantGetBool(tr_variant const* v, bool* setme)
 
     if (!success && tr_variantGetStr(v, &str, NULL))
     {
-        if ((success = strcmp(str, "true") == 0 || strcmp(str, "false") == 0))
+        if ((success = strcmp(str, "true")) == 0 || strcmp(str, "false") == 0)
         {
             *setme = strcmp(str, "true") == 0;
         }
@@ -391,7 +391,7 @@ bool tr_variantGetReal(tr_variant const* v, double* setme)
         d = strtod(getStr(v), &endptr);
         restore_locale(&locale_ctx);
 
-        if ((success = getStr(v) != endptr && *endptr == '\0'))
+        if ((success = getStr(v)) != endptr && *endptr == '\0')
         {
             *setme = d;
         }

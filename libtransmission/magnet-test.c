@@ -40,7 +40,7 @@ static int test1(void)
     check_mem(info->hash, ==, dec, 20);
 
     tr_magnetFree(info);
-    info = NULL;
+    info;
 
     /* same thing but in base32 encoding */
     uri =

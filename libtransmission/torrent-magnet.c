@@ -275,14 +275,14 @@ void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, in
         dbgmsg(tor, "metainfo piece %d was the last one", piece);
         tr_sha1(sha1, m->metadata, m->metadata_size, NULL);
 
-        if ((checksumPassed = memcmp(sha1, tor->info.hash, SHA_DIGEST_LENGTH) == 0))
+        if ((checksumPassed = memcmp(sha1, tor->info.hash, SHA_DIGEST_LENGTH)) == 0)
         {
             /* checksum passed; now try to parse it as benc */
             tr_variant infoDict;
             int const err = tr_variantFromBenc(&infoDict, m->metadata, m->metadata_size);
             dbgmsg(tor, "err is %d", err);
 
-            if ((metainfoParsed = err == 0))
+            if ((metainfoParsed = err) == 0)
             {
                 /* yay we have bencoded metainfo... merge it into our .torrent file */
                 tr_variant newMetainfo;

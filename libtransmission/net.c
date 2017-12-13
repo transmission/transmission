@@ -113,14 +113,14 @@ bool tr_address_from_string(tr_address* dst, char const* src)
 {
     bool ok;
 
-    if ((ok = evutil_inet_pton(AF_INET, src, &dst->addr) == 1))
+    if ((ok = evutil_inet_pton(AF_INET, src, &dst->addr)) == 1)
     {
         dst->type = TR_AF_INET;
     }
 
     if (!ok) /* try IPv6 */
     {
-        if ((ok = evutil_inet_pton(AF_INET6, src, &dst->addr) == 1))
+        if ((ok = evutil_inet_pton(AF_INET6, src, &dst->addr)) == 1)
         {
             dst->type = TR_AF_INET6;
         }

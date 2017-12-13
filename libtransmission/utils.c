@@ -759,7 +759,7 @@ void tr_binary_to_hex(void const* input, char* output, size_t byte_length)
 
 void tr_hex_to_binary(char const* input, void* output, size_t byte_length)
 {
-    static char const hex[] = "0123456789abcdef";
+    static char const *hex = "0123456789abcdef";
     uint8_t* output_octets = output;
 
     for (size_t i = 0; i < byte_length; ++i)
@@ -776,7 +776,7 @@ void tr_hex_to_binary(char const* input, void* output, size_t byte_length)
 
 static bool isValidURLChars(char const* url, size_t url_len)
 {
-    static char const rfc2396_valid_chars[] =
+    static char const *rfc2396_valid_chars =
         "abcdefghijklmnopqrstuvwxyz" /* lowalpha */
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ" /* upalpha */
         "0123456789" /* digit */

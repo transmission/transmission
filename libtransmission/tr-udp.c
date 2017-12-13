@@ -171,11 +171,7 @@ static void rebind_ipv6(tr_session* ss, bool force)
 
     memset(&sin6, 0, sizeof(sin6));
     sin6.sin6_family = AF_INET6;
-
-    if (ipv6 != NULL)
-    {
-        memcpy(&sin6.sin6_addr, ipv6, 16);
-    }
+    memcpy(&sin6.sin6_addr, ipv6, 16);
 
     sin6.sin6_port = htons(ss->udp_port);
     public_addr = tr_sessionGetPublicAddress(ss, TR_AF_INET6, &is_default);

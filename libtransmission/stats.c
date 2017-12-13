@@ -51,7 +51,7 @@ static void loadCumulativeStats(tr_session const* session, tr_session_stats* set
 {
     tr_variant top;
     char* filename;
-    bool loaded = false;
+    bool loaded;
 
     filename = getFilename(session);
     loaded = tr_variantFromFile(&top, TR_VARIANT_FMT_JSON, filename, NULL);
