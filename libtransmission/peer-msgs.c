@@ -1153,7 +1153,7 @@ static void parseUtPex(tr_peerMsgs* msgs, uint32_t msglen, struct evbuffer* inbu
 
     tr_peerIoReadBytes(msgs->io, inbuf, tmp, msglen);
 
-    if (tr_torrentAllowsPex(tor) && (loaded = tr_variantFromBenc(&val, tmp, msglen) == 0))
+    if (tr_torrentAllowsPex(tor) && (loaded = tr_variantFromBenc(&val, tmp, msglen)) == 0)
     {
         if (tr_variantDictFindRaw(&val, TR_KEY_added, &added, &added_len))
         {

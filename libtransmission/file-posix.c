@@ -497,11 +497,11 @@ tr_sys_file_t tr_sys_file_open(char const* path, int flags, int permissions, tr_
     }
 
     native_flags |=
-        (flags & TR_SYS_FILE_CREATE ? O_CREAT : 0) |
-        (flags & TR_SYS_FILE_CREATE_NEW ? O_CREAT | O_EXCL : 0) |
-        (flags & TR_SYS_FILE_APPEND ? O_APPEND : 0) |
-        (flags & TR_SYS_FILE_TRUNCATE ? O_TRUNC : 0) |
-        (flags & TR_SYS_FILE_SEQUENTIAL ? O_SEQUENTIAL : 0) |
+        ((flags & TR_SYS_FILE_CREATE) ? O_CREAT : 0) |
+        ((flags & TR_SYS_FILE_CREATE_NEW) ? O_CREAT | O_EXCL : 0) |
+        ((flags & TR_SYS_FILE_APPEND) ? O_APPEND : 0) |
+        ((flags & TR_SYS_FILE_TRUNCATE) ? O_TRUNC : 0) |
+        ((flags & TR_SYS_FILE_SEQUENTIAL) ? O_SEQUENTIAL : 0) |
         O_BINARY | O_LARGEFILE | O_CLOEXEC;
 
     ret = open(path, native_flags, permissions);
