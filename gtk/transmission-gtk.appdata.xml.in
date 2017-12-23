@@ -4,7 +4,8 @@ Copyright 2014 Richard Hughes <richard@hughsie.com>
 Copyright 2017 Endless Mobile, Inc.
  -->
 <component type="desktop-application">
-  <id type="desktop">transmission-gtk.desktop</id>
+  <id>com.transmissionbt.Transmission</id>
+  <launchable type="desktop-id">transmission-gtk.desktop</launchable>
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>GPL-2.0 OR GPL-3.0</project_license>
 
