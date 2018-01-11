@@ -52,6 +52,7 @@ struct tr_rpc_server
     bool               isEnabled;
     bool               isPasswordEnabled;
     bool               isWhitelistEnabled;
+    bool               isHostWhitelistEnabled;
     tr_port            port;
     char             * url;
     struct in_addr     bindAddress;
@@ -63,6 +64,7 @@ struct tr_rpc_server
     char             * password;
     char             * whitelistStr;
     tr_list          * whitelist;
+    tr_list          * hostWhitelist;
 
     char             * sessionId;
     time_t             sessionIdExpiresAt;
@@ -589,6 +591,47 @@ isAddressAllowed (const tr_rpc_server * server, const char * address)
 }
 
 static bool
+isHostnameAllowed (const tr_rpc_server * server, struct evhttp_request * req)
+{
+  /* If password auth is enabled, any hostname is permitted. */
+  if (server->isPasswordEnabled)
+    return true;
+
+  /* If whitelist is disabled, no restrictions. */
+  if (!server->isHostWhitelistEnabled)
+    return true;
+
+  const char * const host = evhttp_find_header (req->input_headers, "Host");
+
+  /* No host header, invalid request. */
+  if (host == NULL)
+    return false;
+
+  /* Host header might include the port. */
+  char * const hostname = tr_strndup (host, strcspn (host, ":"));
+
+  /* localhost or ipaddress is always acceptable. */
+  if (strcmp (hostname, "localhost") == 0 || strcmp (hostname, "localhost.") == 0 || tr_addressIsIP (hostname))
+    {
+      tr_free (hostname);
+      return true;
+    }
+
+  /* Otherwise, hostname must be whitelisted. */
+  for (tr_list * l = server->hostWhitelist; l != NULL; l = l->next)
+    {
+      if (tr_wildmat (hostname, l->data))
+        {
+          tr_free (hostname);
+          return true;
+        }
+    }
+
+  tr_free(hostname);
+  return false;
+}
+
+static bool
 test_session_id (struct tr_rpc_server * server, struct evhttp_request * req)
 {
   const char * ours = get_current_session_id (server);
@@ -663,6 +706,22 @@ handle_request (struct evhttp_request * req, void * arg)
           handle_upload (req, server);
         }
 #ifdef REQUIRE_SESSION_ID
+      else if (!isHostnameAllowed (server, req))
+        {
+          char * const tmp = tr_strdup_printf (
+            "<p>Transmission received your request, but the hostname was unrecognized.</p>"
+            "<p>To fix this, choose one of the following options:"
+            "<ul>"
+            "<li>Enable password authentication, then any hostname is allowed.</li>"
+            "<li>Add the hostname you want to use to the whitelist in settings.</li>"
+            "</ul></p>"
+            "<p>If you're editing settings.json, see the 'rpc-host-whitelist' and 'rpc-host-whitelist-enabled' entries.</p>"
+            "<p>This requirement has been added to help prevent "
+            "<a href=\"https://en.wikipedia.org/wiki/DNS_rebinding\">DNS Rebinding</a> "
+            "attacks.</p>");
+          send_simple_response (req, 421, tmp);
+          tr_free (tmp);
+        }
       else if (!test_session_id (server, req))
         {
           const char * sessionId = get_current_session_id (server);
@@ -674,7 +733,7 @@ handle_request (struct evhttp_request * req, void * arg)
             "<li> When you get this 409 error message, resend your request with the updated header"
             "</ol></p>"
             "<p>This requirement has been added to help prevent "
-            "<a href=\"http://en.wikipedia.org/wiki/Cross-site_request_forgery\">CSRF</a> "
+            "<a href=\"https://en.wikipedia.org/wiki/Cross-site_request_forgery\">CSRF</a> "
             "attacks.</p>"
             "<p><code>%s: %s</code></p>",
             TR_RPC_SESSION_ID_HEADER, sessionId);
@@ -875,19 +934,14 @@ tr_rpcGetUrl (const tr_rpc_server * server)
   return server->url ? server->url : "";
 }
 
-void
-tr_rpcSetWhitelist (tr_rpc_server * server, const char * whitelistStr)
+static void
+tr_rpcSetList (const char * whitelistStr, tr_list ** list)
 {
   void * tmp;
   const char * walk;
 
-  /* keep the string */
-  tmp = server->whitelistStr;
-  server->whitelistStr = tr_strdup (whitelistStr);
-  tr_free (tmp);
-
   /* clear out the old whitelist entries */
-  while ((tmp = tr_list_pop_front (&server->whitelist)))
+  while ((tmp = tr_list_pop_front (list)))
     tr_free (tmp);
 
   /* build the new whitelist entries */
@@ -896,7 +950,7 @@ tr_rpcSetWhitelist (tr_rpc_server * server, const char * whitelistStr)
       const char * delimiters = " ,;";
       const size_t len = strcspn (walk, delimiters);
       char * token = tr_strndup (walk, len);
-      tr_list_append (&server->whitelist, token);
+      tr_list_append (list, token);
       if (strcspn (token, "+-") < len)
         tr_logAddNamedInfo (MY_NAME, "Adding address to whitelist: %s (And it has a '+' or '-'!  Are you using an old ACL by mistake?)", token);
       else
@@ -907,6 +961,23 @@ tr_rpcSetWhitelist (tr_rpc_server * server, const char * whitelistStr)
 
       walk += len + 1;
     }
+}
+
+void
+tr_rpcSetHostWhitelist (tr_rpc_server* server, const char * whitelistStr)
+{
+  tr_rpcSetList (whitelistStr, &server->hostWhitelist);
+}
+
+void
+tr_rpcSetWhitelist (tr_rpc_server * server, const char * whitelistStr)
+{
+  /* keep the string */
+  char* const tmp = server->whitelistStr;
+  server->whitelistStr = tr_strdup (whitelistStr);
+  tr_free (tmp);
+
+  tr_rpcSetList (whitelistStr, &server->whitelist);
 }
 
 const char*
@@ -928,6 +999,12 @@ bool
 tr_rpcGetWhitelistEnabled (const tr_rpc_server * server)
 {
   return server->isWhitelistEnabled;
+}
+
+void
+tr_rpcSetHostWhitelistEnabled(tr_rpc_server * server, bool isEnabled)
+{
+  server->isHostWhitelistEnabled = isEnabled;
 }
 
 /****
@@ -1062,6 +1139,18 @@ tr_rpcInit (tr_session  * session, tr_variant * settings)
     missing_settings_key (key);
   else
     tr_rpcSetWhitelistEnabled (s, boolVal);
+
+  key = TR_KEY_rpc_host_whitelist_enabled;
+  if (!tr_variantDictFindBool (settings, key, &boolVal))
+    missing_settings_key (key);
+  else
+    tr_rpcSetHostWhitelistEnabled (s, boolVal);
+
+  key = TR_KEY_rpc_host_whitelist;
+  if (!tr_variantDictFindStr (settings, key, &str, NULL) && str)
+    missing_settings_key (key);
+  else
+    tr_rpcSetHostWhitelist (s, str);
 
   key = TR_KEY_rpc_authentication_required;
   if (!tr_variantDictFindBool (settings, key, &boolVal))

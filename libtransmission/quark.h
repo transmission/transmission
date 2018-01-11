@@ -291,6 +291,8 @@ enum
   TR_KEY_rpc_authentication_required,
   TR_KEY_rpc_bind_address,
   TR_KEY_rpc_enabled,
+  TR_KEY_rpc_host_whitelist,
+  TR_KEY_rpc_host_whitelist_enabled,
   TR_KEY_rpc_password,
   TR_KEY_rpc_port,
   TR_KEY_rpc_url,
