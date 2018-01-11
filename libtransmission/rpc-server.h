@@ -42,6 +42,10 @@ void tr_rpcSetWhitelist(tr_rpc_server* server, char const* whitelist);
 
 char const* tr_rpcGetWhitelist(tr_rpc_server const* server);
 
+void tr_rpcSetHostWhitelistEnabled(tr_rpc_server* server, bool isEnabled);
+
+void tr_rpcSetHostWhitelist(tr_rpc_server* server, char const* whitelist);
+
 void tr_rpcSetPassword(tr_rpc_server* server, char const* password);
 
 char const* tr_rpcGetPassword(tr_rpc_server const* server);
