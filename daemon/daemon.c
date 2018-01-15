@@ -80,7 +80,7 @@ static const char *
 getUsage (void)
 {
     return "Transmission " LONG_VERSION_STRING
-           "  http://www.transmissionbt.com/\n"
+           "  https://transmissionbt.com/\n"
            "A fast and easy BitTorrent client\n"
            "\n"
            MY_NAME " is a headless Transmission session\n"

@@ -1,7 +1,7 @@
 VOLUNTEERS WANTED
 
    - Qt developers and translators are needed
-   - If you find a bug, please report it at http://trac.transmissionbt.com/
+   - If you find a bug, please report it at https://github.com/transmission/transmission
 
 ABOUT TRANSMISSION-QT
 

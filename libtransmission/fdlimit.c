@@ -223,7 +223,7 @@ cached_file_open (struct tr_cached_file  * o,
   /* If the file already exists and it's too large, truncate it.
    * This is a fringe case that happens if a torrent's been updated
    * and one of the updated torrent's files is smaller.
-   * http://trac.transmissionbt.com/ticket/2228
+   * https://trac.transmissionbt.com/ticket/2228
    * https://bugs.launchpad.net/ubuntu/+source/transmission/+bug/318249
    */
   if (resize_needed && !tr_sys_file_truncate (fd, file_size, &error))

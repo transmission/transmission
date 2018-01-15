@@ -8,7 +8,7 @@ ABOUT
     * A headless daemon for servers and routers
     * A web UI for remote controlling any of the above
 
-  Visit http://www.transmissionbt.com/ for more information.
+  Visit https://transmissionbt.com/ for more information.
 
 BUILDING
 
@@ -16,7 +16,7 @@ BUILDING
   for building in Xcode.
 
   For a more detailed description, and dependancies, visit:
-  http://trac.transmissionbt.com/wiki/
+  https://github.com/transmission/transmission/wiki
 
   Building a Transmission release from the command line:
 
@@ -28,7 +28,7 @@ BUILDING
 
   Building Transmission from the nightly builds:
 
-    Download a tarball from http://build.transmissionbt.com/job/trunk-linux-inc/
+    Download a tarball from https://build.transmissionbt.com/job/trunk-linux-inc/
     and follow the steps from the previous section.
 
     If you're new to building programs from source code, this is typically 

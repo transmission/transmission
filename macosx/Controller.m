@@ -133,9 +133,9 @@ typedef enum
 
 #define TRANSFER_PLIST  @"Transfers.plist"
 
-#define WEBSITE_URL @"http://www.transmissionbt.com/"
-#define FORUM_URL   @"http://forum.transmissionbt.com/"
-#define TRAC_URL    @"http://trac.transmissionbt.com/"
+#define WEBSITE_URL @"https://transmissionbt.com/"
+#define FORUM_URL   @"https://forum.transmissionbt.com/"
+#define GITHUB_URL  @"https://github.com/transmission/transmission"
 #define DONATE_URL  @"https://transmissionbt.com/donate/"
 
 #define DONATE_NAG_TIME (60 * 60 * 24 * 7)
@@ -4642,9 +4642,9 @@ static void removeKeRangerRansomware()
     [[NSWorkspace sharedWorkspace] openURL: [NSURL URLWithString: FORUM_URL]];
 }
 
-- (void) linkTrac: (id) sender
+- (void) linkGitHub: (id) sender
 {
-    [[NSWorkspace sharedWorkspace] openURL: [NSURL URLWithString: TRAC_URL]];
+    [[NSWorkspace sharedWorkspace] openURL: [NSURL URLWithString: GITHUB_URL]];
 }
 
 - (void) linkDonate: (id) sender

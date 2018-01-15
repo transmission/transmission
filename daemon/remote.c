@@ -198,7 +198,7 @@ getUsage (void)
     return
         MY_NAME" "LONG_VERSION_STRING"\n"
         "A fast and easy BitTorrent client\n"
-        "http://www.transmissionbt.com/\n"
+        "https://transmissionbt.com/\n"
         "\n"
         "Usage: " MY_NAME
         " [host] [options]\n"

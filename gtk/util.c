@@ -353,7 +353,7 @@ gtr_get_help_uri (void)
 
   if (!uri)
     {
-      const char * fmt = "http://www.transmissionbt.com/help/gtk/%d.%dx";
+      const char * fmt = "https://transmissionbt.com/help/gtk/%d.%dx";
       uri = g_strdup_printf (fmt, MAJOR_VERSION, MINOR_VERSION / 10);
     }
 
