@@ -235,6 +235,7 @@ static struct tr_key_struct const my_static[] =
     { "peersFrom", 9 },
     { "peersGettingFromUs", 18 },
     { "peersSendingToUs", 16 },
+    { "percentComplete", 15 },
     { "percentDone", 11 },
     { "pex-enabled", 11 },
     { "piece", 5 },

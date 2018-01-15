@@ -662,6 +662,10 @@ static void addField(tr_torrent* const tor, tr_info const* const inf, tr_stat co
         tr_variantDictAddReal(d, key, st->percentDone);
         break;
 
+    case TR_KEY_percentComplete:
+        tr_variantDictAddReal(d, key, st->percentComplete);
+        break;
+
     case TR_KEY_peer_limit:
         tr_variantDictAddInt(d, key, tr_torrentGetPeerLimit(tor));
         break;

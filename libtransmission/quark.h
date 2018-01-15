@@ -237,6 +237,7 @@ enum
     TR_KEY_peersFrom,
     TR_KEY_peersGettingFromUs,
     TR_KEY_peersSendingToUs,
+    TR_KEY_percentComplete,
     TR_KEY_percentDone,
     TR_KEY_pex_enabled,
     TR_KEY_piece,
