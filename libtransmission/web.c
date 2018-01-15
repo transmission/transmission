@@ -678,6 +678,9 @@ char const* tr_webGetResponseStr(long code)
     case 417:
         return "Expectation Failed";
 
+    case 421:
+        return "Misdirected Request";
+
     case 500:
         return "Internal Server Error";
 
