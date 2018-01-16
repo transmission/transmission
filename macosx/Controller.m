@@ -386,6 +386,7 @@ static void removeKeRangerRansomware()
         tr_variantDictAddInt(&settings, TR_KEY_rpc_port, [fDefaults integerForKey: @"RPCPort"]);
         tr_variantDictAddStr(&settings, TR_KEY_rpc_username,  [[fDefaults stringForKey: @"RPCUsername"] UTF8String]);
         tr_variantDictAddBool(&settings, TR_KEY_rpc_whitelist_enabled,  [fDefaults boolForKey: @"RPCUseWhitelist"]);
+        tr_variantDictAddBool(&settings, TR_KEY_rpc_host_whitelist_enabled, [fDefaults boolForKey: @"RPCUseHostWhitelist"]);
         tr_variantDictAddBool(&settings, TR_KEY_seed_queue_enabled, [fDefaults boolForKey: @"QueueSeed"]);
         tr_variantDictAddInt(&settings, TR_KEY_seed_queue_size, [fDefaults integerForKey: @"QueueSeedNumber"]);
         tr_variantDictAddBool(&settings, TR_KEY_start_added_torrents, [fDefaults boolForKey: @"AutoStartDownload"]);
@@ -393,6 +394,9 @@ static void removeKeRangerRansomware()
         tr_variantDictAddStr(&settings, TR_KEY_script_torrent_done_filename, [[fDefaults stringForKey: @"DoneScriptPath"] UTF8String]);
         tr_variantDictAddBool(&settings, TR_KEY_utp_enabled, [fDefaults boolForKey: @"UTPGlobal"]);
 
+        // TODO: Add to GUI
+        if ([fDefaults objectForKey: @"RPCHostWhitelist"])
+            tr_variantDictAddStr(&settings, TR_KEY_rpc_host_whitelist, [[fDefaults stringForKey: @"RPCHostWhitelist"] UTF8String]);
 
         NSString * kbString, * mbString, * gbString, * tbString;
         if ([NSApp isOnMountainLionOrBetter])
