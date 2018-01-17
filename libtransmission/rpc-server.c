@@ -591,6 +591,16 @@ isAddressAllowed (const tr_rpc_server * server, const char * address)
 }
 
 static bool
+isIPAddressWithOptionalPort (const char * host)
+{
+  struct sockaddr_storage address;
+  int address_len = sizeof (address);
+
+  /* TODO: move to net.{c,h} */
+  return evutil_parse_sockaddr_port (host, (struct sockaddr *) &address, &address_len) != -1;
+}
+
+static bool
 isHostnameAllowed (const tr_rpc_server * server, struct evhttp_request * req)
 {
   /* If password auth is enabled, any hostname is permitted. */
@@ -607,11 +617,15 @@ isHostnameAllowed (const tr_rpc_server * server, struct evhttp_request * req)
   if (host == NULL)
     return false;
 
+  /* IP address is always acceptable. */
+  if (isIPAddressWithOptionalPort (host))
+    return true;
+
   /* Host header might include the port. */
   char * const hostname = tr_strndup (host, strcspn (host, ":"));
 
-  /* localhost or ipaddress is always acceptable. */
-  if (strcmp (hostname, "localhost") == 0 || strcmp (hostname, "localhost.") == 0 || tr_addressIsIP (hostname))
+  /* localhost is always acceptable. */
+  if (strcmp (hostname, "localhost") == 0 || strcmp (hostname, "localhost.") == 0)
     {
       tr_free (hostname);
       return true;
