@@ -68,9 +68,9 @@
 
 2.3.2.  DNS Rebinding Protection
 
-   If CSRF protection is enabled, additional check is being made on each RPC
-   request to make sure that the client sending the request does so using
-   one of the allowed hostnames by which RPC server is meant to be available.
+   Additional check is being made on each RPC request to make sure that the
+   client sending the request does so using one of the allowed hostnames by
+   which RPC server is meant to be available.
 
    If host whitelisting is enabled (which is true by default), Transmission
    inspects the "Host:" HTTP header value (with port stripped, if any) and

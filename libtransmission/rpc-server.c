@@ -719,7 +719,6 @@ handle_request (struct evhttp_request * req, void * arg)
         {
           handle_upload (req, server);
         }
-#ifdef REQUIRE_SESSION_ID
       else if (!isHostnameAllowed (server, req))
         {
           char * const tmp = tr_strdup_printf (
@@ -736,6 +735,7 @@ handle_request (struct evhttp_request * req, void * arg)
           send_simple_response (req, 421, tmp);
           tr_free (tmp);
         }
+#ifdef REQUIRE_SESSION_ID
       else if (!test_session_id (server, req))
         {
           const char * sessionId = get_current_session_id (server);
