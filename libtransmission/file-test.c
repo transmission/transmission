@@ -635,6 +635,29 @@ static int test_path_resolve(void)
     tr_free(path2);
     tr_free(path1);
 
+#ifdef _WIN32
+
+    {
+        char* tmp;
+
+        tmp = tr_sys_path_resolve("\\\\127.0.0.1\\NonExistent", &err);
+        check_str(tmp, ==, NULL);
+        check_ptr(err, !=, NULL);
+        tr_error_clear(&err);
+
+        tmp = tr_sys_path_resolve("\\\\127.0.0.1\\ADMIN$\\NonExistent", &err);
+        check_str(tmp, ==, NULL);
+        check_ptr(err, !=, NULL);
+        tr_error_clear(&err);
+
+        tmp = tr_sys_path_resolve("\\\\127.0.0.1\\ADMIN$\\System32", &err);
+        check_str(tmp, ==, "\\\\127.0.0.1\\ADMIN$\\System32");
+        check_ptr(err, ==, NULL);
+        tr_free(tmp);
+    }
+
+#endif
+
     tr_free(test_dir);
     return 0;
 }
