@@ -1237,8 +1237,19 @@ char* tr_utf8clean(char const* str, size_t max_len)
 
 char* tr_win32_native_to_utf8(wchar_t const* text, int text_size)
 {
+    return tr_win32_native_to_utf8_ex(text, text_size, 0, 0, NULL);
+}
+
+char* tr_win32_native_to_utf8_ex(wchar_t const* text, int text_size, int extra_chars_before, int extra_chars_after,
+    int* real_result_size)
+{
     char* ret = NULL;
     int size;
+
+    if (text_size == -1)
+    {
+        text_size = wcslen(text);
+    }
 
     size = WideCharToMultiByte(CP_UTF8, 0, text, text_size, NULL, 0, NULL, NULL);
 
@@ -1247,15 +1258,20 @@ char* tr_win32_native_to_utf8(wchar_t const* text, int text_size)
         goto fail;
     }
 
-    ret = tr_new(char, size + 1);
-    size = WideCharToMultiByte(CP_UTF8, 0, text, text_size, ret, size, NULL, NULL);
+    ret = tr_new(char, size + extra_chars_before + extra_chars_after + 1);
+    size = WideCharToMultiByte(CP_UTF8, 0, text, text_size, ret + extra_chars_before, size, NULL, NULL);
 
     if (size == 0)
     {
         goto fail;
     }
 
-    ret[size] = '\0';
+    ret[size + extra_chars_before + extra_chars_after] = '\0';
+
+    if (real_result_size != NULL)
+    {
+        *real_result_size = size;
+    }
 
     return ret;
 
