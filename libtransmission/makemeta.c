@@ -134,10 +134,18 @@ static int builderFileCompare(void const* va, void const* vb)
 
 tr_metainfo_builder* tr_metaInfoBuilderCreate(char const* topFileArg)
 {
+    char* const real_top = tr_sys_path_resolve(topFileArg, NULL);
+
+    if (real_top == NULL)
+    {
+        /* TODO: Better error reporting */
+        return NULL;
+    }
+
     struct FileList* files;
     tr_metainfo_builder* ret = tr_new0(tr_metainfo_builder, 1);
 
-    ret->top = tr_sys_path_resolve(topFileArg, NULL);
+    ret->top = real_top;
 
     {
         tr_sys_path_info info;
