@@ -256,7 +256,7 @@ typedef enum
 
 - (void) linkHomepage: (id) sender;
 - (void) linkForums: (id) sender;
-- (void) linkTrac: (id) sender;
+- (void) linkGitHub: (id) sender;
 - (void) linkDonate: (id) sender;
 
 - (void) rpcCallback: (tr_rpc_callback_type) type forTorrentStruct: (struct tr_torrent *) torrentStruct;

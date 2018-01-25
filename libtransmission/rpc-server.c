@@ -549,6 +549,15 @@ static bool isAddressAllowed(tr_rpc_server const* server, char const* address)
     return false;
 }
 
+static bool isIPAddressWithOptionalPort(char const* host)
+{
+    struct sockaddr_storage address;
+    int address_len = sizeof(address);
+
+    /* TODO: move to net.{c,h} */
+    return evutil_parse_sockaddr_port(host, (struct sockaddr *) &address, &address_len) != -1;
+}
+
 static bool isHostnameAllowed(tr_rpc_server const* server, struct evhttp_request* req)
 {
     /* If password auth is enabled, any hostname is permitted. */
@@ -571,11 +580,17 @@ static bool isHostnameAllowed(tr_rpc_server const* server, struct evhttp_request
         return false;
     }
 
+    /* IP address is always acceptable. */
+    if (isIPAddressWithOptionalPort(host))
+    {
+        return true;
+    }
+
     /* Host header might include the port. */
     char* const hostname = tr_strndup(host, strcspn(host, ":"));
 
-    /* localhost or ipaddress is always acceptable. */
-    if (strcmp(hostname, "localhost") == 0 || strcmp(hostname, "localhost.") == 0 || tr_addressIsIP(hostname))
+    /* localhost is always acceptable. */
+    if (strcmp(hostname, "localhost") == 0 || strcmp(hostname, "localhost.") == 0)
     {
         tr_free(hostname);
         return true;
@@ -681,9 +696,6 @@ static void handle_request(struct evhttp_request* req, void* arg)
         {
             handle_upload(req, server);
         }
-
-#ifdef REQUIRE_SESSION_ID
-
         else if (!isHostnameAllowed(server, req))
         {
             char* const tmp = tr_strdup_printf(
@@ -700,6 +712,9 @@ static void handle_request(struct evhttp_request* req, void* arg)
             send_simple_response(req, 421, tmp);
             tr_free(tmp);
         }
+
+#ifdef REQUIRE_SESSION_ID
+
         else if (!test_session_id(server, req))
         {
             char const* sessionId = get_current_session_id(server);

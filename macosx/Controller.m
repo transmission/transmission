@@ -128,7 +128,7 @@ typedef enum
 
 #define WEBSITE_URL @"https://transmissionbt.com/"
 #define FORUM_URL   @"https://forum.transmissionbt.com/"
-#define TRAC_URL    @"https://trac.transmissionbt.com/"
+#define GITHUB_URL  @"https://github.com/transmission/transmission"
 #define DONATE_URL  @"https://transmissionbt.com/donate/"
 
 #define DONATE_NAG_TIME (60 * 60 * 24 * 7)
@@ -376,6 +376,7 @@ static void removeKeRangerRansomware()
         tr_variantDictAddInt(&settings, TR_KEY_rpc_port, [fDefaults integerForKey: @"RPCPort"]);
         tr_variantDictAddStr(&settings, TR_KEY_rpc_username,  [[fDefaults stringForKey: @"RPCUsername"] UTF8String]);
         tr_variantDictAddBool(&settings, TR_KEY_rpc_whitelist_enabled,  [fDefaults boolForKey: @"RPCUseWhitelist"]);
+        tr_variantDictAddBool(&settings, TR_KEY_rpc_host_whitelist_enabled, [fDefaults boolForKey: @"RPCUseHostWhitelist"]);
         tr_variantDictAddBool(&settings, TR_KEY_seed_queue_enabled, [fDefaults boolForKey: @"QueueSeed"]);
         tr_variantDictAddInt(&settings, TR_KEY_seed_queue_size, [fDefaults integerForKey: @"QueueSeedNumber"]);
         tr_variantDictAddBool(&settings, TR_KEY_start_added_torrents, [fDefaults boolForKey: @"AutoStartDownload"]);
@@ -383,6 +384,9 @@ static void removeKeRangerRansomware()
         tr_variantDictAddStr(&settings, TR_KEY_script_torrent_done_filename, [[fDefaults stringForKey: @"DoneScriptPath"] UTF8String]);
         tr_variantDictAddBool(&settings, TR_KEY_utp_enabled, [fDefaults boolForKey: @"UTPGlobal"]);
 
+        // TODO: Add to GUI
+        if ([fDefaults objectForKey: @"RPCHostWhitelist"])
+            tr_variantDictAddStr(&settings, TR_KEY_rpc_host_whitelist, [[fDefaults stringForKey: @"RPCHostWhitelist"] UTF8String]);
 
         NSByteCountFormatter * unitFormatter = [[NSByteCountFormatter alloc] init];
         [unitFormatter setIncludesCount: NO];
@@ -4488,9 +4492,9 @@ static void removeKeRangerRansomware()
     [[NSWorkspace sharedWorkspace] openURL: [NSURL URLWithString: FORUM_URL]];
 }
 
-- (void) linkTrac: (id) sender
+- (void) linkGitHub: (id) sender
 {
-    [[NSWorkspace sharedWorkspace] openURL: [NSURL URLWithString: TRAC_URL]];
+    [[NSWorkspace sharedWorkspace] openURL: [NSURL URLWithString: GITHUB_URL]];
 }
 
 - (void) linkDonate: (id) sender
