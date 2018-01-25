@@ -406,6 +406,7 @@ static bool parse_args(int argc, char const** argv, tr_variant* settings, bool* 
 
         case 'd':
             *dump_settings = true;
+            *exit_code = 0;
             break;
 
         case 'e':
