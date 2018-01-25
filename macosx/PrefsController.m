@@ -33,7 +33,6 @@
 #import "transmission.h"
 #import "utils.h"
 
-#import <Growl/Growl.h>
 #import <Sparkle/Sparkle.h>
 
 #define DOWNLOAD_FOLDER     0
@@ -58,8 +57,6 @@
 @interface PrefsController (Private)
 
 - (void) setPrefView: (id) sender;
-
-- (void) updateGrowlButton;
 
 - (void) setKeychainPassword: (const char *) password forService: (const char *) service username: (const char *) username;
 
@@ -133,9 +130,6 @@
             [fDefaults removeObjectForKey: @"CheckForUpdates"];
         }
 
-        //set built-in Growl
-        [GrowlApplicationBridge setShouldUseBuiltInNotifications: NO];
-
         [self setAutoUpdateToBeta: nil];
     }
 
@@ -168,9 +162,6 @@
     [[self window] setToolbar: toolbar];
 
     [self setPrefView: nil];
-
-    //make sure proper notification settings are shown
-    [self updateGrowlButton];
 
     //set download folder
     [fFolderPopUp selectItemAtIndex: [fDefaults boolForKey: @"DownloadLocationConstant"] ? DOWNLOAD_FOLDER : DOWNLOAD_TORRENT];
@@ -317,12 +308,6 @@
 - (NSArray *) toolbarDefaultItemIdentifiers: (NSToolbar *) toolbar
 {
     return [self toolbarAllowedItemIdentifiers: toolbar];
-}
-
-- (void) windowDidBecomeMain: (NSNotification *) notification
-{
-    //this is a good place to see if Growl was quit/launched
-    [self updateGrowlButton];
 }
 
 + (void) restoreWindowWithIdentifier: (NSString *) identifier state: (NSCoder *) state completionHandler: (void (^)(NSWindow *, NSError *)) completionHandler
@@ -725,26 +710,7 @@
     [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateUI" object: self];
 }
 
-- (IBAction) setBuiltInGrowlEnabled: (id) sender
-{
-    const BOOL enable = [(NSButton *)sender state] == NSOnState;
-    [fDefaults setBool: enable forKey: @"DisplayNotifications"];
-    [GrowlApplicationBridge setShouldUseBuiltInNotifications: enable];
-}
-
-- (IBAction) openGrowlApp: (id) sender
-{
-    SEL selector = NSSelectorFromString(@"openGrowlPreferences:");
-    NSMethodSignature * signature = [GrowlApplicationBridge methodSignatureForSelector:selector];
-    NSInvocation * invocation = [NSInvocation invocationWithMethodSignature:signature];
-    invocation.selector = selector;
-    invocation.target = GrowlApplicationBridge.class;
-    BOOL yes = YES;
-    [invocation setArgument:&yes atIndex:0];
-    [invocation invoke];
-}
-
-- (void) openNotificationSystemPrefs: (id) sender
+- (IBAction) openNotificationSystemPrefs: (NSButton *) sender
 {
     [[NSWorkspace sharedWorkspace] openURL: [NSURL fileURLWithPath:@"/System/Library/PreferencePanes/Notifications.prefPane"]];
 }
@@ -1477,35 +1443,6 @@
                 [window setTitle: [item label]];
                 break;
             }
-    }
-}
-
-- (void) updateGrowlButton
-{
-    if ([GrowlApplicationBridge isGrowlRunning])
-    {
-        [fBuiltInGrowlButton setHidden: YES];
-        [fGrowlAppButton setHidden: NO];
-
-#warning remove NO
-        [fGrowlAppButton setEnabled: NO /*&& [GrowlApplicationBridge isGrowlURLSchemeAvailable] */];
-        [fGrowlAppButton setTitle: NSLocalizedString(@"Configure In Growl", "Prefs -> Notifications")];
-        [fGrowlAppButton sizeToFit];
-
-        [fGrowlAppButton setTarget: self];
-        [fGrowlAppButton setAction: @selector(openGrowlApp:)];
-    }
-    else
-    {
-        [fBuiltInGrowlButton setHidden: YES];
-        [fGrowlAppButton setHidden: NO];
-
-        [fGrowlAppButton setEnabled: YES];
-        [fGrowlAppButton setTitle: NSLocalizedString(@"Configure In System Preferences", "Prefs -> Notifications")];
-        [fGrowlAppButton sizeToFit];
-
-        [fGrowlAppButton setTarget: self];
-        [fGrowlAppButton setAction: @selector(openNotificationSystemPrefs:)];
     }
 }
 

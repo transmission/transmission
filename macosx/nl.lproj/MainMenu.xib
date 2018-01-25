@@ -695,7 +695,7 @@ CA
                             </menuItem>
                             <menuItem title="Support &amp; ontwikkeling " id="3170">
                                 <connections>
-                                    <action selector="linkTrac:" target="206" id="3171"/>
+                                    <action selector="linkGitHub:" target="206" id="3171"/>
                                 </connections>
                             </menuItem>
                         </items>

@@ -6,6 +6,8 @@
  *
  */
 
+#pragma once
+
 #ifndef __TRANSMISSION__
 #error only libtransmission should #include this header.
 #endif

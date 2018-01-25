@@ -183,6 +183,7 @@ set(${PROJECT_NAME}_PUBLIC_ICONS
     hicolor_apps_48x48_transmission.png
     hicolor_apps_256x256_transmission.png
     hicolor_apps_scalable_transmission.svg
+    hicolor_apps_symbolic_transmission-symbolic.svg
 )
 
 set(ICON_NAME_REGEX "^([^_]+)_([^_]+)_([^_]+)_(.+)$")

@@ -20,6 +20,7 @@
 #include "jsonsl.c"
 
 #define __LIBTRANSMISSION_VARIANT_MODULE__
+
 #include "transmission.h"
 #include "ConvertUTF.h"
 #include "list.h"

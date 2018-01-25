@@ -20,11 +20,11 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#pragma once
+
 #ifndef __TRANSMISSION__
 #error only libtransmission should #include this header.
 #endif
-
-#pragma once
 
 #ifdef _WIN32
 #include <inttypes.h>

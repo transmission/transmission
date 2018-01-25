@@ -6,11 +6,11 @@
  *
  */
 
+#pragma once
+
 #ifndef __TRANSMISSION__
 #error only libtransmission should #include this header.
 #endif
-
-#pragma once
 
 extern struct tr_session_stats const TR_SESSION_STATS_INIT;
 

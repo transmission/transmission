@@ -51,6 +51,7 @@ struct tr_rpc_server
     bool isEnabled;
     bool isPasswordEnabled;
     bool isWhitelistEnabled;
+    bool isHostWhitelistEnabled;
     tr_port port;
     char* url;
     struct tr_address bindAddress;
@@ -62,6 +63,7 @@ struct tr_rpc_server
     char* password;
     char* whitelistStr;
     tr_list* whitelist;
+    tr_list* hostWhitelist;
     int loginattempts;
 
     bool isStreamInitialized;
@@ -547,6 +549,67 @@ static bool isAddressAllowed(tr_rpc_server const* server, char const* address)
     return false;
 }
 
+static bool isIPAddressWithOptionalPort(char const* host)
+{
+    struct sockaddr_storage address;
+    int address_len = sizeof(address);
+
+    /* TODO: move to net.{c,h} */
+    return evutil_parse_sockaddr_port(host, (struct sockaddr *) &address, &address_len) != -1;
+}
+
+static bool isHostnameAllowed(tr_rpc_server const* server, struct evhttp_request* req)
+{
+    /* If password auth is enabled, any hostname is permitted. */
+    if (server->isPasswordEnabled)
+    {
+        return true;
+    }
+
+    /* If whitelist is disabled, no restrictions. */
+    if (!server->isHostWhitelistEnabled)
+    {
+        return true;
+    }
+
+    char const* const host = evhttp_find_header(req->input_headers, "Host");
+
+    /* No host header, invalid request. */
+    if (host == NULL)
+    {
+        return false;
+    }
+
+    /* IP address is always acceptable. */
+    if (isIPAddressWithOptionalPort(host))
+    {
+        return true;
+    }
+
+    /* Host header might include the port. */
+    char* const hostname = tr_strndup(host, strcspn(host, ":"));
+
+    /* localhost is always acceptable. */
+    if (strcmp(hostname, "localhost") == 0 || strcmp(hostname, "localhost.") == 0)
+    {
+        tr_free(hostname);
+        return true;
+    }
+
+    /* Otherwise, hostname must be whitelisted. */
+    for (tr_list* l = server->hostWhitelist; l != NULL; l = l->next)
+    {
+        if (tr_wildmat(hostname, l->data))
+        {
+            tr_free(hostname);
+            return true;
+        }
+    }
+
+    tr_free(hostname);
+    return false;
+}
+
 static bool test_session_id(struct tr_rpc_server* server, struct evhttp_request* req)
 {
     char const* ours = get_current_session_id(server);
@@ -633,6 +696,22 @@ static void handle_request(struct evhttp_request* req, void* arg)
         {
             handle_upload(req, server);
         }
+        else if (!isHostnameAllowed(server, req))
+        {
+            char* const tmp = tr_strdup_printf(
+                "<p>Transmission received your request, but the hostname was unrecognized.</p>"
+                "<p>To fix this, choose one of the following options:"
+                "<ul>"
+                "<li>Enable password authentication, then any hostname is allowed.</li>"
+                "<li>Add the hostname you want to use to the whitelist in settings.</li>"
+                "</ul></p>"
+                "<p>If you're editing settings.json, see the 'rpc-host-whitelist' and 'rpc-host-whitelist-enabled' entries.</p>"
+                "<p>This requirement has been added to help prevent "
+                "<a href=\"https://en.wikipedia.org/wiki/DNS_rebinding\">DNS Rebinding</a> "
+                "attacks.</p>");
+            send_simple_response(req, 421, tmp);
+            tr_free(tmp);
+        }
 
 #ifdef REQUIRE_SESSION_ID
 
@@ -647,7 +726,7 @@ static void handle_request(struct evhttp_request* req, void* arg)
                 "<li> When you get this 409 error message, resend your request with the updated header"
                 "</ol></p>"
                 "<p>This requirement has been added to help prevent "
-                "<a href=\"http://en.wikipedia.org/wiki/Cross-site_request_forgery\">CSRF</a> "
+                "<a href=\"https://en.wikipedia.org/wiki/Cross-site_request_forgery\">CSRF</a> "
                 "attacks.</p>"
                 "<p><code>%s: %s</code></p>",
                 TR_RPC_SESSION_ID_HEADER, sessionId);
@@ -844,17 +923,12 @@ char const* tr_rpcGetUrl(tr_rpc_server const* server)
     return server->url != NULL ? server->url : "";
 }
 
-void tr_rpcSetWhitelist(tr_rpc_server* server, char const* whitelistStr)
+static void tr_rpcSetList(char const* whitelistStr, tr_list** list)
 {
     void* tmp;
 
-    /* keep the string */
-    tmp = server->whitelistStr;
-    server->whitelistStr = tr_strdup(whitelistStr);
-    tr_free(tmp);
-
     /* clear out the old whitelist entries */
-    while ((tmp = tr_list_pop_front(&server->whitelist)) != NULL)
+    while ((tmp = tr_list_pop_front(list)) != NULL)
     {
         tr_free(tmp);
     }
@@ -866,7 +940,7 @@ void tr_rpcSetWhitelist(tr_rpc_server* server, char const* whitelistStr)
         size_t const len = strcspn(walk, delimiters);
         char* token = tr_strndup(walk, len);
 
-        tr_list_append(&server->whitelist, token);
+        tr_list_append(list, token);
 
         if (strcspn(token, "+-") < len)
         {
@@ -889,6 +963,21 @@ void tr_rpcSetWhitelist(tr_rpc_server* server, char const* whitelistStr)
     }
 }
 
+void tr_rpcSetHostWhitelist(tr_rpc_server* server, char const* whitelistStr)
+{
+    tr_rpcSetList(whitelistStr, &server->hostWhitelist);
+}
+
+void tr_rpcSetWhitelist(tr_rpc_server* server, char const* whitelistStr)
+{
+    /* keep the string */
+    char* const tmp = server->whitelistStr;
+    server->whitelistStr = tr_strdup(whitelistStr);
+    tr_free(tmp);
+
+    tr_rpcSetList(whitelistStr, &server->whitelist);
+}
+
 char const* tr_rpcGetWhitelist(tr_rpc_server const* server)
 {
     return server->whitelistStr != NULL ? server->whitelistStr : "";
@@ -902,6 +991,11 @@ void tr_rpcSetWhitelistEnabled(tr_rpc_server* server, bool isEnabled)
 bool tr_rpcGetWhitelistEnabled(tr_rpc_server const* server)
 {
     return server->isWhitelistEnabled;
+}
+
+void tr_rpcSetHostWhitelistEnabled(tr_rpc_server* server, bool isEnabled)
+{
+    server->isHostWhitelistEnabled = isEnabled;
 }
 
 /****
@@ -1052,6 +1146,28 @@ tr_rpc_server* tr_rpcInit(tr_session* session, tr_variant* settings)
     else
     {
         tr_rpcSetWhitelistEnabled(s, boolVal);
+    }
+
+    key = TR_KEY_rpc_host_whitelist_enabled;
+
+    if (!tr_variantDictFindBool(settings, key, &boolVal))
+    {
+        missing_settings_key(key);
+    }
+    else
+    {
+        tr_rpcSetHostWhitelistEnabled(s, boolVal);
+    }
+
+    key = TR_KEY_rpc_host_whitelist;
+
+    if (!tr_variantDictFindStr(settings, key, &str, NULL) && str != NULL)
+    {
+        missing_settings_key(key);
+    }
+    else
+    {
+        tr_rpcSetHostWhitelist(s, str);
     }
 
     key = TR_KEY_rpc_authentication_required;

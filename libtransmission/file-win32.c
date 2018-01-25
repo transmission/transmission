@@ -1,5 +1,5 @@
 /*
- * This file Copyright (C) 2013-2014 Mnemosyne LLC
+ * This file Copyright (C) 2013-2017 Mnemosyne LLC
  *
  * It may be used under the GNU GPL versions 2 or 3
  * or any future license endorsed by Mnemosyne LLC.
@@ -33,6 +33,9 @@ struct tr_sys_dir_win32
     WIN32_FIND_DATAW find_data;
     char* utf8_name;
 };
+
+static wchar_t const native_local_path_prefix[] = { '\\', '\\', '?', '\\' };
+static wchar_t const native_unc_path_prefix[] = { '\\', '\\', '?', '\\', 'U', 'N', 'C', '\\' };
 
 static void set_system_error(tr_error** error, DWORD code)
 {
@@ -146,14 +149,12 @@ static wchar_t* path_to_native_path_ex(char const* path, int extra_chars_after, 
     /* Extending maximum path length limit up to ~32K. See "Naming Files, Paths, and Namespaces"
        (https://msdn.microsoft.com/en-us/library/windows/desktop/aa365247.aspx) for more info */
 
-    wchar_t const local_prefix[] = { '\\', '\\', '?', '\\' };
-    wchar_t const unc_prefix[] = { '\\', '\\', '?', '\\', 'U', 'N', 'C', '\\' };
-
     bool const is_relative = tr_sys_path_is_relative(path);
     bool const is_unc = is_unc_path(path);
 
     /* `-2` for UNC since we overwrite existing prefix slashes */
-    int const extra_chars_before = is_relative ? 0 : (is_unc ? TR_N_ELEMENTS(unc_prefix) - 2 : TR_N_ELEMENTS(local_prefix));
+    int const extra_chars_before = is_relative ? 0 : (is_unc ? TR_N_ELEMENTS(native_unc_path_prefix) - 2 :
+        TR_N_ELEMENTS(native_local_path_prefix));
 
     /* TODO (?): TR_ASSERT(!is_relative); */
 
@@ -171,12 +172,12 @@ static wchar_t* path_to_native_path_ex(char const* path, int extra_chars_after, 
         if (is_unc)
         {
             /* UNC path: "\\server\share" -> "\\?\UNC\server\share" */
-            memcpy(wide_path, unc_prefix, sizeof(unc_prefix));
+            memcpy(wide_path, native_unc_path_prefix, sizeof(native_unc_path_prefix));
         }
         else
         {
             /* Local path: "C:" -> "\\?\C:" */
-            memcpy(wide_path, local_prefix, sizeof(local_prefix));
+            memcpy(wide_path, native_local_path_prefix, sizeof(native_local_path_prefix));
         }
     }
 
@@ -199,6 +200,30 @@ static wchar_t* path_to_native_path_ex(char const* path, int extra_chars_after, 
 static wchar_t* path_to_native_path(char const* path)
 {
     return path_to_native_path_ex(path, 0, NULL);
+}
+
+static char* native_path_to_path(wchar_t const* wide_path)
+{
+    if (wide_path == NULL)
+    {
+        return NULL;
+    }
+
+    bool const is_unc = wcsncmp(wide_path, native_unc_path_prefix, TR_N_ELEMENTS(native_unc_path_prefix)) == 0;
+    bool const is_local = !is_unc && wcsncmp(wide_path, native_local_path_prefix, TR_N_ELEMENTS(native_local_path_prefix)) == 0;
+
+    size_t const skip_chars = is_unc ? TR_N_ELEMENTS(native_unc_path_prefix) :
+        (is_local ? TR_N_ELEMENTS(native_local_path_prefix) : 0);
+
+    char* const path = tr_win32_native_to_utf8_ex(wide_path + skip_chars, -1, is_unc ? 2 : 0, 0, NULL);
+
+    if (is_unc && path != NULL)
+    {
+        path[0] = '\\';
+        path[1] = '\\';
+    }
+
+    return path;
 }
 
 static tr_sys_file_t open_file(char const* path, DWORD access, DWORD disposition, DWORD flags, tr_error** error)
@@ -541,8 +566,9 @@ char* tr_sys_path_resolve(char const* path, tr_error** error)
         goto fail;
     }
 
-    /* Resolved path always begins with "\\?\", so skip those first four chars. */
-    ret = tr_win32_native_to_utf8(wide_ret + 4, -1);
+    TR_ASSERT(wcsncmp(wide_ret, L"\\\\?\\", 4) == 0);
+
+    ret = native_path_to_path(wide_ret);
 
     if (ret != NULL)
     {
@@ -740,6 +766,21 @@ bool tr_sys_path_remove(char const* path, tr_error** error)
     tr_free(wide_path);
 
     return ret;
+}
+
+char* tr_sys_path_native_separators(char* path)
+{
+    if (path == NULL)
+    {
+        return NULL;
+    }
+
+    for (char* slash = strchr(path, '/'); slash != NULL; slash = strchr(slash, '/'))
+    {
+        *slash = '\\';
+    }
+
+    return path;
 }
 
 tr_sys_file_t tr_sys_file_get_std(tr_std_sys_file_t std_file, tr_error** error)

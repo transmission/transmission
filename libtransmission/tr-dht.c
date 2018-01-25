@@ -415,6 +415,9 @@ int tr_dhtInit(tr_session* ss)
     return 1;
 
 fail:
+    tr_free(nodes6);
+    tr_free(nodes);
+
     tr_logAddNamedDbg("DHT", "DHT initialization failed (errno = %d)", errno);
     session = NULL;
     return -1;

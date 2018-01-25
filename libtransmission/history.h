@@ -6,11 +6,11 @@
  *
  */
 
+#pragma once
+
 #ifndef __TRANSMISSION__
 #error only libtransmission should #include this header.
 #endif
-
-#pragma once
 
 /**
  * A generic short-term memory object that remembers how many times

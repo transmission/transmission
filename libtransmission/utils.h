@@ -1,5 +1,5 @@
 /*
- * This file Copyright (C) 2009-2014 Mnemosyne LLC
+ * This file Copyright (C) 2009-2017 Mnemosyne LLC
  *
  * It may be used under the GNU GPL versions 2 or 3
  * or any future license endorsed by Mnemosyne LLC.
@@ -115,6 +115,8 @@ char* tr_utf8clean(char const* str, size_t len) TR_GNUC_MALLOC;
 #ifdef _WIN32
 
 char* tr_win32_native_to_utf8(wchar_t const* text, int text_size);
+char* tr_win32_native_to_utf8_ex(wchar_t const* text, int text_size, int extra_chars_before, int extra_chars_after,
+    int* real_result_size);
 wchar_t* tr_win32_utf8_to_native(char const* text, int text_size);
 wchar_t* tr_win32_utf8_to_native_ex(char const* text, int text_size, int extra_chars_before, int extra_chars_after,
     int* real_result_size);
@@ -153,6 +155,9 @@ void* tr_realloc(void* p, size_t size);
 
 /** @brief Portability wrapper around free() in which `NULL' is a safe argument */
 void tr_free(void* p);
+
+/** @brief Free pointers in a NULL-terminated array (the array itself is not freed) */
+void tr_free_ptrv(void* const* p);
 
 /**
  * @brief make a newly-allocated copy of a chunk of memory

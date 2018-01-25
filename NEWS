@@ -1,3 +1,16 @@
+=== Transmission 2.93 (2018/01/xx) ===
+[https://github.com/transmission/transmission/releases/tag/2.93 All tickets closed by this release]
+==== All Platforms ====
+  * Fix CVE-2018-5702 (#468)
+  * Fix crash on handshake if establishing DH shared secret fails (#27)
+  * Fix crash when switching to next tracker during announcement (#297)
+  * Fix potential issue during password salt extraction in OOM situation (#141)
+  * Workaround `glib_DEFUN`- and `glib_REQUIRE`-related configuration issue (#215)
+  * Fix building against OpenSSL 1.1.0+ (#24)
+==== Mac Client ====
+  * Fix uncaught exception when dragging multiple items between groups (#51)
+  * Don't hard-code libcrypto version to 0.9.8 in Xcode project (#71)
+
 === Transmission 2.92 (2016/03/06) ===
 [https://trac.transmissionbt.com/query?milestone=2.92&group=component&order=severity All tickets closed by this release]
 ==== Mac Client ====

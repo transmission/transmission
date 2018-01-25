@@ -6,11 +6,11 @@
  *
  */
 
+#pragma once
+
 #ifndef __LIBTRANSMISSION_ANNOUNCER_MODULE__
 #error only the libtransmission announcer module should #include this header.
 #endif
-
-#pragma once
 
 #include "transmission.h" /* SHA_DIGEST_LENGTH */
 #include "session.h" /* PEER_ID_LEN */

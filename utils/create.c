@@ -192,6 +192,12 @@ int tr_main(int argc, char* argv[])
 
     b = tr_metaInfoBuilderCreate(infile);
 
+    if (b == NULL)
+    {
+        fprintf(stderr, "ERROR: Cannot find specified input file or directory.\n");
+        return EXIT_FAILURE;
+    }
+
     if (piecesize_kib != 0)
     {
         tr_metaInfoBuilderSetPieceSize(b, piecesize_kib * KiB);

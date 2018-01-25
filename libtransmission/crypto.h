@@ -6,12 +6,12 @@
  *
  */
 
+#ifndef TR_ENCRYPTION_H
+#define TR_ENCRYPTION_H
+
 #ifndef __TRANSMISSION__
 #error only libtransmission should #include this header.
 #endif
-
-#ifndef TR_ENCRYPTION_H
-#define TR_ENCRYPTION_H
 
 #include <inttypes.h>
 
