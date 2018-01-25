@@ -100,11 +100,11 @@ TorrentRendererHelper.renderProgressbar = function (controller, t, progressbar) 
 };
 
 TorrentRendererHelper.formatUL = function (t) {
-    return '↑ ' + Transmission.fmt.speedBps(t.getUploadSpeed());
+    return '▲' + Transmission.fmt.speedBps(t.getUploadSpeed());
 };
 
 TorrentRendererHelper.formatDL = function (t) {
-    return '↓ ' + Transmission.fmt.speedBps(t.getDownloadSpeed());
+    return '▼' + Transmission.fmt.speedBps(t.getDownloadSpeed());
 };
 
 TorrentRendererHelper.formatETA = function(t) {
@@ -186,7 +186,7 @@ TorrentRendererFull.prototype = {
                     fmt.countString('peer', 'peers', peer_count),
                     'and',
                     fmt.countString('web seed', 'web seeds', webseed_count),
-                    '-',
+                    '–',
                     TorrentRendererHelper.formatDL(t),
                     TorrentRendererHelper.formatUL(t)
                 ].join(' ');
@@ -194,7 +194,7 @@ TorrentRendererFull.prototype = {
                 // Downloading from 2 webseed(s)
                 return ['Downloading from',
                     fmt.countString('web seed', 'web seeds', webseed_count),
-                    '-',
+                    '–',
                     TorrentRendererHelper.formatDL(t),
                     TorrentRendererHelper.formatUL(t)
                 ].join(' ');
@@ -204,7 +204,7 @@ TorrentRendererFull.prototype = {
                     t.getPeersSendingToUs(),
                     'of',
                     fmt.countString('peer', 'peers', peer_count),
-                    '-',
+                    '–',
                     TorrentRendererHelper.formatDL(t),
                     TorrentRendererHelper.formatUL(t)
                 ].join(' ');

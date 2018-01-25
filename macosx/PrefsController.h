@@ -35,7 +35,7 @@
 
     NSString * fInitialString;
 
-    IBOutlet NSButton * fBuiltInGrowlButton, *fGrowlAppButton;
+    IBOutlet NSButton *fSystemPreferencesButton;
     IBOutlet NSTextField * fCheckForUpdatesLabel;
     IBOutlet NSButton * fCheckForUpdatesButton, * fCheckForUpdatesBetaButton;
 
@@ -102,9 +102,7 @@
 
 - (void) setBadge: (id) sender;
 
-- (IBAction) setBuiltInGrowlEnabled: (id) sender;
-- (IBAction) openGrowlApp: (id) sender;
-- (void) openNotificationSystemPrefs: (id) sender;
+- (IBAction) openNotificationSystemPrefs: (NSButton *) sender;
 
 - (void) resetWarnings: (id) sender;
 

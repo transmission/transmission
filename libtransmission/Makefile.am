@@ -91,9 +91,9 @@ AM_CPPFLAGS += -DWITH_KQUEUE
 endif
 
 if WIN32
-libtransmission_a_SOURCES += file-win32.c watchdir-win32.c
+libtransmission_a_SOURCES += file-win32.c subprocess-win32.c watchdir-win32.c
 else
-libtransmission_a_SOURCES += file-posix.c
+libtransmission_a_SOURCES += file-posix.c subprocess-posix.c
 endif
 
 if CRYPTO_USE_OPENSSL
@@ -157,6 +157,7 @@ noinst_HEADERS = \
   session.h \
   session-id.h \
   stats.h \
+  subprocess.h \
   torrent.h \
   torrent-magnet.h \
   tr-getopt.h \
@@ -197,6 +198,7 @@ TESTS = \
   rename-test \
   rpc-test \
   session-test \
+  subprocess-test \
   tr-getopt-test \
   utils-test \
   variant-test \
@@ -285,6 +287,10 @@ rpc_test_LDFLAGS = ${apps_ldflags}
 session_test_SOURCES = session-test.c $(TEST_SOURCES)
 session_test_LDADD = ${apps_ldadd}
 session_test_LDFLAGS = ${apps_ldflags}
+
+subprocess_test_SOURCES = subprocess-test.c $(TEST_SOURCES)
+subprocess_test_LDADD = ${apps_ldadd}
+subprocess_test_LDFLAGS = ${apps_ldflags}
 
 tr_getopt_test_SOURCES = tr-getopt-test.c $(TEST_SOURCES)
 tr_getopt_test_LDADD = ${apps_ldadd}

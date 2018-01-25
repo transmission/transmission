@@ -28,6 +28,12 @@
 #define __has_builtin(x) 0
 #endif
 
+#ifdef _WIN32
+#define TR_IF_WIN32(ThenValue, ElseValue) ThenValue
+#else
+#define TR_IF_WIN32(ThenValue, ElseValue) ElseValue
+#endif
+
 #ifdef __GNUC__
 #define TR_GNUC_CHECK_VERSION(major, minor) \
     (__GNUC__ > (major) || \

@@ -172,8 +172,6 @@
 		A25E03E30E4015380086C225 /* tr-getopt.c in Sources */ = {isa = PBXBuildFile; fileRef = A25E03E10E4015380086C225 /* tr-getopt.c */; };
 		A25E74650AF5097C006F11AE /* ExpandedPathToPathTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = A25E74440AF5089E006F11AE /* ExpandedPathToPathTransformer.m */; };
 		A25E74660AF5097D006F11AE /* ExpandedPathToIconTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = A25E74460AF5089E006F11AE /* ExpandedPathToIconTransformer.m */; };
-		A261F1DC0A69A1610002815A /* Growl.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A261F1DB0A69A1610002815A /* Growl.framework */; };
-		A261F1E40A69A1B10002815A /* Growl.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = A261F1DB0A69A1610002815A /* Growl.framework */; };
 		A263CFC010DD67670038DE27 /* InfoTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = A263CFBF10DD67670038DE27 /* InfoTextField.m */; };
 		A2661D6112D0E8D9004F69D5 /* FilterBarView.m in Sources */ = {isa = PBXBuildFile; fileRef = A2661D3B12D0E51B004F69D5 /* FilterBarView.m */; };
 		A267927C130DFF2700CB7464 /* libutp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E38544130DFEE3001F501B /* libutp.a */; };
@@ -341,6 +339,8 @@
 		C1077A51183EB29600634C22 /* file.h in Headers */ = {isa = PBXBuildFile; fileRef = C1077A4D183EB29600634C22 /* file.h */; };
 		C10C644D1D9AF328003C1B4C /* session-id.c in Sources */ = {isa = PBXBuildFile; fileRef = C10C644B1D9AF328003C1B4C /* session-id.c */; };
 		C10C644E1D9AF328003C1B4C /* session-id.h in Headers */ = {isa = PBXBuildFile; fileRef = C10C644C1D9AF328003C1B4C /* session-id.h */; };
+		C11DEA161FCD31C0009E22B9 /* subprocess-posix.c in Sources */ = {isa = PBXBuildFile; fileRef = C11DEA141FCD31C0009E22B9 /* subprocess-posix.c */; };
+		C11DEA171FCD31C0009E22B9 /* subprocess.h in Headers */ = {isa = PBXBuildFile; fileRef = C11DEA151FCD31C0009E22B9 /* subprocess.h */; };
 		C12F19791E1AE3C30005E93F /* upnperrors.c in Sources */ = {isa = PBXBuildFile; fileRef = C12F19771E1AE3C30005E93F /* upnperrors.c */; };
 		C12F197B1E1AE4460005E93F /* upnperrors.h in Headers */ = {isa = PBXBuildFile; fileRef = C12F197A1E1AE4460005E93F /* upnperrors.h */; };
 		C1305EBE186A13B100F03351 /* file.c in Sources */ = {isa = PBXBuildFile; fileRef = C1305EB8186A134000F03351 /* file.c */; };
@@ -461,7 +461,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				A261F1E40A69A1B10002815A /* Growl.framework in Copy Files */,
 				A24F19210A3A796800C9C145 /* Sparkle.framework in Copy Files */,
 			);
 			name = "Copy Files";
@@ -722,7 +721,6 @@
 		A2613F9911B3383200472893 /* pt_PT */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pt_PT; path = macosx/pt_PT.lproj/Localizable.strings; sourceTree = "<group>"; };
 		A2613F9A11B3383200472893 /* pt_PT */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = pt_PT; path = macosx/pt_PT.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		A2613F9B11B3383200472893 /* pt_PT */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = pt_PT; path = macosx/pt_PT.lproj/PrefsWindow.xib; sourceTree = "<group>"; };
-		A261F1DB0A69A1610002815A /* Growl.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Growl.framework; path = macosx/Growl.framework; sourceTree = "<group>"; };
 		A263C5651560A35B0082A3D1 /* da */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = da; path = macosx/da.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		A263C5661560A3CF0082A3D1 /* da */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = da; path = macosx/da.lproj/Localizable.strings; sourceTree = "<group>"; };
 		A263C5671560A4210082A3D1 /* da */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = da; path = macosx/da.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -987,6 +985,8 @@
 		C1077A4D183EB29600634C22 /* file.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = file.h; path = libtransmission/file.h; sourceTree = "<group>"; };
 		C10C644B1D9AF328003C1B4C /* session-id.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "session-id.c"; path = "libtransmission/session-id.c"; sourceTree = "<group>"; };
 		C10C644C1D9AF328003C1B4C /* session-id.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "session-id.h"; path = "libtransmission/session-id.h"; sourceTree = "<group>"; };
+		C11DEA141FCD31C0009E22B9 /* subprocess-posix.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "subprocess-posix.c"; path = "libtransmission/subprocess-posix.c"; sourceTree = "<group>"; };
+		C11DEA151FCD31C0009E22B9 /* subprocess.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = subprocess.h; path = libtransmission/subprocess.h; sourceTree = "<group>"; };
 		C12F19771E1AE3C30005E93F /* upnperrors.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = upnperrors.c; path = "third-party/miniupnpc/upnperrors.c"; sourceTree = "<group>"; };
 		C12F197A1E1AE4460005E93F /* upnperrors.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = upnperrors.h; path = "third-party/miniupnpc/upnperrors.h"; sourceTree = "<group>"; };
 		C1305EB8186A134000F03351 /* file.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = file.c; path = libtransmission/file.c; sourceTree = "<group>"; };
@@ -1044,7 +1044,6 @@
 				4D3EA0AA08AE13C600EA10C2 /* IOKit.framework in Frameworks */,
 				4D1838DD09DEC0E80047D688 /* libtransmission.a in Frameworks */,
 				A24F19080A3A790800C9C145 /* Sparkle.framework in Frameworks */,
-				A261F1DC0A69A1610002815A /* Growl.framework in Frameworks */,
 				A296EF3B11E560A7004A2781 /* libiconv.dylib in Frameworks */,
 				A2290D2514421D1A00B95A09 /* libcrypto.dylib in Frameworks */,
 				A2290D2E1442B23200B95A09 /* libcurl.4.dylib in Frameworks */,
@@ -1332,7 +1331,6 @@
 				A2E669780F5B8E5A00B4251A /* Security.framework */,
 				A22CFB810FB66EF30009BD3E /* Carbon.framework */,
 				A221DCC7104B3660008A642D /* Quartz.framework */,
-				A261F1DB0A69A1610002815A /* Growl.framework */,
 				A24F19070A3A790800C9C145 /* Sparkle.framework */,
 			);
 			name = Frameworks;
@@ -1357,6 +1355,8 @@
 				C1077A4C183EB29600634C22 /* file-posix.c */,
 				C1305EB8186A134000F03351 /* file.c */,
 				C1077A4D183EB29600634C22 /* file.h */,
+				C11DEA141FCD31C0009E22B9 /* subprocess-posix.c */,
+				C11DEA151FCD31C0009E22B9 /* subprocess.h */,
 				4D80185710BBC0B0008A4AF2 /* magnet.c */,
 				4D80185810BBC0B0008A4AF2 /* magnet.h */,
 				4D8017E810BBC073008A4AF2 /* torrent-magnet.c */,
@@ -1810,6 +1810,7 @@
 				4D36BA780CA2F00800A63CA5 /* peer-mgr.h in Headers */,
 				4D36BA7A0CA2F00800A63CA5 /* peer-msgs.h in Headers */,
 				4D36BA7B0CA2F00800A63CA5 /* ptrarray.h in Headers */,
+				C11DEA171FCD31C0009E22B9 /* subprocess.h in Headers */,
 				A25D2CBE0CF4C73E0096A262 /* stats.h in Headers */,
 				C1033E0A1A3279B800EF44D8 /* crypto-utils.h in Headers */,
 				A29DF8BA0DB2544C00D04E5A /* resume.h in Headers */,
@@ -2358,6 +2359,7 @@
 				D4AF3B2F0C41F7A500D46B6B /* list.c in Sources */,
 				4394AC670C74FB6000F367E8 /* ptrarray.c in Sources */,
 				A24621420C769D0900088E81 /* trevent.c in Sources */,
+				C11DEA161FCD31C0009E22B9 /* subprocess-posix.c in Sources */,
 				4D36BA6F0CA2F00800A63CA5 /* crypto.c in Sources */,
 				4D36BA720CA2F00800A63CA5 /* handshake.c in Sources */,
 				4D36BA740CA2F00800A63CA5 /* peer-io.c in Sources */,

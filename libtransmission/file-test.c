@@ -1,5 +1,5 @@
 /*
- * This file Copyright (C) 2013-2014 Mnemosyne LLC
+ * This file Copyright (C) 2013-2017 Mnemosyne LLC
  *
  * It may be used under the GNU GPL versions 2 or 3
  * or any future license endorsed by Mnemosyne LLC.
@@ -635,6 +635,29 @@ static int test_path_resolve(void)
     tr_free(path2);
     tr_free(path1);
 
+#ifdef _WIN32
+
+    {
+        char* tmp;
+
+        tmp = tr_sys_path_resolve("\\\\127.0.0.1\\NonExistent", &err);
+        check_str(tmp, ==, NULL);
+        check_ptr(err, !=, NULL);
+        tr_error_clear(&err);
+
+        tmp = tr_sys_path_resolve("\\\\127.0.0.1\\ADMIN$\\NonExistent", &err);
+        check_str(tmp, ==, NULL);
+        check_ptr(err, !=, NULL);
+        tr_error_clear(&err);
+
+        tmp = tr_sys_path_resolve("\\\\127.0.0.1\\ADMIN$\\System32", &err);
+        check_str(tmp, ==, "\\\\127.0.0.1\\ADMIN$\\System32");
+        check_ptr(err, ==, NULL);
+        tr_free(tmp);
+    }
+
+#endif
+
     tr_free(test_dir);
     return 0;
 }
@@ -956,6 +979,42 @@ static int test_path_remove(void)
     tr_free(path1);
 
     tr_free(test_dir);
+    return 0;
+}
+
+static int test_path_native_separators(void)
+{
+    check_str(tr_sys_path_native_separators(NULL), == , NULL);
+
+    char path1[] = "";
+    char path2[] = "a";
+    char path3[] = "/";
+    char path4[] = "/a/b/c";
+    char path5[] = "C:\\a/b\\c";
+
+    struct
+    {
+        char* input;
+        char const* output;
+    }
+    test_data[] =
+    {
+        { path1, "" },
+        { path2, TR_IF_WIN32("a", "a") },
+        { path3, TR_IF_WIN32("\\", "/") },
+        { path4, TR_IF_WIN32("\\a\\b\\c", "/a/b/c") },
+        { path5, TR_IF_WIN32("C:\\a\\b\\c", "C:\\a/b\\c") },
+    };
+
+    for (size_t i = 0; i < TR_N_ELEMENTS(test_data); ++i)
+    {
+        char* const output = tr_sys_path_native_separators(test_data[i].input);
+
+        check_str(output, ==, test_data[i].output);
+        check_str(test_data[i].input, ==, test_data[i].output);
+        check_ptr(output, ==, test_data[i].input);
+    }
+
     return 0;
 }
 
@@ -1565,6 +1624,7 @@ int main(void)
         test_path_basename_dirname,
         test_path_rename,
         test_path_remove,
+        test_path_native_separators,
         test_file_open,
         test_file_read_write_seek,
         test_file_truncate,

@@ -245,7 +245,7 @@
 /* Preferences -> toolbar item title */
 "Bandwidth" = "Båndbredde";
 
-/* Growl notification description */
+/* notification description */
 "Bandwidth settings changed" = "Båndbredde-indstillinger er ændret";
 
 /* Groups -> Name */
@@ -280,12 +280,6 @@
 
 /* View menu -> Quick Look */
 "Close Quick Look" = "Luk Vis";
-
-/* Prefs -> Notifications */
-"Configure In Growl" = "Indstil i Growl";
-
-/* Prefs -> Notifications */
-"Configure In System Preferences" = "Indstil i Systemindstillinger";
 
 /* Blocklist -> message */
 "Connecting to site" = "Opretter forbindelse";
@@ -939,10 +933,10 @@
    Status Bar -> speed tooltip */
 "Speed Limit" = "Begræns hastighed";
 
-/* Growl notification title */
+/* notification title */
 "Speed Limit Auto Disabled" = "Begræns hastighed automatisk deaktiveret";
 
-/* Growl notification title */
+/* notification title */
 "Speed Limit Auto Enabled" = "Begræns hastighed automatisk aktiveret";
 
 /* Main window -> 2nd bottom left button (turtle) tooltip */

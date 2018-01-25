@@ -291,6 +291,8 @@ static struct tr_key_struct const my_static[] =
     { "rpc-authentication-required", 27 },
     { "rpc-bind-address", 16 },
     { "rpc-enabled", 11 },
+    { "rpc-host-whitelist", 18 },
+    { "rpc-host-whitelist-enabled", 26 },
     { "rpc-password", 12 },
     { "rpc-port", 8 },
     { "rpc-url", 7 },

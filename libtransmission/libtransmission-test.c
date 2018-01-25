@@ -1,5 +1,5 @@
 /*
- * This file Copyright (C) 2013-2014 Mnemosyne LLC
+ * This file Copyright (C) 2013-2017 Mnemosyne LLC
  *
  * It may be used under the GNU GPL versions 2 or 3
  * or any future license endorsed by Mnemosyne LLC.
@@ -208,7 +208,7 @@ char* libtest_sandbox_create(void)
     char* sandbox = tr_buildPath(path, "sandbox-XXXXXX", NULL);
     tr_free(path);
     tr_sys_dir_create_temp(sandbox, NULL);
-    return sandbox;
+    return tr_sys_path_native_separators(sandbox);
 }
 
 static void rm_rf(char const* killme)

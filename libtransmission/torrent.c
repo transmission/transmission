@@ -43,6 +43,7 @@
 #include "ptrarray.h"
 #include "resume.h"
 #include "session.h"
+#include "subprocess.h"
 #include "torrent.h"
 #include "torrent-magnet.h"
 #include "tr-assert.h"
@@ -2240,150 +2241,64 @@ void tr_torrentClearIdleLimitHitCallback(tr_torrent* torrent)
     tr_torrentSetIdleLimitHitCallback(torrent, NULL, NULL);
 }
 
-#ifndef _WIN32
-
-static void onSigCHLD(int i UNUSED)
+static void get_local_time_str(char* const buffer, size_t const buffer_len)
 {
-    int rc;
+    time_t const now = tr_time();
 
-    do
+    tr_strlcpy(buffer, ctime(&now), buffer_len);
+
+    char* newline_pos = strchr(buffer, '\n');
+
+    /* ctime() includes '\n', but it's better to be safe */
+    if (newline_pos != NULL)
     {
-        rc = waitpid(-1, NULL, WNOHANG);
+        *newline_pos = '\0';
     }
-    while (rc > 0 || (rc == -1 && errno == EINTR));
 }
-
-#endif
 
 static void torrentCallScript(tr_torrent const* tor, char const* script)
 {
-    char timeStr[128];
-    char* newlinePos;
-    time_t const now = tr_time();
-
-    tr_strlcpy(timeStr, ctime(&now), sizeof(timeStr));
-
-    /* ctime () includes '\n', but it's better to be safe */
-    newlinePos = strchr(timeStr, '\n');
-
-    if (newlinePos != NULL)
+    if (script == NULL || *script == '\0')
     {
-        *newlinePos = '\0';
+        return;
     }
 
-    if (script != NULL && *script != '\0')
+    char time_str[32];
+    get_local_time_str(time_str, TR_N_ELEMENTS(time_str));
+
+    char* const torrent_dir = tr_sys_path_native_separators(tr_strdup(tor->currentDir));
+
+    char* const cmd[] =
     {
-        char* cmd[] =
-        {
-            tr_strdup(script), NULL
-        };
-        char* env[] =
-        {
-            tr_strdup_printf("TR_APP_VERSION=%s", SHORT_VERSION_STRING),
-            tr_strdup_printf("TR_TIME_LOCALTIME=%s", timeStr),
-            tr_strdup_printf("TR_TORRENT_DIR=%s", tor->currentDir),
-            tr_strdup_printf("TR_TORRENT_GROUP=%s", tr_torrentGetDownloadGroup(tor)),
-            tr_strdup_printf("TR_TORRENT_HASH=%s", tor->info.hashString),
-            tr_strdup_printf("TR_TORRENT_ID=%d", tr_torrentId(tor)),
-            tr_strdup_printf("TR_TORRENT_NAME=%s", tr_torrentName(tor)),
-            NULL
-        };
+        tr_strdup(script),
+        NULL
+    };
 
-        tr_logAddTorInfo(tor, "Calling script \"%s\"", script);
+    char* const env[] =
+    {
+        tr_strdup_printf("TR_APP_VERSION=%s", SHORT_VERSION_STRING),
+        tr_strdup_printf("TR_TIME_LOCALTIME=%s", time_str),
+        tr_strdup_printf("TR_TORRENT_DIR=%s", torrent_dir),
+        tr_strdup_printf("TR_TORRENT_GROUP=%s", tr_torrentGetDownloadGroup(tor)),
+        tr_strdup_printf("TR_TORRENT_HASH=%s", tor->info.hashString),
+        tr_strdup_printf("TR_TORRENT_ID=%d", tr_torrentId(tor)),
+        tr_strdup_printf("TR_TORRENT_NAME=%s", tr_torrentName(tor)),
+        NULL
+    };
 
-#ifdef TR_ENABLE_ASSERTS
+    tr_logAddTorInfo(tor, "Calling script \"%s\"", script);
 
-        /* Win32 environment block strings should be sorted alphabetically */
-        for (size_t i = 1; env[i] != NULL; ++i)
-        {
-            TR_ASSERT(strcmp(env[i - 1], env[i]) < 0);
-        }
+    tr_error* error = NULL;
 
-#endif
-
-#ifdef _WIN32
-
-        wchar_t* wide_script = tr_win32_utf8_to_native(script, -1);
-
-        size_t env_block_size = 0;
-        char* env_block = NULL;
-
-        for (size_t i = 0; env[i] != NULL; ++i)
-        {
-            size_t const len = strlen(env[i]) + 1;
-            env_block = tr_renew(char, env_block, env_block_size + len + 1);
-            memcpy(env_block + env_block_size, env[i], len + 1);
-            env_block_size += len;
-        }
-
-        wchar_t* wide_env_block = NULL;
-
-        if (env_block != NULL)
-        {
-            env_block[env_block_size] = '\0';
-            wide_env_block = tr_win32_utf8_to_native(env_block, env_block_size + 1);
-            tr_free(env_block);
-        }
-
-        STARTUPINFOW si = { 0, };
-        si.cb = sizeof(si);
-        si.dwFlags = STARTF_USESHOWWINDOW;
-        si.wShowWindow = SW_HIDE;
-
-        PROCESS_INFORMATION pi;
-
-        if (CreateProcessW(wide_script, NULL, NULL, NULL, FALSE, NORMAL_PRIORITY_CLASS | CREATE_UNICODE_ENVIRONMENT |
-            CREATE_NO_WINDOW | CREATE_DEFAULT_ERROR_MODE | DETACHED_PROCESS, wide_env_block, L"\\", &si, &pi))
-        {
-            CloseHandle(pi.hThread);
-            CloseHandle(pi.hProcess);
-        }
-        else
-        {
-            char* const message = tr_win32_format_message(GetLastError());
-            tr_logAddTorErr(tor, "error executing script \"%s\": %s", script, message);
-            tr_free(message);
-        }
-
-        tr_free(wide_env_block);
-        tr_free(wide_script);
-
-#else /* _WIN32 */
-
-        signal(SIGCHLD, onSigCHLD);
-
-        if (fork() == 0)
-        {
-            for (size_t i = 0; env[i] != NULL; ++i)
-            {
-                putenv(env[i]);
-            }
-
-            if (chdir("/") == -1)
-            {
-                /* ignore (nice to have but not that critical) */
-            }
-
-            if (execvp(script, cmd) == -1)
-            {
-                tr_logAddTorErr(tor, "error executing script \"%s\": %s", script, tr_strerror(errno));
-            }
-
-            _exit(0);
-        }
-
-#endif /* _WIN32 */
-
-        for (size_t i = 0; cmd[i] != NULL; ++i)
-        {
-            tr_free(cmd[i]);
-        }
-
-        for (size_t i = 0; env[i] != NULL; ++i)
-        {
-            tr_free(env[i]);
-        }
+    if (!tr_spawn_async(cmd, env, TR_IF_WIN32("\\", "/"), &error))
+    {
+        tr_logAddTorErr(tor, "Error executing script \"%s\" (%d): %s", script, error->code, error->message);
+        tr_error_free(error);
     }
+
+    tr_free_ptrv((void* const*)env);
+    tr_free_ptrv((void* const*)cmd);
+    tr_free(torrent_dir);
 }
 
 void tr_torrentRecheckCompleteness(tr_torrent* tor)

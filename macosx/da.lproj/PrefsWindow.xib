@@ -14,7 +14,6 @@
                 <outlet property="fBlocklistDateField" destination="1738" id="1740"/>
                 <outlet property="fBlocklistMessageField" destination="1435" id="1463"/>
                 <outlet property="fBlocklistURLField" destination="1985" id="1994"/>
-                <outlet property="fBuiltInGrowlButton" destination="2104" id="2109"/>
                 <outlet property="fCheckForUpdatesBetaButton" destination="1895" id="2040"/>
                 <outlet property="fCheckForUpdatesButton" destination="650" id="2041"/>
                 <outlet property="fCheckForUpdatesLabel" destination="652" id="2042"/>
@@ -23,7 +22,6 @@
                 <outlet property="fFolderPopUp" destination="51" id="98"/>
                 <outlet property="fGeneralView" destination="28" id="71"/>
                 <outlet property="fGroupsView" destination="1760" id="1761"/>
-                <outlet property="fGrowlAppButton" destination="2113" id="2116"/>
                 <outlet property="fIdleStopField" destination="1959" id="1979"/>
                 <outlet property="fImportFolderPopUp" destination="216" id="225"/>
                 <outlet property="fIncompleteFolderPopUp" destination="538" id="551"/>
@@ -48,6 +46,7 @@
                 <outlet property="fSpeedLimitDownloadField" destination="190" id="626"/>
                 <outlet property="fSpeedLimitUploadField" destination="192" id="625"/>
                 <outlet property="fStalledField" destination="636" id="643"/>
+                <outlet property="fSystemPreferencesButton" destination="2113" id="0ZX-Mh-hk6"/>
                 <outlet property="fTransfersView" destination="41" id="72"/>
                 <outlet property="fUploadField" destination="156" id="624"/>
                 <outlet property="window" destination="23" id="82"/>
@@ -136,14 +135,14 @@
                     </connections>
                 </button>
                 <button verticalHuggingPriority="750" id="2113">
-                    <rect key="frame" x="188" y="230" width="159" height="32"/>
+                    <rect key="frame" x="188" y="230" width="192" height="32"/>
                     <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
-                    <buttonCell key="cell" type="push" title="Configure In Growl" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="2114">
+                    <buttonCell key="cell" type="push" title="Indstil i Systemindstillinger" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="2114">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="system"/>
                     </buttonCell>
                     <connections>
-                        <action selector="openGrowlApp:" target="-2" id="2117"/>
+                        <action selector="openNotificationSystemPrefs:" target="-2" id="GLd-Vg-cJT"/>
                     </connections>
                 </button>
                 <button id="230">
@@ -201,17 +200,6 @@
                     <connections>
                         <action selector="setBadge:" target="-2" id="90"/>
                         <binding destination="365" name="value" keyPath="values.BadgeUploadRate" id="398"/>
-                    </connections>
-                </button>
-                <button id="2104">
-                    <rect key="frame" x="192" y="239" width="151" height="18"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
-                    <buttonCell key="cell" type="check" title="Display notifications" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="2105">
-                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                        <font key="font" metaFont="system"/>
-                    </buttonCell>
-                    <connections>
-                        <action selector="setBuiltInGrowlEnabled:" target="-2" id="2108"/>
                     </connections>
                 </button>
                 <button id="33">

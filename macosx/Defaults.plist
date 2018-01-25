@@ -138,6 +138,8 @@
 	<false/>
 	<key>RPCPort</key>
 	<integer>9091</integer>
+	<key>RPCUseHostWhitelist</key>
+	<true/>
 	<key>RPCUsername</key>
 	<string>admin</string>
 	<key>RPCUseWhitelist</key>

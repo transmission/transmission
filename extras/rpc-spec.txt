@@ -66,6 +66,21 @@
    So, the correct way to handle a 409 response is to update your
    X-Transmission-Session-Id and to resend the previous request.
 
+2.3.2.  DNS Rebinding Protection
+
+   Additional check is being made on each RPC request to make sure that the
+   client sending the request does so using one of the allowed hostnames by
+   which RPC server is meant to be available.
+
+   If host whitelisting is enabled (which is true by default), Transmission
+   inspects the "Host:" HTTP header value (with port stripped, if any) and
+   matches it to one of the whitelisted names. Regardless of host whitelist
+   content, "localhost" and "localhost." domain names as well as all the IP
+   addresses are always implicitly allowed.
+
+   For more information on configuration, see settings.json documentation for
+   "rpc-host-whitelist-enabled" and "rpc-host-whitelist" keys.
+
 3.  Torrent Requests
 
 3.1.  Torrent Action Requests

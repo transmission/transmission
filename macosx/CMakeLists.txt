@@ -400,13 +400,11 @@ add_executable(${TR_NAME}-mac MACOSX_BUNDLE
     ${${PROJECT_NAME}_RESOURCES}
 )
 
-find_library(GROWL_FRAMEWORK Growl PATHS ${PROJECT_SOURCE_DIR} NO_DEFAULT_PATHS)
 find_library(SPARKLE_FRAMEWORK Sparkle PATHS ${PROJECT_SOURCE_DIR} NO_DEFAULT_PATHS)
 
 target_link_libraries(${TR_NAME}-mac
     ${TR_NAME}
     vdkqueue
-    ${GROWL_FRAMEWORK}
     ${SPARKLE_FRAMEWORK}
     "-framework AppKit"
     "-framework Carbon"

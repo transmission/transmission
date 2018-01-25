@@ -20,11 +20,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+#pragma once
+
 #ifndef __TRANSMISSION__
 #error only libtransmission should #include this header.
 #endif
-
-#pragma once
 
 int tr_lpdInit(tr_session*, tr_address*);
 void tr_lpdUninit(tr_session*);

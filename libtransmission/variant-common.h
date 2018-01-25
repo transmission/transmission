@@ -6,11 +6,11 @@
  *
  */
 
+#pragma once
+
 #ifndef __LIBTRANSMISSION_VARIANT_MODULE__
 #error only libtransmission/variant-*.c should #include this header.
 #endif
-
-#pragma once
 
 typedef void (* VariantWalkFunc)(tr_variant const* val, void* user_data);
 

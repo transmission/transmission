@@ -245,7 +245,7 @@
 /* Preferences -> toolbar item title */
 "Bandwidth" = "Banda";
 
-/* Growl notification description */
+/* notification description */
 "Bandwidth settings changed" = "Le impostazioni di banda sono state modificate";
 
 /* Groups -> Name */
@@ -280,12 +280,6 @@
 
 /* View menu -> Quick Look */
 "Close Quick Look" = "Chiudi Visualizzazione rapida";
-
-/* Prefs -> Notifications */
-"Configure In Growl" = "Configura su Growl";
-
-/* Prefs -> Notifications */
-"Configure In System Preferences" = "Configura nelle Preferenze di Sistema";
 
 /* Blocklist -> message */
 "Connecting to site" = "Connessione al sito";
@@ -939,10 +933,10 @@
    Status Bar -> speed tooltip */
 "Speed Limit" = "Limite velocità";
 
-/* Growl notification title */
+/* notification title */
 "Speed Limit Auto Disabled" = "Limite di velocità disabilitato automaticamente";
 
-/* Growl notification title */
+/* notification title */
 "Speed Limit Auto Enabled" = "Limite di velocità abilitato automaticamente";
 
 /* Main window -> 2nd bottom left button (turtle) tooltip */
