@@ -390,14 +390,12 @@ dnl Let's hope it's 1.7 or higher, since it provides
 dnl MINIUPNPC_API_VERSION and we won't have to figure
 dnl it out on our own
 if test "x$upnp_version" = "xunknown" ; then
-  AC_RUN_IFELSE(
+  AC_COMPILE_IFELSE(
     [AC_LANG_PROGRAM(
       [#include <stdlib.h>
        #include <miniupnpc/miniupnpc.h>],
-      [#ifdef MINIUPNPC_API_VERSION
-       return EXIT_SUCCESS;
-       #else
-       return EXIT_FAILURE;
+      [#ifndef MINIUPNPC_API_VERSION
+       #error MINIUPNPC_API_VERSION undefined
        #endif]
     )],
     [upnp_version=">= 1.7"]
