@@ -24,6 +24,7 @@ Dialog.prototype = {
         this._message = $('#dialog_message');
         this._cancel_button = $('#dialog_cancel_button');
         this._confirm_button = $('#dialog_confirm_button');
+        this._optional_checkbox = $('#dialog_optional_checkbox');
         this._callback = null;
 
         // Observe the buttons
@@ -42,7 +43,7 @@ Dialog.prototype = {
      *--------------------------------------------*/
 
     executeCallback: function () {
-        this._callback();
+        this._callback(this._optional_checkbox.is(":checked"));
         dialog.hideDialog();
     },
 
@@ -75,7 +76,7 @@ Dialog.prototype = {
      * Display a confirm dialog
      */
     confirm: function (dialog_heading, dialog_message, confirm_button_label,
-        callback, cancel_button_label) {
+        callback, cancel_button_label, optional_checkbox_label) {
         if (!isMobileDevice) {
             $('.dialog_container').hide();
         };
@@ -83,6 +84,15 @@ Dialog.prototype = {
         setTextContent(this._message[0], dialog_message);
         setTextContent(this._cancel_button[0], cancel_button_label || 'Cancel');
         setTextContent(this._confirm_button[0], confirm_button_label);
+
+        if(optional_checkbox_label) {
+            this._optional_checkbox.prop('checked', false);
+            this._optional_checkbox.siblings('label').text(optional_checkbox_label);
+            this._optional_checkbox.parent().show();
+        } else {
+            this._optional_checkbox.parent().css('display', 'none');
+        }
+
         this._confirm_button.show();
         this._callback = callback;
         $('body').addClass('dialog_showing');

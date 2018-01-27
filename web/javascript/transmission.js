@@ -1204,9 +1204,10 @@ Transmission.prototype = {
             message = 'Once removed, continuing the transfer will require the torrent file. Are you sure you want to remove it?';
         }
 
-        dialog.confirm(header, message, 'Remove', function () {
-            transmission.removeTorrents(torrents);
-        });
+        dialog.confirm(header, message, 'Remove', function (isTrashDataSelected) {
+            if(isTrashDataSelected) transmission.removeTorrentsAndData(torrents);
+            else transmission.removeTorrents(torrents);
+        }, 'Cancel', 'Trash data permanently!');
     },
 
     promptToRemoveTorrentsAndData: function (torrents) {
