@@ -1196,22 +1196,17 @@ Transmission.prototype = {
     },
 
     promptToRemoveTorrents: function (torrents) {
+        var header = 'Remove ' + torrents.length + ' transfers?';
+        var message = 'Once removed, continuing the transfers will require the torrent files. Are you sure you want to remove them?';
         if (torrents.length === 1) {
             var torrent = torrents[0];
-            var header = 'Remove ' + torrent.getName() + '?';
-            var message = 'Once removed, continuing the transfer will require the torrent file. Are you sure you want to remove it?';
-
-            dialog.confirm(header, message, 'Remove', function () {
-                transmission.removeTorrents(torrents);
-            });
-        } else {
-            var header = 'Remove ' + torrents.length + ' transfers?';
-            var message = 'Once removed, continuing the transfers will require the torrent files. Are you sure you want to remove them?';
-
-            dialog.confirm(header, message, 'Remove', function () {
-                transmission.removeTorrents(torrents);
-            });
+            header = 'Remove ' + torrent.getName() + '?';
+            message = 'Once removed, continuing the transfer will require the torrent file. Are you sure you want to remove it?';
         }
+
+        dialog.confirm(header, message, 'Remove', function () {
+            transmission.removeTorrents(torrents);
+        });
     },
 
     promptToRemoveTorrentsAndData: function (torrents) {
