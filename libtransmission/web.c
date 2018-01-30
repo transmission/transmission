@@ -183,7 +183,7 @@ static CURL* createEasy(tr_session* s, struct tr_web* web, struct tr_web_task* t
     task->timeout_secs = getTimeoutFromURL(task);
 
     curl_easy_setopt(e, CURLOPT_AUTOREFERER, 1L);
-    curl_easy_setopt(e, CURLOPT_ENCODING, "gzip;q=1.0, deflate, identity");
+    curl_easy_setopt(e, CURLOPT_ENCODING, "");
     curl_easy_setopt(e, CURLOPT_FOLLOWLOCATION, 1L);
     curl_easy_setopt(e, CURLOPT_MAXREDIRS, -1L);
     curl_easy_setopt(e, CURLOPT_NOSIGNAL, 1L);
