@@ -936,7 +936,12 @@ DetailsDialog::refresh ()
   if (!single)
     ui.filesView->clear ();
   if (single)
-    ui.filesView->update (torrents[0]->files (), myChangedTorrents);
+    {
+      if (torrents.empty ())
+        ui.filesView->clear ();
+      else
+        ui.filesView->update (torrents[0]->files (), myChangedTorrents);
+    }
 
   myChangedTorrents = false;
   myHavePendingRefresh = false;
