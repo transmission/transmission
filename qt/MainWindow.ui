@@ -63,6 +63,9 @@
        </property>
        <item>
         <widget class="IconToolButton" name="optionsButton">
+         <property name="toolTip">
+          <string>Options</string>
+         </property>
          <property name="icon">
           <iconset resource="application.qrc">
            <normaloff>:/icons/utilities.png</normaloff>:/icons/utilities.png</iconset>
@@ -143,6 +146,9 @@
        </item>
        <item>
         <widget class="IconToolButton" name="statsModeButton">
+         <property name="toolTip">
+          <string>Statistics</string>
+         </property>
          <property name="icon">
           <iconset resource="application.qrc">
            <normaloff>:/icons/ratio.png</normaloff>:/icons/ratio.png</iconset>
