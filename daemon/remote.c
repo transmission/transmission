@@ -2123,6 +2123,7 @@ static int flush(char const* rpcurl, tr_variant** benc)
             break;
 
         default:
+            evbuffer_add(buf, "", 1);
             fprintf(stderr, "Unexpected response: %s\n", evbuffer_pullup(buf, -1));
             status |= EXIT_FAILURE;
             break;
