@@ -2055,11 +2055,26 @@ static CURL* tr_curl_easy_init(struct evbuffer* writebuf)
     {
         char* h = tr_strdup_printf("%s: %s", TR_RPC_SESSION_ID_HEADER, sessionId);
         struct curl_slist* custom_headers = curl_slist_append(NULL, h);
+        tr_free(h);
+
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, custom_headers);
-        /* fixme: leaks */
+        curl_easy_setopt(curl, CURLOPT_PRIVATE, custom_headers);
     }
 
     return curl;
+}
+
+static void tr_curl_easy_cleanup(CURL* curl)
+{
+    struct curl_slist* custom_headers = NULL;
+    curl_easy_getinfo(curl, CURLINFO_PRIVATE, &custom_headers);
+
+    curl_easy_cleanup(curl);
+
+    if (custom_headers != NULL)
+    {
+        curl_slist_free_all(custom_headers);
+    }
 }
 
 static int flush(char const* rpcurl, tr_variant** benc)
@@ -2101,7 +2116,7 @@ static int flush(char const* rpcurl, tr_variant** benc)
             /* Session id failed. Our curl header func has already
              * pulled the new session id from this response's headers,
              * build a new CURL* and try again */
-            curl_easy_cleanup(curl);
+            tr_curl_easy_cleanup(curl);
             curl = NULL;
             status |= flush(rpcurl, benc);
             benc = NULL;
@@ -2121,12 +2136,13 @@ static int flush(char const* rpcurl, tr_variant** benc)
 
     if (curl != NULL)
     {
-        curl_easy_cleanup(curl);
+        tr_curl_easy_cleanup(curl);
     }
 
     if (benc != NULL)
     {
         tr_variantFree(*benc);
+        tr_free(*benc);
         *benc = NULL;
     }
 
