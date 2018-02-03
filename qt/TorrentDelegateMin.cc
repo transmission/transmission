@@ -6,6 +6,8 @@
  *
  */
 
+#include <algorithm>
+
 #include <QApplication>
 #include <QBrush>
 #include <QFont>
@@ -103,13 +105,20 @@ ItemLayout::ItemLayout(QString const& nameText, QString const& statusText, QIcon
     QFontMetrics const statusFM(statusFont);
     QSize const statusSize(statusFM.size(0, myStatusText));
 
-    QRect baseRect(topLeft, QSize(width, qMax(iconSize, qMax(nameSize.height(), qMax(statusSize.height(),
-        static_cast<int>(BAR_HEIGHT))))));
+    QStyleOptionProgressBar barStyle;
+    barStyle.rect = QRect(0, 0, BAR_WIDTH, BAR_HEIGHT);
+    barStyle.maximum = 100;
+    barStyle.progress = 100;
+    barStyle.textVisible = true;
+    QSize const barSize(barStyle.rect.width() * 2 - style->subElementRect(QStyle::SE_ProgressBarGroove, &barStyle).width(),
+        barStyle.rect.height());
+
+    QRect baseRect(topLeft, QSize(width, std::max({iconSize, nameSize.height(), statusSize.height(), barSize.height()})));
 
     iconRect = style->alignedRect(direction, Qt::AlignLeft | Qt::AlignVCenter, QSize(iconSize, iconSize), baseRect);
     emblemRect = style->alignedRect(direction, Qt::AlignRight | Qt::AlignBottom, emblemIcon.actualSize(iconRect.size() / 2,
         QIcon::Normal, QIcon::On), iconRect);
-    barRect = style->alignedRect(direction, Qt::AlignRight | Qt::AlignVCenter, QSize(BAR_WIDTH, BAR_HEIGHT), baseRect);
+    barRect = style->alignedRect(direction, Qt::AlignRight | Qt::AlignVCenter, barSize, baseRect);
     Utils::narrowRect(baseRect, iconRect.width() + GUI_PAD, barRect.width() + GUI_PAD, direction);
     statusRect = style->alignedRect(direction, Qt::AlignRight | Qt::AlignVCenter, QSize(statusSize.width(), baseRect.height()),
         baseRect);
