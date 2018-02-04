@@ -45,7 +45,7 @@ RelocateDialog::RelocateDialog(Session& session, TorrentModel const& model, QSet
         }
         else if (path != tor->getPath())
         {
-            if (mySession.isServer())
+            if (mySession.isLocal())
             {
                 path = QDir::homePath();
             }
@@ -58,7 +58,7 @@ RelocateDialog::RelocateDialog(Session& session, TorrentModel const& model, QSet
         }
     }
 
-    if (mySession.isServer())
+    if (mySession.isLocal())
     {
         ui.newLocationStack->setCurrentWidget(ui.newLocationButton);
         ui.newLocationButton->setMode(PathButton::DirectoryMode);
