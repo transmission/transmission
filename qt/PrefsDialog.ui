@@ -109,19 +109,19 @@
           <number>2</number>
          </property>
          <item>
-          <widget class="QLabel" name="altSpeedLimitsSectionIconLabel">
-           <property name="pixmap">
-            <pixmap resource="application.qrc">:/icons/alt-limit-off.png</pixmap>
-           </property>
-          </widget>
-         </item>
-         <item>
           <widget class="QLabel" name="altSpeedLimitsSectionLabel">
            <property name="styleSheet">
             <string notr="true">font-weight:bold</string>
            </property>
            <property name="text">
             <string>Alternative Speed Limits</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="altSpeedLimitsSectionIconLabel">
+           <property name="pixmap">
+            <pixmap resource="application.qrc">:/icons/alt-limit-off.png</pixmap>
            </property>
           </widget>
          </item>
