@@ -32,7 +32,7 @@
 
 @implementation InfoGeneralViewController
 
-- (id) init
+- (instancetype) init
 {
     if ((self = [super initWithNibName: @"InfoGeneralView" bundle: nil]))
     {
@@ -54,7 +54,7 @@
     CGFloat oldMaxWidth = 0.0, originX, newMaxWidth = 0.0;
     for (NSTextField * label in labels)
     {
-        const NSRect oldFrame = [label frame];
+        const NSRect oldFrame = label.frame;
         if (oldFrame.size.width > oldMaxWidth)
         {
             oldMaxWidth = oldFrame.size.width;
@@ -62,26 +62,26 @@
         }
 
         [label sizeToFit];
-        const CGFloat newWidth = [label bounds].size.width;
+        const CGFloat newWidth = label.bounds.size.width;
         if (newWidth > newMaxWidth)
             newMaxWidth = newWidth;
     }
 
     for (NSTextField * label in labels)
     {
-        NSRect frame = [label frame];
+        NSRect frame = label.frame;
         frame.origin.x = originX + (newMaxWidth - frame.size.width);
-        [label setFrame: frame];
+        label.frame = frame;
     }
 
     NSArray * fields = @[ fPiecesField, fHashField, fSecureField, fCreatorField, fDateCreatedField, fCommentScrollView, fDataLocationField ];
 
     const CGFloat widthIncrease = newMaxWidth - oldMaxWidth;
     for (NSView * field in fields) {
-        NSRect frame = [field frame];
+        NSRect frame = field.frame;
         frame.origin.x += widthIncrease;
         frame.size.width -= widthIncrease;
-        [field setFrame: frame];
+        field.frame = frame;
     }
 }
 
@@ -98,16 +98,16 @@
     if (!fSet)
         [self setupInfo];
 
-    if ([fTorrents count] != 1)
+    if (fTorrents.count != 1)
         return;
 
     Torrent * torrent = fTorrents[0];
 
     NSString * location = [torrent dataLocation];
-    [fDataLocationField setStringValue: location ? [location stringByAbbreviatingWithTildeInPath] : @""];
-    [fDataLocationField setToolTip: location ? location : @""];
+    fDataLocationField.stringValue = location ? location.stringByAbbreviatingWithTildeInPath : @"";
+    fDataLocationField.toolTip = location ? location : @"";
 
-    [fRevealDataButton setHidden: !location];
+    fRevealDataButton.hidden = !location;
 }
 
 - (void) revealDataFile: (id) sender
@@ -127,41 +127,41 @@
 
 - (void) setupInfo
 {
-    if ([fTorrents count] == 1)
+    if (fTorrents.count == 1)
     {
         Torrent * torrent = fTorrents[0];
 
         #warning candidate for localizedStringWithFormat (although then we'll get two commas)
         NSString * piecesString = ![torrent isMagnet] ? [NSString stringWithFormat: @"%ld, %@", [torrent pieceCount],
                                         [NSString stringForFileSize: [torrent pieceSize]]] : @"";
-        [fPiecesField setStringValue: piecesString];
+        fPiecesField.stringValue = piecesString;
 
         NSString * hashString = [torrent hashString];
-        [fHashField setStringValue: hashString];
-        [fHashField setToolTip: hashString];
-        [fSecureField setStringValue: [torrent privateTorrent]
+        fHashField.stringValue = hashString;
+        fHashField.toolTip = hashString;
+        fSecureField.stringValue = [torrent privateTorrent]
                         ? NSLocalizedString(@"Private Torrent, non-tracker peer discovery disabled", "Inspector -> private torrent")
-                        : NSLocalizedString(@"Public Torrent", "Inspector -> private torrent")];
+                        : NSLocalizedString(@"Public Torrent", "Inspector -> private torrent");
 
         NSString * commentString = [torrent comment];
-        [fCommentView setString: commentString];
+        fCommentView.string = commentString;
 
         NSString * creatorString = [torrent creator];
-        [fCreatorField setStringValue: creatorString];
-        [fDateCreatedField setObjectValue: [torrent dateCreated]];
+        fCreatorField.stringValue = creatorString;
+        fDateCreatedField.objectValue = [torrent dateCreated];
     }
     else
     {
-        [fPiecesField setStringValue: @""];
-        [fHashField setStringValue: @""];
+        fPiecesField.stringValue = @"";
+        fHashField.stringValue = @"";
         [fHashField setToolTip: nil];
-        [fSecureField setStringValue: @""];
-        [fCommentView setString: @""];
+        fSecureField.stringValue = @"";
+        fCommentView.string = @"";
 
-        [fCreatorField setStringValue: @""];
-        [fDateCreatedField setStringValue: @""];
+        fCreatorField.stringValue = @"";
+        fDateCreatedField.stringValue = @"";
 
-        [fDataLocationField setStringValue: @""];
+        fDataLocationField.stringValue = @"";
         [fDataLocationField setToolTip: nil];
 
         [fRevealDataButton setHidden: YES];

@@ -33,7 +33,7 @@
 
 NSString * urlString = nil;
 
-- (id) initWithController: (Controller *) controller
+- (instancetype) initWithController: (Controller *) controller
 {
     if ((self = [self initWithWindowNibName: @"URLSheetWindow"]))
     {
@@ -48,7 +48,7 @@ NSString * urlString = nil;
 
     if (urlString)
     {
-        [fTextField setStringValue: urlString];
+        fTextField.stringValue = urlString;
         [fTextField selectText: self];
 
         [self updateOpenButtonForURL: urlString];
@@ -61,9 +61,9 @@ NSString * urlString = nil;
     [fCancelButton sizeToFit];
 
     //size the two buttons the same
-    NSRect openFrame = [fOpenButton frame];
+    NSRect openFrame = fOpenButton.frame;
     openFrame.size.width += 10.0;
-    NSRect cancelFrame = [fCancelButton frame];
+    NSRect cancelFrame = fCancelButton.frame;
     cancelFrame.size.width += 10.0;
 
     if (NSWidth(openFrame) > NSWidth(cancelFrame))
@@ -71,33 +71,33 @@ NSString * urlString = nil;
     else
         openFrame.size.width = NSWidth(cancelFrame);
 
-    openFrame.origin.x = NSWidth([[self window] frame]) - NSWidth(openFrame) - 20.0 + 6.0; //I don't know why the extra 6.0 is needed
-    [fOpenButton setFrame: openFrame];
+    openFrame.origin.x = NSWidth(self.window.frame) - NSWidth(openFrame) - 20.0 + 6.0; //I don't know why the extra 6.0 is needed
+    fOpenButton.frame = openFrame;
 
     cancelFrame.origin.x = NSMinX(openFrame) - NSWidth(cancelFrame);
-    [fCancelButton setFrame: cancelFrame];
+    fCancelButton.frame = cancelFrame;
 }
 
 - (void) openURLEndSheet: (id) sender
 {
-    [[self window] orderOut: sender];
-    [NSApp endSheet: [self window] returnCode: 1];
+    [self.window orderOut: sender];
+    [NSApp endSheet: self.window returnCode: 1];
 }
 
 - (void) openURLCancelEndSheet: (id) sender
 {
-    [[self window] orderOut: sender];
-    [NSApp endSheet: [self window] returnCode: 0];
+    [self.window orderOut: sender];
+    [NSApp endSheet: self.window returnCode: 0];
 }
 
 - (NSString *) urlString
 {
-    return [fTextField stringValue];
+    return fTextField.stringValue;
 }
 
 - (void) controlTextDidChange: (NSNotification *) notification
 {
-    [self updateOpenButtonForURL: [fTextField stringValue]];
+    [self updateOpenButtonForURL: fTextField.stringValue];
 }
 
 @end
@@ -112,11 +112,11 @@ NSString * urlString = nil;
     else
     {
         NSRange prefixRange = [string rangeOfString: @"://"];
-        if (prefixRange.location != NSNotFound && [string length] == NSMaxRange(prefixRange))
+        if (prefixRange.location != NSNotFound && string.length == NSMaxRange(prefixRange))
             enable = NO;
     }
 
-    [fOpenButton setEnabled: enable];
+    fOpenButton.enabled = enable;
 }
 
 @end

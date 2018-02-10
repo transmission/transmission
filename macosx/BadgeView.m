@@ -33,7 +33,7 @@
 
 @implementation BadgeView
 
-- (id) initWithLib: (tr_session *) lib
+- (instancetype) initWithLib: (tr_session *) lib
 {
     if ((self = [super init]))
     {
@@ -65,13 +65,13 @@
 
 - (void) drawRect: (NSRect) rect
 {
-    [[NSApp applicationIconImage] drawInRect: rect fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0];
+    [NSApp.applicationIconImage drawInRect: rect fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0];
 
     if (fQuitting)
     {
         NSImage * quitBadge = [NSImage imageNamed: @"QuitBadge"];
         [self badge: quitBadge string: NSLocalizedString(@"Quitting", "Dock Badger -> quit")
-                atHeight: (NSHeight(rect) - [quitBadge size].height) * 0.5 adjustForQuit: YES];
+                atHeight: (NSHeight(rect) - quitBadge.size.height) * 0.5 adjustForQuit: YES];
         return;
     }
 
@@ -83,7 +83,7 @@
         NSImage * uploadBadge = [NSImage imageNamed: @"UploadBadge"];
         [self badge: uploadBadge string: [NSString stringForSpeedAbbrev: fUploadRate] atHeight: bottom adjustForQuit: NO];
         if (download)
-            bottom += [uploadBadge size].height + BETWEEN_PADDING; //download rate above upload rate
+            bottom += uploadBadge.size.height + BETWEEN_PADDING; //download rate above upload rate
     }
     if (download)
         [self badge: [NSImage imageNamed: @"DownloadBadge"] string: [NSString stringForSpeedAbbrev: fDownloadRate]
@@ -99,8 +99,8 @@
     if (!fAttributes)
     {
         NSShadow * stringShadow = [[NSShadow alloc] init];
-        [stringShadow setShadowOffset: NSMakeSize(2.0, -2.0)];
-        [stringShadow setShadowBlurRadius: 4.0];
+        stringShadow.shadowOffset = NSMakeSize(2.0, -2.0);
+        stringShadow.shadowBlurRadius = 4.0;
 
         fAttributes = [[NSMutableDictionary alloc] initWithCapacity: 3];
         fAttributes[NSForegroundColorAttributeName] = [NSColor whiteColor];
@@ -109,7 +109,7 @@
     }
 
     NSRect badgeRect;
-    badgeRect.size = [badge size];
+    badgeRect.size = badge.size;
     badgeRect.origin.x = 0.0;
     badgeRect.origin.y = height;
 

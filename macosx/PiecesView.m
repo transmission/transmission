@@ -69,20 +69,20 @@ enum
         fNumPieces = MIN([fTorrent pieceCount], MAX_ACROSS * MAX_ACROSS);
         fAcross = ceil(sqrt(fNumPieces));
 
-        const CGFloat width = [self bounds].size.width;
+        const CGFloat width = self.bounds.size.width;
         fWidth = (width - (fAcross + 1) * BETWEEN) / fAcross;
         fExtraBorder = (width - ((fWidth + BETWEEN) * fAcross + BETWEEN)) / 2;
     }
 
-    NSImage * back = [[NSImage alloc] initWithSize: [self bounds].size];
+    NSImage * back = [[NSImage alloc] initWithSize: self.bounds.size];
     [back lockFocus];
 
     NSGradient * gradient = [[NSGradient alloc] initWithStartingColor: [NSColor colorWithCalibratedWhite: 0.0 alpha: 0.4]
                                 endingColor: [NSColor colorWithCalibratedWhite: 0.2 alpha: 0.4]];
-    [gradient drawInRect: [self bounds] angle: 90.0];
+    [gradient drawInRect: self.bounds angle: 90.0];
     [back unlockFocus];
 
-    [self setImage: back];
+    self.image = back;
 
     [self setNeedsDisplay];
 }
@@ -118,7 +118,7 @@ enum
         [fTorrent getAmountFinished: piecesPercent size: fNumPieces];
     }
 
-    NSImage * image = [self image];
+    NSImage * image = self.image;
 
     NSRect fillRects[fNumPieces];
     NSColor * fillColors[fNumPieces];
@@ -175,7 +175,7 @@ enum
             const NSInteger across = index % fAcross,
                             down = index / fAcross;
             fillRects[usedCount] = NSMakeRect(across * (fWidth + BETWEEN) + BETWEEN + fExtraBorder,
-                                                [image size].width - (down + 1) * (fWidth + BETWEEN) - fExtraBorder,
+                                                image.size.width - (down + 1) * (fWidth + BETWEEN) - fExtraBorder,
                                                 fWidth, fWidth);
             fillColors[usedCount] = pieceColor;
 
@@ -207,7 +207,7 @@ enum
         const BOOL availability = ![[NSUserDefaults standardUserDefaults] boolForKey: @"PiecesViewShowAvailability"];
         [[NSUserDefaults standardUserDefaults] setBool: availability forKey: @"PiecesViewShowAvailability"];
 
-        [self sendAction:[self action] to:[self target]];
+        [self sendAction:self.action to:self.target];
     }
 
     [super mouseDown: event];

@@ -38,16 +38,15 @@
 @class TorrentTableView;
 @class URLSheetWindowController;
 
-typedef enum
-{
+typedef NS_ENUM(unsigned int, addType) {
     ADD_MANUAL,
     ADD_AUTO,
     ADD_SHOW_OPTIONS,
     ADD_URL,
     ADD_CREATED
-} addType;
+};
 
-@interface Controller : NSObject <NSURLDownloadDelegate, NSUserNotificationCenterDelegate, NSPopoverDelegate, NSSharingServiceDelegate, NSSharingServicePickerDelegate, NSSoundDelegate, NSToolbarDelegate, NSWindowDelegate, QLPreviewPanelDataSource, QLPreviewPanelDelegate, VDKQueueDelegate>
+@interface Controller : NSObject <NSApplicationDelegate, NSURLDownloadDelegate, NSUserNotificationCenterDelegate, NSPopoverDelegate, NSSharingServiceDelegate, NSSharingServicePickerDelegate, NSSoundDelegate, NSToolbarDelegate, NSWindowDelegate, QLPreviewPanelDataSource, QLPreviewPanelDelegate, VDKQueueDelegate>
 {
     tr_session                      * fLib;
 
@@ -129,7 +128,7 @@ typedef enum
 
 - (void) quitSheetDidEnd: (NSWindow *) sheet returnCode: (NSInteger) returnCode contextInfo: (void *) contextInfo;
 
-- (tr_session *) sessionHandle;
+@property (nonatomic, readonly) tr_session *sessionHandle;
 
 - (void) createFile: (id) sender;
 
@@ -171,7 +170,7 @@ typedef enum
 - (void) verifySelectedTorrents: (id) sender;
 - (void) verifyTorrents: (NSArray *) torrents;
 
-- (NSArray *)selectedTorrents;
+@property (nonatomic, readonly, copy) NSArray *selectedTorrents;
 
 @property (nonatomic, readonly) PrefsController * prefsController;
 - (void) showPreferenceWindow: (id) sender;
@@ -243,10 +242,10 @@ typedef enum
 - (void) selectedToolbarClicked: (id) sender;
 
 - (void) setWindowSizeToFit;
-- (NSRect) sizedWindowFrame;
+@property (nonatomic, readonly) NSRect sizedWindowFrame;
 - (void) updateForAutoSize;
 - (void) setWindowMinMaxToCurrent;
-- (CGFloat) minWindowContentSizeAllowed;
+@property (nonatomic, readonly) CGFloat minWindowContentSizeAllowed;
 
 - (void) updateForExpandCollape;
 

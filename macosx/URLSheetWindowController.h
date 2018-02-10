@@ -33,11 +33,11 @@
     Controller * fController;
 }
 
-- (id) initWithController: (Controller *) controller;
+- (instancetype) initWithController: (Controller *) controller;
 
 - (void) openURLEndSheet: (id) sender;
 - (void) openURLCancelEndSheet: (id) sender;
 
-- (NSString *) urlString;
+@property (nonatomic, readonly, copy) NSString *urlString;
 
 @end

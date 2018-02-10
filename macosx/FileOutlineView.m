@@ -32,13 +32,13 @@
 - (void) awakeFromNib
 {
     FileNameCell * nameCell = [[FileNameCell alloc] init];
-    [[self tableColumnWithIdentifier: @"Name"] setDataCell: nameCell];
+    [self tableColumnWithIdentifier: @"Name"].dataCell = nameCell;
 
     FilePriorityCell * priorityCell = [[FilePriorityCell alloc] init];
-    [[self tableColumnWithIdentifier: @"Priority"] setDataCell: priorityCell];
+    [self tableColumnWithIdentifier: @"Priority"].dataCell = priorityCell;
 
     [self setAutoresizesOutlineColumn: NO];
-    [self setIndentationPerLevel: 14.0];
+    self.indentationPerLevel = 14.0;
 
     fMouseRow = -1;
 }
@@ -46,13 +46,13 @@
 
 - (void) mouseDown: (NSEvent *) event
 {
-    [[self window] makeKeyWindow];
+    [self.window makeKeyWindow];
     [super mouseDown: event];
 }
 
 - (NSMenu *) menuForEvent: (NSEvent *) event
 {
-    const NSInteger row = [self rowAtPoint: [self convertPoint: [event locationInWindow] fromView: nil]];
+    const NSInteger row = [self rowAtPoint: [self convertPoint: event.locationInWindow fromView: nil]];
 
     if (row >= 0)
     {
@@ -62,7 +62,7 @@
     else
         [self deselectAll: self];
 
-    return [self menu];
+    return self.menu;
 }
 
 - (NSRect) iconRectForRow: (int) row
@@ -70,7 +70,7 @@
     FileNameCell * cell = (FileNameCell *)[self preparedCellAtColumn: [self columnWithIdentifier: @"Name"] row: row];
     NSRect iconRect = [cell imageRectForBounds: [self rectOfRow: row]];
 
-    iconRect.origin.x += [self indentationPerLevel] * (CGFloat)([self levelForRow: row] + 1);
+    iconRect.origin.x += self.indentationPerLevel * (CGFloat)([self levelForRow: row] + 1);
     return iconRect;
 }
 
@@ -78,17 +78,17 @@
 {
     [super updateTrackingAreas];
 
-    for (NSTrackingArea * area in [self trackingAreas])
+    for (NSTrackingArea * area in self.trackingAreas)
     {
-        if ([area owner] == self && [area userInfo][@"Row"])
+        if (area.owner == self && area.userInfo[@"Row"])
             [self removeTrackingArea: area];
     }
 
-    NSRange visibleRows = [self rowsInRect: [self visibleRect]];
+    NSRange visibleRows = [self rowsInRect: self.visibleRect];
     if (visibleRows.length == 0)
         return;
 
-    NSPoint mouseLocation = [self convertPoint: [[self window] mouseLocationOutsideOfEventStream] fromView: nil];
+    NSPoint mouseLocation = [self convertPoint: self.window.mouseLocationOutsideOfEventStream fromView: nil];
 
     for (NSInteger row = visibleRows.location, col = [self columnWithIdentifier: @"Priority"]; (NSUInteger)row < NSMaxRange(visibleRows); row++)
     {
@@ -108,9 +108,9 @@
 - (void) mouseEntered: (NSEvent *) event
 {
     NSNumber * row;
-    if ((row = ((NSDictionary *)[event userData])[@"Row"]))
+    if ((row = ((NSDictionary *)event.userData)[@"Row"]))
     {
-        fMouseRow = [row intValue];
+        fMouseRow = row.intValue;
         [self setNeedsDisplayInRect: [self frameOfCellAtColumn: [self columnWithIdentifier: @"Priority"] row: fMouseRow]];
     }
 }
@@ -118,9 +118,9 @@
 - (void) mouseExited: (NSEvent *) event
 {
     NSNumber * row;
-    if ((row = ((NSDictionary *)[event userData])[@"Row"]))
+    if ((row = ((NSDictionary *)event.userData)[@"Row"]))
     {
-        [self setNeedsDisplayInRect: [self frameOfCellAtColumn: [self columnWithIdentifier: @"Priority"] row: [row intValue]]];
+        [self setNeedsDisplayInRect: [self frameOfCellAtColumn: [self columnWithIdentifier: @"Priority"] row: row.intValue]];
         fMouseRow = -1;
     }
 }

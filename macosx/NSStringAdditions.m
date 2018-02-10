@@ -76,7 +76,7 @@
         partialUnitsSame = magnitudePartial == magnitudeFull;
     }
 
-    [fileSizeFormatter setIncludesUnit: !partialUnitsSame];
+    fileSizeFormatter.includesUnit = !partialUnitsSame;
     NSString * partialString = [fileSizeFormatter stringFromByteCount: partialSize];
 
 
@@ -187,16 +187,16 @@
 - (NSComparisonResult) compareNumeric: (NSString *) string
 {
     const NSStringCompareOptions comparisonOptions = NSNumericSearch | NSForcedOrderingSearch;
-    return [self compare: string options: comparisonOptions range: NSMakeRange(0, [self length]) locale: [NSLocale currentLocale]];
+    return [self compare: string options: comparisonOptions range: NSMakeRange(0, self.length) locale: [NSLocale currentLocale]];
 }
 
 - (NSArray *) betterComponentsSeparatedByCharactersInSet: (NSCharacterSet *) separators
 {
     NSMutableArray * components = [NSMutableArray array];
 
-    NSCharacterSet * includededCharSet = [separators invertedSet];
+    NSCharacterSet * includededCharSet = separators.invertedSet;
     NSUInteger index = 0;
-    const NSUInteger fullLength = [self length];
+    const NSUInteger fullLength = self.length;
     do
     {
         const NSUInteger start = [self rangeOfCharacterFromSet: includededCharSet options: 0 range: NSMakeRange(index, fullLength - index)].location;
@@ -255,9 +255,9 @@
 
     //match Finder's behavior
     NSNumberFormatter * numberFormatter = [[NSNumberFormatter alloc] init];
-    [numberFormatter setNumberStyle: NSNumberFormatterDecimalStyle];
-    [numberFormatter setMinimumFractionDigits: 0];
-    [numberFormatter setMaximumFractionDigits: decimals];
+    numberFormatter.numberStyle = NSNumberFormatterDecimalStyle;
+    numberFormatter.minimumFractionDigits = 0;
+    numberFormatter.maximumFractionDigits = decimals;
 
     NSString * fileSizeString = [numberFormatter stringFromNumber: @(convertedSize)];
 

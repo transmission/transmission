@@ -24,7 +24,7 @@
 
 @implementation GlobalOptionsPopoverViewController
 
-- (id) initWithHandle: (tr_session *) handle
+- (instancetype) initWithHandle: (tr_session *) handle
 {
     if ((self = [super initWithNibName: @"GlobalOptionsPopover" bundle: nil]))
     {
@@ -38,13 +38,13 @@
 
 - (void) awakeFromNib
 {
-    [fUploadLimitField setIntValue: [fDefaults integerForKey: @"UploadLimit"]];
-    [fDownloadLimitField setIntValue: [fDefaults integerForKey: @"DownloadLimit"]];
+    fUploadLimitField.intValue = [fDefaults integerForKey: @"UploadLimit"];
+    fDownloadLimitField.intValue = [fDefaults integerForKey: @"DownloadLimit"];
 
-    [fRatioStopField setFloatValue: [fDefaults floatForKey: @"RatioLimit"]];
-    [fIdleStopField setIntegerValue: [fDefaults integerForKey: @"IdleLimitMinutes"]];
+    fRatioStopField.floatValue = [fDefaults floatForKey: @"RatioLimit"];
+    fIdleStopField.integerValue = [fDefaults integerForKey: @"IdleLimitMinutes"];
 
-    [[self view] setFrameSize: [[self view] fittingSize]];
+    [self.view setFrameSize: self.view.fittingSize];
 }
 
 - (IBAction) updatedDisplayString: (id) sender
@@ -140,7 +140,7 @@
 
 - (BOOL) control: (NSControl *) control textShouldBeginEditing: (NSText *) fieldEditor
 {
-    fInitialString = [control stringValue];
+    fInitialString = control.stringValue;
 
     return YES;
 }
@@ -150,7 +150,7 @@
     NSBeep();
     if (fInitialString)
     {
-        [control setStringValue: fInitialString];
+        control.stringValue = fInitialString;
         fInitialString = nil;
     }
     return NO;

@@ -27,30 +27,26 @@
 
 @implementation DragOverlayView
 
-- (id) initWithFrame: (NSRect) frame
+- (instancetype) initWithFrame: (NSRect) frame
 {
     if ((self = [super initWithFrame: frame]))
     {
         //create attributes
         NSShadow * stringShadow = [[NSShadow alloc] init];
-        [stringShadow setShadowOffset: NSMakeSize(2.0, -2.0)];
-        [stringShadow setShadowBlurRadius: 4.0];
+        stringShadow.shadowOffset = NSMakeSize(2.0, -2.0);
+        stringShadow.shadowBlurRadius = 4.0;
 
         NSFont * bigFont = [NSFont boldSystemFontOfSize: 18.0],
                 * smallFont = [NSFont systemFontOfSize: 14.0];
 
         NSMutableParagraphStyle * paragraphStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
-        [paragraphStyle setLineBreakMode: NSLineBreakByTruncatingMiddle];
+        paragraphStyle.lineBreakMode = NSLineBreakByTruncatingMiddle;
 
-        fMainLineAttributes = [[NSDictionary alloc] initWithObjects: @[[NSColor whiteColor],
-                                bigFont, stringShadow, paragraphStyle]
-                                forKeys: @[NSForegroundColorAttributeName, NSFontAttributeName,
-                                NSShadowAttributeName, NSParagraphStyleAttributeName]];
+        fMainLineAttributes = @{NSForegroundColorAttributeName: [NSColor whiteColor], NSFontAttributeName: bigFont,
+                                NSShadowAttributeName: stringShadow, NSParagraphStyleAttributeName: paragraphStyle};
 
-        fSubLineAttributes = [[NSDictionary alloc] initWithObjects: @[[NSColor whiteColor],
-                                smallFont, stringShadow, paragraphStyle]
-                                forKeys: @[NSForegroundColorAttributeName, NSFontAttributeName,
-                                NSShadowAttributeName, NSParagraphStyleAttributeName]];
+        fSubLineAttributes = @{NSForegroundColorAttributeName: [NSColor whiteColor], NSFontAttributeName: smallFont,
+                                NSShadowAttributeName: stringShadow, NSParagraphStyleAttributeName: paragraphStyle};
 
     }
     return self;
@@ -97,8 +93,8 @@
 {
     if (fBadge)
     {
-        const NSRect frame = [self frame];
-        const NSSize imageSize = [fBadge size];
+        const NSRect frame = self.frame;
+        const NSSize imageSize = fBadge.size;
         [fBadge drawAtPoint: NSMakePoint((NSWidth(frame) - imageSize.width) * 0.5, (NSHeight(frame) - imageSize.height) * 0.5) fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0];
     }
 }

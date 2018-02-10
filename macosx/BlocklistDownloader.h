@@ -24,12 +24,11 @@
 
 @class BlocklistDownloaderViewController;
 
-typedef enum
-{
+typedef NS_ENUM(unsigned int, blocklistDownloadState) {
     BLOCKLIST_DL_START,
     BLOCKLIST_DL_DOWNLOADING,
     BLOCKLIST_DL_PROCESSING
-} blocklistDownloadState;
+};
 
 @interface BlocklistDownloader : NSObject <NSURLDownloadDelegate>
 {

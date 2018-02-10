@@ -29,7 +29,7 @@
 
 @implementation TorrentGroup
 
-- (id) initWithGroup: (NSInteger) group
+- (instancetype) initWithGroup: (NSInteger) group
 {
     if ((self = [super init]))
     {

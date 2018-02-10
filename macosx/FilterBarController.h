@@ -45,7 +45,7 @@
     IBOutlet NSPopUpButton * fGroupsButton;
 }
 
-- (id) init;
+- (instancetype) init;
 
 - (void) setFilter: (id) sender;
 - (void) switchFilter: (BOOL) right;
@@ -54,7 +54,7 @@
 - (void) setGroupFilter: (id) sender;
 - (void) reset: (BOOL) updateUI;
 
-- (NSArray *) searchStrings;
+@property (nonatomic, readonly, copy) NSArray *searchStrings;
 - (void) focusSearchField;
 
 - (void) setCountAll: (NSUInteger) all active: (NSUInteger) active downloading: (NSUInteger) downloading

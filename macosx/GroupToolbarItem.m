@@ -32,42 +32,42 @@
 
 - (void) validate
 {
-    NSSegmentedControl * control = (NSSegmentedControl *)[self view];
+    NSSegmentedControl * control = (NSSegmentedControl *)self.view;
 
-    for (NSInteger i = 0; i < [control segmentCount]; i++)
-        [control setEnabled: [[self target] validateToolbarItem:
+    for (NSInteger i = 0; i < control.segmentCount; i++)
+        [control setEnabled: [self.target validateToolbarItem:
             [[NSToolbarItem alloc] initWithItemIdentifier: fIdentifiers[i]]] forSegment: i];
 }
 
 - (void) createMenu: (NSArray *) labels
 {
-    NSMenuItem * menuItem = [[NSMenuItem alloc] initWithTitle: [self label] action: NULL keyEquivalent: @""];
-    NSMenu * menu = [[NSMenu alloc] initWithTitle: [self label]];
-    [menuItem setSubmenu: menu];
+    NSMenuItem * menuItem = [[NSMenuItem alloc] initWithTitle: self.label action: NULL keyEquivalent: @""];
+    NSMenu * menu = [[NSMenu alloc] initWithTitle: self.label];
+    menuItem.submenu = menu;
 
     [menu setAutoenablesItems: NO];
 
-    const NSInteger count = [(NSSegmentedControl *)[self view] segmentCount];
+    const NSInteger count = ((NSSegmentedControl *)self.view).segmentCount;
     for (NSInteger i = 0; i < count; i++)
     {
-        NSMenuItem * addItem = [[NSMenuItem alloc] initWithTitle: labels[i] action: [self action] keyEquivalent: @""];
-        [addItem setTarget: [self target]];
-        [addItem setTag: i];
+        NSMenuItem * addItem = [[NSMenuItem alloc] initWithTitle: labels[i] action: self.action keyEquivalent: @""];
+        addItem.target = self.target;
+        addItem.tag = i;
 
         [menu addItem: addItem];
     }
 
-    [self setMenuFormRepresentation: menuItem];
+    self.menuFormRepresentation = menuItem;
 }
 
 - (NSMenuItem *) menuFormRepresentation
 {
-    NSMenuItem * menuItem = [super menuFormRepresentation];
+    NSMenuItem * menuItem = super.menuFormRepresentation;
 
-    const NSInteger count = [(NSSegmentedControl *)[self view] segmentCount];
+    const NSInteger count = ((NSSegmentedControl *)self.view).segmentCount;
     for (NSInteger i = 0; i < count; i++)
-        [[[menuItem submenu] itemAtIndex: i] setEnabled: [[self target] validateToolbarItem:
-            [[NSToolbarItem alloc] initWithItemIdentifier: fIdentifiers[i]]]];
+        [menuItem.submenu itemAtIndex: i].enabled = [self.target validateToolbarItem:
+            [[NSToolbarItem alloc] initWithItemIdentifier: fIdentifiers[i]]];
 
     return menuItem;
 }

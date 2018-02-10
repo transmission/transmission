@@ -29,7 +29,7 @@
 #warning remove ivars in header when 64-bit only (or it compiles in 32-bit mode)
 @synthesize torrent = fTorrent;
 
-- (id) initWithTrackerStat: (tr_tracker_stat *) stat torrent: (Torrent *) torrent
+- (instancetype) initWithTrackerStat: (tr_tracker_stat *) stat torrent: (Torrent *) torrent
 {
     if ((self = [super init]))
     {
@@ -59,7 +59,7 @@
     if (![object isKindOfClass: [self class]])
         return NO;
 
-    if ([self torrent] != [object torrent])
+    if (self.torrent != [object torrent])
         return NO;
 
     return [self tier] == [object tier] && [[self fullAnnounceAddress] isEqualToString: [object fullAnnounceAddress]];
@@ -106,8 +106,8 @@
     if (fStat.hasAnnounced)
     {
         NSDateFormatter * dateFormatter = [[NSDateFormatter alloc] init];
-        [dateFormatter setDateStyle: NSDateFormatterFullStyle];
-        [dateFormatter setTimeStyle: NSDateFormatterShortStyle];
+        dateFormatter.dateStyle = NSDateFormatterFullStyle;
+        dateFormatter.timeStyle = NSDateFormatterShortStyle;
         [dateFormatter setDoesRelativeDateFormatting: YES];
 
         dateString = [dateFormatter stringFromDate: [NSDate dateWithTimeIntervalSince1970: fStat.lastAnnounceTime]];
@@ -155,7 +155,7 @@
 
         case TR_TRACKER_WAITING:
         {
-            const NSTimeInterval nextAnnounceTimeLeft = fStat.nextAnnounceTime - [[NSDate date] timeIntervalSince1970];
+            const NSTimeInterval nextAnnounceTimeLeft = fStat.nextAnnounceTime - [NSDate date].timeIntervalSince1970;
 
             NSString *timeString;
             if ([NSApp isOnYosemiteOrBetter]) {
@@ -195,8 +195,8 @@
     if (fStat.hasScraped)
     {
         NSDateFormatter * dateFormatter = [[NSDateFormatter alloc] init];
-        [dateFormatter setDateStyle: NSDateFormatterFullStyle];
-        [dateFormatter setTimeStyle: NSDateFormatterShortStyle];
+        dateFormatter.dateStyle = NSDateFormatterFullStyle;
+        dateFormatter.timeStyle = NSDateFormatterShortStyle;
         [dateFormatter setDoesRelativeDateFormatting: YES];
 
         dateString = [dateFormatter stringFromDate: [NSDate dateWithTimeIntervalSince1970: fStat.lastScrapeTime]];

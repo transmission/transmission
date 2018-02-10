@@ -46,7 +46,7 @@ GroupsController * fGroupsInstance = nil;
     return fGroupsInstance;
 }
 
-- (id) init
+- (instancetype) init
 {
     if ((self = [super init]))
     {
@@ -108,14 +108,14 @@ GroupsController * fGroupsInstance = nil;
 
 - (NSInteger) numberOfGroups
 {
-    return [fGroups count];
+    return fGroups.count;
 }
 
 - (NSInteger) rowValueForIndex: (NSInteger) index
 {
     if (index != -1)
     {
-        for (NSUInteger i = 0; i < [fGroups count]; i++)
+        for (NSUInteger i = 0; i < fGroups.count; i++)
             if (index == [fGroups[i][@"Index"] integerValue])
                 return i;
     }
@@ -205,7 +205,7 @@ GroupsController * fGroupsInstance = nil;
         return NO;
 
     NSNumber * assignRules = fGroups[orderIndex][@"UsesAutoGroupRules"];
-    return assignRules && [assignRules boolValue];
+    return assignRules && assignRules.boolValue;
 }
 
 - (void) setUsesAutoAssignRules: (BOOL) useAutoAssignRules forIndex: (NSInteger) index
@@ -245,11 +245,11 @@ GroupsController * fGroupsInstance = nil;
 - (void) addNewGroup
 {
     //find the lowest index
-    NSMutableIndexSet * candidates = [NSMutableIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [fGroups count]+1)];
+    NSMutableIndexSet * candidates = [NSMutableIndexSet indexSetWithIndexesInRange: NSMakeRange(0, fGroups.count+1)];
     for (NSDictionary * dict in fGroups)
         [candidates removeIndex: [dict[@"Index"] integerValue]];
 
-    const NSInteger index = [candidates firstIndex];
+    const NSInteger index = candidates.firstIndex;
 
     [fGroups addObject: [NSMutableDictionary dictionaryWithObjectsAndKeys: @(index), @"Index",
                             [NSColor colorWithCalibratedRed: 0.0 green: 0.65 blue: 1.0 alpha: 1.0], @"Color", @"", @"Name", nil]];
@@ -287,39 +287,39 @@ GroupsController * fGroupsInstance = nil;
 
     NSMenuItem * item = [[NSMenuItem alloc] initWithTitle: NSLocalizedString(@"None", "Groups -> Menu") action: action
                             keyEquivalent: @""];
-    [item setTarget: target];
-    [item setTag: -1];
+    item.target = target;
+    item.tag = -1;
 
     NSImage * icon = [NSImage imageNamed: @"GroupsNoneTemplate"];
     if (small)
     {
         icon = [icon copy];
-        [icon setSize: NSMakeSize(ICON_WIDTH_SMALL, ICON_WIDTH_SMALL)];
+        icon.size = NSMakeSize(ICON_WIDTH_SMALL, ICON_WIDTH_SMALL);
 
-        [item setImage: icon];
+        item.image = icon;
     }
     else
-        [item setImage: icon];
+        item.image = icon;
 
     [menu addItem: item];
 
     for (NSMutableDictionary * dict in fGroups)
     {
         item = [[NSMenuItem alloc] initWithTitle: dict[@"Name"] action: action keyEquivalent: @""];
-        [item setTarget: target];
+        item.target = target;
 
-        [item setTag: [dict[@"Index"] integerValue]];
+        item.tag = [dict[@"Index"] integerValue];
 
         NSImage * icon = [self imageForGroup: dict];
         if (small)
         {
             icon = [icon copy];
-            [icon setSize: NSMakeSize(ICON_WIDTH_SMALL, ICON_WIDTH_SMALL)];
+            icon.size = NSMakeSize(ICON_WIDTH_SMALL, ICON_WIDTH_SMALL);
 
-            [item setImage: icon];
+            item.image = icon;
         }
         else
-            [item setImage: icon];
+            item.image = icon;
 
         [menu addItem: item];
     }
@@ -345,7 +345,7 @@ GroupsController * fGroupsInstance = nil;
 - (void) saveGroups
 {
     //don't archive the icon
-    NSMutableArray * groups = [NSMutableArray arrayWithCapacity: [fGroups count]];
+    NSMutableArray * groups = [NSMutableArray arrayWithCapacity: fGroups.count];
     for (NSDictionary * dict in fGroups)
     {
         NSMutableDictionary * tempDict = [dict mutableCopy];

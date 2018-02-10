@@ -33,22 +33,20 @@
 
 #define ROW_SMALL_HEIGHT 18.0
 
-typedef enum
-{
+typedef NS_ENUM(unsigned int, fileCheckMenuTag) {
     FILE_CHECK_TAG,
     FILE_UNCHECK_TAG
-} fileCheckMenuTag;
+};
 
-typedef enum
-{
+typedef NS_ENUM(unsigned int, filePriorityMenuTag) {
     FILE_PRIORITY_HIGH_TAG,
     FILE_PRIORITY_NORMAL_TAG,
     FILE_PRIORITY_LOW_TAG
-} filePriorityMenuTag;
+};
 
 @interface FileOutlineController (Private)
 
-- (NSMenu *) menu;
+@property (nonatomic, readonly, copy) NSMenu *menu;
 
 - (NSUInteger) findFileNode: (FileListNode *) node inList: (NSArray *) list atIndexes: (NSIndexSet *) range currentParent: (FileListNode *) currentParent finalParent: (FileListNode **) parent;
 
@@ -60,14 +58,14 @@ typedef enum
 {
     fFileList = [[NSMutableArray alloc] init];
 
-    [fOutline setDoubleAction: @selector(revealFile:)];
-    [fOutline setTarget: self];
+    fOutline.doubleAction = @selector(revealFile:);
+    fOutline.target = self;
 
     //set table header tool tips
     [[fOutline tableColumnWithIdentifier: @"Check"] setHeaderToolTip: NSLocalizedString(@"Download", "file table -> header tool tip")];
     [[fOutline tableColumnWithIdentifier: @"Priority"] setHeaderToolTip: NSLocalizedString(@"Priority", "file table -> header tool tip")];
 
-    [fOutline setMenu: [self menu]];
+    fOutline.menu = [self menu];
 
     [self setTorrent: nil];
 }
@@ -93,7 +91,7 @@ typedef enum
 - (void) setFilterText: (NSString *) text
 {
     NSArray * components = [text betterComponentsSeparatedByCharactersInSet: [NSCharacterSet whitespaceAndNewlineCharacterSet]];
-    if (!components || [components count] == 0)
+    if (!components || components.count == 0)
     {
         text = nil;
         components = nil;
@@ -117,7 +115,7 @@ typedef enum
         if (components)
         {
             [components enumerateObjectsWithOptions: NSEnumerationConcurrent usingBlock: ^(id obj, NSUInteger idx, BOOL * stop) {
-                if ([[item name] rangeOfString: (NSString *)obj options: (NSCaseInsensitiveSearch | NSDiacriticInsensitiveSearch)].location == NSNotFound)
+                if ([item.name rangeOfString: (NSString *)obj options: (NSCaseInsensitiveSearch | NSDiacriticInsensitiveSearch)].location == NSNotFound)
                 {
                     filter = YES;
                     *stop = YES;
@@ -128,7 +126,7 @@ typedef enum
         if (!filter)
         {
             FileListNode * parent = nil;
-            NSUInteger previousIndex = ![item isFolder] ? [self findFileNode: item inList: fFileList atIndexes: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(currentIndex, [fFileList count]-currentIndex)] currentParent: nil finalParent: &parent] : NSNotFound;
+            NSUInteger previousIndex = !item.isFolder ? [self findFileNode: item inList: fFileList atIndexes: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(currentIndex, fFileList.count-currentIndex)] currentParent: nil finalParent: &parent] : NSNotFound;
 
             if (previousIndex == NSNotFound)
             {
@@ -177,9 +175,9 @@ typedef enum
     }
 
     //remove trailing items - those are the unused
-    if (currentIndex  < [fFileList count])
+    if (currentIndex  < fFileList.count)
     {
-        const NSRange removeRange = NSMakeRange(currentIndex, [fFileList count]-currentIndex);
+        const NSRange removeRange = NSMakeRange(currentIndex, fFileList.count-currentIndex);
         [fFileList removeObjectsInRange: removeRange];
         [fOutline removeItemsAtIndexes: [NSIndexSet indexSetWithIndexesInRange: removeRange] inParent: nil withAnimation: NSTableViewAnimationSlideDown];
     }
@@ -202,44 +200,44 @@ typedef enum
 
 - (void) outlineViewSelectionDidChange: (NSNotification *) notification
 {
-    if ([QLPreviewPanel sharedPreviewPanelExists] && [[QLPreviewPanel sharedPreviewPanel] isVisible])
+    if ([QLPreviewPanel sharedPreviewPanelExists] && [QLPreviewPanel sharedPreviewPanel].visible)
         [[QLPreviewPanel sharedPreviewPanel] reloadData];
 }
 
 - (NSInteger) outlineView: (NSOutlineView *) outlineView numberOfChildrenOfItem: (id) item
 {
     if (!item)
-        return fFileList ? [fFileList count] : 0;
+        return fFileList ? fFileList.count : 0;
     else
     {
         FileListNode * node = (FileListNode *)item;
-        return [node isFolder] ? [[node children] count] : 0;
+        return node.isFolder ? node.children.count : 0;
     }
 }
 
 - (BOOL) outlineView: (NSOutlineView *) outlineView isItemExpandable: (id) item
 {
-    return [(FileListNode *)item isFolder];
+    return ((FileListNode *)item).isFolder;
 }
 
 - (id) outlineView: (NSOutlineView *) outlineView child: (NSInteger) index ofItem: (id) item
 {
-    return (item ? [(FileListNode *)item children] : fFileList)[index];
+    return (item ? ((FileListNode *)item).children : fFileList)[index];
 }
 
 - (id) outlineView: (NSOutlineView *) outlineView objectValueForTableColumn: (NSTableColumn *) tableColumn byItem: (id) item
 {
-    if ([[tableColumn identifier] isEqualToString: @"Check"])
-        return @([fTorrent checkForFiles: [(FileListNode *)item indexes]]);
+    if ([tableColumn.identifier isEqualToString: @"Check"])
+        return @([fTorrent checkForFiles: ((FileListNode *)item).indexes]);
     else
         return item;
 }
 
 - (void) outlineView: (NSOutlineView *) outlineView willDisplayCell: (id) cell forTableColumn: (NSTableColumn *) tableColumn item: (id) item
 {
-    NSString * identifier = [tableColumn identifier];
+    NSString * identifier = tableColumn.identifier;
     if ([identifier isEqualToString: @"Check"])
-        [cell setEnabled: [fTorrent canChangeDownloadCheckForFiles: [(FileListNode *)item indexes]]];
+        [cell setEnabled: [fTorrent canChangeDownloadCheckForFiles: ((FileListNode *)item).indexes]];
     else if ([identifier isEqualToString: @"Priority"])
     {
         [cell setRepresentedObject: item];
@@ -252,14 +250,14 @@ typedef enum
 
 - (void) outlineView: (NSOutlineView *) outlineView setObjectValue: (id) object forTableColumn: (NSTableColumn *) tableColumn byItem: (id) item
 {
-    NSString * identifier = [tableColumn identifier];
+    NSString * identifier = tableColumn.identifier;
     if ([identifier isEqualToString: @"Check"])
     {
         NSIndexSet * indexSet;
         if ([NSEvent modifierFlags] & NSAlternateKeyMask)
             indexSet = [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [fTorrent fileCount])];
         else
-            indexSet = [(FileListNode *)item indexes];
+            indexSet = ((FileListNode *)item).indexes;
 
         [fTorrent setFileCheckState: [object intValue] != NSOffState ? NSOnState : NSOffState forIndexes: indexSet];
         [fOutline setNeedsDisplay: YES];
@@ -270,23 +268,23 @@ typedef enum
 
 - (NSString *) outlineView: (NSOutlineView *) outlineView typeSelectStringForTableColumn: (NSTableColumn *) tableColumn item: (id) item
 {
-    return [(FileListNode *)item name];
+    return ((FileListNode *)item).name;
 }
 
 - (NSString *) outlineView: (NSOutlineView *) outlineView toolTipForCell: (NSCell *) cell rect: (NSRectPointer) rect
         tableColumn: (NSTableColumn *) tableColumn item: (id) item mouseLocation: (NSPoint) mouseLocation
 {
-    NSString * ident = [tableColumn identifier];
+    NSString * ident = tableColumn.identifier;
     if ([ident isEqualToString: @"Name"])
     {
         NSString * path = [fTorrent fileLocation: item];
         if (!path)
-            path = [[(FileListNode *)item path] stringByAppendingPathComponent: [(FileListNode *)item name]];
+            path = [((FileListNode *)item).path stringByAppendingPathComponent: ((FileListNode *)item).name];
         return path;
     }
     else if ([ident isEqualToString: @"Check"])
     {
-        switch ([cell state])
+        switch (cell.state)
         {
             case NSOffState:
                 return NSLocalizedString(@"Don't Download", "files tab -> tooltip");
@@ -298,8 +296,8 @@ typedef enum
     }
     else if ([ident isEqualToString: @"Priority"])
     {
-        NSSet * priorities = [fTorrent filePrioritiesForIndexes: [(FileListNode *)item indexes]];
-        switch ([priorities count])
+        NSSet * priorities = [fTorrent filePrioritiesForIndexes: ((FileListNode *)item).indexes];
+        switch (priorities.count)
         {
             case 0:
                 return NSLocalizedString(@"Priority Not Available", "files tab -> tooltip");
@@ -325,19 +323,19 @@ typedef enum
 
 - (CGFloat) outlineView: (NSOutlineView *) outlineView heightOfRowByItem: (id) item
 {
-    if ([(FileListNode *)item isFolder])
+    if (((FileListNode *)item).isFolder)
         return ROW_SMALL_HEIGHT;
     else
-        return [outlineView rowHeight];
+        return outlineView.rowHeight;
 }
 
 - (void) setCheck: (id) sender
 {
     NSInteger state = [sender tag] == FILE_UNCHECK_TAG ? NSOffState : NSOnState;
 
-    NSIndexSet * indexSet = [fOutline selectedRowIndexes];
+    NSIndexSet * indexSet = fOutline.selectedRowIndexes;
     NSMutableIndexSet * itemIndexes = [NSMutableIndexSet indexSet];
-    for (NSInteger i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
+    for (NSInteger i = indexSet.firstIndex; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
         [itemIndexes addIndexes: [[fOutline itemAtRow: i] indexes]];
 
     [fTorrent setFileCheckState: state forIndexes: itemIndexes];
@@ -346,9 +344,9 @@ typedef enum
 
 - (void) setOnlySelectedCheck: (id) sender
 {
-    NSIndexSet * indexSet = [fOutline selectedRowIndexes];
+    NSIndexSet * indexSet = fOutline.selectedRowIndexes;
     NSMutableIndexSet * itemIndexes = [NSMutableIndexSet indexSet];
-    for (NSInteger i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
+    for (NSInteger i = indexSet.firstIndex; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
         [itemIndexes addIndexes: [[fOutline itemAtRow: i] indexes]];
 
     [fTorrent setFileCheckState: NSOnState forIndexes: itemIndexes];
@@ -389,9 +387,9 @@ typedef enum
             priority = TR_PRI_LOW;
     }
 
-    NSIndexSet * indexSet = [fOutline selectedRowIndexes];
+    NSIndexSet * indexSet = fOutline.selectedRowIndexes;
     NSMutableIndexSet * itemIndexes = [NSMutableIndexSet indexSet];
-    for (NSInteger i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
+    for (NSInteger i = indexSet.firstIndex; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
         [itemIndexes addIndexes: [[fOutline itemAtRow: i] indexes]];
 
     [fTorrent setFilePriority: priority forIndexes: itemIndexes];
@@ -400,29 +398,29 @@ typedef enum
 
 - (void) revealFile: (id) sender
 {
-    NSIndexSet * indexes = [fOutline selectedRowIndexes];
-    NSMutableArray * paths = [NSMutableArray arrayWithCapacity: [indexes count]];
-    for (NSUInteger i = [indexes firstIndex]; i != NSNotFound; i = [indexes indexGreaterThanIndex: i])
+    NSIndexSet * indexes = fOutline.selectedRowIndexes;
+    NSMutableArray * paths = [NSMutableArray arrayWithCapacity: indexes.count];
+    for (NSUInteger i = indexes.firstIndex; i != NSNotFound; i = [indexes indexGreaterThanIndex: i])
     {
         NSString * path = [fTorrent fileLocation: [fOutline itemAtRow: i]];
         if (path)
             [paths addObject: [NSURL fileURLWithPath: path]];
     }
 
-    if ([paths count] > 0)
+    if (paths.count > 0)
         [[NSWorkspace sharedWorkspace] activateFileViewerSelectingURLs: paths];
 }
 
 - (void) renameSelected: (id) sender
 {
-    NSIndexSet * indexes = [fOutline selectedRowIndexes];
+    NSIndexSet * indexes = fOutline.selectedRowIndexes;
     NSAssert([indexes count] == 1, @"1 file needs to be selected to rename, but %ld are selected", [indexes count]);
 
-    FileListNode * node = [fOutline itemAtRow: [indexes firstIndex]];
-    Torrent * torrent = [node torrent];
+    FileListNode * node = [fOutline itemAtRow: indexes.firstIndex];
+    Torrent * torrent = node.torrent;
     if (![torrent isFolder])
     {
-        [FileRenameSheetController presentSheetForTorrent: torrent modalForWindow: [fOutline window] completionHandler: ^(BOOL didRename) {
+        [FileRenameSheetController presentSheetForTorrent: torrent modalForWindow: fOutline.window completionHandler: ^(BOOL didRename) {
             if (didRename)
             {
                 [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateQueue" object: self];
@@ -432,7 +430,7 @@ typedef enum
     }
     else
     {
-        [FileRenameSheetController presentSheetForFileListNode: node modalForWindow: [fOutline window] completionHandler: ^(BOOL didRename) {
+        [FileRenameSheetController presentSheetForFileListNode: node modalForWindow: fOutline.window completionHandler: ^(BOOL didRename) {
             #warning instead of calling reset inspector, just resort?
             if (didRename)
                 [[NSNotificationCenter defaultCenter] postNotificationName: @"ResetInspector" object: self userInfo: @{ @"Torrent" : torrent }];
@@ -446,12 +444,12 @@ typedef enum
     if (!fTorrent)
         return NO;
 
-    SEL action = [menuItem action];
+    SEL action = menuItem.action;
 
     if (action == @selector(revealFile:))
     {
-        NSIndexSet * indexSet = [fOutline selectedRowIndexes];
-        for (NSInteger i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
+        NSIndexSet * indexSet = fOutline.selectedRowIndexes;
+        for (NSInteger i = indexSet.firstIndex; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
             if ([fTorrent fileLocation: [fOutline itemAtRow: i]] != nil)
                 return YES;
         return NO;
@@ -459,26 +457,26 @@ typedef enum
 
     if (action == @selector(setCheck:))
     {
-        if ([fOutline numberOfSelectedRows] == 0)
+        if (fOutline.numberOfSelectedRows == 0)
             return NO;
 
-        NSIndexSet * indexSet = [fOutline selectedRowIndexes];
+        NSIndexSet * indexSet = fOutline.selectedRowIndexes;
         NSMutableIndexSet * itemIndexes = [NSMutableIndexSet indexSet];
-        for (NSInteger i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
+        for (NSInteger i = indexSet.firstIndex; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
             [itemIndexes addIndexes: [[fOutline itemAtRow: i] indexes]];
 
-        NSInteger state = ([menuItem tag] == FILE_CHECK_TAG) ? NSOnState : NSOffState;
+        NSInteger state = (menuItem.tag == FILE_CHECK_TAG) ? NSOnState : NSOffState;
         return [fTorrent checkForFiles: itemIndexes] != state && [fTorrent canChangeDownloadCheckForFiles: itemIndexes];
     }
 
     if (action == @selector(setOnlySelectedCheck:))
     {
-        if ([fOutline numberOfSelectedRows] == 0)
+        if (fOutline.numberOfSelectedRows == 0)
             return NO;
 
-        NSIndexSet * indexSet = [fOutline selectedRowIndexes];
+        NSIndexSet * indexSet = fOutline.selectedRowIndexes;
         NSMutableIndexSet * itemIndexes = [NSMutableIndexSet indexSet];
-        for (NSInteger i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
+        for (NSInteger i = indexSet.firstIndex; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
             [itemIndexes addIndexes: [[fOutline itemAtRow: i] indexes]];
 
         return [fTorrent canChangeDownloadCheckForFiles: itemIndexes];
@@ -486,16 +484,16 @@ typedef enum
 
     if (action == @selector(setPriority:))
     {
-        if ([fOutline numberOfSelectedRows] == 0)
+        if (fOutline.numberOfSelectedRows == 0)
         {
-            [menuItem setState: NSOffState];
+            menuItem.state = NSOffState;
             return NO;
         }
 
         //determine which priorities are checked
-        NSIndexSet * indexSet = [fOutline selectedRowIndexes];
+        NSIndexSet * indexSet = fOutline.selectedRowIndexes;
         tr_priority_t priority;
-        switch ([menuItem tag])
+        switch (menuItem.tag)
         {
             case FILE_PRIORITY_HIGH_TAG:
                 priority = TR_PRI_HIGH;
@@ -509,7 +507,7 @@ typedef enum
         }
 
         BOOL current = NO, canChange = NO;
-        for (NSInteger i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
+        for (NSInteger i = indexSet.firstIndex; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
         {
             NSIndexSet * fileIndexSet = [[fOutline itemAtRow: i] indexes];
             if (![fTorrent canChangeDownloadCheckForFiles: fileIndexSet])
@@ -523,13 +521,13 @@ typedef enum
             }
         }
 
-        [menuItem setState: current ? NSOnState : NSOffState];
+        menuItem.state = current ? NSOnState : NSOffState;
         return canChange;
     }
 
     if (action == @selector(renameSelected:))
     {
-        return [fOutline numberOfSelectedRows] == 1;
+        return fOutline.numberOfSelectedRows == 1;
     }
 
     return YES;
@@ -546,20 +544,20 @@ typedef enum
     //check and uncheck
     NSMenuItem * item = [[NSMenuItem alloc] initWithTitle: NSLocalizedString(@"Check Selected", "File Outline -> Menu")
             action: @selector(setCheck:) keyEquivalent: @""];
-    [item setTarget: self];
-    [item setTag: FILE_CHECK_TAG];
+    item.target = self;
+    item.tag = FILE_CHECK_TAG;
     [menu addItem: item];
 
     item = [[NSMenuItem alloc] initWithTitle: NSLocalizedString(@"Uncheck Selected", "File Outline -> Menu")
             action: @selector(setCheck:) keyEquivalent: @""];
-    [item setTarget: self];
-    [item setTag: FILE_UNCHECK_TAG];
+    item.target = self;
+    item.tag = FILE_UNCHECK_TAG;
     [menu addItem: item];
 
     //only check selected
     item = [[NSMenuItem alloc] initWithTitle: NSLocalizedString(@"Only Check Selected", "File Outline -> Menu")
             action: @selector(setOnlySelectedCheck:) keyEquivalent: @""];
-    [item setTarget: self];
+    item.target = self;
     [menu addItem: item];
 
     [menu addItem: [NSMenuItem separatorItem]];
@@ -567,28 +565,28 @@ typedef enum
     //priority
     item = [[NSMenuItem alloc] initWithTitle: NSLocalizedString(@"Priority", "File Outline -> Menu") action: NULL keyEquivalent: @""];
     NSMenu * priorityMenu = [[NSMenu alloc] initWithTitle: @"File Priority Menu"];
-    [item setSubmenu: priorityMenu];
+    item.submenu = priorityMenu;
     [menu addItem: item];
 
     item = [[NSMenuItem alloc] initWithTitle: NSLocalizedString(@"High", "File Outline -> Priority Menu")
             action: @selector(setPriority:) keyEquivalent: @""];
-    [item setTarget: self];
-    [item setTag: FILE_PRIORITY_HIGH_TAG];
-    [item setImage: [NSImage imageNamed: @"PriorityHighTemplate"]];
+    item.target = self;
+    item.tag = FILE_PRIORITY_HIGH_TAG;
+    item.image = [NSImage imageNamed: @"PriorityHighTemplate"];
     [priorityMenu addItem: item];
 
     item = [[NSMenuItem alloc] initWithTitle: NSLocalizedString(@"Normal", "File Outline -> Priority Menu")
             action: @selector(setPriority:) keyEquivalent: @""];
-    [item setTarget: self];
-    [item setTag: FILE_PRIORITY_NORMAL_TAG];
-    [item setImage: [NSImage imageNamed: @"PriorityNormalTemplate"]];
+    item.target = self;
+    item.tag = FILE_PRIORITY_NORMAL_TAG;
+    item.image = [NSImage imageNamed: @"PriorityNormalTemplate"];
     [priorityMenu addItem: item];
 
     item = [[NSMenuItem alloc] initWithTitle: NSLocalizedString(@"Low", "File Outline -> Priority Menu")
             action: @selector(setPriority:) keyEquivalent: @""];
-    [item setTarget: self];
-    [item setTag: FILE_PRIORITY_LOW_TAG];
-    [item setImage: [NSImage imageNamed: @"PriorityLowTemplate"]];
+    item.target = self;
+    item.tag = FILE_PRIORITY_LOW_TAG;
+    item.image = [NSImage imageNamed: @"PriorityLowTemplate"];
     [priorityMenu addItem: item];
 
 
@@ -597,7 +595,7 @@ typedef enum
     //reveal in finder
     item = [[NSMenuItem alloc] initWithTitle: NSLocalizedString(@"Show in Finder", "File Outline -> Menu")
                                       action: @selector(revealFile:) keyEquivalent: @""];
-    [item setTarget: self];
+    item.target = self;
     [menu addItem: item];
 
     [menu addItem: [NSMenuItem separatorItem]];
@@ -605,22 +603,22 @@ typedef enum
     //rename
     item = [[NSMenuItem alloc] initWithTitle: [NSLocalizedString(@"Rename File", "File Outline -> Menu") stringByAppendingEllipsis]
                                                    action: @selector(renameSelected:) keyEquivalent: @""];
-    [item setTarget: self];
+    item.target = self;
     [menu addItem: item];
 
     return menu;
 }
 
-- (NSUInteger) findFileNode: (FileListNode *) node inList: (NSArray *) list atIndexes: (NSIndexSet *) indexes currentParent: (FileListNode *) currentParent finalParent: (FileListNode **) parent
+- (NSUInteger) findFileNode: (FileListNode *) node inList: (NSArray *) list atIndexes: (NSIndexSet *) indexes currentParent: (FileListNode *) currentParent finalParent: (FileListNode * __autoreleasing *) parent
 {
     NSAssert(![node isFolder], @"Looking up folder node!");
 
     __block NSUInteger retIndex = NSNotFound;
 
     [list enumerateObjectsAtIndexes: indexes options: NSEnumerationConcurrent usingBlock: ^(FileListNode * checkNode, NSUInteger index, BOOL * stop) {
-        if ([[checkNode indexes] containsIndex: [[node indexes] firstIndex]])
+        if ([checkNode.indexes containsIndex: node.indexes.firstIndex])
         {
-            if (![checkNode isFolder])
+            if (!checkNode.isFolder)
             {
                 NSAssert2([checkNode isEqualTo: node], @"Expected file nodes to be equal: %@ %@", checkNode, node);
 
@@ -629,7 +627,7 @@ typedef enum
             }
             else
             {
-                const NSUInteger subIndex = [self findFileNode: node inList: [checkNode children] atIndexes: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [[checkNode children] count])] currentParent: checkNode finalParent: parent];
+                const NSUInteger subIndex = [self findFileNode: node inList: checkNode.children atIndexes: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, checkNode.children.count)] currentParent: checkNode finalParent: parent];
                 NSAssert(subIndex != NSNotFound, @"We didn't find an expected file node.");
                 retIndex = subIndex;
             }

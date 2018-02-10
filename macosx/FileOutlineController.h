@@ -35,7 +35,7 @@
     NSString * fFilterText;
 }
 
-- (FileOutlineView *) outlineView;
+@property (nonatomic, readonly, strong) FileOutlineView *outlineView;
 
 - (void) setTorrent: (Torrent *) torrent;
 

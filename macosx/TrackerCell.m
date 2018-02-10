@@ -38,7 +38,7 @@
 
 @interface TrackerCell (Private)
 
-- (NSImage *) favIcon;
+@property (nonatomic, readonly, copy) NSImage *favIcon;
 - (void) loadTrackerIcon: (NSString *) baseAddress;
 
 - (NSRect) imageRectForBounds: (NSRect) bounds;
@@ -48,7 +48,7 @@
 - (NSRect) rectForStatusWithString: (NSAttributedString *) string withAboveRect: (NSRect) aboveRect withRightRect: (NSRect) rightRect
             inBounds: (NSRect) bounds;
 
-- (NSAttributedString *) attributedName;
+@property (nonatomic, readonly, copy) NSAttributedString *attributedName;
 - (NSAttributedString *) attributedStatusWithString: (NSString *) statusString;
 - (NSAttributedString *) attributedCount: (NSInteger) count;
 
@@ -66,12 +66,12 @@ NSMutableSet * fTrackerIconLoading;
     fTrackerIconLoading = [[NSMutableSet alloc] init];
 }
 
-- (id) init
+- (instancetype) init
 {
     if ((self = [super init]))
     {
         NSMutableParagraphStyle * paragraphStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
-        [paragraphStyle setLineBreakMode: NSLineBreakByTruncatingTail];
+        paragraphStyle.lineBreakMode = NSLineBreakByTruncatingTail;
 
         fNameAttributes = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
                             [NSFont messageFontOfSize: 12.0], NSFontAttributeName,
@@ -103,7 +103,7 @@ NSMutableSet * fTrackerIconLoading;
 
     //set table colors
     NSColor * nameColor, * statusColor;
-    if ([self backgroundStyle] == NSBackgroundStyleDark)
+    if (self.backgroundStyle == NSBackgroundStyleDark)
         nameColor = statusColor = [NSColor whiteColor];
     else
     {
@@ -114,7 +114,7 @@ NSMutableSet * fTrackerIconLoading;
     fNameAttributes[NSForegroundColorAttributeName] = nameColor;
     fStatusAttributes[NSForegroundColorAttributeName] = statusColor;
 
-    TrackerNode * node = (TrackerNode *)[self objectValue];
+    TrackerNode * node = (TrackerNode *)self.objectValue;
 
     //name
     NSAttributedString * nameString = [self attributedName];
@@ -177,20 +177,20 @@ NSMutableSet * fTrackerIconLoading;
 - (NSImage *) favIcon
 {
     id icon = nil;
-    NSURL * address = [NSURL URLWithString: [(TrackerNode *)[self objectValue] fullAnnounceAddress]];
+    NSURL * address = [NSURL URLWithString: [(TrackerNode *)self.objectValue fullAnnounceAddress]];
     NSString * host;
-    if ((host = [address host]))
+    if ((host = address.host))
     {
         //don't try to parse ip address
-        const BOOL separable = !tr_addressIsIP([host UTF8String]);
+        const BOOL separable = !tr_addressIsIP(host.UTF8String);
 
         NSArray * hostComponents = separable ? [host componentsSeparatedByString: @"."] : nil;
 
         //let's try getting the tracker address without using any subdomains
         NSString * baseAddress;
-        if (separable && [hostComponents count] > 1)
+        if (separable && hostComponents.count > 1)
             baseAddress = [NSString stringWithFormat: @"http://%@.%@",
-                            hostComponents[[hostComponents count]-2], [hostComponents lastObject]];
+                            hostComponents[hostComponents.count-2], hostComponents.lastObject];
         else
             baseAddress = [NSString stringWithFormat: @"http://%@", host];
 
@@ -233,7 +233,7 @@ NSMutableSet * fTrackerIconLoading;
         {
             [fTrackerIconCache setObject: icon forKey: baseAddress];
 
-            [[self controlView] setNeedsDisplay: YES];
+            [self.controlView setNeedsDisplay: YES];
         }
         else
             [fTrackerIconCache setObject: [NSNull null] forKey: baseAddress];
@@ -290,7 +290,7 @@ NSMutableSet * fTrackerIconLoading;
 
 - (NSAttributedString *) attributedName
 {
-    NSString * name = [(TrackerNode *)[self objectValue] host];
+    NSString * name = [(TrackerNode *)self.objectValue host];
     return [[NSAttributedString alloc] initWithString: name attributes: fNameAttributes];
 }
 

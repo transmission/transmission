@@ -45,24 +45,24 @@
 
 @implementation MessageWindowController
 
-- (id) init
+- (instancetype) init
 {
     return [super initWithWindowNibName: @"MessageWindow"];
 }
 
 - (void) awakeFromNib
 {
-    NSWindow * window = [self window];
+    NSWindow * window = self.window;
     [window setFrameAutosaveName: @"MessageWindowFrame"];
     [window setFrameUsingName: @"MessageWindowFrame"];
-    [window setRestorationClass: [self class]];
+    window.restorationClass = [self class];
 
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(resizeColumn)
         name: NSTableViewColumnDidResizeNotification object: fMessageTable];
 
-    [window setContentBorderThickness: NSMinY([[fMessageTable enclosingScrollView] frame]) forEdge: NSMinYEdge];
+    [window setContentBorderThickness: NSMinY(fMessageTable.enclosingScrollView.frame) forEdge: NSMinYEdge];
 
-    [[self window] setTitle: NSLocalizedString(@"Message Log", "Message window -> title")];
+    [self.window setTitle: NSLocalizedString(@"Message Log", "Message window -> title")];
 
     //set images and text for popup button items
     [[fLevelButton itemAtIndex: LEVEL_ERROR] setTitle: NSLocalizedString(@"Error", "Message window -> level string")];
@@ -70,47 +70,47 @@
     [[fLevelButton itemAtIndex: LEVEL_DEBUG] setTitle: NSLocalizedString(@"Debug", "Message window -> level string")];
     if (![NSApp isOnYosemiteOrBetter])
     {
-        [[fLevelButton itemAtIndex: LEVEL_ERROR] setImage: [NSImage imageNamed: @"RedDotGlossy"]];
-        [[fLevelButton itemAtIndex: LEVEL_INFO] setImage: [NSImage imageNamed: @"YellowDotGlossy"]];
-        [[fLevelButton itemAtIndex: LEVEL_DEBUG] setImage: [NSImage imageNamed: @"PurpleDotGlossy"]];
+        [fLevelButton itemAtIndex: LEVEL_ERROR].image = [NSImage imageNamed: @"RedDotGlossy"];
+        [fLevelButton itemAtIndex: LEVEL_INFO].image = [NSImage imageNamed: @"YellowDotGlossy"];
+        [fLevelButton itemAtIndex: LEVEL_DEBUG].image = [NSImage imageNamed: @"PurpleDotGlossy"];
     }
 
-    const CGFloat levelButtonOldWidth = NSWidth([fLevelButton frame]);
+    const CGFloat levelButtonOldWidth = NSWidth(fLevelButton.frame);
     [fLevelButton sizeToFit];
 
     //set table column text
-    [[[fMessageTable tableColumnWithIdentifier: @"Date"] headerCell] setTitle: NSLocalizedString(@"Date",
+    [[fMessageTable tableColumnWithIdentifier: @"Date"].headerCell setTitle: NSLocalizedString(@"Date",
         "Message window -> table column")];
-    [[[fMessageTable tableColumnWithIdentifier: @"Name"] headerCell] setTitle: NSLocalizedString(@"Process",
+    [[fMessageTable tableColumnWithIdentifier: @"Name"].headerCell setTitle: NSLocalizedString(@"Process",
         "Message window -> table column")];
-    [[[fMessageTable tableColumnWithIdentifier: @"Message"] headerCell] setTitle: NSLocalizedString(@"Message",
+    [[fMessageTable tableColumnWithIdentifier: @"Message"].headerCell setTitle: NSLocalizedString(@"Message",
         "Message window -> table column")];
 
     //set and size buttons
-    [fSaveButton setTitle: [NSLocalizedString(@"Save", "Message window -> save button") stringByAppendingEllipsis]];
+    fSaveButton.title = [NSLocalizedString(@"Save", "Message window -> save button") stringByAppendingEllipsis];
     [fSaveButton sizeToFit];
 
-    NSRect saveButtonFrame = [fSaveButton frame];
+    NSRect saveButtonFrame = fSaveButton.frame;
     saveButtonFrame.size.width += 10.0;
-    saveButtonFrame.origin.x += NSWidth([fLevelButton frame]) - levelButtonOldWidth;
-    [fSaveButton setFrame: saveButtonFrame];
+    saveButtonFrame.origin.x += NSWidth(fLevelButton.frame) - levelButtonOldWidth;
+    fSaveButton.frame = saveButtonFrame;
 
-    const CGFloat oldClearButtonWidth = [fClearButton frame].size.width;
+    const CGFloat oldClearButtonWidth = fClearButton.frame.size.width;
 
     [fClearButton setTitle: NSLocalizedString(@"Clear", "Message window -> save button")];
     [fClearButton sizeToFit];
 
-    NSRect clearButtonFrame = [fClearButton frame];
+    NSRect clearButtonFrame = fClearButton.frame;
     clearButtonFrame.size.width = MAX(clearButtonFrame.size.width + 10.0, saveButtonFrame.size.width);
     clearButtonFrame.origin.x -= NSWidth(clearButtonFrame) - oldClearButtonWidth;
-    [fClearButton setFrame: clearButtonFrame];
+    fClearButton.frame = clearButtonFrame;
 
-    [[fFilterField cell] setPlaceholderString: NSLocalizedString(@"Filter", "Message window -> filter field")];
-    NSRect filterButtonFrame = [fFilterField frame];
+    [fFilterField.cell setPlaceholderString: NSLocalizedString(@"Filter", "Message window -> filter field")];
+    NSRect filterButtonFrame = fFilterField.frame;
     filterButtonFrame.origin.x -= NSWidth(clearButtonFrame) - oldClearButtonWidth;
-    [fFilterField setFrame: filterButtonFrame];
+    fFilterField.frame = filterButtonFrame;
 
-    fAttributes = [[[[fMessageTable tableColumnWithIdentifier: @"Message"] dataCell] attributedStringValue]
+    fAttributes = [[[fMessageTable tableColumnWithIdentifier: @"Message"].dataCell attributedStringValue]
                     attributesAtIndex: 0 effectiveRange: NULL];
 
     //select proper level in popup button
@@ -161,7 +161,7 @@
 {
     NSAssert1([identifier isEqualToString: @"MessageWindow"], @"Trying to restore unexpected identifier %@", identifier);
 
-    NSWindow * window = [[(Controller *)[NSApp delegate] messageWindowController] window];
+    NSWindow * window = ((Controller *)NSApp.delegate).messageWindowController.window;
     completionHandler(window, nil);
 }
 
@@ -182,21 +182,21 @@
 
     static NSUInteger currentIndex = 0;
 
-    NSScroller * scroller = [[fMessageTable enclosingScrollView] verticalScroller];
-    const BOOL shouldScroll = currentIndex == 0 || [scroller floatValue] == 1.0 || [scroller isHidden]
-                                || [scroller knobProportion] == 1.0;
+    NSScroller * scroller = fMessageTable.enclosingScrollView.verticalScroller;
+    const BOOL shouldScroll = currentIndex == 0 || scroller.floatValue == 1.0 || scroller.hidden
+                                || scroller.knobProportion == 1.0;
 
     const NSInteger maxLevel = [[NSUserDefaults standardUserDefaults] integerForKey: @"MessageLevel"];
-    NSString * filterString = [fFilterField stringValue];
+    NSString * filterString = fFilterField.stringValue;
 
     BOOL changed = NO;
 
     for (tr_log_message * currentMessage = messages; currentMessage != NULL; currentMessage = currentMessage->next)
     {
         NSString * name = currentMessage->name != NULL ? @(currentMessage->name)
-                            : [[NSProcessInfo processInfo] processName];
+                            : [NSProcessInfo processInfo].processName;
 
-        NSString * file = [[@(currentMessage->file) lastPathComponent] stringByAppendingFormat: @":%d",
+        NSString * file = [(@(currentMessage->file)).lastPathComponent stringByAppendingFormat: @":%d",
                             currentMessage->line];
 
         NSDictionary * message  = @{
@@ -215,26 +215,26 @@
         }
     }
 
-    if ([fMessages count] > TR_LOG_MAX_QUEUE_LENGTH)
+    if (fMessages.count > TR_LOG_MAX_QUEUE_LENGTH)
     {
-        const NSUInteger oldCount = [fDisplayedMessages count];
+        const NSUInteger oldCount = fDisplayedMessages.count;
 
-        NSIndexSet * removeIndexes = [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [fMessages count]-TR_LOG_MAX_QUEUE_LENGTH)];
+        NSIndexSet * removeIndexes = [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, fMessages.count-TR_LOG_MAX_QUEUE_LENGTH)];
         NSArray * itemsToRemove = [fMessages objectsAtIndexes: removeIndexes];
 
         [fMessages removeObjectsAtIndexes: removeIndexes];
         [fDisplayedMessages removeObjectsInArray: itemsToRemove];
 
-        changed |= oldCount > [fDisplayedMessages count];
+        changed |= oldCount > fDisplayedMessages.count;
     }
 
     if (changed)
     {
-        [fDisplayedMessages sortUsingDescriptors: [fMessageTable sortDescriptors]];
+        [fDisplayedMessages sortUsingDescriptors: fMessageTable.sortDescriptors];
 
         [fMessageTable reloadData];
         if (shouldScroll)
-            [fMessageTable scrollRowToVisible: [fMessageTable numberOfRows]-1];
+            [fMessageTable scrollRowToVisible: fMessageTable.numberOfRows-1];
     }
 
     [fLock unlock];
@@ -244,12 +244,12 @@
 
 - (NSInteger) numberOfRowsInTableView: (NSTableView *) tableView
 {
-    return [fDisplayedMessages count];
+    return fDisplayedMessages.count;
 }
 
 - (id) tableView: (NSTableView *) tableView objectValueForTableColumn: (NSTableColumn *) column row: (NSInteger) row
 {
-    NSString * ident = [column identifier];
+    NSString * ident = column.identifier;
     NSDictionary * message = fDisplayedMessages[row];
 
     if ([ident isEqualToString: @"Date"])
@@ -282,14 +282,14 @@
     NSString * message = fDisplayedMessages[row][@"Message"];
 
     NSTableColumn * column = [tableView tableColumnWithIdentifier: @"Message"];
-    const CGFloat count = floorf([message sizeWithAttributes: fAttributes].width / [column width]);
+    const CGFloat count = floorf([message sizeWithAttributes: fAttributes].width / column.width);
 
-    return [tableView rowHeight] * (count + 1.0);
+    return tableView.rowHeight * (count + 1.0);
 }
 
 - (void) tableView: (NSTableView *) tableView sortDescriptorsDidChange: (NSArray *) oldDescriptors
 {
-    [fDisplayedMessages sortUsingDescriptors: [fMessageTable sortDescriptors]];
+    [fDisplayedMessages sortUsingDescriptors: fMessageTable.sortDescriptors];
     [fMessageTable reloadData];
 }
 
@@ -302,8 +302,8 @@
 
 - (void) copy: (id) sender
 {
-    NSIndexSet * indexes = [fMessageTable selectedRowIndexes];
-    NSMutableArray * messageStrings = [NSMutableArray arrayWithCapacity: [indexes count]];
+    NSIndexSet * indexes = fMessageTable.selectedRowIndexes;
+    NSMutableArray * messageStrings = [NSMutableArray arrayWithCapacity: indexes.count];
 
     for (NSDictionary * message in [fDisplayedMessages objectsAtIndexes: indexes])
         [messageStrings addObject: [self stringForMessage: message]];
@@ -317,10 +317,10 @@
 
 - (BOOL) validateMenuItem: (NSMenuItem *) menuItem
 {
-    SEL action = [menuItem action];
+    SEL action = menuItem.action;
 
     if (action == @selector(copy:))
-        return [fMessageTable numberOfSelectedRows] > 0;
+        return fMessageTable.numberOfSelectedRows > 0;
 
     return YES;
 }
@@ -328,7 +328,7 @@
 - (void) changeLevel: (id) sender
 {
     NSInteger level;
-    switch ([fLevelButton indexOfSelectedItem])
+    switch (fLevelButton.indexOfSelectedItem)
     {
         case LEVEL_ERROR:
             level = TR_LOG_ERROR;
@@ -372,7 +372,7 @@
     [fMessages removeAllObjects];
 
     [fMessageTable beginUpdates];
-    [fMessageTable removeRowsAtIndexes: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [fDisplayedMessages count])] withAnimation: NSTableViewAnimationSlideLeft];
+    [fMessageTable removeRowsAtIndexes: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, fDisplayedMessages.count)] withAnimation: NSTableViewAnimationSlideLeft];
 
     [fDisplayedMessages removeAllObjects];
 
@@ -384,35 +384,35 @@
 - (void) writeToFile: (id) sender
 {
     NSSavePanel * panel = [NSSavePanel savePanel];
-    [panel setAllowedFileTypes: @[@"txt"]];
+    panel.allowedFileTypes = @[@"txt"];
     [panel setCanSelectHiddenExtension: YES];
 
     [panel setNameFieldStringValue: NSLocalizedString(@"untitled", "Save log panel -> default file name")];
 
-    [panel beginSheetModalForWindow: [self window] completionHandler: ^(NSInteger result) {
+    [panel beginSheetModalForWindow: self.window completionHandler: ^(NSInteger result) {
         if (result == NSFileHandlingPanelOKButton)
         {
             //make the array sorted by date
             NSSortDescriptor * descriptor = [NSSortDescriptor sortDescriptorWithKey: @"Index" ascending: YES];
-            NSArray * descriptors = [[NSArray alloc] initWithObjects: descriptor, nil];
+            NSArray * descriptors = @[descriptor];
             NSArray * sortedMessages = [fDisplayedMessages sortedArrayUsingDescriptors: descriptors];
 
             //create the text to output
-            NSMutableArray * messageStrings = [NSMutableArray arrayWithCapacity: [sortedMessages count]];
+            NSMutableArray * messageStrings = [NSMutableArray arrayWithCapacity: sortedMessages.count];
             for (NSDictionary * message in sortedMessages)
                 [messageStrings addObject: [self stringForMessage: message]];
 
             NSString * fileString = [messageStrings componentsJoinedByString: @"\n"];
 
-            if (![fileString writeToFile: [[panel URL] path] atomically: YES encoding: NSUTF8StringEncoding error: nil])
+            if (![fileString writeToFile: panel.URL.path atomically: YES encoding: NSUTF8StringEncoding error: nil])
             {
                 NSAlert * alert = [[NSAlert alloc] init];
                 [alert addButtonWithTitle: NSLocalizedString(@"OK", "Save log alert panel -> button")];
                 [alert setMessageText: NSLocalizedString(@"Log Could Not Be Saved", "Save log alert panel -> title")];
-                [alert setInformativeText: [NSString stringWithFormat:
+                alert.informativeText = [NSString stringWithFormat:
                                             NSLocalizedString(@"There was a problem creating the file \"%@\".",
-                                                              "Save log alert panel -> message"), [[[panel URL] path] lastPathComponent]]];
-                [alert setAlertStyle: NSWarningAlertStyle];
+                                                              "Save log alert panel -> message"), panel.URL.path.lastPathComponent];
+                alert.alertStyle = NSWarningAlertStyle;
 
                 [alert runModal];
             }
@@ -427,7 +427,7 @@
 - (void) resizeColumn
 {
     [fMessageTable noteHeightOfRowsWithIndexesChanged: [NSIndexSet indexSetWithIndexesInRange:
-                    NSMakeRange(0, [fMessageTable numberOfRows])]];
+                    NSMakeRange(0, fMessageTable.numberOfRows)]];
 }
 
 - (BOOL) shouldIncludeMessageForFilter: (NSString *) filterString message: (NSDictionary *) message
@@ -443,13 +443,13 @@
 - (void) updateListForFilter
 {
     const NSInteger level = [[NSUserDefaults standardUserDefaults] integerForKey: @"MessageLevel"];
-    NSString * filterString = [fFilterField stringValue];
+    NSString * filterString = fFilterField.stringValue;
 
     NSIndexSet * indexes = [fMessages indexesOfObjectsWithOptions: NSEnumerationConcurrent passingTest: ^BOOL(id message, NSUInteger idx, BOOL * stop) {
         return [((NSDictionary *)message)[@"Level"] integerValue] <= level && [self shouldIncludeMessageForFilter: filterString message: message];
     }];
 
-    NSArray * tempMessages = [[fMessages objectsAtIndexes: indexes] sortedArrayUsingDescriptors: [fMessageTable sortDescriptors]];
+    NSArray * tempMessages = [[fMessages objectsAtIndexes: indexes] sortedArrayUsingDescriptors: fMessageTable.sortDescriptors];
 
     [fMessageTable beginUpdates];
 
@@ -460,7 +460,7 @@
 
     for (NSDictionary * message in tempMessages)
     {
-        const NSUInteger previousIndex = [fDisplayedMessages indexOfObject: message inRange: NSMakeRange(currentIndex, [fDisplayedMessages count]-currentIndex)];
+        const NSUInteger previousIndex = [fDisplayedMessages indexOfObject: message inRange: NSMakeRange(currentIndex, fDisplayedMessages.count-currentIndex)];
         if (previousIndex == NSNotFound)
         {
             [itemsToAdd addObject: message];
@@ -480,9 +480,9 @@
     }
 
     //remove trailing items - those are the unused
-    if (currentIndex < [fDisplayedMessages count])
+    if (currentIndex < fDisplayedMessages.count)
     {
-        const NSRange removeRange = NSMakeRange(currentIndex, [fDisplayedMessages count]-currentIndex);
+        const NSRange removeRange = NSMakeRange(currentIndex, fDisplayedMessages.count-currentIndex);
         [fDisplayedMessages removeObjectsInRange: removeRange];
         [fMessageTable removeRowsAtIndexes: [NSIndexSet indexSetWithIndexesInRange: removeRange] withAnimation: NSTableViewAnimationSlideDown];
     }

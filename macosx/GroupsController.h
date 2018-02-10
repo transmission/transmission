@@ -31,7 +31,7 @@
 
 + (GroupsController *) groups;
 
-- (NSInteger) numberOfGroups;
+@property (nonatomic, readonly) NSInteger numberOfGroups;
 
 - (NSInteger) rowValueForIndex: (NSInteger) index;
 - (NSInteger) indexForRow: (NSInteger) row;

@@ -12,7 +12,7 @@
 
 + (ShareTorrentFileHelper *) sharedHelper;
 
-- (NSArray *) shareTorrentURLs;
-- (NSArray *) menuItems;
+@property (nonatomic, readonly, copy) NSArray *shareTorrentURLs;
+@property (nonatomic, readonly, copy) NSArray *menuItems;
 
 @end

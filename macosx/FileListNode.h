@@ -49,13 +49,13 @@
 
 @property (nonatomic, strong, readonly) NSIndexSet * indexes;
 
-- (id) initWithFolderName: (NSString *) name path: (NSString *) path torrent: (Torrent *) torrent;
-- (id) initWithFileName: (NSString *) name path: (NSString *) path size: (uint64_t) size index: (NSUInteger) index torrent: (Torrent *) torrent;
+- (instancetype) initWithFolderName: (NSString *) name path: (NSString *) path torrent: (Torrent *) torrent;
+- (instancetype) initWithFileName: (NSString *) name path: (NSString *) path size: (uint64_t) size index: (NSUInteger) index torrent: (Torrent *) torrent;
 
 - (void) insertChild: (FileListNode *) child;
 - (void) insertIndex: (NSUInteger) index withSize: (uint64_t) size;
 
-- (NSString *) description;
+@property (nonatomic, readonly, copy) NSString *description;
 
 - (BOOL) updateFromOldName: (NSString *) oldName toNewName: (NSString *) newName inPath: (NSString *) path;
 

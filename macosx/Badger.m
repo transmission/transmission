@@ -27,14 +27,14 @@
 
 @implementation Badger
 
-- (id) initWithLib: (tr_session *) lib
+- (instancetype) initWithLib: (tr_session *) lib
 {
     if ((self = [super init]))
     {
         fLib = lib;
 
         BadgeView * view = [[BadgeView alloc] initWithLib: lib];
-        [[NSApp dockTile] setContentView: view];
+        NSApp.dockTile.contentView = view;
 
         fHashes = [[NSMutableSet alloc] init];
     }
@@ -51,8 +51,8 @@
                                     ? uploadRate : 0.0;
 
     //only update if the badged values change
-    if ([(BadgeView *)[[NSApp dockTile] contentView] setRatesWithDownload: displayDlRate upload: displayUlRate])
-        [[NSApp dockTile] display];
+    if ([(BadgeView *)NSApp.dockTile.contentView setRatesWithDownload: displayDlRate upload: displayUlRate])
+        [NSApp.dockTile display];
 }
 
 - (void) addCompletedTorrent: (Torrent *) torrent
@@ -60,7 +60,7 @@
     NSParameterAssert(torrent != nil);
 
     [fHashes addObject: [torrent hashString]];
-    [[NSApp dockTile] setBadgeLabel: [NSString formattedUInteger: [fHashes count]]];
+    NSApp.dockTile.badgeLabel = [NSString formattedUInteger: fHashes.count];
 }
 
 - (void) removeTorrent: (Torrent *) torrent
@@ -68,27 +68,27 @@
     if ([fHashes member: [torrent hashString]])
     {
         [fHashes removeObject: [torrent hashString]];
-        if ([fHashes count] > 0)
-            [[NSApp dockTile] setBadgeLabel: [NSString formattedUInteger: [fHashes count]]];
+        if (fHashes.count > 0)
+            NSApp.dockTile.badgeLabel = [NSString formattedUInteger: fHashes.count];
         else
-            [[NSApp dockTile] setBadgeLabel: @""];
+            NSApp.dockTile.badgeLabel = @"";
     }
 }
 
 - (void) clearCompleted
 {
-    if ([fHashes count] > 0)
+    if (fHashes.count > 0)
     {
         [fHashes removeAllObjects];
-        [[NSApp dockTile] setBadgeLabel: @""];
+        NSApp.dockTile.badgeLabel = @"";
     }
 }
 
 - (void) setQuitting
 {
     [self clearCompleted];
-    [(BadgeView *)[[NSApp dockTile] contentView] setQuitting];
-    [[NSApp dockTile] display];
+    [(BadgeView *)NSApp.dockTile.contentView setQuitting];
+    [NSApp.dockTile display];
 }
 
 @end

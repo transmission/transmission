@@ -24,6 +24,6 @@
 
 @interface NSApplication (NSApplicationAdditions)
 
-- (BOOL) isOnYosemiteOrBetter;
+@property (nonatomic, getter=isOnYosemiteOrBetter, readonly) BOOL onYosemiteOrBetter;
 
 @end

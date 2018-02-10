@@ -53,7 +53,7 @@
 
 @implementation TorrentTableView
 
-- (id) initWithCoder: (NSCoder *) decoder
+- (instancetype) initWithCoder: (NSCoder *) decoder
 {
     if ((self = [super initWithCoder: decoder]))
     {
@@ -74,7 +74,7 @@
 
         fActionPopoverShown = NO;
 
-        [self setDelegate: self];
+        self.delegate = self;
 
         fPiecesBarPercent = [fDefaults boolForKey: @"PiecesBar"] ? 1.0 : 0.0;
     }
@@ -128,7 +128,7 @@
 
 - (CGFloat) outlineView: (NSOutlineView *) outlineView heightOfRowByItem: (id) item
 {
-    return [item isKindOfClass: [Torrent class]] ? [self rowHeight] : GROUP_SEPARATOR_HEIGHT;
+    return [item isKindOfClass: [Torrent class]] ? self.rowHeight : GROUP_SEPARATOR_HEIGHT;
 }
 
 - (NSCell *) outlineView: (NSOutlineView *) outlineView dataCellForTableColumn: (NSTableColumn *) tableColumn item: (id) item
@@ -158,11 +158,11 @@
     }
     else
     {
-        NSString * ident = [tableColumn identifier];
+        NSString * ident = tableColumn.identifier;
         if ([ident isEqualToString: @"UL Image"] || [ident isEqualToString: @"DL Image"])
         {
             //ensure arrows are white only when selected
-            [[cell image] setTemplate: [cell backgroundStyle] == NSBackgroundStyleLowered];
+            [cell image].template = [cell backgroundStyle] == NSBackgroundStyleLowered;
         }
     }
 }
@@ -188,12 +188,12 @@
     if ([item isKindOfClass: [Torrent class]])
         return [(Torrent *)item name];
     else
-        return [[self dataSource] outlineView:outlineView objectValueForTableColumn:[self tableColumnWithIdentifier:@"Group"] byItem:item];
+        return [self.dataSource outlineView:outlineView objectValueForTableColumn:[self tableColumnWithIdentifier:@"Group"] byItem:item];
 }
 
 - (NSString *) outlineView: (NSOutlineView *) outlineView toolTipForCell: (NSCell *) cell rect: (NSRectPointer) rect tableColumn: (NSTableColumn *) column item: (id) item mouseLocation: (NSPoint) mouseLocation
 {
-    NSString * ident = [column identifier];
+    NSString * ident = column.identifier;
     if ([ident isEqualToString: @"DL"] || [ident isEqualToString: @"DL Image"])
         return NSLocalizedString(@"Download speed", "Torrent table -> group row -> tooltip");
     else if ([ident isEqualToString: @"UL"] || [ident isEqualToString: @"UL Image"])
@@ -201,7 +201,7 @@
                 : NSLocalizedString(@"Upload speed", "Torrent table -> group row -> tooltip");
     else if (ident)
     {
-        NSUInteger count = [[item torrents] count];
+        NSUInteger count = [item torrents].count;
         if (count == 1)
             return NSLocalizedString(@"1 transfer", "Torrent table -> group row -> tooltip");
         else
@@ -217,11 +217,11 @@
     [super updateTrackingAreas];
     [self removeTrackingAreas];
 
-    const NSRange rows = [self rowsInRect: [self visibleRect]];
+    const NSRange rows = [self rowsInRect: self.visibleRect];
     if (rows.length == 0)
         return;
 
-    NSPoint mouseLocation = [self convertPoint: [[self window] mouseLocationOutsideOfEventStream] fromView: nil];
+    NSPoint mouseLocation = [self convertPoint: self.window.mouseLocationOutsideOfEventStream fromView: nil];
     for (NSUInteger row = rows.location; row < NSMaxRange(rows); row++)
     {
         if (![[self itemAtRow: row] isKindOfClass: [Torrent class]])
@@ -240,9 +240,9 @@
     fMouseRevealRow = -1;
     fMouseActionRow = -1;
 
-    for (NSTrackingArea * area in [self trackingAreas])
+    for (NSTrackingArea * area in self.trackingAreas)
     {
-        if ([area owner] == self && [area userInfo][@"Row"])
+        if (area.owner == self && area.userInfo[@"Row"])
             [self removeTrackingArea: area];
     }
 }
@@ -279,12 +279,12 @@
 
 - (void) mouseEntered: (NSEvent *) event
 {
-    NSDictionary * dict = (NSDictionary *)[event userData];
+    NSDictionary * dict = (NSDictionary *)event.userData;
 
     NSNumber * row;
     if ((row = dict[@"Row"]))
     {
-        NSInteger rowVal = [row integerValue];
+        NSInteger rowVal = row.integerValue;
         NSString * type = dict[@"Type"];
         if ([type isEqualToString: @"Action"])
             fMouseActionRow = rowVal;
@@ -305,7 +305,7 @@
 
 - (void) mouseExited: (NSEvent *) event
 {
-    NSDictionary * dict = (NSDictionary *)[event userData];
+    NSDictionary * dict = (NSDictionary *)event.userData;
 
     NSNumber * row;
     if ((row = dict[@"Row"]))
@@ -324,7 +324,7 @@
                 return;
         }
 
-        [self setNeedsDisplayInRect: [self rectOfRow: [row integerValue]]];
+        [self setNeedsDisplayInRect: [self rectOfRow: row.integerValue]];
     }
 }
 
@@ -338,7 +338,7 @@
 
 - (void) outlineViewItemDidExpand: (NSNotification *) notification
 {
-    NSInteger value = [[notification userInfo][@"NSObject"] groupIndex];
+    NSInteger value = [notification.userInfo[@"NSObject"] groupIndex];
     if (value < 0)
         value = MAX_GROUP;
 
@@ -351,7 +351,7 @@
 
 - (void) outlineViewItemDidCollapse: (NSNotification *) notification
 {
-    NSInteger value = [[notification userInfo][@"NSObject"] groupIndex];
+    NSInteger value = [notification.userInfo[@"NSObject"] groupIndex];
     if (value < 0)
         value = MAX_GROUP;
 
@@ -361,7 +361,7 @@
 
 - (void) mouseDown: (NSEvent *) event
 {
-    NSPoint point = [self convertPoint: [event locationInWindow] fromView: nil];
+    NSPoint point = [self convertPoint: event.locationInWindow fromView: nil];
     const NSInteger row = [self rowAtPoint: point];
 
     //check to toggle group status before anything else
@@ -389,7 +389,7 @@
         #warning maybe make appear on mouse down
         [self displayTorrentActionPopoverForEvent: event];
     }
-    else if (!pushed && [event clickCount] == 2) //double click
+    else if (!pushed && event.clickCount == 2) //double click
     {
         id item = nil;
         if (row != -1)
@@ -423,7 +423,7 @@
         else
         {
             const NSInteger group = [item groupIndex];
-            for (NSInteger i = 0; i < [self numberOfRows]; i++)
+            for (NSInteger i = 0; i < self.numberOfRows; i++)
             {
                 id tableItem = [self itemAtRow: i];
                 if ([tableItem isKindOfClass: [TorrentGroup class]] && group == [tableItem groupIndex])
@@ -440,10 +440,10 @@
 
 - (NSArray *) selectedValues
 {
-    NSIndexSet * selectedIndexes = [self selectedRowIndexes];
-    NSMutableArray * values = [NSMutableArray arrayWithCapacity: [selectedIndexes count]];
+    NSIndexSet * selectedIndexes = self.selectedRowIndexes;
+    NSMutableArray * values = [NSMutableArray arrayWithCapacity: selectedIndexes.count];
 
-    for (NSUInteger i = [selectedIndexes firstIndex]; i != NSNotFound; i = [selectedIndexes indexGreaterThanIndex: i])
+    for (NSUInteger i = selectedIndexes.firstIndex; i != NSNotFound; i = [selectedIndexes indexGreaterThanIndex: i])
         [values addObject: [self itemAtRow: i]];
 
     return values;
@@ -451,10 +451,10 @@
 
 - (NSArray *) selectedTorrents
 {
-    NSIndexSet * selectedIndexes = [self selectedRowIndexes];
-    NSMutableArray * torrents = [NSMutableArray arrayWithCapacity: [selectedIndexes count]]; //take a shot at guessing capacity
+    NSIndexSet * selectedIndexes = self.selectedRowIndexes;
+    NSMutableArray * torrents = [NSMutableArray arrayWithCapacity: selectedIndexes.count]; //take a shot at guessing capacity
 
-    for (NSUInteger i = [selectedIndexes firstIndex]; i != NSNotFound; i = [selectedIndexes indexGreaterThanIndex: i])
+    for (NSUInteger i = selectedIndexes.firstIndex; i != NSNotFound; i = [selectedIndexes indexGreaterThanIndex: i])
     {
         id item = [self itemAtRow: i];
         if ([item isKindOfClass: [Torrent class]])
@@ -464,7 +464,7 @@
             NSArray * groupTorrents = [item torrents];
             [torrents addObjectsFromArray: groupTorrents];
             if ([self isItemExpanded: item])
-                i +=[groupTorrents count];
+                i +=groupTorrents.count;
         }
     }
 
@@ -473,7 +473,7 @@
 
 - (NSMenu *) menuForEvent: (NSEvent *) event
 {
-    NSInteger row = [self rowAtPoint: [self convertPoint: [event locationInWindow] fromView: nil]];
+    NSInteger row = [self rowAtPoint: [self convertPoint: event.locationInWindow fromView: nil]];
     if (row >= 0)
     {
         if (![self isRowSelected: row])
@@ -497,13 +497,13 @@
 //option-command-f will focus the filter bar's search field
 - (void) keyDown: (NSEvent *) event
 {
-    const unichar firstChar = [[event charactersIgnoringModifiers] characterAtIndex: 0];
+    const unichar firstChar = [event.charactersIgnoringModifiers characterAtIndex: 0];
 
-    if (firstChar == 'f' && [event modifierFlags] & NSAlternateKeyMask && [event modifierFlags] & NSCommandKeyMask)
+    if (firstChar == 'f' && event.modifierFlags & NSAlternateKeyMask && event.modifierFlags & NSCommandKeyMask)
         [fController focusFilterField];
     else if (firstChar == ' ')
         [fController toggleQuickLook: nil];
-    else if ([event keyCode] == 53) //esc key
+    else if (event.keyCode == 53) //esc key
         [self deselectAll: nil];
     else
         [super keyDown: event];
@@ -518,7 +518,7 @@
 {
     NSURL * url;
     if ((url = [NSURL URLFromPasteboard: [NSPasteboard generalPasteboard]]))
-        [fController openURL: [url absoluteString]];
+        [fController openURL: url.absoluteString];
     else
     {
         NSArray * items = [[NSPasteboard generalPasteboard] readObjectsForClasses: @[[NSString class]] options: nil];
@@ -533,8 +533,8 @@
                 else
                 {
                     #warning only accept full text?
-                    for (NSTextCheckingResult * result in [detector matchesInString: pbItem options: 0 range: NSMakeRange(0, [pbItem length])])
-                        [fController openURL: [[result URL] absoluteString]];
+                    for (NSTextCheckingResult * result in [detector matchesInString: pbItem options: 0 range: NSMakeRange(0, pbItem.length)])
+                        [fController openURL: result.URL.absoluteString];
                 }
             }
         }
@@ -543,11 +543,11 @@
 
 - (BOOL) validateMenuItem: (NSMenuItem *) menuItem
 {
-    SEL action = [menuItem action];
+    SEL action = menuItem.action;
 
     if (action == @selector(paste:))
     {
-        if ([[[NSPasteboard generalPasteboard] types] containsObject: NSURLPboardType])
+        if ([[NSPasteboard generalPasteboard].types containsObject: NSURLPboardType])
             return YES;
 
         NSArray * items = [[NSPasteboard generalPasteboard] readObjectsForClasses: @[[NSString class]] options: nil];
@@ -558,7 +558,7 @@
             {
                 pbItem = [pbItem stringByTrimmingCharactersInSet: [NSCharacterSet whitespaceAndNewlineCharacterSet]];
                 if (([pbItem rangeOfString: @"magnet:" options: (NSAnchoredSearch | NSCaseInsensitiveSearch)].location != NSNotFound)
-                    || [detector firstMatchInString: pbItem options: 0 range: NSMakeRange(0, [pbItem length])])
+                    || [detector firstMatchInString: pbItem options: 0 range: NSMakeRange(0, pbItem.length)])
                     return YES;
             }
         }
@@ -586,7 +586,7 @@
 
 - (void) displayTorrentActionPopoverForEvent: (NSEvent *) event
 {
-    const NSInteger row = [self rowAtPoint: [self convertPoint: [event locationInWindow] fromView: nil]];
+    const NSInteger row = [self rowAtPoint: [self convertPoint: event.locationInWindow fromView: nil]];
     if (row < 0)
         return;
 
@@ -598,10 +598,10 @@
     Torrent * torrent = [self itemAtRow: row];
 
     NSPopover * popover = [[NSPopover alloc] init];
-    [popover setBehavior: NSPopoverBehaviorTransient];
+    popover.behavior = NSPopoverBehaviorTransient;
     InfoOptionsViewController * infoViewController = [[InfoOptionsViewController alloc] init];
-    [popover setContentViewController: infoViewController];
-    [popover setDelegate: self];
+    popover.contentViewController = infoViewController;
+    popover.delegate = self;
 
     [popover showRelativeToRect: rect ofView: self preferredEdge: NSMaxYEdge];
     [infoViewController setInfoForTorrents: @[torrent]];
@@ -624,13 +624,13 @@
 - (void) menuNeedsUpdate: (NSMenu *) menu
 {
     //this method seems to be called when it shouldn't be
-    if (!fMenuTorrent || ![menu supermenu])
+    if (!fMenuTorrent || !menu.supermenu)
         return;
 
     if (menu == fUploadMenu || menu == fDownloadMenu)
     {
         NSMenuItem * item;
-        if ([menu numberOfItems] == 3)
+        if (menu.numberOfItems == 3)
         {
             const NSInteger speedLimitActionValue[] = { 0, 5, 10, 20, 30, 40, 50, 75, 100, 150, 200, 250, 500,
                                                         750, 1000, 1500, 2000, -1 };
@@ -640,8 +640,8 @@
                 item = [[NSMenuItem alloc] initWithTitle: [NSString stringWithFormat: NSLocalizedString(@"%d KB/s",
                         "Action menu -> upload/download limit"), speedLimitActionValue[i]] action: @selector(setQuickLimit:)
                         keyEquivalent: @""];
-                [item setTarget: self];
-                [item setRepresentedObject: @(speedLimitActionValue[i])];
+                item.target = self;
+                item.representedObject = @(speedLimitActionValue[i]);
                 [menu addItem: item];
             }
         }
@@ -650,17 +650,17 @@
         const BOOL limit = [fMenuTorrent usesSpeedLimit: upload];
 
         item = [menu itemWithTag: ACTION_MENU_LIMIT_TAG];
-        [item setState: limit ? NSOnState : NSOffState];
-        [item setTitle: [NSString stringWithFormat: NSLocalizedString(@"Limit (%d KB/s)",
-                            "torrent action menu -> upload/download limit"), [fMenuTorrent speedLimit: upload]]];
+        item.state = limit ? NSOnState : NSOffState;
+        item.title = [NSString stringWithFormat: NSLocalizedString(@"Limit (%d KB/s)",
+                            "torrent action menu -> upload/download limit"), [fMenuTorrent speedLimit: upload]];
 
         item = [menu itemWithTag: ACTION_MENU_UNLIMITED_TAG];
-        [item setState: !limit ? NSOnState : NSOffState];
+        item.state = !limit ? NSOnState : NSOffState;
     }
     else if (menu == fRatioMenu)
     {
         NSMenuItem * item;
-        if ([menu numberOfItems] == 4)
+        if (menu.numberOfItems == 4)
         {
             const float ratioLimitActionValue[] = { 0.25, 0.5, 0.75, 1.0, 1.5, 2.0, 3.0, -1.0 };
 
@@ -668,8 +668,8 @@
             {
                 item = [[NSMenuItem alloc] initWithTitle: [NSString localizedStringWithFormat: @"%.2f", ratioLimitActionValue[i]]
                         action: @selector(setQuickRatio:) keyEquivalent: @""];
-                [item setTarget: self];
-                [item setRepresentedObject: @(ratioLimitActionValue[i])];
+                item.target = self;
+                item.representedObject = @(ratioLimitActionValue[i]);
                 [menu addItem: item];
             }
         }
@@ -677,28 +677,28 @@
         const tr_ratiolimit mode = [fMenuTorrent ratioSetting];
 
         item = [menu itemWithTag: ACTION_MENU_LIMIT_TAG];
-        [item setState: mode == TR_RATIOLIMIT_SINGLE ? NSOnState : NSOffState];
-        [item setTitle: [NSString localizedStringWithFormat: NSLocalizedString(@"Stop at Ratio (%.2f)",
-            "torrent action menu -> ratio stop"), [fMenuTorrent ratioLimit]]];
+        item.state = mode == TR_RATIOLIMIT_SINGLE ? NSOnState : NSOffState;
+        item.title = [NSString localizedStringWithFormat: NSLocalizedString(@"Stop at Ratio (%.2f)",
+            "torrent action menu -> ratio stop"), [fMenuTorrent ratioLimit]];
 
         item = [menu itemWithTag: ACTION_MENU_UNLIMITED_TAG];
-        [item setState: mode == TR_RATIOLIMIT_UNLIMITED ? NSOnState : NSOffState];
+        item.state = mode == TR_RATIOLIMIT_UNLIMITED ? NSOnState : NSOffState;
 
         item = [menu itemWithTag: ACTION_MENU_GLOBAL_TAG];
-        [item setState: mode == TR_RATIOLIMIT_GLOBAL ? NSOnState : NSOffState];
+        item.state = mode == TR_RATIOLIMIT_GLOBAL ? NSOnState : NSOffState;
     }
     else if (menu == fPriorityMenu)
     {
         const tr_priority_t priority = [fMenuTorrent priority];
 
         NSMenuItem * item = [menu itemWithTag: ACTION_MENU_PRIORITY_HIGH_TAG];
-        [item setState: priority == TR_PRI_HIGH ? NSOnState : NSOffState];
+        item.state = priority == TR_PRI_HIGH ? NSOnState : NSOffState;
 
         item = [menu itemWithTag: ACTION_MENU_PRIORITY_NORMAL_TAG];
-        [item setState: priority == TR_PRI_NORMAL ? NSOnState : NSOffState];
+        item.state = priority == TR_PRI_NORMAL ? NSOnState : NSOffState;
 
         item = [menu itemWithTag: ACTION_MENU_PRIORITY_LOW_TAG];
-        [item setState: priority == TR_PRI_LOW ? NSOnState : NSOffState];
+        item.state = priority == TR_PRI_LOW ? NSOnState : NSOffState;
     }
 }
 
@@ -722,7 +722,7 @@
 
 - (void) setGlobalLimit: (id) sender
 {
-    [fMenuTorrent setUseGlobalSpeedLimit: [(NSButton *)sender state] != NSOnState];
+    [fMenuTorrent setUseGlobalSpeedLimit: ((NSButton *)sender).state != NSOnState];
 
     [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateOptions" object: nil];
 }
@@ -790,9 +790,9 @@
 
     //this stops a previous animation
     fPiecesBarAnimation = [[NSAnimation alloc] initWithDuration: TOGGLE_PROGRESS_SECONDS animationCurve: NSAnimationEaseIn];
-    [fPiecesBarAnimation setAnimationBlockingMode: NSAnimationNonblocking];
-    [fPiecesBarAnimation setProgressMarks: progressMarks];
-    [fPiecesBarAnimation setDelegate: self];
+    fPiecesBarAnimation.animationBlockingMode = NSAnimationNonblocking;
+    fPiecesBarAnimation.progressMarks = progressMarks;
+    fPiecesBarAnimation.delegate = self;
 
     [fPiecesBarAnimation startAnimation];
 }
@@ -831,14 +831,14 @@
     [self selectRowIndexes: [NSIndexSet indexSetWithIndex: row] byExtendingSelection: NO];
 
     const NSRect rowRect = [self rectOfRow: row];
-    const NSRect viewRect = [[self superview] frame];
+    const NSRect viewRect = self.superview.frame;
 
     NSPoint scrollOrigin = rowRect.origin;
     scrollOrigin.y += (rowRect.size.height - viewRect.size.height) / 2;
     if (scrollOrigin.y < 0)
         scrollOrigin.y = 0;
 
-    [[[self superview] animator] setBoundsOrigin: scrollOrigin];
+    [[self.superview animator] setBoundsOrigin: scrollOrigin];
 }
 
 @end
@@ -851,7 +851,7 @@
     if (row < 0 || [[self itemAtRow: row] isKindOfClass: [Torrent class]])
         return NO;
 
-    NSString * ident = [[self tableColumns][[self columnAtPoint: point]] identifier];
+    NSString * ident = (self.tableColumns[[self columnAtPoint: point]]).identifier;
     return [ident isEqualToString: @"UL"] || [ident isEqualToString: @"UL Image"]
             || [ident isEqualToString: @"DL"] || [ident isEqualToString: @"DL Image"];
 }
@@ -860,8 +860,8 @@
 {
     const BOOL ratio = [fDefaults boolForKey: @"DisplayGroupRowRatio"];
 
-    [[self tableColumnWithIdentifier: @"DL"] setHidden: ratio];
-    [[self tableColumnWithIdentifier: @"DL Image"] setHidden: ratio];
+    [self tableColumnWithIdentifier: @"DL"].hidden = ratio;
+    [self tableColumnWithIdentifier: @"DL Image"].hidden = ratio;
 }
 
 @end

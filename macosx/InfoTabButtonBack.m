@@ -24,7 +24,7 @@
 
 @implementation InfoTabButtonBack
 
-- (id) initWithFrame: (NSRect) rect
+- (instancetype) initWithFrame: (NSRect) rect
 {
     if ((self = [super initWithFrame: rect]))
     {
@@ -42,7 +42,7 @@
     NSRect gridRects[2];
     NSColor * colorRects[2];
 
-    NSRect lineBorderRect = NSMakeRect(NSMinX(rect), NSHeight([self bounds]) - 1.0, NSWidth(rect), 1.0);
+    NSRect lineBorderRect = NSMakeRect(NSMinX(rect), NSHeight(self.bounds) - 1.0, NSWidth(rect), 1.0);
     if (NSIntersectsRect(lineBorderRect, rect))
     {
         gridRects[count] = lineBorderRect;

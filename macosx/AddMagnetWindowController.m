@@ -46,12 +46,12 @@
 
 @implementation AddMagnetWindowController
 
-- (id) initWithTorrent: (Torrent *) torrent destination: (NSString *) path controller: (Controller *) controller
+- (instancetype) initWithTorrent: (Torrent *) torrent destination: (NSString *) path controller: (Controller *) controller
 {
     if ((self = [super initWithWindowNibName: @"AddMagnetWindow"]))
     {
         fTorrent = torrent;
-        fDestination = [path stringByExpandingTildeInPath];
+        fDestination = path.stringByExpandingTildeInPath;
 
         fController = controller;
 
@@ -67,9 +67,9 @@
         name: @"UpdateGroups" object: nil];
 
     NSString * name = [fTorrent name];
-    [[self window] setTitle: name];
-    [fNameField setStringValue: name];
-    [fNameField setToolTip: name];
+    self.window.title = name;
+    fNameField.stringValue = name;
+    fNameField.toolTip = name;
 
     [self setGroupsMenu];
     [fGroupPopUp selectItemWithTag: fGroupValue];
@@ -86,40 +86,40 @@
     }
     [fPriorityPopUp selectItemAtIndex: priorityIndex];
 
-    [fStartCheck setState: [[NSUserDefaults standardUserDefaults] boolForKey: @"AutoStartDownload"] ? NSOnState : NSOffState];
+    fStartCheck.state = [[NSUserDefaults standardUserDefaults] boolForKey: @"AutoStartDownload"] ? NSOnState : NSOffState;
 
     if (fDestination)
         [self setDestinationPath: fDestination determinationType: TorrentDeterminationAutomatic];
     else
     {
-        [fLocationField setStringValue: @""];
+        fLocationField.stringValue = @"";
         [fLocationImageView setImage: nil];
     }
 
     #warning when 10.7-only, switch to auto layout
     [fMagnetLinkLabel sizeToFit];
 
-    const CGFloat downloadToLabelOldWidth = [fDownloadToLabel frame].size.width;
+    const CGFloat downloadToLabelOldWidth = fDownloadToLabel.frame.size.width;
     [fDownloadToLabel sizeToFit];
-    const CGFloat changeDestOldWidth = [fChangeDestinationButton frame].size.width;
+    const CGFloat changeDestOldWidth = fChangeDestinationButton.frame.size.width;
     [fChangeDestinationButton sizeToFit];
-    NSRect changeDestFrame = [fChangeDestinationButton frame];
+    NSRect changeDestFrame = fChangeDestinationButton.frame;
     changeDestFrame.origin.x -= changeDestFrame.size.width - changeDestOldWidth;
-    [fChangeDestinationButton setFrame: changeDestFrame];
+    fChangeDestinationButton.frame = changeDestFrame;
 
-    NSRect downloadToBoxFrame = [fDownloadToBox frame];
-    const CGFloat downloadToBoxSizeDiff = ([fDownloadToLabel frame].size.width - downloadToLabelOldWidth) + (changeDestFrame.size.width - changeDestOldWidth);
+    NSRect downloadToBoxFrame = fDownloadToBox.frame;
+    const CGFloat downloadToBoxSizeDiff = (fDownloadToLabel.frame.size.width - downloadToLabelOldWidth) + (changeDestFrame.size.width - changeDestOldWidth);
     downloadToBoxFrame.size.width -= downloadToBoxSizeDiff;
-    downloadToBoxFrame.origin.x -= downloadToLabelOldWidth - [fDownloadToLabel frame].size.width;
-    [fDownloadToBox setFrame: downloadToBoxFrame];
+    downloadToBoxFrame.origin.x -= downloadToLabelOldWidth - fDownloadToLabel.frame.size.width;
+    fDownloadToBox.frame = downloadToBoxFrame;
 
-    NSRect groupPopUpFrame = [fGroupPopUp frame];
-    NSRect priorityPopUpFrame = [fPriorityPopUp frame];
-    const CGFloat popUpOffset = groupPopUpFrame.origin.x - NSMaxX([fGroupLabel frame]);
+    NSRect groupPopUpFrame = fGroupPopUp.frame;
+    NSRect priorityPopUpFrame = fPriorityPopUp.frame;
+    const CGFloat popUpOffset = groupPopUpFrame.origin.x - NSMaxX(fGroupLabel.frame);
     [fGroupLabel sizeToFit];
     [fPriorityLabel sizeToFit];
-    NSRect groupLabelFrame = [fGroupLabel frame];
-    NSRect priorityLabelFrame = [fPriorityLabel frame];
+    NSRect groupLabelFrame = fGroupLabel.frame;
+    NSRect priorityLabelFrame = fPriorityLabel.frame;
     //first bring them both to the left edge
     groupLabelFrame.origin.x = MIN(groupLabelFrame.origin.x, priorityLabelFrame.origin.x);
     priorityLabelFrame.origin.x = MIN(groupLabelFrame.origin.x, priorityLabelFrame.origin.x);
@@ -129,18 +129,18 @@
     priorityLabelFrame.origin.x += labelWidth - priorityLabelFrame.size.width;
     groupPopUpFrame.origin.x = NSMaxX(groupLabelFrame) + popUpOffset;
     priorityPopUpFrame.origin.x = NSMaxX(priorityLabelFrame) + popUpOffset;
-    [fGroupLabel setFrame: groupLabelFrame];
-    [fGroupPopUp setFrame: groupPopUpFrame];
-    [fPriorityLabel setFrame: priorityLabelFrame];
-    [fPriorityPopUp setFrame: priorityPopUpFrame];
+    fGroupLabel.frame = groupLabelFrame;
+    fGroupPopUp.frame = groupPopUpFrame;
+    fPriorityLabel.frame = priorityLabelFrame;
+    fPriorityPopUp.frame = priorityPopUpFrame;
 
     const CGFloat minButtonWidth = 82.0;
-    const CGFloat oldAddButtonWidth = [fAddButton bounds].size.width;
-    const CGFloat oldCancelButtonWidth = [fCancelButton bounds].size.width;
+    const CGFloat oldAddButtonWidth = fAddButton.bounds.size.width;
+    const CGFloat oldCancelButtonWidth = fCancelButton.bounds.size.width;
     [fAddButton sizeToFit];
     [fCancelButton sizeToFit];
-    NSRect addButtonFrame = [fAddButton frame];
-    NSRect cancelButtonFrame = [fCancelButton frame];
+    NSRect addButtonFrame = fAddButton.frame;
+    NSRect cancelButtonFrame = fCancelButton.frame;
     CGFloat buttonWidth = MAX(addButtonFrame.size.width, cancelButtonFrame.size.width);
     buttonWidth = MAX(buttonWidth, minButtonWidth);
     addButtonFrame.size.width = buttonWidth;
@@ -148,8 +148,8 @@
     const CGFloat addButtonWidthIncrease = buttonWidth - oldAddButtonWidth;
     addButtonFrame.origin.x -= addButtonWidthIncrease;
     cancelButtonFrame.origin.x -= addButtonWidthIncrease + (buttonWidth - oldCancelButtonWidth);
-    [fAddButton setFrame: addButtonFrame];
-    [fCancelButton setFrame: cancelButtonFrame];
+    fAddButton.frame = addButtonFrame;
+    fCancelButton.frame = cancelButtonFrame;
 
     [fStartCheck sizeToFit];
 }
@@ -181,12 +181,12 @@
     [panel setCanChooseDirectories: YES];
     [panel setCanCreateDirectories: YES];
 
-    [panel setMessage: [NSString stringWithFormat: NSLocalizedString(@"Select the download folder for \"%@\"",
-                        "Add -> select destination folder"), [fTorrent name]]];
+    panel.message = [NSString stringWithFormat: NSLocalizedString(@"Select the download folder for \"%@\"",
+                        "Add -> select destination folder"), [fTorrent name]];
 
-    [panel beginSheetModalForWindow: [self window] completionHandler: ^(NSInteger result) {
+    [panel beginSheetModalForWindow: self.window completionHandler: ^(NSInteger result) {
         if (result == NSFileHandlingPanelOKButton)
-            [self setDestinationPath: [[panel URLs][0] path] determinationType:TorrentDeterminationUserSpecified];
+            [self setDestinationPath: (panel.URLs[0]).path determinationType:TorrentDeterminationUserSpecified];
         else
         {
             if (!fDestination)
@@ -197,7 +197,7 @@
 
 - (void) add: (id) sender
 {
-    if ([[fDestination lastPathComponent] isEqualToString: [fTorrent name]]
+    if ([fDestination.lastPathComponent isEqualToString: [fTorrent name]]
         && [[NSUserDefaults standardUserDefaults] boolForKey: @"WarningFolderDataSameName"])
     {
         NSAlert * alert = [[NSAlert alloc] init];
@@ -205,12 +205,12 @@
                                 "Add torrent -> same name -> title")];
         [alert setInformativeText: NSLocalizedString(@"If you are attempting to use already existing data,"
             " the root data directory should be inside the destination directory.", "Add torrent -> same name -> message")];
-        [alert setAlertStyle: NSWarningAlertStyle];
+        alert.alertStyle = NSWarningAlertStyle;
         [alert addButtonWithTitle: NSLocalizedString(@"Cancel", "Add torrent -> same name -> button")];
         [alert addButtonWithTitle: NSLocalizedString(@"Add", "Add torrent -> same name -> button")];
         [alert setShowsSuppressionButton: YES];
 
-        [alert beginSheetModalForWindow: [self window] modalDelegate: self
+        [alert beginSheetModalForWindow: self.window modalDelegate: self
             didEndSelector: @selector(sameNameAlertDidEnd:returnCode:contextInfo:) contextInfo: nil];
     }
     else
@@ -219,7 +219,7 @@
 
 - (void) cancelAdd: (id) sender
 {
-    [[self window] performClose: sender];
+    [self.window performClose: sender];
 }
 
 //only called on cancel
@@ -263,7 +263,7 @@
 {
     [fTorrent setGroupValue: fGroupValue determinationType: fGroupDeterminationType];
 
-    if ([fStartCheck state] == NSOnState)
+    if (fStartCheck.state == NSOnState)
         [fTorrent startTransfer];
 
     [self close];
@@ -272,7 +272,7 @@
 
 - (void) setDestinationPath: (NSString *) destination determinationType: (TorrentDeterminationType) determinationType
 {
-    destination = [destination stringByExpandingTildeInPath];
+    destination = destination.stringByExpandingTildeInPath;
     if (!fDestination || ![fDestination isEqualToString: destination])
     {
         fDestination = destination;
@@ -280,17 +280,17 @@
         [fTorrent changeDownloadFolderBeforeUsing: fDestination determinationType: determinationType];
     }
 
-    [fLocationField setStringValue: [fDestination stringByAbbreviatingWithTildeInPath]];
-    [fLocationField setToolTip: fDestination];
+    fLocationField.stringValue = fDestination.stringByAbbreviatingWithTildeInPath;
+    fLocationField.toolTip = fDestination;
 
     ExpandedPathToIconTransformer * iconTransformer = [[ExpandedPathToIconTransformer alloc] init];
-    [fLocationImageView setImage: [iconTransformer transformedValue: fDestination]];
+    fLocationImageView.image = [iconTransformer transformedValue: fDestination];
 }
 
 - (void) setGroupsMenu
 {
     NSMenu * groupMenu = [[GroupsController groups] groupMenuWithTarget: self action: @selector(changeGroupValue:) isSmall: NO];
-    [fGroupPopUp setMenu: groupMenu];
+    fGroupPopUp.menu = groupMenu;
 }
 
 - (void) changeGroupValue: (id) sender
@@ -308,7 +308,7 @@
 
 - (void) sameNameAlertDidEnd: (NSAlert *) alert returnCode: (NSInteger) returnCode contextInfo: (void *) contextInfo
 {
-    if ([[alert suppressionButton] state] == NSOnState)
+    if (alert.suppressionButton.state == NSOnState)
         [[NSUserDefaults standardUserDefaults] setBool: NO forKey: @"WarningFolderDataSameName"];
 
 

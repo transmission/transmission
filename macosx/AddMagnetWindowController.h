@@ -49,9 +49,9 @@
     TorrentDeterminationType fGroupDeterminationType;
 }
 
-- (id) initWithTorrent: (Torrent *) torrent destination: (NSString *) path controller: (Controller *) controller;
+- (instancetype) initWithTorrent: (Torrent *) torrent destination: (NSString *) path controller: (Controller *) controller;
 
-- (Torrent *) torrent;
+@property (nonatomic, readonly, copy) Torrent *torrent;
 
 - (void) setDestination: (id) sender;
 

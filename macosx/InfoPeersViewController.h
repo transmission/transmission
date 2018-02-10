@@ -25,7 +25,7 @@
 
 @class WebSeedTableView;
 
-@interface InfoPeersViewController : NSViewController <InfoViewController, NSAnimationDelegate>
+@interface InfoPeersViewController : NSViewController <InfoViewController>
 {
     NSArray * fTorrents;
 

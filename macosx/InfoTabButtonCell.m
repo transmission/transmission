@@ -33,7 +33,7 @@
     fSelected = NO;
 
     //expects the icon to currently be set as the image
-    fIcon = [self image];
+    fIcon = self.image;
 }
 
 - (void) dealloc
@@ -43,13 +43,13 @@
 
 - (void) setControlView: (NSView *) controlView
 {
-    const BOOL hadControlView = [self controlView] != nil;
+    const BOOL hadControlView = self.controlView != nil;
 
-    [super setControlView: controlView];
+    super.controlView = controlView;
 
     if (!hadControlView)
     {
-        [(NSMatrix *)[self controlView] setToolTip: [self title] forCell: self];
+        [(NSMatrix *)self.controlView setToolTip: self.title forCell: self];
         [self setSelectedTab: fSelected];
     }
 }
@@ -58,12 +58,12 @@
 {
     fSelected = selected;
 
-    if ([self controlView] == nil)
+    if (self.controlView == nil)
         return;
 
     NSInteger row, col;
-    [(NSMatrix *)[self controlView] getRow: &row column: &col ofCell: self];
-    NSRect tabRect = [(NSMatrix *)[self controlView] cellFrameAtRow: row column: col];
+    [(NSMatrix *)self.controlView getRow: &row column: &col ofCell: self];
+    NSRect tabRect = [(NSMatrix *)self.controlView cellFrameAtRow: row column: col];
     tabRect.origin.x = 0.0;
     tabRect.origin.y = 0.0;
 
@@ -96,7 +96,7 @@
 
     if (fIcon)
     {
-        const NSSize iconSize = [fIcon size];
+        const NSSize iconSize = fIcon.size;
 
         const NSRect iconRect = NSMakeRect(NSMinX(tabRect) + floor((NSWidth(tabRect) - iconSize.width) * 0.5),
                                             NSMinY(tabRect) + floor((NSHeight(tabRect) - iconSize.height) * 0.5),
@@ -107,7 +107,7 @@
 
     [tabImage unlockFocus];
 
-    [self setImage: tabImage];
+    self.image = tabImage;
 }
 
 - (void) updateControlTint: (NSNotification *) notification

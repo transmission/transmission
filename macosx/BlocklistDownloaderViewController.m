@@ -27,7 +27,7 @@
 
 @interface BlocklistDownloaderViewController (Private)
 
-- (id) initWithPrefsController: (PrefsController *) prefsController;
+- (instancetype) initWithPrefsController: (PrefsController *) prefsController;
 - (void) startDownload;
 - (void) failureSheetClosed: (NSAlert *) alert returnCode: (NSInteger) code contextInfo: (void *) info;
 
@@ -49,12 +49,12 @@ BlocklistDownloaderViewController * fBLViewController = nil;
 {
     [fButton setTitle: NSLocalizedString(@"Cancel", "Blocklist -> cancel button")];
 
-    const CGFloat oldWidth = NSWidth([fButton frame]);
+    const CGFloat oldWidth = NSWidth(fButton.frame);
     [fButton sizeToFit];
-    NSRect buttonFrame = [fButton frame];
+    NSRect buttonFrame = fButton.frame;
     buttonFrame.size.width += 12.0; //sizeToFit sizes a bit too small
     buttonFrame.origin.x -= NSWidth(buttonFrame) - oldWidth;
-    [fButton setFrame: buttonFrame];
+    fButton.frame = buttonFrame;
 
     [fProgressBar setUsesThreadedAnimation: YES];
     [fProgressBar startAnimation: self];
@@ -67,7 +67,7 @@ BlocklistDownloaderViewController * fBLViewController = nil;
 
 - (void) setStatusStarting
 {
-    [fTextField setStringValue: [NSLocalizedString(@"Connecting to site", "Blocklist -> message") stringByAppendingEllipsis]];
+    fTextField.stringValue = [NSLocalizedString(@"Connecting to site", "Blocklist -> message") stringByAppendingEllipsis];
     [fProgressBar setIndeterminate: YES];
 }
 
@@ -80,12 +80,12 @@ BlocklistDownloaderViewController * fBLViewController = nil;
 
         NSString * substring = [NSString stringForFilePartialSize: currentSize fullSize: expectedSize];
         string = [string stringByAppendingFormat: @" (%@)",  substring];
-        [fProgressBar setDoubleValue: (double)currentSize / expectedSize];
+        fProgressBar.doubleValue = (double)currentSize / expectedSize;
     }
     else
         string = [string stringByAppendingFormat: @" (%@)",  [NSString stringForFileSize: currentSize]];
 
-    [fTextField setStringValue: string];
+    fTextField.stringValue = string;
 }
 
 - (void) setStatusProcessing
@@ -94,7 +94,7 @@ BlocklistDownloaderViewController * fBLViewController = nil;
     [fProgressBar setIndeterminate: YES];
     [fProgressBar startAnimation: self];
 
-    [fTextField setStringValue: [NSLocalizedString(@"Processing blocklist", "Blocklist -> message") stringByAppendingEllipsis]];
+    fTextField.stringValue = [NSLocalizedString(@"Processing blocklist", "Blocklist -> message") stringByAppendingEllipsis];
     [fButton setEnabled: NO];
 }
 
@@ -114,11 +114,11 @@ BlocklistDownloaderViewController * fBLViewController = nil;
     NSAlert * alert = [[NSAlert alloc] init];
     [alert addButtonWithTitle: NSLocalizedString(@"OK", "Blocklist -> button")];
     [alert setMessageText: NSLocalizedString(@"Download of the blocklist failed.", "Blocklist -> message")];
-    [alert setAlertStyle: NSWarningAlertStyle];
+    alert.alertStyle = NSWarningAlertStyle;
 
-    [alert setInformativeText: error];
+    alert.informativeText = error;
 
-    [alert beginSheetModalForWindow: [fPrefsController window] modalDelegate: self
+    [alert beginSheetModalForWindow: fPrefsController.window modalDelegate: self
         didEndSelector: @selector(failureSheetClosed:returnCode:contextInfo:) contextInfo: nil];
 }
 
@@ -126,7 +126,7 @@ BlocklistDownloaderViewController * fBLViewController = nil;
 
 @implementation BlocklistDownloaderViewController (Private)
 
-- (id) initWithPrefsController: (PrefsController *) prefsController
+- (instancetype) initWithPrefsController: (PrefsController *) prefsController
 {
     if ((self = [super init]))
     {
@@ -144,12 +144,12 @@ BlocklistDownloaderViewController * fBLViewController = nil;
     BlocklistDownloader * downloader = [BlocklistDownloader downloader];
     [downloader setViewController: self]; //do before showing the sheet to ensure it doesn't slide out with placeholder text
 
-    [NSApp beginSheet: fStatusWindow modalForWindow: [fPrefsController window] modalDelegate: nil didEndSelector: nil contextInfo: nil];
+    [NSApp beginSheet: fStatusWindow modalForWindow: fPrefsController.window modalDelegate: nil didEndSelector: nil contextInfo: nil];
 }
 
 - (void) failureSheetClosed: (NSAlert *) alert returnCode: (NSInteger) code contextInfo: (void *) info
 {
-    [[alert window] orderOut: self];
+    [alert.window orderOut: self];
 
     fBLViewController = nil;
 }

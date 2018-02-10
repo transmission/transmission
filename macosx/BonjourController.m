@@ -47,12 +47,12 @@ BonjourController * fDefaultController = nil;
 {
     [self stop];
 
-    NSMutableString * serviceName = [NSMutableString stringWithFormat: @"Transmission (%@ - %@)", NSUserName(), [[NSHost currentHost] localizedName]];
-    if ([serviceName length] > BONJOUR_SERVICE_NAME_MAX_LENGTH)
-        [serviceName deleteCharactersInRange: NSMakeRange(BONJOUR_SERVICE_NAME_MAX_LENGTH, [serviceName length] - BONJOUR_SERVICE_NAME_MAX_LENGTH)];
+    NSMutableString * serviceName = [NSMutableString stringWithFormat: @"Transmission (%@ - %@)", NSUserName(), [NSHost currentHost].localizedName];
+    if (serviceName.length > BONJOUR_SERVICE_NAME_MAX_LENGTH)
+        [serviceName deleteCharactersInRange: NSMakeRange(BONJOUR_SERVICE_NAME_MAX_LENGTH, serviceName.length - BONJOUR_SERVICE_NAME_MAX_LENGTH)];
 
     fService = [[NSNetService alloc] initWithDomain: @"" type: @"_http._tcp." name: serviceName port: port];
-    [fService setDelegate: self];
+    fService.delegate = self;
 
     [fService publish];
 }
@@ -65,12 +65,12 @@ BonjourController * fDefaultController = nil;
 
 - (void) netService: (NSNetService *) sender didNotPublish: (NSDictionary *) errorDict
 {
-    NSLog(@"Failed to publish the web interface service on port %ld, with error: %@", [sender port], errorDict);
+    NSLog(@"Failed to publish the web interface service on port %ld, with error: %@", sender.port, errorDict);
 }
 
 - (void) netService: (NSNetService *) sender didNotResolve: (NSDictionary *) errorDict
 {
-    NSLog(@"Failed to resolve the web interface service on port %ld, with error: %@", [sender port], errorDict);
+    NSLog(@"Failed to resolve the web interface service on port %ld, with error: %@", sender.port, errorDict);
 }
 
 @end

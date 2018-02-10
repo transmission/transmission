@@ -46,13 +46,12 @@
         if (!fAttributes)
         {
             NSMutableParagraphStyle * paragraphStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
-            [paragraphStyle setAlignment: NSRightTextAlignment];
+            paragraphStyle.alignment = NSRightTextAlignment;
 
-            fAttributes = [[NSDictionary alloc] initWithObjects: @[[NSFont systemFontOfSize: 11.0], paragraphStyle]
-                forKeys: @[NSFontAttributeName, NSParagraphStyleAttributeName]];
+            fAttributes = @{NSFontAttributeName: [NSFont systemFontOfSize: 11.0], NSParagraphStyleAttributeName: paragraphStyle};
         }
 
-        [[NSString percentString: [self floatValue] longDecimals: NO] drawInRect: cellFrame withAttributes: fAttributes];
+        [[NSString percentString: self.floatValue longDecimals: NO] drawInRect: cellFrame withAttributes: fAttributes];
     }
     else
     {
@@ -67,7 +66,7 @@
         {
             NSImage * checkImage = [NSImage imageNamed: @"CompleteCheck"];
 
-            const NSSize imageSize = [checkImage size];
+            const NSSize imageSize = checkImage.size;
             const NSRect rect = NSMakeRect(floor(NSMidX(cellFrame) - imageSize.width * 0.5),
                                             floor(NSMidY(cellFrame) - imageSize.height * 0.5),
                                             imageSize.width, imageSize.height);

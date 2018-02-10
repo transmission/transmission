@@ -32,7 +32,7 @@
 
 @implementation StatusBarView
 
-- (id) initWithFrame: (NSRect) rect
+- (instancetype) initWithFrame: (NSRect) rect
 {
     if ((self = [super initWithFrame: rect]))
     {
@@ -57,8 +57,8 @@
         else
             fNoiseImage = nil;
 
-        [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(reload) name: NSWindowDidBecomeMainNotification object: [self window]];
-        [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(reload) name: NSWindowDidResignMainNotification object: [self window]];
+        [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(reload) name: NSWindowDidBecomeMainNotification object: self.window];
+        [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(reload) name: NSWindowDidResignMainNotification object: self.window];
     }
     return self;
 }
@@ -92,7 +92,7 @@
         }
     }
     else {
-        const BOOL active = [[self window] isMainWindow];
+        const BOOL active = self.window.mainWindow;
 
         NSInteger count = 0;
         NSRect gridRects[active ? 2 : 3];
@@ -116,7 +116,7 @@
         //top line
         if (active)
         {
-            lineBorderRect.origin.y = NSHeight([self bounds]) - 1.0;
+            lineBorderRect.origin.y = NSHeight(self.bounds) - 1.0;
             intersectLineBorderRect = NSIntersectionRect(lineBorderRect, rect);
             if (!NSIsEmptyRect(intersectLineBorderRect))
             {
@@ -132,7 +132,7 @@
         {
             if (active)
             {
-                const NSRect gradientRect = NSMakeRect(NSMinX(rect), 1.0, NSWidth(rect), NSHeight([self bounds]) - 1.0 - 1.0); //proper gradient requires the full height of the bar
+                const NSRect gradientRect = NSMakeRect(NSMinX(rect), 1.0, NSWidth(rect), NSHeight(self.bounds) - 1.0 - 1.0); //proper gradient requires the full height of the bar
                 [fGradient drawInRect: gradientRect angle: 270.0];
             }
             else

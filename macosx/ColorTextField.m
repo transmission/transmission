@@ -26,15 +26,15 @@
 
 - (void) awakeFromNib
 {
-    [self setEnabled: [self isEnabled]];
+    self.enabled = self.enabled;
 }
 
 - (void) setEnabled: (BOOL) flag
 {
-    [super setEnabled: flag];
+    super.enabled = flag;
 
     NSColor * color = flag ? [NSColor controlTextColor] : [NSColor disabledControlTextColor];
-    [self setTextColor: color];
+    self.textColor = color;
 }
 
 @end

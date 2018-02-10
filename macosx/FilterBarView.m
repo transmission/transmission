@@ -25,7 +25,7 @@
 
 @implementation FilterBarView
 
-- (id) initWithFrame: (NSRect) rect
+- (instancetype) initWithFrame: (NSRect) rect
 {
     if ((self = [super initWithFrame: rect]))
     {
@@ -67,7 +67,7 @@
         NSRect gridRects[2];
         NSColor * colorRects[2];
 
-        NSRect lineBorderRect = NSMakeRect(NSMinX(rect), NSHeight([self bounds]) - 1.0, NSWidth(rect), 1.0);
+        NSRect lineBorderRect = NSMakeRect(NSMinX(rect), NSHeight(self.bounds) - 1.0, NSWidth(rect), 1.0);
         if (NSIntersectsRect(lineBorderRect, rect))
         {
             gridRects[count] = lineBorderRect;
@@ -90,7 +90,7 @@
 
         if (!NSIsEmptyRect(rect))
         {
-            const NSRect gradientRect = NSMakeRect(NSMinX(rect), 1.0, NSWidth(rect), NSHeight([self bounds]) - 1.0 - 1.0); //proper gradient requires the full height of the bar
+            const NSRect gradientRect = NSMakeRect(NSMinX(rect), 1.0, NSWidth(rect), NSHeight(self.bounds) - 1.0 - 1.0); //proper gradient requires the full height of the bar
             [fGradient drawInRect: gradientRect angle: 270.0];
         }
 

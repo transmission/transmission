@@ -26,10 +26,10 @@
 
 @class FileListNode;
 
-typedef enum {
+typedef NS_ENUM(unsigned int, TorrentDeterminationType) {
     TorrentDeterminationAutomatic = 0,
     TorrentDeterminationUserSpecified
-} TorrentDeterminationType;
+};
 
 #define kTorrentDidChangeGroupNotification @"TorrentDidChangeGroup"
 
@@ -63,24 +63,23 @@ typedef enum {
     BOOL fTimeMachineExcludeInitialized;
 }
 
-- (id) initWithPath: (NSString *) path location: (NSString *) location deleteTorrentFile: (BOOL) torrentDelete
+- (instancetype) initWithPath: (NSString *) path location: (NSString *) location deleteTorrentFile: (BOOL) torrentDelete
         lib: (tr_session *) lib;
-- (id) initWithTorrentStruct: (tr_torrent *) torrentStruct location: (NSString *) location lib: (tr_session *) lib;
-- (id) initWithMagnetAddress: (NSString *) address location: (NSString *) location lib: (tr_session *) lib;
-- (id) initWithHistory: (NSDictionary *) history lib: (tr_session *) lib forcePause: (BOOL) pause;
+- (instancetype) initWithTorrentStruct: (tr_torrent *) torrentStruct location: (NSString *) location lib: (tr_session *) lib;
+- (instancetype) initWithMagnetAddress: (NSString *) address location: (NSString *) location lib: (tr_session *) lib;
+- (instancetype) initWithHistory: (NSDictionary *) history lib: (tr_session *) lib forcePause: (BOOL) pause;
 
-- (NSDictionary *) history;
+@property (nonatomic, readonly, copy) NSDictionary *history;
 
 - (void) closeRemoveTorrent: (BOOL) trashFiles;
 
 - (void) changeDownloadFolderBeforeUsing: (NSString *) folder determinationType: (TorrentDeterminationType) determinationType;
 
-- (NSString *) currentDirectory;
+@property (nonatomic, readonly, copy) NSString *currentDirectory;
 
 - (void) getAvailability: (int8_t *) tab size: (NSInteger) size;
 - (void) getAmountFinished: (float *) tab size: (NSInteger) size;
-- (NSIndexSet *) previousFinishedPieces;
-- (void) setPreviousFinishedPieces: (NSIndexSet *) indexes;
+@property (nonatomic, copy) NSIndexSet *previousFinishedPieces;
 
 - (void) update;
 
@@ -95,135 +94,129 @@ typedef enum {
 - (void) setQueuePosition: (NSUInteger) index;
 
 - (void) manualAnnounce;
-- (BOOL) canManualAnnounce;
+@property (nonatomic, readonly) BOOL canManualAnnounce;
 
 - (void) resetCache;
 
-- (BOOL) isMagnet;
-- (NSString *) magnetLink;
+@property (nonatomic, getter=isMagnet, readonly) BOOL magnet;
+@property (nonatomic, readonly, copy) NSString *magnetLink;
 
-- (CGFloat) ratio;
-- (tr_ratiolimit) ratioSetting;
-- (void) setRatioSetting: (tr_ratiolimit) setting;
-- (CGFloat) ratioLimit;
-- (void) setRatioLimit: (CGFloat) limit;
-- (CGFloat) progressStopRatio;
+@property (nonatomic, readonly) CGFloat ratio;
+@property (nonatomic) tr_ratiolimit ratioSetting;
+@property (nonatomic) CGFloat ratioLimit;
+@property (nonatomic, readonly) CGFloat progressStopRatio;
 
-- (tr_idlelimit) idleSetting;
-- (void) setIdleSetting: (tr_idlelimit) setting;
-- (NSUInteger) idleLimitMinutes;
-- (void) setIdleLimitMinutes: (NSUInteger) limit;
+@property (nonatomic) tr_idlelimit idleSetting;
+@property (nonatomic) NSUInteger idleLimitMinutes;
 
 - (BOOL) usesSpeedLimit: (BOOL) upload;
 - (void) setUseSpeedLimit: (BOOL) use upload: (BOOL) upload;
 - (NSInteger) speedLimit: (BOOL) upload;
 - (void) setSpeedLimit: (NSInteger) limit upload: (BOOL) upload;
-- (BOOL) usesGlobalSpeedLimit;
+@property (nonatomic, readonly) BOOL usesGlobalSpeedLimit;
 - (void) setUseGlobalSpeedLimit: (BOOL) use;
 
-- (void) setMaxPeerConnect: (uint16_t) count;
-- (uint16_t) maxPeerConnect;
+@property (nonatomic) uint16_t maxPeerConnect;
 
 @property (nonatomic) BOOL removeWhenFinishSeeding;
 
-- (BOOL) waitingToStart;
+@property (nonatomic, readonly) BOOL waitingToStart;
 
-- (tr_priority_t) priority;
-- (void) setPriority: (tr_priority_t) priority;
+@property (nonatomic) tr_priority_t priority;
 
 + (BOOL) trashFile: (NSString *) path error: (NSError **) error;
 - (void) moveTorrentDataFileTo: (NSString *) folder;
 - (void) copyTorrentFileTo: (NSString *) path;
 
-- (BOOL) alertForRemainingDiskSpace;
+@property (nonatomic, readonly) BOOL alertForRemainingDiskSpace;
 
-- (NSImage *) icon;
+@property (nonatomic, readonly, copy) NSImage *icon;
 
-- (NSString *) name;
-- (BOOL) isFolder;
-- (uint64_t) size;
-- (uint64_t) sizeLeft;
+@property (nonatomic, readonly, copy) NSString *name;
+@property (nonatomic, getter=isFolder, readonly) BOOL folder;
+@property (nonatomic, readonly) uint64_t size;
+@property (nonatomic, readonly) uint64_t sizeLeft;
 
-- (NSMutableArray *) allTrackerStats;
-- (NSArray *) allTrackersFlat; //used by GroupRules
+@property (nonatomic, readonly, copy) NSMutableArray *allTrackerStats;
+@property (nonatomic, readonly, copy) NSArray *allTrackersFlat; //used by GroupRules
 - (BOOL) addTrackerToNewTier: (NSString *) tracker;
 - (void) removeTrackers: (NSSet *) trackers;
 
-- (NSString *) comment;
-- (NSString *) creator;
-- (NSDate *) dateCreated;
+@property (nonatomic, readonly, copy) NSString *comment;
+@property (nonatomic, readonly, copy) NSString *creator;
+@property (nonatomic, readonly, copy) NSDate *dateCreated;
 
-- (NSInteger) pieceSize;
-- (NSInteger) pieceCount;
-- (NSString *) hashString;
-- (BOOL) privateTorrent;
+@property (nonatomic, readonly) NSInteger pieceSize;
+@property (nonatomic, readonly) NSInteger pieceCount;
+@property (nonatomic, readonly, copy) NSString *hashString;
+@property (nonatomic, readonly) BOOL privateTorrent;
 
-- (NSString *) torrentLocation;
-- (NSString *) dataLocation;
+@property (nonatomic, readonly, copy) NSString *torrentLocation;
+@property (nonatomic, readonly, copy) NSString *dataLocation;
 - (NSString *) fileLocation: (FileListNode *) node;
 
 - (void) renameTorrent: (NSString *) newName completionHandler: (void (^)(BOOL didRename)) completionHandler;
 - (void) renameFileNode: (FileListNode *) node withName: (NSString *) newName completionHandler: (void (^)(BOOL didRename)) completionHandler;
 
-- (CGFloat) progress;
-- (CGFloat) progressDone;
-- (CGFloat) progressLeft;
-- (CGFloat) checkingProgress;
+@property (nonatomic, readonly) CGFloat progress;
+@property (nonatomic, readonly) CGFloat progressDone;
+@property (nonatomic, readonly) CGFloat progressLeft;
+@property (nonatomic, readonly) CGFloat checkingProgress;
 
-- (CGFloat) availableDesired;
+@property (nonatomic, readonly) CGFloat availableDesired;
 
-- (BOOL) isActive;
-- (BOOL) isSeeding;
-- (BOOL) isChecking;
-- (BOOL) isCheckingWaiting;
-- (BOOL) allDownloaded;
-- (BOOL) isComplete;
-- (BOOL) isFinishedSeeding;
-- (BOOL) isError;
-- (BOOL) isAnyErrorOrWarning;
-- (NSString *) errorMessage;
+@property (nonatomic, getter=isActive, readonly) BOOL active;
+@property (nonatomic, getter=isSeeding, readonly) BOOL seeding;
+@property (nonatomic, getter=isChecking, readonly) BOOL checking;
+@property (nonatomic, getter=isCheckingWaiting, readonly) BOOL checkingWaiting;
+@property (nonatomic, readonly) BOOL allDownloaded;
+@property (nonatomic, getter=isComplete, readonly) BOOL complete;
+@property (nonatomic, getter=isFinishedSeeding, readonly) BOOL finishedSeeding;
+@property (nonatomic, getter=isError, readonly) BOOL error;
+@property (nonatomic, getter=isAnyErrorOrWarning, readonly) BOOL anyErrorOrWarning;
+@property (nonatomic, readonly, copy) NSString *errorMessage;
 
-- (NSArray *) peers;
+@property (nonatomic, readonly, copy) NSArray *peers;
 
-- (NSUInteger) webSeedCount;
-- (NSArray *) webSeeds;
+@property (nonatomic, readonly) NSUInteger webSeedCount;
+@property (nonatomic, readonly, copy) NSArray *webSeeds;
 
-- (NSString *) progressString;
-- (NSString *) statusString;
-- (NSString *) shortStatusString;
-- (NSString *) remainingTimeString;
+@property (nonatomic, readonly, copy) NSString *progressString;
+@property (nonatomic, readonly, copy) NSString *statusString;
+@property (nonatomic, readonly, copy) NSString *shortStatusString;
+@property (nonatomic, readonly, copy) NSString *remainingTimeString;
 
-- (NSString *) stateString;
-- (NSInteger) totalPeersConnected;
-- (NSInteger) totalPeersTracker;
-- (NSInteger) totalPeersIncoming;
-- (NSInteger) totalPeersCache;
-- (NSInteger) totalPeersPex;
-- (NSInteger) totalPeersDHT;
-- (NSInteger) totalPeersLocal;
-- (NSInteger) totalPeersLTEP;
+@property (nonatomic, readonly, copy) NSString *stateString;
+@property (nonatomic, readonly) NSInteger totalPeersConnected;
+@property (nonatomic, readonly) NSInteger totalPeersTracker;
+@property (nonatomic, readonly) NSInteger totalPeersIncoming;
+@property (nonatomic, readonly) NSInteger totalPeersCache;
+@property (nonatomic, readonly) NSInteger totalPeersPex;
+@property (nonatomic, readonly) NSInteger totalPeersDHT;
+@property (nonatomic, readonly) NSInteger totalPeersLocal;
+@property (nonatomic, readonly) NSInteger totalPeersLTEP;
 
-- (NSInteger) peersSendingToUs;
-- (NSInteger) peersGettingFromUs;
+@property (nonatomic, readonly) NSInteger peersSendingToUs;
+@property (nonatomic, readonly) NSInteger peersGettingFromUs;
 
-- (CGFloat) downloadRate;
-- (CGFloat) uploadRate;
-- (CGFloat) totalRate;
-- (uint64_t) haveVerified;
-- (uint64_t) haveTotal;
-- (uint64_t) totalSizeSelected;
-- (uint64_t) downloadedTotal;
-- (uint64_t) uploadedTotal;
-- (uint64_t) failedHash;
+@property (nonatomic, readonly) CGFloat downloadRate;
+@property (nonatomic, readonly) CGFloat uploadRate;
+@property (nonatomic, readonly) CGFloat totalRate;
+@property (nonatomic, readonly) uint64_t haveVerified;
+@property (nonatomic, readonly) uint64_t haveTotal;
+@property (nonatomic, readonly) uint64_t totalSizeSelected;
+@property (nonatomic, readonly) uint64_t downloadedTotal;
+@property (nonatomic, readonly) uint64_t uploadedTotal;
+@property (nonatomic, readonly) uint64_t failedHash;
 
-- (NSInteger) groupValue;
+@property (nonatomic, readonly) NSInteger groupValue;
 - (void) setGroupValue: (NSInteger) groupValue determinationType: (TorrentDeterminationType) determinationType;;
-- (NSInteger) groupOrderValue;
+@property (nonatomic, readonly) NSInteger groupOrderValue;
 - (void) checkGroupValueForRemoval: (NSNotification *) notification;
 
-- (NSArray *) fileList;
-- (NSArray *) flatFileList;
-- (NSInteger) fileCount;
+@property (nonatomic, readonly, copy) NSArray *fileList;
+@property (nonatomic, readonly, copy) NSArray *flatFileList;
+@property (nonatomic, readonly) NSInteger fileCount;
 - (void) updateFileStat;
 
 //methods require fileStats to have been updated recently to be accurate
@@ -236,22 +229,22 @@ typedef enum {
 - (BOOL) hasFilePriority: (tr_priority_t) priority forIndexes: (NSIndexSet *) indexSet;
 - (NSSet *) filePrioritiesForIndexes: (NSIndexSet *) indexSet;
 
-- (NSDate *) dateAdded;
-- (NSDate *) dateCompleted;
-- (NSDate *) dateActivity;
-- (NSDate *) dateActivityOrAdd;
+@property (nonatomic, readonly, copy) NSDate *dateAdded;
+@property (nonatomic, readonly, copy) NSDate *dateCompleted;
+@property (nonatomic, readonly, copy) NSDate *dateActivity;
+@property (nonatomic, readonly, copy) NSDate *dateActivityOrAdd;
 
-- (NSInteger) secondsDownloading;
-- (NSInteger) secondsSeeding;
+@property (nonatomic, readonly) NSInteger secondsDownloading;
+@property (nonatomic, readonly) NSInteger secondsSeeding;
 
-- (NSInteger) stalledMinutes;
-- (BOOL) isStalled;
+@property (nonatomic, readonly) NSInteger stalledMinutes;
+@property (nonatomic, getter=isStalled, readonly) BOOL stalled;
 
 - (void) updateTimeMachineExclude;
 
-- (NSInteger) stateSortKey;
-- (NSString *) trackerSortKey;
+@property (nonatomic, readonly) NSInteger stateSortKey;
+@property (nonatomic, readonly, copy) NSString *trackerSortKey;
 
-- (tr_torrent *) torrentStruct;
+@property (nonatomic, readonly) tr_torrent *torrentStruct;
 
 @end

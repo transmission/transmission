@@ -28,7 +28,7 @@
 
 - (void) mouseDown: (NSEvent *) event
 {
-    [[self window] makeKeyWindow];
+    [self.window makeKeyWindow];
     [super mouseDown: event];
 }
 
@@ -44,14 +44,14 @@
 
 - (void) copy: (id) sender
 {
-    NSMutableArray * addresses = [NSMutableArray arrayWithCapacity: [fTrackers count]];
-    NSIndexSet * indexes = [self selectedRowIndexes];
-    for (NSUInteger i = [indexes firstIndex]; i != NSNotFound; i = [indexes indexGreaterThanIndex: i])
+    NSMutableArray * addresses = [NSMutableArray arrayWithCapacity: fTrackers.count];
+    NSIndexSet * indexes = self.selectedRowIndexes;
+    for (NSUInteger i = indexes.firstIndex; i != NSNotFound; i = [indexes indexGreaterThanIndex: i])
     {
         id item = fTrackers[i];
         if (![item isKindOfClass: [TrackerNode class]])
         {
-            for (++i; i < [fTrackers count] && [fTrackers[i] isKindOfClass: [TrackerNode class]]; ++i)
+            for (++i; i < fTrackers.count && [fTrackers[i] isKindOfClass: [TrackerNode class]]; ++i)
                 [addresses addObject: [(TrackerNode *)fTrackers[i] fullAnnounceAddress]];
             --i;
         }
@@ -89,10 +89,10 @@
 
 - (BOOL) validateMenuItem: (NSMenuItem *) menuItem
 {
-    const SEL action = [menuItem action];
+    const SEL action = menuItem.action;
 
     if (action == @selector(copy:))
-        return [self numberOfSelectedRows] > 0;
+        return self.numberOfSelectedRows > 0;
 
     if (action == @selector(paste:))
         return fTorrent && [[NSPasteboard generalPasteboard] canReadObjectForClasses: @[[NSString class]] options: nil];
