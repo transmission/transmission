@@ -59,7 +59,7 @@
     controller: (Controller *) controller torrentFile: (NSString *) torrentFile
     deleteTorrentCheckEnableInitially: (BOOL) deleteTorrent canToggleDelete: (BOOL) canToggleDelete; //if canToggleDelete is NO, we will also not delete the file regardless of the delete check's state (this is so it can be disabled and checked for a downloaded torrent, where the file's already deleted)
 
-@property (nonatomic, readonly, copy) Torrent *torrent;
+@property (nonatomic, readonly) Torrent *torrent;
 
 - (void) setDestination: (id) sender;
 

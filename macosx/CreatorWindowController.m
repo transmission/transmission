@@ -82,10 +82,10 @@ NSMutableSet *creatorWindowControllerSet = nil;
         {
             NSAlert * alert = [[NSAlert alloc] init];
             [alert addButtonWithTitle: NSLocalizedString(@"OK", "Create torrent -> no files -> button")];
-            [alert setMessageText: NSLocalizedString(@"This folder contains no files.",
-                                                    "Create torrent -> no files -> title")];
-            [alert setInformativeText: NSLocalizedString(@"There must be at least one file in a folder to create a torrent file.",
-                                                        "Create torrent -> no files -> warning")];
+            alert.messageText = NSLocalizedString(@"This folder contains no files.",
+                "Create torrent -> no files -> title");
+            alert.informativeText = NSLocalizedString(@"There must be at least one file in a folder to create a torrent file.",
+                "Create torrent -> no files -> warning");
             alert.alertStyle = NSWarningAlertStyle;
 
             [alert runModal];
@@ -96,10 +96,10 @@ NSMutableSet *creatorWindowControllerSet = nil;
         {
             NSAlert * alert = [[NSAlert alloc] init];
             [alert addButtonWithTitle: NSLocalizedString(@"OK", "Create torrent -> zero size -> button")];
-            [alert setMessageText: NSLocalizedString(@"The total file size is zero bytes.",
-                                                    "Create torrent -> zero size -> title")];
-            [alert setInformativeText: NSLocalizedString(@"A torrent file cannot be created for files with no size.",
-                                                        "Create torrent -> zero size -> warning")];
+            alert.messageText = NSLocalizedString(@"The total file size is zero bytes.",
+                "Create torrent -> zero size -> title");
+            alert.informativeText = NSLocalizedString(@"A torrent file cannot be created for files with no size.",
+                "Create torrent -> zero size -> warning");
             alert.alertStyle = NSWarningAlertStyle;
 
             [alert runModal];
@@ -243,12 +243,12 @@ NSMutableSet *creatorWindowControllerSet = nil;
 {
     NSSavePanel * panel = [NSSavePanel savePanel];
 
-    [panel setPrompt: NSLocalizedString(@"Select", "Create torrent -> location sheet -> button")];
-    [panel setMessage: NSLocalizedString(@"Select the name and location for the torrent file.",
-                                        "Create torrent -> location sheet -> message")];
+    panel.prompt = NSLocalizedString(@"Select", "Create torrent -> location sheet -> button");
+    panel.message = NSLocalizedString(@"Select the name and location for the torrent file.",
+        "Create torrent -> location sheet -> message");
 
     panel.allowedFileTypes = @[@"org.bittorrent.torrent", @"torrent"];
-    [panel setCanSelectHiddenExtension: YES];
+    panel.canSelectHiddenExtension = YES;
 
     panel.directoryURL = fLocation.URLByDeletingLastPathComponent;
     panel.nameFieldStringValue = fLocation.lastPathComponent;
@@ -273,7 +273,7 @@ NSMutableSet *creatorWindowControllerSet = nil;
         && [fDefaults boolForKey: isPrivate ? @"WarningCreatorPrivateBlankAddress" : @"WarningCreatorBlankAddress"])
     {
         NSAlert * alert = [[NSAlert alloc] init];
-        [alert setMessageText: NSLocalizedString(@"There are no tracker addresses.", "Create torrent -> blank address -> title")];
+        alert.messageText = NSLocalizedString(@"There are no tracker addresses.", "Create torrent -> blank address -> title");
 
         NSString * infoString = isPrivate
                     ? NSLocalizedString(@"A transfer marked as private with no tracker addresses will be unable to connect to peers."
@@ -286,7 +286,7 @@ NSMutableSet *creatorWindowControllerSet = nil;
         alert.informativeText = infoString;
         [alert addButtonWithTitle: NSLocalizedString(@"Create", "Create torrent -> blank address -> button")];
         [alert addButtonWithTitle: NSLocalizedString(@"Cancel", "Create torrent -> blank address -> button")];
-        [alert setShowsSuppressionButton: YES];
+        alert.showsSuppressionButton = YES;
 
         [alert beginSheetModalForWindow: self.window modalDelegate: self
             didEndSelector: @selector(createBlankAddressAlertDidEnd:returnCode:contextInfo:) contextInfo: nil];
@@ -449,14 +449,14 @@ NSMutableSet *creatorWindowControllerSet = nil;
 {
     NSOpenPanel * panel = [NSOpenPanel openPanel];
 
-    [panel setTitle: NSLocalizedString(@"Create Torrent File", "Create torrent -> select file")];
-    [panel setPrompt: NSLocalizedString(@"Select", "Create torrent -> select file")];
-    [panel setAllowsMultipleSelection: NO];
-    [panel setCanChooseFiles: YES];
-    [panel setCanChooseDirectories: YES];
-    [panel setCanCreateDirectories: NO];
+    panel.title = NSLocalizedString(@"Create Torrent File", "Create torrent -> select file");
+    panel.prompt = NSLocalizedString(@"Select", "Create torrent -> select file");
+    panel.allowsMultipleSelection = NO;
+    panel.canChooseFiles = YES;
+    panel.canChooseDirectories = YES;
+    panel.canCreateDirectories = NO;
 
-    [panel setMessage: NSLocalizedString(@"Select a file or folder for the torrent file.", "Create torrent -> select file")];
+    panel.message = NSLocalizedString(@"Select a file or folder for the torrent file.", "Create torrent -> select file");
 
     BOOL success = [panel runModal] == NSOKButton;
     return success ? panel.URLs[0] : nil;
@@ -483,8 +483,8 @@ NSMutableSet *creatorWindowControllerSet = nil;
     {
         NSAlert * alert = [[NSAlert alloc] init];
         [alert addButtonWithTitle: NSLocalizedString(@"OK", "Create torrent -> directory doesn't exist warning -> button")];
-        [alert setMessageText: NSLocalizedString(@"The chosen torrent file location does not exist.",
-                                                "Create torrent -> directory doesn't exist warning -> title")];
+        alert.messageText = NSLocalizedString(@"The chosen torrent file location does not exist.",
+            "Create torrent -> directory doesn't exist warning -> title");
         alert.informativeText = [NSString stringWithFormat:
                 NSLocalizedString(@"The directory \"%@\" does not currently exist. "
                     "Create this directory or choose a different one to create the torrent file.",
@@ -504,8 +504,8 @@ NSMutableSet *creatorWindowControllerSet = nil;
 
         NSAlert * alert = [[NSAlert alloc] init];
         [alert addButtonWithTitle: NSLocalizedString(@"OK", "Create torrent -> file already exists warning -> button")];
-        [alert setMessageText: NSLocalizedString(@"A torrent file with this name and directory cannot be created.",
-                                                "Create torrent -> file already exists warning -> title")];
+        alert.messageText = NSLocalizedString(@"A torrent file with this name and directory cannot be created.",
+            "Create torrent -> file already exists warning -> title");
         alert.informativeText = [NSString stringWithFormat:
                 NSLocalizedString(@"A file with the name \"%@\" already exists in the directory \"%@\". "
                     "Choose a new name or directory to create the torrent file.",
@@ -533,7 +533,7 @@ NSMutableSet *creatorWindowControllerSet = nil;
     fOpenWhenCreated = fOpenCheck.state == NSOnState; //need this since the check box might not exist, and value in prefs might have changed from another creator window
     [fDefaults setURL: fLocation.URLByDeletingLastPathComponent forKey: @"CreatorLocationURL"];
 
-    [self.window setRestorable: NO];
+    self.window.restorable = NO;
 
     [[NSNotificationCenter defaultCenter] postNotificationName: @"BeginCreateTorrentFile" object: fLocation userInfo: nil];
     tr_makeMetaInfo(fInfo, fLocation.path.UTF8String, trackerInfo, fTrackers.count, fCommentView.string.UTF8String, fPrivateCheck.state == NSOnState);
@@ -595,10 +595,10 @@ NSMutableSet *creatorWindowControllerSet = nil;
         {
             fStarted = YES;
 
-            [fProgressView setHidden: YES];
+            fProgressView.hidden = YES;
 
             NSWindow * window = self.window;
-            [window setFrameAutosaveName: @""];
+            window.frameAutosaveName = @"";
 
             NSRect windowRect = window.frame;
             CGFloat difference = fProgressView.frame.size.height - window.contentView.frame.size.height;
@@ -612,9 +612,9 @@ NSMutableSet *creatorWindowControllerSet = nil;
 
             window.contentView = fProgressView;
             [window setFrame: windowRect display: YES animate: YES];
-            [fProgressView setHidden: NO];
+            fProgressView.hidden = NO;
 
-            [[window standardWindowButton: NSWindowCloseButton] setEnabled: NO];
+            [window standardWindowButton: NSWindowCloseButton].enabled = NO;
         }
     }
 }

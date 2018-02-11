@@ -67,7 +67,7 @@ tr_session * fLib = NULL;
 
     self.window.restorationClass = [self class];
 
-    [self.window setTitle: NSLocalizedString(@"Statistics", "Stats window -> title")];
+    self.window.title = NSLocalizedString(@"Statistics", "Stats window -> title");
 
     //set label text
     fUploadedLabelField.stringValue = [NSLocalizedString(@"Uploaded", "Stats window -> label") stringByAppendingString: @":"];
@@ -105,7 +105,7 @@ tr_session * fLib = NULL;
     //resize reset button
     const CGFloat oldButtonWidth = fResetButton.frame.size.width;
 
-    [fResetButton setTitle: NSLocalizedString(@"Reset", "Stats window -> reset button")];
+    fResetButton.title = NSLocalizedString(@"Reset", "Stats window -> reset button");
     [fResetButton sizeToFit];
 
     NSRect buttonFrame = fResetButton.frame;
@@ -137,13 +137,13 @@ tr_session * fLib = NULL;
     }
 
     NSAlert * alert = [[NSAlert alloc] init];
-    [alert setMessageText: NSLocalizedString(@"Are you sure you want to reset usage statistics?", "Stats reset -> title")];
-    [alert setInformativeText: NSLocalizedString(@"This will clear the global statistics displayed by Transmission."
-                                " Individual transfer statistics will not be affected.", "Stats reset -> message")];
+    alert.messageText = NSLocalizedString(@"Are you sure you want to reset usage statistics?", "Stats reset -> title");
+    alert.informativeText = NSLocalizedString(@"This will clear the global statistics displayed by Transmission."
+        " Individual transfer statistics will not be affected.", "Stats reset -> message");
     alert.alertStyle = NSWarningAlertStyle;
     [alert addButtonWithTitle: NSLocalizedString(@"Reset", "Stats reset -> button")];
     [alert addButtonWithTitle: NSLocalizedString(@"Cancel", "Stats reset -> button")];
-    [alert setShowsSuppressionButton: YES];
+    alert.showsSuppressionButton = YES;
 
     [alert beginSheetModalForWindow: self.window modalDelegate: self
         didEndSelector: @selector(resetSheetClosed:returnCode:contextInfo:) contextInfo: nil];
@@ -204,7 +204,7 @@ tr_session * fLib = NULL;
     }
 
     if (statsAll.sessionCount == 1)
-        [fNumOpenedField setStringValue: NSLocalizedString(@"1 time", "stats window -> times opened")];
+        fNumOpenedField.stringValue = NSLocalizedString(@"1 time", "stats window -> times opened");
     else
         fNumOpenedField.stringValue = [NSString stringWithFormat: NSLocalizedString(@"%@ times", "stats window -> times opened"), [NSString formattedUInteger: statsAll.sessionCount]];
 }

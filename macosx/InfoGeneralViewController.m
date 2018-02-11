@@ -36,7 +36,7 @@
 {
     if ((self = [super initWithNibName: @"InfoGeneralView" bundle: nil]))
     {
-        [self setTitle: NSLocalizedString(@"General Info", "Inspector view -> title")];
+        self.title = NSLocalizedString(@"General Info", "Inspector view -> title");
     }
 
     return self;
@@ -154,7 +154,7 @@
     {
         fPiecesField.stringValue = @"";
         fHashField.stringValue = @"";
-        [fHashField setToolTip: nil];
+        fHashField.toolTip = nil;
         fSecureField.stringValue = @"";
         fCommentView.string = @"";
 
@@ -162,9 +162,9 @@
         fDateCreatedField.stringValue = @"";
 
         fDataLocationField.stringValue = @"";
-        [fDataLocationField setToolTip: nil];
+        fDataLocationField.toolTip = nil;
 
-        [fRevealDataButton setHidden: YES];
+        fRevealDataButton.hidden = YES;
     }
 
     fSet = YES;

@@ -814,7 +814,7 @@
         else
             fPiecesBarPercent = 1.0 - progress;
 
-        [self setNeedsDisplay: YES];
+        self.needsDisplay = YES;
     }
 }
 

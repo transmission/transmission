@@ -86,7 +86,7 @@
 
     [fBadge unlockFocus];
 
-    [self setNeedsDisplay: YES];
+    self.needsDisplay = YES;
 }
 
 -(void) drawRect: (NSRect) rect

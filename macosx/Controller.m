@@ -242,10 +242,10 @@ static void removeKeRangerRansomware()
     {
         NSAlert * alert = [[NSAlert alloc] init];
         [alert addButtonWithTitle: NSLocalizedString(@"OK", "Transmission already running alert -> button")];
-        [alert setMessageText: NSLocalizedString(@"Transmission is already running.",
-                                                "Transmission already running alert -> title")];
-        [alert setInformativeText: NSLocalizedString(@"There is already a copy of Transmission running. "
-            "This copy cannot be opened until that instance is quit.", "Transmission already running alert -> message")];
+        alert.messageText = NSLocalizedString(@"Transmission is already running.",
+            "Transmission already running alert -> title");
+        alert.informativeText = NSLocalizedString(@"There is already a copy of Transmission running. "
+            "This copy cannot be opened until that instance is quit.", "Transmission already running alert -> message");
         alert.alertStyle = NSCriticalAlertStyle;
 
         [alert runModal];
@@ -270,11 +270,11 @@ static void removeKeRangerRansomware()
         NSAlert * alert = [[NSAlert alloc] init];
         [alert addButtonWithTitle: NSLocalizedString(@"I Accept", "Legal alert -> button")];
         [alert addButtonWithTitle: NSLocalizedString(@"Quit", "Legal alert -> button")];
-        [alert setMessageText: NSLocalizedString(@"Welcome to Transmission", "Legal alert -> title")];
-        [alert setInformativeText: NSLocalizedString(@"Transmission is a file-sharing program."
+        alert.messageText = NSLocalizedString(@"Welcome to Transmission", "Legal alert -> title");
+        alert.informativeText = NSLocalizedString(@"Transmission is a file-sharing program."
             " When you run a torrent, its data will be made available to others by means of upload."
             " You and you alone are fully responsible for exercising proper judgement and abiding by your local laws.",
-            "Legal alert -> message")];
+            "Legal alert -> message");
         alert.alertStyle = NSInformationalAlertStyle;
 
         if ([alert runModal] == NSAlertSecondButtonReturn)
@@ -384,8 +384,8 @@ static void removeKeRangerRansomware()
             tr_variantDictAddStr(&settings, TR_KEY_rpc_host_whitelist, [fDefaults stringForKey: @"RPCHostWhitelist"].UTF8String);
 
         NSByteCountFormatter * unitFormatter = [[NSByteCountFormatter alloc] init];
-        [unitFormatter setIncludesCount: NO];
-        [unitFormatter setAllowsNonnumericFormatting: NO];
+        unitFormatter.includesCount = NO;
+        unitFormatter.allowsNonnumericFormatting = NO;
 
         unitFormatter.allowedUnits = NSByteCountFormatterUseKB;
         NSString * kbString = [unitFormatter stringFromByteCount: 17]; //use a random value to avoid possible pluralization issues with 1 or 0 (an example is if we use 1 for bytes, we'd get "byte" when we'd want "bytes" for the generic libtransmission value at least)
@@ -459,24 +459,24 @@ static void removeKeRangerRansomware()
 {
     NSToolbar * toolbar = [[NSToolbar alloc] initWithIdentifier: @"TRMainToolbar"];
     toolbar.delegate = self;
-    [toolbar setAllowsUserCustomization: YES];
-    [toolbar setAutosavesConfiguration: YES];
+    toolbar.allowsUserCustomization = YES;
+    toolbar.autosavesConfiguration = YES;
     toolbar.displayMode = NSToolbarDisplayModeIconOnly;
     fWindow.toolbar = toolbar;
 
     fWindow.delegate = self; //do manually to avoid placement issue
 
     [fWindow makeFirstResponder: fTableView];
-    [fWindow setExcludedFromWindowsMenu: YES];
+    fWindow.excludedFromWindowsMenu = YES;
 
     //set table size
     const BOOL small = [fDefaults boolForKey: @"SmallView"];
     if (small)
-        [fTableView setRowHeight: ROW_HEIGHT_SMALL];
+        fTableView.rowHeight = ROW_HEIGHT_SMALL;
     fTableView.usesAlternatingRowBackgroundColors = !small;
 
     [fWindow setContentBorderThickness: NSMinY(fTableView.enclosingScrollView.frame) forEdge: NSMinYEdge];
-    [fWindow setMovableByWindowBackground: YES];
+    fWindow.movableByWindowBackground = YES;
 
     fTotalTorrentsField.cell.backgroundStyle = NSBackgroundStyleRaised;
 
@@ -486,12 +486,12 @@ static void removeKeRangerRansomware()
     //set up status bar
     [self showStatusBar: [fDefaults boolForKey: @"StatusBar"] animate: NO];
 
-    [fActionButton setToolTip: NSLocalizedString(@"Shortcuts for changing global settings.",
-                                "Main window -> 1st bottom left button (action) tooltip")];
-    [fSpeedLimitButton setToolTip: NSLocalizedString(@"Speed Limit overrides the total bandwidth limits with its own limits.",
-                                "Main window -> 2nd bottom left button (turtle) tooltip")];
-    [fClearCompletedButton setToolTip: NSLocalizedString(@"Remove all transfers that have completed seeding.",
-                                "Main window -> 3rd bottom left button (remove all) tooltip")];
+    fActionButton.toolTip = NSLocalizedString(@"Shortcuts for changing global settings.",
+        "Main window -> 1st bottom left button (action) tooltip");
+    fSpeedLimitButton.toolTip = NSLocalizedString(@"Speed Limit overrides the total bandwidth limits with its own limits.",
+        "Main window -> 2nd bottom left button (turtle) tooltip");
+    fClearCompletedButton.toolTip = NSLocalizedString(@"Remove all transfers that have completed seeding.",
+        "Main window -> 3rd bottom left button (remove all) tooltip");
 
     [fTableView registerForDraggedTypes: @[TORRENT_TABLE_VIEW_DATA_TYPE]];
     [fWindow registerForDraggedTypes: @[NSFilenamesPboardType, NSURLPboardType]];
@@ -675,7 +675,7 @@ static void removeKeRangerRansomware()
             [fDefaults setObject: [NSDate date] forKey: @"DonateAskDate"];
 
             NSAlert * alert = [[NSAlert alloc] init];
-            [alert setMessageText: NSLocalizedString(@"Support open-source indie software", "Donation beg -> title")];
+            alert.messageText = NSLocalizedString(@"Support open-source indie software", "Donation beg -> title");
 
             NSString * donateMessage = [NSString stringWithFormat: @"%@\n\n%@",
                 NSLocalizedString(@"Transmission is a full-featured torrent application."
@@ -693,7 +693,7 @@ static void removeKeRangerRansomware()
             const BOOL allowNeverAgain = lastDonateDate != nil; //hide the "don't show again" check the first time - give them time to try the app
             alert.showsSuppressionButton = allowNeverAgain;
             if (allowNeverAgain)
-                [alert.suppressionButton setTitle: NSLocalizedString(@"Don't bug me about this ever again.", "Donation beg -> button")];
+                alert.suppressionButton.title = NSLocalizedString(@"Don't bug me about this ever again.", "Donation beg -> button");
 
             const NSInteger donateResult = [alert runModal];
             if (donateResult == NSAlertFirstButtonReturn)
@@ -1140,9 +1140,9 @@ static void removeKeRangerRansomware()
 {
     NSOpenPanel * panel = [NSOpenPanel openPanel];
 
-    [panel setAllowsMultipleSelection: YES];
-    [panel setCanChooseFiles: YES];
-    [panel setCanChooseDirectories: NO];
+    panel.allowsMultipleSelection = YES;
+    panel.canChooseFiles = YES;
+    panel.canChooseDirectories = NO;
 
     panel.allowedFileTypes = @[@"org.bittorrent.torrent", @"torrent"];
 
@@ -1167,9 +1167,9 @@ static void removeKeRangerRansomware()
     NSAlert * alert = [[NSAlert alloc] init];
     alert.messageText = [NSString stringWithFormat: NSLocalizedString(@"\"%@\" is not a valid torrent file.",
                             "Open invalid alert -> title"), filename];
-    [alert setInformativeText:
-            NSLocalizedString(@"The torrent file cannot be opened because it contains invalid data.",
-                            "Open invalid alert -> message")];
+    alert.informativeText = NSLocalizedString(@"The torrent file cannot be opened because it contains invalid data.",
+        "Open invalid alert -> message");
+     
     alert.alertStyle = NSWarningAlertStyle;
     [alert addButtonWithTitle: NSLocalizedString(@"OK", "Open invalid alert -> button")];
 
@@ -1184,7 +1184,7 @@ static void removeKeRangerRansomware()
         return;
 
     NSAlert * alert = [[NSAlert alloc] init];
-    [alert setMessageText: NSLocalizedString(@"Adding magnetized transfer failed.", "Magnet link failed -> title")];
+    alert.messageText = NSLocalizedString(@"Adding magnetized transfer failed.", "Magnet link failed -> title");
     alert.informativeText = [NSString stringWithFormat: NSLocalizedString(@"There was an error when adding the magnet link \"%@\"."
                                 " The transfer will not occur.", "Magnet link failed -> message"), address];
     alert.alertStyle = NSWarningAlertStyle;
@@ -1203,12 +1203,12 @@ static void removeKeRangerRansomware()
     NSAlert * alert = [[NSAlert alloc] init];
     alert.messageText = [NSString stringWithFormat: NSLocalizedString(@"A transfer of \"%@\" already exists.",
                             "Open duplicate alert -> title"), name];
-    [alert setInformativeText:
-            NSLocalizedString(@"The transfer cannot be added because it is a duplicate of an already existing transfer.",
-                            "Open duplicate alert -> message")];
+    alert.informativeText = NSLocalizedString(@"The transfer cannot be added because it is a duplicate of an already existing transfer.",
+        "Open duplicate alert -> message");
+     
     alert.alertStyle = NSWarningAlertStyle;
     [alert addButtonWithTitle: NSLocalizedString(@"OK", "Open duplicate alert -> button")];
-    [alert setShowsSuppressionButton: YES];
+    alert.showsSuppressionButton = YES;
 
     [alert runModal];
     if (alert.suppressionButton.state)
@@ -1225,14 +1225,14 @@ static void removeKeRangerRansomware()
         alert.messageText = [NSString stringWithFormat: NSLocalizedString(@"A transfer of \"%@\" already exists.",
                                 "Open duplicate magnet alert -> title"), name];
     else
-        [alert setMessageText: NSLocalizedString(@"Magnet link is a duplicate of an existing transfer.",
-                                "Open duplicate magnet alert -> title")];
+        alert.messageText = NSLocalizedString(@"Magnet link is a duplicate of an existing transfer.",
+            "Open duplicate magnet alert -> title");
     alert.informativeText = [NSString stringWithFormat:
             NSLocalizedString(@"The magnet link  \"%@\" cannot be added because it is a duplicate of an already existing transfer.",
                             "Open duplicate magnet alert -> message"), address];
     alert.alertStyle = NSWarningAlertStyle;
     [alert addButtonWithTitle: NSLocalizedString(@"OK", "Open duplicate magnet alert -> button")];
-    [alert setShowsSuppressionButton: YES];
+    alert.showsSuppressionButton = YES;
 
     [alert runModal];
     if (alert.suppressionButton.state)
@@ -1592,6 +1592,7 @@ static void removeKeRangerRansomware()
         alert.alertStyle = NSWarningAlertStyle;
         [alert addButtonWithTitle: NSLocalizedString(@"Remove", "Remove completed confirm panel -> button")];
         [alert addButtonWithTitle: NSLocalizedString(@"Cancel", "Remove completed confirm panel -> button")];
+        alert.showsSuppressionButton = YES;
         [alert setShowsSuppressionButton: YES];
 
         const NSInteger returnCode = [alert runModal];
@@ -1613,11 +1614,11 @@ static void removeKeRangerRansomware()
 - (void) moveDataFiles: (NSArray *) torrents
 {
     NSOpenPanel * panel = [NSOpenPanel openPanel];
-    [panel setPrompt: NSLocalizedString(@"Select", "Move torrent -> prompt")];
-    [panel setAllowsMultipleSelection: NO];
-    [panel setCanChooseFiles: NO];
-    [panel setCanChooseDirectories: YES];
-    [panel setCanCreateDirectories: YES];
+    panel.prompt = NSLocalizedString(@"Select", "Move torrent -> prompt");
+    panel.allowsMultipleSelection = NO;
+    panel.canChooseFiles = NO;
+    panel.canChooseDirectories = YES;
+    panel.canCreateDirectories = YES;
 
     NSInteger count = torrents.count;
     if (count == 1)
@@ -2018,8 +2019,8 @@ static void removeKeRangerRansomware()
         notification.title = notificationTitle;
         notification.informativeText = [torrent name];
 
-        [notification setHasActionButton: YES];
-        [notification setActionButtonTitle: NSLocalizedString(@"Show", "notification button")];
+        notification.hasActionButton = YES;
+        notification.actionButtonTitle = NSLocalizedString(@"Show", "notification button");
 
         NSMutableDictionary * userInfo = [NSMutableDictionary dictionaryWithObject: [torrent hashString] forKey: @"Hash"];
         if (location)
@@ -2066,8 +2067,8 @@ static void removeKeRangerRansomware()
     userNotification.title = notificationTitle;
     userNotification.informativeText = [torrent name];
 
-    [userNotification setHasActionButton: YES];
-    [userNotification setActionButtonTitle: NSLocalizedString(@"Show", "notification button")];
+    userNotification.hasActionButton = YES;
+    userNotification.actionButtonTitle = NSLocalizedString(@"Show", "notification button");
 
     NSMutableDictionary * userInfo = [NSMutableDictionary dictionaryWithObject: [torrent hashString] forKey: @"Hash"];
     if (location)
@@ -2167,7 +2168,7 @@ static void removeKeRangerRansomware()
 {
     //actually sort
     [self sortTorrentsCallUpdates: YES includeQueueOrder: includeQueueOrder];
-    [fTableView setNeedsDisplay: YES];
+    fTableView.needsDisplay = YES;
 }
 
 - (void) sortTorrentsCallUpdates: (BOOL) callUpdates includeQueueOrder: (BOOL) includeQueueOrder
@@ -2644,7 +2645,7 @@ static void removeKeRangerRansomware()
 
     if (beganUpdates)
         [fTableView endUpdates];
-    [fTableView setNeedsDisplay: YES];
+    fTableView.needsDisplay = YES;
 
     [NSAnimationContext endGrouping];
 
@@ -2839,7 +2840,7 @@ static void removeKeRangerRansomware()
                 notification.title = notificationTitle;
                 notification.informativeText = file;
 
-                [notification setHasActionButton: NO];
+                notification.hasActionButton = NO;
 
                 [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification: notification];
                 break;
@@ -3628,13 +3629,13 @@ static void removeKeRangerRansomware()
     {
         ButtonToolbarItem * item = [self standardToolbarButtonWithIdentifier: ident];
 
-        [item setLabel: NSLocalizedString(@"Create", "Create toolbar item -> label")];
-        [item setPaletteLabel: NSLocalizedString(@"Create Torrent File", "Create toolbar item -> palette label")];
-        [item setToolTip: NSLocalizedString(@"Create torrent file", "Create toolbar item -> tooltip")];
+        item.label = NSLocalizedString(@"Create", "Create toolbar item -> label");
+        item.paletteLabel = NSLocalizedString(@"Create Torrent File", "Create toolbar item -> palette label");
+        item.toolTip = NSLocalizedString(@"Create torrent file", "Create toolbar item -> tooltip");
         item.image = [NSImage imageNamed: @"ToolbarCreateTemplate"];
         item.target = self;
         item.action = @selector(createFile:);
-        [item setAutovalidates: NO];
+        item.autovalidates = NO;
 
         return item;
     }
@@ -3642,13 +3643,13 @@ static void removeKeRangerRansomware()
     {
         ButtonToolbarItem * item = [self standardToolbarButtonWithIdentifier: ident];
 
-        [item setLabel: NSLocalizedString(@"Open", "Open toolbar item -> label")];
-        [item setPaletteLabel: NSLocalizedString(@"Open Torrent Files", "Open toolbar item -> palette label")];
-        [item setToolTip: NSLocalizedString(@"Open torrent files", "Open toolbar item -> tooltip")];
+        item.label = NSLocalizedString(@"Open", "Open toolbar item -> label");
+        item.paletteLabel = NSLocalizedString(@"Open Torrent Files", "Open toolbar item -> palette label");
+        item.toolTip = NSLocalizedString(@"Open torrent files", "Open toolbar item -> tooltip");
         item.image = [NSImage imageNamed: @"ToolbarOpenTemplate"];
         item.target = self;
         item.action = @selector(openShowSheet:);
-        [item setAutovalidates: NO];
+        item.autovalidates = NO;
 
         return item;
     }
@@ -3656,13 +3657,13 @@ static void removeKeRangerRansomware()
     {
         ButtonToolbarItem * item = [self standardToolbarButtonWithIdentifier: ident];
 
-        [item setLabel: NSLocalizedString(@"Open Address", "Open address toolbar item -> label")];
-        [item setPaletteLabel: NSLocalizedString(@"Open Torrent Address", "Open address toolbar item -> palette label")];
-        [item setToolTip: NSLocalizedString(@"Open torrent web address", "Open address toolbar item -> tooltip")];
+        item.label = NSLocalizedString(@"Open Address", "Open address toolbar item -> label");
+        item.paletteLabel = NSLocalizedString(@"Open Torrent Address", "Open address toolbar item -> palette label");
+        item.toolTip = NSLocalizedString(@"Open torrent web address", "Open address toolbar item -> tooltip");
         item.image = [NSImage imageNamed: @"ToolbarOpenWebTemplate"];
         item.target = self;
         item.action = @selector(openURLShowSheet:);
-        [item setAutovalidates: NO];
+        item.autovalidates = NO;
 
         return item;
     }
@@ -3670,9 +3671,9 @@ static void removeKeRangerRansomware()
     {
         ButtonToolbarItem * item = [self standardToolbarButtonWithIdentifier: ident];
 
-        [item setLabel: NSLocalizedString(@"Remove", "Remove toolbar item -> label")];
-        [item setPaletteLabel: NSLocalizedString(@"Remove Selected", "Remove toolbar item -> palette label")];
-        [item setToolTip: NSLocalizedString(@"Remove selected transfers", "Remove toolbar item -> tooltip")];
+        item.label = NSLocalizedString(@"Remove", "Remove toolbar item -> label");
+        item.paletteLabel = NSLocalizedString(@"Remove Selected", "Remove toolbar item -> palette label");
+        item.toolTip = NSLocalizedString(@"Remove selected transfers", "Remove toolbar item -> tooltip");
         item.image = [NSImage imageNamed: @"ToolbarRemoveTemplate"];
         item.target = self;
         item.action = @selector(removeNoDelete:);
@@ -3685,9 +3686,9 @@ static void removeKeRangerRansomware()
         ButtonToolbarItem * item = [self standardToolbarButtonWithIdentifier: ident];
         ((NSButtonCell *)((NSButton *)item.view).cell).showsStateBy = NSContentsCellMask; //blue when enabled
 
-        [item setLabel: NSLocalizedString(@"Inspector", "Inspector toolbar item -> label")];
-        [item setPaletteLabel: NSLocalizedString(@"Toggle Inspector", "Inspector toolbar item -> palette label")];
-        [item setToolTip: NSLocalizedString(@"Toggle the torrent inspector", "Inspector toolbar item -> tooltip")];
+        item.label = NSLocalizedString(@"Inspector", "Inspector toolbar item -> label");
+        item.paletteLabel = NSLocalizedString(@"Toggle Inspector", "Inspector toolbar item -> palette label");
+        item.toolTip = NSLocalizedString(@"Toggle the torrent inspector", "Inspector toolbar item -> tooltip");
         item.image = [NSImage imageNamed: @"ToolbarInfoTemplate"];
         item.target = self;
         item.action = @selector(showInfo:);
@@ -3714,8 +3715,8 @@ static void removeKeRangerRansomware()
         groupItem.minSize = groupSize;
         groupItem.maxSize = groupSize;
 
-        [groupItem setLabel: NSLocalizedString(@"Apply All", "All toolbar item -> label")];
-        [groupItem setPaletteLabel: NSLocalizedString(@"Pause / Resume All", "All toolbar item -> palette label")];
+        groupItem.label = NSLocalizedString(@"Apply All", "All toolbar item -> label");
+        groupItem.paletteLabel = NSLocalizedString(@"Pause / Resume All", "All toolbar item -> palette label");
         groupItem.target = self;
         groupItem.action = @selector(allToolbarClicked:);
 
@@ -3759,8 +3760,8 @@ static void removeKeRangerRansomware()
         groupItem.minSize = groupSize;
         groupItem.maxSize = groupSize;
 
-        [groupItem setLabel: NSLocalizedString(@"Apply Selected", "Selected toolbar item -> label")];
-        [groupItem setPaletteLabel: NSLocalizedString(@"Pause / Resume Selected", "Selected toolbar item -> palette label")];
+        groupItem.label = NSLocalizedString(@"Apply Selected", "Selected toolbar item -> label");
+        groupItem.paletteLabel = NSLocalizedString(@"Pause / Resume Selected", "Selected toolbar item -> palette label");
         groupItem.target = self;
         groupItem.action = @selector(selectedToolbarClicked:);
 
@@ -3789,9 +3790,9 @@ static void removeKeRangerRansomware()
         ButtonToolbarItem * item = [self standardToolbarButtonWithIdentifier: ident];
         ((NSButtonCell *)((NSButton *)item.view).cell).showsStateBy = NSContentsCellMask; //blue when enabled
 
-        [item setLabel: NSLocalizedString(@"Filter", "Filter toolbar item -> label")];
-        [item setPaletteLabel: NSLocalizedString(@"Toggle Filter", "Filter toolbar item -> palette label")];
-        [item setToolTip: NSLocalizedString(@"Toggle the filter bar", "Filter toolbar item -> tooltip")];
+        item.label = NSLocalizedString(@"Filter", "Filter toolbar item -> label");
+        item.paletteLabel = NSLocalizedString(@"Toggle Filter", "Filter toolbar item -> palette label");
+        item.toolTip = NSLocalizedString(@"Toggle the filter bar", "Filter toolbar item -> tooltip");
         item.image = [NSImage imageNamed: @"ToolbarFilterTemplate"];
         item.target = self;
         item.action = @selector(toggleFilterBar:);
@@ -3803,9 +3804,9 @@ static void removeKeRangerRansomware()
         ButtonToolbarItem * item = [self standardToolbarButtonWithIdentifier: ident];
         ((NSButtonCell *)((NSButton *)item.view).cell).showsStateBy = NSContentsCellMask; //blue when enabled
 
-        [item setLabel: NSLocalizedString(@"Quick Look", "QuickLook toolbar item -> label")];
-        [item setPaletteLabel: NSLocalizedString(@"Quick Look", "QuickLook toolbar item -> palette label")];
-        [item setToolTip: NSLocalizedString(@"Quick Look", "QuickLook toolbar item -> tooltip")];
+        item.label = NSLocalizedString(@"Quick Look", "QuickLook toolbar item -> label");
+        item.paletteLabel = NSLocalizedString(@"Quick Look", "QuickLook toolbar item -> palette label");
+        item.toolTip = NSLocalizedString(@"Quick Look", "QuickLook toolbar item -> tooltip");
         item.image = [NSImage imageNamed: NSImageNameQuickLookTemplate];
         item.target = self;
         item.action = @selector(toggleQuickLook:);
@@ -3817,9 +3818,9 @@ static void removeKeRangerRansomware()
     {
         ShareToolbarItem * item = [self toolbarButtonWithIdentifier: ident forToolbarButtonClass: [ShareToolbarItem class]];
 
-        [item setLabel: NSLocalizedString(@"Share", "Share toolbar item -> label")];
-        [item setPaletteLabel: NSLocalizedString(@"Share", "Share toolbar item -> palette label")];
-        [item setToolTip: NSLocalizedString(@"Share torrent file", "Share toolbar item -> tooltip")];
+        item.label = NSLocalizedString(@"Share", "Share toolbar item -> label");
+        item.paletteLabel = NSLocalizedString(@"Share", "Share toolbar item -> palette label");
+        item.toolTip = NSLocalizedString(@"Share torrent file", "Share toolbar item -> tooltip");
         item.image = [NSImage imageNamed: NSImageNameShareTemplate];
         item.visibilityPriority = NSToolbarItemVisibilityPriorityLow;
 
@@ -4387,9 +4388,9 @@ static void removeKeRangerRansomware()
     {
         NSScrollView * scrollView = fTableView.enclosingScrollView;
 
-        [scrollView setHasVerticalScroller: NO];
+        scrollView.hasVerticalScroller = NO;
         [fWindow setFrame: [self sizedWindowFrame] display: YES animate: YES];
-        [scrollView setHasVerticalScroller: YES];
+        scrollView.hasVerticalScroller = YES;
 
         [self setWindowMinMaxToCurrent];
     }

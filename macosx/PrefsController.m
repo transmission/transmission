@@ -155,10 +155,10 @@
 
     NSToolbar * toolbar = [[NSToolbar alloc] initWithIdentifier: @"Preferences Toolbar"];
     toolbar.delegate = self;
-    [toolbar setAllowsUserCustomization: NO];
+    toolbar.allowsUserCustomization = NO;
     toolbar.displayMode = NSToolbarDisplayModeIconAndLabel;
     toolbar.sizeMode = NSToolbarSizeModeRegular;
-    [toolbar setSelectedItemIdentifier: TOOLBAR_GENERAL];
+    toolbar.selectedItemIdentifier = TOOLBAR_GENERAL;
     self.window.toolbar = toolbar;
 
     [self setPrefView: nil];
@@ -232,59 +232,59 @@
 
     if ([ident isEqualToString: TOOLBAR_GENERAL])
     {
-        [item setLabel: NSLocalizedString(@"General", "Preferences -> toolbar item title")];
+        item.label = NSLocalizedString(@"General", "Preferences -> toolbar item title");
         item.image = [NSImage imageNamed: NSImageNamePreferencesGeneral];
         item.target = self;
         item.action = @selector(setPrefView:);
-        [item setAutovalidates: NO];
+        item.autovalidates = NO;
     }
     else if ([ident isEqualToString: TOOLBAR_TRANSFERS])
     {
-        [item setLabel: NSLocalizedString(@"Transfers", "Preferences -> toolbar item title")];
+        item.label = NSLocalizedString(@"Transfers", "Preferences -> toolbar item title");
         item.image = [NSImage imageNamed: @"Transfers"];
         item.target = self;
         item.action = @selector(setPrefView:);
-        [item setAutovalidates: NO];
+        item.autovalidates = NO;
     }
     else if ([ident isEqualToString: TOOLBAR_GROUPS])
     {
-        [item setLabel: NSLocalizedString(@"Groups", "Preferences -> toolbar item title")];
+        item.label = NSLocalizedString(@"Groups", "Preferences -> toolbar item title");
         item.image = [NSImage imageNamed: @"Groups"];
         item.target = self;
         item.action = @selector(setPrefView:);
-        [item setAutovalidates: NO];
+        item.autovalidates = NO;
     }
     else if ([ident isEqualToString: TOOLBAR_BANDWIDTH])
     {
-        [item setLabel: NSLocalizedString(@"Bandwidth", "Preferences -> toolbar item title")];
+        item.label = NSLocalizedString(@"Bandwidth", "Preferences -> toolbar item title");
         item.image = [NSImage imageNamed: @"Bandwidth"];
         item.target = self;
         item.action = @selector(setPrefView:);
-        [item setAutovalidates: NO];
+        item.autovalidates = NO;
     }
     else if ([ident isEqualToString: TOOLBAR_PEERS])
     {
-        [item setLabel: NSLocalizedString(@"Peers", "Preferences -> toolbar item title")];
+        item.label = NSLocalizedString(@"Peers", "Preferences -> toolbar item title");
         item.image = [NSImage imageNamed: NSImageNameUserGroup];
         item.target = self;
         item.action = @selector(setPrefView:);
-        [item setAutovalidates: NO];
+        item.autovalidates = NO;
     }
     else if ([ident isEqualToString: TOOLBAR_NETWORK])
     {
-        [item setLabel: NSLocalizedString(@"Network", "Preferences -> toolbar item title")];
+        item.label = NSLocalizedString(@"Network", "Preferences -> toolbar item title");
         item.image = [NSImage imageNamed: NSImageNameNetwork];
         item.target = self;
         item.action = @selector(setPrefView:);
-        [item setAutovalidates: NO];
+        item.autovalidates = NO;
     }
     else if ([ident isEqualToString: TOOLBAR_REMOTE])
     {
-        [item setLabel: NSLocalizedString(@"Remote", "Preferences -> toolbar item title")];
+        item.label = NSLocalizedString(@"Remote", "Preferences -> toolbar item title");
         item.image = [NSImage imageNamed: @"Remote"];
         item.target = self;
         item.action = @selector(setPrefView:);
-        [item setAutovalidates: NO];
+        item.autovalidates = NO;
     }
     else
     {
@@ -373,7 +373,7 @@
         fPeerPort = port;
 
         fPortStatusField.stringValue = @"";
-        [fPortStatusImage setImage: nil];
+        fPortStatusImage.image = nil;
         [fPortStatusProgress startAnimation: self];
 
         if (fPortChecker)
@@ -391,15 +391,15 @@
     switch ([fPortChecker status])
     {
         case PORT_STATUS_OPEN:
-            [fPortStatusField setStringValue: NSLocalizedString(@"Port is open", "Preferences -> Network -> port status")];
+            fPortStatusField.stringValue = NSLocalizedString(@"Port is open", "Preferences -> Network -> port status");
             fPortStatusImage.image = [NSImage imageNamed: NSImageNameStatusAvailable];
             break;
         case PORT_STATUS_CLOSED:
-            [fPortStatusField setStringValue: NSLocalizedString(@"Port is closed", "Preferences -> Network -> port status")];
+            fPortStatusField.stringValue = NSLocalizedString(@"Port is closed", "Preferences -> Network -> port status");
             fPortStatusImage.image = [NSImage imageNamed: NSImageNameStatusUnavailable];
             break;
         case PORT_STATUS_ERROR:
-            [fPortStatusField setStringValue: NSLocalizedString(@"Port check site is down", "Preferences -> Network -> port status")];
+            fPortStatusField.stringValue = NSLocalizedString(@"Port check site is down", "Preferences -> Network -> port status");
             fPortStatusImage.image = [NSImage imageNamed: NSImageNameStatusPartiallyAvailable];
             break;
         default:
@@ -514,8 +514,8 @@
             "Prefs -> blocklist -> message"), countString];
     }
     else
-        [fBlocklistMessageField setStringValue: NSLocalizedString(@"A blocklist must first be downloaded",
-            "Prefs -> blocklist -> message")];
+        fBlocklistMessageField.stringValue = NSLocalizedString(@"A blocklist must first be downloaded",
+            "Prefs -> blocklist -> message");
 
     NSString * updatedDateString;
     if (exists)
@@ -786,11 +786,11 @@
 {
     NSOpenPanel * panel = [NSOpenPanel openPanel];
 
-    [panel setPrompt: NSLocalizedString(@"Select", "Preferences -> Open panel prompt")];
-    [panel setAllowsMultipleSelection: NO];
-    [panel setCanChooseFiles: NO];
-    [panel setCanChooseDirectories: YES];
-    [panel setCanCreateDirectories: YES];
+    panel.prompt = NSLocalizedString(@"Select", "Preferences -> Open panel prompt");
+    panel.allowsMultipleSelection = NO;
+    panel.canChooseFiles = NO;
+    panel.canChooseDirectories = YES;
+    panel.canCreateDirectories = YES;
 
     [panel beginSheetModalForWindow: self.window completionHandler: ^(NSInteger result) {
         if (result == NSFileHandlingPanelOKButton)
@@ -817,11 +817,11 @@
 {
     NSOpenPanel * panel = [NSOpenPanel openPanel];
 
-    [panel setPrompt: NSLocalizedString(@"Select", "Preferences -> Open panel prompt")];
-    [panel setAllowsMultipleSelection: NO];
-    [panel setCanChooseFiles: NO];
-    [panel setCanChooseDirectories: YES];
-    [panel setCanCreateDirectories: YES];
+    panel.prompt = NSLocalizedString(@"Select", "Preferences -> Open panel prompt");
+    panel.allowsMultipleSelection = NO;
+    panel.canChooseFiles = NO;
+    panel.canChooseDirectories = YES;
+    panel.canCreateDirectories = YES;
 
     [panel beginSheetModalForWindow: self.window completionHandler: ^(NSInteger result) {
         if (result == NSFileHandlingPanelOKButton)
@@ -840,11 +840,11 @@
 {
     NSOpenPanel * panel = [NSOpenPanel openPanel];
 
-    [panel setPrompt: NSLocalizedString(@"Select", "Preferences -> Open panel prompt")];
-    [panel setAllowsMultipleSelection: NO];
-    [panel setCanChooseFiles: YES];
-    [panel setCanChooseDirectories: NO];
-    [panel setCanCreateDirectories: NO];
+    panel.prompt = NSLocalizedString(@"Select", "Preferences -> Open panel prompt");
+    panel.allowsMultipleSelection = NO;
+    panel.canChooseFiles = YES;
+    panel.canChooseDirectories = NO;
+    panel.canCreateDirectories = NO;
 
     [panel beginSheetModalForWindow: self.window completionHandler: ^(NSInteger result) {
         if (result == NSFileHandlingPanelOKButton)
@@ -884,12 +884,12 @@
     {
         //always show the add window for magnet links when the download location is the same as the torrent file
         fShowMagnetAddWindowCheck.state = NSOnState;
-        [fShowMagnetAddWindowCheck setEnabled: NO];
+        fShowMagnetAddWindowCheck.enabled = NO;
     }
     else
     {
         fShowMagnetAddWindowCheck.state = [fDefaults boolForKey: @"MagnetOpenAsk"];
-        [fShowMagnetAddWindowCheck setEnabled: YES];
+        fShowMagnetAddWindowCheck.enabled = YES;
     }
 }
 
@@ -928,11 +928,11 @@
 {
     NSOpenPanel * panel = [NSOpenPanel openPanel];
 
-    [panel setPrompt: NSLocalizedString(@"Select", "Preferences -> Open panel prompt")];
-    [panel setAllowsMultipleSelection: NO];
-    [panel setCanChooseFiles: NO];
-    [panel setCanChooseDirectories: YES];
-    [panel setCanCreateDirectories: YES];
+    panel.prompt = NSLocalizedString(@"Select", "Preferences -> Open panel prompt");
+    panel.allowsMultipleSelection = NO;
+    panel.canChooseFiles = NO;
+    panel.canChooseDirectories = YES;
+    panel.canCreateDirectories = YES;
 
     [panel beginSheetModalForWindow: self.window completionHandler: ^(NSInteger result) {
         if (result == NSFileHandlingPanelOKButton)
@@ -1425,10 +1425,10 @@
     windowRect.origin.y -= difference;
     windowRect.size.height += difference;
 
-    [view setHidden: YES];
+    view.hidden = YES;
     window.contentView = view;
     [window setFrame: windowRect display: YES animate: YES];
-    [view setHidden: NO];
+    view.hidden = NO;
 
     //set title label
     if (sender)

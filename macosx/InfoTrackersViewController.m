@@ -48,7 +48,7 @@
 {
     if ((self = [super initWithNibName: @"InfoTrackersView" bundle: nil]))
     {
-        [self setTitle: NSLocalizedString(@"Trackers", "Inspector view -> title")];
+        self.title = NSLocalizedString(@"Trackers", "Inspector view -> title");
 
         fTrackerCell = [[TrackerCell alloc] init];
     }
@@ -106,7 +106,7 @@
         [fTrackerTable setTrackers: fTrackers];
 
         if (oldTrackers && [fTrackers isEqualToArray: oldTrackers])
-            [fTrackerTable setNeedsDisplay: YES];
+            fTrackerTable.needsDisplay =  YES;
         else
             [fTrackerTable reloadData];
 
@@ -359,20 +359,20 @@
         {
             alert.messageText = [NSString stringWithFormat: NSLocalizedString(@"Are you sure you want to remove %d trackers?",
                                                                 "Remove trackers alert -> title"), removeTrackerCount];
-            [alert setInformativeText: NSLocalizedString(@"Once removed, Transmission will no longer attempt to contact them."
-                                        " This cannot be undone.", "Remove trackers alert -> message")];
+            alert.informativeText = NSLocalizedString(@"Once removed, Transmission will no longer attempt to contact them."
+                " This cannot be undone.", "Remove trackers alert -> message");
         }
         else
         {
-            [alert setMessageText: NSLocalizedString(@"Are you sure you want to remove this tracker?", "Remove trackers alert -> title")];
-            [alert setInformativeText: NSLocalizedString(@"Once removed, Transmission will no longer attempt to contact it."
-                                        " This cannot be undone.", "Remove trackers alert -> message")];
+            alert.messageText = NSLocalizedString(@"Are you sure you want to remove this tracker?", "Remove trackers alert -> title");
+            alert.informativeText = NSLocalizedString(@"Once removed, Transmission will no longer attempt to contact it."
+                " This cannot be undone.", "Remove trackers alert -> message");
         }
 
         [alert addButtonWithTitle: NSLocalizedString(@"Remove", "Remove trackers alert -> button")];
         [alert addButtonWithTitle: NSLocalizedString(@"Cancel", "Remove trackers alert -> button")];
 
-        [alert setShowsSuppressionButton: YES];
+        alert.showsSuppressionButton = YES;
 
         NSInteger result = [alert runModal];
         if (alert.suppressionButton.state == NSOnState)

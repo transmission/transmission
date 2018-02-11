@@ -49,11 +49,11 @@
 - (void) awakeFromNib
 {
     //localizations
-    [fNoFilterButton setTitle: NSLocalizedString(@"All", "Filter Bar -> filter button")];
-    [fActiveFilterButton setTitle: NSLocalizedString(@"Active", "Filter Bar -> filter button")];
-    [fDownloadFilterButton setTitle: NSLocalizedString(@"Downloading", "Filter Bar -> filter button")];
-    [fSeedFilterButton setTitle: NSLocalizedString(@"Seeding", "Filter Bar -> filter button")];
-    [fPauseFilterButton setTitle: NSLocalizedString(@"Paused", "Filter Bar -> filter button")];
+    fNoFilterButton.title = NSLocalizedString(@"All", "Filter Bar -> filter button");
+    fActiveFilterButton.title = NSLocalizedString(@"Active", "Filter Bar -> filter button");
+    fDownloadFilterButton.title = NSLocalizedString(@"Downloading", "Filter Bar -> filter button");
+    fSeedFilterButton.title = NSLocalizedString(@"Seeding", "Filter Bar -> filter button");
+    fPauseFilterButton.title = NSLocalizedString(@"Paused", "Filter Bar -> filter button");
 
     fNoFilterButton.cell.backgroundStyle = NSBackgroundStyleRaised;
     fActiveFilterButton.cell.backgroundStyle = NSBackgroundStyleRaised;
@@ -61,13 +61,13 @@
     fSeedFilterButton.cell.backgroundStyle = NSBackgroundStyleRaised;
     fPauseFilterButton.cell.backgroundStyle = NSBackgroundStyleRaised;
 
-    [[fSearchField.searchMenuTemplate itemWithTag: FILTER_TYPE_TAG_NAME] setTitle:
-        NSLocalizedString(@"Name", "Filter Bar -> filter menu")];
-    [[fSearchField.searchMenuTemplate itemWithTag: FILTER_TYPE_TAG_TRACKER] setTitle:
-        NSLocalizedString(@"Tracker", "Filter Bar -> filter menu")];
+    [fSearchField.searchMenuTemplate itemWithTag: FILTER_TYPE_TAG_NAME].title =
+        NSLocalizedString(@"Name", "Filter Bar -> filter menu");
+    [fSearchField.searchMenuTemplate itemWithTag: FILTER_TYPE_TAG_TRACKER].title =
+        NSLocalizedString(@"Tracker", "Filter Bar -> filter menu");
 
-    [[fGroupsButton.menu itemWithTag: GROUP_FILTER_ALL_TAG] setTitle:
-        NSLocalizedString(@"All Groups", "Filter Bar -> group filter menu")];
+    [fGroupsButton.menu itemWithTag: GROUP_FILTER_ALL_TAG].title =
+        NSLocalizedString(@"All Groups", "Filter Bar -> group filter menu");
 
     [self resizeBar];
 

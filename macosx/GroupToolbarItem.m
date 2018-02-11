@@ -45,7 +45,7 @@
     NSMenu * menu = [[NSMenu alloc] initWithTitle: self.label];
     menuItem.submenu = menu;
 
-    [menu setAutoenablesItems: NO];
+    menu.autoenablesItems = NO;
 
     const NSInteger count = ((NSSegmentedControl *)self.view).segmentCount;
     for (NSInteger i = 0; i < count; i++)

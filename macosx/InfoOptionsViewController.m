@@ -48,7 +48,7 @@
 {
     if ((self = [super initWithNibName: @"InfoOptionsView" bundle: nil]))
     {
-        [self setTitle: NSLocalizedString(@"Options", "Inspector view -> title")];
+        self.title = NSLocalizedString(@"Options", "Inspector view -> title");
     }
 
     return self;
@@ -121,7 +121,7 @@
 
     //set upload view
     fUploadLimitCheck.state = uploadUseSpeedLimit;
-    [fUploadLimitCheck setEnabled: YES];
+    fUploadLimitCheck.enabled = YES;
 
     fUploadLimitLabel.enabled = uploadUseSpeedLimit == NSOnState;
     fUploadLimitField.enabled = uploadUseSpeedLimit == NSOnState;
@@ -132,7 +132,7 @@
 
     //set download view
     fDownloadLimitCheck.state = downloadUseSpeedLimit;
-    [fDownloadLimitCheck setEnabled: YES];
+    fDownloadLimitCheck.enabled = YES;
 
     fDownloadLimitLabel.enabled = downloadUseSpeedLimit == NSOnState;
     fDownloadLimitField.enabled = downloadUseSpeedLimit == NSOnState;
@@ -143,7 +143,7 @@
 
     //set global check
     fGlobalLimitCheck.state = globalUseSpeedLimit;
-    [fGlobalLimitCheck setEnabled: YES];
+    fGlobalLimitCheck.enabled = YES;
 
     //get ratio and idle info
     enumerator = [fTorrents objectEnumerator];
@@ -184,7 +184,7 @@
     else
         index = -1;
     [fRatioPopUp selectItemAtIndex: index];
-    [fRatioPopUp setEnabled: YES];
+    fRatioPopUp.enabled = YES;
 
     fRatioLimitField.hidden = checkRatio != TR_RATIOLIMIT_SINGLE;
     if (ratioLimit != INVALID)
@@ -204,7 +204,7 @@
     else
         index = -1;
     [fIdlePopUp selectItemAtIndex: index];
-    [fIdlePopUp setEnabled: YES];
+    fIdlePopUp.enabled = YES;
 
     fIdleLimitField.hidden = checkIdle != TR_IDLELIMIT_SINGLE;
     if (idleLimit != INVALID)
@@ -217,7 +217,7 @@
 
     //set remove transfer when seeding finishes
     fRemoveSeedingCompleteCheck.state = removeWhenFinishSeeding;
-    [fRemoveSeedingCompleteCheck setEnabled: YES];
+    fRemoveSeedingCompleteCheck.enabled = YES;
 
     //get priority info
     enumerator = [fTorrents objectEnumerator];
@@ -241,7 +241,7 @@
     else
         index = -1;
     [fPriorityPopUp selectItemAtIndex: index];
-    [fPriorityPopUp setEnabled: YES];
+    fPriorityPopUp.enabled = YES;
 
     //get peer info
     enumerator = [fTorrents objectEnumerator];
@@ -259,8 +259,8 @@
     }
 
     //set peer view
-    [fPeersConnectField setEnabled: YES];
-    [fPeersConnectLabel setEnabled: YES];
+    fPeersConnectField.enabled = YES;
+    fPeersConnectLabel.enabled = YES;
     if (maxPeers != INVALID)
         fPeersConnectField.intValue = maxPeers;
     else
@@ -483,43 +483,43 @@
 {
     if (fTorrents.count == 0)
     {
-        [fUploadLimitCheck setEnabled: NO];
+        fUploadLimitCheck.enabled = NO;
         fUploadLimitCheck.state = NSOffState;
-        [fUploadLimitField setEnabled: NO];
-        [fUploadLimitLabel setEnabled: NO];
+        fUploadLimitField.enabled = NO;
+        fUploadLimitLabel.enabled = NO;
         fUploadLimitField.stringValue = @"";
 
-        [fDownloadLimitCheck setEnabled: NO];
+        fDownloadLimitCheck.enabled = NO;
         fDownloadLimitCheck.state = NSOffState;
-        [fDownloadLimitField setEnabled: NO];
-        [fDownloadLimitLabel setEnabled: NO];
+        fDownloadLimitField.enabled = NO;
+        fDownloadLimitLabel.enabled = NO;
         fDownloadLimitField.stringValue = @"";
 
-        [fGlobalLimitCheck setEnabled: NO];
+        fGlobalLimitCheck.enabled = NO;
         fGlobalLimitCheck.state = NSOffState;
 
-        [fPriorityPopUp setEnabled: NO];
+        fPriorityPopUp.enabled = NO;
         [fPriorityPopUp selectItemAtIndex: -1];
 
-        [fRatioPopUp setEnabled: NO];
+        fRatioPopUp.enabled = NO;
         [fRatioPopUp selectItemAtIndex: -1];
-        [fRatioLimitField setHidden: YES];
+        fRatioLimitField.hidden = YES;
         fRatioLimitField.stringValue = @"";
-        [fRatioLimitGlobalLabel setHidden: YES];
+        fRatioLimitGlobalLabel.hidden = YES;
 
-        [fIdlePopUp setEnabled: NO];
+        fIdlePopUp.enabled = NO;
         [fIdlePopUp selectItemAtIndex: -1];
-        [fIdleLimitField setHidden: YES];
+        fIdleLimitField.hidden = YES;
         fIdleLimitField.stringValue = @"";
-        [fIdleLimitLabel setHidden: YES];
-        [fIdleLimitGlobalLabel setHidden: YES];
+        fIdleLimitLabel.hidden = YES;
+        fIdleLimitGlobalLabel.hidden = YES;
 
-        [fRemoveSeedingCompleteCheck setEnabled: NO];
+        fRemoveSeedingCompleteCheck.enabled = NO;
         fRemoveSeedingCompleteCheck.state = NSOffState;
 
-        [fPeersConnectField setEnabled: NO];
+        fPeersConnectField.enabled = NO;
         fPeersConnectField.stringValue = @"";
-        [fPeersConnectLabel setEnabled: NO];
+        fPeersConnectLabel.enabled = NO;
     }
     else
         [self updateOptions];

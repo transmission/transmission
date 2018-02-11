@@ -47,7 +47,7 @@ AboutWindowController * fAboutBoxInstance = nil;
     //size license button
     const CGFloat oldButtonWidth = NSWidth(fLicenseButton.frame);
 
-    [fLicenseButton setTitle: NSLocalizedString(@"License", "About window -> license button")];
+    fLicenseButton.title = NSLocalizedString(@"License", "About window -> license button");
     [fLicenseButton sizeToFit];
 
     NSRect buttonFrame = fLicenseButton.frame;
@@ -71,7 +71,7 @@ AboutWindowController * fAboutBoxInstance = nil;
     NSString * licenseText = [NSString stringWithContentsOfFile: [[NSBundle mainBundle] pathForResource: @"COPYING" ofType: nil]
                                 usedEncoding: nil error: NULL];
     fLicenseView.string = licenseText;
-    [fLicenseCloseButton setTitle: NSLocalizedString(@"OK", "About window -> license close button")];
+    fLicenseCloseButton.title = NSLocalizedString(@"OK", "About window -> license close button");
 
     [NSApp beginSheet: fLicenseSheet modalForWindow: self.window modalDelegate: nil didEndSelector: nil contextInfo: nil];
 }

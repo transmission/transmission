@@ -44,7 +44,7 @@ NSString * urlString = nil;
 
 - (void) awakeFromNib
 {
-    [fLabelField setStringValue: NSLocalizedString(@"Internet address of torrent file:", "URL sheet label")];
+    fLabelField.stringValue = NSLocalizedString(@"Internet address of torrent file:", "URL sheet label");
 
     if (urlString)
     {
@@ -54,8 +54,8 @@ NSString * urlString = nil;
         [self updateOpenButtonForURL: urlString];
     }
 
-    [fOpenButton setTitle: NSLocalizedString(@"Open", "URL sheet button")];
-    [fCancelButton setTitle: NSLocalizedString(@"Cancel", "URL sheet button")];
+    fOpenButton.title = NSLocalizedString(@"Open", "URL sheet button");
+    fCancelButton.title = NSLocalizedString(@"Cancel", "URL sheet button");
 
     [fOpenButton sizeToFit];
     [fCancelButton sizeToFit];

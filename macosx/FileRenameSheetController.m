@@ -81,7 +81,7 @@ typedef void (^CompletionBlock)(BOOL);
     (self.labelField).stringValue = label;
 
     (self.inputField).stringValue = self.originalName;
-    [self.renameButton setEnabled: NO];
+    self.renameButton.enabled = NO;
 
     //resize the buttons so that they're long enough and the same width
     const NSRect oldRenameFrame = (self.renameButton).frame;
@@ -91,8 +91,8 @@ typedef void (^CompletionBlock)(BOOL);
     [self.renameButton sizeToFit];
     const CGFloat extra = NSWidth(oldRenameFrame) - NSWidth((self.renameButton).frame);
 
-    [self.renameButton setTitle: NSLocalizedString(@"Rename", "rename sheet button")];
-    [self.cancelButton setTitle: NSLocalizedString(@"Cancel", "rename sheet button")];
+    self.renameButton.title = NSLocalizedString(@"Rename", "rename sheet button");
+    self.cancelButton.title = NSLocalizedString(@"Cancel", "rename sheet button");
 
     [self.renameButton sizeToFit];
     [self.cancelButton sizeToFit];

@@ -44,7 +44,7 @@
 {
     if ((self = [super initWithNibName: @"InfoActivityView" bundle: nil]))
     {
-        [self setTitle: NSLocalizedString(@"Activity", "Inspector view -> title")];
+        self.title = NSLocalizedString(@"Activity", "Inspector view -> title");
     }
 
     return self;
@@ -262,7 +262,7 @@
 
         [fPiecesControl setSelected: NO forSegment: PIECES_CONTROL_AVAILABLE];
         [fPiecesControl setSelected: NO forSegment: PIECES_CONTROL_PROGRESS];
-        [fPiecesControl setEnabled: NO];
+        fPiecesControl.enabled =  NO;
         [fPiecesView setTorrent: nil];
     }
     else
@@ -272,7 +272,7 @@
         const BOOL piecesAvailableSegment = [[NSUserDefaults standardUserDefaults] boolForKey: @"PiecesViewShowAvailability"];
         [fPiecesControl setSelected: piecesAvailableSegment forSegment: PIECES_CONTROL_AVAILABLE];
         [fPiecesControl setSelected: !piecesAvailableSegment forSegment: PIECES_CONTROL_PROGRESS];
-        [fPiecesControl setEnabled: YES];
+        fPiecesControl.enabled = YES;
 
         [fPiecesView setTorrent: torrent];
     }

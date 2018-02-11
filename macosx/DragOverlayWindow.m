@@ -41,14 +41,14 @@
 
         self.backgroundColor = [NSColor colorWithCalibratedWhite: 0.0 alpha: 0.5];
         self.alphaValue = 0.0;
-        [self setOpaque: NO];
-        [self setHasShadow: NO];
+        self.opaque = NO;
+        self.hasShadow = NO;
 
         DragOverlayView * view = [[DragOverlayView alloc] initWithFrame: self.frame];
         self.contentView = view;
 
-        [self setReleasedWhenClosed: NO];
-        [self setIgnoresMouseEvents: YES];
+        self.releasedWhenClosed = NO;
+        self.ignoresMouseEvents = YES;
 
         fFadeInAnimation = [[NSViewAnimation alloc] initWithViewAnimations: @[
                                                                               @{NSViewAnimationTargetKey: self,

@@ -47,7 +47,7 @@ BlocklistDownloaderViewController * fBLViewController = nil;
 
 - (void) awakeFromNib
 {
-    [fButton setTitle: NSLocalizedString(@"Cancel", "Blocklist -> cancel button")];
+    fButton.title = NSLocalizedString(@"Cancel", "Blocklist -> cancel button");
 
     const CGFloat oldWidth = NSWidth(fButton.frame);
     [fButton sizeToFit];
@@ -56,7 +56,7 @@ BlocklistDownloaderViewController * fBLViewController = nil;
     buttonFrame.origin.x -= NSWidth(buttonFrame) - oldWidth;
     fButton.frame = buttonFrame;
 
-    [fProgressBar setUsesThreadedAnimation: YES];
+    fProgressBar.usesThreadedAnimation = YES;
     [fProgressBar startAnimation: self];
 }
 
@@ -68,7 +68,7 @@ BlocklistDownloaderViewController * fBLViewController = nil;
 - (void) setStatusStarting
 {
     fTextField.stringValue = [NSLocalizedString(@"Connecting to site", "Blocklist -> message") stringByAppendingEllipsis];
-    [fProgressBar setIndeterminate: YES];
+    fProgressBar.indeterminate = YES;
 }
 
 - (void) setStatusProgressForCurrentSize: (NSUInteger) currentSize expectedSize: (long long) expectedSize
@@ -76,7 +76,7 @@ BlocklistDownloaderViewController * fBLViewController = nil;
     NSString * string = NSLocalizedString(@"Downloading blocklist", "Blocklist -> message");
     if (expectedSize != NSURLResponseUnknownLength)
     {
-        [fProgressBar setIndeterminate: NO];
+        fProgressBar.indeterminate = NO;
 
         NSString * substring = [NSString stringForFilePartialSize: currentSize fullSize: expectedSize];
         string = [string stringByAppendingFormat: @" (%@)",  substring];
@@ -91,11 +91,11 @@ BlocklistDownloaderViewController * fBLViewController = nil;
 - (void) setStatusProcessing
 {
     //change to indeterminate while processing
-    [fProgressBar setIndeterminate: YES];
+    fProgressBar.indeterminate = YES;
     [fProgressBar startAnimation: self];
 
     fTextField.stringValue = [NSLocalizedString(@"Processing blocklist", "Blocklist -> message") stringByAppendingEllipsis];
-    [fButton setEnabled: NO];
+    fButton.enabled = NO;
 }
 
 - (void) setFinished
@@ -113,7 +113,7 @@ BlocklistDownloaderViewController * fBLViewController = nil;
 
     NSAlert * alert = [[NSAlert alloc] init];
     [alert addButtonWithTitle: NSLocalizedString(@"OK", "Blocklist -> button")];
-    [alert setMessageText: NSLocalizedString(@"Download of the blocklist failed.", "Blocklist -> message")];
+    alert.messageText = NSLocalizedString(@"Download of the blocklist failed.", "Blocklist -> message");
     alert.alertStyle = NSWarningAlertStyle;
 
     alert.informativeText = error;

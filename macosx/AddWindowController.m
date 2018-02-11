@@ -71,7 +71,7 @@
         fGroupValue = [torrent groupValue];
         fGroupValueDetermination = TorrentDeterminationAutomatic;
 
-        [fVerifyIndicator setUsesThreadedAnimation: YES];
+        fVerifyIndicator.usesThreadedAnimation = YES;
     }
     return self;
 }
@@ -93,9 +93,9 @@
 
     if (![fTorrent isFolder])
     {
-        [fFileFilterField setHidden: YES];
-        [fCheckAllButton setHidden: YES];
-        [fUncheckAllButton setHidden: YES];
+        fFileFilterField.hidden = YES;
+        fCheckAllButton.hidden = YES;
+        fUncheckAllButton.hidden = YES;
 
         NSRect scrollFrame = fFileScrollView.frame;
         const CGFloat diff = NSMinY(fFileScrollView.frame) - NSMinY(fFileFilterField.frame);
@@ -131,7 +131,7 @@
     else
     {
         fLocationField.stringValue = @"";
-        [fLocationImageView setImage: nil];
+        fLocationImageView.image = nil;
     }
 
     fTimer = [NSTimer scheduledTimerWithTimeInterval: UPDATE_SECONDS target: self
@@ -162,11 +162,11 @@
 {
     NSOpenPanel * panel = [NSOpenPanel openPanel];
 
-    [panel setPrompt: NSLocalizedString(@"Select", "Open torrent -> prompt")];
-    [panel setAllowsMultipleSelection: NO];
-    [panel setCanChooseFiles: NO];
-    [panel setCanChooseDirectories: YES];
-    [panel setCanCreateDirectories: YES];
+    panel.prompt = NSLocalizedString(@"Select", "Open torrent -> prompt");
+    panel.allowsMultipleSelection = NO;
+    panel.canChooseFiles = NO;
+    panel.canChooseDirectories = YES;
+    panel.canCreateDirectories = YES;
 
     panel.message = [NSString stringWithFormat: NSLocalizedString(@"Select the download folder for \"%@\"",
                         "Add -> select destination folder"), [fTorrent name]];
@@ -191,14 +191,14 @@
         && [[NSUserDefaults standardUserDefaults] boolForKey: @"WarningFolderDataSameName"])
     {
         NSAlert * alert = [[NSAlert alloc] init];
-        [alert setMessageText: NSLocalizedString(@"The destination directory and root data directory have the same name.",
-                                "Add torrent -> same name -> title")];
-        [alert setInformativeText: NSLocalizedString(@"If you are attempting to use already existing data,"
-            " the root data directory should be inside the destination directory.", "Add torrent -> same name -> message")];
+        alert.messageText = NSLocalizedString(@"The destination directory and root data directory have the same name.",
+            "Add torrent -> same name -> title");
+        alert.informativeText = NSLocalizedString(@"If you are attempting to use already existing data,"
+            " the root data directory should be inside the destination directory.", "Add torrent -> same name -> message");
         alert.alertStyle = NSWarningAlertStyle;
         [alert addButtonWithTitle: NSLocalizedString(@"Cancel", "Add torrent -> same name -> button")];
         [alert addButtonWithTitle: NSLocalizedString(@"Add", "Add torrent -> same name -> button")];
-        [alert setShowsSuppressionButton: YES];
+        alert.showsSuppressionButton = YES;
 
         [alert beginSheetModalForWindow: self.window modalDelegate: self
             didEndSelector: @selector(sameNameAlertDidEnd:returnCode:contextInfo:) contextInfo: nil];
@@ -322,7 +322,7 @@
             fVerifyIndicator.doubleValue = [fTorrent checkingProgress];
     }
     else {
-        [fVerifyIndicator setIndeterminate: YES]; //we want to hide when stopped, which only applies when indeterminate
+        fVerifyIndicator.indeterminate = YES; //we want to hide when stopped, which only applies when indeterminate
         [fVerifyIndicator stopAnimation: self];
     }
 }

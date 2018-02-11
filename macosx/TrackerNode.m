@@ -108,7 +108,7 @@
         NSDateFormatter * dateFormatter = [[NSDateFormatter alloc] init];
         dateFormatter.dateStyle = NSDateFormatterFullStyle;
         dateFormatter.timeStyle = NSDateFormatterShortStyle;
-        [dateFormatter setDoesRelativeDateFormatting: YES];
+        dateFormatter.doesRelativeDateFormatting = YES;
 
         dateString = [dateFormatter stringFromDate: [NSDate dateWithTimeIntervalSince1970: fStat.lastAnnounceTime]];
     }
@@ -197,7 +197,7 @@
         NSDateFormatter * dateFormatter = [[NSDateFormatter alloc] init];
         dateFormatter.dateStyle = NSDateFormatterFullStyle;
         dateFormatter.timeStyle = NSDateFormatterShortStyle;
-        [dateFormatter setDoesRelativeDateFormatting: YES];
+        dateFormatter.doesRelativeDateFormatting = YES;
 
         dateString = [dateFormatter stringFromDate: [NSDate dateWithTimeIntervalSince1970: fStat.lastScrapeTime]];
     }

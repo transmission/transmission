@@ -53,7 +53,7 @@
 - (void) awakeFromNib
 {
     NSWindow * window = self.window;
-    [window setFrameAutosaveName: @"MessageWindowFrame"];
+    window.frameAutosaveName = @"MessageWindowFrame";
     [window setFrameUsingName: @"MessageWindowFrame"];
     window.restorationClass = [self class];
 
@@ -62,12 +62,12 @@
 
     [window setContentBorderThickness: NSMinY(fMessageTable.enclosingScrollView.frame) forEdge: NSMinYEdge];
 
-    [self.window setTitle: NSLocalizedString(@"Message Log", "Message window -> title")];
+    self.window.title = NSLocalizedString(@"Message Log", "Message window -> title");
 
     //set images and text for popup button items
-    [[fLevelButton itemAtIndex: LEVEL_ERROR] setTitle: NSLocalizedString(@"Error", "Message window -> level string")];
-    [[fLevelButton itemAtIndex: LEVEL_INFO] setTitle: NSLocalizedString(@"Info", "Message window -> level string")];
-    [[fLevelButton itemAtIndex: LEVEL_DEBUG] setTitle: NSLocalizedString(@"Debug", "Message window -> level string")];
+    [fLevelButton itemAtIndex: LEVEL_ERROR].title = NSLocalizedString(@"Error", "Message window -> level string");
+    [fLevelButton itemAtIndex: LEVEL_INFO].title = NSLocalizedString(@"Info", "Message window -> level string");
+    [fLevelButton itemAtIndex: LEVEL_DEBUG].title = NSLocalizedString(@"Debug", "Message window -> level string");
     if (![NSApp isOnYosemiteOrBetter])
     {
         [fLevelButton itemAtIndex: LEVEL_ERROR].image = [NSImage imageNamed: @"RedDotGlossy"];
@@ -79,12 +79,12 @@
     [fLevelButton sizeToFit];
 
     //set table column text
-    [[fMessageTable tableColumnWithIdentifier: @"Date"].headerCell setTitle: NSLocalizedString(@"Date",
-        "Message window -> table column")];
-    [[fMessageTable tableColumnWithIdentifier: @"Name"].headerCell setTitle: NSLocalizedString(@"Process",
-        "Message window -> table column")];
-    [[fMessageTable tableColumnWithIdentifier: @"Message"].headerCell setTitle: NSLocalizedString(@"Message",
-        "Message window -> table column")];
+    [fMessageTable tableColumnWithIdentifier: @"Date"].headerCell.title = NSLocalizedString(@"Date",
+        "Message window -> table column");
+    [fMessageTable tableColumnWithIdentifier: @"Name"].headerCell.title = NSLocalizedString(@"Process",
+        "Message window -> table column");
+    [fMessageTable tableColumnWithIdentifier: @"Message"].headerCell.title = NSLocalizedString(@"Message",
+        "Message window -> table column");
 
     //set and size buttons
     fSaveButton.title = [NSLocalizedString(@"Save", "Message window -> save button") stringByAppendingEllipsis];
@@ -97,7 +97,7 @@
 
     const CGFloat oldClearButtonWidth = fClearButton.frame.size.width;
 
-    [fClearButton setTitle: NSLocalizedString(@"Clear", "Message window -> save button")];
+    fClearButton.title = NSLocalizedString(@"Clear", "Message window -> save button");
     [fClearButton sizeToFit];
 
     NSRect clearButtonFrame = fClearButton.frame;
@@ -385,9 +385,9 @@
 {
     NSSavePanel * panel = [NSSavePanel savePanel];
     panel.allowedFileTypes = @[@"txt"];
-    [panel setCanSelectHiddenExtension: YES];
+    panel.canSelectHiddenExtension = YES;
 
-    [panel setNameFieldStringValue: NSLocalizedString(@"untitled", "Save log panel -> default file name")];
+    panel.nameFieldStringValue = NSLocalizedString(@"untitled", "Save log panel -> default file name");
 
     [panel beginSheetModalForWindow: self.window completionHandler: ^(NSInteger result) {
         if (result == NSFileHandlingPanelOKButton)
@@ -408,7 +408,7 @@
             {
                 NSAlert * alert = [[NSAlert alloc] init];
                 [alert addButtonWithTitle: NSLocalizedString(@"OK", "Save log alert panel -> button")];
-                [alert setMessageText: NSLocalizedString(@"Log Could Not Be Saved", "Save log alert panel -> title")];
+                alert.messageText = NSLocalizedString(@"Log Could Not Be Saved", "Save log alert panel -> title");
                 alert.informativeText = [NSString stringWithFormat:
                                             NSLocalizedString(@"There was a problem creating the file \"%@\".",
                                                               "Save log alert panel -> message"), panel.URL.path.lastPathComponent];

@@ -93,7 +93,7 @@
     else
     {
         fLocationField.stringValue = @"";
-        [fLocationImageView setImage: nil];
+        fLocationImageView.image = nil;
     }
 
     #warning when 10.7-only, switch to auto layout
@@ -175,18 +175,18 @@
 {
     NSOpenPanel * panel = [NSOpenPanel openPanel];
 
-    [panel setPrompt: NSLocalizedString(@"Select", "Open torrent -> prompt")];
-    [panel setAllowsMultipleSelection: NO];
-    [panel setCanChooseFiles: NO];
-    [panel setCanChooseDirectories: YES];
-    [panel setCanCreateDirectories: YES];
+    panel.prompt = NSLocalizedString(@"Select", "Open torrent -> prompt");
+    panel.allowsMultipleSelection = NO;
+    panel.canChooseFiles = NO;
+    panel.canChooseDirectories = YES;
+    panel.canCreateDirectories = YES;
 
     panel.message = [NSString stringWithFormat: NSLocalizedString(@"Select the download folder for \"%@\"",
                         "Add -> select destination folder"), [fTorrent name]];
 
     [panel beginSheetModalForWindow: self.window completionHandler: ^(NSInteger result) {
         if (result == NSFileHandlingPanelOKButton)
-            [self setDestinationPath: (panel.URLs[0]).path determinationType:TorrentDeterminationUserSpecified];
+            [self setDestinationPath: panel.URLs[0].path determinationType:TorrentDeterminationUserSpecified];
         else
         {
             if (!fDestination)
@@ -201,14 +201,14 @@
         && [[NSUserDefaults standardUserDefaults] boolForKey: @"WarningFolderDataSameName"])
     {
         NSAlert * alert = [[NSAlert alloc] init];
-        [alert setMessageText: NSLocalizedString(@"The destination directory and root data directory have the same name.",
-                                "Add torrent -> same name -> title")];
-        [alert setInformativeText: NSLocalizedString(@"If you are attempting to use already existing data,"
-            " the root data directory should be inside the destination directory.", "Add torrent -> same name -> message")];
+        alert.messageText = NSLocalizedString(@"The destination directory and root data directory have the same name.",
+            "Add torrent -> same name -> title");
+        alert.informativeText = NSLocalizedString(@"If you are attempting to use already existing data,"
+            " the root data directory should be inside the destination directory.", "Add torrent -> same name -> message");
         alert.alertStyle = NSWarningAlertStyle;
         [alert addButtonWithTitle: NSLocalizedString(@"Cancel", "Add torrent -> same name -> button")];
         [alert addButtonWithTitle: NSLocalizedString(@"Add", "Add torrent -> same name -> button")];
-        [alert setShowsSuppressionButton: YES];
+        alert.showsSuppressionButton = YES;
 
         [alert beginSheetModalForWindow: self.window modalDelegate: self
             didEndSelector: @selector(sameNameAlertDidEnd:returnCode:contextInfo:) contextInfo: nil];

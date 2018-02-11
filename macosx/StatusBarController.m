@@ -61,14 +61,14 @@ typedef NS_ENUM(unsigned int, statusTag) {
 - (void) awakeFromNib
 {
     //localize menu items
-    [[fStatusButton.menu itemWithTag: STATUS_RATIO_TOTAL_TAG] setTitle: NSLocalizedString(@"Total Ratio",
-        "Status Bar -> status menu")];
-    [[fStatusButton.menu itemWithTag: STATUS_RATIO_SESSION_TAG] setTitle: NSLocalizedString(@"Session Ratio",
-        "Status Bar -> status menu")];
-    [[fStatusButton.menu itemWithTag: STATUS_TRANSFER_TOTAL_TAG] setTitle: NSLocalizedString(@"Total Transfer",
-        "Status Bar -> status menu")];
-    [[fStatusButton.menu itemWithTag: STATUS_TRANSFER_SESSION_TAG] setTitle: NSLocalizedString(@"Session Transfer",
-        "Status Bar -> status menu")];
+    [fStatusButton.menu itemWithTag: STATUS_RATIO_TOTAL_TAG].title = NSLocalizedString(@"Total Ratio",
+        "Status Bar -> status menu");
+    [fStatusButton.menu itemWithTag: STATUS_RATIO_SESSION_TAG].title = NSLocalizedString(@"Session Ratio",
+        "Status Bar -> status menu");
+    [fStatusButton.menu itemWithTag: STATUS_TRANSFER_TOTAL_TAG].title = NSLocalizedString(@"Total Transfer",
+        "Status Bar -> status menu");
+    [fStatusButton.menu itemWithTag: STATUS_TRANSFER_SESSION_TAG].title = NSLocalizedString(@"Session Transfer",
+        "Status Bar -> status menu");
 
     fStatusButton.cell.backgroundStyle = NSBackgroundStyleRaised;
     fTotalDLField.cell.backgroundStyle = NSBackgroundStyleRaised;

@@ -51,7 +51,7 @@
 
 - (instancetype) initWithTorrent: (Torrent *) torrent destination: (NSString *) path controller: (Controller *) controller;
 
-@property (nonatomic, readonly, copy) Torrent *torrent;
+@property (nonatomic, readonly) Torrent *torrent;
 
 - (void) setDestination: (id) sender;
 

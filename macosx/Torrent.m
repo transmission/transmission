@@ -549,8 +549,8 @@ bool trashDataFile(const char * filename, tr_error ** error)
         && [folder hasPrefix: oldFolder])
     {
         NSAlert * alert = [[NSAlert alloc] init];
-        [alert setMessageText: NSLocalizedString(@"A folder cannot be moved to inside itself.",
-                                                    "Move inside itself alert -> title")];
+        alert.messageText = NSLocalizedString(@"A folder cannot be moved to inside itself.",
+            "Move inside itself alert -> title");
         alert.informativeText = [NSString stringWithFormat:
                         NSLocalizedString(@"The move operation of \"%@\" cannot be done.",
                                             "Move inside itself alert -> message"), [self name]];
@@ -572,7 +572,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
     else
     {
         NSAlert * alert = [[NSAlert alloc] init];
-        [alert setMessageText: NSLocalizedString(@"There was an error moving the data file.", "Move error alert -> title")];
+        alert.messageText = NSLocalizedString(@"There was an error moving the data file.", "Move error alert -> title");
         alert.informativeText = [NSString stringWithFormat:
                 NSLocalizedString(@"The move operation of \"%@\" cannot be done.", "Move error alert -> message"), [self name]];
         [alert addButtonWithTitle: NSLocalizedString(@"OK", "Move error alert -> button")];
@@ -614,9 +614,9 @@ bool trashDataFile(const char * filename, tr_error ** error)
             [alert addButtonWithTitle: NSLocalizedString(@"OK", "Torrent disk space alert -> button")];
             [alert addButtonWithTitle: NSLocalizedString(@"Download Anyway", "Torrent disk space alert -> button")];
 
-            [alert setShowsSuppressionButton: YES];
-            [alert.suppressionButton setTitle: NSLocalizedString(@"Do not check disk space again",
-                                                    "Torrent disk space alert -> button")];
+            alert.showsSuppressionButton = YES;
+            alert.suppressionButton.title = NSLocalizedString(@"Do not check disk space again",
+                "Torrent disk space alert -> button");
 
             const NSInteger result = [alert runModal];
             if (alert.suppressionButton.state == NSOnState)

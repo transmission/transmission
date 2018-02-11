@@ -62,8 +62,8 @@ typedef NS_ENUM(unsigned int, filePriorityMenuTag) {
     fOutline.target = self;
 
     //set table header tool tips
-    [[fOutline tableColumnWithIdentifier: @"Check"] setHeaderToolTip: NSLocalizedString(@"Download", "file table -> header tool tip")];
-    [[fOutline tableColumnWithIdentifier: @"Priority"] setHeaderToolTip: NSLocalizedString(@"Priority", "file table -> header tool tip")];
+    [fOutline tableColumnWithIdentifier: @"Check"].headerToolTip = NSLocalizedString(@"Download", "file table -> header tool tip");
+    [fOutline tableColumnWithIdentifier: @"Priority"].headerToolTip = NSLocalizedString(@"Priority", "file table -> header tool tip");
 
     fOutline.menu = [self menu];
 
@@ -195,7 +195,7 @@ typedef NS_ENUM(unsigned int, filePriorityMenuTag) {
 {
     [fTorrent updateFileStat];
 
-    [fOutline setNeedsDisplay: YES];
+    fOutline.needsDisplay = YES;
 }
 
 - (void) outlineViewSelectionDidChange: (NSNotification *) notification
@@ -260,7 +260,7 @@ typedef NS_ENUM(unsigned int, filePriorityMenuTag) {
             indexSet = ((FileListNode *)item).indexes;
 
         [fTorrent setFileCheckState: [object intValue] != NSOffState ? NSOnState : NSOffState forIndexes: indexSet];
-        [fOutline setNeedsDisplay: YES];
+        fOutline.needsDisplay = YES;
 
         [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateUI" object: nil];
     }
@@ -339,7 +339,7 @@ typedef NS_ENUM(unsigned int, filePriorityMenuTag) {
         [itemIndexes addIndexes: [[fOutline itemAtRow: i] indexes]];
 
     [fTorrent setFileCheckState: state forIndexes: itemIndexes];
-    [fOutline setNeedsDisplay: YES];
+    fOutline.needsDisplay = YES;
 }
 
 - (void) setOnlySelectedCheck: (id) sender
@@ -355,21 +355,21 @@ typedef NS_ENUM(unsigned int, filePriorityMenuTag) {
     [remainingItemIndexes removeIndexes: itemIndexes];
     [fTorrent setFileCheckState: NSOffState forIndexes: remainingItemIndexes];
 
-    [fOutline setNeedsDisplay: YES];
+    fOutline.needsDisplay = YES;
 }
 
 - (void) checkAll
 {
     NSIndexSet * indexSet = [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [fTorrent fileCount])];
     [fTorrent setFileCheckState: NSOnState forIndexes: indexSet];
-    [fOutline setNeedsDisplay: YES];
+    fOutline.needsDisplay = YES;
 }
 
 - (void) uncheckAll
 {
     NSIndexSet * indexSet = [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [fTorrent fileCount])];
     [fTorrent setFileCheckState: NSOffState forIndexes: indexSet];
-    [fOutline setNeedsDisplay: YES];
+    fOutline.needsDisplay = YES;
 }
 
 - (void) setPriority: (id) sender
@@ -393,7 +393,7 @@ typedef NS_ENUM(unsigned int, filePriorityMenuTag) {
         [itemIndexes addIndexes: [[fOutline itemAtRow: i] indexes]];
 
     [fTorrent setFilePriority: priority forIndexes: itemIndexes];
-    [fOutline setNeedsDisplay: YES];
+    fOutline.needsDisplay = YES;
 }
 
 - (void) revealFile: (id) sender

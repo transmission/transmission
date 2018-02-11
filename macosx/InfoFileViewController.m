@@ -40,7 +40,7 @@
 {
     if ((self = [super initWithNibName: @"InfoFileView" bundle: nil]))
     {
-        [self setTitle: NSLocalizedString(@"Files", "Inspector view -> title")];
+        self.title = NSLocalizedString(@"Files", "Inspector view -> title");
     }
 
     return self;
@@ -59,8 +59,8 @@
     [fFileFilterField.cell setPlaceholderString: NSLocalizedString(@"Filter", "inspector -> file filter")];
 
     //localize and place all and none buttons
-    [fCheckAllButton setTitle: NSLocalizedString(@"All", "inspector -> check all")];
-    [fUncheckAllButton setTitle: NSLocalizedString(@"None", "inspector -> check all")];
+    fCheckAllButton.title = NSLocalizedString(@"All", "inspector -> check all");
+    fUncheckAllButton.title = NSLocalizedString(@"None", "inspector -> check all");
 
     NSRect checkAllFrame = fCheckAllButton.frame;
     NSRect uncheckAllFrame = fUncheckAllButton.frame;
@@ -214,18 +214,18 @@
 
         if (!isFolder)
         {
-            [fCheckAllButton setEnabled: NO];
-            [fUncheckAllButton setEnabled: NO];
+            fCheckAllButton.enabled = NO;
+            fUncheckAllButton.enabled = NO;
         }
     }
     else
     {
         [fFileController setTorrent: nil];
 
-        [fFileFilterField setEnabled: NO];
+        fFileFilterField.enabled = NO;
 
-        [fCheckAllButton setEnabled: NO];
-        [fUncheckAllButton setEnabled: NO];
+        fCheckAllButton.enabled = NO;
+        fUncheckAllButton.enabled = NO;
     }
 
     fSet = YES;

@@ -89,7 +89,7 @@
     {
        NSInteger index = [[GroupsController groups] indexForRow: fTableView.selectedRow];
        [[GroupsController groups] setColor: fSelectedColorView.color forIndex: index];
-       [fTableView setNeedsDisplay: YES];
+       fTableView.needsDisplay = YES;
     }
 }
 
@@ -99,7 +99,7 @@
     {
        NSInteger index = [[GroupsController groups] indexForRow: fTableView.selectedRow];
        [[GroupsController groups] setName: fSelectedColorNameField.stringValue forIndex: index];
-       [fTableView setNeedsDisplay: YES];
+       fTableView.needsDisplay = YES;
     }
 }
 
@@ -201,11 +201,11 @@
 {
     NSOpenPanel * panel = [NSOpenPanel openPanel];
 
-    [panel setPrompt: NSLocalizedString(@"Select", "Preferences -> Open panel prompt")];
-    [panel setAllowsMultipleSelection: NO];
-    [panel setCanChooseFiles: NO];
-    [panel setCanChooseDirectories: YES];
-    [panel setCanCreateDirectories: YES];
+    panel.prompt = NSLocalizedString(@"Select", "Preferences -> Open panel prompt");
+    panel.allowsMultipleSelection = NO;
+    panel.canChooseFiles = NO;
+    panel.canChooseDirectories = YES;
+    panel.canCreateDirectories = YES;
 
     [panel beginSheetModalForWindow: fCustomLocationPopUp.window completionHandler: ^(NSInteger result) {
         const NSInteger index = [[GroupsController groups] indexForRow: fTableView.selectedRow];
@@ -287,8 +287,8 @@
     if (![[GroupsController groups] autoAssignRulesForIndex: index])
     {
         [[GroupsController groups] setUsesAutoAssignRules: NO forIndex: index];
-        [fAutoAssignRulesEnableCheck setState: NO];
-        [fAutoAssignRulesEditButton setEnabled: NO];
+        fAutoAssignRulesEnableCheck.state = NO;
+        fAutoAssignRulesEditButton.enabled = NO;
     }
 }
 
@@ -317,7 +317,7 @@
     const CGFloat requiredRowCount = (self.ruleEditor).numberOfRows;
     const CGFloat maxVisibleRowCount = (long)((NSHeight((self.ruleEditor).window.screen.visibleFrame) * 2 / 3) / rowHeight);
 
-    [self.ruleEditorHeightConstraint setConstant: MIN(requiredRowCount, maxVisibleRowCount) * rowHeight + bordersHeight];
+    self.ruleEditorHeightConstraint.constant = MIN(requiredRowCount, maxVisibleRowCount) * rowHeight + bordersHeight;
     ruleEditorScrollView.hasVerticalScroller = requiredRowCount > maxVisibleRowCount;
 }
 
@@ -332,26 +332,26 @@
     {
         const NSInteger index = [[GroupsController groups] indexForRow: fTableView.selectedRow];
         fSelectedColorView.color = [[GroupsController groups] colorForIndex: index];
-        [fSelectedColorView setEnabled: YES];
+        fSelectedColorView.enabled = YES;
         fSelectedColorNameField.stringValue = [[GroupsController groups] nameForIndex: index];
-        [fSelectedColorNameField setEnabled: YES];
+        fSelectedColorNameField.enabled = YES;
 
         [self refreshCustomLocationWithSingleGroup];
 
         fAutoAssignRulesEnableCheck.state = [[GroupsController groups] usesAutoAssignRulesForIndex: index];
-        [fAutoAssignRulesEnableCheck setEnabled: YES];
+        fAutoAssignRulesEnableCheck.enabled = YES;
         fAutoAssignRulesEditButton.enabled = (fAutoAssignRulesEnableCheck.state == NSOnState);
     }
     else
     {
         fSelectedColorView.color = [NSColor whiteColor];
-        [fSelectedColorView setEnabled: NO];
+        fSelectedColorView.enabled = NO;
         fSelectedColorNameField.stringValue = @"";
-        [fSelectedColorNameField setEnabled: NO];
-        [fCustomLocationEnableCheck setEnabled: NO];
-        [fCustomLocationPopUp setEnabled: NO];
-        [fAutoAssignRulesEnableCheck setEnabled: NO];
-        [fAutoAssignRulesEditButton setEnabled: NO];
+        fSelectedColorNameField.enabled = NO;
+        fCustomLocationEnableCheck.enabled = NO;
+        fCustomLocationPopUp.enabled = NO;
+        fAutoAssignRulesEnableCheck.enabled = NO;
+        fAutoAssignRulesEditButton.enabled = NO;
     }
 }
 
@@ -361,7 +361,7 @@
 
     const BOOL hasCustomLocation = [[GroupsController groups] usesCustomDownloadLocationForIndex: index];
     fCustomLocationEnableCheck.state = hasCustomLocation;
-    [fCustomLocationEnableCheck setEnabled: YES];
+    fCustomLocationEnableCheck.enabled = YES;
     fCustomLocationPopUp.enabled = hasCustomLocation;
 
     NSString * location = [[GroupsController groups] customDownloadLocationForIndex: index];
@@ -375,7 +375,7 @@
     else
     {
         [fCustomLocationPopUp itemAtIndex: 0].title = @"";
-        [[fCustomLocationPopUp itemAtIndex: 0] setImage: nil];
+        [fCustomLocationPopUp itemAtIndex: 0].image = nil;
     }
 }
 

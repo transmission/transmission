@@ -83,7 +83,7 @@
     [torrent setFilePriority: priority forIndexes: ((FileListNode *)self.representedObject).indexes];
 
     FileOutlineView * controlView = (FileOutlineView *)self.controlView;
-    [controlView setNeedsDisplay: YES];
+    controlView.needsDisplay = YES;
 }
 
 - (void) addTrackingAreasForView: (NSView *) controlView inRect: (NSRect) cellFrame withUserInfo: (NSDictionary *) userInfo

@@ -160,7 +160,7 @@
 
 - (void) reload
 {
-    [self setNeedsDisplay: YES];
+    self.needsDisplay = YES;
 }
 
 @end

@@ -37,7 +37,7 @@
     FilePriorityCell * priorityCell = [[FilePriorityCell alloc] init];
     [self tableColumnWithIdentifier: @"Priority"].dataCell = priorityCell;
 
-    [self setAutoresizesOutlineColumn: NO];
+    self.autoresizesOutlineColumn = NO;
     self.indentationPerLevel = 14.0;
 
     fMouseRow = -1;

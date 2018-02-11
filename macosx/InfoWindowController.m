@@ -70,12 +70,12 @@ typedef NS_ENUM(unsigned int, tabTag) {
 
 - (void) awakeFromNib
 {
-    [fNoneSelectedField setStringValue: NSLocalizedString(@"No Torrents Selected", "Inspector -> selected torrents")];
+    fNoneSelectedField.stringValue = NSLocalizedString(@"No Torrents Selected", "Inspector -> selected torrents");
 
     //window location and size
     NSPanel * window = (NSPanel *)self.window;
 
-    [window setFloatingPanel: NO];
+    window.floatingPanel = NO;
 
     const CGFloat windowHeight = NSHeight(window.frame);
     fMinWindowWidth = window.minSize.width;
@@ -88,7 +88,7 @@ typedef NS_ENUM(unsigned int, tabTag) {
     windowRect.size.height = windowHeight;
     [window setFrame: windowRect display: NO];
 
-    [window setBecomesKeyOnlyIfNeeded: YES];
+    window.becomesKeyOnlyIfNeeded = YES;
 
     //set tab tooltips
     [fTabMatrix setToolTip: NSLocalizedString(@"General Info", "Inspector -> tab") forCell: [fTabMatrix cellWithTag: TAB_GENERAL_TAG]];
@@ -398,7 +398,7 @@ typedef NS_ENUM(unsigned int, tabTag) {
             fNameField.stringValue = [NSString stringWithFormat: NSLocalizedString(@"%@ Torrents Selected",
                                             "Inspector -> selected torrents"),
                                             [NSString formattedUInteger: numberSelected]];
-            [fNameField setHidden: NO];
+            fNameField.hidden = NO;
 
             uint64_t size = 0;
             NSUInteger fileCount = 0, magnetCount = 0;
@@ -447,22 +447,22 @@ typedef NS_ENUM(unsigned int, tabTag) {
             else
             {
                 fBasicInfoField.stringValue = fileString;
-                [fBasicInfoField setToolTip: nil];
+                fBasicInfoField.toolTip = nil;
             }
-            [fBasicInfoField setHidden: NO];
+            fBasicInfoField.hidden = NO;
 
-            [fNoneSelectedField setHidden: YES];
+            fNoneSelectedField.hidden = YES;
         }
         else
         {
             fImageView.image = [NSImage imageNamed: NSImageNameApplicationIcon];
-            [fNoneSelectedField setHidden: NO];
+            fNoneSelectedField.hidden = NO;
 
-            [fNameField setHidden: YES];
-            [fBasicInfoField setHidden: YES];
+            fNameField.hidden = YES;
+            fBasicInfoField.hidden = YES;
         }
 
-        [fNameField setToolTip: nil];
+        fNameField.toolTip = nil;
     }
     else
     {
@@ -473,7 +473,7 @@ typedef NS_ENUM(unsigned int, tabTag) {
         NSString * name = [torrent name];
         fNameField.stringValue = name;
         fNameField.toolTip = name;
-        [fNameField setHidden: NO];
+        fNameField.hidden = NO;
 
         if (![torrent isMagnet])
         {
@@ -497,12 +497,12 @@ typedef NS_ENUM(unsigned int, tabTag) {
         }
         else
         {
-            [fBasicInfoField setStringValue: NSLocalizedString(@"Magnetized transfer", "Inspector -> selected torrents")];
-            [fBasicInfoField setToolTip: nil];
+            fBasicInfoField.stringValue = NSLocalizedString(@"Magnetized transfer", "Inspector -> selected torrents");
+            fBasicInfoField.toolTip = nil;
         }
-        [fBasicInfoField setHidden: NO];
+        fBasicInfoField.hidden = NO;
 
-        [fNoneSelectedField setHidden: YES];
+        fNoneSelectedField.hidden = YES;
     }
 
     [fGeneralViewController setInfoForTorrents: fTorrents];
