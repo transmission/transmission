@@ -209,6 +209,9 @@ Transmission.prototype = {
             reannounce: function () {
                 tr.reannounceSelectedTorrents();
             },
+            show_magnet_link: function() {
+            	tr.showmagnetlinkSelectedTorrents();
+            },
             move_top: function () {
                 tr.moveTop();
             },
@@ -1277,6 +1280,10 @@ Transmission.prototype = {
     reannounceSelectedTorrents: function () {
         this.reannounceTorrents(this.getSelectedTorrents());
     },
+	
+	showmagnetlinkSelectedTorrents: function () {
+		this.showmagnetlinkTorrents(this.getSelectedTorrents());
+	},
 
     startAllTorrents: function (force) {
         this.startTorrents(this.getAllTorrents(), force);
@@ -1304,6 +1311,38 @@ Transmission.prototype = {
     reannounceTorrents: function (torrents) {
         this.remote.reannounceTorrents(this.getTorrentIds(torrents), this.refreshTorrents, this);
     },
+	
+	showmagnetlinkTorrents: function(torrents) {
+		for (i = 0; t = torrents[i]; ++i) {
+			if (typeof t.getHashString() != "string" || t.getHashString().length != 40 || typeof t.getTrackers() != "object" || t.getTrackers().length < 1) {
+				break;
+			};
+			if (i == torrents.length-1) {
+				var data = [];
+				for (i = 0; t = torrents[i]; ++i) {
+					data.push("magnet:?xt=urn:btih:" + t.getHashString() + "&dn=" + encodeURIComponent(t.getName()) + "&tr=" + t.getTrackers().map(function(e){return encodeURIComponent(e.announce);}).join('&tr='));
+				};
+				this.showMagnetLinks(torrents, data);
+				return;
+			};
+		};
+		this.remote.getMagnetLinks(this.getTorrentIds(torrents), function(data) {
+			this.showMagnetLinks(torrents, Array.from(data.torrents, x => x.magnetLink));
+		}, this);
+		
+	},
+	
+	showMagnetLinks: function(torrents, data) {
+		$('#magnet-links-dialog > div').html('');
+		for (i = 0; t = torrents[i]; ++i) {
+			$('#magnet-links-dialog > div').append('<div class="title">' + t.getName() + '</div><div class="row"><input type="text" value="' + data[i] + '" readonly/></div>');
+		};
+		$('#magnet-links-dialog').dialog({
+            show: 'fade',
+            hide: 'fade',
+            title: 'Magnet Links'
+        });
+	},
 
     stopAllTorrents: function () {
         this.stopTorrents(this.getAllTorrents());
