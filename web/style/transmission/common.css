@@ -326,20 +326,20 @@ ul.torrent_list {
 ****
 ***/
 .magnet-links-section .title {
-	word-wrap: break-word;
-    font-weight: bold;
-    font-size: larger;
-    padding-left: 0px;
+  word-wrap: break-word;
+  font-weight: bold;
+  font-size: larger;
+  padding-left: 0px;
 }
-.magnet-links-section .title:not(:first-of-type) {
-	margin-top: 20px;
+  .magnet-links-section .title:not(:first-of-type) {
+  margin-top: 20px;
 }
-.magnet-links-section .row {
-	margin-top: 5px;
+  .magnet-links-section .row {
+  margin-top: 5px;
 }
 .magnet-links-section input {
-	width: 90%;
-	padding: 5px;
+  width: 90%;
+  padding: 5px;
 }
 /***
 ****
