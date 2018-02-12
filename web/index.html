@@ -379,7 +379,7 @@
 					enctype="multipart/form-data" target="torrent_upload_frame" autocomplete="off">
 					<div class="dialog_message">
 						<label for="torrent_upload_file">Please select a torrent file to upload:</label>
-							<input type="file" name="torrent_files[]" id="torrent_upload_file" multiple />
+							<input type="file" name="torrent_files[]" id="torrent_upload_file" multiple="multiple" />
 						<label for="torrent_upload_url">Or enter a URL:</label>
 							<input type="url" id="torrent_upload_url"/>
 						<label id='add-dialog-folder-label' for="add-dialog-folder-input">Destination folder:</label>
@@ -520,7 +520,7 @@
 			<li data-command="reannounce">Ask tracker for more peers</li>
 			<li>---</li>
 			<li data-command="show_magnet_link">Show magnet link</li>
-                        <li>---</li>
+			<li>---</li>
 			<li data-command="select_all">Select All</li>
 			<li data-command="deselect_all">Deselect All</li>
 		</ul>
