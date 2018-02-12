@@ -242,7 +242,7 @@ TransmissionRemote.prototype = {
             method: 'torrent-get',
             arguments: {
                 fields: ["magnetLink"],
-				ids: torrent_ids
+                ids: torrent_ids
             }
         };
         this.sendRequest(o, function (response) {
