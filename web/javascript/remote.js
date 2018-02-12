@@ -236,8 +236,8 @@ TransmissionRemote.prototype = {
     reannounceTorrents: function (torrent_ids, callback, context) {
         this.sendTorrentActionRequests('torrent-reannounce', torrent_ids, callback, context);
     },
-	getMagnetLinks: function (torrent_ids, callback, context) {
-		var remote = this;
+    getMagnetLinks: function (torrent_ids, callback, context) {
+        var remote = this;
         var o = {
             method: 'torrent-get',
             arguments: {
