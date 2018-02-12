@@ -1280,11 +1280,9 @@ Transmission.prototype = {
     reannounceSelectedTorrents: function () {
         this.reannounceTorrents(this.getSelectedTorrents());
     },
-	
     showmagnetlinkSelectedTorrents: function () {
         this.showmagnetlinkTorrents(this.getSelectedTorrents());
     },
-
     startAllTorrents: function (force) {
         this.startTorrents(this.getAllTorrents(), force);
     },
