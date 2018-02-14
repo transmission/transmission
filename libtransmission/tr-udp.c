@@ -119,7 +119,7 @@ void tr_udpSetSocketBuffers(tr_session* session)
 
     for (l = session->udp_sockets; l; l = l->next)
     {
-	b = l->data;
+        b = l->data;
         set_socket_buffers(b->socket, utp);
     }
 }
@@ -131,11 +131,11 @@ static struct tr_bindinfo* find_socket(tr_session* session, int s)
 
     for (l = session->udp_sockets; l; l = l->next)
     {
-	b = l->data;
-	if (b->socket == s)
-	{
-	    return b;
-	}
+        b = l->data;
+        if (b->socket == s)
+        {
+            return b;
+        }
     }
 
     return NULL;
@@ -214,8 +214,8 @@ void tr_udpInit(tr_session* ss)
     while ((public_addr = tr_sessionGetPublicAddress(ss, TR_AF_INET, idx++)))
     {
         struct sockaddr_in sin;
-	struct tr_bindinfo* b;
-	int sock;
+        struct tr_bindinfo* b;
+        int sock;
 
         memset(&sin, 0, sizeof(sin));
         sin.sin_family = AF_INET;
@@ -224,14 +224,14 @@ void tr_udpInit(tr_session* ss)
 
         sock = socket(PF_INET, SOCK_DGRAM, 0);
         if (sock == TR_BAD_SOCKET)
-	{
+        {
             tr_logAddNamedError("UDP", "Couldn't create IPv4 socket");
             break;
         }
 
         rc = bind(sock, (struct sockaddr*)&sin, sizeof(sin));
         if (rc < 0)
-	{
+        {
             tr_logAddNamedError("UDP", "Couldn't bind IPv4 socket");
             tr_netCloseSocket(sock);
             continue;
@@ -243,13 +243,13 @@ void tr_udpInit(tr_session* ss)
         b->session = ss;
         b->ev = event_new(ss->event_base, sock, EV_READ | EV_PERSIST, event_callback, ss);
         if (b->ev == NULL)
-	{
+        {
             tr_logAddNamedError("UDP", "Couldn't allocate IPv4 event");
-	}
-	else
-	{
-	    event_add(b->ev, NULL);
-	}
+        }
+        else
+        {
+            event_add(b->ev, NULL);
+        }
         tr_list_append(&ss->udp_sockets, b);
     }
 
@@ -257,8 +257,8 @@ void tr_udpInit(tr_session* ss)
     while ((public_addr = tr_sessionGetPublicAddress(ss, TR_AF_INET6, idx++)))
     {
         struct sockaddr_in6 sin6;
-	struct tr_bindinfo* b;
-	int sock;
+        struct tr_bindinfo* b;
+        int sock;
 
         memset(&sin6, 0, sizeof(sin6));
         sin6.sin6_family = AF_INET6;
@@ -266,25 +266,25 @@ void tr_udpInit(tr_session* ss)
         sin6.sin6_port = htons(ss->udp_port);
 
         if (!tr_address_compare(public_addr, tr_address_default(TR_AF_INET6)))
-	{
+        {
             const unsigned char *ipv6 = tr_globalIPv6();
             if (!ipv6)
-	    {
-		continue;
-	    }
+            {
+                continue;
+            }
             memcpy(&sin6.sin6_addr, ipv6, sizeof(struct in6_addr));
         }
 
         sock = socket(PF_INET6, SOCK_DGRAM, 0);
         if (sock == TR_BAD_SOCKET)
-	{
+        {
             tr_logAddNamedError("UDP", "Couldn't create IPv6 socket");
             break;
         }
 
         rc = bind(sock, (struct sockaddr*)&sin6, sizeof(sin6));
         if (rc < 0)
-	{
+        {
             tr_logAddNamedError("UDP", "Couldn't bind IPv6 socket");
             tr_netCloseSocket(sock);
             continue;
@@ -296,13 +296,13 @@ void tr_udpInit(tr_session* ss)
         b->session = ss;
         b->ev = event_new(ss->event_base, sock, EV_READ | EV_PERSIST, event_callback, ss);
         if (b->ev == NULL)
-	{
+        {
             tr_logAddNamedError("UDP", "Couldn't allocate IPv6 event");
-	}
-	else
-	{
-	    event_add(b->ev, NULL);
-	}
+        }
+        else
+        {
+            event_add(b->ev, NULL);
+        }
         tr_list_append(&ss->udp_sockets, b);
     }
 
@@ -323,11 +323,11 @@ void tr_udpUninit(tr_session* ss)
     while ((b = tr_list_pop_front(&ss->udp_sockets)))
     {
         if (b->socket != TR_BAD_SOCKET)
-	{
+        {
             tr_netCloseSocket(b->socket);
         }
         if (b->ev)
-	{
+        {
             event_free(b->ev);
         }
         tr_free (b);
@@ -340,30 +340,30 @@ struct tr_bindinfo* tr_udpGetSocket(tr_session* ss, int tr_af_type, int idx)
 
     while ((a = tr_sessionGetPublicAddress(ss, tr_af_type, idx)))
     {
-	tr_list const* l;
+        tr_list const* l;
         int count = 0;
 
         for (l = ss->udp_sockets; l; l = l->next)
-	{
+        {
             struct tr_bindinfo* b = l->data;
 
             if (b->socket == TR_BAD_SOCKET)
-	    {
+            {
                 continue;
-	    }
+            }
             if (b->addr == a)
-	    {
+            {
                 return b;
-	    }
+            }
             if (b->addr->type == tr_af_type)
-	    {
+            {
                 count++;
-	    }
+            }
         }
         if (count == 0 || idx >= 0)
-	{
+        {
             break;
-	}
+        }
     }
 
     return NULL;

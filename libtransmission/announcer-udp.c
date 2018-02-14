@@ -54,12 +54,17 @@ static int tau_sendto(tr_session* session, struct evutil_addrinfo* ai, tr_port p
 
     for (l = session->udp_sockets; l; l = l->next)
     {
-        const struct tr_bindinfo * b = l->data;
+        struct tr_bindinfo const* b = l->data;
+
         if (b->socket == TR_BAD_SOCKET)
+        {
             continue;
+        }
         if ((ai->ai_addr->sa_family == AF_INET && b->addr->type == TR_AF_INET) ||
             (ai->ai_addr->sa_family == AF_INET6 && b->addr->type == TR_AF_INET6))
+        {
             sendto (b->socket, buf, buflen, 0, ai->ai_addr, ai->ai_addrlen);
+        }
     }
 
     return 0;

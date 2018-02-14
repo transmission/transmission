@@ -184,7 +184,9 @@ static void open_incoming_peer_port(tr_session* session)
         tr_address* addr = l->data;
         int sock = tr_netBindTCP(addr, session->private_peer_port, false);
         if (sock == TR_BAD_SOCKET)
+        {
             continue;
+        }
         b = tr_new(struct tr_bindinfo, 1);
         b->session = session;
         b->addr = addr;
@@ -200,18 +202,24 @@ tr_address const* tr_sessionGetPublicAddress(tr_session const* session, int tr_a
     tr_list const* l;
 
     if (tr_af_type >= NUM_TR_AF_INET_TYPES)
-        return 0;
+    {
+        return NULL;
+    }
 
     if (idx < 0)
+    {
         idx = tr_rand_int_weak(tr_list_size(session->public_addrs[tr_af_type]));
+    }
 
     for (l = session->public_addrs[tr_af_type]; l; l = l->next)
     {
         if (idx-- == 0)
+        {
             return l->data;
+        }
     }
 
-    return 0;
+    return NULL;
 }
 
 char const* tr_sessionGetBindAddress(tr_session const* session, int tr_af_type)
@@ -221,7 +229,7 @@ char const* tr_sessionGetBindAddress(tr_session const* session, int tr_af_type)
     tr_list const* l;
     size_t len = 0;
 
-    assert(tr_af_type < NUM_TR_AF_INET_TYPES);
+    TR_ASSERT(tr_af_type < NUM_TR_AF_INET_TYPES);
      
     for (l = session->public_addrs[tr_af_type]; l; l = l->next)
     {
@@ -229,13 +237,17 @@ char const* tr_sessionGetBindAddress(tr_session const* session, int tr_af_type)
         int n = strlen(s);
 
         if (len+n+1 > bufsize)
+        {
             buf = tr_realloc(buf, bufsize = len+n+1);
+        }
         memcpy(buf+len, s, n); len += n;
         buf[len++] = ',';
     }
 
     if (buf == NULL)
+    {
         buf = tr_malloc(bufsize = len = 1);
+    }
     buf[--len] = '\0';
     return buf;
 }
@@ -245,7 +257,16 @@ void tr_sessionAddBindAddress(tr_session* session, int tr_af_type, char const* s
     tr_address addr;
 
     if (!tr_address_from_string(&addr, str))
+    {
+        tr_logAddError("Invalid bind address %s", str);
         return;
+    }
+
+    if (addr.type != tr_af_type)
+    {
+        tr_logAddError("Incorrect type for bind address %s", str);
+        return;
+    }
 
     if (!tr_list_find(session->public_addrs[tr_af_type], &addr, (TrListCompareFunc)tr_address_compare))
     {
@@ -256,7 +277,7 @@ void tr_sessionAddBindAddress(tr_session* session, int tr_af_type, char const* s
 
 void tr_sessionSetBindAddress(tr_session* session, int tr_af_type, char const* str)
 {
-    assert(tr_af_type < NUM_TR_AF_INET_TYPES);
+    TR_ASSERT(tr_af_type < NUM_TR_AF_INET_TYPES);
 
     if (session->public_addrs[tr_af_type])
     {
@@ -268,10 +289,21 @@ void tr_sessionSetBindAddress(tr_session* session, int tr_af_type, char const* s
         char* temp = tr_strdup (str);
         char* walk = temp;
         char const* token;
+
         while ((token = tr_strsep(&walk, ", ")))
+        {
             if (*token)
+            {
                 tr_sessionAddBindAddress(session, tr_af_type, token);
+            }
+        }
         tr_free(temp);
+    }
+
+    if (session->public_addrs[tr_af_type] == NULL)
+    {
+        tr_address* a = tr_memdup(tr_address_default(tr_af_type), sizeof(tr_address));
+        tr_list_append(&session->public_addrs[tr_af_type], a);
     }
 }
 
