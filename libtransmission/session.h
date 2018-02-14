@@ -49,7 +49,6 @@ struct evdns_base;
 struct tr_address;
 struct tr_announcer;
 struct tr_announcer_udp;
-struct tr_bindsockets;
 struct tr_cache;
 struct tr_fdInfo;
 struct tr_device_info;
@@ -91,6 +90,14 @@ struct tr_turtle_info
 
     /* recent action that was done by turtle's automatic switch */
     tr_auto_switch_state_t autoTurtleState;
+};
+
+struct tr_bindinfo
+{
+    tr_socket_t socket;
+    const tr_address* addr;
+    struct event* ev;
+    struct tr_session* session;
 };
 
 /** @brief handle to an active libtransmission session */
@@ -149,16 +156,13 @@ struct tr_session
 
     /* The UDP sockets used for the DHT and uTP. */
     tr_port udp_port;
-    tr_socket_t udp_socket;
-    tr_socket_t udp6_socket;
-    unsigned char* udp6_bound;
-    struct event* udp_event;
-    struct event* udp6_event;
+    struct tr_list* udp_sockets;
 
     struct event* utp_timer;
 
     /* The open port on the local machine for incoming peer requests */
     tr_port private_peer_port;
+    struct tr_list* peer_sockets;
 
     /**
      * The open port on the public device for incoming peer requests.
@@ -220,8 +224,7 @@ struct tr_session
 
     uint16_t idleLimitMinutes;
 
-    struct tr_bindinfo* public_ipv4;
-    struct tr_bindinfo* public_ipv6;
+    struct tr_list* public_addrs[NUM_TR_AF_INET_TYPES];
 };
 
 static inline tr_port tr_sessionGetPublicPeerPort(tr_session const* session)
@@ -245,7 +248,7 @@ void tr_sessionUnlock(tr_session*);
 
 bool tr_sessionIsLocked(tr_session const*);
 
-struct tr_address const* tr_sessionGetPublicAddress(tr_session const* session, int tr_af_type, bool* is_default_value);
+struct tr_address const* tr_sessionGetPublicAddress(tr_session const* session, int tr_af_type, int idx);
 
 struct tr_bindsockets* tr_sessionGetBindSockets(tr_session*);
 

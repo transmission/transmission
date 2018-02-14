@@ -26,6 +26,7 @@ THE SOFTWARE.
 #include <libutp/utp.h>
 
 #include "transmission.h"
+#include "list.h"
 #include "log.h"
 #include "net.h"
 #include "session.h"
@@ -65,7 +66,7 @@ bool UTP_Write(struct UTPSocket* socket, size_t count)
 }
 
 int tr_utpPacket(unsigned char const* buf UNUSED, size_t buflen UNUSED, struct sockaddr const* from UNUSED,
-    socklen_t fromlen UNUSED, tr_session* ss UNUSED)
+    socklen_t fromlen UNUSED, struct tr_bindinfo* b UNUSED)
 {
     return -1;
 }
@@ -94,7 +95,8 @@ void tr_utpSendTo(void* closure UNUSED, unsigned char const* buf UNUSED, size_t 
 
 static void incoming(void* closure, struct UTPSocket* s)
 {
-    tr_session* ss = closure;
+    struct tr_bindinfo* b = closure;
+    tr_session* ss = b->session;
     struct sockaddr_storage from_storage;
     struct sockaddr* from = (struct sockaddr*)&from_storage;
     socklen_t fromlen = sizeof(from_storage);
@@ -121,16 +123,9 @@ static void incoming(void* closure, struct UTPSocket* s)
 
 void tr_utpSendTo(void* closure, unsigned char const* buf, size_t buflen, struct sockaddr const* to, socklen_t tolen)
 {
-    tr_session* ss = closure;
+    struct tr_bindinfo* b = closure;
 
-    if (to->sa_family == AF_INET && ss->udp_socket != TR_BAD_SOCKET)
-    {
-        sendto(ss->udp_socket, (void const*)buf, buflen, 0, to, tolen);
-    }
-    else if (to->sa_family == AF_INET6 && ss->udp6_socket != TR_BAD_SOCKET)
-    {
-        sendto(ss->udp6_socket, (void const*)buf, buflen, 0, to, tolen);
-    }
+    sendto(b->socket, (void const*)buf, buflen, 0, to, tolen);
 }
 
 static void reset_timer(tr_session* ss)
@@ -164,8 +159,10 @@ static void timer_callback(evutil_socket_t s UNUSED, short type UNUSED, void* cl
     reset_timer(ss);
 }
 
-int tr_utpPacket(unsigned char const* buf, size_t buflen, struct sockaddr const* from, socklen_t fromlen, tr_session* ss)
+int tr_utpPacket(unsigned char const* buf, size_t buflen, struct sockaddr const* from, socklen_t fromlen, struct tr_bindinfo* b)
 {
+    tr_session* ss = b->session;
+
     if (!ss->isClosed && ss->utp_timer == NULL)
     {
         ss->utp_timer = evtimer_new(ss->event_base, timer_callback, ss);
@@ -178,7 +175,7 @@ int tr_utpPacket(unsigned char const* buf, size_t buflen, struct sockaddr const*
         reset_timer(ss);
     }
 
-    return UTP_IsIncomingUTP(incoming, tr_utpSendTo, ss, buf, buflen, from, fromlen);
+    return UTP_IsIncomingUTP(incoming, tr_utpSendTo, b, buf, buflen, from, fromlen);
 }
 
 void tr_utpClose(tr_session* session)

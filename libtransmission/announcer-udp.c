@@ -19,6 +19,7 @@
 #include "announcer.h"
 #include "announcer-common.h"
 #include "crypto-utils.h" /* tr_rand_buffer() */
+#include "list.h"
 #include "log.h"
 #include "peer-io.h"
 #include "peer-mgr.h" /* tr_peerMgrCompactToPex() */
@@ -47,29 +48,21 @@ static void tau_sockaddr_setport(struct sockaddr* sa, tr_port port)
 
 static int tau_sendto(tr_session* session, struct evutil_addrinfo* ai, tr_port port, void const* buf, size_t buflen)
 {
-    tr_socket_t sockfd;
-
-    if (ai->ai_addr->sa_family == AF_INET)
-    {
-        sockfd = session->udp_socket;
-    }
-    else if (ai->ai_addr->sa_family == AF_INET6)
-    {
-        sockfd = session->udp6_socket;
-    }
-    else
-    {
-        sockfd = TR_BAD_SOCKET;
-    }
-
-    if (sockfd == TR_BAD_SOCKET)
-    {
-        errno = EAFNOSUPPORT;
-        return -1;
-    }
+    tr_list* l;
 
     tau_sockaddr_setport(ai->ai_addr, port);
-    return sendto(sockfd, buf, buflen, 0, ai->ai_addr, ai->ai_addrlen);
+
+    for (l = session->udp_sockets; l; l = l->next)
+    {
+        const struct tr_bindinfo * b = l->data;
+        if (b->socket == TR_BAD_SOCKET)
+            continue;
+        if ((ai->ai_addr->sa_family == AF_INET && b->addr->type == TR_AF_INET) ||
+            (ai->ai_addr->sa_family == AF_INET6 && b->addr->type == TR_AF_INET6))
+            sendto (b->socket, buf, buflen, 0, ai->ai_addr, ai->ai_addrlen);
+    }
+
+    return 0;
 }
 
 /****

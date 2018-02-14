@@ -35,6 +35,7 @@ THE SOFTWARE.
 #include <libutp/utp.h>
 
 #include "transmission.h"
+#include "list.h"
 #include "log.h"
 #include "net.h"
 #include "session.h"
@@ -113,129 +114,31 @@ static void set_socket_buffers(tr_socket_t fd, bool large)
 void tr_udpSetSocketBuffers(tr_session* session)
 {
     bool utp = tr_sessionIsUTPEnabled(session);
+    struct tr_bindinfo const* b;
+    tr_list const* l;
 
-    if (session->udp_socket != TR_BAD_SOCKET)
+    for (l = session->udp_sockets; l; l = l->next)
     {
-        set_socket_buffers(session->udp_socket, utp);
-    }
-
-    if (session->udp6_socket != TR_BAD_SOCKET)
-    {
-        set_socket_buffers(session->udp6_socket, utp);
+	b = l->data;
+        set_socket_buffers(b->socket, utp);
     }
 }
 
-/* BEP-32 has a rather nice explanation of why we need to bind to one
-   IPv6 address, if I may say so myself. */
-
-static void rebind_ipv6(tr_session* ss, bool force)
+static struct tr_bindinfo* find_socket(tr_session* session, int s)
 {
-    bool is_default;
-    struct tr_address const* public_addr;
-    struct sockaddr_in6 sin6;
-    unsigned char const* ipv6 = tr_globalIPv6();
-    tr_socket_t s = TR_BAD_SOCKET;
-    int rc;
-    int one = 1;
+    struct tr_bindinfo* b;
+    tr_list const* l;
 
-    /* We currently have no way to enable or disable IPv6 after initialisation.
-       No way to fix that without some surgery to the DHT code itself. */
-    if (ipv6 == NULL || (!force && ss->udp6_socket == TR_BAD_SOCKET))
+    for (l = session->udp_sockets; l; l = l->next)
     {
-        if (ss->udp6_bound != NULL)
-        {
-            free(ss->udp6_bound);
-            ss->udp6_bound = NULL;
-        }
-
-        return;
+	b = l->data;
+	if (b->socket == s)
+	{
+	    return b;
+	}
     }
 
-    if (ss->udp6_bound != NULL && memcmp(ipv6, ss->udp6_bound, 16) == 0)
-    {
-        return;
-    }
-
-    s = socket(PF_INET6, SOCK_DGRAM, 0);
-
-    if (s == TR_BAD_SOCKET)
-    {
-        goto fail;
-    }
-
-#ifdef IPV6_V6ONLY
-    /* Since we always open an IPv4 socket on the same port, this
-       shouldn't matter.  But I'm superstitious. */
-    setsockopt(s, IPPROTO_IPV6, IPV6_V6ONLY, (void const*)&one, sizeof(one));
-#endif
-
-    memset(&sin6, 0, sizeof(sin6));
-    sin6.sin6_family = AF_INET6;
-
-    if (ipv6 != NULL)
-    {
-        memcpy(&sin6.sin6_addr, ipv6, 16);
-    }
-
-    sin6.sin6_port = htons(ss->udp_port);
-    public_addr = tr_sessionGetPublicAddress(ss, TR_AF_INET6, &is_default);
-
-    if (public_addr != NULL && !is_default)
-    {
-        sin6.sin6_addr = public_addr->addr.addr6;
-    }
-
-    rc = bind(s, (struct sockaddr*)&sin6, sizeof(sin6));
-
-    if (rc == -1)
-    {
-        goto fail;
-    }
-
-    if (ss->udp6_socket == TR_BAD_SOCKET)
-    {
-        ss->udp6_socket = s;
-    }
-    else
-    {
-        /* FIXME: dup2 doesn't work for sockets on Windows */
-        rc = dup2(s, ss->udp6_socket);
-
-        if (rc == -1)
-        {
-            goto fail;
-        }
-
-        tr_netCloseSocket(s);
-    }
-
-    if (ss->udp6_bound == NULL)
-    {
-        ss->udp6_bound = malloc(16);
-    }
-
-    if (ss->udp6_bound != NULL)
-    {
-        memcpy(ss->udp6_bound, ipv6, 16);
-    }
-
-    return;
-
-fail:
-    /* Something went wrong.  It's difficult to recover, so let's simply
-       set things up so that we try again next time. */
-    tr_logAddNamedError("UDP", "Couldn't rebind IPv6 socket");
-
-    if (s != TR_BAD_SOCKET)
-    {
-        tr_netCloseSocket(s);
-    }
-
-    if (ss->udp6_bound != NULL)
-    {
-        free(ss->udp6_bound);
-        ss->udp6_bound = NULL;
-    }
+    return NULL;
 }
 
 static void event_callback(evutil_socket_t s, short type UNUSED, void* sv)
@@ -280,9 +183,11 @@ static void event_callback(evutil_socket_t s, short type UNUSED, void* sv)
         }
         else
         {
-            if (tr_sessionIsUTPEnabled(ss))
+            struct tr_bindinfo* b;
+
+            if (tr_sessionIsUTPEnabled(ss) && (b = find_socket(ss, s)))
             {
-                rc = tr_utpPacket(buf, rc, (struct sockaddr*)&from, fromlen, ss);
+                rc = tr_utpPacket(buf, rc, (struct sockaddr*)&from, fromlen, b);
 
                 if (rc == 0)
                 {
@@ -295,13 +200,8 @@ static void event_callback(evutil_socket_t s, short type UNUSED, void* sv)
 
 void tr_udpInit(tr_session* ss)
 {
-    TR_ASSERT(ss->udp_socket == TR_BAD_SOCKET);
-    TR_ASSERT(ss->udp6_socket == TR_BAD_SOCKET);
-
-    bool is_default;
     struct tr_address const* public_addr;
-    struct sockaddr_in sin;
-    int rc;
+    int rc, idx;
 
     ss->udp_port = tr_sessionGetPeerPort(ss);
 
@@ -310,55 +210,100 @@ void tr_udpInit(tr_session* ss)
         return;
     }
 
-    ss->udp_socket = socket(PF_INET, SOCK_DGRAM, 0);
-
-    if (ss->udp_socket == TR_BAD_SOCKET)
+    idx = 0;
+    while ((public_addr = tr_sessionGetPublicAddress(ss, TR_AF_INET, idx++)))
     {
-        tr_logAddNamedError("UDP", "Couldn't create IPv4 socket");
-        goto ipv6;
-    }
+        struct sockaddr_in sin;
+	struct tr_bindinfo* b;
+	int sock;
 
-    memset(&sin, 0, sizeof(sin));
-    sin.sin_family = AF_INET;
-    public_addr = tr_sessionGetPublicAddress(ss, TR_AF_INET, &is_default);
+        memset(&sin, 0, sizeof(sin));
+        sin.sin_family = AF_INET;
+        sin.sin_addr = public_addr->addr.addr4;
+        sin.sin_port = htons(ss->udp_port);
 
-    if (public_addr != NULL && !is_default)
-    {
-        memcpy(&sin.sin_addr, &public_addr->addr.addr4, sizeof(struct in_addr));
-    }
-
-    sin.sin_port = htons(ss->udp_port);
-    rc = bind(ss->udp_socket, (struct sockaddr*)&sin, sizeof(sin));
-
-    if (rc == -1)
-    {
-        tr_logAddNamedError("UDP", "Couldn't bind IPv4 socket");
-        tr_netCloseSocket(ss->udp_socket);
-        ss->udp_socket = TR_BAD_SOCKET;
-        goto ipv6;
-    }
-
-    ss->udp_event = event_new(ss->event_base, ss->udp_socket, EV_READ | EV_PERSIST, event_callback, ss);
-
-    if (ss->udp_event == NULL)
-    {
-        tr_logAddNamedError("UDP", "Couldn't allocate IPv4 event");
-    }
-
-ipv6:
-    if (tr_globalIPv6() != NULL)
-    {
-        rebind_ipv6(ss, true);
-    }
-
-    if (ss->udp6_socket != TR_BAD_SOCKET)
-    {
-        ss->udp6_event = event_new(ss->event_base, ss->udp6_socket, EV_READ | EV_PERSIST, event_callback, ss);
-
-        if (ss->udp6_event == NULL)
-        {
-            tr_logAddNamedError("UDP", "Couldn't allocate IPv6 event");
+        sock = socket(PF_INET, SOCK_DGRAM, 0);
+        if (sock == TR_BAD_SOCKET)
+	{
+            tr_logAddNamedError("UDP", "Couldn't create IPv4 socket");
+            break;
         }
+
+        rc = bind(sock, (struct sockaddr*)&sin, sizeof(sin));
+        if (rc < 0)
+	{
+            tr_logAddNamedError("UDP", "Couldn't bind IPv4 socket");
+            tr_netCloseSocket(sock);
+            continue;
+        }
+
+        b = tr_new(struct tr_bindinfo, 1);
+        b->socket = sock;
+        b->addr = public_addr;
+        b->session = ss;
+        b->ev = event_new(ss->event_base, sock, EV_READ | EV_PERSIST, event_callback, ss);
+        if (b->ev == NULL)
+	{
+            tr_logAddNamedError("UDP", "Couldn't allocate IPv4 event");
+	}
+	else
+	{
+	    event_add(b->ev, NULL);
+	}
+        tr_list_append(&ss->udp_sockets, b);
+    }
+
+    idx = 0;
+    while ((public_addr = tr_sessionGetPublicAddress(ss, TR_AF_INET6, idx++)))
+    {
+        struct sockaddr_in6 sin6;
+	struct tr_bindinfo* b;
+	int sock;
+
+        memset(&sin6, 0, sizeof(sin6));
+        sin6.sin6_family = AF_INET6;
+        sin6.sin6_addr = public_addr->addr.addr6;
+        sin6.sin6_port = htons(ss->udp_port);
+
+        if (!tr_address_compare(public_addr, tr_address_default(TR_AF_INET6)))
+	{
+            const unsigned char *ipv6 = tr_globalIPv6();
+            if (!ipv6)
+	    {
+		continue;
+	    }
+            memcpy(&sin6.sin6_addr, ipv6, sizeof(struct in6_addr));
+        }
+
+        sock = socket(PF_INET6, SOCK_DGRAM, 0);
+        if (sock == TR_BAD_SOCKET)
+	{
+            tr_logAddNamedError("UDP", "Couldn't create IPv6 socket");
+            break;
+        }
+
+        rc = bind(sock, (struct sockaddr*)&sin6, sizeof(sin6));
+        if (rc < 0)
+	{
+            tr_logAddNamedError("UDP", "Couldn't bind IPv6 socket");
+            tr_netCloseSocket(sock);
+            continue;
+        }
+
+        b = tr_new(struct tr_bindinfo, 1);
+        b->socket = sock;
+        b->addr = public_addr;
+        b->session = ss;
+        b->ev = event_new(ss->event_base, sock, EV_READ | EV_PERSIST, event_callback, ss);
+        if (b->ev == NULL)
+	{
+            tr_logAddNamedError("UDP", "Couldn't allocate IPv6 event");
+	}
+	else
+	{
+	    event_add(b->ev, NULL);
+	}
+        tr_list_append(&ss->udp_sockets, b);
     }
 
     tr_udpSetSocketBuffers(ss);
@@ -367,49 +312,59 @@ ipv6:
     {
         tr_dhtInit(ss);
     }
-
-    if (ss->udp_event != NULL)
-    {
-        event_add(ss->udp_event, NULL);
-    }
-
-    if (ss->udp6_event != NULL)
-    {
-        event_add(ss->udp6_event, NULL);
-    }
 }
 
 void tr_udpUninit(tr_session* ss)
 {
+    struct tr_bindinfo* b;
+
     tr_dhtUninit(ss);
 
-    if (ss->udp_socket != TR_BAD_SOCKET)
+    while ((b = tr_list_pop_front(&ss->udp_sockets)))
     {
-        tr_netCloseSocket(ss->udp_socket);
-        ss->udp_socket = TR_BAD_SOCKET;
+        if (b->socket != TR_BAD_SOCKET)
+	{
+            tr_netCloseSocket(b->socket);
+        }
+        if (b->ev)
+	{
+            event_free(b->ev);
+        }
+        tr_free (b);
+    }
+}
+
+struct tr_bindinfo* tr_udpGetSocket(tr_session* ss, int tr_af_type, int idx)
+{
+    tr_address const* a;
+
+    while ((a = tr_sessionGetPublicAddress(ss, tr_af_type, idx)))
+    {
+	tr_list const* l;
+        int count = 0;
+
+        for (l = ss->udp_sockets; l; l = l->next)
+	{
+            struct tr_bindinfo* b = l->data;
+
+            if (b->socket == TR_BAD_SOCKET)
+	    {
+                continue;
+	    }
+            if (b->addr == a)
+	    {
+                return b;
+	    }
+            if (b->addr->type == tr_af_type)
+	    {
+                count++;
+	    }
+        }
+        if (count == 0 || idx >= 0)
+	{
+            break;
+	}
     }
 
-    if (ss->udp_event != NULL)
-    {
-        event_free(ss->udp_event);
-        ss->udp_event = NULL;
-    }
-
-    if (ss->udp6_socket != TR_BAD_SOCKET)
-    {
-        tr_netCloseSocket(ss->udp6_socket);
-        ss->udp6_socket = TR_BAD_SOCKET;
-    }
-
-    if (ss->udp6_event != NULL)
-    {
-        event_free(ss->udp6_event);
-        ss->udp6_event = NULL;
-    }
-
-    if (ss->udp6_bound != NULL)
-    {
-        free(ss->udp6_bound);
-        ss->udp6_bound = NULL;
-    }
+    return NULL;
 }

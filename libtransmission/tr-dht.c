@@ -60,6 +60,7 @@
 #include "torrent.h" /* tr_torrentFindFromHash() */
 #include "tr-assert.h"
 #include "tr-dht.h"
+#include "tr-udp.h"  /* tr_udpGetSocket() */
 #include "trevent.h" /* tr_runInEventThread() */
 #include "utils.h"
 #include "variant.h"
@@ -329,6 +330,8 @@ int tr_dhtInit(tr_session* ss)
     size_t len;
     size_t len6;
     struct bootstrap_closure* cl;
+    struct tr_bindinfo const* sock4;
+    struct tr_bindinfo const* sock6;
 
     if (session != NULL) /* already initialized */
     {
@@ -341,6 +344,9 @@ int tr_dhtInit(tr_session* ss)
     {
         dht_debug = stderr;
     }
+
+    sock4 = tr_udpGetSocket(ss, TR_AF_INET,  -1);
+    sock6 = tr_udpGetSocket(ss, TR_AF_INET6, -1);
 
     dat_file = tr_buildPath(ss->configDir, "dht.dat", NULL);
     rc = tr_variantFromFile(&benc, TR_VARIANT_FMT_BENC, dat_file, NULL) ? 0 : -1;
@@ -355,12 +361,12 @@ int tr_dhtInit(tr_session* ss)
             memcpy(myid, raw, len);
         }
 
-        if (ss->udp_socket != TR_BAD_SOCKET && tr_variantDictFindRaw(&benc, TR_KEY_nodes, &raw, &len) && len % 6 == 0)
+        if (sock4 != NULL && tr_variantDictFindRaw(&benc, TR_KEY_nodes, &raw, &len) && len % 6 == 0)
         {
             nodes = tr_memdup(raw, len);
         }
 
-        if (ss->udp6_socket != TR_BAD_SOCKET && tr_variantDictFindRaw(&benc, TR_KEY_nodes6, &raw, &len6) && len6 % 18 == 0)
+        if (sock6 != NULL && tr_variantDictFindRaw(&benc, TR_KEY_nodes6, &raw, &len6) && len6 % 18 == 0)
         {
             nodes6 = tr_memdup(raw, len6);
         }
@@ -390,7 +396,7 @@ int tr_dhtInit(tr_session* ss)
         tr_rand_buffer(myid, 20);
     }
 
-    rc = dht_init(ss->udp_socket, ss->udp6_socket, myid, NULL);
+    rc = dht_init(sock4->socket, sock6->socket, myid, NULL);
 
     if (rc < 0)
     {
@@ -539,9 +545,14 @@ static void getstatus(void* cl)
 int tr_dhtStatus(tr_session* session, int af, int* nodes_return)
 {
     struct getstatus_closure closure = { .af = af, .status = -1, .count = -1 };
+    struct tr_bindinfo const* sock4;
+    struct tr_bindinfo const* sock6;
 
-    if (!tr_dhtEnabled(session) || (af == AF_INET && session->udp_socket == TR_BAD_SOCKET) ||
-        (af == AF_INET6 && session->udp6_socket == TR_BAD_SOCKET))
+    sock4 = tr_udpGetSocket(session, TR_AF_INET,  -1);
+    sock6 = tr_udpGetSocket(session, TR_AF_INET6, -1);
+
+    if (!tr_dhtEnabled(session) || (af == AF_INET && sock4 != NULL) ||
+        (af == AF_INET6 && sock6 != NULL))
     {
         if (nodes_return != NULL)
         {
