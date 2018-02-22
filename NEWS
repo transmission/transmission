@@ -1,4 +1,4 @@
-=== Transmission 2.93 (2018/01/xx) ===
+=== Transmission 2.93 (2018/01/23) ===
 [https://github.com/transmission/transmission/releases/tag/2.93 All tickets closed by this release]
 ==== All Platforms ====
   * Fix CVE-2018-5702 (#468)
