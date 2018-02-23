@@ -716,7 +716,7 @@ function Inspector(controller) {
 			html.push ('<div class="inspector_group">');
 
 			if (torrents.length > 1)
-				html.push('<div class="inspector_torrent_label">', tor.getName(), '</div>');
+				html.push('<div class="inspector_torrent_label">', sanitizeText(tor.getName()), '</div>');
 
 			tier = -1;
 			trackers = tor.getTrackers();
