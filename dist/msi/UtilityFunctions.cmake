@@ -7,7 +7,7 @@ function(png2ico OUTPUT_FILE)
 
     add_custom_command(
         OUTPUT "${OUTPUT_FILE}"
-        COMMAND convert ${ARGN} "${OUTPUT_FILE}"
+        COMMAND magick convert ${ARGN} "${OUTPUT_FILE}"
         DEPENDS ${ARGN})
 
     list(APPEND ${OUTPUT_VAR} "${OUTPUT_FILE}")
