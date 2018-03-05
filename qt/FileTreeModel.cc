@@ -47,7 +47,7 @@ public:
 
     bool hasNext() const
     {
-        return mySlashIndex > 0;
+        return mySlashIndex > -1;
     }
 
     QString const& next()
