@@ -23,6 +23,7 @@ transmission_cli_LDADD = \
     @LIBCURL_LIBS@ \
     @CRYPTO_LIBS@ \
     @INTLLIBS@ \
+    @SYSTEMD_LIBS@ \
     @ZLIB_LIBS@ \
     @PTHREAD_LIBS@ \
     ${LIBM}

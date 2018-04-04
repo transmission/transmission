@@ -9,6 +9,10 @@
 #include <errno.h>
 #include <string.h> /* memcpy */
 
+#ifndef _WIN32
+#include <unistd.h> /* dup */
+#endif
+
 #include <zlib.h>
 
 #include <event2/buffer.h>
@@ -35,6 +39,26 @@
 #include "utils.h"
 #include "variant.h"
 #include "web.h"
+
+#ifdef USE_SYSTEMD
+
+#include <systemd/sd-daemon.h>
+
+#else
+
+#define SD_LISTEN_FDS_START 3
+
+static int sd_listen_fds(int unset_environment UNUSED)
+{
+    return 0;
+}
+
+static int sd_is_socket_inet(int fd UNUSED, int family UNUSED, int type UNUSED, int listening UNUSED, uint16_t port UNUSED)
+{
+    return 0;
+}
+
+#endif
 
 /* session-id is used to make cross-site request forgery attacks difficult.
  * Don't disable this feature unless you really know what you're doing!
@@ -807,7 +831,41 @@ static void startServer(void* vserver)
 
     int const port = server->port;
 
-    if (evhttp_bind_socket(httpd, address, port) == -1)
+    int sd_activated_sockets = sd_listen_fds(0);
+    bool was_sd_activated = false;
+
+#ifndef _Win32
+    for (int i = 0; i < sd_activated_sockets; i++) {
+        int fd = SD_LISTEN_FDS_START + i;
+        if (sd_is_socket_inet(fd, AF_UNSPEC, SOCK_STREAM, 1, port))
+        {
+            /* dup the fd so it'll be available again if we restart evhttp - it closes fds */
+            int newfd = dup(fd);
+            if (newfd == -1)
+            {
+                tr_logAddNamedDbg(MY_NAME, "Can't dup systemd activated socket on port %d", port);
+            }
+            else if (evutil_make_socket_nonblocking(newfd) == -1)
+            {
+                close(newfd);
+                tr_logAddNamedDbg(MY_NAME, "Can't setup systemd activated socket on port %d", port);
+            }
+            else if (evhttp_accept_socket(httpd, newfd) == -1)
+            {
+                close(newfd);
+                tr_logAddNamedDbg(MY_NAME, "Can't use systemd activated socket on port %d", port);
+            }
+            else
+            {
+                tr_logAddNamedDbg(MY_NAME, "Using systemd activated socket on port %d", port);
+                was_sd_activated = true;
+            }
+            break;
+        }
+    }
+#endif
+
+    if (!was_sd_activated && evhttp_bind_socket(httpd, address, port) == -1)
     {
         evhttp_free(httpd);
 

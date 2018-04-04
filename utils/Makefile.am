@@ -34,6 +34,7 @@ transmission_create_LDADD = \
     @LIBEVENT_LIBS@ \
     @LIBCURL_LIBS@ \
     @CRYPTO_LIBS@ \
+    @SYSTEMD_LIBS@ \
     @ZLIB_LIBS@ \
     @PTHREAD_LIBS@ \
     ${LIBM}

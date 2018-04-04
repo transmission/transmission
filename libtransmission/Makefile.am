@@ -13,6 +13,7 @@ AM_CFLAGS = \
   @LIBCURL_CFLAGS@ \
   @CRYPTO_CFLAGS@ \
   @PTHREAD_CFLAGS@ \
+  @SYSTEMD_CFLAGS@ \
   @ZLIB_CFLAGS@
 
 noinst_LIBRARIES = libtransmission.a
@@ -219,6 +220,7 @@ apps_ldadd = \
   @LIBEVENT_LIBS@ \
   @CRYPTO_LIBS@ \
   @PTHREAD_LIBS@ \
+  @SYSTEMD_LIBS@ \
   @ZLIB_LIBS@ \
   ${LIBM}
 
