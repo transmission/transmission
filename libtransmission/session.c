@@ -14,6 +14,7 @@
 #include <signal.h>
 
 #ifndef _WIN32
+#include <unistd.h> /* dup */
 #include <sys/types.h> /* umask() */
 #include <sys/stat.h> /* umask() */
 #endif
@@ -58,6 +59,26 @@
 #include "verify.h"
 #include "version.h"
 #include "web.h"
+
+#ifdef USE_SYSTEMD
+
+#include <systemd/sd-daemon.h>
+
+#else
+
+#define SD_LISTEN_FDS_START 3
+
+static int sd_listen_fds(int unset_environment UNUSED)
+{
+    return 0;
+}
+
+static int sd_is_socket_inet(int fd UNUSED, int family UNUSED, int type UNUSED, int listening UNUSED, uint16_t port UNUSED)
+{
+    return 0;
+}
+
+#endif
 
 enum
 {
@@ -183,9 +204,38 @@ static void open_incoming_peer_port(tr_session* session)
 {
     struct tr_bindinfo* b;
 
+    int sd_activated_sockets = sd_listen_fds(0);
+    bool was_systemd_activated = false;
+
+#ifndef _WIN32
+    for (int i = 0; i < sd_activated_sockets; i++)
+    {
+        int fd = SD_LISTEN_FDS_START + i;
+        if (sd_is_socket_inet(fd, AF_UNSPEC, SOCK_STREAM, 1, session->private_peer_port))
+        {
+            int newfd = dup(fd);
+            if (newfd != -1)
+            {
+                if (evutil_make_socket_nonblocking(newfd) == -1)
+                {
+                    close(newfd);
+                    break;
+                }
+                b = session->public_ipv4;
+                b->socket = newfd;
+                was_systemd_activated = true;
+            }
+            break;
+        }
+    }
+#endif
+
     /* bind an ipv4 port to listen for incoming peers... */
-    b = session->public_ipv4;
-    b->socket = tr_netBindTCP(&b->addr, session->private_peer_port, false);
+    if (!was_systemd_activated)
+    {
+        b = session->public_ipv4;
+        b->socket = tr_netBindTCP(&b->addr, session->private_peer_port, false);
+    }
 
     if (b->socket != TR_BAD_SOCKET)
     {
@@ -194,7 +244,7 @@ static void open_incoming_peer_port(tr_session* session)
     }
 
     /* and do the exact same thing for ipv6, if it's supported... */
-    if (tr_net_hasIPv6(session->private_peer_port))
+    if (!was_systemd_activated && tr_net_hasIPv6(session->private_peer_port))
     {
         b = session->public_ipv6;
         b->socket = tr_netBindTCP(&b->addr, session->private_peer_port, false);
