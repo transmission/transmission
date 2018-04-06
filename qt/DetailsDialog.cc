@@ -513,7 +513,7 @@ void DetailsDialog::refresh()
             }
         }
 
-        double const d = 100.0 * (sizeWhenDone != 0 ? (sizeWhenDone - leftUntilDone) / sizeWhenDone : 1);
+        double const d = sizeWhenDone != 0 ? 100.0 * (sizeWhenDone - leftUntilDone) / sizeWhenDone : 100.0;
         QString pct = Formatter::percentToString(d);
 
         if (haveUnverified == 0 && leftUntilDone == 0)
