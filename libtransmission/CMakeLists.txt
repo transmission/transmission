@@ -194,6 +194,10 @@ if(USE_SYSTEM_B64)
     add_definitions(-DUSE_SYSTEM_B64)
 endif()
 
+if(POLARSSL_IS_MBEDTLS)
+    add_definitions(-DPOLARSSL_IS_MBEDTLS)
+endif()
+
 include_directories(
     ${PROJECT_SOURCE_DIR}
     ${PROJECT_BINARY_DIR}
