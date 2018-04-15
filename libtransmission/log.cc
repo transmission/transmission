@@ -18,6 +18,10 @@
 #include "tr-assert.h"
 #include "utils.h"
 
+#ifdef __ANDROID__
+#include <android/log.h>
+#endif
+
 tr_log_level __tr_message_level = TR_LOG_ERROR;
 
 static bool myQueueEnabled = false;
@@ -241,7 +245,31 @@ void tr_logAddMessage(char const* file, int line, tr_log_level level, char const
         OutputDebugStringA(buf);
     }
 
+#elif defined(__ANDROID__)
+
+    int prio;
+
+    switch (level) {
+      case TR_LOG_ERROR:
+        prio = ANDROID_LOG_ERROR;
+        break;
+      case TR_LOG_INFO:
+        prio = ANDROID_LOG_INFO;
+        break;
+      case TR_LOG_DEBUG:
+        prio = ANDROID_LOG_DEBUG;
+        break;
+      default:
+        prio = ANDROID_LOG_VERBOSE;
+    }
+
+#ifdef NDEBUG
+    __android_log_print(prio, "transmission", "%s", buf);
+#else
+    __android_log_print(prio, "transmission", "[%s:%d] %s", file, line, buf);
 #endif
+
+#else
 
     if (!tr_str_is_empty(buf))
     {
@@ -296,6 +324,7 @@ void tr_logAddMessage(char const* file, int line, tr_log_level level, char const
             tr_sys_file_flush(fp, nullptr);
         }
     }
+#endif
 
 FINISH:
     tr_lockUnlock(getMessageLock());
