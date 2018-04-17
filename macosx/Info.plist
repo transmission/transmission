@@ -59,7 +59,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>VCS_REVISION_NUM</string>
+	<string>BUILD_STRING_INFOPLIST</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.utilities</string>
 	<key>LSMinimumSystemVersion</key>
