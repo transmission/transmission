@@ -49,12 +49,10 @@ add_custom_command(
 )
 
 if(ENABLE_NLS)
-    find_program(INTLTOOL_MERGE_EXECUTABLE intltool-merge REQUIRED)
-
     set(${PROJECT_NAME}_DESKTOP_FILE "${PROJECT_BINARY_DIR}/${TR_NAME}-gtk.desktop")
     add_custom_command(
         OUTPUT ${${PROJECT_NAME}_DESKTOP_FILE}
-        COMMAND ${INTLTOOL_MERGE_EXECUTABLE} --desktop-style --utf8 ${CMAKE_SOURCE_DIR}/po ${PROJECT_SOURCE_DIR}/transmission-gtk.desktop.in ${${PROJECT_NAME}_DESKTOP_FILE}
+        COMMAND ${GETTEXT_MSGFMT_EXECUTABLE} --desktop -d ${CMAKE_SOURCE_DIR}/po --template ${PROJECT_SOURCE_DIR}/transmission-gtk.desktop.in -o ${${PROJECT_NAME}_DESKTOP_FILE}
         DEPENDS ${PROJECT_SOURCE_DIR}/transmission-gtk.desktop.in
         VERBATIM
     )
@@ -62,7 +60,7 @@ if(ENABLE_NLS)
     set(${PROJECT_NAME}_APPDATA_FILE "${PROJECT_BINARY_DIR}/${TR_NAME}-gtk.appdata.xml")
     add_custom_command(
         OUTPUT ${${PROJECT_NAME}_APPDATA_FILE}
-        COMMAND ${INTLTOOL_MERGE_EXECUTABLE} --xml-style --utf8 ${CMAKE_SOURCE_DIR}/po ${PROJECT_SOURCE_DIR}/transmission-gtk.appdata.xml.in ${${PROJECT_NAME}_APPDATA_FILE}
+        COMMAND ${GETTEXT_MSGFMT_EXECUTABLE} --xml -d ${CMAKE_SOURCE_DIR}/po --template ${PROJECT_SOURCE_DIR}/transmission-gtk.appdata.xml.in -o ${${PROJECT_NAME}_APPDATA_FILE}
         DEPENDS ${PROJECT_SOURCE_DIR}/transmission-gtk.appdata.xml.in
         VERBATIM
     )
