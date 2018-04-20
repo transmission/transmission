@@ -76,7 +76,7 @@ msgstr "_Компактен вид"
 
 #: ../gtk/actions.c:71
 msgid "Re_verse Sort Order"
-msgstr "Обр_ъни подредбата"
+msgstr "Объ_рни подредбата"
 
 #: ../gtk/actions.c:72
 msgid "_Filterbar"
@@ -208,7 +208,7 @@ msgstr "Създай торент"
 
 #: ../gtk/actions.c:102
 msgid "_Quit"
-msgstr "_Затвори"
+msgstr "_Изход"
 
 #: ../gtk/actions.c:103
 msgid "Select _All"
@@ -544,11 +544,11 @@ msgstr "Заявки за сваляне"
 
 #: ../gtk/details.c:1338
 msgid "Dn Blocks"
-msgstr "Приети блокове"
+msgstr "Свалени блокове"
 
 #: ../gtk/details.c:1342
 msgid "Up Blocks"
-msgstr "Предадени блокове"
+msgstr "Качени блокове"
 
 #: ../gtk/details.c:1346
 msgid "We Cancelled"
@@ -707,7 +707,7 @@ msgstr "Тракер"
 
 #: ../gtk/details.c:2728
 msgid "_Announce URL:"
-msgstr "_Announce линк:"
+msgstr "_Обявен линк:"
 
 #: ../gtk/details.c:2813 ../gtk/details.c:2956
 msgid "Trackers"
@@ -814,7 +814,7 @@ msgstr "Нисък"
 #: ../gtk/file-list.c:834
 #, c-format
 msgid "Unable to rename file as \"%s\": %s"
-msgstr ""
+msgstr "Не може да бъде преименуван файла, като \"%s\": %s"
 
 #. add file column
 #: ../gtk/file-list.c:947 ../gtk/msgwin.c:290
@@ -867,12 +867,12 @@ msgstr "_Покажи:"
 #: ../gtk/filter.c:884
 #, c-format
 msgid "_Show %'d of:"
-msgstr ""
+msgstr "_Покажи %'d от:"
 
 #: ../gtk/main.c:314
 #, c-format
 msgid "Error registering Transmission as a %s handler: %s"
-msgstr ""
+msgstr "Грешка при регистрирането на Transmission, като %s манипулатор: %s"
 
 #: ../gtk/main.c:479
 #, c-format
@@ -920,7 +920,7 @@ msgstr ""
 
 #: ../gtk/main.c:748
 msgid "I _Agree"
-msgstr ""
+msgstr "_Съгласен съм"
 
 #: ../gtk/main.c:983
 msgid "<b>Closing Connections</b>"
@@ -932,7 +932,7 @@ msgstr "Изпращане на обща информация за качван�
 
 #: ../gtk/main.c:992
 msgid "_Quit Now"
-msgstr "_Затвори сега"
+msgstr "_Излез сега"
 
 #: ../gtk/main.c:1042
 msgid "Couldn't add corrupt torrent"
@@ -987,17 +987,17 @@ msgstr ""
 #: ../gtk/makemeta-ui.c:70
 #, c-format
 msgid "Creating \"%s\""
-msgstr "Създаване на «%s»"
+msgstr "Създаване на \"%s\""
 
 #: ../gtk/makemeta-ui.c:74
 #, c-format
 msgid "Created \"%s\"!"
-msgstr "«%s» е създаден!"
+msgstr "Създаден е \"%s\"!"
 
 #: ../gtk/makemeta-ui.c:78
 #, c-format
 msgid "Error: invalid announce URL \"%s\""
-msgstr "Грешка: неправилен адрес за обявяване «%s»"
+msgstr "Грешка: невалиден адрес за обявяване \"%s\""
 
 #: ../gtk/makemeta-ui.c:82
 #, c-format
@@ -1064,7 +1064,7 @@ msgstr "<i>Не е избран източник</i>"
 
 #: ../gtk/makemeta-ui.c:477
 msgid "Properties"
-msgstr "Настройки"
+msgstr "Свойства"
 
 #: ../gtk/makemeta-ui.c:479
 msgid "_Trackers:"
@@ -1319,7 +1319,7 @@ msgstr ""
 #: ../gtk/torrent-cell-renderer.c:170
 #, c-format
 msgid "%1$s  %2$s"
-msgstr ""
+msgstr "%1$s  %2$s"
 
 #: ../gtk/torrent-cell-renderer.c:174
 msgid "Stalled"
@@ -1333,12 +1333,12 @@ msgstr "Проверка на локалните данни (%.1f%% са про�
 #: ../gtk/torrent-cell-renderer.c:235
 #, c-format
 msgid "Tracker gave a warning: \"%s\""
-msgstr "Предупреждение от тракера: «%s»"
+msgstr "Предупреждение от тракера: \"%s\""
 
 #: ../gtk/torrent-cell-renderer.c:236
 #, c-format
 msgid "Tracker gave an error: \"%s\""
-msgstr "Грешка от тракера: «%s»"
+msgstr "Грешка от тракера: \"%s\""
 
 #: ../gtk/torrent-cell-renderer.c:237
 #, c-format
@@ -1478,15 +1478,15 @@ msgstr "Добавяне"
 
 #: ../gtk/tr-prefs.c:260
 msgid "Automatically add .torrent files _from:"
-msgstr ""
+msgstr "Автоматично добавяне на .torrent файлове от:"
 
 #: ../gtk/tr-prefs.c:267
 msgid "Show the Torrent Options _dialog"
-msgstr ""
+msgstr "Покажи диалога с опциите на торента"
 
 #: ../gtk/tr-prefs.c:271
 msgid "_Start added torrents"
-msgstr ""
+msgstr "Стартирай добавянето на торенти"
 
 #: ../gtk/tr-prefs.c:280
 msgid "Save to _Location:"
@@ -1494,19 +1494,19 @@ msgstr "Съхрани в _папката:"
 
 #: ../gtk/tr-prefs.c:287
 msgid "Download Queue"
-msgstr ""
+msgstr "Изтегли на опашката"
 
 #: ../gtk/tr-prefs.c:289
 msgid "Ma_ximum active downloads:"
-msgstr ""
+msgstr "Максимален брой активни сваляния:"
 
 #: ../gtk/tr-prefs.c:293
 msgid "Downloads sharing data in the last _N minutes are active:"
-msgstr ""
+msgstr "Изтеглянията за споделяне на данни в последните _N минути са активни:"
 
 #: ../gtk/tr-prefs.c:298 ../libtransmission/torrent.c:2158
 msgid "Incomplete"
-msgstr "Процес на сваляне"
+msgstr "Незавършен"
 
 #: ../gtk/tr-prefs.c:300
 msgid "Append \"._part\" to incomplete files' names"
@@ -1558,7 +1558,7 @@ msgstr "Покажи известие, когато торентите _завъ
 
 #: ../gtk/tr-prefs.c:386
 msgid "Play a _sound when torrents finish"
-msgstr "Възпройзвеждай  зву_ково уведомяване, когато торентите завършат свалянето"
+msgstr "Възпроизвеждай  зву_ково уведомяване, когато торентите завършат свалянето"
 
 #: ../gtk/tr-prefs.c:412
 #, c-format
@@ -1855,7 +1855,7 @@ msgstr "Мрежа"
 
 #: ../gtk/tr-prefs.c:1261
 msgid "Remote"
-msgstr ""
+msgstr "Отдалечен достъп"
 
 #: ../gtk/tr-window.c:123
 msgid "Torrent"
@@ -1882,15 +1882,15 @@ msgstr "Трансфер в сесията"
 msgid ""
 "Click to disable Alternative Speed Limits\n"
 " (%1$s down, %2$s up)"
-msgstr ""
-
+msgstr "Кликнете за да изключите алтернативното ограничаване на скоростта\n"
+" (%1$s сваляне, %2$s качване)"
 #: ../gtk/tr-window.c:249
 #, c-format
 msgid ""
 "Click to enable Alternative Speed Limits\n"
 " (%1$s down, %2$s up)"
-msgstr ""
-
+msgstr "Кликнете за да включите алтернативното ограничаване на скоростта\n"
+" (%1$s сваляне, %2$s качване)"
 #: ../gtk/tr-window.c:303
 #, c-format
 msgid "Tracker will allow requests in %s"
