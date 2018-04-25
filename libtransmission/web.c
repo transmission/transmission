@@ -196,7 +196,10 @@ static CURL* createEasy(tr_session* s, struct tr_web* web, struct tr_web_task* t
 
     if (web->curl_ssl_verify)
     {
-        curl_easy_setopt(e, CURLOPT_CAINFO, web->curl_ca_bundle);
+        if (web->curl_ca_bundle != NULL)
+        {
+            curl_easy_setopt(e, CURLOPT_CAINFO, web->curl_ca_bundle);
+        }
     }
     else
     {
