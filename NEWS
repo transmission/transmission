@@ -1,4 +1,17 @@
-=== Transmission 2.93 (2018/01/xx) ===
+=== Transmission 2.94 (2018/05/01) ===
+[https://github.com/transmission/transmission/releases/tag/2.94 All tickets closed by this release]
+==== All Platforms ====
+  * Fix building against LibreSSL (#284, #486, #570)
+  * Fix building against mbedTLS (#115, #528)
+  * Fix torrents ETA calculation (#522)
+  * Fix cross-compilation issues caused by miniupnpc configuration test (#475)
+==== Qt Client ====
+  * Fix bad downloaded percentage in DetailsDialog  (#547)
+==== Web Client ====
+  * Fix tracker error XSS in inspector (CVE pending)
+  * Fix torrent name HTML-escaping in trackers inspector tabTODO
+
+=== Transmission 2.93 (2018/01/23) ===
 [https://github.com/transmission/transmission/releases/tag/2.93 All tickets closed by this release]
 ==== All Platforms ====
   * Fix CVE-2018-5702 (#468)

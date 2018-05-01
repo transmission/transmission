@@ -759,7 +759,7 @@ function Inspector(controller) {
                 html.push('<div class="inspector_group">');
 
                 if (torrents.length > 1) {
-                    html.push('<div class="inspector_torrent_label">', tor.getName(), '</div>');
+                    html.push('<div class="inspector_torrent_label">', sanitizeText(tor.getName()), '</div>');
                 }
 
                 tier = -1;
@@ -785,9 +785,9 @@ function Inspector(controller) {
                     html.push('<li class="inspector_tracker_entry ', parity, '"><div class="tracker_host" title="', sanitizeText(tracker.announce), '">',
                         sanitizeText(tracker.host || tracker.announce), '</div>',
                         '<div class="tracker_activity">',
-                        '<div>', lastAnnounceStatusHash['label'], ': ', lastAnnounceStatusHash['value'], '</div>',
+                        '<div>', lastAnnounceStatusHash['label'], ': ', sanitizeText(lastAnnounceStatusHash['value']), '</div>',
                         '<div>', announceState, '</div>',
-                        '<div>', lastScrapeStatusHash['label'], ': ', lastScrapeStatusHash['value'], '</div>',
+                        '<div>', lastScrapeStatusHash['label'], ': ', sanitizeText(lastScrapeStatusHash['value']), '</div>',
                         '</div><table class="tracker_stats">',
                         '<tr><th>Seeders:</th><td>', (tracker.seederCount > -1 ? tracker.seederCount : na), '</td></tr>',
                         '<tr><th>Leechers:</th><td>', (tracker.leecherCount > -1 ? tracker.leecherCount : na), '</td></tr>',
