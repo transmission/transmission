@@ -93,6 +93,7 @@ struct tr_web
 {
     bool curl_verbose;
     bool curl_ssl_verify;
+    bool curl_proxy_ssl_verify;
     char* curl_ca_bundle;
     int close_mode;
     struct tr_web_task* tasks;
@@ -205,6 +206,19 @@ static CURL* createEasy(tr_session* s, struct tr_web* web, struct tr_web_task* t
     {
         curl_easy_setopt(e, CURLOPT_SSL_VERIFYHOST, 0L);
         curl_easy_setopt(e, CURLOPT_SSL_VERIFYPEER, 0L);
+    }
+
+    if (web->curl_proxy_ssl_verify)
+    {
+        if (web->curl_ca_bundle != NULL)
+        {
+            curl_easy_setopt(e, CURLOPT_PROXY_CAINFO, web->curl_ca_bundle);
+        }
+    }
+    else
+    {
+        curl_easy_setopt(e, CURLOPT_PROXY_SSL_VERIFYHOST, 0L);
+        curl_easy_setopt(e, CURLOPT_PROXY_SSL_VERIFYPEER, 0L);
     }
 
     curl_easy_setopt(e, CURLOPT_TIMEOUT, task->timeout_secs);
@@ -378,6 +392,7 @@ static void tr_webThreadFunc(void* vsession)
     web->tasks = NULL;
     web->curl_verbose = tr_env_key_exists("TR_CURL_VERBOSE");
     web->curl_ssl_verify = !tr_env_key_exists("TR_CURL_SSL_NO_VERIFY");
+    web->curl_proxy_ssl_verify = !tr_env_key_exists("TR_CURL_PROXY_SSL_NO_VERIFY");
     web->curl_ca_bundle = tr_env_get_string("CURL_CA_BUNDLE", NULL);
 
     if (web->curl_ssl_verify)
