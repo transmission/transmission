@@ -114,8 +114,15 @@ static void showInfo(tr_info const* inf)
     }
     else
     {
-        struct tm tm = *localtime(&inf->dateCreated);
-        printf("  Created on: %s", asctime(&tm));
+        struct tm *created_on = localtime(&inf->dateCreated);
+        if (created_on == NULL)
+        {
+            printf("  Created on: Invalid date\n");
+        }
+        else
+        {
+            printf("  Created on: %s", asctime(created_on));
+        }
     }
 
     if (inf->comment != NULL && *inf->comment != '\0')
