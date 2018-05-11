@@ -176,7 +176,6 @@ static long getTimeoutFromURL(struct tr_web_task const* task)
 
 static CURL* createEasy(tr_session* s, struct tr_web* web, struct tr_web_task* task)
 {
-    bool is_default_value;
     tr_address const* addr;
     CURL* e = task->curl_easy = curl_easy_init();
 
@@ -214,11 +213,11 @@ static CURL* createEasy(tr_session* s, struct tr_web* web, struct tr_web_task* t
     curl_easy_setopt(e, CURLOPT_WRITEDATA, task);
     curl_easy_setopt(e, CURLOPT_WRITEFUNCTION, writeFunc);
 
-    if ((addr = tr_sessionGetPublicAddress(s, TR_AF_INET, &is_default_value)) != NULL && !is_default_value)
+    if ((addr = tr_sessionGetPublicAddress(s, TR_AF_INET, -1)) != NULL && tr_address_compare(addr, tr_address_default(TR_AF_INET)))
     {
         curl_easy_setopt(e, CURLOPT_INTERFACE, tr_address_to_string(addr));
     }
-    else if ((addr = tr_sessionGetPublicAddress(s, TR_AF_INET6, &is_default_value)) != NULL && !is_default_value)
+    else if ((addr = tr_sessionGetPublicAddress(s, TR_AF_INET6, -1)) != NULL && tr_address_compare(addr, tr_address_default(TR_AF_INET6)))
     {
         curl_easy_setopt(e, CURLOPT_INTERFACE, tr_address_to_string(addr));
     }

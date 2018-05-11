@@ -42,6 +42,7 @@
 #include "peer-io.h" /* tr_peerIoAddrStr() FIXME this should be moved to net.h */
 #include "session.h" /* tr_sessionGetPublicAddress() */
 #include "tr-assert.h"
+#include "tr-udp.h" /* tr_udpGetSocket () */
 #include "tr-utp.h" /* tr_utpSendTo() */
 #include "utils.h" /* tr_time(), tr_logAddDebug() */
 
@@ -336,7 +337,7 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const
     addrlen = setup_sockaddr(addr, port, &sock);
 
     /* set source address */
-    source_addr = tr_sessionGetPublicAddress(session, addr->type, NULL);
+    source_addr = tr_sessionGetPublicAddress(session, addr->type, -1);
     TR_ASSERT(source_addr != NULL);
     sourcelen = setup_sockaddr(source_addr, 0, &source_sock);
 
@@ -378,12 +379,13 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const
 struct tr_peer_socket tr_netOpenPeerUTPSocket(tr_session* session, tr_address const* addr, tr_port port, bool clientIsSeed UNUSED)
 {
     struct tr_peer_socket ret = TR_PEER_SOCKET_INIT;
+    struct tr_bindinfo* b = tr_udpGetSocket(session, addr->type, -1);
 
-    if (tr_address_is_valid_for_peers(addr, port))
+    if (tr_address_is_valid_for_peers(addr, port) && b != NULL)
     {
         struct sockaddr_storage ss;
         socklen_t const sslen = setup_sockaddr(addr, port, &ss);
-        struct UTPSocket* const socket = UTP_Create(tr_utpSendTo, session, (struct sockaddr*)&ss, sslen);
+        struct UTPSocket* const socket = UTP_Create(tr_utpSendTo, b, (struct sockaddr*)&ss, sslen);
 
         if (socket != NULL)
         {

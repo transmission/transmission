@@ -30,5 +30,6 @@ THE SOFTWARE.
 void tr_udpInit(tr_session*);
 void tr_udpUninit(tr_session*);
 void tr_udpSetSocketBuffers(tr_session*);
+struct tr_bindinfo* tr_udpGetSocket(tr_session*, int tr_af_type, int idx);
 
 bool tau_handle_message(tr_session* session, uint8_t const* msg, size_t msglen);

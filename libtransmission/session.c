@@ -128,13 +128,6 @@ void tr_sessionSetEncryption(tr_session* session, tr_encryption_mode mode)
 ****
 ***/
 
-struct tr_bindinfo
-{
-    tr_socket_t socket;
-    tr_address addr;
-    struct event* ev;
-};
-
 static void close_bindinfo(struct tr_bindinfo* b)
 {
     if (b != NULL && b->socket != TR_BAD_SOCKET)
@@ -147,19 +140,18 @@ static void close_bindinfo(struct tr_bindinfo* b)
 
 static void close_incoming_peer_port(tr_session* session)
 {
-    close_bindinfo(session->public_ipv4);
-    close_bindinfo(session->public_ipv6);
+    struct tr_bindinfo* b;
+
+    while ((b = tr_list_pop_front(&session->peer_sockets)))
+    {
+        close_bindinfo(b);
+        tr_free(b);
+    }
 }
 
 static void free_incoming_peer_port(tr_session* session)
 {
-    close_bindinfo(session->public_ipv4);
-    tr_free(session->public_ipv4);
-    session->public_ipv4 = NULL;
-
-    close_bindinfo(session->public_ipv6);
-    tr_free(session->public_ipv6);
-    session->public_ipv6 = NULL;
+    close_incoming_peer_port(session);
 }
 
 static void accept_incoming_peer(evutil_socket_t fd, short what UNUSED, void* vsession)
@@ -182,60 +174,137 @@ static void accept_incoming_peer(evutil_socket_t fd, short what UNUSED, void* vs
 static void open_incoming_peer_port(tr_session* session)
 {
     struct tr_bindinfo* b;
+    int tr_af_type;
+    tr_list const* l;
 
-    /* bind an ipv4 port to listen for incoming peers... */
-    b = session->public_ipv4;
-    b->socket = tr_netBindTCP(&b->addr, session->private_peer_port, false);
-
-    if (b->socket != TR_BAD_SOCKET)
+    /* listen for incoming peers... */
+    for (tr_af_type = 0; tr_af_type < NUM_TR_AF_INET_TYPES; tr_af_type++)
+    for (l = session->public_addrs[tr_af_type]; l; l = l->next)
     {
+        tr_address* addr = l->data;
+        int sock = tr_netBindTCP(addr, session->private_peer_port, false);
+        if (sock == TR_BAD_SOCKET)
+        {
+            continue;
+        }
+        b = tr_new(struct tr_bindinfo, 1);
+        b->session = session;
+        b->addr = addr;
+        b->socket = sock;
         b->ev = event_new(session->event_base, b->socket, EV_READ | EV_PERSIST, accept_incoming_peer, session);
         event_add(b->ev, NULL);
-    }
-
-    /* and do the exact same thing for ipv6, if it's supported... */
-    if (tr_net_hasIPv6(session->private_peer_port))
-    {
-        b = session->public_ipv6;
-        b->socket = tr_netBindTCP(&b->addr, session->private_peer_port, false);
-
-        if (b->socket != TR_BAD_SOCKET)
-        {
-            b->ev = event_new(session->event_base, b->socket, EV_READ | EV_PERSIST, accept_incoming_peer, session);
-            event_add(b->ev, NULL);
-        }
+        tr_list_append(&session->peer_sockets, b);
     }
 }
 
-tr_address const* tr_sessionGetPublicAddress(tr_session const* session, int tr_af_type, bool* is_default_value)
+tr_address const* tr_sessionGetPublicAddress(tr_session const* session, int tr_af_type, int idx)
 {
-    char const* default_value;
-    struct tr_bindinfo const* bindinfo;
+    tr_list const* l;
 
-    switch (tr_af_type)
+    if (tr_af_type >= NUM_TR_AF_INET_TYPES)
     {
-    case TR_AF_INET:
-        bindinfo = session->public_ipv4;
-        default_value = TR_DEFAULT_BIND_ADDRESS_IPV4;
-        break;
-
-    case TR_AF_INET6:
-        bindinfo = session->public_ipv6;
-        default_value = TR_DEFAULT_BIND_ADDRESS_IPV6;
-        break;
-
-    default:
-        bindinfo = NULL;
-        default_value = "";
-        break;
+        return NULL;
     }
 
-    if (is_default_value != NULL && bindinfo != NULL)
+    if (idx < 0)
     {
-        *is_default_value = tr_strcmp0(default_value, tr_address_to_string(&bindinfo->addr)) == 0;
+        idx = tr_rand_int_weak(tr_list_size(session->public_addrs[tr_af_type]));
     }
 
-    return bindinfo != NULL ? &bindinfo->addr : NULL;
+    for (l = session->public_addrs[tr_af_type]; l; l = l->next)
+    {
+        if (idx-- == 0)
+        {
+            return l->data;
+        }
+    }
+
+    return NULL;
+}
+
+char const* tr_sessionGetBindAddress(tr_session const* session, int tr_af_type)
+{
+    static char* buf = NULL;
+    static size_t bufsize = 0;
+    tr_list const* l;
+    size_t len = 0;
+
+    TR_ASSERT(tr_af_type < NUM_TR_AF_INET_TYPES);
+     
+    for (l = session->public_addrs[tr_af_type]; l; l = l->next)
+    {
+        char const* s = tr_address_to_string(l->data);
+        int n = strlen(s);
+
+        if (len+n+1 > bufsize)
+        {
+            buf = tr_realloc(buf, bufsize = len+n+1);
+        }
+        memcpy(buf+len, s, n); len += n;
+        buf[len++] = ',';
+    }
+
+    if (buf == NULL)
+    {
+        buf = tr_malloc(bufsize = len = 1);
+    }
+    buf[--len] = '\0';
+    return buf;
+}
+
+void tr_sessionAddBindAddress(tr_session* session, int tr_af_type, char const* str)
+{
+    tr_address addr;
+
+    if (!tr_address_from_string(&addr, str))
+    {
+        tr_logAddError("Invalid bind address %s", str);
+        return;
+    }
+
+    if (addr.type != tr_af_type)
+    {
+        tr_logAddError("Incorrect type for bind address %s", str);
+        return;
+    }
+
+    if (!tr_list_find(session->public_addrs[tr_af_type], &addr, (TrListCompareFunc)tr_address_compare))
+    {
+        tr_address* a = tr_memdup(&addr, sizeof(tr_address));
+        tr_list_append(&session->public_addrs[tr_af_type], a);
+    }
+}
+
+void tr_sessionSetBindAddress(tr_session* session, int tr_af_type, char const* str)
+{
+    TR_ASSERT(tr_af_type < NUM_TR_AF_INET_TYPES);
+
+    if (session->public_addrs[tr_af_type])
+    {
+        tr_list_free(&session->public_addrs[tr_af_type], tr_free);
+    }
+
+    if (str)
+    {
+        char* temp = tr_strdup (str);
+        char* walk = temp;
+        char const* token;
+
+        while ((token = tr_strsep(&walk, ", ")))
+        {
+            if (*token)
+            {
+                tr_sessionAddBindAddress(session, tr_af_type, token);
+            }
+        }
+        tr_free(temp);
+    }
+
+    if (session->public_addrs[tr_af_type] == NULL)
+    {
+        tr_address* a = tr_memdup(tr_address_default(tr_af_type), sizeof(tr_address));
+        tr_list_append(&session->public_addrs[tr_af_type], a);
+    }
 }
 
 /***
@@ -462,8 +531,8 @@ void tr_sessionGetSettings(tr_session* s, tr_variant* d)
     tr_variantDictAddBool(d, TR_KEY_speed_limit_up_enabled, tr_sessionIsSpeedLimited(s, TR_UP));
     tr_variantDictAddInt(d, TR_KEY_umask, s->umask);
     tr_variantDictAddInt(d, TR_KEY_upload_slots_per_torrent, s->uploadSlotsPerTorrent);
-    tr_variantDictAddStr(d, TR_KEY_bind_address_ipv4, tr_address_to_string(&s->public_ipv4->addr));
-    tr_variantDictAddStr(d, TR_KEY_bind_address_ipv6, tr_address_to_string(&s->public_ipv6->addr));
+    tr_variantDictAddStr(d, TR_KEY_bind_address_ipv4, tr_sessionGetBindAddress(s, TR_AF_INET));
+    tr_variantDictAddStr(d, TR_KEY_bind_address_ipv6, tr_sessionGetBindAddress(s, TR_AF_INET6));
     tr_variantDictAddBool(d, TR_KEY_start_added_torrents, !tr_sessionGetPaused(s));
     tr_variantDictAddBool(d, TR_KEY_trash_original_torrent_files, tr_sessionGetDeleteSource(s));
 }
@@ -608,8 +677,6 @@ tr_session* tr_sessionInit(char const* configDir, bool messageQueuingEnabled, tr
 
     /* initialize the bare skeleton of the session object */
     session = tr_new0(tr_session, 1);
-    session->udp_socket = TR_BAD_SOCKET;
-    session->udp6_socket = TR_BAD_SOCKET;
     session->lock = tr_lockNew();
     session->cache = tr_cacheNew(1024 * 1024 * 2);
     session->magicNumber = SESSION_MAGIC_NUMBER;
@@ -776,7 +843,7 @@ static void tr_sessionInitImpl(void* vdata)
 
     if (session->isLPDEnabled)
     {
-        tr_lpdInit(session, &session->public_ipv4->addr);
+        tr_lpdInit(session, NULL);
     }
 
     /* cleanup */
@@ -801,7 +868,6 @@ static void sessionSetImpl(void* vdata)
     double d;
     bool boolVal;
     char const* str;
-    struct tr_bindinfo b;
     struct tr_turtle_info* turtle = &session->turtle;
 
     if (tr_variantDictFindInt(settings, TR_KEY_message_level, &i))
@@ -965,28 +1031,15 @@ static void sessionSetImpl(void* vdata)
     session->rpcServer = tr_rpcInit(session, settings);
 
     /* public addresses */
-
-    free_incoming_peer_port(session);
-
-    tr_variantDictFindStr(settings, TR_KEY_bind_address_ipv4, &str, NULL);
-
-    if (!tr_address_from_string(&b.addr, str) || b.addr.type != TR_AF_INET)
+    if (tr_variantDictFindStr(settings, TR_KEY_bind_address_ipv4, &str, NULL))
     {
-        b.addr = tr_inaddr_any;
+        tr_sessionSetBindAddress(session, TR_AF_INET, str);
     }
 
-    b.socket = TR_BAD_SOCKET;
-    session->public_ipv4 = tr_memdup(&b, sizeof(struct tr_bindinfo));
-
-    tr_variantDictFindStr(settings, TR_KEY_bind_address_ipv6, &str, NULL);
-
-    if (!tr_address_from_string(&b.addr, str) || b.addr.type != TR_AF_INET6)
+    if (tr_variantDictFindStr(settings, TR_KEY_bind_address_ipv6, &str, NULL))
     {
-        b.addr = tr_in6addr_any;
+        tr_sessionSetBindAddress(session, TR_AF_INET6, str);
     }
-
-    b.socket = TR_BAD_SOCKET;
-    session->public_ipv6 = tr_memdup(&b, sizeof(struct tr_bindinfo));
 
     /* incoming peer port */
     if (tr_variantDictFindInt(settings, TR_KEY_peer_port_random_low, &i))
@@ -2311,7 +2364,7 @@ static void toggleLPDImpl(void* data)
 
     if (session->isLPDEnabled)
     {
-        tr_lpdInit(session, &session->public_ipv4->addr);
+        tr_lpdInit(session, NULL);
     }
 }
 

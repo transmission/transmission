@@ -114,6 +114,11 @@ static inline bool tr_address_is_valid(tr_address const* a)
     return a != NULL && (a->type == TR_AF_INET || a->type == TR_AF_INET6);
 }
 
+static inline const tr_address* tr_address_default(tr_address_type type)
+{
+    return type == TR_AF_INET ? &tr_inaddr_any : type == TR_AF_INET6 ? &tr_in6addr_any : NULL;
+}
+
 /***********************************************************************
  * Sockets
  **********************************************************************/
