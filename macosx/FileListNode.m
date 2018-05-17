@@ -114,7 +114,7 @@
     NSParameterAssert(path != nil);
 
     NSArray * lookupPathComponents = path.pathComponents;
-    NSArray * thesePathComponents = (self.path).pathComponents;
+    NSArray * thesePathComponents = self.path.pathComponents;
 
     if ([lookupPathComponents isEqualToArray: thesePathComponents]) //this node represents what's being renamed
     {
