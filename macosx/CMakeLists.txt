@@ -371,6 +371,7 @@ endforeach()
 
 include_directories(
     ${CMAKE_SOURCE_DIR}/libtransmission
+    ${CMAKE_BINARY_DIR}/libtransmission
     ${PROJECT_SOURCE_DIR}/VDKQueue
 )
 

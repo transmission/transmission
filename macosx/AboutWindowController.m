@@ -22,6 +22,8 @@
 
 #import "AboutWindowController.h"
 
+#include "version.h"
+
 @implementation AboutWindowController
 
 AboutWindowController * fAboutBoxInstance = nil;
@@ -34,9 +36,7 @@ AboutWindowController * fAboutBoxInstance = nil;
 
 - (void) awakeFromNib
 {
-    NSDictionary * info = [NSBundle mainBundle].infoDictionary;
-    fVersionField.stringValue = [NSString stringWithFormat: @"%@ (%@)",
-        info[@"CFBundleShortVersionString"], info[(NSString *)kCFBundleVersionKey]];
+    fVersionField.stringValue = @(LONG_VERSION_STRING);
 
     fCopyrightField.stringValue = [[NSBundle mainBundle] localizedStringForKey: @"NSHumanReadableCopyright"
                                         value: nil table: @"InfoPlist"];
