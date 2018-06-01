@@ -199,7 +199,7 @@ endif()
 
 if(ENABLE_NLS)
     install(FILES ${${PROJECT_NAME}_DESKTOP_FILE} DESTINATION ${CMAKE_INSTALL_DATADIR}/applications)
-    install(FILES ${${PROJECT_NAME}_APPDATA_FILE} DESTINATION ${CMAKE_INSTALL_DATADIR}/appdata)
+    install(FILES ${${PROJECT_NAME}_APPDATA_FILE} DESTINATION ${CMAKE_INSTALL_DATADIR}/metainfo)
 else()
     install(FILES transmission-gtk.desktop.in DESTINATION ${CMAKE_INSTALL_DATADIR}/applications RENAME ${TR_NAME}-gtk.desktop)
 endif()
