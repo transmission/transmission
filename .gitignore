@@ -24,3 +24,9 @@ macosx/en.lproj/*~.nib
 po/*.mo
 /release
 third-party/miniupnp/miniupnpcstrings.h
+
+# Related to snap packaging
+/parts
+/prime
+/stage
+/*.snap

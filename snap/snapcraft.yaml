@@ -1,0 +1,61 @@
+name: transmission-daemon
+version: '2.94'
+summary: Transmission is a fast, easy, and free BitTorrent client.
+description: |
+  Transmission is a BitTorrent client which features a variety 
+  of user interfaces on top of a cross-platform back-end. 
+  Transmission is free software licensed under the terms 
+  of the GNU General Public License (GNU GPL), 
+  with parts under the MIT License.
+  This snap package has the daemon/CLI tools of Transmission
+
+grade: stable
+confinement: strict
+
+apps:
+  transmission-daemon:
+    command: 
+      transmission-daemon
+    plugs:
+      - home
+      - network
+      - network-bind
+      - removable-media
+  transmission-create:
+    command: 
+      transmission-create
+    plugs:
+      - home
+  transmission-edit:
+    command: 
+      transmission-edit
+    plugs:
+      - home
+  transmission-show:
+    command: 
+      transmission-show
+    plugs:
+      - home
+
+parts:
+  transmission-daemon:
+    source: https://github.com/transmission/transmission.git
+    source-tag: '2.94'
+    plugin: autotools
+    configflags:
+      - "--disable-gtk"
+      - "--enable-daemon"
+    build-packages: 
+      - pkg-config
+      - libcurl4-gnutls-dev
+      - libevent-dev
+      - zlib1g-dev
+      - libssl-dev
+      - intltool
+      - libglib2.0-dev
+      - libminiupnpc-dev
+    stage-packages:
+      - libcurl3
+      - libcurl3-gnutls
+      - libevent-2.0-5
+      - libminiupnpc10
