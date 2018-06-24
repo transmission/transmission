@@ -1834,6 +1834,10 @@ static char const* torrentAdd(tr_session* session, tr_variant* args_in, tr_varia
         {
             tr_ctorSetMetainfoFromMagnetLink(ctor, fname);
         }
+        else if (tr_maybeHash(fname) && !tr_sys_path_exists(fname, NULL))
+        {
+            tr_ctorSetMetainfoFromMagnetLink(ctor, fname);
+        }
         else
         {
             tr_ctorSetMetainfoFromFile(ctor, fname);

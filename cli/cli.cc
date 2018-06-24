@@ -321,6 +321,10 @@ int tr_main(int argc, char* argv[])
             tr_wait_msec(1000);
         }
     }
+    else if (tr_maybeHash(torrentPath))
+    {
+        tr_ctorSetMetainfoFromMagnetLink(ctor, torrentPath);
+    }
     else
     {
         fprintf(stderr, "ERROR: Unrecognized torrent \"%s\".\n", torrentPath);
