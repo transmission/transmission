@@ -533,7 +533,7 @@ GtkWidget* gtr_window_new(GtkApplication* app, TrCore* core)
     toolbar = gtk_header_bar_new();
     gtk_header_bar_set_show_close_button(GTK_HEADER_BAR(toolbar), TRUE);
     gtk_header_bar_set_title(GTK_HEADER_BAR(toolbar), g_get_application_name());
-    gtk_header_bar_set_subtitle(GTK_HEADER_BAR(toolbar), "All Torrents");
+    gtk_header_bar_set_subtitle(GTK_HEADER_BAR(toolbar), _("All Torrents"));
     gtk_window_set_titlebar(GTK_WINDOW(win), toolbar);
 
     /* selected torrent actions */

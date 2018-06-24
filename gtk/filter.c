@@ -314,7 +314,7 @@ GtkWidget* gtr_filter_bar_new(tr_session* session UNUSED, GtkTreeModel* tmodel, 
 
     /* add the entry field */
     w = gtk_search_entry_new();
-    gtk_entry_set_placeholder_text(GTK_ENTRY(w), "Search by torrent name");
+    gtk_entry_set_placeholder_text(GTK_ENTRY(w), _("Search by torrent name"));
     g_signal_connect(w, "icon-release", G_CALLBACK(entry_clear), NULL);
 
     gtk_box_pack_start(GTK_BOX(wrapper), w, TRUE, TRUE, 0);
