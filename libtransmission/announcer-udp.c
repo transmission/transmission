@@ -326,8 +326,8 @@ static tau_announce_event get_tau_announce_event(tr_announce_event e)
     }
 }
 
-static struct tau_announce_request* tau_announce_request_new(tr_announce_request const* in, tr_announce_response_func callback,
-    void* user_data)
+static struct tau_announce_request* tau_announce_request_new(tr_session const* session, tr_announce_request const* in,
+    tr_announce_response_func callback, void* user_data)
 {
     struct evbuffer* buf;
     struct tau_announce_request* req;
@@ -343,7 +343,7 @@ static struct tau_announce_request* tau_announce_request_new(tr_announce_request
     evbuffer_add_hton_64(buf, in->leftUntilComplete);
     evbuffer_add_hton_64(buf, in->up);
     evbuffer_add_hton_32(buf, get_tau_announce_event(in->event));
-    evbuffer_add_hton_32(buf, 0);
+    evbuffer_add_hton_32(buf, tr_sessionGetExternalIPAddr(session));
     evbuffer_add_hton_32(buf, in->key);
     evbuffer_add_hton_32(buf, in->numwant);
     evbuffer_add_hton_16(buf, in->port);
@@ -988,7 +988,7 @@ void tr_tracker_udp_announce(tr_session* session, tr_announce_request const* req
 {
     struct tr_announcer_udp* tau = announcer_udp_get(session);
     struct tau_tracker* tracker = tau_session_get_tracker(tau, request->url);
-    struct tau_announce_request* r = tau_announce_request_new(request, response_func, user_data);
+    struct tau_announce_request* r = tau_announce_request_new(session, request, response_func, user_data);
     tr_ptrArrayAppend(&tracker->announces, r);
     tau_tracker_upkeep_ex(tracker, false);
 }

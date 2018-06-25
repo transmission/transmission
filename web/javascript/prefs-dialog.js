@@ -35,6 +35,8 @@ function PrefsDialog(remote) {
             'peer-port-random-on-start',
             'pex-enabled',
             'port-forwarding-enabled',
+            'announce-external-ip',
+            'static-external-ip',
             'rename-partial-files',
             'seedRatioLimit',
             'seedRatioLimited',
@@ -58,7 +60,8 @@ function PrefsDialog(remote) {
             'idle-seeding-limit-enabled': ['idle-seeding-limit'],
             'seedRatioLimited': ['seedRatioLimit'],
             'speed-limit-down-enabled': ['speed-limit-down'],
-            'speed-limit-up-enabled': ['speed-limit-up']
+            'speed-limit-up-enabled': ['speed-limit-up'],
+            'announce-external-ip': ['static-external-ip']
         }
     };
 

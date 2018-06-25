@@ -2130,6 +2130,16 @@ static char const* sessionSet(tr_session* session, tr_variant* args_in, tr_varia
         tr_sessionSetPortForwardingEnabled(session, boolVal);
     }
 
+    if (tr_variantDictFindBool(args_in, TR_KEY_announce_external_ip, &boolVal))
+    {
+        tr_sessionSetAnnounceExternalIP(session, boolVal);
+    }
+
+    if (tr_variantDictFindStr(args_in, TR_KEY_static_external_ip, &str, NULL))
+    {
+        tr_sessionSetStaticExternalIP(session, str);
+    }
+
     if (tr_variantDictFindBool(args_in, TR_KEY_rename_partial_files, &boolVal))
     {
         tr_sessionSetIncompleteFileNamingEnabled(session, boolVal);
@@ -2384,6 +2394,14 @@ static void addSessionField(tr_session* s, tr_variant* d, tr_quark key)
 
     case TR_KEY_port_forwarding_enabled:
         tr_variantDictAddBool(d, key, tr_sessionIsPortForwardingEnabled(s));
+        break;
+
+    case TR_KEY_announce_external_ip:
+        tr_variantDictAddBool(d, key, tr_sessionIsAnnounceExternalIPEnabled(s));
+        break;
+
+    case TR_KEY_static_external_ip:
+        tr_variantDictAddStr(d, key, tr_sessionGetStaticExternalIP(s));
         break;
 
     case TR_KEY_rename_partial_files:

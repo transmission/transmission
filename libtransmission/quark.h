@@ -44,6 +44,7 @@ enum
     TR_KEY_alt_speed_time_end, /* rpc, settings */
     TR_KEY_alt_speed_up, /* rpc, settings */
     TR_KEY_announce, /* metainfo */
+    TR_KEY_announce_external_ip,
     TR_KEY_announce_list, /* metainfo */
     TR_KEY_announceState, /* rpc */
     TR_KEY_arguments, /* rpc */
@@ -350,6 +351,7 @@ enum
     TR_KEY_start_added_torrents,
     TR_KEY_start_minimized,
     TR_KEY_startDate,
+    TR_KEY_static_external_ip,
     TR_KEY_status,
     TR_KEY_statusbar_stats,
     TR_KEY_tag,

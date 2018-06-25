@@ -113,6 +113,8 @@ struct tr_session
     bool pauseAddedTorrent;
     bool deleteSourceTorrent;
     bool scrapePausedTorrents;
+    bool announceExternalIP;
+    char staticExternalIP[16];
 
     uint8_t peer_id_ttl_hours;
 
@@ -320,3 +322,6 @@ bool tr_sessionGetActiveSpeedLimit_Bps(tr_session const* session, tr_direction d
 void tr_sessionGetNextQueuedTorrents(tr_session* session, tr_direction dir, size_t numwanted, tr_ptrArray* setme);
 
 int tr_sessionCountQueueFreeSlots(tr_session* session, tr_direction);
+
+char const* tr_sessionGetExternalIPStr(tr_session const* session);
+uint32_t tr_sessionGetExternalIPAddr(tr_session const* session);

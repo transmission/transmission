@@ -66,6 +66,7 @@ struct tr_web_task
     char* url;
     char* range;
     char* cookies;
+    struct curl_slist* headers;
     tr_session* session;
     tr_web_done_func done_func;
     void* done_func_user_data;
@@ -78,6 +79,11 @@ static void task_free(struct tr_web_task* task)
     if (task->freebuf != NULL)
     {
         evbuffer_free(task->freebuf);
+    }
+
+    if (task->headers != NULL)
+    {
+        curl_slist_free_all(task->headers);
     }
 
     tr_free(task->cookies);
@@ -242,6 +248,7 @@ static CURL* createEasy(tr_session* s, struct tr_web* web, struct tr_web_task* t
 {
     bool is_default_value;
     tr_address const* addr;
+    char const* ip_str;
     CURL* e = curl_easy_init();
 
     task->curl_easy = e;
@@ -307,6 +314,27 @@ static CURL* createEasy(tr_session* s, struct tr_web* web, struct tr_web_task* t
         curl_easy_setopt(e, CURLOPT_RANGE, task->range);
         /* don't bother asking the server to compress webseed fragments */
         curl_easy_setopt(e, CURLOPT_ENCODING, "identity");
+    }
+
+    /* Duplicate "ip=" from URL to X-Forwarded-For HTTP header */
+    if ((ip_str = strstr(task->url, "&ip=")) != NULL)
+    {
+        char const* ip_end;
+        unsigned ip_len;
+        char* header;
+
+        ip_str += 4; /* Skip &ip= */
+        ip_end = strchr(ip_str, '&');
+        ip_len = ip_end ? (unsigned)(ip_end - ip_str) : strlen(ip_str);
+
+        if (ip_len > 0)
+        {
+            header = tr_strdup_printf("X-Forwarded-For: %.*s", ip_len, ip_str);
+            task->headers = curl_slist_append(task->headers, header);
+            TR_ASSERT(task->headers != NULL);
+            curl_easy_setopt(e, CURLOPT_HTTPHEADER, task->headers);
+            tr_free (header);
+        }
     }
 
     return e;

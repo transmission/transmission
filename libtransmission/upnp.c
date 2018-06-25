@@ -48,6 +48,7 @@ struct tr_upnp
     char lanaddr[16];
     bool isMapped;
     tr_upnp_state state;
+    char ipv4AddrStr[16];
 };
 
 /**
@@ -170,6 +171,35 @@ static void tr_upnpDeletePortMapping(tr_upnp const* handle, char const* proto, t
     UPNP_DeletePortMapping(handle->urls.controlURL, handle->data.first.servicetype, portStr, proto, NULL);
 }
 
+static void tr_upnpResetExternalIPAddress(tr_upnp* handle)
+{
+    handle->ipv4AddrStr[0] = '\0';
+}
+
+static int tr_upnpUpdateExternalIPAddress(tr_upnp* handle)
+{
+    int err = 0;
+    int const old_errno = errno;
+    errno = 0;
+
+    err = UPNP_GetExternalIPAddress(handle->urls.controlURL, handle->data.first.servicetype, handle->ipv4AddrStr);
+
+    if (err != 0)
+    {
+        tr_upnpResetExternalIPAddress(handle);
+    }
+
+    tr_logAddNamedDbg(getKey(), "External IP Address: %s", handle->ipv4AddrStr);
+
+    if (err != 0)
+    {
+        tr_logAddNamedDbg(getKey(), "Can't get External IP Address, error is %d (errno %d - %s)", err, errno, tr_strerror(errno));
+    }
+
+    errno = old_errno;
+    return err;
+}
+
 /**
 ***
 **/
@@ -228,6 +258,15 @@ int tr_upnpPulse(tr_upnp* handle, int port, bool isEnabled, bool doPortCheck)
             tr_logAddNamedInfo(getKey(), _("Port %d isn't forwarded"), handle->port);
             handle->isMapped = false;
         }
+
+        if (handle->isMapped)
+        {
+            tr_upnpUpdateExternalIPAddress(handle);
+        }
+        else
+        {
+            tr_upnpResetExternalIPAddress(handle);
+        }
     }
 
     if (handle->state == TR_UPNP_UNMAP)
@@ -241,6 +280,7 @@ int tr_upnpPulse(tr_upnp* handle, int port, bool isEnabled, bool doPortCheck)
         handle->isMapped = false;
         handle->state = TR_UPNP_IDLE;
         handle->port = -1;
+        tr_upnpResetExternalIPAddress(handle);
     }
 
     if (handle->state == TR_UPNP_IDLE)
@@ -280,12 +320,14 @@ int tr_upnpPulse(tr_upnp* handle, int port, bool isEnabled, bool doPortCheck)
             tr_logAddNamedInfo(getKey(), "%s", _("Port forwarding successful!"));
             handle->port = port;
             handle->state = TR_UPNP_IDLE;
+            tr_upnpUpdateExternalIPAddress(handle);
         }
         else
         {
             tr_logAddNamedDbg(getKey(), "If your router supports UPnP, please make sure UPnP is enabled!");
             handle->port = -1;
             handle->state = TR_UPNP_ERR;
+            tr_upnpResetExternalIPAddress(handle);
         }
     }
 
@@ -313,4 +355,9 @@ int tr_upnpPulse(tr_upnp* handle, int port, bool isEnabled, bool doPortCheck)
     }
 
     return ret;
+}
+
+char const* tr_upnpGetExternalIP(tr_upnp const* handle)
+{
+    return handle->ipv4AddrStr;
 }

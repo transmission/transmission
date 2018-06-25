@@ -35,6 +35,7 @@ typedef enum
     TR_NATPMP_IDLE,
     TR_NATPMP_ERR,
     TR_NATPMP_DISCOVER,
+    TR_NATPMP_SEND_PUB,
     TR_NATPMP_RECV_PUB,
     TR_NATPMP_SEND_MAP,
     TR_NATPMP_RECV_MAP,
@@ -55,6 +56,7 @@ struct tr_natpmp
     time_t command_time;
     tr_natpmp_state state;
     natpmp_t natpmp;
+    char ipv4AddrStr[16];
 };
 
 /**
@@ -110,15 +112,35 @@ static void setCommandTime(struct tr_natpmp* nat)
     nat->command_time = tr_time() + COMMAND_WAIT_SECS;
 }
 
+static void tr_natpmpSaveExternalIPAddress(struct tr_natpmp* nat, char const* str)
+{
+    tr_strlcpy(nat->ipv4AddrStr, str, sizeof(nat->ipv4AddrStr));
+}
+
+static void tr_natpmpResetExternalIPAddress(struct tr_natpmp* nat)
+{
+    nat->ipv4AddrStr[0] = '\0';
+}
+
+char const *tr_natpmpGetExternalIP(struct tr_natpmp const* nat)
+{
+    return nat->ipv4AddrStr;
+}
+
 int tr_natpmpPulse(struct tr_natpmp* nat, tr_port private_port, bool is_enabled, tr_port* public_port)
 {
     int ret;
 
     if (is_enabled && nat->state == TR_NATPMP_DISCOVER)
     {
-        int val = initnatpmp(&nat->natpmp, 0, 0);
+        int const val = initnatpmp(&nat->natpmp, 0, 0);
         logVal("initnatpmp", val);
-        val = sendpublicaddressrequest(&nat->natpmp);
+        nat->state = TR_NATPMP_SEND_PUB;
+    }
+
+    if (nat->state == TR_NATPMP_SEND_PUB && canSendCommand(nat))
+    {
+        int const val = sendpublicaddressrequest(&nat->natpmp);
         logVal("sendpublicaddressrequest", val);
         nat->state = val < 0 ? TR_NATPMP_ERR : TR_NATPMP_RECV_PUB;
         nat->has_discovered = true;
@@ -136,6 +158,7 @@ int tr_natpmpPulse(struct tr_natpmp* nat, tr_port private_port, bool is_enabled,
             char str[128];
             evutil_inet_ntop(AF_INET, &response.pnu.publicaddress.addr, str, sizeof(str));
             tr_logAddNamedInfo(getKey(), _("Found public address \"%s\""), str);
+            tr_natpmpSaveExternalIPAddress(nat, str);
             nat->state = TR_NATPMP_IDLE;
         }
         else if (val != NATPMP_TRYAGAIN)
@@ -178,6 +201,7 @@ int tr_natpmpPulse(struct tr_natpmp* nat, tr_port private_port, bool is_enabled,
                 nat->public_port = 0;
                 nat->state = TR_NATPMP_IDLE;
                 nat->is_mapped = false;
+                tr_natpmpResetExternalIPAddress(nat);
             }
         }
         else if (val != NATPMP_TRYAGAIN)
@@ -214,7 +238,7 @@ int tr_natpmpPulse(struct tr_natpmp* nat, tr_port private_port, bool is_enabled,
 
         if (val >= 0)
         {
-            nat->state = TR_NATPMP_IDLE;
+            nat->state = TR_NATPMP_SEND_PUB;
             nat->is_mapped = true;
             nat->renew_time = tr_time() + (resp.pnu.newportmapping.lifetime / 2);
             nat->private_port = resp.pnu.newportmapping.privateport;
@@ -238,6 +262,7 @@ int tr_natpmpPulse(struct tr_natpmp* nat, tr_port private_port, bool is_enabled,
         ret = TR_PORT_UNMAPPED;
         break;
 
+    case TR_NATPMP_SEND_PUB:
     case TR_NATPMP_RECV_PUB:
     case TR_NATPMP_SEND_MAP:
     case TR_NATPMP_RECV_MAP:

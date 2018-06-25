@@ -106,6 +106,13 @@ static char* announce_url_new(tr_session const* session, tr_announce_request con
         evbuffer_add_printf(buf, "&trackerid=%s", str);
     }
 
+    str = tr_sessionGetExternalIPStr(session);
+
+    if (str != NULL && *str != '\0')
+    {
+        evbuffer_add_printf(buf, "&ip=%s", str);
+    }
+
     /* There are two incompatible techniques for announcing an IPv6 address.
        BEP-7 suggests adding an "ipv6=" parameter to the announce URL,
        while OpenTracker requires that peers announce twice, once over IPv4

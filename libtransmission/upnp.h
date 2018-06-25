@@ -25,4 +25,6 @@ void tr_upnpClose(tr_upnp*);
 
 int tr_upnpPulse(tr_upnp*, int port, bool isEnabled, bool doPortCheck);
 
+char const* tr_upnpGetExternalIP(tr_upnp const* handle);
+
 /* @} */

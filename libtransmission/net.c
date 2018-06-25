@@ -710,6 +710,34 @@ unsigned char const* tr_globalIPv6(void)
     return have_ipv6 ? ipv6 : NULL;
 }
 
+char const* tr_globalIPv4Str(void)
+{
+    static char ipv4_str[16];
+    static time_t last_time = 0;
+    time_t const now = tr_time ();
+
+    /* Re-check every half hour */
+    if (last_time < now - 1800)
+    {
+        unsigned char ipv4[4];
+        int addrlen = sizeof(ipv4);
+        int const rc = tr_globalAddress(AF_INET, ipv4, &addrlen);
+
+        if ((rc >= 0) && (addrlen == 4))
+        {
+            evutil_inet_ntop(AF_INET, ipv4, ipv4_str, sizeof(ipv4_str));
+        }
+        else
+        {
+            ipv4_str[0] = '\0';
+        }
+
+        last_time = now;
+    }
+
+    return ipv4_str;
+}
+
 /***
 ****
 ****

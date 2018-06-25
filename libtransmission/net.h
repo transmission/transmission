@@ -154,3 +154,5 @@ bool tr_net_hasIPv6(tr_port);
 char* tr_net_strerror(char* buf, size_t buflen, int err);
 
 unsigned char const* tr_globalIPv6(void);
+
+char const* tr_globalIPv4Str(void);

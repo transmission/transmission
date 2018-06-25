@@ -37,4 +37,6 @@ bool tr_sharedTraversalIsEnabled(tr_shared const* s);
 
 int tr_sharedTraversalStatus(tr_shared const*);
 
+char const* tr_sharedGetExternalIP(tr_shared const* s);
+
 /** @} */

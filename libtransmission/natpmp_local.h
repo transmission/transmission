@@ -25,4 +25,6 @@ void tr_natpmpClose(tr_natpmp*);
 
 int tr_natpmpPulse(tr_natpmp*, tr_port port, bool isEnabled, tr_port* public_port);
 
+char const* tr_natpmpGetExternalIP(tr_natpmp const* nat);
+
 /* @} */
