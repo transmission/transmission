@@ -54,6 +54,7 @@ cat > libtransmission/version.h.new << EOF
 #define SHORT_VERSION_STRING      "${user_agent_prefix}"
 #define LONG_VERSION_STRING       "${user_agent_prefix} (${vcs_revision})"
 #define VERSION_STRING_INFOPLIST  ${user_agent_prefix}
+#define BUILD_STRING_INFOPLIST    14714.${major_version}.${minor_version}
 #define MAJOR_VERSION             ${major_version}
 #define MINOR_VERSION             ${minor_version}
 EOF

@@ -48,7 +48,7 @@ static void log_openssl_error(char const* file, int line)
 
         if (!strings_loaded)
         {
-#if OPENSSL_VERSION_NUMBER < 0x10100000 || defined(LIBRESSL_VERSION_NUMBER)
+#if OPENSSL_VERSION_NUMBER < 0x10100000 || (defined(LIBRESSL_VERSION_NUMBER) && LIBRESSL_VERSION_NUMBER < 0x20700000)
             ERR_load_crypto_strings();
 #else
             OPENSSL_init_crypto(OPENSSL_INIT_LOAD_CRYPTO_STRINGS, NULL);
@@ -237,7 +237,7 @@ void tr_rc4_process(tr_rc4_ctx_t handle, void const* input, void* output, size_t
 ****
 ***/
 
-#if OPENSSL_VERSION_NUMBER < 0x10100000 || defined(LIBRESSL_VERSION_NUMBER)
+#if OPENSSL_VERSION_NUMBER < 0x10100000 || (defined(LIBRESSL_VERSION_NUMBER) && LIBRESSL_VERSION_NUMBER < 0x20700000)
 
 static inline int DH_set0_pqg(DH* dh, BIGNUM* p, BIGNUM* q, BIGNUM* g)
 {
