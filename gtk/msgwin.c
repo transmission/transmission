@@ -465,7 +465,7 @@ GtkWidget* gtr_message_log_window_new(GtkWindow* parent, TrCore* core)
 
     toolbar = gtk_header_bar_new();
     gtk_header_bar_set_show_close_button(GTK_HEADER_BAR(toolbar), TRUE);
-    gtk_header_bar_set_title(GTK_HEADER_BAR(toolbar), "Message Log");
+    gtk_header_bar_set_title(GTK_HEADER_BAR(toolbar), _("Message Log"));
 
     gtk_window_set_titlebar(GTK_WINDOW(win), toolbar);
 

@@ -20,6 +20,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <glib/gi18n.h>
 
 #include "tr-limit-popover.h"
 
@@ -106,7 +107,7 @@ static void tr_limit_popover_init(TrLimitPopover* popover)
     gtk_grid_set_row_spacing(GTK_GRID(popover), 10);
     gtk_grid_set_column_homogeneous(GTK_GRID(popover), FALSE);
 
-    w = priv->download_limit_check = gtk_check_button_new_with_label("Limit Download");
+    w = priv->download_limit_check = gtk_check_button_new_with_label(_("Limit Download"));
     gtk_actionable_set_action_name(GTK_ACTIONABLE(w), "win.speed-limit-down-enabled");
     gtk_grid_attach(GTK_GRID(popover), w, 1, 1, 1, 1);
 
@@ -119,7 +120,7 @@ static void tr_limit_popover_init(TrLimitPopover* popover)
     gtk_grid_attach(GTK_GRID(popover), w, 2, 1, 1, 1);
     gtk_grid_attach(GTK_GRID(popover), gtk_label_new("KB/s"), 3, 1, 1, 1);
 
-    w = priv->upload_limit_check = gtk_check_button_new_with_label("Limit Upload");
+    w = priv->upload_limit_check = gtk_check_button_new_with_label(_("Limit Upload"));
     gtk_actionable_set_action_name(GTK_ACTIONABLE(w), "win.speed-limit-up-enabled");
     gtk_grid_attach(GTK_GRID(popover), w, 1, 2, 1, 1);
 
@@ -132,7 +133,7 @@ static void tr_limit_popover_init(TrLimitPopover* popover)
     gtk_grid_attach(GTK_GRID(popover), w, 2, 2, 1, 1);
     gtk_grid_attach(GTK_GRID(popover), gtk_label_new("KB/s"), 3, 2, 1, 1);
 
-    w = priv->ratio_limit_check = gtk_check_button_new_with_label("Stop seeding at ratio");
+    w = priv->ratio_limit_check = gtk_check_button_new_with_label(_("Stop seeding at ratio"));
     gtk_actionable_set_action_name(GTK_ACTIONABLE(w), "win.ratio-limit-enabled");
     gtk_grid_attach(GTK_GRID(popover), w, 1, 3, 1, 1);
 
