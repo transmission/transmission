@@ -140,6 +140,7 @@ std::array<Prefs::PrefItem, Prefs::PREFS_COUNT> const Prefs::Items{
     { UTP_ENABLED, TR_KEY_utp_enabled, QVariant::Bool },
     { LPD_ENABLED, TR_KEY_lpd_enabled, QVariant::Bool },
     { PORT_FORWARDING, TR_KEY_port_forwarding_enabled, QVariant::Bool },
+    { PROXY_LIST, TR_KEY_proxy_list, QVariant::StringList },
     { PREALLOCATION, TR_KEY_preallocation, QVariant::Int },
     { RATIO, TR_KEY_ratio_limit, QVariant::Double },
     { RATIO_ENABLED, TR_KEY_ratio_limit_enabled, QVariant::Bool },
@@ -493,6 +494,12 @@ QString Prefs::getString(int key) const
     }
 
     return values_[key].toString();
+}
+
+QStringList Prefs::getStringList(int key) const
+{
+    assert(Items[key].type == QVariant::StringList);
+    return values_[key].toStringList();
 }
 
 int Prefs::getInt(int key) const

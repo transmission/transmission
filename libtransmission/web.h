@@ -44,6 +44,9 @@ public:
         // the URL to fetch
         std::string url;
 
+        // Proxy server URL to use
+        std::optional<std::string> proxy_url;
+
         // Callback to invoke with a FetchResponse when done
         FetchDoneFunc done_func = nullptr;
         void* done_func_user_data = nullptr;

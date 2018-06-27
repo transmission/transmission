@@ -207,6 +207,11 @@ private:
             return options.url;
         }
 
+        [[nodiscard]] auto const& proxyUrl() const
+        {
+            return options.proxy_url;
+        }
+
         [[nodiscard]] auto const& range() const
         {
             return options.range;
@@ -396,6 +401,12 @@ private:
             /* don't bother asking the server to compress webseed fragments */
             (void)curl_easy_setopt(e, CURLOPT_ENCODING, "identity");
             (void)curl_easy_setopt(e, CURLOPT_RANGE, range->c_str());
+        }
+
+        if (auto const& proxy_url = task->proxyUrl(); proxy_url)
+        {
+            tr_logAddDebug(fmt::format("using proxy {} for {}", *proxy_url, task->url()));
+            (void)curl_easy_setopt(e, CURLOPT_PROXY, proxy_url->c_str());
         }
     }
 

@@ -1052,6 +1052,49 @@
        </item>
       </layout>
      </widget>
+     <widget class="QWidget" name="proxyTab">
+      <attribute name="title">
+       <string>Proxy</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="proxyTabLayout">
+       <item>
+        <widget class="QLabel" name="proxySectionLabel">
+         <property name="styleSheet">
+          <string notr="true">font-weight:bold</string>
+         </property>
+         <property name="text">
+          <string>Proxy &amp;list</string>
+         </property>
+         <property name="buddy">
+          <cstring>proxyTextEdit</cstring>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QVBoxLayout" name="proxySectionLayout">
+         <property name="leftMargin">
+          <number>18</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="proxyHelpLabel">
+           <property name="text">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Each line in the list must consist of two ''words''.&lt;br/&gt;First ''word'' is a tracker domain mask with wildcards ('*' and '?').&lt;br/&gt;Second ''word'' is a CURL-style proxy URL ([protocol://]host[:port]).&lt;br/&gt;The protocol may be one of: socks4://, socks4a://, socks5://, socks5h://, http://, https://&lt;br/&gt;Examples:&lt;br/&gt;&lt;span style=&quot; font-family:'monospace';&quot;&gt;*.onion/*&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;socks5h://127.0.0.1:9050&lt;br/&gt;*my.tracker.com/*&amp;nbsp;http://my.proxy.com&lt;br/&gt;*&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;https://all.proxy.com&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPlainTextEdit" name="proxyTextEdit">
+           <property name="font">
+            <font>
+             <family>monospace</family>
+            </font>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
      <widget class="QWidget" name="desktopTab">
       <attribute name="title">
        <string>Desktop</string>

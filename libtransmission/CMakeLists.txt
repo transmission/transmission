@@ -46,6 +46,7 @@ set(PROJECT_FILES
   platform-quota.cc
   platform.cc
   port-forwarding.cc
+  proxylist.cc
   ptrarray.cc
   quark.cc
   resume.cc

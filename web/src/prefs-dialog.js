@@ -62,7 +62,25 @@ export class PrefsDialog extends EventTarget {
     e.value = b ? 'Update' : 'Updating...';
   }
 
+  static _setProxyList(e, val) {
+    let text = '';
+    for (let i = 1; i < val.length; i += 2) {
+      text += `${val[i - 1]} ${val[i]}\n`;
+    }
+    e.value = text;
+  }
+
+  static _getProxyList(e) {
+    const a = e.value.split(/\s+/);
+    a.length = Math.floor(a.length / 2) * 2;
+    return a;
+  }
+
   static _getValue(e) {
+    if (e.id === 'proxy-text') {
+      return PrefsDialog._getProxyList(e);
+    }
+
     if (e.tagName === 'TEXTAREA') {
       return e.value;
     }
@@ -122,6 +140,11 @@ export class PrefsDialog extends EventTarget {
           const n = Formatter.number(value);
           element.innerHTML = `Blocklist has <span class="blocklist-size-number">${n}</span> rules`;
           setTextContent(this.elements.peers.blocklist_update_button, 'Update');
+        } else if (key === 'proxy-list') {
+          if (element !== document.activeElement) {
+            PrefsDialog._setProxyList(element, value);
+            element.dispatchEvent(new Event('change'));
+          }
         } else {
           switch (element.type) {
             case 'checkbox':
@@ -687,10 +710,31 @@ export class PrefsDialog extends EventTarget {
     };
   }
 
+  static _createProxyPage() {
+    const root = document.createElement('div');
+    root.classList.add('prefs-proxy-page');
+
+    const label = document.createElement('div');
+    label.textContent = 'Proxy list';
+    label.classList.add('section-label');
+    root.append(label);
+
+    const proxy_text = document.createElement('textarea');
+    proxy_text.dataset.key = 'proxy-list';
+    proxy_text.id = 'proxy-text';
+    root.append(proxy_text);
+
+    return {
+      proxy_text,
+      root,
+    };
+  }
+
   static _create() {
     const pages = {
       network: PrefsDialog._createNetworkPage(),
       peers: PrefsDialog._createPeersPage(),
+      proxy: PrefsDialog._createProxyPage(),
       speed: PrefsDialog._createSpeedPage(),
       torrents: PrefsDialog._createTorrentsPage(),
     };
@@ -700,7 +744,13 @@ export class PrefsDialog extends EventTarget {
       ['prefs-tab-speed', pages.speed.root],
       ['prefs-tab-peers', pages.peers.root],
       ['prefs-tab-network', pages.network.root],
+      ['prefs-tab-proxy', pages.proxy.root],
     ]);
+    // Proxy icon needed
+    elements.buttons.find((b) => {
+      return b.id === 'prefs-tab-proxy';
+    }).textContent = 'PROXY';
+    // Proxy icon needed
 
     return { ...elements, ...pages };
   }
@@ -752,6 +802,7 @@ export class PrefsDialog extends EventTarget {
     };
     walk(this.elements.network);
     walk(this.elements.peers);
+    walk(this.elements.proxy);
     walk(this.elements.speed);
     walk(this.elements.torrents);
 

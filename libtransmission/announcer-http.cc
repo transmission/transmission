@@ -346,7 +346,7 @@ void tr_tracker_http_announce(
     options.timeout_secs = 90L;
     options.sndbuf = 1024;
     options.rcvbuf = 3072;
-    session->web->fetch(std::move(options));
+    tr_sessionFetch(session, std::move(options));
 }
 
 /****
@@ -544,5 +544,5 @@ void tr_tracker_http_scrape(
     options.timeout_secs = 30L;
     options.sndbuf = 4096;
     options.rcvbuf = 4096;
-    session->web->fetch(std::move(options));
+    tr_sessionFetch(session, std::move(options));
 }

@@ -193,6 +193,56 @@ std::vector<std::string> gtr_pref_strv_get(tr_quark const key)
     return ret;
 }
 
+void gtr_pref_strv_set(tr_quark const key, std::vector<std::string> const& value)
+{
+    auto list = tr_variantDictAddOrReplaceList(getPrefs(), key, value.size());
+
+    for (auto const& str : value)
+    {
+        tr_variantListAddStr(list, str);
+    }
+}
+
+bool gtr_pref_strv_equal(tr_quark const key, std::vector<std::string> const& value)
+{
+    tr_variant* list = nullptr;
+
+    if (!tr_variantDictFindList(getPrefs(), key, &list))
+    {
+        return false;
+    }
+
+    size_t const n = tr_variantListSize(list);
+
+    if (n != value.size())
+    {
+        return false;
+    }
+
+    for (size_t i = 0; i < n; ++i)
+    {
+        auto sv = std::string_view{};
+
+        if (!tr_variantGetStrView(tr_variantListChild(list, i), &sv))
+        {
+            return false;
+        }
+
+        if (sv != value[i])
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+tr_variant* gtr_pref_vlist_get(tr_quark const key)
+{
+    tr_variant* vlist;
+    return tr_variantDictFindList(getPrefs(), key, &vlist) ? vlist : nullptr;
+}
+
 std::string gtr_pref_string_get(tr_quark const key)
 {
     auto sv = std::string_view{};

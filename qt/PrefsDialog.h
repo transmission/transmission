@@ -57,6 +57,8 @@ private:
     void updateBlocklistLabel();
     void updateDownloadingWidgetsLocality();
     void updateSeedingWidgetsLocality();
+    void updateProxyValue(QWidget* widget, int pref_key);
+    QStringList parseProxyText(QString const& text);
 
     void setPref(int key, QVariant const& v);
 
@@ -65,6 +67,7 @@ private:
     void initSpeedTab();
     void initPrivacyTab();
     void initNetworkTab();
+    void initProxyTab();
     void initDesktopTab();
     void initRemoteTab();
 
