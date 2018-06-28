@@ -105,20 +105,22 @@ static void base32_to_sha1(uint8_t* out, char const* in, size_t const inlen)
 ****
 ***/
 
-static bool tr_isHex(const char* in, const size_t inlen)
+static bool tr_isHex(char const* in, size_t const inlen)
 {
     size_t i;
 
     for (i = 0; i < inlen; ++i)
     {
         if (!isxdigit(in[i]))
+        {
             return false;
+        }
     }
 
     return true;
 }
 
-static bool tr_isBase32(const char* in, const size_t inlen)
+static bool tr_isBase32(char const* in, size_t const inlen)
 {
     size_t i;
 
@@ -127,10 +129,14 @@ static bool tr_isBase32(const char* in, const size_t inlen)
         int lookup = in[i] - '0';
 
         if (lookup < 0 || lookup >= base32LookupLen)
+        {
             return false;
+        }
 
         if (base32Lookup[lookup] == 0xFF)
+        {
             return false;
+        }
     }
 
     return true;
@@ -149,7 +155,7 @@ bool tr_maybeHash(char const* uri)
     return false;
 }
 
-static bool hash_to_sha1(uint8_t* sha1, const char* hash, size_t hashlen)
+static bool hash_to_sha1(uint8_t* sha1, char const* hash, size_t hashlen)
 {
     if (hashlen == 40)
     {
@@ -252,7 +258,7 @@ tr_magnet_info* tr_magnetParse(char const* uri)
     }
     else if (uri != NULL)
     {
-        const size_t hashlen = strlen(uri);
+        size_t const hashlen = strlen(uri);
         got_checksum = hash_to_sha1(sha1, uri, hashlen);
     }
 
