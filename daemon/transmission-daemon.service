@@ -3,9 +3,9 @@ Description=Transmission BitTorrent Daemon
 After=network.target
 
 [Service]
-User=transmission
+User=$USER
 Type=notify
-ExecStart=/usr/bin/transmission-daemon -f --log-error
+ExecStart=/usr/bin/transmission-daemon -f --log-error $OPTIONS
 ExecReload=/bin/kill -s HUP $MAINPID
 
 [Install]
