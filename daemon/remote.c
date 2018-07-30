@@ -1450,7 +1450,7 @@ static void printTorrentList(tr_variant* top)
                     errorMark = ' ';
                 }
 
-                printf("%4d%c  %4s  %9s  %-8s  %6.1f  %6.1f  %5s  %-11s  %s\n", (int)id, errorMark, doneStr, haveStr, etaStr,
+                printf("%4d%c  %4s  %9s  %-8s  %6.1f  %6.1f  %5s  %-11s  \x2%s\n", (int)id, errorMark, doneStr, haveStr, etaStr,
                     up / (double)tr_speed_K, down / (double)tr_speed_K, strlratio2(ratioStr, ratio, sizeof(ratioStr)),
                     getStatusString(d, statusStr, sizeof(statusStr)), name);
 
