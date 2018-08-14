@@ -186,6 +186,12 @@ Torrent.prototype = {
                     changed |= this.setField(this.fields, key, data[key]);
                 };
                 break;
+            case 'name':
+                if (this.setField(this.fields, key, data[key])) {
+                    this.fields.collatedName = '';
+                    changed = true;
+                };
+                break;
             default:
                 changed |= this.setField(this.fields, key, data[key]);
             };
