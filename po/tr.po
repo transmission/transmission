@@ -2322,7 +2322,7 @@ msgstr ""
 #: ../libtransmission/rpc-server.c:991
 #, c-format
 msgid "Couldn't find settings key \"%s\""
-msgstr "Ayarlar anahtarı bulunamadı \"%s\""
+msgstr "Ayarlar anahtarı bulunamadı \" %s\""
 
 #: ../libtransmission/rpc-server.c:1103
 #, c-format
