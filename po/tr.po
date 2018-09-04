@@ -1013,6 +1013,7 @@ msgstr ""
 "  webdr https://launchpad.net/~drumut\n"
 "  wj https://launchpad.net/~mokoko\n"
 "  Şâkir Aşçı https://launchpad.net/~sakirasci"
+"  Serdar Sağlam https://launchpad.net/~serdarsaglam"
 
 #: ../gtk/makemeta-ui.c:70
 #, c-format
@@ -1379,7 +1380,7 @@ msgstr "Hata: %s"
 #: ../gtk/torrent-cell-renderer.c:261
 #, c-format
 msgid "Downloading metadata from %1$'d %2$s (%3$d%% done)"
-msgstr ""
+msgstr "Meta verileri indiriliyor %1$'d %2$s (%3$d%% tamam)"
 
 #: ../gtk/torrent-cell-renderer.c:262 ../gtk/torrent-cell-renderer.c:268
 #: ../gtk/torrent-cell-renderer.c:281
@@ -1444,15 +1445,15 @@ msgstr "BitTorrent İstemcisi"
 #. Translators: Search terms to find this application. Do NOT translate or localize the semicolons! The list MUST also end with a semicolon!
 #: ../gtk/transmission-gtk.desktop.in.h:5
 msgid "torrents;downloading;uploading;share;sharing;"
-msgstr ""
+msgstr "torrentler;indirilen;yüklenen;paylaş;paylaşım;"
 
 #: ../gtk/transmission-gtk.desktop.in.h:6
 msgid "Start Transmission with All Torrents Paused"
-msgstr ""
+msgstr "Duraklatılmış tüm Torrentlerle başlat"
 
 #: ../gtk/transmission-gtk.desktop.in.h:7
 msgid "Start Transmission Minimized"
-msgstr ""
+msgstr "Transmission Simge Durumuna Başlat"
 
 #: ../gtk/tr-core.c:1238
 #, c-format
@@ -1913,6 +1914,8 @@ msgid ""
 "Click to disable Alternative Speed Limits\n"
 " (%1$s down, %2$s up)"
 msgstr ""
+"Alternatif Hız Sınırlarını kapatmak için tıklayın\n"
+" (%1$s indir, %2$s yükle)"
 
 #: ../gtk/tr-window.c:249
 #, c-format
@@ -1920,6 +1923,8 @@ msgid ""
 "Click to enable Alternative Speed Limits\n"
 " (%1$s down, %2$s up)"
 msgstr ""
+"Alternatif Hız Sınırlarını etkinleştirmek için tıklayın\n"
+" (%1$s indir, %2$s yükle)"
 
 #: ../gtk/tr-window.c:303
 #, c-format
@@ -2056,7 +2061,7 @@ msgstr "Torrent dosyası \"%s\" geçersiz veri içeriyor."
 #: ../gtk/util.c:262
 #, c-format
 msgid "The torrent file \"%s\" is already in use by \"%s.\""
-msgstr ""
+msgstr "Torrent dosyası \"%s\" zaten kullanımda \"%s.\""
 
 #: ../gtk/util.c:267
 #, c-format
@@ -2098,7 +2103,7 @@ msgstr "%s boş"
 
 #: ../libtransmission/announcer.c:1099 ../libtransmission/announcer.c:1392
 msgid "Could not connect to tracker"
-msgstr ""
+msgstr "İzleyici ile bağlantı kurulamadı"
 
 #: ../libtransmission/announcer.c:1103 ../libtransmission/announcer.c:1396
 msgid "Tracker did not respond"
@@ -2112,7 +2117,7 @@ msgstr "Başarılı"
 #: ../libtransmission/announcer-http.c:397
 #, c-format
 msgid "Tracker gave HTTP response code %1$ld (%2$s)"
-msgstr ""
+msgstr "İzleyici HTTP yanıt kodunu verdi %1$ld (%2$s)"
 
 #: ../libtransmission/announcer-udp.c:280
 #: ../libtransmission/announcer-udp.c:430
@@ -2122,7 +2127,7 @@ msgstr "Bilinmeyen hata"
 #: ../libtransmission/announcer-udp.c:520
 #, c-format
 msgid "DNS Lookup failed: %s"
-msgstr ""
+msgstr "DNS Araması başarısız oldu: %s"
 
 #: ../libtransmission/announcer-udp.c:623
 msgid "Connection failed"
@@ -2160,7 +2165,7 @@ msgstr "\"%s\" engelleme listesi %zu öğe ile güncellendi"
 #: ../libtransmission/fdlimit.c:176
 #, c-format
 msgid "Couldn't get directory for \"%1$s\": %2$s"
-msgstr ""
+msgstr "İçin dizin alınamadı \"%1$s\": %2$s"
 
 #: ../libtransmission/fdlimit.c:182 ../libtransmission/file-posix.c:187
 #: ../libtransmission/file-posix.c:197
@@ -2175,21 +2180,21 @@ msgstr "Açılamadı, \"%1$s\": %2$s"
 
 #: ../libtransmission/fdlimit.c:215
 msgid "full"
-msgstr ""
+msgstr "tam"
 
 #: ../libtransmission/fdlimit.c:220
 msgid "sparse"
-msgstr ""
+msgstr "seyrek"
 
 #: ../libtransmission/fdlimit.c:227
 #, c-format
 msgid "Couldn't preallocate file \"%1$s\" (%2$s, size: %3$<PRIu64>): %4$s"
-msgstr ""
+msgstr "Dosya yeniden düzenlenemedi \"%1$s\" (%2$s, boyut: %3$<PRIu64>): %4$s"
 
 #: ../libtransmission/fdlimit.c:232
 #, c-format
 msgid "Preallocated file \"%1$s\" (%2$s, size: %3$<PRIu64>)"
-msgstr ""
+msgstr "Önceden ayrılmış dosya \"%1$s\" (%2$s, boyut: %3$<PRIu64>)"
 
 #: ../libtransmission/fdlimit.c:243
 #, c-format
@@ -2215,7 +2220,7 @@ msgstr "Torrent Oluşturucunun atladığı dosya, \"%s\": %s"
 #: ../libtransmission/makemeta.c:200
 #, c-format
 msgid "Failed to set piece size to %s, leaving it at %s"
-msgstr ""
+msgstr "Parça boyutu ayarlanamadı %s, bırakarak %s"
 
 #: ../libtransmission/metainfo.c:648
 #, c-format
@@ -2249,12 +2254,12 @@ msgstr "Bağlantı noktası %d başarıyla yönlendirildi"
 #: ../libtransmission/net.c:286
 #, c-format
 msgid "Couldn't set source address %s on %<PRIdMAX>: %s"
-msgstr ""
+msgstr "Kaynak adresi ayarlanamadı %s on %<PRIdMAX>: %s"
 
 #: ../libtransmission/net.c:303
 #, c-format
 msgid "Couldn't connect socket %<PRIdMAX> to %s, port %d (errno %d - %s)"
-msgstr ""
+msgstr "Soket bağlanamadı %<PRIdMAX> için %s, port %d (errno %d - %s)"
 
 #: ../libtransmission/net.c:391
 msgid "Is another copy of Transmission already running?"
@@ -2278,7 +2283,7 @@ msgstr "Lütfen Yerel Veriyi Doğrulayın! #%zu parçası bozuk."
 #: ../libtransmission/platform.c:469
 #, c-format
 msgid "Searching for web interface file \"%s\""
-msgstr ""
+msgstr "Web arabirimi dosyası aranıyor \"%s\""
 
 #: ../libtransmission/port-forwarding.c:29
 msgid "Port Forwarding"
@@ -2317,7 +2322,7 @@ msgstr ""
 #: ../libtransmission/rpc-server.c:991
 #, c-format
 msgid "Couldn't find settings key \"%s\""
-msgstr ""
+msgstr "Ayarlar anahtarı bulunamadı \" %s\""
 
 #: ../libtransmission/rpc-server.c:1103
 #, c-format
@@ -2327,12 +2332,12 @@ msgstr "%s geçerli bir adres değil"
 #: ../libtransmission/rpc-server.c:1108
 #, c-format
 msgid "%s is not an IPv4 or IPv6 address. RPC listeners must be IPv4 or IPv6"
-msgstr ""
+msgstr "%s IPv4 veya IPv6 adresi değildir. RPC dinleyicileri IPv4 veya IPv6 olmalıdır"
 
 #: ../libtransmission/rpc-server.c:1116
 #, c-format
 msgid "Serving RPC and Web requests on %s:%d%s"
-msgstr ""
+msgstr "RPC ve Web isteklerinin %s:%d%s"
 
 #: ../libtransmission/rpc-server.c:1121
 msgid "Whitelist enabled"
@@ -2392,11 +2397,11 @@ msgstr "Tamamlandı"
 #: ../libtransmission/torrent.c:3506
 #, c-format
 msgid "Piece %<PRIu32>, which was just downloaded, failed its checksum test"
-msgstr ""
+msgstr "İndirilen Parça %<PRIu32>, sağlama testi başarısız oldu"
 
 #: ../libtransmission/torrent-magnet.c:318
 msgid "Magnet torrent's metadata is not usable"
-msgstr ""
+msgstr "Magnet torrent meta verileri kullanılamaz"
 
 #: ../libtransmission/upnp.c:29
 msgid "Port Forwarding (UPnP)"
@@ -2452,7 +2457,7 @@ msgstr "Kaydedildi: \"%s\""
 
 #: ../libtransmission/variant.c:1241
 msgid "Unable to parse file content"
-msgstr ""
+msgstr "Dosya içeriği ayrıştırılamıyor"
 
 #: ../libtransmission/verify.c:230
 msgid "Verifying torrent"
