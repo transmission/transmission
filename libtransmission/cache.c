@@ -293,16 +293,16 @@ static int cache_block_compare(void const* va, void const* vb)
     struct cache_block const* a = va;
     struct cache_block const* b = vb;
 
-    /* primary key: torrent id */
-    if (a->tor->uniqueId != b->tor->uniqueId)
-    {
-        return a->tor->uniqueId < b->tor->uniqueId ? -1 : 1;
-    }
-
-    /* secondary key: block # */
+    /* key: block # */
     if (a->block != b->block)
     {
         return a->block < b->block ? -1 : 1;
+    }
+
+    /* key: torrent id */
+    if (a->tor->uniqueId != b->tor->uniqueId)
+    {
+        return a->tor->uniqueId < b->tor->uniqueId ? -1 : 1;
     }
 
     /* they're equal */
