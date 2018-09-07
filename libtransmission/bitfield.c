@@ -122,7 +122,7 @@ static size_t countRange(tr_bitfield const* b, size_t begin, size_t end)
         }
     }
 
-    TR_ASSERT(ret <= (begin - end));
+    TR_ASSERT(ret <= (end - begin));
     return ret;
 }
 
