@@ -39,7 +39,7 @@ static int test_bitfield_count_range(void)
     }
     while (end == begin);
 
-    /* ensure end <= begin */
+    /* ensure begin <= end */
     if (end < begin)
     {
         int const tmp = begin;
