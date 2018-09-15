@@ -2471,7 +2471,7 @@ Um eine weitere primäre URL hinzuzufügen, muss diese nach einer Leerzeile eing
         <source>Downloading from %1 of %Ln connected peer(s)</source>
         <extracomment>First part of phrase &quot;Downloading from ... of ... connected peer(s) and ... web seed(s)&quot;</extracomment>
         <translation>
-            <numerusform>Lade von %1 von &amp;Ln verbundenem Peer herunter</numerusform>
+            <numerusform>Lade von %1 von %Ln verbundenem Peer herunter</numerusform>
             <numerusform>Lade von %1 von %Ln verbundenen Peers herunter</numerusform>
         </translation>
     </message>
