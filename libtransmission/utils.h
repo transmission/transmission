@@ -105,6 +105,16 @@ uint64_t tr_time_msec(void);
 void tr_wait_msec(long int delay_milliseconds);
 
 /**
+ * @brief Computes the time difference, \p stop - \p start into \p result. \p stop must correspond to a later point in time than \p start.
+ *
+*/
+void timespec_diff(struct timespec *start, struct timespec *stop,
+		   struct timespec *result) TR_GNUC_NONNULL(1, 2, 3);
+
+/** @brief returns a clock for use with clock_gettime() */
+clockid_t get_clock(void);
+
+/**
  * @brief make a copy of 'str' whose non-utf8 content has been corrected or stripped
  * @return a newly-allocated string that must be freed with tr_free()
  * @param str the string to make a clean copy of

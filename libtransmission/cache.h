@@ -36,7 +36,7 @@ int tr_cacheWriteBlock(tr_cache* cache, tr_torrent* torrent, tr_piece_index_t pi
     struct evbuffer* writeme);
 
 int tr_cacheReadBlock(tr_cache* cache, tr_torrent* torrent, tr_piece_index_t piece, uint32_t offset, uint32_t len,
-    uint8_t* setme);
+    struct evbuffer* setme);
 
 int tr_cachePrefetchBlock(tr_cache* cache, tr_torrent* torrent, tr_piece_index_t piece, uint32_t offset, uint32_t len);
 

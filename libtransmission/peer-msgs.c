@@ -2090,7 +2090,6 @@ static size_t fillOutputBuffer(tr_peerMsgs* msgs, time_t now)
             int err;
             uint32_t const msglen = 4 + 1 + 4 + 4 + req.length;
             struct evbuffer* out;
-            struct evbuffer_iovec iovec[1];
 
             out = evbuffer_new();
             evbuffer_expand(out, msglen);
@@ -2100,11 +2099,8 @@ static size_t fillOutputBuffer(tr_peerMsgs* msgs, time_t now)
             evbuffer_add_uint32(out, req.index);
             evbuffer_add_uint32(out, req.offset);
 
-            evbuffer_reserve_space(out, req.length, iovec, 1);
             err = tr_cacheReadBlock(getSession(msgs)->cache, msgs->torrent, req.index, req.offset, req.length,
-                iovec[0].iov_base);
-            iovec[0].iov_len = req.length;
-            evbuffer_commit_space(out, iovec, 1);
+                out);
 
             /* check the piece if it needs checking... */
             if (err == 0 && tr_torrentPieceNeedsCheck(msgs->torrent, req.index))

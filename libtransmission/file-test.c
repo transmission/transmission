@@ -15,6 +15,8 @@
 #else
 #include <windows.h>
 #endif
+#include <stdio.h>
+#include <time.h>
 
 #include "transmission.h"
 #include "error.h"
@@ -1204,12 +1206,197 @@ static int test_file_read_write_seek(void)
 
     check_mem(buf, ==, "st-ok", 5);
 
+    struct evbuffer *evbuf = evbuffer_new();
+    evbuffer_add(evbuf, "v", 1);
+
+    check(tr_sys_file_write_evbuffer_at(fd, evbuf, 1, 4, &n, &err));
+    check_ptr(err, ==, NULL);
+    check_uint(n, ==, 1);
+
+    check(tr_sys_file_seek(fd, 0, TR_SEEK_SET, &n, &err));
+    check_ptr(err, ==, NULL);
+    check_uint(n, ==, 0);
+
+    check(tr_sys_file_read(fd, buf, sizeof(buf), &n, &err));
+    check_ptr(err, ==, NULL);
+    check_uint(n, ==, 7);
+
+    check_mem(buf, ==, "tEstvok", 7);
+
+    check(tr_sys_file_read_evbuffer_at(fd, evbuf, 5, 2, &n, &err));
+    check_ptr(err, ==, NULL);
+    check_uint(n, ==, 5);
+
+    evbuffer_copyout(evbuf, buf, 5);
+    evbuffer_free(evbuf);
+
+    check_mem(buf, ==, "stvok", 5);
+
     tr_sys_file_close(fd, NULL);
 
     tr_sys_path_remove(path1, NULL);
 
     tr_free(path1);
 
+    tr_free(test_dir);
+    return 0;
+}
+
+static int test_file_write_at(void)
+{
+    char* const test_dir = create_test_dir(__FUNCTION__);
+    tr_error* err = NULL;
+    char* path1;
+    tr_sys_file_t fd;
+
+    path1 = tr_buildPath(test_dir, "a", NULL);
+
+    fd = tr_sys_file_open(path1, TR_SYS_FILE_READ | TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE, 0600, &err);
+
+    check_int(fd, !=, -1);
+    check_ptr(err, ==, NULL);
+
+    bool ok;
+
+    const size_t file_size = 100 * 1024 * 1024; // 100 MiB
+    ok = tr_sys_file_truncate(fd, file_size, &err);
+    check_bool(ok, ==, true);
+    check_ptr(err, ==, NULL);
+
+    const size_t chunk_size = 256 * 1024;
+    const int num_chunks = 1024 * 1024 / chunk_size;
+    void *buf = tr_malloc(chunk_size);
+
+    struct evbuffer *evbuf = evbuffer_new();
+    for (int i = 0; i < num_chunks; ++i) {
+      evbuffer_add(evbuf, buf, chunk_size);
+    }
+    const size_t write_size = chunk_size * num_chunks; // 1 MiB
+    buf = tr_malloc(write_size);
+
+    uint64_t bytes_written;
+
+    const unsigned int num_outer = 20;
+    struct timespec start, end, diff;
+    float total_duration = 0;
+
+    clockid_t clock = get_clock();
+
+    for (unsigned int j = 0; j < num_outer; ++j) {
+      for (unsigned int i = 0; i < file_size / 1024 / 1024; ++i) {
+	clock_gettime(clock, &start);
+	evbuffer_copyout(evbuf, buf, write_size);
+	uint64_t offset = i * write_size;
+	ok = tr_sys_file_write_at(fd, buf, write_size, offset, &bytes_written, &err);
+	clock_gettime(clock, &end);
+	timespec_diff(&start, &end, &diff);
+	float duration = (diff.tv_sec + (float)diff.tv_nsec / 1e9);
+	total_duration += duration;
+	check_bool(ok, ==, true);
+	check_ptr(err, ==, NULL);
+	check_uint(bytes_written, ==, write_size);
+      }
+    }
+
+    void *buf2 = tr_malloc(write_size);
+    for (unsigned int i = 0; i < file_size / write_size; ++i) {
+      uint64_t bytes_read;
+      uint64_t offset = i * write_size;
+      ok = tr_sys_file_read_at(fd, buf2, write_size, offset, &bytes_read, &err);
+      check_bool(ok, ==, true);
+      check_ptr(err, ==, NULL);
+      check_uint(bytes_read, ==, write_size);
+      if(memcmp(buf, buf2, chunk_size)) {
+	printf("%s:%d: failed file data validation at %"PRIu64"\n", __FUNCTION__, __LINE__, offset);
+	return 1;
+      }
+    }
+    tr_free(buf);
+    tr_free(buf2);
+
+    printf("%s: %fs; %gs per file iteration\n", __FUNCTION__, total_duration, total_duration / (file_size / 1024 / 1024) / num_outer);
+
+    evbuffer_free(evbuf);
+    tr_sys_file_close(fd, NULL);
+    tr_sys_path_remove(path1, NULL);
+    tr_free(path1);
+    tr_free(test_dir);
+    return 0;
+}
+
+static int test_file_write_evbuffer_at(void)
+{
+    char* const test_dir = create_test_dir(__FUNCTION__);
+    tr_error* err = NULL;
+    char* path1;
+    tr_sys_file_t fd;
+
+    path1 = tr_buildPath(test_dir, "a", NULL);
+
+    fd = tr_sys_file_open(path1, TR_SYS_FILE_READ | TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE, 0600, &err);
+
+    check_int(fd, !=, -1);
+    check_ptr(err, ==, NULL);
+
+    bool ok;
+
+    const size_t file_size = 100 * 1024 * 1024;
+    ok = tr_sys_file_truncate(fd, file_size, &err);
+    check_bool(ok, ==, true);
+    check_ptr(err, ==, NULL);
+
+    const size_t chunk_size = 256 * 1024;
+    const int num_chunks = 1024 * 1024 / chunk_size;
+    void *buf = tr_malloc(chunk_size);
+    const size_t write_size = chunk_size * num_chunks;
+
+    struct evbuffer *evbuf = evbuffer_new();
+
+    const unsigned int num_outer = 20;
+    struct timespec start, end, diff;
+    float total_duration = 0;
+
+    clockid_t clock = get_clock();
+    for (unsigned int j = 0; j < num_outer; ++j) {
+      for (unsigned int i = 0; i < file_size / write_size; ++i) {
+	uint64_t bytes_written;
+	for (int i = 0; i < num_chunks; ++i) {
+	  evbuffer_add(evbuf, buf, chunk_size);
+	}
+	clock_gettime(clock, &start);
+	ok = tr_sys_file_write_evbuffer_at(fd, evbuf, evbuffer_get_length(evbuf), i * write_size, &bytes_written, &err);
+	clock_gettime(clock, &end);
+	timespec_diff(&start, &end, &diff);
+	float duration = (diff.tv_sec + (float)diff.tv_nsec / 1e9);
+	total_duration += duration;
+	check_bool(ok, ==, true);
+	check_ptr(err, ==, NULL);
+	check_uint(bytes_written, ==, write_size);
+      }
+    }
+
+    void *buf2 = tr_malloc(chunk_size);
+    for (unsigned int i = 0; i < file_size / chunk_size; ++i) {
+      uint64_t bytes_read;
+      uint64_t offset = i * chunk_size;
+      ok = tr_sys_file_read_at(fd, buf2, chunk_size, offset, &bytes_read, &err);
+      check_bool(ok, ==, true);
+      check_ptr(err, ==, NULL);
+      check_uint(bytes_read, ==, chunk_size);
+      if(memcmp(buf, buf2, chunk_size)) {
+	printf("%s:%d: failed file data validation at %"PRIu64"\n", __FUNCTION__, __LINE__, offset);
+	return 1;
+      }
+    }
+    tr_free(buf);
+    tr_free(buf2);
+
+    printf("%s: %fs; %gs per file iteration\n", __FUNCTION__, total_duration, total_duration / (file_size / 1024 / 1024) / num_outer);
+
+    evbuffer_free(evbuf);
+    tr_sys_file_close(fd, NULL);
+    tr_sys_path_remove(path1, NULL);
+    tr_free(path1);
     tr_free(test_dir);
     return 0;
 }
@@ -1633,6 +1820,8 @@ int main(void)
         test_path_native_separators,
         test_file_open,
         test_file_read_write_seek,
+	test_file_write_evbuffer_at,
+	test_file_write_at,
         test_file_truncate,
         test_file_preallocate,
         test_file_map,

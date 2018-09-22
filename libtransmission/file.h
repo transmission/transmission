@@ -10,6 +10,7 @@
 
 #include <inttypes.h>
 #include <time.h>
+#include <event2/buffer.h>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -394,6 +395,25 @@ bool tr_sys_file_read_at(tr_sys_file_t handle, void* buffer, uint64_t size, uint
     struct tr_error** error);
 
 /**
+ * @brief Like `pread()`, except that the position is undefined afterwards.
+ *        Not thread-safe.
+ *
+ * @param[in]  handle     Valid file descriptor.
+ * @param[out] evbuf      evbuffer to which to store data read.
+ * @param[in]  size       Number of bytes to read.
+ * @param[in]  offset     File offset in bytes to start reading from.
+ * @param[out] bytes_read Number of bytes actually read. Optional, pass `NULL`
+ *                        if you are not interested.
+ * @param[out] error      Pointer to error object. Optional, pass `NULL` if you
+ *                        are not interested in error details.
+ *
+ * @return `True` on success, `false` otherwise (with `error` set accordingly).
+ */
+bool tr_sys_file_read_evbuffer_at(tr_sys_file_t handle, struct evbuffer* evbuf, uint64_t size, uint64_t offset, uint64_t* bytes_read,
+    struct tr_error** error);
+
+
+/**
  * @brief Portability wrapper for `write()`.
  *
  * @param[in]  handle        Valid file descriptor.
@@ -426,6 +446,25 @@ bool tr_sys_file_write(tr_sys_file_t handle, void const* buffer, uint64_t size, 
  */
 bool tr_sys_file_write_at(tr_sys_file_t handle, void const* buffer, uint64_t size, uint64_t offset, uint64_t* bytes_written,
     struct tr_error** error);
+
+/**
+ * @brief Like `pwrite()`, except that the position is undefined afterwards.
+ *        Not thread-safe.
+ *
+ * @param[in]  handle        Valid file descriptor.
+ * @param[in]  evbuf         evbuffer from which to get data.
+ * @param[in]  size          Number of bytes to write.
+ * @param[in]  offset        File offset in bytes to start writing from.
+ * @param[out] bytes_written Number of bytes actually written. Optional, pass
+ *                           `NULL` if you are not interested.
+ * @param[out] error         Pointer to error object. Optional, pass `NULL` if you
+ *                           are not interested in error details.
+ *
+ * @return `True` on success, `false` otherwise (with `error` set accordingly).
+ */
+bool tr_sys_file_write_evbuffer_at(tr_sys_file_t handle, struct evbuffer * evbuf, uint64_t size, uint64_t offset, uint64_t * bytes_written,
+				   struct tr_error ** error);
+
 
 /**
  * @brief Portability wrapper for `fsync()`.

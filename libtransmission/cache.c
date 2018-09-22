@@ -164,33 +164,33 @@ static int calcRuns(tr_cache* cache, struct run_info* runs)
 
 static int flushContiguous(tr_cache* cache, int pos, int n)
 {
-    int err = 0;
-    uint8_t* buf = tr_new(uint8_t, n * MAX_BLOCK_SIZE);
-    uint8_t* walk = buf;
-    struct cache_block** blocks = (struct cache_block**)tr_ptrArrayBase(&cache->blocks);
+  int err = 0;
 
-    struct cache_block* b = blocks[pos];
-    tr_torrent* tor = b->tor;
-    tr_piece_index_t const piece = b->piece;
-    uint32_t const offset = b->offset;
+  struct cache_block ** blocks = (struct cache_block**) tr_ptrArrayBase(&cache->blocks);
 
-    for (int i = 0; i < n; ++i)
+  struct cache_block * b = blocks[pos];
+  tr_torrent * tor = b->tor;
+  const tr_piece_index_t piece = b->piece;
+  const uint32_t offset = b->offset;
+  uint32_t length = 0;
+
+  struct evbuffer * buf = evbuffer_new();
+  for (int i = pos; i < pos + n; ++i)
     {
-        b = blocks[pos + i];
-        evbuffer_copyout(b->evbuf, walk, b->length);
-        walk += b->length;
-        evbuffer_free(b->evbuf);
-        tr_free(b);
+      b = blocks[i];
+      length += b->length;
+      evbuffer_remove_buffer(b->evbuf, buf, b->length);
+      evbuffer_free (b->evbuf);
+      tr_free (b);
     }
 
-    tr_ptrArrayErase(&cache->blocks, pos, pos + n);
+  err = tr_ioWrite(tor, piece, offset, length, buf);
+  evbuffer_free(buf);
 
-    err = tr_ioWrite(tor, piece, offset, walk - buf, buf);
-    tr_free(buf);
-
-    ++cache->disk_writes;
-    cache->disk_write_bytes += walk - buf;
-    return err;
+  tr_ptrArrayErase (&cache->blocks, pos, pos+n);
+  ++cache->disk_writes;
+  cache->disk_write_bytes += length;
+  return err;
 }
 
 static int flushRuns(tr_cache* cache, struct run_info* runs, int n)
@@ -350,14 +350,19 @@ int tr_cacheWriteBlock(tr_cache* cache, tr_torrent* torrent, tr_piece_index_t pi
 }
 
 int tr_cacheReadBlock(tr_cache* cache, tr_torrent* torrent, tr_piece_index_t piece, uint32_t offset, uint32_t len,
-    uint8_t* setme)
+    struct evbuffer* setme)
 {
     int err = 0;
     struct cache_block* cb = findBlock(cache, torrent, piece, offset);
 
     if (cb != NULL)
     {
-        evbuffer_copyout(cb->evbuf, setme, len);
+      uint32_t read_length = MIN(len, evbuffer_get_length(cb->evbuf));
+      struct evbuffer_iovec iovec[1];
+      evbuffer_reserve_space(setme, read_length, iovec, 1);
+      iovec->iov_len = read_length;
+      evbuffer_copyout(cb->evbuf, iovec->iov_base, read_length);
+      evbuffer_commit_space(setme, iovec, 1);
     }
     else
     {

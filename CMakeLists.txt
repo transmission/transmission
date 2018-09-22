@@ -5,6 +5,7 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
 set(CMAKE_MACOSX_RPATH ON)
 
+include(CheckCSourceRuns)
 include(CheckIncludeFile)
 include(CheckIncludeFiles)
 include(CheckFunctionExists)
@@ -479,6 +480,38 @@ foreach(F ${NEEDED_FUNCTIONS})
         add_definitions(-DHAVE_${F_ID})
     endif()
 endforeach()
+
+check_c_source_runs(
+      "
+    #include <stdlib.h>
+    #include <time.h>
+    #include <sys/time.h>
+    int main(void)
+    {
+        int ret;
+        struct timespec ts;
+        ret = clock_gettime(CLOCK_MONOTONIC, &ts);
+        exit(ret);
+        return 0;
+    }
+    "
+      HAVE_CLOCK_MONOTONIC)
+
+check_c_source_runs(
+      "
+    #include <stdlib.h>
+    #include <time.h>
+    #include <sys/time.h>
+    int main(void)
+    {
+        int ret;
+        struct timespec ts;
+        ret = clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
+        exit(ret);
+        return 0;
+    }
+    "
+      HAVE_CLOCK_MONOTONIC_RAW)
 
 if(ICONV_FOUND)
     add_definitions(-DHAVE_ICONV)
