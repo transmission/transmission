@@ -7,8 +7,8 @@
  */
 
 #include <errno.h>
-#include <stdlib.h> /* bsearch() */
-#include <string.h> /* memcmp() */
+#include <stdlib.h> /* bsearch () */
+#include <string.h> /* memcmp () */
 
 #include "transmission.h"
 #include "cache.h" /* tr_cacheReadBlock() */
@@ -38,7 +38,7 @@ enum
 
 /* returns 0 on success, or an errno on failure */
 static int readOrWriteBytes(tr_session* session, tr_torrent* tor, int ioMode, tr_file_index_t fileIndex, uint64_t fileOffset,
-    void* buf, size_t buflen)
+    struct evbuffer *buf, size_t buflen)
 {
     tr_sys_file_t fd;
     int err = 0;
@@ -116,7 +116,7 @@ static int readOrWriteBytes(tr_session* session, tr_torrent* tor, int ioMode, tr
 
         if (ioMode == TR_IO_READ)
         {
-            if (!tr_sys_file_read_at(fd, buf, buflen, fileOffset, NULL, &error))
+            if (!tr_sys_file_read_evbuffer_at(fd, buf, buflen, fileOffset, NULL, &error))
             {
                 err = error->code;
                 tr_logAddTorErr(tor, "read failed for \"%s\": %s", file->name, error->message);
@@ -125,7 +125,7 @@ static int readOrWriteBytes(tr_session* session, tr_torrent* tor, int ioMode, tr
         }
         else if (ioMode == TR_IO_WRITE)
         {
-            if (!tr_sys_file_write_at(fd, buf, buflen, fileOffset, NULL, &error))
+          if (!tr_sys_file_write_evbuffer_at (fd, buf, buflen, fileOffset, NULL, &error))
             {
                 err = error->code;
                 tr_logAddTorErr(tor, "write failed for \"%s\": %s", file->name, error->message);
@@ -185,7 +185,7 @@ void tr_ioFindFileLocation(tr_torrent const* tor, tr_piece_index_t pieceIndex, u
 }
 
 /* returns 0 on success, or an errno on failure */
-static int readOrWritePiece(tr_torrent* tor, int ioMode, tr_piece_index_t pieceIndex, uint32_t pieceOffset, uint8_t* buf,
+static int readOrWritePiece(tr_torrent* tor, int ioMode, tr_piece_index_t pieceIndex, uint32_t pieceOffset, struct evbuffer* buf,
     size_t buflen)
 {
     int err = 0;
@@ -206,7 +206,6 @@ static int readOrWritePiece(tr_torrent* tor, int ioMode, tr_piece_index_t pieceI
         uint64_t const bytesThisPass = MIN(buflen, file->length - fileOffset);
 
         err = readOrWriteBytes(tor->session, tor, ioMode, fileIndex, fileOffset, buf, bytesThisPass);
-        buf += bytesThisPass;
         buflen -= bytesThisPass;
         fileIndex++;
         fileOffset = 0;
@@ -222,7 +221,7 @@ static int readOrWritePiece(tr_torrent* tor, int ioMode, tr_piece_index_t pieceI
     return err;
 }
 
-int tr_ioRead(tr_torrent* tor, tr_piece_index_t pieceIndex, uint32_t begin, uint32_t len, uint8_t* buf)
+int tr_ioRead(tr_torrent* tor, tr_piece_index_t pieceIndex, uint32_t begin, uint32_t len, struct evbuffer* buf)
 {
     return readOrWritePiece(tor, TR_IO_READ, pieceIndex, begin, buf, len);
 }
@@ -232,9 +231,9 @@ int tr_ioPrefetch(tr_torrent* tor, tr_piece_index_t pieceIndex, uint32_t begin, 
     return readOrWritePiece(tor, TR_IO_PREFETCH, pieceIndex, begin, NULL, len);
 }
 
-int tr_ioWrite(tr_torrent* tor, tr_piece_index_t pieceIndex, uint32_t begin, uint32_t len, uint8_t const* buf)
+int tr_ioWrite(tr_torrent* tor, tr_piece_index_t pieceIndex, uint32_t begin, uint32_t len, struct evbuffer* buf)
 {
-    return readOrWritePiece(tor, TR_IO_WRITE, pieceIndex, begin, (uint8_t*)buf, len);
+    return readOrWritePiece(tor, TR_IO_WRITE, pieceIndex, begin, buf, len);
 }
 
 /****
@@ -251,35 +250,43 @@ static bool recalculateHash(tr_torrent* tor, tr_piece_index_t pieceIndex, uint8_
     uint32_t offset = 0;
     bool success = true;
     size_t const buflen = tor->blockSize;
-    void* buffer = tr_valloc(buflen);
     tr_sha1_ctx_t sha;
 
-    TR_ASSERT(buffer != NULL);
     TR_ASSERT(buflen > 0);
 
     sha = tr_sha1_init();
     bytesLeft = tr_torPieceCountBytes(tor, pieceIndex);
 
     tr_ioPrefetch(tor, pieceIndex, offset, bytesLeft);
+    struct evbuffer *evbuf = evbuffer_new();
 
     while (bytesLeft != 0)
     {
         size_t const len = MIN(bytesLeft, buflen);
-        success = tr_cacheReadBlock(tor->session->cache, tor, pieceIndex, offset, len, buffer) == 0;
+        success = tr_cacheReadBlock(tor->session->cache, tor, pieceIndex, offset, len, evbuf) == 0;
 
         if (!success)
         {
             break;
         }
 
-        tr_sha1_update(sha, buffer, len);
+	int extents = evbuffer_peek(evbuf, buflen, NULL, NULL, 0);
+	struct evbuffer_iovec *v = tr_malloc(sizeof(struct evbuffer_iovec)*extents);
+	evbuffer_peek(evbuf, buflen, NULL, v, extents);
+	for (int i = 0; i < extents; ++i) {
+	  tr_sha1_update(sha, v[i].iov_base, v[i].iov_len);
+	}
+	
+	tr_free(v);
+	evbuffer_drain(evbuf, evbuffer_get_length(evbuf));
         offset += len;
         bytesLeft -= len;
     }
 
+    evbuffer_free(evbuf);
+
     tr_sha1_final(sha, success ? setme : NULL);
 
-    tr_free(buffer);
     return success;
 }
 

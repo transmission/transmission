@@ -680,8 +680,44 @@ bool tr_sys_file_read_at(tr_sys_file_t handle, void* buffer, uint64_t size, uint
     return ret;
 }
 
+bool tr_sys_file_read_evbuffer_at(tr_sys_file_t handle, struct evbuffer* buffer, uint64_t size, uint64_t offset, uint64_t* bytes_read,
+    tr_error** error)
+{
+    TR_ASSERT(handle != TR_BAD_SYS_FILE);
+    TR_ASSERT(buffer != NULL || size == 0);
+    /* seek requires signed offset, so it should be in mod range */
+    TR_ASSERT(offset < UINT64_MAX / 2);
+
+    ssize_t my_bytes_read = -1;
+    TR_STATIC_ASSERT(sizeof(*bytes_read) >= sizeof(my_bytes_read), "");
+
+    bool ret = false;
+    if (lseek (handle, offset, SEEK_SET) == -1){
+      goto cleanup;
+    }
+
+    my_bytes_read = evbuffer_read(buffer, handle, size);
+
+ cleanup:
+    if (my_bytes_read != -1)
+    {
+        if (bytes_read != NULL)
+        {
+            *bytes_read = my_bytes_read;
+        }
+        ret = true;
+    }
+    else
+    {
+        set_system_error(error, errno);
+    }
+
+    return ret;
+}
+
 bool tr_sys_file_write(tr_sys_file_t handle, void const* buffer, uint64_t size, uint64_t* bytes_written, tr_error** error)
 {
+  // TODO: call tr_sys_file_write_evbuffer_at() instead of supporting a separate implementation
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
     TR_ASSERT(buffer != NULL || size == 0);
 
@@ -709,51 +745,88 @@ bool tr_sys_file_write(tr_sys_file_t handle, void const* buffer, uint64_t size, 
     return ret;
 }
 
-bool tr_sys_file_write_at(tr_sys_file_t handle, void const* buffer, uint64_t size, uint64_t offset, uint64_t* bytes_written,
-    tr_error** error)
+bool tr_sys_file_write_evbuffer_at(tr_sys_file_t handle,struct evbuffer * evbuf, uint64_t size, uint64_t offset, uint64_t * bytes_written,
+				   tr_error ** error)
 {
-    TR_ASSERT(handle != TR_BAD_SYS_FILE);
-    TR_ASSERT(buffer != NULL || size == 0);
-    /* seek requires signed offset, so it should be in mod range */
-    TR_ASSERT(offset < UINT64_MAX / 2);
+  TR_ASSERT(handle != TR_BAD_SYS_FILE);
+  /* seek requires signed offset, so it should be in mod range */
+  TR_ASSERT(offset < UINT64_MAX / 2);
+  TR_ASSERT(evbuf || size == 0);
+  bool ret = false;
+  ssize_t my_bytes_written = -1;
+  ssize_t total_bytes_written = 0;
+  TR_STATIC_ASSERT(sizeof(*bytes_written) >= sizeof(my_bytes_written), "");
 
-    bool ret = false;
-    ssize_t my_bytes_written;
-
-    TR_STATIC_ASSERT(sizeof(*bytes_written) >= sizeof(my_bytes_written), "");
-
-#ifdef HAVE_PWRITE
-
-    my_bytes_written = pwrite(handle, buffer, size, offset);
-
-#else
-
-    if (lseek(handle, offset, SEEK_SET) != -1)
-    {
-        my_bytes_written = write(handle, buffer, size);
+  if (lseek (handle, offset, SEEK_SET) == -1){
+    goto cleanup;
+  }
+  ssize_t left = size;
+  do {
+    my_bytes_written = evbuffer_write_atmost(evbuf, handle, left);
+    if(my_bytes_written != -1){
+      left -= my_bytes_written;
+      total_bytes_written += my_bytes_written;
     }
-    else
-    {
-        my_bytes_written = -1;
-    }
+  } while (my_bytes_written != -1 && left > 0);
 
-#endif
-
-    if (my_bytes_written != -1)
+cleanup:
+  if (total_bytes_written != -1)
     {
-        if (bytes_written != NULL)
+      if (bytes_written != NULL)
         {
-            *bytes_written = my_bytes_written;
+	  *bytes_written = total_bytes_written;
         }
 
-        ret = true;
+      ret = true;
     }
-    else
+  else
     {
-        set_system_error(error, errno);
+      set_system_error(error, errno);
     }
 
-    return ret;
+  return ret;
+}
+
+bool tr_sys_file_write_at(tr_sys_file_t handle, void const* buffer, uint64_t size, uint64_t offset, uint64_t* bytes_written,
+			  tr_error** error)
+{
+  // TODO: call tr_sys_file_write_evbuffer_at() instead of supporing a separate implementation
+  TR_ASSERT(handle != TR_BAD_SYS_FILE);
+  /* seek requires signed offset, so it should be in mod range */
+  TR_ASSERT(offset < UINT64_MAX / 2);
+  TR_ASSERT(buffer || size == 0);
+  bool ret = false;
+  ssize_t my_bytes_written = 0;
+  TR_STATIC_ASSERT(sizeof(*bytes_written) >= sizeof(my_bytes_written), "");
+
+#ifdef HAVE_PWRITE
+  my_bytes_written = pwrite(handle, buffer, size, offset);
+#else
+  if (lseek(handle, offset, SEEK_SET) != -1)
+    {
+      my_bytes_written = write(handle, buffer, size);
+    }
+  else
+    {
+      my_bytes_written = -1;
+    }
+#endif
+
+  if (my_bytes_written != -1)
+    {
+      if (bytes_written != NULL)
+        {
+	  *bytes_written = my_bytes_written;
+        }
+
+      ret = true;
+    }
+  else
+    {
+      set_system_error(error, errno);
+    }
+
+  return ret;
 }
 
 bool tr_sys_file_flush(tr_sys_file_t handle, tr_error** error)
