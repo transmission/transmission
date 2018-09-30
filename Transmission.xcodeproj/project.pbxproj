@@ -2983,6 +2983,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = NO;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					.,
+					"third-party/libevent/include",
+				);
 				PRODUCT_NAME = "transmission-remote";
 			};
 			name = Debug;
@@ -3349,6 +3354,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = NO;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					.,
+					"third-party/libevent/include",
+				);
 				PRODUCT_NAME = "transmission-remote";
 			};
 			name = "Release - Debug";
@@ -3499,6 +3509,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = NO;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					.,
+					"third-party/libevent/include",
+				);
 				PRODUCT_NAME = "transmission-remote";
 			};
 			name = Release;
