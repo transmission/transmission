@@ -20,9 +20,9 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#import "AboutWindowController.h"
+#include <libtransmission/version.h>
 
-#include "version.h"
+#import "AboutWindowController.h"
 
 @implementation AboutWindowController
 

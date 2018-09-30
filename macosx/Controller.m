@@ -25,6 +25,14 @@
 #import <Carbon/Carbon.h>
 #import <libkern/OSAtomic.h>
 
+#import <Sparkle/Sparkle.h>
+
+#include <libtransmission/transmission.h>
+#include <libtransmission/utils.h>
+#include <libtransmission/variant.h>
+
+#import "VDKQueue.h"
+
 #import "Controller.h"
 #import "Torrent.h"
 #import "TorrentGroup.h"
@@ -57,13 +65,6 @@
 #import "NSStringAdditions.h"
 #import "ExpandedPathToPathTransformer.h"
 #import "ExpandedPathToIconTransformer.h"
-
-#import "transmission.h"
-#import "utils.h"
-#import "variant.h"
-
-#import "VDKQueue.h"
-#import <Sparkle/Sparkle.h>
 
 #define TOOLBAR_CREATE                  @"Toolbar Create"
 #define TOOLBAR_OPEN_FILE               @"Toolbar Open"

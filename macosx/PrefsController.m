@@ -20,6 +20,15 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#import <Foundation/Foundation.h>
+
+#import <Sparkle/Sparkle.h>
+
+#include <libtransmission/transmission.h>
+#include <libtransmission/utils.h>
+
+#import "VDKQueue.h"
+
 #import "PrefsController.h"
 #import "BlocklistDownloaderViewController.h"
 #import "BlocklistScheduler.h"
@@ -28,12 +37,6 @@
 #import "BonjourController.h"
 #import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
-#import "VDKQueue.h"
-
-#import "transmission.h"
-#import "utils.h"
-
-#import <Sparkle/Sparkle.h>
 
 #define DOWNLOAD_FOLDER     0
 #define DOWNLOAD_TORRENT    2

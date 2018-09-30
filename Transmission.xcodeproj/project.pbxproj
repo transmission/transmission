@@ -2256,15 +2256,15 @@
 			files = (
 			);
 			inputPaths = (
-				"$(SRCROOT)/third-party/miniupnpc/VERSION",
-				"$(SRCROOT)/third-party/miniupnpc/miniupnpcstrings.h.in",
+				"third-party/miniupnpc/VERSION",
+				"third-party/miniupnpc/miniupnpcstrings.h.in",
 			);
 			outputPaths = (
-				"$(SRCROOT)/third-party/miniupnpc/miniupnpcstrings.h",
+				"third-party/miniupnpc/miniupnpcstrings.h",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cd third-party/miniupnpc\nsh updateminiupnpcstrings.sh \"$SCRIPT_INPUT_FILE_0\" \"$SCRIPT_INPUT_FILE_1\" \"$SCRIPT_OUTPUT_FILE_0\"";
+			shellScript = "cd third-party/miniupnpc\nsh updateminiupnpcstrings.sh \"$SCRIPT_INPUT_FILE_0\" \"$SCRIPT_INPUT_FILE_1\" \"$SCRIPT_OUTPUT_FILE_0\"\n";
 		};
 		BE75C3510C729EE100DBEFE0 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -2277,7 +2277,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "if [ ! -e ./third-party/libevent/include/event2/config.h -a ! ./third-party/macosx-libevent-config.h -ef ./third-party/libevent/include/event2/config.h ]; then ln -s ../../../macosx-libevent-config.h ./third-party/libevent/include/event2/config.h; fi\n\nif [ ! -e ./third-party/libevent/include/event2/event-config.h -a ! ./third-party/macosx-libevent-event-config.h -ef ./third-party/libevent/include/event2/event-config.h ]; then ln -s ../../../macosx-libevent-event-config.h ./third-party/libevent/include/event2/event-config.h; fi";
+			shellScript = "cd third-party/libevent/include/event2\n\nif [ ! -e config.h -a ! ../../../macosx-libevent-config.h -ef config.h ]; then\n    ln -s ../../../macosx-libevent-config.h config.h;\nfi\n\nif [ ! -e event-config.h -a ! ../../../macosx-libevent-event-config.h -ef event-config.h ]; then\n    ln -s ../../../macosx-libevent-event-config.h event-config.h;\nfi\n";
 		};
 		C12F197C1E1AE55A0005E93F /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -2287,11 +2287,11 @@
 			inputPaths = (
 			);
 			outputPaths = (
-				"$(SRCROOT)/third-party/miniupnpc/miniupnp",
+				"third-party/miniupnpc/miniupnp",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cd third-party/miniupnpc && rm -f miniupnp && ln -s . miniupnp";
+			shellScript = "cd third-party/miniupnpc && rm -f miniupnp && ln -s . miniupnp\n";
 		};
 		C12F197D1E1AE6830005E93F /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -2301,11 +2301,11 @@
 			inputPaths = (
 			);
 			outputPaths = (
-				"$(SRCROOT)/third-party/libutp/libutp",
+				"third-party/libutp/libutp",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cd third-party/libutp && rm -f libutp && ln -s . libutp";
+			shellScript = "cd third-party/libutp && rm -f libutp && ln -s . libutp\n";
 		};
 		C12F197E1E1AE6D50005E93F /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -2315,11 +2315,11 @@
 			inputPaths = (
 			);
 			outputPaths = (
-				"$(SRCROOT)/third-party/dht/dht",
+				"third-party/dht/dht",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cd third-party/dht && rm -f dht && ln -s . dht";
+			shellScript = "cd third-party/dht && rm -f dht && ln -s . dht\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -2916,11 +2916,6 @@
 					"third-party/libutp",
 					"third-party/miniupnpc",
 				);
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/build/Development\"",
-					"\"$(SRCROOT)/build/Debug\"",
-				);
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-DWITH_UTP",
@@ -2944,11 +2939,11 @@
 				CLANG_ENABLE_OBJC_ARC = YES;
 				FRAMEWORK_SEARCH_PATHS = macosx;
 				GCC_PREFIX_HEADER = macosx/Transmission_Prefix.pch;
-				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks";
-				LIBRARY_SEARCH_PATHS = (
+				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/third-party/curl/lib\"",
+					.,
 				);
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks";
 				PRODUCT_NAME = Transmission;
 				WRAPPER_EXTENSION = app;
 			};
@@ -2959,8 +2954,9 @@
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = NO;
 				HEADER_SEARCH_PATHS = (
-					"third-party/curl/include",
+					"$(inherited)",
 					.,
+					"third-party/libevent/include",
 				);
 				PRODUCT_NAME = transmissioncli;
 			};
@@ -2987,11 +2983,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = NO;
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					.,
-					"third-party/libevent/include",
-				);
 				PRODUCT_NAME = "transmission-remote";
 			};
 			name = Debug;
@@ -3039,9 +3030,9 @@
 				IBC_FLATTEN_NIBS = YES;
 				IBC_NOTICES = NO;
 				IBC_WARNINGS = YES;
-				INFOPLIST_FILE = "$(SRCROOT)/macosx/Info.plist";
+				INFOPLIST_FILE = macosx/Info.plist;
 				INFOPLIST_OTHER_PREPROCESSOR_FLAGS = "-traditional";
-				INFOPLIST_PREFIX_HEADER = "$(SRCROOT)/libtransmission/version.h";
+				INFOPLIST_PREFIX_HEADER = libtransmission/version.h;
 				INFOPLIST_PREPROCESS = YES;
 				LIBRARY_SEARCH_PATHS = (
 					"third-party/curl/lib",
@@ -3094,11 +3085,6 @@
 					"third-party/libutp",
 					"third-party/miniupnpc",
 				);
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/build/Development\"",
-					"\"$(SRCROOT)/build/Debug\"",
-				);
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-DWITH_UTP",
@@ -3121,8 +3107,9 @@
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = NO;
 				HEADER_SEARCH_PATHS = (
-					"third-party/curl/include",
+					"$(inherited)",
 					.,
+					"third-party/libevent/include",
 				);
 				PRODUCT_NAME = transmissioncli;
 			};
@@ -3134,11 +3121,11 @@
 				CLANG_ENABLE_OBJC_ARC = YES;
 				FRAMEWORK_SEARCH_PATHS = macosx;
 				GCC_PREFIX_HEADER = macosx/Transmission_Prefix.pch;
-				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks";
-				LIBRARY_SEARCH_PATHS = (
+				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/third-party/curl/lib\"",
+					.,
 				);
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks";
 				PRODUCT_NAME = Transmission;
 				WRAPPER_EXTENSION = app;
 			};
@@ -3186,9 +3173,9 @@
 				IBC_FLATTEN_NIBS = YES;
 				IBC_NOTICES = NO;
 				IBC_WARNINGS = YES;
-				INFOPLIST_FILE = "$(SRCROOT)/macosx/Info.plist";
+				INFOPLIST_FILE = macosx/Info.plist;
 				INFOPLIST_OTHER_PREPROCESSOR_FLAGS = "-traditional";
-				INFOPLIST_PREFIX_HEADER = "$(SRCROOT)/libtransmission/version.h";
+				INFOPLIST_PREFIX_HEADER = libtransmission/version.h;
 				INFOPLIST_PREPROCESS = YES;
 				LIBRARY_SEARCH_PATHS = (
 					"third-party/curl/lib",
@@ -3267,9 +3254,9 @@
 				IBC_FLATTEN_NIBS = YES;
 				IBC_NOTICES = NO;
 				IBC_WARNINGS = YES;
-				INFOPLIST_FILE = "$(SRCROOT)/macosx/Info.plist";
+				INFOPLIST_FILE = macosx/Info.plist;
 				INFOPLIST_OTHER_PREPROCESSOR_FLAGS = "-traditional";
-				INFOPLIST_PREFIX_HEADER = "$(SRCROOT)/libtransmission/version.h";
+				INFOPLIST_PREFIX_HEADER = libtransmission/version.h;
 				INFOPLIST_PREPROCESS = YES;
 				LIBRARY_SEARCH_PATHS = (
 					"third-party/curl/lib",
@@ -3288,11 +3275,11 @@
 				CLANG_ENABLE_OBJC_ARC = YES;
 				FRAMEWORK_SEARCH_PATHS = macosx;
 				GCC_PREFIX_HEADER = macosx/Transmission_Prefix.pch;
-				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks";
-				LIBRARY_SEARCH_PATHS = (
+				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/third-party/curl/lib\"",
+					.,
 				);
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks";
 				PRODUCT_NAME = Transmission;
 				WRAPPER_EXTENSION = app;
 			};
@@ -3303,8 +3290,9 @@
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = NO;
 				HEADER_SEARCH_PATHS = (
-					"third-party/curl/include",
+					"$(inherited)",
 					.,
+					"third-party/libevent/include",
 				);
 				PRODUCT_NAME = transmissioncli;
 			};
@@ -3322,11 +3310,6 @@
 					"third-party/libnatpmp",
 					"third-party/libutp",
 					"third-party/miniupnpc",
-				);
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/build/Development\"",
-					"\"$(SRCROOT)/build/Debug\"",
 				);
 				OTHER_CFLAGS = (
 					"$(inherited)",
@@ -3366,11 +3349,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = NO;
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					.,
-					"third-party/libevent/include",
-				);
 				PRODUCT_NAME = "transmission-remote";
 			};
 			name = "Release - Debug";
@@ -3419,8 +3397,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = YES;
-				GCC_PREFIX_HEADER = "$(SRCROOT)/macosx/QuickLookPlugin/QuickLookPlugin-Prefix.pch";
-				INFOPLIST_FILE = "$(SRCROOT)/macosx/QuickLookPlugin/QuickLookPlugin-Info.plist";
+				GCC_PREFIX_HEADER = "macosx/QuickLookPlugin/QuickLookPlugin-Prefix.pch";
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					.,
+				);
+				INFOPLIST_FILE = "macosx/QuickLookPlugin/QuickLookPlugin-Info.plist";
 				INSTALL_PATH = /Library/QuickLook;
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -3432,8 +3414,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = YES;
-				GCC_PREFIX_HEADER = "$(SRCROOT)/macosx/QuickLookPlugin/QuickLookPlugin-Prefix.pch";
-				INFOPLIST_FILE = "$(SRCROOT)/macosx/QuickLookPlugin/QuickLookPlugin-Info.plist";
+				GCC_PREFIX_HEADER = "macosx/QuickLookPlugin/QuickLookPlugin-Prefix.pch";
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					.,
+				);
+				INFOPLIST_FILE = "macosx/QuickLookPlugin/QuickLookPlugin-Info.plist";
 				INSTALL_PATH = /Library/QuickLook;
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -3445,8 +3431,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = YES;
-				GCC_PREFIX_HEADER = "$(SRCROOT)/macosx/QuickLookPlugin/QuickLookPlugin-Prefix.pch";
-				INFOPLIST_FILE = "$(SRCROOT)/macosx/QuickLookPlugin/QuickLookPlugin-Info.plist";
+				GCC_PREFIX_HEADER = "macosx/QuickLookPlugin/QuickLookPlugin-Prefix.pch";
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					.,
+				);
+				INFOPLIST_FILE = "macosx/QuickLookPlugin/QuickLookPlugin-Info.plist";
 				INSTALL_PATH = /Library/QuickLook;
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -3509,11 +3499,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = NO;
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					.,
-					"third-party/libevent/include",
-				);
 				PRODUCT_NAME = "transmission-remote";
 			};
 			name = Release;

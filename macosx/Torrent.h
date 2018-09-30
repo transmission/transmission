@@ -21,8 +21,9 @@
  *****************************************************************************/
 
 #import <Cocoa/Cocoa.h>
-#import <transmission.h>
 #import <Quartz/Quartz.h>
+
+#include <libtransmission/transmission.h>
 
 @class FileListNode;
 

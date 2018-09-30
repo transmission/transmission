@@ -20,9 +20,10 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#import <QuartzCore/QuartzCore.h>
+
 #import "StatusBarView.h"
 #import "NSApplicationAdditions.h"
-#import <QuartzCore/QuartzCore.h>
 
 @interface StatusBarView (Private)
 
