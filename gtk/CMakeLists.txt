@@ -190,7 +190,7 @@ set(${PROJECT_NAME}_PUBLIC_ICONS
 )
 
 foreach(ICON ${${PROJECT_NAME}_PUBLIC_ICONS})
-    install(FILES icons/${ICON} DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/${ICON})
+    install(FILES icons/${ICON} DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/ RENAME ${ICON})
 endforeach()
 
 if(INSTALL_DOC)
