@@ -327,7 +327,7 @@
 #endif
 - (void) setAutoUpdateToBeta: (id) sender
 {
-    [[SUUpdater sharedUpdater] setAllowedTags: SPARKLE_TAG ? [NSSet setWithObject: @"beta"] : nil];
+    // TODO: Support beta releases (if/when necessary)
 }
 
 - (void) setPort: (id) sender
