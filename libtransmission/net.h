@@ -118,6 +118,11 @@ static inline bool tr_address_is_valid(tr_address const* a)
  * Sockets
  **********************************************************************/
 
+#define TR_IPTOS_LOWCOST    0x38    // AF13: low prio, high drop
+#define TR_IPTOS_LOWDELAY   0x70    // AF32: high prio, mid drop
+#define TR_IPTOS_THRUPUT    0x20    // CS1: low prio, undef drop
+#define TR_IPTOS_RELIABLE   0x28    // AF11: low prio, low drop
+
 struct tr_session;
 
 struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const* addr, tr_port port, bool clientIsSeed);
