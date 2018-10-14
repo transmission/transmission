@@ -6,6 +6,8 @@
  *
  */
 
+#include <QMessageBox>
+
 #include "Prefs.h"
 #include "Session.h"
 #include "SessionDialog.h"
@@ -22,7 +24,12 @@ void SessionDialog::accept()
     myPrefs.set(Prefs::SESSION_REMOTE_AUTH, ui.authCheck->isChecked());
     myPrefs.set(Prefs::SESSION_REMOTE_USERNAME, ui.usernameEdit->text());
     myPrefs.set(Prefs::SESSION_REMOTE_PASSWORD, ui.passwordEdit->text());
-    mySession.restart();
+
+    if (!mySession.restart())
+    {
+        warnDuplicateSession();
+    }
+
     BaseDialog::accept();
 }
 
@@ -76,4 +83,11 @@ SessionDialog::SessionDialog(Session& session, Prefs& prefs, QWidget* parent) :
     myAuthWidgets << ui.passwordLabel << ui.passwordEdit;
 
     resensitize();
+}
+
+void SessionDialog::warnDuplicateSession()
+{
+    QMessageBox::warning(nullptr, QString(),
+        tr("A different session of transmission is already active on the specified configuration."),
+        QMessageBox::Ok);
 }

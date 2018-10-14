@@ -64,6 +64,21 @@ bool InteropHelper::addMetainfo(QString const& metainfo)
     return false;
 }
 
+bool InteropHelper::raisePresent()
+{
+#ifdef ENABLE_DBUS_INTEROP
+    {
+        return myDbusClient.raisePresent();
+    }
+#endif
+
+#ifdef ENABLE_COM_INTEROP
+    {
+        return myComClient.raisePresent();
+    }
+#endif
+}
+
 void InteropHelper::initialize()
 {
 #ifdef ENABLE_COM_INTEROP

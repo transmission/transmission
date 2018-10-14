@@ -28,6 +28,8 @@ public:
     {
     }
 
+    void static warnDuplicateSession();
+
 public slots:
     // QDialog
     virtual void accept();

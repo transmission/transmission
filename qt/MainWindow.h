@@ -83,6 +83,8 @@ public slots:
 
     void openSession();
 
+    void toggleWindows(bool doShow);
+
 protected:
     // QWidget
     virtual void contextMenuEvent(QContextMenuEvent*);
@@ -133,7 +135,6 @@ private slots:
     void dataReadProgress();
     void dataSendProgress();
     void onNetworkResponse(QNetworkReply::NetworkError code, QString const& message);
-    void toggleWindows(bool doShow);
     void onSetPrefs();
     void onSetPrefs(bool);
     void onSessionSourceChanged();

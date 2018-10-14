@@ -314,6 +314,7 @@ void Session::updatePref(int key)
 Session::Session(QString const& configDir, Prefs& prefs) :
     myConfigDir(configDir),
     myPrefs(prefs),
+    myLock(configDir + QLatin1Literal("/session.lock")),
     myBlocklistSize(-1),
     mySession(nullptr),
     myIsDefinitelyLocalSession(true)
@@ -352,15 +353,17 @@ void Session::stop()
         tr_sessionClose(mySession);
         mySession = nullptr;
     }
+
+    myLock.unlock();
 }
 
-void Session::restart()
+bool Session::restart()
 {
     stop();
-    start();
+    return start();
 }
 
-void Session::start()
+bool Session::start()
 {
     if (myPrefs.get<bool>(Prefs::SESSION_IS_REMOTE))
     {
@@ -380,6 +383,12 @@ void Session::start()
     }
     else
     {
+        // allow only one local session per config
+        if (!myLock.tryLock())
+        {
+            return false;
+        }
+
         tr_variant settings;
         tr_variantInitDict(&settings, 0);
         tr_sessionLoadSettings(&settings, myConfigDir.toUtf8().constData(), "qt");
@@ -396,6 +405,7 @@ void Session::start()
     }
 
     emit sourceChanged();
+    return true;
 }
 
 bool Session::isServer() const

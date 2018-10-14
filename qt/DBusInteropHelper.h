@@ -18,6 +18,7 @@ public:
     bool isConnected() const;
 
     QVariant addMetainfo(QString const& metainfo);
+    bool raisePresent();
 
     static void registerObject(QObject* parent);
 };

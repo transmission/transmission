@@ -41,6 +41,15 @@ QVariant DBusInteropHelper::addMetainfo(QString const& metainfo)
     return response.isValid() ? QVariant(response.value()) : QVariant();
 }
 
+bool DBusInteropHelper::raisePresent()
+{
+    QDBusMessage const request = QDBusMessage::createMethodCall(DBUS_SERVICE, DBUS_OBJECT_PATH, DBUS_INTERFACE,
+        QLatin1String("PresentWindow"));
+
+    QDBusReply<bool> const response = QDBusConnection::sessionBus().call(request);
+    return response.isValid() && response.value();
+}
+
 void DBusInteropHelper::registerObject(QObject* parent)
 {
     QDBusConnection bus = QDBusConnection::sessionBus();

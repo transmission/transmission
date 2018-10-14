@@ -35,6 +35,7 @@
 #include "OptionsDialog.h"
 #include "Prefs.h"
 #include "Session.h"
+#include "SessionDialog.h"
 #include "TorrentModel.h"
 #include "WatchDir.h"
 
@@ -225,6 +226,12 @@ Application::Application(int& argc, char** argv) :
             }
         }
 
+        // simply raise already open window if no files were selected
+        if (!delegated && filenames.isEmpty())
+        {
+            delegated = interopClient.raisePresent();
+        }
+
         if (delegated)
         {
             quitLater();
@@ -342,7 +349,11 @@ Application::Application(int& argc, char** argv) :
 
     if (!firstTime)
     {
-        mySession->restart();
+        if (!mySession->restart())
+        {
+            SessionDialog::warnDuplicateSession();
+            quitLater();
+        }
     }
     else
     {
@@ -623,6 +634,7 @@ void Application::addTorrent(AddData const& addme)
 
 void Application::raise()
 {
+    myWindow->toggleWindows(true);
     alert(myWindow);
 }
 

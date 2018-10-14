@@ -46,6 +46,11 @@ QVariant ComInteropHelper::addMetainfo(QString const& metainfo)
     return m_client->dynamicCall("AddMetainfo(QString)", metainfo);
 }
 
+bool ComInteropHelper::raisePresent()
+{
+    return m_client->dynamicCall("PresentWindow()");
+}
+
 void ComInteropHelper::initialize()
 {
     qAxOutProcServer = true;

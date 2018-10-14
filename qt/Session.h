@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include <QLockFile>
 #include <QObject>
 #include <QSet>
 #include <QString>
@@ -36,7 +37,7 @@ public:
     virtual ~Session();
 
     void stop();
-    void restart();
+    bool restart();
 
     QUrl const& getRemoteUrl() const
     {
@@ -125,7 +126,7 @@ signals:
     void httpAuthenticationRequired();
 
 private:
-    void start();
+    bool start();
 
     void updateStats(tr_variant* args);
     void updateInfo(tr_variant* args);
@@ -140,6 +141,7 @@ private:
 private:
     QString const myConfigDir;
     Prefs& myPrefs;
+    QLockFile myLock;
 
     int64_t myBlocklistSize;
     tr_session* mySession;
