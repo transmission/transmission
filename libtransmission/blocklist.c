@@ -320,7 +320,7 @@ static bool parseLine3(char const* line, struct tr_ipv4_range* range) {
     }
 
     /* do it in the network order */
-    mask <<= pflen;
+    mask <<= 32 - pflen;
     ip_u = ip[0] << 24 | ip[1] << 16 | ip[2] << 8 | ip[3];
 
     /* fill the non-prefix bits the way we need it */
