@@ -319,13 +319,13 @@ static bool parseLine3(char const* line, struct tr_ipv4_range* range) {
         return false;
     }
 
-    /* do it in the network order */
+    /* this is host order */
     mask <<= 32 - pflen;
     ip_u = ip[0] << 24 | ip[1] << 16 | ip[2] << 8 | ip[3];
 
     /* fill the non-prefix bits the way we need it */
-    range->begin = ntohl(ip_u & mask);
-    range->end = ntohl(ip_u | (~mask));
+    range->begin = ip_u & mask;
+    range->end = ip_u | (~mask);
 
     return true;
 }
