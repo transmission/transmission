@@ -72,7 +72,7 @@ static int test_parsing(void)
     tr_free(path);
     tr_sessionReloadBlocklists(session);
     check(tr_blocklistExists(session));
-    check_int(tr_blocklistGetRuleCount(session), ==, 4);
+    check_int(tr_blocklistGetRuleCount(session), ==, 5);
 
     /* enable the blocklist */
     check(!tr_blocklistIsEnabled(session));
