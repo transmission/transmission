@@ -75,6 +75,31 @@ void TorrentFilter::refilter()
 ****
 ***/
 
+namespace
+{
+int compareState(Torrent const* left, Torrent const* right)
+{
+    int val = tr_compare_3way(left->hasError(), right->hasError());
+
+    if (val == 0)
+    {
+        val = tr_compare_3way(left->isFinished(), right->isFinished());
+    }
+
+    if (val == 0)
+    {
+        val = -tr_compare_3way(left->isPaused(), right->isPaused());
+    }
+
+    if (val == 0)
+    {
+        val = -tr_compare_3way(!left->hasMetadata(), !right->hasMetadata());
+    }
+
+    return val;
+}
+} // namespace
+
 bool TorrentFilter::lessThan(QModelIndex const& left, QModelIndex const& right) const
 {
     int val = 0;
@@ -83,7 +108,17 @@ bool TorrentFilter::lessThan(QModelIndex const& left, QModelIndex const& right) 
 
     switch (prefs_.get<SortMode>(Prefs::SORT_MODE).mode())
     {
+    case SortMode::SORT_BY_NAME:
+        val = -tr_compare_3way(!a->hasMetadata(), !b->hasMetadata());
+        if (val == 0)
+        {
+            val = -a->name().compare(b->name(), Qt::CaseInsensitive);
+        }
+
+        break;
+
     case SortMode::SORT_BY_QUEUE:
+        val = compareState(a, b);
         if (val == 0)
         {
             val = -tr_compare_3way(a->queuePosition(), b->queuePosition());
@@ -92,30 +127,23 @@ bool TorrentFilter::lessThan(QModelIndex const& left, QModelIndex const& right) 
         break;
 
     case SortMode::SORT_BY_SIZE:
-        if (val == 0)
-        {
-            val = tr_compare_3way(a->sizeWhenDone(), b->sizeWhenDone());
-        }
+        val = tr_compare_3way(a->sizeWhenDone(), b->sizeWhenDone());
 
         break;
 
     case SortMode::SORT_BY_AGE:
-        if (val == 0)
-        {
-            val = tr_compare_3way(a->dateAdded(), b->dateAdded());
-        }
+        val = tr_compare_3way(a->dateAdded(), b->dateAdded());
 
         break;
 
     case SortMode::SORT_BY_ID:
-        if (val == 0)
-        {
-            val = tr_compare_3way(a->id(), b->id());
-        }
+        val = tr_compare_3way(a->id(), b->id());
 
         break;
 
+    case SortMode::SORT_BY_STATE:
     case SortMode::SORT_BY_ACTIVITY:
+        val = compareState(a, b);
         if (val == 0)
         {
             val = tr_compare_3way(a->downloadSpeed() + a->uploadSpeed(), b->downloadSpeed() + b->uploadSpeed());
@@ -124,16 +152,26 @@ bool TorrentFilter::lessThan(QModelIndex const& left, QModelIndex const& right) 
         if (val == 0)
         {
             val = tr_compare_3way(
-                a->peersWeAreUploadingTo() + a->webseedsWeAreDownloadingFrom(),
-                b->peersWeAreUploadingTo() + b->webseedsWeAreDownloadingFrom());
+                a->peersWeAreUploadingTo() + a->peersWeAreDownloadingFrom() + a->webseedsWeAreDownloadingFrom(),
+                b->peersWeAreUploadingTo() + b->peersWeAreDownloadingFrom() + b->webseedsWeAreDownloadingFrom());
         }
 
         [[fallthrough]];
 
-    case SortMode::SORT_BY_STATE:
+    case SortMode::SORT_BY_PROGRESS:
         if (val == 0)
         {
-            val = -tr_compare_3way(a->isPaused(), b->isPaused());
+            val = compareState(a, b);
+        }
+
+        if (val == 0)
+        {
+            val = tr_compare_3way(a->metadataPercentDone(), b->metadataPercentDone());
+        }
+
+        if (val == 0)
+        {
+            val = a->compareSeedProgress(*b);
         }
 
         if (val == 0)
@@ -146,37 +184,10 @@ bool TorrentFilter::lessThan(QModelIndex const& left, QModelIndex const& right) 
             val = -tr_compare_3way(a->queuePosition(), b->queuePosition());
         }
 
-        if (val == 0)
-        {
-            val = tr_compare_3way(a->hasError(), b->hasError());
-        }
-
-        [[fallthrough]];
-
-    case SortMode::SORT_BY_PROGRESS:
-        if (val == 0)
-        {
-            val = tr_compare_3way(a->metadataPercentDone(), b->metadataPercentDone());
-        }
-
-        if (val == 0)
-        {
-            val = tr_compare_3way(a->percentComplete(), b->percentComplete());
-        }
-
-        if (val == 0)
-        {
-            val = a->compareSeedProgress(*b);
-        }
-
-        if (val == 0)
-        {
-            val = -tr_compare_3way(a->queuePosition(), b->queuePosition());
-        }
-
-        [[fallthrough]];
+        break;
 
     case SortMode::SORT_BY_RATIO:
+        val = -tr_compare_3way(!a->hasMetadata(), !b->hasMetadata());
         if (val == 0)
         {
             val = a->compareRatio(*b);
@@ -185,6 +196,7 @@ bool TorrentFilter::lessThan(QModelIndex const& left, QModelIndex const& right) 
         break;
 
     case SortMode::SORT_BY_ETA:
+        val = compareState(a, b);
         if (val == 0)
         {
             val = a->compareETA(*b);
