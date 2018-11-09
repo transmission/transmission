@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11762" systemVersion="16D32" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14460.23.1" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11762"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14460.23.1"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -25,7 +25,7 @@
             <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
             <subviews>
                 <button verticalHuggingPriority="750" id="3" customClass="FilterButton">
-                    <rect key="frame" x="73" y="2" width="49" height="17"/>
+                    <rect key="frame" x="73" y="3" width="49" height="17"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <buttonCell key="cell" type="recessed" title="Active" bezelStyle="recessed" alignment="center" controlSize="mini" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="21">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
@@ -64,7 +64,7 @@
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                 </box>
                 <button verticalHuggingPriority="750" id="6" customClass="FilterButton">
-                    <rect key="frame" x="273" y="2" width="55" height="17"/>
+                    <rect key="frame" x="273" y="3" width="55" height="17"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <buttonCell key="cell" type="recessed" title="Paused" bezelStyle="recessed" alignment="center" controlSize="mini" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="15">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
@@ -75,7 +75,7 @@
                     </connections>
                 </button>
                 <button verticalHuggingPriority="750" id="7" customClass="FilterButton">
-                    <rect key="frame" x="213" y="2" width="59" height="17"/>
+                    <rect key="frame" x="213" y="3" width="59" height="17"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <buttonCell key="cell" type="recessed" title="Seeding" bezelStyle="recessed" alignment="center" controlSize="mini" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="14">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
@@ -86,7 +86,7 @@
                     </connections>
                 </button>
                 <button verticalHuggingPriority="750" id="8" customClass="FilterButton">
-                    <rect key="frame" x="123" y="2" width="89" height="17"/>
+                    <rect key="frame" x="123" y="3" width="89" height="17"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <buttonCell key="cell" type="recessed" title="Downloading" bezelStyle="recessed" alignment="center" controlSize="mini" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="13">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
@@ -97,7 +97,7 @@
                     </connections>
                 </button>
                 <button verticalHuggingPriority="750" id="9" customClass="FilterButton">
-                    <rect key="frame" x="42" y="2" width="30" height="17"/>
+                    <rect key="frame" x="42" y="3" width="30" height="17"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <buttonCell key="cell" type="recessed" title="All" bezelStyle="recessed" alignment="center" controlSize="mini" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="12">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
@@ -107,8 +107,8 @@
                         <action selector="setFilter:" target="-2" id="40"/>
                     </connections>
                 </button>
-                <searchField wantsLayer="YES" verticalHuggingPriority="750" id="10">
-                    <rect key="frame" x="357" y="2" width="95" height="19"/>
+                <searchField wantsLayer="YES" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="10">
+                    <rect key="frame" x="357" y="3" width="95" height="19"/>
                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES"/>
                     <searchFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" borderStyle="bezel" bezelStyle="round" id="11">
                         <font key="font" metaFont="smallSystem"/>

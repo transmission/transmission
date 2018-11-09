@@ -21,6 +21,7 @@
  *****************************************************************************/
 
 #import "InfoTabButtonCell.h"
+#import "NSApplicationAdditions.h"
 
 @implementation InfoTabButtonCell
 
@@ -76,16 +77,27 @@
     {
         NSColor * lightColor = [NSColor colorForControlTint: [NSColor currentControlTint]];
         NSColor * darkColor = [lightColor blendedColorWithFraction: 0.2 ofColor: [NSColor blackColor]];
+        if ([NSApp willUseSemanticColors]) {
+            lightColor = [NSColor colorForControlTint: [NSColor currentControlTint]];
+            darkColor = [lightColor blendedColorWithFraction: 0.2 ofColor: [NSColor controlBackgroundColor]];
+        }
         gradient = [[NSGradient alloc] initWithStartingColor: lightColor endingColor: darkColor];
     }
     else
     {
         NSColor * lightColor = [NSColor colorWithCalibratedRed: 245.0/255.0 green: 245.0/255.0 blue: 245.0/255.0 alpha: 1.0];
         NSColor * darkColor = [NSColor colorWithCalibratedRed: 215.0/255.0 green: 215.0/255.0 blue: 215.0/255.0 alpha: 1.0];
+        if ([NSApp willUseSemanticColors]) {
+            lightColor = [NSColor controlColor];
+            darkColor = [NSColor gridColor];
+        }
         gradient = [[NSGradient alloc] initWithStartingColor: lightColor endingColor: darkColor];
     }
+    NSColor * fillColor = [NSColor grayColor];
+    if ([NSApp willUseSemanticColors])
+    fillColor = [NSColor controlShadowColor];
 
-    [[NSColor grayColor] set];
+    [fillColor set];
     NSRectFill(NSMakeRect(0.0, 0.0, NSWidth(tabRect), 1.0));
     NSRectFill(NSMakeRect(0.0, NSHeight(tabRect) - 1.0, NSWidth(tabRect), 1.0));
     NSRectFill(NSMakeRect(NSWidth(tabRect) - 1.0, 1.0, NSWidth(tabRect) - 1.0, NSHeight(tabRect) - 2.0));

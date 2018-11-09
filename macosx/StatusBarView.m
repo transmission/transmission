@@ -88,7 +88,10 @@
         const NSRect lineBorderRect = NSMakeRect(NSMinX(rect), 0.0, NSWidth(rect), 1.0);
         if (NSIntersectsRect(lineBorderRect, rect))
         {
-            [[NSColor lightGrayColor] setFill];
+            NSColor * lineColor = [NSColor lightGrayColor];
+            if ([NSApp willUseSemanticColors])
+            lineColor = [NSColor gridColor];
+            [lineColor setFill];
             NSRectFill(lineBorderRect);
         }
     }

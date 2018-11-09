@@ -65,6 +65,7 @@
 #import "NSStringAdditions.h"
 #import "ExpandedPathToPathTransformer.h"
 #import "ExpandedPathToIconTransformer.h"
+#import "NSImageAdditions.h"
 
 #define TOOLBAR_CREATE                  @"Toolbar Create"
 #define TOOLBAR_OPEN_FILE               @"Toolbar Open"
@@ -2921,10 +2922,10 @@ static void removeKeRangerRansomware()
             return [[GroupsController groups] imageForIndex: group];
         }
         else if ([ident isEqualToString: @"DL Image"])
-            return [NSImage imageNamed: @"DownArrowGroupTemplate"];
+        return [[NSImage imageNamed: @"DownArrowGroupTemplate"] imageWithColor: [NSColor labelColor]];
         else if ([ident isEqualToString: @"UL Image"])
-            return [NSImage imageNamed: [fDefaults boolForKey: @"DisplayGroupRowRatio"]
-                                        ? @"YingYangGroupTemplate" : @"UpArrowGroupTemplate"];
+        return [[NSImage imageNamed: [fDefaults boolForKey: @"DisplayGroupRowRatio"]
+                 ? @"YingYangGroupTemplate" : @"UpArrowGroupTemplate"] imageWithColor: [NSColor labelColor]];
         else
         {
             TorrentGroup * group = (TorrentGroup *)item;

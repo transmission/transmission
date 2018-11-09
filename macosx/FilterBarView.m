@@ -52,14 +52,22 @@
 - (void) drawRect: (NSRect) rect
 {
     if ([NSApp isOnYosemiteOrBetter]) {
-        [[NSColor windowBackgroundColor] setFill];
-        NSRectFill(rect);
-
-        const NSRect lineBorderRect = NSMakeRect(NSMinX(rect), 0.0, NSWidth(rect), 1.0);
-        if (NSIntersectsRect(lineBorderRect, rect))
-        {
-            [[NSColor lightGrayColor] setFill];
-            NSRectFill(lineBorderRect);
+        NSColor * lineColor = [NSColor lightGrayColor];
+        NSColor * color = [NSColor windowBackgroundColor];
+        switch ([NSApp willUseSemanticColors]) {
+                case 1:
+                lineColor = [NSColor gridColor];
+                color = [NSColor windowBackgroundColor];
+                case 0:
+                [color setFill];
+                NSRectFill(rect);
+                const NSRect lineBorderRect = NSMakeRect(NSMinX(rect), 0.0, NSWidth(rect), 1.0);
+                if (NSIntersectsRect(lineBorderRect, rect))
+            {
+                [lineColor setFill];
+                NSRectFill(lineBorderRect);
+            }
+                break;
         }
     }
     else {

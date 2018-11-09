@@ -21,6 +21,7 @@
  *****************************************************************************/
 
 #import "InfoTabButtonBack.h"
+#import "NSApplicationAdditions.h"
 
 @implementation InfoTabButtonBack
 
@@ -30,7 +31,14 @@
     {
         NSColor * lightColor = [NSColor colorWithCalibratedRed: 245.0/255.0 green: 245.0/255.0 blue: 245.0/255.0 alpha: 1.0];
         NSColor * darkColor = [NSColor colorWithCalibratedRed: 215.0/255.0 green: 215.0/255.0 blue: 215.0/255.0 alpha: 1.0];
-        fGradient = [[NSGradient alloc] initWithStartingColor: lightColor endingColor: darkColor];
+        switch ([NSApp willUseSemanticColors]) {
+                case 1:
+                lightColor = [NSColor controlColor];
+                darkColor = [NSColor gridColor];
+                case 0:
+                fGradient = [[NSGradient alloc] initWithStartingColor: lightColor endingColor: darkColor];
+                break;
+        }
     }
     return self;
 }
@@ -46,7 +54,10 @@
     if (NSIntersectsRect(lineBorderRect, rect))
     {
         gridRects[count] = lineBorderRect;
-        colorRects[count] = [NSColor grayColor];
+        NSColor * lineColor = [NSColor grayColor];
+        if ([NSApp willUseSemanticColors])
+        lineColor = [NSColor controlShadowColor];
+        colorRects[count] = lineColor;
         ++count;
 
         rect.size.height -= 1.0;
@@ -56,7 +67,10 @@
     if (NSIntersectsRect(lineBorderRect, rect))
     {
         gridRects[count] = lineBorderRect;
-        colorRects[count] = [NSColor grayColor];
+        NSColor * lineColor = [NSColor grayColor];
+        if ([NSApp willUseSemanticColors])
+        lineColor = [NSColor controlShadowColor];
+        colorRects[count] = lineColor;
         ++count;
 
         rect.origin.y += 1.0;

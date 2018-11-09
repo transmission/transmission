@@ -29,4 +29,9 @@
     return floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_9;
 }
 
+- (BOOL) willUseSemanticColors
+{
+    return floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_13;
+}
+
 @end

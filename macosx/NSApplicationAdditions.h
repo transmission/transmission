@@ -25,5 +25,6 @@
 @interface NSApplication (NSApplicationAdditions)
 
 - (BOOL) isOnYosemiteOrBetter;
+- (BOOL) willUseSemanticColors;
 
 @end
