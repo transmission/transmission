@@ -947,7 +947,7 @@
 		BE75C3490C729E9500DBEFE0 /* libevent.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libevent.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		BEFC1C000C07750000B0BB3C /* transmission-daemon */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "transmission-daemon"; sourceTree = BUILT_PRODUCTS_DIR; };
 		BEFC1C0E0C07756200B0BB3C /* daemon.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = daemon.c; path = daemon/daemon.c; sourceTree = "<group>"; };
-		BEFC1C140C07756200B0BB3C /* remote.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = remote.c; path = daemon/remote.c; sourceTree = "<group>"; };
+		BEFC1C140C07756200B0BB3C /* remote.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = remote.c; path = utils/remote.c; sourceTree = "<group>"; };
 		BEFC1CF90C07822400B0BB3C /* transmission-remote */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "transmission-remote"; sourceTree = BUILT_PRODUCTS_DIR; };
 		BEFC1DF00C07861A00B0BB3C /* version.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = version.h; path = libtransmission/version.h; sourceTree = "<group>"; };
 		BEFC1DF10C07861A00B0BB3C /* utils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = utils.h; path = libtransmission/utils.h; sourceTree = "<group>"; };
@@ -1265,6 +1265,7 @@
 				4D1838DC09DEC04A0047D688 /* libtransmission */,
 				4DDBB71F09E16BFE00284745 /* CLI */,
 				BEFC1C0B0C07754700B0BB3C /* daemon */,
+				C15E58AC219A37C600AB292F /* utils */,
 				A22CFCB50FC24F630009BD3E /* dht */,
 				A2E384BF130DFA49001F501B /* libutp */,
 				BE75C3570C72A0D600DBEFE0 /* libevent */,
@@ -1683,9 +1684,16 @@
 				BEFC1C0E0C07756200B0BB3C /* daemon.c */,
 				C1F690FE1AD0628400D95CF0 /* daemon.h */,
 				C1F690FC1AD0627500D95CF0 /* daemon-posix.c */,
-				BEFC1C140C07756200B0BB3C /* remote.c */,
 			);
 			name = daemon;
+			sourceTree = "<group>";
+		};
+		C15E58AC219A37C600AB292F /* utils */ = {
+			isa = PBXGroup;
+			children = (
+				BEFC1C140C07756200B0BB3C /* remote.c */,
+			);
+			name = utils;
 			sourceTree = "<group>";
 		};
 		C1639A751A55F52800E42033 /* b64 */ = {
