@@ -54,11 +54,8 @@
     if ([NSApp isOnYosemiteOrBetter]) {
         NSColor * lineColor = [NSColor lightGrayColor];
         NSColor * color = [NSColor windowBackgroundColor];
-        switch ([NSApp willUseSemanticColors]) {
-                case 1:
-                lineColor = [NSColor gridColor];
-                color = [NSColor windowBackgroundColor];
-                case 0:
+        if ([NSApp willUseSemanticColors])
+            lineColor = [NSColor gridColor];
                 [color setFill];
                 NSRectFill(rect);
                 const NSRect lineBorderRect = NSMakeRect(NSMinX(rect), 0.0, NSWidth(rect), 1.0);
@@ -67,9 +64,7 @@
                 [lineColor setFill];
                 NSRectFill(lineBorderRect);
             }
-                break;
         }
-    }
     else {
         NSInteger count = 0;
         NSRect gridRects[2];

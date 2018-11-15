@@ -31,14 +31,11 @@
     {
         NSColor * lightColor = [NSColor colorWithCalibratedRed: 245.0/255.0 green: 245.0/255.0 blue: 245.0/255.0 alpha: 1.0];
         NSColor * darkColor = [NSColor colorWithCalibratedRed: 215.0/255.0 green: 215.0/255.0 blue: 215.0/255.0 alpha: 1.0];
-        switch ([NSApp willUseSemanticColors]) {
-                case 1:
+        if ([NSApp willUseSemanticColors]) {
                 lightColor = [NSColor controlColor];
                 darkColor = [NSColor gridColor];
-                case 0:
-                fGradient = [[NSGradient alloc] initWithStartingColor: lightColor endingColor: darkColor];
-                break;
         }
+                fGradient = [[NSGradient alloc] initWithStartingColor: lightColor endingColor: darkColor];
     }
     return self;
 }
