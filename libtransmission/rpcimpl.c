@@ -397,6 +397,17 @@ static char const* torrentVerify(tr_session* session, tr_variant* args_in, tr_va
 ****
 ***/
 
+static void
+addLabels (const tr_torrent * tor, tr_variant * list)
+{
+  int i;
+  int labelsCount = tr_ptrArraySize (tor->labels);
+  tr_variantInitList (list, labelsCount);
+  for (i = 0; i<labelsCount; ++i)
+    tr_variantListAddStr (list, tr_ptrArrayNth (tor->labels, i));
+}
+
+
 static void addFileStats(tr_torrent const* tor, tr_variant* list)
 {
     tr_file_index_t n;
@@ -630,6 +641,10 @@ static void addField(tr_torrent* const tor, tr_info const* const inf, tr_stat co
 
     case TR_KEY_isStalled:
         tr_variantDictAddBool(d, key, st->isStalled);
+        break;
+
+    case TR_KEY_labels:
+        addLabels (tor, tr_variantDictAdd (d, key));
         break;
 
     case TR_KEY_leftUntilDone:
@@ -926,6 +941,23 @@ static char const* torrentGet(tr_session* session, tr_variant* args_in, tr_varia
 /***
 ****
 ***/
+
+static void
+setLabels (tr_torrent * tor,
+           tr_variant * list)
+{
+  int i;
+  const char * str;
+  size_t str_len;
+  const int n = tr_variantListSize (list);
+  tr_ptrArrayForeach (tor->labels, (PtrArrayForeachFunc)tr_free);
+  tr_ptrArrayClear (tor->labels);
+  for (i = 0; i < n; i++)
+    {
+      if (tr_variantGetStr (tr_variantListChild (list, i), &str, &str_len) && str && str_len)
+        tr_ptrArrayAppend (tor->labels, tr_strndup (str, str_len));
+    }
+}
 
 static char const* setFilePriorities(tr_torrent* tor, int priority, tr_variant* list)
 {
@@ -1240,6 +1272,11 @@ static char const* torrentSet(tr_session* session, tr_variant* args_in, tr_varia
                 tr_torrentSetPriority(tor, tmp);
             }
         }
+
+        if (errmsg == NULL && tr_variantDictFindList(args_in, TR_KEY_labels, &files))
+	{
+            errmsg = setlabels(tor, files);
+	}
 
         if (errmsg == NULL && tr_variantDictFindList(args_in, TR_KEY_files_unwanted, &files))
         {
