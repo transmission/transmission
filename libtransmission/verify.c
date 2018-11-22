@@ -30,6 +30,14 @@ enum
     MSEC_TO_SLEEP_PER_SECOND_DURING_VERIFY = 100
 };
 
+static bool skiplocalverify = false;
+/*
+ * calling skipverify() anywhere can stop the program from verifying local data
+ */
+void skipverify(){
+    skiplocalverify = true;
+}
+
 static bool verifyTorrent(tr_torrent* tor, bool* stopFlag)
 {
     time_t end;
@@ -66,7 +74,7 @@ static bool verifyTorrent(tr_torrent* tor, bool* stopFlag)
         }
 
         /* if we're starting a new file... */
-        if (filePos == 0 && fd == TR_BAD_SYS_FILE && fileIndex != prevFileIndex)
+        if (!skiplocalverify && filePos == 0 && fd == TR_BAD_SYS_FILE && fileIndex != prevFileIndex)
         {
             char* filename = tr_torrentFindFile(tor, fileIndex);
             fd = filename == NULL ? TR_BAD_SYS_FILE : tr_sys_file_open(filename, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0,
@@ -86,7 +94,7 @@ static bool verifyTorrent(tr_torrent* tor, bool* stopFlag)
         {
             uint64_t numRead;
 
-            if (tr_sys_file_read_at(fd, buffer, bytesThisPass, filePos, &numRead, NULL) && numRead > 0)
+            if (!skiplocalverify && tr_sys_file_read_at(fd, buffer, bytesThisPass, filePos, &numRead, NULL) && numRead > 0)
             {
                 bytesThisPass = numRead;
                 tr_sha1_update(sha, buffer, bytesThisPass);
@@ -108,7 +116,7 @@ static bool verifyTorrent(tr_torrent* tor, bool* stopFlag)
             uint8_t hash[SHA_DIGEST_LENGTH];
 
             tr_sha1_final(sha, hash);
-            hasPiece = memcmp(hash, tor->info.pieces[pieceIndex].hash, SHA_DIGEST_LENGTH) == 0;
+            hasPiece = skiplocalverify || memcmp(hash, tor->info.pieces[pieceIndex].hash, SHA_DIGEST_LENGTH) == 0;
 
             if (hasPiece || hadPiece)
             {
@@ -145,6 +153,10 @@ static bool verifyTorrent(tr_torrent* tor, bool* stopFlag)
             fileIndex++;
             filePos = 0;
         }
+    }
+    if(skiplocalverify){
+        skiplocalverify = false;
+	tr_logAddTorInfo (tor, "%s", _("Verification has been skipped"));
     }
 
     /* cleanup */

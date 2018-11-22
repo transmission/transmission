@@ -91,6 +91,7 @@ static struct tr_option const options[] =
     { 'u', "uplimit", "Set max upload speed in "SPEED_K_STR, "u", 1, "<speed>" },
     { 'U', "no-uplimit", "Don't limit the upload speed", "U", 0, NULL },
     { 'v', "verify", "Verify the specified torrent", "v", 0, NULL },
+    { 's', "skip-verify", "Skip verifying specified first-added torrent", "s", 0, NULL },
     { 'V', "version", "Show version number and exit", "V", 0, NULL },
     { 'w', "download-dir", "Where to save downloaded data", "w", 1, "<path>" },
     { 0, NULL, NULL, NULL, 0, NULL }
@@ -457,6 +458,11 @@ static int parseCommandLine(tr_variant* d, int argc, char const** argv)
         case 'v':
             verify = true;
             break;
+
+        case 's':
+	    verify = false;
+	    skipverify();
+	    break;
 
         case 'V':
             showVersion = true;
