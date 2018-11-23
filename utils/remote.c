@@ -335,7 +335,7 @@ static tr_option opts[] =
     { 830, "utp", "Enable uTP for peer connections", NULL, 0, NULL },
     { 831, "no-utp", "Disable uTP for peer connections", NULL, 0, NULL },
     { 'v', "verify", "Verify the current torrent(s)", "v", 0, NULL },
-    { 's', "skip-verify", "Skip verifying the current torrent(s)", "s", 0, NULL },
+    { '114', "skip-verify", "Skip verifying the current torrent(s)", "s", 0, NULL },
     { 'V', "version", "Show version number and exit", "V", 0, NULL },
     { 'w', "download-dir", "When used in conjunction with --add, set the new torrent's download folder. Otherwise, set the default download folder", "w", 1, "<path>" },
     { 'x', "pex", "Enable peer exchange (PEX)", "x", 0, NULL },
@@ -500,7 +500,7 @@ static int getOptMode(int val)
     case 'v': /* verify */
         return MODE_TORRENT_VERIFY;
 
-    case 's': /* skip verify */
+    case '114': /* skip verify */
 	return MODE_TORRENT_SKIP_VERIFY;
 
     case 600: /* reannounce */
@@ -2874,7 +2874,7 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
                     break;
                 }
 
-            case 's':
+            case '114':
                 {
                     tr_variant* top;
 
