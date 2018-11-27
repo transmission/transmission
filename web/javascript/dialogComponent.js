@@ -13,9 +13,24 @@ class DialogComponent extends HTMLElement {
     style.textContent = `
     #draggable {
       position: absolute;
+      width: 300px;
+      border: 1px solid #aaa;
+      background: white;
+      border-radius: 4px;
+      z-index: 100;
+      padding: 2px;
     }
     ::slotted(.handle) {
       cursor: move;
+    }
+    ::slotted(.header) {
+      border: 1px solid #aaa;
+      background: #ccc url("images/ui-bg_highlight-soft_75_cccccc_1x100.png") 50% 50% repeat-x;
+      color: #222;
+      font-weight: bold;
+      padding: 4.4px 11px 4.4px;
+      border-radius: 4px;
+      margin: 0;
     }`
 
     let markup = `
