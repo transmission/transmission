@@ -1,9 +1,4 @@
-
-function htmlToElements(html) {
-    var template = document.createElement('template');
-    template.innerHTML = html;
-    return template.content;
-}
+import { htmlToElements } from './utils/utils.js';
 
 function keepInRange(min, value, max) {
     return value < min ? min : (value > max ? max : value);
