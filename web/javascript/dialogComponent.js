@@ -5,6 +5,10 @@ function htmlToElements(html) {
     return template.content;
 }
 
+function keepInRange(min, value, max) {
+    return value < min ? min : (value > max ? max : value);
+}
+
 class DialogComponent extends HTMLElement {
   constructor() {
     super()
@@ -65,8 +69,10 @@ class DialogComponent extends HTMLElement {
 
     document.addEventListener("mousemove", function(e) {
       if (!inDrag) {return;}
-      draggable.style.left = (objInitLeft + e.pageX-dragStartX) + "px";
-      draggable.style.top = (objInitTop + e.pageY-dragStartY) + "px";
+      let newLeft = objInitLeft + e.pageX-dragStartX
+      let newTop = objInitTop + e.pageY-dragStartY
+      draggable.style.left =  keepInRange(0, newLeft, window.innerWidth - draggable.clientWidth)+ "px";
+      draggable.style.top = keepInRange(0, newTop, window.innerHeight - draggable.clientHeight) + "px";
     });
     document.addEventListener("mouseup", function(e) {inDrag = false;});
   }
