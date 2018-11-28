@@ -74,3 +74,4 @@ class DialogComponent extends HTMLElement {
 }
 
 customElements.define('dialog-component', DialogComponent);
+export default DialogComponent;

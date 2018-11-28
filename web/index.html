@@ -35,7 +35,7 @@
 		<script type="text/javascript" src="./javascript/dialog.js"></script>
 		<script type="text/javascript" src="./javascript/formatter.js"></script>
 		<script type="text/javascript" src="./javascript/notifications.js"></script>
-		<script type="text/javascript" src="./javascript/dialogComponent.js"></script>
+		<script type="module" src="./javascript/statsDialog.js"></script>
 		<script type="text/javascript" src="./javascript/main.js"></script>
 		<title>Transmission Web Interface</title>
 	</head>
@@ -288,24 +288,8 @@
 			</div>
 		</div>
 
-		<dialog-component>
-			<h4 class="header handle">Statistics</h4>
-			<div class="prefs-section">
-				<div class="title">Current Session</div>
-				<div class="row"><div class="key">Uploaded:</div><div class="value" id='stats-session-uploaded'>&nbsp;</div></div>
-				<div class="row"><div class="key">Downloaded:</div><div class="value" id='stats-session-downloaded'>&nbsp;</div></div>
-				<div class="row"><div class="key">Ratio:</div><div class="value" id='stats-session-ratio'>&nbsp;</div></div>
-				<div class="row"><div class="key">Running Time:</div><div class="value" id='stats-session-duration'>&nbsp;</div></div>
-			</div>
-			<div class="prefs-section">
-				<div class="title">Total</div>
-				<div class="row"><div class="key">Started:</div><div class="value" id='stats-total-count'>&nbsp;</div></div>
-				<div class="row"><div class="key">Uploaded:</div><div class="value" id='stats-total-uploaded'>&nbsp;</div></div>
-				<div class="row"><div class="key">Downloaded:</div><div class="value" id='stats-total-downloaded'>&nbsp;</div></div>
-				<div class="row"><div class="key">Ratio:</div><div class="value" id='stats-total-ratio'>&nbsp;</div></div>
-				<div class="row"><div class="key">Running Time:</div><div class="value" id='stats-total-duration'>&nbsp;</div></div>
-			</div>
-		</dialog-component>
+		<stats-dialog>
+		</stats-dialog>
 
 		<div class="ui-helper-hidden" id="hotkeys-dialog">
 			<table>
