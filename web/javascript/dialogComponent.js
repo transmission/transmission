@@ -19,10 +19,12 @@ class DialogComponent extends HTMLElement {
       z-index: 100;
       padding: 2px;
     }
-    ::slotted(.handle) {
+    .header {
       cursor: move;
-    }
-    ::slotted(.header) {
+      -moz-user-select: none;
+      -webkit-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
       border: 1px solid #aaa;
       background: #ccc url("images/ui-bg_highlight-soft_75_cccccc_1x100.png") 50% 50% repeat-x;
       color: #222;
@@ -30,10 +32,29 @@ class DialogComponent extends HTMLElement {
       padding: 4.4px 11px 4.4px;
       border-radius: 4px;
       margin: 0;
+      display: flex;
+      align-items: baseline;
+    }
+    .header > #title {
+      flex: 2;
+    }
+    button.close {
+      background-image: url(images/ui-icons_888888_256x240.png);
+      color: #555;
+      font-family: Verdana,Arial,sans-serif;
+      cursor: pointer;
     }`
 
     let markup = `
     <div id="draggable">
+      <h4 class='header handle'>
+        <span id='title'>
+          No Title
+        </span>
+        <button class='close'>
+          &#x274c;
+        </button>
+      </h4>
       <slot></slot>
     </div>`
 
@@ -42,14 +63,16 @@ class DialogComponent extends HTMLElement {
     shadowRoot.appendChild(htmlToElements(markup));
   }
 
-  connectedCallback() {
-    let handle = this.shadowRoot.querySelector('slot').assignedNodes()
-      .filter(element => element.classList && element.classList.contains('handle'))[0]
+  setTitle() {
+    let title = this.getAttribute('title')
+    this.shadowRoot.querySelector('#title').textContent = title
+  }
 
+  connectedCallback() {
+    this.setTitle()
+
+    let handle = this.shadowRoot.querySelector('.handle')
     let draggable = this.shadowRoot.querySelector('#draggable')
-    if (!handle) {
-      handle = draggable
-    }
 
     // Modeled after the dragging functionality here: http://infoheap.com/javascript-make-element-draggable/
     var dragStartX, dragStartY; var objInitLeft, objInitTop;

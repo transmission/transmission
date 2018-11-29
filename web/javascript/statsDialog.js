@@ -32,9 +32,7 @@ class StatsDialog extends HTMLElement {
     `
 
     let markup = `
-    <dialog-component id='stats'>
-      <h4 class="header handle">Statistics</h4>
-
+    <dialog-component title='Statistics'>
       <section>
         <h4>Current Session</h4>
         <table id="current">
