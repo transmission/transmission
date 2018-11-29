@@ -1,4 +1,4 @@
-import { htmlToElements } from './utils/utils.js';
+import { htmlToElements } from './utils.js';
 
 function keepInRange(min, value, max) {
     return value < min ? min : (value > max ? max : value);

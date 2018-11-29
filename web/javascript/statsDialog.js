@@ -1,5 +1,5 @@
 import DialogComponent from './dialogComponent.js'
-import { htmlToElements } from './utils/utils.js';
+import { htmlToElements } from './utils.js';
 
 class StatsDialog extends HTMLElement {
   constructor() {
