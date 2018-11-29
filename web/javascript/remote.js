@@ -99,6 +99,16 @@ TransmissionRemote.prototype = {
         $.ajax(ajaxSettings);
     },
 
+    fetchData: function(body) {
+      return fetch(RPC._Root, {
+        method: 'POST',
+        headers: {
+            "X-Transmission-Session-Id": this._token,
+        },
+        body: JSON.stringify(body)
+      }).then(response => response.json())
+    },
+
     loadDaemonPrefs: function (callback, context, async) {
         var o = {
             method: 'session-get'
@@ -125,11 +135,8 @@ TransmissionRemote.prototype = {
         this.sendRequest(o, callback, context);
     },
 
-    loadDaemonStats: function (callback, context, async) {
-        var o = {
-            method: 'session-stats'
-        };
-        this.sendRequest(o, callback, context, async);
+    loadDaemonStats: function () {
+        return this.fetchData({ method: 'session-stats' })
     },
 
     updateTorrents: function (torrentIds, fields, callback, context) {

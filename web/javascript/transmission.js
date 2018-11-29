@@ -1861,34 +1861,28 @@ Transmission.prototype = {
     },
 
     loadDaemonStats: function (async, callback) {
-        this.remote.loadDaemonStats(function (data) {
-            this.updateStats(data['arguments']);
-
-            if (callback) {
-                callback();
+        this.remote.loadDaemonStats()
+        .then( data => {
+          let current = data.arguments['current-stats']
+          let total = data.arguments['cumulative-stats']
+          let statsDialog = document.getElementsByTagName('stats-dialog')[0]
+          let transformed = {
+            current: {
+              uploaded: current.uploadedBytes,
+              downloaded: current.downloadedBytes,
+              ratio: Math.ratio(current.uploadedBytes, current.downloadedBytes),
+              running: current.secondsActive
+            },
+            total: {
+              started: total.sessionCount,
+              uploaded: total.uploadedBytes,
+              downloaded: total.downloadedBytes,
+              ratio: Math.ratio(total.uploadedBytes, total.downloadedBytes),
+              running: total.secondsActive
             }
-        }, this, async);
-    },
-
-    // Process new session stats from the server
-    updateStats: function (stats) {
-        var s, ratio;
-        var fmt = Transmission.fmt;
-
-        s = stats["current-stats"];
-        ratio = Math.ratio(s.uploadedBytes, s.downloadedBytes);
-        $('#stats-session-uploaded').html(fmt.size(s.uploadedBytes));
-        $('#stats-session-downloaded').html(fmt.size(s.downloadedBytes));
-        $('#stats-session-ratio').html(fmt.ratioString(ratio));
-        $('#stats-session-duration').html(fmt.timeInterval(s.secondsActive));
-
-        s = stats["cumulative-stats"];
-        ratio = Math.ratio(s.uploadedBytes, s.downloadedBytes);
-        $('#stats-total-count').html(s.sessionCount + " times");
-        $('#stats-total-uploaded').html(fmt.size(s.uploadedBytes));
-        $('#stats-total-downloaded').html(fmt.size(s.downloadedBytes));
-        $('#stats-total-ratio').html(fmt.ratioString(ratio));
-        $('#stats-total-duration').html(fmt.timeInterval(s.secondsActive));
+          }
+          statsDialog.setAttribute('stats', JSON.stringify(transformed))
+        })
     },
 
     showStatsDialog: function () {

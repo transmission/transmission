@@ -270,25 +270,23 @@
 			<p id="about-copyright">Copyright (c) The Transmission Project</p>
 		</div>
 
-		<div class="ui-helper-hidden" id="stats-dialog">
-			<div class="prefs-section">
-				<div class="title">Current Session</div>
-				<div class="row"><div class="key">Uploaded:</div><div class="value" id='stats-session-uploaded'>&nbsp;</div></div>
-				<div class="row"><div class="key">Downloaded:</div><div class="value" id='stats-session-downloaded'>&nbsp;</div></div>
-				<div class="row"><div class="key">Ratio:</div><div class="value" id='stats-session-ratio'>&nbsp;</div></div>
-				<div class="row"><div class="key">Running Time:</div><div class="value" id='stats-session-duration'>&nbsp;</div></div>
-			</div>
-			<div class="prefs-section">
-				<div class="title">Total</div>
-				<div class="row"><div class="key">Started:</div><div class="value" id='stats-total-count'>&nbsp;</div></div>
-				<div class="row"><div class="key">Uploaded:</div><div class="value" id='stats-total-uploaded'>&nbsp;</div></div>
-				<div class="row"><div class="key">Downloaded:</div><div class="value" id='stats-total-downloaded'>&nbsp;</div></div>
-				<div class="row"><div class="key">Ratio:</div><div class="value" id='stats-total-ratio'>&nbsp;</div></div>
-				<div class="row"><div class="key">Running Time:</div><div class="value" id='stats-total-duration'>&nbsp;</div></div>
-			</div>
-		</div>
 
-		<stats-dialog>
+		<!-- This initial `stats` attribute is just an example of the format -->
+		<stats-dialog stats='{
+		  "current": {
+		    "uploaded": 1,
+		    "downloaded": 3,
+		    "ratio": 6,
+		    "running": 7
+		  },
+		  "total": {
+		    "started": 2,
+		    "uploaded": 5,
+		    "downloaded": 6,
+		    "ratio": 7,
+		    "running": 8
+		  }
+		}'>
 		</stats-dialog>
 
 		<div class="ui-helper-hidden" id="hotkeys-dialog">
