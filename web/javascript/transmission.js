@@ -1889,12 +1889,7 @@ Transmission.prototype = {
         this.loadDaemonStats();
         this.hideMobileAddressbar();
         this.togglePeriodicStatsRefresh(true);
-        $('#stats-dialog').dialog({
-            close: $.proxy(this.onStatsDialogClosed, this),
-            show: 'fade',
-            hide: 'fade',
-            title: 'Statistics'
-        });
+        document.getElementsByTagName('stats-dialog')[0].toggle()
     },
 
     onStatsDialogClosed: function () {

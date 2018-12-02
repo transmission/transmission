@@ -10,6 +10,15 @@ class DialogComponent extends HTMLElement {
 
     let style = document.createElement('style')
     style.textContent = `
+    .visible {
+      visibility: visible;
+      opacity: 1;
+    }
+    .hidden {
+      visibility: hidden;
+      opacity: 0;
+    }
+
     #draggable {
       position: absolute;
       width: 300px;
@@ -18,6 +27,7 @@ class DialogComponent extends HTMLElement {
       border-radius: 4px;
       z-index: 100;
       padding: 2px;
+      transition: visibility 0.3s ease, opacity 0.3s ease;
     }
     .header {
       cursor: move;
@@ -68,8 +78,15 @@ class DialogComponent extends HTMLElement {
     this.shadowRoot.querySelector('#title').textContent = title
   }
 
+  toggle(e) {
+    this.shadowRoot.querySelector('#draggable').classList.toggle('visible')
+    this.shadowRoot.querySelector('#draggable').classList.toggle('hidden')
+  }
+
   connectedCallback() {
     this.setTitle()
+    this.shadowRoot.querySelector('button.close')
+      .addEventListener('click', this.toggle.bind(this))
 
     let handle = this.shadowRoot.querySelector('.handle')
     let draggable = this.shadowRoot.querySelector('#draggable')

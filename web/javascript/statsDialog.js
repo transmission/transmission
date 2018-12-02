@@ -130,6 +130,10 @@ class StatsDialog extends HTMLElement {
       this.renderValues(JSON.parse(newValue))
     }
   }
+
+  toggle() {
+    this.shadowRoot.querySelector('dialog-component').toggle()
+  }
 }
 
 customElements.define('stats-dialog', StatsDialog);
