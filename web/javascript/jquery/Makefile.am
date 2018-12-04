@@ -6,4 +6,5 @@ dist_data_DATA = \
   jquery.min.js \
   jquery.ui-contextmenu.min.js \
   jquery.transmenu.min.js \
-  json2.min.js
+  json2.min.js \
+  taphold.min.js
