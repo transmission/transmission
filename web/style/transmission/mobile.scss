@@ -428,6 +428,7 @@ div#torrent_inspector
 	overflow: auto;
 	text-align: left;
 	padding: 15px;
+	box-sizing: border-box;
 	top: 0;
 	position: relative;
 	width: 100%;
@@ -688,7 +689,8 @@ div.torrent_footer
 {
 	height: 22px;
 	border-top: 1px solid #555;
-	position: relative;
+	position: fixed;
+	bottom: 0;
 	width: 100%;
 	z-index: 3;
 

@@ -513,6 +513,8 @@ div#torrent_inspector
 	top: $torrent-container-top;
 	position: fixed;
 	width: $inspector-width;
+	max-width: 100%;
+	box-sizing: border-box;
 	z-index: 5;
 	border-left: 1px solid #888;
 	bottom: 22px;
