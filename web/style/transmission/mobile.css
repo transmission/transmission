@@ -43,7 +43,6 @@ body.open_showing #torrent_filter_bar, body.open_showing #torrent_container {
 ****
 ***/
 div#toolbar {
-  width: 100%;
   height: 39px;
   margin: 0px;
   padding: 2px;
