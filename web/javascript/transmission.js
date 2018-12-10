@@ -84,8 +84,9 @@ Transmission.prototype = {
             $('#inspector_link').click($.proxy(this.toggleInspector, this));
 
             this.setupSearchBox();
-            this.createContextMenu();
         };
+
+        this.createContextMenu();
 
         if (this.isMenuEnabled) {
             this.createSettingsMenu();
