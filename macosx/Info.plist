@@ -75,6 +75,8 @@
 	<string>Copyright © 2005-2018 The Transmission Project</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
+	<key>NSRequiresAquaSystemAppearance</key>
+	<string>False</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
 	<key>NSServices</key>
