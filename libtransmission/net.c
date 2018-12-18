@@ -494,7 +494,7 @@ static tr_socket_t tr_netBindTCPImpl(tr_address const* addr, tr_port port, bool 
 
 #endif
 
-    if (listen(fd, 128) == -1)
+    if (listen(fd, 256) == -1)
     {
         *errOut = sockerrno;
         tr_netCloseSocket(fd);
