@@ -1516,6 +1516,7 @@ Transmission.prototype = {
             tr.setEnabled(e.toolbar_pause_button, s.activeSel > 0);
             tr.setEnabled(e.toolbar_start_button, s.pausedSel > 0);
             tr.setEnabled(e.toolbar_remove_button, s.sel > 0);
+            tr.setEnabled(e.toolbar_delete_button, s.sel > 0);
         });
     },
 
