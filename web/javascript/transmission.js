@@ -43,6 +43,7 @@ Transmission.prototype = {
         $('#toolbar-pause-all').click($.proxy(this.stopAllClicked, this));
         $('#toolbar-start-all').click($.proxy(this.startAllClicked, this));
         $('#toolbar-remove').click($.proxy(this.removeClicked, this));
+        $('#toolbar-delete').click($.proxy(this.deleteClicked,this));
         $('#toolbar-open').click($.proxy(this.openTorrentClicked, this));
 
         $('#prefs-button').click($.proxy(this.togglePrefsDialogClicked, this));
@@ -97,6 +98,7 @@ Transmission.prototype = {
         e.toolbar_pause_button = $('#toolbar-pause')[0];
         e.toolbar_start_button = $('#toolbar-start')[0];
         e.toolbar_remove_button = $('#toolbar-remove')[0];
+        e.toolbar_delete_button = $('#toolbar-delete')[0];
         this.elements = e;
 
         // Apply the prefs settings to the gui
