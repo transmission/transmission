@@ -774,6 +774,13 @@ Transmission.prototype = {
         };
     },
 
+    deleteClicked: function (ev) {
+        if (this.isButtonEnabled(ev)) {
+            this.removeSelectedTorrentsAndData();
+            this.hideMobileAddressbar();
+        };
+    },
+
     // turn the periodic ajax session refresh on & off
     togglePeriodicSessionRefresh: function (enabled) {
         var that = this,
