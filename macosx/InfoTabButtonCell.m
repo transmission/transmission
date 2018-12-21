@@ -58,7 +58,12 @@
 - (void) setSelectedTab: (BOOL) selected
 {
     fSelected = selected;
+    
+    [self reloadAppearance];
+}
 
+- (void) reloadAppearance
+{
     if ([self controlView] == nil)
         return;
 
