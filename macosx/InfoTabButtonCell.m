@@ -27,9 +27,11 @@
 
 - (void) awakeFromNib
 {
-    NSNotificationCenter * nc = [NSNotificationCenter defaultCenter];
-    [nc addObserver: self selector: @selector(updateControlTint:)
-        name: NSControlTintDidChangeNotification object: NSApp];
+    if (![NSApp isOnMojaveOrBetter]) {
+        NSNotificationCenter * nc = [NSNotificationCenter defaultCenter];
+        [nc addObserver: self selector: @selector(updateControlTint:)
+            name: NSControlTintDidChangeNotification object: NSApp];
+    }
 
     fSelected = NO;
 
@@ -80,8 +82,14 @@
     NSGradient * gradient;
     if (fSelected)
     {
-        NSColor * lightColor = [NSColor colorForControlTint: [NSColor currentControlTint]];
-        NSColor * darkColor = [lightColor blendedColorWithFraction: 0.2 ofColor: [NSColor blackColor]];
+        NSColor * lightColor, * darkColor;
+        if (@available(macOS 10.14, *)) {
+            lightColor = [NSColor.controlAccentColor blendedColorWithFraction: 0.35 ofColor: [NSColor whiteColor]];
+            darkColor = [NSColor.controlAccentColor blendedColorWithFraction: 0.15 ofColor: [NSColor whiteColor]];
+        } else {
+            lightColor = [NSColor colorForControlTint: [NSColor currentControlTint]];
+            darkColor = [lightColor blendedColorWithFraction: 0.2 ofColor: [NSColor blackColor]];
+        }
         gradient = [[NSGradient alloc] initWithStartingColor: lightColor endingColor: darkColor];
     }
     else
@@ -128,6 +136,8 @@
 
 - (void) updateControlTint: (NSNotification *) notification
 {
+    NSAssert(![NSApp isOnMojaveOrBetter], @"should not be observing control tint color when accent color is available");
+    
     if (fSelected)
         [self setSelectedTab: YES];
 }
