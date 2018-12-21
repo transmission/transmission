@@ -375,8 +375,8 @@
         titleColor = statusColor = [NSColor whiteColor];
     else
     {
-        titleColor = [NSColor controlTextColor];
-        statusColor = [NSColor darkGrayColor];
+        titleColor = [NSColor labelColor];
+        statusColor = [NSColor secondaryLabelColor];
     }
 
     fTitleAttributes[NSForegroundColorAttributeName] = titleColor;
@@ -474,7 +474,7 @@
                                                NSMidY(titleRect) - PRIORITY_ICON_HEIGHT  * 0.5,
                                                PRIORITY_ICON_WIDTH, PRIORITY_ICON_HEIGHT);
 
-        NSColor * priorityColor = [self backgroundStyle] == NSBackgroundStyleDark ? [NSColor whiteColor] : [NSColor darkGrayColor];
+        NSColor * priorityColor = [self backgroundStyle] == NSBackgroundStyleDark ? [NSColor whiteColor] : [NSColor labelColor];
         NSImage * priorityImage = [[NSImage imageNamed: ([torrent priority] == TR_PRI_HIGH ? @"PriorityHighTemplate" : @"PriorityLowTemplate")] imageWithColor: priorityColor];
         [priorityImage drawInRect: priorityRect fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0 respectFlipped: YES hints: nil];
     }
@@ -527,7 +527,7 @@
     cellFrame.origin.x += PADDING_EXPANSION_FRAME;
     cellFrame.origin.y += PADDING_EXPANSION_FRAME;
 
-    fTitleAttributes[NSForegroundColorAttributeName] = [NSColor controlTextColor];
+    fTitleAttributes[NSForegroundColorAttributeName] = [NSColor labelColor];
     NSAttributedString * titleString = [self attributedTitle];
     [titleString drawInRect: cellFrame];
 }

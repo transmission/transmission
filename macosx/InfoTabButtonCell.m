@@ -21,6 +21,7 @@
  *****************************************************************************/
 
 #import "InfoTabButtonCell.h"
+#import "NSApplicationAdditions.h"
 
 @implementation InfoTabButtonCell
 
@@ -80,12 +81,22 @@
     }
     else
     {
-        NSColor * lightColor = [NSColor colorWithCalibratedRed: 245.0/255.0 green: 245.0/255.0 blue: 245.0/255.0 alpha: 1.0];
-        NSColor * darkColor = [NSColor colorWithCalibratedRed: 215.0/255.0 green: 215.0/255.0 blue: 215.0/255.0 alpha: 1.0];
-        gradient = [[NSGradient alloc] initWithStartingColor: lightColor endingColor: darkColor];
+        if ([NSApp isDarkMode]) {
+            NSColor * darkColor = [NSColor colorWithCalibratedRed: 60.0/255.0 green: 60.0/255.0 blue: 60.0/255.0 alpha: 1.0];
+            NSColor * lightColor = [NSColor colorWithCalibratedRed: 90.0/255.0 green: 90.0/255.0 blue: 90.0/255.0 alpha: 1.0];
+            gradient = [[NSGradient alloc] initWithStartingColor: lightColor endingColor: darkColor];
+        } else {
+            NSColor * lightColor = [NSColor colorWithCalibratedRed: 245.0/255.0 green: 245.0/255.0 blue: 245.0/255.0 alpha: 1.0];
+            NSColor * darkColor = [NSColor colorWithCalibratedRed: 215.0/255.0 green: 215.0/255.0 blue: 215.0/255.0 alpha: 1.0];
+            gradient = [[NSGradient alloc] initWithStartingColor: lightColor endingColor: darkColor];
+        }
     }
 
-    [[NSColor grayColor] set];
+    if (@available(macOS 10.14, *)) {
+        [[NSColor separatorColor] set];
+    } else {
+        [[NSColor grayColor] set];
+    }
     NSRectFill(NSMakeRect(0.0, 0.0, NSWidth(tabRect), 1.0));
     NSRectFill(NSMakeRect(0.0, NSHeight(tabRect) - 1.0, NSWidth(tabRect), 1.0));
     NSRectFill(NSMakeRect(NSWidth(tabRect) - 1.0, 1.0, NSWidth(tabRect) - 1.0, NSHeight(tabRect) - 2.0));
