@@ -52,7 +52,7 @@ Gw
                     </button>
                     <scrollView autohidesScrollers="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" hasVerticalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="31">
                         <rect key="frame" x="20" y="61" width="431" height="167"/>
-                        <clipView key="contentView" id="7rg-Yg-Ppg">
+                        <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" id="7rg-Yg-Ppg">
                             <rect key="frame" x="1" y="1" width="429" height="165"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
