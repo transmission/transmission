@@ -74,7 +74,7 @@ static bool verifyTorrent(tr_torrent* tor, bool* stopFlag)
         }
 
         /* if we're starting a new file... */
-        if (!skiplocalverify && filePos == 0 && fd == TR_BAD_SYS_FILE && fileIndex != prevFileIndex)
+        if (filePos == 0 && fd == TR_BAD_SYS_FILE && fileIndex != prevFileIndex)
         {
             char* filename = tr_torrentFindFile(tor, fileIndex);
             fd = filename == NULL ? TR_BAD_SYS_FILE : tr_sys_file_open(filename, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0,
@@ -116,7 +116,7 @@ static bool verifyTorrent(tr_torrent* tor, bool* stopFlag)
             uint8_t hash[SHA_DIGEST_LENGTH];
 
             tr_sha1_final(sha, hash);
-            hasPiece = skiplocalverify || memcmp(hash, tor->info.pieces[pieceIndex].hash, SHA_DIGEST_LENGTH) == 0;
+            hasPiece = (fd != TR_BAD_SYS_FILE) && skiplocalverify || memcmp(hash, tor->info.pieces[pieceIndex].hash, SHA_DIGEST_LENGTH) == 0;
 
             if (hasPiece || hadPiece)
             {
@@ -156,7 +156,7 @@ static bool verifyTorrent(tr_torrent* tor, bool* stopFlag)
     }
     if(skiplocalverify){
         skiplocalverify = false;
-	tr_logAddTorInfo (tor, "%s", _("Verification has been skipped"));
+	/*tr_logAddTorInfo (tor, "%s", _("Verification has been skipped"));*/
     }
 
     /* cleanup */
