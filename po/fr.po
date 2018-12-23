@@ -76,7 +76,7 @@ msgstr "Vue _compacte"
 
 #: ../gtk/actions.c:71
 msgid "Re_verse Sort Order"
-msgstr "In_verser le sens du tri"
+msgstr "In_verser l'ordre du tri"
 
 #: ../gtk/actions.c:72
 msgid "_Filterbar"
@@ -88,7 +88,7 @@ msgstr "_Barre d'état"
 
 #: ../gtk/actions.c:74
 msgid "_Toolbar"
-msgstr "Barre d'ou_tils"
+msgstr "Barre à ou_tils"
 
 #: ../gtk/actions.c:79
 msgid "_File"
@@ -196,7 +196,7 @@ msgstr "Supprimer le torrent"
 
 #: ../gtk/actions.c:100
 msgid "_Delete Files and Remove"
-msgstr "_Supprimer les fichiers et enlever"
+msgstr "_Supprimer les fichiers et retirer"
 
 #: ../gtk/actions.c:101
 msgid "_New…"
@@ -332,7 +332,7 @@ msgstr "Mis en attente de téléchargement"
 #: ../gtk/details.c:607 ../gtk/filter.c:586
 msgctxt "Verb"
 msgid "Downloading"
-msgstr "Téléchargement en cours"
+msgstr "En cours de téléchargement"
 
 #: ../gtk/details.c:610 ../gtk/torrent-cell-renderer.c:202
 msgid "Queued for seeding"
@@ -341,7 +341,7 @@ msgstr "En attente de partage"
 #: ../gtk/details.c:613 ../gtk/filter.c:587
 msgctxt "Verb"
 msgid "Seeding"
-msgstr "Partage en cours"
+msgstr "En cours de partage"
 
 #: ../gtk/details.c:616 ../gtk/filter.c:589 ../gtk/torrent-cell-renderer.c:190
 msgid "Finished"
@@ -512,7 +512,7 @@ msgstr "Commentaire :"
 
 #: ../gtk/details.c:1256
 msgid "Web Seeds"
-msgstr ""
+msgstr "Sources web"
 
 #: ../gtk/details.c:1260 ../gtk/details.c:1316
 msgid "Down"
@@ -627,7 +627,7 @@ msgstr "Demande de la liste de pairs %1$sexpirée il y a %2$s %3$s ; nouvelle t
 #: ../gtk/details.c:2167
 #, c-format
 msgid "Got an error %1$s\"%2$s\"%3$s %4$s ago"
-msgstr "Erreur %1$s\"%2$s\"%3$s survenue il y a %4$s"
+msgstr "Erreur %1$s« %2$s »%3$s survenue il y a %4$s"
 
 #: ../gtk/details.c:2176
 msgid "No updates scheduled"
@@ -814,7 +814,7 @@ msgstr "Basse"
 #: ../gtk/file-list.c:834
 #, c-format
 msgid "Unable to rename file as \"%s\": %s"
-msgstr ""
+msgstr "Incapable de renommer le fichier « %s »: %s"
 
 #. add file column
 #: ../gtk/file-list.c:947 ../gtk/msgwin.c:290
@@ -867,12 +867,12 @@ msgstr "_Afficher :"
 #: ../gtk/filter.c:884
 #, c-format
 msgid "_Show %'d of:"
-msgstr ""
+msgstr ":Montrer % de :"
 
 #: ../gtk/main.c:314
 #, c-format
 msgid "Error registering Transmission as a %s handler: %s"
-msgstr ""
+msgstr "Une erreur est survenue en enregistrant Transmission comme gestionnaire de %s : %s"
 
 #: ../gtk/main.c:479
 #, c-format
@@ -916,11 +916,11 @@ msgstr ""
 
 #: ../gtk/main.c:745
 msgid "Transmission is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility."
-msgstr ""
+msgstr "Transmission est un programme de partage de fichiers. Quand vous lancez un torrent, ses données seront disponibles	à d'autres via téléversement. Tout contenu partagé et de votre unique responsabilité."
 
 #: ../gtk/main.c:748
 msgid "I _Agree"
-msgstr ""
+msgstr "J'_accepte"
 
 #: ../gtk/main.c:983
 msgid "<b>Closing Connections</b>"
@@ -963,6 +963,7 @@ msgstr ""
 "Pierre-Henri Quelen <pierrehenri.quelen@gmail.com>, 2006.\n"
 "Robert-André Mauchin <zebob.m@pengzone.org>, 2006-2008.\n"
 "Jean-François Fortin Tam <nekohayo arobas gmail.com>, 2007.\n"
+"Sami Bosch <sami.bosch@gmail.com>, 2018.\n"
 "\n"
 "Launchpad Contributions:\n"
 "  Adrien Blanc https://launchpad.net/~adrien-blanc\n"
@@ -1434,38 +1435,38 @@ msgstr "Erreur : %s"
 #: ../gtk/torrent-cell-renderer.c:261
 #, c-format
 msgid "Downloading metadata from %1$'d %2$s (%3$d%% done)"
-msgstr ""
+msgstr "Téléchargement des métadonnées de %1$'d %2$s (%3$d%% finis)"
 
 #: ../gtk/torrent-cell-renderer.c:262 ../gtk/torrent-cell-renderer.c:268
 #: ../gtk/torrent-cell-renderer.c:281
 msgid "peer"
 msgid_plural "peers"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "pair"
+msgstr[1] "pairs"
 
 #. Downloading from 2 of 3 peer (s) and 2 webseed (s)
 #: ../gtk/torrent-cell-renderer.c:267
 #, c-format
 msgid "Downloading from %1$'d of %2$'d %3$s and %4$'d %5$s"
-msgstr ""
+msgstr "Téléchargement de %1$'d de %2$'d %3$s et %4$'d %5$s"
 
 #: ../gtk/torrent-cell-renderer.c:269 ../gtk/torrent-cell-renderer.c:275
 msgid "web seed"
 msgid_plural "web seeds"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "source web"
+msgstr[1] "sources web"
 
 #. Downloading from 3 web seed (s)
 #: ../gtk/torrent-cell-renderer.c:274
 #, c-format
 msgid "Downloading from %1$'d %2$s"
-msgstr ""
+msgstr "Téléchargement de %1$'d %2$s"
 
 #. Downloading from 2 of 3 peer (s)
 #: ../gtk/torrent-cell-renderer.c:280
 #, c-format
 msgid "Downloading from %1$'d of %2$'d %3$s"
-msgstr ""
+msgstr "Téléchargement de %1$'d de %2$'d %3$s"
 
 #: ../gtk/torrent-cell-renderer.c:288
 #, c-format
@@ -1482,15 +1483,15 @@ msgstr "Téléchargement et partage des fichiers via BitTorrent"
 #. Translators: these are the application description paragraphs in the AppData file.
 #: ../gtk/transmission-gtk.appdata.xml.in.h:4
 msgid "BitTorrent is a peer-to-peer file-sharing protocol that is commonly used to distribute large amounts of data between multiple users."
-msgstr ""
+msgstr "BitTorrent est un protocol de partage de fichiers peer-to-peer qui est utilisé couramment pour distribuer des grandes quantités de données entre plusieurs utilisateurs."
 
 #: ../gtk/transmission-gtk.appdata.xml.in.h:5
 msgid "Transmission is a BitTorrent client with an easy-to-use frontend on top a cross-platform backend. Native frontends are available for OS X and Windows, as well as command line and web frontends."
-msgstr ""
+msgstr "Transmission est un client BitTorrent avec un interface facile à utiliser basée sur un software compatible à plusieurs plateformes. Des interfaces natives sont disponibles pour OS X et Windows, de même que un programme en console et des interfaces web."
 
 #: ../gtk/transmission-gtk.appdata.xml.in.h:6
 msgid "Notable features of Transmission include support for Local Peer Discovery, encryption, DHT, µTP, PEX and Magnet Link."
-msgstr ""
+msgstr "Des fonctionnalités notables de Transmission incluent le support pour l'encryption Local Peer Discovery, DHT, µTP, PEX et les liens Magnet."
 
 #: ../gtk/transmission-gtk.desktop.in.h:2
 msgid "BitTorrent Client"
@@ -1503,11 +1504,11 @@ msgstr ""
 
 #: ../gtk/transmission-gtk.desktop.in.h:6
 msgid "Start Transmission with All Torrents Paused"
-msgstr ""
+msgstr "Démarrer Transmission avec tous les torrents sur pause"
 
 #: ../gtk/transmission-gtk.desktop.in.h:7
 msgid "Start Transmission Minimized"
-msgstr ""
+msgstr "Démarrer Transmission minimisé"
 
 #: ../gtk/tr-core.c:1238
 #, c-format
@@ -1539,7 +1540,7 @@ msgstr "Inactif"
 #: ../gtk/tr-icon.c:76 ../gtk/tr-icon.c:98
 #, c-format
 msgid " (Limit: %s)"
-msgstr ""
+msgstr " (Limite : %s)"
 
 #. %1$s: current upload speed
 #. * %2$s: current upload limit, if any
@@ -1563,15 +1564,15 @@ msgstr "Ajout"
 
 #: ../gtk/tr-prefs.c:260
 msgid "Automatically add .torrent files _from:"
-msgstr ""
+msgstr "Ajouter automatiquement les fichiers .torrent _de :"
 
 #: ../gtk/tr-prefs.c:267
 msgid "Show the Torrent Options _dialog"
-msgstr ""
+msgstr "Montres l'_interface options torrent"
 
 #: ../gtk/tr-prefs.c:271
 msgid "_Start added torrents"
-msgstr ""
+msgstr "_Démarrer les torrents ajoutés"
 
 #: ../gtk/tr-prefs.c:280
 msgid "Save to _Location:"
@@ -1579,15 +1580,15 @@ msgstr "Enregistrer _vers :"
 
 #: ../gtk/tr-prefs.c:287
 msgid "Download Queue"
-msgstr ""
+msgstr "File de téléchargement"
 
 #: ../gtk/tr-prefs.c:289
 msgid "Ma_ximum active downloads:"
-msgstr ""
+msgstr "Ma_ximum de téléchargements actifs"
 
 #: ../gtk/tr-prefs.c:293
 msgid "Downloads sharing data in the last _N minutes are active:"
-msgstr ""
+msgstr "Téléchargement partageant des données dans les _N dernières minutes sont actifs :"
 
 #: ../gtk/tr-prefs.c:298 ../libtransmission/torrent.c:2158
 msgid "Incomplete"
@@ -1713,12 +1714,12 @@ msgstr "Activer les mises à jour _automatiques"
 
 #: ../gtk/tr-prefs.c:747
 msgid "Remote Control"
-msgstr ""
+msgstr "Contrôle à distance"
 
 #. "enabled" checkbutton
 #: ../gtk/tr-prefs.c:750
 msgid "Allow _remote access"
-msgstr ""
+msgstr "Autoriser accès à distance"
 
 #: ../gtk/tr-prefs.c:756
 msgid "_Open web client"
@@ -1746,7 +1747,7 @@ msgstr "Mot de _passe :"
 #. require authentication
 #: ../gtk/tr-prefs.c:792
 msgid "Only allow these IP a_ddresses:"
-msgstr ""
+msgstr "N'autoriser que ces a_ddresses IP :" 
 
 #: ../gtk/tr-prefs.c:816
 msgid "IP addresses may use wildcards, such as 192.168.*.*"
@@ -1940,7 +1941,7 @@ msgstr "Réseau"
 
 #: ../gtk/tr-prefs.c:1261
 msgid "Remote"
-msgstr ""
+msgstr "Distant"
 
 #: ../gtk/tr-window.c:123
 msgid "Torrent"
@@ -2111,7 +2112,7 @@ msgstr "Le fichier torrent « %s » contient des données invalides."
 #: ../gtk/util.c:262
 #, c-format
 msgid "The torrent file \"%s\" is already in use by \"%s.\""
-msgstr ""
+msgstr "Le fichier torrent « %s » est déjà en utilisation par « %s »"
 
 #: ../gtk/util.c:267
 #, c-format
@@ -2149,39 +2150,39 @@ msgstr "Ce lien magnet semble destiné à autre chose que BitTorrent. Les liens 
 #: ../gtk/util.c:730
 #, c-format
 msgid "%s free"
-msgstr ""
+msgstr "%s libre"
 
 #: ../libtransmission/announcer.c:1099 ../libtransmission/announcer.c:1392
 msgid "Could not connect to tracker"
-msgstr ""
+msgstr "Connection au traceur échouée"
 
 #: ../libtransmission/announcer.c:1103 ../libtransmission/announcer.c:1396
 msgid "Tracker did not respond"
-msgstr ""
+msgstr "Le traceur n'a pas répondu"
 
 #: ../libtransmission/announcer.c:1167
 msgid "Success"
-msgstr ""
+msgstr "Réussite"
 
 #: ../libtransmission/announcer-http.c:229
 #: ../libtransmission/announcer-http.c:397
 #, c-format
 msgid "Tracker gave HTTP response code %1$ld (%2$s)"
-msgstr ""
+msgstr "Le traceur a répondu avec le code HTTP %1$ld (%2$s)"
 
 #: ../libtransmission/announcer-udp.c:280
 #: ../libtransmission/announcer-udp.c:430
 msgid "Unknown error"
-msgstr ""
+msgstr "Erreur inconnue"
 
 #: ../libtransmission/announcer-udp.c:520
 #, c-format
 msgid "DNS Lookup failed: %s"
-msgstr ""
+msgstr "DNS Lookup a échoué : %s"
 
 #: ../libtransmission/announcer-udp.c:623
 msgid "Connection failed"
-msgstr ""
+msgstr "Connection échouée"
 
 #: ../libtransmission/blocklist.c:63 ../libtransmission/blocklist.c:329
 #: ../libtransmission/utils.c:243
@@ -2215,7 +2216,7 @@ msgstr "Liste de blocage « %s » mise à jour avec %zu entrées."
 #: ../libtransmission/fdlimit.c:176
 #, c-format
 msgid "Couldn't get directory for \"%1$s\": %2$s"
-msgstr ""
+msgstr "N'a pas pu récupérer le dossier pour « %2$s » : %2$s"
 
 #: ../libtransmission/fdlimit.c:182 ../libtransmission/file-posix.c:187
 #: ../libtransmission/file-posix.c:197
@@ -2230,21 +2231,21 @@ msgstr "Impossible d'ouvrir « %1$s » : %2$s"
 
 #: ../libtransmission/fdlimit.c:215
 msgid "full"
-msgstr ""
+msgstr "plein"
 
 #: ../libtransmission/fdlimit.c:220
 msgid "sparse"
-msgstr ""
+msgstr "vide"
 
 #: ../libtransmission/fdlimit.c:227
 #, c-format
 msgid "Couldn't preallocate file \"%1$s\" (%2$s, size: %3$<PRIu64>): %4$s"
-msgstr ""
+msgstr "Incapable de pré-allouer le fichier « %1$s » (%2$s, taille: %3$<PRIu64>) : %4$s"
 
 #: ../libtransmission/fdlimit.c:232
 #, c-format
 msgid "Preallocated file \"%1$s\" (%2$s, size: %3$<PRIu64>)"
-msgstr ""
+msgstr "Pré-allocation du fichier « %1$s » réussie (%2$s, taille: %3$<PRIu64>)"
 
 #: ../libtransmission/fdlimit.c:243
 #, c-format
@@ -2270,7 +2271,7 @@ msgstr "Le créateur de torrent ignore le fichier « %s » : %s"
 #: ../libtransmission/makemeta.c:200
 #, c-format
 msgid "Failed to set piece size to %s, leaving it at %s"
-msgstr ""
+msgstr "N'a pas pu régler la taille de la pièce à %s, restera %s"
 
 #: ../libtransmission/metainfo.c:648
 #, c-format
@@ -2304,12 +2305,12 @@ msgstr "Port %d redirigé avec succès"
 #: ../libtransmission/net.c:286
 #, c-format
 msgid "Couldn't set source address %s on %<PRIdMAX>: %s"
-msgstr ""
+msgstr "N'a pas su mettre l'adresse source %s sur %<PRIdMAX> : %s"
 
 #: ../libtransmission/net.c:303
 #, c-format
 msgid "Couldn't connect socket %<PRIdMAX> to %s, port %d (errno %d - %s)"
-msgstr ""
+msgstr "N'a pas sur connecter le socket %<PRIdMAX> $ %s, port %d (errno %d - %s)"
 
 #: ../libtransmission/net.c:391
 msgid "Is another copy of Transmission already running?"
@@ -2333,7 +2334,7 @@ msgstr "Veuillez vérifier les données locales ! La partie #%zu est corrompue.
 #: ../libtransmission/platform.c:469
 #, c-format
 msgid "Searching for web interface file \"%s\""
-msgstr ""
+msgstr "Cherche le fichier interface web « %s »"
 
 #: ../libtransmission/port-forwarding.c:29
 msgid "Port Forwarding"
@@ -2367,35 +2368,35 @@ msgstr "Arrêté"
 #: ../libtransmission/rpcimpl.c:1567
 #, c-format
 msgid "Error uncompressing blocklist: %s (%d)"
-msgstr ""
+msgstr "Erreur en décompressant la liste de blocage : %s (%d)"
 
 #: ../libtransmission/rpc-server.c:991
 #, c-format
 msgid "Couldn't find settings key \"%s\""
-msgstr ""
+msgstr "N'a pas su trouver la clé de configuration « %s »"
 
 #: ../libtransmission/rpc-server.c:1103
 #, c-format
 msgid "%s is not a valid address"
-msgstr ""
+msgstr "%s n'est pas une adresse valide"
 
 #: ../libtransmission/rpc-server.c:1108
 #, c-format
 msgid "%s is not an IPv4 or IPv6 address. RPC listeners must be IPv4 or IPv6"
-msgstr ""
+msgstr "%s n'est pas une adresse IPv4 ou IPv6. Les auditeurs RPC doivent être en IPv4 ou IPv6"
 
 #: ../libtransmission/rpc-server.c:1116
 #, c-format
 msgid "Serving RPC and Web requests on %s:%d%s"
-msgstr ""
+msgstr "Sert les requêtes RPC et Web sur %s:%d%s"
 
 #: ../libtransmission/rpc-server.c:1121
 msgid "Whitelist enabled"
-msgstr ""
+msgstr "Liste blanche activée"
 
 #: ../libtransmission/rpc-server.c:1126
 msgid "Password required"
-msgstr ""
+msgstr "Mot de passe requis"
 
 #. first %s is the application name
 #. second %s is the version number
@@ -2447,11 +2448,11 @@ msgstr "Complet"
 #: ../libtransmission/torrent.c:3506
 #, c-format
 msgid "Piece %<PRIu32>, which was just downloaded, failed its checksum test"
-msgstr ""
+msgstr "La pièce %<PRIu32>, qui vient d'être téléchargée, a échouée son test de checksum."
 
 #: ../libtransmission/torrent-magnet.c:318
 msgid "Magnet torrent's metadata is not usable"
-msgstr ""
+msgstr "Les métadonnées du torrent magnet ne sont pas utilisables."
 
 #: ../libtransmission/upnp.c:29
 msgid "Port Forwarding (UPnP)"
@@ -2507,7 +2508,7 @@ msgstr "« %s » enregistré"
 
 #: ../libtransmission/variant.c:1241
 msgid "Unable to parse file content"
-msgstr ""
+msgstr "Incapable de parse les contenus du fichier"
 
 #: ../libtransmission/verify.c:230
 msgid "Verifying torrent"
