@@ -64,7 +64,7 @@ msgstr "Transmission an_zeigen"
 
 #: ../gtk/actions.c:56
 msgid "Message _Log"
-msgstr "_Nachrichtenprotokoll"
+msgstr "_Meldungsprotokoll"
 
 #: ../gtk/actions.c:69
 msgid "Enable Alternative Speed _Limits"
@@ -124,11 +124,11 @@ msgstr "_Magnetlink in die Zwischenablage kopieren"
 
 #: ../gtk/actions.c:87
 msgid "Open _URL…"
-msgstr "_Adresse öffnen …"
+msgstr "_Webadresse öffnen…"
 
 #: ../gtk/actions.c:87
 msgid "Open URL…"
-msgstr "Adresse öffnen …"
+msgstr "Webadresse öffnen…"
 
 #: ../gtk/actions.c:88 ../gtk/actions.c:89
 msgid "Open a torrent"
@@ -136,19 +136,19 @@ msgstr "Torrent öffnen"
 
 #: ../gtk/actions.c:90
 msgid "_Start"
-msgstr "_Starten"
+msgstr "_Anfangen"
 
 #: ../gtk/actions.c:90
 msgid "Start torrent"
-msgstr "Torrent starten"
+msgstr "Torrent anfangen"
 
 #: ../gtk/actions.c:91
 msgid "Start _Now"
-msgstr "Jetzt _beginnen"
+msgstr "Jetzt _anfangen"
 
 #: ../gtk/actions.c:91
 msgid "Start torrent now"
-msgstr "Torrent jetzt starten"
+msgstr "Torrent jetzt anfangen"
 
 #: ../gtk/actions.c:92
 msgid "_Statistics"
@@ -188,7 +188,7 @@ msgstr "Alle Torrents starten"
 
 #: ../gtk/actions.c:98
 msgid "Set _Location…"
-msgstr "Ort fest_legen …"
+msgstr "Ort fest_legen…"
 
 #: ../gtk/actions.c:99
 msgid "Remove torrent"
@@ -200,7 +200,7 @@ msgstr "Dateien _löschen und entfernen"
 
 #: ../gtk/actions.c:101
 msgid "_New…"
-msgstr "_Neu …"
+msgstr "_Neu…"
 
 #: ../gtk/actions.c:101
 msgid "Create a torrent"
@@ -220,7 +220,7 @@ msgstr "Alle a_bwählen"
 
 #: ../gtk/actions.c:106
 msgid "Torrent properties"
-msgstr "Torrent-Eigenschaften"
+msgstr "Torrent Eigenschaften"
 
 #: ../gtk/actions.c:107
 msgid "Open Fold_er"
@@ -319,7 +319,7 @@ msgstr "Maximale Anzahl an Gegenstellen:"
 #: ../gtk/details.c:598 ../gtk/torrent-cell-renderer.c:194
 #: ../libtransmission/verify.c:284
 msgid "Queued for verification"
-msgstr "Zur Prüfung in Warteschlange"
+msgstr "Zur Prüfung angestanden"
 
 #: ../gtk/details.c:601
 msgid "Verifying local data"
@@ -332,7 +332,7 @@ msgstr "Zum Herunterladen in Warteschlange eingereiht"
 #: ../gtk/details.c:607 ../gtk/filter.c:586
 msgctxt "Verb"
 msgid "Downloading"
-msgstr "Wird heruntergeladen"
+msgstr "Am herunterladen"
 
 #: ../gtk/details.c:610 ../gtk/torrent-cell-renderer.c:202
 msgid "Queued for seeding"
@@ -645,7 +645,7 @@ msgstr "Warten auf Bitte, um mehr Gegenstellen"
 #: ../gtk/details.c:2193
 #, c-format
 msgid "Asking for more peers now… <small>%s</small>"
-msgstr "Mehr Gegenstellen werden jetzt angefordert … <small>%s</small>"
+msgstr "Mehr Gegenstellen werden jetzt angefordert… <small>%s</small>"
 
 #: ../gtk/details.c:2206
 #, c-format
@@ -669,7 +669,7 @@ msgstr "Auf Anfrage über die Anzahl der Gegenstellen wird gewartet"
 #: ../gtk/details.c:2235
 #, c-format
 msgid "Asking for peer counts now… <small>%s</small>"
-msgstr "Peer-Zahl wird jetzt angefordert … <small>%s</small>"
+msgstr "Peer-Zahl wird jetzt angefordert… <small>%s</small>"
 
 #: ../gtk/details.c:2538
 msgid "List contains invalid URLs"
@@ -928,7 +928,7 @@ msgstr "<b>Verbindungen werden geschlossen</b>"
 
 #: ../gtk/main.c:987
 msgid "Sending upload/download totals to tracker…"
-msgstr "Hoch-/Herunterladestatistik wird an den Tracker gesendet …"
+msgstr "Hoch-/Herunterladestatistik wird an den Tracker gesendet…"
 
 #: ../gtk/main.c:992
 msgid "_Quit Now"
@@ -1065,7 +1065,7 @@ msgstr "Neuer Torrent"
 
 #: ../gtk/makemeta-ui.c:194
 msgid "Creating torrent…"
-msgstr "Torrent wird erstellt …"
+msgstr "Torrent wird erstellt…"
 
 #: ../gtk/makemeta-ui.c:303
 msgid "No source selected"
@@ -1231,7 +1231,7 @@ msgstr "Torrent konnte nicht verschoben werden"
 
 #: ../gtk/relocate.c:111
 msgid "This may take a moment…"
-msgstr "Dies kann eine Weile dauern …"
+msgstr "Dies kann eine Weile dauern…"
 
 #: ../gtk/relocate.c:139 ../gtk/relocate.c:154
 msgid "Set Torrent Location"
@@ -1627,7 +1627,7 @@ msgstr "Sperrliste aktualisieren"
 
 #: ../gtk/tr-prefs.c:463
 msgid "Getting new blocklist…"
-msgstr "Neue Sperrliste wird empfangen …"
+msgstr "Neue Sperrliste wird empfangen…"
 
 #: ../gtk/tr-prefs.c:488
 msgid "Allow encryption"
@@ -1808,7 +1808,7 @@ msgstr "Port ist <b>geschlossen</b>"
 
 #: ../gtk/tr-prefs.c:1106
 msgid "<i>Testing TCP port…</i>"
-msgstr "<i>TCP-Port wird getestet …<i>"
+msgstr "<i>TCP-Port wird getestet…<i>"
 
 #: ../gtk/tr-prefs.c:1132
 msgid "Listening Port"
