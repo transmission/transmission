@@ -1,0 +1,3 @@
+#!/bin/sh
+
+snapctl restart --reload transmission-daemon

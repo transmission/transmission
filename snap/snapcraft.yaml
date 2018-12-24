@@ -1,5 +1,6 @@
 name: transmission-daemon
-version: '2.94'
+version: git
+version-script: git describe --tags HEAD
 summary: Transmission is a fast, easy, and free BitTorrent client.
 description: |
   Transmission is a BitTorrent client which features a variety 
@@ -9,44 +10,56 @@ description: |
   with parts under the MIT License.
   This snap package has the daemon/CLI tools of Transmission
 
+  Available config keys:
+    - port:            listen port [9091]
+    - dirs.downloads:  directory where files are downloaded
+        [/var/snap/transmission-deamon/common/downloads]
+    - dirs.watch:      directory to watch for torrent files [unset]
+icon: gtk/icons/hicolor_apps_scalable_transmission.svg
+base: core18
 grade: stable
 confinement: strict
 
 apps:
-  transmission-daemon:
-    command: 
-      transmission-daemon
+  daemon:
+    command: wrappers/daemon
+    daemon: simple
     plugs:
-      - home
       - network
       - network-bind
       - removable-media
-  transmission-create:
-    command: 
-      transmission-create
+  create:
+    command: bin/transmission-create
     plugs:
       - home
-  transmission-edit:
-    command: 
-      transmission-edit
+      - removable-media
+  edit:
+    command: bin/transmission-edit
     plugs:
       - home
-  transmission-show:
-    command: 
-      transmission-show
+      - removable-media
+  show:
+    command: bin/transmission-show
     plugs:
       - home
+      - removable-media
+  remote:
+    command: wrappers/remote
+    plugs:
+      - home
+      - network
+      - removable-media
 
 parts:
   transmission-daemon:
-    source: https://github.com/transmission/transmission.git
-    source-tag: '2.94'
     plugin: autotools
+    source: .
+    source-type: git
     configflags:
-      - "--disable-gtk"
-      - "--enable-daemon"
+      - --disable-gtk
+      - --enable-daemon
+      - --disable-cli
     build-packages: 
-      - pkg-config
       - libcurl4-gnutls-dev
       - libevent-dev
       - zlib1g-dev
@@ -57,5 +70,22 @@ parts:
     stage-packages:
       - libcurl3
       - libcurl3-gnutls
-      - libevent-2.0-5
+      - libevent-2.1-6
       - libminiupnpc10
+      # for configuration scripts
+      - jq
+      - libjq1
+    stage:
+      - bin
+      - lib
+      - share/transmission
+      - usr/bin
+      - usr/lib
+
+  snap-data:
+    plugin: dump
+    source: snap-data
+    stage:
+      - wrappers
+    prime:
+      - wrappers

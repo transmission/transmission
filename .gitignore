@@ -28,5 +28,6 @@ third-party/miniupnp/miniupnpcstrings.h
 # Related to snap packaging
 /parts
 /prime
+/snap/.snapcraft
 /stage
 /*.snap

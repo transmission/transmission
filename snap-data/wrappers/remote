@@ -1,0 +1,11 @@
+#!/bin/bash -e
+
+# shellcheck disable=SC1090
+. "$SNAP/wrappers/defaults"
+
+SERVER_PORT=$(snapctl get "$PORT_KEY")
+if [ ! "$SERVER_PORT" ] ; then
+   SERVER_PORT="$PORT"
+fi
+
+exec "$SNAP/bin/transmission-remote" "localhost" "$SERVER_PORT" "$@"

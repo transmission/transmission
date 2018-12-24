@@ -1,0 +1,56 @@
+#!/bin/bash -e
+
+# shellcheck disable=SC1090
+. "$SNAP/wrappers/defaults"
+
+DAEMON="$SNAP/bin/transmission-daemon"
+CONFIGFILE="$SNAP_DATA/settings.json"
+
+set_config_key() {
+    local key="$1"
+    local value="$2"
+
+    local tempfile
+    tempfile=$(mktemp)
+    jq ".[\"$key\"] = $value" "$CONFIGFILE" > "$tempfile"
+    mv "$tempfile" "$CONFIGFILE"
+}
+
+configure() {
+    local escape=""
+    if [ "$1" = "-e" ]; then
+        escape="t"
+        shift 1
+    fi
+
+    local key="$1"
+    local config="$2"
+    local default="$3"
+
+    local value
+    value="$(snapctl get "$config")"
+    if [ -z "$value" ]; then
+        value="$default"
+    fi
+    if [ "$escape" ]; then
+        value="\"$value\""
+    fi
+    set_config_key "$key" "$value"
+}
+
+
+if [ ! -f "$CONFIGFILE" ]; then
+  "$DAEMON" -d 2>"$CONFIGFILE"
+fi
+
+mkdir -p "$SNAP_COMMON/downloads"
+
+configure rpc-port "$PORT_KEY" "$PORT"
+configure -e incomplete-dir dirs.downloads "$SNAP_COMMON/downloads"
+configure -e download-dir dirs.downloads "$SNAP_COMMON/downloads"
+configure -e watch-dir dirs.watch ""
+set_config_key watch-dir-enabled true
+set_config_key incomplete-dir-enabled true
+
+export TRANSMISSION_WEB_HOME="$SNAP/share/transmission/web"
+"$DAEMON" -f --log-info --config-dir "$SNAP_DATA"
