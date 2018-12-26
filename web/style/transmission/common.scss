@@ -5,7 +5,7 @@
 	background-image:    -moz-linear-gradient(top, $topColor, $bottomColor);
 	background-image:     -ms-linear-gradient(top, $topColor, $bottomColor);
 	background-image:      -o-linear-gradient(top, $topColor, $bottomColor);
-	background-image:         linear-gradient(top, $topColor, $bottomColor);
+	background-image:         linear-gradient(to bottom, $topColor, $bottomColor);
 }
 
 @mixin imageOnVerticalGradient($src, $topColor, $bottomColor) {
@@ -16,6 +16,7 @@
 	background-image: url($src), -moz-linear-gradient(top, $topColor, $bottomColor); /* FF3.6+ */
 	background-image: url($src), -ms-linear-gradient(top, $topColor, $bottomColor); /* IE10 */
 	background-image: url($src), -o-linear-gradient(top, $topColor, $bottomColor); /* Opera 11.10+ */
+	background-image: url($src), linear-gradient(to bottom, $topColor, $bottomColor);
 	background-position: center;
 	background-repeat: no-repeat;
 }

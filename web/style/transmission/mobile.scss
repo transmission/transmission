@@ -1,11 +1,11 @@
 @mixin verticalGradient($topColor, $bottomColor) {
 	background-color: mix($topColor, $bottomColor);
-	background-image: -webkit-gradient(linear, left top, left bottom, from($topColor), to($bottomColor)); 
-	background-image: -webkit-linear-gradient(top, $topColor, $bottomColor); 
-	background-image:    -moz-linear-gradient(top, $topColor, $bottomColor); 
-	background-image:     -ms-linear-gradient(top, $topColor, $bottomColor); 
-	background-image:      -o-linear-gradient(top, $topColor, $bottomColor); 
-	background-image:         linear-gradient(top, $topColor, $bottomColor);
+	background-image: -webkit-gradient(linear, left top, left bottom, from($topColor), to($bottomColor));
+	background-image: -webkit-linear-gradient(top, $topColor, $bottomColor);
+	background-image:    -moz-linear-gradient(top, $topColor, $bottomColor);
+	background-image:     -ms-linear-gradient(top, $topColor, $bottomColor);
+	background-image:      -o-linear-gradient(top, $topColor, $bottomColor);
+	background-image:         linear-gradient(to bottom, $topColor, $bottomColor);
 }
 
 @mixin imageOnVerticalGradient($src, $topColor, $bottomColor) {
@@ -16,6 +16,7 @@
 	background-image: url($src), -moz-linear-gradient(top, $topColor, $bottomColor); /* FF3.6+ */
 	background-image: url($src), -ms-linear-gradient(top, $topColor, $bottomColor); /* IE10 */
 	background-image: url($src), -o-linear-gradient(top, $topColor, $bottomColor); /* Opera 11.10+ */
+	background-image: url($src), linear-gradient(to bottom, $topColor, $bottomColor);
 	background-position: center;
 	background-repeat: no-repeat;
 }
@@ -570,7 +571,7 @@ div#torrent_inspector
 
 	div.inspector_torrent_file_list_entry_name {
 		font-size: 1.2em;
-		color: black; 
+		color: black;
 		display: inline;
 		margin-left: 0px;
 	}
