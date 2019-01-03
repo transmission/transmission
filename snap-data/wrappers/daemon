@@ -32,15 +32,19 @@ configure() {
     if [ -z "$value" ]; then
         value="$default"
     fi
-    if [ "$escape" ]; then
+    if [ "$escape" = "t" ]; then
         value="\"$value\""
     fi
     set_config_key "$key" "$value"
 }
 
 
-if [ ! -f "$CONFIGFILE" ]; then
+if [ ! -s "$CONFIGFILE" ]; then
   "$DAEMON" -d 2>"$CONFIGFILE"
+  set_config_key watch-dir-enabled true
+  set_config_key incomplete-dir-enabled true
+  set_config_key rpc-host-whitelist-enabled false
+  set_config_key rpc-whitelist-enabled false
 fi
 
 mkdir -p "$SNAP_COMMON/downloads"
@@ -49,8 +53,6 @@ configure rpc-port "$PORT_KEY" "$PORT"
 configure -e incomplete-dir dirs.downloads "$SNAP_COMMON/downloads"
 configure -e download-dir dirs.downloads "$SNAP_COMMON/downloads"
 configure -e watch-dir dirs.watch ""
-set_config_key watch-dir-enabled true
-set_config_key incomplete-dir-enabled true
 
 export TRANSMISSION_WEB_HOME="$SNAP/share/transmission/web"
 "$DAEMON" -f --log-info --config-dir "$SNAP_DATA"

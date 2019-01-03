@@ -16,7 +16,6 @@ description: |
         [/var/snap/transmission-deamon/common/downloads]
     - dirs.watch:      directory to watch for torrent files [unset]
 icon: gtk/icons/hicolor_apps_scalable_transmission.svg
-base: core18
 grade: stable
 confinement: strict
 
@@ -59,7 +58,8 @@ parts:
       - --disable-gtk
       - --enable-daemon
       - --disable-cli
-    build-packages: 
+    build-packages:
+      - pkg-config
       - libcurl4-gnutls-dev
       - libevent-dev
       - zlib1g-dev
@@ -70,11 +70,11 @@ parts:
     stage-packages:
       - libcurl3
       - libcurl3-gnutls
-      - libevent-2.1-6
+      - libevent-2.0-5
       - libminiupnpc10
       # for configuration scripts
       - jq
-      - libjq1
+      - libonig2
     stage:
       - bin
       - lib
