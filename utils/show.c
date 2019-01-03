@@ -93,6 +93,33 @@ static int compare_files_by_name(void const* va, void const* vb)
     return strcmp(a->name, b->name);
 }
 
+static char const* unix_timestamp_to_str(time_t timestamp)
+{
+    if (timestamp == 0)
+    {
+        return "Unknown";
+    }
+
+    struct tm const* const local_time = localtime(&timestamp);
+
+    if (local_time == NULL)
+    {
+        return "Invalid";
+    }
+
+    static char buffer[32];
+    tr_strlcpy(buffer, asctime(local_time), TR_N_ELEMENTS(buffer));
+
+    char* const newline_pos = strchr(buffer, '\n');
+
+    if (newline_pos != NULL)
+    {
+        *newline_pos = '\0';
+    }
+
+    return buffer;
+}
+
 static void showInfo(tr_info const* inf)
 {
     char buf[128];
@@ -107,16 +134,7 @@ static void showInfo(tr_info const* inf)
     printf("  Name: %s\n", inf->name);
     printf("  Hash: %s\n", inf->hashString);
     printf("  Created by: %s\n", inf->creator ? inf->creator : "Unknown");
-
-    if (inf->dateCreated == 0)
-    {
-        printf("  Created on: Unknown\n");
-    }
-    else
-    {
-        struct tm tm = *localtime(&inf->dateCreated);
-        printf("  Created on: %s", asctime(&tm));
-    }
+    printf("  Created on: %s\n", unix_timestamp_to_str(inf->dateCreated));
 
     if (inf->comment != NULL && *inf->comment != '\0')
     {

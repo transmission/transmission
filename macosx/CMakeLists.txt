@@ -1,5 +1,7 @@
 project(trmac)
 
+include_directories(${CMAKE_SOURCE_DIR})
+
 if(CMAKE_GENERATOR STREQUAL "Xcode")
     set(CMAKE_XCODE_ATTRIBUTE_CLANG_ENABLE_OBJC_ARC ON)
 else()

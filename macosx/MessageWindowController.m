@@ -20,13 +20,14 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#include <libtransmission/transmission.h>
+#include <libtransmission/log.h>
+
 #import "MessageWindowController.h"
 #import "Controller.h"
 #import "NSApplicationAdditions.h"
 #import "NSMutableArrayAdditions.h"
 #import "NSStringAdditions.h"
-#import <log.h>
-#import <transmission.h>
 
 #define LEVEL_ERROR 0
 #define LEVEL_INFO  1

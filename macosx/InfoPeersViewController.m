@@ -20,15 +20,15 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#include <libtransmission/transmission.h>
+#include <libtransmission/utils.h>
+
 #import "InfoPeersViewController.h"
 #import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 #import "PeerProgressIndicatorCell.h"
 #import "Torrent.h"
 #import "WebSeedTableView.h"
-
-#import "transmission.h" // required by utils.h
-#import "utils.h"
 
 #define ANIMATION_ID_KEY @"animationId"
 #define WEB_SEED_ANIMATION_ID @"webSeed"

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11762" systemVersion="16D32" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11762"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14460.31"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -54,7 +54,7 @@
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
-        <window title="Einstellungen" allowsToolTipsWhenApplicationIsInactive="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" animationBehavior="default" id="23" userLabel="Preferences" customClass="PrefsWindow">
+        <window title="Einstellungen" allowsToolTipsWhenApplicationIsInactive="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" tabbingMode="disallowed" id="23" userLabel="Preferences" customClass="PrefsWindow">
             <windowStyleMask key="styleMask" titled="YES" closable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="108" y="632" width="555" height="107"/>
@@ -72,7 +72,7 @@
             <rect key="frame" x="0.0" y="0.0" width="555" height="366"/>
             <autoresizingMask key="autoresizingMask"/>
             <subviews>
-                <textField verticalHuggingPriority="750" id="652">
+                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="652">
                     <rect key="frame" x="71" y="39" width="117" height="17"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="right" title="Aktualisierungen:" id="1214">
@@ -104,7 +104,7 @@
                         <binding destination="365" name="value" keyPath="values.SUEnableAutomaticChecks" id="1737"/>
                     </connections>
                 </button>
-                <textField verticalHuggingPriority="750" id="630">
+                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="630">
                     <rect key="frame" x="190" y="114" width="196" height="17"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Alle Warnungen zurücksetzen:" id="1212">
@@ -158,7 +158,7 @@
                         <binding destination="365" name="value" keyPath="values.AutoSize" id="399"/>
                     </connections>
                 </button>
-                <textField verticalHuggingPriority="750" id="229">
+                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="229">
                     <rect key="frame" x="97" y="329" width="91" height="17"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="right" title="Fenstergröße:" id="1209">
@@ -215,7 +215,7 @@
                         <binding destination="365" name="value" keyPath="values.BadgeDownloadRate" id="397"/>
                     </connections>
                 </button>
-                <textField verticalHuggingPriority="750" id="32">
+                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="32">
                     <rect key="frame" x="66" y="292" width="122" height="17"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="right" title="Im Dock anzeigen:" id="1204">
@@ -224,7 +224,7 @@
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <textField verticalHuggingPriority="750" id="2086">
+                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="2086">
                     <rect key="frame" x="55" y="235" width="133" height="17"/>
                     <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="right" title="Benachrichtigungen:" id="2087">
@@ -233,7 +233,7 @@
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <textField verticalHuggingPriority="750" id="31">
+                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="31">
                     <rect key="frame" x="83" y="198" width="105" height="17"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="right" title="Nachfragen vor:" id="1203">
@@ -264,7 +264,7 @@
                         <binding destination="365" name="value" keyPath="values.CheckQuit" id="389"/>
                     </connections>
                 </button>
-                <textField verticalHuggingPriority="750" id="1930">
+                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="1930">
                     <rect key="frame" x="47" y="76" width="141" height="17"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="right" title="magnet-Links öffnen:" id="1931">
@@ -332,7 +332,7 @@
                                             </menu>
                                         </popUpButtonCell>
                                     </popUpButton>
-                                    <textField verticalHuggingPriority="750" id="59">
+                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="59">
                                         <rect key="frame" x="30" y="302" width="174" height="17"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Geladene Daten sichern in:" id="1216">
@@ -341,7 +341,7 @@
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
-                                    <textField verticalHuggingPriority="750" id="61">
+                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="61">
                                         <rect key="frame" x="14" y="327" width="93" height="17"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Einstellungen:" id="1217">
@@ -423,7 +423,7 @@
                                             <binding destination="365" name="enabled" keyPath="values.AutoImport" id="404"/>
                                         </connections>
                                     </popUpButton>
-                                    <textField verticalHuggingPriority="750" id="352">
+                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="352">
                                         <rect key="frame" x="14" y="60" width="179" height="17"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="right" title="Automatisches Hinzufügen:" id="1226">
@@ -540,7 +540,7 @@
                                             <binding destination="365" name="value" keyPath="values.DownloadAskManual" id="1480"/>
                                         </connections>
                                     </button>
-                                    <textField verticalHuggingPriority="750" id="1337">
+                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="1337">
                                         <rect key="frame" x="14" y="181" width="180" height="17"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="right" title="Übertragungseinstellungen:" id="1338">
@@ -569,7 +569,7 @@
                                 <rect key="frame" x="10" y="33" width="509" height="347"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <subviews>
-                                    <textField verticalHuggingPriority="750" id="257">
+                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="257">
                                         <rect key="frame" x="236" y="171" width="44" height="22"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="1229">
@@ -580,7 +580,7 @@
                                                 <real key="maximum" value="99999"/>
                                             </numberFormatter>
                                             <font key="font" metaFont="system"/>
-                                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                         <connections>
@@ -590,7 +590,7 @@
                                             <outlet property="nextKeyView" destination="604" id="1638"/>
                                         </connections>
                                     </textField>
-                                    <textField verticalHuggingPriority="750" id="262">
+                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="262">
                                         <rect key="frame" x="69" y="173" width="71" height="17"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="right" title="Warteliste:" id="1230">
@@ -599,7 +599,7 @@
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
-                                    <textField verticalHuggingPriority="750" id="263" customClass="ColorTextField">
+                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="263" customClass="ColorTextField">
                                         <rect key="frame" x="285" y="173" width="167" height="17"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="aktive Empfangsvorgänge" id="1231">
@@ -623,7 +623,7 @@
                                             <binding destination="365" name="value" keyPath="values.RatioCheck" id="430"/>
                                         </connections>
                                     </button>
-                                    <textField verticalHuggingPriority="750" id="265">
+                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="265">
                                         <rect key="frame" x="368" y="312" width="44" height="22"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="1233">
@@ -634,7 +634,7 @@
                                                 <real key="maximum" value="99999"/>
                                             </numberFormatter>
                                             <font key="font" metaFont="system"/>
-                                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                         <connections>
@@ -656,7 +656,7 @@
                                             <binding destination="365" name="value" keyPath="values.IdleLimitCheck" id="1982"/>
                                         </connections>
                                     </button>
-                                    <textField verticalHuggingPriority="750" id="1959">
+                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="1959">
                                         <rect key="frame" x="201" y="254" width="41" height="22"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="1960">
@@ -665,7 +665,7 @@
                                                 <real key="maximum" value="40320"/>
                                             </numberFormatter>
                                             <font key="font" metaFont="system"/>
-                                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                         <connections>
@@ -675,7 +675,7 @@
                                             <outlet property="nextKeyView" destination="257" id="1963"/>
                                         </connections>
                                     </textField>
-                                    <textField verticalHuggingPriority="750" id="267">
+                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="267">
                                         <rect key="frame" x="17" y="314" width="123" height="17"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="right" title="Verteilen anhalten:" id="1234">
@@ -684,7 +684,7 @@
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
-                                    <textField verticalHuggingPriority="750" id="268">
+                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="268">
                                         <rect key="frame" x="161" y="279" width="334" height="28"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" title="Das „Verhältnis“ ist der Quotient der Menge der gesendeten Daten durch die Menge der empfangenen Daten." id="1235">
@@ -705,7 +705,7 @@
                                             <binding destination="365" name="value" keyPath="values.Queue" id="405"/>
                                         </connections>
                                     </button>
-                                    <textField verticalHuggingPriority="750" id="604">
+                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="604">
                                         <rect key="frame" x="236" y="146" width="44" height="22"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="1238">
@@ -716,7 +716,7 @@
                                                 <real key="maximum" value="99999"/>
                                             </numberFormatter>
                                             <font key="font" metaFont="system"/>
-                                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                         <connections>
@@ -726,7 +726,7 @@
                                             <outlet property="nextKeyView" destination="636" id="1639"/>
                                         </connections>
                                     </textField>
-                                    <textField verticalHuggingPriority="750" id="606" customClass="ColorTextField">
+                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="606" customClass="ColorTextField">
                                         <rect key="frame" x="285" y="148" width="126" height="17"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="aktive Verteilungen" id="1239">
@@ -750,7 +750,7 @@
                                             <binding destination="365" name="value" keyPath="values.QueueSeed" id="608"/>
                                         </connections>
                                     </button>
-                                    <textField verticalHuggingPriority="750" id="636">
+                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="636">
                                         <rect key="frame" x="316" y="121" width="44" height="22"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="1241">
@@ -761,7 +761,7 @@
                                                 <real key="maximum" value="99999"/>
                                             </numberFormatter>
                                             <font key="font" metaFont="system"/>
-                                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                         <connections>
@@ -771,7 +771,7 @@
                                             <outlet property="nextKeyView" destination="1298" id="1640"/>
                                         </connections>
                                     </textField>
-                                    <textField verticalHuggingPriority="750" id="638" customClass="ColorTextField">
+                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="638" customClass="ColorTextField">
                                         <rect key="frame" x="365" y="123" width="122" height="17"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Minuten Inaktivität" id="1242">
@@ -795,7 +795,7 @@
                                             <binding destination="365" name="value" keyPath="values.CheckStalled" id="640"/>
                                         </connections>
                                     </button>
-                                    <textField verticalHuggingPriority="750" id="1297">
+                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="1297">
                                         <rect key="frame" x="43" y="83" width="97" height="17"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="right" title="Ton abspielen:" id="1310">
@@ -865,7 +865,7 @@
                                             <binding destination="365" name="value" keyPath="values.PlayDownloadSound" id="1322"/>
                                         </connections>
                                     </button>
-                                    <textField verticalHuggingPriority="750" id="1969" customClass="ColorTextField">
+                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="1969" customClass="ColorTextField">
                                         <rect key="frame" x="247" y="256" width="122" height="17"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Minuten Inaktivität" id="1970">
@@ -889,7 +889,7 @@
                                             <binding destination="365" name="value" keyPath="values.DoneScriptEnabled" id="2058"/>
                                         </connections>
                                     </button>
-                                    <textField verticalHuggingPriority="750" id="2046">
+                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="2046">
                                         <rect key="frame" x="27" y="18" width="113" height="17"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                         <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="right" title="Skript ausführen:" id="2047">
@@ -958,7 +958,7 @@
                                             <binding destination="365" name="value" keyPath="values.RemoveWhenFinishSeeding" id="2125"/>
                                         </connections>
                                     </button>
-                                    <textField verticalHuggingPriority="750" id="2122">
+                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="2122">
                                         <rect key="frame" x="161" y="214" width="207" height="14"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Für neu hinzugefügte Übertragungen." id="2123">
@@ -981,7 +981,7 @@
             <rect key="frame" x="0.0" y="0.0" width="555" height="268"/>
             <autoresizingMask key="autoresizingMask"/>
             <subviews>
-                <textField verticalHuggingPriority="750" id="1834">
+                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="1834">
                     <rect key="frame" x="204" y="77" width="311" height="30"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" title="Übertragungen werden der ersten Gruppe hinzugefügt, deren Hinzufügebedingungen sie erfüllen." id="1835">
@@ -1012,7 +1012,7 @@
                         <action selector="toggleUseAutoAssignRules:" target="1783" id="1884"/>
                     </connections>
                 </button>
-                <textField verticalHuggingPriority="750" id="1823">
+                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="1823">
                     <rect key="frame" x="204" y="135" width="334" height="28"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" title="Der Speicherort für die empfangenen Daten wird beim Hinzufügen automatisch gesetzt." id="1824">
@@ -1058,7 +1058,7 @@
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <color key="color" red="0.058130499000000002" green="0.055541898999999999" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                 </colorWell>
-                <textField verticalHuggingPriority="750" id="1795">
+                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="1795">
                     <rect key="frame" x="245" y="231" width="45" height="17"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Name:" id="1796">
@@ -1067,12 +1067,12 @@
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <textField verticalHuggingPriority="750" id="1793">
+                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="1793">
                     <rect key="frame" x="248" y="201" width="287" height="22"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="1794">
                         <font key="font" metaFont="system"/>
-                        <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                     <connections>
@@ -1118,7 +1118,7 @@
                                             <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                         </tableHeaderCell>
-                                        <imageCell key="dataCell" controlSize="small" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="2E136052-B864-4307-A633-4F456C27164B" id="1782"/>
+                                        <imageCell key="dataCell" controlSize="small" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="imageCell:1782:image" id="1782"/>
                                     </tableColumn>
                                     <tableColumn identifier="Name" editable="NO" width="132" minWidth="40" maxWidth="1000" id="1779">
                                         <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Name">
@@ -1141,11 +1141,11 @@
                             </tableView>
                         </subviews>
                     </clipView>
-                    <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" doubleValue="0.19672129999999999" horizontal="YES" id="1775">
+                    <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" doubleValue="0.19672129999999999" horizontal="YES" id="1775">
                         <rect key="frame" x="-100" y="-100" width="470" height="15"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </scroller>
-                    <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="NO" id="1776">
+                    <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="1776">
                         <rect key="frame" x="184" y="1" width="15" height="188"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </scroller>
@@ -1192,10 +1192,9 @@
                     <autoresizingMask key="autoresizingMask"/>
                     <datePickerCell key="cell" borderStyle="bezel" alignment="left" id="1283">
                         <font key="font" metaFont="system"/>
-                        <calendarDate key="date" timeIntervalSinceReferenceDate="-31575600" calendarFormat="%Y-%m-%d %H:%M:%S %z">
-                            <!--2000-01-01 08:00:00 -0500-->
-                            <timeZone key="timeZone" name="America/New_York"/>
-                        </calendarDate>
+                        <date key="date" timeIntervalSinceReferenceDate="-31575600">
+                            <!--2000-01-01 13:00:00 +0000-->
+                        </date>
                         <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                         <datePickerElements key="datePickerElements" hour="YES" minute="YES"/>
@@ -1212,10 +1211,9 @@
                     <autoresizingMask key="autoresizingMask"/>
                     <datePickerCell key="cell" borderStyle="bezel" alignment="left" id="1282">
                         <font key="font" metaFont="system"/>
-                        <calendarDate key="date" timeIntervalSinceReferenceDate="-31525200" calendarFormat="%Y-%m-%d %H:%M:%S %z">
-                            <!--2000-01-01 22:00:00 -0500-->
-                            <timeZone key="timeZone" name="America/New_York"/>
-                        </calendarDate>
+                        <date key="date" timeIntervalSinceReferenceDate="-31525200">
+                            <!--2000-01-02 03:00:00 +0000-->
+                        </date>
                         <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                         <datePickerElements key="datePickerElements" hour="YES" minute="YES"/>
@@ -1227,7 +1225,7 @@
                         <outlet property="nextKeyView" destination="526" id="583"/>
                     </connections>
                 </datePicker>
-                <textField verticalHuggingPriority="750" id="310" customClass="ColorTextField">
+                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="310" customClass="ColorTextField">
                     <rect key="frame" x="373" y="22" width="23" height="17"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="bis" id="1281">
@@ -1256,7 +1254,7 @@
                     <autoresizingMask key="autoresizingMask"/>
                     <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyUpOrDown" image="TurtleTemplate" id="1279"/>
                 </imageView>
-                <textField verticalHuggingPriority="750" id="200">
+                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="200">
                     <rect key="frame" x="17" y="53" width="192" height="84"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" id="1278">
@@ -1266,7 +1264,7 @@
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <textField verticalHuggingPriority="750" id="199">
+                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="199">
                     <rect key="frame" x="283" y="152" width="69" height="17"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="höchstens" id="1277">
@@ -1275,7 +1273,7 @@
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <textField verticalHuggingPriority="750" id="198">
+                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="198">
                     <rect key="frame" x="283" y="123" width="69" height="17"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="höchstens" id="1276">
@@ -1284,7 +1282,7 @@
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <textField verticalHuggingPriority="750" id="196">
+                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="196">
                     <rect key="frame" x="17" y="152" width="264" height="17"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="right" title="Begrenzte Übertragungsgeschwindigkeit:" id="1275">
@@ -1293,7 +1291,7 @@
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <textField verticalHuggingPriority="750" id="195">
+                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="195">
                     <rect key="frame" x="408" y="123" width="83" height="17"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="KB/s senden" id="1274">
@@ -1302,7 +1300,7 @@
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <textField verticalHuggingPriority="750" id="194">
+                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="194">
                     <rect key="frame" x="408" y="151" width="109" height="17"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="KB/s empfangen" id="1273">
@@ -1311,7 +1309,7 @@
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <textField verticalHuggingPriority="750" id="192">
+                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="192">
                     <rect key="frame" x="355" y="121" width="50" height="22"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="1272">
@@ -1322,7 +1320,7 @@
                             <real key="maximum" value="99999"/>
                         </numberFormatter>
                         <font key="font" metaFont="system"/>
-                        <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                     <connections>
@@ -1331,7 +1329,7 @@
                         <outlet property="nextKeyView" destination="525" id="581"/>
                     </connections>
                 </textField>
-                <textField verticalHuggingPriority="750" id="190">
+                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="190">
                     <rect key="frame" x="355" y="149" width="50" height="22"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="1271">
@@ -1342,7 +1340,7 @@
                             <real key="maximum" value="99999"/>
                         </numberFormatter>
                         <font key="font" metaFont="system"/>
-                        <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                     <connections>
@@ -1351,7 +1349,7 @@
                         <outlet property="nextKeyView" destination="192" id="580"/>
                     </connections>
                 </textField>
-                <textField verticalHuggingPriority="750" id="163">
+                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="163">
                     <rect key="frame" x="102" y="226" width="179" height="17"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="right" title="Datendurchsatz begrenzen:" id="1270">
@@ -1360,7 +1358,7 @@
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <textField verticalHuggingPriority="750" id="159" customClass="ColorTextField">
+                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="159" customClass="ColorTextField">
                     <rect key="frame" x="428" y="201" width="83" height="17"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="KB/s senden" id="1269">
@@ -1372,7 +1370,7 @@
                         <binding destination="365" name="enabled" keyPath="values.CheckUpload" id="1701"/>
                     </connections>
                 </textField>
-                <textField verticalHuggingPriority="750" id="158" customClass="ColorTextField">
+                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="158" customClass="ColorTextField">
                     <rect key="frame" x="428" y="226" width="109" height="17"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="KB/s empfangen" id="1268">
@@ -1396,7 +1394,7 @@
                         <binding destination="365" name="value" keyPath="values.CheckDownload" id="465"/>
                     </connections>
                 </button>
-                <textField verticalHuggingPriority="750" id="156">
+                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="156">
                     <rect key="frame" x="375" y="198" width="50" height="22"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="1266">
@@ -1407,7 +1405,7 @@
                             <real key="maximum" value="99999"/>
                         </numberFormatter>
                         <font key="font" metaFont="system"/>
-                        <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                     <connections>
@@ -1429,7 +1427,7 @@
                         <binding destination="365" name="value" keyPath="values.CheckUpload" id="464"/>
                     </connections>
                 </button>
-                <textField verticalHuggingPriority="750" id="154">
+                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="154">
                     <rect key="frame" x="375" y="224" width="50" height="22"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="1264">
@@ -1440,7 +1438,7 @@
                             <real key="maximum" value="99999"/>
                         </numberFormatter>
                         <font key="font" metaFont="system"/>
-                        <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                     <connections>
@@ -1491,7 +1489,7 @@
                         <action selector="updateBlocklist:" target="-2" id="1462"/>
                     </connections>
                 </button>
-                <textField verticalHuggingPriority="750" id="1435">
+                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="1435">
                     <rect key="frame" x="272" y="90" width="266" height="17"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="blocklist loaded/not loaded" id="1438">
@@ -1500,7 +1498,7 @@
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <textField verticalHuggingPriority="750" id="1434">
+                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="1434">
                     <rect key="frame" x="64" y="144" width="68" height="17"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="right" title="Blockliste:" id="1439">
@@ -1521,16 +1519,16 @@
                         <binding destination="365" name="value" keyPath="values.BlocklistNew" id="1992"/>
                     </connections>
                 </button>
-                <textField verticalHuggingPriority="750" id="1738">
+                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="1738">
                     <rect key="frame" x="153" y="68" width="385" height="14"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" controlSize="small" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Zuletzt aktualisiert: —" id="1739">
                         <font key="font" metaFont="smallSystem"/>
-                        <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <textField verticalHuggingPriority="750" id="1432">
+                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="1432">
                     <rect key="frame" x="134" y="311" width="398" height="28"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" title="Eine große Anzahl von Verbindungen kann die Geschwindigkeit des Computers negativ beeinflussen." id="1441">
@@ -1575,7 +1573,7 @@
                         <binding destination="365" name="value" keyPath="values.PEXGlobal" id="1464"/>
                     </connections>
                 </button>
-                <textField verticalHuggingPriority="750" id="1430">
+                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="1430">
                     <rect key="frame" x="134" y="349" width="227" height="17"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Für neue Übertragungen höchstens" id="1443">
@@ -1584,7 +1582,7 @@
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <textField verticalHuggingPriority="750" id="1987" customClass="ColorTextField">
+                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="1987" customClass="ColorTextField">
                     <rect key="frame" x="153" y="117" width="33" height="17"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="URL:" id="1988">
@@ -1596,7 +1594,7 @@
                         <binding destination="365" name="enabled" keyPath="values.BlocklistNew" id="1993"/>
                     </connections>
                 </textField>
-                <textField verticalHuggingPriority="750" id="1429">
+                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="1429">
                     <rect key="frame" x="364" y="347" width="50" height="22"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="1444">
@@ -1607,14 +1605,14 @@
                             <real key="maximum" value="3000"/>
                         </numberFormatter>
                         <font key="font" metaFont="system"/>
-                        <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                     <connections>
                         <action selector="setPeersTorrent:" target="-2" id="1457"/>
                     </connections>
                 </textField>
-                <textField verticalHuggingPriority="750" id="1428">
+                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="1428">
                     <rect key="frame" x="417" y="349" width="93" height="17"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Verbindungen" id="1446">
@@ -1623,7 +1621,7 @@
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <textField verticalHuggingPriority="750" id="1427">
+                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="1427">
                     <rect key="frame" x="351" y="376" width="151" height="17"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Teilnehmern verbinden" id="1447">
@@ -1632,7 +1630,7 @@
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <textField verticalHuggingPriority="750" id="1426">
+                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="1426">
                     <rect key="frame" x="298" y="374" width="50" height="22"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="1448">
@@ -1643,7 +1641,7 @@
                             <real key="maximum" value="3000"/>
                         </numberFormatter>
                         <font key="font" metaFont="system"/>
-                        <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                     <connections>
@@ -1651,7 +1649,7 @@
                         <outlet property="nextKeyView" destination="1429" id="1455"/>
                     </connections>
                 </textField>
-                <textField verticalHuggingPriority="750" id="1425">
+                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="1425">
                     <rect key="frame" x="134" y="376" width="161" height="17"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Mit insgesamt höchstens" id="1450">
@@ -1660,7 +1658,7 @@
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <textField verticalHuggingPriority="750" id="1424">
+                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="1424">
                     <rect key="frame" x="35" y="376" width="97" height="17"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="right" title="Verbindungen:" id="1451">
@@ -1681,7 +1679,7 @@
                         <binding destination="365" name="value" keyPath="values.EncryptionPrefer" id="1465"/>
                     </connections>
                 </button>
-                <textField verticalHuggingPriority="750" id="1422">
+                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="1422">
                     <rect key="frame" x="21" y="206" width="111" height="17"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="right" title="Verschlüsselung:" id="1453">
@@ -1703,12 +1701,12 @@
                         <binding destination="365" name="value" keyPath="values.EncryptionRequire" id="1466"/>
                     </connections>
                 </button>
-                <textField verticalHuggingPriority="750" id="1985">
+                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="1985">
                     <rect key="frame" x="191" y="115" width="344" height="22"/>
                     <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="1986">
                         <font key="font" metaFont="system"/>
-                        <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         <allowedInputSourceLocales>
                             <string>NSAllRomanInputSourcesLocaleIdentifier</string>
@@ -1738,7 +1736,7 @@
                         <action selector="randomPort:" target="-2" id="1894"/>
                     </connections>
                 </button>
-                <textField verticalHuggingPriority="750" id="660">
+                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="660">
                     <rect key="frame" x="41" y="193" width="109" height="17"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Kommunikation:" id="1253">
@@ -1747,7 +1745,7 @@
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <textField verticalHuggingPriority="750" id="2081">
+                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="2081">
                     <rect key="frame" x="37" y="153" width="113" height="17"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Zugriff über Port:" id="2082">
@@ -1756,7 +1754,7 @@
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <textField verticalHuggingPriority="750" id="357">
+                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="357">
                     <rect key="frame" x="224" y="153" width="286" height="16"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Port ist geöffnet." id="1250">
@@ -1765,7 +1763,7 @@
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <textField verticalHuggingPriority="750" id="336">
+                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="336">
                     <rect key="frame" x="171" y="86" width="271" height="14"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" title="Die Port-Weiterleitung nutzt NAT-PMP oder UPnP." id="1248">
@@ -1774,7 +1772,7 @@
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <textField verticalHuggingPriority="750" id="68">
+                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="68">
                     <rect key="frame" x="155" y="150" width="50" height="22"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="1245">
@@ -1785,7 +1783,7 @@
                             <real key="maximum" value="65535"/>
                         </numberFormatter>
                         <font key="font" metaFont="system"/>
-                        <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                     <connections>
@@ -1837,7 +1835,7 @@
                         <binding destination="365" name="value" keyPath="values.SleepPrevent" id="666"/>
                     </connections>
                 </button>
-                <textField verticalHuggingPriority="750" id="665">
+                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="665">
                     <rect key="frame" x="59" y="49" width="91" height="17"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Ruhezustand:" id="1255">
@@ -1898,12 +1896,12 @@
                         <action selector="helpForRemote:" target="-2" id="1662"/>
                     </connections>
                 </button>
-                <textField verticalHuggingPriority="750" id="1552">
+                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="1552">
                     <rect key="frame" x="216" y="294" width="184" height="22"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="1553">
                         <font key="font" metaFont="system"/>
-                        <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                     <connections>
@@ -1921,7 +1919,7 @@
                         <outlet property="nextKeyView" destination="1509" id="1625"/>
                     </connections>
                 </textField>
-                <textField verticalHuggingPriority="750" id="1541">
+                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="1541">
                     <rect key="frame" x="187" y="84" width="266" height="14"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" title="IP-Adressen können „*“ als Platzhalter enthalten." id="1542">
@@ -1961,17 +1959,17 @@
                     <rect key="frame" x="115" y="108" width="335" height="78"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <clipView key="contentView" id="mfY-sh-Bfh">
-                        <rect key="frame" x="1" y="1" width="318" height="76"/>
+                        <rect key="frame" x="1" y="1" width="317" height="76"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" columnResizing="NO" autosaveColumns="NO" typeSelect="NO" id="1521">
-                                <rect key="frame" x="0.0" y="0.0" width="318" height="76"/>
+                                <rect key="frame" x="0.0" y="0.0" width="317" height="76"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <size key="intercellSpacing" width="3" height="2"/>
                                 <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                 <tableColumns>
-                                    <tableColumn identifier="IP" width="315" minWidth="40" maxWidth="1000" id="1523">
+                                    <tableColumn identifier="IP" width="314" minWidth="40" maxWidth="1000" id="1523">
                                         <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="IP-Adresse">
                                             <font key="font" metaFont="smallSystem"/>
                                             <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -2005,17 +2003,17 @@
                         <rect key="frame" x="-100" y="-100" width="327" height="15"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </scroller>
-                    <scroller key="verticalScroller" verticalHuggingPriority="750" horizontal="NO" id="1519">
-                        <rect key="frame" x="319" y="1" width="15" height="76"/>
+                    <scroller key="verticalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="1519">
+                        <rect key="frame" x="318" y="1" width="16" height="76"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </scroller>
                 </scrollView>
-                <secureTextField verticalHuggingPriority="750" id="1509">
+                <secureTextField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="1509">
                     <rect key="frame" x="216" y="268" width="184" height="22"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <secureTextFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" id="1510">
                         <font key="font" metaFont="system"/>
-                        <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         <allowedInputSourceLocales>
                             <string>NSAllRomanInputSourcesLocaleIdentifier</string>
@@ -2035,7 +2033,7 @@
                         <outlet property="nextKeyView" destination="1491" id="1626"/>
                     </connections>
                 </secureTextField>
-                <textField verticalHuggingPriority="750" id="1644">
+                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="1644">
                     <rect key="frame" x="95" y="400" width="383" height="14"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" title="Hierdurch kann Transmission mit einem Web-Browser bedient werden." id="1645">
@@ -2095,7 +2093,7 @@
                         <binding destination="365" name="value" keyPath="values.RPC" id="1511"/>
                     </connections>
                 </button>
-                <textField verticalHuggingPriority="750" id="1491">
+                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="1491">
                     <rect key="frame" x="211" y="228" width="50" height="22"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="1494">
@@ -2106,7 +2104,7 @@
                             <real key="maximum" value="65535"/>
                         </numberFormatter>
                         <font key="font" metaFont="system"/>
-                        <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                     <connections>
@@ -2116,7 +2114,7 @@
                         <outlet property="nextKeyView" destination="1552" id="1627"/>
                     </connections>
                 </textField>
-                <textField verticalHuggingPriority="750" id="1556" customClass="ColorTextField">
+                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="1556" customClass="ColorTextField">
                     <rect key="frame" x="114" y="296" width="99" height="17"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Benutzername:" id="1557">
@@ -2136,7 +2134,7 @@
                         </binding>
                     </connections>
                 </textField>
-                <textField verticalHuggingPriority="750" id="1554" customClass="ColorTextField">
+                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="1554" customClass="ColorTextField">
                     <rect key="frame" x="144" y="270" width="69" height="17"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Kennwort:" id="1555">
@@ -2156,7 +2154,7 @@
                         </binding>
                     </connections>
                 </textField>
-                <textField verticalHuggingPriority="750" id="1492" customClass="ColorTextField">
+                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="1492" customClass="ColorTextField">
                     <rect key="frame" x="95" y="230" width="113" height="17"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Zugriff über Port:" id="1493">
@@ -2185,12 +2183,16 @@
         </customObject>
     </objects>
     <resources>
-        <image name="2E136052-B864-4307-A633-4F456C27164B" width="18" height="18">
+        <image name="NSAddTemplate" width="11" height="11"/>
+        <image name="NSRemoveTemplate" width="11" height="11"/>
+        <image name="NSStatusPartiallyAvailable" width="16" height="16"/>
+        <image name="TurtleTemplate" width="18" height="18"/>
+        <image name="imageCell:1782:image" width="18" height="18">
             <mutableData key="keyedArchiveRepresentation">
 YnBsaXN0MDDUAQIDBAUGPT5YJHZlcnNpb25YJG9iamVjdHNZJGFyY2hpdmVyVCR0b3ASAAGGoK4HCBMU
 GR4fIyQrLjE3OlUkbnVsbNUJCgsMDQ4PEBESVk5TU2l6ZVYkY2xhc3NcTlNJbWFnZUZsYWdzVk5TUmVw
 c1dOU0NvbG9ygAKADRIgwAAAgAOAC1h7MTgsIDE4fdIVChYYWk5TLm9iamVjdHOhF4AEgArSFQoaHaIb
-HIAFgAaACRAA0iAKISJfEBROU1RJRkZSZXByZXNlbnRhdGlvboAHgAhPERHETU0AKgAABGKAACBQOCQW
+HIAFgAaACRAA0iAKISJfEBROU1RJRkZSZXByZXNlbnRhdGlvboAHgAhPERHcTU0AKgAABGKAACBQOCQW
 DQeEQmDAuBv6BveFRGJROKEMVBRGOZ1vVlNd1vdVRSRRQDQMEwMEQMJg8LhgcKM2ENILhdsdsrl2AxkN
 1rNJBwN1QeSwIHwMMgwHg8MgoEA4MA4GgkKhYLBgQBoOiIPBwMhYOhaWhUIBIGhEFggBAojghrgB0vSS
 r99icAHA0F8kwNcQQSCUTIEtFkwGMSCcQA8NBgMAgNhsOAQGg6igsFAcAPp+PwAA0FAyBAJ/gB7vd9gB
@@ -2209,75 +2211,72 @@ c5vcSCQIOYee5gIeJvTHm2HmnDxJHEB55mIW5WCYg4YkAQ5HGKPQ5jaBLNNCfB7U4b/zgADIBaqCAHUO
 AB9uef59QUfx7nmAB+wS5h6Sefw9EWCyF2NUfIaBRjWC6PqBQuSDglPsG4YoPAaAvAkN8bg4R2jTGwNY
 dwMwVlYD6GoHpDB/kQH8ZhMY8WKjuHUiwdI4x0j7G6N8cw8RxDiG8OcZY1h0DOFcNEdIcyBuFIMA1CgC
 wiD7fopwgQ4iBgOD4GgK4kgTgbAUA8Zw0hqOxG0OYdI4B1jyHAOIdQ9CPD8H+N8hwAEMECXAQJMRAknk
-KWOQI0JCiUkCLoQI0pAmAECfwQIzUdiRkIICAA8BAAADAAAAAQASAAABAQADAAAAAQASAAABAgADAAAA
-BAAABRwBAwADAAAAAQAFAAABBgADAAAAAQACAAABEQAEAAAAAQAAAAgBEgADAAAAAQABAAABFQADAAAA
-AQAEAAABFgADAAAAAQASAAABFwAEAAAAAQAABFoBHAADAAAAAQABAAABPQADAAAAAQACAAABUgADAAAA
-AQABAAABUwADAAAABAAABSSHcwAHAAAMmAAABSwAAAAAAAgACAAIAAgAAQABAAEAAQAADJhhcHBsAhAA
-AG1udHJSR0IgWFlaIAfdAAMADgAWAAEAO2Fjc3BBUFBMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD2
-1gABAAAAANMtYXBwbAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-EWRlc2MAAAFQAAAAYmRzY20AAAG0AAABgGNwcnQAAAM0AAAAJHd0cHQAAANYAAAAFHJYWVoAAANsAAAA
-FGdYWVoAAAOAAAAAFGJYWVoAAAOUAAAAFHJUUkMAAAOoAAAIDGFhcmcAAAu0AAAAIHZjZ3QAAAvUAAAA
-MG5kaW4AAAwEAAAAPmNoYWQAAAxEAAAALG1tb2QAAAxwAAAAKGJUUkMAAAOoAAAIDGdUUkMAAAOoAAAI
-DGFhYmcAAAu0AAAAIGFhZ2cAAAu0AAAAIGRlc2MAAAAAAAAACERpc3BsYXkAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAABtbHVjAAAAAAAAAB4AAAAMc2tTSwAAAAgAAAF4Y2FFUwAAAAgAAAF4aGVJTAAAAAgAAAF4cHRC
-UgAAAAgAAAF4aXRJVAAAAAgAAAF4aHVIVQAAAAgAAAF4dWtVQQAAAAgAAAF4a29LUgAAAAgAAAF4bmJO
-TwAAAAgAAAF4Y3NDWgAAAAgAAAF4emhUVwAAAAgAAAF4ZGVERQAAAAgAAAF4cm9STwAAAAgAAAF4c3ZT
-RQAAAAgAAAF4emhDTgAAAAgAAAF4amFKUAAAAAgAAAF4YXIAAAAAAAgAAAF4ZWxHUgAAAAgAAAF4cHRQ
-VAAAAAgAAAF4bmxOTAAAAAgAAAF4ZnJGUgAAAAgAAAF4ZXNFUwAAAAgAAAF4dGhUSAAAAAgAAAF4dHJU
-UgAAAAgAAAF4ZmlGSQAAAAgAAAF4aHJIUgAAAAgAAAF4cGxQTAAAAAgAAAF4cnVSVQAAAAgAAAF4ZW5V
-UwAAAAgAAAF4ZGFESwAAAAgAAAF4AGkATQBhAGN0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSwgSW5jLiwg
-MjAxMwBYWVogAAAAAAAA8xYAAQAAAAEWylhZWiAAAAAAAABxwAAAOYoAAAFnWFlaIAAAAAAAAGEjAAC5
-5gAAE/ZYWVogAAAAAAAAI/IAAAyQAAC90GN1cnYAAAAAAAAEAAAAAAUACgAPABQAGQAeACMAKAAtADIA
-NgA7AEAARQBKAE8AVABZAF4AYwBoAG0AcgB3AHwAgQCGAIsAkACVAJoAnwCjAKgArQCyALcAvADBAMYA
-ywDQANUA2wDgAOUA6wDwAPYA+wEBAQcBDQETARkBHwElASsBMgE4AT4BRQFMAVIBWQFgAWcBbgF1AXwB
-gwGLAZIBmgGhAakBsQG5AcEByQHRAdkB4QHpAfIB+gIDAgwCFAIdAiYCLwI4AkECSwJUAl0CZwJxAnoC
-hAKOApgCogKsArYCwQLLAtUC4ALrAvUDAAMLAxYDIQMtAzgDQwNPA1oDZgNyA34DigOWA6IDrgO6A8cD
-0wPgA+wD+QQGBBMEIAQtBDsESARVBGMEcQR+BIwEmgSoBLYExATTBOEE8AT+BQ0FHAUrBToFSQVYBWcF
-dwWGBZYFpgW1BcUF1QXlBfYGBgYWBicGNwZIBlkGagZ7BowGnQavBsAG0QbjBvUHBwcZBysHPQdPB2EH
-dAeGB5kHrAe/B9IH5Qf4CAsIHwgyCEYIWghuCIIIlgiqCL4I0gjnCPsJEAklCToJTwlkCXkJjwmkCboJ
-zwnlCfsKEQonCj0KVApqCoEKmAquCsUK3ArzCwsLIgs5C1ELaQuAC5gLsAvIC+EL+QwSDCoMQwxcDHUM
-jgynDMAM2QzzDQ0NJg1ADVoNdA2ODakNww3eDfgOEw4uDkkOZA5/DpsOtg7SDu4PCQ8lD0EPXg96D5YP
-sw/PD+wQCRAmEEMQYRB+EJsQuRDXEPURExExEU8RbRGMEaoRyRHoEgcSJhJFEmQShBKjEsMS4xMDEyMT
-QxNjE4MTpBPFE+UUBhQnFEkUahSLFK0UzhTwFRIVNBVWFXgVmxW9FeAWAxYmFkkWbBaPFrIW1hb6Fx0X
-QRdlF4kXrhfSF/cYGxhAGGUYihivGNUY+hkgGUUZaxmRGbcZ3RoEGioaURp3Gp4axRrsGxQbOxtjG4ob
-shvaHAIcKhxSHHscoxzMHPUdHh1HHXAdmR3DHeweFh5AHmoelB6+HukfEx8+H2kflB+/H+ogFSBBIGwg
-mCDEIPAhHCFIIXUhoSHOIfsiJyJVIoIiryLdIwojOCNmI5QjwiPwJB8kTSR8JKsk2iUJJTglaCWXJccl
-9yYnJlcmhya3JugnGCdJJ3onqyfcKA0oPyhxKKIo1CkGKTgpaymdKdAqAio1KmgqmyrPKwIrNitpK50r
-0SwFLDksbiyiLNctDC1BLXYtqy3hLhYuTC6CLrcu7i8kL1ovkS/HL/4wNTBsMKQw2zESMUoxgjG6MfIy
-KjJjMpsy1DMNM0YzfzO4M/E0KzRlNJ402DUTNU01hzXCNf02NzZyNq426TckN2A3nDfXOBQ4UDiMOMg5
-BTlCOX85vDn5OjY6dDqyOu87LTtrO6o76DwnPGU8pDzjPSI9YT2hPeA+ID5gPqA+4D8hP2E/oj/iQCNA
-ZECmQOdBKUFqQaxB7kIwQnJCtUL3QzpDfUPARANER0SKRM5FEkVVRZpF3kYiRmdGq0bwRzVHe0fASAVI
-S0iRSNdJHUljSalJ8Eo3Sn1KxEsMS1NLmkviTCpMcky6TQJNSk2TTdxOJU5uTrdPAE9JT5NP3VAnUHFQ
-u1EGUVBRm1HmUjFSfFLHUxNTX1OqU/ZUQlSPVNtVKFV1VcJWD1ZcVqlW91dEV5JX4FgvWH1Yy1kaWWlZ
-uFoHWlZaplr1W0VblVvlXDVchlzWXSddeF3JXhpebF69Xw9fYV+zYAVgV2CqYPxhT2GiYfViSWKcYvBj
-Q2OXY+tkQGSUZOllPWWSZedmPWaSZuhnPWeTZ+loP2iWaOxpQ2maafFqSGqfavdrT2una/9sV2yvbQht
-YG25bhJua27Ebx5veG/RcCtwhnDgcTpxlXHwcktypnMBc11zuHQUdHB0zHUodYV14XY+dpt2+HdWd7N4
-EXhueMx5KnmJeed6RnqlewR7Y3vCfCF8gXzhfUF9oX4BfmJ+wn8jf4R/5YBHgKiBCoFrgc2CMIKSgvSD
-V4O6hB2EgITjhUeFq4YOhnKG14c7h5+IBIhpiM6JM4mZif6KZIrKizCLlov8jGOMyo0xjZiN/45mjs6P
-No+ekAaQbpDWkT+RqJIRknqS45NNk7aUIJSKlPSVX5XJljSWn5cKl3WX4JhMmLiZJJmQmfyaaJrVm0Kb
-r5wcnImc951kndKeQJ6unx2fi5/6oGmg2KFHobaiJqKWowajdqPmpFakx6U4pammGqaLpv2nbqfgqFKo
-xKk3qamqHKqPqwKrdavprFys0K1ErbiuLa6hrxavi7AAsHWw6rFgsdayS7LCszizrrQltJy1E7WKtgG2
-ebbwt2i34LhZuNG5SrnCuju6tbsuu6e8IbybvRW9j74KvoS+/796v/XAcMDswWfB48JfwtvDWMPUxFHE
-zsVLxcjGRsbDx0HHv8g9yLzJOsm5yjjKt8s2y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TT
-xtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp22vvbgNwF3IrdEN2W3hzeot8p36/gNuC94UThzOJT4tvj
-Y+Pr5HPk/OWE5g3mlucf56noMui86Ubp0Opb6uXrcOv77IbtEe2c7ijutO9A78zwWPDl8XLx//KM8xnz
-p/Q09ML1UPXe9m32+/eK+Bn4qPk4+cf6V/rn+3f8B/yY/Sn9uv5L/tz/bf//cGFyYQAAAAAAAwAAAAJm
-ZgAA8qcAAA1ZAAAT0AAACg52Y2d0AAAAAAAAAAEAAQAAAAAAAAABAAAAAQAAAAAAAAABAAAAAQAAAAAA
-AAABAABuZGluAAAAAAAAADYAAKdAAABVgAAATMAAAJ7AAAAlgAAADMAAAFAAAABUQAACMzMAAjMzAAIz
-MwAAAAAAAAAAc2YzMgAAAAAAAQxyAAAF+P//8x0AAAe6AAD9cv//+53///2kAAAD2QAAwHFtbW9kAAAA
-AAAABhAAAKAHAAAAAMknHgAAAAAAAAAAAAAAAAAAAAAA0iUmJyhaJGNsYXNzbmFtZVgkY2xhc3Nlc18Q
-EE5TQml0bWFwSW1hZ2VSZXCjJykqWk5TSW1hZ2VSZXBYTlNPYmplY3TSJSYsLVdOU0FycmF5oiwq0iUm
-LzBeTlNNdXRhYmxlQXJyYXmjLywq0zIzCjQ1NldOU1doaXRlXE5TQ29sb3JTcGFjZUQwIDAAEAOADNIl
-Jjg5V05TQ29sb3KiOCrSJSY7PFdOU0ltYWdlojsqXxAPTlNLZXllZEFyY2hpdmVy0T9AVHJvb3SAAQAI
-ABEAGgAjAC0AMgA3AEYATABXAF4AZQByAHkAgQCDAIUAigCMAI4AlwCcAKcAqQCrAK0AsgC1ALcAuQC7
-AL0AwgDZANsA3RKlEqoStRK+EtES1RLgEukS7hL2EvkS/hMNExETGBMgEy0TMhM0EzYTOxNDE0YTSxNT
-E1YTaBNrE3AAAAAAAAACAQAAAAAAAABBAAAAAAAAAAAAAAAAAAATcg
+KWOQI0JCiUkCLoQI0pAmAECfwQIzUdiRkIICABEBAAADAAAAAQASAAABAQADAAAAAQASAAABAgADAAAA
+BAAABTQBAwADAAAAAQAFAAABBgADAAAAAQACAAABCgADAAAAAQABAAABEQAEAAAAAQAAAAgBEgADAAAA
+AQABAAABFQADAAAAAQAEAAABFgADAAAAAQASAAABFwAEAAAAAQAABFoBHAADAAAAAQABAAABKAADAAAA
+AQACAAABPQADAAAAAQACAAABUgADAAAAAQABAAABUwADAAAABAAABTyHcwAHAAAMmAAABUQAAAAAAAgA
+CAAIAAgAAQABAAEAAQAADJhhcHBsAhAAAG1udHJSR0IgWFlaIAfdAAMADgAWAAEAO2Fjc3BBUFBMAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD21gABAAAAANMtYXBwbAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEWRlc2MAAAFQAAAAYmRzY20AAAG0AAABgGNwcnQAAAM0AAAA
+JHd0cHQAAANYAAAAFHJYWVoAAANsAAAAFGdYWVoAAAOAAAAAFGJYWVoAAAOUAAAAFHJUUkMAAAOoAAAI
+DGFhcmcAAAu0AAAAIHZjZ3QAAAvUAAAAMG5kaW4AAAwEAAAAPmNoYWQAAAxEAAAALG1tb2QAAAxwAAAA
+KGJUUkMAAAOoAAAIDGdUUkMAAAOoAAAIDGFhYmcAAAu0AAAAIGFhZ2cAAAu0AAAAIGRlc2MAAAAAAAAA
+CERpc3BsYXkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABtbHVjAAAAAAAAAB4AAAAMc2tTSwAAAAgAAAF4Y2FF
+UwAAAAgAAAF4aGVJTAAAAAgAAAF4cHRCUgAAAAgAAAF4aXRJVAAAAAgAAAF4aHVIVQAAAAgAAAF4dWtV
+QQAAAAgAAAF4a29LUgAAAAgAAAF4bmJOTwAAAAgAAAF4Y3NDWgAAAAgAAAF4emhUVwAAAAgAAAF4ZGVE
+RQAAAAgAAAF4cm9STwAAAAgAAAF4c3ZTRQAAAAgAAAF4emhDTgAAAAgAAAF4amFKUAAAAAgAAAF4YXIA
+AAAAAAgAAAF4ZWxHUgAAAAgAAAF4cHRQVAAAAAgAAAF4bmxOTAAAAAgAAAF4ZnJGUgAAAAgAAAF4ZXNF
+UwAAAAgAAAF4dGhUSAAAAAgAAAF4dHJUUgAAAAgAAAF4ZmlGSQAAAAgAAAF4aHJIUgAAAAgAAAF4cGxQ
+TAAAAAgAAAF4cnVSVQAAAAgAAAF4ZW5VUwAAAAgAAAF4ZGFESwAAAAgAAAF4AGkATQBhAGN0ZXh0AAAA
+AENvcHlyaWdodCBBcHBsZSwgSW5jLiwgMjAxMwBYWVogAAAAAAAA8xYAAQAAAAEWylhZWiAAAAAAAABx
+wAAAOYoAAAFnWFlaIAAAAAAAAGEjAAC55gAAE/ZYWVogAAAAAAAAI/IAAAyQAAC90GN1cnYAAAAAAAAE
+AAAAAAUACgAPABQAGQAeACMAKAAtADIANgA7AEAARQBKAE8AVABZAF4AYwBoAG0AcgB3AHwAgQCGAIsA
+kACVAJoAnwCjAKgArQCyALcAvADBAMYAywDQANUA2wDgAOUA6wDwAPYA+wEBAQcBDQETARkBHwElASsB
+MgE4AT4BRQFMAVIBWQFgAWcBbgF1AXwBgwGLAZIBmgGhAakBsQG5AcEByQHRAdkB4QHpAfIB+gIDAgwC
+FAIdAiYCLwI4AkECSwJUAl0CZwJxAnoChAKOApgCogKsArYCwQLLAtUC4ALrAvUDAAMLAxYDIQMtAzgD
+QwNPA1oDZgNyA34DigOWA6IDrgO6A8cD0wPgA+wD+QQGBBMEIAQtBDsESARVBGMEcQR+BIwEmgSoBLYE
+xATTBOEE8AT+BQ0FHAUrBToFSQVYBWcFdwWGBZYFpgW1BcUF1QXlBfYGBgYWBicGNwZIBlkGagZ7BowG
+nQavBsAG0QbjBvUHBwcZBysHPQdPB2EHdAeGB5kHrAe/B9IH5Qf4CAsIHwgyCEYIWghuCIIIlgiqCL4I
+0gjnCPsJEAklCToJTwlkCXkJjwmkCboJzwnlCfsKEQonCj0KVApqCoEKmAquCsUK3ArzCwsLIgs5C1EL
+aQuAC5gLsAvIC+EL+QwSDCoMQwxcDHUMjgynDMAM2QzzDQ0NJg1ADVoNdA2ODakNww3eDfgOEw4uDkkO
+ZA5/DpsOtg7SDu4PCQ8lD0EPXg96D5YPsw/PD+wQCRAmEEMQYRB+EJsQuRDXEPURExExEU8RbRGMEaoR
+yRHoEgcSJhJFEmQShBKjEsMS4xMDEyMTQxNjE4MTpBPFE+UUBhQnFEkUahSLFK0UzhTwFRIVNBVWFXgV
+mxW9FeAWAxYmFkkWbBaPFrIW1hb6Fx0XQRdlF4kXrhfSF/cYGxhAGGUYihivGNUY+hkgGUUZaxmRGbcZ
+3RoEGioaURp3Gp4axRrsGxQbOxtjG4obshvaHAIcKhxSHHscoxzMHPUdHh1HHXAdmR3DHeweFh5AHmoe
+lB6+HukfEx8+H2kflB+/H+ogFSBBIGwgmCDEIPAhHCFIIXUhoSHOIfsiJyJVIoIiryLdIwojOCNmI5Qj
+wiPwJB8kTSR8JKsk2iUJJTglaCWXJccl9yYnJlcmhya3JugnGCdJJ3onqyfcKA0oPyhxKKIo1CkGKTgp
+aymdKdAqAio1KmgqmyrPKwIrNitpK50r0SwFLDksbiyiLNctDC1BLXYtqy3hLhYuTC6CLrcu7i8kL1ov
+kS/HL/4wNTBsMKQw2zESMUoxgjG6MfIyKjJjMpsy1DMNM0YzfzO4M/E0KzRlNJ402DUTNU01hzXCNf02
+NzZyNq426TckN2A3nDfXOBQ4UDiMOMg5BTlCOX85vDn5OjY6dDqyOu87LTtrO6o76DwnPGU8pDzjPSI9
+YT2hPeA+ID5gPqA+4D8hP2E/oj/iQCNAZECmQOdBKUFqQaxB7kIwQnJCtUL3QzpDfUPARANER0SKRM5F
+EkVVRZpF3kYiRmdGq0bwRzVHe0fASAVIS0iRSNdJHUljSalJ8Eo3Sn1KxEsMS1NLmkviTCpMcky6TQJN
+Sk2TTdxOJU5uTrdPAE9JT5NP3VAnUHFQu1EGUVBRm1HmUjFSfFLHUxNTX1OqU/ZUQlSPVNtVKFV1VcJW
+D1ZcVqlW91dEV5JX4FgvWH1Yy1kaWWlZuFoHWlZaplr1W0VblVvlXDVchlzWXSddeF3JXhpebF69Xw9f
+YV+zYAVgV2CqYPxhT2GiYfViSWKcYvBjQ2OXY+tkQGSUZOllPWWSZedmPWaSZuhnPWeTZ+loP2iWaOxp
+Q2maafFqSGqfavdrT2una/9sV2yvbQhtYG25bhJua27Ebx5veG/RcCtwhnDgcTpxlXHwcktypnMBc11z
+uHQUdHB0zHUodYV14XY+dpt2+HdWd7N4EXhueMx5KnmJeed6RnqlewR7Y3vCfCF8gXzhfUF9oX4BfmJ+
+wn8jf4R/5YBHgKiBCoFrgc2CMIKSgvSDV4O6hB2EgITjhUeFq4YOhnKG14c7h5+IBIhpiM6JM4mZif6K
+ZIrKizCLlov8jGOMyo0xjZiN/45mjs6PNo+ekAaQbpDWkT+RqJIRknqS45NNk7aUIJSKlPSVX5XJljSW
+n5cKl3WX4JhMmLiZJJmQmfyaaJrVm0Kbr5wcnImc951kndKeQJ6unx2fi5/6oGmg2KFHobaiJqKWowaj
+dqPmpFakx6U4pammGqaLpv2nbqfgqFKoxKk3qamqHKqPqwKrdavprFys0K1ErbiuLa6hrxavi7AAsHWw
+6rFgsdayS7LCszizrrQltJy1E7WKtgG2ebbwt2i34LhZuNG5SrnCuju6tbsuu6e8IbybvRW9j74KvoS+
+/796v/XAcMDswWfB48JfwtvDWMPUxFHEzsVLxcjGRsbDx0HHv8g9yLzJOsm5yjjKt8s2y7bMNcy1zTXN
+tc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp22vvbgNwF3Ird
+EN2W3hzeot8p36/gNuC94UThzOJT4tvjY+Pr5HPk/OWE5g3mlucf56noMui86Ubp0Opb6uXrcOv77Ibt
+Ee2c7ijutO9A78zwWPDl8XLx//KM8xnzp/Q09ML1UPXe9m32+/eK+Bn4qPk4+cf6V/rn+3f8B/yY/Sn9
+uv5L/tz/bf//cGFyYQAAAAAAAwAAAAJmZgAA8qcAAA1ZAAAT0AAACg52Y2d0AAAAAAAAAAEAAQAAAAAA
+AAABAAAAAQAAAAAAAAABAAAAAQAAAAAAAAABAABuZGluAAAAAAAAADYAAKdAAABVgAAATMAAAJ7AAAAl
+gAAADMAAAFAAAABUQAACMzMAAjMzAAIzMwAAAAAAAAAAc2YzMgAAAAAAAQxyAAAF+P//8x0AAAe6AAD9
+cv//+53///2kAAAD2QAAwHFtbW9kAAAAAAAABhAAAKAHAAAAAMknHgAAAAAAAAAAAAAAAAAAAAAA0iUm
+JyhaJGNsYXNzbmFtZVgkY2xhc3Nlc18QEE5TQml0bWFwSW1hZ2VSZXCjJykqWk5TSW1hZ2VSZXBYTlNP
+YmplY3TSJSYsLVdOU0FycmF5oiwq0iUmLzBeTlNNdXRhYmxlQXJyYXmjLywq0zIzCjQ1NldOU1doaXRl
+XE5TQ29sb3JTcGFjZUQwIDAAEAOADNIlJjg5V05TQ29sb3KiOCrSJSY7PFdOU0ltYWdlojsqXxAPTlNL
+ZXllZEFyY2hpdmVy0T9AVHJvb3SAAQAIABEAGgAjAC0AMgA3AEYATABXAF4AZQByAHkAgQCDAIUAigCM
+AI4AlwCcAKcAqQCrAK0AsgC1ALcAuQC7AL0AwgDZANsA3RK9EsISzRLWEukS7RL4EwETBhMOExETFhMl
+EykTMBM4E0UTShNME04TUxNbE14TYxNrE24TgBODE4gAAAAAAAACAQAAAAAAAABBAAAAAAAAAAAAAAAA
+AAATig
 </mutableData>
         </image>
-        <image name="NSAddTemplate" width="11" height="11"/>
-        <image name="NSRemoveTemplate" width="11" height="11"/>
-        <image name="NSStatusPartiallyAvailable" width="16" height="16"/>
-        <image name="TurtleTemplate" width="18" height="18"/>
     </resources>
 </document>

@@ -1,3 +1,13 @@
+=== Transmission 3.00 (2019/mm/dd) ===
+[https://github.com/transmission/transmission/releases/tag/3.00]
+==== All Platforms ====
+==== OS X Client Client ====
+  * Dark Mode support
+  * Sparkle updated to 1.21.2
+  * Minimum OS version updated to 10.10
+==== Qt Client ====
+==== Web Client ====
+
 === Transmission 2.94 (2018/05/01) ===
 [https://github.com/transmission/transmission/releases/tag/2.94 All tickets closed by this release]
 ==== All Platforms ====
@@ -9,7 +19,7 @@
   * Fix bad downloaded percentage in DetailsDialog  (#547)
 ==== Web Client ====
   * Fix tracker error XSS in inspector (CVE pending)
-  * Fix torrent name HTML-escaping in trackers inspector tabTODO
+  * Fix torrent name HTML-escaping in trackers inspector tab
 
 === Transmission 2.93 (2018/01/23) ===
 [https://github.com/transmission/transmission/releases/tag/2.93 All tickets closed by this release]

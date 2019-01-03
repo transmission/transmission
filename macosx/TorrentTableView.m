@@ -156,15 +156,6 @@
             [cell setActionHover: row == fMouseActionRow];
         }
     }
-    else
-    {
-        NSString * ident = tableColumn.identifier;
-        if ([ident isEqualToString: @"UL Image"] || [ident isEqualToString: @"DL Image"])
-        {
-            //ensure arrows are white only when selected
-            [cell image].template = [cell backgroundStyle] == NSBackgroundStyleLowered;
-        }
-    }
 }
 
 - (NSRect) frameOfCellAtColumn: (NSInteger) column row: (NSInteger) row
