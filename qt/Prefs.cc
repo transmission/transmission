@@ -59,6 +59,7 @@ Prefs::PrefItem Prefs::myItems[] =
     { FILTER_TEXT, TR_KEY_filter_text, QVariant::String },
     { SESSION_IS_REMOTE, TR_KEY_remote_session_enabled, QVariant::Bool },
     { SESSION_REMOTE_HOST, TR_KEY_remote_session_host, QVariant::String },
+    { SESSION_REMOTE_RPC_URL, TR_KEY_rpc_url, QVariant::String },
     { SESSION_REMOTE_PORT, TR_KEY_remote_session_port, QVariant::Int },
     { SESSION_REMOTE_AUTH, TR_KEY_remote_session_requres_authentication, QVariant::Bool },
     { SESSION_REMOTE_USERNAME, TR_KEY_remote_session_username, QVariant::String },
@@ -342,6 +343,7 @@ void Prefs::initDefaults(tr_variant* d)
     tr_variantDictAddInt(d, TR_KEY_main_window_x, 50);
     tr_variantDictAddInt(d, TR_KEY_main_window_y, 50);
     tr_variantDictAddInt(d, TR_KEY_remote_session_port, atoi(TR_DEFAULT_RPC_PORT_STR));
+    tr_variantDictAddStr(d, TR_KEY_rpc_url, TR_DEFAULT_RPC_URL_STR);
     tr_variantDictAddStr(d, TR_KEY_download_dir, tr_getDefaultDownloadDir());
     tr_variantDictAddStr(d, TR_KEY_filter_mode, "all");
     tr_variantDictAddStr(d, TR_KEY_main_window_layout_order, "menu,toolbar,filter,list,statusbar");

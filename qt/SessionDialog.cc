@@ -18,6 +18,7 @@ void SessionDialog::accept()
 {
     myPrefs.set(Prefs::SESSION_IS_REMOTE, ui.remoteSessionRadio->isChecked());
     myPrefs.set(Prefs::SESSION_REMOTE_HOST, ui.hostEdit->text());
+    myPrefs.set(Prefs::SESSION_REMOTE_RPC_URL, ui.rpcEdit->text());
     myPrefs.set(Prefs::SESSION_REMOTE_PORT, ui.portSpin->value());
     myPrefs.set(Prefs::SESSION_REMOTE_AUTH, ui.authCheck->isChecked());
     myPrefs.set(Prefs::SESSION_REMOTE_USERNAME, ui.usernameEdit->text());
@@ -61,6 +62,9 @@ SessionDialog::SessionDialog(Session& session, Prefs& prefs, QWidget* parent) :
 
     ui.hostEdit->setText(prefs.get<QString>(Prefs::SESSION_REMOTE_HOST));
     myRemoteWidgets << ui.hostLabel << ui.hostEdit;
+
+    ui.rpcEdit->setText(prefs.get<QString>(Prefs::SESSION_REMOTE_RPC_URL));
+    myRemoteWidgets << ui.rpcLabel << ui.rpcEdit;
 
     ui.portSpin->setValue(prefs.get<int>(Prefs::SESSION_REMOTE_PORT));
     myRemoteWidgets << ui.portLabel << ui.portSpin;
