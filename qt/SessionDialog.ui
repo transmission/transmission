@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>250</width>
-    <height>265</height>
+    <height>292</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -122,7 +122,7 @@
      <item row="4" column="0">
       <widget class="QLabel" name="rpcLabel">
        <property name="text">
-        <string>RP&amp;C URL path:</string>
+        <string>RPC URL pa&amp;th:</string>
        </property>
        <property name="buddy">
         <cstring>rpcEdit</cstring>
