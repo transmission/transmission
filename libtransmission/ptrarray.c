@@ -29,20 +29,19 @@ void tr_ptrArrayDestruct(tr_ptrArray* p, PtrArrayForeachFunc func)
     tr_free(p->items);
 }
 
-tr_ptrArray*
-tr_ptrArrayNew (void)
+tr_ptrArray* tr_ptrArrayNew(void)
 {
-    tr_ptrArray * p = tr_new (tr_ptrArray, 1);
+    tr_ptrArray * p = tr_new(tr_ptrArray, 1);
     *p = TR_PTR_ARRAY_INIT;
     return p;
 }
-tr_ptrArray*
-tr_ptrArrayDup (tr_ptrArray* in)
+
+tr_ptrArray* tr_ptrArrayDup(tr_ptrArray* in)
 {
     tr_ptrArray * out;
-    out = tr_new (tr_ptrArray, 1);
+    out = tr_new(tr_ptrArray, 1);
     out->n_items = out->n_alloc = in->n_items;
-    out->items = tr_memdup (in->items, out->n_items * sizeof (void*));
+    out->items = tr_memdup(in->items, out->n_items * sizeof (void*));
     return out;
 }
 
@@ -58,12 +57,10 @@ void tr_ptrArrayForeach(tr_ptrArray* t, PtrArrayForeachFunc func)
     }
 }
 
-void
-tr_ptrArrayFree (tr_ptrArray *       t,
-                 PtrArrayForeachFunc func)
+void tr_ptrArrayFree(tr_ptrArray* t, PtrArrayForeachFunc func)
 {
-    tr_ptrArrayDestruct (t, func);
-    tr_free (t);
+    tr_ptrArrayDestruct(t, func);
+    tr_free(t);
 }
 
 void** tr_ptrArrayPeek(tr_ptrArray* t, int* size)

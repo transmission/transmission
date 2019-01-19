@@ -111,32 +111,30 @@ static uint64_t loadPeers(tr_variant* dict, tr_torrent* tor)
 ****
 ***/
 
-static void
-saveLabels (tr_variant * dict, const tr_torrent * tor)
+static void saveLabels(tr_variant* dict, const tr_torrent* tor)
 {
-  int i, n = tr_ptrArraySize (tor->labels);
-  tr_variant * list;
-  list = tr_variantDictAddList (dict, TR_KEY_labels, n);
-  for (i = 0; i<n; ++i)
-    tr_variantListAddStr (list, tr_ptrArrayNth (tor->labels, i));
+    int i, n = tr_ptrArraySize(tor->labels);
+    tr_variant* list;
+    list = tr_variantDictAddList(dict, TR_KEY_labels, n);
+    for (i = 0; i < n; ++i)
+        tr_variantListAddStr(list, tr_ptrArrayNth (tor->labels, i));
 }
 
-static uint64_t
-loadLabels (tr_variant * dict, tr_torrent * tor)
+static uint64_t loadLabels(tr_variant* dict, tr_torrent* tor)
 {
-  uint64_t ret = 0;
-  tr_variant * list = NULL;
-  if (tr_variantDictFindList (dict, TR_KEY_labels, &list))
+    uint64_t ret = 0;
+    tr_variant* list = NULL;
+    if (tr_variantDictFindList(dict, TR_KEY_labels, &list))
     {
-      int i, n = tr_variantListSize (list);
-      const char * str;
-      size_t str_len;
-      for (i = 0; i<n; ++i)
-        if (tr_variantGetStr (tr_variantListChild (list, i), &str, &str_len) && str && str_len)
-          tr_ptrArrayAppend (tor->labels, tr_strndup (str, str_len));
-      ret = TR_FR_LABELS;
+        int i, n = tr_variantListSize(list);
+        const char* str;
+        size_t str_len;
+        for (i = 0; i < n; ++i)
+            if (tr_variantGetStr(tr_variantListChild(list, i), &str, &str_len) && str && str_len)
+                tr_ptrArrayAppend(tor->labels, tr_strndup(str, str_len));
+        ret = TR_FR_LABELS;
     }
-  return ret;
+    return ret;
 }
 
 /***
