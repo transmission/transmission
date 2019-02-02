@@ -17,7 +17,7 @@
                 <outlet property="fPrivateCheck" destination="22" id="33"/>
                 <outlet property="fProgressIndicator" destination="57" id="61"/>
                 <outlet property="fProgressView" destination="56" id="60"/>
-                <outlet property="fSourceFlag" destination="R2K-fl-edv" id="bqE-sb-RJZ"/>
+                <outlet property="fSource" destination="R2K-fl-edv" id="bqE-sb-RJZ"/>
                 <outlet property="fStatusField" destination="10" id="34"/>
                 <outlet property="fTrackerAddRemoveControl" destination="103" id="105"/>
                 <outlet property="fTrackerTable" destination="92" id="99"/>
@@ -276,7 +276,7 @@ Gw
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="YES" id="faa-JK-W9Q">
                         <rect key="frame" x="21" y="123" width="77" height="17"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Source flag:" id="f1g-Kk-weU">
+                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Source tag:" id="f1g-Kk-weU">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>

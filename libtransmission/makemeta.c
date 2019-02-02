@@ -427,7 +427,7 @@ static void makeInfoDict(tr_variant* dict, tr_metainfo_builder* builder)
     }
 
     tr_variantDictAddInt(dict, TR_KEY_private, builder->isPrivate ? 1 : 0);
-    if (builder->source != NULL && *builder->source != '\0')
+    if (builder->source != NULL)
     {
         tr_variantDictAddStr(dict, TR_KEY_source, builder->source);
     }
@@ -569,7 +569,7 @@ static void makeMetaWorkerFunc(void* unused UNUSED)
 }
 
 void tr_makeMetaInfo(tr_metainfo_builder* builder, char const* outputFile, tr_tracker_info const* trackers, int trackerCount,
-    char const* comment, bool isPrivate, char const* sourceFlag)
+    char const* comment, bool isPrivate, char const* source)
 {
     tr_lock* lock;
 
@@ -600,7 +600,7 @@ void tr_makeMetaInfo(tr_metainfo_builder* builder, char const* outputFile, tr_tr
 
     builder->comment = tr_strdup(comment);
     builder->isPrivate = isPrivate;
-    builder->source = tr_strdup(sourceFlag);
+    builder->source = tr_strdup(source);
 
     if (outputFile != NULL && *outputFile != '\0')
     {

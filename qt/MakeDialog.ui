@@ -158,14 +158,14 @@ To add another primary URL, add it after a blank line.</string>
       </widget>
      </item>
      <item row="3" column="0">
-      <widget class="QCheckBox" name="sourceFlagCheck">
+      <widget class="QCheckBox" name="sourceCheck">
        <property name="text">
-        <string>&amp;Source flag:</string>
+        <string>&amp;Source tag:</string>
        </property>
       </widget>
      </item>
      <item row="3" column="1">
-      <widget class="QLineEdit" name="sourceFlagEdit">
+      <widget class="QLineEdit" name="sourceEdit">
        <property name="enabled">
         <bool>false</bool>
        </property>
@@ -250,9 +250,9 @@ To add another primary URL, add it after a blank line.</string>
    </hints>
   </connection>
   <connection>
-   <sender>sourceFlagCheck</sender>
+   <sender>sourceCheck</sender>
    <signal>toggled(bool)</signal>
-   <receiver>sourceFlagEdit</receiver>
+   <receiver>sourceEdit</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">

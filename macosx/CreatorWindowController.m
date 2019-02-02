@@ -192,8 +192,8 @@ NSMutableSet *creatorWindowControllerSet = nil;
     if ([fDefaults objectForKey: @"CreatorPrivate"])
         [fPrivateCheck setState: [fDefaults boolForKey: @"CreatorPrivate"] ? NSOnState : NSOffState];
     
-    if ([fDefaults objectForKey: @"CreatorSourceFlag"])
-        [fSourceFlag setStringValue: [fDefaults stringForKey: @"CreatorSourceFlag"]];
+    if ([fDefaults objectForKey: @"CreatorSource"])
+        [fSource setStringValue: [fDefaults stringForKey: @"CreatorSource"]];
 
     [fOpenCheck setState: [fDefaults boolForKey: @"CreatorOpen"] ? NSOnState : NSOffState];
 }
@@ -226,7 +226,7 @@ NSMutableSet *creatorWindowControllerSet = nil;
     [state encodeObject: fTrackers forKey: @"TRCreatorTrackers"];
     [state encodeInteger: [fOpenCheck state] forKey: @"TRCreatorOpenCheck"];
     [state encodeInteger: [fPrivateCheck state] forKey: @"TRCreatorPrivateCheck"];
-    [state encodeObject: [fSourceFlag stringValue] forKey: @"TRCreatorSourceFlag"];
+    [state encodeObject: [fSource stringValue] forKey: @"TRCreatorSource"];
     [state encodeObject: [fCommentView string] forKey: @"TRCreatorPrivateComment"];
 }
 
@@ -240,7 +240,7 @@ NSMutableSet *creatorWindowControllerSet = nil;
 
     [fOpenCheck setState: [coder decodeIntegerForKey: @"TRCreatorOpenCheck"]];
     [fPrivateCheck setState: [coder decodeIntegerForKey: @"TRCreatorPrivateCheck"]];
-    [fSourceFlag setStringValue: [coder decodeObjectForKey: @"TRCreatorSourceFlag"]];
+    [fSource setStringValue: [coder decodeObjectForKey: @"TRCreatorSource"]];
     [fCommentView setString: [coder decodeObjectForKey: @"TRCreatorPrivateComment"]];
 }
 
@@ -534,7 +534,7 @@ NSMutableSet *creatorWindowControllerSet = nil;
     //store values
     [fDefaults setObject: fTrackers forKey: @"CreatorTrackers"];
     [fDefaults setBool: [fPrivateCheck state] == NSOnState forKey: @"CreatorPrivate"];
-    [fDefaults setObject: [fSourceFlag stringValue] forKey: @"CreatorSourceFlag"];
+    [fDefaults setObject: [fSource stringValue] forKey: @"CreatorSource"];
     [fDefaults setBool: [fOpenCheck state] == NSOnState forKey: @"CreatorOpen"];
     fOpenWhenCreated = [fOpenCheck state] == NSOnState; //need this since the check box might not exist, and value in prefs might have changed from another creator window
     [fDefaults setURL: [fLocation URLByDeletingLastPathComponent] forKey: @"CreatorLocationURL"];
@@ -542,7 +542,7 @@ NSMutableSet *creatorWindowControllerSet = nil;
     [[self window] setRestorable: NO];
 
     [[NSNotificationCenter defaultCenter] postNotificationName: @"BeginCreateTorrentFile" object: fLocation userInfo: nil];
-    tr_makeMetaInfo(fInfo, [[fLocation path] UTF8String], trackerInfo, [fTrackers count], [[fCommentView string] UTF8String], [fPrivateCheck state] == NSOnState, [[fSourceFlag stringValue] UTF8String]);
+    tr_makeMetaInfo(fInfo, [[fLocation path] UTF8String], trackerInfo, [fTrackers count], [[fCommentView string] UTF8String], [fPrivateCheck state] == NSOnState, [[fSource stringValue] UTF8String]);
     tr_free(trackerInfo);
 
     fTimer = [NSTimer scheduledTimerWithTimeInterval: 0.1 target: self selector: @selector(checkProgress) userInfo: nil repeats: YES];

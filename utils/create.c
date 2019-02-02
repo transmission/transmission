@@ -31,12 +31,12 @@ static char const* comment = NULL;
 static char const* outfile = NULL;
 static char const* infile = NULL;
 static uint32_t piecesize_kib = 0;
-static char const* source_flag = NULL;
+static char const* source = NULL;
 
 static tr_option options[] =
 {
     { 'p', "private", "Allow this torrent to only be used with the specified tracker(s)", "p", 0, NULL },
-    { 'r', "source", "Set the source flag for private trackers", "r", 1, "<flag>" },
+    { 'r', "source", "Set the source tag for private trackers", "r", 1, "<flag>" },
     { 'o', "outfile", "Save the generated .torrent to this filename", "o", 1, "<file>" },
     { 's', "piecesize", "Set how many KiB each piece should be, overriding the preferred default", "s", 1, "<size in KiB>" },
     { 'c', "comment", "Add a comment", "c", 1, "<comment>" },
@@ -100,7 +100,7 @@ static int parseCommandLine(int argc, char const* const* argv)
             break;
 
         case 'r':
-            source_flag = optarg;
+            source = optarg;
             break;
 
         case TR_OPT_UNK:
@@ -209,7 +209,7 @@ int tr_main(int argc, char* argv[])
         tr_metaInfoBuilderSetPieceSize(b, piecesize_kib * KiB);
     }
 
-    tr_makeMetaInfo(b, outfile, trackers, trackerCount, comment, isPrivate, source_flag);
+    tr_makeMetaInfo(b, outfile, trackers, trackerCount, comment, isPrivate, source);
 
     while (!b->isDone)
     {

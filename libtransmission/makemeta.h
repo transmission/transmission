@@ -116,7 +116,7 @@ void tr_metaInfoBuilderFree(tr_metainfo_builder*);
  * @param trackerCount size of the `trackers' array
  */
 void tr_makeMetaInfo(tr_metainfo_builder* builder, char const* outputFile, tr_tracker_info const* trackers, int trackerCount,
-    char const* comment, bool isPrivate, char const* sourceFlag);
+    char const* comment, bool isPrivate, char const* source);
 
 #ifdef __cplusplus
 }

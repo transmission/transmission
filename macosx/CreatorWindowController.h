@@ -33,7 +33,7 @@
     IBOutlet NSSegmentedControl * fTrackerAddRemoveControl;
     IBOutlet NSTextView * fCommentView;
     IBOutlet NSButton * fPrivateCheck, * fOpenCheck;
-    IBOutlet NSTextField * fSourceFlag;
+    IBOutlet NSTextField * fSource;
 
     IBOutlet NSView * fProgressView;
     IBOutlet NSProgressIndicator * fProgressIndicator;
