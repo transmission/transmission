@@ -2328,6 +2328,8 @@ void tr_torrentRecheckCompleteness(tr_torrent* tor)
 
             if (tr_sessionIsTorrentDoneScriptEnabled(tor->session))
             {
+                tr_torrentSave(tor);
+
                 torrentCallScript(tor, tr_sessionGetTorrentDoneScript(tor->session));
             }
         }
