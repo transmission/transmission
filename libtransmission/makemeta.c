@@ -232,7 +232,7 @@ void tr_metaInfoBuilderFree(tr_metainfo_builder* builder)
         tr_free(builder->files);
         tr_free(builder->top);
         tr_free(builder->comment);
-        tr_free(builder->sourceFlag);
+        tr_free(builder->source);
 
         for (int i = 0; i < builder->trackerCount; ++i)
         {
@@ -427,9 +427,9 @@ static void makeInfoDict(tr_variant* dict, tr_metainfo_builder* builder)
     }
 
     tr_variantDictAddInt(dict, TR_KEY_private, builder->isPrivate ? 1 : 0);
-    if (builder->sourceFlag != NULL && *builder->sourceFlag != '\0')
+    if (builder->source != NULL && *builder->source != '\0')
     {
-        tr_variantDictAddStr(dict, TR_KEY_source, builder->sourceFlag);
+        tr_variantDictAddStr(dict, TR_KEY_source, builder->source);
     }
 }
 
@@ -581,7 +581,7 @@ void tr_makeMetaInfo(tr_metainfo_builder* builder, char const* outputFile, tr_tr
 
     tr_free(builder->trackers);
     tr_free(builder->comment);
-    tr_free(builder->sourceFlag);
+    tr_free(builder->source);
     tr_free(builder->outputFile);
 
     /* initialize the builder variables */
@@ -600,7 +600,7 @@ void tr_makeMetaInfo(tr_metainfo_builder* builder, char const* outputFile, tr_tr
 
     builder->comment = tr_strdup(comment);
     builder->isPrivate = isPrivate;
-    builder->sourceFlag = tr_strdup(sourceFlag);
+    builder->source = tr_strdup(sourceFlag);
 
     if (outputFile != NULL && *outputFile != '\0')
     {

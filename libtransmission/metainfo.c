@@ -600,8 +600,8 @@ static char const* tr_metainfoParseImpl(tr_session const* session, tr_info* inf,
         }
     }
 
-    tr_free(inf->sourceFlag);
-    inf->sourceFlag = tr_utf8clean(str, len);
+    tr_free(inf->source);
+    inf->source = tr_utf8clean(str, len);
     
     /* piece length */
     if (!isMagnet)

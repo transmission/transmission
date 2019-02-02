@@ -1610,6 +1610,10 @@ struct tr_info
 
     char* comment;
     char* creator;
+
+    /* torrent's source flag. empty if not set. */
+    char* source;
+
     tr_file* files;
     tr_piece* pieces;
 
@@ -1632,7 +1636,6 @@ struct tr_info
     /* Flags */
     bool isPrivate;
     bool isFolder;
-    char* sourceFlag;
 };
 
 static inline bool tr_torrentHasMetadata(tr_torrent const* tor)

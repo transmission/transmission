@@ -49,7 +49,7 @@ static int test_single_file_impl(tr_tracker_info const* trackers, size_t const t
     check_bool(isPrivate, ==, builder->isPrivate);
     check_str(builder->outputFile, ==, torrent_file);
     check_str(builder->comment, ==, comment);
-    check_str(builder->sourceFlag, ==, sourceFlag);
+    check_str(builder->source, ==, sourceFlag);
     check_int(builder->trackerCount, ==, trackerCount);
 
     while (!builder->isDone)
@@ -72,7 +72,7 @@ static int test_single_file_impl(tr_tracker_info const* trackers, size_t const t
     check_str(inf.comment, ==, comment);
     check_int(inf.fileCount, ==, 1);
     check_int(inf.isPrivate, ==, isPrivate);
-    check_str(inf.sourceFlag, ==, sourceFlag);
+    check_str(inf.source, ==, sourceFlag);
     check(!inf.isFolder);
     check_int(inf.trackerCount, ==, trackerCount);
 
@@ -170,7 +170,7 @@ static int test_single_directory_impl(tr_tracker_info const* trackers, size_t co
     check_bool(isPrivate, ==, builder->isPrivate);
     check_str(builder->outputFile, ==, torrent_file);
     check_str(builder->comment, ==, comment);
-    check_str(builder->sourceFlag, ==, sourceFlag);
+    check_str(builder->source, ==, sourceFlag);
     check_int(builder->trackerCount, ==, trackerCount);
 
     while (!builder->isDone)
@@ -191,7 +191,7 @@ static int test_single_directory_impl(tr_tracker_info const* trackers, size_t co
     check_str(inf.name, ==, tmpstr);
     tr_free(tmpstr);
     check_str(inf.comment, ==, comment);
-    check_str(inf.sourceFlag, ==, sourceFlag);
+    check_str(inf.source, ==, sourceFlag);
     check_int(inf.fileCount, ==, payloadCount);
     check_int(inf.isPrivate, ==, isPrivate);
     check_int(inf.isFolder, ==, builder->isFolder);

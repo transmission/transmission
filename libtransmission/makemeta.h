@@ -56,7 +56,7 @@ typedef struct tr_metainfo_builder
     char* comment;
     char* outputFile;
     bool isPrivate;
-    char* sourceFlag;
+    char* source;
 
     /**
     ***  These are set inside tr_makeMetaInfo() so the client
