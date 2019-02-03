@@ -677,7 +677,7 @@
 + (NSInteger) dateToTimeSum: (NSDate *) date
 {
     NSCalendar * calendar = [NSCalendar currentCalendar];
-    NSDateComponents * components = [calendar components: NSHourCalendarUnit | NSMinuteCalendarUnit fromDate: date];
+    NSDateComponents * components = [calendar components: NSCalendarUnitHour | NSCalendarUnitMinute fromDate: date];
     return [components hour] * 60 + [components minute];
 }
 

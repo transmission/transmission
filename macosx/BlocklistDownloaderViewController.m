@@ -29,7 +29,6 @@
 
 - (id) initWithPrefsController: (PrefsController *) prefsController;
 - (void) startDownload;
-- (void) failureSheetClosed: (NSAlert *) alert returnCode: (NSInteger) code contextInfo: (void *) info;
 
 @end
 
@@ -100,7 +99,7 @@ BlocklistDownloaderViewController * fBLViewController = nil;
 
 - (void) setFinished
 {
-    [NSApp endSheet: fStatusWindow];
+    [[fPrefsController window] endSheet: fStatusWindow];
     [fStatusWindow orderOut: self];
 
     fBLViewController = nil;
@@ -108,7 +107,7 @@ BlocklistDownloaderViewController * fBLViewController = nil;
 
 - (void) setFailed: (NSString *) error
 {
-    [NSApp endSheet: fStatusWindow];
+    [[fPrefsController window] endSheet: fStatusWindow];
     [fStatusWindow orderOut: self];
 
     NSAlert * alert = [[NSAlert alloc] init];
@@ -118,8 +117,9 @@ BlocklistDownloaderViewController * fBLViewController = nil;
 
     [alert setInformativeText: error];
 
-    [alert beginSheetModalForWindow: [fPrefsController window] modalDelegate: self
-        didEndSelector: @selector(failureSheetClosed:returnCode:contextInfo:) contextInfo: nil];
+    [alert beginSheetModalForWindow: [fPrefsController window] completionHandler: ^(NSModalResponse returnCode) {
+        fBLViewController = nil;
+    }];
 }
 
 @end
@@ -144,14 +144,7 @@ BlocklistDownloaderViewController * fBLViewController = nil;
     BlocklistDownloader * downloader = [BlocklistDownloader downloader];
     [downloader setViewController: self]; //do before showing the sheet to ensure it doesn't slide out with placeholder text
 
-    [NSApp beginSheet: fStatusWindow modalForWindow: [fPrefsController window] modalDelegate: nil didEndSelector: nil contextInfo: nil];
-}
-
-- (void) failureSheetClosed: (NSAlert *) alert returnCode: (NSInteger) code contextInfo: (void *) info
-{
-    [[alert window] orderOut: self];
-
-    fBLViewController = nil;
+    [[fPrefsController window] beginSheet: fStatusWindow completionHandler: nil];
 }
 
 @end
