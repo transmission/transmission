@@ -799,7 +799,7 @@
 		A292C9E01413BA5F00EF710F /* es */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = es; path = macosx/es.lproj/GlobalOptionsPopover.xib; sourceTree = "<group>"; };
 		A292C9E2141593DA00EF710F /* de */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = de; path = macosx/de.lproj/GlobalOptionsPopover.xib; sourceTree = "<group>"; };
 		A292C9E414163AE500EF710F /* it */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = it; path = macosx/it.lproj/GlobalOptionsPopover.xib; sourceTree = "<group>"; };
-		A29304EC15D7465100B1F726 /* style.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; name = style.css; path = macosx/QuickLookPlugin/style.css; sourceTree = SOURCE_ROOT; };
+		A29304EC15D7465100B1F726 /* style.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = style.css; sourceTree = "<group>"; };
 		A29443271419746A0016143A /* ru */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = ru; path = macosx/ru.lproj/GlobalOptionsPopover.xib; sourceTree = "<group>"; };
 		A294432E141B23CD0016143A /* pt_PT */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = pt_PT; path = macosx/pt_PT.lproj/GlobalOptionsPopover.xib; sourceTree = "<group>"; };
 		A2963CFD1423F2BB00C497B5 /* fr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = fr; path = macosx/fr.lproj/GlobalOptionsPopover.xib; sourceTree = "<group>"; };
@@ -912,12 +912,12 @@
 		A2F35BBD15C5A0A100EBF632 /* ApplicationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ApplicationServices.framework; path = System/Library/Frameworks/ApplicationServices.framework; sourceTree = SDKROOT; };
 		A2F35BBF15C5A0A100EBF632 /* CoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreServices.framework; path = System/Library/Frameworks/CoreServices.framework; sourceTree = SDKROOT; };
 		A2F35BC115C5A0A100EBF632 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
-		A2F35BC515C5A0A100EBF632 /* QuickLookPlugin-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "QuickLookPlugin-Info.plist"; path = "macosx/QuickLookPlugin/QuickLookPlugin-Info.plist"; sourceTree = SOURCE_ROOT; };
+		A2F35BC515C5A0A100EBF632 /* QuickLookPlugin-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "QuickLookPlugin-Info.plist"; sourceTree = "<group>"; };
 		A2F35BC715C5A0A100EBF632 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		A2F35BC915C5A0A100EBF632 /* GenerateThumbnailForURL.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = GenerateThumbnailForURL.m; path = macosx/QuickLookPlugin/GenerateThumbnailForURL.m; sourceTree = SOURCE_ROOT; };
-		A2F35BCB15C5A0A100EBF632 /* GeneratePreviewForURL.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = GeneratePreviewForURL.m; path = macosx/QuickLookPlugin/GeneratePreviewForURL.m; sourceTree = SOURCE_ROOT; };
-		A2F35BCD15C5A0A100EBF632 /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = main.c; path = macosx/QuickLookPlugin/main.c; sourceTree = SOURCE_ROOT; };
-		A2F35BCF15C5A0A100EBF632 /* QuickLookPlugin-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "QuickLookPlugin-Prefix.pch"; path = "macosx/QuickLookPlugin/QuickLookPlugin-Prefix.pch"; sourceTree = SOURCE_ROOT; };
+		A2F35BC915C5A0A100EBF632 /* GenerateThumbnailForURL.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GenerateThumbnailForURL.m; sourceTree = "<group>"; };
+		A2F35BCB15C5A0A100EBF632 /* GeneratePreviewForURL.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GeneratePreviewForURL.m; sourceTree = "<group>"; };
+		A2F35BCD15C5A0A100EBF632 /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
+		A2F35BCF15C5A0A100EBF632 /* QuickLookPlugin-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "QuickLookPlugin-Prefix.pch"; sourceTree = "<group>"; };
 		A2F35BE015C5A7ED00EBF632 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		A2F35BE215C5A7F900EBF632 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		A2F7CF5413035F7B0016FF10 /* URLSheetWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = URLSheetWindow.xib; path = macosx/URLSheetWindow.xib; sourceTree = "<group>"; };
@@ -1604,7 +1604,8 @@
 				A2F35BCD15C5A0A100EBF632 /* main.c */,
 				A2F35BC415C5A0A100EBF632 /* Supporting Files */,
 			);
-			path = QuickLookPlugin;
+			name = QuickLookPlugin;
+			path = macosx/QuickLookPlugin;
 			sourceTree = "<group>";
 		};
 		A2F35BC415C5A0A100EBF632 /* Supporting Files */ = {
@@ -2910,8 +2911,7 @@
 				A2F35BC715C5A0A100EBF632 /* en */,
 			);
 			name = InfoPlist.strings;
-			path = macosx/QuickLookPlugin;
-			sourceTree = SOURCE_ROOT;
+			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
 
