@@ -1611,7 +1611,7 @@ struct tr_info
     char* comment;
     char* creator;
 
-    /* torrent's source tag. empty if not set. */
+    /* torrent's source. empty if not set. */
     char* source;
 
     tr_file* files;

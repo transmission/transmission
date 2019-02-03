@@ -160,7 +160,7 @@ To add another primary URL, add it after a blank line.</string>
      <item row="3" column="0">
       <widget class="QCheckBox" name="sourceCheck">
        <property name="text">
-        <string>&amp;Source tag:</string>
+        <string>&amp;Source:</string>
        </property>
       </widget>
      </item>

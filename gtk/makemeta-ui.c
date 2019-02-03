@@ -512,7 +512,7 @@ GtkWidget* gtr_torrent_creation_dialog_new(GtkWindow* parent, TrCore* core)
     g_signal_connect(l, "toggled", G_CALLBACK(onSourceToggled), w);
     hig_workarea_add_row_w(t, &row, l, w, NULL);
     
-    l = gtk_check_button_new_with_mnemonic(_("_Source tag:"));
+    l = gtk_check_button_new_with_mnemonic(_("_Source:"));
     ui->source_check = l;
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(l), FALSE);
     w = gtk_entry_new();

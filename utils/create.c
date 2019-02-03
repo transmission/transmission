@@ -36,7 +36,7 @@ static char const* source = NULL;
 static tr_option options[] =
 {
     { 'p', "private", "Allow this torrent to only be used with the specified tracker(s)", "p", 0, NULL },
-    { 'r', "source", "Set the source tag for private trackers", "r", 1, "<flag>" },
+    { 'r', "source", "Set the source for private trackers", "r", 1, "<flag>" },
     { 'o', "outfile", "Save the generated .torrent to this filename", "o", 1, "<file>" },
     { 's', "piecesize", "Set how many KiB each piece should be, overriding the preferred default", "s", 1, "<size in KiB>" },
     { 'c', "comment", "Add a comment", "c", 1, "<comment>" },
