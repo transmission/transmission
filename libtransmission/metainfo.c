@@ -703,6 +703,7 @@ void tr_metainfoFree(tr_info* inf)
     tr_free(inf->files);
     tr_free(inf->comment);
     tr_free(inf->creator);
+    tr_free(inf->source);
     tr_free(inf->torrent);
     tr_free(inf->originalName);
     tr_free(inf->name);
