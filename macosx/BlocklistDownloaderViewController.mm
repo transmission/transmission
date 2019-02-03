@@ -90,7 +90,7 @@ BlocklistDownloaderViewController* fBLViewController = nil;
 
 - (void)setFinished
 {
-    [NSApp endSheet:self.fStatusWindow];
+    [self.fPrefsController.window endSheet:self.fStatusWindow];
     [self.fStatusWindow orderOut:self];
 
     fBLViewController = nil;
@@ -98,7 +98,7 @@ BlocklistDownloaderViewController* fBLViewController = nil;
 
 - (void)setFailed:(NSString*)error
 {
-    [NSApp endSheet:self.fStatusWindow];
+    [self.fPrefsController.window endSheet:self.fStatusWindow];
     [self.fStatusWindow orderOut:self];
 
     NSAlert* alert = [[NSAlert alloc] init];
@@ -109,8 +109,6 @@ BlocklistDownloaderViewController* fBLViewController = nil;
     alert.informativeText = error;
 
     [alert beginSheetModalForWindow:self.fPrefsController.window completionHandler:^(NSModalResponse returnCode) {
-        [alert.window orderOut:self];
-
         fBLViewController = nil;
     }];
 }

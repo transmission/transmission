@@ -296,7 +296,7 @@
 - (IBAction)cancelRules:(id)sender
 {
     [self.groupRulesSheetWindow orderOut:nil];
-    [NSApp endSheet:self.groupRulesSheetWindow];
+    [self.fTableView.window endSheet:self.groupRulesSheetWindow];
 
     NSInteger index = [GroupsController.groups indexForRow:self.fTableView.selectedRow];
     if (![GroupsController.groups autoAssignRulesForIndex:index])
@@ -310,7 +310,7 @@
 - (IBAction)saveRules:(id)sender
 {
     [self.groupRulesSheetWindow orderOut:nil];
-    [NSApp endSheet:self.groupRulesSheetWindow];
+    [self.fTableView.window endSheet:self.groupRulesSheetWindow];
 
     NSInteger index = [GroupsController.groups indexForRow:self.fTableView.selectedRow];
     [GroupsController.groups setUsesAutoAssignRules:YES forIndex:index];

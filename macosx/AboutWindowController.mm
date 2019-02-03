@@ -81,7 +81,7 @@ AboutWindowController* fAboutBoxInstance = nil;
 - (IBAction)hideLicense:(id)sender
 {
     [self.fLicenseSheet orderOut:nil];
-    [NSApp endSheet:self.fLicenseSheet];
+    [self.window endSheet:self.fLicenseSheet];
 }
 
 @end
