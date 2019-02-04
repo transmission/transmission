@@ -653,15 +653,18 @@ static void addDays(tr_variant* args, tr_quark const key, char const* arg)
 
 static void addLabels(tr_variant* args, const tr_quark key, const char* arg)
 {
-    tr_variant* labels = tr_variantDictAddList(args, key, 100);
-    char const* token;
-    while ((token = tr_strsep(&arg, ", ")) != NULL)
+    tr_variant* labels = tr_variantDictAddList(args, key, 10);
+    char* argcpy = tr_strdup(arg);
+    char* const tmp = argcpy; /* save copied string start pointer to free later */
+    char* token;
+    while ((token = tr_strsep(&argcpy, ",")) != NULL)
     {
         if (*token != '\0')
         {
-            tr_variantListAddStr(labels, token);
+            tr_variantListAddStr(labels, tr_strstrip(token));
         }
     }
+    tr_free(tmp);
 }
 
 static void addFiles(tr_variant* args, tr_quark const key, char const* arg)
@@ -956,21 +959,14 @@ static void printDetails(tr_variant* top)
 
             if (tr_variantDictFindList(t, TR_KEY_labels, &l))
             {
-                int i, n = tr_variantListSize(l);
+                const int n = tr_variantListSize(l);
                 const char* str;
                 printf("  Labels: ");
-                for (i = 0; i < n; i++)
+                for (int i = 0; i < n; i++)
                 {
                     if (tr_variantGetStr(tr_variantListChild(l, i), &str, NULL))
                     {
-                        if (i == 0)
-                        {
-                            printf("%s", str);
-                        }
-                        else
-                        {
-                            printf(", %s", str);
-                        }
+                        printf(i == 0 ? "%s" : ", %s", str);
                     }
                 }
                 printf("\n");
