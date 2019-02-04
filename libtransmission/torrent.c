@@ -937,7 +937,7 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     tor->uniqueId = nextUniqueId++;
     tor->magicNumber = TORRENT_MAGIC_NUMBER;
     tor->queuePosition = session->torrentCount;
-    tor->labels = tr_ptrArrayNew();
+    tor->labels = TR_PTR_ARRAY_INIT;
 
     tr_sha1(tor->obfuscatedHash, "req2", 4, tor->info.hash, SHA_DIGEST_LENGTH, NULL);
 
@@ -1740,7 +1740,7 @@ static void freeTorrent(tr_torrent* tor)
     TR_ASSERT(queueIsSequenced(session));
 
     tr_bandwidthDestruct(&tor->bandwidth);
-    tr_ptrArrayFree (tor->labels, (PtrArrayForeachFunc)tr_free);
+    tr_ptrArrayDestruct(&tor->labels, &tr_free);
 
     tr_metainfoFree(inf);
     memset(tor, ~0, sizeof(tr_torrent));

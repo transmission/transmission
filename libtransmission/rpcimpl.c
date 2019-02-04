@@ -399,10 +399,10 @@ static char const* torrentVerify(tr_session* session, tr_variant* args_in, tr_va
 
 static void addLabels(const tr_torrent* tor, tr_variant* list)
 {
-    int i, labelsCount = tr_ptrArraySize(tor->labels);
+    int i, labelsCount = tr_ptrArraySize(&tor->labels);
     tr_variantInitList(list, labelsCount);
     for (i = 0; i < labelsCount; ++i)
-        tr_variantListAddStr(list, tr_ptrArrayNth (tor->labels, i));
+        tr_variantListAddStr(list, tr_ptrArrayNth (&tor->labels, i));
 }
 
 
@@ -946,12 +946,12 @@ static char const* setLabels(tr_torrent* tor, tr_variant* list)
     const char * str;
     size_t str_len;
     const int n = tr_variantListSize(list);
-    tr_ptrArrayForeach(tor->labels, (PtrArrayForeachFunc)tr_free);
-    tr_ptrArrayClear(tor->labels);
+    tr_ptrArrayForeach(&tor->labels, (PtrArrayForeachFunc)tr_free);
+    tr_ptrArrayClear(&tor->labels);
     for (i = 0; i < n; i++)
     {
         if (tr_variantGetStr(tr_variantListChild(list, i), &str, &str_len) && str && str_len)
-            tr_ptrArrayAppend(tor->labels, tr_strndup (str, str_len));
+            tr_ptrArrayAppend(&tor->labels, tr_strndup (str, str_len));
     }
     return NULL;
 }

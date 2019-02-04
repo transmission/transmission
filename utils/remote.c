@@ -290,7 +290,7 @@ static tr_option opts[] =
     { 920, "session-info", "Show the session's details", "si", 0, NULL },
     { 921, "session-stats", "Show the session's statistics", "st", 0, NULL },
     { 'l', "list", "List all torrents", "l", 0, NULL },
-    { 'L', "labels", "Labels the current torrent(s)", "L",  1, "<label[,label...]>" },
+    { 'L', "labels", "Set the current torrents' labels", "L",  1, "<label[,label...]>" },
     { 960, "move", "Move current torrent's data to a new folder", NULL, 1, "<path>" },
     { 961, "find", "Tell Transmission where to find a torrent's data", NULL, 1, "<path>" },
     { 'm', "portmap", "Enable portmapping via NAT-PMP or UPnP", "m", 0, NULL },
@@ -654,22 +654,13 @@ static void addDays(tr_variant* args, tr_quark const key, char const* arg)
 static void addLabels(tr_variant* args, const tr_quark key, const char* arg)
 {
     tr_variant* labels = tr_variantDictAddList(args, key, 100);
-    while (arg && *arg)
+    char const* token;
+    while ((token = tr_strsep(&arg, ", ")) != NULL)
     {
-        const char* pch = strchr(arg, ',');
-        char* str;
-        if (pch)
+        if (*token != '\0')
         {
-            str = tr_strndup(arg, pch - arg);
-            arg = pch + 1;
+            tr_variantListAddStr(labels, token);
         }
-        else
-        {
-            str = tr_strdup(arg);
-            arg += strlen(arg);
-        }
-        tr_variantListAddStr(labels, str);
-        tr_free(str);
     }
 }
 

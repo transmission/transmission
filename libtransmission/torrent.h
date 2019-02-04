@@ -242,7 +242,7 @@ struct tr_torrent
     tr_idlelimit idleLimitMode;
     bool finishedSeedingByIdle;
 
-    tr_ptrArray* labels;
+    tr_ptrArray labels;
 };
 
 static inline tr_torrent* tr_torrentNext(tr_session* session, tr_torrent* current)

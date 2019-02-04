@@ -42,18 +42,12 @@ extern tr_ptrArray const TR_PTR_ARRAY_INIT;
 /** @brief Destructor to free a tr_ptrArray's internal memory */
 void tr_ptrArrayDestruct(tr_ptrArray*, PtrArrayForeachFunc func);
 
-tr_ptrArray* tr_ptrArrayNew(void);
-
-tr_ptrArray* tr_ptrArrayDup(tr_ptrArray*);
-
-void tr_ptrArrayFree(tr_ptrArray* array, PtrArrayForeachFunc func);
-
 /** @brief Iterate through each item in a tr_ptrArray */
 void tr_ptrArrayForeach(tr_ptrArray* array, PtrArrayForeachFunc func);
 
 /** @brief Return the nth item in a tr_ptrArray
     @return the nth item in a tr_ptrArray */
-static inline void* tr_ptrArrayNth(tr_ptrArray* array, int i)
+static inline void* tr_ptrArrayNth(const tr_ptrArray* array, int i)
 {
     TR_ASSERT(array != NULL);
     TR_ASSERT(i >= 0);
