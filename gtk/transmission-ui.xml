@@ -2,7 +2,7 @@
   <menubar name='main-window-menu'> 
     <menu action='file-menu'> 
       <menuitem action='open-torrent-menu'/> 
-      <menuitem action='open-torrent-from-url'/> 
+      <menuitem action='open-torrent-from-url-menu'/> 
       <menuitem action='new-torrent'/> 
       <separator/> 
       <menuitem action='start-all-torrents'/> 
@@ -70,6 +70,8 @@
 
   <toolbar name='main-window-toolbar'> 
     <toolitem action='open-torrent-toolbar'/> 
+    <toolitem action='open-torrent-from-url-toolbar'/>
+    <separator/>
     <toolitem action='torrent-start'/> 
     <toolitem action='torrent-stop'/> 
     <toolitem action='remove-torrent'/> 
@@ -117,7 +119,7 @@
     <menuitem action='toggle-main-window'/> 
     <separator/> 
     <menuitem action='open-torrent-menu'/> 
-    <menuitem action='open-torrent-from-url'/> 
+    <menuitem action='open-torrent-from-url-menu'/> 
     <separator/> 
     <menuitem action='pause-all-torrents'/> 
     <menuitem action='start-all-torrents'/> 

@@ -1518,7 +1518,7 @@ void gtr_actions_handler(char const* action_name, gpointer user_data)
     gboolean changed = FALSE;
     struct cbdata* data = user_data;
 
-    if (g_strcmp0(action_name, "open-torrent-from-url") == 0)
+    if (g_strcmp0(action_name, "open-torrent-from-url-menu") == 0 || g_strcmp0(action_name, "open-torrent-from-url-toolbar") == 0)
     {
         GtkWidget* w = gtr_torrent_open_from_url_dialog_new(data->wind, data->core);
         gtk_widget_show(w);

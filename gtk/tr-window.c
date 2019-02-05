@@ -596,6 +596,7 @@ GtkWidget* gtr_window_new(GtkApplication* app, GtkUIManager* ui_mgr, TrCore* cor
     toolbar = p->toolbar = gtr_action_get_widget("/main-window-toolbar");
     gtk_style_context_add_class(gtk_widget_get_style_context(toolbar), GTK_STYLE_CLASS_PRIMARY_TOOLBAR);
     gtr_action_set_important("open-torrent-toolbar", TRUE);
+    gtr_action_set_important("open-torrent-from-url-toolbar", TRUE);
     gtr_action_set_important("show-torrent-properties", TRUE);
 
     /* filter */
