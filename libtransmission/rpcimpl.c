@@ -773,6 +773,10 @@ static void addField(tr_torrent* const tor, tr_info const* const inf, tr_stat co
         tr_variantDictAddInt(d, key, st->sizeWhenDone);
         break;
 
+    case TR_KEY_source:
+        tr_variantDictAddStr(d, key, inf->source);
+        break;
+
     case TR_KEY_startDate:
         tr_variantDictAddInt(d, key, st->startDate);
         break;

@@ -719,6 +719,7 @@ static tr_quark const details_keys[] =
     TR_KEY_seedRatioMode,
     TR_KEY_seedRatioLimit,
     TR_KEY_sizeWhenDone,
+    TR_KEY_source,
     TR_KEY_startDate,
     TR_KEY_status,
     TR_KEY_totalSize,
@@ -1110,6 +1111,11 @@ static void printDetails(tr_variant* top)
             if (tr_variantDictFindStr(t, TR_KEY_creator, &str, NULL) && str != NULL && *str != '\0')
             {
                 printf("  Creator: %s\n", str);
+            }
+
+            if (tr_variantDictFindStr(t, TR_KEY_source, &str, NULL) && str != NULL && *str != '\0')
+            {
+                printf("  Source: %s\n", str);
             }
 
             if (tr_variantDictFindInt(t, TR_KEY_pieceCount, &i))
