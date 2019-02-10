@@ -210,7 +210,7 @@ int Utils::measureViewItem(QAbstractItemView* view, QString const& text)
     option.font = view->font();
 
     return view->style()->sizeFromContents(QStyle::CT_ItemViewItem, &option, QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX), view).
-               width();
+        width();
 }
 
 int Utils::measureHeaderItem(QHeaderView* view, QString const& text)

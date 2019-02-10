@@ -34,10 +34,10 @@ static int test_spawn_async_missing_exe(void)
 
     tr_error* error = NULL;
     bool const ret = tr_spawn_async(args, NULL, NULL, &error);
-    check_bool(ret, == , false);
-    check_ptr(error, != , NULL);
-    check_int(error->code, != , 0);
-    check_str(error->message, != , NULL);
+    check_bool(ret, ==, false);
+    check_ptr(error, !=, NULL);
+    check_int(error->code, !=, 0);
+    check_str(error->message, !=, NULL);
 
     tr_error_clear(&error);
 
@@ -89,12 +89,12 @@ static int test_spawn_async_args(void)
     check_str(buffer, ==, test_arg_2);
 
     check(tr_sys_file_read_line(fd, buffer, sizeof(buffer), NULL));
-    check_str(buffer, == , test_arg_3);
+    check_str(buffer, ==, test_arg_3);
 
     if (allow_batch_metachars)
     {
         check(tr_sys_file_read_line(fd, buffer, sizeof(buffer), NULL));
-        check_str(buffer, == , test_arg_4);
+        check_str(buffer, ==, test_arg_4);
     }
 
     check(!tr_sys_file_read_line(fd, buffer, sizeof(buffer), NULL));

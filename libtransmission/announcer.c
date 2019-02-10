@@ -1534,13 +1534,13 @@ static void flushCloseMessages(tr_announcer* announcer)
 static bool tierNeedsToAnnounce(tr_tier const* tier, time_t const now)
 {
     return !tier->isAnnouncing && !tier->isScraping && tier->announceAt != 0 && tier->announceAt <= now &&
-           tier->announce_event_count > 0;
+        tier->announce_event_count > 0;
 }
 
 static bool tierNeedsToScrape(tr_tier const* tier, time_t const now)
 {
     return !tier->isScraping && tier->scrapeAt != 0 && tier->scrapeAt <= now && tier->currentTracker != NULL &&
-           tier->currentTracker->scrape != NULL;
+        tier->currentTracker->scrape != NULL;
 }
 
 static int compareTiers(void const* va, void const* vb)

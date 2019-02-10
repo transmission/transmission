@@ -59,11 +59,12 @@ bool libtest_check_ptr(char const* file, int line, bool pass, void const* lhs, v
     { \
         ++current_test; \
         \
-        bool const check_bool_lhs = (lhs); \
-        bool const check_bool_rhs = (rhs); \
+        bool const check_lhs = (lhs); \
+        bool const check_rhs = (rhs); \
         \
-        if (!libtest_check_bool(__FILE__, __LINE__, check_bool_lhs op check_bool_rhs, check_bool_lhs, check_bool_rhs, #lhs, \
-            #op, #rhs)) \
+        bool const check_result = check_lhs op check_rhs; \
+        \
+        if (!libtest_check_bool(__FILE__, __LINE__, check_result, check_lhs, check_rhs, #lhs, #op, #rhs)) \
         { \
             return current_test; \
         } \
@@ -75,11 +76,12 @@ bool libtest_check_ptr(char const* file, int line, bool pass, void const* lhs, v
     { \
         ++current_test; \
         \
-        char const* const check_str_lhs = (lhs); \
-        char const* const check_str_rhs = (rhs); \
+        char const* const check_lhs = (lhs); \
+        char const* const check_rhs = (rhs); \
         \
-        if (!libtest_check_str(__FILE__, __LINE__, tr_strcmp0(check_str_lhs, check_str_rhs) op 0, check_str_lhs, \
-            check_str_rhs, #lhs, #op, #rhs)) \
+        bool const check_result = tr_strcmp0(check_lhs, check_rhs) op 0; \
+        \
+        if (!libtest_check_str(__FILE__, __LINE__, check_result, check_lhs, check_rhs, #lhs, #op, #rhs)) \
         { \
             return current_test; \
         } \
@@ -91,12 +93,13 @@ bool libtest_check_ptr(char const* file, int line, bool pass, void const* lhs, v
     { \
         ++current_test; \
         \
-        void const* const check_mem_lhs = (lhs); \
-        void const* const check_mem_rhs = (rhs); \
-        size_t const check_mem_size = (size);\
+        void const* const check_lhs = (lhs); \
+        void const* const check_rhs = (rhs); \
+        size_t const check_mem_size = (size); \
         \
-        if (!libtest_check_mem(__FILE__, __LINE__, tr_memcmp0(check_mem_lhs, check_mem_rhs, check_mem_size) op 0, \
-            check_mem_lhs, check_mem_rhs, check_mem_size, #lhs, #op, #rhs)) \
+        bool const check_result = tr_memcmp0(check_lhs, check_rhs, check_mem_size) op 0; \
+        \
+        if (!libtest_check_mem(__FILE__, __LINE__, check_result, check_lhs, check_rhs, check_mem_size, #lhs, #op, #rhs)) \
         { \
             return current_test; \
         } \
@@ -108,11 +111,12 @@ bool libtest_check_ptr(char const* file, int line, bool pass, void const* lhs, v
     { \
         ++current_test; \
         \
-        intmax_t const check_int_lhs = (lhs); \
-        intmax_t const check_int_rhs = (rhs); \
+        intmax_t const check_lhs = (lhs); \
+        intmax_t const check_rhs = (rhs); \
         \
-        if (!libtest_check_int(__FILE__, __LINE__, check_int_lhs op check_int_rhs, check_int_lhs, check_int_rhs, #lhs, #op, \
-            #rhs)) \
+        bool const check_result = check_lhs op check_rhs; \
+        \
+        if (!libtest_check_int(__FILE__, __LINE__, check_result, check_lhs, check_rhs, #lhs, #op, #rhs)) \
         { \
             return current_test; \
         } \
@@ -124,11 +128,12 @@ bool libtest_check_ptr(char const* file, int line, bool pass, void const* lhs, v
     { \
         ++current_test; \
         \
-        uintmax_t const check_uint_lhs = (lhs); \
-        uintmax_t const check_uint_rhs = (rhs); \
+        uintmax_t const check_lhs = (lhs); \
+        uintmax_t const check_rhs = (rhs); \
         \
-        if (!libtest_check_uint(__FILE__, __LINE__, check_uint_lhs op check_uint_rhs, check_uint_lhs, check_uint_rhs, #lhs, \
-            #op, #rhs)) \
+        bool const check_result = check_lhs op check_rhs; \
+        \
+        if (!libtest_check_uint(__FILE__, __LINE__, check_result, check_lhs, check_rhs, #lhs, #op, #rhs)) \
         { \
             return current_test; \
         } \
@@ -140,11 +145,12 @@ bool libtest_check_ptr(char const* file, int line, bool pass, void const* lhs, v
     { \
         ++current_test; \
         \
-        void const* const check_ptr_lhs = (lhs); \
-        void const* const check_ptr_rhs = (rhs); \
+        void const* const check_lhs = (lhs); \
+        void const* const check_rhs = (rhs); \
         \
-        if (!libtest_check_ptr(__FILE__, __LINE__, check_ptr_lhs op check_ptr_rhs, check_ptr_lhs, check_ptr_rhs, #lhs, #op, \
-            #rhs)) \
+        bool const check_result = check_lhs op check_rhs; \
+        \
+        if (!libtest_check_ptr(__FILE__, __LINE__, check_result, check_lhs, check_rhs, #lhs, #op, #rhs)) \
         { \
             return current_test; \
         } \

@@ -92,5 +92,5 @@ RelocateDialog::RelocateDialog(Session& session, TorrentModel const& model, QSet
 QString RelocateDialog::newLocation() const
 {
     return ui.newLocationStack->currentWidget() == ui.newLocationButton ? ui.newLocationButton->path() :
-           ui.newLocationEdit->text();
+        ui.newLocationEdit->text();
 }
