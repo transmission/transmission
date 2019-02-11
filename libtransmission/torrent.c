@@ -2318,21 +2318,21 @@ void tr_torrentRecheckCompleteness(tr_torrent* tor)
 
         fireCompletenessChange(tor, completeness, wasRunning);
 
-        if (tr_torrentIsSeed(tor))
+        if (tr_torrentIsSeed(tor) && wasLeeching && wasRunning)
         {
-            if (wasLeeching && wasRunning)
-            {
-                /* if completeness was TR_LEECH then the seed limit check will have been skipped in bandwidthPulse */
-                tr_torrentCheckSeedLimit(tor);
-            }
-
-            if (tr_sessionIsTorrentDoneScriptEnabled(tor->session))
-            {
-                torrentCallScript(tor, tr_sessionGetTorrentDoneScript(tor->session));
-            }
+            /* if completeness was TR_LEECH, the seed limit check
+               will have been skipped in bandwidthPulse */
+            tr_torrentCheckSeedLimit(tor);
         }
 
         tr_torrentSetDirty(tor);
+
+        if (tr_torrentIsSeed(tor) && tr_sessionIsTorrentDoneScriptEnabled(tor->session))
+        {
+            tr_torrentSave(tor);
+
+            torrentCallScript(tor, tr_sessionGetTorrentDoneScript(tor->session));
+        }
     }
 
     tr_torrentUnlock(tor);

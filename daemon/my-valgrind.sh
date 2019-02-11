@@ -1,4 +1,4 @@
-#/bin/sh
+#!/bin/sh
 export G_SLICE=always-malloc
 export G_DEBUG=gc-friendly
 export GLIBCXX_FORCE_NEW=1
