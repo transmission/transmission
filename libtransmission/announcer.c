@@ -59,7 +59,14 @@ enum
     /* */
     UPKEEP_INTERVAL_SECS = 1,
     /* this is how often to call the UDP tracker upkeep */
-    TAU_UPKEEP_INTERVAL_SECS = 5
+    TAU_UPKEEP_INTERVAL_SECS = 5,
+
+    /* minimum number of info hashes to put in a multiscrape */
+    TR_MULTISCRAPE_MIN = 16,
+
+    /* when we get a scrape-too-long error, how many infohashes to trim
+       off in the next try */
+    TR_MULTISCRAPE_STEP = (TR_MULTISCRAPE_MAX - TR_MULTISCRAPE_MIN) / 4
 };
 
 /***
@@ -211,6 +218,7 @@ typedef struct
     int leecherCount;
     int downloadCount;
     int downloaderCount;
+    int multiscrapeMax;
 
     int consecutiveFailures;
 
@@ -241,6 +249,7 @@ static void trackerConstruct(tr_tracker* tracker, tr_tracker_info const* inf)
     tracker->announce = tr_strdup(inf->announce);
     tracker->scrape = tr_strdup(inf->scrape);
     tracker->id = inf->id;
+    tracker->multiscrapeMax = TR_MULTISCRAPE_MAX;
     tracker->seederCount = -1;
     tracker->leecherCount = -1;
     tracker->downloadCount = -1;
@@ -1317,6 +1326,13 @@ static void on_scrape_error(tr_session* session, tr_tier* tier, char const* errm
     dbgmsg(tier, "Scrape error: %s", errmsg);
     tr_logAddTorInfo(tier->tor, "Scrape error: %s", errmsg);
     tr_strlcpy(tier->lastScrapeStr, errmsg, sizeof(tier->lastScrapeStr));
+    if (strstr(errmsg, "GET string too long")) {
+      const int n = tier->currentTracker->multiscrapeMax - TR_MULTISCRAPE_STEP;
+      if (n >= TR_MULTISCRAPE_MIN) {
+        tr_logAddTorInfo(tier->tor, "Reducing announce max to %d", n);
+        tier->currentTracker->multiscrapeMax = n;
+      }
+    }
 
     /* switch to the next tracker */
     tierIncrementTracker(tier);
@@ -1482,7 +1498,7 @@ static void multiscrape(tr_announcer* announcer, tr_ptrArray* tiers)
         {
             tr_scrape_request* req = &requests[j];
 
-            if (req->info_hash_count >= TR_MULTISCRAPE_MAX)
+            if (req->info_hash_count >= tier->currentTracker->multiscrapeMax)
             {
                 continue;
             }
