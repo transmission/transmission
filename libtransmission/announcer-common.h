@@ -22,11 +22,18 @@
 enum
 {
     /* pick a number small enough for common tracker software:
+     *
+     * Some numbers reported in the wild:
      *  - ocelot has no upper bound
      *  - opentracker has an upper bound of 64
      *  - udp protocol has an upper bound of 74
-     *  - xbtt has no upper bound */
-    TR_MULTISCRAPE_MAX = 64
+     *  - xbtt has no upper bound
+     *
+     * Note that announcer.c dials down this number if a multiscrape
+     * errors out so its not the end of the world if this number
+     * is too high
+     */
+    TR_MULTISCRAPE_MAX = 100
 };
 
 typedef struct
