@@ -1362,11 +1362,14 @@ static void tierAnnounce(tr_announcer* announcer, tr_tier* tier)
 static bool multiscrape_too_big(char const* errmsg)
 { 
   if (!errmsg)
-    return false;
+      return false;
+
   if (strstr(errmsg, "GET string too long"))
-    return true;
+      return true;
   if (strstr(errmsg, "Request-URI Too Long"))
-    return true;
+      return true;
+  if (strstr(errmsg, "Bad Request"))
+      return true;
 
   /* Found a tracker that returns some bespoke string for this case?
      Add your patch here and open a PR */
