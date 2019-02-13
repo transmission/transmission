@@ -1312,6 +1312,17 @@ static void tierAnnounce(tr_announcer* announcer, tr_tier* tier)
 ****
 ***/
 
+static bool multiscrape_too_big(char const* errmsg)
+{ 
+  if (strstr(errmsg, "GET string too long"))
+    return true;
+
+  /* Found a tracker that returns some bespoke string for this case?
+     Add your patch here and open a PR */
+
+  return false;
+}
+
 static void on_scrape_error(tr_session* session, tr_tier* tier, char const* errmsg)
 {
     int interval;
@@ -1326,7 +1337,7 @@ static void on_scrape_error(tr_session* session, tr_tier* tier, char const* errm
     dbgmsg(tier, "Scrape error: %s", errmsg);
     tr_logAddTorInfo(tier->tor, "Scrape error: %s", errmsg);
     tr_strlcpy(tier->lastScrapeStr, errmsg, sizeof(tier->lastScrapeStr));
-    if (strstr(errmsg, "GET string too long")) {
+    if (multiscrape_too_big(errmsg)) {
       const int n = tier->currentTracker->multiscrapeMax - TR_MULTISCRAPE_STEP;
       if (n >= TR_MULTISCRAPE_MIN) {
         tr_logAddTorInfo(tier->tor, "Reducing announce max to %d", n);
