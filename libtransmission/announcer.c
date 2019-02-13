@@ -1518,8 +1518,14 @@ static void on_scrape_done(tr_scrape_response const* response, void* vsession)
             const int n = *multiscrape_max - TR_MULTISCRAPE_STEP;
             if (n >= TR_MULTISCRAPE_MIN)
             {
-              tr_logAddNamedInfo(url, "Reducing multiscrape max to %d", n);
-              *multiscrape_max = n;
+                char* host = NULL;
+                if (tr_urlParse(url, strlen(url), NULL, &host, NULL, NULL))
+                {
+                    tr_logAddNamedInfo(host, "Reducing multiscrape max to %d", n);
+                    tr_free(host);
+                }
+
+                *multiscrape_max = n;
             }
         }
     }
