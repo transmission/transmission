@@ -61,10 +61,9 @@ enum
     /* this is how often to call the UDP tracker upkeep */
     TAU_UPKEEP_INTERVAL_SECS = 5,
 
-    /* minimum number of info hashes to put in a multiscrape */
+    /* minimum number of infohashes to put in a multiscrape */
     TR_MULTISCRAPE_MIN = 16,
-    /* when we get a scrape-too-long error, how many infohashes to trim
-       off in the next try */
+    /* how many infohashes to remove when we get a scrape-too-long error */
     TR_MULTISCRAPE_STEP = 5
 };
 
@@ -172,14 +171,13 @@ static int compareScrapeInfo(const void* va, const void* vb)
 typedef struct tr_announcer
 {
     tr_ptrArray stops; /* tr_announce_request */
+    tr_ptrArray scrape_info; /* struct tr_scrape_info */
 
     tr_session* session;
     struct event* upkeepTimer;
     int slotsAvailable;
     int key;
     time_t tauUpkeepAt;
-
-    tr_ptrArray scrape_info;
 }
 tr_announcer;
 

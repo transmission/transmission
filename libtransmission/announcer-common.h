@@ -22,16 +22,13 @@
 enum
 {
     /* pick a number small enough for common tracker software:
-     *
-     * Some numbers reported in the wild:
      *  - ocelot has no upper bound
      *  - opentracker has an upper bound of 64
      *  - udp protocol has an upper bound of 74
      *  - xbtt has no upper bound
      *
-     * Note that announcer.c dials down this number if a multiscrape
-     * errors out so its not the end of the world if this number
-     * is too high
+     * This is only an upper bound: if the tracker complains about
+     * length, announcer will incrementally lower the batch size.
      */
     TR_MULTISCRAPE_MAX = 100
 };
