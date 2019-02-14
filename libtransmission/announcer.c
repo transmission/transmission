@@ -1508,16 +1508,16 @@ static void on_scrape_done(tr_scrape_response const* response, void* vsession)
         }
     }
 
-    /* Maybe dial down the number of torrents in a multiscrape req */
+    /* Maybe reduce the number of torrents in a multiscrape req */
     if (multiscrape_too_big(response->errmsg))
     {
         char const* url = response->url;
-        int* multiscrape_max = &(tr_announcerGetScrapeInfo(announcer, url)->multiscrape_max);
+        int* multiscrape_max = &tr_announcerGetScrapeInfo(announcer, url)->multiscrape_max;
 
         if (*multiscrape_max == response->row_count)
         {
-            const int n = *multiscrape_max - TR_MULTISCRAPE_STEP;
-            if (n >= TR_MULTISCRAPE_MIN)
+            const int n = MAX(TR_MULTISCRAPE_MIN, *multiscrape_max - TR_MULTISCRAPE_STEP);
+            if (*multiscrape_max != n)
             {
                 char* host = NULL;
                 if (tr_urlParse(url, strlen(url), NULL, &host, NULL, NULL))
