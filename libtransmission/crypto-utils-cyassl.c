@@ -6,6 +6,7 @@
  *
  */
 
+/* *INDENT-OFF* */
 #if defined(CYASSL_IS_WOLFSSL)
 #define API_HEADER(x) <wolfssl/x>
 #define API_HEADER_CRYPT(x) API_HEADER(wolfcrypt/x)
@@ -24,6 +25,7 @@
 #include API_HEADER_CRYPT(random.h)
 #include API_HEADER_CRYPT(sha.h)
 #include API_HEADER(version.h)
+/* *INDENT-ON* */
 
 #include "transmission.h"
 #include "crypto-utils.h"

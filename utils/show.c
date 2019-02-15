@@ -194,7 +194,7 @@ static void showInfo(tr_info const* inf)
     {
         files[i] = &inf->files[i];
     }
-    
+
     if (!unsorted)
     {
         qsort(files, inf->fileCount, sizeof(tr_file*), compare_files_by_name);

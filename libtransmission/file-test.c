@@ -990,7 +990,7 @@ static int test_path_remove(void)
 
 static int test_path_native_separators(void)
 {
-    check_str(tr_sys_path_native_separators(NULL), == , NULL);
+    check_str(tr_sys_path_native_separators(NULL), ==, NULL);
 
     char path1[] = "";
     char path2[] = "a";
