@@ -158,8 +158,8 @@ static void scrapeInfoFree(void* va)
 
 static int compareScrapeInfo(void const* va, void const* vb)
 {
-    const struct tr_scrape_info* a = va;
-    const struct tr_scrape_info* b = vb;
+    struct tr_scrape_info const* a = va;
+    struct tr_scrape_info const* b = vb;
     return tr_strcmp0(a->url, b->url);
 }
 
@@ -1356,8 +1356,6 @@ static void tierAnnounce(tr_announcer* announcer, tr_tier* tier)
 
 static bool multiscrape_too_big(char const* errmsg)
 {
-    unsigned int i;
-
     /* Found a tracker that returns some bespoke string for this case?
        Add your patch here and open a PR */
     static char const* const too_long_errors[] =
@@ -1372,7 +1370,7 @@ static bool multiscrape_too_big(char const* errmsg)
         return false;
     }
 
-    for (i = 0; i < TR_N_ELEMENTS(too_long_errors); ++i)
+    for (size_t i = 0; i < TR_N_ELEMENTS(too_long_errors); ++i)
     {
         if (strstr(errmsg, too_long_errors[i]) != NULL)
         {
