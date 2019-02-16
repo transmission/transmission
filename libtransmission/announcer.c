@@ -1539,7 +1539,7 @@ static void on_scrape_done(tr_scrape_response const* response, void* vsession)
                 {
                     /* don't log the full URL, since that might have a personal announce id */
                     char* sanitized_url = tr_strdup_printf("%s://%s:%d", scheme, host, port);
-                    tr_logAddNamedInfo(host, "Reducing multiscrape max to %d", n);
+                    tr_logAddNamedInfo(sanitized_url, "Reducing multiscrape max to %d", n);
                     tr_free(sanitized_url);
                     tr_free(host);
                     tr_free(scheme);
