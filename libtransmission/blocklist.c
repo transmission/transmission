@@ -307,8 +307,8 @@ static bool parseLine2(char const* line, struct tr_ipv4_range* range)
  */
 static bool parseLine3(char const* line, struct tr_ipv4_range* range)
 {
-    unsigned ip[4];
-    unsigned pflen;
+    unsigned int ip[4];
+    unsigned int pflen;
     uint32_t ip_u;
     uint32_t mask = 0xffffffff;
 

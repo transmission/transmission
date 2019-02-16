@@ -56,7 +56,7 @@ static int test_metainfo(void)
     {
         int expected_benc_err;
         int expected_parse_result;
-        const void* benc;
+        void const* benc;
     }
     const metainfo[] =
     {

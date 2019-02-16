@@ -1449,7 +1449,7 @@ static void removeKeRangerRansomware()
             alert.informativeText = message;
             [alert addButtonWithTitle:NSLocalizedString(@"Remove", "Removal confirm panel -> button")];
             [alert addButtonWithTitle:NSLocalizedString(@"Cancel", "Removal confirm panel -> button")];
-            
+
             [alert beginSheetModalForWindow:fWindow
                           completionHandler:^(NSModalResponse returnCode) {
                               if (returnCode == NSAlertFirstButtonReturn) {
