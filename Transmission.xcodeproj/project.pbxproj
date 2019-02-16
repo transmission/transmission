@@ -136,6 +136,7 @@
 		A23547E211CD0B090046EAE6 /* cache.c in Sources */ = {isa = PBXBuildFile; fileRef = A23547E011CD0B090046EAE6 /* cache.c */; };
 		A23547E311CD0B090046EAE6 /* cache.h in Headers */ = {isa = PBXBuildFile; fileRef = A23547E111CD0B090046EAE6 /* cache.h */; };
 		A2385DD40BFE06C800B24EF6 /* DragOverlayWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = A2385DD20BFE06C800B24EF6 /* DragOverlayWindow.m */; };
+		A238D49F21CDA1A5006B03EA /* InfoTabMatrix.m in Sources */ = {isa = PBXBuildFile; fileRef = A238D49E21CDA1A5006B03EA /* InfoTabMatrix.m */; };
 		A23F29A1132A447400E9A83B /* announcer-common.h in Headers */ = {isa = PBXBuildFile; fileRef = A23F299F132A447400E9A83B /* announcer-common.h */; };
 		A23F29A2132A447400E9A83B /* announcer-http.c in Sources */ = {isa = PBXBuildFile; fileRef = A23F29A0132A447400E9A83B /* announcer-http.c */; };
 		A23F4FF20D1D98AD002FCB97 /* PrefsWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A23F4FF00D1D98AD002FCB97 /* PrefsWindow.xib */; };
@@ -644,6 +645,7 @@
 		A22B00AF116A9E90003315FC /* connecthostport.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = connecthostport.h; path = "third-party/miniupnpc/connecthostport.h"; sourceTree = "<group>"; };
 		A22BAE261388040500FB022F /* NSMutableArrayAdditions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = NSMutableArrayAdditions.h; path = macosx/NSMutableArrayAdditions.h; sourceTree = "<group>"; };
 		A22BAE271388040500FB022F /* NSMutableArrayAdditions.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = NSMutableArrayAdditions.m; path = macosx/NSMutableArrayAdditions.m; sourceTree = "<group>"; };
+		A22CEF9E21CDC44400C5C1BA /* Transmission.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = Transmission.entitlements; path = macosx/Transmission.entitlements; sourceTree = "<group>"; };
 		A22CF7AC0FA3505F0009BD3E /* it */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = it; path = macosx/it.lproj/GroupRules.xib; sourceTree = "<group>"; };
 		A22CF7B90FA352740009BD3E /* fr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = fr; path = macosx/fr.lproj/GroupRules.xib; sourceTree = "<group>"; };
 		A22CF7C90FA5D3F90009BD3E /* es */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = es; path = macosx/es.lproj/GroupRules.xib; sourceTree = "<group>"; };
@@ -670,6 +672,8 @@
 		A236D19615F6BD9C000C3DD4 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = macosx/QuickLookPlugin/it.lproj/Localizable.strings; sourceTree = SOURCE_ROOT; };
 		A2385DD20BFE06C800B24EF6 /* DragOverlayWindow.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = DragOverlayWindow.m; path = macosx/DragOverlayWindow.m; sourceTree = "<group>"; };
 		A2385DD30BFE06C800B24EF6 /* DragOverlayWindow.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = DragOverlayWindow.h; path = macosx/DragOverlayWindow.h; sourceTree = "<group>"; };
+		A238D49D21CDA1A5006B03EA /* InfoTabMatrix.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = InfoTabMatrix.h; path = macosx/InfoTabMatrix.h; sourceTree = "<group>"; };
+		A238D49E21CDA1A5006B03EA /* InfoTabMatrix.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = InfoTabMatrix.m; path = macosx/InfoTabMatrix.m; sourceTree = "<group>"; };
 		A23F299F132A447400E9A83B /* announcer-common.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "announcer-common.h"; path = "libtransmission/announcer-common.h"; sourceTree = "<group>"; };
 		A23F29A0132A447400E9A83B /* announcer-http.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "announcer-http.c"; path = "libtransmission/announcer-http.c"; sourceTree = "<group>"; };
 		A23F526D0F14395900AA02E3 /* PredicateEditorRowTemplateAny.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PredicateEditorRowTemplateAny.h; path = macosx/PredicateEditorRowTemplateAny.h; sourceTree = "<group>"; };
@@ -795,7 +799,7 @@
 		A292C9E01413BA5F00EF710F /* es */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = es; path = macosx/es.lproj/GlobalOptionsPopover.xib; sourceTree = "<group>"; };
 		A292C9E2141593DA00EF710F /* de */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = de; path = macosx/de.lproj/GlobalOptionsPopover.xib; sourceTree = "<group>"; };
 		A292C9E414163AE500EF710F /* it */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = it; path = macosx/it.lproj/GlobalOptionsPopover.xib; sourceTree = "<group>"; };
-		A29304EC15D7465100B1F726 /* style.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; name = style.css; path = macosx/QuickLookPlugin/style.css; sourceTree = SOURCE_ROOT; };
+		A29304EC15D7465100B1F726 /* style.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = style.css; sourceTree = "<group>"; };
 		A29443271419746A0016143A /* ru */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = ru; path = macosx/ru.lproj/GlobalOptionsPopover.xib; sourceTree = "<group>"; };
 		A294432E141B23CD0016143A /* pt_PT */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = pt_PT; path = macosx/pt_PT.lproj/GlobalOptionsPopover.xib; sourceTree = "<group>"; };
 		A2963CFD1423F2BB00C497B5 /* fr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = fr; path = macosx/fr.lproj/GlobalOptionsPopover.xib; sourceTree = "<group>"; };
@@ -908,12 +912,12 @@
 		A2F35BBD15C5A0A100EBF632 /* ApplicationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ApplicationServices.framework; path = System/Library/Frameworks/ApplicationServices.framework; sourceTree = SDKROOT; };
 		A2F35BBF15C5A0A100EBF632 /* CoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreServices.framework; path = System/Library/Frameworks/CoreServices.framework; sourceTree = SDKROOT; };
 		A2F35BC115C5A0A100EBF632 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
-		A2F35BC515C5A0A100EBF632 /* QuickLookPlugin-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "QuickLookPlugin-Info.plist"; path = "macosx/QuickLookPlugin/QuickLookPlugin-Info.plist"; sourceTree = SOURCE_ROOT; };
+		A2F35BC515C5A0A100EBF632 /* QuickLookPlugin-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "QuickLookPlugin-Info.plist"; sourceTree = "<group>"; };
 		A2F35BC715C5A0A100EBF632 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		A2F35BC915C5A0A100EBF632 /* GenerateThumbnailForURL.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = GenerateThumbnailForURL.m; path = macosx/QuickLookPlugin/GenerateThumbnailForURL.m; sourceTree = SOURCE_ROOT; };
-		A2F35BCB15C5A0A100EBF632 /* GeneratePreviewForURL.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = GeneratePreviewForURL.m; path = macosx/QuickLookPlugin/GeneratePreviewForURL.m; sourceTree = SOURCE_ROOT; };
-		A2F35BCD15C5A0A100EBF632 /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = main.c; path = macosx/QuickLookPlugin/main.c; sourceTree = SOURCE_ROOT; };
-		A2F35BCF15C5A0A100EBF632 /* QuickLookPlugin-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "QuickLookPlugin-Prefix.pch"; path = "macosx/QuickLookPlugin/QuickLookPlugin-Prefix.pch"; sourceTree = SOURCE_ROOT; };
+		A2F35BC915C5A0A100EBF632 /* GenerateThumbnailForURL.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GenerateThumbnailForURL.m; sourceTree = "<group>"; };
+		A2F35BCB15C5A0A100EBF632 /* GeneratePreviewForURL.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GeneratePreviewForURL.m; sourceTree = "<group>"; };
+		A2F35BCD15C5A0A100EBF632 /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
+		A2F35BCF15C5A0A100EBF632 /* QuickLookPlugin-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "QuickLookPlugin-Prefix.pch"; sourceTree = "<group>"; };
 		A2F35BE015C5A7ED00EBF632 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		A2F35BE215C5A7F900EBF632 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		A2F7CF5413035F7B0016FF10 /* URLSheetWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = URLSheetWindow.xib; path = macosx/URLSheetWindow.xib; sourceTree = "<group>"; };
@@ -947,7 +951,7 @@
 		BE75C3490C729E9500DBEFE0 /* libevent.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libevent.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		BEFC1C000C07750000B0BB3C /* transmission-daemon */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "transmission-daemon"; sourceTree = BUILT_PRODUCTS_DIR; };
 		BEFC1C0E0C07756200B0BB3C /* daemon.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = daemon.c; path = daemon/daemon.c; sourceTree = "<group>"; };
-		BEFC1C140C07756200B0BB3C /* remote.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = remote.c; path = daemon/remote.c; sourceTree = "<group>"; };
+		BEFC1C140C07756200B0BB3C /* remote.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = remote.c; path = utils/remote.c; sourceTree = "<group>"; };
 		BEFC1CF90C07822400B0BB3C /* transmission-remote */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "transmission-remote"; sourceTree = BUILT_PRODUCTS_DIR; };
 		BEFC1DF00C07861A00B0BB3C /* version.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = version.h; path = libtransmission/version.h; sourceTree = "<group>"; };
 		BEFC1DF10C07861A00B0BB3C /* utils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = utils.h; path = libtransmission/utils.h; sourceTree = "<group>"; };
@@ -1260,11 +1264,13 @@
 		29B97314FDCFA39411CA2CEA /* Transmission */ = {
 			isa = PBXGroup;
 			children = (
+				A22CEF9E21CDC44400C5C1BA /* Transmission.entitlements */,
 				4DDBB70A09E16B3200284745 /* GUI */,
 				A2F35BC315C5A0A100EBF632 /* QuickLookPlugin */,
 				4D1838DC09DEC04A0047D688 /* libtransmission */,
 				4DDBB71F09E16BFE00284745 /* CLI */,
 				BEFC1C0B0C07754700B0BB3C /* daemon */,
+				C15E58AC219A37C600AB292F /* utils */,
 				A22CFCB50FC24F630009BD3E /* dht */,
 				A2E384BF130DFA49001F501B /* libutp */,
 				BE75C3570C72A0D600DBEFE0 /* libevent */,
@@ -1598,7 +1604,8 @@
 				A2F35BCD15C5A0A100EBF632 /* main.c */,
 				A2F35BC415C5A0A100EBF632 /* Supporting Files */,
 			);
-			path = QuickLookPlugin;
+			name = QuickLookPlugin;
+			path = macosx/QuickLookPlugin;
 			sourceTree = "<group>";
 		};
 		A2F35BC415C5A0A100EBF632 /* Supporting Files */ = {
@@ -1683,9 +1690,16 @@
 				BEFC1C0E0C07756200B0BB3C /* daemon.c */,
 				C1F690FE1AD0628400D95CF0 /* daemon.h */,
 				C1F690FC1AD0627500D95CF0 /* daemon-posix.c */,
-				BEFC1C140C07756200B0BB3C /* remote.c */,
 			);
 			name = daemon;
+			sourceTree = "<group>";
+		};
+		C15E58AC219A37C600AB292F /* utils */ = {
+			isa = PBXGroup;
+			children = (
+				BEFC1C140C07756200B0BB3C /* remote.c */,
+			);
+			name = utils;
 			sourceTree = "<group>";
 		};
 		C1639A751A55F52800E42033 /* b64 */ = {
@@ -1719,6 +1733,8 @@
 				A257C1800CAD3003004E121C /* PeerTableView.m */,
 				A2E23AC30CB5E1930002BB25 /* InfoTabButtonCell.h */,
 				A2E23AC40CB5E1930002BB25 /* InfoTabButtonCell.m */,
+				A238D49D21CDA1A5006B03EA /* InfoTabMatrix.h */,
+				A238D49E21CDA1A5006B03EA /* InfoTabMatrix.m */,
 				A25BB02812F4F517004B724E /* InfoTabButtonBack.h */,
 				A25BB02912F4F517004B724E /* InfoTabButtonBack.m */,
 				A200B8390A2263BA007BBB1E /* InfoWindowController.h */,
@@ -2142,6 +2158,13 @@
 				LastUpgradeCheck = 0420;
 				ORGANIZATIONNAME = "The Transmission Project";
 				TargetAttributes = {
+					8D1107260486CEB800E47090 = {
+						SystemCapabilities = {
+							com.apple.HardenedRuntime = {
+								enabled = 1;
+							};
+						};
+					};
 					C1639A6E1A55F4D600E42033 = {
 						CreatedOnToolsVersion = 6.1.1;
 					};
@@ -2256,15 +2279,15 @@
 			files = (
 			);
 			inputPaths = (
-				"$(SRCROOT)/third-party/miniupnpc/VERSION",
-				"$(SRCROOT)/third-party/miniupnpc/miniupnpcstrings.h.in",
+				"third-party/miniupnpc/VERSION",
+				"third-party/miniupnpc/miniupnpcstrings.h.in",
 			);
 			outputPaths = (
-				"$(SRCROOT)/third-party/miniupnpc/miniupnpcstrings.h",
+				"third-party/miniupnpc/miniupnpcstrings.h",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cd third-party/miniupnpc\nsh updateminiupnpcstrings.sh \"$SCRIPT_INPUT_FILE_0\" \"$SCRIPT_INPUT_FILE_1\" \"$SCRIPT_OUTPUT_FILE_0\"";
+			shellScript = "cd third-party/miniupnpc\nsh updateminiupnpcstrings.sh \"$SCRIPT_INPUT_FILE_0\" \"$SCRIPT_INPUT_FILE_1\" \"$SCRIPT_OUTPUT_FILE_0\"\n";
 		};
 		BE75C3510C729EE100DBEFE0 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -2277,7 +2300,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "if [ ! -e ./third-party/libevent/include/event2/config.h -a ! ./third-party/macosx-libevent-config.h -ef ./third-party/libevent/include/event2/config.h ]; then ln -s ../../../macosx-libevent-config.h ./third-party/libevent/include/event2/config.h; fi\n\nif [ ! -e ./third-party/libevent/include/event2/event-config.h -a ! ./third-party/macosx-libevent-event-config.h -ef ./third-party/libevent/include/event2/event-config.h ]; then ln -s ../../../macosx-libevent-event-config.h ./third-party/libevent/include/event2/event-config.h; fi";
+			shellScript = "cd third-party/libevent/include/event2\n\nif [ ! -e config.h -a ! ../../../macosx-libevent-config.h -ef config.h ]; then\n    ln -s ../../../macosx-libevent-config.h config.h;\nfi\n\nif [ ! -e event-config.h -a ! ../../../macosx-libevent-event-config.h -ef event-config.h ]; then\n    ln -s ../../../macosx-libevent-event-config.h event-config.h;\nfi\n";
 		};
 		C12F197C1E1AE55A0005E93F /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -2287,11 +2310,11 @@
 			inputPaths = (
 			);
 			outputPaths = (
-				"$(SRCROOT)/third-party/miniupnpc/miniupnp",
+				"third-party/miniupnpc/miniupnp",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cd third-party/miniupnpc && rm -f miniupnp && ln -s . miniupnp";
+			shellScript = "cd third-party/miniupnpc && rm -f miniupnp && ln -s . miniupnp\n";
 		};
 		C12F197D1E1AE6830005E93F /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -2301,11 +2324,11 @@
 			inputPaths = (
 			);
 			outputPaths = (
-				"$(SRCROOT)/third-party/libutp/libutp",
+				"third-party/libutp/libutp",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cd third-party/libutp && rm -f libutp && ln -s . libutp";
+			shellScript = "cd third-party/libutp && rm -f libutp && ln -s . libutp\n";
 		};
 		C12F197E1E1AE6D50005E93F /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -2315,11 +2338,11 @@
 			inputPaths = (
 			);
 			outputPaths = (
-				"$(SRCROOT)/third-party/dht/dht",
+				"third-party/dht/dht",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cd third-party/dht && rm -f dht && ln -s . dht";
+			shellScript = "cd third-party/dht && rm -f dht && ln -s . dht\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -2486,6 +2509,7 @@
 				A2B5B4E91880665E0071A66A /* ShareTorrentFileHelper.m in Sources */,
 				A22BAE281388040500FB022F /* NSMutableArrayAdditions.m in Sources */,
 				A2966E8713DAF74C007B52DF /* GlobalOptionsPopoverViewController.m in Sources */,
+				A238D49F21CDA1A5006B03EA /* InfoTabMatrix.m in Sources */,
 				A234EA541453563B000F3E97 /* NSImageAdditions.m in Sources */,
 				A2AB883E16A399A6008FAD50 /* VDKQueue.m in Sources */,
 				A2451E6916ACE4EB00586E0E /* FileRenameSheetController.m in Sources */,
@@ -2887,8 +2911,7 @@
 				A2F35BC715C5A0A100EBF632 /* en */,
 			);
 			name = InfoPlist.strings;
-			path = macosx/QuickLookPlugin;
-			sourceTree = SOURCE_ROOT;
+			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
 
@@ -2916,11 +2939,6 @@
 					"third-party/libutp",
 					"third-party/miniupnpc",
 				);
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/build/Development\"",
-					"\"$(SRCROOT)/build/Debug\"",
-				);
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-DWITH_UTP",
@@ -2942,13 +2960,14 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = macosx;
 				GCC_PREFIX_HEADER = macosx/Transmission_Prefix.pch;
-				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks";
-				LIBRARY_SEARCH_PATHS = (
+				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/third-party/curl/lib\"",
+					.,
 				);
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks";
 				PRODUCT_NAME = Transmission;
 				WRAPPER_EXTENSION = app;
 			};
@@ -2959,8 +2978,9 @@
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = NO;
 				HEADER_SEARCH_PATHS = (
-					"third-party/curl/include",
+					"$(inherited)",
 					.,
+					"third-party/libevent/include",
 				);
 				PRODUCT_NAME = transmissioncli;
 			};
@@ -3039,15 +3059,15 @@
 				IBC_FLATTEN_NIBS = YES;
 				IBC_NOTICES = NO;
 				IBC_WARNINGS = YES;
-				INFOPLIST_FILE = "$(SRCROOT)/macosx/Info.plist";
+				INFOPLIST_FILE = macosx/Info.plist;
 				INFOPLIST_OTHER_PREPROCESSOR_FLAGS = "-traditional";
-				INFOPLIST_PREFIX_HEADER = "$(SRCROOT)/libtransmission/version.h";
+				INFOPLIST_PREFIX_HEADER = libtransmission/version.h;
 				INFOPLIST_PREPROCESS = YES;
 				LIBRARY_SEARCH_PATHS = (
 					"third-party/curl/lib",
 					"third-party/openssl/lib",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
 				STRIP_INSTALLED_PRODUCT = NO;
@@ -3094,11 +3114,6 @@
 					"third-party/libutp",
 					"third-party/miniupnpc",
 				);
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/build/Development\"",
-					"\"$(SRCROOT)/build/Debug\"",
-				);
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-DWITH_UTP",
@@ -3121,8 +3136,9 @@
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = NO;
 				HEADER_SEARCH_PATHS = (
-					"third-party/curl/include",
+					"$(inherited)",
 					.,
+					"third-party/libevent/include",
 				);
 				PRODUCT_NAME = transmissioncli;
 			};
@@ -3132,13 +3148,14 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = macosx;
 				GCC_PREFIX_HEADER = macosx/Transmission_Prefix.pch;
-				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks";
-				LIBRARY_SEARCH_PATHS = (
+				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/third-party/curl/lib\"",
+					.,
 				);
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks";
 				PRODUCT_NAME = Transmission;
 				WRAPPER_EXTENSION = app;
 			};
@@ -3186,15 +3203,15 @@
 				IBC_FLATTEN_NIBS = YES;
 				IBC_NOTICES = NO;
 				IBC_WARNINGS = YES;
-				INFOPLIST_FILE = "$(SRCROOT)/macosx/Info.plist";
+				INFOPLIST_FILE = macosx/Info.plist;
 				INFOPLIST_OTHER_PREPROCESSOR_FLAGS = "-traditional";
-				INFOPLIST_PREFIX_HEADER = "$(SRCROOT)/libtransmission/version.h";
+				INFOPLIST_PREFIX_HEADER = libtransmission/version.h;
 				INFOPLIST_PREPROCESS = YES;
 				LIBRARY_SEARCH_PATHS = (
 					"third-party/curl/lib",
 					"third-party/openssl/lib",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				OTHER_CFLAGS = "-DNDEBUG";
 				SDKROOT = macosx;
 			};
@@ -3267,15 +3284,15 @@
 				IBC_FLATTEN_NIBS = YES;
 				IBC_NOTICES = NO;
 				IBC_WARNINGS = YES;
-				INFOPLIST_FILE = "$(SRCROOT)/macosx/Info.plist";
+				INFOPLIST_FILE = macosx/Info.plist;
 				INFOPLIST_OTHER_PREPROCESSOR_FLAGS = "-traditional";
-				INFOPLIST_PREFIX_HEADER = "$(SRCROOT)/libtransmission/version.h";
+				INFOPLIST_PREFIX_HEADER = libtransmission/version.h;
 				INFOPLIST_PREPROCESS = YES;
 				LIBRARY_SEARCH_PATHS = (
 					"third-party/curl/lib",
 					"third-party/openssl/lib",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
 				STRIP_INSTALLED_PRODUCT = NO;
@@ -3286,13 +3303,14 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = macosx;
 				GCC_PREFIX_HEADER = macosx/Transmission_Prefix.pch;
-				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks";
-				LIBRARY_SEARCH_PATHS = (
+				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/third-party/curl/lib\"",
+					.,
 				);
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks";
 				PRODUCT_NAME = Transmission;
 				WRAPPER_EXTENSION = app;
 			};
@@ -3303,8 +3321,9 @@
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = NO;
 				HEADER_SEARCH_PATHS = (
-					"third-party/curl/include",
+					"$(inherited)",
 					.,
+					"third-party/libevent/include",
 				);
 				PRODUCT_NAME = transmissioncli;
 			};
@@ -3322,11 +3341,6 @@
 					"third-party/libnatpmp",
 					"third-party/libutp",
 					"third-party/miniupnpc",
-				);
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/build/Development\"",
-					"\"$(SRCROOT)/build/Debug\"",
 				);
 				OTHER_CFLAGS = (
 					"$(inherited)",
@@ -3419,8 +3433,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = YES;
-				GCC_PREFIX_HEADER = "$(SRCROOT)/macosx/QuickLookPlugin/QuickLookPlugin-Prefix.pch";
-				INFOPLIST_FILE = "$(SRCROOT)/macosx/QuickLookPlugin/QuickLookPlugin-Info.plist";
+				GCC_PREFIX_HEADER = "macosx/QuickLookPlugin/QuickLookPlugin-Prefix.pch";
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					.,
+				);
+				INFOPLIST_FILE = "macosx/QuickLookPlugin/QuickLookPlugin-Info.plist";
 				INSTALL_PATH = /Library/QuickLook;
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -3432,8 +3450,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = YES;
-				GCC_PREFIX_HEADER = "$(SRCROOT)/macosx/QuickLookPlugin/QuickLookPlugin-Prefix.pch";
-				INFOPLIST_FILE = "$(SRCROOT)/macosx/QuickLookPlugin/QuickLookPlugin-Info.plist";
+				GCC_PREFIX_HEADER = "macosx/QuickLookPlugin/QuickLookPlugin-Prefix.pch";
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					.,
+				);
+				INFOPLIST_FILE = "macosx/QuickLookPlugin/QuickLookPlugin-Info.plist";
 				INSTALL_PATH = /Library/QuickLook;
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -3445,8 +3467,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = YES;
-				GCC_PREFIX_HEADER = "$(SRCROOT)/macosx/QuickLookPlugin/QuickLookPlugin-Prefix.pch";
-				INFOPLIST_FILE = "$(SRCROOT)/macosx/QuickLookPlugin/QuickLookPlugin-Info.plist";
+				GCC_PREFIX_HEADER = "macosx/QuickLookPlugin/QuickLookPlugin-Prefix.pch";
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					.,
+				);
+				INFOPLIST_FILE = "macosx/QuickLookPlugin/QuickLookPlugin-Info.plist";
 				INSTALL_PATH = /Library/QuickLook;
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";

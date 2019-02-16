@@ -31,4 +31,6 @@
 
 - (void) setSelectedTab: (BOOL) selected;
 
+- (void) reloadAppearance;
+
 @end

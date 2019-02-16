@@ -140,7 +140,7 @@
 #else
 #define TR_STATIC_ASSERT(x, msg) \
     { \
-        typedef char __tr_static_check__[(x) ? 1 : -1] UNUSED; \
+        typedef char __tr_static_check__ [(x) ? 1 : -1] UNUSED; \
     }
 #endif
 

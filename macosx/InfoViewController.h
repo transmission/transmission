@@ -22,7 +22,6 @@
 
 #import <Cocoa/Cocoa.h>
 
-
 @protocol InfoViewController
 
 - (void) setInfoForTorrents: (NSArray *) torrents;
