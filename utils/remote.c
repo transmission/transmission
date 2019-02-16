@@ -238,15 +238,15 @@ enum
 static char const* getUsage(void)
 {
     return MY_NAME " " LONG_VERSION_STRING "\n"
-           "A fast and easy BitTorrent client\n"
-           "https://transmissionbt.com/\n"
-           "\n"
-           "Usage: " MY_NAME " [host] [options]\n"
-           "       " MY_NAME " [port] [options]\n"
-           "       " MY_NAME " [host:port] [options]\n"
-           "       " MY_NAME " [http(s?)://host:port/transmission/] [options]\n"
-           "\n"
-           "See the man page for detailed explanations and many examples.";
+        "A fast and easy BitTorrent client\n"
+        "https://transmissionbt.com/\n"
+        "\n"
+        "Usage: " MY_NAME " [host] [options]\n"
+        "       " MY_NAME " [port] [options]\n"
+        "       " MY_NAME " [host:port] [options]\n"
+        "       " MY_NAME " [http(s?)://host:port/transmission/] [options]\n"
+        "\n"
+        "See the man page for detailed explanations and many examples.";
 }
 
 /***
