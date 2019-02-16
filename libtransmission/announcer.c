@@ -158,7 +158,7 @@ static void scrapeInfoFree(void *va)
     tr_free(a);
 }
 
-static int compareScrapeInfo(const void* va, const void* vb)
+static int compareScrapeInfo(void const* va, void const* vb)
 {
     const struct tr_scrape_info* a = va;
     const struct tr_scrape_info* b = vb;
@@ -181,7 +181,7 @@ typedef struct tr_announcer
 }
 tr_announcer;
 
-static struct tr_scrape_info* tr_announcerGetScrapeInfo(struct tr_announcer* announcer, const char* url)
+static struct tr_scrape_info* tr_announcerGetScrapeInfo(struct tr_announcer* announcer, char const* url)
 {
     struct tr_scrape_info* info = NULL;
 
@@ -1516,7 +1516,7 @@ static void on_scrape_done(tr_scrape_response const* response, void* vsession)
 
         if (*multiscrape_max == response->row_count)
         {
-            const int n = MAX(TR_MULTISCRAPE_MIN, *multiscrape_max - TR_MULTISCRAPE_STEP);
+            int const n = MAX(TR_MULTISCRAPE_MIN, *multiscrape_max - TR_MULTISCRAPE_STEP);
             if (*multiscrape_max != n)
             {
                 char* host = NULL;
