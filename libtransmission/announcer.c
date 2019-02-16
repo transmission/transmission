@@ -61,8 +61,6 @@ enum
     /* this is how often to call the UDP tracker upkeep */
     TAU_UPKEEP_INTERVAL_SECS = 5,
 
-    /* minimum number of infohashes to put in a multiscrape */
-    TR_MULTISCRAPE_MIN = 16,
     /* how many infohashes to remove when we get a scrape-too-long error */
     TR_MULTISCRAPE_STEP = 5
 };
@@ -1529,7 +1527,7 @@ static void on_scrape_done(tr_scrape_response const* response, void* vsession)
            error out, lower the value once for that batch, not N times. */
         if (*multiscrape_max >= response->row_count)
         {
-            int const n = MAX(TR_MULTISCRAPE_MIN, *multiscrape_max - TR_MULTISCRAPE_STEP);
+            int const n = MAX(1, *multiscrape_max - TR_MULTISCRAPE_STEP);
             if (*multiscrape_max != n)
             {
                 char* scheme = NULL;
