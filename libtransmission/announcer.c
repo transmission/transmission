@@ -1360,7 +1360,7 @@ static bool multiscrape_too_big(char const* errmsg)
 
     /* Found a tracker that returns some bespoke string for this case?
        Add your patch here and open a PR */
-    static char const* too_long_errors[3] =
+    static char const* const too_long_errors[] =
     {
         "Bad Request",
         "GET string too long",
