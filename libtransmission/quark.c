@@ -163,7 +163,7 @@ static struct tr_key_struct const my_static[] =
     { "isStalled", 9 },
     { "isUTP", 5 },
     { "isUploadingTo", 13 },
-    { "labels", 6 }, 
+    { "labels", 6 },
     { "lastAnnouncePeerCount", 21 },
     { "lastAnnounceResult", 18 },
     { "lastAnnounceStartTime", 21 },

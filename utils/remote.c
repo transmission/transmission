@@ -238,15 +238,15 @@ enum
 static char const* getUsage(void)
 {
     return MY_NAME " " LONG_VERSION_STRING "\n"
-        "A fast and easy BitTorrent client\n"
-        "https://transmissionbt.com/\n"
-        "\n"
-        "Usage: " MY_NAME " [host] [options]\n"
-        "       " MY_NAME " [port] [options]\n"
-        "       " MY_NAME " [host:port] [options]\n"
-        "       " MY_NAME " [http(s?)://host:port/transmission/] [options]\n"
-        "\n"
-        "See the man page for detailed explanations and many examples.";
+           "A fast and easy BitTorrent client\n"
+           "https://transmissionbt.com/\n"
+           "\n"
+           "Usage: " MY_NAME " [host] [options]\n"
+           "       " MY_NAME " [port] [options]\n"
+           "       " MY_NAME " [host:port] [options]\n"
+           "       " MY_NAME " [http(s?)://host:port/transmission/] [options]\n"
+           "\n"
+           "See the man page for detailed explanations and many examples.";
 }
 
 /***
@@ -290,7 +290,7 @@ static tr_option opts[] =
     { 920, "session-info", "Show the session's details", "si", 0, NULL },
     { 921, "session-stats", "Show the session's statistics", "st", 0, NULL },
     { 'l', "list", "List all torrents", "l", 0, NULL },
-    { 'L', "labels", "Set the current torrents' labels", "L",  1, "<label[,label...]>" },
+    { 'L', "labels", "Set the current torrents' labels", "L", 1, "<label[,label...]>" },
     { 960, "move", "Move current torrent's data to a new folder", NULL, 1, "<path>" },
     { 961, "find", "Tell Transmission where to find a torrent's data", NULL, 1, "<path>" },
     { 'm', "portmap", "Enable portmapping via NAT-PMP or UPnP", "m", 0, NULL },
@@ -651,19 +651,26 @@ static void addDays(tr_variant* args, tr_quark const key, char const* arg)
     }
 }
 
-static void addLabels(tr_variant* args, const tr_quark key, const char* arg)
+static void addLabels(tr_variant* args, char const* arg)
 {
-    tr_variant* labels = tr_variantDictAddList(args, key, 10);
+    tr_variant* labels;
+    if (!tr_variantDictFindList(args, TR_KEY_labels, &labels))
+    {
+        labels = tr_variantDictAddList(args, TR_KEY_labels, 10);
+    }
+
     char* argcpy = tr_strdup(arg);
     char* const tmp = argcpy; /* save copied string start pointer to free later */
     char* token;
     while ((token = tr_strsep(&argcpy, ",")) != NULL)
     {
+        tr_strstrip(token);
         if (*token != '\0')
         {
-            tr_variantListAddStr(labels, tr_strstrip(token));
+            tr_variantListAddStr(labels, token);
         }
     }
+
     tr_free(tmp);
 }
 
@@ -959,8 +966,8 @@ static void printDetails(tr_variant* top)
 
             if (tr_variantDictFindList(t, TR_KEY_labels, &l))
             {
-                const int n = tr_variantListSize(l);
-                const char* str;
+                int const n = tr_variantListSize(l);
+                char const* str;
                 printf("  Labels: ");
                 for (int i = 0; i < n; i++)
                 {
@@ -969,6 +976,7 @@ static void printDetails(tr_variant* top)
                         printf(i == 0 ? "%s" : ", %s", str);
                     }
                 }
+
                 printf("\n");
             }
 
@@ -2686,8 +2694,9 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
             switch (c)
             {
             case 'L':
-                addLabels(args, TR_KEY_labels, optarg);
+                addLabels(args, optarg);
                 break;
+
             case 712:
                 tr_variantListAddInt(tr_variantDictAddList(args, TR_KEY_trackerRemove, 1), atoi(optarg));
                 break;
