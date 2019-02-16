@@ -1418,7 +1418,7 @@ static tr_tier* find_tier(tr_torrent* tor, char const* scrape)
         tr_tracker const* const tracker = tt->tiers[i].currentTracker;
 
         if (tracker != NULL &&
-            tracker->scrape_info &&
+            tracker->scrape_info != NULL &&
             tr_strcmp0(scrape, tracker->scrape_info->url) == 0)
         {
             return &tt->tiers[i];
