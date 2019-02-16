@@ -206,7 +206,7 @@ void gtr_get_host_from_url(char* buf, size_t buflen, char const* url)
 static gboolean gtr_is_supported_url(char const* str)
 {
     return str != NULL && (g_str_has_prefix(str, "ftp://") || g_str_has_prefix(str, "http://") ||
-           g_str_has_prefix(str, "https://"));
+        g_str_has_prefix(str, "https://"));
 }
 
 gboolean gtr_is_magnet_link(char const* str)

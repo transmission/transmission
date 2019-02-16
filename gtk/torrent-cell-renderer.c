@@ -568,7 +568,8 @@ static void gtr_cell_renderer_render(GtkCellRenderer* renderer, GtrDrawable* dra
 }
 
 static void render_compact(TorrentCellRenderer* cell, GtrDrawable* window, GtkWidget* widget,
-    GdkRectangle const* background_area, GdkRectangle const* cell_area UNUSED, GtkCellRendererState flags)
+    GdkRectangle const* background_area, GdkRectangle const* cell_area UNUSED,
+    GtkCellRendererState flags)
 {
     int xpad;
     int ypad;
@@ -754,7 +755,8 @@ static void render_full(TorrentCellRenderer* cell, GtrDrawable* window, GtkWidge
 }
 
 static void torrent_cell_renderer_render(GtkCellRenderer* cell, GtrDrawable* window, GtkWidget* widget,
-    GdkRectangle const* background_area, GdkRectangle const* cell_area, GtkCellRendererState flags)
+    GdkRectangle const* background_area, GdkRectangle const* cell_area,
+    GtkCellRendererState flags)
 {
     TorrentCellRenderer* self = TORRENT_CELL_RENDERER(cell);
 

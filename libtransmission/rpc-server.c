@@ -555,7 +555,7 @@ static bool isIPAddressWithOptionalPort(char const* host)
     int address_len = sizeof(address);
 
     /* TODO: move to net.{c,h} */
-    return evutil_parse_sockaddr_port(host, (struct sockaddr *) &address, &address_len) != -1;
+    return evutil_parse_sockaddr_port(host, (struct sockaddr*)&address, &address_len) != -1;
 }
 
 static bool isHostnameAllowed(tr_rpc_server const* server, struct evhttp_request* req)
@@ -672,7 +672,8 @@ static void handle_request(struct evhttp_request* req, void* arg)
         {
             evhttp_add_header(req->output_headers, "WWW-Authenticate", "Basic realm=\"" MY_REALM "\"");
             server->loginattempts++;
-            char* unauthuser = tr_strdup_printf("<p>Unauthorized User. %d unsuccessful login attempts.</p>", server->loginattempts);
+            char* unauthuser = tr_strdup_printf("<p>Unauthorized User. %d unsuccessful login attempts.</p>",
+                server->loginattempts);
             send_simple_response(req, 401, unauthuser);
             tr_free(unauthuser);
             tr_free(user);
@@ -1236,7 +1237,8 @@ tr_rpc_server* tr_rpcInit(tr_session* session, tr_variant* settings)
 
     if (s->isEnabled)
     {
-        tr_logAddNamedInfo(MY_NAME, _("Serving RPC and Web requests on %s:%d%s"), tr_rpcGetBindAddress(s), (int)s->port, s->url);
+        tr_logAddNamedInfo(MY_NAME, _("Serving RPC and Web requests on %s:%d%s"), tr_rpcGetBindAddress(s), (int)s->port,
+            s->url);
         tr_runInEventThread(session, startServer, s);
 
         if (s->isWhitelistEnabled)

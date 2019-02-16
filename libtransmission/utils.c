@@ -811,7 +811,7 @@ bool tr_urlIsValidTracker(char const* url)
     size_t const url_len = strlen(url);
 
     return isValidURLChars(url, url_len) && tr_urlParse(url, url_len, NULL, NULL, NULL, NULL) &&
-           (memcmp(url, "http://", 7) == 0 || memcmp(url, "https://", 8) == 0 || memcmp(url, "udp://", 6) == 0);
+        (memcmp(url, "http://", 7) == 0 || memcmp(url, "https://", 8) == 0 || memcmp(url, "udp://", 6) == 0);
 }
 
 bool tr_urlIsValid(char const* url, size_t url_len)
@@ -827,8 +827,8 @@ bool tr_urlIsValid(char const* url, size_t url_len)
     }
 
     return isValidURLChars(url, url_len) && tr_urlParse(url, url_len, NULL, NULL, NULL, NULL) &&
-           (memcmp(url, "http://", 7) == 0 || memcmp(url, "https://", 8) == 0 || memcmp(url, "ftp://", 6) == 0 ||
-           memcmp(url, "sftp://", 7) == 0);
+        (memcmp(url, "http://", 7) == 0 || memcmp(url, "https://", 8) == 0 || memcmp(url, "ftp://", 6) == 0 ||
+            memcmp(url, "sftp://", 7) == 0);
 }
 
 bool tr_addressIsIP(char const* str)
@@ -979,8 +979,8 @@ void tr_removeElementFromArray(void* array, unsigned int index_to_remove, size_t
         sizeof_element * (--nmemb - index_to_remove));
 }
 
-int tr_lowerBound(void const* key, void const* base, size_t nmemb, size_t size, int (* compar)(void const* key,
-    void const* arrayMember), bool* exact_match)
+int tr_lowerBound(void const* key, void const* base, size_t nmemb, size_t size, tr_voidptr_compare_func compar,
+    bool* exact_match)
 {
     size_t first = 0;
     char const* cbase = base;
@@ -1038,7 +1038,7 @@ int tr_lowerBound(void const* key, void const* base, size_t nmemb, size_t size, 
     } \
     while (0)
 
-static size_t quickfindPartition(char* base, size_t left, size_t right, size_t size, int (* compar)(void const*, void const*),
+static size_t quickfindPartition(char* base, size_t left, size_t right, size_t size, tr_voidptr_compare_func compar,
     size_t pivotIndex)
 {
     size_t storeIndex;
@@ -1081,8 +1081,7 @@ static size_t quickfindPartition(char* base, size_t left, size_t right, size_t s
     return storeIndex;
 }
 
-static void quickfindFirstK(char* base, size_t left, size_t right, size_t size, int (* compar)(void const*, void const*),
-    size_t k)
+static void quickfindFirstK(char* base, size_t left, size_t right, size_t size, tr_voidptr_compare_func compar, size_t k)
 {
     if (right > left)
     {
@@ -1103,7 +1102,7 @@ static void quickfindFirstK(char* base, size_t left, size_t right, size_t size, 
 
 #ifdef TR_ENABLE_ASSERTS
 
-static void checkBestScoresComeFirst(char* base, size_t nmemb, size_t size, int (* compar)(void const*, void const*), size_t k)
+static void checkBestScoresComeFirst(char* base, size_t nmemb, size_t size, tr_voidptr_compare_func compar, size_t k)
 {
     size_t worstFirstPos = 0;
 
@@ -1128,7 +1127,7 @@ static void checkBestScoresComeFirst(char* base, size_t nmemb, size_t size, int 
 
 #endif
 
-void tr_quickfindFirstK(void* base, size_t nmemb, size_t size, int (* compar)(void const*, void const*), size_t k)
+void tr_quickfindFirstK(void* base, size_t nmemb, size_t size, tr_voidptr_compare_func compar, size_t k)
 {
     if (k < nmemb)
     {

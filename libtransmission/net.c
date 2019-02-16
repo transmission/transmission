@@ -375,7 +375,8 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const
     return ret;
 }
 
-struct tr_peer_socket tr_netOpenPeerUTPSocket(tr_session* session, tr_address const* addr, tr_port port, bool clientIsSeed UNUSED)
+struct tr_peer_socket tr_netOpenPeerUTPSocket(tr_session* session, tr_address const* addr, tr_port port,
+    bool clientIsSeed UNUSED)
 {
     struct tr_peer_socket ret = TR_PEER_SOCKET_INIT;
 
@@ -776,5 +777,5 @@ static bool isMartianAddr(struct tr_address const* a)
 bool tr_address_is_valid_for_peers(tr_address const* addr, tr_port port)
 {
     return port != 0 && tr_address_is_valid(addr) && !isIPv6LinkLocalAddress(addr) && !isIPv4MappedAddress(addr) &&
-           !isMartianAddr(addr);
+        !isMartianAddr(addr);
 }

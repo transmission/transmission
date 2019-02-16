@@ -89,7 +89,7 @@ static char* getTorrentFilename(tr_session const* session, tr_info const* inf, e
 static bool path_component_is_suspicious(char const* component)
 {
     return component == NULL || strpbrk(component, PATH_DELIMITER_CHARS) != NULL || strcmp(component, ".") == 0 ||
-           strcmp(component, "..") == 0;
+        strcmp(component, "..") == 0;
 }
 
 static bool getfile(char** setme, char const* root, tr_variant* path, struct evbuffer* buf)
@@ -626,7 +626,8 @@ static char const* tr_metainfoParseImpl(tr_session const* session, tr_info* inf,
     /* files */
     if (!isMagnet)
     {
-        if ((str = parseFiles(inf, tr_variantDictFind(infoDict, TR_KEY_files), tr_variantDictFind(infoDict, TR_KEY_length))) != NULL)
+        if ((str = parseFiles(inf, tr_variantDictFind(infoDict, TR_KEY_files), tr_variantDictFind(infoDict,
+            TR_KEY_length))) != NULL)
         {
             return str;
         }
