@@ -1374,7 +1374,7 @@ static bool multiscrape_too_big(char const* errmsg)
 
     for (i = 0; i < TR_N_ELEMENTS(too_long_errors); ++i)
     {
-        if (strstr(errmsg, too_long_errors[i]))
+        if (strstr(errmsg, too_long_errors[i]) != NULL)
         {
             return true;
         }
