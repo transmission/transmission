@@ -185,7 +185,7 @@ static struct tr_scrape_info* tr_announcerGetScrapeInfo(struct tr_announcer* ann
 {
     struct tr_scrape_info* info = NULL;
 
-    if (url && *url)
+    if (url != NULL && *url != '\0')
     {
         int pos;
         bool found;
