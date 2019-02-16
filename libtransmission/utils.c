@@ -1162,7 +1162,7 @@ static char* strip_non_utf8(char const* in, size_t inlen)
     return evbuffer_free_to_str(buf, NULL);
 }
 
-static char* to_utf8(const char* in, size_t inlen)
+static char* to_utf8(char const* in, size_t inlen)
 {
     char* ret = NULL;
 
