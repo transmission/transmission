@@ -1357,21 +1357,31 @@ static void tierAnnounce(tr_announcer* announcer, tr_tier* tier)
 ***/
 
 static bool multiscrape_too_big(char const* errmsg)
-{ 
-  if (!errmsg)
-      return false;
+{
+    unsigned int i;
 
-  if (strstr(errmsg, "GET string too long"))
-      return true;
-  if (strstr(errmsg, "Request-URI Too Long"))
-      return true;
-  if (strstr(errmsg, "Bad Request"))
-      return true;
+    /* Found a tracker that returns some bespoke string for this case?
+       Add your patch here and open a PR */
+    static char const* too_long_errors[3] = {
+        "Bad Request",
+        "GET string too long",
+        "Request-URI Too Long"
+    };
 
-  /* Found a tracker that returns some bespoke string for this case?
-     Add your patch here and open a PR */
+    if (!errmsg)
+    {
+        return false;
+    }
 
-  return false;
+    for (i=0; i<TR_N_ELEMENTS(too_long_errors); ++i)
+    {
+        if (strstr(errmsg, too_long_errors[i]))
+        {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 static void on_scrape_error(tr_session* session, tr_tier* tier, char const* errmsg)
