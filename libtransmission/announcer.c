@@ -190,16 +190,17 @@ static struct tr_scrape_info* tr_announcerGetScrapeInfo(struct tr_announcer* ann
         bool found;
         struct tr_scrape_info const key = { .url = (char*)url };
         int const pos = tr_ptrArrayLowerBound(&announcer->scrape_info, &key, compareScrapeInfo, &found);
-
-        if (!found)
+        if (found)
+        {
+            info = tr_ptrArrayNth(&announcer->scrape_info, pos);
+        }
+        else
         {
             info = tr_new0(struct tr_scrape_info, 1);
             info->url = tr_strdup(url);
             info->multiscrape_max = TR_MULTISCRAPE_MAX;
             tr_ptrArrayInsert(&announcer->scrape_info, info, pos);
         }
-
-        info = tr_ptrArrayNth(&announcer->scrape_info, pos);
     }
 
     return info;
