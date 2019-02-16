@@ -1528,11 +1528,17 @@ static void on_scrape_done(tr_scrape_response const* response, void* vsession)
             int const n = MAX(TR_MULTISCRAPE_MIN, *multiscrape_max - TR_MULTISCRAPE_STEP);
             if (*multiscrape_max != n)
             {
+                char* scheme = NULL;
                 char* host = NULL;
-                if (tr_urlParse(url, strlen(url), NULL, &host, NULL, NULL))
+                int port;
+                if (tr_urlParse(url, strlen(url), &scheme, &host, &port, NULL))
                 {
+                    /* don't log the full URL, since that might have a personal announce id */
+                    char* sanitized_url = tr_strdup_printf("%s://%s:%d", scheme, host, port);
                     tr_logAddNamedInfo(host, "Reducing multiscrape max to %d", n);
+                    tr_free(sanitized_url);
                     tr_free(host);
+                    tr_free(scheme);
                 }
 
                 *multiscrape_max = n;
