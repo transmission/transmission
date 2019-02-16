@@ -145,12 +145,12 @@ static int compareStops(void const* va, void const* vb)
 
 struct tr_scrape_info
 {
-    char * url;
+    char* url;
 
     int multiscrape_max;
 };
 
-static void scrapeInfoFree(void *va)
+static void scrapeInfoFree(void* va)
 {
     struct tr_scrape_info* a = va;
 
@@ -1362,7 +1362,8 @@ static bool multiscrape_too_big(char const* errmsg)
 
     /* Found a tracker that returns some bespoke string for this case?
        Add your patch here and open a PR */
-    static char const* too_long_errors[3] = {
+    static char const* too_long_errors[3] =
+    {
         "Bad Request",
         "GET string too long",
         "Request-URI Too Long"
@@ -1373,7 +1374,7 @@ static bool multiscrape_too_big(char const* errmsg)
         return false;
     }
 
-    for (i=0; i<TR_N_ELEMENTS(too_long_errors); ++i)
+    for (i = 0; i < TR_N_ELEMENTS(too_long_errors); ++i)
     {
         if (strstr(errmsg, too_long_errors[i]))
         {
@@ -1418,9 +1419,9 @@ static tr_tier* find_tier(tr_torrent* tor, char const* scrape)
     {
         tr_tracker const* const tracker = tt->tiers[i].currentTracker;
 
-        if (tracker != NULL
-            && tracker->scrape_info
-            && tr_strcmp0(scrape, tracker->scrape_info->url) == 0)
+        if (tracker != NULL &&
+            tracker->scrape_info &&
+            tr_strcmp0(scrape, tracker->scrape_info->url) == 0)
         {
             return &tt->tiers[i];
         }
