@@ -1523,7 +1523,10 @@ static void on_scrape_done(tr_scrape_response const* response, void* vsession)
         char const* url = response->url;
         int* multiscrape_max = &tr_announcerGetScrapeInfo(announcer, url)->multiscrape_max;
 
-        if (*multiscrape_max == response->row_count)
+        /* Lower the max only if it hasn't already lowered for a similar error.
+           For example if N parallel multiscrapes all have the same `max` and
+           error out, lower the value once for that batch, not N times. */
+        if (*multiscrape_max >= response->row_count)
         {
             int const n = MAX(TR_MULTISCRAPE_MIN, *multiscrape_max - TR_MULTISCRAPE_STEP);
             if (*multiscrape_max != n)
