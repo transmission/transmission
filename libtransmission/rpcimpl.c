@@ -944,26 +944,32 @@ static char const* torrentGet(tr_session* session, tr_variant* args_in, tr_varia
 
 static char const* setLabels(tr_torrent* tor, tr_variant* list)
 {
-    char const* str;
-    size_t str_len;
     int const n = tr_variantListSize(list);
     char const* errmsg = NULL;
     tr_ptrArray labels = TR_PTR_ARRAY_INIT;
     int labelcount = 0;
     for (int i = 0; i < n; i++)
     {
+        char const* str;
+        size_t str_len;
         if (tr_variantGetStr(tr_variantListChild(list, i), &str, &str_len) && str != NULL && str_len != 0)
         {
+            char* label = tr_strndup(str, str_len);
+            tr_strstrip(label);
+            if (*label == '\0')
+            {
+                errmsg = "labels cannot be empty";
+            }
+
             if (strchr(str, ',') != NULL)
             {
                 errmsg = "labels cannot contain comma (,) character";
-                break;
             }
 
             bool dup = false;
             for (int j = 0; j < labelcount; j++)
             {
-                if (tr_strcmp0(str, (char*)tr_ptrArrayNth(&labels, j)) == 0)
+                if (tr_strcmp0(label, (char*)tr_ptrArrayNth(&labels, j)) == 0)
                 {
                     dup = true;
                     break;
@@ -973,11 +979,15 @@ static char const* setLabels(tr_torrent* tor, tr_variant* list)
             if (dup)
             {
                 errmsg = "labels cannot contain duplicates";
-                break;
             }
 
-            tr_ptrArrayAppend(&labels, tr_strndup(str, str_len));
+            tr_ptrArrayAppend(&labels, label);
             labelcount++;
+
+            if (errmsg != NULL)
+            {
+                break;
+            }
         }
     }
 
