@@ -509,7 +509,7 @@ static bool tr_torrentIsSeedIdleLimitDone(tr_torrent* tor)
 {
     uint16_t idleMinutes;
     return tr_torrentGetSeedIdle(tor, &idleMinutes) &&
-           difftime(tr_time(), MAX(tor->startDate, tor->activityDate)) >= idleMinutes * 60u;
+        difftime(tr_time(), MAX(tor->startDate, tor->activityDate)) >= idleMinutes * 60u;
 }
 
 /***
@@ -1317,7 +1317,7 @@ static time_t torrentGetIdleSecs(tr_torrent const* tor)
 bool tr_torrentIsStalled(tr_torrent const* tor)
 {
     return tr_sessionGetQueueStalledEnabled(tor->session) &&
-           torrentGetIdleSecs(tor) > tr_sessionGetQueueStalledMinutes(tor->session) * 60;
+        torrentGetIdleSecs(tor) > tr_sessionGetQueueStalledMinutes(tor->session) * 60;
 }
 
 static double getVerifyProgress(tr_torrent const* tor)
@@ -2318,21 +2318,21 @@ void tr_torrentRecheckCompleteness(tr_torrent* tor)
 
         fireCompletenessChange(tor, completeness, wasRunning);
 
-        if (tr_torrentIsSeed(tor))
+        if (tr_torrentIsSeed(tor) && wasLeeching && wasRunning)
         {
-            if (wasLeeching && wasRunning)
-            {
-                /* if completeness was TR_LEECH then the seed limit check will have been skipped in bandwidthPulse */
-                tr_torrentCheckSeedLimit(tor);
-            }
-
-            if (tr_sessionIsTorrentDoneScriptEnabled(tor->session))
-            {
-                torrentCallScript(tor, tr_sessionGetTorrentDoneScript(tor->session));
-            }
+            /* if completeness was TR_LEECH, the seed limit check
+               will have been skipped in bandwidthPulse */
+            tr_torrentCheckSeedLimit(tor);
         }
 
         tr_torrentSetDirty(tor);
+
+        if (tr_torrentIsSeed(tor) && tr_sessionIsTorrentDoneScriptEnabled(tor->session))
+        {
+            tr_torrentSave(tor);
+
+            torrentCallScript(tor, tr_sessionGetTorrentDoneScript(tor->session));
+        }
     }
 
     tr_torrentUnlock(tor);
@@ -3769,7 +3769,7 @@ void tr_torrentSetQueueStartCallback(tr_torrent* torrent, void (* callback)(tr_t
 static bool renameArgsAreValid(char const* oldpath, char const* newname)
 {
     return oldpath != NULL && *oldpath != '\0' && newname != NULL && *newname != '\0' && strcmp(newname, ".") != 0 &&
-           strcmp(newname, "..") != 0 && strchr(newname, TR_PATH_DELIMITER) == NULL;
+        strcmp(newname, "..") != 0 && strchr(newname, TR_PATH_DELIMITER) == NULL;
 }
 
 static tr_file_index_t* renameFindAffectedFiles(tr_torrent* tor, char const* oldpath, size_t* setme_n)

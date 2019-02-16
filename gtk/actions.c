@@ -86,7 +86,8 @@ static GtkActionEntry entries[] =
     { "open-torrent-toolbar", GTK_STOCK_OPEN, NULL, NULL, N_("Open a torrent"), G_CALLBACK(action_cb) },
     { "open-torrent-menu", GTK_STOCK_OPEN, NULL, NULL, N_("Open a torrent"), G_CALLBACK(action_cb) },
     { "torrent-start", GTK_STOCK_MEDIA_PLAY, N_("_Start"), "<control>S", N_("Start torrent"), G_CALLBACK(action_cb) },
-    { "torrent-start-now", GTK_STOCK_MEDIA_PLAY, N_("Start _Now"), "<shift><control>S", N_("Start torrent now"), G_CALLBACK(action_cb) },
+    { "torrent-start-now", GTK_STOCK_MEDIA_PLAY, N_("Start _Now"), "<shift><control>S", N_("Start torrent now"),
+        G_CALLBACK(action_cb) },
     { "show-stats", NULL, N_("_Statistics"), NULL, NULL, G_CALLBACK(action_cb) },
     { "donate", NULL, N_("_Donate"), NULL, NULL, G_CALLBACK(action_cb) },
     { "torrent-verify", NULL, N_("_Verify Local Data"), "<control>V", NULL, G_CALLBACK(action_cb) },
@@ -206,14 +207,16 @@ void gtr_actions_init(GtkUIManager* ui_manager, gpointer callback_user_data)
     gtk_action_group_add_radio_actions(action_group, sort_radio_entries, G_N_ELEMENTS(sort_radio_entries), active,
         G_CALLBACK(sort_changed_cb), NULL);
 
-    gtk_action_group_add_toggle_actions(action_group, show_toggle_entries, G_N_ELEMENTS(show_toggle_entries), callback_user_data);
+    gtk_action_group_add_toggle_actions(action_group, show_toggle_entries, G_N_ELEMENTS(show_toggle_entries),
+        callback_user_data);
 
     for (size_t i = 0; i < G_N_ELEMENTS(pref_toggle_entries); ++i)
     {
         pref_toggle_entries[i].is_active = gtr_pref_flag_get(tr_quark_new(pref_toggle_entries[i].name, TR_BAD_SIZE));
     }
 
-    gtk_action_group_add_toggle_actions(action_group, pref_toggle_entries, G_N_ELEMENTS(pref_toggle_entries), callback_user_data);
+    gtk_action_group_add_toggle_actions(action_group, pref_toggle_entries, G_N_ELEMENTS(pref_toggle_entries),
+        callback_user_data);
 
     gtk_action_group_add_actions(action_group, entries, n_entries, callback_user_data);
 

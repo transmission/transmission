@@ -64,7 +64,7 @@
     NSRectFillListWithColors(gridRects, colorRects, count);
 
     NSGradient *gradient;
-    
+
     if ([NSApp isDarkMode]) {
         NSColor * darkColor = [NSColor colorWithCalibratedRed: 60.0/255.0 green: 60.0/255.0 blue: 60.0/255.0 alpha: 1.0];
         NSColor * lightColor = [NSColor colorWithCalibratedRed: 90.0/255.0 green: 90.0/255.0 blue: 90.0/255.0 alpha: 1.0];
