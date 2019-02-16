@@ -187,12 +187,10 @@ static struct tr_scrape_info* tr_announcerGetScrapeInfo(struct tr_announcer* ann
 
     if (url != NULL && *url != '\0')
     {
-        int pos;
         bool found;
-        struct tr_scrape_info key;
+        struct tr_scrape_info const key = { .url = (char*)url };
+        int const pos = tr_ptrArrayLowerBound(&announcer->scrape_info, &key, compareScrapeInfo, &found);
 
-        key.url = (char*) url;
-        pos = tr_ptrArrayLowerBound(&announcer->scrape_info, &key, compareScrapeInfo, &found);
         if (!found)
         {
             info = tr_new0(struct tr_scrape_info, 1);
