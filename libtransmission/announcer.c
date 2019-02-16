@@ -1367,7 +1367,7 @@ static bool multiscrape_too_big(char const* errmsg)
         "Request-URI Too Long"
     };
 
-    if (!errmsg)
+    if (errmsg == NULL)
     {
         return false;
     }
