@@ -290,6 +290,7 @@ static tr_option opts[] =
     { 920, "session-info", "Show the session's details", "si", 0, NULL },
     { 921, "session-stats", "Show the session's statistics", "st", 0, NULL },
     { 'l', "list", "List all torrents", "l", 0, NULL },
+    { 'L', "labels", "Set the current torrents' labels", "L", 1, "<label[,label...]>" },
     { 960, "move", "Move current torrent's data to a new folder", NULL, 1, "<path>" },
     { 961, "find", "Tell Transmission where to find a torrent's data", NULL, 1, "<path>" },
     { 'm', "portmap", "Enable portmapping via NAT-PMP or UPnP", "m", 0, NULL },
@@ -441,6 +442,7 @@ static int getOptMode(int val)
     case 993: /* no-trash-torrent */
         return MODE_SESSION_SET;
 
+    case 'L': /* labels */
     case 712: /* tracker-remove */
     case 950: /* seedratio */
     case 951: /* seedratio-default */
@@ -649,6 +651,29 @@ static void addDays(tr_variant* args, tr_quark const key, char const* arg)
     }
 }
 
+static void addLabels(tr_variant* args, char const* arg)
+{
+    tr_variant* labels;
+    if (!tr_variantDictFindList(args, TR_KEY_labels, &labels))
+    {
+        labels = tr_variantDictAddList(args, TR_KEY_labels, 10);
+    }
+
+    char* argcpy = tr_strdup(arg);
+    char* const tmp = argcpy; /* save copied string start pointer to free later */
+    char* token;
+    while ((token = tr_strsep(&argcpy, ",")) != NULL)
+    {
+        tr_strstrip(token);
+        if (*token != '\0')
+        {
+            tr_variantListAddStr(labels, token);
+        }
+    }
+
+    tr_free(tmp);
+}
+
 static void addFiles(tr_variant* args, tr_quark const key, char const* arg)
 {
     tr_variant* files = tr_variantDictAddList(args, key, 100);
@@ -706,6 +731,7 @@ static tr_quark const details_keys[] =
     TR_KEY_id,
     TR_KEY_isFinished,
     TR_KEY_isPrivate,
+    TR_KEY_labels,
     TR_KEY_leftUntilDone,
     TR_KEY_magnetLink,
     TR_KEY_name,
@@ -936,6 +962,22 @@ static void printDetails(tr_variant* top)
             if (tr_variantDictFindStr(t, TR_KEY_magnetLink, &str, NULL))
             {
                 printf("  Magnet: %s\n", str);
+            }
+
+            if (tr_variantDictFindList(t, TR_KEY_labels, &l))
+            {
+                int const n = tr_variantListSize(l);
+                char const* str;
+                printf("  Labels: ");
+                for (int i = 0; i < n; i++)
+                {
+                    if (tr_variantGetStr(tr_variantListChild(l, i), &str, NULL))
+                    {
+                        printf(i == 0 ? "%s" : ", %s", str);
+                    }
+                }
+
+                printf("\n");
             }
 
             printf("\n");
@@ -2651,6 +2693,10 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
 
             switch (c)
             {
+            case 'L':
+                addLabels(args, optarg);
+                break;
+
             case 712:
                 tr_variantListAddInt(tr_variantDictAddList(args, TR_KEY_trackerRemove, 1), atoi(optarg));
                 break;

@@ -111,6 +111,44 @@ static uint64_t loadPeers(tr_variant* dict, tr_torrent* tor)
 ****
 ***/
 
+static void saveLabels(tr_variant* dict, tr_torrent const* tor)
+{
+    int const n = tr_ptrArraySize(&tor->labels);
+    tr_variant* list = tr_variantDictAddList(dict, TR_KEY_labels, n);
+    char const* const* labels = (char const* const*)tr_ptrArrayBase(&tor->labels);
+    for (int i = 0; i < n; ++i)
+    {
+        tr_variantListAddStr(list, labels[i]);
+    }
+}
+
+static uint64_t loadLabels(tr_variant* dict, tr_torrent* tor)
+{
+    uint64_t ret = 0;
+    tr_variant* list;
+    if (tr_variantDictFindList(dict, TR_KEY_labels, &list))
+    {
+        int const n = tr_variantListSize(list);
+        char const* str;
+        size_t str_len;
+        for (int i = 0; i < n; ++i)
+        {
+            if (tr_variantGetStr(tr_variantListChild(list, i), &str, &str_len) && str != NULL && str_len != 0)
+            {
+                tr_ptrArrayAppend(&tor->labels, tr_strndup(str, str_len));
+            }
+        }
+
+        ret = TR_FR_LABELS;
+    }
+
+    return ret;
+}
+
+/***
+****
+***/
+
 static void saveDND(tr_variant* dict, tr_torrent const* tor)
 {
     tr_variant* list;
@@ -735,6 +773,7 @@ void tr_torrentSaveResume(tr_torrent* tor)
     saveIdleLimits(&top, tor);
     saveFilenames(&top, tor);
     saveName(&top, tor);
+    saveLabels(&top, tor);
 
     filename = getResumeFilename(tor, TR_METAINFO_BASENAME_HASH);
 
@@ -941,6 +980,11 @@ static uint64_t loadFromFile(tr_torrent* tor, uint64_t fieldsToLoad, bool* didRe
     if ((fieldsToLoad & TR_FR_NAME) != 0)
     {
         fieldsLoaded |= loadName(&top, tor);
+    }
+
+    if ((fieldsToLoad & TR_FR_LABELS) != 0)
+    {
+        fieldsLoaded |= loadLabels(&top, tor);
     }
 
     /* loading the resume file triggers of a lot of changes,
