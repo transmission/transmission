@@ -120,6 +120,8 @@ void tr_error_clear(tr_error** error)
     *error = NULL;
 }
 
+static void error_prefix_valist(tr_error** error, char const* prefix_format, va_list args) TR_GNUC_PRINTF(2, 0);
+
 static void error_prefix_valist(tr_error** error, char const* prefix_format, va_list args)
 {
     TR_ASSERT(error != NULL);

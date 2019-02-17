@@ -62,7 +62,7 @@ tr_error* tr_error_new_literal(int code, char const* message);
  *
  * @return Newly allocated error object on success, `NULL` otherwise.
  */
-tr_error* tr_error_new_valist(int code, char const* message_format, va_list args);
+tr_error* tr_error_new_valist(int code, char const* message_format, va_list args) TR_GNUC_PRINTF(2, 0);
 
 /**
  * @brief Free memory used by error object.
