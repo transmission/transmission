@@ -2054,7 +2054,7 @@ static int processResponse(char const* rpcurl, void const* response, size_t len)
                         }
 
                         /* fall-through to default: to give success or failure msg */
-                        TR_GNUC_FALLTHROUGH
+                        TR_GNUC_FALLTHROUGH;
                     }
 
                 default:
