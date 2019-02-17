@@ -351,9 +351,11 @@ static void saveStringFunc(tr_variant const* v, void* evbuf)
 {
     size_t len;
     char const* str;
-    tr_variantGetStr(v, &str, &len);
-    evbuffer_add_printf(evbuf, "%zu:", len);
-    evbuffer_add(evbuf, str, len);
+    if (tr_variantGetStr(v, &str, &len))
+    {
+        evbuffer_add_printf(evbuf, "%zu:", len);
+        evbuffer_add(evbuf, str, len);
+    }
 }
 
 static void saveDictBeginFunc(tr_variant const* val UNUSED, void* evbuf)
