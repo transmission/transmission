@@ -135,7 +135,7 @@ static gboolean refreshFilesForeach(GtkTreeModel* model, GtkTreePath* path UNUSE
                     (refresh_data->sort_column_id == FC_ENABLED && enabled != old_enabled)))
                 {
                     refresh_data->resort_needed = TRUE;
-                    gtk_tree_sortable_set_sort_column_id(GTK_TREE_SORTABLE( data->model),
+                    gtk_tree_sortable_set_sort_column_id(GTK_TREE_SORTABLE(data->model),
                         GTK_TREE_SORTABLE_UNSORTED_SORT_COLUMN_ID, GTK_SORT_ASCENDING);
                 }
             }

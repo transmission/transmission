@@ -196,7 +196,10 @@ static CURL* createEasy(tr_session* s, struct tr_web* web, struct tr_web_task* t
 
     if (web->curl_ssl_verify)
     {
-        curl_easy_setopt(e, CURLOPT_CAINFO, web->curl_ca_bundle);
+        if (web->curl_ca_bundle != NULL)
+        {
+            curl_easy_setopt(e, CURLOPT_CAINFO, web->curl_ca_bundle);
+        }
     }
     else
     {
@@ -265,7 +268,8 @@ static void task_finish_func(void* vtask)
 static void tr_webThreadFunc(void* vsession);
 
 static struct tr_web_task* tr_webRunImpl(tr_session* session, int torrentId, char const* url, char const* range,
-    char const* cookies, tr_web_done_func done_func, void* done_func_user_data, struct evbuffer* buffer)
+    char const* cookies, tr_web_done_func done_func, void* done_func_user_data,
+    struct evbuffer* buffer)
 {
     struct tr_web_task* task = NULL;
 
@@ -741,7 +745,7 @@ char* tr_http_unescape(char const* str, size_t len)
 static bool is_rfc2396_alnum(uint8_t ch)
 {
     return ('0' <= ch && ch <= '9') || ('A' <= ch && ch <= 'Z') || ('a' <= ch && ch <= 'z') || ch == '.' || ch == '-' ||
-           ch == '_' || ch == '~';
+        ch == '_' || ch == '~';
 }
 
 void tr_http_escape_sha1(char* out, uint8_t const* sha1_digest)

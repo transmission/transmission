@@ -63,7 +63,7 @@ tr_watchdir_win32;
 static BOOL tr_get_overlapped_result_ex(HANDLE handle, LPOVERLAPPED overlapped, LPDWORD bytes_transferred, DWORD timeout,
     BOOL alertable)
 {
-    typedef BOOL (WINAPI * impl_t)(HANDLE, LPOVERLAPPED, LPDWORD, DWORD, BOOL);
+    typedef BOOL (WINAPI* impl_t)(HANDLE, LPOVERLAPPED, LPDWORD, DWORD, BOOL);
 
     static impl_t real_impl = NULL;
     static bool is_real_impl_valid = false;
@@ -268,7 +268,7 @@ tr_watchdir_backend* tr_watchdir_win32_new(tr_watchdir_t handle)
     }
 
     if ((backend->fd = CreateFileW(wide_path, FILE_LIST_DIRECTORY, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL,
-            OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OVERLAPPED, NULL)) == INVALID_HANDLE_VALUE)
+        OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OVERLAPPED, NULL)) == INVALID_HANDLE_VALUE)
     {
         log_error("Failed to open directory \"%s\"", path);
         goto fail;

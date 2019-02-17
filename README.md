@@ -29,6 +29,7 @@ For a more detailed description, and dependencies, visit: https://github.com/tra
     $ tar xf transmission-2.92.tar.xz
     $ cd transmission-2.92
     $ mkdir build
+    $ cd build
     $ cmake ..
     $ make
     $ sudo make install

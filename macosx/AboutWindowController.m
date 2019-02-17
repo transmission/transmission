@@ -20,6 +20,8 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#include <libtransmission/version.h>
+
 #import "AboutWindowController.h"
 
 @implementation AboutWindowController
@@ -34,9 +36,7 @@ AboutWindowController * fAboutBoxInstance = nil;
 
 - (void) awakeFromNib
 {
-    NSDictionary * info = [[NSBundle mainBundle] infoDictionary];
-    [fVersionField setStringValue: [NSString stringWithFormat: @"%@ (%@)",
-        info[@"CFBundleShortVersionString"], info[(NSString *)kCFBundleVersionKey]]];
+    [fVersionField setStringValue: @(LONG_VERSION_STRING)];
 
     [fCopyrightField setStringValue: [[NSBundle mainBundle] localizedStringForKey: @"NSHumanReadableCopyright"
                                         value: nil table: @"InfoPlist"]];

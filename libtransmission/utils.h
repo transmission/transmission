@@ -126,6 +126,7 @@ void tr_win32_make_args_utf8(int* argc, char*** argv);
 
 int tr_main_win32(int argc, char** argv, int (* real_main)(int, char**));
 
+/* *INDENT-OFF* */
 #define tr_main(...) \
     main_impl(__VA_ARGS__); \
     int main(int argc, char* argv[]) \
@@ -133,6 +134,7 @@ int tr_main_win32(int argc, char** argv, int (* real_main)(int, char**));
         return tr_main_win32(argc, argv, &main_impl); \
     } \
     int main_impl(__VA_ARGS__)
+/* *INDENT-ON* */
 
 #else
 
@@ -167,6 +169,7 @@ void tr_free_ptrv(void* const* p);
  */
 void* tr_memdup(void const* src, size_t byteCount);
 
+/* *INDENT-OFF* */
 #define tr_new(struct_type, n_structs) \
     ((struct_type*)tr_malloc(sizeof(struct_type) * (size_t)(n_structs)))
 
@@ -175,6 +178,7 @@ void* tr_memdup(void const* src, size_t byteCount);
 
 #define tr_renew(struct_type, mem, n_structs) \
     ((struct_type*)tr_realloc((mem), sizeof(struct_type) * (size_t)(n_structs)))
+/* *INDENT-ON* */
 
 void* tr_valloc(size_t bufLen);
 
@@ -206,11 +210,11 @@ int tr_memcmp0(void const* lhs, void const* rhs, size_t size);
 char* evbuffer_free_to_str(struct evbuffer* buf, size_t* result_len);
 
 /** @brief similar to bsearch() but returns the index of the lower bound */
-int tr_lowerBound(void const* key, void const* base, size_t nmemb, size_t size, int (* compar)(void const* key,
-    void const* arrayMember), bool* exact_match) TR_GNUC_HOT TR_GNUC_NONNULL(1, 5, 6);
+int tr_lowerBound(void const* key, void const* base, size_t nmemb, size_t size, tr_voidptr_compare_func compar,
+    bool* exact_match) TR_GNUC_HOT TR_GNUC_NONNULL(1, 5, 6);
 
 /** @brief moves the best k items to the first slots in the array. O(n) */
-void tr_quickfindFirstK(void* base, size_t nmemb, size_t size, int (* compar)(void const*, void const*), size_t k);
+void tr_quickfindFirstK(void* base, size_t nmemb, size_t size, tr_voidptr_compare_func compar, size_t k);
 
 /**
  * @brief sprintf() a string into a newly-allocated buffer large enough to hold it

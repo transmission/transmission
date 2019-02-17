@@ -20,17 +20,17 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#include <libtransmission/transmission.h>
+#include <libtransmission/error.h>
+#include <libtransmission/log.h>
+#include <libtransmission/utils.h> // tr_new()
+
 #import "Torrent.h"
 #import "GroupsController.h"
 #import "FileListNode.h"
 #import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 #import "TrackerNode.h"
-
-#import "log.h"
-#import "transmission.h" // required by utils.h
-#import "error.h"
-#import "utils.h" // tr_new()
 
 #define ETA_IDLE_DISPLAY_SEC (2*60)
 

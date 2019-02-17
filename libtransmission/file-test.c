@@ -243,10 +243,12 @@ static int test_get_info(void)
         tr_sys_file_close(fd, NULL);
 
         tr_sys_path_remove(path2, NULL);
+        tr_sys_path_remove(path1, NULL);
 
         /* Good directory info */
         t = time(NULL);
         tr_sys_dir_create(path2, 0, 0777, NULL);
+        check(create_symlink(path1, path2, true)); /* Win32: directory and file symlinks differ :( */
         clear_path_info(&info);
         check(tr_sys_path_get_info(path1, 0, &info, &err));
         check_ptr(err, ==, NULL);
@@ -310,9 +312,11 @@ static int test_path_exists(void)
         check_ptr(err, ==, NULL);
 
         tr_sys_path_remove(path2, NULL);
+        tr_sys_path_remove(path1, NULL);
 
         /* Create directory and see that it exists (via symlink) */
         tr_sys_dir_create(path2, 0, 0777, NULL);
+        check(create_symlink(path1, path2, true)); /* Win32: directory and file symlinks differ :( */
         check(tr_sys_path_exists(path1, &err));
         check_ptr(err, ==, NULL);
 
@@ -615,9 +619,11 @@ static int test_path_resolve(void)
         check(path_contains_no_symlinks(tmp));
         tr_free(tmp);
 
+        tr_sys_path_remove(path2, NULL);
         tr_sys_path_remove(path1, NULL);
-        tr_sys_dir_create(path1, 0, 0755, NULL);
 
+        tr_sys_dir_create(path1, 0, 0755, NULL);
+        check(create_symlink(path2, path1, true)); /* Win32: directory and file symlinks differ :( */
         tmp = tr_sys_path_resolve(path2, &err);
         check_str(tmp, !=, NULL);
         check_ptr(err, ==, NULL);
@@ -984,7 +990,7 @@ static int test_path_remove(void)
 
 static int test_path_native_separators(void)
 {
-    check_str(tr_sys_path_native_separators(NULL), == , NULL);
+    check_str(tr_sys_path_native_separators(NULL), ==, NULL);
 
     char path1[] = "";
     char path2[] = "a";

@@ -111,7 +111,8 @@ static int test_single_file(void)
 }
 
 static int test_single_directory_impl(tr_tracker_info const* trackers, size_t const trackerCount, void const** payloads,
-    size_t const* payloadSizes, size_t const payloadCount, char const* comment, bool const isPrivate)
+    size_t const* payloadSizes, size_t const payloadCount, char const* comment,
+    bool const isPrivate)
 {
     char* sandbox;
     char* torrent_file;
@@ -211,7 +212,8 @@ static int test_single_directory_impl(tr_tracker_info const* trackers, size_t co
 }
 
 static int test_single_directory_random_payload_impl(tr_tracker_info const* trackers, size_t const trackerCount,
-    size_t const maxFileCount, size_t const maxFileSize, char const* comment, bool const isPrivate)
+    size_t const maxFileCount, size_t const maxFileSize, char const* comment,
+    bool const isPrivate)
 {
     void** payloads;
     size_t* payloadSizes;

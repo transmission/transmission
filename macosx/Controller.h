@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2005-2012 Transmission authors and contributors
+ * Copyright (c) 2005-2019 Transmission authors and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -21,8 +21,10 @@
  *****************************************************************************/
 
 #import <Cocoa/Cocoa.h>
-#import <transmission.h>
 #import <Quartz/Quartz.h>
+
+#include <libtransmission/transmission.h>
+
 #import "VDKQueue.h"
 
 @class AddMagnetWindowController;
