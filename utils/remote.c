@@ -1404,7 +1404,7 @@ static void printTorrentList(tr_variant* top)
         double total_down = 0;
         char haveStr[32];
 
-        printf("%-4s   %-4s  %9s  %-8s  %6s  %6s  %-5s  %-11s  %s\n", "ID", "Done", "Have", "ETA", "Up", "Down", "Ratio",
+        printf("%6s   %-4s  %9s  %-8s  %6s  %6s  %-5s  %-11s  %s\n", "ID", "Done", "Have", "ETA", "Up", "Down", "Ratio",
             "Status", "Name");
 
         for (int i = 0, n = tr_variantListSize(list); i < n; ++i)
@@ -1466,7 +1466,7 @@ static void printTorrentList(tr_variant* top)
                     errorMark = ' ';
                 }
 
-                printf("%4d%c  %4s  %9s  %-8s  %6.1f  %6.1f  %5s  %-11s  %s\n", (int)id, errorMark, doneStr, haveStr, etaStr,
+                printf("%6d%c  %4s  %9s  %-8s  %6.1f  %6.1f  %5s  %-11s  %s\n", (int)id, errorMark, doneStr, haveStr, etaStr,
                     up / (double)tr_speed_K, down / (double)tr_speed_K, strlratio2(ratioStr, ratio, sizeof(ratioStr)),
                     getStatusString(d, statusStr, sizeof(statusStr)), name);
 
@@ -1476,7 +1476,7 @@ static void printTorrentList(tr_variant* top)
             }
         }
 
-        printf("Sum:         %9s            %6.1f  %6.1f\n", strlsize(haveStr, total_size, sizeof(haveStr)),
+        printf("Sum:           %9s            %6.1f  %6.1f\n", strlsize(haveStr, total_size, sizeof(haveStr)),
             total_up / (double)tr_speed_K, total_down / (double)tr_speed_K);
     }
 }
