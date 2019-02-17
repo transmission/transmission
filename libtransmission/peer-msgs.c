@@ -1159,10 +1159,15 @@ static void parseUtPex(tr_peerMsgs* msgs, uint32_t msglen, struct evbuffer* inbu
         {
             tr_pex* pex;
             size_t n;
-            size_t added_f_len = 0;
-            uint8_t const* added_f = NULL;
+            size_t added_f_len;
+            uint8_t const* added_f;
 
-            tr_variantDictFindRaw(&val, TR_KEY_added_f, &added_f, &added_f_len);
+            if (!tr_variantDictFindRaw(&val, TR_KEY_added_f, &added_f, &added_f_len))
+            {
+                added_f = NULL;
+                added_f_len = 0;
+            }
+
             pex = tr_peerMgrCompactToPex(added, added_len, added_f, added_f_len, &n);
 
             n = MIN(n, MAX_PEX_PEER_COUNT);
