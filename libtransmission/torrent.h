@@ -17,6 +17,7 @@
 #include "session.h" /* tr_sessionLock(), tr_sessionUnlock() */
 #include "tr-assert.h"
 #include "utils.h" /* TR_GNUC_PRINTF */
+#include "ptrarray.h"
 
 struct tr_torrent_tiers;
 struct tr_magnet_info;
@@ -41,6 +42,8 @@ void tr_ctorInitTorrentWanted(tr_ctor const* ctor, tr_torrent* tor);
 
 /* just like tr_torrentSetFileDLs but doesn't trigger a fastresume save */
 void tr_torrentInitFileDLs(tr_torrent* tor, tr_file_index_t const* files, tr_file_index_t fileCount, bool do_download);
+
+void tr_torrentSetLabels(tr_torrent* tor, tr_ptrArray* labels);
 
 void tr_torrentRecheckCompleteness(tr_torrent*);
 
@@ -240,6 +243,8 @@ struct tr_torrent
     uint16_t idleLimitMinutes;
     tr_idlelimit idleLimitMode;
     bool finishedSeedingByIdle;
+
+    tr_ptrArray labels;
 };
 
 static inline tr_torrent* tr_torrentNext(tr_session* session, tr_torrent* current)
