@@ -356,6 +356,7 @@ static void saveStringFunc(tr_variant const* v, void* evbuf)
         len = 0;
         str = NULL;
     }
+
     evbuffer_add_printf(evbuf, "%zu:", len);
     evbuffer_add(evbuf, str, len);
 }

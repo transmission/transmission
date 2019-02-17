@@ -1086,9 +1086,9 @@ static void parseUtMetadata(tr_peerMsgs* msgs, uint32_t msglen, struct evbuffer*
 
     if (tr_variantFromBencFull(&dict, tmp, msglen, NULL, &benc_end) == 0)
     {
-        (void) tr_variantDictFindInt(&dict, TR_KEY_msg_type, &msg_type);
-        (void) tr_variantDictFindInt(&dict, TR_KEY_piece, &piece);
-        (void) tr_variantDictFindInt(&dict, TR_KEY_total_size, &total_size);
+        (void)tr_variantDictFindInt(&dict, TR_KEY_msg_type, &msg_type);
+        (void)tr_variantDictFindInt(&dict, TR_KEY_piece, &piece);
+        (void)tr_variantDictFindInt(&dict, TR_KEY_total_size, &total_size);
         tr_variantFree(&dict);
     }
 
