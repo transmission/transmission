@@ -74,7 +74,7 @@ TransmissionRemote.prototype = {
 
     sendRequest: function (data, callback, context, async) {
         var remote = this;
-        if (typeof async != 'boolean') {
+        if (typeof (async) != 'boolean') {
             async = true;
         };
 
