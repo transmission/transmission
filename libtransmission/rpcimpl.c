@@ -912,12 +912,14 @@ static char const* torrentGet(tr_session* session, tr_variant* args_in, tr_varia
 
         while ((d = tr_variantListChild(&session->removedTorrents, n++)) != NULL)
         {
-            int64_t intVal;
+            int64_t date;
+            int64_t id;
 
-            if (tr_variantDictFindInt(d, TR_KEY_date, &intVal) && intVal >= now - interval)
+            if (tr_variantDictFindInt(d, TR_KEY_date, &date) &&
+                date >= now - interval &&
+                tr_variantDictFindInt(d, TR_KEY_id, &id))
             {
-                tr_variantDictFindInt(d, TR_KEY_id, &intVal);
-                tr_variantListAddInt(removed_out, intVal);
+                tr_variantListAddInt(removed_out, id);
             }
         }
     }
