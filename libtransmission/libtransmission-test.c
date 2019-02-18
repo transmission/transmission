@@ -54,7 +54,7 @@ bool libtest_check(char const* file, int line, bool pass, bool condition, char c
 {
     if (should_print(pass))
     {
-        fprintf(stderr, "%s %s:%d: %s (%s)\n", pass ? "PASS" : "FAIL", file, line, condition_str, condition ? "true": "false");
+        fprintf(stderr, "%s %s:%d: %s (%s)\n", pass ? "PASS" : "FAIL", file, line, condition_str, condition ? "true" : "false");
     }
 
     return pass;

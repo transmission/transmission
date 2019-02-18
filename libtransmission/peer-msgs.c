@@ -2316,8 +2316,8 @@ typedef void (* tr_set_func)(void* element, void* userData);
  * @param in_both called for items that are in both sets
  * @param userData user data passed along to in_a, in_b, and in_both
  */
-static void tr_set_compare(void const* va, size_t aCount, void const* vb, size_t bCount, int (* compare)(void const* a,
-    void const* b), size_t elementSize, tr_set_func in_a_cb, tr_set_func in_b_cb, tr_set_func in_both_cb, void* userData)
+static void tr_set_compare(void const* va, size_t aCount, void const* vb, size_t bCount, tr_voidptr_compare_func compare,
+    size_t elementSize, tr_set_func in_a_cb, tr_set_func in_b_cb, tr_set_func in_both_cb, void* userData)
 {
     uint8_t const* a = va;
     uint8_t const* b = vb;

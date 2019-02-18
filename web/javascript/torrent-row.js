@@ -107,7 +107,7 @@ TorrentRendererHelper.formatDL = function (t) {
     return '▼' + Transmission.fmt.speedBps(t.getDownloadSpeed());
 };
 
-TorrentRendererHelper.formatETA = function(t) {
+TorrentRendererHelper.formatETA = function (t) {
     var eta = t.getETA();
     if (eta < 0 || eta >= (999 * 60 * 60)) {
         return "";

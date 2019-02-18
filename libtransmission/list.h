@@ -28,7 +28,7 @@ typedef struct tr_list
 }
 tr_list;
 
-typedef int (* TrListCompareFunc)(void const* a, void const* b);
+typedef tr_voidptr_compare_func TrListCompareFunc;
 typedef void (* TrListForeachFunc)(void*);
 
 /**

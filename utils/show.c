@@ -32,6 +32,7 @@ static tr_option options[] =
 {
     { 'm', "magnet", "Give a magnet link for the specified torrent", "m", 0, NULL },
     { 's', "scrape", "Ask the torrent's trackers how many peers are in the torrent's swarm", "s", 0, NULL },
+    { 'u', "unsorted", "Do not sort files by name", "u", 0, NULL },
     { 'V', "version", "Show version number and exit", "V", 0, NULL },
     { 0, NULL, NULL, NULL, 0, NULL }
 };
@@ -43,6 +44,7 @@ static char const* getUsage(void)
 
 static bool magnetFlag = false;
 static bool scrapeFlag = false;
+static bool unsorted = false;
 static bool showVersion = false;
 char const* filename = NULL;
 
@@ -61,6 +63,10 @@ static int parseCommandLine(int argc, char const* const* argv)
 
         case 's':
             scrapeFlag = true;
+            break;
+
+        case 'u':
+            unsorted = true;
             break;
 
         case 'V':
@@ -189,7 +195,10 @@ static void showInfo(tr_info const* inf)
         files[i] = &inf->files[i];
     }
 
-    qsort(files, inf->fileCount, sizeof(tr_file*), compare_files_by_name);
+    if (!unsorted)
+    {
+        qsort(files, inf->fileCount, sizeof(tr_file*), compare_files_by_name);
+    }
 
     for (unsigned int i = 0; i < inf->fileCount; ++i)
     {

@@ -397,6 +397,17 @@ static char const* torrentVerify(tr_session* session, tr_variant* args_in, tr_va
 ****
 ***/
 
+static void addLabels(tr_torrent const* tor, tr_variant* list)
+{
+    int const labelsCount = tr_ptrArraySize(&tor->labels);
+    tr_variantInitList(list, labelsCount);
+    char const* const* labels = (char const* const*)tr_ptrArrayBase(&tor->labels);
+    for (int i = 0; i < labelsCount; ++i)
+    {
+        tr_variantListAddStr(list, labels[i]);
+    }
+}
+
 static void addFileStats(tr_torrent const* tor, tr_variant* list)
 {
     tr_file_index_t n;
@@ -630,6 +641,10 @@ static void addField(tr_torrent* const tor, tr_info const* const inf, tr_stat co
 
     case TR_KEY_isStalled:
         tr_variantDictAddBool(d, key, st->isStalled);
+        break;
+
+    case TR_KEY_labels:
+        addLabels(tor, tr_variantDictAdd(d, key));
         break;
 
     case TR_KEY_leftUntilDone:
@@ -926,6 +941,67 @@ static char const* torrentGet(tr_session* session, tr_variant* args_in, tr_varia
 /***
 ****
 ***/
+
+static char const* setLabels(tr_torrent* tor, tr_variant* list)
+{
+    int const n = tr_variantListSize(list);
+    char const* errmsg = NULL;
+    tr_ptrArray labels = TR_PTR_ARRAY_INIT;
+    int labelcount = 0;
+    for (int i = 0; i < n; i++)
+    {
+        char const* str;
+        size_t str_len;
+        if (tr_variantGetStr(tr_variantListChild(list, i), &str, &str_len) && str != NULL)
+        {
+            char* label = tr_strndup(str, str_len);
+            tr_strstrip(label);
+            if (*label == '\0')
+            {
+                errmsg = "labels cannot be empty";
+            }
+
+            if (errmsg == NULL && strchr(str, ',') != NULL)
+            {
+                errmsg = "labels cannot contain comma (,) character";
+            }
+
+            if (errmsg == NULL)
+            {
+                bool dup = false;
+                for (int j = 0; j < labelcount; j++)
+                {
+                    if (tr_strcmp0(label, (char*)tr_ptrArrayNth(&labels, j)) == 0)
+                    {
+                        dup = true;
+                        break;
+                    }
+                }
+
+                if (dup)
+                {
+                    errmsg = "labels cannot contain duplicates";
+                }
+            }
+
+            tr_ptrArrayAppend(&labels, label);
+            labelcount++;
+
+            if (errmsg != NULL)
+            {
+                break;
+            }
+        }
+    }
+
+    if (errmsg == NULL)
+    {
+        tr_torrentSetLabels(tor, &labels);
+    }
+
+    tr_ptrArrayDestruct(&labels, tr_free);
+    return errmsg;
+}
 
 static char const* setFilePriorities(tr_torrent* tor, int priority, tr_variant* list)
 {
@@ -1226,8 +1302,7 @@ static char const* torrentSet(tr_session* session, tr_variant* args_in, tr_varia
     {
         int64_t tmp;
         double d;
-        tr_variant* files;
-        tr_variant* trackers;
+        tr_variant* tmp_variant;
         bool boolVal;
         tr_torrent* tor;
 
@@ -1241,14 +1316,19 @@ static char const* torrentSet(tr_session* session, tr_variant* args_in, tr_varia
             }
         }
 
-        if (errmsg == NULL && tr_variantDictFindList(args_in, TR_KEY_files_unwanted, &files))
+        if (errmsg == NULL && tr_variantDictFindList(args_in, TR_KEY_labels, &tmp_variant))
         {
-            errmsg = setFileDLs(tor, false, files);
+            errmsg = setLabels(tor, tmp_variant);
         }
 
-        if (errmsg == NULL && tr_variantDictFindList(args_in, TR_KEY_files_wanted, &files))
+        if (errmsg == NULL && tr_variantDictFindList(args_in, TR_KEY_files_unwanted, &tmp_variant))
         {
-            errmsg = setFileDLs(tor, true, files);
+            errmsg = setFileDLs(tor, false, tmp_variant);
+        }
+
+        if (errmsg == NULL && tr_variantDictFindList(args_in, TR_KEY_files_wanted, &tmp_variant))
+        {
+            errmsg = setFileDLs(tor, true, tmp_variant);
         }
 
         if (tr_variantDictFindInt(args_in, TR_KEY_peer_limit, &tmp))
@@ -1256,19 +1336,19 @@ static char const* torrentSet(tr_session* session, tr_variant* args_in, tr_varia
             tr_torrentSetPeerLimit(tor, tmp);
         }
 
-        if (errmsg == NULL && tr_variantDictFindList(args_in, TR_KEY_priority_high, &files))
+        if (errmsg == NULL && tr_variantDictFindList(args_in, TR_KEY_priority_high, &tmp_variant))
         {
-            errmsg = setFilePriorities(tor, TR_PRI_HIGH, files);
+            errmsg = setFilePriorities(tor, TR_PRI_HIGH, tmp_variant);
         }
 
-        if (errmsg == NULL && tr_variantDictFindList(args_in, TR_KEY_priority_low, &files))
+        if (errmsg == NULL && tr_variantDictFindList(args_in, TR_KEY_priority_low, &tmp_variant))
         {
-            errmsg = setFilePriorities(tor, TR_PRI_LOW, files);
+            errmsg = setFilePriorities(tor, TR_PRI_LOW, tmp_variant);
         }
 
-        if (errmsg == NULL && tr_variantDictFindList(args_in, TR_KEY_priority_normal, &files))
+        if (errmsg == NULL && tr_variantDictFindList(args_in, TR_KEY_priority_normal, &tmp_variant))
         {
-            errmsg = setFilePriorities(tor, TR_PRI_NORMAL, files);
+            errmsg = setFilePriorities(tor, TR_PRI_NORMAL, tmp_variant);
         }
 
         if (tr_variantDictFindInt(args_in, TR_KEY_downloadLimit, &tmp))
@@ -1321,19 +1401,19 @@ static char const* torrentSet(tr_session* session, tr_variant* args_in, tr_varia
             tr_torrentSetQueuePosition(tor, tmp);
         }
 
-        if (errmsg == NULL && tr_variantDictFindList(args_in, TR_KEY_trackerAdd, &trackers))
+        if (errmsg == NULL && tr_variantDictFindList(args_in, TR_KEY_trackerAdd, &tmp_variant))
         {
-            errmsg = addTrackerUrls(tor, trackers);
+            errmsg = addTrackerUrls(tor, tmp_variant);
         }
 
-        if (errmsg == NULL && tr_variantDictFindList(args_in, TR_KEY_trackerRemove, &trackers))
+        if (errmsg == NULL && tr_variantDictFindList(args_in, TR_KEY_trackerRemove, &tmp_variant))
         {
-            errmsg = removeTrackers(tor, trackers);
+            errmsg = removeTrackers(tor, tmp_variant);
         }
 
-        if (errmsg == NULL && tr_variantDictFindList(args_in, TR_KEY_trackerReplace, &trackers))
+        if (errmsg == NULL && tr_variantDictFindList(args_in, TR_KEY_trackerReplace, &tmp_variant))
         {
-            errmsg = replaceTrackers(tor, trackers);
+            errmsg = replaceTrackers(tor, tmp_variant);
         }
 
         notify(session, TR_RPC_TORRENT_CHANGED, tor);
