@@ -79,7 +79,7 @@ void tr_upnpClose(tr_upnp* handle)
 ***  Wrappers for miniupnpc functions
 **/
 
-static struct UPNPDev* tr_upnpDiscover(int msec)
+static struct UPNPDev* tr_upnpDiscover(int msec, char const* bindaddr)
 {
     UPNPDev* ret = nullptr;
     auto have_err = bool{};
@@ -88,14 +88,14 @@ static struct UPNPDev* tr_upnpDiscover(int msec)
     int err = UPNPDISCOVER_SUCCESS;
 
 #if (MINIUPNPC_API_VERSION >= 14) /* adds ttl */
-    ret = upnpDiscover(msec, nullptr, nullptr, 0, 0, 2, &err);
+    ret = upnpDiscover(msec, bindaddr, nullptr, 0, 0, 2, &err);
 #else
-    ret = upnpDiscover(msec, nullptr, nullptr, 0, 0, &err);
+    ret = upnpDiscover(msec, bindaddr, nullptr, 0, 0, &err);
 #endif
 
     have_err = err != UPNPDISCOVER_SUCCESS;
 #else
-    ret = upnpDiscover(msec, nullptr, nullptr, 0);
+    ret = upnpDiscover(msec, bindaddr, nullptr, 0);
     have_err = ret == nullptr;
 #endif
 
@@ -221,12 +221,11 @@ enum
     UPNP_IGD_INVALID = 3
 };
 
-tr_port_forwarding tr_upnpPulse(tr_upnp* handle, tr_port port, bool isEnabled, bool doPortCheck)
+tr_port_forwarding tr_upnpPulse(tr_upnp* handle, tr_port port, bool isEnabled, bool doPortCheck, char const* bindaddr)
 {
     if (isEnabled && handle->state == TR_UPNP_DISCOVER)
     {
-        auto* const devlist = tr_upnpDiscover(2000);
-
+        auto* const devlist = tr_upnpDiscover(2000, bindaddr);
         errno = 0;
 
         if (UPNP_GetValidIGD(devlist, &handle->urls, &handle->data, handle->lanaddr, sizeof(handle->lanaddr)) ==

@@ -54,6 +54,13 @@ struct tr_blocklistFile;
 struct tr_cache;
 struct tr_fdInfo;
 
+struct tr_bindinfo
+{
+    int socket;
+    tr_address addr;
+    struct event* ev;
+};
+
 struct tr_turtle_info
 {
     /* TR_UP and TR_DOWN speed limits */
