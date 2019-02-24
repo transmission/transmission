@@ -20,14 +20,14 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#include <libtransmission/transmission.h>
+#include <libtransmission/utils.h> //tr_getRatio()
+
 #import "InfoActivityViewController.h"
 #import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 #import "PiecesView.h"
 #import "Torrent.h"
-
-#include "transmission.h" // required by utils.h
-#include "utils.h" //tr_getRatio()
 
 #define PIECES_CONTROL_PROGRESS 0
 #define PIECES_CONTROL_AVAILABLE 1

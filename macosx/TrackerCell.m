@@ -20,11 +20,11 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#include <libtransmission/transmission.h>
+#include <libtransmission/utils.h> //tr_addressIsIP()
+
 #import "TrackerCell.h"
 #import "TrackerNode.h"
-
-#import "transmission.h" // required by utils.h
-#import "utils.h" //tr_addressIsIP()
 
 #define PADDING_HORIZONAL 3.0
 #define PADDING_STATUS_HORIZONAL 3.0
@@ -107,8 +107,8 @@ NSMutableSet * fTrackerIconLoading;
         nameColor = statusColor = [NSColor whiteColor];
     else
     {
-        nameColor = [NSColor controlTextColor];
-        statusColor = [NSColor darkGrayColor];
+        nameColor = [NSColor labelColor];
+        statusColor = [NSColor secondaryLabelColor];
     }
 
     fNameAttributes[NSForegroundColorAttributeName] = nameColor;

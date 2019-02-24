@@ -351,7 +351,12 @@ static void saveStringFunc(tr_variant const* v, void* evbuf)
 {
     size_t len;
     char const* str;
-    tr_variantGetStr(v, &str, &len);
+    if (!tr_variantGetStr(v, &str, &len))
+    {
+        len = 0;
+        str = NULL;
+    }
+
     evbuffer_add_printf(evbuf, "%zu:", len);
     evbuffer_add(evbuf, str, len);
 }

@@ -25,8 +25,12 @@ enum
      *  - ocelot has no upper bound
      *  - opentracker has an upper bound of 64
      *  - udp protocol has an upper bound of 74
-     *  - xbtt has no upper bound */
-    TR_MULTISCRAPE_MAX = 64
+     *  - xbtt has no upper bound
+     *
+     * This is only an upper bound: if the tracker complains about
+     * length, announcer will incrementally lower the batch size.
+     */
+    TR_MULTISCRAPE_MAX = 100
 };
 
 typedef struct

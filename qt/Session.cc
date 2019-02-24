@@ -147,11 +147,16 @@ void Session::copyMagnetLinkToClipboard(int torrentId)
     q->add([this](RpcResponse const& r)
         {
             tr_variant* torrents;
-            tr_variant* child;
+
+            if (!tr_variantDictFindList(r.args.get(), TR_KEY_torrents, &torrents))
+            {
+                return;
+            }
+
+            tr_variant* const child = tr_variantListChild(torrents, 0);
             char const* str;
 
-            if (tr_variantDictFindList(r.args.get(), TR_KEY_torrents, &torrents) &&
-                (child = tr_variantListChild(torrents, 0)) && tr_variantDictFindStr(child, TR_KEY_magnetLink, &str, nullptr))
+            if (child != nullptr && tr_variantDictFindStr(child, TR_KEY_magnetLink, &str, nullptr))
             {
                 qApp->clipboard()->setText(QString::fromUtf8(str));
             }
@@ -998,10 +1003,15 @@ void Session::addTorrent(AddData const& addMe, tr_variant* args, bool trashOrigi
     q->add([this, addMe](RpcResponse const& r)
         {
             tr_variant* dup;
+
+            if (!tr_variantDictFindDict(r.args.get(), TR_KEY_torrent_duplicate, &dup))
+            {
+                return;
+            }
+
             char const* str;
 
-            if (tr_variantDictFindDict(r.args.get(), TR_KEY_torrent_duplicate, &dup) &&
-                tr_variantDictFindStr(dup, TR_KEY_name, &str, nullptr))
+            if (tr_variantDictFindStr(dup, TR_KEY_name, &str, nullptr))
             {
                 QString const name = QString::fromUtf8(str);
                 QMessageBox* d = new QMessageBox(QMessageBox::Warning, tr("Add Torrent"),

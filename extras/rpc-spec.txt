@@ -117,6 +117,7 @@
    "files-unwanted"      | array      indices of file(s) to not download
    "honorsSessionLimits" | boolean    true if session upload limits are honored
    "ids"                 | array      torrent list, as described in 3.1
+   "labels"              | array      array of string labels
    "location"            | string     new location of the torrent's content
    "peer-limit"          | number     maximum number of peers
    "priority-high"       | array      indices of high-priority file(s)
@@ -189,6 +190,7 @@
    isFinished                  | boolean                     | tr_stat
    isPrivate                   | boolean                     | tr_torrent
    isStalled                   | boolean                     | tr_stat
+   labels                      | array (see below)           | tr_torrent
    leftUntilDone               | number                      | tr_stat
    magnetLink                  | string                      | n/a
    manualAnnounceTime          | number                      | tr_stat
@@ -246,6 +248,10 @@
                       | bytesCompleted          | number     | tr_torrent
                       | wanted                  | boolean    | tr_info
                       | priority                | number     | tr_info
+   -------------------+--------------------------------------+
+   labels             | an array of strings:                 |
+                      +-------------------------+------------+
+                      | label                   | string     | tr_torrent
    -------------------+--------------------------------------+
    peers              | array of objects, each containing:   |
                       +-------------------------+------------+
@@ -784,6 +790,9 @@
    ------+---------+-----------+----------------------+-------------------------------
    16    | 3.00    | yes       | session-get          | new request arg "fields"
          |         | yes       | session-get          | new arg "session-id"
+         |         | yes       | torrent-get          | new arg "labels"
+         |         | yes       | torrent-set          | new arg "labels"
+
 
 5.1.  Upcoming Breakage
 

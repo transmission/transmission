@@ -164,7 +164,7 @@ private:
                 {
                     quint32 const ipv4Address = ipAddress.toIPv4Address();
                     collatedAddress = QLatin1String("1-") + QString::fromLatin1(QByteArray::number(ipv4Address, 16).
-                            rightJustified(8, '0'));
+                        rightJustified(8, '0'));
                 }
                 else if (ipAddress.protocol() == QAbstractSocket::IPv6Protocol)
                 {
@@ -529,7 +529,7 @@ void DetailsDialog::refresh()
             //: %2 is overall size of torrent data,
             //: %3 is percentage (%1/%2*100)
             string = tr("%1 of %2 (%3%)").arg(Formatter::sizeToString(haveVerified)).arg(Formatter::sizeToString(sizeWhenDone)).
-                    arg(pct);
+                arg(pct);
         }
         else
         {
@@ -539,7 +539,7 @@ void DetailsDialog::refresh()
             //: %3 is percentage (%1/%2*100),
             //: %4 is amount of downloaded but not yet verified data
             string = tr("%1 of %2 (%3%), %4 Unverified").arg(Formatter::sizeToString(haveVerified + haveUnverified)).
-                    arg(Formatter::sizeToString(sizeWhenDone)).arg(pct).arg(Formatter::sizeToString(haveUnverified));
+                arg(Formatter::sizeToString(sizeWhenDone)).arg(pct).arg(Formatter::sizeToString(haveUnverified));
         }
     }
 
@@ -784,7 +784,7 @@ void DetailsDialog::refresh()
         else if (pieceSize > 0)
         {
             string = tr("%1 (%Ln pieces @ %2)", "", pieces).arg(Formatter::sizeToString(size)).
-                    arg(Formatter::memToString(pieceSize));
+                arg(Formatter::memToString(pieceSize));
         }
         else
         {

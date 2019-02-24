@@ -25,7 +25,7 @@
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
-        <window title="Crear torrent" allowsToolTipsWhenApplicationIsInactive="NO" releasedWhenClosed="NO" frameAutosaveName="CreatorWindow" animationBehavior="default" id="5" userLabel="Window">
+        <window title="Crear torrent" allowsToolTipsWhenApplicationIsInactive="NO" releasedWhenClosed="NO" frameAutosaveName="CreatorWindow" animationBehavior="default" tabbingMode="disallowed" id="5" userLabel="Window">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" topStrut="YES"/>
             <rect key="contentRect" x="244" y="423" width="708" height="408"/>

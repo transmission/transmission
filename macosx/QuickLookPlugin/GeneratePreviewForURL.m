@@ -1,6 +1,7 @@
 #import <QuickLook/QuickLook.h>
 
-#import "transmission.h"
+#include <libtransmission/transmission.h>
+
 #import "NSStringAdditions.h"
 
 OSStatus GeneratePreviewForURL(void *thisInterface, QLPreviewRequestRef preview, CFURLRef url, CFStringRef contentTypeUTI, CFDictionaryRef options);

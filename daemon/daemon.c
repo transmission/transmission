@@ -87,13 +87,13 @@ static struct event_base* ev_base = NULL;
 static char const* getUsage(void)
 {
     return "Transmission " LONG_VERSION_STRING "  https://transmissionbt.com/\n"
-           "A fast and easy BitTorrent client\n"
-           "\n"
-           MY_NAME " is a headless Transmission session\n"
-           "that can be controlled via transmission-remote\n"
-           "or the web interface.\n"
-           "\n"
-           "Usage: " MY_NAME " [options]";
+        "A fast and easy BitTorrent client\n"
+        "\n"
+        MY_NAME " is a headless Transmission session\n"
+        "that can be controlled via transmission-remote\n"
+        "or the web interface.\n"
+        "\n"
+        "Usage: " MY_NAME " [options]";
 }
 
 static struct tr_option const options[] =
@@ -129,16 +129,20 @@ static struct tr_option const options[] =
     { 'P', "peerport", "Port for incoming peers (Default: " TR_DEFAULT_PEER_PORT_STR ")", "P", 1, "<port>" },
     { 'm', "portmap", "Enable portmapping via NAT-PMP or UPnP", "m", 0, NULL },
     { 'M', "no-portmap", "Disable portmapping", "M", 0, NULL },
-    { 'L', "peerlimit-global", "Maximum overall number of peers (Default: " TR_DEFAULT_PEER_LIMIT_GLOBAL_STR ")", "L", 1, "<limit>" },
-    { 'l', "peerlimit-torrent", "Maximum number of peers per torrent (Default: " TR_DEFAULT_PEER_LIMIT_TORRENT_STR ")", "l", 1, "<limit>" },
+    { 'L', "peerlimit-global", "Maximum overall number of peers (Default: " TR_DEFAULT_PEER_LIMIT_GLOBAL_STR ")", "L", 1,
+        "<limit>" },
+    { 'l', "peerlimit-torrent", "Maximum number of peers per torrent (Default: " TR_DEFAULT_PEER_LIMIT_TORRENT_STR ")", "l", 1,
+        "<limit>" },
     { 910, "encryption-required", "Encrypt all peer connections", "er", 0, NULL },
     { 911, "encryption-preferred", "Prefer encrypted peer connections", "ep", 0, NULL },
     { 912, "encryption-tolerated", "Prefer unencrypted peer connections", "et", 0, NULL },
     { 'i', "bind-address-ipv4", "Where to listen for peer connections", "i", 1, "<ipv4 addr>" },
     { 'I', "bind-address-ipv6", "Where to listen for peer connections", "I", 1, "<ipv6 addr>" },
     { 'r', "rpc-bind-address", "Where to listen for RPC connections", "r", 1, "<ip addr>" },
-    { 953, "global-seedratio", "All torrents, unless overridden by a per-torrent setting, should seed until a specific ratio", "gsr", 1, "ratio" },
-    { 954, "no-global-seedratio", "All torrents, unless overridden by a per-torrent setting, should seed regardless of ratio", "GSR", 0, NULL },
+    { 953, "global-seedratio", "All torrents, unless overridden by a per-torrent setting, should seed until a specific ratio",
+        "gsr", 1, "ratio" },
+    { 954, "no-global-seedratio", "All torrents, unless overridden by a per-torrent setting, should seed regardless of ratio",
+        "GSR", 0, NULL },
     { 'x', "pid-file", "Enable PID file", "x", 1, "<pid-file>" },
     { 0, NULL, NULL, NULL, 0, NULL }
 };
@@ -147,8 +151,8 @@ static bool reopen_log_file(char const* filename)
 {
     tr_error* error = NULL;
     tr_sys_file_t const old_log_file = logfile;
-    tr_sys_file_t const new_log_file = tr_sys_file_open(filename, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_APPEND, 0666,
-        &error);
+    tr_sys_file_t const new_log_file = tr_sys_file_open(filename, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_APPEND,
+        0666, &error);
 
     if (new_log_file == TR_BAD_SYS_FILE)
     {
@@ -648,7 +652,8 @@ static int daemon_start(void* raw_arg, bool foreground)
     if (pid_filename != NULL && *pid_filename != '\0')
     {
         tr_error* error = NULL;
-        tr_sys_file_t fp = tr_sys_file_open(pid_filename, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE, 0666, &error);
+        tr_sys_file_t fp = tr_sys_file_open(pid_filename, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE, 0666,
+            &error);
 
         if (fp != TR_BAD_SYS_FILE)
         {

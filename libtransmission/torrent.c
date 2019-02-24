@@ -509,7 +509,7 @@ static bool tr_torrentIsSeedIdleLimitDone(tr_torrent* tor)
 {
     uint16_t idleMinutes;
     return tr_torrentGetSeedIdle(tor, &idleMinutes) &&
-           difftime(tr_time(), MAX(tor->startDate, tor->activityDate)) >= idleMinutes * 60u;
+        difftime(tr_time(), MAX(tor->startDate, tor->activityDate)) >= idleMinutes * 60u;
 }
 
 /***
@@ -937,6 +937,7 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     tor->uniqueId = nextUniqueId++;
     tor->magicNumber = TORRENT_MAGIC_NUMBER;
     tor->queuePosition = session->torrentCount;
+    tor->labels = TR_PTR_ARRAY_INIT;
 
     tr_sha1(tor->obfuscatedHash, "req2", 4, tor->info.hash, SHA_DIGEST_LENGTH, NULL);
 
@@ -1317,7 +1318,7 @@ static time_t torrentGetIdleSecs(tr_torrent const* tor)
 bool tr_torrentIsStalled(tr_torrent const* tor)
 {
     return tr_sessionGetQueueStalledEnabled(tor->session) &&
-           torrentGetIdleSecs(tor) > tr_sessionGetQueueStalledMinutes(tor->session) * 60;
+        torrentGetIdleSecs(tor) > tr_sessionGetQueueStalledMinutes(tor->session) * 60;
 }
 
 static double getVerifyProgress(tr_torrent const* tor)
@@ -1739,6 +1740,7 @@ static void freeTorrent(tr_torrent* tor)
     TR_ASSERT(queueIsSequenced(session));
 
     tr_bandwidthDestruct(&tor->bandwidth);
+    tr_ptrArrayDestruct(&tor->labels, tr_free);
 
     tr_metainfoFree(inf);
     memset(tor, ~0, sizeof(tr_torrent));
@@ -2318,21 +2320,21 @@ void tr_torrentRecheckCompleteness(tr_torrent* tor)
 
         fireCompletenessChange(tor, completeness, wasRunning);
 
-        if (tr_torrentIsSeed(tor))
+        if (tr_torrentIsSeed(tor) && wasLeeching && wasRunning)
         {
-            if (wasLeeching && wasRunning)
-            {
-                /* if completeness was TR_LEECH then the seed limit check will have been skipped in bandwidthPulse */
-                tr_torrentCheckSeedLimit(tor);
-            }
-
-            if (tr_sessionIsTorrentDoneScriptEnabled(tor->session))
-            {
-                torrentCallScript(tor, tr_sessionGetTorrentDoneScript(tor->session));
-            }
+            /* if completeness was TR_LEECH, the seed limit check
+               will have been skipped in bandwidthPulse */
+            tr_torrentCheckSeedLimit(tor);
         }
 
         tr_torrentSetDirty(tor);
+
+        if (tr_torrentIsSeed(tor) && tr_sessionIsTorrentDoneScriptEnabled(tor->session))
+        {
+            tr_torrentSave(tor);
+
+            torrentCallScript(tor, tr_sessionGetTorrentDoneScript(tor->session));
+        }
     }
 
     tr_torrentUnlock(tor);
@@ -2514,6 +2516,30 @@ void tr_torrentSetFileDLs(tr_torrent* tor, tr_file_index_t const* files, tr_file
     tr_torrentSetDirty(tor);
     tr_torrentRecheckCompleteness(tor);
     tr_peerMgrRebuildRequests(tor);
+
+    tr_torrentUnlock(tor);
+}
+
+/***
+****
+***/
+
+void tr_torrentSetLabels(tr_torrent* tor, tr_ptrArray* labels)
+{
+    TR_ASSERT(tr_isTorrent(tor));
+
+    tr_torrentLock(tor);
+
+    tr_ptrArrayDestruct(&tor->labels, tr_free);
+    tor->labels = TR_PTR_ARRAY_INIT;
+    char** l = (char**)tr_ptrArrayBase(labels);
+    int const n = tr_ptrArraySize(labels);
+    for (int i = 0; i < n; i++)
+    {
+        tr_ptrArrayAppend(&tor->labels, tr_strdup(l[i]));
+    }
+
+    tr_torrentSetDirty(tor);
 
     tr_torrentUnlock(tor);
 }
@@ -3769,7 +3795,7 @@ void tr_torrentSetQueueStartCallback(tr_torrent* torrent, void (* callback)(tr_t
 static bool renameArgsAreValid(char const* oldpath, char const* newname)
 {
     return oldpath != NULL && *oldpath != '\0' && newname != NULL && *newname != '\0' && strcmp(newname, ".") != 0 &&
-           strcmp(newname, "..") != 0 && strchr(newname, TR_PATH_DELIMITER) == NULL;
+        strcmp(newname, "..") != 0 && strchr(newname, TR_PATH_DELIMITER) == NULL;
 }
 
 static tr_file_index_t* renameFindAffectedFiles(tr_torrent* tor, char const* oldpath, size_t* setme_n)

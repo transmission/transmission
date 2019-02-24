@@ -149,7 +149,7 @@ struct peer_atom
 static bool tr_isAtom(struct peer_atom const* atom)
 {
     return atom != NULL && atom->fromFirst < TR_PEER_FROM__MAX && atom->fromBest < TR_PEER_FROM__MAX &&
-           tr_address_is_valid(&atom->addr);
+        tr_address_is_valid(&atom->addr);
 }
 
 #endif
@@ -411,7 +411,7 @@ static bool peerIsInUse(tr_swarm const* cs, struct peer_atom const* atom)
     TR_ASSERT(swarmIsLocked(s));
 
     return atom->peer != NULL || getExistingHandshake(&s->outgoingHandshakes, &atom->addr) ||
-           getExistingHandshake(&s->manager->incomingHandshakes, &atom->addr);
+        getExistingHandshake(&s->manager->incomingHandshakes, &atom->addr);
 }
 
 static inline bool replicationExists(tr_swarm const* s)
@@ -2639,7 +2639,7 @@ void tr_peerMgrTorrentAvailability(tr_torrent const* tor, int8_t* tab, unsigned 
     if (tr_torrentHasMetadata(tor))
     {
         int const peerCount = tr_ptrArraySize(&tor->swarm->peers);
-        tr_peer const** peers = (const tr_peer**)tr_ptrArrayBase(&tor->swarm->peers);
+        tr_peer const** peers = (tr_peer const**)tr_ptrArrayBase(&tor->swarm->peers);
         float const interval = tor->info.pieceCount / (float)tabCount;
         bool const isSeed = tr_torrentGetCompleteness(tor) == TR_SEED;
 
@@ -3643,8 +3643,7 @@ static int comparePeerLiveliness(void const* va, void const* vb)
     return 0;
 }
 
-static void sortPeersByLivelinessImpl(tr_peer** peers, void** clientData, int n, uint64_t now, int (* compare)(void const* va,
-    void const* vb))
+static void sortPeersByLivelinessImpl(tr_peer** peers, void** clientData, int n, uint64_t now, tr_voidptr_compare_func compare)
 {
     struct peer_liveliness* lives;
     struct peer_liveliness* l;

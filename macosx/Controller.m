@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2005-2012 Transmission authors and contributors
+ * Copyright (c) 2005-2019 Transmission authors and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -24,6 +24,14 @@
 #import <IOKit/pwr_mgt/IOPMLib.h>
 #import <Carbon/Carbon.h>
 #import <libkern/OSAtomic.h>
+
+#import <Sparkle/Sparkle.h>
+
+#include <libtransmission/transmission.h>
+#include <libtransmission/utils.h>
+#include <libtransmission/variant.h>
+
+#import "VDKQueue.h"
 
 #import "Controller.h"
 #import "Torrent.h"
@@ -57,13 +65,6 @@
 #import "NSStringAdditions.h"
 #import "ExpandedPathToPathTransformer.h"
 #import "ExpandedPathToIconTransformer.h"
-
-#import "transmission.h"
-#import "utils.h"
-#import "variant.h"
-
-#import "VDKQueue.h"
-#import <Sparkle/Sparkle.h>
 
 #define TOOLBAR_CREATE                  @"Toolbar Create"
 #define TOOLBAR_OPEN_FILE               @"Toolbar Open"
@@ -734,26 +735,26 @@ static void removeKeRangerRansomware()
 
         if ([fDefaults boolForKey: @"CheckQuitDownloading"] ? downloading > 0 : active > 0)
         {
-            NSString * message = active == 1
+            NSAlert *alert = [[NSAlert alloc] init];
+            alert.alertStyle = NSAlertStyleInformational;
+            alert.messageText = NSLocalizedString(@"Are you sure you want to quit?", "Confirm Quit panel -> title");
+            alert.informativeText = active == 1
                 ? NSLocalizedString(@"There is an active transfer that will be paused on quit."
                     " The transfer will automatically resume on the next launch.", "Confirm Quit panel -> message")
                 : [NSString stringWithFormat: NSLocalizedString(@"There are %d active transfers that will be paused on quit."
                     " The transfers will automatically resume on the next launch.", "Confirm Quit panel -> message"), active];
-
-            NSBeginAlertSheet(NSLocalizedString(@"Are you sure you want to quit?", "Confirm Quit panel -> title"),
-                                NSLocalizedString(@"Quit", "Confirm Quit panel -> button"),
-                                NSLocalizedString(@"Cancel", "Confirm Quit panel -> button"), nil, fWindow, self,
-                                @selector(quitSheetDidEnd:returnCode:contextInfo:), nil, nil, @"%@", message);
+            [alert addButtonWithTitle:NSLocalizedString(@"Quit", "Confirm Quit panel -> button")];
+            [alert addButtonWithTitle:NSLocalizedString(@"Cancel", "Confirm Quit panel -> button")];
+            
+            [alert beginSheetModalForWindow:fWindow
+                          completionHandler:^(NSModalResponse returnCode) {
+                              [NSApp replyToApplicationShouldTerminate: returnCode == NSAlertFirstButtonReturn];
+                          }];
             return NSTerminateLater;
         }
     }
 
     return NSTerminateNow;
-}
-
-- (void) quitSheetDidEnd: (NSWindow *) sheet returnCode: (NSInteger) returnCode contextInfo: (void *) contextInfo
-{
-    [NSApp replyToApplicationShouldTerminate: returnCode == NSAlertDefaultReturn];
 }
 
 - (void) applicationWillTerminate: (NSNotification *) notification
@@ -1400,9 +1401,6 @@ static void removeKeRangerRansomware()
 
         if ([fDefaults boolForKey: @"CheckRemoveDownloading"] ? downloading > 0 : active > 0)
         {
-            NSDictionary * dict = @{ @"Torrents" : torrents,
-                                    @"DeleteData" : @(deleteData) };
-
             NSString * title, * message;
 
             const NSUInteger selected = [torrents count];
@@ -1445,22 +1443,24 @@ static void removeKeRangerRansomware()
                             "Removal confirm panel -> message part 2")];
             }
 
-            NSBeginAlertSheet(title, NSLocalizedString(@"Remove", "Removal confirm panel -> button"),
-                NSLocalizedString(@"Cancel", "Removal confirm panel -> button"), nil, fWindow, self,
-                nil, @selector(removeSheetDidEnd:returnCode:contextInfo:), (__bridge_retained void *)(dict), @"%@", message);
+            NSAlert *alert = [[NSAlert alloc] init];
+            alert.alertStyle = NSAlertStyleInformational;
+            alert.messageText = title;
+            alert.informativeText = message;
+            [alert addButtonWithTitle:NSLocalizedString(@"Remove", "Removal confirm panel -> button")];
+            [alert addButtonWithTitle:NSLocalizedString(@"Cancel", "Removal confirm panel -> button")];
+
+            [alert beginSheetModalForWindow:fWindow
+                          completionHandler:^(NSModalResponse returnCode) {
+                              if (returnCode == NSAlertFirstButtonReturn) {
+                                  [self confirmRemoveTorrents: torrents deleteData: deleteData];
+                              }
+                          }];
             return;
         }
     }
 
     [self confirmRemoveTorrents: torrents deleteData: deleteData];
-}
-
-- (void) removeSheetDidEnd: (NSWindow *) sheet returnCode: (NSInteger) returnCode contextInfo: (void *) contextInfo
-{
-    NSDictionary * dict = (__bridge_transfer NSDictionary *)contextInfo;
-    NSArray * torrents = dict[@"Torrents"];
-    if (returnCode == NSAlertDefaultReturn)
-        [self confirmRemoveTorrents: torrents deleteData: [dict[@"DeleteData"] boolValue]];
 }
 
 - (void) confirmRemoveTorrents: (NSArray *) torrents deleteData: (BOOL) deleteData

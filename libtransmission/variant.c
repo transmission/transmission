@@ -117,7 +117,7 @@ static bool tr_variantIsContainer(tr_variant const* v)
 static bool tr_variantIsSomething(tr_variant const* v)
 {
     return tr_variantIsContainer(v) || tr_variantIsInt(v) || tr_variantIsString(v) || tr_variantIsReal(v) ||
-           tr_variantIsBool(v);
+        tr_variantIsBool(v);
 }
 
 void tr_variantInit(tr_variant* v, char type)
