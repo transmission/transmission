@@ -21,6 +21,7 @@ class Session;
 class TorrentModel;
 class MainWindow;
 class WatchDir;
+class Torrent;
 
 class Application : public QApplication
 {
@@ -31,7 +32,8 @@ public:
     virtual ~Application();
 
     void raise();
-    bool notifyApp(QString const& title, QString const& body) const;
+    bool notifyApp(QString const& title, QString const& body,
+                   QStringList const& actions = QStringList()) const;
 
     FaviconCache& faviconCache();
 
@@ -43,6 +45,7 @@ private:
     void maybeUpdateBlocklist();
     void loadTranslations();
     void quitLater();
+    void notifyTorrentAdded(Torrent const*) const;
 
 private slots:
     void consentGiven(int result);
@@ -52,6 +55,9 @@ private slots:
     void onTorrentsAdded(QSet<int> const& torrents);
     void onTorrentCompleted(int);
     void onNewTorrentChanged(int);
+#ifdef QT_DBUS_LIB
+    void onNotificationActionInvoked(quint32 id, QString);
+#endif
 
 private:
     Prefs* myPrefs;
