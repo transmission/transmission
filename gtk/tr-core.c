@@ -1102,7 +1102,7 @@ void gtr_core_add_torrent(TrCore* core, tr_torrent* tor, gboolean do_notify)
 
         if (do_notify)
         {
-            gtr_notify_torrent_added(tr_torrentName(tor));
+            gtr_notify_torrent_added(core, tor);
         }
 
         tr_torrentSetMetadataCallback(tor, on_torrent_metadata_changed, core);

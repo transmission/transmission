@@ -14,6 +14,8 @@
 #include "tr-prefs.h"
 #include "util.h"
 
+#include <libtransmission/rpcimpl.h>
+
 #define NOTIFICATIONS_DBUS_NAME "org.freedesktop.Notifications"
 #define NOTIFICATIONS_DBUS_CORE_OBJECT "/org/freedesktop/Notifications"
 #define NOTIFICATIONS_DBUS_CORE_INTERFACE "org.freedesktop.Notifications"
@@ -40,6 +42,21 @@ static void tr_notification_free(gpointer data)
     }
 
     g_free(n);
+}
+
+static void torrent_start_now(tr_session* session, int id)
+{
+    tr_variant top;
+    tr_variant* args;
+    tr_variant* ids;
+
+    tr_variantInitDict(&top, 2);
+    tr_variantDictAddStr(&top, TR_KEY_method, "torrent-start-now");
+    args = tr_variantDictAddDict(&top, TR_KEY_arguments, 1);
+    ids = tr_variantDictAddList(args, TR_KEY_ids, 0);
+    tr_variantListAddInt(ids, id);
+    tr_rpc_request_exec_json(session, &top, NULL, NULL);
+    tr_variantFree(&top);
 }
 
 static void get_capabilities_callback(GObject* source, GAsyncResult* res, gpointer user_data UNUSED)
@@ -119,6 +136,10 @@ static void g_signal_callback(GDBusProxy* proxy UNUSED, char* sender_name UNUSED
             char* path = g_build_filename(dir, inf->files[0].name, NULL);
             gtr_open_file(path);
             g_free(path);
+        }
+        else if (g_strcmp0(action, "start-now") == 0)
+        {
+            torrent_start_now(gtr_core_session(n->core), tr_torrentId(tor));
         }
     }
 }
@@ -217,8 +238,9 @@ void gtr_notify_torrent_completed(TrCore* core, int torrent_id)
         notify_callback, n);
 }
 
-void gtr_notify_torrent_added(char const* name)
+void gtr_notify_torrent_added(TrCore* core, const tr_torrent* tor)
 {
+    GVariantBuilder actions_builder;
     TrNotification* n;
 
     g_return_if_fail(G_IS_DBUS_PROXY(proxy));
@@ -228,7 +250,12 @@ void gtr_notify_torrent_added(char const* name)
         return;
     }
 
+    g_variant_builder_init(&actions_builder, G_VARIANT_TYPE("as"));
+    g_variant_builder_add(&actions_builder, "s", "start-now");
+    g_variant_builder_add(&actions_builder, "s", _("Start Now"));
     n = g_new0(TrNotification, 1);
+    n->core = g_object_ref(G_OBJECT(core));
+    n->torrent_id = tr_torrentId(tor);
     g_dbus_proxy_call(proxy, "Notify", g_variant_new("(susssasa{sv}i)", "Transmission", 0, "transmission", _("Torrent Added"),
-        name, NULL, NULL, -1), G_DBUS_CALL_FLAGS_NONE, -1, NULL, notify_callback, n);
+        tr_torrentName(tor), &actions_builder, NULL, -1), G_DBUS_CALL_FLAGS_NONE, -1, NULL, notify_callback, n);
 }
