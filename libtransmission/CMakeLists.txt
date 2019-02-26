@@ -2,7 +2,7 @@ project(libtr)
 
 configure_file(version.h.in version.h)
 
-set(THIRD_PARTY_SOURCES ConvertUTF.c wildmat.c)
+set(THIRD_PARTY_SOURCES ConvertUTF.c jsonsl.c wildmat.c)
 if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
   set(DISABLE_WARNINGS -w)
 elseif(CMAKE_C_COMPILER_ID STREQUAL "Clang")
