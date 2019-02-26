@@ -674,7 +674,7 @@ int main(int argc, char** argv)
 
     /* init the application for the specified config dir */
     stat(cbdata.config_dir, &sb);
-    application_id = g_strdup_printf("com.transmissionbt.transmission_%lu_%lu", (unsigned long)sb.st_dev,
+    application_id = g_strdup_printf("com.transmissionbt.Transmission._%lu_%lu", (unsigned long)sb.st_dev,
         (unsigned long)sb.st_ino);
     app = gtk_application_new(application_id, G_APPLICATION_HANDLES_OPEN);
     g_signal_connect(app, "open", G_CALLBACK(on_open), &cbdata);
