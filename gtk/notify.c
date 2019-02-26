@@ -238,7 +238,7 @@ void gtr_notify_torrent_completed(TrCore* core, int torrent_id)
         notify_callback, n);
 }
 
-void gtr_notify_torrent_added(TrCore* core, const tr_torrent* tor)
+void gtr_notify_torrent_added(TrCore* core, tr_torrent const* tor)
 {
     GVariantBuilder actions_builder;
     TrNotification* n;
