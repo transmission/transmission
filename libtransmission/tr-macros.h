@@ -125,8 +125,8 @@
 #define TR_GNUC_MALLOC
 #endif
 
-#if __has_attribute(fallthrough) || TR_GNUC_CHECK_VERSION(7, 0)
-#define TR_GNUC_FALLTHROUGH __attribute__((fallthrough))
+#if __has_attribute(__fallthrough__) || TR_GNUC_CHECK_VERSION(7, 0)
+#define TR_GNUC_FALLTHROUGH __attribute__((__fallthrough__))
 #else
 #define TR_GNUC_FALLTHROUGH
 #endif
