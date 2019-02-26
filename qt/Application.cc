@@ -688,7 +688,7 @@ bool Application::notifyApp(QString const& title, QString const& body, QStringLi
 #ifdef QT_DBUS_LIB
 void Application::onNotificationActionInvoked(quint32, QString action_key)
 {
-    static const QRegularExpression startNowRegex(QLatin1String(
+    static QRegularExpression const startNowRegex(QLatin1String(
         "start-now\\((\\d+)\\)"));
     QRegularExpressionMatch match = startNowRegex.match(action_key);
     if (match.hasMatch())
