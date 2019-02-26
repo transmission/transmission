@@ -385,9 +385,10 @@ Application::Application(int& argc, char** argv) :
     if (bus.isConnected())
     {
         bus.connect(dbusServiceName, dbusPath, dbusInterfaceName,
-                    QLatin1String("ActionInvoked"), this,
-                    SLOT(onNotificationActionInvoked(quint32, QString)));
+            QLatin1String("ActionInvoked"), this,
+            SLOT(onNotificationActionInvoked(quint32, QString)));
     }
+
 #endif
 }
 
@@ -503,10 +504,11 @@ void Application::onNewTorrentChanged(int id)
     }
 }
 
-void Application::notifyTorrentAdded(Torrent const* tor) const {
+void Application::notifyTorrentAdded(Torrent const* tor) const
+{
     QStringList actions;
     actions << QString(QLatin1String("start-now(%1)")).arg(tor->id()) <<
-               QObject::tr("Start Now");
+        QObject::tr("Start Now");
     notifyApp(tr("Torrent Added"), tor->name(), actions);
 }
 
@@ -651,8 +653,7 @@ void Application::raise()
     alert(myWindow);
 }
 
-bool Application::notifyApp(QString const& title, QString const& body,
-                            const QStringList &actions) const
+bool Application::notifyApp(QString const& title, QString const& body, const QStringList& actions) const
 {
 #ifdef QT_DBUS_LIB
     QDBusConnection bus = QDBusConnection::sessionBus();
@@ -685,14 +686,15 @@ bool Application::notifyApp(QString const& title, QString const& body,
 }
 
 #ifdef QT_DBUS_LIB
-void Application::onNotificationActionInvoked(quint32, QString action_key) {
+void Application::onNotificationActionInvoked(quint32, QString action_key)
+{
     static const QRegularExpression startNowRegex(QLatin1String(
-                                                      "start-now\\((\\d+)\\)"));
+        "start-now\\((\\d+)\\)"));
     QRegularExpressionMatch match = startNowRegex.match(action_key);
     if (match.hasMatch())
     {
         int torrentId = match.captured(1).toInt();
-        mySession->startTorrentsNow({torrentId});
+        mySession->startTorrentsNow({ torrentId });
     }
 }
 #endif

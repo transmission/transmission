@@ -32,8 +32,7 @@ public:
     virtual ~Application();
 
     void raise();
-    bool notifyApp(QString const& title, QString const& body,
-                   QStringList const& actions = QStringList()) const;
+    bool notifyApp(QString const& title, QString const& body, QStringList const& actions = QStringList()) const;
 
     FaviconCache& faviconCache();
 
