@@ -653,7 +653,7 @@ void Application::raise()
     alert(myWindow);
 }
 
-bool Application::notifyApp(QString const& title, QString const& body, const QStringList& actions) const
+bool Application::notifyApp(QString const& title, QString const& body, QStringList const& actions) const
 {
 #ifdef QT_DBUS_LIB
     QDBusConnection bus = QDBusConnection::sessionBus();
