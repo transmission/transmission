@@ -24,7 +24,6 @@ static gboolean server_supports_actions = FALSE;
 
 typedef struct TrNotification
 {
-    guint id;
     TrCore* core;
     int torrent_id;
 }
@@ -83,7 +82,7 @@ static void g_signal_callback(GDBusProxy* proxy UNUSED, char* sender_name UNUSED
     g_return_if_fail(g_variant_is_of_type(params, G_VARIANT_TYPE("(u*)")));
 
     g_variant_get(params, "(u*)", &id, NULL);
-    n = g_hash_table_lookup(active_notifications, GINT_TO_POINTER((int*)&id));
+    n = g_hash_table_lookup(active_notifications, GUINT_TO_POINTER(id));
 
     if (n == NULL)
     {
@@ -92,7 +91,7 @@ static void g_signal_callback(GDBusProxy* proxy UNUSED, char* sender_name UNUSED
 
     if (g_strcmp0(signal_name, "NotificationClosed") == 0)
     {
-        g_hash_table_remove(active_notifications, GINT_TO_POINTER((int*)&n->id));
+        g_hash_table_remove(active_notifications, GUINT_TO_POINTER(id));
     }
     else if (g_strcmp0(signal_name, "ActionInvoked") == 0 && g_variant_is_of_type(params, G_VARIANT_TYPE("(us)")))
     {
@@ -140,7 +139,7 @@ static void dbus_proxy_ready_callback(GObject* source UNUSED, GAsyncResult* res,
 
 void gtr_notify_init(void)
 {
-    active_notifications = g_hash_table_new_full(g_int_hash, g_int_equal, NULL, tr_notification_free);
+    active_notifications = g_hash_table_new_full(g_direct_hash, g_direct_equal, NULL, tr_notification_free);
     g_dbus_proxy_new_for_bus(G_BUS_TYPE_SESSION, G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES, NULL, NOTIFICATIONS_DBUS_NAME,
         NOTIFICATIONS_DBUS_CORE_OBJECT, NOTIFICATIONS_DBUS_CORE_INTERFACE, NULL, dbus_proxy_ready_callback, NULL);
 }
@@ -163,8 +162,9 @@ static void notify_callback(GObject* source, GAsyncResult* res, gpointer user_da
         return;
     }
 
-    g_variant_get(result, "(u)", &n->id);
-    g_hash_table_insert(active_notifications, GINT_TO_POINTER((int*)&n->id), n);
+    guint id;
+    g_variant_get(result, "(u)", &id);
+    g_hash_table_insert(active_notifications, GUINT_TO_POINTER(id), n);
 
     g_variant_unref(result);
 }
@@ -212,7 +212,7 @@ void gtr_notify_torrent_completed(TrCore* core, int torrent_id)
         }
     }
 
-    g_dbus_proxy_call(proxy, "Notify", g_variant_new("(susssasa{sv}i)", "Transmission", n->id, "transmission",
+    g_dbus_proxy_call(proxy, "Notify", g_variant_new("(susssasa{sv}i)", "Transmission", 0, "transmission",
         _("Torrent Complete"), tr_torrentName(tor), &actions_builder, NULL, -1), G_DBUS_CALL_FLAGS_NONE, -1, NULL,
         notify_callback, n);
 }
