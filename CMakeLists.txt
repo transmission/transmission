@@ -536,6 +536,11 @@ add_subdirectory(libtransmission)
 
 set(MAC_PROJECT_DIR macosx)
 
+if(ENABLE_GTK AND ENABLE_NLS)
+    find_package(Gettext 0.19.7 REQUIRED)
+    add_subdirectory(po)
+endif()
+
 foreach(P daemon cli utils gtk qt mac)
     string(TOUPPER "${P}" P_ID)
     if(ENABLE_${P_ID})
@@ -548,11 +553,6 @@ endforeach()
 
 if(ENABLE_DAEMON OR ENABLE_GTK OR ENABLE_QT)
     tr_install_web(${CMAKE_INSTALL_DATAROOTDIR}/${TR_NAME})
-endif()
-
-if(ENABLE_GTK AND ENABLE_NLS)
-    find_package(Gettext REQUIRED)
-    add_subdirectory(po)
 endif()
 
 if(INSTALL_DOC)
