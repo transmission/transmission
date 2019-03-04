@@ -674,7 +674,8 @@ static void handle_request(struct evhttp_request* req, void* arg)
 
         server->loginattempts = 0;
 
-        if (strstr(req->uri, server->url) != NULL && req->uri[strlen(server->url)] == '\0')
+        if (strstr(req->uri, server->url) == NULL || req->uri[strlen(server->url)] == '\0' ||
+            (strncmp(req->uri + strlen(server->url), "web", 3) == 0 && req->uri[strlen(server->url) + 3] == '\0'))
         {
             char* location = tr_strdup_printf("%sweb/", server->url);
             evhttp_add_header(req->output_headers, "Location", location);
