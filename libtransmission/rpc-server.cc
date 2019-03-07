@@ -1141,10 +1141,14 @@ tr_rpc_server* tr_rpcInit(tr_session* session, tr_variant* settings)
     }
     else
     {
-        if (str[strlen(str)-1] != '/')
+        if (str[strlen(str) - 1] != '/')
+        {
             s->url = tr_strdup_printf("%s/", str);
+        }
         else
+        {
             s->url = tr_strdup(str);
+        }
     }
 
     key = TR_KEY_rpc_whitelist_enabled;
