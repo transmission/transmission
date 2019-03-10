@@ -1134,10 +1134,7 @@ bool tr_sys_dir_create_temp(char* path_template, tr_error** error)
 
 tr_sys_dir_t tr_sys_dir_open(char const* path, tr_error** error)
 {
-#ifndef __clang__
-    /* Clang gives "static_assert expression is not an integral constant expression" error */
-    TR_STATIC_ASSERT(TR_BAD_SYS_DIR == NULL, "values should match");
-#endif
+    TR_STATIC_ASSERT((void*)TR_BAD_SYS_DIR == NULL, "values should match");
 
     TR_ASSERT(path != NULL);
 
