@@ -6,7 +6,7 @@
     <message>
         <location filename="../AboutDialog.ui" line="+14"/>
         <source>About Transmission</source>
-        <translation>О приложении</translation>
+        <translation>О Transmission</translation>
     </message>
     <message>
         <location filename="../AboutDialog.cc" line="+28"/>
@@ -14,14 +14,14 @@
         <translation>&lt;b style=&apos;font-size:x-large&apos;&gt;Transmission %1&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="../AboutDialog.ui" line="+26"/>
+        <location filename="../AboutDialog.ui" line="+29"/>
         <source>A fast and easy BitTorrent client</source>
         <translation>Быстрый и простой BitTorrent-клиент</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Copyright (c) The Transmission Project</source>
-        <translation>Авторское право (©) The Transmission Project</translation>
+        <translation>Авторское право © The Transmission Project</translation>
     </message>
     <message>
         <location filename="../AboutDialog.cc" line="+4"/>
@@ -49,7 +49,7 @@
     <message>
         <location line="+1"/>
         <source>When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility.</source>
-        <translation>Когда вы запускаете торрент, его данные будут доступны другим в результате загрузки. Вы отвечаете за все данные, которые вы раздаете.</translation>
+        <translation>Когда вы запускаете торрент, его данные становятся доступны другим пользователям посредством раздачи. Вы несёте персональную ответственность за всю информацию, которой делитесь.</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -59,7 +59,7 @@
     <message>
         <location line="+92"/>
         <source>Torrent Completed</source>
-        <translation>Торрент завершен</translation>
+        <translation>Торрент завершён</translation>
     </message>
     <message>
         <location line="+26"/>
@@ -109,18 +109,18 @@
         <location line="+63"/>
         <source>%1 (%Ln pieces @ %2)</source>
         <translation>
-            <numerusform>%1 (%Ln фрагмент @ %2)</numerusform>
-            <numerusform>%1 (%Ln фрагмента @ %2)</numerusform>
-            <numerusform>%1 (%Ln фрагментов @ %2)</numerusform>
+            <numerusform>%1 (%Ln часть @ %2)</numerusform>
+            <numerusform>%1 (%Ln части @ %2)</numerusform>
+            <numerusform>%1 (%Ln частей @ %2)</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+5"/>
         <source>%1 (%Ln pieces)</source>
         <translation>
-            <numerusform>%1 (%Ln фрагмент)</numerusform>
-            <numerusform>%1 (%Ln фрагмента)</numerusform>
-            <numerusform>%1 (%Ln фрагментов)</numerusform>
+            <numerusform>%1 (%Ln часть)</numerusform>
+            <numerusform>%1 (%Ln части)</numerusform>
+            <numerusform>%1 (%Ln частей)</numerusform>
         </translation>
     </message>
     <message>
@@ -152,7 +152,7 @@
         <location line="+185"/>
         <location line="+47"/>
         <source>Encrypted connection</source>
-        <translation>Зашифрованное соединение</translation>
+        <translation>Шифрованное соединение</translation>
     </message>
     <message>
         <location line="-28"/>
@@ -278,7 +278,7 @@
         <location line="+9"/>
         <location line="+46"/>
         <source>Invalid URL &quot;%1&quot;</source>
-        <translation>Недопустимый URL-адрес &quot;%1&quot;</translation>
+        <translation>Недопустимый URL-адрес «%1»</translation>
     </message>
     <message>
         <location line="-9"/>
@@ -334,7 +334,7 @@
     <message>
         <location line="+62"/>
         <source>Up</source>
-        <translation>Раздача</translation>
+        <translation>Отдача</translation>
     </message>
     <message>
         <location line="+0"/>
@@ -519,7 +519,7 @@
     <message>
         <location line="+20"/>
         <source>Limit &amp;upload speed:</source>
-        <translation>Ограничить скорость &amp;раздачи:</translation>
+        <translation>Ограничить скорость &amp;отдачи:</translation>
     </message>
     <message>
         <location line="+20"/>
@@ -555,7 +555,7 @@
 <context>
     <name>FileTreeItem</name>
     <message>
-        <location filename="../FileTreeItem.cc" line="+289"/>
+        <location filename="../FileTreeItem.cc" line="+290"/>
         <location filename="../FileTreeView.cc" line="+108"/>
         <location line="+285"/>
         <source>Low</source>
@@ -592,7 +592,7 @@
     <message>
         <location line="+4"/>
         <source>Size</source>
-        <translation>Объем</translation>
+        <translation>Размер</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -640,7 +640,7 @@
     <message>
         <location line="+1"/>
         <source>Rename...</source>
-        <translation>Переименовать...</translation>
+        <translation>Переименовать…</translation>
     </message>
 </context>
 <context>
@@ -674,17 +674,17 @@
     <message>
         <location line="+4"/>
         <source>Finished</source>
-        <translation>Завершенные</translation>
+        <translation>Завершённые</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Verifying</source>
-        <translation>Проверки</translation>
+        <translation>Проверяются</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Error</source>
-        <translation>Ошибки</translation>
+        <translation>С ошибкой</translation>
     </message>
     <message>
         <location line="+165"/>
@@ -694,7 +694,7 @@
     <message>
         <location line="+14"/>
         <source>Search...</source>
-        <translation>Поиск...</translation>
+        <translation>Поиск…</translation>
     </message>
 </context>
 <context>
@@ -707,7 +707,7 @@
     <message>
         <location line="+1"/>
         <source>kB/s</source>
-        <translation>кБ/с</translation>
+        <translation>КБ/с</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -733,7 +733,7 @@
     <message>
         <location line="-8"/>
         <source>kB</source>
-        <translation>кБ</translation>
+        <translation>КБ</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -837,7 +837,7 @@
     <message>
         <location filename="../FreeSpaceLabel.cc" line="+52"/>
         <source>&lt;i&gt;Calculating Free Space...&lt;/i&gt;</source>
-        <translation>&lt;i&gt;Вычисляется свободное место...&lt;/i&gt;</translation>
+        <translation>&lt;i&gt;Вычисляется свободное место…&lt;/i&gt;</translation>
     </message>
     <message>
         <location line="+35"/>
@@ -888,7 +888,7 @@
     <message>
         <location line="+66"/>
         <source>&amp;New...</source>
-        <translation>&amp;Создать...</translation>
+        <translation>&amp;Создать…</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -903,7 +903,7 @@
     <message>
         <location line="+3"/>
         <source>Show torrent properties</source>
-        <translation>Отобразить свойства торрента</translation>
+        <translation>Показать свойства торрента</translation>
     </message>
     <message>
         <location line="+11"/>
@@ -918,7 +918,7 @@
     <message>
         <location line="+122"/>
         <source>&amp;Open...</source>
-        <translation>&amp;Открыть...</translation>
+        <translation>&amp;Открыть…</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -1169,7 +1169,7 @@
     <message>
         <location line="+5"/>
         <source>&amp;Change Session...</source>
-        <translation>&amp;Сменить сеанс...</translation>
+        <translation>&amp;Сменить сеанс…</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -1180,17 +1180,17 @@
     <message>
         <location line="+5"/>
         <source>Set &amp;Location...</source>
-        <translation>Указать &amp;папку...</translation>
+        <translation>Указать &amp;папку…</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>&amp;Copy Magnet Link to Clipboard</source>
-        <translation>С&amp;копировать magnet-ссылку в буфер обмена</translation>
+        <translation>&amp;Копировать магнет-ссылку в буфер обмена</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Open &amp;URL...</source>
-        <translation>О&amp;ткрыть URL...</translation>
+        <translation>О&amp;ткрыть URL…</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -1230,7 +1230,7 @@
     <message>
         <location line="+8"/>
         <source>Sort by &amp;Queue</source>
-        <translation>Сортировать по очередности</translation>
+        <translation>Сортировать по очерёдности</translation>
     </message>
     <message>
         <location filename="../MainWindow.cc" line="+471"/>
@@ -1301,7 +1301,7 @@
     <message>
         <location line="+8"/>
         <source>Show &amp;options dialog</source>
-        <translation>Показать диалоговое окно &amp;настроек</translation>
+        <translation>Показать окно &amp;настроек</translation>
     </message>
     <message>
         <location line="-9"/>
@@ -1323,14 +1323,14 @@
         <source>Click to disable Temporary Speed Limits
  (%1 down, %2 up)</source>
         <translation>Нажмите для отключения временных ограничений скорости
-(%1 загрузка, %2 раздача)</translation>
+(%1 загрузка, %2 отдача)</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Click to enable Temporary Speed Limits
  (%1 down, %2 up)</source>
         <translation>Нажмите для включения временных ограничений скорости
-(%1 загрузка, %2 раздача)</translation>
+(%1 загрузка, %2 отдача)</translation>
     </message>
     <message>
         <location line="+142"/>
@@ -1372,12 +1372,12 @@
     <message>
         <location line="+6"/>
         <source>Once removed, continuing the transfer will require the torrent file or magnet link.</source>
-        <translation>После удаления для продолжения раздачи потребуется торрент-файл или magnet-ссылка.</translation>
+        <translation>После удаления для продолжения раздачи потребуется торрент-файл или магнет-ссылка.</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Once removed, continuing the transfers will require the torrent files or magnet links.</source>
-        <translation>После удаления для продолжения раздачи потребуются торрент-файлы или magnet-ссылки.</translation>
+        <translation>После удаления для продолжения раздачи потребуются торрент-файлы или магнет-ссылки.</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -1422,7 +1422,7 @@
     <message>
         <location line="+72"/>
         <source>%1 has not responded yet</source>
-        <translation>%1 еще не ответил</translation>
+        <translation>%1 ещё не ответил</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -1465,9 +1465,9 @@
         <location line="+1"/>
         <source>%Ln Piece(s)</source>
         <translation>
-            <numerusform>%Ln фрагмент</numerusform>
-            <numerusform>%Ln фрагмента</numerusform>
-            <numerusform>%Ln фрагментов</numerusform>
+            <numerusform>%Ln часть</numerusform>
+            <numerusform>%Ln части</numerusform>
+            <numerusform>%Ln частей</numerusform>
         </translation>
     </message>
     <message>
@@ -1533,17 +1533,17 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location filename="../MakeDialog.cc" line="-124"/>
         <source>Creating &quot;%1&quot;</source>
-        <translation>Создание &quot;%1&quot;</translation>
+        <translation>Создание «%1»</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Created &quot;%1&quot;!</source>
-        <translation>Создан &quot;%1&quot;!</translation>
+        <translation>Создан «%1»!</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Error: invalid announce URL &quot;%1&quot;</source>
-        <translation>Ошибка: неверный URL-адрес объявлений &quot;%1&quot;</translation>
+        <translation>Ошибка: неверный URL-адрес объявлений «%1»</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -1553,12 +1553,12 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+4"/>
         <source>Error reading &quot;%1&quot;: %2</source>
-        <translation>Ошибка чтения &quot;%1&quot;: %2</translation>
+        <translation>Ошибка чтения «%1»: %2</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Error writing &quot;%1&quot;: %2</source>
-        <translation>Ошибка записи &quot;%1&quot;: %2</translation>
+        <translation>Ошибка записи «%1»: %2</translation>
     </message>
 </context>
 <context>
@@ -1576,7 +1576,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+4"/>
         <source>Open Torrent from URL or Magnet Link</source>
-        <translation>Открыть торрент по URL или magnet-ссылке</translation>
+        <translation>Открыть торрент по URL или магнет-ссылке</translation>
     </message>
     <message>
         <location filename="../OptionsDialog.ui" line="+17"/>
@@ -1839,7 +1839,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+57"/>
         <source>Download Queue</source>
-        <translation>Очередь скачивания</translation>
+        <translation>Очередь загрузки</translation>
     </message>
     <message>
         <location line="+12"/>
@@ -1865,9 +1865,9 @@ To add another primary URL, add it after a blank line.</source>
         <location filename="../PrefsDialog.cc" line="+149"/>
         <source>&lt;i&gt;Blocklist contains %Ln rule(s)&lt;/i&gt;</source>
         <translation>
-            <numerusform>&lt;i&gt;&quot;Черный список&quot; содержит %Ln правило&lt;/i&gt;</numerusform>
-            <numerusform>&lt;i&gt;&quot;Черный список&quot; содержит %Ln правила&lt;/i&gt;</numerusform>
-            <numerusform>&lt;i&gt;&quot;Черный список&quot; содержит %Ln правил&lt;/i&gt;</numerusform>
+            <numerusform>&lt;i&gt;«Чёрный список» содержит %Ln правило&lt;/i&gt;</numerusform>
+            <numerusform>&lt;i&gt;«Чёрный список» содержит %Ln правила&lt;/i&gt;</numerusform>
+            <numerusform>&lt;i&gt;«Чёрный список» содержит %Ln правил&lt;/i&gt;</numerusform>
         </translation>
     </message>
     <message>
@@ -1894,15 +1894,15 @@ To add another primary URL, add it after a blank line.</source>
         <location filename="../PrefsDialog.cc" line="-223"/>
         <source>&lt;b&gt;Update succeeded!&lt;/b&gt;&lt;p&gt;Blocklist now has %Ln rule(s).</source>
         <translation>
-            <numerusform>&lt;b&gt;Обновление успешно завершено!&lt;/b&gt;&lt;p&gt;В &quot;черном списке&quot; %Ln правило.</numerusform>
-            <numerusform>&lt;b&gt;Обновление успешно завершено!&lt;/b&gt;&lt;p&gt;В &quot;черном списке&quot; %Ln правила.</numerusform>
-            <numerusform>&lt;b&gt;Обновление успешно завершено!&lt;/b&gt;&lt;p&gt;В &quot;черном списке&quot; %Ln правил.</numerusform>
+            <numerusform>&lt;b&gt;Обновление успешно завершено!&lt;/b&gt;&lt;p&gt;В чёрном списке %Ln правило.</numerusform>
+            <numerusform>&lt;b&gt;Обновление успешно завершено!&lt;/b&gt;&lt;p&gt;В чёрном списке %Ln правила.</numerusform>
+            <numerusform>&lt;b&gt;Обновление успешно завершено!&lt;/b&gt;&lt;p&gt;В чёрном списке %Ln правил.</numerusform>
         </translation>
     </message>
     <message>
         <location line="+7"/>
         <source>&lt;b&gt;Update Blocklist&lt;/b&gt;&lt;p&gt;Getting new blocklist...</source>
-        <translation>&lt;b&gt;Обновление чёрного списка&lt;/b&gt;&lt;p&gt;Получение нового чёрного списка...</translation>
+        <translation>&lt;b&gt;Обновление чёрного списка&lt;/b&gt;&lt;p&gt;Получение нового чёрного списка…</translation>
     </message>
     <message>
         <location filename="../PrefsDialog.ui" line="-193"/>
@@ -2043,7 +2043,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location filename="../PrefsDialog.cc" line="-73"/>
         <source>Testing TCP Port...</source>
-        <translation>Проверка TCP-порта...</translation>
+        <translation>Проверка TCP-порта…</translation>
     </message>
     <message>
         <location filename="../PrefsDialog.ui" line="-229"/>
@@ -2088,7 +2088,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location filename="../PrefsDialog.cc" line="+141"/>
         <source>Select &quot;Torrent Done&quot; Script</source>
-        <translation>Выбор скрипта, запускаемого при завершении торрента</translation>
+        <translation>Выбор скрипта, запускаемого по завершении торрента</translation>
     </message>
     <message>
         <location line="-1"/>
@@ -2124,12 +2124,12 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+205"/>
         <source>Append &quot;.&amp;part&quot; to incomplete files&apos; names</source>
-        <translation>Добавлят&amp;ь «.part» к именам не завершенных файлов</translation>
+        <translation>Добавлят&amp;ь «.part» к именам незавершённых файлов</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Keep &amp;incomplete files in:</source>
-        <translation>Сохранять &amp;не завершенные файлы в:</translation>
+        <translation>Сохранять &amp;незавершённые файлы в:</translation>
     </message>
     <message>
         <location line="-148"/>
@@ -2139,7 +2139,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+170"/>
         <source>Call scrip&amp;t when torrent is completed:</source>
-        <translation>Выполнить с&amp;крипт, после завершения загрузки:</translation>
+        <translation>Выполнить с&amp;крипт по завершении загрузки:</translation>
     </message>
     <message>
         <location line="+59"/>
@@ -2216,14 +2216,14 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+541"/>
+        <location filename="../Session.cc" line="+546"/>
         <source>Error Renaming Path</source>
         <translation>Ошибка переименования</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>&lt;p&gt;&lt;b&gt;Unable to rename &quot;%1&quot; as &quot;%2&quot;: %3.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Please correct the errors and try again.&lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;b&gt;Невозможно переименовать &quot;%1&quot; в &quot;%2&quot;: %3.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Пожалуйста, исправьте ошибки и попробуйте ещё раз.&lt;/p&gt;</translation>
+        <translation>&lt;p&gt;&lt;b&gt;Невозможно переименовать «%1» в «%2»: %3.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Пожалуйста, исправьте ошибки и попробуйте ещё раз.&lt;/p&gt;</translation>
     </message>
     <message>
         <location line="+449"/>
@@ -2231,7 +2231,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>Ошибка при добавлении торрента</translation>
     </message>
     <message>
-        <location line="+16"/>
+        <location line="+21"/>
         <source>Add Torrent</source>
         <translation>Добавить торрент</translation>
     </message>
@@ -2440,13 +2440,13 @@ To add another primary URL, add it after a blank line.</source>
         <location line="+13"/>
         <source> - %1 left</source>
         <extracomment>Second (optional) part of torrent progress string; %1 is duration; notice that leading space (before the dash) is included here</extracomment>
-        <translation> - осталось %1</translation>
+        <translation> — осталось %1</translation>
     </message>
     <message>
         <location line="+6"/>
         <source> - Remaining time unknown</source>
         <extracomment>Second (optional) part of torrent progress string; notice that leading space (before the dash) is included here</extracomment>
-        <translation> - Оставшееся время неизвестно</translation>
+        <translation> — Оставшееся время неизвестно</translation>
     </message>
     <message>
         <location line="+39"/>
@@ -2473,12 +2473,12 @@ To add another primary URL, add it after a blank line.</source>
         </translation>
     </message>
     <message>
-        <location line="+21"/>
+        <location line="+22"/>
         <source> - </source>
         <translation> — </translation>
     </message>
     <message numerus="yes">
-        <location line="-53"/>
+        <location line="-54"/>
         <source>Downloading metadata from %Ln peer(s) (%1% done)</source>
         <translation>
             <numerusform>Загрузка метаданных от %Ln участника (%1% завершено)</numerusform>
@@ -2516,12 +2516,12 @@ To add another primary URL, add it after a blank line.</source>
         </translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+7"/>
         <source>Error</source>
         <translation>Ошибка</translation>
     </message>
     <message>
-        <location line="-81"/>
+        <location line="-82"/>
         <source>Verifying local data (%1% tested)</source>
         <translation>Проверка локальных данных (проверено %1%)</translation>
     </message>
@@ -2548,7 +2548,7 @@ To add another primary URL, add it after a blank line.</source>
         <location line="+6"/>
         <source>Got an error %1&quot;%2&quot;%3 %4 ago</source>
         <extracomment>%1 and %3 are replaced with HTML markup, %2 is error message, %4 is duration</extracomment>
-        <translation>Получена ошибка %1&quot;%2&quot;%3 %4 назад </translation>
+        <translation>Получена ошибка %1«%2»%3 %4 назад </translation>
     </message>
     <message>
         <location line="+9"/>
@@ -2602,7 +2602,7 @@ To add another primary URL, add it after a blank line.</source>
         <location line="+7"/>
         <source>Got a scrape error %1&quot;%2&quot;%3 %4 ago</source>
         <extracomment>%1 and %3 are replaced with HTML markup, %2 is error message, %4 is duration</extracomment>
-        <translation>Ошибка при запросе к трекеру %1&quot;%2&quot;%3 %4 назад</translation>
+        <translation>Ошибка при запросе к трекеру %1«%2»%3 %4 назад</translation>
     </message>
     <message>
         <location line="+15"/>

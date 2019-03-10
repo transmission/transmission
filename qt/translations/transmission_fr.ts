@@ -14,7 +14,7 @@
         <translation>&lt;b style=&apos;font-size:x-large&apos;&gt;Transmission %1&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="../AboutDialog.ui" line="+26"/>
+        <location filename="../AboutDialog.ui" line="+29"/>
         <source>A fast and easy BitTorrent client</source>
         <translation>Un client BitTorrent simple et rapide</translation>
     </message>
@@ -275,7 +275,7 @@
         <location line="+9"/>
         <location line="+46"/>
         <source>Invalid URL &quot;%1&quot;</source>
-        <translation>URL invalide &quot;%1&quot;</translation>
+        <translation>URL invalide « %1 »</translation>
     </message>
     <message>
         <location line="-9"/>
@@ -552,7 +552,7 @@
 <context>
     <name>FileTreeItem</name>
     <message>
-        <location filename="../FileTreeItem.cc" line="+289"/>
+        <location filename="../FileTreeItem.cc" line="+290"/>
         <location filename="../FileTreeView.cc" line="+108"/>
         <location line="+285"/>
         <source>Low</source>
@@ -1521,17 +1521,17 @@ Pour ajouter une autre URL primaire, placez-la après une ligne vide.</translati
     <message>
         <location filename="../MakeDialog.cc" line="-124"/>
         <source>Creating &quot;%1&quot;</source>
-        <translation>Création de &quot;%1&quot;</translation>
+        <translation>Création de « %1 »</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Created &quot;%1&quot;!</source>
-        <translation>&quot;%1&quot; créé !</translation>
+        <translation>« %1 » créé !</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Error: invalid announce URL &quot;%1&quot;</source>
-        <translation>Erreur : URL d&apos;annonce invalide &quot;%1&quot;</translation>
+        <translation>Erreur : URL d&apos;annonce invalide « %1 »</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -1541,12 +1541,12 @@ Pour ajouter une autre URL primaire, placez-la après une ligne vide.</translati
     <message>
         <location line="+4"/>
         <source>Error reading &quot;%1&quot;: %2</source>
-        <translation>Erreur de lecture &quot;%1&quot; : %2</translation>
+        <translation>Erreur de lecture « %1 » : %2</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Error writing &quot;%1&quot;: %2</source>
-        <translation>Erreur d&apos;écriture &quot;%1&quot; : %2</translation>
+        <translation>Erreur d&apos;écriture « %1 » : %2</translation>
     </message>
 </context>
 <context>
@@ -2072,7 +2072,7 @@ Pour ajouter une autre URL primaire, placez-la après une ligne vide.</translati
     <message>
         <location filename="../PrefsDialog.cc" line="+141"/>
         <source>Select &quot;Torrent Done&quot; Script</source>
-        <translation>Sélectionner le script &quot;Torrent complété&quot;</translation>
+        <translation>Sélectionner le script « Torrent complété »</translation>
     </message>
     <message>
         <location line="-1"/>
@@ -2108,7 +2108,7 @@ Pour ajouter une autre URL primaire, placez-la après une ligne vide.</translati
     <message>
         <location line="+205"/>
         <source>Append &quot;.&amp;part&quot; to incomplete files&apos; names</source>
-        <translation>Ajouter &quot;.&amp;part&quot; aux fichiers incomplets</translation>
+        <translation>Ajouter « .&amp;part » aux fichiers incomplets</translation>
     </message>
     <message>
         <location line="+7"/>
@@ -2200,29 +2200,29 @@ Pour ajouter une autre URL primaire, placez-la après une ligne vide.</translati
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+541"/>
+        <location filename="../Session.cc" line="+546"/>
         <source>Error Renaming Path</source>
         <translation>Renommer le fichier d&apos;erreur</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>&lt;p&gt;&lt;b&gt;Unable to rename &quot;%1&quot; as &quot;%2&quot;: %3.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Please correct the errors and try again.&lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;b&gt;Impossible de renommer &quot;%1&quot; en &quot;%2&quot; : %3.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Corrigez les erreurs et essayez à nouveau.&lt;/p&gt;</translation>
+        <translation>&lt;p&gt;&lt;b&gt;Impossible de renommer « %1 » en « %2 » : %3.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Corrigez les erreurs et essayez à nouveau.&lt;/p&gt;</translation>
     </message>
     <message>
         <location line="+449"/>
         <source>Error Adding Torrent</source>
-        <translation type="unfinished">Erreur lors de l&apos;ajout du torrent</translation>
+        <translation>Erreur lors de l&apos;ajout du torrent</translation>
     </message>
     <message>
-        <location line="+16"/>
+        <location line="+21"/>
         <source>Add Torrent</source>
         <translation>Ajouter un torrent</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>&lt;p&gt;&lt;b&gt;Unable to add &quot;%1&quot;.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;It is a duplicate of &quot;%2&quot; which is already added.&lt;/p&gt;</source>
-        <translation type="unfinished">&lt;p&gt;&lt;b&gt;Impossible d&apos;ajouter &quot;%1&quot;.&lt;/b&gt;&lt;/p&gt;&lt;p&gt; c&apos;est un double de &quot;%2&quot; qui est déjà ajouté.&lt;/p&gt;</translation>
+        <translation>&lt;p&gt;&lt;b&gt;Impossible d&apos;ajouter « %1 ».&lt;/b&gt;&lt;/p&gt;&lt;p&gt;C&apos;est un doublon de « %2 » qui est déjà ajouté.&lt;/p&gt;</translation>
     </message>
 </context>
 <context>
@@ -2454,12 +2454,12 @@ Pour ajouter une autre URL primaire, placez-la après une ligne vide.</translati
         </translation>
     </message>
     <message>
-        <location line="+21"/>
+        <location line="+22"/>
         <source> - </source>
         <translation> - </translation>
     </message>
     <message numerus="yes">
-        <location line="-53"/>
+        <location line="-54"/>
         <source>Downloading metadata from %Ln peer(s) (%1% done)</source>
         <translation>
             <numerusform>Téléchargement des méta-données depuis %Ln pair (%1% fait)</numerusform>
@@ -2493,12 +2493,12 @@ Pour ajouter une autre URL primaire, placez-la après une ligne vide.</translati
         </translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+7"/>
         <source>Error</source>
         <translation>Erreur</translation>
     </message>
     <message>
-        <location line="-81"/>
+        <location line="-82"/>
         <source>Verifying local data (%1% tested)</source>
         <translation>Vérification des données locales (%1% testées)</translation>
     </message>
@@ -2576,7 +2576,7 @@ Pour ajouter une autre URL primaire, placez-la après une ligne vide.</translati
         <location line="+7"/>
         <source>Got a scrape error %1&quot;%2&quot;%3 %4 ago</source>
         <extracomment>%1 and %3 are replaced with HTML markup, %2 is error message, %4 is duration</extracomment>
-        <translation>Reçu une erreur (&quot;scrape error&quot;) %1&quot;%2&quot;%3 il y a %4</translation>
+        <translation>Reçu une erreur (« scrape error ») %1&quot;%2&quot;%3 il y a %4</translation>
     </message>
     <message>
         <location line="+15"/>

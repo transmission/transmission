@@ -1,9 +1,9 @@
 [Desktop Entry]
-_Name=Transmission
-_GenericName=BitTorrent Client
-_Comment=Download and share files over BitTorrent
+Name=Transmission
+GenericName=BitTorrent Client
+Comment=Download and share files over BitTorrent
 # Translators: Search terms to find this application. Do NOT translate or localize the semicolons! The list MUST also end with a semicolon!
-_Keywords=torrents;downloading;uploading;share;sharing;
+Keywords=torrents;downloading;uploading;share;sharing;
 Exec=transmission-gtk %U
 Icon=transmission
 Terminal=false
@@ -17,9 +17,9 @@ X-AppInstall-Keywords=torrent
 Actions=Pause;Minimize;
 
 [Desktop Action Pause]
-_Name=Start Transmission with All Torrents Paused
+Name=Start Transmission with All Torrents Paused
 Exec=transmission-gtk --paused
 
 [Desktop Action Minimize]
-_Name=Start Transmission Minimized
+Name=Start Transmission Minimized
 Exec=transmission-gtk --minimized
