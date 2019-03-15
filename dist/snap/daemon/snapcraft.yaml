@@ -1,0 +1,78 @@
+name: transmission-daemon
+adopt-info: transmission-daemon
+summary: Fast, easy, and free BitTorrent client
+description: |
+  Transmission is a cross-platform BitTorrent client which features a variety
+  of user interfaces on top of a cross-platform back-end.
+
+  Feature Spotlight:
+    * Uses fewer resources than other clients
+    * Native Mac, GTK and Qt GUI clients
+    * Daemon ideal for servers, embedded systems, and headless use
+    * All these can be remote controlled by Web and Terminal clients
+    * Local Peer Discovery
+    * Full encryption, DHT, uTP, PEX and Magnet Link support
+
+  This package contains the Daemon which is a GUI-less application designed to
+  work in the background. It still provides a web interface and you are able
+  to control it remotely with a number of programs including from command line
+  with transmission-remote (part of transmission-utils package), and using a
+  Transmission Qt client with graphical user interface.
+
+  Transmission is free software licensed under the terms of the GNU General
+  Public License (GNU GPL), with parts under the MIT License.
+
+grade: devel
+confinement: strict
+
+parts:
+  transmission-daemon:
+    source: ../../..
+    plugin: cmake
+    override-pull: |
+      snapcraftctl pull
+      snapcraftctl set-version $(test -n "${TR_VERSION}" && echo "${TR_VERSION}" || git describe --tags --abbrev=10)
+    override-build: |
+      snapcraftctl build
+      strip $SNAPCRAFT_PART_INSTALL/bin/transmission-daemon
+    configflags:
+      - -DCMAKE_BUILD_TYPE=RelWithDebInfo
+      - -DENABLE_DAEMON=ON
+      - -DENABLE_GTK=OFF
+      - -DENABLE_QT=OFF
+      - -DENABLE_TESTS=OFF
+      - -DENABLE_UTILS=OFF
+      - -DUSE_SYSTEM_B64=OFF
+      - -DUSE_SYSTEM_DHT=OFF
+      - -DUSE_SYSTEM_EVENT2=ON
+      - -DUSE_SYSTEM_MINIUPNPC=OFF
+      - -DUSE_SYSTEM_NATPMP=OFF
+      - -DUSE_SYSTEM_UTP=OFF
+      - -DWITH_CRYPTO=openssl
+      - -DWITH_INOTIFY=ON
+      - -DWITH_SYSTEMD=ON
+    build-packages:
+      - git
+      - libcurl4-openssl-dev
+      - libevent-dev
+      - libssl-dev
+      - libsystemd-dev
+      - pkg-config
+      - zlib1g-dev
+    stage-packages:
+      - libcurl3
+      - libevent-2.0-5
+      - libssl1.0.0
+      - zlib1g
+
+apps:
+  transmission-daemon:
+    command: transmission-daemon --foreground
+    plugs:
+      - home
+      - network
+      - network-bind
+      - removable-media
+    daemon: simple
+    environment:
+      XDG_DATA_DIRS: $XDG_DATA_DIRS:$SNAP/share

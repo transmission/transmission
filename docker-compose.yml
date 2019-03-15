@@ -7,3 +7,10 @@ services:
       - .:/src
       - ./code_style.sh:/code_style.sh:ro
     command: ["/bin/sh", "/code_style.sh", "/src"]
+
+  snap_build:
+    image: snapcore/snapcraft:edge
+    volumes:
+      - .:/src
+    working_dir: /src/dist/snap
+    command: ["/bin/sh", "-c", "./build.sh"]

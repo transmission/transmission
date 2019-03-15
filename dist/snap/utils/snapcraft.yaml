@@ -1,0 +1,97 @@
+name: transmission-utils
+adopt-info: transmission-utils
+summary: Fast, easy, and free BitTorrent client
+description: |
+  Transmission is a cross-platform BitTorrent client which features a variety
+  of user interfaces on top of a cross-platform back-end.
+
+  Feature Spotlight:
+    * Uses fewer resources than other clients
+    * Native Mac, GTK+ and Qt GUI clients
+    * Daemon ideal for servers, embedded systems, and headless use
+    * All these can be remote controlled by Web and Terminal clients
+    * Local Peer Discovery
+    * Full encryption, DHT, uTP, PEX and Magnet Link support
+
+  This package contains the set of command line tools:
+    * transmission-remote to control a remote (or local!) Transmission
+      instance (GTK client, Qt client, Daemon) covering most of the actions
+      and settings which are otherwise available through either a GUI or a
+      settings.json configuration file.
+    * transmission-create to create new torrent files from your files or
+      directories
+    * transmission-edit to modify a set of trackers listed within existing
+      torrent files
+    * transmission-show to print information about existing torrent files and
+      retrieve their corresponding magnet links
+
+  Transmission is free software licensed under the terms of the GNU General
+  Public License (GNU GPL), with parts under the MIT License.
+
+grade: devel
+confinement: strict
+
+parts:
+  transmission-utils:
+    source: ../../..
+    plugin: cmake
+    override-pull: |
+      snapcraftctl pull
+      snapcraftctl set-version $(test -n "${TR_VERSION}" && echo "${TR_VERSION}" || git describe --tags --abbrev=10)
+    override-build: |
+      snapcraftctl build
+      strip $SNAPCRAFT_PART_INSTALL/bin/transmission-create
+      strip $SNAPCRAFT_PART_INSTALL/bin/transmission-edit
+      strip $SNAPCRAFT_PART_INSTALL/bin/transmission-remote
+      strip $SNAPCRAFT_PART_INSTALL/bin/transmission-show
+    configflags:
+      - -DCMAKE_BUILD_TYPE=RelWithDebInfo
+      - -DENABLE_DAEMON=OFF
+      - -DENABLE_GTK=OFF
+      - -DENABLE_QT=OFF
+      - -DENABLE_TESTS=OFF
+      - -DENABLE_UTILS=ON
+      - -DUSE_SYSTEM_B64=OFF
+      - -DUSE_SYSTEM_DHT=OFF
+      - -DUSE_SYSTEM_EVENT2=ON
+      - -DUSE_SYSTEM_MINIUPNPC=OFF
+      - -DUSE_SYSTEM_NATPMP=OFF
+      - -DUSE_SYSTEM_UTP=OFF
+      - -DWITH_CRYPTO=openssl
+      - -DWITH_INOTIFY=ON
+      - -DWITH_SYSTEMD=OFF
+    build-packages:
+      - git
+      - libcurl4-openssl-dev
+      - libevent-dev
+      - libssl-dev
+      - pkg-config
+      - zlib1g-dev
+    stage-packages:
+      - libcurl3
+      - libevent-2.0-5
+      - libssl1.0.0
+      - zlib1g
+
+apps:
+  create:
+    command: transmission-create
+    plugs:
+      - home
+      - removable-media
+  edit:
+    command: transmission-edit
+    plugs:
+      - home
+      - removable-media
+  remote:
+    command: transmission-remote
+    plugs:
+      - home
+      - network
+      - removable-media
+  show:
+    command: transmission-show
+    plugs:
+      - home
+      - removable-media

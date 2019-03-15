@@ -1,0 +1,133 @@
+name: transmission-gtk
+adopt-info: transmission-gtk
+summary: Fast, easy, and free BitTorrent client
+description: |
+  Transmission is a cross-platform BitTorrent client which features a variety
+  of user interfaces on top of a cross-platform back-end.
+
+  Feature Spotlight:
+    * Uses fewer resources than other clients
+    * Native Mac, GTK and Qt GUI clients
+    * Daemon ideal for servers, embedded systems, and headless use
+    * All these can be remote controlled by Web and Terminal clients
+    * Local Peer Discovery
+    * Full encryption, DHT, uTP, PEX and Magnet Link support
+
+  This package contains the GTK client. It integrates best with GTK-based
+  systems like GNOME, Cinnamon, Budgie, Xfce, LXDE, and MATE.
+
+  Transmission is free software licensed under the terms of the GNU General
+  Public License (GNU GPL), with parts under the MIT License.
+
+grade: devel
+confinement: strict
+
+plugs:
+  gtk-3-themes:
+    interface: content
+    target: $SNAP/usr/share/themes
+    default-provider: gtk-common-themes
+  icon-themes:
+    interface: content
+    target: $SNAP/usr/share/icons
+    default-provider: gtk-common-themes
+
+slots:
+  dbus-daemon:
+    interface: dbus
+    bus: session
+    name: com.transmissionbt.transmission
+
+parts:
+  transmission-gtk:
+    source: ../../..
+    plugin: cmake
+    override-pull: |
+      snapcraftctl pull
+      snapcraftctl set-version $(test -n "${TR_VERSION}" && echo "${TR_VERSION}" || git describe --tags --abbrev=10)
+    override-build: |
+      sed -i.bak -e 's|^Icon=.*$|Icon=${SNAP}/meta/gui/transmission.png|g' ../src/gtk/transmission-gtk.desktop.in
+      snapcraftctl build
+      strip $SNAPCRAFT_PART_INSTALL/bin/transmission-gtk
+      mkdir -p $SNAPCRAFT_PART_INSTALL/meta/gui/
+      cp ../src/gtk/icons/hicolor_apps_48x48_transmission.png $SNAPCRAFT_PART_INSTALL/meta/gui/transmission.png
+    configflags:
+      - -DCMAKE_BUILD_TYPE=RelWithDebInfo
+      - -DENABLE_DAEMON=OFF
+      - -DENABLE_GTK=ON
+      - -DENABLE_QT=OFF
+      - -DENABLE_TESTS=OFF
+      - -DENABLE_UTILS=OFF
+      - -DUSE_SYSTEM_B64=OFF
+      - -DUSE_SYSTEM_DHT=OFF
+      - -DUSE_SYSTEM_EVENT2=ON
+      - -DUSE_SYSTEM_MINIUPNPC=OFF
+      - -DUSE_SYSTEM_NATPMP=OFF
+      - -DUSE_SYSTEM_UTP=OFF
+      - -DWITH_CRYPTO=openssl
+      - -DWITH_INOTIFY=ON
+      - -DWITH_SYSTEMD=OFF
+    build-packages:
+      - git
+      - intltool
+      - libcurl4-openssl-dev
+      - libevent-dev
+      - libgtk-3-dev
+      - libssl-dev
+      - pkg-config
+      - zlib1g-dev
+    stage-packages:
+      - gvfs
+      - libcurl3
+      - libevent-2.0-5
+      - libgtk-3-0
+      - libssl1.0.0
+      - zlib1g
+    stage:
+      - -usr/lib/x86_64-linux-gnu/dri
+      - -usr/lib/x86_64-linux-gnu/libLLVM*
+      - -usr/share/doc
+      - -usr/share/icons/*
+      - -usr/share/themes/*
+  desktop-gtk:
+    source: https://github.com/ubuntu/snapcraft-desktop-helpers.git
+    source-subdir: gtk
+    plugin: make
+    make-parameters:
+      - FLAVOR=gtk3
+    build-packages:
+      - libgtk-3-dev
+    override-build: |
+      snapcraftctl build
+      install -m755 -d $SNAPCRAFT_PART_INSTALL/usr/share/icons
+      install -m755 -d $SNAPCRAFT_PART_INSTALL/usr/share/themes
+    stage-packages:
+      - libxkbcommon0
+      - shared-mime-info
+      - libgtk-3-0
+      - libgdk-pixbuf2.0-0
+      - xdg-user-dirs
+      - ibus-gtk3
+      - libibus-1.0-5
+    stage:
+      - -usr/lib/x86_64-linux-gnu/dri
+      - -usr/lib/x86_64-linux-gnu/libLLVM*
+      - -usr/share/doc
+      - -usr/share/icons/*
+      - -usr/share/themes/*
+
+apps:
+  transmission-gtk:
+    command: desktop-launch transmission-gtk
+    plugs:
+      - desktop
+      - gsettings
+      - home
+      - network
+      - network-bind
+      - removable-media
+      - wayland
+      - x11
+    desktop: share/applications/transmission-gtk.desktop
+    environment:
+      LD_LIBRARY_PATH: $LD_LIBRARY_PATH:$SNAP/usr/lib/x86_64-linux-gnu/gvfs
