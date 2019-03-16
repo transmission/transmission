@@ -37,7 +37,7 @@
 
 2.2.  Responses
 
-   Reponses support three keys:
+   Responses support three keys:
 
    (1) A required "result" string whose value MUST be "success" on success,
        or an error string on failure.
