@@ -445,7 +445,7 @@ void gtr_combo_box_set_active_enum(GtkComboBox* combo_box, int value)
     /* find the one to select */
     i = 0;
 
-    while ((gtk_tree_model_iter_nth_child(model, &iter, NULL, i)))
+    while (gtk_tree_model_iter_nth_child(model, &iter, NULL, i))
     {
         gtk_tree_model_get(model, &iter, column, &currentValue, -1);
 

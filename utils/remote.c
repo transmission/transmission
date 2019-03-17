@@ -1423,7 +1423,7 @@ static void printPortTest(tr_variant* top)
 {
     tr_variant* args;
 
-    if ((tr_variantDictFindDict(top, TR_KEY_arguments, &args)))
+    if (tr_variantDictFindDict(top, TR_KEY_arguments, &args))
     {
         bool boolVal;
 
