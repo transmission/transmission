@@ -1085,7 +1085,7 @@ static void quickfindFirstK(char* base, size_t left, size_t right, size_t size, 
 {
     if (right > left)
     {
-        size_t const pivotIndex = left + (right - left) / 2u;
+        size_t const pivotIndex = left + (right - left) / 2U;
 
         size_t const pivotNewIndex = quickfindPartition(base, left, right, size, compar, pivotIndex);
 
@@ -1974,7 +1974,7 @@ char* tr_formatter_size_B(char* buf, int64_t bytes, size_t buflen)
 
 static struct formatter_units speed_units;
 
-unsigned int tr_speed_K = 0u;
+unsigned int tr_speed_K = 0U;
 
 void tr_formatter_speed_init(unsigned int kilo, char const* kb, char const* mb, char const* gb, char const* tb)
 {
@@ -2014,7 +2014,7 @@ char* tr_formatter_speed_KBps(char* buf, double KBps, size_t buflen)
 
 static struct formatter_units mem_units;
 
-unsigned int tr_mem_K = 0u;
+unsigned int tr_mem_K = 0U;
 
 void tr_formatter_mem_init(unsigned int kilo, char const* kb, char const* mb, char const* gb, char const* tb)
 {

@@ -147,11 +147,11 @@ static bool decode_hex_string(char const* in, unsigned int* setme)
         }
         else if ('a' <= *in && *in <= 'f')
         {
-            val += *in - 'a' + 10u;
+            val += *in - 'a' + 10U;
         }
         else if ('A' <= *in && *in <= 'F')
         {
-            val += *in - 'A' + 10u;
+            val += *in - 'A' + 10U;
         }
         else
         {

@@ -499,7 +499,7 @@ static void containerReserve(tr_variant* v, size_t count)
 
         while (n < needed)
         {
-            n *= 2u;
+            n *= 2U;
         }
 
         v->val.l.vals = tr_renew(tr_variant, v->val.l.vals, n);

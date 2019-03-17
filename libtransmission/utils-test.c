@@ -314,14 +314,14 @@ static int test_array(void)
     size_t array[10] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
     size_t n = TR_N_ELEMENTS(array);
 
-    tr_removeElementFromArray(array, 5u, sizeof(size_t), n--);
+    tr_removeElementFromArray(array, 5U, sizeof(size_t), n--);
 
     for (size_t i = 0; i < n; ++i)
     {
         check_int(array[i], ==, i < 5 ? i : i + 1);
     }
 
-    tr_removeElementFromArray(array, 0u, sizeof(size_t), n--);
+    tr_removeElementFromArray(array, 0U, sizeof(size_t), n--);
 
     for (size_t i = 0; i < n; ++i)
     {
