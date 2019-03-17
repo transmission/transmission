@@ -290,20 +290,24 @@ bool tr_variantGetInt(tr_variant const* v, int64_t* setme)
 {
     bool success = false;
 
-    if (!success && (success = tr_variantIsInt(v)))
+    if (tr_variantIsInt(v))
     {
         if (setme != NULL)
         {
             *setme = v->val.i;
         }
+
+        success = true;
     }
 
-    if (!success && (success = tr_variantIsBool(v)))
+    if (!success && tr_variantIsBool(v))
     {
         if (setme != NULL)
         {
             *setme = v->val.b ? 1 : 0;
         }
+
+        success = true;
     }
 
     return success;
@@ -344,24 +348,27 @@ bool tr_variantGetBool(tr_variant const* v, bool* setme)
     char const* str;
     bool success = false;
 
-    if ((success = tr_variantIsBool(v)))
+    if (tr_variantIsBool(v))
     {
         *setme = v->val.b;
+        success = true;
     }
 
     if (!success && tr_variantIsInt(v))
     {
-        if ((success = v->val.i == 0 || v->val.i == 1))
+        if (v->val.i == 0 || v->val.i == 1)
         {
             *setme = v->val.i != 0;
+            success = true;
         }
     }
 
     if (!success && tr_variantGetStr(v, &str, NULL))
     {
-        if ((success = strcmp(str, "true") == 0 || strcmp(str, "false") == 0))
+        if (strcmp(str, "true") == 0 || strcmp(str, "false") == 0)
         {
             *setme = strcmp(str, "true") == 0;
+            success = true;
         }
     }
 
@@ -372,14 +379,16 @@ bool tr_variantGetReal(tr_variant const* v, double* setme)
 {
     bool success = false;
 
-    if (!success && (success = tr_variantIsReal(v)))
+    if (tr_variantIsReal(v))
     {
         *setme = v->val.d;
+        success = true;
     }
 
-    if (!success && (success = tr_variantIsInt(v)))
+    if (!success && tr_variantIsInt(v))
     {
         *setme = v->val.i;
+        success = true;
     }
 
     if (!success && tr_variantIsString(v))
@@ -393,9 +402,10 @@ bool tr_variantGetReal(tr_variant const* v, double* setme)
         d = strtod(getStr(v), &endptr);
         restore_locale(&locale_ctx);
 
-        if ((success = getStr(v) != endptr && *endptr == '\0'))
+        if (getStr(v) != endptr && *endptr == '\0')
         {
             *setme = d;
+            success = true;
         }
     }
 

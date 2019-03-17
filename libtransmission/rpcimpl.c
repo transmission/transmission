@@ -1187,8 +1187,6 @@ static char const* addTrackerUrls(tr_torrent* tor, tr_variant* urls)
 
 static char const* replaceTrackers(tr_torrent* tor, tr_variant* urls)
 {
-    int i;
-    tr_variant* pair[2];
     tr_tracker_info* trackers;
     bool changed = false;
     tr_info const* inf = tr_torrentInfo(tor);
@@ -1200,23 +1198,20 @@ static char const* replaceTrackers(tr_torrent* tor, tr_variant* urls)
     copyTrackers(trackers, inf->trackers, n);
 
     /* make the substitutions... */
-    i = 0;
-
-    while ((pair[0] = tr_variantListChild(urls, i)) != NULL && (pair[1] = tr_variantListChild(urls, i + 1)) != NULL)
+    for (size_t i = 0, url_count = tr_variantListSize(urls); i + 1 < url_count; i += 2)
     {
         size_t len;
         int64_t pos;
         char const* newval;
 
-        if (tr_variantGetInt(pair[0], &pos) && tr_variantGetStr(pair[1], &newval, &len) && tr_urlIsValidTracker(newval) &&
-            pos < n && pos >= 0)
+        if (tr_variantGetInt(tr_variantListChild(urls, i), &pos) &&
+            tr_variantGetStr(tr_variantListChild(urls, i + 1), &newval, &len) &&
+            tr_urlIsValidTracker(newval) && pos < n && pos >= 0)
         {
             tr_free(trackers[pos].announce);
             trackers[pos].announce = tr_strndup(newval, len);
             changed = true;
         }
-
-        i += 2;
     }
 
     if (!changed)

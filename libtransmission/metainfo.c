@@ -233,7 +233,6 @@ static char const* parseFiles(tr_info* inf, tr_variant* files, tr_variant const*
 static char* tr_convertAnnounceToScrape(char const* announce)
 {
     char* scrape = NULL;
-    char const* s;
 
     /* To derive the scrape URL use the following steps:
      * Begin with the announce URL. Find the last '/' in it.
@@ -241,7 +240,10 @@ static char* tr_convertAnnounceToScrape(char const* announce)
      * it will be taken as a sign that that tracker doesn't support
      * the scrape convention. If it does, substitute 'scrape' for
      * 'announce' to find the scrape page. */
-    if ((s = strrchr(announce, '/')) != NULL && strncmp(s + 1, "announce", 8) == 0)
+
+    char const* s = strrchr(announce, '/');
+
+    if (s != NULL && strncmp(s + 1, "announce", 8) == 0)
     {
         char const* prefix = announce;
         size_t const prefix_len = s + 1 - announce;
