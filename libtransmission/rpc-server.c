@@ -184,7 +184,7 @@ static void handle_upload(struct evhttp_request* req, struct tr_rpc_server* serv
         {
             struct tr_mimepart* p = tr_ptrArrayNth(&parts, i);
 
-            if (tr_memmem(p->headers, p->headers_len, TR_RPC_SESSION_ID_HEADER, strlen(TR_RPC_SESSION_ID_HEADER)) != NULL)
+            if (tr_strcasestr(p->headers, TR_RPC_SESSION_ID_HEADER) != NULL)
             {
                 char const* ours = get_current_session_id(server);
                 size_t const ourlen = strlen(ours);

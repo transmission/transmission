@@ -29,6 +29,7 @@
 #include <ws2tcpip.h> /* WSAStartup() */
 #include <windows.h> /* Sleep(), GetSystemTimeAsFileTime(), GetEnvironmentVariable() */
 #include <shellapi.h> /* CommandLineToArgv() */
+#include <shlwapi.h> /* StrStrIA() */
 #else
 #include <sys/time.h>
 #include <unistd.h> /* getpagesize() */
@@ -452,6 +453,23 @@ char const* tr_memmem(char const* haystack, size_t haystacklen, char const* need
     }
 
     return NULL;
+
+#endif
+}
+
+char const* tr_strcasestr(char const* haystack, char const* needle)
+{
+#ifdef HAVE_STRCASESTR
+
+    return strcasestr(haystack, needle);
+
+#elif defined(_WIN32)
+
+    return StrStrIA(haystack, needle);
+
+#else
+
+#error please open a PR to implement tr_strcasestr() for your platform
 
 #endif
 }
