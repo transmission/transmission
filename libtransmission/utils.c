@@ -1726,7 +1726,8 @@ bool tr_moveFile(char const* oldpath, char const* newpath, tr_error** error)
     while (bytesLeft > 0)
     {
         uint64_t const bytesThisPass = MIN(bytesLeft, buflen);
-        uint64_t numRead, bytesWritten;
+        uint64_t numRead;
+        uint64_t bytesWritten;
 
         if (!tr_sys_file_read(in, buf, bytesThisPass, &numRead, error))
         {
