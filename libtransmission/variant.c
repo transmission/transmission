@@ -250,7 +250,8 @@ tr_variant* tr_variantDictFind(tr_variant* dict, tr_quark const key)
 
 static bool tr_variantDictFindType(tr_variant* dict, tr_quark const key, int type, tr_variant** setme)
 {
-    return tr_variantIsType(*setme = tr_variantDictFind(dict, key), type);
+    *setme = tr_variantDictFind(dict, key);
+    return tr_variantIsType(*setme, type);
 }
 
 size_t tr_variantListSize(tr_variant const* list)
@@ -278,7 +279,8 @@ bool tr_variantListRemove(tr_variant* list, size_t i)
     {
         removed = true;
         tr_variantFree(&list->val.l.vals[i]);
-        tr_removeElementFromArray(list->val.l.vals, i, sizeof(tr_variant), list->val.l.count--);
+        tr_removeElementFromArray(list->val.l.vals, i, sizeof(tr_variant), list->val.l.count);
+        --list->val.l.count;
     }
 
     return removed;
@@ -823,7 +825,9 @@ void tr_variantWalk(tr_variant const* v, struct VariantWalkFuncs const* walkFunc
         }
         else if (tr_variantIsContainer(node->v) && node->childIndex < node->v->val.l.count)
         {
-            int const index = node->childIndex++;
+            int const index = node->childIndex;
+            ++node->childIndex;
+
             v = node->v->val.l.vals + index;
 
             if (tr_variantIsDict(node->v))
@@ -958,7 +962,7 @@ static void tr_variantListCopy(tr_variant* target, tr_variant const* src)
     int i = 0;
     tr_variant const* val;
 
-    while ((val = tr_variantListChild((tr_variant*)src, i++)) != NULL)
+    while ((val = tr_variantListChild((tr_variant*)src, i)) != NULL)
     {
         if (tr_variantIsBool(val))
         {
@@ -997,6 +1001,8 @@ static void tr_variantListCopy(tr_variant* target, tr_variant const* src)
         {
             tr_logAddError("tr_variantListCopy skipping item");
         }
+
+        ++i;
     }
 }
 

@@ -438,7 +438,8 @@ static void jsonChildFunc(struct jsonWalk* data)
         {
         case TR_VARIANT_TYPE_DICT:
             {
-                int const i = pstate->childIndex++;
+                int const i = pstate->childIndex;
+                ++pstate->childIndex;
 
                 if (i % 2 == 0)
                 {
@@ -460,7 +461,8 @@ static void jsonChildFunc(struct jsonWalk* data)
 
         case TR_VARIANT_TYPE_LIST:
             {
-                bool const isLast = ++pstate->childIndex == pstate->childCount;
+                ++pstate->childIndex;
+                bool const isLast = pstate->childIndex == pstate->childCount;
 
                 if (!isLast)
                 {

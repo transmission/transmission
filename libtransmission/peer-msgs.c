@@ -760,7 +760,8 @@ static bool popNextMetadataRequest(tr_peerMsgs* msgs, int* piece)
 
     *piece = msgs->peerAskedForMetadata[0];
 
-    tr_removeElementFromArray(msgs->peerAskedForMetadata, 0, sizeof(int), msgs->peerAskedForMetadataCount--);
+    tr_removeElementFromArray(msgs->peerAskedForMetadata, 0, sizeof(int), msgs->peerAskedForMetadataCount);
+    --msgs->peerAskedForMetadataCount;
 
     return true;
 }
@@ -774,7 +775,8 @@ static bool popNextRequest(tr_peerMsgs* msgs, struct peer_request* setme)
 
     *setme = msgs->peerAskedFor[0];
 
-    tr_removeElementFromArray(msgs->peerAskedFor, 0, sizeof(struct peer_request), msgs->peer.pendingReqsToClient--);
+    tr_removeElementFromArray(msgs->peerAskedFor, 0, sizeof(struct peer_request), msgs->peer.pendingReqsToClient);
+    --msgs->peer.pendingReqsToClient;
 
     return true;
 }
@@ -1630,7 +1632,8 @@ static int readBtMessage(tr_peerMsgs* msgs, struct evbuffer* inbuf, size_t inlen
                 if (req->index == r.index && req->offset == r.offset && req->length == r.length)
                 {
                     tr_removeElementFromArray(msgs->peerAskedFor, i, sizeof(struct peer_request),
-                        msgs->peer.pendingReqsToClient--);
+                        msgs->peer.pendingReqsToClient);
+                    --msgs->peer.pendingReqsToClient;
                     break;
                 }
             }

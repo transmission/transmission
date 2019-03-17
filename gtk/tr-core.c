@@ -1853,9 +1853,10 @@ static void on_port_test_response(TrCore* core, tr_variant* response, gpointer u
 
 void gtr_core_port_test(TrCore* core)
 {
-    int const tag = nextTag++;
-    tr_variant request;
+    int const tag = nextTag;
+    ++nextTag;
 
+    tr_variant request;
     tr_variantInitDict(&request, 2);
     tr_variantDictAddStr(&request, TR_KEY_method, "port-test");
     tr_variantDictAddInt(&request, TR_KEY_tag, tag);
@@ -1888,9 +1889,10 @@ static void on_blocklist_response(TrCore* core, tr_variant* response, gpointer d
 
 void gtr_core_blocklist_update(TrCore* core)
 {
-    int const tag = nextTag++;
-    tr_variant request;
+    int const tag = nextTag;
+    ++nextTag;
 
+    tr_variant request;
     tr_variantInitDict(&request, 2);
     tr_variantDictAddStr(&request, TR_KEY_method, "blocklist-update");
     tr_variantDictAddInt(&request, TR_KEY_tag, tag);
@@ -1904,7 +1906,9 @@ void gtr_core_blocklist_update(TrCore* core)
 
 void gtr_core_exec(TrCore* core, tr_variant const* top)
 {
-    int const tag = nextTag++;
+    int const tag = nextTag;
+    ++nextTag;
+
     core_send_rpc_request(core, top, tag, NULL, NULL);
 }
 

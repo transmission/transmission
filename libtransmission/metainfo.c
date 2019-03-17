@@ -241,14 +241,17 @@ static char* tr_convertAnnounceToScrape(char const* announce)
      * it will be taken as a sign that that tracker doesn't support
      * the scrape convention. If it does, substitute 'scrape' for
      * 'announce' to find the scrape page. */
-    if ((s = strrchr(announce, '/')) != NULL && strncmp(++s, "announce", 8) == 0)
+    if ((s = strrchr(announce, '/')) != NULL && strncmp(s + 1, "announce", 8) == 0)
     {
         char const* prefix = announce;
-        size_t const prefix_len = s - announce;
-        char const* suffix = s + 8;
+        size_t const prefix_len = s + 1 - announce;
+        char const* suffix = s + 1 + 8;
         size_t const suffix_len = strlen(suffix);
         size_t const alloc_len = prefix_len + 6 + suffix_len + 1;
-        char* walk = scrape = tr_new(char, alloc_len);
+
+        scrape = tr_new(char, alloc_len);
+
+        char* walk = scrape;
         memcpy(walk, prefix, prefix_len);
         walk += prefix_len;
         memcpy(walk, "scrape", 6);
@@ -256,7 +259,8 @@ static char* tr_convertAnnounceToScrape(char const* announce)
         memcpy(walk, suffix, suffix_len);
         walk += suffix_len;
         *walk++ = '\0';
-        TR_ASSERT(walk - scrape == (int)alloc_len);
+
+        TR_ASSERT((size_t)(walk - scrape) == alloc_len);
     }
     /* Some torrents with UDP announce URLs don't have /announce. */
     else if (strncmp(announce, "udp:", 4) == 0)
