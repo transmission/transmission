@@ -2124,15 +2124,16 @@ static void sessionLoadTorrents(void* vdata)
 
     int i;
     int n = 0;
-    tr_sys_path_info info;
-    tr_sys_dir_t odir = NULL;
     tr_list* list = NULL;
-    char const* dirname = tr_getTorrentDir(data->session);
 
     tr_ctorSetSave(data->ctor, false); /* since we already have them */
 
-    if (tr_sys_path_get_info(dirname, 0, &info, NULL) && info.type == TR_SYS_PATH_IS_DIRECTORY &&
-        (odir = tr_sys_dir_open(dirname, NULL)) != TR_BAD_SYS_DIR)
+    tr_sys_path_info info;
+    char const* dirname = tr_getTorrentDir(data->session);
+    tr_sys_dir_t odir = (tr_sys_path_get_info(dirname, 0, &info, NULL) && info.type == TR_SYS_PATH_IS_DIRECTORY) ?
+        tr_sys_dir_open(dirname, NULL) : TR_BAD_SYS_DIR;
+
+    if (odir != TR_BAD_SYS_DIR)
     {
         char const* name;
 
@@ -2634,24 +2635,24 @@ static void metainfoLookupInit(tr_session* session)
 {
     TR_ASSERT(tr_isSession(session));
 
-    tr_sys_path_info info;
-    char const* dirname = tr_getTorrentDir(session);
-    tr_sys_dir_t odir;
-    tr_ctor* ctor = NULL;
-    tr_variant* lookup;
+    tr_variant* lookup = tr_new0(tr_variant, 1);
+    tr_variantInitDict(lookup, 0);
+
     int n = 0;
 
-    /* walk through the directory and find the mappings */
-    lookup = tr_new0(tr_variant, 1);
-    tr_variantInitDict(lookup, 0);
-    ctor = tr_ctorNew(session);
-    tr_ctorSetSave(ctor, false); /* since we already have them */
+    tr_sys_path_info info;
+    char const* dirname = tr_getTorrentDir(session);
+    tr_sys_dir_t odir = (tr_sys_path_get_info(dirname, 0, &info, NULL) && info.type == TR_SYS_PATH_IS_DIRECTORY) ?
+        tr_sys_dir_open(dirname, NULL) : TR_BAD_SYS_DIR;
 
-    if (tr_sys_path_get_info(dirname, 0, &info, NULL) && info.type == TR_SYS_PATH_IS_DIRECTORY &&
-        (odir = tr_sys_dir_open(dirname, NULL)) != TR_BAD_SYS_DIR)
+    if (odir != TR_BAD_SYS_DIR)
     {
+        tr_ctor* ctor = tr_ctorNew(session);
+        tr_ctorSetSave(ctor, false); /* since we already have them */
+
         char const* name;
 
+        /* walk through the directory and find the mappings */
         while ((name = tr_sys_dir_read_name(odir, NULL)) != NULL)
         {
             if (tr_str_has_suffix(name, ".torrent"))
@@ -2671,9 +2672,8 @@ static void metainfoLookupInit(tr_session* session)
         }
 
         tr_sys_dir_close(odir, NULL);
+        tr_ctorFree(ctor);
     }
-
-    tr_ctorFree(ctor);
 
     session->metainfoLookup = lookup;
     tr_logAddDebug("Found %d torrents in \"%s\"", n, dirname);

@@ -224,7 +224,7 @@ void tr_cpGetAmountDone(tr_completion const* cp, float* tab, int tabCount)
     {
         if (seed)
         {
-            tab[i] = 1.0f;
+            tab[i] = 1.0F;
         }
         else
         {

@@ -184,7 +184,7 @@ static void handle_upload(struct evhttp_request* req, struct tr_rpc_server* serv
         {
             struct tr_mimepart* p = tr_ptrArrayNth(&parts, i);
 
-            if (tr_memmem(p->headers, p->headers_len, TR_RPC_SESSION_ID_HEADER, strlen(TR_RPC_SESSION_ID_HEADER)) != NULL)
+            if (tr_strcasestr(p->headers, TR_RPC_SESSION_ID_HEADER) != NULL)
             {
                 char const* ours = get_current_session_id(server);
                 size_t const ourlen = strlen(ours);
@@ -511,24 +511,28 @@ static void handle_rpc_from_json(struct evhttp_request* req, struct tr_rpc_serve
 
 static void handle_rpc(struct evhttp_request* req, struct tr_rpc_server* server)
 {
-    char const* q;
-
     if (req->type == EVHTTP_REQ_POST)
     {
         handle_rpc_from_json(req, server, (char const*)evbuffer_pullup(req->input_buffer, -1),
             evbuffer_get_length(req->input_buffer));
+        return;
     }
-    else if (req->type == EVHTTP_REQ_GET && (q = strchr(req->uri, '?')) != NULL)
+
+    if (req->type == EVHTTP_REQ_GET)
     {
-        struct rpc_response_data* data = tr_new0(struct rpc_response_data, 1);
-        data->req = req;
-        data->server = server;
-        tr_rpc_request_exec_uri(server->session, q + 1, TR_BAD_SIZE, rpc_response_func, data);
+        char const* q = strchr(req->uri, '?');
+
+        if (q != NULL)
+        {
+            struct rpc_response_data* data = tr_new0(struct rpc_response_data, 1);
+            data->req = req;
+            data->server = server;
+            tr_rpc_request_exec_uri(server->session, q + 1, TR_BAD_SIZE, rpc_response_func, data);
+            return;
+        }
     }
-    else
-    {
-        send_simple_response(req, 405, NULL);
-    }
+
+    send_simple_response(req, 405, NULL);
 }
 
 static bool isAddressAllowed(tr_rpc_server const* server, char const* address)
@@ -650,12 +654,11 @@ static void handle_request(struct evhttp_request* req, void* arg)
 
         if (auth != NULL && evutil_ascii_strncasecmp(auth, "basic ", 6) == 0)
         {
-            size_t plen;
-            char* p = tr_base64_decode_str(auth + 6, &plen);
+            char* p = tr_base64_decode_str(auth + 6, NULL);
 
             if (p != NULL)
             {
-                if (plen > 0 && (pass = strchr(p, ':')) != NULL)
+                if ((pass = strchr(p, ':')) != NULL)
                 {
                     user = p;
                     *pass++ = '\0';

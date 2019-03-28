@@ -14,6 +14,7 @@
 #include <string.h> /* strcmp */
 
 #include <event2/buffer.h>
+#include <event2/util.h>
 
 #define CURL_DISABLE_TYPECHECK /* otherwise -Wunreachable-code goes insane */
 #include <curl/curl.h>
@@ -290,6 +291,7 @@ static tr_option opts[] =
     { 920, "session-info", "Show the session's details", "si", 0, NULL },
     { 921, "session-stats", "Show the session's statistics", "st", 0, NULL },
     { 'l', "list", "List all torrents", "l", 0, NULL },
+    { 'L', "labels", "Set the current torrents' labels", "L", 1, "<label[,label...]>" },
     { 960, "move", "Move current torrent's data to a new folder", NULL, 1, "<path>" },
     { 961, "find", "Tell Transmission where to find a torrent's data", NULL, 1, "<path>" },
     { 'm', "portmap", "Enable portmapping via NAT-PMP or UPnP", "m", 0, NULL },
@@ -441,6 +443,7 @@ static int getOptMode(int val)
     case 993: /* no-trash-torrent */
         return MODE_SESSION_SET;
 
+    case 'L': /* labels */
     case 712: /* tracker-remove */
     case 950: /* seedratio */
     case 951: /* seedratio-default */
@@ -649,6 +652,29 @@ static void addDays(tr_variant* args, tr_quark const key, char const* arg)
     }
 }
 
+static void addLabels(tr_variant* args, char const* arg)
+{
+    tr_variant* labels;
+    if (!tr_variantDictFindList(args, TR_KEY_labels, &labels))
+    {
+        labels = tr_variantDictAddList(args, TR_KEY_labels, 10);
+    }
+
+    char* argcpy = tr_strdup(arg);
+    char* const tmp = argcpy; /* save copied string start pointer to free later */
+    char* token;
+    while ((token = tr_strsep(&argcpy, ",")) != NULL)
+    {
+        tr_strstrip(token);
+        if (*token != '\0')
+        {
+            tr_variantListAddStr(labels, token);
+        }
+    }
+
+    tr_free(tmp);
+}
+
 static void addFiles(tr_variant* args, tr_quark const key, char const* arg)
 {
     tr_variant* files = tr_variantDictAddList(args, key, 100);
@@ -706,6 +732,7 @@ static tr_quark const details_keys[] =
     TR_KEY_id,
     TR_KEY_isFinished,
     TR_KEY_isPrivate,
+    TR_KEY_labels,
     TR_KEY_leftUntilDone,
     TR_KEY_magnetLink,
     TR_KEY_name,
@@ -766,7 +793,7 @@ static size_t parseResponseHeader(void* ptr, size_t size, size_t nmemb, void* st
     char const* key = TR_RPC_SESSION_ID_HEADER ": ";
     size_t const key_len = strlen(key);
 
-    if (line_len >= key_len && memcmp(line, key, key_len) == 0)
+    if (line_len >= key_len && evutil_ascii_strncasecmp(line, key, key_len) == 0)
     {
         char const* begin = line + key_len;
         char const* end = begin;
@@ -936,6 +963,22 @@ static void printDetails(tr_variant* top)
             if (tr_variantDictFindStr(t, TR_KEY_magnetLink, &str, NULL))
             {
                 printf("  Magnet: %s\n", str);
+            }
+
+            if (tr_variantDictFindList(t, TR_KEY_labels, &l))
+            {
+                int const n = tr_variantListSize(l);
+                char const* str;
+                printf("  Labels: ");
+                for (int i = 0; i < n; i++)
+                {
+                    if (tr_variantGetStr(tr_variantListChild(l, i), &str, NULL))
+                    {
+                        printf(i == 0 ? "%s" : ", %s", str);
+                    }
+                }
+
+                printf("\n");
             }
 
             printf("\n");
@@ -1381,7 +1424,7 @@ static void printPortTest(tr_variant* top)
 {
     tr_variant* args;
 
-    if ((tr_variantDictFindDict(top, TR_KEY_arguments, &args)))
+    if (tr_variantDictFindDict(top, TR_KEY_arguments, &args))
     {
         bool boolVal;
 
@@ -1404,7 +1447,7 @@ static void printTorrentList(tr_variant* top)
         double total_down = 0;
         char haveStr[32];
 
-        printf("%-4s   %-4s  %9s  %-8s  %6s  %6s  %-5s  %-11s  %s\n", "ID", "Done", "Have", "ETA", "Up", "Down", "Ratio",
+        printf("%6s   %-4s  %9s  %-8s  %6s  %6s  %-5s  %-11s  %s\n", "ID", "Done", "Have", "ETA", "Up", "Down", "Ratio",
             "Status", "Name");
 
         for (int i = 0, n = tr_variantListSize(list); i < n; ++i)
@@ -1466,7 +1509,7 @@ static void printTorrentList(tr_variant* top)
                     errorMark = ' ';
                 }
 
-                printf("%4d%c  %4s  %9s  %-8s  %6.1f  %6.1f  %5s  %-11s  %s\n", (int)id, errorMark, doneStr, haveStr, etaStr,
+                printf("%6d%c  %4s  %9s  %-8s  %6.1f  %6.1f  %5s  %-11s  %s\n", (int)id, errorMark, doneStr, haveStr, etaStr,
                     up / (double)tr_speed_K, down / (double)tr_speed_K, strlratio2(ratioStr, ratio, sizeof(ratioStr)),
                     getStatusString(d, statusStr, sizeof(statusStr)), name);
 
@@ -1476,7 +1519,7 @@ static void printTorrentList(tr_variant* top)
             }
         }
 
-        printf("Sum:         %9s            %6.1f  %6.1f\n", strlsize(haveStr, total_size, sizeof(haveStr)),
+        printf("Sum:           %9s            %6.1f  %6.1f\n", strlsize(haveStr, total_size, sizeof(haveStr)),
             total_up / (double)tr_speed_K, total_down / (double)tr_speed_K);
     }
 }
@@ -2651,6 +2694,10 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
 
             switch (c)
             {
+            case 'L':
+                addLabels(args, optarg);
+                break;
+
             case 712:
                 tr_variantListAddInt(tr_variantDictAddList(args, TR_KEY_trackerRemove, 1), atoi(optarg));
                 break;

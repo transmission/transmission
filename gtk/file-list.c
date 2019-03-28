@@ -962,8 +962,8 @@ GtkWidget* gtr_file_list_new(TrCore* core, int torrentId)
     /* add "size" column */
     title = _("Size");
     rend = gtk_cell_renderer_text_new();
-    g_object_set(rend, "alignment", PANGO_ALIGN_RIGHT, "font-desc", pango_font_description, "xpad", GUI_PAD, "xalign", 1.0f,
-        "yalign", 0.5f, NULL);
+    g_object_set(rend, "alignment", PANGO_ALIGN_RIGHT, "font-desc", pango_font_description, "xpad", GUI_PAD, "xalign", 1.0F,
+        "yalign", 0.5F, NULL);
     col = gtk_tree_view_column_new_with_attributes(title, rend, NULL);
     gtk_tree_view_column_set_sizing(col, GTK_TREE_VIEW_COLUMN_GROW_ONLY);
     gtk_tree_view_column_set_sort_column_id(col, FC_SIZE);

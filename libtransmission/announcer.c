@@ -920,7 +920,8 @@ static tr_announce_event tier_announce_event_pull(tr_tier* tier)
 {
     tr_announce_event const e = tier->announce_events[0];
 
-    tr_removeElementFromArray(tier->announce_events, 0, sizeof(tr_announce_event), tier->announce_event_count--);
+    tr_removeElementFromArray(tier->announce_events, 0, sizeof(tr_announce_event), tier->announce_event_count);
+    --tier->announce_event_count;
 
     return e;
 }

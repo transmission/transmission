@@ -14,7 +14,7 @@
         <translation>&lt;b style=&apos;font-size:x-large&apos;&gt;Transmission %1&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="../AboutDialog.ui" line="+26"/>
+        <location filename="../AboutDialog.ui" line="+29"/>
         <source>A fast and easy BitTorrent client</source>
         <translation>Швидкий і простий у використанні клієнт BitTorrent</translation>
     </message>
@@ -77,7 +77,7 @@
     <message>
         <location line="+1"/>
         <source>Mixed</source>
-        <translation>Змішаний</translation>
+        <translation>Мішаний</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -439,7 +439,7 @@
     <message>
         <location line="-66"/>
         <source>Hash:</source>
-        <translation>Хеш:</translation>
+        <translation>Геш:</translation>
     </message>
     <message>
         <location line="+7"/>
@@ -555,7 +555,7 @@
 <context>
     <name>FileTreeItem</name>
     <message>
-        <location filename="../FileTreeItem.cc" line="+289"/>
+        <location filename="../FileTreeItem.cc" line="+290"/>
         <location filename="../FileTreeView.cc" line="+108"/>
         <location line="+285"/>
         <source>Low</source>
@@ -579,7 +579,7 @@
         <location line="+3"/>
         <location filename="../FileTreeView.cc" line="-283"/>
         <source>Mixed</source>
-        <translation>Змішаний</translation>
+        <translation>Мішаний</translation>
     </message>
 </context>
 <context>
@@ -640,7 +640,7 @@
     <message>
         <location line="+1"/>
         <source>Rename...</source>
-        <translation>Змінити ім&apos;я...</translation>
+        <translation>Змінити назву...</translation>
     </message>
 </context>
 <context>
@@ -702,27 +702,27 @@
     <message>
         <location filename="../Formatter.cc" line="+33"/>
         <source>B/s</source>
-        <translation>Б/с</translation>
+        <translation>Б(ів)/с</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>kB/s</source>
-        <translation>кБ/с</translation>
+        <translation>кБ(ів)/с</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>MB/s</source>
-        <translation>МБ/с</translation>
+        <translation>МБ(ів)/с</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>GB/s</source>
-        <translation>ГБ/с</translation>
+        <translation>ГБ(ів)/с</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>TB/s</source>
-        <translation>ТБ/с</translation>
+        <translation>ТБ(ів)/с</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -1296,7 +1296,7 @@
     <message>
         <location line="+470"/>
         <source>Torrent Files (*.torrent);;All Files (*.*)</source>
-        <translation>Торент файли (*.torrent);;Всі файли (*.*)</translation>
+        <translation>Торентові файли (*.torrent);;Всі файли (*.*)</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -2216,7 +2216,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+541"/>
+        <location filename="../Session.cc" line="+546"/>
         <source>Error Renaming Path</source>
         <translation>Помилка під час перейменування шляху</translation>
     </message>
@@ -2228,17 +2228,17 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+449"/>
         <source>Error Adding Torrent</source>
-        <translation type="unfinished">Помилка під час додавання торенту</translation>
+        <translation>Помилка під час додавання торенту</translation>
     </message>
     <message>
-        <location line="+16"/>
+        <location line="+21"/>
         <source>Add Torrent</source>
         <translation>Додати торент</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>&lt;p&gt;&lt;b&gt;Unable to add &quot;%1&quot;.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;It is a duplicate of &quot;%2&quot; which is already added.&lt;/p&gt;</source>
-        <translation type="unfinished">&lt;p&gt;&lt;b&gt;Неможливо додати &quot;%1&quot;.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Це дублікат &quot;%2&quot;, який вже було додано.&lt;/p&gt;</translation>
+        <translation>&lt;p&gt;&lt;b&gt;Неможливо додати &quot;%1&quot;.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Це дублікат &quot;%2&quot;, якого вже додано.&lt;/p&gt;</translation>
     </message>
 </context>
 <context>
@@ -2266,7 +2266,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+7"/>
         <source>&amp;Host:</source>
-        <translation>&amp;Хост:</translation>
+        <translation>&amp;Гост:</translation>
     </message>
     <message>
         <location line="+13"/>
@@ -2473,12 +2473,12 @@ To add another primary URL, add it after a blank line.</source>
         </translation>
     </message>
     <message>
-        <location line="+21"/>
+        <location line="+22"/>
         <source> - </source>
         <translation> - </translation>
     </message>
     <message numerus="yes">
-        <location line="-53"/>
+        <location line="-54"/>
         <source>Downloading metadata from %Ln peer(s) (%1% done)</source>
         <translation>
             <numerusform>Завантажуються метадані з %Ln піра (%1% завершено)</numerusform>
@@ -2501,9 +2501,9 @@ To add another primary URL, add it after a blank line.</source>
         <source> and %Ln web seed(s)</source>
         <extracomment>Second (optional) part of phrase &quot;Downloading from ... of ... connected peer(s) and ... web seed(s)&quot;; notice that leading space (before &quot;and&quot;) is included here</extracomment>
         <translation>
-            <numerusform> і %Ln веб сіда</numerusform>
-            <numerusform> і %Ln веб сідів</numerusform>
-            <numerusform> і %Ln веб сідів</numerusform>
+            <numerusform> і %Ln веб-сида</numerusform>
+            <numerusform> і %Ln веб-сидів</numerusform>
+            <numerusform> і %Ln веб-сидів</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -2516,12 +2516,12 @@ To add another primary URL, add it after a blank line.</source>
         </translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+7"/>
         <source>Error</source>
         <translation>Помилка</translation>
     </message>
     <message>
-        <location line="-81"/>
+        <location line="-82"/>
         <source>Verifying local data (%1% tested)</source>
         <translation>Очікування перевірки локальних даних (%1% перевірено)</translation>
     </message>
@@ -2577,9 +2577,9 @@ To add another primary URL, add it after a blank line.</source>
         <source>Tracker had%1 %Ln seeder(s)%2</source>
         <extracomment>First part of phrase &quot;Tracker had ... seeder(s) and ... leecher(s) ... ago&quot;; %1 and %2 are replaced with HTML markup</extracomment>
         <translation>
-            <numerusform>На трекері був%1 %Ln сідер%2</numerusform>
-            <numerusform>На трекері було%1 %Ln сідера%2</numerusform>
-            <numerusform>На трекері було%1 %Ln сідерів%2</numerusform>
+            <numerusform>На трекері був%1 %Ln сидер%2</numerusform>
+            <numerusform>На трекері було%1 %Ln сидери%2</numerusform>
+            <numerusform>На трекері було%1 %Ln сидерів%2</numerusform>
         </translation>
     </message>
     <message numerus="yes">

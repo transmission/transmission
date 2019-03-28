@@ -647,7 +647,7 @@ GtkWidget* gtr_window_new(GtkApplication* app, GtkUIManager* ui_mgr, TrCore* cor
     sibling = w;
 
     /* spacer */
-    w = gtk_alignment_new(0.0f, 0.0f, 0.0f, 0.0f);
+    w = gtk_alignment_new(0.0F, 0.0F, 0.0F, 0.0F);
     gtk_widget_set_hexpand(w, TRUE);
     gtk_grid_attach_next_to(grid, w, sibling, GTK_POS_RIGHT, 1, 1);
     sibling = w;

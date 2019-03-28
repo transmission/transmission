@@ -283,17 +283,27 @@ static void doScrape(tr_info const* inf)
                         tr_quark key;
                         tr_variant* val;
 
-                        while (tr_variantDictChild(files, i++, &key, &val))
+                        while (tr_variantDictChild(files, i, &key, &val))
                         {
                             if (memcmp(inf->hash, tr_quark_get_string(key, NULL), SHA_DIGEST_LENGTH) == 0)
                             {
-                                int64_t seeders = -1;
-                                int64_t leechers = -1;
-                                tr_variantDictFindInt(val, TR_KEY_complete, &seeders);
-                                tr_variantDictFindInt(val, TR_KEY_incomplete, &leechers);
+                                int64_t seeders;
+                                if (!tr_variantDictFindInt(val, TR_KEY_complete, &seeders))
+                                {
+                                    seeders = -1;
+                                }
+
+                                int64_t leechers;
+                                if (!tr_variantDictFindInt(val, TR_KEY_incomplete, &leechers))
+                                {
+                                    leechers = -1;
+                                }
+
                                 printf("%d seeders, %d leechers\n", (int)seeders, (int)leechers);
                                 matched = true;
                             }
+
+                            ++i;
                         }
                     }
 

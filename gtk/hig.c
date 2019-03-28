@@ -22,9 +22,9 @@ GtkWidget* hig_workarea_create(void)
 
 void hig_workarea_add_section_divider(GtkWidget* t, guint* row)
 {
-    GtkWidget* w = gtk_alignment_new(0.0f, 0.0f, 0.0f, 0.0f);
+    GtkWidget* w = gtk_alignment_new(0.0F, 0.0F, 0.0F, 0.0F);
 
-    gtk_widget_set_size_request(w, 0u, 6u);
+    gtk_widget_set_size_request(w, 0U, 6U);
     gtk_grid_attach(GTK_GRID(t), w, 0, *row, 2, 1);
     ++*row;
 }
@@ -43,7 +43,7 @@ void hig_workarea_add_section_title(GtkWidget* t, guint* row, char const* sectio
 
     g_snprintf(buf, sizeof(buf), "<b>%s</b>", section_title);
     l = gtk_label_new(buf);
-    gtk_misc_set_alignment(GTK_MISC(l), 0.0f, 0.5f);
+    gtk_misc_set_alignment(GTK_MISC(l), 0.0F, 0.5F);
     gtk_label_set_use_markup(GTK_LABEL(l), TRUE);
     hig_workarea_add_section_title_widget(t, row, l);
 }
@@ -77,7 +77,7 @@ void hig_workarea_add_label_w(GtkWidget* t, guint row, GtkWidget* w)
 
     if (GTK_IS_MISC(w))
     {
-        gtk_misc_set_alignment(GTK_MISC(w), 0.0f, 0.5f);
+        gtk_misc_set_alignment(GTK_MISC(w), 0.0F, 0.5F);
     }
 
     if (GTK_IS_LABEL(w))
@@ -92,7 +92,7 @@ static void hig_workarea_add_tall_control(GtkWidget* t, guint row, GtkWidget* co
 {
     if (GTK_IS_MISC(control))
     {
-        gtk_misc_set_alignment(GTK_MISC(control), 0.0f, 0.5f);
+        gtk_misc_set_alignment(GTK_MISC(control), 0.0F, 0.5F);
     }
 
     g_object_set(control, "expand", TRUE, NULL);
@@ -103,7 +103,7 @@ static void hig_workarea_add_control(GtkWidget* t, guint row, GtkWidget* control
 {
     if (GTK_IS_MISC(control))
     {
-        gtk_misc_set_alignment(GTK_MISC(control), 0.0f, 0.5f);
+        gtk_misc_set_alignment(GTK_MISC(control), 0.0F, 0.5F);
     }
 
     gtk_widget_set_hexpand(control, TRUE);

@@ -509,7 +509,7 @@ static bool tr_torrentIsSeedIdleLimitDone(tr_torrent* tor)
 {
     uint16_t idleMinutes;
     return tr_torrentGetSeedIdle(tor, &idleMinutes) &&
-        difftime(tr_time(), MAX(tor->startDate, tor->activityDate)) >= idleMinutes * 60u;
+        difftime(tr_time(), MAX(tor->startDate, tor->activityDate)) >= idleMinutes * 60U;
 }
 
 /***
@@ -809,7 +809,7 @@ uint32_t tr_getBlockSize(uint32_t pieceSize)
 
     while (b > MAX_BLOCK_SIZE)
     {
-        b /= 2u;
+        b /= 2U;
     }
 
     if (b == 0 || pieceSize % b != 0) /* not cleanly divisible */
@@ -937,6 +937,7 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     tor->uniqueId = nextUniqueId++;
     tor->magicNumber = TORRENT_MAGIC_NUMBER;
     tor->queuePosition = session->torrentCount;
+    tor->labels = TR_PTR_ARRAY_INIT;
 
     tr_sha1(tor->obfuscatedHash, "req2", 4, tor->info.hash, SHA_DIGEST_LENGTH, NULL);
 
@@ -1580,7 +1581,7 @@ tr_file_stat* tr_torrentFiles(tr_torrent const* tor, tr_file_index_t* fileCount)
     {
         uint64_t const b = isSeed ? tor->info.files[i].length : countFileBytesCompleted(tor, i);
         walk->bytesCompleted = b;
-        walk->progress = tor->info.files[i].length > 0 ? (float)b / tor->info.files[i].length : 1.0f;
+        walk->progress = tor->info.files[i].length > 0 ? (float)b / tor->info.files[i].length : 1.0F;
     }
 
     if (fileCount != NULL)
@@ -1739,6 +1740,7 @@ static void freeTorrent(tr_torrent* tor)
     TR_ASSERT(queueIsSequenced(session));
 
     tr_bandwidthDestruct(&tor->bandwidth);
+    tr_ptrArrayDestruct(&tor->labels, tr_free);
 
     tr_metainfoFree(inf);
     memset(tor, ~0, sizeof(tr_torrent));
@@ -2514,6 +2516,30 @@ void tr_torrentSetFileDLs(tr_torrent* tor, tr_file_index_t const* files, tr_file
     tr_torrentSetDirty(tor);
     tr_torrentRecheckCompleteness(tor);
     tr_peerMgrRebuildRequests(tor);
+
+    tr_torrentUnlock(tor);
+}
+
+/***
+****
+***/
+
+void tr_torrentSetLabels(tr_torrent* tor, tr_ptrArray* labels)
+{
+    TR_ASSERT(tr_isTorrent(tor));
+
+    tr_torrentLock(tor);
+
+    tr_ptrArrayDestruct(&tor->labels, tr_free);
+    tor->labels = TR_PTR_ARRAY_INIT;
+    char** l = (char**)tr_ptrArrayBase(labels);
+    int const n = tr_ptrArraySize(labels);
+    for (int i = 0; i < n; i++)
+    {
+        tr_ptrArrayAppend(&tor->labels, tr_strdup(l[i]));
+    }
+
+    tr_torrentSetDirty(tor);
 
     tr_torrentUnlock(tor);
 }

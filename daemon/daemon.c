@@ -796,38 +796,23 @@ cleanup:
     return 0;
 }
 
-int tr_main(int argc, char* argv[])
+static bool init_daemon_data(int argc, char* argv[], struct daemon_data* data, bool* foreground, int* ret)
 {
-    dtr_callbacks const cb =
-    {
-        .on_start = &daemon_start,
-        .on_stop = &daemon_stop,
-        .on_reconfigure = &daemon_reconfigure,
-    };
-
-    int ret;
-    bool loaded;
-    bool dumpSettings;
-    bool foreground;
-    tr_error* error = NULL;
-
-    struct daemon_data arg;
-    tr_variant* const settings = &arg.settings;
-    char const** const configDir = &arg.configDir;
-
-    key_pidfile = tr_quark_new("pidfile", 7);
-    key_watch_dir_force_generic = tr_quark_new("watch-dir-force-generic", 23);
+    data->configDir = getConfigDir(argc, (char const* const*)argv);
 
     /* load settings from defaults + config file */
-    tr_variantInitDict(settings, 0);
-    tr_variantDictAddBool(settings, TR_KEY_rpc_enabled, true);
-    *configDir = getConfigDir(argc, (char const* const*)argv);
-    loaded = tr_sessionLoadSettings(settings, *configDir, MY_NAME);
+    tr_variantInitDict(&data->settings, 0);
+    tr_variantDictAddBool(&data->settings, TR_KEY_rpc_enabled, true);
+    bool const loaded = tr_sessionLoadSettings(&data->settings, data->configDir, MY_NAME);
 
-    /* overwrite settings from the comamndline */
-    if (!parse_args(argc, (char const**)argv, settings, &arg.paused, &dumpSettings, &foreground, &ret))
+    bool dumpSettings;
+
+    *ret = 0;
+
+    /* overwrite settings from the command line */
+    if (!parse_args(argc, (char const**)argv, &data->settings, &data->paused, &dumpSettings, foreground, ret))
     {
-        goto cleanup;
+        goto exit_early;
     }
 
     if (foreground && logfile == TR_BAD_SYS_FILE)
@@ -838,19 +823,49 @@ int tr_main(int argc, char* argv[])
     if (!loaded)
     {
         printMessage(logfile, TR_LOG_ERROR, MY_NAME, "Error loading config file -- exiting.", __FILE__, __LINE__);
-        ret = 1;
-        goto cleanup;
+        *ret = 1;
+        goto exit_early;
     }
 
     if (dumpSettings)
     {
-        char* str = tr_variantToStr(settings, TR_VARIANT_FMT_JSON, NULL);
+        char* str = tr_variantToStr(&data->settings, TR_VARIANT_FMT_JSON, NULL);
         fprintf(stderr, "%s", str);
         tr_free(str);
-        goto cleanup;
+        goto exit_early;
     }
 
-    if (!dtr_daemon(&cb, &arg, foreground, &ret, &error))
+    return true;
+
+exit_early:
+    tr_variantFree(&data->settings);
+    return false;
+}
+
+int tr_main(int argc, char* argv[])
+{
+    key_pidfile = tr_quark_new("pidfile", TR_BAD_SIZE);
+    key_watch_dir_force_generic = tr_quark_new("watch-dir-force-generic", TR_BAD_SIZE);
+
+    struct daemon_data data;
+    bool foreground;
+    int ret;
+
+    if (!init_daemon_data(argc, argv, &data, &foreground, &ret))
+    {
+        return ret;
+    }
+
+    dtr_callbacks const cb =
+    {
+        .on_start = &daemon_start,
+        .on_stop = &daemon_stop,
+        .on_reconfigure = &daemon_reconfigure,
+    };
+
+    tr_error* error = NULL;
+
+    if (!dtr_daemon(&cb, &data, foreground, &ret, &error))
     {
         char buf[256];
         tr_snprintf(buf, sizeof(buf), "Failed to daemonize: %s", error->message);
@@ -858,8 +873,6 @@ int tr_main(int argc, char* argv[])
         tr_error_free(error);
     }
 
-cleanup:
-    tr_variantFree(settings);
-
+    tr_variantFree(&data.settings);
     return ret;
 }
