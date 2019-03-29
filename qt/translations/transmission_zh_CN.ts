@@ -14,7 +14,7 @@
         <translation>&lt;b style=&apos;font-size:x-large&apos;&gt;Transmission %1&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="../AboutDialog.ui" line="+26"/>
+        <location filename="../AboutDialog.ui" line="+29"/>
         <source>A fast and easy BitTorrent client</source>
         <translation>一个快速和简单的 BitTorrent 客户端</translation>
     </message>
@@ -163,7 +163,7 @@
     <message>
         <location line="+4"/>
         <source>We would download from this peer if they would let us</source>
-        <translation>如果对方允许，我方将从该用户下载</translation>
+        <translation>如果对方允许，我们将从该用户下载</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -173,17 +173,17 @@
     <message>
         <location line="+4"/>
         <source>We would upload to this peer if they asked</source>
-        <translation>如果对方请求，我方将上传给该用户</translation>
+        <translation>如果对方请求，我们将上传给该用户</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Peer has unchoked us, but we&apos;re not interested</source>
-        <translation>该用户已对我方解锁，但我方不感兴趣</translation>
+        <translation>对方已对我们解锁，但我们不感兴趣</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>We unchoked this peer, but they&apos;re not interested</source>
-        <translation>我方已对该用户解锁，但对方不感兴趣</translation>
+        <translation>我们已对该用户解锁，但对方不感兴趣</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -543,13 +543,13 @@
     <message>
         <location line="+12"/>
         <source>&amp;Maximum peers:</source>
-        <translation>最大用户数(&amp;M):</translation>
+        <translation>最大用户数量(&amp;M):</translation>
     </message>
 </context>
 <context>
     <name>FileTreeItem</name>
     <message>
-        <location filename="../FileTreeItem.cc" line="+289"/>
+        <location filename="../FileTreeItem.cc" line="+290"/>
         <location filename="../FileTreeView.cc" line="+108"/>
         <location line="+285"/>
         <source>Low</source>
@@ -1853,12 +1853,12 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+299"/>
         <source>Maximum peers per &amp;torrent:</source>
-        <translation>每个 Torrent 的最大用户数(&amp;T):</translation>
+        <translation>每个 Torrent 的最大用户数量(&amp;T):</translation>
     </message>
     <message>
         <location line="+23"/>
         <source>Maximum peers &amp;overall:</source>
-        <translation>全体最大用户数(&amp;O):</translation>
+        <translation>全体最大用户数量(&amp;O):</translation>
     </message>
     <message numerus="yes">
         <location filename="../PrefsDialog.cc" line="-223"/>
@@ -2184,7 +2184,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+541"/>
+        <location filename="../Session.cc" line="+546"/>
         <source>Error Renaming Path</source>
         <translation>重命名路径错误</translation>
     </message>
@@ -2199,7 +2199,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>添加 Torrent 时错误</translation>
     </message>
     <message>
-        <location line="+16"/>
+        <location line="+21"/>
         <source>Add Torrent</source>
         <translation>添加 Torrent</translation>
     </message>
@@ -2435,12 +2435,12 @@ To add another primary URL, add it after a blank line.</source>
         </translation>
     </message>
     <message>
-        <location line="+21"/>
+        <location line="+22"/>
         <source> - </source>
         <translation> - </translation>
     </message>
     <message numerus="yes">
-        <location line="-53"/>
+        <location line="-54"/>
         <source>Downloading metadata from %Ln peer(s) (%1% done)</source>
         <translation>
             <numerusform>正在从 %Ln 个用户下载元数据 (%1% 已完成)</numerusform>
@@ -2470,12 +2470,12 @@ To add another primary URL, add it after a blank line.</source>
         </translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+7"/>
         <source>Error</source>
         <translation>错误</translation>
     </message>
     <message>
-        <location line="-81"/>
+        <location line="-82"/>
         <source>Verifying local data (%1% tested)</source>
         <translation>正在检查本地数据 (%1% 已测试)</translation>
     </message>

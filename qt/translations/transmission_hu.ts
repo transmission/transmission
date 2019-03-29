@@ -14,7 +14,7 @@
         <translation>&lt;b style=&apos;font-size:x-large&apos;&gt;Transmission %1&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="../AboutDialog.ui" line="+26"/>
+        <location filename="../AboutDialog.ui" line="+29"/>
         <source>A fast and easy BitTorrent client</source>
         <translation>Egy gyors és egyszerű BitTorrent kliens</translation>
     </message>
@@ -549,7 +549,7 @@
 <context>
     <name>FileTreeItem</name>
     <message>
-        <location filename="../FileTreeItem.cc" line="+289"/>
+        <location filename="../FileTreeItem.cc" line="+290"/>
         <location filename="../FileTreeView.cc" line="+108"/>
         <location line="+285"/>
         <source>Low</source>
@@ -2184,7 +2184,7 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+541"/>
+        <location filename="../Session.cc" line="+546"/>
         <source>Error Renaming Path</source>
         <translation>Hiba az elérési út átnevezésekor</translation>
     </message>
@@ -2199,7 +2199,7 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
         <translation>Hiba a torrent hozzáadásakor</translation>
     </message>
     <message>
-        <location line="+16"/>
+        <location line="+21"/>
         <source>Add Torrent</source>
         <translation>Torrent hozzáadása</translation>
     </message>
@@ -2435,12 +2435,12 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
         </translation>
     </message>
     <message>
-        <location line="+21"/>
+        <location line="+22"/>
         <source> - </source>
         <translation> - </translation>
     </message>
     <message numerus="yes">
-        <location line="-53"/>
+        <location line="-54"/>
         <source>Downloading metadata from %Ln peer(s) (%1% done)</source>
         <translation>
             <numerusform>Metaadat letöltése %Ln partnertől (%1 % kész)</numerusform>
@@ -2470,12 +2470,12 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
         </translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+7"/>
         <source>Error</source>
         <translation>Hiba</translation>
     </message>
     <message>
-        <location line="-81"/>
+        <location line="-82"/>
         <source>Verifying local data (%1% tested)</source>
         <translation>Helyi adatok ellenőrzése (%1 %1)</translation>
     </message>
@@ -2544,7 +2544,7 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
         <location line="+6"/>
         <source>Tracker had %1no information%2 on peer counts %3 ago</source>
         <extracomment>%1 and %2 are replaced with HTML markup, %3 is duration</extracomment>
-        <translation>A követőnek %1nem volt információja%2 a partnerszámáól ennyivel ezelőtt: %3</translation>
+        <translation>A követőnek %1nem volt információja%2 a partnerszámáról ennyivel ezelőtt: %3</translation>
     </message>
     <message>
         <location line="+7"/>

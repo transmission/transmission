@@ -70,6 +70,7 @@ set(${PROJECT_NAME}_LINGUAS
     pl
     pt
     pt_BR
+    pt_PT
     ro
     ru
     si

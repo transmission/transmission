@@ -760,7 +760,8 @@ static bool popNextMetadataRequest(tr_peerMsgs* msgs, int* piece)
 
     *piece = msgs->peerAskedForMetadata[0];
 
-    tr_removeElementFromArray(msgs->peerAskedForMetadata, 0, sizeof(int), msgs->peerAskedForMetadataCount--);
+    tr_removeElementFromArray(msgs->peerAskedForMetadata, 0, sizeof(int), msgs->peerAskedForMetadataCount);
+    --msgs->peerAskedForMetadataCount;
 
     return true;
 }
@@ -774,7 +775,8 @@ static bool popNextRequest(tr_peerMsgs* msgs, struct peer_request* setme)
 
     *setme = msgs->peerAskedFor[0];
 
-    tr_removeElementFromArray(msgs->peerAskedFor, 0, sizeof(struct peer_request), msgs->peer.pendingReqsToClient--);
+    tr_removeElementFromArray(msgs->peerAskedFor, 0, sizeof(struct peer_request), msgs->peer.pendingReqsToClient);
+    --msgs->peer.pendingReqsToClient;
 
     return true;
 }
@@ -1144,88 +1146,93 @@ static void parseUtMetadata(tr_peerMsgs* msgs, uint32_t msglen, struct evbuffer*
 
 static void parseUtPex(tr_peerMsgs* msgs, uint32_t msglen, struct evbuffer* inbuf)
 {
-    bool loaded = false;
-    uint8_t* tmp = tr_new(uint8_t, msglen);
-    tr_variant val;
     tr_torrent* tor = msgs->torrent;
+    if (!tr_torrentAllowsPex(tor))
+    {
+        return;
+    }
+
+    uint8_t* tmp = tr_new(uint8_t, msglen);
+    tr_peerIoReadBytes(msgs->io, inbuf, tmp, msglen);
+
+    tr_variant val;
+    bool const loaded = tr_variantFromBenc(&val, tmp, msglen) == 0;
+
+    tr_free(tmp);
+
+    if (!loaded)
+    {
+        return;
+    }
+
     uint8_t const* added;
     size_t added_len;
 
-    tr_peerIoReadBytes(msgs->io, inbuf, tmp, msglen);
-
-    if (tr_torrentAllowsPex(tor) && (loaded = tr_variantFromBenc(&val, tmp, msglen) == 0))
+    if (tr_variantDictFindRaw(&val, TR_KEY_added, &added, &added_len))
     {
-        if (tr_variantDictFindRaw(&val, TR_KEY_added, &added, &added_len))
+        tr_pex* pex;
+        size_t n;
+        size_t added_f_len;
+        uint8_t const* added_f;
+
+        if (!tr_variantDictFindRaw(&val, TR_KEY_added_f, &added_f, &added_f_len))
         {
-            tr_pex* pex;
-            size_t n;
-            size_t added_f_len;
-            uint8_t const* added_f;
-
-            if (!tr_variantDictFindRaw(&val, TR_KEY_added_f, &added_f, &added_f_len))
-            {
-                added_f_len = 0;
-                added_f = NULL;
-            }
-
-            pex = tr_peerMgrCompactToPex(added, added_len, added_f, added_f_len, &n);
-
-            n = MIN(n, MAX_PEX_PEER_COUNT);
-
-            for (size_t i = 0; i < n; ++i)
-            {
-                int seedProbability = -1;
-
-                if (i < added_f_len)
-                {
-                    seedProbability = (added_f[i] & ADDED_F_SEED_FLAG) != 0 ? 100 : 0;
-                }
-
-                tr_peerMgrAddPex(tor, TR_PEER_FROM_PEX, pex + i, seedProbability);
-            }
-
-            tr_free(pex);
+            added_f_len = 0;
+            added_f = NULL;
         }
 
-        if (tr_variantDictFindRaw(&val, TR_KEY_added6, &added, &added_len))
+        pex = tr_peerMgrCompactToPex(added, added_len, added_f, added_f_len, &n);
+
+        n = MIN(n, MAX_PEX_PEER_COUNT);
+
+        for (size_t i = 0; i < n; ++i)
         {
-            tr_pex* pex;
-            size_t n;
-            size_t added_f_len;
-            uint8_t const* added_f;
+            int seedProbability = -1;
 
-            if (!tr_variantDictFindRaw(&val, TR_KEY_added6_f, &added_f, &added_f_len))
+            if (i < added_f_len)
             {
-                added_f_len = 0;
-                added_f = NULL;
+                seedProbability = (added_f[i] & ADDED_F_SEED_FLAG) != 0 ? 100 : 0;
             }
 
-            pex = tr_peerMgrCompact6ToPex(added, added_len, added_f, added_f_len, &n);
-
-            n = MIN(n, MAX_PEX_PEER_COUNT);
-
-            for (size_t i = 0; i < n; ++i)
-            {
-                int seedProbability = -1;
-
-                if (i < added_f_len)
-                {
-                    seedProbability = (added_f[i] & ADDED_F_SEED_FLAG) != 0 ? 100 : 0;
-                }
-
-                tr_peerMgrAddPex(tor, TR_PEER_FROM_PEX, pex + i, seedProbability);
-            }
-
-            tr_free(pex);
+            tr_peerMgrAddPex(tor, TR_PEER_FROM_PEX, pex + i, seedProbability);
         }
+
+        tr_free(pex);
     }
 
-    if (loaded)
+    if (tr_variantDictFindRaw(&val, TR_KEY_added6, &added, &added_len))
     {
-        tr_variantFree(&val);
+        tr_pex* pex;
+        size_t n;
+        size_t added_f_len;
+        uint8_t const* added_f;
+
+        if (!tr_variantDictFindRaw(&val, TR_KEY_added6_f, &added_f, &added_f_len))
+        {
+            added_f_len = 0;
+            added_f = NULL;
+        }
+
+        pex = tr_peerMgrCompact6ToPex(added, added_len, added_f, added_f_len, &n);
+
+        n = MIN(n, MAX_PEX_PEER_COUNT);
+
+        for (size_t i = 0; i < n; ++i)
+        {
+            int seedProbability = -1;
+
+            if (i < added_f_len)
+            {
+                seedProbability = (added_f[i] & ADDED_F_SEED_FLAG) != 0 ? 100 : 0;
+            }
+
+            tr_peerMgrAddPex(tor, TR_PEER_FROM_PEX, pex + i, seedProbability);
+        }
+
+        tr_free(pex);
     }
 
-    tr_free(tmp);
+    tr_variantFree(&val);
 }
 
 static void sendPex(tr_peerMsgs* msgs);
@@ -1412,7 +1419,7 @@ static bool messageLengthIsCorrect(tr_peerMsgs const* msg, uint8_t id, uint32_t 
     case BT_BITFIELD:
         if (tr_torrentHasMetadata(msg->torrent))
         {
-            return len == (msg->torrent->info.pieceCount >> 3) + ((msg->torrent->info.pieceCount & 7) != 0 ? 1 : 0) + 1u;
+            return len == (msg->torrent->info.pieceCount >> 3) + ((msg->torrent->info.pieceCount & 7) != 0 ? 1 : 0) + 1U;
         }
 
         /* we don't know the piece count yet,
@@ -1630,7 +1637,8 @@ static int readBtMessage(tr_peerMsgs* msgs, struct evbuffer* inbuf, size_t inlen
                 if (req->index == r.index && req->offset == r.offset && req->length == r.length)
                 {
                     tr_removeElementFromArray(msgs->peerAskedFor, i, sizeof(struct peer_request),
-                        msgs->peer.pendingReqsToClient--);
+                        msgs->peer.pendingReqsToClient);
+                    --msgs->peer.pendingReqsToClient;
                     break;
                 }
             }

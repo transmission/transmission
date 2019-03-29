@@ -259,7 +259,8 @@ void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, in
 
     memcpy(m->metadata + offset, data, len);
 
-    tr_removeElementFromArray(m->piecesNeeded, neededPieceIndex, sizeof(struct metadata_node), m->piecesNeededCount--);
+    tr_removeElementFromArray(m->piecesNeeded, neededPieceIndex, sizeof(struct metadata_node), m->piecesNeededCount);
+    --m->piecesNeededCount;
 
     dbgmsg(tor, "saving metainfo piece %d... %d remain", piece, m->piecesNeededCount);
 
@@ -367,12 +368,10 @@ bool tr_torrentGetNextMetadataRequest(tr_torrent* tor, time_t now, int* setme_pi
 
     if (m != NULL && m->piecesNeededCount > 0 && m->piecesNeeded[0].requestedAt + MIN_REPEAT_INTERVAL_SECS < now)
     {
-        int i;
         int const piece = m->piecesNeeded[0].piece;
+        tr_removeElementFromArray(m->piecesNeeded, 0, sizeof(struct metadata_node), m->piecesNeededCount);
 
-        tr_removeElementFromArray(m->piecesNeeded, 0, sizeof(struct metadata_node), m->piecesNeededCount--);
-
-        i = m->piecesNeededCount++;
+        int i = m->piecesNeededCount - 1;
         m->piecesNeeded[i].piece = piece;
         m->piecesNeeded[i].requestedAt = now;
 

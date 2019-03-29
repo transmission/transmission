@@ -1226,7 +1226,7 @@ static GtkWidget* info_page_new(struct DetailsImpl* di)
     gtk_frame_set_shadow_type(GTK_FRAME(fr), GTK_SHADOW_IN);
     gtk_container_add(GTK_CONTAINER(fr), sw);
     w = hig_workarea_add_tall_row(t, &row, _("Comment:"), fr, NULL);
-    gtk_misc_set_alignment(GTK_MISC(w), 0.0f, 0.0f);
+    gtk_misc_set_alignment(GTK_MISC(w), 0.0F, 0.0F);
 
     hig_workarea_add_section_divider(t, &row);
     return t;
@@ -1962,14 +1962,14 @@ static void setPeerViewColumns(GtkTreeView* peer_view)
 
         case PEER_COL_DOWNLOAD_RATE_STRING:
             r = gtk_cell_renderer_text_new();
-            g_object_set(G_OBJECT(r), "xalign", 1.0f, NULL);
+            g_object_set(G_OBJECT(r), "xalign", 1.0F, NULL);
             c = gtk_tree_view_column_new_with_attributes(t, r, "text", col, NULL);
             sort_col = PEER_COL_DOWNLOAD_RATE_DOUBLE;
             break;
 
         case PEER_COL_UPLOAD_RATE_STRING:
             r = gtk_cell_renderer_text_new();
-            g_object_set(G_OBJECT(r), "xalign", 1.0f, NULL);
+            g_object_set(G_OBJECT(r), "xalign", 1.0F, NULL);
             c = gtk_tree_view_column_new_with_attributes(t, r, "text", col, NULL);
             sort_col = PEER_COL_UPLOAD_RATE_DOUBLE;
             break;
@@ -2627,7 +2627,7 @@ static void on_edit_trackers(GtkButton* button, gpointer data)
         gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(sw), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
         gtk_container_add(GTK_CONTAINER(sw), w);
         gtk_container_add(GTK_CONTAINER(fr), sw);
-        gtk_widget_set_size_request(fr, 500u, 166u);
+        gtk_widget_set_size_request(fr, 500U, 166U);
         hig_workarea_add_wide_tall_control(t, &row, fr);
 
         gtr_dialog_set_content(GTK_DIALOG(d), t);
@@ -2814,7 +2814,7 @@ static GtkWidget* tracker_page_new(struct DetailsImpl* di)
     gtk_tree_view_append_column(GTK_TREE_VIEW(v), c);
 
     r = gtk_cell_renderer_pixbuf_new();
-    g_object_set(r, "width", 20 + (GUI_PAD_SMALL * 2), "xpad", GUI_PAD_SMALL, "ypad", pad, "yalign", 0.0f, NULL);
+    g_object_set(r, "width", 20 + (GUI_PAD_SMALL * 2), "xpad", GUI_PAD_SMALL, "ypad", pad, "yalign", 0.0F, NULL);
     gtk_tree_view_column_pack_start(c, r, FALSE);
     gtk_tree_view_column_add_attribute(c, r, "pixbuf", TRACKER_COL_FAVICON);
 

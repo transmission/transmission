@@ -961,8 +961,8 @@ GtkWidget* gtr_filter_bar_new(tr_session* session, GtkTreeModel* tmodel, GtkTree
     gtk_box_pack_start(h_box, w, TRUE, TRUE, 0);
 
     /* add a spacer */
-    w = gtk_alignment_new(0.0f, 0.0f, 0.0f, 0.0f);
-    gtk_widget_set_size_request(w, 0u, GUI_PAD_BIG);
+    w = gtk_alignment_new(0.0F, 0.0F, 0.0F, 0.0F);
+    gtk_widget_set_size_request(w, 0U, GUI_PAD_BIG);
     gtk_box_pack_start(h_box, w, FALSE, FALSE, 0);
 
     /* add the tracker combobox */
@@ -970,8 +970,8 @@ GtkWidget* gtr_filter_bar_new(tr_session* session, GtkTreeModel* tmodel, GtkTree
     gtk_box_pack_start(h_box, w, TRUE, TRUE, 0);
 
     /* add a spacer */
-    w = gtk_alignment_new(0.0f, 0.0f, 0.0f, 0.0f);
-    gtk_widget_set_size_request(w, 0u, GUI_PAD_BIG);
+    w = gtk_alignment_new(0.0F, 0.0F, 0.0F, 0.0F);
+    gtk_widget_set_size_request(w, 0U, GUI_PAD_BIG);
     gtk_box_pack_start(h_box, w, FALSE, FALSE, 0);
 
     /* add the entry field */

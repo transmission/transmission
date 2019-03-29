@@ -466,6 +466,7 @@ set(NEEDED_FUNCTIONS
     pread
     pwrite
     statvfs
+    strcasestr
     strlcpy
     strsep
     syslog

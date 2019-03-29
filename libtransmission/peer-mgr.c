@@ -808,7 +808,8 @@ static void requestListRemove(tr_swarm* s, tr_block_index_t block, tr_peer const
 
         decrementPendingReqCount(b);
 
-        tr_removeElementFromArray(s->requests, pos, sizeof(struct block_request), s->requestCount--);
+        tr_removeElementFromArray(s->requests, pos, sizeof(struct block_request), s->requestCount);
+        --s->requestCount;
 
         // fprintf(stderr, "removing request of block %lu from peer %s... there are now %d block requests left\n", (unsigned long)block,
         //     tr_atomAddrStr(peer->atom), t->requestCount);
@@ -1162,7 +1163,8 @@ static void pieceListRemovePiece(tr_swarm* s, tr_piece_index_t piece)
     {
         int const pos = p - s->pieces;
 
-        tr_removeElementFromArray(s->pieces, pos, sizeof(struct weighted_piece), s->pieceCount--);
+        tr_removeElementFromArray(s->pieces, pos, sizeof(struct weighted_piece), s->pieceCount);
+        --s->pieceCount;
 
         if (s->pieceCount == 0)
         {
@@ -1208,11 +1210,13 @@ static void pieceListResortPiece(tr_swarm* s, struct weighted_piece* p)
         bool exact;
         struct weighted_piece const tmp = *p;
 
-        tr_removeElementFromArray(s->pieces, pos, sizeof(struct weighted_piece), s->pieceCount--);
+        tr_removeElementFromArray(s->pieces, pos, sizeof(struct weighted_piece), s->pieceCount);
+        --s->pieceCount;
 
         pos = tr_lowerBound(&tmp, s->pieces, s->pieceCount, sizeof(struct weighted_piece), comparePieceByWeight, &exact);
 
-        memmove(&s->pieces[pos + 1], &s->pieces[pos], sizeof(struct weighted_piece) * (s->pieceCount++ - pos));
+        memmove(&s->pieces[pos + 1], &s->pieces[pos], sizeof(struct weighted_piece) * (s->pieceCount - pos));
+        ++s->pieceCount;
 
         s->pieces[pos] = tmp;
     }

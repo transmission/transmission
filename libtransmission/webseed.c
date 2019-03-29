@@ -190,7 +190,6 @@ struct connection_succeeded_data
 
 static void connection_succeeded(void* vdata)
 {
-    tr_torrent* tor;
     struct connection_succeeded_data* data = vdata;
     struct tr_webseed* w = data->webseed;
 
@@ -200,15 +199,20 @@ static void connection_succeeded(void* vdata)
         w->consecutive_failures = w->retry_tickcount = w->retry_challenge = 0;
     }
 
-    if (data->real_url != NULL && (tor = tr_torrentFindFromId(w->session, w->torrent_id)) != NULL)
+    if (data->real_url != NULL)
     {
-        uint64_t file_offset;
-        tr_file_index_t file_index;
+        tr_torrent* tor = tr_torrentFindFromId(w->session, w->torrent_id);
 
-        tr_ioFindFileLocation(tor, data->piece_index, data->piece_offset, &file_index, &file_offset);
-        tr_free(w->file_urls[file_index]);
-        w->file_urls[file_index] = data->real_url;
-        data->real_url = NULL;
+        if (tor != NULL)
+        {
+            uint64_t file_offset;
+            tr_file_index_t file_index;
+
+            tr_ioFindFileLocation(tor, data->piece_index, data->piece_offset, &file_index, &file_offset);
+            tr_free(w->file_urls[file_index]);
+            w->file_urls[file_index] = data->real_url;
+            data->real_url = NULL;
+        }
     }
 
     tr_free(data->real_url);

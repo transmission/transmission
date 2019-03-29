@@ -1134,21 +1134,17 @@ bool tr_sys_dir_create_temp(char* path_template, tr_error** error)
 
 tr_sys_dir_t tr_sys_dir_open(char const* path, tr_error** error)
 {
-#ifndef __clang__
-    /* Clang gives "static_assert expression is not an integral constant expression" error */
-    TR_STATIC_ASSERT(TR_BAD_SYS_DIR == NULL, "values should match");
-#endif
-
     TR_ASSERT(path != NULL);
 
-    tr_sys_dir_t ret = opendir(path);
+    DIR* ret = opendir(path);
 
-    if (ret == TR_BAD_SYS_DIR)
+    if (ret == NULL)
     {
         set_system_error(error, errno);
+        return TR_BAD_SYS_DIR;
     }
 
-    return ret;
+    return (tr_sys_dir_t)ret;
 }
 
 char const* tr_sys_dir_read_name(tr_sys_dir_t handle, tr_error** error)
@@ -1158,7 +1154,7 @@ char const* tr_sys_dir_read_name(tr_sys_dir_t handle, tr_error** error)
     char const* ret = NULL;
 
     errno = 0;
-    struct dirent* entry = readdir(handle);
+    struct dirent* entry = readdir((DIR*)handle);
 
     if (entry != NULL)
     {
@@ -1176,7 +1172,7 @@ bool tr_sys_dir_close(tr_sys_dir_t handle, tr_error** error)
 {
     TR_ASSERT(handle != TR_BAD_SYS_DIR);
 
-    bool ret = closedir(handle) != -1;
+    bool ret = closedir((DIR*)handle) != -1;
 
     if (!ret)
     {

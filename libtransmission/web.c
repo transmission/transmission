@@ -178,8 +178,9 @@ static CURL* createEasy(tr_session* s, struct tr_web* web, struct tr_web_task* t
 {
     bool is_default_value;
     tr_address const* addr;
-    CURL* e = task->curl_easy = curl_easy_init();
+    CURL* e = curl_easy_init();
 
+    task->curl_easy = e;
     task->timeout_secs = getTimeoutFromURL(task);
 
     curl_easy_setopt(e, CURLOPT_AUTOREFERER, 1L);
