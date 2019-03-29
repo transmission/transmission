@@ -278,6 +278,10 @@ if(ICONV_FOUND)
     target_link_libraries(${TR_NAME} ${ICONV_LIBRARIES})
 endif()
 
+if(WIN32)
+    target_link_libraries(${TR_NAME} shlwapi)
+endif()
+
 if(ENABLE_TESTS)
     add_library(${TR_NAME}-test STATIC
         libtransmission-test.c

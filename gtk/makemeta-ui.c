@@ -219,7 +219,8 @@ static void onResponse(GtkDialog* d, int response, gpointer user_data)
         {
             int n;
             int tier;
-            GtkTextIter start, end;
+            GtkTextIter start;
+            GtkTextIter end;
             char* dir;
             char* base;
             char* tracker_text;

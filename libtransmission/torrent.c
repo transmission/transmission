@@ -509,7 +509,7 @@ static bool tr_torrentIsSeedIdleLimitDone(tr_torrent* tor)
 {
     uint16_t idleMinutes;
     return tr_torrentGetSeedIdle(tor, &idleMinutes) &&
-        difftime(tr_time(), MAX(tor->startDate, tor->activityDate)) >= idleMinutes * 60u;
+        difftime(tr_time(), MAX(tor->startDate, tor->activityDate)) >= idleMinutes * 60U;
 }
 
 /***
@@ -809,7 +809,7 @@ uint32_t tr_getBlockSize(uint32_t pieceSize)
 
     while (b > MAX_BLOCK_SIZE)
     {
-        b /= 2u;
+        b /= 2U;
     }
 
     if (b == 0 || pieceSize % b != 0) /* not cleanly divisible */
@@ -1581,7 +1581,7 @@ tr_file_stat* tr_torrentFiles(tr_torrent const* tor, tr_file_index_t* fileCount)
     {
         uint64_t const b = isSeed ? tor->info.files[i].length : countFileBytesCompleted(tor, i);
         walk->bytesCompleted = b;
-        walk->progress = tor->info.files[i].length > 0 ? (float)b / tor->info.files[i].length : 1.0f;
+        walk->progress = tor->info.files[i].length > 0 ? (float)b / tor->info.files[i].length : 1.0F;
     }
 
     if (fileCount != NULL)

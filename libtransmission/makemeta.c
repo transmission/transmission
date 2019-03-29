@@ -43,7 +43,6 @@ static struct FileList* getFiles(char const* dir, char const* base, struct FileL
         return NULL;
     }
 
-    tr_sys_dir_t odir;
     char* buf;
     tr_sys_path_info info;
     tr_error* error = NULL;
@@ -58,7 +57,9 @@ static struct FileList* getFiles(char const* dir, char const* base, struct FileL
         return list;
     }
 
-    if (info.type == TR_SYS_PATH_IS_DIRECTORY && (odir = tr_sys_dir_open(buf, NULL)) != TR_BAD_SYS_DIR)
+    tr_sys_dir_t odir = info.type == TR_SYS_PATH_IS_DIRECTORY ? tr_sys_dir_open(buf, NULL) : TR_BAD_SYS_DIR;
+
+    if (odir != TR_BAD_SYS_DIR)
     {
         char const* name;
 

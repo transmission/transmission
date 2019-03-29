@@ -14,7 +14,7 @@
         <translation>&lt;b style=&apos;font-size:x-large&apos;&gt;Transmission %1&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="../AboutDialog.ui" line="+26"/>
+        <location filename="../AboutDialog.ui" line="+29"/>
         <source>A fast and easy BitTorrent client</source>
         <translation>Sebuah klien BitTorrent cepat dan mudah</translation>
     </message>
@@ -49,12 +49,12 @@
     <message>
         <location line="+1"/>
         <source>When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ketika Anda menjalankan suatu torrent, datanya akan menjadi tersedia bagi orang lain dengan cara diunggah. Sebarang isi yang Anda bagikan adalah sepenuhnya tanggung jawab Anda.</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>I &amp;Agree</source>
-        <translation>Saya &amp;Setuju</translation>
+        <translation>S&amp;aya Setuju</translation>
     </message>
     <message>
         <location line="+92"/>
@@ -77,7 +77,7 @@
     <message>
         <location line="+1"/>
         <source>Mixed</source>
-        <translation type="unfinished"></translation>
+        <translation>Campuran</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -93,7 +93,7 @@
     <message>
         <location line="+4"/>
         <source>Paused</source>
-        <translation>Berhenti Sejenak</translation>
+        <translation>Diistirahatkan</translation>
     </message>
     <message>
         <location line="+250"/>
@@ -153,7 +153,7 @@
     <message>
         <location line="-28"/>
         <source>Optimistic unchoke</source>
-        <translation type="unfinished"></translation>
+        <translation>Buka pengetatan optimis</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -178,12 +178,12 @@
     <message>
         <location line="+4"/>
         <source>Peer has unchoked us, but we&apos;re not interested</source>
-        <translation type="unfinished"></translation>
+        <translation>Rekan membuka pengetatan untuk kita, tapi kita tidak tertarik</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>We unchoked this peer, but they&apos;re not interested</source>
-        <translation type="unfinished"></translation>
+        <translation>Kita membuka pengetatan untuk rekan ini, tapi mereka tidak tertarik</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -308,12 +308,12 @@
     <message>
         <location line="-3"/>
         <source>Seed regardless of ratio</source>
-        <translation>Kirim terlepas dari rasio</translation>
+        <translation>Membenih tak peduli rasio</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Stop seeding at ratio:</source>
-        <translation>Berhenti kirim saat rasio:</translation>
+        <translation>Berhenti membenih pada rasio:</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -323,17 +323,17 @@
     <message>
         <location line="+1"/>
         <source>Stop seeding if idle for:</source>
-        <translation type="unfinished"></translation>
+        <translation>Berhenti membenih bila menganggur selama:</translation>
     </message>
     <message>
         <location line="+62"/>
         <source>Up</source>
-        <translation>Atas</translation>
+        <translation>Naik</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Down</source>
-        <translation>Bawah</translation>
+        <translation>Turun</translation>
     </message>
     <message>
         <location line="+0"/>
@@ -503,7 +503,7 @@
     <message>
         <location line="+12"/>
         <source>Honor global &amp;limits</source>
-        <translation type="unfinished"></translation>
+        <translation>Patuhi batas g&amp;lobal</translation>
     </message>
     <message>
         <location line="+7"/>
@@ -533,7 +533,7 @@
     <message>
         <location line="+30"/>
         <source>&amp;Idle:</source>
-        <translation type="unfinished"></translation>
+        <translation>Mengan&amp;ggur:</translation>
     </message>
     <message>
         <location line="+50"/>
@@ -543,13 +543,13 @@
     <message>
         <location line="+12"/>
         <source>&amp;Maximum peers:</source>
-        <translation>&amp;Rekan Maksimum:</translation>
+        <translation>Rekan &amp;maksimum:</translation>
     </message>
 </context>
 <context>
     <name>FileTreeItem</name>
     <message>
-        <location filename="../FileTreeItem.cc" line="+289"/>
+        <location filename="../FileTreeItem.cc" line="+290"/>
         <location filename="../FileTreeView.cc" line="+108"/>
         <location line="+285"/>
         <source>Low</source>
@@ -573,7 +573,7 @@
         <location line="+3"/>
         <location filename="../FileTreeView.cc" line="-283"/>
         <source>Mixed</source>
-        <translation type="unfinished"></translation>
+        <translation>Campuran</translation>
     </message>
 </context>
 <context>
@@ -609,32 +609,32 @@
     <message>
         <location filename="../FileTreeView.cc" line="+275"/>
         <source>Check Selected</source>
-        <translation type="unfinished"></translation>
+        <translation>Centang Yang Dipilih</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Uncheck Selected</source>
-        <translation type="unfinished"></translation>
+        <translation>Hapus Centang Yang Dipilih</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Only Check Selected</source>
-        <translation type="unfinished"></translation>
+        <translation>Hanya Centang Yang Dipilih</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Priority</source>
-        <translation type="unfinished">Prioritas</translation>
+        <translation>Prioritas</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Open</source>
-        <translation type="unfinished">Buka</translation>
+        <translation>Buka</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Rename...</source>
-        <translation type="unfinished"></translation>
+        <translation>Ubah Nama...</translation>
     </message>
 </context>
 <context>
@@ -696,7 +696,7 @@
     <message>
         <location filename="../Formatter.cc" line="+33"/>
         <source>B/s</source>
-        <translation>B/d</translation>
+        <translation>B/s</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -1265,7 +1265,7 @@
     <message>
         <location line="+31"/>
         <source>Idle</source>
-        <translation type="unfinished"></translation>
+        <translation>Menganggur</translation>
     </message>
     <message>
         <location line="+34"/>
@@ -1338,8 +1338,8 @@
     <message numerus="yes">
         <location line="-555"/>
         <source>Showing %L1 of %Ln torrent(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Menampilkan %L1 dari %Ln torrent</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -1831,13 +1831,13 @@ Untuk menambahkan URL utama, tambahkan setelah baris kosong.</translation>
     <message>
         <location line="+548"/>
         <source>Remote</source>
-        <translation type="unfinished"></translation>
+        <translation>Remote</translation>
     </message>
     <message numerus="yes">
         <location filename="../PrefsDialog.cc" line="+149"/>
         <source>&lt;i&gt;Blocklist contains %Ln rule(s)&lt;/i&gt;</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>&lt;i&gt;Daftar blokir memuat %Ln aturan&lt;/i&gt;</numerusform>
         </translation>
     </message>
     <message>
@@ -1941,7 +1941,7 @@ Untuk menambahkan URL utama, tambahkan setelah baris kosong.</translation>
     <message>
         <location line="+453"/>
         <source>Remote Control</source>
-        <translation type="unfinished"></translation>
+        <translation>Kendali Remote</translation>
     </message>
     <message>
         <location line="+12"/>
@@ -2066,7 +2066,7 @@ Untuk menambahkan URL utama, tambahkan setelah baris kosong.</translation>
     <message>
         <location line="-2"/>
         <source>Select Watch Directory</source>
-        <translation type="unfinished"></translation>
+        <translation>Pilih Direktori Pantau</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -2097,7 +2097,7 @@ Untuk menambahkan URL utama, tambahkan setelah baris kosong.</translation>
     <message>
         <location line="+7"/>
         <source>Keep &amp;incomplete files in:</source>
-        <translation type="unfinished"></translation>
+        <translation>S&amp;impan berkas belum lengkap di:</translation>
     </message>
     <message>
         <location line="-148"/>
@@ -2117,7 +2117,7 @@ Untuk menambahkan URL utama, tambahkan setelah baris kosong.</translation>
     <message>
         <location line="+20"/>
         <source>Stop seedi&amp;ng if idle for:</source>
-        <translation type="unfinished"></translation>
+        <translation>Berhenti membibit bila me&amp;nganggur selama:</translation>
     </message>
     <message>
         <location line="-557"/>
@@ -2137,7 +2137,7 @@ Untuk menambahkan URL utama, tambahkan setelah baris kosong.</translation>
     <message>
         <location filename="../PrefsDialog.cc" line="+95"/>
         <source>Not supported by remote sessions</source>
-        <translation type="unfinished"></translation>
+        <translation>Tidak didukung oleh sesi remote</translation>
     </message>
 </context>
 <context>
@@ -2184,7 +2184,7 @@ Untuk menambahkan URL utama, tambahkan setelah baris kosong.</translation>
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+541"/>
+        <location filename="../Session.cc" line="+546"/>
         <source>Error Renaming Path</source>
         <translation>Galat Penggantian Jalur</translation>
     </message>
@@ -2196,17 +2196,17 @@ Untuk menambahkan URL utama, tambahkan setelah baris kosong.</translation>
     <message>
         <location line="+449"/>
         <source>Error Adding Torrent</source>
-        <translation type="unfinished">Galat Menambahkan Torrent</translation>
+        <translation>Galat Saat Menambah Torrent</translation>
     </message>
     <message>
-        <location line="+16"/>
+        <location line="+21"/>
         <source>Add Torrent</source>
         <translation>Tambah Torrent</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>&lt;p&gt;&lt;b&gt;Unable to add &quot;%1&quot;.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;It is a duplicate of &quot;%2&quot; which is already added.&lt;/p&gt;</source>
-        <translation type="unfinished">&lt;p&gt;&lt;b&gt;Tidak dapat menambahkan &quot;%1&quot;.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Ini adalah duplikat dari &quot;%2&quot; yang telah ditambahkan.&lt;/p&gt;</translation>
+        <translation>&lt;p&gt;&lt;b&gt;Tidak bisa menambah &quot;%1&quot;.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Itu duplikat dari &quot;%2&quot; yang telah ditambahkan.&lt;/p&gt;</translation>
     </message>
 </context>
 <context>
@@ -2229,7 +2229,7 @@ Untuk menambahkan URL utama, tambahkan setelah baris kosong.</translation>
     <message>
         <location line="+7"/>
         <source>Connect to &amp;Remote Session</source>
-        <translation type="unfinished"></translation>
+        <translation>Menyambung ke Sesi &amp;Remote</translation>
     </message>
     <message>
         <location line="+7"/>
@@ -2370,7 +2370,7 @@ Untuk menambahkan URL utama, tambahkan setelah baris kosong.</translation>
         <location filename="../TorrentDelegate.cc" line="+177"/>
         <source>Magnetized transfer - retrieving metadata (%1%)</source>
         <extracomment>First part of torrent progress string; %1 is the percentage of torrent metadata downloaded</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Transfer termagnetisasi - mengambil metadata (%1%)</translation>
     </message>
     <message>
         <location line="+9"/>
@@ -2435,12 +2435,12 @@ Untuk menambahkan URL utama, tambahkan setelah baris kosong.</translation>
         </translation>
     </message>
     <message>
-        <location line="+21"/>
+        <location line="+22"/>
         <source> - </source>
         <translation> - </translation>
     </message>
     <message numerus="yes">
-        <location line="-53"/>
+        <location line="-54"/>
         <source>Downloading metadata from %Ln peer(s) (%1% done)</source>
         <translation>
             <numerusform>Mengunduh metadata dari %Ln rekan (%1% selesai)</numerusform>
@@ -2470,12 +2470,12 @@ Untuk menambahkan URL utama, tambahkan setelah baris kosong.</translation>
         </translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+7"/>
         <source>Error</source>
         <translation>Galat</translation>
     </message>
     <message>
-        <location line="-81"/>
+        <location line="-82"/>
         <source>Verifying local data (%1% tested)</source>
         <translation>Memeriksa lokal data (%1% diuji)</translation>
     </message>

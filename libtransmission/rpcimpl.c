@@ -910,7 +910,7 @@ static char const* torrentGet(tr_session* session, tr_variant* args_in, tr_varia
         int const interval = RECENTLY_ACTIVE_SECONDS;
         tr_variant* removed_out = tr_variantDictAddList(args_out, TR_KEY_removed, 0);
 
-        while ((d = tr_variantListChild(&session->removedTorrents, n++)) != NULL)
+        while ((d = tr_variantListChild(&session->removedTorrents, n)) != NULL)
         {
             int64_t date;
             int64_t id;
@@ -921,6 +921,8 @@ static char const* torrentGet(tr_session* session, tr_variant* args_in, tr_varia
             {
                 tr_variantListAddInt(removed_out, id);
             }
+
+            ++n;
         }
     }
 
@@ -1154,7 +1156,7 @@ static char const* addTrackerUrls(tr_torrent* tor, tr_variant* urls)
     /* and add the new ones */
     i = 0;
 
-    while ((val = tr_variantListChild(urls, i++)) != NULL)
+    while ((val = tr_variantListChild(urls, i)) != NULL)
     {
         char const* announce = NULL;
 
@@ -1166,6 +1168,8 @@ static char const* addTrackerUrls(tr_torrent* tor, tr_variant* urls)
             ++n;
             changed = true;
         }
+
+        ++i;
     }
 
     if (!changed)
@@ -1183,8 +1187,6 @@ static char const* addTrackerUrls(tr_torrent* tor, tr_variant* urls)
 
 static char const* replaceTrackers(tr_torrent* tor, tr_variant* urls)
 {
-    int i;
-    tr_variant* pair[2];
     tr_tracker_info* trackers;
     bool changed = false;
     tr_info const* inf = tr_torrentInfo(tor);
@@ -1196,23 +1198,20 @@ static char const* replaceTrackers(tr_torrent* tor, tr_variant* urls)
     copyTrackers(trackers, inf->trackers, n);
 
     /* make the substitutions... */
-    i = 0;
-
-    while ((pair[0] = tr_variantListChild(urls, i)) != NULL && (pair[1] = tr_variantListChild(urls, i + 1)) != NULL)
+    for (size_t i = 0, url_count = tr_variantListSize(urls); i + 1 < url_count; i += 2)
     {
         size_t len;
         int64_t pos;
         char const* newval;
 
-        if (tr_variantGetInt(pair[0], &pos) && tr_variantGetStr(pair[1], &newval, &len) && tr_urlIsValidTracker(newval) &&
-            pos < n && pos >= 0)
+        if (tr_variantGetInt(tr_variantListChild(urls, i), &pos) &&
+            tr_variantGetStr(tr_variantListChild(urls, i + 1), &newval, &len) &&
+            tr_urlIsValidTracker(newval) && pos < n && pos >= 0)
         {
             tr_free(trackers[pos].announce);
             trackers[pos].announce = tr_strndup(newval, len);
             changed = true;
         }
-
-        i += 2;
     }
 
     if (!changed)
@@ -1250,7 +1249,7 @@ static char const* removeTrackers(tr_torrent* tor, tr_variant* ids)
     /* remove the ones specified in the urls list */
     i = 0;
 
-    while ((val = tr_variantListChild(ids, i++)) != NULL)
+    while ((val = tr_variantListChild(ids, i)) != NULL)
     {
         int64_t pos;
 
@@ -1258,9 +1257,11 @@ static char const* removeTrackers(tr_torrent* tor, tr_variant* ids)
         {
             tids[t++] = pos;
         }
+
+        ++i;
     }
 
-    /* sort trackerIds and remove from largest to smallest so there is no need to recacluate array indicies */
+    /* sort trackerIds and remove from largest to smallest so there is no need to recalculate array indicies */
     qsort(tids, t, sizeof(int), compareInt);
 
     while (t-- != 0)
@@ -1271,7 +1272,9 @@ static char const* removeTrackers(tr_torrent* tor, tr_variant* ids)
             continue;
         }
 
-        tr_removeElementFromArray(trackers, tids[t], sizeof(tr_tracker_info), n--);
+        tr_removeElementFromArray(trackers, tids[t], sizeof(tr_tracker_info), n);
+        --n;
+
         dup = tids[t];
         changed = true;
     }

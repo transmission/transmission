@@ -147,11 +147,11 @@ static bool decode_hex_string(char const* in, unsigned int* setme)
         }
         else if ('a' <= *in && *in <= 'f')
         {
-            val += *in - 'a' + 10u;
+            val += *in - 'a' + 10U;
         }
         else if ('A' <= *in && *in <= 'F')
         {
-            val += *in - 'A' + 10u;
+            val += *in - 'A' + 10U;
         }
         else
         {
@@ -438,7 +438,8 @@ static void jsonChildFunc(struct jsonWalk* data)
         {
         case TR_VARIANT_TYPE_DICT:
             {
-                int const i = pstate->childIndex++;
+                int const i = pstate->childIndex;
+                ++pstate->childIndex;
 
                 if (i % 2 == 0)
                 {
@@ -460,7 +461,8 @@ static void jsonChildFunc(struct jsonWalk* data)
 
         case TR_VARIANT_TYPE_LIST:
             {
-                bool const isLast = ++pstate->childIndex == pstate->childCount;
+                ++pstate->childIndex;
+                bool const isLast = pstate->childIndex == pstate->childCount;
 
                 if (!isLast)
                 {

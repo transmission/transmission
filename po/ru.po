@@ -3,14 +3,19 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
+# Translators:
+# Andrei Stepanov <adem4ik@gmail.com>, 2017
+# Stas Solovey <whats_up@tut.by>, 2017
+# Валерий Дмиртиевич Степанов <valera1111@yandex.ru>, 2017
+#
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-05-19 22:53+0300\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: Stas Solovey <whats_up@tut.by>, 2017\n"
+"POT-Creation-Date: 2019-03-06 03:08+0300\n"
+"PO-Revision-Date: 2017-01-26 19:47+0000\n"
+"Last-Translator: Валерий Дмиртиевич Степанов <valera1111@yandex.ru>, 2017\n"
 "Language-Team: Russian (https://www.transifex.com/transmissionbt/teams/33778/ru/)\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -18,239 +23,239 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n%100>=11 && n%100<=14)? 2 : 3);\n"
 
-#: ../cli/cli.c:114 ../gtk/util.c:92 ../libtransmission/utils.c:1597
+#: ../cli/cli.c:114 ../gtk/util.c:92 ../libtransmission/utils.c:1646
 msgid "None"
 msgstr "Нет данных"
 
-#: ../gtk/actions.c:33
+#: ../gtk/actions.c:31
 msgid "Sort by _Activity"
 msgstr "Сортировать по _активности"
 
-#: ../gtk/actions.c:34
+#: ../gtk/actions.c:32
 msgid "Sort by _Name"
 msgstr "Сортировать по _названию"
 
-#: ../gtk/actions.c:35
+#: ../gtk/actions.c:33
 msgid "Sort by _Progress"
 msgstr "Сортировать по продвижению _загрузки"
 
-#: ../gtk/actions.c:36
+#: ../gtk/actions.c:34
 msgid "Sort by _Queue"
 msgstr "Сортировать по _очерёдности"
 
-#: ../gtk/actions.c:37
+#: ../gtk/actions.c:35
 msgid "Sort by Rati_o"
 msgstr "Сортировать по со_отношению"
 
-#: ../gtk/actions.c:38
+#: ../gtk/actions.c:36
 msgid "Sort by Stat_e"
 msgstr "Сортировать по со_стоянию"
 
-#: ../gtk/actions.c:39
+#: ../gtk/actions.c:37
 msgid "Sort by A_ge"
 msgstr "Сортировать по _дате добавления"
 
-#: ../gtk/actions.c:40
+#: ../gtk/actions.c:38
 msgid "Sort by Time _Left"
 msgstr "Сортировать по _оставшемуся времени"
 
-#: ../gtk/actions.c:41
+#: ../gtk/actions.c:39
 msgid "Sort by Si_ze"
 msgstr "Сортировать по _размеру"
 
-#: ../gtk/actions.c:55
+#: ../gtk/actions.c:53
 msgid "_Show Transmission"
 msgstr "_Показать Transmission"
 
-#: ../gtk/actions.c:56
+#: ../gtk/actions.c:54
 msgid "Message _Log"
 msgstr "_Журнал сообщений"
 
-#: ../gtk/actions.c:69
+#: ../gtk/actions.c:67
 msgid "Enable Alternative Speed _Limits"
 msgstr "Включить расширенное ограничение с_корости"
 
-#: ../gtk/actions.c:70
+#: ../gtk/actions.c:68
 msgid "_Compact View"
 msgstr "_Компактный вид"
 
-#: ../gtk/actions.c:71
+#: ../gtk/actions.c:69
 msgid "Re_verse Sort Order"
 msgstr "Об_ратный порядок сортировки"
 
-#: ../gtk/actions.c:72
+#: ../gtk/actions.c:70
 msgid "_Filterbar"
 msgstr "_Панель _фильтров"
 
-#: ../gtk/actions.c:73
+#: ../gtk/actions.c:71
 msgid "_Statusbar"
 msgstr "_Строка состояния"
 
-#: ../gtk/actions.c:74
+#: ../gtk/actions.c:72
 msgid "_Toolbar"
 msgstr "Панель _инструментов"
 
-#: ../gtk/actions.c:79
+#: ../gtk/actions.c:77
 msgid "_File"
 msgstr "_Файл"
 
-#: ../gtk/actions.c:80
+#: ../gtk/actions.c:78
 msgid "_Torrent"
 msgstr "_Торрент"
 
-#: ../gtk/actions.c:81
+#: ../gtk/actions.c:79
 msgid "_View"
 msgstr "_Вид"
 
-#: ../gtk/actions.c:82
+#: ../gtk/actions.c:80
 msgid "_Sort Torrents By"
 msgstr "_Сортировать торренты по"
 
-#: ../gtk/actions.c:83
+#: ../gtk/actions.c:81
 msgid "_Queue"
 msgstr "По_ложение в очереди"
 
-#: ../gtk/actions.c:84 ../gtk/details.c:2842
+#: ../gtk/actions.c:82 ../gtk/details.c:2842
 msgid "_Edit"
 msgstr "_Правка"
 
-#: ../gtk/actions.c:85
+#: ../gtk/actions.c:83
 msgid "_Help"
 msgstr "_Справка"
 
-#: ../gtk/actions.c:86
+#: ../gtk/actions.c:84
 msgid "Copy _Magnet Link to Clipboard"
-msgstr "Скопировать magnet-ссылку в буфер обмена"
+msgstr "Скопировать магнет-ссылку в буфер обмена"
 
-#: ../gtk/actions.c:87
-msgid "Open _URL…"
-msgstr "Отк_рыть URL…"
-
-#: ../gtk/actions.c:87
+#: ../gtk/actions.c:85
 msgid "Open URL…"
 msgstr "Открыть URL…"
 
-#: ../gtk/actions.c:88 ../gtk/actions.c:89
+#: ../gtk/actions.c:85
+msgid "Open _URL…"
+msgstr "Отк_рыть URL…"
+
+#: ../gtk/actions.c:86 ../gtk/actions.c:87
 msgid "Open a torrent"
 msgstr "Открыть торрент"
 
-#: ../gtk/actions.c:90
-msgid "_Start"
-msgstr "_Запустить"
-
-#: ../gtk/actions.c:90
+#: ../gtk/actions.c:88
 msgid "Start torrent"
 msgstr "Запустить торрент"
 
-#: ../gtk/actions.c:91
+#: ../gtk/actions.c:88
+msgid "_Start"
+msgstr "_Запустить"
+
+#: ../gtk/actions.c:89
 msgid "Start _Now"
 msgstr "Запустить _сейчас"
 
-#: ../gtk/actions.c:91
+#: ../gtk/actions.c:89
 msgid "Start torrent now"
 msgstr "Начать загрузку сейчас"
 
-#: ../gtk/actions.c:92
+#: ../gtk/actions.c:91
 msgid "_Statistics"
 msgstr "_Статистика"
 
-#: ../gtk/actions.c:93
+#: ../gtk/actions.c:92
 msgid "_Donate"
 msgstr "_Пожертвовать"
 
-#: ../gtk/actions.c:94
+#: ../gtk/actions.c:93
 msgid "_Verify Local Data"
 msgstr "Про_верить локальные данные"
 
-#: ../gtk/actions.c:95
+#: ../gtk/actions.c:94
+msgid "Pause torrent"
+msgstr "Приостановить торрент"
+
+#: ../gtk/actions.c:94
 msgid "_Pause"
 msgstr "_Приостановить"
 
 #: ../gtk/actions.c:95
-msgid "Pause torrent"
-msgstr "Приостановить торрент"
+msgid "Pause all torrents"
+msgstr "Приостановить все торренты"
 
-#: ../gtk/actions.c:96
+#: ../gtk/actions.c:95
 msgid "_Pause All"
 msgstr "_Приостановить все"
 
 #: ../gtk/actions.c:96
-msgid "Pause all torrents"
-msgstr "Приостановить все торренты"
+msgid "Start all torrents"
+msgstr "Запустить все торренты"
 
-#: ../gtk/actions.c:97
+#: ../gtk/actions.c:96
 msgid "_Start All"
 msgstr "_Запустить все"
 
 #: ../gtk/actions.c:97
-msgid "Start all torrents"
-msgstr "Запустить все торренты"
-
-#: ../gtk/actions.c:98
 msgid "Set _Location…"
 msgstr "Указать _расположение…"
 
-#: ../gtk/actions.c:99
+#: ../gtk/actions.c:98
 msgid "Remove torrent"
 msgstr "Убрать торрент"
 
-#: ../gtk/actions.c:100
+#: ../gtk/actions.c:99
 msgid "_Delete Files and Remove"
 msgstr "_Убрать торрент и удалить загруженные файлы"
 
-#: ../gtk/actions.c:101
+#: ../gtk/actions.c:100
+msgid "Create a torrent"
+msgstr "Создать торрент"
+
+#: ../gtk/actions.c:100
 msgid "_New…"
 msgstr "_Создать…"
 
 #: ../gtk/actions.c:101
-msgid "Create a torrent"
-msgstr "Создать торрент"
-
-#: ../gtk/actions.c:102
 msgid "_Quit"
 msgstr "_Завершить"
 
-#: ../gtk/actions.c:103
+#: ../gtk/actions.c:102
 msgid "Select _All"
 msgstr "Выде_лить всё"
 
-#: ../gtk/actions.c:104
+#: ../gtk/actions.c:103
 msgid "Dese_lect All"
 msgstr "_Снять выделение"
 
-#: ../gtk/actions.c:106
+#: ../gtk/actions.c:105
 msgid "Torrent properties"
 msgstr "Свойства торрента"
 
-#: ../gtk/actions.c:107
+#: ../gtk/actions.c:106
 msgid "Open Fold_er"
 msgstr "Открыть папк_у"
 
-#: ../gtk/actions.c:109
+#: ../gtk/actions.c:108
 msgid "_Contents"
 msgstr "_Содержание"
 
-#: ../gtk/actions.c:110
+#: ../gtk/actions.c:109
 msgid "Ask Tracker for _More Peers"
 msgstr "Зап_росить у трекера больше участников"
 
-#: ../gtk/actions.c:111
+#: ../gtk/actions.c:110
 msgid "Move to _Top"
 msgstr "Переместить в начало _списка"
 
-#: ../gtk/actions.c:112
+#: ../gtk/actions.c:111
 msgid "Move _Up"
 msgstr "Переместить в_верх"
 
-#: ../gtk/actions.c:113
+#: ../gtk/actions.c:112
 msgid "Move _Down"
 msgstr "Переместить в_низ"
 
-#: ../gtk/actions.c:114
+#: ../gtk/actions.c:113
 msgid "Move to _Bottom"
 msgstr "Переместить в конец _списка"
 
-#: ../gtk/actions.c:115
+#: ../gtk/actions.c:114
 msgid "Present Main Window"
 msgstr "Показать основное окно"
 
@@ -316,8 +321,7 @@ msgstr "Соединения с участниками"
 msgid "_Maximum peers:"
 msgstr "_Максимальное количество участников:"
 
-#: ../gtk/details.c:598 ../gtk/torrent-cell-renderer.c:194
-#: ../libtransmission/verify.c:284
+#: ../gtk/details.c:598 ../gtk/torrent-cell-renderer.c:194 ../libtransmission/verify.c:272
 msgid "Queued for verification"
 msgstr "В очереди на проверку"
 
@@ -394,19 +398,19 @@ msgstr "Неизвестно"
 #, c-format
 msgid "%1$s (%2$'d piece @ %3$s)"
 msgid_plural "%1$s (%2$'d pieces @ %3$s)"
-msgstr[0] "%1$s (%2$'d фрагмент @ %3$s)"
-msgstr[1] "%1$s (%2$'d фрагмента @ %3$s)"
-msgstr[2] "%1$s (%2$'d фрагментов @ %3$s)"
-msgstr[3] "%1$s (%2$'d фрагментов @ %3$s)"
+msgstr[0] "%1$s (%2$'d часть @ %3$s)"
+msgstr[1] "%1$s (%2$'d части @ %3$s)"
+msgstr[2] "%1$s (%2$'d частей @ %3$s)"
+msgstr[3] "%1$s (%2$'d частей @ %3$s)"
 
 #: ../gtk/details.c:925
 #, c-format
 msgid "%1$s (%2$'d piece)"
 msgid_plural "%1$s (%2$'d pieces)"
-msgstr[0] "%1$s (%2$'d фрагмент)"
-msgstr[1] "%1$s (%2$'d фрагмента)"
-msgstr[2] "%1$s (%2$'d фрагментов)"
-msgstr[3] "%1$s (%2$'d фрагментов)"
+msgstr[0] "%1$s (%2$'d часть)"
+msgstr[1] "%1$s (%2$'d части)"
+msgstr[2] "%1$s (%2$'d частей)"
+msgstr[3] "%1$s (%2$'d частей)"
 
 #: ../gtk/details.c:969
 #, c-format
@@ -764,26 +768,26 @@ msgstr "%'d Свойства торрента"
 msgid "Remove torrent?"
 msgid_plural "Remove %d torrents?"
 msgstr[0] "Удалить торрент?"
-msgstr[1] "Удалить торренты?"
-msgstr[2] "Удалить торренты?"
-msgstr[3] "Remove %d torrents?"
+msgstr[1] "Удалить %d торрента?"
+msgstr[2] "Удалить %d торрента?"
+msgstr[3] "Удалить %d торрентов?"
 
 #: ../gtk/dialogs.c:104
 #, c-format
 msgid "Delete this torrent's downloaded files?"
 msgid_plural "Delete these %d torrents' downloaded files?"
 msgstr[0] "Удалить загруженные файлы этого торрента?"
-msgstr[1] "Удалить загруженные файлы этих торрентов?"
-msgstr[2] "Удалить загруженные файлы этих торрентов?"
-msgstr[3] "Delete these %d torrents' downloaded files?"
+msgstr[1] "Удалить загруженные файлы этих %d торрентов?"
+msgstr[2] "Удалить загруженные файлы этих %d торрентов?"
+msgstr[3] "Удалить загруженные файлы этих %d торрентов?"
 
 #: ../gtk/dialogs.c:113
 msgid "Once removed, continuing the transfer will require the torrent file or magnet link."
 msgid_plural "Once removed, continuing the transfers will require the torrent files or magnet links."
-msgstr[0] "После удаления, для возобновления передачи потребуется торрент-файл или Magnet-ссылка."
-msgstr[1] "После удаления, для возобновления передач потребуются торрент-файлы или Magnet-ссылки."
-msgstr[2] "После удаления, для возобновления передач потребуются торрент-файлы или Magnet-ссылки."
-msgstr[3] "Once removed, continuing the transfers will require the torrent files or magnet links."
+msgstr[0] "После удаления, для возобновления передачи потребуется торрент-файл или магнет-ссылка."
+msgstr[1] "После удаления, для возобновления передач потребуются торрент-файлы или магнет-ссылки."
+msgstr[2] "После удаления, для возобновления передач потребуются торрент-файлы или магнет-ссылки."
+msgstr[3] "После удаления, для возобновления передач потребуются торрент-файлы или магнет-ссылки."
 
 #: ../gtk/dialogs.c:118
 msgid "This torrent has not finished downloading."
@@ -791,7 +795,7 @@ msgid_plural "These torrents have not finished downloading."
 msgstr[0] "Загрузка этого торрента не завершена."
 msgstr[1] "Загрузка этих торрентов не завершена."
 msgstr[2] "Загрузка этих торрентов не завершена."
-msgstr[3] "These torrents have not finished downloading."
+msgstr[3] "Загрузка этих торрентов не завершена."
 
 #: ../gtk/dialogs.c:123
 msgid "This torrent is connected to peers."
@@ -815,7 +819,7 @@ msgid_plural "Some of these torrents have not finished downloading."
 msgstr[0] "Загрузка одного из этих торрентов не завершена."
 msgstr[1] "Загрузка некоторых из этих торрентов не завершена."
 msgstr[2] "Загрузка некоторых из этих торрентов не завершена."
-msgstr[3] "Some of these torrents have not finished downloading."
+msgstr[3] "Загрузка некоторых из этих торрентов не завершена."
 
 #: ../gtk/file-list.c:614 ../gtk/util.c:514
 msgid "High"
@@ -873,12 +877,10 @@ msgid "Verifying"
 msgstr "Проверяется"
 
 #: ../gtk/filter.c:591 ../gtk/msgwin.c:431 ../gtk/util.c:724
-#, c-format
 msgid "Error"
 msgstr "Ошибки"
 
 #: ../gtk/filter.c:880
-#, c-format
 msgid "_Show:"
 msgstr "_Показать:"
 
@@ -913,8 +915,7 @@ msgstr "Запускать свёрнутым в области уведомле
 msgid "Show version number and exit"
 msgstr "Показать номер версии и завершить"
 
-#: ../gtk/main.c:636 ../gtk/transmission-gtk.appdata.xml.in.h:1
-#: ../gtk/transmission-gtk.desktop.in.h:1
+#: ../gtk/main.c:636 ../gtk/transmission-gtk.appdata.xml.in:11 ../gtk/transmission-gtk.desktop.in:3
 msgid "Transmission"
 msgstr "Transmission"
 
@@ -974,7 +975,7 @@ msgstr "Быстрый и простой BitTorrent-клиент"
 
 #: ../gtk/main.c:1368
 msgid "Copyright (c) The Transmission Project"
-msgstr "Авторское право (©) The Transmission Project"
+msgstr "Авторское право © The Transmission Project"
 
 #. Translators: translate "translator-credits" as your name
 #. to have it appear in the credits in the "About"
@@ -999,7 +1000,6 @@ msgid "Error: invalid announce URL \"%s\""
 msgstr "Ошибка: неверный URL объявлений «%s»"
 
 #: ../gtk/makemeta-ui.c:82
-#, c-format
 msgid "Cancelled"
 msgstr "Отменено"
 
@@ -1044,10 +1044,10 @@ msgstr[3] "%1$s; %2$'d Files"
 #, c-format
 msgid "%1$'d Piece @ %2$s"
 msgid_plural "%1$'d Pieces @ %2$s"
-msgstr[0] "%1$'d фрагмент по %2$s"
-msgstr[1] "%1$'d фрагмента по %2$s"
-msgstr[2] "%1$'d фрагментов по %2$s"
-msgstr[3] "%1$'d фрагментов по @ %2$s"
+msgstr[0] "%1$'d часть по %2$s"
+msgstr[1] "%1$'d части по %2$s"
+msgstr[2] "%1$'d частей по %2$s"
+msgstr[3] "%1$'d частей по @ %2$s"
 
 #: ../gtk/makemeta-ui.c:443
 msgid "Sa_ve to:"
@@ -1356,8 +1356,7 @@ msgstr "Ошибка: %s"
 msgid "Downloading metadata from %1$'d %2$s (%3$d%% done)"
 msgstr "Загрузка метаданных от %1$'d %2$s (завершено %3$d%%)"
 
-#: ../gtk/torrent-cell-renderer.c:262 ../gtk/torrent-cell-renderer.c:268
-#: ../gtk/torrent-cell-renderer.c:281
+#: ../gtk/torrent-cell-renderer.c:262 ../gtk/torrent-cell-renderer.c:268 ../gtk/torrent-cell-renderer.c:281
 msgid "peer"
 msgid_plural "peers"
 msgstr[0] "участник"
@@ -1399,41 +1398,6 @@ msgstr[0] "Раздача %1$'d из %2$'d подключённого участ
 msgstr[1] "Раздача %1$'d из %2$'d подключённых участников"
 msgstr[2] "Раздача %1$'d из %2$'d подключённых участников"
 msgstr[3] "Раздача %1$'d из %2$'d подключённых участников"
-
-#: ../gtk/transmission-gtk.appdata.xml.in.h:2
-#: ../gtk/transmission-gtk.desktop.in.h:3
-msgid "Download and share files over BitTorrent"
-msgstr "Загружайте и обменивайтесь файлами в сети BitTorrent"
-
-#. Translators: these are the application description paragraphs in the AppData file.
-#: ../gtk/transmission-gtk.appdata.xml.in.h:4
-msgid "BitTorrent is a peer-to-peer file-sharing protocol that is commonly used to distribute large amounts of data between multiple users."
-msgstr ""
-
-#: ../gtk/transmission-gtk.appdata.xml.in.h:5
-msgid "Transmission is a BitTorrent client with an easy-to-use frontend on top a cross-platform backend. Native frontends are available for OS X and Windows, as well as command line and web frontends."
-msgstr ""
-
-#: ../gtk/transmission-gtk.appdata.xml.in.h:6
-msgid "Notable features of Transmission include support for Local Peer Discovery, encryption, DHT, µTP, PEX and Magnet Link."
-msgstr ""
-
-#: ../gtk/transmission-gtk.desktop.in.h:2
-msgid "BitTorrent Client"
-msgstr "Клиент BitTorrent"
-
-#. Translators: Search terms to find this application. Do NOT translate or localize the semicolons! The list MUST also end with a semicolon!
-#: ../gtk/transmission-gtk.desktop.in.h:5
-msgid "torrents;downloading;uploading;share;sharing;"
-msgstr ""
-
-#: ../gtk/transmission-gtk.desktop.in.h:6
-msgid "Start Transmission with All Torrents Paused"
-msgstr "Запускать Transmission с приостановленными торрентами"
-
-#: ../gtk/transmission-gtk.desktop.in.h:7
-msgid "Start Transmission Minimized"
-msgstr "Сворачивать Transmission при запуске"
 
 #: ../gtk/tr-core.c:1238
 #, c-format
@@ -1515,7 +1479,7 @@ msgstr "Максимальное количество одновременных
 msgid "Downloads sharing data in the last _N minutes are active:"
 msgstr "Загружать данные о раздаче за последние n-минут _активности:"
 
-#: ../gtk/tr-prefs.c:298 ../libtransmission/torrent.c:2158
+#: ../gtk/tr-prefs.c:298 ../libtransmission/torrent.c:2166
 msgid "Incomplete"
 msgstr "Процесс загрузки"
 
@@ -1590,12 +1554,12 @@ msgstr[2] "Черный список содержит %'d правил."
 msgstr[3] "В чёрном списке %'d правил."
 
 #: ../gtk/tr-prefs.c:450
-msgid "<b>Update succeeded!</b>"
-msgstr "<b>Обновление успешно завершено!</b>"
-
-#: ../gtk/tr-prefs.c:450
 msgid "<b>Unable to update.</b>"
 msgstr "<b>Невозможно обновить.</b>"
+
+#: ../gtk/tr-prefs.c:450
+msgid "<b>Update succeeded!</b>"
+msgstr "<b>Обновление успешно завершено!</b>"
 
 #: ../gtk/tr-prefs.c:461
 msgid "Update Blocklist"
@@ -1775,12 +1739,12 @@ msgid "Status unknown"
 msgstr "Статус неизвестен"
 
 #: ../gtk/tr-prefs.c:1092
-msgid "Port is <b>open</b>"
-msgstr "Порт <b>открыт</b>"
-
-#: ../gtk/tr-prefs.c:1092
 msgid "Port is <b>closed</b>"
 msgstr "Порт <b>закрыт</b>"
+
+#: ../gtk/tr-prefs.c:1092
+msgid "Port is <b>open</b>"
+msgstr "Порт <b>открыт</b>"
 
 #: ../gtk/tr-prefs.c:1106
 msgid "<i>Testing TCP port…</i>"
@@ -1961,6 +1925,44 @@ msgstr "Загрузка: %1$s, Отдача: %2$s"
 msgid "size|Down: %1$s, Up: %2$s"
 msgstr "Принято: %1$s, Отдано: %2$s"
 
+#: ../gtk/transmission-gtk.appdata.xml.in:12 ../gtk/transmission-gtk.desktop.in:5
+msgid "Download and share files over BitTorrent"
+msgstr "Загружайте и обменивайтесь файлами в сети BitTorrent"
+
+#. Translators: these are the application description paragraphs in the AppData file.
+#: ../gtk/transmission-gtk.appdata.xml.in:16
+msgid "BitTorrent is a peer-to-peer file-sharing protocol that is commonly used to distribute large amounts of data between multiple users."
+msgstr "BitTorrent - протокол обмена файлами пиринговой сети, который обычно используется для распространения больших объемов данных между несколькими пользователями."
+
+#: ../gtk/transmission-gtk.appdata.xml.in:20
+msgid "Transmission is a BitTorrent client with an easy-to-use frontend on top a cross-platform backend. Native frontends are available for OS X and Windows, as well as command line and web frontends."
+msgstr "Transmission - BitTorrent клиент с простым в использовании интерфейсом поверх кросс-платформенного бэкэнда. Родные интерфейсы доступны для OS X и Windows так же как командная строка и веб-интерфейс."
+
+#: ../gtk/transmission-gtk.appdata.xml.in:26
+msgid "Notable features of Transmission include support for Local Peer Discovery, encryption, DHT, µTP, PEX and Magnet Link."
+msgstr "Заслуживающие внимания функции Transmission включают в себя поддержку локального обнаружения пиров, шифрования, DHT, μTP, PEX и Магнитных ссылок."
+
+#: ../gtk/transmission-gtk.desktop.in:4
+msgid "BitTorrent Client"
+msgstr "Клиент BitTorrent"
+
+#. Translators: Search terms to find this application. Do NOT translate or localize the semicolons! The list MUST also end with a semicolon!
+#: ../gtk/transmission-gtk.desktop.in:7
+msgid "torrents;downloading;uploading;share;sharing;"
+msgstr "торренты;скачивание;загрузка;раздать;раздача;"
+
+#: ../gtk/transmission-gtk.desktop.in:9
+msgid "transmission"
+msgstr ""
+
+#: ../gtk/transmission-gtk.desktop.in:21
+msgid "Start Transmission with All Torrents Paused"
+msgstr "Запускать Transmission с приостановленными торрентами"
+
+#: ../gtk/transmission-gtk.desktop.in:25
+msgid "Start Transmission Minimized"
+msgstr "Сворачивать Transmission при запуске"
+
 #: ../gtk/util.c:36
 msgid "KiB"
 msgstr "КиБ"
@@ -2086,47 +2088,44 @@ msgstr "Transmission не знает, как использовать «%s»"
 #: ../gtk/util.c:608
 #, c-format
 msgid "This magnet link appears to be intended for something other than BitTorrent. BitTorrent magnet links have a section containing \"%s\"."
-msgstr "Эта magnet-ссылка, по-видимому, предназначена не для BitTorrent. Magnet-ссылки для BitTorrent имеют раздел, содержащий «%s»."
+msgstr "Эта магнет-ссылка, по-видимому, предназначена не для BitTorrent. Магнет-ссылки для BitTorrent имеют раздел, содержащий «%s»."
 
 #: ../gtk/util.c:730
 #, c-format
 msgid "%s free"
 msgstr "%s свободно"
 
-#: ../libtransmission/announcer.c:1099 ../libtransmission/announcer.c:1392
-msgid "Could not connect to tracker"
-msgstr "Невозможно подключиться к трекеру"
-
-#: ../libtransmission/announcer.c:1103 ../libtransmission/announcer.c:1396
-msgid "Tracker did not respond"
-msgstr "Трекер не отвечает"
-
-#: ../libtransmission/announcer.c:1167
-msgid "Success"
-msgstr "Успешно"
-
-#: ../libtransmission/announcer-http.c:229
-#: ../libtransmission/announcer-http.c:397
+#: ../libtransmission/announcer-http.c:221 ../libtransmission/announcer-http.c:389
 #, c-format
 msgid "Tracker gave HTTP response code %1$ld (%2$s)"
 msgstr "Трекер выдал код ответа HTTP %1$ld (%2$s)"
 
-#: ../libtransmission/announcer-udp.c:280
-#: ../libtransmission/announcer-udp.c:430
+#: ../libtransmission/announcer-udp.c:273 ../libtransmission/announcer-udp.c:423
 msgid "Unknown error"
 msgstr "Неизвестная ошибка"
 
-#: ../libtransmission/announcer-udp.c:520
+#: ../libtransmission/announcer-udp.c:513
 #, c-format
 msgid "DNS Lookup failed: %s"
 msgstr "Ошибка поиска DNS: %s"
 
-#: ../libtransmission/announcer-udp.c:623
+#: ../libtransmission/announcer-udp.c:616
 msgid "Connection failed"
 msgstr "Сбой подключения"
 
-#: ../libtransmission/blocklist.c:63 ../libtransmission/blocklist.c:329
-#: ../libtransmission/utils.c:243
+#: ../libtransmission/announcer.c:1154 ../libtransmission/announcer.c:1473
+msgid "Could not connect to tracker"
+msgstr "Невозможно подключиться к трекеру"
+
+#: ../libtransmission/announcer.c:1158 ../libtransmission/announcer.c:1477
+msgid "Tracker did not respond"
+msgstr "Трекер не отвечает"
+
+#: ../libtransmission/announcer.c:1222
+msgid "Success"
+msgstr "Успешно"
+
+#: ../libtransmission/blocklist.c:63 ../libtransmission/blocklist.c:360 ../libtransmission/utils.c:257
 #, c-format
 msgid "Couldn't read \"%1$s\": %2$s"
 msgstr "Не удалось прочитать «%1$s»: %2$s"
@@ -2137,58 +2136,55 @@ msgid "Blocklist \"%s\" contains %zu entries"
 msgstr "Чёрный список «%s» содержит %zu записи"
 
 #. don't try to display the actual lines - it causes issues
-#: ../libtransmission/blocklist.c:372
+#: ../libtransmission/blocklist.c:403
 #, c-format
 msgid "blocklist skipped invalid address at line %d"
 msgstr "пропущен неверный адрес в строке %d чёрного списка"
 
-#: ../libtransmission/blocklist.c:430 ../libtransmission/rpcimpl.c:1543
-#: ../libtransmission/rpcimpl.c:1557 ../libtransmission/rpcimpl.c:1580
-#: ../libtransmission/variant.c:1203
+#: ../libtransmission/blocklist.c:460 ../libtransmission/rpcimpl.c:1597 ../libtransmission/rpcimpl.c:1611 ../libtransmission/rpcimpl.c:1634 ../libtransmission/variant.c:1204
 #, c-format
 msgid "Couldn't save file \"%1$s\": %2$s"
 msgstr "Не удалось сохранить файл «%1$s»: %2$s"
 
-#: ../libtransmission/blocklist.c:436
+#: ../libtransmission/blocklist.c:466
 #, c-format
 msgid "Blocklist \"%s\" updated with %zu entries"
 msgstr "Чёрный список «%s» обновлён %zu записями"
 
-#: ../libtransmission/fdlimit.c:176
+#: ../libtransmission/fdlimit.c:168
 #, c-format
 msgid "Couldn't get directory for \"%1$s\": %2$s"
 msgstr "Не удалось получить каталог для «%1$s»: %2$s"
 
-#: ../libtransmission/fdlimit.c:182 ../libtransmission/file-posix.c:187
-#: ../libtransmission/file-posix.c:197
+#: ../libtransmission/fdlimit.c:174 ../libtransmission/file-posix.c:243
 #, c-format
 msgid "Couldn't create \"%1$s\": %2$s"
 msgstr "Не удалось создать «%1$s»: %2$s"
 
-#: ../libtransmission/fdlimit.c:203
+#: ../libtransmission/fdlimit.c:195
 #, c-format
 msgid "Couldn't open \"%1$s\": %2$s"
 msgstr "Не удалось открыть «%1$s»: %2$s"
 
-#: ../libtransmission/fdlimit.c:215
+#: ../libtransmission/fdlimit.c:207
 msgid "full"
 msgstr "полный"
 
-#: ../libtransmission/fdlimit.c:220
+#: ../libtransmission/fdlimit.c:212
 msgid "sparse"
 msgstr "редкий"
 
-#: ../libtransmission/fdlimit.c:227
+#: ../libtransmission/fdlimit.c:219
 #, c-format
 msgid "Couldn't preallocate file \"%1$s\" (%2$s, size: %3$<PRIu64>): %4$s"
 msgstr "Не удалось зарезервировать место для файла «%1$s» (%2$s, size: %3$<PRIu64>): %4$s"
 
-#: ../libtransmission/fdlimit.c:232
+#: ../libtransmission/fdlimit.c:224
 #, c-format
 msgid "Preallocated file \"%1$s\" (%2$s, size: %3$<PRIu64>)"
 msgstr "Зарезервированное место для файла «%1$s» (%2$s, размер: %3$<PRIu64>)"
 
-#: ../libtransmission/fdlimit.c:243
+#: ../libtransmission/fdlimit.c:235
 #, c-format
 msgid "Couldn't truncate \"%1$s\": %2$s"
 msgstr "Невозможно прервать «%1$s»: %2$s"
@@ -2198,8 +2194,7 @@ msgstr "Невозможно прервать «%1$s»: %2$s"
 msgid "Couldn't create socket: %s"
 msgstr "Не удалось создать сокет: %s"
 
-#. Node exists but isn't a folder
-#: ../libtransmission/file-posix.c:196
+#: ../libtransmission/file-posix.c:153
 #, c-format
 msgid "File \"%s\" is in the way"
 msgstr "Файл «%s» в пути"
@@ -2209,12 +2204,12 @@ msgstr "Файл «%s» в пути"
 msgid "Torrent Creator is skipping file \"%s\": %s"
 msgstr "При создании торрента пропущен файл «%s»: %s"
 
-#: ../libtransmission/makemeta.c:200
+#: ../libtransmission/makemeta.c:208
 #, c-format
 msgid "Failed to set piece size to %s, leaving it at %s"
-msgstr "Сбой установки размера фрагмента на %s, размер оставлен на %s"
+msgstr "Сбой установки размера части на %s, размер оставлен на %s"
 
-#: ../libtransmission/metainfo.c:648
+#: ../libtransmission/metainfo.c:670
 #, c-format
 msgid "Invalid metadata entry \"%s\""
 msgstr "Некорректная запись метаданных «%s»"
@@ -2243,36 +2238,36 @@ msgstr "перенаправление порта %d прекращено"
 msgid "Port %d forwarded successfully"
 msgstr "Порт %d успешно перенаправлен"
 
-#: ../libtransmission/net.c:286
+#: ../libtransmission/net.c:345
 #, c-format
 msgid "Couldn't set source address %s on %<PRIdMAX>: %s"
 msgstr "Не удалось установить адрес источника %s на %<PRIdMAX>: %s"
 
-#: ../libtransmission/net.c:303
+#: ../libtransmission/net.c:361
 #, c-format
 msgid "Couldn't connect socket %<PRIdMAX> to %s, port %d (errno %d - %s)"
 msgstr "Не удалось подключить сокет %<PRIdMAX> к %s, порт %d (номер ошибки %d — %s)"
 
-#: ../libtransmission/net.c:391
+#: ../libtransmission/net.c:458
 msgid "Is another copy of Transmission already running?"
 msgstr "Уже запущена другая копия Transmission?"
 
-#: ../libtransmission/net.c:400
+#: ../libtransmission/net.c:467
 #, c-format
 msgid "Couldn't bind port %d on %s: %s"
 msgstr "Не удалось открыть порт %d на %s: %s"
 
-#: ../libtransmission/net.c:404
+#: ../libtransmission/net.c:471
 #, c-format
 msgid "Couldn't bind port %d on %s: %s (%s)"
 msgstr "Не удалось привязать порт %d к %s: %s (%s)"
 
-#: ../libtransmission/peer-msgs.c:2118
+#: ../libtransmission/peer-msgs.c:2124
 #, c-format
 msgid "Please Verify Local Data! Piece #%zu is corrupt."
-msgstr "Проверьте локальные данные! Фрагмент #%zu повреждён."
+msgstr "Проверьте локальные данные! Часть #%zu повреждена."
 
-#: ../libtransmission/platform.c:469
+#: ../libtransmission/platform.c:470
 #, c-format
 msgid "Searching for web interface file \"%s\""
 msgstr "Поиск файла веб-интерфейса «%s»"
@@ -2297,7 +2292,7 @@ msgstr "Останавливается"
 msgid "Not forwarded"
 msgstr "Не перенаправляется"
 
-#: ../libtransmission/port-forwarding.c:106 ../libtransmission/torrent.c:2372
+#: ../libtransmission/port-forwarding.c:106 ../libtransmission/torrent.c:2294
 #, c-format
 msgid "State changed from \"%1$s\" to \"%2$s\""
 msgstr "Состояние изменилось с «%1$s» на «%2$s»"
@@ -2306,70 +2301,74 @@ msgstr "Состояние изменилось с «%1$s» на «%2$s»"
 msgid "Stopped"
 msgstr "Остановлен"
 
-#: ../libtransmission/rpcimpl.c:1567
-#, c-format
-msgid "Error uncompressing blocklist: %s (%d)"
-msgstr "Ошибка извлечения чёрного списка: %s (%d)"
-
-#: ../libtransmission/rpc-server.c:991
+#: ../libtransmission/rpc-server.c:1093
 #, c-format
 msgid "Couldn't find settings key \"%s\""
 msgstr "Невозможно найти ключ настройки «%s»"
 
-#: ../libtransmission/rpc-server.c:1103
+#: ../libtransmission/rpc-server.c:1227
 #, c-format
 msgid "%s is not a valid address"
 msgstr "%s — недопустимый адрес"
 
-#: ../libtransmission/rpc-server.c:1108
-#, fuzzy, c-format
+#: ../libtransmission/rpc-server.c:1232
+#, c-format
 msgid "%s is not an IPv4 or IPv6 address. RPC listeners must be IPv4 or IPv6"
-msgstr "%s не является адресом IPv4. Слушателями RPC могут быть только IPv4"
+msgstr "%sне является адресом IPv4 или IPv6. Слушатели RPC должны быть IPv4 или IPv6"
 
-#: ../libtransmission/rpc-server.c:1116
-#, fuzzy, c-format
+#: ../libtransmission/rpc-server.c:1240
+#, c-format
 msgid "Serving RPC and Web requests on %s:%d%s"
-msgstr "Обслуживание RPC и веб-запросов через порт 127.0.0.1:%d%s"
+msgstr "Обслуживание RPC и веб-запросов на %s:%d%s"
 
-#: ../libtransmission/rpc-server.c:1121
+#: ../libtransmission/rpc-server.c:1246
 msgid "Whitelist enabled"
 msgstr "Список разрешённых задействован"
 
-#: ../libtransmission/rpc-server.c:1126
+#: ../libtransmission/rpc-server.c:1251
 msgid "Password required"
 msgstr "Требуется пароль"
 
+#: ../libtransmission/rpcimpl.c:1621
+#, c-format
+msgid "Error uncompressing blocklist: %s (%d)"
+msgstr "Ошибка извлечения чёрного списка: %s (%d)"
+
 #. first %s is the application name
 #. second %s is the version number
-#: ../libtransmission/session.c:773
+#: ../libtransmission/session.c:769
 #, c-format
 msgid "%s %s started"
 msgstr "%s %s запущен"
 
-#: ../libtransmission/session.c:2187
+#: ../libtransmission/session.c:2174
 #, c-format
 msgid "Loaded %d torrents"
 msgstr "Загружено торрентов: %d"
 
-#: ../libtransmission/torrent.c:621
+#: ../libtransmission/torrent-magnet.c:309
+msgid "Magnet torrent's metadata is not usable"
+msgstr "Метаданные из магнет не могут быть использованы"
+
+#: ../libtransmission/torrent.c:615
 #, c-format
 msgid "Tracker warning: \"%s\""
 msgstr "Предупреждение трекера: «%s»"
 
-#: ../libtransmission/torrent.c:628
+#: ../libtransmission/torrent.c:622
 #, c-format
 msgid "Tracker error: \"%s\""
 msgstr "Ошибка трекера: «%s»"
 
-#: ../libtransmission/torrent.c:923
+#: ../libtransmission/torrent.c:915
 msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, remove the torrent and re-add it."
 msgstr "Данные не обнаружены! Убедитесь, что диски подключены, или используйте пункт меню «Указать расположение». Для повторной загрузки, удалите торрент, а затем добавьте его снова."
 
-#: ../libtransmission/torrent.c:1858
+#: ../libtransmission/torrent.c:1864
 msgid "Restarted manually -- disabling its seed ratio"
 msgstr "Перезагружено вручную — отключение рейтинга раздачи"
 
-#: ../libtransmission/torrent.c:2067
+#: ../libtransmission/torrent.c:2074
 msgid "Removing torrent"
 msgstr "Удаление торрента"
 
@@ -2378,22 +2377,18 @@ msgstr "Удаление торрента"
 #. "Complete" means we've downloaded every file in the torrent.
 #. "Done" means we're done downloading the files we wanted, but NOT all
 #. that exist
-#: ../libtransmission/torrent.c:2152
+#: ../libtransmission/torrent.c:2160
 msgid "Done"
 msgstr "Готово"
 
-#: ../libtransmission/torrent.c:2155
+#: ../libtransmission/torrent.c:2163
 msgid "Complete"
 msgstr "Завершено"
 
-#: ../libtransmission/torrent.c:3506
+#: ../libtransmission/torrent.c:3451
 #, c-format
 msgid "Piece %<PRIu32>, which was just downloaded, failed its checksum test"
-msgstr "Загруженный фрагмент %<PRIu32> не прошел проверку контрольной суммы"
-
-#: ../libtransmission/torrent-magnet.c:318
-msgid "Magnet torrent's metadata is not usable"
-msgstr "Метаданные Magnet не могут быть использованы"
+msgstr "Загруженнаячасть %<PRIu32> не прошла проверку контрольной суммы"
 
 #: ../libtransmission/upnp.c:29
 msgid "Port Forwarding (UPnP)"
@@ -2428,32 +2423,29 @@ msgstr "Перенаправление через «%s», служба «%s». (
 msgid "Port forwarding successful!"
 msgstr "Перенаправление портов работает!"
 
-#: ../libtransmission/utils.c:255 ../libtransmission/utils.c:256
+#: ../libtransmission/utils.c:269 ../libtransmission/utils.c:270
 msgid "Not a regular file"
 msgstr "Не является обычным файлом"
 
 #. did caller give us an uninitialized val?
-#: ../libtransmission/variant.c:905
+#: ../libtransmission/variant.c:906
 msgid "Invalid metadata"
 msgstr "Некорректные метаданные"
 
-#: ../libtransmission/variant.c:1188 ../libtransmission/variant.c:1212
+#: ../libtransmission/variant.c:1189 ../libtransmission/variant.c:1213
 #, c-format
 msgid "Couldn't save temporary file \"%1$s\": %2$s"
 msgstr "Не удалось сохранить временный файл «%1$s»: %2$s"
 
-#: ../libtransmission/variant.c:1198
+#: ../libtransmission/variant.c:1199
 #, c-format
 msgid "Saved \"%s\""
 msgstr "Сохранение «%s»"
 
-#: ../libtransmission/variant.c:1241
+#: ../libtransmission/variant.c:1242
 msgid "Unable to parse file content"
 msgstr "Невозможно разобрать содержимое файла"
 
-#: ../libtransmission/verify.c:230
+#: ../libtransmission/verify.c:220
 msgid "Verifying torrent"
 msgstr "Проверка торрента"
-
-#~ msgid "Transmission BitTorrent Client"
-#~ msgstr "BitTorrent-клиент Transmission"

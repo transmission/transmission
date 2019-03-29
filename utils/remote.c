@@ -14,6 +14,7 @@
 #include <string.h> /* strcmp */
 
 #include <event2/buffer.h>
+#include <event2/util.h>
 
 #define CURL_DISABLE_TYPECHECK /* otherwise -Wunreachable-code goes insane */
 #include <curl/curl.h>
@@ -792,7 +793,7 @@ static size_t parseResponseHeader(void* ptr, size_t size, size_t nmemb, void* st
     char const* key = TR_RPC_SESSION_ID_HEADER ": ";
     size_t const key_len = strlen(key);
 
-    if (line_len >= key_len && memcmp(line, key, key_len) == 0)
+    if (line_len >= key_len && evutil_ascii_strncasecmp(line, key, key_len) == 0)
     {
         char const* begin = line + key_len;
         char const* end = begin;
@@ -1423,7 +1424,7 @@ static void printPortTest(tr_variant* top)
 {
     tr_variant* args;
 
-    if ((tr_variantDictFindDict(top, TR_KEY_arguments, &args)))
+    if (tr_variantDictFindDict(top, TR_KEY_arguments, &args))
     {
         bool boolVal;
 
