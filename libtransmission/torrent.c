@@ -2249,6 +2249,8 @@ static void torrentCallScript(tr_torrent const* tor, char const* script)
         NULL
     };
 
+    char* labels = tr_strjoin((char const* const*)tr_ptrArrayBase(&tor->labels), tr_ptrArraySize(&tor->labels), ",");
+
     char* const env[] =
     {
         tr_strdup_printf("TR_APP_VERSION=%s", SHORT_VERSION_STRING),
@@ -2257,6 +2259,7 @@ static void torrentCallScript(tr_torrent const* tor, char const* script)
         tr_strdup_printf("TR_TORRENT_HASH=%s", tor->info.hashString),
         tr_strdup_printf("TR_TORRENT_ID=%d", tr_torrentId(tor)),
         tr_strdup_printf("TR_TORRENT_NAME=%s", tr_torrentName(tor)),
+        tr_strdup_printf("TR_TORRENT_LABELS=%s", labels),
         NULL
     };
 
@@ -2272,6 +2275,7 @@ static void torrentCallScript(tr_torrent const* tor, char const* script)
 
     tr_free_ptrv((void* const*)env);
     tr_free_ptrv((void* const*)cmd);
+    tr_free(labels);
     tr_free(torrent_dir);
 }
 

@@ -246,6 +246,9 @@ char const* tr_memmem(char const* haystack, size_t haystack_len, char const* nee
 /** @brief Portability wrapper for strsep() that uses the system implementation if available */
 char* tr_strsep(char** str, char const* delim);
 
+/** @brief Concatenates array of strings with delimiter in between elements */
+char* tr_strjoin(char const* const* arr, size_t len, char const* delim);
+
 /***
 ****
 ***/

@@ -587,6 +587,37 @@ char* tr_strsep(char** str, char const* delims)
 #endif
 }
 
+char* tr_strjoin(char const* const* arr, size_t len, char const* delim)
+{
+    size_t total_len = 1;
+    size_t delim_len = strlen(delim);
+    for (size_t i = 0; i < len; ++i)
+    {
+        total_len += strlen(arr[i]);
+    }
+
+    total_len += len > 0 ? (len - 1) * delim_len : 0;
+
+    char* const ret = tr_new(char, total_len);
+    char* p = ret;
+
+    for (size_t i = 0; i < len; ++i)
+    {
+        if (i > 0)
+        {
+            memcpy(p, delim, delim_len);
+            p += delim_len;
+        }
+
+        size_t const part_len = strlen(arr[i]);
+        memcpy(p, arr[i], part_len);
+        p += part_len;
+    }
+
+    *p = '\0';
+    return ret;
+}
+
 char* tr_strstrip(char* str)
 {
     if (str != NULL)
