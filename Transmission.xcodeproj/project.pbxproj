@@ -2949,6 +2949,7 @@
 					"-DHAVE_ASPRINTF",
 					"-DHAVE_LIBGEN",
 					"-DHAVE_STRCASECMP",
+					"-DHAVE_STRCASESTR",
 					"-DHAVE_ZLIB",
 					"-DHAVE_ICONV",
 				);
@@ -3124,6 +3125,7 @@
 					"-DHAVE_ASPRINTF",
 					"-DHAVE_LIBGEN",
 					"-DHAVE_STRCASECMP",
+					"-DHAVE_STRCASESTR",
 					"-DHAVE_ZLIB",
 					"-DHAVE_ICONV",
 				);
@@ -3352,6 +3354,7 @@
 					"-DHAVE_ASPRINTF",
 					"-DHAVE_LIBGEN",
 					"-DHAVE_STRCASECMP",
+					"-DHAVE_STRCASESTR",
 					"-DHAVE_ZLIB",
 					"-DHAVE_ICONV",
 				);

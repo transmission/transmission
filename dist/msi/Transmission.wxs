@@ -21,7 +21,7 @@
       Installed OR (VersionNT &gt;= 600)
     </Condition>
 
-    <Property Id="TRQTWINSTALLDIR">
+    <Property Id="TRQTWINSTALLDIR" Secure="yes">
       <RegistrySearch Id="TrQtWRegSearch" Root="HKLM" Key="SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Transmission-Qt" Name="InstallLocation" Type="directory" Win64="no"/>
       <RegistrySearch Id="TrQtWRegSearch64" Root="HKLM" Key="SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Transmission-Qt" Name="InstallLocation" Type="directory" Win64="yes"/>
     </Property>
@@ -29,7 +29,7 @@
       NOT TRQTWINSTALLDIR
     </Condition>
 
-    <Property Id="UCRTINSTALLED">
+    <Property Id="UCRTINSTALLED" Secure="yes">
       <DirectorySearch Id="UcrtDirSearch" Path="[$(var.PlatformSystemFolder)]" Depth="0">
         <FileSearch Id="UcrtFileSearch" Name="ucrtbase.dll" MinVersion="6.2.10585.0" />
       </DirectorySearch>

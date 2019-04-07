@@ -153,7 +153,8 @@ static char* getShortTransferString(tr_torrent const* tor, tr_stat const* st, do
 
     if (haveDown)
     {
-        char dnStr[32], upStr[32];
+        char dnStr[32];
+        char upStr[32];
         tr_formatter_speed_KBps(dnStr, downloadSpeed_KBps, sizeof(dnStr));
         tr_formatter_speed_KBps(upStr, uploadSpeed_KBps, sizeof(upStr));
 
@@ -513,7 +514,8 @@ static void torrent_cell_renderer_get_size(GtkCellRenderer* cell, GtkWidget* wid
 
         if (y_offset != NULL)
         {
-            int xpad, ypad;
+            int xpad;
+            int ypad;
             gtk_cell_renderer_get_padding(cell, &xpad, &ypad);
             *y_offset = cell_area ? (int)((cell_area->height - (ypad * 2 + h)) / 2.0) : 0;
         }
