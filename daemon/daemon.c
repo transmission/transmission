@@ -87,13 +87,13 @@ static struct event_base* ev_base = NULL;
 static char const* getUsage(void)
 {
     return "Transmission " LONG_VERSION_STRING "  https://transmissionbt.com/\n"
-           "A fast and easy BitTorrent client\n"
-           "\n"
-           MY_NAME " is a headless Transmission session\n"
-           "that can be controlled via transmission-remote\n"
-           "or the web interface.\n"
-           "\n"
-           "Usage: " MY_NAME " [options]";
+        "A fast and easy BitTorrent client\n"
+        "\n"
+        MY_NAME " is a headless Transmission session\n"
+        "that can be controlled via transmission-remote\n"
+        "or the web interface.\n"
+        "\n"
+        "Usage: " MY_NAME " [options]";
 }
 
 static struct tr_option const options[] =
@@ -129,16 +129,20 @@ static struct tr_option const options[] =
     { 'P', "peerport", "Port for incoming peers (Default: " TR_DEFAULT_PEER_PORT_STR ")", "P", 1, "<port>" },
     { 'm', "portmap", "Enable portmapping via NAT-PMP or UPnP", "m", 0, NULL },
     { 'M', "no-portmap", "Disable portmapping", "M", 0, NULL },
-    { 'L', "peerlimit-global", "Maximum overall number of peers (Default: " TR_DEFAULT_PEER_LIMIT_GLOBAL_STR ")", "L", 1, "<limit>" },
-    { 'l', "peerlimit-torrent", "Maximum number of peers per torrent (Default: " TR_DEFAULT_PEER_LIMIT_TORRENT_STR ")", "l", 1, "<limit>" },
+    { 'L', "peerlimit-global", "Maximum overall number of peers (Default: " TR_DEFAULT_PEER_LIMIT_GLOBAL_STR ")", "L", 1,
+        "<limit>" },
+    { 'l', "peerlimit-torrent", "Maximum number of peers per torrent (Default: " TR_DEFAULT_PEER_LIMIT_TORRENT_STR ")", "l", 1,
+        "<limit>" },
     { 910, "encryption-required", "Encrypt all peer connections", "er", 0, NULL },
     { 911, "encryption-preferred", "Prefer encrypted peer connections", "ep", 0, NULL },
     { 912, "encryption-tolerated", "Prefer unencrypted peer connections", "et", 0, NULL },
     { 'i', "bind-address-ipv4", "Where to listen for peer connections", "i", 1, "<ipv4 addr>" },
     { 'I', "bind-address-ipv6", "Where to listen for peer connections", "I", 1, "<ipv6 addr>" },
     { 'r', "rpc-bind-address", "Where to listen for RPC connections", "r", 1, "<ip addr>" },
-    { 953, "global-seedratio", "All torrents, unless overridden by a per-torrent setting, should seed until a specific ratio", "gsr", 1, "ratio" },
-    { 954, "no-global-seedratio", "All torrents, unless overridden by a per-torrent setting, should seed regardless of ratio", "GSR", 0, NULL },
+    { 953, "global-seedratio", "All torrents, unless overridden by a per-torrent setting, should seed until a specific ratio",
+        "gsr", 1, "ratio" },
+    { 954, "no-global-seedratio", "All torrents, unless overridden by a per-torrent setting, should seed regardless of ratio",
+        "GSR", 0, NULL },
     { 'x', "pid-file", "Enable PID file", "x", 1, "<pid-file>" },
     { 0, NULL, NULL, NULL, 0, NULL }
 };
@@ -147,8 +151,8 @@ static bool reopen_log_file(char const* filename)
 {
     tr_error* error = NULL;
     tr_sys_file_t const old_log_file = logfile;
-    tr_sys_file_t const new_log_file = tr_sys_file_open(filename, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_APPEND, 0666,
-        &error);
+    tr_sys_file_t const new_log_file = tr_sys_file_open(filename, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_APPEND,
+        0666, &error);
 
     if (new_log_file == TR_BAD_SYS_FILE)
     {
@@ -648,7 +652,8 @@ static int daemon_start(void* raw_arg, bool foreground)
     if (pid_filename != NULL && *pid_filename != '\0')
     {
         tr_error* error = NULL;
-        tr_sys_file_t fp = tr_sys_file_open(pid_filename, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE, 0666, &error);
+        tr_sys_file_t fp = tr_sys_file_open(pid_filename, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE, 0666,
+            &error);
 
         if (fp != TR_BAD_SYS_FILE)
         {
@@ -791,38 +796,23 @@ cleanup:
     return 0;
 }
 
-int tr_main(int argc, char* argv[])
+static bool init_daemon_data(int argc, char* argv[], struct daemon_data* data, bool* foreground, int* ret)
 {
-    dtr_callbacks const cb =
-    {
-        .on_start = &daemon_start,
-        .on_stop = &daemon_stop,
-        .on_reconfigure = &daemon_reconfigure,
-    };
-
-    int ret;
-    bool loaded;
-    bool dumpSettings;
-    bool foreground;
-    tr_error* error = NULL;
-
-    struct daemon_data arg;
-    tr_variant* const settings = &arg.settings;
-    char const** const configDir = &arg.configDir;
-
-    key_pidfile = tr_quark_new("pidfile", 7);
-    key_watch_dir_force_generic = tr_quark_new("watch-dir-force-generic", 23);
+    data->configDir = getConfigDir(argc, (char const* const*)argv);
 
     /* load settings from defaults + config file */
-    tr_variantInitDict(settings, 0);
-    tr_variantDictAddBool(settings, TR_KEY_rpc_enabled, true);
-    *configDir = getConfigDir(argc, (char const* const*)argv);
-    loaded = tr_sessionLoadSettings(settings, *configDir, MY_NAME);
+    tr_variantInitDict(&data->settings, 0);
+    tr_variantDictAddBool(&data->settings, TR_KEY_rpc_enabled, true);
+    bool const loaded = tr_sessionLoadSettings(&data->settings, data->configDir, MY_NAME);
 
-    /* overwrite settings from the comamndline */
-    if (!parse_args(argc, (char const**)argv, settings, &arg.paused, &dumpSettings, &foreground, &ret))
+    bool dumpSettings;
+
+    *ret = 0;
+
+    /* overwrite settings from the command line */
+    if (!parse_args(argc, (char const**)argv, &data->settings, &data->paused, &dumpSettings, foreground, ret))
     {
-        goto cleanup;
+        goto exit_early;
     }
 
     if (foreground && logfile == TR_BAD_SYS_FILE)
@@ -833,19 +823,49 @@ int tr_main(int argc, char* argv[])
     if (!loaded)
     {
         printMessage(logfile, TR_LOG_ERROR, MY_NAME, "Error loading config file -- exiting.", __FILE__, __LINE__);
-        ret = 1;
-        goto cleanup;
+        *ret = 1;
+        goto exit_early;
     }
 
     if (dumpSettings)
     {
-        char* str = tr_variantToStr(settings, TR_VARIANT_FMT_JSON, NULL);
+        char* str = tr_variantToStr(&data->settings, TR_VARIANT_FMT_JSON, NULL);
         fprintf(stderr, "%s", str);
         tr_free(str);
-        goto cleanup;
+        goto exit_early;
     }
 
-    if (!dtr_daemon(&cb, &arg, foreground, &ret, &error))
+    return true;
+
+exit_early:
+    tr_variantFree(&data->settings);
+    return false;
+}
+
+int tr_main(int argc, char* argv[])
+{
+    key_pidfile = tr_quark_new("pidfile", TR_BAD_SIZE);
+    key_watch_dir_force_generic = tr_quark_new("watch-dir-force-generic", TR_BAD_SIZE);
+
+    struct daemon_data data;
+    bool foreground;
+    int ret;
+
+    if (!init_daemon_data(argc, argv, &data, &foreground, &ret))
+    {
+        return ret;
+    }
+
+    dtr_callbacks const cb =
+    {
+        .on_start = &daemon_start,
+        .on_stop = &daemon_stop,
+        .on_reconfigure = &daemon_reconfigure,
+    };
+
+    tr_error* error = NULL;
+
+    if (!dtr_daemon(&cb, &data, foreground, &ret, &error))
     {
         char buf[256];
         tr_snprintf(buf, sizeof(buf), "Failed to daemonize: %s", error->message);
@@ -853,8 +873,6 @@ int tr_main(int argc, char* argv[])
         tr_error_free(error);
     }
 
-cleanup:
-    tr_variantFree(settings);
-
+    tr_variantFree(&data.settings);
     return ret;
 }

@@ -99,8 +99,8 @@ static struct tr_option const options[] =
 static char const* getUsage(void)
 {
     return "A fast and easy BitTorrent client\n"
-           "\n"
-           "Usage: " MY_READABLE_NAME " [options] <file|url|magnet>";
+        "\n"
+        "Usage: " MY_READABLE_NAME " [options] <file|url|magnet>";
 }
 
 static int parseCommandLine(tr_variant*, int argc, char const** argv);

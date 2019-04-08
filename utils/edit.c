@@ -204,23 +204,27 @@ static bool replaceURL(tr_variant* metainfo, char const* in, char const* out)
         tr_variant* tier;
         int tierCount = 0;
 
-        while ((tier = tr_variantListChild(announce_list, tierCount++)) != NULL)
+        while ((tier = tr_variantListChild(announce_list, tierCount)) != NULL)
         {
             tr_variant* node;
             int nodeCount = 0;
 
-            while ((node = tr_variantListChild(tier, nodeCount++)) != NULL)
+            while ((node = tr_variantListChild(tier, nodeCount)) != NULL)
             {
                 if (tr_variantGetStr(node, &str, NULL) && strstr(str, in) != NULL)
                 {
                     char* newstr = replaceSubstr(str, in, out);
-                    printf("\tReplaced in \"announce-list\" tier %d: \"%s\" --> \"%s\"\n", tierCount, str, newstr);
+                    printf("\tReplaced in \"announce-list\" tier %d: \"%s\" --> \"%s\"\n", tierCount + 1, str, newstr);
                     tr_variantFree(node);
                     tr_variantInitStr(node, newstr, TR_BAD_SIZE);
                     tr_free(newstr);
                     changed = true;
                 }
+
+                ++nodeCount;
             }
+
+            ++tierCount;
         }
     }
 
@@ -232,19 +236,23 @@ static bool announce_list_has_url(tr_variant* announce_list, char const* url)
     tr_variant* tier;
     int tierCount = 0;
 
-    while ((tier = tr_variantListChild(announce_list, tierCount++)) != NULL)
+    while ((tier = tr_variantListChild(announce_list, tierCount)) != NULL)
     {
         tr_variant* node;
         char const* str;
         int nodeCount = 0;
 
-        while ((node = tr_variantListChild(tier, nodeCount++)) != NULL)
+        while ((node = tr_variantListChild(tier, nodeCount)) != NULL)
         {
             if (tr_variantGetStr(node, &str, NULL) && strcmp(str, url) == 0)
             {
                 return true;
             }
+
+            ++nodeCount;
         }
+
+        ++tierCount;
     }
 
     return false;

@@ -686,7 +686,7 @@ void MainWindow::openAbout()
 void MainWindow::openHelp()
 {
     QDesktopServices::openUrl(QUrl(QString::fromLatin1("https://transmissionbt.com/help/gtk/%1.%2x").arg(MAJOR_VERSION).
-            arg(MINOR_VERSION / 10)));
+        arg(MINOR_VERSION / 10)));
 }
 
 void MainWindow::refreshTitle()
@@ -769,13 +769,13 @@ void MainWindow::refreshStatusBar()
     {
         tr_session_stats const& stats(mySession.getStats());
         str = tr("Down: %1, Up: %2").arg(Formatter::sizeToString(stats.downloadedBytes)).
-                arg(Formatter::sizeToString(stats.uploadedBytes));
+            arg(Formatter::sizeToString(stats.uploadedBytes));
     }
     else if (mode == TotalTransferStatsModeName)
     {
         tr_session_stats const& stats(mySession.getCumulativeStats());
         str = tr("Down: %1, Up: %2").arg(Formatter::sizeToString(stats.downloadedBytes)).
-                arg(Formatter::sizeToString(stats.uploadedBytes));
+            arg(Formatter::sizeToString(stats.uploadedBytes));
     }
     else // default is "total-ratio"
     {

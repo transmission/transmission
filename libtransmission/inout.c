@@ -89,7 +89,7 @@ static int readOrWriteBytes(tr_session* session, tr_torrent* tor, int ioMode, tr
             int const prealloc = (file->dnd || !doWrite) ? TR_PREALLOCATE_NONE : tor->session->preallocationMode;
 
             if ((fd = tr_fdFileCheckout(session, tor->uniqueId, fileIndex, filename, doWrite, prealloc,
-                    file->length)) == TR_BAD_SYS_FILE)
+                file->length)) == TR_BAD_SYS_FILE)
             {
                 err = errno;
                 tr_logAddTorErr(tor, "tr_fdFileCheckout failed for \"%s\": %s", filename, tr_strerror(err));

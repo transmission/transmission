@@ -29,6 +29,7 @@
 #include <ws2tcpip.h> /* WSAStartup() */
 #include <windows.h> /* Sleep(), GetSystemTimeAsFileTime(), GetEnvironmentVariable() */
 #include <shellapi.h> /* CommandLineToArgv() */
+#include <shlwapi.h> /* StrStrIA() */
 #else
 #include <sys/time.h>
 #include <unistd.h> /* getpagesize() */
@@ -456,6 +457,23 @@ char const* tr_memmem(char const* haystack, size_t haystacklen, char const* need
 #endif
 }
 
+char const* tr_strcasestr(char const* haystack, char const* needle)
+{
+#ifdef HAVE_STRCASESTR
+
+    return strcasestr(haystack, needle);
+
+#elif defined(_WIN32)
+
+    return StrStrIA(haystack, needle);
+
+#else
+
+#error please open a PR to implement tr_strcasestr() for your platform
+
+#endif
+}
+
 char* tr_strdup_printf(char const* fmt, ...)
 {
     va_list ap;
@@ -811,7 +829,7 @@ bool tr_urlIsValidTracker(char const* url)
     size_t const url_len = strlen(url);
 
     return isValidURLChars(url, url_len) && tr_urlParse(url, url_len, NULL, NULL, NULL, NULL) &&
-           (memcmp(url, "http://", 7) == 0 || memcmp(url, "https://", 8) == 0 || memcmp(url, "udp://", 6) == 0);
+        (memcmp(url, "http://", 7) == 0 || memcmp(url, "https://", 8) == 0 || memcmp(url, "udp://", 6) == 0);
 }
 
 bool tr_urlIsValid(char const* url, size_t url_len)
@@ -827,8 +845,8 @@ bool tr_urlIsValid(char const* url, size_t url_len)
     }
 
     return isValidURLChars(url, url_len) && tr_urlParse(url, url_len, NULL, NULL, NULL, NULL) &&
-           (memcmp(url, "http://", 7) == 0 || memcmp(url, "https://", 8) == 0 || memcmp(url, "ftp://", 6) == 0 ||
-           memcmp(url, "sftp://", 7) == 0);
+        (memcmp(url, "http://", 7) == 0 || memcmp(url, "https://", 8) == 0 || memcmp(url, "ftp://", 6) == 0 ||
+            memcmp(url, "sftp://", 7) == 0);
 }
 
 bool tr_addressIsIP(char const* str)
@@ -979,8 +997,8 @@ void tr_removeElementFromArray(void* array, unsigned int index_to_remove, size_t
         sizeof_element * (--nmemb - index_to_remove));
 }
 
-int tr_lowerBound(void const* key, void const* base, size_t nmemb, size_t size, int (* compar)(void const* key,
-    void const* arrayMember), bool* exact_match)
+int tr_lowerBound(void const* key, void const* base, size_t nmemb, size_t size, tr_voidptr_compare_func compar,
+    bool* exact_match)
 {
     size_t first = 0;
     char const* cbase = base;
@@ -1038,7 +1056,7 @@ int tr_lowerBound(void const* key, void const* base, size_t nmemb, size_t size, 
     } \
     while (0)
 
-static size_t quickfindPartition(char* base, size_t left, size_t right, size_t size, int (* compar)(void const*, void const*),
+static size_t quickfindPartition(char* base, size_t left, size_t right, size_t size, tr_voidptr_compare_func compar,
     size_t pivotIndex)
 {
     size_t storeIndex;
@@ -1081,12 +1099,11 @@ static size_t quickfindPartition(char* base, size_t left, size_t right, size_t s
     return storeIndex;
 }
 
-static void quickfindFirstK(char* base, size_t left, size_t right, size_t size, int (* compar)(void const*, void const*),
-    size_t k)
+static void quickfindFirstK(char* base, size_t left, size_t right, size_t size, tr_voidptr_compare_func compar, size_t k)
 {
     if (right > left)
     {
-        size_t const pivotIndex = left + (right - left) / 2u;
+        size_t const pivotIndex = left + (right - left) / 2U;
 
         size_t const pivotNewIndex = quickfindPartition(base, left, right, size, compar, pivotIndex);
 
@@ -1103,7 +1120,7 @@ static void quickfindFirstK(char* base, size_t left, size_t right, size_t size, 
 
 #ifdef TR_ENABLE_ASSERTS
 
-static void checkBestScoresComeFirst(char* base, size_t nmemb, size_t size, int (* compar)(void const*, void const*), size_t k)
+static void checkBestScoresComeFirst(char* base, size_t nmemb, size_t size, tr_voidptr_compare_func compar, size_t k)
 {
     size_t worstFirstPos = 0;
 
@@ -1128,7 +1145,7 @@ static void checkBestScoresComeFirst(char* base, size_t nmemb, size_t size, int 
 
 #endif
 
-void tr_quickfindFirstK(void* base, size_t nmemb, size_t size, int (* compar)(void const*, void const*), size_t k)
+void tr_quickfindFirstK(void* base, size_t nmemb, size_t size, tr_voidptr_compare_func compar, size_t k)
 {
     if (k < nmemb)
     {
@@ -1163,7 +1180,7 @@ static char* strip_non_utf8(char const* in, size_t inlen)
     return evbuffer_free_to_str(buf, NULL);
 }
 
-static char* to_utf8(const char* in, size_t inlen)
+static char* to_utf8(char const* in, size_t inlen)
 {
     char* ret = NULL;
 
@@ -1727,7 +1744,8 @@ bool tr_moveFile(char const* oldpath, char const* newpath, tr_error** error)
     while (bytesLeft > 0)
     {
         uint64_t const bytesThisPass = MIN(bytesLeft, buflen);
-        uint64_t numRead, bytesWritten;
+        uint64_t numRead;
+        uint64_t bytesWritten;
 
         if (!tr_sys_file_read(in, buf, bytesThisPass, &numRead, error))
         {
@@ -1975,7 +1993,7 @@ char* tr_formatter_size_B(char* buf, int64_t bytes, size_t buflen)
 
 static struct formatter_units speed_units;
 
-unsigned int tr_speed_K = 0u;
+unsigned int tr_speed_K = 0U;
 
 void tr_formatter_speed_init(unsigned int kilo, char const* kb, char const* mb, char const* gb, char const* tb)
 {
@@ -2015,7 +2033,7 @@ char* tr_formatter_speed_KBps(char* buf, double KBps, size_t buflen)
 
 static struct formatter_units mem_units;
 
-unsigned int tr_mem_K = 0u;
+unsigned int tr_mem_K = 0U;
 
 void tr_formatter_mem_init(unsigned int kilo, char const* kb, char const* mb, char const* gb, char const* tb)
 {

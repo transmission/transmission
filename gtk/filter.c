@@ -493,7 +493,7 @@ static gboolean test_torrent_activity(tr_torrent* tor, int type)
 
     case ACTIVITY_FILTER_ACTIVE:
         return st->peersSendingToUs > 0 || st->peersGettingFromUs > 0 || st->webseedsSendingToUs > 0 ||
-               st->activity == TR_STATUS_CHECK;
+            st->activity == TR_STATUS_CHECK;
 
     case ACTIVITY_FILTER_PAUSED:
         return st->activity == TR_STATUS_STOPPED;
@@ -779,7 +779,7 @@ static gboolean is_row_visible(GtkTreeModel* model, GtkTreeIter* iter, gpointer 
     text = (char const*)g_object_get_qdata(o, TEXT_KEY);
 
     return tor != NULL && test_tracker(tor, data->active_tracker_type, data->active_tracker_host) &&
-           test_torrent_activity(tor, data->active_activity_type) && testText(tor, text);
+        test_torrent_activity(tor, data->active_activity_type) && testText(tor, text);
 }
 
 static void selection_changed_cb(GtkComboBox* combo, gpointer vdata)
@@ -961,8 +961,8 @@ GtkWidget* gtr_filter_bar_new(tr_session* session, GtkTreeModel* tmodel, GtkTree
     gtk_box_pack_start(h_box, w, TRUE, TRUE, 0);
 
     /* add a spacer */
-    w = gtk_alignment_new(0.0f, 0.0f, 0.0f, 0.0f);
-    gtk_widget_set_size_request(w, 0u, GUI_PAD_BIG);
+    w = gtk_alignment_new(0.0F, 0.0F, 0.0F, 0.0F);
+    gtk_widget_set_size_request(w, 0U, GUI_PAD_BIG);
     gtk_box_pack_start(h_box, w, FALSE, FALSE, 0);
 
     /* add the tracker combobox */
@@ -970,8 +970,8 @@ GtkWidget* gtr_filter_bar_new(tr_session* session, GtkTreeModel* tmodel, GtkTree
     gtk_box_pack_start(h_box, w, TRUE, TRUE, 0);
 
     /* add a spacer */
-    w = gtk_alignment_new(0.0f, 0.0f, 0.0f, 0.0f);
-    gtk_widget_set_size_request(w, 0u, GUI_PAD_BIG);
+    w = gtk_alignment_new(0.0F, 0.0F, 0.0F, 0.0F);
+    gtk_widget_set_size_request(w, 0U, GUI_PAD_BIG);
     gtk_box_pack_start(h_box, w, FALSE, FALSE, 0);
 
     /* add the entry field */

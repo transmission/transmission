@@ -25,5 +25,7 @@
 @interface NSApplication (NSApplicationAdditions)
 
 - (BOOL) isOnYosemiteOrBetter;
+- (BOOL) isOnMojaveOrBetter;
+- (BOOL) isDarkMode;
 
 @end

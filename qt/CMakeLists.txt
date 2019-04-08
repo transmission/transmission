@@ -132,7 +132,11 @@ endif()
 tr_qt_add_resources(${PROJECT_NAME}_QRC_SOURCES ${${PROJECT_NAME}_QRC_FILES})
 
 set(${PROJECT_NAME}_LINGUAS
+    af
+    ca
+    da
     de
+    el
     en
     es
     eu
@@ -144,11 +148,13 @@ set(${PROJECT_NAME}_LINGUAS
     kk
     ko
     lt
+    nb
     nl
     pl
     pt_BR
     pt_PT
     ru
+    sl
     sv
     tr
     uk
