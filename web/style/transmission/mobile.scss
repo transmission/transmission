@@ -1,10 +1,10 @@
 @mixin verticalGradient($topColor, $bottomColor) {
 	background-color: mix($topColor, $bottomColor);
-	background-image: -webkit-gradient(linear, left top, left bottom, from($topColor), to($bottomColor)); 
-	background-image: -webkit-linear-gradient(top, $topColor, $bottomColor); 
-	background-image:    -moz-linear-gradient(top, $topColor, $bottomColor); 
-	background-image:     -ms-linear-gradient(top, $topColor, $bottomColor); 
-	background-image:      -o-linear-gradient(top, $topColor, $bottomColor); 
+	background-image: -webkit-gradient(linear, left top, left bottom, from($topColor), to($bottomColor));
+	background-image: -webkit-linear-gradient(top, $topColor, $bottomColor);
+	background-image:    -moz-linear-gradient(top, $topColor, $bottomColor);
+	background-image:     -ms-linear-gradient(top, $topColor, $bottomColor);
+	background-image:      -o-linear-gradient(top, $topColor, $bottomColor);
 	background-image:         linear-gradient(top, $topColor, $bottomColor);
 }
 
@@ -67,6 +67,14 @@ $selected-gradient-bottom: white;
 	@include roundedBox($radius);
 }
 
+$toolbar-gradient-top: #ddd;
+$toolbar-gradient-bottom: #bbb;
+$toolbar-height: 44px;
+
+$statusbar-gradient-top: #ddd;
+$statusbar-gradient-bottom: #bbb;
+$statusbar-height: 24px;
+
 /*--------------------------------------
  *
  * G L O B A L
@@ -96,6 +104,13 @@ body {
 	&.landscape div#torrent_container {	min-height: 147px; }
 	&.landscape div#dialog_container,
 	&.landscape div#torrent_inspector {	min-height: 143px; }
+
+	div#torrent_container,
+	div.dialog_container,
+	div#torrent_inspector {
+		position: relative;
+		top: calc(#{$toolbar-height} + #{$statusbar-height});
+	}
 }
 
 body.inspector_showing #torrent_filter_bar, body.inspector_showing #torrent_container,
@@ -111,15 +126,16 @@ body.open_showing #torrent_filter_bar, body.open_showing #torrent_container {
 ****
 ***/
 
-$toolbar-gradient-top: #ddd;
-$toolbar-gradient-bottom: #bbb;
-$toolbar-height: 39px;
-
 div#toolbar
 {
 	height: $toolbar-height;
 	margin: 0px;
 	padding: 2px;
+	box-sizing: border-box;
+	width: 100vw;
+	position: fixed;
+	top: 0;
+	z-index: 3;
 	border-bottom: 1px solid #AAA;
 	@include verticalGradient($toolbar-gradient-top, $toolbar-gradient-bottom);
 
@@ -183,17 +199,16 @@ div#toolbar
 ****
 ***/
 
-$statusbar-gradient-top: #ddd;
-$statusbar-gradient-bottom: #bbb;
-$statusbar-height: 24px;
-
 #statusbar
 {
 	height: $statusbar-height;
 	width: 100%;
 	border-bottom: 1px solid #AAA;
 	overflow: hidden;
-	position: relative;
+	box-sizing: border-box;
+	position: fixed;
+	top: $toolbar-height;
+	z-index: 3;
 	@include verticalGradient($statusbar-gradient-top, $statusbar-gradient-bottom);
 
 	#filter
@@ -305,7 +320,7 @@ ul.torrent_list
 	/**
 	 * Progressbar
 	 *
-	 * Each progressbar has three elemens: a parent container and two children,
+	 * Each progressbar has three elements: a parent container and two children,
 	 * complete and incomplete.
 	 *
 	 * The only thing needed to set the progressbar percentage is to set
@@ -570,7 +585,7 @@ div#torrent_inspector
 
 	div.inspector_torrent_file_list_entry_name {
 		font-size: 1.2em;
-		color: black; 
+		color: black;
 		display: inline;
 		margin-left: 0px;
 	}
@@ -823,7 +838,7 @@ div.dialog_container a {
 
 #torrent_context_menu {
   font-size: 1em;
-  z-index: 3;
+  z-index: 4;
 }
 
 iframe#torrent_upload_frame {

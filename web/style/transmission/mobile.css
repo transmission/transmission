@@ -31,6 +31,14 @@ body {
   body.landscape div#dialog_container, body.landscape div#torrent_inspector {
     min-height: 143px; }
 
+  body div#torrent_container,
+  body div.dialog_container,
+  body div#torrent_inspector {
+    position: relative;
+    top: calc(44px + 24px);
+  }
+
+
 body.inspector_showing #torrent_filter_bar, body.inspector_showing #torrent_container,
 body.dialog_showing #torrent_filter_bar, body.dialog_showing #torrent_container, body.dialog_showing #torrent_inspector,
 body.prefs_showing #torrent_inspector, body.prefs_showing #torrent_filter_bar, body.prefs_showing #torrent_container,
@@ -43,9 +51,14 @@ body.open_showing #torrent_filter_bar, body.open_showing #torrent_container {
 ****
 ***/
 div#toolbar {
-  height: 39px;
+  height: 44px;
   margin: 0px;
   padding: 2px;
+  box-sizing: border-box;
+  width: 100vw;
+  position: fixed;
+  top: 0;
+  z-index: 3;
   border-bottom: 1px solid #AAA;
   background-color: #cccccc;
   background-image: -webkit-gradient(linear, left top, left bottom, from(#ddd), to(#bbb));
@@ -105,7 +118,10 @@ div#toolbar {
   width: 100%;
   border-bottom: 1px solid #AAA;
   overflow: hidden;
-  position: relative;
+  box-sizing: border-box;
+  position: fixed;
+  top: 44px;
+  z-index: 3;
   background-color: #cccccc;
   background-image: -webkit-gradient(linear, left top, left bottom, from(#ddd), to(#bbb));
   background-image: -webkit-linear-gradient(top, #ddd, #bbb);
@@ -949,7 +965,7 @@ div.dialog_container a {
 
 #torrent_context_menu {
   font-size: 1em;
-  z-index: 3; }
+  z-index: 4; }
 
 iframe#torrent_upload_frame {
   display: block;
