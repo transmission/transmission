@@ -89,7 +89,7 @@ static char* getTorrentFilename(tr_session const* session, tr_info const* inf, e
 static bool path_component_is_suspicious(char const* component)
 {
     return component == NULL || strpbrk(component, PATH_DELIMITER_CHARS) != NULL || strcmp(component, ".") == 0 ||
-           strcmp(component, "..") == 0;
+        strcmp(component, "..") == 0;
 }
 
 static bool getfile(char** setme, char const* root, tr_variant* path, struct evbuffer* buf)
@@ -233,7 +233,6 @@ static char const* parseFiles(tr_info* inf, tr_variant* files, tr_variant const*
 static char* tr_convertAnnounceToScrape(char const* announce)
 {
     char* scrape = NULL;
-    char const* s;
 
     /* To derive the scrape URL use the following steps:
      * Begin with the announce URL. Find the last '/' in it.
@@ -241,14 +240,20 @@ static char* tr_convertAnnounceToScrape(char const* announce)
      * it will be taken as a sign that that tracker doesn't support
      * the scrape convention. If it does, substitute 'scrape' for
      * 'announce' to find the scrape page. */
-    if ((s = strrchr(announce, '/')) != NULL && strncmp(++s, "announce", 8) == 0)
+
+    char const* s = strrchr(announce, '/');
+
+    if (s != NULL && strncmp(s + 1, "announce", 8) == 0)
     {
         char const* prefix = announce;
-        size_t const prefix_len = s - announce;
-        char const* suffix = s + 8;
+        size_t const prefix_len = s + 1 - announce;
+        char const* suffix = s + 1 + 8;
         size_t const suffix_len = strlen(suffix);
         size_t const alloc_len = prefix_len + 6 + suffix_len + 1;
-        char* walk = scrape = tr_new(char, alloc_len);
+
+        scrape = tr_new(char, alloc_len);
+
+        char* walk = scrape;
         memcpy(walk, prefix, prefix_len);
         walk += prefix_len;
         memcpy(walk, "scrape", 6);
@@ -256,7 +261,8 @@ static char* tr_convertAnnounceToScrape(char const* announce)
         memcpy(walk, suffix, suffix_len);
         walk += suffix_len;
         *walk++ = '\0';
-        TR_ASSERT(walk - scrape == (int)alloc_len);
+
+        TR_ASSERT((size_t)(walk - scrape) == alloc_len);
     }
     /* Some torrents with UDP announce URLs don't have /announce. */
     else if (strncmp(announce, "udp:", 4) == 0)
@@ -626,7 +632,8 @@ static char const* tr_metainfoParseImpl(tr_session const* session, tr_info* inf,
     /* files */
     if (!isMagnet)
     {
-        if ((str = parseFiles(inf, tr_variantDictFind(infoDict, TR_KEY_files), tr_variantDictFind(infoDict, TR_KEY_length))) != NULL)
+        if ((str = parseFiles(inf, tr_variantDictFind(infoDict, TR_KEY_files), tr_variantDictFind(infoDict,
+            TR_KEY_length))) != NULL)
         {
             return str;
         }

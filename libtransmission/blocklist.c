@@ -301,9 +301,41 @@ static bool parseLine2(char const* line, struct tr_ipv4_range* range)
     return true;
 }
 
+/*
+ * CIDR notation: "0.0.0.0/8", IPv4 only
+ * https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing#CIDR_notation
+ */
+static bool parseLine3(char const* line, struct tr_ipv4_range* range)
+{
+    unsigned int ip[4];
+    unsigned int pflen;
+    uint32_t ip_u;
+    uint32_t mask = 0xffffffff;
+
+    if (sscanf(line, "%u.%u.%u.%u/%u", &ip[0], &ip[1], &ip[2], &ip[3], &pflen) != 5)
+    {
+        return false;
+    }
+
+    if (pflen > 32 || ip[0] > 0xff || ip[1] > 0xff || ip[2] > 0xff || ip[3] > 0xff)
+    {
+        return false;
+    }
+
+    /* this is host order */
+    mask <<= 32 - pflen;
+    ip_u = ip[0] << 24 | ip[1] << 16 | ip[2] << 8 | ip[3];
+
+    /* fill the non-prefix bits the way we need it */
+    range->begin = ip_u & mask;
+    range->end = ip_u | (~mask);
+
+    return true;
+}
+
 static bool parseLine(char const* line, struct tr_ipv4_range* range)
 {
-    return parseLine1(line, range) || parseLine2(line, range);
+    return parseLine1(line, range) || parseLine2(line, range) || parseLine3(line, range);
 }
 
 static int compareAddressRangesByFirstAddress(void const* va, void const* vb)

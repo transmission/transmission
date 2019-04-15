@@ -59,7 +59,7 @@ tr_option const opts[] =
 char const* getUsage()
 {
     return "Usage:\n"
-           "  transmission [OPTIONS...] [torrent files]";
+        "  transmission [OPTIONS...] [torrent files]";
 }
 
 enum

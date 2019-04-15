@@ -20,7 +20,7 @@
 
 struct tr_session_stats const TR_SESSION_STATS_INIT =
 {
-    .ratio = 0.0f,
+    .ratio = 0.0F,
     .uploadedBytes = 0,
     .downloadedBytes = 0,
     .filesAdded = 0,

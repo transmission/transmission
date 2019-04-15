@@ -113,12 +113,12 @@ void MakeProgressDialog::onProgress()
     else if (b.result == TR_MAKEMETA_IO_READ)
     {
         str = tr("Error reading \"%1\": %2").arg(QString::fromUtf8(b.errfile)).
-                arg(QString::fromLocal8Bit(tr_strerror(b.my_errno)));
+            arg(QString::fromLocal8Bit(tr_strerror(b.my_errno)));
     }
     else if (b.result == TR_MAKEMETA_IO_WRITE)
     {
         str = tr("Error writing \"%1\": %2").arg(QString::fromUtf8(b.errfile)).
-                arg(QString::fromLocal8Bit(tr_strerror(b.my_errno)));
+            arg(QString::fromLocal8Bit(tr_strerror(b.my_errno)));
     }
 
     ui.progressLabel->setText(str);
@@ -221,7 +221,7 @@ void MakeDialog::onSourceChanged()
         QString files = tr("%Ln File(s)", nullptr, myBuilder->fileCount);
         QString pieces = tr("%Ln Piece(s)", nullptr, myBuilder->pieceCount);
         text = tr("%1 in %2; %3 @ %4").arg(Formatter::sizeToString(myBuilder->totalSize)).arg(files).arg(pieces).
-                arg(Formatter::sizeToString(myBuilder->pieceSize));
+            arg(Formatter::sizeToString(myBuilder->pieceSize));
     }
 
     ui.sourceSizeLabel->setText(text);

@@ -222,7 +222,7 @@ void RpcClient::networkRequestFinished(QNetworkReply* reply)
     reply->deleteLater();
 
     QFutureInterface<RpcResponse> promise = reply->property(REQUEST_FUTUREINTERFACE_PROPERTY_KEY).
-            value<QFutureInterface<RpcResponse>>();
+        value<QFutureInterface<RpcResponse>>();
 
 #ifdef DEBUG_HTTP
     std::cerr << "http response header: " << std::endl;

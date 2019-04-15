@@ -49,6 +49,8 @@ struct tr_variant;
 
 typedef int8_t tr_priority_t;
 
+typedef int (* tr_voidptr_compare_func)(void const* lhs, void const* rhs);
+
 #define TR_RPC_SESSION_ID_HEADER "X-Transmission-Session-Id"
 
 typedef enum

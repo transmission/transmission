@@ -19,12 +19,14 @@
 #include "libtransmission-test.h"
 
 static char const* contents1 =
+    "10.5.6.7/8\n"
     "Austin Law Firm:216.16.1.144-216.16.1.151\n"
     "Sargent Controls and Aerospace:216.19.18.0-216.19.18.255\n"
     "Corel Corporation:216.21.157.192-216.21.157.223\n"
     "Fox Speed Channel:216.79.131.192-216.79.131.223\n";
 
 static char const* contents2 =
+    "10.5.6.7/8\n"
     "Austin Law Firm:216.16.1.144-216.16.1.151\n"
     "Sargent Controls and Aerospace:216.19.18.0-216.19.18.255\n"
     "Corel Corporation:216.21.157.192-216.21.157.223\n"
@@ -70,7 +72,7 @@ static int test_parsing(void)
     tr_free(path);
     tr_sessionReloadBlocklists(session);
     check(tr_blocklistExists(session));
-    check_int(tr_blocklistGetRuleCount(session), ==, 4);
+    check_int(tr_blocklistGetRuleCount(session), ==, 5);
 
     /* enable the blocklist */
     check(!tr_blocklistIsEnabled(session));
@@ -78,6 +80,8 @@ static int test_parsing(void)
     check(tr_blocklistIsEnabled(session));
 
     /* test blocked addresses */
+    check(!address_is_blocked(session, "0.0.0.1"));
+    check(address_is_blocked(session, "10.1.2.3"));
     check(!address_is_blocked(session, "216.16.1.143"));
     check(address_is_blocked(session, "216.16.1.144"));
     check(address_is_blocked(session, "216.16.1.145"));
@@ -116,22 +120,22 @@ static int test_updating(void)
     /* test that updated source files will get loaded */
     create_text_file(path, contents1);
     tr_sessionReloadBlocklists(session);
-    check_int(tr_blocklistGetRuleCount(session), ==, 4);
+    check_int(tr_blocklistGetRuleCount(session), ==, 5);
 
     /* test that updated source files will get loaded */
     create_text_file(path, contents2);
     tr_sessionReloadBlocklists(session);
-    check_int(tr_blocklistGetRuleCount(session), ==, 5);
+    check_int(tr_blocklistGetRuleCount(session), ==, 6);
 
     /* test that updated source files will get loaded */
     create_text_file(path, contents1);
     tr_sessionReloadBlocklists(session);
-    check_int(tr_blocklistGetRuleCount(session), ==, 4);
+    check_int(tr_blocklistGetRuleCount(session), ==, 5);
 
     /* ensure that new files, if bad, get skipped */
     create_text_file(path, "# nothing useful\n");
     tr_sessionReloadBlocklists(session);
-    check_int(tr_blocklistGetRuleCount(session), ==, 4);
+    check_int(tr_blocklistGetRuleCount(session), ==, 5);
 
     /* cleanup */
     libttest_session_close(session);

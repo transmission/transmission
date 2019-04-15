@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2005-2012 Transmission authors and contributors
+ * Copyright (c) 2005-2019 Transmission authors and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -1441,7 +1441,7 @@ static void removeKeRangerRansomware()
             alert.informativeText = message;
             [alert addButtonWithTitle:NSLocalizedString(@"Remove", "Removal confirm panel -> button")];
             [alert addButtonWithTitle:NSLocalizedString(@"Cancel", "Removal confirm panel -> button")];
-            
+
             [alert beginSheetModalForWindow:fWindow
                           completionHandler:^(NSModalResponse returnCode) {
                               if (returnCode == NSAlertFirstButtonReturn) {
