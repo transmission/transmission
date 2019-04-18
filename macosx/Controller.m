@@ -1269,8 +1269,14 @@ static void removeKeRangerRansomware()
             else
                 urlString = [@"http://" stringByAppendingString: urlString];
         }
+        
+        NSURL * url = [NSURL URLWithString: urlString];
+        if (url == nil)
+        {
+            return;
+        }
 
-        NSURLRequest * request = [NSURLRequest requestWithURL: [NSURL URLWithString: urlString]
+        NSURLRequest * request = [NSURLRequest requestWithURL: url
                                     cachePolicy: NSURLRequestReloadIgnoringLocalAndRemoteCacheData timeoutInterval: 60];
 
         if (fPendingTorrentDownloads[[request URL]])
