@@ -1273,6 +1273,7 @@ static void removeKeRangerRansomware()
         NSURL * url = [NSURL URLWithString: urlString];
         if (url == nil)
         {
+            NSLog(@"Detected non-URL string \"%@\". Ignoring.", urlString);
             return;
         }
 
