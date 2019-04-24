@@ -74,7 +74,7 @@ static void tr_prefs_init_defaults(tr_variant* d)
         dir = tr_getDefaultDownloadDir();
     }
 
-    tr_variantDictReserve(d, 29);
+    tr_variantDictReserve(d, 31);
     tr_variantDictAddStr(d, TR_KEY_watch_dir, dir);
     tr_variantDictAddBool(d, TR_KEY_watch_dir_enabled, FALSE);
     tr_variantDictAddBool(d, TR_KEY_user_has_given_informed_consent, FALSE);
