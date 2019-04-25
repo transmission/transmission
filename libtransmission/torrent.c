@@ -3467,7 +3467,7 @@ void tr_torrentGotBlock(tr_torrent* tor, tr_block_index_t block)
 ****
 ***/
 
-static void tr_findFileInDir(char const* name, char const* searchDir, char const** base, char const** subpath,
+static void find_file_in_dir(char const* name, char const* search_dir, char const** base, char const** subpath,
     tr_sys_path_info* file_info)
 {
     char* filename = tr_buildPath(searchDir, name, NULL);
