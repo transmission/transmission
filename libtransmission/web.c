@@ -391,41 +391,6 @@ struct tr_web_task* tr_webRunWebseed(tr_torrent* tor, char const* url, char cons
     return tr_webRunImpl(tor->session, tr_torrentId(tor), url, range, NULL, done_func, done_func_user_data, buffer);
 }
 
-/**
- * Portability wrapper for select().
- *
- * http://msdn.microsoft.com/en-us/library/ms740141%28VS.85%29.aspx
- * On win32, any two of the parameters, readfds, writefds, or exceptfds,
- * can be given as null. At least one must be non-null, and any non-null
- * descriptor set must contain at least one handle to a socket.
- */
-static void tr_select(int nfds, fd_set* r_fd_set, fd_set* w_fd_set, fd_set* c_fd_set, struct timeval* t)
-{
-#ifdef _WIN32
-
-    (void)nfds;
-
-    if (r_fd_set->fd_count == 0 && w_fd_set->fd_count == 0 && c_fd_set->fd_count == 0)
-    {
-        long int const msec = t->tv_sec * 1000 + t->tv_usec / 1000;
-        tr_wait_msec(msec);
-    }
-    else if (select(0, r_fd_set->fd_count != 0 ? r_fd_set : NULL, w_fd_set->fd_count != 0 ? w_fd_set : NULL,
-        c_fd_set->fd_count != 0 ? c_fd_set : NULL, t) == -1)
-    {
-        char errstr[512];
-        int const e = EVUTIL_SOCKET_ERROR();
-        tr_net_strerror(errstr, sizeof(errstr), e);
-        dbgmsg("Error: select (%d) %s", e, errstr);
-    }
-
-#else
-
-    select(nfds, r_fd_set, w_fd_set, c_fd_set, t);
-
-#endif
-}
-
 static void tr_webThreadFunc(void* vsession)
 {
     char* str;
@@ -538,28 +503,11 @@ static void tr_webThreadFunc(void* vsession)
 
         if (msec > 0)
         {
-            int usec;
-            int max_fd;
-            struct timeval t;
-            fd_set r_fd_set;
-            fd_set w_fd_set;
-            fd_set c_fd_set;
-
-            max_fd = 0;
-            FD_ZERO(&r_fd_set);
-            FD_ZERO(&w_fd_set);
-            FD_ZERO(&c_fd_set);
-            curl_multi_fdset(multi, &r_fd_set, &w_fd_set, &c_fd_set, &max_fd);
-
             if (msec > THREADFUNC_MAX_SLEEP_MSEC)
             {
                 msec = THREADFUNC_MAX_SLEEP_MSEC;
             }
-
-            usec = msec * 1000;
-            t.tv_sec = usec / 1000000;
-            t.tv_usec = usec % 1000000;
-            tr_select(max_fd + 1, &r_fd_set, &w_fd_set, &c_fd_set, &t);
+            curl_multi_wait(multi, NULL, 0, msec, NULL);
         }
 
         /* call curl_multi_perform() */
