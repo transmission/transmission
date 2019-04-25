@@ -396,6 +396,7 @@ static void tr_webThreadFunc(void* vsession)
     int taskCount = 0;
     struct tr_web_task* task;
     tr_session* session = vsession;
+    uint32_t repeats = 0;
 
     /* try to enable ssl for https support; but if that fails,
      * try a plain vanilla init */
@@ -435,6 +436,7 @@ static void tr_webThreadFunc(void* vsession)
     for (;;)
     {
         long msec;
+        int numfds;
         int unused;
         CURLMsg* msg;
         CURLMcode mcode;
@@ -504,7 +506,23 @@ static void tr_webThreadFunc(void* vsession)
             {
                 msec = THREADFUNC_MAX_SLEEP_MSEC;
             }
-            curl_multi_wait(multi, NULL, 0, msec, NULL);
+
+            curl_multi_wait(multi, NULL, 0, msec, &numfds);
+            if (!numfds)
+            {
+                repeats++;
+                if (repeats > 1)
+                {
+                    /* curl_multi_wait() returns immediately if there are
+                     * no fds to wait for, so we need an explicit wait here
+                     * to emulate select() behavior */
+                    tr_wait_msec(MIN(msec, THREADFUNC_MAX_SLEEP_MSEC / 2));
+                }
+            }
+            else
+            {
+                repeats = 0;
+            }
         }
 
         /* call curl_multi_perform() */
