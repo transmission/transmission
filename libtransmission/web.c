@@ -11,9 +11,6 @@
 #ifdef _WIN32
 #include <windows.h>
 #include <wincrypt.h>
-#include <ws2tcpip.h>
-#else
-#include <sys/select.h>
 #endif
 
 #include <curl/curl.h>
