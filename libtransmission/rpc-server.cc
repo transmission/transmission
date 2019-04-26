@@ -1144,7 +1144,7 @@ tr_rpc_server* tr_rpcInit(tr_session* session, tr_variant* settings)
     }
     else
     {
-        if (url_len == 0 || str[url_len-1] != '/')
+        if (url_len == 0 || str[url_len - 1] != '/')
         {
             s->url = tr_strdup_printf("%s/", str);
         }
