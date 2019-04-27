@@ -674,7 +674,8 @@ static void handle_request(struct evhttp_request* req, void* arg)
 
         server->loginattempts = 0;
 
-        char* location = strstr(req->uri, server->url) ? req->uri + strlen(server->url) : NULL;
+        size_t const server_url_len = strlen(server->url);
+        char const* const location = strncmp(req->uri, server->url, server_url_len) == 0 ? req->uri + server_url_len : NULL;
 
         if (location == NULL || location[0] == '\0' ||
             (strncmp(location, "web", 3) == 0 && location[3] == '\0'))
