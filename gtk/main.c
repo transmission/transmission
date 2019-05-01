@@ -816,7 +816,7 @@ static gboolean winclose(GtkWidget* w UNUSED, GdkEvent* event UNUSED, gpointer g
     }
     else if (gtr_pref_flag_get(TR_KEY_minimize_on_close))
     {
-       gtk_window_iconify (cbdata->wind);
+        gtk_window_iconify (cbdata->wind);
     }
     else
     {
