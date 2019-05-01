@@ -203,6 +203,7 @@ static struct tr_key_struct const my_static[] =
     Q("method"),
     Q("min interval"),
     Q("min_request_interval"),
+    Q("minimize_on_close"),
     Q("move"),
     Q("msg_type"),
     Q("mtimes"),

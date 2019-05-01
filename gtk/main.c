@@ -814,6 +814,10 @@ static gboolean winclose(GtkWidget* w UNUSED, GdkEvent* event UNUSED, gpointer g
     {
         gtr_action_activate("toggle-main-window");
     }
+    else if (gtr_pref_flag_get(TR_KEY_minimize_on_close))
+    {
+       gtk_window_iconify (cbdata->wind);
+    }
     else
     {
         on_app_exit(cbdata);

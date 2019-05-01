@@ -203,6 +203,7 @@ enum
     TR_KEY_method,
     TR_KEY_min_interval,
     TR_KEY_min_request_interval,
+    TR_KEY_minimize_on_close,
     TR_KEY_move,
     TR_KEY_msg_type,
     TR_KEY_mtimes,

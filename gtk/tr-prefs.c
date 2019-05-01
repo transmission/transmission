@@ -372,6 +372,10 @@ static GtkWidget* desktopPage(GObject* core)
     w = new_check_button(s, TR_KEY_show_notification_area_icon, core);
     hig_workarea_add_wide_control(t, &row, w);
 
+    s = _("Minimize window instead of closing");
+    w = new_check_button(s, TR_KEY_minimize_on_close, core);
+    hig_workarea_add_wide_control(t, &row, w);
+
     hig_workarea_add_section_divider(t, &row);
     hig_workarea_add_section_title(t, &row, _("Notification"));
 
