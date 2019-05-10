@@ -1568,7 +1568,7 @@ msgstr "Uprednostniť šifrovanie"
 
 #: ../gtk/tr-prefs.c:489
 msgid "Require encryption"
-msgstr "Vyžadovať šiforvanie"
+msgstr "Vyžadovať šifrovanie"
 
 #: ../gtk/tr-prefs.c:511 ../gtk/tr-prefs.c:1258
 msgid "Privacy"
