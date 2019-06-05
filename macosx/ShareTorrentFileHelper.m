@@ -24,11 +24,11 @@
 
 - (NSArray *) shareTorrentURLs
 {
-    NSArray * torrents = [(Controller *)NSApp.delegate selectedTorrents];
+    NSArray * torrents = ((Controller *)NSApp.delegate).selectedTorrents;
     NSMutableArray * fileURLs = [NSMutableArray arrayWithCapacity: torrents.count];
     for (Torrent * torrent in torrents)
     {
-        NSString * location = [torrent torrentLocation];
+        NSString * location = torrent.torrentLocation;
         if (location.length > 0) {
             [fileURLs addObject: [NSURL fileURLWithPath: location]];
         }
@@ -38,7 +38,7 @@
 
 - (NSArray *) menuItems
 {
-    NSArray * services = [NSSharingService sharingServicesForItems: [self shareTorrentURLs]];
+    NSArray * services = [NSSharingService sharingServicesForItems: self.shareTorrentURLs];
     NSMutableArray * items = [NSMutableArray arrayWithCapacity: services.count];
     for (NSSharingService * service in services)
     {
@@ -58,7 +58,7 @@
 - (void) performShareAction: (NSMenuItem *) item
 {
     NSSharingService * service = item.representedObject;
-    [service performWithItems: [self shareTorrentURLs]]; // on 10.9, use attachmentFileURLs?
+    [service performWithItems: self.shareTorrentURLs]; // on 10.9, use attachmentFileURLs?
 }
 
 @end

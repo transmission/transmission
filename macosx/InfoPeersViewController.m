@@ -38,7 +38,7 @@
 - (void) setupInfo;
 
 - (void) setWebSeedTableHidden: (BOOL) hide animate: (BOOL) animate;
-@property (nonatomic, readonly, copy) NSArray *peerSortDescriptors;
+@property (nonatomic, readonly) NSArray *peerSortDescriptors;
 
 @end
 
@@ -138,33 +138,33 @@
     BOOL anyActive = false;
     for (Torrent * torrent in fTorrents)
     {
-        if ([torrent webSeedCount] > 0)
-            [fWebSeeds addObjectsFromArray: [torrent webSeeds]];
+        if (torrent.webSeedCount > 0)
+            [fWebSeeds addObjectsFromArray: torrent.webSeeds];
 
-        if ([torrent isActive])
+        if (torrent.active)
         {
             anyActive = YES;
-            [fPeers addObjectsFromArray: [torrent peers]];
+            [fPeers addObjectsFromArray: torrent.peers];
 
-            const NSUInteger connectedThis = [torrent totalPeersConnected];
+            const NSUInteger connectedThis = torrent.totalPeersConnected;
             if (connectedThis > 0)
             {
-                connected += [torrent totalPeersConnected];
-                tracker += [torrent totalPeersTracker];
-                incoming += [torrent totalPeersIncoming];
-                cache += [torrent totalPeersCache];
-                lpd += [torrent totalPeersLocal];
-                pex += [torrent totalPeersPex];
-                dht += [torrent totalPeersDHT];
-                ltep += [torrent totalPeersLTEP];
+                connected += torrent.totalPeersConnected;
+                tracker += torrent.totalPeersTracker;
+                incoming += torrent.totalPeersIncoming;
+                cache += torrent.totalPeersCache;
+                lpd += torrent.totalPeersLocal;
+                pex += torrent.totalPeersPex;
+                dht += torrent.totalPeersDHT;
+                ltep += torrent.totalPeersLTEP;
 
-                toUs += [torrent peersSendingToUs];
-                fromUs += [torrent peersGettingFromUs];
+                toUs += torrent.peersSendingToUs;
+                fromUs += torrent.peersGettingFromUs;
             }
         }
     }
 
-    [fPeers sortUsingDescriptors: [self peerSortDescriptors]];
+    [fPeers sortUsingDescriptors: self.peerSortDescriptors];
     [fPeerTable reloadData];
 
     [fWebSeeds sortUsingDescriptors: fWebSeedTable.sortDescriptors];
@@ -317,7 +317,7 @@
     {
         if (fPeers)
         {
-            [fPeers sortUsingDescriptors: [self peerSortDescriptors]];
+            [fPeers sortUsingDescriptors: self.peerSortDescriptors];
             [tableView reloadData];
         }
     }
@@ -470,7 +470,7 @@
     else
     {
         [fTorrents enumerateObjectsWithOptions: NSEnumerationConcurrent usingBlock: ^(Torrent * torrent, NSUInteger idx, BOOL *stop) {
-            if ([torrent webSeedCount] > 0)
+            if (torrent.webSeedCount > 0)
             {
                 hasWebSeeds = YES;
                 *stop = YES;

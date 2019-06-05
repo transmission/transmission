@@ -19,7 +19,7 @@
 
     if (menuItem.enabled) {
         NSMenu *servicesMenu = [[NSMenu alloc] initWithTitle: @""];
-        for (NSMenuItem * item in [[ShareTorrentFileHelper sharedHelper] menuItems])
+        for (NSMenuItem * item in ShareTorrentFileHelper.sharedHelper.menuItems)
         {
             [servicesMenu addItem:item];
         }

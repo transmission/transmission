@@ -67,8 +67,8 @@
 - (void) setActionButtonHover: (NSInteger) row;
 
 - (void) selectValues: (NSArray *) values;
-@property (nonatomic, readonly, copy) NSArray *selectedValues;
-@property (nonatomic, readonly, copy) NSArray *selectedTorrents;
+@property (nonatomic, readonly) NSArray *selectedValues;
+@property (nonatomic, readonly) NSArray *selectedTorrents;
 
 - (NSRect) iconRectForRow: (NSInteger) row;
 

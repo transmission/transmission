@@ -52,7 +52,7 @@
 
 - (NSInteger) groupOrderValue
 {
-    return [[GroupsController groups] rowValueForIndex: fGroup];
+    return [GroupsController.groups rowValueForIndex: fGroup];
 }
 
 - (NSMutableArray *) torrents
@@ -65,8 +65,8 @@
     uint64_t uploaded = 0, downloaded = 0;
     for (Torrent * torrent in fTorrents)
     {
-        uploaded += [torrent uploadedTotal];
-        downloaded += [torrent downloadedTotal];
+        uploaded += torrent.uploadedTotal;
+        downloaded += torrent.downloadedTotal;
     }
 
     return tr_getRatio(uploaded, downloaded);
@@ -76,7 +76,7 @@
 {
     CGFloat rate = 0.0;
     for (Torrent * torrent in fTorrents)
-        rate += [torrent uploadRate];
+        rate += torrent.uploadRate;
 
     return rate;
 }
@@ -85,7 +85,7 @@
 {
     CGFloat rate = 0.0;
     for (Torrent * torrent in fTorrents)
-        rate += [torrent downloadRate];
+        rate += torrent.downloadRate;
 
     return rate;
 }

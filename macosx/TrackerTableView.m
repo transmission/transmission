@@ -52,11 +52,11 @@
         if (![item isKindOfClass: [TrackerNode class]])
         {
             for (++i; i < fTrackers.count && [fTrackers[i] isKindOfClass: [TrackerNode class]]; ++i)
-                [addresses addObject: [(TrackerNode *)fTrackers[i] fullAnnounceAddress]];
+                [addresses addObject: ((TrackerNode *)fTrackers[i]).fullAnnounceAddress];
             --i;
         }
         else
-            [addresses addObject: [(TrackerNode *)item fullAnnounceAddress]];
+            [addresses addObject: ((TrackerNode *)item).fullAnnounceAddress];
     }
 
     NSString * text = [addresses componentsJoinedByString: @"\n"];

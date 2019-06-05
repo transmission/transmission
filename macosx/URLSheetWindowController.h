@@ -38,6 +38,6 @@
 - (void) openURLEndSheet: (id) sender;
 - (void) openURLCancelEndSheet: (id) sender;
 
-@property (nonatomic, readonly, copy) NSString *urlString;
+@property (nonatomic, readonly) NSString *urlString;
 
 @end

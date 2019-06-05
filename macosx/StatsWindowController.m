@@ -46,7 +46,7 @@ tr_session * fLib = NULL;
     {
         if ((fStatsWindowInstance = [[self alloc] init]))
         {
-            fLib = [(Controller *)NSApp.delegate sessionHandle];
+            fLib = ((Controller *)NSApp.delegate).sessionHandle;
         }
     }
     return fStatsWindowInstance;
@@ -125,7 +125,7 @@ tr_session * fLib = NULL;
 {
     NSAssert1([identifier isEqualToString: @"StatsWindow"], @"Trying to restore unexpected identifier %@", identifier);
 
-    completionHandler([StatsWindowController statsWindow].window, nil);
+    completionHandler(StatsWindowController.statsWindow.window, nil);
 }
 
 - (void) resetStats: (id) sender
@@ -185,7 +185,7 @@ tr_session * fLib = NULL;
         : NSLocalizedString(@"Total N/A", "stats total");
     fRatioAllField.stringValue = totalRatioString;
 
-    if ([NSApp isOnYosemiteOrBetter]) {
+    if (NSApp.onYosemiteOrBetter) {
         static NSDateComponentsFormatter *timeFormatter;
         static dispatch_once_t onceToken;
         dispatch_once(&onceToken, ^{

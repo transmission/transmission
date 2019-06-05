@@ -43,8 +43,8 @@
 - (NSRect) rectForTitleWithString: (NSAttributedString *) string inBounds: (NSRect) bounds;
 - (NSRect) rectForStatusWithString: (NSAttributedString *) string withTitleRect: (NSRect) titleRect inBounds: (NSRect) bounds;
 
-@property (nonatomic, readonly, copy) NSAttributedString *attributedTitle;
-@property (nonatomic, readonly, copy) NSAttributedString *attributedStatus;
+@property (nonatomic, readonly) NSAttributedString *attributedTitle;
+@property (nonatomic, readonly) NSAttributedString *attributedStatus;
 
 @end
 
@@ -108,9 +108,10 @@
     [self.image drawInRect: [self imageRectForBounds: cellFrame] fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0 respectFlipped: YES hints: nil];
 
     NSColor * titleColor, * statusColor;
+    FileListNode * node = self.objectValue;
     if (self.backgroundStyle == NSBackgroundStyleDark)
         titleColor = statusColor = [NSColor whiteColor];
-    else if ([((FileListNode *)self.objectValue).torrent checkForFiles: ((FileListNode *)self.objectValue).indexes] == NSOffState)
+    else if ([node.torrent checkForFiles: node.indexes] == NSOffState)
         titleColor = statusColor = [NSColor disabledControlTextColor];
     else
     {
@@ -122,19 +123,19 @@
     fStatusAttributes[NSForegroundColorAttributeName] = statusColor;
 
     //title
-    NSAttributedString * titleString = [self attributedTitle];
+    NSAttributedString * titleString = self.attributedTitle;
     NSRect titleRect = [self rectForTitleWithString: titleString inBounds: cellFrame];
     [titleString drawInRect: titleRect];
 
     //status
-    NSAttributedString * statusString = [self attributedStatus];
+    NSAttributedString * statusString = self.attributedStatus;
     NSRect statusRect = [self rectForStatusWithString: statusString withTitleRect: titleRect inBounds: cellFrame];
     [statusString drawInRect: statusRect];
 }
 
 - (NSRect) expansionFrameWithFrame: (NSRect) cellFrame inView: (NSView *) view
 {
-    NSAttributedString * titleString = [self attributedTitle];
+    NSAttributedString * titleString = self.attributedTitle;
     NSRect realRect = [self rectForTitleWithString: titleString inBounds: cellFrame];
 
     if ([titleString size].width > NSWidth(realRect)
@@ -153,7 +154,7 @@
     cellFrame.origin.y += PADDING_EXPANSION_FRAME;
 
     fTitleAttributes[NSForegroundColorAttributeName] = [NSColor controlTextColor];
-    NSAttributedString * titleString = [self attributedTitle];
+    NSAttributedString * titleString = self.attributedTitle;
     [titleString drawInRect: cellFrame];
 }
 

@@ -162,7 +162,7 @@ GroupsController * fGroupsInstance = nil;
 
     dict[@"Color"] = color;
 
-    [[GroupsController groups] saveGroups];
+    [GroupsController.groups saveGroups];
     [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateGroups" object: self];
 }
 
@@ -181,7 +181,7 @@ GroupsController * fGroupsInstance = nil;
 
     dict[@"UsesCustomDownloadLocation"] = @(useCustomLocation);
 
-    [[GroupsController groups] saveGroups];
+    [GroupsController.groups saveGroups];
 }
 
 - (NSString *) customDownloadLocationForIndex: (NSInteger) index
@@ -195,7 +195,7 @@ GroupsController * fGroupsInstance = nil;
     NSMutableDictionary * dict = fGroups[[self rowValueForIndex: index]];
     dict[@"CustomDownloadLocation"] = location;
 
-    [[GroupsController groups] saveGroups];
+    [GroupsController.groups saveGroups];
 }
 
 - (BOOL) usesAutoAssignRulesForIndex: (NSInteger) index
@@ -214,7 +214,7 @@ GroupsController * fGroupsInstance = nil;
 
     dict[@"UsesAutoGroupRules"] = @(useAutoAssignRules);
 
-    [[GroupsController groups] saveGroups];
+    [GroupsController.groups saveGroups];
 }
 
 - (NSPredicate *) autoAssignRulesForIndex: (NSInteger) index
@@ -233,7 +233,7 @@ GroupsController * fGroupsInstance = nil;
     if (predicate)
     {
         dict[@"AutoGroupRules"] = predicate;
-        [[GroupsController groups] saveGroups];
+        [GroupsController.groups saveGroups];
     }
     else
     {

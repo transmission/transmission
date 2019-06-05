@@ -54,9 +54,9 @@ NSString * VDKQueueAccessRevocationNotification = @"VDKQueueAccessWasRevokedNoti
 
 - (instancetype) initWithPath:(NSString*)inPath andSubscriptionFlags:(u_int)flags NS_DESIGNATED_INITIALIZER;
 
-@property (atomic, copy) NSString *path;
-@property (atomic, assign) int watchedFD;
-@property (atomic, assign) u_int subscriptionFlags;
+@property (copy) NSString *path;
+@property int watchedFD;
+@property u_int subscriptionFlags;
 
 @end
 
@@ -183,7 +183,7 @@ NSString * VDKQueueAccessRevocationNotification = @"VDKQueueAccessWasRevokedNoti
         
         if (pathEntry)
         {
-            EV_SET(&ev, [pathEntry watchedFD], EVFILT_VNODE, EV_ADD | EV_ENABLE | EV_CLEAR, flags, 0, (__bridge void *) pathEntry);
+            EV_SET(&ev, pathEntry.watchedFD, EVFILT_VNODE, EV_ADD | EV_ENABLE | EV_CLEAR, flags, 0, (__bridge void *) pathEntry);
             
             pathEntry.subscriptionFlags = flags;
             

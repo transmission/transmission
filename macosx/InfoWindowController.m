@@ -366,7 +366,7 @@ typedef NS_ENUM(unsigned int, tabTag) {
 
 - (NSArray *) quickLookURLs
 {
-    return [fFileViewController quickLookURLs];
+    return fFileViewController.quickLookURLs;
 }
 
 - (BOOL) canQuickLook
@@ -374,7 +374,7 @@ typedef NS_ENUM(unsigned int, tabTag) {
     if (fCurrentTabTag != TAB_FILE_TAG || !self.window.visible)
         return NO;
 
-    return [fFileViewController canQuickLook];
+    return fFileViewController.canQuickLook;
 }
 
 - (NSRect) quickLookSourceFrameForPreviewItem: (id <QLPreviewItem>) item
@@ -404,9 +404,9 @@ typedef NS_ENUM(unsigned int, tabTag) {
             NSUInteger fileCount = 0, magnetCount = 0;
             for (Torrent * torrent in fTorrents)
             {
-                size += [torrent size];
-                fileCount += [torrent fileCount];
-                if ([torrent isMagnet])
+                size += torrent.size;
+                fileCount += torrent.fileCount;
+                if (torrent.magnet)
                     ++magnetCount;
             }
 
@@ -468,20 +468,20 @@ typedef NS_ENUM(unsigned int, tabTag) {
     {
         Torrent * torrent = fTorrents[0];
 
-        fImageView.image = [torrent icon];
+        fImageView.image = torrent.icon;
 
-        NSString * name = [torrent name];
+        NSString * name = torrent.name;
         fNameField.stringValue = name;
         fNameField.toolTip = name;
         fNameField.hidden = NO;
 
-        if (![torrent isMagnet])
+        if (!torrent.magnet)
         {
-            NSString * basicString = [NSString stringForFileSize: [torrent size]];
-            if ([torrent isFolder])
+            NSString * basicString = [NSString stringForFileSize: torrent.size];
+            if (torrent.folder)
             {
                 NSString * fileString;
-                const NSUInteger fileCount = [torrent fileCount];
+                const NSUInteger fileCount = torrent.fileCount;
                 if (fileCount == 1)
                     fileString = NSLocalizedString(@"1 file", "Inspector -> selected torrents");
                 else
@@ -493,7 +493,7 @@ typedef NS_ENUM(unsigned int, tabTag) {
 
             NSByteCountFormatter * formatter = [[NSByteCountFormatter alloc] init];
             formatter.allowedUnits = NSByteCountFormatterUseBytes;
-            fBasicInfoField.toolTip = [formatter stringFromByteCount: [torrent size]];
+            fBasicInfoField.toolTip = [formatter stringFromByteCount: torrent.size];
         }
         else
         {

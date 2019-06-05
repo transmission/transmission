@@ -48,7 +48,7 @@ BlocklistScheduler * fScheduler = nil;
 
 - (void) updateSchedule
 {
-    if ([BlocklistDownloader isRunning])
+    if (BlocklistDownloader.isRunning)
         return;
 
     [self cancelSchedule];

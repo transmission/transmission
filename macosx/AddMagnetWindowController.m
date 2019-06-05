@@ -55,7 +55,7 @@
 
         fController = controller;
 
-        fGroupValue = [torrent groupValue];
+        fGroupValue = torrent.groupValue;
         fGroupDeterminationType = TorrentDeterminationAutomatic;
     }
     return self;
@@ -66,7 +66,7 @@
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(updateGroupMenu:)
         name: @"UpdateGroups" object: nil];
 
-    NSString * name = [fTorrent name];
+    NSString * name = fTorrent.name;
     self.window.title = name;
     fNameField.stringValue = name;
     fNameField.toolTip = name;
@@ -75,13 +75,13 @@
     [fGroupPopUp selectItemWithTag: fGroupValue];
 
     NSInteger priorityIndex;
-    switch ([fTorrent priority])
+    switch (fTorrent.priority)
     {
         case TR_PRI_HIGH: priorityIndex = POPUP_PRIORITY_HIGH; break;
         case TR_PRI_NORMAL: priorityIndex = POPUP_PRIORITY_NORMAL; break;
         case TR_PRI_LOW: priorityIndex = POPUP_PRIORITY_LOW; break;
         default:
-            NSAssert1(NO, @"Unknown priority for adding torrent: %d", [fTorrent priority]);
+            NSAssert1(NO, @"Unknown priority for adding torrent: %d", fTorrent.priority);
             priorityIndex = POPUP_PRIORITY_NORMAL;
     }
     [fPriorityPopUp selectItemAtIndex: priorityIndex];
@@ -182,7 +182,7 @@
     panel.canCreateDirectories = YES;
 
     panel.message = [NSString stringWithFormat: NSLocalizedString(@"Select the download folder for \"%@\"",
-                        "Add -> select destination folder"), [fTorrent name]];
+                        "Add -> select destination folder"), fTorrent.name];
 
     [panel beginSheetModalForWindow: self.window completionHandler: ^(NSInteger result) {
         if (result == NSFileHandlingPanelOKButton)
@@ -197,7 +197,7 @@
 
 - (void) add: (id) sender
 {
-    if ([fDestination.lastPathComponent isEqualToString: [fTorrent name]]
+    if ([fDestination.lastPathComponent isEqualToString: fTorrent.name]
         && [[NSUserDefaults standardUserDefaults] boolForKey: @"WarningFolderDataSameName"])
     {
         NSAlert * alert = [[NSAlert alloc] init];
@@ -241,7 +241,7 @@
             NSAssert1(NO, @"Unknown priority tag for adding torrent: %ld", [sender tag]);
             priority = TR_PRI_NORMAL;
     }
-    [fTorrent setPriority: priority];
+    fTorrent.priority = priority;
 }
 
 - (void) updateGroupMenu: (NSNotification *) notification
@@ -289,7 +289,7 @@
 
 - (void) setGroupsMenu
 {
-    NSMenu * groupMenu = [[GroupsController groups] groupMenuWithTarget: self action: @selector(changeGroupValue:) isSmall: NO];
+    NSMenu * groupMenu = [GroupsController.groups groupMenuWithTarget: self action: @selector(changeGroupValue:) isSmall: NO];
     fGroupPopUp.menu = groupMenu;
 }
 
@@ -299,9 +299,9 @@
     fGroupValue = [sender tag];
     fGroupDeterminationType = TorrentDeterminationUserSpecified;
 
-    if ([[GroupsController groups] usesCustomDownloadLocationForIndex: fGroupValue])
-        [self setDestinationPath: [[GroupsController groups] customDownloadLocationForIndex: fGroupValue] determinationType: TorrentDeterminationAutomatic];
-    else if ([fDestination isEqualToString: [[GroupsController groups] customDownloadLocationForIndex: previousGroup]])
+    if ([GroupsController.groups usesCustomDownloadLocationForIndex: fGroupValue])
+        [self setDestinationPath: [GroupsController.groups customDownloadLocationForIndex: fGroupValue] determinationType: TorrentDeterminationAutomatic];
+    else if ([fDestination isEqualToString: [GroupsController.groups customDownloadLocationForIndex: previousGroup]])
         [self setDestinationPath: [[NSUserDefaults standardUserDefaults] stringForKey: @"DownloadFolder"] determinationType: TorrentDeterminationAutomatic];
     else;
 }

@@ -79,8 +79,9 @@
             break;
     }
 
-    Torrent * torrent = ((FileListNode *)self.representedObject).torrent;
-    [torrent setFilePriority: priority forIndexes: ((FileListNode *)self.representedObject).indexes];
+    FileListNode * node = self.representedObject;
+    Torrent * torrent = node.torrent;
+    [torrent setFilePriority: priority forIndexes: node.indexes];
 
     FileOutlineView * controlView = (FileOutlineView *)self.controlView;
     controlView.needsDisplay = YES;

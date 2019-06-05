@@ -48,7 +48,7 @@
 - (IBAction) checkAll: (id) sender;
 - (IBAction) uncheckAll: (id) sender;
 
-@property (nonatomic, readonly, copy) NSArray *quickLookURLs;
+@property (nonatomic, readonly) NSArray *quickLookURLs;
 @property (nonatomic, readonly) BOOL canQuickLook;
 - (NSRect) quickLookSourceFrameForPreviewItem: (id <QLPreviewItem>) item;
 

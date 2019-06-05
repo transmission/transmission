@@ -78,7 +78,7 @@ BlocklistDownloader * fBLDownloader = nil;
 
     [fDownload cancel];
 
-    [[BlocklistScheduler scheduler] updateSchedule];
+    [BlocklistScheduler.scheduler updateSchedule];
 
     fBLDownloader = nil;
 }
@@ -115,7 +115,7 @@ BlocklistDownloader * fBLDownloader = nil;
     [fViewController setFailed: error.localizedDescription];
 
     [[NSUserDefaults standardUserDefaults] setObject: [NSDate date] forKey: @"BlocklistNewLastUpdate"];
-    [[BlocklistScheduler scheduler] updateSchedule];
+    [BlocklistScheduler.scheduler updateSchedule];
 
     fBLDownloader = nil;
 }
@@ -132,7 +132,7 @@ BlocklistDownloader * fBLDownloader = nil;
         [self decompressBlocklist];
 
         dispatch_async(dispatch_get_main_queue(), ^{
-            const int count = tr_blocklistSetContent([(Controller *)NSApp.delegate sessionHandle], fDestination.UTF8String);
+            const int count = tr_blocklistSetContent(((Controller *)NSApp.delegate).sessionHandle, fDestination.UTF8String);
 
             //delete downloaded file
             [[NSFileManager defaultManager] removeItemAtPath: fDestination error: NULL];
@@ -147,7 +147,7 @@ BlocklistDownloader * fBLDownloader = nil;
             NSDate * date = [NSDate date];
             [[NSUserDefaults standardUserDefaults] setObject: date forKey: @"BlocklistNewLastUpdate"];
             [[NSUserDefaults standardUserDefaults] setObject: date forKey: @"BlocklistNewLastUpdateSuccess"];
-            [[BlocklistScheduler scheduler] updateSchedule];
+            [BlocklistScheduler.scheduler updateSchedule];
 
             [[NSNotificationCenter defaultCenter] postNotificationName: @"BlocklistUpdated" object: nil];
 
@@ -169,7 +169,7 @@ BlocklistDownloader * fBLDownloader = nil;
 {
     fState = BLOCKLIST_DL_START;
 
-    [[BlocklistScheduler scheduler] cancelSchedule];
+    [BlocklistScheduler.scheduler cancelSchedule];
 
     NSString * urlString = [[NSUserDefaults standardUserDefaults] stringForKey: @"BlocklistURL"];
     if (!urlString)

@@ -39,8 +39,8 @@
 
 - (BOOL) isEqual: (id) object;
 
-@property (nonatomic, readonly, copy) NSString *host;
-@property (nonatomic, readonly, copy) NSString *fullAnnounceAddress;
+@property (nonatomic, readonly) NSString *host;
+@property (nonatomic, readonly) NSString *fullAnnounceAddress;
 
 @property (nonatomic, readonly) NSInteger tier;
 
@@ -50,8 +50,8 @@
 @property (nonatomic, readonly) NSInteger totalLeechers;
 @property (nonatomic, readonly) NSInteger totalDownloaded;
 
-@property (nonatomic, readonly, copy) NSString *lastAnnounceStatusString;
-@property (nonatomic, readonly, copy) NSString *nextAnnounceStatusString;
-@property (nonatomic, readonly, copy) NSString *lastScrapeStatusString;
+@property (nonatomic, readonly) NSString *lastAnnounceStatusString;
+@property (nonatomic, readonly) NSString *nextAnnounceStatusString;
+@property (nonatomic, readonly) NSString *lastScrapeStatusString;
 
 @end

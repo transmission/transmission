@@ -112,7 +112,7 @@
         [self updateShowAddMagnetWindowField];
 
         //set blocklist scheduler
-        [[BlocklistScheduler scheduler] updateSchedule];
+        [BlocklistScheduler.scheduler updateSchedule];
 
         //set encryption
         [self setEncryptionMode: nil];
@@ -391,7 +391,7 @@
 - (void) portCheckerDidFinishProbing: (PortChecker *) portChecker
 {
     [fPortStatusProgress stopAnimation: self];
-    switch ([fPortChecker status])
+    switch (fPortChecker.status)
     {
         case PORT_STATUS_OPEN:
             fPortStatusField.stringValue = NSLocalizedString(@"Port is open", "Preferences -> Network -> port status");
@@ -406,7 +406,7 @@
             fPortStatusImage.image = [NSImage imageNamed: NSImageNameStatusPartiallyAvailable];
             break;
         default:
-            NSAssert1(NO, @"Port checker returned invalid status: %d", [fPortChecker status]);
+            NSAssert1(NO, @"Port checker returned invalid status: %d", fPortChecker.status);
             break;
     }
     fPortChecker = nil;
@@ -491,7 +491,7 @@
 {
     tr_blocklistSetEnabled(fHandle, [fDefaults boolForKey: @"BlocklistNew"]);
 
-    [[BlocklistScheduler scheduler] updateSchedule];
+    [BlocklistScheduler.scheduler updateSchedule];
 
     [self updateBlocklistButton];
 }
@@ -503,7 +503,7 @@
 
 - (void) setBlocklistAutoUpdate: (id) sender
 {
-    [[BlocklistScheduler scheduler] updateSchedule];
+    [BlocklistScheduler.scheduler updateSchedule];
 }
 
 - (void) updateBlocklistFields
@@ -1039,11 +1039,11 @@
 - (void) setRPCWebUIDiscovery: (id) sender
 {
     if ([fDefaults boolForKey:@"RPC"] && [fDefaults boolForKey: @"RPCWebDiscovery"])
-        [[BonjourController defaultController] startWithPort: [fDefaults integerForKey: @"RPCPort"]];
+        [BonjourController.defaultController startWithPort: [fDefaults integerForKey: @"RPCPort"]];
     else
     {
-        if ([BonjourController defaultControllerExists])
-            [[BonjourController defaultController] stop];
+        if (BonjourController.defaultControllerExists)
+            [BonjourController.defaultController stop];
     }
 }
 

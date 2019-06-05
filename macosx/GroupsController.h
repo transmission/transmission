@@ -29,7 +29,7 @@
     NSMutableArray * fGroups;
 }
 
-+ (GroupsController *) groups;
+@property (nonatomic, class, readonly) GroupsController * groups;
 
 @property (nonatomic, readonly) NSInteger numberOfGroups;
 

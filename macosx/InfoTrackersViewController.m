@@ -95,12 +95,12 @@
         NSArray * oldTrackers = fTrackers;
 
         if (fTorrents.count == 1)
-            fTrackers = [fTorrents[0] allTrackerStats];
+            fTrackers = ((Torrent *)fTorrents[0]).allTrackerStats;
         else
         {
             fTrackers = [[NSMutableArray alloc] init];
             for (Torrent * torrent in fTorrents)
-                [fTrackers addObjectsFromArray: [torrent allTrackerStats]];
+                [fTrackers addObjectsFromArray: torrent.allTrackerStats];
         }
 
         [fTrackerTable setTrackers: fTrackers];
@@ -118,7 +118,7 @@
         NSIndexSet * addedIndexes = [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(fTrackers.count-2, 2)];
         NSArray * tierAndTrackerBeingAdded = [fTrackers objectsAtIndexes: addedIndexes];
 
-        fTrackers = [fTorrents[0] allTrackerStats];
+        fTrackers = ((Torrent *)fTorrents[0]).allTrackerStats;
         [fTrackers addObjectsFromArray: tierAndTrackerBeingAdded];
 
         [fTrackerTable setTrackers: fTrackers];
@@ -198,7 +198,7 @@
 {
     id node = fTrackers[row];
     if ([node isKindOfClass: [TrackerNode class]])
-        return [(TrackerNode *)node fullAnnounceAddress];
+        return ((TrackerNode *)node).fullAnnounceAddress;
     else
         return nil;
 }
@@ -217,7 +217,7 @@
         NSBeep();
 
     //reset table with either new or old value
-    fTrackers = [torrent allTrackerStats];
+    fTrackers = torrent.allTrackerStats;
 
     [fTrackerTable setTrackers: fTrackers];
     [fTrackerTable reloadData];
@@ -305,9 +305,10 @@
         id object = fTrackers[i];
         if ([object isKindOfClass: [TrackerNode class]])
         {
+            TrackerNode * node = (TrackerNode *)object;
             if (groupSelected || [selectedIndexes containsIndex: i])
             {
-                Torrent * torrent = ((TrackerNode *)object).torrent;
+                Torrent * torrent = node.torrent;
                 NSMutableSet * removeSet;
                 if (!(removeSet = removeIdentifiers[torrent]))
                 {
@@ -315,7 +316,7 @@
                     removeIdentifiers[torrent] = removeSet;
                 }
 
-                [removeSet addObject: [(TrackerNode *)object fullAnnounceAddress]];
+                [removeSet addObject: node.fullAnnounceAddress];
                 ++removeTrackerCount;
 
                 [removeIndexes addIndex: i];
@@ -391,7 +392,7 @@
     //reset table with either new or old value
     fTrackers = [[NSMutableArray alloc] init];
     for (Torrent * torrent in fTorrents)
-        [fTrackers addObjectsFromArray: [torrent allTrackerStats]];
+        [fTrackers addObjectsFromArray: torrent.allTrackerStats];
 
     [fTrackerTable removeRowsAtIndexes: removeIndexes withAnimation: NSTableViewAnimationSlideLeft];
 

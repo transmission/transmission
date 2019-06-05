@@ -172,7 +172,7 @@ typedef NS_ENUM(unsigned int, addType) {
 - (void) verifySelectedTorrents: (id) sender;
 - (void) verifyTorrents: (NSArray *) torrents;
 
-@property (nonatomic, readonly, copy) NSArray *selectedTorrents;
+@property (nonatomic, readonly) NSArray *selectedTorrents;
 
 @property (nonatomic, readonly) PrefsController * prefsController;
 - (void) showPreferenceWindow: (id) sender;

@@ -62,11 +62,11 @@ enum
 {
     [self clearView];
 
-    fTorrent = (torrent && ![torrent isMagnet]) ? torrent : nil;
+    fTorrent = (torrent && !torrent.magnet) ? torrent : nil;
     if (fTorrent)
     {
         //determine relevant values
-        fNumPieces = MIN([fTorrent pieceCount], MAX_ACROSS * MAX_ACROSS);
+        fNumPieces = MIN(fTorrent.pieceCount, MAX_ACROSS * MAX_ACROSS);
         fAcross = ceil(sqrt(fNumPieces));
 
         const CGFloat width = self.bounds.size.width;

@@ -61,7 +61,7 @@
 - (void) setNextTab;
 - (void) setPreviousTab;
 
-@property (nonatomic, readonly, copy) NSArray *quickLookURLs;
+@property (nonatomic, readonly) NSArray *quickLookURLs;
 @property (nonatomic, readonly) BOOL canQuickLook;
 - (NSRect) quickLookSourceFrameForPreviewItem: (id <QLPreviewItem>) item;
 

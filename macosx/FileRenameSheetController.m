@@ -14,8 +14,8 @@ typedef void (^CompletionBlock)(BOOL);
 
 @interface FileRenameSheetController ()
 
-@property (nonatomic, strong) Torrent * torrent;
-@property (nonatomic, strong) FileListNode * node;
+@property (nonatomic) Torrent * torrent;
+@property (nonatomic) FileListNode * node;
 @property (nonatomic, copy) CompletionBlock completionHandler;
 
 @property (nonatomic, copy) NSString * originalName;
@@ -76,7 +76,7 @@ typedef void (^CompletionBlock)(BOOL);
 {
     [super windowDidLoad];
 
-    self.originalName = (self.node).name ?: [self.torrent name];
+    self.originalName = self.node.name ?: self.torrent.name;
     NSString * label = [NSString stringWithFormat: NSLocalizedString(@"Rename the file \"%@\":", "rename sheet label"), self.originalName];
     (self.labelField).stringValue = label;
 

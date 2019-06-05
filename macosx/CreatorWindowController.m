@@ -212,7 +212,7 @@ NSMutableSet *creatorWindowControllerSet = nil;
         return;
     }
 
-    NSWindow * window = [self createTorrentFile: [(Controller *)NSApp.delegate sessionHandle] forFile: path].window;
+    NSWindow * window = [self createTorrentFile: ((Controller *)NSApp.delegate).sessionHandle forFile: path].window;
     completionHandler(window, nil);
 }
 

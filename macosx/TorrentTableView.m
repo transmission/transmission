@@ -177,7 +177,7 @@
 - (NSString *) outlineView: (NSOutlineView *) outlineView typeSelectStringForTableColumn: (NSTableColumn *) tableColumn item: (id) item
 {
     if ([item isKindOfClass: [Torrent class]])
-        return [(Torrent *)item name];
+        return ((Torrent *)item).name;
     else
         return [self.dataSource outlineView:outlineView objectValueForTableColumn:[self tableColumnWithIdentifier:@"Group"] byItem:item];
 }
@@ -192,7 +192,7 @@
                 : NSLocalizedString(@"Upload speed", "Torrent table -> group row -> tooltip");
     else if (ident)
     {
-        NSUInteger count = [item torrents].count;
+        NSUInteger count = ((TorrentGroup *)item).torrents.count;
         if (count == 1)
             return NSLocalizedString(@"1 transfer", "Torrent table -> group row -> tooltip");
         else
@@ -329,7 +329,8 @@
 
 - (void) outlineViewItemDidExpand: (NSNotification *) notification
 {
-    NSInteger value = [notification.userInfo[@"NSObject"] groupIndex];
+    TorrentGroup * group = notification.userInfo[@"NSObject"];
+    NSInteger value = group.groupIndex;
     if (value < 0)
         value = MAX_GROUP;
 
@@ -342,7 +343,8 @@
 
 - (void) outlineViewItemDidCollapse: (NSNotification *) notification
 {
-    NSInteger value = [notification.userInfo[@"NSObject"] groupIndex];
+    TorrentGroup * group = notification.userInfo[@"NSObject"];
+    NSInteger value = group.groupIndex;
     if (value < 0)
         value = MAX_GROUP;
 
@@ -368,7 +370,7 @@
 
     //if pushing a button, don't change the selected rows
     if (pushed)
-        fSelectedValues = [self selectedValues];
+        fSelectedValues = self.selectedValues;
 
     [super mouseDown: event];
 
@@ -413,11 +415,12 @@
         }
         else
         {
-            const NSInteger group = [item groupIndex];
+            TorrentGroup * group = (TorrentGroup *)item;
+            const NSInteger groupIndex = group.groupIndex;
             for (NSInteger i = 0; i < self.numberOfRows; i++)
             {
                 id tableItem = [self itemAtRow: i];
-                if ([tableItem isKindOfClass: [TorrentGroup class]] && group == [tableItem groupIndex])
+                if ([tableItem isKindOfClass: [TorrentGroup class]] && groupIndex == ((TorrentGroup *)tableItem).groupIndex)
                 {
                     [indexSet addIndex: i];
                     break;
@@ -452,7 +455,7 @@
             [torrents addObject: item];
         else
         {
-            NSArray * groupTorrents = [item torrents];
+            NSArray * groupTorrents = ((TorrentGroup *)item).torrents;
             [torrents addObjectsFromArray: groupTorrents];
             if ([self isItemExpanded: item])
                 i +=groupTorrents.count;
@@ -562,13 +565,13 @@
 
 - (void) toggleControlForTorrent: (Torrent *) torrent
 {
-    if ([torrent isActive])
+    if (torrent.active)
         [fController stopTorrents: @[torrent]];
     else
     {
         if ([NSEvent modifierFlags] & NSAlternateKeyMask)
             [fController resumeTorrentsNoWait: @[torrent]];
-        else if ([torrent waitingToStart])
+        else if (torrent.waitingToStart)
             [fController stopTorrents: @[torrent]];
         else
             [fController resumeTorrents: @[torrent]];
@@ -665,12 +668,12 @@
             }
         }
 
-        const tr_ratiolimit mode = [fMenuTorrent ratioSetting];
+        const tr_ratiolimit mode = fMenuTorrent.ratioSetting;
 
         item = [menu itemWithTag: ACTION_MENU_LIMIT_TAG];
         item.state = mode == TR_RATIOLIMIT_SINGLE ? NSOnState : NSOffState;
         item.title = [NSString localizedStringWithFormat: NSLocalizedString(@"Stop at Ratio (%.2f)",
-            "torrent action menu -> ratio stop"), [fMenuTorrent ratioLimit]];
+            "torrent action menu -> ratio stop"), fMenuTorrent.ratioLimit];
 
         item = [menu itemWithTag: ACTION_MENU_UNLIMITED_TAG];
         item.state = mode == TR_RATIOLIMIT_UNLIMITED ? NSOnState : NSOffState;
@@ -680,7 +683,7 @@
     }
     else if (menu == fPriorityMenu)
     {
-        const tr_priority_t priority = [fMenuTorrent priority];
+        const tr_priority_t priority = fMenuTorrent.priority;
 
         NSMenuItem * item = [menu itemWithTag: ACTION_MENU_PRIORITY_HIGH_TAG];
         item.state = priority == TR_PRI_HIGH ? NSOnState : NSOffState;
@@ -713,7 +716,7 @@
 
 - (void) setGlobalLimit: (id) sender
 {
-    [fMenuTorrent setUseGlobalSpeedLimit: ((NSButton *)sender).state != NSOnState];
+    fMenuTorrent.usesGlobalSpeedLimit = ((NSButton *)sender).state != NSOnState;
 
     [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateOptions" object: nil];
 }
@@ -736,15 +739,15 @@
             return;
     }
 
-    [fMenuTorrent setRatioSetting: mode];
+    fMenuTorrent.ratioSetting = mode;
 
     [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateOptions" object: nil];
 }
 
 - (void) setQuickRatio: (id) sender
 {
-    [fMenuTorrent setRatioSetting: TR_RATIOLIMIT_SINGLE];
-    [fMenuTorrent setRatioLimit: [[sender representedObject] floatValue]];
+    fMenuTorrent.ratioSetting = TR_RATIOLIMIT_SINGLE;
+    fMenuTorrent.ratioLimit = [[sender representedObject] floatValue];
 
     [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateOptions" object: nil];
 }
@@ -768,7 +771,7 @@
             priority = TR_PRI_NORMAL;
     }
 
-    [fMenuTorrent setPriority: priority];
+    fMenuTorrent.priority = priority;
 
     [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateUI" object: nil];
 }

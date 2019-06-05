@@ -103,7 +103,7 @@
 
     Torrent * torrent = fTorrents[0];
 
-    NSString * location = [torrent dataLocation];
+    NSString * location = torrent.dataLocation;
     fDataLocationField.stringValue = location ? location.stringByAbbreviatingWithTildeInPath : @"";
     fDataLocationField.toolTip = location ? location : @"";
 
@@ -113,7 +113,7 @@
 - (void) revealDataFile: (id) sender
 {
     Torrent * torrent = fTorrents[0];
-    NSString * location = [torrent dataLocation];
+    NSString * location = torrent.dataLocation;
     if (!location)
         return;
 
@@ -132,23 +132,23 @@
         Torrent * torrent = fTorrents[0];
 
         #warning candidate for localizedStringWithFormat (although then we'll get two commas)
-        NSString * piecesString = ![torrent isMagnet] ? [NSString stringWithFormat: @"%ld, %@", [torrent pieceCount],
-                                        [NSString stringForFileSize: [torrent pieceSize]]] : @"";
+        NSString * piecesString = !torrent.magnet ? [NSString stringWithFormat: @"%ld, %@", torrent.pieceCount,
+                                        [NSString stringForFileSize: torrent.pieceSize]] : @"";
         fPiecesField.stringValue = piecesString;
 
-        NSString * hashString = [torrent hashString];
+        NSString * hashString = torrent.hashString;
         fHashField.stringValue = hashString;
         fHashField.toolTip = hashString;
-        fSecureField.stringValue = [torrent privateTorrent]
+        fSecureField.stringValue = torrent.privateTorrent
                         ? NSLocalizedString(@"Private Torrent, non-tracker peer discovery disabled", "Inspector -> private torrent")
                         : NSLocalizedString(@"Public Torrent", "Inspector -> private torrent");
 
-        NSString * commentString = [torrent comment];
+        NSString * commentString = torrent.comment;
         fCommentView.string = commentString;
 
-        NSString * creatorString = [torrent creator];
+        NSString * creatorString = torrent.creator;
         fCreatorField.stringValue = creatorString;
-        fDateCreatedField.objectValue = [torrent dateCreated];
+        fDateCreatedField.objectValue = torrent.dateCreated;
     }
     else
     {

@@ -54,7 +54,7 @@
 - (void) setGroupFilter: (id) sender;
 - (void) reset: (BOOL) updateUI;
 
-@property (nonatomic, readonly, copy) NSArray *searchStrings;
+@property (nonatomic, readonly) NSArray *searchStrings;
 - (void) focusSearchField;
 
 - (void) setCountAll: (NSUInteger) all active: (NSUInteger) active downloading: (NSUInteger) downloading

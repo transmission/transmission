@@ -29,7 +29,7 @@
 {
     if ((self = [super initWithFrame: rect]))
     {
-        if (![NSApp isOnYosemiteOrBetter]) {
+        if (!NSApp.onYosemiteOrBetter) {
             NSColor * lightColor = [NSColor colorWithCalibratedRed: 235.0/255.0 green: 235.0/255.0 blue: 235.0/255.0 alpha: 1.0];
             NSColor * darkColor = [NSColor colorWithCalibratedRed: 205.0/255.0 green: 205.0/255.0 blue: 205.0/255.0 alpha: 1.0];
             fGradient = [[NSGradient alloc] initWithStartingColor: lightColor endingColor: darkColor];
@@ -51,7 +51,7 @@
 
 - (void) drawRect: (NSRect) rect
 {
-    if ([NSApp isOnYosemiteOrBetter]) {
+    if (NSApp.onYosemiteOrBetter) {
         [[NSColor windowBackgroundColor] setFill];
         NSRectFill(rect);
 

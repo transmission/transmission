@@ -43,7 +43,7 @@
 
 - (NSString *) stringByAppendingEllipsis
 {
-    return [self stringByAppendingString: [NSString ellipsis]];
+    return [self stringByAppendingString: NSString.ellipsis];
 }
 
 #warning use localizedStringWithFormat: directly when 10.9-only and stringsdict translations are in place
@@ -134,7 +134,7 @@
 
 + (NSString *) timeString: (uint64_t) seconds includesTimeRemainingPhrase: (BOOL) includesTimeRemainingPhrase showSeconds: (BOOL) showSeconds maxFields: (NSUInteger) max
 {
-    NSAssert(![NSApp isOnYosemiteOrBetter], @"you should be using NSDateComponentsFormatter on >= 10.10");
+    NSAssert(!NSApp.onYosemiteOrBetter, @"you should be using NSDateComponentsFormatter on >= 10.10");
     NSParameterAssert(max > 0);
 
     NSMutableArray * timeArray = [NSMutableArray arrayWithCapacity: MIN(max, 5u)];

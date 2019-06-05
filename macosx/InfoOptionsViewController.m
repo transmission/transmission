@@ -96,7 +96,7 @@
                 uploadSpeedLimit = [torrent speedLimit: YES],
                 downloadUseSpeedLimit = [torrent usesSpeedLimit: NO] ? NSOnState : NSOffState,
                 downloadSpeedLimit = [torrent speedLimit: NO],
-                globalUseSpeedLimit = [torrent usesGlobalSpeedLimit] ? NSOnState : NSOffState;
+                globalUseSpeedLimit = torrent.usesGlobalSpeedLimit ? NSOnState : NSOffState;
 
     while ((torrent = [enumerator nextObject])
             && (uploadUseSpeedLimit != NSMixedState || uploadSpeedLimit != INVALID
@@ -115,7 +115,7 @@
         if (downloadSpeedLimit != INVALID && downloadSpeedLimit != [torrent speedLimit: NO])
             downloadSpeedLimit = INVALID;
 
-        if (globalUseSpeedLimit != NSMixedState && globalUseSpeedLimit != ([torrent usesGlobalSpeedLimit] ? NSOnState : NSOffState))
+        if (globalUseSpeedLimit != NSMixedState && globalUseSpeedLimit != (torrent.usesGlobalSpeedLimit ? NSOnState : NSOffState))
             globalUseSpeedLimit = NSMixedState;
     }
 
@@ -149,24 +149,24 @@
     enumerator = [fTorrents objectEnumerator];
     torrent = [enumerator nextObject]; //first torrent
 
-    NSInteger checkRatio = [torrent ratioSetting], checkIdle = [torrent idleSetting],
+    NSInteger checkRatio = torrent.ratioSetting, checkIdle = torrent.idleSetting,
             removeWhenFinishSeeding = torrent.removeWhenFinishSeeding ? NSOnState : NSOffState;
-    CGFloat ratioLimit = [torrent ratioLimit];
-    NSUInteger idleLimit = [torrent idleLimitMinutes];
+    CGFloat ratioLimit = torrent.ratioLimit;
+    NSUInteger idleLimit = torrent.idleLimitMinutes;
 
     while ((torrent = [enumerator nextObject])
             && (checkRatio != INVALID || ratioLimit != INVALID || checkIdle != INVALID || idleLimit != INVALID))
     {
-        if (checkRatio != INVALID && checkRatio != [torrent ratioSetting])
+        if (checkRatio != INVALID && checkRatio != torrent.ratioSetting)
             checkRatio = INVALID;
 
-        if (ratioLimit != INVALID && ratioLimit != [torrent ratioLimit])
+        if (ratioLimit != INVALID && ratioLimit != torrent.ratioLimit)
             ratioLimit = INVALID;
 
-        if (checkIdle != INVALID && checkIdle != [torrent idleSetting])
+        if (checkIdle != INVALID && checkIdle != torrent.idleSetting)
             checkIdle = INVALID;
 
-        if (idleLimit != INVALID && idleLimit != [torrent idleLimitMinutes])
+        if (idleLimit != INVALID && idleLimit != torrent.idleLimitMinutes)
             idleLimit = INVALID;
 
         if (removeWhenFinishSeeding != NSMixedState && removeWhenFinishSeeding != (torrent.removeWhenFinishSeeding ? NSOnState : NSOffState))
@@ -223,11 +223,11 @@
     enumerator = [fTorrents objectEnumerator];
     torrent = [enumerator nextObject]; //first torrent
 
-    NSInteger priority = [torrent priority];
+    NSInteger priority = torrent.priority;
 
     while ((torrent = [enumerator nextObject]) && priority != INVALID)
     {
-        if (priority != INVALID && priority != [torrent priority])
+        if (priority != INVALID && priority != torrent.priority)
             priority = INVALID;
     }
 
@@ -247,11 +247,11 @@
     enumerator = [fTorrents objectEnumerator];
     torrent = [enumerator nextObject]; //first torrent
 
-    NSInteger maxPeers = [torrent maxPeerConnect];
+    NSInteger maxPeers = torrent.maxPeerConnect;
 
     while ((torrent = [enumerator nextObject]))
     {
-        if (maxPeers != [torrent maxPeerConnect])
+        if (maxPeers != torrent.maxPeerConnect)
         {
             maxPeers = INVALID;
             break;
@@ -299,7 +299,7 @@
     const BOOL limit = ((NSButton *)sender).state == NSOnState;
 
     for (Torrent * torrent in fTorrents)
-        [torrent setUseGlobalSpeedLimit: limit];
+        torrent.usesGlobalSpeedLimit = limit;
 
     [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateOptionsNotification" object: self];
 }
@@ -337,7 +337,7 @@
     }
 
     for (Torrent * torrent in fTorrents)
-        [torrent setRatioSetting: setting];
+        torrent.ratioSetting = setting;
 
     fRatioLimitField.hidden = !single;
     if (single)
@@ -356,7 +356,7 @@
     const CGFloat limit = [sender floatValue];
 
     for (Torrent * torrent in fTorrents)
-        [torrent setRatioLimit: limit];
+        torrent.ratioLimit =  limit;
 
     [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateOptionsNotification" object: self];
 }
@@ -383,7 +383,7 @@
     }
 
     for (Torrent * torrent in fTorrents)
-        [torrent setIdleSetting: setting];
+        torrent.idleSetting = setting;
 
     fIdleLimitField.hidden = !single;
     fIdleLimitLabel.hidden = !single;
@@ -403,7 +403,7 @@
     const NSUInteger limit = [sender integerValue];
 
     for (Torrent * torrent in fTorrents)
-        [torrent setIdleLimitMinutes: limit];
+        torrent.idleLimitMinutes = limit;
 
     [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateOptionsNotification" object: self];
 }
@@ -440,7 +440,7 @@
     }
 
     for (Torrent * torrent in fTorrents)
-        [torrent setPriority: priority];
+        torrent.priority = priority;
 
     [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateUI" object: nil];
 
@@ -452,7 +452,7 @@
     NSInteger limit = [sender intValue];
 
     for (Torrent * torrent in fTorrents)
-        [torrent setMaxPeerConnect: limit];
+        torrent.maxPeerConnect = limit;
 
     [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateOptionsNotification" object: self];
 }

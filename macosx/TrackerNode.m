@@ -42,7 +42,7 @@
 
 - (NSString *) description
 {
-    return [@"Tracker: " stringByAppendingString: [self fullAnnounceAddress]];
+    return [@"Tracker: " stringByAppendingString: self.fullAnnounceAddress];
 }
 
 - (id) copyWithZone: (NSZone *) zone
@@ -58,11 +58,12 @@
 
     if (![object isKindOfClass: [self class]])
         return NO;
-
-    if (self.torrent != [object torrent])
+    
+    typeof(self) other = (typeof(self))object;
+    if (self.torrent != other.torrent)
         return NO;
 
-    return [self tier] == [object tier] && [[self fullAnnounceAddress] isEqualToString: [object fullAnnounceAddress]];
+    return self.tier == other.tier && [self.fullAnnounceAddress isEqualToString: other.fullAnnounceAddress];
 }
 
 - (NSString *) host
@@ -158,7 +159,7 @@
             const NSTimeInterval nextAnnounceTimeLeft = fStat.nextAnnounceTime - [NSDate date].timeIntervalSince1970;
 
             NSString *timeString;
-            if ([NSApp isOnYosemiteOrBetter]) {
+            if (NSApp.onYosemiteOrBetter) {
                 static NSDateComponentsFormatter *formatter;
                 static dispatch_once_t onceToken;
                 dispatch_once(&onceToken, ^{

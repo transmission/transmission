@@ -78,7 +78,7 @@
 - (void) updatePortStatus;
 - (void) portCheckerDidFinishProbing: (PortChecker *) portChecker;
 
-@property (nonatomic, readonly, copy) NSArray *sounds;
+@property (nonatomic, readonly) NSArray *sounds;
 - (void) setSound: (id) sender;
 
 - (void) setUTP: (id) sender;

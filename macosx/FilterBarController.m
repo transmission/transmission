@@ -276,7 +276,7 @@
         for (NSInteger i = menu.numberOfItems-1; i >= 3; i--)
             [menu removeItemAtIndex: i];
 
-        NSMenu * groupMenu = [[GroupsController groups] groupMenuWithTarget: self action: @selector(setGroupFilter:) isSmall: YES];
+        NSMenu * groupMenu = [GroupsController.groups groupMenuWithTarget: self action: @selector(setGroupFilter:) isSmall: YES];
 
         const NSInteger groupMenuCount = groupMenu.numberOfItems;
         for (NSInteger i = 0; i < groupMenuCount; i++)
@@ -394,8 +394,8 @@
     }
     else
     {
-        icon = [[GroupsController groups] imageForIndex: groupIndex];
-        NSString * groupName = groupIndex != -1 ? [[GroupsController groups] nameForIndex: groupIndex]
+        icon = [GroupsController.groups imageForIndex: groupIndex];
+        NSString * groupName = groupIndex != -1 ? [GroupsController.groups nameForIndex: groupIndex]
                                                 : NSLocalizedString(@"None", "Groups -> Button");
         toolTip = [NSLocalizedString(@"Group", "Groups -> Button") stringByAppendingFormat: @": %@", groupName];
     }

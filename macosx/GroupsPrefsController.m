@@ -33,7 +33,7 @@
 
 @interface GroupsPrefsController ()
 
-@property (nonatomic, strong) IBOutlet NSWindow * groupRulesSheetWindow;
+@property (nonatomic) IBOutlet NSWindow * groupRulesSheetWindow;
 @property (nonatomic, weak) IBOutlet NSPredicateEditor * ruleEditor;
 @property (nonatomic, weak) IBOutlet NSLayoutConstraint * ruleEditorHeightConstraint;
 
@@ -63,12 +63,12 @@
 
 - (NSInteger) numberOfRowsInTableView: (NSTableView *) tableview
 {
-    return [[GroupsController groups] numberOfGroups];
+    return GroupsController.groups.numberOfGroups;
 }
 
 - (id) tableView: (NSTableView *) tableView objectValueForTableColumn: (NSTableColumn *) tableColumn row: (NSInteger) row
 {
-    GroupsController * groupsController = [GroupsController groups];
+    GroupsController * groupsController = GroupsController.groups;
     NSInteger groupsIndex = [groupsController indexForRow: row];
 
     NSString * identifier = tableColumn.identifier;
@@ -87,8 +87,8 @@
 {
     if (object == fSelectedColorView && fTableView.numberOfSelectedRows == 1)
     {
-       NSInteger index = [[GroupsController groups] indexForRow: fTableView.selectedRow];
-       [[GroupsController groups] setColor: fSelectedColorView.color forIndex: index];
+       NSInteger index = [GroupsController.groups indexForRow: fTableView.selectedRow];
+       [GroupsController.groups setColor: fSelectedColorView.color forIndex: index];
        fTableView.needsDisplay = YES;
     }
 }
@@ -97,8 +97,8 @@
 {
     if (notification.object == fSelectedColorNameField)
     {
-       NSInteger index = [[GroupsController groups] indexForRow: fTableView.selectedRow];
-       [[GroupsController groups] setName: fSelectedColorNameField.stringValue forIndex: index];
+       NSInteger index = [GroupsController.groups indexForRow: fTableView.selectedRow];
+       [GroupsController.groups setName: fSelectedColorNameField.stringValue forIndex: index];
        fTableView.needsDisplay = YES;
     }
 }
@@ -137,7 +137,7 @@
 
         [fTableView beginUpdates];
 
-        [[GroupsController groups] moveGroupAtRow: oldRow toRow: newRow];
+        [GroupsController.groups moveGroupAtRow: oldRow toRow: newRow];
 
         [fTableView moveRowAtIndex: oldRow toIndex: newRow];
         [fTableView endUpdates];
@@ -158,7 +158,7 @@
         case ADD_TAG:
             [fTableView beginUpdates];
 
-            [[GroupsController groups] addNewGroup];
+            [GroupsController.groups addNewGroup];
 
             row = fTableView.numberOfRows;
 
@@ -178,7 +178,7 @@
 
             [fTableView beginUpdates];
 
-            [[GroupsController groups] removeGroupWithRowIndex: row];
+            [GroupsController.groups removeGroupWithRowIndex: row];
 
             [fTableView removeRowsAtIndexes: [NSIndexSet indexSetWithIndex: row] withAnimation: NSTableViewAnimationSlideUp];
             [fTableView endUpdates];
@@ -208,17 +208,17 @@
     panel.canCreateDirectories = YES;
 
     [panel beginSheetModalForWindow: fCustomLocationPopUp.window completionHandler: ^(NSInteger result) {
-        const NSInteger index = [[GroupsController groups] indexForRow: fTableView.selectedRow];
+        const NSInteger index = [GroupsController.groups indexForRow: fTableView.selectedRow];
         if (result == NSFileHandlingPanelOKButton)
         {
             NSString * path = (panel.URLs[0]).path;
-            [[GroupsController groups] setCustomDownloadLocation: path forIndex: index];
-            [[GroupsController groups] setUsesCustomDownloadLocation: YES forIndex: index];
+            [GroupsController.groups setCustomDownloadLocation: path forIndex: index];
+            [GroupsController.groups setUsesCustomDownloadLocation: YES forIndex: index];
         }
         else
         {
-            if (![[GroupsController groups] customDownloadLocationForIndex: index])
-                [[GroupsController groups] setUsesCustomDownloadLocation: NO forIndex: index];
+            if (![GroupsController.groups customDownloadLocationForIndex: index])
+                [GroupsController.groups setUsesCustomDownloadLocation: NO forIndex: index];
         }
 
         [self refreshCustomLocationWithSingleGroup];
@@ -229,16 +229,16 @@
 
 - (IBAction) toggleUseCustomDownloadLocation: (id) sender
 {
-    NSInteger index = [[GroupsController groups] indexForRow: fTableView.selectedRow];
+    NSInteger index = [GroupsController.groups indexForRow: fTableView.selectedRow];
     if (fCustomLocationEnableCheck.state == NSOnState)
     {
-        if ([[GroupsController groups] customDownloadLocationForIndex: index])
-            [[GroupsController groups] setUsesCustomDownloadLocation: YES forIndex: index];
+        if ([GroupsController.groups customDownloadLocationForIndex: index])
+            [GroupsController.groups setUsesCustomDownloadLocation: YES forIndex: index];
         else
             [self customDownloadLocationSheetShow: nil];
     }
     else
-        [[GroupsController groups] setUsesCustomDownloadLocation: NO forIndex: index];
+        [GroupsController.groups setUsesCustomDownloadLocation: NO forIndex: index];
 
     fCustomLocationPopUp.enabled = (fCustomLocationEnableCheck.state == NSOnState);
 }
@@ -248,16 +248,16 @@
 
 - (IBAction) toggleUseAutoAssignRules: (id) sender
 {
-    NSInteger index = [[GroupsController groups] indexForRow: fTableView.selectedRow];
+    NSInteger index = [GroupsController.groups indexForRow: fTableView.selectedRow];
     if (fAutoAssignRulesEnableCheck.state == NSOnState)
     {
-        if ([[GroupsController groups] autoAssignRulesForIndex: index])
-            [[GroupsController groups] setUsesAutoAssignRules: YES forIndex: index];
+        if ([GroupsController.groups autoAssignRulesForIndex: index])
+            [GroupsController.groups setUsesAutoAssignRules: YES forIndex: index];
         else
             [self orderFrontRulesSheet: nil];
     }
     else
-        [[GroupsController groups] setUsesAutoAssignRules: NO forIndex: index];
+        [GroupsController.groups setUsesAutoAssignRules: NO forIndex: index];
 
     fAutoAssignRulesEditButton.enabled = fAutoAssignRulesEnableCheck.state == NSOnState;
 }
@@ -267,11 +267,11 @@
     if (!self.groupRulesSheetWindow)
         [[NSBundle mainBundle] loadNibNamed: @"GroupRules" owner: self topLevelObjects: NULL];
 
-    NSInteger index = [[GroupsController groups] indexForRow: fTableView.selectedRow];
-    NSPredicate *predicate = [[GroupsController groups] autoAssignRulesForIndex: index];
-    (self.ruleEditor).objectValue = predicate;
+    NSInteger index = [GroupsController.groups indexForRow: fTableView.selectedRow];
+    NSPredicate *predicate = [GroupsController.groups autoAssignRulesForIndex: index];
+    self.ruleEditor.objectValue = predicate;
 
-    if ((self.ruleEditor).numberOfRows == 0)
+    if (self.ruleEditor.numberOfRows == 0)
         [self.ruleEditor addRow: nil];
 
     [fTableView.window beginSheet:self.groupRulesSheetWindow completionHandler:nil];
@@ -282,10 +282,10 @@
     [self.groupRulesSheetWindow orderOut: nil];
     [NSApp endSheet: self.groupRulesSheetWindow];
 
-    NSInteger index = [[GroupsController groups] indexForRow: fTableView.selectedRow];
-    if (![[GroupsController groups] autoAssignRulesForIndex: index])
+    NSInteger index = [GroupsController.groups indexForRow: fTableView.selectedRow];
+    if (![GroupsController.groups autoAssignRulesForIndex: index])
     {
-        [[GroupsController groups] setUsesAutoAssignRules: NO forIndex: index];
+        [GroupsController.groups setUsesAutoAssignRules: NO forIndex: index];
         fAutoAssignRulesEnableCheck.state = NO;
         fAutoAssignRulesEditButton.enabled = NO;
     }
@@ -296,25 +296,25 @@
     [self.groupRulesSheetWindow orderOut: nil];
     [NSApp endSheet: self.groupRulesSheetWindow];
 
-    NSInteger index = [[GroupsController groups] indexForRow: fTableView.selectedRow];
-    [[GroupsController groups] setUsesAutoAssignRules: YES forIndex: index];
+    NSInteger index = [GroupsController.groups indexForRow: fTableView.selectedRow];
+    [GroupsController.groups setUsesAutoAssignRules: YES forIndex: index];
 
-    NSPredicate * predicate = (self.ruleEditor).objectValue;
-    [[GroupsController groups] setAutoAssignRules: predicate forIndex: index];
+    NSPredicate * predicate = self.ruleEditor.objectValue;
+    [GroupsController.groups setAutoAssignRules: predicate forIndex: index];
 
-    fAutoAssignRulesEnableCheck.state = [[GroupsController groups] usesAutoAssignRulesForIndex: index];
+    fAutoAssignRulesEnableCheck.state = [GroupsController.groups usesAutoAssignRulesForIndex: index];
     fAutoAssignRulesEditButton.enabled = fAutoAssignRulesEnableCheck.state == NSOnState;
 }
 
 - (void) ruleEditorRowsDidChange: (NSNotification *) notification
 {
-    NSScrollView * ruleEditorScrollView = (self.ruleEditor).enclosingScrollView;
+    NSScrollView * ruleEditorScrollView = self.ruleEditor.enclosingScrollView;
 
-    const CGFloat rowHeight = (self.ruleEditor).rowHeight;
+    const CGFloat rowHeight = self.ruleEditor.rowHeight;
     const CGFloat bordersHeight = ruleEditorScrollView.frame.size.height - ruleEditorScrollView.contentSize.height;
 
-    const CGFloat requiredRowCount = (self.ruleEditor).numberOfRows;
-    const CGFloat maxVisibleRowCount = (long)((NSHeight((self.ruleEditor).window.screen.visibleFrame) * 2 / 3) / rowHeight);
+    const CGFloat requiredRowCount = self.ruleEditor.numberOfRows;
+    const CGFloat maxVisibleRowCount = (long)((NSHeight(self.ruleEditor.window.screen.visibleFrame) * 2 / 3) / rowHeight);
 
     self.ruleEditorHeightConstraint.constant = MIN(requiredRowCount, maxVisibleRowCount) * rowHeight + bordersHeight;
     ruleEditorScrollView.hasVerticalScroller = requiredRowCount > maxVisibleRowCount;
@@ -329,15 +329,15 @@
     [fAddRemoveControl setEnabled: fTableView.numberOfSelectedRows > 0 forSegment: REMOVE_TAG];
     if (fTableView.numberOfSelectedRows == 1)
     {
-        const NSInteger index = [[GroupsController groups] indexForRow: fTableView.selectedRow];
-        fSelectedColorView.color = [[GroupsController groups] colorForIndex: index];
+        const NSInteger index = [GroupsController.groups indexForRow: fTableView.selectedRow];
+        fSelectedColorView.color = [GroupsController.groups colorForIndex: index];
         fSelectedColorView.enabled = YES;
-        fSelectedColorNameField.stringValue = [[GroupsController groups] nameForIndex: index];
+        fSelectedColorNameField.stringValue = [GroupsController.groups nameForIndex: index];
         fSelectedColorNameField.enabled = YES;
 
         [self refreshCustomLocationWithSingleGroup];
 
-        fAutoAssignRulesEnableCheck.state = [[GroupsController groups] usesAutoAssignRulesForIndex: index];
+        fAutoAssignRulesEnableCheck.state = [GroupsController.groups usesAutoAssignRulesForIndex: index];
         fAutoAssignRulesEnableCheck.enabled = YES;
         fAutoAssignRulesEditButton.enabled = (fAutoAssignRulesEnableCheck.state == NSOnState);
     }
@@ -356,14 +356,14 @@
 
 - (void) refreshCustomLocationWithSingleGroup
 {
-    const NSInteger index = [[GroupsController groups] indexForRow: fTableView.selectedRow];
+    const NSInteger index = [GroupsController.groups indexForRow: fTableView.selectedRow];
 
-    const BOOL hasCustomLocation = [[GroupsController groups] usesCustomDownloadLocationForIndex: index];
+    const BOOL hasCustomLocation = [GroupsController.groups usesCustomDownloadLocationForIndex: index];
     fCustomLocationEnableCheck.state = hasCustomLocation;
     fCustomLocationEnableCheck.enabled = YES;
     fCustomLocationPopUp.enabled = hasCustomLocation;
 
-    NSString * location = [[GroupsController groups] customDownloadLocationForIndex: index];
+    NSString * location = [GroupsController.groups customDownloadLocationForIndex: index];
     if (location)
     {
         ExpandedPathToPathTransformer * pathTransformer = [[ExpandedPathToPathTransformer alloc] init];

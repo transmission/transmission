@@ -37,17 +37,17 @@
     NSMutableArray * fChildren;
 }
 
-@property (nonatomic, copy, readonly) NSString * name;
-@property (nonatomic, copy, readonly) NSString * path;
+@property (nonatomic, readonly) NSString * name;
+@property (nonatomic, readonly) NSString * path;
 
 @property (nonatomic, weak, readonly) Torrent * torrent;
 
 @property (nonatomic, readonly) uint64_t size;
-@property (nonatomic, strong, readonly) NSImage * icon;
+@property (nonatomic, readonly) NSImage * icon;
 @property (nonatomic, readonly) BOOL isFolder;
-@property (nonatomic, strong, readonly) NSMutableArray * children;
+@property (nonatomic, readonly) NSMutableArray * children;
 
-@property (nonatomic, strong, readonly) NSIndexSet * indexes;
+@property (nonatomic, readonly) NSIndexSet * indexes;
 
 - (instancetype) initWithFolderName: (NSString *) name path: (NSString *) path torrent: (Torrent *) torrent;
 - (instancetype) initWithFileName: (NSString *) name path: (NSString *) path size: (uint64_t) size index: (NSUInteger) index torrent: (Torrent *) torrent;
@@ -55,7 +55,7 @@
 - (void) insertChild: (FileListNode *) child;
 - (void) insertIndex: (NSUInteger) index withSize: (uint64_t) size;
 
-@property (nonatomic, readonly, copy) NSString *description;
+@property (nonatomic, readonly) NSString *description;
 
 - (BOOL) updateFromOldName: (NSString *) oldName toNewName: (NSString *) newName inPath: (NSString *) path;
 

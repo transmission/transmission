@@ -41,7 +41,7 @@
         NSColor * darkColor = [NSColor colorWithCalibratedRed: 155.0/255.0 green: 155.0/255.0 blue: 155.0/255.0 alpha: 1.0];
         fGradient = [[NSGradient alloc] initWithStartingColor: lightColor endingColor: darkColor];
 
-        if (![NSApp isOnYosemiteOrBetter])
+        if (!NSApp.onYosemiteOrBetter)
         {
             CIFilter * randomFilter = [CIFilter filterWithName: @"CIRandomGenerator"];
             [randomFilter setDefaults];
@@ -81,7 +81,7 @@
 
 - (void) drawRect: (NSRect) rect
 {
-    if ([NSApp isOnYosemiteOrBetter]) {
+    if (NSApp.onYosemiteOrBetter) {
         [[NSColor windowBackgroundColor] setFill];
         NSRectFill(rect);
 

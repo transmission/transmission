@@ -27,7 +27,7 @@
 
 - (void) awakeFromNib
 {
-    if (![NSApp isOnMojaveOrBetter]) {
+    if (!NSApp.onMojaveOrBetter) {
         NSNotificationCenter * nc = [NSNotificationCenter defaultCenter];
         [nc addObserver: self selector: @selector(updateControlTint:)
             name: NSControlTintDidChangeNotification object: NSApp];
@@ -94,7 +94,7 @@
     }
     else
     {
-        if ([NSApp isDarkMode]) {
+        if (NSApp.isDarkMode) {
             NSColor * darkColor = [NSColor colorWithCalibratedRed: 60.0/255.0 green: 60.0/255.0 blue: 60.0/255.0 alpha: 1.0];
             NSColor * lightColor = [NSColor colorWithCalibratedRed: 90.0/255.0 green: 90.0/255.0 blue: 90.0/255.0 alpha: 1.0];
             gradient = [[NSGradient alloc] initWithStartingColor: lightColor endingColor: darkColor];
@@ -136,7 +136,7 @@
 
 - (void) updateControlTint: (NSNotification *) notification
 {
-    NSAssert(![NSApp isOnMojaveOrBetter], @"should not be observing control tint color when accent color is available");
+    NSAssert(!NSApp.onMojaveOrBetter, @"should not be observing control tint color when accent color is available");
 
     if (fSelected)
         [self setSelectedTab: YES];

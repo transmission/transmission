@@ -59,15 +59,15 @@
 {
     NSParameterAssert(torrent != nil);
 
-    [fHashes addObject: [torrent hashString]];
+    [fHashes addObject: torrent.hashString];
     NSApp.dockTile.badgeLabel = [NSString formattedUInteger: fHashes.count];
 }
 
 - (void) removeTorrent: (Torrent *) torrent
 {
-    if ([fHashes member: [torrent hashString]])
+    if ([fHashes member: torrent.hashString])
     {
-        [fHashes removeObject: [torrent hashString]];
+        [fHashes removeObject: torrent.hashString];
         if (fHashes.count > 0)
             NSApp.dockTile.badgeLabel = [NSString formattedUInteger: fHashes.count];
         else

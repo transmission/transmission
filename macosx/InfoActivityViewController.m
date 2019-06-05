@@ -123,14 +123,14 @@
     NSDate * lastActivity = nil;
     for (Torrent * torrent in fTorrents)
     {
-        have += [torrent haveTotal];
-        haveVerified += [torrent haveVerified];
-        downloadedTotal += [torrent downloadedTotal];
-        uploadedTotal += [torrent uploadedTotal];
-        failedHash += [torrent failedHash];
+        have += torrent.haveTotal;
+        haveVerified += torrent.haveVerified;
+        downloadedTotal += torrent.downloadedTotal;
+        uploadedTotal += torrent.uploadedTotal;
+        failedHash += torrent.failedHash;
 
         NSDate * nextLastActivity;
-        if ((nextLastActivity = [torrent dateActivity]))
+        if ((nextLastActivity = torrent.dateActivity))
             lastActivity = lastActivity ? [lastActivity laterDate: nextLastActivity] : nextLastActivity;
     }
 
@@ -156,30 +156,30 @@
     {
         Torrent * torrent = fTorrents[0];
 
-        fStateField.stringValue = [torrent stateString];
+        fStateField.stringValue = torrent.stateString;
 
-        NSString * progressString = [NSString percentString: [torrent progress] longDecimals: YES];
-        if ([torrent isFolder])
+        NSString * progressString = [NSString percentString: torrent.progress longDecimals: YES];
+        if (torrent.folder)
         {
             NSString * progressSelectedString = [NSString stringWithFormat:
                                                     NSLocalizedString(@"%@ selected", "Inspector -> Activity tab -> progress"),
-                                                    [NSString percentString: [torrent progressDone] longDecimals: YES]];
+                                                    [NSString percentString: torrent.progressDone longDecimals: YES]];
             progressString = [progressString stringByAppendingFormat: @" (%@)", progressSelectedString];
         }
         fProgressField.stringValue = progressString;
 
-        fRatioField.stringValue = [NSString stringForRatio: [torrent ratio]];
+        fRatioField.stringValue = [NSString stringForRatio: torrent.ratio];
 
-        NSString * errorMessage = [torrent errorMessage];
+        NSString * errorMessage = torrent.errorMessage;
         if (![errorMessage isEqualToString: fErrorMessageView.string])
             fErrorMessageView.string = errorMessage;
 
-        fDateCompletedField.objectValue = [torrent dateCompleted];
+        fDateCompletedField.objectValue = torrent.dateCompleted;
 
         //uses a relative date, so can't be set once
-        fDateAddedField.objectValue = [torrent dateAdded];
+        fDateAddedField.objectValue = torrent.dateAdded;
 
-        if ([NSApp isOnYosemiteOrBetter]) {
+        if (NSApp.onYosemiteOrBetter) {
             static NSDateComponentsFormatter *timeFormatter;
             static dispatch_once_t onceToken;
             dispatch_once(&onceToken, ^{
@@ -189,8 +189,8 @@
                 timeFormatter.zeroFormattingBehavior = NSDateComponentsFormatterZeroFormattingBehaviorDropLeading;
             });
 
-            fDownloadTimeField.stringValue = [timeFormatter stringFromTimeInterval:[torrent secondsDownloading]];
-            fSeedTimeField.stringValue = [timeFormatter stringFromTimeInterval:[torrent secondsSeeding]];
+            fDownloadTimeField.stringValue = [timeFormatter stringFromTimeInterval:torrent.secondsDownloading];
+            fSeedTimeField.stringValue = [timeFormatter stringFromTimeInterval:torrent.secondsSeeding];
         }
         else {
             fDownloadTimeField.stringValue = [NSString timeString: [torrent secondsDownloading] includesTimeRemainingPhrase:NO showSeconds: YES];
