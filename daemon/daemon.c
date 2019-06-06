@@ -815,7 +815,7 @@ static bool init_daemon_data(int argc, char* argv[], struct daemon_data* data, b
         goto exit_early;
     }
 
-    if (foreground && logfile == TR_BAD_SYS_FILE)
+    if (*foreground && logfile == TR_BAD_SYS_FILE)
     {
         logfile = tr_sys_file_get_std(TR_STD_SYS_FILE_ERR, NULL);
     }
