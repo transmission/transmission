@@ -74,6 +74,11 @@
     <toolitem action='torrent-stop'/> 
     <toolitem action='remove-torrent'/> 
     <separator/> 
+    <toolitem action='queue-move-top'/> 
+    <toolitem action='queue-move-up'/> 
+    <toolitem action='queue-move-down'/> 
+    <toolitem action='queue-move-bottom'/> 
+    <separator/> 
     <toolitem action='show-torrent-properties'/> 
   </toolbar> 
 
