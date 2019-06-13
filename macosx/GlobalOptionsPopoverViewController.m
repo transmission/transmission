@@ -30,7 +30,7 @@
     {
         fHandle = handle;
 
-        fDefaults = [NSUserDefaults standardUserDefaults];
+        fDefaults = NSUserDefaults.standardUserDefaults;
     }
 
     return self;
@@ -49,14 +49,14 @@
 
 - (IBAction) updatedDisplayString: (id) sender
 {
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"RefreshTorrentTable" object: nil];
+    [NSNotificationCenter.defaultCenter postNotificationName: @"RefreshTorrentTable" object: nil];
 }
 
 - (IBAction) setDownSpeedSetting: (id) sender
 {
     tr_sessionLimitSpeed(fHandle, TR_DOWN, [fDefaults boolForKey: @"CheckDownload"]);
 
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"SpeedLimitUpdate" object: nil];
+    [NSNotificationCenter.defaultCenter postNotificationName: @"SpeedLimitUpdate" object: nil];
 }
 
 - (IBAction) setDownSpeedLimit: (id) sender
@@ -65,16 +65,16 @@
     [fDefaults setInteger: limit forKey: @"DownloadLimit"];
     tr_sessionSetSpeedLimit_KBps(fHandle, TR_DOWN, limit);
 
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateSpeedLimitValuesOutsidePrefs" object: nil];
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"SpeedLimitUpdate" object: nil];
+    [NSNotificationCenter.defaultCenter postNotificationName: @"UpdateSpeedLimitValuesOutsidePrefs" object: nil];
+    [NSNotificationCenter.defaultCenter postNotificationName: @"SpeedLimitUpdate" object: nil];
 }
 
 - (IBAction) setUpSpeedSetting: (id) sender
 {
     tr_sessionLimitSpeed(fHandle, TR_UP, [fDefaults boolForKey: @"CheckUpload"]);
 
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateSpeedLimitValuesOutsidePrefs" object: nil];
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"SpeedLimitUpdate" object: nil];
+    [NSNotificationCenter.defaultCenter postNotificationName: @"UpdateSpeedLimitValuesOutsidePrefs" object: nil];
+    [NSNotificationCenter.defaultCenter postNotificationName: @"SpeedLimitUpdate" object: nil];
 }
 
 - (IBAction) setUpSpeedLimit: (id) sender
@@ -83,7 +83,7 @@
     [fDefaults setInteger: limit forKey: @"UploadLimit"];
     tr_sessionSetSpeedLimit_KBps(fHandle, TR_UP, limit);
 
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"SpeedLimitUpdate" object: nil];
+    [NSNotificationCenter.defaultCenter postNotificationName: @"SpeedLimitUpdate" object: nil];
 }
 
 - (IBAction) setRatioStopSetting: (id) sender
@@ -91,10 +91,10 @@
     tr_sessionSetRatioLimited(fHandle, [fDefaults boolForKey: @"RatioCheck"]);
 
     //reload main table for seeding progress
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateUI" object: nil];
+    [NSNotificationCenter.defaultCenter postNotificationName: @"UpdateUI" object: nil];
 
     //reload global settings in inspector
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateGlobalOptions" object: nil];
+    [NSNotificationCenter.defaultCenter postNotificationName: @"UpdateGlobalOptions" object: nil];
 }
 
 - (IBAction) setRatioStopLimit: (id) sender
@@ -103,13 +103,13 @@
     [fDefaults setFloat: value forKey: @"RatioLimit"];
     tr_sessionSetRatioLimit(fHandle, value);
 
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateRatioStopValueOutsidePrefs" object: nil];
+    [NSNotificationCenter.defaultCenter postNotificationName: @"UpdateRatioStopValueOutsidePrefs" object: nil];
 
     //reload main table for seeding progress
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateUI" object: nil];
+    [NSNotificationCenter.defaultCenter postNotificationName: @"UpdateUI" object: nil];
 
     //reload global settings in inspector
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateGlobalOptions" object: nil];
+    [NSNotificationCenter.defaultCenter postNotificationName: @"UpdateGlobalOptions" object: nil];
 }
 
 - (IBAction) setIdleStopSetting: (id) sender
@@ -117,10 +117,10 @@
     tr_sessionSetIdleLimited(fHandle, [fDefaults boolForKey: @"IdleLimitCheck"]);
 
     //reload main table for remaining seeding time
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateUI" object: nil];
+    [NSNotificationCenter.defaultCenter postNotificationName: @"UpdateUI" object: nil];
 
     //reload global settings in inspector
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateGlobalOptions" object: nil];
+    [NSNotificationCenter.defaultCenter postNotificationName: @"UpdateGlobalOptions" object: nil];
 }
 
 - (IBAction) setIdleStopLimit: (id) sender
@@ -129,13 +129,13 @@
     [fDefaults setInteger: value forKey: @"IdleLimitMinutes"];
     tr_sessionSetIdleLimit(fHandle, value);
 
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateIdleStopValueOutsidePrefs" object: nil];
+    [NSNotificationCenter.defaultCenter postNotificationName: @"UpdateIdleStopValueOutsidePrefs" object: nil];
 
     //reload main table for remaining seeding time
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateUI" object: nil];
+    [NSNotificationCenter.defaultCenter postNotificationName: @"UpdateUI" object: nil];
 
     //reload global settings in inspector
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateGlobalOptions" object: nil];
+    [NSNotificationCenter.defaultCenter postNotificationName: @"UpdateGlobalOptions" object: nil];
 }
 
 - (BOOL) control: (NSControl *) control textShouldBeginEditing: (NSText *) fieldEditor

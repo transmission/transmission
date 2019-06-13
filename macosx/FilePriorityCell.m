@@ -131,14 +131,14 @@
         {
             //if ([self backgroundStyle] != NSBackgroundStyleDark)
             {
-                NSImage * image = [[NSImage imageNamed: @"PriorityNormalTemplate"] imageWithColor: [NSColor lightGrayColor]];
+                NSImage * image = [[NSImage imageNamed: @"PriorityNormalTemplate"] imageWithColor: NSColor.lightGrayColor];
                 [images addObject: image];
                 totalWidth = image.size.width;
             }
         }
         else
         {
-            NSColor * priorityColor = self.backgroundStyle == NSBackgroundStyleDark ? [NSColor whiteColor] : [NSColor darkGrayColor];
+            NSColor * priorityColor = self.backgroundStyle == NSBackgroundStyleDark ? NSColor.whiteColor : NSColor.darkGrayColor;
 
             totalWidth = 0.0;
             if ([priorities containsObject: @(TR_PRI_LOW)])

@@ -103,7 +103,7 @@
         stringShadow.shadowBlurRadius = 4.0;
 
         fAttributes = [[NSMutableDictionary alloc] initWithCapacity: 3];
-        fAttributes[NSForegroundColorAttributeName] = [NSColor whiteColor];
+        fAttributes[NSForegroundColorAttributeName] = NSColor.whiteColor;
         fAttributes[NSShadowAttributeName] = stringShadow;
 
     }

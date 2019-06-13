@@ -66,7 +66,7 @@
 
         [window addChildWindow: self ordered: NSWindowAbove];
 
-        [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(resizeWindow)
+        [NSNotificationCenter.defaultCenter addObserver: self selector: @selector(resizeWindow)
             name: NSWindowDidResizeNotification object: window];
     }
     return self;
@@ -74,7 +74,7 @@
 
 - (void) dealloc
 {
-    [[NSNotificationCenter defaultCenter] removeObserver: self];
+    [NSNotificationCenter.defaultCenter removeObserver: self];
 }
 
 - (void) setTorrents: (NSArray *) files
@@ -88,7 +88,7 @@
 
     for (NSString * file in files)
     {
-        if ([[[NSWorkspace sharedWorkspace] typeOfFile: file error: NULL] isEqualToString: @"org.bittorrent.torrent"]
+        if ([[NSWorkspace.sharedWorkspace typeOfFile: file error: NULL] isEqualToString: @"org.bittorrent.torrent"]
             || [file.pathExtension caseInsensitiveCompare: @"torrent"] == NSOrderedSame)
         {
             tr_ctor * ctor = tr_ctorNew(fLib);
@@ -130,7 +130,7 @@
 
     NSImage * icon;
     if (count == 1)
-        icon = [[NSWorkspace sharedWorkspace] iconForFileType: folder ? NSFileTypeForHFSTypeCode(kGenericFolderIcon) : name.pathExtension];
+        icon = [NSWorkspace.sharedWorkspace iconForFileType: folder ? NSFileTypeForHFSTypeCode(kGenericFolderIcon) : name.pathExtension];
     else
     {
         name = [NSString stringWithFormat: NSLocalizedString(@"%@ Torrent Files", "Drag overlay -> torrents"),

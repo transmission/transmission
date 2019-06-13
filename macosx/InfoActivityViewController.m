@@ -99,7 +99,7 @@
 
 - (void) dealloc
 {
-    [[NSNotificationCenter defaultCenter] removeObserver: self];
+    [NSNotificationCenter.defaultCenter removeObserver: self];
 }
 
 - (void) setInfoForTorrents: (NSArray *) torrents
@@ -209,14 +209,14 @@
 - (void) setPiecesView: (id) sender
 {
     const BOOL availability = [sender selectedSegment] == PIECES_CONTROL_AVAILABLE;
-    [[NSUserDefaults standardUserDefaults] setBool: availability forKey: @"PiecesViewShowAvailability"];
+    [NSUserDefaults.standardUserDefaults setBool: availability forKey: @"PiecesViewShowAvailability"];
     [self updatePiecesView:nil];
 }
 
 
 - (void) updatePiecesView: (id) sender
 {
-    const BOOL piecesAvailableSegment = [[NSUserDefaults standardUserDefaults] boolForKey: @"PiecesViewShowAvailability"];
+    const BOOL piecesAvailableSegment = [NSUserDefaults.standardUserDefaults boolForKey: @"PiecesViewShowAvailability"];
 
     [fPiecesControl setSelected: piecesAvailableSegment forSegment: PIECES_CONTROL_AVAILABLE];
     [fPiecesControl setSelected: !piecesAvailableSegment forSegment: PIECES_CONTROL_PROGRESS];
@@ -269,7 +269,7 @@
     {
         Torrent * torrent = fTorrents[0];
 
-        const BOOL piecesAvailableSegment = [[NSUserDefaults standardUserDefaults] boolForKey: @"PiecesViewShowAvailability"];
+        const BOOL piecesAvailableSegment = [NSUserDefaults.standardUserDefaults boolForKey: @"PiecesViewShowAvailability"];
         [fPiecesControl setSelected: piecesAvailableSegment forSegment: PIECES_CONTROL_AVAILABLE];
         [fPiecesControl setSelected: !piecesAvailableSegment forSegment: PIECES_CONTROL_PROGRESS];
         fPiecesControl.enabled = YES;

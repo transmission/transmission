@@ -72,7 +72,7 @@
     [self resizeBar];
 
     //set current filter
-    NSString * filterType = [[NSUserDefaults standardUserDefaults] stringForKey: @"Filter"];
+    NSString * filterType = [NSUserDefaults.standardUserDefaults stringForKey: @"Filter"];
 
     NSButton * currentFilterButton;
     if ([filterType isEqualToString: FILTER_ACTIVE])
@@ -87,13 +87,13 @@
     {
         //safety
         if (![filterType isEqualToString: FILTER_NONE])
-            [[NSUserDefaults standardUserDefaults] setObject: FILTER_NONE forKey: @"Filter"];
+            [NSUserDefaults.standardUserDefaults setObject: FILTER_NONE forKey: @"Filter"];
         currentFilterButton = fNoFilterButton;
     }
     currentFilterButton.state = NSOnState;
 
     //set filter search type
-    NSString * filterSearchType = [[NSUserDefaults standardUserDefaults] stringForKey: @"FilterSearchType"];
+    NSString * filterSearchType = [NSUserDefaults.standardUserDefaults stringForKey: @"FilterSearchType"];
 
     NSMenu * filterSearchMenu = fSearchField.searchMenuTemplate;
     NSString * filterSearchTypeTitle;
@@ -103,33 +103,33 @@
     {
         //safety
         if (![filterType isEqualToString: FILTER_TYPE_NAME])
-            [[NSUserDefaults standardUserDefaults] setObject: FILTER_TYPE_NAME forKey: @"FilterSearchType"];
+            [NSUserDefaults.standardUserDefaults setObject: FILTER_TYPE_NAME forKey: @"FilterSearchType"];
         filterSearchTypeTitle = [filterSearchMenu itemWithTag: FILTER_TYPE_TAG_NAME].title;
     }
     fSearchField.placeholderString = filterSearchTypeTitle;
 
     NSString * searchString;
-    if ((searchString = [[NSUserDefaults standardUserDefaults] stringForKey: @"FilterSearchString"]))
+    if ((searchString = [NSUserDefaults.standardUserDefaults stringForKey: @"FilterSearchString"]))
         fSearchField.stringValue = searchString;
 
     [self updateGroupsButton];
 
-    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(resizeBar)
+    [NSNotificationCenter.defaultCenter addObserver: self selector: @selector(resizeBar)
         name: NSWindowDidResizeNotification object: self.view.window];
 
     //update when groups change
-    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(updateGroups:)
+    [NSNotificationCenter.defaultCenter addObserver: self selector: @selector(updateGroups:)
         name: @"UpdateGroups" object: nil];
 }
 
 - (void) dealloc
 {
-    [[NSNotificationCenter defaultCenter] removeObserver: self];
+    [NSNotificationCenter.defaultCenter removeObserver: self];
 }
 
 - (void) setFilter: (id) sender
 {
-    NSString * oldFilterType = [[NSUserDefaults standardUserDefaults] stringForKey: @"Filter"];
+    NSString * oldFilterType = [NSUserDefaults.standardUserDefaults stringForKey: @"Filter"];
 
     NSButton * prevFilterButton;
     if ([oldFilterType isEqualToString: FILTER_PAUSE])
@@ -160,17 +160,17 @@
         else
             filterType = FILTER_NONE;
 
-        [[NSUserDefaults standardUserDefaults] setObject: filterType forKey: @"Filter"];
+        [NSUserDefaults.standardUserDefaults setObject: filterType forKey: @"Filter"];
     }
     else
         [sender setState: NSOnState];
 
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"ApplyFilter" object: nil];
+    [NSNotificationCenter.defaultCenter postNotificationName: @"ApplyFilter" object: nil];
 }
 
 - (void) switchFilter: (BOOL) right
 {
-    NSString * filterType = [[NSUserDefaults standardUserDefaults] stringForKey: @"Filter"];
+    NSString * filterType = [NSUserDefaults.standardUserDefaults stringForKey: @"Filter"];
 
     NSButton * button;
     if ([filterType isEqualToString: FILTER_NONE])
@@ -191,8 +191,8 @@
 
 - (void) setSearchText: (id) sender
 {
-    [[NSUserDefaults standardUserDefaults] setObject: fSearchField.stringValue forKey: @"FilterSearchString"];
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"ApplyFilter" object: nil];
+    [NSUserDefaults.standardUserDefaults setObject: fSearchField.stringValue forKey: @"FilterSearchString"];
+    [NSNotificationCenter.defaultCenter postNotificationName: @"ApplyFilter" object: nil];
 }
 
 - (void) focusSearchField
@@ -202,7 +202,7 @@
 
 - (void) setSearchType: (id) sender
 {
-    NSString * oldFilterType = [[NSUserDefaults standardUserDefaults] stringForKey: @"FilterSearchType"];
+    NSString * oldFilterType = [NSUserDefaults.standardUserDefaults stringForKey: @"FilterSearchType"];
 
     NSInteger prevTag, currentTag = [sender tag];
     if ([oldFilterType isEqualToString: FILTER_TYPE_TRACKER])
@@ -218,25 +218,25 @@
         else
             filterType = FILTER_TYPE_NAME;
 
-        [[NSUserDefaults standardUserDefaults] setObject: filterType forKey: @"FilterSearchType"];
+        [NSUserDefaults.standardUserDefaults setObject: filterType forKey: @"FilterSearchType"];
 
         fSearchField.placeholderString = [sender title];
     }
 
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"ApplyFilter" object: nil];
+    [NSNotificationCenter.defaultCenter postNotificationName: @"ApplyFilter" object: nil];
 }
 
 - (void) setGroupFilter: (id) sender
 {
-    [[NSUserDefaults standardUserDefaults] setInteger: [sender tag] forKey: @"FilterGroup"];
+    [NSUserDefaults.standardUserDefaults setInteger: [sender tag] forKey: @"FilterGroup"];
     [self updateGroupsButton];
 
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"ApplyFilter" object: nil];
+    [NSNotificationCenter.defaultCenter postNotificationName: @"ApplyFilter" object: nil];
 }
 
 - (void) reset: (BOOL) updateUI
 {
-    [[NSUserDefaults standardUserDefaults] setInteger: GROUP_FILTER_ALL_TAG forKey: @"FilterGroup"];
+    [NSUserDefaults.standardUserDefaults setInteger: GROUP_FILTER_ALL_TAG forKey: @"FilterGroup"];
 
     if (updateUI)
     {
@@ -249,14 +249,14 @@
     }
     else
     {
-        [[NSUserDefaults standardUserDefaults] setObject: FILTER_NONE forKey: @"Filter"];
-        [[NSUserDefaults standardUserDefaults] removeObjectForKey: @"FilterSearchString"];
+        [NSUserDefaults.standardUserDefaults setObject: FILTER_NONE forKey: @"Filter"];
+        [NSUserDefaults.standardUserDefaults removeObjectForKey: @"FilterSearchString"];
     }
 }
 
 - (NSArray *) searchStrings
 {
-    return [fSearchField.stringValue betterComponentsSeparatedByCharactersInSet: [NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    return [fSearchField.stringValue betterComponentsSeparatedByCharactersInSet: NSCharacterSet.whitespaceAndNewlineCharacterSet];
 }
 
 - (void) setCountAll: (NSUInteger) all active: (NSUInteger) active downloading: (NSUInteger) downloading
@@ -295,7 +295,7 @@
     //check proper filter search item
     if (action == @selector(setSearchType:))
     {
-        NSString * filterType = [[NSUserDefaults standardUserDefaults] stringForKey: @"FilterSearchType"];
+        NSString * filterType = [NSUserDefaults.standardUserDefaults stringForKey: @"FilterSearchType"];
 
         BOOL state;
         if (menuItem.tag == FILTER_TYPE_TAG_TRACKER)
@@ -309,7 +309,7 @@
 
     if (action == @selector(setGroupFilter:))
     {
-        menuItem.state = menuItem.tag == [[NSUserDefaults standardUserDefaults] integerForKey: @"FilterGroup"]
+        menuItem.state = menuItem.tag == [NSUserDefaults.standardUserDefaults integerForKey: @"FilterGroup"]
                                                 ? NSOnState : NSOffState;
         return YES;
     }
@@ -383,7 +383,7 @@
 
 - (void) updateGroupsButton
 {
-    const NSInteger groupIndex = [[NSUserDefaults standardUserDefaults] integerForKey: @"FilterGroup"];
+    const NSInteger groupIndex = [NSUserDefaults.standardUserDefaults integerForKey: @"FilterGroup"];
 
     NSImage * icon;
     NSString * toolTip;

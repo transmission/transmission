@@ -78,36 +78,36 @@ typedef void (^CompletionBlock)(BOOL);
 
     self.originalName = self.node.name ?: self.torrent.name;
     NSString * label = [NSString stringWithFormat: NSLocalizedString(@"Rename the file \"%@\":", "rename sheet label"), self.originalName];
-    (self.labelField).stringValue = label;
+    self.labelField.stringValue = label;
 
-    (self.inputField).stringValue = self.originalName;
+    self.inputField.stringValue = self.originalName;
     self.renameButton.enabled = NO;
 
     //resize the buttons so that they're long enough and the same width
-    const NSRect oldRenameFrame = (self.renameButton).frame;
-    const NSRect oldCancelFrame = (self.cancelButton).frame;
+    const NSRect oldRenameFrame = self.renameButton.frame;
+    const NSRect oldCancelFrame = self.cancelButton.frame;
 
     //get the extra width of the rename button from the English xib - the width from sizeToFit is too squished
     [self.renameButton sizeToFit];
-    const CGFloat extra = NSWidth(oldRenameFrame) - NSWidth((self.renameButton).frame);
+    const CGFloat extra = NSWidth(oldRenameFrame) - NSWidth(self.renameButton.frame);
 
     self.renameButton.title = NSLocalizedString(@"Rename", "rename sheet button");
     self.cancelButton.title = NSLocalizedString(@"Cancel", "rename sheet button");
 
     [self.renameButton sizeToFit];
     [self.cancelButton sizeToFit];
-    NSRect newRenameFrame = (self.renameButton).frame;
-    NSRect newCancelFrame = (self.cancelButton).frame;
+    NSRect newRenameFrame = self.renameButton.frame;
+    NSRect newCancelFrame = self.cancelButton.frame;
     newRenameFrame.size.width = MAX(NSWidth(newRenameFrame), NSWidth(newCancelFrame)) + extra;
     newCancelFrame.size.width = MAX(NSWidth(newRenameFrame), NSWidth(newCancelFrame)) + extra;
 
     const CGFloat renameWidthIncrease = NSWidth(newRenameFrame) - NSWidth(oldRenameFrame);
     newRenameFrame.origin.x -= renameWidthIncrease;
-    (self.renameButton).frame = newRenameFrame;
+    self.renameButton.frame = newRenameFrame;
 
     const CGFloat cancelWidthIncrease = NSWidth(newCancelFrame) - NSWidth(oldCancelFrame);
     newCancelFrame.origin.x -= renameWidthIncrease + cancelWidthIncrease;
-    (self.cancelButton).frame = newCancelFrame;
+    self.cancelButton.frame = newCancelFrame;
 }
 
 - (IBAction) rename: (id) sender
@@ -123,9 +123,9 @@ typedef void (^CompletionBlock)(BOOL);
     };
 
     if (self.node)
-        [self.torrent renameFileNode: self.node withName: (self.inputField).stringValue completionHandler: completionHandler];
+        [self.torrent renameFileNode: self.node withName: self.inputField.stringValue completionHandler: completionHandler];
     else
-        [self.torrent renameTorrent: (self.inputField).stringValue completionHandler: completionHandler];
+        [self.torrent renameTorrent: self.inputField.stringValue completionHandler: completionHandler];
 }
 
 - (IBAction) cancelRename: (id) sender
@@ -135,7 +135,7 @@ typedef void (^CompletionBlock)(BOOL);
 
 - (void) controlTextDidChange: (NSNotification *) notification
 {
-    (self.renameButton).enabled = ![(self.inputField).stringValue isEqualToString: @""] && ![(self.inputField).stringValue isEqualToString: self.originalName];
+    self.renameButton.enabled = ![self.inputField.stringValue isEqualToString: @""] && ![self.inputField.stringValue isEqualToString: self.originalName];
 }
 
 @end

@@ -62,8 +62,8 @@ tr_session * fLib = NULL;
     [self updateStats];
 
     fTimer = [NSTimer scheduledTimerWithTimeInterval: UPDATE_SECONDS target: self selector: @selector(updateStats) userInfo: nil repeats: YES];
-    [[NSRunLoop currentRunLoop] addTimer: fTimer forMode: NSModalPanelRunLoopMode];
-    [[NSRunLoop currentRunLoop] addTimer: fTimer forMode: NSEventTrackingRunLoopMode];
+    [NSRunLoop.currentRunLoop addTimer: fTimer forMode: NSModalPanelRunLoopMode];
+    [NSRunLoop.currentRunLoop addTimer: fTimer forMode: NSEventTrackingRunLoopMode];
 
     self.window.restorationClass = [self class];
 
@@ -130,7 +130,7 @@ tr_session * fLib = NULL;
 
 - (void) resetStats: (id) sender
 {
-    if (![[NSUserDefaults standardUserDefaults] boolForKey: @"WarningResetStats"])
+    if (![NSUserDefaults.standardUserDefaults boolForKey: @"WarningResetStats"])
     {
         [self performResetStats];
         return;
@@ -220,7 +220,7 @@ tr_session * fLib = NULL;
     [alert.window orderOut: nil];
 
     if (alert.suppressionButton.state == NSOnState)
-        [[NSUserDefaults standardUserDefaults] setBool: NO forKey: @"WarningResetStats"];
+        [NSUserDefaults.standardUserDefaults setBool: NO forKey: @"WarningResetStats"];
 
     if (code == NSAlertFirstButtonReturn)
         [self performResetStats];

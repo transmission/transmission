@@ -45,7 +45,7 @@
 
     NSString * text = [addresses componentsJoinedByString: @"\n"];
 
-    NSPasteboard * pb = [NSPasteboard generalPasteboard];
+    NSPasteboard * pb = NSPasteboard.generalPasteboard;
     [pb clearContents];
     [pb writeObjects: @[text]];
 }

@@ -61,7 +61,7 @@
 
     NSString * text = [addresses componentsJoinedByString: @"\n"];
 
-    NSPasteboard * pb = [NSPasteboard generalPasteboard];
+    NSPasteboard * pb = NSPasteboard.generalPasteboard;
     [pb clearContents];
     [pb writeObjects: @[text]];
 }
@@ -72,7 +72,7 @@
 
     BOOL added = NO;
 
-    NSArray * items = [[NSPasteboard generalPasteboard] readObjectsForClasses: @[[NSString class]] options: nil];
+    NSArray * items = [NSPasteboard.generalPasteboard readObjectsForClasses: @[[NSString class]] options: nil];
     NSAssert(items != nil, @"no string items to paste; should not be able to call this method");
 
     for (NSString * pbItem in items)
@@ -95,7 +95,7 @@
         return self.numberOfSelectedRows > 0;
 
     if (action == @selector(paste:))
-        return fTorrent && [[NSPasteboard generalPasteboard] canReadObjectForClasses: @[[NSString class]] options: nil];
+        return fTorrent && [NSPasteboard.generalPasteboard canReadObjectForClasses: @[[NSString class]] options: nil];
 
     return YES;
 }

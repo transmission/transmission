@@ -39,13 +39,13 @@
         NSFont * bigFont = [NSFont boldSystemFontOfSize: 18.0],
                 * smallFont = [NSFont systemFontOfSize: 14.0];
 
-        NSMutableParagraphStyle * paragraphStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
+        NSMutableParagraphStyle * paragraphStyle = [NSParagraphStyle.defaultParagraphStyle mutableCopy];
         paragraphStyle.lineBreakMode = NSLineBreakByTruncatingMiddle;
 
-        fMainLineAttributes = @{NSForegroundColorAttributeName: [NSColor whiteColor], NSFontAttributeName: bigFont,
+        fMainLineAttributes = @{NSForegroundColorAttributeName: NSColor.whiteColor, NSFontAttributeName: bigFont,
                                 NSShadowAttributeName: stringShadow, NSParagraphStyleAttributeName: paragraphStyle};
 
-        fSubLineAttributes = @{NSForegroundColorAttributeName: [NSColor whiteColor], NSFontAttributeName: smallFont,
+        fSubLineAttributes = @{NSForegroundColorAttributeName: NSColor.whiteColor, NSFontAttributeName: smallFont,
                                 NSShadowAttributeName: stringShadow, NSParagraphStyleAttributeName: paragraphStyle};
 
     }

@@ -52,13 +52,13 @@
 - (void) drawRect: (NSRect) rect
 {
     if (NSApp.onYosemiteOrBetter) {
-        [[NSColor windowBackgroundColor] setFill];
+        [NSColor.windowBackgroundColor setFill];
         NSRectFill(rect);
 
         const NSRect lineBorderRect = NSMakeRect(NSMinX(rect), 0.0, NSWidth(rect), 1.0);
         if (NSIntersectsRect(lineBorderRect, rect))
         {
-            [[NSColor gridColor] setFill];
+            [NSColor.gridColor setFill];
             NSRectFill(lineBorderRect);
         }
     }
@@ -71,7 +71,7 @@
         if (NSIntersectsRect(lineBorderRect, rect))
         {
             gridRects[count] = lineBorderRect;
-            colorRects[count] = [NSColor whiteColor];
+            colorRects[count] = NSColor.whiteColor;
             ++count;
 
             rect.size.height -= 1.0;

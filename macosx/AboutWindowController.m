@@ -38,11 +38,11 @@ AboutWindowController * fAboutBoxInstance = nil;
 {
     fVersionField.stringValue = @(LONG_VERSION_STRING);
 
-    fCopyrightField.stringValue = [[NSBundle mainBundle] localizedStringForKey: @"NSHumanReadableCopyright"
+    fCopyrightField.stringValue = [NSBundle.mainBundle localizedStringForKey: @"NSHumanReadableCopyright"
                                         value: nil table: @"InfoPlist"];
 
     [fTextView.textStorage setAttributedString: [[NSAttributedString alloc] initWithPath:
-            [[NSBundle mainBundle] pathForResource: @"Credits" ofType: @"rtf"] documentAttributes: nil]];
+            [NSBundle.mainBundle pathForResource: @"Credits" ofType: @"rtf"] documentAttributes: nil]];
 
     //size license button
     const CGFloat oldButtonWidth = NSWidth(fLicenseButton.frame);
@@ -68,7 +68,7 @@ AboutWindowController * fAboutBoxInstance = nil;
 
 - (IBAction) showLicense: (id) sender
 {
-    NSString * licenseText = [NSString stringWithContentsOfFile: [[NSBundle mainBundle] pathForResource: @"COPYING" ofType: nil]
+    NSString * licenseText = [NSString stringWithContentsOfFile: [NSBundle.mainBundle pathForResource: @"COPYING" ofType: nil]
                                 usedEncoding: nil error: NULL];
     fLicenseView.string = licenseText;
     fLicenseCloseButton.title = NSLocalizedString(@"OK", "About window -> license close button");

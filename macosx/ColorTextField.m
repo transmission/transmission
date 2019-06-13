@@ -33,7 +33,7 @@
 {
     super.enabled = flag;
 
-    NSColor * color = flag ? [NSColor controlTextColor] : [NSColor disabledControlTextColor];
+    NSColor * color = flag ? NSColor.controlTextColor : NSColor.disabledControlTextColor;
     self.textColor = color;
 }
 

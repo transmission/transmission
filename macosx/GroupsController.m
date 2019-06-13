@@ -51,49 +51,49 @@ GroupsController * fGroupsInstance = nil;
     if ((self = [super init]))
     {
         NSData * data;
-        if ((data = [[NSUserDefaults standardUserDefaults] dataForKey: @"GroupDicts"]))
+        if ((data = [NSUserDefaults.standardUserDefaults dataForKey: @"GroupDicts"]))
             fGroups = [NSKeyedUnarchiver unarchiveObjectWithData: data];
-        else if ((data = [[NSUserDefaults standardUserDefaults] dataForKey: @"Groups"])) //handle old groups
+        else if ((data = [NSUserDefaults.standardUserDefaults dataForKey: @"Groups"])) //handle old groups
         {
             fGroups = [NSUnarchiver unarchiveObjectWithData: data];
-            [[NSUserDefaults standardUserDefaults] removeObjectForKey: @"Groups"];
+            [NSUserDefaults.standardUserDefaults removeObjectForKey: @"Groups"];
             [self saveGroups];
         }
         else
         {
             //default groups
             NSMutableDictionary * red = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                            [NSColor redColor], @"Color",
+                                            NSColor.redColor, @"Color",
                                             NSLocalizedString(@"Red", "Groups -> Name"), @"Name",
                                             @0, @"Index", nil];
 
             NSMutableDictionary * orange = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                            [NSColor orangeColor], @"Color",
+                                            NSColor.orangeColor, @"Color",
                                             NSLocalizedString(@"Orange", "Groups -> Name"), @"Name",
                                             @1, @"Index", nil];
 
             NSMutableDictionary * yellow = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                            [NSColor yellowColor], @"Color",
+                                            NSColor.yellowColor, @"Color",
                                             NSLocalizedString(@"Yellow", "Groups -> Name"), @"Name",
                                             @2, @"Index", nil];
 
             NSMutableDictionary * green = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                            [NSColor greenColor], @"Color",
+                                            NSColor.greenColor, @"Color",
                                             NSLocalizedString(@"Green", "Groups -> Name"), @"Name",
                                             @3, @"Index", nil];
 
             NSMutableDictionary * blue = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                            [NSColor blueColor], @"Color",
+                                            NSColor.blueColor, @"Color",
                                             NSLocalizedString(@"Blue", "Groups -> Name"), @"Name",
                                             @4, @"Index", nil];
 
             NSMutableDictionary * purple = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                            [NSColor purpleColor], @"Color",
+                                            NSColor.purpleColor, @"Color",
                                             NSLocalizedString(@"Purple", "Groups -> Name"), @"Name",
                                             @5, @"Index", nil];
 
             NSMutableDictionary * gray = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                            [NSColor grayColor], @"Color",
+                                            NSColor.grayColor, @"Color",
                                             NSLocalizedString(@"Gray", "Groups -> Name"), @"Name",
                                             @6, @"Index", nil];
 
@@ -139,7 +139,7 @@ GroupsController * fGroupsInstance = nil;
     fGroups[orderIndex][@"Name"] = name;
     [self saveGroups];
 
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateGroups" object: self];
+    [NSNotificationCenter.defaultCenter postNotificationName: @"UpdateGroups" object: self];
 }
 
 - (NSImage *) imageForIndex: (NSInteger) index
@@ -163,7 +163,7 @@ GroupsController * fGroupsInstance = nil;
     dict[@"Color"] = color;
 
     [GroupsController.groups saveGroups];
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateGroups" object: self];
+    [NSNotificationCenter.defaultCenter postNotificationName: @"UpdateGroups" object: self];
 }
 
 - (BOOL) usesCustomDownloadLocationForIndex: (NSInteger) index
@@ -254,7 +254,7 @@ GroupsController * fGroupsInstance = nil;
     [fGroups addObject: [NSMutableDictionary dictionaryWithObjectsAndKeys: @(index), @"Index",
                             [NSColor colorWithCalibratedRed: 0.0 green: 0.65 blue: 1.0 alpha: 1.0], @"Color", @"", @"Name", nil]];
 
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateGroups" object: self];
+    [NSNotificationCenter.defaultCenter postNotificationName: @"UpdateGroups" object: self];
     [self saveGroups];
 }
 
@@ -263,13 +263,13 @@ GroupsController * fGroupsInstance = nil;
     NSInteger index = [fGroups[row][@"Index"] integerValue];
     [fGroups removeObjectAtIndex: row];
 
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"GroupValueRemoved" object: self userInfo:
+    [NSNotificationCenter.defaultCenter postNotificationName: @"GroupValueRemoved" object: self userInfo:
      @{@"Index": @(index)}];
 
-    if (index == [[NSUserDefaults standardUserDefaults] integerForKey: @"FilterGroup"])
-        [[NSUserDefaults standardUserDefaults] setInteger: -2 forKey: @"FilterGroup"];
+    if (index == [NSUserDefaults.standardUserDefaults integerForKey: @"FilterGroup"])
+        [NSUserDefaults.standardUserDefaults setInteger: -2 forKey: @"FilterGroup"];
 
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateGroups" object: self];
+    [NSNotificationCenter.defaultCenter postNotificationName: @"UpdateGroups" object: self];
     [self saveGroups];
 }
 
@@ -278,7 +278,7 @@ GroupsController * fGroupsInstance = nil;
     [fGroups moveObjectAtIndex: oldRow toIndex: newRow];
 
     [self saveGroups];
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateGroups" object: self];
+    [NSNotificationCenter.defaultCenter postNotificationName: @"UpdateGroups" object: self];
 }
 
 - (NSMenu *) groupMenuWithTarget: (id) target action: (SEL) action isSmall: (BOOL) small
@@ -353,7 +353,7 @@ GroupsController * fGroupsInstance = nil;
         [groups addObject: tempDict];
     }
 
-    [[NSUserDefaults standardUserDefaults] setObject: [NSKeyedArchiver archivedDataWithRootObject: groups] forKey: @"GroupDicts"];
+    [NSUserDefaults.standardUserDefaults setObject: [NSKeyedArchiver archivedDataWithRootObject: groups] forKey: @"GroupDicts"];
 }
 
 - (NSImage *) imageForGroup: (NSMutableDictionary *) dict
@@ -373,13 +373,13 @@ GroupsController * fGroupsInstance = nil;
 
     //border
     NSGradient * gradient = [[NSGradient alloc] initWithStartingColor: [color blendedColorWithFraction: 0.45 ofColor:
-                                [NSColor whiteColor]] endingColor: color];
+                                NSColor.whiteColor] endingColor: color];
     [gradient drawInBezierPath: bp angle: 270.0];
 
     //inside
     bp = [NSBezierPath bezierPathWithRoundedRect: NSInsetRect(rect, 1.0, 1.0) xRadius: 3.0 yRadius: 3.0];
-    gradient = [[NSGradient alloc] initWithStartingColor: [color blendedColorWithFraction: 0.75 ofColor: [NSColor whiteColor]]
-                endingColor: [color blendedColorWithFraction: 0.2 ofColor: [NSColor whiteColor]]];
+    gradient = [[NSGradient alloc] initWithStartingColor: [color blendedColorWithFraction: 0.75 ofColor: NSColor.whiteColor]
+                endingColor: [color blendedColorWithFraction: 0.2 ofColor: NSColor.whiteColor]];
     [gradient drawInBezierPath: bp angle: 270.0];
 
     [icon unlockFocus];

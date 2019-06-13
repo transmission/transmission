@@ -54,14 +54,14 @@
 {
     if ((self = [super init]))
     {
-        NSMutableParagraphStyle * paragraphStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
+        NSMutableParagraphStyle * paragraphStyle = [NSParagraphStyle.defaultParagraphStyle mutableCopy];
         paragraphStyle.lineBreakMode = NSLineBreakByTruncatingMiddle;
 
         fTitleAttributes = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
                             [NSFont messageFontOfSize: 12.0], NSFontAttributeName,
                             paragraphStyle, NSParagraphStyleAttributeName, nil];
 
-        NSMutableParagraphStyle * statusParagraphStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
+        NSMutableParagraphStyle * statusParagraphStyle = [NSParagraphStyle.defaultParagraphStyle mutableCopy];
         statusParagraphStyle.lineBreakMode = NSLineBreakByTruncatingTail;
 
         fStatusAttributes = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
@@ -110,13 +110,13 @@
     NSColor * titleColor, * statusColor;
     FileListNode * node = self.objectValue;
     if (self.backgroundStyle == NSBackgroundStyleDark)
-        titleColor = statusColor = [NSColor whiteColor];
+        titleColor = statusColor = NSColor.whiteColor;
     else if ([node.torrent checkForFiles: node.indexes] == NSOffState)
-        titleColor = statusColor = [NSColor disabledControlTextColor];
+        titleColor = statusColor = NSColor.disabledControlTextColor;
     else
     {
-        titleColor = [NSColor controlTextColor];
-        statusColor = [NSColor secondaryLabelColor];
+        titleColor = NSColor.controlTextColor;
+        statusColor = NSColor.secondaryLabelColor;
     }
 
     fTitleAttributes[NSForegroundColorAttributeName] = titleColor;
@@ -153,7 +153,7 @@
     cellFrame.origin.x += PADDING_EXPANSION_FRAME;
     cellFrame.origin.y += PADDING_EXPANSION_FRAME;
 
-    fTitleAttributes[NSForegroundColorAttributeName] = [NSColor controlTextColor];
+    fTitleAttributes[NSForegroundColorAttributeName] = NSColor.controlTextColor;
     NSAttributedString * titleString = self.attributedTitle;
     [titleString drawInRect: cellFrame];
 }

@@ -187,7 +187,7 @@
 - (NSComparisonResult) compareNumeric: (NSString *) string
 {
     const NSStringCompareOptions comparisonOptions = NSNumericSearch | NSForcedOrderingSearch;
-    return [self compare: string options: comparisonOptions range: NSMakeRange(0, self.length) locale: [NSLocale currentLocale]];
+    return [self compare: string options: comparisonOptions range: NSMakeRange(0, self.length) locale: NSLocale.currentLocale];
 }
 
 - (NSArray *) betterComponentsSeparatedByCharactersInSet: (NSCharacterSet *) separators

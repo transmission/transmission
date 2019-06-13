@@ -41,11 +41,11 @@
 
 - (void) drawWithFrame: (NSRect) cellFrame inView: (NSView *) controlView
 {
-    if ([[NSUserDefaults standardUserDefaults] boolForKey: @"DisplayPeerProgressBarNumber"])
+    if ([NSUserDefaults.standardUserDefaults boolForKey: @"DisplayPeerProgressBarNumber"])
     {
         if (!fAttributes)
         {
-            NSMutableParagraphStyle * paragraphStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
+            NSMutableParagraphStyle * paragraphStyle = [NSParagraphStyle.defaultParagraphStyle mutableCopy];
             paragraphStyle.alignment = NSRightTextAlignment;
 
             fAttributes = @{NSFontAttributeName: [NSFont systemFontOfSize: 11.0], NSParagraphStyleAttributeName: paragraphStyle};

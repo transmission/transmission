@@ -114,7 +114,7 @@ BlocklistDownloader * fBLDownloader = nil;
 {
     [fViewController setFailed: error.localizedDescription];
 
-    [[NSUserDefaults standardUserDefaults] setObject: [NSDate date] forKey: @"BlocklistNewLastUpdate"];
+    [NSUserDefaults.standardUserDefaults setObject: [NSDate date] forKey: @"BlocklistNewLastUpdate"];
     [BlocklistScheduler.scheduler updateSchedule];
 
     fBLDownloader = nil;
@@ -135,7 +135,7 @@ BlocklistDownloader * fBLDownloader = nil;
             const int count = tr_blocklistSetContent(((Controller *)NSApp.delegate).sessionHandle, fDestination.UTF8String);
 
             //delete downloaded file
-            [[NSFileManager defaultManager] removeItemAtPath: fDestination error: NULL];
+            [NSFileManager.defaultManager removeItemAtPath: fDestination error: NULL];
 
             if (count > 0)
                 [fViewController setFinished];
@@ -145,11 +145,11 @@ BlocklistDownloader * fBLDownloader = nil;
 
             //update last updated date for schedule
             NSDate * date = [NSDate date];
-            [[NSUserDefaults standardUserDefaults] setObject: date forKey: @"BlocklistNewLastUpdate"];
-            [[NSUserDefaults standardUserDefaults] setObject: date forKey: @"BlocklistNewLastUpdateSuccess"];
+            [NSUserDefaults.standardUserDefaults setObject: date forKey: @"BlocklistNewLastUpdate"];
+            [NSUserDefaults.standardUserDefaults setObject: date forKey: @"BlocklistNewLastUpdateSuccess"];
             [BlocklistScheduler.scheduler updateSchedule];
 
-            [[NSNotificationCenter defaultCenter] postNotificationName: @"BlocklistUpdated" object: nil];
+            [NSNotificationCenter.defaultCenter postNotificationName: @"BlocklistUpdated" object: nil];
 
             fBLDownloader = nil;
         });
@@ -171,7 +171,7 @@ BlocklistDownloader * fBLDownloader = nil;
 
     [BlocklistScheduler.scheduler cancelSchedule];
 
-    NSString * urlString = [[NSUserDefaults standardUserDefaults] stringForKey: @"BlocklistURL"];
+    NSString * urlString = [NSUserDefaults.standardUserDefaults stringForKey: @"BlocklistURL"];
     if (!urlString)
         urlString = @"";
     else if (![urlString isEqualToString: @""] && [urlString rangeOfString: @"://"].location == NSNotFound)
@@ -235,11 +235,11 @@ BlocklistDownloader * fBLDownloader = nil;
 
                 NSString * actualFilename = [[NSString alloc] initWithData: [zipinfoOutput readDataToEndOfFile]
                                                 encoding: NSUTF8StringEncoding];
-                actualFilename = [actualFilename stringByTrimmingCharactersInSet: [NSCharacterSet whitespaceAndNewlineCharacterSet]];
+                actualFilename = [actualFilename stringByTrimmingCharactersInSet: NSCharacterSet.whitespaceAndNewlineCharacterSet];
                 NSString * newBlocklistPath = [workingDirectory stringByAppendingPathComponent: actualFilename];
 
                 //Finally, delete the ZIP file; we're done with it, and we'll return the unzipped blocklist
-                [[NSFileManager defaultManager] removeItemAtPath: fDestination error: NULL];
+                [NSFileManager.defaultManager removeItemAtPath: fDestination error: NULL];
 
                 fDestination = newBlocklistPath;
             }

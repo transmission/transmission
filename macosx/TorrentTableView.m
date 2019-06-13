@@ -57,7 +57,7 @@
 {
     if ((self = [super initWithCoder: decoder]))
     {
-        fDefaults = [NSUserDefaults standardUserDefaults];
+        fDefaults = NSUserDefaults.standardUserDefaults;
 
         fTorrentCell = [[TorrentCell alloc] init];
 
@@ -84,7 +84,7 @@
 
 - (void) dealloc
 {
-    [[NSNotificationCenter defaultCenter] removeObserver: self];
+    [NSNotificationCenter.defaultCenter removeObserver: self];
 }
 
 - (void) awakeFromNib
@@ -92,7 +92,7 @@
     //set group columns to show ratio, needs to be in awakeFromNib to size columns correctly
     [self setGroupStatusColumns];
 
-    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(setNeedsDisplay) name: @"RefreshTorrentTable" object: nil];
+    [NSNotificationCenter.defaultCenter addObserver: self selector: @selector(setNeedsDisplay) name: @"RefreshTorrentTable" object: nil];
 }
 
 - (BOOL) isGroupCollapsed: (NSInteger) value
@@ -147,13 +147,14 @@
     {
         if (!tableColumn)
         {
-            [cell setRepresentedObject: item];
+            TorrentCell * torrentCell = cell;
+            torrentCell.representedObject = item;
 
             const NSInteger row = [self rowForItem: item];
-            [cell setHover: row == fMouseRow];
-            [cell setControlHover: row == fMouseControlRow];
-            [cell setRevealHover: row == fMouseRevealRow];
-            [cell setActionHover: row == fMouseActionRow];
+            torrentCell.hover = (row == fMouseRow);
+            torrentCell.controlHover = (row == fMouseControlRow);
+            torrentCell.revealHover = (row == fMouseRevealRow);
+            torrentCell.actionHover = (row == fMouseActionRow);
         }
     }
 }
@@ -337,7 +338,7 @@
     if ([fCollapsedGroups containsIndex: value])
     {
         [fCollapsedGroups removeIndex: value];
-        [[NSNotificationCenter defaultCenter] postNotificationName: @"OutlineExpandCollapse" object: self];
+        [NSNotificationCenter.defaultCenter postNotificationName: @"OutlineExpandCollapse" object: self];
     }
 }
 
@@ -349,7 +350,7 @@
         value = MAX_GROUP;
 
     [fCollapsedGroups addIndex: value];
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"OutlineExpandCollapse" object: self];
+    [NSNotificationCenter.defaultCenter postNotificationName: @"OutlineExpandCollapse" object: self];
 }
 
 - (void) mouseDown: (NSEvent *) event
@@ -511,17 +512,17 @@
 - (void) paste: (id) sender
 {
     NSURL * url;
-    if ((url = [NSURL URLFromPasteboard: [NSPasteboard generalPasteboard]]))
+    if ((url = [NSURL URLFromPasteboard: NSPasteboard.generalPasteboard]))
         [fController openURL: url.absoluteString];
     else
     {
-        NSArray * items = [[NSPasteboard generalPasteboard] readObjectsForClasses: @[[NSString class]] options: nil];
+        NSArray * items = [NSPasteboard.generalPasteboard readObjectsForClasses: @[[NSString class]] options: nil];
         if (items)
         {
             NSDataDetector * detector = [NSDataDetector dataDetectorWithTypes: NSTextCheckingTypeLink error: nil];
             for (__strong NSString * pbItem in items)
             {
-                pbItem = [pbItem stringByTrimmingCharactersInSet: [NSCharacterSet whitespaceAndNewlineCharacterSet]];
+                pbItem = [pbItem stringByTrimmingCharactersInSet: NSCharacterSet.whitespaceAndNewlineCharacterSet];
                 if ([pbItem rangeOfString: @"magnet:" options: (NSAnchoredSearch | NSCaseInsensitiveSearch)].location != NSNotFound)
                     [fController openURL: pbItem];
                 else
@@ -541,16 +542,16 @@
 
     if (action == @selector(paste:))
     {
-        if ([[NSPasteboard generalPasteboard].types containsObject: NSURLPboardType])
+        if ([NSPasteboard.generalPasteboard.types containsObject: NSURLPboardType])
             return YES;
 
-        NSArray * items = [[NSPasteboard generalPasteboard] readObjectsForClasses: @[[NSString class]] options: nil];
+        NSArray * items = [NSPasteboard.generalPasteboard readObjectsForClasses: @[[NSString class]] options: nil];
         if (items)
         {
             NSDataDetector * detector = [NSDataDetector dataDetectorWithTypes: NSTextCheckingTypeLink error: nil];
             for (__strong NSString * pbItem in items)
             {
-                pbItem = [pbItem stringByTrimmingCharactersInSet: [NSCharacterSet whitespaceAndNewlineCharacterSet]];
+                pbItem = [pbItem stringByTrimmingCharactersInSet: NSCharacterSet.whitespaceAndNewlineCharacterSet];
                 if (([pbItem rangeOfString: @"magnet:" options: (NSAnchoredSearch | NSCaseInsensitiveSearch)].location != NSNotFound)
                     || [detector firstMatchInString: pbItem options: 0 range: NSMakeRange(0, pbItem.length)])
                     return YES;
@@ -569,7 +570,7 @@
         [fController stopTorrents: @[torrent]];
     else
     {
-        if ([NSEvent modifierFlags] & NSAlternateKeyMask)
+        if (NSEvent.modifierFlags & NSAlternateKeyMask)
             [fController resumeTorrentsNoWait: @[torrent]];
         else if (torrent.waitingToStart)
             [fController stopTorrents: @[torrent]];
@@ -702,7 +703,7 @@
     const BOOL limit = [sender tag] == ACTION_MENU_LIMIT_TAG;
     [fMenuTorrent setUseSpeedLimit: limit upload: [sender menu] == fUploadMenu];
 
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateOptions" object: nil];
+    [NSNotificationCenter.defaultCenter postNotificationName: @"UpdateOptions" object: nil];
 }
 
 - (void) setQuickLimit: (id) sender
@@ -711,14 +712,14 @@
     [fMenuTorrent setUseSpeedLimit: YES upload: upload];
     [fMenuTorrent setSpeedLimit: [[sender representedObject] intValue] upload: upload];
 
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateOptions" object: nil];
+    [NSNotificationCenter.defaultCenter postNotificationName: @"UpdateOptions" object: nil];
 }
 
 - (void) setGlobalLimit: (id) sender
 {
     fMenuTorrent.usesGlobalSpeedLimit = ((NSButton *)sender).state != NSOnState;
 
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateOptions" object: nil];
+    [NSNotificationCenter.defaultCenter postNotificationName: @"UpdateOptions" object: nil];
 }
 
 - (void) setQuickRatioMode: (id) sender
@@ -741,7 +742,7 @@
 
     fMenuTorrent.ratioSetting = mode;
 
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateOptions" object: nil];
+    [NSNotificationCenter.defaultCenter postNotificationName: @"UpdateOptions" object: nil];
 }
 
 - (void) setQuickRatio: (id) sender
@@ -749,7 +750,7 @@
     fMenuTorrent.ratioSetting = TR_RATIOLIMIT_SINGLE;
     fMenuTorrent.ratioLimit = [[sender representedObject] floatValue];
 
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateOptions" object: nil];
+    [NSNotificationCenter.defaultCenter postNotificationName: @"UpdateOptions" object: nil];
 }
 
 - (void) setPriority: (id) sender
@@ -773,7 +774,7 @@
 
     fMenuTorrent.priority = priority;
 
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateUI" object: nil];
+    [NSNotificationCenter.defaultCenter postNotificationName: @"UpdateUI" object: nil];
 }
 
 - (void) togglePiecesBar
@@ -820,7 +821,7 @@
 - (void) selectAndScrollToRow: (NSInteger) row
 {
     NSParameterAssert(row >= 0);
-    NSParameterAssert(row < [self numberOfRows]);
+    NSParameterAssert(row < self.numberOfRows);
 
     [self selectRowIndexes: [NSIndexSet indexSetWithIndex: row] byExtendingSelection: NO];
 

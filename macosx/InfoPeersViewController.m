@@ -56,7 +56,7 @@
 
 - (void) awakeFromNib
 {
-    const CGFloat height = [[NSUserDefaults standardUserDefaults] floatForKey: @"InspectorContentHeightPeers"];
+    const CGFloat height = [NSUserDefaults.standardUserDefaults floatForKey: @"InspectorContentHeightPeers"];
     if (height != 0.0)
     {
         NSRect viewRect = self.view.frame;
@@ -230,7 +230,7 @@
 
 - (void) saveViewSize
 {
-    [[NSUserDefaults standardUserDefaults] setFloat: NSHeight(self.view.frame) forKey: @"InspectorContentHeightPeers"];
+    [NSUserDefaults.standardUserDefaults setFloat: NSHeight(self.view.frame) forKey: @"InspectorContentHeightPeers"];
 }
 
 - (void) clearView

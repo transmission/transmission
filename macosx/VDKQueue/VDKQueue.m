@@ -247,7 +247,7 @@ NSString * VDKQueueAccessRevocationNotification = @"VDKQueueAccessWasRevokedNoti
                             NSString *fpath = ((VDKQueuePathEntry *)pe).path;
                             if (!fpath) continue;
                             
-                            [[NSWorkspace sharedWorkspace] noteFileSystemChanged:fpath];
+                            [NSWorkspace.sharedWorkspace noteFileSystemChanged:fpath];
                             
                             // Clear any old notifications
                             [notesToPost removeAllObjects];
@@ -296,7 +296,7 @@ NSString * VDKQueueAccessRevocationNotification = @"VDKQueueAccessWasRevokedNoti
                                                    if (!_delegate || _alwaysPostNotifications)
                                                    {
                                                        NSDictionary * userInfoDict = @{@"path": fpath};
-                                                       [[NSWorkspace sharedWorkspace].notificationCenter postNotificationName:note object:self userInfo:userInfoDict];
+                                                       [NSWorkspace.sharedWorkspace.notificationCenter postNotificationName:note object:self userInfo:userInfoDict];
                                                    }
                                                }
                                                

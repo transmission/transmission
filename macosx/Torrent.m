@@ -235,7 +235,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
 
 - (void) dealloc
 {
-    [[NSNotificationCenter defaultCenter] removeObserver: self];
+    [NSNotificationCenter.defaultCenter removeObserver: self];
 
     if (fFileStat)
         tr_torrentFilesFree(fFileStat, self.fileCount);
@@ -310,7 +310,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
     //make sure the "active" filter is updated when stalled-ness changes
     if (wasStalled != self.stalled)
         //posting asynchronously with coalescing to prevent stack overflow on lots of torrents changing state at the same time
-        [[NSNotificationQueue defaultQueue] enqueueNotification: [NSNotification notificationWithName: @"UpdateQueue" object: self]
+        [NSNotificationQueue.defaultQueue enqueueNotification: [NSNotification notificationWithName: @"UpdateQueue" object: self]
                                                    postingStyle: NSPostASAP
                                                    coalesceMask: NSNotificationCoalescingOnName
                                                        forModes: nil];
@@ -328,7 +328,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
         [self update];
 
         //capture, specifically, stop-seeding settings changing to unlimited
-        [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateOptions" object: nil];
+        [NSNotificationCenter.defaultCenter postNotificationName: @"UpdateOptions" object: nil];
     }
 }
 
@@ -512,13 +512,13 @@ bool trashDataFile(const char * filename, tr_error ** error)
 + (BOOL) trashFile: (NSString *) path error: (NSError **) error
 {
     //attempt to move to trash
-    if (![[NSWorkspace sharedWorkspace] performFileOperation: NSWorkspaceRecycleOperation
+    if (![NSWorkspace.sharedWorkspace performFileOperation: NSWorkspaceRecycleOperation
                                                       source: path.stringByDeletingLastPathComponent destination: @""
                                                        files: @[path.lastPathComponent] tag: nil])
     {
         //if cannot trash, just delete it (will work if it's on a remote volume)
         NSError * localError;
-        if (![[NSFileManager defaultManager] removeItemAtPath: path error: &localError])
+        if (![NSFileManager.defaultManager removeItemAtPath: path error: &localError])
         {
             NSLog(@"old Could not trash %@: %@", path, localError.localizedDescription);
             if (error != nil)
@@ -568,7 +568,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
         [NSThread sleepForTimeInterval: 0.05];
 
     if (status == TR_LOC_DONE)
-        [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateStats" object: nil];
+        [NSNotificationCenter.defaultCenter postNotificationName: @"UpdateStats" object: nil];
     else
     {
         NSAlert * alert = [[NSAlert alloc] init];
@@ -585,7 +585,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
 
 - (void) copyTorrentFileTo: (NSString *) path
 {
-    [[NSFileManager defaultManager] copyItemAtPath: self.torrentLocation toPath: path error: NULL];
+    [NSFileManager.defaultManager copyItemAtPath: self.torrentLocation toPath: path error: NULL];
 }
 
 - (BOOL) alertForRemainingDiskSpace
@@ -595,14 +595,14 @@ bool trashDataFile(const char * filename, tr_error ** error)
 
     NSString * downloadFolder = self.currentDirectory;
     NSDictionary * systemAttributes;
-    if ((systemAttributes = [[NSFileManager defaultManager] attributesOfFileSystemForPath: downloadFolder error: NULL]))
+    if ((systemAttributes = [NSFileManager.defaultManager attributesOfFileSystemForPath: downloadFolder error: NULL]))
     {
-        const uint64_t remainingSpace = [systemAttributes[NSFileSystemFreeSize] unsignedLongLongValue];
+        const uint64_t remainingSpace = ((NSNumber *)systemAttributes[NSFileSystemFreeSize]).unsignedLongLongValue;
 
         //if the remaining space is greater than the size left, then there is enough space regardless of preallocation
         if (remainingSpace < self.sizeLeft && remainingSpace < tr_torrentGetBytesLeftToAllocate(fHandle))
         {
-            NSString * volumeName = [[NSFileManager defaultManager] componentsToDisplayForPath: downloadFolder][0];
+            NSString * volumeName = [NSFileManager.defaultManager componentsToDisplayForPath: downloadFolder][0];
 
             NSAlert * alert = [[NSAlert alloc] init];
             alert.messageText = [NSString stringWithFormat:
@@ -635,7 +635,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
 
     if (!fIcon)
         fIcon = self.folder ? [NSImage imageNamed: NSImageNameFolder]
-                                : [[NSWorkspace sharedWorkspace] iconForFileType: self.name.pathExtension];
+                                : [NSWorkspace.sharedWorkspace iconForFileType: self.name.pathExtension];
     return fIcon;
 }
 
@@ -695,7 +695,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
 
 - (BOOL) addTrackerToNewTier: (NSString *) tracker
 {
-    tracker = [tracker stringByTrimmingCharactersInSet: [NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    tracker = [tracker stringByTrimmingCharactersInSet: NSCharacterSet.whitespaceAndNewlineCharacterSet];
 
     if ([tracker rangeOfString: @"://"].location == NSNotFound)
         tracker = [@"http://" stringByAppendingString: tracker];
@@ -784,7 +784,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
     {
         NSString * dataLocation = [self.currentDirectory stringByAppendingPathComponent: self.name];
 
-        if (![[NSFileManager defaultManager] fileExistsAtPath: dataLocation])
+        if (![NSFileManager.defaultManager fileExistsAtPath: dataLocation])
             return nil;
 
         return dataLocation;
@@ -809,7 +809,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
         NSString * basePath = [node.path stringByAppendingPathComponent: node.name];
         NSString * dataLocation = [self.currentDirectory stringByAppendingPathComponent: basePath];
 
-        if (![[NSFileManager defaultManager] fileExistsAtPath: dataLocation])
+        if (![NSFileManager.defaultManager fileExistsAtPath: dataLocation])
             return nil;
 
         return dataLocation;
@@ -1363,7 +1363,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
     if (groupValue != fGroupValue)
     {
         fGroupValue = groupValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName: kTorrentDidChangeGroupNotification object: self];
+        [NSNotificationCenter.defaultCenter postNotificationName: kTorrentDidChangeGroupNotification object: self];
     }
     fGroupValueDetermination = determinationType;
 }
@@ -1480,7 +1480,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
     free(files);
 
     [self update];
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentFileCheckChange" object: self];
+    [NSNotificationCenter.defaultCenter postNotificationName: @"TorrentFileCheckChange" object: self];
 }
 
 - (void) setFilePriority: (tr_priority_t) priority forIndexes: (NSIndexSet *) indexSet
@@ -1505,7 +1505,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
 - (NSSet *) filePrioritiesForIndexes: (NSIndexSet *) indexSet
 {
     BOOL low = NO, normal = NO, high = NO;
-    NSMutableSet * priorities = [NSMutableSet setWithCapacity: MIN([indexSet count], 3u)];
+    NSMutableSet * priorities = [NSMutableSet setWithCapacity: MIN(indexSet.count, 3u)];
 
     for (NSUInteger index = indexSet.firstIndex; index != NSNotFound; index = [indexSet indexGreaterThanIndex: index])
     {
@@ -1651,7 +1651,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
     if (!(self = [super init]))
         return nil;
 
-    fDefaults = [NSUserDefaults standardUserDefaults];
+    fDefaults = NSUserDefaults.standardUserDefaults;
 
     if (torrentStruct)
         fHandle = torrentStruct;
@@ -1719,7 +1719,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
 
     fRemoveWhenFinishSeeding = removeWhenFinishSeeding ? removeWhenFinishSeeding.boolValue : [fDefaults boolForKey: @"RemoveWhenFinishSeeding"];
 
-    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(checkGroupValueForRemoval:)
+    [NSNotificationCenter.defaultCenter addObserver: self selector: @selector(checkGroupValueForRemoval:)
         name: @"GroupValueRemoved" object: nil];
 
     fTimeMachineExcludeInitialized = NO;
@@ -1769,8 +1769,8 @@ bool trashDataFile(const char * filename, tr_error ** error)
 - (void) insertPathForComponents: (NSArray *) components withComponentIndex: (NSUInteger) componentIndex forParent: (FileListNode *) parent fileSize: (uint64_t) size
     index: (NSInteger) index flatList: (NSMutableArray *) flatFileList
 {
-    NSParameterAssert([components count] > 0);
-    NSParameterAssert(componentIndex < [components count]);
+    NSParameterAssert(components.count > 0);
+    NSParameterAssert(componentIndex < components.count);
 
     NSString * name = components[componentIndex];
     const BOOL isFolder = componentIndex < (components.count-1);
@@ -1824,7 +1824,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
 
 - (void) startQueue
 {
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateQueue" object: self];
+    [NSNotificationCenter.defaultCenter postNotificationName: @"UpdateQueue" object: self];
 }
 
 - (void) completenessChange: (tr_completeness) status wasRunning: (BOOL) wasRunning
@@ -1837,7 +1837,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
         case TR_PARTIAL_SEED:
         {
             NSDictionary * statusInfo = @{ @"Status" : @(status), @"WasRunning" : @(wasRunning) };
-            [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentFinishedDownloading" object: self userInfo: statusInfo];
+            [NSNotificationCenter.defaultCenter postNotificationName: @"TorrentFinishedDownloading" object: self userInfo: statusInfo];
 
             //quarantine the finished data
             NSString * dataLocation = [self.currentDirectory stringByAppendingPathComponent: self.name];
@@ -1864,7 +1864,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
             break;
         }
         case TR_LEECH:
-            [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentRestartedDownloading" object: self];
+            [NSNotificationCenter.defaultCenter postNotificationName: @"TorrentRestartedDownloading" object: self];
             break;
     }
 
@@ -1876,14 +1876,14 @@ bool trashDataFile(const char * filename, tr_error ** error)
 {
     fStat = tr_torrentStat(fHandle);
 
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentFinishedSeeding" object: self];
+    [NSNotificationCenter.defaultCenter postNotificationName: @"TorrentFinishedSeeding" object: self];
 }
 
 - (void) idleLimitHit
 {
     fStat = tr_torrentStat(fHandle);
 
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentFinishedSeeding" object: self];
+    [NSNotificationCenter.defaultCenter postNotificationName: @"TorrentFinishedSeeding" object: self];
 }
 
 - (void) metadataRetrieved
@@ -1906,7 +1906,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
         [self changeDownloadFolderBeforeUsing: location determinationType:TorrentDeterminationAutomatic];
     }
 
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"ResetInspector" object: self userInfo: @{ @"Torrent" : self }];
+    [NSNotificationCenter.defaultCenter postNotificationName: @"ResetInspector" object: self userInfo: @{ @"Torrent" : self }];
 }
 
 - (void)renameFinished: (BOOL) success nodes: (NSArray *) nodes completionHandler: (void (^)(BOOL)) completionHandler oldPath: (NSString *) oldPath newName: (NSString *) newName

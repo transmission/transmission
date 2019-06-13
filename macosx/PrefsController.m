@@ -73,7 +73,7 @@
     {
         fHandle = handle;
 
-        fDefaults = [NSUserDefaults standardUserDefaults];
+        fDefaults = NSUserDefaults.standardUserDefaults;
 
         //check for old version download location (before 1.1)
         NSString * choice;
@@ -93,8 +93,8 @@
             [fDefaults setObject: blocklistDate forKey: @"BlocklistNewLastUpdate"];
             [fDefaults removeObjectForKey: @"BlocklistLastUpdate"];
 
-            NSURL * blocklistDir = [[[NSFileManager defaultManager] URLsForDirectory: NSApplicationDirectory inDomains: NSUserDomainMask][0] URLByAppendingPathComponent: @"Transmission/blocklists/"];
-            [[NSFileManager defaultManager] moveItemAtURL: [blocklistDir URLByAppendingPathComponent: @"level1.bin"]
+            NSURL * blocklistDir = [[NSFileManager.defaultManager URLsForDirectory: NSApplicationDirectory inDomains: NSUserDomainMask][0] URLByAppendingPathComponent: @"Transmission/blocklists/"];
+            [NSFileManager.defaultManager moveItemAtURL: [blocklistDir URLByAppendingPathComponent: @"level1.bin"]
                 toURL: [blocklistDir URLByAppendingPathComponent: @DEFAULT_BLOCKLIST_FILENAME]
                 error: nil];
         }
@@ -141,7 +141,7 @@
 
 - (void) dealloc
 {
-    [[NSNotificationCenter defaultCenter] removeObserver: self];
+    [NSNotificationCenter.defaultCenter removeObserver: self];
 
     [fPortStatusTimer invalidate];
     if (fPortChecker)
@@ -206,19 +206,19 @@
     [self updateBlocklistButton];
     [self updateBlocklistFields];
 
-    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(updateLimitFields)
+    [NSNotificationCenter.defaultCenter addObserver: self selector: @selector(updateLimitFields)
                                                  name: @"UpdateSpeedLimitValuesOutsidePrefs" object: nil];
 
-    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(updateRatioStopField)
+    [NSNotificationCenter.defaultCenter addObserver: self selector: @selector(updateRatioStopField)
                                                  name: @"UpdateRatioStopValueOutsidePrefs" object: nil];
 
-    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(updateLimitStopField)
+    [NSNotificationCenter.defaultCenter addObserver: self selector: @selector(updateLimitStopField)
                                                  name: @"UpdateIdleStopValueOutsidePrefs" object: nil];
 
-    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(updateBlocklistFields)
+    [NSNotificationCenter.defaultCenter addObserver: self selector: @selector(updateBlocklistFields)
         name: @"BlocklistUpdated" object: nil];
 
-    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(updateBlocklistURLField)
+    [NSNotificationCenter.defaultCenter addObserver: self selector: @selector(updateBlocklistURLField)
         name: NSControlTextDidChangeNotification object: fBlocklistURLField];
 
     //set rpc port
@@ -423,9 +423,9 @@
         directory = [directory stringByAppendingPathComponent: @"Sounds"];
 
         BOOL isDirectory;
-        if ([[NSFileManager defaultManager] fileExistsAtPath: directory isDirectory: &isDirectory] && isDirectory)
+        if ([NSFileManager.defaultManager fileExistsAtPath: directory isDirectory: &isDirectory] && isDirectory)
         {
-            NSArray * directoryContents = [[NSFileManager defaultManager] contentsOfDirectoryAtPath: directory error: NULL];
+            NSArray * directoryContents = [NSFileManager.defaultManager contentsOfDirectoryAtPath: directory error: NULL];
             for (__strong NSString * sound in directoryContents)
             {
                 sound = sound.stringByDeletingPathExtension;
@@ -568,7 +568,7 @@
     tr_sessionLimitSpeed(fHandle, TR_DOWN, [fDefaults boolForKey: @"CheckDownload"]);
     tr_sessionSetSpeedLimit_KBps(fHandle, TR_DOWN, [fDefaults integerForKey: @"DownloadLimit"]);
 
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"SpeedLimitUpdate" object: nil];
+    [NSNotificationCenter.defaultCenter postNotificationName: @"SpeedLimitUpdate" object: nil];
 }
 
 - (void) applyAltSpeedSettings
@@ -576,7 +576,7 @@
     tr_sessionSetAltSpeed_KBps(fHandle, TR_UP, [fDefaults integerForKey: @"SpeedLimitUploadLimit"]);
     tr_sessionSetAltSpeed_KBps(fHandle, TR_DOWN, [fDefaults integerForKey: @"SpeedLimitDownloadLimit"]);
 
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"SpeedLimitUpdate" object: nil];
+    [NSNotificationCenter.defaultCenter postNotificationName: @"SpeedLimitUpdate" object: nil];
 }
 
 - (void) applyRatioSetting: (id) sender
@@ -585,10 +585,10 @@
     tr_sessionSetRatioLimit(fHandle, [fDefaults floatForKey: @"RatioLimit"]);
 
     //reload main table for seeding progress
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateUI" object: nil];
+    [NSNotificationCenter.defaultCenter postNotificationName: @"UpdateUI" object: nil];
 
     //reload global settings in inspector
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateGlobalOptions" object: nil];
+    [NSNotificationCenter.defaultCenter postNotificationName: @"UpdateGlobalOptions" object: nil];
 }
 
 - (void) setRatioStop: (id) sender
@@ -617,10 +617,10 @@
     tr_sessionSetIdleLimit(fHandle, [fDefaults integerForKey: @"IdleLimitMinutes"]);
 
     //reload main table for remaining seeding time
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateUI" object: nil];
+    [NSNotificationCenter.defaultCenter postNotificationName: @"UpdateUI" object: nil];
 
     //reload global settings in inspector
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateGlobalOptions" object: nil];
+    [NSNotificationCenter.defaultCenter postNotificationName: @"UpdateGlobalOptions" object: nil];
 }
 
 - (void) setIdleStop: (id) sender
@@ -676,7 +676,7 @@
 
 + (NSInteger) dateToTimeSum: (NSDate *) date
 {
-    NSCalendar * calendar = [NSCalendar currentCalendar];
+    NSCalendar * calendar = NSCalendar.currentCalendar;
     NSDateComponents * components = [calendar components: NSHourCalendarUnit | NSMinuteCalendarUnit fromDate: date];
     return components.hour * 60 + components.minute;
 }
@@ -687,7 +687,7 @@
     comps.hour = sum / 60;
     comps.minute = sum % 60;
 
-    return [[NSCalendar currentCalendar] dateFromComponents: comps];
+    return [NSCalendar.currentCalendar dateFromComponents: comps];
 }
 
 - (BOOL) control: (NSControl *) control textShouldBeginEditing: (NSText *) fieldEditor
@@ -710,12 +710,12 @@
 
 - (void) setBadge: (id) sender
 {
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateUI" object: self];
+    [NSNotificationCenter.defaultCenter postNotificationName: @"UpdateUI" object: self];
 }
 
 - (IBAction) openNotificationSystemPrefs: (NSButton *) sender
 {
-    [[NSWorkspace sharedWorkspace] openURL: [NSURL fileURLWithPath:@"/System/Library/PreferencePanes/Notifications.prefPane"]];
+    [NSWorkspace.sharedWorkspace openURL: [NSURL fileURLWithPath:@"/System/Library/PreferencePanes/Notifications.prefPane"]];
 }
 
 - (void) resetWarnings: (id) sender
@@ -735,7 +735,7 @@
 
 - (void) setDefaultForMagnets: (id) sender
 {
-    NSString * bundleID = [NSBundle mainBundle].bundleIdentifier;
+    NSString * bundleID = NSBundle.mainBundle.bundleIdentifier;
     const OSStatus result = LSSetDefaultHandlerForURLScheme((CFStringRef)@"magnet", (__bridge CFStringRef)bundleID);
     if (result != noErr)
         NSLog(@"Failed setting default magnet link handler");
@@ -748,7 +748,7 @@
     tr_sessionSetQueueEnabled(fHandle, TR_UP, [fDefaults boolForKey: @"QueueSeed"]);
 
     //handle if any transfers switch from queued to paused
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateQueue" object: self];
+    [NSNotificationCenter.defaultCenter postNotificationName: @"UpdateQueue" object: self];
 }
 
 - (void) setQueueNumber: (id) sender
@@ -766,7 +766,7 @@
     tr_sessionSetQueueStalledEnabled(fHandle, [fDefaults boolForKey: @"CheckStalled"]);
 
     //reload main table for stalled status
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateUI" object: nil];
+    [NSNotificationCenter.defaultCenter postNotificationName: @"UpdateUI" object: nil];
 }
 
 - (void) setStalledMinutes: (id) sender
@@ -776,7 +776,7 @@
     tr_sessionSetQueueStalledMinutes(fHandle, min);
 
     //reload main table for stalled status
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateUI" object: self];
+    [NSNotificationCenter.defaultCenter postNotificationName: @"UpdateUI" object: self];
 }
 
 - (void) setDownloadLocation: (id) sender
@@ -800,7 +800,7 @@
         {
             [fFolderPopUp selectItemAtIndex: DOWNLOAD_FOLDER];
 
-            NSString * folder = (panel.URLs[0]).path;
+            NSString * folder = panel.URLs[0].path;
             [fDefaults setObject: folder forKey: @"DownloadFolder"];
             [fDefaults setBool: YES forKey: @"DownloadLocationConstant"];
             [self updateShowAddMagnetWindowField];
@@ -829,7 +829,7 @@
     [panel beginSheetModalForWindow: self.window completionHandler: ^(NSInteger result) {
         if (result == NSFileHandlingPanelOKButton)
         {
-            NSString * folder = (panel.URLs[0]).path;
+            NSString * folder = panel.URLs[0].path;
             [fDefaults setObject: folder forKey: @"IncompleteDownloadFolder"];
 
             assert(folder.length > 0);
@@ -852,7 +852,7 @@
     [panel beginSheetModalForWindow: self.window completionHandler: ^(NSInteger result) {
         if (result == NSFileHandlingPanelOKButton)
         {
-            NSString * filePath = (panel.URLs[0]).path;
+            NSString * filePath = panel.URLs[0].path;
 
             assert(filePath.length > 0);
 
@@ -898,7 +898,7 @@
 
 - (void) setDoneScriptEnabled: (id) sender
 {
-    if ([fDefaults boolForKey: @"DoneScriptEnabled"] && ![[NSFileManager defaultManager] fileExistsAtPath: [fDefaults stringForKey:@"DoneScriptPath"]])
+    if ([fDefaults boolForKey: @"DoneScriptEnabled"] && ![NSFileManager.defaultManager fileExistsAtPath: [fDefaults stringForKey:@"DoneScriptPath"]])
     {
         // enabled is set but script file doesn't exist, so prompt for one and disable until they pick one
         [fDefaults setBool: NO forKey: @"DoneScriptEnabled"];
@@ -921,7 +921,7 @@
         else
             [watcherQueue removeAllPaths];
 
-        [[NSNotificationCenter defaultCenter] postNotificationName: @"AutoImportSettingChange" object: self];
+        [NSNotificationCenter.defaultCenter postNotificationName: @"AutoImportSettingChange" object: self];
     }
     else
         [self importFolderSheetShow: nil];
@@ -947,7 +947,7 @@
             [fDefaults setObject: path forKey: @"AutoImportDirectory"];
             [watcherQueue addPath: path.stringByExpandingTildeInPath notifyingAbout: VDKQueueNotifyAboutWrite];
 
-            [[NSNotificationCenter defaultCenter] postNotificationName: @"AutoImportSettingChange" object: self];
+            [NSNotificationCenter.defaultCenter postNotificationName: @"AutoImportSettingChange" object: self];
         }
         else
         {
@@ -962,7 +962,7 @@
 
 - (void) setAutoSize: (id) sender
 {
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"AutoSizeSettingChange" object: self];
+    [NSNotificationCenter.defaultCenter postNotificationName: @"AutoSizeSettingChange" object: self];
 }
 
 - (void) setRPCEnabled: (id) sender
@@ -976,7 +976,7 @@
 - (void) linkWebUI: (id) sender
 {
     NSString * urlString = [NSString stringWithFormat: WEBUI_URL, [fDefaults integerForKey: @"RPCPort"]];
-    [[NSWorkspace sharedWorkspace] openURL: [NSURL URLWithString: urlString]];
+    [NSWorkspace.sharedWorkspace openURL: [NSURL URLWithString: urlString]];
 }
 
 - (void) setRPCAuthorize: (id) sender
@@ -1108,7 +1108,7 @@
             {
                 int num = component.intValue;
                 if (num >= 0 && num < 256)
-                    [newComponents addObject: (@(num)).stringValue];
+                    [newComponents addObject: @(num).stringValue];
                 else
                 {
                     valid = false;
@@ -1154,26 +1154,26 @@
 
 - (void) helpForScript: (id) sender
 {
-    [[NSHelpManager sharedHelpManager] openHelpAnchor: @"script"
-        inBook: [[NSBundle mainBundle] objectForInfoDictionaryKey: @"CFBundleHelpBookName"]];
+    [NSHelpManager.sharedHelpManager openHelpAnchor: @"script"
+        inBook: [NSBundle.mainBundle objectForInfoDictionaryKey: @"CFBundleHelpBookName"]];
 }
 
 - (void) helpForPeers: (id) sender
 {
-    [[NSHelpManager sharedHelpManager] openHelpAnchor: @"peers"
-        inBook: [[NSBundle mainBundle] objectForInfoDictionaryKey: @"CFBundleHelpBookName"]];
+    [NSHelpManager.sharedHelpManager openHelpAnchor: @"peers"
+        inBook: [NSBundle.mainBundle objectForInfoDictionaryKey: @"CFBundleHelpBookName"]];
 }
 
 - (void) helpForNetwork: (id) sender
 {
-    [[NSHelpManager sharedHelpManager] openHelpAnchor: @"network"
-        inBook: [[NSBundle mainBundle] objectForInfoDictionaryKey: @"CFBundleHelpBookName"]];
+    [NSHelpManager.sharedHelpManager openHelpAnchor: @"network"
+        inBook: [NSBundle.mainBundle objectForInfoDictionaryKey: @"CFBundleHelpBookName"]];
 }
 
 - (void) helpForRemote: (id) sender
 {
-    [[NSHelpManager sharedHelpManager] openHelpAnchor: @"remote"
-        inBook: [[NSBundle mainBundle] objectForInfoDictionaryKey: @"CFBundleHelpBookName"]];
+    [NSHelpManager.sharedHelpManager openHelpAnchor: @"remote"
+        inBook: [NSBundle.mainBundle objectForInfoDictionaryKey: @"CFBundleHelpBookName"]];
 }
 
 - (void) rpcUpdatePrefs
@@ -1184,10 +1184,10 @@
     [fDefaults setBool: encryptionMode == TR_ENCRYPTION_REQUIRED forKey: @"EncryptionRequire"];
 
     //download directory
-    NSString * downloadLocation = (@(tr_sessionGetDownloadDir(fHandle))).stringByStandardizingPath;
+    NSString * downloadLocation = @(tr_sessionGetDownloadDir(fHandle)).stringByStandardizingPath;
     [fDefaults setObject: downloadLocation forKey: @"DownloadFolder"];
 
-    NSString * incompleteLocation = (@(tr_sessionGetIncompleteDir(fHandle))).stringByStandardizingPath;
+    NSString * incompleteLocation = @(tr_sessionGetIncompleteDir(fHandle)).stringByStandardizingPath;
     [fDefaults setObject: incompleteLocation forKey: @"IncompleteDownloadFolder"];
 
     const BOOL useIncomplete = tr_sessionIsIncompleteDirEnabled(fHandle);
@@ -1377,10 +1377,10 @@
         fStalledField.intValue = stalledMinutes;
     }
 
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"SpeedLimitUpdate" object: nil];
+    [NSNotificationCenter.defaultCenter postNotificationName: @"SpeedLimitUpdate" object: nil];
 
     //reload global settings in inspector
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateGlobalOptions" object: nil];
+    [NSNotificationCenter.defaultCenter postNotificationName: @"UpdateGlobalOptions" object: nil];
 }
 
 @end
@@ -1393,10 +1393,10 @@
     if (sender)
     {
         identifier = [sender itemIdentifier];
-        [[NSUserDefaults standardUserDefaults] setObject: identifier forKey: @"SelectedPrefView"];
+        [NSUserDefaults.standardUserDefaults setObject: identifier forKey: @"SelectedPrefView"];
     }
     else
-        identifier = [[NSUserDefaults standardUserDefaults] stringForKey: @"SelectedPrefView"];
+        identifier = [NSUserDefaults.standardUserDefaults stringForKey: @"SelectedPrefView"];
 
     NSView * view;
     if ([identifier isEqualToString: TOOLBAR_TRANSFERS])

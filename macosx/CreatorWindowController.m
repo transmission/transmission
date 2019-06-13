@@ -107,7 +107,7 @@ NSMutableSet *creatorWindowControllerSet = nil;
             return nil;
         }
 
-        fDefaults = [NSUserDefaults standardUserDefaults];
+        fDefaults = NSUserDefaults.standardUserDefaults;
 
         //get list of trackers
         if (!(fTrackers = [[fDefaults arrayForKey: @"CreatorTrackers"] mutableCopy]))
@@ -152,7 +152,7 @@ NSMutableSet *creatorWindowControllerSet = nil;
 
     const BOOL multifile = fInfo->isFolder;
 
-    NSImage * icon = [[NSWorkspace sharedWorkspace] iconForFileType: multifile
+    NSImage * icon = [NSWorkspace.sharedWorkspace iconForFileType: multifile
                         ? NSFileTypeForHFSTypeCode(kGenericFolderIcon) : fPath.pathExtension];
     icon.size = fIconView.frame.size;
     fIconView.image = icon;
@@ -350,7 +350,7 @@ NSMutableSet *creatorWindowControllerSet = nil;
 {
     NSString * tracker = (NSString *)object;
 
-    tracker = [tracker stringByTrimmingCharactersInSet: [NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    tracker = [tracker stringByTrimmingCharactersInSet: NSCharacterSet.whitespaceAndNewlineCharacterSet];
 
     if ([tracker rangeOfString: @"://"].location == NSNotFound)
         tracker = [@"http://" stringByAppendingString: tracker];
@@ -377,7 +377,7 @@ NSMutableSet *creatorWindowControllerSet = nil;
     NSArray * addresses = [fTrackers objectsAtIndexes: fTrackerTable.selectedRowIndexes];
     NSString * text = [addresses componentsJoinedByString: @"\n"];
 
-    NSPasteboard * pb = [NSPasteboard generalPasteboard];
+    NSPasteboard * pb = NSPasteboard.generalPasteboard;
     [pb clearContents];
     [pb writeObjects: @[text]];
 }
@@ -391,7 +391,7 @@ NSMutableSet *creatorWindowControllerSet = nil;
 
     if (action == @selector(paste:))
         return self.window.firstResponder == fTrackerTable
-            && [[NSPasteboard generalPasteboard] canReadObjectForClasses: @[[NSString class]] options: nil];
+            && [NSPasteboard.generalPasteboard canReadObjectForClasses: @[[NSString class]] options: nil];
 
     return YES;
 }
@@ -400,7 +400,7 @@ NSMutableSet *creatorWindowControllerSet = nil;
 {
     NSMutableArray * tempTrackers = [NSMutableArray array];
 
-    NSArray * items = [[NSPasteboard generalPasteboard] readObjectsForClasses: @[[NSString class]] options: nil];
+    NSArray * items = [NSPasteboard.generalPasteboard readObjectsForClasses: @[[NSString class]] options: nil];
     NSAssert(items != nil, @"no string items to paste; should not be able to call this method");
 
     for (NSString * pbItem in items)
@@ -413,7 +413,7 @@ NSMutableSet *creatorWindowControllerSet = nil;
 
     for (__strong NSString * tracker in tempTrackers)
     {
-        tracker = [tracker stringByTrimmingCharactersInSet: [NSCharacterSet whitespaceAndNewlineCharacterSet]];
+        tracker = [tracker stringByTrimmingCharactersInSet: NSCharacterSet.whitespaceAndNewlineCharacterSet];
 
         if ([tracker rangeOfString: @"://"].location == NSNotFound)
             tracker = [@"http://" stringByAppendingString: tracker];
@@ -466,9 +466,9 @@ NSMutableSet *creatorWindowControllerSet = nil;
 {
     if (alert.suppressionButton.state == NSOnState)
     {
-        [[NSUserDefaults standardUserDefaults] setBool: NO forKey: @"WarningCreatorBlankAddress"]; //set regardless of private/public
+        [NSUserDefaults.standardUserDefaults setBool: NO forKey: @"WarningCreatorBlankAddress"]; //set regardless of private/public
         if (fPrivateCheck.state == NSOnState)
-            [[NSUserDefaults standardUserDefaults] setBool: NO forKey: @"WarningCreatorPrivateBlankAddress"];
+            [NSUserDefaults.standardUserDefaults setBool: NO forKey: @"WarningCreatorPrivateBlankAddress"];
     }
 
 
@@ -518,7 +518,7 @@ NSMutableSet *creatorWindowControllerSet = nil;
     }
 
     //parse non-empty tracker strings
-    tr_tracker_info * trackerInfo = tr_new0(tr_tracker_info, [fTrackers count]);
+    tr_tracker_info * trackerInfo = tr_new0(tr_tracker_info, fTrackers.count);
 
     for (NSUInteger i = 0; i < fTrackers.count; i++)
     {
@@ -535,7 +535,7 @@ NSMutableSet *creatorWindowControllerSet = nil;
 
     self.window.restorable = NO;
 
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"BeginCreateTorrentFile" object: fLocation userInfo: nil];
+    [NSNotificationCenter.defaultCenter postNotificationName: @"BeginCreateTorrentFile" object: fLocation userInfo: nil];
     tr_makeMetaInfo(fInfo, fLocation.path.UTF8String, trackerInfo, fTrackers.count, fCommentView.string.UTF8String, fPrivateCheck.state == NSOnState);
     tr_free(trackerInfo);
 
@@ -556,7 +556,7 @@ NSMutableSet *creatorWindowControllerSet = nil;
                 if (fOpenWhenCreated)
                 {
                     NSDictionary * dict = @{@"File": fLocation.path, @"Path": fPath.URLByDeletingLastPathComponent.path};
-                    [[NSNotificationCenter defaultCenter] postNotificationName: @"OpenCreatedTorrentFile" object: self userInfo: dict];
+                    [NSNotificationCenter.defaultCenter postNotificationName: @"OpenCreatedTorrentFile" object: self userInfo: dict];
                 }
 
                 [self.window close];

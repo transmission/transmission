@@ -70,7 +70,7 @@ NSMutableSet * fTrackerIconLoading;
 {
     if ((self = [super init]))
     {
-        NSMutableParagraphStyle * paragraphStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
+        NSMutableParagraphStyle * paragraphStyle = [NSParagraphStyle.defaultParagraphStyle mutableCopy];
         paragraphStyle.lineBreakMode = NSLineBreakByTruncatingTail;
 
         fNameAttributes = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
@@ -104,11 +104,11 @@ NSMutableSet * fTrackerIconLoading;
     //set table colors
     NSColor * nameColor, * statusColor;
     if (self.backgroundStyle == NSBackgroundStyleDark)
-        nameColor = statusColor = [NSColor whiteColor];
+        nameColor = statusColor = NSColor.whiteColor;
     else
     {
-        nameColor = [NSColor labelColor];
-        statusColor = [NSColor secondaryLabelColor];
+        nameColor = NSColor.labelColor;
+        statusColor = NSColor.secondaryLabelColor;
     }
 
     fNameAttributes[NSForegroundColorAttributeName] = nameColor;

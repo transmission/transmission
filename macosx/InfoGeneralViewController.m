@@ -118,7 +118,7 @@
         return;
 
     NSURL * file = [NSURL fileURLWithPath: location];
-    [[NSWorkspace sharedWorkspace] activateFileViewerSelectingURLs: @[file]];
+    [NSWorkspace.sharedWorkspace activateFileViewerSelectingURLs: @[file]];
 }
 
 @end

@@ -78,9 +78,9 @@
 
 - (void) awakeFromNib
 {
-    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(updateCheckButtons:) name: @"TorrentFileCheckChange" object: fTorrent];
+    [NSNotificationCenter.defaultCenter addObserver: self selector: @selector(updateCheckButtons:) name: @"TorrentFileCheckChange" object: fTorrent];
 
-    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(updateGroupMenu:) name: @"UpdateGroups" object: nil];
+    [NSNotificationCenter.defaultCenter addObserver: self selector: @selector(updateGroupMenu:) name: @"UpdateGroups" object: nil];
 
     [fFileController setTorrent: fTorrent];
 
@@ -121,7 +121,7 @@
     }
     [fPriorityPopUp selectItemAtIndex: priorityIndex];
 
-    fStartCheck.state = [[NSUserDefaults standardUserDefaults] boolForKey: @"AutoStartDownload"] ? NSOnState : NSOffState;
+    fStartCheck.state = [NSUserDefaults.standardUserDefaults boolForKey: @"AutoStartDownload"] ? NSOnState : NSOffState;
 
     fDeleteCheck.state = fDeleteTorrentEnableInitially ? NSOnState : NSOffState;
     fDeleteCheck.enabled = fCanToggleDelete;
@@ -148,7 +148,7 @@
 
 - (void) dealloc
 {
-    [[NSNotificationCenter defaultCenter] removeObserver: self];
+    [NSNotificationCenter.defaultCenter removeObserver: self];
 
     [fTimer invalidate];
 }
@@ -175,7 +175,7 @@
         if (result == NSFileHandlingPanelOKButton)
         {
             fLockDestination = YES;
-            [self setDestinationPath: (panel.URLs[0]).path determinationType: TorrentDeterminationUserSpecified];
+            [self setDestinationPath: panel.URLs[0].path determinationType: TorrentDeterminationUserSpecified];
         }
         else
         {
@@ -188,7 +188,7 @@
 - (void) add: (id) sender
 {
     if ([fDestination.lastPathComponent isEqualToString: fTorrent.name]
-        && [[NSUserDefaults standardUserDefaults] boolForKey: @"WarningFolderDataSameName"])
+        && [NSUserDefaults.standardUserDefaults boolForKey: @"WarningFolderDataSameName"])
     {
         NSAlert * alert = [[NSAlert alloc] init];
         alert.messageText = NSLocalizedString(@"The destination directory and root data directory have the same name.",
@@ -379,7 +379,7 @@
         if ([GroupsController.groups usesCustomDownloadLocationForIndex: fGroupValue])
             [self setDestinationPath: [GroupsController.groups customDownloadLocationForIndex: fGroupValue] determinationType: TorrentDeterminationAutomatic];
         else if ([fDestination isEqualToString: [GroupsController.groups customDownloadLocationForIndex: previousGroup]])
-            [self setDestinationPath: [[NSUserDefaults standardUserDefaults] stringForKey: @"DownloadFolder"] determinationType: TorrentDeterminationAutomatic];
+            [self setDestinationPath: [NSUserDefaults.standardUserDefaults stringForKey: @"DownloadFolder"] determinationType: TorrentDeterminationAutomatic];
         else;
     }
 }
@@ -387,7 +387,7 @@
 - (void) sameNameAlertDidEnd: (NSAlert *) alert returnCode: (NSInteger) returnCode contextInfo: (void *) contextInfo
 {
     if (alert.suppressionButton.state == NSOnState)
-        [[NSUserDefaults standardUserDefaults] setBool: NO forKey: @"WarningFolderDataSameName"];
+        [NSUserDefaults.standardUserDefaults setBool: NO forKey: @"WarningFolderDataSameName"];
 
 
     if (returnCode == NSAlertSecondButtonReturn)

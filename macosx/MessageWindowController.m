@@ -58,7 +58,7 @@
     [window setFrameUsingName: @"MessageWindowFrame"];
     window.restorationClass = [self class];
 
-    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(resizeColumn)
+    [NSNotificationCenter.defaultCenter addObserver: self selector: @selector(resizeColumn)
         name: NSTableViewColumnDidResizeNotification object: fMessageTable];
 
     [window setContentBorderThickness: NSMinY(fMessageTable.enclosingScrollView.frame) forEdge: NSMinYEdge];
@@ -115,7 +115,7 @@
                     attributesAtIndex: 0 effectiveRange: NULL];
 
     //select proper level in popup button
-    switch ([[NSUserDefaults standardUserDefaults] integerForKey: @"MessageLevel"])
+    switch ([NSUserDefaults.standardUserDefaults integerForKey: @"MessageLevel"])
     {
         case TR_LOG_ERROR:
             [fLevelButton selectItemAtIndex: LEVEL_ERROR];
@@ -127,7 +127,7 @@
             [fLevelButton selectItemAtIndex: LEVEL_DEBUG];
             break;
         default: //safety
-            [[NSUserDefaults standardUserDefaults] setInteger: TR_LOG_ERROR forKey: @"MessageLevel"];
+            [NSUserDefaults.standardUserDefaults setInteger: TR_LOG_ERROR forKey: @"MessageLevel"];
             [fLevelButton selectItemAtIndex: LEVEL_ERROR];
     }
 
@@ -139,7 +139,7 @@
 
 - (void) dealloc
 {
-    [[NSNotificationCenter defaultCenter] removeObserver: self];
+    [NSNotificationCenter.defaultCenter removeObserver: self];
     [fTimer invalidate];
 }
 
@@ -187,7 +187,7 @@
     const BOOL shouldScroll = currentIndex == 0 || scroller.floatValue == 1.0 || scroller.hidden
                                 || scroller.knobProportion == 1.0;
 
-    const NSInteger maxLevel = [[NSUserDefaults standardUserDefaults] integerForKey: @"MessageLevel"];
+    const NSInteger maxLevel = [NSUserDefaults.standardUserDefaults integerForKey: @"MessageLevel"];
     NSString * filterString = fFilterField.stringValue;
 
     BOOL changed = NO;
@@ -195,7 +195,7 @@
     for (tr_log_message * currentMessage = messages; currentMessage != NULL; currentMessage = currentMessage->next)
     {
         NSString * name = currentMessage->name != NULL ? @(currentMessage->name)
-                            : [NSProcessInfo processInfo].processName;
+                            : NSProcessInfo.processInfo.processName;
 
         NSString * file = [(@(currentMessage->file)).lastPathComponent stringByAppendingFormat: @":%d",
                             currentMessage->line];
@@ -311,7 +311,7 @@
 
     NSString * messageString = [messageStrings componentsJoinedByString: @"\n"];
 
-    NSPasteboard * pb = [NSPasteboard generalPasteboard];
+    NSPasteboard * pb = NSPasteboard.generalPasteboard;
     [pb clearContents];
     [pb writeObjects: @[messageString]];
 }
@@ -345,10 +345,10 @@
             level = TR_LOG_INFO;
     }
 
-    if ([[NSUserDefaults standardUserDefaults] integerForKey: @"MessageLevel"] == level)
+    if ([NSUserDefaults.standardUserDefaults integerForKey: @"MessageLevel"] == level)
         return;
 
-    [[NSUserDefaults standardUserDefaults] setInteger: level forKey: @"MessageLevel"];
+    [NSUserDefaults.standardUserDefaults setInteger: level forKey: @"MessageLevel"];
 
     [fLock lock];
 
@@ -443,7 +443,7 @@
 
 - (void) updateListForFilter
 {
-    const NSInteger level = [[NSUserDefaults standardUserDefaults] integerForKey: @"MessageLevel"];
+    const NSInteger level = [NSUserDefaults.standardUserDefaults integerForKey: @"MessageLevel"];
     NSString * filterString = fFilterField.stringValue;
 
     NSIndexSet * indexes = [fMessages indexesOfObjectsWithOptions: NSEnumerationConcurrent passingTest: ^BOOL(id message, NSUInteger idx, BOOL * stop) {

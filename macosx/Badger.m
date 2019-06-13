@@ -45,9 +45,9 @@
 
 - (void) updateBadgeWithDownload: (CGFloat) downloadRate upload: (CGFloat) uploadRate
 {
-    const CGFloat displayDlRate = [[NSUserDefaults standardUserDefaults] boolForKey: @"BadgeDownloadRate"]
+    const CGFloat displayDlRate = [NSUserDefaults.standardUserDefaults boolForKey: @"BadgeDownloadRate"]
                                     ? downloadRate : 0.0;
-    const CGFloat displayUlRate = [[NSUserDefaults standardUserDefaults] boolForKey: @"BadgeUploadRate"]
+    const CGFloat displayUlRate = [NSUserDefaults.standardUserDefaults boolForKey: @"BadgeUploadRate"]
                                     ? uploadRate : 0.0;
 
     //only update if the badged values change

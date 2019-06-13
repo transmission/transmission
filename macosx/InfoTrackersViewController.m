@@ -63,7 +63,7 @@
     [fTrackerAddRemoveControl.cell setToolTip: NSLocalizedString(@"Remove selected trackers", "Inspector view -> tracker buttons")
         forSegment: TRACKER_REMOVE_TAG];
 
-    const CGFloat height = [[NSUserDefaults standardUserDefaults] floatForKey: @"InspectorContentHeightTracker"];
+    const CGFloat height = [NSUserDefaults.standardUserDefaults floatForKey: @"InspectorContentHeightTracker"];
     if (height != 0.0)
     {
         NSRect viewRect = self.view.frame;
@@ -113,7 +113,7 @@
     }
     else
     {
-        NSAssert1([fTorrents count] == 1, @"Attempting to add tracker with %ld transfers selected", [fTorrents count]);
+        NSAssert1(fTorrents.count == 1, @"Attempting to add tracker with %ld transfers selected", fTorrents.count);
 
         NSIndexSet * addedIndexes = [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(fTrackers.count-2, 2)];
         NSArray * tierAndTrackerBeingAdded = [fTrackers objectsAtIndexes: addedIndexes];
@@ -131,7 +131,7 @@
 
 - (void) saveViewSize
 {
-    [[NSUserDefaults standardUserDefaults] setFloat: NSHeight(self.view.frame) forKey: @"InspectorContentHeightTracker"];
+    [NSUserDefaults.standardUserDefaults setFloat: NSHeight(self.view.frame) forKey: @"InspectorContentHeightTracker"];
 }
 
 - (void) clearView
@@ -223,7 +223,7 @@
     [fTrackerTable reloadData];
     [fTrackerTable deselectAll: self];
 
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateUI" object: nil]; //incase sort by tracker
+    [NSNotificationCenter.defaultCenter postNotificationName: @"UpdateUI" object: nil]; //incase sort by tracker
 }
 
 - (void) addRemoveTracker: (id) sender
@@ -280,7 +280,7 @@
 {
     [self.view.window makeKeyWindow];
 
-    NSAssert1([fTorrents count] == 1, @"Attempting to add tracker with %ld transfers selected", [fTorrents count]);
+    NSAssert1(fTorrents.count == 1, @"Attempting to add tracker with %ld transfers selected", fTorrents.count);
 
     [fTrackers addObject: @{@"Tier": @-1}];
     [fTrackers addObject: @""];
@@ -345,14 +345,14 @@
     if (groupRowIndex != NSNotFound)
         [removeIndexes addIndex: groupRowIndex];
 
-    NSAssert2(removeTrackerCount <= [removeIndexes count], @"Marked %ld trackers to remove, but only removing %ld rows", removeTrackerCount, [removeIndexes count]);
+    NSAssert2(removeTrackerCount <= removeIndexes.count, @"Marked %ld trackers to remove, but only removing %ld rows", removeTrackerCount, removeIndexes.count);
 
     //we might have no trackers if remove right after a failed add (race condition ftw)
     #warning look into having a failed add apply right away, so that this can become an assert
     if (removeTrackerCount == 0)
         return;
 
-    if ([[NSUserDefaults standardUserDefaults] boolForKey: @"WarningRemoveTrackers"])
+    if ([NSUserDefaults.standardUserDefaults boolForKey: @"WarningRemoveTrackers"])
     {
         NSAlert * alert = [[NSAlert alloc] init];
 
@@ -377,7 +377,7 @@
 
         NSInteger result = [alert runModal];
         if (alert.suppressionButton.state == NSOnState)
-            [[NSUserDefaults standardUserDefaults] setBool: NO forKey: @"WarningRemoveTrackers"];
+            [NSUserDefaults.standardUserDefaults setBool: NO forKey: @"WarningRemoveTrackers"];
 
         if (result != NSAlertFirstButtonReturn)
             return;
@@ -400,7 +400,7 @@
 
     [fTrackerTable endUpdates];
 
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateUI" object: nil]; //incase sort by tracker
+    [NSNotificationCenter.defaultCenter postNotificationName: @"UpdateUI" object: nil]; //incase sort by tracker
 }
 
 @end

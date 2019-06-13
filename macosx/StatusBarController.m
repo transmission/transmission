@@ -79,15 +79,15 @@ typedef NS_ENUM(unsigned int, statusTag) {
     [self updateSpeedFieldsToolTips];
 
     //update when speed limits are changed
-    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(updateSpeedFieldsToolTips)
+    [NSNotificationCenter.defaultCenter addObserver: self selector: @selector(updateSpeedFieldsToolTips)
         name: @"SpeedLimitUpdate" object: nil];
-    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(resizeStatusButton)
+    [NSNotificationCenter.defaultCenter addObserver: self selector: @selector(resizeStatusButton)
         name: NSWindowDidResizeNotification object: self.view.window];
 }
 
 - (void) dealloc
 {
-    [[NSNotificationCenter defaultCenter] removeObserver: self];
+    [NSNotificationCenter.defaultCenter removeObserver: self];
 }
 
 - (void) updateWithDownload: (CGFloat) dlRate upload: (CGFloat) ulRate
@@ -106,7 +106,7 @@ typedef NS_ENUM(unsigned int, statusTag) {
     }
 
     //set status button text
-    NSString * statusLabel = [[NSUserDefaults standardUserDefaults] stringForKey: @"StatusLabel"], * statusString;
+    NSString * statusLabel = [NSUserDefaults.standardUserDefaults stringForKey: @"StatusLabel"], * statusString;
     BOOL total;
     if ((total = [statusLabel isEqualToString: STATUS_RATIO_TOTAL]) || [statusLabel isEqualToString: STATUS_RATIO_SESSION])
     {
@@ -164,36 +164,36 @@ typedef NS_ENUM(unsigned int, statusTag) {
             return;
     }
 
-    [[NSUserDefaults standardUserDefaults] setObject: statusLabel forKey: @"StatusLabel"];
+    [NSUserDefaults.standardUserDefaults setObject: statusLabel forKey: @"StatusLabel"];
 
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateUI" object: nil];
+    [NSNotificationCenter.defaultCenter postNotificationName: @"UpdateUI" object: nil];
 }
 
 - (void) updateSpeedFieldsToolTips
 {
     NSString * uploadText, * downloadText;
 
-    if ([[NSUserDefaults standardUserDefaults] boolForKey: @"SpeedLimit"])
+    if ([NSUserDefaults.standardUserDefaults boolForKey: @"SpeedLimit"])
     {
         NSString * speedString = [NSString stringWithFormat: @"%@ (%@)", NSLocalizedString(@"%d KB/s", "Status Bar -> speed tooltip"),
                                     NSLocalizedString(@"Speed Limit", "Status Bar -> speed tooltip")];
 
         uploadText = [NSString stringWithFormat: speedString,
-                        [[NSUserDefaults standardUserDefaults] integerForKey: @"SpeedLimitUploadLimit"]];
+                        [NSUserDefaults.standardUserDefaults integerForKey: @"SpeedLimitUploadLimit"]];
         downloadText = [NSString stringWithFormat: speedString,
-                        [[NSUserDefaults standardUserDefaults] integerForKey: @"SpeedLimitDownloadLimit"]];
+                        [NSUserDefaults.standardUserDefaults integerForKey: @"SpeedLimitDownloadLimit"]];
     }
     else
     {
-        if ([[NSUserDefaults standardUserDefaults] boolForKey: @"CheckUpload"])
+        if ([NSUserDefaults.standardUserDefaults boolForKey: @"CheckUpload"])
             uploadText = [NSString stringWithFormat: NSLocalizedString(@"%d KB/s", "Status Bar -> speed tooltip"),
-                            [[NSUserDefaults standardUserDefaults] integerForKey: @"UploadLimit"]];
+                            [NSUserDefaults.standardUserDefaults integerForKey: @"UploadLimit"]];
         else
             uploadText = NSLocalizedString(@"unlimited", "Status Bar -> speed tooltip");
 
-        if ([[NSUserDefaults standardUserDefaults] boolForKey: @"CheckDownload"])
+        if ([NSUserDefaults.standardUserDefaults boolForKey: @"CheckDownload"])
             downloadText = [NSString stringWithFormat: NSLocalizedString(@"%d KB/s", "Status Bar -> speed tooltip"),
-                            [[NSUserDefaults standardUserDefaults] integerForKey: @"DownloadLimit"]];
+                            [NSUserDefaults.standardUserDefaults integerForKey: @"DownloadLimit"]];
         else
             downloadText = NSLocalizedString(@"unlimited", "Status Bar -> speed tooltip");
     }
@@ -230,11 +230,11 @@ typedef NS_ENUM(unsigned int, statusTag) {
                 statusLabel = STATUS_TRANSFER_SESSION;
                 break;
             default:
-                NSAssert1(NO, @"Unknown status label tag received: %ld", [menuItem tag]);
+                NSAssert1(NO, @"Unknown status label tag received: %ld", menuItem.tag);
                 statusLabel = STATUS_RATIO_TOTAL;
         }
 
-        menuItem.state = [statusLabel isEqualToString: [[NSUserDefaults standardUserDefaults] stringForKey: @"StatusLabel"]]
+        menuItem.state = [statusLabel isEqualToString: [NSUserDefaults.standardUserDefaults stringForKey: @"StatusLabel"]]
                             ? NSOnState : NSOffState;
         return YES;
     }

@@ -91,7 +91,7 @@ typedef NS_ENUM(unsigned int, filePriorityMenuTag) {
 
 - (void) setFilterText: (NSString *) text
 {
-    NSArray * components = [text betterComponentsSeparatedByCharactersInSet: [NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    NSArray * components = [text betterComponentsSeparatedByCharactersInSet: NSCharacterSet.whitespaceAndNewlineCharacterSet];
     if (!components || components.count == 0)
     {
         text = nil;
@@ -255,7 +255,7 @@ typedef NS_ENUM(unsigned int, filePriorityMenuTag) {
     if ([identifier isEqualToString: @"Check"])
     {
         NSIndexSet * indexSet;
-        if ([NSEvent modifierFlags] & NSAlternateKeyMask)
+        if (NSEvent.modifierFlags & NSAlternateKeyMask)
             indexSet = [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, fTorrent.fileCount)];
         else
             indexSet = ((FileListNode *)item).indexes;
@@ -263,7 +263,7 @@ typedef NS_ENUM(unsigned int, filePriorityMenuTag) {
         [fTorrent setFileCheckState: [object intValue] != NSOffState ? NSOnState : NSOffState forIndexes: indexSet];
         fOutline.needsDisplay = YES;
 
-        [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateUI" object: nil];
+        [NSNotificationCenter.defaultCenter postNotificationName: @"UpdateUI" object: nil];
     }
 }
 
@@ -420,13 +420,13 @@ typedef NS_ENUM(unsigned int, filePriorityMenuTag) {
     }
 
     if (paths.count > 0)
-        [[NSWorkspace sharedWorkspace] activateFileViewerSelectingURLs: paths];
+        [NSWorkspace.sharedWorkspace activateFileViewerSelectingURLs: paths];
 }
 
 - (void) renameSelected: (id) sender
 {
     NSIndexSet * indexes = fOutline.selectedRowIndexes;
-    NSAssert([indexes count] == 1, @"1 file needs to be selected to rename, but %ld are selected", [indexes count]);
+    NSAssert(indexes.count == 1, @"1 file needs to be selected to rename, but %ld are selected", indexes.count);
 
     FileListNode * node = [fOutline itemAtRow: indexes.firstIndex];
     Torrent * torrent = node.torrent;
@@ -435,8 +435,8 @@ typedef NS_ENUM(unsigned int, filePriorityMenuTag) {
         [FileRenameSheetController presentSheetForTorrent: torrent modalForWindow: fOutline.window completionHandler: ^(BOOL didRename) {
             if (didRename)
             {
-                [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateQueue" object: self];
-                [[NSNotificationCenter defaultCenter] postNotificationName: @"ResetInspector" object: self userInfo: @{ @"Torrent" : torrent }];
+                [NSNotificationCenter.defaultCenter postNotificationName: @"UpdateQueue" object: self];
+                [NSNotificationCenter.defaultCenter postNotificationName: @"ResetInspector" object: self userInfo: @{ @"Torrent" : torrent }];
             }
         }];
     }
@@ -445,7 +445,7 @@ typedef NS_ENUM(unsigned int, filePriorityMenuTag) {
         [FileRenameSheetController presentSheetForFileListNode: node modalForWindow: fOutline.window completionHandler: ^(BOOL didRename) {
             #warning instead of calling reset inspector, just resort?
             if (didRename)
-                [[NSNotificationCenter defaultCenter] postNotificationName: @"ResetInspector" object: self userInfo: @{ @"Torrent" : torrent }];
+                [NSNotificationCenter.defaultCenter postNotificationName: @"ResetInspector" object: self userInfo: @{ @"Torrent" : torrent }];
         }];
     }
 }

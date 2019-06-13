@@ -100,7 +100,7 @@ typedef NS_ENUM(unsigned int, tabTag) {
 
     //set selected tab
     fCurrentTabTag = INVALID;
-    NSString * identifier = [[NSUserDefaults standardUserDefaults] stringForKey: @"InspectorSelected"];
+    NSString * identifier = [NSUserDefaults.standardUserDefaults stringForKey: @"InspectorSelected"];
     NSInteger tag;
     if ([identifier isEqualToString: TAB_INFO_IDENT])
         tag = TAB_GENERAL_TAG;
@@ -116,7 +116,7 @@ typedef NS_ENUM(unsigned int, tabTag) {
         tag = TAB_OPTIONS_TAG;
     else //safety
     {
-        [[NSUserDefaults standardUserDefaults] setObject: TAB_INFO_IDENT forKey: @"InspectorSelected"];
+        [NSUserDefaults.standardUserDefaults setObject: TAB_INFO_IDENT forKey: @"InspectorSelected"];
         tag = TAB_GENERAL_TAG;
     }
     [fTabMatrix selectCellWithTag: tag];
@@ -126,7 +126,7 @@ typedef NS_ENUM(unsigned int, tabTag) {
     [self setInfoForTorrents: @[]];
 
     //allow for update notifications
-    NSNotificationCenter * nc = [NSNotificationCenter defaultCenter];
+    NSNotificationCenter * nc = NSNotificationCenter.defaultCenter;
     [nc addObserver: self selector: @selector(resetInfoForTorrent:) name: @"ResetInspector" object: nil];
     [nc addObserver: self selector: @selector(updateInfoStats) name: @"UpdateStats" object: nil];
     [nc addObserver: self selector: @selector(updateOptions) name: @"UpdateOptions" object: nil];
@@ -134,7 +134,7 @@ typedef NS_ENUM(unsigned int, tabTag) {
 
 - (void) dealloc
 {
-    [[NSNotificationCenter defaultCenter] removeObserver: self];
+    [NSNotificationCenter.defaultCenter removeObserver: self];
 
     if ([fViewController respondsToSelector: @selector(saveViewSize)])
         [fViewController saveViewSize];
@@ -259,7 +259,7 @@ typedef NS_ENUM(unsigned int, tabTag) {
             return;
     }
 
-    [[NSUserDefaults standardUserDefaults] setObject: identifier forKey: @"InspectorSelected"];
+    [NSUserDefaults.standardUserDefaults setObject: identifier forKey: @"InspectorSelected"];
 
     NSWindow * window = self.window;
 
@@ -279,7 +279,7 @@ typedef NS_ENUM(unsigned int, tabTag) {
     windowRect.origin.y -= difference;
     windowRect.size.height += difference;
 
-    const CGFloat minWindowWidth = MAX(fMinWindowWidth, [view fittingSize].width);
+    const CGFloat minWindowWidth = MAX(fMinWindowWidth, view.fittingSize.width);
     windowRect.size.width = MAX(NSWidth(windowRect), minWindowWidth);
 
     if ([fViewController respondsToSelector: @selector(saveViewSize)]) //a little bit hacky, but avoids requiring an extra method

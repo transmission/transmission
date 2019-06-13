@@ -28,7 +28,7 @@
 - (void) awakeFromNib
 {
     if (!NSApp.onMojaveOrBetter) {
-        NSNotificationCenter * nc = [NSNotificationCenter defaultCenter];
+        NSNotificationCenter * nc = NSNotificationCenter.defaultCenter;
         [nc addObserver: self selector: @selector(updateControlTint:)
             name: NSControlTintDidChangeNotification object: NSApp];
     }
@@ -41,7 +41,7 @@
 
 - (void) dealloc
 {
-    [[NSNotificationCenter defaultCenter] removeObserver: self];
+    [NSNotificationCenter.defaultCenter removeObserver: self];
 }
 
 - (void) setControlView: (NSView *) controlView
@@ -66,7 +66,7 @@
 
 - (void) reloadAppearance
 {
-    if ([self controlView] == nil)
+    if (self.controlView == nil)
         return;
 
     NSInteger row, col;
@@ -84,11 +84,11 @@
     {
         NSColor * lightColor, * darkColor;
         if (@available(macOS 10.14, *)) {
-            lightColor = [NSColor.controlAccentColor blendedColorWithFraction: 0.35 ofColor: [NSColor whiteColor]];
-            darkColor = [NSColor.controlAccentColor blendedColorWithFraction: 0.15 ofColor: [NSColor whiteColor]];
+            lightColor = [NSColor.controlAccentColor blendedColorWithFraction: 0.35 ofColor: NSColor.whiteColor];
+            darkColor = [NSColor.controlAccentColor blendedColorWithFraction: 0.15 ofColor: NSColor.whiteColor];
         } else {
-            lightColor = [NSColor colorForControlTint: [NSColor currentControlTint]];
-            darkColor = [lightColor blendedColorWithFraction: 0.2 ofColor: [NSColor blackColor]];
+            lightColor = [NSColor colorForControlTint: NSColor.currentControlTint];
+            darkColor = [lightColor blendedColorWithFraction: 0.2 ofColor: NSColor.blackColor];
         }
         gradient = [[NSGradient alloc] initWithStartingColor: lightColor endingColor: darkColor];
     }
@@ -106,9 +106,9 @@
     }
 
     if (@available(macOS 10.14, *)) {
-        [[NSColor separatorColor] set];
+        [NSColor.separatorColor set];
     } else {
-        [[NSColor grayColor] set];
+        [NSColor.grayColor set];
     }
     NSRectFill(NSMakeRect(0.0, 0.0, NSWidth(tabRect), 1.0));
     NSRectFill(NSMakeRect(0.0, NSHeight(tabRect) - 1.0, NSWidth(tabRect), 1.0));

@@ -106,7 +106,7 @@ enum
     int8_t * pieces = NULL;
     float * piecesPercent = NULL;
 
-    const BOOL showAvailablity = [[NSUserDefaults standardUserDefaults] boolForKey: @"PiecesViewShowAvailability"];
+    const BOOL showAvailablity = [NSUserDefaults.standardUserDefaults boolForKey: @"PiecesViewShowAvailability"];
     if (showAvailablity)
     {
         pieces = (int8_t *)tr_malloc(fNumPieces * sizeof(int8_t));
@@ -135,7 +135,7 @@ enum
             {
                 if (!first && fPieces[index] != PIECE_FLASHING)
                 {
-                    pieceColor = [NSColor orangeColor];
+                    pieceColor = NSColor.orangeColor;
                     fPieces[index] = PIECE_FLASHING;
                 }
                 else
@@ -149,7 +149,7 @@ enum
         {
             if (first || fPieces[index] != PIECE_NONE)
             {
-                pieceColor = [NSColor whiteColor];
+                pieceColor = NSColor.whiteColor;
                 fPieces[index] = PIECE_NONE;
             }
         }
@@ -166,7 +166,7 @@ enum
             //always redraw "mixed"
             CGFloat percent = showAvailablity ? (CGFloat)pieces[index]/HIGH_PEERS : piecesPercent[index];
             NSColor * fullColor = showAvailablity ? fGreenAvailabilityColor : fBluePieceColor;
-            pieceColor = [[NSColor whiteColor] blendedColorWithFraction: percent ofColor: fullColor];
+            pieceColor = [NSColor.whiteColor blendedColorWithFraction: percent ofColor: fullColor];
             fPieces[index] = PIECE_SOME;
         }
 
@@ -204,8 +204,8 @@ enum
 {
     if (fTorrent)
     {
-        const BOOL availability = ![[NSUserDefaults standardUserDefaults] boolForKey: @"PiecesViewShowAvailability"];
-        [[NSUserDefaults standardUserDefaults] setBool: availability forKey: @"PiecesViewShowAvailability"];
+        const BOOL availability = ![NSUserDefaults.standardUserDefaults boolForKey: @"PiecesViewShowAvailability"];
+        [NSUserDefaults.standardUserDefaults setBool: availability forKey: @"PiecesViewShowAvailability"];
 
         [self sendAction:self.action to:self.target];
     }

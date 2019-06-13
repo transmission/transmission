@@ -48,7 +48,7 @@
 
 - (void) awakeFromNib
 {
-    const CGFloat height = [[NSUserDefaults standardUserDefaults] floatForKey: @"InspectorContentHeightFiles"];
+    const CGFloat height = [NSUserDefaults.standardUserDefaults floatForKey: @"InspectorContentHeightFiles"];
     if (height != 0.0)
     {
         NSRect viewRect = self.view.frame;
@@ -69,7 +69,7 @@
 
     [fCheckAllButton sizeToFit];
     [fUncheckAllButton sizeToFit];
-    const CGFloat newWidth = MAX([fCheckAllButton bounds].size.width, [fUncheckAllButton bounds].size.width);
+    const CGFloat newWidth = MAX(fCheckAllButton.bounds.size.width, fUncheckAllButton.bounds.size.width);
 
     const CGFloat uncheckAllChange = newWidth - oldNoneWidth;
     uncheckAllFrame.size.width = newWidth;
@@ -113,7 +113,7 @@
 
 - (void) saveViewSize
 {
-    [[NSUserDefaults standardUserDefaults] setFloat: NSHeight(self.view.frame) forKey: @"InspectorContentHeightFiles"];
+    [NSUserDefaults.standardUserDefaults setFloat: NSHeight(self.view.frame) forKey: @"InspectorContentHeightFiles"];
 }
 
 - (void) setFileFilterText: (id) sender

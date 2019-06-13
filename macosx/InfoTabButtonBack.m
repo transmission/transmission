@@ -36,9 +36,9 @@
     {
         gridRects[count] = lineBorderRect;
         if (@available(macOS 10.14, *)) {
-            colorRects[count] = [NSColor separatorColor];
+            colorRects[count] = NSColor.separatorColor;
         } else {
-            colorRects[count] = [NSColor grayColor];
+            colorRects[count] = NSColor.grayColor;
         }
         ++count;
 
@@ -50,9 +50,9 @@
     {
         gridRects[count] = lineBorderRect;
         if (@available(macOS 10.14, *)) {
-            colorRects[count] = [NSColor separatorColor];
+            colorRects[count] = NSColor.separatorColor;
         } else {
-            colorRects[count] = [NSColor grayColor];
+            colorRects[count] = NSColor.grayColor;
         }
         ++count;
 

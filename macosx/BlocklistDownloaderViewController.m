@@ -139,7 +139,7 @@ BlocklistDownloaderViewController * fBLViewController = nil;
 - (void) startDownload
 {
     //load window and show as sheet
-    [[NSBundle mainBundle] loadNibNamed: @"BlocklistStatusWindow" owner: self topLevelObjects: NULL];
+    [NSBundle.mainBundle loadNibNamed: @"BlocklistStatusWindow" owner: self topLevelObjects: NULL];
 
     BlocklistDownloader * downloader = [BlocklistDownloader downloader];
     [downloader setViewController: self]; //do before showing the sheet to ensure it doesn't slide out with placeholder text

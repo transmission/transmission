@@ -94,9 +94,9 @@
 {
     if ((self = [super init]))
     {
-        fDefaults = [NSUserDefaults standardUserDefaults];
+        fDefaults = NSUserDefaults.standardUserDefaults;
 
-        NSMutableParagraphStyle * paragraphStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
+        NSMutableParagraphStyle * paragraphStyle = [NSParagraphStyle.defaultParagraphStyle mutableCopy];
         paragraphStyle.lineBreakMode = NSLineBreakByTruncatingMiddle;
 
         fTitleAttributes = [[NSMutableDictionary alloc] initWithCapacity: 3];
@@ -210,7 +210,7 @@
         if (location)
         {
             NSURL * file = [NSURL fileURLWithPath: location];
-            [[NSWorkspace sharedWorkspace] activateFileViewerSelectingURLs: @[file]];
+            [NSWorkspace.sharedWorkspace activateFileViewerSelectingURLs: @[file]];
         }
     }
     else;
@@ -336,7 +336,7 @@
         const CGFloat radius = minimal ? 3.0 : 6.0;
 
         NSColor * groupColor = [GroupsController.groups colorForIndex: groupValue],
-                * darkGroupColor = [groupColor blendedColorWithFraction: 0.2 ofColor: [NSColor whiteColor]];
+                * darkGroupColor = [groupColor blendedColorWithFraction: 0.2 ofColor: NSColor.whiteColor];
 
         //border
         NSBezierPath * bp = [NSBezierPath bezierPathWithRoundedRect: groupRect xRadius: radius yRadius: radius];
@@ -347,7 +347,7 @@
         //inside
         bp = [NSBezierPath bezierPathWithRoundedRect: groupRect xRadius: radius yRadius: radius];
         NSGradient * gradient = [[NSGradient alloc] initWithStartingColor: [groupColor blendedColorWithFraction: 0.7
-                                    ofColor: [NSColor whiteColor]] endingColor: darkGroupColor];
+                                    ofColor: NSColor.whiteColor] endingColor: darkGroupColor];
         [gradient drawInBezierPath: bp angle: 90.0];
     }
 
@@ -372,11 +372,11 @@
     //text color
     NSColor * titleColor, * statusColor;
     if (self.backgroundStyle == NSBackgroundStyleDark)
-        titleColor = statusColor = [NSColor whiteColor];
+        titleColor = statusColor = NSColor.whiteColor;
     else
     {
-        titleColor = [NSColor labelColor];
-        statusColor = [NSColor secondaryLabelColor];
+        titleColor = NSColor.labelColor;
+        statusColor = NSColor.secondaryLabelColor;
     }
 
     fTitleAttributes[NSForegroundColorAttributeName] = titleColor;
@@ -474,7 +474,7 @@
                                                NSMidY(titleRect) - PRIORITY_ICON_HEIGHT  * 0.5,
                                                PRIORITY_ICON_WIDTH, PRIORITY_ICON_HEIGHT);
 
-        NSColor * priorityColor = self.backgroundStyle == NSBackgroundStyleDark ? [NSColor whiteColor] : [NSColor labelColor];
+        NSColor * priorityColor = self.backgroundStyle == NSBackgroundStyleDark ? NSColor.whiteColor : NSColor.labelColor;
 
         NSImage * priorityImage = [[NSImage imageNamed: (torrent.priority == TR_PRI_HIGH ? @"PriorityHighTemplate" : @"PriorityLowTemplate")] imageWithColor: priorityColor];
         [priorityImage drawInRect: priorityRect fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0 respectFlipped: YES hints: nil];
@@ -528,7 +528,7 @@
     cellFrame.origin.x += PADDING_EXPANSION_FRAME;
     cellFrame.origin.y += PADDING_EXPANSION_FRAME;
 
-    fTitleAttributes[NSForegroundColorAttributeName] = [NSColor labelColor];
+    fTitleAttributes[NSForegroundColorAttributeName] = NSColor.labelColor;
     NSAttributedString * titleString = self.attributedTitle;
     [titleString drawInRect: cellFrame];
 }
@@ -541,7 +541,7 @@
 {
     const BOOL minimal = [fDefaults boolForKey: @"SmallView"];
 
-    const CGFloat piecesBarPercent = [(TorrentTableView *)self.controlView piecesBarPercent];
+    const CGFloat piecesBarPercent = ((TorrentTableView *)self.controlView).piecesBarPercent;
     if (piecesBarPercent > 0.0)
     {
         NSRect piecesBarRect, regularBarRect;
@@ -663,13 +663,13 @@
         if (piecesPercent[i] == 1.0f)
         {
             if (previousFinishedIndexes && ![previousFinishedIndexes containsIndex: i])
-                pieceColor = [NSColor orangeColor];
+                pieceColor = NSColor.orangeColor;
             else
                 pieceColor = fBluePieceColor;
             [finishedIndexes addIndex: i];
         }
         else
-            pieceColor = [[NSColor whiteColor] blendedColorWithFraction: piecesPercent[i] ofColor: fBluePieceColor];
+            pieceColor = [NSColor.whiteColor blendedColorWithFraction: piecesPercent[i] ofColor: fBluePieceColor];
 
         //it's faster to just set color instead of checking previous color
         [bitmap setColor: pieceColor atX: i y: 0];

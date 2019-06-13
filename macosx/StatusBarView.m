@@ -58,15 +58,15 @@
         else
             fNoiseImage = nil;
 
-        [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(reload) name: NSWindowDidBecomeMainNotification object: self.window];
-        [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(reload) name: NSWindowDidResignMainNotification object: self.window];
+        [NSNotificationCenter.defaultCenter addObserver: self selector: @selector(reload) name: NSWindowDidBecomeMainNotification object: self.window];
+        [NSNotificationCenter.defaultCenter addObserver: self selector: @selector(reload) name: NSWindowDidResignMainNotification object: self.window];
     }
     return self;
 }
 
 - (void) dealloc
 {
-    [[NSNotificationCenter defaultCenter] removeObserver: self];
+    [NSNotificationCenter.defaultCenter removeObserver: self];
 }
 
 - (BOOL) mouseDownCanMoveWindow
@@ -82,13 +82,13 @@
 - (void) drawRect: (NSRect) rect
 {
     if (NSApp.onYosemiteOrBetter) {
-        [[NSColor windowBackgroundColor] setFill];
+        [NSColor.windowBackgroundColor setFill];
         NSRectFill(rect);
 
         const NSRect lineBorderRect = NSMakeRect(NSMinX(rect), 0.0, NSWidth(rect), 1.0);
         if (NSIntersectsRect(lineBorderRect, rect))
         {
-            [[NSColor gridColor] setFill];
+            [NSColor.gridColor setFill];
             NSRectFill(lineBorderRect);
         }
     }

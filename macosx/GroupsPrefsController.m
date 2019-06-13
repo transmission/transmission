@@ -113,7 +113,7 @@
 - (NSDragOperation) tableView: (NSTableView *) tableView validateDrop: (id <NSDraggingInfo>) info
     proposedRow: (NSInteger) row proposedDropOperation: (NSTableViewDropOperation) operation
 {
-    NSPasteboard * pasteboard = [info draggingPasteboard];
+    NSPasteboard * pasteboard = info.draggingPasteboard;
     if ([pasteboard.types containsObject: GROUP_TABLE_VIEW_DATA_TYPE])
     {
         [fTableView setDropRow: row dropOperation: NSTableViewDropAbove];
@@ -126,7 +126,7 @@
 - (BOOL) tableView: (NSTableView *) tableView acceptDrop: (id <NSDraggingInfo>) info row: (NSInteger) newRow
     dropOperation: (NSTableViewDropOperation) operation
 {
-    NSPasteboard * pasteboard = [info draggingPasteboard];
+    NSPasteboard * pasteboard = info.draggingPasteboard;
     if ([pasteboard.types containsObject: GROUP_TABLE_VIEW_DATA_TYPE])
     {
         NSIndexSet * indexes = [NSKeyedUnarchiver unarchiveObjectWithData: [pasteboard dataForType: GROUP_TABLE_VIEW_DATA_TYPE]];
@@ -148,8 +148,8 @@
 
 - (void) addRemoveGroup: (id) sender
 {
-    if ([NSColorPanel sharedColorPanelExists])
-        [[NSColorPanel sharedColorPanel] close];
+    if (NSColorPanel.sharedColorPanelExists)
+        [NSColorPanel.sharedColorPanel close];
 
     NSInteger row;
 
@@ -211,7 +211,7 @@
         const NSInteger index = [GroupsController.groups indexForRow: fTableView.selectedRow];
         if (result == NSFileHandlingPanelOKButton)
         {
-            NSString * path = (panel.URLs[0]).path;
+            NSString * path = panel.URLs[0].path;
             [GroupsController.groups setCustomDownloadLocation: path forIndex: index];
             [GroupsController.groups setUsesCustomDownloadLocation: YES forIndex: index];
         }
@@ -265,7 +265,7 @@
 - (IBAction) orderFrontRulesSheet: (id) sender
 {
     if (!self.groupRulesSheetWindow)
-        [[NSBundle mainBundle] loadNibNamed: @"GroupRules" owner: self topLevelObjects: NULL];
+        [NSBundle.mainBundle loadNibNamed: @"GroupRules" owner: self topLevelObjects: NULL];
 
     NSInteger index = [GroupsController.groups indexForRow: fTableView.selectedRow];
     NSPredicate *predicate = [GroupsController.groups autoAssignRulesForIndex: index];
@@ -343,7 +343,7 @@
     }
     else
     {
-        fSelectedColorView.color = [NSColor whiteColor];
+        fSelectedColorView.color = NSColor.whiteColor;
         fSelectedColorView.enabled = NO;
         fSelectedColorNameField.stringValue = @"";
         fSelectedColorNameField.enabled = NO;

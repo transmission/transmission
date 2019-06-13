@@ -29,7 +29,7 @@
     NSPoint point = [self convertPoint: event.locationInWindow fromView: nil];
     if ([self rowAtPoint: point] != -1 && [self columnAtPoint: point] == [self columnWithIdentifier: @"Progress"])
     {
-        [[NSUserDefaults standardUserDefaults] setBool: ![[NSUserDefaults standardUserDefaults]
+        [NSUserDefaults.standardUserDefaults setBool: ![NSUserDefaults.standardUserDefaults
             boolForKey: @"DisplayPeerProgressBarNumber"] forKey: @"DisplayPeerProgressBarNumber"];
 
         NSIndexSet * rowIndexes = [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, self.numberOfRows)],
