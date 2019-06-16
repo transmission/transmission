@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <stdlib.h> /* qsort() */
 #include <string.h> /* strcmp(), memcpy(), strncmp() */
+#include <math.h> /* round() */
 
 #include <event2/buffer.h>
 #include <event2/event.h> /* evtimer */
@@ -1276,7 +1277,13 @@ static void on_announce_done(tr_announce_response const* response, void* vdata)
             if (!isStopped && tier->announce_event_count == 0)
             {
                 /* the queue is empty, so enqueue a perodic update */
-                i = tier->announceIntervalSec;
+                
+                /* Pick a random interval with a min and max of 2.5% in each direction */ 
+                i = (rand() % (int) (round(tier->announceIntervalSec * 1.025) - round(tier->announceIntervalSec * 0.975) + 1)) + round(tier->announceIntervalSec * 0.975);
+                if (i < tier->announceMinIntervalSec)
+                {
+                    i = tier->announceMinIntervalSec;
+                }
                 dbgmsg(tier, "Sending periodic reannounce in %d seconds", i);
                 tier_announce_event_push(tier, TR_ANNOUNCE_EVENT_NONE, now + i);
             }
