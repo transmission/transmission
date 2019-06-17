@@ -1278,8 +1278,11 @@ static void on_announce_done(tr_announce_response const* response, void* vdata)
             {
                 /* the queue is empty, so enqueue a perodic update */
                 
-                /* Pick a random interval with a min and max of 2.5% in each direction */ 
-                i = (rand() % (int) (round(tier->announceIntervalSec * 1.025) - round(tier->announceIntervalSec * 0.975) + 1)) + round(tier->announceIntervalSec * 0.975);
+                /* Pick a random interval with a min and max of 2.5% in each direction */
+                i = (rand() % (int) (round(tier->announceIntervalSec * 1.025) - round(tier->announceIntervalSec * 0.975) + 1)) 
+                    + round(tier->announceIntervalSec * 0.975);
+                
+                /* But don't go below min interval */
                 if (i < tier->announceMinIntervalSec)
                 {
                     i = tier->announceMinIntervalSec;
