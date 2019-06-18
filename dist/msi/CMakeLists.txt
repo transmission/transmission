@@ -20,6 +20,8 @@ if(NOT TR_QT_DIR)
     set(TR_QT_DIR "$<TARGET_FILE_DIR:Qt5::Core>/..")
 endif()
 
+find_msvc_crt_msm(TR_MSVC_CRT_MSM_FILE)
+
 set(ICONS_DIR "${CMAKE_SOURCE_DIR}/qt/icons/hicolor")
 png2ico(Transmission.ico
     "${ICONS_DIR}/16x16/transmission-qt.png"
@@ -67,6 +69,7 @@ wix_candle(${PROJECT_NAME}_OBJS
         "WebSrcDir=${WEBSRCDIR}"
         "TrQmSrcDir=${TRQMSRCDIR}"
         "QtQmSrcDir=${QTQMSRCDIR}"
+        "MsvcCrtMsmFile=${TR_MSVC_CRT_MSM_FILE}"
     EXTRA_DEPENDS
         "${CMAKE_CURRENT_BINARY_DIR}/TransmissionConfig.wxi")
 
