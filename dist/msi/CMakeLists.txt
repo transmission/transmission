@@ -22,6 +22,14 @@ endif()
 
 find_msvc_crt_msm(TR_MSVC_CRT_MSM_FILE)
 
+if(OPENSSL_VERSION MATCHES "^1[.]1[.]")
+    set(TR_OPENSSL_CRYPTO_NAME "libcrypto-1_1.dll")
+    set(TR_OPENSSL_SSL_NAME "libssl-1_1.dll")
+else()
+    set(TR_OPENSSL_CRYPTO_NAME "libeay32.dll")
+    set(TR_OPENSSL_SSL_NAME "ssleay32.dll")
+endif()
+
 set(ICONS_DIR "${CMAKE_SOURCE_DIR}/qt/icons/hicolor")
 png2ico(Transmission.ico
     "${ICONS_DIR}/16x16/transmission-qt.png"
@@ -70,6 +78,8 @@ wix_candle(${PROJECT_NAME}_OBJS
         "TrQmSrcDir=${TRQMSRCDIR}"
         "QtQmSrcDir=${QTQMSRCDIR}"
         "MsvcCrtMsmFile=${TR_MSVC_CRT_MSM_FILE}"
+        "OpenSslCryptoName=${TR_OPENSSL_CRYPTO_NAME}"
+        "OpenSslSslName=${TR_OPENSSL_SSL_NAME}"
     EXTRA_DEPENDS
         "${CMAKE_CURRENT_BINARY_DIR}/TransmissionConfig.wxi")
 
