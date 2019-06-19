@@ -23,7 +23,7 @@
 #import "URLSheetWindowController.h"
 #import "Controller.h"
 
-@interface URLSheetWindowController (Private)
+@interface URLSheetWindowController ()
 
 - (void)updateOpenButtonForURL:(NSString*)string;
 
@@ -103,10 +103,6 @@ NSString* urlString = nil;
 {
     [self updateOpenButtonForURL:fTextField.stringValue];
 }
-
-@end
-
-@implementation URLSheetWindowController (Private)
 
 - (void)updateOpenButtonForURL:(NSString*)string
 {

@@ -31,7 +31,7 @@
 #define POPUP_PRIORITY_NORMAL 1
 #define POPUP_PRIORITY_LOW 2
 
-@interface AddMagnetWindowController (Private)
+@interface AddMagnetWindowController ()
 
 - (void)confirmAdd;
 
@@ -285,10 +285,6 @@
         [fGroupPopUp selectItemWithTag:fGroupValue];
     }
 }
-
-@end
-
-@implementation AddMagnetWindowController (Private)
 
 - (void)confirmAdd
 {

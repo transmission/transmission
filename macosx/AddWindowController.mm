@@ -34,7 +34,7 @@
 #define POPUP_PRIORITY_NORMAL 1
 #define POPUP_PRIORITY_LOW 2
 
-@interface AddWindowController (Private)
+@interface AddWindowController ()
 
 - (void)updateFiles;
 
@@ -341,10 +341,6 @@
         [fGroupPopUp selectItemWithTag:fGroupValue];
     }
 }
-
-@end
-
-@implementation AddWindowController (Private)
 
 - (void)updateFiles
 {

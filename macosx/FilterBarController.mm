@@ -31,7 +31,7 @@
 #define SEARCH_MIN_WIDTH 48.0
 #define SEARCH_MAX_WIDTH 95.0
 
-@interface FilterBarController (Private)
+@interface FilterBarController ()
 
 - (void)resizeBar;
 - (void)updateGroupsButton;
@@ -380,10 +380,6 @@
 
     return YES;
 }
-
-@end
-
-@implementation FilterBarController (Private)
 
 - (void)resizeBar
 {

@@ -45,7 +45,7 @@ typedef NS_ENUM(unsigned int, filePriorityMenuTag) { //
     FILE_PRIORITY_LOW_TAG
 };
 
-@interface FileOutlineController (Private)
+@interface FileOutlineController ()
 
 @property(nonatomic, readonly) NSMenu* menu;
 
@@ -615,10 +615,6 @@ typedef NS_ENUM(unsigned int, filePriorityMenuTag) { //
 
     return YES;
 }
-
-@end
-
-@implementation FileOutlineController (Private)
 
 - (NSMenu*)menu
 {

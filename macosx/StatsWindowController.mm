@@ -27,7 +27,7 @@
 
 #define UPDATE_SECONDS 1.0
 
-@interface StatsWindowController (Private)
+@interface StatsWindowController ()
 
 - (void)updateStats;
 
@@ -169,10 +169,6 @@ tr_session* fLib = NULL;
 {
     return @"StatsWindow";
 }
-
-@end
-
-@implementation StatsWindowController (Private)
 
 - (void)updateStats
 {
