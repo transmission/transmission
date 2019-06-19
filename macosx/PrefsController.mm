@@ -57,7 +57,7 @@
 
 #define WEBUI_URL @"http://localhost:%ld/"
 
-@interface PrefsController (Private)
+@interface PrefsController ()
 
 - (void)setPrefView:(id)sender;
 
@@ -1508,10 +1508,6 @@
     //reload global settings in inspector
     [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateGlobalOptions" object:nil];
 }
-
-@end
-
-@implementation PrefsController (Private)
 
 - (void)setPrefView:(id)sender
 {

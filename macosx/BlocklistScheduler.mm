@@ -29,7 +29,7 @@
 //update one week after previous update
 #define FULL_WAIT (60 * 60 * 24 * 7)
 
-@interface BlocklistScheduler (Private)
+@interface BlocklistScheduler ()
 
 - (void)runUpdater;
 
@@ -88,10 +88,6 @@ BlocklistScheduler* fScheduler = nil;
     [fTimer invalidate];
     fTimer = nil;
 }
-
-@end
-
-@implementation BlocklistScheduler (Private)
 
 - (void)runUpdater
 {

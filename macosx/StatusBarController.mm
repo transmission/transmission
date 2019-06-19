@@ -37,7 +37,7 @@ typedef NS_ENUM(unsigned int, statusTag) {
     STATUS_TRANSFER_SESSION_TAG = 3
 };
 
-@interface StatusBarController (Private)
+@interface StatusBarController ()
 
 - (void)resizeStatusButton;
 
@@ -253,10 +253,6 @@ typedef NS_ENUM(unsigned int, statusTag) {
 
     return YES;
 }
-
-@end
-
-@implementation StatusBarController (Private)
 
 - (void)resizeStatusButton
 {

@@ -61,7 +61,7 @@
 
 #define MAX_PIECES (18 * 18)
 
-@interface TorrentCell (Private)
+@interface TorrentCell ()
 
 - (void)drawBar:(NSRect)barRect;
 - (void)drawRegularBar:(NSRect)barRect;
@@ -580,10 +580,6 @@
     NSAttributedString* titleString = self.attributedTitle;
     [titleString drawInRect:cellFrame];
 }
-
-@end
-
-@implementation TorrentCell (Private)
 
 - (void)drawBar:(NSRect)barRect
 {

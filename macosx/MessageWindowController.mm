@@ -35,7 +35,7 @@
 
 #define UPDATE_SECONDS 0.75
 
-@interface MessageWindowController (Private)
+@interface MessageWindowController ()
 
 - (void)resizeColumn;
 - (BOOL)shouldIncludeMessageForFilter:(NSString*)filterString message:(NSDictionary*)message;
@@ -435,10 +435,6 @@
         }
     }];
 }
-
-@end
-
-@implementation MessageWindowController (Private)
 
 - (void)resizeColumn
 {

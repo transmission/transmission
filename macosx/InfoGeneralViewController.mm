@@ -24,7 +24,7 @@
 #import "NSStringAdditions.h"
 #import "Torrent.h"
 
-@interface InfoGeneralViewController (Private)
+@interface InfoGeneralViewController ()
 
 - (void)setupInfo;
 
@@ -144,10 +144,6 @@
     NSURL* file = [NSURL fileURLWithPath:location];
     [NSWorkspace.sharedWorkspace activateFileViewerSelectingURLs:@[ file ]];
 }
-
-@end
-
-@implementation InfoGeneralViewController (Private)
 
 - (void)setupInfo
 {

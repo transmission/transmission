@@ -26,7 +26,7 @@
 #import "FileOutlineView.h"
 #import "Torrent.h"
 
-@interface InfoFileViewController (Private)
+@interface InfoFileViewController ()
 
 - (void)setupInfo;
 
@@ -208,10 +208,6 @@
 
     return NSZeroRect;
 }
-
-@end
-
-@implementation InfoFileViewController (Private)
 
 - (void)setupInfo
 {

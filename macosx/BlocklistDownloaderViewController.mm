@@ -25,7 +25,7 @@
 #import "PrefsController.h"
 #import "NSStringAdditions.h"
 
-@interface BlocklistDownloaderViewController (Private)
+@interface BlocklistDownloaderViewController ()
 
 - (instancetype)initWithPrefsController:(PrefsController*)prefsController;
 - (void)startDownload;
@@ -125,10 +125,6 @@ BlocklistDownloaderViewController* fBLViewController = nil;
         fBLViewController = nil;
     }];
 }
-
-@end
-
-@implementation BlocklistDownloaderViewController (Private)
 
 - (instancetype)initWithPrefsController:(PrefsController*)prefsController
 {

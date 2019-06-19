@@ -25,7 +25,7 @@
 
 #define BETWEEN_PADDING 2.0
 
-@interface BadgeView (Private)
+@interface BadgeView ()
 
 - (void)badge:(NSImage*)badge string:(NSString*)string atHeight:(CGFloat)height adjustForQuit:(BOOL)quit;
 
@@ -95,10 +95,6 @@
             adjustForQuit:NO];
     }
 }
-
-@end
-
-@implementation BadgeView (Private)
 
 - (void)badge:(NSImage*)badge string:(NSString*)string atHeight:(CGFloat)height adjustForQuit:(BOOL)quit
 {

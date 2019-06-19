@@ -32,7 +32,7 @@
 #define TRACKER_ADD_TAG 0
 #define TRACKER_REMOVE_TAG 1
 
-@interface CreatorWindowController (Private)
+@interface CreatorWindowController ()
 
 + (NSURL*)chooseFile;
 
@@ -495,10 +495,6 @@ NSMutableSet* creatorWindowControllerSet = nil;
         NSBeep();
     }
 }
-
-@end
-
-@implementation CreatorWindowController (Private)
 
 - (void)updateLocationField
 {

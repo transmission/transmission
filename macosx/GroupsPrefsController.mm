@@ -39,7 +39,7 @@
 
 @end
 
-@interface GroupsPrefsController (Private)
+@interface GroupsPrefsController ()
 
 - (void)updateSelectedGroup;
 - (void)refreshCustomLocationWithSingleGroup;
@@ -350,10 +350,6 @@
     self.ruleEditorHeightConstraint.constant = MIN(requiredRowCount, maxVisibleRowCount) * rowHeight + bordersHeight;
     ruleEditorScrollView.hasVerticalScroller = requiredRowCount > maxVisibleRowCount;
 }
-
-@end
-
-@implementation GroupsPrefsController (Private)
 
 - (void)updateSelectedGroup
 {

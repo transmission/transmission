@@ -38,7 +38,7 @@
 #define PADDING_BETWEEN_NAME_AND_FOLDER_STATUS 4.0
 #define PADDING_EXPANSION_FRAME 2.0
 
-@interface FileNameCell (Private)
+@interface FileNameCell ()
 
 - (NSRect)rectForTitleWithString:(NSAttributedString*)string inBounds:(NSRect)bounds;
 - (NSRect)rectForStatusWithString:(NSAttributedString*)string withTitleRect:(NSRect)titleRect inBounds:(NSRect)bounds;
@@ -159,10 +159,6 @@
     NSAttributedString* titleString = self.attributedTitle;
     [titleString drawInRect:cellFrame];
 }
-
-@end
-
-@implementation FileNameCell (Private)
 
 - (NSRect)rectForTitleWithString:(NSAttributedString*)string inBounds:(NSRect)bounds
 {
