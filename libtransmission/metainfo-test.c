@@ -144,7 +144,9 @@ static int test_sanitize(void)
         { "foo", 3, "foo", false },
         { ".foo", 4, ".foo", false },
         { "..foo", 5, "..foo", false },
-        { "foo.bar.baz", 11, "foo.bar.baz", false }
+        { "foo.bar.baz", 11, "foo.bar.baz", false },
+        { "null", 4, "null", false },
+        { "compass", 7, "compass", false }
     };
 
     for (size_t i = 0; i < TR_N_ELEMENTS(test_data); ++i)
