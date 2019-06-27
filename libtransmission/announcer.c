@@ -1249,9 +1249,11 @@ static void on_announce_done(tr_announce_response const* response, void* vdata)
                then a separate scrape isn't needed */
             if (scrape_fields >= 3 || (scrape_fields >= 1 && tracker->scrape_info == NULL))
             {
+                i = round(tier->scrapeIntervalSec * 0.95) + 
+                    tr_rand_int_weak(round(tier->scrapeIntervalSec * 0.1));
                 tr_logAddTorDbg(tier->tor, "Announce response contained scrape info; "
-                    "rescheduling next scrape to %d seconds from now.", tier->scrapeIntervalSec);
-                tier->scrapeAt = get_next_scrape_time(announcer->session, tier, tier->scrapeIntervalSec);
+                    "rescheduling next scrape to %d seconds from now.", i);
+                tier->scrapeAt = get_next_scrape_time(announcer->session, tier, i);
                 tier->lastScrapeTime = now;
                 tier->lastScrapeSucceeded = true;
             }
@@ -1277,7 +1279,9 @@ static void on_announce_done(tr_announce_response const* response, void* vdata)
             {
                 /* the queue is empty, so enqueue a perodic update */
                 i = tier->announceIntervalSec;
-                dbgmsg(tier, "Sending periodic reannounce in %d seconds", i);
+                i = round(tier->announceIntervalSec * 0.95) + 
+                    tr_rand_int_weak(round(tier->announceIntervalSec * 0.1));
+                tr_logAddTorDbg(tier->tor, "Sending periodic reannounce in %d seconds", i);
                 tier_announce_event_push(tier, TR_ANNOUNCE_EVENT_NONE, now + i);
             }
         }
