@@ -151,7 +151,7 @@ Prefs.setValue = function (key, val) {
 
     var date = new Date();
     date.setFullYear(date.getFullYear() + 1);
-    document.cookie = key + "=" + val + "; expires=" + date.toGMTString() + "; path=/";
+    document.cookie = key + "=" + val + "; expires=" + date.toGMTString();
 };
 
 /**
