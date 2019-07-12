@@ -243,6 +243,9 @@ bool tr_str_has_suffix(char const* str, char const* suffix);
 /** @brief Portability wrapper for memmem() that uses the system implementation if available */
 char const* tr_memmem(char const* haystack, size_t haystack_len, char const* needle, size_t needle_len);
 
+/** @brief Portability wrapper for strcasestr() that uses the system implementation if available */
+char const* tr_strcasestr(char const* haystack, char const* needle);
+
 /** @brief Portability wrapper for strsep() that uses the system implementation if available */
 char* tr_strsep(char** str, char const* delim);
 
