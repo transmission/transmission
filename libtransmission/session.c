@@ -487,7 +487,7 @@ bool tr_sessionLoadSettings(tr_variant* dict, char const* configDir, char const*
     tr_variantFree(&oldDict);
 
     /* if caller didn't specify a config dir, use the default */
-    if (configDir == NULL || *configDir == '\0')
+    if (tr_str_is_empty(configDir))
     {
         configDir = tr_getDefaultConfigDir(appName);
     }

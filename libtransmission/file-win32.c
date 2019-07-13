@@ -595,7 +595,7 @@ cleanup:
 
 char* tr_sys_path_basename(char const* path, tr_error** error)
 {
-    if (path == NULL || path[0] == '\0')
+    if (tr_str_is_empty(path))
     {
         return tr_strdup(".");
     }
@@ -635,7 +635,7 @@ char* tr_sys_path_basename(char const* path, tr_error** error)
 
 char* tr_sys_path_dirname(char const* path, tr_error** error)
 {
-    if (path == NULL || path[0] == '\0')
+    if (tr_str_is_empty(path))
     {
         return tr_strdup(".");
     }

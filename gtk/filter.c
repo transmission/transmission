@@ -703,7 +703,7 @@ static gboolean testText(tr_torrent const* tor, char const* key)
 {
     gboolean ret = FALSE;
 
-    if (key == NULL || *key == '\0')
+    if (tr_str_is_empty(key))
     {
         ret = TRUE;
     }

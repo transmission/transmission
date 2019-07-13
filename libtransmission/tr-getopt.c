@@ -11,8 +11,10 @@
 #include <stdlib.h> /* exit() */
 #include <string.h>
 
+#include "transmission.h"
 #include "tr-getopt.h"
 #include "tr-macros.h"
+#include "utils.h"
 
 int tr_optind = 1;
 
@@ -67,8 +69,8 @@ static void getopts_usage_line(tr_option const* opt, int longWidth, int shortWid
     int const d_width = 80 - d_indent;
     char const* d = opt->description;
 
-    printf(" %s%-*s %s%-*s %-*s ", (shortName != NULL && *shortName != '\0') ? "-" : " ", shortWidth, shortName,
-        (longName != NULL && *longName != '\0') ? "--" : "  ", longWidth, longName, argWidth, arg);
+    printf(" %s%-*s %s%-*s %-*s ", tr_str_is_empty(shortName) ? " " : "-", shortWidth, shortName,
+        tr_str_is_empty(longName) ? "  " : "--", longWidth, longName, argWidth, arg);
     len = get_next_line_len(d, d_width);
     printf("%*.*s\n", len, len, d);
 

@@ -960,7 +960,7 @@ static char const* setLabels(tr_torrent* tor, tr_variant* list)
         {
             char* label = tr_strndup(str, str_len);
             tr_strstrip(label);
-            if (*label == '\0')
+            if (tr_str_is_empty(label))
             {
                 errmsg = "labels cannot be empty";
             }
@@ -1641,7 +1641,7 @@ static void gotNewBlocklist(tr_session* session, bool did_connect UNUSED, bool d
 
         tr_sys_file_close(fd, NULL);
 
-        if (*result != '\0')
+        if (!tr_str_is_empty(result))
         {
             tr_logAddError("%s", result);
         }

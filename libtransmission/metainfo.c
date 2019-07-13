@@ -621,7 +621,7 @@ static char const* tr_metainfoParseImpl(tr_session const* session, tr_info* inf,
             }
         }
 
-        if (str == NULL || *str == '\0')
+        if (tr_str_is_empty(str))
         {
             return "name";
         }

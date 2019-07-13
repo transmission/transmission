@@ -246,7 +246,7 @@ void tr_logAddMessage(char const* file, int line, tr_log_level level, char const
 
 #endif
 
-    if (*buf != '\0')
+    if (!tr_str_is_empty(buf))
     {
         if (tr_logGetQueueEnabled())
         {

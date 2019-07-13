@@ -2233,7 +2233,7 @@ static void get_local_time_str(char* const buffer, size_t const buffer_len)
 
 static void torrentCallScript(tr_torrent const* tor, char const* script)
 {
-    if (script == NULL || *script == '\0')
+    if (tr_str_is_empty(script))
     {
         return;
     }
@@ -3794,8 +3794,8 @@ void tr_torrentSetQueueStartCallback(tr_torrent* torrent, void (* callback)(tr_t
 
 static bool renameArgsAreValid(char const* oldpath, char const* newname)
 {
-    return oldpath != NULL && *oldpath != '\0' && newname != NULL && *newname != '\0' && strcmp(newname, ".") != 0 &&
-        strcmp(newname, "..") != 0 && strchr(newname, TR_PATH_DELIMITER) == NULL;
+    return !tr_str_is_empty(oldpath) && !tr_str_is_empty(newname) && strcmp(newname, ".") != 0 && strcmp(newname, "..") != 0 &&
+        strchr(newname, TR_PATH_DELIMITER) == NULL;
 }
 
 static tr_file_index_t* renameFindAffectedFiles(tr_torrent* tor, char const* oldpath, size_t* setme_n)

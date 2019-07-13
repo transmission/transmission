@@ -431,7 +431,7 @@ error:
 
 static void maybeSetCongestionAlgorithm(tr_socket_t socket, char const* algorithm)
 {
-    if (algorithm != NULL && *algorithm != '\0')
+    if (!tr_str_is_empty(algorithm))
     {
         tr_netSetCongestionControl(socket, algorithm);
     }

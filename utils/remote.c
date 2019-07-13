@@ -548,11 +548,11 @@ static char* getEncodedMetainfo(char const* filename)
 
 static void addIdArg(tr_variant* args, char const* id, char const* fallback)
 {
-    if (id == NULL || *id == '\0')
+    if (tr_str_is_empty(id))
     {
         id = fallback;
 
-        if (id == NULL || *id == '\0')
+        if (tr_str_is_empty(id))
         {
             fprintf(stderr, "No torrent specified!  Please use the -t option first.\n");
             id = "-1"; /* no torrent will have this ID, so will act as a no-op */
@@ -666,7 +666,7 @@ static void addLabels(tr_variant* args, char const* arg)
     while ((token = tr_strsep(&argcpy, ",")) != NULL)
     {
         tr_strstrip(token);
-        if (*token != '\0')
+        if (!tr_str_is_empty(token))
         {
             tr_variantListAddStr(labels, token);
         }
@@ -679,7 +679,7 @@ static void addFiles(tr_variant* args, tr_quark const key, char const* arg)
 {
     tr_variant* files = tr_variantDictAddList(args, key, 100);
 
-    if (*arg == '\0')
+    if (tr_str_is_empty(arg))
     {
         fprintf(stderr, "No files specified!\n");
         arg = "-1"; /* no file will have this index, so should be a no-op */
@@ -1058,7 +1058,7 @@ static void printDetails(tr_variant* top)
                 printf("  Corrupt DL: %s\n", buf);
             }
 
-            if (tr_variantDictFindStr(t, TR_KEY_errorString, &str, NULL) && str != NULL && *str != '\0' &&
+            if (tr_variantDictFindStr(t, TR_KEY_errorString, &str, NULL) && !tr_str_is_empty(str) &&
                 tr_variantDictFindInt(t, TR_KEY_error, &i) && i != 0)
             {
                 switch (i)
@@ -1150,12 +1150,12 @@ static void printDetails(tr_variant* top)
                 printf("  Public torrent: %s\n", (boolVal ? "No" : "Yes"));
             }
 
-            if (tr_variantDictFindStr(t, TR_KEY_comment, &str, NULL) && str != NULL && *str != '\0')
+            if (tr_variantDictFindStr(t, TR_KEY_comment, &str, NULL) && !tr_str_is_empty(str))
             {
                 printf("  Comment: %s\n", str);
             }
 
-            if (tr_variantDictFindStr(t, TR_KEY_creator, &str, NULL) && str != NULL && *str != '\0')
+            if (tr_variantDictFindStr(t, TR_KEY_creator, &str, NULL) && !tr_str_is_empty(str))
             {
                 printf("  Creator: %s\n", str);
             }
@@ -2608,7 +2608,7 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
             tr_variant* targs = NULL;
             tr_variant* sargs = NULL;
 
-            if (*id != '\0')
+            if (!tr_str_is_empty(id))
             {
                 targs = ensure_tset(&tset);
             }

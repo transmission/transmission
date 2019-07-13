@@ -418,7 +418,7 @@ char* tr_torrentInfoGetMagnetLink(tr_info const* inf)
 
     name = inf->name;
 
-    if (name != NULL && *name != '\0')
+    if (!tr_str_is_empty(name))
     {
         evbuffer_add_printf(s, "%s", "&dn=");
         tr_http_escape(s, name, TR_BAD_SIZE, true);

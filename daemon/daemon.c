@@ -649,7 +649,7 @@ static int daemon_start(void* raw_arg, bool foreground)
     pid_filename = NULL;
     tr_variantDictFindStr(settings, key_pidfile, &pid_filename, NULL);
 
-    if (pid_filename != NULL && *pid_filename != '\0')
+    if (!tr_str_is_empty(pid_filename))
     {
         tr_error* error = NULL;
         tr_sys_file_t fp = tr_sys_file_open(pid_filename, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE, 0666,
@@ -693,7 +693,7 @@ static int daemon_start(void* raw_arg, bool foreground)
             force_generic = false;
         }
 
-        if (tr_variantDictFindStr(settings, TR_KEY_watch_dir, &dir, NULL) && dir != NULL && *dir != '\0')
+        if (tr_variantDictFindStr(settings, TR_KEY_watch_dir, &dir, NULL) && !tr_str_is_empty(dir))
         {
             tr_logAddInfo("Watching \"%s\" for new .torrent files", dir);
 

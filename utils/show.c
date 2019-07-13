@@ -142,7 +142,7 @@ static void showInfo(tr_info const* inf)
     printf("  Created by: %s\n", inf->creator ? inf->creator : "Unknown");
     printf("  Created on: %s\n", unix_timestamp_to_str(inf->dateCreated));
 
-    if (inf->comment != NULL && *inf->comment != '\0')
+    if (!tr_str_is_empty(inf->comment))
     {
         printf("  Comment: %s\n", inf->comment);
     }
