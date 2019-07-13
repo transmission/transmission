@@ -11,7 +11,7 @@
 
 #include <dirent.h>
 #include <errno.h>
-#include <fcntl.h> /* O_LARGEFILE, posix_fadvise(), [posix_]fallocate() */
+#include <fcntl.h> /* O_LARGEFILE, posix_fadvise(), [posix_]fallocate(), fcntl() */
 #include <libgen.h> /* basename(), dirname() */
 #include <limits.h> /* PATH_MAX */
 #include <stdio.h>
@@ -985,6 +985,41 @@ bool tr_sys_file_lock(tr_sys_file_t handle, int operation, tr_error** error)
         !!(operation & TR_SYS_FILE_LOCK_UN) == 1);
 
     bool ret;
+
+#if defined(F_OFD_SETLK)
+
+    struct flock fl = {0};
+
+    switch (operation & (TR_SYS_FILE_LOCK_SH | TR_SYS_FILE_LOCK_EX | TR_SYS_FILE_LOCK_UN))
+    {
+    case TR_SYS_FILE_LOCK_SH:
+        fl.l_type = F_RDLCK;
+        break;
+
+    case TR_SYS_FILE_LOCK_EX:
+        fl.l_type = F_WRLCK;
+        break;
+
+    case TR_SYS_FILE_LOCK_UN:
+        fl.l_type = F_UNLCK;
+        break;
+    }
+
+    fl.l_whence = SEEK_SET;
+
+    do
+    {
+        ret = fcntl(handle, (operation & TR_SYS_FILE_LOCK_NB) != 0 ? F_OFD_SETLK : F_OFD_SETLKW, &fl) != -1;
+    }
+    while (!ret && errno == EINTR);
+
+    if (!ret && errno == EAGAIN)
+    {
+        errno = EWOULDBLOCK;
+    }
+
+#elif defined(HAVE_FLOCK)
+
     int native_operation = 0;
 
     if ((operation & TR_SYS_FILE_LOCK_SH) != 0)
@@ -1007,7 +1042,21 @@ bool tr_sys_file_lock(tr_sys_file_t handle, int operation, tr_error** error)
         native_operation |= LOCK_UN;
     }
 
-    ret = flock(handle, native_operation) != -1;
+    do
+    {
+        ret = flock(handle, native_operation) != -1;
+    }
+    while (!ret && errno == EINTR);
+
+#else
+
+    (void)handle;
+    (void)operation;
+
+    errno = ENOSYS;
+    ret = false;
+
+#endif
 
     if (!ret)
     {
