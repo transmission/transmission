@@ -94,7 +94,7 @@ tr_torrent* tr_torrentFindFromHashString(tr_session* session, char const* str)
 
     while ((tor = tr_torrentNext(session, tor)) != NULL)
     {
-        if (!evutil_ascii_strcasecmp(str, tor->info.hashString))
+        if (evutil_ascii_strcasecmp(str, tor->info.hashString) == 0)
         {
             return tor;
         }
@@ -1099,7 +1099,7 @@ static tr_parse_result torrentParseImpl(tr_ctor const* ctor, tr_info* setmeInfo,
         result = TR_PARSE_ERR;
     }
 
-    if (didParse && hasInfo && !tr_getBlockSize(setmeInfo->pieceSize))
+    if (didParse && hasInfo && tr_getBlockSize(setmeInfo->pieceSize) == 0)
     {
         result = TR_PARSE_ERR;
     }
@@ -1417,7 +1417,7 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
     s->haveUnchecked = tr_torrentHaveTotal(tor) - s->haveValid;
     s->desiredAvailable = tr_peerMgrGetDesiredAvailable(tor);
 
-    s->ratio = tr_getRatio(s->uploadedEver, s->downloadedEver ? s->downloadedEver : s->haveValid);
+    s->ratio = tr_getRatio(s->uploadedEver, s->downloadedEver != 0 ? s->downloadedEver : s->haveValid);
 
     seedRatioApplies = tr_torrentGetSeedRatioBytes(tor, &seedRatioBytesLeft, &seedRatioBytesGoal);
 
@@ -2421,13 +2421,13 @@ tr_priority_t* tr_torrentGetFilePriorities(tr_torrent const* tor)
 ***  File DND
 **/
 
-static void setFileDND(tr_torrent* tor, tr_file_index_t fileIndex, int doDownload)
+static void setFileDND(tr_torrent* tor, tr_file_index_t fileIndex, bool doDownload)
 {
-    int8_t const dnd = !doDownload;
+    bool const dnd = !doDownload;
     tr_piece_index_t firstPiece;
-    int8_t firstPieceDND;
+    bool firstPieceDND;
     tr_piece_index_t lastPiece;
-    int8_t lastPieceDND;
+    bool lastPieceDND;
     tr_file* file = &tor->info.files[fileIndex];
 
     file->dnd = dnd;

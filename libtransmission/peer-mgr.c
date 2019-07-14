@@ -328,7 +328,7 @@ static inline void swarmUnlock(tr_swarm* swarm)
 
 #ifdef TR_ENABLE_ASSERTS
 
-static inline int swarmIsLocked(tr_swarm const* swarm)
+static inline bool swarmIsLocked(tr_swarm const* swarm)
 {
     return tr_sessionIsLocked(swarm->manager->session);
 }
@@ -410,8 +410,8 @@ static bool peerIsInUse(tr_swarm const* cs, struct peer_atom const* atom)
 
     TR_ASSERT(swarmIsLocked(s));
 
-    return atom->peer != NULL || getExistingHandshake(&s->outgoingHandshakes, &atom->addr) ||
-        getExistingHandshake(&s->manager->incomingHandshakes, &atom->addr);
+    return atom->peer != NULL || getExistingHandshake(&s->outgoingHandshakes, &atom->addr) != NULL ||
+        getExistingHandshake(&s->manager->incomingHandshakes, &atom->addr) != NULL;
 }
 
 static inline bool replicationExists(tr_swarm const* s)
@@ -587,10 +587,10 @@ static bool isAtomBlocklisted(tr_session* session, struct peer_atom* atom)
 {
     if (atom->blocklisted < 0)
     {
-        atom->blocklisted = tr_sessionIsAddressBlocked(session, &atom->addr);
+        atom->blocklisted = (int8_t)tr_sessionIsAddressBlocked(session, &atom->addr);
     }
 
-    return atom->blocklisted;
+    return atom->blocklisted != 0;
 }
 
 /***
@@ -3564,7 +3564,7 @@ static void closePeer(tr_swarm* s, tr_peer* peer)
     /* if we transferred piece data, then they might be good peers,
        so reset their `numFails' weight to zero. otherwise we connected
        to them fruitlessly, so mark it as another fail */
-    if (atom->piece_data_time)
+    if (atom->piece_data_time != 0)
     {
         tordbg(s, "resetting atom %s numFails to 0", tr_atomAddrStr(atom));
         atom->numFails = 0;

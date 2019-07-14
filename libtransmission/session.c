@@ -2021,7 +2021,7 @@ static void sessionCloseImpl(void* vsession)
     sessionCloseImplStart(session);
 }
 
-static int deadlineReached(time_t const deadline)
+static bool deadlineReached(time_t const deadline)
 {
     return time(NULL) >= deadline;
 }
@@ -2393,7 +2393,7 @@ bool tr_sessionIsPortForwardingEnabled(tr_session const* session)
 ****
 ***/
 
-static int tr_stringEndsWith(char const* str, char const* end)
+static bool tr_stringEndsWith(char const* str, char const* end)
 {
     size_t const slen = strlen(str);
     size_t const elen = strlen(end);

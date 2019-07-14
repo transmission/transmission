@@ -1547,7 +1547,7 @@ static void on_scrape_done(tr_scrape_response const* response, void* vsession)
         }
     }
 
-    if (announcer)
+    if (announcer != NULL)
     {
         ++announcer->slotsAvailable;
     }

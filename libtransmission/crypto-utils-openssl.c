@@ -311,7 +311,7 @@ tr_dh_ctx_t tr_dh_new(uint8_t const* prime_num, size_t prime_num_length, uint8_t
     p = BN_bin2bn(prime_num, prime_num_length, NULL);
     g = BN_bin2bn(generator_num, generator_num_length, NULL);
 
-    if (!check_pointer(p) || !check_pointer(g) || !DH_set0_pqg(handle, p, NULL, g))
+    if (!check_pointer(p) || !check_pointer(g) || DH_set0_pqg(handle, p, NULL, g) == 0)
     {
         BN_free(p);
         BN_free(g);

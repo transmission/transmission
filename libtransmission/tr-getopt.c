@@ -129,7 +129,7 @@ void tr_getopt_usage(char const* progName, char const* description, struct tr_op
     help.longName = "help";
     help.description = "Display this help page and exit";
     help.shortName = "h";
-    help.has_arg = 0;
+    help.has_arg = false;
     maxWidth(&help, &longWidth, &shortWidth, &argWidth);
 
     if (description == NULL)

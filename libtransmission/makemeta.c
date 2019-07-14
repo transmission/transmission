@@ -281,7 +281,7 @@ static uint8_t* getHashInfo(tr_metainfo_builder* b)
         return NULL;
     }
 
-    while (totalRemain)
+    while (totalRemain != 0)
     {
         TR_ASSERT(b->pieceIndex < b->pieceCount);
 

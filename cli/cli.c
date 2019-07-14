@@ -75,25 +75,25 @@ static char const* torrentPath = NULL;
 
 static struct tr_option const options[] =
 {
-    { 'b', "blocklist", "Enable peer blocklists", "b", 0, NULL },
-    { 'B', "no-blocklist", "Disable peer blocklists", "B", 0, NULL },
-    { 'd', "downlimit", "Set max download speed in "SPEED_K_STR, "d", 1, "<speed>" },
-    { 'D', "no-downlimit", "Don't limit the download speed", "D", 0, NULL },
-    { 910, "encryption-required", "Encrypt all peer connections", "er", 0, NULL },
-    { 911, "encryption-preferred", "Prefer encrypted peer connections", "ep", 0, NULL },
-    { 912, "encryption-tolerated", "Prefer unencrypted peer connections", "et", 0, NULL },
-    { 'f', "finish", "Run a script when the torrent finishes", "f", 1, "<script>" },
-    { 'g', "config-dir", "Where to find configuration files", "g", 1, "<path>" },
-    { 'm', "portmap", "Enable portmapping via NAT-PMP or UPnP", "m", 0, NULL },
-    { 'M', "no-portmap", "Disable portmapping", "M", 0, NULL },
-    { 'p', "port", "Port for incoming peers (Default: " TR_DEFAULT_PEER_PORT_STR ")", "p", 1, "<port>" },
-    { 't', "tos", "Peer socket TOS (0 to 255, default=" TR_DEFAULT_PEER_SOCKET_TOS_STR ")", "t", 1, "<tos>" },
-    { 'u', "uplimit", "Set max upload speed in "SPEED_K_STR, "u", 1, "<speed>" },
-    { 'U', "no-uplimit", "Don't limit the upload speed", "U", 0, NULL },
-    { 'v', "verify", "Verify the specified torrent", "v", 0, NULL },
-    { 'V', "version", "Show version number and exit", "V", 0, NULL },
-    { 'w', "download-dir", "Where to save downloaded data", "w", 1, "<path>" },
-    { 0, NULL, NULL, NULL, 0, NULL }
+    { 'b', "blocklist", "Enable peer blocklists", "b", false, NULL },
+    { 'B', "no-blocklist", "Disable peer blocklists", "B", false, NULL },
+    { 'd', "downlimit", "Set max download speed in "SPEED_K_STR, "d", true, "<speed>" },
+    { 'D', "no-downlimit", "Don't limit the download speed", "D", false, NULL },
+    { 910, "encryption-required", "Encrypt all peer connections", "er", false, NULL },
+    { 911, "encryption-preferred", "Prefer encrypted peer connections", "ep", false, NULL },
+    { 912, "encryption-tolerated", "Prefer unencrypted peer connections", "et", false, NULL },
+    { 'f', "finish", "Run a script when the torrent finishes", "f", true, "<script>" },
+    { 'g', "config-dir", "Where to find configuration files", "g", true, "<path>" },
+    { 'm', "portmap", "Enable portmapping via NAT-PMP or UPnP", "m", false, NULL },
+    { 'M', "no-portmap", "Disable portmapping", "M", false, NULL },
+    { 'p', "port", "Port for incoming peers (Default: " TR_DEFAULT_PEER_PORT_STR ")", "p", true, "<port>" },
+    { 't', "tos", "Peer socket TOS (0 to 255, default=" TR_DEFAULT_PEER_SOCKET_TOS_STR ")", "t", true, "<tos>" },
+    { 'u', "uplimit", "Set max upload speed in "SPEED_K_STR, "u", true, "<speed>" },
+    { 'U', "no-uplimit", "Don't limit the upload speed", "U", false, NULL },
+    { 'v', "verify", "Verify the specified torrent", "v", false, NULL },
+    { 'V', "version", "Show version number and exit", "V", false, NULL },
+    { 'w', "download-dir", "Where to save downloaded data", "w", true, "<path>" },
+    { 0, NULL, NULL, NULL, false, NULL }
 };
 
 static char const* getUsage(void)

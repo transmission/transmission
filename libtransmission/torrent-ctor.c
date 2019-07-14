@@ -86,7 +86,7 @@ int tr_ctorSetMetainfo(tr_ctor* ctor, uint8_t const* metainfo, size_t len)
 
     clearMetainfo(ctor);
     err = tr_variantFromBenc(&ctor->metainfo, metainfo, len);
-    ctor->isSet_metainfo = !err;
+    ctor->isSet_metainfo = err == 0;
     return err;
 }
 
