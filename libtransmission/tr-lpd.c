@@ -466,6 +466,7 @@ UNUSED static inline void lpd_consistencyCheck(void)
      * as interfaces to the rest of the lib remain compatible with char* strings. */
     TR_STATIC_ASSERT(sizeof(lpd_torStaticType->info.hashString[0]) == sizeof(char), "");
 }
+
 /**
 * @endcond */
 

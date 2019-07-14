@@ -235,6 +235,7 @@ unsigned char const* tr_torrentGetPeerId(tr_torrent* tor)
 
     return tor->peer_id;
 }
+
 /***
 ****  PER-TORRENT UL / DL SPEEDS
 ***/
@@ -2488,7 +2489,6 @@ static void setFileDND(tr_torrent* tor, tr_file_index_t fileIndex, bool doDownlo
 
 void tr_torrentInitFileDLs(tr_torrent* tor, tr_file_index_t const* files, tr_file_index_t fileCount, bool doDownload)
 {
-
     TR_ASSERT(tr_isTorrent(tor));
 
     tr_torrentLock(tor);
