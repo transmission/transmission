@@ -317,6 +317,7 @@ static void register_magnet_link_handler(void)
 
     g_clear_object(&app);
 }
+
 static void ensure_magnet_handler_exists(void)
 {
     if (!has_magnet_link_handler())

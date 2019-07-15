@@ -1360,7 +1360,7 @@ void MainWindow::removeTorrents(bool const deleteFiles)
             tr("Delete these %Ln torrent(s)' downloaded files?", nullptr, count);
     }
 
-    if (!incomplete && !connected)
+    if (incomplete == 0 && connected == 0)
     {
         secondary_text = count == 1 ?
             tr("Once removed, continuing the transfer will require the torrent file or magnet link.") :

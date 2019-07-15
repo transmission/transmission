@@ -296,6 +296,7 @@ qulonglong Torrent::getSize(int i) const
 
     return myValues[i].toULongLong();
 }
+
 double Torrent::getDouble(int i) const
 {
     assert(0 <= i && i < PROPERTY_COUNT);
@@ -303,6 +304,7 @@ double Torrent::getDouble(int i) const
 
     return myValues[i].toDouble();
 }
+
 QString Torrent::getString(int i) const
 {
     assert(0 <= i && i < PROPERTY_COUNT);
@@ -310,6 +312,7 @@ QString Torrent::getString(int i) const
 
     return myValues[i].toString();
 }
+
 QIcon Torrent::getIcon(int i) const
 {
     assert(0 <= i && i < PROPERTY_COUNT);

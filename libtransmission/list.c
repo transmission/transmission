@@ -163,7 +163,7 @@ static void* tr_list_remove_node(tr_list** list, tr_list* node)
         *list = next;
     }
 
-    data = node ? node->data : NULL;
+    data = node != NULL ? node->data : NULL;
     node_free(node);
     return data;
 }

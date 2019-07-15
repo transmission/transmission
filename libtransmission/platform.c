@@ -328,7 +328,7 @@ char const* tr_getDefaultConfigDir(char const* appname)
 {
     static char* s = NULL;
 
-    if (appname == NULL || *appname == '\0')
+    if (tr_str_is_empty(appname))
     {
         appname = "Transmission";
     }
@@ -390,7 +390,7 @@ char const* tr_getDefaultDownloadDir(void)
         /* figure out where to look for user-dirs.dirs */
         config_home = tr_env_get_string("XDG_CONFIG_HOME", NULL);
 
-        if (config_home != NULL && *config_home != '\0')
+        if (!tr_str_is_empty(config_home))
         {
             config_file = tr_buildPath(config_home, "user-dirs.dirs", NULL);
         }
@@ -576,7 +576,7 @@ char const* tr_getWebClientDir(tr_session const* session UNUSED)
             /* XDG_DATA_HOME should be the first in the list of candidates */
             tmp = tr_env_get_string("XDG_DATA_HOME", NULL);
 
-            if (tmp != NULL && *tmp != '\0')
+            if (!tr_str_is_empty(tmp))
             {
                 tr_list_append(&candidates, tmp);
             }
@@ -596,7 +596,7 @@ char const* tr_getWebClientDir(tr_session const* session UNUSED)
                 tr_free(xdg);
                 tmp = buf;
 
-                while (tmp != NULL && *tmp != '\0')
+                while (!tr_str_is_empty(tmp))
                 {
                     char const* end = strchr(tmp, ':');
 
@@ -609,7 +609,7 @@ char const* tr_getWebClientDir(tr_session const* session UNUSED)
 
                         tmp = (char*)end + 1;
                     }
-                    else if (tmp != NULL && *tmp != '\0')
+                    else if (!tr_str_is_empty(tmp))
                     {
                         tr_list_append(&candidates, tr_strdup(tmp));
                         break;

@@ -345,6 +345,11 @@
 		C12F19791E1AE3C30005E93F /* upnperrors.c in Sources */ = {isa = PBXBuildFile; fileRef = C12F19771E1AE3C30005E93F /* upnperrors.c */; };
 		C12F197B1E1AE4460005E93F /* upnperrors.h in Headers */ = {isa = PBXBuildFile; fileRef = C12F197A1E1AE4460005E93F /* upnperrors.h */; };
 		C1305EBE186A13B100F03351 /* file.c in Sources */ = {isa = PBXBuildFile; fileRef = C1305EB8186A134000F03351 /* file.c */; };
+		C139E3B122BE70FB0007870C /* libssl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = C139E3B022BE70FA0007870C /* libssl.dylib */; };
+		C139E3B222BE71030007870C /* libssl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = C139E3B022BE70FA0007870C /* libssl.dylib */; };
+		C139E3B322BE71180007870C /* libssl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = C139E3B022BE70FA0007870C /* libssl.dylib */; };
+		C139E3B422BE71250007870C /* libssl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = C139E3B022BE70FA0007870C /* libssl.dylib */; };
+		C139E3B522BE712C0007870C /* libssl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = C139E3B022BE70FA0007870C /* libssl.dylib */; };
 		C1425B351EE9C5F5001DB85F /* tr-assert.c in Sources */ = {isa = PBXBuildFile; fileRef = C1425B321EE9C5EA001DB85F /* tr-assert.c */; };
 		C1425B361EE9C605001DB85F /* tr-assert.h in Headers */ = {isa = PBXBuildFile; fileRef = C1425B331EE9C5EA001DB85F /* tr-assert.h */; };
 		C1425B371EE9C705001DB85F /* tr-macros.h in Headers */ = {isa = PBXBuildFile; fileRef = C1425B341EE9C5EA001DB85F /* tr-macros.h */; };
@@ -994,6 +999,7 @@
 		C12F19771E1AE3C30005E93F /* upnperrors.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = upnperrors.c; sourceTree = "<group>"; };
 		C12F197A1E1AE4460005E93F /* upnperrors.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = upnperrors.h; sourceTree = "<group>"; };
 		C1305EB8186A134000F03351 /* file.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = file.c; sourceTree = "<group>"; };
+		C139E3B022BE70FA0007870C /* libssl.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libssl.dylib; path = "third-party/openssl/lib/libssl.dylib"; sourceTree = "<group>"; };
 		C1425B321EE9C5EA001DB85F /* tr-assert.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "tr-assert.c"; sourceTree = "<group>"; };
 		C1425B331EE9C5EA001DB85F /* tr-assert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "tr-assert.h"; sourceTree = "<group>"; };
 		C1425B341EE9C5EA001DB85F /* tr-macros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "tr-macros.h"; sourceTree = "<group>"; };
@@ -1035,6 +1041,7 @@
 				A296EF3C11E560BD004A2781 /* libiconv.dylib in Frameworks */,
 				A2290D1E14421CC100B95A09 /* libcrypto.dylib in Frameworks */,
 				A2290D2F1442B23200B95A09 /* libcurl.4.dylib in Frameworks */,
+				C139E3B322BE71180007870C /* libssl.dylib in Frameworks */,
 				A2B6141E1395B0EC000E0975 /* libz.dylib in Frameworks */,
 				A2B3FB4C0E59023000FF78FB /* Cocoa.framework in Frameworks */,
 			);
@@ -1051,6 +1058,7 @@
 				A296EF3B11E560A7004A2781 /* libiconv.dylib in Frameworks */,
 				A2290D2514421D1A00B95A09 /* libcrypto.dylib in Frameworks */,
 				A2290D2E1442B23200B95A09 /* libcurl.4.dylib in Frameworks */,
+				C139E3B122BE70FB0007870C /* libssl.dylib in Frameworks */,
 				A2B6141F1395B0F5000E0975 /* libz.dylib in Frameworks */,
 				A2E669790F5B8E5A00B4251A /* Security.framework in Frameworks */,
 				A22CFB820FB66EF30009BD3E /* Carbon.framework in Frameworks */,
@@ -1082,9 +1090,10 @@
 				A2F35BE315C5A7F900EBF632 /* Foundation.framework in Frameworks */,
 				A2F35BD415C5A19A00EBF632 /* libtransmission.a in Frameworks */,
 				A2F35BDB15C5A4A000EBF632 /* libiconv.dylib in Frameworks */,
-				A2F35BDA15C5A49200EBF632 /* libz.dylib in Frameworks */,
 				A2F35BD715C5A46D00EBF632 /* libcrypto.dylib in Frameworks */,
 				A2AB76EA15D8130B009EFC95 /* libcurl.4.dylib in Frameworks */,
+				C139E3B222BE71030007870C /* libssl.dylib in Frameworks */,
+				A2F35BDA15C5A49200EBF632 /* libz.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1123,6 +1132,7 @@
 				A296EF3D11E560C3004A2781 /* libiconv.dylib in Frameworks */,
 				A2290D2014421CD000B95A09 /* libcrypto.dylib in Frameworks */,
 				A2290D301442B23200B95A09 /* libcurl.4.dylib in Frameworks */,
+				C139E3B422BE71250007870C /* libssl.dylib in Frameworks */,
 				A2B6141D1395B0E3000E0975 /* libz.dylib in Frameworks */,
 				A2B3FB530E59027100FF78FB /* Cocoa.framework in Frameworks */,
 			);
@@ -1136,6 +1146,7 @@
 				A296EF3E11E560D1004A2781 /* libiconv.dylib in Frameworks */,
 				A2290D2214421CD800B95A09 /* libcrypto.dylib in Frameworks */,
 				A2290D311442B23200B95A09 /* libcurl.4.dylib in Frameworks */,
+				C139E3B522BE712C0007870C /* libssl.dylib in Frameworks */,
 				A2B6141C1395ADE9000E0975 /* libz.dylib in Frameworks */,
 				A25E03D90E4015100086C225 /* Cocoa.framework in Frameworks */,
 			);
@@ -1590,6 +1601,7 @@
 		A2F35BBA15C5A0A100EBF632 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				C139E3B022BE70FA0007870C /* libssl.dylib */,
 				A2F35BBB15C5A0A100EBF632 /* QuickLook.framework */,
 				A2F35BE215C5A7F900EBF632 /* Foundation.framework */,
 				A2F35BE015C5A7ED00EBF632 /* Cocoa.framework */,
