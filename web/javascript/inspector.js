@@ -625,16 +625,34 @@ function Inspector(controller) {
         /****
          *****  PEERS PAGE
          ****/
-
-        updatePeersPage = function () {
+        updatePeersPage = function() {
             var i, k, tor, peers, peer, parity,
                 html = [],
                 fmt = Transmission.fmt,
                 peers_list = data.elements.peers_list,
-                torrents = data.torrents;
+                torrents = data.torrents,
+                sortIndex = 0;
 
+            var theHeader = document.getElementById('headerrow');
+            if (theHeader) {
+                var sortElementList = theHeader.getElementsByClassName('sort');
+                if (sortElementList && sortElementList.length > 0) {
+                    sortIndex = sortElementList[0].cellIndex;
+                }
+            }
             for (k = 0; tor = torrents[k]; ++k) {
                 peers = tor.getPeers();
+                if (peers) {
+                    peers.sort(function(peera, peerb) {
+                        if (sortIndex === 1) {
+                            return peerb.rateToPeer - peera.rateToPeer;
+                        } else if (sortIndex === 2) {
+                            return peerb.rateToClient - peera.rateToClient;
+                        } else if (sortIndex === 3) {
+                            return peerb.progress - peera.progress;
+                        }
+                    });
+                }
                 html.push('<div class="inspector_group">');
                 if (torrents.length > 1) {
                     html.push('<div class="inspector_torrent_label">', sanitizeText(tor.getName()), '</div>');
@@ -643,20 +661,22 @@ function Inspector(controller) {
                     html.push('<br></div>'); // firefox won't paint the top border if the div is empty
                     continue;
                 }
-                html.push('<table class="peer_list">',
-                    '<tr class="inspector_peer_entry even">',
+                html.push('<table id="peer_list_table" class="peer_list">',
+                    '<tr id="headerrow" class="inspector_peer_entry even">',
                     '<th class="encryptedCol"></th>',
-                    '<th class="upCol">Up</th>',
-                    '<th class="downCol">Down</th>',
-                    '<th class="percentCol">%</th>',
+                    '<th class="upCol', sortIndex === 1 ? ' sort' : '', '">Up</th>',
+                    '<th class="downCol', sortIndex === 2 ? ' sort' : '', '">Down</th>',
+                    '<th class="percentCol', sortIndex === 3 ? ' sort' : '', '">%</th>',
                     '<th class="statusCol">Status</th>',
                     '<th class="addressCol">Address</th>',
                     '<th class="clientCol">Client</th>',
                     '</tr>');
+
                 for (i = 0; peer = peers[i]; ++i) {
                     parity = (i % 2) ? 'odd' : 'even';
                     html.push('<tr class="inspector_peer_entry ', parity, '">',
-                        '<td>', (peer.isEncrypted ? '<div class="encrypted-peer-cell" title="Encrypted Connection">' : '<div class="unencrypted-peer-cell">'), '</div>', '</td>',
+                        '<td>', (peer.isEncrypted ? '<div class="encrypted-peer-cell" title="Encrypted Connection">' :
+                            '<div class="unencrypted-peer-cell">'), '</div>', '</td>',
                         '<td>', (peer.rateToPeer ? fmt.speedBps(peer.rateToPeer) : ''), '</td>',
                         '<td>', (peer.rateToClient ? fmt.speedBps(peer.rateToClient) : ''), '</td>',
                         '<td class="percentCol">', Math.floor(peer.progress * 100), '%', '</td>',
@@ -669,6 +689,24 @@ function Inspector(controller) {
             }
 
             setInnerHTML(peers_list, html.join(''));
+
+            var theTable = document.getElementById("peer_list_table");
+            if (theTable) {
+                var tableHeaders = theTable.getElementsByTagName('th');
+                var tableHeaderList = Array.prototype.slice.call(tableHeaders);
+                tableHeaderList.forEach(function(th) {
+                    th.addEventListener('click', (function() {
+                        // clear the existing sorts
+                        var table = th.closest('table');
+                        var tableHeaders = table.getElementsByTagName('th');
+                        var tableHeaderList = Array.prototype.slice.call(tableHeaders);
+                        tableHeaderList.forEach(function(th) {
+                            th.classList.remove('sort');
+                        });
+                        th.classList.add('sort');
+                    }));
+                });
+            }
         },
 
         /****
