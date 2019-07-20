@@ -132,7 +132,7 @@ BlocklistDownloader * fBLDownloader = nil;
         [self decompressBlocklist];
 
         dispatch_async(dispatch_get_main_queue(), ^{
-            const int count = tr_blocklistSetContent([(Controller *)[NSApp delegate] sessionHandle], [fDestination UTF8String]);
+            const int count = tr_blocklistSetContent([(Controller *)[NSApp delegate] sessionHandle], [fDestination fileSystemRepresentation]);
 
             //delete downloaded file
             [[NSFileManager defaultManager] removeItemAtPath: fDestination error: NULL];
