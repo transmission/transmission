@@ -625,7 +625,7 @@ function Inspector(controller) {
         /****
          *****  PEERS PAGE
          ****/
-        updatePeersPage = function() {
+        updatePeersPage = function () {
             var i, k, tor, peers, peer, parity,
                 html = [],
                 fmt = Transmission.fmt,
@@ -643,7 +643,7 @@ function Inspector(controller) {
             for (k = 0; tor = torrents[k]; ++k) {
                 peers = tor.getPeers();
                 if (peers) {
-                    peers.sort(function(peera, peerb) {
+                    peers.sort(function (peera, peerb) {
                         if (sortIndex === 1) {
                             return peerb.rateToPeer - peera.rateToPeer;
                         } else if (sortIndex === 2) {
@@ -694,13 +694,13 @@ function Inspector(controller) {
             if (theTable) {
                 var tableHeaders = theTable.getElementsByTagName('th');
                 var tableHeaderList = Array.prototype.slice.call(tableHeaders);
-                tableHeaderList.forEach(function(th) {
-                    th.addEventListener('click', (function() {
+                tableHeaderList.forEach(function (th) {
+                    th.addEventListener('click', (function () {
                         // clear the existing sorts
                         var table = th.closest('table');
                         var tableHeaders = table.getElementsByTagName('th');
                         var tableHeaderList = Array.prototype.slice.call(tableHeaders);
-                        tableHeaderList.forEach(function(th) {
+                        tableHeaderList.forEach(function (th) {
                             th.classList.remove('sort');
                         });
                         th.classList.add('sort');
