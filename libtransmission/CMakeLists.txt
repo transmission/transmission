@@ -15,6 +15,7 @@ set(${PROJECT_NAME}_SOURCES
     ConvertUTF.c
     crypto.c
     crypto-utils.c
+    crypto-utils-ccrypto.c
     crypto-utils-cyassl.c
     crypto-utils-fallback.c
     crypto-utils-openssl.c
@@ -77,7 +78,7 @@ set(${PROJECT_NAME}_SOURCES
 )
 
 set_source_files_properties(crypto-utils-fallback.c PROPERTIES HEADER_FILE_ONLY ON)
-foreach(CP cyassl openssl polarssl)
+foreach(CP ccrypto cyassl openssl polarssl)
     if(NOT CP STREQUAL CRYPTO_PKG)
         set_source_files_properties(crypto-utils-${CP}.c PROPERTIES HEADER_FILE_ONLY ON)
     endif()
