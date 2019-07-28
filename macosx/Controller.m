@@ -4581,8 +4581,10 @@ static void removeKeRangerRansomware()
 - (void) rpcAddTorrentStruct: (struct tr_torrent *) torrentStruct
 {
     NSString * location = nil;
-    if (tr_torrentGetDownloadDir(torrentStruct) != NULL)
-        location = @(tr_torrentGetDownloadDir(torrentStruct));
+    if (tr_torrentGetDownloadDir(torrentStruct) != NULL) {
+        const char * tmpLoc = tr_torrentGetDownloadDir(torrentStruct);
+        location = [[NSFileManager defaultManager] stringWithFileSystemRepresentation: tmpLoc length: strlen(tmpLoc)];
+    }
 
     Torrent * torrent = [[Torrent alloc] initWithTorrentStruct: torrentStruct location: location lib: fLib];
 
