@@ -394,6 +394,7 @@
    "priority-high"      | array       indices of high-priority file(s)
    "priority-low"       | array       indices of low-priority file(s)
    "priority-normal"    | array       indices of normal-priority file(s)
+   "labels"             | array       array of string labels
 
    Either "filename" OR "metainfo" MUST be included.
    All other arguments are optional.

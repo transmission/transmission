@@ -938,7 +938,7 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     tor->uniqueId = nextUniqueId++;
     tor->magicNumber = TORRENT_MAGIC_NUMBER;
     tor->queuePosition = session->torrentCount;
-    tor->labels = TR_PTR_ARRAY_INIT;
+    tr_torrentSetLabels(tor, tr_ctorGetLabels(ctor));
 
     tr_sha1(tor->obfuscatedHash, "req2", 4, tor->info.hash, SHA_DIGEST_LENGTH, NULL);
 
@@ -2524,7 +2524,7 @@ void tr_torrentSetFileDLs(tr_torrent* tor, tr_file_index_t const* files, tr_file
 ****
 ***/
 
-void tr_torrentSetLabels(tr_torrent* tor, tr_ptrArray* labels)
+void tr_torrentSetLabels(tr_torrent* tor, tr_ptrArray const* labels)
 {
     TR_ASSERT(tr_isTorrent(tor));
 

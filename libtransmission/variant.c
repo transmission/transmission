@@ -259,7 +259,7 @@ size_t tr_variantListSize(tr_variant const* list)
     return tr_variantIsList(list) ? list->val.l.count : 0;
 }
 
-tr_variant* tr_variantListChild(tr_variant* v, size_t i)
+tr_variant* tr_variantListChild(tr_variant const* v, size_t i)
 {
     tr_variant* ret = NULL;
 

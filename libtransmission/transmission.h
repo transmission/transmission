@@ -46,6 +46,7 @@ typedef struct tr_session tr_session;
 
 struct tr_error;
 struct tr_variant;
+struct tr_ptrArray;
 
 typedef int8_t tr_priority_t;
 
@@ -259,6 +260,16 @@ void tr_ctorSetBandwidthPriority(tr_ctor* ctor, tr_priority_t priority);
  * @brief Get the torrent's bandwidth priority.
  */
 tr_priority_t tr_ctorGetBandwidthPriority(tr_ctor const* ctor);
+
+/**
+ * @brief Set the torrent's labels.
+ */
+void tr_ctorSetLabels(tr_ctor* ctor, struct tr_ptrArray const* labels);
+
+/**
+ * @brief Get the torrent's labels.
+ */
+struct tr_ptrArray const* tr_ctorGetLabels(tr_ctor const* ctor);
 
 /**
  * @brief set the per-session incomplete download folder.

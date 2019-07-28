@@ -43,7 +43,7 @@ void tr_ctorInitTorrentWanted(tr_ctor const* ctor, tr_torrent* tor);
 /* just like tr_torrentSetFileDLs but doesn't trigger a fastresume save */
 void tr_torrentInitFileDLs(tr_torrent* tor, tr_file_index_t const* files, tr_file_index_t fileCount, bool do_download);
 
-void tr_torrentSetLabels(tr_torrent* tor, tr_ptrArray* labels);
+void tr_torrentSetLabels(tr_torrent* tor, tr_ptrArray const* labels);
 
 void tr_torrentRecheckCompleteness(tr_torrent*);
 

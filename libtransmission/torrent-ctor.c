@@ -41,6 +41,7 @@ struct tr_ctor
     bool isSet_delete;
     tr_variant metainfo;
     char* sourceFile;
+    tr_ptrArray labels;
 
     struct optional_args optionalArgs[2];
 
@@ -465,6 +466,31 @@ tr_priority_t tr_ctorGetBandwidthPriority(tr_ctor const* ctor)
 ****
 ***/
 
+void tr_ctorSetLabels(tr_ctor* ctor, struct tr_ptrArray const* labels)
+{
+    TR_ASSERT(ctor != NULL);
+
+    tr_ptrArrayDestruct(&ctor->labels, tr_free);
+    ctor->labels = TR_PTR_ARRAY_INIT;
+    char** l = (char**)tr_ptrArrayBase(labels);
+    int const n = tr_ptrArraySize(labels);
+    for (int i = 0; i < n; i++)
+    {
+        tr_ptrArrayAppend(&ctor->labels, tr_strdup(l[i]));
+    }
+}
+
+struct tr_ptrArray const* tr_ctorGetLabels(tr_ctor const* ctor)
+{
+    TR_ASSERT(ctor != NULL);
+
+    return &ctor->labels;
+}
+
+/***
+****
+***/
+
 tr_ctor* tr_ctorNew(tr_session const* session)
 {
     tr_ctor* ctor = tr_new0(struct tr_ctor, 1);
@@ -495,5 +521,6 @@ void tr_ctorFree(tr_ctor* ctor)
     tr_free(ctor->low);
     tr_free(ctor->high);
     tr_free(ctor->normal);
+    tr_ptrArrayDestruct(&ctor->labels, tr_free);
     tr_free(ctor);
 }
