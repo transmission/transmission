@@ -30,11 +30,11 @@ static char const* replace[2] = { NULL, NULL };
 
 static tr_option options[] =
 {
-    { 'a', "add", "Add a tracker's announce URL", "a", 1, "<url>" },
-    { 'd', "delete", "Delete a tracker's announce URL", "d", 1, "<url>" },
-    { 'r', "replace", "Search and replace a substring in the announce URLs", "r", 1, "<old> <new>" },
-    { 'V', "version", "Show version number and exit", "V", 0, NULL },
-    { 0, NULL, NULL, NULL, 0, NULL }
+    { 'a', "add", "Add a tracker's announce URL", "a", true, "<url>" },
+    { 'd', "delete", "Delete a tracker's announce URL", "d", true, "<url>" },
+    { 'r', "replace", "Search and replace a substring in the announce URLs", "r", true, "<old> <new>" },
+    { 'V', "version", "Show version number and exit", "V", false, NULL },
+    { 0, NULL, NULL, NULL, false, NULL }
 };
 
 static char const* getUsage(void)

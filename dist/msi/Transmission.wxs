@@ -42,7 +42,7 @@
     <Property Id="DiskPrompt" Value="Transmission $(var.TrVersion) Installation [1]" />
 
     <Directory Id="TARGETDIR" Name="SourceDir">
-      <Merge Id="VCRedist" SourceFile="$(env.CommonProgramFiles(x86))\Merge Modules\Microsoft_VC140_CRT_$(sys.BUILDARCH).msm" DiskId="1" Language="0" />
+      <Merge Id="VCRedist" SourceFile="$(var.MsvcCrtMsmFile)" DiskId="1" Language="0" />
       <Directory Id="$(var.PlatformProgramFilesFolder)" Name="PFiles">
         <Directory Id="INSTALLDIR" Name="Transmission">
           <Directory Id="WEBINSTALLDIR" Name="web" />
@@ -53,7 +53,7 @@
     </Directory>
 
     <Feature Id="CompleteInstall" Title="Transmission" Level="1" AllowAdvertise="no" Display="expand" ConfigurableDirectory="INSTALLDIR">
-      <Feature Id="VCRedist" Title="Visual C++ 14.0 Runtime" Level="1" AllowAdvertise="no" Display="hidden">
+      <Feature Id="VCRedist" Title="Visual C++ Runtime" Level="1" AllowAdvertise="no" Display="hidden">
         <MergeRef Id="VCRedist" />
       </Feature>
       <Feature Id="CommonLibs" Level="1" AllowAdvertise="no" Display="hidden">

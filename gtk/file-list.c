@@ -679,10 +679,10 @@ static gboolean onRowActivated(GtkTreeView* view, GtkTreePath* path, GtkTreeView
                     g_free(filename);
                     filename = tmp;
                 }
-                while (filename != NULL && *filename != '\0' && !g_file_test(filename, G_FILE_TEST_EXISTS));
+                while (!tr_str_is_empty(filename) && !g_file_test(filename, G_FILE_TEST_EXISTS));
             }
 
-            if ((handled = filename != NULL && *filename != '\0'))
+            if ((handled = !tr_str_is_empty(filename)))
             {
                 gtr_open_file(filename);
             }

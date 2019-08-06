@@ -325,12 +325,9 @@ static int64_t getquota(char const* device)
     int64_t spaceused;
 
 #if defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__DragonFly__) || defined(__APPLE__)
-
     if (quotactl(device, QCMD(Q_GETQUOTA, USRQUOTA), getuid(), (caddr_t)&dq) == 0)
     {
-
 #elif defined(__sun)
-
     struct quotctl op;
     int fd = open(device, O_RDONLY);
 
@@ -346,14 +343,10 @@ static int64_t getquota(char const* device)
     if (ioctl(fd, Q_QUOTACTL, &op) == 0)
     {
         close(fd);
-
 #else
-
     if (quotactl(QCMD(Q_GETQUOTA, USRQUOTA), device, getuid(), (caddr_t)&dq) == 0)
     {
-
 #endif
-
         if (dq.dqb_bsoftlimit > 0)
         {
             /* Use soft limit first */
