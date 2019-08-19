@@ -658,7 +658,7 @@ static int tr_globalAddress(int af, void* addr, int* addr_len)
         return -1;
     }
 
-    if (global_unicast_address((struct sockaddr*)&ss) == 0)
+    if (!global_unicast_address((struct sockaddr*)&ss))
     {
         return -1;
     }
