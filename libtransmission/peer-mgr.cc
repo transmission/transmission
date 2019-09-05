@@ -776,7 +776,10 @@ static void peerCallbackFunc(tr_peer* peer, tr_peer_event const* e, void* vs)
 
             tor->uploadedCur += e->length;
             tr_announcerAddBytes(tor, TR_ANN_UP, e->length);
-            tor->setDateActive(now);
+            if (tor->isDone())
+            {
+                tor->setDateActive(now);
+            }
             tor->setDirty();
             tr_statsAddUploaded(tor->session, e->length);
 
