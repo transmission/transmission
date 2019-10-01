@@ -806,6 +806,10 @@ static void startServer(void* vserver)
     }
 
     struct evhttp* httpd = evhttp_new(server->session->event_base);
+    evhttp_set_allowed_methods (httpd,
+          EVHTTP_REQ_GET |
+          EVHTTP_REQ_POST |
+          EVHTTP_REQ_OPTIONS);
 
     char const* address = tr_rpcGetBindAddress(server);
 
