@@ -484,6 +484,7 @@ static void rpc_response_func(tr_session* session UNUSED, tr_variant* response, 
 
     add_response(data->req, data->server, buf, response_buf);
     evhttp_add_header(data->req->output_headers, "Content-Type", "application/json; charset=UTF-8");
+    evhttp_add_header(data->req->output_headers, "Access-Control-Allow-Origin", "*");
     evhttp_send_reply(data->req, HTTP_OK, "OK", buf);
 
     evbuffer_free(buf);
@@ -519,6 +520,20 @@ static void handle_rpc(struct evhttp_request* req, struct tr_rpc_server* server)
     }
 
     if (req->type == EVHTTP_REQ_GET)
+    {
+        char const* q = strchr(req->uri, '?');
+
+        if (q != NULL)
+        {
+            struct rpc_response_data* data = tr_new0(struct rpc_response_data, 1);
+            data->req = req;
+            data->server = server;
+            tr_rpc_request_exec_uri(server->session, q + 1, TR_BAD_SIZE, rpc_response_func, data);
+            return;
+        }
+    }
+
+    if (req->type == EVHTTP_REQ_OPTIONS)
     {
         char const* q = strchr(req->uri, '?');
 
