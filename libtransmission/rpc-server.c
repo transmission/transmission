@@ -638,7 +638,7 @@ static void handle_request(struct evhttp_request* req, void* arg)
             char const* headers = evhttp_find_header(req->input_headers, "Access-Control-Request-Headers");	
             evhttp_add_header(req->output_headers, "Access-Control-Allow-Methods", "GET, POST, OPTIONS");
             evhttp_add_header(req->output_headers, "Access-Control-Allow-Headers", headers);
-               
+            send_simple_response(req, 200, "");   
         }
 
         if (server->loginattempts == 100)
