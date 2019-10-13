@@ -126,6 +126,24 @@ void tr_udpSetSocketBuffers(tr_session* session)
     }
 }
 
+void tr_udpSetSocketTOS(tr_session* session)
+{
+    if (session->peerSocketTOS == 0)
+    {
+        return;
+    }
+
+    if (session->udp_socket != TR_BAD_SOCKET)
+    {
+        tr_netSetTOS(session->udp_socket, session->peerSocketTOS, TR_AF_INET);
+    }
+
+    if (session->udp6_socket != TR_BAD_SOCKET)
+    {
+        tr_netSetTOS(session->udp6_socket, session->peerSocketTOS, TR_AF_INET6);
+    }
+}
+
 /* BEP-32 has a rather nice explanation of why we need to bind to one
    IPv6 address, if I may say so myself. */
 
@@ -363,6 +381,8 @@ IPV6:
     }
 
     tr_udpSetSocketBuffers(ss);
+
+    tr_udpSetSocketTOS(ss);
 
     if (ss->isDHTEnabled)
     {
