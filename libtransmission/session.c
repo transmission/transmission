@@ -2279,6 +2279,8 @@ static void toggle_utp(void* data)
 
     tr_udpSetSocketBuffers(session);
 
+    tr_udpSetSocketTOS(session);
+
     /* But don't call tr_utpClose -- see reset_timer in tr-utp.c for an
        explanation. */
 }
