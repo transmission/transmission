@@ -40,6 +40,8 @@ private:
 private slots:
     void recountSoon();
     void recount();
+    void filterTextSoon();
+    void filterText();
     void refreshPref(int key);
     void onActivityIndexChanged(int index);
     void onTrackerIndexChanged(int index);
@@ -55,6 +57,7 @@ private:
     QLabel* myCountLabel;
     QStandardItemModel* myTrackerModel;
     QTimer* myRecountTimer;
+    QTimer* myFilterTextTimer;
     bool myIsBootstrapping;
     QLineEdit* myLineEdit;
 };

@@ -255,6 +255,7 @@ FilterBar::FilterBar(Prefs& prefs, TorrentModel const& torrents, TorrentFilter c
     myTorrents(torrents),
     myFilter(filter),
     myRecountTimer(new QTimer(this)),
+    myFilterTextTimer(new QTimer(this)),
     myIsBootstrapping(true)
 {
     QHBoxLayout* h = new QHBoxLayout(this);
@@ -288,6 +289,7 @@ FilterBar::FilterBar(Prefs& prefs, TorrentModel const& torrents, TorrentFilter c
     connect(&myTorrents, SIGNAL(rowsRemoved(QModelIndex, int, int)), this, SLOT(recountSoon()));
     connect(&myTorrents, SIGNAL(dataChanged(QModelIndex, QModelIndex)), this, SLOT(recountSoon()));
     connect(myRecountTimer, SIGNAL(timeout()), this, SLOT(recount()));
+    connect(myFilterTextTimer, SIGNAL(timeout()), this, SLOT(filterText()));
 
     recountSoon();
     refreshTrackers();
@@ -306,6 +308,7 @@ FilterBar::FilterBar(Prefs& prefs, TorrentModel const& torrents, TorrentFilter c
 FilterBar::~FilterBar()
 {
     delete myRecountTimer;
+    delete myFilterTextTimer;
 }
 
 /***
@@ -361,11 +364,11 @@ void FilterBar::refreshPref(int key)
     }
 }
 
-void FilterBar::onTextChanged(QString const& str)
+void FilterBar::onTextChanged(QString const&)
 {
     if (!myIsBootstrapping)
     {
-        myPrefs.set(Prefs::FILTER_TEXT, str.trimmed());
+        filterTextSoon();
     }
 }
 
@@ -408,13 +411,23 @@ void FilterBar::onActivityIndexChanged(int i)
 ****
 ***/
 
+namespace
+{
+
+void ensureTimer(QTimer* timer, int msec)
+{
+    if (!timer->isActive())
+    {
+        timer->setSingleShot(true);
+        timer->start(msec);
+    }
+}
+
+} // namespace
+
 void FilterBar::recountSoon()
 {
-    if (!myRecountTimer->isActive())
-    {
-        myRecountTimer->setSingleShot(true);
-        myRecountTimer->start(800);
-    }
+    ensureTimer(myRecountTimer, 800);
 }
 
 void FilterBar::recount()
@@ -439,4 +452,14 @@ void FilterBar::recount()
 QString FilterBar::getCountString(int n) const
 {
     return QString::fromLatin1("%L1").arg(n);
+}
+
+void FilterBar::filterTextSoon()
+{
+    ensureTimer(myFilterTextTimer, 500);
+}
+
+void FilterBar::filterText()
+{
+    myPrefs.set(Prefs::FILTER_TEXT, myLineEdit->text().trimmed());
 }
