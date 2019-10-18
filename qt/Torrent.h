@@ -11,7 +11,6 @@
 #include <QObject>
 #include <QIcon>
 #include <QMetaType>
-#include <QDateTime>
 #include <QString>
 #include <QStringList>
 #include <QList>
@@ -357,34 +356,34 @@ public:
         return getInt(ETA);
     }
 
-    QDateTime lastActivity() const
+    int64_t lastActivity() const
     {
-        return getDateTime(DATE_ACTIVITY);
+        return getEpochTime(DATE_ACTIVITY);
     }
 
-    QDateTime lastStarted() const
+    int64_t lastStarted() const
     {
-        return getDateTime(DATE_STARTED);
+        return getEpochTime(DATE_STARTED);
     }
 
-    QDateTime dateAdded() const
+    int64_t dateAdded() const
     {
-        return getDateTime(DATE_ADDED);
+        return getEpochTime(DATE_ADDED);
     }
 
-    QDateTime dateCreated() const
+    int64_t dateCreated() const
     {
-        return getDateTime(DATE_CREATED);
+        return getEpochTime(DATE_CREATED);
     }
 
-    QDateTime manualAnnounceTime() const
+    int64_t manualAnnounceTime() const
     {
-        return getDateTime(MANUAL_ANNOUNCE_TIME);
+        return getEpochTime(MANUAL_ANNOUNCE_TIME);
     }
 
-    bool canManualAnnounce() const
+    bool canManualAnnounce(time_t now) const
     {
-        return isReadyToTransfer() && (manualAnnounceTime() <= QDateTime::currentDateTime());
+        return isReadyToTransfer() && (manualAnnounceTime() <= now);
     }
 
     int peersWeAreDownloadingFrom() const
@@ -624,7 +623,7 @@ private:
     double getDouble(int key) const;
     qulonglong getSize(int key) const;
     QString getString(int key) const;
-    QDateTime getDateTime(int key) const;
+    int64_t getEpochTime(int key) const;
 
     bool setInt(int key, int value);
     bool setBool(int key, bool value);
@@ -632,7 +631,7 @@ private:
     bool setDouble(int key, double);
     bool setString(int key, char const*);
     bool setSize(int key, qulonglong);
-    bool setDateTime(int key, QDateTime const&);
+    bool setEpochTime(int key, int64_t);
 
     char const* getMimeTypeString() const;
     void updateMimeIcon();

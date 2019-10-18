@@ -623,13 +623,14 @@ void DetailsDialog::refresh()
     else
     {
         bool allPaused = true;
-        QDateTime baseline = torrents[0]->lastStarted();
+        auto lastStarted = torrents[0]->lastStarted();
+        bool mixedTime = false;
 
         for (Torrent const* const t : torrents)
         {
-            if (baseline != t->lastStarted())
+            if (lastStarted != t->lastStarted())
             {
-                baseline = QDateTime();
+                mixedTime = true;
             }
 
             if (!t->isPaused())
@@ -642,13 +643,14 @@ void DetailsDialog::refresh()
         {
             string = stateString; // paused || finished
         }
-        else if (baseline.isNull())
+        else if (mixedTime)
         {
             string = mixed;
         }
         else
         {
-            string = Formatter::timeToString(baseline.secsTo(qdt_now));
+            int const seconds = int(difftime(time(nullptr), lastStarted));
+            string = Formatter::timeToString(seconds);
         }
     }
 
@@ -696,19 +698,19 @@ void DetailsDialog::refresh()
     }
     else
     {
-        QDateTime latest = torrents[0]->lastActivity();
+        auto latest = torrents[0]->lastActivity();
 
         for (Torrent const* const t : torrents)
         {
-            QDateTime const dt = t->lastActivity();
+            auto const walk = t->lastActivity();
 
-            if (latest < dt)
+            if (latest < walk)
             {
-                latest = dt;
+                latest = walk;
             }
         }
 
-        int const seconds = latest.isValid() ? latest.secsTo(qdt_now) : -1;
+        int const seconds = int(difftime(time(nullptr), latest));
 
         if (seconds < 0)
         {
@@ -867,12 +869,13 @@ void DetailsDialog::refresh()
         bool mixed_creator = false;
         bool mixed_date = false;
         QString const creator = torrents[0]->creator();
-        QString const date = torrents[0]->dateCreated().toString();
+        auto const dateCreated = torrents[0]->dateCreated();
+        auto const date = QDateTime::fromTime_t(dateCreated).toString();
 
         for (Torrent const* const t : torrents)
         {
             mixed_creator |= (creator != t->creator());
-            mixed_date |= (date != t->dateCreated().toString());
+            mixed_date |= (dateCreated != t->dateCreated());
         }
 
         bool const empty_creator = creator.isEmpty();
