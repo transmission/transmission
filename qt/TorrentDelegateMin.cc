@@ -128,13 +128,11 @@ ItemLayout::ItemLayout(QString const& nameText, QString const& statusText, QIcon
 
 } // namespace
 
-QSize TorrentDelegateMin::sizeHint(QStyleOptionViewItem const& option, Torrent const& tor) const
+QSize TorrentDelegateMin::sizeHint(QStyleOptionViewItem const& option, Torrent const& /*tor*/) const
 {
-    bool const isMagnet(!tor.hasMetadata());
-    QSize const m(margin(*qApp->style()));
-    ItemLayout const layout(isMagnet ? progressString(tor) : tor.name(), shortStatusString(tor), QIcon(), option.font,
-        option.direction, QPoint(0, 0), option.rect.width() - m.width() * 2);
-    return layout.size() + m * 2;
+    QSize ret (option.rect.width(), QFontMetrics(option.font).height());
+    ret += margin(*qApp->style())*2;
+    return ret;
 }
 
 void TorrentDelegateMin::drawTorrent(QPainter* painter, QStyleOptionViewItem const& option, Torrent const& tor) const

@@ -26,6 +26,6 @@ public:
 
 protected:
     // TorrentDelegate
-    virtual QSize sizeHint(QStyleOptionViewItem const&, Torrent const&) const;
-    virtual void drawTorrent(QPainter* painter, QStyleOptionViewItem const& option, Torrent const&) const;
+    QSize sizeHint(QStyleOptionViewItem const&, Torrent const&) const override;
+    void drawTorrent(QPainter* painter, QStyleOptionViewItem const& option, Torrent const&) const override;
 };
