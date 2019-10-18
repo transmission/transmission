@@ -6,6 +6,10 @@
  *
  */
 
+#include <map>
+#include <functional>
+#include <string>
+
 #ifdef _WIN32
 #include <windows.h>
 #include <shellapi.h>
@@ -16,6 +20,7 @@
 #include <QColor>
 #include <QDataStream>
 #include <QFile>
+#include <QFileIconProvider>
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QHeaderView>
@@ -85,7 +90,48 @@ bool isSlashChar(QChar const& c)
     return c == QLatin1Char('/') || c == QLatin1Char('\\');
 }
 
+
+std::map<std::string,QIcon> iconCache;
+
+const QIcon& getMimeIcon(QMimeType const& mimeType)
+{
+    static QIcon const fallback = qApp->style()->standardIcon(QStyle::SP_FileIcon);
+
+    if (!mimeType.isValid())
+    {
+        return fallback;
+    }
+
+    auto& icon = iconCache[mimeType.iconName().toStdString()];
+    if (icon.isNull())
+    {
+      icon = QIcon::fromTheme(mimeType.iconName(), QIcon::fromTheme(mimeType.genericIconName(), fallback));
+    }
+
+    return icon;
+}
+
 } // namespace
+
+QIcon& Utils::getFolderIcon()
+{
+    auto& icon = iconCache["folder"];
+    if (icon.isNull())
+    {
+        icon = QFileIconProvider().icon(QFileIconProvider::Folder);
+    }
+    return icon;
+}
+
+QIcon& Utils::getFileIcon()
+{
+    auto& icon = iconCache["file"];
+    if (icon.isNull())
+    {
+        icon = qApp->style()->standardIcon(QStyle::SP_FileIcon);
+    }
+    return icon;
+}
 
 QIcon Utils::guessMimeIcon(QString const& filename)
 {
@@ -113,13 +159,7 @@ QIcon Utils::guessMimeIcon(QString const& filename)
 
     QMimeDatabase mimeDb;
     QMimeType mimeType = mimeDb.mimeTypeForFile(filename, QMimeDatabase::MatchExtension);
-
-    if (mimeType.isValid())
-    {
-        return QIcon::fromTheme(mimeType.iconName(), QIcon::fromTheme(mimeType.genericIconName(), fallback));
-    }
-
-    return fallback;
+    return getMimeIcon(mimeType);
 }
 
 QIcon Utils::getIconFromIndex(QModelIndex const& index)
