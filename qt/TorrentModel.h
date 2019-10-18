@@ -41,6 +41,8 @@ public:
     Torrent* getTorrentFromId(int id);
     Torrent const* getTorrentFromId(int id) const;
 
+    Torrent const* getTorrent(QModelIndex const& index) const;
+
     void getTransferSpeed(Speed& uploadSpeed, size_t& uploadPeerCount, Speed& downloadSpeed, size_t& downloadPeerCount);
 
     // QAbstractItemModel

@@ -86,8 +86,9 @@ int compare(T const a, T const b)
 bool TorrentFilter::lessThan(QModelIndex const& left, QModelIndex const& right) const
 {
     int val = 0;
-    Torrent const* a = sourceModel()->data(left, TorrentModel::TorrentRole).value<Torrent const*>();
-    Torrent const* b = sourceModel()->data(right, TorrentModel::TorrentRole).value<Torrent const*>();
+    TorrentModel const* model = static_cast<TorrentModel const*>(sourceModel());
+    Torrent const* a = model->getTorrent(left);
+    Torrent const* b = model->getTorrent(right);
 
     switch (myPrefs.get<SortMode>(Prefs::SORT_MODE).mode())
     {

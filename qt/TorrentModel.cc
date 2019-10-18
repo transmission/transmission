@@ -60,7 +60,7 @@ QVariant TorrentModel::data(QModelIndex const& index, int role) const
 {
     QVariant var;
 
-    Torrent const* t = myTorrents.value(index.row(), nullptr);
+    Torrent const* t = getTorrent(index);
 
     if (t != nullptr)
     {
@@ -136,6 +136,11 @@ TorrentModel::~TorrentModel()
 /***
 ****
 ***/
+
+Torrent const* TorrentModel::getTorrent(QModelIndex const& index) const
+{
+    return myTorrents.value(index.row(), nullptr);
+}
 
 Torrent* TorrentModel::getTorrentFromId(int id)
 {
