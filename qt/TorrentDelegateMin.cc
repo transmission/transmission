@@ -130,8 +130,8 @@ ItemLayout::ItemLayout(QString const& nameText, QString const& statusText, QIcon
 
 QSize TorrentDelegateMin::sizeHint(QStyleOptionViewItem const& option, Torrent const& /*tor*/) const
 {
-    QSize ret (option.rect.width(), QFontMetrics(option.font).height());
-    ret += margin(*qApp->style())*2;
+    QSize ret(option.rect.width(), QFontMetrics(option.font).height());
+    ret += margin(*qApp->style()) * 2;
     return ret;
 }
 

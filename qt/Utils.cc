@@ -90,10 +90,9 @@ bool isSlashChar(QChar const& c)
     return c == QLatin1Char('/') || c == QLatin1Char('\\');
 }
 
+std::map<std::string, QIcon> iconCache;
 
-std::map<std::string,QIcon> iconCache;
-
-const QIcon& getMimeIcon(QMimeType const& mimeType)
+QIcon const& getMimeIcon(QMimeType const& mimeType)
 {
     static QIcon const fallback = qApp->style()->standardIcon(QStyle::SP_FileIcon);
 
@@ -105,7 +104,7 @@ const QIcon& getMimeIcon(QMimeType const& mimeType)
     auto& icon = iconCache[mimeType.iconName().toStdString()];
     if (icon.isNull())
     {
-      icon = QIcon::fromTheme(mimeType.iconName(), QIcon::fromTheme(mimeType.genericIconName(), fallback));
+        icon = QIcon::fromTheme(mimeType.iconName(), QIcon::fromTheme(mimeType.genericIconName(), fallback));
     }
 
     return icon;
@@ -120,6 +119,7 @@ QIcon& Utils::getFolderIcon()
     {
         icon = QFileIconProvider().icon(QFileIconProvider::Folder);
     }
+
     return icon;
 }
 
@@ -130,6 +130,7 @@ QIcon& Utils::getFileIcon()
     {
         icon = qApp->style()->standardIcon(QStyle::SP_FileIcon);
     }
+
     return icon;
 }
 
