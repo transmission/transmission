@@ -288,6 +288,11 @@ void DetailsDialog::setIds(QSet<int> const& ids)
         ui.tabs->widget(i)->setEnabled(false);
     }
 
+    if (!myIds.empty())
+    {
+        mySession.refreshDetailInfo(myIds);
+    }
+
     onTimer();
 }
 
@@ -349,7 +354,7 @@ void DetailsDialog::getNewData()
             mySession.initTorrents(infos);
         }
 
-        mySession.refreshExtraStats(myIds);
+        mySession.refreshDetailStats(myIds);
     }
 }
 

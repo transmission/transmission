@@ -53,111 +53,147 @@ Torrent::~Torrent()
 
 Torrent::Property Torrent::myProperties[] =
 {
-    { ID, TR_KEY_id, QVariant::Int, INFO },
-    { UPLOAD_SPEED, TR_KEY_rateUpload, QVariant::ULongLong, STAT } /* Bps */,
-    { DOWNLOAD_SPEED, TR_KEY_rateDownload, QVariant::ULongLong, STAT }, /* Bps */
-    { DOWNLOAD_DIR, TR_KEY_downloadDir, QVariant::String, STAT },
-    { ACTIVITY, TR_KEY_status, QVariant::Int, STAT },
-    { NAME, TR_KEY_name, QVariant::String, INFO },
-    { ERROR, TR_KEY_error, QVariant::Int, STAT },
-    { ERROR_STRING, TR_KEY_errorString, QVariant::String, STAT },
-    { SIZE_WHEN_DONE, TR_KEY_sizeWhenDone, QVariant::ULongLong, STAT },
-    { LEFT_UNTIL_DONE, TR_KEY_leftUntilDone, QVariant::ULongLong, STAT },
-    { HAVE_UNCHECKED, TR_KEY_haveUnchecked, QVariant::ULongLong, STAT },
-    { HAVE_VERIFIED, TR_KEY_haveValid, QVariant::ULongLong, STAT },
-    { DESIRED_AVAILABLE, TR_KEY_desiredAvailable, QVariant::ULongLong, STAT },
-    { TOTAL_SIZE, TR_KEY_totalSize, QVariant::ULongLong, INFO },
-    { PIECE_SIZE, TR_KEY_pieceSize, QVariant::ULongLong, INFO },
-    { PIECE_COUNT, TR_KEY_pieceCount, QVariant::Int, INFO },
-    { PEERS_GETTING_FROM_US, TR_KEY_peersGettingFromUs, QVariant::Int, STAT },
-    { PEERS_SENDING_TO_US, TR_KEY_peersSendingToUs, QVariant::Int, STAT },
-    { WEBSEEDS_SENDING_TO_US, TR_KEY_webseedsSendingToUs, QVariant::Int, STAT_EXTRA },
-    { PERCENT_DONE, TR_KEY_percentDone, QVariant::Double, STAT },
-    { METADATA_PERCENT_DONE, TR_KEY_metadataPercentComplete, QVariant::Double, STAT },
-    { PERCENT_VERIFIED, TR_KEY_recheckProgress, QVariant::Double, STAT },
-    { DATE_ACTIVITY, TR_KEY_activityDate, QVariant::DateTime, STAT_EXTRA },
-    { DATE_ADDED, TR_KEY_addedDate, QVariant::DateTime, INFO },
-    { DATE_STARTED, TR_KEY_startDate, QVariant::DateTime, STAT_EXTRA },
-    { DATE_CREATED, TR_KEY_dateCreated, QVariant::DateTime, INFO },
-    { PEERS_CONNECTED, TR_KEY_peersConnected, QVariant::Int, STAT },
-    { ETA, TR_KEY_eta, QVariant::Int, STAT },
-    { RATIO, TR_KEY_uploadRatio, QVariant::Double, STAT },
-    { DOWNLOADED_EVER, TR_KEY_downloadedEver, QVariant::ULongLong, STAT },
-    { UPLOADED_EVER, TR_KEY_uploadedEver, QVariant::ULongLong, STAT },
-    { FAILED_EVER, TR_KEY_corruptEver, QVariant::ULongLong, STAT_EXTRA },
-    { TRACKERS, TR_KEY_trackers, QVariant::StringList, STAT },
-    { HOSTS, TR_KEY_NONE, QVariant::StringList, DERIVED },
-    { TRACKERSTATS, TR_KEY_trackerStats, CustomVariantType::TrackerStatsList, STAT_EXTRA },
-    { MIME_ICON, TR_KEY_NONE, QVariant::Icon, DERIVED },
-    { SEED_RATIO_LIMIT, TR_KEY_seedRatioLimit, QVariant::Double, STAT },
-    { SEED_RATIO_MODE, TR_KEY_seedRatioMode, QVariant::Int, STAT },
-    { SEED_IDLE_LIMIT, TR_KEY_seedIdleLimit, QVariant::Int, STAT_EXTRA },
-    { SEED_IDLE_MODE, TR_KEY_seedIdleMode, QVariant::Int, STAT_EXTRA },
-    { DOWN_LIMIT, TR_KEY_downloadLimit, QVariant::Int, STAT_EXTRA }, /* KB/s */
-    { DOWN_LIMITED, TR_KEY_downloadLimited, QVariant::Bool, STAT_EXTRA },
-    { UP_LIMIT, TR_KEY_uploadLimit, QVariant::Int, STAT_EXTRA }, /* KB/s */
-    { UP_LIMITED, TR_KEY_uploadLimited, QVariant::Bool, STAT_EXTRA },
-    { HONORS_SESSION_LIMITS, TR_KEY_honorsSessionLimits, QVariant::Bool, STAT_EXTRA },
-    { PEER_LIMIT, TR_KEY_peer_limit, QVariant::Int, STAT_EXTRA },
-    { HASH_STRING, TR_KEY_hashString, QVariant::String, INFO },
-    { IS_FINISHED, TR_KEY_isFinished, QVariant::Bool, STAT },
-    { IS_PRIVATE, TR_KEY_isPrivate, QVariant::Bool, INFO },
-    { IS_STALLED, TR_KEY_isStalled, QVariant::Bool, STAT },
-    { COMMENT, TR_KEY_comment, QVariant::String, INFO },
-    { CREATOR, TR_KEY_creator, QVariant::String, INFO },
-    { MANUAL_ANNOUNCE_TIME, TR_KEY_manualAnnounceTime, QVariant::DateTime, STAT_EXTRA },
-    { PEERS, TR_KEY_peers, CustomVariantType::PeerList, STAT_EXTRA },
-    { BANDWIDTH_PRIORITY, TR_KEY_bandwidthPriority, QVariant::Int, STAT_EXTRA },
-    { QUEUE_POSITION, TR_KEY_queuePosition, QVariant::Int, STAT },
+    { ID, TR_KEY_id, QVariant::Int },
+    { UPLOAD_SPEED, TR_KEY_rateUpload, QVariant::ULongLong } /* Bps */,
+    { DOWNLOAD_SPEED, TR_KEY_rateDownload, QVariant::ULongLong }, /* Bps */
+    { DOWNLOAD_DIR, TR_KEY_downloadDir, QVariant::String },
+    { ACTIVITY, TR_KEY_status, QVariant::Int },
+    { NAME, TR_KEY_name, QVariant::String },
+    { ERROR, TR_KEY_error, QVariant::Int },
+    { ERROR_STRING, TR_KEY_errorString, QVariant::String },
+    { SIZE_WHEN_DONE, TR_KEY_sizeWhenDone, QVariant::ULongLong },
+    { LEFT_UNTIL_DONE, TR_KEY_leftUntilDone, QVariant::ULongLong },
+    { HAVE_UNCHECKED, TR_KEY_haveUnchecked, QVariant::ULongLong },
+    { HAVE_VERIFIED, TR_KEY_haveValid, QVariant::ULongLong },
+    { DESIRED_AVAILABLE, TR_KEY_desiredAvailable, QVariant::ULongLong },
+    { TOTAL_SIZE, TR_KEY_totalSize, QVariant::ULongLong },
+    { PIECE_SIZE, TR_KEY_pieceSize, QVariant::ULongLong },
+    { PIECE_COUNT, TR_KEY_pieceCount, QVariant::Int },
+    { PEERS_GETTING_FROM_US, TR_KEY_peersGettingFromUs, QVariant::Int },
+    { PEERS_SENDING_TO_US, TR_KEY_peersSendingToUs, QVariant::Int },
+    { WEBSEEDS_SENDING_TO_US, TR_KEY_webseedsSendingToUs, QVariant::Int },
+    { PERCENT_DONE, TR_KEY_percentDone, QVariant::Double },
+    { METADATA_PERCENT_DONE, TR_KEY_metadataPercentComplete, QVariant::Double },
+    { PERCENT_VERIFIED, TR_KEY_recheckProgress, QVariant::Double },
+    { DATE_ACTIVITY, TR_KEY_activityDate, QVariant::DateTime },
+    { DATE_ADDED, TR_KEY_addedDate, QVariant::DateTime },
+    { DATE_STARTED, TR_KEY_startDate, QVariant::DateTime },
+    { DATE_CREATED, TR_KEY_dateCreated, QVariant::DateTime },
+    { PEERS_CONNECTED, TR_KEY_peersConnected, QVariant::Int },
+    { ETA, TR_KEY_eta, QVariant::Int },
+    { RATIO, TR_KEY_uploadRatio, QVariant::Double },
+    { DOWNLOADED_EVER, TR_KEY_downloadedEver, QVariant::ULongLong },
+    { UPLOADED_EVER, TR_KEY_uploadedEver, QVariant::ULongLong },
+    { FAILED_EVER, TR_KEY_corruptEver, QVariant::ULongLong },
+    { TRACKERS, TR_KEY_trackers, QVariant::StringList },
+    { HOSTS, TR_KEY_NONE, QVariant::StringList },
+    { TRACKERSTATS, TR_KEY_trackerStats, CustomVariantType::TrackerStatsList },
+    { MIME_ICON, TR_KEY_NONE, QVariant::Icon },
+    { SEED_RATIO_LIMIT, TR_KEY_seedRatioLimit, QVariant::Double },
+    { SEED_RATIO_MODE, TR_KEY_seedRatioMode, QVariant::Int },
+    { SEED_IDLE_LIMIT, TR_KEY_seedIdleLimit, QVariant::Int },
+    { SEED_IDLE_MODE, TR_KEY_seedIdleMode, QVariant::Int },
+    { DOWN_LIMIT, TR_KEY_downloadLimit, QVariant::Int }, /* KB/s */
+    { DOWN_LIMITED, TR_KEY_downloadLimited, QVariant::Bool },
+    { UP_LIMIT, TR_KEY_uploadLimit, QVariant::Int }, /* KB/s */
+    { UP_LIMITED, TR_KEY_uploadLimited, QVariant::Bool },
+    { HONORS_SESSION_LIMITS, TR_KEY_honorsSessionLimits, QVariant::Bool },
+    { PEER_LIMIT, TR_KEY_peer_limit, QVariant::Int },
+    { HASH_STRING, TR_KEY_hashString, QVariant::String },
+    { IS_FINISHED, TR_KEY_isFinished, QVariant::Bool },
+    { IS_PRIVATE, TR_KEY_isPrivate, QVariant::Bool },
+    { IS_STALLED, TR_KEY_isStalled, QVariant::Bool },
+    { COMMENT, TR_KEY_comment, QVariant::String },
+    { CREATOR, TR_KEY_creator, QVariant::String },
+    { MANUAL_ANNOUNCE_TIME, TR_KEY_manualAnnounceTime, QVariant::DateTime },
+    { PEERS, TR_KEY_peers, CustomVariantType::PeerList },
+    { BANDWIDTH_PRIORITY, TR_KEY_bandwidthPriority, QVariant::Int },
+    { QUEUE_POSITION, TR_KEY_queuePosition, QVariant::Int },
 };
 
-Torrent::KeyList Torrent::buildKeyList(Group group)
-{
-    KeyList keys;
+/***
+****
+***/
 
-    if (keys.empty())
-    {
-        for (int i = 0; i < PROPERTY_COUNT; ++i)
-        {
-            if (myProperties[i].id == ID || myProperties[i].group == group)
-            {
-                keys << myProperties[i].key;
-            }
-        }
-    }
+// unchanging fields needed by the main window
+const Torrent::KeyList Torrent::mainInfoKeys {
+    TR_KEY_addedDate,
+    TR_KEY_hashString,
+    TR_KEY_id, // must be in every req
+    TR_KEY_name,
+    TR_KEY_totalSize
+};
 
-    return keys;
-}
+// changing fields needed by the main window
+const Torrent::KeyList Torrent::mainStatKeys {
+    TR_KEY_downloadDir,
+    TR_KEY_error,
+    TR_KEY_errorString,
+    TR_KEY_eta,
+    TR_KEY_id, // must be in every req
+    TR_KEY_isFinished,
+    TR_KEY_leftUntilDone,
+    TR_KEY_metadataPercentComplete,
+    TR_KEY_peersConnected,
+    TR_KEY_peersGettingFromUs,
+    TR_KEY_peersSendingToUs,
+    TR_KEY_percentDone,
+    TR_KEY_queuePosition,
+    TR_KEY_rateDownload,
+    TR_KEY_rateUpload,
+    TR_KEY_recheckProgress,
+    TR_KEY_seedRatioLimit,
+    TR_KEY_sizeWhenDone,
+    TR_KEY_status,
+    TR_KEY_trackers,
+    TR_KEY_uploadedEver,
+    TR_KEY_uploadRatio
+};
 
-Torrent::KeyList const& Torrent::getInfoKeys()
-{
-    static KeyList keys;
+const Torrent::KeyList Torrent::allMainKeys = Torrent::mainInfoKeys + Torrent::mainStatKeys;
 
-    if (keys.isEmpty())
-    {
-        keys << buildKeyList(INFO) << TR_KEY_files;
-    }
+// unchanging fields needed by the details dialog
+const Torrent::KeyList Torrent::detailInfoKeys {
+    TR_KEY_comment,
+    TR_KEY_creator,
+    TR_KEY_dateCreated,
+    TR_KEY_files,
+    TR_KEY_id, // must be in every req
+    TR_KEY_isPrivate,
+    TR_KEY_pieceCount,
+    TR_KEY_pieceSize
+};
 
-    return keys;
-}
+// changing fields needed by the details dialog
+const Torrent::KeyList Torrent::detailStatKeys {
+    TR_KEY_activityDate,
+    TR_KEY_bandwidthPriority,
+    TR_KEY_corruptEver,
+    TR_KEY_desiredAvailable,
+    TR_KEY_downloadedEver,
+    TR_KEY_downloadLimit,
+    TR_KEY_downloadLimited,
+    TR_KEY_fileStats,
+    TR_KEY_haveUnchecked,
+    TR_KEY_haveValid,
+    TR_KEY_honorsSessionLimits,
+    TR_KEY_id, // must be in every req
+    TR_KEY_manualAnnounceTime,
+    TR_KEY_peer_limit,
+    TR_KEY_peers,
+    TR_KEY_seedIdleLimit,
+    TR_KEY_seedIdleMode,
+    TR_KEY_seedRatioMode,
+    TR_KEY_startDate,
+    TR_KEY_trackerStats,
+    TR_KEY_uploadLimit,
+    TR_KEY_uploadLimited,
+    TR_KEY_webseedsSendingToUs
+};
 
-Torrent::KeyList const& Torrent::getStatKeys()
-{
-    static KeyList keys(buildKeyList(STAT));
-    return keys;
-}
-
-Torrent::KeyList const& Torrent::getExtraStatKeys()
-{
-    static KeyList keys;
-
-    if (keys.isEmpty())
-    {
-        keys << buildKeyList(STAT_EXTRA) << TR_KEY_fileStats;
-    }
-
-    return keys;
-}
+/***
+****
+***/
 
 bool Torrent::setInt(int i, int value)
 {

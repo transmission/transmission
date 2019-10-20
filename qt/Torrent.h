@@ -186,8 +186,6 @@ public:
         PROPERTY_COUNT
     };
 
-    typedef QList<tr_quark> KeyList;
-
 public:
     Torrent(Prefs const&, int id);
     virtual ~Torrent();
@@ -590,29 +588,24 @@ public:
         return getIcon(MIME_ICON);
     }
 
-    static KeyList const& getInfoKeys();
-    static KeyList const& getStatKeys();
-    static KeyList const& getExtraStatKeys();
+    typedef QList<tr_quark> KeyList;
+    static const KeyList allMainKeys;
+    static const KeyList mainInfoKeys;
+    static const KeyList mainStatKeys;
+    static const KeyList detailInfoKeys;
+    static const KeyList detailStatKeys;
 
 signals:
     void torrentChanged(int id);
     void torrentCompleted(int id);
 
 private:
-    enum Group
-    {
-        INFO, // info fields that only need to be loaded once
-        STAT, // commonly-used stats that should be refreshed often
-        STAT_EXTRA, // rarely used; only refresh if details dialog is open
-        DERIVED // doesn't come from RPC
-    };
 
     struct Property
     {
         int id;
         tr_quark key;
         int type;
-        int group;
     };
 
 private:
@@ -635,8 +628,6 @@ private:
 
     char const* getMimeTypeString() const;
     void updateMimeIcon();
-
-    static KeyList buildKeyList(Group group);
 
 private:
     Prefs const& myPrefs;

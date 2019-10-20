@@ -108,8 +108,9 @@ public slots:
     void launchWebInterface();
     void updatePref(int key);
 
-    /** request a refresh for statistics, including the ones only used by the properties dialog, for a specific torrent */
-    void refreshExtraStats(QSet<int> const& ids);
+    /** request information only used by the details dialog */
+    void refreshDetailInfo(QSet<int> const& ids);
+    void refreshDetailStats(QSet<int> const& ids);
 
 signals:
     void sourceChanged();
