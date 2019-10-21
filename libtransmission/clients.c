@@ -279,10 +279,6 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
         {
             four_digits(buf, buflen, "Avicora", id + 3);
         }
-        else if (strncmp(chid + 1, "BB", 2) == 0)
-        {
-            four_digits(buf, buflen, "BitBuddy", id + 3);
-        }
         else if (strncmp(chid + 1, "BE", 2) == 0)
         {
             four_digits(buf, buflen, "BitTorrent SDK", id + 3);
@@ -318,10 +314,6 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
         else if (strncmp(chid + 1, "BW", 2) == 0)
         {
             four_digits(buf, buflen, "BitWombat", id + 3);
-        }
-        else if (strncmp(chid + 1, "BX", 2) == 0)
-        {
-            four_digits(buf, buflen, "BittorrentX", id + 3);
         }
         else if (strncmp(chid + 1, "EB", 2) == 0)
         {
@@ -500,10 +492,6 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
             four_digits(buf, buflen, "Zona", id + 3);
         }
         /* */
-        else if (strncmp(chid + 1, "AG", 2) == 0)
-        {
-            three_digits(buf, buflen, "Ares", id + 3);
-        }
         else if (strncmp(chid + 1, "A~", 2) == 0)
         {
             three_digits(buf, buflen, "Ares", id + 3);
@@ -531,10 +519,6 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
         else if (strncmp(chid + 1, "pb", 2) == 0)
         {
             three_digits(buf, buflen, "pbTorrent", id + 3);
-        }
-        else if (strncmp(chid + 1, "TT", 2) == 0)
-        {
-            three_digits(buf, buflen, "TuoTu", id + 3);
         }
         else if (strncmp(chid + 1, "qB", 2) == 0)
         {
