@@ -299,8 +299,6 @@ Application::Application(int& argc, char** argv) :
     connect(mySession, SIGNAL(torrentsRemoved(tr_variant*)), myModel, SLOT(removeTorrents(tr_variant*)));
     // when the session source gets changed, request a full refresh
     connect(mySession, SIGNAL(sourceChanged()), this, SLOT(onSessionSourceChanged()));
-    // when the model sees a torrent for the first time, ask the session for full info on it
-    connect(myModel, SIGNAL(torrentsAdded(QSet<int>)), mySession, SLOT(initTorrents(QSet<int>)));
     connect(myModel, SIGNAL(torrentsAdded(QSet<int>)), this, SLOT(onTorrentsAdded(QSet<int>)));
 
     mySession->initTorrents();
@@ -414,6 +412,8 @@ void Application::quitLater()
 
 void Application::onTorrentsAdded(QSet<int> const& torrents)
 {
+    QSet<int> needInfo;
+
     if (!myPrefs->getBool(Prefs::SHOW_NOTIFICATION_ON_ADD))
     {
         return;
@@ -426,6 +426,8 @@ void Application::onTorrentsAdded(QSet<int> const& torrents)
         if (tor->name().isEmpty()) // wait until the torrent's INFO fields are loaded
         {
             connect(tor, SIGNAL(torrentChanged(int)), this, SLOT(onNewTorrentChanged(int)));
+
+            needInfo << id;
         }
         else
         {
@@ -436,6 +438,11 @@ void Application::onTorrentsAdded(QSet<int> const& torrents)
                 connect(tor, SIGNAL(torrentCompleted(int)), this, SLOT(onTorrentCompleted(int)));
             }
         }
+    }
+
+    if (!needInfo.empty())
+    {
+        mySession->initTorrents(needInfo);
     }
 }
 
