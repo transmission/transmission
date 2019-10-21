@@ -422,6 +422,7 @@ static void onRatioToggled(GtkCheckMenuItem* check, gpointer vp)
         gtr_core_set_pref_bool(p->core, TR_KEY_ratio_limit_enabled, f);
     }
 }
+
 static void onRatioSet(GtkCheckMenuItem* check, gpointer vp)
 {
     PrivateData* p = vp;

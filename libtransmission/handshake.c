@@ -370,7 +370,7 @@ static uint32_t getCryptoSelect(tr_handshake const* handshake, uint32_t crypto_p
 
     for (int i = 0; i < nChoices; ++i)
     {
-        if (crypto_provide & choices[i])
+        if ((crypto_provide & choices[i]) != 0)
         {
             return choices[i];
         }
@@ -837,7 +837,7 @@ static ReadState readCryptoProvide(tr_handshake* handshake, struct evbuffer* inb
         obfuscatedTorrentHash[i] = req2[i] ^ req3[i];
     }
 
-    if ((tor = tr_torrentFindFromObfuscatedHash(handshake->session, obfuscatedTorrentHash)))
+    if ((tor = tr_torrentFindFromObfuscatedHash(handshake->session, obfuscatedTorrentHash)) != NULL)
     {
         bool const clientIsSeed = tr_torrentIsSeed(tor);
         bool const peerIsSeed = tr_peerMgrPeerIsSeed(tor, tr_peerIoGetAddress(handshake->io, NULL));

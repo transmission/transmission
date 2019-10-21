@@ -269,7 +269,7 @@ if(ICONV_FOUND)
 endif()
 
 if(WIN32)
-    target_link_libraries(${TR_NAME} shlwapi)
+    target_link_libraries(${TR_NAME} crypt32 shlwapi)
 endif()
 
 if(ENABLE_TESTS)

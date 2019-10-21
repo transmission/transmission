@@ -55,6 +55,7 @@ void hig_workarea_add_wide_control(GtkWidget* t, guint* row, GtkWidget* w)
     gtk_grid_attach(GTK_GRID(t), w, 0, *row, 2, 1);
     ++*row;
 }
+
 void hig_workarea_add_wide_tall_control(GtkWidget* t, guint* row, GtkWidget* w)
 {
     gtk_widget_set_hexpand(w, TRUE);

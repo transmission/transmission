@@ -28,7 +28,7 @@ static int myQueueLength = 0;
 #ifndef _WIN32
 
 /* make null versions of these win32 functions */
-static inline int IsDebuggerPresent(void)
+static inline bool IsDebuggerPresent(void)
 {
     return false;
 }
@@ -162,7 +162,7 @@ bool tr_logGetDeepEnabled(void)
 
     if (deepLoggingIsActive < 0)
     {
-        deepLoggingIsActive = IsDebuggerPresent() || tr_logGetFile() != TR_BAD_SYS_FILE;
+        deepLoggingIsActive = (int8_t)(IsDebuggerPresent() || tr_logGetFile() != TR_BAD_SYS_FILE);
     }
 
     return deepLoggingIsActive != 0;
@@ -246,7 +246,7 @@ void tr_logAddMessage(char const* file, int line, tr_log_level level, char const
 
 #endif
 
-    if (*buf != '\0')
+    if (!tr_str_is_empty(buf))
     {
         if (tr_logGetQueueEnabled())
         {
