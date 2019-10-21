@@ -116,7 +116,7 @@ Torrent::Property Torrent::myProperties[] =
 ***/
 
 // unchanging fields needed by the main window
-const Torrent::KeyList Torrent::mainInfoKeys {
+Torrent::KeyList const Torrent::mainInfoKeys{
     TR_KEY_addedDate,
     TR_KEY_hashString,
     TR_KEY_id, // must be in every req
@@ -125,7 +125,7 @@ const Torrent::KeyList Torrent::mainInfoKeys {
 };
 
 // changing fields needed by the main window
-const Torrent::KeyList Torrent::mainStatKeys {
+Torrent::KeyList const Torrent::mainStatKeys{
     TR_KEY_downloadDir,
     TR_KEY_error,
     TR_KEY_errorString,
@@ -150,10 +150,10 @@ const Torrent::KeyList Torrent::mainStatKeys {
     TR_KEY_uploadRatio
 };
 
-const Torrent::KeyList Torrent::allMainKeys = Torrent::mainInfoKeys + Torrent::mainStatKeys;
+Torrent::KeyList const Torrent::allMainKeys = Torrent::mainInfoKeys + Torrent::mainStatKeys;
 
 // unchanging fields needed by the details dialog
-const Torrent::KeyList Torrent::detailInfoKeys {
+Torrent::KeyList const Torrent::detailInfoKeys{
     TR_KEY_comment,
     TR_KEY_creator,
     TR_KEY_dateCreated,
@@ -165,7 +165,7 @@ const Torrent::KeyList Torrent::detailInfoKeys {
 };
 
 // changing fields needed by the details dialog
-const Torrent::KeyList Torrent::detailStatKeys {
+Torrent::KeyList const Torrent::detailStatKeys{
     TR_KEY_activityDate,
     TR_KEY_bandwidthPriority,
     TR_KEY_corruptEver,

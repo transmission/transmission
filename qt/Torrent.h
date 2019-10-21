@@ -589,18 +589,17 @@ public:
     }
 
     typedef QList<tr_quark> KeyList;
-    static const KeyList allMainKeys;
-    static const KeyList mainInfoKeys;
-    static const KeyList mainStatKeys;
-    static const KeyList detailInfoKeys;
-    static const KeyList detailStatKeys;
+    static KeyList const allMainKeys;
+    static KeyList const mainInfoKeys;
+    static KeyList const mainStatKeys;
+    static KeyList const detailInfoKeys;
+    static KeyList const detailStatKeys;
 
 signals:
     void torrentChanged(int id);
     void torrentCompleted(int id);
 
 private:
-
     struct Property
     {
         int id;
