@@ -259,7 +259,7 @@ int tr_upnpPulse(tr_upnp* handle, int port, bool isEnabled, bool doPortCheck)
 
         if (handle->urls.controlURL == NULL)
         {
-            handle->isMapped = 0;
+            handle->isMapped = false;
         }
         else
         {

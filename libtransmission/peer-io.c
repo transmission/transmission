@@ -431,7 +431,7 @@ error:
 
 static void maybeSetCongestionAlgorithm(tr_socket_t socket, char const* algorithm)
 {
-    if (algorithm != NULL && *algorithm != '\0')
+    if (!tr_str_is_empty(algorithm))
     {
         tr_netSetCongestionControl(socket, algorithm);
     }
@@ -1109,7 +1109,7 @@ static inline void processBuffer(tr_crypto* crypto, struct evbuffer* buffer, siz
         TR_ASSERT(size >= iovec.iov_len);
         size -= iovec.iov_len;
     }
-    while (!evbuffer_ptr_set(buffer, &pos, iovec.iov_len, EVBUFFER_PTR_ADD));
+    while (evbuffer_ptr_set(buffer, &pos, iovec.iov_len, EVBUFFER_PTR_ADD) == 0);
 
     TR_ASSERT(size == 0);
 }

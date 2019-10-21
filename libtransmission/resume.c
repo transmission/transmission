@@ -159,7 +159,7 @@ static void saveDND(tr_variant* dict, tr_torrent const* tor)
 
     for (tr_file_index_t i = 0; i < n; ++i)
     {
-        tr_variantListAddInt(list, inf->files[i].dnd ? 1 : 0);
+        tr_variantListAddBool(list, inf->files[i].dnd);
     }
 }
 
@@ -171,7 +171,7 @@ static uint64_t loadDND(tr_variant* dict, tr_torrent* tor)
 
     if (tr_variantDictFindList(dict, TR_KEY_dnd, &list) && tr_variantListSize(list) == n)
     {
-        int64_t tmp;
+        bool tmp;
         tr_file_index_t* dl = tr_new(tr_file_index_t, n);
         tr_file_index_t* dnd = tr_new(tr_file_index_t, n);
         tr_file_index_t dlCount = 0;
@@ -179,7 +179,7 @@ static uint64_t loadDND(tr_variant* dict, tr_torrent* tor)
 
         for (tr_file_index_t i = 0; i < n; ++i)
         {
-            if (tr_variantGetInt(tr_variantListChild(list, i), &tmp) && tmp != 0)
+            if (tr_variantGetBool(tr_variantListChild(list, i), &tmp) && tmp)
             {
                 dnd[dndCount++] = i;
             }
@@ -847,7 +847,7 @@ static uint64_t loadFromFile(tr_torrent* tor, uint64_t fieldsToLoad, bool* didRe
     }
 
     if ((fieldsToLoad & (TR_FR_PROGRESS | TR_FR_DOWNLOAD_DIR)) != 0 &&
-        tr_variantDictFindStr(&top, TR_KEY_destination, &str, &len) && str != NULL && *str != '\0')
+        tr_variantDictFindStr(&top, TR_KEY_destination, &str, &len) && !tr_str_is_empty(str))
     {
         bool const is_current_dir = tor->currentDir == tor->downloadDir;
         tr_free(tor->downloadDir);
@@ -862,7 +862,7 @@ static uint64_t loadFromFile(tr_torrent* tor, uint64_t fieldsToLoad, bool* didRe
     }
 
     if ((fieldsToLoad & (TR_FR_PROGRESS | TR_FR_INCOMPLETE_DIR)) != 0 &&
-        tr_variantDictFindStr(&top, TR_KEY_incomplete_dir, &str, &len) && str != NULL && *str != '\0')
+        tr_variantDictFindStr(&top, TR_KEY_incomplete_dir, &str, &len) && !tr_str_is_empty(str))
     {
         bool const is_current_dir = tor->currentDir == tor->incompleteDir;
         tr_free(tor->incompleteDir);
@@ -1024,7 +1024,7 @@ static uint64_t setFromCtor(tr_torrent* tor, uint64_t fields, tr_ctor const* cto
     {
         char const* path;
 
-        if (tr_ctorGetDownloadDir(ctor, mode, &path) && path != NULL && *path != '\0')
+        if (tr_ctorGetDownloadDir(ctor, mode, &path) && !tr_str_is_empty(path))
         {
             ret |= TR_FR_DOWNLOAD_DIR;
             tr_free(tor->downloadDir);

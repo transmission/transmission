@@ -298,7 +298,7 @@ static void getStatusString(GString* gstr, tr_torrent const* tor, tr_stat const*
         char buf[256];
         getShortTransferString(tor, st, uploadSpeed_KBps, downloadSpeed_KBps, buf, sizeof(buf));
 
-        if (*buf != '\0')
+        if (!tr_str_is_empty(buf))
         {
             g_string_append_printf(gstr, " - %s", buf);
         }

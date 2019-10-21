@@ -721,7 +721,7 @@ static void refreshInfo(struct DetailsImpl* di, tr_torrent** torrents, int n)
             mixed_date |= date != infos[i]->dateCreated;
         }
 
-        gboolean const empty_creator = *creator == '\0';
+        gboolean const empty_creator = tr_str_is_empty(creator);
         gboolean const empty_date = date == 0;
 
         if (mixed_date || mixed_creator)
@@ -1079,7 +1079,7 @@ static void refreshInfo(struct DetailsImpl* di, tr_torrent** torrents, int n)
         str = is_uniform ? baseline : mixed;
     }
 
-    if (str == NULL || *str == '\0')
+    if (tr_str_is_empty(str))
     {
         str = _("No errors");
     }
@@ -1760,7 +1760,7 @@ static gboolean onPeerViewQueryTooltip(GtkWidget* widget, gint x, gint y, gboole
         g_string_append_printf(gstr, "<b>%s</b>\n%s\n \n", markup, addr);
         g_free(markup);
 
-        for (char const* pch = flagstr; pch != NULL && *pch != '\0'; ++pch)
+        for (char const* pch = flagstr; !tr_str_is_empty(pch); ++pch)
         {
             char const* s = NULL;
 
@@ -2515,7 +2515,7 @@ static void on_edit_trackers_response(GtkDialog* dialog, int response, gpointer 
             {
                 char* const str = tracker_strings[i];
 
-                if (*str == '\0')
+                if (tr_str_is_empty(str))
                 {
                     ++tier;
                 }
@@ -2661,7 +2661,7 @@ static void on_add_tracker_response(GtkDialog* dialog, int response, gpointer gd
         char* url = g_strdup(gtk_entry_get_text(GTK_ENTRY(e)));
         g_strstrip(url);
 
-        if (url != NULL && *url != '\0')
+        if (!tr_str_is_empty(url))
         {
             if (tr_urlIsValidTracker(url))
             {

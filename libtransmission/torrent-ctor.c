@@ -86,7 +86,7 @@ int tr_ctorSetMetainfo(tr_ctor* ctor, uint8_t const* metainfo, size_t len)
 
     clearMetainfo(ctor);
     err = tr_variantFromBenc(&ctor->metainfo, metainfo, len);
-    ctor->isSet_metainfo = !err;
+    ctor->isSet_metainfo = err == 0;
     return err;
 }
 
@@ -159,7 +159,7 @@ int tr_ctorSetMetainfoFromFile(tr_ctor* ctor, char const* filename)
                 }
             }
 
-            if (name == NULL || *name == '\0')
+            if (tr_str_is_empty(name))
             {
                 char* base = tr_sys_path_basename(filename, NULL);
 
@@ -338,7 +338,7 @@ void tr_ctorSetDownloadDir(tr_ctor* ctor, tr_ctorMode mode, char const* director
     args->downloadDir = NULL;
     args->isSet_downloadDir = false;
 
-    if (directory != NULL && *directory != '\0')
+    if (!tr_str_is_empty(directory))
     {
         args->isSet_downloadDir = true;
         args->downloadDir = tr_strdup(directory);

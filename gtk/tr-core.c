@@ -1771,7 +1771,7 @@ static gboolean core_read_rpc_response_idle(void* vresponse)
 
         if (data != NULL)
         {
-            if (data->response_func)
+            if (data->response_func != NULL)
             {
                 (*data->response_func)(data->core, response, data->response_func_user_data);
             }

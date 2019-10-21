@@ -45,6 +45,7 @@ namespace
 {
 
 #ifdef _WIN32
+
 void addAssociatedFileIcon(QFileInfo const& fileInfo, UINT iconSize, QIcon& icon)
 {
     QString const pixmapCacheKey = QLatin1String("tr_file_ext_") + QString::number(iconSize) + QLatin1Char('_') +
@@ -76,6 +77,7 @@ void addAssociatedFileIcon(QFileInfo const& fileInfo, UINT iconSize, QIcon& icon
         icon.addPixmap(pixmap);
     }
 }
+
 #endif
 
 bool isSlashChar(QChar const& c)
