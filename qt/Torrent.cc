@@ -11,6 +11,8 @@
 
 #include <QApplication>
 #include <QFileInfo>
+#include <QMimeDatabase>
+#include <QMimeType>
 #include <QSet>
 #include <QString>
 #include <QStyle>
@@ -511,6 +513,7 @@ int Torrent::compareTracker(Torrent const& that) const
 void Torrent::updateMimeIcon()
 {
     FileList const& files(myFiles);
+    QString const n = name();
 
     QIcon icon;
 
@@ -521,6 +524,15 @@ void Torrent::updateMimeIcon()
     else if (files.size() == 1)
     {
         icon = Utils::guessMimeIcon(files.at(0).filename);
+    }
+    else if (!n.isEmpty())
+    {
+        QMimeDatabase mimeDb;
+        QMimeType const mimeType = mimeDb.mimeTypeForFile(n, QMimeDatabase::MatchExtension);
+
+        icon = mimeType.isValid() && !mimeType.isDefault() ?
+            Utils::guessMimeIcon(n) :
+            Utils::getFolderIcon();
     }
     else
     {
@@ -613,7 +625,14 @@ void Torrent::update(tr_variant* d)
 
                 if (tr_variantGetStr(child, &val, nullptr))
                 {
-                    changed |= setString(property_index, val);
+                    bool const field_changed = setString(property_index, val);
+
+                    if (field_changed && (key == TR_KEY_name))
+                    {
+                        updateMimeIcon();
+                    }
+
+                    changed |= field_changed;
                 }
 
                 break;
