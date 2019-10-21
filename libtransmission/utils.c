@@ -192,7 +192,7 @@ char const* tr_strip_positional_args(char const* str)
 
     out = buf;
 
-    for (; str != NULL && *str != '\0'; ++str)
+    for (; !tr_str_is_empty(str); ++str)
     {
         *out++ = *str;
 
@@ -363,7 +363,7 @@ int64_t tr_getDirFreeSpace(char const* dir)
 {
     int64_t free_space;
 
-    if (dir == NULL || *dir == '\0')
+    if (tr_str_is_empty(dir))
     {
         errno = EINVAL;
         free_space = -1;
@@ -636,7 +636,7 @@ bool tr_str_has_suffix(char const* str, char const* suffix)
         return false;
     }
 
-    return !evutil_ascii_strncasecmp(str + str_len - suffix_len, suffix, suffix_len);
+    return evutil_ascii_strncasecmp(str + str_len - suffix_len, suffix, suffix_len) == 0;
 }
 
 /****
@@ -1526,7 +1526,7 @@ int* tr_parseNumberRange(char const* str_in, size_t len, int* setmeCount)
 
     walk = str;
 
-    while (walk != NULL && *walk != '\0' && success)
+    while (!tr_str_is_empty(walk) && success)
     {
         struct number_range range;
         char const* pch = strchr(walk, ',');
@@ -2110,7 +2110,7 @@ int tr_env_get_int(char const* key, int default_value)
 
     char const* value = getenv(key);
 
-    if (value != NULL && *value != '\0')
+    if (!tr_str_is_empty(value))
     {
         return atoi(value);
     }

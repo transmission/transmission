@@ -94,7 +94,7 @@ tr_torrent* tr_torrentFindFromHashString(tr_session* session, char const* str)
 
     while ((tor = tr_torrentNext(session, tor)) != NULL)
     {
-        if (!evutil_ascii_strcasecmp(str, tor->info.hashString))
+        if (evutil_ascii_strcasecmp(str, tor->info.hashString) == 0)
         {
             return tor;
         }
@@ -235,6 +235,7 @@ unsigned char const* tr_torrentGetPeerId(tr_torrent* tor)
 
     return tor->peer_id;
 }
+
 /***
 ****  PER-TORRENT UL / DL SPEEDS
 ***/
@@ -1099,7 +1100,7 @@ static tr_parse_result torrentParseImpl(tr_ctor const* ctor, tr_info* setmeInfo,
         result = TR_PARSE_ERR;
     }
 
-    if (didParse && hasInfo && !tr_getBlockSize(setmeInfo->pieceSize))
+    if (didParse && hasInfo && tr_getBlockSize(setmeInfo->pieceSize) == 0)
     {
         result = TR_PARSE_ERR;
     }
@@ -1417,7 +1418,7 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
     s->haveUnchecked = tr_torrentHaveTotal(tor) - s->haveValid;
     s->desiredAvailable = tr_peerMgrGetDesiredAvailable(tor);
 
-    s->ratio = tr_getRatio(s->uploadedEver, s->downloadedEver ? s->downloadedEver : s->haveValid);
+    s->ratio = tr_getRatio(s->uploadedEver, s->downloadedEver != 0 ? s->downloadedEver : s->haveValid);
 
     seedRatioApplies = tr_torrentGetSeedRatioBytes(tor, &seedRatioBytesLeft, &seedRatioBytesGoal);
 
@@ -2233,7 +2234,7 @@ static void get_local_time_str(char* const buffer, size_t const buffer_len)
 
 static void torrentCallScript(tr_torrent const* tor, char const* script)
 {
-    if (script == NULL || *script == '\0')
+    if (tr_str_is_empty(script))
     {
         return;
     }
@@ -2421,13 +2422,13 @@ tr_priority_t* tr_torrentGetFilePriorities(tr_torrent const* tor)
 ***  File DND
 **/
 
-static void setFileDND(tr_torrent* tor, tr_file_index_t fileIndex, int doDownload)
+static void setFileDND(tr_torrent* tor, tr_file_index_t fileIndex, bool doDownload)
 {
-    int8_t const dnd = !doDownload;
+    bool const dnd = !doDownload;
     tr_piece_index_t firstPiece;
-    int8_t firstPieceDND;
+    bool firstPieceDND;
     tr_piece_index_t lastPiece;
-    int8_t lastPieceDND;
+    bool lastPieceDND;
     tr_file* file = &tor->info.files[fileIndex];
 
     file->dnd = dnd;
@@ -2488,7 +2489,6 @@ static void setFileDND(tr_torrent* tor, tr_file_index_t fileIndex, int doDownloa
 
 void tr_torrentInitFileDLs(tr_torrent* tor, tr_file_index_t const* files, tr_file_index_t fileCount, bool doDownload)
 {
-
     TR_ASSERT(tr_isTorrent(tor));
 
     tr_torrentLock(tor);
@@ -3794,8 +3794,8 @@ void tr_torrentSetQueueStartCallback(tr_torrent* torrent, void (* callback)(tr_t
 
 static bool renameArgsAreValid(char const* oldpath, char const* newname)
 {
-    return oldpath != NULL && *oldpath != '\0' && newname != NULL && *newname != '\0' && strcmp(newname, ".") != 0 &&
-        strcmp(newname, "..") != 0 && strchr(newname, TR_PATH_DELIMITER) == NULL;
+    return !tr_str_is_empty(oldpath) && !tr_str_is_empty(newname) && strcmp(newname, ".") != 0 && strcmp(newname, "..") != 0 &&
+        strchr(newname, TR_PATH_DELIMITER) == NULL;
 }
 
 static tr_file_index_t* renameFindAffectedFiles(tr_torrent* tor, char const* oldpath, size_t* setme_n)

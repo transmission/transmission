@@ -202,6 +202,11 @@ char* tr_strdup(void const* in);
  */
 int tr_strcmp0(char const* str1, char const* str2);
 
+static inline bool tr_str_is_empty(char const* value)
+{
+    return value == NULL || *value == '\0';
+}
+
 /**
  * @brief like memcmp() but gracefully handles NULL pointers
  */

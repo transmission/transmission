@@ -252,7 +252,7 @@ static void onResponse(GtkDialog* d, int response, gpointer user_data)
             {
                 char* const str = tracker_strings[i];
 
-                if (*str == '\0')
+                if (tr_str_is_empty(str))
                 {
                     ++tier;
                 }
