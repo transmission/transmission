@@ -31,8 +31,7 @@ enum
 {
     GUI_PAD = 6,
     BAR_WIDTH = 50,
-    BAR_HEIGHT = 16,
-    LINE_SPACING = 4
+    BAR_HEIGHT = 16
 };
 
 /***
@@ -106,7 +105,7 @@ ItemLayout::ItemLayout(QString const& nameText, QString const& statusText, QIcon
     QSize const statusSize(statusFM.size(0, myStatusText));
 
     QStyleOptionProgressBar barStyle;
-    barStyle.rect = QRect(0, 0, BAR_WIDTH, BAR_HEIGHT);
+    barStyle.rect.setRect(0, 0, BAR_WIDTH, BAR_HEIGHT);
     barStyle.maximum = 100;
     barStyle.progress = 100;
     barStyle.textVisible = true;

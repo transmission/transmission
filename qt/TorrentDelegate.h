@@ -41,6 +41,9 @@ protected:
     static QString shortTransferString(Torrent const& tor);
 
 protected:
+    mutable int myHeightHint = 0;
+    mutable QFont myHeightFont;
+
     QStyleOptionProgressBar* myProgressBarStyle;
 
     static QColor blueBrush;
