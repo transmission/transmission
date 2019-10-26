@@ -487,7 +487,7 @@ bool tr_sessionLoadSettings(tr_variant* dict, char const* configDir, char const*
     tr_variantFree(&oldDict);
 
     /* if caller didn't specify a config dir, use the default */
-    if (configDir == NULL || *configDir == '\0')
+    if (tr_str_is_empty(configDir))
     {
         configDir = tr_getDefaultConfigDir(appName);
     }
@@ -2021,7 +2021,7 @@ static void sessionCloseImpl(void* vsession)
     sessionCloseImplStart(session);
 }
 
-static int deadlineReached(time_t const deadline)
+static bool deadlineReached(time_t const deadline)
 {
     return time(NULL) >= deadline;
 }
@@ -2393,7 +2393,7 @@ bool tr_sessionIsPortForwardingEnabled(tr_session const* session)
 ****
 ***/
 
-static int tr_stringEndsWith(char const* str, char const* end)
+static bool tr_stringEndsWith(char const* str, char const* end)
 {
     size_t const slen = strlen(str);
     size_t const elen = strlen(end);

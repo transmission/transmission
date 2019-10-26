@@ -46,14 +46,14 @@ QLatin1String const MY_READABLE_NAME("transmission-qt");
 
 tr_option const opts[] =
 {
-    { 'g', "config-dir", "Where to look for configuration files", "g", 1, "<path>" },
-    { 'm', "minimized", "Start minimized in system tray", "m", 0, nullptr },
-    { 'p', "port", "Port to use when connecting to an existing session", "p", 1, "<port>" },
-    { 'r', "remote", "Connect to an existing session at the specified hostname", "r", 1, "<host>" },
-    { 'u', "username", "Username to use when connecting to an existing session", "u", 1, "<username>" },
-    { 'v', "version", "Show version number and exit", "v", 0, nullptr },
-    { 'w', "password", "Password to use when connecting to an existing session", "w", 1, "<password>" },
-    { 0, nullptr, nullptr, nullptr, 0, nullptr }
+    { 'g', "config-dir", "Where to look for configuration files", "g", true, "<path>" },
+    { 'm', "minimized", "Start minimized in system tray", "m", false, nullptr },
+    { 'p', "port", "Port to use when connecting to an existing session", "p", true, "<port>" },
+    { 'r', "remote", "Connect to an existing session at the specified hostname", "r", true, "<host>" },
+    { 'u', "username", "Username to use when connecting to an existing session", "u", true, "<username>" },
+    { 'v', "version", "Show version number and exit", "v", false, nullptr },
+    { 'w', "password", "Password to use when connecting to an existing session", "w", true, "<password>" },
+    { 0, nullptr, nullptr, nullptr, false, nullptr }
 };
 
 char const* getUsage()

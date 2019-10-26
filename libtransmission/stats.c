@@ -133,7 +133,7 @@ void tr_statsInit(tr_session* session)
 
 static struct tr_stats_handle* getStats(tr_session const* session)
 {
-    return session ? session->sessionStats : NULL;
+    return session != NULL ? session->sessionStats : NULL;
 }
 
 void tr_statsSaveDirty(tr_session* session)

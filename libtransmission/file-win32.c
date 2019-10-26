@@ -87,11 +87,11 @@ static void stat_to_sys_path_info(DWORD attributes, DWORD size_low, DWORD size_h
     TR_ASSERT(mtime != NULL);
     TR_ASSERT(info != NULL);
 
-    if (attributes & FILE_ATTRIBUTE_DIRECTORY)
+    if ((attributes & FILE_ATTRIBUTE_DIRECTORY) != 0)
     {
         info->type = TR_SYS_PATH_IS_DIRECTORY;
     }
-    else if (!(attributes & (FILE_ATTRIBUTE_DEVICE | FILE_ATTRIBUTE_REPARSE_POINT | FILE_ATTRIBUTE_VIRTUAL)))
+    else if ((attributes & (FILE_ATTRIBUTE_DEVICE | FILE_ATTRIBUTE_REPARSE_POINT | FILE_ATTRIBUTE_VIRTUAL)) == 0)
     {
         info->type = TR_SYS_PATH_IS_FILE;
     }
@@ -278,8 +278,7 @@ static bool create_dir(char const* path, int flags, int permissions, bool okay_i
     {
         DWORD const attributes = GetFileAttributesW(wide_path);
 
-        if (attributes != INVALID_FILE_ATTRIBUTES &&
-            (attributes & FILE_ATTRIBUTE_DIRECTORY) != 0)
+        if (attributes != INVALID_FILE_ATTRIBUTES && (attributes & FILE_ATTRIBUTE_DIRECTORY) != 0)
         {
             ret = true;
         }
@@ -357,7 +356,7 @@ bool tr_sys_path_exists(char const* path, tr_error** error)
 
         if (attributes != INVALID_FILE_ATTRIBUTES)
         {
-            if (attributes & FILE_ATTRIBUTE_REPARSE_POINT)
+            if ((attributes & FILE_ATTRIBUTE_REPARSE_POINT) != 0)
             {
                 handle = CreateFileW(wide_path, 0, 0, NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
                 ret = handle != INVALID_HANDLE_VALUE;
@@ -595,7 +594,7 @@ cleanup:
 
 char* tr_sys_path_basename(char const* path, tr_error** error)
 {
-    if (path == NULL || path[0] == '\0')
+    if (tr_str_is_empty(path))
     {
         return tr_strdup(".");
     }
@@ -635,7 +634,7 @@ char* tr_sys_path_basename(char const* path, tr_error** error)
 
 char* tr_sys_path_dirname(char const* path, tr_error** error)
 {
-    if (path == NULL || path[0] == '\0')
+    if (tr_str_is_empty(path))
     {
         return tr_strdup(".");
     }

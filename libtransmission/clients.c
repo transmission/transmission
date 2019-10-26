@@ -639,7 +639,7 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
             tr_snprintf(buf, buflen, "Baidu Netdisk");
         }
 
-        if (*buf != '\0')
+        if (!tr_str_is_empty(buf))
         {
             return buf;
         }
@@ -664,7 +664,7 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
                 strint(id + 5, 2), getMnemonicEnd(id[7]));
         }
 
-        if (*buf != '\0')
+        if (!tr_str_is_empty(buf))
         {
             return buf;
         }
@@ -683,7 +683,7 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
             mainline_style(buf, buflen, "Queen Bee", id);
         }
 
-        if (*buf != '\0')
+        if (!tr_str_is_empty(buf))
         {
             return buf;
         }
@@ -806,7 +806,7 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
     }
 
     /* Shad0w-style */
-    if (*buf == '\0')
+    if (tr_str_is_empty(buf))
     {
         int a;
         int b;
@@ -856,7 +856,7 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
     }
 
     /* No match */
-    if (*buf == '\0')
+    if (tr_str_is_empty(buf))
     {
         char out[32];
         char* walk = out;

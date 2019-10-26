@@ -430,7 +430,7 @@ static void handle_web_client(struct evhttp_request* req, struct tr_rpc_server* 
 {
     char const* webClientDir = tr_getWebClientDir(server->session);
 
-    if (webClientDir == NULL || *webClientDir == '\0')
+    if (tr_str_is_empty(webClientDir))
     {
         send_simple_response(req, HTTP_NOTFOUND,
             "<p>Couldn't find Transmission's web interface files!</p>"
@@ -461,7 +461,7 @@ static void handle_web_client(struct evhttp_request* req, struct tr_rpc_server* 
         else
         {
             char* filename = tr_strdup_printf("%s%s%s", webClientDir, TR_PATH_DELIMITER_STR,
-                *subpath != '\0' ? subpath : "index.html");
+                tr_str_is_empty(subpath) ? "index.html" : subpath);
             serve_file(req, server, filename);
             tr_free(filename);
         }
@@ -938,7 +938,7 @@ static void tr_rpcSetList(char const* whitelistStr, tr_list** list)
     }
 
     /* build the new whitelist entries */
-    for (char const* walk = whitelistStr; walk != NULL && *walk != '\0';)
+    for (char const* walk = whitelistStr; !tr_str_is_empty(walk);)
     {
         char const* delimiters = " ,;";
         size_t const len = strcspn(walk, delimiters);

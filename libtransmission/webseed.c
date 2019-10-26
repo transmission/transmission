@@ -367,7 +367,7 @@ static void web_response_func(tr_session* session, bool did_connect UNUSED, bool
     tr_webseed* w;
     tr_torrent* tor;
     struct tr_webseed_task* t = vtask;
-    int const success = (response_code == 206);
+    bool const success = response_code == 206;
 
     if (t->dead)
     {
@@ -486,7 +486,7 @@ static void task_request_next_chunk(struct tr_webseed_task* t)
         file = &inf->files[file_index];
         this_pass = MIN(remain, file->length - file_offset);
 
-        if (!urls[file_index])
+        if (urls[file_index] == NULL)
         {
             urls[file_index] = evbuffer_free_to_str(make_url(t->webseed, file), NULL);
         }

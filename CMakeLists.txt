@@ -453,6 +453,7 @@ set(NEEDED_FUNCTIONS
     canonicalize_file_name
     daemon
     fallocate64
+    flock
     getmntent
     getpagesize
     htonll
