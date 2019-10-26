@@ -742,7 +742,7 @@ static gboolean core_watchdir_idle(gpointer gcore)
 
         core->priv->adding_from_watch_dir = TRUE;
         gtr_core_add_files(core, unchanging, do_start, do_prompt, TRUE);
-        g_slist_foreach(unchanging, (GFunc)rename_torrent_and_unref_file, NULL);
+        g_slist_foreach(unchanging, (GFunc)(GCallback)rename_torrent_and_unref_file, NULL);
         g_slist_free(unchanging);
         core->priv->adding_from_watch_dir = FALSE;
     }
