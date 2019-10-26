@@ -2906,10 +2906,10 @@ bool tr_torrentSetAnnounceList(tr_torrent* tor, tr_tracker_info const* trackers_
 **/
 
 #define BACK_COMPAT_FUNC(oldname, newname) \
-  void oldname(tr_torrent* tor, time_t t) { newname(tor, t); }
-BACK_COMPAT_FUNC(tr_torrentSetAddedDate,    tr_torrentSetDateAdded)
+    void oldname(tr_torrent * tor, time_t t) { newname(tor, t); }
+BACK_COMPAT_FUNC(tr_torrentSetAddedDate, tr_torrentSetDateAdded)
 BACK_COMPAT_FUNC(tr_torrentSetActivityDate, tr_torrentSetDateActive)
-BACK_COMPAT_FUNC(tr_torrentSetDoneDate,     tr_torrentSetDateDone)
+BACK_COMPAT_FUNC(tr_torrentSetDoneDate, tr_torrentSetDateDone)
 #undef BACK_COMPAT_FUNC
 
 void tr_torrentSetDateAdded(tr_torrent* tor, time_t t)

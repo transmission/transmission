@@ -93,7 +93,6 @@ void tr_torrentSetDateActive(tr_torrent* torrent, time_t activityDate);
 
 void tr_torrentSetDateDone(tr_torrent* torrent, time_t doneDate);
 
-
 typedef enum
 {
     TR_VERIFY_NONE,
