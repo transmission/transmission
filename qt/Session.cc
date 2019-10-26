@@ -547,7 +547,7 @@ void Session::torrentRenamePath(QSet<int> const& ids, QString const& oldpath, QS
                 tr("<p><b>Unable to rename \"%1\" as \"%2\": %3.</b></p><p>Please correct the errors and try again.</p>").
                     arg(QString::fromUtf8(path)).arg(QString::fromUtf8(name)).arg(r.result), QMessageBox::Close,
                 qApp->activeWindow());
-            connect(d, SIGNAL(rejected()), d, SLOT(deleteLater()));
+            QObject::connect(d, SIGNAL(rejected()), d, SLOT(deleteLater()));
             d->show();
         });
 
@@ -996,7 +996,7 @@ void Session::addTorrent(AddData const& addMe, tr_variant* args, bool trashOrigi
             QMessageBox* d = new QMessageBox(QMessageBox::Warning, tr("Error Adding Torrent"),
                 QString::fromLatin1("<p><b>%1</b></p><p>%2</p>").arg(r.result).arg(addMe.readableName()), QMessageBox::Close,
                 qApp->activeWindow());
-            connect(d, SIGNAL(rejected()), d, SLOT(deleteLater()));
+            QObject::connect(d, SIGNAL(rejected()), d, SLOT(deleteLater()));
             d->show();
         });
 
@@ -1017,7 +1017,7 @@ void Session::addTorrent(AddData const& addMe, tr_variant* args, bool trashOrigi
                 QMessageBox* d = new QMessageBox(QMessageBox::Warning, tr("Add Torrent"),
                     tr("<p><b>Unable to add \"%1\".</b></p><p>It is a duplicate of \"%2\" which is already added.</p>").
                         arg(addMe.readableShortName()).arg(name), QMessageBox::Close, qApp->activeWindow());
-                connect(d, SIGNAL(rejected()), d, SLOT(deleteLater()));
+                QObject::connect(d, SIGNAL(rejected()), d, SLOT(deleteLater()));
                 d->show();
             }
         });
