@@ -86,21 +86,90 @@ static char* getTorrentFilename(tr_session const* session, tr_info const* inf, e
 ****
 ***/
 
-static bool path_component_is_suspicious(char const* component)
+char* tr_metainfo_sanitize_path_component(char const* str, size_t len, bool* is_adjusted)
 {
-    return component == NULL || strpbrk(component, PATH_DELIMITER_CHARS) != NULL || strcmp(component, ".") == 0 ||
-        strcmp(component, "..") == 0;
+    if (len == 0 || (len == 1 && str[0] == '.'))
+    {
+        return NULL;
+    }
+
+    *is_adjusted = false;
+
+    /* https://docs.microsoft.com/en-us/windows/desktop/FileIO/naming-a-file */
+    char const* const reserved_chars = "<>:\"/\\|?*";
+    char const* const reserved_names[] =
+    {
+        "CON", "PRN", "AUX", "NUL",
+        "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9",
+        "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9"
+    };
+
+    char* const ret = tr_new(char, len + 2);
+    memcpy(ret, str, len);
+    ret[len] = '\0';
+
+    for (size_t i = 0; i < len; ++i)
+    {
+        if (strchr(reserved_chars, ret[i]) != NULL || (unsigned char)ret[i] < 0x20)
+        {
+            ret[i] = '_';
+            *is_adjusted = true;
+        }
+    }
+
+    for (size_t i = 0; i < TR_N_ELEMENTS(reserved_names); ++i)
+    {
+        size_t const reserved_name_len = strlen(reserved_names[i]);
+        if (evutil_ascii_strncasecmp(ret, reserved_names[i], reserved_name_len) != 0 ||
+            (ret[reserved_name_len] != '\0' && ret[reserved_name_len] != '.'))
+        {
+            continue;
+        }
+
+        memmove(&ret[reserved_name_len + 1], &ret[reserved_name_len], len - reserved_name_len + 1);
+        ret[reserved_name_len] = '_';
+        *is_adjusted = true;
+        ++len;
+        break;
+    }
+
+    size_t start_pos = 0;
+    size_t end_pos = len;
+
+    while (start_pos < len && ret[start_pos] == ' ')
+    {
+        ++start_pos;
+    }
+
+    while (end_pos > start_pos && (ret[end_pos - 1] == ' ' || ret[end_pos - 1] == '.'))
+    {
+        --end_pos;
+    }
+
+    if (start_pos == end_pos)
+    {
+        tr_free(ret);
+        return NULL;
+    }
+
+    if (start_pos != 0 || end_pos != len)
+    {
+        len = end_pos - start_pos;
+        memmove(ret, &ret[start_pos], len);
+        ret[len] = '\0';
+        *is_adjusted = true;
+    }
+
+    return ret;
 }
 
-static bool getfile(char** setme, char const* root, tr_variant* path, struct evbuffer* buf)
+static bool getfile(char** setme, bool* is_adjusted, char const* root, tr_variant* path, struct evbuffer* buf)
 {
-    /* root's already been checked by caller */
-    TR_ASSERT(!path_component_is_suspicious(root));
-
     bool success = false;
     size_t root_len = 0;
 
     *setme = NULL;
+    *is_adjusted = false;
 
     if (tr_variantIsList(path))
     {
@@ -114,19 +183,25 @@ static bool getfile(char** setme, char const* root, tr_variant* path, struct evb
             size_t len;
             char const* str;
 
-            if (!tr_variantGetStr(tr_variantListChild(path, i), &str, &len) || path_component_is_suspicious(str))
+            if (!tr_variantGetStr(tr_variantListChild(path, i), &str, &len))
             {
                 success = false;
                 break;
             }
 
-            if (*str == '\0')
+            bool is_component_adjusted;
+            char* final_str = tr_metainfo_sanitize_path_component(str, len, &is_component_adjusted);
+            if (final_str == NULL)
             {
                 continue;
             }
 
+            *is_adjusted = *is_adjusted || is_component_adjusted;
+
             evbuffer_add(buf, TR_PATH_DELIMITER_STR, 1);
-            evbuffer_add(buf, str, len);
+            evbuffer_add(buf, final_str, strlen(final_str));
+
+            tr_free(final_str);
         }
     }
 
@@ -137,8 +212,15 @@ static bool getfile(char** setme, char const* root, tr_variant* path, struct evb
 
     if (success)
     {
-        *setme = tr_utf8clean((char*)evbuffer_pullup(buf, -1), evbuffer_get_length(buf));
-        /* fprintf(stderr, "[%s]\n", *setme); */
+        char const* const buf_data = (char*)evbuffer_pullup(buf, -1);
+        size_t const buf_len = evbuffer_get_length(buf);
+
+        *setme = tr_utf8clean(buf_data, buf_len);
+
+        if (!*is_adjusted)
+        {
+            *is_adjusted = buf_len != strlen(*setme) || strncmp(buf_data, *setme, buf_len) != 0;
+        }
     }
 
     return success;
@@ -150,15 +232,18 @@ static char const* parseFiles(tr_info* inf, tr_variant* files, tr_variant const*
 
     inf->totalSize = 0;
 
+    bool is_root_adjusted;
+    char* const root_name = tr_metainfo_sanitize_path_component(inf->name, strlen(inf->name), &is_root_adjusted);
+    if (root_name == NULL)
+    {
+        return "path";
+    }
+
+    char const* result = NULL;
+
     if (tr_variantIsList(files)) /* multi-file mode */
     {
         struct evbuffer* buf;
-        char const* result;
-
-        if (path_component_is_suspicious(inf->name))
-        {
-            return "path";
-        }
 
         buf = evbuffer_new();
         result = NULL;
@@ -189,7 +274,8 @@ static char const* parseFiles(tr_info* inf, tr_variant* files, tr_variant const*
                 }
             }
 
-            if (!getfile(&inf->files[i].name, inf->name, path, buf))
+            bool is_file_adjusted;
+            if (!getfile(&inf->files[i].name, &is_file_adjusted, root_name, path, buf))
             {
                 result = "path";
                 break;
@@ -202,32 +288,29 @@ static char const* parseFiles(tr_info* inf, tr_variant* files, tr_variant const*
             }
 
             inf->files[i].length = len;
+            inf->files[i].is_renamed = is_root_adjusted || is_file_adjusted;
             inf->totalSize += len;
         }
 
         evbuffer_free(buf);
-        return result;
     }
     else if (tr_variantGetInt(length, &len)) /* single-file mode */
     {
-        if (path_component_is_suspicious(inf->name))
-        {
-            return "path";
-        }
-
         inf->isFolder = false;
         inf->fileCount = 1;
         inf->files = tr_new0(tr_file, 1);
-        inf->files[0].name = tr_strdup(inf->name);
+        inf->files[0].name = tr_strdup(root_name);
         inf->files[0].length = len;
+        inf->files[0].is_renamed = is_root_adjusted;
         inf->totalSize += len;
     }
     else
     {
-        return "length";
+        result = "length";
     }
 
-    return NULL;
+    tr_free(root_name);
+    return result;
 }
 
 static char* tr_convertAnnounceToScrape(char const* announce)
@@ -538,7 +621,7 @@ static char const* tr_metainfoParseImpl(tr_session const* session, tr_info* inf,
             }
         }
 
-        if (str == NULL || *str == '\0')
+        if (tr_str_is_empty(str))
         {
             return "name";
         }

@@ -489,7 +489,7 @@ static void addTrackerStats(tr_tracker_stat const* st, int n, tr_variant* list)
         tr_variantDictAddInt(d, TR_KEY_lastScrapeStartTime, s->lastScrapeStartTime);
         tr_variantDictAddBool(d, TR_KEY_lastScrapeSucceeded, s->lastScrapeSucceeded);
         tr_variantDictAddInt(d, TR_KEY_lastScrapeTime, s->lastScrapeTime);
-        tr_variantDictAddInt(d, TR_KEY_lastScrapeTimedOut, s->lastScrapeTimedOut);
+        tr_variantDictAddBool(d, TR_KEY_lastScrapeTimedOut, s->lastScrapeTimedOut);
         tr_variantDictAddInt(d, TR_KEY_leecherCount, s->leecherCount);
         tr_variantDictAddInt(d, TR_KEY_nextAnnounceTime, s->nextAnnounceTime);
         tr_variantDictAddInt(d, TR_KEY_nextScrapeTime, s->nextScrapeTime);
@@ -552,7 +552,7 @@ static void addField(tr_torrent* const tor, tr_info const* const inf, tr_stat co
         break;
 
     case TR_KEY_comment:
-        tr_variantDictAddStr(d, key, inf->comment ? inf->comment : "");
+        tr_variantDictAddStr(d, key, inf->comment != NULL ? inf->comment : "");
         break;
 
     case TR_KEY_corruptEver:
@@ -560,7 +560,7 @@ static void addField(tr_torrent* const tor, tr_info const* const inf, tr_stat co
         break;
 
     case TR_KEY_creator:
-        tr_variantDictAddStr(d, key, inf->creator ? inf->creator : "");
+        tr_variantDictAddStr(d, key, inf->creator != NULL ? inf->creator : "");
         break;
 
     case TR_KEY_dateCreated:
@@ -960,7 +960,7 @@ static char const* setLabels(tr_torrent* tor, tr_variant* list)
         {
             char* label = tr_strndup(str, str_len);
             tr_strstrip(label);
-            if (*label == '\0')
+            if (tr_str_is_empty(label))
             {
                 errmsg = "labels cannot be empty";
             }
@@ -1082,7 +1082,7 @@ static char const* setFileDLs(tr_torrent* tor, bool do_download, tr_variant* lis
         }
     }
 
-    if (fileCount)
+    if (fileCount != 0)
     {
         tr_torrentSetFileDLs(tor, files, fileCount, do_download);
     }
@@ -1641,7 +1641,7 @@ static void gotNewBlocklist(tr_session* session, bool did_connect UNUSED, bool d
 
         tr_sys_file_close(fd, NULL);
 
-        if (*result != '\0')
+        if (!tr_str_is_empty(result))
         {
             tr_logAddError("%s", result);
         }

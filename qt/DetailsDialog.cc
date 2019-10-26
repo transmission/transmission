@@ -1237,11 +1237,13 @@ void DetailsDialog::onHonorsSessionLimitsToggled(bool val)
     mySession.torrentSet(myIds, TR_KEY_honorsSessionLimits, val);
     getNewData();
 }
+
 void DetailsDialog::onDownloadLimitedToggled(bool val)
 {
     mySession.torrentSet(myIds, TR_KEY_downloadLimited, val);
     getNewData();
 }
+
 void DetailsDialog::onSpinBoxEditingFinished()
 {
     QObject const* spin = sender();

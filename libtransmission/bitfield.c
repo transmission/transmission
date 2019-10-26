@@ -378,7 +378,7 @@ void tr_bitfieldSetRaw(tr_bitfield* b, void const* bits, size_t byte_count, bool
         TR_ASSERT(excess_bit_count >= 0);
         TR_ASSERT(excess_bit_count <= 7);
 
-        if (excess_bit_count)
+        if (excess_bit_count != 0)
         {
             b->bits[b->alloc_count - 1] &= 0xff << excess_bit_count;
         }

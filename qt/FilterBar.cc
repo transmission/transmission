@@ -416,6 +416,7 @@ void FilterBar::recountSoon()
         myRecountTimer->start(800);
     }
 }
+
 void FilterBar::recount()
 {
     QAbstractItemModel* model = myActivityCombo->model();
