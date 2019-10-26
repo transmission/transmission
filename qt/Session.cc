@@ -144,7 +144,7 @@ void Session::copyMagnetLinkToClipboard(int torrentId)
             return exec(TR_KEY_torrent_get, &args);
         });
 
-    q->add([this](RpcResponse const& r)
+    q->add([](RpcResponse const& r)
         {
             tr_variant* torrents;
 
@@ -536,7 +536,7 @@ void Session::torrentRenamePath(QSet<int> const& ids, QString const& oldpath, QS
         {
             return exec("torrent-rename-path", &args);
         },
-        [this](RpcResponse const& r)
+        [](RpcResponse const& r)
         {
             char const* path = "(unknown)";
             char const* name = "(unknown)";
@@ -991,7 +991,7 @@ void Session::addTorrent(AddData const& addMe, tr_variant* args, bool trashOrigi
         {
             return exec("torrent-add", args);
         },
-        [this, addMe](RpcResponse const& r)
+        [addMe](RpcResponse const& r)
         {
             QMessageBox* d = new QMessageBox(QMessageBox::Warning, tr("Error Adding Torrent"),
                 QString::fromLatin1("<p><b>%1</b></p><p>%2</p>").arg(r.result).arg(addMe.readableName()), QMessageBox::Close,
@@ -1000,7 +1000,7 @@ void Session::addTorrent(AddData const& addMe, tr_variant* args, bool trashOrigi
             d->show();
         });
 
-    q->add([this, addMe](RpcResponse const& r)
+    q->add([addMe](RpcResponse const& r)
         {
             tr_variant* dup;
 
@@ -1024,7 +1024,7 @@ void Session::addTorrent(AddData const& addMe, tr_variant* args, bool trashOrigi
 
     if (trashOriginal && addMe.type == AddData::FILENAME)
     {
-        q->add([this, addMe]()
+        q->add([addMe]()
             {
                 QFile original(addMe.filename);
                 original.setPermissions(QFile::ReadOwner | QFile::WriteOwner);
