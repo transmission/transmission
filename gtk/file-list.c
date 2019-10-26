@@ -343,7 +343,7 @@ static gboolean getSelectedFilesForeach(GtkTreeModel* model, GtkTreePath* path U
     return FALSE; /* keep walking */
 }
 
-size_t getSelectedFilesAndDescendants(GtkTreeView* view, tr_file_index_t* indexBuf)
+static size_t getSelectedFilesAndDescendants(GtkTreeView* view, tr_file_index_t* indexBuf)
 {
     struct ActiveData data;
 
