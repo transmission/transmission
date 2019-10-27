@@ -600,6 +600,14 @@ tr.inspector_peer_entry div.encrypted-peer-cell {
 tr.inspector_peer_entry.odd {
   background-color: #EEEEEE; }
 
+tr.asc th.sort:after {
+  content: "▲";
+}
+
+tr.desc th.sort:after {
+    content: "▼";
+}
+
 /***
 ****  File Priority Buttons
 ***/

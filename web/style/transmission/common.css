@@ -667,7 +667,11 @@ th.percentCol {
     cursor: pointer;
 }
 
-th.sort:after {
+tr.asc th.sort:after {
+  content: "▲";
+}
+
+tr.desc th.sort:after {
     content: "▼";
 }
 

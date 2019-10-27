@@ -631,25 +631,55 @@ function Inspector(controller) {
                 fmt = Transmission.fmt,
                 peers_list = data.elements.peers_list,
                 torrents = data.torrents,
-                sortIndex = 0;
+                sortIndex = 5;
 
             var theHeader = document.getElementById('headerrow');
+            var sortDirectionAsc = false;
             if (theHeader) {
                 var sortElementList = theHeader.getElementsByClassName('sort');
                 if (sortElementList && sortElementList.length > 0) {
                     sortIndex = sortElementList[0].cellIndex;
+                }
+                if (theHeader.classList.contains('asc')) {
+                    sortDirectionAsc = true;
                 }
             }
             for (k = 0; tor = torrents[k]; ++k) {
                 peers = tor.getPeers();
                 if (peers) {
                     peers.sort(function (peera, peerb) {
-                        if (sortIndex === 1) {
-                            return peerb.rateToPeer - peera.rateToPeer;
-                        } else if (sortIndex === 2) {
-                            return peerb.rateToClient - peera.rateToClient;
-                        } else if (sortIndex === 3) {
-                            return peerb.progress - peera.progress;
+                        if (sortDirectionAsc) {
+                            if (sortIndex === 1) {
+                                return peerb.rateToPeer - peera.rateToPeer;
+                            } else if (sortIndex === 2) {
+                                return peerb.rateToClient - peera.rateToClient;
+                            } else if (sortIndex === 3) {
+                                return peerb.progress - peera.progress;
+                            } else if (sortIndex === 4) {
+                                return peerb.flagStr.localeCompare(peera.flagStr);
+                            } else if (sortIndex === 5) {
+                                const num1 = Number(peera.address.split(".").map((num) => (`000${num}`).slice(-3) ).join(""));
+                                const num2 = Number(peerb.address.split(".").map((num) => (`000${num}`).slice(-3) ).join(""));
+                                return num2 - num1;
+                            } else if (sortIndex === 6) {
+                                return sanitizeText(peerb.clientName).localeCompare(sanitizeText(peera.clientName));
+                            } 
+                        } else {
+                            if (sortIndex === 1) {
+                                return peera.rateToPeer - peerb.rateToPeer;
+                            } else if (sortIndex === 2) {
+                                return peera.rateToClient - peerb.rateToClient;
+                            } else if (sortIndex === 3) {
+                                return peera.progress - peerb.progress;
+                            } else if (sortIndex === 4) {
+                                return peera.flagStr.localeCompare(peerb.flagStr);
+                            } else if (sortIndex === 5) {
+                                const num1 = Number(peera.address.split(".").map((num) => (`000${num}`).slice(-3) ).join(""));
+                                const num2 = Number(peerb.address.split(".").map((num) => (`000${num}`).slice(-3) ).join(""));
+                                return num1 - num2;
+                            } else if (sortIndex === 6) {
+                                return sanitizeText(peera.clientName).localeCompare(sanitizeText(peerb.clientName));
+                            } 
                         }
                     });
                 }
@@ -662,14 +692,14 @@ function Inspector(controller) {
                     continue;
                 }
                 html.push('<table id="peer_list_table" class="peer_list">',
-                    '<tr id="headerrow" class="inspector_peer_entry even">',
+                    '<tr id="headerrow" class="inspector_peer_entry even', sortDirectionAsc ? ' asc' : ' desc', '">',
                     '<th class="encryptedCol"></th>',
                     '<th class="upCol', sortIndex === 1 ? ' sort' : '', '">Up</th>',
                     '<th class="downCol', sortIndex === 2 ? ' sort' : '', '">Down</th>',
                     '<th class="percentCol', sortIndex === 3 ? ' sort' : '', '">%</th>',
-                    '<th class="statusCol">Status</th>',
-                    '<th class="addressCol">Address</th>',
-                    '<th class="clientCol">Client</th>',
+                    '<th class="statusCol', sortIndex === 4 ? ' sort' : '', '"">Status</th>',
+                    '<th class="addressCol', sortIndex === 5 ? ' sort' : '', '"">Address</th>',
+                    '<th class="clientCol', sortIndex === 6 ? ' sort' : '', '"">Client</th>',
                     '</tr>');
 
                 for (i = 0; peer = peers[i]; ++i) {
@@ -696,6 +726,17 @@ function Inspector(controller) {
                 var tableHeaderList = Array.prototype.slice.call(tableHeaders);
                 tableHeaderList.forEach(function (th) {
                     th.addEventListener('click', (function () {
+                        if (th.classList.contains('sort')) {
+                            // Clicked on the existing sorted column, invert the sort 
+                            var theHeader = document.getElementById('headerrow');
+                            if (theHeader.classList.contains('asc')) {
+                                theHeader.classList.add('desc');
+                                theHeader.classList.remove('asc');
+                            } else {
+                                theHeader.classList.add('asc');
+                                theHeader.classList.remove('desc');
+                            }
+                        }
                         // clear the existing sorts
                         var table = th.closest('table');
                         var tableHeaders = table.getElementsByTagName('th');
@@ -704,6 +745,7 @@ function Inspector(controller) {
                             th.classList.remove('sort');
                         });
                         th.classList.add('sort');
+                        updateInspector();
                     }));
                 });
             }
