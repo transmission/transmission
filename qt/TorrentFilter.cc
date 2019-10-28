@@ -7,6 +7,7 @@
  */
 
 #include <algorithm>
+#include <optional>
 
 #include "Filters.h"
 #include "Prefs.h"
@@ -18,44 +19,58 @@
 TorrentFilter::TorrentFilter(Prefs const& prefs) :
     myPrefs(prefs)
 {
-    // listen for changes to the preferences to know when to refilter / resort
-    connect(&myPrefs, SIGNAL(changed(int)), this, SLOT(refreshPref(int)));
+    connect(&myPrefs, &Prefs::changed, this, &TorrentFilter::onPrefChanged);
+    connect(&myRefilterTimer, &QTimer::timeout, this, &TorrentFilter::refilter);
 
     setDynamicSortFilter(true);
 
-    // initialize our state from the current prefs
-    QList<int> initKeys;
-    initKeys << Prefs::SORT_MODE << Prefs::FILTER_MODE << Prefs::FILTER_TRACKERS << Prefs::FILTER_TEXT;
-
-    for (int const key : initKeys)
-    {
-        refreshPref(key);
-    }
+    refilter();
 }
 
 TorrentFilter::~TorrentFilter()
 {
 }
 
-void TorrentFilter::refreshPref(int key)
+/***
+****
+***/
+
+void TorrentFilter::onPrefChanged(int key)
 {
+    // For refiltering nearly immediately. Used to debounce batched prefs changes.
+    static int const fast_msec = 50;
+
+    // For waiting a little longer. Useful when user is typing the filter text.
+    static int const slow_msec = 500;
+
+    std::optional<int> msec;
     switch (key)
     {
     case Prefs::FILTER_TEXT:
+        // special case for isEmpty: user probably hit the 'clear' button
+        msec = myPrefs.getString(key).isEmpty() ? fast_msec : slow_msec;
+        break;
+
     case Prefs::FILTER_MODE:
     case Prefs::FILTER_TRACKERS:
-        invalidateFilter();
-        /* force a re-sort */
-        sort(0, !myPrefs.getBool(Prefs::SORT_REVERSED) ? Qt::AscendingOrder : Qt::DescendingOrder);
-
-    // fall through
-
     case Prefs::SORT_MODE:
     case Prefs::SORT_REVERSED:
-        sort(0, myPrefs.getBool(Prefs::SORT_REVERSED) ? Qt::AscendingOrder : Qt::DescendingOrder);
-        invalidate();
+        msec = fast_msec;
         break;
     }
+
+    // if this pref change affects filtering, ensure that a refilter is queued
+    if (msec && !myRefilterTimer.isActive())
+    {
+        myRefilterTimer.setSingleShot(true);
+        myRefilterTimer.start(*msec);
+    }
+}
+
+void TorrentFilter::refilter()
+{
+    invalidate();
+    sort(0, myPrefs.getBool(Prefs::SORT_REVERSED) ? Qt::AscendingOrder : Qt::DescendingOrder);
 }
 
 /***
