@@ -632,7 +632,7 @@ private:
     bool setDouble(int key, double);
     bool setString(int key, char const*);
     bool setSize(int key, qulonglong);
-    bool setTime(int key, int64_t);
+    bool setTime(int key, time_t);
 
     char const* getMimeTypeString() const;
     void updateMimeIcon();
