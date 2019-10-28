@@ -658,7 +658,7 @@ function Inspector(controller) {
                             upper = peerb;
                             downer = peera;
                         }
-                    
+
                         if (sortIndex === 1) {
                             return downer.rateToPeer - upper.rateToPeer;
                         } else if (sortIndex === 2) {
