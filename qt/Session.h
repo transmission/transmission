@@ -99,6 +99,7 @@ public slots:
     void refreshSessionStats();
     void refreshActiveTorrents();
     void refreshAllTorrents();
+    void bootstrapTorrents();
     void initTorrents(QSet<int> const& ids = QSet<int>());
     void addNewlyCreatedTorrent(QString const& filename, QString const& localPath);
     void addTorrent(AddData const& addme);
@@ -119,6 +120,8 @@ signals:
     void blocklistUpdated(int);
     void torrentsUpdated(tr_variant* torrentList, bool completeList);
     void torrentsRemoved(tr_variant* torrentList);
+    void bootstrapTorrentsDone();
+    void torrentsBootstrapped();
     void dataReadProgress();
     void dataSendProgress();
     void networkResponse(QNetworkReply::NetworkError code, QString const& message);

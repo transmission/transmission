@@ -85,13 +85,7 @@ bool loadTranslation(QTranslator& translator, QString const& name, QLocale const
 } // namespace
 
 Application::Application(int& argc, char** argv) :
-    QApplication(argc, argv),
-    myPrefs(nullptr),
-    mySession(nullptr),
-    myModel(nullptr),
-    myWindow(nullptr),
-    myWatchDir(nullptr),
-    myLastFullUpdateTime(0)
+    QApplication(argc, argv)
 {
     setApplicationName(MY_CONFIG_NAME);
     loadTranslations();
@@ -299,12 +293,7 @@ Application::Application(int& argc, char** argv) :
     connect(mySession, SIGNAL(torrentsRemoved(tr_variant*)), myModel, SLOT(removeTorrents(tr_variant*)));
     // when the session source gets changed, request a full refresh
     connect(mySession, SIGNAL(sourceChanged()), this, SLOT(onSessionSourceChanged()));
-    // when the model sees a torrent for the first time, ask the session for full info on it
-    connect(myModel, SIGNAL(torrentsAdded(QSet<int>)), mySession, SLOT(initTorrents(QSet<int>)));
     connect(myModel, SIGNAL(torrentsAdded(QSet<int>)), this, SLOT(onTorrentsAdded(QSet<int>)));
-
-    mySession->initTorrents();
-    mySession->refreshSessionStats();
 
     // when torrents are added to the watch directory, tell the session
     connect(myWatchDir, SIGNAL(torrentFileAdded(QString)), this, SLOT(addTorrent(QString)));
@@ -320,13 +309,9 @@ Application::Application(int& argc, char** argv) :
 
     connect(myPrefs, SIGNAL(changed(int)), this, SLOT(refreshPref(int const)));
 
-    QTimer* timer = &myModelTimer;
-    connect(timer, SIGNAL(timeout()), this, SLOT(refreshTorrents()));
-    timer->setSingleShot(false);
-    timer->setInterval(MODEL_REFRESH_INTERVAL_MSEC);
-    timer->start();
+    torStateInit();
 
-    timer = &myStatsTimer;
+    auto* timer = &myStatsTimer;
     connect(timer, SIGNAL(timeout()), mySession, SLOT(refreshSessionStats()));
     timer->setSingleShot(false);
     timer->setInterval(STATS_REFRESH_INTERVAL_MSEC);
@@ -410,78 +395,111 @@ void Application::quitLater()
     QTimer::singleShot(0, this, SLOT(quit()));
 }
 
-/* these functions are for popping up desktop notifications */
+namespace
+{
+
+/* If we found this torrent from a torrent-get response's 'added' field,
+   we may not have the tr_info fields yet. If that's the case we'll need
+   to request them... */
+bool haveTorrentInfo(Torrent const& tor)
+{
+    return !tor.name().isEmpty();
+}
+
+}
 
 void Application::onTorrentsAdded(QSet<int> const& torrents)
 {
-    if (!myPrefs->getBool(Prefs::SHOW_NOTIFICATION_ON_ADD))
-    {
-        return;
-    }
+    QSet<int> needInfo;
 
     for (int const id : torrents)
     {
         Torrent* tor = myModel->getTorrentFromId(id);
 
-        if (tor->name().isEmpty()) // wait until the torrent's INFO fields are loaded
-        {
-            connect(tor, SIGNAL(torrentChanged(int)), this, SLOT(onNewTorrentChanged(int)));
-        }
-        else
-        {
-            onNewTorrentChanged(id);
+        popupsInit(*tor);
 
-            if (!tor->isSeed())
-            {
-                connect(tor, SIGNAL(torrentCompleted(int)), this, SLOT(onTorrentCompleted(int)));
-            }
+        if (!haveTorrentInfo(*tor))
+        {
+            needInfo += tor->id();
         }
+    }
+
+    if (!needInfo.empty())
+    {
+        mySession->initTorrents(needInfo);
     }
 }
 
-void Application::onTorrentCompleted(int id)
+/***
+****  These functions are for popping up desktop notifications
+***/
+
+void Application::popupsInit(Torrent& tor)
 {
-    Torrent* tor = myModel->getTorrentFromId(id);
-
-    if (tor != nullptr)
+    if (!haveTorrentInfo(tor))
     {
-        if (myPrefs->getBool(Prefs::SHOW_NOTIFICATION_ON_COMPLETE))
-        {
-            notifyApp(tr("Torrent Completed"), tor->name());
-        }
+        connect(&tor, &Torrent::torrentChanged, this, &Application::popupsOnTorrentChanged);
+    }
+    else
+    {
+        popupsOnTorrentChanged(tor);
+    }
+}
 
-        if (myPrefs->getBool(Prefs::COMPLETE_SOUND_ENABLED))
-        {
+void Application::popupsOnTorrentChanged(Torrent& tor)
+{
+    if (!haveTorrentInfo(tor)) // not ready yet; keep listening
+    {
+        return;
+    }
+
+    popupsShowTorrentAdded(tor);
+    disconnect(&tor, &Torrent::torrentChanged, this, &Application::popupsOnTorrentChanged);
+
+    if (!tor.isSeed())
+    {
+        connect(&tor, &Torrent::torrentCompleted, this, &Application::popupsOnTorrentCompleted);
+    }
+}
+
+void Application::popupsOnTorrentCompleted(Torrent& tor)
+{
+    popupsShowTorrentComplete(tor);
+    disconnect(&tor, &Torrent::torrentCompleted, this, &Application::popupsOnTorrentCompleted);
+}
+
+void Application::popupsShowTorrentAdded(Torrent const& tor) const
+{
+    if (!myPrefs->getBool(Prefs::SHOW_NOTIFICATION_ON_ADD))
+    {
+        // user doesn't want notificatons
+        return;
+    }
+
+    int const age_secs = tor.dateAdded().secsTo(QDateTime::currentDateTime());
+    if (age_secs > 30)
+    {
+        // it may be new to us, but it's not new to the backend
+        return;
+    }
+
+    notifyApp(tr("Torrent Added"), tor.name());
+}
+
+void Application::popupsShowTorrentComplete(Torrent const& tor) const
+{
+    if (myPrefs->getBool(Prefs::SHOW_NOTIFICATION_ON_COMPLETE))
+    {
+        notifyApp(tr("Torrent Completed"), tor.name());
+    }
+
+    if (myPrefs->getBool(Prefs::COMPLETE_SOUND_ENABLED))
+    {
 #if defined(Q_OS_WIN) || defined(Q_OS_MAC)
-            beep();
+        beep();
 #else
-            QProcess::execute(myPrefs->getString(Prefs::COMPLETE_SOUND_COMMAND));
+        QProcess::execute(myPrefs->getString(Prefs::COMPLETE_SOUND_COMMAND));
 #endif
-        }
-
-        disconnect(tor, SIGNAL(torrentCompleted(int)), this, SLOT(onTorrentCompleted(int)));
-    }
-}
-
-void Application::onNewTorrentChanged(int id)
-{
-    Torrent* tor = myModel->getTorrentFromId(id);
-
-    if (tor != nullptr && !tor->name().isEmpty())
-    {
-        int const age_secs = tor->dateAdded().secsTo(QDateTime::currentDateTime());
-
-        if (age_secs < 30)
-        {
-            notifyApp(tr("Torrent Added"), tor->name());
-        }
-
-        disconnect(tor, SIGNAL(torrentChanged(int)), this, SLOT(onNewTorrentChanged(int)));
-
-        if (!tor->isSeed())
-        {
-            connect(tor, SIGNAL(torrentCompleted(int)), this, SLOT(onTorrentCompleted(int)));
-        }
     }
 }
 
@@ -565,25 +583,61 @@ void Application::maybeUpdateBlocklist()
 
 void Application::onSessionSourceChanged()
 {
-    mySession->initTorrents();
     mySession->refreshSessionStats();
     mySession->refreshSessionInfo();
 }
 
-void Application::refreshTorrents()
+/***
+****
+***/
+
+/*
+ * Whenever the session's source changes, bootstrap our model by calling
+ * Session::bootstrapTorrents() to get tr_info and tr_stat for everyone.
+ * After that, keep tr_stat up-to-date with a periodic timer.
+ */
+
+void Application::torStateInit()
 {
-    // usually we just poll the torrents that have shown recent activity,
-    // but we also periodically ask for updates on the others to ensure
-    // nothing's falling through the cracks.
+    // init (but don't start) the timer
+    QTimer* timer = &myTorStateTimer;
+    connect(timer, &QTimer::timeout, this, &Application::torStateOnTimer);
+    timer->setSingleShot(false);
+    timer->setInterval(MODEL_REFRESH_INTERVAL_MSEC);
+
+    // listen for the source to change
+    connect(mySession, &Session::sourceChanged, this, &Application::torStateOnSessionChanged);
+}
+
+void Application::torStateOnSessionChanged()
+{
+    // bootstrap our torrent model from the new source
+    myTorStateTimer.stop(); // it's redundant to poll while bootstrapping
+    connect(mySession, &Session::torrentsBootstrapped, this, &Application::torStateOnBootstrapped);
+    mySession->bootstrapTorrents();
+}
+
+void Application::torStateOnBootstrapped()
+{
+    // bootstrapping is done -- start the periodic upkeep timer
+    disconnect(mySession, &Session::torrentsBootstrapped, this, &Application::torStateOnBootstrapped);
+    myTorStateTimer.start();
+    myTorStateLastFullUpdate = time(nullptr);
+}
+
+void Application::torStateOnTimer()
+{
+    // Usually we only poll the active torrents, but let's poll everyone
+    // once in awhile to ensure nothing slips through the cracks
     time_t const now = time(nullptr);
 
-    if (myLastFullUpdateTime + 60 >= now)
+    if (myTorStateLastFullUpdate + 60 >= now)
     {
         mySession->refreshActiveTorrents();
     }
     else
     {
-        myLastFullUpdateTime = now;
+        myTorStateLastFullUpdate = now;
         mySession->refreshAllTorrents();
     }
 }

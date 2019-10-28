@@ -64,7 +64,7 @@ private:
     QSet<int> getIds() const;
 
 private slots:
-    void onTorrentChanged(int propertyId);
+    void onTorrentChanged(Torrent&);
 
 private:
     Prefs const& myPrefs;

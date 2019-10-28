@@ -990,12 +990,12 @@ void Torrent::update(tr_variant* d)
 
     if (changed)
     {
-        emit torrentChanged(id());
+        emit torrentChanged(*this);
     }
 
     if (!was_seed && isSeed() && old_verified_size > 0)
     {
-        emit torrentCompleted(id());
+        emit torrentCompleted(*this);
     }
 }
 

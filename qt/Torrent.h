@@ -596,8 +596,8 @@ public:
     static KeyList const& getExtraStatKeys();
 
 signals:
-    void torrentChanged(int id);
-    void torrentCompleted(int id);
+    void torrentChanged(Torrent&);
+    void torrentCompleted(Torrent&);
 
 private:
     enum Group

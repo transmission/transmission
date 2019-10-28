@@ -153,9 +153,9 @@ Torrent const* TorrentModel::getTorrentFromId(int id) const
 ****
 ***/
 
-void TorrentModel::onTorrentChanged(int torrentId)
+void TorrentModel::onTorrentChanged(Torrent& tor)
 {
-    torrents_t::iterator const torrentIt = qBinaryFind(myTorrents.begin(), myTorrents.end(), torrentId, TorrentIdLessThan());
+    torrents_t::iterator const torrentIt = qBinaryFind(myTorrents.begin(), myTorrents.end(), tor.id(), TorrentIdLessThan());
 
     if (torrentIt == myTorrents.end())
     {
@@ -225,7 +225,7 @@ void TorrentModel::updateTorrents(tr_variant* torrents, bool isCompleteList)
                     }
 
                     newTorrents.append(tor);
-                    connect(tor, SIGNAL(torrentChanged(int)), this, SLOT(onTorrentChanged(int)));
+                    connect(tor, &Torrent::torrentChanged, this, &TorrentModel::onTorrentChanged);
                 }
                 else
                 {
@@ -233,6 +233,7 @@ void TorrentModel::updateTorrents(tr_variant* torrents, bool isCompleteList)
 
                     if (tor->isMagnet() && tor->hasMetadata())
                     {
+                        std::cerr << "was a magnet, now is not" << tor->id() << " " << qPrintable(tor->name()) << std::endl;
                         addIds.insert(tor->id());
                         tor->setMagnet(false);
                     }

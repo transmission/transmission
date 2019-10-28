@@ -579,8 +579,9 @@ void Session::refreshTorrents(QSet<int> const& ids, KeyList const& keys)
         });
 
     bool const allTorrents = ids.empty();
+    bool const bootstrap = allTorrents && (keys == getStatKeys() + getInfoKeys());
 
-    q->add([this, allTorrents](RpcResponse const& r)
+    q->add([this, allTorrents, bootstrap](RpcResponse const& r)
         {
             tr_variant* torrents;
 
@@ -592,6 +593,11 @@ void Session::refreshTorrents(QSet<int> const& ids, KeyList const& keys)
             if (tr_variantDictFindList(r.args.get(), TR_KEY_removed, &torrents))
             {
                 emit torrentsRemoved(torrents);
+            }
+
+            if (bootstrap)
+            {
+                emit torrentsBootstrapped();
             }
         });
 
@@ -669,6 +675,13 @@ void Session::refreshAllTorrents()
     refreshTorrents(allIds, getStatKeys());
 }
 
+// get info and stats for all torrents
+void Session::bootstrapTorrents()
+{
+    initTorrents({});
+}
+
+// get info and stats for the specified torrents
 void Session::initTorrents(QSet<int> const& ids)
 {
     refreshTorrents(ids, getStatKeys() + getInfoKeys());

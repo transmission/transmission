@@ -18,6 +18,7 @@
 class AddData;
 class Prefs;
 class Session;
+class Torrent;
 class TorrentModel;
 class MainWindow;
 class WatchDir;
@@ -44,25 +45,35 @@ private:
     void loadTranslations();
     void quitLater();
 
+    void popupsInit(Torrent&);
+    void popupsShowTorrentAdded(Torrent const&) const;
+    void popupsShowTorrentComplete(Torrent const&) const;
+
+    void torStateInit();
+    QTimer myTorStateTimer;
+    time_t myTorStateLastFullUpdate = 0;
+
 private slots:
     void consentGiven(int result);
     void onSessionSourceChanged();
     void refreshPref(int key);
-    void refreshTorrents();
     void onTorrentsAdded(QSet<int> const& torrents);
-    void onTorrentCompleted(int);
-    void onNewTorrentChanged(int);
+
+    void popupsOnTorrentChanged(Torrent&);
+    void popupsOnTorrentCompleted(Torrent&);
+
+    void torStateOnSessionChanged();
+    void torStateOnBootstrapped();
+    void torStateOnTimer();
 
 private:
-    Prefs* myPrefs;
-    Session* mySession;
-    TorrentModel* myModel;
-    MainWindow* myWindow;
-    WatchDir* myWatchDir;
-    QTimer myModelTimer;
+    Prefs* myPrefs = nullptr;
+    Session* mySession = nullptr;
+    TorrentModel* myModel = nullptr;
+    MainWindow* myWindow = nullptr;
+    WatchDir* myWatchDir = nullptr;
     QTimer myStatsTimer;
     QTimer mySessionTimer;
-    time_t myLastFullUpdateTime;
     QTranslator myQtTranslator;
     QTranslator myAppTranslator;
     FaviconCache myFavicons;
