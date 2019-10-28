@@ -661,10 +661,8 @@ tr.inspector_peer_entry div.encrypted-peer-cell {
 tr.inspector_peer_entry.odd {
   background-color: #EEEEEE; }
 
-th.upCol,
-th.downCol,
-th.percentCol {
-    cursor: pointer;
+#headerrow th {
+  cursor: pointer;
 }
 
 tr.asc th.sort:after {
