@@ -208,14 +208,11 @@ bool Torrent::setDouble(int i, double value)
     return changed;
 }
 
-bool Torrent::setDateTime(int i, QDateTime const& value)
+bool Torrent::setTime(int i, time_t value)
 {
     bool changed = false;
 
-    assert(0 <= i && i < PROPERTY_COUNT);
-    assert(myProperties[i].type == QVariant::DateTime);
-
-    if (myValues[i].isNull() || myValues[i].toDateTime() != value)
+    if (getTime(i) != value)
     {
         myValues[i].setValue(value);
         changed = true;
@@ -273,12 +270,12 @@ int Torrent::getInt(int i) const
     return myValues[i].toInt();
 }
 
-QDateTime Torrent::getDateTime(int i) const
+time_t Torrent::getTime(int i) const
 {
     assert(0 <= i && i < PROPERTY_COUNT);
     assert(myProperties[i].type == QVariant::DateTime);
 
-    return myValues[i].toDateTime();
+    return time_t(myValues[i].toLongLong());
 }
 
 bool Torrent::getBool(int i) const
@@ -617,7 +614,7 @@ void Torrent::update(tr_variant* d)
 
                 if (tr_variantGetInt(child, &val) && val)
                 {
-                    changed |= setDateTime(property_index, QDateTime::fromTime_t(val));
+                    changed |= setTime(property_index, time_t(val));
                 }
 
                 break;

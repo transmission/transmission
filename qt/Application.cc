@@ -469,7 +469,7 @@ void Application::onNewTorrentChanged(int id)
 
     if (tor != nullptr && !tor->name().isEmpty())
     {
-        int const age_secs = tor->dateAdded().secsTo(QDateTime::currentDateTime());
+        int const age_secs = int(std::difftime(time(nullptr), tor->dateAdded()));
 
         if (age_secs < 30)
         {

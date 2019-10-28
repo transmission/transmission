@@ -812,18 +812,19 @@ void MainWindow::refreshActionSensitivitySoon()
 
 void MainWindow::refreshActionSensitivity()
 {
-    int selected(0);
     int paused(0);
     int queued(0);
+    int selected(0);
+    int selectedAndCanAnnounce(0);
     int selectedAndPaused(0);
     int selectedAndQueued(0);
     int selectedWithMetadata(0);
-    int canAnnounce(0);
     QAbstractItemModel const* model(ui.listView->model());
     QItemSelectionModel const* selectionModel(ui.listView->selectionModel());
     int const rowCount(model->rowCount());
 
     // count how many torrents are selected, paused, etc
+    auto const now = time(nullptr);
     for (int row = 0; row < rowCount; ++row)
     {
         QModelIndex const modelIndex(model->index(row, 0));
@@ -836,11 +837,6 @@ void MainWindow::refreshActionSensitivity()
             bool const isPaused(tor->isPaused());
             bool const isQueued(tor->isQueued());
 
-            if (isSelected)
-            {
-                ++selected;
-            }
-
             if (isQueued)
             {
                 ++queued;
@@ -851,24 +847,29 @@ void MainWindow::refreshActionSensitivity()
                 ++paused;
             }
 
-            if (isSelected && isPaused)
+            if (isSelected)
             {
-                ++selectedAndPaused;
-            }
+                ++selected;
 
-            if (isSelected && isQueued)
-            {
-                ++selectedAndQueued;
-            }
+                if (isPaused)
+                {
+                    ++selectedAndPaused;
+                }
 
-            if (isSelected && tor->hasMetadata())
-            {
-                ++selectedWithMetadata;
-            }
+                if (isQueued)
+                {
+                    ++selectedAndQueued;
+                }
 
-            if (tor->canManualAnnounce())
-            {
-                ++canAnnounce;
+                if (tor->hasMetadata())
+                {
+                    ++selectedWithMetadata;
+                }
+
+                if (tor->canManualAnnounceAt(now))
+                {
+                    ++selectedAndCanAnnounce;
+                }
             }
         }
     }
@@ -893,7 +894,7 @@ void MainWindow::refreshActionSensitivity()
     ui.action_Start->setEnabled(selectedAndPaused > 0);
     ui.action_StartNow->setEnabled(selectedAndPaused + selectedAndQueued > 0);
     ui.action_Pause->setEnabled(selectedAndPaused < selected);
-    ui.action_Announce->setEnabled(selected > 0 && (canAnnounce == selected));
+    ui.action_Announce->setEnabled(selected > 0 && (selectedAndCanAnnounce == selected));
 
     ui.action_QueueMoveTop->setEnabled(haveSelection);
     ui.action_QueueMoveUp->setEnabled(haveSelection);
