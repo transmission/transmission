@@ -648,38 +648,31 @@ function Inspector(controller) {
                 peers = tor.getPeers();
                 if (peers) {
                     peers.sort(function (peera, peerb) {
+                        var upper;
+                        var downer;
+
                         if (sortDirectionAsc) {
-                            if (sortIndex === 1) {
-                                return peerb.rateToPeer - peera.rateToPeer;
-                            } else if (sortIndex === 2) {
-                                return peerb.rateToClient - peera.rateToClient;
-                            } else if (sortIndex === 3) {
-                                return peerb.progress - peera.progress;
-                            } else if (sortIndex === 4) {
-                                return peerb.flagStr.localeCompare(peera.flagStr);
-                            } else if (sortIndex === 5) {
-                                const num1 = Number(peera.address.split(".").map((num) => (`000${num}`).slice(-3) ).join(""));
-                                const num2 = Number(peerb.address.split(".").map((num) => (`000${num}`).slice(-3) ).join(""));
-                                return num2 - num1;
-                            } else if (sortIndex === 6) {
-                                return sanitizeText(peerb.clientName).localeCompare(sanitizeText(peera.clientName));
-                            } 
+                            upper = peera;
+                            downer = peerb;
                         } else {
-                            if (sortIndex === 1) {
-                                return peera.rateToPeer - peerb.rateToPeer;
-                            } else if (sortIndex === 2) {
-                                return peera.rateToClient - peerb.rateToClient;
-                            } else if (sortIndex === 3) {
-                                return peera.progress - peerb.progress;
-                            } else if (sortIndex === 4) {
-                                return peera.flagStr.localeCompare(peerb.flagStr);
-                            } else if (sortIndex === 5) {
-                                const num1 = Number(peera.address.split(".").map((num) => (`000${num}`).slice(-3) ).join(""));
-                                const num2 = Number(peerb.address.split(".").map((num) => (`000${num}`).slice(-3) ).join(""));
-                                return num1 - num2;
-                            } else if (sortIndex === 6) {
-                                return sanitizeText(peera.clientName).localeCompare(sanitizeText(peerb.clientName));
-                            } 
+                            upper = peerb;
+                            downer = peera;
+                        }
+                    
+                        if (sortIndex === 1) {
+                            return downer.rateToPeer - upper.rateToPeer;
+                        } else if (sortIndex === 2) {
+                            return downer.rateToClient - upper.rateToClient;
+                        } else if (sortIndex === 3) {
+                            return downer.progress - upper.progress;
+                        } else if (sortIndex === 4) {
+                            return downer.flagStr.localeCompare(upper.flagStr);
+                        } else if (sortIndex === 5) {
+                            const num1 = Number(upper.address.split(".").map((num) => (`000${num}`).slice(-3) ).join(""));
+                            const num2 = Number(downer.address.split(".").map((num) => (`000${num}`).slice(-3) ).join(""));
+                            return num2 - num1;
+                        } else if (sortIndex === 6) {
+                            return sanitizeText(downer.clientName).localeCompare(sanitizeText(upper.clientName));
                         }
                     });
                 }
