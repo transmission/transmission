@@ -403,8 +403,21 @@ QSize TorrentDelegate::sizeHint(QStyleOptionViewItem const& option, Torrent cons
 
 QSize TorrentDelegate::sizeHint(QStyleOptionViewItem const& option, QModelIndex const& index) const
 {
-    Torrent const* tor(index.data(TorrentModel::TorrentRole).value<Torrent const*>());
-    return sizeHint(option, *tor);
+    // if the font changed, invalidate the height cache
+    if (myHeightFont != option.font)
+    {
+        myHeightFont = option.font;
+        myHeightHint.reset();
+    }
+
+    // ensure the height is cached
+    if (!myHeightHint)
+    {
+        auto const* tor = index.data(TorrentModel::TorrentRole).value<Torrent const*>();
+        myHeightHint = sizeHint(option, *tor).height();
+    }
+
+    return QSize(option.rect.width(), *myHeightHint);
 }
 
 void TorrentDelegate::paint(QPainter* painter, QStyleOptionViewItem const& option, QModelIndex const& index) const
