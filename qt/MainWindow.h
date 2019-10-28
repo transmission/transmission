@@ -91,7 +91,7 @@ protected:
 
 private:
     QIcon getStockIcon(QString const&, int fallback = -1);
-    QIcon getStockIcon(QString const&, int fallback, QStringList const& emblemNames);
+    QIcon addEmblem(QIcon icon, QStringList const& emblemNames);
 
     QSet<int> getSelectedTorrents(bool withMetadataOnly = false) const;
     void updateNetworkIcon();
@@ -148,6 +148,12 @@ private:
     Session& mySession;
     Prefs& myPrefs;
     TorrentModel& myModel;
+
+    QPixmap myPixmapNetworkError;
+    QPixmap myPixmapNetworkIdle;
+    QPixmap myPixmapNetworkReceive;
+    QPixmap myPixmapNetworkTransmit;
+    QPixmap myPixmapNetworkTransmitReceive;
 
     Ui_MainWindow ui;
 
