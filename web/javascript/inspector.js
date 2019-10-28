@@ -668,9 +668,11 @@ function Inspector(controller) {
                         } else if (sortIndex === 4) {
                             return downer.flagStr.localeCompare(upper.flagStr);
                         } else if (sortIndex === 5) {
-                            const num1 = Number(upper.address.split(".").map((num) => (`000${num}`).slice(-3) ).join(""));
-                            const num2 = Number(downer.address.split(".").map((num) => (`000${num}`).slice(-3) ).join(""));
-                            return num2 - num1;
+                            var upperIPArray = upper.address.split(".");
+                            var upperNumber = (upperIPArray[0] << 24) | (upperIPArray[1] << 16) | (upperIPArray[2] << 8) | upperIPArray[3];
+                            var downerIPArray = downer.address.split(".");
+                            var downerNumber = (downerIPArray[0] << 24) | (downerIPArray[1] << 16) | (downerIPArray[2] << 8) | downerIPArray[3];
+                            return downerNumber - upperNumber;
                         } else if (sortIndex === 6) {
                             return sanitizeText(downer.clientName).localeCompare(sanitizeText(upper.clientName));
                         }
