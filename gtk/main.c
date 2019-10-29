@@ -982,11 +982,11 @@ static void on_app_exit(gpointer vdata)
 
     w = gtk_label_new(NULL);
     gtk_label_set_markup(GTK_LABEL(w), _("<b>Closing Connections</b>"));
-    gtk_misc_set_alignment(GTK_MISC(w), 0.0, 0.5);
+    g_object_set(w, "halign", GTK_ALIGN_START, "valign", GTK_ALIGN_CENTER, NULL);
     gtk_grid_attach(GTK_GRID(p), w, 1, 0, 1, 1);
 
     w = gtk_label_new(_("Sending upload/download totals to tracker…"));
-    gtk_misc_set_alignment(GTK_MISC(w), 0.0, 0.5);
+    g_object_set(w, "halign", GTK_ALIGN_START, "valign", GTK_ALIGN_CENTER, NULL);
     gtk_grid_attach(GTK_GRID(p), w, 1, 1, 1, 1);
 
     b = gtk_alignment_new(0.0, 1.0, 0.01, 0.01);

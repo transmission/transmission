@@ -707,8 +707,8 @@ GtkWidget* gtr_window_new(GtkApplication* app, GtkUIManager* ui_mgr, TrCore* cor
         pango_layout_get_pixel_size(pango_layout, &w, &h);
         gtk_widget_set_size_request(ul_lb, w, h);
         gtk_widget_set_size_request(dl_lb, w, h);
-        gtk_misc_set_alignment(GTK_MISC(ul_lb), 1.0, 0.5);
-        gtk_misc_set_alignment(GTK_MISC(dl_lb), 1.0, 0.5);
+        g_object_set(ul_lb, "halign", GTK_ALIGN_END, "valign", GTK_ALIGN_CENTER, NULL);
+        g_object_set(dl_lb, "halign", GTK_ALIGN_END, "valign", GTK_ALIGN_CENTER, NULL);
         g_object_unref(G_OBJECT(pango_layout));
     }
 

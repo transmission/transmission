@@ -1226,7 +1226,7 @@ static GtkWidget* info_page_new(struct DetailsImpl* di)
     gtk_frame_set_shadow_type(GTK_FRAME(fr), GTK_SHADOW_IN);
     gtk_container_add(GTK_CONTAINER(fr), sw);
     w = hig_workarea_add_tall_row(t, &row, _("Comment:"), fr, NULL);
-    gtk_misc_set_alignment(GTK_MISC(w), 0.0F, 0.0F);
+    g_object_set(w, "halign", GTK_ALIGN_START, "valign", GTK_ALIGN_START, NULL);
 
     hig_workarea_add_section_divider(t, &row);
     return t;
@@ -2614,7 +2614,7 @@ static void on_edit_trackers(GtkButton* button, gpointer data)
         gtk_label_set_markup(GTK_LABEL(l), _("To add a backup URL, add it on the line after the primary URL.\n"
             "To add another primary URL, add it after a blank line."));
         gtk_label_set_justify(GTK_LABEL(l), GTK_JUSTIFY_LEFT);
-        gtk_misc_set_alignment(GTK_MISC(l), 0.0, 0.5);
+        g_object_set(l, "halign", GTK_ALIGN_START, "valign", GTK_ALIGN_CENTER, NULL);
         hig_workarea_add_wide_control(t, &row, l);
 
         w = gtk_text_view_new();

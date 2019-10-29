@@ -280,7 +280,7 @@ static GtkWidget* downloadingPage(GObject* core, struct prefs_dialog_data* data)
     hig_workarea_add_row(t, &row, _("Save to _Location:"), w, NULL);
 
     l = data->freespace_label = gtr_freespace_label_new(TR_CORE(core), NULL);
-    gtk_misc_set_alignment(GTK_MISC(l), 1.0F, 0.5F);
+    g_object_set(l, "halign", GTK_ALIGN_END, "valign", GTK_ALIGN_CENTER, NULL);
     hig_workarea_add_wide_control(t, &row, l);
 
     hig_workarea_add_section_divider(t, &row);
@@ -526,7 +526,7 @@ static GtkWidget* privacyPage(GObject* core)
     target_cb(b, e);
 
     w = gtk_label_new("");
-    gtk_misc_set_alignment(GTK_MISC(w), 0.0F, 0.5F);
+    g_object_set(w, "halign", GTK_ALIGN_START, "valign", GTK_ALIGN_CENTER, NULL);
     updateBlocklistText(w, TR_CORE(core));
     data->label = w;
     h = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, GUI_PAD_BIG);
@@ -834,7 +834,7 @@ static GtkWidget* remotePage(GObject* core)
 
         s = _("Addresses:");
         w = hig_workarea_add_row(t, &row, s, w, NULL);
-        gtk_misc_set_alignment(GTK_MISC(w), 0.0F, 0.0F);
+        g_object_set(w, "halign", GTK_ALIGN_START, "valign", GTK_ALIGN_START, NULL);
         gtk_misc_set_padding(GTK_MISC(w), 0, GUI_PAD);
         page->whitelist_widgets = g_slist_prepend(page->whitelist_widgets, w);
 
@@ -994,7 +994,7 @@ static GtkWidget* speedPage(GObject* core)
     h = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, GUI_PAD);
     g_snprintf(buf, sizeof(buf), "<b>%s</b>", _("Alternative Speed Limits"));
     w = gtk_label_new(buf);
-    gtk_misc_set_alignment(GTK_MISC(w), 0.0F, 0.5F);
+    g_object_set(w, "halign", GTK_ALIGN_START, "valign", GTK_ALIGN_CENTER, NULL);
     gtk_label_set_use_markup(GTK_LABEL(w), TRUE);
     gtk_box_pack_start(GTK_BOX(h), w, FALSE, FALSE, 0);
     w = gtk_image_new_from_stock("alt-speed-on", -1);
@@ -1005,7 +1005,7 @@ static GtkWidget* speedPage(GObject* core)
     g_snprintf(buf, sizeof(buf), "<small>%s</small>", s);
     w = gtk_label_new(buf);
     gtk_label_set_use_markup(GTK_LABEL(w), TRUE);
-    gtk_misc_set_alignment(GTK_MISC(w), 0.0F, 0.5F);
+    g_object_set(w, "halign", GTK_ALIGN_START, "valign", GTK_ALIGN_CENTER, NULL);
     hig_workarea_add_wide_control(t, &row, w);
 
     g_snprintf(buf, sizeof(buf), _("U_pload (%s):"), _(speed_K_str));
@@ -1137,7 +1137,7 @@ static GtkWidget* networkPage(GObject* core)
 
     h = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, GUI_PAD_BIG);
     l = data->portLabel = gtk_label_new(_("Status unknown"));
-    gtk_misc_set_alignment(GTK_MISC(l), 0.0F, 0.5F);
+    g_object_set(l, "halign", GTK_ALIGN_START, "valign", GTK_ALIGN_CENTER, NULL);
     gtk_box_pack_start(GTK_BOX(h), l, TRUE, TRUE, 0);
     w = data->portButton = gtk_button_new_with_mnemonic(_("Te_st Port"));
     gtk_box_pack_end(GTK_BOX(h), w, FALSE, FALSE, 0);
