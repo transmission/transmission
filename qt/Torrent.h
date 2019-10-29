@@ -183,6 +183,7 @@ public:
         PEERS,
         BANDWIDTH_PRIORITY,
         QUEUE_POSITION,
+        EDIT_DATE,
         //
         PROPERTY_COUNT
     };
@@ -596,8 +597,15 @@ public:
     static KeyList const& getExtraStatKeys();
 
 signals:
-    void torrentChanged(int id);
+    // The torrent was previously downloading and is now complete.
     void torrentCompleted(int id);
+
+    // The torrent's tr_info has changed on the backend
+    // and we must resync our local copies
+    void torrentEdited(Torrent&);
+
+    // Any field in this torrent object changed
+    void torrentChanged(int id);
 
 private:
     enum Group

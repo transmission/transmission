@@ -18,6 +18,7 @@
 class AddData;
 class Prefs;
 class Session;
+class Torrent;
 class TorrentModel;
 class MainWindow;
 class WatchDir;
@@ -40,18 +41,20 @@ public slots:
     void addTorrent(AddData const&);
 
 private:
+    void initTorrentNotifications(Torrent*);
     void maybeUpdateBlocklist();
     void loadTranslations();
     void quitLater();
 
 private slots:
     void consentGiven(int result);
+    void onNewTorrentChanged(int);
     void onSessionSourceChanged();
+    void onTorrentCompleted(int);
+    void onTorrentEdited(Torrent&);
+    void onTorrentsAdded(QSet<int> const& torrents);
     void refreshPref(int key);
     void refreshTorrents();
-    void onTorrentsAdded(QSet<int> const& torrents);
-    void onTorrentCompleted(int);
-    void onNewTorrentChanged(int);
 
 private:
     Prefs* myPrefs;

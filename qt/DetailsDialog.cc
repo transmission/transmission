@@ -264,7 +264,8 @@ void DetailsDialog::setIds(QSet<int> const& ids)
 
         if (tor != nullptr)
         {
-            disconnect(tor, SIGNAL(torrentChanged(int)), this, SLOT(onTorrentChanged()));
+            disconnect(tor, &Torrent::torrentChanged, this, &DetailsDialog::onTorrentChanged);
+            disconnect(tor, &Torrent::torrentEdited, this, &DetailsDialog::onTorrentEdited);
         }
     }
 
@@ -279,7 +280,8 @@ void DetailsDialog::setIds(QSet<int> const& ids)
 
         if (tor != nullptr)
         {
-            connect(tor, SIGNAL(torrentChanged(int)), this, SLOT(onTorrentChanged()));
+            connect(tor, &Torrent::torrentChanged, this, &DetailsDialog::onTorrentChanged);
+            connect(tor, &Torrent::torrentEdited, this, &DetailsDialog::onTorrentEdited);
         }
     }
 
@@ -351,6 +353,12 @@ void DetailsDialog::getNewData()
 
         mySession.refreshExtraStats(myIds);
     }
+}
+
+void DetailsDialog::onTorrentEdited(Torrent& tor)
+{
+#warning FIXME: depends on https://github.com/transmission/transmission/pull/1030
+    // refreshDetailInfo({ tor.id() });
 }
 
 void DetailsDialog::onTorrentChanged()

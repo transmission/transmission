@@ -410,31 +410,48 @@ void Application::quitLater()
     QTimer::singleShot(0, this, SLOT(quit()));
 }
 
-/* these functions are for popping up desktop notifications */
-
 void Application::onTorrentsAdded(QSet<int> const& torrents)
+{
+    for (int const id : torrents)
+    {
+        Torrent* tor = myModel->getTorrentFromId(id);
+        if (tor != nullptr)
+        {
+            connect(tor, &Torrent::torrentEdited, this, &Application::onTorrentEdited);
+
+            initTorrentNotifications(tor);
+        }
+    }
+}
+
+void Application::onTorrentEdited(Torrent& tor)
+{
+    // the backend's tr_info has changed, so reload those fields
+    mySession->initTorrents({ tor.id() });
+}
+
+/***
+**** These functions are for popping up desktop notifications
+***/
+
+void Application::initTorrentNotifications(Torrent* tor)
 {
     if (!myPrefs->getBool(Prefs::SHOW_NOTIFICATION_ON_ADD))
     {
         return;
     }
 
-    for (int const id : torrents)
+    if (tor->name().isEmpty()) // wait until the torrent's INFO fields are loaded
     {
-        Torrent* tor = myModel->getTorrentFromId(id);
+       connect(tor, &Torrent::torrentChanged, this, &Application::onNewTorrentChanged);
+    }
+    else
+    {
+        onNewTorrentChanged(tor->id());
 
-        if (tor->name().isEmpty()) // wait until the torrent's INFO fields are loaded
+        if (!tor->isSeed())
         {
-            connect(tor, SIGNAL(torrentChanged(int)), this, SLOT(onNewTorrentChanged(int)));
-        }
-        else
-        {
-            onNewTorrentChanged(id);
-
-            if (!tor->isSeed())
-            {
-                connect(tor, SIGNAL(torrentCompleted(int)), this, SLOT(onTorrentCompleted(int)));
-            }
+            connect(tor, &Torrent::torrentCompleted, this, &Application::onTorrentCompleted);
         }
     }
 }
@@ -459,7 +476,7 @@ void Application::onTorrentCompleted(int id)
 #endif
         }
 
-        disconnect(tor, SIGNAL(torrentCompleted(int)), this, SLOT(onTorrentCompleted(int)));
+        disconnect(tor, &Torrent::torrentCompleted, this, &Application::onTorrentCompleted);
     }
 }
 

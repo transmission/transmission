@@ -185,11 +185,12 @@ struct tr_torrent
     uint64_t etaULSpeedCalculatedAt;
     unsigned int etaULSpeed_Bps;
 
-    time_t addedDate;
     time_t activityDate;
-    time_t doneDate;
-    time_t startDate;
+    time_t addedDate;
     time_t anyDate;
+    time_t doneDate;
+    time_t editDate;
+    time_t startDate;
 
     int secondsDownloading;
     int secondsSeeding;
@@ -341,6 +342,14 @@ static inline void tr_torrentSetDirty(tr_torrent* tor)
     TR_ASSERT(tr_isTorrent(tor));
 
     tor->isDirty = true;
+}
+
+/* note that the torrent's tr_info just changed */
+static inline void tr_torrentMarkEdited(tr_torrent* tor)
+{
+    TR_ASSERT(tr_isTorrent(tor));
+
+    tor->editDate = tr_time();
 }
 
 uint32_t tr_getBlockSize(uint32_t pieceSize);

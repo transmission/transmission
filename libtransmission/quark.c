@@ -105,6 +105,7 @@ static struct tr_key_struct const my_static[] =
     Q("dropped"),
     Q("dropped6"),
     Q("e"),
+    Q("editDate"),
     Q("encoding"),
     Q("encryption"),
     Q("error"),

@@ -110,6 +110,7 @@ Torrent::Property Torrent::myProperties[] =
     { PEERS, TR_KEY_peers, CustomVariantType::PeerList, STAT_EXTRA },
     { BANDWIDTH_PRIORITY, TR_KEY_bandwidthPriority, QVariant::Int, STAT_EXTRA },
     { QUEUE_POSITION, TR_KEY_queuePosition, QVariant::Int, STAT },
+    { EDIT_DATE, TR_KEY_editDate, QVariant::DateTime, STAT },
 };
 
 Torrent::KeyList Torrent::buildKeyList(Group group)
@@ -614,10 +615,15 @@ void Torrent::update(tr_variant* d)
         case QVariant::DateTime:
             {
                 int64_t val;
-
-                if (tr_variantGetInt(child, &val) && val)
+                if (tr_variantGetInt(child, &val) && val
+                    && setDateTime(property_index, QDateTime::fromTime_t(val)))
                 {
-                    changed |= setDateTime(property_index, QDateTime::fromTime_t(val));
+                    changed = true;
+
+                    if (key == TR_KEY_editDate)
+                    {
+                        emit torrentEdited(*this);
+                    }
                 }
 
                 break;
