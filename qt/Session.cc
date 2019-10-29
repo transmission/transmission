@@ -567,7 +567,8 @@ void Session::torrentRenamePath(QSet<int> const& ids, QString const& oldpath, QS
 void Session::refreshTorrents(QSet<int> const& ids, KeyList const& keys)
 {
     tr_variant args;
-    tr_variantInitDict(&args, 2);
+    tr_variantInitDict(&args, 3);
+    tr_variantDictAddStr(&args, TR_KEY_format, "table");
     addList(tr_variantDictAddList(&args, TR_KEY_fields, 0), keys);
     addOptionalIds(&args, ids);
 

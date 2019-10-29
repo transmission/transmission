@@ -579,7 +579,7 @@ public:
 
     void notifyComplete() const;
 
-    void update(tr_variant* dict);
+    void update(tr_quark const* keys, tr_variant** values, size_t n);
 
     void setMagnet(bool magnet)
     {

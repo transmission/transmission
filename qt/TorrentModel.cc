@@ -189,54 +189,114 @@ void TorrentModel::updateTorrents(tr_variant* torrents, bool isCompleteList)
     torrents_t newTorrents;
     QSet<int> oldIds;
     QSet<int> addIds;
-    QSet<int> newIds;
+    QSet<int> curIds;
 
     if (isCompleteList)
     {
         oldIds = getIds();
     }
 
-    if (tr_variantIsList(torrents))
+    tr_variant* const firstChild = tr_variantListSize(torrents) > 0 ?
+        tr_variantListChild(torrents, 0) :
+        nullptr;
+
+    // Build an array of keys
+    QVector<tr_quark> keys;
+    bool table = false;
+    if (tr_variantIsList(firstChild))
     {
-        size_t i(0);
-        tr_variant* child;
-
-        while ((child = tr_variantListChild(torrents, i++)) != nullptr)
+        // In 'table' format, the first entry in 'torrents' is an array of keys.
+        // All the other entries are an array of the values for one torrent.
+        table = true;
+        char const* str;
+        size_t len;
+        size_t i = 0;
+        while (tr_variantGetStr(tr_variantListChild(firstChild, i++), &str, &len))
         {
-            int64_t id;
+            keys.push_back(tr_quark_new(str, len));
+        }
+    }
+    else if (tr_variantIsDict(firstChild))
+    {
+        // In 'object' format, every entry is an object with the same set of properties
+        table = false;
+        size_t i = 0;
+        tr_quark key;
+        tr_variant* value;
+        while (firstChild && tr_variantDictChild(firstChild, i++, &key, &value))
+        {
+            keys.push_back(key);
+        }
+    }
 
-            if (tr_variantDictFindInt(child, TR_KEY_id, &id))
+    // Find the position of TR_KEY_id so we can do torrent lookup
+    auto const id_it = std::find(std::begin(keys), std::end(keys), TR_KEY_id);
+    if (id_it == std::end(keys)) // no ids provided; we can't proceed
+    {
+        return;
+    }
+
+    auto const id_pos = std::distance(std::begin(keys), id_it);
+
+    // Loop through the torrent records...
+    QVector<tr_variant*> values;
+    values.reserve(keys.size());
+    size_t tor_index = table ? 1 : 0;
+    tr_variant* v;
+    while ((v = tr_variantListChild(torrents, tor_index++)))
+    {
+        // Build an array of values
+        values.clear();
+        if (table)
+        {
+            // In table mode, v is already a list of values
+            size_t i = 0;
+            tr_variant* val;
+            while ((val = tr_variantListChild(v, i++)))
             {
-                if (isCompleteList)
-                {
-                    newIds.insert(id);
-                }
+                values.push_back(val);
+            }
+        }
+        else
+        {
+            // In object mode, v is an object of torrent property key/vals
+            size_t i = 0;
+            tr_quark key;
+            tr_variant* value;
+            while (tr_variantDictChild(v, i++, &key, &value))
+            {
+                values.push_back(value);
+            }
+        }
 
-                Torrent* tor = getTorrentFromId(id);
+        // Find the torrent id
+        int64_t id;
+        if (!tr_variantGetInt(values[id_pos], &id))
+        {
+            continue;
+        }
 
-                if (tor == nullptr)
-                {
-                    tor = new Torrent(myPrefs, id);
-                    tor->update(child);
+        if (isCompleteList)
+        {
+            curIds.insert(id);
+        }
 
-                    if (!tor->hasMetadata())
-                    {
-                        tor->setMagnet(true);
-                    }
-
-                    newTorrents.append(tor);
-                    connect(tor, SIGNAL(torrentChanged(int)), this, SLOT(onTorrentChanged(int)));
-                }
-                else
-                {
-                    tor->update(child);
-
-                    if (tor->isMagnet() && tor->hasMetadata())
-                    {
-                        addIds.insert(tor->id());
-                        tor->setMagnet(false);
-                    }
-                }
+        // create or update the torrent
+        Torrent* tor = getTorrentFromId(id);
+        if (tor == nullptr)
+        {
+            tor = new Torrent(myPrefs, id);
+            tor->update(keys.data(), values.data(), keys.size());
+            newTorrents.append(tor);
+            connect(tor, SIGNAL(torrentChanged(int)), this, SLOT(onTorrentChanged(int)));
+        }
+        else
+        {
+            auto const hadMetadata = tor->hasMetadata();
+            tor->update(keys.data(), values.data(), keys.size());
+            if (!hadMetadata && tor->hasMetadata())
+            {
+                addIds.insert(id);
             }
         }
     }
@@ -253,8 +313,7 @@ void TorrentModel::updateTorrents(tr_variant* torrents, bool isCompleteList)
 
     if (isCompleteList)
     {
-        QSet<int> removedIds(oldIds);
-        removedIds -= newIds;
+        QSet<int> removedIds = oldIds - curIds;
 
         for (int const id : removedIds)
         {
