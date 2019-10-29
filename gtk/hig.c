@@ -22,7 +22,7 @@ GtkWidget* hig_workarea_create(void)
 
 void hig_workarea_add_section_divider(GtkWidget* t, guint* row)
 {
-    GtkWidget* w = gtk_alignment_new(0.0F, 0.0F, 0.0F, 0.0F);
+    GtkWidget* w = gtk_fixed_new();
 
     gtk_widget_set_size_request(w, 0U, 6U);
     gtk_grid_attach(GTK_GRID(t), w, 0, *row, 2, 1);

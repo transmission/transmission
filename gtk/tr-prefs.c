@@ -847,11 +847,9 @@ static GtkWidget* remotePage(GObject* core)
         w = gtk_button_new_from_stock(GTK_STOCK_ADD);
         page->whitelist_widgets = g_slist_prepend(page->whitelist_widgets, w);
         g_signal_connect(w, "clicked", G_CALLBACK(onAddWhitelistClicked), page);
+        g_object_set(h, "halign", GTK_ALIGN_END, "valign", GTK_ALIGN_CENTER, NULL);
         gtk_box_pack_start(GTK_BOX(h), w, TRUE, TRUE, 0);
-        w = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-        gtk_box_pack_start(GTK_BOX(w), gtk_alignment_new(0, 0, 0, 0), TRUE, TRUE, 0);
-        gtk_box_pack_start(GTK_BOX(w), h, FALSE, FALSE, 0);
-        hig_workarea_add_wide_control(t, &row, w);
+        hig_workarea_add_wide_control(t, &row, h);
     }
 
     refreshRPCSensitivity(page);

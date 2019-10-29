@@ -541,7 +541,6 @@ GtkWidget* gtr_window_new(GtkApplication* app, GtkUIManager* ui_mgr, TrCore* cor
     char const* pch;
     char const* style;
     PrivateData* p;
-    GtkWidget* sibling = NULL;
     GtkWidget* ul_lb;
     GtkWidget* dl_lb;
     GtkWidget* mainmenu;
@@ -553,11 +552,11 @@ GtkWidget* gtr_window_new(GtkApplication* app, GtkUIManager* ui_mgr, TrCore* cor
     GtkWidget* w;
     GtkWidget* self;
     GtkWidget* menu;
-    GtkWidget* grid_w;
+    GtkWidget* h;
+    GtkBox* h_box;
     GtkWindow* win;
     GtkCssProvider* css_provider;
     GSList* l;
-    GtkGrid* grid;
 
     p = g_new0(PrivateData, 1);
 
@@ -624,19 +623,18 @@ GtkWidget* gtr_window_new(GtkApplication* app, GtkUIManager* ui_mgr, TrCore* cor
     *** Statusbar
     **/
 
-    grid_w = status = p->status = gtk_grid_new();
-    grid = GTK_GRID(grid_w);
-    gtk_container_set_border_width(GTK_CONTAINER(grid), GUI_PAD_SMALL);
+    h = status = p->status = gtk_hbox_new(FALSE, GUI_PAD);
+    h_box = GTK_BOX(h);
+    gtk_container_set_border_width(GTK_CONTAINER(h), GUI_PAD_SMALL);
 
     /* gear */
     w = gtk_button_new();
     gtk_container_add(GTK_CONTAINER(w), gtk_image_new_from_stock("utilities", -1));
     gtk_widget_set_tooltip_text(w, _("Options"));
-    gtk_grid_attach_next_to(grid, w, sibling, GTK_POS_RIGHT, 1, 1);
     gtk_button_set_relief(GTK_BUTTON(w), GTK_RELIEF_NONE);
     p->options_menu = createOptionsMenu(p);
     g_signal_connect(w, "clicked", G_CALLBACK(onOptionsClicked), p);
-    sibling = w;
+    gtk_box_pack_start(h_box, w, false, false, 0);
 
     /* turtle */
     p->alt_speed_image = gtk_image_new();
@@ -644,46 +642,40 @@ GtkWidget* gtr_window_new(GtkApplication* app, GtkUIManager* ui_mgr, TrCore* cor
     gtk_button_set_image(GTK_BUTTON(w), p->alt_speed_image);
     gtk_button_set_relief(GTK_BUTTON(w), GTK_RELIEF_NONE);
     g_signal_connect(w, "toggled", G_CALLBACK(alt_speed_toggled_cb), p);
-    gtk_grid_attach_next_to(grid, w, sibling, GTK_POS_RIGHT, 1, 1);
-    sibling = w;
+    gtk_box_pack_start(h_box, w, false, false, 0);
 
-    /* spacer */
-    w = gtk_alignment_new(0.0F, 0.0F, 0.0F, 0.0F);
-    gtk_widget_set_hexpand(w, TRUE);
-    gtk_grid_attach_next_to(grid, w, sibling, GTK_POS_RIGHT, 1, 1);
-    sibling = w;
-
-    /* download */
-    w = dl_lb = gtk_label_new(NULL);
-    p->dl_lb = GTK_LABEL(w);
-    gtk_label_set_single_line_mode(p->dl_lb, TRUE);
-    gtk_grid_attach_next_to(grid, w, sibling, GTK_POS_RIGHT, 1, 1);
-    sibling = w;
-
-    /* upload */
-    w = ul_lb = gtk_label_new(NULL);
-    g_object_set(G_OBJECT(w), "margin-left", GUI_PAD, NULL);
-    p->ul_lb = GTK_LABEL(w);
-    gtk_label_set_single_line_mode(p->ul_lb, TRUE);
-    gtk_grid_attach_next_to(grid, w, sibling, GTK_POS_RIGHT, 1, 1);
-    sibling = w;
+    /* ratio selector */
+    w = gtk_button_new();
+    gtk_widget_set_tooltip_text(w, _("Statistics"));
+    gtk_container_add(GTK_CONTAINER(w), gtk_image_new_from_stock("ratio", -1));
+    gtk_button_set_relief(GTK_BUTTON(w), GTK_RELIEF_NONE);
+    g_signal_connect(w, "clicked", G_CALLBACK(onYinYangReleased), p);
+    gtk_box_pack_end(h_box, w, false, false, 0);
 
     /* ratio */
     w = gtk_label_new(NULL);
     g_object_set(G_OBJECT(w), "margin-left", GUI_PAD_BIG, NULL);
     p->stats_lb = GTK_LABEL(w);
     gtk_label_set_single_line_mode(p->stats_lb, TRUE);
-    gtk_grid_attach_next_to(grid, w, sibling, GTK_POS_RIGHT, 1, 1);
-    sibling = w;
-    w = gtk_button_new();
-    gtk_widget_set_tooltip_text(w, _("Statistics"));
-    gtk_container_add(GTK_CONTAINER(w), gtk_image_new_from_stock("ratio", -1));
-    gtk_button_set_relief(GTK_BUTTON(w), GTK_RELIEF_NONE);
-    g_signal_connect(w, "clicked", G_CALLBACK(onYinYangReleased), p);
-    gtk_grid_attach_next_to(grid, w, sibling, GTK_POS_RIGHT, 1, 1);
-    sibling = w;
+    gtk_box_pack_end(h_box, w, false, false, 0);
 
-    /* workarea */
+    /* upload */
+    w = ul_lb = gtk_label_new(NULL);
+    g_object_set(G_OBJECT(w), "margin-left", GUI_PAD, NULL);
+    p->ul_lb = GTK_LABEL(w);
+    gtk_label_set_single_line_mode(p->ul_lb, TRUE);
+    gtk_box_pack_end(h_box, w, false, false, 0);
+
+    /* download */
+    w = dl_lb = gtk_label_new(NULL);
+    p->dl_lb = GTK_LABEL(w);
+    gtk_label_set_single_line_mode(p->dl_lb, TRUE);
+    gtk_box_pack_end(h_box, w, false, false, 0);
+
+    /**
+    *** Workarea
+    **/
+
     p->view = makeview(p);
     w = list = p->scroll = gtk_scrolled_window_new(NULL, NULL);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(w), GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
