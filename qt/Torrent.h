@@ -8,13 +8,14 @@
 
 #pragma once
 
-#include <QObject>
-#include <QIcon>
-#include <QMetaType>
 #include <QDateTime>
+#include <QIcon>
+#include <QList>
+#include <QMetaType>
+#include <QObject>
+#include <QSet>
 #include <QString>
 #include <QStringList>
-#include <QList>
 #include <QVariant>
 
 #include <libtransmission/transmission.h>
@@ -186,8 +187,6 @@ public:
         //
         PROPERTY_COUNT
     };
-
-    typedef QList<tr_quark> KeyList;
 
 public:
     Torrent(Prefs const&, int id);
@@ -591,29 +590,23 @@ public:
         return getIcon(MIME_ICON);
     }
 
-    static KeyList const& getInfoKeys();
-    static KeyList const& getStatKeys();
-    static KeyList const& getExtraStatKeys();
+    using KeyList = QSet<tr_quark>;
+    static KeyList const allMainKeys;
+    static KeyList const mainInfoKeys;
+    static KeyList const mainStatKeys;
+    static KeyList const detailInfoKeys;
+    static KeyList const detailStatKeys;
 
 signals:
     void torrentChanged(int id);
     void torrentCompleted(int id);
 
 private:
-    enum Group
-    {
-        INFO, // info fields that only need to be loaded once
-        STAT, // commonly-used stats that should be refreshed often
-        STAT_EXTRA, // rarely used; only refresh if details dialog is open
-        DERIVED // doesn't come from RPC
-    };
-
     struct Property
     {
         int id;
         tr_quark key;
         int type;
-        int group;
     };
 
 private:
@@ -636,8 +629,6 @@ private:
 
     char const* getMimeTypeString() const;
     void updateMimeIcon();
-
-    static KeyList buildKeyList(Group group);
 
 private:
     Prefs const& myPrefs;

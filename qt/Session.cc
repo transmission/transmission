@@ -43,21 +43,6 @@ namespace
 
 typedef Torrent::KeyList KeyList;
 
-KeyList const& getInfoKeys()
-{
-    return Torrent::getInfoKeys();
-}
-
-KeyList const& getStatKeys()
-{
-    return Torrent::getStatKeys();
-}
-
-KeyList const& getExtraStatKeys()
-{
-    return Torrent::getExtraStatKeys();
-}
-
 void addList(tr_variant* list, KeyList const& keys)
 {
     tr_variantListReserve(list, keys.size());
@@ -557,7 +542,7 @@ void Session::torrentRenamePath(QSet<int> const& ids, QString const& oldpath, QS
 
             if (tr_variantDictFindInt(r.args.get(), TR_KEY_id, &id) && id != 0)
             {
-                refreshTorrents(QSet<int>() << id, KeyList() << TR_KEY_fileStats << TR_KEY_files << TR_KEY_id << TR_KEY_name);
+                refreshTorrents({ int(id) }, { TR_KEY_fileStats, TR_KEY_files, TR_KEY_id, TR_KEY_name });
             }
         });
 
@@ -598,9 +583,14 @@ void Session::refreshTorrents(QSet<int> const& ids, KeyList const& keys)
     q->run();
 }
 
-void Session::refreshExtraStats(QSet<int> const& ids)
+void Session::refreshDetailInfo(QSet<int> const& ids)
 {
-    refreshTorrents(ids, getStatKeys() + getExtraStatKeys());
+    refreshTorrents(ids, Torrent::detailInfoKeys);
+}
+
+void Session::refreshDetailStats(QSet<int> const& ids)
+{
+    refreshTorrents(ids, Torrent::detailStatKeys);
 }
 
 void Session::sendTorrentRequest(char const* request, QSet<int> const& ids)
@@ -618,7 +608,7 @@ void Session::sendTorrentRequest(char const* request, QSet<int> const& ids)
 
     q->add([this, ids]()
         {
-            refreshTorrents(ids, getStatKeys());
+            refreshTorrents(ids, Torrent::mainStatKeys);
         });
 
     q->run();
@@ -661,17 +651,17 @@ void Session::queueMoveBottom(QSet<int> const& ids)
 
 void Session::refreshActiveTorrents()
 {
-    refreshTorrents(recentlyActiveIds, getStatKeys());
+    refreshTorrents(recentlyActiveIds, Torrent::mainStatKeys);
 }
 
 void Session::refreshAllTorrents()
 {
-    refreshTorrents(allIds, getStatKeys());
+    refreshTorrents(allIds, Torrent::mainStatKeys);
 }
 
 void Session::initTorrents(QSet<int> const& ids)
 {
-    refreshTorrents(ids, getStatKeys() + getInfoKeys());
+    refreshTorrents(ids, Torrent::allMainKeys);
 }
 
 void Session::refreshSessionStats()

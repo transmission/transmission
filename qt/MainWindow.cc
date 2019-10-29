@@ -614,52 +614,59 @@ static void openSelect(QString const& path)
 
 #endif
 
+QString chooseTorrentOpenPath(Torrent const& tor)
+{
+    auto const parentName = tor.getPath();
+    auto const parentDir = QDir(parentName);
+    if (!parentDir.exists())
+    {
+        return QString();
+    }
+
+    auto const& torrentName = tor.name();
+    if (!torrentName.isEmpty())
+    {
+        auto candidate = QFileInfo(parentDir, torrentName);
+        if (candidate.exists())
+        {
+            return candidate.absoluteFilePath();
+        }
+    }
+
+    return parentName;
+}
+
 } // namespace
 
 void MainWindow::openFolder()
 {
-    QSet<int> const selectedTorrents = getSelectedTorrents();
-
-    if (selectedTorrents.size() != 1)
+    auto const ids = getSelectedTorrents();
+    if (ids.size() != 1)
     {
         return;
     }
 
-    int const torrentId(*selectedTorrents.begin());
-    Torrent const* tor(myModel.getTorrentFromId(torrentId));
-
+    auto* const tor = myModel.getTorrentFromId(*ids.begin());
     if (tor == nullptr)
     {
         return;
     }
 
-    QString path(tor->getPath());
-    FileList const& files = tor->files();
-
-    if (files.isEmpty())
+    auto const path = chooseTorrentOpenPath(*tor);
+    if (path.isEmpty())
     {
         return;
-    }
-
-    QString const firstfile = files.at(0).filename;
-    int slashIndex = firstfile.indexOf(QLatin1Char('/'));
-
-    if (slashIndex > -1)
-    {
-        path = path + QLatin1Char('/') + firstfile.left(slashIndex);
     }
 
 #ifdef HAVE_OPEN_SELECT
 
-    else
-    {
-        openSelect(path + QLatin1Char('/') + firstfile);
-        return;
-    }
+    openSelect(path);
 
-#endif
+#else
 
     QDesktopServices::openUrl(QUrl::fromLocalFile(path));
+
+#endif
 }
 
 void MainWindow::copyMagnetLinkToClipboard()
