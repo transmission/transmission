@@ -972,7 +972,7 @@ static void on_app_exit(gpointer vdata)
     p = g_object_new(GTK_TYPE_GRID, "column-spacing", GUI_PAD_BIG, "halign", GTK_ALIGN_CENTER, "valign", GTK_ALIGN_CENTER, NULL);
     gtk_container_add(GTK_CONTAINER(c), p);
 
-    w = gtk_image_new_from_stock(GTK_STOCK_NETWORK, GTK_ICON_SIZE_DIALOG);
+    w = gtk_image_new_from_icon_name(GTK_STOCK_NETWORK, GTK_ICON_SIZE_DIALOG);
     gtk_grid_attach(GTK_GRID(p), w, 0, 0, 1, 2);
 
     w = gtk_label_new(NULL);
