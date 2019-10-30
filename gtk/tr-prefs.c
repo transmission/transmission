@@ -834,8 +834,7 @@ static GtkWidget* remotePage(GObject* core)
 
         s = _("Addresses:");
         w = hig_workarea_add_row(t, &row, s, w, NULL);
-        g_object_set(w, "halign", GTK_ALIGN_START, "valign", GTK_ALIGN_START, NULL);
-        gtk_misc_set_padding(GTK_MISC(w), 0, GUI_PAD);
+        g_object_set(w, "halign", GTK_ALIGN_START, "valign", GTK_ALIGN_START, "margin-top", GUI_PAD, "margin-bottom", GUI_PAD, NULL);
         page->whitelist_widgets = g_slist_prepend(page->whitelist_widgets, w);
 
         h = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, GUI_PAD);
