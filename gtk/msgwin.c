@@ -489,7 +489,7 @@ GtkWidget* gtr_message_log_window_new(GtkWindow* parent, TrCore* core)
     gtk_toolbar_insert(GTK_TOOLBAR(toolbar), item, -1);
 
     w = gtk_label_new(_("Level"));
-    gtk_misc_set_padding(GTK_MISC(w), GUI_PAD, 0);
+    g_object_set(w, "margin", GUI_PAD, NULL);
     item = gtk_tool_item_new();
     gtk_container_add(GTK_CONTAINER(item), w);
     gtk_toolbar_insert(GTK_TOOLBAR(toolbar), item, -1);

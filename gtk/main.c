@@ -939,7 +939,6 @@ static void exit_now_cb(GtkWidget* w UNUSED, gpointer data UNUSED)
 static void on_app_exit(gpointer vdata)
 {
     GtkWidget* p;
-    GtkWidget* b;
     GtkWidget* w;
     GtkWidget* c;
     struct cbdata* cbdata = vdata;

@@ -250,7 +250,7 @@ static void syncAltSpeedButton(PrivateData* p)
 
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(w), b);
     gtk_image_set_from_stock(GTK_IMAGE(p->alt_speed_image), stock, -1);
-    gtk_button_set_alignment(GTK_BUTTON(w), 0.5, 0.5);
+    g_object_set(w, "halign", GTK_ALIGN_CENTER, "valign", GTK_ALIGN_CENTER, NULL);
     gtk_widget_set_tooltip_text(w, str);
 
     g_free(str);
