@@ -309,7 +309,7 @@ static void getStatusString(GString* gstr, tr_torrent const* tor, tr_stat const*
 ****
 ***/
 
-struct TorrentCellRendererPrivate
+typedef struct TorrentCellRendererPrivate
 {
     tr_torrent* tor;
     GtkCellRenderer* text_renderer;
@@ -329,7 +329,8 @@ struct TorrentCellRendererPrivate
     double download_speed_KBps;
 
     gboolean compact;
-};
+}
+TorrentCellRendererPrivate;
 
 /***
 ****
@@ -852,7 +853,7 @@ static void torrent_cell_renderer_get_property(GObject* object, guint property_i
     }
 }
 
-G_DEFINE_TYPE(TorrentCellRenderer, torrent_cell_renderer, GTK_TYPE_CELL_RENDERER)
+G_DEFINE_TYPE_WITH_CODE(TorrentCellRenderer, torrent_cell_renderer, GTK_TYPE_CELL_RENDERER, G_ADD_PRIVATE(TorrentCellRenderer))
 
 static void torrent_cell_renderer_dispose(GObject* o)
 {
@@ -875,8 +876,6 @@ static void torrent_cell_renderer_class_init(TorrentCellRendererClass* klass)
 {
     GObjectClass* gobject_class = G_OBJECT_CLASS(klass);
     GtkCellRendererClass* cell_class = GTK_CELL_RENDERER_CLASS(klass);
-
-    g_type_class_add_private(klass, sizeof(struct TorrentCellRendererPrivate));
 
     cell_class->render = torrent_cell_renderer_render;
     cell_class->get_size = torrent_cell_renderer_get_size;

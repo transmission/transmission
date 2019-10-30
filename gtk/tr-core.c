@@ -61,7 +61,7 @@ static guint signals[LAST_SIGNAL] = { 0 };
 
 static void core_maybe_inhibit_hibernation(TrCore* core);
 
-struct TrCorePrivate
+typedef struct TrCorePrivate
 {
     GFileMonitor* monitor;
     gulong monitor_tag;
@@ -79,14 +79,15 @@ struct TrCorePrivate
     GtkTreeModel* sorted_model;
     tr_session* session;
     GStringChunk* string_chunk;
-};
+}
+TrCorePrivate;
 
 static int core_is_disposed(TrCore const* core)
 {
     return core == NULL || core->priv->sorted_model == NULL;
 }
 
-G_DEFINE_TYPE(TrCore, tr_core, G_TYPE_OBJECT)
+G_DEFINE_TYPE_WITH_CODE(TrCore, tr_core, G_TYPE_OBJECT, G_ADD_PRIVATE(TrCore));
 
 static void core_dispose(GObject* o)
 {
@@ -115,8 +116,6 @@ static void tr_core_class_init(TrCoreClass* core_class)
 {
     GObjectClass* gobject_class;
     GType core_type = G_TYPE_FROM_CLASS(core_class);
-
-    g_type_class_add_private(core_class, sizeof(struct TrCorePrivate));
 
     gobject_class = G_OBJECT_CLASS(core_class);
     gobject_class->dispose = core_dispose;
