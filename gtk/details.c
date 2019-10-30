@@ -2713,7 +2713,6 @@ static void on_tracker_list_add_button_clicked(GtkButton* button UNUSED, gpointe
         g_string_append_printf(gstr, _("%s - Add Tracker"), tr_torrentName(tor));
         w = gtk_dialog_new_with_buttons(gstr->str, GTK_WINDOW(di->dialog), GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_CANCEL,
             GTK_RESPONSE_CANCEL, GTK_STOCK_ADD, GTK_RESPONSE_ACCEPT, NULL);
-        gtk_dialog_set_alternative_button_order(GTK_DIALOG(w), GTK_RESPONSE_ACCEPT, GTK_RESPONSE_CANCEL, -1);
         g_signal_connect(w, "response", G_CALLBACK(on_add_tracker_response), gdi);
 
         row = 0;

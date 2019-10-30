@@ -209,7 +209,6 @@ static void onSaveRequest(GtkWidget* w, gpointer data)
     GtkWidget* d = gtk_file_chooser_dialog_new(_("Save Log"), window, GTK_FILE_CHOOSER_ACTION_SAVE, GTK_STOCK_CANCEL,
         GTK_RESPONSE_CANCEL, GTK_STOCK_SAVE, GTK_RESPONSE_ACCEPT, NULL);
 
-    gtk_dialog_set_alternative_button_order(GTK_DIALOG(d), GTK_RESPONSE_ACCEPT, GTK_RESPONSE_CANCEL, -1);
     g_signal_connect(d, "response", G_CALLBACK(onSaveDialogResponse), data);
     gtk_widget_show(d);
 }
