@@ -79,7 +79,7 @@ static void on_popup_menu(GtkWidget* self UNUSED, GdkEventButton* event)
 {
     GtkWidget* menu = gtr_action_get_widget("/main-window-popup");
 
-#if GTK_CHECK_VERSION(3,22,0)
+#if GTK_CHECK_VERSION(3, 22, 0)
     gtk_menu_popup_at_pointer(GTK_MENU(menu), (GdkEvent*)event);
 #else
     gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL, event != NULL ? event->button : 0, event != NULL ? event->time : 0);
@@ -208,7 +208,7 @@ static void onYinYangClicked(GtkWidget* w UNUSED, gpointer vprivate)
 {
     PrivateData* p = vprivate;
 
-#if GTK_CHECK_VERSION(3,22,0)
+#if GTK_CHECK_VERSION(3, 22, 0)
     gtk_menu_popup_at_widget(GTK_MENU(p->status_menu), GTK_WIDGET(w), GDK_GRAVITY_NORTH_EAST, GDK_GRAVITY_SOUTH_EAST, NULL);
 #else
     gtk_menu_popup(GTK_MENU(p->status_menu), NULL, NULL, NULL, NULL, 0, gtk_get_current_event_time());
@@ -536,8 +536,9 @@ static void onOptionsClicked(GtkButton* button, gpointer vp)
     b = gtr_pref_flag_get(TR_KEY_ratio_limit_enabled);
     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(b ? p->ratio_on_item : p->ratio_off_item), TRUE);
 
-#if GTK_CHECK_VERSION(3,22,0)
-    gtk_menu_popup_at_widget(GTK_MENU(p->options_menu), GTK_WIDGET(button), GDK_GRAVITY_NORTH_WEST, GDK_GRAVITY_SOUTH_WEST, NULL);
+#if GTK_CHECK_VERSION(3, 22, 0)
+    gtk_menu_popup_at_widget(GTK_MENU(p->options_menu), GTK_WIDGET(button), GDK_GRAVITY_NORTH_WEST, GDK_GRAVITY_SOUTH_WEST,
+        NULL);
 #else
     gtk_menu_popup(GTK_MENU(p->options_menu), NULL, NULL, NULL, NULL, 0, gtk_get_current_event_time());
 #endif
@@ -688,7 +689,6 @@ GtkWidget* gtr_window_new(GtkApplication* app, GtkUIManager* ui_mgr, TrCore* cor
     gtk_button_set_relief(GTK_BUTTON(w), GTK_RELIEF_NONE);
     g_signal_connect(w, "clicked", G_CALLBACK(onYinYangClicked), p);
     gtk_container_add(GTK_CONTAINER(grid), w);
-
 
     /**
     *** Workarea

@@ -968,7 +968,9 @@ static void on_app_exit(gpointer vdata)
     c = GTK_WIDGET(cbdata->wind);
     gtk_container_remove(GTK_CONTAINER(c), gtk_bin_get_child(GTK_BIN(c)));
 
-    p = g_object_new(GTK_TYPE_GRID, "column-spacing", GUI_PAD_BIG, "halign", GTK_ALIGN_CENTER, "valign", GTK_ALIGN_CENTER, NULL);
+    p =
+        g_object_new(GTK_TYPE_GRID, "column-spacing", GUI_PAD_BIG, "halign", GTK_ALIGN_CENTER, "valign", GTK_ALIGN_CENTER,
+        NULL);
     gtk_container_add(GTK_CONTAINER(c), p);
 
     w = gtk_image_new_from_icon_name(GTK_STOCK_NETWORK, GTK_ICON_SIZE_DIALOG);

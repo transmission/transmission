@@ -959,7 +959,7 @@ GtkWidget* gtr_filter_bar_new(tr_session* session, GtkTreeModel* tmodel, GtkTree
     gtk_label_set_mnemonic_widget(GTK_LABEL(l), w);
     gtk_box_pack_start(h_box, l, FALSE, FALSE, 0);
     gtk_box_pack_start(h_box, w, TRUE, TRUE, 0);
-#if GTK_CHECK_VERSION(3,12,0)
+#if GTK_CHECK_VERSION(3, 12, 0)
     gtk_widget_set_margin_end(w, GUI_PAD);
 #else
     gtk_widget_set_margin_right(w, GUI_PAD);
@@ -968,7 +968,7 @@ GtkWidget* gtr_filter_bar_new(tr_session* session, GtkTreeModel* tmodel, GtkTree
     /* add the tracker combobox */
     w = tracker;
     gtk_box_pack_start(h_box, w, TRUE, TRUE, 0);
-#if GTK_CHECK_VERSION(3,12,0)
+#if GTK_CHECK_VERSION(3, 12, 0)
     gtk_widget_set_margin_end(w, GUI_PAD);
 #else
     gtk_widget_set_margin_right(w, GUI_PAD);

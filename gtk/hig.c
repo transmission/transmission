@@ -51,7 +51,7 @@ void hig_workarea_add_section_title(GtkWidget* t, guint* row, char const* sectio
 void hig_workarea_add_wide_control(GtkWidget* t, guint* row, GtkWidget* w)
 {
     gtk_widget_set_hexpand(w, TRUE);
-#if GTK_CHECK_VERSION(3,12,0)
+#if GTK_CHECK_VERSION(3, 12, 0)
     gtk_widget_set_margin_start(w, 18);
 #else
     gtk_widget_set_margin_left(w, 18);
@@ -78,7 +78,7 @@ GtkWidget* hig_workarea_add_wide_checkbutton(GtkWidget* t, guint* row, char cons
 
 void hig_workarea_add_label_w(GtkWidget* t, guint row, GtkWidget* w)
 {
-#if GTK_CHECK_VERSION(3,12,0)
+#if GTK_CHECK_VERSION(3, 12, 0)
     gtk_widget_set_margin_start(w, 18);
 #else
     gtk_widget_set_margin_left(w, 18);
