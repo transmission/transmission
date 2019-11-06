@@ -968,7 +968,7 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     TR_ASSERT(tor->downloadedCur == 0);
     TR_ASSERT(tor->uploadedCur == 0);
 
-    tr_torrentSetAddedDate(tor, tr_time()); /* this is a default value to be overwritten by the resume file */
+    tr_torrentSetDateAdded(tor, tr_time()); /* this is a default value to be overwritten by the resume file */
 
     torrentInitFromInfo(tor);
 
@@ -2905,7 +2905,14 @@ bool tr_torrentSetAnnounceList(tr_torrent* tor, tr_tracker_info const* trackers_
 ***
 **/
 
-void tr_torrentSetAddedDate(tr_torrent* tor, time_t t)
+#define BACK_COMPAT_FUNC(oldname, newname) \
+    void oldname(tr_torrent * tor, time_t t) { newname(tor, t); }
+BACK_COMPAT_FUNC(tr_torrentSetAddedDate, tr_torrentSetDateAdded)
+BACK_COMPAT_FUNC(tr_torrentSetActivityDate, tr_torrentSetDateActive)
+BACK_COMPAT_FUNC(tr_torrentSetDoneDate, tr_torrentSetDateDone)
+#undef BACK_COMPAT_FUNC
+
+void tr_torrentSetDateAdded(tr_torrent* tor, time_t t)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
@@ -2913,7 +2920,7 @@ void tr_torrentSetAddedDate(tr_torrent* tor, time_t t)
     tor->anyDate = MAX(tor->anyDate, tor->addedDate);
 }
 
-void tr_torrentSetActivityDate(tr_torrent* tor, time_t t)
+void tr_torrentSetDateActive(tr_torrent* tor, time_t t)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
@@ -2921,7 +2928,7 @@ void tr_torrentSetActivityDate(tr_torrent* tor, time_t t)
     tor->anyDate = MAX(tor->anyDate, tor->activityDate);
 }
 
-void tr_torrentSetDoneDate(tr_torrent* tor, time_t t)
+void tr_torrentSetDateDone(tr_torrent* tor, time_t t)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
