@@ -425,6 +425,8 @@ static int test_truncd(void)
     return 0;
 }
 
+static char* test_strdup_printf_valist(char const* fmt, ...) TR_GNUC_PRINTF(1, 2);
+
 static char* test_strdup_printf_valist(char const* fmt, ...)
 {
     va_list args;
