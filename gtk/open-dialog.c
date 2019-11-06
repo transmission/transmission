@@ -84,7 +84,7 @@ static void save_recent_destination(TrCore* core, char const* dir)
     gtr_pref_save(gtr_core_session(core));
 
     /* cleanup */
-    g_slist_foreach(list, (GFunc)g_free, NULL);
+    g_slist_foreach(list, (GFunc)(GCallback)g_free, NULL);
     g_slist_free(list);
 }
 
@@ -439,7 +439,7 @@ static void onOpenDialogResponse(GtkDialog* dialog, int response, gpointer core)
         GSList* files = gtk_file_chooser_get_files(chooser);
 
         gtr_core_add_files(core, files, do_start, do_prompt, do_notify);
-        g_slist_foreach(files, (GFunc)g_object_unref, NULL);
+        g_slist_foreach(files, (GFunc)(GCallback)g_object_unref, NULL);
         g_slist_free(files);
     }
 

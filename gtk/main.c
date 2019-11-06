@@ -533,7 +533,7 @@ static void on_startup(GApplication* application, gpointer user_data)
     win = GTK_WINDOW(gtr_window_new(GTK_APPLICATION(application), ui_manager, cbdata->core));
     g_signal_connect(win, "size-allocate", G_CALLBACK(on_main_window_size_allocated), cbdata);
     g_application_hold(application);
-    g_object_weak_ref(G_OBJECT(win), (GWeakNotify)g_application_release, application);
+    g_object_weak_ref(G_OBJECT(win), (GWeakNotify)(GCallback)g_application_release, application);
     app_setup(win, cbdata);
     tr_sessionSetRPCCallback(session, on_rpc_changed, cbdata);
 
@@ -848,7 +848,7 @@ static void on_drag_data_received(GtkWidget* widget UNUSED, GdkDragContext* drag
     open_files(files, gdata);
 
     /* cleanup */
-    g_slist_foreach(files, (GFunc)g_object_unref, NULL);
+    g_slist_foreach(files, (GFunc)(GCallback)g_object_unref, NULL);
     g_slist_free(files);
     g_strfreev(uris);
 
@@ -885,7 +885,7 @@ static gboolean on_session_closed(gpointer gdata)
     struct cbdata* cbdata = gdata;
 
     tmp = g_slist_copy(cbdata->details);
-    g_slist_foreach(tmp, (GFunc)gtk_widget_destroy, NULL);
+    g_slist_foreach(tmp, (GFunc)(GCallback)gtk_widget_destroy, NULL);
     g_slist_free(tmp);
 
     if (cbdata->prefs != NULL)
@@ -905,9 +905,9 @@ static gboolean on_session_closed(gpointer gdata)
         g_object_unref(cbdata->icon);
     }
 
-    g_slist_foreach(cbdata->error_list, (GFunc)g_free, NULL);
+    g_slist_foreach(cbdata->error_list, (GFunc)(GCallback)g_free, NULL);
     g_slist_free(cbdata->error_list);
-    g_slist_foreach(cbdata->duplicates_list, (GFunc)g_free, NULL);
+    g_slist_foreach(cbdata->duplicates_list, (GFunc)(GCallback)g_free, NULL);
     g_slist_free(cbdata->duplicates_list);
 
     return G_SOURCE_REMOVE;
@@ -1026,7 +1026,7 @@ static void show_torrent_errors(GtkWindow* window, char const* primary, GSList**
     gtk_widget_show(w);
     g_string_free(s, TRUE);
 
-    g_slist_foreach(*files, (GFunc)g_free, NULL);
+    g_slist_foreach(*files, (GFunc)(GCallback)g_free, NULL);
     g_slist_free(*files);
     *files = NULL;
 }
@@ -1483,7 +1483,7 @@ static tr_torrent* get_first_selected_torrent(struct cbdata* data)
         }
     }
 
-    g_list_foreach(l, (GFunc)gtk_tree_path_free, NULL);
+    g_list_foreach(l, (GFunc)(GCallback)gtk_tree_path_free, NULL);
     g_list_free(l);
     return tor;
 }
