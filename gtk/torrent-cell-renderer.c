@@ -903,7 +903,11 @@ static void torrent_cell_renderer_init(TorrentCellRenderer* self)
 {
     struct TorrentCellRendererPrivate* p;
 
+#if GLIB_CHECK_VERSION(2,58,0)
+    p = self->priv= torrent_cell_renderer_get_instance_private(self);
+#else
     p = self->priv = G_TYPE_INSTANCE_GET_PRIVATE(self, TORRENT_CELL_RENDERER_TYPE, struct TorrentCellRendererPrivate);
+#endif
 
     p->tor = NULL;
     p->gstr1 = g_string_new(NULL);

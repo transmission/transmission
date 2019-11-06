@@ -167,7 +167,11 @@ static void tr_core_init(TrCore* core)
         G_TYPE_INT /* MC_ACTIVE_PEER_COUNT */
     };
 
+#if GLIB_CHECK_VERSION(2,58,0)
+    p = core->priv= tr_core_get_instance_private(core);    
+#else
     p = core->priv = G_TYPE_INSTANCE_GET_PRIVATE(core, TR_CORE_TYPE, struct TrCorePrivate);
+#endif
 
     /* create the model used to store torrent data */
     g_assert(G_N_ELEMENTS(types) == MC_ROW_COUNT);
