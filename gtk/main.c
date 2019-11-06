@@ -938,9 +938,7 @@ static void exit_now_cb(GtkWidget* w UNUSED, gpointer data UNUSED)
 
 static void on_app_exit(gpointer vdata)
 {
-    GtkWidget* r;
     GtkWidget* p;
-    GtkWidget* b;
     GtkWidget* w;
     GtkWidget* c;
     struct cbdata* cbdata = vdata;
@@ -970,32 +968,29 @@ static void on_app_exit(gpointer vdata)
     c = GTK_WIDGET(cbdata->wind);
     gtk_container_remove(GTK_CONTAINER(c), gtk_bin_get_child(GTK_BIN(c)));
 
-    r = gtk_alignment_new(0.5, 0.5, 0.01, 0.01);
-    gtk_container_add(GTK_CONTAINER(c), r);
+    p =
+        g_object_new(GTK_TYPE_GRID, "column-spacing", GUI_PAD_BIG, "halign", GTK_ALIGN_CENTER, "valign", GTK_ALIGN_CENTER,
+        NULL);
+    gtk_container_add(GTK_CONTAINER(c), p);
 
-    p = gtk_grid_new();
-    gtk_grid_set_column_spacing(GTK_GRID(p), GUI_PAD_BIG);
-    gtk_container_add(GTK_CONTAINER(r), p);
-
-    w = gtk_image_new_from_stock(GTK_STOCK_NETWORK, GTK_ICON_SIZE_DIALOG);
+    w = gtk_image_new_from_icon_name(GTK_STOCK_NETWORK, GTK_ICON_SIZE_DIALOG);
     gtk_grid_attach(GTK_GRID(p), w, 0, 0, 1, 2);
 
     w = gtk_label_new(NULL);
     gtk_label_set_markup(GTK_LABEL(w), _("<b>Closing Connections</b>"));
-    gtk_misc_set_alignment(GTK_MISC(w), 0.0, 0.5);
+    g_object_set(w, "halign", GTK_ALIGN_START, "valign", GTK_ALIGN_CENTER, NULL);
     gtk_grid_attach(GTK_GRID(p), w, 1, 0, 1, 1);
 
     w = gtk_label_new(_("Sending upload/download totals to tracker…"));
-    gtk_misc_set_alignment(GTK_MISC(w), 0.0, 0.5);
+    g_object_set(w, "halign", GTK_ALIGN_START, "valign", GTK_ALIGN_CENTER, NULL);
     gtk_grid_attach(GTK_GRID(p), w, 1, 1, 1, 1);
 
-    b = gtk_alignment_new(0.0, 1.0, 0.01, 0.01);
     w = gtk_button_new_with_mnemonic(_("_Quit Now"));
+    g_object_set(w, "margin-top", GUI_PAD, "halign", GTK_ALIGN_START, "valign", GTK_ALIGN_END, NULL);
     g_signal_connect(w, "clicked", G_CALLBACK(exit_now_cb), NULL);
-    gtk_container_add(GTK_CONTAINER(b), w);
-    gtk_grid_attach(GTK_GRID(p), b, 1, 2, 1, 1);
+    gtk_grid_attach(GTK_GRID(p), w, 1, 2, 1, 1);
 
-    gtk_widget_show_all(r);
+    gtk_widget_show_all(p);
     gtk_widget_grab_focus(w);
 
     /* clear the UI */

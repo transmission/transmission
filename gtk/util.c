@@ -398,7 +398,11 @@ void gtr_open_uri(char const* uri)
 
         if (!opened)
         {
+#if GTK_CHECK_VERSION(3, 22, 0)
+            opened = gtk_show_uri_on_window(NULL, uri, GDK_CURRENT_TIME, NULL);
+#else
             opened = gtk_show_uri(NULL, uri, GDK_CURRENT_TIME, NULL);
+#endif
         }
 
         if (!opened)

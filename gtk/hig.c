@@ -22,7 +22,7 @@ GtkWidget* hig_workarea_create(void)
 
 void hig_workarea_add_section_divider(GtkWidget* t, guint* row)
 {
-    GtkWidget* w = gtk_alignment_new(0.0F, 0.0F, 0.0F, 0.0F);
+    GtkWidget* w = gtk_fixed_new();
 
     gtk_widget_set_size_request(w, 0U, 6U);
     gtk_grid_attach(GTK_GRID(t), w, 0, *row, 2, 1);
@@ -43,7 +43,7 @@ void hig_workarea_add_section_title(GtkWidget* t, guint* row, char const* sectio
 
     g_snprintf(buf, sizeof(buf), "<b>%s</b>", section_title);
     l = gtk_label_new(buf);
-    gtk_misc_set_alignment(GTK_MISC(l), 0.0F, 0.5F);
+    g_object_set(l, "halign", GTK_ALIGN_START, "valign", GTK_ALIGN_CENTER, NULL);
     gtk_label_set_use_markup(GTK_LABEL(l), TRUE);
     hig_workarea_add_section_title_widget(t, row, l);
 }
@@ -51,7 +51,11 @@ void hig_workarea_add_section_title(GtkWidget* t, guint* row, char const* sectio
 void hig_workarea_add_wide_control(GtkWidget* t, guint* row, GtkWidget* w)
 {
     gtk_widget_set_hexpand(w, TRUE);
+#if GTK_CHECK_VERSION(3, 12, 0)
+    gtk_widget_set_margin_start(w, 18);
+#else
     gtk_widget_set_margin_left(w, 18);
+#endif
     gtk_grid_attach(GTK_GRID(t), w, 0, *row, 2, 1);
     ++*row;
 }
@@ -74,11 +78,15 @@ GtkWidget* hig_workarea_add_wide_checkbutton(GtkWidget* t, guint* row, char cons
 
 void hig_workarea_add_label_w(GtkWidget* t, guint row, GtkWidget* w)
 {
+#if GTK_CHECK_VERSION(3, 12, 0)
+    gtk_widget_set_margin_start(w, 18);
+#else
     gtk_widget_set_margin_left(w, 18);
+#endif
 
     if (GTK_IS_MISC(w))
     {
-        gtk_misc_set_alignment(GTK_MISC(w), 0.0F, 0.5F);
+        g_object_set(w, "halign", GTK_ALIGN_START, "valign", GTK_ALIGN_CENTER, NULL);
     }
 
     if (GTK_IS_LABEL(w))
@@ -93,7 +101,7 @@ static void hig_workarea_add_tall_control(GtkWidget* t, guint row, GtkWidget* co
 {
     if (GTK_IS_MISC(control))
     {
-        gtk_misc_set_alignment(GTK_MISC(control), 0.0F, 0.5F);
+        g_object_set(control, "halign", GTK_ALIGN_START, "valign", GTK_ALIGN_CENTER, NULL);
     }
 
     g_object_set(control, "expand", TRUE, NULL);
@@ -104,7 +112,7 @@ static void hig_workarea_add_control(GtkWidget* t, guint row, GtkWidget* control
 {
     if (GTK_IS_MISC(control))
     {
-        gtk_misc_set_alignment(GTK_MISC(control), 0.0F, 0.5F);
+        g_object_set(control, "halign", GTK_ALIGN_START, "valign", GTK_ALIGN_CENTER, NULL);
     }
 
     gtk_widget_set_hexpand(control, TRUE);
