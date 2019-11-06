@@ -23,6 +23,8 @@ class QModelIndex;
 class Utils
 {
 public:
+    static QIcon getFileIcon();
+    static QIcon getFolderIcon();
     static QIcon guessMimeIcon(QString const& filename);
     static QIcon getIconFromIndex(QModelIndex const& index);
 

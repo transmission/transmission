@@ -588,11 +588,11 @@ fail:
 }
 
 /* We all hate NATs. */
-static int global_unicast_address(struct sockaddr* sa)
+static int global_unicast_address(struct sockaddr_storage* ss)
 {
-    if (sa->sa_family == AF_INET)
+    if (ss->ss_family == AF_INET)
     {
-        unsigned char const* a = (unsigned char*)&((struct sockaddr_in*)sa)->sin_addr;
+        unsigned char const* a = (unsigned char*)&((struct sockaddr_in*)ss)->sin_addr;
 
         if (a[0] == 0 || a[0] == 127 || a[0] >= 224 || a[0] == 10 || (a[0] == 172 && a[1] >= 16 && a[1] <= 31) ||
             (a[0] == 192 && a[1] == 168))
@@ -602,9 +602,9 @@ static int global_unicast_address(struct sockaddr* sa)
 
         return 1;
     }
-    else if (sa->sa_family == AF_INET6)
+    else if (ss->ss_family == AF_INET6)
     {
-        unsigned char const* a = (unsigned char*)&((struct sockaddr_in6*)sa)->sin6_addr;
+        unsigned char const* a = (unsigned char*)&((struct sockaddr_in6*)ss)->sin6_addr;
         /* 2000::/3 */
         return (a[0] & 0xE0) == 0x20 ? 1 : 0;
     }
@@ -658,7 +658,7 @@ static int tr_globalAddress(int af, void* addr, int* addr_len)
         return -1;
     }
 
-    if (global_unicast_address((struct sockaddr*)&ss) == 0)
+    if (global_unicast_address(&ss) == 0)
     {
         return -1;
     }

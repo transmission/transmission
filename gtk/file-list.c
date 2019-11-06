@@ -305,7 +305,8 @@ static gboolean refreshModel(gpointer file_data)
 struct ActiveData
 {
     GtkTreeSelection* sel;
-    GArray* array;
+    tr_file_index_t* indexBuf;
+    size_t indexCount;
 };
 
 static gboolean getSelectedFilesForeach(GtkTreeModel* model, GtkTreePath* path UNUSED, GtkTreeIter* iter, gpointer gdata)
@@ -335,27 +336,29 @@ static gboolean getSelectedFilesForeach(GtkTreeModel* model, GtkTreePath* path U
         {
             unsigned int i;
             gtk_tree_model_get(model, iter, FC_INDEX, &i, -1);
-            g_array_append_val(data->array, i);
+            data->indexBuf[data->indexCount++] = i;
         }
     }
 
     return FALSE; /* keep walking */
 }
 
-static GArray* getSelectedFilesAndDescendants(GtkTreeView* view)
+static size_t getSelectedFilesAndDescendants(GtkTreeView* view, tr_file_index_t* indexBuf)
 {
     struct ActiveData data;
 
     data.sel = gtk_tree_view_get_selection(view);
-    data.array = g_array_new(FALSE, FALSE, sizeof(tr_file_index_t));
+    data.indexBuf = indexBuf;
+    data.indexCount = 0;
     gtk_tree_model_foreach(gtk_tree_view_get_model(view), getSelectedFilesForeach, &data);
-    return data.array;
+    return data.indexCount;
 }
 
 struct SubtreeForeachData
 {
-    GArray* array;
     GtkTreePath* path;
+    tr_file_index_t* indexBuf;
+    size_t indexCount;
 };
 
 static gboolean getSubtreeForeach(GtkTreeModel* model, GtkTreePath* path, GtkTreeIter* iter, gpointer gdata)
@@ -370,43 +373,46 @@ static gboolean getSubtreeForeach(GtkTreeModel* model, GtkTreePath* path, GtkTre
         {
             unsigned int i;
             gtk_tree_model_get(model, iter, FC_INDEX, &i, -1);
-            g_array_append_val(data->array, i);
+            data->indexBuf[data->indexCount++] = i;
         }
     }
 
     return FALSE; /* keep walking */
 }
 
-static void getSubtree(GtkTreeView* view, GtkTreePath* path, GArray* indices)
+static size_t getSubtree(GtkTreeView* view, GtkTreePath* path, tr_file_index_t* indexBuf)
 {
     struct SubtreeForeachData tmp;
-    tmp.array = indices;
+    tmp.indexBuf = indexBuf;
+    tmp.indexCount = 0;
     tmp.path = path;
     gtk_tree_model_foreach(gtk_tree_view_get_model(view), getSubtreeForeach, &tmp);
+    return tmp.indexCount;
 }
 
 /* if `path' is a selected row, all selected rows are returned.
  * otherwise, only the row indicated by `path' is returned.
  * this is for toggling all the selected rows' states in a batch.
+ *
+ * indexBuf should be large enough to hold tr_inf.fileCount files.
  */
-static GArray* getActiveFilesForPath(GtkTreeView* view, GtkTreePath* path)
+static size_t getActiveFilesForPath(GtkTreeView* view, GtkTreePath* path, tr_file_index_t* indexBuf)
 {
-    GArray* indices;
+    size_t indexCount;
     GtkTreeSelection* sel = gtk_tree_view_get_selection(view);
 
     if (gtk_tree_selection_path_is_selected(sel, path))
     {
         /* clicked in a selected row... use the current selection */
-        indices = getSelectedFilesAndDescendants(view);
+        indexCount = getSelectedFilesAndDescendants(view, indexBuf);
     }
     else
     {
         /* clicked OUTSIDE of the selected row... just use the clicked row */
-        indices = g_array_new(FALSE, FALSE, sizeof(tr_file_index_t));
-        getSubtree(view, path, indices);
+        indexCount = getSubtree(view, path, indexBuf);
     }
 
-    return indices;
+    return indexCount;
 }
 
 /***
@@ -709,7 +715,8 @@ static gboolean onViewPathToggled(GtkTreeView* view, GtkTreeViewColumn* col, Gtk
     if (tor != NULL && (cid == FC_PRIORITY || cid == FC_ENABLED))
     {
         GtkTreeIter iter;
-        GArray* indices = getActiveFilesForPath(view, path);
+        tr_file_index_t* const indexBuf = g_new0(tr_file_index_t, tr_torrentInfo(tor)->fileCount);
+        size_t const indexCount = getActiveFilesForPath(view, path, indexBuf);
         GtkTreeModel* model = data->model;
 
         gtk_tree_model_get_iter(model, &iter, path);
@@ -734,7 +741,7 @@ static gboolean onViewPathToggled(GtkTreeView* view, GtkTreeViewColumn* col, Gtk
                 break;
             }
 
-            tr_torrentSetFilePriorities(tor, (tr_file_index_t*)indices->data, (tr_file_index_t)indices->len, priority);
+            tr_torrentSetFilePriorities(tor, indexBuf, indexCount, priority);
         }
         else
         {
@@ -742,11 +749,11 @@ static gboolean onViewPathToggled(GtkTreeView* view, GtkTreeViewColumn* col, Gtk
             gtk_tree_model_get(model, &iter, FC_ENABLED, &enabled, -1);
             enabled = !enabled;
 
-            tr_torrentSetFileDLs(tor, (tr_file_index_t*)indices->data, (tr_file_index_t)indices->len, enabled);
+            tr_torrentSetFileDLs(tor, indexBuf, indexCount, enabled);
         }
 
         refresh(data);
-        g_array_free(indices, TRUE);
+        g_free(indexBuf);
         handled = TRUE;
     }
 
@@ -925,7 +932,6 @@ GtkWidget* gtr_file_list_new(TrCore* core, int torrentId)
     /* create the view */
     view = gtk_tree_view_new();
     tree_view = GTK_TREE_VIEW(view);
-    gtk_tree_view_set_rules_hint(tree_view, TRUE);
     gtk_container_set_border_width(GTK_CONTAINER(view), GUI_PAD_BIG);
     g_signal_connect(view, "button-press-event", G_CALLBACK(onViewButtonPressed), data);
     g_signal_connect(view, "row_activated", G_CALLBACK(onRowActivated), data);
