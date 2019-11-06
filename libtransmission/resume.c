@@ -914,7 +914,7 @@ static uint64_t loadFromFile(tr_torrent* tor, uint64_t fieldsToLoad, bool* didRe
 
     if ((fieldsToLoad & TR_FR_ACTIVITY_DATE) != 0 && tr_variantDictFindInt(&top, TR_KEY_activity_date, &i))
     {
-        tr_torrentSetActivityDate(tor, i);
+        tr_torrentSetDateActive(tor, i);
         fieldsLoaded |= TR_FR_ACTIVITY_DATE;
     }
 

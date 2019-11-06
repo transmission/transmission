@@ -1686,7 +1686,7 @@ bool tr_moveFile(char const* oldpath, char const* newpath, tr_error** error)
     char* buf = NULL;
     tr_sys_path_info info;
     uint64_t bytesLeft;
-    size_t const buflen = 1024 * 128; /* 128 KiB buffer */
+    size_t const buflen = 1024 * 1024; /* 1024 KiB buffer */
 
     /* make sure the old file exists */
     if (!tr_sys_path_get_info(oldpath, 0, &info, error))
