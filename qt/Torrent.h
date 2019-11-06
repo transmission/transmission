@@ -8,10 +8,11 @@
 
 #pragma once
 
+#include <ctime> // time_t
+
 #include <QObject>
 #include <QIcon>
 #include <QMetaType>
-#include <QDateTime>
 #include <QString>
 #include <QStringList>
 #include <QList>
@@ -357,34 +358,34 @@ public:
         return getInt(ETA);
     }
 
-    QDateTime lastActivity() const
+    time_t lastActivity() const
     {
-        return getDateTime(DATE_ACTIVITY);
+        return getTime(DATE_ACTIVITY);
     }
 
-    QDateTime lastStarted() const
+    time_t lastStarted() const
     {
-        return getDateTime(DATE_STARTED);
+        return getTime(DATE_STARTED);
     }
 
-    QDateTime dateAdded() const
+    time_t dateAdded() const
     {
-        return getDateTime(DATE_ADDED);
+        return getTime(DATE_ADDED);
     }
 
-    QDateTime dateCreated() const
+    time_t dateCreated() const
     {
-        return getDateTime(DATE_CREATED);
+        return getTime(DATE_CREATED);
     }
 
-    QDateTime manualAnnounceTime() const
+    time_t manualAnnounceTime() const
     {
-        return getDateTime(MANUAL_ANNOUNCE_TIME);
+        return getTime(MANUAL_ANNOUNCE_TIME);
     }
 
-    bool canManualAnnounce() const
+    bool canManualAnnounceAt(time_t t) const
     {
-        return isReadyToTransfer() && (manualAnnounceTime() <= QDateTime::currentDateTime());
+        return isReadyToTransfer() && (manualAnnounceTime() <= t);
     }
 
     int peersWeAreDownloadingFrom() const
@@ -619,12 +620,11 @@ private:
 private:
     int getInt(int key) const;
     bool getBool(int key) const;
-    QTime getTime(int key) const;
     QIcon getIcon(int key) const;
     double getDouble(int key) const;
     qulonglong getSize(int key) const;
     QString getString(int key) const;
-    QDateTime getDateTime(int key) const;
+    time_t getTime(int key) const;
 
     bool setInt(int key, int value);
     bool setBool(int key, bool value);
@@ -632,7 +632,7 @@ private:
     bool setDouble(int key, double);
     bool setString(int key, char const*);
     bool setSize(int key, qulonglong);
-    bool setDateTime(int key, QDateTime const&);
+    bool setTime(int key, time_t);
 
     char const* getMimeTypeString() const;
     void updateMimeIcon();

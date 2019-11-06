@@ -10,11 +10,7 @@
 #include <iostream>
 
 #include <QApplication>
-#include <QFileIconProvider>
-#include <QFileInfo>
-#include <QSet>
 #include <QString>
-#include <QStyle>
 #include <QUrl>
 #include <QVariant>
 
@@ -41,7 +37,7 @@ Torrent::Torrent(Prefs const& prefs, int id) :
 #endif
 
     setInt(ID, id);
-    setIcon(MIME_ICON, qApp->style()->standardIcon(QStyle::SP_FileIcon));
+    setIcon(MIME_ICON, Utils::getFileIcon());
 }
 
 Torrent::~Torrent()
@@ -208,16 +204,19 @@ bool Torrent::setDouble(int i, double value)
     return changed;
 }
 
-bool Torrent::setDateTime(int i, QDateTime const& value)
+bool Torrent::setTime(int i, time_t value)
 {
     bool changed = false;
 
     assert(0 <= i && i < PROPERTY_COUNT);
     assert(myProperties[i].type == QVariant::DateTime);
 
-    if (myValues[i].isNull() || myValues[i].toDateTime() != value)
+    auto& oldval = myValues[i];
+    auto const newval = qlonglong(value);
+
+    if (oldval != newval)
     {
-        myValues[i].setValue(value);
+        oldval = newval;
         changed = true;
     }
 
@@ -273,12 +272,12 @@ int Torrent::getInt(int i) const
     return myValues[i].toInt();
 }
 
-QDateTime Torrent::getDateTime(int i) const
+time_t Torrent::getTime(int i) const
 {
     assert(0 <= i && i < PROPERTY_COUNT);
     assert(myProperties[i].type == QVariant::DateTime);
 
-    return myValues[i].toDateTime();
+    return time_t(myValues[i].toLongLong());
 }
 
 bool Torrent::getBool(int i) const
@@ -484,7 +483,7 @@ void Torrent::updateMimeIcon()
 
     if (files.size() > 1)
     {
-        icon = QFileIconProvider().icon(QFileIconProvider::Folder);
+        icon = Utils::getFolderIcon();
     }
     else if (files.size() == 1)
     {
@@ -492,7 +491,7 @@ void Torrent::updateMimeIcon()
     }
     else
     {
-        icon = QIcon();
+        icon = Utils::guessMimeIcon(name());
     }
 
     setIcon(MIME_ICON, icon);
@@ -581,7 +580,13 @@ void Torrent::update(tr_variant* d)
 
                 if (tr_variantGetStr(child, &val, nullptr))
                 {
-                    changed |= setString(property_index, val);
+                    bool const field_changed = setString(property_index, val);
+                    changed |= field_changed;
+
+                    if (field_changed && key == TR_KEY_name)
+                    {
+                        updateMimeIcon();
+                    }
                 }
 
                 break;
@@ -617,7 +622,7 @@ void Torrent::update(tr_variant* d)
 
                 if (tr_variantGetInt(child, &val) && val)
                 {
-                    changed |= setDateTime(property_index, QDateTime::fromTime_t(val));
+                    changed |= setTime(property_index, time_t(val));
                 }
 
                 break;
