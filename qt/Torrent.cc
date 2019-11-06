@@ -10,11 +10,7 @@
 #include <iostream>
 
 #include <QApplication>
-#include <QFileIconProvider>
-#include <QFileInfo>
-#include <QSet>
 #include <QString>
-#include <QStyle>
 #include <QUrl>
 #include <QVariant>
 
@@ -41,7 +37,7 @@ Torrent::Torrent(Prefs const& prefs, int id) :
 #endif
 
     setInt(ID, id);
-    setIcon(MIME_ICON, qApp->style()->standardIcon(QStyle::SP_FileIcon));
+    setIcon(MIME_ICON, Utils::getFileIcon());
 }
 
 Torrent::~Torrent()
@@ -484,7 +480,7 @@ void Torrent::updateMimeIcon()
 
     if (files.size() > 1)
     {
-        icon = QFileIconProvider().icon(QFileIconProvider::Folder);
+        icon = Utils::getFolderIcon();
     }
     else if (files.size() == 1)
     {
@@ -492,7 +488,7 @@ void Torrent::updateMimeIcon()
     }
     else
     {
-        icon = QIcon();
+        icon = Utils::guessMimeIcon(name());
     }
 
     setIcon(MIME_ICON, icon);
@@ -581,7 +577,13 @@ void Torrent::update(tr_variant* d)
 
                 if (tr_variantGetStr(child, &val, nullptr))
                 {
-                    changed |= setString(property_index, val);
+                    bool const field_changed = setString(property_index, val);
+                    changed |= field_changed;
+
+                    if (field_changed && key == TR_KEY_name)
+                    {
+                        updateMimeIcon();
+                    }
                 }
 
                 break;
