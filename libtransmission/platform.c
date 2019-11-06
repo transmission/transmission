@@ -90,7 +90,7 @@ bool tr_amInThread(tr_thread const* t)
 #ifdef _WIN32
 #define ThreadFuncReturnType unsigned WINAPI
 #else
-#define ThreadFuncReturnType void
+#define ThreadFuncReturnType void*
 #endif
 
 static ThreadFuncReturnType ThreadFunc(void* _t)
@@ -108,6 +108,8 @@ static ThreadFuncReturnType ThreadFunc(void* _t)
 #ifdef _WIN32
     _endthreadex(0);
     return 0;
+#else
+    return NULL;
 #endif
 }
 

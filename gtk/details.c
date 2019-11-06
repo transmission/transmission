@@ -1226,7 +1226,7 @@ static GtkWidget* info_page_new(struct DetailsImpl* di)
     gtk_frame_set_shadow_type(GTK_FRAME(fr), GTK_SHADOW_IN);
     gtk_container_add(GTK_CONTAINER(fr), sw);
     w = hig_workarea_add_tall_row(t, &row, _("Comment:"), fr, NULL);
-    gtk_misc_set_alignment(GTK_MISC(w), 0.0F, 0.0F);
+    g_object_set(w, "halign", GTK_ALIGN_START, "valign", GTK_ALIGN_START, NULL);
 
     hig_workarea_add_section_divider(t, &row);
     return t;
@@ -2028,7 +2028,6 @@ static GtkWidget* peer_page_new(struct DetailsImpl* di)
     store = di->webseed_store = webseed_model_new();
     v = gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
     g_signal_connect(v, "button-release-event", G_CALLBACK(on_tree_view_button_released), NULL);
-    gtk_tree_view_set_rules_hint(GTK_TREE_VIEW(v), TRUE);
     g_object_unref(store);
 
     str = getWebseedColumnNames(WEBSEED_COL_URL);
@@ -2614,7 +2613,7 @@ static void on_edit_trackers(GtkButton* button, gpointer data)
         gtk_label_set_markup(GTK_LABEL(l), _("To add a backup URL, add it on the line after the primary URL.\n"
             "To add another primary URL, add it after a blank line."));
         gtk_label_set_justify(GTK_LABEL(l), GTK_JUSTIFY_LEFT);
-        gtk_misc_set_alignment(GTK_MISC(l), 0.0, 0.5);
+        g_object_set(l, "halign", GTK_ALIGN_START, "valign", GTK_ALIGN_CENTER, NULL);
         hig_workarea_add_wide_control(t, &row, l);
 
         w = gtk_text_view_new();
@@ -2714,7 +2713,6 @@ static void on_tracker_list_add_button_clicked(GtkButton* button UNUSED, gpointe
         g_string_append_printf(gstr, _("%s - Add Tracker"), tr_torrentName(tor));
         w = gtk_dialog_new_with_buttons(gstr->str, GTK_WINDOW(di->dialog), GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_CANCEL,
             GTK_RESPONSE_CANCEL, GTK_STOCK_ADD, GTK_RESPONSE_ACCEPT, NULL);
-        gtk_dialog_set_alternative_button_order(GTK_DIALOG(w), GTK_RESPONSE_ACCEPT, GTK_RESPONSE_CANCEL, -1);
         g_signal_connect(w, "response", G_CALLBACK(on_add_tracker_response), gdi);
 
         row = 0;
@@ -2804,7 +2802,6 @@ static GtkWidget* tracker_page_new(struct DetailsImpl* di)
     gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(v), FALSE);
     g_signal_connect(v, "button-press-event", G_CALLBACK(on_tree_view_button_pressed), NULL);
     g_signal_connect(v, "button-release-event", G_CALLBACK(on_tree_view_button_released), NULL);
-    gtk_tree_view_set_rules_hint(GTK_TREE_VIEW(v), TRUE);
 
     sel = gtk_tree_view_get_selection(GTK_TREE_VIEW(v));
     g_signal_connect(sel, "changed", G_CALLBACK(on_tracker_list_selection_changed), di);
@@ -2840,7 +2837,7 @@ static GtkWidget* tracker_page_new(struct DetailsImpl* di)
     gtk_box_pack_start(GTK_BOX(v), w, FALSE, FALSE, 0);
 
     w = gtk_button_new_with_mnemonic(_("_Edit"));
-    gtk_button_set_image(GTK_BUTTON(w), gtk_image_new_from_stock(GTK_STOCK_EDIT, GTK_ICON_SIZE_BUTTON));
+    gtk_button_set_image(GTK_BUTTON(w), gtk_image_new_from_icon_name(GTK_STOCK_EDIT, GTK_ICON_SIZE_BUTTON));
     g_signal_connect(w, "clicked", G_CALLBACK(on_edit_trackers), di);
     di->edit_trackers_button = w;
     gtk_box_pack_start(GTK_BOX(v), w, FALSE, FALSE, 0);
