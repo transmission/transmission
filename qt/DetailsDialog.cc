@@ -6,7 +6,6 @@
  *
  */
 
-#include <algorithm>
 #include <cassert>
 #include <climits> /* INT_MAX */
 #include <ctime>
@@ -621,25 +620,35 @@ void DetailsDialog::refresh()
     }
     else
     {
-        auto const start = torrents.front()->lastStarted();
-        auto const same_start = std::all_of(torrents.begin(), torrents.end(), [start](Torrent const* a)
-            {
-                return a->lastStarted() == start;
-            });
-        auto const no_start = start <= 0;
+        bool allPaused = true;
+        auto baseline = torrents[0]->lastStarted();
 
-        if (!same_start)
+        for (Torrent const* const t : torrents)
+        {
+            if (baseline != t->lastStarted())
+            {
+                baseline = 0;
+            }
+
+            if (!t->isPaused())
+            {
+                allPaused = false;
+            }
+        }
+
+        if (allPaused)
+        {
+            string = stateString; // paused || finished
+        }
+        else if (baseline == 0)
         {
             string = mixed;
         }
-        else if (no_start)
-        {
-            string = stateString;
-        }
         else
         {
-            auto const seconds_ago = int(std::difftime(time(nullptr), start));
-            string = Formatter::timeToString(seconds_ago);
+            auto const now = time(nullptr);
+            auto const seconds = int(std::difftime(now, baseline));
+            string = Formatter::timeToString(seconds);
         }
     }
 
@@ -687,24 +696,32 @@ void DetailsDialog::refresh()
     }
     else
     {
-        auto const compare_activity_time = [](Torrent const* a, Torrent const* b)
-            {
-                return a->lastActivity() < b->lastActivity();
-            };
-        auto const latest = *std::max_element(torrents.begin(), torrents.end(), compare_activity_time);
-        auto const seconds_ago = int(std::difftime(time(nullptr), latest->lastActivity()));
+        auto latest = torrents[0]->lastActivity();
 
-        if (seconds_ago < 0)
+        for (Torrent const* const t : torrents)
+        {
+            auto const dt = t->lastActivity();
+
+            if (latest < dt)
+            {
+                latest = dt;
+            }
+        }
+
+        auto const now = time(nullptr);
+        auto const seconds = int(std::difftime(now, latest));
+
+        if (seconds < 0)
         {
             string = none;
         }
-        else if (seconds_ago < 5)
+        else if (seconds < 5)
         {
             string = tr("Active now");
         }
         else
         {
-            string = tr("%1 ago").arg(Formatter::timeToString(seconds_ago));
+            string = tr("%1 ago").arg(Formatter::timeToString(seconds));
         }
     }
 
@@ -848,41 +865,41 @@ void DetailsDialog::refresh()
 
     if (!torrents.empty())
     {
-        auto const creator = torrents.front()->creator();
-        auto const same_creator = std::all_of(torrents.begin(), torrents.end(), [creator](Torrent const* a)
-            {
-                return a->creator() == creator;
-            });
-        auto const no_creator = creator.isEmpty();
+        bool mixed_creator = false;
+        bool mixed_date = false;
+        QString const creator = torrents[0]->creator();
+        auto const date = torrents[0]->dateCreated();
 
-        auto const date = torrents.front()->dateCreated();
-        auto const same_date = std::all_of(torrents.begin(), torrents.end(), [date](Torrent const* a)
-            {
-                return a->dateCreated() == date;
-            });
-        auto const no_date = date <= 0;
+        for (Torrent const* const t : torrents)
+        {
+            mixed_creator |= (creator != t->creator());
+            mixed_date |= (date != t->dateCreated());
+        }
 
-        if (!same_creator || !same_date)
+        bool const empty_creator = creator.isEmpty();
+        bool const empty_date = date <= 0;
+
+        if (mixed_creator || mixed_date)
         {
             string = mixed;
         }
-        else if (no_creator && no_date)
+        else if (empty_creator && empty_date)
         {
             string = tr("N/A");
         }
-        else if (no_date)
+        else if (empty_date && !empty_creator)
         {
             string = tr("Created by %1").arg(creator);
         }
-        else if (no_creator)
+        else if (empty_creator && !empty_date)
         {
-            auto const date_str = QDateTime::fromTime_t(date).toString();
-            string = tr("Created on %1").arg(date_str);
+            auto const dateStr = QDateTime::fromSecsSinceEpoch(date).toString();
+            string = tr("Created on %1").arg(dateStr);
         }
         else
         {
-            auto const date_str = QDateTime::fromTime_t(date).toString();
-            string = tr("Created by %1 on %2").arg(creator).arg(date_str);
+            auto const dateStr = QDateTime::fromSecsSinceEpoch(date).toString();
+            string = tr("Created by %1 on %2").arg(creator).arg(dateStr);
         }
     }
 

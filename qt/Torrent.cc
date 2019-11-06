@@ -208,9 +208,15 @@ bool Torrent::setTime(int i, time_t value)
 {
     bool changed = false;
 
-    if (getTime(i) != value)
+    assert(0 <= i && i < PROPERTY_COUNT);
+    assert(myProperties[i].type == QVariant::DateTime);
+
+    auto& oldval = myValues[i];
+    auto const newval = qlonglong(value);
+
+    if (oldval != newval)
     {
-        myValues[i].setValue(value);
+        oldval = newval;
         changed = true;
     }
 
