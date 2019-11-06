@@ -176,33 +176,11 @@ void tr_netSetTOS(tr_socket_t s, int tos, tr_address_type type)
     else if (type == TR_AF_INET6)
     {
 #if defined(IPV6_TCLASS) && !defined(_WIN32)
-
-        int dscp = 0;
-
-        switch (tos)
-        {
-        case 0x10:
-            dscp = 0x20; /* lowcost (CS1) */
-            break;
-
-        case 0x08:
-            dscp = 0x28; /* throughput (AF11) */
-            break;
-
-        case 0x04:
-            dscp = 0x04; /* reliability */
-            break;
-
-        case 0x02:
-            dscp = 0x30; /* low delay (AF12) */
-            break;
-        }
-
-        if (setsockopt(s, IPPROTO_IPV6, IPV6_TCLASS, (void const*)&dscp, sizeof(dscp)) == -1)
+        if (setsockopt(s, IPPROTO_IPV6, IPV6_TCLASS, (void const*)&tos, sizeof(tos)) == -1)
         {
             char err_buf[512];
             tr_net_strerror(err_buf, sizeof(err_buf), sockerrno);
-            tr_logAddNamedInfo("Net", "Can't set IPv6 QoS '%d': %s", dscp, err_buf);
+            tr_logAddNamedInfo("Net", "Can't set IPv6 QoS '%d': %s", tos, err_buf);
         }
 
 #else
