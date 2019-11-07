@@ -89,10 +89,8 @@ QIcon MainWindow::getStockIcon(QString const& name, int fallback)
     return icon;
 }
 
-QIcon MainWindow::getStockIcon(QString const& name, int fallback, QStringList const& emblemNames)
+QIcon MainWindow::addEmblem(QIcon baseIcon, QStringList const& emblemNames)
 {
-    QIcon baseIcon = getStockIcon(name, fallback);
-
     if (baseIcon.isNull())
     {
         return baseIcon;
@@ -168,20 +166,23 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     ui.listView->setAttribute(Qt::WA_MacShowFocusRect, false);
 
     // icons
-    ui.action_OpenFile->setIcon(getStockIcon(QLatin1String("document-open"), QStyle::SP_DialogOpenButton));
-    ui.action_AddURL->setIcon(getStockIcon(QLatin1String("document-open"), QStyle::SP_DialogOpenButton,
+    QIcon const iconPlay = getStockIcon(QLatin1String("media-playback-start"), QStyle::SP_MediaPlay);
+    QIcon const iconPause = getStockIcon(QLatin1String("media-playback-pause"), QStyle::SP_MediaPause);
+    QIcon const iconOpen = getStockIcon(QLatin1String("document-open"), QStyle::SP_DialogOpenButton);
+    ui.action_OpenFile->setIcon(iconOpen);
+    ui.action_AddURL->setIcon(addEmblem(iconOpen,
         QStringList() << QLatin1String("emblem-web") << QLatin1String("applications-internet")));
     ui.action_New->setIcon(getStockIcon(QLatin1String("document-new"), QStyle::SP_DesktopIcon));
     ui.action_Properties->setIcon(getStockIcon(QLatin1String("document-properties"), QStyle::SP_DesktopIcon));
     ui.action_OpenFolder->setIcon(getStockIcon(QLatin1String("folder-open"), QStyle::SP_DirOpenIcon));
-    ui.action_Start->setIcon(getStockIcon(QLatin1String("media-playback-start"), QStyle::SP_MediaPlay));
-    ui.action_StartNow->setIcon(getStockIcon(QLatin1String("media-playback-start"), QStyle::SP_MediaPlay));
+    ui.action_Start->setIcon(iconPlay);
+    ui.action_StartNow->setIcon(iconPlay);
     ui.action_Announce->setIcon(getStockIcon(QLatin1String("network-transmit-receive")));
-    ui.action_Pause->setIcon(getStockIcon(QLatin1String("media-playback-pause"), QStyle::SP_MediaPause));
+    ui.action_Pause->setIcon(iconPause);
     ui.action_Remove->setIcon(getStockIcon(QLatin1String("list-remove"), QStyle::SP_TrashIcon));
     ui.action_Delete->setIcon(getStockIcon(QLatin1String("edit-delete"), QStyle::SP_TrashIcon));
-    ui.action_StartAll->setIcon(getStockIcon(QLatin1String("media-playback-start"), QStyle::SP_MediaPlay));
-    ui.action_PauseAll->setIcon(getStockIcon(QLatin1String("media-playback-pause"), QStyle::SP_MediaPause));
+    ui.action_StartAll->setIcon(iconPlay);
+    ui.action_PauseAll->setIcon(iconPause);
     ui.action_Quit->setIcon(getStockIcon(QLatin1String("application-exit")));
     ui.action_SelectAll->setIcon(getStockIcon(QLatin1String("edit-select-all")));
     ui.action_ReverseSortOrder->setIcon(getStockIcon(QLatin1String("view-sort-ascending"), QStyle::SP_ArrowDown));
@@ -192,6 +193,18 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     ui.action_QueueMoveUp->setIcon(getStockIcon(QLatin1String("go-up"), QStyle::SP_ArrowUp));
     ui.action_QueueMoveDown->setIcon(getStockIcon(QLatin1String("go-down"), QStyle::SP_ArrowDown));
     ui.action_QueueMoveBottom->setIcon(getStockIcon(QLatin1String("go-bottom")));
+
+    auto makeNetworkPixmap = [this](char const* nameIn, QSize size = QSize(16, 16))
+        {
+            QString const name = QLatin1String(nameIn);
+            QIcon const icon = getStockIcon(name, QStyle::SP_DriveNetIcon);
+            return icon.pixmap(size);
+        };
+    myPixmapNetworkError = makeNetworkPixmap("network-error");
+    myPixmapNetworkIdle = makeNetworkPixmap("network-idle");
+    myPixmapNetworkReceive = makeNetworkPixmap("network-receive");
+    myPixmapNetworkTransmit = makeNetworkPixmap("network-transmit");
+    myPixmapNetworkTransmitReceive = makeNetworkPixmap("network-transmit-receive");
 
     // ui signals
     connect(ui.action_Toolbar, SIGNAL(toggled(bool)), this, SLOT(setToolbarVisible(bool)));
@@ -812,18 +825,19 @@ void MainWindow::refreshActionSensitivitySoon()
 
 void MainWindow::refreshActionSensitivity()
 {
-    int selected(0);
     int paused(0);
     int queued(0);
+    int selected(0);
+    int selectedAndCanAnnounce(0);
     int selectedAndPaused(0);
     int selectedAndQueued(0);
     int selectedWithMetadata(0);
-    int canAnnounce(0);
     QAbstractItemModel const* model(ui.listView->model());
     QItemSelectionModel const* selectionModel(ui.listView->selectionModel());
     int const rowCount(model->rowCount());
 
     // count how many torrents are selected, paused, etc
+    auto const now = time(nullptr);
     for (int row = 0; row < rowCount; ++row)
     {
         QModelIndex const modelIndex(model->index(row, 0));
@@ -836,11 +850,6 @@ void MainWindow::refreshActionSensitivity()
             bool const isPaused(tor->isPaused());
             bool const isQueued(tor->isQueued());
 
-            if (isSelected)
-            {
-                ++selected;
-            }
-
             if (isQueued)
             {
                 ++queued;
@@ -851,24 +860,29 @@ void MainWindow::refreshActionSensitivity()
                 ++paused;
             }
 
-            if (isSelected && isPaused)
+            if (isSelected)
             {
-                ++selectedAndPaused;
-            }
+                ++selected;
 
-            if (isSelected && isQueued)
-            {
-                ++selectedAndQueued;
-            }
+                if (isPaused)
+                {
+                    ++selectedAndPaused;
+                }
 
-            if (isSelected && tor->hasMetadata())
-            {
-                ++selectedWithMetadata;
-            }
+                if (isQueued)
+                {
+                    ++selectedAndQueued;
+                }
 
-            if (tor->canManualAnnounce())
-            {
-                ++canAnnounce;
+                if (tor->hasMetadata())
+                {
+                    ++selectedWithMetadata;
+                }
+
+                if (tor->canManualAnnounceAt(now))
+                {
+                    ++selectedAndCanAnnounce;
+                }
             }
         }
     }
@@ -893,7 +907,7 @@ void MainWindow::refreshActionSensitivity()
     ui.action_Start->setEnabled(selectedAndPaused > 0);
     ui.action_StartNow->setEnabled(selectedAndPaused + selectedAndQueued > 0);
     ui.action_Pause->setEnabled(selectedAndPaused < selected);
-    ui.action_Announce->setEnabled(selected > 0 && (canAnnounce == selected));
+    ui.action_Announce->setEnabled(selected > 0 && (selectedAndCanAnnounce == selected));
 
     ui.action_QueueMoveTop->setEnabled(haveSelection);
     ui.action_QueueMoveUp->setEnabled(haveSelection);
@@ -1433,31 +1447,28 @@ void MainWindow::updateNetworkIcon()
     time_t const secondsSinceLastRead = now - myLastReadTime;
     bool const isSending = secondsSinceLastSend <= period;
     bool const isReading = secondsSinceLastRead <= period;
-    char const* key;
+    QPixmap pixmap;
 
     if (myNetworkError)
     {
-        key = "network-error";
+        pixmap = myPixmapNetworkError;
     }
     else if (isSending && isReading)
     {
-        key = "network-transmit-receive";
+        pixmap = myPixmapNetworkTransmitReceive;
     }
     else if (isSending)
     {
-        key = "network-transmit";
+        pixmap = myPixmapNetworkTransmit;
     }
     else if (isReading)
     {
-        key = "network-receive";
+        pixmap = myPixmapNetworkReceive;
     }
     else
     {
-        key = "network-idle";
+        pixmap = myPixmapNetworkIdle;
     }
-
-    QIcon const icon = getStockIcon(QLatin1String(key), QStyle::SP_DriveNetIcon);
-    QPixmap const pixmap = icon.pixmap(16, 16);
 
     QString tip;
     QString const url = mySession.getRemoteUrl().host();

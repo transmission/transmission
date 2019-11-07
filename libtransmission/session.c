@@ -265,27 +265,27 @@ static int parse_tos(char const* str)
 
     if (evutil_ascii_strcasecmp(str, "lowcost") == 0)
     {
-        return 0x10;
+        return TR_IPTOS_LOWCOST;
     }
 
     if (evutil_ascii_strcasecmp(str, "mincost") == 0)
     {
-        return 0x10;
+        return TR_IPTOS_LOWCOST;
     }
 
     if (evutil_ascii_strcasecmp(str, "throughput") == 0)
     {
-        return 0x08;
+        return TR_IPTOS_THRUPUT;
     }
 
     if (evutil_ascii_strcasecmp(str, "reliability") == 0)
     {
-        return 0x04;
+        return TR_IPTOS_RELIABLE;
     }
 
     if (evutil_ascii_strcasecmp(str, "lowdelay") == 0)
     {
-        return 0x02;
+        return TR_IPTOS_LOWDELAY;
     }
 
     value = strtol(str, &p, 0);
@@ -307,16 +307,16 @@ static char const* format_tos(int value)
     case 0:
         return "default";
 
-    case 0x10:
+    case TR_IPTOS_LOWCOST:
         return "lowcost";
 
-    case 0x08:
+    case TR_IPTOS_THRUPUT:
         return "throughput";
 
-    case 0x04:
+    case TR_IPTOS_RELIABLE:
         return "reliability";
 
-    case 0x02:
+    case TR_IPTOS_LOWDELAY:
         return "lowdelay";
 
     default:

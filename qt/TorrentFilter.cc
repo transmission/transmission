@@ -123,7 +123,11 @@ bool TorrentFilter::lessThan(QModelIndex const& left, QModelIndex const& right) 
         break;
 
     case SortMode::SORT_BY_AGE:
-        val = compare(a->dateAdded().toTime_t(), b->dateAdded().toTime_t());
+        if (val == 0)
+        {
+            val = compare(a->dateAdded(), b->dateAdded());
+        }
+
         break;
 
     case SortMode::SORT_BY_ID:
