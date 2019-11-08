@@ -128,7 +128,6 @@ class Torrent : public QObject
 public:
     enum
     {
-        ID,
         UPLOAD_SPEED,
         DOWNLOAD_SPEED,
         DOWNLOAD_DIR,
@@ -156,7 +155,6 @@ public:
         DATE_CREATED,
         PEERS_CONNECTED,
         ETA,
-        RATIO,
         DOWNLOADED_EVER,
         UPLOADED_EVER,
         FAILED_EVER,
@@ -188,11 +186,9 @@ public:
         PROPERTY_COUNT
     };
 
-    typedef QList<tr_quark> KeyList;
-
 public:
     Torrent(Prefs const&, int id);
-    virtual ~Torrent();
+    virtual ~Torrent() =default;;
 
     int getBandwidthPriority() const
     {
@@ -201,12 +197,17 @@ public:
 
     int id() const
     {
-        return getInt(ID);
+        return myId;
     }
 
     QString name() const
     {
         return getString(NAME);
+    }
+
+    bool hasName() const
+    {
+        return !myValues[NAME].isNull();
     }
 
     QString creator() const
@@ -298,11 +299,6 @@ public:
         return getDouble(METADATA_PERCENT_DONE) >= 1.0;
     }
 
-    bool isMagnet() const
-    {
-        return magnetTorrent;
-    }
-
     int pieceCount() const
     {
         return getInt(PIECE_COUNT);
@@ -310,7 +306,10 @@ public:
 
     double ratio() const
     {
-        return getDouble(RATIO);
+        auto const u = uploadedEver();
+        auto const d = downloadedEver();
+        auto const t = totalSize();
+        return double(u) / (d ? d : t);
     }
 
     double percentComplete() const
@@ -320,7 +319,9 @@ public:
 
     double percentDone() const
     {
-        return getDouble(PERCENT_DONE);
+        auto const l = leftUntilDone();
+        auto const s = sizeWhenDone();
+        return s ? double(s - l) / s : 0.0;
     }
 
     double metadataPercentDone() const
@@ -578,43 +579,26 @@ public:
         return isWaitingToDownload() || isWaitingToSeed();
     }
 
-    void notifyComplete() const;
-
-    void update(tr_variant* dict);
-
-    void setMagnet(bool magnet)
-    {
-        magnetTorrent = magnet;
-    }
+    bool update(tr_variant* dict);
 
     QIcon getMimeTypeIcon() const
     {
         return getIcon(MIME_ICON);
     }
 
-    static KeyList const& getInfoKeys();
-    static KeyList const& getStatKeys();
-    static KeyList const& getExtraStatKeys();
-
-signals:
-    void torrentChanged(int id);
-    void torrentCompleted(int id);
+    using KeyList = QSet<tr_quark>;
+    static KeyList const allMainKeys;
+    static KeyList const detailInfoKeys;
+    static KeyList const detailStatKeys;
+    static KeyList const mainInfoKeys;
+    static KeyList const mainStatKeys;
 
 private:
-    enum Group
-    {
-        INFO, // info fields that only need to be loaded once
-        STAT, // commonly-used stats that should be refreshed often
-        STAT_EXTRA, // rarely used; only refresh if details dialog is open
-        DERIVED // doesn't come from RPC
-    };
-
     struct Property
     {
         int id;
         tr_quark key;
         int type;
-        int group;
     };
 
 private:
@@ -630,20 +614,17 @@ private:
     bool setBool(int key, bool value);
     bool setIcon(int key, QIcon const&);
     bool setDouble(int key, double);
-    bool setString(int key, char const*);
+    bool setString(int key, char const*, size_t len);
     bool setSize(int key, qulonglong);
     bool setTime(int key, time_t);
 
     char const* getMimeTypeString() const;
     void updateMimeIcon();
 
-    static KeyList buildKeyList(Group group);
-
 private:
+    int const myId;
     Prefs const& myPrefs;
-
     QVariant myValues[PROPERTY_COUNT];
-    bool magnetTorrent;
     FileList myFiles;
 
     static Property myProperties[];

@@ -36,13 +36,7 @@ public:
     FaviconCache& faviconCache();
 
 public slots:
-    void addTorrent(QString const&);
     void addTorrent(AddData const&);
-
-private:
-    void maybeUpdateBlocklist();
-    void loadTranslations();
-    void quitLater();
 
 private slots:
     void consentGiven(int result);
@@ -50,8 +44,14 @@ private slots:
     void refreshPref(int key);
     void refreshTorrents();
     void onTorrentsAdded(QSet<int> const& torrents);
-    void onTorrentCompleted(int);
-    void onNewTorrentChanged(int);
+    void onTorrentsCompleted(QSet<int> const& torrents);
+    void onTorrentsNeedInfo(QSet<int> const& torrents);
+
+private:
+    void maybeUpdateBlocklist();
+    void loadTranslations();
+    void quitLater();
+    QStringList getNames(QSet<int> const& ids) const;
 
 private:
     Prefs* myPrefs;

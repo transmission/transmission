@@ -78,7 +78,6 @@ public slots:
     void setStatusbarVisible(bool);
     void setCompactView(bool);
     void refreshActionSensitivity();
-    void refreshActionSensitivitySoon();
     void wrongAuthentication();
 
     void openSession();
@@ -109,11 +108,8 @@ private:
 
 private slots:
     void openPreferences();
-    void refreshTitle();
-    void refreshStatusBar();
-    void refreshTrayIcon();
-    void refreshTrayIconSoon();
-    void refreshTorrentViewHeader();
+    void refreshSoon(int fields = ~0);
+    void onRefreshTimer();
     void openTorrent();
     void openURL();
     void newTorrent();
@@ -137,8 +133,6 @@ private slots:
     void onSetPrefs();
     void onSetPrefs(bool);
     void onSessionSourceChanged();
-    void onModelReset();
-
     void setSortAscendingPref(bool);
 
     void onStatsModeChanged(QAction* action);
@@ -171,8 +165,6 @@ private:
     time_t myLastReadTime;
     QTimer myNetworkTimer;
     bool myNetworkError;
-    QTimer myRefreshTrayIconTimer;
-    QTimer myRefreshActionSensitivityTimer;
     QAction* myDlimitOffAction;
     QAction* myDlimitOnAction;
     QAction* myUlimitOffAction;
@@ -183,4 +175,18 @@ private:
     QWidget* myFilterBar;
     QAction* myAltSpeedAction;
     QString myErrorMessage;
+
+    enum {
+        REFRESH_TITLE                = (1 << 0),
+        REFRESH_STATUS_BAR           = (1 << 1),
+        REFRESH_TRAY_ICON            = (1 << 2),
+        REFRESH_TORRENT_VIEW_HEADER  = (1 << 3),
+        REFRESH_ACTION_SENSITIVITY   = (1 << 4)
+    };
+    int myRefreshFields = 0;
+    QTimer myRefreshTimer;
+    void refreshTitle();
+    void refreshStatusBar();
+    void refreshTrayIcon();
+    void refreshTorrentViewHeader();
 };

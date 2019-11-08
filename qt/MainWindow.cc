@@ -152,8 +152,7 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     myLastReadTime(0),
     myNetworkTimer(this),
     myNetworkError(false),
-    myRefreshTrayIconTimer(this),
-    myRefreshActionSensitivityTimer(this)
+    myRefreshTimer(this)
 {
     setAcceptDrops(true);
 
@@ -238,28 +237,25 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     connect(ui.action_SetLocation, SIGNAL(triggered()), this, SLOT(setLocation()));
     connect(ui.action_Properties, SIGNAL(triggered()), this, SLOT(openProperties()));
     connect(ui.action_SessionDialog, SIGNAL(triggered()), this, SLOT(openSession()));
-
     connect(ui.listView, SIGNAL(activated(QModelIndex)), ui.action_Properties, SLOT(trigger()));
-
-    // signals
     connect(ui.action_SelectAll, SIGNAL(triggered()), ui.listView, SLOT(selectAll()));
     connect(ui.action_DeselectAll, SIGNAL(triggered()), ui.listView, SLOT(clearSelection()));
-
-    connect(&myFilterModel, SIGNAL(rowsInserted(QModelIndex, int, int)), this, SLOT(refreshActionSensitivitySoon()));
-    connect(&myFilterModel, SIGNAL(rowsRemoved(QModelIndex, int, int)), this, SLOT(refreshActionSensitivitySoon()));
-
     connect(ui.action_Quit, SIGNAL(triggered()), qApp, SLOT(quit()));
+
+    auto refreshActionSensitivitySoon = [this](){refreshSoon(REFRESH_ACTION_SENSITIVITY);};
+    connect(&myFilterModel, &TorrentFilter::rowsInserted, refreshActionSensitivitySoon);
+    connect(&myFilterModel, &TorrentFilter::rowsRemoved, refreshActionSensitivitySoon);
 
     // torrent view
     myFilterModel.setSourceModel(&myModel);
-    connect(&myModel, SIGNAL(modelReset()), this, SLOT(onModelReset()));
-    connect(&myModel, SIGNAL(rowsRemoved(QModelIndex, int, int)), this, SLOT(onModelReset()));
-    connect(&myModel, SIGNAL(rowsInserted(QModelIndex, int, int)), this, SLOT(onModelReset()));
-    connect(&myModel, SIGNAL(dataChanged(QModelIndex, QModelIndex)), this, SLOT(refreshTrayIconSoon()));
+    auto refreshSoonAdapter = [this](){refreshSoon();};
+    connect(&myModel, &TorrentModel::modelReset, refreshSoonAdapter);
+    connect(&myModel, &TorrentModel::rowsRemoved, refreshSoonAdapter);
+    connect(&myModel, &TorrentModel::rowsInserted, refreshSoonAdapter);
+    connect(&myModel, &TorrentModel::dataChanged, refreshSoonAdapter);
 
     ui.listView->setModel(&myFilterModel);
-    connect(ui.listView->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this,
-        SLOT(refreshActionSensitivitySoon()));
+    connect(ui.listView->selectionModel(), &QItemSelectionModel::selectionChanged, refreshActionSensitivitySoon);
 
     QPair<QAction*, int> const sortModes[] =
     {
@@ -316,10 +312,11 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     initStatusBar();
     ui.verticalLayout->insertWidget(0, myFilterBar = new FilterBar(myPrefs, myModel, myFilterModel));
 
-    connect(&myModel, SIGNAL(rowsInserted(QModelIndex, int, int)), SLOT(refreshTorrentViewHeader()));
-    connect(&myModel, SIGNAL(rowsRemoved(QModelIndex, int, int)), SLOT(refreshTorrentViewHeader()));
-    connect(&myFilterModel, SIGNAL(rowsInserted(QModelIndex, int, int)), SLOT(refreshTorrentViewHeader()));
-    connect(&myFilterModel, SIGNAL(rowsRemoved(QModelIndex, int, int)), SLOT(refreshTorrentViewHeader()));
+    auto refreshHeaderSoon = [this](){refreshSoon(REFRESH_TORRENT_VIEW_HEADER);};
+    connect(&myModel, &TorrentModel::rowsInserted, refreshHeaderSoon);
+    connect(&myModel, &TorrentModel::rowsRemoved, refreshHeaderSoon);
+    connect(&myFilterModel, &TorrentFilter::rowsInserted, refreshHeaderSoon);
+    connect(&myFilterModel, &TorrentFilter::rowsRemoved, refreshHeaderSoon);
     connect(ui.listView, SIGNAL(headerDoubleClicked()), myFilterBar, SLOT(clear()));
 
     QList<int> initKeys;
@@ -347,39 +344,21 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     }
     else
     {
-        connect(&myNetworkTimer, SIGNAL(timeout()), this, SLOT(onNetworkTimer()));
+        connect(&myNetworkTimer, &QTimer::timeout, this, &MainWindow::onNetworkTimer);
         myNetworkTimer.start(1000);
     }
 
-    connect(&myRefreshTrayIconTimer, SIGNAL(timeout()), this, SLOT(refreshTrayIcon()));
-    connect(&myRefreshActionSensitivityTimer, SIGNAL(timeout()), this, SLOT(refreshActionSensitivity()));
-
-    refreshActionSensitivitySoon();
-    refreshTrayIconSoon();
-    refreshStatusBar();
-    refreshTitle();
-    refreshTorrentViewHeader();
+    connect(&myRefreshTimer, &QTimer::timeout, this, &MainWindow::onRefreshTimer);
+    refreshSoon();
 }
 
 MainWindow::~MainWindow()
 {
 }
 
-/****
-*****
-****/
-
 void MainWindow::onSessionSourceChanged()
 {
     myModel.clear();
-}
-
-void MainWindow::onModelReset()
-{
-    refreshTitle();
-    refreshActionSensitivitySoon();
-    refreshStatusBar();
-    refreshTrayIconSoon();
 }
 
 /****
@@ -702,6 +681,42 @@ void MainWindow::openHelp()
         arg(MINOR_VERSION / 10)));
 }
 
+/****
+*****
+****/
+
+void MainWindow::refreshSoon(int fields)
+{
+    myRefreshFields |= fields;
+
+    if (!myRefreshTimer.isActive())
+    {
+        myRefreshTimer.setSingleShot(true);
+        myRefreshTimer.start(100);
+    }
+}
+
+void MainWindow::onRefreshTimer()
+{
+    int fields = 0;
+    std::swap(fields, myRefreshFields);
+
+    if (fields & REFRESH_TITLE)
+      refreshTitle();
+
+    if (fields & REFRESH_STATUS_BAR)
+      refreshStatusBar();
+
+    if (fields & REFRESH_TRAY_ICON)
+      refreshTrayIcon();
+
+    if (fields & REFRESH_TORRENT_VIEW_HEADER)
+      refreshTorrentViewHeader();
+
+    if (fields & REFRESH_ACTION_SENSITIVITY)
+      refreshActionSensitivity();
+}
+
 void MainWindow::refreshTitle()
 {
     QString title(QLatin1String("Transmission"));
@@ -715,15 +730,6 @@ void MainWindow::refreshTitle()
     }
 
     setWindowTitle(title);
-}
-
-void MainWindow::refreshTrayIconSoon()
-{
-    if (!myRefreshTrayIconTimer.isActive())
-    {
-        myRefreshTrayIconTimer.setSingleShot(true);
-        myRefreshTrayIconTimer.start(100);
-    }
 }
 
 void MainWindow::refreshTrayIcon()
@@ -811,15 +817,6 @@ void MainWindow::refreshTorrentViewHeader()
     else
     {
         ui.listView->setHeaderText(tr("Showing %L1 of %Ln torrent(s)", nullptr, totalCount).arg(visibleCount));
-    }
-}
-
-void MainWindow::refreshActionSensitivitySoon()
-{
-    if (!myRefreshActionSensitivityTimer.isActive())
-    {
-        myRefreshActionSensitivityTimer.setSingleShot(true);
-        myRefreshActionSensitivityTimer.start(100);
     }
 }
 
@@ -1179,7 +1176,7 @@ void MainWindow::refreshPref(int key)
         ui.action_TrayIcon->setChecked(b);
         myTrayIcon.setVisible(b);
         qApp->setQuitOnLastWindowClosed(!b);
-        refreshTrayIconSoon();
+        refreshSoon(REFRESH_TRAY_ICON);
         break;
 
     case Prefs::COMPACT_VIEW:
@@ -1523,7 +1520,7 @@ void MainWindow::onNetworkResponse(QNetworkReply::NetworkError code, QString con
 
     myNetworkError = haveError;
     myErrorMessage = message;
-    refreshTrayIconSoon();
+    refreshSoon(REFRESH_TRAY_ICON);
     updateNetworkIcon();
 
     // Refresh our model if we've just gotten a clean connection to the session.

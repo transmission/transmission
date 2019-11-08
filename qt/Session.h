@@ -86,30 +86,29 @@ public:
     void torrentSetLocation(QSet<int> const& ids, QString const& path, bool doMove);
     void torrentRenamePath(QSet<int> const& ids, QString const& oldpath, QString const& newname);
     void addTorrent(AddData const& addme, tr_variant* top, bool trashOriginal);
-
-public slots:
+    void initTorrents(QSet<int> const& ids = QSet<int>());
     void pauseTorrents(QSet<int> const& torrentIds = QSet<int>());
     void startTorrents(QSet<int> const& torrentIds = QSet<int>());
     void startTorrentsNow(QSet<int> const& torrentIds = QSet<int>());
-    void queueMoveTop(QSet<int> const& torrentIds = QSet<int>());
-    void queueMoveUp(QSet<int> const& torrentIds = QSet<int>());
-    void queueMoveDown(QSet<int> const& torrentIds = QSet<int>());
-    void queueMoveBottom(QSet<int> const& torrentIds = QSet<int>());
-    void refreshSessionInfo();
-    void refreshSessionStats();
+    void refreshDetailInfo(QSet<int> const& torrentIds);
     void refreshActiveTorrents();
     void refreshAllTorrents();
-    void initTorrents(QSet<int> const& ids = QSet<int>());
     void addNewlyCreatedTorrent(QString const& filename, QString const& localPath);
-    void addTorrent(AddData const& addme);
-    void removeTorrents(QSet<int> const& torrentIds, bool deleteFiles = false);
     void verifyTorrents(QSet<int> const& torrentIds);
     void reannounceTorrents(QSet<int> const& torrentIds);
-    void launchWebInterface();
-    void updatePref(int key);
-
-    /** request a refresh for statistics, including the ones only used by the properties dialog, for a specific torrent */
     void refreshExtraStats(QSet<int> const& ids);
+
+public slots:
+    void addTorrent(AddData const& addme);
+    void launchWebInterface();
+    void queueMoveBottom(QSet<int> const& torrentIds = QSet<int>());
+    void queueMoveDown(QSet<int> const& torrentIds = QSet<int>());
+    void queueMoveTop(QSet<int> const& torrentIds = QSet<int>());
+    void queueMoveUp(QSet<int> const& torrentIds = QSet<int>());
+    void refreshSessionInfo();
+    void refreshSessionStats();
+    void removeTorrents(QSet<int> const& torrentIds, bool deleteFiles = false);
+    void updatePref(int key);
 
 signals:
     void sourceChanged();
