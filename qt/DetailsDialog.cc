@@ -1445,7 +1445,9 @@ void DetailsDialog::initTrackerTab()
     connect(ui.removeTrackerButton, &QAbstractButton::clicked, this, &DetailsDialog::onRemoveTrackerClicked);
     connect(ui.showBackupTrackersCheck, &QAbstractButton::clicked, this, &DetailsDialog::onShowBackupTrackersToggled);
     connect(ui.showTrackerScrapesCheck, &QAbstractButton::clicked, this, &DetailsDialog::onShowTrackerScrapesToggled);
-    connect(ui.trackersView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &DetailsDialog::onTrackerSelectionChanged);
+    connect(
+        ui.trackersView->selectionModel(), &QItemSelectionModel::selectionChanged, this,
+        &DetailsDialog::onTrackerSelectionChanged);
 
     onTrackerSelectionChanged();
 }

@@ -309,7 +309,6 @@ Application::Application(int& argc, char** argv) :
         refreshPref(key);
     }
 
-
     QTimer* timer = &myModelTimer;
     connect(timer, &QTimer::timeout, this, &Application::refreshTorrents);
     timer->setSingleShot(false);
@@ -407,6 +406,7 @@ QStringList Application::getNames(QSet<int> const& ids) const
     {
         names.push_back(myModel->getTorrentFromId(id)->name());
     }
+
     names.sort();
     return names;
 }

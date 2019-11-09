@@ -44,7 +44,7 @@ struct TorrentIdLessThan
 };
 
 template<typename Iter>
-QSet<int> getIds (Iter it, Iter end)
+QSet<int> getIds(Iter it, Iter end)
 {
     QSet<int> ids;
 
@@ -161,11 +161,11 @@ void TorrentModel::updateTorrents(tr_variant* torrents, bool isCompleteList)
     auto processed = QSet<Torrent*>{};
 
     auto const now = time(nullptr);
-    auto const recently_added = [now](const auto& tor)
+    auto const recently_added = [now](>const< auto& tor)
         {
             static auto constexpr max_age = 60;
             auto const date = tor->dateAdded();
-            return (date != 0) && (difftime(now,date) < max_age);
+            return (date != 0) && (difftime(now, date) < max_age);
         };
 
     size_t i = 0;
@@ -222,7 +222,7 @@ void TorrentModel::updateTorrents(tr_variant* torrents, bool isCompleteList)
     {
         rowsAdd(instantiated);
     }
-    
+
     if (!changed.isEmpty())
     {
         rowsEmitChanged(changed);
@@ -276,7 +276,7 @@ std::optional<int> TorrentModel::getRow(int id) const
         row = std::distance(myTorrents.begin(), it.first);
         assert(myTorrents[*row]->id() == id);
     }
-    
+
     return row;
 }
 
@@ -314,6 +314,7 @@ std::vector<TorrentModel::span_t> TorrentModel::getSpans(QSet<int> const& ids) c
             rows.push_back(*row);
         }
     }
+
     std::sort(rows.begin(), rows.end());
 
     // rows -> spans
@@ -335,12 +336,14 @@ std::vector<TorrentModel::span_t> TorrentModel::getSpans(QSet<int> const& ids) c
                 in_span = false;
             }
         }
+
         if (!in_span)
         {
             span.first = span.second = row;
             in_span = true;
         }
     }
+
     if (in_span)
     {
         spans.push_back(span);
@@ -355,7 +358,7 @@ std::vector<TorrentModel::span_t> TorrentModel::getSpans(QSet<int> const& ids) c
 
 void TorrentModel::rowsEmitChanged(QSet<int> const& ids)
 {
-    for (const auto& span : getSpans(ids))
+    for (>const< auto& span : getSpans(ids))
     {
         emit dataChanged(index(span.first), index(span.second));
     }
@@ -372,14 +375,17 @@ void TorrentModel::rowsAdd(torrents_t const& torrents)
         std::sort(myTorrents.begin(), myTorrents.end(), TorrentIdLessThan());
         endInsertRows();
     }
-    else for (auto const& tor : torrents)
+    else
     {
-        auto const it = std::lower_bound(myTorrents.begin(), myTorrents.end(), tor, compare);
-        auto const row = std::distance(myTorrents.begin(), it);
+        for (auto const& tor : torrents)
+        {
+            auto const it = std::lower_bound(myTorrents.begin(), myTorrents.end(), tor, compare);
+            auto const row = std::distance(myTorrents.begin(), it);
 
-        beginInsertRows(QModelIndex(), row, row);
-        myTorrents.insert(it, tor);
-        endInsertRows();
+            beginInsertRows(QModelIndex(), row, row);
+            myTorrents.insert(it, tor);
+            endInsertRows();
+        }
     }
 }
 
@@ -429,6 +435,6 @@ void TorrentModel::getTransferSpeed(Speed& uploadSpeed, size_t& uploadPeerCount,
 
 bool TorrentModel::hasTorrent(QString const& hashString) const
 {
-    auto test = [hashString](auto const& tor){return tor->hashString() == hashString;};
+    auto test = [hashString](auto const& tor) { return tor->hashString() == hashString; };
     return std::any_of(myTorrents.cbegin(), myTorrents.cend(), test);
 }

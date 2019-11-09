@@ -188,7 +188,8 @@ public:
 
 public:
     Torrent(Prefs const&, int id);
-    virtual ~Torrent() =default;;
+    virtual ~Torrent() = default;
+    ;
 
     int getBandwidthPriority() const
     {

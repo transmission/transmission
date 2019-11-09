@@ -64,7 +64,7 @@ private:
 
     std::optional<int> getRow(int id) const;
     std::optional<int> getRow(Torrent const* tor) const;
-    using span_t = std::pair<int,int>;
+    using span_t = std::pair<int, int>;
     std::vector<span_t> getSpans(QSet<int> const& ids) const;
 
     Prefs const& myPrefs;

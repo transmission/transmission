@@ -301,7 +301,7 @@ int Torrent::getInt(int i) const
 {
     assert(0 <= i && i < PROPERTY_COUNT);
     assert(myProperties[i].type == QVariant::Int);
-    //assert(!myValues[i].isNull());
+    // assert(!myValues[i].isNull());
 
     return myValues[i].toInt();
 }
@@ -310,7 +310,7 @@ time_t Torrent::getTime(int i) const
 {
     assert(0 <= i && i < PROPERTY_COUNT);
     assert(myProperties[i].type == QVariant::DateTime);
-    //assert((i == DATE_ADDED) || !myValues[i].isNull());
+    // assert((i == DATE_ADDED) || !myValues[i].isNull());
 
     return time_t(myValues[i].toLongLong());
 }
@@ -319,7 +319,7 @@ bool Torrent::getBool(int i) const
 {
     assert(0 <= i && i < PROPERTY_COUNT);
     assert(myProperties[i].type == QVariant::Bool);
-    //assert(!myValues[i].isNull());
+    // assert(!myValues[i].isNull());
 
     return myValues[i].toBool();
 }
@@ -328,7 +328,7 @@ qulonglong Torrent::getSize(int i) const
 {
     assert(0 <= i && i < PROPERTY_COUNT);
     assert(myProperties[i].type == QVariant::ULongLong);
-    //assert(!myValues[i].isNull());
+    // assert(!myValues[i].isNull());
 
     return myValues[i].toULongLong();
 }
@@ -337,7 +337,7 @@ double Torrent::getDouble(int i) const
 {
     assert(0 <= i && i < PROPERTY_COUNT);
     assert(myProperties[i].type == QVariant::Double);
-    //assert(!myValues[i].isNull());
+    // assert(!myValues[i].isNull());
 
     return myValues[i].toDouble();
 }
@@ -346,7 +346,7 @@ QString Torrent::getString(int i) const
 {
     assert(0 <= i && i < PROPERTY_COUNT);
     assert(myProperties[i].type == QVariant::String);
-    //assert((i == HASH_STRING) || !myValues[i].isNull());
+    // assert((i == HASH_STRING) || !myValues[i].isNull());
 
     return myValues[i].toString();
 }
@@ -355,7 +355,7 @@ QIcon Torrent::getIcon(int i) const
 {
     assert(0 <= i && i < PROPERTY_COUNT);
     assert(myProperties[i].type == QVariant::Icon);
-    //assert(!myValues[i].isNull());
+    // assert(!myValues[i].isNull());
 
     return myValues[i].value<QIcon>();
 }

@@ -242,13 +242,13 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     connect(ui.action_DeselectAll, SIGNAL(triggered()), ui.listView, SLOT(clearSelection()));
     connect(ui.action_Quit, SIGNAL(triggered()), qApp, SLOT(quit()));
 
-    auto refreshActionSensitivitySoon = [this](){refreshSoon(REFRESH_ACTION_SENSITIVITY);};
+    auto refreshActionSensitivitySoon = [this]() { refreshSoon(REFRESH_ACTION_SENSITIVITY); };
     connect(&myFilterModel, &TorrentFilter::rowsInserted, refreshActionSensitivitySoon);
     connect(&myFilterModel, &TorrentFilter::rowsRemoved, refreshActionSensitivitySoon);
 
     // torrent view
     myFilterModel.setSourceModel(&myModel);
-    auto refreshSoonAdapter = [this](){refreshSoon();};
+    auto refreshSoonAdapter = [this]() { refreshSoon(); };
     connect(&myModel, &TorrentModel::modelReset, refreshSoonAdapter);
     connect(&myModel, &TorrentModel::rowsRemoved, refreshSoonAdapter);
     connect(&myModel, &TorrentModel::rowsInserted, refreshSoonAdapter);
@@ -312,7 +312,7 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     initStatusBar();
     ui.verticalLayout->insertWidget(0, myFilterBar = new FilterBar(myPrefs, myModel, myFilterModel));
 
-    auto refreshHeaderSoon = [this](){refreshSoon(REFRESH_TORRENT_VIEW_HEADER);};
+    auto refreshHeaderSoon = [this]() { refreshSoon(REFRESH_TORRENT_VIEW_HEADER); };
     connect(&myModel, &TorrentModel::rowsInserted, refreshHeaderSoon);
     connect(&myModel, &TorrentModel::rowsRemoved, refreshHeaderSoon);
     connect(&myFilterModel, &TorrentFilter::rowsInserted, refreshHeaderSoon);
@@ -702,19 +702,29 @@ void MainWindow::onRefreshTimer()
     std::swap(fields, myRefreshFields);
 
     if (fields & REFRESH_TITLE)
-      refreshTitle();
+    {
+        refreshTitle();
+    }
 
     if (fields & REFRESH_STATUS_BAR)
-      refreshStatusBar();
+    {
+        refreshStatusBar();
+    }
 
     if (fields & REFRESH_TRAY_ICON)
-      refreshTrayIcon();
+    {
+        refreshTrayIcon();
+    }
 
     if (fields & REFRESH_TORRENT_VIEW_HEADER)
-      refreshTorrentViewHeader();
+    {
+        refreshTorrentViewHeader();
+    }
 
     if (fields & REFRESH_ACTION_SENSITIVITY)
-      refreshActionSensitivity();
+    {
+        refreshActionSensitivity();
+    }
 }
 
 void MainWindow::refreshTitle()

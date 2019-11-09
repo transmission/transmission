@@ -176,12 +176,13 @@ private:
     QAction* myAltSpeedAction;
     QString myErrorMessage;
 
-    enum {
-        REFRESH_TITLE                = (1 << 0),
-        REFRESH_STATUS_BAR           = (1 << 1),
-        REFRESH_TRAY_ICON            = (1 << 2),
-        REFRESH_TORRENT_VIEW_HEADER  = (1 << 3),
-        REFRESH_ACTION_SENSITIVITY   = (1 << 4)
+    enum
+    {
+        REFRESH_TITLE = (1 << 0),
+        REFRESH_STATUS_BAR = (1 << 1),
+        REFRESH_TRAY_ICON = (1 << 2),
+        REFRESH_TORRENT_VIEW_HEADER = (1 << 3),
+        REFRESH_ACTION_SENSITIVITY = (1 << 4)
     };
     int myRefreshFields = 0;
     QTimer myRefreshTimer;
