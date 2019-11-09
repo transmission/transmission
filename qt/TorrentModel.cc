@@ -161,7 +161,7 @@ void TorrentModel::updateTorrents(tr_variant* torrents, bool isCompleteList)
     auto processed = QSet<Torrent*>{};
 
     auto const now = time(nullptr);
-    auto const recently_added = [now](>const< auto& tor)
+    auto const recently_added = [now](auto const& tor)
         {
             static auto constexpr max_age = 60;
             auto const date = tor->dateAdded();
@@ -358,7 +358,7 @@ std::vector<TorrentModel::span_t> TorrentModel::getSpans(QSet<int> const& ids) c
 
 void TorrentModel::rowsEmitChanged(QSet<int> const& ids)
 {
-    for (>const< auto& span : getSpans(ids))
+    for (auto const& span : getSpans(ids))
     {
         emit dataChanged(index(span.first), index(span.second));
     }
