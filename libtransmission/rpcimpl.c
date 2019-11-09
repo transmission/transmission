@@ -1750,11 +1750,11 @@ static void addTorrentImpl(struct tr_rpc_idle_data* data, tr_ctor* ctor)
 
     if (tor != NULL && key != 0)
     {
-        tr_quark fields[] =
+        tr_quark const fields[] =
         {
-            tr_quark_new("id", TR_BAD_SIZE),
-            tr_quark_new("name", TR_BAD_SIZE),
-            tr_quark_new("hashString", TR_BAD_SIZE)
+            TR_KEY_id,
+            TR_KEY_name,
+            TR_KEY_hashString
         };
 
         addTorrentInfo(tor, TR_FORMAT_OBJECT, tr_variantDictAdd(data->args_out, key), fields, TR_N_ELEMENTS(fields));

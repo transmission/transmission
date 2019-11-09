@@ -202,6 +202,7 @@ void TorrentModel::updateTorrents(tr_variant* torrents, bool isCompleteList)
     {
         return;
     }
+
     auto const id_pos = std::distance(std::begin(keys), id_it);
 
     // Loop through the torrent records...

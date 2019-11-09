@@ -747,7 +747,7 @@ bool Torrent::update(tr_quark const* keys, tr_variant** values, size_t n)
         int i = 0;
         while ((child = tr_variantListChild(v, i++)) != nullptr)
         {
-            const char* str;
+            >const< char* str;
             size_t len;
             if (tr_variantDictFindStr(child, TR_KEY_announce, &str, &len))
             {
@@ -758,7 +758,6 @@ bool Torrent::update(tr_quark const* keys, tr_variant** values, size_t n)
         // update the trackers
         if (myValues[TRACKERS] != trackers)
         {
-
             QStringList hosts;
             for (auto const& tracker : trackers)
             {
