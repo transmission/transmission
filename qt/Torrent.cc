@@ -541,7 +541,7 @@ void Torrent::updateMimeIcon()
 ****
 ***/
 
-bool Torrent::update(tr_variant* d)
+bool Torrent::update(tr_quark const* keys, tr_variant** values, size_t n)
 {
     static bool lookup_initialized = false;
     static int key_to_property_index[TR_N_KEYS];
@@ -562,12 +562,11 @@ bool Torrent::update(tr_variant* d)
         }
     }
 
-    tr_quark key;
-    tr_variant* child;
-    size_t pos = 0;
-
-    while (tr_variantDictChild(d, pos++, &key, &child))
+    for (size_t pos = 0; pos < n; ++pos)
     {
+        tr_quark key = keys[pos];
+        tr_variant* child = values[pos];
+
         int const property_index = key_to_property_index[key];
 
         if (property_index == -1) // we're not interested in this one
@@ -669,10 +668,10 @@ bool Torrent::update(tr_variant* d)
         }
     }
 
-    tr_variant* files;
-
-    if (tr_variantDictFindList(d, TR_KEY_files, &files))
+    auto it = std::find(keys, keys + n, TR_KEY_files);
+    if (it != keys + n)
     {
+        tr_variant* files = values[std::distance(keys, it)];
         char const* str;
         int64_t intVal;
         int i = 0;
@@ -704,8 +703,10 @@ bool Torrent::update(tr_variant* d)
         changed = true;
     }
 
-    if (tr_variantDictFindList(d, TR_KEY_fileStats, &files))
+    it = std::find(keys, keys + n, TR_KEY_fileStats);
+    if (it != keys + n)
     {
+        tr_variant* files = values[std::distance(keys, it)];
         int const n = tr_variantListSize(files);
 
         for (int i = 0; i < n && i < myFiles.size(); ++i)
@@ -734,51 +735,50 @@ bool Torrent::update(tr_variant* d)
         changed = true;
     }
 
-    tr_variant* trackers;
-
-    if (tr_variantDictFindList(d, TR_KEY_trackers, &trackers))
+    it = std::find(keys, keys + n, TR_KEY_trackers);
+    if (it != keys + n)
     {
-        size_t len;
-        char const* str;
-        int i = 0;
-        QStringList list;
-        tr_variant* child;
+        tr_variant* v = values[std::distance(keys, it)];
 
-        while ((child = tr_variantListChild(trackers, i++)) != nullptr)
+        // build the new tracker list
+        QStringList trackers;
+        trackers.reserve(tr_variantListSize(v));
+        tr_variant* child;
+        int i = 0;
+        while ((child = tr_variantListChild(v, i++)) != nullptr)
         {
+            char const* str;
+            size_t len;
             if (tr_variantDictFindStr(child, TR_KEY_announce, &str, &len))
             {
-                qApp->faviconCache().add(QUrl(QString::fromUtf8(str)));
-                list.append(QString::fromUtf8(str, len));
+                trackers.append(QString::fromUtf8(str, len));
             }
         }
 
-        if (myValues[TRACKERS] != list)
+        // update the trackers
+        if (myValues[TRACKERS] != trackers)
         {
             QStringList hosts;
-
-            for (QString const& tracker : list)
+            for (auto const& tracker : trackers)
             {
-                QString const host = FaviconCache::getHost(QUrl(tracker));
-
-                if (!host.isEmpty())
-                {
-                    hosts.append(host);
-                }
+                auto const url = QUrl(tracker);
+                qApp->faviconCache().add(url);
+                hosts.append(FaviconCache::getHost(url));
             }
 
             hosts.removeDuplicates();
+            hosts.removeOne(QString());
 
-            myValues[TRACKERS].setValue(list);
+            myValues[TRACKERS].setValue(trackers);
             myValues[HOSTS].setValue(hosts);
             changed = true;
         }
     }
 
-    tr_variant* trackerStats;
-
-    if (tr_variantDictFindList(d, TR_KEY_trackerStats, &trackerStats))
+    it = std::find(keys, keys + n, TR_KEY_trackerStats);
+    if (it != keys + n)
     {
+        tr_variant* trackerStats = values[std::distance(keys, it)];
         tr_variant* child;
         TrackerStatsList trackerStatsList;
         int childNum = 0;
@@ -924,10 +924,10 @@ bool Torrent::update(tr_variant* d)
         changed = true;
     }
 
-    tr_variant* peers;
-
-    if (tr_variantDictFindList(d, TR_KEY_peers, &peers))
+    it = std::find(keys, keys + n, TR_KEY_peers);
+    if (it != keys + n)
     {
+        tr_variant* peers = values[std::distance(keys, it)];
         tr_variant* child;
         PeerList peerList;
         int childNum = 0;

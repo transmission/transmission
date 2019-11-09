@@ -168,13 +168,77 @@ void TorrentModel::updateTorrents(tr_variant* torrents, bool isCompleteList)
             return (date != 0) && (difftime(now, date) < max_age);
         };
 
-    size_t i = 0;
-    tr_variant* child;
-    while ((child = tr_variantListChild(torrents, i++)) != nullptr)
+    // build a list of the property keys
+    tr_variant* const firstChild = tr_variantListChild(torrents, 0);
+    bool const table = tr_variantIsList(firstChild);
+    std::vector<tr_quark> keys;
+    if (table)
     {
-        int64_t id;
+        // In 'table' format, the first entry in 'torrents' is an array of keys.
+        // All the other entries are an array of the values for one torrent.
+        char const* str;
+        size_t len;
+        size_t i = 0;
+        while (tr_variantGetStr(tr_variantListChild(firstChild, i++), &str, &len))
+        {
+            keys.push_back(tr_quark_new(str, len));
+        }
+    }
+    else
+    {
+        // In 'object' format, every entry is an object with the same set of properties
+        size_t i = 0;
+        tr_quark key;
+        tr_variant* value;
+        while (firstChild && tr_variantDictChild(firstChild, i++, &key, &value))
+        {
+            keys.push_back(key);
+        }
+    }
 
-        if (!tr_variantDictFindInt(child, TR_KEY_id, &id))
+    // Find the position of TR_KEY_id so we can do torrent lookup
+    auto const id_it = std::find(std::begin(keys), std::end(keys), TR_KEY_id);
+    if (id_it == std::end(keys)) // no ids provided; we can't proceed
+    {
+        return;
+    }
+
+    auto const id_pos = std::distance(std::begin(keys), id_it);
+
+    // Loop through the torrent records...
+    std::vector<tr_variant*> values;
+    values.reserve(keys.size());
+    size_t tor_index = table ? 1 : 0;
+    tr_variant* v;
+    while ((v = tr_variantListChild(torrents, tor_index++)))
+    {
+        // Build an array of values
+        values.clear();
+        if (table)
+        {
+            // In table mode, v is already a list of values
+            size_t i = 0;
+            tr_variant* val;
+            while ((val = tr_variantListChild(v, i++)))
+            {
+                values.push_back(val);
+            }
+        }
+        else
+        {
+            // In object mode, v is an object of torrent property key/vals
+            size_t i = 0;
+            tr_quark key;
+            tr_variant* value;
+            while (tr_variantDictChild(v, i++, &key, &value))
+            {
+                values.push_back(value);
+            }
+        }
+
+        // Find the torrent id
+        int64_t id;
+        if (!tr_variantGetInt(values[id_pos], &id))
         {
             continue;
         }
@@ -192,7 +256,7 @@ void TorrentModel::updateTorrents(tr_variant* torrents, bool isCompleteList)
             leftUntilDone = tor->leftUntilDone();
         }
 
-        if (tor->update(child))
+        if (tor->update(keys.data(), values.data(), keys.size()))
         {
             changed.insert(id);
         }

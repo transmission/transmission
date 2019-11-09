@@ -125,6 +125,7 @@ enum
     TR_KEY_filter_trackers,
     TR_KEY_flagStr,
     TR_KEY_flags,
+    TR_KEY_format,
     TR_KEY_fromCache,
     TR_KEY_fromDht,
     TR_KEY_fromIncoming,

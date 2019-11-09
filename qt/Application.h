@@ -50,8 +50,8 @@ private slots:
 private:
     void maybeUpdateBlocklist();
     void loadTranslations();
-    void quitLater();
     QStringList getNames(QSet<int> const& ids) const;
+    void quitLater();
 
 private:
     Prefs* myPrefs;

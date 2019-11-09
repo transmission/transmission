@@ -580,7 +580,7 @@ public:
         return isWaitingToDownload() || isWaitingToSeed();
     }
 
-    bool update(tr_variant* dict);
+    bool update(tr_quark const* keys, tr_variant** values, size_t n);
 
     QIcon getMimeTypeIcon() const
     {
