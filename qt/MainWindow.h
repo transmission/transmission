@@ -107,36 +107,36 @@ private:
     virtual void showEvent(QShowEvent* event);
 
 private slots:
-    void openPreferences();
-    void refreshSoon(int fields = ~0);
-    void onRefreshTimer();
-    void openTorrent();
-    void openURL();
-    void newTorrent();
-    void trayActivated(QSystemTrayIcon::ActivationReason);
-    void refreshPref(int key);
     void addTorrents(QStringList const& filenames);
-    void removeTorrents(bool const deleteFiles);
-    void openStats();
-    void openDonate();
-    void openAbout();
-    void openHelp();
-    void openFolder();
     void copyMagnetLinkToClipboard();
-    void setLocation();
-    void openProperties();
-    void toggleSpeedMode();
     void dataReadProgress();
     void dataSendProgress();
+    void newTorrent();
     void onNetworkResponse(QNetworkReply::NetworkError code, QString const& message);
-    void toggleWindows(bool doShow);
+    void onRefreshTimer();
+    void onSessionSourceChanged();
     void onSetPrefs();
     void onSetPrefs(bool);
-    void onSessionSourceChanged();
-    void setSortAscendingPref(bool);
-
-    void onStatsModeChanged(QAction* action);
     void onSortModeChanged(QAction* action);
+    void onStatsModeChanged(QAction* action);
+    void openAbout();
+    void openDonate();
+    void openFolder();
+    void openHelp();
+    void openPreferences();
+    void openProperties();
+    void openStats();
+    void openTorrent();
+    void openURL();
+    void refreshPref(int key);
+    void refreshSoon(int fields = ~0);
+    void refreshStatusBar();
+    void removeTorrents(bool const deleteFiles);
+    void setLocation();
+    void setSortAscendingPref(bool);
+    void toggleSpeedMode();
+    void toggleWindows(bool doShow);
+    void trayActivated(QSystemTrayIcon::ActivationReason);
 
 private:
     Session& mySession;
@@ -186,7 +186,6 @@ private:
     int myRefreshFields = 0;
     QTimer myRefreshTimer;
     void refreshTitle();
-    void refreshStatusBar();
     void refreshTrayIcon();
     void refreshTorrentViewHeader();
 };
