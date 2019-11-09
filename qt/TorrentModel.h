@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include <optional>
+
 #include <QAbstractListModel>
 #include <QSet>
 #include <QVector>
@@ -31,43 +33,43 @@ public:
         TorrentRole = Qt::UserRole
     };
 
-public:
-    TorrentModel(Prefs const& prefs);
+    explicit TorrentModel(Prefs const& prefs);
     virtual ~TorrentModel();
-
     void clear();
+
     bool hasTorrent(QString const& hashString) const;
 
     Torrent* getTorrentFromId(int id);
     Torrent const* getTorrentFromId(int id) const;
 
-    void getTransferSpeed(Speed& uploadSpeed, size_t& uploadPeerCount, Speed& downloadSpeed, size_t& downloadPeerCount);
+    void getTransferSpeed(Speed& uploadSpeed, size_t& uploadPeerCount, Speed& downloadSpeed, size_t& downloadPeerCount) const;
 
     // QAbstractItemModel
-    virtual int rowCount(QModelIndex const& parent = QModelIndex()) const;
-    virtual QVariant data(QModelIndex const& index, int role = Qt::DisplayRole) const;
+    int rowCount(QModelIndex const& parent = QModelIndex()) const override;
+    QVariant data(QModelIndex const& index, int role = Qt::DisplayRole) const override;
 
 public slots:
     void updateTorrents(tr_variant* torrentList, bool isCompleteList);
     void removeTorrents(tr_variant* torrentList);
-    void removeTorrent(int id);
 
 signals:
     void torrentsAdded(QSet<int>);
+    void torrentsChanged(QSet<int>);
+    void torrentsCompleted(QSet<int>);
+    void torrentsNeedInfo(QSet<int>);
 
 private:
-    typedef QVector<Torrent*> torrents_t;
+    using torrents_t = QVector<Torrent*>;
+    void rowsAdd(torrents_t const& torrents);
+    void rowsRemove(QSet<Torrent*> const& torrents);
+    void rowsEmitChanged(QSet<int> const& ids);
 
-private:
-    void addTorrent(Torrent*);
-    void addTorrents(torrents_t&& torrents, QSet<int>& addIds);
-    QSet<int> getIds() const;
+    std::optional<int> getRow(int id) const;
+    std::optional<int> getRow(Torrent const* tor) const;
+    using span_t = std::pair<int, int>;
+    std::vector<span_t> getSpans(QSet<int> const& ids) const;
 
-private slots:
-    void onTorrentChanged(int propertyId);
-
-private:
     Prefs const& myPrefs;
-
     torrents_t myTorrents;
+    QSet<int> myAlreadyAdded;
 };

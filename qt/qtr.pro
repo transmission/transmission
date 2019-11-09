@@ -11,7 +11,7 @@ unix: INSTALLS += man
 man.path = /share/man/man1/
 man.files = transmission-qt.1
 
-CONFIG += qt thread link_pkgconfig c++11 warn_on
+CONFIG += qt thread link_pkgconfig c++1z warn_on
 QT += network dbus
 win32:QT += winextras
 PKGCONFIG = fontconfig libcurl openssl libevent
@@ -38,8 +38,6 @@ LIBS += $${LIBNATPMP_LIBS}
 unix: LIBS += -L$${EVENT_TOP}/lib -lz -lrt
 win32:LIBS += -levent-2.0 -lws2_32 -lintl
 win32:LIBS += -lidn -liconv -lwldap32 -liphlpapi
-
-lessThan(QT_MAJOR_VERSION, 5) : *-g++* | *-clang* : QMAKE_CXXFLAGS += -std=gnu++11
 
 TRANSLATIONS += translations/transmission_de.ts \
                 translations/transmission_en.ts \

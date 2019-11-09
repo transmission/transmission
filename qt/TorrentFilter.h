@@ -9,6 +9,7 @@
 #pragma once
 
 #include <QSortFilterProxyModel>
+#include <QTimer>
 
 class QString;
 
@@ -46,8 +47,10 @@ private:
     bool trackerFilterAcceptsTorrent(Torrent const* tor, QString const& tracker) const;
 
 private slots:
-    void refreshPref(int key);
+    void onPrefChanged(int key);
+    void refilter();
 
 private:
+    QTimer myRefilterTimer;
     Prefs const& myPrefs;
 };

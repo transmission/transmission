@@ -43,21 +43,6 @@ namespace
 
 typedef Torrent::KeyList KeyList;
 
-KeyList const& getInfoKeys()
-{
-    return Torrent::getInfoKeys();
-}
-
-KeyList const& getStatKeys()
-{
-    return Torrent::getStatKeys();
-}
-
-KeyList const& getExtraStatKeys()
-{
-    return Torrent::getExtraStatKeys();
-}
-
 void addList(tr_variant* list, KeyList const& keys)
 {
     tr_variantListReserve(list, keys.size());
@@ -144,7 +129,7 @@ void Session::copyMagnetLinkToClipboard(int torrentId)
             return exec(TR_KEY_torrent_get, &args);
         });
 
-    q->add([this](RpcResponse const& r)
+    q->add([](RpcResponse const& r)
         {
             tr_variant* torrents;
 
@@ -536,7 +521,7 @@ void Session::torrentRenamePath(QSet<int> const& ids, QString const& oldpath, QS
         {
             return exec("torrent-rename-path", &args);
         },
-        [this](RpcResponse const& r)
+        [](RpcResponse const& r)
         {
             char const* path = "(unknown)";
             char const* name = "(unknown)";
@@ -547,7 +532,7 @@ void Session::torrentRenamePath(QSet<int> const& ids, QString const& oldpath, QS
                 tr("<p><b>Unable to rename \"%1\" as \"%2\": %3.</b></p><p>Please correct the errors and try again.</p>").
                     arg(QString::fromUtf8(path)).arg(QString::fromUtf8(name)).arg(r.result), QMessageBox::Close,
                 qApp->activeWindow());
-            connect(d, SIGNAL(rejected()), d, SLOT(deleteLater()));
+            QObject::connect(d, &QMessageBox::rejected, d, &QMessageBox::deleteLater);
             d->show();
         });
 
@@ -599,9 +584,14 @@ void Session::refreshTorrents(QSet<int> const& ids, KeyList const& keys)
     q->run();
 }
 
+void Session::refreshDetailInfo(QSet<int> const& ids)
+{
+    refreshTorrents(ids, Torrent::detailInfoKeys);
+}
+
 void Session::refreshExtraStats(QSet<int> const& ids)
 {
-    refreshTorrents(ids, getStatKeys() + getExtraStatKeys());
+    refreshTorrents(ids, Torrent::mainStatKeys + Torrent::detailStatKeys);
 }
 
 void Session::sendTorrentRequest(char const* request, QSet<int> const& ids)
@@ -619,7 +609,7 @@ void Session::sendTorrentRequest(char const* request, QSet<int> const& ids)
 
     q->add([this, ids]()
         {
-            refreshTorrents(ids, getStatKeys());
+            refreshTorrents(ids, Torrent::mainStatKeys);
         });
 
     q->run();
@@ -662,17 +652,17 @@ void Session::queueMoveBottom(QSet<int> const& ids)
 
 void Session::refreshActiveTorrents()
 {
-    refreshTorrents(recentlyActiveIds, getStatKeys());
+    refreshTorrents(recentlyActiveIds, Torrent::mainStatKeys);
 }
 
 void Session::refreshAllTorrents()
 {
-    refreshTorrents(allIds, getStatKeys());
+    refreshTorrents(allIds, Torrent::mainStatKeys);
 }
 
 void Session::initTorrents(QSet<int> const& ids)
 {
-    refreshTorrents(ids, getStatKeys() + getInfoKeys());
+    refreshTorrents(ids, Torrent::allMainKeys);
 }
 
 void Session::refreshSessionStats()
@@ -992,16 +982,16 @@ void Session::addTorrent(AddData const& addMe, tr_variant* args, bool trashOrigi
         {
             return exec("torrent-add", args);
         },
-        [this, addMe](RpcResponse const& r)
+        [addMe](RpcResponse const& r)
         {
             QMessageBox* d = new QMessageBox(QMessageBox::Warning, tr("Error Adding Torrent"),
                 QString::fromLatin1("<p><b>%1</b></p><p>%2</p>").arg(r.result).arg(addMe.readableName()), QMessageBox::Close,
                 qApp->activeWindow());
-            connect(d, SIGNAL(rejected()), d, SLOT(deleteLater()));
+            QObject::connect(d, &QMessageBox::rejected, d, &QMessageBox::deleteLater);
             d->show();
         });
 
-    q->add([this, addMe](RpcResponse const& r)
+    q->add([addMe](RpcResponse const& r)
         {
             tr_variant* dup;
 
@@ -1018,14 +1008,14 @@ void Session::addTorrent(AddData const& addMe, tr_variant* args, bool trashOrigi
                 QMessageBox* d = new QMessageBox(QMessageBox::Warning, tr("Add Torrent"),
                     tr("<p><b>Unable to add \"%1\".</b></p><p>It is a duplicate of \"%2\" which is already added.</p>").
                         arg(addMe.readableShortName()).arg(name), QMessageBox::Close, qApp->activeWindow());
-                connect(d, SIGNAL(rejected()), d, SLOT(deleteLater()));
+                QObject::connect(d, &QMessageBox::rejected, d, &QMessageBox::deleteLater);
                 d->show();
             }
         });
 
     if (trashOriginal && addMe.type == AddData::FILENAME)
     {
-        q->add([this, addMe]()
+        q->add([addMe]()
             {
                 QFile original(addMe.filename);
                 original.setPermissions(QFile::ReadOwner | QFile::WriteOwner);

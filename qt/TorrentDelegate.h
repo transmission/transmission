@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include <optional>
+
 #include <QStyledItemDelegate>
 
 class QStyle;
@@ -49,4 +51,8 @@ protected:
     static QColor blueBack;
     static QColor greenBack;
     static QColor silverBack;
+
+private:
+    mutable std::optional<int> myHeightHint;
+    mutable QFont myHeightFont;
 };

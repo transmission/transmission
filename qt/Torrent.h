@@ -8,10 +8,11 @@
 
 #pragma once
 
+#include <ctime> // time_t
+
 #include <QObject>
 #include <QIcon>
 #include <QMetaType>
-#include <QDateTime>
 #include <QString>
 #include <QStringList>
 #include <QList>
@@ -127,7 +128,6 @@ class Torrent : public QObject
 public:
     enum
     {
-        ID,
         UPLOAD_SPEED,
         DOWNLOAD_SPEED,
         DOWNLOAD_DIR,
@@ -155,7 +155,6 @@ public:
         DATE_CREATED,
         PEERS_CONNECTED,
         ETA,
-        RATIO,
         DOWNLOADED_EVER,
         UPLOADED_EVER,
         FAILED_EVER,
@@ -187,11 +186,10 @@ public:
         PROPERTY_COUNT
     };
 
-    typedef QList<tr_quark> KeyList;
-
 public:
     Torrent(Prefs const&, int id);
-    virtual ~Torrent();
+    virtual ~Torrent() = default;
+    ;
 
     int getBandwidthPriority() const
     {
@@ -200,12 +198,17 @@ public:
 
     int id() const
     {
-        return getInt(ID);
+        return myId;
     }
 
     QString name() const
     {
         return getString(NAME);
+    }
+
+    bool hasName() const
+    {
+        return !myValues[NAME].isNull();
     }
 
     QString creator() const
@@ -297,11 +300,6 @@ public:
         return getDouble(METADATA_PERCENT_DONE) >= 1.0;
     }
 
-    bool isMagnet() const
-    {
-        return magnetTorrent;
-    }
-
     int pieceCount() const
     {
         return getInt(PIECE_COUNT);
@@ -309,7 +307,10 @@ public:
 
     double ratio() const
     {
-        return getDouble(RATIO);
+        auto const u = uploadedEver();
+        auto const d = downloadedEver();
+        auto const t = totalSize();
+        return double(u) / (d ? d : t);
     }
 
     double percentComplete() const
@@ -319,7 +320,9 @@ public:
 
     double percentDone() const
     {
-        return getDouble(PERCENT_DONE);
+        auto const l = leftUntilDone();
+        auto const s = sizeWhenDone();
+        return s ? double(s - l) / s : 0.0;
     }
 
     double metadataPercentDone() const
@@ -357,34 +360,34 @@ public:
         return getInt(ETA);
     }
 
-    QDateTime lastActivity() const
+    time_t lastActivity() const
     {
-        return getDateTime(DATE_ACTIVITY);
+        return getTime(DATE_ACTIVITY);
     }
 
-    QDateTime lastStarted() const
+    time_t lastStarted() const
     {
-        return getDateTime(DATE_STARTED);
+        return getTime(DATE_STARTED);
     }
 
-    QDateTime dateAdded() const
+    time_t dateAdded() const
     {
-        return getDateTime(DATE_ADDED);
+        return getTime(DATE_ADDED);
     }
 
-    QDateTime dateCreated() const
+    time_t dateCreated() const
     {
-        return getDateTime(DATE_CREATED);
+        return getTime(DATE_CREATED);
     }
 
-    QDateTime manualAnnounceTime() const
+    time_t manualAnnounceTime() const
     {
-        return getDateTime(MANUAL_ANNOUNCE_TIME);
+        return getTime(MANUAL_ANNOUNCE_TIME);
     }
 
-    bool canManualAnnounce() const
+    bool canManualAnnounceAt(time_t t) const
     {
-        return isReadyToTransfer() && (manualAnnounceTime() <= QDateTime::currentDateTime());
+        return isReadyToTransfer() && (manualAnnounceTime() <= t);
     }
 
     int peersWeAreDownloadingFrom() const
@@ -577,73 +580,52 @@ public:
         return isWaitingToDownload() || isWaitingToSeed();
     }
 
-    void notifyComplete() const;
-
-    void update(tr_quark const* keys, tr_variant** values, size_t n);
-
-    void setMagnet(bool magnet)
-    {
-        magnetTorrent = magnet;
-    }
+    bool update(tr_quark const* keys, tr_variant** values, size_t n);
 
     QIcon getMimeTypeIcon() const
     {
         return getIcon(MIME_ICON);
     }
 
-    static KeyList const& getInfoKeys();
-    static KeyList const& getStatKeys();
-    static KeyList const& getExtraStatKeys();
-
-signals:
-    void torrentChanged(int id);
-    void torrentCompleted(int id);
+    using KeyList = QSet<tr_quark>;
+    static KeyList const allMainKeys;
+    static KeyList const detailInfoKeys;
+    static KeyList const detailStatKeys;
+    static KeyList const mainInfoKeys;
+    static KeyList const mainStatKeys;
 
 private:
-    enum Group
-    {
-        INFO, // info fields that only need to be loaded once
-        STAT, // commonly-used stats that should be refreshed often
-        STAT_EXTRA, // rarely used; only refresh if details dialog is open
-        DERIVED // doesn't come from RPC
-    };
-
     struct Property
     {
         int id;
         tr_quark key;
         int type;
-        int group;
     };
 
 private:
     int getInt(int key) const;
     bool getBool(int key) const;
-    QTime getTime(int key) const;
     QIcon getIcon(int key) const;
     double getDouble(int key) const;
     qulonglong getSize(int key) const;
     QString getString(int key) const;
-    QDateTime getDateTime(int key) const;
+    time_t getTime(int key) const;
 
     bool setInt(int key, int value);
     bool setBool(int key, bool value);
     bool setIcon(int key, QIcon const&);
     bool setDouble(int key, double);
-    bool setString(int key, char const*);
+    bool setString(int key, char const*, size_t len);
     bool setSize(int key, qulonglong);
-    bool setDateTime(int key, QDateTime const&);
+    bool setTime(int key, time_t);
 
     char const* getMimeTypeString() const;
     void updateMimeIcon();
 
-    static KeyList buildKeyList(Group group);
-
 private:
+    int const myId;
     Prefs const& myPrefs;
-
     QVariant myValues[PROPERTY_COUNT];
-    bool magnetTorrent;
     FileList myFiles;
 
     static Property myProperties[];
