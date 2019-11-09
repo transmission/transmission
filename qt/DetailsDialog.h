@@ -53,12 +53,13 @@ private:
     void getNewData();
 
     QIcon getStockIcon(QString const& freedesktop_name, int fallback);
+    void setEnabled(bool);
 
 private slots:
     void refresh();
     void refreshPref(int key);
 
-    void onTorrentChanged();
+    void onTorrentsChanged(QSet<int> const& ids);
     void onTimer();
 
     // Tracker tab

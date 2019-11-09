@@ -178,7 +178,7 @@ bool TorrentFilter::lessThan(QModelIndex const& left, QModelIndex const& right) 
     case SortMode::SORT_BY_PROGRESS:
         if (val == 0)
         {
-            val = -compare(a->isMagnet(), b->isMagnet());
+            val = compare(a->metadataPercentDone(), b->metadataPercentDone());
         }
 
         if (val == 0)
