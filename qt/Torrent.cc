@@ -747,7 +747,7 @@ bool Torrent::update(tr_quark const* keys, tr_variant** values, size_t n)
         int i = 0;
         while ((child = tr_variantListChild(v, i++)) != nullptr)
         {
-            >const< char* str;
+            char const* str;
             size_t len;
             if (tr_variantDictFindStr(child, TR_KEY_announce, &str, &len))
             {
