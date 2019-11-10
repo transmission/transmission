@@ -32,6 +32,7 @@ public:
 protected:
     QSize margin(QStyle const& style) const;
     void setProgressBarPercentDone(QStyleOptionViewItem const& option, Torrent const&) const;
+    QIcon& getWarningEmblem() const;
 
     // Our own overridables
     virtual QSize sizeHint(QStyleOptionViewItem const&, Torrent const&) const;
@@ -55,4 +56,5 @@ protected:
 private:
     mutable std::optional<int> myHeightHint;
     mutable QFont myHeightFont;
+    mutable QIcon myWarningEmblem;
 };

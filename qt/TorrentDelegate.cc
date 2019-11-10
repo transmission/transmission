@@ -420,6 +420,23 @@ QSize TorrentDelegate::sizeHint(QStyleOptionViewItem const& option, QModelIndex 
     return QSize(option.rect.width(), *myHeightHint);
 }
 
+QIcon& TorrentDelegate::getWarningEmblem() const
+{
+    auto& icon = myWarningEmblem;
+
+    if (icon.isNull()) 
+    {
+        icon = QIcon::fromTheme(QLatin1String("emblem-important"));
+    }
+
+    if (icon.isNull())
+    {
+        icon = qApp->style()->standardIcon(QStyle::SP_MessageBoxWarning);
+    }
+
+    return icon;
+}
+
 void TorrentDelegate::paint(QPainter* painter, QStyleOptionViewItem const& option, QModelIndex const& index) const
 {
     Torrent const* tor(index.data(TorrentModel::TorrentRole).value<Torrent const*>());
@@ -531,8 +548,7 @@ void TorrentDelegate::drawTorrent(QPainter* painter, QStyleOptionViewItem const&
     progressBarState |= QStyle::State_Small;
 
     QIcon::Mode const emblemIm = isItemSelected ? QIcon::Selected : QIcon::Normal;
-    QIcon const emblemIcon = tor.hasError() ? QIcon::fromTheme(QLatin1String("emblem-important"),
-        style->standardIcon(QStyle::SP_MessageBoxWarning)) : QIcon();
+    QIcon const emblemIcon = tor.hasError() ? getWarningEmblem() : QIcon();
 
     // layout
     QSize const m(margin(*style));
