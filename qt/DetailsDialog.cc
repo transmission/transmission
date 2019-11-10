@@ -312,7 +312,7 @@ void DetailsDialog::getNewData()
 
 void DetailsDialog::onTorrentsChanged(torrent_ids_t const& ids)
 {
-    if (!myHavePendingRefresh)
+    if (myHavePendingRefresh)
         return;
 
     if (!std::any_of(ids.begin(), ids.end(), [this](auto const& id){return myIds.count(id) != 0;}))
