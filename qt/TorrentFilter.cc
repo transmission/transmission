@@ -322,18 +322,9 @@ void TorrentFilter::countTorrentsPerMode(int* setmeCounts) const
 {
     std::fill_n(setmeCounts, static_cast<std::size_t>(FilterMode::NUM_MODES), 0);
 
-    for (int row(0);; ++row)
+    for (auto const& tor : dynamic_cast<TorrentModel*>(sourceModel())->torrents())
     {
-        QModelIndex index(sourceModel()->index(row, 0));
-
-        if (!index.isValid())
-        {
-            break;
-        }
-
-        Torrent const* tor(index.data(TorrentModel::TorrentRole).value<Torrent const*>());
-
-        for (int mode(0); mode < FilterMode::NUM_MODES; ++mode)
+        for (int mode = 0; mode < FilterMode::NUM_MODES; ++mode)
         {
             if (activityFilterAcceptsTorrent(tor, mode))
             {
