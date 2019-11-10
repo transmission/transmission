@@ -158,8 +158,6 @@ public:
         DOWNLOADED_EVER,
         UPLOADED_EVER,
         FAILED_EVER,
-        TRACKERS,
-        HOSTS,
         TRACKERSTATS,
         MIME_ICON,
         SEED_RATIO_LIMIT,
@@ -493,14 +491,14 @@ public:
         return myValues[TRACKERSTATS].value<TrackerStatsList>();
     }
 
-    QStringList trackers() const
+    const QStringList& trackers() const
     {
-        return myValues[TRACKERS].value<QStringList>();
+        return trackers_;
     }
 
-    QStringList hosts() const
+    const QStringList& hosts() const
     {
-        return myValues[HOSTS].value<QStringList>();
+        return hosts_;
     }
 
     PeerList peers() const
@@ -618,6 +616,9 @@ private:
     bool setString(int key, char const*, size_t len);
     bool setSize(int key, qulonglong);
     bool setTime(int key, time_t);
+
+    QStringList trackers_;
+    QStringList hosts_;
 
     char const* getMimeTypeString() const;
     void updateMimeIcon();

@@ -75,8 +75,6 @@ Torrent::Property Torrent::myProperties[] =
     { DOWNLOADED_EVER, TR_KEY_downloadedEver, QVariant::ULongLong },
     { UPLOADED_EVER, TR_KEY_uploadedEver, QVariant::ULongLong },
     { FAILED_EVER, TR_KEY_corruptEver, QVariant::ULongLong },
-    { TRACKERS, TR_KEY_trackers, QVariant::StringList },
-    { HOSTS, TR_KEY_NONE, QVariant::StringList },
     { TRACKERSTATS, TR_KEY_trackerStats, CustomVariantType::TrackerStatsList },
     { MIME_ICON, TR_KEY_NONE, QVariant::Icon },
     { SEED_RATIO_LIMIT, TR_KEY_seedRatioLimit, QVariant::Double },
@@ -406,7 +404,7 @@ bool Torrent::hasFileSubstring(QString const& substr) const
 
 bool Torrent::hasTrackerSubstring(QString const& substr) const
 {
-    for (QString const& s : myValues[TRACKERS].toStringList())
+    for (auto const& s : trackers())
     {
         if (s.contains(substr, Qt::CaseInsensitive))
         {
@@ -657,7 +655,6 @@ bool Torrent::update(tr_quark const* keys, tr_variant** values, size_t n)
                 break;
             }
 
-        case QVariant::StringList:
         case CustomVariantType::PeerList:
             // handled below
             break;
@@ -756,7 +753,7 @@ bool Torrent::update(tr_quark const* keys, tr_variant** values, size_t n)
         }
 
         // update the trackers
-        if (myValues[TRACKERS] != trackers)
+        if (trackers_ != trackers)
         {
             QStringList hosts;
             for (auto const& tracker : trackers)
@@ -769,8 +766,8 @@ bool Torrent::update(tr_quark const* keys, tr_variant** values, size_t n)
             hosts.removeDuplicates();
             hosts.removeOne(QString());
 
-            myValues[TRACKERS].setValue(trackers);
-            myValues[HOSTS].setValue(hosts);
+            trackers_.swap(trackers);
+            hosts_.swap(hosts);
             changed = true;
         }
     }
