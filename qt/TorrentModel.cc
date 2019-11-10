@@ -124,10 +124,11 @@ QVariant TorrentModel::data(QModelIndex const& index, int role) const
 
 void TorrentModel::removeTorrents(tr_variant* list)
 {
+    torrents_t torrents;
+    torrents.reserve(tr_variantListSize(list));
+
     int i = 0;
     tr_variant* child;
-    QSet<Torrent*> torrents;
-
     while ((child = tr_variantListChild(list, i++)) != nullptr)
     {
         int64_t id;
@@ -140,7 +141,7 @@ void TorrentModel::removeTorrents(tr_variant* list)
 
         if (torrent != nullptr)
         {
-            torrents.insert(torrent);
+            torrents.push_back(torrent);
         }
     }
 
@@ -152,13 +153,13 @@ void TorrentModel::removeTorrents(tr_variant* list)
 
 void TorrentModel::updateTorrents(tr_variant* torrents, bool isCompleteList)
 {
-    auto const old = QSet<Torrent*>::fromList(myTorrents.toList());
+    auto const old = isCompleteList ? myTorrents : torrents_t{};
     auto added = QSet<int>{};
     auto changed = QSet<int>{};
     auto completed = QSet<int>{};
     auto instantiated = torrents_t{};
     auto needinfo = QSet<int>{};
-    auto processed = QSet<Torrent*>{};
+    auto processed = torrents_t{};
 
     auto const now = time(nullptr);
     auto const recently_added = [now](auto const& tor)
@@ -179,6 +180,7 @@ void TorrentModel::updateTorrents(tr_variant* torrents, bool isCompleteList)
         char const* str;
         size_t len;
         size_t i = 0;
+        keys.reserve(tr_variantListSize(firstChild));
         while (tr_variantGetStr(tr_variantListChild(firstChild, i++), &str, &len))
         {
             keys.push_back(tr_quark_new(str, len));
@@ -210,6 +212,7 @@ void TorrentModel::updateTorrents(tr_variant* torrents, bool isCompleteList)
     values.reserve(keys.size());
     size_t tor_index = table ? 1 : 0;
     tr_variant* v;
+    processed.reserve(tr_variantListSize(torrents));
     while ((v = tr_variantListChild(torrents, tor_index++)))
     {
         // Build an array of values
@@ -245,11 +248,13 @@ void TorrentModel::updateTorrents(tr_variant* torrents, bool isCompleteList)
 
         Torrent* tor = getTorrentFromId(id);
         std::optional<uint64_t> leftUntilDone;
+        bool is_new = false;
 
         if (tor == nullptr)
         {
             tor = new Torrent(myPrefs, id);
             instantiated.push_back(tor);
+            is_new = true;
         }
         else
         {
@@ -261,7 +266,7 @@ void TorrentModel::updateTorrents(tr_variant* torrents, bool isCompleteList)
             changed.insert(id);
         }
 
-        if (!tor->hasName() && !old.contains(tor))
+        if (is_new && !tor->hasName())
         {
             needinfo.insert(id);
         }
@@ -277,7 +282,7 @@ void TorrentModel::updateTorrents(tr_variant* torrents, bool isCompleteList)
             completed.insert(id);
         }
 
-        processed.insert(tor);
+        processed.push_back(tor);
     }
 
     // model upkeep
@@ -318,11 +323,11 @@ void TorrentModel::updateTorrents(tr_variant* torrents, bool isCompleteList)
 
     if (isCompleteList)
     {
-        auto const removed = old - processed;
-        if (!removed.isEmpty())
-        {
-            rowsRemove(removed);
-        }
+        std::sort(processed.begin(), processed.end(), TorrentIdLessThan());
+        torrents_t removed;
+        removed.reserve(old.size());
+        std::set_difference(old.begin(), old.end(), processed.begin(), processed.end(), std::back_inserter(removed));
+        rowsRemove(removed);
     }
 }
 
@@ -453,7 +458,7 @@ void TorrentModel::rowsAdd(torrents_t const& torrents)
     }
 }
 
-void TorrentModel::rowsRemove(QSet<Torrent*> const& torrents)
+void TorrentModel::rowsRemove(torrents_t const& torrents)
 {
     // must walk in reverse to avoid invalidating row numbers
     auto const& spans = getSpans(getIds(torrents.begin(), torrents.end()));

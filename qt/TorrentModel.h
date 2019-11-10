@@ -43,6 +43,8 @@ public:
     Torrent const* getTorrentFromId(int id) const;
 
     void getTransferSpeed(Speed& uploadSpeed, size_t& uploadPeerCount, Speed& downloadSpeed, size_t& downloadPeerCount) const;
+    using torrents_t = QVector<Torrent*>;
+    const torrents_t& torrents() const { return myTorrents; }
 
     // QAbstractItemModel
     int rowCount(QModelIndex const& parent = QModelIndex()) const override;
@@ -59,9 +61,8 @@ signals:
     void torrentsNeedInfo(QSet<int>);
 
 private:
-    using torrents_t = QVector<Torrent*>;
     void rowsAdd(torrents_t const& torrents);
-    void rowsRemove(QSet<Torrent*> const& torrents);
+    void rowsRemove(torrents_t const& torrents);
     void rowsEmitChanged(QSet<int> const& ids);
 
     std::optional<int> getRow(int id) const;
@@ -70,6 +71,6 @@ private:
     std::vector<span_t> getSpans(QSet<int> const& ids) const;
 
     Prefs const& myPrefs;
-    torrents_t myTorrents;
     QSet<int> myAlreadyAdded;
+    torrents_t myTorrents;
 };
