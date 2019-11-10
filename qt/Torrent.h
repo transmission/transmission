@@ -494,9 +494,9 @@ public:
         return trackers_;
     }
 
-    const QStringList& hosts() const
+    const QStringList& trackerDisplayNames() const
     {
-        return hosts_;
+        return trackerDisplayNames_;
     }
 
     PeerList peers() const
@@ -616,7 +616,7 @@ private:
     bool setTime(int key, time_t);
 
     QStringList trackers_;
-    QStringList hosts_;
+    QStringList trackerDisplayNames_;
 
     char const* getMimeTypeString() const;
     void updateMimeIcon();

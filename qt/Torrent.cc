@@ -755,19 +755,19 @@ bool Torrent::update(tr_quark const* keys, tr_variant** values, size_t n)
         // update the trackers
         if (trackers_ != trackers)
         {
-            QStringList hosts;
+            QStringList displayNames;
+            displayNames.reserve(trackers.size());
             for (auto const& tracker : trackers)
             {
                 auto const url = QUrl(tracker);
-                qApp->faviconCache().add(url);
-                hosts.append(FaviconCache::getHost(url));
+                auto const key = qApp->faviconCache().add(url);
+                displayNames.append(FaviconCache::getDisplayName(key));
             }
 
-            hosts.removeDuplicates();
-            hosts.removeOne(QString());
+            displayNames.removeDuplicates();
 
             trackers_.swap(trackers);
-            hosts_.swap(hosts);
+            trackerDisplayNames_.swap(displayNames);
             changed = true;
         }
     }
@@ -791,7 +791,6 @@ bool Torrent::update(tr_quark const* keys, tr_variant** values, size_t n)
             if (tr_variantDictFindStr(child, TR_KEY_announce, &str, &len))
             {
                 trackerStat.announce = QString::fromUtf8(str, len);
-                qApp->faviconCache().add(QUrl(trackerStat.announce));
             }
 
             if (tr_variantDictFindInt(child, TR_KEY_announceState, &i))
