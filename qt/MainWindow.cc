@@ -610,7 +610,7 @@ static void openSelect(QString const& path)
 
 void MainWindow::openFolder()
 {
-    QSet<int> const selectedTorrents = getSelectedTorrents();
+    auto const selectedTorrents = getSelectedTorrents();
 
     if (selectedTorrents.size() != 1)
     {
@@ -936,9 +936,9 @@ void MainWindow::clearSelection()
     ui.action_DeselectAll->trigger();
 }
 
-QSet<int> MainWindow::getSelectedTorrents(bool withMetadataOnly) const
+torrent_ids_t MainWindow::getSelectedTorrents(bool withMetadataOnly) const
 {
-    QSet<int> ids;
+    torrent_ids_t ids;
 
     for (QModelIndex const& index : ui.listView->selectionModel()->selectedRows())
     {
@@ -1340,7 +1340,7 @@ void MainWindow::addTorrent(AddData const& addMe, bool showOptions)
 
 void MainWindow::removeTorrents(bool const deleteFiles)
 {
-    QSet<int> ids;
+    torrent_ids_t ids;
     QMessageBox msgBox(this);
     QString primary_text;
     QString secondary_text;
@@ -1364,7 +1364,7 @@ void MainWindow::removeTorrents(bool const deleteFiles)
         }
     }
 
-    if (ids.isEmpty())
+    if (ids.empty())
     {
         return;
     }

@@ -399,7 +399,7 @@ void Application::quitLater()
     QTimer::singleShot(0, this, SLOT(quit()));
 }
 
-QStringList Application::getNames(QSet<int> const& ids) const
+QStringList Application::getNames(torrent_ids_t const& ids) const
 {
     QStringList names;
     for (auto const& id : ids)
@@ -411,7 +411,7 @@ QStringList Application::getNames(QSet<int> const& ids) const
     return names;
 }
 
-void Application::onTorrentsAdded(QSet<int> const& ids)
+void Application::onTorrentsAdded(torrent_ids_t const& ids)
 {
     if (myPrefs->getBool(Prefs::SHOW_NOTIFICATION_ON_ADD))
     {
@@ -421,7 +421,7 @@ void Application::onTorrentsAdded(QSet<int> const& ids)
     }
 }
 
-void Application::onTorrentsCompleted(QSet<int> const& ids)
+void Application::onTorrentsCompleted(torrent_ids_t const& ids)
 {
     if (myPrefs->getBool(Prefs::SHOW_NOTIFICATION_ON_COMPLETE))
     {
@@ -440,9 +440,9 @@ void Application::onTorrentsCompleted(QSet<int> const& ids)
     }
 }
 
-void Application::onTorrentsNeedInfo(QSet<int> const& ids)
+void Application::onTorrentsNeedInfo(torrent_ids_t const& ids)
 {
-    if (!ids.isEmpty())
+    if (!ids.empty())
     {
         mySession->initTorrents(ids);
     }

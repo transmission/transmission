@@ -6,6 +6,7 @@
  *
  */
 
+#include <algorithm> // std::any_of
 #include <cassert>
 #include <climits> /* INT_MAX */
 #include <ctime>
@@ -249,7 +250,7 @@ DetailsDialog::~DetailsDialog()
     myTrackerModel->deleteLater();
 }
 
-void DetailsDialog::setIds(QSet<int> const& ids)
+void DetailsDialog::setIds(torrent_ids_t const& ids)
 {
     if (ids != myIds)
     {
@@ -309,15 +310,16 @@ void DetailsDialog::getNewData()
     }
 }
 
-void DetailsDialog::onTorrentsChanged(QSet<int> const& ids)
+void DetailsDialog::onTorrentsChanged(torrent_ids_t const& ids)
 {
-    auto const interesting = ids & myIds;
+    if (!myHavePendingRefresh)
+        return;
 
-    if (!interesting.isEmpty() && !myHavePendingRefresh)
-    {
-        myHavePendingRefresh = true;
-        QTimer::singleShot(100, this, SLOT(refresh()));
-    }
+    if (!std::any_of(ids.begin(), ids.end(), [this](auto const& id){return myIds.count(id) != 0;}))
+        return;
+
+    myHavePendingRefresh = true;
+    QTimer::singleShot(100, this, SLOT(refresh()));
 }
 
 namespace
@@ -1290,7 +1292,7 @@ void DetailsDialog::onAddTrackerClicked()
     }
     else
     {
-        QSet<int> ids;
+        torrent_ids_t ids;
 
         for (int const id : myIds)
         {
@@ -1336,8 +1338,7 @@ void DetailsDialog::onEditTrackerClicked()
     }
     else
     {
-        QSet<int> ids;
-        ids << trackerInfo.torrentId;
+        torrent_ids_t ids { trackerInfo.torrentId };
 
         QPair<int, QString> const idUrl = qMakePair(trackerInfo.st.id, newval);
 
@@ -1362,8 +1363,7 @@ void DetailsDialog::onRemoveTrackerClicked()
     // batch all of a tracker's torrents into one command
     for (int const id : torrentId_to_trackerIds.uniqueKeys())
     {
-        QSet<int> ids;
-        ids << id;
+        torrent_ids_t const ids { id };
         mySession.torrentSet(ids, TR_KEY_trackerRemove, torrentId_to_trackerIds.values(id));
     }
 

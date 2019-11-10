@@ -10,7 +10,6 @@
 
 #include <unordered_map>
 
-#include <QMap>
 #include <QString>
 #include <QObject>
 #include <QPixmap>

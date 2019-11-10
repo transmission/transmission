@@ -9,10 +9,10 @@
 #pragma once
 
 #include <QAbstractListModel>
-#include <QSet>
 #include <QVector>
 
 #include "Torrent.h"
+#include "Typedefs.h"
 
 class TorrentModel;
 
@@ -37,7 +37,7 @@ public:
 public:
     TrackerModel() =default;
 
-    void refresh(TorrentModel const&, QSet<int> const& ids);
+    void refresh(TorrentModel const&, torrent_ids_t const& ids);
     int find(int torrentId, QString const& url) const;
 
     // QAbstractItemModel

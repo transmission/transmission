@@ -43,10 +43,9 @@ struct TorrentIdLessThan
     }
 };
 
-template<typename Iter>
-QSet<int> getIds(Iter it, Iter end)
+template<typename Iter> auto getIds(Iter it, Iter end)
 {
-    QSet<int> ids;
+    std::unordered_set<int> ids;
 
     for ( ; it != end; ++it)
     {
@@ -145,7 +144,7 @@ void TorrentModel::removeTorrents(tr_variant* list)
         }
     }
 
-    if (!torrents.isEmpty())
+    if (!torrents.empty())
     {
         rowsRemove(torrents);
     }
@@ -154,11 +153,11 @@ void TorrentModel::removeTorrents(tr_variant* list)
 void TorrentModel::updateTorrents(tr_variant* torrents, bool isCompleteList)
 {
     auto const old = isCompleteList ? myTorrents : torrents_t{};
-    auto added = QSet<int>{};
-    auto changed = QSet<int>{};
-    auto completed = QSet<int>{};
+    auto added = std::unordered_set<int>{};
+    auto changed = std::unordered_set<int>{};
+    auto completed = std::unordered_set<int>{};
     auto instantiated = torrents_t{};
-    auto needinfo = QSet<int>{};
+    auto needinfo = std::unordered_set<int>{};
     auto processed = torrents_t{};
 
     auto const now = time(nullptr);
@@ -271,7 +270,7 @@ void TorrentModel::updateTorrents(tr_variant* torrents, bool isCompleteList)
             needinfo.insert(id);
         }
 
-        if (recently_added(tor) && tor->hasName() && !myAlreadyAdded.contains(id))
+        if (recently_added(tor) && tor->hasName() && !myAlreadyAdded.count(id))
         {
             added.insert(id);
             myAlreadyAdded.insert(id);
@@ -287,34 +286,34 @@ void TorrentModel::updateTorrents(tr_variant* torrents, bool isCompleteList)
 
     // model upkeep
 
-    if (!instantiated.isEmpty())
+    if (!instantiated.empty())
     {
         rowsAdd(instantiated);
     }
 
-    if (!changed.isEmpty())
+    if (!changed.empty())
     {
         rowsEmitChanged(changed);
     }
 
     // emit signals
 
-    if (!added.isEmpty())
+    if (!added.empty())
     {
         emit torrentsAdded(added);
     }
 
-    if (!needinfo.isEmpty())
+    if (!needinfo.empty())
     {
         emit torrentsNeedInfo(needinfo);
     }
 
-    if (!changed.isEmpty())
+    if (!changed.empty())
     {
         emit torrentsChanged(changed);
     }
 
-    if (!completed.isEmpty())
+    if (!completed.empty())
     {
         emit torrentsCompleted(completed);
     }
@@ -370,7 +369,7 @@ Torrent const* TorrentModel::getTorrentFromId(int id) const
 ****
 ***/
 
-std::vector<TorrentModel::span_t> TorrentModel::getSpans(QSet<int> const& ids) const
+std::vector<TorrentModel::span_t> TorrentModel::getSpans(std::unordered_set<int> const& ids) const
 {
     // ids -> rows
     std::vector<int> rows;
@@ -425,7 +424,7 @@ std::vector<TorrentModel::span_t> TorrentModel::getSpans(QSet<int> const& ids) c
 ****
 ***/
 
-void TorrentModel::rowsEmitChanged(QSet<int> const& ids)
+void TorrentModel::rowsEmitChanged(torrent_ids_t const& ids)
 {
     for (auto const& span : getSpans(ids))
     {
@@ -437,7 +436,7 @@ void TorrentModel::rowsAdd(torrents_t const& torrents)
 {
     auto const compare = TorrentIdLessThan();
 
-    if (myTorrents.isEmpty())
+    if (myTorrents.empty())
     {
         beginInsertRows(QModelIndex(), 0, torrents.size() - 1);
         myTorrents = torrents;

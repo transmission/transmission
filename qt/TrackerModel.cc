@@ -80,7 +80,7 @@ struct CompareTrackers
     }
 };
 
-void TrackerModel::refresh(TorrentModel const& torrentModel, QSet<int> const& ids)
+void TrackerModel::refresh(TorrentModel const& torrentModel, torrent_ids_t const& ids)
 {
     // build a list of the TrackerInfos
     QVector<TrackerInfo> trackers;

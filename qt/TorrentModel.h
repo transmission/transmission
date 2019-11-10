@@ -9,10 +9,12 @@
 #pragma once
 
 #include <optional>
+#include <vector>
 
 #include <QAbstractListModel>
-#include <QSet>
-#include <QVector>
+//#include <QVector>
+
+#include <Typedefs.h>
 
 class Prefs;
 class Speed;
@@ -55,22 +57,22 @@ public slots:
     void removeTorrents(tr_variant* torrentList);
 
 signals:
-    void torrentsAdded(QSet<int>);
-    void torrentsChanged(QSet<int>);
-    void torrentsCompleted(QSet<int>);
-    void torrentsNeedInfo(QSet<int>);
+    void torrentsAdded(torrent_ids_t const&);
+    void torrentsChanged(torrent_ids_t const&);
+    void torrentsCompleted(torrent_ids_t const&);
+    void torrentsNeedInfo(torrent_ids_t const&);
 
 private:
     void rowsAdd(torrents_t const& torrents);
     void rowsRemove(torrents_t const& torrents);
-    void rowsEmitChanged(QSet<int> const& ids);
+    void rowsEmitChanged(torrent_ids_t const& ids);
 
     std::optional<int> getRow(int id) const;
     std::optional<int> getRow(Torrent const* tor) const;
     using span_t = std::pair<int, int>;
-    std::vector<span_t> getSpans(QSet<int> const& ids) const;
+    std::vector<span_t> getSpans(torrent_ids_t const& ids) const;
 
     Prefs const& myPrefs;
-    QSet<int> myAlreadyAdded;
+    torrent_ids_t myAlreadyAdded;
     torrents_t myTorrents;
 };

@@ -14,6 +14,7 @@
 #include <QTimer>
 
 #include "BaseDialog.h"
+#include "Typedefs.h"
 
 #include "ui_DetailsDialog.h"
 
@@ -35,7 +36,7 @@ public:
     DetailsDialog(Session&, Prefs&, TorrentModel const&, QWidget* parent = nullptr);
     virtual ~DetailsDialog();
 
-    void setIds(QSet<int> const& ids);
+    void setIds(torrent_ids_t const& ids);
 
     // QWidget
     QSize sizeHint() const override
@@ -59,7 +60,7 @@ private slots:
     void refresh();
     void refreshPref(int key);
 
-    void onTorrentsChanged(QSet<int> const& ids);
+    void onTorrentsChanged(torrent_ids_t const& ids);
     void onTimer();
 
     // Tracker tab
@@ -93,7 +94,7 @@ private:
 
     Ui::DetailsDialog ui;
 
-    QSet<int> myIds;
+    torrent_ids_t myIds;
     QTimer myTimer;
     bool myChangedTorrents;
     bool myHavePendingRefresh;

@@ -13,13 +13,14 @@
 #include <QMainWindow>
 #include <QNetworkReply>
 #include <QPointer>
-#include <QSet>
 #include <QSystemTrayIcon>
 #include <QTimer>
 #include <QWidgetList>
 
 #include "Filters.h"
 #include "TorrentFilter.h"
+#include "Typedefs.h"
+
 #include "ui_MainWindow.h"
 
 class QAction;
@@ -92,7 +93,7 @@ private:
     QIcon getStockIcon(QString const&, int fallback = -1);
     QIcon addEmblem(QIcon icon, QStringList const& emblemNames);
 
-    QSet<int> getSelectedTorrents(bool withMetadataOnly = false) const;
+    torrent_ids_t getSelectedTorrents(bool withMetadataOnly = false) const;
     void updateNetworkIcon();
 
     QMenu* createOptionsMenu();
