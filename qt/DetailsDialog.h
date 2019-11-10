@@ -38,7 +38,7 @@ public:
     void setIds(QSet<int> const& ids);
 
     // QWidget
-    virtual QSize sizeHint() const
+    QSize sizeHint() const override
     {
         return QSize(440, 460);
     }

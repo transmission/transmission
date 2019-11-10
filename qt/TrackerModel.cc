@@ -16,7 +16,7 @@
 
 int TrackerModel::rowCount(QModelIndex const& parent) const
 {
-    Q_UNUSED(parent);
+    Q_UNUSED(parent)
 
     return parent.isValid() ? 0 : myRows.size();
 }

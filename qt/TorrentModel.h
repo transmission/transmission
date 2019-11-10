@@ -34,7 +34,7 @@ public:
     };
 
     explicit TorrentModel(Prefs const& prefs);
-    virtual ~TorrentModel();
+    virtual ~TorrentModel() override;
     void clear();
 
     bool hasTorrent(QString const& hashString) const;

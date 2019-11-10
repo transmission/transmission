@@ -155,7 +155,7 @@ TorrentDelegate::~TorrentDelegate()
 
 QSize TorrentDelegate::margin(QStyle const& style) const
 {
-    Q_UNUSED(style);
+    Q_UNUSED(style)
 
     return QSize(4, 4);
 }

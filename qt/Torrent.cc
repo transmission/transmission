@@ -503,7 +503,7 @@ int Torrent::compareETA(Torrent const& that) const
 
 int Torrent::compareTracker(Torrent const& that) const
 {
-    Q_UNUSED(that);
+    Q_UNUSED(that)
 
     // FIXME
     return 0;

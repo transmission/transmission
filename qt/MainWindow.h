@@ -84,9 +84,9 @@ public slots:
 
 protected:
     // QWidget
-    virtual void contextMenuEvent(QContextMenuEvent*);
-    virtual void dragEnterEvent(QDragEnterEvent*);
-    virtual void dropEvent(QDropEvent*);
+    void contextMenuEvent(QContextMenuEvent*) override;
+    void dragEnterEvent(QDragEnterEvent*) override;
+    void dropEvent(QDropEvent*) override;
 
 private:
     QIcon getStockIcon(QString const&, int fallback = -1);
@@ -103,8 +103,8 @@ private:
     void addTorrent(AddData const& addMe, bool showOptions);
 
     // QWidget
-    virtual void hideEvent(QHideEvent* event);
-    virtual void showEvent(QShowEvent* event);
+    void hideEvent(QHideEvent* event) override;
+    void showEvent(QShowEvent* event) override;
 
 private slots:
     void addTorrents(QStringList const& filenames);

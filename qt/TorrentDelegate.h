@@ -26,8 +26,8 @@ public:
     virtual ~TorrentDelegate();
 
     // QAbstractItemDelegate
-    virtual QSize sizeHint(QStyleOptionViewItem const& option, QModelIndex const& index) const;
-    virtual void paint(QPainter* painter, QStyleOptionViewItem const& option, QModelIndex const& index) const;
+    QSize sizeHint(QStyleOptionViewItem const& option, QModelIndex const& index) const override;
+    void paint(QPainter* painter, QStyleOptionViewItem const& option, QModelIndex const& index) const override;
 
 protected:
     QSize margin(QStyle const& style) const;

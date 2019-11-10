@@ -33,21 +33,7 @@ namespace
 
 QString readableHostName(QString const& host)
 {
-    // get the readable name...
-    QString name = host;
-    int const pos = name.lastIndexOf(QLatin1Char('.'));
-
-    if (pos >= 0)
-    {
-        name.truncate(pos);
-    }
-
-    if (!name.isEmpty())
-    {
-        name[0] = name[0].toUpper();
-    }
-
-    return name;
+    return host.left(host.lastIndexOf(QLatin1Char('.')));
 }
 
 } // namespace
