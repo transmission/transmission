@@ -231,7 +231,7 @@ public:
 
     bool hasError() const
     {
-        return !getError().isEmpty();
+        return getInt(ERROR) != TR_STAT_OK;
     }
 
     bool isDone() const
