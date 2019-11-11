@@ -18,6 +18,7 @@
 #include <QWidgetList>
 
 #include "Filters.h"
+#include "Speed.h"
 #include "TorrentFilter.h"
 #include "Typedefs.h"
 
@@ -131,7 +132,6 @@ private slots:
     void openURL();
     void refreshPref(int key);
     void refreshSoon(int fields = ~0);
-    void refreshStatusBar();
     void removeTorrents(bool const deleteFiles);
     void setLocation();
     void setSortAscendingPref(bool);
@@ -177,6 +177,15 @@ private:
     QAction* myAltSpeedAction;
     QString myErrorMessage;
 
+    struct TransferStats
+    {
+        Speed speedUp;
+        Speed speedDown;
+        size_t peersSending = 0;
+        size_t peersReceiving = 0;
+    };
+    TransferStats getTransferStats() const;
+
     enum
     {
         REFRESH_TITLE = (1 << 0),
@@ -188,6 +197,7 @@ private:
     int myRefreshFields = 0;
     QTimer myRefreshTimer;
     void refreshTitle();
-    void refreshTrayIcon();
+    void refreshTrayIcon(const TransferStats&);
+    void refreshStatusBar(const TransferStats&);
     void refreshTorrentViewHeader();
 };

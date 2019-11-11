@@ -44,7 +44,6 @@ public:
     Torrent* getTorrentFromId(int id);
     Torrent const* getTorrentFromId(int id) const;
 
-    void getTransferSpeed(Speed& uploadSpeed, size_t& uploadPeerCount, Speed& downloadSpeed, size_t& downloadPeerCount) const;
     using torrents_t = QVector<Torrent*>;
     const torrents_t& torrents() const { return myTorrents; }
 

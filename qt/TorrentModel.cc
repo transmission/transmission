@@ -478,29 +478,6 @@ void TorrentModel::rowsRemove(torrents_t const& torrents)
 ****
 ***/
 
-void TorrentModel::getTransferSpeed(Speed& uploadSpeed, size_t& uploadPeerCount, Speed& downloadSpeed,
-    size_t& downloadPeerCount) const
-{
-    Speed upSpeed;
-    Speed downSpeed;
-    size_t upCount = 0;
-    size_t downCount = 0;
-
-    for (Torrent const* const tor : myTorrents)
-    {
-        upSpeed += tor->uploadSpeed();
-        upCount += tor->peersWeAreUploadingTo();
-        downSpeed += tor->downloadSpeed();
-        downCount += tor->webseedsWeAreDownloadingFrom();
-        downCount += tor->peersWeAreDownloadingFrom();
-    }
-
-    uploadSpeed = upSpeed;
-    uploadPeerCount = upCount;
-    downloadSpeed = downSpeed;
-    downloadPeerCount = downCount;
-}
-
 bool TorrentModel::hasTorrent(QString const& hashString) const
 {
     auto test = [hashString](auto const& tor) { return tor->hashString() == hashString; };
