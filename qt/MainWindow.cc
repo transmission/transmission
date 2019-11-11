@@ -8,14 +8,14 @@
 
 #include <cassert>
 
-#include <QtGui>
 #include <QCheckBox>
+#include <QFileDialog>
 #include <QIcon>
+#include <QLabel>
+#include <QMessageBox>
 #include <QPainter>
 #include <QProxyStyle>
-#include <QLabel>
-#include <QFileDialog>
-#include <QMessageBox>
+#include <QtGui>
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/version.h>
@@ -693,7 +693,7 @@ void MainWindow::refreshSoon(int fields)
     if (!myRefreshTimer.isActive())
     {
         myRefreshTimer.setSingleShot(true);
-        myRefreshTimer.start(100);
+        myRefreshTimer.start(200);
     }
 }
 
