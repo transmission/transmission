@@ -43,7 +43,8 @@ struct TorrentIdLessThan
     }
 };
 
-template<typename Iter> auto getIds(Iter it, Iter end)
+template<typename Iter>
+auto getIds(Iter it, Iter end)
 {
     std::unordered_set<int> ids;
 

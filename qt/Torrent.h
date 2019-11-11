@@ -489,12 +489,12 @@ public:
         return myValues[TRACKERSTATS].value<TrackerStatsList>();
     }
 
-    const QStringList& trackers() const
+    QStringList const& trackers() const
     {
         return trackers_;
     }
 
-    const QStringList& trackerDisplayNames() const
+    QStringList const& trackerDisplayNames() const
     {
         return trackerDisplayNames_;
     }

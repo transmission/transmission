@@ -118,9 +118,13 @@ static void action_callback_PUSH(jsonsl_t jsn, jsonsl_action_t action UNUSED, st
         int const depth = tr_ptrArraySize(&data->stack);
         size_t const n = depth < MAX_DEPTH ? data->preallocGuess[depth] : 0;
         if (state->type == JSONSL_T_LIST)
+        {
             tr_variantInitList(node, n);
+        }
         else
+        {
             tr_variantInitDict(node, n);
+        }
     }
 }
 

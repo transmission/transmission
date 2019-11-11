@@ -313,10 +313,14 @@ void DetailsDialog::getNewData()
 void DetailsDialog::onTorrentsChanged(torrent_ids_t const& ids)
 {
     if (myHavePendingRefresh)
+    {
         return;
+    }
 
-    if (!std::any_of(ids.begin(), ids.end(), [this](auto const& id){return myIds.count(id) != 0;}))
+    if (!std::any_of(ids.begin(), ids.end(), [this](auto const& id) { return myIds.count(id) != 0; }))
+    {
         return;
+    }
 
     myHavePendingRefresh = true;
     QTimer::singleShot(100, this, SLOT(refresh()));
@@ -1338,7 +1342,7 @@ void DetailsDialog::onEditTrackerClicked()
     }
     else
     {
-        torrent_ids_t ids { trackerInfo.torrentId };
+        torrent_ids_t ids{ trackerInfo.torrentId };
 
         QPair<int, QString> const idUrl = qMakePair(trackerInfo.st.id, newval);
 
@@ -1363,7 +1367,7 @@ void DetailsDialog::onRemoveTrackerClicked()
     // batch all of a tracker's torrents into one command
     for (int const id : torrentId_to_trackerIds.uniqueKeys())
     {
-        torrent_ids_t const ids { id };
+        torrent_ids_t const ids{ id };
         mySession.torrentSet(ids, TR_KEY_trackerRemove, torrentId_to_trackerIds.values(id));
     }
 

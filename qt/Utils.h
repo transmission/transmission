@@ -94,21 +94,21 @@ public:
     static bool isUriWithSupportedScheme(QString const& s)
     {
         return s.startsWith(QStringLiteral("ftp://")) ||
-               s.startsWith(QStringLiteral("http://")) ||
-               s.startsWith(QStringLiteral("https://"));
+            s.startsWith(QStringLiteral("http://")) ||
+            s.startsWith(QStringLiteral("https://"));
     }
 };
 
 namespace std
 {
 
-template<> struct hash<QString>
+template<>
+struct hash<QString>
 {
-    std::size_t operator()(const QString& s) const
+    std::size_t operator ()(QString const& s) const
     {
         return qHash(s);
     }
 };
 
 } // namespace std
-

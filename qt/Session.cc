@@ -54,10 +54,10 @@ void addList(tr_variant* list, KeyList const& keys)
 }
 
 // If this object is passed as "ids" (compared by address), then recently active torrents are queried.
-auto const recentlyActiveIds = torrent_ids_t { -1 };
+auto const recentlyActiveIds = torrent_ids_t{ -1 };
 
 // If this object is passed as "ids" (compared by being empty), then all torrents are queried.
-auto const allIds = torrent_ids_t { };
+auto const allIds = torrent_ids_t{};
 
 } // namespace
 
@@ -538,7 +538,7 @@ void Session::torrentRenamePath(torrent_ids_t const& ids, QString const& oldpath
 
     q->add([this, ids](RpcResponse const& /*r*/)
         {
-            refreshTorrents(ids,  {TR_KEY_fileStats, TR_KEY_files, TR_KEY_id, TR_KEY_name});
+            refreshTorrents(ids, { TR_KEY_fileStats, TR_KEY_files, TR_KEY_id, TR_KEY_name });
         });
 
     q->run();

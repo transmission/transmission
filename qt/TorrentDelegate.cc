@@ -424,7 +424,7 @@ QIcon& TorrentDelegate::getWarningEmblem() const
 {
     auto& icon = myWarningEmblem;
 
-    if (icon.isNull()) 
+    if (icon.isNull())
     {
         icon = QIcon::fromTheme(QLatin1String("emblem-important"));
     }

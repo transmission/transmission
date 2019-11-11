@@ -12,7 +12,7 @@
 #include <vector>
 
 #include <QAbstractListModel>
-//#include <QVector>
+// #include <QVector>
 
 #include <Typedefs.h>
 
@@ -45,7 +45,7 @@ public:
     Torrent const* getTorrentFromId(int id) const;
 
     using torrents_t = QVector<Torrent*>;
-    const torrents_t& torrents() const { return myTorrents; }
+    torrents_t const& torrents() const { return myTorrents; }
 
     // QAbstractItemModel
     int rowCount(QModelIndex const& parent = QModelIndex()) const override;

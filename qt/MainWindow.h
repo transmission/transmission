@@ -197,7 +197,7 @@ private:
     int myRefreshFields = 0;
     QTimer myRefreshTimer;
     void refreshTitle();
-    void refreshTrayIcon(const TransferStats&);
-    void refreshStatusBar(const TransferStats&);
+    void refreshTrayIcon(TransferStats const&);
+    void refreshStatusBar(TransferStats const&);
     void refreshTorrentViewHeader();
 };

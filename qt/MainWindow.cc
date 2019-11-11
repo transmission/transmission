@@ -778,7 +778,8 @@ void MainWindow::refreshTrayIcon(TransferStats const& stats)
     }
     else if (stats.peersSending != 0)
     {
-        tip = Formatter::downloadSpeedToString(stats.speedDown) + QLatin1String("   ") + Formatter::uploadSpeedToString(stats.speedUp);
+        tip = Formatter::downloadSpeedToString(stats.speedDown) + QLatin1String("   ") + Formatter::uploadSpeedToString(
+            stats.speedUp);
     }
     else if (stats.peersReceiving != 0)
     {

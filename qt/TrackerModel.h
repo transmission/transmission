@@ -35,7 +35,7 @@ public:
     };
 
 public:
-    TrackerModel() =default;
+    TrackerModel() = default;
 
     void refresh(TorrentModel const&, torrent_ids_t const& ids);
     int find(int torrentId, QString const& url) const;
