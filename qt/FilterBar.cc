@@ -107,7 +107,7 @@ void FilterBar::refreshTrackers()
     auto torrentsPerHost = std::unordered_map<QString, int>{};
     for (auto const& tor : myTorrents.torrents())
     {
-        for (auto const & displayName : tor->trackerDisplayNames())
+        for (auto const& displayName : tor->trackerDisplayNames())
         {
             ++torrentsPerHost[displayName];
         }

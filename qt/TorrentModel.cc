@@ -46,7 +46,7 @@ struct TorrentIdLessThan
 template<typename Iter>
 auto getIds(Iter it, Iter end)
 {
-    std::unordered_set<int> ids;
+    torrent_ids_t ids;
 
     for ( ; it != end; ++it)
     {
@@ -154,11 +154,11 @@ void TorrentModel::removeTorrents(tr_variant* list)
 void TorrentModel::updateTorrents(tr_variant* torrents, bool isCompleteList)
 {
     auto const old = isCompleteList ? myTorrents : torrents_t{};
-    auto added = std::unordered_set<int>{};
-    auto changed = std::unordered_set<int>{};
-    auto completed = std::unordered_set<int>{};
+    auto added = torrent_ids_t{};
+    auto changed = torrent_ids_t{};
+    auto completed = torrent_ids_t{};
     auto instantiated = torrents_t{};
-    auto needinfo = std::unordered_set<int>{};
+    auto needinfo = torrent_ids_t{};
     auto processed = torrents_t{};
 
     auto const now = time(nullptr);
@@ -370,7 +370,7 @@ Torrent const* TorrentModel::getTorrentFromId(int id) const
 ****
 ***/
 
-std::vector<TorrentModel::span_t> TorrentModel::getSpans(std::unordered_set<int> const& ids) const
+std::vector<TorrentModel::span_t> TorrentModel::getSpans(torrent_ids_t const& ids) const
 {
     // ids -> rows
     std::vector<int> rows;
