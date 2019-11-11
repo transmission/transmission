@@ -843,7 +843,6 @@ void MainWindow::refreshTorrentViewHeader()
 void MainWindow::refreshActionSensitivity()
 {
     int paused(0);
-    int queued(0);
     int selected(0);
     int selectedAndCanAnnounce(0);
     int selectedAndPaused(0);
@@ -864,12 +863,6 @@ void MainWindow::refreshActionSensitivity()
         {
             bool const isSelected(selectionModel->isSelected(modelIndex));
             bool const isPaused(tor->isPaused());
-            bool const isQueued(tor->isQueued());
-
-            if (isQueued)
-            {
-                ++queued;
-            }
 
             if (isPaused)
             {
@@ -885,7 +878,7 @@ void MainWindow::refreshActionSensitivity()
                     ++selectedAndPaused;
                 }
 
-                if (isQueued)
+                if (tor->isQueued())
                 {
                     ++selectedAndQueued;
                 }
