@@ -9,10 +9,12 @@
 #pragma once
 
 #include <optional>
+#include <vector>
 
 #include <QAbstractListModel>
-#include <QSet>
-#include <QVector>
+// #include <QVector>
+
+#include <Typedefs.h>
 
 class Prefs;
 class Speed;
@@ -34,7 +36,7 @@ public:
     };
 
     explicit TorrentModel(Prefs const& prefs);
-    virtual ~TorrentModel();
+    virtual ~TorrentModel() override;
     void clear();
 
     bool hasTorrent(QString const& hashString) const;
@@ -42,7 +44,8 @@ public:
     Torrent* getTorrentFromId(int id);
     Torrent const* getTorrentFromId(int id) const;
 
-    void getTransferSpeed(Speed& uploadSpeed, size_t& uploadPeerCount, Speed& downloadSpeed, size_t& downloadPeerCount) const;
+    using torrents_t = QVector<Torrent*>;
+    torrents_t const& torrents() const { return myTorrents; }
 
     // QAbstractItemModel
     int rowCount(QModelIndex const& parent = QModelIndex()) const override;
@@ -53,23 +56,22 @@ public slots:
     void removeTorrents(tr_variant* torrentList);
 
 signals:
-    void torrentsAdded(QSet<int>);
-    void torrentsChanged(QSet<int>);
-    void torrentsCompleted(QSet<int>);
-    void torrentsNeedInfo(QSet<int>);
+    void torrentsAdded(torrent_ids_t const&);
+    void torrentsChanged(torrent_ids_t const&);
+    void torrentsCompleted(torrent_ids_t const&);
+    void torrentsNeedInfo(torrent_ids_t const&);
 
 private:
-    using torrents_t = QVector<Torrent*>;
     void rowsAdd(torrents_t const& torrents);
-    void rowsRemove(QSet<Torrent*> const& torrents);
-    void rowsEmitChanged(QSet<int> const& ids);
+    void rowsRemove(torrents_t const& torrents);
+    void rowsEmitChanged(torrent_ids_t const& ids);
 
     std::optional<int> getRow(int id) const;
     std::optional<int> getRow(Torrent const* tor) const;
     using span_t = std::pair<int, int>;
-    std::vector<span_t> getSpans(QSet<int> const& ids) const;
+    std::vector<span_t> getSpans(torrent_ids_t const& ids) const;
 
     Prefs const& myPrefs;
+    torrent_ids_t myAlreadyAdded;
     torrents_t myTorrents;
-    QSet<int> myAlreadyAdded;
 };

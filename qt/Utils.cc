@@ -6,8 +6,9 @@
  *
  */
 
-#include <map>
 #include <set>
+#include <unordered_map>
+#include <unordered_set>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -109,12 +110,13 @@ QIcon fileIcon()
     return icon;
 }
 
-std::map<QString, QIcon> iconCache;
+std::unordered_map<QString, QIcon> iconCache;
+
 QIcon const getMimeIcon(QString const& filename)
 {
     // If the suffix doesn't match a mime type, treat it as a folder.
     // This heuristic is fast and yields good results for torrent names.
-    static std::set<QString> suffixes;
+    static std::unordered_set<QString> suffixes;
     if (suffixes.empty())
     {
         for (auto const& type : QMimeDatabase().allMimeTypes())

@@ -8,14 +8,14 @@
 
 #include <cassert>
 
-#include <QtGui>
 #include <QCheckBox>
+#include <QFileDialog>
 #include <QIcon>
+#include <QLabel>
+#include <QMessageBox>
 #include <QPainter>
 #include <QProxyStyle>
-#include <QLabel>
-#include <QFileDialog>
-#include <QMessageBox>
+#include <QtGui>
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/version.h>
@@ -330,8 +330,9 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
         refreshPref(key);
     }
 
+    auto refreshStatusSoon = [this]() { refreshSoon(REFRESH_STATUS_BAR); };
     connect(&mySession, SIGNAL(sourceChanged()), this, SLOT(onSessionSourceChanged()));
-    connect(&mySession, SIGNAL(statsUpdated()), this, SLOT(refreshStatusBar()));
+    connect(&mySession, &Session::statsUpdated, refreshStatusSoon);
     connect(&mySession, SIGNAL(dataReadProgress()), this, SLOT(dataReadProgress()));
     connect(&mySession, SIGNAL(dataSendProgress()), this, SLOT(dataSendProgress()));
     connect(&mySession, SIGNAL(httpAuthenticationRequired()), this, SLOT(wrongAuthentication()));
@@ -518,7 +519,7 @@ void MainWindow::setSortAscendingPref(bool b)
 
 void MainWindow::showEvent(QShowEvent* event)
 {
-    Q_UNUSED(event);
+    Q_UNUSED(event)
 
     ui.action_ShowMainWindow->setChecked(true);
 }
@@ -529,7 +530,7 @@ void MainWindow::showEvent(QShowEvent* event)
 
 void MainWindow::hideEvent(QHideEvent* event)
 {
-    Q_UNUSED(event);
+    Q_UNUSED(event)
 
     if (!isVisible())
     {
@@ -610,7 +611,7 @@ static void openSelect(QString const& path)
 
 void MainWindow::openFolder()
 {
-    QSet<int> const selectedTorrents = getSelectedTorrents();
+    auto const selectedTorrents = getSelectedTorrents();
 
     if (selectedTorrents.size() != 1)
     {
@@ -692,8 +693,24 @@ void MainWindow::refreshSoon(int fields)
     if (!myRefreshTimer.isActive())
     {
         myRefreshTimer.setSingleShot(true);
-        myRefreshTimer.start(100);
+        myRefreshTimer.start(200);
     }
+}
+
+MainWindow::TransferStats MainWindow::getTransferStats() const
+{
+    TransferStats stats;
+
+    for (auto const& tor : myModel.torrents())
+    {
+        stats.speedUp += tor->uploadSpeed();
+        stats.speedDown += tor->downloadSpeed();
+        stats.peersSending += tor->webseedsWeAreDownloadingFrom();
+        stats.peersSending += tor->peersWeAreDownloadingFrom();
+        stats.peersReceiving += tor->peersWeAreUploadingTo();
+    }
+
+    return stats;
 }
 
 void MainWindow::onRefreshTimer()
@@ -706,14 +723,19 @@ void MainWindow::onRefreshTimer()
         refreshTitle();
     }
 
-    if (fields & REFRESH_STATUS_BAR)
+    if (fields & (REFRESH_TRAY_ICON | REFRESH_STATUS_BAR))
     {
-        refreshStatusBar();
-    }
+        auto const stats = getTransferStats();
 
-    if (fields & REFRESH_TRAY_ICON)
-    {
-        refreshTrayIcon();
+        if (fields & REFRESH_TRAY_ICON)
+        {
+            refreshTrayIcon(stats);
+        }
+
+        if (fields & REFRESH_STATUS_BAR)
+        {
+            refreshStatusBar(stats);
+        }
     }
 
     if (fields & REFRESH_TORRENT_VIEW_HEADER)
@@ -742,48 +764,37 @@ void MainWindow::refreshTitle()
     setWindowTitle(title);
 }
 
-void MainWindow::refreshTrayIcon()
+void MainWindow::refreshTrayIcon(TransferStats const& stats)
 {
-    Speed upSpeed;
-    Speed downSpeed;
-    size_t upCount;
-    size_t downCount;
     QString tip;
-
-    myModel.getTransferSpeed(upSpeed, upCount, downSpeed, downCount);
 
     if (myNetworkError)
     {
         tip = tr("Network Error");
     }
-    else if (upCount == 0 && downCount == 0)
+    else if (stats.peersSending == 0 && stats.peersReceiving == 0)
     {
         tip = tr("Idle");
     }
-    else if (downCount != 0)
+    else if (stats.peersSending != 0)
     {
-        tip = Formatter::downloadSpeedToString(downSpeed) + QLatin1String("   ") + Formatter::uploadSpeedToString(upSpeed);
+        tip = Formatter::downloadSpeedToString(stats.speedDown) + QLatin1String("   ") + Formatter::uploadSpeedToString(
+            stats.speedUp);
     }
-    else if (upCount != 0)
+    else if (stats.peersReceiving != 0)
     {
-        tip = Formatter::uploadSpeedToString(upSpeed);
+        tip = Formatter::uploadSpeedToString(stats.speedUp);
     }
 
     myTrayIcon.setToolTip(tip);
 }
 
-void MainWindow::refreshStatusBar()
+void MainWindow::refreshStatusBar(TransferStats const& stats)
 {
-    Speed upSpeed;
-    Speed downSpeed;
-    size_t upCount;
-    size_t downCount;
-    myModel.getTransferSpeed(upSpeed, upCount, downSpeed, downCount);
-
-    ui.uploadSpeedLabel->setText(Formatter::uploadSpeedToString(upSpeed));
-    ui.uploadSpeedLabel->setVisible(downCount || upCount);
-    ui.downloadSpeedLabel->setText(Formatter::downloadSpeedToString(downSpeed));
-    ui.downloadSpeedLabel->setVisible(downCount);
+    ui.uploadSpeedLabel->setText(Formatter::uploadSpeedToString(stats.speedUp));
+    ui.uploadSpeedLabel->setVisible(stats.peersSending || stats.peersReceiving);
+    ui.downloadSpeedLabel->setText(Formatter::downloadSpeedToString(stats.speedDown));
+    ui.downloadSpeedLabel->setVisible(stats.peersSending);
 
     ui.networkLabel->setVisible(!mySession.isServer());
 
@@ -833,7 +844,6 @@ void MainWindow::refreshTorrentViewHeader()
 void MainWindow::refreshActionSensitivity()
 {
     int paused(0);
-    int queued(0);
     int selected(0);
     int selectedAndCanAnnounce(0);
     int selectedAndPaused(0);
@@ -848,19 +858,12 @@ void MainWindow::refreshActionSensitivity()
     for (int row = 0; row < rowCount; ++row)
     {
         QModelIndex const modelIndex(model->index(row, 0));
-        assert(model == modelIndex.model());
-        Torrent const* tor(model->data(modelIndex, TorrentModel::TorrentRole).value<Torrent const*>());
+        auto const& tor = model->data(modelIndex, TorrentModel::TorrentRole).value<Torrent const*>();
 
         if (tor != nullptr)
         {
             bool const isSelected(selectionModel->isSelected(modelIndex));
             bool const isPaused(tor->isPaused());
-            bool const isQueued(tor->isQueued());
-
-            if (isQueued)
-            {
-                ++queued;
-            }
 
             if (isPaused)
             {
@@ -876,7 +879,7 @@ void MainWindow::refreshActionSensitivity()
                     ++selectedAndPaused;
                 }
 
-                if (isQueued)
+                if (tor->isQueued())
                 {
                     ++selectedAndQueued;
                 }
@@ -936,9 +939,9 @@ void MainWindow::clearSelection()
     ui.action_DeselectAll->trigger();
 }
 
-QSet<int> MainWindow::getSelectedTorrents(bool withMetadataOnly) const
+torrent_ids_t MainWindow::getSelectedTorrents(bool withMetadataOnly) const
 {
-    QSet<int> ids;
+    torrent_ids_t ids;
 
     for (QModelIndex const& index : ui.listView->selectionModel()->selectedRows())
     {
@@ -1120,7 +1123,7 @@ void MainWindow::refreshPref(int key)
             action->setChecked(str == action->property(STATS_MODE_KEY).toString());
         }
 
-        refreshStatusBar();
+        refreshSoon(REFRESH_STATUS_BAR);
         break;
 
     case Prefs::SORT_REVERSED:
@@ -1340,7 +1343,7 @@ void MainWindow::addTorrent(AddData const& addMe, bool showOptions)
 
 void MainWindow::removeTorrents(bool const deleteFiles)
 {
-    QSet<int> ids;
+    torrent_ids_t ids;
     QMessageBox msgBox(this);
     QString primary_text;
     QString secondary_text;
@@ -1364,7 +1367,7 @@ void MainWindow::removeTorrents(bool const deleteFiles)
         }
     }
 
-    if (ids.isEmpty())
+    if (ids.empty())
     {
         return;
     }

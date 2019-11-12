@@ -158,8 +158,6 @@ public:
         DOWNLOADED_EVER,
         UPLOADED_EVER,
         FAILED_EVER,
-        TRACKERS,
-        HOSTS,
         TRACKERSTATS,
         MIME_ICON,
         SEED_RATIO_LIMIT,
@@ -188,8 +186,6 @@ public:
 
 public:
     Torrent(Prefs const&, int id);
-    virtual ~Torrent() = default;
-    ;
 
     int getBandwidthPriority() const
     {
@@ -235,7 +231,7 @@ public:
 
     bool hasError() const
     {
-        return !getError().isEmpty();
+        return getInt(ERROR) != TR_STAT_OK;
     }
 
     bool isDone() const
@@ -493,14 +489,14 @@ public:
         return myValues[TRACKERSTATS].value<TrackerStatsList>();
     }
 
-    QStringList trackers() const
+    QStringList const& trackers() const
     {
-        return myValues[TRACKERS].value<QStringList>();
+        return trackers_;
     }
 
-    QStringList hosts() const
+    QStringList const& trackerDisplayNames() const
     {
-        return myValues[HOSTS].value<QStringList>();
+        return trackerDisplayNames_;
     }
 
     PeerList peers() const
@@ -618,6 +614,9 @@ private:
     bool setString(int key, char const*, size_t len);
     bool setSize(int key, qulonglong);
     bool setTime(int key, time_t);
+
+    QStringList trackers_;
+    QStringList trackerDisplayNames_;
 
     char const* getMimeTypeString() const;
     void updateMimeIcon();

@@ -26,7 +26,7 @@ void RelocateDialog::onMoveToggled(bool b)
     myMoveFlag = b;
 }
 
-RelocateDialog::RelocateDialog(Session& session, TorrentModel const& model, QSet<int> const& ids, QWidget* parent) :
+RelocateDialog::RelocateDialog(Session& session, TorrentModel const& model, torrent_ids_t const& ids, QWidget* parent) :
     BaseDialog(parent),
     mySession(session),
     myIds(ids)

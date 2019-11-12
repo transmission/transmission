@@ -13,13 +13,15 @@
 #include <QMainWindow>
 #include <QNetworkReply>
 #include <QPointer>
-#include <QSet>
 #include <QSystemTrayIcon>
 #include <QTimer>
 #include <QWidgetList>
 
 #include "Filters.h"
+#include "Speed.h"
 #include "TorrentFilter.h"
+#include "Typedefs.h"
+
 #include "ui_MainWindow.h"
 
 class QAction;
@@ -84,15 +86,15 @@ public slots:
 
 protected:
     // QWidget
-    virtual void contextMenuEvent(QContextMenuEvent*);
-    virtual void dragEnterEvent(QDragEnterEvent*);
-    virtual void dropEvent(QDropEvent*);
+    void contextMenuEvent(QContextMenuEvent*) override;
+    void dragEnterEvent(QDragEnterEvent*) override;
+    void dropEvent(QDropEvent*) override;
 
 private:
     QIcon getStockIcon(QString const&, int fallback = -1);
     QIcon addEmblem(QIcon icon, QStringList const& emblemNames);
 
-    QSet<int> getSelectedTorrents(bool withMetadataOnly = false) const;
+    torrent_ids_t getSelectedTorrents(bool withMetadataOnly = false) const;
     void updateNetworkIcon();
 
     QMenu* createOptionsMenu();
@@ -103,8 +105,8 @@ private:
     void addTorrent(AddData const& addMe, bool showOptions);
 
     // QWidget
-    virtual void hideEvent(QHideEvent* event);
-    virtual void showEvent(QShowEvent* event);
+    void hideEvent(QHideEvent* event) override;
+    void showEvent(QShowEvent* event) override;
 
 private slots:
     void addTorrents(QStringList const& filenames);
@@ -130,7 +132,6 @@ private slots:
     void openURL();
     void refreshPref(int key);
     void refreshSoon(int fields = ~0);
-    void refreshStatusBar();
     void removeTorrents(bool const deleteFiles);
     void setLocation();
     void setSortAscendingPref(bool);
@@ -176,6 +177,15 @@ private:
     QAction* myAltSpeedAction;
     QString myErrorMessage;
 
+    struct TransferStats
+    {
+        Speed speedUp;
+        Speed speedDown;
+        size_t peersSending = 0;
+        size_t peersReceiving = 0;
+    };
+    TransferStats getTransferStats() const;
+
     enum
     {
         REFRESH_TITLE = (1 << 0),
@@ -187,6 +197,7 @@ private:
     int myRefreshFields = 0;
     QTimer myRefreshTimer;
     void refreshTitle();
-    void refreshTrayIcon();
+    void refreshTrayIcon(TransferStats const&);
+    void refreshStatusBar(TransferStats const&);
     void refreshTorrentViewHeader();
 };

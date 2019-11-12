@@ -9,11 +9,11 @@
 #pragma once
 
 #include <QApplication>
-#include <QSet>
 #include <QTimer>
 #include <QTranslator>
 
 #include "FaviconCache.h"
+#include "Typedefs.h"
 
 class AddData;
 class Prefs;
@@ -43,14 +43,14 @@ private slots:
     void onSessionSourceChanged();
     void refreshPref(int key);
     void refreshTorrents();
-    void onTorrentsAdded(QSet<int> const& torrents);
-    void onTorrentsCompleted(QSet<int> const& torrents);
-    void onTorrentsNeedInfo(QSet<int> const& torrents);
+    void onTorrentsAdded(torrent_ids_t const& torrents);
+    void onTorrentsCompleted(torrent_ids_t const& torrents);
+    void onTorrentsNeedInfo(torrent_ids_t const& torrents);
 
 private:
     void maybeUpdateBlocklist();
     void loadTranslations();
-    QStringList getNames(QSet<int> const& ids) const;
+    QStringList getNames(torrent_ids_t const& ids) const;
     void quitLater();
 
 private:

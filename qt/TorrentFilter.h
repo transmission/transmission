@@ -39,8 +39,8 @@ public:
 
 protected:
     // QSortFilterProxyModel
-    virtual bool filterAcceptsRow(int, QModelIndex const&) const;
-    virtual bool lessThan(QModelIndex const&, QModelIndex const&) const;
+    bool filterAcceptsRow(int, QModelIndex const&) const override;
+    bool lessThan(QModelIndex const&, QModelIndex const&) const override;
 
 private:
     bool activityFilterAcceptsTorrent(Torrent const* tor, FilterMode const& mode) const;
