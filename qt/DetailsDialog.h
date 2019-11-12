@@ -59,9 +59,10 @@ private:
 private slots:
     void refresh();
     void refreshPref(int key);
-
-    void onTorrentsChanged(torrent_ids_t const& ids);
     void onTimer();
+
+    void onTorrentEdited(torrent_ids_t const& ids);
+    void onTorrentsChanged(torrent_ids_t const& ids);
 
     // Tracker tab
     void onTrackerSelectionChanged();

@@ -646,10 +646,16 @@ bool Torrent::update(tr_quark const* keys, tr_variant** values, size_t n)
         case QVariant::DateTime:
             {
                 int64_t val;
-
-                if (tr_variantGetInt(child, &val) && val)
+                if (tr_variantGetInt(child, &val) && val &&
+                    setTime(property_index, time_t(val)))
                 {
-                    changed |= setTime(property_index, time_t(val));
+                    changed = true;
+
+                    if (key == TR_KEY_editDate)
+                    {
+                        // FIXME
+                        // emit torrentEdited(*this);
+                    }
                 }
 
                 break;

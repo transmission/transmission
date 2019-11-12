@@ -1828,6 +1828,12 @@ typedef struct tr_stat
     /** The last time we uploaded or downloaded piece data on this torrent. */
     time_t activityDate;
 
+    /** The last time during this session that a rarely-changing field
+        changed -- e.g. any tr_info field (trackers, filenames, name)
+        or download directory. RPC clients can monitor this to know when
+        to reload fields that rarely change. */
+    time_t editDate;
+
     /** Number of seconds since the last activity (or since started).
         -1 if activity is not seeding or downloading. */
     int idleSecs;

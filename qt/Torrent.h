@@ -180,6 +180,7 @@ public:
         PEERS,
         BANDWIDTH_PRIORITY,
         QUEUE_POSITION,
+        EDIT_DATE,
         //
         PROPERTY_COUNT
     };

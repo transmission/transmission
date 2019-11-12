@@ -190,6 +190,7 @@
    downloadedEver              | number                      | tr_stat
    downloadLimit               | number                      | tr_torrent
    downloadLimited             | boolean                     | tr_torrent
+   editDate                    | number                      | tr_stat
    error                       | number                      | tr_stat
    errorString                 | string                      | tr_stat
    eta                         | number                      | tr_stat
@@ -806,6 +807,7 @@
          |         | yes       | session-get          | new arg "session-id"
          |         | yes       | torrent-get          | new arg "labels"
          |         | yes       | torrent-set          | new arg "labels"
+         |         | yes       | torrent-set          | new arg "editDate"
          |         | yes       | torrent-get          | new arg "format"
 
 

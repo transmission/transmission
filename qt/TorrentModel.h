@@ -59,6 +59,7 @@ signals:
     void torrentsAdded(torrent_ids_t const&);
     void torrentsChanged(torrent_ids_t const&);
     void torrentsCompleted(torrent_ids_t const&);
+    void torrentsEdited(torrent_ids_t const&);
     void torrentsNeedInfo(torrent_ids_t const&);
 
 private:

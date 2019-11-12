@@ -641,6 +641,10 @@ static void initField(tr_torrent* const tor, tr_info const* const inf, tr_stat c
         tr_variantInitInt(initme, st->id);
         break;
 
+    case TR_KEY_editDate:
+        tr_variantInitInt(initme, st->editDate);
+        break;
+
     case TR_KEY_isFinished:
         tr_variantInitBool(initme, st->finished);
         break;

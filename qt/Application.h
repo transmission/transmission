@@ -18,6 +18,7 @@
 class AddData;
 class Prefs;
 class Session;
+class Torrent;
 class TorrentModel;
 class MainWindow;
 class WatchDir;
@@ -41,11 +42,12 @@ public slots:
 private slots:
     void consentGiven(int result);
     void onSessionSourceChanged();
-    void refreshPref(int key);
-    void refreshTorrents();
     void onTorrentsAdded(torrent_ids_t const& torrents);
     void onTorrentsCompleted(torrent_ids_t const& torrents);
+    void onTorrentsEdited(torrent_ids_t const& torrents);
     void onTorrentsNeedInfo(torrent_ids_t const& torrents);
+    void refreshPref(int key);
+    void refreshTorrents();
 
 private:
     void maybeUpdateBlocklist();

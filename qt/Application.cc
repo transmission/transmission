@@ -399,6 +399,12 @@ void Application::quitLater()
     QTimer::singleShot(0, this, SLOT(quit()));
 }
 
+void Application::onTorrentsEdited(torrent_ids_t const& ids)
+{
+    // the backend's tr_info has changed, so reload those fields
+    mySession->initTorrents(ids);
+}
+
 QStringList Application::getNames(torrent_ids_t const& ids) const
 {
     QStringList names;

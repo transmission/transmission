@@ -310,6 +310,12 @@ void DetailsDialog::getNewData()
     }
 }
 
+void DetailsDialog::onTorrentEdited(torrent_ids_t const& /*ids*/)
+{
+    // FIXME
+    // refreshDetailInfo({ tor.id() });
+}
+
 void DetailsDialog::onTorrentsChanged(torrent_ids_t const& ids)
 {
     if (myHavePendingRefresh)

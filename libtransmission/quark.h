@@ -105,6 +105,7 @@ enum
     TR_KEY_dropped,
     TR_KEY_dropped6,
     TR_KEY_e,
+    TR_KEY_editDate,
     TR_KEY_encoding,
     TR_KEY_encryption,
     TR_KEY_error,
