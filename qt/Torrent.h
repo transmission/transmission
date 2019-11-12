@@ -591,13 +591,6 @@ public:
     static KeyList const mainInfoKeys;
     static KeyList const mainStatKeys;
 
-    // The torrent's tr_info has changed on the backend
-    // and we must resync our local copies
-    void torrentEdited(Torrent&);
-
-    // Any field in this torrent object changed
-    void torrentChanged(int id);
-
 private:
     struct Property
     {
