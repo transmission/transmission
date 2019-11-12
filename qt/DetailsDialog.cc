@@ -312,7 +312,7 @@ void DetailsDialog::getNewData()
 
 void DetailsDialog::onTorrentEdited(torrent_ids_t const& /*ids*/)
 {
-#warning FIXME: depends on https://github.com/transmission/transmission/pull/1030
+    // FIXME
     // refreshDetailInfo({ tor.id() });
 }
 
