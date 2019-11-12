@@ -293,47 +293,36 @@ Application::Application(int& argc, char** argv) :
     myWindow = new MainWindow(*mySession, *myPrefs, *myModel, minimized);
     myWatchDir = new WatchDir(*myModel);
 
-    // when the session gets torrent info, update the model
-    connect(mySession, SIGNAL(torrentsUpdated(tr_variant*, bool)), myModel, SLOT(updateTorrents(tr_variant*, bool)));
-    connect(mySession, SIGNAL(torrentsUpdated(tr_variant*, bool)), myWindow, SLOT(refreshActionSensitivity()));
-    connect(mySession, SIGNAL(torrentsRemoved(tr_variant*)), myModel, SLOT(removeTorrents(tr_variant*)));
-    // when the session source gets changed, request a full refresh
-    connect(mySession, SIGNAL(sourceChanged()), this, SLOT(onSessionSourceChanged()));
-    // when the model sees a torrent for the first time, ask the session for full info on it
-    connect(myModel, SIGNAL(torrentsAdded(QSet<int>)), mySession, SLOT(initTorrents(QSet<int>)));
-    connect(myModel, SIGNAL(torrentsAdded(QSet<int>)), this, SLOT(onTorrentsAdded(QSet<int>)));
-
-    mySession->initTorrents();
-    mySession->refreshSessionStats();
-
-    // when torrents are added to the watch directory, tell the session
-    connect(myWatchDir, SIGNAL(torrentFileAdded(QString)), this, SLOT(addTorrent(QString)));
+    connect(myModel, &TorrentModel::torrentsAdded, this, &Application::onTorrentsAdded);
+    connect(myModel, &TorrentModel::torrentsChanged, myWindow, &MainWindow::refreshActionSensitivity);
+    connect(myModel, &TorrentModel::torrentsCompleted, this, &Application::onTorrentsCompleted);
+    connect(myModel, &TorrentModel::torrentsNeedInfo, this, &Application::onTorrentsNeedInfo);
+    connect(myPrefs, &Prefs::changed, this, &Application::refreshPref);
+    connect(mySession, &Session::sourceChanged, this, &Application::onSessionSourceChanged);
+    connect(mySession, &Session::torrentsRemoved, myModel, &TorrentModel::removeTorrents);
+    connect(mySession, &Session::torrentsUpdated, myModel, &TorrentModel::updateTorrents);
+    connect(myWatchDir, &WatchDir::torrentFileAdded, this, &Application::addTorrent);
 
     // init from preferences
-    QList<int> initKeys;
-    initKeys << Prefs::DIR_WATCH;
-
-    for (int const key : initKeys)
+    for (auto const key : { Prefs::DIR_WATCH })
     {
         refreshPref(key);
     }
 
-    connect(myPrefs, SIGNAL(changed(int)), this, SLOT(refreshPref(int const)));
-
     QTimer* timer = &myModelTimer;
-    connect(timer, SIGNAL(timeout()), this, SLOT(refreshTorrents()));
+    connect(timer, &QTimer::timeout, this, &Application::refreshTorrents);
     timer->setSingleShot(false);
     timer->setInterval(MODEL_REFRESH_INTERVAL_MSEC);
     timer->start();
 
     timer = &myStatsTimer;
-    connect(timer, SIGNAL(timeout()), mySession, SLOT(refreshSessionStats()));
+    connect(timer, &QTimer::timeout, mySession, &Session::refreshSessionStats);
     timer->setSingleShot(false);
     timer->setInterval(STATS_REFRESH_INTERVAL_MSEC);
     timer->start();
 
     timer = &mySessionTimer;
-    connect(timer, SIGNAL(timeout()), mySession, SLOT(refreshSessionInfo()));
+    connect(timer, &QTimer::timeout, mySession, &Session::refreshSessionInfo);
     timer->setSingleShot(false);
     timer->setInterval(SESSION_REFRESH_INTERVAL_MSEC);
     timer->start();
@@ -410,95 +399,58 @@ void Application::quitLater()
     QTimer::singleShot(0, this, SLOT(quit()));
 }
 
-void Application::onTorrentsAdded(QSet<int> const& torrents)
-{
-    for (int const id : torrents)
-    {
-        Torrent* tor = myModel->getTorrentFromId(id);
-        if (tor != nullptr)
-        {
-            connect(tor, &Torrent::torrentEdited, this, &Application::onTorrentEdited);
-
-            initTorrentNotifications(tor);
-        }
-    }
-}
-
-void Application::onTorrentEdited(Torrent& tor)
+void Application::onTorrentsEdited(torrent_ids_t const& ids)
 {
     // the backend's tr_info has changed, so reload those fields
-    mySession->initTorrents({ tor.id() });
+    mySession->initTorrents(ids);
 }
 
-/***
-**** These functions are for popping up desktop notifications
-***/
-
-void Application::initTorrentNotifications(Torrent* tor)
+QStringList Application::getNames(torrent_ids_t const& ids) const
 {
-    if (!myPrefs->getBool(Prefs::SHOW_NOTIFICATION_ON_ADD))
+    QStringList names;
+    for (auto const& id : ids)
     {
-        return;
+        names.push_back(myModel->getTorrentFromId(id)->name());
     }
 
-    if (tor->name().isEmpty()) // wait until the torrent's INFO fields are loaded
-    {
-       connect(tor, &Torrent::torrentChanged, this, &Application::onNewTorrentChanged);
-    }
-    else
-    {
-        onNewTorrentChanged(tor->id());
+    names.sort();
+    return names;
+}
 
-        if (!tor->isSeed())
-        {
-            connect(tor, &Torrent::torrentCompleted, this, &Application::onTorrentCompleted);
-        }
+void Application::onTorrentsAdded(torrent_ids_t const& ids)
+{
+    if (myPrefs->getBool(Prefs::SHOW_NOTIFICATION_ON_ADD))
+    {
+        auto const title = tr("Torrent(s) Added", nullptr, ids.size());
+        auto const body = getNames(ids).join(QStringLiteral("\n"));
+        notifyApp(title, body);
     }
 }
 
-void Application::onTorrentCompleted(int id)
+void Application::onTorrentsCompleted(torrent_ids_t const& ids)
 {
-    Torrent* tor = myModel->getTorrentFromId(id);
-
-    if (tor != nullptr)
+    if (myPrefs->getBool(Prefs::SHOW_NOTIFICATION_ON_COMPLETE))
     {
-        if (myPrefs->getBool(Prefs::SHOW_NOTIFICATION_ON_COMPLETE))
-        {
-            notifyApp(tr("Torrent Completed"), tor->name());
-        }
+        auto const title = tr("Torrent Completed", nullptr, ids.size());
+        auto const body = getNames(ids).join(QStringLiteral("\n"));
+        notifyApp(title, body);
+    }
 
-        if (myPrefs->getBool(Prefs::COMPLETE_SOUND_ENABLED))
-        {
+    if (myPrefs->getBool(Prefs::COMPLETE_SOUND_ENABLED))
+    {
 #if defined(Q_OS_WIN) || defined(Q_OS_MAC)
-            beep();
+        beep();
 #else
-            QProcess::execute(myPrefs->getString(Prefs::COMPLETE_SOUND_COMMAND));
+        QProcess::execute(myPrefs->getString(Prefs::COMPLETE_SOUND_COMMAND));
 #endif
-        }
-
-        disconnect(tor, &Torrent::torrentCompleted, this, &Application::onTorrentCompleted);
     }
 }
 
-void Application::onNewTorrentChanged(int id)
+void Application::onTorrentsNeedInfo(torrent_ids_t const& ids)
 {
-    Torrent* tor = myModel->getTorrentFromId(id);
-
-    if (tor != nullptr && !tor->name().isEmpty())
+    if (!ids.empty())
     {
-        int const age_secs = tor->dateAdded().secsTo(QDateTime::currentDateTime());
-
-        if (age_secs < 30)
-        {
-            notifyApp(tr("Torrent Added"), tor->name());
-        }
-
-        disconnect(tor, SIGNAL(torrentChanged(int)), this, SLOT(onNewTorrentChanged(int)));
-
-        if (!tor->isSeed())
-        {
-            connect(tor, SIGNAL(torrentCompleted(int)), this, SLOT(onTorrentCompleted(int)));
-        }
+        mySession->initTorrents(ids);
     }
 }
 
@@ -609,25 +561,20 @@ void Application::refreshTorrents()
 ****
 ***/
 
-void Application::addTorrent(QString const& key)
-{
-    AddData const addme(key);
-
-    if (addme.type != addme.NONE)
-    {
-        addTorrent(addme);
-    }
-}
-
 void Application::addTorrent(AddData const& addme)
 {
+    if (addme.type == addme.NONE)
+    {
+        return;
+    }
+
     if (!myPrefs->getBool(Prefs::OPTIONS_PROMPT))
     {
         mySession->addTorrent(addme);
     }
     else
     {
-        OptionsDialog* o = new OptionsDialog(*mySession, *myPrefs, addme, myWindow);
+        auto o = new OptionsDialog(*mySession, *myPrefs, addme, myWindow);
         o->show();
     }
 

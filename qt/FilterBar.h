@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include <unordered_map>
+
 #include <QWidget>
 
 class QLabel;
@@ -35,7 +37,6 @@ private:
     FilterBarComboBox* createTrackerCombo(QStandardItemModel*);
     FilterBarComboBox* createActivityCombo();
     void refreshTrackers();
-    QString getCountString(int n) const;
 
 private slots:
     void recountSoon();
@@ -57,4 +58,5 @@ private:
     QTimer* myRecountTimer;
     bool myIsBootstrapping;
     QLineEdit* myLineEdit;
+    std::map<QString, int> myTrackerCounts;
 };

@@ -22,7 +22,6 @@ class WatchDir : public QObject
 
 public:
     WatchDir(TorrentModel const&);
-    virtual ~WatchDir();
 
     void setPath(QString const& path, bool isEnabled);
 

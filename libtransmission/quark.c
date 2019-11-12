@@ -126,6 +126,7 @@ static struct tr_key_struct const my_static[] =
     Q("filter-trackers"),
     Q("flagStr"),
     Q("flags"),
+    Q("format"),
     Q("fromCache"),
     Q("fromDht"),
     Q("fromIncoming"),

@@ -192,7 +192,7 @@ static void makeProgressDialog(GtkWidget* parent, MakeMetaUI* ui)
     gtk_container_add(GTK_CONTAINER(fr), v);
 
     l = gtk_label_new(_("Creating torrent…"));
-    gtk_misc_set_alignment(GTK_MISC(l), 0.0, 0.5);
+    g_object_set(l, "halign", GTK_ALIGN_START, "valign", GTK_ALIGN_CENTER, NULL);
     gtk_label_set_justify(GTK_LABEL(l), GTK_JUSTIFY_LEFT);
     ui->progress_label = l;
     gtk_box_pack_start(GTK_BOX(v), l, FALSE, FALSE, 0);
@@ -493,7 +493,7 @@ GtkWidget* gtr_torrent_creation_dialog_new(GtkWindow* parent, TrCore* core)
     gtk_label_set_markup(GTK_LABEL(l), _("To add a backup URL, add it on the line after the primary URL.\n"
         "To add another primary URL, add it after a blank line."));
     gtk_label_set_justify(GTK_LABEL(l), GTK_JUSTIFY_LEFT);
-    gtk_misc_set_alignment(GTK_MISC(l), 0.0, 0.5);
+    g_object_set(l, "halign", GTK_ALIGN_START, "valign", GTK_ALIGN_CENTER, NULL);
     gtk_box_pack_start(GTK_BOX(v), l, FALSE, FALSE, 0);
     hig_workarea_add_tall_row(t, &row, str, v, NULL);
 
