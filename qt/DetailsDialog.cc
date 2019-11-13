@@ -707,11 +707,11 @@ void DetailsDialog::refresh()
     }
     else
     {
-        string = torrents.front()->error();
+        string = torrents.front()->errorString();
 
         for (Torrent const* const t : torrents)
         {
-            if (string != t->error())
+            if (string != t->errorString())
             {
                 string = mixed;
                 break;

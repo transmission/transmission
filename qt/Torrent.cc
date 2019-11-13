@@ -234,25 +234,26 @@ int Torrent::compareRatio(Torrent const& that) const
 
 int Torrent::compareETA(Torrent const& that) const
 {
-    bool const haveA(hasETA());
-    bool const haveB(that.hasETA());
-
-    if (haveA && haveB)
-    {
-        return eta() - that.eta();
-    }
-
-    if (haveA)
-    {
-        return 1;
-    }
-
-    if (haveB)
+    if (!hasETA())
     {
         return -1;
     }
-
-    return 0;
+    else if (!that.hasETA())
+    {
+        return 1;
+    }
+    else if (eta() < that.eta())
+    {
+        return -1;
+    }
+    else if (eta() > that.eta())
+    {
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
 }
 
 int Torrent::compareTracker(Torrent const& that) const
@@ -343,15 +344,18 @@ bool change(bool& setme, tr_variant* v)
 }
 
 template<typename T, typename std::enable_if<
-    std::is_same<T, bytes_t>::value ||
     std::is_same<T, Bps_t>::value ||
     std::is_same<T, KBps_t>::value ||
+    std::is_same<T, bytes_t>::value ||
     std::is_same<T, int64_t>::value ||
     std::is_same<T, int>::value ||
+    std::is_same<T, seconds_t>::value ||
     std::is_same<T, time_t>::value ||
     std::is_same<T, tr_idlelimit>::value ||
     std::is_same<T, tr_ratiolimit>::value ||
+    std::is_same<T, tr_stat_errtype>::value ||
     std::is_same<T, tr_torrent_activity>::value ||
+    std::is_same<T, tr_tracker_state>::value ||
     std::is_same<T, uint64_t>::value,
     int>::type = 0>
 bool change(T& setme, tr_variant* v)
