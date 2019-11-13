@@ -6,8 +6,6 @@
  *
  */
 
-#include <iostream>
-
 #include <QDir>
 #include <QFileSystemWatcher>
 #include <QTimer>
@@ -95,7 +93,6 @@ void WatchDir::setPath(QString const& path, bool isEnabled)
         myWatcher = new QFileSystemWatcher();
         myWatcher->addPath(path);
         connect(myWatcher, SIGNAL(directoryChanged(QString)), this, SLOT(watcherActivated(QString)));
-        // std::cerr << "watching " << qPrintable(path) << " for new .torrent files" << std::endl;
         QTimer::singleShot(0, this, SLOT(rescanAllWatchedDirectories())); // trigger the watchdir for .torrent files in there already
     }
 }

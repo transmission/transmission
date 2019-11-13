@@ -248,7 +248,6 @@
    webseeds                    | array (see below)           | n/a
    webseedsSendingToUs         | number                      | tr_stat
                                |                             |
-                               |                             |
    -------------------+--------+-----------------------------+
    files              | array of objects, each containing:   |
                       +-------------------------+------------+

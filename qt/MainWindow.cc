@@ -15,6 +15,7 @@
 #include <QMessageBox>
 #include <QPainter>
 #include <QProxyStyle>
+#include <QStringBuilder>
 #include <QtGui>
 
 #include <libtransmission/transmission.h>
@@ -35,7 +36,6 @@
 #include "RelocateDialog.h"
 #include "Session.h"
 #include "SessionDialog.h"
-#include "Speed.h"
 #include "StatsDialog.h"
 #include "TorrentDelegate.h"
 #include "TorrentDelegateMin.h"
@@ -389,8 +389,7 @@ void MainWindow::initStatusBar()
 {
     ui.optionsButton->setMenu(createOptionsMenu());
 
-    int const minimumSpeedWidth = ui.downloadSpeedLabel->fontMetrics().width(Formatter::uploadSpeedToString(Speed::fromKBps(
-        999.99)));
+    int const minimumSpeedWidth = ui.downloadSpeedLabel->fontMetrics().width(Formatter::speedUp(KBps_t(999)));
     ui.downloadSpeedLabel->setMinimumWidth(minimumSpeedWidth);
     ui.uploadSpeedLabel->setMinimumWidth(minimumSpeedWidth);
 
@@ -414,7 +413,7 @@ QMenu* MainWindow::createOptionsMenu()
             actionGroup->addAction(offAction);
             connect(offAction, SIGNAL(triggered(bool)), this, SLOT(onSetPrefs(bool)));
 
-            onAction = menu->addAction(tr("Limited at %1").arg(Formatter::speedToString(Speed::fromKBps(currentValue))));
+            onAction = menu->addAction(tr("Limited at %1").arg(Formatter::speed(KBps_t(currentValue))));
             onAction->setCheckable(true);
             onAction->setProperty(PREF_VARIANTS_KEY, QVariantList() << pref << currentValue << enabledPref << true);
             actionGroup->addAction(onAction);
@@ -422,9 +421,9 @@ QMenu* MainWindow::createOptionsMenu()
 
             menu->addSeparator();
 
-            for (int const i : stockSpeeds)
+            for (auto const& i : stockSpeeds)
             {
-                QAction* action = menu->addAction(Formatter::speedToString(Speed::fromKBps(i)));
+                QAction* action = menu->addAction(Formatter::speed(KBps_t(i)));
                 action->setProperty(PREF_VARIANTS_KEY, QVariantList() << pref << i << enabledPref << true);
                 connect(action, SIGNAL(triggered(bool)), this, SLOT(onSetPrefs()));
             }
@@ -626,8 +625,8 @@ void MainWindow::openFolder()
         return;
     }
 
-    QString path(tor->getPath());
-    FileList const& files = tor->files();
+    auto path = tor->path();
+    auto const& files = tor->files();
 
     if (files.isEmpty())
     {
@@ -639,14 +638,14 @@ void MainWindow::openFolder()
 
     if (slashIndex > -1)
     {
-        path = path + QLatin1Char('/') + firstfile.left(slashIndex);
+        path = path % QLatin1Char('/') % firstfile.left(slashIndex);
     }
 
 #ifdef HAVE_OPEN_SELECT
 
     else
     {
-        openSelect(path + QLatin1Char('/') + firstfile);
+        openSelect(path % QLatin1Char('/') % firstfile);
         return;
     }
 
@@ -778,12 +777,12 @@ void MainWindow::refreshTrayIcon(TransferStats const& stats)
     }
     else if (stats.peersSending != 0)
     {
-        tip = Formatter::downloadSpeedToString(stats.speedDown) + QLatin1String("   ") + Formatter::uploadSpeedToString(
+        tip = Formatter::speedDown(stats.speedDown) % QLatin1String("   ") % Formatter::speedUp(
             stats.speedUp);
     }
     else if (stats.peersReceiving != 0)
     {
-        tip = Formatter::uploadSpeedToString(stats.speedUp);
+        tip = Formatter::speedUp(stats.speedUp);
     }
 
     myTrayIcon.setToolTip(tip);
@@ -791,9 +790,9 @@ void MainWindow::refreshTrayIcon(TransferStats const& stats)
 
 void MainWindow::refreshStatusBar(TransferStats const& stats)
 {
-    ui.uploadSpeedLabel->setText(Formatter::uploadSpeedToString(stats.speedUp));
+    ui.uploadSpeedLabel->setText(Formatter::speedUp(stats.speedUp));
     ui.uploadSpeedLabel->setVisible(stats.peersSending || stats.peersReceiving);
-    ui.downloadSpeedLabel->setText(Formatter::downloadSpeedToString(stats.speedDown));
+    ui.downloadSpeedLabel->setText(Formatter::speedDown(stats.speedDown));
     ui.downloadSpeedLabel->setVisible(stats.peersSending);
 
     ui.networkLabel->setVisible(!mySession.isServer());
@@ -1147,7 +1146,7 @@ void MainWindow::refreshPref(int key)
         break;
 
     case Prefs::DSPEED:
-        myDlimitOnAction->setText(tr("Limited at %1").arg(Formatter::speedToString(Speed::fromKBps(myPrefs.get<int>(key)))));
+        myDlimitOnAction->setText(tr("Limited at %1").arg(Formatter::speed(KBps_t(myPrefs.get<int>(key)))));
         break;
 
     case Prefs::USPEED_ENABLED:
@@ -1155,7 +1154,7 @@ void MainWindow::refreshPref(int key)
         break;
 
     case Prefs::USPEED:
-        myUlimitOnAction->setText(tr("Limited at %1").arg(Formatter::speedToString(Speed::fromKBps(myPrefs.get<int>(key)))));
+        myUlimitOnAction->setText(tr("Limited at %1").arg(Formatter::speed(KBps_t(myPrefs.get<int>(key)))));
         break;
 
     case Prefs::RATIO_ENABLED:
@@ -1235,9 +1234,9 @@ void MainWindow::refreshPref(int key)
             ui.altSpeedButton->setChecked(b);
             QString const fmt = b ? tr("Click to disable Temporary Speed Limits\n (%1 down, %2 up)") :
                 tr("Click to enable Temporary Speed Limits\n (%1 down, %2 up)");
-            Speed const d = Speed::fromKBps(myPrefs.getInt(Prefs::ALT_SPEED_LIMIT_DOWN));
-            Speed const u = Speed::fromKBps(myPrefs.getInt(Prefs::ALT_SPEED_LIMIT_UP));
-            ui.altSpeedButton->setToolTip(fmt.arg(Formatter::speedToString(d)).arg(Formatter::speedToString(u)));
+            auto const d = KBps_t(myPrefs.getInt(Prefs::ALT_SPEED_LIMIT_DOWN));
+            auto const u = KBps_t(myPrefs.getInt(Prefs::ALT_SPEED_LIMIT_UP));
+            ui.altSpeedButton->setToolTip(fmt.arg(Formatter::speed(d)).arg(Formatter::speed(u)));
             break;
         }
 

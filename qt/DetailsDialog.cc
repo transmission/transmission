@@ -25,6 +25,7 @@
 #include <QMap>
 #include <QMessageBox>
 #include <QResizeEvent>
+#include <QStringBuilder>
 #include <QStringList>
 #include <QStyle>
 #include <QTreeWidgetItem>
@@ -164,7 +165,7 @@ private:
                 if (ipAddress.protocol() == QAbstractSocket::IPv4Protocol)
                 {
                     quint32 const ipv4Address = ipAddress.toIPv4Address();
-                    collatedAddress = QLatin1String("1-") + QString::fromLatin1(QByteArray::number(ipv4Address, 16).
+                    collatedAddress = QLatin1String("1-") % QString::fromLatin1(QByteArray::number(ipv4Address, 16).
                         rightJustified(8, '0'));
                 }
                 else if (ipAddress.protocol() == QAbstractSocket::IPv6Protocol)
@@ -177,13 +178,13 @@ private:
                         tmp[i] = ipv6Address[i];
                     }
 
-                    collatedAddress = QLatin1String("2-") + QString::fromLatin1(tmp.toHex());
+                    collatedAddress = QLatin1String("2-") % QString::fromLatin1(tmp.toHex());
                 }
             }
 
             if (collatedAddress.isEmpty())
             {
-                collatedAddress = QLatin1String("3-") + peer.address.toLower();
+                collatedAddress = QLatin1String("3-") % peer.address.toLower();
             }
         }
 
@@ -316,7 +317,7 @@ void DetailsDialog::onTorrentEdited(torrent_ids_t const& /*ids*/)
     // refreshDetailInfo({ tor.id() });
 }
 
-void DetailsDialog::onTorrentsChanged(torrent_ids_t const& ids)
+void DetailsDialog::onTorrentsChanged(torrent_ids_t const& ids, Torrent::fields_t const& /*fields*/)
 {
     if (myHavePendingRefresh)
     {
@@ -404,11 +405,11 @@ void DetailsDialog::refresh()
         bool isMixed = false;
         bool allPaused = true;
         bool allFinished = true;
-        tr_torrent_activity const baseline = torrents[0]->getActivity();
+        tr_torrent_activity const baseline = torrents.front()->activity();
 
         for (Torrent const* const t : torrents)
         {
-            tr_torrent_activity const activity = t->getActivity();
+            tr_torrent_activity const activity = t->activity();
 
             if (activity != baseline)
             {
@@ -440,7 +441,7 @@ void DetailsDialog::refresh()
         }
         else
         {
-            string = torrents[0]->activityString();
+            string = torrents.front()->activityString();
         }
     }
 
@@ -448,8 +449,8 @@ void DetailsDialog::refresh()
     QString const stateString = string;
 
     // myHaveLabel
-    uint64_t sizeWhenDone = 0;
-    uint64_t available = 0;
+    bytes_t sizeWhenDone = {};
+    bytes_t available = {};
 
     if (torrents.empty())
     {
@@ -457,11 +458,11 @@ void DetailsDialog::refresh()
     }
     else
     {
-        uint64_t leftUntilDone = 0;
-        int64_t haveTotal = 0;
-        int64_t haveVerified = 0;
-        int64_t haveUnverified = 0;
-        int64_t verifiedPieces = 0;
+        bytes_t leftUntilDone = {};
+        bytes_t haveTotal = {};
+        bytes_t haveVerified = {};
+        bytes_t haveUnverified = {};
+        bytes_t verifiedPieces = {};
 
         for (Torrent const* const t : torrents)
         {
@@ -469,7 +470,7 @@ void DetailsDialog::refresh()
             {
                 haveTotal += t->haveTotal();
                 haveUnverified += t->haveUnverified();
-                uint64_t const v = t->haveVerified();
+                auto const v = t->haveVerified();
                 haveVerified += v;
 
                 if (t->pieceSize())
@@ -483,22 +484,22 @@ void DetailsDialog::refresh()
             }
         }
 
-        double const d = sizeWhenDone != 0 ? 100.0 * (sizeWhenDone - leftUntilDone) / sizeWhenDone : 100.0;
+        double const d = sizeWhenDone != 0_B ? 100.0 * (sizeWhenDone - leftUntilDone).value() / sizeWhenDone.value() : 100.0;
         QString pct = Formatter::percentToString(d);
 
-        if (haveUnverified == 0 && leftUntilDone == 0)
+        if ((haveUnverified != 0_B) && (leftUntilDone != 0_B))
         {
             //: Text following the "Have:" label in torrent properties dialog;
             //: %1 is amount of downloaded and verified data
-            string = tr("%1 (100%)").arg(Formatter::sizeToString(haveVerified));
+            string = tr("%1 (100%)").arg(Formatter::storage(haveVerified));
         }
-        else if (haveUnverified == 0)
+        else if (leftUntilDone != 0_B)
         {
             //: Text following the "Have:" label in torrent properties dialog;
             //: %1 is amount of downloaded and verified data,
             //: %2 is overall size of torrent data,
             //: %3 is percentage (%1/%2*100)
-            string = tr("%1 of %2 (%3%)").arg(Formatter::sizeToString(haveVerified)).arg(Formatter::sizeToString(sizeWhenDone)).
+            string = tr("%1 of %2 (%3%)").arg(Formatter::storage(haveVerified)).arg(Formatter::storage(sizeWhenDone)).
                 arg(pct);
         }
         else
@@ -508,8 +509,8 @@ void DetailsDialog::refresh()
             //: %2 is overall size of torrent data,
             //: %3 is percentage (%1/%2*100),
             //: %4 is amount of downloaded but not yet verified data
-            string = tr("%1 of %2 (%3%), %4 Unverified").arg(Formatter::sizeToString(haveVerified + haveUnverified)).
-                arg(Formatter::sizeToString(sizeWhenDone)).arg(pct).arg(Formatter::sizeToString(haveUnverified));
+            string = tr("%1 of %2 (%3%), %4 Unverified").arg(Formatter::storage(haveVerified + haveUnverified)).
+                arg(Formatter::storage(sizeWhenDone)).arg(pct).arg(Formatter::storage(haveUnverified));
         }
     }
 
@@ -520,7 +521,7 @@ void DetailsDialog::refresh()
     {
         string = none;
     }
-    else if (sizeWhenDone == 0)
+    else if (sizeWhenDone == 0_B)
     {
         string = none;
     }
@@ -538,8 +539,8 @@ void DetailsDialog::refresh()
     }
     else
     {
-        uint64_t d = 0;
-        uint64_t f = 0;
+        auto d = bytes_t{};
+        auto f = bytes_t{};
 
         for (Torrent const* const t : torrents)
         {
@@ -547,10 +548,10 @@ void DetailsDialog::refresh()
             f += t->failedEver();
         }
 
-        QString const dstr = Formatter::sizeToString(d);
-        QString const fstr = Formatter::sizeToString(f);
+        QString const dstr = Formatter::storage(d);
+        QString const fstr = Formatter::storage(f);
 
-        if (f != 0)
+        if (f != 0_B)
         {
             string = tr("%1 (%2 corrupt)").arg(dstr).arg(fstr);
         }
@@ -569,16 +570,19 @@ void DetailsDialog::refresh()
     }
     else
     {
-        uint64_t u = 0;
-        uint64_t d = 0;
+        auto u = bytes_t{};
+        auto d = bytes_t{};
+        auto w = bytes_t{};
 
         for (Torrent const* const t : torrents)
         {
             u += t->uploadedEver();
             d += t->downloadedEver();
+            w += t->sizeWhenDone();
         }
 
-        string = tr("%1 (Ratio: %2)").arg(Formatter::sizeToString(u)).arg(Formatter::ratioToString(tr_getRatio(u, d)));
+        auto const ratio = double(u) / double(d != 0_B ? d : w);
+        string = tr("%1 (Ratio: %2)").arg(Formatter::storage(u)).arg(Formatter::ratioToString(ratio));
     }
 
     ui.uploadedValueLabel->setText(string);
@@ -591,11 +595,11 @@ void DetailsDialog::refresh()
     else
     {
         bool allPaused = true;
-        auto baseline = torrents[0]->lastStarted();
+        auto baseline = torrents.front()->startDate();
 
         for (Torrent const* const t : torrents)
         {
-            if (baseline != t->lastStarted())
+            if (baseline != t->startDate())
             {
                 baseline = 0;
             }
@@ -633,11 +637,11 @@ void DetailsDialog::refresh()
     }
     else
     {
-        int baseline = torrents[0]->getETA();
+        int baseline = torrents.front()->eta();
 
         for (Torrent const* const t : torrents)
         {
-            if (baseline != t->getETA())
+            if (baseline != t->eta())
             {
                 string = mixed;
                 break;
@@ -666,11 +670,11 @@ void DetailsDialog::refresh()
     }
     else
     {
-        auto latest = torrents[0]->lastActivity();
+        auto latest = torrents.front()->activityDate();
 
         for (Torrent const* const t : torrents)
         {
-            auto const dt = t->lastActivity();
+            auto const dt = t->activityDate();
 
             if (latest < dt)
             {
@@ -703,11 +707,11 @@ void DetailsDialog::refresh()
     }
     else
     {
-        string = torrents[0]->getError();
+        string = torrents.front()->error();
 
         for (Torrent const* const t : torrents)
         {
-            if (string != t->getError())
+            if (string != t->error())
             {
                 string = mixed;
                 break;
@@ -734,8 +738,8 @@ void DetailsDialog::refresh()
     else
     {
         int pieces = 0;
-        uint64_t size = 0;
-        uint32_t pieceSize = torrents[0]->pieceSize();
+        auto size = bytes_t{};
+        auto pieceSize = torrents.front()->pieceSize();
 
         for (Torrent const* const t : torrents)
         {
@@ -748,18 +752,18 @@ void DetailsDialog::refresh()
             }
         }
 
-        if (size == 0)
+        if (size == 0_B)
         {
             string = none;
         }
         else if (pieceSize > 0)
         {
-            string = tr("%1 (%Ln pieces @ %2)", "", pieces).arg(Formatter::sizeToString(size)).
+            string = tr("%1 (%Ln pieces @ %2)", "", pieces).arg(Formatter::storage(size)).
                 arg(Formatter::memToString(pieceSize));
         }
         else
         {
-            string = tr("%1 (%Ln pieces)", "", pieces).arg(Formatter::sizeToString(size));
+            string = tr("%1 (%Ln pieces)", "", pieces).arg(Formatter::storage(size));
         }
     }
 
@@ -770,7 +774,7 @@ void DetailsDialog::refresh()
 
     if (!torrents.empty())
     {
-        string = torrents[0]->hashString();
+        string = torrents.front()->hashString();
 
         for (Torrent const* const t : torrents)
         {
@@ -789,7 +793,7 @@ void DetailsDialog::refresh()
 
     if (!torrents.empty())
     {
-        bool b = torrents[0]->isPrivate();
+        bool b = torrents.front()->isPrivate();
         string = b ? tr("Private to this tracker -- DHT and PEX disabled") : tr("Public torrent");
 
         for (Torrent const* const t : torrents)
@@ -810,7 +814,7 @@ void DetailsDialog::refresh()
 
     if (!torrents.empty())
     {
-        string = torrents[0]->comment();
+        string = torrents.front()->comment();
 
         for (Torrent const* const t : torrents)
         {
@@ -837,13 +841,13 @@ void DetailsDialog::refresh()
     {
         bool mixed_creator = false;
         bool mixed_date = false;
-        QString const creator = torrents[0]->creator();
-        auto const date = torrents[0]->dateCreated();
+        QString const creator = torrents.front()->creator();
+        auto const date = torrents.front()->creationDate();
 
         for (Torrent const* const t : torrents)
         {
             mixed_creator |= (creator != t->creator());
-            mixed_date |= (date != t->dateCreated());
+            mixed_date |= (date != t->creationDate());
         }
 
         bool const empty_creator = creator.isEmpty();
@@ -880,11 +884,11 @@ void DetailsDialog::refresh()
 
     if (!torrents.empty())
     {
-        string = torrents[0]->getPath();
+        string = torrents.front()->path();
 
         for (Torrent const* const t : torrents)
         {
-            if (string != t->getPath())
+            if (string != t->path())
             {
                 string = mixed;
                 break;
@@ -953,11 +957,11 @@ void DetailsDialog::refresh()
 
         // myBandwidthPriorityCombo
         uniform = true;
-        baselineInt = baseline.getBandwidthPriority();
+        baselineInt = baseline.bandwidthPriority();
 
         for (Torrent const* const tor : torrents)
         {
-            if (baselineInt != tor->getBandwidthPriority())
+            if (baselineInt != tor->bandwidthPriority())
             {
                 uniform = false;
                 break;
@@ -975,8 +979,8 @@ void DetailsDialog::refresh()
 
         setIfIdle(ui.bandwidthPriorityCombo, i);
 
-        setIfIdle(ui.singleDownSpin, int(baseline.downloadLimit().KBps()));
-        setIfIdle(ui.singleUpSpin, int(baseline.uploadLimit().KBps()));
+        setIfIdle(ui.singleDownSpin, int(baseline.downloadLimit()));
+        setIfIdle(ui.singleUpSpin, int(baseline.uploadLimit()));
         setIfIdle(ui.peerLimitSpin, baseline.peerLimit());
     }
 
@@ -1038,12 +1042,11 @@ void DetailsDialog::refresh()
     for (Torrent const* const t : torrents)
     {
         QString const idStr(QString::number(t->id()));
-        PeerList peers = t->peers();
 
-        for (Peer const& peer : peers)
+        for (auto const& peer : t->peers())
         {
-            QString const key = idStr + QLatin1Char(':') + peer.address;
-            PeerItem* item = static_cast<PeerItem*>(myPeers.value(key, nullptr));
+            QString const key = idStr % QLatin1Char(':') % peer.address;
+            auto* item = static_cast<PeerItem*>(myPeers.value(key, nullptr));
 
             if (item == nullptr) // new peer has connected
             {
@@ -1132,8 +1135,8 @@ void DetailsDialog::refresh()
                 codeTip.resize(codeTip.size() - 1); // eat the trailing linefeed
             }
 
-            item->setText(COL_UP, peer.rateToPeer.isZero() ? QString() : Formatter::speedToString(peer.rateToPeer));
-            item->setText(COL_DOWN, peer.rateToClient.isZero() ? QString() : Formatter::speedToString(peer.rateToClient));
+            item->setText(COL_UP, peer.rateToPeer != 0_Bps ? Formatter::speed(peer.rateToPeer) : QString());
+            item->setText(COL_DOWN, peer.rateToClient != 0_Bps ? Formatter::speed(peer.rateToClient) : QString());
             item->setText(COL_PERCENT, peer.progress > 0 ? QString::fromLatin1("%1%").arg(int(peer.progress * 100.0)) :
                 QString());
             item->setText(COL_STATUS, code);
@@ -1164,7 +1167,7 @@ void DetailsDialog::refresh()
 
     if (single)
     {
-        ui.filesView->update(torrents[0]->files(), myChangedTorrents);
+        ui.filesView->update(torrents.front()->files(), myChangedTorrents);
     }
 
     myChangedTorrents = false;
@@ -1542,7 +1545,7 @@ void DetailsDialog::onOpenRequested(QString const& path)
             continue;
         }
 
-        QString const localFilePath = tor->getPath() + QLatin1Char('/') + path;
+        QString const localFilePath = tor->path() % QLatin1Char('/') % path;
 
         if (!QFile::exists(localFilePath))
         {

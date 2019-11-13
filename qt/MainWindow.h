@@ -18,7 +18,6 @@
 #include <QWidgetList>
 
 #include "Filters.h"
-#include "Speed.h"
 #include "TorrentFilter.h"
 #include "Typedefs.h"
 
@@ -179,10 +178,10 @@ private:
 
     struct TransferStats
     {
-        Speed speedUp;
-        Speed speedDown;
-        size_t peersSending = 0;
-        size_t peersReceiving = 0;
+        Bps_t speedUp = {};
+        Bps_t speedDown = {};
+        size_t peersSending = {};
+        size_t peersReceiving = {};
     };
     TransferStats getTransferStats() const;
 

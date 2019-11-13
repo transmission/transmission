@@ -11,6 +11,7 @@
 #include <QNetworkReply>
 #include <QNetworkRequest>
 #include <QStandardPaths>
+#include <QStringBuilder>
 
 #include "FaviconCache.h"
 
@@ -133,10 +134,9 @@ QString FaviconCache::add(QUrl const& url)
         myPixmaps[key] = QPixmap();
 
         // try to download the favicon
-        QString const path = QLatin1String("http://") + url.host() + QLatin1String("/favicon.");
-        QStringList suffixes;
-        suffixes << QLatin1String("ico") << QLatin1String("png") << QLatin1String("gif") << QLatin1String("jpg");
-
+        QString const path = QLatin1String("http://") % url.host() % QLatin1String("/favicon.");
+        QStringList const suffixes{ QStringLiteral("ico"), QStringLiteral("png"), QStringLiteral("gif"),
+            QStringLiteral("jpg") };
         for (QString const& suffix : suffixes)
         {
             myNAM->get(QNetworkRequest(path + suffix));

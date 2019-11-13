@@ -10,6 +10,7 @@
 #include <QApplication>
 #include <QPainter>
 #include <QPixmap>
+#include <QStringBuilder>
 #include <QTextDocument>
 
 #include <libtransmission/transmission.h>
@@ -199,7 +200,7 @@ QString TrackerDelegate::getText(TrackerInfo const& inf) const
 
     if (!key.isEmpty())
     {
-        str += QLatin1String(" - ") + key;
+        str = str % QLatin1String(" - ") % key;
     }
 
     str += inf.st.isBackup ? QLatin1String("</i>") : QLatin1String("</b>");

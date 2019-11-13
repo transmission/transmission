@@ -107,9 +107,9 @@ void FilterBar::refreshTrackers()
     auto torrentsPerHost = std::unordered_map<QString, int>{};
     for (auto const& tor : myTorrents.torrents())
     {
-        for (auto const& displayName : tor->trackerDisplayNames())
+        for (auto const& tracker : tor->trackers())
         {
-            ++torrentsPerHost[displayName];
+            ++torrentsPerHost[tracker.displayName];
         }
     }
 
@@ -232,8 +232,15 @@ FilterBar::FilterBar(Prefs& prefs, TorrentModel const& torrents, TorrentFilter c
     connect(&myTorrents, SIGNAL(modelReset()), this, SLOT(recountSoon()));
     connect(&myTorrents, SIGNAL(rowsInserted(QModelIndex, int, int)), this, SLOT(recountSoon()));
     connect(&myTorrents, SIGNAL(rowsRemoved(QModelIndex, int, int)), this, SLOT(recountSoon()));
-    connect(&myTorrents, SIGNAL(dataChanged(QModelIndex, QModelIndex)), this, SLOT(recountSoon()));
     connect(myRecountTimer, SIGNAL(timeout()), this, SLOT(recount()));
+
+    connect(&myTorrents, &TorrentModel::torrentsChanged, [this](torrent_ids_t const& /*ids*/, Torrent::fields_t const& fields)
+        {
+            if (fields & TF_trackers)
+            {
+                recountSoon();
+            }
+        });
 
     recountSoon();
     refreshTrackers();

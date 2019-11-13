@@ -91,12 +91,10 @@ void TrackerModel::refresh(TorrentModel const& torrentModel, torrent_ids_t const
 
         if (tor != nullptr)
         {
-            TrackerStatsList const trackerList = tor->trackerStats();
-
-            for (TrackerStat const& st : trackerList)
+            for (auto const& tracker : tor->trackers())
             {
                 TrackerInfo trackerInfo;
-                trackerInfo.st = st;
+                trackerInfo.st = tracker;
                 trackerInfo.torrentId = id;
                 trackers.append(trackerInfo);
             }

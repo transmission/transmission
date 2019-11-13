@@ -10,19 +10,17 @@
 
 #include <ctime> // time_t
 
-#include <QObject>
 #include <QIcon>
 #include <QMetaType>
+#include <QObject>
 #include <QString>
-#include <QStringList>
-#include <QList>
-#include <QVariant>
+#include <QVector>
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/quark.h>
 
 #include "CustomVariantType.h"
-#include "Speed.h"
+#include "Typedefs.h"
 
 #ifdef ERROR
 #undef ERROR
@@ -37,309 +35,233 @@ extern "C"
 struct tr_variant;
 }
 
+/***
+****  PEER
+***/
+
+#define FOREACH_PEER_RPC_FIELD(EACH) \
+    EACH(QString, address) \
+    EACH(QString, clientName) \
+    EACH(QString, flagStr) \
+    EACH(double, progress) \
+    EACH(Bps_t, rateToClient) \
+    EACH(Bps_t, rateToPeer) \
+    EACH(bool, isEncrypted)
+
 struct Peer
 {
-    bool clientIsChoked;
-    bool clientIsInterested;
-    bool isDownloadingFrom;
-    bool isEncrypted;
-    bool isIncoming;
-    bool isUploadingTo;
-    bool peerIsChoked;
-    bool peerIsInterested;
-    QString address;
-    QString clientName;
-    QString flagStr;
-    int port;
-    Speed rateToClient;
-    Speed rateToPeer;
-    double progress;
+    // rpc fields
+#define GENERATE_STRUCT(type, key) type key = {};
+    FOREACH_PEER_RPC_FIELD(GENERATE_STRUCT)
+#undef GENERATE_STRUCT
 };
 
-Q_DECLARE_METATYPE(Peer)
+/***
+****  TRACKER
+***/
 
-typedef QList<Peer> PeerList;
-Q_DECLARE_METATYPE(PeerList)
+#define FOREACH_TRACKER_RPC_FIELD(EACH) \
+    EACH(QString, announce) \
+    EACH(QString, lastAnnounceResult) \
+    EACH(QString, lastScrapeResult) \
+    EACH(QString, scrape) \
+    EACH(int64_t, id) \
+    EACH(time_t, lastAnnounceStartTime) \
+    EACH(time_t, lastAnnounceTime) \
+    EACH(time_t, lastScrapeStartTime) \
+    EACH(time_t, lastScrapeTime) \
+    EACH(time_t, nextAnnounceTime) \
+    EACH(time_t, nextScrapeTime) \
+    EACH(int, announceState) \
+    EACH(int, lastAnnouncePeerCount) \
+    EACH(int, leecherCount) \
+    EACH(int, scrapeState) \
+    EACH(int, seederCount) \
+    EACH(int, tier) \
+    EACH(bool, hasAnnounced) \
+    EACH(bool, hasScraped) \
+    EACH(bool, isBackup) \
+    EACH(bool, lastAnnounceSucceeded) \
+    EACH(bool, lastAnnounceTimedOut) \
+    EACH(bool, lastScrapeSucceeded) \
+    EACH(bool, lastScrapeTimedOut)
 
 struct TrackerStat
 {
-    QPixmap getFavicon() const;
+    // rpc fields
+#define GENERATE_STRUCT(type, key) type key = {};
+    FOREACH_TRACKER_RPC_FIELD(GENERATE_STRUCT)
+#undef GENERATE_STRUCT
 
-    bool hasAnnounced;
-    bool hasScraped;
-    bool isBackup;
-    bool lastAnnounceSucceeded;
-    bool lastAnnounceTimedOut;
-    bool lastScrapeSucceeded;
-    bool lastScrapeTimedOut;
-    int announceState;
-    int downloadCount;
-    int id;
-    int lastAnnouncePeerCount;
-    int lastAnnounceStartTime;
-    int lastAnnounceTime;
-    int lastScrapeStartTime;
-    int lastScrapeTime;
-    int leecherCount;
-    int nextAnnounceTime;
-    int nextScrapeTime;
-    int scrapeState;
-    int seederCount;
-    int tier;
-    QString announce;
-    QString host;
-    QString lastAnnounceResult;
-    QString lastScrapeResult;
+    // derived fields
+    QString displayName;
+    QPixmap getFavicon() const;
 };
 
-Q_DECLARE_METATYPE(TrackerStat)
+/***
+****  FILE
+***/
 
-typedef QList<TrackerStat> TrackerStatsList;
-Q_DECLARE_METATYPE(TrackerStatsList)
+// type, key, field
+#define FOREACH_FILE_RPC_FIELD(EACH) \
+    EACH(QString, TR_KEY_name, filename) \
+    EACH(uint64_t, TR_KEY_bytesCompleted, have) \
+    EACH(uint64_t, TR_KEY_length, size) \
+    EACH(uint64_t, TR_KEY_wanted, wanted) \
+    EACH(int, TR_KEY_priority, priority)
 
 struct TorrentFile
 {
-    TorrentFile() :
-        wanted(true),
-        index(-1),
-        priority(0),
-        size(0),
-        have(0)
-    {
-    }
+    // rpc fields
+#define GENERATE_STRUCT(type, key, field) type field = {};
+    FOREACH_FILE_RPC_FIELD(GENERATE_STRUCT)
+#undef GENERATE_STRUCT
 
-    bool wanted;
-    int index;
-    int priority;
-    QString filename;
-    uint64_t size;
-    uint64_t have;
+    // derived fields
+    int index = -1;
 };
 
-Q_DECLARE_METATYPE(TorrentFile)
+using FileList = QVector<TorrentFile>;
 
-typedef QList<TorrentFile> FileList;
-Q_DECLARE_METATYPE(FileList)
+/***
+****  TORRENT
+***/
+
+// type, rpc, name
+#define FOREACH_TORRENT_RPC_FIELD(EACH) \
+    EACH(QString, comment, comment) \
+    EACH(QString, creator, creator) \
+    EACH(QString, downloadDir, path) \
+    EACH(QString, errorString, errorString) \
+    EACH(QString, hashString, hashString) \
+    EACH(QString, name, name) \
+    EACH(QVector<Peer>, peers, peers) \
+    EACH(QVector<TorrentFile>, files, files) \
+    EACH(QVector<TrackerStat>, trackers, trackers) \
+    EACH(double, metadataPercentComplete, metadataProgress) \
+    EACH(double, recheckProgress, verifyProgress) \
+    EACH(double, seedRatioLimit, seedRatioLimit) \
+    EACH(uint64_t, pieceSize, pieceSize) \
+    EACH(bytes_t, corruptEver, failedEver) \
+    EACH(bytes_t, desiredAvailable, desiredAvailable) \
+    EACH(bytes_t, downloadedEver, downloadedEver) \
+    EACH(bytes_t, haveUnchecked, haveUnverified) \
+    EACH(bytes_t, haveValid, haveVerified) \
+    EACH(bytes_t, leftUntilDone, leftUntilDone) \
+    EACH(bytes_t, sizeWhenDone, sizeWhenDone) \
+    EACH(bytes_t, totalSize, totalSize) \
+    EACH(bytes_t, uploadedEver, uploadedEver) \
+    EACH(Bps_t, rateDownload, downloadSpeed) \
+    EACH(Bps_t, rateUpload, uploadSpeed) \
+    EACH(KBps_t, downloadLimit, downloadLimit) \
+    EACH(KBps_t, uploadLimit, uploadLimit) \
+    EACH(time_t, activityDate, activityDate) \
+    EACH(time_t, addedDate, addedDate) \
+    EACH(time_t, dateCreated, creationDate) \
+    EACH(time_t, editDate, editDate) \
+    EACH(time_t, manualAnnounceTime, manualAnnounceTime) \
+    EACH(time_t, startDate, startDate) \
+    EACH(tr_idlelimit, seedIdleMode, seedIdleMode) \
+    EACH(tr_ratiolimit, seedRatioMode, seedRatioMode) \
+    EACH(tr_torrent_activity, status, activity) \
+    EACH(int, bandwidthPriority, bandwidthPriority) \
+    EACH(int, error, error) \
+    EACH(int, eta, eta) \
+    EACH(int, id, id) \
+    EACH(int, peer_limit, peerLimit) \
+    EACH(int, peersConnected, connectedPeers) \
+    EACH(int, peersGettingFromUs, peersWeAreUploadingTo) \
+    EACH(int, peersSendingToUs, peersWeAreDownloadingFrom) \
+    EACH(int, pieceCount, pieceCount) \
+    EACH(int, queuePosition, queuePosition) \
+    EACH(int, seedIdleLimit, seedIdleLimit) \
+    EACH(int, webseedsSendingToUs, webseedsWeAreDownloadingFrom) \
+    EACH(bool, downloadLimited, downloadIsLimited) \
+    EACH(bool, honorsSessionLimits, honorsSessionLimits) \
+    EACH(bool, isFinished, isFinished) \
+    EACH(bool, isPrivate, isPrivate) \
+    EACH(bool, isStalled, isStalled) \
+    EACH(bool, uploadLimited, uploadIsLimited)
+
+/* Generate the bit number for each field.
+   This is just a plain vanilla [0...n) enum used for generating
+   the TorrentFields enums bitfield offsets a few lines down. */
+enum TorrentFieldNumbers
+{
+#define GENERATE_FIELD_NUMBERS(type, rpc, name) TFN_ ## name,
+    FOREACH_TORRENT_RPC_FIELD(GENERATE_FIELD_NUMBERS)
+#undef GENERATE_FIELD_NUMBERS
+};
+
+enum TorrentFields
+{
+#define GENERATE_BITFIELD(type, rpc, name) TF_ ## name = (1ull << TFN_ ## name),
+    FOREACH_TORRENT_RPC_FIELD(GENERATE_BITFIELD)
+#undef GENERATE_BITFIELD
+};
 
 class Torrent : public QObject
 {
     Q_OBJECT
 
 public:
-    enum
-    {
-        UPLOAD_SPEED,
-        DOWNLOAD_SPEED,
-        DOWNLOAD_DIR,
-        ACTIVITY,
-        NAME,
-        ERROR,
-        ERROR_STRING,
-        SIZE_WHEN_DONE,
-        LEFT_UNTIL_DONE,
-        HAVE_UNCHECKED,
-        HAVE_VERIFIED,
-        DESIRED_AVAILABLE,
-        TOTAL_SIZE,
-        PIECE_SIZE,
-        PIECE_COUNT,
-        PEERS_GETTING_FROM_US,
-        PEERS_SENDING_TO_US,
-        WEBSEEDS_SENDING_TO_US,
-        PERCENT_DONE,
-        METADATA_PERCENT_DONE,
-        PERCENT_VERIFIED,
-        DATE_ACTIVITY,
-        DATE_ADDED,
-        DATE_STARTED,
-        DATE_CREATED,
-        PEERS_CONNECTED,
-        ETA,
-        DOWNLOADED_EVER,
-        UPLOADED_EVER,
-        FAILED_EVER,
-        TRACKERSTATS,
-        MIME_ICON,
-        SEED_RATIO_LIMIT,
-        SEED_RATIO_MODE,
-        SEED_IDLE_LIMIT,
-        SEED_IDLE_MODE,
-        DOWN_LIMIT,
-        DOWN_LIMITED,
-        UP_LIMIT,
-        UP_LIMITED,
-        HONORS_SESSION_LIMITS,
-        PEER_LIMIT,
-        HASH_STRING,
-        IS_FINISHED,
-        IS_PRIVATE,
-        IS_STALLED,
-        COMMENT,
-        CREATOR,
-        MANUAL_ANNOUNCE_TIME,
-        PEERS,
-        BANDWIDTH_PRIORITY,
-        QUEUE_POSITION,
-        EDIT_DATE,
-        //
-        PROPERTY_COUNT
-    };
-
-public:
     Torrent(Prefs const&, int id);
 
-    int getBandwidthPriority() const
-    {
-        return getInt(BANDWIDTH_PRIORITY);
-    }
-
-    int id() const
-    {
-        return myId;
-    }
-
-    QString name() const
-    {
-        return getString(NAME);
-    }
+#define GENERATE_GETTER(type, rpc, name) const type& name() const { return name ## _; }
+    FOREACH_TORRENT_RPC_FIELD(GENERATE_GETTER)
+#undef GENERATE_GETTER
 
     bool hasName() const
     {
-        return !myValues[NAME].isNull();
-    }
-
-    QString creator() const
-    {
-        return getString(CREATOR);
-    }
-
-    QString comment() const
-    {
-        return getString(COMMENT);
-    }
-
-    QString getPath() const
-    {
-        return getString(DOWNLOAD_DIR);
+        return !name_.isEmpty();
     }
 
     QString getError() const;
 
-    QString hashString() const
-    {
-        return getString(HASH_STRING);
-    }
-
     bool hasError() const
     {
-        return getInt(ERROR) != TR_STAT_OK;
+        return error_ != TR_STAT_OK;
     }
 
     bool isDone() const
     {
-        return getSize(LEFT_UNTIL_DONE) == 0;
+        return leftUntilDone_ == bytes_t(0);
     }
 
     bool isSeed() const
     {
-        return haveVerified() >= totalSize();
-    }
-
-    bool isPrivate() const
-    {
-        return getBool(IS_PRIVATE);
+        return haveVerified_ >= totalSize_;
     }
 
     bool getSeedRatio(double& setme) const;
 
-    uint64_t haveVerified() const
+    auto haveTotal() const
     {
-        return getSize(HAVE_VERIFIED);
-    }
-
-    uint64_t haveUnverified() const
-    {
-        return getSize(HAVE_UNCHECKED);
-    }
-
-    uint64_t desiredAvailable() const
-    {
-        return getSize(DESIRED_AVAILABLE);
-    }
-
-    uint64_t haveTotal() const
-    {
-        return haveVerified() + haveUnverified();
-    }
-
-    uint64_t totalSize() const
-    {
-        return getSize(TOTAL_SIZE);
-    }
-
-    uint64_t sizeWhenDone() const
-    {
-        return getSize(SIZE_WHEN_DONE);
-    }
-
-    uint64_t leftUntilDone() const
-    {
-        return getSize(LEFT_UNTIL_DONE);
-    }
-
-    uint64_t pieceSize() const
-    {
-        return getSize(PIECE_SIZE);
+        return haveVerified_ + haveUnverified_;
     }
 
     bool hasMetadata() const
     {
-        return getDouble(METADATA_PERCENT_DONE) >= 1.0;
-    }
-
-    int pieceCount() const
-    {
-        return getInt(PIECE_COUNT);
+        return metadataProgress_ >= 1.0;
     }
 
     double ratio() const
     {
-        auto const u = uploadedEver();
-        auto const d = downloadedEver();
-        auto const t = totalSize();
-        return double(u) / (d ? d : t);
+        return double(uploadedEver_.value()) / std::max(downloadedEver_, totalSize_).value();
     }
 
     double percentComplete() const
     {
-        return totalSize() != 0 ? haveTotal() / static_cast<double>(totalSize()) : 0;
+        auto const have = haveTotal().value();
+        auto const total = totalSize().value();
+        return total != 0 ? have / double(total) : 0;
     }
 
     double percentDone() const
     {
-        auto const l = leftUntilDone();
-        auto const s = sizeWhenDone();
+        auto const l = leftUntilDone_.value();
+        auto const s = sizeWhenDone_.value();
         return s ? double(s - l) / s : 0.0;
-    }
-
-    double metadataPercentDone() const
-    {
-        return getDouble(METADATA_PERCENT_DONE);
-    }
-
-    uint64_t downloadedEver() const
-    {
-        return getSize(DOWNLOADED_EVER);
-    }
-
-    uint64_t uploadedEver() const
-    {
-        return getSize(UPLOADED_EVER);
-    }
-
-    uint64_t failedEver() const
-    {
-        return getSize(FAILED_EVER);
     }
 
     int compareTracker(Torrent const&) const;
@@ -349,37 +271,7 @@ public:
 
     bool hasETA() const
     {
-        return getETA() >= 0;
-    }
-
-    int getETA() const
-    {
-        return getInt(ETA);
-    }
-
-    time_t lastActivity() const
-    {
-        return getTime(DATE_ACTIVITY);
-    }
-
-    time_t lastStarted() const
-    {
-        return getTime(DATE_STARTED);
-    }
-
-    time_t dateAdded() const
-    {
-        return getTime(DATE_ADDED);
-    }
-
-    time_t dateCreated() const
-    {
-        return getTime(DATE_CREATED);
-    }
-
-    time_t manualAnnounceTime() const
-    {
-        return getTime(MANUAL_ANNOUNCE_TIME);
+        return eta() >= 0;
     }
 
     bool canManualAnnounceAt(time_t t) const
@@ -387,189 +279,59 @@ public:
         return isReadyToTransfer() && (manualAnnounceTime() <= t);
     }
 
-    int peersWeAreDownloadingFrom() const
-    {
-        return getInt(PEERS_SENDING_TO_US);
-    }
-
-    int webseedsWeAreDownloadingFrom() const
-    {
-        return getInt(WEBSEEDS_SENDING_TO_US);
-    }
-
-    int peersWeAreUploadingTo() const
-    {
-        return getInt(PEERS_GETTING_FROM_US);
-    }
-
     bool isUploading() const
     {
-        return peersWeAreUploadingTo() > 0;
+        return peersWeAreUploadingTo_ > 0;
     }
 
-    int connectedPeers() const
+    auto connectedPeersAndWebseeds() const
     {
-        return getInt(PEERS_CONNECTED);
-    }
-
-    int connectedPeersAndWebseeds() const
-    {
-        return connectedPeers() + getInt(WEBSEEDS_SENDING_TO_US);
-    }
-
-    Speed downloadSpeed() const
-    {
-        return Speed::fromBps(getSize(DOWNLOAD_SPEED));
-    }
-
-    Speed uploadSpeed() const
-    {
-        return Speed::fromBps(getSize(UPLOAD_SPEED));
-    }
-
-    double getVerifyProgress() const
-    {
-        return getDouble(PERCENT_VERIFIED);
+        return connectedPeers_ + webseedsWeAreDownloadingFrom_;
     }
 
     bool hasFileSubstring(QString const& substr) const;
     bool hasTrackerSubstring(QString const& substr) const;
 
-    Speed uploadLimit() const
-    {
-        return Speed::fromKBps(getInt(UP_LIMIT));
-    }
-
-    Speed downloadLimit() const
-    {
-        return Speed::fromKBps(getInt(DOWN_LIMIT));
-    }
-
-    bool uploadIsLimited() const
-    {
-        return getBool(UP_LIMITED);
-    }
-
-    bool downloadIsLimited() const
-    {
-        return getBool(DOWN_LIMITED);
-    }
-
-    bool honorsSessionLimits() const
-    {
-        return getBool(HONORS_SESSION_LIMITS);
-    }
-
-    int peerLimit() const
-    {
-        return getInt(PEER_LIMIT);
-    }
-
-    double seedRatioLimit() const
-    {
-        return getDouble(SEED_RATIO_LIMIT);
-    }
-
-    tr_ratiolimit seedRatioMode() const
-    {
-        return static_cast<tr_ratiolimit>(getInt(SEED_RATIO_MODE));
-    }
-
-    int seedIdleLimit() const
-    {
-        return getInt(SEED_IDLE_LIMIT);
-    }
-
-    tr_idlelimit seedIdleMode() const
-    {
-        return static_cast<tr_idlelimit>(getInt(SEED_IDLE_MODE));
-    }
-
-    TrackerStatsList trackerStats() const
-    {
-        return myValues[TRACKERSTATS].value<TrackerStatsList>();
-    }
-
-    QStringList const& trackers() const
-    {
-        return trackers_;
-    }
-
-    QStringList const& trackerDisplayNames() const
-    {
-        return trackerDisplayNames_;
-    }
-
-    PeerList peers() const
-    {
-        return myValues[PEERS].value<PeerList>();
-    }
-
-    FileList const& files() const
-    {
-        return myFiles;
-    }
-
-    int queuePosition() const
-    {
-        return getInt(QUEUE_POSITION);
-    }
-
-    bool isStalled() const
-    {
-        return getBool(IS_STALLED);
-    }
-
     QString activityString() const;
-
-    tr_torrent_activity getActivity() const
-    {
-        return static_cast<tr_torrent_activity>(getInt(ACTIVITY));
-    }
-
-    bool isFinished() const
-    {
-        return getBool(IS_FINISHED);
-    }
 
     bool isPaused() const
     {
-        return getActivity() == TR_STATUS_STOPPED;
+        return activity_ == TR_STATUS_STOPPED;
     }
 
     bool isWaitingToVerify() const
     {
-        return getActivity() == TR_STATUS_CHECK_WAIT;
+        return activity_ == TR_STATUS_CHECK_WAIT;
     }
 
     bool isVerifying() const
     {
-        return getActivity() == TR_STATUS_CHECK;
+        return activity_ == TR_STATUS_CHECK;
     }
 
     bool isDownloading() const
     {
-        return getActivity() == TR_STATUS_DOWNLOAD;
+        return activity_ == TR_STATUS_DOWNLOAD;
     }
 
     bool isWaitingToDownload() const
     {
-        return getActivity() == TR_STATUS_DOWNLOAD_WAIT;
+        return activity_ == TR_STATUS_DOWNLOAD_WAIT;
     }
 
     bool isSeeding() const
     {
-        return getActivity() == TR_STATUS_SEED;
+        return activity_ == TR_STATUS_SEED;
     }
 
     bool isWaitingToSeed() const
     {
-        return getActivity() == TR_STATUS_SEED_WAIT;
+        return activity_ == TR_STATUS_SEED_WAIT;
     }
 
     bool isReadyToTransfer() const
     {
-        return getActivity() == TR_STATUS_DOWNLOAD || getActivity() == TR_STATUS_SEED;
+        return activity_ == TR_STATUS_DOWNLOAD || activity_ == TR_STATUS_SEED;
     }
 
     bool isQueued() const
@@ -577,11 +339,13 @@ public:
         return isWaitingToDownload() || isWaitingToSeed();
     }
 
-    bool update(tr_quark const* keys, tr_variant** values, size_t n);
+    using fields_t = uint64_t;
 
-    QIcon getMimeTypeIcon() const
+    fields_t update(tr_quark const* keys, tr_variant** values, size_t n);
+
+    QIcon icon() const
     {
-        return getIcon(MIME_ICON);
+        return icon_;
     }
 
     using KeyList = QSet<tr_quark>;
@@ -592,43 +356,16 @@ public:
     static KeyList const mainStatKeys;
 
 private:
-    struct Property
-    {
-        int id;
-        tr_quark key;
-        int type;
-    };
+    Prefs const& prefs_;
 
-private:
-    int getInt(int key) const;
-    bool getBool(int key) const;
-    QIcon getIcon(int key) const;
-    double getDouble(int key) const;
-    qulonglong getSize(int key) const;
-    QString getString(int key) const;
-    time_t getTime(int key) const;
+    // rpc fields
+#define GENERATE_FIELD(type, rpc, name) type name ## _ = {};
+    FOREACH_TORRENT_RPC_FIELD(GENERATE_FIELD)
+#undef GENERATE_FIELD
 
-    bool setInt(int key, int value);
-    bool setBool(int key, bool value);
-    bool setIcon(int key, QIcon const&);
-    bool setDouble(int key, double);
-    bool setString(int key, char const*, size_t len);
-    bool setSize(int key, qulonglong);
-    bool setTime(int key, time_t);
-
-    QStringList trackers_;
-    QStringList trackerDisplayNames_;
-
-    char const* getMimeTypeString() const;
+    // derived fields
+    QIcon icon_;
     void updateMimeIcon();
-
-private:
-    int const myId;
-    Prefs const& myPrefs;
-    QVariant myValues[PROPERTY_COUNT];
-    FileList myFiles;
-
-    static Property myProperties[];
 };
 
 Q_DECLARE_METATYPE(Torrent const*)

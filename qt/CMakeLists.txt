@@ -93,7 +93,6 @@ set(${PROJECT_NAME}_HEADERS
     RpcQueue.h
     Session.h
     SessionDialog.h
-    Speed.h
     SqueezeLabel.h
     StatsDialog.h
     StyleHelper.h
@@ -181,8 +180,12 @@ include_directories(
     ${CMAKE_SOURCE_DIR}
     ${PROJECT_SOURCE_DIR}
     ${PROJECT_BINARY_DIR}
+)
+include_directories(
+    SYSTEM
     ${CURL_INCLUDE_DIRS}
     ${EVENT2_INCLUDE_DIRS}
+    ${THIRD_PARTY_DIR}/units/include
 )
 
 tr_win32_app_info(${PROJECT_NAME}_WIN32_RC_FILE

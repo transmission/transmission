@@ -62,7 +62,7 @@ private slots:
     void onTimer();
 
     void onTorrentEdited(torrent_ids_t const& ids);
-    void onTorrentsChanged(torrent_ids_t const& ids);
+    void onTorrentsChanged(torrent_ids_t const& ids, Torrent::fields_t const& fields);
 
     // Tracker tab
     void onTrackerSelectionChanged();

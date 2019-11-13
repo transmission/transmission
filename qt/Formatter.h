@@ -13,7 +13,7 @@
 #include <QCoreApplication>
 #include <QString>
 
-class Speed;
+#include "Typedefs.h"
 
 class Formatter
 {
@@ -39,12 +39,14 @@ public:
 public:
     static QString memToString(int64_t bytes);
     static QString sizeToString(int64_t bytes);
-    static QString speedToString(Speed const& speed);
     static QString percentToString(double x);
     static QString ratioToString(double ratio);
     static QString timeToString(int seconds);
-    static QString uploadSpeedToString(Speed const& up);
-    static QString downloadSpeedToString(Speed const& down);
+
+    static QString storage(bytes_t const& value);
+    static QString speed(KBps_t const& value);
+    static QString speedUp(KBps_t const& value);
+    static QString speedDown(KBps_t const& value);
 
     static QString unitStr(Type t, Size s)
     {

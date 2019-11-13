@@ -13,7 +13,6 @@
 #include <libtransmission/transmission.h>
 #include <libtransmission/variant.h>
 
-#include "Speed.h"
 #include "Torrent.h"
 #include "TorrentDelegate.h"
 #include "TorrentModel.h"
@@ -102,7 +101,7 @@ QVariant TorrentModel::data(QModelIndex const& index, int role) const
             break;
 
         case Qt::DecorationRole:
-            var.setValue(t->getMimeTypeIcon());
+            var.setValue(t->icon());
             break;
 
         case TorrentRole:
@@ -110,7 +109,6 @@ QVariant TorrentModel::data(QModelIndex const& index, int role) const
             break;
 
         default:
-            // std::cerr << "Unhandled role: " << role << std::endl;
             break;
         }
     }
@@ -160,12 +158,13 @@ void TorrentModel::updateTorrents(tr_variant* torrents, bool isCompleteList)
     auto instantiated = torrents_t{};
     auto needinfo = torrent_ids_t{};
     auto processed = torrents_t{};
+    auto fields = Torrent::fields_t{};
 
     auto const now = time(nullptr);
     auto const recently_added = [now](auto const& tor)
         {
             static auto constexpr max_age = 60;
-            auto const date = tor->dateAdded();
+            auto const date = tor->addedDate();
             return (date != 0) && (difftime(now, date) < max_age);
         };
 
@@ -247,7 +246,7 @@ void TorrentModel::updateTorrents(tr_variant* torrents, bool isCompleteList)
         }
 
         Torrent* tor = getTorrentFromId(id);
-        std::optional<uint64_t> leftUntilDone;
+        std::optional<bytes_t> leftUntilDone;
         bool is_new = false;
 
         if (tor == nullptr)
@@ -261,12 +260,14 @@ void TorrentModel::updateTorrents(tr_variant* torrents, bool isCompleteList)
             leftUntilDone = tor->leftUntilDone();
         }
 
-        if (tor->update(keys.data(), values.data(), keys.size()))
+        auto const diff = tor->update(keys.data(), values.data(), keys.size());
+        if (diff)
         {
             changed.insert(id);
+            fields |= diff;
         }
 
-        if (is_new && !tor->hasName())
+        if ((is_new && !tor->hasName()) || ((diff & TF_editDate) != 0))
         {
             needinfo.insert(id);
         }
@@ -277,7 +278,7 @@ void TorrentModel::updateTorrents(tr_variant* torrents, bool isCompleteList)
             myAlreadyAdded.insert(id);
         }
 
-        if (leftUntilDone && (*leftUntilDone > 0) && (tor->leftUntilDone() == 0) && (tor->downloadedEver() > 0))
+        if (leftUntilDone && (*leftUntilDone != 0_B) && (tor->leftUntilDone() == 0_B) && (tor->downloadedEver() != 0_B))
         {
             completed.insert(id);
         }
@@ -311,7 +312,7 @@ void TorrentModel::updateTorrents(tr_variant* torrents, bool isCompleteList)
 
     if (!changed.empty())
     {
-        emit torrentsChanged(changed);
+        emit torrentsChanged(changed, fields);
     }
 
     if (!completed.empty())

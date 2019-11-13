@@ -239,7 +239,7 @@ void TorrentDelegateMin::drawTorrent(QPainter* painter, QStyleOptionViewItem con
         painter->setPen(option.palette.color(cg, cr));
     }
 
-    tor.getMimeTypeIcon().paint(painter, layout.iconRect, Qt::AlignCenter, im, qs);
+    tor.icon().paint(painter, layout.iconRect, Qt::AlignCenter, im, qs);
 
     if (!emblemIcon.isNull())
     {

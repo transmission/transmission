@@ -14,6 +14,7 @@
 #include <QPainter>
 #include <QPixmap>
 #include <QPixmapCache>
+#include <QStringBuilder>
 #include <QStyleOptionProgressBar>
 
 #include "Formatter.h"
@@ -162,10 +163,10 @@ QSize TorrentDelegate::margin(QStyle const& style) const
 
 QString TorrentDelegate::progressString(Torrent const& tor)
 {
-    bool const isMagnet(!tor.hasMetadata());
-    bool const isDone(tor.isDone());
-    bool const isSeed(tor.isSeed());
-    uint64_t const haveTotal(tor.haveTotal());
+    bool const isMagnet = !tor.hasMetadata();
+    bool const isDone = tor.isDone();
+    bool const isSeed = tor.isSeed();
+    auto const haveTotal = tor.haveTotal();
     QString str;
     double seedRatio;
     bool const hasSeedRatio(tor.getSeedRatio(seedRatio));
@@ -175,7 +176,7 @@ QString TorrentDelegate::progressString(Torrent const& tor)
         //: First part of torrent progress string;
         //: %1 is the percentage of torrent metadata downloaded
         str = tr("Magnetized transfer - retrieving metadata (%1%)").
-            arg(Formatter::percentToString(tor.metadataPercentDone() * 100.0));
+            arg(Formatter::percentToString(tor.metadataProgress() * 100.0));
     }
     else if (!isDone) // downloading
     {
@@ -183,7 +184,7 @@ QString TorrentDelegate::progressString(Torrent const& tor)
         //: %1 is how much we've got,
         //: %2 is how much we'll have when done,
         //: %3 is a percentage of the two
-        str = tr("%1 of %2 (%3%)").arg(Formatter::sizeToString(haveTotal)).arg(Formatter::sizeToString(tor.sizeWhenDone())).
+        str = tr("%1 of %2 (%3%)").arg(Formatter::storage(haveTotal)).arg(Formatter::storage(tor.sizeWhenDone())).
             arg(Formatter::percentToString(tor.percentDone() * 100.0));
     }
     else if (!isSeed) // partial seed
@@ -197,10 +198,10 @@ QString TorrentDelegate::progressString(Torrent const& tor)
             //: %4 is how much we've uploaded,
             //: %5 is our upload-to-download ratio,
             //: %6 is the ratio we want to reach before we stop uploading
-            str = tr("%1 of %2 (%3%), uploaded %4 (Ratio: %5 Goal: %6)").arg(Formatter::sizeToString(haveTotal)).
-                arg(Formatter::sizeToString(tor.totalSize())).
+            str = tr("%1 of %2 (%3%), uploaded %4 (Ratio: %5 Goal: %6)").arg(Formatter::storage(haveTotal)).
+                arg(Formatter::storage(tor.totalSize())).
                 arg(Formatter::percentToString(tor.percentComplete() * 100.0)).
-                arg(Formatter::sizeToString(tor.uploadedEver())).arg(Formatter::ratioToString(tor.ratio())).
+                arg(Formatter::storage(tor.uploadedEver())).arg(Formatter::ratioToString(tor.ratio())).
                 arg(Formatter::ratioToString(seedRatio));
         }
         else
@@ -211,10 +212,10 @@ QString TorrentDelegate::progressString(Torrent const& tor)
             //: %3 is a percentage of the two,
             //: %4 is how much we've uploaded,
             //: %5 is our upload-to-download ratio
-            str = tr("%1 of %2 (%3%), uploaded %4 (Ratio: %5)").arg(Formatter::sizeToString(haveTotal)).
-                arg(Formatter::sizeToString(tor.totalSize())).
+            str = tr("%1 of %2 (%3%), uploaded %4 (Ratio: %5)").arg(Formatter::storage(haveTotal)).
+                arg(Formatter::storage(tor.totalSize())).
                 arg(Formatter::percentToString(tor.percentComplete() * 100.0)).
-                arg(Formatter::sizeToString(tor.uploadedEver())).arg(Formatter::ratioToString(tor.ratio()));
+                arg(Formatter::storage(tor.uploadedEver())).arg(Formatter::ratioToString(tor.ratio()));
         }
     }
     else // seeding
@@ -226,8 +227,8 @@ QString TorrentDelegate::progressString(Torrent const& tor)
             //: %2 is how much we've uploaded,
             //: %3 is our upload-to-download ratio,
             //: %4 is the ratio we want to reach before we stop uploading
-            str = tr("%1, uploaded %2 (Ratio: %3 Goal: %4)").arg(Formatter::sizeToString(haveTotal)).
-                arg(Formatter::sizeToString(tor.uploadedEver())).arg(Formatter::ratioToString(tor.ratio())).
+            str = tr("%1, uploaded %2 (Ratio: %3 Goal: %4)").arg(Formatter::storage(haveTotal)).
+                arg(Formatter::storage(tor.uploadedEver())).arg(Formatter::ratioToString(tor.ratio())).
                 arg(Formatter::ratioToString(seedRatio));
         }
         else // seeding w/o a ratio
@@ -236,8 +237,8 @@ QString TorrentDelegate::progressString(Torrent const& tor)
             //: %1 is the torrent's total size,
             //: %2 is how much we've uploaded,
             //: %3 is our upload-to-download ratio
-            str = tr("%1, uploaded %2 (Ratio: %3)").arg(Formatter::sizeToString(haveTotal)).
-                arg(Formatter::sizeToString(tor.uploadedEver())).arg(Formatter::ratioToString(tor.ratio()));
+            str = tr("%1, uploaded %2 (Ratio: %3)").arg(Formatter::storage(haveTotal)).
+                arg(Formatter::storage(tor.uploadedEver())).arg(Formatter::ratioToString(tor.ratio()));
         }
     }
 
@@ -249,7 +250,7 @@ QString TorrentDelegate::progressString(Torrent const& tor)
             //: Second (optional) part of torrent progress string;
             //: %1 is duration;
             //: notice that leading space (before the dash) is included here
-            str += tr(" - %1 left").arg(Formatter::timeToString(tor.getETA()));
+            str += tr(" - %1 left").arg(Formatter::timeToString(tor.eta()));
         }
         else
         {
@@ -271,12 +272,12 @@ QString TorrentDelegate::shortTransferString(Torrent const& tor)
 
     if (haveDown)
     {
-        str = Formatter::downloadSpeedToString(tor.downloadSpeed()) + QLatin1String("   ") +
-            Formatter::uploadSpeedToString(tor.uploadSpeed());
+        str = Formatter::speedDown(tor.downloadSpeed()) % QLatin1String("   ") %
+            Formatter::speedUp(tor.uploadSpeed());
     }
     else if (haveUp)
     {
-        str = Formatter::uploadSpeedToString(tor.uploadSpeed());
+        str = Formatter::speedUp(tor.uploadSpeed());
     }
 
     return str.trimmed();
@@ -286,15 +287,15 @@ QString TorrentDelegate::shortStatusString(Torrent const& tor)
 {
     QString str;
 
-    switch (tor.getActivity())
+    switch (tor.activity())
     {
     case TR_STATUS_CHECK:
-        str = tr("Verifying local data (%1% tested)").arg(Formatter::percentToString(tor.getVerifyProgress() * 100.0));
+        str = tr("Verifying local data (%1% tested)").arg(Formatter::percentToString(tor.verifyProgress() * 100.0));
         break;
 
     case TR_STATUS_DOWNLOAD:
     case TR_STATUS_SEED:
-        str = shortTransferString(tor) + QLatin1String("    ") + tr("Ratio: %1").arg(Formatter::ratioToString(tor.ratio()));
+        str = shortTransferString(tor) % QLatin1String("    ") % tr("Ratio: %1").arg(Formatter::ratioToString(tor.ratio()));
         break;
 
     default:
@@ -311,11 +312,11 @@ QString TorrentDelegate::statusString(Torrent const& tor)
 
     if (tor.hasError())
     {
-        str = tor.getError();
+        str = tor.error();
     }
     else
     {
-        switch (tor.getActivity())
+        switch (tor.activity())
         {
         case TR_STATUS_STOPPED:
         case TR_STATUS_CHECK_WAIT:
@@ -329,7 +330,7 @@ QString TorrentDelegate::statusString(Torrent const& tor)
             if (!tor.hasMetadata())
             {
                 str = tr("Downloading metadata from %Ln peer(s) (%1% done)", nullptr, tor.peersWeAreDownloadingFrom()).
-                    arg(Formatter::percentToString(100.0 * tor.metadataPercentDone()));
+                    arg(Formatter::percentToString(100.0 * tor.metadataProgress()));
             }
             else
             {
@@ -382,7 +383,7 @@ QString TorrentDelegate::statusString(Torrent const& tor)
 
         if (!s.isEmpty())
         {
-            str += tr(" - ") + s;
+            str += tr(" - ") % s;
         }
     }
 
@@ -460,7 +461,7 @@ void TorrentDelegate::setProgressBarPercentDone(QStyleOptionViewItem const& opti
     {
         bool const isMagnet(!tor.hasMetadata());
         myProgressBarStyle->direction = option.direction;
-        myProgressBarStyle->progress = static_cast<int>(myProgressBarStyle->minimum + (isMagnet ? tor.metadataPercentDone() :
+        myProgressBarStyle->progress = static_cast<int>(myProgressBarStyle->minimum + (isMagnet ? tor.metadataProgress() :
             tor.percentDone()) * (myProgressBarStyle->maximum - myProgressBarStyle->minimum));
     }
 }
@@ -566,7 +567,7 @@ void TorrentDelegate::drawTorrent(QPainter* painter, QStyleOptionViewItem const&
         painter->setPen(option.palette.color(cg, cr));
     }
 
-    tor.getMimeTypeIcon().paint(painter, layout.iconRect, Qt::AlignCenter, im, qs);
+    tor.icon().paint(painter, layout.iconRect, Qt::AlignCenter, im, qs);
 
     if (!emblemIcon.isNull())
     {

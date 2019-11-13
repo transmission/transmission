@@ -22,3 +22,6 @@
 	path = third-party/miniupnpc
 	url = https://github.com/transmission/miniupnpc
 	branch = post-2.0.20170509-transmission
+[submodule "third-party/units"]
+	path = third-party/units
+	url = https://github.com/nholthaus/units

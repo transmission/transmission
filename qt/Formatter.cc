@@ -6,11 +6,12 @@
  *
  */
 
+#include <QStringBuilder>
+
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h> // tr_formatter
 
 #include "Formatter.h"
-#include "Speed.h"
 
 /***
 ****  Constants
@@ -61,20 +62,6 @@ void Formatter::initUnits()
 ****
 ***/
 
-double Speed::KBps() const
-{
-    return _Bps / static_cast<double>(speed_K);
-}
-
-Speed Speed::fromKBps(double KBps)
-{
-    return static_cast<int>(KBps * speed_K);
-}
-
-/***
-****
-***/
-
 QString Formatter::memToString(int64_t bytes)
 {
     if (bytes < 0)
@@ -90,6 +77,11 @@ QString Formatter::memToString(int64_t bytes)
     char buf[128];
     tr_formatter_mem_B(buf, bytes, sizeof(buf));
     return QString::fromUtf8(buf);
+}
+
+QString Formatter::storage(bytes_t const& val)
+{
+    return sizeToString(val.value());
 }
 
 QString Formatter::sizeToString(int64_t bytes)
@@ -109,25 +101,25 @@ QString Formatter::sizeToString(int64_t bytes)
     return QString::fromUtf8(buf);
 }
 
-QString Formatter::speedToString(Speed const& speed)
+QString Formatter::speed(KBps_t const& val)
 {
     char buf[128];
-    tr_formatter_speed_KBps(buf, speed.KBps(), sizeof(buf));
+    tr_formatter_speed_KBps(buf, val.value(), sizeof(buf));
     return QString::fromUtf8(buf);
 }
 
-QString Formatter::uploadSpeedToString(Speed const& uploadSpeed)
+QString Formatter::speedUp(KBps_t const& value)
 {
     static QChar const uploadSymbol(0x25B4);
 
-    return tr("%1 %2").arg(speedToString(uploadSpeed)).arg(uploadSymbol);
+    return tr("%1 %2").arg(speed(value)).arg(uploadSymbol);
 }
 
-QString Formatter::downloadSpeedToString(Speed const& downloadSpeed)
+QString Formatter::speedDown(KBps_t const& value)
 {
     static QChar const downloadSymbol(0x25BE);
 
-    return tr("%1 %2").arg(speedToString(downloadSpeed)).arg(downloadSymbol);
+    return tr("%1 %2").arg(speed(value)).arg(downloadSymbol);
 }
 
 QString Formatter::percentToString(double x)

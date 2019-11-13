@@ -125,7 +125,7 @@ bool TorrentFilter::lessThan(QModelIndex const& left, QModelIndex const& right) 
     case SortMode::SORT_BY_AGE:
         if (val == 0)
         {
-            val = compare(a->dateAdded(), b->dateAdded());
+            val = compare(a->addedDate(), b->addedDate());
         }
 
         break;
@@ -160,7 +160,7 @@ bool TorrentFilter::lessThan(QModelIndex const& left, QModelIndex const& right) 
 
         if (val == 0)
         {
-            val = compare(a->getActivity(), b->getActivity());
+            val = compare(a->activity(), b->activity());
         }
 
         if (val == 0)
@@ -178,7 +178,7 @@ bool TorrentFilter::lessThan(QModelIndex const& left, QModelIndex const& right) 
     case SortMode::SORT_BY_PROGRESS:
         if (val == 0)
         {
-            val = compare(a->metadataPercentDone(), b->metadataPercentDone());
+            val = compare(a->metadataProgress(), b->metadataProgress());
         }
 
         if (val == 0)
@@ -311,11 +311,6 @@ bool TorrentFilter::filterAcceptsRow(int sourceRow, QModelIndex const& sourcePar
     }
 
     return accepts;
-}
-
-int TorrentFilter::hiddenRowCount() const
-{
-    return sourceModel()->rowCount() - rowCount();
 }
 
 void TorrentFilter::countTorrentsPerMode(int* setmeCounts) const

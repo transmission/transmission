@@ -137,10 +137,7 @@ QIcon const getMimeIcon(QString const& filename)
     {
         QMimeDatabase mimeDb;
         QMimeType type = mimeDb.mimeTypeForFile(filename, QMimeDatabase::MatchExtension);
-        if (icon.isNull())
-        {
-            icon = QIcon::fromTheme(type.iconName());
-        }
+        icon = QIcon::fromTheme(type.iconName());
 
         if (icon.isNull())
         {
