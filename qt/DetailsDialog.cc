@@ -637,7 +637,7 @@ void DetailsDialog::refresh()
     }
     else
     {
-        int baseline = torrents.front()->eta();
+        auto baseline = torrents.front()->eta();
 
         for (Torrent const* const t : torrents)
         {
@@ -650,7 +650,7 @@ void DetailsDialog::refresh()
 
         if (string.isEmpty())
         {
-            if (baseline < 0)
+            if (baseline < 0_s)
             {
                 string = tr("Unknown");
             }
