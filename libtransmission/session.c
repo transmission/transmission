@@ -751,10 +751,11 @@ static void tr_sessionInitImpl(void* vdata)
     **/
 
     {
-        char* filename = tr_buildPath(session->configDir, "blocklists", NULL);
+        char* filename = tr_buildPath(session->configDir, "blocklists", "peer", NULL);
         tr_sys_dir_create(filename, TR_SYS_DIR_CREATE_PARENTS, 0777, NULL);
         tr_free(filename);
-        loadBlocklists(session);
+        loadBlocklists(session, BLOCK_ADDR);
+        loadBlocklists(session, BLOCK_PEER);
     }
 
     TR_ASSERT(tr_isSession(session));
@@ -2401,17 +2402,31 @@ static bool tr_stringEndsWith(char const* str, char const* end)
     return slen >= elen && memcmp(&str[slen - elen], end, elen) == 0;
 }
 
-static void loadBlocklists(tr_session* session)
+static void loadBlocklists(tr_session* session, tr_blocklistType type)
 {
     tr_sys_dir_t odir;
     char* dirname;
     char const* name;
     tr_list* blocklists = NULL;
     tr_ptrArray loadme = TR_PTR_ARRAY_INIT;
+    // XXX: Maybe split the field without changing the ABI.
     bool const isEnabled = session->isBlocklistEnabled;
 
     /* walk the blocklist directory... */
-    dirname = tr_buildPath(session->configDir, "blocklists", NULL);
+    switch (type)
+    {
+    case BLOCK_ADDR:
+        dirname = tr_buildPath(session->configDir, "blocklists", NULL);
+        break;
+
+    case BLOCK_PEER:
+        dirname = tr_buildPath(session->configDir, "blocklists", "peers", NULL);
+        break;
+
+    default:
+        /* Panic? */
+    }
+
     odir = tr_sys_dir_open(dirname, NULL);
 
     if (odir == TR_BAD_SYS_DIR)
@@ -2446,7 +2461,7 @@ static void loadBlocklists(tr_session* session)
 
             if (!tr_sys_path_get_info(binname, 0, &binname_info, NULL)) /* create it */
             {
-                tr_blocklistFile* b = tr_blocklistFileNew(binname, isEnabled, BLOCK_ADDR);
+                tr_blocklistFile* b = tr_blocklistFileNew(binname, isEnabled, type);
                 int const n = tr_blocklistFileSetContent(b, path);
 
                 if (n > 0)
@@ -2465,7 +2480,7 @@ static void loadBlocklists(tr_session* session)
                 old = tr_strdup_printf("%s.old", binname);
                 tr_sys_path_remove(old, NULL);
                 tr_sys_path_rename(binname, old, NULL);
-                b = tr_blocklistFileNew(binname, isEnabled, BLOCK_ADDR);
+                b = tr_blocklistFileNew(binname, isEnabled, type);
 
                 if (tr_blocklistFileSetContent(b, path) > 0)
                 {
@@ -2506,7 +2521,7 @@ static void loadBlocklists(tr_session* session)
 
         for (int i = 0; i < n; ++i)
         {
-            tr_list_append(&blocklists, tr_blocklistFileNew(paths[i], isEnabled, BLOCK_ADDR));
+            tr_list_append(&blocklists, tr_blocklistFileNew(paths[i], isEnabled, type));
         }
     }
 
@@ -2514,6 +2529,9 @@ static void loadBlocklists(tr_session* session)
     tr_sys_dir_close(odir, NULL);
     tr_free(dirname);
     tr_ptrArrayDestruct(&loadme, (PtrArrayForeachFunc)tr_free);
+    // XXX: We should probably not duck-type this interface either.
+    // Or we can just invent a tr_blocklistFileHasEntry interface that adjusts
+    // based on the type tag. :/
     session->blocklists = blocklists;
 }
 
@@ -2525,7 +2543,8 @@ static void closeBlocklists(tr_session* session)
 void tr_sessionReloadBlocklists(tr_session* session)
 {
     closeBlocklists(session);
-    loadBlocklists(session);
+    loadBlocklists(session, BLOCK_ADDR);
+    loadBlocklists(session, BLOCK_PEER);
 
     tr_peerMgrOnBlocklistChanged(session->peerMgr);
 }
@@ -2605,6 +2624,21 @@ bool tr_sessionIsAddressBlocked(tr_session const* session, tr_address const* add
     for (tr_list* l = session->blocklists; l != NULL; l = l->next)
     {
         if (tr_blocklistFileHasAddress(l->data, addr))
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool tr_sessionIsPeerBlocked(tr_session const* session, const char* peer_id)
+{
+    TR_ASSERT(tr_isSession(session));
+
+    for (tr_list* l = session->blocklists; l != NULL; l = l->next)
+    {
+        if (tr_blocklistFileHasPeer(l->data, peer_id))
         {
             return true;
         }

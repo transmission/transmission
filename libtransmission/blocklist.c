@@ -247,7 +247,7 @@ bool tr_blocklistFileHasAddress(tr_blocklistFile* b, tr_address const* addr)
     return range != NULL;
 }
 
-bool tr_blocklistFileHasPeer(tr_blocklistfile* b, const char* peer)
+bool tr_blocklistFileHasPeer(tr_blocklistfile* b, const char* peer_id)
 {
     if (!b->isEnabled || b->type != BLOCK_PEER)
     {
@@ -256,7 +256,7 @@ bool tr_blocklistFileHasPeer(tr_blocklistfile* b, const char* peer)
 
     blocklistEnsureLoaded(b);
 
-    return regexec(&b->rule.peer->rule, peer, 0, NULL, 0);
+    return regexec(&b->rule.peer->rule, peer_id, 0, NULL, 0);
 }
 
 /*

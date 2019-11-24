@@ -137,6 +137,7 @@ struct peer_atom
      * if the swarm is small, the atom will be kept past this date. */
     time_t shelf_date;
     tr_peer* peer; /* will be NULL if not connected */
+    char peer_id[PEER_ID_LEN + 1];
     tr_address addr;
 };
 
@@ -587,7 +588,9 @@ static bool isAtomBlocklisted(tr_session* session, struct peer_atom* atom)
 {
     if (atom->blocklisted < 0)
     {
-        atom->blocklisted = (int8_t)tr_sessionIsAddressBlocked(session, &atom->addr);
+        atom->blocklisted = (int8_t)tr_sessionIsAddressBlocked(session, &atom->addr) ||
+            /* We changed the struct! */
+            (int8_t)tr_sessionIsPeerBlocked(session, &atom->peer_id);
     }
 
     return atom->blocklisted != 0;
@@ -1982,7 +1985,8 @@ static int getPeerCount(tr_swarm const* s)
     return tr_ptrArraySize(&s->peers); /* + tr_ptrArraySize(&t->outgoingHandshakes); */
 }
 
-static void createBitTorrentPeer(tr_torrent* tor, struct tr_peerIo* io, struct peer_atom* atom, tr_quark client)
+static void createBitTorrentPeer(tr_torrent* tor, struct tr_peerIo* io, struct peer_atom* atom, tr_quark client,
+    const char* peer_id)
 {
     TR_ASSERT(atom != NULL);
     TR_ASSERT(tr_isTorrent(tor));
@@ -1994,6 +1998,8 @@ static void createBitTorrentPeer(tr_torrent* tor, struct tr_peerIo* io, struct p
     peer->atom = atom;
     peer->client = client;
     atom->peer = peer;
+    memcpy(atom->peer_id, peer_id, PEER_ID_LEN);
+    atom->peer_id[PEER_ID_LEN] = '\0';
 
     tr_ptrArrayInsertSorted(&swarm->peers, peer, peerCompare);
     ++swarm->stats.peerCount;
@@ -2112,7 +2118,7 @@ static bool myHandshakeDoneCB(tr_handshake* handshake, tr_peerIo* io, bool readA
 
                 io = tr_handshakeStealIO(handshake); /* this steals its refcount too, which is balanced by our unref in peerDelete() */
                 tr_peerIoSetParent(io, &s->tor->bandwidth);
-                createBitTorrentPeer(s->tor, io, atom, client);
+                createBitTorrentPeer(s->tor, io, atom, client, peer_id);
 
                 success = true;
             }
