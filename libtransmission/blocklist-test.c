@@ -33,6 +33,12 @@ static char const* contents2 =
     "Fox Speed Channel:216.79.131.192-216.79.131.223\n"
     "Evilcorp:216.88.88.0-216.88.88.255\n";
 
+static char const* peer_content =
+    "# Block EvilClient and EvilCorp's premium offline service\n"
+    "-E[PC].+\n"
+    "# BuggyClient < 3 never gives good pieces\n"
+    "-BC0[12].+\n";
+
 static void create_text_file(char const* path, char const* contents)
 {
     tr_sys_file_t fd;
@@ -56,6 +62,11 @@ static bool address_is_blocked(tr_session* session, char const* address_str)
     return tr_sessionIsAddressBlocked(session, &addr);
 }
 
+static bool peer_is_blocked(tr_session* session, const char peer_id[21])
+{
+    return tr_sessionIsPeerBlocked(session, peer_id);
+}
+
 static int test_parsing(void)
 {
     char* path;
@@ -69,6 +80,9 @@ static int test_parsing(void)
     /* init the blocklist */
     path = tr_buildPath(tr_sessionGetConfigDir(session), "blocklists", "level1", NULL);
     create_text_file(path, contents1);
+    tr_free(path);
+    path = tr_buildPath(tr_sessionGetConfigDir(session), "peers", "badones", NULL);
+    create_text_file(path, peer_content);
     tr_free(path);
     tr_sessionReloadBlocklists(session);
     check(tr_blocklistExists(session));
@@ -95,6 +109,14 @@ static int test_parsing(void)
     check(!address_is_blocked(session, "216.16.1.153"));
     check(!address_is_blocked(session, "217.0.0.1"));
     check(!address_is_blocked(session, "255.0.0.1"));
+
+    /* test blocked peers */
+    check(!peer_is_blocked(session, "M4-3-6--RANDOMstuff."));
+    check(peer_is_blocked(session, "-EC0901-randomStuff."));
+    check(peer_is_blocked(session, "-BC0101-imBuggyBtCl."));
+    check(peer_is_blocked(session, "-BC0205-imBuggy.BtCl"));
+    check(!peer_is_blocked(session, "-BC0205-imfixedNow1!"));
+    /* TODO: put awful bytes like NUL in. regex.h is probably a bad choice... */
 
     /* cleanup */
     libttest_session_close(session);

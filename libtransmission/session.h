@@ -239,6 +239,8 @@ void tr_sessionSetTorrentFile(tr_session* session, char const* hashString, char 
 
 bool tr_sessionIsAddressBlocked(tr_session const* session, struct tr_address const* addr);
 
+bool tr_sessionIsPeerBlocked(tr_session const* session, const char* peer_id);
+
 void tr_sessionLock(tr_session*);
 
 void tr_sessionUnlock(tr_session*);

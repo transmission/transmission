@@ -518,7 +518,7 @@ static ptrdiff_t tr_blocklistFileSaveAddr(tr_sys_file_t in, void** outbuf, size_
 
     /* Compile and go */
     reg = tr_new(tr_regex, 1);
-    int err = regcomp(&reg->rule, regexp, REG_NOSUB);
+    int err = regcomp(&reg->rule, regexp, REG_NOSUB | REG_EXTENDED);
     if (err)
     {
         /* Repurpose the outbuf for errors. */
