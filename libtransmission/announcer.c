@@ -1278,7 +1278,6 @@ static void on_announce_done(tr_announce_response const* response, void* vdata)
             if (!isStopped && tier->announce_event_count == 0)
             {
                 /* the queue is empty, so enqueue a perodic update */
-                i = tier->announceIntervalSec;
                 i = round(tier->announceIntervalSec * 0.95) + 
                     tr_rand_int_weak(round(tier->announceIntervalSec * 0.1));
                 tr_logAddTorDbg(tier->tor, "Sending periodic reannounce in %d seconds", i);
