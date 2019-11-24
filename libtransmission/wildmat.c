@@ -42,79 +42,77 @@
 
 #define ABORT -1
 
-    /* What character marks an inverted character class? */
-#define NEGATE_CLASS		'^'
-    /* Is "*" a common pattern? */
+/* What character marks an inverted character class? */
+#define NEGATE_CLASS '^'
+/* Is "*" a common pattern? */
 #define OPTIMIZE_JUST_STAR
-    /* Do tar (1) matching rules, which ignore a trailing slash? */
+/* Do tar (1) matching rules, which ignore a trailing slash? */
 #undef MATCH_TAR_PATTERN
-
 
 /*
 **  Match text and p, return true, false, or ABORT.
 */
-static int
-DoMatch (const char * text, const char * p)
-{
-    register int	last;
-    register int	matched;
-    register int	reverse;
+static int DoMatch(const char *text, const char *p) {
+    register int last;
+    register int matched;
+    register int reverse;
 
     for (; *p; text++, p++) {
-	if (*text == '\0' && *p != '*')
-	    return ABORT;
-	switch (*p) {
-	case '\\':
-	    /* Literal match with following character. */
-	    p++;
-	    /* FALLTHROUGH */
-	default:
-	    if (*text != *p)
-		return false;
-	    continue;
-	case '?':
-	    /* Match anything. */
-	    continue;
-	case '*':
-	    while (*++p == '*')
-		/* Consecutive stars act just like one. */
-		continue;
-	    if (*p == '\0')
-		/* Trailing star matches everything. */
-		return true;
-	    while (*text)
-		if ((matched = DoMatch (text++, p)) != false)
-		    return matched;
-	    return ABORT;
-	case '[':
-	    reverse = p[1] == NEGATE_CLASS ? true : false;
-	    if (reverse)
-		/* Inverted character class. */
-		p++;
-	    for (last = 0400, matched = false; *++p && *p != ']'; last = *p)
-		/* This next line requires a good C compiler. */
-		if (*p == '-' ? *text <= *++p && *text >= last : *text == *p)
-		    matched = true;
-	    if (matched == reverse)
-		return false;
-	    continue;
-	}
+        if (*text == '\0' && *p != '*')
+            return ABORT;
+        switch (*p) {
+        case '\\':
+            /* Literal match with following character. */
+            p++;
+            /* FALLTHROUGH */
+        default:
+            if (*text != *p)
+                return false;
+            continue;
+        case '?':
+            /* Match anything. */
+            continue;
+        case '*':
+            while (*++p == '*')
+                /* Consecutive stars act just like one. */
+                continue;
+            if (*p == '\0')
+                /* Trailing star matches everything. */
+                return true;
+            while (*text)
+                if ((matched = DoMatch(text++, p)) != false)
+                    return matched;
+            return ABORT;
+        case '[':
+            reverse = p[1] == NEGATE_CLASS;
+            if (reverse)
+                /* Inverted character class. */
+                p++;
+            for (last = 0400, matched = false; *++p && *p && *p != ']'; last = *p)
+                /* This next block requires a good C compiler. */
+                if (*p == '-')
+					matched = *text <= *++p && *text >= last;
+				else
+				    matched = *text == *p;
+            if (matched == reverse)
+                return false;
+            continue;
+        }
     }
 
-#ifdef	MATCH_TAR_PATTERN
+#ifdef MATCH_TAR_PATTERN
     if (*text == '/')
-	return true;
-#endif	/* MATCH_TAR_ATTERN */
+        return true;
+#endif /* MATCH_TAR_ATTERN */
     return *text == '\0';
 }
 
-
 /* User-level routine. returns whether or not 'text' and 'p' matched */
-bool
-tr_wildmat (const char * text, const char * p)
-{
+bool tr_wildmat(const char *text, const char *p) {
+#ifdef OPTIMIZE_JUST_STAR
     if (p[0] == '*' && p[1] == '\0')
-	return true;
+        return true;
+#endif /* OPTIMIZE_JUST_STAR */
 
-    return DoMatch (text, p) == true;
+    return DoMatch(text, p) == true;
 }

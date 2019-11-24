@@ -2446,7 +2446,7 @@ static void loadBlocklists(tr_session* session)
 
             if (!tr_sys_path_get_info(binname, 0, &binname_info, NULL)) /* create it */
             {
-                tr_blocklistFile* b = tr_blocklistFileNew(binname, isEnabled);
+                tr_blocklistFile* b = tr_blocklistFileNew(binname, isEnabled, BLOCK_ADDR);
                 int const n = tr_blocklistFileSetContent(b, path);
 
                 if (n > 0)
@@ -2465,7 +2465,7 @@ static void loadBlocklists(tr_session* session)
                 old = tr_strdup_printf("%s.old", binname);
                 tr_sys_path_remove(old, NULL);
                 tr_sys_path_rename(binname, old, NULL);
-                b = tr_blocklistFileNew(binname, isEnabled);
+                b = tr_blocklistFileNew(binname, isEnabled, BLOCK_ADDR);
 
                 if (tr_blocklistFileSetContent(b, path) > 0)
                 {
@@ -2506,7 +2506,7 @@ static void loadBlocklists(tr_session* session)
 
         for (int i = 0; i < n; ++i)
         {
-            tr_list_append(&blocklists, tr_blocklistFileNew(paths[i], isEnabled));
+            tr_list_append(&blocklists, tr_blocklistFileNew(paths[i], isEnabled, BLOCK_ADDR));
         }
     }
 
@@ -2588,7 +2588,7 @@ int tr_blocklistSetContent(tr_session* session, char const* contentFilename)
     if (b == NULL)
     {
         char* path = tr_buildPath(session->configDir, "blocklists", defaultName, NULL);
-        b = tr_blocklistFileNew(path, session->isBlocklistEnabled);
+        b = tr_blocklistFileNew(path, session->isBlocklistEnabled, BLOCK_ADDR);
         tr_list_append(&session->blocklists, b);
         tr_free(path);
     }

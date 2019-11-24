@@ -14,9 +14,16 @@
 
 struct tr_address;
 
+typedef enum tr_blocklistType
+{
+    BLOCK_ANY,
+    BLOCK_ADDR,
+    BLOCK_PEER,
+} tr_blocklistType;
+
 typedef struct tr_blocklistFile tr_blocklistFile;
 
-tr_blocklistFile* tr_blocklistFileNew(char const* filename, bool isEnabled);
+tr_blocklistFile* tr_blocklistFileNew(char const* filename, bool isEnabled, tr_blocklistType type);
 
 bool tr_blocklistFileExists(tr_blocklistFile const* b);
 
@@ -31,5 +38,7 @@ bool tr_blocklistFileIsEnabled(tr_blocklistFile* b);
 void tr_blocklistFileSetEnabled(tr_blocklistFile* b, bool isEnabled);
 
 bool tr_blocklistFileHasAddress(tr_blocklistFile* b, struct tr_address const* addr);
+
+bool tr_blocklistFileHasPeer(tr_blocklistfile* b, const char* peer)
 
 int tr_blocklistFileSetContent(tr_blocklistFile* b, char const* filename);

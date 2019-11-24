@@ -7,6 +7,7 @@
  */
 
 #include <errno.h>
+#include <regex.h>
 #include <stdio.h>
 #include <stdlib.h> /* bsearch(), qsort() */
 #include <string.h>
@@ -30,6 +31,12 @@ struct tr_ipv4_range
     uint32_t end;
 };
 
+struct tr_regex
+{
+    uint64_t ruleCount;
+    regex_t rule;
+};
+
 struct tr_blocklistFile
 {
     bool isEnabled;
@@ -37,16 +44,23 @@ struct tr_blocklistFile
     size_t ruleCount;
     uint64_t byteCount;
     char* filename;
-    struct tr_ipv4_range* rules;
+    tr_blocklistType type;
+    union
+    {
+        void* any;
+        struct tr_ipv4_range* addr;
+        struct tr_regex* peer;
+    }
+    rules;
 };
 
 static void blocklistClose(tr_blocklistFile* b)
 {
-    if (b->rules != NULL)
+    if (b->rules.any != NULL)
     {
-        tr_sys_file_unmap(b->rules, b->byteCount, NULL);
+        tr_sys_file_unmap(b->rules.any, b->byteCount, NULL);
         tr_sys_file_close(b->fd, NULL);
-        b->rules = NULL;
+        b->rules.any = NULL;
         b->ruleCount = 0;
         b->byteCount = 0;
         b->fd = TR_BAD_SYS_FILE;
@@ -85,9 +99,9 @@ static void blocklistLoad(tr_blocklistFile* b)
         return;
     }
 
-    b->rules = tr_sys_file_map_for_reading(fd, 0, byteCount, &error);
+    b->rules.any = tr_sys_file_map_for_reading(fd, 0, byteCount, &error);
 
-    if (b->rules == NULL)
+    if (b->rules.any == NULL)
     {
         tr_logAddError(err_fmt, b->filename, error->message);
         tr_sys_file_close(fd, NULL);
@@ -97,7 +111,25 @@ static void blocklistLoad(tr_blocklistFile* b)
 
     b->fd = fd;
     b->byteCount = byteCount;
-    b->ruleCount = byteCount / sizeof(struct tr_ipv4_range);
+
+    switch (b->type)
+    {
+    case BLOCK_ADDR:
+        b->ruleCount = byteCount / sizeof(struct tr_ipv4_range);
+        break;
+
+    case BLOCK_PEER:
+        b->ruleCount = b->rules.peer->ruleCount;
+        break;
+
+    default:
+        tr_logAddError(err_fmt, b->filename, _(
+            "blocklist type not specified"
+            ));
+        tr_sys_file_close(fd, NULL);
+        tr_error_free(error);
+        return;
+    }
 
     base = tr_sys_path_basename(b->filename, NULL);
     tr_logAddInfo(_("Blocklist \"%s\" contains %zu entries"), base, b->ruleCount);
@@ -106,7 +138,7 @@ static void blocklistLoad(tr_blocklistFile* b)
 
 static void blocklistEnsureLoaded(tr_blocklistFile* b)
 {
-    if (b->rules == NULL)
+    if (b->rules.any == NULL)
     {
         blocklistLoad(b);
     }
@@ -140,7 +172,7 @@ static void blocklistDelete(tr_blocklistFile* b)
 ****  PACKAGE-VISIBLE
 ***/
 
-tr_blocklistFile* tr_blocklistFileNew(char const* filename, bool isEnabled)
+tr_blocklistFile* tr_blocklistFileNew(char const* filename, bool isEnabled, tr_blocklistType type)
 {
     tr_blocklistFile* b;
 
@@ -148,6 +180,7 @@ tr_blocklistFile* tr_blocklistFileNew(char const* filename, bool isEnabled)
     b->fd = TR_BAD_SYS_FILE;
     b->filename = tr_strdup(filename);
     b->isEnabled = isEnabled;
+    b->type = type;
 
     return b;
 }
@@ -195,23 +228,35 @@ bool tr_blocklistFileHasAddress(tr_blocklistFile* b, tr_address const* addr)
     uint32_t needle;
     struct tr_ipv4_range const* range;
 
-    if (!b->isEnabled || addr->type == TR_AF_INET6)
+    if (!b->isEnabled || b->type != BLOCK_ADDR || addr->type == TR_AF_INET6)
     {
         return false;
     }
 
     blocklistEnsureLoaded(b);
 
-    if (b->rules == NULL || b->ruleCount == 0)
+    if (b->rules.addr == NULL || b->ruleCount == 0)
     {
         return false;
     }
 
     needle = ntohl(addr->addr.addr4.s_addr);
 
-    range = bsearch(&needle, b->rules, b->ruleCount, sizeof(struct tr_ipv4_range), compareAddressToRange);
+    range = bsearch(&needle, b->rules.addr, b->ruleCount, sizeof(struct tr_ipv4_range), compareAddressToRange);
 
     return range != NULL;
+}
+
+bool tr_blocklistFileHasPeer(tr_blocklistfile* b, const char* peer)
+{
+    if (!b->isEnabled || b->type != BLOCK_PEER)
+    {
+        return false;
+    }
+
+    blocklistEnsureLoaded(b);
+
+    return regexec(&b->rule.peer->rule, peer, 0, NULL, 0);
 }
 
 /*
@@ -351,44 +396,13 @@ static int compareAddressRangesByFirstAddress(void const* va, void const* vb)
     return 0;
 }
 
-int tr_blocklistFileSetContent(tr_blocklistFile* b, char const* filename)
+static ptrdiff_t tr_blocklistFileSaveAddr(tr_sys_file_t in, void** outbuf, size_t* outbufsize)
 {
-    tr_sys_file_t in;
-    tr_sys_file_t out;
-    int inCount = 0;
     char line[2048];
-    char const* err_fmt = _("Couldn't read \"%1$s\": %2$s");
+    int inCount = 0;
     struct tr_ipv4_range* ranges = NULL;
     size_t ranges_alloc = 0;
     size_t ranges_count = 0;
-    tr_error* error = NULL;
-
-    if (filename == NULL)
-    {
-        blocklistDelete(b);
-        return 0;
-    }
-
-    in = tr_sys_file_open(filename, TR_SYS_FILE_READ, 0, &error);
-
-    if (in == TR_BAD_SYS_FILE)
-    {
-        tr_logAddError(err_fmt, filename, error->message);
-        tr_error_free(error);
-        return 0;
-    }
-
-    blocklistClose(b);
-
-    out = tr_sys_file_open(b->filename, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE, 0666, &error);
-
-    if (out == TR_BAD_SYS_FILE)
-    {
-        tr_logAddError(err_fmt, b->filename, error->message);
-        tr_error_free(error);
-        tr_sys_file_close(in, NULL);
-        return 0;
-    }
 
     /* load the rules into memory */
     while (tr_sys_file_read_line(in, line, sizeof(line), NULL))
@@ -438,7 +452,6 @@ int tr_blocklistFileSetContent(tr_blocklistFile* b, char const* filename)
         ranges_count = keep + 1 - ranges;
 
 #ifdef TR_ENABLE_ASSERTS
-
         /* sanity checks: make sure the rules are sorted in ascending order and don't overlap */
         {
             for (size_t i = 0; i < ranges_count; ++i)
@@ -451,11 +464,136 @@ int tr_blocklistFileSetContent(tr_blocklistFile* b, char const* filename)
                 TR_ASSERT(ranges[i - 1].end < ranges[i].begin);
             }
         }
-
 #endif
     }
 
-    if (!tr_sys_file_write(out, ranges, sizeof(struct tr_ipv4_range) * ranges_count, NULL, &error))
+    *outbuf = ranges;
+    *outbufsize = sizeof(struct tr_ipv4_range) * ranges_count;
+    return ranges_count;
+}
+
+static ptrdiff_t tr_blocklistFileSaveAddr(tr_sys_file_t in, void** outbuf, size_t* outbufsize)
+{
+    char line[2048];
+    ptrdiff_t ruleCount = 0;
+    size_t pos = 0;
+    char* regexp = NULL;
+    tr_regex* reg = NULL;
+    tr_sys_path_info instat;
+
+    if (!tr_sys_file_get_info(in, &instat, NULL))
+    {
+        return -1;
+    }
+
+    /* ^( ... )$ \0 */
+    if (!(regexp = tr_new(char, instat.size + 5)))
+    {
+        return -1;
+    }
+
+    /* Construct the big regex. Thought about using wildmat but... */
+    regexp[pos++] = '^';
+    regexp[pos++] = '(';
+
+    while (tr_sys_file_read_line(in, line, sizeof(line), NULL))
+    {
+        size_t len;
+
+        if (!line[0] || line[0] == '#')
+        {
+            continue;
+        }
+
+        ruleCount++;
+        len = strlen(line);
+        memcpy(&regexp[pos], line, len);
+        regexp[pos + len] = '|';
+        pos += len + 1;
+    }
+
+    regexp[pos++] = ')';
+    regexp[pos++] = '$';
+    regexp[pos + 1] = '\0';
+
+    /* Compile and go */
+    reg = tr_new(tr_regex, 1);
+    int err = regcomp(&reg->rule, regexp, REG_NOSUB);
+    if (err)
+    {
+        /* Repurpose the outbuf for errors. */
+        char* errbuf = tr_new(char, 128);
+        regerror(err, &reg->rule, errbuf, 128);
+        *outbuf = errbuf;
+        return -1;
+    }
+
+    reg->ruleCount = ruleCount;
+    *outbuf = reg;
+    return ruleCount;
+}
+
+int tr_blocklistFileSetContent(tr_blocklistFile* b, char const* filename)
+{
+    tr_sys_file_t in;
+    tr_sys_file_t out;
+    char const* err_fmt = _("Couldn't read \"%1$s\": %2$s");
+    tr_error* error = NULL;
+    void* outbuf = NULL;
+    size_t outbufsize = 0;
+    ptrdiff_t count = -1;
+
+    if (filename == NULL)
+    {
+        blocklistDelete(b);
+        return 0;
+    }
+
+    in = tr_sys_file_open(filename, TR_SYS_FILE_READ, 0, &error);
+
+    if (in == TR_BAD_SYS_FILE)
+    {
+        tr_logAddError(err_fmt, filename, error->message);
+        tr_error_free(error);
+        return 0;
+    }
+
+    blocklistClose(b);
+
+    out = tr_sys_file_open(b->filename, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE, 0666, &error);
+
+    if (out == TR_BAD_SYS_FILE)
+    {
+        tr_logAddError(err_fmt, b->filename, error->message);
+        tr_error_free(error);
+        tr_sys_file_close(in, NULL);
+        return 0;
+    }
+
+    // XXX: DIVERGE HERE.
+    switch (b->type)
+    {
+    case BLOCK_ADDR:
+        count = tr_blocklistFileSaveAddr(in, &outbuf, &outbufsize);
+        break;
+
+    case BLOCK_PEER:
+        count = tr_blocklistFileSavePeer(in, &outbuf, &outbufsize);
+        break;
+    }
+
+    if (count < 0 || outbuf == NULL)
+    {
+        if (outbuf == NULL)
+        {
+            tr_logAddError(_("Couldn't parse file \"%s\""), filename);
+        }
+        else
+        {
+            tr_logAddError(_("Couldn't parse file \"%1$s\": %2$s"), filename, outbuf);
+        }
+    }
+    else if (!tr_sys_file_write(out, outbuf, outbufsize, NULL, error))
     {
         tr_logAddError(_("Couldn't save file \"%1$s\": %2$s"), b->filename, error->message);
         tr_error_free(error);
@@ -463,15 +601,15 @@ int tr_blocklistFileSetContent(tr_blocklistFile* b, char const* filename)
     else
     {
         char* base = tr_sys_path_basename(b->filename, NULL);
-        tr_logAddInfo(_("Blocklist \"%s\" updated with %zu entries"), base, ranges_count);
+        tr_logAddInfo(_("Blocklist \"%s\" updated with %zu entries"), base, count);
         tr_free(base);
     }
 
-    tr_free(ranges);
+    tr_free(outbuf);
     tr_sys_file_close(out, NULL);
     tr_sys_file_close(in, NULL);
 
     blocklistLoad(b);
 
-    return ranges_count;
+    return count;
 }
