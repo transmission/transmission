@@ -134,31 +134,29 @@ QString Formatter::ratioToString(double ratio)
     return QString::fromUtf8(tr_strratio(buf, sizeof(buf), ratio, "\xE2\x88\x9E"));
 }
 
+QString Formatter::timeToString(seconds_t const& seconds)
+{
+    return timeToString(int(seconds.value()));
+}
+
 QString Formatter::timeToString(int seconds)
 {
-    int days;
-    int hours;
-    int minutes;
-    QString d;
-    QString h;
-    QString m;
-    QString s;
-    QString str;
-
     if (seconds < 0)
     {
         seconds = 0;
     }
 
-    days = seconds / 86400;
-    hours = (seconds % 86400) / 3600;
-    minutes = (seconds % 3600) / 60;
+    int const days = seconds / 86400;
+    int const hours = (seconds % 86400) / 3600;
+    int const minutes = (seconds % 3600) / 60;
     seconds %= 60;
 
-    d = tr("%Ln day(s)", nullptr, days);
-    h = tr("%Ln hour(s)", nullptr, hours);
-    m = tr("%Ln minute(s)", nullptr, minutes);
-    s = tr("%Ln second(s)", nullptr, seconds);
+    QString const d = tr("%Ln day(s)", nullptr, days);
+    QString const h = tr("%Ln hour(s)", nullptr, hours);
+    QString const m = tr("%Ln minute(s)", nullptr, minutes);
+    QString const s = tr("%Ln second(s)", nullptr, seconds);
+
+    QString str;
 
     if (days != 0)
     {

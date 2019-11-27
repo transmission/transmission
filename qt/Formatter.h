@@ -42,6 +42,7 @@ public:
     static QString percentToString(double x);
     static QString ratioToString(double ratio);
     static QString timeToString(int seconds);
+    static QString timeToString(seconds_t const& value);
 
     static QString storage(bytes_t const& value);
     static QString speed(KBps_t const& value);

@@ -72,12 +72,12 @@ struct Peer
     EACH(time_t, lastScrapeTime) \
     EACH(time_t, nextAnnounceTime) \
     EACH(time_t, nextScrapeTime) \
-    EACH(int, announceState) \
     EACH(int, lastAnnouncePeerCount) \
     EACH(int, leecherCount) \
-    EACH(int, scrapeState) \
     EACH(int, seederCount) \
     EACH(int, tier) \
+    EACH(tr_tracker_state, announceState) \
+    EACH(tr_tracker_state, scrapeState) \
     EACH(bool, hasAnnounced) \
     EACH(bool, hasScraped) \
     EACH(bool, isBackup) \
@@ -161,12 +161,7 @@ using FileList = QVector<TorrentFile>;
     EACH(time_t, editDate, editDate) \
     EACH(time_t, manualAnnounceTime, manualAnnounceTime) \
     EACH(time_t, startDate, startDate) \
-    EACH(tr_idlelimit, seedIdleMode, seedIdleMode) \
-    EACH(tr_ratiolimit, seedRatioMode, seedRatioMode) \
-    EACH(tr_torrent_activity, status, activity) \
     EACH(int, bandwidthPriority, bandwidthPriority) \
-    EACH(int, error, error) \
-    EACH(int, eta, eta) \
     EACH(int, id, id) \
     EACH(int, peer_limit, peerLimit) \
     EACH(int, peersConnected, connectedPeers) \
@@ -176,6 +171,11 @@ using FileList = QVector<TorrentFile>;
     EACH(int, queuePosition, queuePosition) \
     EACH(int, seedIdleLimit, seedIdleLimit) \
     EACH(int, webseedsSendingToUs, webseedsWeAreDownloadingFrom) \
+    EACH(tr_idlelimit, seedIdleMode, seedIdleMode) \
+    EACH(tr_ratiolimit, seedRatioMode, seedRatioMode) \
+    EACH(tr_torrent_activity, status, activity) \
+    EACH(tr_stat_errtype, error, error) \
+    EACH(seconds_t, eta, eta) \
     EACH(bool, downloadLimited, downloadIsLimited) \
     EACH(bool, honorsSessionLimits, honorsSessionLimits) \
     EACH(bool, isFinished, isFinished) \
@@ -271,7 +271,7 @@ public:
 
     bool hasETA() const
     {
-        return eta() >= 0;
+        return eta() >= 0_s;
     }
 
     bool canManualAnnounceAt(time_t t) const
