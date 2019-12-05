@@ -57,6 +57,7 @@ private:
     void setEnabled(bool);
 
 private slots:
+    void rebuild();
     void refresh();
     void refreshPref(int key);
     void onTimer();

@@ -255,14 +255,23 @@ void DetailsDialog::setIds(torrent_ids_t const& ids)
 {
     if (ids != myIds)
     {
+        myIds = ids;
+        rebuild();
+    }
+}
+
+void DetailsDialog::rebuild()
+{
+    if (!myIds.empty())
+    {
         setEnabled(false);
         ui.filesView->clear();
 
-        myIds = ids;
         mySession.refreshDetailInfo(myIds);
+        onTimer();
+
         myChangedTorrents = true;
         myTrackerModel->refresh(myModel, myIds);
-        onTimer();
     }
 }
 
@@ -313,8 +322,7 @@ void DetailsDialog::getNewData()
 
 void DetailsDialog::onTorrentEdited(torrent_ids_t const& /*ids*/)
 {
-    // FIXME
-    // refreshDetailInfo({ tor.id() });
+    rebuild();
 }
 
 void DetailsDialog::onTorrentsChanged(torrent_ids_t const& ids, Torrent::fields_t const& /*fields*/)
