@@ -408,7 +408,7 @@ static void get_size_compact(TorrentCellRenderer* cell, GtkWidget* widget, gint*
 
     if (width != NULL)
     {
-        *width = xpad * 2 + icon_size.width + GUI_PAD + name_size.width + GUI_PAD + BAR_WIDTH + GUI_PAD + stat_size.width;
+        *width = xpad * 2 + icon_size.width + GUI_PAD + BAR_WIDTH + GUI_PAD + stat_size.width;
     }
 
     if (height != NULL)
@@ -419,8 +419,6 @@ static void get_size_compact(TorrentCellRenderer* cell, GtkWidget* widget, gint*
     /* cleanup */
     g_object_unref(icon);
 }
-
-#define MAX3(a, b, c) MAX(a, MAX(b, c))
 
 static void get_size_full(TorrentCellRenderer* cell, GtkWidget* widget, gint* width, gint* height)
 {
@@ -465,7 +463,7 @@ static void get_size_full(TorrentCellRenderer* cell, GtkWidget* widget, gint* wi
 
     if (width != NULL)
     {
-        *width = xpad * 2 + icon_size.width + GUI_PAD + MAX3(name_size.width, prog_size.width, stat_size.width);
+        *width = xpad * 2 + icon_size.width + GUI_PAD + MAX(prog_size.width, stat_size.width);
     }
 
     if (height != NULL)
