@@ -269,6 +269,7 @@ void DetailsDialog::rebuild()
 
         mySession.refreshDetailInfo(myIds);
         onTimer();
+        refresh();
 
         myChangedTorrents = true;
         myTrackerModel->refresh(myModel, myIds);
