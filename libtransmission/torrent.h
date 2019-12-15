@@ -225,6 +225,7 @@ struct tr_torrent
     bool isDirty;
     bool isQueued;
 
+    bool prefetchMagnetMetadata;
     bool magnetVerify;
 
     bool infoDictOffsetIsCached;

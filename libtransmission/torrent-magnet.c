@@ -339,7 +339,7 @@ void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, in
             tor->incompleteMetadata = NULL;
             tor->isStopping = true;
             tor->magnetVerify = true;
-            tor->startAfterVerify = true;
+            tor->startAfterVerify = !tor->prefetchMagnetMetadata;
             tr_torrentMarkEdited(tor);
         }
         else /* drat. */
