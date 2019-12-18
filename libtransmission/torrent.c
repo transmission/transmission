@@ -2337,7 +2337,12 @@ void tr_torrentRecheckCompleteness(tr_torrent* tor)
         {
             tr_torrentSave(tor);
 
-            torrentCallScript(tor, tr_sessionGetTorrentDoneScript(tor->session));
+            if ( wasRunning && wasLeeching )
+            {
+                // if the torrent is stopped, and we are hash verifying, then don't call done script
+                // this avoids script calls, when initiating seeding
+                torrentCallScript(tor, tr_sessionGetTorrentDoneScript(tor->session));
+            }
         }
     }
 
