@@ -43,7 +43,7 @@ public:
 
 public:
     FileTreeModel(QObject* parent = nullptr, bool isEditable = true);
-    virtual ~FileTreeModel();
+    ~FileTreeModel();
 
     void setEditable(bool editable);
 
@@ -62,14 +62,14 @@ public:
     QModelIndex parent(QModelIndex const& child, int column) const;
 
     // QAbstractItemModel
-    virtual QVariant data(QModelIndex const& index, int role = Qt::DisplayRole) const;
-    virtual Qt::ItemFlags flags(QModelIndex const& index) const;
-    virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
-    virtual QModelIndex index(int row, int column, QModelIndex const& parent = QModelIndex()) const;
-    virtual QModelIndex parent(QModelIndex const& child) const;
-    virtual int rowCount(QModelIndex const& parent = QModelIndex()) const;
-    virtual int columnCount(QModelIndex const& parent = QModelIndex()) const;
-    virtual bool setData(QModelIndex const& index, QVariant const& value, int role = Qt::EditRole);
+    QVariant data(QModelIndex const& index, int role = Qt::DisplayRole) const override;
+    Qt::ItemFlags flags(QModelIndex const& index) const override;
+    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
+    QModelIndex index(int row, int column, QModelIndex const& parent = QModelIndex()) const override;
+    QModelIndex parent(QModelIndex const& child) const override;
+    int rowCount(QModelIndex const& parent = QModelIndex()) const override;
+    int columnCount(QModelIndex const& parent = QModelIndex()) const override;
+    bool setData(QModelIndex const& index, QVariant const& value, int role = Qt::EditRole) override;
 
 signals:
     void priorityChanged(QSet<int> const& fileIndices, int);

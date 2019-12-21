@@ -106,6 +106,7 @@ set(${PROJECT_NAME}_HEADERS
     TrackerDelegate.h
     TrackerModel.h
     TrackerModelFilter.h
+    Typedefs.h
     Utils.h
     WatchDir.h
 )

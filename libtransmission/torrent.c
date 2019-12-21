@@ -1191,6 +1191,8 @@ void tr_torrentSetDownloadDir(tr_torrent* tor, char const* path)
     {
         tr_free(tor->downloadDir);
         tor->downloadDir = tr_strdup(path);
+
+        tr_torrentMarkEdited(tor);
         tr_torrentSetDirty(tor);
     }
 
@@ -1406,6 +1408,7 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
     s->activityDate = tor->activityDate;
     s->addedDate = tor->addedDate;
     s->doneDate = tor->doneDate;
+    s->editDate = tor->editDate;
     s->startDate = tor->startDate;
     s->secondsSeeding = tor->secondsSeeding;
     s->secondsDownloading = tor->secondsDownloading;
@@ -2862,6 +2865,7 @@ bool tr_torrentSetAnnounceList(tr_torrent* tor, tr_tracker_info const* trackers_
             tor->info.trackerCount = tmpInfo.trackerCount;
             tmpInfo.trackers = swap.trackers;
             tmpInfo.trackerCount = swap.trackerCount;
+            tr_torrentMarkEdited(tor);
 
             tr_metainfoFree(&tmpInfo);
             tr_variantToFile(&metainfo, TR_VARIANT_FMT_BENC, tor->info.torrent);
@@ -3987,6 +3991,7 @@ static void torrentRenamePath(void* vdata)
                     tor->info.name = tr_strdup(newname);
                 }
 
+                tr_torrentMarkEdited(tor);
                 tr_torrentSetDirty(tor);
             }
         }
