@@ -43,21 +43,6 @@ namespace
 
 typedef Torrent::KeyList KeyList;
 
-KeyList const& getInfoKeys()
-{
-    return Torrent::getInfoKeys();
-}
-
-KeyList const& getStatKeys()
-{
-    return Torrent::getStatKeys();
-}
-
-KeyList const& getExtraStatKeys()
-{
-    return Torrent::getExtraStatKeys();
-}
-
 void addList(tr_variant* list, KeyList const& keys)
 {
     tr_variantListReserve(list, keys.size());
@@ -69,10 +54,10 @@ void addList(tr_variant* list, KeyList const& keys)
 }
 
 // If this object is passed as "ids" (compared by address), then recently active torrents are queried.
-QSet<int> const recentlyActiveIds = QSet<int>() << -1;
+auto const recentlyActiveIds = torrent_ids_t{ -1 };
 
 // If this object is passed as "ids" (compared by being empty), then all torrents are queried.
-QSet<int> const allIds;
+auto const allIds = torrent_ids_t{};
 
 } // namespace
 
@@ -144,7 +129,7 @@ void Session::copyMagnetLinkToClipboard(int torrentId)
             return exec(TR_KEY_torrent_get, &args);
         });
 
-    q->add([this](RpcResponse const& r)
+    q->add([](RpcResponse const& r)
         {
             tr_variant* torrents;
 
@@ -420,13 +405,13 @@ bool Session::isLocal() const
 namespace
 {
 
-void addOptionalIds(tr_variant* args, QSet<int> const& ids)
+void addOptionalIds(tr_variant* args, torrent_ids_t const& ids)
 {
     if (&ids == &recentlyActiveIds)
     {
         tr_variantDictAddStr(args, TR_KEY_ids, "recently-active");
     }
-    else if (!ids.isEmpty())
+    else if (!ids.empty())
     {
         tr_variant* idList(tr_variantDictAddList(args, TR_KEY_ids, ids.size()));
 
@@ -439,7 +424,7 @@ void addOptionalIds(tr_variant* args, QSet<int> const& ids)
 
 } // namespace
 
-void Session::torrentSet(QSet<int> const& ids, tr_quark const key, double value)
+void Session::torrentSet(torrent_ids_t const& ids, tr_quark const key, double value)
 {
     tr_variant args;
     tr_variantInitDict(&args, 2);
@@ -449,7 +434,7 @@ void Session::torrentSet(QSet<int> const& ids, tr_quark const key, double value)
     exec(TR_KEY_torrent_set, &args);
 }
 
-void Session::torrentSet(QSet<int> const& ids, tr_quark const key, int value)
+void Session::torrentSet(torrent_ids_t const& ids, tr_quark const key, int value)
 {
     tr_variant args;
     tr_variantInitDict(&args, 2);
@@ -459,7 +444,7 @@ void Session::torrentSet(QSet<int> const& ids, tr_quark const key, int value)
     exec(TR_KEY_torrent_set, &args);
 }
 
-void Session::torrentSet(QSet<int> const& ids, tr_quark const key, bool value)
+void Session::torrentSet(torrent_ids_t const& ids, tr_quark const key, bool value)
 {
     tr_variant args;
     tr_variantInitDict(&args, 2);
@@ -469,7 +454,7 @@ void Session::torrentSet(QSet<int> const& ids, tr_quark const key, bool value)
     exec(TR_KEY_torrent_set, &args);
 }
 
-void Session::torrentSet(QSet<int> const& ids, tr_quark const key, QStringList const& value)
+void Session::torrentSet(torrent_ids_t const& ids, tr_quark const key, QStringList const& value)
 {
     tr_variant args;
     tr_variantInitDict(&args, 2);
@@ -484,7 +469,7 @@ void Session::torrentSet(QSet<int> const& ids, tr_quark const key, QStringList c
     exec(TR_KEY_torrent_set, &args);
 }
 
-void Session::torrentSet(QSet<int> const& ids, tr_quark const key, QList<int> const& value)
+void Session::torrentSet(torrent_ids_t const& ids, tr_quark const key, QList<int> const& value)
 {
     tr_variant args;
     tr_variantInitDict(&args, 2);
@@ -499,7 +484,7 @@ void Session::torrentSet(QSet<int> const& ids, tr_quark const key, QList<int> co
     exec(TR_KEY_torrent_set, &args);
 }
 
-void Session::torrentSet(QSet<int> const& ids, tr_quark const key, QPair<int, QString> const& value)
+void Session::torrentSet(torrent_ids_t const& ids, tr_quark const key, QPair<int, QString> const& value)
 {
     tr_variant args;
     tr_variantInitDict(&args, 2);
@@ -511,7 +496,7 @@ void Session::torrentSet(QSet<int> const& ids, tr_quark const key, QPair<int, QS
     exec(TR_KEY_torrent_set, &args);
 }
 
-void Session::torrentSetLocation(QSet<int> const& ids, QString const& location, bool doMove)
+void Session::torrentSetLocation(torrent_ids_t const& ids, QString const& location, bool doMove)
 {
     tr_variant args;
     tr_variantInitDict(&args, 3);
@@ -522,7 +507,7 @@ void Session::torrentSetLocation(QSet<int> const& ids, QString const& location, 
     exec(TR_KEY_torrent_set_location, &args);
 }
 
-void Session::torrentRenamePath(QSet<int> const& ids, QString const& oldpath, QString const& newname)
+void Session::torrentRenamePath(torrent_ids_t const& ids, QString const& oldpath, QString const& newname)
 {
     tr_variant args;
     tr_variantInitDict(&args, 2);
@@ -536,7 +521,7 @@ void Session::torrentRenamePath(QSet<int> const& ids, QString const& oldpath, QS
         {
             return exec("torrent-rename-path", &args);
         },
-        [this](RpcResponse const& r)
+        [](RpcResponse const& r)
         {
             char const* path = "(unknown)";
             char const* name = "(unknown)";
@@ -547,27 +532,23 @@ void Session::torrentRenamePath(QSet<int> const& ids, QString const& oldpath, QS
                 tr("<p><b>Unable to rename \"%1\" as \"%2\": %3.</b></p><p>Please correct the errors and try again.</p>").
                     arg(QString::fromUtf8(path)).arg(QString::fromUtf8(name)).arg(r.result), QMessageBox::Close,
                 qApp->activeWindow());
-            connect(d, SIGNAL(rejected()), d, SLOT(deleteLater()));
+            QObject::connect(d, &QMessageBox::rejected, d, &QMessageBox::deleteLater);
             d->show();
         });
 
-    q->add([this](RpcResponse const& r)
+    q->add([this, ids](RpcResponse const& /*r*/)
         {
-            int64_t id = 0;
-
-            if (tr_variantDictFindInt(r.args.get(), TR_KEY_id, &id) && id != 0)
-            {
-                refreshTorrents(QSet<int>() << id, KeyList() << TR_KEY_fileStats << TR_KEY_files << TR_KEY_id << TR_KEY_name);
-            }
+            refreshTorrents(ids, { TR_KEY_fileStats, TR_KEY_files, TR_KEY_id, TR_KEY_name });
         });
 
     q->run();
 }
 
-void Session::refreshTorrents(QSet<int> const& ids, KeyList const& keys)
+void Session::refreshTorrents(torrent_ids_t const& ids, KeyList const& keys)
 {
     tr_variant args;
-    tr_variantInitDict(&args, 2);
+    tr_variantInitDict(&args, 3);
+    tr_variantDictAddStr(&args, TR_KEY_format, "table");
     addList(tr_variantDictAddList(&args, TR_KEY_fields, 0), keys);
     addOptionalIds(&args, ids);
 
@@ -598,12 +579,17 @@ void Session::refreshTorrents(QSet<int> const& ids, KeyList const& keys)
     q->run();
 }
 
-void Session::refreshExtraStats(QSet<int> const& ids)
+void Session::refreshDetailInfo(torrent_ids_t const& ids)
 {
-    refreshTorrents(ids, getStatKeys() + getExtraStatKeys());
+    refreshTorrents(ids, Torrent::detailInfoKeys);
 }
 
-void Session::sendTorrentRequest(char const* request, QSet<int> const& ids)
+void Session::refreshExtraStats(torrent_ids_t const& ids)
+{
+    refreshTorrents(ids, Torrent::mainStatKeys + Torrent::detailStatKeys);
+}
+
+void Session::sendTorrentRequest(char const* request, torrent_ids_t const& ids)
 {
     tr_variant args;
     tr_variantInitDict(&args, 1);
@@ -618,60 +604,60 @@ void Session::sendTorrentRequest(char const* request, QSet<int> const& ids)
 
     q->add([this, ids]()
         {
-            refreshTorrents(ids, getStatKeys());
+            refreshTorrents(ids, Torrent::mainStatKeys);
         });
 
     q->run();
 }
 
-void Session::pauseTorrents(QSet<int> const& ids)
+void Session::pauseTorrents(torrent_ids_t const& ids)
 {
     sendTorrentRequest("torrent-stop", ids);
 }
 
-void Session::startTorrents(QSet<int> const& ids)
+void Session::startTorrents(torrent_ids_t const& ids)
 {
     sendTorrentRequest("torrent-start", ids);
 }
 
-void Session::startTorrentsNow(QSet<int> const& ids)
+void Session::startTorrentsNow(torrent_ids_t const& ids)
 {
     sendTorrentRequest("torrent-start-now", ids);
 }
 
-void Session::queueMoveTop(QSet<int> const& ids)
+void Session::queueMoveTop(torrent_ids_t const& ids)
 {
     sendTorrentRequest("queue-move-top", ids);
 }
 
-void Session::queueMoveUp(QSet<int> const& ids)
+void Session::queueMoveUp(torrent_ids_t const& ids)
 {
     sendTorrentRequest("queue-move-up", ids);
 }
 
-void Session::queueMoveDown(QSet<int> const& ids)
+void Session::queueMoveDown(torrent_ids_t const& ids)
 {
     sendTorrentRequest("queue-move-down", ids);
 }
 
-void Session::queueMoveBottom(QSet<int> const& ids)
+void Session::queueMoveBottom(torrent_ids_t const& ids)
 {
     sendTorrentRequest("queue-move-bottom", ids);
 }
 
 void Session::refreshActiveTorrents()
 {
-    refreshTorrents(recentlyActiveIds, getStatKeys());
+    refreshTorrents(recentlyActiveIds, Torrent::mainStatKeys);
 }
 
 void Session::refreshAllTorrents()
 {
-    refreshTorrents(allIds, getStatKeys());
+    refreshTorrents(allIds, Torrent::mainStatKeys);
 }
 
-void Session::initTorrents(QSet<int> const& ids)
+void Session::initTorrents(torrent_ids_t const& ids)
 {
-    refreshTorrents(ids, getStatKeys() + getInfoKeys());
+    refreshTorrents(ids, Torrent::allMainKeys);
 }
 
 void Session::refreshSessionStats()
@@ -991,16 +977,16 @@ void Session::addTorrent(AddData const& addMe, tr_variant* args, bool trashOrigi
         {
             return exec("torrent-add", args);
         },
-        [this, addMe](RpcResponse const& r)
+        [addMe](RpcResponse const& r)
         {
             QMessageBox* d = new QMessageBox(QMessageBox::Warning, tr("Error Adding Torrent"),
                 QString::fromLatin1("<p><b>%1</b></p><p>%2</p>").arg(r.result).arg(addMe.readableName()), QMessageBox::Close,
                 qApp->activeWindow());
-            connect(d, SIGNAL(rejected()), d, SLOT(deleteLater()));
+            QObject::connect(d, &QMessageBox::rejected, d, &QMessageBox::deleteLater);
             d->show();
         });
 
-    q->add([this, addMe](RpcResponse const& r)
+    q->add([addMe](RpcResponse const& r)
         {
             tr_variant* dup;
 
@@ -1017,14 +1003,14 @@ void Session::addTorrent(AddData const& addMe, tr_variant* args, bool trashOrigi
                 QMessageBox* d = new QMessageBox(QMessageBox::Warning, tr("Add Torrent"),
                     tr("<p><b>Unable to add \"%1\".</b></p><p>It is a duplicate of \"%2\" which is already added.</p>").
                         arg(addMe.readableShortName()).arg(name), QMessageBox::Close, qApp->activeWindow());
-                connect(d, SIGNAL(rejected()), d, SLOT(deleteLater()));
+                QObject::connect(d, &QMessageBox::rejected, d, &QMessageBox::deleteLater);
                 d->show();
             }
         });
 
     if (trashOriginal && addMe.type == AddData::FILENAME)
     {
-        q->add([this, addMe]()
+        q->add([addMe]()
             {
                 QFile original(addMe.filename);
                 original.setPermissions(QFile::ReadOwner | QFile::WriteOwner);
@@ -1056,9 +1042,9 @@ void Session::addNewlyCreatedTorrent(QString const& filename, QString const& loc
     exec("torrent-add", &args);
 }
 
-void Session::removeTorrents(QSet<int> const& ids, bool deleteFiles)
+void Session::removeTorrents(torrent_ids_t const& ids, bool deleteFiles)
 {
-    if (!ids.isEmpty())
+    if (!ids.empty())
     {
         tr_variant args;
         tr_variantInitDict(&args, 2);
@@ -1069,9 +1055,9 @@ void Session::removeTorrents(QSet<int> const& ids, bool deleteFiles)
     }
 }
 
-void Session::verifyTorrents(QSet<int> const& ids)
+void Session::verifyTorrents(torrent_ids_t const& ids)
 {
-    if (!ids.isEmpty())
+    if (!ids.empty())
     {
         tr_variant args;
         tr_variantInitDict(&args, 1);
@@ -1081,9 +1067,9 @@ void Session::verifyTorrents(QSet<int> const& ids)
     }
 }
 
-void Session::reannounceTorrents(QSet<int> const& ids)
+void Session::reannounceTorrents(torrent_ids_t const& ids)
 {
-    if (!ids.isEmpty())
+    if (!ids.empty())
     {
         tr_variant args;
         tr_variantInitDict(&args, 1);

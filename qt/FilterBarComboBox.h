@@ -28,12 +28,12 @@ public:
     int currentCount() const;
 
     // QWidget
-    virtual QSize minimumSizeHint() const;
-    virtual QSize sizeHint() const;
+    QSize minimumSizeHint() const override;
+    QSize sizeHint() const override;
 
 protected:
     // QWidget
-    virtual void paintEvent(QPaintEvent* e);
+    void paintEvent(QPaintEvent* e) override;
 
 private:
     QSize calculateSize(QSize const& textSize, QSize const& countSize) const;

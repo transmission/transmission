@@ -120,7 +120,7 @@ void tr_cpBlockAdd(tr_completion* cp, tr_block_index_t block)
         cp->sizeNow += tr_torBlockCountBytes(tor, block);
 
         cp->haveValidIsDirty = true;
-        cp->sizeWhenDoneIsDirty |= tor->info.pieces[piece].dnd;
+        cp->sizeWhenDoneIsDirty = cp->sizeWhenDoneIsDirty || tor->info.pieces[piece].dnd;
     }
 }
 

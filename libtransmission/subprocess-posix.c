@@ -141,7 +141,7 @@ bool tr_spawn_async(char* const* cmd, char* const* env, char const* work_dir, tr
         return false;
     }
 
-    if (fcntl(pipe_fds[1], F_SETFD, fcntl(pipe_fds[1], F_GETFD) | FD_CLOEXEC))
+    if (fcntl(pipe_fds[1], F_SETFD, fcntl(pipe_fds[1], F_GETFD) | FD_CLOEXEC) == -1)
     {
         set_system_error(error, errno, "Call to fcntl()");
         close(pipe_fds[0]);
