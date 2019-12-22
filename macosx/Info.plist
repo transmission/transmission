@@ -42,9 +42,9 @@
 	<key>CFBundleName</key>
 	<string>Transmission</string>
 	<key>CFBundlePackageType</key>
+	<string>APPL</string>
 	<key>NSRequiresAquaSystemAppearance</key>
      	<false />
-	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
 	<string>VERSION_STRING_INFOPLIST</string>
 	<key>CFBundleSignature</key>
