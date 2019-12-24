@@ -208,38 +208,38 @@ NSMutableSet * fTrackerIconLoading;
 #warning better favicon detection
 - (void) loadTrackerIcon: (NSString *) baseAddress
 {
-    @autoreleasepool
-    {
-        //try favicon.png
-        NSURL * favIconUrl = [NSURL URLWithString: [baseAddress stringByAppendingPathComponent: @"favicon.png"]];
-
-        NSURLRequest * request = [NSURLRequest requestWithURL: favIconUrl cachePolicy: NSURLRequestUseProtocolCachePolicy
-                                    timeoutInterval: 30.0];
-        NSData * iconData = [NSURLConnection sendSynchronousRequest: request returningResponse: NULL error: NULL];
-        NSImage * icon = [[NSImage alloc] initWithData: iconData];
-
-        //try favicon.ico
-        if (!icon)
-        {
-            favIconUrl = [NSURL URLWithString: [baseAddress stringByAppendingPathComponent: @"favicon.ico"]];
-
-            request = [NSURLRequest requestWithURL: favIconUrl cachePolicy: NSURLRequestUseProtocolCachePolicy
-                        timeoutInterval: 30.0];
-            iconData = [NSURLConnection sendSynchronousRequest: request returningResponse: NULL error: NULL];
-            icon = [[NSImage alloc] initWithData: iconData];
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        NSImage *icon = nil;
+        
+        NSArray<NSString *> *filenamesToTry = @[ @"favicon.png", @"favicon.ico" ];
+        for (NSString *filename in filenamesToTry) {
+            NSURL * favIconUrl = [NSURL URLWithString: [baseAddress stringByAppendingPathComponent:filename]];
+            
+            NSURLRequest * request = [NSURLRequest requestWithURL: favIconUrl cachePolicy: NSURLRequestUseProtocolCachePolicy
+                                                  timeoutInterval: 30.0];
+            
+            NSData * iconData = [NSURLConnection sendSynchronousRequest: request returningResponse: NULL error: NULL];
+            if (iconData) {
+                icon = [[NSImage alloc] initWithData: iconData];
+                if (icon) {
+                    break;
+                }
+            }
         }
-
-        if (icon)
-        {
-            [fTrackerIconCache setObject: icon forKey: baseAddress];
-
-            [[self controlView] setNeedsDisplay: YES];
-        }
-        else
-            [fTrackerIconCache setObject: [NSNull null] forKey: baseAddress];
-
-        [fTrackerIconLoading removeObject: baseAddress];
-    }
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (icon)
+            {
+                [fTrackerIconCache setObject: icon forKey: baseAddress];
+                
+                [[self controlView] setNeedsDisplay: YES];
+            }
+            else
+                [fTrackerIconCache setObject: [NSNull null] forKey: baseAddress];
+            
+            [fTrackerIconLoading removeObject: baseAddress];
+        });
+    });
 }
 
 - (NSRect) imageRectForBounds: (NSRect) bounds
