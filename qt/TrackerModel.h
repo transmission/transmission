@@ -9,10 +9,10 @@
 #pragma once
 
 #include <QAbstractListModel>
-#include <QSet>
 #include <QVector>
 
 #include "Torrent.h"
+#include "Typedefs.h"
 
 class TorrentModel;
 
@@ -35,20 +35,14 @@ public:
     };
 
 public:
-    TrackerModel()
-    {
-    }
+    TrackerModel() = default;
 
-    virtual ~TrackerModel()
-    {
-    }
-
-    void refresh(TorrentModel const&, QSet<int> const& ids);
+    void refresh(TorrentModel const&, torrent_ids_t const& ids);
     int find(int torrentId, QString const& url) const;
 
     // QAbstractItemModel
-    virtual int rowCount(QModelIndex const& parent = QModelIndex()) const;
-    virtual QVariant data(QModelIndex const& index, int role = Qt::DisplayRole) const;
+    int rowCount(QModelIndex const& parent = QModelIndex()) const override;
+    QVariant data(QModelIndex const& index, int role = Qt::DisplayRole) const override;
 
 private:
     typedef QVector<TrackerInfo> rows_t;

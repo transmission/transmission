@@ -79,7 +79,11 @@ static void on_popup_menu(GtkWidget* self UNUSED, GdkEventButton* event)
 {
     GtkWidget* menu = gtr_action_get_widget("/main-window-popup");
 
+#if GTK_CHECK_VERSION(3, 22, 0)
+    gtk_menu_popup_at_pointer(GTK_MENU(menu), (GdkEvent*)event);
+#else
     gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL, event != NULL ? event->button : 0, event != NULL ? event->time : 0);
+#endif
 }
 
 static void view_row_activated(GtkTreeView* tree_view UNUSED, GtkTreePath* path UNUSED, GtkTreeViewColumn* column UNUSED,
@@ -132,7 +136,6 @@ static GtkWidget* makeview(PrivateData* p)
     gtk_tree_view_append_column(tree_view, col);
     g_object_set(r, "xpad", GUI_PAD_SMALL, "ypad", GUI_PAD_SMALL, NULL);
 
-    gtk_tree_view_set_rules_hint(tree_view, TRUE);
     sel = gtk_tree_view_get_selection(tree_view);
     gtk_tree_selection_set_mode(GTK_TREE_SELECTION(sel), GTK_SELECTION_MULTIPLE);
 
@@ -201,11 +204,15 @@ static void privateFree(gpointer vprivate)
     g_free(p);
 }
 
-static void onYinYangReleased(GtkWidget* w UNUSED, gpointer vprivate)
+static void onYinYangClicked(GtkWidget* w UNUSED, gpointer vprivate)
 {
     PrivateData* p = vprivate;
 
+#if GTK_CHECK_VERSION(3, 22, 0)
+    gtk_menu_popup_at_widget(GTK_MENU(p->status_menu), GTK_WIDGET(w), GDK_GRAVITY_NORTH_EAST, GDK_GRAVITY_SOUTH_EAST, NULL);
+#else
     gtk_menu_popup(GTK_MENU(p->status_menu), NULL, NULL, NULL, NULL, 0, gtk_get_current_event_time());
+#endif
 }
 
 #define STATS_MODE "stats-mode"
@@ -251,7 +258,7 @@ static void syncAltSpeedButton(PrivateData* p)
 
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(w), b);
     gtk_image_set_from_stock(GTK_IMAGE(p->alt_speed_image), stock, -1);
-    gtk_button_set_alignment(GTK_BUTTON(w), 0.5, 0.5);
+    g_object_set(w, "halign", GTK_ALIGN_CENTER, "valign", GTK_ALIGN_CENTER, NULL);
     gtk_widget_set_tooltip_text(w, str);
 
     g_free(str);
@@ -498,7 +505,7 @@ static GtkWidget* createOptionsMenu(PrivateData* p)
     return top;
 }
 
-static void onOptionsClicked(GtkButton* button UNUSED, gpointer vp)
+static void onOptionsClicked(GtkButton* button, gpointer vp)
 {
     char buf1[512];
     char buf2[512];
@@ -529,7 +536,12 @@ static void onOptionsClicked(GtkButton* button UNUSED, gpointer vp)
     b = gtr_pref_flag_get(TR_KEY_ratio_limit_enabled);
     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(b ? p->ratio_on_item : p->ratio_off_item), TRUE);
 
+#if GTK_CHECK_VERSION(3, 22, 0)
+    gtk_menu_popup_at_widget(GTK_MENU(p->options_menu), GTK_WIDGET(button), GDK_GRAVITY_NORTH_WEST, GDK_GRAVITY_SOUTH_WEST,
+        NULL);
+#else
     gtk_menu_popup(GTK_MENU(p->options_menu), NULL, NULL, NULL, NULL, 0, gtk_get_current_event_time());
+#endif
 }
 
 /***
@@ -541,7 +553,6 @@ GtkWidget* gtr_window_new(GtkApplication* app, GtkUIManager* ui_mgr, TrCore* cor
     char const* pch;
     char const* style;
     PrivateData* p;
-    GtkWidget* sibling = NULL;
     GtkWidget* ul_lb;
     GtkWidget* dl_lb;
     GtkWidget* mainmenu;
@@ -625,18 +636,18 @@ GtkWidget* gtr_window_new(GtkApplication* app, GtkUIManager* ui_mgr, TrCore* cor
     **/
 
     grid_w = status = p->status = gtk_grid_new();
+    gtk_orientable_set_orientation(GTK_ORIENTABLE(grid_w), GTK_ORIENTATION_HORIZONTAL);
     grid = GTK_GRID(grid_w);
     gtk_container_set_border_width(GTK_CONTAINER(grid), GUI_PAD_SMALL);
 
     /* gear */
     w = gtk_button_new();
-    gtk_container_add(GTK_CONTAINER(w), gtk_image_new_from_stock("utilities", -1));
+    gtk_container_add(GTK_CONTAINER(w), gtk_image_new_from_icon_name("utilities", GTK_ICON_SIZE_MENU));
     gtk_widget_set_tooltip_text(w, _("Options"));
-    gtk_grid_attach_next_to(grid, w, sibling, GTK_POS_RIGHT, 1, 1);
     gtk_button_set_relief(GTK_BUTTON(w), GTK_RELIEF_NONE);
     p->options_menu = createOptionsMenu(p);
     g_signal_connect(w, "clicked", G_CALLBACK(onOptionsClicked), p);
-    sibling = w;
+    gtk_container_add(GTK_CONTAINER(grid), w);
 
     /* turtle */
     p->alt_speed_image = gtk_image_new();
@@ -644,46 +655,45 @@ GtkWidget* gtr_window_new(GtkApplication* app, GtkUIManager* ui_mgr, TrCore* cor
     gtk_button_set_image(GTK_BUTTON(w), p->alt_speed_image);
     gtk_button_set_relief(GTK_BUTTON(w), GTK_RELIEF_NONE);
     g_signal_connect(w, "toggled", G_CALLBACK(alt_speed_toggled_cb), p);
-    gtk_grid_attach_next_to(grid, w, sibling, GTK_POS_RIGHT, 1, 1);
-    sibling = w;
+    gtk_container_add(GTK_CONTAINER(grid), w);
 
     /* spacer */
-    w = gtk_alignment_new(0.0F, 0.0F, 0.0F, 0.0F);
+    w = gtk_fixed_new();
     gtk_widget_set_hexpand(w, TRUE);
-    gtk_grid_attach_next_to(grid, w, sibling, GTK_POS_RIGHT, 1, 1);
-    sibling = w;
+    gtk_container_add(GTK_CONTAINER(grid), w);
 
     /* download */
     w = dl_lb = gtk_label_new(NULL);
     p->dl_lb = GTK_LABEL(w);
     gtk_label_set_single_line_mode(p->dl_lb, TRUE);
-    gtk_grid_attach_next_to(grid, w, sibling, GTK_POS_RIGHT, 1, 1);
-    sibling = w;
+    gtk_container_add(GTK_CONTAINER(grid), w);
 
     /* upload */
     w = ul_lb = gtk_label_new(NULL);
     g_object_set(G_OBJECT(w), "margin-left", GUI_PAD, NULL);
     p->ul_lb = GTK_LABEL(w);
     gtk_label_set_single_line_mode(p->ul_lb, TRUE);
-    gtk_grid_attach_next_to(grid, w, sibling, GTK_POS_RIGHT, 1, 1);
-    sibling = w;
+    gtk_container_add(GTK_CONTAINER(grid), w);
 
     /* ratio */
     w = gtk_label_new(NULL);
     g_object_set(G_OBJECT(w), "margin-left", GUI_PAD_BIG, NULL);
     p->stats_lb = GTK_LABEL(w);
     gtk_label_set_single_line_mode(p->stats_lb, TRUE);
-    gtk_grid_attach_next_to(grid, w, sibling, GTK_POS_RIGHT, 1, 1);
-    sibling = w;
+    gtk_container_add(GTK_CONTAINER(grid), w);
+
+    /* ratio selector */
     w = gtk_button_new();
     gtk_widget_set_tooltip_text(w, _("Statistics"));
-    gtk_container_add(GTK_CONTAINER(w), gtk_image_new_from_stock("ratio", -1));
+    gtk_container_add(GTK_CONTAINER(w), gtk_image_new_from_icon_name("ratio", GTK_ICON_SIZE_MENU));
     gtk_button_set_relief(GTK_BUTTON(w), GTK_RELIEF_NONE);
-    g_signal_connect(w, "clicked", G_CALLBACK(onYinYangReleased), p);
-    gtk_grid_attach_next_to(grid, w, sibling, GTK_POS_RIGHT, 1, 1);
-    sibling = w;
+    g_signal_connect(w, "clicked", G_CALLBACK(onYinYangClicked), p);
+    gtk_container_add(GTK_CONTAINER(grid), w);
 
-    /* workarea */
+    /**
+    *** Workarea
+    **/
+
     p->view = makeview(p);
     w = list = p->scroll = gtk_scrolled_window_new(NULL, NULL);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(w), GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
@@ -707,8 +717,8 @@ GtkWidget* gtr_window_new(GtkApplication* app, GtkUIManager* ui_mgr, TrCore* cor
         pango_layout_get_pixel_size(pango_layout, &w, &h);
         gtk_widget_set_size_request(ul_lb, w, h);
         gtk_widget_set_size_request(dl_lb, w, h);
-        gtk_misc_set_alignment(GTK_MISC(ul_lb), 1.0, 0.5);
-        gtk_misc_set_alignment(GTK_MISC(dl_lb), 1.0, 0.5);
+        g_object_set(ul_lb, "halign", GTK_ALIGN_END, "valign", GTK_ALIGN_CENTER, NULL);
+        g_object_set(dl_lb, "halign", GTK_ALIGN_END, "valign", GTK_ALIGN_CENTER, NULL);
         g_object_unref(G_OBJECT(pango_layout));
     }
 

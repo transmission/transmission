@@ -6,6 +6,9 @@
  *
  */
 
+#include <map>
+#include <unordered_map>
+
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QLineEdit>
@@ -21,36 +24,13 @@
 #include "Torrent.h"
 #include "TorrentFilter.h"
 #include "TorrentModel.h"
+#include "Utils.h"
 
 enum
 {
     ActivityRole = FilterBarComboBox::UserRole,
     TrackerRole
 };
-
-namespace
-{
-
-QString readableHostName(QString const& host)
-{
-    // get the readable name...
-    QString name = host;
-    int const pos = name.lastIndexOf(QLatin1Char('.'));
-
-    if (pos >= 0)
-    {
-        name.truncate(pos);
-    }
-
-    if (!name.isEmpty())
-    {
-        name[0] = name[0].toUpper();
-    }
-
-    return name;
-}
-
-} // namespace
 
 /***
 ****
@@ -107,122 +87,88 @@ FilterBarComboBox* FilterBar::createActivityCombo()
 ****
 ***/
 
+namespace
+{
+
+QString getCountString(int n)
+{
+    return QString::fromLatin1("%L1").arg(n);
+}
+
+} // namespace
+
 void FilterBar::refreshTrackers()
 {
-    FaviconCache& favicons = qApp->faviconCache();
-    int const firstTrackerRow = 2; // skip over the "All" and separator...
-
-    // pull info from the tracker model...
-    QSet<QString> oldHosts;
-
-    for (int row = firstTrackerRow;; ++row)
+    enum
     {
-        QModelIndex index = myTrackerModel->index(row, 0);
+        ROW_TOTALS = 0, ROW_SEPARATOR, ROW_FIRST_TRACKER
+    };
 
-        if (!index.isValid())
-        {
-            break;
-        }
-
-        oldHosts << index.data(TrackerRole).toString();
-    }
-
-    // pull the new stats from the torrent model...
-    QSet<QString> newHosts;
-    QMap<QString, int> torrentsPerHost;
-
-    for (int row = 0;; ++row)
+    auto torrentsPerHost = std::unordered_map<QString, int>{};
+    for (auto const& tor : myTorrents.torrents())
     {
-        QModelIndex index = myTorrents.index(row, 0);
-
-        if (!index.isValid())
+        for (auto const& displayName : tor->trackerDisplayNames())
         {
-            break;
-        }
-
-        Torrent const* tor = index.data(TorrentModel::TorrentRole).value<Torrent const*>();
-        QSet<QString> torrentNames;
-
-        for (QString const& host : tor->hosts())
-        {
-            newHosts.insert(host);
-            torrentNames.insert(readableHostName(host));
-        }
-
-        for (QString const& name : torrentNames)
-        {
-            ++torrentsPerHost[name];
+            ++torrentsPerHost[displayName];
         }
     }
 
     // update the "All" row
-    myTrackerModel->setData(myTrackerModel->index(0, 0), myTorrents.rowCount(), FilterBarComboBox::CountRole);
-    myTrackerModel->setData(myTrackerModel->index(0, 0), getCountString(myTorrents.rowCount()),
-        FilterBarComboBox::CountStringRole);
+    auto const num_trackers = torrentsPerHost.size();
+    auto item = myTrackerModel->item(ROW_TOTALS);
+    item->setData(int(num_trackers), FilterBarComboBox::CountRole);
+    item->setData(getCountString(num_trackers), FilterBarComboBox::CountStringRole);
 
-    // rows to update
-    for (QString const& host : oldHosts & newHosts)
-    {
-        QString const name = readableHostName(host);
-        QStandardItem* row = myTrackerModel->findItems(name).front();
-        int const count = torrentsPerHost[name];
-        row->setData(count, FilterBarComboBox::CountRole);
-        row->setData(getCountString(count), FilterBarComboBox::CountStringRole);
-        row->setData(QIcon(favicons.findFromHost(host)), Qt::DecorationRole);
-    }
-
-    // rows to remove
-    for (QString const& host : oldHosts - newHosts)
-    {
-        QString const name = readableHostName(host);
-        QStandardItem* item = myTrackerModel->findItems(name).front();
-
-        if (!item->data(TrackerRole).toString().isEmpty()) // don't remove "All"
+    auto updateTrackerItem = [](QStandardItem* i, auto const& it)
         {
-            myTrackerModel->removeRows(item->row(), 1);
-        }
-    }
+            auto const& displayName = it->first;
+            auto const& count = it->second;
+            auto const icon = qApp->faviconCache().find(FaviconCache::getKey(displayName));
+            i->setData(displayName, Qt::DisplayRole);
+            i->setData(displayName, TrackerRole);
+            i->setData(getCountString(count), FilterBarComboBox::CountStringRole);
+            i->setData(icon, Qt::DecorationRole);
+            i->setData(int(count), FilterBarComboBox::CountRole);
+            return i;
+        };
 
-    // rows to add
+    auto newTrackers = std::map<QString, int>(torrentsPerHost.begin(), torrentsPerHost.end());
+    auto old_it = myTrackerCounts.cbegin();
+    auto new_it = newTrackers.cbegin();
+    auto const old_end = myTrackerCounts.cend();
+    auto const new_end = newTrackers.cend();
     bool anyAdded = false;
+    int row = ROW_FIRST_TRACKER;
 
-    for (QString const& host : newHosts - oldHosts)
+    while ((old_it != old_end) || (new_it != new_end))
     {
-        QString const name = readableHostName(host);
-
-        if (!myTrackerModel->findItems(name).isEmpty())
+        if ((old_it == old_end) || ((new_it != new_end) && (old_it->first > new_it->first)))
         {
-            continue;
+            myTrackerModel->insertRow(row, updateTrackerItem(new QStandardItem(1), new_it));
+            anyAdded = true;
+            ++new_it;
+            ++row;
         }
-
-        // find the sorted position to add this row
-        int i = firstTrackerRow;
-
-        for (int n = myTrackerModel->rowCount(); i < n; ++i)
+        else if ((new_it == new_end) || ((old_it != old_end) && (old_it->first < new_it->first)))
         {
-            QString const rowName = myTrackerModel->index(i, 0).data(Qt::DisplayRole).toString();
-
-            if (rowName >= name)
-            {
-                break;
-            }
+            myTrackerModel->removeRow(row);
+            ++old_it;
         }
-
-        // add the row
-        QStandardItem* row = new QStandardItem(favicons.findFromHost(host), name);
-        int const count = torrentsPerHost[host];
-        row->setData(count, FilterBarComboBox::CountRole);
-        row->setData(getCountString(count), FilterBarComboBox::CountStringRole);
-        row->setData(QIcon(favicons.findFromHost(host)), Qt::DecorationRole);
-        row->setData(host, TrackerRole);
-        myTrackerModel->insertRow(i, row);
-        anyAdded = true;
+        else // update
+        {
+            updateTrackerItem(myTrackerModel->item(row), new_it);
+            ++old_it;
+            ++new_it;
+            ++row;
+        }
     }
 
     if (anyAdded) // the one added might match our filter...
     {
         refreshPref(Prefs::FILTER_TRACKERS);
     }
+
+    myTrackerCounts.swap(newTrackers);
 }
 
 FilterBarComboBox* FilterBar::createTrackerCombo(QStandardItemModel* model)
@@ -294,10 +240,7 @@ FilterBar::FilterBar(Prefs& prefs, TorrentModel const& torrents, TorrentFilter c
     myIsBootstrapping = false;
 
     // initialize our state
-    QList<int> initKeys;
-    initKeys << Prefs::FILTER_MODE << Prefs::FILTER_TRACKERS;
-
-    for (int const key : initKeys)
+    for (int const key : { Prefs::FILTER_MODE, Prefs::FILTER_TRACKERS })
     {
         refreshPref(key);
     }
@@ -338,10 +281,8 @@ void FilterBar::refreshPref(int key)
 
     case Prefs::FILTER_TRACKERS:
         {
-            QString const tracker = myPrefs.getString(key);
-            QString const name = readableHostName(tracker);
-            QList<QStandardItem*> rows = myTrackerModel->findItems(name);
-
+            auto const displayName = myPrefs.getString(key);
+            auto rows = myTrackerModel->findItems(displayName);
             if (!rows.isEmpty())
             {
                 myTrackerCombo->setCurrentIndex(rows.front()->row());
@@ -434,9 +375,4 @@ void FilterBar::recount()
     }
 
     refreshTrackers();
-}
-
-QString FilterBar::getCountString(int n) const
-{
-    return QString::fromLatin1("%L1").arg(n);
 }

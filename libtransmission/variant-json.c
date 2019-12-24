@@ -45,6 +45,12 @@ struct json_wrapper_data
     struct evbuffer* strbuf;
     char const* source;
     tr_ptrArray stack;
+
+    /* A very common pattern is for a container's children to be similar,
+     * e.g. they may all be objects with the same set of keys. So when
+     * a container is popped off the stack, remember its size to use as
+     * a preallocation heuristic for the next container at that depth. */
+    size_t preallocGuess[MAX_DEPTH];
 };
 
 static tr_variant* get_node(struct jsonsl_st* jsn)
@@ -103,25 +109,22 @@ static void action_callback_PUSH(jsonsl_t jsn, jsonsl_action_t action UNUSED, st
     tr_variant* node;
     struct json_wrapper_data* data = jsn->data;
 
-    switch (state->type)
+    if ((state->type == JSONSL_T_LIST) || (state->type == JSONSL_T_OBJECT))
     {
-    case JSONSL_T_LIST:
         data->has_content = true;
         node = get_node(jsn);
-        tr_variantInitList(node, 0);
         tr_ptrArrayAppend(&data->stack, node);
-        break;
 
-    case JSONSL_T_OBJECT:
-        data->has_content = true;
-        node = get_node(jsn);
-        tr_variantInitDict(node, 0);
-        tr_ptrArrayAppend(&data->stack, node);
-        break;
-
-    default:
-        /* nothing else interesting on push */
-        break;
+        int const depth = tr_ptrArraySize(&data->stack);
+        size_t const n = depth < MAX_DEPTH ? data->preallocGuess[depth] : 0;
+        if (state->type == JSONSL_T_LIST)
+        {
+            tr_variantInitList(node, n);
+        }
+        else
+        {
+            tr_variantInitDict(node, n);
+        }
     }
 }
 
@@ -318,7 +321,12 @@ static void action_callback_POP(jsonsl_t jsn, jsonsl_action_t action UNUSED, str
     }
     else if (state->type == JSONSL_T_LIST || state->type == JSONSL_T_OBJECT)
     {
-        tr_ptrArrayPop(&data->stack);
+        int const depth = tr_ptrArraySize(&data->stack);
+        tr_variant const* v = tr_ptrArrayPop(&data->stack);
+        if (depth < MAX_DEPTH)
+        {
+            data->preallocGuess[depth] = v->val.l.count;
+        }
     }
     else if (state->type == JSONSL_T_SPECIAL)
     {
@@ -369,6 +377,10 @@ int tr_jsonParse(char const* source, void const* vbuf, size_t len, tr_variant* s
     data.source = source;
     data.keybuf = evbuffer_new();
     data.strbuf = evbuffer_new();
+    for (int i = 0; i < MAX_DEPTH; ++i)
+    {
+        data.preallocGuess[i] = 0;
+    }
 
     /* parse it */
     jsonsl_feed(jsn, vbuf, len);

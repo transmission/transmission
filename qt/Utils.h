@@ -23,6 +23,8 @@ class QModelIndex;
 class Utils
 {
 public:
+    static QIcon getFileIcon();
+    static QIcon getFolderIcon();
     static QIcon guessMimeIcon(QString const& filename);
     static QIcon getIconFromIndex(QModelIndex const& index);
 
@@ -78,7 +80,7 @@ public:
             return false;
         }
 
-        for (QChar const ch : s)
+        for (auto const& ch : s)
         {
             if (!isxdigit(ch.unicode()))
             {
@@ -91,9 +93,22 @@ public:
 
     static bool isUriWithSupportedScheme(QString const& s)
     {
-        static QString const ftp = QString::fromUtf8("ftp://");
-        static QString const http = QString::fromUtf8("http://");
-        static QString const https = QString::fromUtf8("https://");
-        return s.startsWith(http) || s.startsWith(https) || s.startsWith(ftp);
+        return s.startsWith(QStringLiteral("ftp://")) ||
+            s.startsWith(QStringLiteral("http://")) ||
+            s.startsWith(QStringLiteral("https://"));
     }
 };
+
+namespace std
+{
+
+template<>
+struct hash<QString>
+{
+    std::size_t operator ()(QString const& s) const
+    {
+        return qHash(s);
+    }
+};
+
+} // namespace std

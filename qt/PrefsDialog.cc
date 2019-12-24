@@ -433,7 +433,7 @@ void PrefsDialog::initNetworkTab()
 
 void PrefsDialog::onBlocklistDialogDestroyed(QObject* o)
 {
-    Q_UNUSED(o);
+    Q_UNUSED(o)
 
     myBlocklistDialog = nullptr;
 }

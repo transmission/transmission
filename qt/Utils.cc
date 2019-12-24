@@ -6,6 +6,10 @@
  *
  */
 
+#include <set>
+#include <unordered_map>
+#include <unordered_set>
+
 #ifdef _WIN32
 #include <windows.h>
 #include <shellapi.h>
@@ -16,7 +20,7 @@
 #include <QColor>
 #include <QDataStream>
 #include <QFile>
-#include <QFileDialog>
+#include <QFileIconProvider>
 #include <QFileInfo>
 #include <QHeaderView>
 #include <QIcon>
@@ -25,7 +29,6 @@
 #include <QMimeType>
 #include <QObject>
 #include <QPixmapCache>
-#include <QSet>
 #include <QStyle>
 
 #ifdef _WIN32
@@ -85,12 +88,88 @@ bool isSlashChar(QChar const& c)
     return c == QLatin1Char('/') || c == QLatin1Char('\\');
 }
 
+QIcon folderIcon()
+{
+    static QIcon icon;
+    if (icon.isNull())
+    {
+        icon = QFileIconProvider().icon(QFileIconProvider::Folder);
+    }
+
+    return icon;
+}
+
+QIcon fileIcon()
+{
+    static QIcon icon;
+    if (icon.isNull())
+    {
+        icon = QFileIconProvider().icon(QFileIconProvider::File);
+    }
+
+    return icon;
+}
+
+std::unordered_map<QString, QIcon> iconCache;
+
+QIcon const getMimeIcon(QString const& filename)
+{
+    // If the suffix doesn't match a mime type, treat it as a folder.
+    // This heuristic is fast and yields good results for torrent names.
+    static std::unordered_set<QString> suffixes;
+    if (suffixes.empty())
+    {
+        for (auto const& type : QMimeDatabase().allMimeTypes())
+        {
+            auto const tmp = type.suffixes();
+            suffixes.insert(tmp.begin(), tmp.end());
+        }
+    }
+
+    QString const ext = QFileInfo(filename).suffix();
+    if (suffixes.count(ext) == 0)
+    {
+        return folderIcon();
+    }
+
+    QIcon& icon = iconCache[ext];
+    if (icon.isNull()) // cache miss
+    {
+        QMimeDatabase mimeDb;
+        QMimeType type = mimeDb.mimeTypeForFile(filename, QMimeDatabase::MatchExtension);
+        if (icon.isNull())
+        {
+            icon = QIcon::fromTheme(type.iconName());
+        }
+
+        if (icon.isNull())
+        {
+            icon = QIcon::fromTheme(type.genericIconName());
+        }
+
+        if (icon.isNull())
+        {
+            icon = fileIcon();
+        }
+    }
+
+    return icon;
+}
+
 } // namespace
+
+QIcon Utils::getFolderIcon()
+{
+    return folderIcon();
+}
+
+QIcon Utils::getFileIcon()
+{
+    return fileIcon();
+}
 
 QIcon Utils::guessMimeIcon(QString const& filename)
 {
-    static QIcon const fallback = qApp->style()->standardIcon(QStyle::SP_FileIcon);
-
 #ifdef _WIN32
 
     QIcon icon;
@@ -109,17 +188,11 @@ QIcon Utils::guessMimeIcon(QString const& filename)
         return icon;
     }
 
+#else
+
+    return getMimeIcon(filename);
+
 #endif
-
-    QMimeDatabase mimeDb;
-    QMimeType mimeType = mimeDb.mimeTypeForFile(filename, QMimeDatabase::MatchExtension);
-
-    if (mimeType.isValid())
-    {
-        return QIcon::fromTheme(mimeType.iconName(), QIcon::fromTheme(mimeType.genericIconName(), fallback));
-    }
-
-    return fallback;
 }
 
 QIcon Utils::getIconFromIndex(QModelIndex const& index)

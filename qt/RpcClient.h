@@ -42,7 +42,7 @@ struct RpcResponse
     QNetworkReply::NetworkError networkError = QNetworkReply::NoError;
 };
 
-Q_DECLARE_METATYPE(QFutureInterface<RpcResponse>);
+Q_DECLARE_METATYPE(QFutureInterface<RpcResponse>)
 
 // The response future -- the RPC engine returns one for each request made.
 typedef QFuture<RpcResponse> RpcResponseFuture;
