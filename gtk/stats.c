@@ -123,7 +123,6 @@ GtkWidget* gtr_stats_dialog_new(GtkWindow* parent, TrCore* core)
     d = gtk_dialog_new_with_buttons(_("Statistics"), parent, GTK_DIALOG_DESTROY_WITH_PARENT, _("_Reset"), TR_RESPONSE_RESET,
         GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE, NULL);
     gtk_dialog_set_default_response(GTK_DIALOG(d), GTK_RESPONSE_CLOSE);
-    gtk_dialog_set_alternative_button_order(GTK_DIALOG(d), GTK_RESPONSE_CLOSE, TR_RESPONSE_RESET, -1);
     t = hig_workarea_create();
     ui->core = core;
 

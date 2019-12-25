@@ -58,7 +58,7 @@ bool tr_peerMsgsIsIncomingConnection(tr_peerMsgs const* msgs);
 
 void tr_peerMsgsSetChoke(tr_peerMsgs* msgs, bool peerIsChoked);
 
-int tr_peerMsgsIsReadingBlock(tr_peerMsgs const* msgs, tr_block_index_t block);
+bool tr_peerMsgsIsReadingBlock(tr_peerMsgs const* msgs, tr_block_index_t block);
 
 void tr_peerMsgsSetInterested(tr_peerMsgs* msgs, bool clientIsInterested);
 

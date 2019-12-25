@@ -976,7 +976,7 @@ static void tr_variantListCopy(tr_variant* target, tr_variant const* src)
     {
         if (tr_variantIsBool(val))
         {
-            bool boolVal = 0;
+            bool boolVal = false;
             tr_variantGetBool(val, &boolVal);
             tr_variantListAddBool(target, boolVal);
         }

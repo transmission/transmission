@@ -204,7 +204,7 @@ QNetworkAccessManager* RpcClient::networkAccessManager()
 
 void RpcClient::localSessionCallback(tr_session* s, tr_variant* response, void* vself)
 {
-    Q_UNUSED(s);
+    Q_UNUSED(s)
 
     RpcClient* self = static_cast<RpcClient*>(vself);
 

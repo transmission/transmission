@@ -253,7 +253,7 @@ static void append_argument(char** arguments, char const* argument)
         (*arguments)[arguments_len++] = ' ';
     }
 
-    if (argument[0] != '\0' && strpbrk(argument, " \t\n\v\"") == NULL)
+    if (!tr_str_is_empty(argument) && strpbrk(argument, " \t\n\v\"") == NULL)
     {
         *arguments = tr_renew(char, *arguments, arguments_len + argument_len + 2);
         strcpy(*arguments + arguments_len, argument);

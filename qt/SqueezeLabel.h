@@ -53,5 +53,5 @@ public:
 
 protected:
     // QWidget
-    virtual void paintEvent(QPaintEvent* paintEvent);
+    void paintEvent(QPaintEvent* paintEvent) override;
 };

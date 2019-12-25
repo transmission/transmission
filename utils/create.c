@@ -34,13 +34,13 @@ static uint32_t piecesize_kib = 0;
 
 static tr_option options[] =
 {
-    { 'p', "private", "Allow this torrent to only be used with the specified tracker(s)", "p", 0, NULL },
-    { 'o', "outfile", "Save the generated .torrent to this filename", "o", 1, "<file>" },
-    { 's', "piecesize", "Set how many KiB each piece should be, overriding the preferred default", "s", 1, "<size in KiB>" },
-    { 'c', "comment", "Add a comment", "c", 1, "<comment>" },
-    { 't', "tracker", "Add a tracker's announce URL", "t", 1, "<url>" },
-    { 'V', "version", "Show version number and exit", "V", 0, NULL },
-    { 0, NULL, NULL, NULL, 0, NULL }
+    { 'p', "private", "Allow this torrent to only be used with the specified tracker(s)", "p", false, NULL },
+    { 'o', "outfile", "Save the generated .torrent to this filename", "o", true, "<file>" },
+    { 's', "piecesize", "Set how many KiB each piece should be, overriding the preferred default", "s", true, "<size in KiB>" },
+    { 'c', "comment", "Add a comment", "c", true, "<comment>" },
+    { 't', "tracker", "Add a tracker's announce URL", "t", true, "<url>" },
+    { 'V', "version", "Show version number and exit", "V", false, NULL },
+    { 0, NULL, NULL, NULL, false, NULL }
 };
 
 static char const* getUsage(void)
