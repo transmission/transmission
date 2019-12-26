@@ -493,7 +493,7 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, uint64_t file_
         return false;
     }
 
-    out = tr_sys_file_open(newpath, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE |
+    out = tr_sys_file_open(dst_path, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE |
         TR_SYS_FILE_TRUNCATE, 0666, error);
 
     if (out == TR_BAD_SYS_FILE)

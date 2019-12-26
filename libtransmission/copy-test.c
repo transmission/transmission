@@ -118,7 +118,8 @@ static int test_copy_file(void)
     libtest_create_file_with_string_contents(path1, file_content);
 
     /* Copy it. */
-    check_bool(tr_sys_path_copy(path1, path2, sizeof(file_content), NULL), ==,
+    size_t const file_length = strlen(file_content);
+    check_bool(tr_sys_path_copy(path1, path2, file_length, NULL), ==,
         true);
 
     /* Verify the files are identical. */
