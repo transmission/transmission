@@ -503,13 +503,13 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, uint64_t file_
         return false;
     }
 
-#if defined(USE_FILE_COPY_RANGE) || defined(USE_SENDFILE64)
+#if defined(USE_COPY_FILE_RANGE) || defined(USE_SENDFILE64)
 
     while (file_size > 0)
     {
         size_t const chunk_size = MIN(file_size, SIZE_MAX);
         ssize_t const copied =
-#ifdef USE_FILE_COPY_RANGE
+#ifdef USE_COPY_FILE_RANGE
             copy_file_range(in, NULL, out, NULL, chunk_size, 0);
 #elif defined(USE_SENDFILE64)
             sendfile64(out, in, NULL, chunk_size);
@@ -525,7 +525,7 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, uint64_t file_
         file_size -= copied;
     }
 
-#else /* USE_FILE_COPY_RANGE || USE_SENDFILE64 */
+#else /* USE_COPY_FILE_RANGE || USE_SENDFILE64 */
 
     /* Fallback to user-space copy. */
 
@@ -559,7 +559,7 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, uint64_t file_
     /* cleanup */
     tr_free(buf);
 
-#endif /* USE_FILE_COPY_RANGE || USE_SENDFILE64 */
+#endif /* USE_COPY_FILE_RANGE || USE_SENDFILE64 */
 
     /* cleanup */
     tr_sys_file_close(out, NULL);
