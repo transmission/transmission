@@ -20,6 +20,7 @@
 #include <float.h> /* DBL_EPSILON */
 #include <locale.h> /* localeconv() */
 #include <math.h> /* pow(), fabs(), floor() */
+#include <stdint.h> /* SIZE_MAX */
 #include <stdio.h>
 #include <stdlib.h> /* getenv() */
 #include <string.h> /* strerror(), memset(), memmem() */
@@ -1681,12 +1682,7 @@ char* tr_strratio(char* buf, size_t buflen, double ratio, char const* infinity)
 
 bool tr_moveFile(char const* oldpath, char const* newpath, tr_error** error)
 {
-    tr_sys_file_t in;
-    tr_sys_file_t out;
-    char* buf = NULL;
     tr_sys_path_info info;
-    uint64_t bytesLeft;
-    size_t const buflen = 1024 * 1024; /* 1024 KiB buffer */
 
     /* make sure the old file exists */
     if (!tr_sys_path_get_info(oldpath, 0, &info, error))
@@ -1720,56 +1716,10 @@ bool tr_moveFile(char const* oldpath, char const* newpath, tr_error** error)
         return true;
     }
 
-    /* copy the file */
-    in = tr_sys_file_open(oldpath, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, error);
-
-    if (in == TR_BAD_SYS_FILE)
+    /* Otherwise, copy the file. */
+    if (tr_sys_path_copy(oldpath, newpath, info.size, error))
     {
-        tr_error_prefix(error, "Unable to open old file: ");
-        return false;
-    }
-
-    out = tr_sys_file_open(newpath, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE, 0666, error);
-
-    if (out == TR_BAD_SYS_FILE)
-    {
-        tr_error_prefix(error, "Unable to open new file: ");
-        tr_sys_file_close(in, NULL);
-        return false;
-    }
-
-    buf = tr_valloc(buflen);
-    bytesLeft = info.size;
-
-    while (bytesLeft > 0)
-    {
-        uint64_t const bytesThisPass = MIN(bytesLeft, buflen);
-        uint64_t numRead;
-        uint64_t bytesWritten;
-
-        if (!tr_sys_file_read(in, buf, bytesThisPass, &numRead, error))
-        {
-            break;
-        }
-
-        if (!tr_sys_file_write(out, buf, numRead, &bytesWritten, error))
-        {
-            break;
-        }
-
-        TR_ASSERT(numRead == bytesWritten);
-        TR_ASSERT(bytesWritten <= bytesLeft);
-        bytesLeft -= bytesWritten;
-    }
-
-    /* cleanup */
-    tr_free(buf);
-    tr_sys_file_close(out, NULL);
-    tr_sys_file_close(in, NULL);
-
-    if (bytesLeft != 0)
-    {
-        tr_error_prefix(error, "Unable to read/write: ");
+        tr_error_prefix(error, "Unable to copy: ");
         return false;
     }
 
