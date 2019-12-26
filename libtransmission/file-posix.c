@@ -32,13 +32,14 @@
 #if defined(__linux__)
 #   if defined(HAVE_COPY_FILE_RANGE)
 /* Linux's copy_file_range(2) is buggy prior to 5.3. */
-#       include <linux/kernel.h>
+#       include <linux/version.h>
 #       if LINUX_VERSION_CODE >= KERNEL_VERSION(5,3,0)
 #           define USE_COPY_FILE_RANGE
 #       endif
 #   endif /* HAVE_COPY_FILE_RANGE */
 #   if !defined(USE_COPY_FILE_RANGE) && defined(HAVE_SENDFILE64)
 #       define USE_SENDFILE64
+#       include <sys/sendfile.h>
 #   endif
 #elif defined(__APPLE__) && defined(HAVE_COPYFILE)
 #   include <copyfile.h>
@@ -521,7 +522,7 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, uint64_t file_
             break;
         }
 
-        TR_ASSERT(copied <= file_size);
+        TR_ASSERT(copied >= 0 && ((uint64_t) copied) <= file_size);
         file_size -= copied;
     }
 
