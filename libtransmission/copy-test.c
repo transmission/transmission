@@ -38,8 +38,7 @@ static uint64_t fill_buffer_from_fd(tr_sys_file_t fd, uint64_t bytes_remaining,
         uint64_t const chunk_size = MIN( buf_len-buf_pos, bytes_remaining );
         uint64_t bytes_read = 0;
 
-        TR_ASSERT(tr_sys_file_read(fd, buf + buf_pos, chunk_size, &bytes_read,
-            NULL));
+        tr_sys_file_read(fd, buf + buf_pos, chunk_size, &bytes_read, NULL);
 
         TR_ASSERT( buf_pos + bytes_read <= buf_len );
         TR_ASSERT( bytes_read <= bytes_remaining );
@@ -61,14 +60,14 @@ static bool files_are_identical(char const* fn1, char const* fn2)
 
     fd1 = tr_sys_file_open(fn1, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0,
         NULL);
-    TR_ASSERT(fd1 != TR_BAD_SYS_FILE);
+    check_bool(fd1 != TR_BAD_SYS_FILE, ==, true);
 
     fd2 = tr_sys_file_open(fn2, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0,
         NULL);
-    TR_ASSERT(fd2 != TR_BAD_SYS_FILE);
+    check_bool(fd2 != TR_BAD_SYS_FILE, ==, true);
 
-    TR_ASSERT(tr_sys_file_get_info(fd1, &info1, NULL));
-    TR_ASSERT(tr_sys_file_get_info(fd2, &info2, NULL));
+    tr_sys_file_get_info(fd1, &info1, NULL);
+    tr_sys_file_get_info(fd2, &info2, NULL);
 
     if(info1.size != info2.size)
     {
@@ -100,8 +99,8 @@ static bool files_are_identical(char const* fn1, char const* fn2)
 out:
     tr_free(readbuf1);
     tr_free(readbuf2);
-    TR_ASSERT(tr_sys_file_close(fd1, NULL));
-    TR_ASSERT(tr_sys_file_close(fd2, NULL));
+    tr_sys_file_close(fd1, NULL);
+    tr_sys_file_close(fd2, NULL);
 
     return result;
 }
