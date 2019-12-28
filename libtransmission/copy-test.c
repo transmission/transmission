@@ -10,6 +10,7 @@
 #include <string.h> /* memcmp() */
 
 #include "transmission.h"
+#include "crypto-utils.h"
 #include "file.h"
 #include "tr-assert.h"
 
@@ -19,11 +20,10 @@
 ****
 ***/
 
+#define RANDOM_FILE_LENGTH  (1024*1024*128) /* 128 MiB */
+
 char* sandbox_path;
 char* reference_file;
-
-static char const file_content[] =
-    "mZJ0sMGOB9eHtni1DaBdjWYHINl6todyJi2zrUYrkhp8ALva48aP6XJybsPYKOxtO9n49EdqoMf7W5dBOYct7RKJNi4AP2yvmpU9TgQXXeffdNIE8M4wPD9Vp7H2AbwsJXhVz51sxjmC4mCwmAsE531INqtW14w7HYAkPNvccXtiYxa97bSM7lKINA9V0D8o4NknP3HKLTsfDTnnJ0AgxrSZv4R5XjonswreBWwW3NVaEfWVUhnJpMh0B0hJ0QiFX3uBEuka9DKt0GIWNfa0cBSJteUXNnslb6GLOgwXPFLoyfK3G0HfDQ6ofG9aiXcBARCKMPRa9DX5uVKiyYwVD3FuUkbBig7FW7n9e8XqZGpE3sXTM4hVG335L1Tx7eRH2b3KZBQsFEjn9dNzEF1seHRlB4x1uw2Iiebkmgn1UfLpLiUdDzP2QmBQnhWe2NP4eC5Dhd25hhlYJgStjSBcKLJOYDgCy1lmypVXULUZPCOm7hNg4M19qirBp8m5GTScwFvhEntMnxaIrLbWq7SQeKPaMJnlVdlSxOMJtzhNsEHaFRLAf90Zr6dNR9yCdydeNQ0qCNI17SXOXDSEYUGlInZioxilxI2V4Ewd6zhMGNjikMm9jj51lGDHyQnPq7W9oRS0kGWjUwFT8oASGjpWlexo6BMTlG4BDnGLKLYqniV4jCyRpF7UWqmCyMh3H8q7e6JqR0dIZc11OU9VCI9GIfKb0KroE9wnLii7CKLlVJZXtIrxILt13NjPd8if5HfLOyuQVp52jfdjVgTkPVPONBzRieEYYAQwRlmUdJkYoVuP5sxzwH7p6rl74Gl1ApKxFsYCj5dZdxkWe9M2ToUi1qp8ACOK2YtYyxDqG93eDfxQPCdNEL7dZvK8LaBG0h5r96gZ9GwMXM7VBirpkV3HXkxxjK53WDYGMvtbZ5NXi2NTqmXTbvqZHbyGPFXfNSbMUqPToC2INdF0oIQ3Fho22LvNXUWD73s61RPOgHB3%";
 
 /***
 ****
@@ -107,6 +107,30 @@ out:
     return result;
 }
 
+static void get_random_string(char* buffer, size_t length)
+{
+    TR_ASSERT(length > 1);
+
+    /* Obtain a stream of random bytes. */
+    tr_rand_buffer(buffer, length - 1);
+
+    /* Add a terminating null. */
+    buffer[length - 1] = '\0';
+
+    /* Replace embedded nulls, except the terminating one. */
+    char* end = buffer + length - 1;
+    while (end > buffer)
+    {
+        buffer = memchr(buffer, '\0', end - buffer);
+        if (buffer == NULL)
+        {
+            break;
+        }
+        buffer[0] = '\1'; /* Biases the samples towards 0x1 but whiteness is not important for this application. */
+        ++buffer;
+    }
+}
+
 static int test_copy_file(void)
 {
     char const* filename1 = "orig-blob.txt";
@@ -116,8 +140,12 @@ static int test_copy_file(void)
     if (!reference_file)
     {
         path1 = tr_buildPath(sandbox_path, filename1, NULL);
+
         /* Create a file. */
+        char* file_content = tr_valloc(RANDOM_FILE_LENGTH);
+        get_random_string(file_content, RANDOM_FILE_LENGTH);
         libtest_create_file_with_string_contents(path1, file_content);
+        tr_free(file_content);
     }
     else
     {
