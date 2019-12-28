@@ -1717,7 +1717,7 @@ bool tr_moveFile(char const* oldpath, char const* newpath, tr_error** error)
     }
 
     /* Otherwise, copy the file. */
-    if (tr_sys_path_copy(oldpath, newpath, info.size, error))
+    if (!tr_sys_path_copy(oldpath, newpath, info.size, error))
     {
         tr_error_prefix(error, "Unable to copy: ");
         return false;
