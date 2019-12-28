@@ -19,7 +19,8 @@
 ****
 ***/
 
-char* sandbox;
+char* sandbox_path;
+char* reference_file;
 
 static char const file_content[] = "mZJ0sMGOB9eHtni1DaBdjWYHINl6todyJi2zrUYrkhp8ALva48aP6XJybsPYKOxtO9n49EdqoMf7W5dBOYct7RKJNi4AP2yvmpU9TgQXXeffdNIE8M4wPD9Vp7H2AbwsJXhVz51sxjmC4mCwmAsE531INqtW14w7HYAkPNvccXtiYxa97bSM7lKINA9V0D8o4NknP3HKLTsfDTnnJ0AgxrSZv4R5XjonswreBWwW3NVaEfWVUhnJpMh0B0hJ0QiFX3uBEuka9DKt0GIWNfa0cBSJteUXNnslb6GLOgwXPFLoyfK3G0HfDQ6ofG9aiXcBARCKMPRa9DX5uVKiyYwVD3FuUkbBig7FW7n9e8XqZGpE3sXTM4hVG335L1Tx7eRH2b3KZBQsFEjn9dNzEF1seHRlB4x1uw2Iiebkmgn1UfLpLiUdDzP2QmBQnhWe2NP4eC5Dhd25hhlYJgStjSBcKLJOYDgCy1lmypVXULUZPCOm7hNg4M19qirBp8m5GTScwFvhEntMnxaIrLbWq7SQeKPaMJnlVdlSxOMJtzhNsEHaFRLAf90Zr6dNR9yCdydeNQ0qCNI17SXOXDSEYUGlInZioxilxI2V4Ewd6zhMGNjikMm9jj51lGDHyQnPq7W9oRS0kGWjUwFT8oASGjpWlexo6BMTlG4BDnGLKLYqniV4jCyRpF7UWqmCyMh3H8q7e6JqR0dIZc11OU9VCI9GIfKb0KroE9wnLii7CKLlVJZXtIrxILt13NjPd8if5HfLOyuQVp52jfdjVgTkPVPONBzRieEYYAQwRlmUdJkYoVuP5sxzwH7p6rl74Gl1ApKxFsYCj5dZdxkWe9M2ToUi1qp8ACOK2YtYyxDqG93eDfxQPCdNEL7dZvK8LaBG0h5r96gZ9GwMXM7VBirpkV3HXkxxjK53WDYGMvtbZ5NXi2NTqmXTbvqZHbyGPFXfNSbMUqPToC2INdF0oIQ3Fho22LvNXUWD73s61RPOgHB3%";
 
@@ -110,25 +111,35 @@ static int test_copy_file(void)
     char const* filename1 = "orig-blob.txt";
     char const* filename2 = "copy-blob.txt";
 
-    char* path1 = tr_buildPath(sandbox, filename1, NULL);
-    char* path2 = tr_buildPath(sandbox, filename2, NULL);
-
-    /* Create a file. */
-    libtest_create_file_with_string_contents(path1, file_content);
+    char* path1, * path2;
+    if (!reference_file)
+    {
+        path1 = tr_buildPath(sandbox_path, filename1, NULL);
+        /* Create a file. */
+        libtest_create_file_with_string_contents(path1, file_content);
+    }
+    else
+    {
+        /* Use the existing file. */
+        path1 = reference_file;
+    }
+    path2 = tr_buildPath(sandbox_path, filename2, NULL);
 
     /* Copy it. */
-    size_t const file_length = strlen(file_content);
-    check_bool(tr_sys_path_copy(path1, path2, file_length, NULL), ==,
-        true);
+    tr_sys_path_info info1;
+    check_bool(tr_sys_path_get_info(path1, 0, &info1, NULL), ==, true);
+    check_bool(tr_sys_path_copy(path1, path2, info1.size, NULL), ==, true);
 
     /* Verify the files are identical. */
-    check_bool( files_are_identical(path1, path2), ==, true );
+    check_bool(files_are_identical(path1, path2), ==, true);
 
-    /* Dispose of the files. */
-    tr_sys_path_remove(path1, NULL);
+    /* Dispose of those files that we created. */
+    if (!reference_file)
+    {
+        tr_sys_path_remove(path1, NULL);
+        tr_free(path1);
+    }
     tr_sys_path_remove(path2, NULL);
-
-    tr_free(path1);
     tr_free(path2);
 
     return 0;
@@ -138,18 +149,27 @@ static int test_copy_file(void)
 ****
 ***/
 
-int main(void)
+int main(int argc, char* argv[])
 {
+    if (argc == 2)
+    {
+        reference_file = argv[1];
+    }
+    else
+    {
+        reference_file = NULL;
+    }
+
     testFunc const tests[] =
     {
         test_copy_file
     };
 
-    sandbox = libtest_sandbox_create();
+    sandbox_path = libtest_sandbox_create();
 
     int const result = runTests(tests, NUM_TESTS(tests));
 
-    libtest_sandbox_destroy(sandbox);
+    libtest_sandbox_destroy(sandbox_path);
 
     return result;
 }
