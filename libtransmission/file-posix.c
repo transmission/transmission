@@ -466,7 +466,7 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, uint64_t file_
 #ifdef COPYFILE_CLONE /* macos >= 10.12 */
         COPYFILE_CLONE;
 #else
-        COPYFILE_DATA;
+        COPYFILE_ALL;
 #endif
     if (copyfile(src_path, dst_path, NULL, flags) < 0)
     {
