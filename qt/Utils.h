@@ -49,7 +49,7 @@ public:
     static QColor getFadedColor(QColor const& color);
 
     template<typename DialogT, typename... ArgsT>
-    static void openDialog(QPointer<DialogT>& dialog, ArgsT&& ... args)
+    static void openDialog(QPointer<DialogT>& dialog, ArgsT&&... args)
     {
         if (dialog.isNull())
         {
