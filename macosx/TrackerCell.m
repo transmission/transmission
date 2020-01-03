@@ -195,11 +195,8 @@ NSMutableSet * fTrackerIconLoading;
             baseAddress = [NSString stringWithFormat: @"http://%@", host];
 
         icon = [fTrackerIconCache objectForKey: baseAddress];
-        if (!icon && ![fTrackerIconLoading containsObject: baseAddress])
-        {
-            [fTrackerIconLoading addObject: baseAddress];
-            [NSThread detachNewThreadSelector: @selector(loadTrackerIcon:) toTarget: self withObject: baseAddress];
-        }
+        if (!icon)
+            [self loadTrackerIcon: baseAddress];
     }
 
     return (icon && icon != [NSNull null]) ? icon : [NSImage imageNamed: @"FavIcon"];
@@ -208,6 +205,11 @@ NSMutableSet * fTrackerIconLoading;
 #warning better favicon detection
 - (void) loadTrackerIcon: (NSString *) baseAddress
 {
+    if ([fTrackerIconLoading containsObject: baseAddress]) {
+        return;
+    }
+    [fTrackerIconLoading addObject: baseAddress];
+    
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         NSImage *icon = nil;
         
