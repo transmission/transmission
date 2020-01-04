@@ -1,28 +1,4 @@
-/*
- * jsonsl
- * https://github.com/mnunberg/jsonsl
- *
- * Copyright (c) 2012 M. Nunberg, mnunberg@haskalah.org
- *
- * Permission is hereby granted, free of charge, to any person obtaining
- * a copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sublicense, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
- * 
- * The above copyright notice and this permission notice shall be
- * included in all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
- * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
- * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
- * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- */
+/* https://github.com/mnunberg/jsonsl */
 
 /**
  * JSON Simple/Stacked/Stateful Lexer.
@@ -30,6 +6,9 @@
  * - Maintains state
  * - Callback oriented
  * - Lightweight and fast. One source file and one header file
+ *
+ * Copyright (C) 2012-2015 Mark Nunberg
+ * See included LICENSE file for license details.
  */
 
 #ifndef JSONSL_H_
@@ -54,8 +33,16 @@ typedef char jsonsl_char_t;
 typedef unsigned char jsonsl_uchar_t;
 #endif /* JSONSL_USE_WCHAR */
 
+#ifdef JSONSL_PARSE_NAN
+#define JSONSL__NAN_PROXY JSONSL_SPECIALf_NAN
+#define JSONSL__INF_PROXY JSONSL_SPECIALf_INF
+#else
+#define JSONSL__NAN_PROXY 0
+#define JSONSL__INF_PROXY 0
+#endif
+
 /* Stolen from http-parser.h, and possibly others */
-#if defined(_WIN32) && !defined(__MINGW32__) 
+#if defined(_WIN32) && !defined(__MINGW32__) && (!defined(_MSC_VER) || _MSC_VER<1600)
 typedef __int8 int8_t;
 typedef unsigned __int8 uint8_t;
 typedef __int16 int16_t;
@@ -74,8 +61,6 @@ typedef int ssize_t;
 
 
 #if (!defined(JSONSL_STATE_GENERIC)) && (!defined(JSONSL_STATE_USER_FIELDS))
-#warning "JSONSL_STATE_USER_FIELDS not defined. Define this for extra structure fields"
-#warning "or define JSONSL_STATE_GENERIC"
 #define JSONSL_STATE_GENERIC
 #endif /* !defined JSONSL_STATE_GENERIC */
 
@@ -83,9 +68,33 @@ typedef int ssize_t;
 #define JSONSL_STATE_USER_FIELDS
 #endif /* JSONSL_STATE_GENERIC */
 
+/* Additional fields for component object */
+#ifndef JSONSL_JPR_COMPONENT_USER_FIELDS
+#define JSONSL_JPR_COMPONENT_USER_FIELDS
+#endif
+
 #ifndef JSONSL_API
+/**
+ * We require a /DJSONSL_DLL so that users already using this as a static
+ * or embedded library don't get confused
+ */
+#if defined(_WIN32) && defined(JSONSL_DLL)
+#define JSONSL_API __declspec(dllexport)
+#else
 #define JSONSL_API
-#endif /* JSONSL_API */
+#endif /* _WIN32 */
+
+#endif /* !JSONSL_API */
+
+#ifndef JSONSL_INLINE
+#if defined(_MSC_VER)
+  #define JSONSL_INLINE __inline
+  #elif defined(__GNUC__)
+  #define JSONSL_INLINE __inline__
+  #else
+  #define JSONSL_INLINE inline
+  #endif /* _MSC_VER or __GNUC__ */
+#endif /* JSONSL_INLINE */
 
 #define JSONSL_MAX_LEVELS 512
 
@@ -144,18 +153,36 @@ typedef enum {
     X(NULL,         1<<4) \
     X(FLOAT,        1<<5) \
     X(EXPONENT,     1<<6) \
-    X(NONASCII,     1<<7)
+    X(NONASCII,     1<<7) \
+    X(NAN,          1<<8) \
+    X(INF,          1<<9)
 typedef enum {
 #define X(o,b) \
     JSONSL_SPECIALf_##o = b,
     JSONSL_XSPECIAL
 #undef X
     /* Handy flags for checking */
-    JSONSL_SPECIALf_UNKNOWN = 1 << 8,
-    JSONSL_SPECIALf_NUMERIC = (JSONSL_SPECIALf_SIGNED|JSONSL_SPECIALf_UNSIGNED),
+
+    JSONSL_SPECIALf_UNKNOWN = 1 << 10,
+
+    /** @private Private */
+    JSONSL_SPECIALf_ZERO    = 1 << 11 | JSONSL_SPECIALf_UNSIGNED,
+    /** @private */
+    JSONSL_SPECIALf_DASH    = 1 << 12,
+    /** @private */
+    JSONSL_SPECIALf_POS_INF = (JSONSL_SPECIALf_INF),
+    JSONSL_SPECIALf_NEG_INF = (JSONSL_SPECIALf_INF|JSONSL_SPECIALf_SIGNED),
+
+    /** Type is numeric */
+    JSONSL_SPECIALf_NUMERIC = (JSONSL_SPECIALf_SIGNED| JSONSL_SPECIALf_UNSIGNED),
+
+    /** Type is a boolean */
     JSONSL_SPECIALf_BOOLEAN = (JSONSL_SPECIALf_TRUE|JSONSL_SPECIALf_FALSE),
-    /* For non-simple numeric types */
-    JSONSL_SPECIALf_NUMNOINT = (JSONSL_SPECIALf_FLOAT|JSONSL_SPECIALf_EXPONENT)
+
+    /** Type is an "extended", not integral type (but numeric) */
+   JSONSL_SPECIALf_NUMNOINT =
+       (JSONSL_SPECIALf_FLOAT|JSONSL_SPECIALf_EXPONENT|JSONSL_SPECIALf_NAN
+        |JSONSL_SPECIALf_INF)
 } jsonsl_special_t;
 
 
@@ -182,11 +209,12 @@ typedef enum {
  * Various errors which may be thrown while parsing JSON
  */
 #define JSONSL_XERR \
-    X(SUCCESS) \
 /* Trailing garbage characters */ \
     X(GARBAGE_TRAILING) \
 /* We were expecting a 'special' (numeric, true, false, null) */ \
     X(SPECIAL_EXPECTED) \
+/* The 'special' value was incomplete */ \
+    X(SPECIAL_INCOMPLETE) \
 /* Found a stray token */ \
     X(STRAY_TOKEN) \
 /* We were expecting a token before this one */ \
@@ -217,6 +245,8 @@ typedef enum {
     X(TRAILING_COMMA) \
 /* An invalid number was passed in a numeric field */ \
     X(INVALID_NUMBER) \
+/* Value is missing for object */ \
+    X(VALUE_EXPECTED) \
 /* The following are for JPR Stuff */ \
     \
 /* Found a literal '%' but it was only followed by a single valid hex digit */ \
@@ -226,9 +256,14 @@ typedef enum {
 /* Duplicate slash */ \
     X(JPR_DUPSLASH) \
 /* No leading root */ \
-    X(JPR_NOROOT)
+    X(JPR_NOROOT) \
+/* Allocation failure */ \
+    X(ENOMEM) \
+/* Invalid unicode codepoint detected (in case of escapes) */ \
+    X(INVALID_CODEPOINT)
 
 typedef enum {
+    JSONSL_ERROR_SUCCESS = 0,
 #define X(e) \
     JSONSL_ERROR_##e,
     JSONSL_XERR
@@ -251,29 +286,27 @@ struct jsonsl_state_st {
     /**
      * The JSON object type
      */
-    jsonsl_type_t type;
+    unsigned type;
 
     /** If this element is special, then its extended type is here */
-    jsonsl_special_t special_flags;
+    unsigned special_flags;
 
     /**
-     * Position offset variables. These are relative to jsn->pos.
-     * pos_begin is the position at which this state was first pushed
-     * to the stack. pos_cur is the position at which return last controlled
-     * to this state (i.e. an immediate child state was popped from it).
-     */
-
-    /**
-     * The position at which this state was first PUSHed
+     * The position (in terms of number of bytes since the first call to
+     * jsonsl_feed()) at which the state was first pushed. This includes
+     * opening tokens, if applicable.
+     *
+     * @note For strings (i.e. type & JSONSL_Tf_STRINGY is nonzero) this will
+     * be the position of the first quote.
+     *
+     * @see jsonsl_st::pos which contains the _current_ position and can be
+     * used during a POP callback to get the length of the element.
      */
     size_t pos_begin;
 
-    /**
-     * The position at which any immediate child was last POPped.
-     * Note that this field is only set when the item is popped.
-     */
+    /**FIXME: This is redundant as the same information can be derived from
+     * jsonsl_st::pos at pop-time */
     size_t pos_cur;
-
 
     /**
      * Level of recursion into nesting. This is mainly a convenience
@@ -309,6 +342,9 @@ struct jsonsl_state_st {
 
     /**
      * Counter which is incremented each time an escape ('\') is encountered.
+     * This is used internally for non-string types and should only be
+     * inspected by the user if the state actually represents a string
+     * type.
      */
     unsigned int nescapes;
 
@@ -333,6 +369,26 @@ struct jsonsl_state_st {
     void *data;
 #endif /* JSONSL_STATE_USER_FIELDS */
 };
+
+/**Gets the number of elements in the list.
+ * @param st The state. Must be of type JSONSL_T_LIST
+ * @return number of elements in the list
+ */
+#define JSONSL_LIST_SIZE(st) ((st)->nelem)
+
+/**Gets the number of key-value pairs in an object
+ * @param st The state. Must be of type JSONSL_T_OBJECT
+ * @return the number of key-value pairs in the object
+ */
+#define JSONSL_OBJECT_SIZE(st) ((st)->nelem / 2)
+
+/**Gets the numeric value.
+ * @param st The state. Must be of type JSONSL_T_SPECIAL and
+ *           special_flags must have the JSONSL_SPECIALf_NUMERIC flag
+ *           set.
+ * @return the numeric value of the state.
+ */
+#define JSONSL_NUMERIC_VALUE(st) ((st)->nelem)
 
 /*
  * So now we need some special structure for keeping the
@@ -410,6 +466,9 @@ struct jsonsl_st {
     /** This is the current level of the stack */
     unsigned int level;
 
+    /** Flag set to indicate we should stop processing */
+    unsigned int stopfl;
+
     /**
      * This is the current position, relative to the beginning
      * of the stream.
@@ -428,7 +487,12 @@ struct jsonsl_st {
     /** Default callback for any action, if neither PUSH or POP callbacks are defined */
     jsonsl_stack_callback action_callback;
 
-    /** Do not invoke callbacks for objects deeper than this level */
+    /**
+     * Do not invoke callbacks for objects deeper than this level.
+     * NOTE: This field establishes the lower bound for ignored callbacks,
+     * and is thus misnamed. `min_ignore_level` would actually make more
+     * sense, but we don't want to break API.
+     */
     unsigned int max_callback_level;
 
     /** The error callback. Invoked when an error happens. Should not be NULL */
@@ -550,23 +614,54 @@ void jsonsl_destroy(jsonsl_t jsn);
  * @param jsn the lexer
  * @param cur the current nest, which should be a struct jsonsl_nest_st
  */
-#define jsonsl_last_state(jsn, cur) \
-    (cur->level > 1 ) \
-    ? (jsn->stack + (cur->level-1)) \
-    : NULL
+static JSONSL_INLINE
+struct jsonsl_state_st *jsonsl_last_state(const jsonsl_t jsn,
+                                          const struct jsonsl_state_st *state)
+{
+    /* Don't complain about overriding array bounds */
+    if (state->level > 1) {
+        return jsn->stack + state->level - 1;
+    } else {
+        return NULL;
+    }
+}
 
+/**
+ * Gets the state of the last fully consumed child of this parent. This is
+ * only valid in the parent's POP callback.
+ *
+ * @param the lexer
+ * @return A pointer to the child.
+ */
+static JSONSL_INLINE
+struct jsonsl_state_st *jsonsl_last_child(const jsonsl_t jsn,
+                                          const struct jsonsl_state_st *parent)
+{
+    return jsn->stack + (parent->level + 1);
+}
+
+/**Call to instruct the parser to stop parsing and return. This is valid
+ * only from within a callback */
+static JSONSL_INLINE
+void jsonsl_stop(jsonsl_t jsn)
+{
+    jsn->stopfl = 1;
+}
 
 /**
  * This enables receiving callbacks on all events. Doesn't do
  * anything special but helps avoid some boilerplate.
  * This does not touch the UESCAPE callbacks or flags.
  */
-#define jsonsl_enable_all_callbacks(jsn) \
-    jsn->call_HKEY = 1; \
-    jsn->call_STRING = 1; \
-    jsn->call_OBJECT = 1; \
-    jsn->call_SPECIAL = 1; \
+static JSONSL_INLINE
+void jsonsl_enable_all_callbacks(jsonsl_t jsn)
+{
+    jsn->call_HKEY = 1;
+    jsn->call_STRING = 1;
+    jsn->call_OBJECT = 1;
+    jsn->call_SPECIAL = 1;
     jsn->call_LIST = 1;
+}
 
 /**
  * A macro which returns true if the current state object can
@@ -639,7 +734,8 @@ void jsonsl_dump_global_metrics(void);
 #define JSONSL_XMATCH \
     X(COMPLETE,1) \
     X(POSSIBLE,0) \
-    X(NOMATCH,-1)
+    X(NOMATCH,-1) \
+    X(TYPE_MISMATCH, -2)
 
 typedef enum {
 
@@ -663,17 +759,32 @@ typedef enum {
 } jsonsl_jpr_type_t;
 
 struct jsonsl_jpr_component_st {
+    /** The string the component points to */
     char *pstr;
     /** if this is a numeric type, the number is 'cached' here */
     unsigned long idx;
+    /** The length of the string */
     size_t len;
+    /** The type of component (NUMERIC or STRING) */
     jsonsl_jpr_type_t ptype;
+
+    /** Set this to true to enforce type checking between dict keys and array
+     * indices. jsonsl_jpr_match() will return TYPE_MISMATCH if it detects
+     * that an array index is actually a child of a dictionary. */
+    short is_arridx;
+
+    /* Extra fields (for more advanced searches. Default is empty) */
+    JSONSL_JPR_COMPONENT_USER_FIELDS
 };
 
 struct jsonsl_jpr_st {
     /** Path components */
     struct jsonsl_jpr_component_st *components;
     size_t ncomponents;
+
+    /**Type of the match to be expected. If nonzero, will be compared against
+     * the actual type */
+    unsigned match_type;
 
     /** Base of allocated string for components */
     char *basestr;
@@ -682,8 +793,6 @@ struct jsonsl_jpr_st {
     char *orig;
     size_t norig;
 };
-
-
 
 /**
  * Create a new JPR object.
@@ -723,9 +832,41 @@ void jsonsl_jpr_destroy(jsonsl_jpr_t jpr);
  */
 JSONSL_API
 jsonsl_jpr_match_t jsonsl_jpr_match(jsonsl_jpr_t jpr,
-                                    jsonsl_type_t parent_type,
+                                    unsigned int parent_type,
                                     unsigned int parent_level,
                                     const char *key, size_t nkey);
+
+/**
+ * Alternate matching algorithm. This matching algorithm does not use
+ * JSONPointer but relies on a more structured searching mechanism. It
+ * assumes that there is a clear distinction between array indices and
+ * object keys. In this case, the jsonsl_path_component_st::ptype should
+ * be set to @ref JSONSL_PATH_NUMERIC for an array index (the
+ * jsonsl_path_comonent_st::is_arridx field will be removed in a future
+ * version).
+ *
+ * @param jpr The path
+ * @param parent The parent structure. Can be NULL if this is the root object
+ * @param child The child structure. Should not be NULL
+ * @param key Object key, if an object
+ * @param nkey Length of object key
+ * @return Status constant if successful
+ *
+ * @note
+ * For successful matching, both the key and the path itself should be normalized
+ * to contain 'proper' utf8 sequences rather than utf16 '\uXXXX' escapes. This
+ * should currently be done in the application. Another version of this function
+ * may use a temporary buffer in such circumstances (allocated by the application).
+ *
+ * Since this function also checks the state of the child, it should only
+ * be called on PUSH callbacks, and not POP callbacks
+ */
+JSONSL_API
+jsonsl_jpr_match_t
+jsonsl_path_match(jsonsl_jpr_t jpr,
+                  const struct jsonsl_state_st *parent,
+                  const struct jsonsl_state_st *child,
+                  const char *key, size_t nkey);
 
 
 /**
@@ -804,6 +945,13 @@ const char *jsonsl_strmatchtype(jsonsl_jpr_match_t match);
  * to escape a '/' - however this may also be desired behavior. the JSON
  * spec is not clear on this, and therefore jsonsl leaves it up to you.
  *
+ * Additionally, sometimes you may wish to _normalize_ JSON. This is specifically
+ * true when dealing with 'u-escapes' which can be expressed perfectly fine
+ * as utf8. One use case for normalization is JPR string comparison, in which
+ * case two effectively equivalent strings may not match because one is using
+ * u-escapes and the other proper utf8. To normalize u-escapes only, pass in
+ * an empty `toEscape` table, enabling only the `u` index.
+ *
  * @param in The input string.
  * @param out An allocated output (should be the same size as in)
  * @param len the size of the buffer
@@ -820,13 +968,26 @@ const char *jsonsl_strmatchtype(jsonsl_jpr_match_t match);
  * encountered.
  *
  * @return The effective size of the output buffer.
+ *
+ * @note
+ * This function now encodes the UTF8 equivalents of utf16 escapes (i.e.
+ * 'u-escapes'). Previously this would encode the escapes as utf16 literals,
+ * which while still correct in some sense was confusing for many (especially
+ * considering that the inputs were variations of char).
+ *
+ * @note
+ * The output buffer will never be larger than the input buffer, since
+ * standard escape sequences (i.e. '\t') occupy two bytes in the source
+ * but only one byte (when unescaped) in the output. Likewise u-escapes
+ * (i.e. \uXXXX) will occupy six bytes in the source, but at the most
+ * two bytes when escaped.
  */
 JSONSL_API
 size_t jsonsl_util_unescape_ex(const char *in,
                                char *out,
                                size_t len,
                                const int toEscape[128],
-                               jsonsl_special_t *oflags,
+                               unsigned *oflags,
                                jsonsl_error_t *err,
                                const char **errat);
 
@@ -837,44 +998,6 @@ size_t jsonsl_util_unescape_ex(const char *in,
     jsonsl_util_unescape_ex(in, out, len, toEscape, NULL, err, NULL)
 
 #endif /* JSONSL_NO_JPR */
-
-/**
- * HERE BE CHARACTER TABLES!
- */
-#define JSONSL_CHARTABLE_string_nopass \
-/* 0x00 */ 1 /* <NUL> */, /* 0x00 */  \
-/* 0x01 */ 1 /* <SOH> */, /* 0x01 */  \
-/* 0x02 */ 1 /* <STX> */, /* 0x02 */  \
-/* 0x03 */ 1 /* <ETX> */, /* 0x03 */  \
-/* 0x04 */ 1 /* <EOT> */, /* 0x04 */  \
-/* 0x05 */ 1 /* <ENQ> */, /* 0x05 */  \
-/* 0x06 */ 1 /* <ACK> */, /* 0x06 */  \
-/* 0x07 */ 1 /* <BEL> */, /* 0x07 */  \
-/* 0x08 */ 1 /* <BS> */, /* 0x08 */  \
-/* 0x09 */ 1 /* <HT> */, /* 0x09 */  \
-/* 0x0a */ 1 /* <LF> */, /* 0x0a */  \
-/* 0x0b */ 1 /* <VT> */, /* 0x0b */  \
-/* 0x0c */ 1 /* <FF> */, /* 0x0c */  \
-/* 0x0d */ 1 /* <CR> */, /* 0x0d */  \
-/* 0x0e */ 1 /* <SO> */, /* 0x0e */  \
-/* 0x0f */ 1 /* <SI> */, /* 0x0f */  \
-/* 0x10 */ 1 /* <DLE> */, /* 0x10 */  \
-/* 0x11 */ 1 /* <DC1> */, /* 0x11 */  \
-/* 0x12 */ 1 /* <DC2> */, /* 0x12 */  \
-/* 0x13 */ 1 /* <DC3> */, /* 0x13 */  \
-/* 0x14 */ 0,0,0,0,0,0,0,0,0,0,0,0,0,0, /* 0x21 */  \
-/* 0x22 */ 1 /* <"> */, /* 0x22 */  \
-/* 0x23 */ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, /* 0x42 */  \
-/* 0x43 */ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, /* 0x5b */  \
-/* 0x5c */ 1 /* <\> */, /* 0x5c */  \
-/* 0x5d */ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, /* 0x7c */  \
-/* 0x7d */ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, /* 0x9c */  \
-/* 0x9d */ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, /* 0xbc */  \
-/* 0xbd */ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, /* 0xdc */  \
-/* 0xdd */ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, /* 0xfc */  \
-/* 0xfd */ 0,0 /* 0xfe */  \
-
-
 
 #ifdef __cplusplus
 }

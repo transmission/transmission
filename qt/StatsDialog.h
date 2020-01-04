@@ -22,10 +22,10 @@ class StatsDialog : public BaseDialog
 
 public:
     StatsDialog(Session&, QWidget* parent = nullptr);
-    ~StatsDialog();
+    ~StatsDialog() override;
 
     // QWidget
-    virtual void setVisible(bool visible);
+    void setVisible(bool visible) override;
 
 private slots:
     void updateStats();

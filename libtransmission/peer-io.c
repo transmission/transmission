@@ -431,7 +431,7 @@ error:
 
 static void maybeSetCongestionAlgorithm(tr_socket_t socket, char const* algorithm)
 {
-    if (algorithm != NULL && *algorithm != '\0')
+    if (!tr_str_is_empty(algorithm))
     {
         tr_netSetCongestionControl(socket, algorithm);
     }
@@ -1053,7 +1053,7 @@ static unsigned int getDesiredOutputBufferSize(tr_peerIo const* io, uint64_t now
      * or a few blocks, whichever is bigger.
      * It's okay to tweak this as needed */
     unsigned int const currentSpeed_Bps = tr_bandwidthGetPieceSpeed_Bps(&io->bandwidth, now, TR_UP);
-    unsigned int const period = 15u; /* arbitrary */
+    unsigned int const period = 15U; /* arbitrary */
     /* the 3 is arbitrary; the .5 is to leave room for messages */
     static unsigned int const ceiling = (unsigned int)(MAX_BLOCK_SIZE * 3.5);
     return MAX(ceiling, currentSpeed_Bps * period);
@@ -1109,7 +1109,7 @@ static inline void processBuffer(tr_crypto* crypto, struct evbuffer* buffer, siz
         TR_ASSERT(size >= iovec.iov_len);
         size -= iovec.iov_len;
     }
-    while (!evbuffer_ptr_set(buffer, &pos, iovec.iov_len, EVBUFFER_PTR_ADD));
+    while (evbuffer_ptr_set(buffer, &pos, iovec.iov_len, EVBUFFER_PTR_ADD) == 0);
 
     TR_ASSERT(size == 0);
 }

@@ -8,9 +8,8 @@
 
 #pragma once
 
-#include <QSet>
-
 #include "BaseDialog.h"
+#include "Typedefs.h"
 
 #include "ui_RelocateDialog.h"
 
@@ -22,7 +21,7 @@ class RelocateDialog : public BaseDialog
     Q_OBJECT
 
 public:
-    RelocateDialog(Session&, TorrentModel const&, QSet<int> const& ids, QWidget* parent = nullptr);
+    RelocateDialog(Session&, TorrentModel const&, torrent_ids_t const& ids, QWidget* parent = nullptr);
 
     virtual ~RelocateDialog()
     {
@@ -37,7 +36,7 @@ private slots:
 
 private:
     Session& mySession;
-    QSet<int> const myIds;
+    torrent_ids_t const myIds;
 
     Ui::RelocateDialog ui;
 

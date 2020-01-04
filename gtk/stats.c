@@ -123,7 +123,6 @@ GtkWidget* gtr_stats_dialog_new(GtkWindow* parent, TrCore* core)
     d = gtk_dialog_new_with_buttons(_("Statistics"), parent, GTK_DIALOG_DESTROY_WITH_PARENT, _("_Reset"), TR_RESPONSE_RESET,
         GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE, NULL);
     gtk_dialog_set_default_response(GTK_DIALOG(d), GTK_RESPONSE_CLOSE);
-    gtk_dialog_set_alternative_button_order(GTK_DIALOG(d), GTK_RESPONSE_CLOSE, TR_RESPONSE_RESET, -1);
     t = hig_workarea_create();
     ui->core = core;
 
@@ -144,12 +143,15 @@ GtkWidget* gtr_stats_dialog_new(GtkWindow* parent, TrCore* core)
     ui->one_time_lb = GTK_LABEL(l);
     gtk_label_set_single_line_mode(ui->one_time_lb, TRUE);
     hig_workarea_add_row(t, &row, _("Duration:"), l, NULL);
+
     hig_workarea_add_section_divider(t, &row);
+
     hig_workarea_add_section_title(t, &row, _("Total"));
     l = gtk_label_new(_("Started %'d time"));
     ui->all_sessions_lb = GTK_LABEL(l);
     gtk_label_set_single_line_mode(ui->all_sessions_lb, TRUE);
-    hig_workarea_add_label_w(t, row++, l);
+    hig_workarea_add_label_w(t, row, l);
+    ++row;
     l = gtk_label_new(NULL);
     ui->all_up_lb = GTK_LABEL(l);
     gtk_label_set_single_line_mode(ui->all_up_lb, TRUE);
@@ -166,6 +168,7 @@ GtkWidget* gtr_stats_dialog_new(GtkWindow* parent, TrCore* core)
     ui->all_time_lb = GTK_LABEL(l);
     gtk_label_set_single_line_mode(ui->all_time_lb, TRUE);
     hig_workarea_add_row(t, &row, _("Duration:"), l, NULL);
+
     gtr_dialog_set_content(GTK_DIALOG(d), t);
 
     updateStats(ui);

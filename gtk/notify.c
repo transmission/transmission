@@ -191,7 +191,8 @@ void gtr_notify_torrent_completed(TrCore* core, int torrent_id)
     tor = gtr_core_find_torrent(core, torrent_id);
 
     n = g_new0(TrNotification, 1);
-    n->core = g_object_ref(G_OBJECT(core));
+    g_object_ref(G_OBJECT(core));
+    n->core = core;
     n->torrent_id = torrent_id;
 
     g_variant_builder_init(&actions_builder, G_VARIANT_TYPE("as"));

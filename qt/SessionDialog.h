@@ -24,13 +24,9 @@ class SessionDialog : public BaseDialog
 public:
     SessionDialog(Session& session, Prefs& prefs, QWidget* parent = nullptr);
 
-    virtual ~SessionDialog()
-    {
-    }
-
 public slots:
     // QDialog
-    virtual void accept();
+    void accept() override;
 
 private slots:
     void resensitize();
