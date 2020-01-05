@@ -33,7 +33,7 @@
 #   if defined(HAVE_COPY_FILE_RANGE)
 /* Linux's copy_file_range(2) is buggy prior to 5.3. */
 #       include <linux/version.h>
-#       if LINUX_VERSION_CODE >= KERNEL_VERSION(5,3,0)
+#       if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 3, 0)
 #           define USE_COPY_FILE_RANGE
 #       endif
 #   endif /* HAVE_COPY_FILE_RANGE */
@@ -460,7 +460,7 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, uint64_t file_
     TR_ASSERT(dst_path != NULL);
 
 #if defined(__APPLE__) && defined(HAVE_COPYFILE)
-    (void) file_size; /* unused variable */
+    (void)file_size; /* unused variable */
 
     copyfile_flags_t const flags =
 #ifdef COPYFILE_CLONE /* macos >= 10.12 */
@@ -522,7 +522,7 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, uint64_t file_
             break;
         }
 
-        TR_ASSERT(copied >= 0 && ((uint64_t) copied) <= file_size);
+        TR_ASSERT(copied >= 0 && ((uint64_t)copied) <= file_size);
         file_size -= copied;
     }
 
@@ -532,9 +532,9 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, uint64_t file_
 
     char* buf = NULL;
     size_t const buflen = 1024 * 1024; /* 1024 KiB buffer */
-        /* XXX buflen should be configurable. */
+    /* XXX buflen should be configurable. */
     buf = tr_valloc(buflen);
-        /* XXX handle bad buf */
+    /* XXX handle bad buf */
 
     while (file_size > 0)
     {
