@@ -14,6 +14,7 @@
 #include <fcntl.h> /* O_LARGEFILE, posix_fadvise(), [posix_]fallocate(), fcntl() */
 #include <libgen.h> /* basename(), dirname() */
 #include <limits.h> /* PATH_MAX */
+#include <stdint.h> /* SIZE_MAX */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -26,6 +27,26 @@
 #ifdef HAVE_XFS_XFS_H
 #include <xfs/xfs.h>
 #endif
+
+/* OS-specific file copy (copy_file_range, sendfile64, or copyfile). */
+#if defined(__linux__)
+#   if defined(HAVE_COPY_FILE_RANGE)
+/* Linux's copy_file_range(2) is buggy prior to 5.3. */
+#       include <linux/version.h>
+#       if LINUX_VERSION_CODE >= KERNEL_VERSION(5,3,0)
+#           define USE_COPY_FILE_RANGE
+#       endif
+#   endif /* HAVE_COPY_FILE_RANGE */
+#   if !defined(USE_COPY_FILE_RANGE) && defined(HAVE_SENDFILE64)
+#       define USE_SENDFILE64
+#       include <sys/sendfile.h>
+#   endif
+#elif defined(__APPLE__) && defined(HAVE_COPYFILE)
+#   include <copyfile.h>
+#elif defined(HAVE_COPY_FILE_RANGE)
+/* Presently this is only FreeBSD 13+. */
+#   define USE_COPY_FILE_RANGE
+#endif /* __linux__ */
 
 #include "transmission.h"
 #include "error.h"
@@ -428,6 +449,132 @@ bool tr_sys_path_rename(char const* src_path, char const* dst_path, tr_error** e
     }
 
     return ret;
+}
+
+/* We try to do a fast (in-kernel) copy using a variety of non-portable system
+ * calls. If the current implementation does not support in-kernel copying, we
+ * use a user-space fallback instead. */
+bool tr_sys_path_copy(char const* src_path, char const* dst_path, uint64_t file_size, tr_error** error)
+{
+    TR_ASSERT(src_path != NULL);
+    TR_ASSERT(dst_path != NULL);
+
+#if defined(__APPLE__) && defined(HAVE_COPYFILE)
+    (void) file_size; /* unused variable */
+
+    copyfile_flags_t const flags =
+#ifdef COPYFILE_CLONE /* macos >= 10.12 */
+        COPYFILE_CLONE;
+#else
+        COPYFILE_DATA;
+#endif
+    if (copyfile(src_path, dst_path, NULL, flags) < 0)
+    {
+        set_system_error(error, errno);
+        return false;
+    }
+    else
+    {
+        return true;
+    }
+
+#else /* __APPLE__ && HAVE_COPYFILE */
+
+    /* Other OSes require us to copy between file descriptors, so open them. */
+
+    tr_sys_file_t in;
+    tr_sys_file_t out;
+
+    in = tr_sys_file_open(src_path, TR_SYS_FILE_READ |
+        TR_SYS_FILE_SEQUENTIAL, 0, error);
+
+    if (in == TR_BAD_SYS_FILE)
+    {
+        tr_error_prefix(error, "Unable to open old file: ");
+        return false;
+    }
+
+    out = tr_sys_file_open(dst_path, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE |
+        TR_SYS_FILE_TRUNCATE, 0666, error);
+
+    if (out == TR_BAD_SYS_FILE)
+    {
+        tr_error_prefix(error, "Unable to open new file: ");
+        tr_sys_file_close(in, NULL);
+        return false;
+    }
+
+#if defined(USE_COPY_FILE_RANGE) || defined(USE_SENDFILE64)
+
+    while (file_size > 0)
+    {
+        size_t const chunk_size = MIN(file_size, SIZE_MAX);
+        ssize_t const copied =
+#ifdef USE_COPY_FILE_RANGE
+            copy_file_range(in, NULL, out, NULL, chunk_size, 0);
+#elif defined(USE_SENDFILE64)
+            sendfile64(out, in, NULL, chunk_size);
+#endif
+
+        if (copied < 0)
+        {
+            set_system_error(error, errno);
+            break;
+        }
+
+        TR_ASSERT(copied >= 0 && ((uint64_t) copied) <= file_size);
+        file_size -= copied;
+    }
+
+#else /* USE_COPY_FILE_RANGE || USE_SENDFILE64 */
+
+    /* Fallback to user-space copy. */
+
+    char* buf = NULL;
+    size_t const buflen = 1024 * 1024; /* 1024 KiB buffer */
+        /* XXX buflen should be configurable. */
+    buf = tr_valloc(buflen);
+        /* XXX handle bad buf */
+
+    while (file_size > 0)
+    {
+        uint64_t const chunk_size = MIN(file_size, buflen);
+        uint64_t bytes_read;
+        uint64_t bytes_written;
+
+        if (!tr_sys_file_read(in, buf, chunk_size, &bytes_read, error))
+        {
+            break;
+        }
+
+        if (!tr_sys_file_write(out, buf, bytes_read, &bytes_written, error))
+        {
+            break;
+        }
+
+        TR_ASSERT(bytes_read == bytes_written);
+        TR_ASSERT(bytes_written <= file_size);
+        file_size -= bytes_written;
+    }
+
+    /* cleanup */
+    tr_free(buf);
+
+#endif /* USE_COPY_FILE_RANGE || USE_SENDFILE64 */
+
+    /* cleanup */
+    tr_sys_file_close(out, NULL);
+    tr_sys_file_close(in, NULL);
+
+    if (file_size != 0)
+    {
+        tr_error_prefix(error, "Unable to read/write: ");
+        return false;
+    }
+
+    return true;
+
+#endif /* __APPLE__ && HAVE_COPYFILE */
 }
 
 bool tr_sys_path_remove(char const* path, tr_error** error)
