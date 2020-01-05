@@ -746,6 +746,7 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, uint64_t unuse
         set_system_error(error, GetLastError());
         return false;
     }
+
     return true;
 }
 
