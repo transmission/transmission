@@ -316,7 +316,7 @@ static char const* torrentStop(tr_session* session, tr_variant* args_in, tr_vari
     {
         tr_torrent* tor = torrents[i];
 
-        if (tor->isRunning || tr_torrentIsQueued(tor) || tor->verifyState > TR_VERIFY_NONE)
+        if (tor->isRunning || tr_torrentIsQueued(tor) || tor->verifyState != TR_VERIFY_NONE)
         {
             tor->isStopping = true;
             notify(session, TR_RPC_TORRENT_STOPPED, tor);
@@ -2803,7 +2803,8 @@ void tr_rpc_request_exec_uri(tr_session* session, void const* request_uri, size_
             bool isArg = strcmp(key, "method") != 0 && strcmp(key, "tag") != 0;
             tr_variant* parent = isArg ? args : &top;
 
-            tr_rpc_parse_list_str(tr_variantDictAdd(parent, tr_quark_new(key, (size_t)(delim - pch))), delim + 1,
+            tr_rpc_parse_list_str(tr_variantDictAdd(parent, tr_quark_new(key,
+                (size_t)(delim - pch))), delim + 1,
                 next != NULL ? (size_t)(next - (delim + 1)) : strlen(delim + 1));
             tr_free(key);
         }
