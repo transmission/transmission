@@ -50,57 +50,39 @@ static uint64_t fill_buffer_from_fd(tr_sys_file_t fd, uint64_t bytes_remaining, 
     return bytes_remaining;
 }
 
-static bool files_are_identical(char const* fn1, char const* fn2)
+static int files_are_identical(char const* fn1, char const* fn2)
 {
-    tr_sys_file_t fd1, fd2;
-    tr_sys_path_info info1, info2;
-    char* readbuf1 = NULL;
-    char* readbuf2 = NULL;
-    bool result;
-    size_t const buflen = 2 * 1024 * 1024; /* 2 MiB buffer */
-
-    fd1 = tr_sys_file_open(fn1, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, NULL);
-    fd2 = tr_sys_file_open(fn2, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, NULL);
+    tr_sys_file_t fd1 = tr_sys_file_open(fn1, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, NULL);
+    tr_sys_file_t fd2 = tr_sys_file_open(fn2, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, NULL);
     check(fd1 != TR_BAD_SYS_FILE && fd2 != TR_BAD_SYS_FILE);
 
+    tr_sys_path_info info1, info2;
     tr_sys_file_get_info(fd1, &info1, NULL);
     tr_sys_file_get_info(fd2, &info2, NULL);
-
-    if (info1.size != info2.size)
-    {
-        result = false;
-        goto out;
-    }
-
-    readbuf1 = tr_valloc(buflen);
-    readbuf2 = tr_valloc(buflen);
+    check_uint(info1.size, ==, info2.size);
 
     uint64_t bytes_left1 = info1.size;
     uint64_t bytes_left2 = info2.size;
-    check_uint(info1.size, ==, info2.size);
+
+    size_t const buflen = 2 * 1024 * 1024; /* 2 MiB buffer */
+    char* readbuf1 = tr_valloc(buflen);
+    char* readbuf2 = tr_valloc(buflen);
 
     while (bytes_left1 > 0 || bytes_left2 > 0)
     {
         bytes_left1 = fill_buffer_from_fd(fd1, bytes_left1, readbuf1, buflen);
         bytes_left2 = fill_buffer_from_fd(fd2, bytes_left2, readbuf2, buflen);
-        check_uint(bytes_left1, ==, bytes_left2);
 
-        if (memcmp(readbuf1, readbuf2, buflen))
-        {
-            result = false;
-            goto out;
-        }
+        check_uint(bytes_left1, ==, bytes_left2);
+        check_mem(readbuf1, ==, readbuf2, buflen);
     }
 
-    result = true;
-
-out:
     tr_free(readbuf1);
     tr_free(readbuf2);
     tr_sys_file_close(fd1, NULL);
     tr_sys_file_close(fd2, NULL);
 
-    return result;
+    return 0;
 }
 
 static void get_random_string(char* buffer, size_t length)
@@ -157,7 +139,11 @@ static int test_copy_file(void)
     check(tr_sys_path_copy(path1, path2, info1.size, NULL));
 
     /* Verify the files are identical. */
-    check(files_are_identical(path1, path2));
+    int const result = files_are_identical(path1, path2);
+    if (result > 0)
+    {
+        return result;
+    }
 
     /* Dispose of those files that we created. */
     if (!reference_file)
