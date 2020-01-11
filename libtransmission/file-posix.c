@@ -30,21 +30,22 @@
 
 /* OS-specific file copy (copy_file_range, sendfile64, or copyfile). */
 #if defined(__linux__)
-#   if defined(HAVE_COPY_FILE_RANGE)
-/* Linux's copy_file_range(2) is buggy prior to 5.3. */
-#       include <linux/version.h>
-#       if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 3, 0)
-#           define USE_COPY_FILE_RANGE
-#       endif
-#   endif /* HAVE_COPY_FILE_RANGE */
-#   if !defined(USE_COPY_FILE_RANGE) && defined(HAVE_SENDFILE64)
-#       define USE_SENDFILE64
+#   include <linux/version.h>
+    /* Linux's copy_file_range(2) is buggy prior to 5.3. */
+#   if defined(HAVE_COPY_FILE_RANGE) && LINUX_VERSION_CODE >= KERNEL_VERSION(5, 3, 0)
+#       define USE_COPY_FILE_RANGE
+#   elif defined(HAVE_SENDFILE64)
 #       include <sys/sendfile.h>
+#       define USE_SENDFILE64
 #   endif
 #elif defined(__APPLE__) && defined(HAVE_COPYFILE)
 #   include <copyfile.h>
+#   ifndef COPYFILE_CLONE /* macos < 10.12 */
+#       define COPYFILE_CLONE 0
+#   endif
+#   define USE_COPYFILE
 #elif defined(HAVE_COPY_FILE_RANGE)
-/* Presently this is only FreeBSD 13+. */
+    /* Presently this is only FreeBSD 13+. */
 #   define USE_COPY_FILE_RANGE
 #endif /* __linux__ */
 
@@ -454,49 +455,38 @@ bool tr_sys_path_rename(char const* src_path, char const* dst_path, tr_error** e
 /* We try to do a fast (in-kernel) copy using a variety of non-portable system
  * calls. If the current implementation does not support in-kernel copying, we
  * use a user-space fallback instead. */
-bool tr_sys_path_copy(char const* src_path, char const* dst_path, uint64_t file_size, tr_error** error)
+bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** error)
 {
     TR_ASSERT(src_path != NULL);
     TR_ASSERT(dst_path != NULL);
 
-#if defined(__APPLE__) && defined(HAVE_COPYFILE)
-    (void)file_size; /* unused variable */
-
-    copyfile_flags_t const flags =
-#ifdef COPYFILE_CLONE /* macos >= 10.12 */
-        COPYFILE_CLONE;
-#else
-        COPYFILE_ALL;
-#endif
-    if (copyfile(src_path, dst_path, NULL, flags) < 0)
+#if defined(USE_COPYFILE)
+    if (copyfile(src_path, dst_path, NULL, COPYFILE_CLONE | COPYFILE_ALL) < 0)
     {
         set_system_error(error, errno);
         return false;
     }
-    else
-    {
-        return true;
-    }
+    return true;
 
-#else /* __APPLE__ && HAVE_COPYFILE */
+#else /* USE_COPYFILE */
 
     /* Other OSes require us to copy between file descriptors, so open them. */
-
-    tr_sys_file_t in;
-    tr_sys_file_t out;
-
-    in = tr_sys_file_open(src_path, TR_SYS_FILE_READ |
-        TR_SYS_FILE_SEQUENTIAL, 0, error);
-
+    tr_sys_file_t in = tr_sys_file_open(src_path, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, error);
     if (in == TR_BAD_SYS_FILE)
     {
         tr_error_prefix(error, "Unable to open old file: ");
         return false;
     }
 
-    out = tr_sys_file_open(dst_path, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE |
-        TR_SYS_FILE_TRUNCATE, 0666, error);
+    tr_sys_path_info info;
+    if (!tr_sys_file_get_info(in, &info, error))
+    {
+        tr_error_prefix(error, "Unable to get information on old file: ");
+        tr_sys_file_close(in, NULL);
+        return false;
+    }
 
+    tr_sys_file_t out = tr_sys_file_open(dst_path, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE, 0666, error);
     if (out == TR_BAD_SYS_FILE)
     {
         tr_error_prefix(error, "Unable to open new file: ");
@@ -504,19 +494,24 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, uint64_t file_
         return false;
     }
 
+    size_t file_size = info.size;
+
 #if defined(USE_COPY_FILE_RANGE) || defined(USE_SENDFILE64)
 
     while (file_size > 0)
     {
-        size_t const chunk_size = MIN(file_size, SIZE_MAX);
+        size_t const chunk_size = MIN(file_size, SSIZE_MAX);
         ssize_t const copied =
 #ifdef USE_COPY_FILE_RANGE
             copy_file_range(in, NULL, out, NULL, chunk_size, 0);
 #elif defined(USE_SENDFILE64)
             sendfile64(out, in, NULL, chunk_size);
+#else
+#error
 #endif
+        TR_ASSERT(copied == -1 || copied >= 0); /* -1 for error; some non-negative value otherwise. */
 
-        if (copied < 0)
+        if (copied == -1)
         {
             set_system_error(error, errno);
             break;
@@ -530,11 +525,8 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, uint64_t file_
 
     /* Fallback to user-space copy. */
 
-    char* buf = NULL;
     size_t const buflen = 1024 * 1024; /* 1024 KiB buffer */
-    /* XXX buflen should be configurable. */
-    buf = tr_valloc(buflen);
-    /* XXX handle bad buf */
+    char* buf = tr_valloc(buflen);
 
     while (file_size > 0)
     {
@@ -574,7 +566,7 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, uint64_t file_
 
     return true;
 
-#endif /* __APPLE__ && HAVE_COPYFILE */
+#endif /* USE_COPYFILE */
 }
 
 bool tr_sys_path_remove(char const* path, tr_error** error)

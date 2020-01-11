@@ -134,9 +134,7 @@ static int test_copy_file(void)
     path2 = tr_buildPath(sandbox_path, filename2, NULL);
 
     /* Copy it. */
-    tr_sys_path_info info1;
-    check(tr_sys_path_get_info(path1, 0, &info1, NULL));
-    check(tr_sys_path_copy(path1, path2, info1.size, NULL));
+    check(tr_sys_path_copy(path1, path2, NULL));
 
     /* Verify the files are identical. */
     int const result = files_are_identical(path1, path2);

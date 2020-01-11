@@ -733,15 +733,11 @@ bool tr_sys_path_rename(char const* src_path, char const* dst_path, tr_error** e
     return ret;
 }
 
-bool tr_sys_path_copy(char const* src_path, char const* dst_path, uint64_t unused UNUSED, tr_error** error)
+bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** error)
 {
-    DWORD const flags =
-#ifdef COPY_FILE_ALLOW_DECRYPTED_DESTINATION
-        COPY_FILE_ALLOW_DECRYPTED_DESTINATION;
-#else
-        0;
-#endif
-    if (CopyFileExA(src_path, dst_path, NULL, NULL, false, flags) == 0)
+    LPBOOL cancel = FALSE;
+    DWORD const flags = COPY_FILE_ALLOW_DECRYPTED_DESTINATION | COPY_FILE_FAIL_IF_EXISTS;
+    if (CopyFileExW(src_path, dst_path, NULL, NULL, &cancel, flags) == 0)
     {
         set_system_error(error, GetLastError());
         return false;
