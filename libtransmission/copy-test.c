@@ -59,13 +59,9 @@ static bool files_are_identical(char const* fn1, char const* fn2)
     bool result;
     size_t const buflen = 2 * 1024 * 1024; /* 2 MiB buffer */
 
-    fd1 = tr_sys_file_open(fn1, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0,
-        NULL);
-    check_bool(fd1 != TR_BAD_SYS_FILE, ==, true);
-
-    fd2 = tr_sys_file_open(fn2, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0,
-        NULL);
-    check_bool(fd2 != TR_BAD_SYS_FILE, ==, true);
+    fd1 = tr_sys_file_open(fn1, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, NULL);
+    fd2 = tr_sys_file_open(fn2, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, NULL);
+    check(fd1 != TR_BAD_SYS_FILE && fd2 != TR_BAD_SYS_FILE);
 
     tr_sys_file_get_info(fd1, &info1, NULL);
     tr_sys_file_get_info(fd2, &info2, NULL);
@@ -78,16 +74,16 @@ static bool files_are_identical(char const* fn1, char const* fn2)
 
     readbuf1 = tr_valloc(buflen);
     readbuf2 = tr_valloc(buflen);
-    TR_ASSERT(readbuf1);
-    TR_ASSERT(readbuf2);
 
     uint64_t bytes_left1 = info1.size;
     uint64_t bytes_left2 = info2.size;
-    while (bytes_left1 || bytes_left2)
+    check_uint(info1.size, ==, info2.size);
+
+    while (bytes_left1 > 0 || bytes_left2 > 0)
     {
         bytes_left1 = fill_buffer_from_fd(fd1, bytes_left1, readbuf1, buflen);
         bytes_left2 = fill_buffer_from_fd(fd2, bytes_left2, readbuf2, buflen);
-        TR_ASSERT(bytes_left1 == bytes_left2);
+        check_uint(bytes_left1, ==, bytes_left2);
 
         if (memcmp(readbuf1, readbuf2, buflen))
         {
@@ -157,11 +153,11 @@ static int test_copy_file(void)
 
     /* Copy it. */
     tr_sys_path_info info1;
-    check_bool(tr_sys_path_get_info(path1, 0, &info1, NULL), ==, true);
-    check_bool(tr_sys_path_copy(path1, path2, info1.size, NULL), ==, true);
+    check(tr_sys_path_get_info(path1, 0, &info1, NULL));
+    check(tr_sys_path_copy(path1, path2, info1.size, NULL));
 
     /* Verify the files are identical. */
-    check_bool(files_are_identical(path1, path2), ==, true);
+    check(files_are_identical(path1, path2));
 
     /* Dispose of those files that we created. */
     if (!reference_file)
@@ -182,14 +178,7 @@ static int test_copy_file(void)
 
 int main(int argc, char* argv[])
 {
-    if (argc == 2)
-    {
-        reference_file = argv[1];
-    }
-    else
-    {
-        reference_file = NULL;
-    }
+    reference_file = (argc == 2) ? argv[1] : NULL;
 
     testFunc const tests[] =
     {
@@ -204,3 +193,4 @@ int main(int argc, char* argv[])
 
     return result;
 }
+
