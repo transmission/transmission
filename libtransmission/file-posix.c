@@ -474,14 +474,14 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** err
     tr_sys_file_t in = tr_sys_file_open(src_path, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, error);
     if (in == TR_BAD_SYS_FILE)
     {
-        tr_error_prefix(error, "Unable to open old file: ");
+        tr_error_prefix(error, "Unable to open source file: ");
         return false;
     }
 
     tr_sys_path_info info;
     if (!tr_sys_file_get_info(in, &info, error))
     {
-        tr_error_prefix(error, "Unable to get information on old file: ");
+        tr_error_prefix(error, "Unable to get information on source file: ");
         tr_sys_file_close(in, NULL);
         return false;
     }
@@ -489,7 +489,7 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** err
     tr_sys_file_t out = tr_sys_file_open(dst_path, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE, 0666, error);
     if (out == TR_BAD_SYS_FILE)
     {
-        tr_error_prefix(error, "Unable to open new file: ");
+        tr_error_prefix(error, "Unable to open destination file: ");
         tr_sys_file_close(in, NULL);
         return false;
     }
