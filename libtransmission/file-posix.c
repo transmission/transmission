@@ -31,7 +31,7 @@
 /* OS-specific file copy (copy_file_range, sendfile64, or copyfile). */
 #if defined(__linux__)
 #   include <linux/version.h>
-    /* Linux's copy_file_range(2) is buggy prior to 5.3. */
+/* Linux's copy_file_range(2) is buggy prior to 5.3. */
 #   if defined(HAVE_COPY_FILE_RANGE) && LINUX_VERSION_CODE >= KERNEL_VERSION(5, 3, 0)
 #       define USE_COPY_FILE_RANGE
 #   elif defined(HAVE_SENDFILE64)
@@ -45,7 +45,7 @@
 #   endif
 #   define USE_COPYFILE
 #elif defined(HAVE_COPY_FILE_RANGE)
-    /* Presently this is only FreeBSD 13+. */
+/* Presently this is only FreeBSD 13+. */
 #   define USE_COPY_FILE_RANGE
 #endif /* __linux__ */
 
@@ -466,6 +466,7 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** err
         set_system_error(error, errno);
         return false;
     }
+
     return true;
 
 #else /* USE_COPYFILE */

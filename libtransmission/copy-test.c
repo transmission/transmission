@@ -20,7 +20,7 @@
 ****
 ***/
 
-#define RANDOM_FILE_LENGTH  (1024*1024*128) /* 128 MiB */
+#define RANDOM_FILE_LENGTH  (1024 * 1024 * 128) /* 128 MiB */
 
 char* sandbox_path;
 char* reference_file;
@@ -104,6 +104,7 @@ static void get_random_string(char* buffer, size_t length)
         {
             break;
         }
+
         buffer[0] = '\1'; /* Biases the samples towards 0x1 but whiteness is not important for this application. */
         ++buffer;
     }
@@ -177,4 +178,3 @@ int main(int argc, char* argv[])
 
     return result;
 }
-
