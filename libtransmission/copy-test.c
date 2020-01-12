@@ -85,31 +85,6 @@ static int files_are_identical(char const* fn1, char const* fn2)
     return 0;
 }
 
-static void get_random_string(char* buffer, size_t length)
-{
-    TR_ASSERT(length > 1);
-
-    /* Obtain a stream of random bytes. */
-    tr_rand_buffer(buffer, length - 1);
-
-    /* Add a terminating null. */
-    buffer[length - 1] = '\0';
-
-    /* Replace embedded nulls, except the terminating one. */
-    char* end = buffer + length - 1;
-    while (end > buffer)
-    {
-        buffer = memchr(buffer, '\0', end - buffer);
-        if (buffer == NULL)
-        {
-            break;
-        }
-
-        buffer[0] = '\1'; /* Biases the samples towards 0x1 but whiteness is not important for this application. */
-        ++buffer;
-    }
-}
-
 static int test_copy_file(void)
 {
     char const* filename1 = "orig-blob.txt";
@@ -122,8 +97,8 @@ static int test_copy_file(void)
 
         /* Create a file. */
         char* file_content = tr_valloc(RANDOM_FILE_LENGTH);
-        get_random_string(file_content, RANDOM_FILE_LENGTH);
-        libtest_create_file_with_string_contents(path1, file_content);
+        tr_rand_buffer(file_content, RANDOM_FILE_LENGTH);
+        libtest_create_file_with_contents(path1, file_content, RANDOM_FILE_LENGTH);
         tr_free(file_content);
     }
     else
