@@ -733,21 +733,35 @@ bool tr_sys_path_rename(char const* src_path, char const* dst_path, tr_error** e
     return ret;
 }
 
-bool tr_sys_path_copy(char const* src_path, char const* dst_path, uint64_t unused UNUSED, tr_error** error)
+bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** error)
 {
-    DWORD const flags =
-#ifdef COPY_FILE_ALLOW_DECRYPTED_DESTINATION
-        COPY_FILE_ALLOW_DECRYPTED_DESTINATION;
-#else
-        0;
-#endif
-    if (CopyFileExA(src_path, dst_path, NULL, NULL, false, flags) == 0)
+    bool ret = false;
+
+    wchar_t* wide_src_path = path_to_native_path(src_path);
+    wchar_t* wide_dst_path = path_to_native_path(dst_path);
+
+    if (wide_src_path == NULL || wide_dst_path == NULL)
     {
-        set_system_error(error, GetLastError());
-        return false;
+        goto out;
     }
 
-    return true;
+    LPBOOL cancel = FALSE;
+    DWORD const flags = COPY_FILE_ALLOW_DECRYPTED_DESTINATION | COPY_FILE_FAIL_IF_EXISTS;
+    if (CopyFileExW(wide_src_path, wide_dst_path, NULL, NULL, &cancel, flags) == 0)
+    {
+        set_system_error(error, GetLastError());
+        goto out;
+    }
+    else
+    {
+        ret = true;
+    }
+
+out:
+    tr_free(wide_src_path);
+    tr_free(wide_dst_path);
+
+    return ret;
 }
 
 bool tr_sys_path_remove(char const* path, tr_error** error)

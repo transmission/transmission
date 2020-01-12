@@ -10,6 +10,7 @@
 #include <string.h> /* memcmp() */
 
 #include "transmission.h"
+#include "crypto-utils.h"
 #include "file.h"
 #include "tr-assert.h"
 
@@ -19,11 +20,10 @@
 ****
 ***/
 
+#define RANDOM_FILE_LENGTH  (1024 * 1024 * 128) /* 128 MiB */
+
 char* sandbox_path;
 char* reference_file;
-
-static char const file_content[] =
-    "mZJ0sMGOB9eHtni1DaBdjWYHINl6todyJi2zrUYrkhp8ALva48aP6XJybsPYKOxtO9n49EdqoMf7W5dBOYct7RKJNi4AP2yvmpU9TgQXXeffdNIE8M4wPD9Vp7H2AbwsJXhVz51sxjmC4mCwmAsE531INqtW14w7HYAkPNvccXtiYxa97bSM7lKINA9V0D8o4NknP3HKLTsfDTnnJ0AgxrSZv4R5XjonswreBWwW3NVaEfWVUhnJpMh0B0hJ0QiFX3uBEuka9DKt0GIWNfa0cBSJteUXNnslb6GLOgwXPFLoyfK3G0HfDQ6ofG9aiXcBARCKMPRa9DX5uVKiyYwVD3FuUkbBig7FW7n9e8XqZGpE3sXTM4hVG335L1Tx7eRH2b3KZBQsFEjn9dNzEF1seHRlB4x1uw2Iiebkmgn1UfLpLiUdDzP2QmBQnhWe2NP4eC5Dhd25hhlYJgStjSBcKLJOYDgCy1lmypVXULUZPCOm7hNg4M19qirBp8m5GTScwFvhEntMnxaIrLbWq7SQeKPaMJnlVdlSxOMJtzhNsEHaFRLAf90Zr6dNR9yCdydeNQ0qCNI17SXOXDSEYUGlInZioxilxI2V4Ewd6zhMGNjikMm9jj51lGDHyQnPq7W9oRS0kGWjUwFT8oASGjpWlexo6BMTlG4BDnGLKLYqniV4jCyRpF7UWqmCyMh3H8q7e6JqR0dIZc11OU9VCI9GIfKb0KroE9wnLii7CKLlVJZXtIrxILt13NjPd8if5HfLOyuQVp52jfdjVgTkPVPONBzRieEYYAQwRlmUdJkYoVuP5sxzwH7p6rl74Gl1ApKxFsYCj5dZdxkWe9M2ToUi1qp8ACOK2YtYyxDqG93eDfxQPCdNEL7dZvK8LaBG0h5r96gZ9GwMXM7VBirpkV3HXkxxjK53WDYGMvtbZ5NXi2NTqmXTbvqZHbyGPFXfNSbMUqPToC2INdF0oIQ3Fho22LvNXUWD73s61RPOgHB3%";
 
 /***
 ****
@@ -50,61 +50,39 @@ static uint64_t fill_buffer_from_fd(tr_sys_file_t fd, uint64_t bytes_remaining, 
     return bytes_remaining;
 }
 
-static bool files_are_identical(char const* fn1, char const* fn2)
+static int files_are_identical(char const* fn1, char const* fn2)
 {
-    tr_sys_file_t fd1, fd2;
+    tr_sys_file_t fd1 = tr_sys_file_open(fn1, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, NULL);
+    tr_sys_file_t fd2 = tr_sys_file_open(fn2, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, NULL);
+    check(fd1 != TR_BAD_SYS_FILE && fd2 != TR_BAD_SYS_FILE);
+
     tr_sys_path_info info1, info2;
-    char* readbuf1 = NULL;
-    char* readbuf2 = NULL;
-    bool result;
-    size_t const buflen = 2 * 1024 * 1024; /* 2 MiB buffer */
-
-    fd1 = tr_sys_file_open(fn1, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0,
-        NULL);
-    check_bool(fd1 != TR_BAD_SYS_FILE, ==, true);
-
-    fd2 = tr_sys_file_open(fn2, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0,
-        NULL);
-    check_bool(fd2 != TR_BAD_SYS_FILE, ==, true);
-
     tr_sys_file_get_info(fd1, &info1, NULL);
     tr_sys_file_get_info(fd2, &info2, NULL);
-
-    if (info1.size != info2.size)
-    {
-        result = false;
-        goto out;
-    }
-
-    readbuf1 = tr_valloc(buflen);
-    readbuf2 = tr_valloc(buflen);
-    TR_ASSERT(readbuf1);
-    TR_ASSERT(readbuf2);
+    check_uint(info1.size, ==, info2.size);
 
     uint64_t bytes_left1 = info1.size;
     uint64_t bytes_left2 = info2.size;
-    while (bytes_left1 || bytes_left2)
+
+    size_t const buflen = 2 * 1024 * 1024; /* 2 MiB buffer */
+    char* readbuf1 = tr_valloc(buflen);
+    char* readbuf2 = tr_valloc(buflen);
+
+    while (bytes_left1 > 0 || bytes_left2 > 0)
     {
         bytes_left1 = fill_buffer_from_fd(fd1, bytes_left1, readbuf1, buflen);
         bytes_left2 = fill_buffer_from_fd(fd2, bytes_left2, readbuf2, buflen);
-        TR_ASSERT(bytes_left1 == bytes_left2);
 
-        if (memcmp(readbuf1, readbuf2, buflen))
-        {
-            result = false;
-            goto out;
-        }
+        check_uint(bytes_left1, ==, bytes_left2);
+        check_mem(readbuf1, ==, readbuf2, buflen);
     }
 
-    result = true;
-
-out:
     tr_free(readbuf1);
     tr_free(readbuf2);
     tr_sys_file_close(fd1, NULL);
     tr_sys_file_close(fd2, NULL);
 
-    return result;
+    return 0;
 }
 
 static int test_copy_file(void)
@@ -116,8 +94,12 @@ static int test_copy_file(void)
     if (!reference_file)
     {
         path1 = tr_buildPath(sandbox_path, filename1, NULL);
+
         /* Create a file. */
-        libtest_create_file_with_string_contents(path1, file_content);
+        char* file_content = tr_valloc(RANDOM_FILE_LENGTH);
+        tr_rand_buffer(file_content, RANDOM_FILE_LENGTH);
+        libtest_create_file_with_contents(path1, file_content, RANDOM_FILE_LENGTH);
+        tr_free(file_content);
     }
     else
     {
@@ -128,12 +110,14 @@ static int test_copy_file(void)
     path2 = tr_buildPath(sandbox_path, filename2, NULL);
 
     /* Copy it. */
-    tr_sys_path_info info1;
-    check_bool(tr_sys_path_get_info(path1, 0, &info1, NULL), ==, true);
-    check_bool(tr_sys_path_copy(path1, path2, info1.size, NULL), ==, true);
+    check(tr_sys_path_copy(path1, path2, NULL));
 
     /* Verify the files are identical. */
-    check_bool(files_are_identical(path1, path2), ==, true);
+    int const result = files_are_identical(path1, path2);
+    if (result > 0)
+    {
+        return result;
+    }
 
     /* Dispose of those files that we created. */
     if (!reference_file)
@@ -154,14 +138,7 @@ static int test_copy_file(void)
 
 int main(int argc, char* argv[])
 {
-    if (argc == 2)
-    {
-        reference_file = argv[1];
-    }
-    else
-    {
-        reference_file = NULL;
-    }
+    reference_file = (argc == 2) ? argv[1] : NULL;
 
     testFunc const tests[] =
     {
