@@ -243,16 +243,16 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     connect(ui.action_Quit, SIGNAL(triggered()), qApp, SLOT(quit()));
 
     auto refreshActionSensitivitySoon = [this]() { refreshSoon(REFRESH_ACTION_SENSITIVITY); };
-    connect(&myFilterModel, &TorrentFilter::rowsInserted, refreshActionSensitivitySoon);
-    connect(&myFilterModel, &TorrentFilter::rowsRemoved, refreshActionSensitivitySoon);
+    connect(&myFilterModel, &TorrentFilter::rowsInserted, this, refreshActionSensitivitySoon);
+    connect(&myFilterModel, &TorrentFilter::rowsRemoved, this, refreshActionSensitivitySoon);
 
     // torrent view
     myFilterModel.setSourceModel(&myModel);
     auto refreshSoonAdapter = [this]() { refreshSoon(); };
-    connect(&myModel, &TorrentModel::modelReset, refreshSoonAdapter);
-    connect(&myModel, &TorrentModel::rowsRemoved, refreshSoonAdapter);
-    connect(&myModel, &TorrentModel::rowsInserted, refreshSoonAdapter);
-    connect(&myModel, &TorrentModel::dataChanged, refreshSoonAdapter);
+    connect(&myModel, &TorrentModel::modelReset, this, refreshSoonAdapter);
+    connect(&myModel, &TorrentModel::rowsRemoved, this, refreshSoonAdapter);
+    connect(&myModel, &TorrentModel::rowsInserted, this, refreshSoonAdapter);
+    connect(&myModel, &TorrentModel::dataChanged, this, refreshSoonAdapter);
 
     ui.listView->setModel(&myFilterModel);
     connect(ui.listView->selectionModel(), &QItemSelectionModel::selectionChanged, refreshActionSensitivitySoon);
@@ -313,10 +313,10 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     ui.verticalLayout->insertWidget(0, myFilterBar = new FilterBar(myPrefs, myModel, myFilterModel));
 
     auto refreshHeaderSoon = [this]() { refreshSoon(REFRESH_TORRENT_VIEW_HEADER); };
-    connect(&myModel, &TorrentModel::rowsInserted, refreshHeaderSoon);
-    connect(&myModel, &TorrentModel::rowsRemoved, refreshHeaderSoon);
-    connect(&myFilterModel, &TorrentFilter::rowsInserted, refreshHeaderSoon);
-    connect(&myFilterModel, &TorrentFilter::rowsRemoved, refreshHeaderSoon);
+    connect(&myModel, &TorrentModel::rowsInserted, this, refreshHeaderSoon);
+    connect(&myModel, &TorrentModel::rowsRemoved, this, refreshHeaderSoon);
+    connect(&myFilterModel, &TorrentFilter::rowsInserted, this, refreshHeaderSoon);
+    connect(&myFilterModel, &TorrentFilter::rowsRemoved, this, refreshHeaderSoon);
     connect(ui.listView, SIGNAL(headerDoubleClicked()), myFilterBar, SLOT(clear()));
 
     QList<int> initKeys;
@@ -332,7 +332,7 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
 
     auto refreshStatusSoon = [this]() { refreshSoon(REFRESH_STATUS_BAR); };
     connect(&mySession, SIGNAL(sourceChanged()), this, SLOT(onSessionSourceChanged()));
-    connect(&mySession, &Session::statsUpdated, refreshStatusSoon);
+    connect(&mySession, &Session::statsUpdated, this, refreshStatusSoon);
     connect(&mySession, SIGNAL(dataReadProgress()), this, SLOT(dataReadProgress()));
     connect(&mySession, SIGNAL(dataSendProgress()), this, SLOT(dataSendProgress()));
     connect(&mySession, SIGNAL(httpAuthenticationRequired()), this, SLOT(wrongAuthentication()));
