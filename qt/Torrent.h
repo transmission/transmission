@@ -592,14 +592,6 @@ public:
     static KeyList const mainStatKeys;
 
 private:
-    struct Property
-    {
-        int id;
-        tr_quark key;
-        int type;
-    };
-
-private:
     int getInt(int key) const;
     bool getBool(int key) const;
     QIcon getIcon(int key) const;
@@ -627,8 +619,6 @@ private:
     Prefs const& myPrefs;
     QVariant myValues[PROPERTY_COUNT];
     FileList myFiles;
-
-    static Property myProperties[];
 };
 
 Q_DECLARE_METATYPE(Torrent const*)

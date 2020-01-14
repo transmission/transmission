@@ -23,80 +23,68 @@
 #include "Torrent.h"
 #include "Utils.h"
 
-Torrent::Torrent(Prefs const& prefs, int id) :
-    myId(id),
-    myPrefs(prefs)
+struct Property
 {
-#ifndef NDEBUG
+    int id;
+    tr_quark key;
+    int type;
+};
 
-    for (int i = 0; i < PROPERTY_COUNT; ++i)
-    {
-        assert(myProperties[i].id == i);
-    }
-
-#endif
-
-    setIcon(MIME_ICON, Utils::getFileIcon());
-}
-
-/***
-****
-***/
-
-Torrent::Property Torrent::myProperties[] =
+Property constexpr myProperties[] =
 {
-    { UPLOAD_SPEED, TR_KEY_rateUpload, QVariant::ULongLong } /* Bps */,
-    { DOWNLOAD_SPEED, TR_KEY_rateDownload, QVariant::ULongLong }, /* Bps */
-    { DOWNLOAD_DIR, TR_KEY_downloadDir, QVariant::String },
-    { ACTIVITY, TR_KEY_status, QVariant::Int },
-    { NAME, TR_KEY_name, QVariant::String },
-    { ERROR, TR_KEY_error, QVariant::Int },
-    { ERROR_STRING, TR_KEY_errorString, QVariant::String },
-    { SIZE_WHEN_DONE, TR_KEY_sizeWhenDone, QVariant::ULongLong },
-    { LEFT_UNTIL_DONE, TR_KEY_leftUntilDone, QVariant::ULongLong },
-    { HAVE_UNCHECKED, TR_KEY_haveUnchecked, QVariant::ULongLong },
-    { HAVE_VERIFIED, TR_KEY_haveValid, QVariant::ULongLong },
-    { DESIRED_AVAILABLE, TR_KEY_desiredAvailable, QVariant::ULongLong },
-    { TOTAL_SIZE, TR_KEY_totalSize, QVariant::ULongLong },
-    { PIECE_SIZE, TR_KEY_pieceSize, QVariant::ULongLong },
-    { PIECE_COUNT, TR_KEY_pieceCount, QVariant::Int },
-    { PEERS_GETTING_FROM_US, TR_KEY_peersGettingFromUs, QVariant::Int },
-    { PEERS_SENDING_TO_US, TR_KEY_peersSendingToUs, QVariant::Int },
-    { WEBSEEDS_SENDING_TO_US, TR_KEY_webseedsSendingToUs, QVariant::Int },
-    { PERCENT_DONE, TR_KEY_percentDone, QVariant::Double },
-    { METADATA_PERCENT_DONE, TR_KEY_metadataPercentComplete, QVariant::Double },
-    { PERCENT_VERIFIED, TR_KEY_recheckProgress, QVariant::Double },
-    { DATE_ACTIVITY, TR_KEY_activityDate, QVariant::DateTime },
-    { DATE_ADDED, TR_KEY_addedDate, QVariant::DateTime },
-    { DATE_STARTED, TR_KEY_startDate, QVariant::DateTime },
-    { DATE_CREATED, TR_KEY_dateCreated, QVariant::DateTime },
-    { PEERS_CONNECTED, TR_KEY_peersConnected, QVariant::Int },
-    { ETA, TR_KEY_eta, QVariant::Int },
-    { DOWNLOADED_EVER, TR_KEY_downloadedEver, QVariant::ULongLong },
-    { UPLOADED_EVER, TR_KEY_uploadedEver, QVariant::ULongLong },
-    { FAILED_EVER, TR_KEY_corruptEver, QVariant::ULongLong },
-    { TRACKERSTATS, TR_KEY_trackerStats, CustomVariantType::TrackerStatsList },
-    { MIME_ICON, TR_KEY_NONE, QVariant::Icon },
-    { SEED_RATIO_LIMIT, TR_KEY_seedRatioLimit, QVariant::Double },
-    { SEED_RATIO_MODE, TR_KEY_seedRatioMode, QVariant::Int },
-    { SEED_IDLE_LIMIT, TR_KEY_seedIdleLimit, QVariant::Int },
-    { SEED_IDLE_MODE, TR_KEY_seedIdleMode, QVariant::Int },
-    { DOWN_LIMIT, TR_KEY_downloadLimit, QVariant::Int }, /* KB/s */
-    { DOWN_LIMITED, TR_KEY_downloadLimited, QVariant::Bool },
-    { UP_LIMIT, TR_KEY_uploadLimit, QVariant::Int }, /* KB/s */
-    { UP_LIMITED, TR_KEY_uploadLimited, QVariant::Bool },
-    { HONORS_SESSION_LIMITS, TR_KEY_honorsSessionLimits, QVariant::Bool },
-    { PEER_LIMIT, TR_KEY_peer_limit, QVariant::Int },
-    { HASH_STRING, TR_KEY_hashString, QVariant::String },
-    { IS_FINISHED, TR_KEY_isFinished, QVariant::Bool },
-    { IS_PRIVATE, TR_KEY_isPrivate, QVariant::Bool },
-    { IS_STALLED, TR_KEY_isStalled, QVariant::Bool },
-    { COMMENT, TR_KEY_comment, QVariant::String },
-    { CREATOR, TR_KEY_creator, QVariant::String },
-    { MANUAL_ANNOUNCE_TIME, TR_KEY_manualAnnounceTime, QVariant::DateTime },
-    { PEERS, TR_KEY_peers, CustomVariantType::PeerList },
-    { BANDWIDTH_PRIORITY, TR_KEY_bandwidthPriority, QVariant::Int },
-    { QUEUE_POSITION, TR_KEY_queuePosition, QVariant::Int },
+    { Torrent::UPLOAD_SPEED, TR_KEY_rateUpload, QVariant::ULongLong } /* Bps */,
+    { Torrent::DOWNLOAD_SPEED, TR_KEY_rateDownload, QVariant::ULongLong }, /* Bps */
+    { Torrent::DOWNLOAD_DIR, TR_KEY_downloadDir, QVariant::String },
+    { Torrent::ACTIVITY, TR_KEY_status, QVariant::Int },
+    { Torrent::NAME, TR_KEY_name, QVariant::String },
+    { Torrent::ERROR, TR_KEY_error, QVariant::Int },
+    { Torrent::ERROR_STRING, TR_KEY_errorString, QVariant::String },
+    { Torrent::SIZE_WHEN_DONE, TR_KEY_sizeWhenDone, QVariant::ULongLong },
+    { Torrent::LEFT_UNTIL_DONE, TR_KEY_leftUntilDone, QVariant::ULongLong },
+    { Torrent::HAVE_UNCHECKED, TR_KEY_haveUnchecked, QVariant::ULongLong },
+    { Torrent::HAVE_VERIFIED, TR_KEY_haveValid, QVariant::ULongLong },
+    { Torrent::DESIRED_AVAILABLE, TR_KEY_desiredAvailable, QVariant::ULongLong },
+    { Torrent::TOTAL_SIZE, TR_KEY_totalSize, QVariant::ULongLong },
+    { Torrent::PIECE_SIZE, TR_KEY_pieceSize, QVariant::ULongLong },
+    { Torrent::PIECE_COUNT, TR_KEY_pieceCount, QVariant::Int },
+    { Torrent::PEERS_GETTING_FROM_US, TR_KEY_peersGettingFromUs, QVariant::Int },
+    { Torrent::PEERS_SENDING_TO_US, TR_KEY_peersSendingToUs, QVariant::Int },
+    { Torrent::WEBSEEDS_SENDING_TO_US, TR_KEY_webseedsSendingToUs, QVariant::Int },
+    { Torrent::PERCENT_DONE, TR_KEY_percentDone, QVariant::Double },
+    { Torrent::METADATA_PERCENT_DONE, TR_KEY_metadataPercentComplete, QVariant::Double },
+    { Torrent::PERCENT_VERIFIED, TR_KEY_recheckProgress, QVariant::Double },
+    { Torrent::DATE_ACTIVITY, TR_KEY_activityDate, QVariant::DateTime },
+    { Torrent::DATE_ADDED, TR_KEY_addedDate, QVariant::DateTime },
+    { Torrent::DATE_STARTED, TR_KEY_startDate, QVariant::DateTime },
+    { Torrent::DATE_CREATED, TR_KEY_dateCreated, QVariant::DateTime },
+    { Torrent::PEERS_CONNECTED, TR_KEY_peersConnected, QVariant::Int },
+    { Torrent::ETA, TR_KEY_eta, QVariant::Int },
+    { Torrent::DOWNLOADED_EVER, TR_KEY_downloadedEver, QVariant::ULongLong },
+    { Torrent::UPLOADED_EVER, TR_KEY_uploadedEver, QVariant::ULongLong },
+    { Torrent::FAILED_EVER, TR_KEY_corruptEver, QVariant::ULongLong },
+    { Torrent::TRACKERSTATS, TR_KEY_trackerStats, CustomVariantType::TrackerStatsList },
+    { Torrent::MIME_ICON, TR_KEY_NONE, QVariant::Icon },
+    { Torrent::SEED_RATIO_LIMIT, TR_KEY_seedRatioLimit, QVariant::Double },
+    { Torrent::SEED_RATIO_MODE, TR_KEY_seedRatioMode, QVariant::Int },
+    { Torrent::SEED_IDLE_LIMIT, TR_KEY_seedIdleLimit, QVariant::Int },
+    { Torrent::SEED_IDLE_MODE, TR_KEY_seedIdleMode, QVariant::Int },
+    { Torrent::DOWN_LIMIT, TR_KEY_downloadLimit, QVariant::Int }, /* KB/s */
+    { Torrent::DOWN_LIMITED, TR_KEY_downloadLimited, QVariant::Bool },
+    { Torrent::UP_LIMIT, TR_KEY_uploadLimit, QVariant::Int }, /* KB/s */
+    { Torrent::UP_LIMITED, TR_KEY_uploadLimited, QVariant::Bool },
+    { Torrent::HONORS_SESSION_LIMITS, TR_KEY_honorsSessionLimits, QVariant::Bool },
+    { Torrent::PEER_LIMIT, TR_KEY_peer_limit, QVariant::Int },
+    { Torrent::HASH_STRING, TR_KEY_hashString, QVariant::String },
+    { Torrent::IS_FINISHED, TR_KEY_isFinished, QVariant::Bool },
+    { Torrent::IS_PRIVATE, TR_KEY_isPrivate, QVariant::Bool },
+    { Torrent::IS_STALLED, TR_KEY_isStalled, QVariant::Bool },
+    { Torrent::COMMENT, TR_KEY_comment, QVariant::String },
+    { Torrent::CREATOR, TR_KEY_creator, QVariant::String },
+    { Torrent::MANUAL_ANNOUNCE_TIME, TR_KEY_manualAnnounceTime, QVariant::DateTime },
+    { Torrent::PEERS, TR_KEY_peers, CustomVariantType::PeerList },
+    { Torrent::BANDWIDTH_PRIORITY, TR_KEY_bandwidthPriority, QVariant::Int },
+    { Torrent::QUEUE_POSITION, TR_KEY_queuePosition, QVariant::Int },
+    { Torrent::EDIT_DATE, TR_KEY_editDate, QVariant::Int },
 };
 
 /***
@@ -179,6 +167,36 @@ Torrent::KeyList const Torrent::detailStatKeys{
     TR_KEY_uploadLimit,
     TR_KEY_uploadLimited
 };
+
+/***
+****
+***/
+
+Torrent::Torrent(Prefs const& prefs, int id) :
+    myId(id),
+    myPrefs(prefs)
+{
+    static_assert(TR_N_ELEMENTS(myProperties) == PROPERTY_COUNT);
+
+    static_assert(([] () constexpr
+    {
+        int i = 0;
+
+        for (auto const& property : myProperties)
+        {
+            if (property.id != i)
+            {
+                return false;
+            }
+
+            ++i;
+        }
+
+        return true;
+    })());
+
+    setIcon(MIME_ICON, Utils::getFileIcon());
+}
 
 /***
 ****
