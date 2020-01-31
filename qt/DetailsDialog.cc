@@ -28,6 +28,7 @@
 #include <QStringList>
 #include <QStyle>
 #include <QTreeWidgetItem>
+#include <QStringList>
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h> // tr_getRatio()
@@ -1289,39 +1290,43 @@ void DetailsDialog::onTrackerSelectionChanged()
 void DetailsDialog::onAddTrackerClicked()
 {
     bool ok = false;
-    QString const url = QInputDialog::getText(this, tr("Add URL "), tr("Add tracker announce URL:"), QLineEdit::Normal,
+    QString const urlsString = QInputDialog::getText(this, tr("Add URL "), tr("Add tracker announce URL or comma separated list of URLs:"), QLineEdit::Normal,
         QString(), &ok);
+    QStringList const urlsList = urlsString.split(QString::fromLatin1(","), QString::SkipEmptyParts);
+    for (int i = 0; i < urlsList.size(); ++i) {
+        QString const url = urlsList.at(i).trimmed();
 
-    if (!ok)
-    {
-        // user pressed "cancel" -- noop
-    }
-    else if (!QUrl(url).isValid())
-    {
-        QMessageBox::warning(this, tr("Error"), tr("Invalid URL \"%1\"").arg(url));
-    }
-    else
-    {
-        torrent_ids_t ids;
-
-        for (int const id : myIds)
+        if (!ok)
         {
-            if (myTrackerModel->find(id, url) == -1)
-            {
-                ids.insert(id);
-            }
+            // user pressed "cancel" -- noop
         }
-
-        if (ids.empty()) // all the torrents already have this tracker
+        else if (!QUrl(url).isValid())
         {
-            QMessageBox::warning(this, tr("Error"), tr("Tracker already exists."));
+            QMessageBox::warning(this, tr("Error"), tr("Invalid URL \"%1\"").arg(url));
         }
         else
         {
-            QStringList urls;
-            urls << url;
-            mySession.torrentSet(ids, TR_KEY_trackerAdd, urls);
-            getNewData();
+            torrent_ids_t ids;
+
+            for (int const id : myIds)
+            {
+                if (myTrackerModel->find(id, url) == -1)
+                {
+                    ids.insert(id);
+                }
+            }
+
+            if (ids.empty()) // all the torrents already have this tracker
+            {
+                QMessageBox::warning(this, tr("Error"), tr("Tracker already exists."));
+            }
+            else
+            {
+                QStringList urls;
+                urls << url;
+                mySession.torrentSet(ids, TR_KEY_trackerAdd, urls);
+                getNewData();
+            }
         }
     }
 }
