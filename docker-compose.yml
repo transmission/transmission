@@ -1,9 +1,23 @@
 version: '3'
 
 services:
+  daemon:
+    build:
+      context: .
+      dockerfile: docker/daemon/Dockerfile
+    volumes:
+    - ./daemon/settings.json:/root/.config/transmission-daemon/settings.json:ro
+    - ./web:/usr/local/share/transmission/web:ro
+    - downloads:/root/Downloads
+    ports:
+      - 9091:9091
+
   code_style:
     build: docker/code_style
     volumes:
       - .:/src
       - ./code_style.sh:/code_style.sh:ro
     command: ["/bin/sh", "/code_style.sh", "/src"]
+
+volumes:
+  downloads: {}
