@@ -29,6 +29,7 @@ extern "C"
 #include <stddef.h> /* size_t */
 #include <stdint.h> /* uintN_t */
 #include <time.h> /* time_t */
+#include <sys/types.h>
 
 #include "tr-macros.h"
 
