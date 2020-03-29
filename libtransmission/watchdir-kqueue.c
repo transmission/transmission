@@ -145,7 +145,7 @@ tr_watchdir_backend* tr_watchdir_kqueue_new(tr_watchdir_t handle)
 
     /* Create libevent task for event descriptor */
     if ((backend->event = event_new(tr_watchdir_get_event_base(handle), backend->kq, EV_READ | EV_ET | EV_PERSIST,
-            &tr_watchdir_kqueue_on_event, handle)) == NULL)
+        &tr_watchdir_kqueue_on_event, handle)) == NULL)
     {
         log_error("Failed to create event: %s", tr_strerror(errno));
         goto fail;

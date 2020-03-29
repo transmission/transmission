@@ -22,7 +22,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-#import "transmission.h"
+#include <libtransmission/transmission.h>
 
 @interface GlobalOptionsPopoverViewController : NSViewController
 {

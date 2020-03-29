@@ -20,14 +20,14 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#include <libtransmission/transmission.h>
+#include <libtransmission/utils.h>
+
 #import "FileNameCell.h"
 #import "FileOutlineView.h"
 #import "Torrent.h"
 #import "FileListNode.h"
 #import "NSStringAdditions.h"
-
-#import "transmission.h" // required by utils.h
-#import "utils.h"
 
 #define PADDING_HORIZONAL 2.0
 #define IMAGE_FOLDER_SIZE 16.0
@@ -115,7 +115,7 @@
     else
     {
         titleColor = [NSColor controlTextColor];
-        statusColor = [NSColor darkGrayColor];
+        statusColor = [NSColor secondaryLabelColor];
     }
 
     fTitleAttributes[NSForegroundColorAttributeName] = titleColor;

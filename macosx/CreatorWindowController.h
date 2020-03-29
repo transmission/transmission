@@ -21,8 +21,9 @@
  *****************************************************************************/
 
 #import <Cocoa/Cocoa.h>
-#import "transmission.h"
-#import "makemeta.h"
+
+#include <libtransmission/transmission.h>
+#include <libtransmission/makemeta.h>
 
 @interface CreatorWindowController : NSWindowController
 {

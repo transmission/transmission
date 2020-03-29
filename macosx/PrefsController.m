@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2005-2012 Transmission authors and contributors
+ * Copyright (c) 2005-2019 Transmission authors and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -20,6 +20,15 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#import <Foundation/Foundation.h>
+
+#import <Sparkle/Sparkle.h>
+
+#include <libtransmission/transmission.h>
+#include <libtransmission/utils.h>
+
+#import "VDKQueue.h"
+
 #import "PrefsController.h"
 #import "BlocklistDownloaderViewController.h"
 #import "BlocklistScheduler.h"
@@ -28,12 +37,6 @@
 #import "BonjourController.h"
 #import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
-#import "VDKQueue.h"
-
-#import "transmission.h"
-#import "utils.h"
-
-#import <Sparkle/Sparkle.h>
 
 #define DOWNLOAD_FOLDER     0
 #define DOWNLOAD_TORRENT    2
@@ -324,7 +327,7 @@
 #endif
 - (void) setAutoUpdateToBeta: (id) sender
 {
-    [[SUUpdater sharedUpdater] setAllowedTags: SPARKLE_TAG ? [NSSet setWithObject: @"beta"] : nil];
+    // TODO: Support beta releases (if/when necessary)
 }
 
 - (void) setPort: (id) sender

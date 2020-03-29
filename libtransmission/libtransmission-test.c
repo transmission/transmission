@@ -54,7 +54,7 @@ bool libtest_check(char const* file, int line, bool pass, bool condition, char c
 {
     if (should_print(pass))
     {
-        fprintf(stderr, "%s %s:%d: %s (%s)\n", pass ? "PASS" : "FAIL", file, line, condition_str, condition ? "true": "false");
+        fprintf(stderr, "%s %s:%d: %s (%s)\n", pass ? "PASS" : "FAIL", file, line, condition_str, condition ? "true" : "false");
     }
 
     return pass;
@@ -215,34 +215,36 @@ static void rm_rf(char const* killme)
 {
     tr_sys_path_info info;
 
-    if (tr_sys_path_get_info(killme, 0, &info, NULL))
+    if (!tr_sys_path_get_info(killme, 0, &info, NULL))
     {
-        tr_sys_dir_t odir;
-
-        if (info.type == TR_SYS_PATH_IS_DIRECTORY && (odir = tr_sys_dir_open(killme, NULL)) != TR_BAD_SYS_DIR)
-        {
-            char const* name;
-
-            while ((name = tr_sys_dir_read_name(odir, NULL)) != NULL)
-            {
-                if (strcmp(name, ".") != 0 && strcmp(name, "..") != 0)
-                {
-                    char* tmp = tr_buildPath(killme, name, NULL);
-                    rm_rf(tmp);
-                    tr_free(tmp);
-                }
-            }
-
-            tr_sys_dir_close(odir, NULL);
-        }
-
-        if (verbose)
-        {
-            fprintf(stderr, "cleanup: removing %s\n", killme);
-        }
-
-        tr_sys_path_remove(killme, NULL);
+        return;
     }
+
+    tr_sys_dir_t odir = info.type == TR_SYS_PATH_IS_DIRECTORY ? tr_sys_dir_open(killme, NULL) : TR_BAD_SYS_DIR;
+
+    if (odir != TR_BAD_SYS_DIR)
+    {
+        char const* name;
+
+        while ((name = tr_sys_dir_read_name(odir, NULL)) != NULL)
+        {
+            if (strcmp(name, ".") != 0 && strcmp(name, "..") != 0)
+            {
+                char* tmp = tr_buildPath(killme, name, NULL);
+                rm_rf(tmp);
+                tr_free(tmp);
+            }
+        }
+
+        tr_sys_dir_close(odir, NULL);
+    }
+
+    if (verbose)
+    {
+        fprintf(stderr, "cleanup: removing %s\n", killme);
+    }
+
+    tr_sys_path_remove(killme, NULL);
 }
 
 void libtest_sandbox_destroy(char const* sandbox)

@@ -87,68 +87,72 @@ static struct event_base* ev_base = NULL;
 static char const* getUsage(void)
 {
     return "Transmission " LONG_VERSION_STRING "  https://transmissionbt.com/\n"
-           "A fast and easy BitTorrent client\n"
-           "\n"
-           MY_NAME " is a headless Transmission session\n"
-           "that can be controlled via transmission-remote\n"
-           "or the web interface.\n"
-           "\n"
-           "Usage: " MY_NAME " [options]";
+        "A fast and easy BitTorrent client\n"
+        "\n"
+        MY_NAME " is a headless Transmission session\n"
+        "that can be controlled via transmission-remote\n"
+        "or the web interface.\n"
+        "\n"
+        "Usage: " MY_NAME " [options]";
 }
 
 static struct tr_option const options[] =
 {
-    { 'a', "allowed", "Allowed IP addresses. (Default: " TR_DEFAULT_RPC_WHITELIST ")", "a", 1, "<list>" },
-    { 'b', "blocklist", "Enable peer blocklists", "b", 0, NULL },
-    { 'B', "no-blocklist", "Disable peer blocklists", "B", 0, NULL },
-    { 'c', "watch-dir", "Where to watch for new .torrent files", "c", 1, "<directory>" },
-    { 'C', "no-watch-dir", "Disable the watch-dir", "C", 0, NULL },
-    { 941, "incomplete-dir", "Where to store new torrents until they're complete", NULL, 1, "<directory>" },
-    { 942, "no-incomplete-dir", "Don't store incomplete torrents in a different location", NULL, 0, NULL },
-    { 'd', "dump-settings", "Dump the settings and exit", "d", 0, NULL },
-    { 'e', "logfile", "Dump the log messages to this filename", "e", 1, "<filename>" },
-    { 'f', "foreground", "Run in the foreground instead of daemonizing", "f", 0, NULL },
-    { 'g', "config-dir", "Where to look for configuration files", "g", 1, "<path>" },
-    { 'p', "port", "RPC port (Default: " TR_DEFAULT_RPC_PORT_STR ")", "p", 1, "<port>" },
-    { 't', "auth", "Require authentication", "t", 0, NULL },
-    { 'T', "no-auth", "Don't require authentication", "T", 0, NULL },
-    { 'u', "username", "Set username for authentication", "u", 1, "<username>" },
-    { 'v', "password", "Set password for authentication", "v", 1, "<password>" },
-    { 'V', "version", "Show version number and exit", "V", 0, NULL },
-    { 810, "log-error", "Show error messages", NULL, 0, NULL },
-    { 811, "log-info", "Show error and info messages", NULL, 0, NULL },
-    { 812, "log-debug", "Show error, info, and debug messages", NULL, 0, NULL },
-    { 'w', "download-dir", "Where to save downloaded data", "w", 1, "<path>" },
-    { 800, "paused", "Pause all torrents on startup", NULL, 0, NULL },
-    { 'o', "dht", "Enable distributed hash tables (DHT)", "o", 0, NULL },
-    { 'O', "no-dht", "Disable distributed hash tables (DHT)", "O", 0, NULL },
-    { 'y', "lpd", "Enable local peer discovery (LPD)", "y", 0, NULL },
-    { 'Y', "no-lpd", "Disable local peer discovery (LPD)", "Y", 0, NULL },
-    { 830, "utp", "Enable uTP for peer connections", NULL, 0, NULL },
-    { 831, "no-utp", "Disable uTP for peer connections", NULL, 0, NULL },
-    { 'P', "peerport", "Port for incoming peers (Default: " TR_DEFAULT_PEER_PORT_STR ")", "P", 1, "<port>" },
-    { 'm', "portmap", "Enable portmapping via NAT-PMP or UPnP", "m", 0, NULL },
-    { 'M', "no-portmap", "Disable portmapping", "M", 0, NULL },
-    { 'L', "peerlimit-global", "Maximum overall number of peers (Default: " TR_DEFAULT_PEER_LIMIT_GLOBAL_STR ")", "L", 1, "<limit>" },
-    { 'l', "peerlimit-torrent", "Maximum number of peers per torrent (Default: " TR_DEFAULT_PEER_LIMIT_TORRENT_STR ")", "l", 1, "<limit>" },
-    { 910, "encryption-required", "Encrypt all peer connections", "er", 0, NULL },
-    { 911, "encryption-preferred", "Prefer encrypted peer connections", "ep", 0, NULL },
-    { 912, "encryption-tolerated", "Prefer unencrypted peer connections", "et", 0, NULL },
-    { 'i', "bind-address-ipv4", "Where to listen for peer connections", "i", 1, "<ipv4 addr>" },
-    { 'I', "bind-address-ipv6", "Where to listen for peer connections", "I", 1, "<ipv6 addr>" },
-    { 'r', "rpc-bind-address", "Where to listen for RPC connections", "r", 1, "<ip addr>" },
-    { 953, "global-seedratio", "All torrents, unless overridden by a per-torrent setting, should seed until a specific ratio", "gsr", 1, "ratio" },
-    { 954, "no-global-seedratio", "All torrents, unless overridden by a per-torrent setting, should seed regardless of ratio", "GSR", 0, NULL },
-    { 'x', "pid-file", "Enable PID file", "x", 1, "<pid-file>" },
-    { 0, NULL, NULL, NULL, 0, NULL }
+    { 'a', "allowed", "Allowed IP addresses. (Default: " TR_DEFAULT_RPC_WHITELIST ")", "a", true, "<list>" },
+    { 'b', "blocklist", "Enable peer blocklists", "b", false, NULL },
+    { 'B', "no-blocklist", "Disable peer blocklists", "B", false, NULL },
+    { 'c', "watch-dir", "Where to watch for new .torrent files", "c", true, "<directory>" },
+    { 'C', "no-watch-dir", "Disable the watch-dir", "C", false, NULL },
+    { 941, "incomplete-dir", "Where to store new torrents until they're complete", NULL, true, "<directory>" },
+    { 942, "no-incomplete-dir", "Don't store incomplete torrents in a different location", NULL, false, NULL },
+    { 'd', "dump-settings", "Dump the settings and exit", "d", false, NULL },
+    { 'e', "logfile", "Dump the log messages to this filename", "e", true, "<filename>" },
+    { 'f', "foreground", "Run in the foreground instead of daemonizing", "f", false, NULL },
+    { 'g', "config-dir", "Where to look for configuration files", "g", true, "<path>" },
+    { 'p', "port", "RPC port (Default: " TR_DEFAULT_RPC_PORT_STR ")", "p", true, "<port>" },
+    { 't', "auth", "Require authentication", "t", false, NULL },
+    { 'T', "no-auth", "Don't require authentication", "T", false, NULL },
+    { 'u', "username", "Set username for authentication", "u", true, "<username>" },
+    { 'v', "password", "Set password for authentication", "v", true, "<password>" },
+    { 'V', "version", "Show version number and exit", "V", false, NULL },
+    { 810, "log-error", "Show error messages", NULL, false, NULL },
+    { 811, "log-info", "Show error and info messages", NULL, false, NULL },
+    { 812, "log-debug", "Show error, info, and debug messages", NULL, false, NULL },
+    { 'w', "download-dir", "Where to save downloaded data", "w", true, "<path>" },
+    { 800, "paused", "Pause all torrents on startup", NULL, false, NULL },
+    { 'o', "dht", "Enable distributed hash tables (DHT)", "o", false, NULL },
+    { 'O', "no-dht", "Disable distributed hash tables (DHT)", "O", false, NULL },
+    { 'y', "lpd", "Enable local peer discovery (LPD)", "y", false, NULL },
+    { 'Y', "no-lpd", "Disable local peer discovery (LPD)", "Y", false, NULL },
+    { 830, "utp", "Enable uTP for peer connections", NULL, false, NULL },
+    { 831, "no-utp", "Disable uTP for peer connections", NULL, false, NULL },
+    { 'P', "peerport", "Port for incoming peers (Default: " TR_DEFAULT_PEER_PORT_STR ")", "P", true, "<port>" },
+    { 'm', "portmap", "Enable portmapping via NAT-PMP or UPnP", "m", false, NULL },
+    { 'M', "no-portmap", "Disable portmapping", "M", false, NULL },
+    { 'L', "peerlimit-global", "Maximum overall number of peers (Default: " TR_DEFAULT_PEER_LIMIT_GLOBAL_STR ")", "L", true,
+        "<limit>" },
+    { 'l', "peerlimit-torrent", "Maximum number of peers per torrent (Default: " TR_DEFAULT_PEER_LIMIT_TORRENT_STR ")", "l",
+        true, "<limit>" },
+    { 910, "encryption-required", "Encrypt all peer connections", "er", false, NULL },
+    { 911, "encryption-preferred", "Prefer encrypted peer connections", "ep", false, NULL },
+    { 912, "encryption-tolerated", "Prefer unencrypted peer connections", "et", false, NULL },
+    { 'i', "bind-address-ipv4", "Where to listen for peer connections", "i", true, "<ipv4 addr>" },
+    { 'I', "bind-address-ipv6", "Where to listen for peer connections", "I", true, "<ipv6 addr>" },
+    { 'r', "rpc-bind-address", "Where to listen for RPC connections", "r", true, "<ip addr>" },
+    { 953, "global-seedratio", "All torrents, unless overridden by a per-torrent setting, should seed until a specific ratio",
+        "gsr", true, "ratio" },
+    { 954, "no-global-seedratio", "All torrents, unless overridden by a per-torrent setting, should seed regardless of ratio",
+        "GSR", false, NULL },
+    { 'x', "pid-file", "Enable PID file", "x", true, "<pid-file>" },
+    { 0, NULL, NULL, NULL, false, NULL }
 };
 
 static bool reopen_log_file(char const* filename)
 {
     tr_error* error = NULL;
     tr_sys_file_t const old_log_file = logfile;
-    tr_sys_file_t const new_log_file = tr_sys_file_open(filename, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_APPEND, 0666,
-        &error);
+    tr_sys_file_t const new_log_file = tr_sys_file_open(filename, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_APPEND,
+        0666, &error);
 
     if (new_log_file == TR_BAD_SYS_FILE)
     {
@@ -645,10 +649,11 @@ static int daemon_start(void* raw_arg, bool foreground)
     pid_filename = NULL;
     tr_variantDictFindStr(settings, key_pidfile, &pid_filename, NULL);
 
-    if (pid_filename != NULL && *pid_filename != '\0')
+    if (!tr_str_is_empty(pid_filename))
     {
         tr_error* error = NULL;
-        tr_sys_file_t fp = tr_sys_file_open(pid_filename, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE, 0666, &error);
+        tr_sys_file_t fp = tr_sys_file_open(pid_filename, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE, 0666,
+            &error);
 
         if (fp != TR_BAD_SYS_FILE)
         {
@@ -688,7 +693,7 @@ static int daemon_start(void* raw_arg, bool foreground)
             force_generic = false;
         }
 
-        if (tr_variantDictFindStr(settings, TR_KEY_watch_dir, &dir, NULL) && dir != NULL && *dir != '\0')
+        if (tr_variantDictFindStr(settings, TR_KEY_watch_dir, &dir, NULL) && !tr_str_is_empty(dir))
         {
             tr_logAddInfo("Watching \"%s\" for new .torrent files", dir);
 
@@ -791,41 +796,26 @@ cleanup:
     return 0;
 }
 
-int tr_main(int argc, char* argv[])
+static bool init_daemon_data(int argc, char* argv[], struct daemon_data* data, bool* foreground, int* ret)
 {
-    dtr_callbacks const cb =
-    {
-        .on_start = &daemon_start,
-        .on_stop = &daemon_stop,
-        .on_reconfigure = &daemon_reconfigure,
-    };
-
-    int ret;
-    bool loaded;
-    bool dumpSettings;
-    bool foreground;
-    tr_error* error = NULL;
-
-    struct daemon_data arg;
-    tr_variant* const settings = &arg.settings;
-    char const** const configDir = &arg.configDir;
-
-    key_pidfile = tr_quark_new("pidfile", 7);
-    key_watch_dir_force_generic = tr_quark_new("watch-dir-force-generic", 23);
+    data->configDir = getConfigDir(argc, (char const* const*)argv);
 
     /* load settings from defaults + config file */
-    tr_variantInitDict(settings, 0);
-    tr_variantDictAddBool(settings, TR_KEY_rpc_enabled, true);
-    *configDir = getConfigDir(argc, (char const* const*)argv);
-    loaded = tr_sessionLoadSettings(settings, *configDir, MY_NAME);
+    tr_variantInitDict(&data->settings, 0);
+    tr_variantDictAddBool(&data->settings, TR_KEY_rpc_enabled, true);
+    bool const loaded = tr_sessionLoadSettings(&data->settings, data->configDir, MY_NAME);
 
-    /* overwrite settings from the comamndline */
-    if (!parse_args(argc, (char const**)argv, settings, &arg.paused, &dumpSettings, &foreground, &ret))
+    bool dumpSettings;
+
+    *ret = 0;
+
+    /* overwrite settings from the command line */
+    if (!parse_args(argc, (char const**)argv, &data->settings, &data->paused, &dumpSettings, foreground, ret))
     {
-        goto cleanup;
+        goto exit_early;
     }
 
-    if (foreground && logfile == TR_BAD_SYS_FILE)
+    if (*foreground && logfile == TR_BAD_SYS_FILE)
     {
         logfile = tr_sys_file_get_std(TR_STD_SYS_FILE_ERR, NULL);
     }
@@ -833,19 +823,49 @@ int tr_main(int argc, char* argv[])
     if (!loaded)
     {
         printMessage(logfile, TR_LOG_ERROR, MY_NAME, "Error loading config file -- exiting.", __FILE__, __LINE__);
-        ret = 1;
-        goto cleanup;
+        *ret = 1;
+        goto exit_early;
     }
 
     if (dumpSettings)
     {
-        char* str = tr_variantToStr(settings, TR_VARIANT_FMT_JSON, NULL);
+        char* str = tr_variantToStr(&data->settings, TR_VARIANT_FMT_JSON, NULL);
         fprintf(stderr, "%s", str);
         tr_free(str);
-        goto cleanup;
+        goto exit_early;
     }
 
-    if (!dtr_daemon(&cb, &arg, foreground, &ret, &error))
+    return true;
+
+exit_early:
+    tr_variantFree(&data->settings);
+    return false;
+}
+
+int tr_main(int argc, char* argv[])
+{
+    key_pidfile = tr_quark_new("pidfile", TR_BAD_SIZE);
+    key_watch_dir_force_generic = tr_quark_new("watch-dir-force-generic", TR_BAD_SIZE);
+
+    struct daemon_data data;
+    bool foreground;
+    int ret;
+
+    if (!init_daemon_data(argc, argv, &data, &foreground, &ret))
+    {
+        return ret;
+    }
+
+    dtr_callbacks const cb =
+    {
+        .on_start = &daemon_start,
+        .on_stop = &daemon_stop,
+        .on_reconfigure = &daemon_reconfigure,
+    };
+
+    tr_error* error = NULL;
+
+    if (!dtr_daemon(&cb, &data, foreground, &ret, &error))
     {
         char buf[256];
         tr_snprintf(buf, sizeof(buf), "Failed to daemonize: %s", error->message);
@@ -853,8 +873,6 @@ int tr_main(int argc, char* argv[])
         tr_error_free(error);
     }
 
-cleanup:
-    tr_variantFree(settings);
-
+    tr_variantFree(&data.settings);
     return ret;
 }

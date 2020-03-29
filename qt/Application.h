@@ -9,15 +9,16 @@
 #pragma once
 
 #include <QApplication>
-#include <QSet>
 #include <QTimer>
 #include <QTranslator>
 
 #include "FaviconCache.h"
+#include "Typedefs.h"
 
 class AddData;
 class Prefs;
 class Session;
+class Torrent;
 class TorrentModel;
 class MainWindow;
 class WatchDir;
@@ -36,22 +37,23 @@ public:
     FaviconCache& faviconCache();
 
 public slots:
-    void addTorrent(QString const&);
     void addTorrent(AddData const&);
-
-private:
-    void maybeUpdateBlocklist();
-    void loadTranslations();
-    void quitLater();
 
 private slots:
     void consentGiven(int result);
     void onSessionSourceChanged();
+    void onTorrentsAdded(torrent_ids_t const& torrents);
+    void onTorrentsCompleted(torrent_ids_t const& torrents);
+    void onTorrentsEdited(torrent_ids_t const& torrents);
+    void onTorrentsNeedInfo(torrent_ids_t const& torrents);
     void refreshPref(int key);
     void refreshTorrents();
-    void onTorrentsAdded(QSet<int> const& torrents);
-    void onTorrentCompleted(int);
-    void onNewTorrentChanged(int);
+
+private:
+    void maybeUpdateBlocklist();
+    void loadTranslations();
+    QStringList getNames(torrent_ids_t const& ids) const;
+    void quitLater();
 
 private:
     Prefs* myPrefs;

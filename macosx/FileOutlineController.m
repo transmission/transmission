@@ -20,6 +20,8 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#import <Quartz/Quartz.h>
+
 #import "FileOutlineController.h"
 #import "Torrent.h"
 #import "FileListNode.h"
@@ -29,7 +31,6 @@
 #import "NSApplicationAdditions.h"
 #import "NSMutableArrayAdditions.h"
 #import "NSStringAdditions.h"
-#import <Quartz/Quartz.h>
 
 #define ROW_SMALL_HEIGHT 18.0
 

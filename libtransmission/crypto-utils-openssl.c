@@ -16,8 +16,10 @@
 #include <openssl/dh.h>
 #include <openssl/err.h>
 #include <openssl/evp.h>
-#include <openssl/rand.h>
 #include <openssl/opensslv.h>
+#include <openssl/rand.h>
+#include <openssl/ssl.h>
+#include <openssl/x509.h>
 
 #include "transmission.h"
 #include "crypto-utils.h"
@@ -48,7 +50,7 @@ static void log_openssl_error(char const* file, int line)
 
         if (!strings_loaded)
         {
-#if OPENSSL_VERSION_NUMBER < 0x10100000 || defined(LIBRESSL_VERSION_NUMBER)
+#if OPENSSL_VERSION_NUMBER < 0x10100000 || (defined(LIBRESSL_VERSION_NUMBER) && LIBRESSL_VERSION_NUMBER < 0x20700000)
             ERR_load_crypto_strings();
 #else
             OPENSSL_init_crypto(OPENSSL_INIT_LOAD_CRYPTO_STRINGS, NULL);
@@ -237,7 +239,7 @@ void tr_rc4_process(tr_rc4_ctx_t handle, void const* input, void* output, size_t
 ****
 ***/
 
-#if OPENSSL_VERSION_NUMBER < 0x10100000 || defined(LIBRESSL_VERSION_NUMBER)
+#if OPENSSL_VERSION_NUMBER < 0x10100000 || (defined(LIBRESSL_VERSION_NUMBER) && LIBRESSL_VERSION_NUMBER < 0x20700000)
 
 static inline int DH_set0_pqg(DH* dh, BIGNUM* p, BIGNUM* q, BIGNUM* g)
 {
@@ -309,7 +311,7 @@ tr_dh_ctx_t tr_dh_new(uint8_t const* prime_num, size_t prime_num_length, uint8_t
     p = BN_bin2bn(prime_num, prime_num_length, NULL);
     g = BN_bin2bn(generator_num, generator_num_length, NULL);
 
-    if (!check_pointer(p) || !check_pointer(g) || !DH_set0_pqg(handle, p, NULL, g))
+    if (!check_pointer(p) || !check_pointer(g) || DH_set0_pqg(handle, p, NULL, g) == 0)
     {
         BN_free(p);
         BN_free(g);
@@ -394,6 +396,52 @@ tr_dh_secret_t tr_dh_agree(tr_dh_ctx_t handle, uint8_t const* other_public_key, 
 
     BN_free(other_key);
     return ret;
+}
+
+/***
+****
+***/
+
+tr_x509_store_t tr_ssl_get_x509_store(tr_ssl_ctx_t handle)
+{
+    if (handle == NULL)
+    {
+        return NULL;
+    }
+
+    return SSL_CTX_get_cert_store(handle);
+}
+
+bool tr_x509_store_add(tr_x509_store_t handle, tr_x509_cert_t cert)
+{
+    TR_ASSERT(handle != NULL);
+    TR_ASSERT(cert != NULL);
+
+    return check_result(X509_STORE_add_cert(handle, cert));
+}
+
+tr_x509_cert_t tr_x509_cert_new(void const* der, size_t der_length)
+{
+    TR_ASSERT(der != NULL);
+
+    X509* const ret = d2i_X509(NULL, (unsigned char const**)&der, der_length);
+
+    if (ret == NULL)
+    {
+        log_error();
+    }
+
+    return ret;
+}
+
+void tr_x509_cert_free(tr_x509_cert_t handle)
+{
+    if (handle == NULL)
+    {
+        return;
+    }
+
+    X509_free(handle);
 }
 
 /***

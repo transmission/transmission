@@ -2,7 +2,7 @@ project(trutils)
 
 include_directories(${CMAKE_SOURCE_DIR})
 
-foreach(P create edit show)
+foreach(P create edit remote show)
     tr_win32_app_info(${PROJECT_NAME}_${P}_WIN32_RC_FILE
         "Transmission Utility ('${P}')"
         "${TR_NAME}-${P}"

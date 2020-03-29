@@ -59,7 +59,7 @@
 
 #define SHOW_LICENSE
 static char const* LICENSE =
-    "Copyright 2005-2016. All code is copyrighted by the respective authors.\n"
+    "Copyright 2005-2019. All code is copyrighted by the respective authors.\n"
     "\n"
     "Transmission can be redistributed and/or modified under the terms of the "
     "GNU GPL versions 2 or 3 or by any future license endorsed by Mnemosyne LLC.\n"
@@ -317,6 +317,7 @@ static void register_magnet_link_handler(void)
 
     g_clear_object(&app);
 }
+
 static void ensure_magnet_handler_exists(void)
 {
     if (!has_magnet_link_handler())
@@ -532,7 +533,7 @@ static void on_startup(GApplication* application, gpointer user_data)
     win = GTK_WINDOW(gtr_window_new(GTK_APPLICATION(application), ui_manager, cbdata->core));
     g_signal_connect(win, "size-allocate", G_CALLBACK(on_main_window_size_allocated), cbdata);
     g_application_hold(application);
-    g_object_weak_ref(G_OBJECT(win), (GWeakNotify)g_application_release, application);
+    g_object_weak_ref(G_OBJECT(win), (GWeakNotify)(GCallback)g_application_release, application);
     app_setup(win, cbdata);
     tr_sessionSetRPCCallback(session, on_rpc_changed, cbdata);
 
@@ -847,7 +848,7 @@ static void on_drag_data_received(GtkWidget* widget UNUSED, GdkDragContext* drag
     open_files(files, gdata);
 
     /* cleanup */
-    g_slist_foreach(files, (GFunc)g_object_unref, NULL);
+    g_slist_foreach(files, (GFunc)(GCallback)g_object_unref, NULL);
     g_slist_free(files);
     g_strfreev(uris);
 
@@ -884,7 +885,7 @@ static gboolean on_session_closed(gpointer gdata)
     struct cbdata* cbdata = gdata;
 
     tmp = g_slist_copy(cbdata->details);
-    g_slist_foreach(tmp, (GFunc)gtk_widget_destroy, NULL);
+    g_slist_foreach(tmp, (GFunc)(GCallback)gtk_widget_destroy, NULL);
     g_slist_free(tmp);
 
     if (cbdata->prefs != NULL)
@@ -904,9 +905,9 @@ static gboolean on_session_closed(gpointer gdata)
         g_object_unref(cbdata->icon);
     }
 
-    g_slist_foreach(cbdata->error_list, (GFunc)g_free, NULL);
+    g_slist_foreach(cbdata->error_list, (GFunc)(GCallback)g_free, NULL);
     g_slist_free(cbdata->error_list);
-    g_slist_foreach(cbdata->duplicates_list, (GFunc)g_free, NULL);
+    g_slist_foreach(cbdata->duplicates_list, (GFunc)(GCallback)g_free, NULL);
     g_slist_free(cbdata->duplicates_list);
 
     return G_SOURCE_REMOVE;
@@ -937,9 +938,7 @@ static void exit_now_cb(GtkWidget* w UNUSED, gpointer data UNUSED)
 
 static void on_app_exit(gpointer vdata)
 {
-    GtkWidget* r;
     GtkWidget* p;
-    GtkWidget* b;
     GtkWidget* w;
     GtkWidget* c;
     struct cbdata* cbdata = vdata;
@@ -969,32 +968,29 @@ static void on_app_exit(gpointer vdata)
     c = GTK_WIDGET(cbdata->wind);
     gtk_container_remove(GTK_CONTAINER(c), gtk_bin_get_child(GTK_BIN(c)));
 
-    r = gtk_alignment_new(0.5, 0.5, 0.01, 0.01);
-    gtk_container_add(GTK_CONTAINER(c), r);
+    p =
+        g_object_new(GTK_TYPE_GRID, "column-spacing", GUI_PAD_BIG, "halign", GTK_ALIGN_CENTER, "valign", GTK_ALIGN_CENTER,
+        NULL);
+    gtk_container_add(GTK_CONTAINER(c), p);
 
-    p = gtk_grid_new();
-    gtk_grid_set_column_spacing(GTK_GRID(p), GUI_PAD_BIG);
-    gtk_container_add(GTK_CONTAINER(r), p);
-
-    w = gtk_image_new_from_stock(GTK_STOCK_NETWORK, GTK_ICON_SIZE_DIALOG);
+    w = gtk_image_new_from_icon_name(GTK_STOCK_NETWORK, GTK_ICON_SIZE_DIALOG);
     gtk_grid_attach(GTK_GRID(p), w, 0, 0, 1, 2);
 
     w = gtk_label_new(NULL);
     gtk_label_set_markup(GTK_LABEL(w), _("<b>Closing Connections</b>"));
-    gtk_misc_set_alignment(GTK_MISC(w), 0.0, 0.5);
+    g_object_set(w, "halign", GTK_ALIGN_START, "valign", GTK_ALIGN_CENTER, NULL);
     gtk_grid_attach(GTK_GRID(p), w, 1, 0, 1, 1);
 
     w = gtk_label_new(_("Sending upload/download totals to tracker…"));
-    gtk_misc_set_alignment(GTK_MISC(w), 0.0, 0.5);
+    g_object_set(w, "halign", GTK_ALIGN_START, "valign", GTK_ALIGN_CENTER, NULL);
     gtk_grid_attach(GTK_GRID(p), w, 1, 1, 1, 1);
 
-    b = gtk_alignment_new(0.0, 1.0, 0.01, 0.01);
     w = gtk_button_new_with_mnemonic(_("_Quit Now"));
+    g_object_set(w, "margin-top", GUI_PAD, "halign", GTK_ALIGN_START, "valign", GTK_ALIGN_END, NULL);
     g_signal_connect(w, "clicked", G_CALLBACK(exit_now_cb), NULL);
-    gtk_container_add(GTK_CONTAINER(b), w);
-    gtk_grid_attach(GTK_GRID(p), b, 1, 2, 1, 1);
+    gtk_grid_attach(GTK_GRID(p), w, 1, 2, 1, 1);
 
-    gtk_widget_show_all(r);
+    gtk_widget_show_all(p);
     gtk_widget_grab_focus(w);
 
     /* clear the UI */
@@ -1030,7 +1026,7 @@ static void show_torrent_errors(GtkWindow* window, char const* primary, GSList**
     gtk_widget_show(w);
     g_string_free(s, TRUE);
 
-    g_slist_foreach(*files, (GFunc)g_free, NULL);
+    g_slist_foreach(*files, (GFunc)(GCallback)g_free, NULL);
     g_slist_free(*files);
     *files = NULL;
 }
@@ -1487,7 +1483,7 @@ static tr_torrent* get_first_selected_torrent(struct cbdata* data)
         }
     }
 
-    g_list_foreach(l, (GFunc)gtk_tree_path_free, NULL);
+    g_list_foreach(l, (GFunc)(GCallback)gtk_tree_path_free, NULL);
     g_list_free(l);
     return tor;
 }

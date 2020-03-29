@@ -20,12 +20,12 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#include <libtransmission/transmission.h>
+#include <libtransmission/utils.h> // tr_getRatio()
+
 #import "TorrentGroup.h"
 #import "GroupsController.h"
 #import "Torrent.h"
-
-#include "transmission.h" // required by utils.h
-#include "utils.h" // tr_getRatio()
 
 @implementation TorrentGroup
 

@@ -2,6 +2,18 @@ project(libtr)
 
 configure_file(version.h.in version.h)
 
+set(THIRD_PARTY_SOURCES ConvertUTF.c jsonsl.c wildmat.c)
+if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
+  set(DISABLE_WARNINGS -w)
+elseif(CMAKE_C_COMPILER_ID MATCHES "Clang")
+  set(DISABLE_WARNINGS -w)
+elseif(CMAKE_C_COMPILER_ID MATCHES "SunPro")
+  set(DISABLE_WARNINGS -erroff)
+elseif(MSVC)
+  set(DISABLE_WARNINGS /w)
+endif()
+set_source_files_properties(${THIRD_PARTY_SOURCES} PROPERTIES COMPILE_FLAGS ${DISABLE_WARNINGS})
+
 set(${PROJECT_NAME}_SOURCES
     announcer.c
     announcer-http.c
@@ -266,6 +278,10 @@ target_link_libraries(${TR_NAME}
 
 if(ICONV_FOUND)
     target_link_libraries(${TR_NAME} ${ICONV_LIBRARIES})
+endif()
+
+if(WIN32)
+    target_link_libraries(${TR_NAME} crypt32 shlwapi)
 endif()
 
 if(ENABLE_TESTS)

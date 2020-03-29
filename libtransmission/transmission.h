@@ -49,6 +49,8 @@ struct tr_variant;
 
 typedef int8_t tr_priority_t;
 
+typedef int (* tr_voidptr_compare_func)(void const* lhs, void const* rhs);
+
 #define TR_RPC_SESSION_ID_HEADER "X-Transmission-Session-Id"
 
 typedef enum
@@ -1572,8 +1574,8 @@ typedef struct tr_file
     uint64_t length; /* Length of the file, in bytes */
     char* name; /* Path to the file */
     int8_t priority; /* TR_PRI_HIGH, _NORMAL, or _LOW */
-    int8_t dnd; /* "do not download" flag */
-    int8_t is_renamed; /* true if we're using a different path from the one in the metainfo; ie, if the user has renamed it */
+    bool dnd; /* "do not download" flag */
+    bool is_renamed; /* true if we're using a different path from the one in the metainfo; ie, if the user has renamed it */
     tr_piece_index_t firstPiece; /* We need pieces [firstPiece... */
     tr_piece_index_t lastPiece; /* ...lastPiece] to dl this file */
     uint64_t offset; /* file begins at the torrent's nth byte */
@@ -1586,7 +1588,7 @@ typedef struct tr_piece
     time_t timeChecked; /* the last time we tested this piece */
     uint8_t hash[SHA_DIGEST_LENGTH]; /* pieces hash */
     int8_t priority; /* TR_PRI_HIGH, _NORMAL, or _LOW */
-    int8_t dnd; /* "do not download" flag */
+    bool dnd; /* "do not download" flag */
 }
 tr_piece;
 
@@ -1826,6 +1828,12 @@ typedef struct tr_stat
     /** The last time we uploaded or downloaded piece data on this torrent. */
     time_t activityDate;
 
+    /** The last time during this session that a rarely-changing field
+        changed -- e.g. any tr_info field (trackers, filenames, name)
+        or download directory. RPC clients can monitor this to know when
+        to reload fields that rarely change. */
+    time_t editDate;
+
     /** Number of seconds since the last activity (or since started).
         -1 if activity is not seeding or downloading. */
     int idleSecs;
@@ -1860,13 +1868,16 @@ tr_stat const* tr_torrentStat(tr_torrent* torrent);
     reduce the CPU load if you're calling tr_torrentStat() frequently. */
 tr_stat const* tr_torrentStatCached(tr_torrent* torrent);
 
-/** @deprecated */
+/** @deprecated because this should only be accessible to libtransmission.
+    private code, use tr_torentSetDateAdded() instead */
 TR_DEPRECATED void tr_torrentSetAddedDate(tr_torrent* torrent, time_t addedDate);
 
-/** @deprecated */
+/** @deprecated because this should only be accessible to libtransmission.
+    private code, use tr_torentSetDateActive() instead */
 TR_DEPRECATED void tr_torrentSetActivityDate(tr_torrent* torrent, time_t activityDate);
 
-/** @deprecated */
+/** @deprecated because this should only be accessible to libtransmission.
+    private code, use tr_torentSetDateDone() instead */
 TR_DEPRECATED void tr_torrentSetDoneDate(tr_torrent* torrent, time_t doneDate);
 
 /** @} */

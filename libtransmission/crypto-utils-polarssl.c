@@ -6,6 +6,7 @@
  *
  */
 
+/* *INDENT-OFF* */
 #if defined(POLARSSL_IS_MBEDTLS)
 #define API_HEADER(x) <mbedtls/x>
 #define API(x) mbedtls_ ## x
@@ -15,6 +16,7 @@
 #define API(x) x
 #define API_VERSION_NUMBER POLARSSL_VERSION_NUMBER
 #endif
+/* *INDENT-ON* */
 
 #include API_HEADER(arc4.h)
 #include API_HEADER(base64.h)
@@ -32,6 +34,7 @@
 #include "utils.h"
 
 #define TR_CRYPTO_DH_SECRET_FALLBACK
+#define TR_CRYPTO_X509_FALLBACK
 #include "crypto-utils-fallback.c"
 
 /***
@@ -39,6 +42,11 @@
 ***/
 
 #define MY_NAME "tr_crypto_utils"
+
+typedef API (ctr_drbg_context) api_ctr_drbg_context;
+typedef API (sha1_context) api_sha1_context;
+typedef API (arc4_context) api_arc4_context;
+typedef API (dhm_context) api_dhm_context;
 
 static void log_polarssl_error(int error_code, char const* file, int line)
 {
@@ -89,9 +97,9 @@ static int my_rand(void* context UNUSED, unsigned char* buffer, size_t buffer_si
     return 0;
 }
 
-static API(ctr_drbg_context)* get_rng(void)
+static api_ctr_drbg_context* get_rng(void)
 {
-    static API(ctr_drbg_context) rng;
+    static api_ctr_drbg_context rng;
     static bool rng_initialized = false;
 
     if (!rng_initialized)
@@ -132,7 +140,7 @@ static tr_lock* get_rng_lock(void)
 
 tr_sha1_ctx_t tr_sha1_init(void)
 {
-    API(sha1_context)* handle = tr_new0(API(sha1_context), 1);
+    api_sha1_context* handle = tr_new0(api_sha1_context, 1);
 
 #if API_VERSION_NUMBER >= 0x01030800
     API(sha1_init)(handle);
@@ -180,7 +188,7 @@ bool tr_sha1_final(tr_sha1_ctx_t handle, uint8_t* hash)
 
 tr_rc4_ctx_t tr_rc4_new(void)
 {
-    API(arc4_context)* handle = tr_new0(API(arc4_context), 1);
+    api_arc4_context* handle = tr_new0(api_arc4_context, 1);
 
 #if API_VERSION_NUMBER >= 0x01030800
     API(arc4_init)(handle);
@@ -231,7 +239,7 @@ tr_dh_ctx_t tr_dh_new(uint8_t const* prime_num, size_t prime_num_length, uint8_t
     TR_ASSERT(prime_num != NULL);
     TR_ASSERT(generator_num != NULL);
 
-    API(dhm_context)* handle = tr_new0(API(dhm_context), 1);
+    api_dhm_context* handle = tr_new0(api_dhm_context, 1);
 
 #if API_VERSION_NUMBER >= 0x01030800
     API(dhm_init)(handle);
@@ -264,7 +272,7 @@ bool tr_dh_make_key(tr_dh_ctx_t raw_handle, size_t private_key_length, uint8_t* 
     TR_ASSERT(raw_handle != NULL);
     TR_ASSERT(public_key != NULL);
 
-    API(dhm_context)* handle = raw_handle;
+    api_dhm_context* handle = raw_handle;
 
     if (public_key_length != NULL)
     {
@@ -279,7 +287,7 @@ tr_dh_secret_t tr_dh_agree(tr_dh_ctx_t raw_handle, uint8_t const* other_public_k
     TR_ASSERT(raw_handle != NULL);
     TR_ASSERT(other_public_key != NULL);
 
-    API(dhm_context)* handle = raw_handle;
+    api_dhm_context* handle = raw_handle;
     struct tr_dh_secret* ret;
     size_t secret_key_length;
 

@@ -14,7 +14,7 @@
         <translation>&lt;b style=&apos;font-size:x-large&apos;&gt;Transmission %1&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="../AboutDialog.ui" line="+26"/>
+        <location filename="../AboutDialog.ui" line="+29"/>
         <source>A fast and easy BitTorrent client</source>
         <translation>Hızlı ve kolay BitTorrent istemcisi</translation>
     </message>
@@ -251,7 +251,7 @@
     <message>
         <location line="+276"/>
         <source>N/A</source>
-        <translation>N/A</translation>
+        <translation>Yok</translation>
     </message>
     <message>
         <location line="+260"/>
@@ -549,7 +549,7 @@
 <context>
     <name>FileTreeItem</name>
     <message>
-        <location filename="../FileTreeItem.cc" line="+289"/>
+        <location filename="../FileTreeItem.cc" line="+290"/>
         <location filename="../FileTreeView.cc" line="+108"/>
         <location line="+285"/>
         <source>Low</source>
@@ -854,7 +854,7 @@
     <message>
         <location line="+30"/>
         <source>&amp;Edit</source>
-        <translation>&amp;Edit</translation>
+        <translation>&amp;Düzenle</translation>
     </message>
     <message>
         <location line="+11"/>
@@ -1191,7 +1191,7 @@
     <message>
         <location line="+3"/>
         <source>Bypass the queue and start now</source>
-        <translation type="unfinished"></translation>
+        <translation>Kuyruğu atla ve hemen başla</translation>
     </message>
     <message>
         <location line="+11"/>
@@ -1412,7 +1412,7 @@
     <message>
         <location line="+4"/>
         <source>%1 last responded %2 ago</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 en son %2 önce cevap verdi</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -1469,7 +1469,7 @@
     <message>
         <location line="+14"/>
         <source>Source &amp;file:</source>
-        <translation>Kaynak &amp;Dosya:</translation>
+        <translation>Kaynak &amp;dosya:</translation>
     </message>
     <message>
         <location line="+41"/>
@@ -1684,12 +1684,12 @@ Başka bir öncelikli web adresi eklemek için, boş bir satırdan sonra ekleyin
     <message>
         <location line="+1"/>
         <source>Weekdays</source>
-        <translation>Hafta içi günler</translation>
+        <translation>Hafta içi</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Weekends</source>
-        <translation>Hafta sonları</translation>
+        <translation>Hafta sonu</translation>
     </message>
     <message>
         <location line="-183"/>
@@ -1750,7 +1750,7 @@ Başka bir öncelikli web adresi eklemek için, boş bir satırdan sonra ekleyin
     <message>
         <location line="-20"/>
         <source>&amp;Port for incoming connections:</source>
-        <translation>Gelen bağlantılar için &amp;port</translation>
+        <translation>Gelen bağlantılar için &amp;port:</translation>
     </message>
     <message>
         <location line="+44"/>
@@ -1796,7 +1796,7 @@ Başka bir öncelikli web adresi eklemek için, boş bir satırdan sonra ekleyin
     <message>
         <location line="+22"/>
         <source>Show the Torrent Options &amp;dialog</source>
-        <translation type="unfinished"></translation>
+        <translation>Torrent Seçenekleri &amp;ileti penceresini göster</translation>
     </message>
     <message>
         <location line="+7"/>
@@ -1991,7 +1991,7 @@ Başka bir öncelikli web adresi eklemek için, boş bir satırdan sonra ekleyin
     <message>
         <location line="+28"/>
         <source>Notification</source>
-        <translation>Duyuru</translation>
+        <translation>Bildirim</translation>
     </message>
     <message>
         <location line="+12"/>
@@ -2011,7 +2011,7 @@ Başka bir öncelikli web adresi eklemek için, boş bir satırdan sonra ekleyin
     <message>
         <location filename="../PrefsDialog.cc" line="-73"/>
         <source>Testing TCP Port...</source>
-        <translation>TCP bağlantısı sınanıyor…</translation>
+        <translation>TCP bağlantı noktası sınanıyor…</translation>
     </message>
     <message>
         <location filename="../PrefsDialog.ui" line="-229"/>
@@ -2056,7 +2056,7 @@ Başka bir öncelikli web adresi eklemek için, boş bir satırdan sonra ekleyin
     <message>
         <location filename="../PrefsDialog.cc" line="+141"/>
         <source>Select &quot;Torrent Done&quot; Script</source>
-        <translation>&quot;Torrent Tamamlandı&quot; bu betiği seç.</translation>
+        <translation>&quot;Torrent Tamamlandı&quot; Betiğini Seç</translation>
     </message>
     <message>
         <location line="-1"/>
@@ -2102,17 +2102,17 @@ Başka bir öncelikli web adresi eklemek için, boş bir satırdan sonra ekleyin
     <message>
         <location line="-148"/>
         <source>Save to &amp;Location:</source>
-        <translation>&amp;Konumu Kaydet:</translation>
+        <translation>&amp;Konuma Kaydet:</translation>
     </message>
     <message>
         <location line="+170"/>
         <source>Call scrip&amp;t when torrent is completed:</source>
-        <translation>Torrent inince bu &amp;betiği çalıştır:</translation>
+        <translation>Torrent tamamlanınca çağrılacak &amp;betik:</translation>
     </message>
     <message>
         <location line="+59"/>
         <source>Stop seeding at &amp;ratio:</source>
-        <translation>Şu &amp;oranda göndermeyi durdur:</translation>
+        <translation>&amp;orana ulaşılınca göndermeyi durdur:</translation>
     </message>
     <message>
         <location line="+20"/>
@@ -2184,9 +2184,9 @@ Başka bir öncelikli web adresi eklemek için, boş bir satırdan sonra ekleyin
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+541"/>
+        <location filename="../Session.cc" line="+546"/>
         <source>Error Renaming Path</source>
-        <translation type="unfinished"></translation>
+        <translation>Yolu Yeniden Adlandırırken Hata</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -2199,7 +2199,7 @@ Başka bir öncelikli web adresi eklemek için, boş bir satırdan sonra ekleyin
         <translation>Torrent eklenirken hata</translation>
     </message>
     <message>
-        <location line="+16"/>
+        <location line="+21"/>
         <source>Add Torrent</source>
         <translation>Torrent Ekle</translation>
     </message>
@@ -2229,12 +2229,12 @@ Başka bir öncelikli web adresi eklemek için, boş bir satırdan sonra ekleyin
     <message>
         <location line="+7"/>
         <source>Connect to &amp;Remote Session</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Uzak Oturuma Bağlan</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>&amp;Host:</source>
-        <translation>&amp;Host:</translation>
+        <translation>&amp;Sunucu:</translation>
     </message>
     <message>
         <location line="+13"/>
@@ -2254,7 +2254,7 @@ Başka bir öncelikli web adresi eklemek için, boş bir satırdan sonra ekleyin
     <message>
         <location line="+13"/>
         <source>Pass&amp;word:</source>
-        <translation>Şifre</translation>
+        <translation>Parola</translation>
     </message>
 </context>
 <context>
@@ -2273,7 +2273,7 @@ Başka bir öncelikli web adresi eklemek için, boş bir satırdan sonra ekleyin
         <location line="+12"/>
         <location line="+96"/>
         <source>Uploaded:</source>
-        <translation>Yüklendi:</translation>
+        <translation>Gönderildi:</translation>
     </message>
     <message>
         <location line="-82"/>
@@ -2361,7 +2361,7 @@ Başka bir öncelikli web adresi eklemek için, boş bir satırdan sonra ekleyin
     <message>
         <location line="+4"/>
         <source>Error: %1</source>
-        <translation>Hata:%1</translation>
+        <translation>Hata: %1</translation>
     </message>
 </context>
 <context>
@@ -2435,12 +2435,12 @@ Başka bir öncelikli web adresi eklemek için, boş bir satırdan sonra ekleyin
         </translation>
     </message>
     <message>
-        <location line="+21"/>
+        <location line="+22"/>
         <source> - </source>
         <translation> - </translation>
     </message>
     <message numerus="yes">
-        <location line="-53"/>
+        <location line="-54"/>
         <source>Downloading metadata from %Ln peer(s) (%1% done)</source>
         <translation>
             <numerusform>%Ln eşinden üstveri indiriliyor (%1% tamamlandı)</numerusform>
@@ -2450,8 +2450,8 @@ Başka bir öncelikli web adresi eklemek için, boş bir satırdan sonra ekleyin
         <location line="+15"/>
         <source>Downloading from %1 of %Ln connected peer(s)</source>
         <extracomment>First part of phrase &quot;Downloading from ... of ... connected peer(s) and ... web seed(s)&quot;</extracomment>
-        <translation type="unfinished">
-            <numerusform>Bağlı eşten indiriliyor: %1 / %Ln</numerusform>
+        <translation>
+            <numerusform>%Ln bağlı eşten %1 tanesinden indiriliyor</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -2470,12 +2470,12 @@ Başka bir öncelikli web adresi eklemek için, boş bir satırdan sonra ekleyin
         </translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+7"/>
         <source>Error</source>
         <translation>Hata</translation>
     </message>
     <message>
-        <location line="-81"/>
+        <location line="-82"/>
         <source>Verifying local data (%1% tested)</source>
         <translation>Yere veri doğrulanıyor (%1% doğrulandı)</translation>
     </message>
@@ -2487,7 +2487,7 @@ Başka bir öncelikli web adresi eklemek için, boş bir satırdan sonra ekleyin
         <source>Got a list of%1 %Ln peer(s)%2 %3 ago</source>
         <extracomment>%1 and %2 are replaced with HTML markup, %3 is duration</extracomment>
         <translation type="unfinished">
-            <numerusform>%1 %Ln eşdeğerlerinin bir listesi %2s %3 önce alındı</numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -2522,14 +2522,14 @@ Başka bir öncelikli web adresi eklemek için, boş bir satırdan sonra ekleyin
         <location line="+8"/>
         <source>Asking for more peers now... &lt;small&gt;%1&lt;/small&gt;</source>
         <extracomment>%1 is duration</extracomment>
-        <translation>Daha fazla kişiden isteniyor... &lt;small&gt;%1&lt;/small&gt;</translation>
+        <translation>Daha fazla eş için sorgulanıyor... &lt;small&gt;%1&lt;/small&gt;</translation>
     </message>
     <message numerus="yes">
         <location line="+18"/>
         <source>Tracker had%1 %Ln seeder(s)%2</source>
         <extracomment>First part of phrase &quot;Tracker had ... seeder(s) and ... leecher(s) ... ago&quot;; %1 and %2 are replaced with HTML markup</extracomment>
         <translation type="unfinished">
-            <numerusform>İzleyici %1 %Ln dağıtıcıya %2 sahipti</numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">

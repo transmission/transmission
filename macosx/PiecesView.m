@@ -20,12 +20,12 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#include <libtransmission/transmission.h>
+#include <libtransmission/utils.h>
+
 #import "PiecesView.h"
 #import "Torrent.h"
 #import "InfoWindowController.h"
-
-#import "transmission.h"
-#import "utils.h"
 
 #define MAX_ACROSS 18
 #define BETWEEN 1.0

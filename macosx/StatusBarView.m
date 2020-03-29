@@ -20,9 +20,10 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#import <QuartzCore/QuartzCore.h>
+
 #import "StatusBarView.h"
 #import "NSApplicationAdditions.h"
-#import <QuartzCore/QuartzCore.h>
 
 @interface StatusBarView (Private)
 
@@ -87,7 +88,7 @@
         const NSRect lineBorderRect = NSMakeRect(NSMinX(rect), 0.0, NSWidth(rect), 1.0);
         if (NSIntersectsRect(lineBorderRect, rect))
         {
-            [[NSColor lightGrayColor] setFill];
+            [[NSColor gridColor] setFill];
             NSRectFill(lineBorderRect);
         }
     }

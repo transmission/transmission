@@ -23,12 +23,14 @@ class FileTreeItem
     Q_DISABLE_COPY(FileTreeItem)
 
 public:
+/* *INDENT-OFF* */
     enum
     {
         LOW = (1 << 0),
         NORMAL = (1 << 1),
         HIGH = (1 << 2)
     };
+/* *INDENT-ON* */
 
 public:
     FileTreeItem(QString const& name = QString(), int fileIndex = -1, uint64_t size = 0) :

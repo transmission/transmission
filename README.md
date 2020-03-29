@@ -29,6 +29,7 @@ For a more detailed description, and dependencies, visit: https://github.com/tra
     $ tar xf transmission-2.92.tar.xz
     $ cd transmission-2.92
     $ mkdir build
+    $ cd build
     $ cmake ..
     $ make
     $ sudo make install
@@ -59,3 +60,16 @@ If you're new to building programs from source code, this is typically easier th
     $ cmake ..
     $ make
     $ sudo make install
+
+## Contributing
+
+### Code Style
+
+You would want to setup your editor to make use of uncrustify.cfg and .jsbeautifyrc configuration files located in the root of this repository.
+
+If for some reason you are unwilling or unable to do so, there is a shell script which you could run either directly or via docker-compose:
+
+    $ ./code_style.sh
+    or
+    $ docker-compose build --pull
+    $ docker-compose run --rm code_style

@@ -22,6 +22,7 @@
 
 #import <Cocoa/Cocoa.h>
 #import <Quartz/Quartz.h>
+
 #import "InfoViewController.h"
 
 @class FileOutlineController;

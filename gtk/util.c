@@ -206,7 +206,7 @@ void gtr_get_host_from_url(char* buf, size_t buflen, char const* url)
 static gboolean gtr_is_supported_url(char const* str)
 {
     return str != NULL && (g_str_has_prefix(str, "ftp://") || g_str_has_prefix(str, "http://") ||
-           g_str_has_prefix(str, "https://"));
+        g_str_has_prefix(str, "https://"));
 }
 
 gboolean gtr_is_magnet_link(char const* str)
@@ -398,7 +398,11 @@ void gtr_open_uri(char const* uri)
 
         if (!opened)
         {
+#if GTK_CHECK_VERSION(3, 22, 0)
+            opened = gtk_show_uri_on_window(NULL, uri, GDK_CURRENT_TIME, NULL);
+#else
             opened = gtk_show_uri(NULL, uri, GDK_CURRENT_TIME, NULL);
+#endif
         }
 
         if (!opened)
@@ -445,7 +449,7 @@ void gtr_combo_box_set_active_enum(GtkComboBox* combo_box, int value)
     /* find the one to select */
     i = 0;
 
-    while ((gtk_tree_model_iter_nth_child(model, &iter, NULL, i++)))
+    while (gtk_tree_model_iter_nth_child(model, &iter, NULL, i))
     {
         gtk_tree_model_get(model, &iter, column, &currentValue, -1);
 
@@ -454,6 +458,8 @@ void gtr_combo_box_set_active_enum(GtkComboBox* combo_box, int value)
             gtk_combo_box_set_active_iter(combo_box, &iter);
             return;
         }
+
+        ++i;
     }
 }
 

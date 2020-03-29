@@ -20,10 +20,10 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#include <libtransmission/transmission.h>
+
 #import "StatusBarController.h"
 #import "NSStringAdditions.h"
-
-#import "transmission.h"
 
 #define STATUS_RATIO_TOTAL      @"RatioTotal"
 #define STATUS_RATIO_SESSION    @"RatioSession"

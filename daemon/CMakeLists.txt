@@ -46,19 +46,7 @@ if(WITH_SYSTEMD)
     target_link_libraries(${TR_NAME}-daemon ${SYSTEMD_LIBRARIES})
 endif()
 
-tr_win32_app_info(${PROJECT_NAME}_remote_WIN32_RC_FILE
-    "Transmission Utility ('remote')"
-    "${TR_NAME}-remote"
-    "${TR_NAME}-remote.exe")
-
-add_executable(${TR_NAME}-remote remote.c ${${PROJECT_NAME}_remote_WIN32_RC_FILE})
-
-target_link_libraries(${TR_NAME}-remote
-    ${TR_NAME}
-    ${CURL_LIBRARIES}
-)
-
-foreach(P daemon remote)
+foreach(P daemon)
     install(TARGETS ${TR_NAME}-${P} DESTINATION ${CMAKE_INSTALL_BINDIR})
 
     if(INSTALL_DOC)

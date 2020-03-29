@@ -16,7 +16,7 @@
 
 int TrackerModel::rowCount(QModelIndex const& parent) const
 {
-    Q_UNUSED(parent);
+    Q_UNUSED(parent)
 
     return parent.isValid() ? 0 : myRows.size();
 }
@@ -80,7 +80,7 @@ struct CompareTrackers
     }
 };
 
-void TrackerModel::refresh(TorrentModel const& torrentModel, QSet<int> const& ids)
+void TrackerModel::refresh(TorrentModel const& torrentModel, torrent_ids_t const& ids)
 {
     // build a list of the TrackerInfos
     QVector<TrackerInfo> trackers;

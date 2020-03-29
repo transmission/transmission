@@ -8,7 +8,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2009, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2012, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -21,7 +21,6 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
- * $Id: curlbuild.h.in,v 1.8 2009-04-29 15:15:38 yangtse Exp $
  ***************************************************************************/
 
 /* ================================================================ */
@@ -60,52 +59,52 @@
 /* ================================================================ */
 
 #ifdef CURL_SIZEOF_LONG
-#  error "CURL_SIZEOF_LONG shall not be defined except in curlbuild.h"
+#error "CURL_SIZEOF_LONG shall not be defined except in curlbuild.h"
    Error Compilation_aborted_CURL_SIZEOF_LONG_already_defined
 #endif
 
 #ifdef CURL_TYPEOF_CURL_SOCKLEN_T
-#  error "CURL_TYPEOF_CURL_SOCKLEN_T shall not be defined except in curlbuild.h"
+#error "CURL_TYPEOF_CURL_SOCKLEN_T shall not be defined except in curlbuild.h"
    Error Compilation_aborted_CURL_TYPEOF_CURL_SOCKLEN_T_already_defined
 #endif
 
 #ifdef CURL_SIZEOF_CURL_SOCKLEN_T
-#  error "CURL_SIZEOF_CURL_SOCKLEN_T shall not be defined except in curlbuild.h"
+#error "CURL_SIZEOF_CURL_SOCKLEN_T shall not be defined except in curlbuild.h"
    Error Compilation_aborted_CURL_SIZEOF_CURL_SOCKLEN_T_already_defined
 #endif
 
 #ifdef CURL_TYPEOF_CURL_OFF_T
-#  error "CURL_TYPEOF_CURL_OFF_T shall not be defined except in curlbuild.h"
+#error "CURL_TYPEOF_CURL_OFF_T shall not be defined except in curlbuild.h"
    Error Compilation_aborted_CURL_TYPEOF_CURL_OFF_T_already_defined
 #endif
 
 #ifdef CURL_FORMAT_CURL_OFF_T
-#  error "CURL_FORMAT_CURL_OFF_T shall not be defined except in curlbuild.h"
+#error "CURL_FORMAT_CURL_OFF_T shall not be defined except in curlbuild.h"
    Error Compilation_aborted_CURL_FORMAT_CURL_OFF_T_already_defined
 #endif
 
 #ifdef CURL_FORMAT_CURL_OFF_TU
-#  error "CURL_FORMAT_CURL_OFF_TU shall not be defined except in curlbuild.h"
+#error "CURL_FORMAT_CURL_OFF_TU shall not be defined except in curlbuild.h"
    Error Compilation_aborted_CURL_FORMAT_CURL_OFF_TU_already_defined
 #endif
 
 #ifdef CURL_FORMAT_OFF_T
-#  error "CURL_FORMAT_OFF_T shall not be defined except in curlbuild.h"
+#error "CURL_FORMAT_OFF_T shall not be defined except in curlbuild.h"
    Error Compilation_aborted_CURL_FORMAT_OFF_T_already_defined
 #endif
 
 #ifdef CURL_SIZEOF_CURL_OFF_T
-#  error "CURL_SIZEOF_CURL_OFF_T shall not be defined except in curlbuild.h"
+#error "CURL_SIZEOF_CURL_OFF_T shall not be defined except in curlbuild.h"
    Error Compilation_aborted_CURL_SIZEOF_CURL_OFF_T_already_defined
 #endif
 
 #ifdef CURL_SUFFIX_CURL_OFF_T
-#  error "CURL_SUFFIX_CURL_OFF_T shall not be defined except in curlbuild.h"
+#error "CURL_SUFFIX_CURL_OFF_T shall not be defined except in curlbuild.h"
    Error Compilation_aborted_CURL_SUFFIX_CURL_OFF_T_already_defined
 #endif
 
 #ifdef CURL_SUFFIX_CURL_OFF_TU
-#  error "CURL_SUFFIX_CURL_OFF_TU shall not be defined except in curlbuild.h"
+#error "CURL_SUFFIX_CURL_OFF_TU shall not be defined except in curlbuild.h"
    Error Compilation_aborted_CURL_SUFFIX_CURL_OFF_TU_already_defined
 #endif
 
@@ -153,12 +152,19 @@
 #  include <sys/socket.h>
 #endif
 
+/* Configure process defines this to 1 when it finds out that system  */
+/* header file sys/poll.h must be included by the external interface. */
+/* #undef CURL_PULL_SYS_POLL_H */
+#ifdef CURL_PULL_SYS_POLL_H
+#  include <sys/poll.h>
+#endif
+
 /* The size of `long', as computed by sizeof. */
 #ifdef __LP64__
 #define CURL_SIZEOF_LONG 8
-#else /* !__LP64__ */
+#else
 #define CURL_SIZEOF_LONG 4
-#endif /* __LP64__ */
+#endif
 
 /* Integral data type used for curl_socklen_t. */
 #define CURL_TYPEOF_CURL_SOCKLEN_T socklen_t
