@@ -202,6 +202,11 @@ char* tr_strdup(void const* in);
  */
 int tr_strcmp0(char const* str1, char const* str2);
 
+static inline bool tr_str_is_empty(char const* value)
+{
+    return value == NULL || *value == '\0';
+}
+
 /**
  * @brief like memcmp() but gracefully handles NULL pointers
  */
@@ -220,8 +225,8 @@ void tr_quickfindFirstK(void* base, size_t nmemb, size_t size, tr_voidptr_compar
  * @brief sprintf() a string into a newly-allocated buffer large enough to hold it
  * @return a newly-allocated string that can be freed with tr_free()
  */
-char* tr_strdup_printf(char const* fmt, ...) TR_GNUC_PRINTF(1, 2) TR_GNUC_MALLOC;
-char* tr_strdup_vprintf(char const* fmt, va_list args) TR_GNUC_MALLOC;
+char* tr_strdup_printf(char const* fmt, ...) TR_GNUC_MALLOC TR_GNUC_PRINTF(1, 2);
+char* tr_strdup_vprintf(char const* fmt, va_list args) TR_GNUC_MALLOC TR_GNUC_PRINTF(1, 0);
 
 /** @brief Portability wrapper for strlcpy() that uses the system implementation if available */
 size_t tr_strlcpy(char* dst, void const* src, size_t siz);
@@ -242,6 +247,9 @@ bool tr_str_has_suffix(char const* str, char const* suffix);
 
 /** @brief Portability wrapper for memmem() that uses the system implementation if available */
 char const* tr_memmem(char const* haystack, size_t haystack_len, char const* needle, size_t needle_len);
+
+/** @brief Portability wrapper for strcasestr() that uses the system implementation if available */
+char const* tr_strcasestr(char const* haystack, char const* needle);
 
 /** @brief Portability wrapper for strsep() that uses the system implementation if available */
 char* tr_strsep(char** str, char const* delim);

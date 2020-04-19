@@ -139,7 +139,6 @@ GtkWidget* gtr_relocate_dialog_new(GtkWindow* parent, TrCore* core, GSList* torr
     d = gtk_dialog_new_with_buttons(_("Set Torrent Location"), parent, GTK_DIALOG_DESTROY_WITH_PARENT | GTK_DIALOG_MODAL,
         GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_APPLY, GTK_RESPONSE_APPLY, NULL);
     gtk_dialog_set_default_response(GTK_DIALOG(d), GTK_RESPONSE_CANCEL);
-    gtk_dialog_set_alternative_button_order(GTK_DIALOG(d), GTK_RESPONSE_APPLY, GTK_RESPONSE_CANCEL, -1);
     g_signal_connect(d, "response", G_CALLBACK(onResponse), NULL);
 
     row = 0;
