@@ -6,6 +6,7 @@
  *
  */
 
+#include <algorithm> // std::any_of
 #include <cassert>
 #include <climits> /* INT_MAX */
 #include <ctime>
@@ -233,8 +234,9 @@ DetailsDialog::DetailsDialog(Session& session, Prefs& prefs, TorrentModel const&
         refreshPref(key);
     }
 
-    connect(&myTimer, SIGNAL(timeout()), this, SLOT(onTimer()));
-    connect(&myPrefs, SIGNAL(changed(int)), this, SLOT(refreshPref(int)));
+    connect(&myModel, &TorrentModel::torrentsChanged, this, &DetailsDialog::onTorrentsChanged);
+    connect(&myPrefs, &Prefs::changed, this, &DetailsDialog::refreshPref);
+    connect(&myTimer, &QTimer::timeout, this, &DetailsDialog::onTimer);
 
     onTimer();
     myTimer.setSingleShot(false);
@@ -248,47 +250,19 @@ DetailsDialog::~DetailsDialog()
     myTrackerModel->deleteLater();
 }
 
-void DetailsDialog::setIds(QSet<int> const& ids)
+void DetailsDialog::setIds(torrent_ids_t const& ids)
 {
-    if (ids == myIds)
+    if (ids != myIds)
     {
-        return;
+        setEnabled(false);
+        ui.filesView->clear();
+
+        myIds = ids;
+        mySession.refreshDetailInfo(myIds);
+        myChangedTorrents = true;
+        myTrackerModel->refresh(myModel, myIds);
+        onTimer();
     }
-
-    myChangedTorrents = true;
-
-    // stop listening to the old torrents
-    for (int const id : myIds)
-    {
-        Torrent const* tor = myModel.getTorrentFromId(id);
-
-        if (tor != nullptr)
-        {
-            disconnect(tor, SIGNAL(torrentChanged(int)), this, SLOT(onTorrentChanged()));
-        }
-    }
-
-    ui.filesView->clear();
-    myIds = ids;
-    myTrackerModel->refresh(myModel, myIds);
-
-    // listen to the new torrents
-    for (int const id : myIds)
-    {
-        Torrent const* tor = myModel.getTorrentFromId(id);
-
-        if (tor != nullptr)
-        {
-            connect(tor, SIGNAL(torrentChanged(int)), this, SLOT(onTorrentChanged()));
-        }
-    }
-
-    for (int i = 0; i < ui.tabs->count(); ++i)
-    {
-        ui.tabs->widget(i)->setEnabled(false);
-    }
-
-    onTimer();
 }
 
 void DetailsDialog::refreshPref(int key)
@@ -332,34 +306,30 @@ void DetailsDialog::getNewData()
 {
     if (!myIds.empty())
     {
-        QSet<int> infos;
-
-        for (int const id : myIds)
-        {
-            Torrent const* tor = myModel.getTorrentFromId(id);
-
-            if (tor->isMagnet())
-            {
-                infos.insert(tor->id());
-            }
-        }
-
-        if (!infos.isEmpty())
-        {
-            mySession.initTorrents(infos);
-        }
-
         mySession.refreshExtraStats(myIds);
     }
 }
 
-void DetailsDialog::onTorrentChanged()
+void DetailsDialog::onTorrentEdited(torrent_ids_t const& /*ids*/)
 {
-    if (!myHavePendingRefresh)
+    // FIXME
+    // refreshDetailInfo({ tor.id() });
+}
+
+void DetailsDialog::onTorrentsChanged(torrent_ids_t const& ids)
+{
+    if (myHavePendingRefresh)
     {
-        myHavePendingRefresh = true;
-        QTimer::singleShot(100, this, SLOT(refresh()));
+        return;
     }
+
+    if (!std::any_of(ids.begin(), ids.end(), [this](auto const& id) { return myIds.count(id) != 0; }))
+    {
+        return;
+    }
+
+    myHavePendingRefresh = true;
+    QTimer::singleShot(100, this, SLOT(refresh()));
 }
 
 namespace
@@ -613,8 +583,6 @@ void DetailsDialog::refresh()
 
     ui.uploadedValueLabel->setText(string);
 
-    QDateTime const qdt_now = QDateTime::currentDateTime();
-
     // myRunTimeLabel
     if (torrents.empty())
     {
@@ -623,13 +591,13 @@ void DetailsDialog::refresh()
     else
     {
         bool allPaused = true;
-        QDateTime baseline = torrents[0]->lastStarted();
+        auto baseline = torrents[0]->lastStarted();
 
         for (Torrent const* const t : torrents)
         {
             if (baseline != t->lastStarted())
             {
-                baseline = QDateTime();
+                baseline = 0;
             }
 
             if (!t->isPaused())
@@ -642,13 +610,15 @@ void DetailsDialog::refresh()
         {
             string = stateString; // paused || finished
         }
-        else if (baseline.isNull())
+        else if (baseline == 0)
         {
             string = mixed;
         }
         else
         {
-            string = Formatter::timeToString(baseline.secsTo(qdt_now));
+            auto const now = time(nullptr);
+            auto const seconds = int(std::difftime(now, baseline));
+            string = Formatter::timeToString(seconds);
         }
     }
 
@@ -696,11 +666,11 @@ void DetailsDialog::refresh()
     }
     else
     {
-        QDateTime latest = torrents[0]->lastActivity();
+        auto latest = torrents[0]->lastActivity();
 
         for (Torrent const* const t : torrents)
         {
-            QDateTime const dt = t->lastActivity();
+            auto const dt = t->lastActivity();
 
             if (latest < dt)
             {
@@ -708,7 +678,8 @@ void DetailsDialog::refresh()
             }
         }
 
-        int const seconds = latest.isValid() ? latest.secsTo(qdt_now) : -1;
+        auto const now = time(nullptr);
+        auto const seconds = int(std::difftime(now, latest));
 
         if (seconds < 0)
         {
@@ -867,16 +838,16 @@ void DetailsDialog::refresh()
         bool mixed_creator = false;
         bool mixed_date = false;
         QString const creator = torrents[0]->creator();
-        QString const date = torrents[0]->dateCreated().toString();
+        auto const date = torrents[0]->dateCreated();
 
         for (Torrent const* const t : torrents)
         {
             mixed_creator |= (creator != t->creator());
-            mixed_date |= (date != t->dateCreated().toString());
+            mixed_date |= (date != t->dateCreated());
         }
 
         bool const empty_creator = creator.isEmpty();
-        bool const empty_date = date.isEmpty();
+        bool const empty_date = date <= 0;
 
         if (mixed_creator || mixed_date)
         {
@@ -892,11 +863,13 @@ void DetailsDialog::refresh()
         }
         else if (empty_creator && !empty_date)
         {
-            string = tr("Created on %1").arg(date);
+            auto const dateStr = QDateTime::fromSecsSinceEpoch(date).toString();
+            string = tr("Created on %1").arg(dateStr);
         }
         else
         {
-            string = tr("Created by %1 on %2").arg(creator).arg(date);
+            auto const dateStr = QDateTime::fromSecsSinceEpoch(date).toString();
+            string = tr("Created by %1 on %2").arg(creator).arg(dateStr);
         }
     }
 
@@ -1196,10 +1169,14 @@ void DetailsDialog::refresh()
 
     myChangedTorrents = false;
     myHavePendingRefresh = false;
+    setEnabled(true);
+}
 
+void DetailsDialog::setEnabled(bool enabled)
+{
     for (int i = 0; i < ui.tabs->count(); ++i)
     {
-        ui.tabs->widget(i)->setEnabled(true);
+        ui.tabs->widget(i)->setEnabled(enabled);
     }
 }
 
@@ -1325,7 +1302,7 @@ void DetailsDialog::onAddTrackerClicked()
     }
     else
     {
-        QSet<int> ids;
+        torrent_ids_t ids;
 
         for (int const id : myIds)
         {
@@ -1371,8 +1348,7 @@ void DetailsDialog::onEditTrackerClicked()
     }
     else
     {
-        QSet<int> ids;
-        ids << trackerInfo.torrentId;
+        torrent_ids_t ids{ trackerInfo.torrentId };
 
         QPair<int, QString> const idUrl = qMakePair(trackerInfo.st.id, newval);
 
@@ -1397,8 +1373,7 @@ void DetailsDialog::onRemoveTrackerClicked()
     // batch all of a tracker's torrents into one command
     for (int const id : torrentId_to_trackerIds.uniqueKeys())
     {
-        QSet<int> ids;
-        ids << id;
+        torrent_ids_t const ids{ id };
         mySession.torrentSet(ids, TR_KEY_trackerRemove, torrentId_to_trackerIds.values(id));
     }
 
@@ -1438,18 +1413,20 @@ void DetailsDialog::initOptionsTab()
     cr->addLayout(ui.peerConnectionsSectionLayout);
     cr->update();
 
-    connect(ui.sessionLimitCheck, SIGNAL(clicked(bool)), SLOT(onHonorsSessionLimitsToggled(bool)));
-    connect(ui.singleDownCheck, SIGNAL(clicked(bool)), SLOT(onDownloadLimitedToggled(bool)));
-    connect(ui.singleDownSpin, SIGNAL(editingFinished()), SLOT(onSpinBoxEditingFinished()));
-    connect(ui.singleUpCheck, SIGNAL(clicked(bool)), SLOT(onUploadLimitedToggled(bool)));
-    connect(ui.singleUpSpin, SIGNAL(editingFinished()), SLOT(onSpinBoxEditingFinished()));
-    connect(ui.bandwidthPriorityCombo, SIGNAL(currentIndexChanged(int)), SLOT(onBandwidthPriorityChanged(int)));
-    connect(ui.ratioCombo, SIGNAL(currentIndexChanged(int)), SLOT(onRatioModeChanged(int)));
-    connect(ui.ratioSpin, SIGNAL(editingFinished()), SLOT(onSpinBoxEditingFinished()));
-    connect(ui.idleCombo, SIGNAL(currentIndexChanged(int)), SLOT(onIdleModeChanged(int)));
-    connect(ui.idleSpin, SIGNAL(editingFinished()), SLOT(onSpinBoxEditingFinished()));
-    connect(ui.idleSpin, SIGNAL(valueChanged(int)), SLOT(onIdleLimitChanged()));
-    connect(ui.peerLimitSpin, SIGNAL(editingFinished()), SLOT(onSpinBoxEditingFinished()));
+    void (QComboBox::* comboIndexChanged)(int) = &QComboBox::currentIndexChanged;
+    void (QSpinBox::* spinValueChanged)(int) = &QSpinBox::valueChanged;
+    connect(ui.bandwidthPriorityCombo, comboIndexChanged, this, &DetailsDialog::onBandwidthPriorityChanged);
+    connect(ui.idleCombo, comboIndexChanged, this, &DetailsDialog::onIdleModeChanged);
+    connect(ui.idleSpin, &QSpinBox::editingFinished, this, &DetailsDialog::onSpinBoxEditingFinished);
+    connect(ui.idleSpin, spinValueChanged, this, &DetailsDialog::onIdleLimitChanged);
+    connect(ui.peerLimitSpin, &QSpinBox::editingFinished, this, &DetailsDialog::onSpinBoxEditingFinished);
+    connect(ui.ratioCombo, comboIndexChanged, this, &DetailsDialog::onRatioModeChanged);
+    connect(ui.ratioSpin, &QSpinBox::editingFinished, this, &DetailsDialog::onSpinBoxEditingFinished);
+    connect(ui.sessionLimitCheck, &QCheckBox::clicked, this, &DetailsDialog::onHonorsSessionLimitsToggled);
+    connect(ui.singleDownCheck, &QCheckBox::clicked, this, &DetailsDialog::onDownloadLimitedToggled);
+    connect(ui.singleDownSpin, &QSpinBox::editingFinished, this, &DetailsDialog::onSpinBoxEditingFinished);
+    connect(ui.singleUpCheck, &QCheckBox::clicked, this, &DetailsDialog::onUploadLimitedToggled);
+    connect(ui.singleUpSpin, &QSpinBox::editingFinished, this, &DetailsDialog::onSpinBoxEditingFinished);
 }
 
 /***
@@ -1473,13 +1450,14 @@ void DetailsDialog::initTrackerTab()
     ui.showTrackerScrapesCheck->setChecked(myPrefs.getBool(Prefs::SHOW_TRACKER_SCRAPES));
     ui.showBackupTrackersCheck->setChecked(myPrefs.getBool(Prefs::SHOW_BACKUP_TRACKERS));
 
-    connect(ui.trackersView->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)),
-        SLOT(onTrackerSelectionChanged()));
-    connect(ui.addTrackerButton, SIGNAL(clicked()), SLOT(onAddTrackerClicked()));
-    connect(ui.editTrackerButton, SIGNAL(clicked()), SLOT(onEditTrackerClicked()));
-    connect(ui.removeTrackerButton, SIGNAL(clicked()), SLOT(onRemoveTrackerClicked()));
-    connect(ui.showTrackerScrapesCheck, SIGNAL(clicked(bool)), SLOT(onShowTrackerScrapesToggled(bool)));
-    connect(ui.showBackupTrackersCheck, SIGNAL(clicked(bool)), SLOT(onShowBackupTrackersToggled(bool)));
+    connect(ui.addTrackerButton, &QAbstractButton::clicked, this, &DetailsDialog::onAddTrackerClicked);
+    connect(ui.editTrackerButton, &QAbstractButton::clicked, this, &DetailsDialog::onEditTrackerClicked);
+    connect(ui.removeTrackerButton, &QAbstractButton::clicked, this, &DetailsDialog::onRemoveTrackerClicked);
+    connect(ui.showBackupTrackersCheck, &QAbstractButton::clicked, this, &DetailsDialog::onShowBackupTrackersToggled);
+    connect(ui.showTrackerScrapesCheck, &QAbstractButton::clicked, this, &DetailsDialog::onShowTrackerScrapesToggled);
+    connect(
+        ui.trackersView->selectionModel(), &QItemSelectionModel::selectionChanged, this,
+        &DetailsDialog::onTrackerSelectionChanged);
 
     onTrackerSelectionChanged();
 }
@@ -1490,10 +1468,7 @@ void DetailsDialog::initTrackerTab()
 
 void DetailsDialog::initPeersTab()
 {
-    QStringList headers;
-    headers << QString() << tr("Up") << tr("Down") << tr("%") << tr("Status") << tr("Address") << tr("Client");
-
-    ui.peersView->setHeaderLabels(headers);
+    ui.peersView->setHeaderLabels({ QString(), tr("Up"), tr("Down"), tr("%"), tr("Status"), tr("Address"), tr("Client") });
     ui.peersView->sortByColumn(COL_ADDRESS, Qt::AscendingOrder);
 
     ui.peersView->setColumnWidth(COL_LOCK, 20);
@@ -1510,10 +1485,10 @@ void DetailsDialog::initPeersTab()
 
 void DetailsDialog::initFilesTab()
 {
-    connect(ui.filesView, SIGNAL(priorityChanged(QSet<int>, int)), SLOT(onFilePriorityChanged(QSet<int>, int)));
-    connect(ui.filesView, SIGNAL(wantedChanged(QSet<int>, bool)), SLOT(onFileWantedChanged(QSet<int>, bool)));
-    connect(ui.filesView, SIGNAL(pathEdited(QString, QString)), SLOT(onPathEdited(QString, QString)));
-    connect(ui.filesView, SIGNAL(openRequested(QString)), SLOT(onOpenRequested(QString)));
+    connect(ui.filesView, &FileTreeView::openRequested, this, &DetailsDialog::onOpenRequested);
+    connect(ui.filesView, &FileTreeView::pathEdited, this, &DetailsDialog::onPathEdited);
+    connect(ui.filesView, &FileTreeView::priorityChanged, this, &DetailsDialog::onFilePriorityChanged);
+    connect(ui.filesView, &FileTreeView::wantedChanged, this, &DetailsDialog::onFileWantedChanged);
 }
 
 void DetailsDialog::onFilePriorityChanged(QSet<int> const& indices, int priority)

@@ -22,7 +22,6 @@ class AboutDialog : public BaseDialog
 
 public:
     AboutDialog(QWidget* parent = nullptr);
-    virtual ~AboutDialog() = default;
 
 private slots:
     void showCredits();

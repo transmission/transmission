@@ -9,7 +9,6 @@
 #pragma once
 
 #include <QMap>
-#include <QSet>
 
 #include "BaseDialog.h"
 #include "Prefs.h"
