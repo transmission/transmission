@@ -13,13 +13,15 @@
 #include <QMainWindow>
 #include <QNetworkReply>
 #include <QPointer>
-#include <QSet>
 #include <QSystemTrayIcon>
 #include <QTimer>
 #include <QWidgetList>
 
 #include "Filters.h"
+#include "Speed.h"
 #include "TorrentFilter.h"
+#include "Typedefs.h"
+
 #include "ui_MainWindow.h"
 
 class QAction;
@@ -78,22 +80,21 @@ public slots:
     void setStatusbarVisible(bool);
     void setCompactView(bool);
     void refreshActionSensitivity();
-    void refreshActionSensitivitySoon();
     void wrongAuthentication();
 
     void openSession();
 
 protected:
     // QWidget
-    virtual void contextMenuEvent(QContextMenuEvent*);
-    virtual void dragEnterEvent(QDragEnterEvent*);
-    virtual void dropEvent(QDropEvent*);
+    void contextMenuEvent(QContextMenuEvent*) override;
+    void dragEnterEvent(QDragEnterEvent*) override;
+    void dropEvent(QDropEvent*) override;
 
 private:
     QIcon getStockIcon(QString const&, int fallback = -1);
-    QIcon getStockIcon(QString const&, int fallback, QStringList const& emblemNames);
+    QIcon addEmblem(QIcon icon, QStringList const& emblemNames);
 
-    QSet<int> getSelectedTorrents(bool withMetadataOnly = false) const;
+    torrent_ids_t getSelectedTorrents(bool withMetadataOnly = false) const;
     void updateNetworkIcon();
 
     QMenu* createOptionsMenu();
@@ -104,50 +105,50 @@ private:
     void addTorrent(AddData const& addMe, bool showOptions);
 
     // QWidget
-    virtual void hideEvent(QHideEvent* event);
-    virtual void showEvent(QShowEvent* event);
+    void hideEvent(QHideEvent* event) override;
+    void showEvent(QShowEvent* event) override;
 
 private slots:
-    void openPreferences();
-    void refreshTitle();
-    void refreshStatusBar();
-    void refreshTrayIcon();
-    void refreshTrayIconSoon();
-    void refreshTorrentViewHeader();
-    void openTorrent();
-    void openURL();
-    void newTorrent();
-    void trayActivated(QSystemTrayIcon::ActivationReason);
-    void refreshPref(int key);
     void addTorrents(QStringList const& filenames);
-    void removeTorrents(bool const deleteFiles);
-    void openStats();
-    void openDonate();
-    void openAbout();
-    void openHelp();
-    void openFolder();
     void copyMagnetLinkToClipboard();
-    void setLocation();
-    void openProperties();
-    void toggleSpeedMode();
     void dataReadProgress();
     void dataSendProgress();
+    void newTorrent();
     void onNetworkResponse(QNetworkReply::NetworkError code, QString const& message);
-    void toggleWindows(bool doShow);
+    void onRefreshTimer();
+    void onSessionSourceChanged();
     void onSetPrefs();
     void onSetPrefs(bool);
-    void onSessionSourceChanged();
-    void onModelReset();
-
-    void setSortAscendingPref(bool);
-
-    void onStatsModeChanged(QAction* action);
     void onSortModeChanged(QAction* action);
+    void onStatsModeChanged(QAction* action);
+    void openAbout();
+    void openDonate();
+    void openFolder();
+    void openHelp();
+    void openPreferences();
+    void openProperties();
+    void openStats();
+    void openTorrent();
+    void openURL();
+    void refreshPref(int key);
+    void refreshSoon(int fields = ~0);
+    void removeTorrents(bool const deleteFiles);
+    void setLocation();
+    void setSortAscendingPref(bool);
+    void toggleSpeedMode();
+    void toggleWindows(bool doShow);
+    void trayActivated(QSystemTrayIcon::ActivationReason);
 
 private:
     Session& mySession;
     Prefs& myPrefs;
     TorrentModel& myModel;
+
+    QPixmap myPixmapNetworkError;
+    QPixmap myPixmapNetworkIdle;
+    QPixmap myPixmapNetworkReceive;
+    QPixmap myPixmapNetworkTransmit;
+    QPixmap myPixmapNetworkTransmitReceive;
 
     Ui_MainWindow ui;
 
@@ -165,8 +166,6 @@ private:
     time_t myLastReadTime;
     QTimer myNetworkTimer;
     bool myNetworkError;
-    QTimer myRefreshTrayIconTimer;
-    QTimer myRefreshActionSensitivityTimer;
     QAction* myDlimitOffAction;
     QAction* myDlimitOnAction;
     QAction* myUlimitOffAction;
@@ -177,4 +176,28 @@ private:
     QWidget* myFilterBar;
     QAction* myAltSpeedAction;
     QString myErrorMessage;
+
+    struct TransferStats
+    {
+        Speed speedUp;
+        Speed speedDown;
+        size_t peersSending = 0;
+        size_t peersReceiving = 0;
+    };
+    TransferStats getTransferStats() const;
+
+    enum
+    {
+        REFRESH_TITLE = (1 << 0),
+        REFRESH_STATUS_BAR = (1 << 1),
+        REFRESH_TRAY_ICON = (1 << 2),
+        REFRESH_TORRENT_VIEW_HEADER = (1 << 3),
+        REFRESH_ACTION_SENSITIVITY = (1 << 4)
+    };
+    int myRefreshFields = 0;
+    QTimer myRefreshTimer;
+    void refreshTitle();
+    void refreshTrayIcon(TransferStats const&);
+    void refreshStatusBar(TransferStats const&);
+    void refreshTorrentViewHeader();
 };

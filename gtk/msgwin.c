@@ -209,7 +209,6 @@ static void onSaveRequest(GtkWidget* w, gpointer data)
     GtkWidget* d = gtk_file_chooser_dialog_new(_("Save Log"), window, GTK_FILE_CHOOSER_ACTION_SAVE, GTK_STOCK_CANCEL,
         GTK_RESPONSE_CANCEL, GTK_STOCK_SAVE, GTK_RESPONSE_ACCEPT, NULL);
 
-    gtk_dialog_set_alternative_button_order(GTK_DIALOG(d), GTK_RESPONSE_ACCEPT, GTK_RESPONSE_CANCEL, -1);
     g_signal_connect(d, "response", G_CALLBACK(onSaveDialogResponse), data);
     gtk_widget_show(d);
 }
@@ -490,7 +489,7 @@ GtkWidget* gtr_message_log_window_new(GtkWindow* parent, TrCore* core)
     gtk_toolbar_insert(GTK_TOOLBAR(toolbar), item, -1);
 
     w = gtk_label_new(_("Level"));
-    gtk_misc_set_padding(GTK_MISC(w), GUI_PAD, 0);
+    g_object_set(w, "margin", GUI_PAD, NULL);
     item = gtk_tool_item_new();
     gtk_container_add(GTK_CONTAINER(item), w);
     gtk_toolbar_insert(GTK_TOOLBAR(toolbar), item, -1);
@@ -527,7 +526,6 @@ GtkWidget* gtr_message_log_window_new(GtkWindow* parent, TrCore* core)
     g_object_unref(data->sort);
     g_signal_connect(view, "button-release-event", G_CALLBACK(on_tree_view_button_released), NULL);
     data->view = GTK_TREE_VIEW(view);
-    gtk_tree_view_set_rules_hint(data->view, TRUE);
     appendColumn(data->view, COL_SEQUENCE);
     appendColumn(data->view, COL_NAME);
     appendColumn(data->view, COL_MESSAGE);

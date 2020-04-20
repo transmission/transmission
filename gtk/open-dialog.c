@@ -84,7 +84,7 @@ static void save_recent_destination(TrCore* core, char const* dir)
     gtr_pref_save(gtr_core_session(core));
 
     /* cleanup */
-    g_slist_foreach(list, (GFunc)g_free, NULL);
+    g_slist_foreach(list, (GFunc)(GCallback)g_free, NULL);
     g_slist_free(list);
 }
 
@@ -284,7 +284,6 @@ GtkWidget* gtr_torrent_options_dialog_new(GtkWindow* parent, TrCore* core, tr_ct
     d = gtk_dialog_new_with_buttons(_("Torrent Options"), parent, GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_CANCEL,
         GTK_RESPONSE_CANCEL, GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT, NULL);
     gtk_dialog_set_default_response(GTK_DIALOG(d), GTK_RESPONSE_ACCEPT);
-    gtk_dialog_set_alternative_button_order(GTK_DIALOG(d), GTK_RESPONSE_ACCEPT, GTK_RESPONSE_CANCEL, -1);
 
     if (!tr_ctorGetDownloadDir(ctor, TR_FORCE, &str))
     {
@@ -317,7 +316,7 @@ GtkWidget* gtr_torrent_options_dialog_new(GtkWindow* parent, TrCore* core, tr_ct
 
     /* "torrent file" row */
     l = gtk_label_new_with_mnemonic(_("_Torrent file:"));
-    gtk_misc_set_alignment(GTK_MISC(l), 0.0F, 0.5F);
+    g_object_set(l, "halign", GTK_ALIGN_START, "valign", GTK_ALIGN_CENTER, NULL);
     gtk_grid_attach(grid, l, 0, row, 1, 1);
     w = gtk_file_chooser_button_new(_("Select Source File"), GTK_FILE_CHOOSER_ACTION_OPEN);
     source_chooser = w;
@@ -330,7 +329,7 @@ GtkWidget* gtr_torrent_options_dialog_new(GtkWindow* parent, TrCore* core, tr_ct
     /* "destination folder" row */
     row++;
     l = gtk_label_new_with_mnemonic(_("_Destination folder:"));
-    gtk_misc_set_alignment(GTK_MISC(l), 0.0F, 0.5F);
+    g_object_set(l, "halign", GTK_ALIGN_START, "valign", GTK_ALIGN_CENTER, NULL);
     gtk_grid_attach(grid, l, 0, row, 1, 1);
     w = gtk_file_chooser_button_new(_("Select Destination Folder"), GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER);
 
@@ -354,7 +353,7 @@ GtkWidget* gtr_torrent_options_dialog_new(GtkWindow* parent, TrCore* core, tr_ct
     row++;
     l = data->freespace_label = gtr_freespace_label_new(core, data->downloadDir);
     gtk_widget_set_margin_bottom(l, GUI_PAD_BIG);
-    gtk_misc_set_alignment(GTK_MISC(l), 1.0F, 0.5F);
+    g_object_set(l, "halign", GTK_ALIGN_END, "valign", GTK_ALIGN_CENTER, NULL);
     gtk_grid_attach(grid, l, 0, row, 2, 1);
 
     /* file list row */
@@ -367,7 +366,7 @@ GtkWidget* gtr_torrent_options_dialog_new(GtkWindow* parent, TrCore* core, tr_ct
     /* torrent priority row */
     row++;
     l = gtk_label_new_with_mnemonic(_("Torrent _priority:"));
-    gtk_misc_set_alignment(GTK_MISC(l), 0.0F, 0.5F);
+    g_object_set(l, "halign", GTK_ALIGN_START, "valign", GTK_ALIGN_CENTER, NULL);
     gtk_grid_attach(grid, l, 0, row, 1, 1);
     w = data->priority_combo;
     gtk_label_set_mnemonic_widget(GTK_LABEL(l), w);
@@ -440,7 +439,7 @@ static void onOpenDialogResponse(GtkDialog* dialog, int response, gpointer core)
         GSList* files = gtk_file_chooser_get_files(chooser);
 
         gtr_core_add_files(core, files, do_start, do_prompt, do_notify);
-        g_slist_foreach(files, (GFunc)g_object_unref, NULL);
+        g_slist_foreach(files, (GFunc)(GCallback)g_object_unref, NULL);
         g_slist_free(files);
     }
 
@@ -455,7 +454,6 @@ GtkWidget* gtr_torrent_open_from_file_dialog_new(GtkWindow* parent, TrCore* core
 
     w = gtk_file_chooser_dialog_new(_("Open a Torrent"), parent, GTK_FILE_CHOOSER_ACTION_OPEN, GTK_STOCK_CANCEL,
         GTK_RESPONSE_CANCEL, GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT, NULL);
-    gtk_dialog_set_alternative_button_order(GTK_DIALOG(w), GTK_RESPONSE_ACCEPT, GTK_RESPONSE_CANCEL, -1);
     gtk_file_chooser_set_select_multiple(GTK_FILE_CHOOSER(w), TRUE);
     addTorrentFilters(GTK_FILE_CHOOSER(w));
     g_signal_connect(w, "response", G_CALLBACK(onOpenDialogResponse), core);
@@ -519,7 +517,6 @@ GtkWidget* gtr_torrent_open_from_url_dialog_new(GtkWindow* parent, TrCore* core)
 
     w = gtk_dialog_new_with_buttons(_("Open URL"), parent, GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_CANCEL,
         GTK_RESPONSE_CANCEL, GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT, NULL);
-    gtk_dialog_set_alternative_button_order(GTK_DIALOG(w), GTK_RESPONSE_ACCEPT, GTK_RESPONSE_CANCEL, -1);
     g_signal_connect(w, "response", G_CALLBACK(onOpenURLResponse), core);
 
     row = 0;

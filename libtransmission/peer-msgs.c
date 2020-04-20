@@ -186,7 +186,7 @@ struct tr_peerMsgs
 
     int prefetchCount;
 
-    int is_active[2];
+    bool is_active[2];
 
     /* how long the outMessages batch should be allowed to grow before
      * it's flushed -- some messages (like requests >:) should be sent
@@ -402,7 +402,7 @@ static void protocolSendAllowedFast(tr_peerMsgs* msgs, uint32_t pieceIndex)
 
 #endif
 
-static void protocolSendChoke(tr_peerMsgs* msgs, int choke)
+static void protocolSendChoke(tr_peerMsgs* msgs, bool choke)
 {
     struct evbuffer* out = msgs->outMessages;
 
@@ -908,7 +908,7 @@ static void sendLtepHandshake(tr_peerMsgs* msgs)
     }
 
     tr_variantInitDict(&val, 8);
-    tr_variantDictAddInt(&val, TR_KEY_e, getSession(msgs)->encryptionMode != TR_CLEAR_PREFERRED);
+    tr_variantDictAddBool(&val, TR_KEY_e, getSession(msgs)->encryptionMode != TR_CLEAR_PREFERRED);
 
     if (ipv6 != NULL)
     {
@@ -922,7 +922,7 @@ static void sendLtepHandshake(tr_peerMsgs* msgs)
 
     tr_variantDictAddInt(&val, TR_KEY_p, tr_sessionGetPublicPeerPort(getSession(msgs)));
     tr_variantDictAddInt(&val, TR_KEY_reqq, REQQ);
-    tr_variantDictAddInt(&val, TR_KEY_upload_only, tr_torrentIsSeed(msgs->torrent));
+    tr_variantDictAddBool(&val, TR_KEY_upload_only, tr_torrentIsSeed(msgs->torrent));
     tr_variantDictAddQuark(&val, TR_KEY_v, version_quark);
 
     if (allow_metadata_xfer || allow_pex)
@@ -1656,7 +1656,7 @@ static int readBtMessage(tr_peerMsgs* msgs, struct evbuffer* inbuf, size_t inlen
 
         if (msgs->dht_port > 0)
         {
-            tr_dhtAddNode(getSession(msgs), tr_peerAddress(&msgs->peer), msgs->dht_port, 0);
+            tr_dhtAddNode(getSession(msgs), tr_peerAddress(&msgs->peer), msgs->dht_port, false);
         }
 
         break;
@@ -1817,7 +1817,7 @@ static int clientGotBlock(tr_peerMsgs* msgs, struct evbuffer* data, struct peer_
     return 0;
 }
 
-static int peerPulse(void* vmsgs);
+static void peerPulse(void* vmsgs);
 
 static void didWrite(tr_peerIo* io, size_t bytesWritten, bool wasPieceData, void* vmsgs)
 {
@@ -1878,7 +1878,7 @@ static ReadState canRead(tr_peerIo* io, void* vmsgs, size_t* piece)
     return ret;
 }
 
-int tr_peerMsgsIsReadingBlock(tr_peerMsgs const* msgs, tr_block_index_t block)
+bool tr_peerMsgsIsReadingBlock(tr_peerMsgs const* msgs, tr_block_index_t block)
 {
     if (msgs->state != AWAITING_BT_PIECE)
     {
@@ -2105,7 +2105,7 @@ static size_t fillOutputBuffer(tr_peerMsgs* msgs, time_t now)
 
         if (requestIsValid(msgs, &req) && tr_torrentPieceIsComplete(msgs->torrent, req.index))
         {
-            int err;
+            bool err;
             uint32_t const msglen = 4 + 1 + 4 + 4 + req.length;
             struct evbuffer* out;
             struct evbuffer_iovec iovec[1];
@@ -2120,21 +2120,23 @@ static size_t fillOutputBuffer(tr_peerMsgs* msgs, time_t now)
 
             evbuffer_reserve_space(out, req.length, iovec, 1);
             err = tr_cacheReadBlock(getSession(msgs)->cache, msgs->torrent, req.index, req.offset, req.length,
-                iovec[0].iov_base);
+                iovec[0].iov_base) != 0;
             iovec[0].iov_len = req.length;
             evbuffer_commit_space(out, iovec, 1);
 
             /* check the piece if it needs checking... */
-            if (err == 0 && tr_torrentPieceNeedsCheck(msgs->torrent, req.index))
+            if (!err && tr_torrentPieceNeedsCheck(msgs->torrent, req.index))
             {
-                if ((err = !tr_torrentCheckPiece(msgs->torrent, req.index)) != 0)
+                err = !tr_torrentCheckPiece(msgs->torrent, req.index);
+
+                if (err)
                 {
                     tr_torrentSetLocalError(msgs->torrent, _("Please Verify Local Data! Piece #%zu is corrupt."),
                         (size_t)req.index);
                 }
             }
 
-            if (err != 0)
+            if (err)
             {
                 if (fext)
                 {
@@ -2154,7 +2156,7 @@ static size_t fillOutputBuffer(tr_peerMsgs* msgs, time_t now)
 
             evbuffer_free(out);
 
-            if (err != 0)
+            if (err)
             {
                 bytesWritten = 0;
                 msgs = NULL;
@@ -2185,7 +2187,7 @@ static size_t fillOutputBuffer(tr_peerMsgs* msgs, time_t now)
     return bytesWritten;
 }
 
-static int peerPulse(void* vmsgs)
+static void peerPulse(void* vmsgs)
 {
     tr_peerMsgs* msgs = vmsgs;
     time_t const now = tr_time();
@@ -2204,8 +2206,6 @@ static int peerPulse(void* vmsgs)
             break;
         }
     }
-
-    return true; /* loop forever */
 }
 
 void tr_peerMsgsPulse(tr_peerMsgs* msgs)
@@ -2755,7 +2755,7 @@ tr_peerMsgs* tr_peerMsgsNew(struct tr_torrent* torrent, struct tr_peerIo* io, tr
         /* Only send PORT over IPv6 when the IPv6 DHT is running (BEP-32). */
         struct tr_address const* addr = tr_peerIoGetAddress(m->io, NULL);
 
-        if (addr->type == TR_AF_INET || tr_globalIPv6())
+        if (addr->type == TR_AF_INET || tr_globalIPv6() != NULL)
         {
             protocolSendPort(m, tr_dhtPort(torrent->session));
         }

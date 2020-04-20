@@ -305,7 +305,7 @@ void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, in
                     memset(&info, 0, sizeof(tr_info));
                     success = tr_metainfoParse(tor->session, &newMetainfo, &info, &hasInfo, &infoDictLength);
 
-                    if (success && !tr_getBlockSize(info.pieceSize))
+                    if (success && tr_getBlockSize(info.pieceSize) == 0)
                     {
                         tr_torrentSetLocalError(tor, "%s", _("Magnet torrent's metadata is not usable"));
                         tr_metainfoFree(&info);
@@ -340,6 +340,7 @@ void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, in
             tor->isStopping = true;
             tor->magnetVerify = true;
             tor->startAfterVerify = true;
+            tr_torrentMarkEdited(tor);
         }
         else /* drat. */
         {
@@ -418,7 +419,7 @@ char* tr_torrentInfoGetMagnetLink(tr_info const* inf)
 
     name = inf->name;
 
-    if (name != NULL && *name != '\0')
+    if (!tr_str_is_empty(name))
     {
         evbuffer_add_printf(s, "%s", "&dn=");
         tr_http_escape(s, name, TR_BAD_SIZE, true);

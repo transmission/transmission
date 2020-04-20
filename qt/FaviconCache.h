@@ -8,10 +8,13 @@
 
 #pragma once
 
-#include <QMap>
+#include <unordered_map>
+
 #include <QString>
 #include <QObject>
 #include <QPixmap>
+
+#include <Utils.h> // std::hash<QString>
 
 class QNetworkAccessManager;
 class QNetworkReply;
@@ -26,19 +29,21 @@ public:
     virtual ~FaviconCache();
 
     // returns a cached pixmap, or a NULL pixmap if there's no match in the cache
-    QPixmap find(QUrl const& url);
+    QPixmap find(QString const& key);
+    QPixmap find(QUrl const& url) { return find(getKey(url)); }
 
-    // returns a cached pixmap, or a NULL pixmap if there's no match in the cache
-    QPixmap findFromHost(QString const& host);
+    // This will emit a signal when (if) the icon becomes ready.
+    // Returns the key.
+    QString add(QUrl const& url);
 
-    // this will emit a signal when (if) the icon becomes ready
-    void add(QUrl const& url);
-
-    static QString getHost(QUrl const& url);
+    static QString getDisplayName(QUrl const& url);
+    static QString getDisplayName(QString const& key);
+    static QString getKey(QUrl const& url);
+    static QString getKey(QString const& displayName);
     static QSize getIconSize();
 
 signals:
-    void pixmapReady(QString const& host);
+    void pixmapReady(QString const& key);
 
 private:
     QString getCacheDir();
@@ -49,5 +54,5 @@ private slots:
 
 private:
     QNetworkAccessManager* myNAM;
-    QMap<QString, QPixmap> myPixmaps;
+    std::unordered_map<QString, QPixmap> myPixmaps;
 };

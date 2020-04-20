@@ -40,13 +40,13 @@ signals:
 
 protected:
     // QWidget
-    virtual void resizeEvent(QResizeEvent* event);
-    virtual void keyPressEvent(QKeyEvent* event);
-    virtual void mouseDoubleClickEvent(QMouseEvent* event);
-    virtual void contextMenuEvent(QContextMenuEvent* event);
+    void resizeEvent(QResizeEvent* event) override;
+    void keyPressEvent(QKeyEvent* event) override;
+    void mouseDoubleClickEvent(QMouseEvent* event) override;
+    void contextMenuEvent(QContextMenuEvent* event) override;
 
     // QAbstractItemView
-    virtual bool edit(QModelIndex const& index, EditTrigger trigger, QEvent* event);
+    bool edit(QModelIndex const& index, EditTrigger trigger, QEvent* event) override;
 
 private slots:
     void onClicked(QModelIndex const& index);

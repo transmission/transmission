@@ -281,7 +281,7 @@ static uint8_t* getHashInfo(tr_metainfo_builder* b)
         return NULL;
     }
 
-    while (totalRemain)
+    while (totalRemain != 0)
     {
         TR_ASSERT(b->pieceIndex < b->pieceCount);
 
@@ -376,7 +376,7 @@ static void getFileInfo(char const* topFile, tr_metainfo_builder_file const* fil
 
         while ((token = tr_strsep(&walk, TR_PATH_DELIMITER_STR)) != NULL)
         {
-            if (*token != '\0')
+            if (!tr_str_is_empty(token))
             {
                 tr_variantListAddStr(uninitialized_path, token);
             }
@@ -479,7 +479,7 @@ static void tr_realMakeMetaInfo(tr_metainfo_builder* builder)
 
     if (builder->result == TR_MAKEMETA_OK && !builder->abortFlag)
     {
-        if (builder->comment != NULL && *builder->comment != '\0')
+        if (!tr_str_is_empty(builder->comment))
         {
             tr_variantDictAddStr(&top, TR_KEY_comment, builder->comment);
         }
@@ -596,7 +596,7 @@ void tr_makeMetaInfo(tr_metainfo_builder* builder, char const* outputFile, tr_tr
     builder->comment = tr_strdup(comment);
     builder->isPrivate = isPrivate;
 
-    if (outputFile != NULL && *outputFile != '\0')
+    if (!tr_str_is_empty(outputFile))
     {
         builder->outputFile = tr_strdup(outputFile);
     }

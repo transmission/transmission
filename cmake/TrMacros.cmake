@@ -194,5 +194,5 @@ macro(tr_qt_add_resources)
 endmacro()
 
 macro(tr_qt_add_translation)
-    qt5_add_translation(${ARGN})
+    qt5_add_translation(${ARGN} OPTIONS -silent)
 endmacro()
