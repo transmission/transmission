@@ -81,7 +81,7 @@ TransmissionRemote.prototype = {
         var ajaxSettings = {
             url: RPC._Root,
             type: 'POST',
-            contentType: 'json',
+            contentType: 'application/json',
             dataType: 'json',
             cache: false,
             data: JSON.stringify(data),
