@@ -343,13 +343,13 @@ static void removeKeRangerRansomware()
             tr_variantDictAddStr(&settings, TR_KEY_blocklist_url, [[fDefaults stringForKey: @"BlocklistURL"] UTF8String]);
         tr_variantDictAddBool(&settings, TR_KEY_dht_enabled, [fDefaults boolForKey: @"DHTGlobal"]);
         tr_variantDictAddStr(&settings, TR_KEY_download_dir, [[[fDefaults stringForKey: @"DownloadFolder"]
-                                                                    stringByExpandingTildeInPath] fileSystemRepresentation]);
+                                                                    stringByExpandingTildeInPath] UTF8String]);
         tr_variantDictAddBool(&settings, TR_KEY_download_queue_enabled, [fDefaults boolForKey: @"Queue"]);
         tr_variantDictAddInt(&settings, TR_KEY_download_queue_size, [fDefaults integerForKey: @"QueueDownloadNumber"]);
         tr_variantDictAddInt(&settings, TR_KEY_idle_seeding_limit, [fDefaults integerForKey: @"IdleLimitMinutes"]);
         tr_variantDictAddBool(&settings, TR_KEY_idle_seeding_limit_enabled, [fDefaults boolForKey: @"IdleLimitCheck"]);
         tr_variantDictAddStr(&settings, TR_KEY_incomplete_dir, [[[fDefaults stringForKey: @"IncompleteDownloadFolder"]
-                                                                    stringByExpandingTildeInPath] fileSystemRepresentation]);
+                                                                    stringByExpandingTildeInPath] UTF8String]);
         tr_variantDictAddBool(&settings, TR_KEY_incomplete_dir_enabled, [fDefaults boolForKey: @"UseIncompleteDownloadFolder"]);
         tr_variantDictAddBool(&settings, TR_KEY_lpd_enabled, [fDefaults boolForKey: @"LocalPeerDiscoveryGlobal"]);
         tr_variantDictAddInt(&settings, TR_KEY_message_level, TR_LOG_DEBUG);
@@ -382,7 +382,7 @@ static void removeKeRangerRansomware()
         tr_variantDictAddInt(&settings, TR_KEY_seed_queue_size, [fDefaults integerForKey: @"QueueSeedNumber"]);
         tr_variantDictAddBool(&settings, TR_KEY_start_added_torrents, [fDefaults boolForKey: @"AutoStartDownload"]);
         tr_variantDictAddBool(&settings, TR_KEY_script_torrent_done_enabled, [fDefaults boolForKey: @"DoneScriptEnabled"]);
-        tr_variantDictAddStr(&settings, TR_KEY_script_torrent_done_filename, [[fDefaults stringForKey: @"DoneScriptPath"] fileSystemRepresentation]);
+        tr_variantDictAddStr(&settings, TR_KEY_script_torrent_done_filename, [[fDefaults stringForKey: @"DoneScriptPath"] UTF8String]);
         tr_variantDictAddBool(&settings, TR_KEY_utp_enabled, [fDefaults boolForKey: @"UTPGlobal"]);
 
         // TODO: Add to GUI
@@ -424,7 +424,7 @@ static void removeKeRangerRansomware()
         fLib = tr_sessionInit(configDir, YES, &settings);
         tr_variantFree(&settings);
 
-        fConfigDirectory = [[NSFileManager defaultManager] stringWithFileSystemRepresentation: configDir length: strlen(configDir)];
+        fConfigDirectory = [[NSString alloc] initWithUTF8String: configDir];
 
         [NSApp setDelegate: self];
 
@@ -922,7 +922,7 @@ static void removeKeRangerRansomware()
     {
         //ensure torrent doesn't already exist
         tr_ctor * ctor = tr_ctorNew(fLib);
-        tr_ctorSetMetainfoFromFile(ctor, [torrentPath fileSystemRepresentation]);
+        tr_ctorSetMetainfoFromFile(ctor, [torrentPath UTF8String]);
 
         tr_info info;
         const tr_parse_result result = tr_torrentParse(ctor, &info);
@@ -2842,7 +2842,7 @@ static void removeKeRangerRansomware()
             continue;
 
         tr_ctor * ctor = tr_ctorNew(fLib);
-        tr_ctorSetMetainfoFromFile(ctor, [fullFile fileSystemRepresentation]);
+        tr_ctorSetMetainfoFromFile(ctor, [fullFile UTF8String]);
 
         switch (tr_torrentParse(ctor, NULL))
         {
@@ -3130,7 +3130,7 @@ static void removeKeRangerRansomware()
             {
                 torrent = YES;
                 tr_ctor * ctor = tr_ctorNew(fLib);
-                tr_ctorSetMetainfoFromFile(ctor, [file fileSystemRepresentation]);
+                tr_ctorSetMetainfoFromFile(ctor, [file UTF8String]);
                 if (tr_torrentParse(ctor, NULL) == TR_PARSE_OK)
                 {
                     if (!fOverlayWindow)
@@ -3192,7 +3192,7 @@ static void removeKeRangerRansomware()
             {
                 torrent = YES;
                 tr_ctor * ctor = tr_ctorNew(fLib);
-                tr_ctorSetMetainfoFromFile(ctor, [file fileSystemRepresentation]);
+                tr_ctorSetMetainfoFromFile(ctor, [file UTF8String]);
                 if (tr_torrentParse(ctor, NULL) == TR_PARSE_OK)
                     [filesToOpen addObject: file];
                 tr_ctorFree(ctor);
@@ -4588,10 +4588,8 @@ static void removeKeRangerRansomware()
 - (void) rpcAddTorrentStruct: (struct tr_torrent *) torrentStruct
 {
     NSString * location = nil;
-    if (tr_torrentGetDownloadDir(torrentStruct) != NULL) {
-        const char * tmpLoc = tr_torrentGetDownloadDir(torrentStruct);
-        location = [[NSFileManager defaultManager] stringWithFileSystemRepresentation: tmpLoc length: strlen(tmpLoc)];
-    }
+    if (tr_torrentGetDownloadDir(torrentStruct) != NULL)
+        location = @(tr_torrentGetDownloadDir(torrentStruct));
 
     Torrent * torrent = [[Torrent alloc] initWithTorrentStruct: torrentStruct location: location lib: fLib];
 
