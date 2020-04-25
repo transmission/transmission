@@ -652,11 +652,11 @@ function Inspector(controller) {
                         var downer;
 
                         if (sortDirectionAsc) {
-                            upper = peera;
-                            downer = peerb;
-                        } else {
                             upper = peerb;
                             downer = peera;
+                        } else {
+                            upper = peera;
+                            downer = peerb;
                         }
 
                         if (sortIndex === 1) {
@@ -722,7 +722,7 @@ function Inspector(controller) {
                 tableHeaderList.forEach(function (th) {
                     th.addEventListener('click', (function () {
                         if (th.classList.contains('sort')) {
-                            // Clicked on the existing sorted column, invert the sort 
+                            // Clicked on the existing sorted column, invert the sort
                             var theHeader = document.getElementById('headerrow');
                             if (theHeader.classList.contains('asc')) {
                                 theHeader.classList.add('desc');
