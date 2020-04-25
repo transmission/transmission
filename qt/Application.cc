@@ -294,7 +294,7 @@ Application::Application(int& argc, char** argv) :
     myWatchDir = new WatchDir(*myModel);
 
     connect(myModel, &TorrentModel::torrentsAdded, this, &Application::onTorrentsAdded);
-    connect(myModel, &TorrentModel::torrentsChanged, myWindow, &MainWindow::refreshActionSensitivity);
+    connect(myModel, &TorrentModel::torrentsChanged, myWindow, &MainWindow::refreshActionSensitivitySoon);
     connect(myModel, &TorrentModel::torrentsCompleted, this, &Application::onTorrentsCompleted);
     connect(myModel, &TorrentModel::torrentsNeedInfo, this, &Application::onTorrentsNeedInfo);
     connect(myPrefs, &Prefs::changed, this, &Application::refreshPref);

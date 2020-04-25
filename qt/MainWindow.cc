@@ -242,9 +242,8 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     connect(ui.action_DeselectAll, SIGNAL(triggered()), ui.listView, SLOT(clearSelection()));
     connect(ui.action_Quit, SIGNAL(triggered()), qApp, SLOT(quit()));
 
-    auto refreshActionSensitivitySoon = [this]() { refreshSoon(REFRESH_ACTION_SENSITIVITY); };
-    connect(&myFilterModel, &TorrentFilter::rowsInserted, this, refreshActionSensitivitySoon);
-    connect(&myFilterModel, &TorrentFilter::rowsRemoved, this, refreshActionSensitivitySoon);
+    connect(&myFilterModel, &TorrentFilter::rowsInserted, this, &MainWindow::refreshActionSensitivitySoon);
+    connect(&myFilterModel, &TorrentFilter::rowsRemoved, this, &MainWindow::refreshActionSensitivitySoon);
 
     // torrent view
     myFilterModel.setSourceModel(&myModel);
@@ -255,7 +254,7 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     connect(&myModel, &TorrentModel::dataChanged, this, refreshSoonAdapter);
 
     ui.listView->setModel(&myFilterModel);
-    connect(ui.listView->selectionModel(), &QItemSelectionModel::selectionChanged, refreshActionSensitivitySoon);
+    connect(ui.listView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &MainWindow::refreshActionSensitivitySoon);
 
     QPair<QAction*, int> const sortModes[] =
     {
@@ -841,6 +840,11 @@ void MainWindow::refreshTorrentViewHeader()
     }
 }
 
+void MainWindow::refreshActionSensitivitySoon()
+{
+   refreshSoon(REFRESH_ACTION_SENSITIVITY);
+}
+
 void MainWindow::refreshActionSensitivity()
 {
     int paused(0);
@@ -851,6 +855,7 @@ void MainWindow::refreshActionSensitivity()
     int selectedWithMetadata(0);
     QAbstractItemModel const* model(ui.listView->model());
     QItemSelectionModel const* selectionModel(ui.listView->selectionModel());
+    bool const hasSelection = selectionModel->hasSelection();
     int const rowCount(model->rowCount());
 
     // count how many torrents are selected, paused, etc
@@ -862,8 +867,8 @@ void MainWindow::refreshActionSensitivity()
 
         if (tor != nullptr)
         {
-            bool const isSelected(selectionModel->isSelected(modelIndex));
-            bool const isPaused(tor->isPaused());
+            bool const isSelected = hasSelection && selectionModel->isSelected(modelIndex);
+            bool const isPaused = tor->isPaused();
 
             if (isPaused)
             {
