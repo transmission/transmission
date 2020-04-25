@@ -240,11 +240,11 @@ bool TorrentFilter::trackerFilterAcceptsTorrent(Torrent const* tor, QString cons
     return tracker.isEmpty() || tor->hasTrackerSubstring(tracker);
 }
 
-bool TorrentFilter::activityFilterAcceptsTorrent(Torrent const* tor, FilterMode const& m) const
+bool TorrentFilter::activityFilterAcceptsTorrent(Torrent const* tor, int filterMode) const
 {
     bool accepts;
 
-    switch (m.mode())
+    switch (filterMode)
     {
     case FilterMode::SHOW_ACTIVE:
         accepts = tor->peersWeAreUploadingTo() > 0 || tor->peersWeAreDownloadingFrom() > 0 || tor->isVerifying();
@@ -290,8 +290,8 @@ bool TorrentFilter::filterAcceptsRow(int sourceRow, QModelIndex const& sourcePar
 
     if (accepts)
     {
-        FilterMode const m = myPrefs.get<FilterMode>(Prefs::FILTER_MODE);
-        accepts = activityFilterAcceptsTorrent(tor, m);
+        auto const m = myPrefs.get<FilterMode>(Prefs::FILTER_MODE);
+        accepts = activityFilterAcceptsTorrent(tor, m.mode());
     }
 
     if (accepts)

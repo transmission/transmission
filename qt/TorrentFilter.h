@@ -43,7 +43,7 @@ protected:
     bool lessThan(QModelIndex const&, QModelIndex const&) const override;
 
 private:
-    bool activityFilterAcceptsTorrent(Torrent const* tor, FilterMode const& mode) const;
+    bool activityFilterAcceptsTorrent(Torrent const* tor, int filterMode) const;
     bool trackerFilterAcceptsTorrent(Torrent const* tor, QString const& tracker) const;
 
 private slots:
