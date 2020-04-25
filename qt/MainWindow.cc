@@ -254,7 +254,8 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     connect(&myModel, &TorrentModel::dataChanged, this, refreshSoonAdapter);
 
     ui.listView->setModel(&myFilterModel);
-    connect(ui.listView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &MainWindow::refreshActionSensitivitySoon);
+    connect(
+        ui.listView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &MainWindow::refreshActionSensitivitySoon);
 
     QPair<QAction*, int> const sortModes[] =
     {
@@ -842,7 +843,7 @@ void MainWindow::refreshTorrentViewHeader()
 
 void MainWindow::refreshActionSensitivitySoon()
 {
-   refreshSoon(REFRESH_ACTION_SENSITIVITY);
+    refreshSoon(REFRESH_ACTION_SENSITIVITY);
 }
 
 void MainWindow::refreshActionSensitivity()
