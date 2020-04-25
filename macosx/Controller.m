@@ -292,6 +292,7 @@ static void removeKeRangerRansomware()
 {
     if ((self = [super init]))
     {
+        NSString *tmpLocStr = nil;
         fDefaults = [NSUserDefaults standardUserDefaults];
 
         //checks for old version speeds of -1
@@ -342,14 +343,16 @@ static void removeKeRangerRansomware()
         if ([fDefaults objectForKey: @"BlocklistURL"])
             tr_variantDictAddStr(&settings, TR_KEY_blocklist_url, [[fDefaults stringForKey: @"BlocklistURL"] UTF8String]);
         tr_variantDictAddBool(&settings, TR_KEY_dht_enabled, [fDefaults boolForKey: @"DHTGlobal"]);
-        tr_variantDictAddStr(&settings, TR_KEY_download_dir, [[[fDefaults stringForKey: @"DownloadFolder"]
-                                                                    stringByExpandingTildeInPath] UTF8String]);
+        tmpLocStr = [[fDefaults stringForKey: @"DownloadFolder"]
+                     stringByExpandingTildeInPath];
+        tr_variantDictAddStr(&settings, TR_KEY_download_dir, tmpLocStr.length != 0 ? tmpLocStr.fileSystemRepresentation : NULL);
         tr_variantDictAddBool(&settings, TR_KEY_download_queue_enabled, [fDefaults boolForKey: @"Queue"]);
         tr_variantDictAddInt(&settings, TR_KEY_download_queue_size, [fDefaults integerForKey: @"QueueDownloadNumber"]);
         tr_variantDictAddInt(&settings, TR_KEY_idle_seeding_limit, [fDefaults integerForKey: @"IdleLimitMinutes"]);
         tr_variantDictAddBool(&settings, TR_KEY_idle_seeding_limit_enabled, [fDefaults boolForKey: @"IdleLimitCheck"]);
-        tr_variantDictAddStr(&settings, TR_KEY_incomplete_dir, [[[fDefaults stringForKey: @"IncompleteDownloadFolder"]
-                                                                    stringByExpandingTildeInPath] UTF8String]);
+        tmpLocStr = [[fDefaults stringForKey: @"IncompleteDownloadFolder"]
+                     stringByExpandingTildeInPath];
+        tr_variantDictAddStr(&settings, TR_KEY_incomplete_dir, tmpLocStr.length != 0 ? tmpLocStr.fileSystemRepresentation : NULL);
         tr_variantDictAddBool(&settings, TR_KEY_incomplete_dir_enabled, [fDefaults boolForKey: @"UseIncompleteDownloadFolder"]);
         tr_variantDictAddBool(&settings, TR_KEY_lpd_enabled, [fDefaults boolForKey: @"LocalPeerDiscoveryGlobal"]);
         tr_variantDictAddInt(&settings, TR_KEY_message_level, TR_LOG_DEBUG);
@@ -382,7 +385,8 @@ static void removeKeRangerRansomware()
         tr_variantDictAddInt(&settings, TR_KEY_seed_queue_size, [fDefaults integerForKey: @"QueueSeedNumber"]);
         tr_variantDictAddBool(&settings, TR_KEY_start_added_torrents, [fDefaults boolForKey: @"AutoStartDownload"]);
         tr_variantDictAddBool(&settings, TR_KEY_script_torrent_done_enabled, [fDefaults boolForKey: @"DoneScriptEnabled"]);
-        tr_variantDictAddStr(&settings, TR_KEY_script_torrent_done_filename, [[fDefaults stringForKey: @"DoneScriptPath"] UTF8String]);
+        tmpLocStr = [fDefaults stringForKey: @"DoneScriptPath"];
+        tr_variantDictAddStr(&settings, TR_KEY_script_torrent_done_filename, tmpLocStr.length != 0 ? tmpLocStr.fileSystemRepresentation : NULL);
         tr_variantDictAddBool(&settings, TR_KEY_utp_enabled, [fDefaults boolForKey: @"UTPGlobal"]);
 
         // TODO: Add to GUI
