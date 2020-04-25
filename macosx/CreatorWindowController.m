@@ -76,7 +76,7 @@ NSMutableSet *creatorWindowControllerSet = nil;
         fStarted = NO;
 
         fPath = path;
-        fInfo = tr_metaInfoBuilderCreate([fPath fileSystemRepresentation]);
+        fInfo = tr_metaInfoBuilderCreate([[fPath path] UTF8String]);
 
         if (fInfo->fileCount == 0)
         {
@@ -536,7 +536,7 @@ NSMutableSet *creatorWindowControllerSet = nil;
     [[self window] setRestorable: NO];
 
     [[NSNotificationCenter defaultCenter] postNotificationName: @"BeginCreateTorrentFile" object: fLocation userInfo: nil];
-    tr_makeMetaInfo(fInfo, [fLocation fileSystemRepresentation], trackerInfo, [fTrackers count], [[fCommentView string] UTF8String], [fPrivateCheck state] == NSOnState);
+    tr_makeMetaInfo(fInfo, [[fLocation path] UTF8String], trackerInfo, [fTrackers count], [[fCommentView string] UTF8String], [fPrivateCheck state] == NSOnState);
     tr_free(trackerInfo);
 
     fTimer = [NSTimer scheduledTimerWithTimeInterval: 0.1 target: self selector: @selector(checkProgress) userInfo: nil repeats: YES];
