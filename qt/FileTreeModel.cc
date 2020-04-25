@@ -292,7 +292,7 @@ int FileTreeModel::rowCount(QModelIndex const& parent) const
 
 int FileTreeModel::columnCount(QModelIndex const& parent) const
 {
-    Q_UNUSED(parent);
+    Q_UNUSED(parent)
 
     return NUM_COLUMNS;
 }
