@@ -92,7 +92,7 @@
             || [[file pathExtension] caseInsensitiveCompare: @"torrent"] == NSOrderedSame)
         {
             tr_ctor * ctor = tr_ctorNew(fLib);
-            tr_ctorSetMetainfoFromFile(ctor, [file fileSystemRepresentation]);
+            tr_ctorSetMetainfoFromFile(ctor, [file UTF8String]);
             tr_info info;
             if (tr_torrentParse(ctor, &info) == TR_PARSE_OK)
             {

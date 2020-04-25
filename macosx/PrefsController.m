@@ -1320,8 +1320,7 @@
     const BOOL doneScriptEnabled = tr_sessionIsTorrentDoneScriptEnabled(fHandle);
     [fDefaults setBool: doneScriptEnabled forKey: @"DoneScriptEnabled"];
 
-    const char * doneScriptCStr = tr_sessionGetTorrentDoneScript(fHandle);
-    NSString * doneScriptPath = [[NSFileManager defaultManager] stringWithFileSystemRepresentation: doneScriptCStr length: strlen(doneScriptCStr)];
+    NSString * doneScriptPath = @(tr_sessionGetTorrentDoneScript(fHandle));
     [fDefaults setObject: doneScriptPath forKey: @"DoneScriptPath"];
 
     //update gui if loaded
