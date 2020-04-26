@@ -45,7 +45,7 @@ OSStatus GeneratePreviewForURL(void *thisInterface, QLPreviewRequestRef preview,
     //try to parse the torrent file
     tr_info inf;
     tr_ctor * ctor = tr_ctorNew(NULL);
-    tr_ctorSetMetainfoFromFile(ctor, [(__bridge NSURL *)url fileSystemRepresentation]);
+    tr_ctorSetMetainfoFromFile(ctor, [[(__bridge NSURL *)url path] UTF8String]);
     const int err = tr_torrentParse(ctor, &inf);
     tr_ctorFree(ctor);
     if (err)
