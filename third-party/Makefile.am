@@ -7,6 +7,9 @@ endif
 if BUILD_UTP
   UTP_DIR = libutp
 endif
+if BUILD_LIBEVENT
+  LIBEVENT_DIR = libevent
+endif
 if BUILD_MINIUPNP
   MINIUPNP_DIR = miniupnpc
 endif
@@ -17,6 +20,7 @@ endif
 SUBDIRS = \
   $(DHT_DIR) \
   $(B64_DIR) \
+  $(LIBEVENT_DIR) \
   $(NATPMP_DIR) \
   $(MINIUPNP_DIR) \
   $(UTP_DIR)

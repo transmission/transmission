@@ -14,7 +14,7 @@ man.files = transmission-qt.1
 CONFIG += qt thread link_pkgconfig c++1z warn_on
 QT += network dbus
 win32:QT += winextras
-PKGCONFIG = fontconfig libcurl openssl libevent
+PKGCONFIG = fontconfig libcurl openssl
 
 greaterThan(QT_MAJOR_VERSION, 4) {
     QT += widgets
@@ -34,9 +34,10 @@ LIBS += $${LIBUTP_LIBS}
 LIBS += $${DHT_LIBS}
 LIBS += $${LIBB64_LIBS}
 LIBS += $${LIBUPNP_LIBS}
+LIBS += $${LIBEVENT_LIBS}
 LIBS += $${LIBNATPMP_LIBS}
-unix: LIBS += -L$${EVENT_TOP}/lib -lz -lrt
-win32:LIBS += -levent-2.0 -lws2_32 -lintl
+unix: LIBS += -lz -lrt
+win32:LIBS += -lws2_32 -lintl
 win32:LIBS += -lidn -liconv -lwldap32 -liphlpapi
 
 TRANSLATIONS += translations/transmission_de.ts \

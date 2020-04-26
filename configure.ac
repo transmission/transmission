@@ -124,9 +124,7 @@ AC_SEARCH_LIBS([socket], [socket net])
 AC_SEARCH_LIBS([gethostbyname], [nsl bind])
 AC_SEARCH_LIBS([quotacursor_skipidtype], [quota])
 PKG_CHECK_MODULES(LIBCURL, [libcurl >= $CURL_MINIMUM])
-PKG_CHECK_MODULES(LIBEVENT, [libevent >= $LIBEVENT_MINIMUM])
 PKG_CHECK_MODULES(ZLIB, [zlib >= $ZLIB_MINIMUM])
-
 
 AC_ARG_WITH([crypto], AS_HELP_STRING([--with-crypto=PKG],
             [Use specified crypto library: auto (default), openssl, cyassl, polarssl]),
@@ -470,8 +468,6 @@ fi
 AC_SUBST(LIBUPNP_CFLAGS)
 AC_SUBST(LIBUPNP_LIBS)
 AC_SUBST(LIBUPNP_LIBS_QT)
-
-
  
 
 dnl ----------------------------------------------------------------------------
@@ -497,6 +493,33 @@ AM_CONDITIONAL([BUILD_NATPMP],[test "x$build_bundled_natpmp" = "xyes"])
 AC_SUBST(LIBNATPMP_CFLAGS) 
 AC_SUBST(LIBNATPMP_LIBS) 
 AC_SUBST(LIBNATPMP_LIBS_QT) 
+
+
+dnl ----------------------------------------------------------------------------
+dnl
+dnl  Allow usage of system libevent library
+
+build_libevent='yes'
+AC_ARG_ENABLE([system-libevent],
+              AS_HELP_STRING([--enable-system-libevent],[Use system copy of libevent]),
+              [want_system_libevent=${enableval}],
+              [want_system_libevent=no])
+if test "x$want_system_libevent" = xyes ; then
+  PKG_CHECK_MODULES([LIBEVENT], [libevent >= ${LIBEVENT_MINIMUM}])
+  build_libevent=no
+else
+  AC_CONFIG_SUBDIRS([third-party/libevent])
+  LIBEVENT_MAKEFILE='third-party/libevent/Makefile'
+  LIBEVENT_CFLAGS="-I\$(top_srcdir)/third-party/libevent/"
+  LIBEVENT_LIBS="\$(top_builddir)/third-party/libevent/libevent.a"
+  LIBEVENT_LIBS_QT="\$\${TRANSMISSION_TOP}/third-party/libevent/libevent.a"
+fi
+AM_CONDITIONAL([BUILD_LIBEVENT],[test "x$build_libevent" = xyes])
+AC_SUBST(LIBEVENT_CFLAGS)
+AC_SUBST(LIBEVENT_LIBS)
+AC_SUBST(LIBEVENT_LIBS_QT)
+echo "build_libevent $build_libevent"
+echo "want_system_libevent $want_system_libevent"
 
 
 dnl ----------------------------------------------------------------------------
@@ -660,6 +683,7 @@ AC_CONFIG_FILES([Makefile
                  third-party/libb64/Makefile
                  third-party/libutp/Makefile
                  third-party/libnatpmp/Makefile
+                 ${LIBEVENT_MAKEFILE}
                  third-party/miniupnpc/Makefile
                  macosx/Makefile
                  gtk/Makefile
