@@ -289,15 +289,14 @@ else()
     set(EVENT2_CONFIGURE_FLAGS)
     if(APPLE)
         if(CRYPTO_PKG STREQUAL "openssl")
-            list(APPEND EVENT2_CONFIGURE_FLAGS "CPPFLAGS=-I${CRYPTO_INCLUDE_DIRS}")
+            list(APPEND EVENT2_CONFIGURE_FLAGS "CPPFLAGS=-isystem ${CRYPTO_INCLUDE_DIRS}")
         else()
-            list(APPEND EVENT2_CONFIGURE_FLAGS "CPPFLAGS=-I${THIRD_PARTY_DIR}/openssl/include")
+            list(APPEND EVENT2_CONFIGURE_FLAGS "CPPFLAGS=-isystem ${THIRD_PARTY_DIR}/openssl/include")
         endif()
     endif()
     tr_add_external_auto_library(EVENT2 libevent event
         BUILD_IN_SOURCE 1
-        CONFIGURE_COMMAND "<SOURCE_DIR>/autogen.sh"
-                  COMMAND "<SOURCE_DIR>/configure" "--prefix=<INSTALL_DIR>" "--disable-shared" ${EVENT2_CONFIGURE_FLAGS})
+        CMAKE_ARGS -DEVENT__LIBRARY_TYPE:STRING=STATIC -DCMAKE_CXX_FLAGS=${EVENT2_CONFIGURE_FLAGS})
 endif()
 
 tr_add_external_auto_library(NATPMP libnatpmp natpmp)
