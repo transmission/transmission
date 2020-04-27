@@ -38,7 +38,11 @@ static void popup(GtkStatusIcon* self, guint button, guint when, gpointer data U
 {
     GtkWidget* w = gtr_action_get_widget("/icon-popup");
 
+#if GTK_CHECK_VERSION(3, 22, 0)
+    gtk_menu_popup_at_widget(GTK_MENU(w), GTK_WIDGET(self), GDK_GRAVITY_SOUTH, GDK_GRAVITY_NORTH, NULL);
+#else
     gtk_menu_popup(GTK_MENU(w), NULL, NULL, gtk_status_icon_position_menu, self, button, when);
+#endif
 }
 
 void gtr_icon_refresh(gpointer vicon)

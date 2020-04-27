@@ -32,14 +32,14 @@ public:
     QString const& path() const;
 
     // QWidget
-    virtual QSize sizeHint() const;
+    QSize sizeHint() const override;
 
 signals:
     void pathChanged(QString const& path);
 
 protected:
     // QWidget
-    virtual void paintEvent(QPaintEvent* event);
+    void paintEvent(QPaintEvent* event) override;
 
 private:
     void updateAppearance();

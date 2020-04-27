@@ -968,7 +968,7 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     TR_ASSERT(tor->downloadedCur == 0);
     TR_ASSERT(tor->uploadedCur == 0);
 
-    tr_torrentSetAddedDate(tor, tr_time()); /* this is a default value to be overwritten by the resume file */
+    tr_torrentSetDateAdded(tor, tr_time()); /* this is a default value to be overwritten by the resume file */
 
     torrentInitFromInfo(tor);
 
@@ -1191,6 +1191,8 @@ void tr_torrentSetDownloadDir(tr_torrent* tor, char const* path)
     {
         tr_free(tor->downloadDir);
         tor->downloadDir = tr_strdup(path);
+
+        tr_torrentMarkEdited(tor);
         tr_torrentSetDirty(tor);
     }
 
@@ -1406,6 +1408,7 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
     s->activityDate = tor->activityDate;
     s->addedDate = tor->addedDate;
     s->doneDate = tor->doneDate;
+    s->editDate = tor->editDate;
     s->startDate = tor->startDate;
     s->secondsSeeding = tor->secondsSeeding;
     s->secondsDownloading = tor->secondsDownloading;
@@ -2862,6 +2865,7 @@ bool tr_torrentSetAnnounceList(tr_torrent* tor, tr_tracker_info const* trackers_
             tor->info.trackerCount = tmpInfo.trackerCount;
             tmpInfo.trackers = swap.trackers;
             tmpInfo.trackerCount = swap.trackerCount;
+            tr_torrentMarkEdited(tor);
 
             tr_metainfoFree(&tmpInfo);
             tr_variantToFile(&metainfo, TR_VARIANT_FMT_BENC, tor->info.torrent);
@@ -2905,7 +2909,14 @@ bool tr_torrentSetAnnounceList(tr_torrent* tor, tr_tracker_info const* trackers_
 ***
 **/
 
-void tr_torrentSetAddedDate(tr_torrent* tor, time_t t)
+#define BACK_COMPAT_FUNC(oldname, newname) \
+    void oldname(tr_torrent * tor, time_t t) { newname(tor, t); }
+BACK_COMPAT_FUNC(tr_torrentSetAddedDate, tr_torrentSetDateAdded)
+BACK_COMPAT_FUNC(tr_torrentSetActivityDate, tr_torrentSetDateActive)
+BACK_COMPAT_FUNC(tr_torrentSetDoneDate, tr_torrentSetDateDone)
+#undef BACK_COMPAT_FUNC
+
+void tr_torrentSetDateAdded(tr_torrent* tor, time_t t)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
@@ -2913,7 +2924,7 @@ void tr_torrentSetAddedDate(tr_torrent* tor, time_t t)
     tor->anyDate = MAX(tor->anyDate, tor->addedDate);
 }
 
-void tr_torrentSetActivityDate(tr_torrent* tor, time_t t)
+void tr_torrentSetDateActive(tr_torrent* tor, time_t t)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
@@ -2921,7 +2932,7 @@ void tr_torrentSetActivityDate(tr_torrent* tor, time_t t)
     tor->anyDate = MAX(tor->anyDate, tor->activityDate);
 }
 
-void tr_torrentSetDoneDate(tr_torrent* tor, time_t t)
+void tr_torrentSetDateDone(tr_torrent* tor, time_t t)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
@@ -3467,6 +3478,20 @@ void tr_torrentGotBlock(tr_torrent* tor, tr_block_index_t block)
 ****
 ***/
 
+static void find_file_in_dir(char const* name, char const* search_dir, char const** base, char const** subpath,
+    tr_sys_path_info* file_info)
+{
+    char* filename = tr_buildPath(search_dir, name, NULL);
+
+    if (tr_sys_path_get_info(filename, 0, file_info, NULL))
+    {
+        *base = search_dir;
+        *subpath = name;
+    }
+
+    tr_free(filename);
+}
+
 bool tr_torrentFindFile2(tr_torrent const* tor, tr_file_index_t fileNum, char const** base, char** subpath, time_t* mtime)
 {
     TR_ASSERT(tr_isTorrent(tor));
@@ -3483,29 +3508,13 @@ bool tr_torrentFindFile2(tr_torrent const* tor, tr_file_index_t fileNum, char co
     /* look in the download dir... */
     if (b == NULL)
     {
-        char* filename = tr_buildPath(tor->downloadDir, file->name, NULL);
-
-        if (tr_sys_path_get_info(filename, 0, &file_info, NULL))
-        {
-            b = tor->downloadDir;
-            s = file->name;
-        }
-
-        tr_free(filename);
+        find_file_in_dir(file->name, tor->downloadDir, &b, &s, &file_info);
     }
 
     /* look in the incomplete dir... */
     if (b == NULL && tor->incompleteDir != NULL)
     {
-        char* filename = tr_buildPath(tor->incompleteDir, file->name, NULL);
-
-        if (tr_sys_path_get_info(filename, 0, &file_info, NULL))
-        {
-            b = tor->incompleteDir;
-            s = file->name;
-        }
-
-        tr_free(filename);
+        find_file_in_dir(file->name, tor->incompleteDir, &b, &s, &file_info);
     }
 
     if (b == NULL)
@@ -3516,29 +3525,13 @@ bool tr_torrentFindFile2(tr_torrent const* tor, tr_file_index_t fileNum, char co
     /* look for a .part file in the incomplete dir... */
     if (b == NULL && tor->incompleteDir != NULL)
     {
-        char* filename = tr_buildPath(tor->incompleteDir, part, NULL);
-
-        if (tr_sys_path_get_info(filename, 0, &file_info, NULL))
-        {
-            b = tor->incompleteDir;
-            s = part;
-        }
-
-        tr_free(filename);
+        find_file_in_dir(part, tor->incompleteDir, &b, &s, &file_info);
     }
 
     /* look for a .part file in the download dir... */
     if (b == NULL)
     {
-        char* filename = tr_buildPath(tor->downloadDir, part, NULL);
-
-        if (tr_sys_path_get_info(filename, 0, &file_info, NULL))
-        {
-            b = tor->downloadDir;
-            s = part;
-        }
-
-        tr_free(filename);
+        find_file_in_dir(part, tor->downloadDir, &b, &s, &file_info);
     }
 
     /* return the results */
@@ -3998,6 +3991,7 @@ static void torrentRenamePath(void* vdata)
                     tor->info.name = tr_strdup(newname);
                 }
 
+                tr_torrentMarkEdited(tor);
                 tr_torrentSetDirty(tor);
             }
         }

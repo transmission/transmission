@@ -89,7 +89,7 @@ QSize FilterBarComboBox::calculateSize(QSize const& textSize, QSize const& count
 
 void FilterBarComboBox::paintEvent(QPaintEvent* e)
 {
-    Q_UNUSED(e);
+    Q_UNUSED(e)
 
     QStylePainter painter(this);
     painter.setPen(palette().color(QPalette::Text));

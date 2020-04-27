@@ -48,8 +48,9 @@
             NSMutableParagraphStyle * paragraphStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
             [paragraphStyle setAlignment: NSRightTextAlignment];
 
-            fAttributes = [[NSDictionary alloc] initWithObjects: @[[NSFont systemFontOfSize: 11.0], paragraphStyle]
-                forKeys: @[NSFontAttributeName, NSParagraphStyleAttributeName]];
+            fAttributes = @{NSFontAttributeName: [NSFont systemFontOfSize: 11.0],
+                            NSForegroundColorAttributeName: NSColor.labelColor,
+                            NSParagraphStyleAttributeName: paragraphStyle};
         }
 
         [[NSString percentString: [self floatValue] longDecimals: NO] drawInRect: cellFrame withAttributes: fAttributes];
