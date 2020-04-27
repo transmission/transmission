@@ -948,7 +948,7 @@ static void refreshInfo(struct DetailsImpl* di, tr_torrent** torrents, int n)
             haveValid += st->haveValid;
             sizeWhenDone += st->sizeWhenDone;
             leftUntilDone += st->leftUntilDone;
-            available += st->sizeWhenDone - st->leftUntilDone + st->desiredAvailable;
+            available += st->sizeWhenDone - st->leftUntilDone + st->haveUnchecked + st->desiredAvailable;
         }
 
         {
