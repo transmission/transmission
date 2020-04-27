@@ -2897,6 +2897,15 @@ static gboolean periodic_refresh(gpointer data)
     return G_SOURCE_CONTINUE;
 }
 
+static void on_details_window_size_allocated(GtkWidget* gtk_window, GtkAllocation* alloc UNUSED, gpointer gdata UNUSED)
+{
+    GdkWindow* gdk_window = gtk_widget_get_window(gtk_window);
+    int w, h;
+    gtk_window_get_size(GTK_WINDOW(gtk_window), &w, &h);
+    gtr_pref_int_set(TR_KEY_details_window_width, w);
+    gtr_pref_int_set(TR_KEY_details_window_height, h);
+}
+
 static void details_free(gpointer gdata)
 {
     struct DetailsImpl* data = gdata;
@@ -2934,6 +2943,11 @@ GtkWidget* gtr_torrent_details_dialog_new(GtkWindow* parent, TrCore* core)
     d = gtk_dialog_new_with_buttons(NULL, parent, 0, GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE, NULL);
     di->dialog = d;
     gtk_window_set_role(GTK_WINDOW(d), "tr-info");
+
+    /* return saved window size */
+    gtk_window_resize(d, gtr_pref_int_get(TR_KEY_details_window_width), gtr_pref_int_get(TR_KEY_details_window_height));
+    g_signal_connect(d, "size-allocate", G_CALLBACK(on_details_window_size_allocated), NULL);
+
     g_signal_connect_swapped(d, "response", G_CALLBACK(gtk_widget_destroy), d);
     gtk_container_set_border_width(GTK_CONTAINER(d), GUI_PAD);
     g_object_set_qdata_full(G_OBJECT(d), DETAILS_KEY, di, details_free);
