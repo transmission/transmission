@@ -242,8 +242,10 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     connect(ui.action_DeselectAll, SIGNAL(triggered()), ui.listView, SLOT(clearSelection()));
     connect(ui.action_Quit, SIGNAL(triggered()), qApp, SLOT(quit()));
 
-    connect(&myFilterModel, &TorrentFilter::rowsInserted, this, &MainWindow::refreshActionSensitivitySoon);
-    connect(&myFilterModel, &TorrentFilter::rowsRemoved, this, &MainWindow::refreshActionSensitivitySoon);
+    auto refreshActionSensitivitySoon = [this]() { refreshSoon(REFRESH_ACTION_SENSITIVITY); };
+    connect(&myFilterModel, &TorrentFilter::rowsInserted, this, refreshActionSensitivitySoon);
+    connect(&myFilterModel, &TorrentFilter::rowsRemoved, this, refreshActionSensitivitySoon);
+    connect(&myModel, &TorrentModel::torrentsChanged, this, refreshActionSensitivitySoon);
 
     // torrent view
     myFilterModel.setSourceModel(&myModel);
@@ -254,8 +256,7 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     connect(&myModel, &TorrentModel::dataChanged, this, refreshSoonAdapter);
 
     ui.listView->setModel(&myFilterModel);
-    connect(
-        ui.listView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &MainWindow::refreshActionSensitivitySoon);
+    connect(ui.listView->selectionModel(), &QItemSelectionModel::selectionChanged, refreshActionSensitivitySoon);
 
     QPair<QAction*, int> const sortModes[] =
     {
@@ -839,11 +840,6 @@ void MainWindow::refreshTorrentViewHeader()
     {
         ui.listView->setHeaderText(tr("Showing %L1 of %Ln torrent(s)", nullptr, totalCount).arg(visibleCount));
     }
-}
-
-void MainWindow::refreshActionSensitivitySoon()
-{
-    refreshSoon(REFRESH_ACTION_SENSITIVITY);
 }
 
 void MainWindow::refreshActionSensitivity()

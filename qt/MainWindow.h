@@ -79,7 +79,6 @@ public slots:
     void setFilterbarVisible(bool);
     void setStatusbarVisible(bool);
     void setCompactView(bool);
-    void refreshActionSensitivitySoon();
     void wrongAuthentication();
 
     void openSession();
