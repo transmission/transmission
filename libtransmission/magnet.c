@@ -122,7 +122,7 @@ tr_magnet_info* tr_magnetParse(char const* uri)
 
     if (uri != NULL && strncmp(uri, "magnet:?", 8) == 0)
     {
-        for (char const* walk = uri + 8; walk != NULL && *walk != '\0';)
+        for (char const* walk = uri + 8; !tr_str_is_empty(walk);)
         {
             char const* key = walk;
             char const* delim = strchr(key, '=');

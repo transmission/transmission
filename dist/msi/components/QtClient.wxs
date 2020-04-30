@@ -113,14 +113,17 @@
         </Component>
       </Directory>
 
+      <Directory Id="QTSTYLESDIR" Name="styles">
+        <Component Id="dll.qt5.plugins.styles.windowsvista">
+          <File DiskId="1" KeyPath="yes" Name="qwindowsvistastyle.dll" />
+        </Component>
+      </Directory>
+
     </DirectoryRef>
     <DirectoryRef Id="INSTALLDIR" FileSource="$(var.ThirdPartyDir)\bin">
 
       <Component Id="dll.dbus">
-        <File DiskId="1" KeyPath="yes" Name="dbus-1-3.dll" />
-      </Component>
-      <Component Id="dll.expat">
-        <File DiskId="1" KeyPath="yes" Name="expat.dll" />
+        <File DiskId="1" KeyPath="yes" Name="dbus-1.dll" />
       </Component>
 
     </DirectoryRef>
@@ -137,8 +140,8 @@
       <ComponentRef Id="dll.qt5.widgets" />
       <ComponentRef Id="dll.qt5.winextras" />
       <ComponentRef Id="dll.qt5.plugins.platforms.windows" />
+      <ComponentRef Id="dll.qt5.plugins.styles.windowsvista" />
       <ComponentRef Id="dll.dbus" />
-      <ComponentRef Id="dll.expat" />
       <ComponentGroupRef Id="QtClientTranslationsComponents" />
       <ComponentGroupRef Id="QtTranslationsComponents" />
     </ComponentGroup>

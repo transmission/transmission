@@ -279,10 +279,6 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
         {
             four_digits(buf, buflen, "Avicora", id + 3);
         }
-        else if (strncmp(chid + 1, "BB", 2) == 0)
-        {
-            four_digits(buf, buflen, "BitBuddy", id + 3);
-        }
         else if (strncmp(chid + 1, "BE", 2) == 0)
         {
             four_digits(buf, buflen, "BitTorrent SDK", id + 3);
@@ -318,10 +314,6 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
         else if (strncmp(chid + 1, "BW", 2) == 0)
         {
             four_digits(buf, buflen, "BitWombat", id + 3);
-        }
-        else if (strncmp(chid + 1, "BX", 2) == 0)
-        {
-            four_digits(buf, buflen, "BittorrentX", id + 3);
         }
         else if (strncmp(chid + 1, "EB", 2) == 0)
         {
@@ -500,10 +492,6 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
             four_digits(buf, buflen, "Zona", id + 3);
         }
         /* */
-        else if (strncmp(chid + 1, "AG", 2) == 0)
-        {
-            three_digits(buf, buflen, "Ares", id + 3);
-        }
         else if (strncmp(chid + 1, "A~", 2) == 0)
         {
             three_digits(buf, buflen, "Ares", id + 3);
@@ -531,10 +519,6 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
         else if (strncmp(chid + 1, "pb", 2) == 0)
         {
             three_digits(buf, buflen, "pbTorrent", id + 3);
-        }
-        else if (strncmp(chid + 1, "TT", 2) == 0)
-        {
-            three_digits(buf, buflen, "TuoTu", id + 3);
         }
         else if (strncmp(chid + 1, "qB", 2) == 0)
         {
@@ -639,7 +623,7 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
             tr_snprintf(buf, buflen, "Baidu Netdisk");
         }
 
-        if (*buf != '\0')
+        if (!tr_str_is_empty(buf))
         {
             return buf;
         }
@@ -664,7 +648,7 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
                 strint(id + 5, 2), getMnemonicEnd(id[7]));
         }
 
-        if (*buf != '\0')
+        if (!tr_str_is_empty(buf))
         {
             return buf;
         }
@@ -683,7 +667,7 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
             mainline_style(buf, buflen, "Queen Bee", id);
         }
 
-        if (*buf != '\0')
+        if (!tr_str_is_empty(buf))
         {
             return buf;
         }
@@ -806,7 +790,7 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
     }
 
     /* Shad0w-style */
-    if (*buf == '\0')
+    if (tr_str_is_empty(buf))
     {
         int a;
         int b;
@@ -856,7 +840,7 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
     }
 
     /* No match */
-    if (*buf == '\0')
+    if (tr_str_is_empty(buf))
     {
         char out[32];
         char* walk = out;

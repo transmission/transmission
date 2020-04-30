@@ -681,12 +681,12 @@ static void callback(void* ignore UNUSED, int event, unsigned char const* info_h
             if (event == DHT_EVENT_SEARCH_DONE)
             {
                 tr_logAddTorInfo(tor, "%s", "IPv4 DHT announce done");
-                tor->dhtAnnounceInProgress = 0;
+                tor->dhtAnnounceInProgress = false;
             }
             else
             {
                 tr_logAddTorInfo(tor, "%s", "IPv6 DHT announce done");
-                tor->dhtAnnounce6InProgress = 0;
+                tor->dhtAnnounce6InProgress = false;
             }
         }
     }
@@ -761,14 +761,14 @@ void tr_dhtUpkeep(tr_session* session)
 
         if (tor->dhtAnnounceAt <= now)
         {
-            int const rc = tr_dhtAnnounce(tor, AF_INET, 1);
+            int const rc = tr_dhtAnnounce(tor, AF_INET, true);
 
             tor->dhtAnnounceAt = now + ((rc == 0) ? 5 + tr_rand_int_weak(5) : 25 * 60 + tr_rand_int_weak(3 * 60));
         }
 
         if (tor->dhtAnnounce6At <= now)
         {
-            int const rc = tr_dhtAnnounce(tor, AF_INET6, 1);
+            int const rc = tr_dhtAnnounce(tor, AF_INET6, true);
 
             tor->dhtAnnounce6At = now + ((rc == 0) ? 5 + tr_rand_int_weak(5) : 25 * 60 + tr_rand_int_weak(3 * 60));
         }

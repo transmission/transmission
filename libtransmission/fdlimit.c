@@ -395,7 +395,7 @@ static void ensureSessionFdInfoExists(tr_session* session)
         /* set the open-file limit to the largest safe size wrt FD_SETSIZE */
         struct rlimit limit;
 
-        if (!getrlimit(RLIMIT_NOFILE, &limit))
+        if (getrlimit(RLIMIT_NOFILE, &limit) == 0)
         {
             int const old_limit = (int)limit.rlim_cur;
             int const new_limit = MIN(limit.rlim_max, FD_SETSIZE);
