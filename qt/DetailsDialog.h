@@ -14,6 +14,7 @@
 #include <QTimer>
 
 #include "BaseDialog.h"
+#include "Typedefs.h"
 
 #include "ui_DetailsDialog.h"
 
@@ -35,10 +36,10 @@ public:
     DetailsDialog(Session&, Prefs&, TorrentModel const&, QWidget* parent = nullptr);
     virtual ~DetailsDialog();
 
-    void setIds(QSet<int> const& ids);
+    void setIds(torrent_ids_t const& ids);
 
     // QWidget
-    virtual QSize sizeHint() const
+    QSize sizeHint() const override
     {
         return QSize(440, 460);
     }
@@ -53,13 +54,15 @@ private:
     void getNewData();
 
     QIcon getStockIcon(QString const& freedesktop_name, int fallback);
+    void setEnabled(bool);
 
 private slots:
     void refresh();
     void refreshPref(int key);
-
-    void onTorrentChanged();
     void onTimer();
+
+    void onTorrentEdited(torrent_ids_t const& ids);
+    void onTorrentsChanged(torrent_ids_t const& ids);
 
     // Tracker tab
     void onTrackerSelectionChanged();
@@ -92,7 +95,7 @@ private:
 
     Ui::DetailsDialog ui;
 
-    QSet<int> myIds;
+    torrent_ids_t myIds;
     QTimer myTimer;
     bool myChangedTorrents;
     bool myHavePendingRefresh;

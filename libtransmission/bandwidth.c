@@ -50,7 +50,7 @@ static unsigned int getSpeed_Bps(struct bratecontrol const* r, unsigned int inte
             }
         }
 
-        rvolatile->cache_val = (unsigned int)(bytes * 1000u / interval_msec);
+        rvolatile->cache_val = (unsigned int)(bytes * 1000U / interval_msec);
         rvolatile->cache_time = now;
     }
 
@@ -161,7 +161,7 @@ static void allocateBandwidth(tr_bandwidth* b, tr_priority_t parent_priority, tr
     if (b->band[dir].isLimited)
     {
         uint64_t const nextPulseSpeed = b->band[dir].desiredSpeed_Bps;
-        b->band[dir].bytesLeft = nextPulseSpeed * period_msec / 1000u;
+        b->band[dir].bytesLeft = nextPulseSpeed * period_msec / 1000U;
     }
 
     /* add this bandwidth's peer, if any, to the peer pool */

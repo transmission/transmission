@@ -9,6 +9,8 @@
 #include <string.h> /* strlen(), strstr() */
 
 #ifdef _WIN32
+#include <windows.h>
+#include <wincrypt.h>
 #include <ws2tcpip.h>
 #else
 #include <sys/select.h>
@@ -19,6 +21,7 @@
 #include <event2/buffer.h>
 
 #include "transmission.h"
+#include "crypto-utils.h"
 #include "file.h"
 #include "list.h"
 #include "log.h"
@@ -149,6 +152,67 @@ static int sockoptfunction(void* vtask, curl_socket_t fd, curlsocktype purpose U
 
 #endif
 
+static CURLcode ssl_context_func(CURL* curl, void* ssl_ctx, void* user_data)
+{
+    (void)curl;
+    (void)user_data;
+
+    tr_x509_store_t const cert_store = tr_ssl_get_x509_store(ssl_ctx);
+    if (cert_store == NULL)
+    {
+        return CURLE_OK;
+    }
+
+#ifdef _WIN32
+
+    curl_version_info_data const* const curl_ver = curl_version_info(CURLVERSION_NOW);
+    if (curl_ver->age >= 0 && strncmp(curl_ver->ssl_version, "Schannel", 8) == 0)
+    {
+        return CURLE_OK;
+    }
+
+    static LPCWSTR const sys_store_names[] =
+    {
+        L"CA",
+        L"ROOT"
+    };
+
+    for (size_t i = 0; i < TR_N_ELEMENTS(sys_store_names); ++i)
+    {
+        HCERTSTORE const sys_cert_store = CertOpenSystemStoreW(0, sys_store_names[i]);
+        if (sys_cert_store == NULL)
+        {
+            continue;
+        }
+
+        PCCERT_CONTEXT sys_cert = NULL;
+
+        while (true)
+        {
+            sys_cert = CertFindCertificateInStore(sys_cert_store, X509_ASN_ENCODING, 0, CERT_FIND_ANY, NULL, sys_cert);
+            if (sys_cert == NULL)
+            {
+                break;
+            }
+
+            tr_x509_cert_t const cert = tr_x509_cert_new(sys_cert->pbCertEncoded, sys_cert->cbCertEncoded);
+            if (cert == NULL)
+            {
+                continue;
+            }
+
+            tr_x509_store_add(cert_store, cert);
+            tr_x509_cert_free(cert);
+        }
+
+        CertCloseStore(sys_cert_store, 0);
+    }
+
+#endif
+
+    return CURLE_OK;
+}
+
 static long getTimeoutFromURL(struct tr_web_task const* task)
 {
     long timeout;
@@ -178,8 +242,9 @@ static CURL* createEasy(tr_session* s, struct tr_web* web, struct tr_web_task* t
 {
     bool is_default_value;
     tr_address const* addr;
-    CURL* e = task->curl_easy = curl_easy_init();
+    CURL* e = curl_easy_init();
 
+    task->curl_easy = e;
     task->timeout_secs = getTimeoutFromURL(task);
 
     curl_easy_setopt(e, CURLOPT_AUTOREFERER, 1L);
@@ -199,6 +264,10 @@ static CURL* createEasy(tr_session* s, struct tr_web* web, struct tr_web_task* t
         if (web->curl_ca_bundle != NULL)
         {
             curl_easy_setopt(e, CURLOPT_CAINFO, web->curl_ca_bundle);
+        }
+        else
+        {
+            curl_easy_setopt(e, CURLOPT_SSL_CTX_FUNCTION, ssl_context_func);
         }
     }
     else
@@ -268,7 +337,8 @@ static void task_finish_func(void* vtask)
 static void tr_webThreadFunc(void* vsession);
 
 static struct tr_web_task* tr_webRunImpl(tr_session* session, int torrentId, char const* url, char const* range,
-    char const* cookies, tr_web_done_func done_func, void* done_func_user_data, struct evbuffer* buffer)
+    char const* cookies, tr_web_done_func done_func, void* done_func_user_data,
+    struct evbuffer* buffer)
 {
     struct tr_web_task* task = NULL;
 
@@ -744,7 +814,7 @@ char* tr_http_unescape(char const* str, size_t len)
 static bool is_rfc2396_alnum(uint8_t ch)
 {
     return ('0' <= ch && ch <= '9') || ('A' <= ch && ch <= 'Z') || ('a' <= ch && ch <= 'z') || ch == '.' || ch == '-' ||
-           ch == '_' || ch == '~';
+        ch == '_' || ch == '~';
 }
 
 void tr_http_escape_sha1(char* out, uint8_t const* sha1_digest)

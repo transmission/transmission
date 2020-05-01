@@ -17,6 +17,7 @@
 #include "session.h" /* tr_sessionLock(), tr_sessionUnlock() */
 #include "tr-assert.h"
 #include "utils.h" /* TR_GNUC_PRINTF */
+#include "ptrarray.h"
 
 struct tr_torrent_tiers;
 struct tr_magnet_info;
@@ -41,6 +42,8 @@ void tr_ctorInitTorrentWanted(tr_ctor const* ctor, tr_torrent* tor);
 
 /* just like tr_torrentSetFileDLs but doesn't trigger a fastresume save */
 void tr_torrentInitFileDLs(tr_torrent* tor, tr_file_index_t const* files, tr_file_index_t fileCount, bool do_download);
+
+void tr_torrentSetLabels(tr_torrent* tor, tr_ptrArray* labels);
 
 void tr_torrentRecheckCompleteness(tr_torrent*);
 
@@ -83,6 +86,12 @@ void tr_torrentCheckSeedLimit(tr_torrent* tor);
 void tr_torrentSave(tr_torrent* tor);
 
 void tr_torrentSetLocalError(tr_torrent* tor, char const* fmt, ...) TR_GNUC_PRINTF(2, 3);
+
+void tr_torrentSetDateAdded(tr_torrent* torrent, time_t addedDate);
+
+void tr_torrentSetDateActive(tr_torrent* torrent, time_t activityDate);
+
+void tr_torrentSetDateDone(tr_torrent* torrent, time_t doneDate);
 
 typedef enum
 {
@@ -182,11 +191,12 @@ struct tr_torrent
     uint64_t etaULSpeedCalculatedAt;
     unsigned int etaULSpeed_Bps;
 
-    time_t addedDate;
     time_t activityDate;
-    time_t doneDate;
-    time_t startDate;
+    time_t addedDate;
     time_t anyDate;
+    time_t doneDate;
+    time_t editDate;
+    time_t startDate;
 
     int secondsDownloading;
     int secondsSeeding;
@@ -240,6 +250,8 @@ struct tr_torrent
     uint16_t idleLimitMinutes;
     tr_idlelimit idleLimitMode;
     bool finishedSeedingByIdle;
+
+    tr_ptrArray labels;
 };
 
 static inline tr_torrent* tr_torrentNext(tr_session* session, tr_torrent* current)
@@ -336,6 +348,14 @@ static inline void tr_torrentSetDirty(tr_torrent* tor)
     TR_ASSERT(tr_isTorrent(tor));
 
     tor->isDirty = true;
+}
+
+/* note that the torrent's tr_info just changed */
+static inline void tr_torrentMarkEdited(tr_torrent* tor)
+{
+    TR_ASSERT(tr_isTorrent(tor));
+
+    tor->editDate = tr_time();
 }
 
 uint32_t tr_getBlockSize(uint32_t pieceSize);

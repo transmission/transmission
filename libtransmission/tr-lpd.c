@@ -466,6 +466,7 @@ UNUSED static inline void lpd_consistencyCheck(void)
      * as interfaces to the rest of the lib remain compatible with char* strings. */
     TR_STATIC_ASSERT(sizeof(lpd_torStaticType->info.hashString[0]) == sizeof(char), "");
 }
+
 /**
 * @endcond */
 
@@ -517,7 +518,8 @@ bool tr_lpdSendAnnounce(tr_torrent const* t)
 
         /* destination address info has already been set up in tr_lpdInit(),
          * so we refrain from preparing another sockaddr_in here */
-        int res = sendto(lpd_socket2, (void const*)query, len, 0, (struct sockaddr const*)&lpd_mcastAddr, sizeof(lpd_mcastAddr));
+        int res = sendto(lpd_socket2, (void const*)query, len, 0, (struct sockaddr const*)&lpd_mcastAddr,
+            sizeof(lpd_mcastAddr));
 
         if (res != len)
         {

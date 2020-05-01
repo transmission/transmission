@@ -60,7 +60,7 @@
 - (void) setSelectedTab: (BOOL) selected
 {
     fSelected = selected;
-    
+
     [self reloadAppearance];
 }
 
@@ -137,7 +137,7 @@
 - (void) updateControlTint: (NSNotification *) notification
 {
     NSAssert(![NSApp isOnMojaveOrBetter], @"should not be observing control tint color when accent color is available");
-    
+
     if (fSelected)
         [self setSelectedTab: YES];
 }

@@ -1269,8 +1269,15 @@ static void removeKeRangerRansomware()
             else
                 urlString = [@"http://" stringByAppendingString: urlString];
         }
+        
+        NSURL * url = [NSURL URLWithString: urlString];
+        if (url == nil)
+        {
+            NSLog(@"Detected non-URL string \"%@\". Ignoring.", urlString);
+            return;
+        }
 
-        NSURLRequest * request = [NSURLRequest requestWithURL: [NSURL URLWithString: urlString]
+        NSURLRequest * request = [NSURLRequest requestWithURL: url
                                     cachePolicy: NSURLRequestReloadIgnoringLocalAndRemoteCacheData timeoutInterval: 60];
 
         if (fPendingTorrentDownloads[[request URL]])
@@ -1449,7 +1456,7 @@ static void removeKeRangerRansomware()
             alert.informativeText = message;
             [alert addButtonWithTitle:NSLocalizedString(@"Remove", "Removal confirm panel -> button")];
             [alert addButtonWithTitle:NSLocalizedString(@"Cancel", "Removal confirm panel -> button")];
-            
+
             [alert beginSheetModalForWindow:fWindow
                           completionHandler:^(NSModalResponse returnCode) {
                               if (returnCode == NSAlertFirstButtonReturn) {

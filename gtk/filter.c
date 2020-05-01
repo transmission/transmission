@@ -493,7 +493,7 @@ static gboolean test_torrent_activity(tr_torrent* tor, int type)
 
     case ACTIVITY_FILTER_ACTIVE:
         return st->peersSendingToUs > 0 || st->peersGettingFromUs > 0 || st->webseedsSendingToUs > 0 ||
-               st->activity == TR_STATUS_CHECK;
+            st->activity == TR_STATUS_CHECK;
 
     case ACTIVITY_FILTER_PAUSED:
         return st->activity == TR_STATUS_STOPPED;
@@ -703,7 +703,7 @@ static gboolean testText(tr_torrent const* tor, char const* key)
 {
     gboolean ret = FALSE;
 
-    if (key == NULL || *key == '\0')
+    if (tr_str_is_empty(key))
     {
         ret = TRUE;
     }
@@ -779,7 +779,7 @@ static gboolean is_row_visible(GtkTreeModel* model, GtkTreeIter* iter, gpointer 
     text = (char const*)g_object_get_qdata(o, TEXT_KEY);
 
     return tor != NULL && test_tracker(tor, data->active_tracker_type, data->active_tracker_host) &&
-           test_torrent_activity(tor, data->active_activity_type) && testText(tor, text);
+        test_torrent_activity(tor, data->active_activity_type) && testText(tor, text);
 }
 
 static void selection_changed_cb(GtkComboBox* combo, gpointer vdata)
@@ -959,20 +959,20 @@ GtkWidget* gtr_filter_bar_new(tr_session* session, GtkTreeModel* tmodel, GtkTree
     gtk_label_set_mnemonic_widget(GTK_LABEL(l), w);
     gtk_box_pack_start(h_box, l, FALSE, FALSE, 0);
     gtk_box_pack_start(h_box, w, TRUE, TRUE, 0);
-
-    /* add a spacer */
-    w = gtk_alignment_new(0.0f, 0.0f, 0.0f, 0.0f);
-    gtk_widget_set_size_request(w, 0u, GUI_PAD_BIG);
-    gtk_box_pack_start(h_box, w, FALSE, FALSE, 0);
+#if GTK_CHECK_VERSION(3, 12, 0)
+    gtk_widget_set_margin_end(w, GUI_PAD);
+#else
+    gtk_widget_set_margin_right(w, GUI_PAD);
+#endif
 
     /* add the tracker combobox */
     w = tracker;
     gtk_box_pack_start(h_box, w, TRUE, TRUE, 0);
-
-    /* add a spacer */
-    w = gtk_alignment_new(0.0f, 0.0f, 0.0f, 0.0f);
-    gtk_widget_set_size_request(w, 0u, GUI_PAD_BIG);
-    gtk_box_pack_start(h_box, w, FALSE, FALSE, 0);
+#if GTK_CHECK_VERSION(3, 12, 0)
+    gtk_widget_set_margin_end(w, GUI_PAD);
+#else
+    gtk_widget_set_margin_right(w, GUI_PAD);
+#endif
 
     /* add the entry field */
     s = gtk_entry_new();

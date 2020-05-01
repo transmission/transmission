@@ -184,7 +184,7 @@ static void handle_upload(struct evhttp_request* req, struct tr_rpc_server* serv
         {
             struct tr_mimepart* p = tr_ptrArrayNth(&parts, i);
 
-            if (tr_memmem(p->headers, p->headers_len, TR_RPC_SESSION_ID_HEADER, strlen(TR_RPC_SESSION_ID_HEADER)) != NULL)
+            if (tr_strcasestr(p->headers, TR_RPC_SESSION_ID_HEADER) != NULL)
             {
                 char const* ours = get_current_session_id(server);
                 size_t const ourlen = strlen(ours);
@@ -430,7 +430,7 @@ static void handle_web_client(struct evhttp_request* req, struct tr_rpc_server* 
 {
     char const* webClientDir = tr_getWebClientDir(server->session);
 
-    if (webClientDir == NULL || *webClientDir == '\0')
+    if (tr_str_is_empty(webClientDir))
     {
         send_simple_response(req, HTTP_NOTFOUND,
             "<p>Couldn't find Transmission's web interface files!</p>"
@@ -461,7 +461,7 @@ static void handle_web_client(struct evhttp_request* req, struct tr_rpc_server* 
         else
         {
             char* filename = tr_strdup_printf("%s%s%s", webClientDir, TR_PATH_DELIMITER_STR,
-                *subpath != '\0' ? subpath : "index.html");
+                tr_str_is_empty(subpath) ? "index.html" : subpath);
             serve_file(req, server, filename);
             tr_free(filename);
         }
@@ -511,24 +511,28 @@ static void handle_rpc_from_json(struct evhttp_request* req, struct tr_rpc_serve
 
 static void handle_rpc(struct evhttp_request* req, struct tr_rpc_server* server)
 {
-    char const* q;
-
     if (req->type == EVHTTP_REQ_POST)
     {
         handle_rpc_from_json(req, server, (char const*)evbuffer_pullup(req->input_buffer, -1),
             evbuffer_get_length(req->input_buffer));
+        return;
     }
-    else if (req->type == EVHTTP_REQ_GET && (q = strchr(req->uri, '?')) != NULL)
+
+    if (req->type == EVHTTP_REQ_GET)
     {
-        struct rpc_response_data* data = tr_new0(struct rpc_response_data, 1);
-        data->req = req;
-        data->server = server;
-        tr_rpc_request_exec_uri(server->session, q + 1, TR_BAD_SIZE, rpc_response_func, data);
+        char const* q = strchr(req->uri, '?');
+
+        if (q != NULL)
+        {
+            struct rpc_response_data* data = tr_new0(struct rpc_response_data, 1);
+            data->req = req;
+            data->server = server;
+            tr_rpc_request_exec_uri(server->session, q + 1, TR_BAD_SIZE, rpc_response_func, data);
+            return;
+        }
     }
-    else
-    {
-        send_simple_response(req, 405, NULL);
-    }
+
+    send_simple_response(req, 405, NULL);
 }
 
 static bool isAddressAllowed(tr_rpc_server const* server, char const* address)
@@ -555,7 +559,7 @@ static bool isIPAddressWithOptionalPort(char const* host)
     int address_len = sizeof(address);
 
     /* TODO: move to net.{c,h} */
-    return evutil_parse_sockaddr_port(host, (struct sockaddr *) &address, &address_len) != -1;
+    return evutil_parse_sockaddr_port(host, (struct sockaddr*)&address, &address_len) != -1;
 }
 
 static bool isHostnameAllowed(tr_rpc_server const* server, struct evhttp_request* req)
@@ -650,12 +654,11 @@ static void handle_request(struct evhttp_request* req, void* arg)
 
         if (auth != NULL && evutil_ascii_strncasecmp(auth, "basic ", 6) == 0)
         {
-            size_t plen;
-            char* p = tr_base64_decode_str(auth + 6, &plen);
+            char* p = tr_base64_decode_str(auth + 6, NULL);
 
             if (p != NULL)
             {
-                if (plen > 0 && (pass = strchr(p, ':')) != NULL)
+                if ((pass = strchr(p, ':')) != NULL)
                 {
                     user = p;
                     *pass++ = '\0';
@@ -672,7 +675,8 @@ static void handle_request(struct evhttp_request* req, void* arg)
         {
             evhttp_add_header(req->output_headers, "WWW-Authenticate", "Basic realm=\"" MY_REALM "\"");
             server->loginattempts++;
-            char* unauthuser = tr_strdup_printf("<p>Unauthorized User. %d unsuccessful login attempts.</p>", server->loginattempts);
+            char* unauthuser = tr_strdup_printf("<p>Unauthorized User. %d unsuccessful login attempts.</p>",
+                server->loginattempts);
             send_simple_response(req, 401, unauthuser);
             tr_free(unauthuser);
             tr_free(user);
@@ -934,7 +938,7 @@ static void tr_rpcSetList(char const* whitelistStr, tr_list** list)
     }
 
     /* build the new whitelist entries */
-    for (char const* walk = whitelistStr; walk != NULL && *walk != '\0';)
+    for (char const* walk = whitelistStr; !tr_str_is_empty(walk);)
     {
         char const* delimiters = " ,;";
         size_t const len = strcspn(walk, delimiters);
@@ -1236,7 +1240,8 @@ tr_rpc_server* tr_rpcInit(tr_session* session, tr_variant* settings)
 
     if (s->isEnabled)
     {
-        tr_logAddNamedInfo(MY_NAME, _("Serving RPC and Web requests on %s:%d%s"), tr_rpcGetBindAddress(s), (int)s->port, s->url);
+        tr_logAddNamedInfo(MY_NAME, _("Serving RPC and Web requests on %s:%d%s"), tr_rpcGetBindAddress(s), (int)s->port,
+            s->url);
         tr_runInEventThread(session, startServer, s);
 
         if (s->isWhitelistEnabled)

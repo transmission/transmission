@@ -113,7 +113,7 @@ ItemLayout::ItemLayout(QString const& nameText, QString const& statusText, QIcon
     QSize const barSize(barStyle.rect.width() * 2 - style->subElementRect(QStyle::SE_ProgressBarGroove, &barStyle).width(),
         barStyle.rect.height());
 
-    QRect baseRect(topLeft, QSize(width, std::max({iconSize, nameSize.height(), statusSize.height(), barSize.height()})));
+    QRect baseRect(topLeft, QSize(width, std::max({ iconSize, nameSize.height(), statusSize.height(), barSize.height() })));
 
     iconRect = style->alignedRect(direction, Qt::AlignLeft | Qt::AlignVCenter, QSize(iconSize, iconSize), baseRect);
     emblemRect = style->alignedRect(direction, Qt::AlignRight | Qt::AlignBottom, emblemIcon.actualSize(iconRect.size() / 2,
@@ -221,8 +221,7 @@ void TorrentDelegateMin::drawTorrent(QPainter* painter, QStyleOptionViewItem con
     progressBarState |= QStyle::State_Small;
 
     QIcon::Mode const emblemIm = isItemSelected ? QIcon::Selected : QIcon::Normal;
-    QIcon const emblemIcon = tor.hasError() ? QIcon::fromTheme(QLatin1String("emblem-important"),
-        style->standardIcon(QStyle::SP_MessageBoxWarning)) : QIcon();
+    QIcon const emblemIcon = tor.hasError() ? getWarningEmblem() : QIcon();
 
     // layout
     QSize const m(margin(*style));

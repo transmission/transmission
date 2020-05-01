@@ -26,7 +26,7 @@ void RelocateDialog::onMoveToggled(bool b)
     myMoveFlag = b;
 }
 
-RelocateDialog::RelocateDialog(Session& session, TorrentModel const& model, QSet<int> const& ids, QWidget* parent) :
+RelocateDialog::RelocateDialog(Session& session, TorrentModel const& model, torrent_ids_t const& ids, QWidget* parent) :
     BaseDialog(parent),
     mySession(session),
     myIds(ids)
@@ -92,5 +92,5 @@ RelocateDialog::RelocateDialog(Session& session, TorrentModel const& model, QSet
 QString RelocateDialog::newLocation() const
 {
     return ui.newLocationStack->currentWidget() == ui.newLocationButton ? ui.newLocationButton->path() :
-           ui.newLocationEdit->text();
+        ui.newLocationEdit->text();
 }

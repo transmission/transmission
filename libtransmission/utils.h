@@ -126,6 +126,7 @@ void tr_win32_make_args_utf8(int* argc, char*** argv);
 
 int tr_main_win32(int argc, char** argv, int (* real_main)(int, char**));
 
+/* *INDENT-OFF* */
 #define tr_main(...) \
     main_impl(__VA_ARGS__); \
     int main(int argc, char* argv[]) \
@@ -133,6 +134,7 @@ int tr_main_win32(int argc, char** argv, int (* real_main)(int, char**));
         return tr_main_win32(argc, argv, &main_impl); \
     } \
     int main_impl(__VA_ARGS__)
+/* *INDENT-ON* */
 
 #else
 
@@ -167,6 +169,7 @@ void tr_free_ptrv(void* const* p);
  */
 void* tr_memdup(void const* src, size_t byteCount);
 
+/* *INDENT-OFF* */
 #define tr_new(struct_type, n_structs) \
     ((struct_type*)tr_malloc(sizeof(struct_type) * (size_t)(n_structs)))
 
@@ -175,6 +178,7 @@ void* tr_memdup(void const* src, size_t byteCount);
 
 #define tr_renew(struct_type, mem, n_structs) \
     ((struct_type*)tr_realloc((mem), sizeof(struct_type) * (size_t)(n_structs)))
+/* *INDENT-ON* */
 
 void* tr_valloc(size_t bufLen);
 
@@ -198,6 +202,11 @@ char* tr_strdup(void const* in);
  */
 int tr_strcmp0(char const* str1, char const* str2);
 
+static inline bool tr_str_is_empty(char const* value)
+{
+    return value == NULL || *value == '\0';
+}
+
 /**
  * @brief like memcmp() but gracefully handles NULL pointers
  */
@@ -206,18 +215,18 @@ int tr_memcmp0(void const* lhs, void const* rhs, size_t size);
 char* evbuffer_free_to_str(struct evbuffer* buf, size_t* result_len);
 
 /** @brief similar to bsearch() but returns the index of the lower bound */
-int tr_lowerBound(void const* key, void const* base, size_t nmemb, size_t size, int (* compar)(void const* key,
-    void const* arrayMember), bool* exact_match) TR_GNUC_HOT TR_GNUC_NONNULL(1, 5, 6);
+int tr_lowerBound(void const* key, void const* base, size_t nmemb, size_t size, tr_voidptr_compare_func compar,
+    bool* exact_match) TR_GNUC_HOT TR_GNUC_NONNULL(1, 5, 6);
 
 /** @brief moves the best k items to the first slots in the array. O(n) */
-void tr_quickfindFirstK(void* base, size_t nmemb, size_t size, int (* compar)(void const*, void const*), size_t k);
+void tr_quickfindFirstK(void* base, size_t nmemb, size_t size, tr_voidptr_compare_func compar, size_t k);
 
 /**
  * @brief sprintf() a string into a newly-allocated buffer large enough to hold it
  * @return a newly-allocated string that can be freed with tr_free()
  */
-char* tr_strdup_printf(char const* fmt, ...) TR_GNUC_PRINTF(1, 2) TR_GNUC_MALLOC;
-char* tr_strdup_vprintf(char const* fmt, va_list args) TR_GNUC_MALLOC;
+char* tr_strdup_printf(char const* fmt, ...) TR_GNUC_MALLOC TR_GNUC_PRINTF(1, 2);
+char* tr_strdup_vprintf(char const* fmt, va_list args) TR_GNUC_MALLOC TR_GNUC_PRINTF(1, 0);
 
 /** @brief Portability wrapper for strlcpy() that uses the system implementation if available */
 size_t tr_strlcpy(char* dst, void const* src, size_t siz);
@@ -238,6 +247,9 @@ bool tr_str_has_suffix(char const* str, char const* suffix);
 
 /** @brief Portability wrapper for memmem() that uses the system implementation if available */
 char const* tr_memmem(char const* haystack, size_t haystack_len, char const* needle, size_t needle_len);
+
+/** @brief Portability wrapper for strcasestr() that uses the system implementation if available */
+char const* tr_strcasestr(char const* haystack, char const* needle);
 
 /** @brief Portability wrapper for strsep() that uses the system implementation if available */
 char* tr_strsep(char** str, char const* delim);

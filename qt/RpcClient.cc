@@ -204,7 +204,7 @@ QNetworkAccessManager* RpcClient::networkAccessManager()
 
 void RpcClient::localSessionCallback(tr_session* s, tr_variant* response, void* vself)
 {
-    Q_UNUSED(s);
+    Q_UNUSED(s)
 
     RpcClient* self = static_cast<RpcClient*>(vself);
 
@@ -222,7 +222,7 @@ void RpcClient::networkRequestFinished(QNetworkReply* reply)
     reply->deleteLater();
 
     QFutureInterface<RpcResponse> promise = reply->property(REQUEST_FUTUREINTERFACE_PROPERTY_KEY).
-            value<QFutureInterface<RpcResponse>>();
+        value<QFutureInterface<RpcResponse>>();
 
 #ifdef DEBUG_HTTP
     std::cerr << "http response header: " << std::endl;

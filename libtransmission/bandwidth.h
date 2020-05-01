@@ -28,7 +28,7 @@ struct tr_peerIo;
  * it's included in the header for inlining and composition. */
 enum
 {
-    HISTORY_MSEC = 2000u,
+    HISTORY_MSEC = 2000U,
     INTERVAL_MSEC = HISTORY_MSEC,
     GRANULARITY_MSEC = 200,
     HISTORY_SIZE = (INTERVAL_MSEC / GRANULARITY_MSEC),

@@ -35,8 +35,7 @@ add_custom_command(
         --c-name transmission
         transmission.gresource.xml
     DEPENDS
-        icons/hicolor_apps_24x24_transmission.png
-        icons/hicolor_apps_48x48_transmission.png
+        icons/hicolor_apps_scalable_transmission.svg
         icons/lock.png
         icons/ratio.png
         icons/turtle-blue.png
@@ -49,12 +48,10 @@ add_custom_command(
 )
 
 if(ENABLE_NLS)
-    find_program(INTLTOOL_MERGE_EXECUTABLE intltool-merge REQUIRED)
-
     set(${PROJECT_NAME}_DESKTOP_FILE "${PROJECT_BINARY_DIR}/${TR_NAME}-gtk.desktop")
     add_custom_command(
         OUTPUT ${${PROJECT_NAME}_DESKTOP_FILE}
-        COMMAND ${INTLTOOL_MERGE_EXECUTABLE} --desktop-style --utf8 ${CMAKE_SOURCE_DIR}/po ${PROJECT_SOURCE_DIR}/transmission-gtk.desktop.in ${${PROJECT_NAME}_DESKTOP_FILE}
+        COMMAND ${GETTEXT_MSGFMT_EXECUTABLE} --desktop -d ${CMAKE_SOURCE_DIR}/po --template ${PROJECT_SOURCE_DIR}/transmission-gtk.desktop.in -o ${${PROJECT_NAME}_DESKTOP_FILE}
         DEPENDS ${PROJECT_SOURCE_DIR}/transmission-gtk.desktop.in
         VERBATIM
     )
@@ -62,7 +59,7 @@ if(ENABLE_NLS)
     set(${PROJECT_NAME}_APPDATA_FILE "${PROJECT_BINARY_DIR}/${TR_NAME}-gtk.appdata.xml")
     add_custom_command(
         OUTPUT ${${PROJECT_NAME}_APPDATA_FILE}
-        COMMAND ${INTLTOOL_MERGE_EXECUTABLE} --xml-style --utf8 ${CMAKE_SOURCE_DIR}/po ${PROJECT_SOURCE_DIR}/transmission-gtk.appdata.xml.in ${${PROJECT_NAME}_APPDATA_FILE}
+        COMMAND ${GETTEXT_MSGFMT_EXECUTABLE} --xml -d ${CMAKE_SOURCE_DIR}/po --template ${PROJECT_SOURCE_DIR}/transmission-gtk.appdata.xml.in -o ${${PROJECT_NAME}_APPDATA_FILE}
         DEPENDS ${PROJECT_SOURCE_DIR}/transmission-gtk.appdata.xml.in
         VERBATIM
     )
@@ -176,13 +173,8 @@ endif()
 install(TARGETS ${TR_NAME}-gtk DESTINATION ${CMAKE_INSTALL_BINDIR})
 
 set(${PROJECT_NAME}_PUBLIC_ICONS
-    hicolor_apps_16x16_transmission.png
-    hicolor_apps_22x22_transmission.png
-    hicolor_apps_24x24_transmission.png
-    hicolor_apps_32x32_transmission.png
-    hicolor_apps_48x48_transmission.png
-    hicolor_apps_256x256_transmission.png
     hicolor_apps_scalable_transmission.svg
+    hicolor_apps_scalable_transmission-devel.svg
     hicolor_apps_symbolic_transmission-symbolic.svg
 )
 

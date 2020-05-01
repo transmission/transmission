@@ -259,7 +259,8 @@ void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, in
 
     memcpy(m->metadata + offset, data, len);
 
-    tr_removeElementFromArray(m->piecesNeeded, neededPieceIndex, sizeof(struct metadata_node), m->piecesNeededCount--);
+    tr_removeElementFromArray(m->piecesNeeded, neededPieceIndex, sizeof(struct metadata_node), m->piecesNeededCount);
+    --m->piecesNeededCount;
 
     dbgmsg(tor, "saving metainfo piece %d... %d remain", piece, m->piecesNeededCount);
 
@@ -304,7 +305,7 @@ void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, in
                     memset(&info, 0, sizeof(tr_info));
                     success = tr_metainfoParse(tor->session, &newMetainfo, &info, &hasInfo, &infoDictLength);
 
-                    if (success && !tr_getBlockSize(info.pieceSize))
+                    if (success && tr_getBlockSize(info.pieceSize) == 0)
                     {
                         tr_torrentSetLocalError(tor, "%s", _("Magnet torrent's metadata is not usable"));
                         tr_metainfoFree(&info);
@@ -339,6 +340,7 @@ void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, in
             tor->isStopping = true;
             tor->magnetVerify = true;
             tor->startAfterVerify = true;
+            tr_torrentMarkEdited(tor);
         }
         else /* drat. */
         {
@@ -367,12 +369,10 @@ bool tr_torrentGetNextMetadataRequest(tr_torrent* tor, time_t now, int* setme_pi
 
     if (m != NULL && m->piecesNeededCount > 0 && m->piecesNeeded[0].requestedAt + MIN_REPEAT_INTERVAL_SECS < now)
     {
-        int i;
         int const piece = m->piecesNeeded[0].piece;
+        tr_removeElementFromArray(m->piecesNeeded, 0, sizeof(struct metadata_node), m->piecesNeededCount);
 
-        tr_removeElementFromArray(m->piecesNeeded, 0, sizeof(struct metadata_node), m->piecesNeededCount--);
-
-        i = m->piecesNeededCount++;
+        int i = m->piecesNeededCount - 1;
         m->piecesNeeded[i].piece = piece;
         m->piecesNeeded[i].requestedAt = now;
 
@@ -419,7 +419,7 @@ char* tr_torrentInfoGetMagnetLink(tr_info const* inf)
 
     name = inf->name;
 
-    if (name != NULL && *name != '\0')
+    if (!tr_str_is_empty(name))
     {
         evbuffer_add_printf(s, "%s", "&dn=");
         tr_http_escape(s, name, TR_BAD_SIZE, true);

@@ -14,7 +14,7 @@
         <translation>&lt;b style=&apos;font-size:x-large&apos;&gt;Transmission %1&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="../AboutDialog.ui" line="+26"/>
+        <location filename="../AboutDialog.ui" line="+29"/>
         <source>A fast and easy BitTorrent client</source>
         <translation>სწრაფი და მარტივი BitTorrent კლიენტი</translation>
     </message>
@@ -110,7 +110,7 @@
         <source>%1 (%Ln pieces @ %2)</source>
         <translation>
             <numerusform>%1 (%Ln ნაწილი @ %2)</numerusform>
-            <numerusform></numerusform>
+            <numerusform>%1 (%Ln ნაწილი @ %2)</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -118,7 +118,7 @@
         <source>%1 (%Ln pieces)</source>
         <translation>
             <numerusform>%1 (%Ln ნაწილი)</numerusform>
-            <numerusform></numerusform>
+            <numerusform>%1 (%Ln ნაწილი)</numerusform>
         </translation>
     </message>
     <message>
@@ -208,7 +208,7 @@
         <extracomment>Spin box suffix, &quot;Stop seeding if idle for: [ 5 minutes ]&quot; (includes leading space after the number, if needed)</extracomment>
         <translation>
             <numerusform>წუთი</numerusform>
-            <numerusform></numerusform>
+            <numerusform>წუთი</numerusform>
         </translation>
     </message>
     <message>
@@ -552,7 +552,7 @@
 <context>
     <name>FileTreeItem</name>
     <message>
-        <location filename="../FileTreeItem.cc" line="+289"/>
+        <location filename="../FileTreeItem.cc" line="+290"/>
         <location filename="../FileTreeView.cc" line="+108"/>
         <location line="+285"/>
         <source>Low</source>
@@ -790,7 +790,7 @@
         <source>%Ln day(s)</source>
         <translation>
             <numerusform>%Ln დღე</numerusform>
-            <numerusform></numerusform>
+            <numerusform>%Ln დღე</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -798,7 +798,7 @@
         <source>%Ln hour(s)</source>
         <translation>
             <numerusform>%Ln საათი</numerusform>
-            <numerusform></numerusform>
+            <numerusform>%Ln საათი</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -806,7 +806,7 @@
         <source>%Ln minute(s)</source>
         <translation>
             <numerusform>%Ln წუთი</numerusform>
-            <numerusform></numerusform>
+            <numerusform>%Ln წუთი</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -814,7 +814,7 @@
         <source>%Ln second(s)</source>
         <translation>
             <numerusform>%Ln წამი</numerusform>
-            <numerusform></numerusform>
+            <numerusform>%Ln წამი</numerusform>
         </translation>
     </message>
     <message>
@@ -1340,7 +1340,7 @@
         <source>Remove %Ln torrent(s)?</source>
         <translation>
             <numerusform>ამოღებულ იქნას %Ln ტორენტი?</numerusform>
-            <numerusform></numerusform>
+            <numerusform>ამოღებულ იქნას %Ln ტორენტი?</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -1348,7 +1348,7 @@
         <source>Showing %L1 of %Ln torrent(s)</source>
         <translation>
             <numerusform>ნაჩვენებია %L1 ტორენტი %Ln-დან</numerusform>
-            <numerusform></numerusform>
+            <numerusform>ნაჩვენებია %L1 ტორენტი %Ln-დან</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -1357,7 +1357,8 @@
         <translation>
             <numerusform>წაიშალოს ამ %Ln ტორენტების ჩამოტვირთული ფაილები?
 </numerusform>
-            <numerusform></numerusform>
+            <numerusform>წაიშალოს ამ %Ln ტორენტების ჩამოტვირთული ფაილები?
+</numerusform>
         </translation>
     </message>
     <message>
@@ -1448,7 +1449,7 @@
         <source>%Ln File(s)</source>
         <translation>
             <numerusform>%Ln ფაილი</numerusform>
-            <numerusform></numerusform>
+            <numerusform>%Ln ფაილი</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -1457,7 +1458,8 @@
         <translation>
             <numerusform>%Ln ნაწილი
 </numerusform>
-            <numerusform></numerusform>
+            <numerusform>%Ln ნაწილი
+</numerusform>
         </translation>
     </message>
     <message>
@@ -1792,7 +1794,7 @@ To add another primary URL, add it after a blank line.</source>
         <extracomment>Spin box suffix, &quot;Stop seeding if idle for: [ 5 minutes ]&quot; (includes leading space after the number, if needed)</extracomment>
         <translation>
             <numerusform>წუთი</numerusform>
-            <numerusform></numerusform>
+            <numerusform>წუთი</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -1801,7 +1803,7 @@ To add another primary URL, add it after a blank line.</source>
         <extracomment>Spin box suffix, &quot;Download is inactive if data sharing stopped: [ 5 minutes ago ]&quot; (includes leading space after the number, if needed)</extracomment>
         <translation>
             <numerusform>წუთის წინ</numerusform>
-            <numerusform></numerusform>
+            <numerusform>წუთის წინ</numerusform>
         </translation>
     </message>
     <message>
@@ -1854,7 +1856,7 @@ To add another primary URL, add it after a blank line.</source>
         <source>&lt;i&gt;Blocklist contains %Ln rule(s)&lt;/i&gt;</source>
         <translation>
             <numerusform>&lt;i&gt;შავი სია შეიცავს %Ln წესს&lt;/i&gt;</numerusform>
-            <numerusform></numerusform>
+            <numerusform>&lt;i&gt;შავი სია შეიცავს %Ln წესს&lt;/i&gt;</numerusform>
         </translation>
     </message>
     <message>
@@ -1882,7 +1884,7 @@ To add another primary URL, add it after a blank line.</source>
         <source>&lt;b&gt;Update succeeded!&lt;/b&gt;&lt;p&gt;Blocklist now has %Ln rule(s).</source>
         <translation>
             <numerusform>&lt;b&gt;წარმატებით განახლდა!&lt;/b&gt;&lt;p&gt;შავი სია ახლა შეიცავს %Ln წესს.</numerusform>
-            <numerusform></numerusform>
+            <numerusform>&lt;b&gt;წარმატებით განახლდა!&lt;/b&gt;&lt;p&gt;შავი სია ახლა შეიცავს %Ln წესს.</numerusform>
         </translation>
     </message>
     <message>
@@ -2202,7 +2204,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+541"/>
+        <location filename="../Session.cc" line="+546"/>
         <source>Error Renaming Path</source>
         <translation>ბილიკის გადარქმევის შეცდომა</translation>
     </message>
@@ -2214,17 +2216,17 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+449"/>
         <source>Error Adding Torrent</source>
-        <translation type="unfinished">ტორენტის დამატების შეცდომა</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+16"/>
+        <location line="+21"/>
         <source>Add Torrent</source>
         <translation>ტორენტის დამატება</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>&lt;p&gt;&lt;b&gt;Unable to add &quot;%1&quot;.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;It is a duplicate of &quot;%2&quot; which is already added.&lt;/p&gt;</source>
-        <translation type="unfinished">&lt;p&gt;&lt;b&gt;&quot;%1&quot; ვერ დაემატა.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;ის არის უკვე დამატებული ფაილის &quot;%2&quot; ასლი.&lt;/p&gt;</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2321,7 +2323,7 @@ To add another primary URL, add it after a blank line.</source>
         <source>Started %Ln time(s)</source>
         <translation>
             <numerusform>გაშვებულია %Ln-ჯერ</numerusform>
-            <numerusform></numerusform>
+            <numerusform>გაშვებულია %Ln-ჯერ</numerusform>
         </translation>
     </message>
 </context>
@@ -2444,7 +2446,7 @@ To add another primary URL, add it after a blank line.</source>
         <extracomment>First part of phrase &quot;Downloading from ... peer(s) and ... web seed(s)&quot;</extracomment>
         <translation>
             <numerusform>იტვირთება %Ln პირისგან</numerusform>
-            <numerusform></numerusform>
+            <numerusform>იტვირთება %Ln პირისგან</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -2452,20 +2454,20 @@ To add another primary URL, add it after a blank line.</source>
         <source>Seeding to %Ln peer(s)</source>
         <translation>
             <numerusform>სიდირდება %Ln პირზე</numerusform>
-            <numerusform></numerusform>
+            <numerusform>სიდირდება %Ln პირზე</numerusform>
         </translation>
     </message>
     <message>
-        <location line="+21"/>
+        <location line="+22"/>
         <source> - </source>
         <translation> - </translation>
     </message>
     <message numerus="yes">
-        <location line="-53"/>
+        <location line="-54"/>
         <source>Downloading metadata from %Ln peer(s) (%1% done)</source>
         <translation>
             <numerusform>მეტამონაცემების ჩამოტვირთვა %Ln პირისგან (%1% დასრულდა)</numerusform>
-            <numerusform></numerusform>
+            <numerusform>მეტამონაცემების ჩამოტვირთვა %Ln პირისგან (%1% დასრულდა)</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -2474,7 +2476,7 @@ To add another primary URL, add it after a blank line.</source>
         <extracomment>First part of phrase &quot;Downloading from ... of ... connected peer(s) and ... web seed(s)&quot;</extracomment>
         <translation>
             <numerusform>იტვირთება %Ln დაკავშირებულ პირთაგან %1-სგან</numerusform>
-            <numerusform></numerusform>
+            <numerusform>იტვირთება %Ln დაკავშირებულ პირთაგან %1-სგან</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -2483,7 +2485,7 @@ To add another primary URL, add it after a blank line.</source>
         <extracomment>Second (optional) part of phrase &quot;Downloading from ... of ... connected peer(s) and ... web seed(s)&quot;; notice that leading space (before &quot;and&quot;) is included here</extracomment>
         <translation>
             <numerusform>და %Ln ვებ სიდისგან</numerusform>
-            <numerusform></numerusform>
+            <numerusform>და %Ln ვებ სიდისგან</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -2491,16 +2493,16 @@ To add another primary URL, add it after a blank line.</source>
         <source>Seeding to %1 of %Ln connected peer(s)</source>
         <translation>
             <numerusform>სიდირდება %Ln დაკავშირებულ პირთაგან %1-ზე</numerusform>
-            <numerusform></numerusform>
+            <numerusform>სიდირდება %Ln დაკავშირებულ პირთაგან %1-ზე</numerusform>
         </translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+7"/>
         <source>Error</source>
         <translation>შეცდომა</translation>
     </message>
     <message>
-        <location line="-81"/>
+        <location line="-82"/>
         <source>Verifying local data (%1% tested)</source>
         <translation>ადგილობრივი მონაცემების გადამოწმება (%1% შემოწმებულია)</translation>
     </message>
@@ -2513,7 +2515,7 @@ To add another primary URL, add it after a blank line.</source>
         <extracomment>%1 and %2 are replaced with HTML markup, %3 is duration</extracomment>
         <translation>
             <numerusform>მიღებული იქნა სია %1 %Ln პირით%2 %3ს წინ</numerusform>
-            <numerusform></numerusform>
+            <numerusform>მიღებული იქნა სია %1 %Ln პირით%2 %3ს წინ</numerusform>
         </translation>
     </message>
     <message>
@@ -2556,7 +2558,7 @@ To add another primary URL, add it after a blank line.</source>
         <extracomment>First part of phrase &quot;Tracker had ... seeder(s) and ... leecher(s) ... ago&quot;; %1 and %2 are replaced with HTML markup</extracomment>
         <translation>
             <numerusform>ტრეკერს გააჩნდა %1 %Ln სიდერი%2</numerusform>
-            <numerusform></numerusform>
+            <numerusform>ტრეკერს გააჩნდა %1 %Ln სიდერი%2</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -2565,7 +2567,7 @@ To add another primary URL, add it after a blank line.</source>
         <extracomment>Second part of phrase &quot;Tracker had ... seeder(s) and ... leecher(s) ... ago&quot;; %1 and %2 are replaced with HTML markup, %3 is duration; notice that leading space (before &quot;and&quot;) is included here</extracomment>
         <translation>
             <numerusform>და%1 %Ln ლიჩერი%2 %3ს წინ</numerusform>
-            <numerusform></numerusform>
+            <numerusform>და%1 %Ln ლიჩერი%2 %3ს წინ</numerusform>
         </translation>
     </message>
     <message>
