@@ -30,11 +30,11 @@
 
 static tr_option options[] =
 {
-    { 'm', "magnet", "Give a magnet link for the specified torrent", "m", 0, NULL },
-    { 's', "scrape", "Ask the torrent's trackers how many peers are in the torrent's swarm", "s", 0, NULL },
-    { 'u', "unsorted", "Do not sort files by name", "u", 0, NULL },
-    { 'V', "version", "Show version number and exit", "V", 0, NULL },
-    { 0, NULL, NULL, NULL, 0, NULL }
+    { 'm', "magnet", "Give a magnet link for the specified torrent", "m", false, NULL },
+    { 's', "scrape", "Ask the torrent's trackers how many peers are in the torrent's swarm", "s", false, NULL },
+    { 'u', "unsorted", "Do not sort files by name", "u", false, NULL },
+    { 'V', "version", "Show version number and exit", "V", false, NULL },
+    { 0, NULL, NULL, NULL, false, NULL }
 };
 
 static char const* getUsage(void)
@@ -142,7 +142,7 @@ static void showInfo(tr_info const* inf)
     printf("  Created by: %s\n", inf->creator ? inf->creator : "Unknown");
     printf("  Created on: %s\n", unix_timestamp_to_str(inf->dateCreated));
 
-    if (inf->comment != NULL && *inf->comment != '\0')
+    if (!tr_str_is_empty(inf->comment))
     {
         printf("  Comment: %s\n", inf->comment);
     }
@@ -283,7 +283,7 @@ static void doScrape(tr_info const* inf)
                         tr_quark key;
                         tr_variant* val;
 
-                        while (tr_variantDictChild(files, i++, &key, &val))
+                        while (tr_variantDictChild(files, i, &key, &val))
                         {
                             if (memcmp(inf->hash, tr_quark_get_string(key, NULL), SHA_DIGEST_LENGTH) == 0)
                             {
@@ -302,6 +302,8 @@ static void doScrape(tr_info const* inf)
                                 printf("%d seeders, %d leechers\n", (int)seeders, (int)leechers);
                                 matched = true;
                             }
+
+                            ++i;
                         }
                     }
 

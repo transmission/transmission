@@ -250,7 +250,8 @@ tr_variant* tr_variantDictFind(tr_variant* dict, tr_quark const key)
 
 static bool tr_variantDictFindType(tr_variant* dict, tr_quark const key, int type, tr_variant** setme)
 {
-    return tr_variantIsType(*setme = tr_variantDictFind(dict, key), type);
+    *setme = tr_variantDictFind(dict, key);
+    return tr_variantIsType(*setme, type);
 }
 
 size_t tr_variantListSize(tr_variant const* list)
@@ -278,7 +279,8 @@ bool tr_variantListRemove(tr_variant* list, size_t i)
     {
         removed = true;
         tr_variantFree(&list->val.l.vals[i]);
-        tr_removeElementFromArray(list->val.l.vals, i, sizeof(tr_variant), list->val.l.count--);
+        tr_removeElementFromArray(list->val.l.vals, i, sizeof(tr_variant), list->val.l.count);
+        --list->val.l.count;
     }
 
     return removed;
@@ -288,20 +290,24 @@ bool tr_variantGetInt(tr_variant const* v, int64_t* setme)
 {
     bool success = false;
 
-    if (!success && (success = tr_variantIsInt(v)))
+    if (tr_variantIsInt(v))
     {
         if (setme != NULL)
         {
             *setme = v->val.i;
         }
+
+        success = true;
     }
 
-    if (!success && (success = tr_variantIsBool(v)))
+    if (!success && tr_variantIsBool(v))
     {
         if (setme != NULL)
         {
             *setme = v->val.b ? 1 : 0;
         }
+
+        success = true;
     }
 
     return success;
@@ -342,24 +348,27 @@ bool tr_variantGetBool(tr_variant const* v, bool* setme)
     char const* str;
     bool success = false;
 
-    if ((success = tr_variantIsBool(v)))
+    if (tr_variantIsBool(v))
     {
         *setme = v->val.b;
+        success = true;
     }
 
     if (!success && tr_variantIsInt(v))
     {
-        if ((success = v->val.i == 0 || v->val.i == 1))
+        if (v->val.i == 0 || v->val.i == 1)
         {
             *setme = v->val.i != 0;
+            success = true;
         }
     }
 
     if (!success && tr_variantGetStr(v, &str, NULL))
     {
-        if ((success = strcmp(str, "true") == 0 || strcmp(str, "false") == 0))
+        if (strcmp(str, "true") == 0 || strcmp(str, "false") == 0)
         {
             *setme = strcmp(str, "true") == 0;
+            success = true;
         }
     }
 
@@ -370,14 +379,16 @@ bool tr_variantGetReal(tr_variant const* v, double* setme)
 {
     bool success = false;
 
-    if (!success && (success = tr_variantIsReal(v)))
+    if (tr_variantIsReal(v))
     {
         *setme = v->val.d;
+        success = true;
     }
 
-    if (!success && (success = tr_variantIsInt(v)))
+    if (!success && tr_variantIsInt(v))
     {
         *setme = v->val.i;
+        success = true;
     }
 
     if (!success && tr_variantIsString(v))
@@ -391,9 +402,10 @@ bool tr_variantGetReal(tr_variant const* v, double* setme)
         d = strtod(getStr(v), &endptr);
         restore_locale(&locale_ctx);
 
-        if ((success = getStr(v) != endptr && *endptr == '\0'))
+        if (getStr(v) != endptr && *endptr == '\0')
         {
             *setme = d;
+            success = true;
         }
     }
 
@@ -499,7 +511,7 @@ static void containerReserve(tr_variant* v, size_t count)
 
         while (n < needed)
         {
-            n *= 2u;
+            n *= 2U;
         }
 
         v->val.l.vals = tr_renew(tr_variant, v->val.l.vals, n);
@@ -746,7 +758,7 @@ static int compareKeyIndex(void const* va, void const* vb)
 struct SaveNode
 {
     tr_variant const* v;
-    tr_variant sorted;
+    tr_variant* sorted;
     size_t childIndex;
     bool isVisited;
 };
@@ -771,30 +783,36 @@ static void nodeConstruct(struct SaveNode* node, tr_variant const* v, bool sort_
 
         qsort(tmp, n, sizeof(struct KeyIndex), compareKeyIndex);
 
-        tr_variantInitDict(&node->sorted, n);
+        node->sorted = tr_new(tr_variant, 1);
+        tr_variantInitDict(node->sorted, n);
 
         for (size_t i = 0; i < n; ++i)
         {
-            node->sorted.val.l.vals[i] = *tmp[i].val;
+            node->sorted->val.l.vals[i] = *tmp[i].val;
         }
 
-        node->sorted.val.l.count = n;
+        node->sorted->val.l.count = n;
 
         tr_free(tmp);
 
-        node->v = &node->sorted;
+        v = node->sorted;
     }
     else
     {
-        node->v = v;
+        node->sorted = NULL;
     }
+
+    node->v = v;
 }
 
 static void nodeDestruct(struct SaveNode* node)
 {
-    if (node->v == &node->sorted)
+    TR_ASSERT(node != NULL);
+
+    if (node->sorted != NULL)
     {
-        tr_free(node->sorted.val.l.vals);
+        tr_free(node->sorted->val.l.vals);
+        tr_free(node->sorted);
     }
 }
 
@@ -823,7 +841,9 @@ void tr_variantWalk(tr_variant const* v, struct VariantWalkFuncs const* walkFunc
         }
         else if (tr_variantIsContainer(node->v) && node->childIndex < node->v->val.l.count)
         {
-            int const index = node->childIndex++;
+            int const index = node->childIndex;
+            ++node->childIndex;
+
             v = node->v->val.l.vals + index;
 
             if (tr_variantIsDict(node->v))
@@ -958,11 +978,11 @@ static void tr_variantListCopy(tr_variant* target, tr_variant const* src)
     int i = 0;
     tr_variant const* val;
 
-    while ((val = tr_variantListChild((tr_variant*)src, i++)) != NULL)
+    while ((val = tr_variantListChild((tr_variant*)src, i)) != NULL)
     {
         if (tr_variantIsBool(val))
         {
-            bool boolVal = 0;
+            bool boolVal = false;
             tr_variantGetBool(val, &boolVal);
             tr_variantListAddBool(target, boolVal);
         }
@@ -997,6 +1017,8 @@ static void tr_variantListCopy(tr_variant* target, tr_variant const* src)
         {
             tr_logAddError("tr_variantListCopy skipping item");
         }
+
+        ++i;
     }
 }
 

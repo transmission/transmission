@@ -1,7 +1,3 @@
-/* Inspector -> selected torrents
-   stats -> bytes */
-"%@ bytes" = "%@ octets";
-
 /* Add torrent -> info
    Create torrent -> info
    Drag overlay -> torrents
@@ -22,7 +18,7 @@
 /* Torrent -> progress string */
 "%@ of torrent metadata retrieved" = "%@ des métadonnées du torrent récupérées";
 
-/* Torrent -> eta string */
+/* time remaining string */
 "%@ remaining" = "%@ restant";
 
 /* Add torrent -> info
@@ -433,8 +429,7 @@
 /* Inspector -> Peers tab -> table row tooltip */
 "From: tracker" = "De : trackeur";
 
-/* File size - gigabytes
-   file/memory size - gigabytes */
+/* File size - gigabytes */
 "GB" = "Go";
 
 /* Transfer speed (gigabytes per second) */
@@ -511,8 +506,7 @@
 /* Download not a torrent -> message */
 "It appears that the file \"%@\" from %@ is not a torrent file." = "Il semblerait que le ficher \"%1$@\" de %2$@ ne soit pas un fichier torrent.";
 
-/* File size - kilobytes
-   file/memory size - kilobytes */
+/* File size - kilobytes */
 "KB" = "Ko";
 
 /* Transfer speed (kilobytes per second) */
@@ -533,8 +527,7 @@
 /* About window -> license button */
 "License" = "Licence";
 
-/* Action menu -> upload/download limit
-   torrent action menu -> upload/download limit */
+/* torrent action menu -> upload/download limit */
 "Limit (%d KB/s)" = "Limité (%d Ko/s)";
 
 /* Save log alert panel -> title */
@@ -553,8 +546,7 @@
    Torrent -> progress string */
 "Magnetized transfer" = "Transfert aimanté";
 
-/* File size - megabytes
-   file/memory size - megabytes */
+/* File size - megabytes */
 "MB" = "Mo";
 
 /* Transfer speed (megabytes per second) */
@@ -783,9 +775,6 @@
 /* Groups -> Name */
 "Red" = "Rouge";
 
-/* Action menu -> status string toggle */
-"Remaining Time" = "Temps restant";
-
 /* Torrent -> eta string */
 "remaining time unknown" = "temps restant inconnu";
 
@@ -948,11 +937,7 @@
 /* Stats window -> title */
 "Statistics" = "Statisiques";
 
-/* Action menu -> status string toggle */
-"Status of Selected Files" = "État des fichiers sélectionnés";
-
-/* Action menu -> ratio stop
-   torrent action menu -> ratio stop */
+/* torrent action menu -> ratio stop */
 "Stop at Ratio (%.2f)" = "Arrêter au Ratio (%.2f)";
 
 /* Torrent cell -> button info */
@@ -961,8 +946,7 @@
 /* Donation beg -> title */
 "Support open-source indie software" = "Supporter les logiciels open-source indépendants";
 
-/* File size - terabytes
-   file/memory size - terabytes */
+/* File size - terabytes */
 "TB" = "To";
 
 /* Transfer speed (terabytes per second) */

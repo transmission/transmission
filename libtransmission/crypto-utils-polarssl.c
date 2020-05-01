@@ -34,6 +34,7 @@
 #include "utils.h"
 
 #define TR_CRYPTO_DH_SECRET_FALLBACK
+#define TR_CRYPTO_X509_FALLBACK
 #include "crypto-utils-fallback.c"
 
 /***

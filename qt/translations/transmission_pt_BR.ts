@@ -14,7 +14,7 @@
         <translation>&lt;b style=&apos;font-size:x-large&apos;&gt;Transmission %1&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="../AboutDialog.ui" line="+26"/>
+        <location filename="../AboutDialog.ui" line="+29"/>
         <source>A fast and easy BitTorrent client</source>
         <translation>Um cliente BitTorrent rápido e descomplicado</translation>
     </message>
@@ -139,7 +139,7 @@
     <message>
         <location line="+4"/>
         <source>Created on %1</source>
-        <translation>Criado em</translation>
+        <translation>Criado em %1</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -552,7 +552,7 @@
 <context>
     <name>FileTreeItem</name>
     <message>
-        <location filename="../FileTreeItem.cc" line="+289"/>
+        <location filename="../FileTreeItem.cc" line="+290"/>
         <location filename="../FileTreeView.cc" line="+108"/>
         <location line="+285"/>
         <source>Low</source>
@@ -2200,7 +2200,7 @@ Adicione outra URL primária depois de uma linha em branco.</translation>
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+541"/>
+        <location filename="../Session.cc" line="+546"/>
         <source>Error Renaming Path</source>
         <translation>Erro ao renomear caminho</translation>
     </message>
@@ -2212,17 +2212,17 @@ Adicione outra URL primária depois de uma linha em branco.</translation>
     <message>
         <location line="+449"/>
         <source>Error Adding Torrent</source>
-        <translation type="unfinished">Erro ao adicionar torrent</translation>
+        <translation>Erro ao adicionar Torrent</translation>
     </message>
     <message>
-        <location line="+16"/>
+        <location line="+21"/>
         <source>Add Torrent</source>
         <translation>Adicionar Torrent</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>&lt;p&gt;&lt;b&gt;Unable to add &quot;%1&quot;.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;It is a duplicate of &quot;%2&quot; which is already added.&lt;/p&gt;</source>
-        <translation type="unfinished">&lt;p&gt;&lt;b&gt;Impossível adicionar &quot;%1&quot;.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;É uma cópia de &quot;%2&quot; que já está adicionado.&lt;/p&gt;</translation>
+        <translation>&lt;p&gt;&lt;b&gt;Impossível adic &quot;%1&quot;.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Isso é uma duplicação de &quot;%2&quot; que já foi adicionado.&lt;/p&gt;</translation>
     </message>
 </context>
 <context>
@@ -2449,17 +2449,17 @@ Adicione outra URL primária depois de uma linha em branco.</translation>
         <location line="+22"/>
         <source>Seeding to %Ln peer(s)</source>
         <translation>
-            <numerusform>Semeando para %1 fonte</numerusform>
-            <numerusform>Semeando para %1 fontes</numerusform>
+            <numerusform>Semeando para %Ln fonte</numerusform>
+            <numerusform>Semeando para %Ln fontes</numerusform>
         </translation>
     </message>
     <message>
-        <location line="+21"/>
+        <location line="+22"/>
         <source> - </source>
         <translation> - </translation>
     </message>
     <message numerus="yes">
-        <location line="-53"/>
+        <location line="-54"/>
         <source>Downloading metadata from %Ln peer(s) (%1% done)</source>
         <translation>
             <numerusform>Baixando metadado de %Ln fonte (%1% concluído)</numerusform>
@@ -2493,12 +2493,12 @@ Adicione outra URL primária depois de uma linha em branco.</translation>
         </translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+7"/>
         <source>Error</source>
         <translation>Erro</translation>
     </message>
     <message>
-        <location line="-81"/>
+        <location line="-82"/>
         <source>Verifying local data (%1% tested)</source>
         <translation>Verificando dados locais (%1% testado)</translation>
     </message>

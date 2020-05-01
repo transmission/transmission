@@ -27,7 +27,7 @@ typedef struct tr_option
     char const* longName; /* --long-form */
     char const* description; /* option's description for tr_getopt_usage() */
     char const* shortName; /* short form */
-    int has_arg; /* 0 for no argument, 1 for argument */
+    bool has_arg; /* 0 for no argument, 1 for argument */
     char const* argName; /* argument's description for tr_getopt_usage() */
 }
 tr_option;

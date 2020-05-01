@@ -183,7 +183,7 @@ static struct tr_scrape_info* tr_announcerGetScrapeInfo(struct tr_announcer* ann
 {
     struct tr_scrape_info* info = NULL;
 
-    if (url != NULL && *url != '\0')
+    if (!tr_str_is_empty(url))
     {
         bool found;
         struct tr_scrape_info const key = { .url = (char*)url };
@@ -920,7 +920,8 @@ static tr_announce_event tier_announce_event_pull(tr_tier* tier)
 {
     tr_announce_event const e = tier->announce_events[0];
 
-    tr_removeElementFromArray(tier->announce_events, 0, sizeof(tr_announce_event), tier->announce_event_count--);
+    tr_removeElementFromArray(tier->announce_events, 0, sizeof(tr_announce_event), tier->announce_event_count);
+    --tier->announce_event_count;
 
     return e;
 }
@@ -1546,7 +1547,7 @@ static void on_scrape_done(tr_scrape_response const* response, void* vsession)
         }
     }
 
-    if (announcer)
+    if (announcer != NULL)
     {
         ++announcer->slotsAvailable;
     }

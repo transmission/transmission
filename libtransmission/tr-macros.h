@@ -125,6 +125,12 @@
 #define TR_GNUC_MALLOC
 #endif
 
+#if __has_attribute(__fallthrough__) || TR_GNUC_CHECK_VERSION(7, 0)
+#define TR_GNUC_FALLTHROUGH __attribute__((__fallthrough__))
+#else
+#define TR_GNUC_FALLTHROUGH
+#endif
+
 /***
 ****
 ***/
@@ -158,6 +164,9 @@
 /***
 ****
 ***/
+
+/* Only use this macro to suppress false-positive alignment warnings */
+#define TR_DISCARD_ALIGN(ptr, type) ((type)(void*)(ptr))
 
 #define SHA_DIGEST_LENGTH 20
 

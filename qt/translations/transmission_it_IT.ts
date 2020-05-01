@@ -14,7 +14,7 @@
         <translation>&lt;b style=&apos;font-size:x-large&apos;&gt;Transmission %1&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="../AboutDialog.ui" line="+26"/>
+        <location filename="../AboutDialog.ui" line="+29"/>
         <source>A fast and easy BitTorrent client</source>
         <translation>Un client BitTorrent semplice e veloce</translation>
     </message>
@@ -552,7 +552,7 @@
 <context>
     <name>FileTreeItem</name>
     <message>
-        <location filename="../FileTreeItem.cc" line="+289"/>
+        <location filename="../FileTreeItem.cc" line="+290"/>
         <location filename="../FileTreeView.cc" line="+108"/>
         <location line="+285"/>
         <source>Low</source>
@@ -2202,7 +2202,7 @@ una riga vuota.</translation>
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+541"/>
+        <location filename="../Session.cc" line="+546"/>
         <source>Error Renaming Path</source>
         <translation>Errore durante la rinomina del precorso</translation>
     </message>
@@ -2214,17 +2214,17 @@ una riga vuota.</translation>
     <message>
         <location line="+449"/>
         <source>Error Adding Torrent</source>
-        <translation type="unfinished">Errore durante l&apos;aggiunta del torrent</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+16"/>
+        <location line="+21"/>
         <source>Add Torrent</source>
         <translation>Aggiungi torrent</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>&lt;p&gt;&lt;b&gt;Unable to add &quot;%1&quot;.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;It is a duplicate of &quot;%2&quot; which is already added.&lt;/p&gt;</source>
-        <translation type="unfinished">&lt;p&gt;&lt;b&gt;Impossibile aggiungere &quot;%1&quot;.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;In quanto è un duplicato di &quot;%2&quot; che è già stato aggiunto.&lt;/p&gt;</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2456,12 +2456,12 @@ una riga vuota.</translation>
         </translation>
     </message>
     <message>
-        <location line="+21"/>
+        <location line="+22"/>
         <source> - </source>
         <translation> - </translation>
     </message>
     <message numerus="yes">
-        <location line="-53"/>
+        <location line="-54"/>
         <source>Downloading metadata from %Ln peer(s) (%1% done)</source>
         <translation>
             <numerusform>Scaricamento metadati da %Ln peer (%1% completato)</numerusform>
@@ -2495,12 +2495,12 @@ una riga vuota.</translation>
         </translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+7"/>
         <source>Error</source>
         <translation>Errore</translation>
     </message>
     <message>
-        <location line="-81"/>
+        <location line="-82"/>
         <source>Verifying local data (%1% tested)</source>
         <translation>Verifica dati locali (%1% testati)</translation>
     </message>

@@ -19,6 +19,9 @@
 #define tr_rc4_ctx_t tr_rc4_ctx_t_
 #define tr_dh_ctx_t tr_dh_ctx_t_
 #define tr_dh_secret_t tr_dh_secret_t_
+#define tr_ssl_ctx_t tr_ssl_ctx_t_
+#define tr_x509_store_t tr_x509_store_t_
+#define tr_x509_cert_t tr_x509_cert_t_
 #define tr_crypto tr_crypto_
 #define tr_cryptoConstruct tr_cryptoConstruct_
 #define tr_cryptoDestruct tr_cryptoDestruct_
@@ -47,6 +50,10 @@
 #define tr_dh_secret_derive tr_dh_secret_derive_
 #define tr_dh_secret_free tr_dh_secret_free_
 #define tr_dh_align_key tr_dh_align_key_
+#define tr_ssl_get_x509_store tr_ssl_get_x509_store_
+#define tr_x509_store_add tr_x509_store_add_
+#define tr_x509_cert_new tr_x509_cert_new_
+#define tr_x509_cert_free tr_x509_cert_free_
 #define tr_rand_int tr_rand_int_
 #define tr_rand_int_weak tr_rand_int_weak_
 #define tr_rand_buffer tr_rand_buffer_
@@ -76,6 +83,9 @@
 #undef tr_rc4_ctx_t
 #undef tr_dh_ctx_t
 #undef tr_dh_secret_t
+#undef tr_ssl_ctx_t
+#undef tr_x509_store_t
+#undef tr_x509_cert_t
 #undef tr_crypto
 #undef tr_cryptoConstruct
 #undef tr_cryptoDestruct
@@ -104,6 +114,10 @@
 #undef tr_dh_secret_derive
 #undef tr_dh_secret_free
 #undef tr_dh_align_key
+#undef tr_ssl_get_x509_store
+#undef tr_x509_store_add
+#undef tr_x509_cert_new
+#undef tr_x509_cert_free
 #undef tr_rand_int
 #undef tr_rand_int_weak
 #undef tr_rand_buffer
@@ -126,6 +140,9 @@
 #define tr_rc4_ctx_t_ tr_rc4_ctx_t
 #define tr_dh_ctx_t_ tr_dh_ctx_t
 #define tr_dh_secret_t_ tr_dh_secret_t
+#define tr_ssl_ctx_t_ tr_ssl_ctx_t
+#define tr_x509_store_t_ tr_x509_store_t
+#define tr_x509_cert_t_ tr_x509_cert_t
 #define tr_crypto_ tr_crypto
 #define tr_cryptoConstruct_ tr_cryptoConstruct
 #define tr_cryptoDestruct_ tr_cryptoDestruct
@@ -154,6 +171,10 @@
 #define tr_dh_secret_derive_ tr_dh_secret_derive
 #define tr_dh_secret_free_ tr_dh_secret_free
 #define tr_dh_align_key_ tr_dh_align_key
+#define tr_ssl_get_x509_store_ tr_ssl_get_x509_store
+#define tr_x509_store_add_ tr_x509_store_add
+#define tr_x509_cert_new_ tr_x509_cert_new
+#define tr_x509_cert_free_ tr_x509_cert_free
 #define tr_rand_int_ tr_rand_int
 #define tr_rand_int_weak_ tr_rand_int_weak
 #define tr_rand_buffer_ tr_rand_buffer
