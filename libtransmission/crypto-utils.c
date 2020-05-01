@@ -92,7 +92,7 @@ int tr_rand_int(int upper_bound)
     unsigned noise;
 
     if (tr_rand_buffer(&noise, sizeof(noise)))
-    {       
+    {
         return noise % upper_bound;
     }
 
