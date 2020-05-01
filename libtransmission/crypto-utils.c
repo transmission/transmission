@@ -89,17 +89,11 @@ int tr_rand_int(int upper_bound)
 {
     TR_ASSERT(upper_bound > 0);
 
-    int noise;
+    unsigned noise;
 
-    while (tr_rand_buffer(&noise, sizeof(noise)))
-    {
-        noise = abs(noise) % upper_bound;
-
-        /* abs(INT_MIN) is undefined and could return negative value */
-        if (noise >= 0)
-        {
-            return noise;
-        }
+    if (tr_rand_buffer(&noise, sizeof(noise)))
+    {       
+        return noise % upper_bound;
     }
 
     /* fall back to a weaker implementation... */
