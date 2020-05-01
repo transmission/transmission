@@ -63,8 +63,8 @@ static size_t countArray(tr_bitfield const* b)
 static size_t countRange(tr_bitfield const* b, size_t begin, size_t end)
 {
     size_t ret = 0;
-    size_t const first_byte = begin >> 3u;
-    size_t const last_byte = (end - 1) >> 3u;
+    size_t const first_byte = begin >> 3U;
+    size_t const last_byte = (end - 1) >> 3U;
 
     if (b->bit_count == 0)
     {
@@ -153,12 +153,12 @@ bool tr_bitfieldHas(tr_bitfield const* b, size_t n)
         return false;
     }
 
-    if (n >> 3u >= b->alloc_count)
+    if (n >> 3U >= b->alloc_count)
     {
         return false;
     }
 
-    return (b->bits[n >> 3u] << (n & 7u) & 0x80) != 0;
+    return (b->bits[n >> 3U] << (n & 7U) & 0x80) != 0;
 }
 
 /***
@@ -378,7 +378,7 @@ void tr_bitfieldSetRaw(tr_bitfield* b, void const* bits, size_t byte_count, bool
         TR_ASSERT(excess_bit_count >= 0);
         TR_ASSERT(excess_bit_count <= 7);
 
-        if (excess_bit_count)
+        if (excess_bit_count != 0)
         {
             b->bits[b->alloc_count - 1] &= 0xff << excess_bit_count;
         }
@@ -399,7 +399,7 @@ void tr_bitfieldSetFromFlags(tr_bitfield* b, bool const* flags, size_t n)
         if (flags[i])
         {
             ++trueCount;
-            b->bits[i >> 3u] |= (0x80 >> (i & 7u));
+            b->bits[i >> 3U] |= (0x80 >> (i & 7U));
         }
     }
 
@@ -410,7 +410,7 @@ void tr_bitfieldAdd(tr_bitfield* b, size_t nth)
 {
     if (!tr_bitfieldHas(b, nth) && tr_bitfieldEnsureNthBitAlloced(b, nth))
     {
-        b->bits[nth >> 3u] |= 0x80 >> (nth & 7u);
+        b->bits[nth >> 3U] |= 0x80 >> (nth & 7U);
         tr_bitfieldIncTrueCount(b, 1);
     }
 }
@@ -470,7 +470,7 @@ void tr_bitfieldRem(tr_bitfield* b, size_t nth)
 
     if (tr_bitfieldHas(b, nth) && tr_bitfieldEnsureNthBitAlloced(b, nth))
     {
-        b->bits[nth >> 3u] &= 0xff7f >> (nth & 7u);
+        b->bits[nth >> 3U] &= 0xff7f >> (nth & 7U);
         tr_bitfieldDecTrueCount(b, 1);
     }
 }

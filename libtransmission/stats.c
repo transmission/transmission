@@ -20,7 +20,7 @@
 
 struct tr_session_stats const TR_SESSION_STATS_INIT =
 {
-    .ratio = 0.0f,
+    .ratio = 0.0F,
     .uploadedBytes = 0,
     .downloadedBytes = 0,
     .filesAdded = 0,
@@ -133,7 +133,7 @@ void tr_statsInit(tr_session* session)
 
 static struct tr_stats_handle* getStats(tr_session const* session)
 {
-    return session ? session->sessionStats : NULL;
+    return session != NULL ? session->sessionStats : NULL;
 }
 
 void tr_statsSaveDirty(tr_session* session)

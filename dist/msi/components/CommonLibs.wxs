@@ -9,10 +9,10 @@
         <File DiskId="1" KeyPath="yes" Name="libcurl.dll" />
       </Component>
       <Component Id="dll.openssl.crypto">
-        <File DiskId="1" KeyPath="yes" Name="libeay32.dll" />
+        <File DiskId="1" KeyPath="yes" Name="$(var.OpenSslCryptoName)" />
       </Component>
       <Component Id="dll.openssl.ssl">
-        <File DiskId="1" KeyPath="yes" Name="ssleay32.dll" />
+        <File DiskId="1" KeyPath="yes" Name="$(var.OpenSslSslName)" />
       </Component>
       <Component Id="dll.zlib">
         <File DiskId="1" KeyPath="yes" Name="zlib.dll" />

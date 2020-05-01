@@ -11,7 +11,7 @@
 
 #include <dirent.h>
 #include <errno.h>
-#include <fcntl.h> /* O_LARGEFILE, posix_fadvise(), [posix_]fallocate() */
+#include <fcntl.h> /* O_LARGEFILE, posix_fadvise(), [posix_]fallocate(), fcntl() */
 #include <libgen.h> /* basename(), dirname() */
 #include <limits.h> /* PATH_MAX */
 #include <stdio.h>
@@ -487,28 +487,28 @@ tr_sys_file_t tr_sys_file_open(char const* path, int flags, int permissions, tr_
     {
         native_flags |= O_RDWR;
     }
-    else if (flags & TR_SYS_FILE_READ)
+    else if ((flags & TR_SYS_FILE_READ) != 0)
     {
         native_flags |= O_RDONLY;
     }
-    else if (flags & TR_SYS_FILE_WRITE)
+    else if ((flags & TR_SYS_FILE_WRITE) != 0)
     {
         native_flags |= O_WRONLY;
     }
 
     native_flags |=
-        (flags & TR_SYS_FILE_CREATE ? O_CREAT : 0) |
-        (flags & TR_SYS_FILE_CREATE_NEW ? O_CREAT | O_EXCL : 0) |
-        (flags & TR_SYS_FILE_APPEND ? O_APPEND : 0) |
-        (flags & TR_SYS_FILE_TRUNCATE ? O_TRUNC : 0) |
-        (flags & TR_SYS_FILE_SEQUENTIAL ? O_SEQUENTIAL : 0) |
+        ((flags & TR_SYS_FILE_CREATE) != 0 ? O_CREAT : 0) |
+        ((flags & TR_SYS_FILE_CREATE_NEW) != 0 ? O_CREAT | O_EXCL : 0) |
+        ((flags & TR_SYS_FILE_APPEND) != 0 ? O_APPEND : 0) |
+        ((flags & TR_SYS_FILE_TRUNCATE) != 0 ? O_TRUNC : 0) |
+        ((flags & TR_SYS_FILE_SEQUENTIAL) != 0 ? O_SEQUENTIAL : 0) |
         O_BINARY | O_LARGEFILE | O_CLOEXEC;
 
     ret = open(path, native_flags, permissions);
 
     if (ret != TR_BAD_SYS_FILE)
     {
-        if (flags & TR_SYS_FILE_SEQUENTIAL)
+        if ((flags & TR_SYS_FILE_SEQUENTIAL) != 0)
         {
             set_file_for_single_pass(ret);
         }
@@ -985,6 +985,41 @@ bool tr_sys_file_lock(tr_sys_file_t handle, int operation, tr_error** error)
         !!(operation & TR_SYS_FILE_LOCK_UN) == 1);
 
     bool ret;
+
+#if defined(F_OFD_SETLK)
+
+    struct flock fl = { 0 };
+
+    switch (operation & (TR_SYS_FILE_LOCK_SH | TR_SYS_FILE_LOCK_EX | TR_SYS_FILE_LOCK_UN))
+    {
+    case TR_SYS_FILE_LOCK_SH:
+        fl.l_type = F_RDLCK;
+        break;
+
+    case TR_SYS_FILE_LOCK_EX:
+        fl.l_type = F_WRLCK;
+        break;
+
+    case TR_SYS_FILE_LOCK_UN:
+        fl.l_type = F_UNLCK;
+        break;
+    }
+
+    fl.l_whence = SEEK_SET;
+
+    do
+    {
+        ret = fcntl(handle, (operation & TR_SYS_FILE_LOCK_NB) != 0 ? F_OFD_SETLK : F_OFD_SETLKW, &fl) != -1;
+    }
+    while (!ret && errno == EINTR);
+
+    if (!ret && errno == EAGAIN)
+    {
+        errno = EWOULDBLOCK;
+    }
+
+#elif defined(HAVE_FLOCK)
+
     int native_operation = 0;
 
     if ((operation & TR_SYS_FILE_LOCK_SH) != 0)
@@ -1007,7 +1042,21 @@ bool tr_sys_file_lock(tr_sys_file_t handle, int operation, tr_error** error)
         native_operation |= LOCK_UN;
     }
 
-    ret = flock(handle, native_operation) != -1;
+    do
+    {
+        ret = flock(handle, native_operation) != -1;
+    }
+    while (!ret && errno == EINTR);
+
+#else
+
+    (void)handle;
+    (void)operation;
+
+    errno = ENOSYS;
+    ret = false;
+
+#endif
 
     if (!ret)
     {
@@ -1134,21 +1183,17 @@ bool tr_sys_dir_create_temp(char* path_template, tr_error** error)
 
 tr_sys_dir_t tr_sys_dir_open(char const* path, tr_error** error)
 {
-#ifndef __clang__
-    /* Clang gives "static_assert expression is not an integral constant expression" error */
-    TR_STATIC_ASSERT(TR_BAD_SYS_DIR == NULL, "values should match");
-#endif
-
     TR_ASSERT(path != NULL);
 
-    tr_sys_dir_t ret = opendir(path);
+    DIR* ret = opendir(path);
 
-    if (ret == TR_BAD_SYS_DIR)
+    if (ret == NULL)
     {
         set_system_error(error, errno);
+        return TR_BAD_SYS_DIR;
     }
 
-    return ret;
+    return (tr_sys_dir_t)ret;
 }
 
 char const* tr_sys_dir_read_name(tr_sys_dir_t handle, tr_error** error)
@@ -1158,7 +1203,7 @@ char const* tr_sys_dir_read_name(tr_sys_dir_t handle, tr_error** error)
     char const* ret = NULL;
 
     errno = 0;
-    struct dirent* entry = readdir(handle);
+    struct dirent* entry = readdir((DIR*)handle);
 
     if (entry != NULL)
     {
@@ -1176,7 +1221,7 @@ bool tr_sys_dir_close(tr_sys_dir_t handle, tr_error** error)
 {
     TR_ASSERT(handle != TR_BAD_SYS_DIR);
 
-    bool ret = closedir(handle) != -1;
+    bool ret = closedir((DIR*)handle) != -1;
 
     if (!ret)
     {
