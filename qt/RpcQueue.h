@@ -133,7 +133,7 @@ private:
         >::type* = nullptr>
     ErrorHandlerFunction normalizeErrorHandler(Func const& func)
     {
-        return [func](RpcResponseFuture const& r)
+        return [func](RpcResponseFuture const&)
             {
                 func();
             };

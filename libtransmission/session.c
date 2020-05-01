@@ -265,27 +265,27 @@ static int parse_tos(char const* str)
 
     if (evutil_ascii_strcasecmp(str, "lowcost") == 0)
     {
-        return 0x10;
+        return TR_IPTOS_LOWCOST;
     }
 
     if (evutil_ascii_strcasecmp(str, "mincost") == 0)
     {
-        return 0x10;
+        return TR_IPTOS_LOWCOST;
     }
 
     if (evutil_ascii_strcasecmp(str, "throughput") == 0)
     {
-        return 0x08;
+        return TR_IPTOS_THRUPUT;
     }
 
     if (evutil_ascii_strcasecmp(str, "reliability") == 0)
     {
-        return 0x04;
+        return TR_IPTOS_RELIABLE;
     }
 
     if (evutil_ascii_strcasecmp(str, "lowdelay") == 0)
     {
-        return 0x02;
+        return TR_IPTOS_LOWDELAY;
     }
 
     value = strtol(str, &p, 0);
@@ -307,16 +307,16 @@ static char const* format_tos(int value)
     case 0:
         return "default";
 
-    case 0x10:
+    case TR_IPTOS_LOWCOST:
         return "lowcost";
 
-    case 0x08:
+    case TR_IPTOS_THRUPUT:
         return "throughput";
 
-    case 0x04:
+    case TR_IPTOS_RELIABLE:
         return "reliability";
 
-    case 0x02:
+    case TR_IPTOS_LOWDELAY:
         return "lowdelay";
 
     default:
@@ -487,7 +487,7 @@ bool tr_sessionLoadSettings(tr_variant* dict, char const* configDir, char const*
     tr_variantFree(&oldDict);
 
     /* if caller didn't specify a config dir, use the default */
-    if (configDir == NULL || *configDir == '\0')
+    if (tr_str_is_empty(configDir))
     {
         configDir = tr_getDefaultConfigDir(appName);
     }
@@ -2021,7 +2021,7 @@ static void sessionCloseImpl(void* vsession)
     sessionCloseImplStart(session);
 }
 
-static int deadlineReached(time_t const deadline)
+static bool deadlineReached(time_t const deadline)
 {
     return time(NULL) >= deadline;
 }
@@ -2124,15 +2124,16 @@ static void sessionLoadTorrents(void* vdata)
 
     int i;
     int n = 0;
-    tr_sys_path_info info;
-    tr_sys_dir_t odir = NULL;
     tr_list* list = NULL;
-    char const* dirname = tr_getTorrentDir(data->session);
 
     tr_ctorSetSave(data->ctor, false); /* since we already have them */
 
-    if (tr_sys_path_get_info(dirname, 0, &info, NULL) && info.type == TR_SYS_PATH_IS_DIRECTORY &&
-        (odir = tr_sys_dir_open(dirname, NULL)) != TR_BAD_SYS_DIR)
+    tr_sys_path_info info;
+    char const* dirname = tr_getTorrentDir(data->session);
+    tr_sys_dir_t odir = (tr_sys_path_get_info(dirname, 0, &info, NULL) && info.type == TR_SYS_PATH_IS_DIRECTORY) ?
+        tr_sys_dir_open(dirname, NULL) : TR_BAD_SYS_DIR;
+
+    if (odir != TR_BAD_SYS_DIR)
     {
         char const* name;
 
@@ -2392,7 +2393,7 @@ bool tr_sessionIsPortForwardingEnabled(tr_session const* session)
 ****
 ***/
 
-static int tr_stringEndsWith(char const* str, char const* end)
+static bool tr_stringEndsWith(char const* str, char const* end)
 {
     size_t const slen = strlen(str);
     size_t const elen = strlen(end);
@@ -2634,24 +2635,24 @@ static void metainfoLookupInit(tr_session* session)
 {
     TR_ASSERT(tr_isSession(session));
 
-    tr_sys_path_info info;
-    char const* dirname = tr_getTorrentDir(session);
-    tr_sys_dir_t odir;
-    tr_ctor* ctor = NULL;
-    tr_variant* lookup;
+    tr_variant* lookup = tr_new0(tr_variant, 1);
+    tr_variantInitDict(lookup, 0);
+
     int n = 0;
 
-    /* walk through the directory and find the mappings */
-    lookup = tr_new0(tr_variant, 1);
-    tr_variantInitDict(lookup, 0);
-    ctor = tr_ctorNew(session);
-    tr_ctorSetSave(ctor, false); /* since we already have them */
+    tr_sys_path_info info;
+    char const* dirname = tr_getTorrentDir(session);
+    tr_sys_dir_t odir = (tr_sys_path_get_info(dirname, 0, &info, NULL) && info.type == TR_SYS_PATH_IS_DIRECTORY) ?
+        tr_sys_dir_open(dirname, NULL) : TR_BAD_SYS_DIR;
 
-    if (tr_sys_path_get_info(dirname, 0, &info, NULL) && info.type == TR_SYS_PATH_IS_DIRECTORY &&
-        (odir = tr_sys_dir_open(dirname, NULL)) != TR_BAD_SYS_DIR)
+    if (odir != TR_BAD_SYS_DIR)
     {
+        tr_ctor* ctor = tr_ctorNew(session);
+        tr_ctorSetSave(ctor, false); /* since we already have them */
+
         char const* name;
 
+        /* walk through the directory and find the mappings */
         while ((name = tr_sys_dir_read_name(odir, NULL)) != NULL)
         {
             if (tr_str_has_suffix(name, ".torrent"))
@@ -2671,9 +2672,8 @@ static void metainfoLookupInit(tr_session* session)
         }
 
         tr_sys_dir_close(odir, NULL);
+        tr_ctorFree(ctor);
     }
-
-    tr_ctorFree(ctor);
 
     session->metainfoLookup = lookup;
     tr_logAddDebug("Found %d torrents in \"%s\"", n, dirname);

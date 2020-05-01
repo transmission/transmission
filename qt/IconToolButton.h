@@ -18,9 +18,9 @@ public:
     IconToolButton(QWidget* parent = nullptr);
 
     // QWidget
-    virtual QSize sizeHint() const;
+    QSize sizeHint() const override;
 
 protected:
     // QWidget
-    virtual void paintEvent(QPaintEvent* event);
+    void paintEvent(QPaintEvent* event) override;
 };
