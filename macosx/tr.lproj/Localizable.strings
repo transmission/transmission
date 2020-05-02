@@ -5,7 +5,7 @@
 "%@ files" = "%@ dosya";
 
 /* Prefs -> blocklist -> message */
-"%@ IP address rules in list" = "Listede %@ IP adresi kuralı";
+"%@ IP address rules in list" = "Dizelgede %@ IP adresi kuralları";
 
 /* Inspector -> selected torrents */
 "%@ magnetized transfers" = "%@ mıknatıslı aktarım";
