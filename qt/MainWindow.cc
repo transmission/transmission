@@ -245,6 +245,7 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     auto refreshActionSensitivitySoon = [this]() { refreshSoon(REFRESH_ACTION_SENSITIVITY); };
     connect(&myFilterModel, &TorrentFilter::rowsInserted, this, refreshActionSensitivitySoon);
     connect(&myFilterModel, &TorrentFilter::rowsRemoved, this, refreshActionSensitivitySoon);
+    connect(&myModel, &TorrentModel::torrentsChanged, this, refreshActionSensitivitySoon);
 
     // torrent view
     myFilterModel.setSourceModel(&myModel);
@@ -851,6 +852,7 @@ void MainWindow::refreshActionSensitivity()
     int selectedWithMetadata(0);
     QAbstractItemModel const* model(ui.listView->model());
     QItemSelectionModel const* selectionModel(ui.listView->selectionModel());
+    bool const hasSelection = selectionModel->hasSelection();
     int const rowCount(model->rowCount());
 
     // count how many torrents are selected, paused, etc
@@ -862,8 +864,8 @@ void MainWindow::refreshActionSensitivity()
 
         if (tor != nullptr)
         {
-            bool const isSelected(selectionModel->isSelected(modelIndex));
-            bool const isPaused(tor->isPaused());
+            bool const isSelected = hasSelection && selectionModel->isSelected(modelIndex);
+            bool const isPaused = tor->isPaused();
 
             if (isPaused)
             {
