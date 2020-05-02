@@ -591,6 +591,10 @@ void gtr_file_list_set_torrent(GtkWidget* w, int torrentId)
     }
 
     gtk_tree_view_set_model(GTK_TREE_VIEW(data->view), data->model);
+
+    /* set default sort by label */
+    gtk_tree_sortable_set_sort_column_id(data->model, FC_LABEL, GTK_SORT_ASCENDING);
+
     gtk_tree_view_expand_all(GTK_TREE_VIEW(data->view));
     g_object_unref(data->model);
 }

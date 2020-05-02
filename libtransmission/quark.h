@@ -82,6 +82,8 @@ enum
     TR_KEY_delete_local_data,
     TR_KEY_desiredAvailable,
     TR_KEY_destination,
+    TR_KEY_details_window_height,
+    TR_KEY_details_window_width,
     TR_KEY_dht_enabled,
     TR_KEY_display_name,
     TR_KEY_dnd,
