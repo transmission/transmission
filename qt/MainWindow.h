@@ -79,7 +79,6 @@ public slots:
     void setFilterbarVisible(bool);
     void setStatusbarVisible(bool);
     void setCompactView(bool);
-    void refreshActionSensitivity();
     void wrongAuthentication();
 
     void openSession();
@@ -196,8 +195,9 @@ private:
     };
     int myRefreshFields = 0;
     QTimer myRefreshTimer;
-    void refreshTitle();
-    void refreshTrayIcon(TransferStats const&);
+    void refreshActionSensitivity();
     void refreshStatusBar(TransferStats const&);
+    void refreshTitle();
     void refreshTorrentViewHeader();
+    void refreshTrayIcon(TransferStats const&);
 };
