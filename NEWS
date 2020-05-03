@@ -1,12 +1,95 @@
-=== Transmission 3.00 (2019/mm/dd) ===
+=== Transmission 3.00 (2020/mm/dd) ===
 [https://github.com/transmission/transmission/releases/tag/3.00]
-==== All Platforms ====
-==== OS X Client Client ====
-  * Dark Mode support
-  * Sparkle updated to 1.22.0
-  * Minimum OS version updated to 10.10
-==== Qt Client ====
-==== Web Client ====
+=== All Platforms ===
+- Allow the RPC server to listen on an IPv6 address (#161)
+- Change `TR_CURL_SSL_VERIFY` to `TR_CURL_SSL_NO_VERIFY` and enable verification by default (#334)
+- Go back to using hash as base name for resume and torrent files (those stored in configuration directory) (#122)
+- Handle "fields" argument in "session-get" RPC request; if "fields" array is present in arguments, only return session fields specified; otherwise return all the fields as before
+- Limit the number of incorrect authentication attempts in embedded web server to 100 to prevent brute-force attacks (#371)
+- Set idle seed limit range to 1..40320 (4 weeks tops) in all clients (#212)
+- Add Peer ID for Xfplay, PicoTorrent, Free Download Manager, Folx, Baidu Netdisk torrent clients (#256, #285, #355, #363, #386)
+- Announce `INT64_MAX` as size left if the value is unknown (helps with e.g. Amazon S3 trackers) (#250)
+- Add `TCP_FASTOPEN` support (should result in slight speedup) (#184)
+- Improve ToS handling on IPv6 connections (#128, #341, #360, #692, #737)
+- Abort handshake if establishing DH shared secret fails (leads to crash) (#27)
+- Don't switch trackers while announcing (leads to crash) (#297)
+- Improve completion scripts execution and error handling; add support for .cmd and .bat files on Windows (#405)
+- Maintain a "session ID" file (in temporary directory) to better detect whether session is local or remote; return the ID as part of "session-get" response (TRAC-5348, #861)
+- Change torrent location even if no data move is needed (#35)
+- Support CIDR-notated blocklists (#230, #741)
+- Update the resume file before running scripts (#825)
+- Make multiscrape limits adaptive (#837)
+- Add labels support to libtransmission and transmission-remote (#822)
+- Parse `session-id` header case-insensitively (#765)
+- Sanitize suspicious path components instead of rejecting them (#62, #294)
+- Load CA certs from system store on Windows / OpenSSL (#446)
+- Add support for mbedtls (formely polarssl) and wolfssl (formely cyassl), LibreSSL (#115, #116, #284, #486, #524, #570)
+- Fix building against OpenSSL 1.1.0+ (#24)
+- Fix quota support for uClibc-ng 1.0.18+ and DragonFly BSD (#42, #58, #312)
+- Fix a number of memory leaks (magnet loading, session shutdown, bencoded data parsing) (#56)
+- Bump miniupnpc version to 2.0.20170509 (#347)
+- CMake-related improvements (Ninja generator, libappindicator, systemd, Solaris and macOS) (#72, #96, #117, #118, #133, #191)
+- Switch to submodules to manage (most of) third-party dependencies
+- Fail installation on Windows if UCRT is not installed
+
+=== Mac Client ===
+- Bump minimum macOS version to 10.10
+- Dark Mode support (#644, #722, #757, #779, #788)
+- Remove Growl support, notification center is always used (#387)
+- Fix autoupdate on High Sierra and up by bumping the Sparkle version (#121, #600)
+- Transition to ARC (#336)
+- Use proper UTF-8 encoding (with macOS-specific normalization) when setting download/incomplete directory and completion script paths (#11)
+- Fix uncaught exception when dragging multiple items between groups (#51)
+- Add flat variants of status icons for message log (#134)
+- Optimize image resources size (#304, #429)
+- Update file icon when file name changes (#37)
+- Update translations
+
+=== GTK+ Client ===
+- Add queue up/down hotkeys (#158)
+- Modernize the .desktop file (#162)
+- Add AppData file (#224)
+- Add symbolic icon variant for the Gnome top bar and when the high contrast theme is in use (#414, #449)
+- Update file icon when its name changes (#37)
+- Switch from intltool to gettext for translations (#584, #647)
+- Update translations, add new translations for Portuguese (Portugal)
+
+=== Qt Client ===
+- Bump minimum Qt version to 5.2
+- Fix dropping .torrent files into main window on Windows (#269)
+- Fix prepending of drive letter to various user-selected paths on Windows (#236, #307, #404, #437, #699, #723, #877)
+- Fix sorting by progress in presence of magnet transfers (#234)
+- Fix .torrent file trashing upon addition (#262)
+- Add queue up/down hotkeys (#158)
+- Reduce torrent properties (file tree) memory usage
+- Display tooltips in torrent properties (file tree) in case the names don't fit (#411)
+- Improve UI look on hi-dpi displays (YMMV)
+- Use session ID (if available) to check if session is local or not (#861)
+- Use default (instead of system) locale to be more flexible (#130)
+- Modernize the .desktop file (#162)
+- Update translations, add new translations for Afrikaans, Catalan, Danish, Greek, Norwegian Bokmål, Slovenian
+
+=== Daemon ===
+- Use libsystemd instead of libsystemd-daemon (TRAC-5921)
+- Harden transmission-daemon.service by disallowing privileges elevation (#795)
+- Fix exit code to be zero when dumping settings (#487)
+
+=== Web Client ===
+- Fix tracker error XSS in inspector (CVE-?)
+- Fix performance issues due to improper use of `setInterval()` for UI refresh (TRAC-6031)
+- Fix recognition of `https://` links in comments field (#41, #180)
+- Fix torrent list style in Google Chrome 59+ (#384)
+- Show ETA in compact view on non-mobile devices (#146)
+- Show upload file button on mobile devices (#320, #431, #956)
+- Add keyboard hotkeys for web interface (#351)
+- Disable autocompletion in torrent URL field (#367)
+
+=== Utils ===
+- Prevent crash in transmission-show displaying torrents with invalid creation date (#609)
+- Handle IPv6 RPC addresses in transmission-remote (#247)
+- Add `--unsorted` option to transmission-show (#767)
+- Widen the torrent-id column in transmission-remote for cleaner formatting (#840)
+
 
 === Transmission 2.94 (2018/05/01) ===
 [https://github.com/transmission/transmission/releases/tag/2.94 All tickets closed by this release]
