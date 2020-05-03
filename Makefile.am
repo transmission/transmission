@@ -28,7 +28,7 @@ SUBDIRS = \
 
 EXTRA_DIST = \
   qt \
-  NEWS \
+  NEWS.md \
   AUTHORS \
   COPYING \
   README.md \
