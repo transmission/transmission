@@ -89,7 +89,7 @@ int tr_rand_int(int upper_bound)
 {
     TR_ASSERT(upper_bound > 0);
 
-    unsigned noise;
+    unsigned int noise;
 
     if (tr_rand_buffer(&noise, sizeof(noise)))
     {
