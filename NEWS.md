@@ -1,4 +1,4 @@
-## [Transmission 3.00](https://github.com/transmission/transmission/releases/tag/3.00) (2020/mm/dd)
+## [Transmission 3.00](https://github.com/transmission/transmission/releases/tag/3.00) (2020/05/03)
 
 ### All Platforms
 - Allow the RPC server to listen on an IPv6 address ([#161](https://github.com/transmission/transmission/pull/161))
