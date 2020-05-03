@@ -1252,14 +1252,6 @@ tr_handshake* tr_handshakeNew(tr_peerIo* io, tr_encryption_mode encryptionMode, 
     return handshake;
 }
 
-struct tr_peerIo* tr_handshakeGetIO(tr_handshake* handshake)
-{
-    TR_ASSERT(handshake != NULL);
-    TR_ASSERT(handshake->io != NULL);
-
-    return handshake->io;
-}
-
 struct tr_peerIo* tr_handshakeStealIO(tr_handshake* handshake)
 {
     TR_ASSERT(handshake != NULL);
