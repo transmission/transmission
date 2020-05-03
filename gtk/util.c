@@ -583,19 +583,6 @@ void gtr_dialog_set_content(GtkDialog* dialog, GtkWidget* content)
 ****
 ***/
 
-void gtr_http_failure_dialog(GtkWidget* parent, char const* url, long response_code)
-{
-    GtkWindow* window = getWindow(parent);
-
-    GtkWidget* w = gtk_message_dialog_new(window, 0, GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, _("Error opening \"%s\""), url);
-
-    gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(w), _("Server returned \"%1$ld %2$s\""), response_code,
-        tr_webGetResponseStr(response_code));
-
-    g_signal_connect_swapped(w, "response", G_CALLBACK(gtk_widget_destroy), w);
-    gtk_widget_show(w);
-}
-
 void gtr_unrecognized_url_dialog(GtkWidget* parent, char const* url)
 {
     char const* xt = "xt=urn:btih";
