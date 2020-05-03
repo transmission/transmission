@@ -33,8 +33,6 @@ public:
     TorrentFilter(Prefs const& prefs);
     virtual ~TorrentFilter();
 
-    int hiddenRowCount() const;
-
     void countTorrentsPerMode(int* setmeCounts) const;
 
 protected:
