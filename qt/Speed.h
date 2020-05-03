@@ -56,6 +56,16 @@ public:
         return _Bps < that._Bps;
     }
 
+    bool operator ==(Speed const& that) const
+    {
+        return _Bps == that._Bps;
+    }
+
+    bool operator !=(Speed const& that) const
+    {
+        return _Bps != that._Bps;
+    }
+
 private:
     Speed(int Bps) :
         _Bps(Bps)
