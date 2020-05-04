@@ -81,12 +81,6 @@ enum
 #define HANDSHAKE_SET_DHT(bits) ((void)0)
 #endif
 
-/* http://www.azureuswiki.com/index.php/Extension_negotiation_protocol
-   these macros are to be used if both extended messaging and the
-   azureus protocol is supported, they indicate which protocol is preferred */
-#define HANDSHAKE_GET_EXTPREF(reserved) ((reserved)[5] & 0x03)
-#define HANDSHAKE_SET_EXTPREF(reserved, val) ((reserved)[5] |= 0x03 & (val))
-
 /**
 ***
 **/

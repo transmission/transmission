@@ -204,11 +204,6 @@ static struct tr_scrape_info* tr_announcerGetScrapeInfo(struct tr_announcer* ann
     return info;
 }
 
-bool tr_announcerHasBacklog(struct tr_announcer const* announcer)
-{
-    return announcer->slotsAvailable < 1;
-}
-
 static void onUpkeepTimer(evutil_socket_t foo UNUSED, short bar UNUSED, void* vannouncer);
 
 void tr_announcerInit(tr_session* session)
