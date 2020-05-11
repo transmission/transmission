@@ -33,17 +33,6 @@ typedef struct tr_error
 tr_error;
 
 /**
- * @brief Create new error object using `printf`-style formatting.
- *
- * @param[in] code           Error code (platform-specific).
- * @param[in] message_format Error message format string.
- * @param[in] ...            Format arguments.
- *
- * @return Newly allocated error object on success, `NULL` otherwise.
- */
-tr_error* tr_error_new(int code, char const* message_format, ...) TR_GNUC_PRINTF(2, 3);
-
-/**
  * @brief Create new error object using literal error message.
  *
  * @param[in] code    Error code (platform-specific).

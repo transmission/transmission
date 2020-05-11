@@ -17,11 +17,6 @@ RpcQueue::RpcQueue(QObject* parent) :
     connect(&myFutureWatcher, SIGNAL(finished()), SLOT(stepFinished()));
 }
 
-RpcResponseFuture RpcQueue::future()
-{
-    return myPromise.future();
-}
-
 void RpcQueue::stepFinished()
 {
     RpcResponse result;
