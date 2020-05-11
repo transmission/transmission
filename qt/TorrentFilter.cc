@@ -313,11 +313,6 @@ bool TorrentFilter::filterAcceptsRow(int sourceRow, QModelIndex const& sourcePar
     return accepts;
 }
 
-int TorrentFilter::hiddenRowCount() const
-{
-    return sourceModel()->rowCount() - rowCount();
-}
-
 void TorrentFilter::countTorrentsPerMode(int* setmeCounts) const
 {
     std::fill_n(setmeCounts, static_cast<std::size_t>(FilterMode::NUM_MODES), 0);
