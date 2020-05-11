@@ -214,17 +214,18 @@ tr_magnet_info* tr_magnetParse(char const* uri)
     }
     else
     {
-        for (int i = 0; i < trCount; i++) {
+        for (int i = 0; i < trCount; i++)
+        {
             tr_free(tr[i]);
         }
 
-        for (int i = 0; i < wsCount; i++) {
+        for (int i = 0; i < wsCount; i++)
+        {
             tr_free(ws[i]);
         }
 
         tr_free(displayName);
     }
-
 
     return info;
 }
