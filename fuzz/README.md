@@ -29,6 +29,9 @@ make fuzz-torrent
 ## Running fuzzers
 
 ```bash
+# Run torrent fuzzer until a memory error occurs
+./fuzz/fuzz-torrent
+
 # Run magnet URI fuzzer until a memory error occurs
 ./fuzz/fuzz-magnet -max_len=2000 -only_ascii=1
 
