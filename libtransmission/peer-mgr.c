@@ -2204,19 +2204,6 @@ void tr_peerMgrAddPex(tr_torrent* tor, uint8_t from, tr_pex const* pex, int8_t s
     }
 }
 
-void tr_peerMgrMarkAllAsSeeds(tr_torrent* tor)
-{
-    tr_swarm* s = tor->swarm;
-    int const n = tr_ptrArraySize(&s->pool);
-    struct peer_atom** it = (struct peer_atom**)tr_ptrArrayBase(&s->pool);
-    struct peer_atom** end = it + n;
-
-    while (it != end)
-    {
-        atomSetSeed(s, *it++);
-    }
-}
-
 tr_pex* tr_peerMgrCompactToPex(void const* compact, size_t compactLen, uint8_t const* added_f, size_t added_f_len,
     size_t* pexCount)
 {
@@ -2261,24 +2248,6 @@ tr_pex* tr_peerMgrCompact6ToPex(void const* compact, size_t compactLen, uint8_t 
         {
             pex[i].flags = added_f[i];
         }
-    }
-
-    *pexCount = n;
-    return pex;
-}
-
-tr_pex* tr_peerMgrArrayToPex(void const* array, size_t arrayLen, size_t* pexCount)
-{
-    size_t n = arrayLen / (sizeof(tr_address) + 2);
-    uint8_t const* walk = array;
-    tr_pex* pex = tr_new0(tr_pex, n);
-
-    for (size_t i = 0; i < n; ++i)
-    {
-        memcpy(&pex[i].addr, walk, sizeof(tr_address));
-        memcpy(&pex[i].port, walk + sizeof(tr_address), 2);
-        pex[i].flags = 0x00;
-        walk += sizeof(tr_address) + 2;
     }
 
     *pexCount = n;

@@ -43,8 +43,6 @@ public:
         myQueue.enqueue(qMakePair(normalizeFunc(func), normalizeErrorHandler(errorHandler)));
     }
 
-    RpcResponseFuture future();
-
     // The first function in queue is ran synchronously
     // (hence it may be e. g. a lambda capturing local variables by reference).
     void run();
