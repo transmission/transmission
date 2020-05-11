@@ -174,7 +174,7 @@ tr_magnet_info* tr_magnetParse(char const* uri)
                 }
             }
 
-            if (vallen > 0 && keylen == 2 && memcmp(key, "dn", 2) == 0 && displayName == NULL)
+            if (displayName == NULL && vallen > 0 && keylen == 2 && memcmp(key, "dn", 2) == 0)
             {
                 displayName = tr_http_unescape(val, vallen);
             }
