@@ -534,6 +534,7 @@ function(tr_install_web DST_DIR)
         PATTERN *.scss EXCLUDE)
 endfunction()
 
+add_subdirectory(fuzz)
 add_subdirectory(libtransmission)
 
 set(MAC_PROJECT_DIR macosx)
