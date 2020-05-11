@@ -20,6 +20,7 @@ tr_auto_option(ENABLE_MAC           "Build Mac client" AUTO)
         option(ENABLE_UTILS         "Build utils (create, edit, show)" ON)
         option(ENABLE_CLI           "Build command-line client" OFF)
         option(ENABLE_TESTS         "Build unit tests" ON)
+        option(ENABLE_FUZZ          "Build fuzz testing targets" OFF)
         option(ENABLE_LIGHTWEIGHT   "Optimize libtransmission for low-resource systems: smaller cache size, prefer unencrypted peer connections, etc." OFF)
         option(ENABLE_UTP           "Build µTP support" ON)
         option(ENABLE_NLS           "Enable native language support" ON)
@@ -527,6 +528,10 @@ if(ENABLE_TESTS)
     enable_testing()
 endif()
 
+if(ENABLE_FUZZ)
+    add_subdirectory(fuzz)
+endif()
+
 function(tr_install_web DST_DIR)
     install(DIRECTORY ${CMAKE_SOURCE_DIR}/web DESTINATION ${DST_DIR}
         PATTERN *.am EXCLUDE
@@ -534,7 +539,6 @@ function(tr_install_web DST_DIR)
         PATTERN *.scss EXCLUDE)
 endfunction()
 
-add_subdirectory(fuzz)
 add_subdirectory(libtransmission)
 
 set(MAC_PROJECT_DIR macosx)

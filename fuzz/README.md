@@ -17,7 +17,7 @@ export CFLAGS="-g -O0"
 ```bash
 mkdir -p build
 cd build
-cmake ..
+cmake .. -DENABLE_FUZZ=ON
 
 # Magnet URI fuzzing
 make fuzz-magnet
