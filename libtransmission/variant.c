@@ -758,7 +758,7 @@ static int compareKeyIndex(void const* va, void const* vb)
 struct SaveNode
 {
     tr_variant const* v;
-    tr_variant sorted;
+    tr_variant* sorted;
     size_t childIndex;
     bool isVisited;
 };
@@ -783,30 +783,36 @@ static void nodeConstruct(struct SaveNode* node, tr_variant const* v, bool sort_
 
         qsort(tmp, n, sizeof(struct KeyIndex), compareKeyIndex);
 
-        tr_variantInitDict(&node->sorted, n);
+        node->sorted = tr_new(tr_variant, 1);
+        tr_variantInitDict(node->sorted, n);
 
         for (size_t i = 0; i < n; ++i)
         {
-            node->sorted.val.l.vals[i] = *tmp[i].val;
+            node->sorted->val.l.vals[i] = *tmp[i].val;
         }
 
-        node->sorted.val.l.count = n;
+        node->sorted->val.l.count = n;
 
         tr_free(tmp);
 
-        node->v = &node->sorted;
+        v = node->sorted;
     }
     else
     {
-        node->v = v;
+        node->sorted = NULL;
     }
+
+    node->v = v;
 }
 
 static void nodeDestruct(struct SaveNode* node)
 {
-    if (node->v == &node->sorted)
+    TR_ASSERT(node != NULL);
+
+    if (node->sorted != NULL)
     {
-        tr_free(node->sorted.val.l.vals);
+        tr_free(node->sorted->val.l.vals);
+        tr_free(node->sorted);
     }
 }
 

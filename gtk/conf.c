@@ -74,7 +74,7 @@ static void tr_prefs_init_defaults(tr_variant* d)
         dir = tr_getDefaultDownloadDir();
     }
 
-    tr_variantDictReserve(d, 29);
+    tr_variantDictReserve(d, 31);
     tr_variantDictAddStr(d, TR_KEY_watch_dir, dir);
     tr_variantDictAddBool(d, TR_KEY_watch_dir_enabled, FALSE);
     tr_variantDictAddBool(d, TR_KEY_user_has_given_informed_consent, FALSE);
@@ -101,6 +101,8 @@ static void tr_prefs_init_defaults(tr_variant* d)
     tr_variantDictAddInt(d, TR_KEY_main_window_width, 300);
     tr_variantDictAddInt(d, TR_KEY_main_window_x, 50);
     tr_variantDictAddInt(d, TR_KEY_main_window_y, 50);
+    tr_variantDictAddInt(d, TR_KEY_details_window_height, 500);
+    tr_variantDictAddInt(d, TR_KEY_details_window_width, 700);
     tr_variantDictAddStr(d, TR_KEY_download_dir, dir);
     tr_variantDictAddStr(d, TR_KEY_sort_mode, "sort-by-name");
     tr_variantDictAddBool(d, TR_KEY_sort_reversed, FALSE);

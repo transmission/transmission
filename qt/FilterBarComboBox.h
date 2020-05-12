@@ -25,8 +25,6 @@ public:
 public:
     FilterBarComboBox(QWidget* parent = nullptr);
 
-    int currentCount() const;
-
     // QWidget
     QSize minimumSizeHint() const override;
     QSize sizeHint() const override;
