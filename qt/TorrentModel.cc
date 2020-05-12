@@ -349,11 +349,6 @@ std::optional<int> TorrentModel::getRow(int id) const
     return row;
 }
 
-std::optional<int> TorrentModel::getRow(Torrent const* tor) const
-{
-    return getRow(tor->id());
-}
-
 Torrent* TorrentModel::getTorrentFromId(int id)
 {
     auto const row = getRow(id);
