@@ -28,10 +28,6 @@ WatchDir::WatchDir(TorrentModel const& model) :
 {
 }
 
-WatchDir::~WatchDir()
-{
-}
-
 /***
 ****
 ***/

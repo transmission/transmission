@@ -17,9 +17,9 @@
 
 #include <ctype.h> /* isdigit(), tolower() */
 #include <errno.h>
-#include <float.h> /* DBL_EPSILON */
+#include <float.h> /* DBL_DIG */
 #include <locale.h> /* localeconv() */
-#include <math.h> /* pow(), fabs(), floor() */
+#include <math.h> /* fabs(), floor() */
 #include <stdio.h>
 #include <stdlib.h> /* getenv() */
 #include <string.h> /* strerror(), memset(), memmem() */
@@ -192,7 +192,7 @@ char const* tr_strip_positional_args(char const* str)
 
     out = buf;
 
-    for (; str != NULL && *str != '\0'; ++str)
+    for (; !tr_str_is_empty(str); ++str)
     {
         *out++ = *str;
 
@@ -363,7 +363,7 @@ int64_t tr_getDirFreeSpace(char const* dir)
 {
     int64_t free_space;
 
-    if (dir == NULL || *dir == '\0')
+    if (tr_str_is_empty(dir))
     {
         errno = EINVAL;
         free_space = -1;
@@ -667,7 +667,7 @@ bool tr_str_has_suffix(char const* str, char const* suffix)
         return false;
     }
 
-    return !evutil_ascii_strncasecmp(str + str_len - suffix_len, suffix, suffix_len);
+    return evutil_ascii_strncasecmp(str + str_len - suffix_len, suffix, suffix_len) == 0;
 }
 
 /****
@@ -1557,7 +1557,7 @@ int* tr_parseNumberRange(char const* str_in, size_t len, int* setmeCount)
 
     walk = str;
 
-    while (walk != NULL && *walk != '\0' && success)
+    while (!tr_str_is_empty(walk) && success)
     {
         struct number_range range;
         char const* pch = strchr(walk, ',');
@@ -1656,8 +1656,7 @@ double tr_truncd(double x, int precision)
 {
     char* pt;
     char buf[128];
-    int const max_precision = (int)log10(1.0 / DBL_EPSILON) - 1;
-    tr_snprintf(buf, sizeof(buf), "%.*f", max_precision, x);
+    tr_snprintf(buf, sizeof(buf), "%.*f", DBL_DIG, x);
 
     if ((pt = strstr(buf, localeconv()->decimal_point)) != NULL)
     {
@@ -1717,7 +1716,7 @@ bool tr_moveFile(char const* oldpath, char const* newpath, tr_error** error)
     char* buf = NULL;
     tr_sys_path_info info;
     uint64_t bytesLeft;
-    size_t const buflen = 1024 * 128; /* 128 KiB buffer */
+    size_t const buflen = 1024 * 1024; /* 1024 KiB buffer */
 
     /* make sure the old file exists */
     if (!tr_sys_path_get_info(oldpath, 0, &info, error))
@@ -2141,7 +2140,7 @@ int tr_env_get_int(char const* key, int default_value)
 
     char const* value = getenv(key);
 
-    if (value != NULL && *value != '\0')
+    if (!tr_str_is_empty(value))
     {
         return atoi(value);
     }

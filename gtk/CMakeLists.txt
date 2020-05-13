@@ -35,8 +35,7 @@ add_custom_command(
         --c-name transmission
         transmission.gresource.xml
     DEPENDS
-        icons/hicolor_apps_24x24_transmission.png
-        icons/hicolor_apps_48x48_transmission.png
+        icons/hicolor_apps_scalable_transmission.svg
         icons/lock.png
         icons/ratio.png
         icons/turtle-blue.png
@@ -174,13 +173,8 @@ endif()
 install(TARGETS ${TR_NAME}-gtk DESTINATION ${CMAKE_INSTALL_BINDIR})
 
 set(${PROJECT_NAME}_PUBLIC_ICONS
-    hicolor_apps_16x16_transmission.png
-    hicolor_apps_22x22_transmission.png
-    hicolor_apps_24x24_transmission.png
-    hicolor_apps_32x32_transmission.png
-    hicolor_apps_48x48_transmission.png
-    hicolor_apps_256x256_transmission.png
     hicolor_apps_scalable_transmission.svg
+    hicolor_apps_scalable_transmission-devel.svg
     hicolor_apps_symbolic_transmission-symbolic.svg
 )
 

@@ -33,6 +33,12 @@ typedef void* tr_rc4_ctx_t;
 typedef void* tr_dh_ctx_t;
 /** @brief Opaque DH secret key type. */
 typedef void* tr_dh_secret_t;
+/** @brief Opaque SSL context type. */
+typedef void* tr_ssl_ctx_t;
+/** @brief Opaque X509 certificate store type. */
+typedef void* tr_x509_store_t;
+/** @brief Opaque X509 certificate type. */
+typedef void* tr_x509_cert_t;
 
 /**
  * @brief Generate a SHA1 hash from one or more chunks of memory.
@@ -111,6 +117,26 @@ void tr_dh_secret_free(tr_dh_secret_t handle);
  * @brief Align DH key (big-endian number) to required length (internal, do not use).
  */
 void tr_dh_align_key(uint8_t* key_buffer, size_t key_size, size_t buffer_size);
+
+/**
+ * @brief Get X509 certificate store from SSL context.
+ */
+tr_x509_store_t tr_ssl_get_x509_store(tr_ssl_ctx_t handle);
+
+/**
+ * @brief Add certificate to X509 certificate store.
+ */
+bool tr_x509_store_add(tr_x509_store_t handle, tr_x509_cert_t cert);
+
+/**
+ * @brief Allocate and initialize new X509 certificate from DER-encoded buffer.
+ */
+tr_x509_cert_t tr_x509_cert_new(void const* der_data, size_t der_data_size);
+
+/**
+ * @brief Free X509 certificate returned by @ref tr_x509_cert_new.
+ */
+void tr_x509_cert_free(tr_x509_cert_t handle);
 
 /**
  * @brief Returns a random number in the range of [0...upper_bound).

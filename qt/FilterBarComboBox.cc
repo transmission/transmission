@@ -30,20 +30,6 @@ FilterBarComboBox::FilterBarComboBox(QWidget* parent) :
     setSizeAdjustPolicy(QComboBox::AdjustToContents);
 }
 
-int FilterBarComboBox::currentCount() const
-{
-    int count = 0;
-
-    QModelIndex const modelIndex = model()->index(currentIndex(), 0, rootModelIndex());
-
-    if (modelIndex.isValid())
-    {
-        count = modelIndex.data(CountRole).toInt();
-    }
-
-    return count;
-}
-
 QSize FilterBarComboBox::minimumSizeHint() const
 {
     QFontMetrics fm(fontMetrics());
@@ -89,7 +75,7 @@ QSize FilterBarComboBox::calculateSize(QSize const& textSize, QSize const& count
 
 void FilterBarComboBox::paintEvent(QPaintEvent* e)
 {
-    Q_UNUSED(e);
+    Q_UNUSED(e)
 
     QStylePainter painter(this);
     painter.setPen(palette().color(QPalette::Text));

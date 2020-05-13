@@ -26,19 +26,14 @@ public:
     {
     }
 
-    virtual ~TrackerDelegate()
-    {
-    }
-
     void setShowMore(bool b);
 
     // QAbstractItemDelegate
-    virtual QSize sizeHint(QStyleOptionViewItem const& option, QModelIndex const& index) const;
-    virtual void paint(QPainter* painter, QStyleOptionViewItem const& option, QModelIndex const& index) const;
+    QSize sizeHint(QStyleOptionViewItem const& option, QModelIndex const& index) const override;
+    void paint(QPainter* painter, QStyleOptionViewItem const& option, QModelIndex const& index) const override;
 
 protected:
     QString getText(TrackerInfo const&) const;
-    QSize margin(QStyle const& style) const;
 
     QSize sizeHint(QStyleOptionViewItem const&, TrackerInfo const&) const;
     void drawTracker(QPainter*, QStyleOptionViewItem const&, TrackerInfo const&) const;

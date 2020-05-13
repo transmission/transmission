@@ -446,6 +446,9 @@ static int test_truncd(void)
     tr_snprintf(buf, sizeof(buf), "%.0f", tr_truncd(3.3333, 0));
     check_str(buf, ==, "3");
 
+    tr_snprintf(buf, sizeof(buf), "%.0f", tr_truncd(3.9999, 0));
+    check_str(buf, ==, "3");
+
 #if !(defined(_MSC_VER) || (defined(__MINGW32__) && defined(__MSVCRT__)))
     /* FIXME: MSCVRT behaves differently in case of nan */
     tr_snprintf(buf, sizeof(buf), "%.2f", tr_truncd(nan, 2));
@@ -456,6 +459,8 @@ static int test_truncd(void)
 
     return 0;
 }
+
+static char* test_strdup_printf_valist(char const* fmt, ...) TR_GNUC_PRINTF(1, 2);
 
 static char* test_strdup_printf_valist(char const* fmt, ...)
 {

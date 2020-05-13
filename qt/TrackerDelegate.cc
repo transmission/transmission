@@ -86,13 +86,6 @@ ItemLayout::ItemLayout(QString const& text, bool suppressColors, Qt::LayoutDirec
 
 } // namespace
 
-QSize TrackerDelegate::margin(QStyle const& style) const
-{
-    Q_UNUSED(style);
-
-    return myMargin;
-}
-
 /***
 ****
 ***/
