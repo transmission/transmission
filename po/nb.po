@@ -13,7 +13,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-02 13:06+0300\n"
+"POT-Creation-Date: 2020-05-14 18:55+0300\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
 "Last-Translator: Allan Nordhøy <epost@anotheragency.no>, 2017\n"
 "Language-Team: Norwegian Bokmål (https://www.transifex.com/transmissionbt/teams/33778/nb/)\n"
@@ -23,7 +23,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../cli/cli.c:114 ../gtk/util.c:92 ../libtransmission/utils.c:1663
+#: ../cli/cli.c:114 ../gtk/util.c:92 ../libtransmission/utils.c:1694
 msgid "None"
 msgstr "Ingen"
 
@@ -858,7 +858,7 @@ msgctxt "Verb"
 msgid "Verifying"
 msgstr "Godkjenner"
 
-#: ../gtk/filter.c:591 ../gtk/msgwin.c:430 ../gtk/util.c:730
+#: ../gtk/filter.c:591 ../gtk/msgwin.c:430 ../gtk/util.c:717
 msgid "Error"
 msgstr "Feil"
 
@@ -2035,31 +2035,21 @@ msgstr "Støtte på en ukjent feil med torrentfila «%s»"
 msgid "Error opening torrent"
 msgstr "Feil under åpning av torrent"
 
-#: ../gtk/util.c:590
-#, c-format
-msgid "Error opening \"%s\""
-msgstr "Feil ved åpning av \"%s\""
-
-#: ../gtk/util.c:592
-#, c-format
-msgid "Server returned \"%1$ld %2$s\""
-msgstr "Tjeneren svarte med «%1$ld %2$s»"
-
-#: ../gtk/util.c:607
+#: ../gtk/util.c:594
 msgid "Unrecognized URL"
 msgstr "Ukjent URL"
 
-#: ../gtk/util.c:609
+#: ../gtk/util.c:596
 #, c-format
 msgid "Transmission doesn't know how to use \"%s\""
 msgstr "Transmission vet ikke hvordan «%s» brukes"
 
-#: ../gtk/util.c:614
+#: ../gtk/util.c:601
 #, c-format
 msgid "This magnet link appears to be intended for something other than BitTorrent. BitTorrent magnet links have a section containing \"%s\"."
 msgstr "Denne mangetlenka ser ut til å være laget for noe annet enn BitTorrent. BitTorrent-magnetlenker skal ha en seksjon som inneholder «%s»."
 
-#: ../gtk/util.c:736
+#: ../gtk/util.c:723
 #, c-format
 msgid "%s free"
 msgstr "%s gratis"
@@ -2082,15 +2072,15 @@ msgstr "DNS Oppslag feilet: %s"
 msgid "Connection failed"
 msgstr "Tilkobling feilet"
 
-#: ../libtransmission/announcer.c:1155 ../libtransmission/announcer.c:1474
+#: ../libtransmission/announcer.c:1150 ../libtransmission/announcer.c:1469
 msgid "Could not connect to tracker"
 msgstr "Kunne ikke koble til tracker"
 
-#: ../libtransmission/announcer.c:1159 ../libtransmission/announcer.c:1478
+#: ../libtransmission/announcer.c:1154 ../libtransmission/announcer.c:1473
 msgid "Tracker did not respond"
 msgstr "Tracker svarte ikke"
 
-#: ../libtransmission/announcer.c:1223
+#: ../libtransmission/announcer.c:1218
 msgid "Success"
 msgstr "Suksess"
 
@@ -2261,7 +2251,7 @@ msgstr "Stopper"
 msgid "Not forwarded"
 msgstr "Ikke videreført"
 
-#: ../libtransmission/port-forwarding.c:106 ../libtransmission/torrent.c:2298
+#: ../libtransmission/port-forwarding.c:106 ../libtransmission/torrent.c:2302
 #, c-format
 msgid "State changed from \"%1$s\" to \"%2$s\""
 msgstr "Tilstanden endret seg fra «%1$s» til «%2$s»"
@@ -2310,7 +2300,7 @@ msgstr "Feil ved dekomprimering av blokk-liste: %s (%d)"
 msgid "%s %s started"
 msgstr "%s %s startet"
 
-#: ../libtransmission/session.c:2175
+#: ../libtransmission/session.c:2170
 #, c-format
 msgid "Loaded %d torrents"
 msgstr "%d torrenter lastet inn"
@@ -2354,7 +2344,7 @@ msgstr "Utført"
 msgid "Complete"
 msgstr "Fullført"
 
-#: ../libtransmission/torrent.c:3462
+#: ../libtransmission/torrent.c:3466
 #, c-format
 msgid "Piece %<PRIu32>, which was just downloaded, failed its checksum test"
 msgstr "Del %<PRIu32>, som akkurat ble lastet ned, feilet sin checksum test"
@@ -2418,3 +2408,11 @@ msgstr "Kunne ikke lese filinnhold"
 #: ../libtransmission/verify.c:220
 msgid "Verifying torrent"
 msgstr "Kontrollerer torrent"
+
+#, c-format
+#~ msgid "Server returned \"%1$ld %2$s\""
+#~ msgstr "Tjeneren svarte med «%1$ld %2$s»"
+
+#, c-format
+#~ msgid "Error opening \"%s\""
+#~ msgstr "Feil ved åpning av \"%s\""

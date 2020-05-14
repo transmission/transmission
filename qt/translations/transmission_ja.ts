@@ -59,15 +59,15 @@
     <message numerus="yes">
         <location line="+77"/>
         <source>Torrent(s) Added</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>トレントを追加しました</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+10"/>
         <source>Torrent Completed</source>
-        <translation type="unfinished">
-            <numerusform>完了したトレント</numerusform>
+        <translation>
+            <numerusform>トレントが完了しました</numerusform>
         </translation>
     </message>
 </context>
@@ -157,7 +157,7 @@
     <message>
         <location line="-28"/>
         <source>Optimistic unchoke</source>
-        <translation type="unfinished"></translation>
+        <translation>楽観的アンチョーク</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -167,7 +167,7 @@
     <message>
         <location line="+4"/>
         <source>We would download from this peer if they would let us</source>
-        <translation type="unfinished"></translation>
+        <translation>許可があればこのピアからダウンロード</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -177,17 +177,17 @@
     <message>
         <location line="+4"/>
         <source>We would upload to this peer if they asked</source>
-        <translation>問い合わせがあればこのピアにアップロード</translation>
+        <translation>要求があればこのピアにアップロード</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Peer has unchoked us, but we&apos;re not interested</source>
-        <translation type="unfinished"></translation>
+        <translation>このピアをアンチョークしたがピアへの影響なし</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>We unchoked this peer, but they&apos;re not interested</source>
-        <translation type="unfinished"></translation>
+        <translation>私はアンチョークだが大勢への影響なし</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -202,7 +202,7 @@
     <message>
         <location line="+4"/>
         <source>Peer is an incoming connection</source>
-        <translation>ピアは着信接続</translation>
+        <translation>ピアが接続してきました</translation>
     </message>
     <message numerus="yes">
         <location line="+142"/>
@@ -250,7 +250,7 @@
     <message>
         <location line="+26"/>
         <source>%1 (Ratio: %2)</source>
-        <translation>%1 (比率: %2)</translation>
+        <translation>%1 (共有比: %2)</translation>
     </message>
     <message>
         <location line="+277"/>
@@ -312,12 +312,12 @@
     <message>
         <location line="-3"/>
         <source>Seed regardless of ratio</source>
-        <translation>比率にかかわらずシードする</translation>
+        <translation>共有比にかかわらずシードする</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Stop seeding at ratio:</source>
-        <translation>この比率でシードを停止:</translation>
+        <translation>この共有比でシードを停止:</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -332,12 +332,12 @@
     <message>
         <location line="+64"/>
         <source>Up</source>
-        <translation>アップ</translation>
+        <translation>上り</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Down</source>
-        <translation>ダウン</translation>
+        <translation>下り</translation>
     </message>
     <message>
         <location line="+0"/>
@@ -507,7 +507,7 @@
     <message>
         <location line="+12"/>
         <source>Honor global &amp;limits</source>
-        <translation>全体の速度制限を尊重(&amp;L)</translation>
+        <translation>速度制限の全体設定を尊重(&amp;L)</translation>
     </message>
     <message>
         <location line="+7"/>
@@ -532,7 +532,7 @@
     <message>
         <location line="+12"/>
         <source>&amp;Ratio:</source>
-        <translation>比率(&amp;R):</translation>
+        <translation>共有比(&amp;R):</translation>
     </message>
     <message>
         <location line="+30"/>
@@ -613,17 +613,17 @@
     <message>
         <location filename="../FileTreeView.cc" line="+275"/>
         <source>Check Selected</source>
-        <translation>選択にチェックを入れる</translation>
+        <translation>選択項目をチェック</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Uncheck Selected</source>
-        <translation>選択のチェックを外す</translation>
+        <translation>選択項目のチェックを外す</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Only Check Selected</source>
-        <translation type="unfinished"></translation>
+        <translation>選択項目のみチェック</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -943,7 +943,7 @@
     <message>
         <location line="+3"/>
         <source>Ask tracker for more peers</source>
-        <translation>トラッカーにピアの増加するために問い合わせる</translation>
+        <translation>トラッカーにピアの増加を要求</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -1054,7 +1054,7 @@
     <message>
         <location line="+8"/>
         <source>Sort by Time &amp;Left</source>
-        <translation>残時間順(&amp;L)</translation>
+        <translation>残り時間順(&amp;L)</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -1064,12 +1064,12 @@
     <message>
         <location line="+8"/>
         <source>Sort by &amp;Progress</source>
-        <translation>進行状態順(&amp;P)</translation>
+        <translation>進行率順(&amp;P)</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Sort by Rati&amp;o</source>
-        <translation>比率順(&amp;O)</translation>
+        <translation>共有比順(&amp;O)</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -1220,7 +1220,7 @@
     <message>
         <location line="+8"/>
         <source>Sort by &amp;Queue</source>
-        <translation>順番待ちを並び替え(&amp;Q)</translation>
+        <translation>処理待ち順に並び替え(&amp;Q)</translation>
     </message>
     <message>
         <location filename="../MainWindow.cc" line="+465"/>
@@ -1247,7 +1247,7 @@
     <message>
         <location line="+5"/>
         <source>Stop Seeding at Ratio</source>
-        <translation>この比率でシードを停止</translation>
+        <translation>この共有比でシードを停止</translation>
     </message>
     <message>
         <location line="-31"/>
@@ -1258,7 +1258,7 @@
         <location line="+6"/>
         <location line="+721"/>
         <source>Stop at Ratio (%1)</source>
-        <translation>停止する比率 (%1)</translation>
+        <translation>停止する共有比 (%1)</translation>
     </message>
     <message>
         <location line="-406"/>
@@ -1275,13 +1275,13 @@
         <location line="+29"/>
         <location line="+17"/>
         <source>Ratio: %1</source>
-        <translation>比率: %1</translation>
+        <translation>共有比: %1</translation>
     </message>
     <message>
         <location line="-12"/>
         <location line="+6"/>
         <source>Down: %1, Up: %2</source>
-        <translation>ダウン: %1, アップ: %2</translation>
+        <translation>下り: %1, 上り: %2</translation>
     </message>
     <message>
         <location line="+455"/>
@@ -1312,15 +1312,15 @@
         <location line="+464"/>
         <source>Click to disable Temporary Speed Limits
  (%1 down, %2 up)</source>
-        <translation>クリックで一時的な速度制限を無効化
-(%1 ダウン, %2 アップ)</translation>
+        <translation>クリックで第二の速度制限を無効化
+(%1 下り, %2 上り)</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Click to enable Temporary Speed Limits
  (%1 down, %2 up)</source>
-        <translation>クリックで一時的な速度制限を有効化
- (%1 ダウン, %2 アップ)</translation>
+        <translation>クリックで第二の速度制限を有効化
+ (%1 下り, %2 上り)</translation>
     </message>
     <message>
         <location line="+142"/>
@@ -1754,12 +1754,12 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="-20"/>
         <source>&amp;Port for incoming connections:</source>
-        <translation>待ち受け用ポート(&amp;P):</translation>
+        <translation>応答接続用ポート(&amp;P):</translation>
     </message>
     <message>
         <location line="+44"/>
         <source>Use UPnP or NAT-PMP port &amp;forwarding from my router</source>
-        <translation>UPnP か NAT-PMP にて自分のルータでポートフォワード使用(&amp;F)</translation>
+        <translation>UPnP か NAT-PMP にて自分のルータのポート転送を使用(&amp;F)</translation>
     </message>
     <message>
         <location line="+107"/>
@@ -1795,7 +1795,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location filename="../PrefsDialog.ui" line="-638"/>
         <source>Automatically add .torrent files &amp;from:</source>
-        <translation>ここから自動で .torrentファイルを追加:</translation>
+        <translation>ここから .torrent ファイルを自動追加:</translation>
     </message>
     <message>
         <location line="+22"/>
@@ -1805,7 +1805,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+7"/>
         <source>&amp;Start added torrents</source>
-        <translation>追加したトレントを開始する(&amp;S)</translation>
+        <translation>追加したトレントを開始(&amp;S)</translation>
     </message>
     <message>
         <location line="+7"/>
@@ -1960,7 +1960,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+60"/>
         <source>Only allow these IP a&amp;ddresses:</source>
-        <translation>以下の IP アドレスのみを許可(&amp;D):</translation>
+        <translation>以下の IP アドレスのみ許可(&amp;D):</translation>
     </message>
     <message>
         <location line="-1128"/>
@@ -2116,7 +2116,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+59"/>
         <source>Stop seeding at &amp;ratio:</source>
-        <translation>この比率でシード停止(&amp;R):</translation>
+        <translation>この共有比でシード停止(&amp;R):</translation>
     </message>
     <message>
         <location line="+20"/>
@@ -2289,13 +2289,13 @@ To add another primary URL, add it after a blank line.</source>
         <location line="-82"/>
         <location line="+96"/>
         <source>Ratio:</source>
-        <translation>比率:</translation>
+        <translation>共有比:</translation>
     </message>
     <message>
         <location line="-82"/>
         <location line="+96"/>
         <source>Duration:</source>
-        <translation>期間:</translation>
+        <translation>時間:</translation>
     </message>
     <message>
         <location line="-61"/>
@@ -2313,7 +2313,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>Torrent</name>
     <message>
-        <location filename="../Torrent.cc" line="+1064"/>
+        <location filename="../Torrent.cc" line="+1043"/>
         <source>Verifying local data</source>
         <translation>取得済みのデータを検証中</translation>
     </message>
@@ -2386,25 +2386,25 @@ To add another primary URL, add it after a blank line.</source>
         <location line="+14"/>
         <source>%1 of %2 (%3%), uploaded %4 (Ratio: %5 Goal: %6)</source>
         <extracomment>First part of torrent progress string; %1 is how much we&apos;ve got, %2 is the torrent&apos;s total size, %3 is a percentage of the two, %4 is how much we&apos;ve uploaded, %5 is our upload-to-download ratio, %6 is the ratio we want to reach before we stop uploading</extracomment>
-        <translation>%1 / %2 (%3%), アップ済み %4 (比率: %5 目標: %6)</translation>
+        <translation>%1 / %2 (%3%), アップ済み %4 (共有比: %5 目標: %6)</translation>
     </message>
     <message>
         <location line="+14"/>
         <source>%1 of %2 (%3%), uploaded %4 (Ratio: %5)</source>
         <extracomment>First part of torrent progress string; %1 is how much we&apos;ve got, %2 is the torrent&apos;s total size, %3 is a percentage of the two, %4 is how much we&apos;ve uploaded, %5 is our upload-to-download ratio</extracomment>
-        <translation>%1 / %2 (%3%), アップ済み %4 (比率: %5)</translation>
+        <translation>%1 / %2 (%3%), アップ済み %4 (共有比: %5)</translation>
     </message>
     <message>
         <location line="+15"/>
         <source>%1, uploaded %2 (Ratio: %3 Goal: %4)</source>
         <extracomment>First part of torrent progress string; %1 is the torrent&apos;s total size, %2 is how much we&apos;ve uploaded, %3 is our upload-to-download ratio, %4 is the ratio we want to reach before we stop uploading</extracomment>
-        <translation>%1, アップ済み %2 (比率: %3 目標: %4)</translation>
+        <translation>%1, アップ済み %2 (共有比: %3 目標: %4)</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>%1, uploaded %2 (Ratio: %3)</source>
         <extracomment>First part of torrent progress string; %1 is the torrent&apos;s total size, %2 is how much we&apos;ve uploaded, %3 is our upload-to-download ratio</extracomment>
-        <translation>%1, アップ済み %2 (比率: %3)</translation>
+        <translation>%1, アップ済み %2 (共有比: %3)</translation>
     </message>
     <message>
         <location line="+13"/>
@@ -2421,7 +2421,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+39"/>
         <source>Ratio: %1</source>
-        <translation>比率: %1</translation>
+        <translation>共有比: %1</translation>
     </message>
     <message numerus="yes">
         <location line="+44"/>
@@ -2487,7 +2487,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>TrackerDelegate</name>
     <message numerus="yes">
-        <location filename="../TrackerDelegate.cc" line="+218"/>
+        <location filename="../TrackerDelegate.cc" line="+211"/>
         <source>Got a list of%1 %Ln peer(s)%2 %3 ago</source>
         <extracomment>%1 and %2 are replaced with HTML markup, %3 is duration</extracomment>
         <translation>
@@ -2509,13 +2509,13 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+9"/>
         <source>No updates scheduled</source>
-        <translation>更新の計画はありません</translation>
+        <translation>更新の予定はありません</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Asking for more peers in %1</source>
         <extracomment>%1 is duration</extracomment>
-        <translation>%1 にピア探索を要求</translation>
+        <translation>%1 後にピア探索を要求</translation>
     </message>
     <message>
         <location line="+6"/>
@@ -2554,7 +2554,7 @@ To add another primary URL, add it after a blank line.</source>
         <location line="+7"/>
         <source>Got a scrape error %1&quot;%2&quot;%3 %4 ago</source>
         <extracomment>%1 and %3 are replaced with HTML markup, %2 is error message, %4 is duration</extracomment>
-        <translation>データ取得エラー %1&quot;%2&quot;%3 %4 前</translation>
+        <translation>データ取得エラー %1&quot;%2&quot;%3 が %4 前に発生</translation>
     </message>
     <message>
         <location line="+15"/>
@@ -2565,7 +2565,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+7"/>
         <source>Queued to ask for peer counts</source>
-        <translation>ピア数問い合わせを処理待ちに追加</translation>
+        <translation>ピア数確認を処理待ちに追加</translation>
     </message>
     <message>
         <location line="+9"/>

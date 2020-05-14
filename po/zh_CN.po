@@ -4,16 +4,16 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 # Translators:
-# Dingzhong Chen <wsxy162@gmail.com>, 2019
+# Dingzhong Chen <wsxy162@gmail.com>, 2020
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-02 13:06+0300\n"
+"POT-Creation-Date: 2020-05-14 18:55+0300\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Dingzhong Chen <wsxy162@gmail.com>, 2019\n"
+"Last-Translator: Dingzhong Chen <wsxy162@gmail.com>, 2020\n"
 "Language-Team: Chinese (China) (https://www.transifex.com/transmissionbt/teams/33778/zh_CN/)\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
@@ -21,7 +21,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: ../cli/cli.c:114 ../gtk/util.c:92 ../libtransmission/utils.c:1663
+#: ../cli/cli.c:114 ../gtk/util.c:92 ../libtransmission/utils.c:1694
 msgid "None"
 msgstr "无"
 
@@ -151,7 +151,7 @@ msgstr "立即开始(_N)"
 
 #: ../gtk/actions.c:89
 msgid "Start torrent now"
-msgstr "现在开始种子任务"
+msgstr "立即开始任务"
 
 #: ../gtk/actions.c:91
 msgid "_Statistics"
@@ -167,7 +167,7 @@ msgstr "校验本地数据(_V)"
 
 #: ../gtk/actions.c:94
 msgid "Pause torrent"
-msgstr "暂停种子任务"
+msgstr "暂停任务"
 
 #: ../gtk/actions.c:94
 msgid "_Pause"
@@ -175,7 +175,7 @@ msgstr "暂停(_P)"
 
 #: ../gtk/actions.c:95
 msgid "Pause all torrents"
-msgstr "暂停所有种子任务"
+msgstr "暂停所有任务"
 
 #: ../gtk/actions.c:95
 msgid "_Pause All"
@@ -183,7 +183,7 @@ msgstr "全部暂停(_P)"
 
 #: ../gtk/actions.c:96
 msgid "Start all torrents"
-msgstr "开始所有种子任务"
+msgstr "开始所有任务"
 
 #: ../gtk/actions.c:96
 msgid "_Start All"
@@ -219,7 +219,7 @@ msgstr "全部选择(_A)"
 
 #: ../gtk/actions.c:103
 msgid "Dese_lect All"
-msgstr "全部不选(_L)"
+msgstr "取消选择(_L)"
 
 #: ../gtk/actions.c:105
 msgid "Torrent properties"
@@ -847,7 +847,7 @@ msgctxt "Verb"
 msgid "Verifying"
 msgstr "校验中"
 
-#: ../gtk/filter.c:591 ../gtk/msgwin.c:430 ../gtk/util.c:730
+#: ../gtk/filter.c:591 ../gtk/msgwin.c:430 ../gtk/util.c:717
 msgid "Error"
 msgstr "出错"
 
@@ -858,7 +858,7 @@ msgstr "显示(_S)："
 #: ../gtk/filter.c:884
 #, c-format
 msgid "_Show %'d of:"
-msgstr "显示 %'d 个属于(_S)："
+msgstr "显示共 %'d 个(_S)："
 
 #: ../gtk/main.c:314
 #, c-format
@@ -906,7 +906,7 @@ msgstr ""
 
 #: ../gtk/main.c:746
 msgid "Transmission is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility."
-msgstr "Transmission 是一个文件分享程序。当那您运行一个种子任务时，其数据将通过上传的方式传给其他人。任何您分享的内容都由您自己负责。"
+msgstr "Transmission 是一个文件分享程序。当你运行种子任务时，其数据将通过上传的方式传给其他人。你分享的任何内容都由你自负责任。"
 
 #: ../gtk/main.c:749
 msgid "I _Agree"
@@ -949,7 +949,7 @@ msgstr "Copyright (c) Transmission 项目"
 msgid "translator-credits"
 msgstr ""
 "Aron Xu <happyaron.xu@gmail.com>, 2012\n"
-"Dingzhong Chen <wsxy162@gmail.com>, 2017\n"
+"Dingzhong Chen <wsxy162@gmail.com>, 2020\n"
 "Launchpad 贡献者：\n"
 "  Alexey Kotlyarov https://launchpad.net/~koterpillar\n"
 "  Andrew Starr-Bochicchio https://launchpad.net/~andrewsomething\n"
@@ -1226,11 +1226,11 @@ msgstr[0] "已启动 %d 次"
 
 #: ../gtk/stats.c:91
 msgid "Reset your statistics?"
-msgstr "重置您的统计信息？"
+msgstr "重置你的统计信息？"
 
 #: ../gtk/stats.c:92
 msgid "These statistics are for your information only. Resetting them doesn't affect the statistics logged by your BitTorrent trackers."
-msgstr "这些统计信息只是供您参考。重置它们不会影响 Tracker 上的统计信息。"
+msgstr "这些统计信息只是供你参考。重置它们不会影响 Tracker 上的统计信息。"
 
 #: ../gtk/stats.c:96 ../gtk/stats.c:123
 msgid "_Reset"
@@ -1779,7 +1779,7 @@ msgstr "使用 PE_X 以寻找更多节点"
 
 #: ../gtk/tr-prefs.c:1176
 msgid "PEX is a tool for exchanging peer lists with the peers you're connected to."
-msgstr "PEX 是用于同已与您相连接的节点交换节点名单的工具。"
+msgstr "PEX 是用于跟你相连接的节点交换节点名单的工具。"
 
 #: ../gtk/tr-prefs.c:1180
 msgid "Use _DHT to find more peers"
@@ -2033,31 +2033,21 @@ msgstr "种子文件“%s”出现未知错误。"
 msgid "Error opening torrent"
 msgstr "打开种子文件时出错"
 
-#: ../gtk/util.c:590
-#, c-format
-msgid "Error opening \"%s\""
-msgstr "打开“%s”时出错"
-
-#: ../gtk/util.c:592
-#, c-format
-msgid "Server returned \"%1$ld %2$s\""
-msgstr "服务器返回了“%1$ld %2$s”"
-
-#: ../gtk/util.c:607
+#: ../gtk/util.c:594
 msgid "Unrecognized URL"
 msgstr "无法识别的 URL 地址"
 
-#: ../gtk/util.c:609
+#: ../gtk/util.c:596
 #, c-format
 msgid "Transmission doesn't know how to use \"%s\""
 msgstr "Transmission 不知道如何使用“%s”"
 
-#: ../gtk/util.c:614
+#: ../gtk/util.c:601
 #, c-format
 msgid "This magnet link appears to be intended for something other than BitTorrent. BitTorrent magnet links have a section containing \"%s\"."
 msgstr "这个磁力链接不是为 BitTorrent 而准备的，BitTorrent 的磁力链接应包含“%s”段。"
 
-#: ../gtk/util.c:736
+#: ../gtk/util.c:723
 #, c-format
 msgid "%s free"
 msgstr "%s 可用"
@@ -2080,15 +2070,15 @@ msgstr "DNS 查找失败：%s"
 msgid "Connection failed"
 msgstr "连接失败"
 
-#: ../libtransmission/announcer.c:1155 ../libtransmission/announcer.c:1474
+#: ../libtransmission/announcer.c:1150 ../libtransmission/announcer.c:1469
 msgid "Could not connect to tracker"
 msgstr "无法连接到 Tracker"
 
-#: ../libtransmission/announcer.c:1159 ../libtransmission/announcer.c:1478
+#: ../libtransmission/announcer.c:1154 ../libtransmission/announcer.c:1473
 msgid "Tracker did not respond"
 msgstr "Tracker 没有响应"
 
-#: ../libtransmission/announcer.c:1223
+#: ../libtransmission/announcer.c:1218
 msgid "Success"
 msgstr "成功"
 
@@ -2259,7 +2249,7 @@ msgstr "停止中"
 msgid "Not forwarded"
 msgstr "未转发"
 
-#: ../libtransmission/port-forwarding.c:106 ../libtransmission/torrent.c:2298
+#: ../libtransmission/port-forwarding.c:106 ../libtransmission/torrent.c:2302
 #, c-format
 msgid "State changed from \"%1$s\" to \"%2$s\""
 msgstr "状态已从“%1$s”变为“%2$s”"
@@ -2308,7 +2298,7 @@ msgstr "解压缩屏蔽列表时出错：%s (%d)"
 msgid "%s %s started"
 msgstr "%s %s 已启动"
 
-#: ../libtransmission/session.c:2175
+#: ../libtransmission/session.c:2170
 #, c-format
 msgid "Loaded %d torrents"
 msgstr "载入了 %d 个种子"
@@ -2329,7 +2319,7 @@ msgstr "Tracker 错误：“%s”"
 
 #: ../libtransmission/torrent.c:916
 msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, remove the torrent and re-add it."
-msgstr "未找到数据！请确保您的驱动器已经连接，或使用“设定位置”进行选择。如需重新下载，请移除此任务后重新添加。"
+msgstr "未找到数据！请确保你的驱动器已经连接，或使用“设定位置”进行选择。如需重新下载，请移除此任务后重新添加。"
 
 #: ../libtransmission/torrent.c:1868
 msgid "Restarted manually -- disabling its seed ratio"
@@ -2352,7 +2342,7 @@ msgstr "完成"
 msgid "Complete"
 msgstr "完成"
 
-#: ../libtransmission/torrent.c:3462
+#: ../libtransmission/torrent.c:3466
 #, c-format
 msgid "Piece %<PRIu32>, which was just downloaded, failed its checksum test"
 msgstr "区块 %<PRIu32>（刚刚下载的）校验测试失败了"
@@ -2417,5 +2407,10 @@ msgstr "无法解析文件内容"
 msgid "Verifying torrent"
 msgstr "正在验证种子文件"
 
-#~ msgid "transmission"
-#~ msgstr "transmission"
+#, c-format
+#~ msgid "Server returned \"%1$ld %2$s\""
+#~ msgstr "服务器返回了“%1$ld %2$s”"
+
+#, c-format
+#~ msgid "Error opening \"%s\""
+#~ msgstr "打开“%s”时出错"

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-02 13:06+0300\n"
+"POT-Creation-Date: 2020-05-14 18:55+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2017\n"
 "Language-Team: Vietnamese (https://www.transifex.com/transmissionbt/teams/33778/vi/)\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: ../cli/cli.c:114 ../gtk/util.c:92 ../libtransmission/utils.c:1663
+#: ../cli/cli.c:114 ../gtk/util.c:92 ../libtransmission/utils.c:1694
 msgid "None"
 msgstr "Không có"
 
@@ -844,7 +844,7 @@ msgctxt "Verb"
 msgid "Verifying"
 msgstr ""
 
-#: ../gtk/filter.c:591 ../gtk/msgwin.c:430 ../gtk/util.c:730
+#: ../gtk/filter.c:591 ../gtk/msgwin.c:430 ../gtk/util.c:717
 msgid "Error"
 msgstr "Lỗi"
 
@@ -1995,31 +1995,21 @@ msgstr "Tập tin torrent \"%s\" gặp lỗi không xác định."
 msgid "Error opening torrent"
 msgstr "Lỗi khi mở torrent"
 
-#: ../gtk/util.c:590
-#, c-format
-msgid "Error opening \"%s\""
-msgstr "Lỗi khi mở \"%s\""
-
-#: ../gtk/util.c:592
-#, c-format
-msgid "Server returned \"%1$ld %2$s\""
-msgstr "Máy chủ trả về \"%1$ld %2$s\""
-
-#: ../gtk/util.c:607
+#: ../gtk/util.c:594
 msgid "Unrecognized URL"
 msgstr "URL không thể nhận dạng"
 
-#: ../gtk/util.c:609
+#: ../gtk/util.c:596
 #, c-format
 msgid "Transmission doesn't know how to use \"%s\""
 msgstr "Transmission không biết cách sử dụng \"%s\""
 
-#: ../gtk/util.c:614
+#: ../gtk/util.c:601
 #, c-format
 msgid "This magnet link appears to be intended for something other than BitTorrent. BitTorrent magnet links have a section containing \"%s\"."
 msgstr "Liên kết magnet này có vẻ như không được tạo ra cho Bittorrent. Liên kết magnet của Bittorrent phải có một phần chứa \"%s\"."
 
-#: ../gtk/util.c:736
+#: ../gtk/util.c:723
 #, c-format
 msgid "%s free"
 msgstr ""
@@ -2042,15 +2032,15 @@ msgstr ""
 msgid "Connection failed"
 msgstr ""
 
-#: ../libtransmission/announcer.c:1155 ../libtransmission/announcer.c:1474
+#: ../libtransmission/announcer.c:1150 ../libtransmission/announcer.c:1469
 msgid "Could not connect to tracker"
 msgstr ""
 
-#: ../libtransmission/announcer.c:1159 ../libtransmission/announcer.c:1478
+#: ../libtransmission/announcer.c:1154 ../libtransmission/announcer.c:1473
 msgid "Tracker did not respond"
 msgstr ""
 
-#: ../libtransmission/announcer.c:1223
+#: ../libtransmission/announcer.c:1218
 msgid "Success"
 msgstr ""
 
@@ -2221,7 +2211,7 @@ msgstr "Đang ngừng"
 msgid "Not forwarded"
 msgstr "Chưa chuyển tiếp"
 
-#: ../libtransmission/port-forwarding.c:106 ../libtransmission/torrent.c:2298
+#: ../libtransmission/port-forwarding.c:106 ../libtransmission/torrent.c:2302
 #, c-format
 msgid "State changed from \"%1$s\" to \"%2$s\""
 msgstr "Trạng thái thay đổi từ \"%1$s\" tới \"%2$s\""
@@ -2270,7 +2260,7 @@ msgstr ""
 msgid "%s %s started"
 msgstr "%s %s đã chạy"
 
-#: ../libtransmission/session.c:2175
+#: ../libtransmission/session.c:2170
 #, c-format
 msgid "Loaded %d torrents"
 msgstr "Tải %d torrents"
@@ -2314,7 +2304,7 @@ msgstr "Xong"
 msgid "Complete"
 msgstr "Hoàn thành"
 
-#: ../libtransmission/torrent.c:3462
+#: ../libtransmission/torrent.c:3466
 #, c-format
 msgid "Piece %<PRIu32>, which was just downloaded, failed its checksum test"
 msgstr ""
@@ -2379,5 +2369,13 @@ msgstr ""
 msgid "Verifying torrent"
 msgstr "Đang kiểm tra torrent"
 
+#, c-format
+#~ msgid "Server returned \"%1$ld %2$s\""
+#~ msgstr "Máy chủ trả về \"%1$ld %2$s\""
+
 #~ msgid "Transmission BitTorrent Client"
 #~ msgstr "Trình khách BitTorrent Transmission"
+
+#, c-format
+#~ msgid "Error opening \"%s\""
+#~ msgstr "Lỗi khi mở \"%s\""

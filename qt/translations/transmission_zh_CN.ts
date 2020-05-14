@@ -59,14 +59,14 @@
     <message numerus="yes">
         <location line="+77"/>
         <source>Torrent(s) Added</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Torrent 已添加</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+10"/>
         <source>Torrent Completed</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>Torrent 已完成</numerusform>
         </translation>
     </message>
@@ -265,7 +265,7 @@
     <message>
         <location line="+172"/>
         <source>Add URL </source>
-        <translation>添加链接</translation>
+        <translation>添加链接 </translation>
     </message>
     <message>
         <location line="+0"/>
@@ -281,7 +281,7 @@
     <message>
         <location line="-9"/>
         <source>Edit URL </source>
-        <translation>编辑链接</translation>
+        <translation>编辑链接 </translation>
     </message>
     <message>
         <location line="+0"/>
@@ -382,7 +382,7 @@
     <message>
         <location line="+26"/>
         <source>Availability:</source>
-        <translation>健康度:</translation>
+        <translation>可用性:</translation>
     </message>
     <message>
         <location line="+26"/>
@@ -2162,7 +2162,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location filename="../RelocateDialog.ui" line="+14"/>
         <source>Set Torrent Location</source>
-        <translation>设置种子位置</translation>
+        <translation>设置 Torrent 位置</translation>
     </message>
     <message>
         <location line="+12"/>
@@ -2313,7 +2313,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>Torrent</name>
     <message>
-        <location filename="../Torrent.cc" line="+1064"/>
+        <location filename="../Torrent.cc" line="+1043"/>
         <source>Verifying local data</source>
         <translation>正在检查本地数据</translation>
     </message>
@@ -2487,7 +2487,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>TrackerDelegate</name>
     <message numerus="yes">
-        <location filename="../TrackerDelegate.cc" line="+218"/>
+        <location filename="../TrackerDelegate.cc" line="+211"/>
         <source>Got a list of%1 %Ln peer(s)%2 %3 ago</source>
         <extracomment>%1 and %2 are replaced with HTML markup, %3 is duration</extracomment>
         <translation>
