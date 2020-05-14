@@ -7,17 +7,17 @@
 # Mike Gelfand <mikedld@mikedld.com>, 2017
 # gyeben <gyonkibendeguz@gmail.com>, 2017
 # Márton Fazekas <zseliakiraly@gmail.com>, 2018
-# Balázs Meskó <mesko.balazs@fsf.hu>, 2019
 # Ács Zoltán <acszoltan111@gmail.com>, 2020
+# Balázs Meskó <mesko.balazs@fsf.hu>, 2020
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-02 13:06+0300\n"
+"POT-Creation-Date: 2020-05-14 18:55+0300\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Ács Zoltán <acszoltan111@gmail.com>, 2020\n"
+"Last-Translator: Balázs Meskó <mesko.balazs@fsf.hu>, 2020\n"
 "Language-Team: Hungarian (https://www.transifex.com/transmissionbt/teams/33778/hu/)\n"
 "Language: hu\n"
 "MIME-Version: 1.0\n"
@@ -25,9 +25,9 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../cli/cli.c:114 ../gtk/util.c:92 ../libtransmission/utils.c:1663
+#: ../cli/cli.c:114 ../gtk/util.c:92 ../libtransmission/utils.c:1694
 msgid "None"
-msgstr "nincs"
+msgstr "Nincs"
 
 #: ../gtk/actions.c:31
 msgid "Sort by _Activity"
@@ -860,7 +860,7 @@ msgctxt "Verb"
 msgid "Verifying"
 msgstr "Ellenőrzés"
 
-#: ../gtk/filter.c:591 ../gtk/msgwin.c:430 ../gtk/util.c:730
+#: ../gtk/filter.c:591 ../gtk/msgwin.c:430 ../gtk/util.c:717
 msgid "Error"
 msgstr "Hiba"
 
@@ -871,7 +871,7 @@ msgstr "_Megjelenítés:"
 #: ../gtk/filter.c:884
 #, c-format
 msgid "_Show %'d of:"
-msgstr "%'d megjelenítése ennyiből:"
+msgstr "%'d _megjelenítése ennyiből:"
 
 #: ../gtk/main.c:314
 #, c-format
@@ -893,7 +893,7 @@ msgstr "Az összes torrent indítása felfüggesztettként"
 
 #: ../gtk/main.c:618
 msgid "Start minimized in notification area"
-msgstr "Az értesítési területen minimalizálva induljon"
+msgstr "Indítás az értesítési területen, kis méretben"
 
 #: ../gtk/main.c:619
 msgid "Show version number and exit"
@@ -964,7 +964,7 @@ msgstr "Copyright (c) The Transmission Project"
 msgid "translator-credits"
 msgstr ""
 "Kéménczy Kálmán <kkemenczy@openscope.org>\n"
-"Meskó Balázs <meskobalazs@fedoraproject.org>\n"
+"Meskó Balázs <mesko.balazs@fsf.hu>\n"
 "\n"
 "Launchpad Contributions:\n"
 "  Baranyai Márk https://launchpad.net/~baranyai-mark\n"
@@ -1010,7 +1010,7 @@ msgstr "„%s” létrehozva"
 #: ../gtk/makemeta-ui.c:78
 #, c-format
 msgid "Error: invalid announce URL \"%s\""
-msgstr "Hiba: érvénytelen bejelentési URL „%s”"
+msgstr "Hiba: érvénytelen bejelentési URL: „%s”"
 
 #: ../gtk/makemeta-ui.c:82
 msgid "Cancelled"
@@ -1019,12 +1019,12 @@ msgstr "Megszakítva"
 #: ../gtk/makemeta-ui.c:86
 #, c-format
 msgid "Error reading \"%s\": %s"
-msgstr "Hiba „%s” olvasásakor: %s"
+msgstr "Hiba a(z) „%s” olvasásakor: %s"
 
 #: ../gtk/makemeta-ui.c:90
 #, c-format
 msgid "Error writing \"%s\": %s"
-msgstr "Hiba „%s” írásakor: %s"
+msgstr "Hiba a(z) „%s” írásakor: %s"
 
 #. how much data we've scanned through to generate checksums
 #: ../gtk/makemeta-ui.c:113
@@ -1637,11 +1637,11 @@ msgstr "_Jelszó:"
 #. require authentication
 #: ../gtk/tr-prefs.c:792
 msgid "Only allow these IP a_ddresses:"
-msgstr "Csak a következő IP cí&mek engedélyezése:"
+msgstr "Csak a következő IP cí_mek engedélyezése:"
 
 #: ../gtk/tr-prefs.c:816
 msgid "IP addresses may use wildcards, such as 192.168.*.*"
-msgstr "Az IP címekhez használhatóak helyettesítő karakterek, például: 192.168.*.*"
+msgstr "Az IP-címekben lehetnek helyettesítő karakterek, például: 192.168.*.*"
 
 #: ../gtk/tr-prefs.c:835
 msgid "Addresses:"
@@ -2029,13 +2029,13 @@ msgstr[1] "%'d perc"
 #, c-format
 msgid "%'d second"
 msgid_plural "%'d seconds"
-msgstr[0] "%'d mp."
-msgstr[1] "%'d mp."
+msgstr[0] "%'d másodperc"
+msgstr[1] "%'d másodperc"
 
 #: ../gtk/util.c:258
 #, c-format
 msgid "The torrent file \"%s\" contains invalid data."
-msgstr "A torrentfájl („%s”) érvénytelen adatokat tartalmaz."
+msgstr "A(z) „%s” torrentfájl érvénytelen adatokat tartalmaz."
 
 #: ../gtk/util.c:262
 #, c-format
@@ -2045,37 +2045,27 @@ msgstr "A(z) „%s” torrentfájlt már a(z) „%s” használja."
 #: ../gtk/util.c:267
 #, c-format
 msgid "The torrent file \"%s\" encountered an unknown error."
-msgstr "A torrentfájl („%s”) ismeretlen hibát észlelt."
+msgstr "A(z) „%s” torrentfájl ismeretlen hibát észlelt."
 
 #: ../gtk/util.c:271
 msgid "Error opening torrent"
 msgstr "Hiba történt a torrent megnyitásakor"
 
-#: ../gtk/util.c:590
-#, c-format
-msgid "Error opening \"%s\""
-msgstr "Hiba „%s” megnyitása közben"
-
-#: ../gtk/util.c:592
-#, c-format
-msgid "Server returned \"%1$ld %2$s\""
-msgstr "A kiszolgáló válasza: „%1$ld %2$s”"
-
-#: ../gtk/util.c:607
+#: ../gtk/util.c:594
 msgid "Unrecognized URL"
 msgstr "Ismeretlen URL"
 
-#: ../gtk/util.c:609
+#: ../gtk/util.c:596
 #, c-format
 msgid "Transmission doesn't know how to use \"%s\""
 msgstr "A Transmission nem tudja használni: „%s”"
 
-#: ../gtk/util.c:614
+#: ../gtk/util.c:601
 #, c-format
 msgid "This magnet link appears to be intended for something other than BitTorrent. BitTorrent magnet links have a section containing \"%s\"."
 msgstr "Ez a mágnes link úgy tűnik más, nem a BitTorrent alkalmazáshoz készült. A BitTorrent mágnes linkek egy szakasza az alábbit tartalmazza: „%s”."
 
-#: ../gtk/util.c:736
+#: ../gtk/util.c:723
 #, c-format
 msgid "%s free"
 msgstr "%s szabad"
@@ -2098,58 +2088,58 @@ msgstr "DNS feloldás sikertelen: %s"
 msgid "Connection failed"
 msgstr "Kapcsolat sikertelen"
 
-#: ../libtransmission/announcer.c:1155 ../libtransmission/announcer.c:1474
+#: ../libtransmission/announcer.c:1150 ../libtransmission/announcer.c:1469
 msgid "Could not connect to tracker"
 msgstr "Nem sikerült kapcsolódni a követőhöz"
 
-#: ../libtransmission/announcer.c:1159 ../libtransmission/announcer.c:1478
+#: ../libtransmission/announcer.c:1154 ../libtransmission/announcer.c:1473
 msgid "Tracker did not respond"
 msgstr "A követő nem válaszolt"
 
-#: ../libtransmission/announcer.c:1223
+#: ../libtransmission/announcer.c:1218
 msgid "Success"
-msgstr "Siker"
+msgstr "Sikeres"
 
 #: ../libtransmission/blocklist.c:63 ../libtransmission/blocklist.c:360 ../libtransmission/utils.c:258
 #, c-format
 msgid "Couldn't read \"%1$s\": %2$s"
-msgstr "„%1$s” nem olvasható be: %2$s"
+msgstr "A(z) „%1$s” nem olvasható: %2$s"
 
 #: ../libtransmission/blocklist.c:103
 #, c-format
 msgid "Blocklist \"%s\" contains %zu entries"
-msgstr "A „%s” tiltólista %zu elemű."
+msgstr "A(z) „%s” tiltólista %zu bejegyzést tartalmaz"
 
 #. don't try to display the actual lines - it causes issues
 #: ../libtransmission/blocklist.c:403
 #, c-format
 msgid "blocklist skipped invalid address at line %d"
-msgstr "a tiltólista %d sorában az érvénytelen elem kihagyva"
+msgstr "a tiltólista %d. sorában lévő érvénytelen cím kihagyva"
 
 #: ../libtransmission/blocklist.c:460 ../libtransmission/rpcimpl.c:1650 ../libtransmission/rpcimpl.c:1664 ../libtransmission/rpcimpl.c:1687 ../libtransmission/variant.c:1226
 #, c-format
 msgid "Couldn't save file \"%1$s\": %2$s"
-msgstr "A fájl („%1$s”) nem menthető: %2$s"
+msgstr "A(z) „%1$s”' fájl nem menthető: %2$s"
 
 #: ../libtransmission/blocklist.c:466
 #, c-format
 msgid "Blocklist \"%s\" updated with %zu entries"
-msgstr "„%s” tiltólista frissítve %zu bejegyzéssel"
+msgstr "A(z) „%s” tiltólista frissítve %zu bejegyzéssel"
 
 #: ../libtransmission/fdlimit.c:168
 #, c-format
 msgid "Couldn't get directory for \"%1$s\": %2$s"
-msgstr "Nem kérhető el a(z) „%1$s” könyvtár: %2$s"
+msgstr "Nem kérhető le a(z) „%1$s” könyvtár: %2$s"
 
 #: ../libtransmission/fdlimit.c:174 ../libtransmission/file-posix.c:243
 #, c-format
 msgid "Couldn't create \"%1$s\": %2$s"
-msgstr "„%1$s” nem hozható létre: %2$s"
+msgstr "A(z) „%1$s” nem hozható létre: %2$s"
 
 #: ../libtransmission/fdlimit.c:195
 #, c-format
 msgid "Couldn't open \"%1$s\": %2$s"
-msgstr "„%1$s” nem nyitható meg: %2$s"
+msgstr "A(z) „%1$s” nem nyitható meg: %2$s"
 
 #: ../libtransmission/fdlimit.c:207
 msgid "full"
@@ -2277,7 +2267,7 @@ msgstr "Leállítás"
 msgid "Not forwarded"
 msgstr "Nincs átirányítva"
 
-#: ../libtransmission/port-forwarding.c:106 ../libtransmission/torrent.c:2298
+#: ../libtransmission/port-forwarding.c:106 ../libtransmission/torrent.c:2302
 #, c-format
 msgid "State changed from \"%1$s\" to \"%2$s\""
 msgstr "Az állapot megváltoztatva: „%1$s” -> „%2$s”"
@@ -2326,7 +2316,7 @@ msgstr "Hiba a blokklista kibontásakor: %s (%d)"
 msgid "%s %s started"
 msgstr "%s %s elindítva"
 
-#: ../libtransmission/session.c:2175
+#: ../libtransmission/session.c:2170
 #, c-format
 msgid "Loaded %d torrents"
 msgstr "%d torrent betöltve"
@@ -2370,7 +2360,7 @@ msgstr "Kész"
 msgid "Complete"
 msgstr "Befejezve"
 
-#: ../libtransmission/torrent.c:3462
+#: ../libtransmission/torrent.c:3466
 #, c-format
 msgid "Piece %<PRIu32>, which was just downloaded, failed its checksum test"
 msgstr "A(z) %<PRIu32>. elem, amely most töltődött le, nem ment át az ellenőrzőösszeg teszten"
@@ -2435,5 +2425,10 @@ msgstr "A fájl tartalma nem dolgozható fel"
 msgid "Verifying torrent"
 msgstr "Torrent ellenőrzése"
 
-#~ msgid "transmission"
-#~ msgstr "transmission"
+#, c-format
+#~ msgid "Server returned \"%1$ld %2$s\""
+#~ msgstr "A kiszolgáló válasza: „%1$ld %2$s”"
+
+#, c-format
+#~ msgid "Error opening \"%s\""
+#~ msgstr "Hiba „%s” megnyitása közben"

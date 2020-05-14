@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-02 13:06+0300\n"
+"POT-Creation-Date: 2020-05-14 18:55+0300\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
 "Last-Translator: Andika Triwidada <andika@gmail.com>, 2020\n"
 "Language-Team: Indonesian (https://www.transifex.com/transmissionbt/teams/33778/id/)\n"
@@ -22,7 +22,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: ../cli/cli.c:114 ../gtk/util.c:92 ../libtransmission/utils.c:1663
+#: ../cli/cli.c:114 ../gtk/util.c:92 ../libtransmission/utils.c:1694
 msgid "None"
 msgstr "Nihil"
 
@@ -848,7 +848,7 @@ msgctxt "Verb"
 msgid "Verifying"
 msgstr "Memverifikasi"
 
-#: ../gtk/filter.c:591 ../gtk/msgwin.c:430 ../gtk/util.c:730
+#: ../gtk/filter.c:591 ../gtk/msgwin.c:430 ../gtk/util.c:717
 msgid "Error"
 msgstr "Galat"
 
@@ -2009,31 +2009,21 @@ msgstr "Berkas torrent \"%s\" menemui galat yang tak dikenal."
 msgid "Error opening torrent"
 msgstr "Gagal membuka torrent"
 
-#: ../gtk/util.c:590
-#, c-format
-msgid "Error opening \"%s\""
-msgstr "Galat ketika membuka \"%s\""
-
-#: ../gtk/util.c:592
-#, c-format
-msgid "Server returned \"%1$ld %2$s\""
-msgstr "Server mengembalikan \"%1$ld %2$s\""
-
-#: ../gtk/util.c:607
+#: ../gtk/util.c:594
 msgid "Unrecognized URL"
 msgstr "URL Tak Dikenali"
 
-#: ../gtk/util.c:609
+#: ../gtk/util.c:596
 #, c-format
 msgid "Transmission doesn't know how to use \"%s\""
 msgstr "Transmission tak tahu bagaimana memakai \"%s\""
 
-#: ../gtk/util.c:614
+#: ../gtk/util.c:601
 #, c-format
 msgid "This magnet link appears to be intended for something other than BitTorrent. BitTorrent magnet links have a section containing \"%s\"."
 msgstr "Magnet link ini nampaknya ditujukan bagi sesuatu selain BitTorrent. Magnet link BitTorrent memiliki seksi yang memuat \"%s\"."
 
-#: ../gtk/util.c:736
+#: ../gtk/util.c:723
 #, c-format
 msgid "%s free"
 msgstr "%s bebas"
@@ -2056,15 +2046,15 @@ msgstr "Pencarian DNS gagal: %s"
 msgid "Connection failed"
 msgstr "Koneksi gagal"
 
-#: ../libtransmission/announcer.c:1155 ../libtransmission/announcer.c:1474
+#: ../libtransmission/announcer.c:1150 ../libtransmission/announcer.c:1469
 msgid "Could not connect to tracker"
 msgstr "Tidak bisa menyambung ke pelacak"
 
-#: ../libtransmission/announcer.c:1159 ../libtransmission/announcer.c:1478
+#: ../libtransmission/announcer.c:1154 ../libtransmission/announcer.c:1473
 msgid "Tracker did not respond"
 msgstr "Pelacak tidak merespon"
 
-#: ../libtransmission/announcer.c:1223
+#: ../libtransmission/announcer.c:1218
 msgid "Success"
 msgstr "Sukses"
 
@@ -2235,7 +2225,7 @@ msgstr "Menghentikan"
 msgid "Not forwarded"
 msgstr "Tak diteruskan"
 
-#: ../libtransmission/port-forwarding.c:106 ../libtransmission/torrent.c:2298
+#: ../libtransmission/port-forwarding.c:106 ../libtransmission/torrent.c:2302
 #, c-format
 msgid "State changed from \"%1$s\" to \"%2$s\""
 msgstr "Keadaan berubah dari \"%1$s\" ke \"%2$s\""
@@ -2284,7 +2274,7 @@ msgstr "Galat saat membuka blokir yang terkompresi:%s (%d)"
 msgid "%s %s started"
 msgstr "%s %s dimulai"
 
-#: ../libtransmission/session.c:2175
+#: ../libtransmission/session.c:2170
 #, c-format
 msgid "Loaded %d torrents"
 msgstr "Dimuat %d torrent"
@@ -2328,7 +2318,7 @@ msgstr "Selesai"
 msgid "Complete"
 msgstr "Komplit"
 
-#: ../libtransmission/torrent.c:3462
+#: ../libtransmission/torrent.c:3466
 #, c-format
 msgid "Piece %<PRIu32>, which was just downloaded, failed its checksum test"
 msgstr "Sepotong %<PRIu32>, yang baru saja diunduh, gagal dalam ujian checksum"
@@ -2393,5 +2383,10 @@ msgstr "Tidak dapat menguraikan konten berkas"
 msgid "Verifying torrent"
 msgstr "Verifikasi torrent"
 
-#~ msgid "transmission"
-#~ msgstr "transmission"
+#, c-format
+#~ msgid "Server returned \"%1$ld %2$s\""
+#~ msgstr "Server mengembalikan \"%1$ld %2$s\""
+
+#, c-format
+#~ msgid "Error opening \"%s\""
+#~ msgstr "Galat ketika membuka \"%s\""

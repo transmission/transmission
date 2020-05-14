@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-02 13:06+0300\n"
+"POT-Creation-Date: 2020-05-14 18:55+0300\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
 "Last-Translator: Piotr Drąg <piotrdrag@gmail.com>, 2020\n"
 "Language-Team: Polish (https://www.transifex.com/transmissionbt/teams/33778/pl/)\n"
@@ -21,7 +21,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
 
-#: ../cli/cli.c:114 ../gtk/util.c:92 ../libtransmission/utils.c:1663
+#: ../cli/cli.c:114 ../gtk/util.c:92 ../libtransmission/utils.c:1694
 msgid "None"
 msgstr "Brak"
 
@@ -874,7 +874,7 @@ msgctxt "Verb"
 msgid "Verifying"
 msgstr "Sprawdzanie"
 
-#: ../gtk/filter.c:591 ../gtk/msgwin.c:430 ../gtk/util.c:730
+#: ../gtk/filter.c:591 ../gtk/msgwin.c:430 ../gtk/util.c:717
 msgid "Error"
 msgstr "Błąd"
 
@@ -2103,31 +2103,21 @@ msgstr "Plik torrent „%s” napotkał na nieznany błąd."
 msgid "Error opening torrent"
 msgstr "Błąd podczas otwierania torrenta"
 
-#: ../gtk/util.c:590
-#, c-format
-msgid "Error opening \"%s\""
-msgstr "Błąd podczas otwierania „%s”"
-
-#: ../gtk/util.c:592
-#, c-format
-msgid "Server returned \"%1$ld %2$s\""
-msgstr "Serwer zwrócił „%1$ld %2$s”"
-
-#: ../gtk/util.c:607
+#: ../gtk/util.c:594
 msgid "Unrecognized URL"
 msgstr "Nierozpoznany adres URL"
 
-#: ../gtk/util.c:609
+#: ../gtk/util.c:596
 #, c-format
 msgid "Transmission doesn't know how to use \"%s\""
 msgstr "Program Transmission nie potrafi używać „%s”"
 
-#: ../gtk/util.c:614
+#: ../gtk/util.c:601
 #, c-format
 msgid "This magnet link appears to be intended for something other than BitTorrent. BitTorrent magnet links have a section containing \"%s\"."
 msgstr "Ten odnośnik magnet wygląda na przeznaczony do innych celów niż sieć BitTorrent. Odnośniki magnet sieci BitTorrent mają sekcję zawierającą „%s”."
 
-#: ../gtk/util.c:736
+#: ../gtk/util.c:723
 #, c-format
 msgid "%s free"
 msgstr "Wolne: %s"
@@ -2150,15 +2140,15 @@ msgstr "Wyszukanie DNS się nie powiodło: %s"
 msgid "Connection failed"
 msgstr "Połączenie się powiodło"
 
-#: ../libtransmission/announcer.c:1155 ../libtransmission/announcer.c:1474
+#: ../libtransmission/announcer.c:1150 ../libtransmission/announcer.c:1469
 msgid "Could not connect to tracker"
 msgstr "Nie można połączyć z serwerem śledzącym"
 
-#: ../libtransmission/announcer.c:1159 ../libtransmission/announcer.c:1478
+#: ../libtransmission/announcer.c:1154 ../libtransmission/announcer.c:1473
 msgid "Tracker did not respond"
 msgstr "Serwer śledzący nie odpowiedział"
 
-#: ../libtransmission/announcer.c:1223
+#: ../libtransmission/announcer.c:1218
 msgid "Success"
 msgstr "Powodzenie"
 
@@ -2329,7 +2319,7 @@ msgstr "Zatrzymywanie"
 msgid "Not forwarded"
 msgstr "Nie przekierowano"
 
-#: ../libtransmission/port-forwarding.c:106 ../libtransmission/torrent.c:2298
+#: ../libtransmission/port-forwarding.c:106 ../libtransmission/torrent.c:2302
 #, c-format
 msgid "State changed from \"%1$s\" to \"%2$s\""
 msgstr "Stan zmienił się z „%1$s” na „%2$s”"
@@ -2378,7 +2368,7 @@ msgstr "Błąd podczas dekompresowania listy blokowania: %s (%d)"
 msgid "%s %s started"
 msgstr "Uruchomiono program %s %s"
 
-#: ../libtransmission/session.c:2175
+#: ../libtransmission/session.c:2170
 #, c-format
 msgid "Loaded %d torrents"
 msgstr "Wczytano torrenty: %d"
@@ -2422,7 +2412,7 @@ msgstr "Gotowe"
 msgid "Complete"
 msgstr "Ukończono"
 
-#: ../libtransmission/torrent.c:3462
+#: ../libtransmission/torrent.c:3466
 #, c-format
 msgid "Piece %<PRIu32>, which was just downloaded, failed its checksum test"
 msgstr "Sprawdzenie sumy kontrolnej właśnie pobranej części %<PRIu32> się nie powiodło"
@@ -2487,5 +2477,10 @@ msgstr "Nie można przetworzyć treści pliku"
 msgid "Verifying torrent"
 msgstr "Sprawdzanie torrenta"
 
-#~ msgid "transmission"
-#~ msgstr "transmission"
+#, c-format
+#~ msgid "Server returned \"%1$ld %2$s\""
+#~ msgstr "Serwer zwrócił „%1$ld %2$s”"
+
+#, c-format
+#~ msgid "Error opening \"%s\""
+#~ msgstr "Błąd podczas otwierania „%s”"

@@ -13,7 +13,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-02 13:06+0300\n"
+"POT-Creation-Date: 2020-05-14 18:55+0300\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
 "Last-Translator: Lock Ring <reject5514@naver.com>, 2019\n"
 "Language-Team: Korean (https://www.transifex.com/transmissionbt/teams/33778/ko/)\n"
@@ -23,7 +23,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: ../cli/cli.c:114 ../gtk/util.c:92 ../libtransmission/utils.c:1663
+#: ../cli/cli.c:114 ../gtk/util.c:92 ../libtransmission/utils.c:1694
 msgid "None"
 msgstr "없음"
 
@@ -849,7 +849,7 @@ msgctxt "Verb"
 msgid "Verifying"
 msgstr "확인 중"
 
-#: ../gtk/filter.c:591 ../gtk/msgwin.c:430 ../gtk/util.c:730
+#: ../gtk/filter.c:591 ../gtk/msgwin.c:430 ../gtk/util.c:717
 msgid "Error"
 msgstr "오류"
 
@@ -2008,31 +2008,21 @@ msgstr "\"%s\" 토렌트 파일에서 알 수 없는 오류가 발생했습니�
 msgid "Error opening torrent"
 msgstr "토렌트를 여는 중 오류"
 
-#: ../gtk/util.c:590
-#, c-format
-msgid "Error opening \"%s\""
-msgstr "\"%s\"을(를) 여는 중 오류"
-
-#: ../gtk/util.c:592
-#, c-format
-msgid "Server returned \"%1$ld %2$s\""
-msgstr "서버가 \"%1$ld %2$s\" 메시지를 반환함"
-
-#: ../gtk/util.c:607
+#: ../gtk/util.c:594
 msgid "Unrecognized URL"
 msgstr "인식할 수 없는 주소"
 
-#: ../gtk/util.c:609
+#: ../gtk/util.c:596
 #, c-format
 msgid "Transmission doesn't know how to use \"%s\""
 msgstr "트랜스미션이 \"%s\"의 사용 방법을 알지 못합니다"
 
-#: ../gtk/util.c:614
+#: ../gtk/util.c:601
 #, c-format
 msgid "This magnet link appears to be intended for something other than BitTorrent. BitTorrent magnet links have a section containing \"%s\"."
 msgstr "이 미그넷 주소는 비트 토렌트에서 사용 할 수 없는 것으로 보입니다. 비트 토렌트에서 사용 가능한 마그넷 주소는 \"%s\"(이)라는 부분을 포함하고 있습니다."
 
-#: ../gtk/util.c:736
+#: ../gtk/util.c:723
 #, c-format
 msgid "%s free"
 msgstr "%s 남음"
@@ -2055,15 +2045,15 @@ msgstr "DNS 조회 실패: %s"
 msgid "Connection failed"
 msgstr "연결 오류"
 
-#: ../libtransmission/announcer.c:1155 ../libtransmission/announcer.c:1474
+#: ../libtransmission/announcer.c:1150 ../libtransmission/announcer.c:1469
 msgid "Could not connect to tracker"
 msgstr "트래커에 연결할 수 없음"
 
-#: ../libtransmission/announcer.c:1159 ../libtransmission/announcer.c:1478
+#: ../libtransmission/announcer.c:1154 ../libtransmission/announcer.c:1473
 msgid "Tracker did not respond"
 msgstr "트래커가 응답하지 않음"
 
-#: ../libtransmission/announcer.c:1223
+#: ../libtransmission/announcer.c:1218
 msgid "Success"
 msgstr "성공"
 
@@ -2234,7 +2224,7 @@ msgstr "정지"
 msgid "Not forwarded"
 msgstr "포워드 되지 않음"
 
-#: ../libtransmission/port-forwarding.c:106 ../libtransmission/torrent.c:2298
+#: ../libtransmission/port-forwarding.c:106 ../libtransmission/torrent.c:2302
 #, c-format
 msgid "State changed from \"%1$s\" to \"%2$s\""
 msgstr "상태가 \"%1$s\"에서 \"%2$s\"(으)로 바뀜"
@@ -2283,7 +2273,7 @@ msgstr "블록리스트 압축 해제 오류: %s (%d)"
 msgid "%s %s started"
 msgstr "%s %s 시작함"
 
-#: ../libtransmission/session.c:2175
+#: ../libtransmission/session.c:2170
 #, c-format
 msgid "Loaded %d torrents"
 msgstr "토렌트 %d개를 불러옴"
@@ -2327,7 +2317,7 @@ msgstr "마침"
 msgid "Complete"
 msgstr "완료"
 
-#: ../libtransmission/torrent.c:3462
+#: ../libtransmission/torrent.c:3466
 #, c-format
 msgid "Piece %<PRIu32>, which was just downloaded, failed its checksum test"
 msgstr "조각 %<PRIu32>이 방금 다운로드 되었으나, 체크섬 테스트를 실패함"
@@ -2391,3 +2381,11 @@ msgstr "파일 내용을 해석할 수 없습니다"
 #: ../libtransmission/verify.c:220
 msgid "Verifying torrent"
 msgstr "토렌트 확인 중"
+
+#, c-format
+#~ msgid "Server returned \"%1$ld %2$s\""
+#~ msgstr "서버가 \"%1$ld %2$s\" 메시지를 반환함"
+
+#, c-format
+#~ msgid "Error opening \"%s\""
+#~ msgstr "\"%s\"을(를) 여는 중 오류"

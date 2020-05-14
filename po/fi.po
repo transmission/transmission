@@ -6,16 +6,16 @@
 # Translators:
 # Mike Gelfand <mikedld@mikedld.com>, 2017
 # Otto Koskelah <otto@nise.fi>, 2017
-# Jiri Grönroos <jiri.gronroos@iki.fi>, 2017
+# Jiri Grönroos <jiri.gronroos@iki.fi>, 2020
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-02 13:06+0300\n"
+"POT-Creation-Date: 2020-05-14 18:55+0300\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Jiri Grönroos <jiri.gronroos@iki.fi>, 2017\n"
+"Last-Translator: Jiri Grönroos <jiri.gronroos@iki.fi>, 2020\n"
 "Language-Team: Finnish (https://www.transifex.com/transmissionbt/teams/33778/fi/)\n"
 "Language: fi\n"
 "MIME-Version: 1.0\n"
@@ -23,7 +23,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../cli/cli.c:114 ../gtk/util.c:92 ../libtransmission/utils.c:1663
+#: ../cli/cli.c:114 ../gtk/util.c:92 ../libtransmission/utils.c:1694
 msgid "None"
 msgstr "Ei mitään"
 
@@ -858,7 +858,7 @@ msgctxt "Verb"
 msgid "Verifying"
 msgstr "Tarkistetaan"
 
-#: ../gtk/filter.c:591 ../gtk/msgwin.c:430 ../gtk/util.c:730
+#: ../gtk/filter.c:591 ../gtk/msgwin.c:430 ../gtk/util.c:717
 msgid "Error"
 msgstr "Virhe"
 
@@ -1314,13 +1314,13 @@ msgstr "%s jäljellä"
 #: ../gtk/torrent-cell-renderer.c:162
 #, c-format
 msgid "%1$s %2$s  %3$s %4$s"
-msgstr ""
+msgstr "%1$s %2$s  %3$s %4$s"
 
 #. up speed, up symbol
 #: ../gtk/torrent-cell-renderer.c:171
 #, c-format
 msgid "%1$s  %2$s"
-msgstr ""
+msgstr "%1$s  %2$s"
 
 #: ../gtk/torrent-cell-renderer.c:175
 msgid "Stalled"
@@ -1350,7 +1350,7 @@ msgstr "Virhe: %s"
 #: ../gtk/torrent-cell-renderer.c:262
 #, c-format
 msgid "Downloading metadata from %1$'d %2$s (%3$d%% done)"
-msgstr ""
+msgstr "Ladataan metadataa %1$'d %2$s (%3$d%% valmiina)"
 
 #: ../gtk/torrent-cell-renderer.c:263 ../gtk/torrent-cell-renderer.c:269 ../gtk/torrent-cell-renderer.c:282
 msgid "peer"
@@ -1374,13 +1374,13 @@ msgstr[1] ""
 #: ../gtk/torrent-cell-renderer.c:275
 #, c-format
 msgid "Downloading from %1$'d %2$s"
-msgstr ""
+msgstr "Ladataan %1$'d %2$s"
 
 #. Downloading from 2 of 3 peer (s)
 #: ../gtk/torrent-cell-renderer.c:281
 #, c-format
 msgid "Downloading from %1$'d of %2$'d %3$s"
-msgstr ""
+msgstr "Ladataan %1$'d/%2$'d %3$s"
 
 #: ../gtk/torrent-cell-renderer.c:289
 #, c-format
@@ -1848,6 +1848,8 @@ msgid ""
 "Click to disable Alternative Speed Limits\n"
 " (%1$s down, %2$s up)"
 msgstr ""
+"Napsauta poistaaksesi käytöstä vaihtoehtoiset nopeusrajoitukset\n"
+" (%1$s lataus, %2$s lähetys)"
 
 #: ../gtk/tr-window.c:256
 #, c-format
@@ -1855,6 +1857,8 @@ msgid ""
 "Click to enable Alternative Speed Limits\n"
 " (%1$s down, %2$s up)"
 msgstr ""
+"Napsauta käyttääksesi vaihtoehtoisia nopeusrajoituksia\n"
+" (%1$s lataus, %2$s lähetys)"
 
 #: ../gtk/tr-window.c:310
 #, c-format
@@ -2025,7 +2029,7 @@ msgstr "Torrent-tiedosto \"%s\" sisältää virheellistä dataa."
 #: ../gtk/util.c:262
 #, c-format
 msgid "The torrent file \"%s\" is already in use by \"%s.\""
-msgstr ""
+msgstr "Torrent-tiedostoa \"%s\" käyttää jo \"%s.\""
 
 #: ../gtk/util.c:267
 #, c-format
@@ -2036,31 +2040,21 @@ msgstr "Torrent-tiedoston \"%s\" kohdalla tapahtui tuntematon virhe."
 msgid "Error opening torrent"
 msgstr "Virhe avattaessa torrenttia"
 
-#: ../gtk/util.c:590
-#, c-format
-msgid "Error opening \"%s\""
-msgstr "Virhe avatessa \"%s\""
-
-#: ../gtk/util.c:592
-#, c-format
-msgid "Server returned \"%1$ld %2$s\""
-msgstr "Palvelin vastasi \"%1$ld %2$s\""
-
-#: ../gtk/util.c:607
+#: ../gtk/util.c:594
 msgid "Unrecognized URL"
 msgstr "Tunnistamaton verkko-osoite"
 
-#: ../gtk/util.c:609
+#: ../gtk/util.c:596
 #, c-format
 msgid "Transmission doesn't know how to use \"%s\""
 msgstr "Transmission ei tiedä, miten kohdetta \"%s\" käytetään"
 
-#: ../gtk/util.c:614
+#: ../gtk/util.c:601
 #, c-format
 msgid "This magnet link appears to be intended for something other than BitTorrent. BitTorrent magnet links have a section containing \"%s\"."
 msgstr "Tämä magneettilinkki vaikuttaa olevan tarkoitettu jotain muuta kuin BitTorrentia varten. BitTorrent-magneettilinkit sisältävät osion, johon sisältyy \"%s\"."
 
-#: ../gtk/util.c:736
+#: ../gtk/util.c:723
 #, c-format
 msgid "%s free"
 msgstr "%s vapaana"
@@ -2083,15 +2077,15 @@ msgstr "DNS-haku epäonnistui: %s"
 msgid "Connection failed"
 msgstr "Yhteys epäonnistui"
 
-#: ../libtransmission/announcer.c:1155 ../libtransmission/announcer.c:1474
+#: ../libtransmission/announcer.c:1150 ../libtransmission/announcer.c:1469
 msgid "Could not connect to tracker"
 msgstr "Yhteys seurantapalvelimeen epäonnistui"
 
-#: ../libtransmission/announcer.c:1159 ../libtransmission/announcer.c:1478
+#: ../libtransmission/announcer.c:1154 ../libtransmission/announcer.c:1473
 msgid "Tracker did not respond"
 msgstr "Seurantapalvelin ei vastannut"
 
-#: ../libtransmission/announcer.c:1223
+#: ../libtransmission/announcer.c:1218
 msgid "Success"
 msgstr "Onnistui"
 
@@ -2262,7 +2256,7 @@ msgstr "Pysäytetään"
 msgid "Not forwarded"
 msgstr "Ei välitetty"
 
-#: ../libtransmission/port-forwarding.c:106 ../libtransmission/torrent.c:2298
+#: ../libtransmission/port-forwarding.c:106 ../libtransmission/torrent.c:2302
 #, c-format
 msgid "State changed from \"%1$s\" to \"%2$s\""
 msgstr "Tila muuttui tilasta %1$s tilaan %2$s"
@@ -2284,16 +2278,16 @@ msgstr "%s ei ole kelvollinen osoite"
 #: ../libtransmission/rpc-server.c:1235
 #, c-format
 msgid "%s is not an IPv4 or IPv6 address. RPC listeners must be IPv4 or IPv6"
-msgstr ""
+msgstr "%s ei ole IPv4- tai IPv6-osoite. RPC-kuuntelijoiden tulee olla IPv4:ää tai IPv6:tta"
 
 #: ../libtransmission/rpc-server.c:1243
 #, c-format
 msgid "Serving RPC and Web requests on %s:%d%s"
-msgstr ""
+msgstr "Kuunneellaan RPC- ja web-pyyntöjä osoitteessa %s:%d%s"
 
 #: ../libtransmission/rpc-server.c:1249
 msgid "Whitelist enabled"
-msgstr ""
+msgstr "Sallittujen lista käytössä"
 
 #: ../libtransmission/rpc-server.c:1254
 msgid "Password required"
@@ -2311,14 +2305,14 @@ msgstr "Virhe estolistaa purkaessa: %s (%d)"
 msgid "%s %s started"
 msgstr "%s %s käynnistettiin"
 
-#: ../libtransmission/session.c:2175
+#: ../libtransmission/session.c:2170
 #, c-format
 msgid "Loaded %d torrents"
 msgstr "Ladattiin %d torrenttia"
 
 #: ../libtransmission/torrent-magnet.c:310
 msgid "Magnet torrent's metadata is not usable"
-msgstr ""
+msgstr "Magneettitorrentin metadata ei ole käyttökelpoista"
 
 #: ../libtransmission/torrent.c:616
 #, c-format
@@ -2355,7 +2349,7 @@ msgstr "Valmis"
 msgid "Complete"
 msgstr "Valmis"
 
-#: ../libtransmission/torrent.c:3462
+#: ../libtransmission/torrent.c:3466
 #, c-format
 msgid "Piece %<PRIu32>, which was just downloaded, failed its checksum test"
 msgstr "Osa %<PRIu32>, joka ladattiin juuri, ei läpäise tarkistussummatestiä"
@@ -2419,3 +2413,11 @@ msgstr "Tiedoston sisällön jäsentäminen ei onnistu"
 #: ../libtransmission/verify.c:220
 msgid "Verifying torrent"
 msgstr "Tarkistetaan torrenttia"
+
+#, c-format
+#~ msgid "Server returned \"%1$ld %2$s\""
+#~ msgstr "Palvelin vastasi \"%1$ld %2$s\""
+
+#, c-format
+#~ msgid "Error opening \"%s\""
+#~ msgstr "Virhe avatessa \"%s\""

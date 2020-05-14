@@ -59,17 +59,17 @@
     <message numerus="yes">
         <location line="+77"/>
         <source>Torrent(s) Added</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Torrent(s) Adicionado</numerusform>
+            <numerusform>Torrent(s) Adicionado</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+10"/>
         <source>Torrent Completed</source>
-        <translation type="unfinished">
-            <numerusform>Torrent Completo</numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Torrent Concluído</numerusform>
+            <numerusform>Torrent Concluído</numerusform>
         </translation>
     </message>
 </context>
@@ -492,7 +492,7 @@
     <message>
         <location line="+7"/>
         <source>Show &amp;backup trackers</source>
-        <translation>Mostrar rastreadores &amp;backup</translation>
+        <translation>Exibir os rastreadores de &amp;backup</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -618,7 +618,7 @@
     <message>
         <location filename="../FileTreeView.cc" line="+275"/>
         <source>Check Selected</source>
-        <translation>Marque a Opção</translation>
+        <translation>Verificar Selecionado</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -628,7 +628,7 @@
     <message>
         <location line="+1"/>
         <source>Only Check Selected</source>
-        <translation>Apenas seleção marcada</translation>
+        <translation>Verificar Apenas o Selecionado</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -692,7 +692,7 @@
     <message>
         <location line="+131"/>
         <source>Show:</source>
-        <translation>Mostrar:</translation>
+        <translation>Exibir:</translation>
     </message>
     <message>
         <location line="+14"/>
@@ -1300,7 +1300,7 @@
     <message>
         <location line="+8"/>
         <source>Show &amp;options dialog</source>
-        <translation>Exibir diálogo de opções</translation>
+        <translation>Exibir a caixa de diálogo das &amp;opções</translation>
     </message>
     <message>
         <location line="-9"/>
@@ -1353,8 +1353,8 @@
         <location line="-540"/>
         <source>Showing %L1 of %Ln torrent(s)</source>
         <translation>
-            <numerusform>Mostrando %L1 de %Ln torrent</numerusform>
-            <numerusform>Mostrando %L1 de %Ln torrents</numerusform>
+            <numerusform>Exibindo %L1 de %Ln torrent</numerusform>
+            <numerusform>Exibindo %L1 de %Ln torrents</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -1816,7 +1816,7 @@ Adicione outra URL primária depois de uma linha em branco.</translation>
     <message>
         <location line="+22"/>
         <source>Show the Torrent Options &amp;dialog</source>
-        <translation>Mostrar caixa de &amp;diálogo Opções do torrent</translation>
+        <translation>Exibir a caixa de &amp;diálogo Opções do Torrent</translation>
     </message>
     <message>
         <location line="+7"/>
@@ -1907,7 +1907,7 @@ Adicione outra URL primária depois de uma linha em branco.</translation>
     <message>
         <location filename="../PrefsDialog.cc" line="+15"/>
         <source>Allow encryption</source>
-        <translation>Permitir</translation>
+        <translation>Permitir criptografia</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -1938,7 +1938,7 @@ Adicione outra URL primária depois de uma linha em branco.</translation>
     <message>
         <location line="+12"/>
         <source>Show Transmission icon in the &amp;notification area</source>
-        <translation>Mostrar o ícone do Transmission  na área de &amp;notificação</translation>
+        <translation>Exibir o ícone do Transmission na área de &amp;notificação</translation>
     </message>
     <message>
         <location line="-213"/>
@@ -2018,12 +2018,12 @@ Adicione outra URL primária depois de uma linha em branco.</translation>
     <message>
         <location line="+12"/>
         <source>Show a notification when torrents are a&amp;dded</source>
-        <translation>Mostrar uma notificação quando torrents forem a&amp;dicionados</translation>
+        <translation>Exibir uma notificação quando os torrents são a&amp;dicionados</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Show a notification when torrents &amp;finish</source>
-        <translation>Mostrar uma notificação quando torrents forem &amp;finalizados</translation>
+        <translation>Exibir uma notificação quando torrents são &amp;concluídos</translation>
     </message>
     <message>
         <location line="+7"/>
@@ -2332,7 +2332,7 @@ Adicione outra URL primária depois de uma linha em branco.</translation>
 <context>
     <name>Torrent</name>
     <message>
-        <location filename="../Torrent.cc" line="+1064"/>
+        <location filename="../Torrent.cc" line="+1043"/>
         <source>Verifying local data</source>
         <translation>Verificando dados locais</translation>
     </message>
@@ -2512,7 +2512,7 @@ Adicione outra URL primária depois de uma linha em branco.</translation>
 <context>
     <name>TrackerDelegate</name>
     <message numerus="yes">
-        <location filename="../TrackerDelegate.cc" line="+218"/>
+        <location filename="../TrackerDelegate.cc" line="+211"/>
         <source>Got a list of%1 %Ln peer(s)%2 %3 ago</source>
         <extracomment>%1 and %2 are replaced with HTML markup, %3 is duration</extracomment>
         <translation>
