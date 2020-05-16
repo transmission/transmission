@@ -124,17 +124,25 @@ namespace
 template<typename T>
 bool setValue(T& setme, T const& value)
 {
-    const bool changed = setme != value;
+    bool const changed = setme != value;
+
     if (changed)
-      setme = value;
+    {
+        setme = value;
+    }
+
     return changed;
 }
 
 bool setValue(double& setme, double const& value)
 {
-    const bool changed = !qFuzzyCompare(setme+1, value+1);
+    bool const changed = !qFuzzyCompare(setme + 1, value + 1);
+
     if (changed)
+    {
         setme = value;
+    }
+
     return changed;
 }
 
@@ -181,9 +189,12 @@ bool setValue(QString& setme, tr_variant const* value)
     size_t len;
 
     if (!tr_variantGetStr(value, &str, &len))
-       return changed;
+    {
+        return changed;
+    }
 
-    if (len == 0) {
+    if (len == 0)
+    {
         changed = !setme.isEmpty();
         setme.clear();
         return changed;
@@ -203,7 +214,9 @@ bool setValue(Peer& setme, tr_variant* value)
     {
         switch (key)
         {
-#define HANDLE_KEY(key) case TR_KEY_##key: changed |= setValue(setme.key, child); break;
+#define HANDLE_KEY(key) case TR_KEY_ ## key: \
+    changed |= setValue(setme.key, child); break;
+
             HANDLE_KEY(address)
             HANDLE_KEY(clientIsChoked)
             HANDLE_KEY(clientIsInterested)
@@ -220,8 +233,8 @@ bool setValue(Peer& setme, tr_variant* value)
             HANDLE_KEY(rateToClient)
             HANDLE_KEY(rateToPeer)
 #undef HANDLE_KEY
-            default:
-                break;
+        default:
+            break;
         }
     }
 
@@ -239,19 +252,23 @@ bool setValue(TorrentFile& setme, tr_variant* value)
     {
         switch (key)
         {
-#define HANDLE_KEY(key) case TR_KEY_##key: changed |= setValue(setme.key, child); break;
+#define HANDLE_KEY(key) case TR_KEY_ ## key: \
+    changed |= setValue(setme.key, child); break;
+
             HANDLE_KEY(have)
             HANDLE_KEY(priority)
             HANDLE_KEY(wanted)
 #undef HANDLE_KEY
-#define HANDLE_KEY(key, field) case TR_KEY_##key: changed |= setValue(setme.field, child); break;
+#define HANDLE_KEY(key, field) case TR_KEY_ ## key: \
+    changed |= setValue(setme.field, child); break;
+
             HANDLE_KEY(bytesCompleted, have)
             HANDLE_KEY(length, size)
             HANDLE_KEY(name, filename)
 #undef HANDLE_KEY
-            default:
-                std::cerr << "unhandled " << tr_quark_get_string(key, nullptr) << std::endl;
-                break;
+        default:
+            std::cerr << "unhandled " << tr_quark_get_string(key, nullptr) << std::endl;
+            break;
         }
     }
 
@@ -269,7 +286,8 @@ bool setValue(TrackerStat& setme, tr_variant* value)
     {
         switch (key)
         {
-#define HANDLE_KEY(key) case TR_KEY_##key: changed |= setValue(setme.key, child); break;
+#define HANDLE_KEY(key) case TR_KEY_ ## key: \
+    changed |= setValue(setme.key, child); break;
             HANDLE_KEY(announce);
             HANDLE_KEY(announceState);
             HANDLE_KEY(downloadCount);
@@ -295,9 +313,10 @@ bool setValue(TrackerStat& setme, tr_variant* value)
             HANDLE_KEY(scrapeState);
             HANDLE_KEY(seederCount);
             HANDLE_KEY(tier);
+
 #undef HANDLE_KEY
-            default:
-                break;
+        default:
+            break;
         }
     }
 
@@ -316,7 +335,7 @@ bool setValue(QVector<T>& setme, tr_variant* value)
         changed = true;
     }
 
-    for (int i=0; i<n; ++i)
+    for (int i = 0; i < n; ++i)
     {
         changed |= setValue(setme[i], tr_variantListChild(value, i));
     }
@@ -330,7 +349,7 @@ bool setValue(QVector<T>& setme, tr_variant* value)
 ****
 ***/
 
-bool Torrent::getSeedRatio(double& ratio) const
+bool Torrent::getSeedRatio(double& setmeRatio) const
 {
     bool isLimited;
 
@@ -338,13 +357,13 @@ bool Torrent::getSeedRatio(double& ratio) const
     {
     case TR_RATIOLIMIT_SINGLE:
         isLimited = true;
-        ratio = seedRatioLimit();
+        setmeRatio = seedRatioLimit();
         break;
 
     case TR_RATIOLIMIT_GLOBAL:
         if ((isLimited = prefs_.getBool(Prefs::RATIO_ENABLED)))
         {
-            ratio = prefs_.getDouble(Prefs::RATIO);
+            setmeRatio = prefs_.getDouble(Prefs::RATIO);
         }
 
         break;
@@ -498,66 +517,70 @@ bool Torrent::update(tr_quark const* keys, tr_variant** values, size_t n)
 
         switch (key)
         {
-#define HANDLE_KEY(key) case TR_KEY_##key: field_changed |= setValue(key##_, child); break;
-          HANDLE_KEY(activityDate)
-          HANDLE_KEY(addedDate)
-          HANDLE_KEY(bandwidthPriority)
-          HANDLE_KEY(comment)
-          HANDLE_KEY(creator)
-          HANDLE_KEY(dateCreated)
-          HANDLE_KEY(desiredAvailable)
-          HANDLE_KEY(downloadDir)
-          HANDLE_KEY(downloadLimit) // KB/s
-          HANDLE_KEY(downloadLimited)
-          HANDLE_KEY(downloadedEver)
-          HANDLE_KEY(editDate)
-          HANDLE_KEY(error)
-          HANDLE_KEY(errorString)
-          HANDLE_KEY(eta)
-          HANDLE_KEY(files)
-          HANDLE_KEY(hashString)
-          HANDLE_KEY(haveUnchecked)
-          HANDLE_KEY(honorsSessionLimits)
-          HANDLE_KEY(isFinished)
-          HANDLE_KEY(isPrivate)
-          HANDLE_KEY(isStalled)
-          HANDLE_KEY(leftUntilDone)
-          HANDLE_KEY(manualAnnounceTime)
-          HANDLE_KEY(metadataPercentComplete)
-          HANDLE_KEY(name)
-          HANDLE_KEY(peer_limit)
-          HANDLE_KEY(peers)
-          HANDLE_KEY(peersConnected)
-          HANDLE_KEY(peersGettingFromUs)
-          HANDLE_KEY(peersSendingToUs)
-          HANDLE_KEY(percentDone)
-          HANDLE_KEY(pieceCount)
-          HANDLE_KEY(pieceSize)
-          HANDLE_KEY(queuePosition)
-          HANDLE_KEY(recheckProgress)
-          HANDLE_KEY(seedIdleLimit)
-          HANDLE_KEY(seedIdleMode)
-          HANDLE_KEY(seedRatioLimit)
-          HANDLE_KEY(seedRatioMode)
-          HANDLE_KEY(sizeWhenDone)
-          HANDLE_KEY(startDate)
-          HANDLE_KEY(status)
-          HANDLE_KEY(totalSize)
-          HANDLE_KEY(trackerStats)
-          HANDLE_KEY(uploadLimit) // KB/s
-          HANDLE_KEY(uploadLimited)
-          HANDLE_KEY(uploadedEver)
-          HANDLE_KEY(webseedsSendingToUs)
+#define HANDLE_KEY(key) case TR_KEY_ ## key: \
+    field_changed |= setValue(key ## _, child); break;
+
+            HANDLE_KEY(activityDate)
+            HANDLE_KEY(addedDate)
+            HANDLE_KEY(bandwidthPriority)
+            HANDLE_KEY(comment)
+            HANDLE_KEY(creator)
+            HANDLE_KEY(dateCreated)
+            HANDLE_KEY(desiredAvailable)
+            HANDLE_KEY(downloadDir)
+            HANDLE_KEY(downloadLimit) // KB/s
+            HANDLE_KEY(downloadLimited)
+            HANDLE_KEY(downloadedEver)
+            HANDLE_KEY(editDate)
+            HANDLE_KEY(error)
+            HANDLE_KEY(errorString)
+            HANDLE_KEY(eta)
+            HANDLE_KEY(files)
+            HANDLE_KEY(hashString)
+            HANDLE_KEY(haveUnchecked)
+            HANDLE_KEY(honorsSessionLimits)
+            HANDLE_KEY(isFinished)
+            HANDLE_KEY(isPrivate)
+            HANDLE_KEY(isStalled)
+            HANDLE_KEY(leftUntilDone)
+            HANDLE_KEY(manualAnnounceTime)
+            HANDLE_KEY(metadataPercentComplete)
+            HANDLE_KEY(name)
+            HANDLE_KEY(peer_limit)
+            HANDLE_KEY(peers)
+            HANDLE_KEY(peersConnected)
+            HANDLE_KEY(peersGettingFromUs)
+            HANDLE_KEY(peersSendingToUs)
+            HANDLE_KEY(percentDone)
+            HANDLE_KEY(pieceCount)
+            HANDLE_KEY(pieceSize)
+            HANDLE_KEY(queuePosition)
+            HANDLE_KEY(recheckProgress)
+            HANDLE_KEY(seedIdleLimit)
+            HANDLE_KEY(seedIdleMode)
+            HANDLE_KEY(seedRatioLimit)
+            HANDLE_KEY(seedRatioMode)
+            HANDLE_KEY(sizeWhenDone)
+            HANDLE_KEY(startDate)
+            HANDLE_KEY(status)
+            HANDLE_KEY(totalSize)
+            HANDLE_KEY(trackerStats)
+            HANDLE_KEY(uploadLimit) // KB/s
+            HANDLE_KEY(uploadLimited)
+            HANDLE_KEY(uploadedEver)
+            HANDLE_KEY(webseedsSendingToUs)
 #undef HANDLE_KEY
-#define HANDLE_KEY(key, field) case TR_KEY_##key: field_changed |= setValue(field##_, child); break;
-          HANDLE_KEY(corruptEver, failedEver)
-          HANDLE_KEY(fileStats, files)
-          HANDLE_KEY(haveValid, haveVerified)
-          HANDLE_KEY(rateDownload, downloadSpeed)
-          HANDLE_KEY(rateUpload, uploadSpeed)
-          HANDLE_KEY(trackers, trackerStats)
+#define HANDLE_KEY(key, field) case TR_KEY_ ## key: \
+    field_changed |= setValue(field ## _, child); break;
+
+            HANDLE_KEY(corruptEver, failedEver)
+            HANDLE_KEY(fileStats, files)
+            HANDLE_KEY(haveValid, haveVerified)
+            HANDLE_KEY(rateDownload, downloadSpeed)
+            HANDLE_KEY(rateUpload, uploadSpeed)
+            HANDLE_KEY(trackers, trackerStats)
 #undef HANDLE_KEY
-          default:
+        default:
             break;
         }
 
@@ -567,36 +590,49 @@ bool Torrent::update(tr_quark const* keys, tr_variant** values, size_t n)
         {
             switch (key)
             {
-                case TR_KEY_editDate:
-                    // FIXME
-                    break;
+            case TR_KEY_editDate:
+                // FIXME
+                break;
 
-                case TR_KEY_name:
+            case TR_KEY_name:
+                {
                     updateMimeIcon();
                     break;
+                }
 
-                case TR_KEY_files:
+            case TR_KEY_files:
+                {
                     updateMimeIcon();
-                    for (int i=0; i<files_.size(); ++i)
+                    for (int i = 0; i < files_.size(); ++i)
+                    {
                         files_[i].index = i;
-                    break;
+                    }
 
-                case TR_KEY_trackers: {
+                    break;
+                }
+
+            case TR_KEY_trackers:
+                {
                     // rebuild trackers_
                     QStringList urls;
                     urls.reserve(trackerStats_.size());
                     for (auto const& t : trackerStats_)
+                    {
                         urls.append(t.announce);
+                    }
+
                     trackers_.swap(urls);
 
                     // rebuild trackerDisplayNames
                     QStringList displayNames;
                     displayNames.reserve(trackers_.size());
-                    for (auto const& tracker : trackers_) {
+                    for (auto const& tracker : trackers_)
+                    {
                         auto const url = QUrl(tracker);
                         auto const key = qApp->faviconCache().add(url);
                         displayNames.append(FaviconCache::getDisplayName(key));
                     }
+
                     displayNames.removeDuplicates();
                     trackerDisplayNames_.swap(displayNames);
                     break;

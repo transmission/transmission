@@ -169,7 +169,7 @@ public:
         return isPrivate_;
     }
 
-    bool getSeedRatio(double& setme) const;
+    bool getSeedRatio(double& setmeRatio) const;
 
     uint64_t haveVerified() const
     {
@@ -509,11 +509,9 @@ public:
     static KeyList const mainStatKeys;
 
 private:
-
     void updateMimeIcon();
 
 private:
-
     int const id_;
 
     bool downloadLimited_ = {};
