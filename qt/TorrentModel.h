@@ -68,7 +68,6 @@ private:
     void rowsEmitChanged(torrent_ids_t const& ids);
 
     std::optional<int> getRow(int id) const;
-    std::optional<int> getRow(Torrent const* tor) const;
     using span_t = std::pair<int, int>;
     std::vector<span_t> getSpans(torrent_ids_t const& ids) const;
 

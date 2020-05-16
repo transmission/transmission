@@ -36,7 +36,6 @@ public:
     // Returns the key.
     QString add(QUrl const& url);
 
-    static QString getDisplayName(QUrl const& url);
     static QString getDisplayName(QString const& key);
     static QString getKey(QUrl const& url);
     static QString getKey(QString const& displayName);

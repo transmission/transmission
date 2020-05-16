@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-02 13:06+0300\n"
+"POT-Creation-Date: 2020-05-14 18:55+0300\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
 "Last-Translator: Марко М. Костић (Marko M. Kostić) <marko.m.kostic@gmail.com>, 2017\n"
 "Language-Team: Serbian (https://www.transifex.com/transmissionbt/teams/33778/sr/)\n"
@@ -22,7 +22,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
-#: ../cli/cli.c:114 ../gtk/util.c:92 ../libtransmission/utils.c:1663
+#: ../cli/cli.c:114 ../gtk/util.c:92 ../libtransmission/utils.c:1694
 msgid "None"
 msgstr "ништа"
 
@@ -866,7 +866,7 @@ msgctxt "Verb"
 msgid "Verifying"
 msgstr "Проверавам"
 
-#: ../gtk/filter.c:591 ../gtk/msgwin.c:430 ../gtk/util.c:730
+#: ../gtk/filter.c:591 ../gtk/msgwin.c:430 ../gtk/util.c:717
 msgid "Error"
 msgstr "Грешка"
 
@@ -2050,31 +2050,21 @@ msgstr "Датотека торента „%s“ је наишла на непо
 msgid "Error opening torrent"
 msgstr "Грешка отварања торента"
 
-#: ../gtk/util.c:590
-#, c-format
-msgid "Error opening \"%s\""
-msgstr "Грешка отварања „%s“"
-
-#: ../gtk/util.c:592
-#, c-format
-msgid "Server returned \"%1$ld %2$s\""
-msgstr "Сервер је одговорио „%1$ld %2$s“"
-
-#: ../gtk/util.c:607
+#: ../gtk/util.c:594
 msgid "Unrecognized URL"
 msgstr "Непозната адреса"
 
-#: ../gtk/util.c:609
+#: ../gtk/util.c:596
 #, c-format
 msgid "Transmission doesn't know how to use \"%s\""
 msgstr "Трансмисија не зна како да користи „%s“"
 
-#: ../gtk/util.c:614
+#: ../gtk/util.c:601
 #, c-format
 msgid "This magnet link appears to be intended for something other than BitTorrent. BitTorrent magnet links have a section containing \"%s\"."
 msgstr "Ова магнетна веза изгледа да је постављена за нешто друго а не за Бит-торент. Магнетне везе Бит-торента имају одељак који садржи „%s“."
 
-#: ../gtk/util.c:736
+#: ../gtk/util.c:723
 #, c-format
 msgid "%s free"
 msgstr "%s слободно"
@@ -2097,15 +2087,15 @@ msgstr "DNS упит није успео: %s"
 msgid "Connection failed"
 msgstr "Неуспешна веза"
 
-#: ../libtransmission/announcer.c:1155 ../libtransmission/announcer.c:1474
+#: ../libtransmission/announcer.c:1150 ../libtransmission/announcer.c:1469
 msgid "Could not connect to tracker"
 msgstr "Нисам могао да се повежем на трагача"
 
-#: ../libtransmission/announcer.c:1159 ../libtransmission/announcer.c:1478
+#: ../libtransmission/announcer.c:1154 ../libtransmission/announcer.c:1473
 msgid "Tracker did not respond"
 msgstr "Трагач не одговара"
 
-#: ../libtransmission/announcer.c:1223
+#: ../libtransmission/announcer.c:1218
 msgid "Success"
 msgstr "Успех"
 
@@ -2276,7 +2266,7 @@ msgstr "Прекидам"
 msgid "Not forwarded"
 msgstr "Није прослеђен"
 
-#: ../libtransmission/port-forwarding.c:106 ../libtransmission/torrent.c:2298
+#: ../libtransmission/port-forwarding.c:106 ../libtransmission/torrent.c:2302
 #, c-format
 msgid "State changed from \"%1$s\" to \"%2$s\""
 msgstr "Стање је промењено из „%1$s“ у „%2$s“"
@@ -2325,7 +2315,7 @@ msgstr "Грешка при распакивању списка блокиран
 msgid "%s %s started"
 msgstr "%s %s је покренута"
 
-#: ../libtransmission/session.c:2175
+#: ../libtransmission/session.c:2170
 #, c-format
 msgid "Loaded %d torrents"
 msgstr "Учитао сам %d торената"
@@ -2369,7 +2359,7 @@ msgstr "Обављено"
 msgid "Complete"
 msgstr "Завршено"
 
-#: ../libtransmission/torrent.c:3462
+#: ../libtransmission/torrent.c:3466
 #, c-format
 msgid "Piece %<PRIu32>, which was just downloaded, failed its checksum test"
 msgstr "Комад %<PRIu32>, који је управо преузет, није прошао пробу чексуме"
@@ -2433,3 +2423,11 @@ msgstr "Нисам успео да обрадим садржај датотек�
 #: ../libtransmission/verify.c:220
 msgid "Verifying torrent"
 msgstr "Проверавам торент"
+
+#, c-format
+#~ msgid "Server returned \"%1$ld %2$s\""
+#~ msgstr "Сервер је одговорио „%1$ld %2$s“"
+
+#, c-format
+#~ msgid "Error opening \"%s\""
+#~ msgstr "Грешка отварања „%s“"

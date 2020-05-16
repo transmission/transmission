@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-02 13:06+0300\n"
+"POT-Creation-Date: 2020-05-14 18:55+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Baurzhan Muftakhidinov <baurthefirst@gmail.com>, 2017\n"
 "Language-Team: Kazakh (https://www.transifex.com/transmissionbt/teams/33778/kk/)\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: ../cli/cli.c:114 ../gtk/util.c:92 ../libtransmission/utils.c:1663
+#: ../cli/cli.c:114 ../gtk/util.c:92 ../libtransmission/utils.c:1694
 msgid "None"
 msgstr "Ешнәрсе"
 
@@ -844,7 +844,7 @@ msgctxt "Verb"
 msgid "Verifying"
 msgstr "Тексерілуде"
 
-#: ../gtk/filter.c:591 ../gtk/msgwin.c:430 ../gtk/util.c:730
+#: ../gtk/filter.c:591 ../gtk/msgwin.c:430 ../gtk/util.c:717
 msgid "Error"
 msgstr "Қате"
 
@@ -1991,31 +1991,21 @@ msgstr "«%s» торрент файлында белгісіз қате бар.
 msgid "Error opening torrent"
 msgstr "Торренті ашу қатесі"
 
-#: ../gtk/util.c:590
-#, c-format
-msgid "Error opening \"%s\""
-msgstr "\"%s\" ашу қатесі"
-
-#: ../gtk/util.c:592
-#, c-format
-msgid "Server returned \"%1$ld %2$s\""
-msgstr "Сервер \"%1$ld %2$s\" қайтарды"
-
-#: ../gtk/util.c:607
+#: ../gtk/util.c:594
 msgid "Unrecognized URL"
 msgstr "Түсініксіз URL"
 
-#: ../gtk/util.c:609
+#: ../gtk/util.c:596
 #, c-format
 msgid "Transmission doesn't know how to use \"%s\""
 msgstr "Transmission \"%s\" қалай қолдануды білмейді"
 
-#: ../gtk/util.c:614
+#: ../gtk/util.c:601
 #, c-format
 msgid "This magnet link appears to be intended for something other than BitTorrent. BitTorrent magnet links have a section containing \"%s\"."
 msgstr "Бұл магнет сілтемесі BitTorrent үшін емес, басқа нәрседен сияқты. BitTorrent магнет сілтемелерінің ішінде \"%s\" болуы керек."
 
-#: ../gtk/util.c:736
+#: ../gtk/util.c:723
 #, c-format
 msgid "%s free"
 msgstr "%s бос"
@@ -2038,15 +2028,15 @@ msgstr ""
 msgid "Connection failed"
 msgstr "Байланысты орнату сәтсіз аяқталды"
 
-#: ../libtransmission/announcer.c:1155 ../libtransmission/announcer.c:1474
+#: ../libtransmission/announcer.c:1150 ../libtransmission/announcer.c:1469
 msgid "Could not connect to tracker"
 msgstr ""
 
-#: ../libtransmission/announcer.c:1159 ../libtransmission/announcer.c:1478
+#: ../libtransmission/announcer.c:1154 ../libtransmission/announcer.c:1473
 msgid "Tracker did not respond"
 msgstr "Трекер жауап бермеді"
 
-#: ../libtransmission/announcer.c:1223
+#: ../libtransmission/announcer.c:1218
 msgid "Success"
 msgstr "Сәтті"
 
@@ -2217,7 +2207,7 @@ msgstr "Тоқтауда"
 msgid "Not forwarded"
 msgstr "Бағдарланған жоқ"
 
-#: ../libtransmission/port-forwarding.c:106 ../libtransmission/torrent.c:2298
+#: ../libtransmission/port-forwarding.c:106 ../libtransmission/torrent.c:2302
 #, c-format
 msgid "State changed from \"%1$s\" to \"%2$s\""
 msgstr "Қалып күй ескі «%1$s» күйінен жаңа «%2$s» күйіне ауысты"
@@ -2266,7 +2256,7 @@ msgstr ""
 msgid "%s %s started"
 msgstr "%s %s қосылған"
 
-#: ../libtransmission/session.c:2175
+#: ../libtransmission/session.c:2170
 #, c-format
 msgid "Loaded %d torrents"
 msgstr "Жүктелген %d торрент"
@@ -2310,7 +2300,7 @@ msgstr "Дайын"
 msgid "Complete"
 msgstr "Аяқталды"
 
-#: ../libtransmission/torrent.c:3462
+#: ../libtransmission/torrent.c:3466
 #, c-format
 msgid "Piece %<PRIu32>, which was just downloaded, failed its checksum test"
 msgstr ""
@@ -2375,5 +2365,13 @@ msgstr ""
 msgid "Verifying torrent"
 msgstr "Торрентті тексеру"
 
+#, c-format
+#~ msgid "Server returned \"%1$ld %2$s\""
+#~ msgstr "Сервер \"%1$ld %2$s\" қайтарды"
+
 #~ msgid "Transmission BitTorrent Client"
 #~ msgstr "Transmission BitTorrent қолданбасы"
+
+#, c-format
+#~ msgid "Error opening \"%s\""
+#~ msgstr "\"%s\" ашу қатесі"

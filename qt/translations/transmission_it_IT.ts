@@ -59,17 +59,17 @@
     <message numerus="yes">
         <location line="+77"/>
         <source>Torrent(s) Added</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Torrent aggiunto(i)</numerusform>
+            <numerusform>Torrent aggiunto(i)</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+10"/>
         <source>Torrent Completed</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>Torrent completato</numerusform>
-            <numerusform></numerusform>
+            <numerusform>Torrent completato</numerusform>
         </translation>
     </message>
 </context>
@@ -2334,7 +2334,7 @@ una riga vuota.</translation>
 <context>
     <name>Torrent</name>
     <message>
-        <location filename="../Torrent.cc" line="+1064"/>
+        <location filename="../Torrent.cc" line="+1043"/>
         <source>Verifying local data</source>
         <translation>Verifica dei dati locali</translation>
     </message>
@@ -2514,7 +2514,7 @@ una riga vuota.</translation>
 <context>
     <name>TrackerDelegate</name>
     <message numerus="yes">
-        <location filename="../TrackerDelegate.cc" line="+218"/>
+        <location filename="../TrackerDelegate.cc" line="+211"/>
         <source>Got a list of%1 %Ln peer(s)%2 %3 ago</source>
         <extracomment>%1 and %2 are replaced with HTML markup, %3 is duration</extracomment>
         <translation>

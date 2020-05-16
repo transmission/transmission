@@ -357,19 +357,6 @@ bool Torrent::getSeedRatio(double& ratio) const
     return isLimited;
 }
 
-bool Torrent::hasFileSubstring(QString const& substr) const
-{
-    for (auto const& file : files_)
-    {
-        if (file.filename.contains(substr, Qt::CaseInsensitive))
-        {
-            return true;
-        }
-    }
-
-    return false;
-}
-
 bool Torrent::hasTrackerSubstring(QString const& substr) const
 {
     for (auto const& s : trackers())
@@ -466,14 +453,6 @@ int Torrent::compareETA(Torrent const& that) const
         return -1;
     }
 
-    return 0;
-}
-
-int Torrent::compareTracker(Torrent const& that) const
-{
-    Q_UNUSED(that)
-
-    // FIXME
     return 0;
 }
 

@@ -79,11 +79,6 @@ void FaviconCache::ensureCacheDirHasBeenScanned()
 ****
 ***/
 
-QString FaviconCache::getDisplayName(QUrl const& url)
-{
-    return getDisplayName(getKey(url));
-}
-
 QString FaviconCache::getDisplayName(QString const& key)
 {
     auto name = key;

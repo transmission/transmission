@@ -274,7 +274,6 @@ public:
         return failedEver_;
     }
 
-    int compareTracker(Torrent const&) const;
     int compareSeedRatio(Torrent const&) const;
     int compareRatio(Torrent const&) const;
     int compareETA(Torrent const&) const;
@@ -364,7 +363,6 @@ public:
         return recheckProgress_;
     }
 
-    bool hasFileSubstring(QString const& substr) const;
     bool hasTrackerSubstring(QString const& substr) const;
 
     Speed uploadLimit() const
