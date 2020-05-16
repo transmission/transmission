@@ -57,10 +57,6 @@ struct Peer
 };
 
 using PeerList = QVector<Peer>;
-// Q_DECLARE_METATYPE(Peer)
-
-// typedef QList<Peer> PeerList;
-// Q_DECLARE_METATYPE(PeerList)
 
 struct TrackerStat
 {
@@ -93,10 +89,7 @@ struct TrackerStat
     QString lastScrapeResult;
 };
 
-//Q_DECLARE_METATYPE(TrackerStat)
-
 using TrackerStatsList = QVector<TrackerStat>;
-//Q_DECLARE_METATYPE(TrackerStatsList)
 
 struct TorrentFile
 {
@@ -108,10 +101,7 @@ struct TorrentFile
     uint64_t have = 0;
 };
 
-//Q_DECLARE_METATYPE(TorrentFile)
-
 using FileList = QVector<TorrentFile>;
-//Q_DECLARE_METATYPE(FileList)
 
 class Torrent : public QObject
 {
