@@ -10,18 +10,15 @@
 
 #include <ctime> // time_t
 
-#include <QObject>
 #include <QIcon>
 #include <QMetaType>
+#include <QObject>
 #include <QString>
 #include <QStringList>
-#include <QList>
-#include <QVariant>
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/quark.h>
 
-#include "CustomVariantType.h"
 #include "Speed.h"
 
 #ifdef ERROR

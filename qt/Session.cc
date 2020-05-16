@@ -27,6 +27,7 @@
 #include <libtransmission/variant.h>
 
 #include "AddData.h"
+#include "CustomVariantType.h"
 #include "Prefs.h"
 #include "RpcQueue.h"
 #include "Session.h"
