@@ -379,7 +379,7 @@ public:
 
     int peerLimit() const
     {
-        return peer_limit_;
+        return peerLimit_;
     }
 
     double seedRatioLimit() const
@@ -532,7 +532,7 @@ private:
     int downloadLimit_ = {};
     int error_ = {};
     int eta_ = {};
-    int peer_limit_ = {};
+    int peerLimit_ = {};
     int peersConnected_ = {};
     int peersGettingFromUs_ = {};
     int peersSendingToUs_ = {};
