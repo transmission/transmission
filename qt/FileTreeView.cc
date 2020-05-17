@@ -341,7 +341,7 @@ void FileTreeView::onlyCheckSelectedItems()
 
 void FileTreeView::setSelectedItemsPriority()
 {
-    QAction* action = qobject_cast<QAction*>(sender());
+    auto* action = qobject_cast<QAction*>(sender());
     assert(action != nullptr);
     myModel->setPriority(selectedSourceRows(), action->property(PRIORITY_KEY).toInt());
 }

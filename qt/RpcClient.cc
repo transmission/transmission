@@ -206,7 +206,7 @@ void RpcClient::localSessionCallback(tr_session* s, tr_variant* response, void* 
 {
     Q_UNUSED(s)
 
-    RpcClient* self = static_cast<RpcClient*>(vself);
+    auto* self = static_cast<RpcClient*>(vself);
 
     TrVariantPtr json = createVariant();
     *json = *response;
@@ -221,7 +221,7 @@ void RpcClient::networkRequestFinished(QNetworkReply* reply)
 {
     reply->deleteLater();
 
-    QFutureInterface<RpcResponse> promise = reply->property(REQUEST_FUTUREINTERFACE_PROPERTY_KEY).
+    auto promise = reply->property(REQUEST_FUTUREINTERFACE_PROPERTY_KEY).
         value<QFutureInterface<RpcResponse>>();
 
 #ifdef DEBUG_HTTP

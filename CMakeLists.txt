@@ -387,6 +387,12 @@ else()
     set(CMAKE_CXX_STANDARD_REQUIRED ON)
 endif()
 
+if(NOT CMAKE_VERSION VERSION_LESS "3.7.2")
+  if(CMAKE_C_COMPILER_ID STREQUAL "Clang")
+    set(CMAKE_CXX_CLANG_TIDY "clang-tidy")
+  endif()
+endif()
+
 if(CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
     set(NEEDED_COMPILER_FLAGS
         -Wall

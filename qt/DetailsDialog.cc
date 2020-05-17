@@ -121,7 +121,7 @@ public:
 
     virtual bool operator <(QTreeWidgetItem const& other) const
     {
-        PeerItem const* i = dynamic_cast<PeerItem const*>(&other);
+        auto const* i = dynamic_cast<PeerItem const*>(&other);
         QTreeWidget* tw(treeWidget());
         int const column = tw != nullptr ? tw->sortColumn() : 0;
 
@@ -1189,7 +1189,7 @@ void DetailsDialog::initInfoTab()
     int const h = QFontMetrics(ui.commentBrowser->font()).lineSpacing() * 4;
     ui.commentBrowser->setFixedHeight(h);
 
-    ColumnResizer* cr(new ColumnResizer(this));
+    auto* cr = new ColumnResizer(this);
     cr->addLayout(ui.activitySectionLayout);
     cr->addLayout(ui.detailsSectionLayout);
     cr->update();
@@ -1225,7 +1225,7 @@ void DetailsDialog::onSpinBoxEditingFinished()
 {
     QObject const* spin = sender();
     tr_quark const key = spin->property(PREF_KEY).toInt();
-    QDoubleSpinBox const* d = qobject_cast<QDoubleSpinBox const*>(spin);
+    auto const* d = qobject_cast<QDoubleSpinBox const*>(spin);
 
     if (d != nullptr)
     {
@@ -1332,7 +1332,7 @@ void DetailsDialog::onEditTrackerClicked()
     QModelIndexList selectedRows = selectionModel->selectedRows();
     assert(selectedRows.size() == 1);
     QModelIndex i = selectionModel->currentIndex();
-    TrackerInfo const trackerInfo = ui.trackersView->model()->data(i, TrackerModel::TrackerRole).value<TrackerInfo>();
+    auto const trackerInfo = ui.trackersView->model()->data(i, TrackerModel::TrackerRole).value<TrackerInfo>();
 
     bool ok = false;
     QString const newval = QInputDialog::getText(this, tr("Edit URL "), tr("Edit tracker announce URL:"), QLineEdit::Normal,
@@ -1366,7 +1366,7 @@ void DetailsDialog::onRemoveTrackerClicked()
 
     for (QModelIndex const& i : selectedRows)
     {
-        TrackerInfo const inf = ui.trackersView->model()->data(i, TrackerModel::TrackerRole).value<TrackerInfo>();
+        auto const inf = ui.trackersView->model()->data(i, TrackerModel::TrackerRole).value<TrackerInfo>();
         torrentId_to_trackerIds.insertMulti(inf.torrentId, inf.st.id);
     }
 
@@ -1406,7 +1406,7 @@ void DetailsDialog::initOptionsTab()
     ui.idleCombo->addItem(tr("Seed regardless of activity"), TR_IDLELIMIT_UNLIMITED);
     ui.idleCombo->addItem(tr("Stop seeding if idle for:"), TR_IDLELIMIT_SINGLE);
 
-    ColumnResizer* cr(new ColumnResizer(this));
+    auto* cr = new ColumnResizer(this);
     cr->addLayout(ui.speedSectionLayout);
     cr->addLayout(ui.seedingLimitsSectionRatioLayout);
     cr->addLayout(ui.seedingLimitsSectionIdleLayout);

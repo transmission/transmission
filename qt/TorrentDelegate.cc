@@ -439,7 +439,7 @@ QIcon& TorrentDelegate::getWarningEmblem() const
 
 void TorrentDelegate::paint(QPainter* painter, QStyleOptionViewItem const& option, QModelIndex const& index) const
 {
-    Torrent const* tor(index.data(TorrentModel::TorrentRole).value<Torrent const*>());
+    auto const* tor(index.data(TorrentModel::TorrentRole).value<Torrent const*>());
     painter->save();
     painter->setClipRect(option.rect);
     drawTorrent(painter, option, *tor);

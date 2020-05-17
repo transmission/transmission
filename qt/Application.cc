@@ -339,7 +339,7 @@ Application::Application(int& argc, char** argv) :
 
     if (!myPrefs->getBool(Prefs::USER_HAS_GIVEN_INFORMED_CONSENT))
     {
-        QMessageBox* dialog = new QMessageBox(QMessageBox::Information, QString(),
+        auto* dialog = new QMessageBox(QMessageBox::Information, QString(),
             tr("<b>Transmission is a file sharing program.</b>"), QMessageBox::Ok | QMessageBox::Cancel, myWindow);
         dialog->setInformativeText(tr("When you run a torrent, its data will be made available to others by means of upload. "
             "Any content you share is your sole responsibility."));

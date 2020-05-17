@@ -41,7 +41,7 @@ void FilterBarComboBoxDelegate::setSeparator(QAbstractItemModel* model, QModelIn
 {
     model->setData(index, QString::fromLatin1("separator"), Qt::AccessibleDescriptionRole);
 
-    if (QStandardItemModel* m = qobject_cast<QStandardItemModel*>(model))
+    if (auto* m = qobject_cast<QStandardItemModel*>(model))
     {
         if (QStandardItem* item = m->itemFromIndex(index))
         {
@@ -56,7 +56,7 @@ void FilterBarComboBoxDelegate::paint(QPainter* painter, QStyleOptionViewItem co
     {
         QRect rect = option.rect;
 
-        if (QAbstractItemView const* view = qobject_cast<QAbstractItemView const*>(option.widget))
+        if (auto const* view = qobject_cast<QAbstractItemView const*>(option.widget))
         {
             rect.setWidth(view->viewport()->width());
         }

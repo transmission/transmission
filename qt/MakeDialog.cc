@@ -181,7 +181,7 @@ void MakeDialog::makeTorrent()
         trackers.size(), comment.isEmpty() ? nullptr : comment.toUtf8().constData(), ui.privateCheck->isChecked());
 
     // pop up the dialog
-    MakeProgressDialog* dialog = new MakeProgressDialog(mySession, *myBuilder, this);
+    auto* dialog = new MakeProgressDialog(mySession, *myBuilder, this);
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->open();
 }
@@ -240,7 +240,7 @@ MakeDialog::MakeDialog(Session& session, QWidget* parent) :
     ui.sourceFolderButton->setMode(PathButton::DirectoryMode);
     ui.sourceFileButton->setMode(PathButton::FileMode);
 
-    ColumnResizer* cr(new ColumnResizer(this));
+    auto* cr = new ColumnResizer(this);
     cr->addLayout(ui.filesSectionLayout);
     cr->addLayout(ui.propertiesSectionLayout);
     cr->update();
