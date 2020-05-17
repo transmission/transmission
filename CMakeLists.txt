@@ -530,7 +530,7 @@ if(NOT CMAKE_VERSION VERSION_LESS "3.7.2")
     message(STATUS "Looking for clang-tidy - not found")
   else()
     message(STATUS "Looking for clang-tidy - found")
-    set(CMAKE_CXX_CLANG_TIDY CLANG_TIDY)
+    set(CMAKE_CXX_CLANG_TIDY "${CLANG_TIDY}")
   endif()
 endif()
 
