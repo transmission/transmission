@@ -122,7 +122,7 @@ namespace
 {
 
 template<typename T>
-bool setValue(T& setme, T const& value)
+bool change(T& setme, T const& value)
 {
     bool const changed = setme != value;
 
@@ -134,7 +134,7 @@ bool setValue(T& setme, T const& value)
     return changed;
 }
 
-bool setValue(double& setme, double const& value)
+bool change(double& setme, double const& value)
 {
     bool const changed = !qFuzzyCompare(setme + 1, value + 1);
 
@@ -146,43 +146,43 @@ bool setValue(double& setme, double const& value)
     return changed;
 }
 
-bool setValue(double& setme, tr_variant const* value)
+bool change(double& setme, tr_variant const* value)
 {
     double d;
-    return tr_variantGetReal(value, &d) && setValue(setme, d);
+    return tr_variantGetReal(value, &d) && change(setme, d);
 }
 
-bool setValue(int& setme, tr_variant const* value)
+bool change(int& setme, tr_variant const* value)
 {
     int64_t i;
-    return tr_variantGetInt(value, &i) && setValue(setme, static_cast<int>(i));
+    return tr_variantGetInt(value, &i) && change(setme, static_cast<int>(i));
 }
 
-bool setValue(uint64_t& setme, tr_variant const* value)
+bool change(uint64_t& setme, tr_variant const* value)
 {
     int64_t i;
-    return tr_variantGetInt(value, &i) && setValue(setme, static_cast<uint64_t>(i));
+    return tr_variantGetInt(value, &i) && change(setme, static_cast<uint64_t>(i));
 }
 
-bool setValue(time_t& setme, tr_variant const* value)
+bool change(time_t& setme, tr_variant const* value)
 {
     int64_t i;
-    return tr_variantGetInt(value, &i) && setValue(setme, static_cast<time_t>(i));
+    return tr_variantGetInt(value, &i) && change(setme, static_cast<time_t>(i));
 }
 
-bool setValue(Speed& setme, tr_variant const* value)
+bool change(Speed& setme, tr_variant const* value)
 {
     int64_t i;
-    return tr_variantGetInt(value, &i) && setValue(setme, Speed::fromBps(i));
+    return tr_variantGetInt(value, &i) && change(setme, Speed::fromBps(i));
 }
 
-bool setValue(bool& setme, tr_variant const* value)
+bool change(bool& setme, tr_variant const* value)
 {
     bool b;
-    return tr_variantGetBool(value, &b) && setValue(setme, b);
+    return tr_variantGetBool(value, &b) && change(setme, b);
 }
 
-bool setValue(QString& setme, tr_variant const* value)
+bool change(QString& setme, tr_variant const* value)
 {
     bool changed = false;
     char const* str;
@@ -200,10 +200,10 @@ bool setValue(QString& setme, tr_variant const* value)
         return changed;
     }
 
-    return setValue(setme, QString::fromUtf8(str, len));
+    return change(setme, QString::fromUtf8(str, len));
 }
 
-bool setValue(Peer& setme, tr_variant* value)
+bool change(Peer& setme, tr_variant* value)
 {
     bool changed = false;
 
@@ -215,7 +215,7 @@ bool setValue(Peer& setme, tr_variant* value)
         switch (key)
         {
 #define HANDLE_KEY(key) case TR_KEY_ ## key: \
-    changed |= setValue(setme.key, child); break;
+    changed |= change(setme.key, child); break;
 
             HANDLE_KEY(address)
             HANDLE_KEY(clientIsChoked)
@@ -241,7 +241,7 @@ bool setValue(Peer& setme, tr_variant* value)
     return changed;
 }
 
-bool setValue(TorrentFile& setme, tr_variant* value)
+bool change(TorrentFile& setme, tr_variant* value)
 {
     bool changed = false;
 
@@ -253,14 +253,14 @@ bool setValue(TorrentFile& setme, tr_variant* value)
         switch (key)
         {
 #define HANDLE_KEY(key) case TR_KEY_ ## key: \
-    changed |= setValue(setme.key, child); break;
+    changed |= change(setme.key, child); break;
 
             HANDLE_KEY(have)
             HANDLE_KEY(priority)
             HANDLE_KEY(wanted)
 #undef HANDLE_KEY
 #define HANDLE_KEY(key, field) case TR_KEY_ ## key: \
-    changed |= setValue(setme.field, child); break;
+    changed |= change(setme.field, child); break;
 
             HANDLE_KEY(bytesCompleted, have)
             HANDLE_KEY(length, size)
@@ -275,7 +275,7 @@ bool setValue(TorrentFile& setme, tr_variant* value)
     return changed;
 }
 
-bool setValue(TrackerStat& setme, tr_variant* value)
+bool change(TrackerStat& setme, tr_variant* value)
 {
     bool changed = false;
 
@@ -287,7 +287,7 @@ bool setValue(TrackerStat& setme, tr_variant* value)
         switch (key)
         {
 #define HANDLE_KEY(key) case TR_KEY_ ## key: \
-    changed |= setValue(setme.key, child); break;
+    changed |= change(setme.key, child); break;
             HANDLE_KEY(announce);
             HANDLE_KEY(announceState);
             HANDLE_KEY(downloadCount);
@@ -324,7 +324,7 @@ bool setValue(TrackerStat& setme, tr_variant* value)
 }
 
 template<typename T>
-bool setValue(QVector<T>& setme, tr_variant* value)
+bool change(QVector<T>& setme, tr_variant* value)
 {
     bool changed = false;
 
@@ -337,7 +337,7 @@ bool setValue(QVector<T>& setme, tr_variant* value)
 
     for (int i = 0; i < n; ++i)
     {
-        changed |= setValue(setme[i], tr_variantListChild(value, i));
+        changed |= change(setme[i], tr_variantListChild(value, i));
     }
 
     return changed;
@@ -518,7 +518,7 @@ bool Torrent::update(tr_quark const* keys, tr_variant** values, size_t n)
         switch (key)
         {
 #define HANDLE_KEY(key) case TR_KEY_ ## key: \
-    field_changed |= setValue(key ## _, child); break;
+    field_changed |= change(key ## _, child); break;
 
             HANDLE_KEY(activityDate)
             HANDLE_KEY(addedDate)
@@ -571,7 +571,7 @@ bool Torrent::update(tr_quark const* keys, tr_variant** values, size_t n)
             HANDLE_KEY(webseedsSendingToUs)
 #undef HANDLE_KEY
 #define HANDLE_KEY(key, field) case TR_KEY_ ## key: \
-    field_changed |= setValue(field ## _, child); break;
+    field_changed |= change(field ## _, child); break;
 
             HANDLE_KEY(corruptEver, failedEver)
             HANDLE_KEY(fileStats, files)
