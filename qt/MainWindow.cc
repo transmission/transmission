@@ -83,7 +83,7 @@ QIcon MainWindow::getStockIcon(QString const& name, int fallback)
 
     if (icon.isNull() && fallback >= 0)
     {
-        icon = style()->standardIcon(QStyle::StandardPixmap(fallback), 0, this);
+        icon = style()->standardIcon(QStyle::StandardPixmap(fallback), nullptr, this);
     }
 
     return icon;
