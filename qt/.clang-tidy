@@ -1,5 +1,6 @@
 ---
 Checks: "-*,\
+  modernize-deprecated-headers,
   modernize-use-auto,
   modernize-use-emplace"
 WarningsAsErrors: "*"
