@@ -267,7 +267,6 @@ bool change(TorrentFile& setme, tr_variant const* value)
             HANDLE_KEY(name, filename)
 #undef HANDLE_KEY
         default:
-            std::cerr << "unhandled " << tr_quark_get_string(key, nullptr) << std::endl;
             break;
         }
     }
