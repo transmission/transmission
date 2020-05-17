@@ -99,9 +99,7 @@ public:
     {
     }
 
-    virtual ~PeerItem()
-    {
-    }
+    virtual ~PeerItem() =default;
 
 public:
     void refresh(Peer const& p)

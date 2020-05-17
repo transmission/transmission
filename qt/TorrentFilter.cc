@@ -27,9 +27,7 @@ TorrentFilter::TorrentFilter(Prefs const& prefs) :
     refilter();
 }
 
-TorrentFilter::~TorrentFilter()
-{
-}
+TorrentFilter::~TorrentFilter() =default;
 
 /***
 ****

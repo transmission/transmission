@@ -354,9 +354,7 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     refreshSoon();
 }
 
-MainWindow::~MainWindow()
-{
-}
+MainWindow::~MainWindow() =default;
 
 void MainWindow::onSessionSourceChanged()
 {

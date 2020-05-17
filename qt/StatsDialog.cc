@@ -38,9 +38,7 @@ StatsDialog::StatsDialog(Session& session, QWidget* parent) :
     mySession.refreshSessionStats();
 }
 
-StatsDialog::~StatsDialog()
-{
-}
+StatsDialog::~StatsDialog() =default;
 
 void StatsDialog::setVisible(bool visible)
 {
