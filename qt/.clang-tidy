@@ -2,7 +2,8 @@
 Checks: "-*,\
   modernize-deprecated-headers,
   modernize-use-auto,
-  modernize-use-emplace"
+  modernize-use-emplace,
+  modernize-use-equals-delete"
 WarningsAsErrors: "*"
 ...
 
