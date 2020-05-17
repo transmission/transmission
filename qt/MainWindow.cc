@@ -66,7 +66,7 @@ class ListViewProxyStyle : public QProxyStyle
 {
 public:
     int styleHint(StyleHint hint, QStyleOption const* option = nullptr, QWidget const* widget = nullptr,
-        QStyleHintReturn* returnData = nullptr) const
+        QStyleHintReturn* returnData = nullptr) const override
     {
         if (hint == QStyle::SH_ItemView_ActivateItemOnSingleClick)
         {

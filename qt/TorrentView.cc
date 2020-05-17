@@ -29,7 +29,7 @@ public:
     }
 
     // QWidget
-    virtual QSize sizeHint() const
+    QSize sizeHint() const override
     {
         QStyleOptionHeader option;
         option.rect = QRect(0, 0, 100, 100);
@@ -41,7 +41,7 @@ public:
 
 protected:
     // QWidget
-    virtual void paintEvent(QPaintEvent* /*event*/)
+    void paintEvent(QPaintEvent* /*event*/) override
     {
         QStyleOptionHeader option;
         option.initFrom(this);
@@ -55,7 +55,7 @@ protected:
         painter.drawItemText(option.rect, Qt::AlignCenter, option.palette, true, myText, QPalette::ButtonText);
     }
 
-    virtual void mouseDoubleClickEvent(QMouseEvent* /*event*/)
+    void mouseDoubleClickEvent(QMouseEvent* /*event*/) override
     {
         emit static_cast<TorrentView*>(parent())->headerDoubleClicked();
     }

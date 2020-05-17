@@ -99,7 +99,7 @@ public:
     {
     }
 
-    virtual ~PeerItem() =default;
+    ~PeerItem() override =default;
 
 public:
     void refresh(Peer const& p)
@@ -117,7 +117,7 @@ public:
         status = s;
     }
 
-    virtual bool operator <(QTreeWidgetItem const& other) const
+    bool operator <(QTreeWidgetItem const& other) const override
     {
         auto const* i = dynamic_cast<PeerItem const*>(&other);
         QTreeWidget* tw(treeWidget());
