@@ -203,14 +203,14 @@ bool change(QString& setme, tr_variant const* value)
     return change(setme, QString::fromUtf8(str, len));
 }
 
-bool change(Peer& setme, tr_variant* value)
+bool change(Peer& setme, tr_variant const* value)
 {
     bool changed = false;
 
     size_t pos = 0;
     tr_quark key;
     tr_variant* child;
-    while (tr_variantDictChild(value, pos++, &key, &child))
+    while (tr_variantDictChild(const_cast<tr_variant*>(value), pos++, &key, &child))
     {
         switch (key)
         {
@@ -241,14 +241,14 @@ bool change(Peer& setme, tr_variant* value)
     return changed;
 }
 
-bool change(TorrentFile& setme, tr_variant* value)
+bool change(TorrentFile& setme, tr_variant const* value)
 {
     bool changed = false;
 
     size_t pos = 0;
     tr_quark key;
     tr_variant* child;
-    while (tr_variantDictChild(value, pos++, &key, &child))
+    while (tr_variantDictChild(const_cast<tr_variant*>(value), pos++, &key, &child))
     {
         switch (key)
         {
@@ -275,14 +275,14 @@ bool change(TorrentFile& setme, tr_variant* value)
     return changed;
 }
 
-bool change(TrackerStat& setme, tr_variant* value)
+bool change(TrackerStat& setme, tr_variant const* value)
 {
     bool changed = false;
 
     size_t pos = 0;
     tr_quark key;
     tr_variant* child;
-    while (tr_variantDictChild(value, pos++, &key, &child))
+    while (tr_variantDictChild(const_cast<tr_variant*>(value), pos++, &key, &child))
     {
         switch (key)
         {
@@ -324,7 +324,7 @@ bool change(TrackerStat& setme, tr_variant* value)
 }
 
 template<typename T>
-bool change(QVector<T>& setme, tr_variant* value)
+bool change(QVector<T>& setme, tr_variant const* value)
 {
     bool changed = false;
 
@@ -337,7 +337,7 @@ bool change(QVector<T>& setme, tr_variant* value)
 
     for (int i = 0; i < n; ++i)
     {
-        changed |= change(setme[i], tr_variantListChild(value, i));
+        changed |= change(setme[i], tr_variantListChild(const_cast<tr_variant*>(value), i));
     }
 
     return changed;
@@ -505,14 +505,14 @@ void Torrent::updateMimeIcon()
 ****
 ***/
 
-bool Torrent::update(tr_quark const* keys, tr_variant** values, size_t n)
+bool Torrent::update(tr_quark const* keys, tr_variant const* const* values, size_t n)
 {
     bool changed = false;
 
     for (size_t pos = 0; pos < n; ++pos)
     {
         tr_quark key = keys[pos];
-        tr_variant* child = values[pos];
+        tr_variant const* child = values[pos];
         bool field_changed = false;
 
         switch (key)
