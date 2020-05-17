@@ -25,7 +25,7 @@ StatsDialog::StatsDialog(Session& session, QWidget* parent) :
 {
     ui.setupUi(this);
 
-    auto * cr = new ColumnResizer(this);
+    auto* cr = new ColumnResizer(this);
     cr->addLayout(ui.currentSessionSectionLayout);
     cr->addLayout(ui.totalSectionLayout);
     cr->update();
@@ -38,7 +38,7 @@ StatsDialog::StatsDialog(Session& session, QWidget* parent) :
     mySession.refreshSessionStats();
 }
 
-StatsDialog::~StatsDialog() =default;
+StatsDialog::~StatsDialog() = default;
 
 void StatsDialog::setVisible(bool visible)
 {

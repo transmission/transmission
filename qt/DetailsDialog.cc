@@ -99,7 +99,7 @@ public:
     {
     }
 
-    ~PeerItem() override =default;
+    ~PeerItem() override = default;
 
 public:
     void refresh(Peer const& p)

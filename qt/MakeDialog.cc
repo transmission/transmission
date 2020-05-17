@@ -258,7 +258,7 @@ MakeDialog::MakeDialog(Session& session, QWidget* parent) :
     onSourceChanged();
 }
 
-MakeDialog::~MakeDialog() =default;
+MakeDialog::~MakeDialog() = default;
 
 /***
 ****
