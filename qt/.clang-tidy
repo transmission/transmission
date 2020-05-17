@@ -1,5 +1,7 @@
 ---
 Checks: "-*,\
+  bugprone-suspicious-*,
+  misc-unused-using-decls,
   modernize-deprecated-headers,
   modernize-make-shared,
   modernize-make-unique,
@@ -10,7 +12,12 @@ Checks: "-*,\
   modernize-use-equals-delete,
   modernize-use-nullptr,
   modernize-use-override,
-  modernize-use-using"
+  modernize-use-using,
+  readability-make-member-function-const,
+  readability-non-const-parameter,
+  readability-qualified-auto,
+  readability-redundant-*,
+  readability-simplify-boolean-expr"
 WarningsAsErrors: "*"
 ...
 

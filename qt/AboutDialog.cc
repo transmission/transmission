@@ -19,8 +19,7 @@
 #include "Utils.h"
 
 AboutDialog::AboutDialog(QWidget* parent) :
-    BaseDialog(parent),
-    myLicenseDialog()
+    BaseDialog(parent)
 {
     ui.setupUi(this);
 

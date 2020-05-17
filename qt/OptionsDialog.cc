@@ -281,7 +281,7 @@ void OptionsDialog::onAccepted()
 
         for (int i = 0, n = myWanted.size(); i < n; ++i)
         {
-            if (myWanted.at(i) == false)
+            if (!myWanted.at(i))
             {
                 tr_variantListAddInt(l, i);
             }
