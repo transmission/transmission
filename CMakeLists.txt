@@ -387,13 +387,6 @@ else()
     set(CMAKE_CXX_STANDARD_REQUIRED ON)
 endif()
 
-if(NOT CMAKE_VERSION VERSION_LESS "3.7.2")
-  find_program(CLANG_TIDY_EXECUTABLE clang-tidy REQUIRED)
-  if(NOT CLANG_TIDY_EXECUTABLE-NOTFOUND)
-    set(CMAKE_CXX_CLANG_TIDY "clang-tidy")
-  endif()
-endif()
-
 if(CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
     set(NEEDED_COMPILER_FLAGS
         -Wall
@@ -528,6 +521,17 @@ else()
     if(NOT LIB MATCHES "^(|c)$")
         list(APPEND TR_NETWORK_LIBRARIES ${LIB})
     endif()
+endif()
+
+if(NOT CMAKE_VERSION VERSION_LESS "3.7.2")
+  message(STATUS "Looking for clang-tidy")
+  find_program(CLANG_TIDY clang-tidy)
+  if (CLANG_TIDY STREQUAL "CLANG_TIDY-NOTFOUND")
+    message(STATUS "Looking for clang-tidy - not found")
+  else()
+    message(STATUS "Looking for clang-tidy - found")
+    set(CMAKE_CXX_CLANG_TIDY CLANG_TIDY)
+  endif()
 endif()
 
 if(ENABLE_TESTS)
