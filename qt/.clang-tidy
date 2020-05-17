@@ -1,6 +1,7 @@
 ---
 Checks: "-*,\
-  modernize-use-auto"
+  modernize-use-auto,
+  modernize-use-emplace"
 WarningsAsErrors: "*"
 ...
 
