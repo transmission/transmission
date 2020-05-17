@@ -1,12 +1,15 @@
 ---
 Checks: "-*,\
   modernize-deprecated-headers,
+  modernize-make-shared,
+  modernize-make-unique,
   modernize-use-auto,
   modernize-use-default-member-init,
   modernize-use-emplace,
   modernize-use-equals-default,
   modernize-use-equals-delete,
-  modernize-use-nullptr"
+  modernize-use-nullptr,
+  modernize-use-using"
 WarningsAsErrors: "*"
 ...
 

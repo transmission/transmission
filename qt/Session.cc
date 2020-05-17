@@ -41,7 +41,7 @@
 namespace
 {
 
-typedef Torrent::KeyList KeyList;
+using KeyList = Torrent::KeyList;
 
 void addList(tr_variant* list, KeyList const& keys)
 {

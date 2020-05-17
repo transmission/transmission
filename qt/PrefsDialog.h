@@ -31,7 +31,7 @@ public:
     virtual ~PrefsDialog();
 
 private:
-    typedef QMap<int, QWidget*> key2widget_t;
+    using key2widget_t = QMap<int, QWidget*>;
 
 private:
     bool updateWidgetValue(QWidget* widget, int prefKey);

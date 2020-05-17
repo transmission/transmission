@@ -45,7 +45,7 @@ public:
     QVariant data(QModelIndex const& index, int role = Qt::DisplayRole) const override;
 
 private:
-    typedef QVector<TrackerInfo> rows_t;
+    using rows_t = QVector<TrackerInfo>;
 
 private:
     rows_t myRows;
