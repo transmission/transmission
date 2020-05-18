@@ -383,8 +383,7 @@ void MainWindow::initStatusBar()
 {
     ui.optionsButton->setMenu(createOptionsMenu());
 
-    int const minimumSpeedWidth = ui.downloadSpeedLabel->fontMetrics().width(Formatter::uploadSpeedToString(Speed::fromKBps(
-        999.99)));
+    int const minimumSpeedWidth = ui.downloadSpeedLabel->fontMetrics().boundingRect(Formatter::uploadSpeedToString(Speed::fromKBps(999.99))).width();
     ui.downloadSpeedLabel->setMinimumWidth(minimumSpeedWidth);
     ui.uploadSpeedLabel->setMinimumWidth(minimumSpeedWidth);
 
