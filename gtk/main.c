@@ -59,7 +59,7 @@
 
 #define SHOW_LICENSE
 static char const* LICENSE =
-    "Copyright 2005-2019. All code is copyrighted by the respective authors.\n"
+    "Copyright 2005-2020. All code is copyrighted by the respective authors.\n"
     "\n"
     "Transmission can be redistributed and/or modified under the terms of the "
     "GNU GPL versions 2 or 3 or by any future license endorsed by Mnemosyne LLC.\n"
@@ -1352,7 +1352,7 @@ static void show_about_dialog(GtkWindow* parent)
     char const* uri = "https://transmissionbt.com/";
     char const* authors[] =
     {
-        "Jordan Lee (Backend; GTK+)",
+        "Charles Kerr (Backend; GTK+)",
         "Mitchell Livingston (Backend; OS X)",
         "Mike Gelfand",
         NULL

@@ -135,13 +135,13 @@
 "1 year" = "1 jaar";
 
 /* Open invalid alert -> title */
-"\"%@\" is not a valid torrent file." = "\"%@\" is geen geldig torrentbestand.";
+"\"%@\" is not a valid torrent file." = "‘%@’ is geen geldig torrentbestand.";
 
 /* Prefs -> blocklist -> message */
 "A blocklist must first be downloaded" = "Een zwarte lijst moet eerst gedownload worden";
 
 /* Create torrent -> file already exists warning -> warning */
-"A file with the name \"%@\" already exists in the directory \"%@\". Choose a new name or directory to create the torrent file." = "Een bestand met de naam \"%1$@\" bestaat al in de map \"%2$@\". Kies een nieuwe naam of map om het torrentbestand aan te maken.";
+"A file with the name \"%@\" already exists in the directory \"%@\". Choose a new name or directory to create the torrent file." = "Een bestand met de naam ‘%1$@’ bestaat al in de map ‘%2$@’. Kies een nieuwe naam of map om het torrentbestand aan te maken.";
 
 /* Move inside itself alert -> title */
 "A folder cannot be moved to inside itself." = "Een map kan niet in zichzelf geplaatst worden.";
@@ -153,11 +153,11 @@
 "A torrent file with this name and directory cannot be created." = "Een torrentbestand met deze naam en map kan niet gemaakt worden.";
 
 /* Create torrent -> blank address -> message */
-"A transfer marked as private with no tracker addresses will be unable to connect to peers. The torrent file will only be useful if you plan to upload the file to a tracker website that will add the addresses for you." = "Een overdracht die gemarkeerd is als privaat en geen trackeradressen bevat zal niet met andere peers kunnen verbinden. Dit is enkel zinvol als je van plan bent dit torrentbestand te uploaden naar een trackerwebsite die de adressen voor jou toevoegt.";
+"A transfer marked as private with no tracker addresses will be unable to connect to peers. The torrent file will only be useful if you plan to upload the file to a tracker website that will add the addresses for you." = "Een overdracht die gemarkeerd is als privaat en geen trackeradressen bevat zal niet met andere peers kunnen verbinden. Dit is enkel zinvol als u van plan bent dit torrentbestand te uploaden naar een trackerwebsite die de adressen voor u toevoegt.";
 
 /* Open duplicate alert -> title
    Open duplicate magnet alert -> title */
-"A transfer of \"%@\" already exists." = "Een overdracht van \"%@\" bestaat al.";
+"A transfer of \"%@\" already exists." = "Een overdracht van ‘%@’ bestaat al.";
 
 /* Filter Bar -> filter button */
 "Active" = "Actief";
@@ -208,32 +208,32 @@
 "Apply Selected" = "Pas toe op geselecteerde";
 
 /* Confirm Quit panel -> title */
-"Are you sure you want to quit?" = "Weet je zeker dat je wil afsluiten?";
+"Are you sure you want to quit?" = "Weet u zeker dat u wilt afsluiten?";
 
 /* Remove completed confirm panel -> title */
-"Are you sure you want to remove %@ completed transfers from the transfer list?" = "Weet je zeker dat je %@ vervolledigde overdrachten wil verwijderen van de overdrachtenlijst?";
+"Are you sure you want to remove %@ completed transfers from the transfer list?" = "Weet u zeker dat u %@ vervolledigde overdrachten wilt verwijderen van de overdrachtenlijst?";
 
 /* Removal confirm panel -> title */
-"Are you sure you want to remove %@ transfers from the transfer list and trash the data files?" = "Weet je zeker dat je %@ overdrachten wil verwijderen van de overdrachtenlijst en de gegevens naar de prullenmand wil verplaatsen?";
+"Are you sure you want to remove %@ transfers from the transfer list and trash the data files?" = "Weet u zeker dat u %@ overdrachten wilt verwijderen van de overdrachtenlijst en de gegevens naar de prullenmand wilt verplaatsen?";
 
 /* Removal confirm panel -> title */
-"Are you sure you want to remove %@ transfers from the transfer list?" = "Weet je zeker dat je %@ overdrachten wil verwijderen van de overdrachtenlijst?";
+"Are you sure you want to remove %@ transfers from the transfer list?" = "Weet u zeker dat u %@ overdrachten wilt verwijderen van de overdrachtenlijst?";
 
 /* Remove trackers alert -> title */
-"Are you sure you want to remove %d trackers?" = "Weet je zeker dat je %d trackers wil verwijderen?";
+"Are you sure you want to remove %d trackers?" = "Weet u zeker dat u %d trackers wilt verwijderen?";
 
 /* Removal confirm panel -> title */
-"Are you sure you want to remove \"%@\" from the transfer list and trash the data file?" = "Weet je zeker dat je \"%@\" wil verwijderen van de overdrachtenlijst en de gegevens naar de prullenmand wil verplaatsen?";
+"Are you sure you want to remove \"%@\" from the transfer list and trash the data file?" = "Weet u zeker dat u ‘%@’ wilt verwijderen van de overdrachtenlijst en de gegevens naar de prullenmand wilt verplaatsen?";
 
 /* Removal confirm panel -> title
    Remove completed confirm panel -> title */
-"Are you sure you want to remove \"%@\" from the transfer list?" = "Weet je zeker dat je \"%@\" wil verwijderen van de overdrachtenlijst?";
+"Are you sure you want to remove \"%@\" from the transfer list?" = "Weet u zeker dat u ‘%@’ wilt verwijderen van de overdrachtenlijst?";
 
 /* Remove trackers alert -> title */
-"Are you sure you want to remove this tracker?" = "Weet je zeker dat je deze tracker wil verwijderen?";
+"Are you sure you want to remove this tracker?" = "Weet u zeker dat u deze tracker wilt verwijderen?";
 
 /* Stats reset -> title */
-"Are you sure you want to reset usage statistics?" = "Weet je zeker dat je de gebruiksstatistieken wil wissen?";
+"Are you sure you want to reset usage statistics?" = "Weet u zeker dat u de gebruiksstatistieken wilt wissen?";
 
 /* inspector -> peer table -> header tool tip */
 "Available" = "Beschikbaar";
@@ -304,7 +304,7 @@
 "Create Torrent File" = "Torrentbestand aanmaken";
 
 /* Create torrent -> failed -> title */
-"Creation of \"%@\" failed." = "Aanmaken van \"%@\" mislukt.";
+"Creation of \"%@\" failed." = "Aanmaken van ‘%@’ mislukt.";
 
 /* Inspector -> peer -> status */
 "Currently downloading (interested and not choked)" = "Bezig met downloaden (geïnteresseerd en niet verstikt)";
@@ -344,7 +344,7 @@
 "Donate" = "Doneren";
 
 /* Donation beg -> message */
-"Donate or not, there will be no difference to your torrenting experience." = "Of je nu doneert of niet, er zal geen verschil zijn in je Bittorrent-ervaring.";
+"Donate or not, there will be no difference to your torrenting experience." = "Of u nu doneert of niet, er zal geen verschil zijn in uw Bittorrent-ervaring.";
 
 /* file table -> header tool tip
    files tab -> tooltip */
@@ -485,7 +485,7 @@
 "I Accept" = "Ik ga akkoord";
 
 /* Add torrent -> same name -> message */
-"If you are attempting to use already existing data, the root data directory should be inside the destination directory." = "Als je probeert bestaande gegevens te gebruiken, moeten de gegevens zich in de geselecteerde map bevinden.";
+"If you are attempting to use already existing data, the root data directory should be inside the destination directory." = "Als u probeert bestaande gegevens te gebruiken, moeten de gegevens zich in de geselecteerde map bevinden.";
 
 /* Torrent -> eta string */
 "inactive" = "inactief";
@@ -504,7 +504,7 @@
 "IP Address" = "IP-adres";
 
 /* Download not a torrent -> message */
-"It appears that the file \"%@\" from %@ is not a torrent file." = "Het blijkt dat bestand \"%1$@\" van %2$@ geen torrentbestand is.";
+"It appears that the file \"%@\" from %@ is not a torrent file." = "Bestand ‘%1$@’ van %2$@ lijkt geen torrentbestand te zijn.";
 
 /* File size - kilobytes */
 "KB" = "KB";
@@ -605,7 +605,7 @@
 "Normal Priority" = "Normale prioriteit";
 
 /* Torrent disk space alert -> title */
-"Not enough remaining disk space to download \"%@\" completely." = "Onvoldoende ruimte op de harde schijf om \"%@\" volledig te downloaden.";
+"Not enough remaining disk space to download \"%@\" completely." = "Onvoldoende opslagruimte om ‘%@’ volledig te downloaden.";
 
 /* About window -> license close button
    Blocklist -> button
@@ -700,10 +700,10 @@
 "Paused" = "Gepauzeerd";
 
 /* Inspector -> peer -> status */
-"Peer is unchoking you, but you are not interested" = "Peer verstikt je niet meer, maar je bent niet geïnteresseerd";
+"Peer is unchoking you, but you are not interested" = "Peer verstikt u niet meer, maar u bent niet geïnteresseerd";
 
 /* Inspector -> peer -> status */
-"Peer wants you to upload, but you do not want to (interested and choked)" = "Peer wil dat je uploadt, maar dat wil jij niet (geïnteresseerd en verstikt)";
+"Peer wants you to upload, but you do not want to (interested and choked)" = "Peer wil dat u uploadt, maar dat wilt u niet (geïnteresseerd en verstikt)";
 
 /* Inspector -> tab
    Inspector view -> title
@@ -806,7 +806,7 @@
 "Rename File" = "Bestand hernoemen";
 
 /* rename sheet label */
-"Rename the file \"%@\":" = "Hernoem het bestand \"%@\":";
+"Rename the file \"%@\":" = "Hernoem het bestand ‘%@’:";
 
 /* Stats reset -> button
    Stats window -> reset button */
@@ -873,7 +873,7 @@
 "Select a file or folder for the torrent file." = "Selecteer een bestand of map voor het torrentbestand.";
 
 /* Add -> select destination folder */
-"Select the download folder for \"%@\"" = "Selecteer de downloadmap voor \"%@\"";
+"Select the download folder for \"%@\"" = "Selecteer de downloadmap voor ‘%@’";
 
 /* Create torrent -> location sheet -> message */
 "Select the name and location for the torrent file." = "Selecteer de naam en locatie voor het torrentbestand.";
@@ -959,14 +959,14 @@
 "The destination directory and root data directory have the same name." = "De bestemmingsmap en de gegevensmap hebben dezelfde naam.";
 
 /* Create torrent -> directory doesn't exist warning -> warning */
-"The directory \"%@\" does not currently exist. Create this directory or choose a different one to create the torrent file." = "De map \"%@\" bestaat niet. Maak deze map aan, of kies een andere map om het torrentbestand te maken.";
+"The directory \"%@\" does not currently exist. Create this directory or choose a different one to create the torrent file." = "De map ‘%@’ bestaat niet. Maak deze map aan, of kies een andere map om het torrentbestand aan te maken.";
 
 /* Open duplicate magnet alert -> message */
-"The magnet link  \"%@\" cannot be added because it is a duplicate of an already existing transfer." = "De magnetlink \"%@\" kan niet worden toegevoegd omdat het een duplicaat is van een bestaande overdracht.";
+"The magnet link  \"%@\" cannot be added because it is a duplicate of an already existing transfer." = "De magnetlink ‘%@’ kan niet worden toegevoegd omdat het een duplicaat is van een bestaande overdracht.";
 
 /* Move error alert -> message
    Move inside itself alert -> message */
-"The move operation of \"%@\" cannot be done." = "\"%@\" kan niet verplaatst worden.";
+"The move operation of \"%@\" cannot be done." = "‘%@’ kan niet verplaatst worden.";
 
 /* blocklist fail message */
 "The specified blocklist file did not contain any valid rules." = "De gegeven zwarte lijst bevat geen geldige waardes.";
@@ -1020,7 +1020,7 @@
 "There was an error moving the data file." = "Er trad een fout op bij het verplaatsen van het gegevensbestand.";
 
 /* Magnet link failed -> message */
-"There was an error when adding the magnet link \"%@\". The transfer will not occur." = "Er trad een fout op tijdens het toevoegen van de magnetlink \"%@\". Deze overdracht zal niet worden toegevoegd.";
+"There was an error when adding the magnet link \"%@\". The transfer will not occur." = "Er trad een fout op tijdens het toevoegen van de magnetlink ‘%@’. Deze overdracht zal niet worden toegevoegd.";
 
 /* Create torrent -> no files -> title */
 "This folder contains no files." = "Deze map bevat geen bestanden.";
@@ -1094,10 +1094,10 @@
 "Transfers Not Active" = "Overdrachten niet actief";
 
 /* Legal alert -> message */
-"Transmission is a file-sharing program. When you run a torrent, its data will be made available to others by means of upload. You and you alone are fully responsible for exercising proper judgement and abiding by your local laws." = "Transmission is een programma om bestanden te delen. Als je een torrent downloadt worden de gegevens ervan beschikbaar gesteld voor anderen door middel van upload. Jij, en enkel jij, bent volledig verantwoordelijk voor het respecteren van lokale wetgeving.";
+"Transmission is a file-sharing program. When you run a torrent, its data will be made available to others by means of upload. You and you alone are fully responsible for exercising proper judgement and abiding by your local laws." = "Transmission is een programma om bestanden te delen. Als u een torrent downloadt worden de gegevens ervan beschikbaar gesteld voor anderen door middel van upload. U, en enkel u, bent volledig verantwoordelijk voor het respecteren van lokale wetgeving.";
 
 /* Donation beg -> message */
-"Transmission is a full-featured torrent application. A lot of time and effort have gone into development, coding, and refinement. If you enjoy using it, please consider showing your love with a donation." = "Transmission is een volledig torrentprogramma. Er is veel energie gestoken in het ontwikkelen, programmeren en het verfijnen. Als je er plezier aan hebt, toon dan je liefde met een donatie.";
+"Transmission is a full-featured torrent application. A lot of time and effort have gone into development, coding, and refinement. If you enjoy using it, please consider showing your love with a donation." = "Transmission is een volledig torrentprogramma. Er is veel energie gestoken in het ontwikkelen, programmeren en het verfijnen. Als u er plezier aan heeft, toon dan uw liefde met een donatie.";
 
 /* Transmission already running alert -> title */
 "Transmission is already running." = "Transmission is al actief.";
@@ -1159,8 +1159,8 @@
 "Yellow" = "Geel";
 
 /* Inspector -> peer -> status */
-"You unchoked the peer, but the peer is not interested" = "Je verstikt de peer niet meer, maar hij is niet geïnteresseerd";
+"You unchoked the peer, but the peer is not interested" = "U verstikt de peer niet meer, maar hij is niet geïnteresseerd";
 
 /* Inspector -> peer -> status */
-"You want to download, but peer does not want to send (interested and choked)" = "Je wil downloaden, maar de peer wil niets versturen (geïnteresseerd en verstikt)";
+"You want to download, but peer does not want to send (interested and choked)" = "U wilt downloaden, maar de peer wil niets versturen (geïnteresseerd en verstikt)";
 
