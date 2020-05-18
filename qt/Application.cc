@@ -208,9 +208,6 @@ Application::Application(int& argc, char** argv) :
                 break;
 
             case AddData::FILENAME:
-                metainfo = QString::fromLatin1(a.toBase64());
-                break;
-
             case AddData::METAINFO:
                 metainfo = QString::fromLatin1(a.toBase64());
                 break;

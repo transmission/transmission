@@ -106,16 +106,14 @@ QSize FilterBarComboBoxDelegate::sizeHint(QStyleOptionViewItem const& option, QM
         int const pm = myCombo->style()->pixelMetric(QStyle::PM_DefaultFrameWidth, nullptr, myCombo);
         return QSize(pm, pm + 10);
     }
-    else
-    {
-        QStyle* s = myCombo->style();
-        int const hmargin = getHSpacing(myCombo);
 
-        QSize size = QItemDelegate::sizeHint(option, index);
-        size.setHeight(qMax(size.height(), myCombo->iconSize().height() + 6));
-        size.rwidth() += s->pixelMetric(QStyle::PM_FocusFrameHMargin, nullptr, myCombo);
-        size.rwidth() += rect(option, index, FilterBarComboBox::CountStringRole).width();
-        size.rwidth() += hmargin * 4;
-        return size;
-    }
+    QStyle* s = myCombo->style();
+    int const hmargin = getHSpacing(myCombo);
+
+    QSize size = QItemDelegate::sizeHint(option, index);
+    size.setHeight(qMax(size.height(), myCombo->iconSize().height() + 6));
+    size.rwidth() += s->pixelMetric(QStyle::PM_FocusFrameHMargin, nullptr, myCombo);
+    size.rwidth() += rect(option, index, FilterBarComboBox::CountStringRole).width();
+    size.rwidth() += hmargin * 4;
+    return size;
 }

@@ -23,7 +23,7 @@
 #include "Torrent.h"
 #include "Utils.h"
 
-struct Property
+struct Property // NOLINT(clang-analyzer-optin.performance.Padding)
 {
     int id;
     tr_quark key;

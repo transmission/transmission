@@ -513,11 +513,7 @@ void DetailsDialog::refresh()
     ui.haveValueLabel->setText(string);
 
     // myAvailabilityLabel
-    if (torrents.empty())
-    {
-        string = none;
-    }
-    else if (sizeWhenDone == 0)
+    if (torrents.empty() || sizeWhenDone == 0)
     {
         string = none;
     }

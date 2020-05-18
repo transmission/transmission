@@ -35,7 +35,7 @@ public:
     MakeProgressDialog(Session& session, tr_metainfo_builder& builder, QWidget* parent = nullptr);
 
 private slots:
-    void onButtonBoxClicked(QAbstractButton*);
+    void onButtonBoxClicked(QAbstractButton* button);
     void onProgress();
 
 private /* NOLINT(readability-redundant-access-specifiers) */ :

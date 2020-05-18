@@ -19,7 +19,7 @@
 namespace
 {
 
-static int const INTERVAL_MSEC = 15000;
+int const INTERVAL_MSEC = 15000;
 
 } // namespace
 
