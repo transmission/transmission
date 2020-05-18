@@ -41,7 +41,6 @@ public:
     QRect iconRect;
     QRect textRect;
 
-public:
     ItemLayout(QString const& text, bool suppressColors, Qt::LayoutDirection direction, QPoint const& topLeft, int width);
 
     QSize size() const

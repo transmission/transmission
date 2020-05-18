@@ -668,7 +668,7 @@ bool Torrent::update(tr_quark const* keys, tr_variant** values, size_t n)
         }
     }
 
-    auto it = std::find(keys, keys + n, TR_KEY_files);
+    auto const* it = std::find(keys, keys + n, TR_KEY_files);
     if (it != keys + n)
     {
         tr_variant* files = values[std::distance(keys, it)];

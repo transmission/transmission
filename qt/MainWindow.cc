@@ -929,7 +929,7 @@ void MainWindow::refreshActionSensitivity()
 ***
 **/
 
-void MainWindow::clearSelection()
+void MainWindow::clearSelection() const
 {
     ui.action_DeselectAll->trigger();
 }
@@ -1267,7 +1267,7 @@ void MainWindow::openTorrent()
     d->setFileMode(QFileDialog::ExistingFiles);
     d->setAttribute(Qt::WA_DeleteOnClose);
 
-    auto const l = qobject_cast<QGridLayout*>(d->layout());
+    auto* const l = qobject_cast<QGridLayout*>(d->layout());
 
     if (l != nullptr)
     {
@@ -1422,7 +1422,7 @@ void MainWindow::removeTorrents(bool const deleteFiles)
     msgBox.setDefaultButton(QMessageBox::Cancel);
     msgBox.setIcon(QMessageBox::Question);
     // hack needed to keep the dialog from being too narrow
-    auto layout = qobject_cast<QGridLayout*>(msgBox.layout());
+    auto* layout = qobject_cast<QGridLayout*>(msgBox.layout());
 
     if (layout == nullptr)
     {

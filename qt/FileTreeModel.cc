@@ -27,7 +27,6 @@ protected:
         myToken.reserve(path.size() / 2);
     }
 
-protected:
     QString const& myPath;
     int mySlashIndex;
     QString myToken;

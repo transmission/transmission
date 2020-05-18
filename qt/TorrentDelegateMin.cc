@@ -62,7 +62,6 @@ public:
     QRect statusRect;
     QRect barRect;
 
-public:
     ItemLayout(QString const& nameText, QString const& statusText, QIcon const& emblemIcon, QFont const& baseFont,
         Qt::LayoutDirection direction, QPoint const& topLeft, int width);
 

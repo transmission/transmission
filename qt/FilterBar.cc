@@ -115,7 +115,7 @@ void FilterBar::refreshTrackers()
 
     // update the "All" row
     auto const num_trackers = torrentsPerHost.size();
-    auto item = myTrackerModel->item(ROW_TOTALS);
+    auto* item = myTrackerModel->item(ROW_TOTALS);
     item->setData(int(num_trackers), FilterBarComboBox::CountRole);
     item->setData(getCountString(num_trackers), FilterBarComboBox::CountStringRole);
 
