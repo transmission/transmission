@@ -65,7 +65,7 @@ private:
 
     // normal closure, takes response and returns new future
     template<typename Func, typename std::enable_if<
-        std::is_same<typename std::invoke_result<Func,RpcResponse const&>::type, RpcResponseFuture>::value
+        std::is_same<typename std::invoke_result<Func, RpcResponse const&>::type, RpcResponseFuture>::value
         >::type* = nullptr>
     QueuedFunction normalizeFunc(Func const& func)
     {
@@ -89,7 +89,7 @@ private:
 
     // closure without return value ("auxiliary"), takes response and returns nothing -- internally we reuse the last future
     template<typename Func, typename std::enable_if<
-        std::is_same<typename std::invoke_result<Func,RpcResponse const&>::type, void>::value
+        std::is_same<typename std::invoke_result<Func, RpcResponse const&>::type, void>::value
         >::type* = nullptr>
     QueuedFunction normalizeFunc(Func const& func)
     {
@@ -115,7 +115,7 @@ private:
 
     // normal error handler, takes last response
     template<typename Func, typename std::enable_if<
-        std::is_same<typename std::invoke_result<Func,RpcResponse const&>::type, void>::value
+        std::is_same<typename std::invoke_result<Func, RpcResponse const&>::type, void>::value
         >::type* = nullptr>
     ErrorHandlerFunction normalizeErrorHandler(Func const& func)
     {
