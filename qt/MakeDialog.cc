@@ -38,7 +38,7 @@ private slots:
     void onButtonBoxClicked(QAbstractButton*);
     void onProgress();
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
     Session& mySession;
     tr_metainfo_builder& myBuilder;
     Ui::MakeProgressDialog ui;
