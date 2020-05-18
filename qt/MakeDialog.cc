@@ -175,7 +175,7 @@ void MakeDialog::makeTorrent()
     {
         comment = ui.commentEdit->text();
     }
-    
+
     // source
     QString source;
 

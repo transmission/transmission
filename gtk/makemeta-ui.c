@@ -273,7 +273,7 @@ static void onResponse(GtkDialog* d, int response, gpointer user_data)
             /* build the .torrent */
             makeProgressDialog(GTK_WIDGET(d), ui);
             tr_makeMetaInfo(ui->builder, ui->target, trackers, n, useComment ? comment : NULL,
-                            isPrivate, useSource ? source : NULL);
+                isPrivate, useSource ? source : NULL);
 
             /* cleanup */
             g_free(trackers);
@@ -512,7 +512,7 @@ GtkWidget* gtr_torrent_creation_dialog_new(GtkWindow* parent, TrCore* core)
     gtk_widget_set_sensitive(GTK_WIDGET(w), FALSE);
     g_signal_connect(l, "toggled", G_CALLBACK(onSourceToggled), w);
     hig_workarea_add_row_w(t, &row, l, w, NULL);
-    
+
     l = gtk_check_button_new_with_mnemonic(_("_Source:"));
     ui->source_check = l;
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(l), FALSE);
