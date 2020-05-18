@@ -106,7 +106,7 @@ QVariant TorrentModel::data(QModelIndex const& index, int role) const
             break;
 
         case TorrentRole:
-            var = qVariantFromValue(t);
+            var = QVariant::fromValue(t);
             break;
 
         default:
