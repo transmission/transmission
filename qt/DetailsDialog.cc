@@ -1503,14 +1503,14 @@ void DetailsDialog::onFilePriorityChanged(QSet<int> const& indices, int priority
         break;
     }
 
-    mySession.torrentSet(myIds, key, indices.toList());
+    mySession.torrentSet(myIds, key, indices.values());
     getNewData();
 }
 
 void DetailsDialog::onFileWantedChanged(QSet<int> const& indices, bool wanted)
 {
     tr_quark const key = wanted ? TR_KEY_files_wanted : TR_KEY_files_unwanted;
-    mySession.torrentSet(myIds, key, indices.toList());
+    mySession.torrentSet(myIds, key, indices.values());
     getNewData();
 }
 
