@@ -661,6 +661,7 @@ void Application::onNotificationActionInvoked(quint32, QString action_key)
         mySession->startTorrentsNow({ torrentId });
     }
 }
+
 #endif
 
 FaviconCache& Application::faviconCache()
