@@ -145,6 +145,7 @@ set(${PROJECT_NAME}_LINGUAS
     hu
     id
     it_IT
+    ja
     ka
     kk
     ko
