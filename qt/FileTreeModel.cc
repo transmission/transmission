@@ -6,6 +6,7 @@
  *
  */
 
+#include <algorithm>
 #include <cassert>
 
 #include <libtransmission/transmission.h> // priorities
@@ -124,7 +125,7 @@ QModelIndexList FileTreeModel::getOrphanIndices(QModelIndexList const& indices) 
 {
     QModelIndexList orphanIndices = indices;
 
-    qSort(orphanIndices);
+    std::sort(orphanIndices.begin(), orphanIndices.end());
 
     for (QMutableListIterator<QModelIndex> it(orphanIndices); it.hasNext();)
     {
@@ -139,7 +140,7 @@ QModelIndexList FileTreeModel::getOrphanIndices(QModelIndexList const& indices) 
                 break;
             }
 
-            if (qBinaryFind(orphanIndices, walk) != orphanIndices.end())
+            if (std::binary_search(orphanIndices.begin(), orphanIndices.end(), walk))
             {
                 it.remove();
                 break;
