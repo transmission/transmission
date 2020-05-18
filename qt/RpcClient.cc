@@ -15,8 +15,6 @@
 #include <QNetworkReply>
 #include <QNetworkRequest>
 
-#include <event2/buffer.h>
-
 #include <libtransmission/transmission.h>
 #include <libtransmission/rpcimpl.h>
 #include <libtransmission/utils.h> // tr_free
