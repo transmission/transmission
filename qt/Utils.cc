@@ -183,10 +183,7 @@ QIcon Utils::guessMimeIcon(QString const& filename)
         addAssociatedFileIcon(fileInfo, SHGFI_LARGEICON, icon);
     }
 
-    if (!icon.isNull())
-    {
-        return icon;
-    }
+    return icon;
 
 #else
 
