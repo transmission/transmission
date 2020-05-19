@@ -215,7 +215,7 @@ bool change(Peer& setme, tr_variant const* value)
         switch (key)
         {
 #define HANDLE_KEY(key) case TR_KEY_ ## key: \
-    changed |= change(setme.key, child); break;
+    changed = change(setme.key, child) || changed; break;
 
             HANDLE_KEY(address)
             HANDLE_KEY(clientIsChoked)
@@ -253,14 +253,14 @@ bool change(TorrentFile& setme, tr_variant const* value)
         switch (key)
         {
 #define HANDLE_KEY(key) case TR_KEY_ ## key: \
-    changed |= change(setme.key, child); break;
+    changed = change(setme.key, child) || changed; break;
 
             HANDLE_KEY(have)
             HANDLE_KEY(priority)
             HANDLE_KEY(wanted)
 #undef HANDLE_KEY
 #define HANDLE_KEY(key, field) case TR_KEY_ ## key: \
-    changed |= change(setme.field, child); break;
+    changed = change(setme.field, child) || changed; break;
 
             HANDLE_KEY(bytesCompleted, have)
             HANDLE_KEY(length, size)
@@ -286,7 +286,7 @@ bool change(TrackerStat& setme, tr_variant const* value)
         switch (key)
         {
 #define HANDLE_KEY(key) case TR_KEY_ ## key: \
-    changed |= change(setme.key, child); break;
+    changed = change(setme.key, child) || changed; break;
             HANDLE_KEY(announce);
             HANDLE_KEY(announceState);
             HANDLE_KEY(downloadCount);
@@ -336,7 +336,7 @@ bool change(QVector<T>& setme, tr_variant const* value)
 
     for (int i = 0; i < n; ++i)
     {
-        changed |= change(setme[i], tr_variantListChild(const_cast<tr_variant*>(value), i));
+        changed = change(setme[i], tr_variantListChild(const_cast<tr_variant*>(value), i)) || changed;
     }
 
     return changed;
@@ -517,7 +517,7 @@ bool Torrent::update(tr_quark const* keys, tr_variant const* const* values, size
         switch (key)
         {
 #define HANDLE_KEY(key) case TR_KEY_ ## key: \
-    field_changed |= change(key ## _, child); break;
+    field_changed = change(key ## _, child); break;
 
             HANDLE_KEY(activityDate)
             HANDLE_KEY(addedDate)
@@ -569,7 +569,7 @@ bool Torrent::update(tr_quark const* keys, tr_variant const* const* values, size
             HANDLE_KEY(webseedsSendingToUs)
 #undef HANDLE_KEY
 #define HANDLE_KEY(key, field) case TR_KEY_ ## key: \
-    field_changed |= change(field ## _, child); break;
+    field_changed = change(field ## _, child); break;
 
             HANDLE_KEY(corruptEver, failedEver)
             HANDLE_KEY(fileStats, files)
@@ -583,7 +583,7 @@ bool Torrent::update(tr_quark const* keys, tr_variant const* const* values, size
             break;
         }
 
-        changed |= field_changed;
+        changed = changed || field_changed;
 
         if (field_changed)
         {
