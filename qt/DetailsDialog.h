@@ -93,7 +93,7 @@ private:
     Prefs& prefs_;
     TorrentModel const& model_;
 
-    Ui::DetailsDialog ui;
+    Ui::DetailsDialog ui_;
 
     torrent_ids_t ids_;
     QTimer timer_;
