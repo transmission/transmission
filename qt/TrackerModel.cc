@@ -18,7 +18,7 @@ int TrackerModel::rowCount(QModelIndex const& parent) const
 {
     Q_UNUSED(parent)
 
-    return parent.isValid() ? 0 : myRows.size();
+    return parent.isValid() ? 0 : rows_.size();
 }
 
 QVariant TrackerModel::data(QModelIndex const& index, int role) const
@@ -27,9 +27,9 @@ QVariant TrackerModel::data(QModelIndex const& index, int role) const
 
     int const row = index.row();
 
-    if (0 <= row && row < myRows.size())
+    if (0 <= row && row < rows_.size())
     {
-        TrackerInfo const& trackerInfo = myRows.at(row);
+        TrackerInfo const& trackerInfo = rows_.at(row);
 
         switch (role)
         {
@@ -111,30 +111,30 @@ void TrackerModel::refresh(TorrentModel const& torrentModel, torrent_ids_t const
     int oldIndex = 0;
     int newIndex = 0;
 
-    while (oldIndex < myRows.size() || newIndex < trackers.size())
+    while (oldIndex < rows_.size() || newIndex < trackers.size())
     {
-        bool const isEndOfOld = oldIndex == myRows.size();
+        bool const isEndOfOld = oldIndex == rows_.size();
         bool const isEndOfNew = newIndex == trackers.size();
 
-        if (isEndOfOld || (!isEndOfNew && comp(trackers.at(newIndex), myRows.at(oldIndex))))
+        if (isEndOfOld || (!isEndOfNew && comp(trackers.at(newIndex), rows_.at(oldIndex))))
         {
             // add this new row
             beginInsertRows(QModelIndex(), oldIndex, oldIndex);
-            myRows.insert(oldIndex, trackers.at(newIndex));
+            rows_.insert(oldIndex, trackers.at(newIndex));
             endInsertRows();
             ++oldIndex;
             ++newIndex;
         }
-        else if (isEndOfNew || (!isEndOfOld && comp(myRows.at(oldIndex), trackers.at(newIndex))))
+        else if (isEndOfNew || (!isEndOfOld && comp(rows_.at(oldIndex), trackers.at(newIndex))))
         {
             // remove this old row
             beginRemoveRows(QModelIndex(), oldIndex, oldIndex);
-            myRows.remove(oldIndex);
+            rows_.remove(oldIndex);
             endRemoveRows();
         }
         else // update existing row
         {
-            myRows[oldIndex].st = trackers.at(newIndex).st;
+            rows_[oldIndex].st = trackers.at(newIndex).st;
             emit dataChanged(index(oldIndex, 0), index(oldIndex, 0));
             ++oldIndex;
             ++newIndex;
@@ -144,9 +144,9 @@ void TrackerModel::refresh(TorrentModel const& torrentModel, torrent_ids_t const
 
 int TrackerModel::find(int torrentId, QString const& url) const
 {
-    for (int i = 0, n = myRows.size(); i < n; ++i)
+    for (int i = 0, n = rows_.size(); i < n; ++i)
     {
-        TrackerInfo const& inf = myRows.at(i);
+        TrackerInfo const& inf = rows_.at(i);
 
         if (inf.torrentId == torrentId && url == inf.st.announce)
         {

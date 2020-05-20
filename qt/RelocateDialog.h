@@ -35,10 +35,10 @@ private slots:
     void onMoveToggled(bool);
 
 private:
-    Session& mySession;
-    torrent_ids_t const myIds;
+    Session& session_;
+    torrent_ids_t const ids_;
 
     Ui::RelocateDialog ui;
 
-    static bool myMoveFlag;
+    static bool move_flag_;
 };

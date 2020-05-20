@@ -88,8 +88,8 @@ private:
     QModelIndexList getOrphanIndices(QModelIndexList const& indices) const;
 
 private:
-    bool myIsEditable;
+    bool is_editable_;
 
-    FileTreeItem* myRootItem;
-    QMap<int, FileTreeItem*> myIndexCache;
+    FileTreeItem* root_item_;
+    QMap<int, FileTreeItem*> index_cache_;
 };

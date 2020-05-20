@@ -29,13 +29,13 @@
 namespace
 {
 
-int const mySpacing = 6;
-QSize const myMargin(10, 10);
+int const spacing_ = 6;
+QSize const margin_(10, 10);
 
 class ItemLayout
 {
 private:
-    QTextDocument myTextDocument;
+    QTextDocument text_document_;
 
 public:
     QRect iconRect;
@@ -50,7 +50,7 @@ public:
 
     QAbstractTextDocumentLayout* textLayout() const
     {
-        return myTextDocument.documentLayout();
+        return text_document_.documentLayout();
     }
 };
 
@@ -63,10 +63,10 @@ ItemLayout::ItemLayout(QString const& text, bool suppressColors, Qt::LayoutDirec
     QRect baseRect(topLeft, QSize(width, 0));
 
     iconRect = style->alignedRect(direction, Qt::AlignLeft | Qt::AlignTop, iconSize, baseRect);
-    Utils::narrowRect(baseRect, iconSize.width() + mySpacing, 0, direction);
+    Utils::narrowRect(baseRect, iconSize.width() + spacing_, 0, direction);
 
-    myTextDocument.setDocumentMargin(0);
-    myTextDocument.setTextWidth(baseRect.width());
+    text_document_.setDocumentMargin(0);
+    text_document_.setTextWidth(baseRect.width());
 
     QTextOption textOption;
     textOption.setTextDirection(direction);
@@ -76,11 +76,11 @@ ItemLayout::ItemLayout(QString const& text, bool suppressColors, Qt::LayoutDirec
         textOption.setFlags(QTextOption::SuppressColors);
     }
 
-    myTextDocument.setDefaultTextOption(textOption);
-    myTextDocument.setHtml(text);
+    text_document_.setDefaultTextOption(textOption);
+    text_document_.setHtml(text);
 
     textRect = baseRect;
-    textRect.setSize(myTextDocument.size().toSize());
+    textRect.setSize(text_document_.size().toSize());
 }
 
 } // namespace
@@ -91,8 +91,8 @@ ItemLayout::ItemLayout(QString const& text, bool suppressColors, Qt::LayoutDirec
 
 QSize TrackerDelegate::sizeHint(QStyleOptionViewItem const& option, TrackerInfo const& info) const
 {
-    ItemLayout const layout(getText(info), true, option.direction, QPoint(0, 0), option.rect.width() - myMargin.width() * 2);
-    return layout.size() + myMargin * 2;
+    ItemLayout const layout(getText(info), true, option.direction, QPoint(0, 0), option.rect.width() - margin_.width() * 2);
+    return layout.size() + margin_ * 2;
 }
 
 QSize TrackerDelegate::sizeHint(QStyleOptionViewItem const& option, QModelIndex const& index) const
@@ -120,7 +120,7 @@ void TrackerDelegate::drawTracker(QPainter* painter, QStyleOptionViewItem const&
 
     QIcon trackerIcon(inf.st.getFavicon());
 
-    QRect const contentRect(option.rect.adjusted(myMargin.width(), myMargin.height(), -myMargin.width(), -myMargin.height()));
+    QRect const contentRect(option.rect.adjusted(margin_.width(), margin_.height(), -margin_.width(), -margin_.height()));
     ItemLayout const layout(getText(inf), isItemSelected, option.direction, contentRect.topLeft(), contentRect.width());
 
     painter->save();
@@ -151,7 +151,7 @@ void TrackerDelegate::drawTracker(QPainter* painter, QStyleOptionViewItem const&
 
 void TrackerDelegate::setShowMore(bool b)
 {
-    myShowMore = b;
+    show_more_ = b;
 }
 
 namespace
@@ -255,7 +255,7 @@ QString TrackerDelegate::getText(TrackerInfo const& inf) const
             }
         }
 
-        if (myShowMore)
+        if (show_more_)
         {
             if (inf.st.hasScraped)
             {

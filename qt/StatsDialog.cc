@@ -20,8 +20,8 @@ enum
 
 StatsDialog::StatsDialog(Session& session, QWidget* parent) :
     BaseDialog(parent),
-    mySession(session),
-    myTimer(new QTimer(this))
+    session_(session),
+    timer_(new QTimer(this))
 {
     ui.setupUi(this);
 
@@ -30,23 +30,23 @@ StatsDialog::StatsDialog(Session& session, QWidget* parent) :
     cr->addLayout(ui.totalSectionLayout);
     cr->update();
 
-    myTimer->setSingleShot(false);
-    connect(myTimer, SIGNAL(timeout()), &mySession, SLOT(refreshSessionStats()));
+    timer_->setSingleShot(false);
+    connect(timer_, SIGNAL(timeout()), &session_, SLOT(refreshSessionStats()));
 
-    connect(&mySession, SIGNAL(statsUpdated()), this, SLOT(updateStats()));
+    connect(&session_, SIGNAL(statsUpdated()), this, SLOT(updateStats()));
     updateStats();
-    mySession.refreshSessionStats();
+    session_.refreshSessionStats();
 }
 
 StatsDialog::~StatsDialog() = default;
 
 void StatsDialog::setVisible(bool visible)
 {
-    myTimer->stop();
+    timer_->stop();
 
     if (visible)
     {
-        myTimer->start(REFRESH_INTERVAL_MSEC);
+        timer_->start(REFRESH_INTERVAL_MSEC);
     }
 
     BaseDialog::setVisible(visible);
@@ -54,8 +54,8 @@ void StatsDialog::setVisible(bool visible)
 
 void StatsDialog::updateStats()
 {
-    tr_session_stats const& current(mySession.getStats());
-    tr_session_stats const& total(mySession.getCumulativeStats());
+    tr_session_stats const& current(session_.getStats());
+    tr_session_stats const& total(session_.getCumulativeStats());
 
     ui.currentUploadedValueLabel->setText(Formatter::sizeToString(current.uploadedBytes));
     ui.currentDownloadedValueLabel->setText(Formatter::sizeToString(current.downloadedBytes));

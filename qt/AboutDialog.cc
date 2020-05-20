@@ -47,5 +47,5 @@ void AboutDialog::showCredits()
 
 void AboutDialog::showLicense()
 {
-    Utils::openDialog(myLicenseDialog, this);
+    Utils::openDialog(license_dialog_, this);
 }

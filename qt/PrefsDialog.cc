@@ -167,31 +167,31 @@ bool PrefsDialog::updateWidgetValue(QWidget* widget, int prefKey)
 
     if (prefWidget.is<QCheckBox>())
     {
-        prefWidget.as<QCheckBox>()->setChecked(myPrefs.getBool(prefKey));
+        prefWidget.as<QCheckBox>()->setChecked(prefs_.getBool(prefKey));
     }
     else if (prefWidget.is<QSpinBox>())
     {
-        prefWidget.as<QSpinBox>()->setValue(myPrefs.getInt(prefKey));
+        prefWidget.as<QSpinBox>()->setValue(prefs_.getInt(prefKey));
     }
     else if (prefWidget.is<QDoubleSpinBox>())
     {
-        prefWidget.as<QDoubleSpinBox>()->setValue(myPrefs.getDouble(prefKey));
+        prefWidget.as<QDoubleSpinBox>()->setValue(prefs_.getDouble(prefKey));
     }
     else if (prefWidget.is<QTimeEdit>())
     {
-        prefWidget.as<QTimeEdit>()->setTime(QTime(0, 0).addSecs(myPrefs.getInt(prefKey) * 60));
+        prefWidget.as<QTimeEdit>()->setTime(QTime(0, 0).addSecs(prefs_.getInt(prefKey) * 60));
     }
     else if (prefWidget.is<QLineEdit>())
     {
-        prefWidget.as<QLineEdit>()->setText(myPrefs.getString(prefKey));
+        prefWidget.as<QLineEdit>()->setText(prefs_.getString(prefKey));
     }
     else if (prefWidget.is<PathButton>())
     {
-        prefWidget.as<PathButton>()->setPath(myPrefs.getString(prefKey));
+        prefWidget.as<PathButton>()->setPath(prefs_.getString(prefKey));
     }
     else if (prefWidget.is<FreeSpaceLabel>())
     {
-        prefWidget.as<FreeSpaceLabel>()->setPath(myPrefs.getString(prefKey));
+        prefWidget.as<FreeSpaceLabel>()->setPath(prefs_.getString(prefKey));
     }
     else
     {
@@ -207,7 +207,7 @@ void PrefsDialog::linkWidgetToPref(QWidget* widget, int prefKey)
 
     prefWidget.setPrefKey(prefKey);
     updateWidgetValue(widget, prefKey);
-    myWidgets.insert(prefKey, widget);
+    widgets_.insert(prefKey, widget);
 
     if (prefWidget.is<QCheckBox>())
     {
@@ -304,12 +304,12 @@ void PrefsDialog::initRemoteTab()
     linkWidgetToPref(ui.enableRpcWhitelistCheck, Prefs::RPC_WHITELIST_ENABLED);
     linkWidgetToPref(ui.rpcWhitelistEdit, Prefs::RPC_WHITELIST);
 
-    myWebWidgets << ui.rpcPortLabel << ui.rpcPortSpin << ui.requireRpcAuthCheck << ui.enableRpcWhitelistCheck;
-    myWebAuthWidgets << ui.rpcUsernameLabel << ui.rpcUsernameEdit << ui.rpcPasswordLabel << ui.rpcPasswordEdit;
-    myWebWhitelistWidgets << ui.rpcWhitelistLabel << ui.rpcWhitelistEdit;
-    myUnsupportedWhenRemote << ui.enableRpcCheck << myWebWidgets << myWebAuthWidgets << myWebWhitelistWidgets;
+    web_widgets_ << ui.rpcPortLabel << ui.rpcPortSpin << ui.requireRpcAuthCheck << ui.enableRpcWhitelistCheck;
+    web_auth_widgets_ << ui.rpcUsernameLabel << ui.rpcUsernameEdit << ui.rpcPasswordLabel << ui.rpcPasswordEdit;
+    web_whitelist_widgets_ << ui.rpcWhitelistLabel << ui.rpcWhitelistEdit;
+    unsupported_when_remote_ << ui.enableRpcCheck << web_widgets_ << web_auth_widgets_ << web_whitelist_widgets_;
 
-    connect(ui.openWebClientButton, SIGNAL(clicked()), &mySession, SLOT(launchWebInterface()));
+    connect(ui.openWebClientButton, SIGNAL(clicked()), &session_, SLOT(launchWebInterface()));
 }
 
 /***
@@ -347,7 +347,7 @@ void PrefsDialog::initSpeedTab()
         ui.altSpeedLimitDaysCombo->addItem(qtDayName(i), qtDayToTrDay(i));
     }
 
-    ui.altSpeedLimitDaysCombo->setCurrentIndex(ui.altSpeedLimitDaysCombo->findData(myPrefs.getInt(
+    ui.altSpeedLimitDaysCombo->setCurrentIndex(ui.altSpeedLimitDaysCombo->findData(prefs_.getInt(
         Prefs::ALT_SPEED_LIMIT_TIME_DAY)));
 
     linkWidgetToPref(ui.uploadSpeedLimitCheck, Prefs::USPEED_ENABLED);
@@ -360,7 +360,7 @@ void PrefsDialog::initSpeedTab()
     linkWidgetToPref(ui.altSpeedLimitStartTimeEdit, Prefs::ALT_SPEED_LIMIT_TIME_BEGIN);
     linkWidgetToPref(ui.altSpeedLimitEndTimeEdit, Prefs::ALT_SPEED_LIMIT_TIME_END);
 
-    mySchedWidgets << ui.altSpeedLimitStartTimeEdit << ui.altSpeedLimitToLabel << ui.altSpeedLimitEndTimeEdit <<
+    sched_widgets_ << ui.altSpeedLimitStartTimeEdit << ui.altSpeedLimitToLabel << ui.altSpeedLimitEndTimeEdit <<
         ui.altSpeedLimitDaysLabel << ui.altSpeedLimitDaysCombo;
 
     auto* cr = new ColumnResizer(this);
@@ -391,7 +391,7 @@ void PrefsDialog::initDesktopTab()
 void PrefsDialog::onPortTested(bool isOpen)
 {
     ui.testPeerPortButton->setEnabled(true);
-    myWidgets[Prefs::PEER_PORT]->setEnabled(true);
+    widgets_[Prefs::PEER_PORT]->setEnabled(true);
     ui.peerPortStatusLabel->setText(isOpen ? tr("Port is <b>open</b>") : tr("Port is <b>closed</b>"));
 }
 
@@ -399,8 +399,8 @@ void PrefsDialog::onPortTest()
 {
     ui.peerPortStatusLabel->setText(tr("Testing TCP Port..."));
     ui.testPeerPortButton->setEnabled(false);
-    myWidgets[Prefs::PEER_PORT]->setEnabled(false);
-    mySession.portTest();
+    widgets_[Prefs::PEER_PORT]->setEnabled(false);
+    session_.portTest();
 }
 
 void PrefsDialog::initNetworkTab()
@@ -424,7 +424,7 @@ void PrefsDialog::initNetworkTab()
     cr->update();
 
     connect(ui.testPeerPortButton, SIGNAL(clicked()), SLOT(onPortTest()));
-    connect(&mySession, SIGNAL(portTested(bool)), SLOT(onPortTested(bool)));
+    connect(&session_, SIGNAL(portTested(bool)), SLOT(onPortTested(bool)));
 }
 
 /***
@@ -435,29 +435,29 @@ void PrefsDialog::onBlocklistDialogDestroyed(QObject* o)
 {
     Q_UNUSED(o)
 
-    myBlocklistDialog = nullptr;
+    blocklist_dialog_ = nullptr;
 }
 
 void PrefsDialog::onUpdateBlocklistCancelled()
 {
-    disconnect(&mySession, SIGNAL(blocklistUpdated(int)), this, SLOT(onBlocklistUpdated(int)));
-    myBlocklistDialog->deleteLater();
+    disconnect(&session_, SIGNAL(blocklistUpdated(int)), this, SLOT(onBlocklistUpdated(int)));
+    blocklist_dialog_->deleteLater();
 }
 
 void PrefsDialog::onBlocklistUpdated(int n)
 {
-    myBlocklistDialog->setText(tr("<b>Update succeeded!</b><p>Blocklist now has %Ln rule(s).", nullptr, n));
-    myBlocklistDialog->setTextFormat(Qt::RichText);
+    blocklist_dialog_->setText(tr("<b>Update succeeded!</b><p>Blocklist now has %Ln rule(s).", nullptr, n));
+    blocklist_dialog_->setTextFormat(Qt::RichText);
 }
 
 void PrefsDialog::onUpdateBlocklistClicked()
 {
-    myBlocklistDialog = new QMessageBox(QMessageBox::Information, QString(),
+    blocklist_dialog_ = new QMessageBox(QMessageBox::Information, QString(),
         tr("<b>Update Blocklist</b><p>Getting new blocklist..."), QMessageBox::Close, this);
-    connect(myBlocklistDialog, SIGNAL(rejected()), this, SLOT(onUpdateBlocklistCancelled()));
-    connect(&mySession, SIGNAL(blocklistUpdated(int)), this, SLOT(onBlocklistUpdated(int)));
-    myBlocklistDialog->show();
-    mySession.updateBlocklist();
+    connect(blocklist_dialog_, SIGNAL(rejected()), this, SLOT(onUpdateBlocklistCancelled()));
+    connect(&session_, SIGNAL(blocklistUpdated(int)), this, SLOT(onBlocklistUpdated(int)));
+    blocklist_dialog_->show();
+    session_.updateBlocklist();
 }
 
 void PrefsDialog::encryptionEdited(int i)
@@ -477,7 +477,7 @@ void PrefsDialog::initPrivacyTab()
     linkWidgetToPref(ui.blocklistEdit, Prefs::BLOCKLIST_URL);
     linkWidgetToPref(ui.autoUpdateBlocklistCheck, Prefs::BLOCKLIST_UPDATES_ENABLED);
 
-    myBlockWidgets << ui.blocklistEdit << ui.blocklistStatusLabel << ui.updateBlocklistButton << ui.autoUpdateBlocklistCheck;
+    block_widgets_ << ui.blocklistEdit << ui.blocklistStatusLabel << ui.updateBlocklistButton << ui.autoUpdateBlocklistCheck;
 
     auto* cr = new ColumnResizer(this);
     cr->addLayout(ui.encryptionSectionLayout);
@@ -542,8 +542,8 @@ void PrefsDialog::initDownloadingTab()
 
     ui.watchDirStack->setMinimumWidth(200);
 
-    ui.downloadDirFreeSpaceLabel->setSession(mySession);
-    ui.downloadDirFreeSpaceLabel->setPath(myPrefs.getString(Prefs::DOWNLOAD_DIR));
+    ui.downloadDirFreeSpaceLabel->setSession(session_);
+    ui.downloadDirFreeSpaceLabel->setPath(prefs_.getString(Prefs::DOWNLOAD_DIR));
 
     linkWidgetToPref(ui.watchDirCheck, Prefs::DIR_WATCH_ENABLED);
     linkWidgetToPref(ui.watchDirButton, Prefs::DIR_WATCH);
@@ -578,10 +578,10 @@ void PrefsDialog::initDownloadingTab()
 
 void PrefsDialog::updateDownloadingWidgetsLocality()
 {
-    ui.watchDirStack->setCurrentWidget(myIsLocal ? static_cast<QWidget*>(ui.watchDirButton) : ui.watchDirEdit);
-    ui.downloadDirStack->setCurrentWidget(myIsLocal ? static_cast<QWidget*>(ui.downloadDirButton) : ui.downloadDirEdit);
-    ui.incompleteDirStack->setCurrentWidget(myIsLocal ? static_cast<QWidget*>(ui.incompleteDirButton) : ui.incompleteDirEdit);
-    ui.completionScriptStack->setCurrentWidget(myIsLocal ? static_cast<QWidget*>(ui.completionScriptButton) :
+    ui.watchDirStack->setCurrentWidget(is_local_ ? static_cast<QWidget*>(ui.watchDirButton) : ui.watchDirEdit);
+    ui.downloadDirStack->setCurrentWidget(is_local_ ? static_cast<QWidget*>(ui.downloadDirButton) : ui.downloadDirEdit);
+    ui.incompleteDirStack->setCurrentWidget(is_local_ ? static_cast<QWidget*>(ui.incompleteDirButton) : ui.incompleteDirEdit);
+    ui.completionScriptStack->setCurrentWidget(is_local_ ? static_cast<QWidget*>(ui.completionScriptButton) :
         ui.completionScriptEdit);
 
     ui.watchDirStack->setFixedHeight(ui.watchDirStack->currentWidget()->sizeHint().height());
@@ -598,10 +598,10 @@ void PrefsDialog::updateDownloadingWidgetsLocality()
 
 PrefsDialog::PrefsDialog(Session& session, Prefs& prefs, QWidget* parent) :
     BaseDialog(parent),
-    mySession(session),
-    myPrefs(prefs),
-    myIsServer(session.isServer()),
-    myIsLocal(mySession.isLocal())
+    session_(session),
+    prefs_(prefs),
+    is_server_(session.isServer()),
+    is_local_(session_.isLocal())
 {
     ui.setupUi(this);
 
@@ -613,7 +613,7 @@ PrefsDialog::PrefsDialog(Session& session, Prefs& prefs, QWidget* parent) :
     initDesktopTab();
     initRemoteTab();
 
-    connect(&mySession, SIGNAL(sessionUpdated()), SLOT(sessionUpdated()));
+    connect(&session_, SIGNAL(sessionUpdated()), SLOT(sessionUpdated()));
 
     QList<int> keys;
     keys << Prefs::RPC_ENABLED << Prefs::ALT_SPEED_LIMIT_ENABLED << Prefs::ALT_SPEED_LIMIT_TIME_ENABLED << Prefs::ENCRYPTION <<
@@ -627,9 +627,9 @@ PrefsDialog::PrefsDialog(Session& session, Prefs& prefs, QWidget* parent) :
 
     // if it's a remote session, disable the preferences
     // that don't work in remote sessions
-    if (!myIsServer)
+    if (!is_server_)
     {
-        for (QWidget* const w : myUnsupportedWhenRemote)
+        for (QWidget* const w : unsupported_when_remote_)
         {
             w->setToolTip(tr("Not supported by remote sessions"));
             w->setEnabled(false);
@@ -643,7 +643,7 @@ PrefsDialog::~PrefsDialog() = default;
 
 void PrefsDialog::setPref(int key, QVariant const& v)
 {
-    myPrefs.set(key, v);
+    prefs_.set(key, v);
     refreshPref(key);
 }
 
@@ -653,11 +653,11 @@ void PrefsDialog::setPref(int key, QVariant const& v)
 
 void PrefsDialog::sessionUpdated()
 {
-    bool const isLocal = mySession.isLocal();
+    bool const isLocal = session_.isLocal();
 
-    if (myIsLocal != isLocal)
+    if (is_local_ != isLocal)
     {
-        myIsLocal = isLocal;
+        is_local_ = isLocal;
         updateDownloadingWidgetsLocality();
     }
 
@@ -666,7 +666,7 @@ void PrefsDialog::sessionUpdated()
 
 void PrefsDialog::updateBlocklistLabel()
 {
-    int const n = mySession.blocklistSize();
+    int const n = session_.blocklistSize();
     ui.blocklistStatusLabel->setText(tr("<i>Blocklist contains %Ln rule(s)</i>", nullptr, n));
 }
 
@@ -678,21 +678,21 @@ void PrefsDialog::refreshPref(int key)
     case Prefs::RPC_WHITELIST_ENABLED:
     case Prefs::RPC_AUTH_REQUIRED:
         {
-            bool const enabled(myPrefs.getBool(Prefs::RPC_ENABLED));
-            bool const whitelist(myPrefs.getBool(Prefs::RPC_WHITELIST_ENABLED));
-            bool const auth(myPrefs.getBool(Prefs::RPC_AUTH_REQUIRED));
+            bool const enabled(prefs_.getBool(Prefs::RPC_ENABLED));
+            bool const whitelist(prefs_.getBool(Prefs::RPC_WHITELIST_ENABLED));
+            bool const auth(prefs_.getBool(Prefs::RPC_AUTH_REQUIRED));
 
-            for (QWidget* const w : myWebWhitelistWidgets)
+            for (QWidget* const w : web_whitelist_widgets_)
             {
                 w->setEnabled(enabled && whitelist);
             }
 
-            for (QWidget* const w : myWebAuthWidgets)
+            for (QWidget* const w : web_auth_widgets_)
             {
                 w->setEnabled(enabled && auth);
             }
 
-            for (QWidget* const w : myWebWidgets)
+            for (QWidget* const w : web_widgets_)
             {
                 w->setEnabled(enabled);
             }
@@ -702,9 +702,9 @@ void PrefsDialog::refreshPref(int key)
 
     case Prefs::ALT_SPEED_LIMIT_TIME_ENABLED:
         {
-            bool const enabled = myPrefs.getBool(key);
+            bool const enabled = prefs_.getBool(key);
 
-            for (QWidget* const w : mySchedWidgets)
+            for (QWidget* const w : sched_widgets_)
             {
                 w->setEnabled(enabled);
             }
@@ -714,9 +714,9 @@ void PrefsDialog::refreshPref(int key)
 
     case Prefs::BLOCKLIST_ENABLED:
         {
-            bool const enabled = myPrefs.getBool(key);
+            bool const enabled = prefs_.getBool(key);
 
-            for (QWidget* const w : myBlockWidgets)
+            for (QWidget* const w : block_widgets_)
             {
                 w->setEnabled(enabled);
             }
@@ -733,9 +733,9 @@ void PrefsDialog::refreshPref(int key)
         break;
     }
 
-    key2widget_t::iterator it(myWidgets.find(key));
+    key2widget_t::iterator it(widgets_.find(key));
 
-    if (it != myWidgets.end())
+    if (it != widgets_.end())
     {
         QWidget* w(it.value());
 
@@ -744,7 +744,7 @@ void PrefsDialog::refreshPref(int key)
             if (key == Prefs::ENCRYPTION)
             {
                 auto* comboBox = qobject_cast<QComboBox*>(w);
-                int const index = comboBox->findData(myPrefs.getInt(key));
+                int const index = comboBox->findData(prefs_.getInt(key));
                 comboBox->setCurrentIndex(index);
             }
         }

@@ -91,10 +91,10 @@ private slots:
     void localRequestFinished(TrVariantPtr response);
 
 private:
-    tr_session* mySession;
-    QString mySessionId;
-    QUrl myUrl;
-    QNetworkAccessManager* myNAM;
-    QHash<int64_t, QFutureInterface<RpcResponse>> myLocalRequests;
-    int64_t myNextTag;
+    tr_session* session_;
+    QString session_id_;
+    QUrl url_;
+    QNetworkAccessManager* nam_;
+    QHash<int64_t, QFutureInterface<RpcResponse>> local_requests_;
+    int64_t next_tag_;
 };

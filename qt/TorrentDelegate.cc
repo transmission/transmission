@@ -41,9 +41,9 @@ namespace
 class ItemLayout
 {
 private:
-    QString myNameText;
-    QString myStatusText;
-    QString myProgressText;
+    QString name_text_;
+    QString status_text_;
+    QString progress_text_;
 
 public:
     QFont nameFont;
@@ -67,17 +67,17 @@ public:
 
     QString nameText() const
     {
-        return elidedText(nameFont, myNameText, nameRect.width());
+        return elidedText(nameFont, name_text_, nameRect.width());
     }
 
     QString statusText() const
     {
-        return elidedText(statusFont, myStatusText, statusRect.width());
+        return elidedText(statusFont, status_text_, statusRect.width());
     }
 
     QString progressText() const
     {
-        return elidedText(progressFont, myProgressText, progressRect.width());
+        return elidedText(progressFont, progress_text_, progressRect.width());
     }
 
 private:
@@ -89,9 +89,9 @@ private:
 
 ItemLayout::ItemLayout(QString const& nameText, QString const& statusText, QString const& progressText, QIcon const& emblemIcon,
     QFont const& baseFont, Qt::LayoutDirection direction, QPoint const& topLeft, int width) :
-    myNameText(nameText),
-    myStatusText(statusText),
-    myProgressText(progressText),
+    name_text_(nameText),
+    status_text_(statusText),
+    progress_text_(progressText),
     nameFont(baseFont),
     statusFont(baseFont),
     progressFont(baseFont)
@@ -101,15 +101,15 @@ ItemLayout::ItemLayout(QString const& nameText, QString const& statusText, QStri
 
     nameFont.setWeight(QFont::Bold);
     QFontMetrics const nameFM(nameFont);
-    QSize const nameSize(nameFM.size(0, myNameText));
+    QSize const nameSize(nameFM.size(0, name_text_));
 
     statusFont.setPointSize(static_cast<int>(statusFont.pointSize() * 0.9));
     QFontMetrics const statusFM(statusFont);
-    QSize const statusSize(statusFM.size(0, myStatusText));
+    QSize const statusSize(statusFM.size(0, status_text_));
 
     progressFont.setPointSize(static_cast<int>(progressFont.pointSize() * 0.9));
     QFontMetrics const progressFM(progressFont);
-    QSize const progressSize(progressFM.size(0, myProgressText));
+    QSize const progressSize(progressFM.size(0, progress_text_));
 
     QRect baseRect(topLeft, QSize(width, 0));
     Utils::narrowRect(baseRect, iconSize + GUI_PAD, 0, direction);
@@ -128,10 +128,10 @@ ItemLayout::ItemLayout(QString const& nameText, QString const& statusText, QStri
 
 TorrentDelegate::TorrentDelegate(QObject* parent) :
     QStyledItemDelegate(parent),
-    myProgressBarStyle(new QStyleOptionProgressBar)
+    progress_bar_style_(new QStyleOptionProgressBar)
 {
-    myProgressBarStyle->minimum = 0;
-    myProgressBarStyle->maximum = 1000;
+    progress_bar_style_->minimum = 0;
+    progress_bar_style_->maximum = 1000;
 
     greenBrush = QColor("forestgreen");
     greenBack = QColor("darkseagreen");
@@ -145,7 +145,7 @@ TorrentDelegate::TorrentDelegate(QObject* parent) :
 
 TorrentDelegate::~TorrentDelegate()
 {
-    delete myProgressBarStyle;
+    delete progress_bar_style_;
 }
 
 /***
@@ -403,25 +403,25 @@ QSize TorrentDelegate::sizeHint(QStyleOptionViewItem const& option, Torrent cons
 QSize TorrentDelegate::sizeHint(QStyleOptionViewItem const& option, QModelIndex const& index) const
 {
     // if the font changed, invalidate the height cache
-    if (myHeightFont != option.font)
+    if (height_font_ != option.font)
     {
-        myHeightFont = option.font;
-        myHeightHint.reset();
+        height_font_ = option.font;
+        height_hint_.reset();
     }
 
     // ensure the height is cached
-    if (!myHeightHint)
+    if (!height_hint_)
     {
         auto const* tor = index.data(TorrentModel::TorrentRole).value<Torrent const*>();
-        myHeightHint = sizeHint(option, *tor).height();
+        height_hint_ = sizeHint(option, *tor).height();
     }
 
-    return QSize(option.rect.width(), *myHeightHint);
+    return QSize(option.rect.width(), *height_hint_);
 }
 
 QIcon& TorrentDelegate::getWarningEmblem() const
 {
-    auto& icon = myWarningEmblem;
+    auto& icon = warning_emblem_;
 
     if (icon.isNull())
     {
@@ -452,15 +452,15 @@ void TorrentDelegate::setProgressBarPercentDone(QStyleOptionViewItem const& opti
     if (tor.isSeeding() && tor.getSeedRatio(seedRatioLimit))
     {
         double const seedRateRatio = tor.ratio() / seedRatioLimit;
-        int const scaledProgress = seedRateRatio * (myProgressBarStyle->maximum - myProgressBarStyle->minimum);
-        myProgressBarStyle->progress = myProgressBarStyle->minimum + scaledProgress;
+        int const scaledProgress = seedRateRatio * (progress_bar_style_->maximum - progress_bar_style_->minimum);
+        progress_bar_style_->progress = progress_bar_style_->minimum + scaledProgress;
     }
     else
     {
         bool const isMagnet(!tor.hasMetadata());
-        myProgressBarStyle->direction = option.direction;
-        myProgressBarStyle->progress = static_cast<int>(myProgressBarStyle->minimum + (isMagnet ? tor.metadataPercentDone() :
-            tor.percentDone()) * (myProgressBarStyle->maximum - myProgressBarStyle->minimum));
+        progress_bar_style_->direction = option.direction;
+        progress_bar_style_->progress = static_cast<int>(progress_bar_style_->minimum + (isMagnet ? tor.metadataPercentDone() :
+            tor.percentDone()) * (progress_bar_style_->maximum - progress_bar_style_->minimum));
     }
 }
 
@@ -578,31 +578,31 @@ void TorrentDelegate::drawTorrent(QPainter* painter, QStyleOptionViewItem const&
     painter->drawText(layout.statusRect, Qt::AlignLeft | Qt::AlignVCenter, layout.statusText());
     painter->setFont(layout.progressFont);
     painter->drawText(layout.progressRect, Qt::AlignLeft | Qt::AlignVCenter, layout.progressText());
-    myProgressBarStyle->rect = layout.barRect;
+    progress_bar_style_->rect = layout.barRect;
 
     if (tor.isDownloading())
     {
-        myProgressBarStyle->palette.setBrush(QPalette::Highlight, blueBrush);
-        myProgressBarStyle->palette.setColor(QPalette::Base, blueBack);
-        myProgressBarStyle->palette.setColor(QPalette::Window, blueBack);
+        progress_bar_style_->palette.setBrush(QPalette::Highlight, blueBrush);
+        progress_bar_style_->palette.setColor(QPalette::Base, blueBack);
+        progress_bar_style_->palette.setColor(QPalette::Window, blueBack);
     }
     else if (tor.isSeeding())
     {
-        myProgressBarStyle->palette.setBrush(QPalette::Highlight, greenBrush);
-        myProgressBarStyle->palette.setColor(QPalette::Base, greenBack);
-        myProgressBarStyle->palette.setColor(QPalette::Window, greenBack);
+        progress_bar_style_->palette.setBrush(QPalette::Highlight, greenBrush);
+        progress_bar_style_->palette.setColor(QPalette::Base, greenBack);
+        progress_bar_style_->palette.setColor(QPalette::Window, greenBack);
     }
     else
     {
-        myProgressBarStyle->palette.setBrush(QPalette::Highlight, silverBrush);
-        myProgressBarStyle->palette.setColor(QPalette::Base, silverBack);
-        myProgressBarStyle->palette.setColor(QPalette::Window, silverBack);
+        progress_bar_style_->palette.setBrush(QPalette::Highlight, silverBrush);
+        progress_bar_style_->palette.setColor(QPalette::Base, silverBack);
+        progress_bar_style_->palette.setColor(QPalette::Window, silverBack);
     }
 
-    myProgressBarStyle->state = progressBarState;
+    progress_bar_style_->state = progressBarState;
     setProgressBarPercentDone(option, tor);
 
-    style->drawControl(QStyle::CE_ProgressBar, myProgressBarStyle, painter);
+    style->drawControl(QStyle::CE_ProgressBar, progress_bar_style_, painter);
 
     painter->restore();
 }

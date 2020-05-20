@@ -28,7 +28,7 @@ int getHSpacing(QWidget const* w)
 
 FilterBarComboBoxDelegate::FilterBarComboBoxDelegate(QObject* parent, QComboBox* combo) :
     QItemDelegate(parent),
-    myCombo(combo)
+    combo_(combo)
 {
 }
 
@@ -63,7 +63,7 @@ void FilterBarComboBoxDelegate::paint(QPainter* painter, QStyleOptionViewItem co
 
         QStyleOption opt;
         opt.rect = rect;
-        myCombo->style()->drawPrimitive(QStyle::PE_IndicatorToolBarSeparator, &opt, painter, myCombo);
+        combo_->style()->drawPrimitive(QStyle::PE_IndicatorToolBarSeparator, &opt, painter, combo_);
     }
     else
     {
@@ -75,11 +75,11 @@ void FilterBarComboBoxDelegate::paint(QPainter* painter, QStyleOptionViewItem co
 
         QRect boundingBox = option.rect;
 
-        int const hmargin = getHSpacing(myCombo);
+        int const hmargin = getHSpacing(combo_);
         boundingBox.adjust(hmargin, 0, -hmargin, 0);
 
         QRect decorationRect = rect(option, index, Qt::DecorationRole);
-        decorationRect.setSize(myCombo->iconSize());
+        decorationRect.setSize(combo_->iconSize());
         decorationRect = QStyle::alignedRect(option.direction, Qt::AlignLeft | Qt::AlignVCenter, decorationRect.size(),
             boundingBox);
         Utils::narrowRect(boundingBox, decorationRect.width() + hmargin, 0, option.direction);
@@ -103,16 +103,16 @@ QSize FilterBarComboBoxDelegate::sizeHint(QStyleOptionViewItem const& option, QM
 {
     if (isSeparator(index))
     {
-        int const pm = myCombo->style()->pixelMetric(QStyle::PM_DefaultFrameWidth, nullptr, myCombo);
+        int const pm = combo_->style()->pixelMetric(QStyle::PM_DefaultFrameWidth, nullptr, combo_);
         return QSize(pm, pm + 10);
     }
 
-    QStyle* s = myCombo->style();
-    int const hmargin = getHSpacing(myCombo);
+    QStyle* s = combo_->style();
+    int const hmargin = getHSpacing(combo_);
 
     QSize size = QItemDelegate::sizeHint(option, index);
-    size.setHeight(qMax(size.height(), myCombo->iconSize().height() + 6));
-    size.rwidth() += s->pixelMetric(QStyle::PM_FocusFrameHMargin, nullptr, myCombo);
+    size.setHeight(qMax(size.height(), combo_->iconSize().height() + 6));
+    size.rwidth() += s->pixelMetric(QStyle::PM_FocusFrameHMargin, nullptr, combo_);
     size.rwidth() += rect(option, index, FilterBarComboBox::CountStringRole).width();
     size.rwidth() += hmargin * 4;
     return size;

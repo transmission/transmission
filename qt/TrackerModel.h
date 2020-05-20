@@ -48,5 +48,5 @@ private:
     using rows_t = QVector<TrackerInfo>;
 
 private:
-    rows_t myRows;
+    rows_t rows_;
 };

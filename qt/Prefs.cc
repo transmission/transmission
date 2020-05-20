@@ -25,7 +25,7 @@
 ****
 ***/
 
-Prefs::PrefItem Prefs::myItems[] =
+Prefs::PrefItem Prefs::items_[] =
 {
     /* gui settings */
     { OPTIONS_PROMPT, TR_KEY_show_options_window, QVariant::Bool },
@@ -126,27 +126,27 @@ Prefs::PrefItem Prefs::myItems[] =
 ***/
 
 Prefs::Prefs(QString const& configDir) :
-    myConfigDir(configDir)
+    config_dir_(configDir)
 {
-    assert(sizeof(myItems) / sizeof(myItems[0]) == PREFS_COUNT);
+    assert(sizeof(items_) / sizeof(items_[0]) == PREFS_COUNT);
 
 #ifndef NDEBUG
 
     for (int i = 0; i < PREFS_COUNT; ++i)
     {
-        assert(myItems[i].id == i);
+        assert(items_[i].id == i);
     }
 
 #endif
 
     // these are the prefs that don't get saved to settings.json
     // when the application exits.
-    myTemporaryPrefs << FILTER_TEXT;
+    temporary_prefs_ << FILTER_TEXT;
 
     tr_variant top;
     tr_variantInitDict(&top, 0);
     initDefaults(&top);
-    tr_sessionLoadSettings(&top, myConfigDir.toUtf8().constData(), nullptr);
+    tr_sessionLoadSettings(&top, config_dir_.toUtf8().constData(), nullptr);
 
     for (int i = 0; i < PREFS_COUNT; ++i)
     {
@@ -155,14 +155,14 @@ Prefs::Prefs(QString const& configDir) :
         int64_t intVal;
         char const* str;
         size_t strLen;
-        tr_variant* b(tr_variantDictFind(&top, myItems[i].key));
+        tr_variant* b(tr_variantDictFind(&top, items_[i].key));
 
-        switch (myItems[i].type)
+        switch (items_[i].type)
         {
         case QVariant::Int:
             if (tr_variantGetInt(b, &intVal))
             {
-                myValues[i].setValue(static_cast<qlonglong>(intVal));
+                values_[i].setValue(static_cast<qlonglong>(intVal));
             }
 
             break;
@@ -170,7 +170,7 @@ Prefs::Prefs(QString const& configDir) :
         case CustomVariantType::SortModeType:
             if (tr_variantGetStr(b, &str, nullptr))
             {
-                myValues[i] = QVariant::fromValue(SortMode(QString::fromUtf8(str)));
+                values_[i] = QVariant::fromValue(SortMode(QString::fromUtf8(str)));
             }
 
             break;
@@ -178,7 +178,7 @@ Prefs::Prefs(QString const& configDir) :
         case CustomVariantType::FilterModeType:
             if (tr_variantGetStr(b, &str, nullptr))
             {
-                myValues[i] = QVariant::fromValue(FilterMode(QString::fromUtf8(str)));
+                values_[i] = QVariant::fromValue(FilterMode(QString::fromUtf8(str)));
             }
 
             break;
@@ -186,7 +186,7 @@ Prefs::Prefs(QString const& configDir) :
         case QVariant::String:
             if (tr_variantGetStr(b, &str, &strLen))
             {
-                myValues[i].setValue(QString::fromUtf8(str, strLen));
+                values_[i].setValue(QString::fromUtf8(str, strLen));
             }
 
             break;
@@ -194,7 +194,7 @@ Prefs::Prefs(QString const& configDir) :
         case QVariant::Bool:
             if (tr_variantGetBool(b, &boolVal))
             {
-                myValues[i].setValue(static_cast<bool>(boolVal));
+                values_[i].setValue(static_cast<bool>(boolVal));
             }
 
             break;
@@ -202,7 +202,7 @@ Prefs::Prefs(QString const& configDir) :
         case QVariant::Double:
             if (tr_variantGetReal(b, &d))
             {
-                myValues[i].setValue(d);
+                values_[i].setValue(d);
             }
 
             break;
@@ -210,7 +210,7 @@ Prefs::Prefs(QString const& configDir) :
         case QVariant::DateTime:
             if (tr_variantGetInt(b, &intVal))
             {
-                myValues[i].setValue(QDateTime::fromTime_t(intVal));
+                values_[i].setValue(QDateTime::fromTime_t(intVal));
             }
 
             break;
@@ -232,15 +232,15 @@ Prefs::~Prefs()
 
     for (int i = 0; i < PREFS_COUNT; ++i)
     {
-        if (myTemporaryPrefs.contains(i))
+        if (temporary_prefs_.contains(i))
         {
             continue;
         }
 
-        tr_quark const key = myItems[i].key;
-        QVariant const& val = myValues[i];
+        tr_quark const key = items_[i].key;
+        QVariant const& val = values_[i];
 
-        switch (myItems[i].type)
+        switch (items_[i].type)
         {
         case QVariant::Int:
             tr_variantDictAddInt(&current_settings, key, val.toInt());
@@ -291,7 +291,7 @@ Prefs::~Prefs()
 
     // update settings.json with our settings
     tr_variant file_settings;
-    QFile const file(QDir(myConfigDir).absoluteFilePath(QLatin1String("settings.json")));
+    QFile const file(QDir(config_dir_).absoluteFilePath(QLatin1String("settings.json")));
 
     if (!tr_variantFromFile(&file_settings, TR_VARIANT_FMT_JSON, file.fileName().toUtf8().constData(), nullptr))
     {
@@ -360,39 +360,39 @@ void Prefs::initDefaults(tr_variant* d)
 
 bool Prefs::getBool(int key) const
 {
-    assert(myItems[key].type == QVariant::Bool);
-    return myValues[key].toBool();
+    assert(items_[key].type == QVariant::Bool);
+    return values_[key].toBool();
 }
 
 QString Prefs::getString(int key) const
 {
-    assert(myItems[key].type == QVariant::String);
-    QByteArray const b = myValues[key].toByteArray();
+    assert(items_[key].type == QVariant::String);
+    QByteArray const b = values_[key].toByteArray();
 
     if (Utils::isValidUtf8(b.constData()))
     {
-        myValues[key].setValue(QString::fromUtf8(b.constData()));
+        values_[key].setValue(QString::fromUtf8(b.constData()));
     }
 
-    return myValues[key].toString();
+    return values_[key].toString();
 }
 
 int Prefs::getInt(int key) const
 {
-    assert(myItems[key].type == QVariant::Int);
-    return myValues[key].toInt();
+    assert(items_[key].type == QVariant::Int);
+    return values_[key].toInt();
 }
 
 double Prefs::getDouble(int key) const
 {
-    assert(myItems[key].type == QVariant::Double);
-    return myValues[key].toDouble();
+    assert(items_[key].type == QVariant::Double);
+    return values_[key].toDouble();
 }
 
 QDateTime Prefs::getDateTime(int key) const
 {
-    assert(myItems[key].type == QVariant::DateTime);
-    return myValues[key].toDateTime();
+    assert(items_[key].type == QVariant::DateTime);
+    return values_[key].toDateTime();
 }
 
 /***

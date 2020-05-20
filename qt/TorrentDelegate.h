@@ -44,7 +44,7 @@ protected:
     static QString shortTransferString(Torrent const& tor);
 
 protected:
-    QStyleOptionProgressBar* myProgressBarStyle;
+    QStyleOptionProgressBar* progress_bar_style_;
 
     static QColor blueBrush;
     static QColor greenBrush;
@@ -54,7 +54,7 @@ protected:
     static QColor silverBack;
 
 private:
-    mutable std::optional<int> myHeightHint;
-    mutable QFont myHeightFont;
-    mutable QIcon myWarningEmblem;
+    mutable std::optional<int> height_hint_;
+    mutable QFont height_font_;
+    mutable QIcon warning_emblem_;
 };

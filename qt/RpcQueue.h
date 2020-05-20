@@ -28,19 +28,19 @@ public:
 
     void setTolerateErrors(bool tolerateErrors = true)
     {
-        myTolerateErrors = tolerateErrors;
+        tolerate_errors_ = tolerateErrors;
     }
 
     template<typename Func>
     void add(Func func)
     {
-        myQueue.enqueue(qMakePair(normalizeFunc(func), ErrorHandlerFunction()));
+        queue_.enqueue(qMakePair(normalizeFunc(func), ErrorHandlerFunction()));
     }
 
     template<typename Func, typename ErrorHandler>
     void add(Func func, ErrorHandler errorHandler)
     {
-        myQueue.enqueue(qMakePair(normalizeFunc(func), normalizeErrorHandler(errorHandler)));
+        queue_.enqueue(qMakePair(normalizeFunc(func), normalizeErrorHandler(errorHandler)));
     }
 
     // The first function in queue is ran synchronously
@@ -138,9 +138,9 @@ private:
     }
 
 private:
-    bool myTolerateErrors;
-    QFutureInterface<RpcResponse> myPromise;
-    QQueue<QPair<QueuedFunction, ErrorHandlerFunction>> myQueue;
-    ErrorHandlerFunction myNextErrorHandler;
-    QFutureWatcher<RpcResponse> myFutureWatcher;
+    bool tolerate_errors_;
+    QFutureInterface<RpcResponse> promise_;
+    QQueue<QPair<QueuedFunction, ErrorHandlerFunction>> queue_;
+    ErrorHandlerFunction next_error_handler_;
+    QFutureWatcher<RpcResponse> future_watcher_;
 };

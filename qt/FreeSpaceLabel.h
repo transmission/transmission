@@ -37,7 +37,7 @@ private slots:
     void onTimer();
 
 private:
-    Session* mySession;
-    QString myPath;
-    QTimer myTimer;
+    Session* session_;
+    QString path_;
+    QTimer timer_;
 };

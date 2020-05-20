@@ -13,29 +13,29 @@
 #include "Torrent.h"
 #include "TorrentModel.h"
 
-bool RelocateDialog::myMoveFlag = true;
+bool RelocateDialog::move_flag_ = true;
 
 void RelocateDialog::onSetLocation()
 {
-    mySession.torrentSetLocation(myIds, newLocation(), myMoveFlag);
+    session_.torrentSetLocation(ids_, newLocation(), move_flag_);
     close();
 }
 
 void RelocateDialog::onMoveToggled(bool b)
 {
-    myMoveFlag = b;
+    move_flag_ = b;
 }
 
 RelocateDialog::RelocateDialog(Session& session, TorrentModel const& model, torrent_ids_t const& ids, QWidget* parent) :
     BaseDialog(parent),
-    mySession(session),
-    myIds(ids)
+    session_(session),
+    ids_(ids)
 {
     ui.setupUi(this);
 
     QString path;
 
-    for (int const id : myIds)
+    for (int const id : ids_)
     {
         Torrent const* tor = model.getTorrentFromId(id);
 
@@ -45,7 +45,7 @@ RelocateDialog::RelocateDialog(Session& session, TorrentModel const& model, torr
         }
         else if (path != tor->getPath())
         {
-            if (mySession.isServer())
+            if (session_.isServer())
             {
                 path = QDir::homePath();
             }
@@ -58,7 +58,7 @@ RelocateDialog::RelocateDialog(Session& session, TorrentModel const& model, torr
         }
     }
 
-    if (mySession.isServer())
+    if (session_.isServer())
     {
         ui.newLocationStack->setCurrentWidget(ui.newLocationButton);
         ui.newLocationButton->setMode(PathButton::DirectoryMode);
@@ -75,7 +75,7 @@ RelocateDialog::RelocateDialog(Session& session, TorrentModel const& model, torr
     ui.newLocationStack->setFixedHeight(ui.newLocationStack->currentWidget()->sizeHint().height());
     ui.newLocationLabel->setBuddy(ui.newLocationStack->currentWidget());
 
-    if (myMoveFlag)
+    if (move_flag_)
     {
         ui.moveDataRadio->setChecked(true);
     }

@@ -70,25 +70,25 @@ private slots:
     void onBlocklistUpdated(int n);
 
 private:
-    Session& mySession;
-    Prefs& myPrefs;
+    Session& session_;
+    Prefs& prefs_;
 
     Ui::PrefsDialog ui;
 
-    bool const myIsServer;
-    bool myIsLocal;
+    bool const is_server_;
+    bool is_local_;
 
-    key2widget_t myWidgets;
-    QWidgetList myWebWidgets;
-    QWidgetList myWebAuthWidgets;
-    QWidgetList myWebWhitelistWidgets;
-    QWidgetList myProxyWidgets;
-    QWidgetList myProxyAuthWidgets;
-    QWidgetList mySchedWidgets;
-    QWidgetList myBlockWidgets;
-    QWidgetList myUnsupportedWhenRemote;
+    key2widget_t widgets_;
+    QWidgetList web_widgets_;
+    QWidgetList web_auth_widgets_;
+    QWidgetList web_whitelist_widgets_;
+    QWidgetList proxy_widgets_;
+    QWidgetList proxy_auth_widgets_;
+    QWidgetList sched_widgets_;
+    QWidgetList block_widgets_;
+    QWidgetList unsupported_when_remote_;
 
-    int myBlocklistHttpTag;
-    QHttp* myBlocklistHttp;
-    QMessageBox* myBlocklistDialog;
+    int blocklist_http_tag_;
+    QHttp* blocklist_http_;
+    QMessageBox* blocklist_dialog_;
 };

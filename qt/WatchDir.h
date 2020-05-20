@@ -46,8 +46,8 @@ private slots:
     void rescanAllWatchedDirectories();
 
 private:
-    TorrentModel const& myModel;
+    TorrentModel const& model_;
 
-    QSet<QString> myWatchDirFiles;
-    QFileSystemWatcher* myWatcher;
+    QSet<QString> watch_dir_files_;
+    QFileSystemWatcher* watcher_;
 };

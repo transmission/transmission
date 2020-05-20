@@ -39,25 +39,25 @@ private slots:
     void onProgress();
 
 private:
-    Session& mySession;
-    tr_metainfo_builder& myBuilder;
+    Session& session_;
+    tr_metainfo_builder& builder_;
     Ui::MakeProgressDialog ui;
-    QTimer myTimer;
+    QTimer timer_;
 };
 
 } // namespace
 
 MakeProgressDialog::MakeProgressDialog(Session& session, tr_metainfo_builder& builder, QWidget* parent) :
     BaseDialog(parent),
-    mySession(session),
-    myBuilder(builder)
+    session_(session),
+    builder_(builder)
 {
     ui.setupUi(this);
 
     connect(ui.dialogButtons, SIGNAL(clicked(QAbstractButton*)), this, SLOT(onButtonBoxClicked(QAbstractButton*)));
 
-    connect(&myTimer, SIGNAL(timeout()), this, SLOT(onProgress()));
-    myTimer.start(100);
+    connect(&timer_, SIGNAL(timeout()), this, SLOT(onProgress()));
+    timer_.start(100);
 
     onProgress();
 }
@@ -67,12 +67,12 @@ void MakeProgressDialog::onButtonBoxClicked(QAbstractButton* button)
     switch (ui.dialogButtons->standardButton(button))
     {
     case QDialogButtonBox::Open:
-        mySession.addNewlyCreatedTorrent(QString::fromUtf8(myBuilder.outputFile),
-            QFileInfo(QString::fromUtf8(myBuilder.top)).dir().path());
+        session_.addNewlyCreatedTorrent(QString::fromUtf8(builder_.outputFile),
+            QFileInfo(QString::fromUtf8(builder_.top)).dir().path());
         break;
 
     case QDialogButtonBox::Abort:
-        myBuilder.abortFlag = true;
+        builder_.abortFlag = true;
         break;
 
     default: // QDialogButtonBox::Ok:
@@ -85,7 +85,7 @@ void MakeProgressDialog::onButtonBoxClicked(QAbstractButton* button)
 void MakeProgressDialog::onProgress()
 {
     // progress bar
-    tr_metainfo_builder const& b = myBuilder;
+    tr_metainfo_builder const& b = builder_;
     double const denom = b.pieceCount != 0 ? b.pieceCount : 1;
     ui.progressBar->setValue(static_cast<int>((100.0 * b.pieceIndex) / denom));
 
@@ -137,7 +137,7 @@ void MakeProgressDialog::onProgress()
 
 void MakeDialog::makeTorrent()
 {
-    if (myBuilder == nullptr)
+    if (builder_ == nullptr)
     {
         return;
     }
@@ -164,7 +164,7 @@ void MakeDialog::makeTorrent()
     }
 
     // the file to create
-    QString const path = QString::fromUtf8(myBuilder->top);
+    QString const path = QString::fromUtf8(builder_->top);
     QString const torrentName = QFileInfo(path).completeBaseName() + QLatin1String(".torrent");
     QString const target = QDir(ui.destinationButton->path()).filePath(torrentName);
 
@@ -177,11 +177,11 @@ void MakeDialog::makeTorrent()
     }
 
     // start making the torrent
-    tr_makeMetaInfo(myBuilder.get(), target.toUtf8().constData(), trackers.isEmpty() ? nullptr : trackers.data(),
+    tr_makeMetaInfo(builder_.get(), target.toUtf8().constData(), trackers.isEmpty() ? nullptr : trackers.data(),
         trackers.size(), comment.isEmpty() ? nullptr : comment.toUtf8().constData(), ui.privateCheck->isChecked());
 
     // pop up the dialog
-    auto* dialog = new MakeProgressDialog(mySession, *myBuilder, this);
+    auto* dialog = new MakeProgressDialog(session_, *builder_, this);
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->open();
 }
@@ -201,27 +201,27 @@ QString MakeDialog::getSource() const
 
 void MakeDialog::onSourceChanged()
 {
-    myBuilder.reset();
+    builder_.reset();
 
     QString const filename = getSource();
 
     if (!filename.isEmpty())
     {
-        myBuilder.reset(tr_metaInfoBuilderCreate(filename.toUtf8().constData()));
+        builder_.reset(tr_metaInfoBuilderCreate(filename.toUtf8().constData()));
     }
 
     QString text;
 
-    if (myBuilder == nullptr)
+    if (builder_ == nullptr)
     {
         text = tr("<i>No source selected</i>");
     }
     else
     {
-        QString files = tr("%Ln File(s)", nullptr, myBuilder->fileCount);
-        QString pieces = tr("%Ln Piece(s)", nullptr, myBuilder->pieceCount);
-        text = tr("%1 in %2; %3 @ %4").arg(Formatter::sizeToString(myBuilder->totalSize)).arg(files).arg(pieces).
-            arg(Formatter::sizeToString(myBuilder->pieceSize));
+        QString files = tr("%Ln File(s)", nullptr, builder_->fileCount);
+        QString pieces = tr("%Ln Piece(s)", nullptr, builder_->pieceCount);
+        text = tr("%1 in %2; %3 @ %4").arg(Formatter::sizeToString(builder_->totalSize)).arg(files).arg(pieces).
+            arg(Formatter::sizeToString(builder_->pieceSize));
     }
 
     ui.sourceSizeLabel->setText(text);
@@ -229,8 +229,8 @@ void MakeDialog::onSourceChanged()
 
 MakeDialog::MakeDialog(Session& session, QWidget* parent) :
     BaseDialog(parent),
-    mySession(session),
-    myBuilder(nullptr, &tr_metaInfoBuilderFree)
+    session_(session),
+    builder_(nullptr, &tr_metaInfoBuilderFree)
 {
     ui.setupUi(this);
 

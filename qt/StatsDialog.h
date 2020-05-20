@@ -31,9 +31,9 @@ private slots:
     void updateStats();
 
 private:
-    Session& mySession;
+    Session& session_;
 
     Ui::StatsDialog ui;
 
-    QTimer* myTimer;
+    QTimer* timer_;
 };

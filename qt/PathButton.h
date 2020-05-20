@@ -52,8 +52,8 @@ private slots:
     void onFileSelected(QString const& path);
 
 private:
-    Mode myMode;
-    QString myTitle;
-    QString myNameFilter;
-    QString myPath;
+    Mode mode_;
+    QString title_;
+    QString name_filter_;
+    QString path_;
 };

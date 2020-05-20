@@ -40,27 +40,27 @@ public:
 
     QUrl const& getRemoteUrl() const
     {
-        return myRpc.url();
+        return rpc_.url();
     }
 
     tr_session_stats const& getStats() const
     {
-        return myStats;
+        return stats_;
     }
 
     tr_session_stats const& getCumulativeStats() const
     {
-        return myCumulativeStats;
+        return cumulative_stats_;
     }
 
     QString const& sessionVersion() const
     {
-        return mySessionVersion;
+        return session_version_;
     }
 
     int64_t blocklistSize() const
     {
-        return myBlocklistSize;
+        return blocklist_size_;
     }
 
     void setBlocklistSize(int64_t i);
@@ -137,16 +137,16 @@ private:
     static void updateStats(tr_variant* d, tr_session_stats* stats);
 
 private:
-    QString const myConfigDir;
-    Prefs& myPrefs;
+    QString const config_dir_;
+    Prefs& prefs_;
 
-    int64_t myBlocklistSize;
-    tr_session* mySession;
-    QStringList myIdleJSON;
-    tr_session_stats myStats;
-    tr_session_stats myCumulativeStats;
-    QString mySessionVersion;
-    QString mySessionId;
-    bool myIsDefinitelyLocalSession;
-    RpcClient myRpc;
+    int64_t blocklist_size_;
+    tr_session* session_;
+    QStringList idle_json_;
+    tr_session_stats stats_;
+    tr_session_stats cumulative_stats_;
+    QString session_version_;
+    QString session_id_;
+    bool is_definitely_local_session_;
+    RpcClient rpc_;
 };

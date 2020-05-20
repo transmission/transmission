@@ -52,6 +52,6 @@ private slots:
     void onRequestFinished(QNetworkReply* reply);
 
 private:
-    QNetworkAccessManager* myNAM;
-    std::unordered_map<QString, QPixmap> myPixmaps;
+    QNetworkAccessManager* nam_;
+    std::unordered_map<QString, QPixmap> pixmaps_;
 };

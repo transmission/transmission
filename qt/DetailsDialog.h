@@ -89,20 +89,20 @@ private slots:
     void onIdleLimitChanged();
 
 private:
-    Session& mySession;
-    Prefs& myPrefs;
-    TorrentModel const& myModel;
+    Session& session_;
+    Prefs& prefs_;
+    TorrentModel const& model_;
 
     Ui::DetailsDialog ui;
 
-    torrent_ids_t myIds;
-    QTimer myTimer;
-    bool myChangedTorrents;
-    bool myHavePendingRefresh;
+    torrent_ids_t ids_;
+    QTimer timer_;
+    bool changed_torrents_;
+    bool have_pending_refresh_;
 
-    TrackerModel* myTrackerModel;
-    TrackerModelFilter* myTrackerFilter;
-    TrackerDelegate* myTrackerDelegate;
+    TrackerModel* tracker_model_;
+    TrackerModelFilter* tracker_filter_;
+    TrackerDelegate* tracker_delegate_;
 
-    QMap<QString, QTreeWidgetItem*> myPeers;
+    QMap<QString, QTreeWidgetItem*> peers_;
 };

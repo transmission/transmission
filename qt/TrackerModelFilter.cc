@@ -11,13 +11,13 @@
 
 TrackerModelFilter::TrackerModelFilter(QObject* parent) :
     QSortFilterProxyModel(parent),
-    myShowBackups(false)
+    show_backups_(false)
 {
 }
 
 void TrackerModelFilter::setShowBackupTrackers(bool b)
 {
-    myShowBackups = b;
+    show_backups_ = b;
     invalidateFilter();
 }
 
@@ -25,5 +25,5 @@ bool TrackerModelFilter::filterAcceptsRow(int sourceRow, QModelIndex const& sour
 {
     QModelIndex index = sourceModel()->index(sourceRow, 0, sourceParent);
     auto const trackerInfo = index.data(TrackerModel::TrackerRole).value<TrackerInfo>();
-    return myShowBackups || !trackerInfo.st.isBackup;
+    return show_backups_ || !trackerInfo.st.isBackup;
 }

@@ -23,8 +23,8 @@
 ***/
 
 WatchDir::WatchDir(TorrentModel const& model) :
-    myModel(model),
-    myWatcher(nullptr)
+    model_(model),
+    watcher_(nullptr)
 {
 }
 
@@ -46,7 +46,7 @@ int WatchDir::metainfoTest(QString const& filename) const
     {
         ret = ERROR;
     }
-    else if (myModel.hasTorrent(QString::fromUtf8(inf.hashString)))
+    else if (model_.hasTorrent(QString::fromUtf8(inf.hashString)))
     {
         ret = DUPLICATE;
     }
@@ -81,20 +81,20 @@ void WatchDir::onTimeout()
 void WatchDir::setPath(QString const& path, bool isEnabled)
 {
     // clear out any remnants of the previous watcher, if any
-    myWatchDirFiles.clear();
+    watch_dir_files_.clear();
 
-    if (myWatcher != nullptr)
+    if (watcher_ != nullptr)
     {
-        delete myWatcher;
-        myWatcher = nullptr;
+        delete watcher_;
+        watcher_ = nullptr;
     }
 
     // maybe create a new watcher
     if (isEnabled)
     {
-        myWatcher = new QFileSystemWatcher();
-        myWatcher->addPath(path);
-        connect(myWatcher, SIGNAL(directoryChanged(QString)), this, SLOT(watcherActivated(QString)));
+        watcher_ = new QFileSystemWatcher();
+        watcher_->addPath(path);
+        connect(watcher_, SIGNAL(directoryChanged(QString)), this, SLOT(watcherActivated(QString)));
         // std::cerr << "watching " << qPrintable(path) << " for new .torrent files" << std::endl;
         QTimer::singleShot(0, this, SLOT(rescanAllWatchedDirectories())); // trigger the watchdir for .torrent files in there already
     }
@@ -113,7 +113,7 @@ void WatchDir::watcherActivated(QString const& path)
     }
 
     // try to add any new files which end in .torrent
-    QSet<QString> const newFiles(files - myWatchDirFiles);
+    QSet<QString> const newFiles(files - watch_dir_files_);
     QString const torrentSuffix = QString::fromUtf8(".torrent");
 
     for (QString const& name : newFiles)
@@ -146,17 +146,17 @@ void WatchDir::watcherActivated(QString const& path)
 
     // update our file list so that we can use it
     // for comparison the next time around
-    myWatchDirFiles = files;
+    watch_dir_files_ = files;
 }
 
 void WatchDir::rescanAllWatchedDirectories()
 {
-    if (myWatcher == nullptr)
+    if (watcher_ == nullptr)
     {
         return;
     }
 
-    for (QString const& path : myWatcher->directories())
+    for (QString const& path : watcher_->directories())
     {
         watcherActivated(path);
     }

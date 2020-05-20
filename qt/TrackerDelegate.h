@@ -22,7 +22,7 @@ class TrackerDelegate : public QItemDelegate
 public:
     TrackerDelegate(QObject* parent = nullptr) :
         QItemDelegate(parent),
-        myShowMore(false)
+        show_more_(false)
     {
     }
 
@@ -39,5 +39,5 @@ protected:
     void drawTracker(QPainter*, QStyleOptionViewItem const&, TrackerInfo const&) const;
 
 private:
-    bool myShowMore;
+    bool show_more_;
 };

@@ -30,5 +30,5 @@ private slots:
 private:
     Ui::AboutDialog ui;
 
-    QPointer<LicenseDialog> myLicenseDialog;
+    QPointer<LicenseDialog> license_dialog_;
 };

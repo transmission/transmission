@@ -49,8 +49,8 @@ namespace
 class ItemLayout
 {
 private:
-    QString myNameText;
-    QString myStatusText;
+    QString name_text_;
+    QString status_text_;
 
 public:
     QFont nameFont;
@@ -72,12 +72,12 @@ public:
 
     QString nameText() const
     {
-        return elidedText(nameFont, myNameText, nameRect.width());
+        return elidedText(nameFont, name_text_, nameRect.width());
     }
 
     QString statusText() const
     {
-        return myStatusText;
+        return status_text_;
     }
 
 private:
@@ -89,8 +89,8 @@ private:
 
 ItemLayout::ItemLayout(QString const& nameText, QString const& statusText, QIcon const& emblemIcon, QFont const& baseFont,
     Qt::LayoutDirection direction, QPoint const& topLeft, int width) :
-    myNameText(nameText),
-    myStatusText(statusText),
+    name_text_(nameText),
+    status_text_(statusText),
     nameFont(baseFont),
     statusFont(baseFont)
 {
@@ -98,11 +98,11 @@ ItemLayout::ItemLayout(QString const& nameText, QString const& statusText, QIcon
     int const iconSize(style->pixelMetric(QStyle::PM_SmallIconSize));
 
     QFontMetrics const nameFM(nameFont);
-    QSize const nameSize(nameFM.size(0, myNameText));
+    QSize const nameSize(nameFM.size(0, name_text_));
 
     statusFont.setPointSize(static_cast<int>(statusFont.pointSize() * 0.85));
     QFontMetrics const statusFM(statusFont);
-    QSize const statusSize(statusFM.size(0, myStatusText));
+    QSize const statusSize(statusFM.size(0, status_text_));
 
     QStyleOptionProgressBar barStyle;
     barStyle.rect = QRect(0, 0, BAR_WIDTH, BAR_HEIGHT);
@@ -249,33 +249,33 @@ void TorrentDelegateMin::drawTorrent(QPainter* painter, QStyleOptionViewItem con
     painter->drawText(layout.nameRect, Qt::AlignLeft | Qt::AlignVCenter, layout.nameText());
     painter->setFont(layout.statusFont);
     painter->drawText(layout.statusRect, Qt::AlignLeft | Qt::AlignVCenter, layout.statusText());
-    myProgressBarStyle->rect = layout.barRect;
+    progress_bar_style_->rect = layout.barRect;
 
     if (tor.isDownloading())
     {
-        myProgressBarStyle->palette.setBrush(QPalette::Highlight, blueBrush);
-        myProgressBarStyle->palette.setColor(QPalette::Base, blueBack);
-        myProgressBarStyle->palette.setColor(QPalette::Window, blueBack);
+        progress_bar_style_->palette.setBrush(QPalette::Highlight, blueBrush);
+        progress_bar_style_->palette.setColor(QPalette::Base, blueBack);
+        progress_bar_style_->palette.setColor(QPalette::Window, blueBack);
     }
     else if (tor.isSeeding())
     {
-        myProgressBarStyle->palette.setBrush(QPalette::Highlight, greenBrush);
-        myProgressBarStyle->palette.setColor(QPalette::Base, greenBack);
-        myProgressBarStyle->palette.setColor(QPalette::Window, greenBack);
+        progress_bar_style_->palette.setBrush(QPalette::Highlight, greenBrush);
+        progress_bar_style_->palette.setColor(QPalette::Base, greenBack);
+        progress_bar_style_->palette.setColor(QPalette::Window, greenBack);
     }
     else
     {
-        myProgressBarStyle->palette.setBrush(QPalette::Highlight, silverBrush);
-        myProgressBarStyle->palette.setColor(QPalette::Base, silverBack);
-        myProgressBarStyle->palette.setColor(QPalette::Window, silverBack);
+        progress_bar_style_->palette.setBrush(QPalette::Highlight, silverBrush);
+        progress_bar_style_->palette.setColor(QPalette::Base, silverBack);
+        progress_bar_style_->palette.setColor(QPalette::Window, silverBack);
     }
 
-    myProgressBarStyle->state = progressBarState;
-    myProgressBarStyle->text = QString::fromLatin1("%1%").arg(static_cast<int>(tr_truncd(100.0 * tor.percentDone(), 0)));
-    myProgressBarStyle->textVisible = true;
-    myProgressBarStyle->textAlignment = Qt::AlignCenter;
+    progress_bar_style_->state = progressBarState;
+    progress_bar_style_->text = QString::fromLatin1("%1%").arg(static_cast<int>(tr_truncd(100.0 * tor.percentDone(), 0)));
+    progress_bar_style_->textVisible = true;
+    progress_bar_style_->textAlignment = Qt::AlignCenter;
     setProgressBarPercentDone(option, tor);
-    style->drawControl(QStyle::CE_ProgressBar, myProgressBarStyle, painter);
+    style->drawControl(QStyle::CE_ProgressBar, progress_bar_style_, painter);
 
     painter->restore();
 }

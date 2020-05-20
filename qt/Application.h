@@ -56,18 +56,18 @@ private:
     void quitLater();
 
 private:
-    Prefs* myPrefs;
-    Session* mySession;
-    TorrentModel* myModel;
-    MainWindow* myWindow;
-    WatchDir* myWatchDir;
-    QTimer myModelTimer;
-    QTimer myStatsTimer;
-    QTimer mySessionTimer;
-    time_t myLastFullUpdateTime;
-    QTranslator myQtTranslator;
-    QTranslator myAppTranslator;
-    FaviconCache myFavicons;
+    Prefs* prefs_;
+    Session* session_;
+    TorrentModel* model_;
+    MainWindow* window_;
+    WatchDir* watch_dir_;
+    QTimer model_timer_;
+    QTimer stats_timer_;
+    QTimer session_timer_;
+    time_t last_full_update_time_;
+    QTranslator qt_translator_;
+    QTranslator app_translator_;
+    FaviconCache favicons_;
 };
 
 #undef qApp

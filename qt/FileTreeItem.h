@@ -34,14 +34,14 @@ public:
 
 public:
     FileTreeItem(QString const& name = QString(), int fileIndex = -1, uint64_t size = 0) :
-        myName(name),
-        myFileIndex(fileIndex),
-        myTotalSize(size),
-        myParent(nullptr),
-        myPriority(0),
-        myIsWanted(false),
-        myHaveSize(0),
-        myFirstUnhashedRow(0)
+        name_(name),
+        file_index_(fileIndex),
+        total_size_(size),
+        parent_(nullptr),
+        priority_(0),
+        is_wanted_(false),
+        have_size_(0),
+        first_unhashed_row_(0)
     {
     }
 
@@ -53,29 +53,29 @@ public:
 
     FileTreeItem* child(int row)
     {
-        return myChildren.at(row);
+        return children_.at(row);
     }
 
     int childCount() const
     {
-        return myChildren.size();
+        return children_.size();
     }
 
     FileTreeItem* parent()
     {
-        return myParent;
+        return parent_;
     }
 
     FileTreeItem const* parent() const
     {
-        return myParent;
+        return parent_;
     }
 
     int row() const;
 
     QString const& name() const
     {
-        return myName;
+        return name_;
     }
 
     QVariant data(int column, int role) const;
@@ -85,12 +85,12 @@ public:
 
     int fileIndex() const
     {
-        return myFileIndex;
+        return file_index_;
     }
 
     uint64_t totalSize() const
     {
-        return myTotalSize;
+        return total_size_;
     }
 
     QString path() const;
@@ -107,15 +107,15 @@ private:
     QHash<QString, int> const& getMyChildRows();
 
 private:
-    QString myName;
-    int const myFileIndex;
-    uint64_t const myTotalSize;
+    QString name_;
+    int const file_index_;
+    uint64_t const total_size_;
 
-    FileTreeItem* myParent;
-    QList<FileTreeItem*> myChildren;
-    QHash<QString, int> myChildRows;
-    int myPriority;
-    bool myIsWanted;
-    uint64_t myHaveSize;
-    size_t myFirstUnhashedRow;
+    FileTreeItem* parent_;
+    QList<FileTreeItem*> children_;
+    QHash<QString, int> child_rows_;
+    int priority_;
+    bool is_wanted_;
+    uint64_t have_size_;
+    size_t first_unhashed_row_;
 };

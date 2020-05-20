@@ -45,7 +45,7 @@ public:
     Torrent const* getTorrentFromId(int id) const;
 
     using torrents_t = QVector<Torrent*>;
-    torrents_t const& torrents() const { return myTorrents; }
+    torrents_t const& torrents() const { return torrents_; }
 
     // QAbstractItemModel
     int rowCount(QModelIndex const& parent = QModelIndex()) const override;
@@ -71,7 +71,7 @@ private:
     using span_t = std::pair<int, int>;
     std::vector<span_t> getSpans(torrent_ids_t const& ids) const;
 
-    Prefs const& myPrefs;
-    torrent_ids_t myAlreadyAdded;
-    torrents_t myTorrents;
+    Prefs const& prefs_;
+    torrent_ids_t already_added_;
+    torrents_t torrents_;
 };

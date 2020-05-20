@@ -21,7 +21,7 @@ public:
 
     bool showBackupTrackers() const
     {
-        return myShowBackups;
+        return show_backups_;
     }
 
 protected:
@@ -29,5 +29,5 @@ protected:
     virtual bool filterAcceptsRow(int sourceRow, QModelIndex const& sourceParent) const;
 
 private:
-    bool myShowBackups;
+    bool show_backups_;
 };

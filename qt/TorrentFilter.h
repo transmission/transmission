@@ -49,6 +49,6 @@ private slots:
     void refilter();
 
 private:
-    QTimer myRefilterTimer;
-    Prefs const& myPrefs;
+    QTimer refilter_timer_;
+    Prefs const& prefs_;
 };

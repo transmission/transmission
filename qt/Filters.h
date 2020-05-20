@@ -30,23 +30,23 @@ public:
 
 public:
     FilterMode(int mode = SHOW_ALL) :
-        myMode(mode)
+        mode_(mode)
     {
     }
 
     FilterMode(QString const& name) :
-        myMode(modeFromName(name))
+        mode_(modeFromName(name))
     {
     }
 
     int mode() const
     {
-        return myMode;
+        return mode_;
     }
 
     QString const& name() const
     {
-        return names[myMode];
+        return names[mode_];
     }
 
     static int modeFromName(QString const& name);
@@ -57,7 +57,7 @@ public:
     }
 
 private:
-    int myMode;
+    int mode_;
 
     static QString const names[];
 };
@@ -84,30 +84,30 @@ public:
 
 public:
     SortMode(int mode = SORT_BY_ID) :
-        myMode(mode)
+        mode_(mode)
     {
     }
 
     SortMode(QString const& name) :
-        myMode(modeFromName(name))
+        mode_(modeFromName(name))
     {
     }
 
     int mode() const
     {
-        return myMode;
+        return mode_;
     }
 
     QString const& name() const
     {
-        return names[myMode];
+        return names[mode_];
     }
 
     static int modeFromName(QString const& name);
     static QString const& nameFromMode(int mode);
 
 private:
-    int myMode;
+    int mode_;
 
     static QString const names[];
 };

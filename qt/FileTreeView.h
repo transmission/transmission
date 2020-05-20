@@ -67,18 +67,18 @@ private:
     static Qt::CheckState getCumulativeCheckState(QModelIndexList const& indices);
 
 private:
-    FileTreeModel* myModel;
-    QSortFilterProxyModel* myProxy;
-    FileTreeDelegate* myDelegate;
+    FileTreeModel* model_;
+    QSortFilterProxyModel* proxy_;
+    FileTreeDelegate* delegate_;
 
-    QMenu* myContextMenu = nullptr;
-    QMenu* myPriorityMenu = nullptr;
-    QAction* myCheckSelectedAction = nullptr;
-    QAction* myUncheckSelectedAction = nullptr;
-    QAction* myOnlyCheckSelectedAction = nullptr;
-    QAction* myHighPriorityAction = nullptr;
-    QAction* myNormalPriorityAction = nullptr;
-    QAction* myLowPriorityAction = nullptr;
-    QAction* myOpenAction = nullptr;
-    QAction* myRenameAction = nullptr;
+    QMenu* context_menu_ = nullptr;
+    QMenu* priority_menu_ = nullptr;
+    QAction* check_selected_action_ = nullptr;
+    QAction* uncheck_selected_action_ = nullptr;
+    QAction* only_check_selected_action_ = nullptr;
+    QAction* high_priority_action_ = nullptr;
+    QAction* normal_priority_action_ = nullptr;
+    QAction* low_priority_action_ = nullptr;
+    QAction* open_action_ = nullptr;
+    QAction* rename_action_ = nullptr;
 };

@@ -20,13 +20,13 @@
 
 FaviconCache::FaviconCache()
 {
-    myNAM = new QNetworkAccessManager();
-    connect(myNAM, SIGNAL(finished(QNetworkReply*)), this, SLOT(onRequestFinished(QNetworkReply*)));
+    nam_ = new QNetworkAccessManager();
+    connect(nam_, SIGNAL(finished(QNetworkReply*)), this, SLOT(onRequestFinished(QNetworkReply*)));
 }
 
 FaviconCache::~FaviconCache()
 {
-    delete myNAM;
+    delete nam_;
 }
 
 /***
@@ -69,7 +69,7 @@ void FaviconCache::ensureCacheDirHasBeenScanned()
 
             if (!pixmap.isNull())
             {
-                myPixmaps[file] = scale(pixmap);
+                pixmaps_[file] = scale(pixmap);
             }
         }
     }
@@ -113,7 +113,7 @@ QPixmap FaviconCache::find(QString const& key)
 {
     ensureCacheDirHasBeenScanned();
 
-    return myPixmaps[key];
+    return pixmaps_[key];
 }
 
 QString FaviconCache::add(QUrl const& url)
@@ -122,10 +122,10 @@ QString FaviconCache::add(QUrl const& url)
 
     QString const key = getKey(url);
 
-    if (myPixmaps.count(key) == 0)
+    if (pixmaps_.count(key) == 0)
     {
         // add a placholder s.t. we only ping the server once per session
-        myPixmaps[key] = QPixmap();
+        pixmaps_[key] = QPixmap();
 
         // try to download the favicon
         QString const path = QLatin1String("http://") + url.host() + QLatin1String("/favicon.");
@@ -134,7 +134,7 @@ QString FaviconCache::add(QUrl const& url)
 
         for (QString const& suffix : suffixes)
         {
-            myNAM->get(QNetworkRequest(path + suffix));
+            nam_->get(QNetworkRequest(path + suffix));
         }
     }
 
@@ -157,7 +157,7 @@ void FaviconCache::onRequestFinished(QNetworkReply* reply)
     if (!pixmap.isNull())
     {
         // save it in memory...
-        myPixmaps[key] = scale(pixmap);
+        pixmaps_[key] = scale(pixmap);
 
         // save it on disk...
         QDir cacheDir(getCacheDir());
