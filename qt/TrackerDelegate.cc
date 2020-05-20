@@ -29,8 +29,8 @@
 namespace
 {
 
-int const spacing_ = 6;
-QSize const margin_(10, 10);
+int const spacing = 6;
+QSize const margin(10, 10);
 
 class ItemLayout
 {
@@ -63,7 +63,7 @@ ItemLayout::ItemLayout(QString const& text, bool suppressColors, Qt::LayoutDirec
     QRect baseRect(topLeft, QSize(width, 0));
 
     iconRect = style->alignedRect(direction, Qt::AlignLeft | Qt::AlignTop, iconSize, baseRect);
-    Utils::narrowRect(baseRect, iconSize.width() + spacing_, 0, direction);
+    Utils::narrowRect(baseRect, iconSize.width() + spacing, 0, direction);
 
     text_document_.setDocumentMargin(0);
     text_document_.setTextWidth(baseRect.width());
@@ -91,8 +91,8 @@ ItemLayout::ItemLayout(QString const& text, bool suppressColors, Qt::LayoutDirec
 
 QSize TrackerDelegate::sizeHint(QStyleOptionViewItem const& option, TrackerInfo const& info) const
 {
-    ItemLayout const layout(getText(info), true, option.direction, QPoint(0, 0), option.rect.width() - margin_.width() * 2);
-    return layout.size() + margin_ * 2;
+    ItemLayout const layout(getText(info), true, option.direction, QPoint(0, 0), option.rect.width() - margin.width() * 2);
+    return layout.size() + margin * 2;
 }
 
 QSize TrackerDelegate::sizeHint(QStyleOptionViewItem const& option, QModelIndex const& index) const
@@ -120,7 +120,7 @@ void TrackerDelegate::drawTracker(QPainter* painter, QStyleOptionViewItem const&
 
     QIcon trackerIcon(inf.st.getFavicon());
 
-    QRect const contentRect(option.rect.adjusted(margin_.width(), margin_.height(), -margin_.width(), -margin_.height()));
+    QRect const contentRect(option.rect.adjusted(margin.width(), margin.height(), -margin.width(), -margin.height()));
     ItemLayout const layout(getText(inf), isItemSelected, option.direction, contentRect.topLeft(), contentRect.width());
 
     painter->save();
