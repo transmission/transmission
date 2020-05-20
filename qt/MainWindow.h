@@ -100,7 +100,7 @@ private:
     QMenu* createStatsModeMenu();
     void initStatusBar();
 
-    void clearSelection() const;
+    void clearSelection();
     void addTorrent(AddData const& addMe, bool showOptions);
 
     // QWidget

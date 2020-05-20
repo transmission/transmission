@@ -929,7 +929,7 @@ void MainWindow::refreshActionSensitivity()
 ***
 **/
 
-void MainWindow::clearSelection() const
+void MainWindow::clearSelection()
 {
     ui.action_DeselectAll->trigger();
 }
