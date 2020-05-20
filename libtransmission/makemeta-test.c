@@ -16,8 +16,9 @@
 #include <stdlib.h> /* mktemp() */
 #include <string.h> /* strlen() */
 
-static int test_single_file_impl(tr_tracker_info const* trackers, size_t const trackerCount, void const* payload,
-    size_t const payloadSize, char const* comment, bool isPrivate, char const* source)
+static int test_single_file_impl_fill_tr_info(tr_info* inf, tr_tracker_info const* trackers, size_t const trackerCount,
+    void const* payload, size_t const payloadSize, char const* comment,
+    bool isPrivate, char const* source)
 {
     char* sandbox;
     char* input_file;
@@ -25,7 +26,6 @@ static int test_single_file_impl(tr_tracker_info const* trackers, size_t const t
     tr_metainfo_builder* builder;
     tr_ctor* ctor;
     tr_parse_result parse_result;
-    tr_info inf;
     char* tmpstr;
 
     /* set up our local test sandbox */
@@ -61,30 +61,38 @@ static int test_single_file_impl(tr_tracker_info const* trackers, size_t const t
     ctor = tr_ctorNew(NULL);
     libttest_sync();
     tr_ctorSetMetainfoFromFile(ctor, torrent_file);
-    parse_result = tr_torrentParse(ctor, &inf);
+    parse_result = tr_torrentParse(ctor, inf);
     check_int(parse_result, ==, TR_PARSE_OK);
 
     /* quick check of some of the parsed metainfo */
-    check_int(inf.totalSize, ==, payloadSize);
+    check_int(inf->totalSize, ==, payloadSize);
     tmpstr = tr_sys_path_basename(input_file, NULL);
-    check_str(inf.name, ==, tmpstr);
+    check_str(inf->name, ==, tmpstr);
     tr_free(tmpstr);
-    check_str(inf.comment, ==, comment);
-    check_int(inf.fileCount, ==, 1);
-    check_int(inf.isPrivate, ==, isPrivate);
-    check_str(inf.source, ==, source);
-    check(!inf.isFolder);
-    check_int(inf.trackerCount, ==, trackerCount);
+    check_str(inf->comment, ==, comment);
+    check_int(inf->fileCount, ==, 1);
+    check_int(inf->isPrivate, ==, isPrivate);
+    check_str(inf->source, ==, source);
+    check(!inf->isFolder);
+    check_int(inf->trackerCount, ==, trackerCount);
 
     /* cleanup */
     tr_free(torrent_file);
     tr_free(input_file);
     tr_ctorFree(ctor);
-    tr_metainfoFree(&inf);
     tr_metaInfoBuilderFree(builder);
     libtest_sandbox_destroy(sandbox);
     tr_free(sandbox);
     return 0;
+}
+
+static int test_single_file_impl(tr_tracker_info const* trackers, size_t const trackerCount, void const* payload,
+    size_t const payloadSize, char const* comment, bool isPrivate, char const* source)
+{
+    tr_info inf;
+    int rv = test_single_file_impl_fill_tr_info(&inf, trackers, trackerCount, payload, payloadSize, comment, isPrivate, source);
+    tr_metainfoFree(&inf);
+    return rv;
 }
 
 static int test_single_file(void)
@@ -110,6 +118,43 @@ static int test_single_file(void)
     isPrivate = false;
     source = "FOOBAR";
     test_single_file_impl(trackers, trackerCount, payload, payloadSize, comment, isPrivate, source);
+
+    return 0;
+}
+
+static int test_single_file_different_source_flags(void)
+{
+    tr_tracker_info trackers[16];
+    size_t trackerCount;
+    bool isPrivate;
+    char const* comment;
+    char const* payload;
+    char const* source;
+    size_t payloadSize;
+    tr_info sourceFoobar;
+    tr_info sourceTestme;
+
+    trackerCount = 0;
+    trackers[trackerCount].tier = trackerCount;
+    trackers[trackerCount].announce = (char*)"udp://tracker.openbittorrent.com:80";
+    ++trackerCount;
+    trackers[trackerCount].tier = trackerCount;
+    trackers[trackerCount].announce = (char*)"udp://tracker.publicbt.com:80";
+    ++trackerCount;
+    payload = "Hello, World!\n";
+    payloadSize = strlen(payload);
+    comment = "This is the comment";
+    isPrivate = false;
+    source = "FOOBAR";
+    test_single_file_impl_fill_tr_info(&sourceFoobar, trackers, trackerCount, payload, payloadSize, comment, isPrivate, source);
+
+    source = "TESTME";
+    test_single_file_impl_fill_tr_info(&sourceTestme, trackers, trackerCount, payload, payloadSize, comment, isPrivate, source);
+
+    check_mem(sourceFoobar.hash, !=, sourceTestme.hash, sizeof(sourceFoobar.hash));
+
+    tr_metainfoFree(&sourceFoobar);
+    tr_metainfoFree(&sourceTestme);
 
     return 0;
 }
@@ -290,7 +335,8 @@ int main(void)
     testFunc const tests[] =
     {
         test_single_file,
-        test_single_directory_random_payload
+        test_single_directory_random_payload,
+        test_single_file_different_source_flags
     };
 
     return runTests(tests, NUM_TESTS(tests));
