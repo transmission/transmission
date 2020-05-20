@@ -6,6 +6,7 @@
  *
  */
 
+#include <algorithm>
 #include <cassert>
 
 #include <libtransmission/transmission.h> // priorities
@@ -27,7 +28,6 @@ protected:
         myToken.reserve(path.size() / 2);
     }
 
-protected:
     QString const& myPath;
     int mySlashIndex;
     QString myToken;
@@ -94,8 +94,7 @@ public:
 FileTreeModel::FileTreeModel(QObject* parent, bool isEditable) :
     QAbstractItemModel(parent),
     myIsEditable(isEditable),
-    myRootItem(new FileTreeItem),
-    myIndexCache()
+    myRootItem(new FileTreeItem)
 {
 }
 
@@ -126,7 +125,7 @@ QModelIndexList FileTreeModel::getOrphanIndices(QModelIndexList const& indices) 
 {
     QModelIndexList orphanIndices = indices;
 
-    qSort(orphanIndices);
+    std::sort(orphanIndices.begin(), orphanIndices.end());
 
     for (QMutableListIterator<QModelIndex> it(orphanIndices); it.hasNext();)
     {
@@ -141,7 +140,7 @@ QModelIndexList FileTreeModel::getOrphanIndices(QModelIndexList const& indices) 
                 break;
             }
 
-            if (qBinaryFind(orphanIndices, walk) != orphanIndices.end())
+            if (std::binary_search(orphanIndices.begin(), orphanIndices.end(), walk))
             {
                 it.remove();
                 break;

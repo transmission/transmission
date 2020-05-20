@@ -39,7 +39,7 @@ public:
     virtual ~OptionsDialog();
 
 private:
-    typedef QMap<uint32_t, int32_t> mybins_t;
+    using mybins_t = QMap<uint32_t, int32_t>;
 
 private:
     void reload();

@@ -50,10 +50,10 @@ public:
 private:
     // Internally queued function. Takes the last response future, makes a
     // request and returns a new response future.
-    typedef std::function<RpcResponseFuture(RpcResponseFuture const&)> QueuedFunction;
+    using QueuedFunction = std::function<RpcResponseFuture(RpcResponseFuture const&)>;
 
     // Internally stored error handler function. Takes the last response future and returns nothing.
-    typedef std::function<void (RpcResponseFuture const&)> ErrorHandlerFunction;
+    using ErrorHandlerFunction = std::function<void (RpcResponseFuture const&)>;
 
 private slots:
     void stepFinished();
@@ -65,7 +65,7 @@ private:
 
     // normal closure, takes response and returns new future
     template<typename Func, typename std::enable_if<
-        std::is_same<typename std::result_of<Func(RpcResponse const&)>::type, RpcResponseFuture>::value
+        std::is_same_v<typename std::invoke_result_t<Func, RpcResponse const&>, RpcResponseFuture>
         >::type* = nullptr>
     QueuedFunction normalizeFunc(Func const& func)
     {
@@ -77,7 +77,7 @@ private:
 
     // closure without argument (first step), takes nothing and returns new future
     template<typename Func, typename std::enable_if<
-        std::is_same<typename std::result_of<Func()>::type, RpcResponseFuture>::value
+        std::is_same_v<typename std::invoke_result_t<Func>, RpcResponseFuture>
         >::type* = nullptr>
     QueuedFunction normalizeFunc(Func const& func)
     {
@@ -89,7 +89,7 @@ private:
 
     // closure without return value ("auxiliary"), takes response and returns nothing -- internally we reuse the last future
     template<typename Func, typename std::enable_if<
-        std::is_same<typename std::result_of<Func(RpcResponse const&)>::type, void>::value
+        std::is_same_v<typename std::invoke_result_t<Func, RpcResponse const&>, void>
         >::type* = nullptr>
     QueuedFunction normalizeFunc(Func const& func)
     {
@@ -102,7 +102,7 @@ private:
 
     // closure without argument and return value, takes nothing and returns nothing -- next function will also get nothing
     template<typename Func, typename std::enable_if<
-        std::is_same<typename std::result_of<Func()>::type, void>::value
+        std::is_same_v<typename std::invoke_result_t<Func>, void>
         >::type* = nullptr>
     QueuedFunction normalizeFunc(Func const& func)
     {
@@ -115,7 +115,7 @@ private:
 
     // normal error handler, takes last response
     template<typename Func, typename std::enable_if<
-        std::is_same<typename std::result_of<Func(RpcResponse const&)>::type, void>::value
+        std::is_same_v<typename std::invoke_result_t<Func, RpcResponse const&>, void>
         >::type* = nullptr>
     ErrorHandlerFunction normalizeErrorHandler(Func const& func)
     {
@@ -127,7 +127,7 @@ private:
 
     // error handler without an argument, takes nothing
     template<typename Func, typename std::enable_if<
-        std::is_same<typename std::result_of<Func()>::type, void>::value
+        std::is_same_v<typename std::invoke_result_t<Func>, void>
         >::type* = nullptr>
     ErrorHandlerFunction normalizeErrorHandler(Func const& func)
     {

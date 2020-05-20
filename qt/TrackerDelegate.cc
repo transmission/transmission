@@ -41,7 +41,6 @@ public:
     QRect iconRect;
     QRect textRect;
 
-public:
     ItemLayout(QString const& text, bool suppressColors, Qt::LayoutDirection direction, QPoint const& topLeft, int width);
 
     QSize size() const
@@ -98,13 +97,13 @@ QSize TrackerDelegate::sizeHint(QStyleOptionViewItem const& option, TrackerInfo 
 
 QSize TrackerDelegate::sizeHint(QStyleOptionViewItem const& option, QModelIndex const& index) const
 {
-    TrackerInfo const trackerInfo = index.data(TrackerModel::TrackerRole).value<TrackerInfo>();
+    auto const trackerInfo = index.data(TrackerModel::TrackerRole).value<TrackerInfo>();
     return sizeHint(option, trackerInfo);
 }
 
 void TrackerDelegate::paint(QPainter* painter, QStyleOptionViewItem const& option, QModelIndex const& index) const
 {
-    TrackerInfo const trackerInfo = index.data(TrackerModel::TrackerRole).value<TrackerInfo>();
+    auto const trackerInfo = index.data(TrackerModel::TrackerRole).value<TrackerInfo>();
     painter->save();
     painter->setClipRect(option.rect);
     drawBackground(painter, option, index);
