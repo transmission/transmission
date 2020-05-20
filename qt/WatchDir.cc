@@ -67,7 +67,7 @@ int WatchDir::metainfoTest(QString const& filename) const
 
 void WatchDir::onTimeout()
 {
-    QTimer* t = qobject_cast<QTimer*>(sender());
+    auto* t = qobject_cast<QTimer*>(sender());
     QString const filename = t->objectName();
 
     if (metainfoTest(filename) == OK)
@@ -134,7 +134,7 @@ void WatchDir::watcherActivated(QString const& path)
             case ERROR:
                 {
                     // give the .torrent a few seconds to finish downloading
-                    QTimer* t = new QTimer(this);
+                    auto* t = new QTimer(this);
                     t->setObjectName(dir.absoluteFilePath(name));
                     t->setSingleShot(true);
                     connect(t, SIGNAL(timeout()), this, SLOT(onTimeout()));

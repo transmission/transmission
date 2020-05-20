@@ -9,15 +9,16 @@
 # Rodrigo Piñero <rodrigo.pinero@yahoo.com.br>, 2017
 # Heitor Rocha <heitor@riseup.net>, 2019
 # Carlos Henrique De Freitas Ferreira <Neocazen@vivaldi.net>, 2019
+# Alex Wender, 2020
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-02 13:06+0300\n"
+"POT-Creation-Date: 2020-05-14 18:55+0300\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Carlos Henrique De Freitas Ferreira <Neocazen@vivaldi.net>, 2019\n"
+"Last-Translator: Alex Wender, 2020\n"
 "Language-Team: Portuguese (Brazil) (https://www.transifex.com/transmissionbt/teams/33778/pt_BR/)\n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
@@ -25,7 +26,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: ../cli/cli.c:114 ../gtk/util.c:92 ../libtransmission/utils.c:1663
+#: ../cli/cli.c:114 ../gtk/util.c:92 ../libtransmission/utils.c:1694
 msgid "None"
 msgstr "Nenhum"
 
@@ -107,7 +108,7 @@ msgstr "_Torrent"
 
 #: ../gtk/actions.c:79
 msgid "_View"
-msgstr "_Ver"
+msgstr "_Visualizar"
 
 #: ../gtk/actions.c:80
 msgid "_Sort Torrents By"
@@ -618,7 +619,7 @@ msgstr "Par conectado com µTP"
 
 #: ../gtk/details.c:2082 ../gtk/details.c:2854
 msgid "Show _more details"
-msgstr "Mostrar _mais detalhes"
+msgstr "Exibir _mais detalhes"
 
 #: ../gtk/details.c:2156
 #, c-format
@@ -729,7 +730,7 @@ msgstr "_Remover"
 
 #: ../gtk/details.c:2861
 msgid "Show _backup trackers"
-msgstr "Mostrar cópia de segurança de rastreadores"
+msgstr "Exibir os rastreadores de _backup"
 
 #: ../gtk/details.c:2959 ../gtk/msgwin.c:431
 msgid "Information"
@@ -835,7 +836,7 @@ msgstr "Tamanho"
 #. add "progress" column
 #: ../gtk/file-list.c:984
 msgid "Have"
-msgstr "Permitir"
+msgstr "Progresso"
 
 #. add "enabled" column
 #: ../gtk/file-list.c:997
@@ -860,7 +861,7 @@ msgctxt "Verb"
 msgid "Verifying"
 msgstr "Verificando"
 
-#: ../gtk/filter.c:591 ../gtk/msgwin.c:430 ../gtk/util.c:730
+#: ../gtk/filter.c:591 ../gtk/msgwin.c:430 ../gtk/util.c:717
 msgid "Error"
 msgstr "Erro"
 
@@ -871,7 +872,7 @@ msgstr "Mo_strar:"
 #: ../gtk/filter.c:884
 #, c-format
 msgid "_Show %'d of:"
-msgstr "_Mostrar %'d de:"
+msgstr "_Exibir %'d de:"
 
 #: ../gtk/main.c:314
 #, c-format
@@ -897,7 +898,7 @@ msgstr "Iniciar minimizado na área de notificação"
 
 #: ../gtk/main.c:619
 msgid "Show version number and exit"
-msgstr "Mostrar o número da versão e sair"
+msgstr "Exibir a versão e sair"
 
 #: ../gtk/main.c:637 ../gtk/transmission-gtk.appdata.xml.in:11 ../gtk/transmission-gtk.desktop.in:3
 msgid "Transmission"
@@ -1206,7 +1207,7 @@ msgstr "Abrir um Torrent"
 
 #: ../gtk/open-dialog.c:466
 msgid "Show _options dialog"
-msgstr "Mostrar janela de _opções"
+msgstr "Exibir a caixa de diálogo das _opções"
 
 #: ../gtk/open-dialog.c:518
 msgid "Open URL"
@@ -1485,7 +1486,7 @@ msgstr "Adic. automaticamente arquivos .torrents _de:"
 
 #: ../gtk/tr-prefs.c:267
 msgid "Show the Torrent Options _dialog"
-msgstr "Mostrar as Opções do _Diálogo do Torrent"
+msgstr "Exibir a caixa de _diálogo Opções do Torrent"
 
 #: ../gtk/tr-prefs.c:271
 msgid "_Start added torrents"
@@ -1545,7 +1546,7 @@ msgstr "_Impedir a hibernação se houver torrents ativos"
 
 #: ../gtk/tr-prefs.c:371
 msgid "Show Transmission icon in the _notification area"
-msgstr "Mostrar ícone do Transmission na área de _notificação"
+msgstr "Exibir o ícone do Transmission na área de _notificação"
 
 #: ../gtk/tr-prefs.c:376
 msgid "Notification"
@@ -1553,11 +1554,11 @@ msgstr "Notificação"
 
 #: ../gtk/tr-prefs.c:378
 msgid "Show a notification when torrents are a_dded"
-msgstr "Mostrar notificação quando for a_dicionado um torrent"
+msgstr "Exibir uma notificação quando os torrents são a_dicionados"
 
 #: ../gtk/tr-prefs.c:382
 msgid "Show a notification when torrents _finish"
-msgstr "Mostrar notificação quando o torrent _terminar"
+msgstr "Exibir uma notificação quando os torrents são _concluídos"
 
 #: ../gtk/tr-prefs.c:386
 msgid "Play a _sound when torrents finish"
@@ -1595,7 +1596,7 @@ msgstr "Obtendo nova lista de bloqueio..."
 
 #: ../gtk/tr-prefs.c:488
 msgid "Allow encryption"
-msgstr "Permitir"
+msgstr "Permitir criptografia"
 
 #: ../gtk/tr-prefs.c:488
 msgid "Prefer encryption"
@@ -2078,31 +2079,21 @@ msgstr "O arquivo torrent \"%s\" encontrou um erro desconhecido."
 msgid "Error opening torrent"
 msgstr "Erro ao abrir torrent"
 
-#: ../gtk/util.c:590
-#, c-format
-msgid "Error opening \"%s\""
-msgstr "Erro ao abrir \"%s\""
-
-#: ../gtk/util.c:592
-#, c-format
-msgid "Server returned \"%1$ld %2$s\""
-msgstr "Servidor retornou \"%1$ld %2$s\""
-
-#: ../gtk/util.c:607
+#: ../gtk/util.c:594
 msgid "Unrecognized URL"
 msgstr "URL desconhecida"
 
-#: ../gtk/util.c:609
+#: ../gtk/util.c:596
 #, c-format
 msgid "Transmission doesn't know how to use \"%s\""
 msgstr "Transmission não sabe como usar \"%s\""
 
-#: ../gtk/util.c:614
+#: ../gtk/util.c:601
 #, c-format
 msgid "This magnet link appears to be intended for something other than BitTorrent. BitTorrent magnet links have a section containing \"%s\"."
 msgstr "Este link magnético parece não ter sido feito para o BitTorrent. Links magnéticos de BitTorrent tem uma seção que contém \"%s\"."
 
-#: ../gtk/util.c:736
+#: ../gtk/util.c:723
 #, c-format
 msgid "%s free"
 msgstr "%s livre"
@@ -2125,15 +2116,15 @@ msgstr "Falha na pesquisa de DNS: %s"
 msgid "Connection failed"
 msgstr "Falha ao conectar"
 
-#: ../libtransmission/announcer.c:1155 ../libtransmission/announcer.c:1474
+#: ../libtransmission/announcer.c:1150 ../libtransmission/announcer.c:1469
 msgid "Could not connect to tracker"
 msgstr "Não foi possível conectar ao rastreador"
 
-#: ../libtransmission/announcer.c:1159 ../libtransmission/announcer.c:1478
+#: ../libtransmission/announcer.c:1154 ../libtransmission/announcer.c:1473
 msgid "Tracker did not respond"
 msgstr "O rastreador não respondeu"
 
-#: ../libtransmission/announcer.c:1223
+#: ../libtransmission/announcer.c:1218
 msgid "Success"
 msgstr "Sucesso"
 
@@ -2306,7 +2297,7 @@ msgstr "Parando"
 msgid "Not forwarded"
 msgstr "Não encaminhado"
 
-#: ../libtransmission/port-forwarding.c:106 ../libtransmission/torrent.c:2298
+#: ../libtransmission/port-forwarding.c:106 ../libtransmission/torrent.c:2302
 #, c-format
 msgid "State changed from \"%1$s\" to \"%2$s\""
 msgstr "Estado alterado de \"%1$s\" para \"%2$s\""
@@ -2355,7 +2346,7 @@ msgstr "Erro ao descompactar lista de bloqueio: %s (%d)"
 msgid "%s %s started"
 msgstr "%s %s iniciado"
 
-#: ../libtransmission/session.c:2175
+#: ../libtransmission/session.c:2170
 #, c-format
 msgid "Loaded %d torrents"
 msgstr "Carregados %d torrents"
@@ -2399,7 +2390,7 @@ msgstr "Concluído"
 msgid "Complete"
 msgstr "Completo"
 
-#: ../libtransmission/torrent.c:3462
+#: ../libtransmission/torrent.c:3466
 #, c-format
 msgid "Piece %<PRIu32>, which was just downloaded, failed its checksum test"
 msgstr "A Peça %<PRIu32>,  que acabou de ser baixada, falhou no teste de soma de verificação"
@@ -2464,5 +2455,10 @@ msgstr "Não foi possível analisar o conteúdo do arquivo"
 msgid "Verifying torrent"
 msgstr "Verificando torrent"
 
-#~ msgid "transmission"
-#~ msgstr "transmissionBT"
+#, c-format
+#~ msgid "Server returned \"%1$ld %2$s\""
+#~ msgstr "Servidor retornou \"%1$ld %2$s\""
+
+#, c-format
+#~ msgid "Error opening \"%s\""
+#~ msgstr "Erro ao abrir \"%s\""

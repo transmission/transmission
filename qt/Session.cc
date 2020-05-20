@@ -27,6 +27,7 @@
 #include <libtransmission/variant.h>
 
 #include "AddData.h"
+#include "CustomVariantType.h"
 #include "Prefs.h"
 #include "RpcQueue.h"
 #include "Session.h"
@@ -41,7 +42,7 @@
 namespace
 {
 
-typedef Torrent::KeyList KeyList;
+using KeyList = Torrent::KeyList;
 
 void addList(tr_variant* list, KeyList const& keys)
 {
@@ -93,7 +94,7 @@ void Session::sessionSet(tr_quark const key, QVariant const& value)
 
 void Session::portTest()
 {
-    RpcQueue* q = new RpcQueue();
+    auto* q = new RpcQueue();
 
     q->add([this]()
         {
@@ -122,7 +123,7 @@ void Session::copyMagnetLinkToClipboard(int torrentId)
     tr_variantListAddInt(tr_variantDictAddList(&args, TR_KEY_ids, 1), torrentId);
     tr_variantListAddStr(tr_variantDictAddList(&args, TR_KEY_fields, 1), "magnetLink");
 
-    RpcQueue* q = new RpcQueue();
+    auto* q = new RpcQueue();
 
     q->add([this, &args]()
         {
@@ -515,7 +516,7 @@ void Session::torrentRenamePath(torrent_ids_t const& ids, QString const& oldpath
     tr_variantDictAddStr(&args, TR_KEY_path, oldpath.toUtf8().constData());
     tr_variantDictAddStr(&args, TR_KEY_name, newname.toUtf8().constData());
 
-    RpcQueue* q = new RpcQueue();
+    auto* q = new RpcQueue();
 
     q->add([this, &args]()
         {
@@ -528,7 +529,7 @@ void Session::torrentRenamePath(torrent_ids_t const& ids, QString const& oldpath
             tr_variantDictFindStr(r.args.get(), TR_KEY_path, &path, nullptr);
             tr_variantDictFindStr(r.args.get(), TR_KEY_name, &name, nullptr);
 
-            QMessageBox* d = new QMessageBox(QMessageBox::Information, tr("Error Renaming Path"),
+            auto* d = new QMessageBox(QMessageBox::Information, tr("Error Renaming Path"),
                 tr("<p><b>Unable to rename \"%1\" as \"%2\": %3.</b></p><p>Please correct the errors and try again.</p>").
                     arg(QString::fromUtf8(path)).arg(QString::fromUtf8(name)).arg(r.result), QMessageBox::Close,
                 qApp->activeWindow());
@@ -552,7 +553,7 @@ void Session::refreshTorrents(torrent_ids_t const& ids, KeyList const& keys)
     addList(tr_variantDictAddList(&args, TR_KEY_fields, 0), keys);
     addOptionalIds(&args, ids);
 
-    RpcQueue* q = new RpcQueue();
+    auto* q = new RpcQueue();
 
     q->add([this, &args]()
         {
@@ -595,7 +596,7 @@ void Session::sendTorrentRequest(char const* request, torrent_ids_t const& ids)
     tr_variantInitDict(&args, 1);
     addOptionalIds(&args, ids);
 
-    RpcQueue* q = new RpcQueue();
+    auto* q = new RpcQueue();
 
     q->add([this, request, &args]()
         {
@@ -662,7 +663,7 @@ void Session::initTorrents(torrent_ids_t const& ids)
 
 void Session::refreshSessionStats()
 {
-    RpcQueue* q = new RpcQueue();
+    auto* q = new RpcQueue();
 
     q->add([this]()
         {
@@ -679,7 +680,7 @@ void Session::refreshSessionStats()
 
 void Session::refreshSessionInfo()
 {
-    RpcQueue* q = new RpcQueue();
+    auto* q = new RpcQueue();
 
     q->add([this]()
         {
@@ -696,7 +697,7 @@ void Session::refreshSessionInfo()
 
 void Session::updateBlocklist()
 {
-    RpcQueue* q = new RpcQueue();
+    auto* q = new RpcQueue();
 
     q->add([this]()
         {
@@ -971,7 +972,7 @@ void Session::addTorrent(AddData const& addMe, tr_variant* args, bool trashOrigi
         break;
     }
 
-    RpcQueue* q = new RpcQueue();
+    auto* q = new RpcQueue();
 
     q->add([this, args]()
         {
@@ -979,7 +980,7 @@ void Session::addTorrent(AddData const& addMe, tr_variant* args, bool trashOrigi
         },
         [addMe](RpcResponse const& r)
         {
-            QMessageBox* d = new QMessageBox(QMessageBox::Warning, tr("Error Adding Torrent"),
+            auto* d = new QMessageBox(QMessageBox::Warning, tr("Error Adding Torrent"),
                 QString::fromLatin1("<p><b>%1</b></p><p>%2</p>").arg(r.result).arg(addMe.readableName()), QMessageBox::Close,
                 qApp->activeWindow());
             QObject::connect(d, &QMessageBox::rejected, d, &QMessageBox::deleteLater);
@@ -1000,7 +1001,7 @@ void Session::addTorrent(AddData const& addMe, tr_variant* args, bool trashOrigi
             if (tr_variantDictFindStr(dup, TR_KEY_name, &str, nullptr))
             {
                 QString const name = QString::fromUtf8(str);
-                QMessageBox* d = new QMessageBox(QMessageBox::Warning, tr("Add Torrent"),
+                auto* d = new QMessageBox(QMessageBox::Warning, tr("Add Torrent"),
                     tr("<p><b>Unable to add \"%1\".</b></p><p>It is a duplicate of \"%2\" which is already added.</p>").
                         arg(addMe.readableShortName()).arg(name), QMessageBox::Close, qApp->activeWindow());
                 QObject::connect(d, &QMessageBox::rejected, d, &QMessageBox::deleteLater);

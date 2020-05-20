@@ -59,17 +59,17 @@
     <message numerus="yes">
         <location line="+77"/>
         <source>Torrent(s) Added</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Torrent(s) toegevoegd</numerusform>
+            <numerusform>Torrent(s) toegevoegd</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+10"/>
         <source>Torrent Completed</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>Torrent voltooid</numerusform>
-            <numerusform></numerusform>
+            <numerusform>Torrent voltooid</numerusform>
         </translation>
     </message>
 </context>
@@ -2332,7 +2332,7 @@ Om een andere hoofd-URL toe te voegen, plaats deze na een lege regel</translatio
 <context>
     <name>Torrent</name>
     <message>
-        <location filename="../Torrent.cc" line="+1064"/>
+        <location filename="../Torrent.cc" line="+1043"/>
         <source>Verifying local data</source>
         <translation>Lokale gegevens verifiëren</translation>
     </message>
@@ -2512,7 +2512,7 @@ Om een andere hoofd-URL toe te voegen, plaats deze na een lege regel</translatio
 <context>
     <name>TrackerDelegate</name>
     <message numerus="yes">
-        <location filename="../TrackerDelegate.cc" line="+218"/>
+        <location filename="../TrackerDelegate.cc" line="+211"/>
         <source>Got a list of%1 %Ln peer(s)%2 %3 ago</source>
         <extracomment>%1 and %2 are replaced with HTML markup, %3 is duration</extracomment>
         <translation>

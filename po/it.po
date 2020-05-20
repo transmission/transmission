@@ -13,7 +13,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-02 13:06+0300\n"
+"POT-Creation-Date: 2020-05-14 18:55+0300\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
 "Last-Translator: Milo Casagrande <milo@ubuntu.com>, 2019\n"
 "Language-Team: Italian (https://www.transifex.com/transmissionbt/teams/33778/it/)\n"
@@ -23,7 +23,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../cli/cli.c:114 ../gtk/util.c:92 ../libtransmission/utils.c:1663
+#: ../cli/cli.c:114 ../gtk/util.c:92 ../libtransmission/utils.c:1694
 msgid "None"
 msgstr "Nessuno"
 
@@ -858,7 +858,7 @@ msgctxt "Verb"
 msgid "Verifying"
 msgstr "In verifica"
 
-#: ../gtk/filter.c:591 ../gtk/msgwin.c:430 ../gtk/util.c:730
+#: ../gtk/filter.c:591 ../gtk/msgwin.c:430 ../gtk/util.c:717
 msgid "Error"
 msgstr "Errore"
 
@@ -2049,31 +2049,21 @@ msgstr "Il file torrent «%s» ha riscontrato un errore sconosciuto."
 msgid "Error opening torrent"
 msgstr "Errore nell'aprire il torrent"
 
-#: ../gtk/util.c:590
-#, c-format
-msgid "Error opening \"%s\""
-msgstr "Errore nell'aprire «%s»"
-
-#: ../gtk/util.c:592
-#, c-format
-msgid "Server returned \"%1$ld %2$s\""
-msgstr "Il server ha restituito «%1$ld %2$s»"
-
-#: ../gtk/util.c:607
+#: ../gtk/util.c:594
 msgid "Unrecognized URL"
 msgstr "URL non riconosciuto"
 
-#: ../gtk/util.c:609
+#: ../gtk/util.c:596
 #, c-format
 msgid "Transmission doesn't know how to use \"%s\""
 msgstr "Transmission non sa come usare «%s»"
 
-#: ../gtk/util.c:614
+#: ../gtk/util.c:601
 #, c-format
 msgid "This magnet link appears to be intended for something other than BitTorrent. BitTorrent magnet links have a section containing \"%s\"."
 msgstr "Questo collegamento magnetico sembra essere utilizzato per qualche cosa di diverso da BitTorrent. I collegamenti magnetici di BitTorrent presentano una sezione che contiene «%s»."
 
-#: ../gtk/util.c:736
+#: ../gtk/util.c:723
 #, c-format
 msgid "%s free"
 msgstr "%s libero"
@@ -2096,15 +2086,15 @@ msgstr "Ricerca DNS non riuscita: %s"
 msgid "Connection failed"
 msgstr "Connessione non riuscita"
 
-#: ../libtransmission/announcer.c:1155 ../libtransmission/announcer.c:1474
+#: ../libtransmission/announcer.c:1150 ../libtransmission/announcer.c:1469
 msgid "Could not connect to tracker"
 msgstr "Impossibile connettersi al server traccia"
 
-#: ../libtransmission/announcer.c:1159 ../libtransmission/announcer.c:1478
+#: ../libtransmission/announcer.c:1154 ../libtransmission/announcer.c:1473
 msgid "Tracker did not respond"
 msgstr "Il server traccia non ha risposto"
 
-#: ../libtransmission/announcer.c:1223
+#: ../libtransmission/announcer.c:1218
 msgid "Success"
 msgstr "Successo"
 
@@ -2275,7 +2265,7 @@ msgstr "In arresto"
 msgid "Not forwarded"
 msgstr "Inoltro non applicato"
 
-#: ../libtransmission/port-forwarding.c:106 ../libtransmission/torrent.c:2298
+#: ../libtransmission/port-forwarding.c:106 ../libtransmission/torrent.c:2302
 #, c-format
 msgid "State changed from \"%1$s\" to \"%2$s\""
 msgstr "Stato cambiato da «%1$s» a «%2$s»"
@@ -2324,7 +2314,7 @@ msgstr "Errore nell'aprire la blocklist: %s (%d)"
 msgid "%s %s started"
 msgstr "%s %s avviato"
 
-#: ../libtransmission/session.c:2175
+#: ../libtransmission/session.c:2170
 #, c-format
 msgid "Loaded %d torrents"
 msgstr "Caricati %d torrent"
@@ -2368,7 +2358,7 @@ msgstr "Fatto"
 msgid "Complete"
 msgstr "Completo"
 
-#: ../libtransmission/torrent.c:3462
+#: ../libtransmission/torrent.c:3466
 #, c-format
 msgid "Piece %<PRIu32>, which was just downloaded, failed its checksum test"
 msgstr "Il frammento %<PRIu32>, appena scaricato, non supera il controllo"
@@ -2433,5 +2423,10 @@ msgstr "Impossibile leggere il contenuto del file"
 msgid "Verifying torrent"
 msgstr "Verifica torrent"
 
-#~ msgid "transmission"
-#~ msgstr "transmission"
+#, c-format
+#~ msgid "Server returned \"%1$ld %2$s\""
+#~ msgstr "Il server ha restituito «%1$ld %2$s»"
+
+#, c-format
+#~ msgid "Error opening \"%s\""
+#~ msgstr "Errore nell'aprire «%s»"

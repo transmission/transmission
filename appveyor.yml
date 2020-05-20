@@ -88,7 +88,7 @@ for:
 
   deploy:
   - provider: Webhook
-    url: https://app.signpath.io/API/v1/8c96c8c9-a72c-4b46-a53c-80aad617f6bc/Integrations/AppVeyor?ProjectKey=transmission&SigningPolicyKey=test-signing
+    url: https://app.signpath.io/API/v1/8c96c8c9-a72c-4b46-a53c-80aad617f6bc/Integrations/AppVeyor?ProjectKey=transmission&SigningPolicyKey=release-signing
     authorization:
        secure: PrvcykaHmPgJ0ENht1q58tCfjRcmybiOeHYrvtQtAGsfahWvniAfP66DqHxv872acpyf3FpJn2ETCeszoVuFGA==
     on:

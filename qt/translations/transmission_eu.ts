@@ -59,17 +59,17 @@
     <message numerus="yes">
         <location line="+77"/>
         <source>Torrent(s) Added</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Torrenta Gehituta</numerusform>
+            <numerusform>Torrentak Gehituta</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+10"/>
         <source>Torrent Completed</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>Torrenta Osatuta</numerusform>
-            <numerusform></numerusform>
+            <numerusform>Torrentak Osatuta</numerusform>
         </translation>
     </message>
 </context>
@@ -2332,7 +2332,7 @@ Beste lehen URL bat gehitzeko, gehitu hura lerro huts baten ondoren.</translatio
 <context>
     <name>Torrent</name>
     <message>
-        <location filename="../Torrent.cc" line="+1064"/>
+        <location filename="../Torrent.cc" line="+1043"/>
         <source>Verifying local data</source>
         <translation>Tokiko datuak egiaztatzen</translation>
     </message>
@@ -2512,7 +2512,7 @@ Beste lehen URL bat gehitzeko, gehitu hura lerro huts baten ondoren.</translatio
 <context>
     <name>TrackerDelegate</name>
     <message numerus="yes">
-        <location filename="../TrackerDelegate.cc" line="+218"/>
+        <location filename="../TrackerDelegate.cc" line="+211"/>
         <source>Got a list of%1 %Ln peer(s)%2 %3 ago</source>
         <extracomment>%1 and %2 are replaced with HTML markup, %3 is duration</extracomment>
         <translation>

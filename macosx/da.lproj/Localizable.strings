@@ -37,7 +37,7 @@
 
 /* Inspector -> selected torrents
    stats total */
-"%@ total" = "%@ total";
+"%@ total" = "%@ samlet";
 
 /* Filter Bar Button -> tool tip
    Status bar transfer count
@@ -220,7 +220,7 @@
 "Are you sure you want to remove %@ transfers from the transfer list?" = "Er du sikker på, at du vil fjerne %@ overførsler fra listen?";
 
 /* Remove trackers alert -> title */
-"Are you sure you want to remove %d trackers?" = "Er du sikker på, at du vil fjerne %d trackers?";
+"Are you sure you want to remove %d trackers?" = "Er du sikker på, at du vil fjerne %d trackere?";
 
 /* Removal confirm panel -> title */
 "Are you sure you want to remove \"%@\" from the transfer list and trash the data file?" = "Er du sikker på, at du vil fjerne \"%@\" fra listen og flytte data til papirkurven?";
@@ -317,7 +317,7 @@
 
 /* Message window -> level
    Message window -> level string */
-"Debug" = "Debug";
+"Debug" = "Fejlfinding";
 
 /* Info options -> global setting */
 "disabled" = "deaktiveret";
@@ -415,7 +415,7 @@
 "From: distributed hash table" = "Fra: distributed hash table";
 
 /* Inspector -> Peers tab -> table row tooltip */
-"From: incoming connection" = "Fra: incoming connection";
+"From: incoming connection" = "Fra: indgående forbindelse";
 
 /* Inspector -> Peers tab -> table row tooltip */
 "From: libtorrent extension protocol handshake" = "Fra: libtorrent extension protocol handshake";
@@ -479,7 +479,7 @@
 "High" = "Høj";
 
 /* files tab -> tooltip */
-"High Priority" = "Høj priotet";
+"High Priority" = "Høj prioritet";
 
 /* Legal alert -> button */
 "I Accept" = "Accepter";
@@ -522,7 +522,7 @@
 "Last updated" = "Sidst opdateret";
 
 /* tracker peer stat */
-"Leechers" = "Leechers";
+"Leechers" = "Leechere";
 
 /* About window -> license button */
 "License" = "Licens";
@@ -537,7 +537,7 @@
 "Low" = "Lav";
 
 /* files tab -> tooltip */
-"Low Priority" = "Lav priotet";
+"Low Priority" = "Lav prioritet";
 
 /* Open duplicate magnet alert -> title */
 "Magnet link is a duplicate of an existing transfer." = "Magnet-linket er en dublet af en eksisterende overførsel.";
@@ -559,7 +559,7 @@
 "Message Log" = "Beskeder";
 
 /* files tab -> tooltip */
-"Multiple Priorities" = "Flere prioteter";
+"Multiple Priorities" = "Flere prioriteter";
 
 /* Inspector -> Peers tab -> table row tooltip
    No Ratio
@@ -602,7 +602,7 @@
 "Normal" = "Normal";
 
 /* files tab -> tooltip */
-"Normal Priority" = "Normal priotet";
+"Normal Priority" = "Normal prioritet";
 
 /* Torrent disk space alert -> title */
 "Not enough remaining disk space to download \"%@\" completely." = "Der er ikke tilstrækkelig diskplads til at fuldføre \"%@\".";
@@ -629,11 +629,11 @@
 "OK" = "OK";
 
 /* Remove completed confirm panel -> message */
-"Once removed, continuing the transfer will require the torrent file or magnet link." = "Fjernes denne, vil det kræve torrent-filen eller magnet-link at fortsætte overførslen.";
+"Once removed, continuing the transfer will require the torrent file or magnet link." = "Når den er blevet fjernet kræver det torrent-filen eller magnet-linket for at fortsætte overførslen.";
 
 /* Removal confirm panel -> message part 2
    Remove completed confirm panel -> message */
-"Once removed, continuing the transfers will require the torrent files or magnet links." = "Fjernes disse, vil det kræve torrent-filerne eller magnet-linksne at fortsætte overførslerne.";
+"Once removed, continuing the transfers will require the torrent files or magnet links." = "Når de er blevet fjernet kræver det torrent-filerne eller magnet-linkene for at fortsætte overførslerne.";
 
 /* Remove trackers alert -> message */
 "Once removed, Transmission will no longer attempt to contact it. This cannot be undone." = "Fjernes denne, vil programmet ikke længere forsøge at kontakte den. Denne handling kan ikke fortrydes.";
@@ -724,10 +724,10 @@
 
 /* File Outline -> Menu
    file table -> header tool tip */
-"Priority" = "Priotet";
+"Priority" = "Prioritet";
 
 /* files tab -> tooltip */
-"Priority Not Available" = "Priotet ikke tilgængelig";
+"Priority Not Available" = "Prioritet ikke tilgængelig";
 
 /* Inspector -> private torrent */
 "Private Torrent, non-tracker peer discovery disabled" = "Private torrent, ikke-tracker modpartsopdagelse deaktiveret";
@@ -742,7 +742,7 @@
 "Program Started" = "Program startet";
 
 /* Inspector -> Peers tab -> table row tooltip */
-"Progress: %@" = "Fremskridt: %@";
+"Progress: %@" = "Fremgang: %@";
 
 /* Inspector -> Peers tab -> table row tooltip */
 "Protocol: %@" = "Protokol: %@";
@@ -794,7 +794,7 @@
 "Remove Selected" = "Fjern valgte";
 
 /* Inspector view -> tracker buttons */
-"Remove selected trackers" = "Fjern valgte trackers";
+"Remove selected trackers" = "Fjern valgte trackere";
 
 /* Remove toolbar item -> tooltip */
 "Remove selected transfers" = "Fjern valgte overførsler";
@@ -838,7 +838,7 @@
 "Save" = "Arkiver";
 
 /* Tracker last scrape */
-"Scrape error" = "Scrape fejl";
+"Scrape error" = "Fejl ved scrape";
 
 /* Tracker last scrape */
 "Scrape timed out" = "Scrape fik timeout";
@@ -929,7 +929,7 @@
 "Speed Limit Auto Enabled" = "Begræns hastighed automatisk aktiveret";
 
 /* Main window -> 2nd bottom left button (turtle) tooltip */
-"Speed Limit overrides the total bandwidth limits with its own limits." = "Slå 'Begræns hastighed' til.";
+"Speed Limit overrides the total bandwidth limits with its own limits." = "Hastighedsgrænse tilsidesætter de samlede båndbreddegrænser med sine egne grænser.";
 
 /* Torrent -> status string */
 "Stalled" = "Gået i stå";
@@ -1082,7 +1082,7 @@
 
 /* Inspector -> tab
    Inspector view -> title */
-"Trackers" = "Trackers";
+"Trackers" = "Trackere";
 
 /* Inspector -> Peers tab -> peers */
 "Transfer Not Active" = "Inaktiv overførsel";
@@ -1097,7 +1097,7 @@
 "Transmission is a file-sharing program. When you run a torrent, its data will be made available to others by means of upload. You and you alone are fully responsible for exercising proper judgement and abiding by your local laws." = "Transmission er et fildelingsprogram. Når du kører en torrent, vil dens data være tilgængelig for andre. Du har alene det fulde ansvar for at udvise god dømmekraft og overholde dine lands love.";
 
 /* Donation beg -> message */
-"Transmission is a full-featured torrent application. A lot of time and effort have gone into development, coding, and refinement. If you enjoy using it, please consider showing your love with a donation." = "Transmission er et fuldt udstyret torrent-program. Der bruges mange ressourcer på udvikling, kodning og refinement. Hvis du synes godt om programmet, venligst overvej at støtte projektet ved at donere.";
+"Transmission is a full-featured torrent application. A lot of time and effort have gone into development, coding, and refinement. If you enjoy using it, please consider showing your love with a donation." = "Transmission er et fuldt udstyret torrent-program. Der bruges mange ressourcer på udvikling, kodning og forbedring. Hvis du synes godt om programmet, venligst overvej at støtte projektet ved at donere.";
 
 /* Transmission already running alert -> title */
 "Transmission is already running." = "Transmission kører allerede.";

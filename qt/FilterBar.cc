@@ -38,13 +38,13 @@ enum
 
 FilterBarComboBox* FilterBar::createActivityCombo()
 {
-    FilterBarComboBox* c = new FilterBarComboBox(this);
-    FilterBarComboBoxDelegate* delegate = new FilterBarComboBoxDelegate(this, c);
+    auto* c = new FilterBarComboBox(this);
+    auto* delegate = new FilterBarComboBoxDelegate(this, c);
     c->setItemDelegate(delegate);
 
-    QStandardItemModel* model = new QStandardItemModel(this);
+    auto* model = new QStandardItemModel(this);
 
-    QStandardItem* row = new QStandardItem(tr("All"));
+    auto* row = new QStandardItem(tr("All"));
     row->setData(FilterMode::SHOW_ALL, ActivityRole);
     model->appendRow(row);
 
@@ -115,7 +115,7 @@ void FilterBar::refreshTrackers()
 
     // update the "All" row
     auto const num_trackers = torrentsPerHost.size();
-    auto item = myTrackerModel->item(ROW_TOTALS);
+    auto* item = myTrackerModel->item(ROW_TOTALS);
     item->setData(int(num_trackers), FilterBarComboBox::CountRole);
     item->setData(getCountString(num_trackers), FilterBarComboBox::CountStringRole);
 
@@ -173,11 +173,11 @@ void FilterBar::refreshTrackers()
 
 FilterBarComboBox* FilterBar::createTrackerCombo(QStandardItemModel* model)
 {
-    FilterBarComboBox* c = new FilterBarComboBox(this);
-    FilterBarComboBoxDelegate* delegate = new FilterBarComboBoxDelegate(this, c);
+    auto* c = new FilterBarComboBox(this);
+    auto* delegate = new FilterBarComboBoxDelegate(this, c);
     c->setItemDelegate(delegate);
 
-    QStandardItem* row = new QStandardItem(tr("All"));
+    auto* row = new QStandardItem(tr("All"));
     row->setData(QString(), TrackerRole);
     int const count = myTorrents.rowCount();
     row->setData(count, FilterBarComboBox::CountRole);
@@ -203,7 +203,7 @@ FilterBar::FilterBar(Prefs& prefs, TorrentModel const& torrents, TorrentFilter c
     myRecountTimer(new QTimer(this)),
     myIsBootstrapping(true)
 {
-    QHBoxLayout* h = new QHBoxLayout(this);
+    auto* h = new QHBoxLayout(this);
     h->setContentsMargins(3, 3, 3, 3);
 
     myCountLabel = new QLabel(tr("Show:"), this);
@@ -272,7 +272,7 @@ void FilterBar::refreshPref(int key)
     {
     case Prefs::FILTER_MODE:
         {
-            FilterMode const m = myPrefs.get<FilterMode>(key);
+            auto const m = myPrefs.get<FilterMode>(key);
             QAbstractItemModel* model = myActivityCombo->model();
             QModelIndexList indices = model->match(model->index(0, 0), ActivityRole, m.mode());
             myActivityCombo->setCurrentIndex(indices.isEmpty() ? 0 : indices.first().row());

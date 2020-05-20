@@ -566,7 +566,6 @@ tr_sched_day tr_sessionGetAltSpeedDay(tr_session const*);
 
 typedef void (* tr_altSpeedFunc)(tr_session*, bool active, bool userDriven, void*);
 
-void tr_sessionClearAltSpeedFunc(tr_session*);
 void tr_sessionSetAltSpeedFunc(tr_session*, tr_altSpeedFunc, void*);
 
 bool tr_sessionGetActiveSpeedLimit_KBps(tr_session const* session, tr_direction dir, double* setme);

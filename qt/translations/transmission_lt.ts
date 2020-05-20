@@ -69,7 +69,7 @@
         <location line="+10"/>
         <source>Torrent Completed</source>
         <translation type="unfinished">
-            <numerusform>Torento siuntimas užbaigtas</numerusform>
+            <numerusform></numerusform>
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
@@ -2351,7 +2351,7 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
 <context>
     <name>Torrent</name>
     <message>
-        <location filename="../Torrent.cc" line="+1064"/>
+        <location filename="../Torrent.cc" line="+1043"/>
         <source>Verifying local data</source>
         <translation>Tikrinami vietiniai duomenys</translation>
     </message>
@@ -2537,7 +2537,7 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
 <context>
     <name>TrackerDelegate</name>
     <message numerus="yes">
-        <location filename="../TrackerDelegate.cc" line="+218"/>
+        <location filename="../TrackerDelegate.cc" line="+211"/>
         <source>Got a list of%1 %Ln peer(s)%2 %3 ago</source>
         <extracomment>%1 and %2 are replaced with HTML markup, %3 is duration</extracomment>
         <translation>

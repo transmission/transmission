@@ -66,7 +66,7 @@ class ListViewProxyStyle : public QProxyStyle
 {
 public:
     int styleHint(StyleHint hint, QStyleOption const* option = nullptr, QWidget const* widget = nullptr,
-        QStyleHintReturn* returnData = nullptr) const
+        QStyleHintReturn* returnData = nullptr) const override
     {
         if (hint == QStyle::SH_ItemView_ActivateItemOnSingleClick)
         {
@@ -83,7 +83,7 @@ QIcon MainWindow::getStockIcon(QString const& name, int fallback)
 
     if (icon.isNull() && fallback >= 0)
     {
-        icon = style()->standardIcon(QStyle::StandardPixmap(fallback), 0, this);
+        icon = style()->standardIcon(QStyle::StandardPixmap(fallback), nullptr, this);
     }
 
     return icon;
@@ -140,11 +140,6 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     myPrefs(prefs),
     myModel(model),
     myLastFullUpdateTime(0),
-    mySessionDialog(),
-    myPrefsDialog(),
-    myAboutDialog(),
-    myStatsDialog(),
-    myDetailsDialog(),
     myFilterModel(prefs),
     myTorrentDelegate(new TorrentDelegate(this)),
     myTorrentDelegateMin(new TorrentDelegateMin(this)),
@@ -156,7 +151,7 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
 {
     setAcceptDrops(true);
 
-    QAction* sep = new QAction(this);
+    auto* sep = new QAction(this);
     sep->setSeparator(true);
 
     ui.setupUi(this);
@@ -271,7 +266,7 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
         qMakePair(ui.action_SortByState, static_cast<int>(SortMode::SORT_BY_STATE))
     };
 
-    QActionGroup* actionGroup = new QActionGroup(this);
+    auto* actionGroup = new QActionGroup(this);
 
     for (auto const& mode : sortModes)
     {
@@ -286,7 +281,7 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     myAltSpeedAction->setCheckable(true);
     connect(myAltSpeedAction, SIGNAL(triggered()), this, SLOT(toggleSpeedMode()));
 
-    QMenu* menu = new QMenu(this);
+    auto* menu = new QMenu(this);
     menu->addAction(ui.action_OpenFile);
     menu->addAction(ui.action_AddURL);
     menu->addSeparator();
@@ -354,9 +349,7 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     refreshSoon();
 }
 
-MainWindow::~MainWindow()
-{
-}
+MainWindow::~MainWindow() = default;
 
 void MainWindow::onSessionSourceChanged()
 {
@@ -390,8 +383,8 @@ void MainWindow::initStatusBar()
 {
     ui.optionsButton->setMenu(createOptionsMenu());
 
-    int const minimumSpeedWidth = ui.downloadSpeedLabel->fontMetrics().width(Formatter::uploadSpeedToString(Speed::fromKBps(
-        999.99)));
+    int const minimumSpeedWidth =
+        ui.downloadSpeedLabel->fontMetrics().boundingRect(Formatter::uploadSpeedToString(Speed::fromKBps(999.99))).width();
     ui.downloadSpeedLabel->setMinimumWidth(minimumSpeedWidth);
     ui.uploadSpeedLabel->setMinimumWidth(minimumSpeedWidth);
 
@@ -407,7 +400,7 @@ QMenu* MainWindow::createOptionsMenu()
             int const stockSpeeds[] = { 5, 10, 20, 30, 40, 50, 75, 100, 150, 200, 250, 500, 750 };
             int const currentValue = myPrefs.get<int>(pref);
 
-            QActionGroup* actionGroup = new QActionGroup(this);
+            auto* actionGroup = new QActionGroup(this);
 
             offAction = menu->addAction(tr("Unlimited"));
             offAction->setCheckable(true);
@@ -434,9 +427,9 @@ QMenu* MainWindow::createOptionsMenu()
     auto const initSeedRatioSubMenu = [this](QMenu* menu, QAction*& offAction, QAction*& onAction, int pref, int enabledPref)
         {
             double const stockRatios[] = { 0.25, 0.50, 0.75, 1, 1.5, 2, 3 };
-            double const currentValue = myPrefs.get<double>(pref);
+            auto const currentValue = myPrefs.get<double>(pref);
 
-            QActionGroup* actionGroup = new QActionGroup(this);
+            auto* actionGroup = new QActionGroup(this);
 
             offAction = menu->addAction(tr("Seed Forever"));
             offAction->setCheckable(true);
@@ -460,7 +453,7 @@ QMenu* MainWindow::createOptionsMenu()
             }
         };
 
-    QMenu* menu = new QMenu(this);
+    auto* menu = new QMenu(this);
 
     initSpeedSubMenu(menu->addMenu(tr("Limit Download Speed")), myDlimitOffAction, myDlimitOnAction, Prefs::DSPEED,
         Prefs::DSPEED_ENABLED);
@@ -485,8 +478,8 @@ QMenu* MainWindow::createStatsModeMenu()
         qMakePair(ui.action_SessionTransfer, SessionTransferStatsModeName)
     };
 
-    QActionGroup* actionGroup = new QActionGroup(this);
-    QMenu* menu = new QMenu(this);
+    auto* actionGroup = new QActionGroup(this);
+    auto* menu = new QMenu(this);
 
     for (auto const& mode : statsModes)
     {
@@ -561,7 +554,7 @@ void MainWindow::openProperties()
 
 void MainWindow::setLocation()
 {
-    RelocateDialog* d = new RelocateDialog(mySession, myModel, getSelectedTorrents(), this);
+    auto* d = new RelocateDialog(mySession, myModel, getSelectedTorrents(), this);
     d->setAttribute(Qt::WA_DeleteOnClose, true);
     d->show();
 }
@@ -947,7 +940,7 @@ torrent_ids_t MainWindow::getSelectedTorrents(bool withMetadataOnly) const
 
     for (QModelIndex const& index : ui.listView->selectionModel()->selectedRows())
     {
-        Torrent const* tor(index.data(TorrentModel::TorrentRole).value<Torrent const*>());
+        auto const* tor(index.data(TorrentModel::TorrentRole).value<Torrent const*>());
 
         if (tor != nullptr && (!withMetadataOnly || tor->hasMetadata()))
         {
@@ -1261,7 +1254,7 @@ QLatin1String const SHOW_OPTIONS_CHECKBOX_NAME("show-options-checkbox");
 
 void MainWindow::newTorrent()
 {
-    MakeDialog* dialog = new MakeDialog(mySession, this);
+    auto* dialog = new MakeDialog(mySession, this);
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->show();
 }
@@ -1274,11 +1267,11 @@ void MainWindow::openTorrent()
     d->setFileMode(QFileDialog::ExistingFiles);
     d->setAttribute(Qt::WA_DeleteOnClose);
 
-    auto const l = qobject_cast<QGridLayout*>(d->layout());
+    auto* const l = qobject_cast<QGridLayout*>(d->layout());
 
     if (l != nullptr)
     {
-        QCheckBox* b = new QCheckBox(tr("Show &options dialog"));
+        auto* b = new QCheckBox(tr("Show &options dialog"));
         b->setChecked(myPrefs.getBool(Prefs::OPTIONS_PROMPT));
         b->setObjectName(SHOW_OPTIONS_CHECKBOX_NAME);
         l->addWidget(b, l->rowCount(), 0, 1, -1, Qt::AlignLeft);
@@ -1310,11 +1303,11 @@ void MainWindow::addTorrents(QStringList const& filenames)
 {
     bool showOptions = myPrefs.getBool(Prefs::OPTIONS_PROMPT);
 
-    QFileDialog const* const fileDialog = qobject_cast<QFileDialog const*>(sender());
+    auto const* const fileDialog = qobject_cast<QFileDialog const*>(sender());
 
     if (fileDialog != nullptr)
     {
-        QCheckBox const* const b = fileDialog->findChild<QCheckBox const*>(SHOW_OPTIONS_CHECKBOX_NAME);
+        auto const* const b = fileDialog->findChild<QCheckBox const*>(SHOW_OPTIONS_CHECKBOX_NAME);
 
         if (b != nullptr)
         {
@@ -1332,7 +1325,7 @@ void MainWindow::addTorrent(AddData const& addMe, bool showOptions)
 {
     if (showOptions)
     {
-        OptionsDialog* o = new OptionsDialog(mySession, myPrefs, addMe, this);
+        auto* o = new OptionsDialog(mySession, myPrefs, addMe, this);
         o->show();
         qApp->alert(o);
     }
@@ -1355,7 +1348,7 @@ void MainWindow::removeTorrents(bool const deleteFiles)
 
     for (QModelIndex const& index : ui.listView->selectionModel()->selectedRows())
     {
-        Torrent const* tor(index.data(TorrentModel::TorrentRole).value<Torrent const*>());
+        auto const* tor(index.data(TorrentModel::TorrentRole).value<Torrent const*>());
         ids.insert(tor->id());
 
         if (tor->connectedPeers())
@@ -1429,7 +1422,7 @@ void MainWindow::removeTorrents(bool const deleteFiles)
     msgBox.setDefaultButton(QMessageBox::Cancel);
     msgBox.setIcon(QMessageBox::Question);
     // hack needed to keep the dialog from being too narrow
-    auto layout = qobject_cast<QGridLayout*>(msgBox.layout());
+    auto* layout = qobject_cast<QGridLayout*>(msgBox.layout());
 
     if (layout == nullptr)
     {
@@ -1437,7 +1430,7 @@ void MainWindow::removeTorrents(bool const deleteFiles)
         msgBox.setLayout(layout);
     }
 
-    QSpacerItem* spacer = new QSpacerItem(450, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
+    auto* spacer = new QSpacerItem(450, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
     layout->addItem(spacer, layout->rowCount(), 0, 1, layout->columnCount());
 
     if (msgBox.exec() == QMessageBox::Ok)

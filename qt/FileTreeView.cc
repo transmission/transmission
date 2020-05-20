@@ -283,7 +283,7 @@ void FileTreeView::onlyCheckSelectedItems()
     QModelIndexList wantedIndices = selectedSourceRows();
     myModel->setWanted(wantedIndices, true);
 
-    qSort(wantedIndices);
+    std::sort(wantedIndices.begin(), wantedIndices.end());
 
     QSet<QModelIndex> wantedIndicesParents;
 
@@ -303,7 +303,7 @@ void FileTreeView::onlyCheckSelectedItems()
     {
         QModelIndex const parentIndex = parentsQueue.dequeue();
 
-        if (qBinaryFind(wantedIndices, parentIndex) != wantedIndices.end())
+        if (std::binary_search(wantedIndices.begin(), wantedIndices.end(), parentIndex))
         {
             continue;
         }
@@ -313,7 +313,7 @@ void FileTreeView::onlyCheckSelectedItems()
             QModelIndex const childIndex = parentIndex.child(i, 0);
             int const childCheckState = childIndex.data(FileTreeModel::WantedRole).toInt();
 
-            if (childCheckState == Qt::Unchecked || qBinaryFind(wantedIndices, childIndex) != wantedIndices.end())
+            if (childCheckState == Qt::Unchecked || std::binary_search(wantedIndices.begin(), wantedIndices.end(), childIndex))
             {
                 continue;
             }
@@ -341,7 +341,7 @@ void FileTreeView::onlyCheckSelectedItems()
 
 void FileTreeView::setSelectedItemsPriority()
 {
-    QAction* action = qobject_cast<QAction*>(sender());
+    auto* action = qobject_cast<QAction*>(sender());
     assert(action != nullptr);
     myModel->setPriority(selectedSourceRows(), action->property(PRIORITY_KEY).toInt());
 }

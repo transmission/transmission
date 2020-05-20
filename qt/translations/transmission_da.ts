@@ -59,17 +59,17 @@
     <message numerus="yes">
         <location line="+77"/>
         <source>Torrent(s) Added</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Torrent tilføjet</numerusform>
+            <numerusform>Torrents tilføjet</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+10"/>
         <source>Torrent Completed</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>Torrent fuldført</numerusform>
-            <numerusform></numerusform>
+            <numerusform>Torrents fuldført</numerusform>
         </translation>
     </message>
 </context>
@@ -145,12 +145,12 @@
     <message>
         <location line="+5"/>
         <source>Created on %1</source>
-        <translation>Oprettet d. %1</translation>
+        <translation>Oprettet %1</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Created by %1 on %2</source>
-        <translation>Oprettet af %1 d. %2</translation>
+        <translation>Oprettet af %1 %2</translation>
     </message>
     <message>
         <location line="+185"/>
@@ -502,7 +502,7 @@
     <message>
         <location line="+32"/>
         <source>Options</source>
-        <translation>undefined</translation>
+        <translation>Indstillinger</translation>
     </message>
     <message>
         <location line="+9"/>
@@ -512,7 +512,7 @@
     <message>
         <location line="+12"/>
         <source>Honor global &amp;limits</source>
-        <translation>Respektér globale &amp;grænser</translation>
+        <translation>Overhold globale &amp;grænser</translation>
     </message>
     <message>
         <location line="+7"/>
@@ -1138,7 +1138,7 @@
     <message>
         <location line="+8"/>
         <source>Total Ratio</source>
-        <translation>Total forhold</translation>
+        <translation>Samlet forhold</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -1148,7 +1148,7 @@
     <message>
         <location line="+8"/>
         <source>Total Transfer</source>
-        <translation>Total overførsel</translation>
+        <translation>Samlet overførsel</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -1368,12 +1368,12 @@
     <message>
         <location line="+6"/>
         <source>Once removed, continuing the transfer will require the torrent file or magnet link.</source>
-        <translation>Når den er fjernet vil fortsættelse af overførslen kræve torrent-filen eller magnet-linket.</translation>
+        <translation>Når den er blevet fjernet kræver det torrent-filen eller magnet-linket for at fortsætte overførslen.</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Once removed, continuing the transfers will require the torrent files or magnet links.</source>
-        <translation>Når den er fjernet vil fortsættelse af overførslerne kræve torrent-filen eller magnet-linket.</translation>
+        <translation>Når de er blevet fjernet kræver det torrent-filerne eller magnet-linkene for at fortsætte overførslerne.</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -2159,7 +2159,7 @@ For at tilføje en anden primære URL, skal du tilføje den efter en tom linje.<
     <message>
         <location filename="../PrefsDialog.cc" line="+95"/>
         <source>Not supported by remote sessions</source>
-        <translation>Ikke understøttet af fjern-sessioner</translation>
+        <translation>Ikke understøttet af fjernsessioner</translation>
     </message>
 </context>
 <context>
@@ -2251,7 +2251,7 @@ For at tilføje en anden primære URL, skal du tilføje den efter en tom linje.<
     <message>
         <location line="+7"/>
         <source>Connect to &amp;Remote Session</source>
-        <translation>Opret forbindelse til &amp;fjern-session</translation>
+        <translation>Opret forbindelse til &amp;fjernsession</translation>
     </message>
     <message>
         <location line="+7"/>
@@ -2318,7 +2318,7 @@ For at tilføje en anden primære URL, skal du tilføje den efter en tom linje.<
     <message>
         <location line="-61"/>
         <source>Total</source>
-        <translation>Total</translation>
+        <translation>Samlet</translation>
     </message>
     <message numerus="yes">
         <location filename="../StatsDialog.cc" line="+72"/>
@@ -2332,7 +2332,7 @@ For at tilføje en anden primære URL, skal du tilføje den efter en tom linje.<
 <context>
     <name>Torrent</name>
     <message>
-        <location filename="../Torrent.cc" line="+1064"/>
+        <location filename="../Torrent.cc" line="+1043"/>
         <source>Verifying local data</source>
         <translation>Verificerer lokale data</translation>
     </message>
@@ -2512,7 +2512,7 @@ For at tilføje en anden primære URL, skal du tilføje den efter en tom linje.<
 <context>
     <name>TrackerDelegate</name>
     <message numerus="yes">
-        <location filename="../TrackerDelegate.cc" line="+218"/>
+        <location filename="../TrackerDelegate.cc" line="+211"/>
         <source>Got a list of%1 %Ln peer(s)%2 %3 ago</source>
         <extracomment>%1 and %2 are replaced with HTML markup, %3 is duration</extracomment>
         <translation>
@@ -2559,8 +2559,8 @@ For at tilføje en anden primære URL, skal du tilføje den efter en tom linje.<
         <source>Tracker had%1 %Ln seeder(s)%2</source>
         <extracomment>First part of phrase &quot;Tracker had ... seeder(s) and ... leecher(s) ... ago&quot;; %1 and %2 are replaced with HTML markup</extracomment>
         <translation>
-            <numerusform>Tracker havde %1 %Ln seeder %2</numerusform>
-            <numerusform>Tracker havde %1 %Ln seedere %2</numerusform>
+            <numerusform>Tracker havde%1 %Ln seeder%2</numerusform>
+            <numerusform>Tracker havde%1 %Ln seedere%2</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -2576,13 +2576,13 @@ For at tilføje en anden primære URL, skal du tilføje den efter en tom linje.<
         <location line="+6"/>
         <source>Tracker had %1no information%2 on peer counts %3 ago</source>
         <extracomment>%1 and %2 are replaced with HTML markup, %3 is duration</extracomment>
-        <translation>Tracker havde %1 ingen information %2 på modpartsantal %3 siden</translation>
+        <translation>Tracker havde %1ingen information%2 på modpartsantal %3 siden</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Got a scrape error %1&quot;%2&quot;%3 %4 ago</source>
         <extracomment>%1 and %3 are replaced with HTML markup, %2 is error message, %4 is duration</extracomment>
-        <translation>Fik en scrape-fejl %1&quot;%2&quot;%3 %4 siden</translation>
+        <translation>Fik en fejl ved scrape %1&quot;%2&quot;%3 %4 siden</translation>
     </message>
     <message>
         <location line="+15"/>

@@ -271,7 +271,7 @@ void PrefsDialog::lineEditingFinished()
 
     if (prefWidget.is<QLineEdit>())
     {
-        QLineEdit const* const lineEdit = prefWidget.as<QLineEdit>();
+        auto const* const lineEdit = prefWidget.as<QLineEdit>();
 
         if (lineEdit->isModified())
         {
@@ -363,7 +363,7 @@ void PrefsDialog::initSpeedTab()
     mySchedWidgets << ui.altSpeedLimitStartTimeEdit << ui.altSpeedLimitToLabel << ui.altSpeedLimitEndTimeEdit <<
         ui.altSpeedLimitDaysLabel << ui.altSpeedLimitDaysCombo;
 
-    ColumnResizer* cr(new ColumnResizer(this));
+    auto* cr = new ColumnResizer(this);
     cr->addLayout(ui.speedLimitsSectionLayout);
     cr->addLayout(ui.altSpeedLimitsSectionLayout);
     cr->update();
@@ -418,7 +418,7 @@ void PrefsDialog::initNetworkTab()
     linkWidgetToPref(ui.enableDhtCheck, Prefs::DHT_ENABLED);
     linkWidgetToPref(ui.enableLpdCheck, Prefs::LPD_ENABLED);
 
-    ColumnResizer* cr(new ColumnResizer(this));
+    auto* cr = new ColumnResizer(this);
     cr->addLayout(ui.incomingPeersSectionLayout);
     cr->addLayout(ui.peerLimitsSectionLayout);
     cr->update();
@@ -479,7 +479,7 @@ void PrefsDialog::initPrivacyTab()
 
     myBlockWidgets << ui.blocklistEdit << ui.blocklistStatusLabel << ui.updateBlocklistButton << ui.autoUpdateBlocklistCheck;
 
-    ColumnResizer* cr(new ColumnResizer(this));
+    auto* cr = new ColumnResizer(this);
     cr->addLayout(ui.encryptionSectionLayout);
     cr->addLayout(ui.blocklistSectionLayout);
     cr->update();
@@ -564,7 +564,7 @@ void PrefsDialog::initDownloadingTab()
     linkWidgetToPref(ui.completionScriptButton, Prefs::SCRIPT_TORRENT_DONE_FILENAME);
     linkWidgetToPref(ui.completionScriptEdit, Prefs::SCRIPT_TORRENT_DONE_FILENAME);
 
-    ColumnResizer* cr(new ColumnResizer(this));
+    auto* cr = new ColumnResizer(this);
     cr->addLayout(ui.addingSectionLayout);
     cr->addLayout(ui.downloadQueueSectionLayout);
     cr->addLayout(ui.incompleteSectionLayout);
@@ -639,9 +639,7 @@ PrefsDialog::PrefsDialog(Session& session, Prefs& prefs, QWidget* parent) :
     adjustSize();
 }
 
-PrefsDialog::~PrefsDialog()
-{
-}
+PrefsDialog::~PrefsDialog() = default;
 
 void PrefsDialog::setPref(int key, QVariant const& v)
 {
@@ -745,7 +743,7 @@ void PrefsDialog::refreshPref(int key)
         {
             if (key == Prefs::ENCRYPTION)
             {
-                QComboBox* comboBox(qobject_cast<QComboBox*>(w));
+                auto* comboBox = qobject_cast<QComboBox*>(w);
                 int const index = comboBox->findData(myPrefs.getInt(key));
                 comboBox->setCurrentIndex(index);
             }

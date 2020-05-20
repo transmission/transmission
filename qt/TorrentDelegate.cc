@@ -57,7 +57,6 @@ public:
     QRect barRect;
     QRect progressRect;
 
-public:
     ItemLayout(QString const& nameText, QString const& statusText, QString const& progressText, QIcon const& emblemIcon,
         QFont const& baseFont, Qt::LayoutDirection direction, QPoint const& topLeft, int width);
 
@@ -439,7 +438,7 @@ QIcon& TorrentDelegate::getWarningEmblem() const
 
 void TorrentDelegate::paint(QPainter* painter, QStyleOptionViewItem const& option, QModelIndex const& index) const
 {
-    Torrent const* tor(index.data(TorrentModel::TorrentRole).value<Torrent const*>());
+    auto const* tor(index.data(TorrentModel::TorrentRole).value<Torrent const*>());
     painter->save();
     painter->setClipRect(option.rect);
     drawTorrent(painter, option, *tor);

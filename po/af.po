@@ -13,7 +13,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-02 13:06+0300\n"
+"POT-Creation-Date: 2020-05-14 18:55+0300\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
 "Last-Translator: Gideon Wentink <gjwentink@gmail.com>, 2018\n"
 "Language-Team: Afrikaans (https://www.transifex.com/transmissionbt/teams/33778/af/)\n"
@@ -23,7 +23,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../cli/cli.c:114 ../gtk/util.c:92 ../libtransmission/utils.c:1663
+#: ../cli/cli.c:114 ../gtk/util.c:92 ../libtransmission/utils.c:1694
 msgid "None"
 msgstr "Geen"
 
@@ -858,7 +858,7 @@ msgctxt "Verb"
 msgid "Verifying"
 msgstr "Verifieer tans"
 
-#: ../gtk/filter.c:591 ../gtk/msgwin.c:430 ../gtk/util.c:730
+#: ../gtk/filter.c:591 ../gtk/msgwin.c:430 ../gtk/util.c:717
 msgid "Error"
 msgstr "Fout"
 
@@ -2024,31 +2024,21 @@ msgstr "Die torrentlêer “%s” het ’n onbekende fout teëgekom."
 msgid "Error opening torrent"
 msgstr "Fout met oopmaak van torrent"
 
-#: ../gtk/util.c:590
-#, c-format
-msgid "Error opening \"%s\""
-msgstr "Fout met oopmaak van “%s”"
-
-#: ../gtk/util.c:592
-#, c-format
-msgid "Server returned \"%1$ld %2$s\""
-msgstr "Bediener het “%1$ld %2$s” teruggekeer"
-
-#: ../gtk/util.c:607
+#: ../gtk/util.c:594
 msgid "Unrecognized URL"
 msgstr "Onherkende URL"
 
-#: ../gtk/util.c:609
+#: ../gtk/util.c:596
 #, c-format
 msgid "Transmission doesn't know how to use \"%s\""
 msgstr "Transmission weet nie hoe om “%s” te gebruik nie"
 
-#: ../gtk/util.c:614
+#: ../gtk/util.c:601
 #, c-format
 msgid "This magnet link appears to be intended for something other than BitTorrent. BitTorrent magnet links have a section containing \"%s\"."
 msgstr "Die magneetskakel blyk bedoel te wees vir iets anders as BitTorrent. BitTorrent-magneetskakels moet ’n seksie met “%s” hê."
 
-#: ../gtk/util.c:736
+#: ../gtk/util.c:723
 #, c-format
 msgid "%s free"
 msgstr "%s vry"
@@ -2071,15 +2061,15 @@ msgstr "DNS-opsoek het misluk: %s"
 msgid "Connection failed"
 msgstr "Verbinding het misluk"
 
-#: ../libtransmission/announcer.c:1155 ../libtransmission/announcer.c:1474
+#: ../libtransmission/announcer.c:1150 ../libtransmission/announcer.c:1469
 msgid "Could not connect to tracker"
 msgstr "Kon nie aan spoorder verbind nie"
 
-#: ../libtransmission/announcer.c:1159 ../libtransmission/announcer.c:1478
+#: ../libtransmission/announcer.c:1154 ../libtransmission/announcer.c:1473
 msgid "Tracker did not respond"
 msgstr "Spoorder het nie gereageer nie"
 
-#: ../libtransmission/announcer.c:1223
+#: ../libtransmission/announcer.c:1218
 msgid "Success"
 msgstr "Sukses"
 
@@ -2250,7 +2240,7 @@ msgstr "Stop tans"
 msgid "Not forwarded"
 msgstr "Nie aangestuur nie"
 
-#: ../libtransmission/port-forwarding.c:106 ../libtransmission/torrent.c:2298
+#: ../libtransmission/port-forwarding.c:106 ../libtransmission/torrent.c:2302
 #, c-format
 msgid "State changed from \"%1$s\" to \"%2$s\""
 msgstr "Staat het verander van “%1$s” na “%2$s”"
@@ -2299,7 +2289,7 @@ msgstr "Fout tydens ontpak van bloklys: %s (%d)"
 msgid "%s %s started"
 msgstr "%s %s het begin"
 
-#: ../libtransmission/session.c:2175
+#: ../libtransmission/session.c:2170
 #, c-format
 msgid "Loaded %d torrents"
 msgstr "%d torrents gelaai"
@@ -2343,7 +2333,7 @@ msgstr "Klaar"
 msgid "Complete"
 msgstr "Afgehandel"
 
-#: ../libtransmission/torrent.c:3462
+#: ../libtransmission/torrent.c:3466
 #, c-format
 msgid "Piece %<PRIu32>, which was just downloaded, failed its checksum test"
 msgstr "Stuk %<PRIu32>, wat pas afgelaai is, het die kotrolesomtoets gefaal"
@@ -2407,3 +2397,11 @@ msgstr "Kan nie lêerinhoud parseer nie"
 #: ../libtransmission/verify.c:220
 msgid "Verifying torrent"
 msgstr "Verifieer tans torrent"
+
+#, c-format
+#~ msgid "Server returned \"%1$ld %2$s\""
+#~ msgstr "Bediener het “%1$ld %2$s” teruggekeer"
+
+#, c-format
+#~ msgid "Error opening \"%s\""
+#~ msgstr "Fout met oopmaak van “%s”"

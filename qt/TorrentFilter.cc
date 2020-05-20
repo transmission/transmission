@@ -27,9 +27,7 @@ TorrentFilter::TorrentFilter(Prefs const& prefs) :
     refilter();
 }
 
-TorrentFilter::~TorrentFilter()
-{
-}
+TorrentFilter::~TorrentFilter() = default;
 
 /***
 ****
@@ -101,8 +99,8 @@ int compare(T const a, T const b)
 bool TorrentFilter::lessThan(QModelIndex const& left, QModelIndex const& right) const
 {
     int val = 0;
-    Torrent const* a = sourceModel()->data(left, TorrentModel::TorrentRole).value<Torrent const*>();
-    Torrent const* b = sourceModel()->data(right, TorrentModel::TorrentRole).value<Torrent const*>();
+    auto const* a = sourceModel()->data(left, TorrentModel::TorrentRole).value<Torrent const*>();
+    auto const* b = sourceModel()->data(right, TorrentModel::TorrentRole).value<Torrent const*>();
 
     switch (myPrefs.get<SortMode>(Prefs::SORT_MODE).mode())
     {
@@ -285,12 +283,12 @@ bool TorrentFilter::activityFilterAcceptsTorrent(Torrent const* tor, FilterMode 
 bool TorrentFilter::filterAcceptsRow(int sourceRow, QModelIndex const& sourceParent) const
 {
     QModelIndex childIndex = sourceModel()->index(sourceRow, 0, sourceParent);
-    Torrent const* tor = childIndex.model()->data(childIndex, TorrentModel::TorrentRole).value<Torrent const*>();
+    auto const* tor = childIndex.model()->data(childIndex, TorrentModel::TorrentRole).value<Torrent const*>();
     bool accepts = true;
 
     if (accepts)
     {
-        FilterMode const m = myPrefs.get<FilterMode>(Prefs::FILTER_MODE);
+        auto const m = myPrefs.get<FilterMode>(Prefs::FILTER_MODE);
         accepts = activityFilterAcceptsTorrent(tor, m);
     }
 
@@ -311,11 +309,6 @@ bool TorrentFilter::filterAcceptsRow(int sourceRow, QModelIndex const& sourcePar
     }
 
     return accepts;
-}
-
-int TorrentFilter::hiddenRowCount() const
-{
-    return sourceModel()->rowCount() - rowCount();
 }
 
 void TorrentFilter::countTorrentsPerMode(int* setmeCounts) const

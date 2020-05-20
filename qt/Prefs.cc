@@ -341,7 +341,7 @@ void Prefs::initDefaults(tr_variant* d)
     tr_variantDictAddInt(d, TR_KEY_main_window_width, 300);
     tr_variantDictAddInt(d, TR_KEY_main_window_x, 50);
     tr_variantDictAddInt(d, TR_KEY_main_window_y, 50);
-    tr_variantDictAddInt(d, TR_KEY_remote_session_port, atoi(TR_DEFAULT_RPC_PORT_STR));
+    tr_variantDictAddInt(d, TR_KEY_remote_session_port, strtol(TR_DEFAULT_RPC_PORT_STR, nullptr, 0));
     tr_variantDictAddStr(d, TR_KEY_download_dir, tr_getDefaultDownloadDir());
     tr_variantDictAddStr(d, TR_KEY_filter_mode, "all");
     tr_variantDictAddStr(d, TR_KEY_main_window_layout_order, "menu,toolbar,filter,list,statusbar");
