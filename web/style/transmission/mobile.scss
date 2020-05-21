@@ -713,7 +713,8 @@ div.torrent_footer
 	$active-color-bottom: $selected-gradient-bottom;
 
 	#settings_menu {
-		display: none;
+		@include roundedBox(5px);
+		@include buttonImage('images/settings.png', $idle-color-top, $idle-color-bottom, $active-color-top, $active-color-bottom);
 	}
 
 	#prefs-button {
