@@ -566,7 +566,6 @@ tr_sched_day tr_sessionGetAltSpeedDay(tr_session const*);
 
 typedef void (* tr_altSpeedFunc)(tr_session*, bool active, bool userDriven, void*);
 
-void tr_sessionClearAltSpeedFunc(tr_session*);
 void tr_sessionSetAltSpeedFunc(tr_session*, tr_altSpeedFunc, void*);
 
 bool tr_sessionGetActiveSpeedLimit_KBps(tr_session const* session, tr_direction dir, double* setme);
@@ -1574,8 +1573,8 @@ typedef struct tr_file
     uint64_t length; /* Length of the file, in bytes */
     char* name; /* Path to the file */
     int8_t priority; /* TR_PRI_HIGH, _NORMAL, or _LOW */
-    int8_t dnd; /* "do not download" flag */
-    int8_t is_renamed; /* true if we're using a different path from the one in the metainfo; ie, if the user has renamed it */
+    bool dnd; /* "do not download" flag */
+    bool is_renamed; /* true if we're using a different path from the one in the metainfo; ie, if the user has renamed it */
     tr_piece_index_t firstPiece; /* We need pieces [firstPiece... */
     tr_piece_index_t lastPiece; /* ...lastPiece] to dl this file */
     uint64_t offset; /* file begins at the torrent's nth byte */
@@ -1588,7 +1587,7 @@ typedef struct tr_piece
     time_t timeChecked; /* the last time we tested this piece */
     uint8_t hash[SHA_DIGEST_LENGTH]; /* pieces hash */
     int8_t priority; /* TR_PRI_HIGH, _NORMAL, or _LOW */
-    int8_t dnd; /* "do not download" flag */
+    bool dnd; /* "do not download" flag */
 }
 tr_piece;
 
@@ -1828,6 +1827,12 @@ typedef struct tr_stat
     /** The last time we uploaded or downloaded piece data on this torrent. */
     time_t activityDate;
 
+    /** The last time during this session that a rarely-changing field
+        changed -- e.g. any tr_info field (trackers, filenames, name)
+        or download directory. RPC clients can monitor this to know when
+        to reload fields that rarely change. */
+    time_t editDate;
+
     /** Number of seconds since the last activity (or since started).
         -1 if activity is not seeding or downloading. */
     int idleSecs;
@@ -1862,13 +1867,16 @@ tr_stat const* tr_torrentStat(tr_torrent* torrent);
     reduce the CPU load if you're calling tr_torrentStat() frequently. */
 tr_stat const* tr_torrentStatCached(tr_torrent* torrent);
 
-/** @deprecated */
+/** @deprecated because this should only be accessible to libtransmission.
+    private code, use tr_torentSetDateAdded() instead */
 TR_DEPRECATED void tr_torrentSetAddedDate(tr_torrent* torrent, time_t addedDate);
 
-/** @deprecated */
+/** @deprecated because this should only be accessible to libtransmission.
+    private code, use tr_torentSetDateActive() instead */
 TR_DEPRECATED void tr_torrentSetActivityDate(tr_torrent* torrent, time_t activityDate);
 
-/** @deprecated */
+/** @deprecated because this should only be accessible to libtransmission.
+    private code, use tr_torentSetDateDone() instead */
 TR_DEPRECATED void tr_torrentSetDoneDate(tr_torrent* torrent, time_t doneDate);
 
 /** @} */

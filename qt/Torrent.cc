@@ -10,13 +10,8 @@
 #include <iostream>
 
 #include <QApplication>
-#include <QFileIconProvider>
-#include <QFileInfo>
-#include <QSet>
 #include <QString>
-#include <QStyle>
 #include <QUrl>
-#include <QVariant>
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h> /* tr_new0, tr_strdup */
@@ -27,24 +22,95 @@
 #include "Torrent.h"
 #include "Utils.h"
 
+/***
+****
+***/
+
+// unchanging fields needed by the main window
+Torrent::KeyList const Torrent::mainInfoKeys{
+    TR_KEY_addedDate,
+    TR_KEY_downloadDir,
+    TR_KEY_hashString,
+    TR_KEY_id, // must be in every req
+    TR_KEY_name,
+    TR_KEY_totalSize,
+    TR_KEY_trackers,
+};
+
+// changing fields needed by the main window
+Torrent::KeyList const Torrent::mainStatKeys{
+    TR_KEY_downloadedEver,
+    TR_KEY_error,
+    TR_KEY_errorString,
+    TR_KEY_eta,
+    TR_KEY_haveUnchecked,
+    TR_KEY_haveValid,
+    TR_KEY_id, // must be in every req
+    TR_KEY_isFinished,
+    TR_KEY_leftUntilDone,
+    TR_KEY_manualAnnounceTime,
+    TR_KEY_metadataPercentComplete,
+    TR_KEY_peersConnected,
+    TR_KEY_peersGettingFromUs,
+    TR_KEY_peersSendingToUs,
+    TR_KEY_percentDone,
+    TR_KEY_queuePosition,
+    TR_KEY_rateDownload,
+    TR_KEY_rateUpload,
+    TR_KEY_recheckProgress,
+    TR_KEY_seedRatioLimit,
+    TR_KEY_seedRatioMode,
+    TR_KEY_sizeWhenDone,
+    TR_KEY_status,
+    TR_KEY_uploadedEver,
+    TR_KEY_webseedsSendingToUs
+};
+
+Torrent::KeyList const Torrent::allMainKeys = Torrent::mainInfoKeys + Torrent::mainStatKeys;
+
+// unchanging fields needed by the details dialog
+Torrent::KeyList const Torrent::detailInfoKeys{
+    TR_KEY_comment,
+    TR_KEY_creator,
+    TR_KEY_dateCreated,
+    TR_KEY_files,
+    TR_KEY_id, // must be in every req
+    TR_KEY_isPrivate,
+    TR_KEY_pieceCount,
+    TR_KEY_pieceSize,
+    TR_KEY_trackers
+};
+
+// changing fields needed by the details dialog
+Torrent::KeyList const Torrent::detailStatKeys{
+    TR_KEY_activityDate,
+    TR_KEY_bandwidthPriority,
+    TR_KEY_corruptEver,
+    TR_KEY_desiredAvailable,
+    TR_KEY_downloadedEver,
+    TR_KEY_downloadLimit,
+    TR_KEY_downloadLimited,
+    TR_KEY_fileStats,
+    TR_KEY_honorsSessionLimits,
+    TR_KEY_id, // must be in every req
+    TR_KEY_peer_limit,
+    TR_KEY_peers,
+    TR_KEY_seedIdleLimit,
+    TR_KEY_seedIdleMode,
+    TR_KEY_startDate,
+    TR_KEY_trackerStats,
+    TR_KEY_uploadLimit,
+    TR_KEY_uploadLimited
+};
+
+/***
+****
+***/
+
 Torrent::Torrent(Prefs const& prefs, int id) :
-    myPrefs(prefs),
-    magnetTorrent(false)
-{
-#ifndef NDEBUG
-
-    for (int i = 0; i < PROPERTY_COUNT; ++i)
-    {
-        assert(myProperties[i].id == i);
-    }
-
-#endif
-
-    setInt(ID, id);
-    setIcon(MIME_ICON, qApp->style()->standardIcon(QStyle::SP_FileIcon));
-}
-
-Torrent::~Torrent()
+    id_(id),
+    icon_(Utils::getFileIcon()),
+    prefs_(prefs)
 {
 }
 
@@ -52,277 +118,237 @@ Torrent::~Torrent()
 ****
 ***/
 
-Torrent::Property Torrent::myProperties[] =
+namespace
 {
-    { ID, TR_KEY_id, QVariant::Int, INFO },
-    { UPLOAD_SPEED, TR_KEY_rateUpload, QVariant::ULongLong, STAT } /* Bps */,
-    { DOWNLOAD_SPEED, TR_KEY_rateDownload, QVariant::ULongLong, STAT }, /* Bps */
-    { DOWNLOAD_DIR, TR_KEY_downloadDir, QVariant::String, STAT },
-    { ACTIVITY, TR_KEY_status, QVariant::Int, STAT },
-    { NAME, TR_KEY_name, QVariant::String, INFO },
-    { ERROR, TR_KEY_error, QVariant::Int, STAT },
-    { ERROR_STRING, TR_KEY_errorString, QVariant::String, STAT },
-    { SIZE_WHEN_DONE, TR_KEY_sizeWhenDone, QVariant::ULongLong, STAT },
-    { LEFT_UNTIL_DONE, TR_KEY_leftUntilDone, QVariant::ULongLong, STAT },
-    { HAVE_UNCHECKED, TR_KEY_haveUnchecked, QVariant::ULongLong, STAT },
-    { HAVE_VERIFIED, TR_KEY_haveValid, QVariant::ULongLong, STAT },
-    { DESIRED_AVAILABLE, TR_KEY_desiredAvailable, QVariant::ULongLong, STAT },
-    { TOTAL_SIZE, TR_KEY_totalSize, QVariant::ULongLong, INFO },
-    { PIECE_SIZE, TR_KEY_pieceSize, QVariant::ULongLong, INFO },
-    { PIECE_COUNT, TR_KEY_pieceCount, QVariant::Int, INFO },
-    { PEERS_GETTING_FROM_US, TR_KEY_peersGettingFromUs, QVariant::Int, STAT },
-    { PEERS_SENDING_TO_US, TR_KEY_peersSendingToUs, QVariant::Int, STAT },
-    { WEBSEEDS_SENDING_TO_US, TR_KEY_webseedsSendingToUs, QVariant::Int, STAT_EXTRA },
-    { PERCENT_DONE, TR_KEY_percentDone, QVariant::Double, STAT },
-    { METADATA_PERCENT_DONE, TR_KEY_metadataPercentComplete, QVariant::Double, STAT },
-    { PERCENT_VERIFIED, TR_KEY_recheckProgress, QVariant::Double, STAT },
-    { DATE_ACTIVITY, TR_KEY_activityDate, QVariant::DateTime, STAT_EXTRA },
-    { DATE_ADDED, TR_KEY_addedDate, QVariant::DateTime, INFO },
-    { DATE_STARTED, TR_KEY_startDate, QVariant::DateTime, STAT_EXTRA },
-    { DATE_CREATED, TR_KEY_dateCreated, QVariant::DateTime, INFO },
-    { PEERS_CONNECTED, TR_KEY_peersConnected, QVariant::Int, STAT },
-    { ETA, TR_KEY_eta, QVariant::Int, STAT },
-    { RATIO, TR_KEY_uploadRatio, QVariant::Double, STAT },
-    { DOWNLOADED_EVER, TR_KEY_downloadedEver, QVariant::ULongLong, STAT },
-    { UPLOADED_EVER, TR_KEY_uploadedEver, QVariant::ULongLong, STAT },
-    { FAILED_EVER, TR_KEY_corruptEver, QVariant::ULongLong, STAT_EXTRA },
-    { TRACKERS, TR_KEY_trackers, QVariant::StringList, STAT },
-    { HOSTS, TR_KEY_NONE, QVariant::StringList, DERIVED },
-    { TRACKERSTATS, TR_KEY_trackerStats, CustomVariantType::TrackerStatsList, STAT_EXTRA },
-    { MIME_ICON, TR_KEY_NONE, QVariant::Icon, DERIVED },
-    { SEED_RATIO_LIMIT, TR_KEY_seedRatioLimit, QVariant::Double, STAT },
-    { SEED_RATIO_MODE, TR_KEY_seedRatioMode, QVariant::Int, STAT },
-    { SEED_IDLE_LIMIT, TR_KEY_seedIdleLimit, QVariant::Int, STAT_EXTRA },
-    { SEED_IDLE_MODE, TR_KEY_seedIdleMode, QVariant::Int, STAT_EXTRA },
-    { DOWN_LIMIT, TR_KEY_downloadLimit, QVariant::Int, STAT_EXTRA }, /* KB/s */
-    { DOWN_LIMITED, TR_KEY_downloadLimited, QVariant::Bool, STAT_EXTRA },
-    { UP_LIMIT, TR_KEY_uploadLimit, QVariant::Int, STAT_EXTRA }, /* KB/s */
-    { UP_LIMITED, TR_KEY_uploadLimited, QVariant::Bool, STAT_EXTRA },
-    { HONORS_SESSION_LIMITS, TR_KEY_honorsSessionLimits, QVariant::Bool, STAT_EXTRA },
-    { PEER_LIMIT, TR_KEY_peer_limit, QVariant::Int, STAT_EXTRA },
-    { HASH_STRING, TR_KEY_hashString, QVariant::String, INFO },
-    { IS_FINISHED, TR_KEY_isFinished, QVariant::Bool, STAT },
-    { IS_PRIVATE, TR_KEY_isPrivate, QVariant::Bool, INFO },
-    { IS_STALLED, TR_KEY_isStalled, QVariant::Bool, STAT },
-    { COMMENT, TR_KEY_comment, QVariant::String, INFO },
-    { CREATOR, TR_KEY_creator, QVariant::String, INFO },
-    { MANUAL_ANNOUNCE_TIME, TR_KEY_manualAnnounceTime, QVariant::DateTime, STAT_EXTRA },
-    { PEERS, TR_KEY_peers, CustomVariantType::PeerList, STAT_EXTRA },
-    { BANDWIDTH_PRIORITY, TR_KEY_bandwidthPriority, QVariant::Int, STAT_EXTRA },
-    { QUEUE_POSITION, TR_KEY_queuePosition, QVariant::Int, STAT },
-};
 
-Torrent::KeyList Torrent::buildKeyList(Group group)
+template<typename T>
+bool change(T& setme, T const& value)
 {
-    KeyList keys;
+    bool const changed = setme != value;
 
-    if (keys.empty())
+    if (changed)
     {
-        for (int i = 0; i < PROPERTY_COUNT; ++i)
+        setme = value;
+    }
+
+    return changed;
+}
+
+bool change(double& setme, double const& value)
+{
+    bool const changed = !qFuzzyCompare(setme + 1, value + 1);
+
+    if (changed)
+    {
+        setme = value;
+    }
+
+    return changed;
+}
+
+bool change(double& setme, tr_variant const* value)
+{
+    double d;
+    return tr_variantGetReal(value, &d) && change(setme, d);
+}
+
+bool change(int& setme, tr_variant const* value)
+{
+    int64_t i;
+    return tr_variantGetInt(value, &i) && change(setme, static_cast<int>(i));
+}
+
+bool change(uint64_t& setme, tr_variant const* value)
+{
+    int64_t i;
+    return tr_variantGetInt(value, &i) && change(setme, static_cast<uint64_t>(i));
+}
+
+bool change(time_t& setme, tr_variant const* value)
+{
+    int64_t i;
+    return tr_variantGetInt(value, &i) && change(setme, static_cast<time_t>(i));
+}
+
+bool change(Speed& setme, tr_variant const* value)
+{
+    int64_t i;
+    return tr_variantGetInt(value, &i) && change(setme, Speed::fromBps(i));
+}
+
+bool change(bool& setme, tr_variant const* value)
+{
+    bool b;
+    return tr_variantGetBool(value, &b) && change(setme, b);
+}
+
+bool change(QString& setme, tr_variant const* value)
+{
+    bool changed = false;
+    char const* str;
+    size_t len;
+
+    if (!tr_variantGetStr(value, &str, &len))
+    {
+        return changed;
+    }
+
+    if (len == 0)
+    {
+        changed = !setme.isEmpty();
+        setme.clear();
+        return changed;
+    }
+
+    return change(setme, QString::fromUtf8(str, len));
+}
+
+bool change(Peer& setme, tr_variant const* value)
+{
+    bool changed = false;
+
+    size_t pos = 0;
+    tr_quark key;
+    tr_variant* child;
+    while (tr_variantDictChild(const_cast<tr_variant*>(value), pos++, &key, &child))
+    {
+        switch (key)
         {
-            if (myProperties[i].id == ID || myProperties[i].group == group)
-            {
-                keys << myProperties[i].key;
-            }
+#define HANDLE_KEY(key) case TR_KEY_ ## key: \
+    changed = change(setme.key, child) || changed; break;
+
+            HANDLE_KEY(address)
+            HANDLE_KEY(clientIsChoked)
+            HANDLE_KEY(clientIsInterested)
+            HANDLE_KEY(clientName)
+            HANDLE_KEY(flagStr)
+            HANDLE_KEY(isDownloadingFrom)
+            HANDLE_KEY(isEncrypted)
+            HANDLE_KEY(isIncoming)
+            HANDLE_KEY(isUploadingTo)
+            HANDLE_KEY(peerIsChoked)
+            HANDLE_KEY(peerIsInterested)
+            HANDLE_KEY(port)
+            HANDLE_KEY(progress)
+            HANDLE_KEY(rateToClient)
+            HANDLE_KEY(rateToPeer)
+#undef HANDLE_KEY
+        default:
+            break;
         }
     }
 
-    return keys;
+    return changed;
 }
 
-Torrent::KeyList const& Torrent::getInfoKeys()
-{
-    static KeyList keys;
-
-    if (keys.isEmpty())
-    {
-        keys << buildKeyList(INFO) << TR_KEY_files;
-    }
-
-    return keys;
-}
-
-Torrent::KeyList const& Torrent::getStatKeys()
-{
-    static KeyList keys(buildKeyList(STAT));
-    return keys;
-}
-
-Torrent::KeyList const& Torrent::getExtraStatKeys()
-{
-    static KeyList keys;
-
-    if (keys.isEmpty())
-    {
-        keys << buildKeyList(STAT_EXTRA) << TR_KEY_fileStats;
-    }
-
-    return keys;
-}
-
-bool Torrent::setInt(int i, int value)
+bool change(TorrentFile& setme, tr_variant const* value)
 {
     bool changed = false;
 
-    assert(0 <= i && i < PROPERTY_COUNT);
-    assert(myProperties[i].type == QVariant::Int);
-
-    if (myValues[i].isNull() || myValues[i].toInt() != value)
+    size_t pos = 0;
+    tr_quark key;
+    tr_variant* child;
+    while (tr_variantDictChild(const_cast<tr_variant*>(value), pos++, &key, &child))
     {
-        myValues[i].setValue(value);
-        changed = true;
+        switch (key)
+        {
+#define HANDLE_KEY(key) case TR_KEY_ ## key: \
+    changed = change(setme.key, child) || changed; break;
+
+            HANDLE_KEY(have)
+            HANDLE_KEY(priority)
+            HANDLE_KEY(wanted)
+#undef HANDLE_KEY
+#define HANDLE_KEY(key, field) case TR_KEY_ ## key: \
+    changed = change(setme.field, child) || changed; break;
+
+            HANDLE_KEY(bytesCompleted, have)
+            HANDLE_KEY(length, size)
+            HANDLE_KEY(name, filename)
+#undef HANDLE_KEY
+        default:
+            break;
+        }
     }
 
     return changed;
 }
 
-bool Torrent::setBool(int i, bool value)
+bool change(TrackerStat& setme, tr_variant const* value)
 {
     bool changed = false;
 
-    assert(0 <= i && i < PROPERTY_COUNT);
-    assert(myProperties[i].type == QVariant::Bool);
-
-    if (myValues[i].isNull() || myValues[i].toBool() != value)
+    size_t pos = 0;
+    tr_quark key;
+    tr_variant* child;
+    while (tr_variantDictChild(const_cast<tr_variant*>(value), pos++, &key, &child))
     {
-        myValues[i].setValue(value);
-        changed = true;
+        switch (key)
+        {
+#define HANDLE_KEY(key) case TR_KEY_ ## key: \
+    changed = change(setme.key, child) || changed; break;
+            HANDLE_KEY(announce);
+            HANDLE_KEY(announceState);
+            HANDLE_KEY(downloadCount);
+            HANDLE_KEY(hasAnnounced);
+            HANDLE_KEY(hasScraped);
+            HANDLE_KEY(host);
+            HANDLE_KEY(id);
+            HANDLE_KEY(isBackup);
+            HANDLE_KEY(lastAnnouncePeerCount);
+            HANDLE_KEY(lastAnnounceResult);
+            HANDLE_KEY(lastAnnounceStartTime);
+            HANDLE_KEY(lastAnnounceSucceeded);
+            HANDLE_KEY(lastAnnounceTime);
+            HANDLE_KEY(lastAnnounceTimedOut);
+            HANDLE_KEY(lastScrapeResult);
+            HANDLE_KEY(lastScrapeStartTime);
+            HANDLE_KEY(lastScrapeSucceeded);
+            HANDLE_KEY(lastScrapeTime);
+            HANDLE_KEY(lastScrapeTimedOut);
+            HANDLE_KEY(leecherCount);
+            HANDLE_KEY(nextAnnounceTime);
+            HANDLE_KEY(nextScrapeTime);
+            HANDLE_KEY(scrapeState);
+            HANDLE_KEY(seederCount);
+            HANDLE_KEY(tier);
+
+#undef HANDLE_KEY
+        default:
+            break;
+        }
     }
 
     return changed;
 }
 
-bool Torrent::setDouble(int i, double value)
+template<typename T>
+bool change(QVector<T>& setme, tr_variant const* value)
 {
     bool changed = false;
 
-    assert(0 <= i && i < PROPERTY_COUNT);
-    assert(myProperties[i].type == QVariant::Double);
-
-    if (myValues[i] != value)
+    int const n = tr_variantListSize(value);
+    if (setme.size() != n)
     {
-        myValues[i].setValue(value);
+        setme.resize(n);
         changed = true;
+    }
+
+    for (int i = 0; i < n; ++i)
+    {
+        changed = change(setme[i], tr_variantListChild(const_cast<tr_variant*>(value), i)) || changed;
     }
 
     return changed;
 }
 
-bool Torrent::setDateTime(int i, QDateTime const& value)
-{
-    bool changed = false;
-
-    assert(0 <= i && i < PROPERTY_COUNT);
-    assert(myProperties[i].type == QVariant::DateTime);
-
-    if (myValues[i].isNull() || myValues[i].toDateTime() != value)
-    {
-        myValues[i].setValue(value);
-        changed = true;
-    }
-
-    return changed;
-}
-
-bool Torrent::setSize(int i, qulonglong value)
-{
-    bool changed = false;
-
-    assert(0 <= i && i < PROPERTY_COUNT);
-    assert(myProperties[i].type == QVariant::ULongLong);
-
-    if (myValues[i].isNull() || myValues[i].toULongLong() != value)
-    {
-        myValues[i].setValue(value);
-        changed = true;
-    }
-
-    return changed;
-}
-
-bool Torrent::setString(int i, char const* value)
-{
-    bool changed = false;
-
-    assert(0 <= i && i < PROPERTY_COUNT);
-    assert(myProperties[i].type == QVariant::String);
-
-    if (myValues[i].isNull() || myValues[i].toString() != QString::fromUtf8(value))
-    {
-        myValues[i].setValue(QString::fromUtf8(value));
-        changed = true;
-    }
-
-    return changed;
-}
-
-bool Torrent::setIcon(int i, QIcon const& value)
-{
-    assert(0 <= i && i < PROPERTY_COUNT);
-    assert(myProperties[i].type == QVariant::Icon);
-
-    myValues[i].setValue(value);
-    return true;
-}
-
-int Torrent::getInt(int i) const
-{
-    assert(0 <= i && i < PROPERTY_COUNT);
-    assert(myProperties[i].type == QVariant::Int);
-
-    return myValues[i].toInt();
-}
-
-QDateTime Torrent::getDateTime(int i) const
-{
-    assert(0 <= i && i < PROPERTY_COUNT);
-    assert(myProperties[i].type == QVariant::DateTime);
-
-    return myValues[i].toDateTime();
-}
-
-bool Torrent::getBool(int i) const
-{
-    assert(0 <= i && i < PROPERTY_COUNT);
-    assert(myProperties[i].type == QVariant::Bool);
-
-    return myValues[i].toBool();
-}
-
-qulonglong Torrent::getSize(int i) const
-{
-    assert(0 <= i && i < PROPERTY_COUNT);
-    assert(myProperties[i].type == QVariant::ULongLong);
-
-    return myValues[i].toULongLong();
-}
-double Torrent::getDouble(int i) const
-{
-    assert(0 <= i && i < PROPERTY_COUNT);
-    assert(myProperties[i].type == QVariant::Double);
-
-    return myValues[i].toDouble();
-}
-QString Torrent::getString(int i) const
-{
-    assert(0 <= i && i < PROPERTY_COUNT);
-    assert(myProperties[i].type == QVariant::String);
-
-    return myValues[i].toString();
-}
-QIcon Torrent::getIcon(int i) const
-{
-    assert(0 <= i && i < PROPERTY_COUNT);
-    assert(myProperties[i].type == QVariant::Icon);
-
-    return myValues[i].value<QIcon>();
-}
+} // anonymous namespace
 
 /***
 ****
 ***/
 
-bool Torrent::getSeedRatio(double& ratio) const
+bool Torrent::getSeedRatio(double& setmeRatio) const
 {
     bool isLimited;
 
@@ -330,13 +356,13 @@ bool Torrent::getSeedRatio(double& ratio) const
     {
     case TR_RATIOLIMIT_SINGLE:
         isLimited = true;
-        ratio = seedRatioLimit();
+        setmeRatio = seedRatioLimit();
         break;
 
     case TR_RATIOLIMIT_GLOBAL:
-        if ((isLimited = myPrefs.getBool(Prefs::RATIO_ENABLED)))
+        if ((isLimited = prefs_.getBool(Prefs::RATIO_ENABLED)))
         {
-            ratio = myPrefs.getDouble(Prefs::RATIO);
+            setmeRatio = prefs_.getDouble(Prefs::RATIO);
         }
 
         break;
@@ -349,22 +375,9 @@ bool Torrent::getSeedRatio(double& ratio) const
     return isLimited;
 }
 
-bool Torrent::hasFileSubstring(QString const& substr) const
-{
-    for (TorrentFile const& file : myFiles)
-    {
-        if (file.filename.contains(substr, Qt::CaseInsensitive))
-        {
-            return true;
-        }
-    }
-
-    return false;
-}
-
 bool Torrent::hasTrackerSubstring(QString const& substr) const
 {
-    for (QString const& s : myValues[TRACKERS].toStringList())
+    for (auto const& s : trackers())
     {
         if (s.contains(substr, Qt::CaseInsensitive))
         {
@@ -461,27 +474,19 @@ int Torrent::compareETA(Torrent const& that) const
     return 0;
 }
 
-int Torrent::compareTracker(Torrent const& that) const
-{
-    Q_UNUSED(that);
-
-    // FIXME
-    return 0;
-}
-
 /***
 ****
 ***/
 
 void Torrent::updateMimeIcon()
 {
-    FileList const& files(myFiles);
+    auto const& files = files_;
 
     QIcon icon;
 
     if (files.size() > 1)
     {
-        icon = QFileIconProvider().icon(QFileIconProvider::Folder);
+        icon = Utils::getFolderIcon();
     }
     else if (files.size() == 1)
     {
@@ -489,511 +494,153 @@ void Torrent::updateMimeIcon()
     }
     else
     {
-        icon = QIcon();
+        icon = Utils::guessMimeIcon(name());
     }
 
-    setIcon(MIME_ICON, icon);
+    icon_ = icon;
 }
 
 /***
 ****
 ***/
 
-void Torrent::notifyComplete() const
+bool Torrent::update(tr_quark const* keys, tr_variant const* const* values, size_t n)
 {
-    // if someone wants to implement notification, here's the hook.
-}
-
-/***
-****
-***/
-
-void Torrent::update(tr_variant* d)
-{
-    static bool lookup_initialized = false;
-    static int key_to_property_index[TR_N_KEYS];
     bool changed = false;
-    bool const was_seed = isSeed();
-    uint64_t const old_verified_size = haveVerified();
 
-    if (!lookup_initialized)
+    for (size_t pos = 0; pos < n; ++pos)
     {
-        lookup_initialized = true;
+        tr_quark key = keys[pos];
+        tr_variant const* child = values[pos];
+        bool field_changed = false;
 
-        for (int i = 0; i < TR_N_KEYS; ++i)
+        switch (key)
         {
-            key_to_property_index[i] = -1;
-        }
+#define HANDLE_KEY(key) case TR_KEY_ ## key: \
+    field_changed = change(key ## _, child); break;
 
-        for (int i = 0; i < PROPERTY_COUNT; i++)
-        {
-            key_to_property_index[myProperties[i].key] = i;
-        }
-    }
+            HANDLE_KEY(activityDate)
+            HANDLE_KEY(addedDate)
+            HANDLE_KEY(bandwidthPriority)
+            HANDLE_KEY(comment)
+            HANDLE_KEY(creator)
+            HANDLE_KEY(dateCreated)
+            HANDLE_KEY(desiredAvailable)
+            HANDLE_KEY(downloadDir)
+            HANDLE_KEY(downloadLimit) // KB/s
+            HANDLE_KEY(downloadLimited)
+            HANDLE_KEY(downloadedEver)
+            HANDLE_KEY(editDate)
+            HANDLE_KEY(error)
+            HANDLE_KEY(errorString)
+            HANDLE_KEY(eta)
+            HANDLE_KEY(files)
+            HANDLE_KEY(hashString)
+            HANDLE_KEY(haveUnchecked)
+            HANDLE_KEY(honorsSessionLimits)
+            HANDLE_KEY(isFinished)
+            HANDLE_KEY(isPrivate)
+            HANDLE_KEY(isStalled)
+            HANDLE_KEY(leftUntilDone)
+            HANDLE_KEY(manualAnnounceTime)
+            HANDLE_KEY(metadataPercentComplete)
+            HANDLE_KEY(name)
+            HANDLE_KEY(peers)
+            HANDLE_KEY(peersConnected)
+            HANDLE_KEY(peersGettingFromUs)
+            HANDLE_KEY(peersSendingToUs)
+            HANDLE_KEY(percentDone)
+            HANDLE_KEY(pieceCount)
+            HANDLE_KEY(pieceSize)
+            HANDLE_KEY(queuePosition)
+            HANDLE_KEY(recheckProgress)
+            HANDLE_KEY(seedIdleLimit)
+            HANDLE_KEY(seedIdleMode)
+            HANDLE_KEY(seedRatioLimit)
+            HANDLE_KEY(seedRatioMode)
+            HANDLE_KEY(sizeWhenDone)
+            HANDLE_KEY(startDate)
+            HANDLE_KEY(status)
+            HANDLE_KEY(totalSize)
+            HANDLE_KEY(trackerStats)
+            HANDLE_KEY(uploadLimit) // KB/s
+            HANDLE_KEY(uploadLimited)
+            HANDLE_KEY(uploadedEver)
+            HANDLE_KEY(webseedsSendingToUs)
+#undef HANDLE_KEY
+#define HANDLE_KEY(key, field) case TR_KEY_ ## key: \
+    field_changed = change(field ## _, child); break;
 
-    tr_quark key;
-    tr_variant* child;
-    size_t pos = 0;
-
-    while (tr_variantDictChild(d, pos++, &key, &child))
-    {
-        int const property_index = key_to_property_index[key];
-
-        if (property_index == -1) // we're not interested in this one
-        {
-            continue;
-        }
-
-        assert(myProperties[property_index].key == key);
-
-        switch (myProperties[property_index].type)
-        {
-        case QVariant::Int:
-            {
-                int64_t val;
-
-                if (tr_variantGetInt(child, &val))
-                {
-                    changed |= setInt(property_index, val);
-                }
-
-                break;
-            }
-
-        case QVariant::Bool:
-            {
-                bool val;
-
-                if (tr_variantGetBool(child, &val))
-                {
-                    changed |= setBool(property_index, val);
-                }
-
-                break;
-            }
-
-        case QVariant::String:
-            {
-                char const* val;
-
-                if (tr_variantGetStr(child, &val, nullptr))
-                {
-                    changed |= setString(property_index, val);
-                }
-
-                break;
-            }
-
-        case QVariant::ULongLong:
-            {
-                int64_t val;
-
-                if (tr_variantGetInt(child, &val))
-                {
-                    changed |= setSize(property_index, val);
-                }
-
-                break;
-            }
-
-        case QVariant::Double:
-            {
-                double val;
-
-                if (tr_variantGetReal(child, &val))
-                {
-                    changed |= setDouble(property_index, val);
-                }
-
-                break;
-            }
-
-        case QVariant::DateTime:
-            {
-                int64_t val;
-
-                if (tr_variantGetInt(child, &val) && val)
-                {
-                    changed |= setDateTime(property_index, QDateTime::fromTime_t(val));
-                }
-
-                break;
-            }
-
-        case QVariant::StringList:
-        case CustomVariantType::PeerList:
-            // handled below
-            break;
-
+            HANDLE_KEY(corruptEver, failedEver)
+            HANDLE_KEY(fileStats, files)
+            HANDLE_KEY(haveValid, haveVerified)
+            HANDLE_KEY(peer_limit, peerLimit)
+            HANDLE_KEY(rateDownload, downloadSpeed)
+            HANDLE_KEY(rateUpload, uploadSpeed)
+            HANDLE_KEY(trackers, trackerStats)
+#undef HANDLE_KEY
         default:
-            std::cerr << __FILE__ << ':' << __LINE__ << "unhandled type: " << tr_quark_get_string(key, nullptr) << std::endl;
-            assert(false && "unhandled type");
-        }
-    }
-
-    tr_variant* files;
-
-    if (tr_variantDictFindList(d, TR_KEY_files, &files))
-    {
-        char const* str;
-        int64_t intVal;
-        int i = 0;
-        tr_variant* child;
-
-        myFiles.clear();
-        myFiles.reserve(tr_variantListSize(files));
-
-        while ((child = tr_variantListChild(files, i)) != nullptr)
-        {
-            TorrentFile file;
-            size_t len;
-            file.index = i++;
-
-            if (tr_variantDictFindStr(child, TR_KEY_name, &str, &len))
-            {
-                file.filename = QString::fromUtf8(str, len);
-            }
-
-            if (tr_variantDictFindInt(child, TR_KEY_length, &intVal))
-            {
-                file.size = intVal;
-            }
-
-            myFiles.append(file);
+            break;
         }
 
-        updateMimeIcon();
-        changed = true;
-    }
+        changed = changed || field_changed;
 
-    if (tr_variantDictFindList(d, TR_KEY_fileStats, &files))
-    {
-        int const n = tr_variantListSize(files);
-
-        for (int i = 0; i < n && i < myFiles.size(); ++i)
+        if (field_changed)
         {
-            int64_t intVal;
-            bool boolVal;
-            tr_variant* child = tr_variantListChild(files, i);
-            TorrentFile& file(myFiles[i]);
-
-            if (tr_variantDictFindInt(child, TR_KEY_bytesCompleted, &intVal))
+            switch (key)
             {
-                file.have = intVal;
-            }
+            case TR_KEY_editDate:
+                // FIXME
+                break;
 
-            if (tr_variantDictFindBool(child, TR_KEY_wanted, &boolVal))
-            {
-                file.wanted = boolVal;
-            }
-
-            if (tr_variantDictFindInt(child, TR_KEY_priority, &intVal))
-            {
-                file.priority = intVal;
-            }
-        }
-
-        changed = true;
-    }
-
-    tr_variant* trackers;
-
-    if (tr_variantDictFindList(d, TR_KEY_trackers, &trackers))
-    {
-        size_t len;
-        char const* str;
-        int i = 0;
-        QStringList list;
-        tr_variant* child;
-
-        while ((child = tr_variantListChild(trackers, i++)) != nullptr)
-        {
-            if (tr_variantDictFindStr(child, TR_KEY_announce, &str, &len))
-            {
-                qApp->faviconCache().add(QUrl(QString::fromUtf8(str)));
-                list.append(QString::fromUtf8(str, len));
-            }
-        }
-
-        if (myValues[TRACKERS] != list)
-        {
-            QStringList hosts;
-
-            for (QString const& tracker : list)
-            {
-                QString const host = FaviconCache::getHost(QUrl(tracker));
-
-                if (!host.isEmpty())
+            case TR_KEY_name:
                 {
-                    hosts.append(host);
+                    updateMimeIcon();
+                    break;
+                }
+
+            case TR_KEY_files:
+                {
+                    updateMimeIcon();
+                    for (int i = 0; i < files_.size(); ++i)
+                    {
+                        files_[i].index = i;
+                    }
+
+                    break;
+                }
+
+            case TR_KEY_trackers:
+                {
+                    // rebuild trackers_
+                    QStringList urls;
+                    urls.reserve(trackerStats_.size());
+                    for (auto const& t : trackerStats_)
+                    {
+                        urls.append(t.announce);
+                    }
+
+                    trackers_.swap(urls);
+
+                    // rebuild trackerDisplayNames
+                    QStringList displayNames;
+                    displayNames.reserve(trackers_.size());
+                    for (auto const& tracker : trackers_)
+                    {
+                        auto const url = QUrl(tracker);
+                        auto const key = qApp->faviconCache().add(url);
+                        displayNames.append(FaviconCache::getDisplayName(key));
+                    }
+
+                    displayNames.removeDuplicates();
+                    trackerDisplayNames_.swap(displayNames);
+                    break;
                 }
             }
-
-            hosts.removeDuplicates();
-
-            myValues[TRACKERS].setValue(list);
-            myValues[HOSTS].setValue(hosts);
-            changed = true;
         }
     }
 
-    tr_variant* trackerStats;
-
-    if (tr_variantDictFindList(d, TR_KEY_trackerStats, &trackerStats))
-    {
-        tr_variant* child;
-        TrackerStatsList trackerStatsList;
-        int childNum = 0;
-
-        while ((child = tr_variantListChild(trackerStats, childNum++)) != nullptr)
-        {
-            bool b;
-            int64_t i;
-            size_t len;
-            char const* str;
-            TrackerStat trackerStat;
-
-            if (tr_variantDictFindStr(child, TR_KEY_announce, &str, &len))
-            {
-                trackerStat.announce = QString::fromUtf8(str, len);
-                qApp->faviconCache().add(QUrl(trackerStat.announce));
-            }
-
-            if (tr_variantDictFindInt(child, TR_KEY_announceState, &i))
-            {
-                trackerStat.announceState = i;
-            }
-
-            if (tr_variantDictFindInt(child, TR_KEY_downloadCount, &i))
-            {
-                trackerStat.downloadCount = i;
-            }
-
-            if (tr_variantDictFindBool(child, TR_KEY_hasAnnounced, &b))
-            {
-                trackerStat.hasAnnounced = b;
-            }
-
-            if (tr_variantDictFindBool(child, TR_KEY_hasScraped, &b))
-            {
-                trackerStat.hasScraped = b;
-            }
-
-            if (tr_variantDictFindStr(child, TR_KEY_host, &str, &len))
-            {
-                trackerStat.host = QString::fromUtf8(str, len);
-            }
-
-            if (tr_variantDictFindInt(child, TR_KEY_id, &i))
-            {
-                trackerStat.id = i;
-            }
-
-            if (tr_variantDictFindBool(child, TR_KEY_isBackup, &b))
-            {
-                trackerStat.isBackup = b;
-            }
-
-            if (tr_variantDictFindInt(child, TR_KEY_lastAnnouncePeerCount, &i))
-            {
-                trackerStat.lastAnnouncePeerCount = i;
-            }
-
-            if (tr_variantDictFindStr(child, TR_KEY_lastAnnounceResult, &str, &len))
-            {
-                trackerStat.lastAnnounceResult = QString::fromUtf8(str, len);
-            }
-
-            if (tr_variantDictFindInt(child, TR_KEY_lastAnnounceStartTime, &i))
-            {
-                trackerStat.lastAnnounceStartTime = i;
-            }
-
-            if (tr_variantDictFindBool(child, TR_KEY_lastAnnounceSucceeded, &b))
-            {
-                trackerStat.lastAnnounceSucceeded = b;
-            }
-
-            if (tr_variantDictFindInt(child, TR_KEY_lastAnnounceTime, &i))
-            {
-                trackerStat.lastAnnounceTime = i;
-            }
-
-            if (tr_variantDictFindBool(child, TR_KEY_lastAnnounceTimedOut, &b))
-            {
-                trackerStat.lastAnnounceTimedOut = b;
-            }
-
-            if (tr_variantDictFindStr(child, TR_KEY_lastScrapeResult, &str, &len))
-            {
-                trackerStat.lastScrapeResult = QString::fromUtf8(str, len);
-            }
-
-            if (tr_variantDictFindInt(child, TR_KEY_lastScrapeStartTime, &i))
-            {
-                trackerStat.lastScrapeStartTime = i;
-            }
-
-            if (tr_variantDictFindBool(child, TR_KEY_lastScrapeSucceeded, &b))
-            {
-                trackerStat.lastScrapeSucceeded = b;
-            }
-
-            if (tr_variantDictFindInt(child, TR_KEY_lastScrapeTime, &i))
-            {
-                trackerStat.lastScrapeTime = i;
-            }
-
-            if (tr_variantDictFindBool(child, TR_KEY_lastScrapeTimedOut, &b))
-            {
-                trackerStat.lastScrapeTimedOut = b;
-            }
-
-            if (tr_variantDictFindInt(child, TR_KEY_leecherCount, &i))
-            {
-                trackerStat.leecherCount = i;
-            }
-
-            if (tr_variantDictFindInt(child, TR_KEY_nextAnnounceTime, &i))
-            {
-                trackerStat.nextAnnounceTime = i;
-            }
-
-            if (tr_variantDictFindInt(child, TR_KEY_nextScrapeTime, &i))
-            {
-                trackerStat.nextScrapeTime = i;
-            }
-
-            if (tr_variantDictFindInt(child, TR_KEY_scrapeState, &i))
-            {
-                trackerStat.scrapeState = i;
-            }
-
-            if (tr_variantDictFindInt(child, TR_KEY_seederCount, &i))
-            {
-                trackerStat.seederCount = i;
-            }
-
-            if (tr_variantDictFindInt(child, TR_KEY_tier, &i))
-            {
-                trackerStat.tier = i;
-            }
-
-            trackerStatsList << trackerStat;
-        }
-
-        myValues[TRACKERSTATS].setValue(trackerStatsList);
-        changed = true;
-    }
-
-    tr_variant* peers;
-
-    if (tr_variantDictFindList(d, TR_KEY_peers, &peers))
-    {
-        tr_variant* child;
-        PeerList peerList;
-        int childNum = 0;
-
-        while ((child = tr_variantListChild(peers, childNum++)) != nullptr)
-        {
-            double d;
-            bool b;
-            int64_t i;
-            size_t len;
-            char const* str;
-            Peer peer;
-
-            if (tr_variantDictFindStr(child, TR_KEY_address, &str, &len))
-            {
-                peer.address = QString::fromUtf8(str, len);
-            }
-
-            if (tr_variantDictFindStr(child, TR_KEY_clientName, &str, &len))
-            {
-                peer.clientName = QString::fromUtf8(str, len);
-            }
-
-            if (tr_variantDictFindBool(child, TR_KEY_clientIsChoked, &b))
-            {
-                peer.clientIsChoked = b;
-            }
-
-            if (tr_variantDictFindBool(child, TR_KEY_clientIsInterested, &b))
-            {
-                peer.clientIsInterested = b;
-            }
-
-            if (tr_variantDictFindStr(child, TR_KEY_flagStr, &str, &len))
-            {
-                peer.flagStr = QString::fromUtf8(str, len);
-            }
-
-            if (tr_variantDictFindBool(child, TR_KEY_isDownloadingFrom, &b))
-            {
-                peer.isDownloadingFrom = b;
-            }
-
-            if (tr_variantDictFindBool(child, TR_KEY_isEncrypted, &b))
-            {
-                peer.isEncrypted = b;
-            }
-
-            if (tr_variantDictFindBool(child, TR_KEY_isIncoming, &b))
-            {
-                peer.isIncoming = b;
-            }
-
-            if (tr_variantDictFindBool(child, TR_KEY_isUploadingTo, &b))
-            {
-                peer.isUploadingTo = b;
-            }
-
-            if (tr_variantDictFindBool(child, TR_KEY_peerIsChoked, &b))
-            {
-                peer.peerIsChoked = b;
-            }
-
-            if (tr_variantDictFindBool(child, TR_KEY_peerIsInterested, &b))
-            {
-                peer.peerIsInterested = b;
-            }
-
-            if (tr_variantDictFindInt(child, TR_KEY_port, &i))
-            {
-                peer.port = i;
-            }
-
-            if (tr_variantDictFindReal(child, TR_KEY_progress, &d))
-            {
-                peer.progress = d;
-            }
-
-            if (tr_variantDictFindInt(child, TR_KEY_rateToClient, &i))
-            {
-                peer.rateToClient = Speed::fromBps(i);
-            }
-
-            if (tr_variantDictFindInt(child, TR_KEY_rateToPeer, &i))
-            {
-                peer.rateToPeer = Speed::fromBps(i);
-            }
-
-            peerList << peer;
-        }
-
-        myValues[PEERS].setValue(peerList);
-        changed = true;
-    }
-
-    if (changed)
-    {
-        emit torrentChanged(id());
-    }
-
-    if (!was_seed && isSeed() && old_verified_size > 0)
-    {
-        emit torrentCompleted(id());
-    }
+    return changed;
 }
 
 QString Torrent::activityString() const
@@ -1036,9 +683,9 @@ QString Torrent::activityString() const
 
 QString Torrent::getError() const
 {
-    QString s = getString(ERROR_STRING);
+    auto s = errorString_;
 
-    switch (getInt(ERROR))
+    switch (error_)
     {
     case TR_STAT_TRACKER_WARNING:
         s = tr("Tracker gave a warning: %1").arg(s);

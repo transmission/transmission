@@ -323,7 +323,7 @@ static void stripWhitespace(char* in)
 {
     char* out = in;
 
-    for (; in != NULL && *in != '\0'; ++in)
+    for (; !tr_str_is_empty(in); ++in)
     {
         if (!isspace(*in))
         {

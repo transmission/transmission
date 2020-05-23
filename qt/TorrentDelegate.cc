@@ -57,7 +57,6 @@ public:
     QRect barRect;
     QRect progressRect;
 
-public:
     ItemLayout(QString const& nameText, QString const& statusText, QString const& progressText, QIcon const& emblemIcon,
         QFont const& baseFont, Qt::LayoutDirection direction, QPoint const& topLeft, int width);
 
@@ -155,7 +154,7 @@ TorrentDelegate::~TorrentDelegate()
 
 QSize TorrentDelegate::margin(QStyle const& style) const
 {
-    Q_UNUSED(style);
+    Q_UNUSED(style)
 
     return QSize(4, 4);
 }
@@ -403,13 +402,43 @@ QSize TorrentDelegate::sizeHint(QStyleOptionViewItem const& option, Torrent cons
 
 QSize TorrentDelegate::sizeHint(QStyleOptionViewItem const& option, QModelIndex const& index) const
 {
-    Torrent const* tor(index.data(TorrentModel::TorrentRole).value<Torrent const*>());
-    return sizeHint(option, *tor);
+    // if the font changed, invalidate the height cache
+    if (myHeightFont != option.font)
+    {
+        myHeightFont = option.font;
+        myHeightHint.reset();
+    }
+
+    // ensure the height is cached
+    if (!myHeightHint)
+    {
+        auto const* tor = index.data(TorrentModel::TorrentRole).value<Torrent const*>();
+        myHeightHint = sizeHint(option, *tor).height();
+    }
+
+    return QSize(option.rect.width(), *myHeightHint);
+}
+
+QIcon& TorrentDelegate::getWarningEmblem() const
+{
+    auto& icon = myWarningEmblem;
+
+    if (icon.isNull())
+    {
+        icon = QIcon::fromTheme(QLatin1String("emblem-important"));
+    }
+
+    if (icon.isNull())
+    {
+        icon = qApp->style()->standardIcon(QStyle::SP_MessageBoxWarning);
+    }
+
+    return icon;
 }
 
 void TorrentDelegate::paint(QPainter* painter, QStyleOptionViewItem const& option, QModelIndex const& index) const
 {
-    Torrent const* tor(index.data(TorrentModel::TorrentRole).value<Torrent const*>());
+    auto const* tor(index.data(TorrentModel::TorrentRole).value<Torrent const*>());
     painter->save();
     painter->setClipRect(option.rect);
     drawTorrent(painter, option, *tor);
@@ -518,8 +547,7 @@ void TorrentDelegate::drawTorrent(QPainter* painter, QStyleOptionViewItem const&
     progressBarState |= QStyle::State_Small;
 
     QIcon::Mode const emblemIm = isItemSelected ? QIcon::Selected : QIcon::Normal;
-    QIcon const emblemIcon = tor.hasError() ? QIcon::fromTheme(QLatin1String("emblem-important"),
-        style->standardIcon(QStyle::SP_MessageBoxWarning)) : QIcon();
+    QIcon const emblemIcon = tor.hasError() ? getWarningEmblem() : QIcon();
 
     // layout
     QSize const m(margin(*style));

@@ -106,6 +106,7 @@ set(${PROJECT_NAME}_HEADERS
     TrackerDelegate.h
     TrackerModel.h
     TrackerModelFilter.h
+    Typedefs.h
     Utils.h
     WatchDir.h
 )
@@ -140,10 +141,12 @@ set(${PROJECT_NAME}_LINGUAS
     en
     es
     eu
+    fi
     fr
     hu
     id
     it_IT
+    ja
     ka
     kk
     ko

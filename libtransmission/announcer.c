@@ -183,7 +183,7 @@ static struct tr_scrape_info* tr_announcerGetScrapeInfo(struct tr_announcer* ann
 {
     struct tr_scrape_info* info = NULL;
 
-    if (url != NULL && *url != '\0')
+    if (!tr_str_is_empty(url))
     {
         bool found;
         struct tr_scrape_info const key = { .url = (char*)url };
@@ -202,11 +202,6 @@ static struct tr_scrape_info* tr_announcerGetScrapeInfo(struct tr_announcer* ann
     }
 
     return info;
-}
-
-bool tr_announcerHasBacklog(struct tr_announcer const* announcer)
-{
-    return announcer->slotsAvailable < 1;
 }
 
 static void onUpkeepTimer(evutil_socket_t foo UNUSED, short bar UNUSED, void* vannouncer);
@@ -1547,7 +1542,7 @@ static void on_scrape_done(tr_scrape_response const* response, void* vsession)
         }
     }
 
-    if (announcer)
+    if (announcer != NULL)
     {
         ++announcer->slotsAvailable;
     }

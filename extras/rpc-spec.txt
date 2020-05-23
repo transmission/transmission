@@ -148,11 +148,25 @@
 
    (1) An optional "ids" array as described in 3.1.
    (2) A required "fields" array of keys. (see list below)
+   (3) An optional "format" string specifying how to format the
+       "torrents" response field. Allowed values are "objects" (default)
+       and "table". (see "Response arguments" below)
 
    Response arguments:
 
-   (1) A "torrents" array of objects, each of which contains
-       the key/value pairs matching the request's "fields" argument.
+   (1) A "torrents" array.
+
+       If the "format" request was "objects" (default), "torrents" will
+       be an array of objects, each of which contains the key/value
+       pairs matching the request's "fields" arg. This was the only
+       format before Transmission 3 and has some obvious programmer
+       conveniences, such as parsing directly into Javascript objects.
+
+       If the format was "table", then "torrents" will be an array of
+       arrays. The first row holds the keys and each remaining row holds
+       a torrent's values for those keys. This format is more efficient
+       in terms of JSON generation and JSON parsing.
+
    (2) If the request's "ids" field was "recently-active",
        a "removed" array of torrent-id numbers of recently-removed
        torrents.
@@ -176,6 +190,7 @@
    downloadedEver              | number                      | tr_stat
    downloadLimit               | number                      | tr_torrent
    downloadLimited             | boolean                     | tr_torrent
+   editDate                    | number                      | tr_stat
    error                       | number                      | tr_stat
    errorString                 | string                      | tr_stat
    eta                         | number                      | tr_stat
@@ -792,6 +807,8 @@
          |         | yes       | session-get          | new arg "session-id"
          |         | yes       | torrent-get          | new arg "labels"
          |         | yes       | torrent-set          | new arg "labels"
+         |         | yes       | torrent-set          | new arg "editDate"
+         |         | yes       | torrent-get          | new arg "format"
 
 
 5.1.  Upcoming Breakage

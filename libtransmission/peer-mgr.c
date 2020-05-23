@@ -328,7 +328,7 @@ static inline void swarmUnlock(tr_swarm* swarm)
 
 #ifdef TR_ENABLE_ASSERTS
 
-static inline int swarmIsLocked(tr_swarm const* swarm)
+static inline bool swarmIsLocked(tr_swarm const* swarm)
 {
     return tr_sessionIsLocked(swarm->manager->session);
 }
@@ -410,8 +410,8 @@ static bool peerIsInUse(tr_swarm const* cs, struct peer_atom const* atom)
 
     TR_ASSERT(swarmIsLocked(s));
 
-    return atom->peer != NULL || getExistingHandshake(&s->outgoingHandshakes, &atom->addr) ||
-        getExistingHandshake(&s->manager->incomingHandshakes, &atom->addr);
+    return atom->peer != NULL || getExistingHandshake(&s->outgoingHandshakes, &atom->addr) != NULL ||
+        getExistingHandshake(&s->manager->incomingHandshakes, &atom->addr) != NULL;
 }
 
 static inline bool replicationExists(tr_swarm const* s)
@@ -587,10 +587,10 @@ static bool isAtomBlocklisted(tr_session* session, struct peer_atom* atom)
 {
     if (atom->blocklisted < 0)
     {
-        atom->blocklisted = tr_sessionIsAddressBlocked(session, &atom->addr);
+        atom->blocklisted = (int8_t)tr_sessionIsAddressBlocked(session, &atom->addr);
     }
 
-    return atom->blocklisted;
+    return atom->blocklisted != 0;
 }
 
 /***
@@ -1766,7 +1766,7 @@ static void peerCallbackFunc(tr_peer* peer, tr_peer_event const* e, void* vs)
 
             tor->uploadedCur += e->length;
             tr_announcerAddBytes(tor, TR_ANN_UP, e->length);
-            tr_torrentSetActivityDate(tor, now);
+            tr_torrentSetDateActive(tor, now);
             tr_torrentSetDirty(tor);
             tr_statsAddUploaded(tor->session, e->length);
 
@@ -1784,7 +1784,7 @@ static void peerCallbackFunc(tr_peer* peer, tr_peer_event const* e, void* vs)
             tr_torrent* tor = s->tor;
 
             tor->downloadedCur += e->length;
-            tr_torrentSetActivityDate(tor, now);
+            tr_torrentSetDateActive(tor, now);
             tr_torrentSetDirty(tor);
 
             tr_statsAddDownloaded(tor->session, e->length);
@@ -2204,19 +2204,6 @@ void tr_peerMgrAddPex(tr_torrent* tor, uint8_t from, tr_pex const* pex, int8_t s
     }
 }
 
-void tr_peerMgrMarkAllAsSeeds(tr_torrent* tor)
-{
-    tr_swarm* s = tor->swarm;
-    int const n = tr_ptrArraySize(&s->pool);
-    struct peer_atom** it = (struct peer_atom**)tr_ptrArrayBase(&s->pool);
-    struct peer_atom** end = it + n;
-
-    while (it != end)
-    {
-        atomSetSeed(s, *it++);
-    }
-}
-
 tr_pex* tr_peerMgrCompactToPex(void const* compact, size_t compactLen, uint8_t const* added_f, size_t added_f_len,
     size_t* pexCount)
 {
@@ -2261,24 +2248,6 @@ tr_pex* tr_peerMgrCompact6ToPex(void const* compact, size_t compactLen, uint8_t 
         {
             pex[i].flags = added_f[i];
         }
-    }
-
-    *pexCount = n;
-    return pex;
-}
-
-tr_pex* tr_peerMgrArrayToPex(void const* array, size_t arrayLen, size_t* pexCount)
-{
-    size_t n = arrayLen / (sizeof(tr_address) + 2);
-    uint8_t const* walk = array;
-    tr_pex* pex = tr_new0(tr_pex, n);
-
-    for (size_t i = 0; i < n; ++i)
-    {
-        memcpy(&pex[i].addr, walk, sizeof(tr_address));
-        memcpy(&pex[i].port, walk + sizeof(tr_address), 2);
-        pex[i].flags = 0x00;
-        walk += sizeof(tr_address) + 2;
     }
 
     *pexCount = n;
@@ -3564,7 +3533,7 @@ static void closePeer(tr_swarm* s, tr_peer* peer)
     /* if we transferred piece data, then they might be good peers,
        so reset their `numFails' weight to zero. otherwise we connected
        to them fruitlessly, so mark it as another fail */
-    if (atom->piece_data_time)
+    if (atom->piece_data_time != 0)
     {
         tordbg(s, "resetting atom %s numFails to 0", tr_atomAddrStr(atom));
         atom->numFails = 0;

@@ -24,7 +24,7 @@ public:
     void addLayout(QGridLayout* layout);
 
     // QObject
-    virtual bool eventFilter(QObject* object, QEvent* event);
+    bool eventFilter(QObject* object, QEvent* event) override;
 
 public slots:
     void update();
