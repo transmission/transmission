@@ -26,21 +26,21 @@ class RpcQueue : public QObject
 public:
     explicit RpcQueue(QObject* parent = nullptr);
 
-    void setTolerateErrors(bool tolerateErrors = true)
+    void setTolerateErrors(bool tolerate_errors = true)
     {
-        myTolerateErrors = tolerateErrors;
+        tolerate_errors_ = tolerate_errors;
     }
 
     template<typename Func>
     void add(Func func)
     {
-        myQueue.enqueue(qMakePair(normalizeFunc(func), ErrorHandlerFunction()));
+        queue_.enqueue(qMakePair(normalizeFunc(func), ErrorHandlerFunction()));
     }
 
     template<typename Func, typename ErrorHandler>
-    void add(Func func, ErrorHandler errorHandler)
+    void add(Func func, ErrorHandler error_handler)
     {
-        myQueue.enqueue(qMakePair(normalizeFunc(func), normalizeErrorHandler(errorHandler)));
+        queue_.enqueue(qMakePair(normalizeFunc(func), normalizeErrorHandler(error_handler)));
     }
 
     // The first function in queue is ran synchronously
@@ -138,9 +138,9 @@ private:
     }
 
 private:
-    bool myTolerateErrors;
-    QFutureInterface<RpcResponse> myPromise;
-    QQueue<QPair<QueuedFunction, ErrorHandlerFunction>> myQueue;
-    ErrorHandlerFunction myNextErrorHandler;
-    QFutureWatcher<RpcResponse> myFutureWatcher;
+    bool tolerate_errors_ = {};
+    QFutureInterface<RpcResponse> promise_;
+    QQueue<QPair<QueuedFunction, ErrorHandlerFunction>> queue_;
+    ErrorHandlerFunction next_error_handler_;
+    QFutureWatcher<RpcResponse> future_watcher_;
 };

@@ -48,11 +48,11 @@ public:
 
     static QString unitStr(Type t, Size s)
     {
-        return unitStrings[t][s];
+        return unit_strings_[t][s];
     }
 
     static void initUnits();
 
 private:
-    static QString unitStrings[3][5];
+    static QString unit_strings_[3][5];
 };

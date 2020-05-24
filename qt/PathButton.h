@@ -26,7 +26,7 @@ public:
 
     void setMode(Mode mode);
     void setTitle(QString const& title);
-    void setNameFilter(QString const& nameFilter);
+    void setNameFilter(QString const& name_filter);
 
     void setPath(QString const& path);
     QString const& path() const;
@@ -41,19 +41,18 @@ protected:
     // QWidget
     void paintEvent(QPaintEvent* event) override;
 
+private slots:
+    void onClicked();
+    void onFileSelected(QString const& path);
+
 private:
     void updateAppearance();
 
     bool isDirMode() const;
     QString effectiveTitle() const;
 
-private slots:
-    void onClicked();
-    void onFileSelected(QString const& path);
-
-private:
-    Mode myMode;
-    QString myTitle;
-    QString myNameFilter;
-    QString myPath;
+    QString name_filter_;
+    QString path_;
+    QString title_;
+    Mode mode_;
 };

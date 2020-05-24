@@ -73,9 +73,9 @@ private slots:
     void onShowBackupTrackersToggled(bool);
 
     // Files tab
-    void onFilePriorityChanged(QSet<int> const& fileIndices, int);
-    void onFileWantedChanged(QSet<int> const& fileIndices, bool);
-    void onPathEdited(QString const& oldpath, QString const& newname);
+    void onFilePriorityChanged(QSet<int> const& file_indices, int);
+    void onFileWantedChanged(QSet<int> const& file_indices, bool);
+    void onPathEdited(QString const& old_path, QString const& new_name);
     void onOpenRequested(QString const& path);
 
     // Options tab
@@ -89,20 +89,20 @@ private slots:
     void onIdleLimitChanged();
 
 private:
-    Session& mySession;
-    Prefs& myPrefs;
-    TorrentModel const& myModel;
+    Session& session_;
+    Prefs& prefs_;
+    TorrentModel const& model_;
 
-    Ui::DetailsDialog ui;
+    Ui::DetailsDialog ui_;
 
-    torrent_ids_t myIds;
-    QTimer myTimer;
-    bool myChangedTorrents;
-    bool myHavePendingRefresh;
+    torrent_ids_t ids_;
+    QTimer timer_;
+    bool changed_torrents_;
+    bool have_pending_refresh_;
 
-    TrackerModel* myTrackerModel;
-    TrackerModelFilter* myTrackerFilter;
-    TrackerDelegate* myTrackerDelegate;
+    TrackerModel* tracker_model_ = {};
+    TrackerModelFilter* tracker_filter_ = {};
+    TrackerDelegate* tracker_delegate_ = {};
 
-    QMap<QString, QTreeWidgetItem*> myPeers;
+    QMap<QString, QTreeWidgetItem*> peers_;
 };

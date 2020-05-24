@@ -43,18 +43,17 @@ protected:
     static QString shortStatusString(Torrent const& tor);
     static QString shortTransferString(Torrent const& tor);
 
-protected:
-    QStyleOptionProgressBar* myProgressBarStyle;
+    QStyleOptionProgressBar* progress_bar_style_ = {};
 
-    static QColor blueBrush;
-    static QColor greenBrush;
-    static QColor silverBrush;
-    static QColor blueBack;
-    static QColor greenBack;
-    static QColor silverBack;
+    static QColor blue_brush_;
+    static QColor green_brush_;
+    static QColor silver_brush_;
+    static QColor blue_back_;
+    static QColor green_back_;
+    static QColor silver_back_;
 
 private:
-    mutable std::optional<int> myHeightHint;
-    mutable QFont myHeightFont;
-    mutable QIcon myWarningEmblem;
+    mutable std::optional<int> height_hint_;
+    mutable QFont height_font_;
+    mutable QIcon warning_emblem_;
 };

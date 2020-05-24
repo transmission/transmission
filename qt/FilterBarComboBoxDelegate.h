@@ -29,5 +29,5 @@ protected:
     QSize sizeHint(QStyleOptionViewItem const&, QModelIndex const&) const override;
 
 private:
-    QComboBox* const myCombo;
+    QComboBox* const combo_ = {};
 };
