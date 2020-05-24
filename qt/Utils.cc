@@ -63,7 +63,7 @@ void addAssociatedFileIcon(QFileInfo const& file_info, UINT icon_size, QIcon& ic
         SHFILEINFO shell_file_info;
 
         if (::SHGetFileInfoW(reinterpret_cast<wchar_t const*>(filename.utf16()), FILE_ATTRIBUTE_NORMAL, &shell_file_info,
-            sizeof(shell_file_info), SHGFI_ICON | iconSize | SHGFI_USEFILEATTRIBUTES) != 0)
+            sizeof(shell_file_info), SHGFI_ICON | icon_size | SHGFI_USEFILEATTRIBUTES) != 0)
         {
             if (shell_file_info.hIcon != nullptr)
             {

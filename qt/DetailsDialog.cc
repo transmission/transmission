@@ -1310,7 +1310,7 @@ void DetailsDialog::onAddTrackerClicked()
         }
         else
         {
-            QStringList const urls { url };
+            auto const urls = QStringList { url };
             session_.torrentSet(ids, TR_KEY_trackerAdd, urls);
             getNewData();
         }

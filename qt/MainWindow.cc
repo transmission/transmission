@@ -637,7 +637,7 @@ void MainWindow::openFolder()
 
     else
     {
-        openSelect(path + QLatin1Char('/') + firstfile);
+        openSelect(path + QLatin1Char('/') + first_file);
         return;
     }
 
