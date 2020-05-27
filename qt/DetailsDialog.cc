@@ -161,7 +161,7 @@ private:
                 if (ip_address.protocol() == QAbstractSocket::IPv4Protocol)
                 {
                     quint32 const ipv4_address = ip_address.toIPv4Address();
-                    collated_address = QLatin1String("1-") + QString::fromLatin1(QByteArray::number(ipv4_address, 16).
+                    collated_address = QStringLiteral("1-") + QString::fromUtf8(QByteArray::number(ipv4_address, 16).
                         rightJustified(8, '0'));
                 }
                 else if (ip_address.protocol() == QAbstractSocket::IPv6Protocol)
@@ -174,13 +174,13 @@ private:
                         tmp[i] = ipv6_address[i];
                     }
 
-                    collated_address = QLatin1String("2-") + QString::fromLatin1(tmp.toHex());
+                    collated_address = QStringLiteral("2-") + QString::fromUtf8(tmp.toHex());
                 }
             }
 
             if (collated_address.isEmpty())
             {
-                collated_address = QLatin1String("3-") + peer.address.toLower();
+                collated_address = QStringLiteral("3-") + peer.address.toLower();
             }
         }
 
@@ -518,7 +518,7 @@ void DetailsDialog::refresh()
     }
     else
     {
-        string = QString::fromLatin1("%1%").arg(Formatter::percentToString((100.0 * available) / size_when_done));
+        string = QStringLiteral("%1%").arg(Formatter::percentToString((100.0 * available) / size_when_done));
     }
 
     ui_.availabilityValueLabel->setText(string);
@@ -1039,7 +1039,7 @@ void DetailsDialog::refresh()
 
             if (item == nullptr) // new peer has connected
             {
-                static QIcon const ENCRYPTION_ICON(QLatin1String(":/icons/encrypted.png"));
+                static QIcon const ENCRYPTION_ICON(QStringLiteral(":/icons/encrypted.png"));
                 static QIcon const EMPTY_ICON;
                 item = new PeerItem(peer);
                 item->setTextAlignment(COL_UP, Qt::AlignRight | Qt::AlignVCenter);
@@ -1115,7 +1115,7 @@ void DetailsDialog::refresh()
 
                 if (!txt.isEmpty())
                 {
-                    code_tip += QString::fromLatin1("%1: %2\n").arg(ch).arg(txt);
+                    code_tip += QStringLiteral("%1: %2\n").arg(ch).arg(txt);
                 }
             }
 
@@ -1126,7 +1126,7 @@ void DetailsDialog::refresh()
 
             item->setText(COL_UP, peer.rate_to_peer.isZero() ? QString() : Formatter::speedToString(peer.rate_to_peer));
             item->setText(COL_DOWN, peer.rate_to_client.isZero() ? QString() : Formatter::speedToString(peer.rate_to_client));
-            item->setText(COL_PERCENT, peer.progress > 0 ? QString::fromLatin1("%1%").arg(int(peer.progress * 100.0)) :
+            item->setText(COL_PERCENT, peer.progress > 0 ? QStringLiteral("%1%").arg(int(peer.progress * 100.0)) :
                 QString());
             item->setText(COL_STATUS, code);
             item->setToolTip(COL_STATUS, code_tip);
@@ -1376,8 +1376,8 @@ void DetailsDialog::initOptionsTab()
 {
     QString const speed_K_str = Formatter::unitStr(Formatter::SPEED, Formatter::KB);
 
-    ui_.singleDownSpin->setSuffix(QString::fromLatin1(" %1").arg(speed_K_str));
-    ui_.singleUpSpin->setSuffix(QString::fromLatin1(" %1").arg(speed_K_str));
+    ui_.singleDownSpin->setSuffix(QStringLiteral(" %1").arg(speed_K_str));
+    ui_.singleUpSpin->setSuffix(QStringLiteral(" %1").arg(speed_K_str));
 
     ui_.singleDownSpin->setProperty(PREF_KEY, TR_KEY_downloadLimit);
     ui_.singleUpSpin->setProperty(PREF_KEY, TR_KEY_uploadLimit);
@@ -1434,9 +1434,9 @@ void DetailsDialog::initTrackerTab()
     ui_.trackersView->setModel(tracker_filter_);
     ui_.trackersView->setItemDelegate(tracker_delegate_);
 
-    ui_.addTrackerButton->setIcon(getStockIcon(QLatin1String("list-add"), QStyle::SP_DialogOpenButton));
-    ui_.editTrackerButton->setIcon(getStockIcon(QLatin1String("document-properties"), QStyle::SP_DesktopIcon));
-    ui_.removeTrackerButton->setIcon(getStockIcon(QLatin1String("list-remove"), QStyle::SP_TrashIcon));
+    ui_.addTrackerButton->setIcon(getStockIcon(QStringLiteral("list-add"), QStyle::SP_DialogOpenButton));
+    ui_.editTrackerButton->setIcon(getStockIcon(QStringLiteral("document-properties"), QStyle::SP_DesktopIcon));
+    ui_.removeTrackerButton->setIcon(getStockIcon(QStringLiteral("list-remove"), QStyle::SP_TrashIcon));
 
     ui_.showTrackerScrapesCheck->setChecked(prefs_.getBool(Prefs::SHOW_TRACKER_SCRAPES));
     ui_.showBackupTrackersCheck->setChecked(prefs_.getBool(Prefs::SHOW_BACKUP_TRACKERS));
@@ -1463,11 +1463,11 @@ void DetailsDialog::initPeersTab()
     ui_.peersView->sortByColumn(COL_ADDRESS, Qt::AscendingOrder);
 
     ui_.peersView->setColumnWidth(COL_LOCK, 20);
-    ui_.peersView->setColumnWidth(COL_UP, measureViewItem(ui_.peersView, COL_UP, QLatin1String("1024 MiB/s")));
-    ui_.peersView->setColumnWidth(COL_DOWN, measureViewItem(ui_.peersView, COL_DOWN, QLatin1String("1024 MiB/s")));
-    ui_.peersView->setColumnWidth(COL_PERCENT, measureViewItem(ui_.peersView, COL_PERCENT, QLatin1String("100%")));
-    ui_.peersView->setColumnWidth(COL_STATUS, measureViewItem(ui_.peersView, COL_STATUS, QLatin1String("ODUK?EXI")));
-    ui_.peersView->setColumnWidth(COL_ADDRESS, measureViewItem(ui_.peersView, COL_ADDRESS, QLatin1String("888.888.888.888")));
+    ui_.peersView->setColumnWidth(COL_UP, measureViewItem(ui_.peersView, COL_UP, QStringLiteral("1024 MiB/s")));
+    ui_.peersView->setColumnWidth(COL_DOWN, measureViewItem(ui_.peersView, COL_DOWN, QStringLiteral("1024 MiB/s")));
+    ui_.peersView->setColumnWidth(COL_PERCENT, measureViewItem(ui_.peersView, COL_PERCENT, QStringLiteral("100%")));
+    ui_.peersView->setColumnWidth(COL_STATUS, measureViewItem(ui_.peersView, COL_STATUS, QStringLiteral("ODUK?EXI")));
+    ui_.peersView->setColumnWidth(COL_ADDRESS, measureViewItem(ui_.peersView, COL_ADDRESS, QStringLiteral("888.888.888.888")));
 }
 
 /***

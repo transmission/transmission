@@ -271,7 +271,7 @@ QString TorrentDelegate::shortTransferString(Torrent const& tor)
 
     if (have_down)
     {
-        str = Formatter::downloadSpeedToString(tor.downloadSpeed()) + QLatin1String("   ") +
+        str = Formatter::downloadSpeedToString(tor.downloadSpeed()) + QStringLiteral("   ") +
             Formatter::uploadSpeedToString(tor.uploadSpeed());
     }
     else if (have_up)
@@ -294,7 +294,7 @@ QString TorrentDelegate::shortStatusString(Torrent const& tor)
 
     case TR_STATUS_DOWNLOAD:
     case TR_STATUS_SEED:
-        str = shortTransferString(tor) + QLatin1String("    ") + tr("Ratio: %1").arg(Formatter::ratioToString(tor.ratio()));
+        str = shortTransferString(tor) + QStringLiteral("    ") + tr("Ratio: %1").arg(Formatter::ratioToString(tor.ratio()));
         break;
 
     default:
@@ -426,7 +426,7 @@ QIcon& TorrentDelegate::getWarningEmblem() const
 
     if (icon.isNull())
     {
-        icon = QIcon::fromTheme(QLatin1String("emblem-important"));
+        icon = QIcon::fromTheme(QStringLiteral("emblem-important"));
     }
 
     if (icon.isNull())

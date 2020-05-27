@@ -34,12 +34,12 @@ FilterBarComboBoxDelegate::FilterBarComboBoxDelegate(QObject* parent, QComboBox*
 
 bool FilterBarComboBoxDelegate::isSeparator(QModelIndex const& index)
 {
-    return index.data(Qt::AccessibleDescriptionRole).toString() == QLatin1String("separator");
+    return index.data(Qt::AccessibleDescriptionRole).toString() == QStringLiteral("separator");
 }
 
 void FilterBarComboBoxDelegate::setSeparator(QAbstractItemModel* model, QModelIndex const& index)
 {
-    model->setData(index, QString::fromLatin1("separator"), Qt::AccessibleDescriptionRole);
+    model->setData(index, QStringLiteral("separator"), Qt::AccessibleDescriptionRole);
 
     if (auto* m = qobject_cast<QStandardItemModel*>(model))
     {

@@ -37,7 +37,7 @@ QString FaviconCache::getCacheDir()
 {
     QString const base = QStandardPaths::writableLocation(QStandardPaths::CacheLocation);
 
-    return QDir(base).absoluteFilePath(QLatin1String("favicons"));
+    return QDir(base).absoluteFilePath(QStringLiteral("favicons"));
 }
 
 namespace
@@ -128,9 +128,9 @@ QString FaviconCache::add(QUrl const& url)
         pixmaps_[key] = QPixmap();
 
         // try to download the favicon
-        QString const path = QLatin1String("http://") + url.host() + QLatin1String("/favicon.");
+        QString const path = QStringLiteral("http://") + url.host() + QStringLiteral("/favicon.");
         QStringList suffixes;
-        suffixes << QLatin1String("ico") << QLatin1String("png") << QLatin1String("gif") << QLatin1String("jpg");
+        suffixes << QStringLiteral("ico") << QStringLiteral("png") << QStringLiteral("gif") << QStringLiteral("jpg");
 
         for (QString const& suffix : suffixes)
         {

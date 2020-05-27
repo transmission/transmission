@@ -25,7 +25,6 @@ int const INTERVAL_MSEC = 15000;
 
 FreeSpaceLabel::FreeSpaceLabel(QWidget* parent) :
     QLabel(parent),
-    session_(nullptr),
     timer_(this)
 {
     timer_.setSingleShot(true);

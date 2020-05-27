@@ -60,7 +60,7 @@ void FileTreeDelegate::paint(QPainter* painter, QStyleOptionViewItem const& opti
         p.textAlignment = Qt::AlignCenter;
         p.textVisible = true;
         p.progress = int(100.0 * index.data().toDouble());
-        p.text = QString::fromLatin1("%1%").arg(p.progress);
+        p.text = QStringLiteral("%1%").arg(p.progress);
         style->drawControl(QStyle::CE_ProgressBar, &p, painter);
     }
     else if (column == FileTreeModel::COL_WANTED)

@@ -15,6 +15,7 @@
 #include <QMessageBox>
 #include <QPainter>
 #include <QProxyStyle>
+#include <QString>
 #include <QtGui>
 
 #include <libtransmission/transmission.h>
@@ -50,10 +51,10 @@
 namespace
 {
 
-QLatin1String const TotalRatioStatsModeName("total-ratio");
-QLatin1String const TotalTransferStatsModeName("total-transfer");
-QLatin1String const SessionRatioStatsModeName("session-ratio");
-QLatin1String const SessionTransferStatsModeName("session-transfer");
+auto const TOTAL_RATIO_STATS_MODE_NAME = QStringLiteral("total-ratio");
+auto const TOTAL_TRANSFER_STATS_MODE_NAME = QStringLiteral("total-transfer");
+auto const SESSION_RATIO_STATS_MODE_NAME = QStringLiteral("session-ratio");
+auto const SESSION_TRANSFER_STATS_MODE_NAME = QStringLiteral("session-transfer");
 
 } // namespace
 
@@ -156,37 +157,37 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     ui_.listView->setAttribute(Qt::WA_MacShowFocusRect, false);
 
     // icons
-    QIcon const icon_play = getStockIcon(QLatin1String("media-playback-start"), QStyle::SP_MediaPlay);
-    QIcon const icon_pause = getStockIcon(QLatin1String("media-playback-pause"), QStyle::SP_MediaPause);
-    QIcon const icon_open = getStockIcon(QLatin1String("document-open"), QStyle::SP_DialogOpenButton);
+    QIcon const icon_play = getStockIcon(QStringLiteral("media-playback-start"), QStyle::SP_MediaPlay);
+    QIcon const icon_pause = getStockIcon(QStringLiteral("media-playback-pause"), QStyle::SP_MediaPause);
+    QIcon const icon_open = getStockIcon(QStringLiteral("document-open"), QStyle::SP_DialogOpenButton);
     ui_.action_OpenFile->setIcon(icon_open);
     ui_.action_AddURL->setIcon(addEmblem(icon_open,
-        QStringList() << QLatin1String("emblem-web") << QLatin1String("applications-internet")));
-    ui_.action_New->setIcon(getStockIcon(QLatin1String("document-new"), QStyle::SP_DesktopIcon));
-    ui_.action_Properties->setIcon(getStockIcon(QLatin1String("document-properties"), QStyle::SP_DesktopIcon));
-    ui_.action_OpenFolder->setIcon(getStockIcon(QLatin1String("folder-open"), QStyle::SP_DirOpenIcon));
+        QStringList() << QStringLiteral("emblem-web") << QStringLiteral("applications-internet")));
+    ui_.action_New->setIcon(getStockIcon(QStringLiteral("document-new"), QStyle::SP_DesktopIcon));
+    ui_.action_Properties->setIcon(getStockIcon(QStringLiteral("document-properties"), QStyle::SP_DesktopIcon));
+    ui_.action_OpenFolder->setIcon(getStockIcon(QStringLiteral("folder-open"), QStyle::SP_DirOpenIcon));
     ui_.action_Start->setIcon(icon_play);
     ui_.action_StartNow->setIcon(icon_play);
-    ui_.action_Announce->setIcon(getStockIcon(QLatin1String("network-transmit-receive")));
+    ui_.action_Announce->setIcon(getStockIcon(QStringLiteral("network-transmit-receive")));
     ui_.action_Pause->setIcon(icon_pause);
-    ui_.action_Remove->setIcon(getStockIcon(QLatin1String("list-remove"), QStyle::SP_TrashIcon));
-    ui_.action_Delete->setIcon(getStockIcon(QLatin1String("edit-delete"), QStyle::SP_TrashIcon));
+    ui_.action_Remove->setIcon(getStockIcon(QStringLiteral("list-remove"), QStyle::SP_TrashIcon));
+    ui_.action_Delete->setIcon(getStockIcon(QStringLiteral("edit-delete"), QStyle::SP_TrashIcon));
     ui_.action_StartAll->setIcon(icon_play);
     ui_.action_PauseAll->setIcon(icon_pause);
-    ui_.action_Quit->setIcon(getStockIcon(QLatin1String("application-exit")));
-    ui_.action_SelectAll->setIcon(getStockIcon(QLatin1String("edit-select-all")));
-    ui_.action_ReverseSortOrder->setIcon(getStockIcon(QLatin1String("view-sort-ascending"), QStyle::SP_ArrowDown));
-    ui_.action_Preferences->setIcon(getStockIcon(QLatin1String("preferences-system")));
-    ui_.action_Contents->setIcon(getStockIcon(QLatin1String("help-contents"), QStyle::SP_DialogHelpButton));
-    ui_.action_About->setIcon(getStockIcon(QLatin1String("help-about")));
-    ui_.action_QueueMoveTop->setIcon(getStockIcon(QLatin1String("go-top")));
-    ui_.action_QueueMoveUp->setIcon(getStockIcon(QLatin1String("go-up"), QStyle::SP_ArrowUp));
-    ui_.action_QueueMoveDown->setIcon(getStockIcon(QLatin1String("go-down"), QStyle::SP_ArrowDown));
-    ui_.action_QueueMoveBottom->setIcon(getStockIcon(QLatin1String("go-bottom")));
+    ui_.action_Quit->setIcon(getStockIcon(QStringLiteral("application-exit")));
+    ui_.action_SelectAll->setIcon(getStockIcon(QStringLiteral("edit-select-all")));
+    ui_.action_ReverseSortOrder->setIcon(getStockIcon(QStringLiteral("view-sort-ascending"), QStyle::SP_ArrowDown));
+    ui_.action_Preferences->setIcon(getStockIcon(QStringLiteral("preferences-system")));
+    ui_.action_Contents->setIcon(getStockIcon(QStringLiteral("help-contents"), QStyle::SP_DialogHelpButton));
+    ui_.action_About->setIcon(getStockIcon(QStringLiteral("help-about")));
+    ui_.action_QueueMoveTop->setIcon(getStockIcon(QStringLiteral("go-top")));
+    ui_.action_QueueMoveUp->setIcon(getStockIcon(QStringLiteral("go-up"), QStyle::SP_ArrowUp));
+    ui_.action_QueueMoveDown->setIcon(getStockIcon(QStringLiteral("go-down"), QStyle::SP_ArrowDown));
+    ui_.action_QueueMoveBottom->setIcon(getStockIcon(QStringLiteral("go-bottom")));
 
     auto makeNetworkPixmap = [this](char const* name_in, QSize size = QSize(16, 16))
         {
-            QString const name = QLatin1String(name_in);
+            auto const name = QString::fromUtf8(name_in);
             QIcon const icon = getStockIcon(name, QStyle::SP_DriveNetIcon);
             return icon.pixmap(size);
         };
@@ -291,7 +292,7 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     menu->addSeparator();
     menu->addAction(ui_.action_Quit);
     tray_icon_.setContextMenu(menu);
-    tray_icon_.setIcon(QIcon::fromTheme(QLatin1String("transmission-tray-icon"), qApp->windowIcon()));
+    tray_icon_.setIcon(QIcon::fromTheme(QStringLiteral("transmission-tray-icon"), qApp->windowIcon()));
 
     connect(&prefs_, SIGNAL(changed(int)), this, SLOT(refreshPref(int)));
     connect(ui_.action_ShowMainWindow, SIGNAL(triggered(bool)), this, SLOT(toggleWindows(bool)));
@@ -467,12 +468,12 @@ QMenu* MainWindow::createOptionsMenu()
 
 QMenu* MainWindow::createStatsModeMenu()
 {
-    QPair<QAction*, QLatin1String> const stats_modes[] =
+    QPair<QAction*, QString> const stats_modes[] =
     {
-        qMakePair(ui_.action_TotalRatio, TotalRatioStatsModeName),
-        qMakePair(ui_.action_TotalTransfer, TotalTransferStatsModeName),
-        qMakePair(ui_.action_SessionRatio, SessionRatioStatsModeName),
-        qMakePair(ui_.action_SessionTransfer, SessionTransferStatsModeName)
+        qMakePair(ui_.action_TotalRatio, TOTAL_RATIO_STATS_MODE_NAME),
+        qMakePair(ui_.action_TotalTransfer, TOTAL_TRANSFER_STATS_MODE_NAME),
+        qMakePair(ui_.action_SessionRatio, SESSION_RATIO_STATS_MODE_NAME),
+        qMakePair(ui_.action_SessionTransfer, SESSION_TRANSFER_STATS_MODE_NAME)
     };
 
     auto* actionGroup = new QActionGroup(this);
@@ -568,12 +569,12 @@ namespace
 
 static void openSelect(QString const& path)
 {
-    QString const explorer = QLatin1String("explorer");
+    auto const explorer = QStringLiteral("explorer");
     QString param;
 
     if (!QFileInfo(path).isDir())
     {
-        param = QLatin1String("/select,");
+        param = QStringLiteral("/select,");
     }
 
     param += QDir::toNativeSeparators(path);
@@ -587,13 +588,13 @@ static void openSelect(QString const& path)
 static void openSelect(QString const& path)
 {
     QStringList script_args;
-    script_args << QLatin1String("-e") <<
-        QString::fromLatin1("tell application \"Finder\" to reveal POSIX file \"%1\"").arg(path);
-    QProcess::execute(QLatin1String("/usr/bin/osascript"), script_args);
+    script_args << QStringLiteral("-e") <<
+        QStringLiteral("tell application \"Finder\" to reveal POSIX file \"%1\"").arg(path);
+    QProcess::execute(QStringLiteral("/usr/bin/osascript"), script_args);
 
     script_args.clear();
-    script_args << QLatin1String("-e") << QLatin1String("tell application \"Finder\" to activate");
-    QProcess::execute(QLatin1String("/usr/bin/osascript"), script_args);
+    script_args << QStringLiteral("-e") << QStringLiteral("tell application \"Finder\" to activate");
+    QProcess::execute(QStringLiteral("/usr/bin/osascript"), script_args);
 }
 
 #endif
@@ -659,7 +660,7 @@ void MainWindow::openStats()
 
 void MainWindow::openDonate()
 {
-    QDesktopServices::openUrl(QUrl(QLatin1String("https://transmissionbt.com/donate/")));
+    QDesktopServices::openUrl(QUrl(QStringLiteral("https://transmissionbt.com/donate/")));
 }
 
 void MainWindow::openAbout()
@@ -669,7 +670,7 @@ void MainWindow::openAbout()
 
 void MainWindow::openHelp()
 {
-    QDesktopServices::openUrl(QUrl(QString::fromLatin1("https://transmissionbt.com/help/gtk/%1.%2x").arg(MAJOR_VERSION).
+    QDesktopServices::openUrl(QUrl(QStringLiteral("https://transmissionbt.com/help/gtk/%1.%2x").arg(MAJOR_VERSION).
         arg(MINOR_VERSION / 10)));
 }
 
@@ -742,7 +743,7 @@ void MainWindow::onRefreshTimer()
 
 void MainWindow::refreshTitle()
 {
-    QString title(QLatin1String("Transmission"));
+    QString title(QStringLiteral("Transmission"));
     QUrl const url(session_.getRemoteUrl());
 
     if (!url.isEmpty())
@@ -769,7 +770,7 @@ void MainWindow::refreshTrayIcon(TransferStats const& stats)
     }
     else if (stats.peers_sending != 0)
     {
-        tip = Formatter::downloadSpeedToString(stats.speed_down) + QLatin1String("   ") + Formatter::uploadSpeedToString(
+        tip = Formatter::downloadSpeedToString(stats.speed_down) + QStringLiteral("   ") + Formatter::uploadSpeedToString(
             stats.speed_up);
     }
     else if (stats.peers_receiving != 0)
@@ -792,17 +793,17 @@ void MainWindow::refreshStatusBar(TransferStats const& stats)
     QString const mode(prefs_.getString(Prefs::STATUSBAR_STATS));
     QString str;
 
-    if (mode == SessionRatioStatsModeName)
+    if (mode == SESSION_RATIO_STATS_MODE_NAME)
     {
         str = tr("Ratio: %1").arg(Formatter::ratioToString(session_.getStats().ratio));
     }
-    else if (mode == SessionTransferStatsModeName)
+    else if (mode == SESSION_TRANSFER_STATS_MODE_NAME)
     {
         tr_session_stats const& stats(session_.getStats());
         str = tr("Down: %1, Up: %2").arg(Formatter::sizeToString(stats.downloadedBytes)).
             arg(Formatter::sizeToString(stats.uploadedBytes));
     }
-    else if (mode == TotalTransferStatsModeName)
+    else if (mode == TOTAL_TRANSFER_STATS_MODE_NAME)
     {
         tr_session_stats const& stats(session_.getCumulativeStats());
         str = tr("Down: %1, Up: %2").arg(Formatter::sizeToString(stats.downloadedBytes)).
@@ -810,7 +811,7 @@ void MainWindow::refreshStatusBar(TransferStats const& stats)
     }
     else // default is "total-ratio"
     {
-        assert(mode == TotalRatioStatsModeName);
+        assert(mode == TOTAL_RATIO_STATS_MODE_NAME);
         str = tr("Ratio: %1").arg(Formatter::ratioToString(session_.getCumulativeStats().ratio));
     }
 
@@ -1245,7 +1246,7 @@ void MainWindow::refreshPref(int key)
 namespace
 {
 
-QLatin1String const SHOW_OPTIONS_CHECKBOX_NAME("show-options-checkbox");
+auto const SHOW_OPTIONS_CHECKBOX_NAME = QStringLiteral("show-options-checkbox");
 
 } // namespace
 
@@ -1412,8 +1413,8 @@ void MainWindow::removeTorrents(bool const delete_files)
         }
     }
 
-    msg_box.setWindowTitle(QLatin1String(" "));
-    msg_box.setText(QString::fromLatin1("<big><b>%1</big></b>").arg(primary_text));
+    msg_box.setWindowTitle(QStringLiteral(" "));
+    msg_box.setText(QStringLiteral("<big><b>%1</big></b>").arg(primary_text));
     msg_box.setInformativeText(secondary_text);
     msg_box.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
     msg_box.setDefaultButton(QMessageBox::Cancel);
@@ -1550,9 +1551,9 @@ void MainWindow::dragEnterEvent(QDragEnterEvent* event)
 {
     QMimeData const* mime = event->mimeData();
 
-    if (mime->hasFormat(QLatin1String("application/x-bittorrent")) || mime->hasUrls() ||
-        mime->text().trimmed().endsWith(QLatin1String(".torrent"), Qt::CaseInsensitive) ||
-        mime->text().startsWith(QLatin1String("magnet:"), Qt::CaseInsensitive))
+    if (mime->hasFormat(QStringLiteral("application/x-bittorrent")) || mime->hasUrls() ||
+        mime->text().trimmed().endsWith(QStringLiteral(".torrent"), Qt::CaseInsensitive) ||
+        mime->text().startsWith(QStringLiteral("magnet:"), Qt::CaseInsensitive))
     {
         event->acceptProposedAction();
     }

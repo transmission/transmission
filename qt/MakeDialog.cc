@@ -113,12 +113,12 @@ void MakeProgressDialog::onProgress()
     else if (b.result == TR_MAKEMETA_IO_READ)
     {
         str = tr("Error reading \"%1\": %2").arg(QString::fromUtf8(b.errfile)).
-            arg(QString::fromLocal8Bit(tr_strerror(b.my_errno)));
+            arg(QString::fromUtf8(tr_strerror(b.my_errno)));
     }
     else if (b.result == TR_MAKEMETA_IO_WRITE)
     {
         str = tr("Error writing \"%1\": %2").arg(QString::fromUtf8(b.errfile)).
-            arg(QString::fromLocal8Bit(tr_strerror(b.my_errno)));
+            arg(QString::fromUtf8(tr_strerror(b.my_errno)));
     }
 
     ui_.progressLabel->setText(str);
@@ -165,7 +165,7 @@ void MakeDialog::makeTorrent()
 
     // the file to create
     QString const path = QString::fromUtf8(builder_->top);
-    QString const torrent_name = QFileInfo(path).completeBaseName() + QLatin1String(".torrent");
+    auto const torrent_name = QFileInfo(path).completeBaseName() + QStringLiteral(".torrent");
     QString const target = QDir(ui_.destinationButton->path()).filePath(torrent_name);
 
     // comment

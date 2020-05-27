@@ -51,7 +51,7 @@ namespace
 
 void addAssociatedFileIcon(QFileInfo const& file_info, UINT icon_size, QIcon& icon)
 {
-    QString const pixmap_cache_key = QLatin1String("tr_file_ext_") + QString::number(icon_size) + QLatin1Char('_') +
+    QString const pixmap_cache_key = QStringLiteral("tr_file_ext_") + QString::number(icon_size) + QLatin1Char('_') +
         file_info.suffix();
 
     QPixmap pixmap;
