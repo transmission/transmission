@@ -495,7 +495,7 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** err
         return false;
     }
 
-    size_t file_size = info.size;
+    uint64_t file_size = info.size;
 
 #if defined(USE_COPY_FILE_RANGE) || defined(USE_SENDFILE64)
 
@@ -508,7 +508,7 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** err
 #elif defined(USE_SENDFILE64)
             sendfile64(out, in, NULL, chunk_size);
 #else
-#error
+#error File copy mechanism not implemented.
 #endif
         TR_ASSERT(copied == -1 || copied >= 0); /* -1 for error; some non-negative value otherwise. */
 
@@ -519,6 +519,7 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** err
         }
 
         TR_ASSERT(copied >= 0 && ((uint64_t)copied) <= file_size);
+        TR_ASSERT(copied >= 0 && ((uint64_t)copied) <= chunk_size);
         file_size -= copied;
     }
 

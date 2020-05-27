@@ -20,7 +20,7 @@
 ****
 ***/
 
-#define RANDOM_FILE_LENGTH  (1024 * 1024 * 128) /* 128 MiB */
+#define RANDOM_FILE_LENGTH  (8 * 1024 * 1024) /* 8 MiB */
 
 char* sandbox_path;
 char* reference_file;
@@ -54,7 +54,8 @@ static int files_are_identical(char const* fn1, char const* fn2)
 {
     tr_sys_file_t fd1 = tr_sys_file_open(fn1, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, NULL);
     tr_sys_file_t fd2 = tr_sys_file_open(fn2, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, NULL);
-    check(fd1 != TR_BAD_SYS_FILE && fd2 != TR_BAD_SYS_FILE);
+    check(fd1 != TR_BAD_SYS_FILE);
+    check(fd2 != TR_BAD_SYS_FILE);
 
     tr_sys_path_info info1, info2;
     tr_sys_file_get_info(fd1, &info1, NULL);
@@ -85,13 +86,19 @@ static int files_are_identical(char const* fn1, char const* fn2)
     return 0;
 }
 
+static int copy_file_and_check(char const* path1, char const* path2)
+{
+    check(tr_sys_path_copy(path1, path2, NULL));
+    return files_are_identical(path1, path2);
+}
+
 static int test_copy_file(void)
 {
     char const* filename1 = "orig-blob.txt";
     char const* filename2 = "copy-blob.txt";
 
-    char* path1, * path2;
-    if (!reference_file)
+    char* path1;
+    if (reference_file == NULL)
     {
         path1 = tr_buildPath(sandbox_path, filename1, NULL);
 
@@ -107,24 +114,44 @@ static int test_copy_file(void)
         path1 = reference_file;
     }
 
-    path2 = tr_buildPath(sandbox_path, filename2, NULL);
+    char* path2 = tr_buildPath(sandbox_path, filename2, NULL);
 
-    /* Copy it. */
-    check(tr_sys_path_copy(path1, path2, NULL));
-
-    /* Verify the files are identical. */
-    int const result = files_are_identical(path1, path2);
+    int const result = copy_file_and_check(path1, path2);
     if (result > 0)
     {
         return result;
     }
 
     /* Dispose of those files that we created. */
-    if (!reference_file)
+    if (reference_file == NULL)
     {
         tr_sys_path_remove(path1, NULL);
         tr_free(path1);
     }
+
+    tr_sys_path_remove(path2, NULL);
+    tr_free(path2);
+
+    return 0;
+}
+
+static int test_copy_empty_file(void)
+{
+    char* path1 = tr_buildPath(sandbox_path, "orig-empty.txt", NULL);
+    char* path2 = tr_buildPath(sandbox_path, "copy-empty.txt", NULL);
+
+    /* Create a file. */
+    libtest_create_file_with_contents(path1, "", 0);
+
+    int const result = copy_file_and_check(path1, path2);
+    if (result > 0)
+    {
+        return result;
+    }
+
+    /* Dispose of those files that we created. */
+    tr_sys_path_remove(path1, NULL);
+    tr_free(path1);
 
     tr_sys_path_remove(path2, NULL);
     tr_free(path2);
@@ -142,7 +169,8 @@ int main(int argc, char* argv[])
 
     testFunc const tests[] =
     {
-        test_copy_file
+        test_copy_file,
+        test_copy_empty_file
     };
 
     sandbox_path = libtest_sandbox_create();

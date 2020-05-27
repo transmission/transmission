@@ -735,6 +735,9 @@ bool tr_sys_path_rename(char const* src_path, char const* dst_path, tr_error** e
 
 bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** error)
 {
+    TR_ASSERT(src_path != NULL);
+    TR_ASSERT(dst_path != NULL);
+
     bool ret = false;
 
     wchar_t* wide_src_path = path_to_native_path(src_path);
@@ -742,6 +745,7 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** err
 
     if (wide_src_path == NULL || wide_dst_path == NULL)
     {
+        set_system_error(error, ERROR_INVALID_PARAMETER);
         goto out;
     }
 
