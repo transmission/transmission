@@ -112,7 +112,7 @@ QIcon fileIcon()
 
 std::unordered_map<QString, QIcon> iconCache;
 
-QIcon const getMimeIcon(QString const& filename)
+QIcon getMimeIcon(QString const& filename)
 {
     // If the suffix doesn't match a mime type, treat it as a folder.
     // This heuristic is fast and yields good results for torrent names.
@@ -183,10 +183,7 @@ QIcon Utils::guessMimeIcon(QString const& filename)
         addAssociatedFileIcon(fileInfo, SHGFI_LARGEICON, icon);
     }
 
-    if (!icon.isNull())
-    {
-        return icon;
-    }
+    return icon;
 
 #else
 
@@ -223,7 +220,7 @@ bool Utils::isValidUtf8(char const* s)
             n = 1; // ASCII
         }
         else if ((*c & 0xc0) == 0x80)
-        {
+        { // NOLINT(bugprone-branch-clone)
             return false; // not valid
         }
         else if ((*c & 0xe0) == 0xc0)

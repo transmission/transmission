@@ -72,7 +72,7 @@
 		<true/>
 	</dict>
 	<key>NSHumanReadableCopyright</key>
-	<string>Copyright © 2005-2019 The Transmission Project</string>
+	<string>Copyright © 2005-2020 The Transmission Project</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>

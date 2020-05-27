@@ -17,7 +17,7 @@
 
 class FileTreeItem;
 
-class FileTreeModel : public QAbstractItemModel
+class FileTreeModel final : public QAbstractItemModel
 {
     Q_OBJECT
 

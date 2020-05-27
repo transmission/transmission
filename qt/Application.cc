@@ -208,9 +208,6 @@ Application::Application(int& argc, char** argv) :
                 break;
 
             case AddData::FILENAME:
-                metainfo = QString::fromLatin1(a.toBase64());
-                break;
-
             case AddData::METAINFO:
                 metainfo = QString::fromLatin1(a.toBase64());
                 break;
@@ -294,7 +291,6 @@ Application::Application(int& argc, char** argv) :
     myWatchDir = new WatchDir(*myModel);
 
     connect(myModel, &TorrentModel::torrentsAdded, this, &Application::onTorrentsAdded);
-    connect(myModel, &TorrentModel::torrentsChanged, myWindow, &MainWindow::refreshActionSensitivity);
     connect(myModel, &TorrentModel::torrentsCompleted, this, &Application::onTorrentsCompleted);
     connect(myModel, &TorrentModel::torrentsNeedInfo, this, &Application::onTorrentsNeedInfo);
     connect(myPrefs, &Prefs::changed, this, &Application::refreshPref);
@@ -340,7 +336,7 @@ Application::Application(int& argc, char** argv) :
 
     if (!myPrefs->getBool(Prefs::USER_HAS_GIVEN_INFORMED_CONSENT))
     {
-        QMessageBox* dialog = new QMessageBox(QMessageBox::Information, QString(),
+        auto* dialog = new QMessageBox(QMessageBox::Information, QString(),
             tr("<b>Transmission is a file sharing program.</b>"), QMessageBox::Ok | QMessageBox::Cancel, myWindow);
         dialog->setInformativeText(tr("When you run a torrent, its data will be made available to others by means of upload. "
             "Any content you share is your sole responsibility."));
@@ -574,7 +570,7 @@ void Application::addTorrent(AddData const& addme)
     }
     else
     {
-        auto o = new OptionsDialog(*mySession, *myPrefs, addme, myWindow);
+        auto* o = new OptionsDialog(*mySession, *myPrefs, addme, myWindow);
         o->show();
     }
 

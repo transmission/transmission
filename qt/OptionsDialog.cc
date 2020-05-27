@@ -90,7 +90,7 @@ OptionsDialog::OptionsDialog(Session& session, Prefs const& prefs, AddData const
 
     if (myIsLocal)
     {
-        myLocalDestination = downloadDir;
+        myLocalDestination.setPath(downloadDir);
     }
 
     connect(ui.destinationButton, SIGNAL(pathChanged(QString)), this, SLOT(onDestinationChanged()));
@@ -281,7 +281,7 @@ void OptionsDialog::onAccepted()
 
         for (int i = 0, n = myWanted.size(); i < n; ++i)
         {
-            if (myWanted.at(i) == false)
+            if (!myWanted.at(i))
             {
                 tr_variantListAddInt(l, i);
             }
@@ -343,7 +343,7 @@ void OptionsDialog::onDestinationChanged()
 {
     if (ui.destinationStack->currentWidget() == ui.destinationButton)
     {
-        myLocalDestination = ui.destinationButton->path();
+        myLocalDestination.setPath(ui.destinationButton->path());
         ui.freeSpaceLabel->setPath(myLocalDestination.absolutePath());
     }
     else

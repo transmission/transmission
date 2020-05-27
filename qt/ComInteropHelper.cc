@@ -32,9 +32,7 @@ ComInteropHelper::ComInteropHelper() :
 {
 }
 
-ComInteropHelper::~ComInteropHelper()
-{
-}
+ComInteropHelper::~ComInteropHelper() = default;
 
 bool ComInteropHelper::isConnected() const
 {
