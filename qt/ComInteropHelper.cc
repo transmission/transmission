@@ -28,7 +28,7 @@ extern wchar_t qAxModuleFilename[MAX_PATH];
 extern QString qAxInit();
 
 ComInteropHelper::ComInteropHelper() :
-    m_client(new QAxObject(QLatin1String("Transmission.QtClient")))
+    client_(new QAxObject(QLatin1String("Transmission.QtClient")))
 {
 }
 
@@ -36,12 +36,12 @@ ComInteropHelper::~ComInteropHelper() = default;
 
 bool ComInteropHelper::isConnected() const
 {
-    return !m_client->isNull();
+    return !client_->isNull();
 }
 
 QVariant ComInteropHelper::addMetainfo(QString const& metainfo)
 {
-    return m_client->dynamicCall("AddMetainfo(QString)", metainfo);
+    return client_->dynamicCall("AddMetainfo(QString)", metainfo);
 }
 
 void ComInteropHelper::initialize()

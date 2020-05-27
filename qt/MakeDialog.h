@@ -44,9 +44,9 @@ private slots:
     void makeTorrent();
 
 private:
-    Session& mySession;
+    Session& session_;
 
-    Ui::MakeDialog ui;
+    Ui::MakeDialog ui_;
 
-    std::unique_ptr<tr_metainfo_builder, void (*)(tr_metainfo_builder*)> myBuilder;
+    std::unique_ptr<tr_metainfo_builder, void (*)(tr_metainfo_builder*)> builder_;
 };

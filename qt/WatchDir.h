@@ -23,7 +23,7 @@ class WatchDir : public QObject
 public:
     WatchDir(TorrentModel const&);
 
-    void setPath(QString const& path, bool isEnabled);
+    void setPath(QString const& path, bool is_enabled);
 
 signals:
     void torrentFileAdded(QString const& filename);
@@ -46,8 +46,8 @@ private slots:
     void rescanAllWatchedDirectories();
 
 private:
-    TorrentModel const& myModel;
+    TorrentModel const& model_;
 
-    QSet<QString> myWatchDirFiles;
-    QFileSystemWatcher* myWatcher;
+    QSet<QString> watch_dir_files_;
+    QFileSystemWatcher* watcher_ = {};
 };

@@ -11,10 +11,7 @@
 class Speed
 {
 public:
-    Speed() :
-        _Bps(0)
-    {
-    }
+    Speed() = default;
 
     double KBps() const;
 
@@ -73,5 +70,5 @@ private:
     }
 
 private:
-    int _Bps;
+    int _Bps = 0;
 };

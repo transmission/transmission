@@ -214,24 +214,24 @@ bool change(Peer& setme, tr_variant const* value)
     {
         switch (key)
         {
-#define HANDLE_KEY(key) case TR_KEY_ ## key: \
-    changed = change(setme.key, child) || changed; break;
+#define HANDLE_KEY(key, field) case TR_KEY_ ## key: \
+    changed = change(setme.field, child) || changed; break;
 
-            HANDLE_KEY(address)
-            HANDLE_KEY(clientIsChoked)
-            HANDLE_KEY(clientIsInterested)
-            HANDLE_KEY(clientName)
-            HANDLE_KEY(flagStr)
-            HANDLE_KEY(isDownloadingFrom)
-            HANDLE_KEY(isEncrypted)
-            HANDLE_KEY(isIncoming)
-            HANDLE_KEY(isUploadingTo)
-            HANDLE_KEY(peerIsChoked)
-            HANDLE_KEY(peerIsInterested)
-            HANDLE_KEY(port)
-            HANDLE_KEY(progress)
-            HANDLE_KEY(rateToClient)
-            HANDLE_KEY(rateToPeer)
+            HANDLE_KEY(address, address)
+            HANDLE_KEY(clientIsChoked, client_is_choked)
+            HANDLE_KEY(clientIsInterested, client_is_interested)
+            HANDLE_KEY(clientName, client_name)
+            HANDLE_KEY(flagStr, flags)
+            HANDLE_KEY(isDownloadingFrom, is_downloading_from)
+            HANDLE_KEY(isEncrypted, is_encrypted)
+            HANDLE_KEY(isIncoming, is_incoming)
+            HANDLE_KEY(isUploadingTo, is_uploading_to)
+            HANDLE_KEY(peerIsChoked, peer_is_choked)
+            HANDLE_KEY(peerIsInterested, peer_is_interested)
+            HANDLE_KEY(port, port)
+            HANDLE_KEY(progress, progress)
+            HANDLE_KEY(rateToClient, rate_to_client)
+            HANDLE_KEY(rateToPeer, rate_to_peer)
 #undef HANDLE_KEY
         default:
             break;
@@ -285,33 +285,33 @@ bool change(TrackerStat& setme, tr_variant const* value)
     {
         switch (key)
         {
-#define HANDLE_KEY(key) case TR_KEY_ ## key: \
-    changed = change(setme.key, child) || changed; break;
-            HANDLE_KEY(announce);
-            HANDLE_KEY(announceState);
-            HANDLE_KEY(downloadCount);
-            HANDLE_KEY(hasAnnounced);
-            HANDLE_KEY(hasScraped);
-            HANDLE_KEY(host);
-            HANDLE_KEY(id);
-            HANDLE_KEY(isBackup);
-            HANDLE_KEY(lastAnnouncePeerCount);
-            HANDLE_KEY(lastAnnounceResult);
-            HANDLE_KEY(lastAnnounceStartTime);
-            HANDLE_KEY(lastAnnounceSucceeded);
-            HANDLE_KEY(lastAnnounceTime);
-            HANDLE_KEY(lastAnnounceTimedOut);
-            HANDLE_KEY(lastScrapeResult);
-            HANDLE_KEY(lastScrapeStartTime);
-            HANDLE_KEY(lastScrapeSucceeded);
-            HANDLE_KEY(lastScrapeTime);
-            HANDLE_KEY(lastScrapeTimedOut);
-            HANDLE_KEY(leecherCount);
-            HANDLE_KEY(nextAnnounceTime);
-            HANDLE_KEY(nextScrapeTime);
-            HANDLE_KEY(scrapeState);
-            HANDLE_KEY(seederCount);
-            HANDLE_KEY(tier);
+#define HANDLE_KEY(key, field) case TR_KEY_ ## key: \
+    changed = change(setme.field, child) || changed; break;
+            HANDLE_KEY(announce, announce)
+            HANDLE_KEY(announceState, announce_state)
+            HANDLE_KEY(downloadCount, download_count)
+            HANDLE_KEY(hasAnnounced, has_announced)
+            HANDLE_KEY(hasScraped, has_scraped)
+            HANDLE_KEY(host, host);
+            HANDLE_KEY(id, id);
+            HANDLE_KEY(isBackup, is_backup);
+            HANDLE_KEY(lastAnnouncePeerCount, last_announce_peer_count);
+            HANDLE_KEY(lastAnnounceResult, last_announce_result);
+            HANDLE_KEY(lastAnnounceStartTime, last_announce_start_time)
+            HANDLE_KEY(lastAnnounceSucceeded, last_announce_succeeded)
+            HANDLE_KEY(lastAnnounceTime, last_announce_time)
+            HANDLE_KEY(lastAnnounceTimedOut, last_announce_timed_out)
+            HANDLE_KEY(lastScrapeResult, last_scrape_result)
+            HANDLE_KEY(lastScrapeStartTime, last_scrape_start_time)
+            HANDLE_KEY(lastScrapeSucceeded, last_scrape_succeeded)
+            HANDLE_KEY(lastScrapeTime, last_scrape_time)
+            HANDLE_KEY(lastScrapeTimedOut, last_scrape_timed_out)
+            HANDLE_KEY(leecherCount, leecher_count)
+            HANDLE_KEY(nextAnnounceTime, next_announce_time)
+            HANDLE_KEY(nextScrapeTime, next_scrape_time)
+            HANDLE_KEY(scrapeState, scrape_state)
+            HANDLE_KEY(seederCount, seeder_count)
+            HANDLE_KEY(tier, tier)
 
 #undef HANDLE_KEY
         default:
@@ -453,20 +453,20 @@ int Torrent::compareRatio(Torrent const& that) const
 
 int Torrent::compareETA(Torrent const& that) const
 {
-    bool const haveA(hasETA());
-    bool const haveB(that.hasETA());
+    bool const have_a(hasETA());
+    bool const have_b(that.hasETA());
 
-    if (haveA && haveB)
+    if (have_a && have_b)
     {
         return getETA() - that.getETA();
     }
 
-    if (haveA)
+    if (have_a)
     {
         return 1;
     }
 
-    if (haveB)
+    if (have_b)
     {
         return -1;
     }
@@ -516,68 +516,64 @@ bool Torrent::update(tr_quark const* keys, tr_variant const* const* values, size
 
         switch (key)
         {
-#define HANDLE_KEY(key) case TR_KEY_ ## key: \
-    field_changed = change(key ## _, child); break;
-
-            HANDLE_KEY(activityDate)
-            HANDLE_KEY(addedDate)
-            HANDLE_KEY(bandwidthPriority)
-            HANDLE_KEY(comment)
-            HANDLE_KEY(creator)
-            HANDLE_KEY(dateCreated)
-            HANDLE_KEY(desiredAvailable)
-            HANDLE_KEY(downloadDir)
-            HANDLE_KEY(downloadLimit) // KB/s
-            HANDLE_KEY(downloadLimited)
-            HANDLE_KEY(downloadedEver)
-            HANDLE_KEY(editDate)
-            HANDLE_KEY(error)
-            HANDLE_KEY(errorString)
-            HANDLE_KEY(eta)
-            HANDLE_KEY(files)
-            HANDLE_KEY(hashString)
-            HANDLE_KEY(haveUnchecked)
-            HANDLE_KEY(honorsSessionLimits)
-            HANDLE_KEY(isFinished)
-            HANDLE_KEY(isPrivate)
-            HANDLE_KEY(isStalled)
-            HANDLE_KEY(leftUntilDone)
-            HANDLE_KEY(manualAnnounceTime)
-            HANDLE_KEY(metadataPercentComplete)
-            HANDLE_KEY(name)
-            HANDLE_KEY(peers)
-            HANDLE_KEY(peersConnected)
-            HANDLE_KEY(peersGettingFromUs)
-            HANDLE_KEY(peersSendingToUs)
-            HANDLE_KEY(percentDone)
-            HANDLE_KEY(pieceCount)
-            HANDLE_KEY(pieceSize)
-            HANDLE_KEY(queuePosition)
-            HANDLE_KEY(recheckProgress)
-            HANDLE_KEY(seedIdleLimit)
-            HANDLE_KEY(seedIdleMode)
-            HANDLE_KEY(seedRatioLimit)
-            HANDLE_KEY(seedRatioMode)
-            HANDLE_KEY(sizeWhenDone)
-            HANDLE_KEY(startDate)
-            HANDLE_KEY(status)
-            HANDLE_KEY(totalSize)
-            HANDLE_KEY(trackerStats)
-            HANDLE_KEY(uploadLimit) // KB/s
-            HANDLE_KEY(uploadLimited)
-            HANDLE_KEY(uploadedEver)
-            HANDLE_KEY(webseedsSendingToUs)
-#undef HANDLE_KEY
 #define HANDLE_KEY(key, field) case TR_KEY_ ## key: \
     field_changed = change(field ## _, child); break;
 
-            HANDLE_KEY(corruptEver, failedEver)
+            HANDLE_KEY(activityDate, activity_date)
+            HANDLE_KEY(addedDate, added_date)
+            HANDLE_KEY(bandwidthPriority, bandwidth_priority)
+            HANDLE_KEY(comment, comment)
+            HANDLE_KEY(corruptEver, failed_ever)
+            HANDLE_KEY(creator, creator)
+            HANDLE_KEY(dateCreated, date_created)
+            HANDLE_KEY(desiredAvailable, desired_available)
+            HANDLE_KEY(downloadDir, download_dir)
+            HANDLE_KEY(downloadLimit, download_limit) // KB/s
+            HANDLE_KEY(downloadLimited, download_limited)
+            HANDLE_KEY(downloadedEver, downloaded_ever)
+            HANDLE_KEY(editDate, edit_date)
+            HANDLE_KEY(error, error)
+            HANDLE_KEY(errorString, error_string)
+            HANDLE_KEY(eta, eta)
             HANDLE_KEY(fileStats, files)
-            HANDLE_KEY(haveValid, haveVerified)
-            HANDLE_KEY(peer_limit, peerLimit)
-            HANDLE_KEY(rateDownload, downloadSpeed)
-            HANDLE_KEY(rateUpload, uploadSpeed)
-            HANDLE_KEY(trackers, trackerStats)
+            HANDLE_KEY(files, files)
+            HANDLE_KEY(hashString, hash_string)
+            HANDLE_KEY(haveUnchecked, have_unchecked)
+            HANDLE_KEY(haveValid, have_verified)
+            HANDLE_KEY(honorsSessionLimits, honors_session_limits)
+            HANDLE_KEY(isFinished, is_finished)
+            HANDLE_KEY(isPrivate, is_private)
+            HANDLE_KEY(isStalled, is_stalled)
+            HANDLE_KEY(leftUntilDone, left_until_done)
+            HANDLE_KEY(manualAnnounceTime, manual_announce_time)
+            HANDLE_KEY(metadataPercentComplete, metadata_percent_complete)
+            HANDLE_KEY(name, name)
+            HANDLE_KEY(peer_limit, peer_limit)
+            HANDLE_KEY(peers, peers)
+            HANDLE_KEY(peersConnected, peers_connected)
+            HANDLE_KEY(peersGettingFromUs, peers_getting_from_us)
+            HANDLE_KEY(peersSendingToUs, peers_sending_to_us)
+            HANDLE_KEY(percentDone, percent_done)
+            HANDLE_KEY(pieceCount, piece_count)
+            HANDLE_KEY(pieceSize, piece_size)
+            HANDLE_KEY(queuePosition, queue_position)
+            HANDLE_KEY(rateDownload, download_speed)
+            HANDLE_KEY(rateUpload, upload_speed)
+            HANDLE_KEY(recheckProgress, recheck_progress)
+            HANDLE_KEY(seedIdleLimit, seed_idle_limit)
+            HANDLE_KEY(seedIdleMode, seed_idle_mode)
+            HANDLE_KEY(seedRatioLimit, seed_ratio_limit)
+            HANDLE_KEY(seedRatioMode, seed_ratio_mode)
+            HANDLE_KEY(sizeWhenDone, size_when_done)
+            HANDLE_KEY(startDate, start_date)
+            HANDLE_KEY(status, status)
+            HANDLE_KEY(totalSize, total_size)
+            HANDLE_KEY(trackerStats, tracker_stats)
+            HANDLE_KEY(trackers, tracker_stats)
+            HANDLE_KEY(uploadLimit, upload_limit) // KB/s
+            HANDLE_KEY(uploadLimited, upload_limited)
+            HANDLE_KEY(uploadedEver, uploaded_ever)
+            HANDLE_KEY(webseedsSendingToUs, webseeds_sending_to_us)
 #undef HANDLE_KEY
         default:
             break;
@@ -614,8 +610,8 @@ bool Torrent::update(tr_quark const* keys, tr_variant const* const* values, size
                 {
                     // rebuild trackers_
                     QStringList urls;
-                    urls.reserve(trackerStats_.size());
-                    for (auto const& t : trackerStats_)
+                    urls.reserve(tracker_stats_.size());
+                    for (auto const& t : tracker_stats_)
                     {
                         urls.append(t.announce);
                     }
@@ -633,7 +629,7 @@ bool Torrent::update(tr_quark const* keys, tr_variant const* const* values, size
                     }
 
                     displayNames.removeDuplicates();
-                    trackerDisplayNames_.swap(displayNames);
+                    tracker_display_names_.swap(displayNames);
                     break;
                 }
             }
@@ -683,7 +679,7 @@ QString Torrent::activityString() const
 
 QString Torrent::getError() const
 {
-    auto s = errorString_;
+    auto s = error_string_;
 
     switch (error_)
     {
