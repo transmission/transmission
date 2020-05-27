@@ -106,7 +106,7 @@ void PathButton::paintEvent(QPaintEvent* /*event*/)
 
 void PathButton::onClicked()
 {
-    QFileDialog* dialog = new QFileDialog(window(), effectiveTitle());
+    auto* dialog = new QFileDialog(window(), effectiveTitle());
     dialog->setFileMode(isDirMode() ? QFileDialog::Directory : QFileDialog::ExistingFile);
 
     if (isDirMode())

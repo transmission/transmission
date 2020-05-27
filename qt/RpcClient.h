@@ -25,7 +25,7 @@
 class QByteArray;
 class QNetworkAccessManager;
 
-typedef std::shared_ptr<tr_variant> TrVariantPtr;
+using TrVariantPtr = std::shared_ptr<tr_variant>;
 Q_DECLARE_METATYPE(TrVariantPtr)
 
 extern "C"
@@ -45,7 +45,7 @@ struct RpcResponse
 Q_DECLARE_METATYPE(QFutureInterface<RpcResponse>)
 
 // The response future -- the RPC engine returns one for each request made.
-typedef QFuture<RpcResponse> RpcResponseFuture;
+using RpcResponseFuture = QFuture<RpcResponse>;
 
 class RpcClient : public QObject
 {

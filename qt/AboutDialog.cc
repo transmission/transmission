@@ -19,8 +19,7 @@
 #include "Utils.h"
 
 AboutDialog::AboutDialog(QWidget* parent) :
-    BaseDialog(parent),
-    myLicenseDialog()
+    BaseDialog(parent)
 {
     ui.setupUi(this);
 
@@ -41,7 +40,7 @@ AboutDialog::AboutDialog(QWidget* parent) :
 void AboutDialog::showCredits()
 {
     QMessageBox::about(this, tr("Credits"), QString::fromUtf8(
-        "Jordan Lee (Backend; Daemon; GTK+; Qt)\n"
+        "Charles Kerr (Backend; Daemon; GTK+; Qt)\n"
         "Mitchell Livingston (OS X)\n"
         "Mike Gelfand\n"));
 }

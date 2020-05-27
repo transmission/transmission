@@ -42,7 +42,7 @@ QVariant TrackerModel::data(QModelIndex const& index, int role) const
             break;
 
         case TrackerRole:
-            var = qVariantFromValue(trackerInfo);
+            var = QVariant::fromValue(trackerInfo);
             break;
 
         default:

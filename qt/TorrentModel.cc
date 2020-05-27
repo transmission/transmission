@@ -106,7 +106,7 @@ QVariant TorrentModel::data(QModelIndex const& index, int role) const
             break;
 
         case TorrentRole:
-            var = qVariantFromValue(t);
+            var = QVariant::fromValue(t);
             break;
 
         default:
@@ -349,11 +349,6 @@ std::optional<int> TorrentModel::getRow(int id) const
     return row;
 }
 
-std::optional<int> TorrentModel::getRow(Torrent const* tor) const
-{
-    return getRow(tor->id());
-}
-
 Torrent* TorrentModel::getTorrentFromId(int id)
 {
     auto const row = getRow(id);
@@ -448,7 +443,7 @@ void TorrentModel::rowsAdd(torrents_t const& torrents)
     {
         for (auto const& tor : torrents)
         {
-            auto const it = std::lower_bound(myTorrents.begin(), myTorrents.end(), tor, compare);
+            auto* const it = std::lower_bound(myTorrents.begin(), myTorrents.end(), tor, compare);
             auto const row = std::distance(myTorrents.begin(), it);
 
             beginInsertRows(QModelIndex(), row, row);

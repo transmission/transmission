@@ -80,6 +80,38 @@ static int test_strstrip(void)
     return 0;
 }
 
+static int test_strjoin(void)
+{
+    char* out;
+
+    char const* in1[] = { "one", "two" };
+    out = tr_strjoin(in1, 2, ", ");
+    check_str(out, ==, "one, two");
+    tr_free(out);
+
+    char const* in2[] = { "hello" };
+    out = tr_strjoin(in2, 1, "###");
+    check_str(out, ==, "hello");
+    tr_free(out);
+
+    char const* in3[] = { "a", "b", "ccc", "d", "eeeee" };
+    out = tr_strjoin(in3, 5, " ");
+    check_str(out, ==, "a b ccc d eeeee");
+    tr_free(out);
+
+    char const* in4[] = { "7", "ate", "9" };
+    out = tr_strjoin(in4, 3, "");
+    check_str(out, ==, "7ate9");
+    tr_free(out);
+
+    char const** in5;
+    out = tr_strjoin(in5, 0, "a");
+    check_str(out, ==, "");
+    tr_free(out);
+
+    return 0;
+}
+
 static int test_buildpath(void)
 {
     char* out;
@@ -414,6 +446,9 @@ static int test_truncd(void)
     tr_snprintf(buf, sizeof(buf), "%.0f", tr_truncd(3.3333, 0));
     check_str(buf, ==, "3");
 
+    tr_snprintf(buf, sizeof(buf), "%.0f", tr_truncd(3.9999, 0));
+    check_str(buf, ==, "3");
+
 #if !(defined(_MSC_VER) || (defined(__MINGW32__) && defined(__MSVCRT__)))
     /* FIXME: MSCVRT behaves differently in case of nan */
     tr_snprintf(buf, sizeof(buf), "%.2f", tr_truncd(nan, 2));
@@ -542,6 +577,7 @@ int main(void)
         test_strip_positional_args,
         test_strdup_printf,
         test_strstrip,
+        test_strjoin,
         test_truncd,
         test_url,
         test_utf8,

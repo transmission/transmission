@@ -1782,11 +1782,6 @@ void tr_sessionSetAltSpeedFunc(tr_session* session, tr_altSpeedFunc func, void* 
     session->turtle.callbackUserData = userData;
 }
 
-void tr_sessionClearAltSpeedFunc(tr_session* session)
-{
-    tr_sessionSetAltSpeedFunc(session, NULL, NULL);
-}
-
 /***
 ****
 ***/

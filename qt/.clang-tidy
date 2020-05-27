@@ -1,0 +1,30 @@
+---
+Checks: "-*,\
+  bugprone-*,
+  -bugprone-branch-clone,
+  -bugprone-narrowing-conversions,
+  cert-*,
+  -cert-err58-cpp,
+  clang-analyzer-optin*,
+  cppcoreguidelines-*,
+  hicpp-*,
+  misc-*,
+  -misc-non-private-member-variables-in-classes,
+  modernize-*,
+  -modernize-avoid-c-arrays,
+  -modernize-loop-convert,
+  -modernize-pass-by-value,
+  -modernize-raw-string-literal,
+  -modernize-use-nodiscard,
+  -modernize-use-trailing-return-type,
+  readability-*,
+  -readability-convert-member-functions-to-static,
+  -readability-implicit-bool-conversion,
+  -readability-inconsistent-declaration-parameter-name,
+  -readability-isolate-declaration,
+  -readability-magic-numbers,
+  -readability-redundant-access-specifiers,
+  -readability-static-accessed-through-instance,
+WarningsAsErrors: "*"
+...
+

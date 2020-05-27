@@ -34,7 +34,6 @@ public:
 
 protected:
     QString getText(TrackerInfo const&) const;
-    QSize margin(QStyle const& style) const;
 
     QSize sizeHint(QStyleOptionViewItem const&, TrackerInfo const&) const;
     void drawTracker(QPainter*, QStyleOptionViewItem const&, TrackerInfo const&) const;
