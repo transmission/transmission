@@ -128,7 +128,7 @@ Prefs::PrefItem Prefs::items_[] =
 Prefs::Prefs(QString config_dir) :
     config_dir_(std::move(config_dir))
 {
-    assert(sizeof(items_) / sizeof(items_[0]) == PREFS_COUNT);
+    static_assert(sizeof(items_) / sizeof(items_[0]) == PREFS_COUNT);
 
 #ifndef NDEBUG
 
