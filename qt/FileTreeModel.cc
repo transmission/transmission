@@ -39,7 +39,7 @@ QChar const PathIteratorBase::slash_char = QLatin1Char('/');
 class ForwardPathIterator : public PathIteratorBase
 {
 public:
-    ForwardPathIterator(QString const& path) :
+    explicit ForwardPathIterator(QString const& path) :
         PathIteratorBase(path, path.size() - 1)
     {
     }
@@ -62,7 +62,7 @@ public:
 class BackwardPathIterator : public PathIteratorBase
 {
 public:
-    BackwardPathIterator(QString const& path) :
+    explicit BackwardPathIterator(QString const& path) :
         PathIteratorBase(path, 0)
     {
     }

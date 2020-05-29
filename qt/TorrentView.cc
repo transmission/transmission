@@ -15,7 +15,7 @@
 class TorrentView::HeaderWidget : public QWidget
 {
 public:
-    HeaderWidget(TorrentView* parent) :
+    explicit HeaderWidget(TorrentView* parent) :
         QWidget(parent),
         text_()
     {
