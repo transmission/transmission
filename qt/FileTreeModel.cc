@@ -463,11 +463,11 @@ void FileTreeModel::emitParentsChanged(QModelIndex const& index, int first_colum
     }
 }
 
-void FileTreeModel::emitSubtreeChanged(QModelIndex const& index, int first_column, int last_column)
+void FileTreeModel::emitSubtreeChanged(QModelIndex const& idx, int first_column, int last_column)
 {
     assert(first_column <= last_column);
 
-    int const child_count = rowCount(index);
+    int const child_count = rowCount(idx);
 
     if (child_count == 0)
     {
@@ -475,12 +475,12 @@ void FileTreeModel::emitSubtreeChanged(QModelIndex const& index, int first_colum
     }
 
     // tell everyone that this item changed
-    emit dataChanged(index.child(0, first_column), index.child(child_count - 1, last_column));
+    emit dataChanged(index(0, first_column, idx), index(child_count - 1, last_column, idx));
 
     // walk the subitems
     for (int i = 0; i < child_count; ++i)
     {
-        emitSubtreeChanged(index.child(i, 0), first_column, last_column);
+        emitSubtreeChanged(index(i, 0, idx), first_column, last_column);
     }
 }
 
