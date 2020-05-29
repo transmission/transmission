@@ -74,7 +74,7 @@ OptionsDialog::OptionsDialog(Session& session, Prefs const& prefs, AddData const
     ui_.sourceLabel->setBuddy(ui_.sourceStack->currentWidget());
 
     QFontMetrics const fontMetrics(font());
-    int const width = fontMetrics.size(0, QString::fromUtf8("This is a pretty long torrent filename indeed.torrent")).width();
+    int const width = fontMetrics.size(0, QStringLiteral("This is a pretty long torrent filename indeed.torrent")).width();
     ui_.sourceStack->setMinimumWidth(width);
 
     QString const download_dir(Utils::removeTrailingDirSeparator(prefs.getString(Prefs::DOWNLOAD_DIR)));

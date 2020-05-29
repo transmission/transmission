@@ -91,13 +91,13 @@ void FileTreeView::resizeEvent(QResizeEvent* event)
         case FileTreeModel::COL_SIZE:
             for (int s = Formatter::B; s <= Formatter::TB; ++s)
             {
-                item_texts << QLatin1String("999.9 ") + Formatter::unitStr(Formatter::MEM, static_cast<Formatter::Size>(s));
+                item_texts << QStringLiteral("999.9 ") + Formatter::unitStr(Formatter::MEM, static_cast<Formatter::Size>(s));
             }
 
             break;
 
         case FileTreeModel::COL_PROGRESS:
-            item_texts << QLatin1String("  100%  ");
+            item_texts << QStringLiteral("  100%  ");
             break;
 
         case FileTreeModel::COL_WANTED:

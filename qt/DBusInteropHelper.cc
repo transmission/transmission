@@ -20,9 +20,9 @@
 namespace
 {
 
-QLatin1String const DBUS_SERVICE("com.transmissionbt.Transmission");
-QLatin1String const DBUS_OBJECT_PATH("/com/transmissionbt/Transmission");
-QLatin1String const DBUS_INTERFACE("com.transmissionbt.Transmission");
+auto const DBUS_SERVICE = QStringLiteral("com.transmissionbt.Transmission");
+auto const DBUS_OBJECT_PATH = QStringLiteral("/com/transmissionbt/Transmission");
+auto const DBUS_INTERFACE = QStringLiteral("com.transmissionbt.Transmission");
 
 } // namespace
 
@@ -34,7 +34,7 @@ bool DBusInteropHelper::isConnected() const
 QVariant DBusInteropHelper::addMetainfo(QString const& metainfo)
 {
     QDBusMessage request = QDBusMessage::createMethodCall(DBUS_SERVICE, DBUS_OBJECT_PATH, DBUS_INTERFACE,
-        QLatin1String("AddMetainfo"));
+        QStringLiteral("AddMetainfo"));
     request.setArguments(QVariantList() << metainfo);
 
     QDBusReply<bool> const response = QDBusConnection::sessionBus().call(request);

@@ -291,7 +291,7 @@ Prefs::~Prefs()
 
     // update settings.json with our settings
     tr_variant file_settings;
-    QFile const file(QDir(config_dir_).absoluteFilePath(QLatin1String("settings.json")));
+    QFile const file(QDir(config_dir_).absoluteFilePath(QStringLiteral("settings.json")));
 
     if (!tr_variantFromFile(&file_settings, TR_VARIANT_FMT_JSON, file.fileName().toUtf8().constData(), nullptr))
     {
