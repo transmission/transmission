@@ -50,7 +50,6 @@ Checks: "
   -readability-isolate-declaration,
   -readability-magic-numbers,
   -readability-redundant-access-specifiers,
-  -readability-simplify-boolean-expr,
   -readability-static-accessed-through-instance"
 WarningsAsErrors: "*"
 ...

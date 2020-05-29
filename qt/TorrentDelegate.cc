@@ -57,8 +57,8 @@ public:
     QRect bar_rect;
     QRect progress_rect;
 
-    ItemLayout(QString name_text, QString status_text, QString progress_text, QIcon const& emblem_icon,
-        QFont const& base_font, Qt::LayoutDirection direction, QPoint const& top_left, int width);
+    ItemLayout(QString name_text, QString status_text, QString progress_text, QIcon const& emblem_icon, QFont const& base_font,
+        Qt::LayoutDirection direction, QPoint const& top_left, int width);
 
     [[nodiscard]] QSize size() const
     {
@@ -87,9 +87,8 @@ private:
     }
 };
 
-ItemLayout::ItemLayout(QString name_text, QString status_text, QString progress_text,
-    QIcon const& emblem_icon, QFont const& base_font, Qt::LayoutDirection direction, QPoint const& top_left,
-    int width) :
+ItemLayout::ItemLayout(QString name_text, QString status_text, QString progress_text, QIcon const& emblem_icon,
+    QFont const& base_font, Qt::LayoutDirection direction, QPoint const& top_left, int width) :
     name_text_(std::move(name_text)),
     status_text_(std::move(status_text)),
     progress_text_(std::move(progress_text)),
