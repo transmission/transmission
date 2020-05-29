@@ -29,7 +29,7 @@ public:
     }
 
     // QWidget
-    QSize sizeHint() const override
+    [[nodiscard]] QSize sizeHint() const override
     {
         QStyleOptionHeader option;
         option.rect = QRect(0, 0, 100, 100);

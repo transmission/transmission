@@ -62,20 +62,20 @@ public:
     }
 
     template<typename T>
-    bool is() const
+    [[nodiscard]] bool is() const
     {
         return qobject_cast<T*>(m_object) != nullptr;
     }
 
     template<typename T>
-    T const* as() const
+    [[nodiscard]] T const* as() const
     {
         assert(is<T>());
         return static_cast<T const*>(m_object);
     }
 
     template<typename T>
-    T* as()
+    [[nodiscard]] T* as()
     {
         assert(is<T>());
         return static_cast<T*>(m_object);
@@ -86,7 +86,7 @@ public:
         m_object->setProperty(PREF_KEY, key);
     }
 
-    int getPrefKey() const
+    [[nodiscard]] int getPrefKey() const
     {
         return m_object->property(PREF_KEY).toInt();
     }

@@ -44,7 +44,7 @@ public:
     {
     }
 
-    bool hasNext() const
+    [[nodiscard]] bool hasNext() const
     {
         return slash_index_ > -1;
     }
@@ -67,7 +67,7 @@ public:
     {
     }
 
-    bool hasNext() const
+    [[nodiscard]] bool hasNext() const
     {
         return slash_index_ < path_.size();
     }

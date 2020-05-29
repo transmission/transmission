@@ -45,7 +45,6 @@ Checks: "
   -modernize-pass-by-value,
   -modernize-raw-string-literal,
   -modernize-use-default-member-init,
-  -modernize-use-nodiscard,
   -modernize-use-trailing-return-type, # keep
   performance-*,
   readability-*,

@@ -65,23 +65,23 @@ public:
     ItemLayout(QString const& name_text, QString const& status_text, QIcon const& emblem_icon, QFont const& base_font,
         Qt::LayoutDirection direction, QPoint const& top_left, int width);
 
-    QSize size() const
+    [[nodiscard]] QSize size() const
     {
         return (icon_rect | name_rect | status_rect | bar_rect).size();
     }
 
-    QString nameText() const
+    [[nodiscard]] QString nameText() const
     {
         return elidedText(name_font, name_text_, name_rect.width());
     }
 
-    QString statusText() const
+    [[nodiscard]] QString statusText() const
     {
         return status_text_;
     }
 
 private:
-    QString elidedText(QFont const& font, QString const& text, int width) const
+    [[nodiscard]] QString elidedText(QFont const& font, QString const& text, int width) const
     {
         return QFontMetrics(font).elidedText(text, Qt::ElideRight, width);
     }

@@ -43,12 +43,12 @@ public:
 
     ItemLayout(QString const& text, bool suppress_colors, Qt::LayoutDirection direction, QPoint const& top_left, int width);
 
-    QSize size() const
+    [[nodiscard]] QSize size() const
     {
         return (icon_rect | text_rect).size();
     }
 
-    QAbstractTextDocumentLayout* textLayout() const
+    [[nodiscard]] QAbstractTextDocumentLayout* textLayout() const
     {
         return text_document_.documentLayout();
     }

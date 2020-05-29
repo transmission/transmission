@@ -60,28 +60,28 @@ public:
     ItemLayout(QString const& name_text, QString const& status_text, QString const& progress_text, QIcon const& emblem_icon,
         QFont const& base_font, Qt::LayoutDirection direction, QPoint const& top_left, int width);
 
-    QSize size() const
+    [[nodiscard]] QSize size() const
     {
         return (icon_rect | name_rect | status_rect | bar_rect | progress_rect).size();
     }
 
-    QString nameText() const
+    [[nodiscard]] QString nameText() const
     {
         return elidedText(name_font, name_text_, name_rect.width());
     }
 
-    QString statusText() const
+    [[nodiscard]] QString statusText() const
     {
         return elidedText(status_font, status_text_, status_rect.width());
     }
 
-    QString progressText() const
+    [[nodiscard]] QString progressText() const
     {
         return elidedText(progress_font, progress_text_, progress_rect.width());
     }
 
 private:
-    QString elidedText(QFont const& font, QString const& text, int width) const
+    [[nodiscard]] QString elidedText(QFont const& font, QString const& text, int width) const
     {
         return QFontMetrics(font).elidedText(text, Qt::ElideRight, width);
     }
