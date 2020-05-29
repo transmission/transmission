@@ -44,7 +44,6 @@ Checks: "
   -modernize-loop-convert,
   -modernize-pass-by-value,
   -modernize-raw-string-literal,
-  -modernize-use-default-member-init,
   -modernize-use-trailing-return-type, # keep
   performance-*,
   readability-*,
