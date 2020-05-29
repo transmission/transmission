@@ -35,7 +35,7 @@ private:
     Session& session_;
     Prefs& prefs_;
 
-    Ui::SessionDialog ui_;
+    Ui::SessionDialog ui_ = {};
 
     QWidgetList remote_widgets_;
     QWidgetList auth_widgets_;

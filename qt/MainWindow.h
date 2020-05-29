@@ -149,7 +149,7 @@ private:
     QPixmap pixmap_network_transmit_;
     QPixmap pixmap_network_transmit_receive_;
 
-    Ui_MainWindow ui_;
+    Ui_MainWindow ui_ = {};
 
     time_t last_full_update_time_ = {};
     QPointer<SessionDialog> session_dialog_;

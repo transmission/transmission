@@ -36,7 +36,7 @@ private:
     Session& session_;
     torrent_ids_t const ids_;
 
-    Ui::RelocateDialog ui_;
+    Ui::RelocateDialog ui_ = {};
 
     static bool move_flag_;
 };

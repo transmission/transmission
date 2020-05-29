@@ -41,7 +41,7 @@ private slots:
 private:
     Session& session_;
     tr_metainfo_builder& builder_;
-    Ui::MakeProgressDialog ui_;
+    Ui::MakeProgressDialog ui_ = {};
     QTimer timer_;
 };
 

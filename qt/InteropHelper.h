@@ -31,9 +31,9 @@ public:
 
 private:
 #ifdef ENABLE_DBUS_INTEROP
-    DBusInteropHelper dbus_client_;
+    DBusInteropHelper dbus_client_ = {};
 #endif
 #ifdef ENABLE_COM_INTEROP
-    ComInteropHelper com_client_;
+    ComInteropHelper com_client_ = {};
 #endif
 };

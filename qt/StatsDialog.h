@@ -33,7 +33,7 @@ private slots:
 private:
     Session& session_;
 
-    Ui::StatsDialog ui_;
+    Ui::StatsDialog ui_ = {};
 
     QTimer* timer_ = {};
 };
