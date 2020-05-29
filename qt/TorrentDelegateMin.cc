@@ -131,9 +131,9 @@ ItemLayout::ItemLayout(QString name_text, QString status_text, QIcon const& embl
 
 QSize TorrentDelegateMin::sizeHint(QStyleOptionViewItem const& option, Torrent const& tor) const
 {
-    bool const isMagnet(!tor.hasMetadata());
+    bool const is_magnet(!tor.hasMetadata());
     QSize const m(margin(*qApp->style()));
-    ItemLayout const layout(isMagnet ? progressString(tor) : tor.name(), shortStatusString(tor), QIcon(), option.font,
+    ItemLayout const layout(is_magnet ? progressString(tor) : tor.name(), shortStatusString(tor), QIcon(), option.font,
         option.direction, QPoint(0, 0), option.rect.width() - m.width() * 2);
     return layout.size() + m * 2;
 }
@@ -255,21 +255,21 @@ void TorrentDelegateMin::drawTorrent(QPainter* painter, QStyleOptionViewItem con
 
     if (tor.isDownloading())
     {
-        progress_bar_style_->palette.setBrush(QPalette::Highlight, blue_brush_);
-        progress_bar_style_->palette.setColor(QPalette::Base, blue_back_);
-        progress_bar_style_->palette.setColor(QPalette::Window, blue_back_);
+        progress_bar_style_->palette.setBrush(QPalette::Highlight, blue_brush);
+        progress_bar_style_->palette.setColor(QPalette::Base, blue_back);
+        progress_bar_style_->palette.setColor(QPalette::Window, blue_back);
     }
     else if (tor.isSeeding())
     {
-        progress_bar_style_->palette.setBrush(QPalette::Highlight, green_brush_);
-        progress_bar_style_->palette.setColor(QPalette::Base, green_back_);
-        progress_bar_style_->palette.setColor(QPalette::Window, green_back_);
+        progress_bar_style_->palette.setBrush(QPalette::Highlight, green_brush);
+        progress_bar_style_->palette.setColor(QPalette::Base, green_back);
+        progress_bar_style_->palette.setColor(QPalette::Window, green_back);
     }
     else
     {
-        progress_bar_style_->palette.setBrush(QPalette::Highlight, silver_brush_);
-        progress_bar_style_->palette.setColor(QPalette::Base, silver_back_);
-        progress_bar_style_->palette.setColor(QPalette::Window, silver_back_);
+        progress_bar_style_->palette.setBrush(QPalette::Highlight, silver_brush);
+        progress_bar_style_->palette.setColor(QPalette::Base, silver_back);
+        progress_bar_style_->palette.setColor(QPalette::Window, silver_back);
     }
 
     progress_bar_style_->state = progress_bar_state;

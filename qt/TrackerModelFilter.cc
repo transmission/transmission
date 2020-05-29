@@ -23,6 +23,6 @@ void TrackerModelFilter::setShowBackupTrackers(bool b)
 bool TrackerModelFilter::filterAcceptsRow(int source_row, QModelIndex const& source_parent) const
 {
     QModelIndex index = sourceModel()->index(source_row, 0, source_parent);
-    auto const trackerInfo = index.data(TrackerModel::TrackerRole).value<TrackerInfo>();
-    return show_backups_ || !trackerInfo.st.is_backup;
+    auto const tracker_info = index.data(TrackerModel::TrackerRole).value<TrackerInfo>();
+    return show_backups_ || !tracker_info.st.is_backup;
 }

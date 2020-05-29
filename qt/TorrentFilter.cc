@@ -36,24 +36,24 @@ TorrentFilter::~TorrentFilter() = default;
 void TorrentFilter::onPrefChanged(int key)
 {
     // For refiltering nearly immediately. Used to debounce batched prefs changes.
-    static int const fast_msec = 50;
+    static int const FastMSec = 50;
 
     // For waiting a little longer. Useful when user is typing the filter text.
-    static int const slow_msec = 500;
+    static int const SlowMSec = 500;
 
     std::optional<int> msec;
     switch (key)
     {
     case Prefs::FILTER_TEXT:
         // special case for isEmpty: user probably hit the 'clear' button
-        msec = prefs_.getString(key).isEmpty() ? fast_msec : slow_msec;
+        msec = prefs_.getString(key).isEmpty() ? FastMSec : SlowMSec;
         break;
 
     case Prefs::FILTER_MODE:
     case Prefs::FILTER_TRACKERS:
     case Prefs::SORT_MODE:
     case Prefs::SORT_REVERSED:
-        msec = fast_msec;
+        msec = FastMSec;
         break;
     }
 

@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include <array>
+
 #include <QMetaType>
 #include <QString>
 #include <QVariant>
@@ -53,13 +55,13 @@ public:
 
     static QString const& nameFromMode(int mode)
     {
-        return names_[mode];
+        return Names[mode];
     }
 
 private:
     int mode_;
 
-    static QString const names_[];
+    static std::array<QString,NUM_MODES> const Names;
 };
 
 Q_DECLARE_METATYPE(FilterMode)
@@ -100,7 +102,7 @@ public:
 
     QString const& name() const
     {
-        return names_[mode_];
+        return Names[mode_];
     }
 
     static int modeFromName(QString const& name);
@@ -109,7 +111,7 @@ public:
 private:
     int mode_ = SORT_BY_ID;
 
-    static QString const names_[];
+    static std::array<QString,NUM_MODES> const Names;
 };
 
 Q_DECLARE_METATYPE(SortMode)

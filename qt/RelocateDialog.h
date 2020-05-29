@@ -38,5 +38,5 @@ private:
 
     Ui::RelocateDialog ui_ = {};
 
-    static bool move_flag_;
+    static bool move_flag;
 };

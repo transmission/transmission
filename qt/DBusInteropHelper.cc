@@ -20,9 +20,9 @@
 namespace
 {
 
-auto const DBUS_SERVICE = QStringLiteral("com.transmissionbt.Transmission");
-auto const DBUS_OBJECT_PATH = QStringLiteral("/com/transmissionbt/Transmission");
-auto const DBUS_INTERFACE = QStringLiteral("com.transmissionbt.Transmission");
+auto const DBusService = QStringLiteral("com.transmissionbt.Transmission");
+auto const DBusObjectPath = QStringLiteral("/com/transmissionbt/Transmission");
+auto const DBusInterface = QStringLiteral("com.transmissionbt.Transmission");
 
 } // namespace
 
@@ -33,7 +33,7 @@ bool DBusInteropHelper::isConnected() const
 
 QVariant DBusInteropHelper::addMetainfo(QString const& metainfo)
 {
-    QDBusMessage request = QDBusMessage::createMethodCall(DBUS_SERVICE, DBUS_OBJECT_PATH, DBUS_INTERFACE,
+    QDBusMessage request = QDBusMessage::createMethodCall(DBusService, DBusObjectPath, DBusInterface,
         QStringLiteral("AddMetainfo"));
     request.setArguments(QVariantList() << metainfo);
 
@@ -50,13 +50,13 @@ void DBusInteropHelper::registerObject(QObject* parent)
         return;
     }
 
-    if (!bus.registerService(DBUS_SERVICE))
+    if (!bus.registerService(DBusService))
     {
-        std::cerr << "couldn't register " << qPrintable(DBUS_SERVICE) << std::endl;
+        std::cerr << "couldn't register " << qPrintable(DBusService) << std::endl;
     }
 
-    if (!bus.registerObject(DBUS_OBJECT_PATH, new InteropObject(parent), QDBusConnection::ExportAllSlots))
+    if (!bus.registerObject(DBusObjectPath, new InteropObject(parent), QDBusConnection::ExportAllSlots))
     {
-        std::cerr << "couldn't register " << qPrintable(DBUS_OBJECT_PATH) << std::endl;
+        std::cerr << "couldn't register " << qPrintable(DBusObjectPath) << std::endl;
     }
 }

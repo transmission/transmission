@@ -50,10 +50,10 @@
 namespace
 {
 
-auto const TOTAL_RATIO_STATS_MODE_NAME = QStringLiteral("total-ratio");
-auto const TOTAL_TRANSFER_STATS_MODE_NAME = QStringLiteral("total-transfer");
-auto const SESSION_RATIO_STATS_MODE_NAME = QStringLiteral("session-ratio");
-auto const SESSION_TRANSFER_STATS_MODE_NAME = QStringLiteral("session-transfer");
+auto const TotalRatioStatsModeName = QStringLiteral("total-ratio");
+auto const TotalTransferStatsModeName = QStringLiteral("total-transfer");
+auto const SessionRatioStatsModeName = QStringLiteral("session-ratio");
+auto const SessionTransferStatsModeName = QStringLiteral("session-transfer");
 
 } // namespace
 
@@ -184,17 +184,17 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     ui_.action_QueueMoveDown->setIcon(getStockIcon(QStringLiteral("go-down"), QStyle::SP_ArrowDown));
     ui_.action_QueueMoveBottom->setIcon(getStockIcon(QStringLiteral("go-bottom")));
 
-    auto makeNetworkPixmap = [this](char const* name_in, QSize size = QSize(16, 16))
+    auto make_network_pixmap = [this](char const* name_in, QSize size = QSize(16, 16))
         {
             auto const name = QString::fromUtf8(name_in);
             QIcon const icon = getStockIcon(name, QStyle::SP_DriveNetIcon);
             return icon.pixmap(size);
         };
-    pixmap_network_error_ = makeNetworkPixmap("network-error");
-    pixmap_network_idle_ = makeNetworkPixmap("network-idle");
-    pixmap_network_receive_ = makeNetworkPixmap("network-receive");
-    pixmap_network_transmit_ = makeNetworkPixmap("network-transmit");
-    pixmap_network_transmit_receive_ = makeNetworkPixmap("network-transmit-receive");
+    pixmap_network_error_ = make_network_pixmap("network-error");
+    pixmap_network_idle_ = make_network_pixmap("network-idle");
+    pixmap_network_receive_ = make_network_pixmap("network-receive");
+    pixmap_network_transmit_ = make_network_pixmap("network-transmit");
+    pixmap_network_transmit_receive_ = make_network_pixmap("network-transmit-receive");
 
     // ui signals
     connect(ui_.action_Toolbar, SIGNAL(toggled(bool)), this, SLOT(setToolbarVisible(bool)));
@@ -233,21 +233,21 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     connect(ui_.action_DeselectAll, SIGNAL(triggered()), ui_.listView, SLOT(clearSelection()));
     connect(ui_.action_Quit, SIGNAL(triggered()), qApp, SLOT(quit()));
 
-    auto refreshActionSensitivitySoon = [this]() { refreshSoon(REFRESH_ACTION_SENSITIVITY); };
-    connect(&filter_model_, &TorrentFilter::rowsInserted, this, refreshActionSensitivitySoon);
-    connect(&filter_model_, &TorrentFilter::rowsRemoved, this, refreshActionSensitivitySoon);
-    connect(&model_, &TorrentModel::torrentsChanged, this, refreshActionSensitivitySoon);
+    auto refresh_action_sensitivity_soon = [this]() { refreshSoon(REFRESH_ACTION_SENSITIVITY); };
+    connect(&filter_model_, &TorrentFilter::rowsInserted, this, refresh_action_sensitivity_soon);
+    connect(&filter_model_, &TorrentFilter::rowsRemoved, this, refresh_action_sensitivity_soon);
+    connect(&model_, &TorrentModel::torrentsChanged, this, refresh_action_sensitivity_soon);
 
     // torrent view
     filter_model_.setSourceModel(&model_);
-    auto refreshSoonAdapter = [this]() { refreshSoon(); };
-    connect(&model_, &TorrentModel::modelReset, this, refreshSoonAdapter);
-    connect(&model_, &TorrentModel::rowsRemoved, this, refreshSoonAdapter);
-    connect(&model_, &TorrentModel::rowsInserted, this, refreshSoonAdapter);
-    connect(&model_, &TorrentModel::dataChanged, this, refreshSoonAdapter);
+    auto refresh_soon_adapter = [this]() { refreshSoon(); };
+    connect(&model_, &TorrentModel::modelReset, this, refresh_soon_adapter);
+    connect(&model_, &TorrentModel::rowsRemoved, this, refresh_soon_adapter);
+    connect(&model_, &TorrentModel::rowsInserted, this, refresh_soon_adapter);
+    connect(&model_, &TorrentModel::dataChanged, this, refresh_soon_adapter);
 
     ui_.listView->setModel(&filter_model_);
-    connect(ui_.listView->selectionModel(), &QItemSelectionModel::selectionChanged, refreshActionSensitivitySoon);
+    connect(ui_.listView->selectionModel(), &QItemSelectionModel::selectionChanged, refresh_action_sensitivity_soon);
 
     QPair<QAction*, int> const sort_modes[] =
     {
@@ -421,7 +421,7 @@ QMenu* MainWindow::createOptionsMenu()
             }
         };
 
-    auto const initSeedRatioSubMenu = [this](QMenu* menu, QAction*& off_action, QAction*& on_action, int pref, int enabled_pref)
+    auto const init_seed_ratio_sub_menu = [this](QMenu* menu, QAction*& off_action, QAction*& on_action, int pref, int enabled_pref)
         {
             double const stock_ratios[] = { 0.25, 0.50, 0.75, 1, 1.5, 2, 3 };
             auto const current_value = prefs_.get<double>(pref);
@@ -459,7 +459,7 @@ QMenu* MainWindow::createOptionsMenu()
 
     menu->addSeparator();
 
-    initSeedRatioSubMenu(menu->addMenu(tr("Stop Seeding at Ratio")), ratio_off_action_, ratio_on_action_, Prefs::RATIO,
+    init_seed_ratio_sub_menu(menu->addMenu(tr("Stop Seeding at Ratio")), ratio_off_action_, ratio_on_action_, Prefs::RATIO,
         Prefs::RATIO_ENABLED);
 
     return menu;
@@ -469,23 +469,23 @@ QMenu* MainWindow::createStatsModeMenu()
 {
     QPair<QAction*, QString> const stats_modes[] =
     {
-        qMakePair(ui_.action_TotalRatio, TOTAL_RATIO_STATS_MODE_NAME),
-        qMakePair(ui_.action_TotalTransfer, TOTAL_TRANSFER_STATS_MODE_NAME),
-        qMakePair(ui_.action_SessionRatio, SESSION_RATIO_STATS_MODE_NAME),
-        qMakePair(ui_.action_SessionTransfer, SESSION_TRANSFER_STATS_MODE_NAME)
+        qMakePair(ui_.action_TotalRatio, TotalRatioStatsModeName),
+        qMakePair(ui_.action_TotalTransfer, TotalTransferStatsModeName),
+        qMakePair(ui_.action_SessionRatio, SessionRatioStatsModeName),
+        qMakePair(ui_.action_SessionTransfer, SessionTransferStatsModeName)
     };
 
-    auto* actionGroup = new QActionGroup(this);
+    auto* action_group = new QActionGroup(this);
     auto* menu = new QMenu(this);
 
     for (auto const& mode : stats_modes)
     {
         mode.first->setProperty(STATS_MODE_KEY, QString(mode.second));
-        actionGroup->addAction(mode.first);
+        action_group->addAction(mode.first);
         menu->addAction(mode.first);
     }
 
-    connect(actionGroup, SIGNAL(triggered(QAction*)), this, SLOT(onStatsModeChanged(QAction*)));
+    connect(action_group, SIGNAL(triggered(QAction*)), this, SLOT(onStatsModeChanged(QAction*)));
 
     return menu;
 }
@@ -792,17 +792,17 @@ void MainWindow::refreshStatusBar(TransferStats const& stats)
     QString const mode(prefs_.getString(Prefs::STATUSBAR_STATS));
     QString str;
 
-    if (mode == SESSION_RATIO_STATS_MODE_NAME)
+    if (mode == SessionRatioStatsModeName)
     {
         str = tr("Ratio: %1").arg(Formatter::ratioToString(session_.getStats().ratio));
     }
-    else if (mode == SESSION_TRANSFER_STATS_MODE_NAME)
+    else if (mode == SessionTransferStatsModeName)
     {
         tr_session_stats const& stats(session_.getStats());
         str = tr("Down: %1, Up: %2").arg(Formatter::sizeToString(stats.downloadedBytes)).
             arg(Formatter::sizeToString(stats.uploadedBytes));
     }
-    else if (mode == TOTAL_TRANSFER_STATS_MODE_NAME)
+    else if (mode == TotalTransferStatsModeName)
     {
         tr_session_stats const& stats(session_.getCumulativeStats());
         str = tr("Down: %1, Up: %2").arg(Formatter::sizeToString(stats.downloadedBytes)).
@@ -810,7 +810,7 @@ void MainWindow::refreshStatusBar(TransferStats const& stats)
     }
     else // default is "total-ratio"
     {
-        assert(mode == TOTAL_RATIO_STATS_MODE_NAME);
+        assert(mode == TotalRatioStatsModeName);
         str = tr("Ratio: %1").arg(Formatter::ratioToString(session_.getCumulativeStats().ratio));
     }
 
@@ -849,12 +849,12 @@ void MainWindow::refreshActionSensitivity()
     auto const now = time(nullptr);
     for (int row = 0; row < row_count; ++row)
     {
-        QModelIndex const modelIndex(model->index(row, 0));
-        auto const& tor = model->data(modelIndex, TorrentModel::TorrentRole).value<Torrent const*>();
+        QModelIndex const model_index(model->index(row, 0));
+        auto const& tor = model->data(model_index, TorrentModel::TorrentRole).value<Torrent const*>();
 
         if (tor != nullptr)
         {
-            bool const is_selected = has_selection && selection_model->isSelected(modelIndex);
+            bool const is_selected = has_selection && selection_model->isSelected(model_index);
             bool const is_paused = tor->isPaused();
 
             if (is_paused)
@@ -1245,7 +1245,7 @@ void MainWindow::refreshPref(int key)
 namespace
 {
 
-auto const SHOW_OPTIONS_CHECKBOX_NAME = QStringLiteral("show-options-checkbox");
+auto const ShowOptionsCheckboxName = QStringLiteral("show-options-checkbox");
 
 } // namespace
 
@@ -1270,7 +1270,7 @@ void MainWindow::openTorrent()
     {
         auto* b = new QCheckBox(tr("Show &options dialog"));
         b->setChecked(prefs_.getBool(Prefs::OPTIONS_PROMPT));
-        b->setObjectName(SHOW_OPTIONS_CHECKBOX_NAME);
+        b->setObjectName(ShowOptionsCheckboxName);
         l->addWidget(b, l->rowCount(), 0, 1, -1, Qt::AlignLeft);
     }
 
@@ -1304,7 +1304,7 @@ void MainWindow::addTorrents(QStringList const& filenames)
 
     if (file_dialog != nullptr)
     {
-        auto const* const b = file_dialog->findChild<QCheckBox const*>(SHOW_OPTIONS_CHECKBOX_NAME);
+        auto const* const b = file_dialog->findChild<QCheckBox const*>(ShowOptionsCheckboxName);
 
         if (b != nullptr)
         {
@@ -1443,12 +1443,12 @@ void MainWindow::removeTorrents(bool const delete_files)
 
 void MainWindow::updateNetworkIcon()
 {
-    static constexpr int const period = 3;
+    static constexpr int const Period = 3;
     time_t const now = time(nullptr);
     time_t const seconds_since_last_send = now - last_send_time_;
     time_t const seconds_since_last_read = now - last_read_time_;
-    bool const is_sending = seconds_since_last_send <= period;
-    bool const is_reading = seconds_since_last_read <= period;
+    bool const is_sending = seconds_since_last_send <= Period;
+    bool const is_reading = seconds_since_last_read <= Period;
     QPixmap pixmap;
 
     if (network_error_)

@@ -19,57 +19,56 @@
 namespace
 {
 
-unsigned int speed_K;
-unsigned int mem_K;
-unsigned int size_K;
+enum Units { KILO = 1000, KIBI = 1024 };
+
+auto constexpr SpeedBaseline = KILO;
+auto constexpr SizeBaseline = KILO;
+auto constexpr MemBaseline = KIBI;
 
 } // namespace
 
-QString Formatter::unit_strings_[3][5];
+QString Formatter::unit_strings[3][5];
 
 void Formatter::initUnits()
 {
-    speed_K = 1000;
-    unit_strings_[SPEED][B] = tr("B/s");
-    unit_strings_[SPEED][KB] = tr("kB/s");
-    unit_strings_[SPEED][MB] = tr("MB/s");
-    unit_strings_[SPEED][GB] = tr("GB/s");
-    unit_strings_[SPEED][TB] = tr("TB/s");
-    tr_formatter_speed_init(speed_K, unit_strings_[SPEED][KB].toUtf8().constData(),
-        unit_strings_[SPEED][MB].toUtf8().constData(),
-        unit_strings_[SPEED][GB].toUtf8().constData(), unit_strings_[SPEED][TB].toUtf8().constData());
+    unit_strings[SPEED][B] = tr("B/s");
+    unit_strings[SPEED][KB] = tr("kB/s");
+    unit_strings[SPEED][MB] = tr("MB/s");
+    unit_strings[SPEED][GB] = tr("GB/s");
+    unit_strings[SPEED][TB] = tr("TB/s");
+    tr_formatter_speed_init(SpeedBaseline, unit_strings[SPEED][KB].toUtf8().constData(),
+        unit_strings[SPEED][MB].toUtf8().constData(),
+        unit_strings[SPEED][GB].toUtf8().constData(), unit_strings[SPEED][TB].toUtf8().constData());
 
-    size_K = 1000;
-    unit_strings_[SIZE][B] = tr("B");
-    unit_strings_[SIZE][KB] = tr("kB");
-    unit_strings_[SIZE][MB] = tr("MB");
-    unit_strings_[SIZE][GB] = tr("GB");
-    unit_strings_[SIZE][TB] = tr("TB");
-    tr_formatter_size_init(size_K, unit_strings_[SIZE][KB].toUtf8().constData(), unit_strings_[SIZE][MB].toUtf8().constData(),
-        unit_strings_[SIZE][GB].toUtf8().constData(), unit_strings_[SIZE][TB].toUtf8().constData());
+    unit_strings[SIZE][B] = tr("B");
+    unit_strings[SIZE][KB] = tr("kB");
+    unit_strings[SIZE][MB] = tr("MB");
+    unit_strings[SIZE][GB] = tr("GB");
+    unit_strings[SIZE][TB] = tr("TB");
+    tr_formatter_size_init(SizeBaseline, unit_strings[SIZE][KB].toUtf8().constData(), unit_strings[SIZE][MB].toUtf8().constData(),
+        unit_strings[SIZE][GB].toUtf8().constData(), unit_strings[SIZE][TB].toUtf8().constData());
 
-    mem_K = 1024;
-    unit_strings_[MEM][B] = tr("B");
-    unit_strings_[MEM][KB] = tr("KiB");
-    unit_strings_[MEM][MB] = tr("MiB");
-    unit_strings_[MEM][GB] = tr("GiB");
-    unit_strings_[MEM][TB] = tr("TiB");
-    tr_formatter_mem_init(mem_K, unit_strings_[MEM][KB].toUtf8().constData(), unit_strings_[MEM][MB].toUtf8().constData(),
-        unit_strings_[MEM][GB].toUtf8().constData(), unit_strings_[MEM][TB].toUtf8().constData());
+    unit_strings[MEM][B] = tr("B");
+    unit_strings[MEM][KB] = tr("KiB");
+    unit_strings[MEM][MB] = tr("MiB");
+    unit_strings[MEM][GB] = tr("GiB");
+    unit_strings[MEM][TB] = tr("TiB");
+    tr_formatter_mem_init(MemBaseline, unit_strings[MEM][KB].toUtf8().constData(), unit_strings[MEM][MB].toUtf8().constData(),
+        unit_strings[MEM][GB].toUtf8().constData(), unit_strings[MEM][TB].toUtf8().constData());
 }
 
 /***
 ****
 ***/
 
-double Speed::KBps() const
+double Speed::getKBps() const
 {
-    return _Bps / static_cast<double>(speed_K);
+    return getBps() / static_cast<double>(SpeedBaseline);
 }
 
 Speed Speed::fromKBps(double KBps)
 {
-    return static_cast<int>(KBps * speed_K);
+    return Speed { static_cast<int>(KBps * SpeedBaseline) };
 }
 
 /***
@@ -113,22 +112,22 @@ QString Formatter::sizeToString(int64_t bytes)
 QString Formatter::speedToString(Speed const& speed)
 {
     char buf[128];
-    tr_formatter_speed_KBps(buf, speed.KBps(), sizeof(buf));
+    tr_formatter_speed_KBps(buf, speed.getKBps(), sizeof(buf));
     return QString::fromUtf8(buf);
 }
 
 QString Formatter::uploadSpeedToString(Speed const& upload_speed)
 {
-    static QChar constexpr upload_symbol(0x25B4);
+    static QChar constexpr UploadSymbol(0x25B4);
 
-    return tr("%1 %2").arg(speedToString(upload_speed)).arg(upload_symbol);
+    return tr("%1 %2").arg(speedToString(upload_speed)).arg(UploadSymbol);
 }
 
 QString Formatter::downloadSpeedToString(Speed const& download_speed)
 {
-    static QChar constexpr download_symbol(0x25BE);
+    static QChar constexpr DownloadSymbol(0x25BE);
 
-    return tr("%1 %2").arg(speedToString(download_speed)).arg(download_symbol);
+    return tr("%1 %2").arg(speedToString(download_speed)).arg(DownloadSymbol);
 }
 
 QString Formatter::percentToString(double x)

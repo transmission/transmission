@@ -31,10 +31,10 @@ protected:
     QString token_;
     int slash_index_;
 
-    static QChar const slash_char;
+    static QChar const SlashChar;
 };
 
-QChar const PathIteratorBase::slash_char = QLatin1Char('/');
+QChar const PathIteratorBase::SlashChar = QLatin1Char('/');
 
 class ForwardPathIterator : public PathIteratorBase
 {
@@ -51,7 +51,7 @@ public:
 
     QString const& next()
     {
-        int new_slash_index = path_.lastIndexOf(slash_char, slash_index_);
+        int new_slash_index = path_.lastIndexOf(SlashChar, slash_index_);
         token_.truncate(0);
         token_ += path_.midRef(new_slash_index + 1, slash_index_ - new_slash_index);
         slash_index_ = new_slash_index - 1;
@@ -74,7 +74,7 @@ public:
 
     QString const& next()
     {
-        int new_slash_index = path_.indexOf(slash_char, slash_index_);
+        int new_slash_index = path_.indexOf(SlashChar, slash_index_);
 
         if (new_slash_index == -1)
         {
@@ -274,18 +274,11 @@ QModelIndex FileTreeModel::parent(QModelIndex const& child, int column) const
 
 int FileTreeModel::rowCount(QModelIndex const& parent) const
 {
-    FileTreeItem* parentItem;
+    FileTreeItem* parent_item = parent.isValid()
+        ? itemFromIndex(parent)
+        : root_item_;
 
-    if (parent.isValid())
-    {
-        parentItem = itemFromIndex(parent);
-    }
-    else
-    {
-        parentItem = root_item_;
-    }
-
-    return parentItem->childCount();
+    return parent_item->childCount();
 }
 
 int FileTreeModel::columnCount(QModelIndex const& parent) const

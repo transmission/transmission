@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include <array>
+
 #include <QObject>
 #include <QSet>
 #include <QString>
@@ -144,17 +146,17 @@ public:
 
     char const* keyStr(int i) const
     {
-        return tr_quark_get_string(items_[i].key, nullptr);
+        return tr_quark_get_string(Items[i].key, nullptr);
     }
 
     tr_quark getKey(int i) const
     {
-        return items_[i].key;
+        return Items[i].key;
     }
 
     int type(int i) const
     {
-        return items_[i].type;
+        return Items[i].type;
     }
 
     QVariant const& variant(int i) const
@@ -200,17 +202,15 @@ private:
         int type;
     };
 
-private:
     void initDefaults(tr_variant*);
 
     // Intentionally not implemented
     void set(int key, char const* value);
 
-private:
     QString const config_dir_;
 
     QSet<int> temporary_prefs_;
     QVariant mutable values_[PREFS_COUNT];
 
-    static PrefItem items_[];
+    static std::array<PrefItem,PREFS_COUNT> const Items;
 };

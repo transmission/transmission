@@ -13,17 +13,17 @@
 #include "Torrent.h"
 #include "TorrentModel.h"
 
-bool RelocateDialog::move_flag_ = true;
+bool RelocateDialog::move_flag = true;
 
 void RelocateDialog::onSetLocation()
 {
-    session_.torrentSetLocation(ids_, newLocation(), move_flag_);
+    session_.torrentSetLocation(ids_, newLocation(), move_flag);
     close();
 }
 
 void RelocateDialog::onMoveToggled(bool b)
 {
-    move_flag_ = b;
+    move_flag = b;
 }
 
 RelocateDialog::RelocateDialog(Session& session, TorrentModel const& model, torrent_ids_t ids, QWidget* parent) :
@@ -75,7 +75,7 @@ RelocateDialog::RelocateDialog(Session& session, TorrentModel const& model, torr
     ui_.newLocationStack->setFixedHeight(ui_.newLocationStack->currentWidget()->sizeHint().height());
     ui_.newLocationLabel->setBuddy(ui_.newLocationStack->currentWidget());
 
-    if (move_flag_)
+    if (move_flag)
     {
         ui_.moveDataRadio->setChecked(true);
     }

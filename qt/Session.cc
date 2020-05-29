@@ -55,10 +55,10 @@ void addList(tr_variant* list, KeyList const& keys)
 }
 
 // If this object is passed as "ids" (compared by address), then recently active torrents are queried.
-auto const recently_active_ids = torrent_ids_t{ -1 };
+auto const RecentlyActiveIDs = torrent_ids_t{ -1 };
 
 // If this object is passed as "ids" (compared by being empty), then all torrents are queried.
-auto const all_ids = torrent_ids_t{};
+auto const AllIDs = torrent_ids_t{};
 
 } // namespace
 
@@ -405,7 +405,7 @@ namespace
 
 void addOptionalIds(tr_variant* args, torrent_ids_t const& ids)
 {
-    if (&ids == &recently_active_ids)
+    if (&ids == &RecentlyActiveIDs)
     {
         tr_variantDictAddStr(args, TR_KEY_ids, "recently-active");
     }
@@ -579,12 +579,12 @@ void Session::refreshTorrents(torrent_ids_t const& ids, KeyList const& keys)
 
 void Session::refreshDetailInfo(torrent_ids_t const& ids)
 {
-    refreshTorrents(ids, Torrent::detailInfoKeys);
+    refreshTorrents(ids, Torrent::DetailInfoKeys);
 }
 
 void Session::refreshExtraStats(torrent_ids_t const& ids)
 {
-    refreshTorrents(ids, Torrent::mainStatKeys + Torrent::detailStatKeys);
+    refreshTorrents(ids, Torrent::MainStatKeys + Torrent::DetailStatKeys);
 }
 
 void Session::sendTorrentRequest(char const* request, torrent_ids_t const& ids)
@@ -602,7 +602,7 @@ void Session::sendTorrentRequest(char const* request, torrent_ids_t const& ids)
 
     q->add([this, ids]()
         {
-            refreshTorrents(ids, Torrent::mainStatKeys);
+            refreshTorrents(ids, Torrent::MainStatKeys);
         });
 
     q->run();
@@ -645,17 +645,17 @@ void Session::queueMoveBottom(torrent_ids_t const& ids)
 
 void Session::refreshActiveTorrents()
 {
-    refreshTorrents(recently_active_ids, Torrent::mainStatKeys);
+    refreshTorrents(RecentlyActiveIDs, Torrent::MainStatKeys);
 }
 
 void Session::refreshAllTorrents()
 {
-    refreshTorrents(all_ids, Torrent::mainStatKeys);
+    refreshTorrents(AllIDs, Torrent::MainStatKeys);
 }
 
 void Session::initTorrents(torrent_ids_t const& ids)
 {
-    refreshTorrents(ids, Torrent::allMainKeys);
+    refreshTorrents(ids, Torrent::AllMainKeys);
 }
 
 void Session::refreshSessionStats()
