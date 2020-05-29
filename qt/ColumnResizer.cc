@@ -24,7 +24,10 @@ int itemColumnSpan(QGridLayout* layout, QLayoutItem const* item)
             continue;
         }
 
-        int row, column, row_span, column_span;
+        int row = {};
+        int column = {};
+        int row_span = {};
+        int column_span = {};
         layout->getItemPosition(i, &row, &column, &row_span, &column_span);
         return column_span;
     }
