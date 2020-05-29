@@ -9,6 +9,8 @@ echo '=== uncrustify ==='
 echo '=================='
 echo ''
 
+uncrustify --version
+
 find \
         cli \
         daemon \

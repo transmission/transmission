@@ -153,13 +153,13 @@ void TorrentModel::removeTorrents(tr_variant* list)
 
 void TorrentModel::updateTorrents(tr_variant* torrents, bool is_complete_list)
 {
-    auto const old = is_complete_list ? torrents_ : torrents_t{};
-    auto added = torrent_ids_t{};
-    auto changed = torrent_ids_t{};
-    auto completed = torrent_ids_t{};
-    auto instantiated = torrents_t{};
-    auto needinfo = torrent_ids_t{};
-    auto processed = torrents_t{};
+    auto const old = is_complete_list ? torrents_ : torrents_t {};
+    auto added = torrent_ids_t {};
+    auto changed = torrent_ids_t {};
+    auto completed = torrent_ids_t {};
+    auto instantiated = torrents_t {};
+    auto needinfo = torrent_ids_t {};
+    auto processed = torrents_t {};
 
     auto const now = time(nullptr);
     auto const recently_added = [now](auto const& tor)

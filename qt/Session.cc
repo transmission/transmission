@@ -55,10 +55,10 @@ void addList(tr_variant* list, KeyList const& keys)
 }
 
 // If this object is passed as "ids" (compared by address), then recently active torrents are queried.
-auto const recently_active_ids = torrent_ids_t{ -1 };
+auto const recently_active_ids = torrent_ids_t { -1 };
 
 // If this object is passed as "ids" (compared by being empty), then all torrents are queried.
-auto const all_ids = torrent_ids_t{};
+auto const all_ids = torrent_ids_t {};
 
 } // namespace
 

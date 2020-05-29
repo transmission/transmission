@@ -27,7 +27,7 @@
 ***/
 
 // unchanging fields needed by the main window
-Torrent::KeyList const Torrent::mainInfoKeys{
+Torrent::KeyList const Torrent::mainInfoKeys {
     TR_KEY_addedDate,
     TR_KEY_downloadDir,
     TR_KEY_hashString,
@@ -38,7 +38,7 @@ Torrent::KeyList const Torrent::mainInfoKeys{
 };
 
 // changing fields needed by the main window
-Torrent::KeyList const Torrent::mainStatKeys{
+Torrent::KeyList const Torrent::mainStatKeys {
     TR_KEY_downloadedEver,
     TR_KEY_error,
     TR_KEY_errorString,
@@ -69,7 +69,7 @@ Torrent::KeyList const Torrent::mainStatKeys{
 Torrent::KeyList const Torrent::allMainKeys = Torrent::mainInfoKeys + Torrent::mainStatKeys;
 
 // unchanging fields needed by the details dialog
-Torrent::KeyList const Torrent::detailInfoKeys{
+Torrent::KeyList const Torrent::detailInfoKeys {
     TR_KEY_comment,
     TR_KEY_creator,
     TR_KEY_dateCreated,
@@ -82,7 +82,7 @@ Torrent::KeyList const Torrent::detailInfoKeys{
 };
 
 // changing fields needed by the details dialog
-Torrent::KeyList const Torrent::detailStatKeys{
+Torrent::KeyList const Torrent::detailStatKeys {
     TR_KEY_activityDate,
     TR_KEY_bandwidthPriority,
     TR_KEY_corruptEver,

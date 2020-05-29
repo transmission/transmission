@@ -1310,7 +1310,7 @@ void DetailsDialog::onAddTrackerClicked()
         }
         else
         {
-            auto const urls = QStringList{ url };
+            auto const urls = QStringList { url };
             session_.torrentSet(ids, TR_KEY_trackerAdd, urls);
             getNewData();
         }
@@ -1339,7 +1339,7 @@ void DetailsDialog::onEditTrackerClicked()
     }
     else
     {
-        torrent_ids_t ids{ trackerInfo.torrent_id };
+        torrent_ids_t ids { trackerInfo.torrent_id };
 
         QPair<int, QString> const id_url = qMakePair(trackerInfo.st.id, newval);
 
@@ -1364,7 +1364,7 @@ void DetailsDialog::onRemoveTrackerClicked()
     // batch all of a tracker's torrents into one command
     for (int const id : torrent_id_to_tracker_ids.uniqueKeys())
     {
-        torrent_ids_t const ids{ id };
+        torrent_ids_t const ids { id };
         session_.torrentSet(ids, TR_KEY_trackerRemove, torrent_id_to_tracker_ids.values(id));
     }
 
