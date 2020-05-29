@@ -125,8 +125,8 @@ Prefs::PrefItem Prefs::items_[] =
 ****
 ***/
 
-Prefs::Prefs(QString const& config_dir) :
-    config_dir_(config_dir)
+Prefs::Prefs(QString config_dir) :
+    config_dir_(std::move(config_dir))
 {
     assert(sizeof(items_) / sizeof(items_[0]) == PREFS_COUNT);
 

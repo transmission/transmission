@@ -62,7 +62,7 @@ public:
     QRect status_rect;
     QRect bar_rect;
 
-    ItemLayout(QString const& name_text, QString const& status_text, QIcon const& emblem_icon, QFont const& base_font,
+    ItemLayout(QString name_text, QString status_text, QIcon const& emblem_icon, QFont const& base_font,
         Qt::LayoutDirection direction, QPoint const& top_left, int width);
 
     [[nodiscard]] QSize size() const
@@ -87,10 +87,10 @@ private:
     }
 };
 
-ItemLayout::ItemLayout(QString const& name_text, QString const& status_text, QIcon const& emblem_icon, QFont const& base_font,
+ItemLayout::ItemLayout(QString name_text, QString status_text, QIcon const& emblem_icon, QFont const& base_font,
     Qt::LayoutDirection direction, QPoint const& top_left, int width) :
-    name_text_(name_text),
-    status_text_(status_text),
+    name_text_(std::move(name_text)),
+    status_text_(std::move(status_text)),
     name_font(base_font),
     status_font(base_font)
 {

@@ -35,7 +35,7 @@ class OptionsDialog : public BaseDialog
     Q_OBJECT
 
 public:
-    OptionsDialog(Session& session, Prefs const& prefs, AddData const& addme, QWidget* parent = nullptr);
+    OptionsDialog(Session& session, Prefs const& prefs, AddData addme, QWidget* parent = nullptr);
     virtual ~OptionsDialog();
 
 private:

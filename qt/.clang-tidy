@@ -40,7 +40,6 @@ Checks: "
   modernize-*,
   -modernize-avoid-c-arrays,
   -modernize-loop-convert,
-  -modernize-pass-by-value,
   -modernize-raw-string-literal,
   -modernize-use-trailing-return-type, # keep
   performance-*,

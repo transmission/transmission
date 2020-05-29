@@ -26,10 +26,10 @@ void RelocateDialog::onMoveToggled(bool b)
     move_flag_ = b;
 }
 
-RelocateDialog::RelocateDialog(Session& session, TorrentModel const& model, torrent_ids_t const& ids, QWidget* parent) :
+RelocateDialog::RelocateDialog(Session& session, TorrentModel const& model, torrent_ids_t ids, QWidget* parent) :
     BaseDialog(parent),
     session_(session),
-    ids_(ids)
+    ids_(std::move(ids))
 {
     ui_.setupUi(this);
 

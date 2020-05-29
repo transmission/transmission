@@ -32,7 +32,7 @@ class Session : public QObject
     Q_OBJECT
 
 public:
-    Session(QString const& config_dir, Prefs& prefs);
+    Session(QString config_dir, Prefs& prefs);
     virtual ~Session();
 
     void stop();

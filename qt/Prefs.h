@@ -129,7 +129,7 @@ public:
     };
 
 public:
-    Prefs(QString const& config_dir);
+    Prefs(QString config_dir);
     virtual ~Prefs();
 
     bool isCore(int key) const

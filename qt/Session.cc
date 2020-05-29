@@ -297,8 +297,8 @@ void Session::updatePref(int key)
 ****
 ***/
 
-Session::Session(QString const& config_dir, Prefs& prefs) :
-    config_dir_(config_dir),
+Session::Session(QString config_dir, Prefs& prefs) :
+    config_dir_(std::move(config_dir)),
     prefs_(prefs)
 {
     stats_.ratio = TR_RATIO_NA;

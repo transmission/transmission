@@ -25,9 +25,9 @@
 ****
 ***/
 
-OptionsDialog::OptionsDialog(Session& session, Prefs const& prefs, AddData const& addme, QWidget* parent) :
+OptionsDialog::OptionsDialog(Session& session, Prefs const& prefs, AddData addme, QWidget* parent) :
     BaseDialog(parent),
-    add_(addme),
+    add_(std::move(addme)),
     verify_hash_(QCryptographicHash::Sha1),
     verify_button_(new QPushButton(tr("&Verify Local Data"), this)),
     edit_timer_(this),

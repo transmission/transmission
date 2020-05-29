@@ -21,7 +21,7 @@ class RelocateDialog : public BaseDialog
     Q_OBJECT
 
 public:
-    RelocateDialog(Session&, TorrentModel const&, torrent_ids_t const& ids, QWidget* parent = nullptr);
+    RelocateDialog(Session&, TorrentModel const&, torrent_ids_t ids, QWidget* parent = nullptr);
 
     virtual ~RelocateDialog() = default;
 

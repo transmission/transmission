@@ -94,8 +94,8 @@ class PeerItem : public QTreeWidgetItem
     QString status;
 
 public:
-    PeerItem(Peer const& p) :
-        peer(p)
+    PeerItem(Peer p) :
+        peer(std::move(p))
     {
     }
 
