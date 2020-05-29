@@ -28,7 +28,7 @@ extern wchar_t qAxModuleFilename[MAX_PATH];
 extern QString qAxInit();
 
 ComInteropHelper::ComInteropHelper() :
-    client_(new QAxObject(QLatin1String("Transmission.QtClient")))
+    client_(new QAxObject(QStringLiteral("Transmission.QtClient")))
 {
 }
 

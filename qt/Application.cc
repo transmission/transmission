@@ -41,8 +41,8 @@
 namespace
 {
 
-QLatin1String const MY_CONFIG_NAME("transmission");
-QLatin1String const MY_READABLE_NAME("transmission-qt");
+auto const MY_CONFIG_NAME = QStringLiteral("transmission");
+auto const MY_READABLE_NAME = QStringLiteral("transmission-qt");
 
 tr_option const opts[] =
 {
@@ -73,7 +73,7 @@ bool loadTranslation(QTranslator& translator, QString const& name, QLocale const
 {
     for (QString const& directory : search_directories)
     {
-        if (translator.load(locale, name, QLatin1String("_"), directory))
+        if (translator.load(locale, name, QStringLiteral("_"), directory))
         {
             return true;
         }
@@ -96,13 +96,13 @@ Application::Application(int& argc, char** argv) :
 
     if (QIcon::themeName().isEmpty())
     {
-        QIcon::setThemeName(QLatin1String("Faenza"));
+        QIcon::setThemeName(QStringLiteral("Faenza"));
     }
 
 #endif
 
     // set the default icon
-    QIcon icon = QIcon::fromTheme(QLatin1String("transmission"));
+    QIcon icon = QIcon::fromTheme(QStringLiteral("transmission"));
 
     if (icon.isNull())
     {
@@ -111,7 +111,7 @@ Application::Application(int& argc, char** argv) :
 
         for (int const size : sizes)
         {
-            icon.addPixmap(QPixmap(QString::fromLatin1(":/icons/transmission-%1.png").arg(size)));
+            icon.addPixmap(QPixmap(QStringLiteral(":/icons/transmission-%1.png").arg(size)));
         }
     }
 
@@ -161,13 +161,13 @@ Application::Application(int& argc, char** argv) :
             break;
 
         case 'v':
-            std::cerr << MY_READABLE_NAME.latin1() << ' ' << LONG_VERSION_STRING << std::endl;
+            std::cerr << qPrintable(MY_READABLE_NAME) << ' ' << LONG_VERSION_STRING << std::endl;
             quitLater();
             return;
 
         case TR_OPT_ERR:
             std::cerr << qPrintable(QObject::tr("Invalid option")) << std::endl;
-            tr_getopt_usage(MY_READABLE_NAME.latin1(), getUsage(), opts);
+            tr_getopt_usage(qPrintable(MY_READABLE_NAME), getUsage(), opts);
             quitLater();
             return;
 
@@ -203,7 +203,7 @@ Application::Application(int& argc, char** argv) :
 
             case AddData::FILENAME:
             case AddData::METAINFO:
-                metainfo = QString::fromLatin1(a.toBase64());
+                metainfo = QString::fromUtf8(a.toBase64());
                 break;
 
             default:
@@ -238,7 +238,7 @@ Application::Application(int& argc, char** argv) :
     }
 
     // is this the first time we've run transmission?
-    bool const first_time = !dir.exists(QLatin1String("settings.json"));
+    bool const first_time = !dir.exists(QStringLiteral("settings.json"));
 
     // initialize the prefs
     prefs_ = new Prefs(config_dir);
@@ -356,17 +356,17 @@ void Application::loadTranslations()
 {
     QStringList const qt_qm_dirs = QStringList() << QLibraryInfo::location(QLibraryInfo::TranslationsPath) <<
 #ifdef TRANSLATIONS_DIR
-        QString::fromUtf8(TRANSLATIONS_DIR) <<
+        QStringLiteral(TRANSLATIONS_DIR) <<
 #endif
-        (applicationDirPath() + QLatin1String("/translations"));
+        (applicationDirPath() + QStringLiteral("/translations"));
 
     QStringList const app_qm_dirs = QStringList() <<
 #ifdef TRANSLATIONS_DIR
-        QString::fromUtf8(TRANSLATIONS_DIR) <<
+        QStringLiteral(TRANSLATIONS_DIR) <<
 #endif
-        (applicationDirPath() + QLatin1String("/translations"));
+        (applicationDirPath() + QStringLiteral("/translations"));
 
-    QString const qt_file_name = QLatin1String("qtbase");
+    auto const qt_file_name = QStringLiteral("qtbase");
 
     QLocale const locale;
     QLocale const english_locale(QLocale::English, QLocale::UnitedStates);
@@ -584,20 +584,20 @@ bool Application::notifyApp(QString const& title, QString const& body) const
 {
 #ifdef QT_DBUS_LIB
 
-    QLatin1String const dbus_service_name("org.freedesktop.Notifications");
-    QLatin1String const dbus_interface_name("org.freedesktop.Notifications");
-    QLatin1String const dbus_path("/org/freedesktop/Notifications");
+    auto const DBUS_SERVICE_NAME = QStringLiteral("org.freedesktop.Notifications");
+    auto const DBUS_INTERFACE_NAME = QStringLiteral("org.freedesktop.Notifications");
+    auto const DBUS_PATH = QStringLiteral("/org/freedesktop/Notifications");
 
     QDBusConnection bus = QDBusConnection::sessionBus();
 
     if (bus.isConnected())
     {
         QDBusMessage m =
-            QDBusMessage::createMethodCall(dbus_service_name, dbus_path, dbus_interface_name, QLatin1String("Notify"));
+            QDBusMessage::createMethodCall(DBUS_SERVICE_NAME, DBUS_PATH, DBUS_INTERFACE_NAME, QStringLiteral("Notify"));
         QVariantList args;
-        args.append(QLatin1String("Transmission")); // app_name
+        args.append(QStringLiteral("Transmission")); // app_name
         args.append(0U); // replaces_id
-        args.append(QLatin1String("transmission")); // icon
+        args.append(QStringLiteral("transmission")); // icon
         args.append(title); // summary
         args.append(body); // body
         args.append(QStringList()); // actions - unused for plain passive popups

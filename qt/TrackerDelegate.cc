@@ -175,27 +175,27 @@ QString TrackerDelegate::getText(TrackerInfo const& inf) const
     QString key;
     QString str;
     time_t const now(time(nullptr));
-    QString const err_markup_begin = QLatin1String("<span style=\"color:red\">");
-    QString const err_markup_end = QLatin1String("</span>");
-    QString const timeout_markup_begin = QLatin1String("<span style=\"color:#224466\">");
-    QString const timeout_markup_end = QLatin1String("</span>");
-    QString const success_markup_begin = QLatin1String("<span style=\"color:#008B00\">");
-    QString const success_markup_end = QLatin1String("</span>");
+    auto const err_markup_begin = QStringLiteral("<span style=\"color:red\">");
+    auto const err_markup_end = QStringLiteral("</span>");
+    auto const timeout_markup_begin = QStringLiteral("<span style=\"color:#224466\">");
+    auto const timeout_markup_end = QStringLiteral("</span>");
+    auto const success_markup_begin = QStringLiteral("<span style=\"color:#008B00\">");
+    auto const success_markup_end = QStringLiteral("</span>");
 
     // hostname
-    str += inf.st.is_backup ? QLatin1String("<i>") : QLatin1String("<b>");
+    str += inf.st.is_backup ? QStringLiteral("<i>") : QStringLiteral("<b>");
     char* host = nullptr;
     int port = 0;
     tr_urlParse(inf.st.announce.toUtf8().constData(), TR_BAD_SIZE, nullptr, &host, &port, nullptr);
-    str += QString::fromLatin1("%1:%2").arg(QString::fromUtf8(host)).arg(port);
+    str += QStringLiteral("%1:%2").arg(QString::fromUtf8(host)).arg(port);
     tr_free(host);
 
     if (!key.isEmpty())
     {
-        str += QLatin1String(" - ") + key;
+        str += QStringLiteral(" - ") + key;
     }
 
-    str += inf.st.is_backup ? QLatin1String("</i>") : QLatin1String("</b>");
+    str += inf.st.is_backup ? QStringLiteral("</i>") : QStringLiteral("</b>");
 
     // announce & scrape info
     if (!inf.st.is_backup)
@@ -203,7 +203,7 @@ QString TrackerDelegate::getText(TrackerInfo const& inf) const
         if (inf.st.has_announced && inf.st.announce_state != TR_TRACKER_INACTIVE)
         {
             QString const tstr(timeToStringRounded(now - inf.st.last_announce_time));
-            str += QLatin1String("<br/>\n");
+            str += QStringLiteral("<br/>\n");
 
             if (inf.st.last_announce_succeeded)
             {
@@ -228,28 +228,28 @@ QString TrackerDelegate::getText(TrackerInfo const& inf) const
         switch (inf.st.announce_state)
         {
         case TR_TRACKER_INACTIVE:
-            str += QLatin1String("<br/>\n");
+            str += QStringLiteral("<br/>\n");
             str += tr("No updates scheduled");
             break;
 
         case TR_TRACKER_WAITING:
             {
                 QString const tstr(timeToStringRounded(inf.st.next_announce_time - now));
-                str += QLatin1String("<br/>\n");
+                str += QStringLiteral("<br/>\n");
                 //: %1 is duration
                 str += tr("Asking for more peers in %1").arg(tstr);
                 break;
             }
 
         case TR_TRACKER_QUEUED:
-            str += QLatin1String("<br/>\n");
+            str += QStringLiteral("<br/>\n");
             str += tr("Queued to ask for more peers");
             break;
 
         case TR_TRACKER_ACTIVE:
             {
                 QString const tstr(timeToStringRounded(now - inf.st.last_announce_start_time));
-                str += QLatin1String("<br/>\n");
+                str += QStringLiteral("<br/>\n");
                 //: %1 is duration
                 str += tr("Asking for more peers now... <small>%1</small>").arg(tstr);
                 break;
@@ -260,7 +260,7 @@ QString TrackerDelegate::getText(TrackerInfo const& inf) const
         {
             if (inf.st.has_scraped)
             {
-                str += QLatin1String("<br/>\n");
+                str += QStringLiteral("<br/>\n");
                 QString const tstr(timeToStringRounded(now - inf.st.last_scrape_time));
 
                 if (inf.st.last_scrape_succeeded)
@@ -299,7 +299,7 @@ QString TrackerDelegate::getText(TrackerInfo const& inf) const
 
             case TR_TRACKER_WAITING:
                 {
-                    str += QLatin1String("<br/>\n");
+                    str += QStringLiteral("<br/>\n");
                     QString const tstr(timeToStringRounded(inf.st.next_scrape_time - now));
                     //: %1 is duration
                     str += tr("Asking for peer counts in %1").arg(tstr);
@@ -308,14 +308,14 @@ QString TrackerDelegate::getText(TrackerInfo const& inf) const
 
             case TR_TRACKER_QUEUED:
                 {
-                    str += QLatin1String("<br/>\n");
+                    str += QStringLiteral("<br/>\n");
                     str += tr("Queued to ask for peer counts");
                     break;
                 }
 
             case TR_TRACKER_ACTIVE:
                 {
-                    str += QLatin1String("<br/>\n");
+                    str += QStringLiteral("<br/>\n");
                     QString const tstr(timeToStringRounded(now - inf.st.last_scrape_start_time));
                     //: %1 is duration
                     str += tr("Asking for peer counts now... <small>%1</small>").arg(tstr);

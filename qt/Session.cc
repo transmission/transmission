@@ -216,15 +216,15 @@ void Session::updatePref(int key)
                 switch (i)
                 {
                 case 0:
-                    sessionSet(prefs_.getKey(key), QLatin1String("tolerated"));
+                    sessionSet(prefs_.getKey(key), QStringLiteral("tolerated"));
                     break;
 
                 case 1:
-                    sessionSet(prefs_.getKey(key), QLatin1String("preferred"));
+                    sessionSet(prefs_.getKey(key), QStringLiteral("preferred"));
                     break;
 
                 case 2:
-                    sessionSet(prefs_.getKey(key), QLatin1String("required"));
+                    sessionSet(prefs_.getKey(key), QStringLiteral("required"));
                     break;
                 }
 
@@ -348,10 +348,10 @@ void Session::start()
     if (prefs_.get<bool>(Prefs::SESSION_IS_REMOTE))
     {
         QUrl url;
-        url.setScheme(QLatin1String("http"));
+        url.setScheme(QStringLiteral("http"));
         url.setHost(prefs_.get<QString>(Prefs::SESSION_REMOTE_HOST));
         url.setPort(prefs_.get<int>(Prefs::SESSION_REMOTE_PORT));
-        url.setPath(QLatin1String("/transmission/rpc"));
+        url.setPath(QStringLiteral("/transmission/rpc"));
 
         if (prefs_.get<bool>(Prefs::SESSION_REMOTE_AUTH))
         {
@@ -978,7 +978,7 @@ void Session::addTorrent(AddData const& add_me, tr_variant* args, bool trash_ori
         [add_me](RpcResponse const& r)
         {
             auto* d = new QMessageBox(QMessageBox::Warning, tr("Error Adding Torrent"),
-                QString::fromLatin1("<p><b>%1</b></p><p>%2</p>").arg(r.result).arg(add_me.readableName()), QMessageBox::Close,
+                QStringLiteral("<p><b>%1</b></p><p>%2</p>").arg(r.result).arg(add_me.readableName()), QMessageBox::Close,
                 qApp->activeWindow());
             QObject::connect(d, &QMessageBox::rejected, d, &QMessageBox::deleteLater);
             d->show();
@@ -1088,12 +1088,12 @@ void Session::launchWebInterface()
     if (session_ == nullptr) // remote session
     {
         url = rpc_.url();
-        url.setPath(QLatin1String("/transmission/web/"));
+        url.setPath(QStringLiteral("/transmission/web/"));
     }
     else // local session
     {
-        url.setScheme(QLatin1String("http"));
-        url.setHost(QLatin1String("localhost"));
+        url.setScheme(QStringLiteral("http"));
+        url.setHost(QStringLiteral("localhost"));
         url.setPort(prefs_.getInt(Prefs::RPC_PORT));
     }
 

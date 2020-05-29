@@ -24,7 +24,7 @@ AboutDialog::AboutDialog(QWidget* parent) :
     ui_.setupUi(this);
 
     ui_.iconLabel->setPixmap(qApp->windowIcon().pixmap(48));
-    ui_.titleLabel->setText(tr("<b style='font-size:x-large'>Transmission %1</b>").arg(QString::fromUtf8(LONG_VERSION_STRING)));
+    ui_.titleLabel->setText(tr("<b style='font-size:x-large'>Transmission %1</b>").arg(QStringLiteral(LONG_VERSION_STRING)));
 
     QPushButton* b;
 
