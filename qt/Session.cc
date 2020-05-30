@@ -527,7 +527,7 @@ void Session::torrentRenamePath(torrent_ids_t const& ids, QString const& oldpath
             tr_variantDictFindStr(r.args.get(), TR_KEY_name, &name, nullptr);
 
             auto* d = new QMessageBox(QMessageBox::Information, tr("Error Renaming Path"),
-                tr("<p><b>Unable to rename \"%1\" as \"%2\": %3.</b></p><p>Please correct the errors and try again.</p>").
+                tr(R"(<p><b>Unable to rename "%1" as "%2": %3.</b></p><p>Please correct the errors and try again.</p>)").
                     arg(QString::fromUtf8(path)).arg(QString::fromUtf8(name)).arg(r.result), QMessageBox::Close,
                 qApp->activeWindow());
             QObject::connect(d, &QMessageBox::rejected, d, &QMessageBox::deleteLater);
@@ -999,7 +999,7 @@ void Session::addTorrent(AddData const& add_me, tr_variant* args, bool trash_ori
             {
                 QString const name = QString::fromUtf8(str);
                 auto* d = new QMessageBox(QMessageBox::Warning, tr("Add Torrent"),
-                    tr("<p><b>Unable to add \"%1\".</b></p><p>It is a duplicate of \"%2\" which is already added.</p>").
+                    tr(R"(<p><b>Unable to add "%1".</b></p><p>It is a duplicate of "%2" which is already added.</p>)").
                         arg(add_me.readableShortName()).arg(name), QMessageBox::Close, qApp->activeWindow());
                 QObject::connect(d, &QMessageBox::rejected, d, &QMessageBox::deleteLater);
                 d->show();

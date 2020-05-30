@@ -32,7 +32,6 @@ Checks: >
   misc-*,
   -misc-non-private-member-variables-in-classes,
   modernize-*,
-  -modernize-raw-string-literal,
   -modernize-use-trailing-return-type, # keep
   performance-*,
   readability-*,
