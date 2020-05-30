@@ -212,5 +212,5 @@ private:
     QSet<int> temporary_prefs_;
     QVariant mutable values_[PREFS_COUNT];
 
-    static std::array<PrefItem,PREFS_COUNT> const Items;
+    static std::array<PrefItem, PREFS_COUNT> const Items;
 };

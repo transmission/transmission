@@ -231,7 +231,7 @@ uint64_t FileTreeItem::size() const
 std::pair<int, int> FileTreeItem::update(QString const& name, bool wanted, int priority, uint64_t have_size, bool update_fields)
 {
     int changed_count = 0;
-    int changed_columns[4];
+    std::array<int, FileTreeModel::NUM_COLUMNS> changed_columns = {};
 
     if (name_ != name)
     {
@@ -272,9 +272,9 @@ std::pair<int, int> FileTreeItem::update(QString const& name, bool wanted, int p
 
     if (changed_count > 0)
     {
-        std::sort(changed_columns, changed_columns + changed_count);
-        changed.first = changed_columns[0];
-        changed.second = changed_columns[changed_count - 1];
+        std::sort(changed_columns.begin(), changed_columns.end());
+        changed.first = changed_columns.front();
+        changed.second = changed_columns.back();
     }
 
     return changed;

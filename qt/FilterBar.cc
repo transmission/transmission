@@ -362,8 +362,7 @@ void FilterBar::recount()
 {
     QAbstractItemModel* model = activity_combo_->model();
 
-    int torrents_per_mode[FilterMode::NUM_MODES] = {};
-    filter_.countTorrentsPerMode(torrents_per_mode);
+    auto const torrents_per_mode = filter_.countTorrentsPerMode();
 
     for (int row = 0, n = model->rowCount(); row < n; ++row)
     {

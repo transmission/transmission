@@ -19,15 +19,13 @@
 namespace
 {
 
-enum Units { KILO = 1000, KIBI = 1024 };
-
-auto constexpr SpeedBaseline = KILO;
-auto constexpr SizeBaseline = KILO;
-auto constexpr MemBaseline = KIBI;
+auto constexpr SpeedBase = 1000;
+auto constexpr SizeBase = 1000;
+auto constexpr MemBase = 1024;
 
 } // namespace
 
-QString Formatter::unit_strings[3][5];
+std::array<std::array<QString, Formatter::NUM_SIZES>, Formatter::NUM_TYPES> Formatter::unit_strings {};
 
 void Formatter::initUnits()
 {
@@ -36,7 +34,7 @@ void Formatter::initUnits()
     unit_strings[SPEED][MB] = tr("MB/s");
     unit_strings[SPEED][GB] = tr("GB/s");
     unit_strings[SPEED][TB] = tr("TB/s");
-    tr_formatter_speed_init(SpeedBaseline, unit_strings[SPEED][KB].toUtf8().constData(),
+    tr_formatter_speed_init(SpeedBase, unit_strings[SPEED][KB].toUtf8().constData(),
         unit_strings[SPEED][MB].toUtf8().constData(),
         unit_strings[SPEED][GB].toUtf8().constData(), unit_strings[SPEED][TB].toUtf8().constData());
 
@@ -45,7 +43,8 @@ void Formatter::initUnits()
     unit_strings[SIZE][MB] = tr("MB");
     unit_strings[SIZE][GB] = tr("GB");
     unit_strings[SIZE][TB] = tr("TB");
-    tr_formatter_size_init(SizeBaseline, unit_strings[SIZE][KB].toUtf8().constData(), unit_strings[SIZE][MB].toUtf8().constData(),
+    tr_formatter_size_init(SizeBase, unit_strings[SIZE][KB].toUtf8().constData(),
+        unit_strings[SIZE][MB].toUtf8().constData(),
         unit_strings[SIZE][GB].toUtf8().constData(), unit_strings[SIZE][TB].toUtf8().constData());
 
     unit_strings[MEM][B] = tr("B");
@@ -53,7 +52,7 @@ void Formatter::initUnits()
     unit_strings[MEM][MB] = tr("MiB");
     unit_strings[MEM][GB] = tr("GiB");
     unit_strings[MEM][TB] = tr("TiB");
-    tr_formatter_mem_init(MemBaseline, unit_strings[MEM][KB].toUtf8().constData(), unit_strings[MEM][MB].toUtf8().constData(),
+    tr_formatter_mem_init(MemBase, unit_strings[MEM][KB].toUtf8().constData(), unit_strings[MEM][MB].toUtf8().constData(),
         unit_strings[MEM][GB].toUtf8().constData(), unit_strings[MEM][TB].toUtf8().constData());
 }
 
@@ -63,12 +62,12 @@ void Formatter::initUnits()
 
 double Speed::getKBps() const
 {
-    return getBps() / static_cast<double>(SpeedBaseline);
+    return getBps() / static_cast<double>(SpeedBase);
 }
 
 Speed Speed::fromKBps(double KBps)
 {
-    return Speed { static_cast<int>(KBps * SpeedBaseline) };
+    return Speed { static_cast<int>(KBps * SpeedBase) };
 }
 
 /***
@@ -87,9 +86,9 @@ QString Formatter::memToString(int64_t bytes)
         return tr("None");
     }
 
-    char buf[128];
-    tr_formatter_mem_B(buf, bytes, sizeof(buf));
-    return QString::fromUtf8(buf);
+    auto buf = std::array<char, 128>{};
+    tr_formatter_mem_B(buf.begin(), bytes, buf.size());
+    return QString::fromUtf8(buf.begin());
 }
 
 QString Formatter::sizeToString(int64_t bytes)
@@ -104,16 +103,16 @@ QString Formatter::sizeToString(int64_t bytes)
         return tr("None");
     }
 
-    char buf[128];
-    tr_formatter_size_B(buf, bytes, sizeof(buf));
-    return QString::fromUtf8(buf);
+    auto buf = std::array<char, 128>{};
+    tr_formatter_size_B(buf.begin(), bytes, buf.size());
+    return QString::fromUtf8(buf.begin());
 }
 
 QString Formatter::speedToString(Speed const& speed)
 {
-    char buf[128];
-    tr_formatter_speed_KBps(buf, speed.getKBps(), sizeof(buf));
-    return QString::fromUtf8(buf);
+    auto buf = std::array<char, 128>{};
+    tr_formatter_speed_KBps(buf.begin(), speed.getKBps(), buf.size());
+    return QString::fromUtf8(buf.begin());
 }
 
 QString Formatter::uploadSpeedToString(Speed const& upload_speed)
@@ -132,41 +131,30 @@ QString Formatter::downloadSpeedToString(Speed const& download_speed)
 
 QString Formatter::percentToString(double x)
 {
-    char buf[128];
-    return QString::fromUtf8(tr_strpercent(buf, x, sizeof(buf)));
+    auto buf = std::array<char, 128>{};
+    return QString::fromUtf8(tr_strpercent(buf.begin(), x, buf.size()));
 }
 
 QString Formatter::ratioToString(double ratio)
 {
-    char buf[128];
-    return QString::fromUtf8(tr_strratio(buf, sizeof(buf), ratio, "\xE2\x88\x9E"));
+    auto buf = std::array<char, 128>{};
+    return QString::fromUtf8(tr_strratio(buf.begin(), buf.size(), ratio, "\xE2\x88\x9E"));
 }
 
 QString Formatter::timeToString(int seconds)
 {
-    int days;
-    int hours;
-    int minutes;
-    QString d;
-    QString h;
-    QString m;
-    QString s;
-    QString str;
-
-    if (seconds < 0)
-    {
-        seconds = 0;
-    }
-
-    days = seconds / 86400;
-    hours = (seconds % 86400) / 3600;
-    minutes = (seconds % 3600) / 60;
+    seconds = std::max(seconds, 0);
+    auto const days = seconds / 86400;
+    auto const hours = (seconds % 86400) / 3600;
+    auto const minutes = (seconds % 3600) / 60;
     seconds %= 60;
 
-    d = tr("%Ln day(s)", nullptr, days);
-    h = tr("%Ln hour(s)", nullptr, hours);
-    m = tr("%Ln minute(s)", nullptr, minutes);
-    s = tr("%Ln second(s)", nullptr, seconds);
+    auto const d = tr("%Ln day(s)", nullptr, days);
+    auto const h = tr("%Ln hour(s)", nullptr, hours);
+    auto const m = tr("%Ln minute(s)", nullptr, minutes);
+    auto const s = tr("%Ln second(s)", nullptr, seconds);
+
+    QString str;
 
     if (days != 0)
     {

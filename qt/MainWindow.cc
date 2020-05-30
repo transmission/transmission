@@ -249,7 +249,7 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     ui_.listView->setModel(&filter_model_);
     connect(ui_.listView->selectionModel(), &QItemSelectionModel::selectionChanged, refresh_action_sensitivity_soon);
 
-    QPair<QAction*, int> const sort_modes[] =
+    std::array<QPair<QAction*, int>, SortMode::NUM_MODES> sort_modes =
     {
         qMakePair(ui_.action_SortByActivity, static_cast<int>(SortMode::SORT_BY_ACTIVITY)),
         qMakePair(ui_.action_SortByAge, static_cast<int>(SortMode::SORT_BY_AGE)),
@@ -262,6 +262,7 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
         qMakePair(ui_.action_SortByState, static_cast<int>(SortMode::SORT_BY_STATE))
     };
 
+    // NOLINTNEXTLINE(clang-analyzer-cplusplus.NewDeleteLeaks)
     auto* action_group = new QActionGroup(this);
 
     for (auto const& mode : sort_modes)
@@ -272,6 +273,7 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
 
     connect(action_group, SIGNAL(triggered(QAction*)), this, SLOT(onSortModeChanged(QAction*)));
 
+    // NOLINTNEXTLINE(clang-analyzer-cplusplus.NewDeleteLeaks)
     alt_speed_action_ = new QAction(tr("Speed Limits"), this);
     alt_speed_action_->setIcon(ui_.altSpeedButton->icon());
     alt_speed_action_->setCheckable(true);
@@ -394,9 +396,10 @@ QMenu* MainWindow::createOptionsMenu()
 {
     auto const init_speed_sub_menu = [this](QMenu* menu, QAction*& off_action, QAction*& on_action, int pref, int enabled_pref)
         {
-            int const stock_speeds[] = { 5, 10, 20, 30, 40, 50, 75, 100, 150, 200, 250, 500, 750 };
+            std::array<int, 13> stock_speeds = { 5, 10, 20, 30, 40, 50, 75, 100, 150, 200, 250, 500, 750 };
             int const current_value = prefs_.get<int>(pref);
 
+            // NOLINTNEXTLINE(clang-analyzer-cplusplus.NewDeleteLeaks)
             auto* action_group = new QActionGroup(this);
 
             off_action = menu->addAction(tr("Unlimited"));
@@ -421,9 +424,10 @@ QMenu* MainWindow::createOptionsMenu()
             }
         };
 
-    auto const init_seed_ratio_sub_menu = [this](QMenu* menu, QAction*& off_action, QAction*& on_action, int pref, int enabled_pref)
+    auto const init_seed_ratio_sub_menu =
+        [this](QMenu* menu, QAction*& off_action, QAction*& on_action, int pref, int enabled_pref)
         {
-            double const stock_ratios[] = { 0.25, 0.50, 0.75, 1, 1.5, 2, 3 };
+            std::array<double, 7> stock_ratios = { 0.25, 0.50, 0.75, 1, 1.5, 2, 3 };
             auto const current_value = prefs_.get<double>(pref);
 
             auto* action_group = new QActionGroup(this);
@@ -467,7 +471,7 @@ QMenu* MainWindow::createOptionsMenu()
 
 QMenu* MainWindow::createStatsModeMenu()
 {
-    QPair<QAction*, QString> const stats_modes[] =
+    std::array<QPair<QAction*, QString>, 4> stats_modes =
     {
         qMakePair(ui_.action_TotalRatio, TotalRatioStatsModeName),
         qMakePair(ui_.action_TotalTransfer, TotalTransferStatsModeName),
@@ -487,6 +491,7 @@ QMenu* MainWindow::createStatsModeMenu()
 
     connect(action_group, SIGNAL(triggered(QAction*)), this, SLOT(onStatsModeChanged(QAction*)));
 
+    // NOLINTNEXTLINE(clang-analyzer-cplusplus.NewDeleteLeaks)
     return menu;
 }
 

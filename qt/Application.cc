@@ -44,9 +44,9 @@ namespace
 auto const MyConfigName = QStringLiteral("transmission");
 auto const MyReadableName = QStringLiteral("transmission-qt");
 
-tr_option const Opts[] =
+std::array<tr_option, 8> const Opts =
 {
-    { 'g', "config-dir", "Where to look for configuration files", "g", true, "<path>" },
+    tr_option{ 'g', "config-dir", "Where to look for configuration files", "g", true, "<path>" },
     { 'm', "minimized", "Start minimized in system tray", "m", false, nullptr },
     { 'p', "port", "Port to use when connecting to an existing session", "p", true, "<port>" },
     { 'r', "remote", "Connect to an existing session at the specified hostname", "r", true, "<host>" },
@@ -132,7 +132,7 @@ Application::Application(int& argc, char** argv) :
     QString config_dir;
     QStringList filenames;
 
-    while ((c = tr_getopt(getUsage(), argc, const_cast<char const**>(argv), Opts, &optarg)) != TR_OPT_DONE)
+    while ((c = tr_getopt(getUsage(), argc, const_cast<char const**>(argv), Opts.begin(), &optarg)) != TR_OPT_DONE)
     {
         switch (c)
         {
@@ -167,7 +167,7 @@ Application::Application(int& argc, char** argv) :
 
         case TR_OPT_ERR:
             std::cerr << qPrintable(QObject::tr("Invalid option")) << std::endl;
-            tr_getopt_usage(qPrintable(MyReadableName), getUsage(), Opts);
+            tr_getopt_usage(qPrintable(MyReadableName), getUsage(), Opts.begin());
             quitLater();
             return;
 

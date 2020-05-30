@@ -55,9 +55,9 @@ class Session;
 namespace
 {
 
-int const RefreshIntervalMSec = 4000;
+int constexpr RefreshIntervalMSec = 4000;
 
-char constexpr PrefKey[] = "pref-key";
+char const constexpr* const PrefKey = "pref_key";
 
 enum // peer columns
 {

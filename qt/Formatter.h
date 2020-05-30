@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include <algorithm>
 #include <cstdint> // int64_t
 
 #include <QCoreApplication>
@@ -26,14 +27,18 @@ public:
         KB,
         MB,
         GB,
-        TB
+        TB,
+
+        NUM_SIZES
     };
 
     enum Type
     {
         SPEED,
         SIZE,
-        MEM
+        MEM,
+
+        NUM_TYPES
     };
 
 public:
@@ -54,5 +59,5 @@ public:
     static void initUnits();
 
 private:
-    static QString unit_strings[3][5];
+    static std::array<std::array<QString, NUM_SIZES>, NUM_TYPES> unit_strings;
 };

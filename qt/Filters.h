@@ -61,7 +61,7 @@ public:
 private:
     int mode_;
 
-    static std::array<QString,NUM_MODES> const Names;
+    static std::array<QString, NUM_MODES> const Names;
 };
 
 Q_DECLARE_METATYPE(FilterMode)
@@ -111,7 +111,7 @@ public:
 private:
     int mode_ = SORT_BY_ID;
 
-    static std::array<QString,NUM_MODES> const Names;
+    static std::array<QString, NUM_MODES> const Names;
 };
 
 Q_DECLARE_METATYPE(SortMode)

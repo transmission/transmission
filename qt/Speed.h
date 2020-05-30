@@ -65,7 +65,7 @@ public:
 
 private:
     explicit Speed(int bytes_per_second) :
-        bytes_per_second_ { bytes_per_second }
+        bytes_per_second_{bytes_per_second}
     {
     }
 

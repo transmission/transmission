@@ -274,9 +274,9 @@ QModelIndex FileTreeModel::parent(QModelIndex const& child, int column) const
 
 int FileTreeModel::rowCount(QModelIndex const& parent) const
 {
-    FileTreeItem* parent_item = parent.isValid()
-        ? itemFromIndex(parent)
-        : root_item_;
+    FileTreeItem* parent_item = parent.isValid() ?
+        itemFromIndex(parent) :
+        root_item_;
 
     return parent_item->childCount();
 }

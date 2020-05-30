@@ -9,7 +9,6 @@ Checks: >
   -cert-err58-cpp,
   clang-analyzer-optin*,
   cppcoreguidelines-*,
-  -cppcoreguidelines-avoid-c-arrays,
   -cppcoreguidelines-avoid-magic-numbers,
   -cppcoreguidelines-macro-usage,
   -cppcoreguidelines-narrowing-conversions,
@@ -26,7 +25,6 @@ Checks: >
   google-readability-*,
   google-runtime-operator,
   hicpp-*,
-  -hicpp-avoid-c-arrays,
   -hicpp-multiway-paths-covered,
   -hicpp-no-array-decay,
   -hicpp-signed-bitwise,
@@ -34,7 +32,6 @@ Checks: >
   misc-*,
   -misc-non-private-member-variables-in-classes,
   modernize-*,
-  -modernize-avoid-c-arrays,
   -modernize-raw-string-literal,
   -modernize-use-trailing-return-type, # keep
   performance-*,
