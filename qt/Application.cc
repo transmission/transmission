@@ -133,7 +133,7 @@ Application::Application(int& argc, char** argv) :
     QString config_dir;
     QStringList filenames;
 
-    while ((c = tr_getopt(getUsage(), argc, const_cast<char const**>(argv), Opts.begin(), &optarg)) != TR_OPT_DONE)
+    while ((c = tr_getopt(getUsage(), argc, const_cast<char const**>(argv), Opts.data(), &optarg)) != TR_OPT_DONE)
     {
         switch (c)
         {
@@ -168,7 +168,7 @@ Application::Application(int& argc, char** argv) :
 
         case TR_OPT_ERR:
             std::cerr << qPrintable(QObject::tr("Invalid option")) << std::endl;
-            tr_getopt_usage(qPrintable(MyReadableName), getUsage(), Opts.begin());
+            tr_getopt_usage(qPrintable(MyReadableName), getUsage(), Opts.data());
             quitLater();
             return;
 
