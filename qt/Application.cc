@@ -6,6 +6,7 @@
  *
  */
 
+#include <array>
 #include <ctime>
 #include <iostream>
 

@@ -6,6 +6,8 @@
  *
  */
 
+#include <array>
+
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h> // tr_formatter
 
