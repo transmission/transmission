@@ -174,7 +174,7 @@ tr_magnet_info* tr_magnetParse(char const* uri)
                 }
             }
 
-            if (vallen > 0 && keylen == 2 && memcmp(key, "dn", 2) == 0)
+            if (displayName == NULL && vallen > 0 && keylen == 2 && memcmp(key, "dn", 2) == 0)
             {
                 displayName = tr_http_unescape(val, vallen);
             }
@@ -211,6 +211,20 @@ tr_magnet_info* tr_magnetParse(char const* uri)
         info->webseedCount = wsCount;
         info->webseeds = tr_memdup(ws, sizeof(char*) * wsCount);
         memcpy(info->hash, sha1, sizeof(uint8_t) * SHA_DIGEST_LENGTH);
+    }
+    else
+    {
+        for (int i = 0; i < trCount; i++)
+        {
+            tr_free(tr[i]);
+        }
+
+        for (int i = 0; i < wsCount; i++)
+        {
+            tr_free(ws[i]);
+        }
+
+        tr_free(displayName);
     }
 
     return info;

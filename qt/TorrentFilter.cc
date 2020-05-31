@@ -17,19 +17,17 @@
 #include "Utils.h"
 
 TorrentFilter::TorrentFilter(Prefs const& prefs) :
-    myPrefs(prefs)
+    prefs_(prefs)
 {
-    connect(&myPrefs, &Prefs::changed, this, &TorrentFilter::onPrefChanged);
-    connect(&myRefilterTimer, &QTimer::timeout, this, &TorrentFilter::refilter);
+    connect(&prefs_, &Prefs::changed, this, &TorrentFilter::onPrefChanged);
+    connect(&refilter_timer_, &QTimer::timeout, this, &TorrentFilter::refilter);
 
     setDynamicSortFilter(true);
 
     refilter();
 }
 
-TorrentFilter::~TorrentFilter()
-{
-}
+TorrentFilter::~TorrentFilter() = default;
 
 /***
 ****
@@ -48,7 +46,7 @@ void TorrentFilter::onPrefChanged(int key)
     {
     case Prefs::FILTER_TEXT:
         // special case for isEmpty: user probably hit the 'clear' button
-        msec = myPrefs.getString(key).isEmpty() ? fast_msec : slow_msec;
+        msec = prefs_.getString(key).isEmpty() ? fast_msec : slow_msec;
         break;
 
     case Prefs::FILTER_MODE:
@@ -60,17 +58,17 @@ void TorrentFilter::onPrefChanged(int key)
     }
 
     // if this pref change affects filtering, ensure that a refilter is queued
-    if (msec && !myRefilterTimer.isActive())
+    if (msec && !refilter_timer_.isActive())
     {
-        myRefilterTimer.setSingleShot(true);
-        myRefilterTimer.start(*msec);
+        refilter_timer_.setSingleShot(true);
+        refilter_timer_.start(*msec);
     }
 }
 
 void TorrentFilter::refilter()
 {
     invalidate();
-    sort(0, myPrefs.getBool(Prefs::SORT_REVERSED) ? Qt::AscendingOrder : Qt::DescendingOrder);
+    sort(0, prefs_.getBool(Prefs::SORT_REVERSED) ? Qt::AscendingOrder : Qt::DescendingOrder);
 }
 
 /***
@@ -101,10 +99,10 @@ int compare(T const a, T const b)
 bool TorrentFilter::lessThan(QModelIndex const& left, QModelIndex const& right) const
 {
     int val = 0;
-    Torrent const* a = sourceModel()->data(left, TorrentModel::TorrentRole).value<Torrent const*>();
-    Torrent const* b = sourceModel()->data(right, TorrentModel::TorrentRole).value<Torrent const*>();
+    auto const* a = sourceModel()->data(left, TorrentModel::TorrentRole).value<Torrent const*>();
+    auto const* b = sourceModel()->data(right, TorrentModel::TorrentRole).value<Torrent const*>();
 
-    switch (myPrefs.get<SortMode>(Prefs::SORT_MODE).mode())
+    switch (prefs_.get<SortMode>(Prefs::SORT_MODE).mode())
     {
     case SortMode::SORT_BY_QUEUE:
         if (val == 0)
@@ -282,27 +280,27 @@ bool TorrentFilter::activityFilterAcceptsTorrent(Torrent const* tor, FilterMode 
     return accepts;
 }
 
-bool TorrentFilter::filterAcceptsRow(int sourceRow, QModelIndex const& sourceParent) const
+bool TorrentFilter::filterAcceptsRow(int source_row, QModelIndex const& source_parent) const
 {
-    QModelIndex childIndex = sourceModel()->index(sourceRow, 0, sourceParent);
-    Torrent const* tor = childIndex.model()->data(childIndex, TorrentModel::TorrentRole).value<Torrent const*>();
+    QModelIndex child_index = sourceModel()->index(source_row, 0, source_parent);
+    auto const* tor = child_index.model()->data(child_index, TorrentModel::TorrentRole).value<Torrent const*>();
     bool accepts = true;
 
     if (accepts)
     {
-        FilterMode const m = myPrefs.get<FilterMode>(Prefs::FILTER_MODE);
+        auto const m = prefs_.get<FilterMode>(Prefs::FILTER_MODE);
         accepts = activityFilterAcceptsTorrent(tor, m);
     }
 
     if (accepts)
     {
-        QString const trackers = myPrefs.getString(Prefs::FILTER_TRACKERS);
+        QString const trackers = prefs_.getString(Prefs::FILTER_TRACKERS);
         accepts = trackerFilterAcceptsTorrent(tor, trackers);
     }
 
     if (accepts)
     {
-        QString const text = myPrefs.getString(Prefs::FILTER_TEXT);
+        QString const text = prefs_.getString(Prefs::FILTER_TEXT);
 
         if (!text.isEmpty())
         {
@@ -313,14 +311,9 @@ bool TorrentFilter::filterAcceptsRow(int sourceRow, QModelIndex const& sourcePar
     return accepts;
 }
 
-int TorrentFilter::hiddenRowCount() const
+void TorrentFilter::countTorrentsPerMode(int* setme_counts) const
 {
-    return sourceModel()->rowCount() - rowCount();
-}
-
-void TorrentFilter::countTorrentsPerMode(int* setmeCounts) const
-{
-    std::fill_n(setmeCounts, static_cast<std::size_t>(FilterMode::NUM_MODES), 0);
+    std::fill_n(setme_counts, static_cast<std::size_t>(FilterMode::NUM_MODES), 0);
 
     for (auto const& tor : dynamic_cast<TorrentModel*>(sourceModel())->torrents())
     {
@@ -328,7 +321,7 @@ void TorrentFilter::countTorrentsPerMode(int* setmeCounts) const
         {
             if (activityFilterAcceptsTorrent(tor, mode))
             {
-                ++setmeCounts[mode];
+                ++setme_counts[mode];
             }
         }
     }

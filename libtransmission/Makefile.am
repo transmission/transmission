@@ -316,3 +316,6 @@ watchdir_generic_test_CPPFLAGS = -DWATCHDIR_TEST_FORCE_GENERIC $(AM_CPPFLAGS)
 rename_test_SOURCES = rename-test.c $(TEST_SOURCES)
 rename_test_LDADD = ${apps_ldadd}
 rename_test_LDFLAGS = ${apps_ldflags}
+
+EXTRA_DIST = \
+  subprocess-test.cmd

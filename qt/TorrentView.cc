@@ -17,19 +17,19 @@ class TorrentView::HeaderWidget : public QWidget
 public:
     HeaderWidget(TorrentView* parent) :
         QWidget(parent),
-        myText()
+        text_()
     {
         setFont(qApp->font("QMiniFont"));
     }
 
     void setText(QString const& text)
     {
-        myText = text;
+        text_ = text;
         update();
     }
 
     // QWidget
-    virtual QSize sizeHint() const
+    QSize sizeHint() const override
     {
         QStyleOptionHeader option;
         option.rect = QRect(0, 0, 100, 100);
@@ -41,7 +41,7 @@ public:
 
 protected:
     // QWidget
-    virtual void paintEvent(QPaintEvent* /*event*/)
+    void paintEvent(QPaintEvent* /*event*/) override
     {
         QStyleOptionHeader option;
         option.initFrom(this);
@@ -52,44 +52,44 @@ protected:
         painter.drawControl(QStyle::CE_HeaderSection, option);
 
         option.rect = style()->subElementRect(QStyle::SE_HeaderLabel, &option, this);
-        painter.drawItemText(option.rect, Qt::AlignCenter, option.palette, true, myText, QPalette::ButtonText);
+        painter.drawItemText(option.rect, Qt::AlignCenter, option.palette, true, text_, QPalette::ButtonText);
     }
 
-    virtual void mouseDoubleClickEvent(QMouseEvent* /*event*/)
+    void mouseDoubleClickEvent(QMouseEvent* /*event*/) override
     {
         emit static_cast<TorrentView*>(parent())->headerDoubleClicked();
     }
 
 private:
-    QString myText;
+    QString text_;
 };
 
 TorrentView::TorrentView(QWidget* parent) :
     QListView(parent),
-    myHeaderWidget(new HeaderWidget(this))
+    header_widget_(new HeaderWidget(this))
 {
 }
 
 void TorrentView::setHeaderText(QString const& text)
 {
-    bool const headerVisible = !text.isEmpty();
+    bool const header_visible = !text.isEmpty();
 
-    myHeaderWidget->setText(text);
-    myHeaderWidget->setVisible(headerVisible);
+    header_widget_->setText(text);
+    header_widget_->setVisible(header_visible);
 
-    if (headerVisible)
+    if (header_visible)
     {
         adjustHeaderPosition();
     }
 
-    setViewportMargins(0, headerVisible ? myHeaderWidget->height() : 0, 0, 0);
+    setViewportMargins(0, header_visible ? header_widget_->height() : 0, 0, 0);
 }
 
 void TorrentView::resizeEvent(QResizeEvent* event)
 {
     QListView::resizeEvent(event);
 
-    if (myHeaderWidget->isVisible())
+    if (header_widget_->isVisible())
     {
         adjustHeaderPosition();
     }
@@ -97,8 +97,8 @@ void TorrentView::resizeEvent(QResizeEvent* event)
 
 void TorrentView::adjustHeaderPosition()
 {
-    QRect headerWidgetRect = contentsRect();
-    headerWidgetRect.setWidth(viewport()->width());
-    headerWidgetRect.setHeight(myHeaderWidget->sizeHint().height());
-    myHeaderWidget->setGeometry(headerWidgetRect);
+    QRect header_widget_rect = contentsRect();
+    header_widget_rect.setWidth(viewport()->width());
+    header_widget_rect.setHeight(header_widget_->sizeHint().height());
+    header_widget_->setGeometry(header_widget_rect);
 }

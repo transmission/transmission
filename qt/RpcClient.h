@@ -25,7 +25,7 @@
 class QByteArray;
 class QNetworkAccessManager;
 
-typedef std::shared_ptr<tr_variant> TrVariantPtr;
+using TrVariantPtr = std::shared_ptr<tr_variant>;
 Q_DECLARE_METATYPE(TrVariantPtr)
 
 extern "C"
@@ -45,7 +45,7 @@ struct RpcResponse
 Q_DECLARE_METATYPE(QFutureInterface<RpcResponse>)
 
 // The response future -- the RPC engine returns one for each request made.
-typedef QFuture<RpcResponse> RpcResponseFuture;
+using RpcResponseFuture = QFuture<RpcResponse>;
 
 class RpcClient : public QObject
 {
@@ -53,10 +53,7 @@ class RpcClient : public QObject
 
 public:
     RpcClient(QObject* parent = nullptr);
-
-    virtual ~RpcClient()
-    {
-    }
+    virtual ~RpcClient() = default;
 
     void stop();
     void start(tr_session* session);
@@ -74,6 +71,10 @@ signals:
     void dataSendProgress();
     void networkResponse(QNetworkReply::NetworkError code, QString const& message);
 
+private slots:
+    void networkRequestFinished(QNetworkReply* reply);
+    void localRequestFinished(TrVariantPtr response);
+
 private:
     RpcResponseFuture sendRequest(TrVariantPtr json);
     QNetworkAccessManager* networkAccessManager();
@@ -86,15 +87,10 @@ private:
 
     static void localSessionCallback(tr_session* s, tr_variant* response, void* vself);
 
-private slots:
-    void networkRequestFinished(QNetworkReply* reply);
-    void localRequestFinished(TrVariantPtr response);
-
-private:
-    tr_session* mySession;
-    QString mySessionId;
-    QUrl myUrl;
-    QNetworkAccessManager* myNAM;
-    QHash<int64_t, QFutureInterface<RpcResponse>> myLocalRequests;
-    int64_t myNextTag;
+    tr_session* session_ = {};
+    QString session_id_;
+    QUrl url_;
+    QNetworkAccessManager* nam_ = {};
+    QHash<int64_t, QFutureInterface<RpcResponse>> local_requests_;
+    int64_t next_tag_ = {};
 };

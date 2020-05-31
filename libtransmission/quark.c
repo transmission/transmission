@@ -82,6 +82,8 @@ static struct tr_key_struct const my_static[] =
     Q("delete-local-data"),
     Q("desiredAvailable"),
     Q("destination"),
+    Q("details-window-height"),
+    Q("details-window-width"),
     Q("dht-enabled"),
     Q("display-name"),
     Q("dnd"),

@@ -2253,6 +2253,8 @@ static void torrentCallScript(tr_torrent const* tor, char const* script)
         NULL
     };
 
+    char* labels = tr_strjoin((char const* const*)tr_ptrArrayBase(&tor->labels), tr_ptrArraySize(&tor->labels), ",");
+
     char* const env[] =
     {
         tr_strdup_printf("TR_APP_VERSION=%s", SHORT_VERSION_STRING),
@@ -2261,6 +2263,7 @@ static void torrentCallScript(tr_torrent const* tor, char const* script)
         tr_strdup_printf("TR_TORRENT_HASH=%s", tor->info.hashString),
         tr_strdup_printf("TR_TORRENT_ID=%d", tr_torrentId(tor)),
         tr_strdup_printf("TR_TORRENT_NAME=%s", tr_torrentName(tor)),
+        tr_strdup_printf("TR_TORRENT_LABELS=%s", labels),
         NULL
     };
 
@@ -2276,6 +2279,7 @@ static void torrentCallScript(tr_torrent const* tor, char const* script)
 
     tr_free_ptrv((void* const*)env);
     tr_free_ptrv((void* const*)cmd);
+    tr_free(labels);
     tr_free(torrent_dir);
 }
 
@@ -3478,6 +3482,20 @@ void tr_torrentGotBlock(tr_torrent* tor, tr_block_index_t block)
 ****
 ***/
 
+static void find_file_in_dir(char const* name, char const* search_dir, char const** base, char const** subpath,
+    tr_sys_path_info* file_info)
+{
+    char* filename = tr_buildPath(search_dir, name, NULL);
+
+    if (tr_sys_path_get_info(filename, 0, file_info, NULL))
+    {
+        *base = search_dir;
+        *subpath = name;
+    }
+
+    tr_free(filename);
+}
+
 bool tr_torrentFindFile2(tr_torrent const* tor, tr_file_index_t fileNum, char const** base, char** subpath, time_t* mtime)
 {
     TR_ASSERT(tr_isTorrent(tor));
@@ -3494,29 +3512,13 @@ bool tr_torrentFindFile2(tr_torrent const* tor, tr_file_index_t fileNum, char co
     /* look in the download dir... */
     if (b == NULL)
     {
-        char* filename = tr_buildPath(tor->downloadDir, file->name, NULL);
-
-        if (tr_sys_path_get_info(filename, 0, &file_info, NULL))
-        {
-            b = tor->downloadDir;
-            s = file->name;
-        }
-
-        tr_free(filename);
+        find_file_in_dir(file->name, tor->downloadDir, &b, &s, &file_info);
     }
 
     /* look in the incomplete dir... */
     if (b == NULL && tor->incompleteDir != NULL)
     {
-        char* filename = tr_buildPath(tor->incompleteDir, file->name, NULL);
-
-        if (tr_sys_path_get_info(filename, 0, &file_info, NULL))
-        {
-            b = tor->incompleteDir;
-            s = file->name;
-        }
-
-        tr_free(filename);
+        find_file_in_dir(file->name, tor->incompleteDir, &b, &s, &file_info);
     }
 
     if (b == NULL)
@@ -3527,29 +3529,13 @@ bool tr_torrentFindFile2(tr_torrent const* tor, tr_file_index_t fileNum, char co
     /* look for a .part file in the incomplete dir... */
     if (b == NULL && tor->incompleteDir != NULL)
     {
-        char* filename = tr_buildPath(tor->incompleteDir, part, NULL);
-
-        if (tr_sys_path_get_info(filename, 0, &file_info, NULL))
-        {
-            b = tor->incompleteDir;
-            s = part;
-        }
-
-        tr_free(filename);
+        find_file_in_dir(part, tor->incompleteDir, &b, &s, &file_info);
     }
 
     /* look for a .part file in the download dir... */
     if (b == NULL)
     {
-        char* filename = tr_buildPath(tor->downloadDir, part, NULL);
-
-        if (tr_sys_path_get_info(filename, 0, &file_info, NULL))
-        {
-            b = tor->downloadDir;
-            s = part;
-        }
-
-        tr_free(filename);
+        find_file_in_dir(part, tor->downloadDir, &b, &s, &file_info);
     }
 
     /* return the results */

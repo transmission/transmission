@@ -141,10 +141,12 @@ set(${PROJECT_NAME}_LINGUAS
     en
     es
     eu
+    fi
     fr
     hu
     id
     it_IT
+    ja
     ka
     kk
     ko

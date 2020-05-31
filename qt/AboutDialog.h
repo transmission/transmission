@@ -28,7 +28,7 @@ private slots:
     void showLicense();
 
 private:
-    Ui::AboutDialog ui;
+    Ui::AboutDialog ui_;
 
-    QPointer<LicenseDialog> myLicenseDialog;
+    QPointer<LicenseDialog> license_dialog_;
 };

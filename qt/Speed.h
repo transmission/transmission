@@ -11,10 +11,7 @@
 class Speed
 {
 public:
-    Speed() :
-        _Bps(0)
-    {
-    }
+    Speed() = default;
 
     double KBps() const;
 
@@ -56,6 +53,16 @@ public:
         return _Bps < that._Bps;
     }
 
+    bool operator ==(Speed const& that) const
+    {
+        return _Bps == that._Bps;
+    }
+
+    bool operator !=(Speed const& that) const
+    {
+        return _Bps != that._Bps;
+    }
+
 private:
     Speed(int Bps) :
         _Bps(Bps)
@@ -63,5 +70,5 @@ private:
     }
 
 private:
-    int _Bps;
+    int _Bps = 0;
 };

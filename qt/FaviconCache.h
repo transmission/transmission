@@ -36,10 +36,9 @@ public:
     // Returns the key.
     QString add(QUrl const& url);
 
-    static QString getDisplayName(QUrl const& url);
     static QString getDisplayName(QString const& key);
     static QString getKey(QUrl const& url);
-    static QString getKey(QString const& displayName);
+    static QString getKey(QString const& display_name);
     static QSize getIconSize();
 
 signals:
@@ -53,6 +52,6 @@ private slots:
     void onRequestFinished(QNetworkReply* reply);
 
 private:
-    QNetworkAccessManager* myNAM;
-    std::unordered_map<QString, QPixmap> myPixmaps;
+    QNetworkAccessManager* nam_ = {};
+    std::unordered_map<QString, QPixmap> pixmaps_;
 };

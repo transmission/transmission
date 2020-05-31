@@ -19,60 +19,60 @@
 namespace
 {
 
-static int const INTERVAL_MSEC = 15000;
+int const INTERVAL_MSEC = 15000;
 
 } // namespace
 
 FreeSpaceLabel::FreeSpaceLabel(QWidget* parent) :
     QLabel(parent),
-    mySession(nullptr),
-    myTimer(this)
+    session_(nullptr),
+    timer_(this)
 {
-    myTimer.setSingleShot(true);
-    myTimer.setInterval(INTERVAL_MSEC);
+    timer_.setSingleShot(true);
+    timer_.setInterval(INTERVAL_MSEC);
 
-    connect(&myTimer, SIGNAL(timeout()), this, SLOT(onTimer()));
+    connect(&timer_, SIGNAL(timeout()), this, SLOT(onTimer()));
 }
 
 void FreeSpaceLabel::setSession(Session& session)
 {
-    if (mySession == &session)
+    if (session_ == &session)
     {
         return;
     }
 
-    mySession = &session;
+    session_ = &session;
     onTimer();
 }
 
 void FreeSpaceLabel::setPath(QString const& path)
 {
-    if (myPath != path)
+    if (path_ != path)
     {
         setText(tr("<i>Calculating Free Space...</i>"));
-        myPath = path;
+        path_ = path;
         onTimer();
     }
 }
 
 void FreeSpaceLabel::onTimer()
 {
-    myTimer.stop();
+    timer_.stop();
 
-    if (mySession == nullptr || myPath.isEmpty())
+    if (session_ == nullptr || path_.isEmpty())
     {
         return;
     }
 
     tr_variant args;
     tr_variantInitDict(&args, 1);
-    tr_variantDictAddStr(&args, TR_KEY_path, myPath.toUtf8().constData());
+    tr_variantDictAddStr(&args, TR_KEY_path, path_.toUtf8().constData());
 
-    RpcQueue* q = new RpcQueue();
+    auto* q = new RpcQueue();
 
     q->add([this, &args]()
         {
-            return mySession->exec("free-space", &args);
+            return session_->exec("free-space", &args);
         });
 
     q->add([this](RpcResponse const& r)
@@ -98,7 +98,7 @@ void FreeSpaceLabel::onTimer()
             str = QString::fromUtf8(path, len);
             setToolTip(QDir::toNativeSeparators(str));
 
-            myTimer.start();
+            timer_.start();
         });
 
     q->run();

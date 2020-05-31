@@ -17,7 +17,7 @@
 
 class FileTreeItem;
 
-class FileTreeModel : public QAbstractItemModel
+class FileTreeModel final : public QAbstractItemModel
 {
     Q_OBJECT
 
@@ -42,14 +42,14 @@ public:
     };
 
 public:
-    FileTreeModel(QObject* parent = nullptr, bool isEditable = true);
+    FileTreeModel(QObject* parent = nullptr, bool is_editable = true);
     ~FileTreeModel();
 
     void setEditable(bool editable);
 
     void clear();
     void addFile(int index, QString const& filename, bool wanted, int priority, uint64_t size, uint64_t have,
-        bool torrentChanged);
+        bool torrent_changed);
 
     bool openFile(QModelIndex const& index);
 
@@ -65,31 +65,30 @@ public:
     QVariant data(QModelIndex const& index, int role = Qt::DisplayRole) const override;
     Qt::ItemFlags flags(QModelIndex const& index) const override;
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
-    QModelIndex index(int row, int column, QModelIndex const& parent = QModelIndex()) const override;
+    QModelIndex index(int row, int column, QModelIndex const& parent = {}) const override;
     QModelIndex parent(QModelIndex const& child) const override;
-    int rowCount(QModelIndex const& parent = QModelIndex()) const override;
-    int columnCount(QModelIndex const& parent = QModelIndex()) const override;
+    int rowCount(QModelIndex const& parent = {}) const override;
+    int columnCount(QModelIndex const& parent = {}) const override;
     bool setData(QModelIndex const& index, QVariant const& value, int role = Qt::EditRole) override;
 
 signals:
-    void priorityChanged(QSet<int> const& fileIndices, int);
-    void wantedChanged(QSet<int> const& fileIndices, bool);
-    void pathEdited(QString const& oldpath, QString const& newname);
+    void priorityChanged(QSet<int> const& file_indices, int);
+    void wantedChanged(QSet<int> const& file_indices, bool);
+    void pathEdited(QString const& oldpath, QString const& new_name);
     void openRequested(QString const& path);
 
 private:
     void clearSubtree(QModelIndex const&);
     QModelIndex indexOf(FileTreeItem*, int column) const;
-    void emitParentsChanged(QModelIndex const&, int firstColumn, int lastColumn,
-        QSet<QModelIndex>* visitedParentIndices = nullptr);
-    void emitSubtreeChanged(QModelIndex const&, int firstColumn, int lastColumn);
-    FileTreeItem* findItemForFileIndex(int fileIndex) const;
+    void emitParentsChanged(QModelIndex const&, int first_column, int last_column,
+        QSet<QModelIndex>* visited_parent_indices = nullptr);
+    void emitSubtreeChanged(QModelIndex const&, int first_column, int last_column);
+    FileTreeItem* findItemForFileIndex(int file_index) const;
     FileTreeItem* itemFromIndex(QModelIndex const&) const;
     QModelIndexList getOrphanIndices(QModelIndexList const& indices) const;
 
 private:
-    bool myIsEditable;
-
-    FileTreeItem* myRootItem;
-    QMap<int, FileTreeItem*> myIndexCache;
+    QMap<int, FileTreeItem*> index_cache_;
+    FileTreeItem* root_item_ = {};
+    bool is_editable_ = {};
 };

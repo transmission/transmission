@@ -29,5 +29,5 @@ public:
     static void registerObject(QObject* parent);
 
 private:
-    std::unique_ptr<QAxObject> m_client;
+    std::unique_ptr<QAxObject> client_;
 };

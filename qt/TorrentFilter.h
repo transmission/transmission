@@ -33,8 +33,6 @@ public:
     TorrentFilter(Prefs const& prefs);
     virtual ~TorrentFilter();
 
-    int hiddenRowCount() const;
-
     void countTorrentsPerMode(int* setmeCounts) const;
 
 protected:
@@ -51,6 +49,6 @@ private slots:
     void refilter();
 
 private:
-    QTimer myRefilterTimer;
-    Prefs const& myPrefs;
+    QTimer refilter_timer_;
+    Prefs const& prefs_;
 };

@@ -49,30 +49,30 @@ namespace
 
 #ifdef _WIN32
 
-void addAssociatedFileIcon(QFileInfo const& fileInfo, UINT iconSize, QIcon& icon)
+void addAssociatedFileIcon(QFileInfo const& file_info, UINT icon_size, QIcon& icon)
 {
-    QString const pixmapCacheKey = QLatin1String("tr_file_ext_") + QString::number(iconSize) + QLatin1Char('_') +
-        fileInfo.suffix();
+    QString const pixmap_cache_key = QStringLiteral("tr_file_ext_") + QString::number(icon_size) + QLatin1Char('_') +
+        file_info.suffix();
 
     QPixmap pixmap;
 
-    if (!QPixmapCache::find(pixmapCacheKey, &pixmap))
+    if (!QPixmapCache::find(pixmap_cache_key, &pixmap))
     {
-        QString const filename = fileInfo.fileName();
+        QString const filename = file_info.fileName();
 
-        SHFILEINFO shellFileInfo;
+        SHFILEINFO shell_file_info;
 
-        if (::SHGetFileInfoW(reinterpret_cast<wchar_t const*>(filename.utf16()), FILE_ATTRIBUTE_NORMAL, &shellFileInfo,
-            sizeof(shellFileInfo), SHGFI_ICON | iconSize | SHGFI_USEFILEATTRIBUTES) != 0)
+        if (::SHGetFileInfoW(reinterpret_cast<wchar_t const*>(filename.utf16()), FILE_ATTRIBUTE_NORMAL, &shell_file_info,
+            sizeof(shell_file_info), SHGFI_ICON | icon_size | SHGFI_USEFILEATTRIBUTES) != 0)
         {
-            if (shellFileInfo.hIcon != nullptr)
+            if (shell_file_info.hIcon != nullptr)
             {
-                pixmap = QtWin::fromHICON(shellFileInfo.hIcon);
-                ::DestroyIcon(shellFileInfo.hIcon);
+                pixmap = QtWin::fromHICON(shell_file_info.hIcon);
+                ::DestroyIcon(shell_file_info.hIcon);
             }
         }
 
-        QPixmapCache::insert(pixmapCacheKey, pixmap);
+        QPixmapCache::insert(pixmap_cache_key, pixmap);
     }
 
     if (!pixmap.isNull())
@@ -112,7 +112,7 @@ QIcon fileIcon()
 
 std::unordered_map<QString, QIcon> iconCache;
 
-QIcon const getMimeIcon(QString const& filename)
+QIcon getMimeIcon(QString const& filename)
 {
     // If the suffix doesn't match a mime type, treat it as a folder.
     // This heuristic is fast and yields good results for torrent names.
@@ -176,17 +176,14 @@ QIcon Utils::guessMimeIcon(QString const& filename)
 
     if (!filename.isEmpty())
     {
-        QFileInfo const fileInfo(filename);
+        QFileInfo const file_info(filename);
 
-        addAssociatedFileIcon(fileInfo, SHGFI_SMALLICON, icon);
-        addAssociatedFileIcon(fileInfo, 0, icon);
-        addAssociatedFileIcon(fileInfo, SHGFI_LARGEICON, icon);
+        addAssociatedFileIcon(file_info, SHGFI_SMALLICON, icon);
+        addAssociatedFileIcon(file_info, 0, icon);
+        addAssociatedFileIcon(file_info, SHGFI_LARGEICON, icon);
     }
 
-    if (!icon.isNull())
-    {
-        return icon;
-    }
+    return icon;
 
 #else
 
@@ -223,7 +220,7 @@ bool Utils::isValidUtf8(char const* s)
             n = 1; // ASCII
         }
         else if ((*c & 0xc0) == 0x80)
-        {
+        { // NOLINT(bugprone-branch-clone)
             return false; // not valid
         }
         else if ((*c & 0xe0) == 0xc0)
@@ -300,7 +297,7 @@ int Utils::measureHeaderItem(QHeaderView* view, QString const& text)
 
 QColor Utils::getFadedColor(QColor const& color)
 {
-    QColor fadedColor(color);
-    fadedColor.setAlpha(128);
-    return fadedColor;
+    QColor faded_color(color);
+    faded_color.setAlpha(128);
+    return faded_color;
 }

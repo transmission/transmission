@@ -47,16 +47,16 @@ private slots:
     void onTextChanged(QString const&);
 
 private:
-    Prefs& myPrefs;
-    TorrentModel const& myTorrents;
-    TorrentFilter const& myFilter;
+    Prefs& prefs_;
+    TorrentModel const& torrents_;
+    TorrentFilter const& filter_;
 
-    FilterBarComboBox* myActivityCombo;
-    FilterBarComboBox* myTrackerCombo;
-    QLabel* myCountLabel;
-    QStandardItemModel* myTrackerModel;
-    QTimer* myRecountTimer;
-    bool myIsBootstrapping;
-    QLineEdit* myLineEdit;
-    std::map<QString, int> myTrackerCounts;
+    std::map<QString, int> tracker_counts_;
+    FilterBarComboBox* activity_combo_ = {};
+    FilterBarComboBox* tracker_combo_ = {};
+    QLabel* count_label_ = {};
+    QStandardItemModel* tracker_model_ = {};
+    QTimer* recount_timer_ = {};
+    QLineEdit* line_edit_ = {};
+    bool is_bootstrapping_ = {};
 };

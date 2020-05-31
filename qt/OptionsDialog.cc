@@ -27,20 +27,18 @@
 
 OptionsDialog::OptionsDialog(Session& session, Prefs const& prefs, AddData const& addme, QWidget* parent) :
     BaseDialog(parent),
-    mySession(session),
-    myAdd(addme),
-    myIsLocal(mySession.isLocal()),
-    myHaveInfo(false),
-    myVerifyButton(new QPushButton(tr("&Verify Local Data"), this)),
-    myVerifyFile(nullptr),
-    myVerifyHash(QCryptographicHash::Sha1),
-    myEditTimer(this)
+    add_(addme),
+    verify_hash_(QCryptographicHash::Sha1),
+    verify_button_(new QPushButton(tr("&Verify Local Data"), this)),
+    edit_timer_(this),
+    session_(session),
+    is_local_(session_.isLocal())
 {
-    ui.setupUi(this);
+    ui_.setupUi(this);
 
     QString title;
 
-    if (myAdd.type == AddData::FILENAME)
+    if (add_.type == AddData::FILENAME)
     {
         title = tr("Open Torrent from File");
     }
@@ -51,74 +49,74 @@ OptionsDialog::OptionsDialog(Session& session, Prefs const& prefs, AddData const
 
     setWindowTitle(title);
 
-    myEditTimer.setInterval(2000);
-    myEditTimer.setSingleShot(true);
-    connect(&myEditTimer, SIGNAL(timeout()), this, SLOT(onDestinationChanged()));
+    edit_timer_.setInterval(2000);
+    edit_timer_.setSingleShot(true);
+    connect(&edit_timer_, SIGNAL(timeout()), this, SLOT(onDestinationChanged()));
 
-    if (myAdd.type == AddData::FILENAME)
+    if (add_.type == AddData::FILENAME)
     {
-        ui.sourceStack->setCurrentWidget(ui.sourceButton);
-        ui.sourceButton->setMode(PathButton::FileMode);
-        ui.sourceButton->setTitle(tr("Open Torrent"));
-        ui.sourceButton->setNameFilter(tr("Torrent Files (*.torrent);;All Files (*.*)"));
-        ui.sourceButton->setPath(myAdd.filename);
-        connect(ui.sourceButton, SIGNAL(pathChanged(QString)), this, SLOT(onSourceChanged()));
+        ui_.sourceStack->setCurrentWidget(ui_.sourceButton);
+        ui_.sourceButton->setMode(PathButton::FileMode);
+        ui_.sourceButton->setTitle(tr("Open Torrent"));
+        ui_.sourceButton->setNameFilter(tr("Torrent Files (*.torrent);;All Files (*.*)"));
+        ui_.sourceButton->setPath(add_.filename);
+        connect(ui_.sourceButton, SIGNAL(pathChanged(QString)), this, SLOT(onSourceChanged()));
     }
     else
     {
-        ui.sourceStack->setCurrentWidget(ui.sourceEdit);
-        ui.sourceEdit->setText(myAdd.readableName());
-        ui.sourceEdit->selectAll();
-        connect(ui.sourceEdit, SIGNAL(editingFinished()), this, SLOT(onSourceChanged()));
+        ui_.sourceStack->setCurrentWidget(ui_.sourceEdit);
+        ui_.sourceEdit->setText(add_.readableName());
+        ui_.sourceEdit->selectAll();
+        connect(ui_.sourceEdit, SIGNAL(editingFinished()), this, SLOT(onSourceChanged()));
     }
 
-    ui.sourceStack->setFixedHeight(ui.sourceStack->currentWidget()->sizeHint().height());
-    ui.sourceLabel->setBuddy(ui.sourceStack->currentWidget());
+    ui_.sourceStack->setFixedHeight(ui_.sourceStack->currentWidget()->sizeHint().height());
+    ui_.sourceLabel->setBuddy(ui_.sourceStack->currentWidget());
 
     QFontMetrics const fontMetrics(font());
-    int const width = fontMetrics.size(0, QString::fromUtf8("This is a pretty long torrent filename indeed.torrent")).width();
-    ui.sourceStack->setMinimumWidth(width);
+    int const width = fontMetrics.size(0, QStringLiteral("This is a pretty long torrent filename indeed.torrent")).width();
+    ui_.sourceStack->setMinimumWidth(width);
 
-    QString const downloadDir(Utils::removeTrailingDirSeparator(prefs.getString(Prefs::DOWNLOAD_DIR)));
-    ui.freeSpaceLabel->setSession(mySession);
-    ui.freeSpaceLabel->setPath(downloadDir);
+    QString const download_dir(Utils::removeTrailingDirSeparator(prefs.getString(Prefs::DOWNLOAD_DIR)));
+    ui_.freeSpaceLabel->setSession(session_);
+    ui_.freeSpaceLabel->setPath(download_dir);
 
-    ui.destinationButton->setMode(PathButton::DirectoryMode);
-    ui.destinationButton->setTitle(tr("Select Destination"));
-    ui.destinationButton->setPath(downloadDir);
-    ui.destinationEdit->setText(downloadDir);
+    ui_.destinationButton->setMode(PathButton::DirectoryMode);
+    ui_.destinationButton->setTitle(tr("Select Destination"));
+    ui_.destinationButton->setPath(download_dir);
+    ui_.destinationEdit->setText(download_dir);
 
-    if (myIsLocal)
+    if (is_local_)
     {
-        myLocalDestination = downloadDir;
+        local_destination_.setPath(download_dir);
     }
 
-    connect(ui.destinationButton, SIGNAL(pathChanged(QString)), this, SLOT(onDestinationChanged()));
-    connect(ui.destinationEdit, SIGNAL(textEdited(QString)), &myEditTimer, SLOT(start()));
-    connect(ui.destinationEdit, SIGNAL(editingFinished()), this, SLOT(onDestinationChanged()));
+    connect(ui_.destinationButton, SIGNAL(pathChanged(QString)), this, SLOT(onDestinationChanged()));
+    connect(ui_.destinationEdit, SIGNAL(textEdited(QString)), &edit_timer_, SLOT(start()));
+    connect(ui_.destinationEdit, SIGNAL(editingFinished()), this, SLOT(onDestinationChanged()));
 
-    ui.filesView->setEditable(false);
+    ui_.filesView->setEditable(false);
 
-    ui.priorityCombo->addItem(tr("High"), TR_PRI_HIGH);
-    ui.priorityCombo->addItem(tr("Normal"), TR_PRI_NORMAL);
-    ui.priorityCombo->addItem(tr("Low"), TR_PRI_LOW);
-    ui.priorityCombo->setCurrentIndex(1); // Normal
+    ui_.priorityCombo->addItem(tr("High"), TR_PRI_HIGH);
+    ui_.priorityCombo->addItem(tr("Normal"), TR_PRI_NORMAL);
+    ui_.priorityCombo->addItem(tr("Low"), TR_PRI_LOW);
+    ui_.priorityCombo->setCurrentIndex(1); // Normal
 
-    ui.dialogButtons->addButton(myVerifyButton, QDialogButtonBox::ActionRole);
-    connect(myVerifyButton, SIGNAL(clicked(bool)), this, SLOT(onVerify()));
+    ui_.dialogButtons->addButton(verify_button_, QDialogButtonBox::ActionRole);
+    connect(verify_button_, SIGNAL(clicked(bool)), this, SLOT(onVerify()));
 
-    ui.startCheck->setChecked(prefs.getBool(Prefs::START));
-    ui.trashCheck->setChecked(prefs.getBool(Prefs::TRASH_ORIGINAL));
+    ui_.startCheck->setChecked(prefs.getBool(Prefs::START));
+    ui_.trashCheck->setChecked(prefs.getBool(Prefs::TRASH_ORIGINAL));
 
-    connect(ui.dialogButtons, SIGNAL(rejected()), this, SLOT(deleteLater()));
-    connect(ui.dialogButtons, SIGNAL(accepted()), this, SLOT(onAccepted()));
+    connect(ui_.dialogButtons, SIGNAL(rejected()), this, SLOT(deleteLater()));
+    connect(ui_.dialogButtons, SIGNAL(accepted()), this, SLOT(onAccepted()));
 
-    connect(ui.filesView, SIGNAL(priorityChanged(QSet<int>, int)), this, SLOT(onPriorityChanged(QSet<int>, int)));
-    connect(ui.filesView, SIGNAL(wantedChanged(QSet<int>, bool)), this, SLOT(onWantedChanged(QSet<int>, bool)));
+    connect(ui_.filesView, SIGNAL(priorityChanged(QSet<int>, int)), this, SLOT(onPriorityChanged(QSet<int>, int)));
+    connect(ui_.filesView, SIGNAL(wantedChanged(QSet<int>, bool)), this, SLOT(onWantedChanged(QSet<int>, bool)));
 
-    connect(&myVerifyTimer, SIGNAL(timeout()), this, SLOT(onTimeout()));
+    connect(&verify_timer_, SIGNAL(timeout()), this, SLOT(onTimeout()));
 
-    connect(&mySession, SIGNAL(sessionUpdated()), SLOT(onSessionUpdated()));
+    connect(&session_, SIGNAL(sessionUpdated()), SLOT(onSessionUpdated()));
 
     updateWidgetsLocality();
     reload();
@@ -135,13 +133,13 @@ OptionsDialog::~OptionsDialog()
 
 void OptionsDialog::clearInfo()
 {
-    if (myHaveInfo)
+    if (have_info_)
     {
-        tr_metainfoFree(&myInfo);
+        tr_metainfoFree(&info_);
     }
 
-    myHaveInfo = false;
-    myFiles.clear();
+    have_info_ = false;
+    files_.clear();
 }
 
 void OptionsDialog::reload()
@@ -151,96 +149,96 @@ void OptionsDialog::reload()
 
     tr_ctor* ctor = tr_ctorNew(nullptr);
 
-    switch (myAdd.type)
+    switch (add_.type)
     {
     case AddData::MAGNET:
-        tr_ctorSetMetainfoFromMagnetLink(ctor, myAdd.magnet.toUtf8().constData());
+        tr_ctorSetMetainfoFromMagnetLink(ctor, add_.magnet.toUtf8().constData());
         break;
 
     case AddData::FILENAME:
-        tr_ctorSetMetainfoFromFile(ctor, myAdd.filename.toUtf8().constData());
+        tr_ctorSetMetainfoFromFile(ctor, add_.filename.toUtf8().constData());
         break;
 
     case AddData::METAINFO:
-        tr_ctorSetMetainfo(ctor, reinterpret_cast<quint8 const*>(myAdd.metainfo.constData()), myAdd.metainfo.size());
+        tr_ctorSetMetainfo(ctor, reinterpret_cast<quint8 const*>(add_.metainfo.constData()), add_.metainfo.size());
         break;
 
     default:
         break;
     }
 
-    int const err = tr_torrentParse(ctor, &myInfo);
-    myHaveInfo = err == 0;
+    int const err = tr_torrentParse(ctor, &info_);
+    have_info_ = err == 0;
     tr_ctorFree(ctor);
 
-    ui.filesView->clear();
-    myFiles.clear();
-    myPriorities.clear();
-    myWanted.clear();
+    ui_.filesView->clear();
+    files_.clear();
+    priorities_.clear();
+    wanted_.clear();
 
-    bool const haveFilesToShow = myHaveInfo && myInfo.fileCount > 0;
+    bool const have_files_to_show = have_info_ && info_.fileCount > 0;
 
-    ui.filesView->setVisible(haveFilesToShow);
-    myVerifyButton->setEnabled(haveFilesToShow);
-    layout()->setSizeConstraint(haveFilesToShow ? QLayout::SetDefaultConstraint : QLayout::SetFixedSize);
+    ui_.filesView->setVisible(have_files_to_show);
+    verify_button_->setEnabled(have_files_to_show);
+    layout()->setSizeConstraint(have_files_to_show ? QLayout::SetDefaultConstraint : QLayout::SetFixedSize);
 
-    if (myHaveInfo)
+    if (have_info_)
     {
-        myPriorities.insert(0, myInfo.fileCount, TR_PRI_NORMAL);
-        myWanted.insert(0, myInfo.fileCount, true);
+        priorities_.insert(0, info_.fileCount, TR_PRI_NORMAL);
+        wanted_.insert(0, info_.fileCount, true);
 
-        for (tr_file_index_t i = 0; i < myInfo.fileCount; ++i)
+        for (tr_file_index_t i = 0; i < info_.fileCount; ++i)
         {
             TorrentFile file;
             file.index = i;
-            file.priority = myPriorities[i];
-            file.wanted = myWanted[i];
-            file.size = myInfo.files[i].length;
+            file.priority = priorities_[i];
+            file.wanted = wanted_[i];
+            file.size = info_.files[i].length;
             file.have = 0;
-            file.filename = QString::fromUtf8(myInfo.files[i].name);
-            myFiles.append(file);
+            file.filename = QString::fromUtf8(info_.files[i].name);
+            files_.append(file);
         }
     }
 
-    ui.filesView->update(myFiles);
+    ui_.filesView->update(files_);
 }
 
 void OptionsDialog::updateWidgetsLocality()
 {
-    ui.destinationStack->setCurrentWidget(myIsLocal ? static_cast<QWidget*>(ui.destinationButton) : ui.destinationEdit);
-    ui.destinationStack->setFixedHeight(ui.destinationStack->currentWidget()->sizeHint().height());
-    ui.destinationLabel->setBuddy(ui.destinationStack->currentWidget());
+    ui_.destinationStack->setCurrentWidget(is_local_ ? static_cast<QWidget*>(ui_.destinationButton) : ui_.destinationEdit);
+    ui_.destinationStack->setFixedHeight(ui_.destinationStack->currentWidget()->sizeHint().height());
+    ui_.destinationLabel->setBuddy(ui_.destinationStack->currentWidget());
 
     // hide the % done when non-local, since we've no way of knowing
-    (ui.filesView->*(myIsLocal ? &QTreeView::showColumn : &QTreeView::hideColumn))(2);
+    (ui_.filesView->*(is_local_ ? &QTreeView::showColumn : &QTreeView::hideColumn))(2);
 
-    myVerifyButton->setVisible(myIsLocal);
+    verify_button_->setVisible(is_local_);
 }
 
 void OptionsDialog::onSessionUpdated()
 {
-    bool const isLocal = mySession.isLocal();
+    bool const is_local = session_.isLocal();
 
-    if (myIsLocal != isLocal)
+    if (is_local_ != is_local)
     {
-        myIsLocal = isLocal;
+        is_local_ = is_local;
         updateWidgetsLocality();
     }
 }
 
-void OptionsDialog::onPriorityChanged(QSet<int> const& fileIndices, int priority)
+void OptionsDialog::onPriorityChanged(QSet<int> const& file_indices, int priority)
 {
-    for (int const i : fileIndices)
+    for (int const i : file_indices)
     {
-        myPriorities[i] = priority;
+        priorities_[i] = priority;
     }
 }
 
-void OptionsDialog::onWantedChanged(QSet<int> const& fileIndices, bool isWanted)
+void OptionsDialog::onWantedChanged(QSet<int> const& file_indices, bool is_wanted)
 {
-    for (int const i : fileIndices)
+    for (int const i : file_indices)
     {
-        myWanted[i] = isWanted;
+        wanted_[i] = is_wanted;
     }
 }
 
@@ -250,38 +248,38 @@ void OptionsDialog::onAccepted()
 
     tr_variant args;
     tr_variantInitDict(&args, 10);
-    QString downloadDir;
+    QString download_dir;
 
     // "download-dir"
-    if (ui.destinationStack->currentWidget() == ui.destinationButton)
+    if (ui_.destinationStack->currentWidget() == ui_.destinationButton)
     {
-        downloadDir = myLocalDestination.absolutePath();
+        download_dir = local_destination_.absolutePath();
     }
     else
     {
-        downloadDir = ui.destinationEdit->text();
+        download_dir = ui_.destinationEdit->text();
     }
 
-    tr_variantDictAddStr(&args, TR_KEY_download_dir, downloadDir.toUtf8().constData());
+    tr_variantDictAddStr(&args, TR_KEY_download_dir, download_dir.toUtf8().constData());
 
     // paused
-    tr_variantDictAddBool(&args, TR_KEY_paused, !ui.startCheck->isChecked());
+    tr_variantDictAddBool(&args, TR_KEY_paused, !ui_.startCheck->isChecked());
 
     // priority
-    int const index = ui.priorityCombo->currentIndex();
-    int const priority = ui.priorityCombo->itemData(index).toInt();
+    int const index = ui_.priorityCombo->currentIndex();
+    int const priority = ui_.priorityCombo->itemData(index).toInt();
     tr_variantDictAddInt(&args, TR_KEY_bandwidthPriority, priority);
 
     // files-unwanted
-    int count = myWanted.count(false);
+    int count = wanted_.count(false);
 
     if (count > 0)
     {
         tr_variant* l = tr_variantDictAddList(&args, TR_KEY_files_unwanted, count);
 
-        for (int i = 0, n = myWanted.size(); i < n; ++i)
+        for (int i = 0, n = wanted_.size(); i < n; ++i)
         {
-            if (myWanted.at(i) == false)
+            if (!wanted_.at(i))
             {
                 tr_variantListAddInt(l, i);
             }
@@ -289,15 +287,15 @@ void OptionsDialog::onAccepted()
     }
 
     // priority-low
-    count = myPriorities.count(TR_PRI_LOW);
+    count = priorities_.count(TR_PRI_LOW);
 
     if (count > 0)
     {
         tr_variant* l = tr_variantDictAddList(&args, TR_KEY_priority_low, count);
 
-        for (int i = 0, n = myPriorities.size(); i < n; ++i)
+        for (int i = 0, n = priorities_.size(); i < n; ++i)
         {
-            if (myPriorities.at(i) == TR_PRI_LOW)
+            if (priorities_.at(i) == TR_PRI_LOW)
             {
                 tr_variantListAddInt(l, i);
             }
@@ -305,35 +303,35 @@ void OptionsDialog::onAccepted()
     }
 
     // priority-high
-    count = myPriorities.count(TR_PRI_HIGH);
+    count = priorities_.count(TR_PRI_HIGH);
 
     if (count > 0)
     {
         tr_variant* l = tr_variantDictAddList(&args, TR_KEY_priority_high, count);
 
-        for (int i = 0, n = myPriorities.size(); i < n; ++i)
+        for (int i = 0, n = priorities_.size(); i < n; ++i)
         {
-            if (myPriorities.at(i) == TR_PRI_HIGH)
+            if (priorities_.at(i) == TR_PRI_HIGH)
             {
                 tr_variantListAddInt(l, i);
             }
         }
     }
 
-    mySession.addTorrent(myAdd, &args, ui.trashCheck->isChecked());
+    session_.addTorrent(add_, &args, ui_.trashCheck->isChecked());
 
     deleteLater();
 }
 
 void OptionsDialog::onSourceChanged()
 {
-    if (ui.sourceStack->currentWidget() == ui.sourceButton)
+    if (ui_.sourceStack->currentWidget() == ui_.sourceButton)
     {
-        myAdd.set(ui.sourceButton->path());
+        add_.set(ui_.sourceButton->path());
     }
     else
     {
-        myAdd.set(ui.sourceEdit->text());
+        add_.set(ui_.sourceEdit->text());
     }
 
     reload();
@@ -341,14 +339,14 @@ void OptionsDialog::onSourceChanged()
 
 void OptionsDialog::onDestinationChanged()
 {
-    if (ui.destinationStack->currentWidget() == ui.destinationButton)
+    if (ui_.destinationStack->currentWidget() == ui_.destinationButton)
     {
-        myLocalDestination = ui.destinationButton->path();
-        ui.freeSpaceLabel->setPath(myLocalDestination.absolutePath());
+        local_destination_.setPath(ui_.destinationButton->path());
+        ui_.freeSpaceLabel->setPath(local_destination_.absolutePath());
     }
     else
     {
-        ui.freeSpaceLabel->setPath(ui.destinationEdit->text());
+        ui_.freeSpaceLabel->setPath(ui_.destinationEdit->text());
     }
 }
 
@@ -360,37 +358,37 @@ void OptionsDialog::onDestinationChanged()
 
 void OptionsDialog::clearVerify()
 {
-    myVerifyHash.reset();
-    myVerifyFile.close();
-    myVerifyFilePos = 0;
-    myVerifyFlags.clear();
-    myVerifyFileIndex = 0;
-    myVerifyPieceIndex = 0;
-    myVerifyPiecePos = 0;
-    myVerifyTimer.stop();
+    verify_hash_.reset();
+    verify_file_.close();
+    verify_file_pos_ = 0;
+    verify_flags_.clear();
+    verify_file_index_ = 0;
+    verify_piece_index_ = 0;
+    verify_piece_pos_ = 0;
+    verify_timer_.stop();
 
-    for (TorrentFile& f : myFiles)
+    for (TorrentFile& f : files_)
     {
         f.have = 0;
     }
 
-    ui.filesView->update(myFiles);
+    ui_.filesView->update(files_);
 }
 
 void OptionsDialog::onVerify()
 {
     clearVerify();
-    myVerifyFlags.insert(0, myInfo.pieceCount, false);
-    myVerifyTimer.setSingleShot(false);
-    myVerifyTimer.start(0);
+    verify_flags_.insert(0, info_.pieceCount, false);
+    verify_timer_.setSingleShot(false);
+    verify_timer_.start(0);
 }
 
 namespace
 {
 
-uint64_t getPieceSize(tr_info const* info, tr_piece_index_t pieceIndex)
+uint64_t getPieceSize(tr_info const* info, tr_piece_index_t piece_index)
 {
-    if (pieceIndex != info->pieceCount - 1)
+    if (piece_index != info->pieceCount - 1)
     {
         return info->pieceSize;
     }
@@ -402,82 +400,82 @@ uint64_t getPieceSize(tr_info const* info, tr_piece_index_t pieceIndex)
 
 void OptionsDialog::onTimeout()
 {
-    if (myFiles.isEmpty())
+    if (files_.isEmpty())
     {
-        myVerifyTimer.stop();
+        verify_timer_.stop();
         return;
     }
 
-    tr_file const* file = &myInfo.files[myVerifyFileIndex];
+    tr_file const* file = &info_.files[verify_file_index_];
 
-    if (myVerifyFilePos == 0 && !myVerifyFile.isOpen())
+    if (verify_file_pos_ == 0 && !verify_file_.isOpen())
     {
-        QFileInfo const fileInfo(myLocalDestination, QString::fromUtf8(file->name));
-        myVerifyFile.setFileName(fileInfo.absoluteFilePath());
-        myVerifyFile.open(QIODevice::ReadOnly);
+        QFileInfo const file_info(local_destination_, QString::fromUtf8(file->name));
+        verify_file_.setFileName(file_info.absoluteFilePath());
+        verify_file_.open(QIODevice::ReadOnly);
     }
 
-    int64_t leftInPiece = getPieceSize(&myInfo, myVerifyPieceIndex) - myVerifyPiecePos;
-    int64_t leftInFile = file->length - myVerifyFilePos;
-    int64_t bytesThisPass = qMin(leftInFile, leftInPiece);
-    bytesThisPass = qMin(bytesThisPass, static_cast<int64_t>(sizeof(myVerifyBuf)));
+    int64_t left_in_piece = getPieceSize(&info_, verify_piece_index_) - verify_piece_pos_;
+    int64_t left_in_file = file->length - verify_file_pos_;
+    int64_t bytes_this_pass = qMin(left_in_file, left_in_piece);
+    bytes_this_pass = qMin(bytes_this_pass, static_cast<int64_t>(sizeof(verify_buf_)));
 
-    if (myVerifyFile.isOpen() && myVerifyFile.seek(myVerifyFilePos))
+    if (verify_file_.isOpen() && verify_file_.seek(verify_file_pos_))
     {
-        int64_t numRead = myVerifyFile.read(myVerifyBuf, bytesThisPass);
+        int64_t numRead = verify_file_.read(verify_buf_, bytes_this_pass);
 
-        if (numRead == bytesThisPass)
+        if (numRead == bytes_this_pass)
         {
-            myVerifyHash.addData(myVerifyBuf, numRead);
+            verify_hash_.addData(verify_buf_, numRead);
         }
     }
 
-    leftInPiece -= bytesThisPass;
-    leftInFile -= bytesThisPass;
-    myVerifyPiecePos += bytesThisPass;
-    myVerifyFilePos += bytesThisPass;
+    left_in_piece -= bytes_this_pass;
+    left_in_file -= bytes_this_pass;
+    verify_piece_pos_ += bytes_this_pass;
+    verify_file_pos_ += bytes_this_pass;
 
-    myVerifyBins[myVerifyFileIndex] += bytesThisPass;
+    verify_bins_[verify_file_index_] += bytes_this_pass;
 
-    if (leftInPiece == 0)
+    if (left_in_piece == 0)
     {
-        QByteArray const result(myVerifyHash.result());
-        bool const matches = memcmp(result.constData(), myInfo.pieces[myVerifyPieceIndex].hash, SHA_DIGEST_LENGTH) == 0;
-        myVerifyFlags[myVerifyPieceIndex] = matches;
-        myVerifyPiecePos = 0;
-        ++myVerifyPieceIndex;
-        myVerifyHash.reset();
+        QByteArray const result(verify_hash_.result());
+        bool const matches = memcmp(result.constData(), info_.pieces[verify_piece_index_].hash, SHA_DIGEST_LENGTH) == 0;
+        verify_flags_[verify_piece_index_] = matches;
+        verify_piece_pos_ = 0;
+        ++verify_piece_index_;
+        verify_hash_.reset();
 
-        FileList changedFiles;
+        FileList changed_files;
 
         if (matches)
         {
-            for (auto i = myVerifyBins.begin(), end = myVerifyBins.end(); i != end; ++i)
+            for (auto i = verify_bins_.begin(), end = verify_bins_.end(); i != end; ++i)
             {
-                TorrentFile& f(myFiles[i.key()]);
+                TorrentFile& f(files_[i.key()]);
                 f.have += i.value();
-                changedFiles.append(f);
+                changed_files.append(f);
             }
         }
 
-        ui.filesView->update(changedFiles);
-        myVerifyBins.clear();
+        ui_.filesView->update(changed_files);
+        verify_bins_.clear();
     }
 
-    if (leftInFile == 0)
+    if (left_in_file == 0)
     {
-        myVerifyFile.close();
-        ++myVerifyFileIndex;
-        myVerifyFilePos = 0;
+        verify_file_.close();
+        ++verify_file_index_;
+        verify_file_pos_ = 0;
     }
 
-    bool done = myVerifyPieceIndex >= myInfo.pieceCount;
+    bool done = verify_piece_index_ >= info_.pieceCount;
 
     if (done)
     {
         uint64_t have = 0;
 
-        for (TorrentFile const& f : myFiles)
+        for (TorrentFile const& f : files_)
         {
             have += f.have;
         }
@@ -487,10 +485,10 @@ void OptionsDialog::onTimeout()
             // did the user accidentally specify the child directory instead of the parent?
             QStringList const tokens = QString::fromUtf8(file->name).split(QLatin1Char('/'));
 
-            if (!tokens.empty() && myLocalDestination.dirName() == tokens.at(0))
+            if (!tokens.empty() && local_destination_.dirName() == tokens.at(0))
             {
                 // move up one directory and try again
-                myLocalDestination.cdUp();
+                local_destination_.cdUp();
                 onVerify();
                 done = false;
             }
@@ -499,6 +497,6 @@ void OptionsDialog::onTimeout()
 
     if (done)
     {
-        myVerifyTimer.stop();
+        verify_timer_.stop();
     }
 }

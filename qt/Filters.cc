@@ -8,23 +8,23 @@
 
 #include "Filters.h"
 
-QString const FilterMode::names[NUM_MODES] =
+QString const FilterMode::names_[NUM_MODES] =
 {
-    QLatin1String("show-all"),
-    QLatin1String("show-active"),
-    QLatin1String("show-downloading"),
-    QLatin1String("show-seeding"),
-    QLatin1String("show-paused"),
-    QLatin1String("show-finished"),
-    QLatin1String("show-verifying"),
-    QLatin1String("show-error")
+    QStringLiteral("show-all"),
+    QStringLiteral("show-active"),
+    QStringLiteral("show-downloading"),
+    QStringLiteral("show-seeding"),
+    QStringLiteral("show-paused"),
+    QStringLiteral("show-finished"),
+    QStringLiteral("show-verifying"),
+    QStringLiteral("show-error")
 };
 
 int FilterMode::modeFromName(QString const& name)
 {
     for (int i = 0; i < NUM_MODES; ++i)
     {
-        if (names[i] == name)
+        if (names_[i] == name)
         {
             return i;
         }
@@ -33,25 +33,25 @@ int FilterMode::modeFromName(QString const& name)
     return FilterMode().mode(); // use the default value
 }
 
-QString const SortMode::names[NUM_MODES] =
+QString const SortMode::names_[NUM_MODES] =
 {
-    QLatin1String("sort-by-activity"),
-    QLatin1String("sort-by-age"),
-    QLatin1String("sort-by-eta"),
-    QLatin1String("sort-by-name"),
-    QLatin1String("sort-by-progress"),
-    QLatin1String("sort-by-queue"),
-    QLatin1String("sort-by-ratio"),
-    QLatin1String("sort-by-size"),
-    QLatin1String("sort-by-state"),
-    QLatin1String("sort-by-id")
+    QStringLiteral("sort-by-activity"),
+    QStringLiteral("sort-by-age"),
+    QStringLiteral("sort-by-eta"),
+    QStringLiteral("sort-by-name"),
+    QStringLiteral("sort-by-progress"),
+    QStringLiteral("sort-by-queue"),
+    QStringLiteral("sort-by-ratio"),
+    QStringLiteral("sort-by-size"),
+    QStringLiteral("sort-by-state"),
+    QStringLiteral("sort-by-id")
 };
 
 int SortMode::modeFromName(QString const& name)
 {
     for (int i = 0; i < NUM_MODES; ++i)
     {
-        if (names[i] == name)
+        if (names_[i] == name)
         {
             return i;
         }
