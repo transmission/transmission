@@ -124,36 +124,28 @@ tr_magnet_info* tr_magnetParse(char const* uri)
     {
         for (char const* walk = uri + 8; !tr_str_is_empty(walk);)
         {
+            char const* next = strchr(walk, '&');
             char const* key = walk;
-            char const* delim = strchr(key, '=');
-            char const* val = delim == NULL ? NULL : delim + 1;
-            char const* next = strchr(delim == NULL ? key : val, '&');
-            size_t keylen;
-            size_t vallen;
+            char const* val = strchr(key, '=');
 
-            if (delim != NULL)
+            size_t keylen = 0;
+            size_t vallen = 0;
+
+            if (next != NULL && val != NULL && val <= next)
             {
-                keylen = (size_t)(delim - key);
+                keylen = (size_t)(val - key);
+                val++;
+                vallen = (size_t)(next - val);
             }
             else if (next != NULL)
             {
                 keylen = (size_t)(next - key);
-            }
-            else
-            {
-                keylen = strlen(key);
-            }
-
-            if (val == NULL)
-            {
                 vallen = 0;
             }
-            else if (next != NULL)
+            else if (val != NULL)
             {
-                vallen = (size_t)(next - val);
-            }
-            else
-            {
+                keylen = (size_t)(val - key);
+                val++;
                 vallen = strlen(val);
             }
 
