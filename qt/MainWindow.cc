@@ -583,7 +583,7 @@ namespace
 
 #define HAVE_OPEN_SELECT
 
-static void openSelect(QString const& path)
+void openSelect(QString const& path)
 {
     auto const explorer = QStringLiteral("explorer");
     QString param;
@@ -601,7 +601,7 @@ static void openSelect(QString const& path)
 
 #define HAVE_OPEN_SELECT
 
-static void openSelect(QString const& path)
+void openSelect(QString const& path)
 {
     QStringList script_args;
     script_args << QStringLiteral("-e") <<
