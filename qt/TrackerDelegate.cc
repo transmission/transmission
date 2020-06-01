@@ -29,9 +29,9 @@
 namespace
 {
 
-auto constexpr Spacing = int { 6 };
+auto constexpr Spacing = int{ 6 };
 
-auto constexpr Margin = QSize { 10, 10 };
+auto constexpr Margin = QSize{ 10, 10 };
 
 class ItemLayout
 {
