@@ -8,6 +8,7 @@
 
 #include <array>
 #include <cassert>
+#include <utility>
 
 #include <QCheckBox>
 #include <QFileDialog>
@@ -185,17 +186,15 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     ui_.action_QueueMoveDown->setIcon(getStockIcon(QStringLiteral("go-down"), QStyle::SP_ArrowDown));
     ui_.action_QueueMoveBottom->setIcon(getStockIcon(QStringLiteral("go-bottom")));
 
-    auto make_network_pixmap = [this](char const* name_in, QSize size = QSize(16, 16))
+    auto make_network_pixmap = [this](QString name, QSize size = { 16, 16 })
         {
-            auto const name = QString::fromUtf8(name_in);
-            QIcon const icon = getStockIcon(name, QStyle::SP_DriveNetIcon);
-            return icon.pixmap(size);
+            return getStockIcon(name, QStyle::SP_DriveNetIcon).pixmap(size);
         };
-    pixmap_network_error_ = make_network_pixmap("network-error");
-    pixmap_network_idle_ = make_network_pixmap("network-idle");
-    pixmap_network_receive_ = make_network_pixmap("network-receive");
-    pixmap_network_transmit_ = make_network_pixmap("network-transmit");
-    pixmap_network_transmit_receive_ = make_network_pixmap("network-transmit-receive");
+    pixmap_network_error_ = make_network_pixmap(QStringLiteral("network-error"));
+    pixmap_network_idle_ = make_network_pixmap(QStringLiteral("network-idle"));
+    pixmap_network_receive_ = make_network_pixmap(QStringLiteral("network-receive"));
+    pixmap_network_transmit_ = make_network_pixmap(QStringLiteral("network-transmit"));
+    pixmap_network_transmit_receive_ = make_network_pixmap(QStringLiteral("network-transmit-receive"));
 
     // ui signals
     connect(ui_.action_Toolbar, SIGNAL(toggled(bool)), this, SLOT(setToolbarVisible(bool)));
@@ -250,18 +249,18 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     ui_.listView->setModel(&filter_model_);
     connect(ui_.listView->selectionModel(), &QItemSelectionModel::selectionChanged, refresh_action_sensitivity_soon);
 
-    std::array<QPair<QAction*, int>, SortMode::NUM_MODES> sort_modes =
-    {
-        qMakePair(ui_.action_SortByActivity, static_cast<int>(SortMode::SORT_BY_ACTIVITY)),
-        qMakePair(ui_.action_SortByAge, static_cast<int>(SortMode::SORT_BY_AGE)),
-        qMakePair(ui_.action_SortByETA, static_cast<int>(SortMode::SORT_BY_ETA)),
-        qMakePair(ui_.action_SortByName, static_cast<int>(SortMode::SORT_BY_NAME)),
-        qMakePair(ui_.action_SortByProgress, static_cast<int>(SortMode::SORT_BY_PROGRESS)),
-        qMakePair(ui_.action_SortByQueue, static_cast<int>(SortMode::SORT_BY_QUEUE)),
-        qMakePair(ui_.action_SortByRatio, static_cast<int>(SortMode::SORT_BY_RATIO)),
-        qMakePair(ui_.action_SortBySize, static_cast<int>(SortMode::SORT_BY_SIZE)),
-        qMakePair(ui_.action_SortByState, static_cast<int>(SortMode::SORT_BY_STATE))
-    };
+    std::array<std::pair<QAction*, int>, 9> const sort_modes =
+    {{
+         { ui_.action_SortByActivity, SortMode::SORT_BY_ACTIVITY },
+         { ui_.action_SortByAge, SortMode::SORT_BY_AGE },
+         { ui_.action_SortByETA, SortMode::SORT_BY_ETA },
+         { ui_.action_SortByName, SortMode::SORT_BY_NAME },
+         { ui_.action_SortByProgress, SortMode::SORT_BY_PROGRESS },
+         { ui_.action_SortByQueue, SortMode::SORT_BY_QUEUE },
+         { ui_.action_SortByRatio, SortMode::SORT_BY_RATIO },
+         { ui_.action_SortBySize, SortMode::SORT_BY_SIZE },
+         { ui_.action_SortByState, SortMode::SORT_BY_STATE }
+    }};
 
     // NOLINTNEXTLINE(clang-analyzer-cplusplus.NewDeleteLeaks)
     auto* action_group = new QActionGroup(this);
