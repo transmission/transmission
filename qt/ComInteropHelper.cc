@@ -22,10 +22,10 @@ QAXCLASS(InteropObject)
 QAXFACTORY_END()
 
 // These are ActiveQt internals; declaring here as I don't like their WinMain much...
-extern HANDLE qAxInstance;
-extern bool qAxOutProcServer;
-extern wchar_t qAxModuleFilename[MAX_PATH];
-extern QString qAxInit();
+extern HANDLE qAxInstance; // NOLINT
+extern bool qAxOutProcServer; // NOLINT
+extern wchar_t qAxModuleFilename[MAX_PATH]; // NOLINT
+extern QString qAxInit(); // NOLINT
 
 ComInteropHelper::ComInteropHelper() :
     client_(new QAxObject(QStringLiteral("Transmission.QtClient")))
