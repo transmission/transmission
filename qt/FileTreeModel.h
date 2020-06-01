@@ -8,10 +8,9 @@
 
 #pragma once
 
-#include <cstdint>
+#include <cstdint> // uint64_t
 
 #include <QAbstractItemModel>
-#include <QList>
 #include <QMap>
 #include <QSet>
 

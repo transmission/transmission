@@ -29,7 +29,7 @@ public:
 
     static Speed fromBps(int Bps)
     {
-        return Speed { Bps };
+        return Speed{ Bps };
     }
 
     void setBps(int Bps)
@@ -45,7 +45,7 @@ public:
 
     [[nodiscard]] Speed operator +(Speed const& that) const
     {
-        return Speed { getBps() + that.getBps() };
+        return Speed{ getBps() + that.getBps() };
     }
 
     [[nodiscard]] bool operator <(Speed const& that) const

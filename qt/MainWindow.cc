@@ -251,15 +251,15 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
 
     std::array<std::pair<QAction*, int>, 9> const sort_modes =
     {{
-         { ui_.action_SortByActivity, SortMode::SORT_BY_ACTIVITY },
-         { ui_.action_SortByAge, SortMode::SORT_BY_AGE },
-         { ui_.action_SortByETA, SortMode::SORT_BY_ETA },
-         { ui_.action_SortByName, SortMode::SORT_BY_NAME },
-         { ui_.action_SortByProgress, SortMode::SORT_BY_PROGRESS },
-         { ui_.action_SortByQueue, SortMode::SORT_BY_QUEUE },
-         { ui_.action_SortByRatio, SortMode::SORT_BY_RATIO },
-         { ui_.action_SortBySize, SortMode::SORT_BY_SIZE },
-         { ui_.action_SortByState, SortMode::SORT_BY_STATE }
+        { ui_.action_SortByActivity, SortMode::SORT_BY_ACTIVITY },
+        { ui_.action_SortByAge, SortMode::SORT_BY_AGE },
+        { ui_.action_SortByETA, SortMode::SORT_BY_ETA },
+        { ui_.action_SortByName, SortMode::SORT_BY_NAME },
+        { ui_.action_SortByProgress, SortMode::SORT_BY_PROGRESS },
+        { ui_.action_SortByQueue, SortMode::SORT_BY_QUEUE },
+        { ui_.action_SortByRatio, SortMode::SORT_BY_RATIO },
+        { ui_.action_SortBySize, SortMode::SORT_BY_SIZE },
+        { ui_.action_SortByState, SortMode::SORT_BY_STATE }
     }};
 
     // NOLINTNEXTLINE(clang-analyzer-cplusplus.NewDeleteLeaks)
@@ -313,14 +313,26 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     connect(&filter_model_, &TorrentFilter::rowsRemoved, this, refresh_header_soon);
     connect(ui_.listView, SIGNAL(headerDoubleClicked()), filter_bar_, SLOT(clear()));
 
-    QList<int> init_keys;
-    init_keys << Prefs::MAIN_WINDOW_X << Prefs::SHOW_TRAY_ICON << Prefs::SORT_REVERSED << Prefs::SORT_MODE <<
-        Prefs::FILTERBAR <<
-        Prefs::STATUSBAR << Prefs::STATUSBAR_STATS << Prefs::TOOLBAR << Prefs::ALT_SPEED_LIMIT_ENABLED <<
-        Prefs::COMPACT_VIEW << Prefs::DSPEED << Prefs::DSPEED_ENABLED << Prefs::USPEED << Prefs::USPEED_ENABLED <<
-        Prefs::RATIO << Prefs::RATIO_ENABLED;
-
-    for (int const key : init_keys)
+    static std::array<int, 16> constexpr InitKeys =
+    {
+        Prefs::ALT_SPEED_LIMIT_ENABLED,
+        Prefs::COMPACT_VIEW,
+        Prefs::DSPEED,
+        Prefs::DSPEED_ENABLED,
+        Prefs::FILTERBAR,
+        Prefs::MAIN_WINDOW_X,
+        Prefs::RATIO,
+        Prefs::RATIO_ENABLED,
+        Prefs::SHOW_TRAY_ICON,
+        Prefs::SORT_MODE,
+        Prefs::SORT_REVERSED,
+        Prefs::STATUSBAR,
+        Prefs::STATUSBAR_STATS,
+        Prefs::TOOLBAR,
+        Prefs::USPEED,
+        Prefs::USPEED_ENABLED,
+    };
+    for (auto const key : InitKeys)
     {
         refreshPref(key);
     }

@@ -221,10 +221,13 @@ DetailsDialog::DetailsDialog(Session& session, Prefs& prefs, TorrentModel const&
     adjustSize();
     ui_.commentBrowser->setMaximumHeight(QWIDGETSIZE_MAX);
 
-    QList<int> init_keys;
-    init_keys << Prefs::SHOW_TRACKER_SCRAPES << Prefs::SHOW_BACKUP_TRACKERS;
+    static std::array<int, 2> constexpr InitKeys =
+    {
+        Prefs::SHOW_TRACKER_SCRAPES,
+        Prefs::SHOW_BACKUP_TRACKERS
+    };
 
-    for (int const key : init_keys)
+    for (int const key : InitKeys)
     {
         refreshPref(key);
     }

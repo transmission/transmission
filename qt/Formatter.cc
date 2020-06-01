@@ -27,7 +27,7 @@ auto constexpr MemBase = 1024;
 
 } // namespace
 
-std::array<std::array<QString, Formatter::NUM_SIZES>, Formatter::NUM_TYPES> Formatter::unit_strings {};
+std::array<std::array<QString, Formatter::NUM_SIZES>, Formatter::NUM_TYPES> Formatter::unit_strings{};
 
 void Formatter::initUnits()
 {
@@ -69,7 +69,7 @@ double Speed::getKBps() const
 
 Speed Speed::fromKBps(double KBps)
 {
-    return Speed { static_cast<int>(KBps * SpeedBase) };
+    return Speed{ static_cast<int>(KBps * SpeedBase) };
 }
 
 /***

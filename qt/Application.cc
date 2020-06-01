@@ -107,10 +107,8 @@ Application::Application(int& argc, char** argv) :
 
     if (icon.isNull())
     {
-        QList<int> sizes;
-        sizes << 16 << 22 << 24 << 32 << 48 << 64 << 72 << 96 << 128 << 192 << 256;
-
-        for (int const size : sizes)
+        static std::array<int, 11> constexpr Sizes = { 16, 22, 24, 32, 48, 64, 72, 96, 128, 192, 256 };
+        for (auto const size : Sizes)
         {
             icon.addPixmap(QPixmap(QStringLiteral(":/icons/transmission-%1.png").arg(size)));
         }
