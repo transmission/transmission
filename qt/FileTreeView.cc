@@ -308,7 +308,7 @@ void FileTreeView::onlyCheckSelectedItems()
             continue;
         }
 
-        auto* parent_model = parent_index.model();
+        auto const* parent_model = parent_index.model();
 
         for (int i = 0, count = model_->rowCount(parent_index); i < count; ++i)
         {

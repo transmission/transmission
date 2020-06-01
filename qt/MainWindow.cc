@@ -932,6 +932,7 @@ void MainWindow::refreshActionSensitivity()
 ***
 **/
 
+// NOLINTNEXTLINE(readability-make-member-function-const)
 void MainWindow::clearSelection()
 {
     ui_.action_DeselectAll->trigger();
