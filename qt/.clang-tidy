@@ -44,8 +44,7 @@ Checks: >
   -readability-static-accessed-through-instance
 
 WarningsAsErrors: >
-  *,
-  -readability-identifier-naming # needed due to _WIN32_WINNT
+  *
 
 CheckOptions:
   - { key: readability-identifier-naming.ClassCase,                value: CamelCase  }
@@ -54,7 +53,6 @@ CheckOptions:
   - { key: readability-identifier-naming.EnumConstantCase,         value: UPPER_CASE }
   - { key: readability-identifier-naming.FunctionCase,             value: camelBack  }
   - { key: readability-identifier-naming.GlobalConstantCase,       value: CamelCase  }
-  - { key: readability-identifier-naming.MacroDefinitionCase,      value: UPPER_CASE }
   - { key: readability-identifier-naming.MemberConstantCase,       value: CamelCase  }
   - { key: readability-identifier-naming.NamespaceCase,            value: lower_case }
   - { key: readability-identifier-naming.PrivateMemberSuffix,      value: _          }
