@@ -626,8 +626,7 @@ FaviconCache& Application::faviconCache()
 ****
 ***/
 
-// NOLINTNEXTLINE
-int tr_main(int argc, char* argv[])
+int tr_main(int argc, char** argv)
 {
     InteropHelper::initialize();
 
