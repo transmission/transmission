@@ -8,11 +8,10 @@
 
 #pragma once
 
-#include <algorithm>
 #include <array>
 #include <cstdint> // int64_t
 
-#include <QCoreApplication>
+#include <QCoreApplication> // Q_DECLARE_TR_FUNCTIONS
 #include <QString>
 
 class Speed;
@@ -54,11 +53,11 @@ public:
 
     static QString unitStr(Type t, Size s)
     {
-        return unit_strings[t][s];
+        return UnitStrings[t][s];
     }
 
     static void initUnits();
 
 private:
-    static std::array<std::array<QString, NUM_SIZES>, NUM_TYPES> unit_strings;
+    static std::array<std::array<QString, Formatter::NUM_SIZES>, Formatter::NUM_TYPES> const UnitStrings;
 };

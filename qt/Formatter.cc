@@ -27,35 +27,25 @@ auto constexpr MemBase = 1024;
 
 } // namespace
 
-std::array<std::array<QString, Formatter::NUM_SIZES>, Formatter::NUM_TYPES> Formatter::unit_strings{};
+std::array<std::array<QString, Formatter::NUM_SIZES>, Formatter::NUM_TYPES> const Formatter::UnitStrings =
+{{
+    /* SPEED */ { tr("B/s"), tr("kB/s"), tr("MB/s"), tr("GB/s"), tr("TB/s") },
+    /* SIZE */ { tr("B"), tr("kB"), tr("MB"), tr("GB"), tr("TB") },
+    /* MEM  */ { tr("B"), tr("KiB"), tr("MiB"), tr("GiB"), tr("TiB") }
+}};
 
 void Formatter::initUnits()
 {
-    unit_strings[SPEED][B] = tr("B/s");
-    unit_strings[SPEED][KB] = tr("kB/s");
-    unit_strings[SPEED][MB] = tr("MB/s");
-    unit_strings[SPEED][GB] = tr("GB/s");
-    unit_strings[SPEED][TB] = tr("TB/s");
-    tr_formatter_speed_init(SpeedBase, unit_strings[SPEED][KB].toUtf8().constData(),
-        unit_strings[SPEED][MB].toUtf8().constData(),
-        unit_strings[SPEED][GB].toUtf8().constData(), unit_strings[SPEED][TB].toUtf8().constData());
+    tr_formatter_speed_init(SpeedBase, UnitStrings[SPEED][KB].toUtf8().constData(),
+        UnitStrings[SPEED][MB].toUtf8().constData(), UnitStrings[SPEED][GB].toUtf8().constData(),
+        UnitStrings[SPEED][TB].toUtf8().constData());
 
-    unit_strings[SIZE][B] = tr("B");
-    unit_strings[SIZE][KB] = tr("kB");
-    unit_strings[SIZE][MB] = tr("MB");
-    unit_strings[SIZE][GB] = tr("GB");
-    unit_strings[SIZE][TB] = tr("TB");
-    tr_formatter_size_init(SizeBase, unit_strings[SIZE][KB].toUtf8().constData(),
-        unit_strings[SIZE][MB].toUtf8().constData(),
-        unit_strings[SIZE][GB].toUtf8().constData(), unit_strings[SIZE][TB].toUtf8().constData());
+    tr_formatter_size_init(SizeBase, UnitStrings[SIZE][KB].toUtf8().constData(),
+        UnitStrings[SIZE][MB].toUtf8().constData(),
+        UnitStrings[SIZE][GB].toUtf8().constData(), UnitStrings[SIZE][TB].toUtf8().constData());
 
-    unit_strings[MEM][B] = tr("B");
-    unit_strings[MEM][KB] = tr("KiB");
-    unit_strings[MEM][MB] = tr("MiB");
-    unit_strings[MEM][GB] = tr("GiB");
-    unit_strings[MEM][TB] = tr("TiB");
-    tr_formatter_mem_init(MemBase, unit_strings[MEM][KB].toUtf8().constData(), unit_strings[MEM][MB].toUtf8().constData(),
-        unit_strings[MEM][GB].toUtf8().constData(), unit_strings[MEM][TB].toUtf8().constData());
+    tr_formatter_mem_init(MemBase, UnitStrings[MEM][KB].toUtf8().constData(), UnitStrings[MEM][MB].toUtf8().constData(),
+        UnitStrings[MEM][GB].toUtf8().constData(), UnitStrings[MEM][TB].toUtf8().constData());
 }
 
 /***
