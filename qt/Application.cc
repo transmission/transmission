@@ -626,7 +626,7 @@ FaviconCache& Application::faviconCache()
 ****
 ***/
 
-// NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
+// NOLINTNEXTLINE
 int tr_main(int argc, char* argv[])
 {
     InteropHelper::initialize();
