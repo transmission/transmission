@@ -122,7 +122,7 @@ static void tr_natpmpResetExternalIPAddress(struct tr_natpmp* nat)
     nat->ipv4AddrStr[0] = '\0';
 }
 
-char const *tr_natpmpGetExternalIP(struct tr_natpmp const* nat)
+char const* tr_natpmpGetExternalIP(struct tr_natpmp const* nat)
 {
     return nat->ipv4AddrStr;
 }

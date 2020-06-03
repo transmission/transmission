@@ -193,7 +193,8 @@ static int tr_upnpUpdateExternalIPAddress(tr_upnp* handle)
 
     if (err != 0)
     {
-        tr_logAddNamedDbg(getKey(), "Can't get External IP Address, error is %d (errno %d - %s)", err, errno, tr_strerror(errno));
+        tr_logAddNamedDbg(getKey(), "Can't get External IP Address, error is %d (errno %d - %s)",
+            err, errno, tr_strerror(errno));
     }
 
     if (tr_strcmp0(handle->ipv4AddrStr, "0.0.0.0") == 0)

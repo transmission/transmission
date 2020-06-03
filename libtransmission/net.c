@@ -714,7 +714,7 @@ char const* tr_globalIPv4Str(void)
 {
     static char ipv4_str[16];
     static time_t last_time = 0;
-    time_t const now = tr_time ();
+    time_t const now = tr_time();
 
     /* Re-check every half hour */
     if (last_time < now - 1800)

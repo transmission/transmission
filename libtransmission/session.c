@@ -3117,7 +3117,7 @@ char const* tr_sessionGetExternalIPStr(tr_session const* session)
     /* Assume direct Internet connection and try to guess our address */
     pub_addr = tr_sessionGetPublicAddress(session, TR_AF_INET, &is_default);
 
-    if(pub_addr != NULL && !is_default)
+    if (pub_addr != NULL && !is_default)
     {
         return tr_address_to_string(pub_addr);
     }

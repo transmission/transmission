@@ -333,7 +333,7 @@ static CURL* createEasy(tr_session* s, struct tr_web* web, struct tr_web_task* t
             task->headers = curl_slist_append(task->headers, header);
             TR_ASSERT(task->headers != NULL);
             curl_easy_setopt(e, CURLOPT_HTTPHEADER, task->headers);
-            tr_free (header);
+            tr_free(header);
         }
     }
 

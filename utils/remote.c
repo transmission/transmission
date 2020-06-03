@@ -1758,12 +1758,12 @@ static void printSession(tr_variant* top)
 
         if (tr_variantDictFindBool(args, TR_KEY_announce_external_ip, &boolVal))
         {
-            printf ("  Announce external IP address enabled: %s\n", (boolVal ? "Yes" : "No"));
+            printf("  Announce external IP address enabled: %s\n", (boolVal ? "Yes" : "No"));
         }
 
         if (tr_variantDictFindStr(args, TR_KEY_static_external_ip, &str, NULL))
         {
-            printf ("  External IP address: %s\n", (str && *str) ? str : "Autodetect");
+            printf("  External IP address: %s\n", (str && *str) ? str : "Autodetect");
         }
 
         if (tr_variantDictFindBool(args, TR_KEY_utp_enabled, &boolVal))
