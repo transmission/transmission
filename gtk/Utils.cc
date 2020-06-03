@@ -7,7 +7,6 @@
  */
 
 #include <array>
-#include <ctype.h> /* isxdigit() */
 #include <errno.h>
 #include <limits.h> /* INT_MAX */
 #include <stdarg.h>
@@ -177,25 +176,12 @@ bool gtr_is_supported_url(Glib::ustring const& str)
 
 bool gtr_is_magnet_link(Glib::ustring const& str)
 {
-    return !str.empty() && Glib::str_has_prefix(str, "magnet:?");
+    return tr_isMagnet(str.c_str());
 }
 
 bool gtr_is_hex_hashcode(std::string const& str)
 {
-    if (str.size() != 40)
-    {
-        return false;
-    }
-
-    for (int i = 0; i < 40; ++i)
-    {
-        if (!isxdigit(str[i]))
-        {
-            return false;
-        }
-    }
-
-    return true;
+    return tr_maybeHash(str.c_str());
 }
 
 namespace

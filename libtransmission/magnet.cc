@@ -105,6 +105,11 @@ static void base32_to_sha1(uint8_t* out, char const* in, size_t const inlen)
 ****
 ***/
 
+bool tr_isMagnet(char const* uri)
+{
+    return uri != NULL && strncmp(uri, "magnet:?", 8) == 0;
+}
+
 static bool tr_isHex(char const* in, size_t const inlen)
 {
     size_t i;
@@ -144,9 +149,14 @@ static bool tr_isBase32(char const* in, size_t const inlen)
 
 bool tr_maybeHash(char const* uri)
 {
-    size_t len = strlen(uri);
+    size_t len;
 
-    if((len == 32) && tr_isBase32(uri, len))
+    if (uri == NULL)
+        return false;
+
+    len = strlen(uri);
+
+    if ((len == 32) && tr_isBase32(uri, len))
         return true;
 
     if ((len == 40) && tr_isHex(uri, len))
@@ -185,7 +195,7 @@ tr_magnet_info* tr_magnetParse(char const* uri)
     uint8_t sha1[SHA_DIGEST_LENGTH];
     tr_magnet_info* info = nullptr;
 
-    if (uri != nullptr && strncmp(uri, "magnet:?", 8) == 0)
+    if (tr_isMagnet(uri))
     {
         for (char const* walk = uri + 8; !tr_str_is_empty(walk);)
         {

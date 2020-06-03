@@ -1830,7 +1830,7 @@ static char const* torrentAdd(tr_session* session, tr_variant* args_in, tr_varia
             tr_ctorSetMetainfo(ctor, (uint8_t*)metainfo, len);
             tr_free(metainfo);
         }
-        else if (strncmp(fname, "magnet:?", 8) == 0 || tr_maybeHash(fname))
+        else if (tr_isMagnet(fname) || tr_maybeHash(fname))
         {
             tr_ctorSetMetainfoFromMagnetLink(ctor, fname);
         }

@@ -1562,7 +1562,7 @@ void MainWindow::dragEnterEvent(QDragEnterEvent* event)
 
     if (mime->hasFormat(QStringLiteral("application/x-bittorrent")) || mime->hasUrls() ||
         mime->text().trimmed().endsWith(QStringLiteral(".torrent"), Qt::CaseInsensitive) ||
-        mime->text().startsWith(QStringLiteral("magnet:"), Qt::CaseInsensitive))
+        Utils::isMagnetLink(mime->text()) || Utils::isHexHashcode(mime->text()))
     {
         event->acceptProposedAction();
     }

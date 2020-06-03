@@ -1208,8 +1208,7 @@ bool Session::Impl::add_file(Glib::RefPtr<Gio::File> const& file, bool do_start,
 
             if (gtr_is_hex_hashcode(str))
             {
-                auto const magnet = gtr_sprintf("magnet:?xt=urn:btih:%s", str);
-                loaded = !tr_ctorSetMetainfoFromMagnetLink(ctor, magnet.c_str());
+                loaded = !tr_ctorSetMetainfoFromMagnetLink(ctor, str.c_str());
             }
         }
 

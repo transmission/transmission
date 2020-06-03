@@ -971,6 +971,8 @@ void tr_metainfoFree(tr_info* inf);
  */
 tr_torrent* tr_torrentNew(tr_ctor const* ctor, int* setme_error, int* setme_duplicate_id);
 
+/** @brief Check if uri is 'magnet:' (with NULL check) */
+bool tr_isMagnet(char const* uri);
 
 /** @brief Check if uri may be interpreted as raw hash */
 bool tr_maybeHash(char const* uri);
