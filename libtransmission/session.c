@@ -3098,7 +3098,7 @@ char const* tr_sessionGetExternalIPStr(tr_session const* session)
     /* User defined IP has maximum priority */
     ipv4_str = tr_sessionGetStaticExternalIP(session);
 
-    if (ipv4_str != NULL && *ipv4_str != '\0')
+    if (!tr_str_is_empty(ipv4_str))
     {
         return ipv4_str;
     }
@@ -3109,7 +3109,7 @@ char const* tr_sessionGetExternalIPStr(tr_session const* session)
         ipv4_str = tr_sharedGetExternalIP(session->shared);
     }
 
-    if (ipv4_str != NULL && *ipv4_str != '\0')
+    if (!tr_str_is_empty(ipv4_str))
     {
         return ipv4_str;
     }
@@ -3131,7 +3131,7 @@ uint32_t tr_sessionGetExternalIPAddr(tr_session const* session)
     char const* ipv4_str = tr_sessionGetExternalIPStr(session);
     tr_address taddr;
 
-    if (ipv4_str == NULL || *ipv4_str == '\0')
+    if (tr_str_is_empty(ipv4_str))
     {
         return ipv4_addr;
     }

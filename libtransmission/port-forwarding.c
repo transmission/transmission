@@ -266,7 +266,7 @@ char const* tr_sharedGetExternalIP(tr_shared const* s)
         ipv4_str = tr_natpmpGetExternalIP(s->natpmp);
     }
 
-    if ((ipv4_str == NULL || *ipv4_str == '\0') && s->upnp != NULL)
+    if (tr_str_is_empty(ipv4_str) && s->upnp != NULL)
     {
         ipv4_str = tr_upnpGetExternalIP(s->upnp);
     }

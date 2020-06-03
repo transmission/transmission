@@ -108,7 +108,7 @@ static char* announce_url_new(tr_session const* session, tr_announce_request con
 
     str = tr_sessionGetExternalIPStr(session);
 
-    if (str != NULL && *str != '\0')
+    if (!tr_str_is_empty(str))
     {
         evbuffer_add_printf(buf, "&ip=%s", str);
     }
