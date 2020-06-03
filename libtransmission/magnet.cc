@@ -152,15 +152,21 @@ bool tr_maybeHash(char const* uri)
     size_t len;
 
     if (uri == NULL)
+    {
         return false;
+    }
 
     len = strlen(uri);
 
     if ((len == 32) && tr_isBase32(uri, len))
+    {
         return true;
+    }
 
     if ((len == 40) && tr_isHex(uri, len))
+    {
         return true;
+    }
 
     return false;
 }
