@@ -251,14 +251,14 @@ bool FileTreeView::edit(QModelIndex const& index, EditTrigger trigger, QEvent* e
         return false;
     }
 
-    QModelIndex const nameIndex = index.sibling(index.row(), FileTreeModel::COL_NAME);
+    QModelIndex const name_index = index.sibling(index.row(), FileTreeModel::COL_NAME);
 
     if (editTriggers().testFlag(trigger))
     {
-        selectionModel()->setCurrentIndex(nameIndex, QItemSelectionModel::NoUpdate);
+        selectionModel()->setCurrentIndex(name_index, QItemSelectionModel::NoUpdate);
     }
 
-    return QTreeView::edit(nameIndex, trigger, event);
+    return QTreeView::edit(name_index, trigger, event);
 }
 
 void FileTreeView::checkSelectedItems()
@@ -308,9 +308,11 @@ void FileTreeView::onlyCheckSelectedItems()
             continue;
         }
 
+        auto const* parent_model = parent_index.model();
+
         for (int i = 0, count = model_->rowCount(parent_index); i < count; ++i)
         {
-            QModelIndex const child_index = parent_index.child(i, 0);
+            QModelIndex const child_index = parent_model->index(i, 0, parent_index);
             int const child_check_state = child_index.data(FileTreeModel::WantedRole).toInt();
 
             if (child_check_state == Qt::Unchecked ||

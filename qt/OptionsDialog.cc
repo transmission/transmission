@@ -25,9 +25,9 @@
 ****
 ***/
 
-OptionsDialog::OptionsDialog(Session& session, Prefs const& prefs, AddData const& addme, QWidget* parent) :
+OptionsDialog::OptionsDialog(Session& session, Prefs const& prefs, AddData addme, QWidget* parent) :
     BaseDialog(parent),
-    add_(addme),
+    add_(std::move(addme)),
     verify_hash_(QCryptographicHash::Sha1),
     verify_button_(new QPushButton(tr("&Verify Local Data"), this)),
     edit_timer_(this),
@@ -73,8 +73,8 @@ OptionsDialog::OptionsDialog(Session& session, Prefs const& prefs, AddData const
     ui_.sourceStack->setFixedHeight(ui_.sourceStack->currentWidget()->sizeHint().height());
     ui_.sourceLabel->setBuddy(ui_.sourceStack->currentWidget());
 
-    QFontMetrics const fontMetrics(font());
-    int const width = fontMetrics.size(0, QStringLiteral("This is a pretty long torrent filename indeed.torrent")).width();
+    QFontMetrics const font_metrics(font());
+    int const width = font_metrics.size(0, QStringLiteral("This is a pretty long torrent filename indeed.torrent")).width();
     ui_.sourceStack->setMinimumWidth(width);
 
     QString const download_dir(Utils::removeTrailingDirSeparator(prefs.getString(Prefs::DOWNLOAD_DIR)));
@@ -422,11 +422,11 @@ void OptionsDialog::onTimeout()
 
     if (verify_file_.isOpen() && verify_file_.seek(verify_file_pos_))
     {
-        int64_t numRead = verify_file_.read(verify_buf_, bytes_this_pass);
+        int64_t num_read = verify_file_.read(verify_buf_, bytes_this_pass);
 
-        if (numRead == bytes_this_pass)
+        if (num_read == bytes_this_pass)
         {
-            verify_hash_.addData(verify_buf_, numRead);
+            verify_hash_.addData(verify_buf_, num_read);
         }
     }
 

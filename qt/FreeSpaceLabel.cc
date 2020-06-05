@@ -19,17 +19,16 @@
 namespace
 {
 
-int const INTERVAL_MSEC = 15000;
+int const IntervalMSec = 15000;
 
 } // namespace
 
 FreeSpaceLabel::FreeSpaceLabel(QWidget* parent) :
     QLabel(parent),
-    session_(nullptr),
     timer_(this)
 {
     timer_.setSingleShot(true);
-    timer_.setInterval(INTERVAL_MSEC);
+    timer_.setInterval(IntervalMSec);
 
     connect(&timer_, SIGNAL(timeout()), this, SLOT(onTimer()));
 }

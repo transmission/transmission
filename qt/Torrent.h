@@ -502,11 +502,11 @@ public:
     }
 
     using KeyList = QSet<tr_quark>;
-    static KeyList const allMainKeys;
-    static KeyList const detailInfoKeys;
-    static KeyList const detailStatKeys;
-    static KeyList const mainInfoKeys;
-    static KeyList const mainStatKeys;
+    static KeyList const AllMainKeys;
+    static KeyList const DetailInfoKeys;
+    static KeyList const DetailStatKeys;
+    static KeyList const MainInfoKeys;
+    static KeyList const MainStatKeys;
 
 private:
     void updateMimeIcon();

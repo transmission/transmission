@@ -46,7 +46,7 @@ private slots:
 private:
     Session& session_;
 
-    Ui::MakeDialog ui_;
+    Ui::MakeDialog ui_ = {};
 
     std::unique_ptr<tr_metainfo_builder, void (*)(tr_metainfo_builder*)> builder_;
 };

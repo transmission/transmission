@@ -27,7 +27,7 @@
 ***/
 
 // unchanging fields needed by the main window
-Torrent::KeyList const Torrent::mainInfoKeys{
+Torrent::KeyList const Torrent::MainInfoKeys{
     TR_KEY_addedDate,
     TR_KEY_downloadDir,
     TR_KEY_hashString,
@@ -38,7 +38,7 @@ Torrent::KeyList const Torrent::mainInfoKeys{
 };
 
 // changing fields needed by the main window
-Torrent::KeyList const Torrent::mainStatKeys{
+Torrent::KeyList const Torrent::MainStatKeys{
     TR_KEY_downloadedEver,
     TR_KEY_error,
     TR_KEY_errorString,
@@ -66,10 +66,10 @@ Torrent::KeyList const Torrent::mainStatKeys{
     TR_KEY_webseedsSendingToUs
 };
 
-Torrent::KeyList const Torrent::allMainKeys = Torrent::mainInfoKeys + Torrent::mainStatKeys;
+Torrent::KeyList const Torrent::AllMainKeys = Torrent::MainInfoKeys + Torrent::MainStatKeys;
 
 // unchanging fields needed by the details dialog
-Torrent::KeyList const Torrent::detailInfoKeys{
+Torrent::KeyList const Torrent::DetailInfoKeys{
     TR_KEY_comment,
     TR_KEY_creator,
     TR_KEY_dateCreated,
@@ -82,7 +82,7 @@ Torrent::KeyList const Torrent::detailInfoKeys{
 };
 
 // changing fields needed by the details dialog
-Torrent::KeyList const Torrent::detailStatKeys{
+Torrent::KeyList const Torrent::DetailStatKeys{
     TR_KEY_activityDate,
     TR_KEY_bandwidthPriority,
     TR_KEY_corruptEver,
@@ -350,17 +350,17 @@ bool change(QVector<T>& setme, tr_variant const* value)
 
 bool Torrent::getSeedRatio(double& setmeRatio) const
 {
-    bool isLimited;
+    bool is_limited;
 
     switch (seedRatioMode())
     {
     case TR_RATIOLIMIT_SINGLE:
-        isLimited = true;
+        is_limited = true;
         setmeRatio = seedRatioLimit();
         break;
 
     case TR_RATIOLIMIT_GLOBAL:
-        if ((isLimited = prefs_.getBool(Prefs::RATIO_ENABLED)))
+        if ((is_limited = prefs_.getBool(Prefs::RATIO_ENABLED)))
         {
             setmeRatio = prefs_.getDouble(Prefs::RATIO);
         }
@@ -368,11 +368,11 @@ bool Torrent::getSeedRatio(double& setmeRatio) const
         break;
 
     default: // TR_RATIOLIMIT_UNLIMITED:
-        isLimited = false;
+        is_limited = false;
         break;
     }
 
-    return isLimited;
+    return is_limited;
 }
 
 bool Torrent::hasTrackerSubstring(QString const& substr) const
@@ -619,17 +619,17 @@ bool Torrent::update(tr_quark const* keys, tr_variant const* const* values, size
                     trackers_.swap(urls);
 
                     // rebuild trackerDisplayNames
-                    QStringList displayNames;
-                    displayNames.reserve(trackers_.size());
+                    QStringList display_names;
+                    display_names.reserve(trackers_.size());
                     for (auto const& tracker : trackers_)
                     {
                         auto const url = QUrl(tracker);
                         auto const key = qApp->faviconCache().add(url);
-                        displayNames.append(FaviconCache::getDisplayName(key));
+                        display_names.append(FaviconCache::getDisplayName(key));
                     }
 
-                    displayNames.removeDuplicates();
-                    tracker_display_names_.swap(displayNames);
+                    display_names.removeDuplicates();
+                    tracker_display_names_.swap(display_names);
                     break;
                 }
             }

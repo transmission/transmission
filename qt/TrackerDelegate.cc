@@ -29,8 +29,9 @@
 namespace
 {
 
-int const SPACING = 6;
-QSize const myMargin(10, 10);
+auto constexpr Spacing = int{ 6 };
+
+auto constexpr Margin = QSize{ 10, 10 };
 
 class ItemLayout
 {
@@ -43,12 +44,12 @@ public:
 
     ItemLayout(QString const& text, bool suppress_colors, Qt::LayoutDirection direction, QPoint const& top_left, int width);
 
-    QSize size() const
+    [[nodiscard]] QSize size() const
     {
         return (icon_rect | text_rect).size();
     }
 
-    QAbstractTextDocumentLayout* textLayout() const
+    [[nodiscard]] QAbstractTextDocumentLayout* textLayout() const
     {
         return text_document_.documentLayout();
     }
@@ -63,7 +64,7 @@ ItemLayout::ItemLayout(QString const& text, bool suppress_colors, Qt::LayoutDire
     QRect base_rect(top_left, QSize(width, 0));
 
     icon_rect = style->alignedRect(direction, Qt::AlignLeft | Qt::AlignTop, icon_size, base_rect);
-    Utils::narrowRect(base_rect, icon_size.width() + SPACING, 0, direction);
+    Utils::narrowRect(base_rect, icon_size.width() + Spacing, 0, direction);
 
     text_document_.setDocumentMargin(0);
     text_document_.setTextWidth(base_rect.width());
@@ -91,8 +92,8 @@ ItemLayout::ItemLayout(QString const& text, bool suppress_colors, Qt::LayoutDire
 
 QSize TrackerDelegate::sizeHint(QStyleOptionViewItem const& option, TrackerInfo const& info) const
 {
-    ItemLayout const layout(getText(info), true, option.direction, QPoint(0, 0), option.rect.width() - myMargin.width() * 2);
-    return layout.size() + myMargin * 2;
+    ItemLayout const layout(getText(info), true, option.direction, QPoint(0, 0), option.rect.width() - Margin.width() * 2);
+    return layout.size() + Margin * 2;
 }
 
 QSize TrackerDelegate::sizeHint(QStyleOptionViewItem const& option, QModelIndex const& index) const
@@ -118,9 +119,9 @@ void TrackerDelegate::drawTracker(QPainter* painter, QStyleOptionViewItem const&
     bool const is_item_enabled((option.state & QStyle::State_Enabled) != 0);
     bool const is_item_active((option.state & QStyle::State_Active) != 0);
 
-    QIcon trackerIcon(inf.st.getFavicon());
+    QIcon tracker_icon(inf.st.getFavicon());
 
-    QRect const content_rect(option.rect.adjusted(myMargin.width(), myMargin.height(), -myMargin.width(), -myMargin.height()));
+    QRect const content_rect(option.rect.adjusted(Margin.width(), Margin.height(), -Margin.width(), -Margin.height()));
     ItemLayout const layout(getText(inf), is_item_selected, option.direction, content_rect.topLeft(), content_rect.width());
 
     painter->save();
@@ -137,7 +138,7 @@ void TrackerDelegate::drawTracker(QPainter* painter, QStyleOptionViewItem const&
         painter->fillRect(option.rect, option.palette.brush(cg, QPalette::Highlight));
     }
 
-    trackerIcon.paint(painter, layout.icon_rect, Qt::AlignCenter, is_item_selected ? QIcon::Selected : QIcon::Normal,
+    tracker_icon.paint(painter, layout.icon_rect, Qt::AlignCenter, is_item_selected ? QIcon::Selected : QIcon::Normal,
         QIcon::On);
 
     QAbstractTextDocumentLayout::PaintContext paint_context;

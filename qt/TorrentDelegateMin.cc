@@ -62,35 +62,35 @@ public:
     QRect status_rect;
     QRect bar_rect;
 
-    ItemLayout(QString const& name_text, QString const& status_text, QIcon const& emblem_icon, QFont const& base_font,
+    ItemLayout(QString name_text, QString status_text, QIcon const& emblem_icon, QFont const& base_font,
         Qt::LayoutDirection direction, QPoint const& top_left, int width);
 
-    QSize size() const
+    [[nodiscard]] QSize size() const
     {
         return (icon_rect | name_rect | status_rect | bar_rect).size();
     }
 
-    QString nameText() const
+    [[nodiscard]] QString nameText() const
     {
         return elidedText(name_font, name_text_, name_rect.width());
     }
 
-    QString statusText() const
+    [[nodiscard]] QString statusText() const
     {
         return status_text_;
     }
 
 private:
-    QString elidedText(QFont const& font, QString const& text, int width) const
+    [[nodiscard]] QString elidedText(QFont const& font, QString const& text, int width) const
     {
         return QFontMetrics(font).elidedText(text, Qt::ElideRight, width);
     }
 };
 
-ItemLayout::ItemLayout(QString const& name_text, QString const& status_text, QIcon const& emblem_icon, QFont const& base_font,
+ItemLayout::ItemLayout(QString name_text, QString status_text, QIcon const& emblem_icon, QFont const& base_font,
     Qt::LayoutDirection direction, QPoint const& top_left, int width) :
-    name_text_(name_text),
-    status_text_(status_text),
+    name_text_(std::move(name_text)),
+    status_text_(std::move(status_text)),
     name_font(base_font),
     status_font(base_font)
 {
@@ -131,9 +131,9 @@ ItemLayout::ItemLayout(QString const& name_text, QString const& status_text, QIc
 
 QSize TorrentDelegateMin::sizeHint(QStyleOptionViewItem const& option, Torrent const& tor) const
 {
-    bool const isMagnet(!tor.hasMetadata());
+    bool const is_magnet(!tor.hasMetadata());
     QSize const m(margin(*qApp->style()));
-    ItemLayout const layout(isMagnet ? progressString(tor) : tor.name(), shortStatusString(tor), QIcon(), option.font,
+    ItemLayout const layout(is_magnet ? progressString(tor) : tor.name(), shortStatusString(tor), QIcon(), option.font,
         option.direction, QPoint(0, 0), option.rect.width() - m.width() * 2);
     return layout.size() + m * 2;
 }
@@ -255,21 +255,21 @@ void TorrentDelegateMin::drawTorrent(QPainter* painter, QStyleOptionViewItem con
 
     if (tor.isDownloading())
     {
-        progress_bar_style_->palette.setBrush(QPalette::Highlight, blue_brush_);
-        progress_bar_style_->palette.setColor(QPalette::Base, blue_back_);
-        progress_bar_style_->palette.setColor(QPalette::Window, blue_back_);
+        progress_bar_style_->palette.setBrush(QPalette::Highlight, blue_brush);
+        progress_bar_style_->palette.setColor(QPalette::Base, blue_back);
+        progress_bar_style_->palette.setColor(QPalette::Window, blue_back);
     }
     else if (tor.isSeeding())
     {
-        progress_bar_style_->palette.setBrush(QPalette::Highlight, green_brush_);
-        progress_bar_style_->palette.setColor(QPalette::Base, green_back_);
-        progress_bar_style_->palette.setColor(QPalette::Window, green_back_);
+        progress_bar_style_->palette.setBrush(QPalette::Highlight, green_brush);
+        progress_bar_style_->palette.setColor(QPalette::Base, green_back);
+        progress_bar_style_->palette.setColor(QPalette::Window, green_back);
     }
     else
     {
-        progress_bar_style_->palette.setBrush(QPalette::Highlight, silver_brush_);
-        progress_bar_style_->palette.setColor(QPalette::Base, silver_back_);
-        progress_bar_style_->palette.setColor(QPalette::Window, silver_back_);
+        progress_bar_style_->palette.setBrush(QPalette::Highlight, silver_brush);
+        progress_bar_style_->palette.setColor(QPalette::Base, silver_back);
+        progress_bar_style_->palette.setColor(QPalette::Window, silver_back);
     }
 
     progress_bar_style_->state = progress_bar_state;

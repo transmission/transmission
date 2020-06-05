@@ -32,7 +32,7 @@ class Session : public QObject
     Q_OBJECT
 
 public:
-    Session(QString const& config_dir, Prefs& prefs);
+    Session(QString config_dir, Prefs& prefs);
     virtual ~Session();
 
     void stop();
@@ -143,8 +143,8 @@ private:
     int64_t blocklist_size_ = -1;
     tr_session* session_ = {};
     QStringList idle_json_;
-    tr_session_stats stats_;
-    tr_session_stats cumulative_stats_;
+    tr_session_stats stats_ = {};
+    tr_session_stats cumulative_stats_ = {};
     QString session_version_;
     QString session_id_;
     bool is_definitely_local_session_ = true;

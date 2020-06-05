@@ -93,12 +93,12 @@ private:
     Prefs& prefs_;
     TorrentModel const& model_;
 
-    Ui::DetailsDialog ui_;
+    Ui::DetailsDialog ui_ = {};
 
     torrent_ids_t ids_;
     QTimer timer_;
-    bool changed_torrents_;
-    bool have_pending_refresh_;
+    bool changed_torrents_ = {};
+    bool have_pending_refresh_ = {};
 
     TrackerModel* tracker_model_ = {};
     TrackerModelFilter* tracker_filter_ = {};

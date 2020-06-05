@@ -8,9 +8,10 @@
 
 #pragma once
 
+#include <array>
 #include <cstdint> // int64_t
 
-#include <QCoreApplication>
+#include <QCoreApplication> // Q_DECLARE_TR_FUNCTIONS
 #include <QString>
 
 class Speed;
@@ -26,14 +27,18 @@ public:
         KB,
         MB,
         GB,
-        TB
+        TB,
+
+        NUM_SIZES
     };
 
     enum Type
     {
         SPEED,
         SIZE,
-        MEM
+        MEM,
+
+        NUM_TYPES
     };
 
 public:
@@ -48,11 +53,11 @@ public:
 
     static QString unitStr(Type t, Size s)
     {
-        return unit_strings_[t][s];
+        return UnitStrings[t][s];
     }
 
     static void initUnits();
 
 private:
-    static QString unit_strings_[3][5];
+    static std::array<std::array<QString, Formatter::NUM_SIZES>, Formatter::NUM_TYPES> const UnitStrings;
 };

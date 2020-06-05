@@ -73,7 +73,7 @@ private:
     Session& session_;
     Prefs& prefs_;
 
-    Ui::PrefsDialog ui_;
+    Ui::PrefsDialog ui_ = {};
 
     bool const is_server_;
     bool is_local_ = {};

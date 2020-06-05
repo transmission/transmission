@@ -21,7 +21,7 @@ class RelocateDialog : public BaseDialog
     Q_OBJECT
 
 public:
-    RelocateDialog(Session&, TorrentModel const&, torrent_ids_t const& ids, QWidget* parent = nullptr);
+    RelocateDialog(Session&, TorrentModel const&, torrent_ids_t ids, QWidget* parent = nullptr);
 
     virtual ~RelocateDialog() = default;
 
@@ -36,7 +36,7 @@ private:
     Session& session_;
     torrent_ids_t const ids_;
 
-    Ui::RelocateDialog ui_;
+    Ui::RelocateDialog ui_ = {};
 
-    static bool move_flag_;
+    static bool move_flag;
 };

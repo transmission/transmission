@@ -25,7 +25,6 @@
 #include <QIcon>
 #include <QLabel>
 #include <QLineEdit>
-#include <QList>
 #include <QMessageBox>
 #include <QPushButton>
 #include <QSpinBox>
@@ -53,49 +52,49 @@ namespace
 
 class PreferenceWidget
 {
-    static char const* const PREF_KEY;
+    static char const* const PrefKey;
 
 public:
     explicit PreferenceWidget(QObject* object) :
-        m_object(object)
+        object_(object)
     {
     }
 
     template<typename T>
-    bool is() const
+    [[nodiscard]] bool is() const
     {
-        return qobject_cast<T*>(m_object) != nullptr;
+        return qobject_cast<T*>(object_) != nullptr;
     }
 
     template<typename T>
-    T const* as() const
+    [[nodiscard]] T const* as() const
     {
         assert(is<T>());
-        return static_cast<T const*>(m_object);
+        return static_cast<T const*>(object_);
     }
 
     template<typename T>
-    T* as()
+    [[nodiscard]] T* as()
     {
         assert(is<T>());
-        return static_cast<T*>(m_object);
+        return static_cast<T*>(object_);
     }
 
     void setPrefKey(int key)
     {
-        m_object->setProperty(PREF_KEY, key);
+        object_->setProperty(PrefKey, key);
     }
 
-    int getPrefKey() const
+    [[nodiscard]] int getPrefKey() const
     {
-        return m_object->property(PREF_KEY).toInt();
+        return object_->property(PrefKey).toInt();
     }
 
 private:
-    QObject* const m_object;
+    QObject* const object_;
 };
 
-char const* const PreferenceWidget::PREF_KEY = "pref-key";
+char const* const PreferenceWidget::PrefKey = "pref-key";
 
 int qtDayToTrDay(int day)
 {
@@ -271,11 +270,11 @@ void PrefsDialog::lineEditingFinished()
 
     if (pref_widget.is<QLineEdit>())
     {
-        auto const* const lineEdit = pref_widget.as<QLineEdit>();
+        auto const* const line_edit = pref_widget.as<QLineEdit>();
 
-        if (lineEdit->isModified())
+        if (line_edit->isModified())
         {
-            setPref(pref_widget.getPrefKey(), lineEdit->text());
+            setPref(pref_widget.getPrefKey(), line_edit->text());
         }
     }
 }
@@ -324,13 +323,14 @@ void PrefsDialog::altSpeedDaysEdited(int i)
 
 void PrefsDialog::initSpeedTab()
 {
-    QString const speed_K_str = Formatter::unitStr(Formatter::SPEED, Formatter::KB);
+    QString const speed_unit_str = Formatter::unitStr(Formatter::SPEED, Formatter::KB);
+    auto const suffix = QStringLiteral(" %1").arg(speed_unit_str);
     QLocale const locale;
 
-    ui_.uploadSpeedLimitSpin->setSuffix(QStringLiteral(" %1").arg(speed_K_str));
-    ui_.downloadSpeedLimitSpin->setSuffix(QStringLiteral(" %1").arg(speed_K_str));
-    ui_.altUploadSpeedLimitSpin->setSuffix(QStringLiteral(" %1").arg(speed_K_str));
-    ui_.altDownloadSpeedLimitSpin->setSuffix(QStringLiteral(" %1").arg(speed_K_str));
+    ui_.uploadSpeedLimitSpin->setSuffix(suffix);
+    ui_.downloadSpeedLimitSpin->setSuffix(suffix);
+    ui_.altUploadSpeedLimitSpin->setSuffix(suffix);
+    ui_.altDownloadSpeedLimitSpin->setSuffix(suffix);
 
     ui_.altSpeedLimitDaysCombo->addItem(tr("Every Day"), QVariant(TR_SCHED_ALL));
     ui_.altSpeedLimitDaysCombo->addItem(tr("Weekdays"), QVariant(TR_SCHED_WEEKDAY));
@@ -616,12 +616,21 @@ PrefsDialog::PrefsDialog(Session& session, Prefs& prefs, QWidget* parent) :
 
     connect(&session_, SIGNAL(sessionUpdated()), SLOT(sessionUpdated()));
 
-    QList<int> keys;
-    keys << Prefs::RPC_ENABLED << Prefs::ALT_SPEED_LIMIT_ENABLED << Prefs::ALT_SPEED_LIMIT_TIME_ENABLED << Prefs::ENCRYPTION <<
-        Prefs::BLOCKLIST_ENABLED << Prefs::DIR_WATCH << Prefs::DOWNLOAD_DIR << Prefs::INCOMPLETE_DIR <<
-        Prefs::INCOMPLETE_DIR_ENABLED << Prefs::SCRIPT_TORRENT_DONE_FILENAME;
+    static std::array<int, 10> constexpr InitKeys =
+    {
+        Prefs::ALT_SPEED_LIMIT_ENABLED,
+        Prefs::ALT_SPEED_LIMIT_TIME_ENABLED,
+        Prefs::BLOCKLIST_ENABLED,
+        Prefs::DIR_WATCH,
+        Prefs::DOWNLOAD_DIR,
+        Prefs::ENCRYPTION,
+        Prefs::INCOMPLETE_DIR,
+        Prefs::INCOMPLETE_DIR_ENABLED,
+        Prefs::RPC_ENABLED,
+        Prefs::SCRIPT_TORRENT_DONE_FILENAME
+    };
 
-    for (int const key : keys)
+    for (auto const key : InitKeys)
     {
         refreshPref(key);
     }
@@ -744,9 +753,9 @@ void PrefsDialog::refreshPref(int key)
         {
             if (key == Prefs::ENCRYPTION)
             {
-                auto* comboBox = qobject_cast<QComboBox*>(w);
-                int const index = comboBox->findData(prefs_.getInt(key));
-                comboBox->setCurrentIndex(index);
+                auto* combo_box = qobject_cast<QComboBox*>(w);
+                int const index = combo_box->findData(prefs_.getInt(key));
+                combo_box->setCurrentIndex(index);
             }
         }
     }

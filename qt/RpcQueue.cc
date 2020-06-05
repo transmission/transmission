@@ -66,7 +66,7 @@ void RpcQueue::runNext(RpcResponseFuture const& response)
 {
     assert(!queue_.isEmpty());
 
-    RpcResponseFuture const oldFuture = future_watcher_.future();
+    RpcResponseFuture const old_future = future_watcher_.future();
 
     while (true)
     {
@@ -74,7 +74,7 @@ void RpcQueue::runNext(RpcResponseFuture const& response)
         next_error_handler_ = next.second;
         future_watcher_.setFuture((next.first)(response));
 
-        if (oldFuture != future_watcher_.future())
+        if (old_future != future_watcher_.future())
         {
             break;
         }

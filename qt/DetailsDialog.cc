@@ -55,9 +55,9 @@ class Session;
 namespace
 {
 
-int const REFRESH_INTERVAL_MSEC = 4000;
+int constexpr RefreshIntervalMSec = 4000;
 
-char const* PREF_KEY("pref-key");
+char const constexpr* const PrefKey = "pref_key";
 
 enum // peer columns
 {
@@ -89,13 +89,13 @@ int measureViewItem(QTreeWidget* view, int column, QString const& text)
 
 class PeerItem : public QTreeWidgetItem
 {
-    Peer peer;
-    QString mutable collated_address;
-    QString status;
+    Peer peer_;
+    QString mutable collated_address_;
+    QString status_;
 
 public:
-    PeerItem(Peer const& p) :
-        peer(p)
+    explicit PeerItem(Peer p) :
+        peer_(std::move(p))
     {
     }
 
@@ -103,17 +103,17 @@ public:
 
     void refresh(Peer const& p)
     {
-        if (p.address != peer.address)
+        if (p.address != peer_.address)
         {
-            collated_address.clear();
+            collated_address_.clear();
         }
 
-        peer = p;
+        peer_ = p;
     }
 
     void setStatus(QString const& s)
     {
-        status = s;
+        status_ = s;
     }
 
     bool operator <(QTreeWidgetItem const& other) const override
@@ -127,22 +127,22 @@ public:
         switch (column)
         {
         case COL_UP:
-            return peer.rate_to_peer < i->peer.rate_to_peer;
+            return peer_.rate_to_peer < i->peer_.rate_to_peer;
 
         case COL_DOWN:
-            return peer.rate_to_client < i->peer.rate_to_client;
+            return peer_.rate_to_client < i->peer_.rate_to_client;
 
         case COL_PERCENT:
-            return peer.progress < i->peer.progress;
+            return peer_.progress < i->peer_.progress;
 
         case COL_STATUS:
-            return status < i->status;
+            return status_ < i->status_;
 
         case COL_CLIENT:
-            return peer.client_name < i->peer.client_name;
+            return peer_.client_name < i->peer_.client_name;
 
         case COL_LOCK:
-            return peer.is_encrypted && !i->peer.is_encrypted;
+            return peer_.is_encrypted && !i->peer_.is_encrypted;
 
         default:
             return address() < i->address();
@@ -152,16 +152,16 @@ public:
 private:
     QString const& address() const
     {
-        if (collated_address.isEmpty())
+        if (collated_address_.isEmpty())
         {
             QHostAddress ip_address;
 
-            if (ip_address.setAddress(peer.address))
+            if (ip_address.setAddress(peer_.address))
             {
                 if (ip_address.protocol() == QAbstractSocket::IPv4Protocol)
                 {
                     quint32 const ipv4_address = ip_address.toIPv4Address();
-                    collated_address = QStringLiteral("1-") + QString::fromUtf8(QByteArray::number(ipv4_address, 16).
+                    collated_address_ = QStringLiteral("1-") + QString::fromUtf8(QByteArray::number(ipv4_address, 16).
                         rightJustified(8, '0'));
                 }
                 else if (ip_address.protocol() == QAbstractSocket::IPv6Protocol)
@@ -174,17 +174,17 @@ private:
                         tmp[i] = ipv6_address[i];
                     }
 
-                    collated_address = QStringLiteral("2-") + QString::fromUtf8(tmp.toHex());
+                    collated_address_ = QStringLiteral("2-") + QString::fromUtf8(tmp.toHex());
                 }
             }
 
-            if (collated_address.isEmpty())
+            if (collated_address_.isEmpty())
             {
-                collated_address = QStringLiteral("3-") + peer.address.toLower();
+                collated_address_ = QStringLiteral("3-") + peer_.address.toLower();
             }
         }
 
-        return collated_address;
+        return collated_address_;
     }
 };
 
@@ -221,10 +221,13 @@ DetailsDialog::DetailsDialog(Session& session, Prefs& prefs, TorrentModel const&
     adjustSize();
     ui_.commentBrowser->setMaximumHeight(QWIDGETSIZE_MAX);
 
-    QList<int> init_keys;
-    init_keys << Prefs::SHOW_TRACKER_SCRAPES << Prefs::SHOW_BACKUP_TRACKERS;
+    static std::array<int, 2> constexpr InitKeys =
+    {
+        Prefs::SHOW_TRACKER_SCRAPES,
+        Prefs::SHOW_BACKUP_TRACKERS
+    };
 
-    for (int const key : init_keys)
+    for (int const key : InitKeys)
     {
         refreshPref(key);
     }
@@ -235,7 +238,7 @@ DetailsDialog::DetailsDialog(Session& session, Prefs& prefs, TorrentModel const&
 
     onTimer();
     timer_.setSingleShot(false);
-    timer_.start(REFRESH_INTERVAL_MSEC);
+    timer_.start(RefreshIntervalMSec);
 }
 
 DetailsDialog::~DetailsDialog()
@@ -798,7 +801,7 @@ void DetailsDialog::refresh()
 
     // myCommentBrowser
     string = none;
-    bool isCommentMixed = false;
+    bool is_comment_mixed = false;
 
     if (!torrents.empty())
     {
@@ -809,7 +812,7 @@ void DetailsDialog::refresh()
             if (string != t->comment())
             {
                 string = mixed;
-                isCommentMixed = true;
+                is_comment_mixed = true;
                 break;
             }
         }
@@ -820,7 +823,7 @@ void DetailsDialog::refresh()
         ui_.commentBrowser->setText(string);
     }
 
-    ui_.commentBrowser->setEnabled(!isCommentMixed && !string.isEmpty());
+    ui_.commentBrowser->setEnabled(!is_comment_mixed && !string.isEmpty());
 
     // myOriginLabel
     string = none;
@@ -967,8 +970,8 @@ void DetailsDialog::refresh()
 
         setIfIdle(ui_.bandwidthPriorityCombo, i);
 
-        setIfIdle(ui_.singleDownSpin, int(baseline.downloadLimit().KBps()));
-        setIfIdle(ui_.singleUpSpin, int(baseline.uploadLimit().KBps()));
+        setIfIdle(ui_.singleDownSpin, int(baseline.downloadLimit().getKBps()));
+        setIfIdle(ui_.singleUpSpin, int(baseline.uploadLimit().getKBps()));
         setIfIdle(ui_.peerLimitSpin, baseline.peerLimit());
     }
 
@@ -1025,31 +1028,31 @@ void DetailsDialog::refresh()
     ///
 
     QMap<QString, QTreeWidgetItem*> peers2;
-    QList<QTreeWidgetItem*> newItems;
+    QList<QTreeWidgetItem*> new_items;
 
     for (Torrent const* const t : torrents)
     {
-        QString const idStr(QString::number(t->id()));
+        QString const id_str(QString::number(t->id()));
         PeerList peers = t->peers();
 
         for (Peer const& peer : peers)
         {
-            QString const key = idStr + QLatin1Char(':') + peer.address;
+            QString const key = id_str + QLatin1Char(':') + peer.address;
             PeerItem* item = static_cast<PeerItem*>(peers_.value(key, nullptr));
 
             if (item == nullptr) // new peer has connected
             {
-                static QIcon const ENCRYPTION_ICON(QStringLiteral(":/icons/encrypted.png"));
-                static QIcon const EMPTY_ICON;
+                static QIcon const EncryptionIcon(QStringLiteral(":/icons/encrypted.png"));
+                static QIcon const EmptyIcon;
                 item = new PeerItem(peer);
                 item->setTextAlignment(COL_UP, Qt::AlignRight | Qt::AlignVCenter);
                 item->setTextAlignment(COL_DOWN, Qt::AlignRight | Qt::AlignVCenter);
                 item->setTextAlignment(COL_PERCENT, Qt::AlignRight | Qt::AlignVCenter);
-                item->setIcon(COL_LOCK, peer.is_encrypted ? ENCRYPTION_ICON : EMPTY_ICON);
+                item->setIcon(COL_LOCK, peer.is_encrypted ? EncryptionIcon : EmptyIcon);
                 item->setToolTip(COL_LOCK, peer.is_encrypted ? tr("Encrypted connection") : QString());
                 item->setText(COL_ADDRESS, peer.address);
                 item->setText(COL_CLIENT, peer.client_name);
-                newItems << item;
+                new_items << item;
             }
 
             QString const code = peer.flags;
@@ -1135,7 +1138,7 @@ void DetailsDialog::refresh()
         }
     }
 
-    ui_.peersView->addTopLevelItems(newItems);
+    ui_.peersView->addTopLevelItems(new_items);
 
     for (QString const& key : peers_.keys())
     {
@@ -1216,7 +1219,7 @@ void DetailsDialog::onDownloadLimitedToggled(bool val)
 void DetailsDialog::onSpinBoxEditingFinished()
 {
     QObject const* spin = sender();
-    tr_quark const key = spin->property(PREF_KEY).toInt();
+    tr_quark const key = spin->property(PrefKey).toInt();
     auto const* d = qobject_cast<QDoubleSpinBox const*>(spin);
 
     if (d != nullptr)
@@ -1247,11 +1250,11 @@ void DetailsDialog::onIdleModeChanged(int index)
 void DetailsDialog::onIdleLimitChanged()
 {
     //: Spin box suffix, "Stop seeding if idle for: [ 5 minutes ]" (includes leading space after the number, if needed)
-    QString const unitsSuffix = tr(" minute(s)", nullptr, ui_.idleSpin->value());
+    QString const units_suffix = tr(" minute(s)", nullptr, ui_.idleSpin->value());
 
-    if (ui_.idleSpin->suffix() != unitsSuffix)
+    if (ui_.idleSpin->suffix() != units_suffix)
     {
-        ui_.idleSpin->setSuffix(unitsSuffix);
+        ui_.idleSpin->setSuffix(units_suffix);
     }
 }
 
@@ -1323,11 +1326,11 @@ void DetailsDialog::onEditTrackerClicked()
     QModelIndexList selected_rows = selection_model->selectedRows();
     assert(selected_rows.size() == 1);
     QModelIndex i = selection_model->currentIndex();
-    auto const trackerInfo = ui_.trackersView->model()->data(i, TrackerModel::TrackerRole).value<TrackerInfo>();
+    auto const tracker_info = ui_.trackersView->model()->data(i, TrackerModel::TrackerRole).value<TrackerInfo>();
 
     bool ok = false;
     QString const newval = QInputDialog::getText(this, tr("Edit URL "), tr("Edit tracker announce URL:"), QLineEdit::Normal,
-        trackerInfo.st.announce, &ok);
+        tracker_info.st.announce, &ok);
 
     if (!ok)
     {
@@ -1339,9 +1342,9 @@ void DetailsDialog::onEditTrackerClicked()
     }
     else
     {
-        torrent_ids_t ids{ trackerInfo.torrent_id };
+        torrent_ids_t ids{ tracker_info.torrent_id };
 
-        QPair<int, QString> const id_url = qMakePair(trackerInfo.st.id, newval);
+        QPair<int, QString> const id_url = qMakePair(tracker_info.st.id, newval);
 
         session_.torrentSet(ids, TR_KEY_trackerReplace, id_url);
         getNewData();
@@ -1374,16 +1377,16 @@ void DetailsDialog::onRemoveTrackerClicked()
 
 void DetailsDialog::initOptionsTab()
 {
-    QString const speed_K_str = Formatter::unitStr(Formatter::SPEED, Formatter::KB);
+    auto const speed_unit_str = Formatter::unitStr(Formatter::SPEED, Formatter::KB);
 
-    ui_.singleDownSpin->setSuffix(QStringLiteral(" %1").arg(speed_K_str));
-    ui_.singleUpSpin->setSuffix(QStringLiteral(" %1").arg(speed_K_str));
+    ui_.singleDownSpin->setSuffix(QStringLiteral(" %1").arg(speed_unit_str));
+    ui_.singleUpSpin->setSuffix(QStringLiteral(" %1").arg(speed_unit_str));
 
-    ui_.singleDownSpin->setProperty(PREF_KEY, TR_KEY_downloadLimit);
-    ui_.singleUpSpin->setProperty(PREF_KEY, TR_KEY_uploadLimit);
-    ui_.ratioSpin->setProperty(PREF_KEY, TR_KEY_seedRatioLimit);
-    ui_.idleSpin->setProperty(PREF_KEY, TR_KEY_seedIdleLimit);
-    ui_.peerLimitSpin->setProperty(PREF_KEY, TR_KEY_peer_limit);
+    ui_.singleDownSpin->setProperty(PrefKey, TR_KEY_downloadLimit);
+    ui_.singleUpSpin->setProperty(PrefKey, TR_KEY_uploadLimit);
+    ui_.ratioSpin->setProperty(PrefKey, TR_KEY_seedRatioLimit);
+    ui_.idleSpin->setProperty(PrefKey, TR_KEY_seedIdleLimit);
+    ui_.peerLimitSpin->setProperty(PrefKey, TR_KEY_peer_limit);
 
     ui_.bandwidthPriorityCombo->addItem(tr("High"), TR_PRI_HIGH);
     ui_.bandwidthPriorityCombo->addItem(tr("Normal"), TR_PRI_NORMAL);
@@ -1404,14 +1407,14 @@ void DetailsDialog::initOptionsTab()
     cr->addLayout(ui_.peerConnectionsSectionLayout);
     cr->update();
 
-    void (QComboBox::* comboIndexChanged)(int) = &QComboBox::currentIndexChanged;
-    void (QSpinBox::* spinValueChanged)(int) = &QSpinBox::valueChanged;
-    connect(ui_.bandwidthPriorityCombo, comboIndexChanged, this, &DetailsDialog::onBandwidthPriorityChanged);
-    connect(ui_.idleCombo, comboIndexChanged, this, &DetailsDialog::onIdleModeChanged);
+    void (QComboBox::* combo_index_changed)(int) = &QComboBox::currentIndexChanged;
+    void (QSpinBox::* spin_value_changed)(int) = &QSpinBox::valueChanged;
+    connect(ui_.bandwidthPriorityCombo, combo_index_changed, this, &DetailsDialog::onBandwidthPriorityChanged);
+    connect(ui_.idleCombo, combo_index_changed, this, &DetailsDialog::onIdleModeChanged);
     connect(ui_.idleSpin, &QSpinBox::editingFinished, this, &DetailsDialog::onSpinBoxEditingFinished);
-    connect(ui_.idleSpin, spinValueChanged, this, &DetailsDialog::onIdleLimitChanged);
+    connect(ui_.idleSpin, spin_value_changed, this, &DetailsDialog::onIdleLimitChanged);
     connect(ui_.peerLimitSpin, &QSpinBox::editingFinished, this, &DetailsDialog::onSpinBoxEditingFinished);
-    connect(ui_.ratioCombo, comboIndexChanged, this, &DetailsDialog::onRatioModeChanged);
+    connect(ui_.ratioCombo, combo_index_changed, this, &DetailsDialog::onRatioModeChanged);
     connect(ui_.ratioSpin, &QSpinBox::editingFinished, this, &DetailsDialog::onSpinBoxEditingFinished);
     connect(ui_.sessionLimitCheck, &QCheckBox::clicked, this, &DetailsDialog::onHonorsSessionLimitsToggled);
     connect(ui_.singleDownCheck, &QCheckBox::clicked, this, &DetailsDialog::onDownloadLimitedToggled);
@@ -1533,14 +1536,14 @@ void DetailsDialog::onOpenRequested(QString const& path)
             continue;
         }
 
-        QString const localFilePath = tor->getPath() + QLatin1Char('/') + path;
+        QString const local_file_path = tor->getPath() + QLatin1Char('/') + path;
 
-        if (!QFile::exists(localFilePath))
+        if (!QFile::exists(local_file_path))
         {
             continue;
         }
 
-        if (QDesktopServices::openUrl(QUrl::fromLocalFile(localFilePath)))
+        if (QDesktopServices::openUrl(QUrl::fromLocalFile(local_file_path)))
         {
             break;
         }

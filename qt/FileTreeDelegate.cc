@@ -67,9 +67,9 @@ void FileTreeDelegate::paint(QPainter* painter, QStyleOptionViewItem const& opti
     {
         QStyleOptionViewItem vi(option);
         vi.features |= QStyleOptionViewItem::HasCheckIndicator;
-        QRect checkRect = style->subElementRect(QStyle::SE_ItemViewItemCheckIndicator, &vi, nullptr);
-        checkRect.moveCenter(option.rect.center());
-        drawCheck(painter, vi, checkRect, static_cast<Qt::CheckState>(index.data().toInt()));
+        QRect check_rect = style->subElementRect(QStyle::SE_ItemViewItemCheckIndicator, &vi, nullptr);
+        check_rect.moveCenter(option.rect.center());
+        drawCheck(painter, vi, check_rect, static_cast<Qt::CheckState>(index.data().toInt()));
     }
 
     QItemDelegate::drawFocus(painter, option, option.rect);

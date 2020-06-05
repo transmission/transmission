@@ -28,8 +28,8 @@
 
 enum
 {
-    ActivityRole = FilterBarComboBox::UserRole,
-    TrackerRole
+    ACTIVITY_ROLE = FilterBarComboBox::UserRole,
+    TRACKER_ROLE
 };
 
 /***
@@ -45,38 +45,38 @@ FilterBarComboBox* FilterBar::createActivityCombo()
     auto* model = new QStandardItemModel(this);
 
     auto* row = new QStandardItem(tr("All"));
-    row->setData(FilterMode::SHOW_ALL, ActivityRole);
+    row->setData(FilterMode::SHOW_ALL, ACTIVITY_ROLE);
     model->appendRow(row);
 
     model->appendRow(new QStandardItem); // separator
     delegate->setSeparator(model, model->index(1, 0));
 
     row = new QStandardItem(QIcon::fromTheme(QStringLiteral("system-run")), tr("Active"));
-    row->setData(FilterMode::SHOW_ACTIVE, ActivityRole);
+    row->setData(FilterMode::SHOW_ACTIVE, ACTIVITY_ROLE);
     model->appendRow(row);
 
     row = new QStandardItem(QIcon::fromTheme(QStringLiteral("go-down")), tr("Downloading"));
-    row->setData(FilterMode::SHOW_DOWNLOADING, ActivityRole);
+    row->setData(FilterMode::SHOW_DOWNLOADING, ACTIVITY_ROLE);
     model->appendRow(row);
 
     row = new QStandardItem(QIcon::fromTheme(QStringLiteral("go-up")), tr("Seeding"));
-    row->setData(FilterMode::SHOW_SEEDING, ActivityRole);
+    row->setData(FilterMode::SHOW_SEEDING, ACTIVITY_ROLE);
     model->appendRow(row);
 
     row = new QStandardItem(QIcon::fromTheme(QStringLiteral("media-playback-pause")), tr("Paused"));
-    row->setData(FilterMode::SHOW_PAUSED, ActivityRole);
+    row->setData(FilterMode::SHOW_PAUSED, ACTIVITY_ROLE);
     model->appendRow(row);
 
     row = new QStandardItem(QIcon::fromTheme(QStringLiteral("dialog-ok")), tr("Finished"));
-    row->setData(FilterMode::SHOW_FINISHED, ActivityRole);
+    row->setData(FilterMode::SHOW_FINISHED, ACTIVITY_ROLE);
     model->appendRow(row);
 
     row = new QStandardItem(QIcon::fromTheme(QStringLiteral("view-refresh")), tr("Verifying"));
-    row->setData(FilterMode::SHOW_VERIFYING, ActivityRole);
+    row->setData(FilterMode::SHOW_VERIFYING, ACTIVITY_ROLE);
     model->appendRow(row);
 
     row = new QStandardItem(QIcon::fromTheme(QStringLiteral("process-stop")), tr("Error"));
-    row->setData(FilterMode::SHOW_ERROR, ActivityRole);
+    row->setData(FilterMode::SHOW_ERROR, ACTIVITY_ROLE);
     model->appendRow(row);
 
     c->setModel(model);
@@ -119,13 +119,13 @@ void FilterBar::refreshTrackers()
     item->setData(int(num_trackers), FilterBarComboBox::CountRole);
     item->setData(getCountString(num_trackers), FilterBarComboBox::CountStringRole);
 
-    auto updateTrackerItem = [](QStandardItem* i, auto const& it)
+    auto update_tracker_item = [](QStandardItem* i, auto const& it)
         {
             auto const& display_name = it->first;
             auto const& count = it->second;
             auto const icon = qApp->faviconCache().find(FaviconCache::getKey(display_name));
             i->setData(display_name, Qt::DisplayRole);
-            i->setData(display_name, TrackerRole);
+            i->setData(display_name, TRACKER_ROLE);
             i->setData(getCountString(count), FilterBarComboBox::CountStringRole);
             i->setData(icon, Qt::DecorationRole);
             i->setData(int(count), FilterBarComboBox::CountRole);
@@ -144,7 +144,7 @@ void FilterBar::refreshTrackers()
     {
         if ((old_it == old_end) || ((new_it != new_end) && (old_it->first > new_it->first)))
         {
-            tracker_model_->insertRow(row, updateTrackerItem(new QStandardItem(1), new_it));
+            tracker_model_->insertRow(row, update_tracker_item(new QStandardItem(1), new_it));
             any_added = true;
             ++new_it;
             ++row;
@@ -156,7 +156,7 @@ void FilterBar::refreshTrackers()
         }
         else // update
         {
-            updateTrackerItem(tracker_model_->item(row), new_it);
+            update_tracker_item(tracker_model_->item(row), new_it);
             ++old_it;
             ++new_it;
             ++row;
@@ -178,7 +178,7 @@ FilterBarComboBox* FilterBar::createTrackerCombo(QStandardItemModel* model)
     c->setItemDelegate(delegate);
 
     auto* row = new QStandardItem(tr("All"));
-    row->setData(QString(), TrackerRole);
+    row->setData(QString(), TRACKER_ROLE);
     int const count = torrents_.rowCount();
     row->setData(count, FilterBarComboBox::CountRole);
     row->setData(getCountString(count), FilterBarComboBox::CountStringRole);
@@ -274,7 +274,7 @@ void FilterBar::refreshPref(int key)
         {
             auto const m = prefs_.get<FilterMode>(key);
             QAbstractItemModel* model = activity_combo_->model();
-            QModelIndexList indices = model->match(model->index(0, 0), ActivityRole, m.mode());
+            QModelIndexList indices = model->match(model->index(0, 0), ACTIVITY_ROLE, m.mode());
             activity_combo_->setCurrentIndex(indices.isEmpty() ? 0 : indices.first().row());
             break;
         }
@@ -315,7 +315,7 @@ void FilterBar::onTrackerIndexChanged(int i)
     if (!is_bootstrapping_)
     {
         QString str;
-        bool const is_tracker = !tracker_combo_->itemData(i, TrackerRole).toString().isEmpty();
+        bool const is_tracker = !tracker_combo_->itemData(i, TRACKER_ROLE).toString().isEmpty();
 
         if (!is_tracker)
         {
@@ -323,7 +323,7 @@ void FilterBar::onTrackerIndexChanged(int i)
         }
         else
         {
-            str = tracker_combo_->itemData(i, TrackerRole).toString();
+            str = tracker_combo_->itemData(i, TRACKER_ROLE).toString();
             int const pos = str.lastIndexOf(QLatin1Char('.'));
 
             if (pos >= 0)
@@ -340,7 +340,7 @@ void FilterBar::onActivityIndexChanged(int i)
 {
     if (!is_bootstrapping_)
     {
-        FilterMode const mode = activity_combo_->itemData(i, ActivityRole).toInt();
+        FilterMode const mode = activity_combo_->itemData(i, ACTIVITY_ROLE).toInt();
         prefs_.set(Prefs::FILTER_MODE, mode);
     }
 }
@@ -362,13 +362,12 @@ void FilterBar::recount()
 {
     QAbstractItemModel* model = activity_combo_->model();
 
-    int torrents_per_mode[FilterMode::NUM_MODES] = {};
-    filter_.countTorrentsPerMode(torrents_per_mode);
+    auto const torrents_per_mode = filter_.countTorrentsPerMode();
 
     for (int row = 0, n = model->rowCount(); row < n; ++row)
     {
         QModelIndex index = model->index(row, 0);
-        int const mode = index.data(ActivityRole).toInt();
+        int const mode = index.data(ACTIVITY_ROLE).toInt();
         int const count = torrents_per_mode[mode];
         model->setData(index, count, FilterBarComboBox::CountRole);
         model->setData(index, getCountString(count), FilterBarComboBox::CountStringRole);

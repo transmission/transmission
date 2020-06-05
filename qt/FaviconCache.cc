@@ -160,9 +160,9 @@ void FaviconCache::onRequestFinished(QNetworkReply* reply)
         pixmaps_[key] = scale(pixmap);
 
         // save it on disk...
-        QDir cacheDir(getCacheDir());
-        cacheDir.mkpath(cacheDir.absolutePath());
-        QFile file(cacheDir.absoluteFilePath(key));
+        QDir cache_dir(getCacheDir());
+        cache_dir.mkpath(cache_dir.absolutePath());
+        QFile file(cache_dir.absoluteFilePath(key));
         file.open(QIODevice::WriteOnly);
         file.write(content);
         file.close();

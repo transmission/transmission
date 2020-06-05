@@ -6,7 +6,9 @@
  *
  */
 
+#include <array>
 #include <cassert>
+#include <utility>
 
 #include <QCheckBox>
 #include <QFileDialog>
@@ -50,10 +52,10 @@
 namespace
 {
 
-auto const TOTAL_RATIO_STATS_MODE_NAME = QStringLiteral("total-ratio");
-auto const TOTAL_TRANSFER_STATS_MODE_NAME = QStringLiteral("total-transfer");
-auto const SESSION_RATIO_STATS_MODE_NAME = QStringLiteral("session-ratio");
-auto const SESSION_TRANSFER_STATS_MODE_NAME = QStringLiteral("session-transfer");
+auto const TotalRatioStatsModeName = QStringLiteral("total-ratio");
+auto const TotalTransferStatsModeName = QStringLiteral("total-transfer");
+auto const SessionRatioStatsModeName = QStringLiteral("session-ratio");
+auto const SessionTransferStatsModeName = QStringLiteral("session-transfer");
 
 } // namespace
 
@@ -184,17 +186,15 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     ui_.action_QueueMoveDown->setIcon(getStockIcon(QStringLiteral("go-down"), QStyle::SP_ArrowDown));
     ui_.action_QueueMoveBottom->setIcon(getStockIcon(QStringLiteral("go-bottom")));
 
-    auto makeNetworkPixmap = [this](char const* name_in, QSize size = QSize(16, 16))
+    auto make_network_pixmap = [this](QString name, QSize size = { 16, 16 })
         {
-            auto const name = QString::fromUtf8(name_in);
-            QIcon const icon = getStockIcon(name, QStyle::SP_DriveNetIcon);
-            return icon.pixmap(size);
+            return getStockIcon(name, QStyle::SP_DriveNetIcon).pixmap(size);
         };
-    pixmap_network_error_ = makeNetworkPixmap("network-error");
-    pixmap_network_idle_ = makeNetworkPixmap("network-idle");
-    pixmap_network_receive_ = makeNetworkPixmap("network-receive");
-    pixmap_network_transmit_ = makeNetworkPixmap("network-transmit");
-    pixmap_network_transmit_receive_ = makeNetworkPixmap("network-transmit-receive");
+    pixmap_network_error_ = make_network_pixmap(QStringLiteral("network-error"));
+    pixmap_network_idle_ = make_network_pixmap(QStringLiteral("network-idle"));
+    pixmap_network_receive_ = make_network_pixmap(QStringLiteral("network-receive"));
+    pixmap_network_transmit_ = make_network_pixmap(QStringLiteral("network-transmit"));
+    pixmap_network_transmit_receive_ = make_network_pixmap(QStringLiteral("network-transmit-receive"));
 
     // ui signals
     connect(ui_.action_Toolbar, SIGNAL(toggled(bool)), this, SLOT(setToolbarVisible(bool)));
@@ -233,35 +233,36 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     connect(ui_.action_DeselectAll, SIGNAL(triggered()), ui_.listView, SLOT(clearSelection()));
     connect(ui_.action_Quit, SIGNAL(triggered()), qApp, SLOT(quit()));
 
-    auto refreshActionSensitivitySoon = [this]() { refreshSoon(REFRESH_ACTION_SENSITIVITY); };
-    connect(&filter_model_, &TorrentFilter::rowsInserted, this, refreshActionSensitivitySoon);
-    connect(&filter_model_, &TorrentFilter::rowsRemoved, this, refreshActionSensitivitySoon);
-    connect(&model_, &TorrentModel::torrentsChanged, this, refreshActionSensitivitySoon);
+    auto refresh_action_sensitivity_soon = [this]() { refreshSoon(REFRESH_ACTION_SENSITIVITY); };
+    connect(&filter_model_, &TorrentFilter::rowsInserted, this, refresh_action_sensitivity_soon);
+    connect(&filter_model_, &TorrentFilter::rowsRemoved, this, refresh_action_sensitivity_soon);
+    connect(&model_, &TorrentModel::torrentsChanged, this, refresh_action_sensitivity_soon);
 
     // torrent view
     filter_model_.setSourceModel(&model_);
-    auto refreshSoonAdapter = [this]() { refreshSoon(); };
-    connect(&model_, &TorrentModel::modelReset, this, refreshSoonAdapter);
-    connect(&model_, &TorrentModel::rowsRemoved, this, refreshSoonAdapter);
-    connect(&model_, &TorrentModel::rowsInserted, this, refreshSoonAdapter);
-    connect(&model_, &TorrentModel::dataChanged, this, refreshSoonAdapter);
+    auto refresh_soon_adapter = [this]() { refreshSoon(); };
+    connect(&model_, &TorrentModel::modelReset, this, refresh_soon_adapter);
+    connect(&model_, &TorrentModel::rowsRemoved, this, refresh_soon_adapter);
+    connect(&model_, &TorrentModel::rowsInserted, this, refresh_soon_adapter);
+    connect(&model_, &TorrentModel::dataChanged, this, refresh_soon_adapter);
 
     ui_.listView->setModel(&filter_model_);
-    connect(ui_.listView->selectionModel(), &QItemSelectionModel::selectionChanged, refreshActionSensitivitySoon);
+    connect(ui_.listView->selectionModel(), &QItemSelectionModel::selectionChanged, refresh_action_sensitivity_soon);
 
-    QPair<QAction*, int> const sort_modes[] =
-    {
-        qMakePair(ui_.action_SortByActivity, static_cast<int>(SortMode::SORT_BY_ACTIVITY)),
-        qMakePair(ui_.action_SortByAge, static_cast<int>(SortMode::SORT_BY_AGE)),
-        qMakePair(ui_.action_SortByETA, static_cast<int>(SortMode::SORT_BY_ETA)),
-        qMakePair(ui_.action_SortByName, static_cast<int>(SortMode::SORT_BY_NAME)),
-        qMakePair(ui_.action_SortByProgress, static_cast<int>(SortMode::SORT_BY_PROGRESS)),
-        qMakePair(ui_.action_SortByQueue, static_cast<int>(SortMode::SORT_BY_QUEUE)),
-        qMakePair(ui_.action_SortByRatio, static_cast<int>(SortMode::SORT_BY_RATIO)),
-        qMakePair(ui_.action_SortBySize, static_cast<int>(SortMode::SORT_BY_SIZE)),
-        qMakePair(ui_.action_SortByState, static_cast<int>(SortMode::SORT_BY_STATE))
-    };
+    std::array<std::pair<QAction*, int>, 9> const sort_modes =
+    {{
+        { ui_.action_SortByActivity, SortMode::SORT_BY_ACTIVITY },
+        { ui_.action_SortByAge, SortMode::SORT_BY_AGE },
+        { ui_.action_SortByETA, SortMode::SORT_BY_ETA },
+        { ui_.action_SortByName, SortMode::SORT_BY_NAME },
+        { ui_.action_SortByProgress, SortMode::SORT_BY_PROGRESS },
+        { ui_.action_SortByQueue, SortMode::SORT_BY_QUEUE },
+        { ui_.action_SortByRatio, SortMode::SORT_BY_RATIO },
+        { ui_.action_SortBySize, SortMode::SORT_BY_SIZE },
+        { ui_.action_SortByState, SortMode::SORT_BY_STATE }
+    }};
 
+    // NOLINTNEXTLINE(clang-analyzer-cplusplus.NewDeleteLeaks)
     auto* action_group = new QActionGroup(this);
 
     for (auto const& mode : sort_modes)
@@ -272,6 +273,7 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
 
     connect(action_group, SIGNAL(triggered(QAction*)), this, SLOT(onSortModeChanged(QAction*)));
 
+    // NOLINTNEXTLINE(clang-analyzer-cplusplus.NewDeleteLeaks)
     alt_speed_action_ = new QAction(tr("Speed Limits"), this);
     alt_speed_action_->setIcon(ui_.altSpeedButton->icon());
     alt_speed_action_->setCheckable(true);
@@ -311,14 +313,26 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     connect(&filter_model_, &TorrentFilter::rowsRemoved, this, refresh_header_soon);
     connect(ui_.listView, SIGNAL(headerDoubleClicked()), filter_bar_, SLOT(clear()));
 
-    QList<int> init_keys;
-    init_keys << Prefs::MAIN_WINDOW_X << Prefs::SHOW_TRAY_ICON << Prefs::SORT_REVERSED << Prefs::SORT_MODE <<
-        Prefs::FILTERBAR <<
-        Prefs::STATUSBAR << Prefs::STATUSBAR_STATS << Prefs::TOOLBAR << Prefs::ALT_SPEED_LIMIT_ENABLED <<
-        Prefs::COMPACT_VIEW << Prefs::DSPEED << Prefs::DSPEED_ENABLED << Prefs::USPEED << Prefs::USPEED_ENABLED <<
-        Prefs::RATIO << Prefs::RATIO_ENABLED;
-
-    for (int const key : init_keys)
+    static std::array<int, 16> constexpr InitKeys =
+    {
+        Prefs::ALT_SPEED_LIMIT_ENABLED,
+        Prefs::COMPACT_VIEW,
+        Prefs::DSPEED,
+        Prefs::DSPEED_ENABLED,
+        Prefs::FILTERBAR,
+        Prefs::MAIN_WINDOW_X,
+        Prefs::RATIO,
+        Prefs::RATIO_ENABLED,
+        Prefs::SHOW_TRAY_ICON,
+        Prefs::SORT_MODE,
+        Prefs::SORT_REVERSED,
+        Prefs::STATUSBAR,
+        Prefs::STATUSBAR_STATS,
+        Prefs::TOOLBAR,
+        Prefs::USPEED,
+        Prefs::USPEED_ENABLED,
+    };
+    for (auto const key : InitKeys)
     {
         refreshPref(key);
     }
@@ -394,9 +408,10 @@ QMenu* MainWindow::createOptionsMenu()
 {
     auto const init_speed_sub_menu = [this](QMenu* menu, QAction*& off_action, QAction*& on_action, int pref, int enabled_pref)
         {
-            int const stock_speeds[] = { 5, 10, 20, 30, 40, 50, 75, 100, 150, 200, 250, 500, 750 };
+            std::array<int, 13> stock_speeds = { 5, 10, 20, 30, 40, 50, 75, 100, 150, 200, 250, 500, 750 };
             int const current_value = prefs_.get<int>(pref);
 
+            // NOLINTNEXTLINE(clang-analyzer-cplusplus.NewDeleteLeaks)
             auto* action_group = new QActionGroup(this);
 
             off_action = menu->addAction(tr("Unlimited"));
@@ -421,9 +436,10 @@ QMenu* MainWindow::createOptionsMenu()
             }
         };
 
-    auto const initSeedRatioSubMenu = [this](QMenu* menu, QAction*& off_action, QAction*& on_action, int pref, int enabled_pref)
+    auto const init_seed_ratio_sub_menu =
+        [this](QMenu* menu, QAction*& off_action, QAction*& on_action, int pref, int enabled_pref)
         {
-            double const stock_ratios[] = { 0.25, 0.50, 0.75, 1, 1.5, 2, 3 };
+            std::array<double, 7> stock_ratios = { 0.25, 0.50, 0.75, 1, 1.5, 2, 3 };
             auto const current_value = prefs_.get<double>(pref);
 
             auto* action_group = new QActionGroup(this);
@@ -459,7 +475,7 @@ QMenu* MainWindow::createOptionsMenu()
 
     menu->addSeparator();
 
-    initSeedRatioSubMenu(menu->addMenu(tr("Stop Seeding at Ratio")), ratio_off_action_, ratio_on_action_, Prefs::RATIO,
+    init_seed_ratio_sub_menu(menu->addMenu(tr("Stop Seeding at Ratio")), ratio_off_action_, ratio_on_action_, Prefs::RATIO,
         Prefs::RATIO_ENABLED);
 
     return menu;
@@ -467,26 +483,27 @@ QMenu* MainWindow::createOptionsMenu()
 
 QMenu* MainWindow::createStatsModeMenu()
 {
-    QPair<QAction*, QString> const stats_modes[] =
+    std::array<QPair<QAction*, QString>, 4> stats_modes =
     {
-        qMakePair(ui_.action_TotalRatio, TOTAL_RATIO_STATS_MODE_NAME),
-        qMakePair(ui_.action_TotalTransfer, TOTAL_TRANSFER_STATS_MODE_NAME),
-        qMakePair(ui_.action_SessionRatio, SESSION_RATIO_STATS_MODE_NAME),
-        qMakePair(ui_.action_SessionTransfer, SESSION_TRANSFER_STATS_MODE_NAME)
+        qMakePair(ui_.action_TotalRatio, TotalRatioStatsModeName),
+        qMakePair(ui_.action_TotalTransfer, TotalTransferStatsModeName),
+        qMakePair(ui_.action_SessionRatio, SessionRatioStatsModeName),
+        qMakePair(ui_.action_SessionTransfer, SessionTransferStatsModeName)
     };
 
-    auto* actionGroup = new QActionGroup(this);
+    auto* action_group = new QActionGroup(this);
     auto* menu = new QMenu(this);
 
     for (auto const& mode : stats_modes)
     {
         mode.first->setProperty(STATS_MODE_KEY, QString(mode.second));
-        actionGroup->addAction(mode.first);
+        action_group->addAction(mode.first);
         menu->addAction(mode.first);
     }
 
-    connect(actionGroup, SIGNAL(triggered(QAction*)), this, SLOT(onStatsModeChanged(QAction*)));
+    connect(action_group, SIGNAL(triggered(QAction*)), this, SLOT(onStatsModeChanged(QAction*)));
 
+    // NOLINTNEXTLINE(clang-analyzer-cplusplus.NewDeleteLeaks)
     return menu;
 }
 
@@ -566,7 +583,7 @@ namespace
 
 #define HAVE_OPEN_SELECT
 
-static void openSelect(QString const& path)
+void openSelect(QString const& path)
 {
     auto const explorer = QStringLiteral("explorer");
     QString param;
@@ -584,7 +601,7 @@ static void openSelect(QString const& path)
 
 #define HAVE_OPEN_SELECT
 
-static void openSelect(QString const& path)
+void openSelect(QString const& path)
 {
     QStringList script_args;
     script_args << QStringLiteral("-e") <<
@@ -792,17 +809,17 @@ void MainWindow::refreshStatusBar(TransferStats const& stats)
     QString const mode(prefs_.getString(Prefs::STATUSBAR_STATS));
     QString str;
 
-    if (mode == SESSION_RATIO_STATS_MODE_NAME)
+    if (mode == SessionRatioStatsModeName)
     {
         str = tr("Ratio: %1").arg(Formatter::ratioToString(session_.getStats().ratio));
     }
-    else if (mode == SESSION_TRANSFER_STATS_MODE_NAME)
+    else if (mode == SessionTransferStatsModeName)
     {
         tr_session_stats const& stats(session_.getStats());
         str = tr("Down: %1, Up: %2").arg(Formatter::sizeToString(stats.downloadedBytes)).
             arg(Formatter::sizeToString(stats.uploadedBytes));
     }
-    else if (mode == TOTAL_TRANSFER_STATS_MODE_NAME)
+    else if (mode == TotalTransferStatsModeName)
     {
         tr_session_stats const& stats(session_.getCumulativeStats());
         str = tr("Down: %1, Up: %2").arg(Formatter::sizeToString(stats.downloadedBytes)).
@@ -810,7 +827,7 @@ void MainWindow::refreshStatusBar(TransferStats const& stats)
     }
     else // default is "total-ratio"
     {
-        assert(mode == TOTAL_RATIO_STATS_MODE_NAME);
+        assert(mode == TotalRatioStatsModeName);
         str = tr("Ratio: %1").arg(Formatter::ratioToString(session_.getCumulativeStats().ratio));
     }
 
@@ -849,12 +866,12 @@ void MainWindow::refreshActionSensitivity()
     auto const now = time(nullptr);
     for (int row = 0; row < row_count; ++row)
     {
-        QModelIndex const modelIndex(model->index(row, 0));
-        auto const& tor = model->data(modelIndex, TorrentModel::TorrentRole).value<Torrent const*>();
+        QModelIndex const model_index(model->index(row, 0));
+        auto const& tor = model->data(model_index, TorrentModel::TorrentRole).value<Torrent const*>();
 
         if (tor != nullptr)
         {
-            bool const is_selected = has_selection && selection_model->isSelected(modelIndex);
+            bool const is_selected = has_selection && selection_model->isSelected(model_index);
             bool const is_paused = tor->isPaused();
 
             if (is_paused)
@@ -926,6 +943,7 @@ void MainWindow::refreshActionSensitivity()
 ***
 **/
 
+// NOLINTNEXTLINE(readability-make-member-function-const)
 void MainWindow::clearSelection()
 {
     ui_.action_DeselectAll->trigger();
@@ -1245,7 +1263,7 @@ void MainWindow::refreshPref(int key)
 namespace
 {
 
-auto const SHOW_OPTIONS_CHECKBOX_NAME = QStringLiteral("show-options-checkbox");
+auto const ShowOptionsCheckboxName = QStringLiteral("show-options-checkbox");
 
 } // namespace
 
@@ -1270,7 +1288,7 @@ void MainWindow::openTorrent()
     {
         auto* b = new QCheckBox(tr("Show &options dialog"));
         b->setChecked(prefs_.getBool(Prefs::OPTIONS_PROMPT));
-        b->setObjectName(SHOW_OPTIONS_CHECKBOX_NAME);
+        b->setObjectName(ShowOptionsCheckboxName);
         l->addWidget(b, l->rowCount(), 0, 1, -1, Qt::AlignLeft);
     }
 
@@ -1304,7 +1322,7 @@ void MainWindow::addTorrents(QStringList const& filenames)
 
     if (file_dialog != nullptr)
     {
-        auto const* const b = file_dialog->findChild<QCheckBox const*>(SHOW_OPTIONS_CHECKBOX_NAME);
+        auto const* const b = file_dialog->findChild<QCheckBox const*>(ShowOptionsCheckboxName);
 
         if (b != nullptr)
         {
@@ -1443,12 +1461,12 @@ void MainWindow::removeTorrents(bool const delete_files)
 
 void MainWindow::updateNetworkIcon()
 {
-    static constexpr int const period = 3;
+    static constexpr int const Period = 3;
     time_t const now = time(nullptr);
     time_t const seconds_since_last_send = now - last_send_time_;
     time_t const seconds_since_last_read = now - last_read_time_;
-    bool const is_sending = seconds_since_last_send <= period;
-    bool const is_reading = seconds_since_last_read <= period;
+    bool const is_sending = seconds_since_last_send <= Period;
+    bool const is_reading = seconds_since_last_read <= Period;
     QPixmap pixmap;
 
     if (network_error_)

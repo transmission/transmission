@@ -12,25 +12,21 @@
 
 bool InteropHelper::isConnected() const
 {
+    bool is_connected = false;
+
 #ifdef ENABLE_DBUS_INTEROP
 
-    if (dbus_client_.isConnected())
-    {
-        return true;
-    }
+    is_connected |= dbus_client_.isConnected();
 
 #endif
 
 #ifdef ENABLE_COM_INTEROP
 
-    if (com_client_.isConnected())
-    {
-        return true;
-    }
+    is_connected |= com_client_.isConnected();
 
 #endif
 
-    return false;
+    return is_connected;
 }
 
 bool InteropHelper::addMetainfo(QString const& metainfo)

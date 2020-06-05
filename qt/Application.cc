@@ -6,6 +6,7 @@
  *
  */
 
+#include <array>
 #include <ctime>
 #include <iostream>
 
@@ -41,12 +42,12 @@
 namespace
 {
 
-auto const MY_CONFIG_NAME = QStringLiteral("transmission");
-auto const MY_READABLE_NAME = QStringLiteral("transmission-qt");
+auto const MyConfigName = QStringLiteral("transmission");
+auto const MyReadableName = QStringLiteral("transmission-qt");
 
-tr_option const opts[] =
+std::array<tr_option, 8> const Opts =
 {
-    { 'g', "config-dir", "Where to look for configuration files", "g", true, "<path>" },
+    tr_option{ 'g', "config-dir", "Where to look for configuration files", "g", true, "<path>" },
     { 'm', "minimized", "Start minimized in system tray", "m", false, nullptr },
     { 'p', "port", "Port to use when connecting to an existing session", "p", true, "<port>" },
     { 'r', "remote", "Connect to an existing session at the specified hostname", "r", true, "<host>" },
@@ -87,7 +88,7 @@ bool loadTranslation(QTranslator& translator, QString const& name, QLocale const
 Application::Application(int& argc, char** argv) :
     QApplication(argc, argv)
 {
-    setApplicationName(MY_CONFIG_NAME);
+    setApplicationName(MyConfigName);
     loadTranslations();
 
     Formatter::initUnits();
@@ -106,10 +107,8 @@ Application::Application(int& argc, char** argv) :
 
     if (icon.isNull())
     {
-        QList<int> sizes;
-        sizes << 16 << 22 << 24 << 32 << 48 << 64 << 72 << 96 << 128 << 192 << 256;
-
-        for (int const size : sizes)
+        static std::array<int, 11> constexpr Sizes = { 16, 22, 24, 32, 48, 64, 72, 96, 128, 192, 256 };
+        for (auto const size : Sizes)
         {
             icon.addPixmap(QPixmap(QStringLiteral(":/icons/transmission-%1.png").arg(size)));
         }
@@ -132,7 +131,7 @@ Application::Application(int& argc, char** argv) :
     QString config_dir;
     QStringList filenames;
 
-    while ((c = tr_getopt(getUsage(), argc, const_cast<char const**>(argv), opts, &optarg)) != TR_OPT_DONE)
+    while ((c = tr_getopt(getUsage(), argc, const_cast<char const**>(argv), Opts.data(), &optarg)) != TR_OPT_DONE)
     {
         switch (c)
         {
@@ -161,13 +160,13 @@ Application::Application(int& argc, char** argv) :
             break;
 
         case 'v':
-            std::cerr << qPrintable(MY_READABLE_NAME) << ' ' << LONG_VERSION_STRING << std::endl;
+            std::cerr << qPrintable(MyReadableName) << ' ' << LONG_VERSION_STRING << std::endl;
             quitLater();
             return;
 
         case TR_OPT_ERR:
             std::cerr << qPrintable(QObject::tr("Invalid option")) << std::endl;
-            tr_getopt_usage(qPrintable(MY_READABLE_NAME), getUsage(), opts);
+            tr_getopt_usage(qPrintable(MyReadableName), getUsage(), Opts.data());
             quitLater();
             return;
 
@@ -377,8 +376,8 @@ void Application::loadTranslations()
         installTranslator(&qt_translator_);
     }
 
-    if (loadTranslation(app_translator_, MY_CONFIG_NAME, locale, app_qm_dirs) ||
-        loadTranslation(app_translator_, MY_CONFIG_NAME, english_locale, app_qm_dirs))
+    if (loadTranslation(app_translator_, MyConfigName, locale, app_qm_dirs) ||
+        loadTranslation(app_translator_, MyConfigName, english_locale, app_qm_dirs))
     {
         installTranslator(&app_translator_);
     }
@@ -464,11 +463,11 @@ Application::~Application()
 {
     if (prefs_ != nullptr && window_ != nullptr)
     {
-        QRect const mainwinRect(window_->geometry());
-        prefs_->set(Prefs::MAIN_WINDOW_HEIGHT, std::max(100, mainwinRect.height()));
-        prefs_->set(Prefs::MAIN_WINDOW_WIDTH, std::max(100, mainwinRect.width()));
-        prefs_->set(Prefs::MAIN_WINDOW_X, mainwinRect.x());
-        prefs_->set(Prefs::MAIN_WINDOW_Y, mainwinRect.y());
+        auto const geometry = window_->geometry();
+        prefs_->set(Prefs::MAIN_WINDOW_HEIGHT, std::max(100, geometry.height()));
+        prefs_->set(Prefs::MAIN_WINDOW_WIDTH, std::max(100, geometry.width()));
+        prefs_->set(Prefs::MAIN_WINDOW_X, geometry.x());
+        prefs_->set(Prefs::MAIN_WINDOW_Y, geometry.y());
     }
 
     delete watch_dir_;
@@ -584,16 +583,16 @@ bool Application::notifyApp(QString const& title, QString const& body) const
 {
 #ifdef QT_DBUS_LIB
 
-    auto const DBUS_SERVICE_NAME = QStringLiteral("org.freedesktop.Notifications");
-    auto const DBUS_INTERFACE_NAME = QStringLiteral("org.freedesktop.Notifications");
-    auto const DBUS_PATH = QStringLiteral("/org/freedesktop/Notifications");
+    auto const dbus_service_name = QStringLiteral("org.freedesktop.Notifications");
+    auto const dbus_interface_name = QStringLiteral("org.freedesktop.Notifications");
+    auto const dbus_path = QStringLiteral("/org/freedesktop/Notifications");
 
     QDBusConnection bus = QDBusConnection::sessionBus();
 
     if (bus.isConnected())
     {
         QDBusMessage m =
-            QDBusMessage::createMethodCall(DBUS_SERVICE_NAME, DBUS_PATH, DBUS_INTERFACE_NAME, QStringLiteral("Notify"));
+            QDBusMessage::createMethodCall(dbus_service_name, dbus_path, dbus_interface_name, QStringLiteral("Notify"));
         QVariantList args;
         args.append(QStringLiteral("Transmission")); // app_name
         args.append(0U); // replaces_id
@@ -627,7 +626,7 @@ FaviconCache& Application::faviconCache()
 ****
 ***/
 
-int tr_main(int argc, char* argv[])
+int tr_main(int argc, char** argv)
 {
     InteropHelper::initialize();
 

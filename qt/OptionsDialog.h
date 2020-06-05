@@ -35,7 +35,7 @@ class OptionsDialog : public BaseDialog
     Q_OBJECT
 
 public:
-    OptionsDialog(Session& session, Prefs const& prefs, AddData const& addme, QWidget* parent = nullptr);
+    OptionsDialog(Session& session, Prefs const& prefs, AddData addme, QWidget* parent = nullptr);
     virtual ~OptionsDialog();
 
 private:
@@ -72,9 +72,9 @@ private:
     QVector<bool> wanted_;
     QVector<int> priorities_;
     Session& session_;
-    Ui::OptionsDialog ui_;
+    Ui::OptionsDialog ui_ = {};
     mybins_t verify_bins_;
-    tr_info info_;
+    tr_info info_ = {};
     uint64_t verify_file_pos_ = {};
     uint32_t verify_piece_index_ = {};
     uint32_t verify_piece_pos_ = {};

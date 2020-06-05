@@ -8,7 +8,7 @@
 
 #include "Filters.h"
 
-QString const FilterMode::names_[NUM_MODES] =
+std::array<QString, FilterMode::NUM_MODES> const FilterMode::Names =
 {
     QStringLiteral("show-all"),
     QStringLiteral("show-active"),
@@ -24,7 +24,7 @@ int FilterMode::modeFromName(QString const& name)
 {
     for (int i = 0; i < NUM_MODES; ++i)
     {
-        if (names_[i] == name)
+        if (Names[i] == name)
         {
             return i;
         }
@@ -33,7 +33,7 @@ int FilterMode::modeFromName(QString const& name)
     return FilterMode().mode(); // use the default value
 }
 
-QString const SortMode::names_[NUM_MODES] =
+std::array<QString, SortMode::NUM_MODES> const SortMode::Names =
 {
     QStringLiteral("sort-by-activity"),
     QStringLiteral("sort-by-age"),
@@ -51,7 +51,7 @@ int SortMode::modeFromName(QString const& name)
 {
     for (int i = 0; i < NUM_MODES; ++i)
     {
-        if (names_[i] == name)
+        if (Names[i] == name)
         {
             return i;
         }

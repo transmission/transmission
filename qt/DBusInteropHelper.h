@@ -15,6 +15,9 @@ class QVariant;
 class DBusInteropHelper
 {
 public:
+    DBusInteropHelper() = default;
+    ~DBusInteropHelper() = default;
+
     bool isConnected() const;
 
     QVariant addMetainfo(QString const& metainfo);

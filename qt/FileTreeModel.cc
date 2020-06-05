@@ -31,27 +31,27 @@ protected:
     QString token_;
     int slash_index_;
 
-    static QChar const slash_char;
+    static QChar const SlashChar;
 };
 
-QChar const PathIteratorBase::slash_char = QLatin1Char('/');
+QChar const PathIteratorBase::SlashChar = QLatin1Char('/');
 
 class ForwardPathIterator : public PathIteratorBase
 {
 public:
-    ForwardPathIterator(QString const& path) :
+    explicit ForwardPathIterator(QString const& path) :
         PathIteratorBase(path, path.size() - 1)
     {
     }
 
-    bool hasNext() const
+    [[nodiscard]] bool hasNext() const
     {
         return slash_index_ > -1;
     }
 
     QString const& next()
     {
-        int new_slash_index = path_.lastIndexOf(slash_char, slash_index_);
+        int new_slash_index = path_.lastIndexOf(SlashChar, slash_index_);
         token_.truncate(0);
         token_ += path_.midRef(new_slash_index + 1, slash_index_ - new_slash_index);
         slash_index_ = new_slash_index - 1;
@@ -62,19 +62,19 @@ public:
 class BackwardPathIterator : public PathIteratorBase
 {
 public:
-    BackwardPathIterator(QString const& path) :
+    explicit BackwardPathIterator(QString const& path) :
         PathIteratorBase(path, 0)
     {
     }
 
-    bool hasNext() const
+    [[nodiscard]] bool hasNext() const
     {
         return slash_index_ < path_.size();
     }
 
     QString const& next()
     {
-        int new_slash_index = path_.indexOf(slash_char, slash_index_);
+        int new_slash_index = path_.indexOf(SlashChar, slash_index_);
 
         if (new_slash_index == -1)
         {
@@ -274,18 +274,11 @@ QModelIndex FileTreeModel::parent(QModelIndex const& child, int column) const
 
 int FileTreeModel::rowCount(QModelIndex const& parent) const
 {
-    FileTreeItem* parentItem;
+    FileTreeItem* parent_item = parent.isValid() ?
+        itemFromIndex(parent) :
+        root_item_;
 
-    if (parent.isValid())
-    {
-        parentItem = itemFromIndex(parent);
-    }
-    else
-    {
-        parentItem = root_item_;
-    }
-
-    return parentItem->childCount();
+    return parent_item->childCount();
 }
 
 int FileTreeModel::columnCount(QModelIndex const& parent) const
@@ -463,11 +456,11 @@ void FileTreeModel::emitParentsChanged(QModelIndex const& index, int first_colum
     }
 }
 
-void FileTreeModel::emitSubtreeChanged(QModelIndex const& index, int first_column, int last_column)
+void FileTreeModel::emitSubtreeChanged(QModelIndex const& idx, int first_column, int last_column)
 {
     assert(first_column <= last_column);
 
-    int const child_count = rowCount(index);
+    int const child_count = rowCount(idx);
 
     if (child_count == 0)
     {
@@ -475,12 +468,12 @@ void FileTreeModel::emitSubtreeChanged(QModelIndex const& index, int first_colum
     }
 
     // tell everyone that this item changed
-    emit dataChanged(index.child(0, first_column), index.child(child_count - 1, last_column));
+    emit dataChanged(index(0, first_column, idx), index(child_count - 1, last_column, idx));
 
     // walk the subitems
     for (int i = 0; i < child_count; ++i)
     {
-        emitSubtreeChanged(index.child(i, 0), first_column, last_column);
+        emitSubtreeChanged(index(i, 0, idx), first_column, last_column);
     }
 }
 

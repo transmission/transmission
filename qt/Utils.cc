@@ -110,7 +110,7 @@ QIcon fileIcon()
     return icon;
 }
 
-std::unordered_map<QString, QIcon> iconCache;
+std::unordered_map<QString, QIcon> icon_cache;
 
 QIcon getMimeIcon(QString const& filename)
 {
@@ -132,11 +132,11 @@ QIcon getMimeIcon(QString const& filename)
         return folderIcon();
     }
 
-    QIcon& icon = iconCache[ext];
+    QIcon& icon = icon_cache[ext];
     if (icon.isNull()) // cache miss
     {
-        QMimeDatabase mimeDb;
-        QMimeType type = mimeDb.mimeTypeForFile(filename, QMimeDatabase::MatchExtension);
+        QMimeDatabase mime_db;
+        QMimeType type = mime_db.mimeTypeForFile(filename, QMimeDatabase::MatchExtension);
         if (icon.isNull())
         {
             icon = QIcon::fromTheme(type.iconName());

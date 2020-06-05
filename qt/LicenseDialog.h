@@ -22,5 +22,5 @@ public:
     virtual ~LicenseDialog() = default;
 
 private:
-    Ui::LicenseDialog ui_;
+    Ui::LicenseDialog ui_ = {};
 };

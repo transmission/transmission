@@ -45,12 +45,12 @@ protected:
 
     QStyleOptionProgressBar* progress_bar_style_ = {};
 
-    static QColor blue_brush_;
-    static QColor green_brush_;
-    static QColor silver_brush_;
-    static QColor blue_back_;
-    static QColor green_back_;
-    static QColor silver_back_;
+    static QColor blue_brush;
+    static QColor green_brush;
+    static QColor silver_brush;
+    static QColor blue_back;
+    static QColor green_back;
+    static QColor silver_back;
 
 private:
     mutable std::optional<int> height_hint_;
