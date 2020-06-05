@@ -256,9 +256,15 @@ void DetailsDialog::setIds(torrent_ids_t const& ids)
         ui_.filesView->clear();
 
         ids_ = ids;
-        session_.refreshDetailInfo(ids_);
+
+        // refresh the UI with the info we have
         changed_torrents_ = true;
+        refresh();
         tracker_model_->refresh(model_, ids_);
+
+        // ask the backend for updated info
+        changed_torrents_ = true;
+        session_.refreshDetailInfo(ids_);
         onTimer();
     }
 }
