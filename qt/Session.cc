@@ -116,6 +116,12 @@ void Session::portTest()
     q->run();
 }
 
+QString Session::getExternalIPStr()
+{
+    char const* ip_str = tr_sessionGetExternalIPStr(session_);
+    return tr_str_is_empty(ip_str) ? QString() : QString::fromUtf8(ip_str);
+}
+
 void Session::copyMagnetLinkToClipboard(int torrent_id)
 {
     tr_variant args;
@@ -164,6 +170,8 @@ void Session::updatePref(int key)
         case Prefs::ALT_SPEED_LIMIT_TIME_ENABLED:
         case Prefs::ALT_SPEED_LIMIT_TIME_END:
         case Prefs::ALT_SPEED_LIMIT_UP:
+        case Prefs::ANNOUNCE_EXTERNAL_IP:
+        case Prefs::STATIC_EXTERNAL_IP:
         case Prefs::BLOCKLIST_DATE:
         case Prefs::BLOCKLIST_ENABLED:
         case Prefs::BLOCKLIST_URL:

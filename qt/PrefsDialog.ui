@@ -802,6 +802,69 @@
         </layout>
        </item>
        <item>
+        <spacer name="externalIPSectionSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Fixed</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>1</width>
+           <height>10</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QLabel" name="externalIPSectionLabel">
+         <property name="styleSheet">
+          <string notr="true">font-weight:bold</string>
+         </property>
+         <property name="text">
+          <string>External IP address</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QGridLayout" name="externalIPSectionLayout" columnstretch="0,0">
+         <property name="leftMargin">
+          <number>18</number>
+         </property>
+         <item row="0" column="0" colspan="2">
+          <widget class="QCheckBox" name="enableAnnounceExternalIPCheck">
+           <property name="text">
+            <string>Announce &amp;external IP address</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QLineEdit" name="externalIPEdit"/>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="externalIPLabel">
+           <property name="text">
+            <string>External &amp;IP (optional):</string>
+           </property>
+           <property name="buddy">
+            <cstring>externalIPEdit</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0" colspan="2">
+          <widget class="QLabel" name="currentExternalIPlabel">
+           <property name="text">
+            <string/>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
         <spacer name="peerLimitsSectionSpacer">
          <property name="orientation">
           <enum>Qt::Vertical</enum>

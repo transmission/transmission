@@ -403,6 +403,24 @@ void PrefsDialog::onPortTest()
     session_.portTest();
 }
 
+void PrefsDialog::onUpdateCurrentExternalIP()
+{
+    QString ip_str = session_.getExternalIPStr();
+
+    if (ip_str.isEmpty())
+    {
+        ip_str = tr("address unknown");
+    }
+
+    ui_.currentExternalIPlabel->setText(tr("<i>Current external IP: %1</i>").arg(ip_str));
+
+    if (ext_ip_tick_count_ != 0)
+    {
+        --ext_ip_tick_count_;
+        QTimer::singleShot(500, this, SLOT(onUpdateCurrentExternalIP()));
+    }
+}
+
 void PrefsDialog::initNetworkTab()
 {
     ui_.torrentPeerLimitSpin->setRange(1, FD_SETSIZE);
@@ -417,9 +435,14 @@ void PrefsDialog::initNetworkTab()
     linkWidgetToPref(ui_.enablePexCheck, Prefs::PEX_ENABLED);
     linkWidgetToPref(ui_.enableDhtCheck, Prefs::DHT_ENABLED);
     linkWidgetToPref(ui_.enableLpdCheck, Prefs::LPD_ENABLED);
+    linkWidgetToPref(ui_.enableAnnounceExternalIPCheck, Prefs::ANNOUNCE_EXTERNAL_IP);
+    linkWidgetToPref(ui_.externalIPEdit, Prefs::STATIC_EXTERNAL_IP);
+
+    ext_ip_widgets_ << ui_.externalIPEdit << ui_.externalIPLabel << ui_.currentExternalIPlabel;
 
     auto* cr = new ColumnResizer(this);
     cr->addLayout(ui_.incomingPeersSectionLayout);
+    cr->addLayout(ui_.externalIPSectionLayout);
     cr->addLayout(ui_.peerLimitsSectionLayout);
     cr->update();
 
@@ -616,7 +639,7 @@ PrefsDialog::PrefsDialog(Session& session, Prefs& prefs, QWidget* parent) :
 
     connect(&session_, SIGNAL(sessionUpdated()), SLOT(sessionUpdated()));
 
-    static std::array<int, 10> constexpr InitKeys =
+    static std::array<int, 11> constexpr InitKeys =
     {
         Prefs::ALT_SPEED_LIMIT_ENABLED,
         Prefs::ALT_SPEED_LIMIT_TIME_ENABLED,
@@ -627,7 +650,8 @@ PrefsDialog::PrefsDialog(Session& session, Prefs& prefs, QWidget* parent) :
         Prefs::INCOMPLETE_DIR,
         Prefs::INCOMPLETE_DIR_ENABLED,
         Prefs::RPC_ENABLED,
-        Prefs::SCRIPT_TORRENT_DONE_FILENAME
+        Prefs::SCRIPT_TORRENT_DONE_FILENAME,
+        Prefs::ANNOUNCE_EXTERNAL_IP
     };
 
     for (auto const key : InitKeys)
@@ -737,6 +761,28 @@ void PrefsDialog::refreshPref(int key)
     case Prefs::PEER_PORT:
         ui_.peerPortStatusLabel->setText(tr("Status unknown"));
         ui_.testPeerPortButton->setEnabled(true);
+        break;
+
+    case Prefs::ANNOUNCE_EXTERNAL_IP:
+        {
+            bool const enabled = prefs_.getBool(key);
+
+            for (QWidget* const w : ext_ip_widgets_)
+            {
+                w->setEnabled(enabled);
+            }
+
+            onUpdateCurrentExternalIP();
+            break;
+        }
+
+    case Prefs::STATIC_EXTERNAL_IP:
+        onUpdateCurrentExternalIP();
+        break;
+
+    case Prefs::PORT_FORWARDING:
+        ext_ip_tick_count_ = 20; // 20 * 500 == 10 seconds
+        onUpdateCurrentExternalIP();
         break;
 
     default:

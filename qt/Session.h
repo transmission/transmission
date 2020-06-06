@@ -66,6 +66,7 @@ public:
     void setBlocklistSize(int64_t i);
     void updateBlocklist();
     void portTest();
+    QString getExternalIPStr();
     void copyMagnetLinkToClipboard(int torrent_id);
 
     /** returns true if the transmission session is being run inside this client */
