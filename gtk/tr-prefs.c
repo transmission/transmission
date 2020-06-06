@@ -34,6 +34,9 @@ struct prefs_dialog_data
     GtkWidget* port_label;
     GtkWidget* port_button;
     GtkWidget* port_spin;
+    GtkWidget* ext_ip_label;
+    gint ext_ip_timer;
+    int ext_ip_tick_count;
 };
 
 /**
@@ -1111,7 +1114,46 @@ static void onPortTest(GtkButton* button UNUSED, gpointer vdata)
     gtr_core_port_test(data->core);
 }
 
-static GtkWidget* networkPage(GObject* core)
+static void showExternalIP(GtkLabel* label, TrCore* core)
+{
+    tr_session* session;
+    char const* ip_str;
+    char* text;
+
+    session = gtr_core_session(core);
+    ip_str = tr_sessionGetExternalIPStr(session);
+
+    if (tr_str_is_empty(ip_str))
+    {
+        ip_str = _("address unknown");
+    }
+
+    text = g_strdup_printf(_("<i>Current external IP: %s</i>"), ip_str);
+    gtk_label_set_markup(label, text);
+    g_free(text);
+}
+
+static gint onExternalIPTimeout(gpointer gdata)
+{
+    struct prefs_dialog_data* data = gdata;
+
+    showExternalIP(GTK_LABEL(data->ext_ip_label), data->core);
+
+    if (data->ext_ip_tick_count != 0)
+    {
+        --data->ext_ip_tick_count;
+    }
+
+    if (data->ext_ip_tick_count == 0)
+    {
+        g_source_remove(data->ext_ip_timer);
+        data->ext_ip_timer = 0;
+    }
+
+    return data->ext_ip_tick_count;
+}
+
+static GtkWidget* networkPage(GObject* core, struct prefs_dialog_data* pd_data)
 {
     GtkWidget* t;
     GtkWidget* w;
@@ -1151,6 +1193,29 @@ static GtkWidget* networkPage(GObject* core)
     s = _("Use UPnP or NAT-PMP port _forwarding from my router");
     w = new_check_button(s, TR_KEY_port_forwarding_enabled, core);
     hig_workarea_add_wide_control(t, &row, w);
+
+    hig_workarea_add_section_divider(t, &row);
+    hig_workarea_add_section_title(t, &row, _("External IP address"));
+
+    s = _("Announce external IP address");
+    l = new_check_button(s, TR_KEY_announce_external_ip, core);
+    hig_workarea_add_wide_control(t, &row, l);
+
+    s = _("External IP (optional):");
+    w = new_entry(TR_KEY_static_external_ip, core);
+    g_signal_connect(l, "toggled", G_CALLBACK(target_cb), w);
+    target_cb(l, w);
+    w = hig_workarea_add_row(t, &row, s, w, NULL);
+    g_signal_connect(l, "toggled", G_CALLBACK(target_cb), w);
+    target_cb(l, w);
+
+    w = gtk_label_new("");
+    gtk_label_set_use_markup(GTK_LABEL(w), TRUE);
+    g_object_set(w, "halign", GTK_ALIGN_END, "valign", GTK_ALIGN_CENTER, NULL);
+    hig_workarea_add_wide_control(t, &row, w);
+    g_signal_connect(l, "toggled", G_CALLBACK(target_cb), w);
+    target_cb(l, w);
+    pd_data->ext_ip_label = w;
 
     hig_workarea_add_section_divider(t, &row);
     hig_workarea_add_section_title(t, &row, _("Peer Limits"));
@@ -1205,6 +1270,11 @@ static void on_prefs_dialog_destroyed(gpointer gdata, GObject* dead_dialog G_GNU
         g_signal_handler_disconnect(data->core, data->core_prefs_tag);
     }
 
+    if (data->ext_ip_timer != 0)
+    {
+        g_source_remove(data->ext_ip_timer);
+    }
+
     g_free(data);
 }
 
@@ -1228,6 +1298,23 @@ static void on_core_prefs_changed(TrCore* core, tr_quark const key, gpointer gda
         char const* downloadDir = tr_sessionGetDownloadDir(gtr_core_session(core));
         gtr_freespace_label_set_dir(data->freespace_label, downloadDir);
     }
+
+    if (key == TR_KEY_announce_external_ip ||
+        key == TR_KEY_static_external_ip ||
+        key == TR_KEY_port_forwarding_enabled)
+    {
+        showExternalIP(GTK_LABEL(data->ext_ip_label), core);
+    }
+
+    if (key == TR_KEY_port_forwarding_enabled)
+    {
+        data->ext_ip_tick_count = 20; /* 500 * 20 == 10 seconds */
+
+        if (data->ext_ip_timer == 0)
+        {
+            data->ext_ip_timer = g_timeout_add(500, onExternalIPTimeout, gdata);
+        }
+    }
 }
 
 GtkWidget* gtr_prefs_dialog_new(GtkWindow* parent, GObject* core)
@@ -1235,7 +1322,7 @@ GtkWidget* gtr_prefs_dialog_new(GtkWindow* parent, GObject* core)
     GtkWidget* d;
     GtkWidget* n;
     struct prefs_dialog_data* data;
-    tr_quark const prefs_quarks[] = { TR_KEY_peer_port, TR_KEY_download_dir };
+    tr_quark const prefs_quarks[] = { TR_KEY_peer_port, TR_KEY_download_dir, TR_KEY_announce_external_ip };
 
     data = g_new0(struct prefs_dialog_data, 1);
     data->core = TR_CORE(core);
@@ -1254,7 +1341,7 @@ GtkWidget* gtr_prefs_dialog_new(GtkWindow* parent, GObject* core)
     gtk_notebook_append_page(GTK_NOTEBOOK(n), downloadingPage(core, data), gtk_label_new(C_("Gerund", "Downloading")));
     gtk_notebook_append_page(GTK_NOTEBOOK(n), seedingPage(core), gtk_label_new(C_("Gerund", "Seeding")));
     gtk_notebook_append_page(GTK_NOTEBOOK(n), privacyPage(core), gtk_label_new(_("Privacy")));
-    gtk_notebook_append_page(GTK_NOTEBOOK(n), networkPage(core), gtk_label_new(_("Network")));
+    gtk_notebook_append_page(GTK_NOTEBOOK(n), networkPage(core, data), gtk_label_new(_("Network")));
     gtk_notebook_append_page(GTK_NOTEBOOK(n), desktopPage(core), gtk_label_new(_("Desktop")));
     gtk_notebook_append_page(GTK_NOTEBOOK(n), remotePage(core), gtk_label_new(_("Remote")));
 

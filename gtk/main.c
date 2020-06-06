@@ -1294,6 +1294,14 @@ static void on_prefs_changed(TrCore* core UNUSED, tr_quark const key, gpointer d
         tr_sessionSetDeleteSource(tr, gtr_pref_flag_get(key));
         break;
 
+    case TR_KEY_announce_external_ip:
+        tr_sessionSetAnnounceExternalIP(tr, gtr_pref_flag_get(key));
+        break;
+
+    case TR_KEY_static_external_ip:
+        tr_sessionSetStaticExternalIP(tr, gtr_pref_string_get(key));
+        break;
+
     default:
         break;
     }

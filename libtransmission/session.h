@@ -323,5 +323,4 @@ void tr_sessionGetNextQueuedTorrents(tr_session* session, tr_direction dir, size
 
 int tr_sessionCountQueueFreeSlots(tr_session* session, tr_direction);
 
-char const* tr_sessionGetExternalIPStr(tr_session const* session);
 uint32_t tr_sessionGetExternalIPAddr(tr_session const* session);

@@ -490,6 +490,8 @@ void tr_sessionSetStaticExternalIP(tr_session* session, char const* str);
 
 char const* tr_sessionGetStaticExternalIP(tr_session const* session);
 
+char const* tr_sessionGetExternalIPStr(tr_session const* session);
+
 void tr_sessionSetPeerPort(tr_session* session, tr_port port);
 
 tr_port tr_sessionGetPeerPort(tr_session const* session);
