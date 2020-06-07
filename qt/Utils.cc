@@ -310,12 +310,12 @@ QString Utils::getDynamicDownloadDir(Prefs const& prefs, QString const& torrentN
         auto const filter_table = prefs.getString(Prefs::DOWNLOAD_DIR_DYNAMIC_TABLE);
         auto const rows = filter_table.split(QStringLiteral(";"));
 
-        for (>const< auto& row : rows)
+        for (auto const& row : rows)
         {
             auto const column = row.split(QStringLiteral(","));
 
-            >const< auto& expression = column[1];
-            >const< auto& path = column[2];
+            auto const& expression = column[1];
+            auto const& path = column[2];
 
             QRegularExpression rg(expression);
 

@@ -168,21 +168,21 @@ FilterDataModel::FilterDataModel(QObject* parent) :
 {
 }
 
-int FilterDataModel::rowCount(>const< QModelIndex& index) const
+int FilterDataModel::rowCount(QModelIndex const& index) const
 {
     (void)index;
 
     return data_.count();
 }
 
-int FilterDataModel::columnCount(>const< QModelIndex& index) const
+int FilterDataModel::columnCount(QModelIndex const& index) const
 {
     (void)index;
 
     return Columns::ColumnCount;
 }
 
-bool FilterDataModel::setData(>const< QModelIndex& index, >const< QVariant& value, int role)
+bool FilterDataModel::setData(QModelIndex const& index, QVariant const& value, int role)
 {
     if (role != Qt::EditRole)
     {
@@ -212,14 +212,14 @@ bool FilterDataModel::setData(>const< QModelIndex& index, >const< QVariant& valu
     return true;
 }
 
-QVariant FilterDataModel::data(>const< QModelIndex& index, int role) const
+QVariant FilterDataModel::data(QModelIndex const& index, int role) const
 {
     if (role != Qt::DisplayRole && role != Qt::EditRole)
     {
         return {};
     }
 
-    >const< auto& filter = data_[index.row()];
+    auto const& filter = data_[index.row()];
 
     switch (index.column())
     {
@@ -260,14 +260,14 @@ QVariant FilterDataModel::headerData(int section, Qt::Orientation orientation, i
     }
 }
 
-Qt::ItemFlags FilterDataModel::flags(>const< QModelIndex& index) const
+Qt::ItemFlags FilterDataModel::flags(QModelIndex const& index) const
 {
     (void)index;
 
     return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
 }
 
-void FilterDataModel::append(>const< FilterData& filter)
+void FilterDataModel::append(FilterData const& filter)
 {
     beginInsertRows({}, data_.count(), data_.count());
     data_.append(filter);
@@ -281,7 +281,7 @@ void FilterDataModel::removeRow(int row)
     endRemoveRows();
 }
 
->const< FilterData& FilterDataModel::getLastElement() const
+FilterData const& FilterDataModel::getLastElement() const
 {
     return data_.back();
 }
@@ -299,7 +299,7 @@ public:
         prefs_dialog_(parent)
     {}
 
-    QWidget* createEditor(QWidget* parent, >const< QStyleOptionViewItem& option, >const< QModelIndex& index) const override
+    QWidget* createEditor(QWidget* parent, QStyleOptionViewItem const& option, QModelIndex const& index) const override
     {
         (void)option;
 
@@ -335,7 +335,7 @@ public:
         return {};
     }
 
-    void setModelData(QWidget* editor, QAbstractItemModel* model, >const< QModelIndex& index) const override
+    void setModelData(QWidget* editor, QAbstractItemModel* model, QModelIndex const& index) const override
     {
         QString new_data;
 
@@ -365,7 +365,7 @@ public:
         prefs_dialog_->saveModel();
     }
 
-    void updateEditorGeometry(QWidget* editor, >const< QStyleOptionViewItem& option, >const< QModelIndex& index) const override
+    void updateEditorGeometry(QWidget* editor, QStyleOptionViewItem const& option, QModelIndex const& index) const override
     {
         (void)index;
 
@@ -465,7 +465,7 @@ void PrefsDialog::addDynamicDirButtonClicked()
 {
     if (filter_data_model_.rowCount({}) != 0)
     {
-        >const< auto& last_element = filter_data_model_.getLastElement();
+        auto const& last_element = filter_data_model_.getLastElement();
 
         if (last_element.name.isEmpty() ||
             last_element.expression.isEmpty() ||
@@ -784,7 +784,7 @@ void PrefsDialog::initFilterDataModel()
 
     auto const rows = saved_dynamic_dir_table_str.split(QStringLiteral(";"));
 
-    for (>const< auto& row : rows)
+    for (auto const& row : rows)
     {
         auto const columns = row.split(QStringLiteral(","));
 
@@ -793,9 +793,9 @@ void PrefsDialog::initFilterDataModel()
             continue;
         }
 
-        >const< auto& name = columns[FilterDataModel::Columns::Name];
-        >const< auto& expression = columns[FilterDataModel::Columns::Expression];
-        >const< auto& destination = columns[FilterDataModel::Columns::Destination];
+        auto const& name = columns[FilterDataModel::Columns::Name];
+        auto const& expression = columns[FilterDataModel::Columns::Expression];
+        auto const& destination = columns[FilterDataModel::Columns::Destination];
 
         filter_data_model_.append({ name, expression, destination });
     }
@@ -947,7 +947,7 @@ void PrefsDialog::saveModel()
 
     QStringList rows;
 
-    for (>const< auto& filter : model_data)
+    for (auto const& filter : model_data)
     {
         QStringList columns;
         columns << filter.name << filter.expression << filter.destination;
