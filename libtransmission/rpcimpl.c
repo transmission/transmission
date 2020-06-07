@@ -2070,6 +2070,16 @@ static char const* sessionSet(tr_session* session, tr_variant* args_in, tr_varia
         tr_sessionSetQueueSize(session, TR_DOWN, i);
     }
 
+    if (tr_variantDictFindBool(args_in, TR_KEY_download_dir_dynamic_enabled, &boolVal))
+    {
+        tr_sessionSetDownloadDirDynamicEnabled(session, boolVal);
+    }
+
+    if (tr_variantDictFindStr(args_in, TR_KEY_download_dir_dynamic_table, &str, NULL))
+    {
+        tr_sessionSetDownloadDirDynamicTable(session, str);
+    }
+
     if (tr_variantDictFindBool(args_in, TR_KEY_download_queue_enabled, &boolVal))
     {
         tr_sessionSetQueueEnabled(session, TR_DOWN, boolVal);
@@ -2332,6 +2342,14 @@ static void addSessionField(tr_session* s, tr_variant* d, tr_quark key)
 
     case TR_KEY_download_dir_free_space:
         tr_variantDictAddInt(d, key, tr_device_info_get_free_space(s->downloadDir));
+        break;
+
+    case TR_KEY_download_dir_dynamic_enabled:
+        tr_variantDictAddBool(d, key, tr_sessionGetDownloadDirDynamicEnabled(s, TR_DOWN));
+        break;
+
+    case TR_KEY_download_dir_dynamic_table:
+        tr_variantDictAddStr(d, key, tr_sessionGetDownloadDirDynamicTable(s));
         break;
 
     case TR_KEY_download_queue_enabled:

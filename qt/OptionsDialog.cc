@@ -77,7 +77,12 @@ OptionsDialog::OptionsDialog(Session& session, Prefs const& prefs, AddData addme
     int const width = font_metrics.size(0, QStringLiteral("This is a pretty long torrent filename indeed.torrent")).width();
     ui_.sourceStack->setMinimumWidth(width);
 
-    QString const download_dir(Utils::removeTrailingDirSeparator(prefs.getString(Prefs::DOWNLOAD_DIR)));
+    QString download_dir(Utils::removeTrailingDirSeparator(prefs.getString(Prefs::DOWNLOAD_DIR)));
+
+    if (auto const& dynamic_download_dir = Utils::getDynamicDownloadDir(prefs, add_.readableShortName()); ! dynamic_download_dir.isEmpty()) {
+        download_dir = dynamic_download_dir;
+    }
+
     ui_.freeSpaceLabel->setSession(session_);
     ui_.freeSpaceLabel->setPath(download_dir);
 

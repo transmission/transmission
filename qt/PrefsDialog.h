@@ -22,6 +22,40 @@ class QString;
 class Prefs;
 class Session;
 
+struct FilterData
+{
+    QString name;
+    QString expression;
+    QString path;
+};
+
+class FilterDataModel : public QAbstractTableModel
+{
+public:
+    FilterDataModel(QObject* parent = {});
+
+    int rowCount(const QModelIndex&) const override;
+    int columnCount(const QModelIndex&) const override;
+
+    bool setData(const QModelIndex& index, const QVariant& value, int role) override;
+
+    QVariant data(const QModelIndex& index, int role) const override;
+    QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
+
+    Qt::ItemFlags flags(const QModelIndex &index) const override;
+
+    void append(const FilterData& filter);
+
+    void removeRow(int row);
+
+    const FilterData& getLastElement() const;
+
+    QList<FilterData> getData() const;
+
+private:
+   QList<FilterData> data_;
+};
+
 class PrefsDialog : public BaseDialog
 {
     Q_OBJECT
@@ -29,6 +63,8 @@ class PrefsDialog : public BaseDialog
 public:
     PrefsDialog(Session&, Prefs&, QWidget* parent = nullptr);
     virtual ~PrefsDialog();
+
+    void saveModel();
 
 private:
     using key2widget_t = QMap<int, QWidget*>;
@@ -41,6 +77,9 @@ private:
 
     void setPref(int key, QVariant const& v);
 
+    void initFilterDataModel();
+    void toggleDynamicTableGroup(bool state);
+
     void initDownloadingTab();
     void initSeedingTab();
     void initSpeedTab();
@@ -51,6 +90,8 @@ private:
 
 private slots:
     void checkBoxToggled(bool checked);
+    void addDynamicDirButtonClicked();
+    void removeDynamicDirButtonClicked();
     void spinBoxEditingFinished();
     void timeEditingFinished();
     void lineEditingFinished();
@@ -91,4 +132,6 @@ private:
     int blocklist_http_tag_ = {};
     QHttp* blocklist_http_ = {};
     QMessageBox* blocklist_dialog_ = {};
+
+    FilterDataModel filter_data_model_;
 };

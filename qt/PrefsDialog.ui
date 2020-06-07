@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>545</width>
-    <height>547</height>
+    <width>1769</width>
+    <height>1423</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="tabs">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <property name="elideMode">
       <enum>Qt::ElideNone</enum>
@@ -269,7 +269,7 @@
         </widget>
        </item>
        <item>
-        <layout class="QGridLayout" name="addingSectionLayout" columnstretch="0,1">
+        <layout class="QGridLayout" name="addingSectionLayout" columnstretch="0,0">
          <property name="leftMargin">
           <number>18</number>
          </property>
@@ -283,6 +283,30 @@
            </property>
           </widget>
          </item>
+         <item row="5" column="0">
+          <widget class="QLabel" name="downloadDirLabel">
+           <property name="text">
+            <string>Save to &amp;Location:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="1">
+          <widget class="FreeSpaceLabel" name="downloadDirFreeSpaceLabel">
+           <property name="text">
+            <string notr="true">...</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="0">
+          <widget class="QCheckBox" name="downloadDirDynamicCheck">
+           <property name="text">
+            <string>Dynamic Location</string>
+           </property>
+          </widget>
+         </item>
          <item row="0" column="1">
           <widget class="QStackedWidget" name="watchDirStack">
            <property name="sizePolicy">
@@ -291,15 +315,11 @@
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
+           <property name="currentIndex">
+            <number>1</number>
+           </property>
            <widget class="PathButton" name="watchDirButton"/>
            <widget class="QLineEdit" name="watchDirEdit"/>
-          </widget>
-         </item>
-         <item row="1" column="0" colspan="2">
-          <widget class="QCheckBox" name="showTorrentOptionsDialogCheck">
-           <property name="text">
-            <string>Show the Torrent Options &amp;dialog</string>
-           </property>
           </widget>
          </item>
          <item row="2" column="0" colspan="2">
@@ -309,21 +329,14 @@
            </property>
           </widget>
          </item>
-         <item row="3" column="0" colspan="2">
-          <widget class="QCheckBox" name="trashTorrentFileCheck">
+         <item row="1" column="0" colspan="2">
+          <widget class="QCheckBox" name="showTorrentOptionsDialogCheck">
            <property name="text">
-            <string>Mo&amp;ve the .torrent file to the trash</string>
+            <string>Show the Torrent Options &amp;dialog</string>
            </property>
           </widget>
          </item>
-         <item row="4" column="0">
-          <widget class="QLabel" name="downloadDirLabel">
-           <property name="text">
-            <string>Save to &amp;Location:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="1">
+         <item row="5" column="1">
           <widget class="QStackedWidget" name="downloadDirStack">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -335,14 +348,57 @@
            <widget class="QLineEdit" name="downloadDirEdit"/>
           </widget>
          </item>
-         <item row="5" column="1">
-          <widget class="FreeSpaceLabel" name="downloadDirFreeSpaceLabel">
+         <item row="8" column="1">
+          <layout class="QHBoxLayout" name="dynamicLocationButtonsLayout">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QPushButton" name="addDynamicLocationButton">
+             <property name="text">
+              <string>Add</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="removeDynamicLocationButton">
+             <property name="text">
+              <string>Remove</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item row="3" column="0" colspan="2">
+          <widget class="QCheckBox" name="trashTorrentFileCheck">
            <property name="text">
-            <string notr="true">...</string>
+            <string>Mo&amp;ve the .torrent file to the trash</string>
            </property>
-           <property name="alignment">
-            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </widget>
+         </item>
+         <item row="7" column="1">
+          <widget class="QTableView" name="dynamicLocationsTable">
+           <property name="alternatingRowColors">
+            <bool>true</bool>
            </property>
+           <property name="selectionMode">
+            <enum>QAbstractItemView::SingleSelection</enum>
+           </property>
+           <property name="selectionBehavior">
+            <enum>QAbstractItemView::SelectRows</enum>
+           </property>
+           <attribute name="verticalHeaderCascadingSectionResizes">
+            <bool>true</bool>
+           </attribute>
           </widget>
          </item>
         </layout>
@@ -1229,14 +1285,14 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>PathButton</class>
-   <extends>QToolButton</extends>
-   <header>PathButton.h</header>
-  </customwidget>
-  <customwidget>
    <class>FreeSpaceLabel</class>
    <extends>QLabel</extends>
    <header>FreeSpaceLabel.h</header>
+  </customwidget>
+  <customwidget>
+   <class>PathButton</class>
+   <extends>QToolButton</extends>
+   <header>PathButton.h</header>
   </customwidget>
  </customwidgets>
  <resources>

@@ -20,6 +20,8 @@ class QHeaderView;
 class QIcon;
 class QModelIndex;
 
+class Prefs;
+
 class Utils
 {
 public:
@@ -97,6 +99,8 @@ public:
             s.startsWith(QStringLiteral("http://")) ||
             s.startsWith(QStringLiteral("https://"));
     }
+
+    static QString getDynamicDownloadDir(Prefs const& prefs, QString const& torrentName);
 };
 
 #if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)

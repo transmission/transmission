@@ -91,6 +91,8 @@ static struct tr_key_struct const my_static[] =
     Q("doneDate"),
     Q("download-dir"),
     Q("download-dir-free-space"),
+    Q("download-dir-dynamic-enabled"),
+    Q("download-dir-dynamic-table"),
     Q("download-queue-enabled"),
     Q("download-queue-size"),
     Q("downloadCount"),

@@ -650,6 +650,18 @@ void tr_torrentsQueueMoveBottom(tr_torrent** torrents, int torrentCount);
 /**
 **/
 
+/** @brief Set whether or not to use dynamic download folders */
+void tr_sessionSetDownloadDirDynamicEnabled(tr_session* session, bool is_enabled);
+
+/** @brief Return true if we're using dynamic download folders */
+bool tr_sessionGetDownloadDirDynamicEnabled(tr_session const* session, tr_direction);
+
+/** @brief Set the dynamic download folder filter table */
+void tr_sessionSetDownloadDirDynamicTable(tr_session* session, char const* table);
+
+/** @brief Return the dynamic download folder filter table*/
+char const* tr_sessionGetDownloadDirDynamicTable(tr_session const* session);
+
 /** @brief Set the number of torrents allowed to download (if direction is TR_DOWN) or seed (if direction is TR_UP) at the same time */
 void tr_sessionSetQueueSize(tr_session*, tr_direction, int max_simultaneous_seed_torrents);
 

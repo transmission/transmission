@@ -346,6 +346,8 @@ void tr_sessionGetDefaultSettings(tr_variant* d)
     tr_variantDictAddBool(d, TR_KEY_incomplete_dir_enabled, false);
     tr_variantDictAddInt(d, TR_KEY_message_level, TR_LOG_INFO);
     tr_variantDictAddInt(d, TR_KEY_download_queue_size, 5);
+    tr_variantDictAddBool(d, TR_KEY_download_dir_dynamic_enabled, false);
+    tr_variantDictAddStr(d, TR_KEY_download_dir_dynamic_table, "");
     tr_variantDictAddBool(d, TR_KEY_download_queue_enabled, true);
     tr_variantDictAddInt(d, TR_KEY_peer_limit_global, atoi(TR_DEFAULT_PEER_LIMIT_GLOBAL_STR));
     tr_variantDictAddInt(d, TR_KEY_peer_limit_per_torrent, atoi(TR_DEFAULT_PEER_LIMIT_TORRENT_STR));
@@ -410,6 +412,8 @@ void tr_sessionGetSettings(tr_session* s, tr_variant* d)
     tr_variantDictAddBool(d, TR_KEY_lpd_enabled, s->isLPDEnabled);
     tr_variantDictAddStr(d, TR_KEY_download_dir, tr_sessionGetDownloadDir(s));
     tr_variantDictAddInt(d, TR_KEY_download_queue_size, tr_sessionGetQueueSize(s, TR_DOWN));
+    tr_variantDictAddBool(d, TR_KEY_download_dir_dynamic_enabled, tr_sessionGetDownloadDirDynamicEnabled(s, TR_DOWN));
+    tr_variantDictAddStr(d, TR_KEY_download_dir_dynamic_table, tr_sessionGetDownloadDirDynamicTable(s));
     tr_variantDictAddBool(d, TR_KEY_download_queue_enabled, tr_sessionGetQueueEnabled(s, TR_DOWN));
     tr_variantDictAddInt(d, TR_KEY_speed_limit_down, tr_sessionGetSpeedLimit_KBps(s, TR_DOWN));
     tr_variantDictAddBool(d, TR_KEY_speed_limit_down_enabled, tr_sessionIsSpeedLimited(s, TR_DOWN));
@@ -908,6 +912,16 @@ static void sessionSetImpl(void* vdata)
     if (tr_variantDictFindInt(settings, TR_KEY_download_queue_size, &i))
     {
         tr_sessionSetQueueSize(session, TR_DOWN, i);
+    }
+
+    if (tr_variantDictFindBool(settings, TR_KEY_download_dir_dynamic_enabled, &boolVal))
+    {
+        tr_sessionSetDownloadDirDynamicEnabled(session, boolVal);
+    }
+
+    if (tr_variantDictFindStr(settings, TR_KEY_download_dir_dynamic_table, &str, NULL))
+    {
+        tr_sessionSetDownloadDirDynamicTable(session, str);
     }
 
     if (tr_variantDictFindBool(settings, TR_KEY_download_queue_enabled, &boolVal))
@@ -2893,6 +2907,39 @@ void tr_sessionSetQueueEnabled(tr_session* session, tr_direction dir, bool is_en
     TR_ASSERT(tr_isDirection(dir));
 
     session->queueEnabled[dir] = is_enabled;
+}
+
+void tr_sessionSetDownloadDirDynamicEnabled(tr_session* session, bool is_enabled)
+{
+    TR_ASSERT(tr_isSession(session));
+
+    session->downloadDirDynamicEnabled = is_enabled;
+}
+
+bool tr_sessionGetDownloadDirDynamicEnabled(tr_session const* session, tr_direction dir)
+{
+    TR_ASSERT(tr_isSession(session));
+    TR_ASSERT(tr_isDirection(dir));
+
+    return session->downloadDirDynamicEnabled;
+}
+
+char const* tr_sessionGetDownloadDirDynamicTable(tr_session const* session)
+{
+    TR_ASSERT(tr_isSession(session));
+
+    return session->downloadDirDynamicTable;
+}
+
+void tr_sessionSetDownloadDirDynamicTable(tr_session* session, char const* table)
+{
+    TR_ASSERT(tr_isSession(session));
+
+    if (session->downloadDirDynamicTable != table)
+    {
+        tr_free(session->downloadDirDynamicTable);
+        session->downloadDirDynamicTable = tr_strdup(table);
+    }
 }
 
 bool tr_sessionGetQueueEnabled(tr_session const* session, tr_direction dir)
