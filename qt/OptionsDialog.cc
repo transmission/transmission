@@ -79,7 +79,9 @@ OptionsDialog::OptionsDialog(Session& session, Prefs const& prefs, AddData addme
 
     QString download_dir(Utils::removeTrailingDirSeparator(prefs.getString(Prefs::DOWNLOAD_DIR)));
 
-    if (auto const& dynamic_download_dir = Utils::getDynamicDownloadDir(prefs, add_.readableShortName()); ! dynamic_download_dir.isEmpty()) {
+    if (auto const& dynamic_download_dir = Utils::getDynamicDownloadDir(prefs, add_.readableShortName());
+        !dynamic_download_dir.isEmpty())
+    {
         download_dir = dynamic_download_dir;
     }
 

@@ -305,21 +305,24 @@ QColor Utils::getFadedColor(QColor const& color)
 
 QString Utils::getDynamicDownloadDir(Prefs const& prefs, QString const& torrentName)
 {
-    if (prefs.getBool(Prefs::DOWNLOAD_DIR_DYNAMIC_ENABLED)) {
+    if (prefs.getBool(Prefs::DOWNLOAD_DIR_DYNAMIC_ENABLED))
+    {
         auto const filter_table = prefs.getString(Prefs::DOWNLOAD_DIR_DYNAMIC_TABLE);
         auto const rows = filter_table.split(QStringLiteral(";"));
 
-        for (const auto& row : rows) {
+        for (>const< auto& row : rows)
+        {
             auto const column = row.split(QStringLiteral(","));
 
-            const auto& expression = column[1];
-            const auto& path = column[2];
+            >const< auto& expression = column[1];
+            >const< auto& path = column[2];
 
             QRegularExpression rg(expression);
 
             auto const match = rg.match(torrentName);
 
-            if (match.hasPartialMatch() || match.hasMatch()) {
+            if (match.hasPartialMatch() || match.hasMatch())
+            {
                 return Utils::removeTrailingDirSeparator(path);
             }
         }

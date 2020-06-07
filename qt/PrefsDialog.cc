@@ -160,83 +160,114 @@ QString qtDayName(int day)
         return QString();
     }
 }
+
 } // namespace
 
-FilterDataModel::FilterDataModel(QObject * parent) : QAbstractTableModel{parent}
-{}
+FilterDataModel::FilterDataModel(QObject* parent) :
+    QAbstractTableModel{parent}
+{
+}
 
-int FilterDataModel::rowCount(const QModelIndex& index) const
+int FilterDataModel::rowCount(>const< QModelIndex& index) const
 {
     (void)index;
 
     return data_.count();
 }
 
-int FilterDataModel::columnCount(const QModelIndex& index) const
+int FilterDataModel::columnCount(>const< QModelIndex& index) const
 {
     (void)index;
 
-    return 3;
+    return Columns::ColumnCount;
 }
 
-bool FilterDataModel::setData(const QModelIndex& index, const QVariant& value, int role)
+bool FilterDataModel::setData(>const< QModelIndex& index, >const< QVariant& value, int role)
 {
-    if (role != Qt::EditRole) {
+    if (role != Qt::EditRole)
+    {
         return false;
     }
 
     auto& filter = data_[index.row()];
 
-    switch (index.column()) {
-        case 0: filter.name = value.toString(); break;
-        case 1: filter.expression = value.toString(); break;
-        case 2: filter.path = value.toString(); break;
+    switch (index.column())
+    {
+    case Columns::Name:
+        filter.name = value.toString();
+        break;
 
-        default: return false;
+    case Columns::Expression:
+        filter.expression = value.toString();
+        break;
+
+    case Columns::Destination:
+        filter.destination = value.toString();
+        break;
+
+    default:
+        return false;
     }
 
     return true;
 }
 
-QVariant FilterDataModel::data(const QModelIndex& index, int role) const
+QVariant FilterDataModel::data(>const< QModelIndex& index, int role) const
 {
-    if (role != Qt::DisplayRole && role != Qt::EditRole) {
+    if (role != Qt::DisplayRole && role != Qt::EditRole)
+    {
         return {};
     }
 
-    const auto& filter = data_[index.row()];
+    >const< auto& filter = data_[index.row()];
 
-    switch (index.column()) {
-        case 0: return filter.name;
-        case 1: return filter.expression;
-        case 2: return filter.path;
+    switch (index.column())
+    {
+    case Columns::Name:
+        return filter.name;
 
-        default: return {};
+    case Columns::Expression:
+        return filter.expression;
+
+    case Columns::Destination:
+        return filter.destination;
+
+    default:
+        return {};
     }
 }
 
 QVariant FilterDataModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
-    if (orientation != Qt::Horizontal || role != Qt::DisplayRole) {
+    if (orientation != Qt::Horizontal || role != Qt::DisplayRole)
+    {
         return {};
     }
 
-    switch (section) {
-        case 0: return tr("Name");
-        case 1: return tr("Filter");
-        case 2: return tr("Destination");
-        default: return {};
+    switch (section)
+    {
+    case Columns::Name:
+        return tr("Name");
+
+    case Columns::Expression:
+        return tr("Expression");
+
+    case Columns::Destination:
+        return tr("Destination");
+
+    default:
+        return {};
     }
 }
 
-Qt::ItemFlags FilterDataModel::flags(const QModelIndex &index) const
+Qt::ItemFlags FilterDataModel::flags(>const< QModelIndex& index) const
 {
     (void)index;
 
     return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
 }
 
-void FilterDataModel::append(const FilterData& filter)
+void FilterDataModel::append(>const< FilterData& filter)
 {
     beginInsertRows({}, data_.count(), data_.count());
     data_.append(filter);
@@ -250,7 +281,7 @@ void FilterDataModel::removeRow(int row)
     endRemoveRows();
 }
 
-const FilterData& FilterDataModel::getLastElement() const
+>const< FilterData& FilterDataModel::getLastElement() const
 {
     return data_.back();
 }
@@ -260,37 +291,36 @@ QList<FilterData> FilterDataModel::getData() const
     return data_;
 }
 
-class PathColumnDelegate: public QItemDelegate
+class PathColumnDelegate : public QItemDelegate
 {
 public:
-    explicit PathColumnDelegate(PrefsDialog* parent)
-        : QItemDelegate(parent)
-        , prefs_dialog_(parent)
+    explicit PathColumnDelegate(PrefsDialog* parent) :
+        QItemDelegate(parent),
+        prefs_dialog_(parent)
     {}
 
-    QWidget* createEditor(QWidget* parent,
-                          const QStyleOptionViewItem& option,
-                          const QModelIndex& index) const override
+    QWidget* createEditor(QWidget* parent, >const< QStyleOptionViewItem& option, >const< QModelIndex& index) const override
     {
         (void)option;
 
         switch (index.column())
         {
-        case 0:
-        case 1:
+        case FilterDataModel::Columns::Name:
+        case FilterDataModel::Columns::Expression:
             {
                 auto* const line_edit = new QLineEdit(parent);
                 line_edit->setText(index.model()->data(index).toString());
 
                 return line_edit;
             }
-        
-        case 2:
+
+        case FilterDataModel::Columns::Destination:
             {
-                auto const selected_folder = QFileDialog::getExistingDirectory(parent, tr("Select destination folder"), QDir::currentPath());
+                auto const selected_folder = QFileDialog::getExistingDirectory(parent, tr(
+                    "Select destination folder"), QDir::currentPath());
                 auto* const label = new QLabel(parent);
 
-                if (! selected_folder.isEmpty())
+                if (!selected_folder.isEmpty())
                 {
                     label->setText(selected_folder);
                 }
@@ -305,23 +335,21 @@ public:
         return {};
     }
 
-    void setModelData(QWidget* editor,
-                      QAbstractItemModel* model,
-                      const QModelIndex& index) const override
+    void setModelData(QWidget* editor, QAbstractItemModel* model, >const< QModelIndex& index) const override
     {
         QString new_data;
 
         switch (index.column())
         {
-        case 0:
-        case 1:
+        case FilterDataModel::Columns::Name:
+        case FilterDataModel::Columns::Expression:
             {
                 auto* const line_edit = static_cast<QLineEdit*>(editor);
                 new_data = line_edit->text();
                 break;
             }
 
-        case 2:
+        case FilterDataModel::Columns::Destination:
             {
                 auto* const label = static_cast<QLabel*>(editor);
                 new_data = label->text();
@@ -329,7 +357,7 @@ public:
             }
         }
 
-        if (index.model()->data(index).toString().isEmpty() || ! new_data.isEmpty())
+        if (index.model()->data(index).toString().isEmpty() || !new_data.isEmpty())
         {
             model->setData(index, new_data, Qt::EditRole);
         }
@@ -337,9 +365,7 @@ public:
         prefs_dialog_->saveModel();
     }
 
-    void updateEditorGeometry(QWidget* editor,
-                              const QStyleOptionViewItem& option,
-                              const QModelIndex& index) const override
+    void updateEditorGeometry(QWidget* editor, >const< QStyleOptionViewItem& option, >const< QModelIndex& index) const override
     {
         (void)index;
 
@@ -439,11 +465,11 @@ void PrefsDialog::addDynamicDirButtonClicked()
 {
     if (filter_data_model_.rowCount({}) != 0)
     {
-        const auto& last_element = filter_data_model_.getLastElement();
+        >const< auto& last_element = filter_data_model_.getLastElement();
 
         if (last_element.name.isEmpty() ||
             last_element.expression.isEmpty() ||
-            last_element.path.isEmpty())
+            last_element.destination.isEmpty())
         {
             return;
         }
@@ -758,18 +784,20 @@ void PrefsDialog::initFilterDataModel()
 
     auto const rows = saved_dynamic_dir_table_str.split(QStringLiteral(";"));
 
-    for (const auto& row : rows) {
+    for (>const< auto& row : rows)
+    {
         auto const columns = row.split(QStringLiteral(","));
 
-        if (columns.size() != 3) {
+        if (columns.size() != FilterDataModel::Columns::ColumnCount)
+        {
             continue;
         }
 
-        const auto& name = columns[0];
-        const auto& expression = columns[1];
-        const auto& path = columns[2];
+        >const< auto& name = columns[FilterDataModel::Columns::Name];
+        >const< auto& expression = columns[FilterDataModel::Columns::Expression];
+        >const< auto& destination = columns[FilterDataModel::Columns::Destination];
 
-        filter_data_model_.append({ name, expression, path });
+        filter_data_model_.append({ name, expression, destination });
     }
 }
 
@@ -919,10 +947,10 @@ void PrefsDialog::saveModel()
 
     QStringList rows;
 
-    for (const auto& filter : model_data)
+    for (>const< auto& filter : model_data)
     {
         QStringList columns;
-        columns << filter.name << filter.expression << filter.path;
+        columns << filter.name << filter.expression << filter.destination;
 
         rows << columns.join(QStringLiteral(","));
     }

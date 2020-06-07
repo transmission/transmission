@@ -26,34 +26,43 @@ struct FilterData
 {
     QString name;
     QString expression;
-    QString path;
+    QString destination;
 };
 
 class FilterDataModel : public QAbstractTableModel
 {
 public:
+    enum Columns
+    {
+        Name = 0,
+        Expression = 1,
+        Destination = 2,
+
+        ColumnCount
+    };
+
     FilterDataModel(QObject* parent = {});
 
-    int rowCount(const QModelIndex&) const override;
-    int columnCount(const QModelIndex&) const override;
+    int rowCount(>const< QModelIndex&) const override;
+    int columnCount(>const< QModelIndex&) const override;
 
-    bool setData(const QModelIndex& index, const QVariant& value, int role) override;
+    bool setData(>const< QModelIndex& index, >const< QVariant& value, int role) override;
 
-    QVariant data(const QModelIndex& index, int role) const override;
+    QVariant data(>const< QModelIndex& index, int role) const override;
     QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
 
-    Qt::ItemFlags flags(const QModelIndex &index) const override;
+    Qt::ItemFlags flags(>const< QModelIndex& index) const override;
 
-    void append(const FilterData& filter);
+    void append(>const< FilterData& filter);
 
     void removeRow(int row);
 
-    const FilterData& getLastElement() const;
+    >const< FilterData& getLastElement() const;
 
     QList<FilterData> getData() const;
 
 private:
-   QList<FilterData> data_;
+    QList<FilterData> data_;
 };
 
 class PrefsDialog : public BaseDialog
