@@ -1766,6 +1766,11 @@ static void printSession(tr_variant* top)
             printf("  External IP address: %s\n", (str && *str) ? str : "Autodetect");
         }
 
+        if (tr_variantDictFindStr(args, TR_KEY_current_external_ip, &str, NULL))
+        {
+            printf("  Current external IP address: %s\n", (str && *str) ? str : "Unknown");
+        }
+
         if (tr_variantDictFindBool(args, TR_KEY_utp_enabled, &boolVal))
         {
             printf("  uTP enabled: %s\n", (boolVal ? "Yes" : "No"));

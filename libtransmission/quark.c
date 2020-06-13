@@ -77,6 +77,7 @@ static struct tr_key_struct const my_static[] =
     Q("creation date"),
     Q("creator"),
     Q("cumulative-stats"),
+    Q("current-external-ip"),
     Q("current-stats"),
     Q("date"),
     Q("dateCreated"),

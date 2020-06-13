@@ -2404,6 +2404,10 @@ static void addSessionField(tr_session* s, tr_variant* d, tr_quark key)
         tr_variantDictAddStr(d, key, tr_sessionGetStaticExternalIP(s));
         break;
 
+    case TR_KEY_current_external_ip:
+        tr_variantDictAddStr(d, key, tr_sessionGetExternalIPStr(s));
+        break;
+
     case TR_KEY_rename_partial_files:
         tr_variantDictAddBool(d, key, tr_sessionIsIncompleteFileNamingEnabled(s));
         break;

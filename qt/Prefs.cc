@@ -77,6 +77,7 @@ std::array<Prefs::PrefItem, Prefs::PREFS_COUNT> const Prefs::Items
     { ALT_SPEED_LIMIT_TIME_DAY, TR_KEY_alt_speed_time_day, QVariant::Int },
     { ANNOUNCE_EXTERNAL_IP, TR_KEY_announce_external_ip, QVariant::Bool },
     { STATIC_EXTERNAL_IP, TR_KEY_static_external_ip, QVariant::String },
+    { CURRENT_EXTERNAL_IP, TR_KEY_current_external_ip, QVariant::String },
     { BLOCKLIST_ENABLED, TR_KEY_blocklist_enabled, QVariant::Bool },
     { BLOCKLIST_URL, TR_KEY_blocklist_url, QVariant::String },
     { DSPEED, TR_KEY_speed_limit_down, QVariant::Int },

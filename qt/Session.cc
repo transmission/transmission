@@ -118,8 +118,15 @@ void Session::portTest()
 
 QString Session::getExternalIPStr()
 {
-    char const* ip_str = tr_sessionGetExternalIPStr(session_);
-    return tr_str_is_empty(ip_str) ? QString() : QString::fromUtf8(ip_str);
+    if (session_)
+    {
+        char const* ip_str = tr_sessionGetExternalIPStr(session_);
+        return tr_str_is_empty(ip_str) ? QString() : QString::fromUtf8(ip_str);
+    }
+    else
+    {
+        return prefs_.getString(Prefs::CURRENT_EXTERNAL_IP);
+    }
 }
 
 void Session::copyMagnetLinkToClipboard(int torrent_id)

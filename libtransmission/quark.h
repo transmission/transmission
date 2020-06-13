@@ -77,6 +77,7 @@ enum
     TR_KEY_creation_date,
     TR_KEY_creator,
     TR_KEY_cumulative_stats,
+    TR_KEY_current_external_ip,
     TR_KEY_current_stats,
     TR_KEY_date,
     TR_KEY_dateCreated,
