@@ -52,7 +52,6 @@ class MainWindow : public QMainWindow
 
 public:
     MainWindow(Session&, Prefs&, TorrentModel&, bool minized);
-    virtual ~MainWindow();
 
     QSystemTrayIcon& trayIcon()
     {

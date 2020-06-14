@@ -35,7 +35,6 @@ public:
 
 public:
     explicit TorrentFilter(Prefs const& prefs);
-    virtual ~TorrentFilter();
     [[nodiscard]] std::array<int, FilterMode::NUM_MODES> countTorrentsPerMode() const;
 
 protected:

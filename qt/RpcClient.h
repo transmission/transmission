@@ -53,7 +53,6 @@ class RpcClient : public QObject
 
 public:
     RpcClient(QObject* parent = nullptr);
-    virtual ~RpcClient() = default;
 
     void stop();
     void start(tr_session* session);

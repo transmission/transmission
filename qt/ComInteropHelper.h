@@ -19,7 +19,6 @@ class ComInteropHelper
 {
 public:
     ComInteropHelper();
-    ~ComInteropHelper();
 
     bool isConnected() const;
 

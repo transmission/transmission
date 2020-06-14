@@ -23,8 +23,6 @@ class RelocateDialog : public BaseDialog
 public:
     RelocateDialog(Session&, TorrentModel const&, torrent_ids_t ids, QWidget* parent = nullptr);
 
-    virtual ~RelocateDialog() = default;
-
 private:
     QString newLocation() const;
 

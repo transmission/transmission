@@ -28,7 +28,6 @@ class FilterBar : public QWidget
 
 public:
     FilterBar(Prefs& prefs, TorrentModel const& torrents, TorrentFilter const& filter, QWidget* parent = nullptr);
-    virtual ~FilterBar();
 
 public slots:
     void clear();

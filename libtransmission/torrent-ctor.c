@@ -80,7 +80,7 @@ static void clearMetainfo(tr_ctor* ctor)
     setSourceFile(ctor, NULL);
 }
 
-int tr_ctorSetMetainfo(tr_ctor* ctor, uint8_t const* metainfo, size_t len)
+int tr_ctorSetMetainfo(tr_ctor* ctor, void const* metainfo, size_t len)
 {
     int err;
 

@@ -32,8 +32,6 @@ ComInteropHelper::ComInteropHelper() :
 {
 }
 
-ComInteropHelper::~ComInteropHelper() = default;
-
 bool ComInteropHelper::isConnected() const
 {
     return !client_->isNull();
