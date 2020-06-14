@@ -15,9 +15,7 @@
 #include "DBusInteropHelper.h"
 #endif
 
-class QAxObject;
 class QString;
-class QVariant;
 
 class InteropHelper
 {

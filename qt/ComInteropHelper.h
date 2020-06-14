@@ -10,7 +10,8 @@
 
 #include <memory>
 
-class QAxObject;
+#include <QAxObject>
+
 class QObject;
 class QString;
 class QVariant;
