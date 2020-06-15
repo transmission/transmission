@@ -99,8 +99,6 @@ public:
     {
     }
 
-    ~PeerItem() override = default;
-
     void refresh(Peer const& p)
     {
         if (p.address != peer_.address)

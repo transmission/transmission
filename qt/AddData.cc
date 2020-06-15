@@ -100,7 +100,7 @@ QString AddData::readableName() const
             tr_info inf;
             tr_ctor* ctor = tr_ctorNew(nullptr);
 
-            tr_ctorSetMetainfo(ctor, reinterpret_cast<quint8 const*>(metainfo.constData()), metainfo.size());
+            tr_ctorSetMetainfo(ctor, metainfo.constData(), metainfo.size());
 
             if (tr_torrentParse(ctor, &inf) == TR_PARSE_OK)
             {

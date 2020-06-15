@@ -22,7 +22,6 @@ class StatsDialog : public BaseDialog
 
 public:
     StatsDialog(Session&, QWidget* parent = nullptr);
-    ~StatsDialog() override;
 
     // QWidget
     void setVisible(bool visible) override;

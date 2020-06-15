@@ -251,33 +251,33 @@ void TorrentDelegateMin::drawTorrent(QPainter* painter, QStyleOptionViewItem con
     painter->drawText(layout.name_rect, Qt::AlignLeft | Qt::AlignVCenter, layout.nameText());
     painter->setFont(layout.status_font);
     painter->drawText(layout.status_rect, Qt::AlignLeft | Qt::AlignVCenter, layout.statusText());
-    progress_bar_style_->rect = layout.bar_rect;
+    progress_bar_style_.rect = layout.bar_rect;
 
     if (tor.isDownloading())
     {
-        progress_bar_style_->palette.setBrush(QPalette::Highlight, blue_brush);
-        progress_bar_style_->palette.setColor(QPalette::Base, blue_back);
-        progress_bar_style_->palette.setColor(QPalette::Window, blue_back);
+        progress_bar_style_.palette.setBrush(QPalette::Highlight, blue_brush);
+        progress_bar_style_.palette.setColor(QPalette::Base, blue_back);
+        progress_bar_style_.palette.setColor(QPalette::Window, blue_back);
     }
     else if (tor.isSeeding())
     {
-        progress_bar_style_->palette.setBrush(QPalette::Highlight, green_brush);
-        progress_bar_style_->palette.setColor(QPalette::Base, green_back);
-        progress_bar_style_->palette.setColor(QPalette::Window, green_back);
+        progress_bar_style_.palette.setBrush(QPalette::Highlight, green_brush);
+        progress_bar_style_.palette.setColor(QPalette::Base, green_back);
+        progress_bar_style_.palette.setColor(QPalette::Window, green_back);
     }
     else
     {
-        progress_bar_style_->palette.setBrush(QPalette::Highlight, silver_brush);
-        progress_bar_style_->palette.setColor(QPalette::Base, silver_back);
-        progress_bar_style_->palette.setColor(QPalette::Window, silver_back);
+        progress_bar_style_.palette.setBrush(QPalette::Highlight, silver_brush);
+        progress_bar_style_.palette.setColor(QPalette::Base, silver_back);
+        progress_bar_style_.palette.setColor(QPalette::Window, silver_back);
     }
 
-    progress_bar_style_->state = progress_bar_state;
-    progress_bar_style_->text = QStringLiteral("%1%").arg(static_cast<int>(tr_truncd(100.0 * tor.percentDone(), 0)));
-    progress_bar_style_->textVisible = true;
-    progress_bar_style_->textAlignment = Qt::AlignCenter;
+    progress_bar_style_.state = progress_bar_state;
+    progress_bar_style_.text = QStringLiteral("%1%").arg(static_cast<int>(tr_truncd(100.0 * tor.percentDone(), 0)));
+    progress_bar_style_.textVisible = true;
+    progress_bar_style_.textAlignment = Qt::AlignCenter;
     setProgressBarPercentDone(option, tor);
-    style->drawControl(QStyle::CE_ProgressBar, progress_bar_style_, painter);
+    style->drawControl(QStyle::CE_ProgressBar, &progress_bar_style_, painter);
 
     painter->restore();
 }

@@ -649,8 +649,6 @@ PrefsDialog::PrefsDialog(Session& session, Prefs& prefs, QWidget* parent) :
     adjustSize();
 }
 
-PrefsDialog::~PrefsDialog() = default;
-
 void PrefsDialog::setPref(int key, QVariant const& v)
 {
     prefs_.set(key, v);

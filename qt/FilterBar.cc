@@ -246,11 +246,6 @@ FilterBar::FilterBar(Prefs& prefs, TorrentModel const& torrents, TorrentFilter c
     }
 }
 
-FilterBar::~FilterBar()
-{
-    delete recount_timer_;
-}
-
 /***
 ****
 ***/

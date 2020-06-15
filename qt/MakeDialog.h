@@ -29,7 +29,6 @@ class MakeDialog : public BaseDialog
 
 public:
     MakeDialog(Session&, QWidget* parent = nullptr);
-    virtual ~MakeDialog();
 
 protected:
     // QWidget
