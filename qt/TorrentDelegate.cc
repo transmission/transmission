@@ -127,11 +127,10 @@ ItemLayout::ItemLayout(QString name_text, QString status_text, QString progress_
 } // namespace
 
 TorrentDelegate::TorrentDelegate(QObject* parent) :
-    QStyledItemDelegate(parent),
-    progress_bar_style_(new QStyleOptionProgressBar)
+    QStyledItemDelegate(parent)
 {
-    progress_bar_style_->minimum = 0;
-    progress_bar_style_->maximum = 1000;
+    progress_bar_style_.minimum = 0;
+    progress_bar_style_.maximum = 1000;
 
     green_brush = QColor("forestgreen");
     green_back = QColor("darkseagreen");
@@ -141,11 +140,6 @@ TorrentDelegate::TorrentDelegate(QObject* parent) :
 
     silver_brush = QColor("silver");
     silver_back = QColor("grey");
-}
-
-TorrentDelegate::~TorrentDelegate()
-{
-    delete progress_bar_style_;
 }
 
 /***
@@ -452,15 +446,15 @@ void TorrentDelegate::setProgressBarPercentDone(QStyleOptionViewItem const& opti
     if (tor.isSeeding() && tor.getSeedRatio(seed_ratio_limit))
     {
         double const seed_rate_ratio = tor.ratio() / seed_ratio_limit;
-        int const scaled_progress = seed_rate_ratio * (progress_bar_style_->maximum - progress_bar_style_->minimum);
-        progress_bar_style_->progress = progress_bar_style_->minimum + scaled_progress;
+        int const scaled_progress = seed_rate_ratio * (progress_bar_style_.maximum - progress_bar_style_.minimum);
+        progress_bar_style_.progress = progress_bar_style_.minimum + scaled_progress;
     }
     else
     {
         bool const is_magnet(!tor.hasMetadata());
-        progress_bar_style_->direction = option.direction;
-        progress_bar_style_->progress = static_cast<int>(progress_bar_style_->minimum + (is_magnet ? tor.metadataPercentDone() :
-            tor.percentDone()) * (progress_bar_style_->maximum - progress_bar_style_->minimum));
+        progress_bar_style_.direction = option.direction;
+        progress_bar_style_.progress = static_cast<int>(progress_bar_style_.minimum + (is_magnet ? tor.metadataPercentDone() :
+            tor.percentDone()) * (progress_bar_style_.maximum - progress_bar_style_.minimum));
     }
 }
 
@@ -578,31 +572,31 @@ void TorrentDelegate::drawTorrent(QPainter* painter, QStyleOptionViewItem const&
     painter->drawText(layout.status_rect, Qt::AlignLeft | Qt::AlignVCenter, layout.statusText());
     painter->setFont(layout.progress_font);
     painter->drawText(layout.progress_rect, Qt::AlignLeft | Qt::AlignVCenter, layout.progressText());
-    progress_bar_style_->rect = layout.bar_rect;
+    progress_bar_style_.rect = layout.bar_rect;
 
     if (tor.isDownloading())
     {
-        progress_bar_style_->palette.setBrush(QPalette::Highlight, blue_brush);
-        progress_bar_style_->palette.setColor(QPalette::Base, blue_back);
-        progress_bar_style_->palette.setColor(QPalette::Window, blue_back);
+        progress_bar_style_.palette.setBrush(QPalette::Highlight, blue_brush);
+        progress_bar_style_.palette.setColor(QPalette::Base, blue_back);
+        progress_bar_style_.palette.setColor(QPalette::Window, blue_back);
     }
     else if (tor.isSeeding())
     {
-        progress_bar_style_->palette.setBrush(QPalette::Highlight, green_brush);
-        progress_bar_style_->palette.setColor(QPalette::Base, green_back);
-        progress_bar_style_->palette.setColor(QPalette::Window, green_back);
+        progress_bar_style_.palette.setBrush(QPalette::Highlight, green_brush);
+        progress_bar_style_.palette.setColor(QPalette::Base, green_back);
+        progress_bar_style_.palette.setColor(QPalette::Window, green_back);
     }
     else
     {
-        progress_bar_style_->palette.setBrush(QPalette::Highlight, silver_brush);
-        progress_bar_style_->palette.setColor(QPalette::Base, silver_back);
-        progress_bar_style_->palette.setColor(QPalette::Window, silver_back);
+        progress_bar_style_.palette.setBrush(QPalette::Highlight, silver_brush);
+        progress_bar_style_.palette.setColor(QPalette::Base, silver_back);
+        progress_bar_style_.palette.setColor(QPalette::Window, silver_back);
     }
 
-    progress_bar_style_->state = progress_bar_state;
+    progress_bar_style_.state = progress_bar_state;
     setProgressBarPercentDone(option, tor);
 
-    style->drawControl(QStyle::CE_ProgressBar, progress_bar_style_, painter);
+    style->drawControl(QStyle::CE_ProgressBar, &progress_bar_style_, painter);
 
     painter->restore();
 }

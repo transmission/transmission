@@ -10,13 +10,13 @@
 #include <objbase.h>
 
 #include <QAxFactory>
-#include <QAxObject>
 #include <QString>
 #include <QVariant>
 
 #include "ComInteropHelper.h"
 #include "InteropObject.h"
 
+// NOLINTNEXTLINE(cppcoreguidelines-special-member-functions)
 QAXFACTORY_BEGIN("{1e405fc2-1a3a-468b-8bd6-bfbb58770390}", "{792d1aac-53cc-4dc9-bc29-e5295fdb93a9}")
 QAXCLASS(InteropObject)
 QAXFACTORY_END()
@@ -31,8 +31,6 @@ ComInteropHelper::ComInteropHelper() :
     client_(new QAxObject(QStringLiteral("Transmission.QtClient")))
 {
 }
-
-ComInteropHelper::~ComInteropHelper() = default;
 
 bool ComInteropHelper::isConnected() const
 {

@@ -853,7 +853,7 @@ void tr_ctorSetDeleteSource(tr_ctor* ctor, bool doDelete);
 int tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, char const* magnet);
 
 /** @brief Set the constructor's metainfo from a raw benc already in memory */
-int tr_ctorSetMetainfo(tr_ctor* ctor, uint8_t const* metainfo, size_t len);
+int tr_ctorSetMetainfo(tr_ctor* ctor, void const* metainfo, size_t len);
 
 /** @brief Set the constructor's metainfo from a local .torrent file */
 int tr_ctorSetMetainfoFromFile(tr_ctor* ctor, char const* filename);

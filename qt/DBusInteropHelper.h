@@ -16,7 +16,6 @@ class DBusInteropHelper
 {
 public:
     DBusInteropHelper() = default;
-    ~DBusInteropHelper() = default;
 
     bool isConnected() const;
 

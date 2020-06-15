@@ -28,7 +28,6 @@ class PrefsDialog : public BaseDialog
 
 public:
     PrefsDialog(Session&, Prefs&, QWidget* parent = nullptr);
-    virtual ~PrefsDialog();
 
 private:
     using key2widget_t = QMap<int, QWidget*>;

@@ -26,7 +26,6 @@ class FaviconCache : public QObject
 
 public:
     FaviconCache();
-    virtual ~FaviconCache();
 
     // returns a cached pixmap, or a NULL pixmap if there's no match in the cache
     QPixmap find(QString const& key);

@@ -160,7 +160,7 @@ void OptionsDialog::reload()
         break;
 
     case AddData::METAINFO:
-        tr_ctorSetMetainfo(ctor, reinterpret_cast<quint8 const*>(add_.metainfo.constData()), add_.metainfo.size());
+        tr_ctorSetMetainfo(ctor, add_.metainfo.constData(), add_.metainfo.size());
         break;
 
     default:
