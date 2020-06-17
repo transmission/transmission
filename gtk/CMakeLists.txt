@@ -121,7 +121,6 @@ include_directories(
     ${PROJECT_BINARY_DIR}
     ${LIBAPPINDICATOR_INCLUDE_DIRS}
     ${GTK_INCLUDE_DIRS}
-    ${CURL_INCLUDE_DIRS}
     ${EVENT2_INCLUDE_DIRS}
 )
 
@@ -162,7 +161,6 @@ target_link_libraries(${TR_NAME}-gtk
     ${TR_NAME}
     ${LIBAPPINDICATOR_LIBRARIES}
     ${GTK_LIBRARIES}
-    ${CURL_LIBRARIES}
     ${EVENT2_LIBRARIES}
 )
 

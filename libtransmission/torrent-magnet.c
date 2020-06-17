@@ -6,6 +6,7 @@
  *
  */
 
+#include <limits.h>
 #include <string.h> /* memcpy(), memset(), memcmp() */
 
 #include <event2/buffer.h>

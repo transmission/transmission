@@ -218,7 +218,6 @@ endif()
 include_directories(
     ${PROJECT_SOURCE_DIR}
     ${PROJECT_BINARY_DIR}
-    ${CURL_INCLUDE_DIRS}
     ${EVENT2_INCLUDE_DIRS}
     ${NATPMP_INCLUDE_DIRS}
     ${MINIUPNPC_INCLUDE_DIRS}
@@ -248,7 +247,6 @@ endforeach()
 
 target_link_libraries(${TR_NAME}
     PUBLIC
-    ${CURL_LIBRARIES}
     ${EVENT2_LIBRARIES}
     ${NATPMP_LIBRARIES}
     ${MINIUPNPC_LIBRARIES}
@@ -259,6 +257,7 @@ target_link_libraries(${TR_NAME}
 
 target_link_libraries(${TR_NAME}
     PRIVATE
+        CURL::libcurl
         Threads::Threads
         TrCryptoBackend
         ZLIB::ZLIB

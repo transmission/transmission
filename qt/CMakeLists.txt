@@ -183,7 +183,6 @@ include_directories(
     ${CMAKE_SOURCE_DIR}
     ${PROJECT_SOURCE_DIR}
     ${PROJECT_BINARY_DIR}
-    ${CURL_INCLUDE_DIRS}
     ${EVENT2_INCLUDE_DIRS}
 )
 
@@ -220,7 +219,6 @@ add_executable(${TR_NAME}-qt WIN32
 target_link_libraries(${TR_NAME}-qt
     ${TR_NAME}
     ${QT_TARGETS}
-    ${CURL_LIBRARIES}
     ${EVENT2_LIBRARIES}
 )
 

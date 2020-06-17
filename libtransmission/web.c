@@ -632,9 +632,24 @@ void tr_webClose(tr_session* session, tr_web_close_mode close_mode)
     }
 }
 
-void tr_webGetTaskInfo(struct tr_web_task* task, tr_web_task_info info, void* dst)
+bool tr_webGetTaskInfo(struct tr_web_task* task, tr_web_task_info info, void* dst)
 {
-    curl_easy_getinfo(task->curl_easy, (CURLINFO)info, dst);
+    CURLINFO curl_info = CURLINFO_NONE;
+
+    switch (info)
+    {
+    case TR_WEB_GET_CODE:
+        curl_info = CURLINFO_RESPONSE_CODE;
+        break;
+    case TR_WEB_GET_REDIRECTS:
+        curl_info = CURLINFO_REDIRECT_COUNT;
+        break;
+    case TR_WEB_GET_REAL_URL:
+        curl_info = CURLINFO_EFFECTIVE_URL;
+        break;
+    }
+
+    return curl_easy_getinfo(task->curl_easy, curl_info, dst) == CURLE_OK;
 }
 
 /*****

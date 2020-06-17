@@ -9,8 +9,12 @@ foreach(P create edit remote show)
         "${TR_NAME}-${P}.exe")
 
     add_executable(${TR_NAME}-${P} ${P}.c ${${PROJECT_NAME}_${P}_WIN32_RC_FILE})
-    include_directories(${TR_NAME}-${P} ${EVENT2_INCLUDE_DIRS} ${CURL_INCLUDE_DIRS})
-    target_link_libraries(${TR_NAME}-${P} ${TR_NAME})
+    include_directories(${TR_NAME}-${P} ${EVENT2_INCLUDE_DIRS})
+    target_link_libraries(${TR_NAME}-${P}
+        PRIVATE
+            $<$<STREQUAL:${P},remote>:CURL::libcurl>
+            $<$<STREQUAL:${P},show>:CURL::libcurl>
+            ${TR_NAME})
 
     install(TARGETS ${TR_NAME}-${P} DESTINATION ${CMAKE_INSTALL_BINDIR})
 
