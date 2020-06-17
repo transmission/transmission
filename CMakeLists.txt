@@ -276,10 +276,7 @@ if(ENABLE_MAC)
     tr_fixup_auto_option(ENABLE_MAC MAC_FOUND MAC_IS_REQUIRED)
 endif()
 
-find_package(ZLIB ${ZLIB_MINIMUM})
-if(ZLIB_FOUND)
-    add_definitions(-DHAVE_ZLIB)
-endif()
+find_package(ZLIB ${ZLIB_MINIMUM} REQUIRED)
 
 set(THIRD_PARTY_DIR ${CMAKE_SOURCE_DIR}/third-party)
 

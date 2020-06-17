@@ -226,7 +226,6 @@ endif()
 include_directories(
     ${PROJECT_SOURCE_DIR}
     ${PROJECT_BINARY_DIR}
-    ${ZLIB_INCLUDE_DIRS}
     ${CRYPTO_INCLUDE_DIRS}
     ${CURL_INCLUDE_DIRS}
     ${EVENT2_INCLUDE_DIRS}
@@ -258,7 +257,6 @@ endforeach()
 
 target_link_libraries(${TR_NAME}
     PUBLIC
-    ${ZLIB_LIBRARIES}
     ${CRYPTO_LIBRARIES}
     ${CURL_LIBRARIES}
     ${EVENT2_LIBRARIES}
@@ -272,6 +270,7 @@ target_link_libraries(${TR_NAME}
 target_link_libraries(${TR_NAME}
     PRIVATE
         Threads::Threads
+        ZLIB::ZLIB
         $<$<TARGET_EXISTS:Iconv::Iconv>:Iconv::Iconv>
         $<$<BOOL:${HAVE_LIBINTL}>:intl>
         $<$<BOOL:${HAVE_LIBM}>:m>
