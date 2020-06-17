@@ -215,18 +215,9 @@ if(USE_SYSTEM_B64)
     add_definitions(-DUSE_SYSTEM_B64)
 endif()
 
-if(CYASSL_IS_WOLFSSL)
-    add_definitions(-DCYASSL_IS_WOLFSSL)
-endif()
-
-if(POLARSSL_IS_MBEDTLS)
-    add_definitions(-DPOLARSSL_IS_MBEDTLS)
-endif()
-
 include_directories(
     ${PROJECT_SOURCE_DIR}
     ${PROJECT_BINARY_DIR}
-    ${CRYPTO_INCLUDE_DIRS}
     ${CURL_INCLUDE_DIRS}
     ${EVENT2_INCLUDE_DIRS}
     ${NATPMP_INCLUDE_DIRS}
@@ -257,7 +248,6 @@ endforeach()
 
 target_link_libraries(${TR_NAME}
     PUBLIC
-    ${CRYPTO_LIBRARIES}
     ${CURL_LIBRARIES}
     ${EVENT2_LIBRARIES}
     ${NATPMP_LIBRARIES}
@@ -270,6 +260,7 @@ target_link_libraries(${TR_NAME}
 target_link_libraries(${TR_NAME}
     PRIVATE
         Threads::Threads
+        TrCryptoBackend
         ZLIB::ZLIB
         $<$<TARGET_EXISTS:Iconv::Iconv>:Iconv::Iconv>
         $<$<BOOL:${HAVE_LIBINTL}>:intl>

@@ -46,9 +46,6 @@ if(NOT POLARSSL_VERSION AND POLARSSL_INCLUDE_DIR)
     endif()
 endif()
 
-set(POLARSSL_INCLUDE_DIRS ${POLARSSL_INCLUDE_DIR})
-set(POLARSSL_LIBRARIES ${POLARSSL_LIBRARY})
-
 include(FindPackageHandleStandardArgs)
 
 find_package_handle_standard_args(PolarSSL
@@ -64,4 +61,22 @@ mark_as_advanced(MBEDTLS_INCLUDE_DIR MBEDTLS_LIBRARY MBEDCRYPTO_LIBRARY POLARSSL
 if(POLARSSL_PREFER_STATIC_LIB)
     set(CMAKE_FIND_LIBRARY_SUFFIXES ${POLARSSL_ORIG_CMAKE_FIND_LIBRARY_SUFFIXES})
     unset(POLARSSL_ORIG_CMAKE_FIND_LIBRARY_SUFFIXES)
+endif()
+
+if(PolarSSL_FOUND)
+    set(POLARSSL_INCLUDE_DIRS ${POLARSSL_INCLUDE_DIR})
+    set(POLARSSL_LIBRARIES ${POLARSSL_LIBRARY})
+
+    if(NOT TARGET PolarSSL::PolarSSL)
+        add_library(PolarSSL::PolarSSL INTERFACE IMPORTED)
+        target_include_directories(PolarSSL::PolarSSL
+            INTERFACE
+                ${POLARSSL_INCLUDE_DIRS})
+        target_link_libraries(PolarSSL::PolarSSL
+            INTERFACE
+                ${POLARSSL_LIBRARIES})
+        target_compile_definitions(PolarSSL::PolarSSL
+            INTERFACE
+                $<$<BOOL:${POLARSSL_IS_MBEDTLS}>:POLARSSL_IS_MBEDTLS>)
+    endif()
 endif()

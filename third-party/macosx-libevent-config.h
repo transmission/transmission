@@ -135,7 +135,7 @@
 #define HAVE_NETINET_IN_H 1
 
 /* Define if the system has openssl */
-#define HAVE_OPENSSL 1
+/* #undef HAVE_OPENSSL */
 
 /* Define to 1 if you have the `pipe' function. */
 #define HAVE_PIPE 1

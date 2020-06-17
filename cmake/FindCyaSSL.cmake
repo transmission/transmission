@@ -41,9 +41,6 @@ if(NOT CYASSL_VERSION AND CYASSL_INCLUDE_DIR)
     endif()
 endif()
 
-set(CYASSL_INCLUDE_DIRS ${CYASSL_INCLUDE_DIR})
-set(CYASSL_LIBRARIES ${CYASSL_LIBRARY})
-
 include(FindPackageHandleStandardArgs)
 
 find_package_handle_standard_args(CyaSSL
@@ -59,4 +56,22 @@ mark_as_advanced(WOLFSSL_INCLUDE_DIR WOLFSSL_LIBRARY CYASSL_INCLUDE_DIR CYASSL_L
 if(CYASSL_PREFER_STATIC_LIB)
     set(CMAKE_FIND_LIBRARY_SUFFIXES ${CYASSL_ORIG_CMAKE_FIND_LIBRARY_SUFFIXES})
     unset(CYASSL_ORIG_CMAKE_FIND_LIBRARY_SUFFIXES)
+endif()
+
+if(CyaSSL_FOUND)
+    set(CYASSL_INCLUDE_DIRS ${CYASSL_INCLUDE_DIR})
+    set(CYASSL_LIBRARIES ${CYASSL_LIBRARY})
+
+    if(NOT TARGET CyaSSL::CyaSSL)
+        add_library(CyaSSL::CyaSSL INTERFACE IMPORTED)
+        target_include_directories(CyaSSL::CyaSSL
+            INTERFACE
+                ${CYASSL_INCLUDE_DIRS})
+        target_link_libraries(CyaSSL::CyaSSL
+            INTERFACE
+                ${CYASSL_LIBRARIES})
+        target_compile_definitions(CyaSSL::CyaSSL
+            INTERFACE
+                $<$<BOOL:${CYASSL_IS_WOLFSSL}>:CYASSL_IS_WOLFSSL>)
+    endif()
 endif()

@@ -138,14 +138,17 @@ find_package(CURL ${CURL_MINIMUM} REQUIRED)
 find_package(Iconv)
 
 set(CRYPTO_PKG "")
+add_library(TrCryptoBackend INTERFACE IMPORTED)
 if(WITH_CRYPTO STREQUAL "AUTO" OR WITH_CRYPTO STREQUAL "openssl")
     tr_get_required_flag(WITH_CRYPTO OPENSSL_IS_REQUIRED)
     find_package(OpenSSL ${OPENSSL_MINIMUM} ${OPENSSL_IS_REQUIRED})
     tr_fixup_list_option(WITH_CRYPTO "openssl" OPENSSL_FOUND "AUTO" OPENSSL_IS_REQUIRED)
     if(WITH_CRYPTO STREQUAL "openssl")
         set(CRYPTO_PKG "openssl")
-        set(CRYPTO_INCLUDE_DIRS ${OPENSSL_INCLUDE_DIR})
-        set(CRYPTO_LIBRARIES ${OPENSSL_LIBRARIES})
+        target_link_libraries(TrCryptoBackend
+            INTERFACE
+                OpenSSL::Crypto
+                OpenSSL::SSL)
     endif()
 endif()
 if(WITH_CRYPTO STREQUAL "AUTO" OR WITH_CRYPTO STREQUAL "cyassl")
@@ -154,8 +157,9 @@ if(WITH_CRYPTO STREQUAL "AUTO" OR WITH_CRYPTO STREQUAL "cyassl")
     tr_fixup_list_option(WITH_CRYPTO "cyassl" CYASSL_FOUND "AUTO" CYASSL_IS_REQUIRED)
     if(WITH_CRYPTO STREQUAL "cyassl")
         set(CRYPTO_PKG "cyassl")
-        set(CRYPTO_INCLUDE_DIRS ${CYASSL_INCLUDE_DIRS})
-        set(CRYPTO_LIBRARIES ${CYASSL_LIBRARIES})
+        target_link_libraries(TrCryptoBackend
+            INTERFACE
+                CyaSSL::CyaSSL)
     endif()
 endif()
 if(WITH_CRYPTO STREQUAL "AUTO" OR WITH_CRYPTO STREQUAL "polarssl")
@@ -164,8 +168,9 @@ if(WITH_CRYPTO STREQUAL "AUTO" OR WITH_CRYPTO STREQUAL "polarssl")
     tr_fixup_list_option(WITH_CRYPTO "polarssl" POLARSSL_FOUND "AUTO" POLARSSL_IS_REQUIRED)
     if(WITH_CRYPTO STREQUAL "polarssl")
         set(CRYPTO_PKG "polarssl")
-        set(CRYPTO_INCLUDE_DIRS ${POLARSSL_INCLUDE_DIRS})
-        set(CRYPTO_LIBRARIES ${POLARSSL_LIBRARIES})
+        target_link_libraries(TrCryptoBackend
+            INTERFACE
+                PolarSSL::PolarSSL)
     endif()
 endif()
 # We should have found the library by now
@@ -283,18 +288,10 @@ set(THIRD_PARTY_DIR ${CMAKE_SOURCE_DIR}/third-party)
 if(WIN32)
     tr_add_external_auto_library(EVENT2 libevent event)
 else()
-    set(EVENT2_CONFIGURE_FLAGS)
-    if(APPLE)
-        if(CRYPTO_PKG STREQUAL "openssl")
-            list(APPEND EVENT2_CONFIGURE_FLAGS "CPPFLAGS=-I${CRYPTO_INCLUDE_DIRS}")
-        else()
-            list(APPEND EVENT2_CONFIGURE_FLAGS "CPPFLAGS=-I${THIRD_PARTY_DIR}/openssl/include")
-        endif()
-    endif()
     tr_add_external_auto_library(EVENT2 libevent event
         BUILD_IN_SOURCE 1
         CONFIGURE_COMMAND "<SOURCE_DIR>/autogen.sh"
-                  COMMAND "<SOURCE_DIR>/configure" "--prefix=<INSTALL_DIR>" "--disable-shared" ${EVENT2_CONFIGURE_FLAGS})
+                  COMMAND "<SOURCE_DIR>/configure" "--prefix=<INSTALL_DIR>" "--disable-shared" "--disable-openssl")
 endif()
 
 tr_add_external_auto_library(NATPMP libnatpmp natpmp)
