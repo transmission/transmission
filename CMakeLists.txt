@@ -130,12 +130,12 @@ if(WIN32)
     endforeach()
 endif()
 
-find_package(Threads)
+find_package(Threads REQUIRED)
 find_package(PkgConfig QUIET)
 
 find_package(CURL ${CURL_MINIMUM} REQUIRED)
 
-find_package(ICONV)
+find_package(Iconv)
 
 set(CRYPTO_PKG "")
 if(WITH_CRYPTO STREQUAL "AUTO" OR WITH_CRYPTO STREQUAL "openssl")
@@ -482,11 +482,35 @@ foreach(F ${NEEDED_FUNCTIONS})
     endif()
 endforeach()
 
-if(ICONV_FOUND)
-    add_definitions(-DHAVE_ICONV)
-    if(ICONV_SECOND_ARGUMENT_IS_CONST)
-        add_definitions(-DICONV_SECOND_ARGUMENT_IS_CONST)
+if(TARGET Iconv::Iconv)
+    if(NOT DEFINED ICONV_SECOND_ARGUMENT_IS_CONST)
+        include(CheckCSourceCompiles)
+
+        set(CMAKE_REQUIRED_LIBRARIES Iconv::Iconv)
+
+        check_c_source_compiles("
+            #include <iconv.h>
+            int main()
+            {
+                iconv_t conv = 0;
+                char const* in = 0;
+                size_t ilen = 0;
+                char* out = 0;
+                size_t olen = 0;
+                iconv(conv, &in, &ilen, &out, &olen);
+                return 0;
+            }"
+            ICONV_SECOND_ARGUMENT_IS_CONST
+            FAIL_REGEX "incompatible pointer type"
+            FAIL_REGEX "discards qualifiers in nested pointer types")
+
+        set(CMAKE_REQUIRED_LIBRARIES)
     endif()
+
+    target_compile_definitions(Iconv::Iconv
+        INTERFACE
+            HAVE_ICONV
+            $<$<BOOL:${ICONV_SECOND_ARGUMENT_IS_CONST}>:ICONV_SECOND_ARGUMENT_IS_CONST>)
 endif()
 
 # if(MINGW)
@@ -498,20 +522,12 @@ endif()
 
 if(ENABLE_NLS)
     check_library_exists(intl libintl_gettext "" HAVE_LIBINTL)
-    if(HAVE_LIBINTL)
-        set(LIBINTL_LIBRARY intl)
-    endif()
 endif()
 
 check_library_exists(m sqrt "" HAVE_LIBM)
-if(HAVE_LIBM)
-    set(LIBM_LIBRARY m)
-endif()
 
 set(TR_NETWORK_LIBRARIES)
-if(WIN32)
-    list(APPEND TR_NETWORK_LIBRARIES iphlpapi ws2_32)
-else()
+if(NOT WIN32)
     tr_select_library("c;socket;net" socket "" LIB)
     if(NOT LIB MATCHES "^(|c)$")
         list(APPEND TR_NETWORK_LIBRARIES ${LIB})

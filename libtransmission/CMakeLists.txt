@@ -237,10 +237,6 @@ include_directories(
     ${B64_INCLUDE_DIRS}
 )
 
-if(ICONV_FOUND)
-    include_directories(${ICONV_INCLUDE_DIRS})
-endif()
-
 if(ENABLE_UTP)
     include_directories(${TP_TOP}/libutp)
 endif()
@@ -261,7 +257,7 @@ foreach(UT ${EVENT2_UPSTREAM_TARGET}
 endforeach()
 
 target_link_libraries(${TR_NAME}
-    ${CMAKE_THREAD_LIBS_INIT}
+    PUBLIC
     ${ZLIB_LIBRARIES}
     ${CRYPTO_LIBRARIES}
     ${CURL_LIBRARIES}
@@ -271,18 +267,19 @@ target_link_libraries(${TR_NAME}
     ${DHT_LIBRARIES}
     ${UTP_LIBRARIES}
     ${B64_LIBRARIES}
-    ${LIBINTL_LIBRARY}
-    ${LIBM_LIBRARY}
-    ${TR_NETWORK_LIBRARIES}
 )
 
-if(ICONV_FOUND)
-    target_link_libraries(${TR_NAME} ${ICONV_LIBRARIES})
-endif()
-
-if(WIN32)
-    target_link_libraries(${TR_NAME} crypt32 shlwapi)
-endif()
+target_link_libraries(${TR_NAME}
+    PRIVATE
+        Threads::Threads
+        $<$<TARGET_EXISTS:Iconv::Iconv>:Iconv::Iconv>
+        $<$<BOOL:${HAVE_LIBINTL}>:intl>
+        $<$<BOOL:${HAVE_LIBM}>:m>
+        $<$<BOOL:${WIN32}>:crypt32>
+        $<$<BOOL:${WIN32}>:iphlpapi>
+        $<$<BOOL:${WIN32}>:shlwapi>
+        $<$<BOOL:${WIN32}>:ws2_32>
+        ${TR_NETWORK_LIBRARIES})
 
 if(ENABLE_TESTS)
     add_library(${TR_NAME}-test STATIC
