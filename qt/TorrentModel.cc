@@ -157,6 +157,7 @@ void TorrentModel::updateTorrents(tr_variant* torrents, bool is_complete_list)
     auto added = torrent_ids_t{};
     auto changed = torrent_ids_t{};
     auto completed = torrent_ids_t{};
+    auto edited = torrent_ids_t{};
     auto instantiated = torrents_t{};
     auto needinfo = torrent_ids_t{};
     auto processed = torrents_t{};
@@ -261,9 +262,16 @@ void TorrentModel::updateTorrents(tr_variant* torrents, bool is_complete_list)
             left_until_done = tor->leftUntilDone();
         }
 
+        auto const old_edit_date = tor->dateEdited();
+
         if (tor->update(keys.data(), values.data(), keys.size()))
         {
             changed.insert(id);
+        }
+
+        if (old_edit_date != tor->dateEdited())
+        {
+            edited.insert(id);
         }
 
         if (is_new && !tor->hasName())
@@ -290,6 +298,11 @@ void TorrentModel::updateTorrents(tr_variant* torrents, bool is_complete_list)
     if (!instantiated.empty())
     {
         rowsAdd(instantiated);
+    }
+
+    if (!edited.empty())
+    {
+        emit torrentsEdited(edited);
     }
 
     if (!changed.empty())

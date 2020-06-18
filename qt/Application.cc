@@ -285,6 +285,7 @@ Application::Application(int& argc, char** argv) :
 
     connect(model_, &TorrentModel::torrentsAdded, this, &Application::onTorrentsAdded);
     connect(model_, &TorrentModel::torrentsCompleted, this, &Application::onTorrentsCompleted);
+    connect(model_, &TorrentModel::torrentsEdited, this, &Application::onTorrentsEdited);
     connect(model_, &TorrentModel::torrentsNeedInfo, this, &Application::onTorrentsNeedInfo);
     connect(prefs_, &Prefs::changed, this, &Application::refreshPref);
     connect(session_, &Session::sourceChanged, this, &Application::onSessionSourceChanged);
