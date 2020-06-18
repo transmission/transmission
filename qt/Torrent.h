@@ -295,6 +295,11 @@ public:
         return date_created_;
     }
 
+    time_t dateEdited() const
+    {
+        return edit_date_;
+    }
+
     time_t manualAnnounceTime() const
     {
         return manual_announce_time_;

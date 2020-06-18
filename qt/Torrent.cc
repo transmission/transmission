@@ -40,6 +40,7 @@ Torrent::KeyList const Torrent::MainInfoKeys{
 // changing fields needed by the main window
 Torrent::KeyList const Torrent::MainStatKeys{
     TR_KEY_downloadedEver,
+    TR_KEY_editDate,
     TR_KEY_error,
     TR_KEY_errorString,
     TR_KEY_eta,
