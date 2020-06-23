@@ -6,6 +6,7 @@
  *
  */
 
+#include <cstdint> // uint64_t
 #include <map>
 #include <unordered_map>
 
@@ -94,6 +95,12 @@ QString getCountString(int n)
 {
     return QStringLiteral("%L1").arg(n);
 }
+
+Torrent::fields_t constexpr TrackerFields = {
+    (uint64_t(1) << Torrent::TRACKER_STATS)
+    };
+
+auto constexpr ActivityFields = FilterMode::TorrentFields;
 
 } // namespace
 
@@ -229,14 +236,14 @@ FilterBar::FilterBar(Prefs& prefs, TorrentModel const& torrents, TorrentFilter c
     connect(&prefs_, SIGNAL(changed(int)), this, SLOT(refreshPref(int)));
     connect(activity_combo_, SIGNAL(currentIndexChanged(int)), this, SLOT(onActivityIndexChanged(int)));
     connect(tracker_combo_, SIGNAL(currentIndexChanged(int)), this, SLOT(onTrackerIndexChanged(int)));
-    connect(&torrents_, SIGNAL(modelReset()), this, SLOT(recountSoon()));
-    connect(&torrents_, SIGNAL(rowsInserted(QModelIndex, int, int)), this, SLOT(recountSoon()));
-    connect(&torrents_, SIGNAL(rowsRemoved(QModelIndex, int, int)), this, SLOT(recountSoon()));
+    connect(&torrents_, &TorrentModel::modelReset, this, &FilterBar::recountAllSoon);
+    connect(&torrents_, &TorrentModel::rowsInserted, this, &FilterBar::recountAllSoon);
+    connect(&torrents_, &TorrentModel::rowsRemoved, this, &FilterBar::recountAllSoon);
     connect(&torrents_, &TorrentModel::torrentsChanged, this, &FilterBar::onTorrentsChanged);
     connect(recount_timer_, SIGNAL(timeout()), this, SLOT(recount()));
+    connect(&qApp->faviconCache(), &FaviconCache::pixmapReady, this, &FilterBar::recountTrackersSoon);
 
-    recountSoon();
-    refreshTrackers();
+    recountAllSoon();
     is_bootstrapping_ = false;
 
     // initialize our state
@@ -299,10 +306,17 @@ void FilterBar::refreshPref(int key)
 
 void FilterBar::onTorrentsChanged(torrent_ids_t const& ids, Torrent::fields_t const& changed_fields)
 {
-    Q_UNUSED(ids);
-    Q_UNUSED(changed_fields);
+    Q_UNUSED(ids)
 
-    recountSoon();
+    if ((changed_fields & TrackerFields).any())
+    {
+        recountTrackersSoon();
+    }
+
+    if ((changed_fields & ActivityFields).any())
+    {
+        recountActivitySoon();
+    }
 }
 
 void FilterBar::onTextChanged(QString const& str)
@@ -352,8 +366,10 @@ void FilterBar::onActivityIndexChanged(int i)
 ****
 ***/
 
-void FilterBar::recountSoon()
+void FilterBar::recountSoon(Pending const& pending)
 {
+    pending_ |= pending;
+
     if (!recount_timer_->isActive())
     {
         recount_timer_->setSingleShot(true);
@@ -365,16 +381,25 @@ void FilterBar::recount()
 {
     QAbstractItemModel* model = activity_combo_->model();
 
-    auto const torrents_per_mode = filter_.countTorrentsPerMode();
+    decltype(pending_) pending = {};
+    std::swap(pending_, pending);
 
-    for (int row = 0, n = model->rowCount(); row < n; ++row)
+    if (pending[ACTIVITY])
     {
-        QModelIndex index = model->index(row, 0);
-        int const mode = index.data(ACTIVITY_ROLE).toInt();
-        int const count = torrents_per_mode[mode];
-        model->setData(index, count, FilterBarComboBox::CountRole);
-        model->setData(index, getCountString(count), FilterBarComboBox::CountStringRole);
+        auto const torrents_per_mode = filter_.countTorrentsPerMode();
+
+        for (int row = 0, n = model->rowCount(); row < n; ++row)
+        {
+            auto const index = model->index(row, 0);
+            auto const mode = index.data(ACTIVITY_ROLE).toInt();
+            auto const count = torrents_per_mode[mode];
+            model->setData(index, count, FilterBarComboBox::CountRole);
+            model->setData(index, getCountString(count), FilterBarComboBox::CountStringRole);
+        }
     }
 
-    refreshTrackers();
+    if (pending[TRACKERS])
+    {
+        refreshTrackers();
+    }
 }

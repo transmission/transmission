@@ -6,6 +6,8 @@
  *
  */
 
+#include <cstdint> // uint64_t
+
 #include "Filters.h"
 
 std::array<QString, FilterMode::NUM_MODES> const FilterMode::Names =
@@ -32,6 +34,41 @@ int FilterMode::modeFromName(QString const& name)
 
     return FilterMode().mode(); // use the default value
 }
+
+// NB: if you change this function, update TorrentFields too
+bool FilterMode::test(Torrent const& tor, int mode)
+{
+    switch (mode)
+    {
+    case SHOW_ACTIVE:
+        return tor.peersWeAreUploadingTo() > 0 || tor.peersWeAreDownloadingFrom() > 0 || tor.isVerifying();
+
+    case SHOW_DOWNLOADING:
+        return tor.isDownloading() || tor.isWaitingToDownload();
+
+    case SHOW_ERROR:
+        return tor.hasError();
+
+    case SHOW_FINISHED:
+        return tor.isFinished();
+
+    case SHOW_PAUSED:
+        return tor.isPaused();
+
+    case SHOW_SEEDING:
+        return tor.isSeeding() || tor.isWaitingToSeed();
+
+    case SHOW_VERIFYING:
+        return tor.isVerifying() || tor.isWaitingToVerify();
+
+    default: // SHOW_ALL
+        return true;
+    }
+}
+
+/***
+****
+***/
 
 std::array<QString, SortMode::NUM_MODES> const SortMode::Names =
 {
