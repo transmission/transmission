@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include <bitset>
 #include <ctime> // time_t
 
 #include <QIcon>
@@ -499,8 +500,6 @@ public:
         return isWaitingToDownload() || isWaitingToSeed();
     }
 
-    bool update(tr_quark const* keys, tr_variant const* const* values, size_t n);
-
     QIcon getMimeTypeIcon() const
     {
         return icon_;
@@ -513,10 +512,72 @@ public:
     static KeyList const MainInfoKeys;
     static KeyList const MainStatKeys;
 
+    enum Field
+    {
+        ACTIVITY_DATE,
+        ADDED_DATE,
+        BANDWIDTH_PRIORITY,
+        COMMENT,
+        CREATOR,
+        DATE_CREATED,
+        DESIRED_AVAILABLE,
+        DOWNLOADED_EVER,
+        DOWNLOAD_DIR,
+        DOWNLOAD_LIMIT,
+        DOWNLOAD_LIMITED,
+        DOWNLOAD_SPEED,
+        EDIT_DATE,
+        ERROR,
+        ERROR_STRING,
+        ETA,
+        FAILED_EVER,
+        FILES,
+        HASH_STRING,
+        HAVE_UNCHECKED,
+        HAVE_VERIFIED,
+        HONORS_SESSION_LIMITS,
+        ICON,
+        IS_FINISHED,
+        IS_PRIVATE,
+        IS_STALLED,
+        LEFT_UNTIL_DONE,
+        MANUAL_ANNOUNCE_TIME,
+        METADATA_PERCENT_COMPLETE,
+        NAME,
+        PEERS,
+        PEERS_CONNECTED,
+        PEERS_GETTING_FROM_US,
+        PEERS_SENDING_TO_US,
+        PEER_LIMIT,
+        PERCENT_DONE,
+        PIECE_COUNT,
+        PIECE_SIZE,
+        QUEUE_POSITION,
+        RECHECK_PROGRESS,
+        SEED_IDLE_LIMIT,
+        SEED_IDLE_MODE,
+        SEED_RATIO_LIMIT,
+        SEED_RATIO_MODE,
+        SIZE_WHEN_DONE,
+        START_DATE,
+        STATUS,
+        TOTAL_SIZE,
+        TRACKER_STATS,
+        UPLOADED_EVER,
+        UPLOAD_LIMIT,
+        UPLOAD_LIMITED,
+        UPLOAD_SPEED,
+        WEBSEEDS_SENDING_TO_US,
+
+        N_FIELDS
+    };
+    using fields_t = std::bitset<N_FIELDS>;
+
+    fields_t update(tr_quark const* keys, tr_variant const* const* values, size_t n);
+
 private:
     void updateMimeIcon();
 
-private:
     int const id_;
 
     bool download_limited_ = {};

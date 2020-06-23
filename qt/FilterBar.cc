@@ -232,7 +232,7 @@ FilterBar::FilterBar(Prefs& prefs, TorrentModel const& torrents, TorrentFilter c
     connect(&torrents_, SIGNAL(modelReset()), this, SLOT(recountSoon()));
     connect(&torrents_, SIGNAL(rowsInserted(QModelIndex, int, int)), this, SLOT(recountSoon()));
     connect(&torrents_, SIGNAL(rowsRemoved(QModelIndex, int, int)), this, SLOT(recountSoon()));
-    connect(&torrents_, SIGNAL(dataChanged(QModelIndex, QModelIndex)), this, SLOT(recountSoon()));
+    connect(&torrents_, &TorrentModel::torrentsChanged, this, &FilterBar::onTorrentsChanged);
     connect(recount_timer_, SIGNAL(timeout()), this, SLOT(recount()));
 
     recountSoon();
@@ -295,6 +295,14 @@ void FilterBar::refreshPref(int key)
             break;
         }
     }
+}
+
+void FilterBar::onTorrentsChanged(torrent_ids_t const& ids, Torrent::fields_t const& changed_fields)
+{
+    Q_UNUSED(ids);
+    Q_UNUSED(changed_fields);
+
+    recountSoon();
 }
 
 void FilterBar::onTextChanged(QString const& str)
