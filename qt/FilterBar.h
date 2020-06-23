@@ -9,10 +9,11 @@
 #pragma once
 
 #include <bitset>
-#include <unordered_map>
+#include <map>
 
 #include <QWidget>
 
+#include "FaviconCache.h"
 #include "Torrent.h"
 
 class QLabel;
@@ -56,7 +57,7 @@ private:
     TorrentModel const& torrents_;
     TorrentFilter const& filter_;
 
-    std::map<QString, int> tracker_counts_;
+    std::map<FaviconCache::Key, int> tracker_counts_;
     FilterBarComboBox* activity_combo_ = {};
     FilterBarComboBox* tracker_combo_ = {};
     QLabel* count_label_ = {};

@@ -15,11 +15,11 @@
 #include <QMetaType>
 #include <QObject>
 #include <QString>
-#include <QStringList>
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/quark.h>
 
+#include "FaviconCache.h"
 #include "Speed.h"
 
 #ifdef ERROR
@@ -81,6 +81,7 @@ struct TrackerStat
     int scrape_state;
     int seeder_count;
     int tier;
+    FaviconCache::Key favicon_key;
     QString announce;
     QString host;
     QString last_announce_result;
@@ -356,7 +357,12 @@ public:
         return recheck_progress_;
     }
 
-    bool hasTrackerSubstring(QString const& substr) const;
+    bool includesTracker(FaviconCache::Key const& key) const;
+
+    FaviconCache::Keys const& trackerKeys() const
+    {
+        return tracker_keys_;
+    }
 
     Speed uploadLimit() const
     {
@@ -411,16 +417,6 @@ public:
     TrackerStatsList const& trackerStats() const
     {
         return tracker_stats_;
-    }
-
-    QStringList const& trackers() const
-    {
-        return trackers_;
-    }
-
-    QStringList const& trackerDisplayNames() const
-    {
-        return tracker_display_names_;
     }
 
     PeerList const& peers() const
@@ -639,8 +635,7 @@ private:
     PeerList peers_;
     FileList files_;
 
-    QStringList trackers_;
-    QStringList tracker_display_names_;
+    FaviconCache::Keys tracker_keys_;
     TrackerStatsList tracker_stats_;
 
     Speed upload_speed_;
