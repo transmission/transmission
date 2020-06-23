@@ -52,7 +52,6 @@ private:
 
     using Pending = std::bitset<NUM_FLAGS>;
 
-private:
     Prefs& prefs_;
     TorrentModel const& torrents_;
     TorrentFilter const& filter_;
