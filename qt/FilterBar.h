@@ -8,8 +8,10 @@
 
 #pragma once
 
-#include <unordered_map>
+#include <bitset>
+#include <map>
 
+#include <QString>
 #include <QWidget>
 
 #include "Torrent.h"
@@ -40,16 +42,16 @@ private:
     FilterBarComboBox* createActivityCombo();
     void refreshTrackers();
 
-private slots:
-    void recountSoon();
-    void recount();
-    void refreshPref(int key);
-    void onActivityIndexChanged(int index);
-    void onTrackerIndexChanged(int index);
-    void onTextChanged(QString const&);
-    void onTorrentsChanged(torrent_ids_t const&, Torrent::fields_t const& fields);
+    enum
+    {
+        ACTIVITY,
+        TRACKERS,
 
-private:
+        NUM_FLAGS
+    };
+
+    using Pending = std::bitset<NUM_FLAGS>;
+
     Prefs& prefs_;
     TorrentModel const& torrents_;
     TorrentFilter const& filter_;
@@ -61,5 +63,19 @@ private:
     QStandardItemModel* tracker_model_ = {};
     QTimer* recount_timer_ = {};
     QLineEdit* line_edit_ = {};
+    Pending pending_ = {};
     bool is_bootstrapping_ = {};
+
+private slots:
+    void recount();
+    void recountSoon(Pending const& fields);
+    void recountActivitySoon() { recountSoon(Pending().set(ACTIVITY)); }
+    void recountTrackersSoon() { recountSoon(Pending().set(TRACKERS)); }
+    void recountAllSoon() { recountSoon(Pending().set(ACTIVITY).set(TRACKERS)); }
+
+    void refreshPref(int key);
+    void onActivityIndexChanged(int index);
+    void onTextChanged(QString const&);
+    void onTorrentsChanged(torrent_ids_t const&, Torrent::fields_t const& fields);
+    void onTrackerIndexChanged(int index);
 };
