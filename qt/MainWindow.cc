@@ -245,7 +245,7 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     connect(&model_, &TorrentModel::modelReset, this, refresh_soon_adapter);
     connect(&model_, &TorrentModel::rowsRemoved, this, refresh_soon_adapter);
     connect(&model_, &TorrentModel::rowsInserted, this, refresh_soon_adapter);
-    connect(&model_, &TorrentModel::dataChanged, this, refresh_soon_adapter);
+    connect(&model_, &TorrentModel::torrentsChanged, this, refresh_soon_adapter);
 
     ui_.listView->setModel(&filter_model_);
     connect(ui_.listView->selectionModel(), &QItemSelectionModel::selectionChanged, refresh_action_sensitivity_soon);

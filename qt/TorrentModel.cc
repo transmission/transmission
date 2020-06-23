@@ -161,6 +161,7 @@ void TorrentModel::updateTorrents(tr_variant* torrents, bool is_complete_list)
     auto instantiated = torrents_t{};
     auto needinfo = torrent_ids_t{};
     auto processed = torrents_t{};
+    auto changed_fields = Torrent::fields_t{};
 
     auto const now = time(nullptr);
     auto const recently_added = [now](auto const& tor)
@@ -248,7 +249,6 @@ void TorrentModel::updateTorrents(tr_variant* torrents, bool is_complete_list)
         }
 
         Torrent* tor = getTorrentFromId(id);
-        std::optional<uint64_t> left_until_done;
         bool is_new = false;
 
         if (tor == nullptr)
@@ -257,19 +257,16 @@ void TorrentModel::updateTorrents(tr_variant* torrents, bool is_complete_list)
             instantiated.push_back(tor);
             is_new = true;
         }
-        else
-        {
-            left_until_done = tor->leftUntilDone();
-        }
 
-        auto const old_edit_date = tor->dateEdited();
+        auto const fields = tor->update(keys.data(), values.data(), keys.size());
 
-        if (tor->update(keys.data(), values.data(), keys.size()))
+        if (fields.any())
         {
+            changed_fields |= fields;
             changed.insert(id);
         }
 
-        if (old_edit_date != tor->dateEdited())
+        if (fields.test(Torrent::EDIT_DATE))
         {
             edited.insert(id);
         }
@@ -285,7 +282,7 @@ void TorrentModel::updateTorrents(tr_variant* torrents, bool is_complete_list)
             already_added_.insert(id);
         }
 
-        if (left_until_done && (*left_until_done > 0) && (tor->leftUntilDone() == 0) && (tor->downloadedEver() > 0))
+        if (fields.test(Torrent::LEFT_UNTIL_DONE) && (tor->leftUntilDone() == 0) && (tor->downloadedEver() > 0))
         {
             completed.insert(id);
         }
@@ -324,7 +321,7 @@ void TorrentModel::updateTorrents(tr_variant* torrents, bool is_complete_list)
 
     if (!changed.empty())
     {
-        emit torrentsChanged(changed);
+        emit torrentsChanged(changed, changed_fields);
     }
 
     if (!completed.empty())

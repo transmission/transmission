@@ -12,6 +12,9 @@
 
 #include <QWidget>
 
+#include "Torrent.h"
+#include "Typedefs.h"
+
 class QLabel;
 class QLineEdit;
 class QStandardItemModel;
@@ -44,6 +47,7 @@ private slots:
     void onActivityIndexChanged(int index);
     void onTrackerIndexChanged(int index);
     void onTextChanged(QString const&);
+    void onTorrentsChanged(torrent_ids_t const&, Torrent::fields_t const& fields);
 
 private:
     Prefs& prefs_;
