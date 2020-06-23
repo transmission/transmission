@@ -13,6 +13,7 @@
 #include <QWidget>
 
 #include "Torrent.h"
+#include "Typedefs.h"
 
 class QLabel;
 class QLineEdit;
