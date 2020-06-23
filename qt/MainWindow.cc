@@ -8,6 +8,7 @@
 
 #include <array>
 #include <cassert>
+#include <functional>
 #include <utility>
 
 #include <QCheckBox>
@@ -849,64 +850,52 @@ void MainWindow::refreshTorrentViewHeader()
 
 void MainWindow::refreshActionSensitivity()
 {
-    int paused(0);
-    int selected(0);
-    int selected_and_can_announce(0);
-    int selected_and_paused(0);
-    int selected_and_queued(0);
-    int selected_with_metadata(0);
-    QAbstractItemModel const* model(ui_.listView->model());
-    QItemSelectionModel const* selection_model(ui_.listView->selectionModel());
-    bool const has_selection = selection_model->hasSelection();
-    int const row_count(model->rowCount());
+    auto const* model = ui_.listView->model();
+    auto const* selection_model = ui_.listView->selectionModel();
+    auto const row_count = model->rowCount();
 
     // count how many torrents are selected, paused, etc
+    auto selected = int{};
+    auto selected_and_can_announce = int{};
+    auto selected_and_paused = int{};
+    auto selected_and_queued = int{};
+    auto selected_with_metadata = int{};
     auto const now = time(nullptr);
-    for (int row = 0; row < row_count; ++row)
+    for (auto const& row : selection_model->selectedRows())
     {
-        QModelIndex const model_index(model->index(row, 0));
-        auto const& tor = model->data(model_index, TorrentModel::TorrentRole).value<Torrent const*>();
+        auto const& tor = model->data(row, TorrentModel::TorrentRole).value<Torrent const*>();
 
-        if (tor != nullptr)
+        ++selected;
+
+        if (tor->isPaused())
         {
-            bool const is_selected = has_selection && selection_model->isSelected(model_index);
-            bool const is_paused = tor->isPaused();
+            ++selected_and_paused;
+        }
 
-            if (is_paused)
-            {
-                ++paused;
-            }
+        if (tor->isQueued())
+        {
+            ++selected_and_queued;
+        }
 
-            if (is_selected)
-            {
-                ++selected;
+        if (tor->hasMetadata())
+        {
+            ++selected_with_metadata;
+        }
 
-                if (is_paused)
-                {
-                    ++selected_and_paused;
-                }
-
-                if (tor->isQueued())
-                {
-                    ++selected_and_queued;
-                }
-
-                if (tor->hasMetadata())
-                {
-                    ++selected_with_metadata;
-                }
-
-                if (tor->canManualAnnounceAt(now))
-                {
-                    ++selected_and_can_announce;
-                }
-            }
+        if (tor->canManualAnnounceAt(now))
+        {
+            ++selected_and_can_announce;
         }
     }
 
-    bool const have_selection(selected > 0);
-    bool const have_selection_with_metadata = selected_with_metadata > 0;
-    bool const one_selection(selected == 1);
+    auto const& torrents = model_.torrents();
+    auto const is_paused = [](auto const* tor) { return tor->isPaused(); };
+    auto const any_paused = std::any_of(std::begin(torrents), std::end(torrents), is_paused);
+    auto const any_not_paused = std::any_of(std::begin(torrents), std::end(torrents), std::not_fn(is_paused));
+
+    auto const have_selection = selected > 0;
+    auto const have_selection_with_metadata = selected_with_metadata > 0;
+    auto const one_selection = selected == 1;
 
     ui_.action_Verify->setEnabled(have_selection_with_metadata);
     ui_.action_Remove->setEnabled(have_selection);
@@ -919,8 +908,8 @@ void MainWindow::refreshActionSensitivity()
     ui_.action_CopyMagnetToClipboard->setEnabled(one_selection);
 
     ui_.action_SelectAll->setEnabled(selected < row_count);
-    ui_.action_StartAll->setEnabled(paused > 0);
-    ui_.action_PauseAll->setEnabled(paused < row_count);
+    ui_.action_StartAll->setEnabled(any_paused);
+    ui_.action_PauseAll->setEnabled(any_not_paused);
     ui_.action_Start->setEnabled(selected_and_paused > 0);
     ui_.action_StartNow->setEnabled(selected_and_paused + selected_and_queued > 0);
     ui_.action_Pause->setEnabled(selected_and_paused < selected);
