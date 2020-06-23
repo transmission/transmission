@@ -9,11 +9,13 @@
 #pragma once
 
 #include <bitset>
-#include <unordered_map>
+#include <map>
 
+#include <QString>
 #include <QWidget>
 
 #include "Torrent.h"
+#include "Typedefs.h"
 
 class QLabel;
 class QLineEdit;
@@ -40,7 +42,6 @@ private:
     FilterBarComboBox* createActivityCombo();
     void refreshTrackers();
 
-private:
     enum
     {
         ACTIVITY,
