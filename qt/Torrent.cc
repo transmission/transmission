@@ -6,8 +6,9 @@
  *
  */
 
+#include <algorithm>
 #include <cassert>
-#include <iostream>
+#include <iterator>
 
 #include <QApplication>
 #include <QString>
@@ -284,10 +285,12 @@ bool change(TrackerStat& setme, tr_variant const* value)
     tr_variant* child;
     while (tr_variantDictChild(const_cast<tr_variant*>(value), pos++, &key, &child))
     {
+        bool field_changed = false;
+
         switch (key)
         {
 #define HANDLE_KEY(key, field) case TR_KEY_ ## key: \
-    changed = change(setme.field, child) || changed; break;
+    field_changed = change(setme.field, child); break;
             HANDLE_KEY(announce, announce)
             HANDLE_KEY(announceState, announce_state)
             HANDLE_KEY(downloadCount, download_count)
@@ -317,6 +320,16 @@ bool change(TrackerStat& setme, tr_variant const* value)
 #undef HANDLE_KEY
         default:
             break;
+        }
+
+        if (field_changed)
+        {
+            if (key == TR_KEY_announce)
+            {
+                setme.favicon_key = qApp->faviconCache().add(QUrl(setme.announce));
+            }
+
+            changed = true;
         }
     }
 
@@ -376,17 +389,9 @@ bool Torrent::getSeedRatio(double& setmeRatio) const
     return is_limited;
 }
 
-bool Torrent::hasTrackerSubstring(QString const& substr) const
+bool Torrent::includesTracker(FaviconCache::Key const& key) const
 {
-    for (auto const& s : trackers())
-    {
-        if (s.contains(substr, Qt::CaseInsensitive))
-        {
-            return true;
-        }
-    }
-
-    return false;
+    return tracker_keys_.count(key) != 0;
 }
 
 int Torrent::compareSeedRatio(Torrent const& that) const
@@ -586,10 +591,6 @@ Torrent::fields_t Torrent::update(tr_quark const* keys, tr_variant const* const*
         {
             switch (key)
             {
-            case TR_KEY_editDate:
-                // FIXME
-                break;
-
             case TR_KEY_name:
                 {
                     updateMimeIcon();
@@ -609,28 +610,11 @@ Torrent::fields_t Torrent::update(tr_quark const* keys, tr_variant const* const*
 
             case TR_KEY_trackers:
                 {
-                    // rebuild trackers_
-                    QStringList urls;
-                    urls.reserve(tracker_stats_.size());
-                    for (auto const& t : tracker_stats_)
-                    {
-                        urls.append(t.announce);
-                    }
-
-                    trackers_.swap(urls);
-
-                    // rebuild trackerDisplayNames
-                    QStringList display_names;
-                    display_names.reserve(trackers_.size());
-                    for (auto const& tracker : trackers_)
-                    {
-                        auto const url = QUrl(tracker);
-                        auto const key = qApp->faviconCache().add(url);
-                        display_names.append(FaviconCache::getDisplayName(key));
-                    }
-
-                    display_names.removeDuplicates();
-                    tracker_display_names_.swap(display_names);
+                    FaviconCache::Keys keys;
+                    std::transform(std::cbegin(tracker_stats_), std::cend(tracker_stats_),
+                        std::inserter(keys, std::end(keys)),
+                        [](auto const& ts) { return ts.favicon_key; });
+                    std::swap(tracker_keys_, keys);
                     break;
                 }
             }
@@ -706,5 +690,5 @@ QString Torrent::getError() const
 
 QPixmap TrackerStat::getFavicon() const
 {
-    return qApp->faviconCache().find(QUrl(announce));
+    return qApp->faviconCache().find(favicon_key);
 }

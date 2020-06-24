@@ -111,35 +111,38 @@ void FilterBar::refreshTrackers()
         ROW_TOTALS = 0, ROW_SEPARATOR, ROW_FIRST_TRACKER
     };
 
-    auto torrents_per_host = std::unordered_map<QString, int>{};
+    auto torrents_per_tracker = std::unordered_map<FaviconCache::Key, int>{};
     for (auto const& tor : torrents_.torrents())
     {
-        for (auto const& display_name : tor->trackerDisplayNames())
+        for (auto const& key : tor->trackerKeys())
         {
-            ++torrents_per_host[display_name];
+            ++torrents_per_tracker[key];
         }
     }
 
     // update the "All" row
-    auto const num_trackers = torrents_per_host.size();
+    auto const num_trackers = torrents_per_tracker.size();
     auto* item = tracker_model_->item(ROW_TOTALS);
     item->setData(int(num_trackers), FilterBarComboBox::CountRole);
     item->setData(getCountString(num_trackers), FilterBarComboBox::CountStringRole);
 
     auto update_tracker_item = [](QStandardItem* i, auto const& it)
         {
-            auto const& display_name = it->first;
+            auto const& key = it->first;
+            auto const& display_name = FaviconCache::getDisplayName(key);
             auto const& count = it->second;
-            auto const icon = qApp->faviconCache().find(FaviconCache::getKey(display_name));
+            auto const icon = qApp->faviconCache().find(key);
+
             i->setData(display_name, Qt::DisplayRole);
             i->setData(display_name, TRACKER_ROLE);
             i->setData(getCountString(count), FilterBarComboBox::CountStringRole);
             i->setData(icon, Qt::DecorationRole);
             i->setData(int(count), FilterBarComboBox::CountRole);
+
             return i;
         };
 
-    auto new_trackers = std::map<QString, int>(torrents_per_host.begin(), torrents_per_host.end());
+    auto new_trackers = std::map<FaviconCache::Key, int>(torrents_per_tracker.begin(), torrents_per_tracker.end());
     auto old_it = tracker_counts_.cbegin();
     auto new_it = new_trackers.cbegin();
     auto const old_end = tracker_counts_.cend();
@@ -331,25 +334,8 @@ void FilterBar::onTrackerIndexChanged(int i)
 {
     if (!is_bootstrapping_)
     {
-        QString str;
-        bool const is_tracker = !tracker_combo_->itemData(i, TRACKER_ROLE).toString().isEmpty();
-
-        if (!is_tracker)
-        {
-            // show all
-        }
-        else
-        {
-            str = tracker_combo_->itemData(i, TRACKER_ROLE).toString();
-            int const pos = str.lastIndexOf(QLatin1Char('.'));
-
-            if (pos >= 0)
-            {
-                str.truncate(pos + 1);
-            }
-        }
-
-        prefs_.set(Prefs::FILTER_TRACKERS, str);
+        auto const display_name = tracker_combo_->itemData(i, TRACKER_ROLE).toString();
+        prefs_.set(Prefs::FILTER_TRACKERS, display_name);
     }
 }
 

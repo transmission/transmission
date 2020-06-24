@@ -245,8 +245,9 @@ bool TorrentFilter::filterAcceptsRow(int source_row, QModelIndex const& source_p
 
     if (accepts)
     {
-        auto const name = prefs_.getString(Prefs::FILTER_TRACKERS);
-        accepts = name.isEmpty() || tor.hasTrackerSubstring(name);
+        auto const display_name = prefs_.getString(Prefs::FILTER_TRACKERS);
+        auto const key = FaviconCache::getKey(display_name);
+        accepts = key.isEmpty() || tor.includesTracker(key);
     }
 
     if (accepts)
