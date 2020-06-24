@@ -591,10 +591,6 @@ Torrent::fields_t Torrent::update(tr_quark const* keys, tr_variant const* const*
         {
             switch (key)
             {
-            case TR_KEY_editDate:
-                // FIXME
-                break;
-
             case TR_KEY_name:
                 {
                     updateMimeIcon();
