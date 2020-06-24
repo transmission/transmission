@@ -11,10 +11,12 @@
 #include <bitset>
 #include <map>
 
+#include <QString>
 #include <QWidget>
 
 #include "FaviconCache.h"
 #include "Torrent.h"
+#include "Typedefs.h"
 
 class QLabel;
 class QLineEdit;
@@ -41,7 +43,6 @@ private:
     FilterBarComboBox* createActivityCombo();
     void refreshTrackers();
 
-private:
     enum
     {
         ACTIVITY,
@@ -52,7 +53,6 @@ private:
 
     using Pending = std::bitset<NUM_FLAGS>;
 
-private:
     Prefs& prefs_;
     TorrentModel const& torrents_;
     TorrentFilter const& filter_;
