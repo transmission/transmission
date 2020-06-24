@@ -111,7 +111,7 @@ void FilterBar::refreshTrackers()
         ROW_TOTALS = 0, ROW_SEPARATOR, ROW_FIRST_TRACKER
     };
 
-    auto torrents_per_tracker = std::unordered_map<QString, int>{};
+    auto torrents_per_tracker = std::unordered_map<FaviconCache::Key, int>{};
     for (auto const& tor : torrents_.torrents())
     {
         for (auto const& key : tor->trackerKeys())
