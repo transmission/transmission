@@ -939,8 +939,6 @@ PrefsDialog::PrefsDialog(Session& session, Prefs& prefs, QWidget* parent) :
     adjustSize();
 }
 
-PrefsDialog::~PrefsDialog() = default;
-
 void PrefsDialog::saveModel()
 {
     auto const model_data = filter_data_model_.getData();
