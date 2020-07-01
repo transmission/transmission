@@ -29,9 +29,9 @@ auto constexpr MemBase = 1024;
 
 std::array<std::array<QString, Formatter::NUM_SIZES>, Formatter::NUM_TYPES> const Formatter::UnitStrings =
 {{
-    /* SPEED */{ tr("B/s"), tr("kB/s"), tr("MB/s"), tr("GB/s"), tr("TB/s") },
-    /* SIZE */{ tr("B"), tr("kB"), tr("MB"), tr("GB"), tr("TB") },
-    /* MEM  */{ tr("B"), tr("KiB"), tr("MiB"), tr("GiB"), tr("TiB") }
+    /* SPEED */ { tr("B/s"), tr("kB/s"), tr("MB/s"), tr("GB/s"), tr("TB/s") },
+    /* SIZE */ { tr("B"), tr("kB"), tr("MB"), tr("GB"), tr("TB") },
+    /* MEM  */ { tr("B"), tr("KiB"), tr("MiB"), tr("GiB"), tr("TiB") }
 }};
 
 void Formatter::initUnits()
