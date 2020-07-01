@@ -71,7 +71,6 @@ class PrefsDialog : public BaseDialog
 
 public:
     PrefsDialog(Session&, Prefs&, QWidget* parent = nullptr);
-    virtual ~PrefsDialog();
 
     void saveModel();
 

@@ -14,6 +14,8 @@
 #include <QString>
 #include <QVariant>
 
+#include "Torrent.h"
+
 class FilterMode
 {
 public:
@@ -57,6 +59,19 @@ public:
     {
         return Names[mode];
     }
+
+    /* The Torrent properties that can affect this filter.
+       When one of these changes, it's time to refilter. */
+    static Torrent::fields_t constexpr TorrentFields = {
+        (uint64_t(1) << Torrent::ERROR) |
+                (uint64_t(1) << Torrent::IS_FINISHED) |
+                (uint64_t(1) << Torrent::PEERS_GETTING_FROM_US) |
+                (uint64_t(1) << Torrent::PEERS_SENDING_TO_US) |
+                (uint64_t(1) << Torrent::STATUS)
+        };
+
+    static bool test(Torrent const& tor, int mode);
+    bool test(Torrent const& tor) const { return test(tor, mode()); }
 
 private:
     int mode_;

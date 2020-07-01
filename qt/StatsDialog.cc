@@ -38,8 +38,6 @@ StatsDialog::StatsDialog(Session& session, QWidget* parent) :
     session_.refreshSessionStats();
 }
 
-StatsDialog::~StatsDialog() = default;
-
 void StatsDialog::setVisible(bool visible)
 {
     timer_->stop();

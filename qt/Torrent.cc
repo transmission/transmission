@@ -6,8 +6,9 @@
  *
  */
 
+#include <algorithm>
 #include <cassert>
-#include <iostream>
+#include <iterator>
 
 #include <QApplication>
 #include <QString>
@@ -40,6 +41,7 @@ Torrent::KeyList const Torrent::MainInfoKeys{
 // changing fields needed by the main window
 Torrent::KeyList const Torrent::MainStatKeys{
     TR_KEY_downloadedEver,
+    TR_KEY_editDate,
     TR_KEY_error,
     TR_KEY_errorString,
     TR_KEY_eta,
@@ -283,10 +285,12 @@ bool change(TrackerStat& setme, tr_variant const* value)
     tr_variant* child;
     while (tr_variantDictChild(const_cast<tr_variant*>(value), pos++, &key, &child))
     {
+        bool field_changed = false;
+
         switch (key)
         {
 #define HANDLE_KEY(key, field) case TR_KEY_ ## key: \
-    changed = change(setme.field, child) || changed; break;
+    field_changed = change(setme.field, child); break;
             HANDLE_KEY(announce, announce)
             HANDLE_KEY(announceState, announce_state)
             HANDLE_KEY(downloadCount, download_count)
@@ -316,6 +320,16 @@ bool change(TrackerStat& setme, tr_variant const* value)
 #undef HANDLE_KEY
         default:
             break;
+        }
+
+        if (field_changed)
+        {
+            if (key == TR_KEY_announce)
+            {
+                setme.favicon_key = qApp->faviconCache().add(QUrl(setme.announce));
+            }
+
+            changed = true;
         }
     }
 
@@ -375,17 +389,9 @@ bool Torrent::getSeedRatio(double& setmeRatio) const
     return is_limited;
 }
 
-bool Torrent::hasTrackerSubstring(QString const& substr) const
+bool Torrent::includesTracker(FaviconCache::Key const& key) const
 {
-    for (auto const& s : trackers())
-    {
-        if (s.contains(substr, Qt::CaseInsensitive))
-        {
-            return true;
-        }
-    }
-
-    return false;
+    return tracker_keys_.count(key) != 0;
 }
 
 int Torrent::compareSeedRatio(Torrent const& that) const
@@ -504,9 +510,9 @@ void Torrent::updateMimeIcon()
 ****
 ***/
 
-bool Torrent::update(tr_quark const* keys, tr_variant const* const* values, size_t n)
+Torrent::fields_t Torrent::update(tr_quark const* keys, tr_variant const* const* values, size_t n)
 {
-    bool changed = false;
+    auto changed = fields_t{};
 
     for (size_t pos = 0; pos < n; ++pos)
     {
@@ -516,79 +522,75 @@ bool Torrent::update(tr_quark const* keys, tr_variant const* const* values, size
 
         switch (key)
         {
-#define HANDLE_KEY(key, field) case TR_KEY_ ## key: \
-    field_changed = change(field ## _, child); break;
+#define HANDLE_KEY(key, field, bit) case TR_KEY_ ## key: \
+    field_changed = change(field ## _, child); \
+    changed.set(bit, field_changed); \
+    break;
 
-            HANDLE_KEY(activityDate, activity_date)
-            HANDLE_KEY(addedDate, added_date)
-            HANDLE_KEY(bandwidthPriority, bandwidth_priority)
-            HANDLE_KEY(comment, comment)
-            HANDLE_KEY(corruptEver, failed_ever)
-            HANDLE_KEY(creator, creator)
-            HANDLE_KEY(dateCreated, date_created)
-            HANDLE_KEY(desiredAvailable, desired_available)
-            HANDLE_KEY(downloadDir, download_dir)
-            HANDLE_KEY(downloadLimit, download_limit) // KB/s
-            HANDLE_KEY(downloadLimited, download_limited)
-            HANDLE_KEY(downloadedEver, downloaded_ever)
-            HANDLE_KEY(editDate, edit_date)
-            HANDLE_KEY(error, error)
-            HANDLE_KEY(errorString, error_string)
-            HANDLE_KEY(eta, eta)
-            HANDLE_KEY(fileStats, files)
-            HANDLE_KEY(files, files)
-            HANDLE_KEY(hashString, hash_string)
-            HANDLE_KEY(haveUnchecked, have_unchecked)
-            HANDLE_KEY(haveValid, have_verified)
-            HANDLE_KEY(honorsSessionLimits, honors_session_limits)
-            HANDLE_KEY(isFinished, is_finished)
-            HANDLE_KEY(isPrivate, is_private)
-            HANDLE_KEY(isStalled, is_stalled)
-            HANDLE_KEY(leftUntilDone, left_until_done)
-            HANDLE_KEY(manualAnnounceTime, manual_announce_time)
-            HANDLE_KEY(metadataPercentComplete, metadata_percent_complete)
-            HANDLE_KEY(name, name)
-            HANDLE_KEY(peer_limit, peer_limit)
-            HANDLE_KEY(peers, peers)
-            HANDLE_KEY(peersConnected, peers_connected)
-            HANDLE_KEY(peersGettingFromUs, peers_getting_from_us)
-            HANDLE_KEY(peersSendingToUs, peers_sending_to_us)
-            HANDLE_KEY(percentDone, percent_done)
-            HANDLE_KEY(pieceCount, piece_count)
-            HANDLE_KEY(pieceSize, piece_size)
-            HANDLE_KEY(queuePosition, queue_position)
-            HANDLE_KEY(rateDownload, download_speed)
-            HANDLE_KEY(rateUpload, upload_speed)
-            HANDLE_KEY(recheckProgress, recheck_progress)
-            HANDLE_KEY(seedIdleLimit, seed_idle_limit)
-            HANDLE_KEY(seedIdleMode, seed_idle_mode)
-            HANDLE_KEY(seedRatioLimit, seed_ratio_limit)
-            HANDLE_KEY(seedRatioMode, seed_ratio_mode)
-            HANDLE_KEY(sizeWhenDone, size_when_done)
-            HANDLE_KEY(startDate, start_date)
-            HANDLE_KEY(status, status)
-            HANDLE_KEY(totalSize, total_size)
-            HANDLE_KEY(trackerStats, tracker_stats)
-            HANDLE_KEY(trackers, tracker_stats)
-            HANDLE_KEY(uploadLimit, upload_limit) // KB/s
-            HANDLE_KEY(uploadLimited, upload_limited)
-            HANDLE_KEY(uploadedEver, uploaded_ever)
-            HANDLE_KEY(webseedsSendingToUs, webseeds_sending_to_us)
+            HANDLE_KEY(activityDate, activity_date, ACTIVITY_DATE)
+            HANDLE_KEY(addedDate, added_date, ADDED_DATE)
+            HANDLE_KEY(bandwidthPriority, bandwidth_priority, BANDWIDTH_PRIORITY)
+            HANDLE_KEY(comment, comment, COMMENT)
+            HANDLE_KEY(corruptEver, failed_ever, FAILED_EVER)
+            HANDLE_KEY(creator, creator, CREATOR)
+            HANDLE_KEY(dateCreated, date_created, DATE_CREATED)
+            HANDLE_KEY(desiredAvailable, desired_available, DESIRED_AVAILABLE)
+            HANDLE_KEY(downloadDir, download_dir, DOWNLOAD_DIR)
+            HANDLE_KEY(downloadLimit, download_limit, DOWNLOAD_LIMIT) // KB/s
+            HANDLE_KEY(downloadLimited, download_limited, DOWNLOAD_LIMITED)
+            HANDLE_KEY(downloadedEver, downloaded_ever, DOWNLOADED_EVER)
+            HANDLE_KEY(editDate, edit_date, EDIT_DATE)
+            HANDLE_KEY(error, error, ERROR)
+            HANDLE_KEY(errorString, error_string, ERROR_STRING)
+            HANDLE_KEY(eta, eta, ETA)
+            HANDLE_KEY(fileStats, files, FILES)
+            HANDLE_KEY(files, files, FILES)
+            HANDLE_KEY(hashString, hash_string, HASH_STRING)
+            HANDLE_KEY(haveUnchecked, have_unchecked, HAVE_UNCHECKED)
+            HANDLE_KEY(haveValid, have_verified, HAVE_VERIFIED)
+            HANDLE_KEY(honorsSessionLimits, honors_session_limits, HONORS_SESSION_LIMITS)
+            HANDLE_KEY(isFinished, is_finished, IS_FINISHED)
+            HANDLE_KEY(isPrivate, is_private, IS_PRIVATE)
+            HANDLE_KEY(isStalled, is_stalled, IS_STALLED)
+            HANDLE_KEY(leftUntilDone, left_until_done, LEFT_UNTIL_DONE)
+            HANDLE_KEY(manualAnnounceTime, manual_announce_time, MANUAL_ANNOUNCE_TIME)
+            HANDLE_KEY(metadataPercentComplete, metadata_percent_complete, METADATA_PERCENT_COMPLETE)
+            HANDLE_KEY(name, name, NAME)
+            HANDLE_KEY(peer_limit, peer_limit, PEER_LIMIT)
+            HANDLE_KEY(peers, peers, PEERS)
+            HANDLE_KEY(peersConnected, peers_connected, PEERS_CONNECTED)
+            HANDLE_KEY(peersGettingFromUs, peers_getting_from_us, PEERS_GETTING_FROM_US)
+            HANDLE_KEY(peersSendingToUs, peers_sending_to_us, PEERS_SENDING_TO_US)
+            HANDLE_KEY(percentDone, percent_done, PERCENT_DONE)
+            HANDLE_KEY(pieceCount, piece_count, PIECE_COUNT)
+            HANDLE_KEY(pieceSize, piece_size, PIECE_SIZE)
+            HANDLE_KEY(queuePosition, queue_position, QUEUE_POSITION)
+            HANDLE_KEY(rateDownload, download_speed, DOWNLOAD_SPEED)
+            HANDLE_KEY(rateUpload, upload_speed, UPLOAD_SPEED)
+            HANDLE_KEY(recheckProgress, recheck_progress, RECHECK_PROGRESS)
+            HANDLE_KEY(seedIdleLimit, seed_idle_limit, SEED_IDLE_LIMIT)
+            HANDLE_KEY(seedIdleMode, seed_idle_mode, SEED_IDLE_MODE)
+            HANDLE_KEY(seedRatioLimit, seed_ratio_limit, SEED_RATIO_LIMIT)
+            HANDLE_KEY(seedRatioMode, seed_ratio_mode, SEED_RATIO_MODE)
+            HANDLE_KEY(sizeWhenDone, size_when_done, SIZE_WHEN_DONE)
+            HANDLE_KEY(startDate, start_date, START_DATE)
+            HANDLE_KEY(status, status, STATUS)
+            HANDLE_KEY(totalSize, total_size, TOTAL_SIZE)
+            HANDLE_KEY(trackerStats, tracker_stats, TRACKER_STATS)
+            HANDLE_KEY(trackers, tracker_stats, TRACKER_STATS)
+            HANDLE_KEY(uploadLimit, upload_limit, UPLOAD_LIMIT) // KB/s
+            HANDLE_KEY(uploadLimited, upload_limited, UPLOAD_LIMITED)
+            HANDLE_KEY(uploadedEver, uploaded_ever, UPLOADED_EVER)
+            HANDLE_KEY(webseedsSendingToUs, webseeds_sending_to_us, WEBSEEDS_SENDING_TO_US)
 #undef HANDLE_KEY
         default:
             break;
         }
 
-        changed = changed || field_changed;
-
         if (field_changed)
         {
             switch (key)
             {
-            case TR_KEY_editDate:
-                // FIXME
-                break;
-
             case TR_KEY_name:
                 {
                     updateMimeIcon();
@@ -608,28 +610,11 @@ bool Torrent::update(tr_quark const* keys, tr_variant const* const* values, size
 
             case TR_KEY_trackers:
                 {
-                    // rebuild trackers_
-                    QStringList urls;
-                    urls.reserve(tracker_stats_.size());
-                    for (auto const& t : tracker_stats_)
-                    {
-                        urls.append(t.announce);
-                    }
-
-                    trackers_.swap(urls);
-
-                    // rebuild trackerDisplayNames
-                    QStringList display_names;
-                    display_names.reserve(trackers_.size());
-                    for (auto const& tracker : trackers_)
-                    {
-                        auto const url = QUrl(tracker);
-                        auto const key = qApp->faviconCache().add(url);
-                        display_names.append(FaviconCache::getDisplayName(key));
-                    }
-
-                    display_names.removeDuplicates();
-                    tracker_display_names_.swap(display_names);
+                    FaviconCache::Keys keys;
+                    std::transform(std::cbegin(tracker_stats_), std::cend(tracker_stats_),
+                        std::inserter(keys, std::end(keys)),
+                        [](auto const& ts) { return ts.favicon_key; });
+                    std::swap(tracker_keys_, keys);
                     break;
                 }
             }
@@ -705,5 +690,5 @@ QString Torrent::getError() const
 
 QPixmap TrackerStat::getFavicon() const
 {
-    return qApp->faviconCache().find(QUrl(announce));
+    return qApp->faviconCache().find(favicon_key);
 }

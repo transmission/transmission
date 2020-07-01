@@ -23,7 +23,6 @@ class TorrentDelegate : public QStyledItemDelegate
 
 public:
     explicit TorrentDelegate(QObject* parent = nullptr);
-    virtual ~TorrentDelegate();
 
     // QAbstractItemDelegate
     QSize sizeHint(QStyleOptionViewItem const& option, QModelIndex const& index) const override;
@@ -43,14 +42,14 @@ protected:
     static QString shortStatusString(Torrent const& tor);
     static QString shortTransferString(Torrent const& tor);
 
-    QStyleOptionProgressBar* progress_bar_style_ = {};
-
     static QColor blue_brush;
     static QColor green_brush;
     static QColor silver_brush;
     static QColor blue_back;
     static QColor green_back;
     static QColor silver_back;
+
+    mutable QStyleOptionProgressBar progress_bar_style_ = {};
 
 private:
     mutable std::optional<int> height_hint_;

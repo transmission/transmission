@@ -59,11 +59,11 @@ void addAssociatedFileIcon(QFileInfo const& file_info, UINT icon_size, QIcon& ic
 
     if (!QPixmapCache::find(pixmap_cache_key, &pixmap))
     {
-        QString const filename = file_info.fileName();
+        auto const filename = file_info.fileName().toStdWString();
 
         SHFILEINFO shell_file_info;
 
-        if (::SHGetFileInfoW(reinterpret_cast<wchar_t const*>(filename.utf16()), FILE_ATTRIBUTE_NORMAL, &shell_file_info,
+        if (::SHGetFileInfoW(filename.data(), FILE_ATTRIBUTE_NORMAL, &shell_file_info,
             sizeof(shell_file_info), SHGFI_ICON | icon_size | SHGFI_USEFILEATTRIBUTES) != 0)
         {
             if (shell_file_info.hIcon != nullptr)

@@ -27,8 +27,6 @@ TorrentFilter::TorrentFilter(Prefs const& prefs) :
     refilter();
 }
 
-TorrentFilter::~TorrentFilter() = default;
-
 /***
 ****
 ***/
@@ -233,79 +231,29 @@ bool TorrentFilter::lessThan(QModelIndex const& left, QModelIndex const& right) 
 ****
 ***/
 
-bool TorrentFilter::trackerFilterAcceptsTorrent(Torrent const* tor, QString const& tracker) const
-{
-    return tracker.isEmpty() || tor->hasTrackerSubstring(tracker);
-}
-
-bool TorrentFilter::activityFilterAcceptsTorrent(Torrent const* tor, FilterMode const& m) const
-{
-    bool accepts;
-
-    switch (m.mode())
-    {
-    case FilterMode::SHOW_ACTIVE:
-        accepts = tor->peersWeAreUploadingTo() > 0 || tor->peersWeAreDownloadingFrom() > 0 || tor->isVerifying();
-        break;
-
-    case FilterMode::SHOW_DOWNLOADING:
-        accepts = tor->isDownloading() || tor->isWaitingToDownload();
-        break;
-
-    case FilterMode::SHOW_SEEDING:
-        accepts = tor->isSeeding() || tor->isWaitingToSeed();
-        break;
-
-    case FilterMode::SHOW_PAUSED:
-        accepts = tor->isPaused();
-        break;
-
-    case FilterMode::SHOW_FINISHED:
-        accepts = tor->isFinished();
-        break;
-
-    case FilterMode::SHOW_VERIFYING:
-        accepts = tor->isVerifying() || tor->isWaitingToVerify();
-        break;
-
-    case FilterMode::SHOW_ERROR:
-        accepts = tor->hasError();
-        break;
-
-    default: // FilterMode::SHOW_ALL
-        accepts = true;
-        break;
-    }
-
-    return accepts;
-}
-
 bool TorrentFilter::filterAcceptsRow(int source_row, QModelIndex const& source_parent) const
 {
     QModelIndex child_index = sourceModel()->index(source_row, 0, source_parent);
-    auto const* tor = child_index.model()->data(child_index, TorrentModel::TorrentRole).value<Torrent const*>();
+    auto const& tor = *child_index.model()->data(child_index, TorrentModel::TorrentRole).value<Torrent const*>();
     bool accepts = true;
 
     if (accepts)
     {
         auto const m = prefs_.get<FilterMode>(Prefs::FILTER_MODE);
-        accepts = activityFilterAcceptsTorrent(tor, m);
+        accepts = m.test(tor);
     }
 
     if (accepts)
     {
-        QString const trackers = prefs_.getString(Prefs::FILTER_TRACKERS);
-        accepts = trackerFilterAcceptsTorrent(tor, trackers);
+        auto const display_name = prefs_.getString(Prefs::FILTER_TRACKERS);
+        auto const key = FaviconCache::getKey(display_name);
+        accepts = key.isEmpty() || tor.includesTracker(key);
     }
 
     if (accepts)
     {
-        QString const text = prefs_.getString(Prefs::FILTER_TEXT);
-
-        if (!text.isEmpty())
-        {
-            accepts = tor->name().contains(text, Qt::CaseInsensitive);
-        }
+        auto const text = prefs_.getString(Prefs::FILTER_TEXT);
+        accepts = text.isEmpty() || tor.name().contains(text, Qt::CaseInsensitive);
     }
 
     return accepts;
@@ -319,7 +267,7 @@ std::array<int, FilterMode::NUM_MODES> TorrentFilter::countTorrentsPerMode() con
     {
         for (int mode = 0; mode < FilterMode::NUM_MODES; ++mode)
         {
-            if (activityFilterAcceptsTorrent(tor, mode))
+            if (FilterMode::test(*tor, mode))
             {
                 ++torrent_counts[mode];
             }

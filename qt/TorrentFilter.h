@@ -35,7 +35,6 @@ public:
 
 public:
     explicit TorrentFilter(Prefs const& prefs);
-    virtual ~TorrentFilter();
     [[nodiscard]] std::array<int, FilterMode::NUM_MODES> countTorrentsPerMode() const;
 
 protected:
@@ -48,9 +47,6 @@ private slots:
     void refilter();
 
 private:
-    bool activityFilterAcceptsTorrent(Torrent const* tor, FilterMode const& mode) const;
-    bool trackerFilterAcceptsTorrent(Torrent const* tor, QString const& tracker) const;
-
     QTimer refilter_timer_;
     Prefs const& prefs_;
 };

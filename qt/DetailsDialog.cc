@@ -6,9 +6,8 @@
  *
  */
 
-#include <algorithm> // std::any_of
+#include <algorithm>
 #include <cassert>
-#include <climits> /* INT_MAX */
 #include <ctime>
 
 #include <QDateTime>
@@ -98,8 +97,6 @@ public:
         peer_(std::move(p))
     {
     }
-
-    ~PeerItem() override = default;
 
     void refresh(Peer const& p)
     {
@@ -233,6 +230,7 @@ DetailsDialog::DetailsDialog(Session& session, Prefs& prefs, TorrentModel const&
     }
 
     connect(&model_, &TorrentModel::torrentsChanged, this, &DetailsDialog::onTorrentsChanged);
+    connect(&model_, &TorrentModel::torrentsEdited, this, &DetailsDialog::onTorrentsEdited);
     connect(&prefs_, &Prefs::changed, this, &DetailsDialog::refreshPref);
     connect(&timer_, &QTimer::timeout, this, &DetailsDialog::onTimer);
 
@@ -308,14 +306,30 @@ void DetailsDialog::getNewData()
     }
 }
 
-void DetailsDialog::onTorrentEdited(torrent_ids_t const& /*ids*/)
+void DetailsDialog::onTorrentsEdited(torrent_ids_t const& ids)
 {
-    // FIXME
-    // refreshDetailInfo({ tor.id() });
+    // std::set_intersection requires sorted inputs
+    auto a = std::vector<int>{ ids.begin(), ids.end() };
+    std::sort(std::begin(a), std::end(a));
+    auto b = std::vector<int>{ ids_.begin(), ids_.end() };
+    std::sort(std::begin(b), std::end(b));
+
+    // are any of the edited torrents on display here?
+    torrent_ids_t interesting_ids;
+    std::set_intersection(std::begin(a), std::end(a),
+        std::begin(b), std::end(b),
+        std::inserter(interesting_ids, std::begin(interesting_ids)));
+
+    if (!interesting_ids.empty())
+    {
+        session_.refreshDetailInfo(interesting_ids);
+    }
 }
 
-void DetailsDialog::onTorrentsChanged(torrent_ids_t const& ids)
+void DetailsDialog::onTorrentsChanged(torrent_ids_t const& ids, Torrent::fields_t const& fields)
 {
+    Q_UNUSED(fields)
+
     if (have_pending_refresh_)
     {
         return;
