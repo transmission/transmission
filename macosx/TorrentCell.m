@@ -47,6 +47,7 @@
 #define PADDING_HORIZONTAL 5.0
 #define PADDING_BETWEEN_BUTTONS 3.0
 #define PADDING_BETWEEN_IMAGE_AND_TITLE (PADDING_HORIZONTAL + 1.0)
+#define PADDING_BETWEEN_IMAGE_AND_TITLE_MIN PADDING_BETWEEN_IMAGE_AND_TITLE + 5.0
 #define PADDING_BETWEEN_IMAGE_AND_BAR PADDING_HORIZONTAL
 #define PADDING_BETWEEN_TITLE_AND_PRIORITY 6.0
 #define PADDING_ABOVE_TITLE 4.0
@@ -716,7 +717,8 @@
 
     NSRect result;
     result.origin.x = NSMinX(bounds) + PADDING_HORIZONTAL
-                        + (minimal ? IMAGE_SIZE_MIN : IMAGE_SIZE_REG) + PADDING_BETWEEN_IMAGE_AND_TITLE;
+                        + (minimal ? IMAGE_SIZE_MIN : IMAGE_SIZE_REG)
+                        + (minimal ? PADDING_BETWEEN_IMAGE_AND_TITLE_MIN : PADDING_BETWEEN_IMAGE_AND_TITLE);
     result.size.height = HEIGHT_TITLE;
 
     if (minimal)
@@ -739,9 +741,12 @@
 
 - (NSRect) rectForProgressWithStringInBounds: (NSRect) bounds
 {
+    const BOOL minimal = [fDefaults boolForKey: @"SmallView"];
+
     NSRect result;
     result.origin.y = NSMinY(bounds) + PADDING_ABOVE_TITLE + HEIGHT_TITLE + PADDING_BETWEEN_TITLE_AND_PROGRESS;
-    result.origin.x = NSMinX(bounds) + PADDING_HORIZONTAL + IMAGE_SIZE_REG + PADDING_BETWEEN_IMAGE_AND_TITLE;
+    result.origin.x = NSMinX(bounds) + PADDING_HORIZONTAL + IMAGE_SIZE_REG
+                        + (minimal ? PADDING_BETWEEN_IMAGE_AND_TITLE_MIN : PADDING_BETWEEN_IMAGE_AND_TITLE);
 
     result.size.height = HEIGHT_STATUS;
     result.size.width = NSMaxX(bounds) - NSMinX(result) - PADDING_HORIZONTAL;
@@ -751,10 +756,13 @@
 
 - (NSRect) rectForStatusWithStringInBounds: (NSRect) bounds
 {
+    const BOOL minimal = [fDefaults boolForKey: @"SmallView"];
+
     NSRect result;
     result.origin.y = NSMinY(bounds) + PADDING_ABOVE_TITLE + HEIGHT_TITLE + PADDING_BETWEEN_TITLE_AND_PROGRESS + HEIGHT_STATUS
                         + PADDING_BETWEEN_PROGRESS_AND_BAR + BAR_HEIGHT + PADDING_BETWEEN_BAR_AND_STATUS;
-    result.origin.x = NSMinX(bounds) + PADDING_HORIZONTAL + IMAGE_SIZE_REG + PADDING_BETWEEN_IMAGE_AND_TITLE;
+    result.origin.x = NSMinX(bounds) + PADDING_HORIZONTAL + IMAGE_SIZE_REG
+            + (minimal ? PADDING_BETWEEN_IMAGE_AND_TITLE_MIN : PADDING_BETWEEN_IMAGE_AND_TITLE);
 
     result.size.height = HEIGHT_STATUS;
     result.size.width = NSMaxX(bounds) - NSMinX(result) - PADDING_HORIZONTAL;
