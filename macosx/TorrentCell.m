@@ -24,7 +24,7 @@
 #import "GroupsController.h"
 #import "NSImageAdditions.h"
 #import "NSStringAdditions.h"
-#import "ProgressGradients.h"
+#import "ProgressColors.h"
 #import "Torrent.h"
 #import "TorrentTableView.h"
 
@@ -574,30 +574,30 @@
         if ([torrent isActive])
         {
             if ([torrent isChecking])
-                [[ProgressGradients progressYellowGradient] drawInRect: haveRect angle: 90];
+                [[ProgressColors progressYellowColor] drawInRect: haveRect];
             else if ([torrent isSeeding])
             {
                 NSRect ratioHaveRect, ratioRemainingRect;
                 NSDivideRect(haveRect, &ratioHaveRect, &ratioRemainingRect, round([torrent progressStopRatio] * NSWidth(haveRect)),
                             NSMinXEdge);
 
-                [[ProgressGradients progressGreenGradient] drawInRect: ratioHaveRect angle: 90];
-                [[ProgressGradients progressLightGreenGradient] drawInRect: ratioRemainingRect angle: 90];
+                [[ProgressColors progressGreenColor] drawInRect: ratioHaveRect];
+                [[ProgressColors progressLightGreenColor] drawInRect: ratioRemainingRect];
             }
             else
-                [[ProgressGradients progressBlueGradient] drawInRect: haveRect angle: 90];
+                [[ProgressColors progressBlueColor] drawInRect: haveRect];
         }
         else
         {
             if ([torrent waitingToStart])
             {
                 if ([torrent allDownloaded])
-                    [[ProgressGradients progressDarkGreenGradient] drawInRect: haveRect angle: 90];
+                    [[ProgressColors progressDarkGreenColor] drawInRect: haveRect];
                 else
-                    [[ProgressGradients progressDarkBlueGradient] drawInRect: haveRect angle: 90];
+                    [[ProgressColors progressDarkBlueColor] drawInRect: haveRect];
             }
             else
-                [[ProgressGradients progressGrayGradient] drawInRect: haveRect angle: 90];
+                [[ProgressColors progressGrayColor] drawInRect: haveRect];
         }
     }
 
@@ -616,20 +616,20 @@
             NSDivideRect(wantedRect, &wantedRect, &unavailableRect, round(NSWidth(wantedRect) * [torrent availableDesired]),
                         NSMinXEdge);
 
-            [[ProgressGradients progressRedGradient] drawInRect: unavailableRect angle: 90];
+            [[ProgressColors progressRedColor] drawInRect: unavailableRect];
         }
 
         //remaining section
-        [[ProgressGradients progressWhiteGradient] drawInRect: wantedRect angle: 90];
+        [[ProgressColors progressWhiteColor] drawInRect: wantedRect];
     }
 
     //unwanted section
     if (!NSIsEmptyRect(missingRect))
     {
         if (![torrent isMagnet])
-            [[ProgressGradients progressLightGrayGradient] drawInRect: missingRect angle: 90];
+            [[ProgressColors progressLightGrayColor] drawInRect: missingRect];
         else
-            [[ProgressGradients progressRedGradient] drawInRect: missingRect angle: 90];
+            [[ProgressColors progressRedColor] drawInRect: missingRect];
     }
 }
 

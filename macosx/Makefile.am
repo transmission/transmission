@@ -139,8 +139,8 @@ EXTRA_DIST = \
     PrefsController.m \
     PrefsWindow.h \
     PrefsWindow.m \
-    ProgressGradients.h \
-    ProgressGradients.m \
+    ProgressColors.h \
+    ProgressColors.m \
     ShareToolbarItem.h \
     ShareToolbarItem.m \
     ShareTorrentFileHelper.h \

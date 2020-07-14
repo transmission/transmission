@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2007-2012 Transmission authors and contributors
+ * Copyright (c) 2007-2020 Transmission authors and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -20,20 +20,25 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#import <Foundation/Foundation.h>
 #import <AppKit/AppKit.h>
 
-@interface ProgressGradients : NSObject
+@interface NSColor (NSColorAdditions)
 
-+ (NSGradient *) progressWhiteGradient;
-+ (NSGradient *) progressGrayGradient;
-+ (NSGradient *) progressLightGrayGradient;
-+ (NSGradient *) progressBlueGradient;
-+ (NSGradient *) progressDarkBlueGradient;
-+ (NSGradient *) progressGreenGradient;
-+ (NSGradient *) progressLightGreenGradient;
-+ (NSGradient *) progressDarkGreenGradient;
-+ (NSGradient *) progressRedGradient;
-+ (NSGradient *) progressYellowGradient;
+- (void) drawInRect: (NSRect) rect;
+
+@end
+
+@interface ProgressColors : NSObject
+
++ (NSColor *) progressWhiteColor;
++ (NSColor *) progressGrayColor;
++ (NSColor *) progressLightGrayColor;
++ (NSColor *) progressBlueColor;
++ (NSColor *) progressDarkBlueColor;
++ (NSColor *) progressGreenColor;
++ (NSColor *) progressLightGreenColor;
++ (NSColor *) progressDarkGreenColor;
++ (NSColor *) progressRedColor;
++ (NSColor *) progressYellowColor;
 
 @end

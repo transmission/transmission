@@ -282,6 +282,7 @@
 		A2F8CD430F3D0F4A00DB356A /* miniupnpcstrings.h in Headers */ = {isa = PBXBuildFile; fileRef = A2F8CD420F3D0F4A00DB356A /* miniupnpcstrings.h */; };
 		A2FB057F0BFEB6800095564D /* DragOverlayView.m in Sources */ = {isa = PBXBuildFile; fileRef = A2FB057D0BFEB6800095564D /* DragOverlayView.m */; };
 		A2FB701C0D95CAEA0001F331 /* GroupsController.m in Sources */ = {isa = PBXBuildFile; fileRef = A2FB701B0D95CAEA0001F331 /* GroupsController.m */; };
+		B2391E5ADAC80E30EF4837D6 /* ProgressColors.m in Sources */ = {isa = PBXBuildFile; fileRef = B239195863D900A12A6EC860 /* ProgressColors.m */; };
 		BE1183580CE160C50002D0F3 /* miniupnpc_declspec.h in Headers */ = {isa = PBXBuildFile; fileRef = BE11834E0CE160C50002D0F3 /* miniupnpc_declspec.h */; };
 		BE1183590CE160C50002D0F3 /* igd_desc_parse.h in Headers */ = {isa = PBXBuildFile; fileRef = BE11834F0CE160C50002D0F3 /* igd_desc_parse.h */; };
 		BE11835A0CE160C50002D0F3 /* minixml.h in Headers */ = {isa = PBXBuildFile; fileRef = BE1183500CE160C50002D0F3 /* minixml.h */; };
@@ -369,7 +370,6 @@
 		C1FEE57B1C3223CC00D62832 /* watchdir.h in Headers */ = {isa = PBXBuildFile; fileRef = C1FEE5761C3223CC00D62832 /* watchdir.h */; };
 		D4AF3B2F0C41F7A500D46B6B /* list.c in Sources */ = {isa = PBXBuildFile; fileRef = D4AF3B2D0C41F7A500D46B6B /* list.c */; };
 		D4AF3B300C41F7A600D46B6B /* list.h in Headers */ = {isa = PBXBuildFile; fileRef = D4AF3B2E0C41F7A500D46B6B /* list.h */; };
-		E138A9780C04D88F00C5426C /* ProgressGradients.m in Sources */ = {isa = PBXBuildFile; fileRef = E138A9760C04D88F00C5426C /* ProgressGradients.m */; };
 		F63480631E1D7274005B9E09 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F63480621E1D7274005B9E09 /* Images.xcassets */; };
 /* End PBXBuildFile section */
 
@@ -935,6 +935,8 @@
 		A2FB07F115F8208300933543 /* nl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/Localizable.strings; sourceTree = "<group>"; };
 		A2FB701A0D95CAEA0001F331 /* GroupsController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GroupsController.h; sourceTree = "<group>"; };
 		A2FB701B0D95CAEA0001F331 /* GroupsController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GroupsController.m; sourceTree = "<group>"; };
+		B239195863D900A12A6EC860 /* ProgressColors.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProgressColors.m; sourceTree = "<group>"; };
+		B2391FAFE4F08932C96F7C0D /* ProgressColors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProgressColors.h; sourceTree = "<group>"; };
 		BE1183480CE160960002D0F3 /* libminiupnp.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libminiupnp.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		BE11834E0CE160C50002D0F3 /* miniupnpc_declspec.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = miniupnpc_declspec.h; sourceTree = "<group>"; };
 		BE11834F0CE160C50002D0F3 /* igd_desc_parse.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = igd_desc_parse.h; sourceTree = "<group>"; };
@@ -1020,8 +1022,6 @@
 		C1FEE5761C3223CC00D62832 /* watchdir.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = watchdir.h; sourceTree = "<group>"; };
 		D4AF3B2D0C41F7A500D46B6B /* list.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = list.c; sourceTree = "<group>"; };
 		D4AF3B2E0C41F7A500D46B6B /* list.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = list.h; sourceTree = "<group>"; };
-		E138A9750C04D88F00C5426C /* ProgressGradients.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ProgressGradients.h; sourceTree = "<group>"; };
-		E138A9760C04D88F00C5426C /* ProgressGradients.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ProgressGradients.m; sourceTree = "<group>"; };
 		F63480621E1D7274005B9E09 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = Images/Images.xcassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -1212,8 +1212,8 @@
 				A26AF2220D2DA42800FF7140 /* File Outline View */,
 				E1B6FBFD0C0D72430015FE4D /* Prefs Window */,
 				E1B6FC000C0D72A00015FE4D /* Overlay Window */,
-				E138A9750C04D88F00C5426C /* ProgressGradients.h */,
-				E138A9760C04D88F00C5426C /* ProgressGradients.m */,
+				B2391FAFE4F08932C96F7C0D /* ProgressColors.h */,
+				B239195863D900A12A6EC860 /* ProgressColors.m */,
 				A2E57AB91310822C00A7DAB1 /* StatusBarController.h */,
 				A2E57ABA1310822C00A7DAB1 /* StatusBarController.m */,
 				A21282A50CA6C66800EAEE0F /* StatusBarView.h */,
@@ -2483,7 +2483,6 @@
 				A2A1CB7A0BF29D5500AE959F /* PeerProgressIndicatorCell.m in Sources */,
 				A2385DD40BFE06C800B24EF6 /* DragOverlayWindow.m in Sources */,
 				A2FB057F0BFEB6800095564D /* DragOverlayView.m in Sources */,
-				E138A9780C04D88F00C5426C /* ProgressGradients.m in Sources */,
 				A2DF37070C220D03006523C1 /* CreatorWindowController.m in Sources */,
 				35F373030C2DA89000DAA8F2 /* FilePriorityCell.m in Sources */,
 				A2085DDC0C53BC74000BC3B7 /* AboutWindowController.m in Sources */,
@@ -2532,6 +2531,7 @@
 				A234EA541453563B000F3E97 /* NSImageAdditions.m in Sources */,
 				A2AB883E16A399A6008FAD50 /* VDKQueue.m in Sources */,
 				A2451E6916ACE4EB00586E0E /* FileRenameSheetController.m in Sources */,
+				B2391E5ADAC80E30EF4837D6 /* ProgressColors.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

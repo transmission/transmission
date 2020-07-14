@@ -90,7 +90,7 @@ set(${PROJECT_NAME}_SOURCES
     PredicateEditorRowTemplateAny.m
     PrefsController.m
     PrefsWindow.m
-    ProgressGradients.m
+    ProgressColors.m
     ShareToolbarItem.m
     ShareTorrentFileHelper.m
     StatsWindowController.m
@@ -162,7 +162,7 @@ set(${PROJECT_NAME}_HEADERS
     PredicateEditorRowTemplateAny.h
     PrefsController.h
     PrefsWindow.h
-    ProgressGradients.h
+    ProgressColors.h
     ShareToolbarItem.h
     ShareTorrentFileHelper.h
     StatsWindowController.h
