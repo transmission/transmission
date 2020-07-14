@@ -109,8 +109,6 @@
 
 
         fBluePieceColor = [NSColor colorWithCalibratedRed: 0.0 green: 0.4 blue: 0.8 alpha: 1.0];
-        fBarBorderColor = [NSColor colorWithCalibratedWhite: 0.0 alpha: 0.2];
-        fBarMinimalBorderColor = [NSColor colorWithCalibratedWhite: 0.0 alpha: 0.015];
     }
     return self;
 }
@@ -538,8 +536,6 @@
 
 - (void) drawBar: (NSRect) barRect
 {
-    const BOOL minimal = [fDefaults boolForKey: @"SmallView"];
-
     const CGFloat piecesBarPercent = [(TorrentTableView *)[self controlView] piecesBarPercent];
     if (piecesBarPercent > 0.0)
     {
@@ -556,10 +552,6 @@
 
         [self drawRegularBar: barRect];
     }
-
-    NSColor * borderColor = minimal ? fBarMinimalBorderColor : fBarBorderColor;
-    [borderColor set];
-    [NSBezierPath strokeRect: NSInsetRect(barRect, 0.5, 0.5)];
 }
 
 - (void) drawRegularBar: (NSRect) barRect
