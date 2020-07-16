@@ -63,6 +63,7 @@
 
 @interface TorrentCell (Private)
 
+- (void) drawProgress: (void (^)()) block inBar: (NSRect) barRect;
 - (void) drawBar: (NSRect) barRect;
 - (void) drawRegularBar: (NSRect) barRect;
 - (void) drawPiecesBar: (NSRect) barRect;
@@ -534,6 +535,24 @@
 
 @implementation TorrentCell (Private)
 
+- (void) drawProgress: (void (^)()) block inBar: (NSRect) barRect
+{
+    CGContextRef context = [[NSGraphicsContext currentContext] CGContext];
+    NSGraphicsContext * drawingContext = [NSGraphicsContext graphicsContextWithCGContext: context flipped: YES];
+    NSGraphicsContext * previousContext = [NSGraphicsContext currentContext];
+    [NSGraphicsContext setCurrentContext: drawingContext];
+    [NSGraphicsContext saveGraphicsState];
+
+    const CGFloat radius = NSHeight(barRect) / 2;
+    NSBezierPath * barPath = [NSBezierPath bezierPathWithRoundedRect: barRect xRadius: radius yRadius: radius];
+    [barPath addClip];
+
+    block();
+
+    [NSGraphicsContext restoreGraphicsState];
+    [NSGraphicsContext setCurrentContext: previousContext];
+}
+
 - (void) drawBar: (NSRect) barRect
 {
     const CGFloat piecesBarPercent = [(TorrentTableView *)[self controlView] piecesBarPercent];
@@ -543,14 +562,18 @@
         NSDivideRect(barRect, &piecesBarRect, &regularBarRect, floor(NSHeight(barRect) * PIECES_TOTAL_PERCENT * piecesBarPercent),
                     NSMaxYEdge);
 
-        [self drawRegularBar: regularBarRect];
-        [self drawPiecesBar: piecesBarRect];
+        [self drawProgress: ^{
+            [self drawRegularBar: regularBarRect];
+            [self drawPiecesBar: piecesBarRect];
+        } inBar: barRect];
     }
     else
     {
         [[self representedObject] setPreviousFinishedPieces: nil];
 
-        [self drawRegularBar: barRect];
+        [self drawProgress: ^{
+            [self drawRegularBar: barRect];
+        } inBar: barRect];
     }
 }
 
