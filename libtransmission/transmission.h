@@ -780,6 +780,13 @@ void tr_logFreeQueue(tr_log_message* freeme);
  *
  * Passing NULL for a filename will clear the blocklist.
  */
+
+bool tr_sessionIsTorrentAddedScriptEnabled (const tr_session *);
+void tr_sessionSetTorrentAddedScriptEnabled (tr_session *, bool isEnabled);
+const char * tr_sessionGetTorrentAddedScript (const tr_session *);
+void tr_sessionSetTorrentAddedScript (tr_session *, const char * scriptFilename);
+
+
 int tr_blocklistSetContent(tr_session* session, char const* filename);
 
 int tr_blocklistGetRuleCount(tr_session const* session);

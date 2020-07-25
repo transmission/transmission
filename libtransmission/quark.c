@@ -308,6 +308,8 @@ static struct tr_key_struct const my_static[] =
     Q("scrape"),
     Q("scrape-paused-torrents-enabled"),
     Q("scrapeState"),
+    Q("script-torrent-added-enabled"),
+    Q("script-torrent-added-filename"),
     Q("script-torrent-done-enabled"),
     Q("script-torrent-done-filename"),
     Q("seconds-active"),

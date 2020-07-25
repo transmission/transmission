@@ -732,6 +732,27 @@ static tr_priority_t calculatePiecePriority(tr_torrent const* tor, tr_piece_inde
     return priority;
 }
 
+
+
+
+static void onSigCHLD (int i UNUSED)
+{
+#ifdef WIN32
+
+  _cwait (NULL, -1, WAIT_CHILD);
+
+#else
+
+  int rc;
+  do
+    rc = waitpid (-1, NULL, WNOHANG);
+  while (rc>0 || (rc==-1 && errno==EINTR));
+
+#endif
+}
+
+
+ 		
 static void tr_torrentInitFilePieces(tr_torrent* tor)
 {
     uint64_t offset = 0;
@@ -920,8 +941,80 @@ static bool setLocalErrorIfFilesDisappeared(tr_torrent* tor)
     return disappeared;
 }
 
+/** copied or moved **/
+
+static void get_local_time_str(char* const buffer, size_t const buffer_len)
+{
+    time_t const now = tr_time();
+
+    tr_strlcpy(buffer, ctime(&now), buffer_len);
+
+    char* newline_pos = strchr(buffer, '\n');
+
+    /* ctime() includes '\n', but it's better to be safe */
+    if (newline_pos != NULL)
+    {
+        *newline_pos = '\0';
+    }
+}
+
+
+static void torrentCallScript(tr_torrent const* tor, char const* script)
+{
+
+    if (tr_str_is_empty(script))
+    {
+        return;
+    }
+    tr_logAddTorInfo(tor, "debug - Calling a script");
+
+    
+    char time_str[32];
+    get_local_time_str(time_str, TR_N_ELEMENTS(time_str));
+
+    char* const torrent_dir = tr_sys_path_native_separators(tr_strdup(tor->currentDir));
+
+    char* const cmd[] =
+    {
+        tr_strdup(script),
+        NULL
+    };
+
+    char* labels = tr_strjoin((char const* const*)tr_ptrArrayBase(&tor->labels), tr_ptrArraySize(&tor->labels), ",");
+
+char* const env[] =
+{
+    tr_strdup_printf("TR_APP_VERSION=%s", SHORT_VERSION_STRING),
+    tr_strdup_printf("TR_TIME_LOCALTIME=%s", time_str),
+    tr_strdup_printf("TR_TORRENT_DIR=%s", torrent_dir),
+    tr_strdup_printf("TR_TORRENT_HASH=%s", tor->info.hashString),
+    tr_strdup_printf("TR_TORRENT_ID=%d", tr_torrentId(tor)),
+    tr_strdup_printf("TR_TORRENT_NAME=%s", tr_torrentName(tor)),
+    tr_strdup_printf("TR_TORRENT_LABELS=%s", labels),
+    NULL
+};
+
+    tr_logAddTorInfo(tor, "Calling script \"%s\"", script);
+
+    tr_error* error = NULL;
+
+if (!tr_spawn_async(cmd, env, TR_IF_WIN32("\\", "/"), &error))
+{
+    tr_logAddTorErr(tor, "Error executing script \"%s\" (%d): %s", script, error->code, error->message);
+    tr_error_free(error);
+}
+
+tr_free_ptrv((void* const*)env);
+tr_free_ptrv((void* const*)cmd);
+tr_free(labels);
+tr_free(torrent_dir);
+}
+/** HERE **/
+
 static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
 {
+
+    tr_logAddInfo ("************************** TORRENT INIT FUNCTION! *****************************");
     tr_session* session = tr_ctorGetSession(ctor);
 
     TR_ASSERT(session != NULL);
@@ -1058,12 +1151,28 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
 
     if (isNewTorrent)
     {
+        tr_logAddInfo ("******************* THIS IS A NEW TORRENT! ***********************");
+    
         tor->startAfterVerify = doStart;
         tr_torrentVerify(tor, NULL, NULL);
+        
+        if  (tr_sessionIsTorrentAddedScriptEnabled(tor->session))
+        {
+            tr_logAddInfo ("******************* CALLING TORRENT ADDED SCRIPT ***********************");
+            torrentCallScript(tor, tr_sessionGetTorrentAddedScript(tor->session));
+        }
+        
+        
+        
     }
     else if (doStart)
     {
         tr_torrentStart(tor);
+        if (tr_sessionIsTorrentAddedScriptEnabled (tor->session))
+        {
+        
+                    torrentCallScript(tor, tr_sessionGetTorrentAddedScript(tor->session));
+        }
     }
 
     tr_sessionUnlock(session);
@@ -2220,7 +2329,7 @@ void tr_torrentClearIdleLimitHitCallback(tr_torrent* torrent)
     tr_torrentSetIdleLimitHitCallback(torrent, NULL, NULL);
 }
 
-static void get_local_time_str(char* const buffer, size_t const buffer_len)
+static void get_local_time_str__(char* const buffer, size_t const buffer_len)
 {
     time_t const now = tr_time();
 
@@ -2235,7 +2344,8 @@ static void get_local_time_str(char* const buffer, size_t const buffer_len)
     }
 }
 
-static void torrentCallScript(tr_torrent const* tor, char const* script)
+/**static void torrentCallScript(tr_torrent const* tor, char const* script)**/
+static void __torrentCallScript (const tr_torrent * tor, const char * script)
 {
     if (tr_str_is_empty(script))
     {

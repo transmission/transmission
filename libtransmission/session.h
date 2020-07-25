@@ -104,6 +104,7 @@ struct tr_session
     bool isBlocklistEnabled;
     bool isPrefetchEnabled;
     bool isTorrentDoneScriptEnabled;
+    bool isTorrentAddedScriptEnabled;
     bool isClosing;
     bool isClosed;
     bool isIncompleteFileNamingEnabled;
@@ -178,7 +179,8 @@ struct tr_session
     tr_torrent* torrentList;
 
     char* torrentDoneScript;
-
+    char* torrentAddedScript;
+    
     char* configDir;
     char* resumeDir;
     char* torrentDir;

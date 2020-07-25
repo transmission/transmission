@@ -1922,6 +1922,18 @@ static char const* torrentAdd(tr_session* session, tr_variant* args_in, tr_varia
         tr_free(files);
     }
 
+/**
+   if (tr_variantDictFindStr (args_in, TR_KEY_script_torrent_added_filename, &str, NULL))
+    {
+        tr_sessionSetTorrentAddedScript (session, str);
+    }
+    
+    if (tr_variantDictFindBool (args_in, TR_KEY_script_torrent_added_enabled, &boolVal))
+    {
+        tr_sessionSetTorrentAddedScriptEnabled (session, boolVal);
+    }
+**/
+
     if (tr_variantDictFindList(args_in, TR_KEY_priority_high, &l))
     {
         tr_file_index_t fileCount;
@@ -2452,6 +2464,14 @@ static void addSessionField(tr_session* s, tr_variant* d, tr_quark key)
 
     case TR_KEY_script_torrent_done_enabled:
         tr_variantDictAddBool(d, key, tr_sessionIsTorrentDoneScriptEnabled(s));
+        break;
+        
+    case TR_KEY_script_torrent_added_enabled:   
+        tr_variantDictAddBool(d, key, tr_sessionIsTorrentAddedScriptEnabled(s));
+        break;
+
+    case TR_KEY_script_torrent_added_filename:
+        tr_variantDictAddStr(d, key, tr_sessionGetTorrentAddedScript(s));
         break;
 
     case TR_KEY_queue_stalled_enabled:

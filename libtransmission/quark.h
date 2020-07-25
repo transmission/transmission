@@ -308,6 +308,8 @@ enum
     TR_KEY_scrape,
     TR_KEY_scrape_paused_torrents_enabled,
     TR_KEY_scrapeState,
+    TR_KEY_script_torrent_added_enabled,
+    TR_KEY_script_torrent_added_filename,
     TR_KEY_script_torrent_done_enabled,
     TR_KEY_script_torrent_done_filename,
     TR_KEY_seconds_active,
