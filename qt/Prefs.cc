@@ -20,6 +20,10 @@
 #include "CustomVariantType.h"
 #include "Prefs.h"
 #include "Utils.h"
+#include "VariantHelpers.h"
+
+using ::trqt::variant_helpers::dictAdd;
+using ::trqt::variant_helpers::getValue;
 
 /***
 ****
@@ -150,69 +154,78 @@ Prefs::Prefs(QString config_dir) :
 
     for (int i = 0; i < PREFS_COUNT; ++i)
     {
-        double d;
-        bool bool_val;
-        int64_t int_val;
-        char const* str;
-        size_t str_len;
         tr_variant* b(tr_variantDictFind(&top, Items[i].key));
 
         switch (Items[i].type)
         {
         case QVariant::Int:
-            if (tr_variantGetInt(b, &int_val))
             {
-                values_[i].setValue(static_cast<qlonglong>(int_val));
+                auto const value = getValue<int64_t>(b);
+                if (value)
+                {
+                    values_[i].setValue(*value);
+                }
             }
-
             break;
 
         case CustomVariantType::SortModeType:
-            if (tr_variantGetStr(b, &str, nullptr))
             {
-                values_[i] = QVariant::fromValue(SortMode(QString::fromUtf8(str)));
+                auto const value = getValue<QString>(b);
+                if (value)
+                {
+                    values_[i] = QVariant::fromValue(SortMode(*value));
+                }
             }
-
             break;
 
         case CustomVariantType::FilterModeType:
-            if (tr_variantGetStr(b, &str, nullptr))
             {
-                values_[i] = QVariant::fromValue(FilterMode(QString::fromUtf8(str)));
+                auto const value = getValue<QString>(b);
+                if (value)
+                {
+                    values_[i] = QVariant::fromValue(FilterMode(*value));
+                }
             }
-
             break;
 
         case QVariant::String:
-            if (tr_variantGetStr(b, &str, &str_len))
             {
-                values_[i].setValue(QString::fromUtf8(str, str_len));
+                auto const value = getValue<QString>(b);
+                if (value)
+                {
+                    values_[i].setValue(*value);
+                }
             }
-
             break;
 
         case QVariant::Bool:
-            if (tr_variantGetBool(b, &bool_val))
             {
-                values_[i].setValue(static_cast<bool>(bool_val));
+                auto const value = getValue<bool>(b);
+                if (value)
+                {
+                    values_[i].setValue(*value);
+                }
             }
-
             break;
 
         case QVariant::Double:
-            if (tr_variantGetReal(b, &d))
             {
-                values_[i].setValue(d);
+                auto const value = getValue<double>(b);
+                if (value)
+                {
+                    values_[i].setValue(*value);
+                }
             }
-
             break;
 
         case QVariant::DateTime:
-            if (tr_variantGetInt(b, &int_val))
             {
-                values_[i].setValue(QDateTime::fromTime_t(int_val));
+                auto const value = getValue<time_t>(b);
+                if (value)
+                {
+                    values_[i].setValue(QDateTime::fromTime_t(*value));
+                }
             }
-
             break;
 
         default:
@@ -243,44 +256,31 @@ Prefs::~Prefs()
         switch (Items[i].type)
         {
         case QVariant::Int:
-            tr_variantDictAddInt(&current_settings, key, val.toInt());
+            dictAdd(&current_settings, key, val.toInt());
             break;
 
         case CustomVariantType::SortModeType:
-            tr_variantDictAddStr(&current_settings, key, val.value<SortMode>().name().toUtf8().constData());
+            dictAdd(&current_settings, key, val.value<SortMode>().name());
             break;
 
         case CustomVariantType::FilterModeType:
-            tr_variantDictAddStr(&current_settings, key, val.value<FilterMode>().name().toUtf8().constData());
+            dictAdd(&current_settings, key, val.value<FilterMode>().name());
             break;
 
         case QVariant::String:
-            {
-                QByteArray const ba(val.toByteArray());
-                char const* s = ba.constData();
-
-                if (Utils::isValidUtf8(s))
-                {
-                    tr_variantDictAddStr(&current_settings, key, s);
-                }
-                else
-                {
-                    tr_variantDictAddStr(&current_settings, key, val.toString().toUtf8().constData());
-                }
-
-                break;
-            }
+            dictAdd(&current_settings, key, val.toString());
+            break;
 
         case QVariant::Bool:
-            tr_variantDictAddBool(&current_settings, key, val.toBool());
+            dictAdd(&current_settings, key, val.toBool());
             break;
 
         case QVariant::Double:
-            tr_variantDictAddReal(&current_settings, key, val.toDouble());
+            dictAdd(&current_settings, key, val.toDouble());
             break;
 
         case QVariant::DateTime:
-            tr_variantDictAddInt(&current_settings, key, val.toDateTime().toTime_t());
+            dictAdd(&current_settings, key, val.toDateTime().toTime_t());
             break;
 
         default:
@@ -313,45 +313,45 @@ Prefs::~Prefs()
 void Prefs::initDefaults(tr_variant* d)
 {
     tr_variantDictReserve(d, 38);
-    tr_variantDictAddBool(d, TR_KEY_blocklist_updates_enabled, true);
-    tr_variantDictAddBool(d, TR_KEY_compact_view, false);
-    tr_variantDictAddBool(d, TR_KEY_inhibit_desktop_hibernation, false);
-    tr_variantDictAddBool(d, TR_KEY_prompt_before_exit, true);
-    tr_variantDictAddBool(d, TR_KEY_remote_session_enabled, false);
-    tr_variantDictAddBool(d, TR_KEY_remote_session_requres_authentication, false);
-    tr_variantDictAddBool(d, TR_KEY_show_backup_trackers, false);
-    tr_variantDictAddBool(d, TR_KEY_show_extra_peer_details, false);
-    tr_variantDictAddBool(d, TR_KEY_show_filterbar, true);
-    tr_variantDictAddBool(d, TR_KEY_show_notification_area_icon, false);
-    tr_variantDictAddBool(d, TR_KEY_start_minimized, false);
-    tr_variantDictAddBool(d, TR_KEY_show_options_window, true);
-    tr_variantDictAddBool(d, TR_KEY_show_statusbar, true);
-    tr_variantDictAddBool(d, TR_KEY_show_toolbar, true);
-    tr_variantDictAddBool(d, TR_KEY_show_tracker_scrapes, false);
-    tr_variantDictAddBool(d, TR_KEY_sort_reversed, false);
-    tr_variantDictAddBool(d, TR_KEY_torrent_added_notification_enabled, true);
-    tr_variantDictAddBool(d, TR_KEY_torrent_complete_notification_enabled, true);
-    tr_variantDictAddStr(d, TR_KEY_torrent_complete_sound_command,
+    dictAdd(d, TR_KEY_blocklist_updates_enabled, true);
+    dictAdd(d, TR_KEY_compact_view, false);
+    dictAdd(d, TR_KEY_inhibit_desktop_hibernation, false);
+    dictAdd(d, TR_KEY_prompt_before_exit, true);
+    dictAdd(d, TR_KEY_remote_session_enabled, false);
+    dictAdd(d, TR_KEY_remote_session_requres_authentication, false);
+    dictAdd(d, TR_KEY_show_backup_trackers, false);
+    dictAdd(d, TR_KEY_show_extra_peer_details, false);
+    dictAdd(d, TR_KEY_show_filterbar, true);
+    dictAdd(d, TR_KEY_show_notification_area_icon, false);
+    dictAdd(d, TR_KEY_start_minimized, false);
+    dictAdd(d, TR_KEY_show_options_window, true);
+    dictAdd(d, TR_KEY_show_statusbar, true);
+    dictAdd(d, TR_KEY_show_toolbar, true);
+    dictAdd(d, TR_KEY_show_tracker_scrapes, false);
+    dictAdd(d, TR_KEY_sort_reversed, false);
+    dictAdd(d, TR_KEY_torrent_added_notification_enabled, true);
+    dictAdd(d, TR_KEY_torrent_complete_notification_enabled, true);
+    dictAdd(d, TR_KEY_torrent_complete_sound_command,
         "canberra-gtk-play -i complete-download -d 'transmission torrent downloaded'");
-    tr_variantDictAddBool(d, TR_KEY_torrent_complete_sound_enabled, true);
-    tr_variantDictAddBool(d, TR_KEY_user_has_given_informed_consent, false);
-    tr_variantDictAddBool(d, TR_KEY_watch_dir_enabled, false);
-    tr_variantDictAddInt(d, TR_KEY_blocklist_date, 0);
-    tr_variantDictAddInt(d, TR_KEY_main_window_height, 500);
-    tr_variantDictAddInt(d, TR_KEY_main_window_width, 300);
-    tr_variantDictAddInt(d, TR_KEY_main_window_x, 50);
-    tr_variantDictAddInt(d, TR_KEY_main_window_y, 50);
-    tr_variantDictAddInt(d, TR_KEY_remote_session_port, strtol(TR_DEFAULT_RPC_PORT_STR, nullptr, 0));
-    tr_variantDictAddStr(d, TR_KEY_download_dir, tr_getDefaultDownloadDir());
-    tr_variantDictAddStr(d, TR_KEY_filter_mode, "all");
-    tr_variantDictAddStr(d, TR_KEY_main_window_layout_order, "menu,toolbar,filter,list,statusbar");
-    tr_variantDictAddStr(d, TR_KEY_open_dialog_dir, QDir::home().absolutePath().toUtf8());
-    tr_variantDictAddStr(d, TR_KEY_remote_session_host, "localhost");
-    tr_variantDictAddStr(d, TR_KEY_remote_session_password, "");
-    tr_variantDictAddStr(d, TR_KEY_remote_session_username, "");
-    tr_variantDictAddStr(d, TR_KEY_sort_mode, "sort-by-name");
-    tr_variantDictAddStr(d, TR_KEY_statusbar_stats, "total-ratio");
-    tr_variantDictAddStr(d, TR_KEY_watch_dir, tr_getDefaultDownloadDir());
+    dictAdd(d, TR_KEY_torrent_complete_sound_enabled, true);
+    dictAdd(d, TR_KEY_user_has_given_informed_consent, false);
+    dictAdd(d, TR_KEY_watch_dir_enabled, false);
+    dictAdd(d, TR_KEY_blocklist_date, 0);
+    dictAdd(d, TR_KEY_main_window_height, 500);
+    dictAdd(d, TR_KEY_main_window_width, 300);
+    dictAdd(d, TR_KEY_main_window_x, 50);
+    dictAdd(d, TR_KEY_main_window_y, 50);
+    dictAdd(d, TR_KEY_remote_session_port, strtol(TR_DEFAULT_RPC_PORT_STR, nullptr, 0));
+    dictAdd(d, TR_KEY_download_dir, tr_getDefaultDownloadDir());
+    dictAdd(d, TR_KEY_filter_mode, "all");
+    dictAdd(d, TR_KEY_main_window_layout_order, "menu,toolbar,filter,list,statusbar");
+    dictAdd(d, TR_KEY_open_dialog_dir, QDir::home().absolutePath().toUtf8());
+    dictAdd(d, TR_KEY_remote_session_host, "localhost");
+    dictAdd(d, TR_KEY_remote_session_password, "");
+    dictAdd(d, TR_KEY_remote_session_username, "");
+    dictAdd(d, TR_KEY_sort_mode, "sort-by-name");
+    dictAdd(d, TR_KEY_statusbar_stats, "total-ratio");
+    dictAdd(d, TR_KEY_watch_dir, tr_getDefaultDownloadDir());
 }
 
 /***
