@@ -11,13 +11,12 @@
 #include <string_view>
 #include <optional>
 
-#include <QByteArray>
-#include <QList>
 #include <QString>
-#include <QStringList>
 #include <QVector>
 
 #include <libtransmission/variant.h>
+
+class QByteArray;
 
 class Speed;
 struct Peer;
