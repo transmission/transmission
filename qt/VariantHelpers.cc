@@ -210,11 +210,4 @@ void variantInit(tr_variant* init_me, std::string_view value)
     tr_variantInitStr(init_me, std::data(value), std::size(value));
 }
 
-void variantInit(tr_variant* init_me, tr_quark value)
-{
-    size_t len;
-    char const* str = tr_quark_get_string(value, &len);
-    variantInit(init_me, std::string_view(str, len));
-}
-
 } // namespace trqt::variant_helpers

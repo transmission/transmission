@@ -99,7 +99,9 @@ QUrl const& RpcClient::url() const
 
 RpcResponseFuture RpcClient::exec(tr_quark method, tr_variant* args)
 {
-    return exec(tr_quark_get_string(method, nullptr), args);
+    auto len = size_t {};
+    auto const* str = tr_quark_get_string(method, &len);
+    return exec(std::string_view(str, len), args);
 }
 
 RpcResponseFuture RpcClient::exec(std::string_view method, tr_variant* args)

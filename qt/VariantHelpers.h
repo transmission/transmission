@@ -156,7 +156,6 @@ void variantInit(tr_variant* init_me, int64_t value);
 void variantInit(tr_variant* init_me, int value);
 void variantInit(tr_variant* init_me, unsigned int value);
 void variantInit(tr_variant* init_me, double value);
-void variantInit(tr_variant* init_me, tr_quark value);
 void variantInit(tr_variant* init_me, QByteArray const& value);
 void variantInit(tr_variant* init_me, QString const& value);
 void variantInit(tr_variant* init_me, std::string_view value);

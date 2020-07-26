@@ -121,7 +121,7 @@ void Session::copyMagnetLinkToClipboard(int torrent_id)
     tr_variant args;
     tr_variantInitDict(&args, 2);
     dictAdd(&args, TR_KEY_ids, std::array<int, 1>{ torrent_id });
-    dictAdd(&args, TR_KEY_fields, std::array<tr_quark, 1>{ TR_KEY_magnetLink });
+    dictAdd(&args, TR_KEY_fields, std::array<std::string_view, 1>{ "magnetLink" });
 
     auto* q = new RpcQueue();
 
@@ -534,7 +534,17 @@ void Session::refreshTorrents(torrent_ids_t const& ids, KeyList const& keys)
     tr_variant args;
     tr_variantInitDict(&args, 3);
     dictAdd(&args, TR_KEY_format, "table");
-    dictAdd(&args, TR_KEY_fields, keys);
+
+    std::vector<std::string_view> keystrs;
+    keystrs.reserve(keys.size());
+    for (auto const& key : keys)
+    {
+        auto len = size_t {};
+        auto const* str = tr_quark_get_string(key, &len);
+        keystrs.emplace_back(str, len);
+    }
+
+    dictAdd(&args, TR_KEY_fields, keystrs);
     addOptionalIds(&args, ids);
 
     auto* q = new RpcQueue();
