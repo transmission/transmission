@@ -341,7 +341,7 @@ void Prefs::initDefaults(tr_variant* d)
     dictAdd(d, TR_KEY_main_window_width, 300);
     dictAdd(d, TR_KEY_main_window_x, 50);
     dictAdd(d, TR_KEY_main_window_y, 50);
-    dictAdd(d, TR_KEY_remote_session_port, strtol(TR_DEFAULT_RPC_PORT_STR, nullptr, 0));
+    dictAdd(d, TR_KEY_remote_session_port, TR_DEFAULT_RPC_PORT);
     dictAdd(d, TR_KEY_download_dir, tr_getDefaultDownloadDir());
     dictAdd(d, TR_KEY_filter_mode, "all");
     dictAdd(d, TR_KEY_main_window_layout_order, "menu,toolbar,filter,list,statusbar");
