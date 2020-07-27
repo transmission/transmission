@@ -674,7 +674,9 @@ static GtkWidget* activity_combo_box_new(GtkTreeModel* tmodel)
 
     r = gtk_cell_renderer_pixbuf_new();
     gtk_cell_layout_pack_start(c_cell_layout, r, FALSE);
-    gtk_cell_layout_set_attributes(c_cell_layout, r, "icon-name", ACTIVITY_FILTER_COL_ICON_NAME, NULL);
+    gtk_cell_layout_set_attributes(c_cell_layout, r,
+        "icon-name", ACTIVITY_FILTER_COL_ICON_NAME,
+        NULL);
     gtk_cell_layout_set_cell_data_func(c_cell_layout, r, render_activity_pixbuf_func, NULL, NULL);
 
     r = gtk_cell_renderer_text_new();

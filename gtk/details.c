@@ -2713,8 +2713,10 @@ static void on_tracker_list_add_button_clicked(GtkButton* button UNUSED, gpointe
 
         g_string_truncate(gstr, 0);
         g_string_append_printf(gstr, _("%s - Add Tracker"), tr_torrentName(tor));
-        w = gtk_dialog_new_with_buttons(gstr->str, GTK_WINDOW(di->dialog), GTK_DIALOG_DESTROY_WITH_PARENT, _("_Cancel"),
-            GTK_RESPONSE_CANCEL, _("_Add"), GTK_RESPONSE_ACCEPT, NULL);
+        w = gtk_dialog_new_with_buttons(gstr->str, GTK_WINDOW(di->dialog), GTK_DIALOG_DESTROY_WITH_PARENT,
+            _("_Cancel"), GTK_RESPONSE_CANCEL,
+            _("_Add"), GTK_RESPONSE_ACCEPT,
+            NULL);
         g_signal_connect(w, "response", G_CALLBACK(on_add_tracker_response), gdi);
 
         row = 0;
@@ -2940,7 +2942,9 @@ GtkWidget* gtr_torrent_details_dialog_new(GtkWindow* parent, TrCore* core)
     /* create the dialog */
     di->core = core;
     di->gstr = g_string_new(NULL);
-    d = gtk_dialog_new_with_buttons(NULL, parent, 0, _("_Close"), GTK_RESPONSE_CLOSE, NULL);
+    d = gtk_dialog_new_with_buttons(NULL, parent, 0,
+        _("_Close"), GTK_RESPONSE_CLOSE,
+        NULL);
     di->dialog = d;
     gtk_window_set_role(GTK_WINDOW(d), "tr-info");
 
