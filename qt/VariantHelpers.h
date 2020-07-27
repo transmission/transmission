@@ -159,6 +159,7 @@ void variantInit(tr_variant* init_me, double value);
 void variantInit(tr_variant* init_me, QByteArray const& value);
 void variantInit(tr_variant* init_me, QString const& value);
 void variantInit(tr_variant* init_me, std::string_view value);
+void variantInit(tr_variant* init_me, char const* value) = delete; // use string_view
 
 template<typename C, typename T = typename C::value_type>
 void variantInit(tr_variant* init_me, C const& value)
