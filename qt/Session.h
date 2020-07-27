@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include <string_view>
+
 #include <QObject>
 #include <QString>
 #include <QStringList>
@@ -75,7 +77,7 @@ public:
     bool isLocal() const;
 
     RpcResponseFuture exec(tr_quark method, tr_variant* args);
-    RpcResponseFuture exec(char const* method, tr_variant* args);
+    RpcResponseFuture exec(std::string_view method, tr_variant* args);
 
     void torrentSet(torrent_ids_t const& ids, tr_quark const key, bool val);
     void torrentSet(torrent_ids_t const& ids, tr_quark const key, int val);
@@ -131,7 +133,7 @@ private:
 
     void sessionSet(tr_quark const key, QVariant const& variant);
     void pumpRequests();
-    void sendTorrentRequest(char const* request, torrent_ids_t const& torrent_ids);
+    void sendTorrentRequest(std::string_view request, torrent_ids_t const& torrent_ids);
     void refreshTorrents(torrent_ids_t const& torrent_ids, Torrent::KeyList const& keys);
 
     static void updateStats(tr_variant* d, tr_session_stats* stats);
