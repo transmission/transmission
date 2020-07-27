@@ -24,7 +24,12 @@
 #include "Formatter.h"
 #include "Utils.h"
 
-#define PRIORITY_KEY "priority"
+namespace
+{
+
+char const constexpr* const PriorityKey { "priority" };
+
+}
 
 FileTreeView::FileTreeView(QWidget* parent, bool is_editable) :
     QTreeView(parent),
@@ -346,7 +351,7 @@ void FileTreeView::setSelectedItemsPriority()
 {
     auto* action = qobject_cast<QAction*>(sender());
     assert(action != nullptr);
-    model_->setPriority(selectedSourceRows(), action->property(PRIORITY_KEY).toInt());
+    model_->setPriority(selectedSourceRows(), action->property(PriorityKey).toInt());
 }
 
 bool FileTreeView::openSelectedItem()
@@ -395,9 +400,9 @@ void FileTreeView::initContextMenu()
     normal_priority_action_ = priority_menu_->addAction(FileTreeItem::tr("Normal"), this, SLOT(setSelectedItemsPriority()));
     low_priority_action_ = priority_menu_->addAction(FileTreeItem::tr("Low"), this, SLOT(setSelectedItemsPriority()));
 
-    high_priority_action_->setProperty(PRIORITY_KEY, TR_PRI_HIGH);
-    normal_priority_action_->setProperty(PRIORITY_KEY, TR_PRI_NORMAL);
-    low_priority_action_->setProperty(PRIORITY_KEY, TR_PRI_LOW);
+    high_priority_action_->setProperty(PriorityKey, TR_PRI_HIGH);
+    normal_priority_action_->setProperty(PriorityKey, TR_PRI_NORMAL);
+    low_priority_action_->setProperty(PriorityKey, TR_PRI_LOW);
 
     context_menu_->addSeparator();
 

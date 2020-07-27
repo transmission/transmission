@@ -118,10 +118,12 @@ void Session::portTest()
 
 void Session::copyMagnetLinkToClipboard(int torrent_id)
 {
+    auto constexpr MagnetLinkKey = std::string_view { "magnetLink" };
+
     tr_variant args;
     tr_variantInitDict(&args, 2);
     dictAdd(&args, TR_KEY_ids, std::array<int, 1>{ torrent_id });
-    dictAdd(&args, TR_KEY_fields, std::array<std::string_view, 1>{ "magnetLink" });
+    dictAdd(&args, TR_KEY_fields, std::array<std::string_view, 1>{ MagnetLinkKey });
 
     auto* q = new RpcQueue();
 
@@ -407,9 +409,11 @@ namespace
 
 void addOptionalIds(tr_variant* args, torrent_ids_t const& ids)
 {
+    auto constexpr RecentlyActiveKey = std::string_view{ "recently-active" };
+
     if (&ids == &RecentlyActiveIDs)
     {
-        dictAdd(args, TR_KEY_ids, "recently-active");
+        dictAdd(args, TR_KEY_ids, RecentlyActiveKey);
     }
     else if (!ids.empty())
     {
@@ -531,9 +535,11 @@ void Session::torrentRenamePath(torrent_ids_t const& ids, QString const& oldpath
 
 void Session::refreshTorrents(torrent_ids_t const& ids, KeyList const& keys)
 {
+    auto constexpr TableKey = std::string_view{ "table" };
+
     tr_variant args;
     tr_variantInitDict(&args, 3);
-    dictAdd(&args, TR_KEY_format, "table");
+    dictAdd(&args, TR_KEY_format, TableKey);
 
     std::vector<std::string_view> keystrs;
     keystrs.reserve(keys.size());

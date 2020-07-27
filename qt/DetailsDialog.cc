@@ -56,7 +56,7 @@ namespace
 
 int constexpr RefreshIntervalMSec = 4000;
 
-char const constexpr* const PrefKey = "pref_key";
+char const constexpr* const PrefKey { "pref_key" };
 
 enum // peer columns
 {
