@@ -206,8 +206,10 @@ static void onSaveDialogResponse(GtkWidget* d, int response, gpointer data)
 static void onSaveRequest(GtkWidget* w, gpointer data)
 {
     GtkWindow* window = GTK_WINDOW(gtk_widget_get_toplevel(w));
-    GtkWidget* d = gtk_file_chooser_dialog_new(_("Save Log"), window, GTK_FILE_CHOOSER_ACTION_SAVE, _("_Cancel"),
-        GTK_RESPONSE_CANCEL, _("_Save"), GTK_RESPONSE_ACCEPT, NULL);
+    GtkWidget* d = gtk_file_chooser_dialog_new(_("Save Log"), window, GTK_FILE_CHOOSER_ACTION_SAVE,
+        _("_Cancel"), GTK_RESPONSE_CANCEL,
+        _("_Save"), GTK_RESPONSE_ACCEPT,
+        NULL);
 
     g_signal_connect(d, "response", G_CALLBACK(onSaveDialogResponse), data);
     gtk_widget_show(d);

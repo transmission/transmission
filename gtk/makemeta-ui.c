@@ -181,7 +181,10 @@ static void makeProgressDialog(GtkWidget* parent, MakeMetaUI* ui)
     GtkWidget* fr;
 
     d = gtk_dialog_new_with_buttons(_("New Torrent"), GTK_WINDOW(parent), GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
-        _("_Cancel"), GTK_RESPONSE_CANCEL, _("_Close"), GTK_RESPONSE_CLOSE, _("_Add"), GTK_RESPONSE_ACCEPT, NULL);
+        _("_Cancel"), GTK_RESPONSE_CANCEL,
+        _("_Close"), GTK_RESPONSE_CLOSE,
+        _("_Add"), GTK_RESPONSE_ACCEPT,
+        NULL);
     ui->progress_dialog = d;
     g_signal_connect(d, "response", G_CALLBACK(onProgressDialogResponse), ui);
 
