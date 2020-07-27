@@ -15,6 +15,10 @@
 #include "FreeSpaceLabel.h"
 #include "RpcQueue.h"
 #include "Session.h"
+#include "VariantHelpers.h"
+
+using ::trqt::variant_helpers::dictAdd;
+using ::trqt::variant_helpers::dictFind;
 
 namespace
 {
@@ -65,7 +69,7 @@ void FreeSpaceLabel::onTimer()
 
     tr_variant args;
     tr_variantInitDict(&args, 1);
-    tr_variantDictAddStr(&args, TR_KEY_path, path_.toUtf8().constData());
+    dictAdd(&args, TR_KEY_path, path_);
 
     auto* q = new RpcQueue();
 
@@ -76,14 +80,11 @@ void FreeSpaceLabel::onTimer()
 
     q->add([this](RpcResponse const& r)
         {
-            QString str;
-
             // update the label
-            int64_t bytes = -1;
-
-            if (tr_variantDictFindInt(r.args.get(), TR_KEY_size_bytes, &bytes) && bytes >= 0)
+            auto const bytes = dictFind<int64_t>(r.args.get(), TR_KEY_size_bytes);
+            if (bytes && *bytes > 1)
             {
-                setText(tr("%1 free").arg(Formatter::sizeToString(bytes)));
+                setText(tr("%1 free").arg(Formatter::sizeToString(*bytes)));
             }
             else
             {
@@ -91,11 +92,8 @@ void FreeSpaceLabel::onTimer()
             }
 
             // update the tooltip
-            size_t len = 0;
-            char const* path = nullptr;
-            tr_variantDictFindStr(r.args.get(), TR_KEY_path, &path, &len);
-            str = QString::fromUtf8(path, len);
-            setToolTip(QDir::toNativeSeparators(str));
+            auto const path = dictFind<QString>(r.args.get(), TR_KEY_path);
+            setToolTip(QDir::toNativeSeparators(path ? *path : QString()));
 
             timer_.start();
         });
