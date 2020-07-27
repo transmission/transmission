@@ -144,11 +144,6 @@ public:
         return !isCore(key);
     }
 
-    char const* keyStr(int i) const
-    {
-        return tr_quark_get_string(Items[i].key, nullptr);
-    }
-
     tr_quark getKey(int i) const
     {
         return Items[i].key;
@@ -204,8 +199,7 @@ private:
 
     void initDefaults(tr_variant*);
 
-    // Intentionally not implemented
-    void set(int key, char const* value);
+    void set(int key, char const* value) = delete;
 
     QString const config_dir_;
 
