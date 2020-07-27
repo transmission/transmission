@@ -1242,9 +1242,9 @@ GtkWidget* gtr_prefs_dialog_new(GtkWindow* parent, GObject* core)
     data->core_prefs_tag = g_signal_connect(TR_CORE(core), "prefs-changed", G_CALLBACK(on_core_prefs_changed), data);
 
     d = gtk_dialog_new_with_buttons(_("Transmission Preferences"), parent, GTK_DIALOG_DESTROY_WITH_PARENT,
-            _("_Help"), GTK_RESPONSE_HELP,
-            _("_Close"), GTK_RESPONSE_CLOSE,
-            NULL);
+        _("_Help"), GTK_RESPONSE_HELP,
+        _("_Close"), GTK_RESPONSE_CLOSE,
+        NULL);
     g_object_weak_ref(G_OBJECT(d), on_prefs_dialog_destroyed, data);
     gtk_window_set_role(GTK_WINDOW(d), "transmission-preferences-dialog");
     gtk_container_set_border_width(GTK_CONTAINER(d), GUI_PAD);

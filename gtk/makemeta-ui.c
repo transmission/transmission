@@ -432,9 +432,9 @@ GtkWidget* gtr_torrent_creation_dialog_new(GtkWindow* parent, TrCore* core)
     ui->core = core;
 
     d = gtk_dialog_new_with_buttons(_("New Torrent"), parent, GTK_DIALOG_DESTROY_WITH_PARENT,
-            _("_Close"), GTK_RESPONSE_CLOSE,
-            _("_New"), GTK_RESPONSE_ACCEPT,
-            NULL);
+        _("_Close"), GTK_RESPONSE_CLOSE,
+        _("_New"), GTK_RESPONSE_ACCEPT,
+        NULL);
     ui->dialog = d;
     g_signal_connect(d, "response", G_CALLBACK(onResponse), ui);
     g_object_set_data_full(G_OBJECT(d), "ui", ui, freeMetaUI);

@@ -102,7 +102,8 @@ static GtkActionEntry entries[] =
     { "select-all", "edit-select-all", N_("Select _All"), "<control>A", NULL, G_CALLBACK(action_cb) },
     { "deselect-all", NULL, N_("Dese_lect All"), "<shift><control>A", NULL, G_CALLBACK(action_cb) },
     { "edit-preferences", "preferences-system", N_("_Preferences"), NULL, NULL, G_CALLBACK(action_cb) },
-    { "show-torrent-properties", "document-properties", N_("_Properties"), "<alt>Return", N_("Torrent properties"), G_CALLBACK(action_cb) },
+    { "show-torrent-properties", "document-properties", N_("_Properties"), "<alt>Return", N_("Torrent properties"), G_CALLBACK(
+        action_cb) },
     { "open-torrent-folder", "document-open", N_("Open Fold_er"), "<control>E", NULL, G_CALLBACK(action_cb) },
     { "show-about-dialog", "help-about", N_("_About"), NULL, NULL, G_CALLBACK(action_cb) },
     { "help", "help-browser", N_("_Contents"), "F1", NULL, G_CALLBACK(action_cb) },

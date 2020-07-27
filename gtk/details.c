@@ -2602,9 +2602,9 @@ static void on_edit_trackers(GtkButton* button, gpointer data)
         g_string_truncate(gstr, 0);
         g_string_append_printf(gstr, _("%s - Edit Trackers"), tr_torrentName(tor));
         d = gtk_dialog_new_with_buttons(gstr->str, win, GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
-                _("_Cancel"), GTK_RESPONSE_CANCEL,
-                _("_Save"), GTK_RESPONSE_ACCEPT,
-                NULL);
+            _("_Cancel"), GTK_RESPONSE_CANCEL,
+            _("_Save"), GTK_RESPONSE_ACCEPT,
+            NULL);
         g_signal_connect(d, "response", G_CALLBACK(on_edit_trackers_response), data);
 
         row = 0;
