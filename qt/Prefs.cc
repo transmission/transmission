@@ -312,6 +312,18 @@ Prefs::~Prefs()
  */
 void Prefs::initDefaults(tr_variant* d)
 {
+    auto constexpr FilterMode = std::string_view { "all" };
+    auto constexpr SessionHost = std::string_view { "localhost" };
+    auto constexpr SessionPassword = std::string_view { "" };
+    auto constexpr SessionUsername = std::string_view { "" };
+    auto constexpr SortMode = std::string_view { "sort-by-name" };
+    auto constexpr SoundCommand =
+        std::string_view { "canberra-gtk-play -i complete-download -d 'transmission torrent downloaded'" };
+    auto constexpr StatsMode = std::string_view { "total-ratio" };
+    auto constexpr WindowLayout = std::string_view { "menu,toolbar,filter,list,statusbar" };
+
+    auto const download_dir = std::string_view { tr_getDefaultDownloadDir() };
+
     tr_variantDictReserve(d, 38);
     dictAdd(d, TR_KEY_blocklist_updates_enabled, true);
     dictAdd(d, TR_KEY_compact_view, false);
@@ -331,8 +343,7 @@ void Prefs::initDefaults(tr_variant* d)
     dictAdd(d, TR_KEY_sort_reversed, false);
     dictAdd(d, TR_KEY_torrent_added_notification_enabled, true);
     dictAdd(d, TR_KEY_torrent_complete_notification_enabled, true);
-    dictAdd(d, TR_KEY_torrent_complete_sound_command,
-        "canberra-gtk-play -i complete-download -d 'transmission torrent downloaded'");
+    dictAdd(d, TR_KEY_torrent_complete_sound_command, SoundCommand);
     dictAdd(d, TR_KEY_torrent_complete_sound_enabled, true);
     dictAdd(d, TR_KEY_user_has_given_informed_consent, false);
     dictAdd(d, TR_KEY_watch_dir_enabled, false);
@@ -342,16 +353,16 @@ void Prefs::initDefaults(tr_variant* d)
     dictAdd(d, TR_KEY_main_window_x, 50);
     dictAdd(d, TR_KEY_main_window_y, 50);
     dictAdd(d, TR_KEY_remote_session_port, TR_DEFAULT_RPC_PORT);
-    dictAdd(d, TR_KEY_download_dir, tr_getDefaultDownloadDir());
-    dictAdd(d, TR_KEY_filter_mode, "all");
-    dictAdd(d, TR_KEY_main_window_layout_order, "menu,toolbar,filter,list,statusbar");
-    dictAdd(d, TR_KEY_open_dialog_dir, QDir::home().absolutePath().toUtf8());
-    dictAdd(d, TR_KEY_remote_session_host, "localhost");
-    dictAdd(d, TR_KEY_remote_session_password, "");
-    dictAdd(d, TR_KEY_remote_session_username, "");
-    dictAdd(d, TR_KEY_sort_mode, "sort-by-name");
-    dictAdd(d, TR_KEY_statusbar_stats, "total-ratio");
-    dictAdd(d, TR_KEY_watch_dir, tr_getDefaultDownloadDir());
+    dictAdd(d, TR_KEY_download_dir, download_dir);
+    dictAdd(d, TR_KEY_filter_mode, FilterMode);
+    dictAdd(d, TR_KEY_main_window_layout_order, WindowLayout);
+    dictAdd(d, TR_KEY_open_dialog_dir, QDir::home().absolutePath());
+    dictAdd(d, TR_KEY_remote_session_host, SessionHost);
+    dictAdd(d, TR_KEY_remote_session_password, SessionPassword);
+    dictAdd(d, TR_KEY_remote_session_username, SessionUsername);
+    dictAdd(d, TR_KEY_sort_mode, SortMode);
+    dictAdd(d, TR_KEY_statusbar_stats, StatsMode);
+    dictAdd(d, TR_KEY_watch_dir, download_dir);
 }
 
 /***
