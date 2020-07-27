@@ -326,8 +326,10 @@ void DetailsDialog::onTorrentsEdited(torrent_ids_t const& ids)
     }
 }
 
-void DetailsDialog::onTorrentsChanged(torrent_ids_t const& ids)
+void DetailsDialog::onTorrentsChanged(torrent_ids_t const& ids, Torrent::fields_t const& fields)
 {
+    Q_UNUSED(fields)
+
     if (have_pending_refresh_)
     {
         return;

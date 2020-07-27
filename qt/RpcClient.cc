@@ -21,11 +21,16 @@
 #include <libtransmission/version.h> // LONG_VERSION_STRING
 
 #include "RpcClient.h"
+#include "VariantHelpers.h"
 
 // #define DEBUG_HTTP
 
 #define REQUEST_DATA_PROPERTY_KEY "requestData"
 #define REQUEST_FUTUREINTERFACE_PROPERTY_KEY "requestReplyFutureInterface"
+
+using ::trqt::variant_helpers::dictAdd;
+using ::trqt::variant_helpers::dictFind;
+using ::trqt::variant_helpers::variantInit;
 
 namespace
 {
@@ -94,14 +99,16 @@ QUrl const& RpcClient::url() const
 
 RpcResponseFuture RpcClient::exec(tr_quark method, tr_variant* args)
 {
-    return exec(tr_quark_get_string(method, nullptr), args);
+    auto len = size_t{};
+    auto const* str = tr_quark_get_string(method, &len);
+    return exec(std::string_view(str, len), args);
 }
 
-RpcResponseFuture RpcClient::exec(char const* method, tr_variant* args)
+RpcResponseFuture RpcClient::exec(std::string_view method, tr_variant* args)
 {
     TrVariantPtr json = createVariant();
     tr_variantInitDict(json.get(), 3);
-    tr_variantDictAddStr(json.get(), TR_KEY_method, method);
+    dictAdd(json.get(), TR_KEY_method, method);
 
     if (args != nullptr)
     {
@@ -162,7 +169,7 @@ void RpcClient::sendLocalRequest(TrVariantPtr json, QFutureInterface<RpcResponse
 RpcResponseFuture RpcClient::sendRequest(TrVariantPtr json)
 {
     int64_t tag = getNextTag();
-    tr_variantDictAddInt(json.get(), TR_KEY_tag, tag);
+    dictAdd(json.get(), TR_KEY_tag, tag);
 
     QFutureInterface<RpcResponse> promise;
     promise.setExpectedResultCount(1);
@@ -205,7 +212,7 @@ void RpcClient::localSessionCallback(tr_session* s, tr_variant* response, void* 
 
     TrVariantPtr json = createVariant();
     *json = *response;
-    tr_variantInitBool(response, false);
+    variantInit(response, false);
 
     // this callback is invoked in the libtransmission thread, so we don't want
     // to process the response here... let's push it over to the Qt thread.
@@ -281,26 +288,19 @@ void RpcClient::localRequestFinished(TrVariantPtr response)
 
 int64_t RpcClient::parseResponseTag(tr_variant& json)
 {
-    int64_t tag;
-
-    if (!tr_variantDictFindInt(&json, TR_KEY_tag, &tag))
-    {
-        tag = -1;
-    }
-
-    return tag;
+    auto const tag = dictFind<int>(&json, TR_KEY_tag);
+    return tag ? *tag : -1;
 }
 
 RpcResponse RpcClient::parseResponseData(tr_variant& json)
 {
     RpcResponse ret;
 
-    char const* result;
-
-    if (tr_variantDictFindStr(&json, TR_KEY_result, &result, nullptr))
+    auto const result = dictFind<QString>(&json, TR_KEY_result);
+    if (result)
     {
-        ret.result = QString::fromUtf8(result);
-        ret.success = std::strcmp(result, "success") == 0;
+        ret.result = *result;
+        ret.success = *result == QStringLiteral("success");
     }
 
     tr_variant* args;
@@ -309,7 +309,7 @@ RpcResponse RpcClient::parseResponseData(tr_variant& json)
     {
         ret.args = createVariant();
         *ret.args = *args;
-        tr_variantInitBool(args, false);
+        variantInit(args, false);
     }
 
     return ret;
