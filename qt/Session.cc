@@ -539,7 +539,7 @@ void Session::refreshTorrents(torrent_ids_t const& ids, KeyList const& keys)
     keystrs.reserve(keys.size());
     for (auto const& key : keys)
     {
-        auto len = size_t {};
+        auto len = size_t{};
         auto const* str = tr_quark_get_string(key, &len);
         keystrs.emplace_back(str, len);
     }
