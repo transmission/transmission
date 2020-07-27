@@ -6,6 +6,7 @@
  *
  */
 
+#include <cstdint> // uint64_t
 #include <map>
 #include <unordered_map>
 
@@ -95,6 +96,12 @@ QString getCountString(int n)
     return QStringLiteral("%L1").arg(n);
 }
 
+Torrent::fields_t constexpr TrackerFields = {
+    (uint64_t(1) << Torrent::TRACKER_STATS)
+    };
+
+auto constexpr ActivityFields = FilterMode::TorrentFields;
+
 } // namespace
 
 void FilterBar::refreshTrackers()
@@ -104,35 +111,38 @@ void FilterBar::refreshTrackers()
         ROW_TOTALS = 0, ROW_SEPARATOR, ROW_FIRST_TRACKER
     };
 
-    auto torrents_per_host = std::unordered_map<QString, int>{};
+    auto torrents_per_tracker = std::unordered_map<FaviconCache::Key, int>{};
     for (auto const& tor : torrents_.torrents())
     {
-        for (auto const& display_name : tor->trackerDisplayNames())
+        for (auto const& key : tor->trackerKeys())
         {
-            ++torrents_per_host[display_name];
+            ++torrents_per_tracker[key];
         }
     }
 
     // update the "All" row
-    auto const num_trackers = torrents_per_host.size();
+    auto const num_trackers = torrents_per_tracker.size();
     auto* item = tracker_model_->item(ROW_TOTALS);
     item->setData(int(num_trackers), FilterBarComboBox::CountRole);
     item->setData(getCountString(num_trackers), FilterBarComboBox::CountStringRole);
 
     auto update_tracker_item = [](QStandardItem* i, auto const& it)
         {
-            auto const& display_name = it->first;
+            auto const& key = it->first;
+            auto const& display_name = FaviconCache::getDisplayName(key);
             auto const& count = it->second;
-            auto const icon = qApp->faviconCache().find(FaviconCache::getKey(display_name));
+            auto const icon = qApp->faviconCache().find(key);
+
             i->setData(display_name, Qt::DisplayRole);
             i->setData(display_name, TRACKER_ROLE);
             i->setData(getCountString(count), FilterBarComboBox::CountStringRole);
             i->setData(icon, Qt::DecorationRole);
             i->setData(int(count), FilterBarComboBox::CountRole);
+
             return i;
         };
 
-    auto new_trackers = std::map<QString, int>(torrents_per_host.begin(), torrents_per_host.end());
+    auto new_trackers = std::map<FaviconCache::Key, int>(torrents_per_tracker.begin(), torrents_per_tracker.end());
     auto old_it = tracker_counts_.cbegin();
     auto new_it = new_trackers.cbegin();
     auto const old_end = tracker_counts_.cend();
@@ -229,14 +239,14 @@ FilterBar::FilterBar(Prefs& prefs, TorrentModel const& torrents, TorrentFilter c
     connect(&prefs_, SIGNAL(changed(int)), this, SLOT(refreshPref(int)));
     connect(activity_combo_, SIGNAL(currentIndexChanged(int)), this, SLOT(onActivityIndexChanged(int)));
     connect(tracker_combo_, SIGNAL(currentIndexChanged(int)), this, SLOT(onTrackerIndexChanged(int)));
-    connect(&torrents_, SIGNAL(modelReset()), this, SLOT(recountSoon()));
-    connect(&torrents_, SIGNAL(rowsInserted(QModelIndex, int, int)), this, SLOT(recountSoon()));
-    connect(&torrents_, SIGNAL(rowsRemoved(QModelIndex, int, int)), this, SLOT(recountSoon()));
-    connect(&torrents_, SIGNAL(dataChanged(QModelIndex, QModelIndex)), this, SLOT(recountSoon()));
+    connect(&torrents_, &TorrentModel::modelReset, this, &FilterBar::recountAllSoon);
+    connect(&torrents_, &TorrentModel::rowsInserted, this, &FilterBar::recountAllSoon);
+    connect(&torrents_, &TorrentModel::rowsRemoved, this, &FilterBar::recountAllSoon);
+    connect(&torrents_, &TorrentModel::torrentsChanged, this, &FilterBar::onTorrentsChanged);
     connect(recount_timer_, SIGNAL(timeout()), this, SLOT(recount()));
+    connect(&qApp->faviconCache(), &FaviconCache::pixmapReady, this, &FilterBar::recountTrackersSoon);
 
-    recountSoon();
-    refreshTrackers();
+    recountAllSoon();
     is_bootstrapping_ = false;
 
     // initialize our state
@@ -297,6 +307,21 @@ void FilterBar::refreshPref(int key)
     }
 }
 
+void FilterBar::onTorrentsChanged(torrent_ids_t const& ids, Torrent::fields_t const& changed_fields)
+{
+    Q_UNUSED(ids)
+
+    if ((changed_fields & TrackerFields).any())
+    {
+        recountTrackersSoon();
+    }
+
+    if ((changed_fields & ActivityFields).any())
+    {
+        recountActivitySoon();
+    }
+}
+
 void FilterBar::onTextChanged(QString const& str)
 {
     if (!is_bootstrapping_)
@@ -309,25 +334,8 @@ void FilterBar::onTrackerIndexChanged(int i)
 {
     if (!is_bootstrapping_)
     {
-        QString str;
-        bool const is_tracker = !tracker_combo_->itemData(i, TRACKER_ROLE).toString().isEmpty();
-
-        if (!is_tracker)
-        {
-            // show all
-        }
-        else
-        {
-            str = tracker_combo_->itemData(i, TRACKER_ROLE).toString();
-            int const pos = str.lastIndexOf(QLatin1Char('.'));
-
-            if (pos >= 0)
-            {
-                str.truncate(pos + 1);
-            }
-        }
-
-        prefs_.set(Prefs::FILTER_TRACKERS, str);
+        auto const display_name = tracker_combo_->itemData(i, TRACKER_ROLE).toString();
+        prefs_.set(Prefs::FILTER_TRACKERS, display_name);
     }
 }
 
@@ -344,8 +352,10 @@ void FilterBar::onActivityIndexChanged(int i)
 ****
 ***/
 
-void FilterBar::recountSoon()
+void FilterBar::recountSoon(Pending const& pending)
 {
+    pending_ |= pending;
+
     if (!recount_timer_->isActive())
     {
         recount_timer_->setSingleShot(true);
@@ -357,16 +367,25 @@ void FilterBar::recount()
 {
     QAbstractItemModel* model = activity_combo_->model();
 
-    auto const torrents_per_mode = filter_.countTorrentsPerMode();
+    decltype(pending_) pending = {};
+    std::swap(pending_, pending);
 
-    for (int row = 0, n = model->rowCount(); row < n; ++row)
+    if (pending[ACTIVITY])
     {
-        QModelIndex index = model->index(row, 0);
-        int const mode = index.data(ACTIVITY_ROLE).toInt();
-        int const count = torrents_per_mode[mode];
-        model->setData(index, count, FilterBarComboBox::CountRole);
-        model->setData(index, getCountString(count), FilterBarComboBox::CountStringRole);
+        auto const torrents_per_mode = filter_.countTorrentsPerMode();
+
+        for (int row = 0, n = model->rowCount(); row < n; ++row)
+        {
+            auto const index = model->index(row, 0);
+            auto const mode = index.data(ACTIVITY_ROLE).toInt();
+            auto const count = torrents_per_mode[mode];
+            model->setData(index, count, FilterBarComboBox::CountRole);
+            model->setData(index, getCountString(count), FilterBarComboBox::CountStringRole);
+        }
     }
 
-    refreshTrackers();
+    if (pending[TRACKERS])
+    {
+        refreshTrackers();
+    }
 }
