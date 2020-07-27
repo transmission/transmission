@@ -9,6 +9,7 @@
 #pragma once
 
 #include <memory>
+#include <string_view>
 
 #include <QFuture>
 #include <QFutureInterface>
@@ -62,7 +63,7 @@ public:
     QUrl const& url() const;
 
     RpcResponseFuture exec(tr_quark method, tr_variant* args);
-    RpcResponseFuture exec(char const* method, tr_variant* args);
+    RpcResponseFuture exec(std::string_view method, tr_variant* args);
 
 signals:
     void httpAuthenticationRequired();
