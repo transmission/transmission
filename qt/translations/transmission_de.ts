@@ -59,17 +59,17 @@
     <message numerus="yes">
         <location line="+77"/>
         <source>Torrent(s) Added</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Torrent hinzugefügt</numerusform>
+            <numerusform>Torrents hinzugefügt</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+10"/>
         <source>Torrent Completed</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>Torrent abgeschlossen</numerusform>
-            <numerusform></numerusform>
+            <numerusform>Torrents abgeschlossen</numerusform>
         </translation>
     </message>
 </context>
@@ -877,7 +877,7 @@
     <message>
         <location line="+11"/>
         <source>&amp;View</source>
-        <translation>&amp;Zeige</translation>
+        <translation>&amp;Ansicht</translation>
     </message>
     <message>
         <location line="+22"/>
@@ -977,7 +977,7 @@
     <message>
         <location line="+8"/>
         <source>&amp;Remove</source>
-        <translation>&amp;Entferne</translation>
+        <translation>&amp;Entfernen</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -987,7 +987,7 @@
     <message>
         <location line="+11"/>
         <source>&amp;Delete Files and Remove</source>
-        <translation>&amp;Lösche Dateien und entferne</translation>
+        <translation>Entfernen und Dateien &amp;löschen</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -2251,7 +2251,7 @@ Um eine weitere primäre URL hinzuzufügen, muss diese nach einer Leerzeile eing
     <message>
         <location line="+7"/>
         <source>Connect to &amp;Remote Session</source>
-        <translation>Zu entfe%rnter Sitzung verbinden</translation>
+        <translation>Zu entfe&amp;rnter Sitzung verbinden</translation>
     </message>
     <message>
         <location line="+7"/>
@@ -2332,7 +2332,7 @@ Um eine weitere primäre URL hinzuzufügen, muss diese nach einer Leerzeile eing
 <context>
     <name>Torrent</name>
     <message>
-        <location filename="../Torrent.cc" line="+1064"/>
+        <location filename="../Torrent.cc" line="+1043"/>
         <source>Verifying local data</source>
         <translation>Überprüfe lokale Daten</translation>
     </message>
@@ -2512,7 +2512,7 @@ Um eine weitere primäre URL hinzuzufügen, muss diese nach einer Leerzeile eing
 <context>
     <name>TrackerDelegate</name>
     <message numerus="yes">
-        <location filename="../TrackerDelegate.cc" line="+218"/>
+        <location filename="../TrackerDelegate.cc" line="+211"/>
         <source>Got a list of%1 %Ln peer(s)%2 %3 ago</source>
         <extracomment>%1 and %2 are replaced with HTML markup, %3 is duration</extracomment>
         <translation>

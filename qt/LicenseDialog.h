@@ -19,10 +19,6 @@ class LicenseDialog : public BaseDialog
 public:
     LicenseDialog(QWidget* parent = nullptr);
 
-    virtual ~LicenseDialog()
-    {
-    }
-
 private:
-    Ui::LicenseDialog ui;
+    Ui::LicenseDialog ui_ = {};
 };

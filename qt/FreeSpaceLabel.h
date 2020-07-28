@@ -26,10 +26,6 @@ class FreeSpaceLabel : public QLabel
 public:
     FreeSpaceLabel(QWidget* parent = nullptr);
 
-    virtual ~FreeSpaceLabel()
-    {
-    }
-
     void setSession(Session& session);
     void setPath(QString const& folder);
 
@@ -37,7 +33,7 @@ private slots:
     void onTimer();
 
 private:
-    Session* mySession;
-    QString myPath;
-    QTimer myTimer;
+    Session* session_ = {};
+    QString path_;
+    QTimer timer_;
 };

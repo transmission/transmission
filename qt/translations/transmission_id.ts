@@ -67,7 +67,7 @@
         <location line="+10"/>
         <source>Torrent Completed</source>
         <translation type="unfinished">
-            <numerusform>Torrent Selesai</numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
 </context>
@@ -2313,7 +2313,7 @@ Untuk menambahkan URL utama, tambahkan setelah baris kosong.</translation>
 <context>
     <name>Torrent</name>
     <message>
-        <location filename="../Torrent.cc" line="+1064"/>
+        <location filename="../Torrent.cc" line="+1043"/>
         <source>Verifying local data</source>
         <translation>Memeriksa data lokal</translation>
     </message>
@@ -2487,7 +2487,7 @@ Untuk menambahkan URL utama, tambahkan setelah baris kosong.</translation>
 <context>
     <name>TrackerDelegate</name>
     <message numerus="yes">
-        <location filename="../TrackerDelegate.cc" line="+218"/>
+        <location filename="../TrackerDelegate.cc" line="+211"/>
         <source>Got a list of%1 %Ln peer(s)%2 %3 ago</source>
         <extracomment>%1 and %2 are replaced with HTML markup, %3 is duration</extracomment>
         <translation>

@@ -70,7 +70,7 @@ public:
 
     static bool isMagnetLink(QString const& s)
     {
-        return s.startsWith(QString::fromUtf8("magnet:?"));
+        return s.startsWith(QStringLiteral("magnet:?"));
     }
 
     static bool isHexHashcode(QString const& s)

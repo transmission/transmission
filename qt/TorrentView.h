@@ -29,9 +29,7 @@ protected:
 private:
     class HeaderWidget;
 
-private:
     void adjustHeaderPosition();
 
-private:
-    HeaderWidget* const myHeaderWidget;
+    HeaderWidget* const header_widget_ = {};
 };

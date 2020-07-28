@@ -254,6 +254,9 @@ char const* tr_strcasestr(char const* haystack, char const* needle);
 /** @brief Portability wrapper for strsep() that uses the system implementation if available */
 char* tr_strsep(char** str, char const* delim);
 
+/** @brief Concatenates array of strings with delimiter in between elements */
+char* tr_strjoin(char const* const* arr, size_t len, char const* delim);
+
 /***
 ****
 ***/

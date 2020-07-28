@@ -1274,7 +1274,7 @@ static bool add_file(TrCore* core, GFile* file, gboolean do_start, gboolean do_p
         {
             char* str = g_file_get_path(file);
 
-            if ((tried = g_file_test(str, G_FILE_TEST_EXISTS)))
+            if ((tried = (str != NULL) && g_file_test(str, G_FILE_TEST_EXISTS)))
             {
                 loaded = !tr_ctorSetMetainfoFromFile(ctor, str);
             }

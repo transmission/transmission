@@ -21,13 +21,13 @@ public:
 
     bool showBackupTrackers() const
     {
-        return myShowBackups;
+        return show_backups_;
     }
 
 protected:
     // QSortFilterProxyModel
-    virtual bool filterAcceptsRow(int sourceRow, QModelIndex const& sourceParent) const;
+    virtual bool filterAcceptsRow(int source_row, QModelIndex const& source_parent) const;
 
 private:
-    bool myShowBackups;
+    bool show_backups_ = {};
 };

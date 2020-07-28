@@ -133,8 +133,6 @@ void gtr_freespace_label_set_dir(GtkWidget* label, char const* dir);
 
 void gtr_unrecognized_url_dialog(GtkWidget* parent, char const* url);
 
-void gtr_http_failure_dialog(GtkWidget* parent, char const* url, long response_code);
-
 void gtr_add_torrent_error_dialog(GtkWidget* window_or_child, int err, tr_torrent* duplicate_torrent, char const* filename);
 
 /* pop up the context menu if a user right-clicks.

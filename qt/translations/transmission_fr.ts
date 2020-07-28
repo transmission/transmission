@@ -59,17 +59,17 @@
     <message numerus="yes">
         <location line="+77"/>
         <source>Torrent(s) Added</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Torrent ajouté</numerusform>
+            <numerusform>Torrents ajoutés</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+10"/>
         <source>Torrent Completed</source>
-        <translation type="unfinished">
-            <numerusform>Torrent complété</numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Torrent terminé</numerusform>
+            <numerusform>Torrents terminés</numerusform>
         </translation>
     </message>
 </context>
@@ -145,7 +145,7 @@
     <message>
         <location line="+5"/>
         <source>Created on %1</source>
-        <translation>Créé&#xa0;: %1</translation>
+        <translation>Créé le&#xa0;: %1</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -2332,7 +2332,7 @@ Pour ajouter une autre URL primaire, placez-la après une ligne vide.</translati
 <context>
     <name>Torrent</name>
     <message>
-        <location filename="../Torrent.cc" line="+1064"/>
+        <location filename="../Torrent.cc" line="+1043"/>
         <source>Verifying local data</source>
         <translation>Vérification des données locales</translation>
     </message>
@@ -2512,7 +2512,7 @@ Pour ajouter une autre URL primaire, placez-la après une ligne vide.</translati
 <context>
     <name>TrackerDelegate</name>
     <message numerus="yes">
-        <location filename="../TrackerDelegate.cc" line="+218"/>
+        <location filename="../TrackerDelegate.cc" line="+211"/>
         <source>Got a list of%1 %Ln peer(s)%2 %3 ago</source>
         <extracomment>%1 and %2 are replaced with HTML markup, %3 is duration</extracomment>
         <translation>

@@ -20,9 +20,9 @@
 namespace
 {
 
-QLatin1String const DBUS_SERVICE("com.transmissionbt.Transmission");
-QLatin1String const DBUS_OBJECT_PATH("/com/transmissionbt/Transmission");
-QLatin1String const DBUS_INTERFACE("com.transmissionbt.Transmission");
+auto const DBusService = QStringLiteral("com.transmissionbt.Transmission");
+auto const DBusObjectPath = QStringLiteral("/com/transmissionbt/Transmission");
+auto const DBusInterface = QStringLiteral("com.transmissionbt.Transmission");
 
 } // namespace
 
@@ -33,8 +33,8 @@ bool DBusInteropHelper::isConnected() const
 
 QVariant DBusInteropHelper::addMetainfo(QString const& metainfo)
 {
-    QDBusMessage request = QDBusMessage::createMethodCall(DBUS_SERVICE, DBUS_OBJECT_PATH, DBUS_INTERFACE,
-        QLatin1String("AddMetainfo"));
+    QDBusMessage request = QDBusMessage::createMethodCall(DBusService, DBusObjectPath, DBusInterface,
+        QStringLiteral("AddMetainfo"));
     request.setArguments(QVariantList() << metainfo);
 
     QDBusReply<bool> const response = QDBusConnection::sessionBus().call(request);
@@ -50,13 +50,13 @@ void DBusInteropHelper::registerObject(QObject* parent)
         return;
     }
 
-    if (!bus.registerService(DBUS_SERVICE))
+    if (!bus.registerService(DBusService))
     {
-        std::cerr << "couldn't register " << qPrintable(DBUS_SERVICE) << std::endl;
+        std::cerr << "couldn't register " << qPrintable(DBusService) << std::endl;
     }
 
-    if (!bus.registerObject(DBUS_OBJECT_PATH, new InteropObject(parent), QDBusConnection::ExportAllSlots))
+    if (!bus.registerObject(DBusObjectPath, new InteropObject(parent), QDBusConnection::ExportAllSlots))
     {
-        std::cerr << "couldn't register " << qPrintable(DBUS_OBJECT_PATH) << std::endl;
+        std::cerr << "couldn't register " << qPrintable(DBusObjectPath) << std::endl;
     }
 }

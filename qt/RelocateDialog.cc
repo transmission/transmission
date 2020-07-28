@@ -13,29 +13,29 @@
 #include "Torrent.h"
 #include "TorrentModel.h"
 
-bool RelocateDialog::myMoveFlag = true;
+bool RelocateDialog::move_flag = true;
 
 void RelocateDialog::onSetLocation()
 {
-    mySession.torrentSetLocation(myIds, newLocation(), myMoveFlag);
+    session_.torrentSetLocation(ids_, newLocation(), move_flag);
     close();
 }
 
 void RelocateDialog::onMoveToggled(bool b)
 {
-    myMoveFlag = b;
+    move_flag = b;
 }
 
-RelocateDialog::RelocateDialog(Session& session, TorrentModel const& model, torrent_ids_t const& ids, QWidget* parent) :
+RelocateDialog::RelocateDialog(Session& session, TorrentModel const& model, torrent_ids_t ids, QWidget* parent) :
     BaseDialog(parent),
-    mySession(session),
-    myIds(ids)
+    session_(session),
+    ids_(std::move(ids))
 {
-    ui.setupUi(this);
+    ui_.setupUi(this);
 
     QString path;
 
-    for (int const id : myIds)
+    for (int const id : ids_)
     {
         Torrent const* tor = model.getTorrentFromId(id);
 
@@ -45,7 +45,7 @@ RelocateDialog::RelocateDialog(Session& session, TorrentModel const& model, torr
         }
         else if (path != tor->getPath())
         {
-            if (mySession.isServer())
+            if (session_.isServer())
             {
                 path = QDir::homePath();
             }
@@ -58,39 +58,39 @@ RelocateDialog::RelocateDialog(Session& session, TorrentModel const& model, torr
         }
     }
 
-    if (mySession.isServer())
+    if (session_.isServer())
     {
-        ui.newLocationStack->setCurrentWidget(ui.newLocationButton);
-        ui.newLocationButton->setMode(PathButton::DirectoryMode);
-        ui.newLocationButton->setTitle(tr("Select Location"));
-        ui.newLocationButton->setPath(path);
+        ui_.newLocationStack->setCurrentWidget(ui_.newLocationButton);
+        ui_.newLocationButton->setMode(PathButton::DirectoryMode);
+        ui_.newLocationButton->setTitle(tr("Select Location"));
+        ui_.newLocationButton->setPath(path);
     }
     else
     {
-        ui.newLocationStack->setCurrentWidget(ui.newLocationEdit);
-        ui.newLocationEdit->setText(path);
-        ui.newLocationEdit->selectAll();
+        ui_.newLocationStack->setCurrentWidget(ui_.newLocationEdit);
+        ui_.newLocationEdit->setText(path);
+        ui_.newLocationEdit->selectAll();
     }
 
-    ui.newLocationStack->setFixedHeight(ui.newLocationStack->currentWidget()->sizeHint().height());
-    ui.newLocationLabel->setBuddy(ui.newLocationStack->currentWidget());
+    ui_.newLocationStack->setFixedHeight(ui_.newLocationStack->currentWidget()->sizeHint().height());
+    ui_.newLocationLabel->setBuddy(ui_.newLocationStack->currentWidget());
 
-    if (myMoveFlag)
+    if (move_flag)
     {
-        ui.moveDataRadio->setChecked(true);
+        ui_.moveDataRadio->setChecked(true);
     }
     else
     {
-        ui.findDataRadio->setChecked(true);
+        ui_.findDataRadio->setChecked(true);
     }
 
-    connect(ui.moveDataRadio, SIGNAL(toggled(bool)), this, SLOT(onMoveToggled(bool)));
-    connect(ui.dialogButtons, SIGNAL(rejected()), this, SLOT(close()));
-    connect(ui.dialogButtons, SIGNAL(accepted()), this, SLOT(onSetLocation()));
+    connect(ui_.moveDataRadio, SIGNAL(toggled(bool)), this, SLOT(onMoveToggled(bool)));
+    connect(ui_.dialogButtons, SIGNAL(rejected()), this, SLOT(close()));
+    connect(ui_.dialogButtons, SIGNAL(accepted()), this, SLOT(onSetLocation()));
 }
 
 QString RelocateDialog::newLocation() const
 {
-    return ui.newLocationStack->currentWidget() == ui.newLocationButton ? ui.newLocationButton->path() :
-        ui.newLocationEdit->text();
+    return ui_.newLocationStack->currentWidget() == ui_.newLocationButton ? ui_.newLocationButton->path() :
+        ui_.newLocationEdit->text();
 }

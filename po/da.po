@@ -4,16 +4,16 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 # Translators:
-# scootergrisen, 2019
+# scootergrisen, 2020
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-02 13:06+0300\n"
+"POT-Creation-Date: 2020-05-14 18:55+0300\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: scootergrisen, 2019\n"
+"Last-Translator: scootergrisen, 2020\n"
 "Language-Team: Danish (https://www.transifex.com/transmissionbt/teams/33778/da/)\n"
 "Language: da\n"
 "MIME-Version: 1.0\n"
@@ -21,7 +21,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../cli/cli.c:114 ../gtk/util.c:92 ../libtransmission/utils.c:1663
+#: ../cli/cli.c:114 ../gtk/util.c:92 ../libtransmission/utils.c:1694
 msgid "None"
 msgstr "Ingen"
 
@@ -127,11 +127,11 @@ msgstr "Kopiér _magnet-link til udklipsholder"
 
 #: ../gtk/actions.c:85
 msgid "Open URL…"
-msgstr "Åbn URL..."
+msgstr "Åbn URL …"
 
 #: ../gtk/actions.c:85
 msgid "Open _URL…"
-msgstr "Åbn _URL..."
+msgstr "Åbn _URL …"
 
 #: ../gtk/actions.c:86 ../gtk/actions.c:87
 msgid "Open a torrent"
@@ -191,7 +191,7 @@ msgstr "_Start alle"
 
 #: ../gtk/actions.c:97
 msgid "Set _Location…"
-msgstr "Angiv p_lacering..."
+msgstr "Angiv p_lacering …"
 
 #: ../gtk/actions.c:98
 msgid "Remove torrent"
@@ -207,7 +207,7 @@ msgstr "Opret en torrent"
 
 #: ../gtk/actions.c:100
 msgid "_New…"
-msgstr "_Ny..."
+msgstr "_Ny …"
 
 #: ../gtk/actions.c:101
 msgid "_Quit"
@@ -283,7 +283,7 @@ msgstr "Hastighed"
 
 #: ../gtk/details.c:519
 msgid "Honor global _limits"
-msgstr "Respektér globale _grænser"
+msgstr "Overhold globale _grænser"
 
 #: ../gtk/details.c:524
 #, c-format
@@ -381,12 +381,12 @@ msgstr "Oprettet af %1$s"
 #: ../gtk/details.c:743
 #, c-format
 msgid "Created on %1$s"
-msgstr "Oprettet d. %1$s"
+msgstr "Oprettet %1$s"
 
 #: ../gtk/details.c:747
 #, c-format
 msgid "Created by %1$s on %2$s"
-msgstr "Oprettet af %1$s d. %2$s"
+msgstr "Oprettet af %1$s %2$s"
 
 #: ../gtk/details.c:877
 msgid "Unknown"
@@ -647,17 +647,17 @@ msgstr "Sat i kø for at efterspørge flere modparter"
 #: ../gtk/details.c:2192
 #, c-format
 msgid "Asking for more peers now… <small>%s</small>"
-msgstr "Efterspørger flere modparter nu… <small>%s</small>"
+msgstr "Efterspørger flere modparter nu … <small>%s</small>"
 
 #: ../gtk/details.c:2205
 #, c-format
 msgid "Tracker had %s%'d seeders and %'d leechers%s %s ago"
-msgstr "Tracker havde %s%'d seedere og %'d leechere %s %s siden"
+msgstr "Tracker havde %s%'d seedere og %'d leechere%s %s siden"
 
 #: ../gtk/details.c:2210
 #, c-format
 msgid "Got a scrape error \"%s%s%s\" %s ago"
-msgstr "Fik en scrape-fejl \"%s%s%s\" %s tilbage"
+msgstr "Fik en fejl ved scrape \"%s%s%s\" %s tilbage"
 
 #: ../gtk/details.c:2223
 #, c-format
@@ -671,7 +671,7 @@ msgstr "Sat i kø for at bede om modpartsantal"
 #: ../gtk/details.c:2234
 #, c-format
 msgid "Asking for peer counts now… <small>%s</small>"
-msgstr "Efterspørger modpartsantal nu… <small>%s</small>"
+msgstr "Efterspørger modpartsantal nu … <small>%s</small>"
 
 #: ../gtk/details.c:2537
 msgid "List contains invalid URLs"
@@ -774,8 +774,8 @@ msgstr[1] "Slet disse %d torrents downloadede filer?"
 #: ../gtk/dialogs.c:113
 msgid "Once removed, continuing the transfer will require the torrent file or magnet link."
 msgid_plural "Once removed, continuing the transfers will require the torrent files or magnet links."
-msgstr[0] "Når den er fjernet vil fortsættelse af overførslen kræve torrent-filen eller magnet-linket."
-msgstr[1] "Når den er fjernet vil fortsættelse af overførslerne kræve torrent-filen eller magnet-linket."
+msgstr[0] "Når den er blevet fjernet kræver det torrent-filen eller magnet-linket for at fortsætte overførslen."
+msgstr[1] "Når de er blevet fjernet kræver det torrent-filerne eller magnet-linkene for at fortsætte overførslerne."
 
 #: ../gtk/dialogs.c:118
 msgid "This torrent has not finished downloading."
@@ -856,7 +856,7 @@ msgctxt "Verb"
 msgid "Verifying"
 msgstr "Verificerer"
 
-#: ../gtk/filter.c:591 ../gtk/msgwin.c:430 ../gtk/util.c:730
+#: ../gtk/filter.c:591 ../gtk/msgwin.c:430 ../gtk/util.c:717
 msgid "Error"
 msgstr "Fejl"
 
@@ -927,7 +927,7 @@ msgstr "<b>Lukker forbindelser</b>"
 
 #: ../gtk/main.c:984
 msgid "Sending upload/download totals to tracker…"
-msgstr "Sender upload/download totaler til tracker…"
+msgstr "Sender upload/download samlet til tracker …"
 
 #: ../gtk/main.c:988
 msgid "_Quit Now"
@@ -1027,7 +1027,7 @@ msgstr "Ny torrent"
 
 #: ../gtk/makemeta-ui.c:194
 msgid "Creating torrent…"
-msgstr "Opretter torrent..."
+msgstr "Opretter torrent …"
 
 #: ../gtk/makemeta-ui.c:304
 msgid "No source selected"
@@ -1193,7 +1193,7 @@ msgstr "Kunne ikke flytte torrent"
 
 #: ../gtk/relocate.c:111
 msgid "This may take a moment…"
-msgstr "Dette kan tage et øjeblik..."
+msgstr "Dette kan tage et øjeblik …"
 
 #: ../gtk/relocate.c:139 ../gtk/relocate.c:153
 msgid "Set Torrent Location"
@@ -1252,7 +1252,7 @@ msgstr "Varighed:"
 
 #: ../gtk/stats.c:149
 msgid "Total"
-msgstr "Total"
+msgstr "Samlet"
 
 #. %1$s is how much we've got,
 #. %2$s is how much we'll have when done,
@@ -1553,7 +1553,7 @@ msgstr "Opdater blokeringsliste"
 
 #: ../gtk/tr-prefs.c:463
 msgid "Getting new blocklist…"
-msgstr "Downloader ny blokeringsliste..."
+msgstr "Downloader ny blokeringsliste …"
 
 #: ../gtk/tr-prefs.c:488
 msgid "Allow encryption"
@@ -1734,7 +1734,7 @@ msgstr "Port er <b>åben</b>"
 
 #: ../gtk/tr-prefs.c:1104
 msgid "<i>Testing TCP port…</i>"
-msgstr "<i>Tester TCP-port…</i>"
+msgstr "<i>Tester TCP-port …</i>"
 
 #: ../gtk/tr-prefs.c:1130
 msgid "Listening Port"
@@ -1828,7 +1828,7 @@ msgstr "Torrent"
 
 #: ../gtk/tr-window.c:227
 msgid "Total Ratio"
-msgstr "Totalt forhold"
+msgstr "Samlet forhold"
 
 #: ../gtk/tr-window.c:228
 msgid "Session Ratio"
@@ -1836,7 +1836,7 @@ msgstr "Sessionsforhold"
 
 #: ../gtk/tr-window.c:229
 msgid "Total Transfer"
-msgstr "Total overførsel"
+msgstr "Samlet overførsel"
 
 #: ../gtk/tr-window.c:230
 msgid "Session Transfer"
@@ -2040,31 +2040,21 @@ msgstr "Torrentfilen \"%s\" blev udsat for en ukendt fejl."
 msgid "Error opening torrent"
 msgstr "Fejl ved åbning af torrent"
 
-#: ../gtk/util.c:590
-#, c-format
-msgid "Error opening \"%s\""
-msgstr "Fejl ved åbning af \"%s\""
-
-#: ../gtk/util.c:592
-#, c-format
-msgid "Server returned \"%1$ld %2$s\""
-msgstr "Server svarede \"%1$ld %2$s\""
-
-#: ../gtk/util.c:607
+#: ../gtk/util.c:594
 msgid "Unrecognized URL"
 msgstr "Ikke genkendt URL"
 
-#: ../gtk/util.c:609
+#: ../gtk/util.c:596
 #, c-format
 msgid "Transmission doesn't know how to use \"%s\""
 msgstr "Transmission ved ikke hvordan man anvender \"%s\""
 
-#: ../gtk/util.c:614
+#: ../gtk/util.c:601
 #, c-format
 msgid "This magnet link appears to be intended for something other than BitTorrent. BitTorrent magnet links have a section containing \"%s\"."
 msgstr "Dette magnet-link ser ud til at være tiltænkt noget andet end BitTorrent. BitTorrent magnet-links har en sektion med \"%s\"."
 
-#: ../gtk/util.c:736
+#: ../gtk/util.c:723
 #, c-format
 msgid "%s free"
 msgstr "%s ledig"
@@ -2087,15 +2077,15 @@ msgstr "DNS-opslag mislykkedes: %s"
 msgid "Connection failed"
 msgstr "Forbindelsen mislykkedes"
 
-#: ../libtransmission/announcer.c:1155 ../libtransmission/announcer.c:1474
+#: ../libtransmission/announcer.c:1150 ../libtransmission/announcer.c:1469
 msgid "Could not connect to tracker"
 msgstr "Kunne ikke oprette forbindelse til tracker"
 
-#: ../libtransmission/announcer.c:1159 ../libtransmission/announcer.c:1478
+#: ../libtransmission/announcer.c:1154 ../libtransmission/announcer.c:1473
 msgid "Tracker did not respond"
 msgstr "Tracker svarede ikke"
 
-#: ../libtransmission/announcer.c:1223
+#: ../libtransmission/announcer.c:1218
 msgid "Success"
 msgstr "Succes"
 
@@ -2220,7 +2210,7 @@ msgstr "Kunne ikke sætte kildeadresse %s på %<PRIdMAX>: %s"
 #: ../libtransmission/net.c:339
 #, c-format
 msgid "Couldn't connect socket %<PRIdMAX> to %s, port %d (errno %d - %s)"
-msgstr "Kunne ikke forbinde socket %<PRIdMAX> til %s, port %d (errno %d - %s)"
+msgstr "Kunne ikke forbinde sokkel %<PRIdMAX> til %s, port %d (errno %d - %s)"
 
 #: ../libtransmission/net.c:436
 msgid "Is another copy of Transmission already running?"
@@ -2266,7 +2256,7 @@ msgstr "Stopper"
 msgid "Not forwarded"
 msgstr "Ikke videresendt"
 
-#: ../libtransmission/port-forwarding.c:106 ../libtransmission/torrent.c:2298
+#: ../libtransmission/port-forwarding.c:106 ../libtransmission/torrent.c:2302
 #, c-format
 msgid "State changed from \"%1$s\" to \"%2$s\""
 msgstr "Tilstand ændret fra \"%1$s\" til \"%2$s\""
@@ -2315,7 +2305,7 @@ msgstr "Fejl ved dekomprimering af blokeringslist: %s (%d)"
 msgid "%s %s started"
 msgstr "%s %s startet"
 
-#: ../libtransmission/session.c:2175
+#: ../libtransmission/session.c:2170
 #, c-format
 msgid "Loaded %d torrents"
 msgstr "Indlæste %d torrents"
@@ -2359,7 +2349,7 @@ msgstr "Udført"
 msgid "Complete"
 msgstr "Færdig"
 
-#: ../libtransmission/torrent.c:3462
+#: ../libtransmission/torrent.c:3466
 #, c-format
 msgid "Piece %<PRIu32>, which was just downloaded, failed its checksum test"
 msgstr "Stykke %<PRIu32>, som netop er blevet downloadet, fejlede sin tjeksumstest"
@@ -2424,5 +2414,10 @@ msgstr "Filens indhold kan ikke parses"
 msgid "Verifying torrent"
 msgstr "Verificerer torrent"
 
-#~ msgid "transmission"
-#~ msgstr "transmission"
+#, c-format
+#~ msgid "Server returned \"%1$ld %2$s\""
+#~ msgstr "Server svarede \"%1$ld %2$s\""
+
+#, c-format
+#~ msgid "Error opening \"%s\""
+#~ msgstr "Fejl ved åbning af \"%s\""

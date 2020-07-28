@@ -5,7 +5,7 @@
 "%@ Files" = "%@ Filer";
 
 /* quicklook tracker header */
-"%@ Trackers" = "%@ Trackers";
+"%@ Trackers" = "%@ Trackere";
 
 /* quicklook web seed header */
 "%@ Web Seeds" = "%@ Webseeds";
@@ -23,10 +23,10 @@
 "1 Web Seed" = "1 webseed";
 
 /* quicklook creation info */
-"Created on %@" = "Oprettet d. %@";
+"Created on %@" = "Oprettet %@";
 
 /* quicklook creation info */
-"Created on %@ with %@" = "Oprettet d. %1$@ med %2$@";
+"Created on %@ with %@" = "Oprettet %1$@ med %2$@";
 
 /* quicklook creation info */
 "Created with %@" = "Oprettet med %@";

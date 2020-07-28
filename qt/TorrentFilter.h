@@ -8,8 +8,12 @@
 
 #pragma once
 
+#include <array>
+
 #include <QSortFilterProxyModel>
 #include <QTimer>
+
+#include "Filters.h"
 
 class QString;
 
@@ -30,27 +34,19 @@ public:
     };
 
 public:
-    TorrentFilter(Prefs const& prefs);
-    virtual ~TorrentFilter();
-
-    int hiddenRowCount() const;
-
-    void countTorrentsPerMode(int* setmeCounts) const;
+    explicit TorrentFilter(Prefs const& prefs);
+    [[nodiscard]] std::array<int, FilterMode::NUM_MODES> countTorrentsPerMode() const;
 
 protected:
     // QSortFilterProxyModel
     bool filterAcceptsRow(int, QModelIndex const&) const override;
     bool lessThan(QModelIndex const&, QModelIndex const&) const override;
 
-private:
-    bool activityFilterAcceptsTorrent(Torrent const* tor, FilterMode const& mode) const;
-    bool trackerFilterAcceptsTorrent(Torrent const* tor, QString const& tracker) const;
-
 private slots:
     void onPrefChanged(int key);
     void refilter();
 
 private:
-    QTimer myRefilterTimer;
-    Prefs const& myPrefs;
+    QTimer refilter_timer_;
+    Prefs const& prefs_;
 };
