@@ -601,7 +601,9 @@ bool Application::notifyApp(QString const& title, QString const& body) const
         args.append(title); // summary
         args.append(body); // body
         args.append(QStringList()); // actions - unused for plain passive popups
-        args.append(QVariantMap()); // hints - unused atm
+        args.append(QVariantMap({
+            std::make_pair(QStringLiteral("category"), QVariant(QStringLiteral("transfer.complete")))
+        })); // hints
         args.append(static_cast<int32_t>(-1)); // use the default timeout period
         m.setArguments(args);
         QDBusReply<quint32> const reply_msg = bus.call(m);
