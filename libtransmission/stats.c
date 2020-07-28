@@ -110,7 +110,11 @@ static void saveCumulativeStats(tr_session const* session, tr_session_stats cons
     tr_variantDictAddInt(&top, TR_KEY_uploaded_bytes, s->uploadedBytes);
 
     filename = getFilename(session);
-    tr_logAddDeep(__FILE__, __LINE__, NULL, "Saving stats to \"%s\"", filename);
+    if (tr_logGetDeepEnabled())
+    {
+        tr_logAddDeep(__FILE__, __LINE__, NULL, "Saving stats to \"%s\"", filename);
+    }
+
     tr_variantToFile(&top, TR_VARIANT_FMT_JSON, filename);
 
     tr_free(filename);
