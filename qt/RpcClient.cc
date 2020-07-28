@@ -25,15 +25,15 @@
 
 // #define DEBUG_HTTP
 
-#define REQUEST_DATA_PROPERTY_KEY "requestData"
-#define REQUEST_FUTUREINTERFACE_PROPERTY_KEY "requestReplyFutureInterface"
-
 using ::trqt::variant_helpers::dictAdd;
 using ::trqt::variant_helpers::dictFind;
 using ::trqt::variant_helpers::variantInit;
 
 namespace
 {
+
+char const constexpr* const RequestDataPropertyKey { "requestData" };
+char const constexpr* const RequestFutureinterfacePropertyKey { "requestReplyFutureInterface" };
 
 void destroyVariant(tr_variant* json)
 {
@@ -59,6 +59,7 @@ void RpcClient::stop()
     session_ = nullptr;
     session_id_.clear();
     url_.clear();
+    request_.reset();
 
     if (nam_ != nullptr)
     {
@@ -75,6 +76,7 @@ void RpcClient::start(tr_session* session)
 void RpcClient::start(QUrl const& url)
 {
     url_ = url;
+    request_.reset();
 }
 
 bool RpcClient::isLocal() const
@@ -125,15 +127,19 @@ int64_t RpcClient::getNextTag()
 
 void RpcClient::sendNetworkRequest(TrVariantPtr json, QFutureInterface<RpcResponse> const& promise)
 {
-    QNetworkRequest request;
-    request.setUrl(url_);
-    request.setRawHeader("User-Agent", (qApp->applicationName() + QLatin1Char('/') +
-        QString::fromUtf8(LONG_VERSION_STRING)).toUtf8());
-    request.setRawHeader("Content-Type", "application/json; charset=UTF-8");
-
-    if (!session_id_.isEmpty())
+    if (!request_)
     {
-        request.setRawHeader(TR_RPC_SESSION_ID_HEADER, session_id_.toUtf8());
+        QNetworkRequest request;
+        request.setUrl(url_);
+        request.setRawHeader("User-Agent", (qApp->applicationName() + QLatin1Char('/') + QString::fromUtf8(
+            LONG_VERSION_STRING)).toUtf8());
+        request.setRawHeader("Content-Type", "application/json; charset=UTF-8");
+        if (!session_id_.isEmpty())
+        {
+            request.setRawHeader(TR_RPC_SESSION_ID_HEADER, session_id_.toUtf8());
+        }
+
+        request_ = request;
     }
 
     size_t raw_json_data_length;
@@ -141,9 +147,9 @@ void RpcClient::sendNetworkRequest(TrVariantPtr json, QFutureInterface<RpcRespon
     QByteArray json_data(raw_json_data, raw_json_data_length);
     tr_free(raw_json_data);
 
-    QNetworkReply* reply = networkAccessManager()->post(request, json_data);
-    reply->setProperty(REQUEST_DATA_PROPERTY_KEY, QVariant::fromValue(json));
-    reply->setProperty(REQUEST_FUTUREINTERFACE_PROPERTY_KEY, QVariant::fromValue(promise));
+    QNetworkReply* reply = networkAccessManager()->post(*request_, json_data);
+    reply->setProperty(RequestDataPropertyKey, QVariant::fromValue(json));
+    reply->setProperty(RequestFutureinterfacePropertyKey, QVariant::fromValue(promise));
 
     connect(reply, SIGNAL(downloadProgress(qint64, qint64)), this, SIGNAL(dataReadProgress()));
     connect(reply, SIGNAL(uploadProgress(qint64, qint64)), this, SIGNAL(dataSendProgress()));
@@ -223,7 +229,7 @@ void RpcClient::networkRequestFinished(QNetworkReply* reply)
 {
     reply->deleteLater();
 
-    auto promise = reply->property(REQUEST_FUTUREINTERFACE_PROPERTY_KEY).
+    auto promise = reply->property(RequestFutureinterfacePropertyKey).
         value<QFutureInterface<RpcResponse>>();
 
 #ifdef DEBUG_HTTP
@@ -243,8 +249,9 @@ void RpcClient::networkRequestFinished(QNetworkReply* reply)
         // we got a 409 telling us our session id has expired.
         // update it and resubmit the request.
         session_id_ = QString::fromUtf8(reply->rawHeader(TR_RPC_SESSION_ID_HEADER));
+        request_.reset();
 
-        sendNetworkRequest(reply->property(REQUEST_DATA_PROPERTY_KEY).value<TrVariantPtr>(), promise);
+        sendNetworkRequest(reply->property(RequestDataPropertyKey).value<TrVariantPtr>(), promise);
         return;
     }
 

@@ -9,11 +9,13 @@
 #pragma once
 
 #include <memory>
+#include <optional>
 #include <string_view>
 
 #include <QFuture>
 #include <QFutureInterface>
 #include <QHash>
+#include <QNetworkRequest>
 #include <QNetworkReply>
 #include <QObject>
 #include <QString>
@@ -86,6 +88,8 @@ private:
     RpcResponse parseResponseData(tr_variant& response);
 
     static void localSessionCallback(tr_session* s, tr_variant* response, void* vself);
+
+    std::optional<QNetworkRequest> request_;
 
     tr_session* session_ = {};
     QString session_id_;
