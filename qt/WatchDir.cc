@@ -86,7 +86,7 @@ void WatchDir::setPath(QString const& path, bool is_enabled)
     // maybe create a new watcher
     if (is_enabled)
     {
-        watcher_ = std::make_unique<QFileSystemWatcher>(QStringList{path});
+        watcher_ = std::make_unique<QFileSystemWatcher>(QStringList{ path });
         connect(watcher_.get(), SIGNAL(directoryChanged(QString)), this, SLOT(watcherActivated(QString)));
         QTimer::singleShot(0, this, SLOT(rescanAllWatchedDirectories())); // trigger the watchdir for .torrent files in there already
     }
