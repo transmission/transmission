@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include <cstdint>
 #include <functional>
 #include <type_traits>
 
@@ -46,6 +47,9 @@ public:
     // The first function in queue is ran synchronously
     // (hence it may be e. g. a lambda capturing local variables by reference).
     void run();
+
+    using Tag = uint64_t;
+    Tag tag() const { return tag_; }
 
 private:
     // Internally queued function. Takes the last response future, makes a
@@ -138,6 +142,7 @@ private:
     }
 
 private:
+    Tag const tag_;
     bool tolerate_errors_ = {};
     QFutureInterface<RpcResponse> promise_;
     QQueue<QPair<QueuedFunction, ErrorHandlerFunction>> queue_;
