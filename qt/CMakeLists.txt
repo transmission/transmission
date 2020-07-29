@@ -47,6 +47,7 @@ set(${PROJECT_NAME}_SOURCES
     TrackerModel.cc
     TrackerModelFilter.cc
     Utils.cc
+    VariantHelpers.cc
     WatchDir.cc
 )
 
@@ -108,6 +109,7 @@ set(${PROJECT_NAME}_HEADERS
     TrackerModelFilter.h
     Typedefs.h
     Utils.h
+    VariantHelpers.h
     WatchDir.h
 )
 
@@ -141,10 +143,12 @@ set(${PROJECT_NAME}_LINGUAS
     en
     es
     eu
+    fi
     fr
     hu
     id
     it_IT
+    ja
     ka
     kk
     ko

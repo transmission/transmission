@@ -171,7 +171,6 @@ static void notify_callback(GObject* source, GAsyncResult* res, gpointer user_da
 
 void gtr_notify_torrent_completed(TrCore* core, int torrent_id)
 {
-    GVariantBuilder actions_builder;
     TrNotification* n;
     tr_torrent* tor;
     char const* cmd = gtr_pref_string_get(TR_KEY_torrent_complete_sound_command);
@@ -195,8 +194,8 @@ void gtr_notify_torrent_completed(TrCore* core, int torrent_id)
     n->core = core;
     n->torrent_id = torrent_id;
 
+    GVariantBuilder actions_builder;
     g_variant_builder_init(&actions_builder, G_VARIANT_TYPE("as"));
-
     if (server_supports_actions)
     {
         tr_info const* inf = tr_torrentInfo(tor);
@@ -213,8 +212,12 @@ void gtr_notify_torrent_completed(TrCore* core, int torrent_id)
         }
     }
 
+    GVariantBuilder hints_builder;
+    g_variant_builder_init(&hints_builder, G_VARIANT_TYPE("a{sv}"));
+    g_variant_builder_add(&hints_builder, "{sv}", "category", g_variant_new_string("transfer.complete"));
+
     g_dbus_proxy_call(proxy, "Notify", g_variant_new("(susssasa{sv}i)", "Transmission", n->id, "transmission",
-        _("Torrent Complete"), tr_torrentName(tor), &actions_builder, NULL, -1), G_DBUS_CALL_FLAGS_NONE, -1, NULL,
+        _("Torrent Complete"), tr_torrentName(tor), &actions_builder, &hints_builder, -1), G_DBUS_CALL_FLAGS_NONE, -1, NULL,
         notify_callback, n);
 }
 

@@ -23,8 +23,7 @@
 ***/
 
 WatchDir::WatchDir(TorrentModel const& model) :
-    myModel(model),
-    myWatcher(nullptr)
+    model_(model)
 {
 }
 
@@ -46,7 +45,7 @@ int WatchDir::metainfoTest(QString const& filename) const
     {
         ret = ERROR;
     }
-    else if (myModel.hasTorrent(QString::fromUtf8(inf.hashString)))
+    else if (model_.hasTorrent(QString::fromUtf8(inf.hashString)))
     {
         ret = DUPLICATE;
     }
@@ -67,7 +66,7 @@ int WatchDir::metainfoTest(QString const& filename) const
 
 void WatchDir::onTimeout()
 {
-    QTimer* t = qobject_cast<QTimer*>(sender());
+    auto* t = qobject_cast<QTimer*>(sender());
     QString const filename = t->objectName();
 
     if (metainfoTest(filename) == OK)
@@ -78,23 +77,23 @@ void WatchDir::onTimeout()
     t->deleteLater();
 }
 
-void WatchDir::setPath(QString const& path, bool isEnabled)
+void WatchDir::setPath(QString const& path, bool is_enabled)
 {
     // clear out any remnants of the previous watcher, if any
-    myWatchDirFiles.clear();
+    watch_dir_files_.clear();
 
-    if (myWatcher != nullptr)
+    if (watcher_ != nullptr)
     {
-        delete myWatcher;
-        myWatcher = nullptr;
+        delete watcher_;
+        watcher_ = nullptr;
     }
 
     // maybe create a new watcher
-    if (isEnabled)
+    if (is_enabled)
     {
-        myWatcher = new QFileSystemWatcher();
-        myWatcher->addPath(path);
-        connect(myWatcher, SIGNAL(directoryChanged(QString)), this, SLOT(watcherActivated(QString)));
+        watcher_ = new QFileSystemWatcher();
+        watcher_->addPath(path);
+        connect(watcher_, SIGNAL(directoryChanged(QString)), this, SLOT(watcherActivated(QString)));
         // std::cerr << "watching " << qPrintable(path) << " for new .torrent files" << std::endl;
         QTimer::singleShot(0, this, SLOT(rescanAllWatchedDirectories())); // trigger the watchdir for .torrent files in there already
     }
@@ -113,12 +112,12 @@ void WatchDir::watcherActivated(QString const& path)
     }
 
     // try to add any new files which end in .torrent
-    QSet<QString> const newFiles(files - myWatchDirFiles);
-    QString const torrentSuffix = QString::fromUtf8(".torrent");
+    QSet<QString> const new_files(files - watch_dir_files_);
+    auto const torrent_suffix = QStringLiteral(".torrent");
 
-    for (QString const& name : newFiles)
+    for (QString const& name : new_files)
     {
-        if (name.endsWith(torrentSuffix, Qt::CaseInsensitive))
+        if (name.endsWith(torrent_suffix, Qt::CaseInsensitive))
         {
             QString const filename = dir.absoluteFilePath(name);
 
@@ -134,7 +133,7 @@ void WatchDir::watcherActivated(QString const& path)
             case ERROR:
                 {
                     // give the .torrent a few seconds to finish downloading
-                    QTimer* t = new QTimer(this);
+                    auto* t = new QTimer(this);
                     t->setObjectName(dir.absoluteFilePath(name));
                     t->setSingleShot(true);
                     connect(t, SIGNAL(timeout()), this, SLOT(onTimeout()));
@@ -146,17 +145,17 @@ void WatchDir::watcherActivated(QString const& path)
 
     // update our file list so that we can use it
     // for comparison the next time around
-    myWatchDirFiles = files;
+    watch_dir_files_ = files;
 }
 
 void WatchDir::rescanAllWatchedDirectories()
 {
-    if (myWatcher == nullptr)
+    if (watcher_ == nullptr)
     {
         return;
     }
 
-    for (QString const& path : myWatcher->directories())
+    for (QString const& path : watcher_->directories())
     {
         watcherActivated(path);
     }

@@ -19,7 +19,7 @@ class TorrentModel;
 struct TrackerInfo
 {
     TrackerStat st;
-    int torrentId;
+    int torrent_id = {};
 };
 
 Q_DECLARE_METATYPE(TrackerInfo)
@@ -38,15 +38,15 @@ public:
     TrackerModel() = default;
 
     void refresh(TorrentModel const&, torrent_ids_t const& ids);
-    int find(int torrentId, QString const& url) const;
+    int find(int torrent_id, QString const& url) const;
 
     // QAbstractItemModel
     int rowCount(QModelIndex const& parent = QModelIndex()) const override;
     QVariant data(QModelIndex const& index, int role = Qt::DisplayRole) const override;
 
 private:
-    typedef QVector<TrackerInfo> rows_t;
+    using rows_t = QVector<TrackerInfo>;
 
 private:
-    rows_t myRows;
+    rows_t rows_;
 };

@@ -17,9 +17,9 @@
 
 #include <ctype.h> /* isdigit(), tolower() */
 #include <errno.h>
-#include <float.h> /* DBL_EPSILON */
+#include <float.h> /* DBL_DIG */
 #include <locale.h> /* localeconv() */
-#include <math.h> /* pow(), fabs(), floor() */
+#include <math.h> /* fabs(), floor() */
 #include <stdio.h>
 #include <stdlib.h> /* getenv() */
 #include <string.h> /* strerror(), memset(), memmem() */
@@ -585,6 +585,37 @@ char* tr_strsep(char** str, char const* delims)
     return token;
 
 #endif
+}
+
+char* tr_strjoin(char const* const* arr, size_t len, char const* delim)
+{
+    size_t total_len = 1;
+    size_t delim_len = strlen(delim);
+    for (size_t i = 0; i < len; ++i)
+    {
+        total_len += strlen(arr[i]);
+    }
+
+    total_len += len > 0 ? (len - 1) * delim_len : 0;
+
+    char* const ret = tr_new(char, total_len);
+    char* p = ret;
+
+    for (size_t i = 0; i < len; ++i)
+    {
+        if (i > 0)
+        {
+            memcpy(p, delim, delim_len);
+            p += delim_len;
+        }
+
+        size_t const part_len = strlen(arr[i]);
+        memcpy(p, arr[i], part_len);
+        p += part_len;
+    }
+
+    *p = '\0';
+    return ret;
 }
 
 char* tr_strstrip(char* str)
@@ -1625,8 +1656,7 @@ double tr_truncd(double x, int precision)
 {
     char* pt;
     char buf[128];
-    int const max_precision = (int)log10(1.0 / DBL_EPSILON) - 1;
-    tr_snprintf(buf, sizeof(buf), "%.*f", max_precision, x);
+    tr_snprintf(buf, sizeof(buf), "%.*f", DBL_DIG, x);
 
     if ((pt = strstr(buf, localeconv()->decimal_point)) != NULL)
     {

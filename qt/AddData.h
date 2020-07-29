@@ -25,10 +25,7 @@ public:
     };
 
 public:
-    AddData() :
-        type(NONE)
-    {
-    }
+    AddData() = default;
 
     AddData(QString const& str)
     {
@@ -46,8 +43,7 @@ public:
         return AddData(str).type != NONE;
     }
 
-public:
-    int type;
+    int type = NONE;
     QByteArray metainfo;
     QString filename;
     QString magnet;

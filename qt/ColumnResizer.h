@@ -32,7 +32,6 @@ public slots:
 private:
     void scheduleUpdate();
 
-private:
-    QTimer* myTimer;
-    QSet<QGridLayout*> myLayouts;
+    QTimer* timer_ = {};
+    QSet<QGridLayout*> layouts_;
 };

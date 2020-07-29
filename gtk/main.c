@@ -59,7 +59,7 @@
 
 #define SHOW_LICENSE
 static char const* LICENSE =
-    "Copyright 2005-2019. All code is copyrighted by the respective authors.\n"
+    "Copyright 2005-2020. All code is copyrighted by the respective authors.\n"
     "\n"
     "Transmission can be redistributed and/or modified under the terms of the "
     "GNU GPL versions 2 or 3 or by any future license endorsed by Mnemosyne LLC.\n"
@@ -745,7 +745,7 @@ static void app_setup(GtkWindow* wind, struct cbdata* cbdata)
         GtkWidget* w = gtk_message_dialog_new(GTK_WINDOW(wind), GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_OTHER,
             GTK_BUTTONS_NONE, "%s", _("Transmission is a file sharing program. When you run a torrent, its data will be "
             "made available to others by means of upload. Any content you share is your sole responsibility."));
-        gtk_dialog_add_button(GTK_DIALOG(w), GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT);
+        gtk_dialog_add_button(GTK_DIALOG(w), _("_Cancel"), GTK_RESPONSE_REJECT);
         gtk_dialog_add_button(GTK_DIALOG(w), _("I _Agree"), GTK_RESPONSE_ACCEPT);
         gtk_dialog_set_default_response(GTK_DIALOG(w), GTK_RESPONSE_ACCEPT);
 
@@ -973,7 +973,7 @@ static void on_app_exit(gpointer vdata)
         NULL);
     gtk_container_add(GTK_CONTAINER(c), p);
 
-    w = gtk_image_new_from_icon_name(GTK_STOCK_NETWORK, GTK_ICON_SIZE_DIALOG);
+    w = gtk_image_new_from_icon_name("network-workgroup", GTK_ICON_SIZE_DIALOG);
     gtk_grid_attach(GTK_GRID(p), w, 0, 0, 1, 2);
 
     w = gtk_label_new(NULL);
@@ -1352,7 +1352,7 @@ static void show_about_dialog(GtkWindow* parent)
     char const* uri = "https://transmissionbt.com/";
     char const* authors[] =
     {
-        "Jordan Lee (Backend; GTK+)",
+        "Charles Kerr (Backend; GTK+)",
         "Mitchell Livingston (Backend; OS X)",
         "Mike Gelfand",
         NULL

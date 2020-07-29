@@ -70,7 +70,7 @@ public:
 
     static bool isMagnetLink(QString const& s)
     {
-        return s.startsWith(QString::fromUtf8("magnet:?"));
+        return s.startsWith(QStringLiteral("magnet:?"));
     }
 
     static bool isHexHashcode(QString const& s)
@@ -99,6 +99,8 @@ public:
     }
 };
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
+
 namespace std
 {
 
@@ -112,3 +114,5 @@ struct hash<QString>
 };
 
 } // namespace std
+
+#endif
