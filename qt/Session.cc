@@ -423,57 +423,71 @@ void addOptionalIds(tr_variant* args, torrent_ids_t const& ids)
 
 } // namespace
 
-void Session::torrentSet(torrent_ids_t const& ids, tr_quark const key, double value)
+Session::Tag Session::torrentSetImpl(tr_variant* args)
+{
+    auto* const q = new RpcQueue();
+    auto const tag = q->tag();
+
+    q->add([this, args]()
+        {
+            return rpc_.exec(TR_KEY_torrent_set, args);
+        });
+    q->add([this, tag]()
+        {
+            emit sessionCalled(tag);
+        });
+    q->setTolerateErrors();
+    q->run();
+
+    return tag;
+}
+
+Session::Tag Session::torrentSet(torrent_ids_t const& ids, tr_quark const key, double value)
 {
     tr_variant args;
     tr_variantInitDict(&args, 2);
     addOptionalIds(&args, ids);
     dictAdd(&args, key, value);
-
-    exec(TR_KEY_torrent_set, &args);
+    return torrentSetImpl(&args);
 }
 
-void Session::torrentSet(torrent_ids_t const& ids, tr_quark const key, int value)
+Session::Tag Session::torrentSet(torrent_ids_t const& ids, tr_quark const key, int value)
 {
     tr_variant args;
     tr_variantInitDict(&args, 2);
     addOptionalIds(&args, ids);
     dictAdd(&args, key, value);
-
-    exec(TR_KEY_torrent_set, &args);
+    return torrentSetImpl(&args);
 }
 
-void Session::torrentSet(torrent_ids_t const& ids, tr_quark const key, bool value)
+Session::Tag Session::torrentSet(torrent_ids_t const& ids, tr_quark const key, bool value)
 {
     tr_variant args;
     tr_variantInitDict(&args, 2);
     addOptionalIds(&args, ids);
     dictAdd(&args, key, value);
-
-    exec(TR_KEY_torrent_set, &args);
+    return torrentSetImpl(&args);
 }
 
-void Session::torrentSet(torrent_ids_t const& ids, tr_quark const key, QStringList const& value)
+Session::Tag Session::torrentSet(torrent_ids_t const& ids, tr_quark const key, QStringList const& value)
 {
     tr_variant args;
     tr_variantInitDict(&args, 2);
     addOptionalIds(&args, ids);
     dictAdd(&args, key, value);
-
-    exec(TR_KEY_torrent_set, &args);
+    return torrentSetImpl(&args);
 }
 
-void Session::torrentSet(torrent_ids_t const& ids, tr_quark const key, QList<int> const& value)
+Session::Tag Session::torrentSet(torrent_ids_t const& ids, tr_quark const key, QList<int> const& value)
 {
     tr_variant args;
     tr_variantInitDict(&args, 2);
     addOptionalIds(&args, ids);
     dictAdd(&args, key, value);
-
-    exec(TR_KEY_torrent_set, &args);
+    return torrentSetImpl(&args);
 }
 
-void Session::torrentSet(torrent_ids_t const& ids, tr_quark const key, QPair<int, QString> const& value)
+Session::Tag Session::torrentSet(torrent_ids_t const& ids, tr_quark const key, QPair<int, QString> const& value)
 {
     tr_variant args;
     tr_variantInitDict(&args, 2);
@@ -481,8 +495,7 @@ void Session::torrentSet(torrent_ids_t const& ids, tr_quark const key, QPair<int
     tr_variant* list(tr_variantDictAddList(&args, key, 2));
     listAdd(list, value.first);
     listAdd(list, value.second);
-
-    exec(TR_KEY_torrent_set, &args);
+    return torrentSetImpl(&args);
 }
 
 void Session::torrentSetLocation(torrent_ids_t const& ids, QString const& location, bool do_move)
