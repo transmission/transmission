@@ -390,7 +390,7 @@ void setIfIdle(QSpinBox* spin, int value)
     }
 }
 
-}  // namespace
+} // namespace
 
 void DetailsDialog::refreshUI()
 {
