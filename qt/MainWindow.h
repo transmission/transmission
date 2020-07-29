@@ -9,6 +9,7 @@
 #pragma once
 
 #include <ctime>
+#include <memory>
 
 #include <QMainWindow>
 #include <QNetworkReply>
@@ -32,6 +33,7 @@ class QStringList;
 class AboutDialog;
 class AddData;
 class DetailsDialog;
+class ListViewProxyStyle;
 class Prefs;
 class PrefsDialog;
 class Session;
@@ -141,6 +143,8 @@ private:
     Session& session_;
     Prefs& prefs_;
     TorrentModel& model_;
+
+    std::shared_ptr<ListViewProxyStyle> lvp_style_;
 
     QPixmap pixmap_network_error_;
     QPixmap pixmap_network_idle_;
