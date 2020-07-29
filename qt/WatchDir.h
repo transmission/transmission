@@ -8,11 +8,12 @@
 
 #pragma once
 
+#include <memory>
+
 #include <QObject>
+#include <QFileSystemWatcher>
 #include <QSet>
 #include <QString>
-
-class QFileSystemWatcher;
 
 class TorrentModel;
 
@@ -49,5 +50,5 @@ private:
     TorrentModel const& model_;
 
     QSet<QString> watch_dir_files_;
-    QFileSystemWatcher* watcher_ = {};
+    std::unique_ptr<QFileSystemWatcher> watcher_;
 };
