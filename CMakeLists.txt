@@ -97,7 +97,7 @@ string(SUBSTRING "${TR_VCS_REVISION}" 0 10 TR_VCS_REVISION)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-set(CURL_MINIMUM            7.15.4)
+set(CURL_MINIMUM            7.28.0)
 set(EVENT2_MINIMUM          2.0.10)
 set(OPENSSL_MINIMUM         0.9.7)
 set(CYASSL_MINIMUM          3.0)
