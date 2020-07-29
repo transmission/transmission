@@ -142,6 +142,7 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     session_(session),
     prefs_(prefs),
     model_(model),
+    lvp_style_(new ListViewProxyStyle{}),
     filter_model_(prefs),
     torrent_delegate_(new TorrentDelegate(this)),
     torrent_delegate_min_(new TorrentDelegateMin(this)),
@@ -155,7 +156,7 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
 
     ui_.setupUi(this);
 
-    ui_.listView->setStyle(new ListViewProxyStyle);
+    ui_.listView->setStyle(lvp_style_.get());
     ui_.listView->setAttribute(Qt::WA_MacShowFocusRect, false);
 
     // icons
