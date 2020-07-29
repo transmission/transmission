@@ -21,6 +21,7 @@
  *****************************************************************************/
 
 #include <errno.h>
+#include <limits.h>
 #include <string.h>
 
 #include <sys/types.h>
@@ -476,7 +477,12 @@ static tr_socket_t tr_netBindTCPImpl(tr_address const* addr, tr_port port, bool 
 
 #endif
 
-    if (listen(fd, 128) == -1)
+#ifdef _WIN32
+    if (listen(fd, SOMAXCONN) == -1)
+#else /* _WIN32 */
+    /* Listen queue backlog will be capped to the operating system's limit. */
+    if (listen(fd, INT_MAX) == -1)
+#endif /* _WIN32 */
     {
         *errOut = sockerrno;
         tr_netCloseSocket(fd);
