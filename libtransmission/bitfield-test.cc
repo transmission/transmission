@@ -14,54 +14,59 @@
 
 #include "gtest/gtest.h"
 
-TEST(Bitfield, count_range) {
-    int begin;
-    int end;
-    int count1;
-    int count2;
-    int const bitCount = 100 + tr_rand_int_weak(1000);
-    tr_bitfield bf;
-
-    /* generate a random bitfield */
-    tr_bitfieldConstruct(&bf, bitCount);
-
-    for (int i = 0, n = tr_rand_int_weak(bitCount); i < n; ++i)
+TEST(Bitfield, count_range)
+{
+    auto constexpr N_ITERS = int { 10000 };
+    for (auto i = 0; i < N_ITERS; ++i)
     {
-        tr_bitfieldAdd(&bf, tr_rand_int_weak(bitCount));
-    }
+        int begin;
+        int end;
+        int count1;
+        int count2;
+        int const bitCount = 100 + tr_rand_int_weak(1000);
+        tr_bitfield bf;
 
-    begin = tr_rand_int_weak(bitCount);
+        /* generate a random bitfield */
+        tr_bitfieldConstruct(&bf, bitCount);
 
-    do
-    {
-        end = tr_rand_int_weak(bitCount);
-    }
-    while (end == begin);
-
-    /* ensure end <= begin */
-    if (end < begin)
-    {
-        int const tmp = begin;
-        begin = end;
-        end = tmp;
-    }
-
-    /* test the bitfield */
-    count1 = 0;
-
-    for (int i = begin; i < end; ++i)
-    {
-        if (tr_bitfieldHas(&bf, i))
+        for (int i = 0, n = tr_rand_int_weak(bitCount); i < n; ++i)
         {
-            ++count1;
+            tr_bitfieldAdd(&bf, tr_rand_int_weak(bitCount));
         }
+
+        begin = tr_rand_int_weak(bitCount);
+
+        do
+        {
+            end = tr_rand_int_weak(bitCount);
+        }
+        while (end == begin);
+
+        /* ensure end <= begin */
+        if (end < begin)
+        {
+            int const tmp = begin;
+            begin = end;
+            end = tmp;
+        }
+
+        /* test the bitfield */
+        count1 = 0;
+
+        for (int i = begin; i < end; ++i)
+        {
+            if (tr_bitfieldHas(&bf, i))
+            {
+                ++count1;
+            }
+        }
+
+        count2 = tr_bitfieldCountRange(&bf, begin, end);
+        EXPECT_EQ(count1, count2);
+
+        /* cleanup */
+        tr_bitfieldDestruct(&bf);
     }
-
-    count2 = tr_bitfieldCountRange(&bf, begin, end);
-    EXPECT_EQ(count1, count2);
-
-    /* cleanup */
-    tr_bitfieldDestruct(&bf);
 }
 
 TEST(Bitfields, bitfields)

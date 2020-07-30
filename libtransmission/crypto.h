@@ -6,7 +6,9 @@
  *
  */
 
-#pragma once
+// NB: crypto-test-ref.h needs this, so use it instead of #pragma once
+#ifndef TR_ENCRYPTION_H
+#define TR_ENCRYPTION_H
 
 #ifndef __TRANSMISSION__
 #error only libtransmission should #include this header.
@@ -79,3 +81,4 @@ bool tr_cryptoSecretKeySha1(tr_crypto const* crypto, void const* prepend_data, s
 }
 #endif
 
+#endif  // TR_ENCRYPTION_H
