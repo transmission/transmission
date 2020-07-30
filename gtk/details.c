@@ -2923,8 +2923,7 @@ static void details_free(gpointer gdata)
 GtkWidget* gtr_torrent_details_dialog_new(GtkWindow* parent, TrCore* core)
 {
     GtkWidget* d;
-    GtkWidget* n;
-    GtkWidget* v;
+    GtkWidget* n; GtkWidget* v;
     GtkWidget* w;
     GtkWidget* l;
     struct DetailsImpl* di = g_new0(struct DetailsImpl, 1);
@@ -2949,7 +2948,9 @@ GtkWidget* gtr_torrent_details_dialog_new(GtkWindow* parent, TrCore* core)
     gtk_window_set_role(GTK_WINDOW(d), "tr-info");
 
     /* return saved window size */
-    gtk_window_resize(d, gtr_pref_int_get(TR_KEY_details_window_width), gtr_pref_int_get(TR_KEY_details_window_height));
+    gtk_window_resize(GTK_WINDOW(d),
+        gtr_pref_int_get(TR_KEY_details_window_width),
+        gtr_pref_int_get(TR_KEY_details_window_height));
     g_signal_connect(d, "size-allocate", G_CALLBACK(on_details_window_size_allocated), NULL);
 
     g_signal_connect_swapped(d, "response", G_CALLBACK(gtk_widget_destroy), d);
