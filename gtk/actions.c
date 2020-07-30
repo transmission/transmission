@@ -95,7 +95,7 @@ static GtkActionEntry entries[] =
     { "pause-all-torrents", "media-playback-pause", N_("_Pause All"), NULL, N_("Pause all torrents"), G_CALLBACK(action_cb) },
     { "start-all-torrents", "media-playback-start", N_("_Start All"), NULL, N_("Start all torrents"), G_CALLBACK(action_cb) },
     { "relocate-torrent", NULL, N_("Set _Location…"), NULL, NULL, G_CALLBACK(action_cb) },
-    { "remove-torrent", "list-remove", N_("Remove torrent"), "Delete", G_CALLBACK(action_cb) },
+    { "remove-torrent", "list-remove", N_("Remove torrent"), "Delete", NULL, G_CALLBACK(action_cb) },
     { "delete-torrent", "edit-delete", N_("_Delete Files and Remove"), "<shift>Delete", NULL, G_CALLBACK(action_cb) },
     { "new-torrent", "document-new", N_("_New…"), NULL, N_("Create a torrent"), G_CALLBACK(action_cb) },
     { "quit", "application-exit", N_("_Quit"), NULL, NULL, G_CALLBACK(action_cb) },
