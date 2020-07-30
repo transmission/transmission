@@ -1,5 +1,10 @@
 project(libtr)
 
+if(ENABLE_TESTS)
+  include(GoogleTest)
+  add_subdirectory("${CMAKE_SOURCE_DIR}/third-party/googletest" "third-party/googletest")
+endif()
+
 configure_file(version.h.in version.h)
 
 set(THIRD_PARTY_SOURCES ConvertUTF.c jsonsl.c wildmat.c)
@@ -285,21 +290,14 @@ if(WIN32)
 endif()
 
 if(ENABLE_TESTS)
-    add_library(${TR_NAME}-test STATIC
-        libtransmission-test.c
-        libtransmission-test.h
-    )
-
-    target_link_libraries(${TR_NAME}-test ${TR_NAME})
-    set_property(TARGET ${TR_NAME}-test PROPERTY FOLDER "UnitTests")
-
     set(crypto-test_ADD_SOURCES crypto-test-ref.h)
     set(subprocess-test_ADD_SOURCES subprocess-test.cmd)
 
     set(watchdir@generic-test_DEFINITIONS WATCHDIR_TEST_FORCE_GENERIC)
 
-    foreach(T bitfield blocklist clients crypto error file history json magnet makemeta metainfo move peer-msgs quark rename rpc
-              session subprocess tr-getopt utils variant watchdir watchdir@generic)
+    #foreach(T error file history json magnet makemeta metainfo move peer-msgs quark rename rpc
+    #          session subprocess tr-getopt utils variant watchdir watchdir@generic)
+    foreach(T bitfield blocklist clients crypto)
         set(TP ${TR_NAME}-test-${T})
         if(T MATCHES "^([^@]+)@.+$")
             string(REPLACE "@" "-" TP "${TP}")
@@ -309,8 +307,8 @@ if(ENABLE_TESTS)
             set(T_NAME "${T}")
             set(${TP}_TEST_BASENAME "${T}")
         endif()
-        add_executable(${TP} ${${TP}_TEST_BASENAME}-test.c ${${T}-test_ADD_SOURCES})
-        target_link_libraries(${TP} ${TR_NAME} ${TR_NAME}-test)
+        add_executable(${TP} ${${TP}_TEST_BASENAME}-test.cc ${${T}-test_ADD_SOURCES})
+        target_link_libraries(${TP} gtest gtest_main ${TR_NAME})
         if(DEFINED ${T}-test_DEFINITIONS)
             target_compile_definitions(${TP} PRIVATE ${${T}-test_DEFINITIONS})
         endif()

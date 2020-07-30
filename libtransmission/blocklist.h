@@ -12,6 +12,11 @@
 #error only libtransmission should #include this header.
 #endif
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 struct tr_address;
 
 typedef struct tr_blocklistFile tr_blocklistFile;
@@ -33,3 +38,7 @@ void tr_blocklistFileSetEnabled(tr_blocklistFile* b, bool isEnabled);
 bool tr_blocklistFileHasAddress(tr_blocklistFile* b, struct tr_address const* addr);
 
 int tr_blocklistFileSetContent(tr_blocklistFile* b, char const* filename);
+
+#ifdef __cplusplus
+}
+#endif

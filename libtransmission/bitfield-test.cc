@@ -12,10 +12,9 @@
 #include "bitfield.h"
 #include "utils.h" /* tr_free */
 
-#include "libtransmission-test.h"
+#include "gtest/gtest.h"
 
-static int test_bitfield_count_range(void)
-{
+TEST(Bitfield, count_range) {
     int begin;
     int end;
     int count1;
@@ -59,14 +58,13 @@ static int test_bitfield_count_range(void)
     }
 
     count2 = tr_bitfieldCountRange(&bf, begin, end);
-    check_int(count1, ==, count2);
+    EXPECT_EQ(count1, count2);
 
     /* cleanup */
     tr_bitfieldDestruct(&bf);
-    return 0;
 }
 
-static int test_bitfields(void)
+TEST(Bitfields, bitfields)
 {
     unsigned int bitcount = 500;
     tr_bitfield field;
@@ -84,7 +82,7 @@ static int test_bitfields(void)
 
     for (unsigned int i = 0; i < bitcount; i++)
     {
-        check_bool(tr_bitfieldHas(&field, i), ==, (i % 7 == 0));
+        EXPECT_EQ(tr_bitfieldHas(&field, i), (i % 7 == 0));
     }
 
     /* test tr_bitfieldAddRange */
@@ -92,7 +90,7 @@ static int test_bitfields(void)
 
     for (unsigned int i = 0; i < bitcount; i++)
     {
-        check(tr_bitfieldHas(&field, i));
+        EXPECT_TRUE(tr_bitfieldHas(&field, i));
     }
 
     /* test tr_bitfieldRem */
@@ -106,7 +104,7 @@ static int test_bitfields(void)
 
     for (unsigned int i = 0; i < bitcount; i++)
     {
-        check_bool(tr_bitfieldHas(&field, i), ==, (i % 7 == 0));
+        EXPECT_EQ(tr_bitfieldHas(&field, i), (i % 7 == 0));
     }
 
     /* test tr_bitfieldRemRange in the middle of a boundary */
@@ -115,7 +113,7 @@ static int test_bitfields(void)
 
     for (unsigned int i = 0; i < 64; i++)
     {
-        check_bool(tr_bitfieldHas(&field, i), ==, (i < 4 || i >= 21));
+        EXPECT_EQ(tr_bitfieldHas(&field, i), (i < 4 || i >= 21));
     }
 
     /* test tr_bitfieldRemRange on the boundaries */
@@ -124,7 +122,7 @@ static int test_bitfields(void)
 
     for (unsigned int i = 0; i < 64; i++)
     {
-        check_bool(tr_bitfieldHas(&field, i), ==, (i < 8 || i >= 24));
+        EXPECT_EQ(tr_bitfieldHas(&field, i), (i < 8 || i >= 24));
     }
 
     /* test tr_bitfieldRemRange when begin & end is on the same word */
@@ -133,7 +131,7 @@ static int test_bitfields(void)
 
     for (unsigned int i = 0; i < 64; i++)
     {
-        check_bool(tr_bitfieldHas(&field, i), ==, (i < 4 || i >= 5));
+        EXPECT_EQ(tr_bitfieldHas(&field, i), (i < 4 || i >= 5));
     }
 
     /* test tr_bitfieldAddRange */
@@ -142,7 +140,7 @@ static int test_bitfields(void)
 
     for (unsigned int i = 0; i < 64; i++)
     {
-        check_bool(tr_bitfieldHas(&field, i), ==, (4 <= i && i < 21));
+        EXPECT_EQ(tr_bitfieldHas(&field, i), (4 <= i && i < 21));
     }
 
     /* test tr_bitfieldAddRange on the boundaries */
@@ -151,7 +149,7 @@ static int test_bitfields(void)
 
     for (unsigned int i = 0; i < 64; i++)
     {
-        check_bool(tr_bitfieldHas(&field, i), ==, (8 <= i && i < 24));
+        EXPECT_EQ(tr_bitfieldHas(&field, i), (8 <= i && i < 24));
     }
 
     /* test tr_bitfieldAddRange when begin & end is on the same word */
@@ -160,85 +158,61 @@ static int test_bitfields(void)
 
     for (unsigned int i = 0; i < 64; i++)
     {
-        check_bool(tr_bitfieldHas(&field, i), ==, (4 <= i && i < 5));
+        EXPECT_EQ(tr_bitfieldHas(&field, i), (4 <= i && i < 5));
     }
 
     tr_bitfieldDestruct(&field);
-    return 0;
 }
 
-static int test_bitfield_has_all_none(void)
+TEST(Bitfields, has_all_none)
 {
     tr_bitfield field;
 
     tr_bitfieldConstruct(&field, 3);
 
-    check(!tr_bitfieldHasAll(&field));
-    check(tr_bitfieldHasNone(&field));
+    EXPECT_TRUE(!tr_bitfieldHasAll(&field));
+    EXPECT_TRUE(tr_bitfieldHasNone(&field));
 
     tr_bitfieldAdd(&field, 0);
-    check(!tr_bitfieldHasAll(&field));
-    check(!tr_bitfieldHasNone(&field));
+    EXPECT_TRUE(!tr_bitfieldHasAll(&field));
+    EXPECT_TRUE(!tr_bitfieldHasNone(&field));
 
     tr_bitfieldRem(&field, 0);
     tr_bitfieldAdd(&field, 1);
-    check(!tr_bitfieldHasAll(&field));
-    check(!tr_bitfieldHasNone(&field));
+    EXPECT_TRUE(!tr_bitfieldHasAll(&field));
+    EXPECT_TRUE(!tr_bitfieldHasNone(&field));
 
     tr_bitfieldRem(&field, 1);
     tr_bitfieldAdd(&field, 2);
-    check(!tr_bitfieldHasAll(&field));
-    check(!tr_bitfieldHasNone(&field));
+    EXPECT_TRUE(!tr_bitfieldHasAll(&field));
+    EXPECT_TRUE(!tr_bitfieldHasNone(&field));
 
     tr_bitfieldAdd(&field, 0);
     tr_bitfieldAdd(&field, 1);
-    check(tr_bitfieldHasAll(&field));
-    check(!tr_bitfieldHasNone(&field));
+    EXPECT_TRUE(tr_bitfieldHasAll(&field));
+    EXPECT_TRUE(!tr_bitfieldHasNone(&field));
 
     tr_bitfieldSetHasNone(&field);
-    check(!tr_bitfieldHasAll(&field));
-    check(tr_bitfieldHasNone(&field));
+    EXPECT_TRUE(!tr_bitfieldHasAll(&field));
+    EXPECT_TRUE(tr_bitfieldHasNone(&field));
 
     tr_bitfieldSetHasAll(&field);
-    check(tr_bitfieldHasAll(&field));
-    check(!tr_bitfieldHasNone(&field));
+    EXPECT_TRUE(tr_bitfieldHasAll(&field));
+    EXPECT_TRUE(!tr_bitfieldHasNone(&field));
 
     tr_bitfieldDestruct(&field);
     tr_bitfieldConstruct(&field, 0);
 
-    check(!tr_bitfieldHasAll(&field));
-    check(!tr_bitfieldHasNone(&field));
+    EXPECT_TRUE(!tr_bitfieldHasAll(&field));
+    EXPECT_TRUE(!tr_bitfieldHasNone(&field));
 
     tr_bitfieldSetHasNone(&field);
-    check(!tr_bitfieldHasAll(&field));
-    check(tr_bitfieldHasNone(&field));
+    EXPECT_TRUE(!tr_bitfieldHasAll(&field));
+    EXPECT_TRUE(tr_bitfieldHasNone(&field));
 
     tr_bitfieldSetHasAll(&field);
-    check(tr_bitfieldHasAll(&field));
-    check(!tr_bitfieldHasNone(&field));
+    EXPECT_TRUE(tr_bitfieldHasAll(&field));
+    EXPECT_TRUE(!tr_bitfieldHasNone(&field));
 
     tr_bitfieldDestruct(&field);
-    return 0;
-}
-
-int main(void)
-{
-    testFunc const tests[] =
-    {
-        test_bitfields,
-        test_bitfield_has_all_none
-    };
-
-    int ret = runTests(tests, NUM_TESTS(tests));
-
-    /* bitfield count range */
-    for (int l = 0; l < 10000; ++l)
-    {
-        if (test_bitfield_count_range() != 0)
-        {
-            ++ret;
-        }
-    }
-
-    return ret;
 }

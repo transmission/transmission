@@ -12,6 +12,11 @@
 #error only libtransmission should #include this header.
 #endif
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 #include "net.h"
 #include "tr-assert.h"
 
@@ -47,3 +52,7 @@ static inline struct tr_peer_socket tr_peer_socket_utp_create(struct UTPSocket* 
     TR_ASSERT(handle != NULL);
     return (struct tr_peer_socket){ .type = TR_PEER_SOCKET_TYPE_UTP, .handle.utp = handle };
 }
+
+#ifdef __cplusplus
+}
+#endif

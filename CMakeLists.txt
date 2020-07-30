@@ -396,7 +396,6 @@ if(CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
         -Wmissing-format-attribute
         -Wpointer-arith
         -Wredundant-decls
-        -Wundef
         -Wunused-parameter
         -Wwrite-strings)
 
@@ -535,7 +534,8 @@ if(NOT CMAKE_VERSION VERSION_LESS "3.7.2")
 endif()
 
 if(ENABLE_TESTS)
-    enable_testing()
+  include(CTest)
+  enable_testing()
 endif()
 
 function(tr_install_web DST_DIR)

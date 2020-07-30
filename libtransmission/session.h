@@ -12,6 +12,11 @@
 #error only libtransmission should #include this header.
 #endif
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 #define TR_NAME "Transmission"
 
 #include "bandwidth.h"
@@ -320,3 +325,7 @@ bool tr_sessionGetActiveSpeedLimit_Bps(tr_session const* session, tr_direction d
 void tr_sessionGetNextQueuedTorrents(tr_session* session, tr_direction dir, size_t numwanted, tr_ptrArray* setme);
 
 int tr_sessionCountQueueFreeSlots(tr_session* session, tr_direction);
+
+#ifdef __cplusplus
+}
+#endif

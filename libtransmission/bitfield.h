@@ -8,6 +8,12 @@
 
 #pragma once
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+
 #ifndef __TRANSMISSION__
 #error only libtransmission should #include this header.
 #endif
@@ -91,3 +97,7 @@ static inline bool tr_bitfieldHasNone(tr_bitfield const* b)
 }
 
 bool tr_bitfieldHas(tr_bitfield const* b, size_t n);
+
+#ifdef __cplusplus
+}
+#endif

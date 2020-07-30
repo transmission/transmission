@@ -6,11 +6,15 @@
  *
  */
 
-#ifndef TR_ENCRYPTION_H
-#define TR_ENCRYPTION_H
+#pragma once
 
 #ifndef __TRANSMISSION__
 #error only libtransmission should #include this header.
+#endif
+
+#ifdef __cplusplus
+extern "C"
+{
 #endif
 
 #include <inttypes.h>
@@ -71,4 +75,7 @@ bool tr_cryptoSecretKeySha1(tr_crypto const* crypto, void const* prepend_data, s
 
 /* @} */
 
+#ifdef __cplusplus
+}
 #endif
+
