@@ -2923,7 +2923,8 @@ static void details_free(gpointer gdata)
 GtkWidget* gtr_torrent_details_dialog_new(GtkWindow* parent, TrCore* core)
 {
     GtkWidget* d;
-    GtkWidget* n; GtkWidget* v;
+    GtkWidget* n;
+    GtkWidget* v;
     GtkWidget* w;
     GtkWidget* l;
     struct DetailsImpl* di = g_new0(struct DetailsImpl, 1);
