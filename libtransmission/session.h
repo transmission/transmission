@@ -12,18 +12,16 @@
 #error only libtransmission should #include this header.
 #endif
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
 #define TR_NAME "Transmission"
 
 #include "bandwidth.h"
 #include "bitfield.h"
 #include "net.h"
+#include "tr-macros.h"
 #include "utils.h"
 #include "variant.h"
+
+TR_BEGIN_DECLS
 
 typedef enum
 {
@@ -326,6 +324,4 @@ void tr_sessionGetNextQueuedTorrents(tr_session* session, tr_direction dir, size
 
 int tr_sessionCountQueueFreeSlots(tr_session* session, tr_direction);
 
-#ifdef __cplusplus
-}
-#endif
+TR_END_DECLS

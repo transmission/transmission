@@ -26,11 +26,6 @@
 #error only libtransmission should #include this header.
 #endif
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
 #ifdef _WIN32
 #include <inttypes.h>
 #include <ws2tcpip.h>
@@ -39,6 +34,10 @@ extern "C"
 #include <sys/socket.h>
 #include <netinet/in.h>
 #endif
+
+#include "tr-macros.h"
+
+TR_BEGIN_DECLS
 
 #ifdef _WIN32
 typedef SOCKET tr_socket_t;
@@ -160,6 +159,4 @@ char* tr_net_strerror(char* buf, size_t buflen, int err);
 
 unsigned char const* tr_globalIPv6(void);
 
-#ifdef __cplusplus
-}
-#endif
+TR_END_DECLS

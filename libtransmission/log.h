@@ -11,12 +11,10 @@
 #include <stddef.h> /* size_t */
 
 #include "file.h" /* tr_sys_file_t */
+#include "tr-macros.h"
 #include "utils.h" /* TR_GNUC_PRINTF, TR_GNUC_NONNULL */
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
+TR_BEGIN_DECLS
 
 #define TR_LOG_MAX_QUEUE_LENGTH 10000
 
@@ -77,8 +75,6 @@ void tr_logAddDeep(char const* file, int line, char const* name, char const* fmt
 /** @brief set the buffer with the current time formatted for deep logging. */
 char* tr_logGetTimeStr(char* buf, size_t buflen) TR_GNUC_NONNULL(1);
 
-#ifdef __cplusplus
-}
-#endif
-
 /** @} */
+
+TR_END_DECLS

@@ -8,15 +8,13 @@
 
 #pragma once
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
-
 #ifndef __TRANSMISSION__
 #error only libtransmission should #include this header.
 #endif
+
+#include "tr-macros.h"
+
+TR_BEGIN_DECLS
 
 /**
  * @brief parse a peer-id into a human-readable client name and version number
@@ -24,6 +22,4 @@ extern "C"
  */
 char* tr_clientForId(char* buf, size_t buflen, void const* peer_id);
 
-#ifdef __cplusplus
-}
-#endif
+TR_END_DECLS

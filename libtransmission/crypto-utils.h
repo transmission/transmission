@@ -13,12 +13,10 @@
 #include <stddef.h>
 
 #include "transmission.h" /* SHA_DIGEST_LENGTH */
+#include "tr-macros.h"
 #include "utils.h" /* TR_GNUC_MALLOC, TR_GNUC_NULL_TERMINATED */
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
+TR_BEGIN_DECLS
 
 /**
 *** @addtogroup utils Utilities
@@ -208,8 +206,6 @@ static inline void tr_hex_to_sha1(uint8_t* sha1, char const* hex)
 
 /** @} */
 
-#ifdef __cplusplus
-}
-#endif
+TR_END_DECLS
 
 #endif /* TR_CRYPTO_UTILS_H */

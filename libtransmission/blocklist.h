@@ -12,10 +12,9 @@
 #error only libtransmission should #include this header.
 #endif
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
+#include "tr-macros.h"
+
+TR_BEGIN_DECLS
 
 struct tr_address;
 
@@ -39,6 +38,4 @@ bool tr_blocklistFileHasAddress(tr_blocklistFile* b, struct tr_address const* ad
 
 int tr_blocklistFileSetContent(tr_blocklistFile* b, char const* filename);
 
-#ifdef __cplusplus
-}
-#endif
+TR_END_DECLS

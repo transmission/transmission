@@ -13,10 +13,9 @@
 #include <stddef.h> /* size_t */
 #include <time.h> /* time_t */
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
+#include "tr-macros.h"
+
+TR_BEGIN_DECLS
 
 /***
 ****
@@ -422,12 +421,6 @@ char* tr_env_get_string(char const* key, char const* default_value);
 
 void tr_net_init(void);
 
-/***
-****
-***/
-
-#ifdef __cplusplus
-}
-#endif
-
 /** @} */
+
+TR_END_DECLS
