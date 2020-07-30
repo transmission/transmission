@@ -166,6 +166,10 @@ target_link_libraries(${TR_NAME}-gtk
     ${EVENT2_LIBRARIES}
 )
 
+if(NOT MSVC)
+    target_compile_options(${TR_NAME}-gtk PRIVATE -Wno-deprecated-declarations)
+endif()
+
 if(MSVC)
     tr_append_target_property(${TR_NAME}-gtk LINK_FLAGS "/ENTRY:mainCRTStartup")
 endif()
