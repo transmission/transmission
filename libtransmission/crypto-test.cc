@@ -6,7 +6,8 @@
  *
  */
 
-#include <string.h>
+#include <cstring>
+#include <unordered_set>
 
 #include "transmission.h"
 #include "crypto.h"
@@ -129,52 +130,41 @@ TEST(Crypto, ssha1)
 
     for (size_t i = 0; i < TR_N_ELEMENTS(test_data); ++i)
     {
-        char* const phrase = tr_strdup(test_data[i].plain_text);
-        char** hashes = tr_new(char*, HASH_COUNT);
+        std::unordered_set<std::string> hashes;
+        hashes.reserve(HASH_COUNT);
 
+        char* const phrase = tr_strdup(test_data[i].plain_text);
         EXPECT_TRUE(tr_ssha1_matches(test_data[i].ssha1, phrase));
         EXPECT_TRUE(tr_ssha1_matches_(test_data[i].ssha1, phrase));
 
         for (size_t j = 0; j < HASH_COUNT; ++j)
         {
-            hashes[j] = j % 2 == 0 ? tr_ssha1(phrase) : tr_ssha1_(phrase);
-            EXPECT_NE(nullptr, hashes[j]);
+            char* hash = (j % 2 == 0) ? tr_ssha1(phrase) : tr_ssha1_(phrase);
+            EXPECT_NE(nullptr, hash);
 
             /* phrase matches each of generated hashes */
-            EXPECT_TRUE(tr_ssha1_matches(hashes[j], phrase));
-            EXPECT_TRUE(tr_ssha1_matches_(hashes[j], phrase));
+            EXPECT_TRUE(tr_ssha1_matches(hash, phrase));
+            EXPECT_TRUE(tr_ssha1_matches_(hash, phrase));
+
+            hashes.insert(hash);
+            tr_free(hash);
         }
 
-        for (size_t j = 0; j < HASH_COUNT; ++j)
-        {
-            /* all hashes are different */
-            for (size_t k = 0; k < HASH_COUNT; ++k)
-            {
-                if (k != j)
-                {
-                    EXPECT_STRNE(hashes[j], hashes[k]);
-                }
-            }
-        }
+        // confirm all hashes are different
+        EXPECT_EQ(HASH_COUNT, std::size(hashes));
 
         /* exchange two first chars */
         phrase[0] ^= phrase[1];
         phrase[1] ^= phrase[0];
         phrase[0] ^= phrase[1];
 
-        for (size_t j = 0; j < HASH_COUNT; ++j)
+        for (auto const& hash : hashes)
         {
             /* changed phrase doesn't match the hashes */
-            EXPECT_FALSE(tr_ssha1_matches(hashes[j], phrase));
-            EXPECT_FALSE(tr_ssha1_matches_(hashes[j], phrase));
+            EXPECT_FALSE(tr_ssha1_matches(hash.c_str(), phrase));
+            EXPECT_FALSE(tr_ssha1_matches_(hash.c_str(), phrase));
         }
 
-        for (size_t j = 0; j < HASH_COUNT; ++j)
-        {
-            tr_free(hashes[j]);
-        }
-
-        tr_free(hashes);
         tr_free(phrase);
     }
 
