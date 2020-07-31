@@ -294,7 +294,18 @@ if(ENABLE_TESTS)
     set(subprocess-test_ADD_SOURCES subprocess-test.cmd)
     set(watchdir@generic-test_DEFINITIONS WATCHDIR_TEST_FORCE_GENERIC)
 
-    foreach(T bitfield blocklist clients crypto error file history json session)
+    foreach(T
+        bitfield
+        blocklist
+        clients
+        crypto
+        error
+        file
+        history
+        json
+        makemeta
+        session
+        )
         set(TP ${TR_NAME}-test-${T})
         if(T MATCHES "^([^@]+)@.+$")
             string(REPLACE "@" "-" TP "${TP}")
@@ -335,7 +346,7 @@ if(ENABLE_TESTS)
 
     set(watchdir@generic-test_DEFINITIONS WATCHDIR_TEST_FORCE_GENERIC)
 
-    foreach(T magnet makemeta metainfo move peer-msgs quark rename rpc
+    foreach(T magnet metainfo move peer-msgs quark rename rpc
               subprocess tr-getopt utils variant watchdir watchdir@generic)
         set(TP ${TR_NAME}-test-${T})
         if(T MATCHES "^([^@]+)@.+$")

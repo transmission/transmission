@@ -81,6 +81,51 @@ private:
   }
 
 protected:
+  void build_parent_dir(char const* path)
+  {
+    char* dir;
+    tr_error* error = nullptr;
+    int const tmperr = errno;
+
+    dir = tr_sys_path_dirname(path, nullptr);
+    tr_sys_dir_create(dir, TR_SYS_DIR_CREATE_PARENTS, 0700, &error);
+    EXPECT_EQ(nullptr, error);
+    tr_free(dir);
+
+    errno = tmperr;
+  }
+
+  void create_tmpfile_with_contents(char* tmpl, void const* payload, size_t n)
+  {
+      int const tmperr = errno;
+
+      build_parent_dir(tmpl);
+
+      auto fd = tr_sys_file_open_temp(tmpl, nullptr);
+
+      uint64_t n_left = n;
+      while (n_left > 0)
+      {
+          uint64_t n;
+
+          tr_error* error = nullptr;
+          if (!tr_sys_file_write(fd, payload, n_left, &n, &error))
+          {
+              fprintf(stderr, "Error writing '%s': %s\n", tmpl, error->message);
+              tr_error_free(error);
+              break;
+          }
+
+          n_left -= n;
+      }
+
+      tr_sys_file_close(fd, nullptr);
+
+      sync();
+
+      errno = tmperr;
+  }
+
   bool verbose = false;
   char* sandbox_ = {};
 
@@ -211,20 +256,6 @@ class SessionTest : public SandboxedTest
   {
     tr_sessionClose(session);
     tr_logFreeQueue(tr_logGetQueue());
-  }
-
-  void build_parent_dir(char const* path)
-  {
-    char* dir;
-    tr_error* error = nullptr;
-    int const tmperr = errno;
-
-    dir = tr_sys_path_dirname(path, nullptr);
-    tr_sys_dir_create(dir, TR_SYS_DIR_CREATE_PARENTS, 0700, &error);
-    EXPECT_EQ(nullptr, error);
-    tr_free(dir);
-
-    errno = tmperr;
   }
 
 protected:
@@ -432,37 +463,6 @@ void libttest_blockingTorrentVerify(tr_torrent* tor)
     }
 }
 
-void libtest_create_tmpfile_with_contents(char* tmpl, void const* payload, size_t n)
-{
-    tr_sys_file_t fd;
-    int const tmperr = errno;
-    uint64_t n_left = n;
-    tr_error* error = nullptr;
-
-    build_parent_dir(tmpl);
-
-    fd = tr_sys_file_open_temp(tmpl, nullptr);
-
-    while (n_left > 0)
-    {
-        uint64_t n;
-
-        if (!tr_sys_file_write(fd, payload, n_left, &n, &error))
-        {
-            fprintf(stderr, "Error writing '%s': %s\n", tmpl, error->message);
-            tr_error_free(error);
-            break;
-        }
-
-        n_left -= n;
-    }
-
-    tr_sys_file_close(fd, nullptr);
-
-    libttest_sync();
-
-    errno = tmperr;
-}
 
 void libttest_sync(void)
 {
