@@ -301,6 +301,7 @@ if(ENABLE_TESTS)
         crypto
         error
         file
+        getopt
         history
         json
         magnet
@@ -352,7 +353,7 @@ if(ENABLE_TESTS)
     set(watchdir@generic-test_DEFINITIONS WATCHDIR_TEST_FORCE_GENERIC)
 
     foreach(T move rename rpc
-              subprocess tr-getopt utils watchdir watchdir@generic)
+              subprocess utils watchdir watchdir@generic)
         set(TP ${TR_NAME}-test-${T})
         if(T MATCHES "^([^@]+)@.+$")
             string(REPLACE "@" "-" TP "${TP}")
