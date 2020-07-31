@@ -305,6 +305,7 @@ if(ENABLE_TESTS)
         json
         makemeta
         metainfo
+        quark
         session
         )
         set(TP ${TR_NAME}-test-${T})
@@ -347,7 +348,7 @@ if(ENABLE_TESTS)
 
     set(watchdir@generic-test_DEFINITIONS WATCHDIR_TEST_FORCE_GENERIC)
 
-    foreach(T magnet move peer-msgs quark rename rpc
+    foreach(T magnet move peer-msgs rename rpc
               subprocess tr-getopt utils variant watchdir watchdir@generic)
         set(TP ${TR_NAME}-test-${T})
         if(T MATCHES "^([^@]+)@.+$")
