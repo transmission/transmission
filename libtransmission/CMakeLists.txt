@@ -309,6 +309,7 @@ if(ENABLE_TESTS)
         peer-msgs
         quark
         session
+        variant
         )
         set(TP ${TR_NAME}-test-${T})
         if(T MATCHES "^([^@]+)@.+$")
@@ -351,7 +352,7 @@ if(ENABLE_TESTS)
     set(watchdir@generic-test_DEFINITIONS WATCHDIR_TEST_FORCE_GENERIC)
 
     foreach(T move rename rpc
-              subprocess tr-getopt utils variant watchdir watchdir@generic)
+              subprocess tr-getopt utils watchdir watchdir@generic)
         set(TP ${TR_NAME}-test-${T})
         if(T MATCHES "^([^@]+)@.+$")
             string(REPLACE "@" "-" TP "${TP}")
