@@ -8,9 +8,11 @@
 
 #include <string>
 
-#include "file.h"
 #include "error.h"
+#include "file.h"
+#include "quark.h"
 #include "utils.h"
+#include "variant.h"
 
 #include "gtest/gtest.h"
 
@@ -126,10 +128,9 @@ class SessionTest : public SandboxedTest
     size_t len;
     char const* str;
     char* path;
-    tr_quark q;
     static bool formatters_inited = false;
-    tr_variant local_settings;
 
+    tr_variant local_settings;
     tr_variantInitDict(&local_settings, 10);
 
     if (settings == nullptr)
@@ -146,7 +147,7 @@ class SessionTest : public SandboxedTest
     }
 
     /* download dir */
-    q = TR_KEY_download_dir;
+    auto q = TR_KEY_download_dir;
 
     if (tr_variantDictFindStr(settings, q, &str, &len))
     {
@@ -212,7 +213,42 @@ class SessionTest : public SandboxedTest
     tr_logFreeQueue(tr_logGetQueue());
   }
 
+  void build_parent_dir(char const* path)
+  {
+    char* dir;
+    tr_error* error = nullptr;
+    int const tmperr = errno;
+
+    dir = tr_sys_path_dirname(path, nullptr);
+    tr_sys_dir_create(dir, TR_SYS_DIR_CREATE_PARENTS, 0700, &error);
+    EXPECT_EQ(nullptr, error);
+    tr_free(dir);
+
+    errno = tmperr;
+  }
+
 protected:
+
+  void create_file_with_contents(char const* path, void const* payload, size_t n)
+  {
+    tr_sys_file_t fd;
+    int const tmperr = errno;
+
+    build_parent_dir(path);
+
+    fd = tr_sys_file_open(path, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE, 0600, nullptr);
+    tr_sys_file_write(fd, payload, n, nullptr, nullptr);
+    tr_sys_file_close(fd, nullptr);
+
+    sync();
+
+    errno = tmperr;
+  }
+
+  void create_file_with_string_contents(char const* path, char const* str)
+  {
+    create_file_with_contents(path, str, strlen(str));
+  }
 
   tr_session* session_ = nullptr;
 
@@ -394,41 +430,6 @@ void libttest_blockingTorrentVerify(tr_torrent* tor)
     {
         tr_wait_msec(10);
     }
-}
-
-static void build_parent_dir(char const* path)
-{
-    char* dir;
-    tr_error* error = nullptr;
-    int const tmperr = errno;
-
-    dir = tr_sys_path_dirname(path, nullptr);
-    tr_sys_dir_create(dir, TR_SYS_DIR_CREATE_PARENTS, 0700, &error);
-    TR_ASSERT(error == nullptr);
-    tr_free(dir);
-
-    errno = tmperr;
-}
-
-void libtest_create_file_with_contents(char const* path, void const* payload, size_t n)
-{
-    tr_sys_file_t fd;
-    int const tmperr = errno;
-
-    build_parent_dir(path);
-
-    fd = tr_sys_file_open(path, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE, 0600, nullptr);
-    tr_sys_file_write(fd, payload, n, nullptr, nullptr);
-    tr_sys_file_close(fd, nullptr);
-
-    libttest_sync();
-
-    errno = tmperr;
-}
-
-void libtest_create_file_with_string_contents(char const* path, char const* str)
-{
-    libtest_create_file_with_contents(path, str, strlen(str));
 }
 
 void libtest_create_tmpfile_with_contents(char* tmpl, void const* payload, size_t n)
