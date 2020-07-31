@@ -718,6 +718,7 @@ void tr_sessionSetTorrentDoneScript(tr_session*, char const* scriptFilename);
 
 typedef enum
 {
+    TR_LOG_SILENT = 0,
     TR_LOG_ERROR = 1,
     TR_LOG_INFO = 2,
     TR_LOG_DEBUG = 3,
