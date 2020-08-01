@@ -108,6 +108,8 @@ static int test_session_get_and_set(void)
     check_ptr(tr_variantDictFind(args, TR_KEY_dht_enabled), !=, NULL);
     check_ptr(tr_variantDictFind(args, TR_KEY_download_dir), !=, NULL);
     check_ptr(tr_variantDictFind(args, TR_KEY_download_dir_free_space), !=, NULL);
+    check_ptr(tr_variantDictFind(args, TR_KEY_download_dir_dynamic_enabled), !=, NULL);
+    check_ptr(tr_variantDictFind(args, TR_KEY_download_dir_dynamic_table), !=, NULL);
     check_ptr(tr_variantDictFind(args, TR_KEY_download_queue_enabled), !=, NULL);
     check_ptr(tr_variantDictFind(args, TR_KEY_download_queue_size), !=, NULL);
     check_ptr(tr_variantDictFind(args, TR_KEY_encryption), !=, NULL);

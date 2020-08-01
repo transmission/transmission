@@ -200,6 +200,8 @@ void Session::updatePref(int key)
             break;
 
         case Prefs::DOWNLOAD_DIR:
+        case Prefs::DOWNLOAD_DIR_DYNAMIC_ENABLED:
+        case Prefs::DOWNLOAD_DIR_DYNAMIC_TABLE:
             sessionSet(prefs_.getKey(key), prefs_.variant(key));
             /* this will change the 'freespace' argument, so refresh */
             refreshSessionInfo();
@@ -954,6 +956,13 @@ void Session::addTorrent(AddData const& add_me, tr_variant* args, bool trash_ori
         dictAdd(args, TR_KEY_paused, !prefs_.getBool(Prefs::START));
     }
 
+    if (tr_variantDictFind(args, TR_KEY_download_dir) == nullptr)
+    {
+        auto const new_download_dir = Utils::getDynamicDownloadDir(prefs_, add_me.readableShortName());
+
+        tr_variantDictAddStr(args, TR_KEY_download_dir, new_download_dir.toUtf8().constData());
+    }
+
     switch (add_me.type)
     {
     case AddData::MAGNET:
@@ -1025,7 +1034,7 @@ void Session::addTorrent(AddData const& add_me, tr_variant* args, bool trash_ori
 void Session::addTorrent(AddData const& add_me)
 {
     tr_variant args;
-    tr_variantInitDict(&args, 3);
+    tr_variantInitDict(&args, 4);
 
     addTorrent(add_me, &args, prefs_.getBool(Prefs::TRASH_ORIGINAL));
 }

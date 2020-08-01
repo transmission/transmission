@@ -38,6 +38,7 @@
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h> // tr_formatter
 
+#include "Prefs.h"
 #include "Utils.h"
 
 /***
@@ -300,4 +301,32 @@ QColor Utils::getFadedColor(QColor const& color)
     QColor faded_color(color);
     faded_color.setAlpha(128);
     return faded_color;
+}
+
+QString Utils::getDynamicDownloadDir(Prefs const& prefs, QString const& torrentName)
+{
+    if (prefs.getBool(Prefs::DOWNLOAD_DIR_DYNAMIC_ENABLED))
+    {
+        auto const filter_table = prefs.getString(Prefs::DOWNLOAD_DIR_DYNAMIC_TABLE);
+        auto const rows = filter_table.split(QStringLiteral(";"));
+
+        for (auto const& row : rows)
+        {
+            auto const column = row.split(QStringLiteral(","));
+
+            auto const& expression = column[1];
+            auto const& path = column[2];
+
+            QRegularExpression rg(expression);
+
+            auto const match = rg.match(torrentName);
+
+            if (match.hasPartialMatch() || match.hasMatch())
+            {
+                return Utils::removeTrailingDirSeparator(path);
+            }
+        }
+    }
+
+    return {};
 }

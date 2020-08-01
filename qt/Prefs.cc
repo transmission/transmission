@@ -84,6 +84,8 @@ std::array<Prefs::PrefItem, Prefs::PREFS_COUNT> const Prefs::Items
     { DSPEED, TR_KEY_speed_limit_down, QVariant::Int },
     { DSPEED_ENABLED, TR_KEY_speed_limit_down_enabled, QVariant::Bool },
     { DOWNLOAD_DIR, TR_KEY_download_dir, QVariant::String },
+    { DOWNLOAD_DIR_DYNAMIC_ENABLED, TR_KEY_download_dir_dynamic_enabled, QVariant::Bool },
+    { DOWNLOAD_DIR_DYNAMIC_TABLE, TR_KEY_download_dir_dynamic_table, QVariant::String },
     { DOWNLOAD_QUEUE_ENABLED, TR_KEY_download_queue_enabled, QVariant::Bool },
     { DOWNLOAD_QUEUE_SIZE, TR_KEY_download_queue_size, QVariant::Int },
     { ENCRYPTION, TR_KEY_encryption, QVariant::Int },

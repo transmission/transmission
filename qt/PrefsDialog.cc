@@ -19,6 +19,7 @@
 #include <QCoreApplication>
 #include <QDialogButtonBox>
 #include <QDoubleSpinBox>
+#include <QFileDialog>
 #include <QFileIconProvider>
 #include <QFileInfo>
 #include <QHBoxLayout>
@@ -33,7 +34,9 @@
 #include <QTime>
 #include <QTimeEdit>
 #include <QTimer>
+#include <QLineEdit>
 #include <QVBoxLayout>
+#include <QItemDelegate>
 
 #include "ColumnResizer.h"
 #include "FreeSpaceLabel.h"
@@ -160,6 +163,219 @@ QString qtDayName(int day)
 
 } // namespace
 
+FilterDataModel::FilterDataModel(QObject* parent) :
+    QAbstractTableModel{parent}
+{
+}
+
+int FilterDataModel::rowCount(QModelIndex const& index) const
+{
+    (void)index;
+
+    return data_.count();
+}
+
+int FilterDataModel::columnCount(QModelIndex const& index) const
+{
+    (void)index;
+
+    return Columns::ColumnCount;
+}
+
+bool FilterDataModel::setData(QModelIndex const& index, QVariant const& value, int role)
+{
+    if (role != Qt::EditRole)
+    {
+        return false;
+    }
+
+    auto& filter = data_[index.row()];
+
+    switch (index.column())
+    {
+    case Columns::Name:
+        filter.name = value.toString();
+        break;
+
+    case Columns::Expression:
+        filter.expression = value.toString();
+        break;
+
+    case Columns::Destination:
+        filter.destination = value.toString();
+        break;
+
+    default:
+        return false;
+    }
+
+    return true;
+}
+
+QVariant FilterDataModel::data(QModelIndex const& index, int role) const
+{
+    if (role != Qt::DisplayRole && role != Qt::EditRole)
+    {
+        return {};
+    }
+
+    auto const& filter = data_[index.row()];
+
+    switch (index.column())
+    {
+    case Columns::Name:
+        return filter.name;
+
+    case Columns::Expression:
+        return filter.expression;
+
+    case Columns::Destination:
+        return filter.destination;
+
+    default:
+        return {};
+    }
+}
+
+QVariant FilterDataModel::headerData(int section, Qt::Orientation orientation, int role) const
+{
+    if (orientation != Qt::Horizontal || role != Qt::DisplayRole)
+    {
+        return {};
+    }
+
+    switch (section)
+    {
+    case Columns::Name:
+        return tr("Name");
+
+    case Columns::Expression:
+        return tr("Expression");
+
+    case Columns::Destination:
+        return tr("Destination");
+
+    default:
+        return {};
+    }
+}
+
+Qt::ItemFlags FilterDataModel::flags(QModelIndex const& index) const
+{
+    (void)index;
+
+    return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
+}
+
+void FilterDataModel::append(FilterData const& filter)
+{
+    beginInsertRows({}, data_.count(), data_.count());
+    data_.append(filter);
+    endInsertRows();
+}
+
+void FilterDataModel::removeRow(int row)
+{
+    beginRemoveRows({}, row, row + data_.count() - 1);
+    data_.removeAt(row);
+    endRemoveRows();
+}
+
+FilterData const& FilterDataModel::getLastElement() const
+{
+    return data_.back();
+}
+
+QList<FilterData> FilterDataModel::getData() const
+{
+    return data_;
+}
+
+class PathColumnDelegate : public QItemDelegate
+{
+public:
+    explicit PathColumnDelegate(PrefsDialog* parent) :
+        QItemDelegate(parent),
+        prefs_dialog_(parent)
+    {}
+
+    QWidget* createEditor(QWidget* parent, QStyleOptionViewItem const& option, QModelIndex const& index) const override
+    {
+        (void)option;
+
+        switch (index.column())
+        {
+        case FilterDataModel::Columns::Name:
+        case FilterDataModel::Columns::Expression:
+            {
+                auto* const line_edit = new QLineEdit(parent);
+                line_edit->setText(index.model()->data(index).toString());
+
+                return line_edit;
+            }
+
+        case FilterDataModel::Columns::Destination:
+            {
+                auto const selected_folder = QFileDialog::getExistingDirectory(parent, tr(
+                    "Select destination folder"), QDir::currentPath());
+                auto* const label = new QLabel(parent);
+
+                if (!selected_folder.isEmpty())
+                {
+                    label->setText(selected_folder);
+                }
+
+                return label;
+            }
+
+        default:
+            assert(false && "Unknown dynamic download dir table column");
+        }
+
+        return {};
+    }
+
+    void setModelData(QWidget* editor, QAbstractItemModel* model, QModelIndex const& index) const override
+    {
+        QString new_data;
+
+        switch (index.column())
+        {
+        case FilterDataModel::Columns::Name:
+        case FilterDataModel::Columns::Expression:
+            {
+                auto* const line_edit = static_cast<QLineEdit*>(editor);
+                new_data = line_edit->text();
+                break;
+            }
+
+        case FilterDataModel::Columns::Destination:
+            {
+                auto* const label = static_cast<QLabel*>(editor);
+                new_data = label->text();
+                break;
+            }
+        }
+
+        if (index.model()->data(index).toString().isEmpty() || !new_data.isEmpty())
+        {
+            model->setData(index, new_data, Qt::EditRole);
+        }
+
+        prefs_dialog_->saveModel();
+    }
+
+    void updateEditorGeometry(QWidget* editor, QStyleOptionViewItem const& option, QModelIndex const& index) const override
+    {
+        (void)index;
+
+        editor->setGeometry(option.rect);
+    }
+
+private:
+    PrefsDialog* prefs_dialog_;
+};
+
 bool PrefsDialog::updateWidgetValue(QWidget* widget, int pref_key)
 {
     PreferenceWidget pref_widget(widget);
@@ -237,6 +453,39 @@ void PrefsDialog::checkBoxToggled(bool checked)
     if (pref_widget.is<QCheckBox>())
     {
         setPref(pref_widget.getPrefKey(), checked);
+
+        if (pref_widget.getPrefKey() == Prefs::DOWNLOAD_DIR_DYNAMIC_ENABLED)
+        {
+            toggleDynamicTableGroup(checked);
+        }
+    }
+}
+
+void PrefsDialog::addDynamicDirButtonClicked()
+{
+    if (filter_data_model_.rowCount({}) != 0)
+    {
+        auto const& last_element = filter_data_model_.getLastElement();
+
+        if (last_element.name.isEmpty() ||
+            last_element.expression.isEmpty() ||
+            last_element.destination.isEmpty())
+        {
+            return;
+        }
+    }
+
+    filter_data_model_.append({ QString{}, QString{}, tr("...") });
+}
+
+void PrefsDialog::removeDynamicDirButtonClicked()
+{
+    auto const selected_rows = ui_.dynamicLocationsTable->selectionModel()->selectedRows();
+
+    for (auto i = 0; i < selected_rows.count(); i++)
+    {
+        QModelIndex index = selected_rows.at(i);
+        filter_data_model_.removeRow(index.row());
     }
 }
 
@@ -529,6 +778,36 @@ void PrefsDialog::onQueueStalledMinutesChanged()
     }
 }
 
+void PrefsDialog::initFilterDataModel()
+{
+    auto const saved_dynamic_dir_table_str = prefs_.getString(Prefs::DOWNLOAD_DIR_DYNAMIC_TABLE);
+
+    auto const rows = saved_dynamic_dir_table_str.split(QStringLiteral(";"));
+
+    for (auto const& row : rows)
+    {
+        auto const columns = row.split(QStringLiteral(","));
+
+        if (columns.size() != FilterDataModel::Columns::ColumnCount)
+        {
+            continue;
+        }
+
+        auto const& name = columns[FilterDataModel::Columns::Name];
+        auto const& expression = columns[FilterDataModel::Columns::Expression];
+        auto const& destination = columns[FilterDataModel::Columns::Destination];
+
+        filter_data_model_.append({ name, expression, destination });
+    }
+}
+
+void PrefsDialog::toggleDynamicTableGroup(bool state)
+{
+    ui_.dynamicLocationsTable->setEnabled(state);
+    ui_.addDynamicLocationButton->setEnabled(state);
+    ui_.removeDynamicLocationButton->setEnabled(state);
+}
+
 void PrefsDialog::initDownloadingTab()
 {
     ui_.watchDirButton->setMode(PathButton::DirectoryMode);
@@ -552,6 +831,7 @@ void PrefsDialog::initDownloadingTab()
     linkWidgetToPref(ui_.showTorrentOptionsDialogCheck, Prefs::OPTIONS_PROMPT);
     linkWidgetToPref(ui_.startAddedTorrentsCheck, Prefs::START);
     linkWidgetToPref(ui_.trashTorrentFileCheck, Prefs::TRASH_ORIGINAL);
+    linkWidgetToPref(ui_.downloadDirDynamicCheck, Prefs::DOWNLOAD_DIR_DYNAMIC_ENABLED);
     linkWidgetToPref(ui_.downloadDirButton, Prefs::DOWNLOAD_DIR);
     linkWidgetToPref(ui_.downloadDirEdit, Prefs::DOWNLOAD_DIR);
     linkWidgetToPref(ui_.downloadDirFreeSpaceLabel, Prefs::DOWNLOAD_DIR);
@@ -571,7 +851,15 @@ void PrefsDialog::initDownloadingTab()
     cr->addLayout(ui_.incompleteSectionLayout);
     cr->update();
 
+    initFilterDataModel();
+
+    ui_.dynamicLocationsTable->setModel(&filter_data_model_);
+    ui_.dynamicLocationsTable->setItemDelegate(new PathColumnDelegate(this));
+    ui_.dynamicLocationsTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+
     connect(ui_.queueStalledMinutesSpin, SIGNAL(valueChanged(int)), SLOT(onQueueStalledMinutesChanged()));
+    connect(ui_.addDynamicLocationButton, SIGNAL(clicked()), SLOT(addDynamicDirButtonClicked()));
+    connect(ui_.removeDynamicLocationButton, SIGNAL(clicked()), SLOT(removeDynamicDirButtonClicked()));
 
     updateDownloadingWidgetsLocality();
     onQueueStalledMinutesChanged();
@@ -602,7 +890,8 @@ PrefsDialog::PrefsDialog(Session& session, Prefs& prefs, QWidget* parent) :
     session_(session),
     prefs_(prefs),
     is_server_(session.isServer()),
-    is_local_(session_.isLocal())
+    is_local_(session_.isLocal()),
+    filter_data_model_(this)
 {
     ui_.setupUi(this);
 
@@ -616,7 +905,7 @@ PrefsDialog::PrefsDialog(Session& session, Prefs& prefs, QWidget* parent) :
 
     connect(&session_, SIGNAL(sessionUpdated()), SLOT(sessionUpdated()));
 
-    static std::array<int, 10> constexpr InitKeys =
+    static std::array<int, 11> constexpr InitKeys =
     {
         Prefs::ALT_SPEED_LIMIT_ENABLED,
         Prefs::ALT_SPEED_LIMIT_TIME_ENABLED,
@@ -627,7 +916,8 @@ PrefsDialog::PrefsDialog(Session& session, Prefs& prefs, QWidget* parent) :
         Prefs::INCOMPLETE_DIR,
         Prefs::INCOMPLETE_DIR_ENABLED,
         Prefs::RPC_ENABLED,
-        Prefs::SCRIPT_TORRENT_DONE_FILENAME
+        Prefs::SCRIPT_TORRENT_DONE_FILENAME,
+        Prefs::DOWNLOAD_DIR_DYNAMIC_ENABLED
     };
 
     for (auto const key : InitKeys)
@@ -647,6 +937,25 @@ PrefsDialog::PrefsDialog(Session& session, Prefs& prefs, QWidget* parent) :
     }
 
     adjustSize();
+}
+
+void PrefsDialog::saveModel()
+{
+    auto const model_data = filter_data_model_.getData();
+
+    QStringList rows;
+
+    for (auto const& filter : model_data)
+    {
+        QStringList columns;
+        columns << filter.name << filter.expression << filter.destination;
+
+        rows << columns.join(QStringLiteral(","));
+    }
+
+    auto const dynamic_table = rows.join(QStringLiteral(";"));
+
+    setPref(Prefs::DOWNLOAD_DIR_DYNAMIC_TABLE, dynamic_table);
 }
 
 void PrefsDialog::setPref(int key, QVariant const& v)
@@ -736,6 +1045,14 @@ void PrefsDialog::refreshPref(int key)
         ui_.peerPortStatusLabel->setText(tr("Status unknown"));
         ui_.testPeerPortButton->setEnabled(true);
         break;
+
+    case Prefs::DOWNLOAD_DIR_DYNAMIC_ENABLED:
+        {
+            bool const state = prefs_.getBool(key);
+            toggleDynamicTableGroup(state);
+
+            break;
+        }
 
     default:
         break;
