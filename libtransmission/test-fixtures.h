@@ -6,6 +6,7 @@
  *
  */
 
+#include <memory>
 #include <string>
 
 #include "error.h"
@@ -15,6 +16,27 @@
 #include "variant.h"
 
 #include "gtest/gtest.h"
+
+namespace libtransmission::test
+{
+    struct UniqueCStrDeleter {
+        void operator()(char* s) const { tr_free(s); };
+    };
+    
+    auto constexpr unique_cstr_deleter = UniqueCStrDeleter {};
+    
+    auto constexpr make_unique_cstr = [](char* s){
+      return std::unique_ptr<char, UniqueCStrDeleter>(s, unique_cstr_deleter);
+    };
+
+    auto constexpr make_string = [](char*&& s) {
+      auto const ret = std::string(s);
+      tr_free(s);
+      return ret;
+    };
+
+}  // namespace libtransmission::test
+
 
 class SandboxedTest : public ::testing::Test
 {

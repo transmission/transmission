@@ -32,16 +32,18 @@
 #define NATIVE_PATH_SEP "\\"
 #endif
 
+using ::libtransmission::test::make_string;
+
 class FileTest: public SessionTest
 {
 protected:
 
   // static tr_session* session;
 
-    char* create_test_dir(char const* name)
+    auto create_test_dir(char const* name)
     {
-        char* const test_dir = tr_buildPath(tr_sessionGetConfigDir(session_), name, nullptr);
-        tr_sys_dir_create(test_dir, 0, 0777, nullptr);
+        auto const test_dir = make_string(tr_buildPath(tr_sessionGetConfigDir(session_), name, nullptr));
+        tr_sys_dir_create(std::data(test_dir), 0, 0777, nullptr);
         return test_dir;
     }
 
@@ -54,15 +56,10 @@ protected:
         return symlink(src_path, dst_path) != -1;
 
 #else
+        wchar_t* wide_src_path = tr_win32_utf8_to_native(src_path, -1);
+        wchar_t* wide_dst_path = tr_win32_utf8_to_native(dst_path, -1);
 
-        wchar_t* wide_src_path;
-        wchar_t* wide_dst_path;
-        bool ret = false;
-
-        wide_src_path = tr_win32_utf8_to_native(src_path, -1);
-        wide_dst_path = tr_win32_utf8_to_native(dst_path, -1);
-
-        ret = CreateSymbolicLinkW(wide_dst_path, wide_src_path, dst_is_dir ? SYMBOLIC_LINK_FLAG_DIRECTORY : 0);
+        auto const ret = CreateSymbolicLinkW(wide_dst_path, wide_src_path, dst_is_dir ? SYMBOLIC_LINK_FLAG_DIRECTORY : 0);
 
         tr_free(wide_dst_path);
         tr_free(wide_src_path);
@@ -83,7 +80,7 @@ protected:
         wchar_t* wide_src_path = tr_win32_utf8_to_native(src_path, -1);
         wchar_t* wide_dst_path = tr_win32_utf8_to_native(dst_path, -1);
 
-        bool ret = CreateHardLinkW(wide_dst_path, wide_src_path, nullptr);
+        auto const ret = CreateHardLinkW(wide_dst_path, wide_src_path, nullptr);
 
         tr_free(wide_dst_path);
         tr_free(wide_src_path);
@@ -107,7 +104,6 @@ protected:
         while (*p != '\0')
         {
             tr_sys_path_info info;
-            char* pathPart;
             char const* slashPos = strchr(p, '/');
 
 #ifdef _WIN32
@@ -126,16 +122,13 @@ protected:
                 slashPos = p + strlen(p) - 1;
             }
 
-            pathPart = tr_strndup(path, (size_t)(slashPos - path + 1));
+            auto const pathPart = make_string(tr_strndup(path, (size_t)(slashPos - path + 1)));
 
-            if (!tr_sys_path_get_info(pathPart, TR_SYS_PATH_NO_FOLLOW, &info, nullptr) ||
+            if (!tr_sys_path_get_info(pathPart.c_str(), TR_SYS_PATH_NO_FOLLOW, &info, nullptr) ||
                 (info.type != TR_SYS_PATH_IS_FILE && info.type != TR_SYS_PATH_IS_DIRECTORY))
             {
-                tr_free(pathPart);
                 return false;
             }
-
-            tr_free(pathPart);
 
             p = slashPos + 1;
         }
@@ -190,12 +183,12 @@ protected:
         }
     }
 
-    static void test_dir_read_impl(char const* path, bool* have1, bool* have2)
+    static void test_dir_read_impl(std::string const& path, bool* have1, bool* have2)
     {
         *have1 = *have2 = false;
 
         tr_error* err = nullptr;
-        auto dd = tr_sys_dir_open(path, &err);
+        auto dd = tr_sys_dir_open(path.c_str(), &err);
         EXPECT_NE(TR_BAD_SYS_DIR, dd);
         EXPECT_EQ(nullptr, err);
 
@@ -232,11 +225,11 @@ protected:
 
 TEST_F(FileTest, get_info)
 {
-    char* const test_dir = create_test_dir(__FUNCTION__);
+    auto const test_dir = create_test_dir(__FUNCTION__);
     tr_sys_path_info info;
 
-    char* path1 = tr_buildPath(test_dir, "a", nullptr);
-    char* path2 = tr_buildPath(test_dir, "b", nullptr);
+    char* path1 = tr_buildPath(std::data(test_dir), "a", nullptr);
+    char* path2 = tr_buildPath(std::data(test_dir), "b", nullptr);
 
     // Can't get info of non-existent file/directory
     tr_error* err = nullptr;
@@ -336,16 +329,14 @@ TEST_F(FileTest, get_info)
 
     tr_free(path2);
     tr_free(path1);
-
-    tr_free(test_dir);
 }
 
 TEST_F(FileTest, path_exists)
 {
-    char* const test_dir = create_test_dir(__FUNCTION__);
+    auto const test_dir = create_test_dir(__FUNCTION__);
 
-    auto* path1 = tr_buildPath(test_dir, "a", nullptr);
-    auto* path2 = tr_buildPath(test_dir, "b", nullptr);
+    auto* path1 = tr_buildPath(std::data(test_dir), "a", nullptr);
+    auto* path2 = tr_buildPath(std::data(test_dir), "b", nullptr);
 
     // Non-existent file does not exist
     tr_error* err = nullptr;
@@ -396,8 +387,6 @@ TEST_F(FileTest, path_exists)
 
     tr_free(path2);
     tr_free(path1);
-
-    tr_free(test_dir);
 }
 
 TEST_F(FileTest, path_is_relative)
@@ -448,14 +437,14 @@ TEST_F(FileTest, path_is_relative)
 
 TEST_F(FileTest, path_is_same)
 {
-    char* const test_dir = create_test_dir(__FUNCTION__);
+    auto const test_dir = create_test_dir(__FUNCTION__);
     tr_error* err = nullptr;
     char* path1;
     char* path2;
     char* path3;
 
-    path1 = tr_buildPath(test_dir, "a", nullptr);
-    path2 = tr_buildPath(test_dir, "b", nullptr);
+    path1 = tr_buildPath(std::data(test_dir), "a", nullptr);
+    path2 = tr_buildPath(std::data(test_dir), "b", nullptr);
     path3 = tr_buildPath(path2, "c", nullptr);
 
     /* Two non-existent files are not the same */
@@ -506,9 +495,9 @@ TEST_F(FileTest, path_is_same)
     if (create_symlink(path1, ".", true))
     {
         /* Directory and symlink pointing to it are the same */
-        EXPECT_TRUE(tr_sys_path_is_same(path1, test_dir, &err));
+        EXPECT_TRUE(tr_sys_path_is_same(path1, std::data(test_dir), &err));
         EXPECT_EQ(nullptr, err);
-        EXPECT_TRUE(tr_sys_path_is_same(test_dir, path1, &err));
+        EXPECT_TRUE(tr_sys_path_is_same(std::data(test_dir), path1, &err));
         EXPECT_EQ(nullptr, err);
 
         /* Non-existent file and symlink are not the same */
@@ -598,7 +587,7 @@ TEST_F(FileTest, path_is_same)
     }
 
     tr_free(path3);
-    path3 = tr_buildPath(test_dir, "c", nullptr);
+    path3 = tr_buildPath(std::data(test_dir), "c", nullptr);
 
     create_file_with_string_contents(path1, "test");
 
@@ -655,40 +644,34 @@ TEST_F(FileTest, path_is_same)
     tr_free(path3);
     tr_free(path2);
     tr_free(path1);
-
-    tr_free(test_dir);
 }
 
 TEST_F(FileTest, path_resolve)
 {
-    char* const test_dir = create_test_dir(__FUNCTION__);
+    auto const test_dir = create_test_dir(__FUNCTION__);
     tr_error* err = nullptr;
     char* path1;
     char* path2;
 
-    path1 = tr_buildPath(test_dir, "a", nullptr);
-    path2 = tr_buildPath(test_dir, "b", nullptr);
+    path1 = tr_buildPath(std::data(test_dir), "a", nullptr);
+    path2 = tr_buildPath(std::data(test_dir), "b", nullptr);
 
     create_file_with_string_contents(path1, "test");
 
     if (create_symlink(path2, path1, false))
     {
-        auto* tmp = tr_sys_path_resolve(path2, &err);
-        EXPECT_NE(nullptr, tmp);
+        auto tmp = make_string(tr_sys_path_resolve(path2, &err));
         EXPECT_EQ(nullptr, err);
-        EXPECT_TRUE(path_contains_no_symlinks(tmp));
-        tr_free(tmp);
+        EXPECT_TRUE(path_contains_no_symlinks(tmp.c_str()));
 
         tr_sys_path_remove(path2, nullptr);
         tr_sys_path_remove(path1, nullptr);
 
         tr_sys_dir_create(path1, 0, 0755, nullptr);
         EXPECT_TRUE(create_symlink(path2, path1, true)); /* Win32: directory and file symlinks differ :( */
-        tmp = tr_sys_path_resolve(path2, &err);
-        EXPECT_NE(nullptr, tmp);
+        tmp = make_string(tr_sys_path_resolve(path2, &err));
         EXPECT_EQ(nullptr, err);
-        EXPECT_TRUE(path_contains_no_symlinks(tmp));
-        tr_free(tmp);
+        EXPECT_TRUE(path_contains_no_symlinks(tmp.c_str()));
     }
     else
     {
@@ -723,8 +706,6 @@ TEST_F(FileTest, path_resolve)
     }
 
 #endif
-
-    tr_free(test_dir);
 }
 
 TEST_F(FileTest, path_basename_dirname)
@@ -830,11 +811,11 @@ TEST_F(FileTest, path_basename_dirname)
 
 TEST_F(FileTest, path_rename)
 {
-    char* const test_dir = create_test_dir(__FUNCTION__);
+    auto const test_dir = create_test_dir(__FUNCTION__);
     tr_error* err = nullptr;
 
-    auto* path1 = tr_buildPath(test_dir, "a", nullptr);
-    auto* path2 = tr_buildPath(test_dir, "b", nullptr);
+    auto* path1 = tr_buildPath(std::data(test_dir), "a", nullptr);
+    auto* path2 = tr_buildPath(std::data(test_dir), "b", nullptr);
     auto* path3 = tr_buildPath(path2, "c", nullptr);
 
     create_file_with_string_contents(path1, "test");
@@ -889,7 +870,7 @@ TEST_F(FileTest, path_rename)
     tr_sys_path_remove(path2, nullptr);
 
     tr_free(path3);
-    path3 = tr_buildPath(test_dir, "c", nullptr);
+    path3 = tr_buildPath(std::data(test_dir), "c", nullptr);
 
     if (create_symlink(path2, path1, false))
     {
@@ -938,17 +919,15 @@ TEST_F(FileTest, path_rename)
     tr_free(path3);
     tr_free(path2);
     tr_free(path1);
-
-    tr_free(test_dir);
 }
 
 TEST_F(FileTest, path_remove)
 {
-    char* const test_dir = create_test_dir(__FUNCTION__);
+    auto const test_dir = create_test_dir(__FUNCTION__);
     tr_error* err = nullptr;
 
-    auto* path1 = tr_buildPath(test_dir, "a", nullptr);
-    auto* path2 = tr_buildPath(test_dir, "b", nullptr);
+    auto* path1 = tr_buildPath(std::data(test_dir), "a", nullptr);
+    auto* path2 = tr_buildPath(std::data(test_dir), "b", nullptr);
     auto* path3 = tr_buildPath(path2, "c", nullptr);
 
     /* Can't remove non-existent file/directory */
@@ -989,8 +968,6 @@ TEST_F(FileTest, path_remove)
     tr_free(path3);
     tr_free(path2);
     tr_free(path1);
-
-    tr_free(test_dir);
 }
 
 TEST_F(FileTest, path_native_separators)
@@ -1029,14 +1006,14 @@ TEST_F(FileTest, path_native_separators)
 
 TEST_F(FileTest, file_open)
 {
-    char* const test_dir = create_test_dir(__FUNCTION__);
+    auto const test_dir = create_test_dir(__FUNCTION__);
     tr_error* err = nullptr;
     char* path1;
     tr_sys_file_t fd;
     uint64_t n;
     tr_sys_path_info info;
 
-    path1 = tr_buildPath(test_dir, "a", nullptr);
+    path1 = tr_buildPath(std::data(test_dir), "a", nullptr);
 
     /* Can't open non-existent file */
     EXPECT_FALSE(tr_sys_path_exists(path1, nullptr));
@@ -1121,20 +1098,18 @@ TEST_F(FileTest, file_open)
     tr_sys_path_remove(path1, nullptr);
 
     tr_free(path1);
-
-    tr_free(test_dir);
 }
 
 TEST_F(FileTest, file_read_write_seek)
 {
-    char* const test_dir = create_test_dir(__FUNCTION__);
+    auto const test_dir = create_test_dir(__FUNCTION__);
     tr_error* err = nullptr;
     char* path1;
     tr_sys_file_t fd;
     uint64_t n;
     char buf[100];
 
-    path1 = tr_buildPath(test_dir, "a", nullptr);
+    path1 = tr_buildPath(std::data(test_dir), "a", nullptr);
 
     fd = tr_sys_file_open(path1, TR_SYS_FILE_READ | TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE, 0600, nullptr);
 
@@ -1211,17 +1186,15 @@ TEST_F(FileTest, file_read_write_seek)
     tr_sys_path_remove(path1, nullptr);
 
     tr_free(path1);
-
-    tr_free(test_dir);
 }
 
 TEST_F(FileTest, file_truncate)
 {
-    char* const test_dir = create_test_dir(__FUNCTION__);
+    auto const test_dir = create_test_dir(__FUNCTION__);
     tr_error* err = nullptr;
     tr_sys_path_info info;
 
-    auto* path1 = tr_buildPath(test_dir, "a", nullptr);
+    auto* path1 = tr_buildPath(test_dir.c_str(), "a", nullptr);
 
     auto fd = tr_sys_file_open(path1, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE, 0600, nullptr);
 
@@ -1261,15 +1234,13 @@ TEST_F(FileTest, file_truncate)
     tr_sys_path_remove(path1, nullptr);
 
     tr_free(path1);
-
-    tr_free(test_dir);
 }
 
 TEST_F(FileTest, file_preallocate)
 {
-    char* const test_dir = create_test_dir(__FUNCTION__);
+    auto const test_dir = create_test_dir(__FUNCTION__);
 
-    auto* path1 = tr_buildPath(test_dir, "a", nullptr);
+    auto* path1 = tr_buildPath(std::data(test_dir), "a", nullptr);
 
     auto fd = tr_sys_file_open(path1, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE, 0600, nullptr);
 
@@ -1315,14 +1286,12 @@ TEST_F(FileTest, file_preallocate)
     tr_sys_path_remove(path1, nullptr);
 
     tr_free(path1);
-
-    tr_free(test_dir);
 }
 
 TEST_F(FileTest, map)
 {
-    char* const test_dir = create_test_dir(__FUNCTION__);
-    auto* path1 = tr_buildPath(test_dir, "a", nullptr);
+    auto const test_dir = create_test_dir(__FUNCTION__);
+    auto* path1 = tr_buildPath(std::data(test_dir), "a", nullptr);
 
     auto constexpr contents = std::string_view { "test" };
     create_file_with_string_contents(path1, std::data(contents));
@@ -1356,14 +1325,12 @@ TEST_F(FileTest, map)
     tr_sys_path_remove(path1, nullptr);
 
     tr_free(path1);
-
-    tr_free(test_dir);
 }
 
 TEST_F(FileTest, file_utilities)
 {
-    char* const test_dir = create_test_dir(__FUNCTION__);
-    auto* path1 = tr_buildPath(test_dir, "a", nullptr);
+    auto const test_dir = create_test_dir(__FUNCTION__);
+    auto* path1 = tr_buildPath(std::data(test_dir), "a", nullptr);
     auto constexpr contents = std::string_view { "a\nbc\r\ndef\nghij\r\n\n\nklmno\r" };
     create_file_with_string_contents(path1, std::data(contents));
 
@@ -1450,15 +1417,13 @@ TEST_F(FileTest, file_utilities)
     tr_sys_path_remove(path1, nullptr);
 
     tr_free(path1);
-
-    tr_free(test_dir);
 }
 
 TEST_F(FileTest, dir_create)
 {
-    char* const test_dir = create_test_dir(__FUNCTION__);
+    auto const test_dir = create_test_dir(__FUNCTION__);
 
-    auto* path1 = tr_buildPath(test_dir, "a", nullptr);
+    auto* path1 = tr_buildPath(std::data(test_dir), "a", nullptr);
     auto* path2 = tr_buildPath(path1, "b", nullptr);
 
     // Can create directory which has parent
@@ -1506,15 +1471,13 @@ TEST_F(FileTest, dir_create)
 
     tr_free(path2);
     tr_free(path1);
-
-    tr_free(test_dir);
 }
 
 TEST_F(FileTest, dir_read)
 {
-    char* const test_dir = create_test_dir(__FUNCTION__);
-    auto* path1 = tr_buildPath(test_dir, "a", nullptr);
-    auto* path2 = tr_buildPath(test_dir, "b", nullptr);
+    auto const test_dir = create_test_dir(__FUNCTION__);
+    auto* path1 = tr_buildPath(std::data(test_dir), "a", nullptr);
+    auto* path2 = tr_buildPath(std::data(test_dir), "b", nullptr);
 
     bool have1;
     bool have2;
@@ -1539,6 +1502,4 @@ TEST_F(FileTest, dir_read)
 
     tr_free(path2);
     tr_free(path1);
-
-    tr_free(test_dir);
 }
