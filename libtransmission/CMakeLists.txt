@@ -309,6 +309,7 @@ if(ENABLE_TESTS)
         metainfo
         peer-msgs
         quark
+        rename
         rpc
         session
         utils
@@ -354,7 +355,7 @@ if(ENABLE_TESTS)
 
     set(watchdir@generic-test_DEFINITIONS WATCHDIR_TEST_FORCE_GENERIC)
 
-    foreach(T move rename
+    foreach(T move 
               subprocess watchdir watchdir@generic)
         set(TP ${TR_NAME}-test-${T})
         if(T MATCHES "^([^@]+)@.+$")

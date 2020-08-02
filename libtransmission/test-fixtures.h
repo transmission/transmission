@@ -13,6 +13,9 @@
 #include "error.h"
 #include "file.h"
 #include "quark.h"
+#include "platform.h" // TR_PATH_DELIMITER
+#include "trevent.h" // tr_amInEventThread()
+#include "torrent.h"
 #include "utils.h"
 #include "variant.h"
 
@@ -283,7 +286,7 @@ class SessionTest : public SandboxedTest
 
 protected:
 
-  tr_torrent* libttest_zero_torrent_init() const
+  tr_torrent* zero_torrent_init() const
   {
       // 1048576 files-filled-with-zeroes/1048576
       //    4096 files-filled-with-zeroes/4096
@@ -325,6 +328,64 @@ protected:
       // cleanup
       tr_ctorFree(ctor);
       return tor;
+  }
+
+  void zero_torrent_populate(tr_torrent* tor, bool complete)
+  {
+      using ::libtransmission::test::make_string;
+
+      for (tr_file_index_t i = 0; i < tor->info.fileCount; ++i)
+      {
+          auto const& file = tor->info.files[i];
+
+          auto path = (!complete && i == 0)
+              ? make_string(tr_strdup_printf("%s%c%s.part", tor->currentDir, TR_PATH_DELIMITER, file.name))
+              : make_string(tr_strdup_printf("%s%c%s", tor->currentDir, TR_PATH_DELIMITER, file.name));
+
+          auto const dirname = make_string(tr_sys_path_dirname(std::data(path), nullptr));
+          tr_sys_dir_create(std::data(dirname), TR_SYS_DIR_CREATE_PARENTS, 0700, nullptr);
+          auto fd = tr_sys_file_open(std::data(path), TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE, 0600, nullptr);
+
+          for (uint64_t j = 0; j < file.length; ++j)
+          {
+              tr_sys_file_write(fd, (!complete && i == 0 && j < tor->info.pieceSize) ? "\1" : "\0", 1, nullptr, nullptr);
+          }
+
+          tr_sys_file_close(fd, nullptr);
+
+          path = make_string(tr_torrentFindFile(tor, i));
+          auto const err = errno;
+          EXPECT_TRUE(tr_sys_path_exists(std::data(path), nullptr));
+          errno = err;
+      }
+
+      sync();
+      blocking_torrent_verify(tor);
+
+      if (complete)
+      {
+          EXPECT_EQ(0, tr_torrentStat(tor)->leftUntilDone);
+      }
+      else
+      {
+          EXPECT_EQ(tor->info.pieceSize, tr_torrentStat(tor)->leftUntilDone);
+      }
+  }
+
+  void blocking_torrent_verify(tr_torrent* tor)
+  {
+      EXPECT_NE(nullptr, tor->session);
+      EXPECT_FALSE(tr_amInEventThread(tor->session));
+
+      auto constexpr onVerifyDone = [](tr_torrent*, bool, void* done) {
+          *(bool*)done = true;
+      };
+
+      bool done = false;
+      tr_torrentVerify(tor, onVerifyDone, &done);
+      while (!done) {
+          tr_wait_msec(10);
+      }
   }
 
   void create_file_with_contents(char const* path, void const* payload, size_t n)
@@ -396,83 +457,10 @@ protected:
 ***/
 
 
-void libttest_zero_torrent_populate(tr_torrent* tor, bool complete)
-{
-    for (tr_file_index_t i = 0; i < tor->info.fileCount; ++i)
-    {
-        int err;
-        tr_sys_file_t fd;
-        char* path;
-        char* dirname;
-        tr_file const* file = &tor->info.files[i];
-
-        if (!complete && i == 0)
-        {
-            path = tr_strdup_printf("%s%c%s.part", tor->currentDir, TR_PATH_DELIMITER, file->name);
-        }
-        else
-        {
-            path = tr_strdup_printf("%s%c%s", tor->currentDir, TR_PATH_DELIMITER, file->name);
-        }
-
-        dirname = tr_sys_path_dirname(path, nullptr);
-        tr_sys_dir_create(dirname, TR_SYS_DIR_CREATE_PARENTS, 0700, nullptr);
-        fd = tr_sys_file_open(path, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE, 0600, nullptr);
-
-        for (uint64_t j = 0; j < file->length; ++j)
-        {
-            tr_sys_file_write(fd, (!complete && i == 0 && j < tor->info.pieceSize) ? "\1" : "\0", 1, nullptr, nullptr);
-        }
-
-        tr_sys_file_close(fd, nullptr);
-
-        tr_free(dirname);
-        tr_free(path);
-
-        path = tr_torrentFindFile(tor, i);
-        TR_ASSERT(path != nullptr);
-        err = errno;
-        TR_ASSERT(tr_sys_path_exists(path, nullptr));
-        errno = err;
-        tr_free(path);
-    }
-
-    libttest_sync();
-    libttest_blockingTorrentVerify(tor);
-
-    if (complete)
-    {
-        TR_ASSERT(tr_torrentStat(tor)->leftUntilDone == 0);
-    }
-    else
-    {
-        TR_ASSERT(tr_torrentStat(tor)->leftUntilDone == tor->info.pieceSize);
-    }
-}
 
 /***
 ****
 ***/
-
-static void onVerifyDone(tr_torrent* tor UNUSED, bool aborted UNUSED, void* done)
-{
-    *(bool*)done = true;
-}
-
-void libttest_blockingTorrentVerify(tr_torrent* tor)
-{
-    TR_ASSERT(tor->session != nullptr);
-    TR_ASSERT(!tr_amInEventThread(tor->session));
-
-    bool done = false;
-
-    tr_torrentVerify(tor, onVerifyDone, &done);
-
-    while (!done)
-    {
-        tr_wait_msec(10);
-    }
-}
 
 
 void libttest_sync(void)

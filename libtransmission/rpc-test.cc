@@ -80,7 +80,7 @@ TEST_F(RpcTest, session_get)
         tr_variantInitBool(response, false);
     };
 
-    auto* tor = libttest_zero_torrent_init();
+    auto* tor = zero_torrent_init();
     EXPECT_NE(nullptr, tor);
 
     tr_variant request;
