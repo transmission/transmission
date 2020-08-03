@@ -6,7 +6,6 @@
  *
  */
 
-#include <chrono>
 #include <cstdlib>
 #include <string>
 #include <string_view>
@@ -129,27 +128,14 @@ protected:
 
     void wait_for_file(std::string const& path)
     {
-        auto constexpr TimeLimit = std::chrono::milliseconds { 2000 };
-        auto const begin = std::chrono::steady_clock::now();
-
-        for (;;)
-        {
-            if (tr_sys_path_exists(std::data(path), nullptr))
-            {
-                break;
-            }
-            if ((std::chrono::steady_clock::now() - begin) >= TimeLimit)
-            {
-                FAIL();
-            }
-            tr_wait_msec(10);
-        }
+        auto const test = [path](){ return tr_sys_path_exists(std::data(path), nullptr); };
+        EXPECT_TRUE(wait_for(test, 2000));
     }
 
     virtual void SetUp() override
     {
         process_command_line_args();
-        self_path_ = get_self_path();
+        self_path_ = GetParam();
     }
 };
 

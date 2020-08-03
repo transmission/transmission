@@ -307,6 +307,7 @@ if(ENABLE_TESTS)
         magnet
         makemeta
         metainfo
+        move
         peer-msgs
         quark
         rename
@@ -356,7 +357,7 @@ if(ENABLE_TESTS)
 
     set(watchdir@generic-test_DEFINITIONS WATCHDIR_TEST_FORCE_GENERIC)
 
-    foreach(T move watchdir watchdir@generic)
+    foreach(T watchdir watchdir@generic)
         set(TP ${TR_NAME}-test-${T})
         if(T MATCHES "^([^@]+)@.+$")
             string(REPLACE "@" "-" TP "${TP}")

@@ -6,7 +6,10 @@
  *
  */
 
+#include <chrono>
 #include <memory>
+#include <thread>
+#include <mutex>  // std::once_flag()
 #include <string>
 #include <cstdlib>  // getenv()
 
@@ -31,6 +34,25 @@ auto constexpr make_string = [](char*&& s)
     return ret;
 };
 
+bool wait_for(std::function<bool()> const& test, int msec)
+{
+    auto const deadline = std::chrono::milliseconds { msec };
+    auto const begin = std::chrono::steady_clock::now();
+
+    for (;;)
+    {
+        if (test())
+        {
+            return true;
+        }
+        if ((std::chrono::steady_clock::now() - begin) >= deadline)
+        {
+            return false;
+        }
+        tr_wait_msec(10);
+    }
+}
+
 class Sandbox
 {
 public:
@@ -42,7 +64,7 @@ public:
 
     ~Sandbox()
     {
-        rimraf(sandbox_dir_, true);
+        rimraf(sandbox_dir_);
     }
 
     std::string const& path() const
@@ -217,8 +239,7 @@ private:
     Sandbox sandbox_;
 };
 
-
-class SessionTest : public SandboxedTest
+void ensure_formatters_inited()
 {
     static constexpr int MEM_K = 1024;
     static char const constexpr* const MEM_K_STR = "KiB";
@@ -238,25 +259,23 @@ class SessionTest : public SandboxedTest
     static char const constexpr* const SPEED_G_STR = "GB/s";
     static char const constexpr* const SPEED_T_STR = "TB/s";
 
-    tr_session* sessionInit(tr_variant* settings)
+    static std::once_flag flag;
+
+    std::call_once(flag, []() {
+        tr_formatter_mem_init(MEM_K, MEM_K_STR, MEM_M_STR, MEM_G_STR, MEM_T_STR);
+        tr_formatter_size_init(DISK_K, DISK_K_STR, DISK_M_STR, DISK_G_STR, DISK_T_STR);
+        tr_formatter_speed_init(SPEED_K, SPEED_K_STR, SPEED_M_STR, SPEED_G_STR, SPEED_T_STR);
+    });
+}
+
+class SessionTest : public SandboxedTest
+{
+private:
+    std::shared_ptr<tr_variant> settings_;
+
+    tr_session* session_init(tr_variant* settings)
     {
-        static bool formatters_inited = false;
-
-        tr_variant local_settings;
-        tr_variantInitDict(&local_settings, 10);
-
-        if (settings == nullptr)
-        {
-            settings = &local_settings;
-        }
-
-        if (!formatters_inited)
-        {
-            formatters_inited = true;
-            tr_formatter_mem_init(MEM_K, MEM_K_STR, MEM_M_STR, MEM_G_STR, MEM_T_STR);
-            tr_formatter_size_init(DISK_K, DISK_K_STR, DISK_M_STR, DISK_G_STR, DISK_T_STR);
-            tr_formatter_speed_init(SPEED_K, SPEED_K_STR, SPEED_M_STR, SPEED_G_STR, SPEED_T_STR);
-        }
+        ensure_formatters_inited();
 
         // download dir
         size_t len;
@@ -299,12 +318,10 @@ class SessionTest : public SandboxedTest
             tr_variantDictAddInt(settings, q, verbose ? TR_LOG_DEBUG : TR_LOG_ERROR);
         }
 
-        auto* session = tr_sessionInit(std::data(sandboxDir()), !verbose, settings);
-        tr_variantFree(&local_settings);
-        return session;
+        return tr_sessionInit(std::data(sandboxDir()), !verbose, settings);
     }
 
-    void sessionClose(tr_session* session)
+    void session_close(tr_session* session)
     {
         tr_sessionClose(session);
         tr_logFreeQueue(tr_logGetQueue());
@@ -312,124 +329,139 @@ class SessionTest : public SandboxedTest
 
 protected:
 
-  tr_torrent* zero_torrent_init() const
-  {
-      // 1048576 files-filled-with-zeroes/1048576
-      //    4096 files-filled-with-zeroes/4096
-      //     512 files-filled-with-zeroes/512
-      char const* metainfo_base64 =
-          "ZDg6YW5ub3VuY2UzMTpodHRwOi8vd3d3LmV4YW1wbGUuY29tL2Fubm91bmNlMTA6Y3JlYXRlZCBi"
-          "eTI1OlRyYW5zbWlzc2lvbi8yLjYxICgxMzQwNykxMzpjcmVhdGlvbiBkYXRlaTEzNTg3MDQwNzVl"
-          "ODplbmNvZGluZzU6VVRGLTg0OmluZm9kNTpmaWxlc2xkNjpsZW5ndGhpMTA0ODU3NmU0OnBhdGhs"
-          "NzoxMDQ4NTc2ZWVkNjpsZW5ndGhpNDA5NmU0OnBhdGhsNDo0MDk2ZWVkNjpsZW5ndGhpNTEyZTQ6"
-          "cGF0aGwzOjUxMmVlZTQ6bmFtZTI0OmZpbGVzLWZpbGxlZC13aXRoLXplcm9lczEyOnBpZWNlIGxl"
-          "bmd0aGkzMjc2OGU2OnBpZWNlczY2MDpRiEMYSbRhMVL9e9umo/8KT9ZCS1GIQxhJtGExUv1726aj"
-          "/wpP1kJLUYhDGEm0YTFS/XvbpqP/Ck/WQktRiEMYSbRhMVL9e9umo/8KT9ZCS1GIQxhJtGExUv17"
-          "26aj/wpP1kJLUYhDGEm0YTFS/XvbpqP/Ck/WQktRiEMYSbRhMVL9e9umo/8KT9ZCS1GIQxhJtGEx"
-          "Uv1726aj/wpP1kJLUYhDGEm0YTFS/XvbpqP/Ck/WQktRiEMYSbRhMVL9e9umo/8KT9ZCS1GIQxhJ"
-          "tGExUv1726aj/wpP1kJLUYhDGEm0YTFS/XvbpqP/Ck/WQktRiEMYSbRhMVL9e9umo/8KT9ZCS1GI"
-          "QxhJtGExUv1726aj/wpP1kJLUYhDGEm0YTFS/XvbpqP/Ck/WQktRiEMYSbRhMVL9e9umo/8KT9ZC"
-          "S1GIQxhJtGExUv1726aj/wpP1kJLUYhDGEm0YTFS/XvbpqP/Ck/WQktRiEMYSbRhMVL9e9umo/8K"
-          "T9ZCS1GIQxhJtGExUv1726aj/wpP1kJLUYhDGEm0YTFS/XvbpqP/Ck/WQktRiEMYSbRhMVL9e9um"
-          "o/8KT9ZCS1GIQxhJtGExUv1726aj/wpP1kJLUYhDGEm0YTFS/XvbpqP/Ck/WQktRiEMYSbRhMVL9"
-          "e9umo/8KT9ZCS1GIQxhJtGExUv1726aj/wpP1kJLUYhDGEm0YTFS/XvbpqP/Ck/WQktRiEMYSbRh"
-          "MVL9e9umo/8KT9ZCS1GIQxhJtGExUv1726aj/wpP1kJLUYhDGEm0YTFS/XvbpqP/Ck/WQktRiEMY"
-          "SbRhMVL9e9umo/8KT9ZCS1GIQxhJtGExUv1726aj/wpP1kJLOlf5A+Tz30nMBVuNM2hpV3wg/103"
-          "OnByaXZhdGVpMGVlZQ==";
+    tr_torrent* zero_torrent_init() const
+    {
+        // 1048576 files-filled-with-zeroes/1048576
+        //    4096 files-filled-with-zeroes/4096
+        //     512 files-filled-with-zeroes/512
+        char const* metainfo_base64 =
+            "ZDg6YW5ub3VuY2UzMTpodHRwOi8vd3d3LmV4YW1wbGUuY29tL2Fubm91bmNlMTA6Y3JlYXRlZCBi"
+            "eTI1OlRyYW5zbWlzc2lvbi8yLjYxICgxMzQwNykxMzpjcmVhdGlvbiBkYXRlaTEzNTg3MDQwNzVl"
+            "ODplbmNvZGluZzU6VVRGLTg0OmluZm9kNTpmaWxlc2xkNjpsZW5ndGhpMTA0ODU3NmU0OnBhdGhs"
+            "NzoxMDQ4NTc2ZWVkNjpsZW5ndGhpNDA5NmU0OnBhdGhsNDo0MDk2ZWVkNjpsZW5ndGhpNTEyZTQ6"
+            "cGF0aGwzOjUxMmVlZTQ6bmFtZTI0OmZpbGVzLWZpbGxlZC13aXRoLXplcm9lczEyOnBpZWNlIGxl"
+            "bmd0aGkzMjc2OGU2OnBpZWNlczY2MDpRiEMYSbRhMVL9e9umo/8KT9ZCS1GIQxhJtGExUv1726aj"
+            "/wpP1kJLUYhDGEm0YTFS/XvbpqP/Ck/WQktRiEMYSbRhMVL9e9umo/8KT9ZCS1GIQxhJtGExUv17"
+            "26aj/wpP1kJLUYhDGEm0YTFS/XvbpqP/Ck/WQktRiEMYSbRhMVL9e9umo/8KT9ZCS1GIQxhJtGEx"
+            "Uv1726aj/wpP1kJLUYhDGEm0YTFS/XvbpqP/Ck/WQktRiEMYSbRhMVL9e9umo/8KT9ZCS1GIQxhJ"
+            "tGExUv1726aj/wpP1kJLUYhDGEm0YTFS/XvbpqP/Ck/WQktRiEMYSbRhMVL9e9umo/8KT9ZCS1GI"
+            "QxhJtGExUv1726aj/wpP1kJLUYhDGEm0YTFS/XvbpqP/Ck/WQktRiEMYSbRhMVL9e9umo/8KT9ZC"
+            "S1GIQxhJtGExUv1726aj/wpP1kJLUYhDGEm0YTFS/XvbpqP/Ck/WQktRiEMYSbRhMVL9e9umo/8K"
+            "T9ZCS1GIQxhJtGExUv1726aj/wpP1kJLUYhDGEm0YTFS/XvbpqP/Ck/WQktRiEMYSbRhMVL9e9um"
+            "o/8KT9ZCS1GIQxhJtGExUv1726aj/wpP1kJLUYhDGEm0YTFS/XvbpqP/Ck/WQktRiEMYSbRhMVL9"
+            "e9umo/8KT9ZCS1GIQxhJtGExUv1726aj/wpP1kJLUYhDGEm0YTFS/XvbpqP/Ck/WQktRiEMYSbRh"
+            "MVL9e9umo/8KT9ZCS1GIQxhJtGExUv1726aj/wpP1kJLUYhDGEm0YTFS/XvbpqP/Ck/WQktRiEMY"
+            "SbRhMVL9e9umo/8KT9ZCS1GIQxhJtGExUv1726aj/wpP1kJLOlf5A+Tz30nMBVuNM2hpV3wg/103"
+            "OnByaXZhdGVpMGVlZQ==";
 
-      // create the torrent ctor
-      auto metainfo_len = size_t {};
-      auto* metainfo = tr_base64_decode_str(metainfo_base64, &metainfo_len);
-      EXPECT_NE(nullptr, metainfo);
-      EXPECT_LT(0, metainfo_len);
-      auto* ctor = tr_ctorNew(session_);
-      tr_ctorSetMetainfo(ctor, reinterpret_cast<uint8_t*>(metainfo), metainfo_len);
-      tr_ctorSetPaused(ctor, TR_FORCE, true);
+        // create the torrent ctor
+        auto metainfo_len = size_t {};
+        auto* metainfo = tr_base64_decode_str(metainfo_base64, &metainfo_len);
+        EXPECT_NE(nullptr, metainfo);
+        EXPECT_LT(0, metainfo_len);
+        auto* ctor = tr_ctorNew(session_);
+        tr_ctorSetMetainfo(ctor, reinterpret_cast<uint8_t*>(metainfo), metainfo_len);
+        tr_ctorSetPaused(ctor, TR_FORCE, true);
+        tr_free(metainfo);
 
-      // create the torrent
-      auto err = int {};
-      auto* tor = tr_torrentNew(ctor, &err, nullptr);
-      EXPECT_EQ(0, err);
+        // create the torrent
+        auto err = int {};
+        auto* tor = tr_torrentNew(ctor, &err, nullptr);
+        EXPECT_EQ(0, err);
 
-      // cleanup
-      tr_ctorFree(ctor);
-      return tor;
-  }
+        // cleanup
+        tr_ctorFree(ctor);
+        return tor;
+    }
 
-  void zero_torrent_populate(tr_torrent* tor, bool complete)
-  {
-      using ::libtransmission::test::make_string;
+    void zero_torrent_populate(tr_torrent* tor, bool complete)
+    {
+        for (tr_file_index_t i = 0; i < tor->info.fileCount; ++i)
+        {
+            auto const& file = tor->info.files[i];
 
-      for (tr_file_index_t i = 0; i < tor->info.fileCount; ++i)
-      {
-          auto const& file = tor->info.files[i];
+            auto path = (!complete && i == 0)
+                ? make_string(tr_strdup_printf("%s%c%s.part", tor->currentDir, TR_PATH_DELIMITER, file.name))
+                : make_string(tr_strdup_printf("%s%c%s", tor->currentDir, TR_PATH_DELIMITER, file.name));
 
-          auto path = (!complete && i == 0)
-              ? make_string(tr_strdup_printf("%s%c%s.part", tor->currentDir, TR_PATH_DELIMITER, file.name))
-              : make_string(tr_strdup_printf("%s%c%s", tor->currentDir, TR_PATH_DELIMITER, file.name));
+            auto const dirname = make_string(tr_sys_path_dirname(std::data(path), nullptr));
+            tr_sys_dir_create(std::data(dirname), TR_SYS_DIR_CREATE_PARENTS, 0700, nullptr);
+            auto fd = tr_sys_file_open(std::data(path), TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE, 0600, nullptr);
 
-          auto const dirname = make_string(tr_sys_path_dirname(std::data(path), nullptr));
-          tr_sys_dir_create(std::data(dirname), TR_SYS_DIR_CREATE_PARENTS, 0700, nullptr);
-          auto fd = tr_sys_file_open(std::data(path), TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE, 0600, nullptr);
+            for (uint64_t j = 0; j < file.length; ++j)
+            {
+                tr_sys_file_write(fd, (!complete && i == 0 && j < tor->info.pieceSize) ? "\1" : "\0", 1, nullptr, nullptr);
+            }
 
-          for (uint64_t j = 0; j < file.length; ++j)
-          {
-              tr_sys_file_write(fd, (!complete && i == 0 && j < tor->info.pieceSize) ? "\1" : "\0", 1, nullptr, nullptr);
-          }
+            tr_sys_file_close(fd, nullptr);
 
-          tr_sys_file_close(fd, nullptr);
+            path = make_string(tr_torrentFindFile(tor, i));
+            auto const err = errno;
+            EXPECT_TRUE(tr_sys_path_exists(std::data(path), nullptr));
+            errno = err;
+        }
 
-          path = make_string(tr_torrentFindFile(tor, i));
-          auto const err = errno;
-          EXPECT_TRUE(tr_sys_path_exists(std::data(path), nullptr));
-          errno = err;
-      }
+        sync();
+        blocking_torrent_verify(tor);
 
-      sync();
-      blocking_torrent_verify(tor);
+        if (complete)
+        {
+            EXPECT_EQ(0, tr_torrentStat(tor)->leftUntilDone);
+        }
+        else
+        {
+            EXPECT_EQ(tor->info.pieceSize, tr_torrentStat(tor)->leftUntilDone);
+        }
+    }
 
-      if (complete)
-      {
-          EXPECT_EQ(0, tr_torrentStat(tor)->leftUntilDone);
-      }
-      else
-      {
-          EXPECT_EQ(tor->info.pieceSize, tr_torrentStat(tor)->leftUntilDone);
-      }
-  }
+    void blocking_torrent_verify(tr_torrent* tor)
+    {
+        EXPECT_NE(nullptr, tor->session);
+        EXPECT_FALSE(tr_amInEventThread(tor->session));
 
-  void blocking_torrent_verify(tr_torrent* tor)
-  {
-      EXPECT_NE(nullptr, tor->session);
-      EXPECT_FALSE(tr_amInEventThread(tor->session));
+        auto constexpr onVerifyDone = [](tr_torrent*, bool, void* done) {
+            *(bool*)done = true;
+        };
 
-      auto constexpr onVerifyDone = [](tr_torrent*, bool, void* done) {
-          *(bool*)done = true;
-      };
+        bool done = false;
+        tr_torrentVerify(tor, onVerifyDone, &done);
+        while (!done) {
+            tr_wait_msec(10);
+        }
+    }
 
-      bool done = false;
-      tr_torrentVerify(tor, onVerifyDone, &done);
-      while (!done) {
-          tr_wait_msec(10);
-      }
-  }
+    tr_session* session_ = nullptr;
 
-  tr_session* session_ = nullptr;
+    tr_variant* settings()
+    {
+        if (!settings_)
+        {
+            auto* settings = new tr_variant {};
+            tr_variantInitDict(settings, 10);
+            auto constexpr deleter = [](tr_variant* v){
+                tr_variantFree(v);
+                delete v;
+            };
+            settings_.reset(settings, deleter);
+        }
 
-  virtual void SetUp() override
-  {
-    SandboxedTest::SetUp();
+        return settings_.get();
+    }
 
-    session_ = sessionInit(nullptr);
-  }
+    virtual void SetUp() override
+    {
+        session_ = session_init(settings());
+        SandboxedTest::SetUp();
+    }
 
-  virtual void TearDown() override
-  {
-    sessionClose(session_);
-    session_ = nullptr;
+    virtual void TearDown() override
+    {
+        session_close(session_);
+        session_ = nullptr;
+        settings_.reset();
 
-    SandboxedTest::TearDown();
-  }
+        SandboxedTest::TearDown();
+    }
 };
 
 }  // namespace libtransmission::test
