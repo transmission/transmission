@@ -12,9 +12,9 @@
 
 #include "gtest/gtest.h"
 
-TEST(Magnet, tr_magnetParse)
+TEST(Magnet, magnetParse)
 {
-    auto constexpr expected_hash = std::array<uint8_t, SHA_DIGEST_LENGTH> {
+    auto constexpr ExpectedHash = std::array<uint8_t, SHA_DIGEST_LENGTH> {
         210, 53, 64, 16, 163, 202, 74, 222, 91, 116,
         39, 187, 9, 58, 98, 163, 137, 159, 243, 129
     };
@@ -45,8 +45,8 @@ TEST(Magnet, tr_magnetParse)
         EXPECT_EQ(1, info->webseedCount);
         EXPECT_STREQ("http://server.webseed.org/path/to/file", info->webseeds[0]);
         EXPECT_STREQ("Display Name", info->displayName);
-        EXPECT_EQ(std::size(expected_hash), sizeof(info->hash));
-        EXPECT_EQ(0, memcmp(info->hash, std::data(expected_hash), SHA_DIGEST_LENGTH));
+        EXPECT_EQ(std::size(ExpectedHash), sizeof(info->hash));
+        EXPECT_EQ(0, memcmp(info->hash, std::data(ExpectedHash), std::size(ExpectedHash)));
         tr_magnetFree(info);
     }
 }

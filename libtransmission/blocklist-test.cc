@@ -46,13 +46,13 @@ protected:
         tr_sys_file_t fd;
         char* dir;
 
-        dir = tr_sys_path_dirname(path, NULL);
-        tr_sys_dir_create(dir, TR_SYS_DIR_CREATE_PARENTS, 0700, NULL);
+        dir = tr_sys_path_dirname(path, nullptr);
+        tr_sys_dir_create(dir, TR_SYS_DIR_CREATE_PARENTS, 0700, nullptr);
         tr_free(dir);
 
-        fd = tr_sys_file_open(path, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE, 0600, NULL);
-        blocking_file_write(fd, contents, strlen(contents));
-        tr_sys_file_close(fd, NULL);
+        fd = tr_sys_file_open(path, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE, 0600, nullptr);
+        blockingFileWrite(fd, contents, strlen(contents));
+        tr_sys_file_close(fd, nullptr);
 
         sync();
     }
@@ -71,12 +71,12 @@ TEST_F(BlocklistTest, parsing)
     // tr_session* session;
 
     /* init the session */
-    // session = libttest_session_init(NULL);
+    // session = libttest_session_init(nullptr);
     // EXPECT_TRUE(!tr_blocklistExists(session));
     EXPECT_EQ(0, tr_blocklistGetRuleCount(session_));
 
     /* init the blocklist */
-    char* path = tr_buildPath(tr_sessionGetConfigDir(session_), "blocklists", "level1", NULL);
+    char* path = tr_buildPath(tr_sessionGetConfigDir(session_), "blocklists", "level1", nullptr);
     create_text_file(path, contents1);
     tr_free(path);
     tr_sessionReloadBlocklists(session_);
@@ -118,8 +118,8 @@ TEST_F(BlocklistTest, updating)
     //tr_session* session;
 
     /* init the session */
-    // session = libttest_session_init(NULL);
-    char* path = tr_buildPath(tr_sessionGetConfigDir(session_), "blocklists", "level1", NULL);
+    // session = libttest_session_init(nullptr);
+    char* path = tr_buildPath(tr_sessionGetConfigDir(session_), "blocklists", "level1", nullptr);
 
     /* no blocklist to start with... */
     EXPECT_EQ(0, tr_blocklistGetRuleCount(session_));

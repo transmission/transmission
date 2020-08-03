@@ -11,7 +11,7 @@
 
 #include "gtest/gtest.h"
 
-TEST(History, tr_history)
+TEST(History, recentHistory)
 {
     auto h = tr_recentHistory { };
 

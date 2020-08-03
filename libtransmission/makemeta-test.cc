@@ -14,8 +14,8 @@
 
 #include "test-fixtures.h"
 
-#include <stdlib.h> // mktemp()
-#include <string.h> // strlen()
+#include <cstdlib> // mktemp()
+#include <cstring> // strlen()
 
 namespace libtransmission::test
 {
@@ -23,19 +23,19 @@ namespace libtransmission::test
 class MakemetaTest: public SandboxedTest
 {
 protected:
-    void test_single_file_impl(tr_tracker_info const* trackers,
-                               size_t const trackerCount,
-                               void const* payload,
-                               size_t const payloadSize,
-                               char const* comment,
-                               bool isPrivate)
+    void testSingleFileImpl(tr_tracker_info const* trackers,
+                            size_t const trackerCount,
+                            void const* payload,
+                            size_t const payloadSize,
+                            char const* comment,
+                            bool isPrivate)
     {
         // char* sandbox;
         tr_info inf;
 
         // create a single input file
-        auto input_file = make_string(tr_buildPath(std::data(sandboxDir()), "test.XXXXXX", nullptr));
-        create_tmpfile_with_contents(input_file, payload, payloadSize);
+        auto input_file = makeString(tr_buildPath(std::data(sandboxDir()), "test.XXXXXX", nullptr));
+        createTmpfileWithContents(input_file, payload, payloadSize);
         auto* builder = tr_metaInfoBuilderCreate(std::data(input_file));
         EXPECT_EQ(1, builder->fileCount);
         EXPECT_STREQ(std::data(input_file), builder->top);
@@ -67,7 +67,7 @@ protected:
 
         // quick check of some of the parsed metainfo
         EXPECT_EQ(payloadSize, inf.totalSize);
-        EXPECT_EQ(make_string(tr_sys_path_basename(std::data(input_file), nullptr)), inf.name);
+        EXPECT_EQ(makeString(tr_sys_path_basename(std::data(input_file), nullptr)), inf.name);
         EXPECT_STREQ(comment, inf.comment);
         EXPECT_EQ(1, inf.fileCount);
         EXPECT_EQ(isPrivate, inf.isPrivate);
@@ -81,13 +81,13 @@ protected:
         tr_metaInfoBuilderFree(builder);
     }
 
-    void test_single_directory_impl(tr_tracker_info const* trackers,
-                                    size_t const trackerCount,
-                                    void const** payloads,
-                                    size_t const* payloadSizes,
-                                    size_t const payloadCount,
-                                    char const* comment,
-                                    bool const isPrivate)
+    void testSingleDirectoryImpl(tr_tracker_info const* trackers,
+                                 size_t const tracker_count,
+                                 void const** payloads,
+                                 size_t const* payload_sizes,
+                                 size_t const payload_count,
+                                 char const* comment,
+                                 bool const is_private)
     {
         // create the top temp directory
         auto* top = tr_buildPath(std::data(sandboxDir()), "folder.XXXXXX", nullptr);
@@ -95,17 +95,17 @@ protected:
 
         // build the payload files that go into the top temp directory
         auto files = std::vector<std::string> {};
-        files.reserve(payloadCount);
-        size_t totalSize = 0;
+        files.reserve(payload_count);
+        size_t total_size = 0;
 
-        for (size_t i = 0; i < payloadCount; i++)
+        for (size_t i = 0; i < payload_count; i++)
         {
-            char tmpl[16];
-            tr_snprintf(tmpl, sizeof(tmpl), "file.%04zu%s", i, "XXXXXX");
-            auto path = make_string(tr_buildPath(top, tmpl, nullptr));
-            create_tmpfile_with_contents(path, payloads[i], payloadSizes[i]);
+            auto tmpl = std::array<char, 16>{};
+            tr_snprintf(std::data(tmpl), std::size(tmpl), "file.%04zu%s", i, "XXXXXX");
+            auto path = makeString(tr_buildPath(top, std::data(tmpl), nullptr));
+            createTmpfileWithContents(path, payloads[i], payload_sizes[i]);
             files.push_back(path);
-            totalSize += payloadSizes[i];
+            total_size += payload_sizes[i];
         }
 
         sync();
@@ -114,31 +114,28 @@ protected:
         auto* builder = tr_metaInfoBuilderCreate(top);
         EXPECT_FALSE(builder->abortFlag);
         EXPECT_STREQ(top, builder->top);
-        EXPECT_EQ(payloadCount, builder->fileCount);
-        EXPECT_EQ(totalSize, builder->totalSize);
+        EXPECT_EQ(payload_count, builder->fileCount);
+        EXPECT_EQ(total_size, builder->totalSize);
         EXPECT_TRUE(builder->isFolder);
 
         for (size_t i = 0; i < builder->fileCount; ++i)
         {
             EXPECT_EQ(files[i], builder->files[i].filename);
-            EXPECT_EQ(payloadSizes[i], builder->files[i].size);
+            EXPECT_EQ(payload_sizes[i], builder->files[i].size);
         }
 
-        // call tr_makeMetaInfo() to build the .torrent file
+        // build the .torrent file
         auto* torrent_file = tr_strdup_printf("%s.torrent", top);
-        tr_makeMetaInfo(builder, torrent_file, trackers, trackerCount, comment, isPrivate);
-        EXPECT_EQ(isPrivate, builder->isPrivate);
+        tr_makeMetaInfo(builder, torrent_file, trackers, tracker_count, comment, is_private);
+        EXPECT_EQ(is_private, builder->isPrivate);
         EXPECT_STREQ(torrent_file, builder->outputFile);
         EXPECT_STREQ(comment, builder->comment);
-        EXPECT_EQ(trackerCount, builder->trackerCount);
-
-        while (!builder->isDone)
-        {
-            tr_wait_msec(100);
-        }
+        EXPECT_EQ(tracker_count, builder->trackerCount);
+        auto test = [&builder](){ return builder->isDone; };
+        EXPECT_TRUE(waitFor(test, 5000));
+        sync();
 
         // now let's check our work: parse the  .torrent file
-        sync();
         auto* ctor = tr_ctorNew(nullptr);
         tr_ctorSetMetainfoFromFile(ctor, torrent_file);
         tr_info inf;
@@ -146,15 +143,15 @@ protected:
         EXPECT_EQ(TR_PARSE_OK, parse_result);
 
         // quick check of some of the parsed metainfo
-        EXPECT_EQ(totalSize, inf.totalSize);
+        EXPECT_EQ(total_size, inf.totalSize);
         auto* tmpstr = tr_sys_path_basename(top, nullptr);
         EXPECT_STREQ(tmpstr, inf.name);
         tr_free(tmpstr);
         EXPECT_STREQ(comment, inf.comment);
-        EXPECT_EQ(payloadCount, inf.fileCount);
-        EXPECT_EQ(isPrivate, inf.isPrivate);
+        EXPECT_EQ(payload_count, inf.fileCount);
+        EXPECT_EQ(is_private, inf.isPrivate);
         EXPECT_EQ(builder->isFolder, inf.isFolder);
-        EXPECT_EQ(trackerCount, inf.trackerCount);
+        EXPECT_EQ(tracker_count, inf.trackerCount);
 
         // cleanup
         tr_free(torrent_file);
@@ -165,84 +162,86 @@ protected:
         tr_free(top);
     }
 
-    void test_single_directory_random_payload_impl(tr_tracker_info const* trackers,
-                                                   size_t const trackerCount,
-                                                   size_t const maxFileCount,
-                                                   size_t const maxFileSize,
-                                                   char const* comment,
-                                                   bool const isPrivate)
+    void testSingleDirectoryRandomPayloadImpl(tr_tracker_info const* trackers,
+                                              size_t const tracker_count,
+                                              size_t const max_file_count,
+                                              size_t const max_file_size,
+                                              char const* comment,
+                                              bool const is_private)
     {
 
         // build random payloads
-        size_t payloadCount = 1 + tr_rand_int_weak(maxFileCount);
-        void** payloads = tr_new0(void*, payloadCount);
-        size_t* payloadSizes = tr_new0(size_t, payloadCount);
+        size_t payload_count = 1 + tr_rand_int_weak(max_file_count);
+        void** payloads = tr_new0(void*, payload_count);
+        size_t* payload_sizes = tr_new0(size_t, payload_count);
 
-        for (size_t i = 0; i < payloadCount; i++)
+        for (size_t i = 0; i < payload_count; i++)
         {
-            size_t const n = 1 + tr_rand_int_weak(maxFileSize);
+            size_t const n = 1 + tr_rand_int_weak(max_file_size);
             payloads[i] = tr_new(char, n);
             tr_rand_buffer(payloads[i], n);
-            payloadSizes[i] = n;
+            payload_sizes[i] = n;
         }
 
         // run the test
-        test_single_directory_impl(trackers, trackerCount,
-                                   (void const**)payloads, payloadSizes, payloadCount,
-                                   comment, isPrivate);
+        testSingleDirectoryImpl(
+            trackers, tracker_count,
+            const_cast<void const**>(payloads),
+            payload_sizes,
+            payload_count,
+            comment, is_private);
 
         // cleanup
-        for (size_t i = 0; i < payloadCount; i++)
+        for (size_t i = 0; i < payload_count; i++)
         {
             tr_free(payloads[i]);
         }
 
         tr_free(payloads);
-        tr_free(payloadSizes);
+        tr_free(payload_sizes);
     }
 };
 
-TEST_F(MakemetaTest, single_file)
+TEST_F(MakemetaTest, singleFile)
 {
-    tr_tracker_info trackers[16];
-    size_t trackerCount = 0;
-    trackers[trackerCount].tier = trackerCount;
-    trackers[trackerCount].announce = (char*)"udp://tracker.openbittorrent.com:80";
-    ++trackerCount;
-    trackers[trackerCount].tier = trackerCount;
-    trackers[trackerCount].announce = (char*)"udp://tracker.publicbt.com:80";
-    ++trackerCount;
-    auto constexpr payload = std::string_view { "Hello, World!\n" };
+    auto trackers = std::array<tr_tracker_info, 16> {};
+    auto tracker_count = size_t {};
+    trackers[tracker_count].tier = tracker_count;
+    trackers[tracker_count].announce = const_cast<char*>("udp://tracker.openbittorrent.com:80");
+    ++tracker_count;
+    trackers[tracker_count].tier = tracker_count;
+    trackers[tracker_count].announce = const_cast<char*>("udp://tracker.publicbt.com:80");
+    ++tracker_count;
+    auto constexpr Payload = std::string_view { "Hello, World!\n" };
     char const* const comment = "This is the comment";
-    bool const isPrivate = false;
-    test_single_file_impl(trackers, trackerCount,
-                          std::data(payload), std::size(payload),
-                          comment, isPrivate);
+    bool const is_private = false;
+    testSingleFileImpl(std::data(trackers), tracker_count,
+                       std::data(Payload), std::size(Payload),
+                       comment, is_private);
 }
 
-TEST_F(MakemetaTest, single_directory_random_payload)
+TEST_F(MakemetaTest, singleDirectoryRandomPayload)
 {
-    auto constexpr DEFAULT_MAX_FILE_COUNT = size_t { 16 };
-    auto constexpr DEFAULT_MAX_FILE_SIZE = size_t { 1024 };
+    auto constexpr DefaultMaxFileCount = size_t { 16 };
+    auto constexpr DefaultMaxFileSize = size_t { 1024 };
 
-    tr_tracker_info trackers[16];
-    size_t trackerCount;
-    trackerCount = 0;
-    trackers[trackerCount].tier = trackerCount;
-    trackers[trackerCount].announce = (char*)"udp://tracker.openbittorrent.com:80";
-    ++trackerCount;
-    trackers[trackerCount].tier = trackerCount;
-    trackers[trackerCount].announce = (char*)"udp://tracker.publicbt.com:80";
-    ++trackerCount;
+    auto trackers = std::array<tr_tracker_info, 16> {};
+    auto tracker_count = size_t {};
+    trackers[tracker_count].tier = tracker_count;
+    trackers[tracker_count].announce = const_cast<char*>("udp://tracker.openbittorrent.com:80");
+    ++tracker_count;
+    trackers[tracker_count].tier = tracker_count;
+    trackers[tracker_count].announce = const_cast<char*>("udp://tracker.publicbt.com:80");
+    ++tracker_count;
     char const* const comment = "This is the comment";
-    bool const isPrivate = false;
+    bool const is_private = false;
 
-    for (size_t i = 0; i < 10; i++)
+    for (size_t i = 0; i < 10; ++i)
     {
-        test_single_directory_random_payload_impl(trackers, trackerCount,
-                                                  DEFAULT_MAX_FILE_COUNT,
-                                                  DEFAULT_MAX_FILE_SIZE,
-                                                  comment, isPrivate);
+        testSingleDirectoryRandomPayloadImpl(std::data(trackers), tracker_count,
+                                             DefaultMaxFileCount,
+                                             DefaultMaxFileSize,
+                                             comment, is_private);
     }
 }
 

@@ -25,7 +25,7 @@ class IncompleteDirTest:
     public ::testing::WithParamInterface<std::pair<std::string,std::string>>
 {
 protected:
-    virtual void SetUp() override
+    void SetUp() override
     {
         auto const incomplete_dir = GetParam().first;
         auto const download_dir = GetParam().second;
@@ -37,33 +37,33 @@ protected:
     }
 };
 
-TEST_P(IncompleteDirTest, incomplete_dir)
+TEST_P(IncompleteDirTest, incompleteDir)
 {
     auto const* download_dir = tr_sessionGetDownloadDir(session_);
     auto const* incomplete_dir = tr_sessionGetIncompleteDir(session_);
 
     // init an incomplete torrent.
     // the test zero_torrent will be missing its first piece.
-    auto* tor = zero_torrent_init();
-    zero_torrent_populate(tor, false);
-    EXPECT_EQ(make_string(tr_strdup_printf("%s/%s.part", incomplete_dir, tor->info.files[0].name)),
-              make_string(tr_torrentFindFile(tor, 0)));
-    EXPECT_EQ(make_string(tr_buildPath(incomplete_dir, tor->info.files[1].name, nullptr)),
-              make_string(tr_torrentFindFile(tor, 1)));
+    auto* tor = zeroTorrentInit();
+    zeroTorrentPopulate(tor, false);
+    EXPECT_EQ(makeString(tr_strdup_printf("%s/%s.part", incomplete_dir, tor->info.files[0].name)),
+              makeString(tr_torrentFindFile(tor, 0)));
+    EXPECT_EQ(makeString(tr_buildPath(incomplete_dir, tor->info.files[1].name, nullptr)),
+              makeString(tr_torrentFindFile(tor, 1)));
     EXPECT_EQ(tor->info.pieceSize, tr_torrentStat(tor)->leftUntilDone);
 
     // auto constexpr completeness_unset = tr_completeness { -1 };
     using maybe_completeness = std::optional<tr_completeness>;
     maybe_completeness completeness;
     // auto completeness = completeness_unset;
-    auto constexpr zeroes_completeness_func = [](
+    auto const zeroes_completeness_func = [](
             tr_torrent*, tr_completeness completeness,
             bool, void* user_data) {
         *static_cast<maybe_completeness*>(user_data) = completeness;
     };
     tr_torrentSetCompletenessCallback(tor, zeroes_completeness_func, &completeness);
 
-    struct test_incomplete_dir_data {
+    struct TestIncompleteDirData {
         tr_session* session = {};
         tr_torrent* tor = {};
         tr_block_index_t block = {};
@@ -74,7 +74,7 @@ TEST_P(IncompleteDirTest, incomplete_dir)
     };
 
     auto const test_incomplete_dir_threadfunc = [](void* vdata){
-        auto* data = static_cast<test_incomplete_dir_data*>(vdata);
+        auto* data = static_cast<TestIncompleteDirData*>(vdata);
         tr_cacheWriteBlock(data->session->cache, data->tor, 0, data->offset, data->tor->blockSize, data->buf);
         tr_torrentGotBlock(data->tor, data->block);
         data->done = true;
@@ -84,7 +84,7 @@ TEST_P(IncompleteDirTest, incomplete_dir)
     {
         char* zero_block = tr_new0(char, tor->blockSize);
 
-        struct test_incomplete_dir_data data = {};
+        struct TestIncompleteDirData data = {};
         data.session = session_;
         data.tor = tor;
         data.buf = evbuffer_new();
@@ -102,24 +102,24 @@ TEST_P(IncompleteDirTest, incomplete_dir)
             tr_runInEventThread(session_, test_incomplete_dir_threadfunc, &data);
 
             auto const test = [&data](){ return data.done; };
-            EXPECT_TRUE(wait_for(test, 1000));
+            EXPECT_TRUE(waitFor(test, 1000));
         }
 
         evbuffer_free(data.buf);
         tr_free(zero_block);
     }
 
-    blocking_torrent_verify(tor);
+    blockingTorrentVerify(tor);
     EXPECT_EQ(0, tr_torrentStat(tor)->leftUntilDone);
 
     auto test = [&completeness](){ return completeness.has_value(); };
-    EXPECT_TRUE(wait_for(test, 300));
+    EXPECT_TRUE(waitFor(test, 300));
     EXPECT_EQ(TR_SEED, completeness);
 
     for (tr_file_index_t file_index = 0; file_index < tor->info.fileCount; ++file_index)
     {
-        EXPECT_EQ(make_string(tr_buildPath(download_dir, tor->info.files[file_index].name, nullptr)),
-                  make_string(tr_torrentFindFile(tor, file_index)));
+        EXPECT_EQ(makeString(tr_buildPath(download_dir, tor->info.files[file_index].name, nullptr)),
+                  makeString(tr_torrentFindFile(tor, file_index)));
     }
 
     // cleanup
@@ -145,38 +145,38 @@ INSTANTIATE_TEST_SUITE_P(
 
 using MoveTest = SessionTest;
 
-TEST_F(MoveTest, set_location)
+TEST_F(MoveTest, setLocation)
 {
-    auto const target_dir = make_string(tr_buildPath(tr_sessionGetConfigDir(session_), "target", nullptr));
+    auto const target_dir = makeString(tr_buildPath(tr_sessionGetConfigDir(session_), "target", nullptr));
     tr_sys_dir_create(std::data(target_dir), TR_SYS_DIR_CREATE_PARENTS, 0777, nullptr);
 
     // init a torrent.
-    auto* tor = zero_torrent_init();
-    zero_torrent_populate(tor, true);
-    blocking_torrent_verify(tor);
+    auto* tor = zeroTorrentInit();
+    zeroTorrentPopulate(tor, true);
+    blockingTorrentVerify(tor);
     EXPECT_EQ(0, tr_torrentStat(tor)->leftUntilDone);
 
     // now move it
     auto state = int { -1 };
     tr_torrentSetLocation(tor, std::data(target_dir), true, nullptr, &state);
     auto test = [&state](){ return state == TR_LOC_DONE; };
-    EXPECT_TRUE(wait_for(test, 300));
+    EXPECT_TRUE(waitFor(test, 300));
     EXPECT_EQ(TR_LOC_DONE, state);
 
     // confirm the torrent is still complete after being moved
-    blocking_torrent_verify(tor);
+    blockingTorrentVerify(tor);
     EXPECT_EQ(0, tr_torrentStat(tor)->leftUntilDone);
 
     // confirm the files really got moved
     sync();
     for (tr_file_index_t file_index = 0; file_index < tor->info.fileCount; ++file_index)
     {
-        EXPECT_EQ(make_string(tr_buildPath(std::data(target_dir), tor->info.files[file_index].name, nullptr)),
-                  make_string(tr_torrentFindFile(tor, file_index)));
+        EXPECT_EQ(makeString(tr_buildPath(std::data(target_dir), tor->info.files[file_index].name, nullptr)),
+                  makeString(tr_torrentFindFile(tor, file_index)));
     }
 
     // cleanup
     tr_torrentRemove(tor, true, tr_sys_path_remove);
 }
 
-}  // namespace ::libtransmission::test
+} // namespace ::libtransmission::test

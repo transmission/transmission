@@ -25,7 +25,7 @@
 
 #include "test-fixtures.h"
 
-using ::libtransmission::test::make_string;
+using ::libtransmission::test::makeString;
 
 using UtilsTest = ::testing::Test;
 
@@ -67,69 +67,69 @@ TEST_F(UtilsTest, tr_strstrip)
 TEST_F(UtilsTest, tr_strjoin)
 {
     char const* in1[] = { "one", "two" };
-    auto out = make_string(tr_strjoin(in1, 2, ", "));
+    auto out = makeString(tr_strjoin(in1, 2, ", "));
     EXPECT_EQ("one, two", out);
 
     char const* in2[] = { "hello" };
-    out = make_string(tr_strjoin(in2, 1, "###"));
+    out = makeString(tr_strjoin(in2, 1, "###"));
     EXPECT_EQ("hello", out);
 
     char const* in3[] = { "a", "b", "ccc", "d", "eeeee" };
-    out = make_string(tr_strjoin(in3, 5, " "));
+    out = makeString(tr_strjoin(in3, 5, " "));
     EXPECT_EQ("a b ccc d eeeee", out);
 
     char const* in4[] = { "7", "ate", "9" };
-    out = make_string(tr_strjoin(in4, 3, ""));
+    out = makeString(tr_strjoin(in4, 3, ""));
     EXPECT_EQ("7ate9", out);
 
-    char const** in5;
-    out = make_string(tr_strjoin(in5, 0, "a"));
+    char const** in5 = nullptr;
+    out = makeString(tr_strjoin(in5, 0, "a"));
     EXPECT_EQ("", out);
 }
 
 TEST_F(UtilsTest, tr_buildPath)
 {
-    auto out = make_string(tr_buildPath("foo", "bar", nullptr));
+    auto out = makeString(tr_buildPath("foo", "bar", nullptr));
     EXPECT_EQ("foo" TR_PATH_DELIMITER_STR "bar", out);
 
-    out = make_string(tr_buildPath("", "foo", "bar", nullptr));
+    out = makeString(tr_buildPath("", "foo", "bar", nullptr));
     EXPECT_EQ(TR_PATH_DELIMITER_STR "foo" TR_PATH_DELIMITER_STR "bar", out);
 }
 
 TEST_F(UtilsTest, tr_utf8clean)
 {
     auto const* in = "hello world";
-    auto out = make_string(tr_utf8clean(in, TR_BAD_SIZE));
+    auto out = makeString(tr_utf8clean(in, TR_BAD_SIZE));
     EXPECT_EQ(in, out);
 
     in = "hello world";
-    out = make_string(tr_utf8clean(in, 5));
+    out = makeString(tr_utf8clean(in, 5));
     EXPECT_EQ("hello", out);
 
     // this version is not utf-8 (but cp866)
     in = "\x92\xE0\xE3\xA4\xAD\xAE \xA1\xEB\xE2\xEC \x81\xAE\xA3\xAE\xAC";
-    out = make_string(tr_utf8clean(in, 17));
+    out = makeString(tr_utf8clean(in, 17));
     EXPECT_TRUE(std::size(out)== 17 || std::size(out)== 33);
-    EXPECT_TRUE(tr_utf8_validate(std::data(out), std::size(out), nullptr));
+    EXPECT_TRUE(tr_utf8_validate(out.c_str(), std::size(out), nullptr));
 
     // same string, but utf-8 clean
     in = "Трудно быть Богом";
-    out = make_string(tr_utf8clean(in, TR_BAD_SIZE));
+    out = makeString(tr_utf8clean(in, TR_BAD_SIZE));
     EXPECT_NE(nullptr, std::data(out));
-    EXPECT_TRUE(tr_utf8_validate(std::data(out), std::size(out), nullptr));
+    EXPECT_TRUE(tr_utf8_validate(out.c_str(), std::size(out), nullptr));
     EXPECT_EQ(in, out);
 
     in = "\xF4\x00\x81\x82";
-    out = make_string(tr_utf8clean(in, 4));
+    out = makeString(tr_utf8clean(in, 4));
     EXPECT_NE(nullptr, std::data(out));
     EXPECT_TRUE(std::size(out) == 1 || std::size(out) == 2);
-    EXPECT_TRUE(tr_utf8_validate(std::data(out), std::size(out), nullptr));
+    EXPECT_TRUE(tr_utf8_validate(out.c_str(), std::size(out), nullptr));
 
     in = "\xF4\x33\x81\x82";
-    out = make_string(tr_utf8clean(in, 4));
+    out = makeString(tr_utf8clean(in, 4));
     EXPECT_NE(nullptr, std::data(out));
     EXPECT_TRUE(std::size(out) == 4 || std::size(out) == 7);
-    EXPECT_TRUE(tr_utf8_validate(std::data(out), std::size(out), nullptr));
+    EXPECT_TRUE(tr_utf8_validate(out.c_str(), std::size(out), nullptr));
 }
 
 TEST_F(UtilsTest, numbers)
@@ -310,7 +310,7 @@ TEST_F(UtilsTest, url)
 TEST_F(UtilsTest, tr_http_unescape)
 {
     auto constexpr Url = std::string_view { "http%3A%2F%2Fwww.example.com%2F~user%2F%3Ftest%3D1%26test1%3D2" };
-    auto str = make_string(tr_http_unescape(std::data(Url), std::size(Url)));
+    auto str = makeString(tr_http_unescape(std::data(Url), std::size(Url)));
     EXPECT_EQ("http://www.example.com/~user/?test=1&test1=2", str);
 }
 
@@ -360,19 +360,19 @@ TEST_F(UtilsTest, tr_strdup_vprintf)
         return ret;
     };
 
-    auto s = make_string(test_strdup_printf_valist("\n-%s-%s-%s-\n", "\r", "\t", "\b"));
+    auto s = makeString(test_strdup_printf_valist("\n-%s-%s-%s-\n", "\r", "\t", "\b"));
     EXPECT_EQ("\n-\r-\t-\b-\n", s);
 }
 
 TEST_F(UtilsTest, tr_strdup_printf_fmt_s)
 {
-    auto s = make_string(tr_strdup_printf("%s", "test"));
+    auto s = makeString(tr_strdup_printf("%s", "test"));
     EXPECT_EQ("test", s);
 }
 
 TEST_F(UtilsTest, tr_strdup_printf)
 {
-    auto s = make_string(tr_strdup_printf("%d %s %c %u", -1, "0", '1', 2));
+    auto s = makeString(tr_strdup_printf("%d %s %c %u", -1, "0", '1', 2));
     EXPECT_EQ("-1 0 1 2", s);
 
     auto* s3 = reinterpret_cast<char*>(tr_malloc0(4098));
@@ -387,12 +387,12 @@ TEST_F(UtilsTest, tr_strdup_printf)
     s2[2047] = '%';
     s2[2048] = 's';
 
-    s = make_string(tr_strdup_printf(s2, "test"));
+    s = makeString(tr_strdup_printf(s2, "test"));
     EXPECT_EQ(s3, s);
 
     tr_free(s2);
 
-    s = make_string(tr_strdup_printf("%s", s3));
+    s = makeString(tr_strdup_printf("%s", s3));
     EXPECT_EQ(s3, s);
 
     tr_free(s3);
@@ -407,24 +407,24 @@ TEST_F(UtilsTest, env)
     EXPECT_FALSE(tr_env_key_exists(test_key));
     EXPECT_EQ(123, tr_env_get_int(test_key, 123));
     EXPECT_EQ(nullptr, tr_env_get_string(test_key, nullptr));
-    auto s = make_string(tr_env_get_string(test_key, "a"));
+    auto s = makeString(tr_env_get_string(test_key, "a"));
     EXPECT_EQ("a", s);
 
     setenv(test_key, "", 1);
 
     EXPECT_TRUE(tr_env_key_exists(test_key));
     EXPECT_EQ(456, tr_env_get_int(test_key, 456));
-    s = make_string(tr_env_get_string(test_key, nullptr));
+    s = makeString(tr_env_get_string(test_key, nullptr));
     EXPECT_EQ("", s);
-    s = make_string(tr_env_get_string(test_key, "b"));
+    s = makeString(tr_env_get_string(test_key, "b"));
     EXPECT_EQ("", s);
 
     setenv(test_key, "135", 1);
 
     EXPECT_TRUE(tr_env_key_exists(test_key));
     EXPECT_EQ(135, tr_env_get_int(test_key, 789));
-    s = make_string(tr_env_get_string(test_key, nullptr));
+    s = makeString(tr_env_get_string(test_key, nullptr));
     EXPECT_EQ("135", s);
-    s = make_string(tr_env_get_string(test_key, "c"));
+    s = makeString(tr_env_get_string(test_key, "c"));
     EXPECT_EQ("135", s);
 }

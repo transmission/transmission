@@ -44,7 +44,7 @@ TEST(Session, peer_id)
         for (auto const ch : suffix)
         {
             char tmp[2] = { ch, '\0' };
-            val += strtoul(tmp, NULL, 36);
+            val += strtoul(tmp, nullptr, 36);
         }
         EXPECT_EQ(0, val % 36);
     }

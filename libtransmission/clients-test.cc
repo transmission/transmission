@@ -6,18 +6,22 @@
  *
  */
 
+#include <array>
+
 #include "transmission.h"
 #include "clients.h"
 
 #include "gtest/gtest.h"
 
-TEST(Client, client_names_from_peer_id)
+TEST(Client, clientForId)
 {
-    const struct {
+    struct Test {
         char const* peer_id;
         char const* expected_client;
-    } tests[] = {
-        {"-BT791B-", "BitTorrent 7.9.1 (Beta)"},
+    };
+   
+    auto constexpr Tests = std::array<Test, 24> {
+        Test{"-BT791B-", "BitTorrent 7.9.1 (Beta)"},
         {"-BT791\0-", "BitTorrent 7.9.1"},
         {"-FC1013-", "FileCroc 1.0.1.3"},
         {"-FC1013-", "FileCroc 1.0.1.3"},
@@ -58,10 +62,10 @@ TEST(Client, client_names_from_peer_id)
         {"\x65\x78\x62\x63\x00\x38\x4C\x4F\x52\x44\x32\x00\x04\x8E\xCE\xD5\x7B\xD7\x10\x28", "BitLord 0.56"}
     };
 
-    for (auto const& test : tests)
+    for (auto const& test : Tests)
     {
-        char buf[128];
-        tr_clientForId(buf, sizeof(buf), test.peer_id);
-        EXPECT_STREQ(test.expected_client, buf);
+        auto buf = std::array<char, 128>{};
+        tr_clientForId(std::data(buf), std::size(buf), test.peer_id);
+        EXPECT_STREQ(test.expected_client, std::data(buf));
     }
 }

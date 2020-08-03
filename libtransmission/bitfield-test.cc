@@ -6,7 +6,6 @@
  *
  */
 
-#include <string.h> /* strlen() */
 #include "transmission.h"
 #include "crypto-utils.h"
 #include "bitfield.h"
@@ -14,35 +13,32 @@
 
 #include "gtest/gtest.h"
 
-TEST(Bitfield, count_range)
+TEST(Bitfield, countRange)
 {
-    auto constexpr N_ITERS = int { 10000 };
-    for (auto i = 0; i < N_ITERS; ++i)
+    auto constexpr IterCount = int { 10000 };
+
+    for (auto i = 0; i < IterCount; ++i)
     {
-        int begin;
-        int end;
-        int count1;
-        int count2;
-        int const bitCount = 100 + tr_rand_int_weak(1000);
+        int const bit_count = 100 + tr_rand_int_weak(1000);
+
+        // generate a random bitfield
         tr_bitfield bf;
+        tr_bitfieldConstruct(&bf, bit_count);
 
-        /* generate a random bitfield */
-        tr_bitfieldConstruct(&bf, bitCount);
-
-        for (int i = 0, n = tr_rand_int_weak(bitCount); i < n; ++i)
+        for (int i = 0, n = tr_rand_int_weak(bit_count); i < n; ++i)
         {
-            tr_bitfieldAdd(&bf, tr_rand_int_weak(bitCount));
+            tr_bitfieldAdd(&bf, tr_rand_int_weak(bit_count));
         }
 
-        begin = tr_rand_int_weak(bitCount);
-
+        int begin = tr_rand_int_weak(bit_count);
+        int end;
         do
         {
-            end = tr_rand_int_weak(bitCount);
+            end = tr_rand_int_weak(bit_count);
         }
         while (end == begin);
 
-        /* ensure end <= begin */
+        // ensure end <= begin
         if (end < begin)
         {
             int const tmp = begin;
@@ -50,9 +46,8 @@ TEST(Bitfield, count_range)
             end = tmp;
         }
 
-        /* test the bitfield */
-        count1 = 0;
-
+        // test the bitfield
+        auto count1 = int {};
         for (int i = begin; i < end; ++i)
         {
             if (tr_bitfieldHas(&bf, i))
@@ -61,10 +56,10 @@ TEST(Bitfield, count_range)
             }
         }
 
-        count2 = tr_bitfieldCountRange(&bf, begin, end);
+        auto const count2 = tr_bitfieldCountRange(&bf, begin, end);
         EXPECT_EQ(count1, count2);
 
-        /* cleanup */
+        // cleanup
         tr_bitfieldDestruct(&bf);
     }
 }
@@ -169,7 +164,7 @@ TEST(Bitfields, bitfields)
     tr_bitfieldDestruct(&field);
 }
 
-TEST(Bitfields, has_all_none)
+TEST(Bitfields, hasAllNone)
 {
     tr_bitfield field;
 
