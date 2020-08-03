@@ -30,9 +30,9 @@ protected:
     }
 };
 
-TEST_P(JSONTest, test_elements)
+TEST_P(JSONTest, testElements)
 {
-    auto constexpr in = std::string_view {
+    auto constexpr In = std::string_view {
         "{ \"string\": \"hello world\","
         "  \"escaped\": \"bell \\b formfeed \\f linefeed \\n carriage return \\r tab \\t\","
         "  \"int\": 5, "
@@ -43,7 +43,7 @@ TEST_P(JSONTest, test_elements)
     };
 
     tr_variant top;
-    int err = tr_variantFromJson(&top, std::data(in), std::size(in));
+    int err = tr_variantFromJson(&top, std::data(In), std::size(In));
     EXPECT_EQ(0, err);
     EXPECT_TRUE(tr_variantIsDict(&top));
 
@@ -151,7 +151,7 @@ TEST_P(JSONTest, test_utf8)
 
 TEST_P(JSONTest, test1)
 {
-    auto constexpr in = std::string_view {
+    auto constexpr In = std::string_view {
         "{\n"
         "    \"headers\": {\n"
         "        \"type\": \"request\",\n"
@@ -167,7 +167,7 @@ TEST_P(JSONTest, test1)
     };
 
     tr_variant top;
-    auto const err = tr_variantFromJson(&top, std::data(in), std::size(in));
+    auto const err = tr_variantFromJson(&top, std::data(In), std::size(In));
 
     char const* str;
     int64_t i;
@@ -202,10 +202,10 @@ TEST_P(JSONTest, test1)
 TEST_P(JSONTest, test2)
 {
     tr_variant top;
-    auto constexpr in = std::string_view { " " };
+    auto constexpr In = std::string_view { " " };
 
     top.type = 0;
-    int err = tr_variantFromJson(&top, std::data(in), std::size(in));
+    int err = tr_variantFromJson(&top, std::data(In), std::size(In));
 
     EXPECT_NE(0, err);
     EXPECT_FALSE(tr_variantIsDict(&top));
@@ -213,7 +213,7 @@ TEST_P(JSONTest, test2)
 
 TEST_P(JSONTest, test3)
 {
-    auto constexpr in = std::string_view {
+    auto constexpr In = std::string_view {
         "{ \"error\": 2,"
         "  \"errorString\": \"torrent not registered with this tracker 6UHsVW'*C\","
         "  \"eta\": 262792,"
@@ -222,7 +222,7 @@ TEST_P(JSONTest, test3)
     };
 
     tr_variant top;
-    auto const err = tr_variantFromJson(&top, std::data(in), std::size(in));
+    auto const err = tr_variantFromJson(&top, std::data(In), std::size(In));
     EXPECT_EQ(0, err);
 
     char const* str;
@@ -235,8 +235,8 @@ TEST_P(JSONTest, test3)
 TEST_P(JSONTest, unescape)
 {
     tr_variant top;
-    auto constexpr in = std::string_view { "{ \"string-1\": \"\\/usr\\/lib\" }" };
-    int const err = tr_variantFromJson(&top, std::data(in), std::size(in));
+    auto constexpr In = std::string_view { R"({ "string-1": "\/usr\/lib" })" };
+    int const err = tr_variantFromJson(&top, std::data(In), std::size(In));
     EXPECT_EQ(0, err);
 
     char const* str;

@@ -300,7 +300,7 @@ TEST_P(SubprocessTest, SpawnAsyncEnv)
 
 TEST_P(SubprocessTest, SpawnAsyncCwdExplicit)
 {
-    auto test_dir = sandbox_.path();
+    auto const test_dir = sandbox_.path();
     auto const result_path = buildSandboxPath("result.txt");
 
     auto args = std::array<char*, 4> {
@@ -323,8 +323,8 @@ TEST_P(SubprocessTest, SpawnAsyncCwdExplicit)
 
     auto buffer = std::array<char, 1024> {};
     EXPECT_TRUE(tr_sys_file_read_line(fd, std::data(buffer), std::size(buffer), nullptr));
-    tr_sys_path_native_separators(std::data(test_dir));
-    EXPECT_EQ(test_dir, tr_sys_path_native_separators(std::data(buffer)));
+    EXPECT_EQ(makeString(tr_sys_path_native_separators(tr_strdup(test_dir.c_str()))),
+              tr_sys_path_native_separators(std::data(buffer)));
 
     EXPECT_FALSE(tr_sys_file_read_line(fd, std::data(buffer), std::size(buffer), nullptr));
 

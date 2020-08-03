@@ -8,11 +8,11 @@
 
 #include <algorithm>
 #include <array>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include <string_view>
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include "transmission.h"
 #include "session.h"
 #include "session-id.h"
@@ -21,7 +21,7 @@
 
 #include "gtest/gtest.h"
 
-TEST(Session, peer_id)
+TEST(Session, peerId)
 {
     auto constexpr PeerIdPrefix = std::string_view { PEERID_PREFIX };
 
@@ -41,16 +41,16 @@ TEST(Session, peer_id)
         // confirm that its total is evenly divisible by 36
         int val = 0;
         auto const suffix = peer_id.substr(std::size(PeerIdPrefix));
-        for (auto const ch : suffix)
+        for (char const ch : suffix)
         {
-            char tmp[2] = { ch, '\0' };
-            val += strtoul(tmp, nullptr, 36);
+            auto const tmp = std::array<char, 2>{ ch, '\0' };
+            val += strtoul(std::data(tmp), nullptr, 36);
         }
         EXPECT_EQ(0, val % 36);
     }
 }
 
-TEST(Session, session_id)
+TEST(Session, sessionId)
 {
     EXPECT_FALSE(tr_session_id_is_local(nullptr));
     EXPECT_FALSE(tr_session_id_is_local(""));
@@ -118,7 +118,7 @@ TEST(Session, session_id)
     EXPECT_FALSE(tr_session_id_is_local(session_id_str_2));
     EXPECT_FALSE(tr_session_id_is_local(session_id_str_1));
 
-    tr_free((char*)session_id_str_3);
-    tr_free((char*)session_id_str_2);
-    tr_free((char*)session_id_str_1);
+    tr_free(const_cast<char*>(session_id_str_3));
+    tr_free(const_cast<char*>(session_id_str_2));
+    tr_free(const_cast<char*>(session_id_str_1));
 }

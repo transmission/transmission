@@ -99,50 +99,50 @@ TEST(Crypto, encrypt_decrypt)
 
 TEST(Crypto, sha1)
 {
-    uint8_t hash[SHA_DIGEST_LENGTH];
-    uint8_t hash_[SHA_DIGEST_LENGTH];
+    auto hash1 = std::array<uint8_t, SHA_DIGEST_LENGTH>{};
+    auto hash2 = std::array<uint8_t, SHA_DIGEST_LENGTH>{};
 
-    EXPECT_TRUE(tr_sha1(hash, "test", 4, nullptr));
-    EXPECT_TRUE(tr_sha1_(hash_, "test", 4, nullptr));
-    EXPECT_EQ(0, memcmp(hash, "\xa9\x4a\x8f\xe5\xcc\xb1\x9b\xa6\x1c\x4c\x08\x73\xd3\x91\xe9\x87\x98\x2f\xbb\xd3", SHA_DIGEST_LENGTH));
-    EXPECT_EQ(0, memcmp(hash, hash_, SHA_DIGEST_LENGTH));
+    EXPECT_TRUE(tr_sha1(std::data(hash1), "test", 4, nullptr));
+    EXPECT_TRUE(tr_sha1_(std::data(hash2), "test", 4, nullptr));
+    EXPECT_EQ(0, memcmp(std::data(hash1), "\xa9\x4a\x8f\xe5\xcc\xb1\x9b\xa6\x1c\x4c\x08\x73\xd3\x91\xe9\x87\x98\x2f\xbb\xd3", std::size(hash1)));
+    EXPECT_EQ(0, memcmp(std::data(hash1), std::data(hash2), std::size(hash2)));
 
-    EXPECT_TRUE(tr_sha1(hash, "1", 1, "22", 2, "333", 3, nullptr));
-    EXPECT_TRUE(tr_sha1_(hash_, "1", 1, "22", 2, "333", 3, nullptr));
-    EXPECT_EQ(0, memcmp(hash, "\x1f\x74\x64\x8e\x50\xa6\xa6\x70\x8e\xc5\x4a\xb3\x27\xa1\x63\xd5\x53\x6b\x7c\xed", SHA_DIGEST_LENGTH));
-    EXPECT_EQ(0, memcmp(hash, hash_, SHA_DIGEST_LENGTH));
+    EXPECT_TRUE(tr_sha1(std::data(hash1), "1", 1, "22", 2, "333", 3, nullptr));
+    EXPECT_TRUE(tr_sha1_(std::data(hash2), "1", 1, "22", 2, "333", 3, nullptr));
+    EXPECT_EQ(0, memcmp(std::data(hash1), "\x1f\x74\x64\x8e\x50\xa6\xa6\x70\x8e\xc5\x4a\xb3\x27\xa1\x63\xd5\x53\x6b\x7c\xed", std::size(hash1)));
+    EXPECT_EQ(0, memcmp(std::data(hash1), std::data(hash2), std::size(hash2)));
 }
 
 TEST(Crypto, ssha1)
 {
-    struct
+    struct Test
     {
         char const* const plain_text;
         char const* const ssha1;
-    }
-    test_data[] =
-    {
-        { "test", "{15ad0621b259a84d24dcd4e75b09004e98a3627bAMbyRHJy" },
+    };
+
+    auto constexpr Tests = std::array<Test, 2> {
+        Test{ "test", "{15ad0621b259a84d24dcd4e75b09004e98a3627bAMbyRHJy" },
         { "QNY)(*#$B)!_X$B !_B#($^!)*&$%CV!#)&$C!@$(P*)", "{10e2d7acbb104d970514a147cd16d51dfa40fb3c0OSwJtOL" }
     };
 
-    auto constexpr HASH_COUNT = size_t { 4 * 1024 };
+    auto constexpr HashCount = size_t { 4 * 1024 };
 
-    for (size_t i = 0; i < TR_N_ELEMENTS(test_data); ++i)
+    for (auto const& test : Tests)
     {
         std::unordered_set<std::string> hashes;
-        hashes.reserve(HASH_COUNT);
+        hashes.reserve(HashCount);
 
-        char* const phrase = tr_strdup(test_data[i].plain_text);
-        EXPECT_TRUE(tr_ssha1_matches(test_data[i].ssha1, phrase));
-        EXPECT_TRUE(tr_ssha1_matches_(test_data[i].ssha1, phrase));
+        char* const phrase = tr_strdup(test.plain_text);
+        EXPECT_TRUE(tr_ssha1_matches(test.ssha1, phrase));
+        EXPECT_TRUE(tr_ssha1_matches_(test.ssha1, phrase));
 
-        for (size_t j = 0; j < HASH_COUNT; ++j)
+        for (size_t j = 0; j < HashCount; ++j)
         {
             char* hash = (j % 2 == 0) ? tr_ssha1(phrase) : tr_ssha1_(phrase);
             EXPECT_NE(nullptr, hash);
 
-            /* phrase matches each of generated hashes */
+            // phrase matches each of generated hashes
             EXPECT_TRUE(tr_ssha1_matches(hash, phrase));
             EXPECT_TRUE(tr_ssha1_matches_(hash, phrase));
 
@@ -151,7 +151,7 @@ TEST(Crypto, ssha1)
         }
 
         // confirm all hashes are different
-        EXPECT_EQ(HASH_COUNT, std::size(hashes));
+        EXPECT_EQ(HashCount, std::size(hashes));
 
         /* exchange two first chars */
         phrase[0] ^= phrase[1];
@@ -209,14 +209,11 @@ static bool base64_eq(char const* a, char const* b)
 
 TEST(Crypto, base64)
 {
-    size_t len;
-    char* in;
-    char* out;
-
-    out = static_cast<char*>(tr_base64_encode_str("YOYO!", &len));
+    auto len = size_t {};
+    auto* out = static_cast<char*>(tr_base64_encode_str("YOYO!", &len));
     EXPECT_EQ(strlen(out), len);
     EXPECT_TRUE(base64_eq("WU9ZTyE=", out));
-    in = static_cast<char*>(tr_base64_decode_str(out, &len));
+    auto* in = static_cast<char*>(tr_base64_decode_str(out, &len));
     EXPECT_EQ(5, len);
     EXPECT_STREQ("YOYO!", in);
     tr_free(in);
@@ -238,21 +235,21 @@ TEST(Crypto, base64)
     EXPECT_EQ(0, len);
     EXPECT_EQ(nullptr, out);
 
-    static auto constexpr MAX_BUF_SIZE = size_t { 1024 };
-    for (size_t i = 1; i <= MAX_BUF_SIZE; ++i)
+    static auto constexpr MaxBufSize = size_t { 1024 };
+    for (size_t i = 1; i <= MaxBufSize; ++i)
     {
-        char buf[MAX_BUF_SIZE + 1];
+        auto buf = std::array<char, MaxBufSize + 1>{};
 
         for (size_t j = 0; j < i; ++j)
         {
-            buf[j] = (char)tr_rand_int_weak(256);
+            buf[j] = char(tr_rand_int_weak(256));
         }
 
-        out = static_cast<char*>(tr_base64_encode(buf, i, &len));
+        out = static_cast<char*>(tr_base64_encode(std::data(buf), i, &len));
         EXPECT_EQ(strlen(out), len);
         in = static_cast<char*>(tr_base64_decode(out, len, &len));
         EXPECT_EQ(i, len);
-        EXPECT_EQ(0, memcmp(in, buf, len));
+        EXPECT_EQ(0, memcmp(in, std::data(buf), len));
         tr_free(in);
         tr_free(out);
 
@@ -263,11 +260,11 @@ TEST(Crypto, base64)
 
         buf[i] = '\0';
 
-        out = static_cast<char*>(tr_base64_encode_str(buf, &len));
+        out = static_cast<char*>(tr_base64_encode_str(std::data(buf), &len));
         EXPECT_EQ(strlen(out), len);
         in = static_cast<char*>(tr_base64_decode_str(out, &len));
         EXPECT_EQ(i, len);
-        EXPECT_STREQ(buf, in);
+        EXPECT_STREQ(std::data(buf), in);
         tr_free(in);
         tr_free(out);
     }
