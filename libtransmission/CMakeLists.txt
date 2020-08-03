@@ -312,6 +312,7 @@ if(ENABLE_TESTS)
         rename
         rpc
         session
+        subprocess
         utils
         variant
         )
@@ -355,8 +356,7 @@ if(ENABLE_TESTS)
 
     set(watchdir@generic-test_DEFINITIONS WATCHDIR_TEST_FORCE_GENERIC)
 
-    foreach(T move 
-              subprocess watchdir watchdir@generic)
+    foreach(T move watchdir watchdir@generic)
         set(TP ${TR_NAME}-test-${T})
         if(T MATCHES "^([^@]+)@.+$")
             string(REPLACE "@" "-" TP "${TP}")

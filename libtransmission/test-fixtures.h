@@ -8,281 +8,307 @@
 
 #include <memory>
 #include <string>
+#include <cstdlib>  // getenv()
 
 #include "crypto-utils.h" // tr_base64_decode_str()
 #include "error.h"
-#include "file.h"
+#include "file.h"  // tr_sys_file_*()
 #include "quark.h"
 #include "platform.h" // TR_PATH_DELIMITER
 #include "trevent.h" // tr_amInEventThread()
 #include "torrent.h"
-#include "utils.h"
 #include "variant.h"
 
 #include "gtest/gtest.h"
 
 namespace libtransmission::test
 {
-    struct UniqueCStrDeleter {
-        void operator()(char* s) const { tr_free(s); };
-    };
-    
-    auto constexpr unique_cstr_deleter = UniqueCStrDeleter {};
-    
-    auto constexpr make_unique_cstr = [](char* s){
-      return std::unique_ptr<char, UniqueCStrDeleter>(s, unique_cstr_deleter);
-    };
 
-    auto constexpr make_string = [](char*&& s) {
-      auto const ret = std::string(s);
-      tr_free(s);
-      return ret;
-    };
+auto constexpr make_string = [](char*&& s)
+{
+    auto const ret = std::string(s != nullptr ? s : "");
+    tr_free(s);
+    return ret;
+};
 
-}  // namespace libtransmission::test
+class Sandbox
+{
+public:
+    Sandbox():
+        parent_dir_{get_default_parent_dir()},
+        sandbox_dir_{create_sandbox(parent_dir_, "transmission-test-XXXXXX")}
+    {
+    }
+
+    ~Sandbox()
+    {
+        rimraf(sandbox_dir_, true);
+    }
+
+    std::string const& path() const
+    {
+        return sandbox_dir_;
+    }
+
+protected:
+    static std::string get_default_parent_dir()
+    {
+         auto* path = getenv("TMPDIR");
+         if (path != NULL)
+         {
+             return path;
+         }
+
+         tr_error* error = nullptr;
+         path = tr_sys_dir_get_current(&error);
+         if (path != nullptr)
+         {
+             std::string const ret = path;
+             tr_free(path);
+             return ret;
+         }
+
+         std::cerr << "tr_sys_dir_get_current error: '" << error->message << "'" << std::endl;
+         tr_error_free(error);
+         return {};
+    }
+
+    static std::string create_sandbox(std::string const& parent_dir, std::string const& tmpl)
+    {
+        auto sandbox = make_string(tr_buildPath(std::data(parent_dir), std::data(tmpl), nullptr));
+        tr_sys_dir_create_temp(std::data(sandbox), nullptr);
+        tr_sys_path_native_separators(std::data(sandbox));
+        return sandbox;
+    }
+
+    static auto get_folder_files(std::string const& path)
+    {
+        std::vector<std::string> ret;
+        
+        tr_sys_path_info info;
+        if (tr_sys_path_get_info(std::data(path), 0, &info, nullptr)
+            && (info.type == TR_SYS_PATH_IS_DIRECTORY))
+        {
+            auto const odir = tr_sys_dir_open(std::data(path), nullptr);
+            if (odir != TR_BAD_SYS_DIR)
+            {
+                char const* name;
+                while ((name = tr_sys_dir_read_name(odir, nullptr)) != nullptr)
+                {
+                    if (strcmp(name, ".") != 0 && strcmp(name, "..") != 0)
+                    {
+                        ret.push_back(make_string(tr_buildPath(std::data(path), name, nullptr)));
+                    }
+                }
+                tr_sys_dir_close(odir, nullptr);
+            }
+        }
+
+        return ret;
+    }
+
+    static void rimraf(std::string const& path, bool verbose=false)
+    {
+        for (auto const& child : get_folder_files(path))
+        {
+            rimraf(child, verbose);
+        }
+
+        if (verbose)
+        {
+            std::cerr << "cleanup: removing '" << path << "'" << std::endl;
+        }
+
+        tr_sys_path_remove(std::data(path), nullptr);
+    }
+
+private:
+    std::string const parent_dir_;
+    std::string const sandbox_dir_;
+};
 
 
 class SandboxedTest : public ::testing::Test
 {
-private:
-  char* tr_getcwd()
-  {
-    tr_error* error = nullptr;
-
-    char* result = tr_sys_dir_get_current(&error);
-    if (result == nullptr) {
-      std::cerr << "getcwd error: '" << error->message << "'" << std::endl;
-      tr_error_free(error);
-      result = tr_strdup("");
-    }
-
-    return result;
-  }
-
-  char* create_sandbox()
-  {
-    char* path = tr_getcwd();
-    char* sandbox = tr_buildPath(path, "sandbox-XXXXXX", nullptr);
-    tr_free(path);
-    tr_sys_dir_create_temp(sandbox, nullptr);
-    return tr_sys_path_native_separators(sandbox);
-  }
-
-  void rm_rf(char const* killme)
-  {
-    tr_sys_path_info info;
-
-    if (!tr_sys_path_get_info(killme, 0, &info, nullptr))
-    {
-      return;
-    }
-
-    tr_sys_dir_t const odir = info.type == TR_SYS_PATH_IS_DIRECTORY
-      ? tr_sys_dir_open(killme, nullptr)
-      : TR_BAD_SYS_DIR;
-
-    if (odir != TR_BAD_SYS_DIR)
-    {
-      char const* name;
-
-      while ((name = tr_sys_dir_read_name(odir, nullptr)) != nullptr)
-      {
-        if (strcmp(name, ".") != 0 && strcmp(name, "..") != 0)
-        {
-          char* tmp = tr_buildPath(killme, name, nullptr);
-          rm_rf(tmp);
-          tr_free(tmp);
-        }
-      }
-
-      tr_sys_dir_close(odir, nullptr);
-    }
-
-    if (verbose)
-    {
-      std::cerr << "cleanup: removing '" << killme << "'" << std::endl;
-    }
-
-    tr_sys_path_remove(killme, nullptr);
-  }
-
 protected:
-  void build_parent_dir(char const* path)
-  {
-    char* dir;
-    tr_error* error = nullptr;
-    int const tmperr = errno;
 
-    dir = tr_sys_path_dirname(path, nullptr);
-    tr_sys_dir_create(dir, TR_SYS_DIR_CREATE_PARENTS, 0700, &error);
-    EXPECT_EQ(nullptr, error);
-    tr_free(dir);
+    std::string sandboxDir() const { return sandbox_.path(); }
 
-    errno = tmperr;
-  }
+    void build_parent_dir(std::string_view path) const
+    {
+        auto const tmperr = errno;
 
-  void create_tmpfile_with_contents(char* tmpl, void const* payload, size_t n)
-  {
-      int const tmperr = errno;
+        auto const path_sz = std::string(std::data(path), std::size(path));
+        auto const dir = make_string(tr_sys_path_dirname(std::data(path_sz), nullptr));
+        tr_error* error = nullptr;
+        tr_sys_dir_create(std::data(dir), TR_SYS_DIR_CREATE_PARENTS, 0700, &error);
+        EXPECT_EQ(nullptr, error);
 
-      build_parent_dir(tmpl);
+        errno = tmperr;
+    }
 
-      auto fd = tr_sys_file_open_temp(tmpl, nullptr);
+    static void blocking_file_write(tr_sys_file_t fd, void const* data, size_t data_len)
+    {
+        uint64_t n_left = data_len;
+        auto const* left = static_cast<uint8_t const*>(data);
 
-      uint64_t n_left = n;
-      while (n_left > 0)
-      {
-          uint64_t n;
+        while (n_left > 0)
+        {
+            uint64_t n = {};
+            tr_error* error = nullptr;
+            if (!tr_sys_file_write(fd, left, n_left, &n, &error))
+            {
+                fprintf(stderr, "Error writing file: '%s'\n", error->message);
+                tr_error_free(error);
+                break;
+            }
 
-          tr_error* error = nullptr;
-          if (!tr_sys_file_write(fd, payload, n_left, &n, &error))
-          {
-              fprintf(stderr, "Error writing '%s': %s\n", tmpl, error->message);
-              tr_error_free(error);
-              break;
-          }
+            left += n;
+            n_left -= n;
+        }
+    }
 
-          n_left -= n;
-      }
+    void create_tmpfile_with_contents(std::string& tmpl, void const* payload, size_t n) const
+    {
+        auto const tmperr = errno;
 
-      tr_sys_file_close(fd, nullptr);
+        build_parent_dir(tmpl);
 
-      sync();
+        auto const fd = tr_sys_file_open_temp(std::data(tmpl), nullptr);
+        blocking_file_write(fd, payload, n);
+        tr_sys_file_close(fd, nullptr);
+        sync();
 
-      errno = tmperr;
-  }
+        errno = tmperr;
+    }
 
-  bool verbose = false;
-  char* sandbox_ = {};
+    void create_file_with_contents(std::string_view path, void const* payload, size_t n) const
+    {
+        auto const tmperr = errno;
 
-  void sync()
-  {
+        build_parent_dir(path);
+
+        auto const path_sz = std::string(std::data(path), std::size(path));
+        auto const fd = tr_sys_file_open(std::data(path_sz),
+            TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE,
+            0600, nullptr);
+        blocking_file_write(fd, payload, n);
+        tr_sys_file_close(fd, nullptr);
+        sync();
+
+        errno = tmperr;
+    }
+
+    void create_file_with_contents(std::string_view path, std::string_view str)
+    {
+        create_file_with_contents(path, std::data(str), std::size(str));
+    }
+
+    bool verbose = false;
+
+    void sync() const
+    {
 #ifndef _WIN32
-    ::sync();
+        ::sync();
 #endif
-  }
+    }
 
-  virtual void SetUp() override
-  {
-    sandbox_ = create_sandbox();
-  }
-
-  virtual void TearDown() override
-  {
-    rm_rf(sandbox_);
-  }
+private:
+    Sandbox sandbox_;
 };
 
 
 class SessionTest : public SandboxedTest
 {
-  static constexpr int MEM_K = 1024;
-  static char const constexpr* const MEM_K_STR = "KiB";
-  static char const constexpr* const MEM_M_STR = "MiB";
-  static char const constexpr* const MEM_G_STR = "GiB";
-  static char const constexpr* const MEM_T_STR = "TiB";
+    static constexpr int MEM_K = 1024;
+    static char const constexpr* const MEM_K_STR = "KiB";
+    static char const constexpr* const MEM_M_STR = "MiB";
+    static char const constexpr* const MEM_G_STR = "GiB";
+    static char const constexpr* const MEM_T_STR = "TiB";
 
-  static constexpr int DISK_K = 1000;
-  static char const constexpr* const DISK_K_STR = "kB";
-  static char const constexpr* const DISK_M_STR = "MB";
-  static char const constexpr* const DISK_G_STR = "GB";
-  static char const constexpr* const DISK_T_STR = "TB";
+    static constexpr int DISK_K = 1000;
+    static char const constexpr* const DISK_K_STR = "kB";
+    static char const constexpr* const DISK_M_STR = "MB";
+    static char const constexpr* const DISK_G_STR = "GB";
+    static char const constexpr* const DISK_T_STR = "TB";
 
-  static constexpr int SPEED_K = 1000;
-  static char const constexpr* const SPEED_K_STR = "kB/s";
-  static char const constexpr* const SPEED_M_STR = "MB/s";
-  static char const constexpr* const SPEED_G_STR = "GB/s";
-  static char const constexpr* const SPEED_T_STR = "TB/s";
+    static constexpr int SPEED_K = 1000;
+    static char const constexpr* const SPEED_K_STR = "kB/s";
+    static char const constexpr* const SPEED_M_STR = "MB/s";
+    static char const constexpr* const SPEED_G_STR = "GB/s";
+    static char const constexpr* const SPEED_T_STR = "TB/s";
 
-  tr_session* sessionInit(tr_variant* settings)
-  {
-    size_t len;
-    char const* str;
-    char* path;
-    static bool formatters_inited = false;
-
-    tr_variant local_settings;
-    tr_variantInitDict(&local_settings, 10);
-
-    if (settings == nullptr)
+    tr_session* sessionInit(tr_variant* settings)
     {
-        settings = &local_settings;
+        static bool formatters_inited = false;
+
+        tr_variant local_settings;
+        tr_variantInitDict(&local_settings, 10);
+
+        if (settings == nullptr)
+        {
+            settings = &local_settings;
+        }
+
+        if (!formatters_inited)
+        {
+            formatters_inited = true;
+            tr_formatter_mem_init(MEM_K, MEM_K_STR, MEM_M_STR, MEM_G_STR, MEM_T_STR);
+            tr_formatter_size_init(DISK_K, DISK_K_STR, DISK_M_STR, DISK_G_STR, DISK_T_STR);
+            tr_formatter_speed_init(SPEED_K, SPEED_K_STR, SPEED_M_STR, SPEED_G_STR, SPEED_T_STR);
+        }
+
+        // download dir
+        size_t len;
+        char const* str;
+        auto q = TR_KEY_download_dir;
+        auto path = tr_variantDictFindStr(settings, q, &str, &len)
+            ? make_string(tr_strdup_printf("%s/%*.*s", std::data(sandboxDir()), (int)len, (int)len, str))
+            : make_string(tr_buildPath(std::data(sandboxDir()), "Downloads", nullptr));
+        tr_sys_dir_create(std::data(path), TR_SYS_DIR_CREATE_PARENTS, 0700, nullptr);
+        tr_variantDictAddStr(settings, q, std::data(path));
+
+        // incomplete dir
+        q = TR_KEY_incomplete_dir;
+        path = tr_variantDictFindStr(settings, q, &str, &len)
+            ? make_string(tr_strdup_printf("%s/%*.*s", std::data(sandboxDir()), (int)len, (int)len, str))
+            : make_string(tr_buildPath(std::data(sandboxDir()), "Incomplete", nullptr));
+        tr_variantDictAddStr(settings, q, std::data(path));
+
+        // blocklists
+        path = make_string(tr_buildPath(std::data(sandboxDir()), "blocklists", nullptr));
+        tr_sys_dir_create(std::data(path), TR_SYS_DIR_CREATE_PARENTS, 0700, nullptr);
+
+        // fill in any missing settings
+
+        q = TR_KEY_port_forwarding_enabled;
+        if (tr_variantDictFind(settings, q) == nullptr)
+        {
+            tr_variantDictAddBool(settings, q, false);
+        }
+
+        q = TR_KEY_dht_enabled;
+        if (tr_variantDictFind(settings, q) == nullptr)
+        {
+            tr_variantDictAddBool(settings, q, false);
+        }
+
+        q = TR_KEY_message_level;
+        if (tr_variantDictFind(settings, q) == nullptr)
+        {
+            tr_variantDictAddInt(settings, q, verbose ? TR_LOG_DEBUG : TR_LOG_ERROR);
+        }
+
+        auto* session = tr_sessionInit(std::data(sandboxDir()), !verbose, settings);
+        tr_variantFree(&local_settings);
+        return session;
     }
 
-    if (!formatters_inited)
+    void sessionClose(tr_session* session)
     {
-        formatters_inited = true;
-        tr_formatter_mem_init(MEM_K, MEM_K_STR, MEM_M_STR, MEM_G_STR, MEM_T_STR);
-        tr_formatter_size_init(DISK_K, DISK_K_STR, DISK_M_STR, DISK_G_STR, DISK_T_STR);
-        tr_formatter_speed_init(SPEED_K, SPEED_K_STR, SPEED_M_STR, SPEED_G_STR, SPEED_T_STR);
+        tr_sessionClose(session);
+        tr_logFreeQueue(tr_logGetQueue());
     }
-
-    /* download dir */
-    auto q = TR_KEY_download_dir;
-
-    if (tr_variantDictFindStr(settings, q, &str, &len))
-    {
-        path = tr_strdup_printf("%s/%*.*s", sandbox_, (int)len, (int)len, str);
-    }
-    else
-    {
-        path = tr_buildPath(sandbox_, "Downloads", nullptr);
-    }
-
-    tr_sys_dir_create(path, TR_SYS_DIR_CREATE_PARENTS, 0700, nullptr);
-    tr_variantDictAddStr(settings, q, path);
-    tr_free(path);
-
-    /* incomplete dir */
-    q = TR_KEY_incomplete_dir;
-
-    if (tr_variantDictFindStr(settings, q, &str, &len))
-    {
-        path = tr_strdup_printf("%s/%*.*s", sandbox_, (int)len, (int)len, str);
-    }
-    else
-    {
-        path = tr_buildPath(sandbox_, "Incomplete", nullptr);
-    }
-
-    tr_variantDictAddStr(settings, q, path);
-    tr_free(path);
-
-    path = tr_buildPath(sandbox_, "blocklists", nullptr);
-    tr_sys_dir_create(path, TR_SYS_DIR_CREATE_PARENTS, 0700, nullptr);
-    tr_free(path);
-
-    q = TR_KEY_port_forwarding_enabled;
-
-    if (tr_variantDictFind(settings, q) == nullptr)
-    {
-        tr_variantDictAddBool(settings, q, false);
-    }
-
-    q = TR_KEY_dht_enabled;
-
-    if (tr_variantDictFind(settings, q) == nullptr)
-    {
-        tr_variantDictAddBool(settings, q, false);
-    }
-
-    q = TR_KEY_message_level;
-
-    if (tr_variantDictFind(settings, q) == nullptr)
-    {
-        tr_variantDictAddInt(settings, q, verbose ? TR_LOG_DEBUG : TR_LOG_ERROR);
-    }
-
-    tr_session* session = tr_sessionInit(sandbox_, !verbose, settings);
-    tr_variantFree(&local_settings);
-    return session;
-  }
-
-  void sessionClose(tr_session* session)
-  {
-    tr_sessionClose(session);
-    tr_logFreeQueue(tr_logGetQueue());
-  }
 
 protected:
 
@@ -388,24 +414,6 @@ protected:
       }
   }
 
-  void create_file_with_contents(char const* path, void const* payload, size_t n)
-  {
-    int const tmperr = errno;
-
-    build_parent_dir(path);
-    auto fd = tr_sys_file_open(path, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE, 0600, nullptr);
-    tr_sys_file_write(fd, payload, n, nullptr, nullptr);
-    tr_sys_file_close(fd, nullptr);
-    sync();
-
-    errno = tmperr;
-  }
-
-  void create_file_with_string_contents(char const* path, char const* str)
-  {
-    create_file_with_contents(path, str, strlen(str));
-  }
-
   tr_session* session_ = nullptr;
 
   virtual void SetUp() override
@@ -424,49 +432,4 @@ protected:
   }
 };
 
-#if 0
-#include <errno.h>
-#include <stdio.h>
-#include <stdlib.h> /* mkstemp() */
-#include <string.h> /* strcmp() */
-
-#ifndef _WIN32
-#include <unistd.h> /* sync() */
-#endif
-
-#include "transmission.h"
-#include "crypto-utils.h"
-#include "error.h"
-#include "file.h"
-#include "platform.h" /* TR_PATH_DELIMETER */
-#include "torrent.h"
-#include "tr-assert.h"
-#include "trevent.h"
-#include "variant.h"
-#include "libtransmission-test.h"
-
-
-/***
-****
-***/
-
-
-
-/***
-****
-***/
-
-
-
-/***
-****
-***/
-
-
-void libttest_sync(void)
-{
-#ifndef _WIN32
-    sync();
-#endif
-}
-#endif
+}  // namespace libtransmission::test

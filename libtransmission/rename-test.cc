@@ -20,7 +20,8 @@
 
 #include "test-fixtures.h"
 
-using ::libtransmission::test::make_string;
+namespace libtransmission::test
+{
 
 class RenameTest: public SessionTest {
 protected:
@@ -34,21 +35,21 @@ protected:
 
     void create_single_file_torrent_contents(char const* top) {
         auto const path = make_string(tr_buildPath(top, "hello-world.txt", nullptr));
-        create_file_with_string_contents(std::data(path), "hello, world!\n");
+        create_file_with_contents(std::data(path), "hello, world!\n");
     }
 
     void create_multifile_torrent_contents(char const* top) {
         auto path = make_string(tr_buildPath(top, "Felidae", "Felinae", "Acinonyx", "Cheetah", "Chester", nullptr));
-        create_file_with_string_contents(std::data(path), "It ain't easy bein' cheesy.\n");
+        create_file_with_contents(std::data(path), "It ain't easy bein' cheesy.\n");
 
         path = make_string(tr_buildPath(top, "Felidae", "Pantherinae", "Panthera", "Tiger", "Tony", nullptr));
-        create_file_with_string_contents(std::data(path), "They’re Grrrrreat!\n");
+        create_file_with_contents(std::data(path), "They’re Grrrrreat!\n");
 
         path = make_string(tr_buildPath(top, "Felidae", "Felinae", "Felis", "catus", "Kyphi", nullptr));
-        create_file_with_string_contents(std::data(path), "Inquisitive\n");
+        create_file_with_contents(std::data(path), "Inquisitive\n");
 
         path = make_string(tr_buildPath(top, "Felidae", "Felinae", "Felis", "catus", "Saffron", nullptr));
-        create_file_with_string_contents(std::data(path), "Tough\n");
+        create_file_with_contents(std::data(path), "Tough\n");
 
         sync();
     }
@@ -533,3 +534,5 @@ TEST_F(RenameTest, partial_file)
 
     torrentRemoveAndWait(tor, 0);
 }
+
+}  // namespace libtransmission::test

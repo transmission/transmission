@@ -20,6 +20,9 @@
 
 #include "test-fixtures.h"
 
+namespace libtransmission::test
+{
+
 class BlocklistTest: public SessionTest
 {
 protected:
@@ -48,7 +51,7 @@ protected:
         tr_free(dir);
 
         fd = tr_sys_file_open(path, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE, 0600, NULL);
-        tr_sys_file_write(fd, contents, strlen(contents), NULL, NULL);
+        blocking_file_write(fd, contents, strlen(contents));
         tr_sys_file_close(fd, NULL);
 
         sync();
@@ -145,3 +148,5 @@ TEST_F(BlocklistTest, updating)
     //libttest_session_close(session);
     tr_free(path);
 }
+
+}  // namespace libtransmission::test

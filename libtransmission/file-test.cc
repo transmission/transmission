@@ -32,7 +32,8 @@
 #define NATIVE_PATH_SEP "\\"
 #endif
 
-using ::libtransmission::test::make_string;
+namespace libtransmission::test
+{
 
 class FileTest: public SessionTest
 {
@@ -238,7 +239,7 @@ TEST_F(FileTest, get_info)
     tr_error_clear(&err);
 
     auto t = time(nullptr);
-    create_file_with_string_contents(path1, "test");
+    create_file_with_contents(path1, "test");
 
     // Good file info
     clear_path_info(&info);
@@ -282,7 +283,7 @@ TEST_F(FileTest, get_info)
         tr_error_clear(&err);
 
         t = time(nullptr);
-        create_file_with_string_contents(path2, "test");
+        create_file_with_contents(path2, "test");
 
         // Good file info
         clear_path_info(&info);
@@ -344,7 +345,7 @@ TEST_F(FileTest, path_exists)
     EXPECT_EQ(nullptr, err);
 
     // Create file and see that it exists
-    create_file_with_string_contents(path1, "test");
+    create_file_with_contents(path1, "test");
     EXPECT_TRUE(tr_sys_path_exists(path1, &err));
     EXPECT_EQ(nullptr, err);
 
@@ -364,7 +365,7 @@ TEST_F(FileTest, path_exists)
         EXPECT_EQ(nullptr, err);
 
         // Create file and see that it exists (via symlink)
-        create_file_with_string_contents(path2, "test");
+        create_file_with_contents(path2, "test");
         EXPECT_TRUE(tr_sys_path_exists(path1, &err));
         EXPECT_EQ(nullptr, err);
 
@@ -454,7 +455,7 @@ TEST_F(FileTest, path_is_same)
     EXPECT_EQ(nullptr, err);
 
     /* Two same files are the same */
-    create_file_with_string_contents(path1, "test");
+    create_file_with_contents(path1, "test");
     EXPECT_TRUE(tr_sys_path_is_same(path1, path1, &err));
     EXPECT_EQ(nullptr, err);
 
@@ -465,7 +466,7 @@ TEST_F(FileTest, path_is_same)
     EXPECT_EQ(nullptr, err);
 
     /* Two separate files (even with same content) are not the same */
-    create_file_with_string_contents(path2, "test");
+    create_file_with_contents(path2, "test");
     EXPECT_FALSE(tr_sys_path_is_same(path1, path2, &err));
     EXPECT_EQ(nullptr, err);
 
@@ -537,7 +538,7 @@ TEST_F(FileTest, path_is_same)
         tr_sys_path_remove(path1, nullptr);
 
         /* File and symlink pointing to directory are not the same */
-        create_file_with_string_contents(path1, "test");
+        create_file_with_contents(path1, "test");
         EXPECT_FALSE(tr_sys_path_is_same(path1, path3, &err));
         EXPECT_EQ(nullptr, err);
         EXPECT_FALSE(tr_sys_path_is_same(path3, path1, &err));
@@ -589,7 +590,7 @@ TEST_F(FileTest, path_is_same)
     tr_free(path3);
     path3 = tr_buildPath(std::data(test_dir), "c", nullptr);
 
-    create_file_with_string_contents(path1, "test");
+    create_file_with_contents(path1, "test");
 
     if (create_hardlink(path2, path1))
     {
@@ -612,7 +613,7 @@ TEST_F(FileTest, path_is_same)
         tr_sys_path_remove(path3, nullptr);
 
         /* File and hardlink to another file are not the same */
-        create_file_with_string_contents(path3, "test");
+        create_file_with_contents(path3, "test");
         create_hardlink(path2, path3);
         EXPECT_FALSE(tr_sys_path_is_same(path1, path2, &err));
         EXPECT_EQ(nullptr, err);
@@ -656,7 +657,7 @@ TEST_F(FileTest, path_resolve)
     path1 = tr_buildPath(std::data(test_dir), "a", nullptr);
     path2 = tr_buildPath(std::data(test_dir), "b", nullptr);
 
-    create_file_with_string_contents(path1, "test");
+    create_file_with_contents(path1, "test");
 
     if (create_symlink(path2, path1, false))
     {
@@ -818,7 +819,7 @@ TEST_F(FileTest, path_rename)
     auto* path2 = tr_buildPath(std::data(test_dir), "b", nullptr);
     auto* path3 = tr_buildPath(path2, "c", nullptr);
 
-    create_file_with_string_contents(path1, "test");
+    create_file_with_contents(path1, "test");
 
     /* Preconditions */
     EXPECT_TRUE(tr_sys_path_exists(path1, nullptr));
@@ -851,7 +852,7 @@ TEST_F(FileTest, path_rename)
     EXPECT_NE(nullptr, err);
     tr_error_clear(&err);
 
-    create_file_with_string_contents(path2, "test");
+    create_file_with_contents(path2, "test");
 
     /* Renaming file does overwrite existing file */
     EXPECT_TRUE(tr_sys_path_rename(path2, path1, &err));
@@ -938,7 +939,7 @@ TEST_F(FileTest, path_remove)
     tr_error_clear(&err);
 
     /* Removing file works */
-    create_file_with_string_contents(path1, "test");
+    create_file_with_contents(path1, "test");
     EXPECT_TRUE(tr_sys_path_exists(path1, nullptr));
     EXPECT_TRUE(tr_sys_path_remove(path1, &err));
     EXPECT_EQ(nullptr, err);
@@ -953,7 +954,7 @@ TEST_F(FileTest, path_remove)
 
     /* Removing non-empty directory fails */
     tr_sys_dir_create(path2, 0, 0777, nullptr);
-    create_file_with_string_contents(path3, "test");
+    create_file_with_contents(path3, "test");
     EXPECT_TRUE(tr_sys_path_exists(path2, nullptr));
     EXPECT_TRUE(tr_sys_path_exists(path3, nullptr));
     EXPECT_FALSE(tr_sys_path_remove(path2, &err));
@@ -1060,7 +1061,7 @@ TEST_F(FileTest, file_open)
     tr_sys_file_close(fd, nullptr);
 
     tr_sys_path_remove(path1, nullptr);
-    create_file_with_string_contents(path1, "test");
+    create_file_with_contents(path1, "test");
 
     /* Can't create new file if it already exists */
     fd = tr_sys_file_open(path1, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE_NEW, 0640, &err);
@@ -1294,7 +1295,7 @@ TEST_F(FileTest, map)
     auto* path1 = tr_buildPath(std::data(test_dir), "a", nullptr);
 
     auto constexpr contents = std::string_view { "test" };
-    create_file_with_string_contents(path1, std::data(contents));
+    create_file_with_contents(path1, std::data(contents));
 
     auto fd = tr_sys_file_open(path1, TR_SYS_FILE_READ | TR_SYS_FILE_WRITE, 0600, nullptr);
 
@@ -1332,7 +1333,7 @@ TEST_F(FileTest, file_utilities)
     auto const test_dir = create_test_dir(__FUNCTION__);
     auto* path1 = tr_buildPath(std::data(test_dir), "a", nullptr);
     auto constexpr contents = std::string_view { "a\nbc\r\ndef\nghij\r\n\n\nklmno\r" };
-    create_file_with_string_contents(path1, std::data(contents));
+    create_file_with_contents(path1, std::data(contents));
 
     auto fd = tr_sys_file_open(path1, TR_SYS_FILE_READ, 0, nullptr);
 
@@ -1434,7 +1435,7 @@ TEST_F(FileTest, dir_create)
     EXPECT_TRUE(validate_permissions(path1, 0700));
 
     tr_sys_path_remove(path1, nullptr);
-    create_file_with_string_contents(path1, "test");
+    create_file_with_contents(path1, "test");
 
     // Can't create directory where file already exists
     EXPECT_FALSE(tr_sys_dir_create(path1, 0, 0700, &err));
@@ -1485,12 +1486,12 @@ TEST_F(FileTest, dir_read)
     EXPECT_FALSE(have1);
     EXPECT_FALSE(have2);
 
-    create_file_with_string_contents(path1, "test");
+    create_file_with_contents(path1, "test");
     test_dir_read_impl(test_dir, &have1, &have2);
     EXPECT_TRUE(have1);
     EXPECT_FALSE(have2);
 
-    create_file_with_string_contents(path2, "test");
+    create_file_with_contents(path2, "test");
     test_dir_read_impl(test_dir, &have1, &have2);
     EXPECT_TRUE(have1);
     EXPECT_TRUE(have2);
@@ -1503,3 +1504,5 @@ TEST_F(FileTest, dir_read)
     tr_free(path2);
     tr_free(path1);
 }
+
+}  // namespace libtransmission::test

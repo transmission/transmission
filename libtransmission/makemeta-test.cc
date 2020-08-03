@@ -17,6 +17,9 @@
 #include <stdlib.h> // mktemp()
 #include <string.h> // strlen()
 
+namespace libtransmission::test
+{
+
 class MakemetaTest: public SandboxedTest
 {
 protected:
@@ -31,19 +34,19 @@ protected:
         tr_info inf;
 
         // create a single input file
-        auto* input_file = tr_buildPath(sandbox_, "test.XXXXXX", nullptr);
+        auto input_file = make_string(tr_buildPath(std::data(sandboxDir()), "test.XXXXXX", nullptr));
         create_tmpfile_with_contents(input_file, payload, payloadSize);
-        auto* builder = tr_metaInfoBuilderCreate(input_file);
+        auto* builder = tr_metaInfoBuilderCreate(std::data(input_file));
         EXPECT_EQ(1, builder->fileCount);
-        EXPECT_STREQ(input_file, builder->top);
-        EXPECT_STREQ(input_file, builder->files[0].filename);
+        EXPECT_STREQ(std::data(input_file), builder->top);
+        EXPECT_STREQ(std::data(input_file), builder->files[0].filename);
         EXPECT_EQ(payloadSize, builder->files[0].size);
         EXPECT_EQ(payloadSize, builder->totalSize);
         EXPECT_FALSE(builder->isFolder);
         EXPECT_FALSE(builder->abortFlag);
 
         // have tr_makeMetaInfo() build the .torrent file
-        auto* torrent_file = tr_strdup_printf("%s.torrent", input_file);
+        auto* torrent_file = tr_strdup_printf("%s.torrent", std::data(input_file));
         tr_makeMetaInfo(builder, torrent_file, trackers, trackerCount, comment, isPrivate);
         EXPECT_EQ(isPrivate, builder->isPrivate);
         EXPECT_STREQ(torrent_file, builder->outputFile);
@@ -64,9 +67,7 @@ protected:
 
         // quick check of some of the parsed metainfo
         EXPECT_EQ(payloadSize, inf.totalSize);
-        auto* tmpstr = tr_sys_path_basename(input_file, nullptr);
-        EXPECT_STREQ(tmpstr, inf.name);
-        tr_free(tmpstr);
+        EXPECT_EQ(make_string(tr_sys_path_basename(std::data(input_file), nullptr)), inf.name);
         EXPECT_STREQ(comment, inf.comment);
         EXPECT_EQ(1, inf.fileCount);
         EXPECT_EQ(isPrivate, inf.isPrivate);
@@ -75,7 +76,6 @@ protected:
 
         // cleanup
         tr_free(torrent_file);
-        tr_free(input_file);
         tr_ctorFree(ctor);
         tr_metainfoFree(&inf);
         tr_metaInfoBuilderFree(builder);
@@ -90,11 +90,11 @@ protected:
                                     bool const isPrivate)
     {
         // create the top temp directory
-        auto* top = tr_buildPath(sandbox_, "folder.XXXXXX", nullptr);
+        auto* top = tr_buildPath(std::data(sandboxDir()), "folder.XXXXXX", nullptr);
         tr_sys_dir_create_temp(top, nullptr);
 
         // build the payload files that go into the top temp directory
-        std::vector<char*> files;
+        auto files = std::vector<std::string> {};
         files.reserve(payloadCount);
         size_t totalSize = 0;
 
@@ -102,9 +102,9 @@ protected:
         {
             char tmpl[16];
             tr_snprintf(tmpl, sizeof(tmpl), "file.%04zu%s", i, "XXXXXX");
-            auto* path = tr_buildPath(top, tmpl, nullptr);
-            files.push_back(path);
+            auto path = make_string(tr_buildPath(top, tmpl, nullptr));
             create_tmpfile_with_contents(path, payloads[i], payloadSizes[i]);
+            files.push_back(path);
             totalSize += payloadSizes[i];
         }
 
@@ -120,7 +120,7 @@ protected:
 
         for (size_t i = 0; i < builder->fileCount; ++i)
         {
-            EXPECT_STREQ(files[i], builder->files[i].filename);
+            EXPECT_EQ(files[i], builder->files[i].filename);
             EXPECT_EQ(payloadSizes[i], builder->files[i].size);
         }
 
@@ -161,11 +161,6 @@ protected:
         tr_ctorFree(ctor);
         tr_metainfoFree(&inf);
         tr_metaInfoBuilderFree(builder);
-
-        for (size_t i = 0; i < payloadCount; i++)
-        {
-            tr_free(files[i]);
-        }
 
         tr_free(top);
     }
@@ -250,3 +245,5 @@ TEST_F(MakemetaTest, single_directory_random_payload)
                                                   comment, isPrivate);
     }
 }
+
+}  // namespace libtransmission::test

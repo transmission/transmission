@@ -18,6 +18,9 @@
 
 #include "test-fixtures.h"
 
+namespace libtransmission::test
+{
+
 using RpcTest = SessionTest;
 
 TEST_F(RpcTest, list)
@@ -173,3 +176,5 @@ TEST_F(RpcTest, session_get)
     tr_variantFree(&response);
     tr_torrentRemove(tor, false, nullptr);
 }
+
+}  // namespace libtransmission::test
