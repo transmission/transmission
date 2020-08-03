@@ -51,4 +51,12 @@ static inline struct tr_peer_socket tr_peer_socket_utp_create(struct UTPSocket* 
     return (struct tr_peer_socket){ .type = TR_PEER_SOCKET_TYPE_UTP, .handle.utp = handle };
 }
 
+struct tr_session;
+struct tr_address;
+
+struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const* addr, tr_port port, bool clientIsSeed);
+
+struct tr_peer_socket tr_netOpenPeerUTPSocket(tr_session* session, tr_address const* addr, tr_port port, bool clientIsSeed);
+
+
 TR_END_DECLS

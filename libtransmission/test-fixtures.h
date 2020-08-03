@@ -224,7 +224,7 @@ protected:
         errno = tmperr;
     }
 
-    void createFileWithContents(std::string_view path, std::string_view str)
+    void createFileWithContents(std::string_view path, std::string_view str) const
     {
         createFileWithContents(path, std::data(str), std::size(str));
     }
@@ -423,14 +423,13 @@ protected:
         EXPECT_FALSE(tr_amInEventThread(tor->session));
 
         auto constexpr onVerifyDone = [](tr_torrent*, bool, void* done) {
-            *(bool*)done = true;
+            *static_cast<bool*>(done) = true;
         };
 
         bool done = false;
         tr_torrentVerify(tor, onVerifyDone, &done);
-        while (!done) {
-            tr_wait_msec(10);
-        }
+        auto test = [&done](){ return done; };
+        EXPECT_TRUE(waitFor(test, 2000));
     }
 
     tr_session* session_ = nullptr;

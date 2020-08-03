@@ -292,31 +292,10 @@ endif()
 if(ENABLE_TESTS)
     set(crypto-test_ADD_SOURCES crypto-test-ref.h)
     set(subprocess-test_ADD_SOURCES subprocess-test.cmd)
-    set(watchdir@generic-test_DEFINITIONS WATCHDIR_TEST_FORCE_GENERIC)
 
-    foreach(T
-        bitfield
-        blocklist
-        clients
-        crypto
-        error
-        file
-        getopt
-        history
-        json
-        magnet
-        makemeta
-        metainfo
-        move
-        peer-msgs
-        quark
-        rename
-        rpc
-        session
-        subprocess
-        utils
-        variant
-        )
+    foreach(T bitfield blocklist clients crypto error file getopt
+              history json magnet makemeta metainfo move peer-msgs
+              quark rename rpc session subprocess utils variant watchdir)
         set(TP ${TR_NAME}-test-${T})
         if(T MATCHES "^([^@]+)@.+$")
             string(REPLACE "@" "-" TP "${TP}")
@@ -328,9 +307,6 @@ if(ENABLE_TESTS)
         endif()
         add_executable(${TP} ${${TP}_TEST_BASENAME}-test.cc ${${T}-test_ADD_SOURCES})
         target_link_libraries(${TP} gtest gtest_main ${TR_NAME})
-        if(DEFINED ${T}-test_DEFINITIONS)
-            target_compile_definitions(${TP} PRIVATE ${${T}-test_DEFINITIONS})
-        endif()
         add_test(NAME ${T_NAME}-test COMMAND ${TP})
         set_property(TARGET ${TP} PROPERTY FOLDER "UnitTests")
     endforeach()
@@ -340,50 +316,4 @@ if(ENABLE_TESTS)
             COMMAND ${CMAKE_COMMAND} -E copy_if_different ${PROJECT_SOURCE_DIR}/subprocess-test.cmd
                 $<TARGET_FILE_DIR:${TR_NAME}-test-subprocess>/${TR_NAME}-test-subprocess.cmd)
     endif()
-endif()
-
-# tests that haven't been moved over to Google Test yet
-if(ENABLE_TESTS)
-    add_library(${TR_NAME}-test STATIC
-        libtransmission-test.c
-        libtransmission-test.h
-    )
-
-    target_link_libraries(${TR_NAME}-test ${TR_NAME})
-    set_property(TARGET ${TR_NAME}-test PROPERTY FOLDER "UnitTests")
-
-    set(crypto-test_ADD_SOURCES crypto-test-ref.h)
-    set(subprocess-test_ADD_SOURCES subprocess-test.cmd)
-
-    set(watchdir@generic-test_DEFINITIONS WATCHDIR_TEST_FORCE_GENERIC)
-
-    foreach(T watchdir watchdir@generic)
-        set(TP ${TR_NAME}-test-${T})
-        if(T MATCHES "^([^@]+)@.+$")
-            string(REPLACE "@" "-" TP "${TP}")
-            string(REPLACE "@" "-" T_NAME "${T}")
-            set(${TP}_TEST_BASENAME "${CMAKE_MATCH_1}")
-        else()
-            set(T_NAME "${T}")
-            set(${TP}_TEST_BASENAME "${T}")
-        endif()
-        add_executable(${TP} ${${TP}_TEST_BASENAME}-test.c ${${T}-test_ADD_SOURCES})
-        target_link_libraries(${TP} ${TR_NAME} ${TR_NAME}-test)
-        if(DEFINED ${T}-test_DEFINITIONS)
-            target_compile_definitions(${TP} PRIVATE ${${T}-test_DEFINITIONS})
-        endif()
-        add_test(NAME ${T_NAME}-test COMMAND ${TP})
-        set_property(TARGET ${TP} PROPERTY FOLDER "UnitTests")
-    endforeach()
-
-    if(WIN32)
-        add_custom_command(TARGET ${TR_NAME}-test-subprocess PRE_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${PROJECT_SOURCE_DIR}/subprocess-test.cmd
-                $<TARGET_FILE_DIR:${TR_NAME}-test-subprocess>/${TR_NAME}-test-subprocess.cmd)
-    endif()
-endif()
-
-if(INSTALL_LIB)
-    install(TARGETS ${TR_NAME} DESTINATION ${CMAKE_INSTALL_LIBDIR})
-    install(FILES ${${PROJECT_NAME}_PUBLIC_HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${TR_NAME})
 endif()

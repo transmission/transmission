@@ -26,14 +26,14 @@ namespace libtransmission::test
 class BlocklistTest: public SessionTest
 {
 protected:
-    char const* contents1 =
+    static char const constexpr* const Contents1 =
         "10.5.6.7/8\n"
         "Austin Law Firm:216.16.1.144-216.16.1.151\n"
         "Sargent Controls and Aerospace:216.19.18.0-216.19.18.255\n"
         "Corel Corporation:216.21.157.192-216.21.157.223\n"
         "Fox Speed Channel:216.79.131.192-216.79.131.223\n";
 
-    char const* contents2 =
+    static char const constexpr* const Contents2 =
         "10.5.6.7/8\n"
         "Austin Law Firm:216.16.1.144-216.16.1.151\n"
         "Sargent Controls and Aerospace:216.19.18.0-216.19.18.255\n"
@@ -41,7 +41,8 @@ protected:
         "Fox Speed Channel:216.79.131.192-216.79.131.223\n"
         "Evilcorp:216.88.88.0-216.88.88.255\n";
 
-    void create_text_file(char const* path, char const* contents)
+#if 0
+    void createFileWithContents(char const* path, char const* contents)
     {
         tr_sys_file_t fd;
         char* dir;
@@ -56,57 +57,48 @@ protected:
 
         sync();
     }
+#endif
 
-    bool address_is_blocked(tr_session* session, char const* address_str)
+    bool addressIsBlocked(char const* address_str)
     {
-        struct tr_address addr;
+        struct tr_address addr = {};
         tr_address_from_string(&addr, address_str);
-        return tr_sessionIsAddressBlocked(session, &addr);
+        return tr_sessionIsAddressBlocked(session_, &addr);
     }
 };
 
 TEST_F(BlocklistTest, parsing)
 {
-    // char* path;
-    // tr_session* session;
-
-    /* init the session */
-    // session = libttest_session_init(nullptr);
-    // EXPECT_TRUE(!tr_blocklistExists(session));
     EXPECT_EQ(0, tr_blocklistGetRuleCount(session_));
 
-    /* init the blocklist */
-    char* path = tr_buildPath(tr_sessionGetConfigDir(session_), "blocklists", "level1", nullptr);
-    create_text_file(path, contents1);
-    tr_free(path);
+    // init the blocklist
+    auto const path = makeString(tr_buildPath(tr_sessionGetConfigDir(session_), "blocklists", "level1", nullptr));
+    createFileWithContents(path, Contents1);
     tr_sessionReloadBlocklists(session_);
     EXPECT_TRUE(tr_blocklistExists(session_));
     EXPECT_EQ(5, tr_blocklistGetRuleCount(session_));
 
-    /* enable the blocklist */
-    EXPECT_TRUE(!tr_blocklistIsEnabled(session_));
+    // enable the blocklist
+    EXPECT_FALSE(tr_blocklistIsEnabled(session_));
     tr_blocklistSetEnabled(session_, true);
     EXPECT_TRUE(tr_blocklistIsEnabled(session_));
 
-    /* test blocked addresses */
-    EXPECT_TRUE(!address_is_blocked(session_, "0.0.0.1"));
-    EXPECT_TRUE(address_is_blocked(session_, "10.1.2.3"));
-    EXPECT_TRUE(!address_is_blocked(session_, "216.16.1.143"));
-    EXPECT_TRUE(address_is_blocked(session_, "216.16.1.144"));
-    EXPECT_TRUE(address_is_blocked(session_, "216.16.1.145"));
-    EXPECT_TRUE(address_is_blocked(session_, "216.16.1.146"));
-    EXPECT_TRUE(address_is_blocked(session_, "216.16.1.147"));
-    EXPECT_TRUE(address_is_blocked(session_, "216.16.1.148"));
-    EXPECT_TRUE(address_is_blocked(session_, "216.16.1.149"));
-    EXPECT_TRUE(address_is_blocked(session_, "216.16.1.150"));
-    EXPECT_TRUE(address_is_blocked(session_, "216.16.1.151"));
-    EXPECT_TRUE(!address_is_blocked(session_, "216.16.1.152"));
-    EXPECT_TRUE(!address_is_blocked(session_, "216.16.1.153"));
-    EXPECT_TRUE(!address_is_blocked(session_, "217.0.0.1"));
-    EXPECT_TRUE(!address_is_blocked(session_, "255.0.0.1"));
-
-    /* cleanup */
-    // libttest_session_close(session);
+    // test blocked addresses
+    EXPECT_FALSE(addressIsBlocked("0.0.0.1"));
+    EXPECT_TRUE(addressIsBlocked("10.1.2.3"));
+    EXPECT_FALSE(addressIsBlocked("216.16.1.143"));
+    EXPECT_TRUE(addressIsBlocked("216.16.1.144"));
+    EXPECT_TRUE(addressIsBlocked("216.16.1.145"));
+    EXPECT_TRUE(addressIsBlocked("216.16.1.146"));
+    EXPECT_TRUE(addressIsBlocked("216.16.1.147"));
+    EXPECT_TRUE(addressIsBlocked("216.16.1.148"));
+    EXPECT_TRUE(addressIsBlocked("216.16.1.149"));
+    EXPECT_TRUE(addressIsBlocked("216.16.1.150"));
+    EXPECT_TRUE(addressIsBlocked("216.16.1.151"));
+    EXPECT_FALSE(addressIsBlocked("216.16.1.152"));
+    EXPECT_FALSE(addressIsBlocked("216.16.1.153"));
+    EXPECT_FALSE(addressIsBlocked("217.0.0.1"));
+    EXPECT_FALSE(addressIsBlocked("255.0.0.1"));
 }
 
 /***
@@ -115,37 +107,33 @@ TEST_F(BlocklistTest, parsing)
 
 TEST_F(BlocklistTest, updating)
 {
-    //tr_session* session;
-
-    /* init the session */
-    // session = libttest_session_init(nullptr);
+    // init the session
     char* path = tr_buildPath(tr_sessionGetConfigDir(session_), "blocklists", "level1", nullptr);
 
-    /* no blocklist to start with... */
+    // no blocklist to start with...
     EXPECT_EQ(0, tr_blocklistGetRuleCount(session_));
 
-    /* test that updated source files will get loaded */
-    create_text_file(path, contents1);
+    // test that updated source files will get loaded
+    createFileWithContents(path, Contents1);
     tr_sessionReloadBlocklists(session_);
     EXPECT_EQ(5, tr_blocklistGetRuleCount(session_));
 
-    /* test that updated source files will get loaded */
-    create_text_file(path, contents2);
+    // test that updated source files will get loaded
+    createFileWithContents(path, Contents2);
     tr_sessionReloadBlocklists(session_);
     EXPECT_EQ(6, tr_blocklistGetRuleCount(session_));
 
-    /* test that updated source files will get loaded */
-    create_text_file(path, contents1);
+    // test that updated source files will get loaded
+    createFileWithContents(path, Contents1);
     tr_sessionReloadBlocklists(session_);
     EXPECT_EQ(5, tr_blocklistGetRuleCount(session_));
 
-    /* ensure that new files, if bad, get skipped */
-    create_text_file(path, "# nothing useful\n");
+    // ensure that new files, if bad, get skipped
+    createFileWithContents(path, "# nothing useful\n");
     tr_sessionReloadBlocklists(session_);
     EXPECT_EQ(5, tr_blocklistGetRuleCount(session_));
 
-    /* cleanup */
-    //libttest_session_close(session);
+    // cleanup
     tr_free(path);
 }
 

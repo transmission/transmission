@@ -24,6 +24,8 @@ namespace libtransmission::test
 {
 
 class RenameTest: public SessionTest {
+
+    static auto constexpr MaxWaitMsec = 3000;
 protected:
 
     void torrentRemoveAndWait(tr_torrent* tor, int expected_torrent_count)
@@ -32,7 +34,7 @@ protected:
         auto const test = [this, expected_torrent_count]() {
             return tr_sessionCountTorrents(session_) == expected_torrent_count;
         };
-        waitFor(test, 3000);
+        EXPECT_TRUE(waitFor(test, MaxWaitMsec));
     }
 
     void createSingleFileTorrentContents(char const* top)
@@ -112,36 +114,25 @@ protected:
         EXPECT_EQ(total_size, tor->info.totalSize);
         EXPECT_EQ(0, tst->haveValid);
     }
-};
 
-/***
-****
-***/
-
-
-static void onRenameDone(tr_torrent* tor UNUSED, char const* oldpath UNUSED, char const* newname UNUSED, int error,
-    void* user_data)
-{
-    *static_cast<int*>(user_data) = error;
-}
-
-static int torrentRenameAndWait(tr_torrent* tor, char const* oldpath, char const* newname)
-{
-    int error = -1;
-    tr_torrentRenamePath(tor, oldpath, newname, onRenameDone, &error);
-
-    do
+    int torrentRenameAndWait(tr_torrent* tor,
+                             char const* oldpath,
+                             char const* newname)
     {
-        tr_wait_msec(10);
+        auto const on_rename_done = [](
+                tr_torrent* /*tor*/, char const* /*oldpath*/,
+                char const* /*newname*/, int error,
+                void* user_data) {
+            *static_cast<int*>(user_data) = error;
+        };
+
+        int error = -1;
+        tr_torrentRenamePath(tor, oldpath, newname, on_rename_done, &error);
+        auto test = [&error](){ return error != -1; };
+        EXPECT_TRUE(waitFor(test, MaxWaitMsec));
+        return error;
     }
-    while (error == -1);
-
-    return error;
-}
-
-/***
-****
-***/
+};
 
 TEST_F(RenameTest, singleFilenameTorrent)
 {
@@ -402,7 +393,7 @@ TEST_F(RenameTest, multifileTorrent)
     }
 
     EXPECT_EQ(0, torrentRenameAndWait(tor, "Felidae", "gabba"));
-    char const* strings[4];
+    auto strings = std::array<char const*, 4>{};
     strings[0] = "gabba/Felinae/Acinonyx/Cheetah/Chester";
     strings[1] = "gabba/Felinae/Felis/catus/Kyphi";
     strings[2] = "gabba/Felinae/Felis/catus/Saffron";
@@ -480,10 +471,10 @@ TEST_F(RenameTest, multifileTorrent)
 
 TEST_F(RenameTest, partialFile)
 {
-    uint32_t constexpr PieceCount = 33;
-    uint32_t constexpr PieceSize = 32768;
-    uint32_t constexpr Length[] = { 1048576, 4096, 512 };
-    uint64_t constexpr TotalSize = Length[0] + Length[1] + Length[2];
+    auto constexpr PieceCount = uint32_t { 33 };
+    auto constexpr PieceSize = uint32_t { 32768 };
+    auto constexpr Length = std::array<uint32_t, 3> { 1048576, 4096, 512 };
+    auto constexpr TotalSize = uint64_t(Length[0]) + Length[1] + Length[2];
 
     /***
     ****  create our test torrent with an incomplete .part file
@@ -513,7 +504,7 @@ TEST_F(RenameTest, partialFile)
 
     EXPECT_EQ(0, torrentRenameAndWait(tor, "files-filled-with-zeroes", "foo"));
     EXPECT_EQ(0, torrentRenameAndWait(tor, "foo/1048576", "bar"));
-    char const* strings[3];
+    auto strings = std::array<char const*, 3>{};
     strings[0] = "foo/bar";
     strings[1] = "foo/4096";
     strings[2] = "foo/512";

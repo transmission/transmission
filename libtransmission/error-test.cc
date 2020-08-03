@@ -12,7 +12,7 @@
 #include "gtest/gtest.h"
 
 
-TEST(Error, error_set)
+TEST(Error, errorSet)
 {
     tr_error* err = nullptr;
 

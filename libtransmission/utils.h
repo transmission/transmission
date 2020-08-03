@@ -228,10 +228,10 @@ char* tr_strdup_printf(char const* fmt, ...) TR_GNUC_MALLOC TR_GNUC_PRINTF(1, 2)
 char* tr_strdup_vprintf(char const* fmt, va_list args) TR_GNUC_MALLOC TR_GNUC_PRINTF(1, 0);
 
 /** @brief Portability wrapper for strlcpy() that uses the system implementation if available */
-size_t tr_strlcpy(char* dst, void const* src, size_t siz);
+size_t tr_strlcpy(void* dst, void const* src, size_t siz);
 
 /** @brief Portability wrapper for snprintf() that uses the system implementation if available */
-int tr_snprintf(char* buf, size_t buflen, char const* fmt, ...) TR_GNUC_PRINTF(3, 4) TR_GNUC_NONNULL(1, 3);
+int tr_snprintf(void* buf, size_t buflen, char const* fmt, ...) TR_GNUC_PRINTF(3, 4) TR_GNUC_NONNULL(1, 3);
 
 /** @brief Convenience wrapper around strerorr() guaranteed to not return NULL
     @param errnum the error number to describe */

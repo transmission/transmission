@@ -13,7 +13,7 @@
 
 class GetoptTest: public ::testing::Test {
 protected:
-    std::array<tr_option,8> options = {
+    static auto constexpr Options = std::array<tr_option, 8> {
         tr_option{ 'p', "private", "Allow this torrent to only be used with the specified tracker(s)", "p", false, nullptr },
         { 'o', "outfile", "Save the generated .torrent to this filename", "o", true, "<file>" },
         { 's', "piecesize", "Set how many KiB each piece should be, overriding the preferred default", "s", true, "<size in KiB>" },
@@ -34,7 +34,7 @@ protected:
 
         int c;
         char const* optarg;
-        while ((c = tr_getopt("summary", argc, argv, std::data(options), &optarg)) != TR_OPT_DONE)
+        while ((c = tr_getopt("summary", argc, argv, std::data(Options), &optarg)) != TR_OPT_DONE)
         {
             EXPECT_LT(n, expected_n);
             EXPECT_EQ(expected_c[n], c);

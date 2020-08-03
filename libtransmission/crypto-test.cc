@@ -18,14 +18,14 @@
 
 #include "gtest/gtest.h"
 
-TEST(Crypto, torrent_hash)
+TEST(Crypto, torrentHash)
 {
     tr_crypto a;
-    uint8_t hash[SHA_DIGEST_LENGTH];
 
-    for (uint8_t i = 0; i < SHA_DIGEST_LENGTH; ++i)
+    auto hash = std::array<uint8_t, SHA_DIGEST_LENGTH>{};
+    for (size_t i = 0; i < std::size(hash); ++i)
     {
-        hash[i] = i;
+        hash[i] = uint8_t(i);
     }
 
     tr_cryptoConstruct(&a, nullptr, true);
@@ -33,23 +33,23 @@ TEST(Crypto, torrent_hash)
     EXPECT_FALSE(tr_cryptoHasTorrentHash(&a));
     EXPECT_EQ(nullptr, tr_cryptoGetTorrentHash(&a));
 
-    tr_cryptoSetTorrentHash(&a, hash);
+    tr_cryptoSetTorrentHash(&a, std::data(hash));
     EXPECT_TRUE(tr_cryptoHasTorrentHash(&a));
     EXPECT_NE(nullptr, tr_cryptoGetTorrentHash(&a));
-    EXPECT_EQ(0, memcmp(tr_cryptoGetTorrentHash(&a), hash, SHA_DIGEST_LENGTH));
+    EXPECT_EQ(0, memcmp(tr_cryptoGetTorrentHash(&a), std::data(hash), std::size(hash)));
 
     tr_cryptoDestruct(&a);
 
-    for (uint8_t i = 0; i < SHA_DIGEST_LENGTH; ++i)
+    for (size_t i = 0; i < std::size(hash); ++i)
     {
-        hash[i] = i + 1;
+        hash[i] = uint8_t(i + 1);
     }
 
-    tr_cryptoConstruct(&a, hash, false);
+    tr_cryptoConstruct(&a, std::data(hash), false);
 
     EXPECT_TRUE(tr_cryptoHasTorrentHash(&a));
     EXPECT_NE(nullptr, tr_cryptoGetTorrentHash(&a));
-    EXPECT_EQ(0, memcmp(tr_cryptoGetTorrentHash(&a), hash, SHA_DIGEST_LENGTH));
+    EXPECT_EQ(0, memcmp(tr_cryptoGetTorrentHash(&a), std::data(hash), std::size(hash)));
 
     tr_cryptoSetTorrentHash(&a, nullptr);
     EXPECT_FALSE(tr_cryptoHasTorrentHash(&a));
@@ -58,40 +58,41 @@ TEST(Crypto, torrent_hash)
     tr_cryptoDestruct(&a);
 }
 
-TEST(Crypto, encrypt_decrypt)
+TEST(Crypto, encryptDecrypt)
 {
-    tr_crypto a;
-    tr_crypto_ b;
-    uint8_t hash[SHA_DIGEST_LENGTH];
-    char const test1[] = { "test1" };
-    char buf11[sizeof(test1)];
-    char buf12[sizeof(test1)];
-    char const test2[] = { "@#)C$@)#(*%bvkdjfhwbc039bc4603756VB3)" };
-    char buf21[sizeof(test2)];
-    char buf22[sizeof(test2)];
-    int public_key_length;
-
-    for (int i = 0; i < SHA_DIGEST_LENGTH; ++i)
+    auto hash = std::array<uint8_t, SHA_DIGEST_LENGTH>{};
+    for (size_t i = 0; i < std::size(hash); ++i)
     {
-        hash[i] = (uint8_t)i;
+        hash[i] = uint8_t(i);
     }
 
-    tr_cryptoConstruct(&a, hash, false);
-    tr_cryptoConstruct_(&b, hash, true);
+    auto a = tr_crypto {};
+    tr_cryptoConstruct(&a, std::data(hash), false);
+    auto b = tr_crypto_ {};
+    tr_cryptoConstruct_(&b, std::data(hash), true);
+    auto public_key_length = int {};
     EXPECT_TRUE(tr_cryptoComputeSecret(&a, tr_cryptoGetMyPublicKey_(&b, &public_key_length)));
     EXPECT_TRUE(tr_cryptoComputeSecret_(&b, tr_cryptoGetMyPublicKey(&a, &public_key_length)));
 
+    auto constexpr Input1 = std::string_view { "test1" };
+    auto encrypted1 = std::array<char, std::size(Input1)>{};
+    auto decrypted1 = std::array<char, std::size(Input1)>{};
+
     tr_cryptoEncryptInit(&a);
-    tr_cryptoEncrypt(&a, sizeof(test1), test1, buf11);
+    tr_cryptoEncrypt(&a, std::size(Input1), std::data(Input1), std::data(encrypted1));
     tr_cryptoDecryptInit_(&b);
-    tr_cryptoDecrypt_(&b, sizeof(test1), buf11, buf12);
-    EXPECT_STREQ(buf12, test1);
+    tr_cryptoDecrypt_(&b, std::size(encrypted1), std::data(encrypted1), std::data(decrypted1));
+    EXPECT_EQ(Input1, std::string_view(std::data(decrypted1), std::size(decrypted1)));
+
+    auto constexpr Input2 = std::string_view { "@#)C$@)#(*%bvkdjfhwbc039bc4603756VB3)" };
+    auto encrypted2 = std::array<char, std::size(Input2)>{};
+    auto decrypted2 = std::array<char, std::size(Input2)>{};
 
     tr_cryptoEncryptInit_(&b);
-    tr_cryptoEncrypt_(&b, sizeof(test2), test2, buf21);
+    tr_cryptoEncrypt_(&b, std::size(Input2), std::data(Input2), std::data(encrypted2));
     tr_cryptoDecryptInit(&a);
-    tr_cryptoDecrypt(&a, sizeof(test2), buf21, buf22);
-    EXPECT_STREQ(buf22, test2);
+    tr_cryptoDecrypt(&a, std::size(encrypted2), std::data(encrypted2), std::data(decrypted2));
+    EXPECT_EQ(Input2, std::string_view(std::data(decrypted2), std::size(decrypted2)));
 
     tr_cryptoDestruct_(&b);
     tr_cryptoDestruct(&a);
@@ -184,7 +185,7 @@ TEST(Crypto, random)
     }
 }
 
-static bool base64_eq(char const* a, char const* b)
+static bool base64Eq(char const* a, char const* b)
 {
     for (;; ++a, ++b)
     {
@@ -212,7 +213,7 @@ TEST(Crypto, base64)
     auto len = size_t {};
     auto* out = static_cast<char*>(tr_base64_encode_str("YOYO!", &len));
     EXPECT_EQ(strlen(out), len);
-    EXPECT_TRUE(base64_eq("WU9ZTyE=", out));
+    EXPECT_TRUE(base64Eq("WU9ZTyE=", out));
     auto* in = static_cast<char*>(tr_base64_decode_str(out, &len));
     EXPECT_EQ(5, len);
     EXPECT_STREQ("YOYO!", in);
@@ -255,7 +256,7 @@ TEST(Crypto, base64)
 
         for (size_t j = 0; j < i; ++j)
         {
-            buf[j] = (char)(1 + tr_rand_int_weak(255));
+            buf[j] = char(1 + tr_rand_int_weak(255));
         }
 
         buf[i] = '\0';

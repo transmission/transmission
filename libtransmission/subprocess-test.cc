@@ -17,7 +17,6 @@
 #include "utils.h"
 
 #include "gtest/internal/gtest-port.h" // GetArgvs()
-#include "libtransmission-test.h"
 
 #include "test-fixtures.h"
 
@@ -40,12 +39,14 @@ std::string getCmdSelfPath()
     return exec;
 }
 
-class SubprocessTest: public ::testing::TestWithParam<std::string>
+class SubprocessTest:
+    public ::testing::Test,
+    public testing::WithParamInterface<std::string>
 {
 protected:
     Sandbox sandbox_;
 
-    std::string buildSandboxPath(std::string_view filename) const
+    [[nodiscard]] std::string buildSandboxPath(std::string_view filename) const
     {
         auto* tmp = tr_strdup_printf("%s%c%*.*s",
             sandbox_.path().c_str(), TR_PATH_DELIMITER,
@@ -56,7 +57,7 @@ protected:
         return path;
     }
 
-    static std::string nativeCwd()
+    [[nodiscard]] static std::string nativeCwd()
     {
         auto* tmp = tr_sys_dir_get_current(nullptr);
         tr_sys_path_native_separators(tmp);
@@ -145,10 +146,11 @@ protected:
 
 TEST_P(SubprocessTest, SpawnAsyncMissingExec)
 {
-    char missing_exe_path[] = TR_IF_WIN32("C:\\", "/") "tr-missing-test-exe" TR_IF_WIN32(".exe", "");
+    auto constexpr MissingExePath = std::string_view { TR_IF_WIN32("C:\\", "/") "tr-missing-test-exe" TR_IF_WIN32(".exe", "") };
 
     auto args = std::array<char*, 2> {
-        missing_exe_path,
+        //  FIXME(ckerr): remove tr_strdup()s after https://github.com/transmission/transmission/issues/1384
+        tr_strdup(std::data(MissingExePath)),
         nullptr
     };
 

@@ -29,7 +29,7 @@ using ::libtransmission::test::makeString;
 
 using UtilsTest = ::testing::Test;
 
-TEST_F(UtilsTest, tr_strip_positional_args)
+TEST_F(UtilsTest, trStripPositionalArgs)
 {
     auto const* in = "Hello %1$s foo %2$.*f";
     auto const* expected = "Hello %s foo %.*f";
@@ -42,7 +42,7 @@ TEST_F(UtilsTest, tr_strip_positional_args)
     EXPECT_STREQ(expected, out);
 }
 
-TEST_F(UtilsTest, tr_strstrip)
+TEST_F(UtilsTest, trStrstrip)
 {
     auto* in = tr_strdup("   test    ");
     auto* out = tr_strstrip(in);
@@ -64,7 +64,7 @@ TEST_F(UtilsTest, tr_strstrip)
     tr_free(in);
 }
 
-TEST_F(UtilsTest, tr_strjoin)
+TEST_F(UtilsTest, trStrjoin)
 {
     char const* in1[] = { "one", "two" };
     auto out = makeString(tr_strjoin(in1, 2, ", "));
@@ -87,7 +87,7 @@ TEST_F(UtilsTest, tr_strjoin)
     EXPECT_EQ("", out);
 }
 
-TEST_F(UtilsTest, tr_buildPath)
+TEST_F(UtilsTest, trBuildpath)
 {
     auto out = makeString(tr_buildPath("foo", "bar", nullptr));
     EXPECT_EQ("foo" TR_PATH_DELIMITER_STR "bar", out);
@@ -96,7 +96,7 @@ TEST_F(UtilsTest, tr_buildPath)
     EXPECT_EQ(TR_PATH_DELIMITER_STR "foo" TR_PATH_DELIMITER_STR "bar", out);
 }
 
-TEST_F(UtilsTest, tr_utf8clean)
+TEST_F(UtilsTest, trUtf8clean)
 {
     auto const* in = "hello world";
     auto out = makeString(tr_utf8clean(in, TR_BAD_SIZE));
@@ -172,12 +172,12 @@ namespace
 
 int compareInts(void const* va, void const* vb)
 {
-    int const a = *(int const*)va;
-    int const b = *(int const*)vb;
+    auto const a = *static_cast<int const*>(va);
+    auto const b = *static_cast<int const*>(vb);
     return a - b;
 }
 
-}
+} // unnamed namespace
 
 TEST_F(UtilsTest, lowerbound)
 {
@@ -194,9 +194,9 @@ TEST_F(UtilsTest, lowerbound)
     }
 }
 
-TEST_F(UtilsTest, tr_quickfindFirstK)
+TEST_F(UtilsTest, trQuickfindfirstk)
 {
-    auto constexpr run_test = [](size_t const k, size_t const n, int* buf, int range) {
+    auto const run_test = [](size_t const k, size_t const n, int* buf, int range) {
         // populate buf with random ints
         std::generate(buf, buf+n, [range](){return tr_rand_int_weak(range);});
 
@@ -218,7 +218,7 @@ TEST_F(UtilsTest, tr_quickfindFirstK)
     }
 }
 
-TEST_F(UtilsTest, tr_memmem)
+TEST_F(UtilsTest, trMemmem)
 {
     auto constexpr Haystack = std::string_view { "abcabcabcabc" };
     auto constexpr Needle = std::string_view { "cab" };
@@ -228,7 +228,7 @@ TEST_F(UtilsTest, tr_memmem)
     EXPECT_EQ(nullptr, tr_memmem(std::data(Needle), std::size(Needle), std::data(Haystack), std::size(Haystack)));
 }
 
-TEST_F(UtilsTest, tr_binary_hex)
+TEST_F(UtilsTest, trBinaryHex)
 {
     auto constexpr HexIn = std::string_view { "fb5ef5507427b17e04b69cef31fa3379b456735a" };
 
@@ -307,7 +307,7 @@ TEST_F(UtilsTest, url)
     tr_free(host);
 }
 
-TEST_F(UtilsTest, tr_http_unescape)
+TEST_F(UtilsTest, trHttpUnescape)
 {
     auto constexpr Url = std::string_view { "http%3A%2F%2Fwww.example.com%2F~user%2F%3Ftest%3D1%26test1%3D2" };
     auto str = makeString(tr_http_unescape(std::data(Url), std::size(Url)));
@@ -350,8 +350,9 @@ TEST_F(UtilsTest, truncd)
 #endif
 }
 
-TEST_F(UtilsTest, tr_strdup_vprintf)
+TEST_F(UtilsTest, trStrdupVprintf)
 {
+    //NOLINTNEXTLINE(cert-dcl50-cpp)
     auto constexpr test_strdup_printf_valist = [](char const* fmt, ...){
         va_list args;
         va_start(args, fmt);
@@ -364,13 +365,13 @@ TEST_F(UtilsTest, tr_strdup_vprintf)
     EXPECT_EQ("\n-\r-\t-\b-\n", s);
 }
 
-TEST_F(UtilsTest, tr_strdup_printf_fmt_s)
+TEST_F(UtilsTest, trStrdupPrintfFmtS)
 {
     auto s = makeString(tr_strdup_printf("%s", "test"));
     EXPECT_EQ("test", s);
 }
 
-TEST_F(UtilsTest, tr_strdup_printf)
+TEST_F(UtilsTest, trStrdupPrintf)
 {
     auto s = makeString(tr_strdup_printf("%d %s %c %u", -1, "0", '1', 2));
     EXPECT_EQ("-1 0 1 2", s);

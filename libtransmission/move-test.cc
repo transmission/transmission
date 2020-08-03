@@ -57,8 +57,8 @@ TEST_P(IncompleteDirTest, incompleteDir)
     maybe_completeness completeness;
     // auto completeness = completeness_unset;
     auto const zeroes_completeness_func = [](
-            tr_torrent*, tr_completeness completeness,
-            bool, void* user_data) {
+            tr_torrent* /*torrent*/, tr_completeness completeness,
+            bool /*was_running*/, void* user_data) {
         *static_cast<maybe_completeness*>(user_data) = completeness;
     };
     tr_torrentSetCompletenessCallback(tor, zeroes_completeness_func, &completeness);
@@ -179,4 +179,4 @@ TEST_F(MoveTest, setLocation)
     tr_torrentRemove(tor, true, tr_sys_path_remove);
 }
 
-} // namespace ::libtransmission::test
+} // namespace libtransmission::test

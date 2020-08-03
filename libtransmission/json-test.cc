@@ -6,15 +6,15 @@
  *
  */
 
-#include <string.h> /* strlen() */
+#include <clocale> // setlocale()
+#include <cstring> // strlen()
 #include <string_view>
 
-#include <locale.h> /* setlocale() */
 
 #define __LIBTRANSMISSION_VARIANT_MODULE__
 
 #include "transmission.h"
-#include "utils.h" /* tr_free */
+#include "utils.h" // tr_free()
 #include "variant.h"
 #include "variant-common.h"
 
@@ -79,7 +79,7 @@ TEST_P(JSONTest, testElements)
     }
 }
 
-TEST_P(JSONTest, test_utf8)
+TEST_P(JSONTest, testUtf8)
 {
     auto in = std::string_view { "{ \"key\": \"Letöltések\" }" };
     tr_variant top;
@@ -99,7 +99,7 @@ TEST_P(JSONTest, test_utf8)
         tr_variantFree(&top);
     }
 
-    in = std::string_view { "{ \"key\": \"\\u005C\" }" };
+    in = std::string_view { R"({ "key": "\u005C" })" };
     err = tr_variantFromJson(&top, std::data(in), std::size(in));
     EXPECT_EQ(0, err);
     EXPECT_TRUE(tr_variantIsDict(&top));
@@ -119,7 +119,7 @@ TEST_P(JSONTest, test_utf8)
      * 5. Dogfood that result back into the parser.
      * 6. Confirm that the result is UTF-8.
      */
-    in = std::string_view { "{ \"key\": \"Let\\u00f6lt\\u00e9sek\" }" };
+    in = std::string_view { R"({ "key": "Let\u00f6lt\u00e9sek" })" };
     err = tr_variantFromJson(&top, std::data(in), std::size(in));
     EXPECT_EQ(0, err);
     EXPECT_TRUE(tr_variantIsDict(&top));

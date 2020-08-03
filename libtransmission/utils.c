@@ -702,7 +702,7 @@ void tr_wait_msec(long int msec)
 ****
 ***/
 
-int tr_snprintf(char* buf, size_t buflen, char const* fmt, ...)
+int tr_snprintf(void* buf, size_t buflen, char const* fmt, ...)
 {
     int len;
     va_list args;
@@ -718,7 +718,7 @@ int tr_snprintf(char* buf, size_t buflen, char const* fmt, ...)
  * will be copied. Always NUL terminates (unless siz == 0).
  * Returns strlen (src); if retval >= siz, truncation occurred.
  */
-size_t tr_strlcpy(char* dst, void const* src, size_t siz)
+size_t tr_strlcpy(void* dst, void const* src, size_t siz)
 {
     TR_ASSERT(dst != NULL);
     TR_ASSERT(src != NULL);

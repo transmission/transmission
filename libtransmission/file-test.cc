@@ -7,6 +7,8 @@
  */
 
 #include <cstring>
+#include <string>
+#include <string_view>
 
 #ifndef _WIN32
 #include <sys/types.h>
@@ -970,48 +972,38 @@ TEST_F(FileTest, pathNativeSeparators)
 {
     EXPECT_EQ(nullptr, tr_sys_path_native_separators(nullptr));
 
-    char path1[] = "";
-    char path2[] = "a";
-    char path3[] = "/";
-    char path4[] = "/a/b/c";
-    char path5[] = "C:\\a/b\\c";
-
     struct Test
     {
-        char* input;
-        char const* output;
+        std::string_view input;
+        std::string_view expected_output;
     };
 
-    auto const tests = std::array<Test, 5> {
-        Test{ path1, "" },
-        { path2, TR_IF_WIN32("a", "a") },
-        { path3, TR_IF_WIN32("\\", "/") },
-        { path4, TR_IF_WIN32("\\a\\b\\c", "/a/b/c") },
-        { path5, TR_IF_WIN32("C:\\a\\b\\c", "C:\\a/b\\c") },
-    };
-
-    for (auto const& test : tests)
+    auto constexpr Tests = std::array<Test, 5>
     {
-        char* const output = tr_sys_path_native_separators(test.input);
-        EXPECT_STREQ(test.output, output);
-        EXPECT_STREQ(test.output, test.input);
-        EXPECT_EQ(test.input, output);
+        Test{ "", "" },
+        { "a", TR_IF_WIN32("a", "a") },
+        { "/", TR_IF_WIN32("\\", "/") },
+        { "/a/b/c", TR_IF_WIN32("\\a\\b\\c", "/a/b/c") },
+        { "C:\\a/b\\c", TR_IF_WIN32("C:\\a\\b\\c", "C:\\a/b\\c") },
+    };
+
+    for (auto const& test : Tests)
+    {
+        auto buf = std::string(test.input);
+        char* const output = tr_sys_path_native_separators(&buf.front());
+        EXPECT_EQ(test.expected_output, output);
+        EXPECT_EQ(std::data(buf), output);
     }
 }
 
 TEST_F(FileTest, fileOpen)
 {
     auto const test_dir = createTestDir(__FUNCTION__);
-    tr_error* err = nullptr;
-    char* path1;
-    tr_sys_file_t fd;
-    uint64_t n;
-    tr_sys_path_info info;
 
-    path1 = tr_buildPath(std::data(test_dir), "a", nullptr);
-
-    /* Can't open non-existent file */
+    // can't open non-existent file
+    auto* path1 = tr_buildPath(std::data(test_dir), "a", nullptr);
     EXPECT_FALSE(tr_sys_path_exists(path1, nullptr));
+    tr_error* err = nullptr;
     EXPECT_TRUE(tr_sys_file_open(path1, TR_SYS_FILE_READ, 0600, &err) == TR_BAD_SYS_FILE);
     EXPECT_NE(nullptr, err);
     EXPECT_FALSE(tr_sys_path_exists(path1, nullptr));
@@ -1021,10 +1013,10 @@ TEST_F(FileTest, fileOpen)
     EXPECT_FALSE(tr_sys_path_exists(path1, nullptr));
     tr_error_clear(&err);
 
-    /* Can't open directory */
+    // can't open directory
     tr_sys_dir_create(path1, 0, 0777, nullptr);
 #ifdef _WIN32
-    /* This works on *NIX */
+    // this works on *NIX
     EXPECT_TRUE(tr_sys_file_open(path1, TR_SYS_FILE_READ, 0600, &err) == TR_BAD_SYS_FILE);
     EXPECT_NE(nullptr, err);
     tr_error_clear(&err);
@@ -1035,15 +1027,15 @@ TEST_F(FileTest, fileOpen)
 
     tr_sys_path_remove(path1, nullptr);
 
-    /* Can create non-existent file */
-    fd = tr_sys_file_open(path1, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE, 0640, &err);
+    // can create non-existent file
+    auto fd = tr_sys_file_open(path1, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE, 0640, &err);
     EXPECT_NE(TR_BAD_SYS_FILE, fd);
     EXPECT_EQ(nullptr, err);
     tr_sys_file_close(fd, nullptr);
     EXPECT_TRUE(tr_sys_path_exists(path1, nullptr));
     EXPECT_TRUE(validatePermissions(path1, 0640));
 
-    /* Can open existing file */
+    // can open existing file
     EXPECT_TRUE(tr_sys_path_exists(path1, nullptr));
     fd = tr_sys_file_open(path1, TR_SYS_FILE_READ, 0600, &err);
     EXPECT_NE(TR_BAD_SYS_FILE, fd);
@@ -1062,6 +1054,7 @@ TEST_F(FileTest, fileOpen)
     EXPECT_EQ(TR_BAD_SYS_FILE, fd);
     EXPECT_NE(nullptr, err);
     tr_error_clear(&err);
+    tr_sys_path_info info;
     tr_sys_path_get_info(path1, TR_SYS_PATH_NO_FOLLOW, &info, nullptr);
     EXPECT_EQ(4, info.size);
 
@@ -1072,6 +1065,7 @@ TEST_F(FileTest, fileOpen)
     EXPECT_NE(TR_BAD_SYS_FILE, fd);
     EXPECT_EQ(nullptr, err);
     tr_sys_file_write(fd, "s", 1, nullptr, nullptr); /* On *NIX, pointer is positioned on each write but not initially */
+    auto n = uint64_t {};
     tr_sys_file_seek(fd, 0, TR_SEEK_CUR, &n, nullptr);
     EXPECT_EQ(5, n);
     tr_sys_file_close(fd, nullptr);
@@ -1098,15 +1092,12 @@ TEST_F(FileTest, fileOpen)
 TEST_F(FileTest, fileReadWriteSeek)
 {
     auto const test_dir = createTestDir(__FUNCTION__);
-    tr_error* err = nullptr;
-    char* path1;
-    uint64_t n;
-    char buf[100];
 
-    path1 = tr_buildPath(std::data(test_dir), "a", nullptr);
-
+    auto* path1 = tr_buildPath(std::data(test_dir), "a", nullptr);
     auto const fd = tr_sys_file_open(path1, TR_SYS_FILE_READ | TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE, 0600, nullptr);
 
+    uint64_t n;
+    tr_error* err = nullptr;
     EXPECT_TRUE(tr_sys_file_seek(fd, 0, TR_SEEK_CUR, &n, &err));
     EXPECT_EQ(nullptr, err);
     EXPECT_EQ(0, n);
@@ -1123,11 +1114,12 @@ TEST_F(FileTest, fileReadWriteSeek)
     EXPECT_EQ(nullptr, err);
     EXPECT_EQ(0, n);
 
-    EXPECT_TRUE(tr_sys_file_read(fd, buf, sizeof(buf), &n, &err));
+    auto buf = std::array<char, 100>{};
+    EXPECT_TRUE(tr_sys_file_read(fd, std::data(buf), std::size(buf), &n, &err));
     EXPECT_EQ(nullptr, err);
     EXPECT_EQ(4, n);
 
-    EXPECT_EQ(0, memcmp(buf, "test", 4));
+    EXPECT_EQ(0, memcmp("test", std::data(buf), 4));
 
     EXPECT_TRUE(tr_sys_file_seek(fd, -3, TR_SEEK_CUR, &n, &err));
     EXPECT_EQ(nullptr, err);
@@ -1141,11 +1133,11 @@ TEST_F(FileTest, fileReadWriteSeek)
     EXPECT_EQ(nullptr, err);
     EXPECT_EQ(0, n);
 
-    EXPECT_TRUE(tr_sys_file_read(fd, buf, sizeof(buf), &n, &err));
+    EXPECT_TRUE(tr_sys_file_read(fd, std::data(buf), std::size(buf), &n, &err));
     EXPECT_EQ(nullptr, err);
     EXPECT_EQ(4, n);
 
-    EXPECT_EQ(0, memcmp("tEst", buf, 4));
+    EXPECT_EQ(0, memcmp("tEst", std::data(buf), 4));
 
     EXPECT_TRUE(tr_sys_file_seek(fd, 0, TR_SEEK_END, &n, &err));
     EXPECT_EQ(nullptr, err);
@@ -1159,21 +1151,21 @@ TEST_F(FileTest, fileReadWriteSeek)
     EXPECT_EQ(nullptr, err);
     EXPECT_EQ(0, n);
 
-    EXPECT_TRUE(tr_sys_file_read(fd, buf, sizeof(buf), &n, &err));
+    EXPECT_TRUE(tr_sys_file_read(fd, std::data(buf), std::size(buf), &n, &err));
     EXPECT_EQ(nullptr, err);
     EXPECT_EQ(7, n);
 
-    EXPECT_EQ(0, memcmp("tEst ok", buf, 7));
+    EXPECT_EQ(0, memcmp("tEst ok", std::data(buf), 7));
 
     EXPECT_TRUE(tr_sys_file_write_at(fd, "-", 1, 4, &n, &err));
     EXPECT_EQ(nullptr, err);
     EXPECT_EQ(1, n);
 
-    EXPECT_TRUE(tr_sys_file_read_at(fd, buf, 5, 2, &n, &err));
+    EXPECT_TRUE(tr_sys_file_read_at(fd, std::data(buf), 5, 2, &n, &err));
     EXPECT_EQ(nullptr, err);
     EXPECT_EQ(5, n);
 
-    EXPECT_EQ(0, memcmp("st-ok", buf, 5));
+    EXPECT_EQ(0, memcmp("st-ok", std::data(buf), 5));
 
     tr_sys_file_close(fd, nullptr);
 
@@ -1185,15 +1177,14 @@ TEST_F(FileTest, fileReadWriteSeek)
 TEST_F(FileTest, fileTruncate)
 {
     auto const test_dir = createTestDir(__FUNCTION__);
-    tr_error* err = nullptr;
-    tr_sys_path_info info;
 
     auto* path1 = tr_buildPath(test_dir.c_str(), "a", nullptr);
-
     auto fd = tr_sys_file_open(path1, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE, 0600, nullptr);
 
+    tr_error* err = nullptr;
     EXPECT_TRUE(tr_sys_file_truncate(fd, 10, &err));
     EXPECT_EQ(nullptr, err);
+    tr_sys_path_info info;
     tr_sys_file_get_info(fd, &info, nullptr);
     EXPECT_EQ(10, info.size);
 
