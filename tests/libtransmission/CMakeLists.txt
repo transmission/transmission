@@ -17,6 +17,10 @@ include_directories(
     ${CMAKE_BINARY_DIR}/libtransmission
 )
 
+include_directories(
+    SYSTEM
+    ${EVENT2_INCLUDE_DIRS}
+)
 
 foreach(T bitfield blocklist clients crypto error file getopt
           history json magnet makemeta metainfo move peer-msgs

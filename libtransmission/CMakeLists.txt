@@ -228,6 +228,10 @@ endif()
 include_directories(
     ${PROJECT_SOURCE_DIR}
     ${PROJECT_BINARY_DIR}
+)
+
+include_directories(
+    SYSTEM
     ${ZLIB_INCLUDE_DIRS}
     ${CRYPTO_INCLUDE_DIRS}
     ${CURL_INCLUDE_DIRS}
@@ -240,11 +244,11 @@ include_directories(
 )
 
 if(ICONV_FOUND)
-    include_directories(${ICONV_INCLUDE_DIRS})
+    include_directories(SYSTEM ${ICONV_INCLUDE_DIRS})
 endif()
 
 if(ENABLE_UTP)
-    include_directories(${TP_TOP}/libutp)
+    include_directories(SYSTEM ${TP_TOP}/libutp)
 endif()
 
 add_library(${TR_NAME} STATIC
