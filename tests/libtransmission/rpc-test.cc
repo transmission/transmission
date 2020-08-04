@@ -78,10 +78,11 @@ TEST_F(RpcTest, list)
 
 TEST_F(RpcTest, sessionGet)
 {
-    auto const rpc_response_func = [](tr_session* session UNUSED, tr_variant* response, void* setme) {
-        *static_cast<tr_variant*>(setme) = *response;
-        tr_variantInitBool(response, false);
-    };
+    auto const rpc_response_func = [](tr_session* session UNUSED, tr_variant* response, void* setme)
+        {
+            *static_cast<tr_variant*>(setme) = *response;
+            tr_variantInitBool(response, false);
+        };
 
     auto* tor = zeroTorrentInit();
     EXPECT_NE(nullptr, tor);
@@ -98,7 +99,7 @@ TEST_F(RpcTest, sessionGet)
     EXPECT_TRUE(tr_variantDictFindDict(&response, TR_KEY_arguments, &args));
 
     // what we expected
-    auto constexpr ExpectedKeys = std::array<tr_quark, 50> {
+    auto constexpr ExpectedKeys = std::array<tr_quark, 50>{
         TR_KEY_alt_speed_down,
         TR_KEY_alt_speed_enabled,
         TR_KEY_alt_speed_time_begin,
@@ -156,25 +157,26 @@ TEST_F(RpcTest, sessionGet)
     tr_quark key;
     tr_variant* val;
     size_t n = 0;
-    while ((tr_variantDictChild(args, n++, &key, &val))) {
+    while ((tr_variantDictChild(args, n++, &key, &val)))
+    {
         actual_keys.insert(key);
     }
 
     auto missing_keys = std::vector<tr_quark>{};
     std::set_difference(std::begin(ExpectedKeys), std::end(ExpectedKeys),
-                        std::begin(actual_keys), std::end(actual_keys),
-                        std::inserter(missing_keys, std::begin(missing_keys)));
-    EXPECT_EQ(decltype(missing_keys){}, missing_keys);
+        std::begin(actual_keys), std::end(actual_keys),
+        std::inserter(missing_keys, std::begin(missing_keys)));
+    EXPECT_EQ(decltype(missing_keys) {}, missing_keys);
 
     auto unexpected_keys = std::vector<tr_quark>{};
     std::set_difference(std::begin(actual_keys), std::end(actual_keys),
-                        std::begin(ExpectedKeys), std::end(ExpectedKeys),
-                        std::inserter(unexpected_keys, std::begin(unexpected_keys)));
-    EXPECT_EQ(decltype(unexpected_keys){}, unexpected_keys);
+        std::begin(ExpectedKeys), std::end(ExpectedKeys),
+        std::inserter(unexpected_keys, std::begin(unexpected_keys)));
+    EXPECT_EQ(decltype(unexpected_keys) {}, unexpected_keys);
 
     // cleanup
     tr_variantFree(&response);
     tr_torrentRemove(tor, false, nullptr);
 }
 
-}  // namespace libtransmission::test
+} // namespace libtransmission::test

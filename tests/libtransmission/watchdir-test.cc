@@ -31,12 +31,13 @@ extern struct timeval tr_watchdir_retry_max_interval;
 
 namespace libtransmission::test
 {
+
 auto constexpr Native = std::string_view { "native" };
 auto constexpr Generic = std::string_view { "generic" };
 
-class WatchDirTest:
-   public SandboxedTest,
-   public ::testing::WithParamInterface<std::string_view>
+class WatchDirTest :
+    public SandboxedTest,
+    public ::testing::WithParamInterface<std::string_view>
 {
 private:
     std::shared_ptr<struct event_base> ev_base_;
@@ -62,15 +63,13 @@ protected:
         SandboxedTest::TearDown();
     };
 
-    auto createWatchDir(std::string const& path,
-                        tr_watchdir_cb cb, void* cb_data)
+    auto createWatchDir(std::string const& path, tr_watchdir_cb cb, void* cb_data)
     {
         auto const force_generic = GetParam() == Generic;
         return tr_watchdir_new(path.c_str(), cb, cb_data, ev_base_.get(), force_generic);
     }
 
-    std::string createFile(std::string_view parent_dir,
-                           std::string_view name)
+    std::string createFile(std::string_view parent_dir, std::string_view name)
     {
         auto path = std::string(parent_dir);
         path += TR_PATH_DELIMITER;
@@ -81,8 +80,7 @@ protected:
         return path;
     }
 
-    std::string createDir(std::string_view parent_dir,
-                          std::string_view name)
+    std::string createDir(std::string_view parent_dir, std::string_view name)
     {
         auto path = std::string(parent_dir);
         path += TR_PATH_DELIMITER;
@@ -101,7 +99,8 @@ protected:
 
     struct CallbackData
     {
-        explicit CallbackData(tr_watchdir_status status = TR_WATCHDIR_ACCEPT): result{status} {}
+        explicit CallbackData(tr_watchdir_status status = TR_WATCHDIR_ACCEPT) :
+            result{status} {}
         tr_watchdir_status result;
 
         tr_watchdir_t wd = {};
@@ -232,7 +231,7 @@ TEST_P(WatchDirTest, watchTwoDirs)
     EXPECT_EQ("", wd2_data.name);
 
     // add a file into directory 1 and confirm it triggers
-    // a callback with the right wd 
+    // a callback with the right wd
     auto constexpr File1 = std::string_view { "test.txt" };
     createFile(dir1, File1);
     processEvents();
@@ -242,7 +241,7 @@ TEST_P(WatchDirTest, watchTwoDirs)
     EXPECT_EQ("", wd2_data.name);
 
     // add a file into directory 2 and confirm it triggers
-    // a callback with the right wd 
+    // a callback with the right wd
     wd1_data = CallbackData(TR_WATCHDIR_ACCEPT);
     wd2_data = CallbackData(TR_WATCHDIR_ACCEPT);
     auto constexpr File2 = std::string_view { "test2.txt" };
@@ -355,6 +354,6 @@ INSTANTIATE_TEST_SUITE_P(
     WatchDir,
     WatchDirTest,
     ::testing::Values(Native, Generic)
-);
+    );
 
 } //  namespace libtransmission::test

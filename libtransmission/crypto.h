@@ -77,4 +77,4 @@ bool tr_cryptoSecretKeySha1(tr_crypto const* crypto, void const* prepend_data, s
 
 TR_END_DECLS
 
-#endif  // TR_ENCRYPTION_H
+#endif // TR_ENCRYPTION_H

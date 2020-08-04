@@ -37,11 +37,10 @@
 namespace libtransmission::test
 {
 
-class FileTest: public SessionTest
+class FileTest : public SessionTest
 {
 protected:
-
-  // static tr_session* session;
+    // static tr_session* session;
 
     auto createTestDir(char const* name)
     {
@@ -247,8 +246,8 @@ TEST_F(FileTest, getInfo)
     EXPECT_EQ(nullptr, err);
     EXPECT_EQ(TR_SYS_PATH_IS_FILE, info.type);
     EXPECT_EQ(4, info.size);
-    EXPECT_GT(info.last_modified_at, t-1);
-    EXPECT_LE(info.last_modified_at, time(nullptr)+1);
+    EXPECT_GT(info.last_modified_at, t - 1);
+    EXPECT_LE(info.last_modified_at, time(nullptr) + 1);
 
     // Good file info (by handle)
     auto fd = tr_sys_file_open(path1, TR_SYS_FILE_READ, 0, nullptr);
@@ -257,8 +256,8 @@ TEST_F(FileTest, getInfo)
     EXPECT_EQ(nullptr, err);
     EXPECT_EQ(TR_SYS_PATH_IS_FILE, info.type);
     EXPECT_EQ(4, info.size);
-    EXPECT_GT(info.last_modified_at, t-1);
-    EXPECT_LE(info.last_modified_at, time(nullptr)+1);
+    EXPECT_GT(info.last_modified_at, t - 1);
+    EXPECT_LE(info.last_modified_at, time(nullptr) + 1);
     tr_sys_file_close(fd, nullptr);
 
     tr_sys_path_remove(path1, nullptr);
@@ -271,8 +270,8 @@ TEST_F(FileTest, getInfo)
     EXPECT_EQ(nullptr, err);
     EXPECT_EQ(TR_SYS_PATH_IS_DIRECTORY, info.type);
     EXPECT_NE(uint64_t(-1), info.size);
-    EXPECT_GT(info.last_modified_at, t-1);
-    EXPECT_LE(info.last_modified_at, time(nullptr)+1);
+    EXPECT_GT(info.last_modified_at, t - 1);
+    EXPECT_LE(info.last_modified_at, time(nullptr) + 1);
     tr_sys_path_remove(path1, nullptr);
 
     if (createSymlink(path1, path2, false))
@@ -291,8 +290,8 @@ TEST_F(FileTest, getInfo)
         EXPECT_EQ(nullptr, err);
         EXPECT_EQ(TR_SYS_PATH_IS_FILE, info.type);
         EXPECT_EQ(4, info.size);
-        EXPECT_GT(info.last_modified_at, t-1);
-        EXPECT_LE(info.last_modified_at, time(nullptr)+1);
+        EXPECT_GT(info.last_modified_at, t - 1);
+        EXPECT_LE(info.last_modified_at, time(nullptr) + 1);
 
         // Good file info (by handle)
         fd = tr_sys_file_open(path1, TR_SYS_FILE_READ, 0, nullptr);
@@ -301,8 +300,8 @@ TEST_F(FileTest, getInfo)
         EXPECT_EQ(nullptr, err);
         EXPECT_EQ(TR_SYS_PATH_IS_FILE, info.type);
         EXPECT_EQ(4, info.size);
-        EXPECT_GT(info.last_modified_at, t-1);
-        EXPECT_LE(info.last_modified_at, time(nullptr)+1);
+        EXPECT_GT(info.last_modified_at, t - 1);
+        EXPECT_LE(info.last_modified_at, time(nullptr) + 1);
         tr_sys_file_close(fd, nullptr);
 
         tr_sys_path_remove(path2, nullptr);
@@ -317,8 +316,8 @@ TEST_F(FileTest, getInfo)
         EXPECT_EQ(nullptr, err);
         EXPECT_EQ(TR_SYS_PATH_IS_DIRECTORY, info.type);
         EXPECT_NE(uint64_t(-1), info.size);
-        EXPECT_GT(info.last_modified_at, t-1);
-        EXPECT_LE(info.last_modified_at, time(nullptr)+1);
+        EXPECT_GT(info.last_modified_at, t - 1);
+        EXPECT_LE(info.last_modified_at, time(nullptr) + 1);
 
         tr_sys_path_remove(path2, nullptr);
         tr_sys_path_remove(path1, nullptr);
@@ -711,11 +710,13 @@ TEST_F(FileTest, pathResolve)
 
 TEST_F(FileTest, pathBasenameDirname)
 {
-    auto const common_xname_tests = std::vector<XnameTestData> {
+    auto const common_xname_tests = std::vector<XnameTestData>{
         XnameTestData{ "/", "/" },
         { "", "." },
 #ifdef _WIN32
-        { "\\", "/" },
+        {
+            "\\", "/"
+        },
         /* Invalid paths */
         { "\\\\\\", nullptr },
         { "123:", nullptr },
@@ -742,21 +743,25 @@ TEST_F(FileTest, pathBasenameDirname)
         { "c:\\a\\b?c\\d", nullptr },
         { "c:\\a\\b*c\\d", nullptr }
 #else
-        { "////", "/" }
+        {
+            "////", "/"
+        }
 #endif
     };
 
     testPathXname(std::data(common_xname_tests), std::size(common_xname_tests), tr_sys_path_basename);
     testPathXname(std::data(common_xname_tests), std::size(common_xname_tests), tr_sys_path_dirname);
 
-    auto const basename_tests = std::vector<XnameTestData> {
+    auto const basename_tests = std::vector<XnameTestData>{
         XnameTestData{ "a", "a" },
         { "aa", "aa" },
         { "/aa", "aa" },
         { "/a/b/c", "c" },
         { "/a/b/c/", "c" },
 #ifdef _WIN32
-        { "c:\\a\\b\\c", "c" },
+        {
+            "c:\\a\\b\\c", "c"
+        },
         { "c:", "/" },
         { "c:/", "/" },
         { "c:\\", "/" },
@@ -774,14 +779,16 @@ TEST_F(FileTest, pathBasenameDirname)
 
     testPathXname(std::data(basename_tests), std::size(basename_tests), tr_sys_path_basename);
 
-    auto const dirname_tests = std::vector<XnameTestData> {
+    auto const dirname_tests = std::vector<XnameTestData>{
         XnameTestData{ "/a/b/c", "/a/b" },
         { "a/b/c", "a/b" },
         { "a/b/c/", "a/b" },
         { "a", "." },
         { "a/", "." },
 #ifdef _WIN32
-        { "C:\\a/b\\c", "C:\\a/b" },
+        {
+            "C:\\a/b\\c", "C:\\a/b"
+        },
         { "C:\\a/b\\c\\", "C:\\a/b" },
         { "C:\\a/b", "C:\\a" },
         { "C:/a", "C:" },
@@ -1230,7 +1237,7 @@ TEST_F(FileTest, filePreallocate)
     auto fd = tr_sys_file_open(path1, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE, 0600, nullptr);
 
     tr_error* err = nullptr;
-    auto prealloc_size = size_t { 50 };
+    auto prealloc_size = size_t{ 50 };
     if (tr_sys_file_preallocate(fd, prealloc_size, 0, &err))
     {
         EXPECT_EQ(nullptr, err);
@@ -1293,7 +1300,7 @@ TEST_F(FileTest, map)
 #ifdef HAVE_UNIFIED_BUFFER_CACHE
 
     auto constexpr Contents2 = std::string_view { "more" };
-    auto n_written = uint64_t { };
+    auto n_written = uint64_t {};
     tr_sys_file_write_at(fd, std::data(Contents2), std::size(Contents2), 0, &n_written, &err);
     EXPECT_EQ(map_len, std::size(Contents2));
     EXPECT_EQ(map_len, n_written);
@@ -1489,4 +1496,4 @@ TEST_F(FileTest, dirRead)
     tr_free(path1);
 }
 
-}  // namespace libtransmission::test
+} // namespace libtransmission::test

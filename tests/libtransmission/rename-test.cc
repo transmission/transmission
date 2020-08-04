@@ -23,17 +23,18 @@
 namespace libtransmission::test
 {
 
-class RenameTest: public SessionTest {
-
+class RenameTest : public SessionTest
+{
     static auto constexpr MaxWaitMsec = 3000;
-protected:
 
+protected:
     void torrentRemoveAndWait(tr_torrent* tor, int expected_torrent_count)
     {
         tr_torrentRemove(tor, false, nullptr);
-        auto const test = [this, expected_torrent_count]() {
-            return tr_sessionCountTorrents(session_) == expected_torrent_count;
-        };
+        auto const test = [this, expected_torrent_count]()
+            {
+                return tr_sessionCountTorrents(session_) == expected_torrent_count;
+            };
         EXPECT_TRUE(waitFor(test, MaxWaitMsec));
     }
 
@@ -71,7 +72,7 @@ protected:
         tr_ctorSetPaused(ctor, TR_FORCE, true);
 
         // create the torrent
-        auto err = int {};
+        auto err = int{};
         auto* tor = tr_torrentNew(ctor, &err, nullptr);
         EXPECT_EQ(0, err);
 
@@ -80,9 +81,7 @@ protected:
         return tor;
     }
 
-    bool testFileExistsAndConsistsOfThisString(tr_torrent const* tor,
-                                               tr_file_index_t file_index,
-                                               std::string_view str)
+    bool testFileExistsAndConsistsOfThisString(tr_torrent const* tor, tr_file_index_t file_index, std::string_view str)
     {
         auto const str_len = std::size(str);
         auto success = false;
@@ -115,20 +114,19 @@ protected:
         EXPECT_EQ(0, tst->haveValid);
     }
 
-    int torrentRenameAndWait(tr_torrent* tor,
-                             char const* oldpath,
-                             char const* newname)
+    int torrentRenameAndWait(tr_torrent* tor, char const* oldpath, char const* newname)
     {
         auto const on_rename_done = [](
-                tr_torrent* /*tor*/, char const* /*oldpath*/,
-                char const* /*newname*/, int error,
-                void* user_data) {
-            *static_cast<int*>(user_data) = error;
-        };
+            tr_torrent* /*tor*/, char const* /*oldpath*/,
+            char const* /*newname*/, int error,
+            void* user_data)
+            {
+                *static_cast<int*>(user_data) = error;
+            };
 
         int error = -1;
         tr_torrentRenamePath(tor, oldpath, newname, on_rename_done, &error);
-        auto test = [&error](){ return error != -1; };
+        auto test = [&error]() { return error != -1; };
         EXPECT_TRUE(waitFor(test, MaxWaitMsec));
         return error;
     }
@@ -137,7 +135,7 @@ protected:
 TEST_F(RenameTest, singleFilenameTorrent)
 {
     uint64_t loaded;
-    static auto constexpr TotalSize = size_t { 14 };
+    static auto constexpr TotalSize = size_t{ 14 };
 
     /* this is a single-file torrent whose file is hello-world.txt, holding the string "hello, world!" */
     auto* ctor = tr_ctorNew(session_);
@@ -238,7 +236,7 @@ TEST_F(RenameTest, singleFilenameTorrent)
 TEST_F(RenameTest, multifileTorrent)
 {
     char* str;
-    auto constexpr TotalSize = size_t { 67 };
+    auto constexpr TotalSize = size_t{ 67 };
     auto constexpr ExpectedFiles = std::array<std::string_view, 4>
     {
         "Felidae/Felinae/Acinonyx/Cheetah/Chester",
@@ -473,7 +471,7 @@ TEST_F(RenameTest, partialFile)
 {
     auto constexpr PieceCount = uint32_t { 33 };
     auto constexpr PieceSize = uint32_t { 32768 };
-    auto constexpr Length = std::array<uint32_t, 3> { 1048576, 4096, 512 };
+    auto constexpr Length = std::array<uint32_t, 3>{ 1048576, 4096, 512 };
     auto constexpr TotalSize = uint64_t(Length[0]) + Length[1] + Length[2];
 
     /***
@@ -528,4 +526,4 @@ TEST_F(RenameTest, partialFile)
     torrentRemoveAndWait(tor, 0);
 }
 
-}  // namespace libtransmission::test
+} // namespace libtransmission::test

@@ -14,11 +14,12 @@
 
 #include "gtest/gtest.h"
 
-class QuarkTest: public ::testing::Test
+class QuarkTest : public ::testing::Test
 {
 protected:
     template<typename T>
-    std::string_view quarkGetString(T i) {
+    std::string_view quarkGetString(T i)
+    {
         size_t len;
         char const* const str = tr_quark_get_string(tr_quark(i), &len);
         EXPECT_EQ(strlen(str), len);
@@ -43,7 +44,7 @@ TEST_F(QuarkTest, allPredefinedKeysAreSorted)
     for (int i = 0; i + 1 < TR_N_KEYS; i++)
     {
         auto const str1 = quarkGetString(i);
-        auto const str2 = quarkGetString(i+1);
+        auto const str2 = quarkGetString(i + 1);
         EXPECT_LT(str1, str2);
     }
 }
@@ -52,5 +53,5 @@ TEST_F(QuarkTest, newEmptyQuarkReturnsNone)
 {
     auto const q = tr_quark_new(nullptr, TR_BAD_SIZE);
     EXPECT_EQ(TR_KEY_NONE, q);
-    EXPECT_EQ(std::string_view{""}, quarkGetString(q));
+    EXPECT_EQ(std::string_view{ "" }, quarkGetString(q));
 }

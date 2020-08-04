@@ -23,7 +23,7 @@
 namespace libtransmission::test
 {
 
-class BlocklistTest: public SessionTest
+class BlocklistTest : public SessionTest
 {
 protected:
     static char const constexpr* const Contents1 =
@@ -57,6 +57,7 @@ protected:
 
         sync();
     }
+
 #endif
 
     bool addressIsBlocked(char const* address_str)
@@ -137,4 +138,4 @@ TEST_F(BlocklistTest, updating)
     tr_free(path);
 }
 
-}  // namespace libtransmission::test
+} // namespace libtransmission::test

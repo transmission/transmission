@@ -10,7 +10,6 @@
 #include <cstring> // strlen()
 #include <string_view>
 
-
 #define __LIBTRANSMISSION_VARIANT_MODULE__
 
 #include "transmission.h"
@@ -20,11 +19,14 @@
 
 #include "gtest/gtest.h"
 
-class JSONTest : public ::testing::TestWithParam<char const*> {
+class JSONTest : public ::testing::TestWithParam<char const*>
+{
 protected:
-    void SetUp() override {
+    void SetUp() override
+    {
         auto const* locale_str = GetParam();
-        if (setlocale(LC_NUMERIC, locale_str) == nullptr) {
+        if (setlocale(LC_NUMERIC, locale_str) == nullptr)
+        {
             GTEST_SKIP();
         }
     }
@@ -59,11 +61,11 @@ TEST_P(JSONTest, testElements)
     EXPECT_TRUE(tr_variantDictFindInt(&top, tr_quark_new("int", 3), &i));
     EXPECT_EQ(5, i);
 
-    auto d = double {};
+    auto d = double{};
     EXPECT_TRUE(tr_variantDictFindReal(&top, tr_quark_new("float", 5), &d));
-    EXPECT_EQ(65, int(d*10));
+    EXPECT_EQ(65, int(d * 10));
 
-    auto f = bool {};
+    auto f = bool{};
     EXPECT_TRUE(tr_variantDictFindBool(&top, tr_quark_new("true", 4), &f));
     EXPECT_TRUE(f);
 
@@ -250,4 +252,4 @@ INSTANTIATE_TEST_SUITE_P(
     JSON,
     JSONTest,
     ::testing::Values("C", "da_DK.UTF-8", "fr_FR.UTF-8", "ru_RU.UTF-8")
-);
+    );

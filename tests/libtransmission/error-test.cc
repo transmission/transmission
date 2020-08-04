@@ -11,7 +11,6 @@
 
 #include "gtest/gtest.h"
 
-
 TEST(Error, errorSet)
 {
     tr_error* err = nullptr;

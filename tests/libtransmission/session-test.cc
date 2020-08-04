@@ -28,7 +28,7 @@ TEST(Session, peerId)
     for (int i = 0; i < 100000; ++i)
     {
         // get a new peer-id
-        auto buf = std::array<uint8_t, PEER_ID_LEN+1> {};
+        auto buf = std::array<uint8_t, PEER_ID_LEN + 1>{};
         tr_peerIdInit(std::data(buf));
 
         // confirm that it has the right length
@@ -46,6 +46,7 @@ TEST(Session, peerId)
             auto const tmp = std::array<char, 2>{ ch, '\0' };
             val += strtoul(std::data(tmp), nullptr, 36);
         }
+
         EXPECT_EQ(0, val % 36);
     }
 }

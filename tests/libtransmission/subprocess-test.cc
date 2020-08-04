@@ -31,7 +31,7 @@ std::string getSelfPath()
 
 std::string getCmdSelfPath()
 {
-    auto constexpr NewSuffix = std::string_view {".cmd"};
+    auto constexpr NewSuffix = std::string_view { ".cmd" };
     auto exec = getSelfPath();
     // replace ".exe" suffix with ".cmd"
     exec.resize(std::size(exec) - std::size(NewSuffix));
@@ -39,7 +39,7 @@ std::string getCmdSelfPath()
     return exec;
 }
 
-class SubprocessTest:
+class SubprocessTest :
     public ::testing::Test,
     public testing::WithParamInterface<std::string>
 {
@@ -90,8 +90,8 @@ protected:
         auto const tmp_result_path = result_path + ".tmp";
 
         auto const fd = tr_sys_file_open(std::data(tmp_result_path),
-                TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE,
-                0644, nullptr);
+            TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE,
+            0644, nullptr);
 
         if (fd == TR_BAD_SYS_FILE)
         {
@@ -133,7 +133,7 @@ protected:
 
     void waitForFileToExist(std::string const& path)
     {
-        auto const test = [path](){ return tr_sys_path_exists(std::data(path), nullptr); };
+        auto const test = [path]() { return tr_sys_path_exists(std::data(path), nullptr); };
         EXPECT_TRUE(waitFor(test, 2000));
     }
 
@@ -148,7 +148,7 @@ TEST_P(SubprocessTest, SpawnAsyncMissingExec)
 {
     auto constexpr MissingExePath = std::string_view { TR_IF_WIN32("C:\\", "/") "tr-missing-test-exe" TR_IF_WIN32(".exe", "") };
 
-    auto args = std::array<char*, 2> {
+    auto args = std::array<char*, 2>{
         //  FIXME(ckerr): remove tr_strdup()s after https://github.com/transmission/transmission/issues/1384
         tr_strdup(std::data(MissingExePath)),
         nullptr
@@ -235,7 +235,7 @@ TEST_P(SubprocessTest, SpawnAsyncEnv)
     static auto constexpr TestEnvValue4 = std::string_view { "bar" };
     static auto constexpr TestEnvValue5 = std::string_view { "jar" };
 
-    auto args = std::array<char*, 10> {
+    auto args = std::array<char*, 10>{
         //  FIXME(ckerr): remove tr_strdup()s after https://github.com/transmission/transmission/issues/1384
         tr_strdup(self_path_.c_str()),
         tr_strdup(std::data(result_path)),
@@ -249,7 +249,7 @@ TEST_P(SubprocessTest, SpawnAsyncEnv)
         nullptr
     };
 
-    auto env = std::array<char*, 5> {
+    auto env = std::array<char*, 5>{
         //  FIXME(ckerr): remove tr_strdup()s after https://github.com/transmission/transmission/issues/1384
         tr_strdup_printf("%s=%s", std::data(TestEnvKey1), std::data(TestEnvValue1)),
         tr_strdup_printf("%s=%s", std::data(TestEnvKey2), std::data(TestEnvValue2)),
@@ -271,7 +271,7 @@ TEST_P(SubprocessTest, SpawnAsyncEnv)
     auto const fd = tr_sys_file_open(std::data(result_path), TR_SYS_FILE_READ, 0, nullptr);
     EXPECT_NE(TR_BAD_SYS_FILE, fd);
 
-    auto buffer = std::array<char, 1024> {};
+    auto buffer = std::array<char, 1024>{};
 
     EXPECT_TRUE(tr_sys_file_read_line(fd, std::data(buffer), std::size(buffer), nullptr));
     EXPECT_EQ(TestEnvValue1, std::data(buffer));
@@ -295,7 +295,8 @@ TEST_P(SubprocessTest, SpawnAsyncEnv)
 
     tr_sys_file_close(fd, nullptr);
 
-    for (auto& env_item : env) {
+    for (auto& env_item : env)
+    {
         tr_free(env_item);
     }
 }
@@ -305,7 +306,7 @@ TEST_P(SubprocessTest, SpawnAsyncCwdExplicit)
     auto const test_dir = sandbox_.path();
     auto const result_path = buildSandboxPath("result.txt");
 
-    auto args = std::array<char*, 4> {
+    auto args = std::array<char*, 4>{
         //  FIXME(ckerr): remove tr_strdup()s after https://github.com/transmission/transmission/issues/1384
         tr_strdup(self_path_.c_str()),
         tr_strdup(std::data(result_path)),
@@ -323,10 +324,10 @@ TEST_P(SubprocessTest, SpawnAsyncCwdExplicit)
     auto const fd = tr_sys_file_open(std::data(result_path), TR_SYS_FILE_READ, 0, nullptr);
     EXPECT_NE(TR_BAD_SYS_FILE, fd);
 
-    auto buffer = std::array<char, 1024> {};
+    auto buffer = std::array<char, 1024>{};
     EXPECT_TRUE(tr_sys_file_read_line(fd, std::data(buffer), std::size(buffer), nullptr));
     EXPECT_EQ(makeString(tr_sys_path_native_separators(tr_strdup(test_dir.c_str()))),
-              tr_sys_path_native_separators(std::data(buffer)));
+        tr_sys_path_native_separators(std::data(buffer)));
 
     EXPECT_FALSE(tr_sys_file_read_line(fd, std::data(buffer), std::size(buffer), nullptr));
 
@@ -338,7 +339,7 @@ TEST_P(SubprocessTest, SpawnAsyncCwdInherit)
     auto const result_path = buildSandboxPath("result.txt");
     auto const expected_cwd = nativeCwd();
 
-    auto args = std::array<char*, 4> {
+    auto args = std::array<char*, 4>{
         //  FIXME(ckerr): remove tr_strdup()s after https://github.com/transmission/transmission/issues/1384
         tr_strdup(self_path_.c_str()),
         tr_strdup(std::data(result_path)),
@@ -355,7 +356,7 @@ TEST_P(SubprocessTest, SpawnAsyncCwdInherit)
     auto const fd = tr_sys_file_open(std::data(result_path), TR_SYS_FILE_READ, 0, nullptr);
     EXPECT_NE(TR_BAD_SYS_FILE, fd);
 
-    auto buffer = std::array<char, 1024> {};
+    auto buffer = std::array<char, 1024>{};
     EXPECT_TRUE(tr_sys_file_read_line(fd, std::data(buffer), std::size(buffer), nullptr));
     EXPECT_EQ(expected_cwd, tr_sys_path_native_separators(std::data(buffer)));
     EXPECT_FALSE(tr_sys_file_read_line(fd, std::data(buffer), std::size(buffer), nullptr));
@@ -367,7 +368,7 @@ TEST_P(SubprocessTest, SpawnAsyncCwdMissing)
 {
     auto const result_path = buildSandboxPath("result.txt");
 
-    auto args = std::array<char*, 4> {
+    auto args = std::array<char*, 4>{
         //  FIXME(ckerr): remove tr_strdup()s after https://github.com/transmission/transmission/issues/1384
         tr_strdup(self_path_.c_str()),
         tr_strdup(std::data(result_path)),
@@ -392,7 +393,6 @@ INSTANTIATE_TEST_SUITE_P(
 #else
     ::testing::Values(getSelfPath())
 #endif
-);
+    );
 
-
-}  // namespace libtransmission::test
+} // namespace libtransmission::test

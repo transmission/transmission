@@ -11,8 +11,8 @@
 #include <event2/buffer.h>
 
 #include "transmission.h"
-#include "cache.h"  // tr_cacheWriteBlock()
-#include "file.h"  // tr_sys_path_*()
+#include "cache.h" // tr_cacheWriteBlock()
+#include "file.h" // tr_sys_path_*()
 #include "variant.h"
 
 #include "test-fixtures.h"
@@ -20,9 +20,9 @@
 namespace libtransmission::test
 {
 
-class IncompleteDirTest:
+class IncompleteDirTest :
     public SessionTest,
-    public ::testing::WithParamInterface<std::pair<std::string,std::string>>
+    public ::testing::WithParamInterface<std::pair<std::string, std::string>>
 {
 protected:
     void SetUp() override
@@ -47,9 +47,9 @@ TEST_P(IncompleteDirTest, incompleteDir)
     auto* tor = zeroTorrentInit();
     zeroTorrentPopulate(tor, false);
     EXPECT_EQ(makeString(tr_strdup_printf("%s/%s.part", incomplete_dir, tor->info.files[0].name)),
-              makeString(tr_torrentFindFile(tor, 0)));
+        makeString(tr_torrentFindFile(tor, 0)));
     EXPECT_EQ(makeString(tr_buildPath(incomplete_dir, tor->info.files[1].name, nullptr)),
-              makeString(tr_torrentFindFile(tor, 1)));
+        makeString(tr_torrentFindFile(tor, 1)));
     EXPECT_EQ(tor->info.pieceSize, tr_torrentStat(tor)->leftUntilDone);
 
     // auto constexpr completeness_unset = tr_completeness { -1 };
@@ -57,13 +57,15 @@ TEST_P(IncompleteDirTest, incompleteDir)
     maybe_completeness completeness;
     // auto completeness = completeness_unset;
     auto const zeroes_completeness_func = [](
-            tr_torrent* /*torrent*/, tr_completeness completeness,
-            bool /*was_running*/, void* user_data) {
-        *static_cast<maybe_completeness*>(user_data) = completeness;
-    };
+        tr_torrent* /*torrent*/, tr_completeness completeness,
+        bool /*was_running*/, void* user_data)
+        {
+            *static_cast<maybe_completeness*>(user_data) = completeness;
+        };
     tr_torrentSetCompletenessCallback(tor, zeroes_completeness_func, &completeness);
 
-    struct TestIncompleteDirData {
+    struct TestIncompleteDirData
+    {
         tr_session* session = {};
         tr_torrent* tor = {};
         tr_block_index_t block = {};
@@ -73,12 +75,13 @@ TEST_P(IncompleteDirTest, incompleteDir)
         bool done = {};
     };
 
-    auto const test_incomplete_dir_threadfunc = [](void* vdata){
-        auto* data = static_cast<TestIncompleteDirData*>(vdata);
-        tr_cacheWriteBlock(data->session->cache, data->tor, 0, data->offset, data->tor->blockSize, data->buf);
-        tr_torrentGotBlock(data->tor, data->block);
-        data->done = true;
-    };
+    auto const test_incomplete_dir_threadfunc = [](void* vdata)
+        {
+            auto* data = static_cast<TestIncompleteDirData*>(vdata);
+            tr_cacheWriteBlock(data->session->cache, data->tor, 0, data->offset, data->tor->blockSize, data->buf);
+            tr_torrentGotBlock(data->tor, data->block);
+            data->done = true;
+        };
 
     // now finish writing it
     {
@@ -101,7 +104,7 @@ TEST_P(IncompleteDirTest, incompleteDir)
             data.offset = data.block * tor->blockSize;
             tr_runInEventThread(session_, test_incomplete_dir_threadfunc, &data);
 
-            auto const test = [&data](){ return data.done; };
+            auto const test = [&data]() { return data.done; };
             EXPECT_TRUE(waitFor(test, 1000));
         }
 
@@ -112,14 +115,14 @@ TEST_P(IncompleteDirTest, incompleteDir)
     blockingTorrentVerify(tor);
     EXPECT_EQ(0, tr_torrentStat(tor)->leftUntilDone);
 
-    auto test = [&completeness](){ return completeness.has_value(); };
+    auto test = [&completeness]() { return completeness.has_value(); };
     EXPECT_TRUE(waitFor(test, 300));
     EXPECT_EQ(TR_SEED, completeness);
 
     for (tr_file_index_t file_index = 0; file_index < tor->info.fileCount; ++file_index)
     {
         EXPECT_EQ(makeString(tr_buildPath(download_dir, tor->info.files[file_index].name, nullptr)),
-                  makeString(tr_torrentFindFile(tor, file_index)));
+            makeString(tr_torrentFindFile(tor, file_index)));
     }
 
     // cleanup
@@ -130,14 +133,14 @@ INSTANTIATE_TEST_SUITE_P(
     IncompleteDir,
     IncompleteDirTest,
     ::testing::Values(
-        // what happens when incompleteDir is a subdir of downloadDir
-        std::make_pair(std::string{"Downloads/Incomplete"}, std::string{"Downloads"}),
-        // test what happens when downloadDir is a subdir of incompleteDir
-        std::make_pair(std::string{"Downloads"}, std::string{"Downloads/Complete"}),
-        // test what happens when downloadDir and incompleteDir are siblings
-        std::make_pair(std::string{"Incomplete"}, std::string{"Downloads"})
+    // what happens when incompleteDir is a subdir of downloadDir
+    std::make_pair(std::string{ "Downloads/Incomplete" }, std::string{ "Downloads" }),
+    // test what happens when downloadDir is a subdir of incompleteDir
+    std::make_pair(std::string{ "Downloads" }, std::string{ "Downloads/Complete" }),
+    // test what happens when downloadDir and incompleteDir are siblings
+    std::make_pair(std::string{ "Incomplete" }, std::string{ "Downloads" })
     )
-);
+    );
 
 /***
 ****
@@ -157,9 +160,9 @@ TEST_F(MoveTest, setLocation)
     EXPECT_EQ(0, tr_torrentStat(tor)->leftUntilDone);
 
     // now move it
-    auto state = int { -1 };
+    auto state = int{ -1 };
     tr_torrentSetLocation(tor, std::data(target_dir), true, nullptr, &state);
-    auto test = [&state](){ return state == TR_LOC_DONE; };
+    auto test = [&state]() { return state == TR_LOC_DONE; };
     EXPECT_TRUE(waitFor(test, 300));
     EXPECT_EQ(TR_LOC_DONE, state);
 
@@ -172,7 +175,7 @@ TEST_F(MoveTest, setLocation)
     for (tr_file_index_t file_index = 0; file_index < tor->info.fileCount; ++file_index)
     {
         EXPECT_EQ(makeString(tr_buildPath(std::data(target_dir), tor->info.files[file_index].name, nullptr)),
-                  makeString(tr_torrentFindFile(tor, file_index)));
+            makeString(tr_torrentFindFile(tor, file_index)));
     }
 
     // cleanup

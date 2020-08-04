@@ -15,7 +15,7 @@
 
 TEST(Bitfield, countRange)
 {
-    auto constexpr IterCount = int { 10000 };
+    auto constexpr IterCount = int{ 10000 };
 
     for (auto i = 0; i < IterCount; ++i)
     {
@@ -47,7 +47,7 @@ TEST(Bitfield, countRange)
         }
 
         // test the bitfield
-        auto count1 = int {};
+        auto count1 = int{};
         for (int i = begin; i < end; ++i)
         {
             if (tr_bitfieldHas(&bf, i))

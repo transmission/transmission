@@ -13,7 +13,7 @@
 
 TEST(History, recentHistory)
 {
-    auto h = tr_recentHistory { };
+    auto h = tr_recentHistory {};
 
     tr_historyAdd(&h, 10000, 1);
     EXPECT_EQ(0, tr_historyGet(&h, 12000, 1000));

@@ -11,12 +11,14 @@
 
 #include "gtest/gtest.h"
 
-class GetoptTest: public ::testing::Test {
+class GetoptTest : public ::testing::Test
+{
 protected:
-    static auto constexpr Options = std::array<tr_option, 8> {
+    static auto constexpr Options = std::array<tr_option, 8>{
         tr_option{ 'p', "private", "Allow this torrent to only be used with the specified tracker(s)", "p", false, nullptr },
         { 'o', "outfile", "Save the generated .torrent to this filename", "o", true, "<file>" },
-        { 's', "piecesize", "Set how many KiB each piece should be, overriding the preferred default", "s", true, "<size in KiB>" },
+        { 's', "piecesize", "Set how many KiB each piece should be, overriding the preferred default", "s", true,
+            "<size in KiB>" },
         { 'c', "comment", "Add a comment", "c", true, "<comment>" },
         { 't', "tracker", "Add a tracker's announce URL", "t", true, "<url>" },
         { 'q', "pooka", "Pooka", "pk", false, nullptr },
@@ -24,12 +26,10 @@ protected:
         { 0, nullptr, nullptr, nullptr, false, nullptr }
     };
 
-    void runTest(int argc, char const* const* argv,
-                 int expected_n,
-                 int const* expected_c,
-                 char const* const* expected_optarg) const
+    void runTest(int argc, char const* const* argv, int expected_n, int const* expected_c,
+        char const* const* expected_optarg) const
     {
-        auto n = int {};
+        auto n = int{};
         tr_optind = 1;
 
         int c;
@@ -129,7 +129,8 @@ TEST_F(GetoptTest, missingArg)
 
 TEST_F(GetoptTest, lotsOfOptions)
 {
-    auto constexpr Args = std::array<char const*, 6>{ "/some/path/tr-getopt-test", "--piecesize=4", "-c", "hello world", "-p", "--tracker=foo" };
+    auto constexpr Args =
+        std::array<char const*, 6>{ "/some/path/tr-getopt-test", "--piecesize=4", "-c", "hello world", "-p", "--tracker=foo" };
     auto constexpr ExpectedN = 4;
     auto constexpr ExpectedC = std::array<int, ExpectedN>{ 's', 'c', 'p', 't' };
     auto constexpr ExpectedOptArg = std::array<char const*, ExpectedN>{ "4", "hello world", nullptr, "foo" };

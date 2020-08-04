@@ -9,13 +9,13 @@
 #include <chrono>
 #include <memory>
 #include <thread>
-#include <mutex>  // std::once_flag()
+#include <mutex> // std::once_flag()
 #include <string>
-#include <cstdlib>  // getenv()
+#include <cstdlib> // getenv()
 
 #include "crypto-utils.h" // tr_base64_decode_str()
 #include "error.h"
-#include "file.h"  // tr_sys_file_*()
+#include "file.h" // tr_sys_file_*()
 #include "quark.h"
 #include "platform.h" // TR_PATH_DELIMITER
 #include "trevent.h" // tr_amInEventThread()
@@ -28,11 +28,11 @@ namespace libtransmission::test
 {
 
 auto constexpr makeString = [](char*&& s)
-{
-    auto const ret = std::string(s != nullptr ? s : "");
-    tr_free(s);
-    return ret;
-};
+    {
+        auto const ret = std::string(s != nullptr ? s : "");
+        tr_free(s);
+        return ret;
+    };
 
 bool waitFor(std::function<bool()> const& test, int msec)
 {
@@ -45,10 +45,12 @@ bool waitFor(std::function<bool()> const& test, int msec)
         {
             return true;
         }
+
         if ((std::chrono::steady_clock::now() - begin) >= deadline)
         {
             return false;
         }
+
         tr_wait_msec(10);
     }
 }
@@ -56,7 +58,7 @@ bool waitFor(std::function<bool()> const& test, int msec)
 class Sandbox
 {
 public:
-    Sandbox():
+    Sandbox() :
         parent_dir_{get_default_parent_dir()},
         sandbox_dir_{create_sandbox(parent_dir_, "transmission-test-XXXXXX")}
     {
@@ -75,24 +77,24 @@ public:
 protected:
     static std::string get_default_parent_dir()
     {
-         auto* path = getenv("TMPDIR");
-         if (path != NULL)
-         {
-             return path;
-         }
+        auto* path = getenv("TMPDIR");
+        if (path != NULL)
+        {
+            return path;
+        }
 
-         tr_error* error = nullptr;
-         path = tr_sys_dir_get_current(&error);
-         if (path != nullptr)
-         {
-             std::string const ret = path;
-             tr_free(path);
-             return ret;
-         }
+        tr_error* error = nullptr;
+        path = tr_sys_dir_get_current(&error);
+        if (path != nullptr)
+        {
+            std::string const ret = path;
+            tr_free(path);
+            return ret;
+        }
 
-         std::cerr << "tr_sys_dir_get_current error: '" << error->message << "'" << std::endl;
-         tr_error_free(error);
-         return {};
+        std::cerr << "tr_sys_dir_get_current error: '" << error->message << "'" << std::endl;
+        tr_error_free(error);
+        return {};
     }
 
     static std::string create_sandbox(std::string const& parent_dir, std::string const& tmpl)
@@ -108,10 +110,10 @@ protected:
     static auto get_folder_files(std::string const& path)
     {
         std::vector<std::string> ret;
-        
+
         tr_sys_path_info info;
-        if (tr_sys_path_get_info(std::data(path), 0, &info, nullptr)
-            && (info.type == TR_SYS_PATH_IS_DIRECTORY))
+        if (tr_sys_path_get_info(std::data(path), 0, &info, nullptr) &&
+            (info.type == TR_SYS_PATH_IS_DIRECTORY))
         {
             auto const odir = tr_sys_dir_open(std::data(path), nullptr);
             if (odir != TR_BAD_SYS_DIR)
@@ -124,6 +126,7 @@ protected:
                         ret.push_back(makeString(tr_buildPath(std::data(path), name, nullptr)));
                     }
                 }
+
                 tr_sys_dir_close(odir, nullptr);
             }
         }
@@ -131,7 +134,7 @@ protected:
         return ret;
     }
 
-    static void rimraf(std::string const& path, bool verbose=false)
+    static void rimraf(std::string const& path, bool verbose = false)
     {
         for (auto const& child : get_folder_files(path))
         {
@@ -151,11 +154,9 @@ private:
     std::string const sandbox_dir_;
 };
 
-
 class SandboxedTest : public ::testing::Test
 {
 protected:
-
     std::string sandboxDir() const { return sandbox_.path(); }
 
     void buildParentDir(std::string_view path) const
@@ -264,11 +265,12 @@ void ensureFormattersInited()
 
     static std::once_flag flag;
 
-    std::call_once(flag, []() {
-        tr_formatter_mem_init(MEM_K, MEM_K_STR, MEM_M_STR, MEM_G_STR, MEM_T_STR);
-        tr_formatter_size_init(DISK_K, DISK_K_STR, DISK_M_STR, DISK_G_STR, DISK_T_STR);
-        tr_formatter_speed_init(SPEED_K, SPEED_K_STR, SPEED_M_STR, SPEED_G_STR, SPEED_T_STR);
-    });
+    std::call_once(flag, []()
+        {
+            tr_formatter_mem_init(MEM_K, MEM_K_STR, MEM_M_STR, MEM_G_STR, MEM_T_STR);
+            tr_formatter_size_init(DISK_K, DISK_K_STR, DISK_M_STR, DISK_G_STR, DISK_T_STR);
+            tr_formatter_speed_init(SPEED_K, SPEED_K_STR, SPEED_M_STR, SPEED_G_STR, SPEED_T_STR);
+        });
 }
 
 class SessionTest : public SandboxedTest
@@ -284,17 +286,17 @@ private:
         size_t len;
         char const* str;
         auto q = TR_KEY_download_dir;
-        auto const download_dir = tr_variantDictFindStr(settings, q, &str, &len)
-            ? makeString(tr_strdup_printf("%s/%*.*s", std::data(sandboxDir()), (int)len, (int)len, str))
-            : makeString(tr_buildPath(std::data(sandboxDir()), "Downloads", nullptr));
+        auto const download_dir = tr_variantDictFindStr(settings, q, &str, &len) ?
+            makeString(tr_strdup_printf("%s/%*.*s", std::data(sandboxDir()), (int)len, (int)len, str)) :
+            makeString(tr_buildPath(std::data(sandboxDir()), "Downloads", nullptr));
         tr_sys_dir_create(std::data(download_dir), TR_SYS_DIR_CREATE_PARENTS, 0700, nullptr);
         tr_variantDictAddStr(settings, q, std::data(download_dir));
 
         // incomplete dir
         q = TR_KEY_incomplete_dir;
-        auto const incomplete_dir = tr_variantDictFindStr(settings, q, &str, &len)
-            ? makeString(tr_strdup_printf("%s/%*.*s", std::data(sandboxDir()), (int)len, (int)len, str))
-            : makeString(tr_buildPath(std::data(sandboxDir()), "Incomplete", nullptr));
+        auto const incomplete_dir = tr_variantDictFindStr(settings, q, &str, &len) ?
+            makeString(tr_strdup_printf("%s/%*.*s", std::data(sandboxDir()), (int)len, (int)len, str)) :
+            makeString(tr_buildPath(std::data(sandboxDir()), "Incomplete", nullptr));
         tr_variantDictAddStr(settings, q, std::data(incomplete_dir));
 
         // blocklists
@@ -331,7 +333,6 @@ private:
     }
 
 protected:
-
     tr_torrent* zeroTorrentInit() const
     {
         // 1048576 files-filled-with-zeroes/1048576
@@ -358,7 +359,7 @@ protected:
             "OnByaXZhdGVpMGVlZQ==";
 
         // create the torrent ctor
-        auto metainfo_len = size_t {};
+        auto metainfo_len = size_t{};
         auto* metainfo = tr_base64_decode_str(metainfo_base64, &metainfo_len);
         EXPECT_NE(nullptr, metainfo);
         EXPECT_LT(0, metainfo_len);
@@ -368,7 +369,7 @@ protected:
         tr_free(metainfo);
 
         // create the torrent
-        auto err = int {};
+        auto err = int{};
         auto* tor = tr_torrentNew(ctor, &err, nullptr);
         EXPECT_EQ(0, err);
 
@@ -383,13 +384,14 @@ protected:
         {
             auto const& file = tor->info.files[i];
 
-            auto path = (!complete && i == 0)
-                ? makeString(tr_strdup_printf("%s%c%s.part", tor->currentDir, TR_PATH_DELIMITER, file.name))
-                : makeString(tr_strdup_printf("%s%c%s", tor->currentDir, TR_PATH_DELIMITER, file.name));
+            auto path = (!complete && i == 0) ?
+                makeString(tr_strdup_printf("%s%c%s.part", tor->currentDir, TR_PATH_DELIMITER, file.name)) :
+                makeString(tr_strdup_printf("%s%c%s", tor->currentDir, TR_PATH_DELIMITER, file.name));
 
             auto const dirname = makeString(tr_sys_path_dirname(path.c_str(), nullptr));
             tr_sys_dir_create(std::data(dirname), TR_SYS_DIR_CREATE_PARENTS, 0700, nullptr);
-            auto fd = tr_sys_file_open(path.c_str(), TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE, 0600, nullptr);
+            auto fd = tr_sys_file_open(
+                path.c_str(), TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE, 0600, nullptr);
 
             for (uint64_t j = 0; j < file.length; ++j)
             {
@@ -422,13 +424,14 @@ protected:
         EXPECT_NE(nullptr, tor->session);
         EXPECT_FALSE(tr_amInEventThread(tor->session));
 
-        auto constexpr onVerifyDone = [](tr_torrent*, bool, void* done) {
-            *static_cast<bool*>(done) = true;
-        };
+        auto constexpr onVerifyDone = [](tr_torrent*, bool, void* done)
+            {
+                *static_cast<bool*>(done) = true;
+            };
 
         bool done = false;
         tr_torrentVerify(tor, onVerifyDone, &done);
-        auto test = [&done](){ return done; };
+        auto test = [&done]() { return done; };
         EXPECT_TRUE(waitFor(test, 2000));
     }
 
@@ -440,10 +443,11 @@ protected:
         {
             auto* settings = new tr_variant {};
             tr_variantInitDict(settings, 10);
-            auto constexpr deleter = [](tr_variant* v){
-                tr_variantFree(v);
-                delete v;
-            };
+            auto constexpr deleter = [](tr_variant* v)
+                {
+                    tr_variantFree(v);
+                    delete v;
+                };
             settings_.reset(settings, deleter);
         }
 
@@ -466,4 +470,4 @@ protected:
     }
 };
 
-}  // namespace libtransmission::test
+} // namespace libtransmission::test

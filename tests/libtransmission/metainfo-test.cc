@@ -59,7 +59,7 @@ TEST(Metainfo, bucket)
         void const* benc;
     };
 
-    auto constexpr Tests = std::array<Test, 9> {
+    auto constexpr Tests = std::array<Test, 9>{
         Test{ 0, TR_PARSE_OK, BEFORE_PATH "5:a.txt" AFTER_PATH },
 
         /* allow empty components, but not =all= empty components, see bug #5517 */
@@ -109,7 +109,7 @@ TEST(Metainfo, sanitize)
         bool expected_is_adjusted;
     };
 
-    auto constexpr Tests = std::array<Test, 29> {
+    auto constexpr Tests = std::array<Test, 29>{
         // skipped
         Test{ "", 0, nullptr, false },
         { ".", 1, nullptr, false },

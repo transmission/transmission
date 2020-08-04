@@ -109,7 +109,7 @@ TEST_F(UtilsTest, trUtf8clean)
     // this version is not utf-8 (but cp866)
     in = "\x92\xE0\xE3\xA4\xAD\xAE \xA1\xEB\xE2\xEC \x81\xAE\xA3\xAE\xAC";
     out = makeString(tr_utf8clean(in, 17));
-    EXPECT_TRUE(std::size(out)== 17 || std::size(out)== 33);
+    EXPECT_TRUE(std::size(out) == 17 || std::size(out) == 33);
     EXPECT_TRUE(tr_utf8_validate(out.c_str(), std::size(out), nullptr));
 
     // same string, but utf-8 clean
@@ -134,7 +134,7 @@ TEST_F(UtilsTest, trUtf8clean)
 
 TEST_F(UtilsTest, numbers)
 {
-    auto count = int {};
+    auto count = int{};
     auto* numbers = tr_parseNumberRange("1-10,13,16-19", TR_BAD_SIZE, &count);
     EXPECT_EQ(15, count);
     EXPECT_EQ(1, numbers[0]);
@@ -152,6 +152,7 @@ TEST_F(UtilsTest, numbers)
     {
         EXPECT_EQ(i + 1, numbers[i]);
     }
+
     tr_free(numbers);
 
     numbers = tr_parseNumberRange("1-Hello", TR_BAD_SIZE, &count);
@@ -181,7 +182,7 @@ int compareInts(void const* va, void const* vb)
 
 TEST_F(UtilsTest, lowerbound)
 {
-    auto constexpr A = std::array<int, 7> { 1, 2, 3, 3, 3, 5, 8 };
+    auto constexpr A = std::array<int, 7>{ 1, 2, 3, 3, 3, 5, 8 };
     int const expected_pos[] = { 0, 1, 2, 5, 5, 6, 6, 6, 7, 7 };
     bool const expected_exact[] = { true, true, true, false, true, false, false, true, false, false };
 
@@ -196,22 +197,23 @@ TEST_F(UtilsTest, lowerbound)
 
 TEST_F(UtilsTest, trQuickfindfirstk)
 {
-    auto const run_test = [](size_t const k, size_t const n, int* buf, int range) {
-        // populate buf with random ints
-        std::generate(buf, buf+n, [range](){return tr_rand_int_weak(range);});
+    auto const run_test = [](size_t const k, size_t const n, int* buf, int range)
+        {
+            // populate buf with random ints
+            std::generate(buf, buf + n, [range]() { return tr_rand_int_weak(range); });
 
-        // find the best k
-        tr_quickfindFirstK(buf, n, sizeof(int), compareInts, k);
+            // find the best k
+            tr_quickfindFirstK(buf, n, sizeof(int), compareInts, k);
 
-        // confirm that the smallest K ints are in the first slots K slots in buf
-        auto const highest_low = std::max_element(buf, buf+k);
-        auto const lowest_high = std::min_element(buf+k, buf+n);
-        EXPECT_LE(highest_low, lowest_high);
-    };
+            // confirm that the smallest K ints are in the first slots K slots in buf
+            auto const highest_low = std::max_element(buf, buf + k);
+            auto const lowest_high = std::min_element(buf + k, buf + n);
+            EXPECT_LE(highest_low, lowest_high);
+        };
 
-    auto constexpr K = size_t { 10 };
-    auto constexpr NumTrials = size_t { 1000 };
-    auto buf = std::array<int,100>{};
+    auto constexpr K = size_t{ 10 };
+    auto constexpr NumTrials = size_t{ 1000 };
+    auto buf = std::array<int, 100>{};
     for (auto i = 0; i != NumTrials; ++i)
     {
         run_test(K, std::size(buf), std::data(buf), 100);
@@ -233,7 +235,7 @@ TEST_F(UtilsTest, trBinaryHex)
     auto constexpr HexIn = std::string_view { "fb5ef5507427b17e04b69cef31fa3379b456735a" };
 
     uint8_t binary[20];
-    tr_hex_to_binary(std::begin(HexIn), binary, std::size(HexIn)/2);
+    tr_hex_to_binary(std::begin(HexIn), binary, std::size(HexIn) / 2);
 
     char hex_out[41];
     tr_binary_to_hex(binary, hex_out, 20);
@@ -352,14 +354,15 @@ TEST_F(UtilsTest, truncd)
 
 TEST_F(UtilsTest, trStrdupVprintf)
 {
-    //NOLINTNEXTLINE(cert-dcl50-cpp)
-    auto constexpr test_strdup_printf_valist = [](char const* fmt, ...){
-        va_list args;
-        va_start(args, fmt);
-        auto* ret = tr_strdup_vprintf(fmt, args);
-        va_end(args);
-        return ret;
-    };
+    // NOLINTNEXTLINE(cert-dcl50-cpp)
+    auto constexpr test_strdup_printf_valist = [](char const* fmt, ...)
+        {
+            va_list args;
+            va_start(args, fmt);
+            auto* ret = tr_strdup_vprintf(fmt, args);
+            va_end(args);
+            return ret;
+        };
 
     auto s = makeString(test_strdup_printf_valist("\n-%s-%s-%s-\n", "\r", "\t", "\b"));
     EXPECT_EQ("\n-\r-\t-\b-\n", s);

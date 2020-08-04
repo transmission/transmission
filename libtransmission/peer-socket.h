@@ -58,5 +58,4 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const
 
 struct tr_peer_socket tr_netOpenPeerUTPSocket(tr_session* session, tr_address const* addr, tr_port port, bool clientIsSeed);
 
-
 TR_END_DECLS

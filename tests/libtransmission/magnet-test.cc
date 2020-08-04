@@ -14,7 +14,7 @@
 
 TEST(Magnet, magnetParse)
 {
-    auto constexpr ExpectedHash = std::array<uint8_t, SHA_DIGEST_LENGTH> {
+    auto constexpr ExpectedHash = std::array<uint8_t, SHA_DIGEST_LENGTH>{
         210, 53, 64, 16, 163, 202, 74, 222, 91, 116,
         39, 187, 9, 58, 98, 163, 137, 159, 243, 129
     };
