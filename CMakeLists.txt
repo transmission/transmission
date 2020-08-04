@@ -388,7 +388,7 @@ else()
 endif()
 
 if(CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
-    set(NEEDED_COMPILER_FLAGS
+    set(COMPILER_WARNING_FLAGS
         -Wall
         -W
         -Wcast-align
@@ -400,7 +400,7 @@ if(CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
         -Wwrite-strings)
 
     if(NOT CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_VERSION VERSION_GREATER "3.3")
-        list(APPEND NEEDED_COMPILER_FLAGS
+        list(APPEND COMPILER_WARNING_FLAGS
             -Wextra
             -Winit-self)
     endif()
@@ -408,24 +408,16 @@ if(CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
     if(MINGW)
         # Disable excessive warnings since we're using __USE_MINGW_ANSI_STDIO
         # Hopefully, any potential issues will be spotted on other platforms
-        list(APPEND NEEDED_COMPILER_FLAGS -Wno-format)
+        list(APPEND COMPILER_WARNING_FLAGS -Wno-format)
     else()
-        list(APPEND NEEDED_COMPILER_FLAGS -Wformat-security)
+        list(APPEND COMPILER_WARNING_FLAGS -Wformat-security)
     endif()
 
-    set(NEEDED_C_COMPILER_FLAGS
-        ${NEEDED_COMPILER_FLAGS}
+    list(APPEND COMPILER_WARNING_FLAGS
         -Winline
         -Wmissing-declarations
         -Wnested-externs
         -Wstrict-prototypes)
-    string(REPLACE ";" " " NEEDED_C_COMPILER_FLAGS_STRING "${NEEDED_C_COMPILER_FLAGS}")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${NEEDED_C_COMPILER_FLAGS_STRING}")
-
-    set(NEEDED_CXX_COMPILER_FLAGS
-        ${NEEDED_COMPILER_FLAGS})
-    string(REPLACE ";" " " NEEDED_CXX_COMPILER_FLAGS_STRING "${NEEDED_CXX_COMPILER_FLAGS}")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${NEEDED_CXX_COMPILER_FLAGS_STRING}")
 endif()
 
 include(LargeFileSupport)

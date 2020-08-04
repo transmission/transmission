@@ -1,5 +1,7 @@
 project(trutils)
 
+add_compile_options(${COMPILER_WARNING_FLAGS})
+
 include_directories(${CMAKE_SOURCE_DIR})
 
 foreach(P create edit remote show)

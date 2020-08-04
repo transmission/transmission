@@ -1,5 +1,7 @@
 project(trqt)
 
+add_compile_options(${COMPILER_WARNING_FLAGS})
+
 set(${PROJECT_NAME}_SOURCES
     AboutDialog.cc
     AddData.cc

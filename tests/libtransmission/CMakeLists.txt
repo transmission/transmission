@@ -4,13 +4,17 @@
 set(crypto-test_ADD_SOURCES crypto-test-ref.h)
 set(subprocess-test_ADD_SOURCES subprocess-test.cmd)
 
+add_compile_options(
+    ${COMPILER_WARNING_FLAGS}
+)
+
+add_compile_definitions(
+    __TRANSMISSION__
+)
+
 include_directories(
     ${CMAKE_SOURCE_DIR}/libtransmission
     ${CMAKE_BINARY_DIR}/libtransmission
-)
-
-add_definitions(
-    -D__TRANSMISSION__
 )
 
 

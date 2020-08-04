@@ -183,6 +183,8 @@ set(${PROJECT_NAME}_PRIVATE_HEADERS
     webseed.h
 )
 
+add_compile_options(${COMPILER_WARNING_FLAGS})
+
 if(NOT ENABLE_UTP)
     set_source_files_properties(tr-utp.c PROPERTIES HEADER_FILE_ONLY ON)
 endif()
