@@ -1,6 +1,6 @@
 project(trgtk)
 
-add_compile_options(${COMPILER_WARNING_FLAGS})
+add_compile_options(${C_WARNING_FLAGS})
 
 if(WITH_LIBAPPINDICATOR)
     add_definitions(-DHAVE_LIBAPPINDICATOR)

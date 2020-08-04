@@ -39,17 +39,9 @@ struct tr_peer_socket
 
 #define TR_PEER_SOCKET_INIT ((struct tr_peer_socket){ .type = TR_PEER_SOCKET_TYPE_NONE })
 
-static inline struct tr_peer_socket tr_peer_socket_tcp_create(tr_socket_t const handle)
-{
-    TR_ASSERT(handle != TR_BAD_SOCKET);
-    return (struct tr_peer_socket){ .type = TR_PEER_SOCKET_TYPE_TCP, .handle.tcp = handle };
-}
+struct tr_peer_socket tr_peer_socket_tcp_create(tr_socket_t const handle);
 
-static inline struct tr_peer_socket tr_peer_socket_utp_create(struct UTPSocket* const handle)
-{
-    TR_ASSERT(handle != NULL);
-    return (struct tr_peer_socket){ .type = TR_PEER_SOCKET_TYPE_UTP, .handle.utp = handle };
-}
+struct tr_peer_socket tr_peer_socket_utp_create(struct UTPSocket* const handle);
 
 struct tr_session;
 struct tr_address;

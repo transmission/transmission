@@ -393,11 +393,13 @@ if(CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
         -W
         -Wcast-align
         -Wfloat-equal
+        -Winline
         -Wmissing-format-attribute
         -Wpointer-arith
         -Wredundant-decls
         -Wunused-parameter
-        -Wwrite-strings)
+        -Wwrite-strings
+    )
 
     if(NOT CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_VERSION VERSION_GREATER "3.3")
         list(APPEND COMPILER_WARNING_FLAGS
@@ -413,11 +415,11 @@ if(CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
         list(APPEND COMPILER_WARNING_FLAGS -Wformat-security)
     endif()
 
-    list(APPEND COMPILER_WARNING_FLAGS
-        -Winline
-        -Wmissing-declarations
+    set(C_WARNING_FLAGS ${COMPILER_WARNING_FLAGS}
         -Wnested-externs
-        -Wstrict-prototypes)
+        -Wstrict-prototypes
+    )
+    set(CXX_WARNING_FLAGS ${COMPILER_WARNING_FLAGS})
 endif()
 
 include(LargeFileSupport)

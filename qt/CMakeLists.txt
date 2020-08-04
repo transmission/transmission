@@ -1,6 +1,6 @@
 project(trqt)
 
-add_compile_options(${COMPILER_WARNING_FLAGS})
+add_compile_options(${CXX_WARNING_FLAGS})
 
 set(${PROJECT_NAME}_SOURCES
     AboutDialog.cc

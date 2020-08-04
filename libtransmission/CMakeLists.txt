@@ -14,6 +14,8 @@ elseif(MSVC)
 endif()
 set_source_files_properties(${THIRD_PARTY_SOURCES} PROPERTIES COMPILE_FLAGS ${DISABLE_WARNINGS})
 
+add_compile_options(${C_WARNING_FLAGS})
+
 set(${PROJECT_NAME}_SOURCES
     announcer.c
     announcer-http.c
@@ -182,8 +184,6 @@ set(${PROJECT_NAME}_PRIVATE_HEADERS
     watchdir-common.h
     webseed.h
 )
-
-add_compile_options(${COMPILER_WARNING_FLAGS})
 
 if(NOT ENABLE_UTP)
     set_source_files_properties(tr-utp.c PROPERTIES HEADER_FILE_ONLY ON)

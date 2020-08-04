@@ -5,7 +5,7 @@ set(crypto-test_ADD_SOURCES crypto-test-ref.h)
 set(subprocess-test_ADD_SOURCES subprocess-test.cmd)
 
 add_compile_options(
-    ${COMPILER_WARNING_FLAGS}
+    ${CXX_WARNING_FLAGS}
 )
 
 if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.12.0)

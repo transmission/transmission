@@ -352,18 +352,23 @@ TEST_F(UtilsTest, truncd)
 #endif
 }
 
+namespace
+{
+    char* test_strdup_printf_valist(char const* fmt, ...) TR_GNUC_PRINTF(1, 2);
+
+    char* test_strdup_printf_valist(char const* fmt, ...)
+    {
+        va_list args;
+        va_start(args, fmt);
+        auto* ret = tr_strdup_vprintf(fmt, args);
+        va_end(args);
+        return ret;
+    }
+}
+
 TEST_F(UtilsTest, trStrdupVprintf)
 {
     // NOLINTNEXTLINE(cert-dcl50-cpp)
-    auto constexpr test_strdup_printf_valist = [](char const* fmt, ...)
-        {
-            va_list args;
-            va_start(args, fmt);
-            auto* ret = tr_strdup_vprintf(fmt, args);
-            va_end(args);
-            return ret;
-        };
-
     auto s = makeString(test_strdup_printf_valist("\n-%s-%s-%s-\n", "\r", "\t", "\b"));
     EXPECT_EQ("\n-\r-\t-\b-\n", s);
 }
