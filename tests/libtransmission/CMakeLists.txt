@@ -8,9 +8,15 @@ add_compile_options(
     ${COMPILER_WARNING_FLAGS}
 )
 
-add_compile_definitions(
-    __TRANSMISSION__
-)
+if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.12.0)
+    add_compile_definitions(
+        __TRANSMISSION__
+    )
+else()
+    add_definitions(
+        -D__TRANSMISSION__
+    )
+endif()
 
 include_directories(
     ${CMAKE_SOURCE_DIR}/libtransmission
