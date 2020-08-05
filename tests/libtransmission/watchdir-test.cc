@@ -18,7 +18,7 @@
 
 #include <map>
 #include <string>
-#if !defined(__has_include) || __has_include("<string_view>")
+#if !defined(__has_include) || __has_include(<string_view>)
 # include <string_view>
 #else
 # include <experimental/string_view>
