@@ -43,9 +43,9 @@ private:
     std::shared_ptr<struct event_base> ev_base_;
 
 protected:
-    static auto constexpr FiftyMsec = timeval { .tv_sec = 0, .tv_usec = 50000 };
-    static auto constexpr OneHundredMsec = timeval { .tv_sec = 0, .tv_usec = 100000 };
-    static auto constexpr TwoHundredMsec = timeval { .tv_sec = 0, .tv_usec = 200000 };
+    static auto constexpr FiftyMsec = timeval { 0, 50000 };
+    static auto constexpr OneHundredMsec = timeval { 0, 100000 };
+    static auto constexpr TwoHundredMsec = timeval { 0, 200000 };
 
     void SetUp() override
     {

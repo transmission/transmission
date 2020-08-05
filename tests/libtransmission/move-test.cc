@@ -6,8 +6,6 @@
  *
  */
 
-#include <utility>
-
 #include <event2/buffer.h>
 
 #include "transmission.h"
@@ -16,6 +14,10 @@
 #include "variant.h"
 
 #include "test-fixtures.h"
+
+#include <optional>
+#include <string>
+#include <utility>
 
 namespace libtransmission::test
 {

@@ -1,12 +1,11 @@
-set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+#set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 
 include(GoogleTest)
 
-add_subdirectory(
-    "${CMAKE_SOURCE_DIR}/third-party/googletest"
-    "${CMAKE_BINARY_DIR}/third-party/googletest"
+include_directories(
+  ${CMAKE_SOURCE_DIR}/third-party/googletest/googletest/include
+  ${CMAKE_SOURCE_DIR}/third-party/googletest/googletest
 )
 
-add_subdirectory(
-    libtransmission
-)
+add_subdirectory(gtest)
+add_subdirectory(libtransmission)

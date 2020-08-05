@@ -1,93 +1,96 @@
 project(libtr)
 
-configure_file(version.h.in version.h)
+configure_file(
+  version.h.in
+  version.h
+)
 
-set(THIRD_PARTY_SOURCES ConvertUTF.c jsonsl.c wildmat.c)
-if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
-  set(DISABLE_WARNINGS -w)
-elseif(CMAKE_C_COMPILER_ID MATCHES "Clang")
-  set(DISABLE_WARNINGS -w)
-elseif(CMAKE_C_COMPILER_ID MATCHES "SunPro")
-  set(DISABLE_WARNINGS -erroff)
-elseif(MSVC)
-  set(DISABLE_WARNINGS /w)
-endif()
-set_source_files_properties(${THIRD_PARTY_SOURCES} PROPERTIES COMPILE_FLAGS ${DISABLE_WARNINGS})
+set(THIRD_PARTY_SOURCES
+  ConvertUTF.c
+  jsonsl.c
+  wildmat.c
+)
 
-add_compile_options(${C_WARNING_FLAGS})
+set(PROJECT_SOURCES
+  announcer.c
+  announcer-http.c
+  announcer-udp.c
+  bandwidth.c
+  bitfield.c
+  blocklist.c
+  cache.c
+  clients.c
+  completion.c
+  crypto.c
+  crypto-utils.c
+  crypto-utils-cyassl.c
+  crypto-utils-fallback.c
+  crypto-utils-openssl.c
+  crypto-utils-polarssl.c
+  error.c
+  fdlimit.c
+  file.c
+  file-posix.c
+  file-win32.c
+  handshake.c
+  history.c
+  inout.c
+  list.c
+  log.c
+  magnet.c
+  makemeta.c
+  metainfo.c
+  natpmp.c
+  net.c
+  peer-io.c
+  peer-mgr.c
+  peer-msgs.c
+  platform.c
+  platform-quota.c
+  port-forwarding.c
+  ptrarray.c
+  quark.c
+  resume.c
+  rpcimpl.c
+  rpc-server.c
+  session.c
+  session-id.c
+  subprocess-posix.c
+  subprocess-win32.c
+  stats.c
+  torrent.c
+  torrent-ctor.c
+  torrent-magnet.c
+  tr-dht.c
+  trevent.c
+  tr-assert.c
+  tr-getopt.c
+  tr-lpd.c
+  tr-udp.c
+  tr-utp.c
+  upnp.c
+  utils.c
+  variant-benc.c
+  variant.c
+  variant-json.c
+  verify.c
+  watchdir.c
+  watchdir-generic.c
+  watchdir-inotify.c
+  watchdir-kqueue.c
+  watchdir-win32.c
+  web.c
+  webseed.c
+)
 
+set_source_files_properties(
+  ${PROJECT_SOURCES}
+  PROPERTIES
+  COMPILE_FLAGS ${C_WARNING_FLAGS}
+)
 set(${PROJECT_NAME}_SOURCES
-    announcer.c
-    announcer-http.c
-    announcer-udp.c
-    bandwidth.c
-    bitfield.c
-    blocklist.c
-    cache.c
-    clients.c
-    completion.c
-    ConvertUTF.c
-    crypto.c
-    crypto-utils.c
-    crypto-utils-cyassl.c
-    crypto-utils-fallback.c
-    crypto-utils-openssl.c
-    crypto-utils-polarssl.c
-    error.c
-    fdlimit.c
-    file.c
-    file-posix.c
-    file-win32.c
-    handshake.c
-    history.c
-    inout.c
-    list.c
-    log.c
-    magnet.c
-    makemeta.c
-    metainfo.c
-    natpmp.c
-    net.c
-    peer-io.c
-    peer-mgr.c
-    peer-msgs.c
-    platform.c
-    platform-quota.c
-    port-forwarding.c
-    ptrarray.c
-    quark.c
-    resume.c
-    rpcimpl.c
-    rpc-server.c
-    session.c
-    session-id.c
-    subprocess-posix.c
-    subprocess-win32.c
-    stats.c
-    torrent.c
-    torrent-ctor.c
-    torrent-magnet.c
-    tr-dht.c
-    trevent.c
-    tr-assert.c
-    tr-getopt.c
-    tr-lpd.c
-    tr-udp.c
-    tr-utp.c
-    upnp.c
-    utils.c
-    variant-benc.c
-    variant.c
-    variant-json.c
-    verify.c
-    watchdir.c
-    watchdir-generic.c
-    watchdir-inotify.c
-    watchdir-kqueue.c
-    watchdir-win32.c
-    web.c
-    webseed.c
-    wildmat.c
+  ${THIRD_PARTY_SOURCES}
+  ${PROJECT_SOURCES}
 )
 
 set_source_files_properties(crypto-utils-fallback.c PROPERTIES HEADER_FILE_ONLY ON)

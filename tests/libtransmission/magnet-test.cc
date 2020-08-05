@@ -12,6 +12,8 @@
 
 #include "gtest/gtest.h"
 
+#include <array>
+
 TEST(Magnet, magnetParse)
 {
     auto constexpr ExpectedHash = std::array<uint8_t, SHA_DIGEST_LENGTH>{

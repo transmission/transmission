@@ -105,7 +105,7 @@ protected:
         while (*p != '\0')
         {
             tr_sys_path_info info;
-            char const* slash_pos = strchr(p, '/');
+            char const* slashPos = strchr(p, '/');
 
 #ifdef _WIN32
 
@@ -118,12 +118,12 @@ protected:
 
 #endif
 
-            if (slash_pos == nullptr)
+            if (slashPos == nullptr)
             {
-                slash_pos = p + strlen(p) - 1;
+                slashPos = p + strlen(p) - 1;
             }
 
-            auto const path_part = makeString(tr_strndup(path, size_t(slash_pos - path + 1)));
+            auto const path_part = makeString(tr_strndup(path, size_t(slashPos - path + 1)));
 
             if (!tr_sys_path_get_info(path_part.c_str(), TR_SYS_PATH_NO_FOLLOW, &info, nullptr) ||
                 (info.type != TR_SYS_PATH_IS_FILE && info.type != TR_SYS_PATH_IS_DIRECTORY))
@@ -131,7 +131,7 @@ protected:
                 return false;
             }
 
-            p = slash_pos + 1;
+            p = slashPos + 1;
         }
 
         return true;

@@ -6,10 +6,6 @@
  *
  */
 
-#include <cstdlib>
-#include <string>
-#include <string_view>
-
 #include "transmission.h"
 #include "error.h"
 #include "file.h"
@@ -19,6 +15,11 @@
 #include "gtest/internal/gtest-port.h" // GetArgvs()
 
 #include "test-fixtures.h"
+
+#include <array>
+#include <cstdlib>
+#include <string>
+#include <string_view>
 
 namespace libtransmission::test
 {
