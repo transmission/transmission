@@ -387,6 +387,9 @@ else()
     set(CMAKE_CXX_STANDARD_REQUIRED ON)
 endif()
 
+set(C_WARNING_FLAGS)
+set(CXX_WARNING_FLAGS)
+
 if(CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
     set(COMPILER_WARNING_FLAGS
         -Wall
@@ -415,11 +418,14 @@ if(CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
         list(APPEND COMPILER_WARNING_FLAGS -Wformat-security)
     endif()
 
-    set(C_WARNING_FLAGS ${COMPILER_WARNING_FLAGS}
+    list(APPEND C_WARNING_FLAGS
+         ${COMPILER_WARNING_FLAGS}
         -Wnested-externs
         -Wstrict-prototypes
     )
-    set(CXX_WARNING_FLAGS ${COMPILER_WARNING_FLAGS})
+    list(APPEND CXX_WARNING_FLAGS
+        ${COMPILER_WARNING_FLAGS}
+    )
 endif()
 
 include(LargeFileSupport)

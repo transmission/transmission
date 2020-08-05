@@ -5,13 +5,7 @@ configure_file(
   version.h
 )
 
-set(THIRD_PARTY_SOURCES
-  ConvertUTF.c
-  jsonsl.c
-  wildmat.c
-)
-
-set(PROJECT_SOURCES
+set(PROJECT_FILES
   announcer.c
   announcer-http.c
   announcer-udp.c
@@ -83,14 +77,22 @@ set(PROJECT_SOURCES
   webseed.c
 )
 
+list(JOIN C_WARNING_FLAGS " " C_WARNING_FLAGS_STR)
 set_source_files_properties(
-  ${PROJECT_SOURCES}
+  ${PROJECT_FILES}
   PROPERTIES
-  COMPILE_FLAGS ${C_WARNING_FLAGS}
+  COMPILE_FLAGS ${C_WARNING_FLAGS_STR}
 )
+
+set(THIRD_PARTY_FILES
+  ConvertUTF.c
+  jsonsl.c
+  wildmat.c
+)
+
 set(${PROJECT_NAME}_SOURCES
-  ${THIRD_PARTY_SOURCES}
-  ${PROJECT_SOURCES}
+  ${PROJECT_FILES}
+  ${THIRD_PARTY_FILES}
 )
 
 set_source_files_properties(crypto-utils-fallback.c PROPERTIES HEADER_FILE_ONLY ON)
