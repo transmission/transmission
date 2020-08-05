@@ -83,3 +83,7 @@ test_subprocess_SOURCES = subprocess-test.cc
 test_utils_SOURCES = utils-test.cc
 test_variant_SOURCES = variant-test.cc
 test_watchdir_SOURCES = watchdir-test.cc
+
+EXTRA_DIST = \
+  subprocess-test.cmd
+
