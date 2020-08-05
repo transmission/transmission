@@ -196,5 +196,3 @@ apps_ldadd = \
   @ZLIB_LIBS@ \
   ${LIBM}
 
-EXTRA_DIST = \
-  subprocess-test.cmd
