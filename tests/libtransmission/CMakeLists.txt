@@ -26,26 +26,23 @@ include_directories(
   ${EVENT2_INCLUDE_DIRS}
 )
 
+set_property(DIRECTORY PROPERTY FOLDER "UnitTests")
+set_property(DIRECTORY PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded")
+
 foreach(T bitfield blocklist clients crypto error file getopt
           history json magnet makemeta metainfo move peer-msgs
           quark rename rpc session subprocess utils variant watchdir)
-  set(TP ${TR_NAME}-test-${T})
-  if(T MATCHES "^([^@]+)@.+$")
-    string(REPLACE "@" "-" TP "${TP}")
-    string(REPLACE "@" "-" T_NAME "${T}")
-    set(${TP}_TEST_BASENAME "${CMAKE_MATCH_1}")
-  else()
-    set(T_NAME "${T}")
-    set(${TP}_TEST_BASENAME "${T}")
-  endif()
-  add_executable(${TP} ${${TP}_TEST_BASENAME}-test.cc ${${T}-test_ADD_SOURCES})
+  set(TP libtransmission-test-${T})
+  add_executable(${TP} ${T}-test.cc)
   target_link_libraries(${TP} gtestall ${TR_NAME})
-  add_test(NAME ${T_NAME}-test COMMAND ${TP})
-  set_property(TARGET ${TP} PROPERTY FOLDER "UnitTests")
+  add_test(NAME ${TP} COMMAND ${TP})
 endforeach()
 
-if(WIN32)
-  add_custom_command(TARGET ${TR_NAME}-test-subprocess PRE_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${PROJECT_SOURCE_DIR}/libtransmission/subprocess-test.cmd
-            $<TARGET_FILE_DIR:${TR_NAME}-test-subprocess>/${TR_NAME}-test-subprocess.cmd)
-endif()
+add_custom_command(
+  TARGET ${TR_NAME}-test-subprocess
+  PRE_BUILD
+  COMMAND
+    ${CMAKE_COMMAND} -E copy_if_different
+      ${PROJECT_SOURCE_DIR}/tests/libtransmission/subprocess-test.cmd
+      $<TARGET_FILE_DIR:libtransmission-test-subprocess>/libtransmission-test-subprocess.cmd
+)
