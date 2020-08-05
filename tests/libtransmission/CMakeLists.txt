@@ -34,12 +34,13 @@ foreach(T bitfield blocklist clients crypto error file getopt
           quark rename rpc session subprocess utils variant watchdir)
   set(TP libtransmission-test-${T})
   add_executable(${TP} ${T}-test.cc)
+  tr_set_compiler_std(${TP})
   target_link_libraries(${TP} gtestall ${TR_NAME})
   add_test(NAME ${TP} COMMAND ${TP})
 endforeach()
 
 add_custom_command(
-  TARGET ${TR_NAME}-test-subprocess
+  TARGET libtransmission-test-subprocess
   PRE_BUILD
   COMMAND
     ${CMAKE_COMMAND} -E copy_if_different

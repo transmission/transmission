@@ -29,10 +29,13 @@
 ****
 ***/
 
-extern struct timeval tr_watchdir_generic_interval;
-extern unsigned int tr_watchdir_retry_limit;
-extern struct timeval tr_watchdir_retry_start_interval;
-extern struct timeval tr_watchdir_retry_max_interval;
+extern "C"
+{
+    extern struct timeval tr_watchdir_generic_interval;
+    extern unsigned int tr_watchdir_retry_limit;
+    extern struct timeval tr_watchdir_retry_start_interval;
+    extern struct timeval tr_watchdir_retry_max_interval;
+}
 
 namespace libtransmission::test
 {
