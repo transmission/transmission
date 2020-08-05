@@ -26,6 +26,12 @@
 # define string_view experimental::string_view
 #endif
 
+#ifdef _WIN32
+#include <windows.h>
+#define setenv(key, value, unused) SetEnvironmentVariableA(key, value)
+#define unsetenv(key) SetEnvironmentVariableA(key, nullptr)
+#endif
+
 namespace libtransmission::test
 {
 
@@ -391,14 +397,18 @@ TEST_P(SubprocessTest, SpawnAsyncCwdMissing)
     tr_error_clear(&error);
 }
 
+#ifdef _WIN32
 INSTANTIATE_TEST_SUITE_P(
     Subprocess,
     SubprocessTest,
-#ifdef _WIN32
     ::testing::Values(getSelfPath(), getCmdSelfPath())
+);
 #else
+INSTANTIATE_TEST_SUITE_P(
+    Subprocess,
+    SubprocessTest,
     ::testing::Values(getSelfPath())
+);
 #endif
-    );
 
 } // namespace libtransmission::test
