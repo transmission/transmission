@@ -35,7 +35,7 @@ protected:
         auto input_file = makeString(tr_buildPath(std::data(sandboxDir()), "test.XXXXXX", nullptr));
         createTmpfileWithContents(input_file, payload, payloadSize);
         auto* builder = tr_metaInfoBuilderCreate(std::data(input_file));
-        EXPECT_EQ(tr_file_index_t{1}, builder->fileCount);
+        EXPECT_EQ(tr_file_index_t{ 1 }, builder->fileCount);
         EXPECT_STREQ(std::data(input_file), builder->top);
         EXPECT_STREQ(std::data(input_file), builder->files[0].filename);
         EXPECT_EQ(payloadSize, builder->files[0].size);
@@ -67,7 +67,7 @@ protected:
         EXPECT_EQ(payloadSize, inf.totalSize);
         EXPECT_EQ(makeString(tr_sys_path_basename(std::data(input_file), nullptr)), inf.name);
         EXPECT_STREQ(comment, inf.comment);
-        EXPECT_EQ(tr_file_index_t{1}, inf.fileCount);
+        EXPECT_EQ(tr_file_index_t{ 1 }, inf.fileCount);
         EXPECT_EQ(isPrivate, inf.isPrivate);
         EXPECT_FALSE(inf.isFolder);
         EXPECT_EQ(trackerCount, inf.trackerCount);
