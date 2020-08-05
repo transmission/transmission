@@ -706,7 +706,7 @@ TEST_F(FileTest, pathResolve)
         tr_error_clear(&err);
 
         tmp = tr_sys_path_resolve("\\\\127.0.0.1\\ADMIN$\\System32", &err);
-        EXPECT_STEQ("\\\\127.0.0.1\\ADMIN$\\System32", tmp);
+        EXPECT_STREQ("\\\\127.0.0.1\\ADMIN$\\System32", tmp);
         EXPECT_EQ(nullptr, err);
         tr_free(tmp);
     }
