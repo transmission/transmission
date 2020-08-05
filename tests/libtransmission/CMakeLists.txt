@@ -22,6 +22,7 @@ include_directories(
 
 include_directories(
   SYSTEM
+  ${CURL_INCLUDE_DIRS}
   ${EVENT2_INCLUDE_DIRS}
 )
 
