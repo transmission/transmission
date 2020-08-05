@@ -79,7 +79,6 @@ set(PROJECT_FILES
 
 string(REPLACE ";" " " C_WARNING_FLAGS_STR "${C_WARNING_FLAGS}")
 foreach(FILE ${PROJECT_FILES})
-  message("${FILE} ${C_WARNING_FLAGS_STR}")
   set_source_files_properties(${FILE} PROPERTIES COMPILE_FLAGS "${C_WARNING_FLAGS_STR}")
 endforeach()
 
