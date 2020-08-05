@@ -262,8 +262,8 @@ char* tr_strjoin(char const* const* arr, size_t len, char const* delim);
 
 int compareInt(void const* va, void const* vb);
 
-void tr_binary_to_hex(void const* input, char* output, size_t byte_length) TR_GNUC_NONNULL(1, 2);
-void tr_hex_to_binary(char const* input, void* output, size_t byte_length) TR_GNUC_NONNULL(1, 2);
+void tr_binary_to_hex(void const* input, void* output, size_t byte_length) TR_GNUC_NONNULL(1, 2);
+void tr_hex_to_binary(void const* input, void* output, size_t byte_length) TR_GNUC_NONNULL(1, 2);
 
 /** @brief convenience function to determine if an address is an IP address (IPv4 or IPv6) */
 bool tr_addressIsIP(char const* address);

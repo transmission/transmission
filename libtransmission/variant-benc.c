@@ -39,8 +39,10 @@
  * but to handle it as a signed 64bit integer is mandatory to handle
  * "large files" aka .torrent for more that 4Gbyte
  */
-int tr_bencParseInt(uint8_t const* buf, uint8_t const* bufend, uint8_t const** setme_end, int64_t* setme_val)
+int tr_bencParseInt(void const* vbuf, void const* vbufend, uint8_t const** setme_end, int64_t* setme_val)
 {
+    uint8_t const* const buf = (uint8_t const*)vbuf;
+    uint8_t const* const bufend = (uint8_t const*)vbufend;
     char* endptr;
     void const* begin;
     void const* end;
@@ -88,9 +90,12 @@ int tr_bencParseInt(uint8_t const* buf, uint8_t const* bufend, uint8_t const** s
  * Note that there is no constant beginning delimiter, and no ending delimiter.
  * Example: 4:spam represents the string "spam"
  */
-int tr_bencParseStr(uint8_t const* buf, uint8_t const* bufend, uint8_t const** setme_end, uint8_t const** setme_str,
+int tr_bencParseStr(void const* vbuf, void const* vbufend, uint8_t const** setme_end, uint8_t const** setme_str,
     size_t* setme_strlen)
 {
+    uint8_t const* const buf = (uint8_t const*)vbuf;
+    uint8_t const* const bufend = (uint8_t const*)vbufend;
+
     void const* end;
     size_t len;
     char* ulend;

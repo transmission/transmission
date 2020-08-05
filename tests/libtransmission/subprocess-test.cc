@@ -402,13 +402,13 @@ INSTANTIATE_TEST_SUITE_P(
     Subprocess,
     SubprocessTest,
     ::testing::Values(getSelfPath(), getCmdSelfPath())
-);
+    );
 #else
 INSTANTIATE_TEST_SUITE_P(
     Subprocess,
     SubprocessTest,
     ::testing::Values(getSelfPath())
-);
+    );
 #endif
 
 } // namespace libtransmission::test

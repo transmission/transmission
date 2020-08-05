@@ -787,35 +787,39 @@ double tr_getRatio(uint64_t numerator, uint64_t denominator)
     return ratio;
 }
 
-void tr_binary_to_hex(void const* input, char* output, size_t byte_length)
+void tr_binary_to_hex(void const* vinput, void* voutput, size_t byte_length)
 {
     static char const hex[] = "0123456789abcdef";
-    uint8_t const* input_octets = input;
+
+    uint8_t const* input = vinput;
+    char* output = voutput;
 
     /* go from back to front to allow for in-place conversion */
-    input_octets += byte_length;
+    input += byte_length;
     output += byte_length * 2;
 
     *output = '\0';
 
     while (byte_length-- > 0)
     {
-        unsigned int const val = *(--input_octets);
+        unsigned int const val = *(--input);
         *(--output) = hex[val & 0xf];
         *(--output) = hex[val >> 4];
     }
 }
 
-void tr_hex_to_binary(char const* input, void* output, size_t byte_length)
+void tr_hex_to_binary(void const* vinput, void* voutput, size_t byte_length)
 {
     static char const hex[] = "0123456789abcdef";
-    uint8_t* output_octets = output;
+
+    uint8_t const* input = (uint8_t const*)vinput;
+    uint8_t* output = voutput;
 
     for (size_t i = 0; i < byte_length; ++i)
     {
         int const hi = strchr(hex, tolower(*input++)) - hex;
         int const lo = strchr(hex, tolower(*input++)) - hex;
-        *output_octets++ = (uint8_t)((hi << 4) | lo);
+        *output++ = (uint8_t)((hi << 4) | lo);
     }
 }
 

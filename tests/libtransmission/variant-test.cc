@@ -43,8 +43,8 @@ protected:
 
     auto bencParseInt(std::string_view in, uint8_t const** end, int64_t* val)
     {
-        return tr_bencParseInt(reinterpret_cast<uint8_t const*>(std::data(in)),
-            reinterpret_cast<uint8_t const*>(std::data(in) + std::size(in)),
+        return tr_bencParseInt(std::data(in),
+            std::data(in) + std::size(in),
             end, val);
     }
 };
