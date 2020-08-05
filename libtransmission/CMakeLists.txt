@@ -76,18 +76,12 @@ set(PROJECT_FILES
   web.c
   webseed.c
 )
-foreach(file ${PROJECT_FILES})
-  foreach(warning ${C_WARNING_FLAGS_STR})
-    set_source_files_properties(${file} PROPERTIES COMPILE_FLAGS ${warning})
-  endforeach()
-endforeach()
 
-#string(REPLACE ";" " " C_WARNING_FLAGS_STR "${C_WARNING_FLAGS}")
-#set_source_files_properties(
-#  ${PROJECT_FILES}
-#  PROPERTIES
-#  COMPILE_FLAGS ${C_WARNING_FLAGS_STR}
-#)
+string(REPLACE ";" " " C_WARNING_FLAGS_STR "${C_WARNING_FLAGS}")
+foreach(FILE ${PROJECT_FILES})
+  message("${FILE} ${C_WARNING_FLAGS_STR}")
+  set_source_files_properties(${FILE} PROPERTIES COMPILE_FLAGS "${C_WARNING_FLAGS_STR}")
+endforeach()
 
 set(THIRD_PARTY_FILES
   ConvertUTF.c
