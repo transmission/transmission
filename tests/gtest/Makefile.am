@@ -26,3 +26,5 @@ libgtest_main_la_CPPFLAGS = \
 libgtest_main_la_LIBADD = \
   $(top_builddir)/tests/gtest/libgtest.la
 
+EXTRA_DIST = \
+  CMakeLists.txt
