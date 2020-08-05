@@ -12,6 +12,7 @@
 
 #include "gtest/gtest.h"
 
+#include <array>
 #include <cerrno>
 #include <cstring>
 #if !defined(__has_include) || __has_include(<string_view>)
