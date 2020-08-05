@@ -34,6 +34,7 @@
 
 #include <event2/util.h>
 
+#include <stdint.h>
 #include <libutp/utp.h>
 
 #include "transmission.h"

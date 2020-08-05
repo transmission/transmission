@@ -13,6 +13,7 @@
 #include <event2/buffer.h>
 #include <event2/bufferevent.h>
 
+#include <stdint.h>
 #include <libutp/utp.h>
 
 #include "transmission.h"
