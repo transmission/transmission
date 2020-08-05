@@ -271,7 +271,7 @@ TEST_F(FileTest, getInfo)
     EXPECT_EQ(nullptr, err);
     EXPECT_EQ(TR_SYS_PATH_IS_DIRECTORY, info.type);
     EXPECT_NE(uint64_t(-1), info.size);
-    EXPECT_GT(info.last_modified_at, t - 1);
+    EXPECT_GE(info.last_modified_at, t - 1);
     EXPECT_LE(info.last_modified_at, time(nullptr) + 1);
     tr_sys_path_remove(path1, nullptr);
 
@@ -291,7 +291,7 @@ TEST_F(FileTest, getInfo)
         EXPECT_EQ(nullptr, err);
         EXPECT_EQ(TR_SYS_PATH_IS_FILE, info.type);
         EXPECT_EQ(4, info.size);
-        EXPECT_GT(info.last_modified_at, t - 1);
+        EXPECT_GE(info.last_modified_at, t - 1);
         EXPECT_LE(info.last_modified_at, time(nullptr) + 1);
 
         // Good file info (by handle)
@@ -301,7 +301,7 @@ TEST_F(FileTest, getInfo)
         EXPECT_EQ(nullptr, err);
         EXPECT_EQ(TR_SYS_PATH_IS_FILE, info.type);
         EXPECT_EQ(4, info.size);
-        EXPECT_GT(info.last_modified_at, t - 1);
+        EXPECT_GE(info.last_modified_at, t - 1);
         EXPECT_LE(info.last_modified_at, time(nullptr) + 1);
         tr_sys_file_close(fd, nullptr);
 
@@ -317,7 +317,7 @@ TEST_F(FileTest, getInfo)
         EXPECT_EQ(nullptr, err);
         EXPECT_EQ(TR_SYS_PATH_IS_DIRECTORY, info.type);
         EXPECT_NE(uint64_t(-1), info.size);
-        EXPECT_GT(info.last_modified_at, t - 1);
+        EXPECT_GE(info.last_modified_at, t - 1);
         EXPECT_LE(info.last_modified_at, time(nullptr) + 1);
 
         tr_sys_path_remove(path2, nullptr);
