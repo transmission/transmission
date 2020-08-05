@@ -10,11 +10,16 @@
 #include "metainfo.h"
 #include "utils.h"
 
+#include "gtest/gtest.h"
+
 #include <cerrno>
 #include <cstring>
-#include <string_view>
-
-#include "gtest/gtest.h"
+#if defined(__GNUC__) && (__GNUC__ < 7)
+# include <experimental/string_view>
+# define string_view experimental::string_view
+#else
+# include <string_view>
+#endif
 
 TEST(Metainfo, magnetLink)
 {

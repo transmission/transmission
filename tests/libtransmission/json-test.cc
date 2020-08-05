@@ -6,10 +6,6 @@
  *
  */
 
-#include <clocale> // setlocale()
-#include <cstring> // strlen()
-#include <string_view>
-
 #define __LIBTRANSMISSION_VARIANT_MODULE__
 
 #include "transmission.h"
@@ -18,6 +14,15 @@
 #include "variant-common.h"
 
 #include "gtest/gtest.h"
+
+#include <clocale> // setlocale()
+#include <cstring> // strlen()
+#if defined(__GNUC__) && (__GNUC__ < 7)
+# include <experimental/string_view>
+# define string_view experimental::string_view
+#else
+# include <string_view>
+#endif
 
 class JSONTest : public ::testing::TestWithParam<char const*>
 {

@@ -26,7 +26,12 @@
 #include <cmath> // sqrt()
 #include <cstdlib> // setenv(), unsetenv()
 #include <string>
-#include <string_view>
+#if defined(__GNUC__) && (__GNUC__ < 7)
+# include <experimental/string_view>
+# define string_view experimental::string_view
+#else
+# include <string_view>
+#endif
 
 using ::libtransmission::test::makeString;
 

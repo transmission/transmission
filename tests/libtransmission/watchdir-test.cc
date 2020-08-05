@@ -6,12 +6,6 @@
  *
  */
 
-#include <map>
-#include <string>
-#include <string_view>
-
-#include <event2/event.h>
-
 #include "transmission.h"
 #include "file.h"
 #include "net.h"
@@ -19,6 +13,15 @@
 #include "watchdir.h"
 
 #include "test-fixtures.h"
+
+#include <event2/event.h>
+
+#include <map>
+#include <string>
+#if defined(__GNUC__) && (__GNUC__ < 7)
+#else
+# include <string_view>
+#endif
 
 /***
 ****
@@ -73,7 +76,7 @@ protected:
     {
         auto path = std::string(parent_dir);
         path += TR_PATH_DELIMITER;
-        path += name;
+        path.append(std::data(name), std::size(name));
 
         createFileWithContents(path, "");
 
@@ -84,7 +87,7 @@ protected:
     {
         auto path = std::string(parent_dir);
         path += TR_PATH_DELIMITER;
-        path += name;
+        path.append(std::data(name), std::size(name));
 
         tr_sys_dir_create(path.c_str(), 0, 0700, nullptr);
 

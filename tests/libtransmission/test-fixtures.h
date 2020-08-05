@@ -6,13 +6,6 @@
  *
  */
 
-#include <chrono>
-#include <memory>
-#include <thread>
-#include <mutex> // std::once_flag()
-#include <string>
-#include <cstdlib> // getenv()
-
 #include "crypto-utils.h" // tr_base64_decode_str()
 #include "error.h"
 #include "file.h" // tr_sys_file_*()
@@ -21,6 +14,19 @@
 #include "trevent.h" // tr_amInEventThread()
 #include "torrent.h"
 #include "variant.h"
+
+#include <chrono>
+#include <memory>
+#include <thread>
+#include <mutex> // std::once_flag()
+#include <string>
+#include <cstdlib> // getenv()
+#if defined(__GNUC__) && (__GNUC__ < 7)
+# include <experimental/string_view>
+# define string_view experimental::string_view
+#else
+# include <string_view>
+#endif
 
 #include "gtest/gtest.h"
 

@@ -6,12 +6,6 @@
  *
  */
 
-#include <array>
-#include <cstring>
-#include <string>
-#include <string_view>
-#include <unordered_set>
-
 #include "transmission.h"
 #include "crypto.h"
 #include "crypto-utils.h"
@@ -20,6 +14,17 @@
 #include "crypto-test-ref.h"
 
 #include "gtest/gtest.h"
+
+#include <array>
+#include <cstring>
+#include <string>
+#include <unordered_set>
+#if defined(__GNUC__) && (__GNUC__ < 7)
+# include <experimental/string_view>
+# define string_view experimental::string_view
+#else
+# include <string_view>
+#endif
 
 TEST(Crypto, torrentHash)
 {

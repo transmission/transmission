@@ -6,13 +6,18 @@
  *
  */
 
-#include <cstring>
-#include <string_view>
-
 #include "transmission.h"
 #include "quark.h"
 
 #include "gtest/gtest.h"
+
+#include <cstring>
+#if defined(__GNUC__) && (__GNUC__ < 7)
+# include <experimental/string_view>
+# define string_view experimental::string_view
+#else
+# include <string_view>
+#endif
 
 class QuarkTest : public ::testing::Test
 {

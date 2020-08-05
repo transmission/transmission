@@ -6,14 +6,6 @@
  *
  */
 
-#ifndef _WIN32
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#else
-#include <windows.h>
-#endif
-
 #include "transmission.h"
 #include "error.h"
 #include "file.h"
@@ -23,7 +15,20 @@
 #include <array>
 #include <cstring>
 #include <string>
-#include <string_view>
+#if defined(__GNUC__) && (__GNUC__ < 7)
+# include <experimental/string_view>
+# define string_view experimental::string_view
+#else
+# include <string_view>
+#endif
+
+#ifndef _WIN32
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#else
+#include <windows.h>
+#endif
 
 #if !defined(__OpenBSD__)
 #define HAVE_UNIFIED_BUFFER_CACHE

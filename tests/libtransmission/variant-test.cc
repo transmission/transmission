@@ -6,8 +6,6 @@
  *
  */
 
-#include <event2/buffer.h>
-
 #define __LIBTRANSMISSION_VARIANT_MODULE__
 
 #include "transmission.h"
@@ -15,10 +13,17 @@
 #include "variant-common.h"
 #include "variant.h"
 
+#include <event2/buffer.h>
+
 #include <array>
 #include <cmath> // lrint()
 #include <cctype> // isspace()
-#include <string_view>
+#if defined(__GNUC__) && (__GNUC__ < 7)
+# include <experimental/string_view>
+# define string_view experimental::string_view
+#else
+# include <string_view>
+#endif
 
 #include "gtest/gtest.h"
 
