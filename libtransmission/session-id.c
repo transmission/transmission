@@ -93,7 +93,7 @@ static tr_sys_file_t create_session_id_lock_file(char const* session_id)
 
     if (error != NULL)
     {
-        tr_logAddError("Unable to create session lock file (%d): %s", error->code, error->message);
+        tr_logAddError("Unable to create session lock file \"%s\": %s (%d)", lock_file_path, error->message, error->code);
         tr_error_free(error);
     }
 

@@ -66,7 +66,7 @@ TEST_F(VariantTest, parseInt)
     auto const err = bencParseInt(In, &end, &val);
     EXPECT_EQ(0, err);
     EXPECT_EQ(ExpectVal, val);
-    EXPECT_EQ(reinterpret_cast<decltype(end)>(std::end(In)), end);
+    EXPECT_EQ(reinterpret_cast<decltype(end)>(std::data(In) + std::size(In)), end);
 }
 
 TEST_F(VariantTest, parseIntWithMissingEnd)
@@ -117,7 +117,7 @@ TEST_F(VariantTest, parseNegativeInt)
     auto const err = bencParseInt(In, &end, &val);
     EXPECT_EQ(0, err);
     EXPECT_EQ(-3, val);
-    EXPECT_EQ(reinterpret_cast<decltype(end)>(std::end(In)), end);
+    EXPECT_EQ(reinterpret_cast<decltype(end)>(std::data(In) + std::size(In)), end);
 }
 
 TEST_F(VariantTest, parseIntZero)
@@ -129,7 +129,7 @@ TEST_F(VariantTest, parseIntZero)
     auto const err = bencParseInt(In, &end, &val);
     EXPECT_EQ(0, err);
     EXPECT_EQ(0, val);
-    EXPECT_EQ(reinterpret_cast<decltype(end)>(std::end(In)), end);
+    EXPECT_EQ(reinterpret_cast<decltype(end)>(std::data(In) + std::size(In)), end);
 }
 
 TEST_F(VariantTest, parseIntWithLeadingZero)
@@ -307,7 +307,7 @@ TEST_F(VariantTest, bencSortWhenSerializing)
     char const* end;
     auto const err = tr_variantFromBencFull(&val, std::data(In), std::size(In), nullptr, &end);
     EXPECT_EQ(0, err);
-    EXPECT_EQ(reinterpret_cast<decltype(end)>(std::end(In)), end);
+    EXPECT_EQ(reinterpret_cast<decltype(end)>(std::data(In) + std::size(In)), end);
 
     auto len = size_t{};
     auto* saved = tr_variantToStr(&val, TR_VARIANT_FMT_BENC, &len);
