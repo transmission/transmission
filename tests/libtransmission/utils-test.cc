@@ -346,7 +346,7 @@ TEST_F(UtilsTest, truncd)
 
 #if !(defined(_MSC_VER) || (defined(__MINGW32__) && defined(__MSVCRT__)))
     /* FIXME: MSCVRT behaves differently in case of nan */
-    auto const nan = sqrt(-1);
+    auto const nan = sqrt(-1.0f);
     tr_snprintf(buf, sizeof(buf), "%.2f", tr_truncd(nan, 2));
     EXPECT_TRUE(strstr(buf, "nan") != nullptr || strstr(buf, "NaN") != nullptr);
 #endif

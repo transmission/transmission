@@ -27,7 +27,7 @@
 namespace libtransmission::test
 {
 
-auto constexpr makeString = [](char*&& s)
+auto const makeString = [](char*&& s)
     {
         auto const ret = std::string(s != nullptr ? s : "");
         tr_free(s);

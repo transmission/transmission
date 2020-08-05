@@ -1,0 +1,3 @@
+SUBDIRS = \
+  gtest \
+  libtransmission
