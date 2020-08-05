@@ -16,7 +16,7 @@ AC_CONFIG_MACRO_DIR([m4])
 
 dnl AM_CONFIG_HEADER(config.h)
 AC_CONFIG_SRCDIR(libtransmission/transmission.h)
-AM_INIT_AUTOMAKE([1.9 tar-pax no-dist-gzip dist-xz foreign])
+AM_INIT_AUTOMAKE([1.9 tar-pax no-dist-gzip dist-xz foreign subdir-objects])
 LT_INIT
 LT_LIB_M
 
@@ -675,6 +675,9 @@ AC_CONFIG_FILES([Makefile
                  web/style/transmission/images/buttons/Makefile
                  web/javascript/Makefile
                  web/javascript/jquery/Makefile
+                 tests/Makefile
+                 tests/gtest/Makefile
+                 tests/libtransmission/Makefile
                  po/Makefile.in])
 
 AC_OUTPUT
