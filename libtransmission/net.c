@@ -780,4 +780,3 @@ struct tr_peer_socket tr_peer_socket_utp_create(struct UTPSocket* const handle)
     struct tr_peer_socket const ret = { .type = TR_PEER_SOCKET_TYPE_UTP, .handle.utp = handle };
     return ret;
 }
-
