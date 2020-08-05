@@ -87,5 +87,5 @@ test_variant_SOURCES = variant-test.cc
 test_watchdir_SOURCES = watchdir-test.cc
 
 EXTRA_DIST = \
-  subprocess-test.cmd
-
+  subprocess-test.cmd \
+  test-fixtures.h
