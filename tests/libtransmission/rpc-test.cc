@@ -6,17 +6,17 @@
  *
  */
 
-#include <algorithm>
-#include <array>
-#include <set>
-#include <vector>
-
 #include "transmission.h"
 #include "rpcimpl.h"
 #include "utils.h"
 #include "variant.h"
 
 #include "test-fixtures.h"
+
+#include <algorithm>
+#include <array>
+#include <set>
+#include <vector>
 
 namespace libtransmission::test
 {

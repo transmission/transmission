@@ -14,8 +14,10 @@
 
 #include "test-fixtures.h"
 
+#include <array>
 #include <cstdlib> // mktemp()
 #include <cstring> // strlen()
+#include <string_view>
 
 namespace libtransmission::test
 {

@@ -6,10 +6,6 @@
  *
  */
 
-#include <algorithm>
-#include <cmath> // sqrt()
-#include <cstdlib> // setenv(), unsetenv()
-
 #ifdef _WIN32
 #include <windows.h>
 #define setenv(key, value, unused) SetEnvironmentVariableA(key, value)
@@ -24,6 +20,13 @@
 #include "web.h" // tr_http_unescape()
 
 #include "test-fixtures.h"
+
+#include <algorithm>
+#include <array>
+#include <cmath> // sqrt()
+#include <cstdlib> // setenv(), unsetenv()
+#include <string>
+#include <string_view>
 
 using ::libtransmission::test::makeString;
 

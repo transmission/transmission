@@ -11,6 +11,8 @@
 
 #include "gtest/gtest.h"
 
+#include <array>
+
 class GetoptTest : public ::testing::Test
 {
 protected:

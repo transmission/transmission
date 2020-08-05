@@ -6,7 +6,10 @@
  *
  */
 
+#include <array>
 #include <cstring>
+#include <string>
+#include <string_view>
 #include <unordered_set>
 
 #include "transmission.h"

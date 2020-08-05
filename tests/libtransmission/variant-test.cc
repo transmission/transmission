@@ -6,9 +6,6 @@
  *
  */
 
-#include <cmath> // lrint()
-#include <cctype> // isspace()
-
 #include <event2/buffer.h>
 
 #define __LIBTRANSMISSION_VARIANT_MODULE__
@@ -17,6 +14,11 @@
 #include "utils.h" /* tr_free */
 #include "variant-common.h"
 #include "variant.h"
+
+#include <array>
+#include <cmath> // lrint()
+#include <cctype> // isspace()
+#include <string_view>
 
 #include "gtest/gtest.h"
 

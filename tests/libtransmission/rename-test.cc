@@ -6,10 +6,6 @@
  *
  */
 
-#include <cerrno>
-#include <cstdio> // fopen()
-#include <cstring> // strcmp()
-
 #include "transmission.h"
 #include "crypto-utils.h"
 #include "file.h"
@@ -19,6 +15,12 @@
 #include "variant.h"
 
 #include "test-fixtures.h"
+
+#include <array>
+#include <cerrno>
+#include <cstdio> // fopen()
+#include <cstring> // strcmp()
+#include <string_view>
 
 namespace libtransmission::test
 {

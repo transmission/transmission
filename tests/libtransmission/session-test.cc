@@ -6,13 +6,6 @@
  *
  */
 
-#include <algorithm>
-#include <array>
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
-#include <string_view>
-
 #include "transmission.h"
 #include "session.h"
 #include "session-id.h"
@@ -20,6 +13,13 @@
 #include "version.h"
 
 #include "gtest/gtest.h"
+
+#include <algorithm>
+#include <array>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <string_view>
 
 TEST(Session, peerId)
 {

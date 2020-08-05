@@ -6,10 +6,6 @@
  *
  */
 
-#include <cstring>
-#include <string>
-#include <string_view>
-
 #ifndef _WIN32
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -23,6 +19,11 @@
 #include "file.h"
 
 #include "test-fixtures.h"
+
+#include <array>
+#include <cstring>
+#include <string>
+#include <string_view>
 
 #if !defined(__OpenBSD__)
 #define HAVE_UNIFIED_BUFFER_CACHE
