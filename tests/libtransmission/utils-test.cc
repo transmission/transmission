@@ -243,7 +243,7 @@ TEST_F(UtilsTest, trBinaryHex)
     auto constexpr HexIn = std::string_view { "fb5ef5507427b17e04b69cef31fa3379b456735a" };
 
     uint8_t binary[20];
-    tr_hex_to_binary(std::begin(HexIn), binary, std::size(HexIn) / 2);
+    tr_hex_to_binary(std::data(HexIn), binary, std::size(HexIn) / 2);
 
     char hex_out[41];
     tr_binary_to_hex(binary, hex_out, 20);
