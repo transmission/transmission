@@ -77,7 +77,7 @@ set(PROJECT_FILES
   webseed.c
 )
 
-list(JOIN C_WARNING_FLAGS " " C_WARNING_FLAGS_STR)
+string(REPLACE ";" " " C_WARNING_FLAGS_STR "${C_WARNING_FLAGS}")
 set_source_files_properties(
   ${PROJECT_FILES}
   PROPERTIES

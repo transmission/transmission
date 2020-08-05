@@ -18,9 +18,11 @@
 
 #include <map>
 #include <string>
-#if defined(__GNUC__) && (__GNUC__ < 7)
-#else
+#if !defined(__has_include) || __has_include("<string_view>")
 # include <string_view>
+#else
+# include <experimental/string_view>
+# define string_view experimental::string_view
 #endif
 
 /***
