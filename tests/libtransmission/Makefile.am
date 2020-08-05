@@ -88,4 +88,5 @@ test_watchdir_SOURCES = watchdir-test.cc
 
 EXTRA_DIST = \
   subprocess-test.cmd \
+  crypto-test-ref.h \
   test-fixtures.h
