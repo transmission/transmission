@@ -163,6 +163,15 @@ class SandboxedTest : public ::testing::Test
 protected:
     std::string sandboxDir() const { return sandbox_.path(); }
 
+    auto currentTestName() const
+    {
+        auto const* i = ::testing::UnitTest::GetInstance()->current_test_info();
+        auto child = std::string(i->test_suite_name());
+        child += '_';
+        child += i->name();
+        return child;
+    }
+
     void buildParentDir(std::string_view path) const
     {
         auto const tmperr = errno;

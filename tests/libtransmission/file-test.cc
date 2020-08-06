@@ -46,11 +46,9 @@ namespace libtransmission::test
 class FileTest : public SessionTest
 {
 protected:
-    // static tr_session* session;
-
-    auto createTestDir(char const* name)
+    auto createTestDir(std::string const& child_name)
     {
-        auto const test_dir = makeString(tr_buildPath(tr_sessionGetConfigDir(session_), name, nullptr));
+        auto const test_dir = makeString(tr_buildPath(tr_sessionGetConfigDir(session_), child_name.c_str(), nullptr));
         tr_sys_dir_create(test_dir.data(), 0, 0777, nullptr);
         return test_dir;
     }
@@ -231,7 +229,7 @@ protected:
 
 TEST_F(FileTest, getInfo)
 {
-    auto const test_dir = createTestDir(__FUNCTION__);
+    auto const test_dir = createTestDir(currentTestName());
     tr_sys_path_info info;
 
     char* path1 = tr_buildPath(test_dir.data(), "a", nullptr);
@@ -339,7 +337,7 @@ TEST_F(FileTest, getInfo)
 
 TEST_F(FileTest, pathExists)
 {
-    auto const test_dir = createTestDir(__FUNCTION__);
+    auto const test_dir = createTestDir(currentTestName());
 
     auto* path1 = tr_buildPath(test_dir.data(), "a", nullptr);
     auto* path2 = tr_buildPath(test_dir.data(), "b", nullptr);
@@ -443,17 +441,14 @@ TEST_F(FileTest, pathIsRelative)
 
 TEST_F(FileTest, pathIsSame)
 {
-    auto const test_dir = createTestDir(__FUNCTION__);
-    tr_error* err = nullptr;
-    char* path1;
-    char* path2;
-    char* path3;
+    auto const test_dir = createTestDir(currentTestName());
 
-    path1 = tr_buildPath(test_dir.data(), "a", nullptr);
-    path2 = tr_buildPath(test_dir.data(), "b", nullptr);
-    path3 = tr_buildPath(path2, "c", nullptr);
+    auto* path1 = tr_buildPath(test_dir.data(), "a", nullptr);
+    auto* path2 = tr_buildPath(test_dir.data(), "b", nullptr);
+    auto* path3 = tr_buildPath(path2, "c", nullptr);
 
     /* Two non-existent files are not the same */
+    tr_error* err = nullptr;
     EXPECT_FALSE(tr_sys_path_is_same(path1, path1, &err));
     EXPECT_EQ(nullptr, err);
     EXPECT_FALSE(tr_sys_path_is_same(path1, path2, &err));
@@ -654,13 +649,11 @@ TEST_F(FileTest, pathIsSame)
 
 TEST_F(FileTest, pathResolve)
 {
-    auto const test_dir = createTestDir(__FUNCTION__);
-    tr_error* err = nullptr;
-    char* path1;
-    char* path2;
+    auto const test_dir = createTestDir(currentTestName());
 
-    path1 = tr_buildPath(test_dir.data(), "a", nullptr);
-    path2 = tr_buildPath(test_dir.data(), "b", nullptr);
+    tr_error* err = nullptr;
+    auto* path1 = tr_buildPath(test_dir.data(), "a", nullptr);
+    auto* path2 = tr_buildPath(test_dir.data(), "b", nullptr);
 
     createFileWithContents(path1, "test");
 
@@ -822,8 +815,7 @@ TEST_F(FileTest, pathBasenameDirname)
 
 TEST_F(FileTest, pathRename)
 {
-    auto const test_dir = createTestDir(__FUNCTION__);
-    tr_error* err = nullptr;
+    auto const test_dir = createTestDir(currentTestName());
 
     auto* path1 = tr_buildPath(test_dir.data(), "a", nullptr);
     auto* path2 = tr_buildPath(test_dir.data(), "b", nullptr);
@@ -836,6 +828,7 @@ TEST_F(FileTest, pathRename)
     EXPECT_FALSE(tr_sys_path_exists(path2, nullptr));
 
     /* Forward rename works */
+    tr_error* err = nullptr;
     EXPECT_TRUE(tr_sys_path_rename(path1, path2, &err));
     EXPECT_FALSE(tr_sys_path_exists(path1, nullptr));
     EXPECT_TRUE(tr_sys_path_exists(path2, nullptr));
@@ -934,8 +927,7 @@ TEST_F(FileTest, pathRename)
 
 TEST_F(FileTest, pathRemove)
 {
-    auto const test_dir = createTestDir(__FUNCTION__);
-    tr_error* err = nullptr;
+    auto const test_dir = createTestDir(currentTestName());
 
     auto* path1 = tr_buildPath(test_dir.data(), "a", nullptr);
     auto* path2 = tr_buildPath(test_dir.data(), "b", nullptr);
@@ -943,6 +935,7 @@ TEST_F(FileTest, pathRemove)
 
     /* Can't remove non-existent file/directory */
     EXPECT_FALSE(tr_sys_path_exists(path1, nullptr));
+    tr_error* err = nullptr;
     EXPECT_FALSE(tr_sys_path_remove(path1, &err));
     EXPECT_NE(nullptr, err);
     EXPECT_FALSE(tr_sys_path_exists(path1, nullptr));
@@ -1011,7 +1004,7 @@ TEST_F(FileTest, pathNativeSeparators)
 
 TEST_F(FileTest, fileOpen)
 {
-    auto const test_dir = createTestDir(__FUNCTION__);
+    auto const test_dir = createTestDir(currentTestName());
 
     // can't open non-existent file
     auto* path1 = tr_buildPath(test_dir.data(), "a", nullptr);
@@ -1104,7 +1097,7 @@ TEST_F(FileTest, fileOpen)
 
 TEST_F(FileTest, fileReadWriteSeek)
 {
-    auto const test_dir = createTestDir(__FUNCTION__);
+    auto const test_dir = createTestDir(currentTestName());
 
     auto* path1 = tr_buildPath(test_dir.data(), "a", nullptr);
     auto const fd = tr_sys_file_open(path1, TR_SYS_FILE_READ | TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE, 0600, nullptr);
@@ -1189,7 +1182,7 @@ TEST_F(FileTest, fileReadWriteSeek)
 
 TEST_F(FileTest, fileTruncate)
 {
-    auto const test_dir = createTestDir(__FUNCTION__);
+    auto const test_dir = createTestDir(currentTestName());
 
     auto* path1 = tr_buildPath(test_dir.c_str(), "a", nullptr);
     auto fd = tr_sys_file_open(path1, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE, 0600, nullptr);
@@ -1236,10 +1229,9 @@ TEST_F(FileTest, fileTruncate)
 
 TEST_F(FileTest, filePreallocate)
 {
-    auto const test_dir = createTestDir(__FUNCTION__);
+    auto const test_dir = createTestDir(currentTestName());
 
     auto* path1 = tr_buildPath(test_dir.data(), "a", nullptr);
-
     auto fd = tr_sys_file_open(path1, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE, 0600, nullptr);
 
     tr_error* err = nullptr;
@@ -1288,9 +1280,9 @@ TEST_F(FileTest, filePreallocate)
 
 TEST_F(FileTest, map)
 {
-    auto const test_dir = createTestDir(__FUNCTION__);
-    auto* path1 = tr_buildPath(test_dir.data(), "a", nullptr);
+    auto const test_dir = createTestDir(currentTestName());
 
+    auto* path1 = tr_buildPath(test_dir.data(), "a", nullptr);
     auto constexpr Contents = std::string_view { "test" };
     createFileWithContents(path1, Contents.data());
 
@@ -1327,7 +1319,8 @@ TEST_F(FileTest, map)
 
 TEST_F(FileTest, fileUtilities)
 {
-    auto const test_dir = createTestDir(__FUNCTION__);
+    auto const test_dir = createTestDir(currentTestName());
+
     auto* path1 = tr_buildPath(test_dir.data(), "a", nullptr);
     auto constexpr Contents = std::string_view { "a\nbc\r\ndef\nghij\r\n\n\nklmno\r" };
     createFileWithContents(path1, Contents.data());
@@ -1419,7 +1412,7 @@ TEST_F(FileTest, fileUtilities)
 
 TEST_F(FileTest, dirCreate)
 {
-    auto const test_dir = createTestDir(__FUNCTION__);
+    auto const test_dir = createTestDir(currentTestName());
 
     auto* path1 = tr_buildPath(test_dir.data(), "a", nullptr);
     auto* path2 = tr_buildPath(path1, "b", nullptr);
@@ -1473,7 +1466,8 @@ TEST_F(FileTest, dirCreate)
 
 TEST_F(FileTest, dirRead)
 {
-    auto const test_dir = createTestDir(__FUNCTION__);
+    auto const test_dir = createTestDir(currentTestName());
+
     auto* path1 = tr_buildPath(test_dir.data(), "a", nullptr);
     auto* path2 = tr_buildPath(test_dir.data(), "b", nullptr);
 

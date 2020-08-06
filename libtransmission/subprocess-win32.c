@@ -347,23 +347,21 @@ static bool construct_cmd_line(char const* const* cmd, wchar_t** cmd_line)
     enum tr_app_type const app_type = get_app_type(cmd[0]);
 
     char* args = NULL;
-    /* size_t arg_count = 0; */
+    size_t arg_count = 0;
     bool ret = false;
 
     append_app_launcher_arguments(app_type, &args);
 
     for (size_t i = 0; cmd[i] != NULL; ++i)
     {
-        fprintf(stderr,"%s:%d cmd[%s]=='%s'\n", __FILE__, __LINE__, cmd[i]);
         if (app_type == TR_APP_TYPE_BATCH && i > 0 && contains_batch_metachars(cmd[i]))
         {
-            fprintf(stderr,"%s:%d ^ contains metachars... failing\n", __FILE__, __LINE__);
             /* FIXME: My attempts to escape them one or another way didn't lead to anything good so far */
             goto cleanup;
         }
 
         append_argument(&args, cmd[i]);
-        /* ++arg_count; */
+        ++arg_count;
     }
 
     *cmd_line = args != NULL ? tr_win32_utf8_to_native(args, -1) : NULL;
@@ -377,7 +375,6 @@ cleanup:
 
 bool tr_spawn_async(char* const* cmd, char* const* env, char const* work_dir, tr_error** error)
 {
-    fprintf(stderr, "%s:%d NOMERGE cmd[0]=='%s'\n", __FILE__, __LINE__, cmd[0]);
     wchar_t* env_block = NULL;
 
     if (!create_env_block(env, &env_block, error))
