@@ -37,6 +37,7 @@ libtransmission_a_SOURCES = \
   handshake.c \
   history.c \
   inout.c \
+  jsonsl.c \
   list.c \
   log.c \
   magnet.c \
