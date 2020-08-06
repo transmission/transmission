@@ -396,7 +396,6 @@ if(CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
         -W
         -Wcast-align
         -Wfloat-equal
-        -Winline
         -Wmissing-format-attribute
         -Wpointer-arith
         -Wredundant-decls
