@@ -26,7 +26,9 @@
 #define unsetenv(key) SetEnvironmentVariableA(key, nullptr)
 #endif
 
-namespace libtransmission::test
+namespace libtransmission
+{
+namespace test
 {
 
 std::string getSelfPath()
@@ -401,4 +403,5 @@ INSTANTIATE_TEST_SUITE_P(
     );
 #endif
 
-} // namespace libtransmission::test
+} // namespace test
+} // namespace libtransmission

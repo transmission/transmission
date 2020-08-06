@@ -18,7 +18,9 @@
 #include <set>
 #include <vector>
 
-namespace libtransmission::test
+namespace libtransmission
+{
+namespace test
 {
 
 using RpcTest = SessionTest;
@@ -179,4 +181,5 @@ TEST_F(RpcTest, sessionGet)
     tr_torrentRemove(tor, false, nullptr);
 }
 
-} // namespace libtransmission::test
+} // namespace test
+} // namespace libtransmission

@@ -34,7 +34,9 @@
 #define NATIVE_PATH_SEP "\\"
 #endif
 
-namespace libtransmission::test
+namespace libtransmission
+{
+namespace test
 {
 
 class FileTest : public SessionTest
@@ -1490,4 +1492,5 @@ TEST_F(FileTest, dirRead)
     tr_free(path1);
 }
 
-} // namespace libtransmission::test
+} // namespace test
+} // namespace libtransmission

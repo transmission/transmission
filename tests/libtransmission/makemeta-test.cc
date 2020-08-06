@@ -19,7 +19,9 @@
 #include <cstring> // strlen()
 #include <string>
 
-namespace libtransmission::test
+namespace libtransmission
+{
+namespace test
 {
 
 class MakemetaTest : public SandboxedTest
@@ -238,4 +240,5 @@ TEST_F(MakemetaTest, singleDirectoryRandomPayload)
     }
 }
 
-} // namespace libtransmission::test
+} // namespace test
+} // namespace libtransmission

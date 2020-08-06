@@ -22,7 +22,9 @@
 #include <cstring> // strcmp()
 #include <string>
 
-namespace libtransmission::test
+namespace libtransmission
+{
+namespace test
 {
 
 class RenameTest : public SessionTest
@@ -528,4 +530,5 @@ TEST_F(RenameTest, partialFile)
     torrentRemoveAndWait(tor, 0);
 }
 
-} // namespace libtransmission::test
+} // namespace test
+} // namespace libtransmission

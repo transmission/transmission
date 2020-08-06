@@ -19,7 +19,9 @@
 #include <string>
 #include <utility>
 
-namespace libtransmission::test
+namespace libtransmission
+{
+namespace test
 {
 
 class IncompleteDirTest :
@@ -184,4 +186,5 @@ TEST_F(MoveTest, setLocation)
     tr_torrentRemove(tor, true, tr_sys_path_remove);
 }
 
-} // namespace libtransmission::test
+} // namespace test
+} // namespace libtransmission

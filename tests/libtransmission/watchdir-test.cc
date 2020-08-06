@@ -31,7 +31,9 @@ extern struct timeval tr_watchdir_retry_start_interval;
 extern struct timeval tr_watchdir_retry_max_interval;
 }
 
-namespace libtransmission::test
+namespace libtransmission
+{
+namespace test
 {
 
 auto const Native = std::string { "native" };
@@ -358,4 +360,5 @@ INSTANTIATE_TEST_SUITE_P(
     ::testing::Values(Native, Generic)
     );
 
-} //  namespace libtransmission::test
+} // namespace test
+} // namespace libtransmission

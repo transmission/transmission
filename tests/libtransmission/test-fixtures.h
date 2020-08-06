@@ -25,7 +25,9 @@
 
 #include "gtest/gtest.h"
 
-namespace libtransmission::test
+namespace libtransmission
+{
+namespace test
 {
 
 auto const makeString = [](char*&& s)
@@ -476,4 +478,5 @@ protected:
     }
 };
 
-} // namespace libtransmission::test
+} // namespace test
+} // namespace libtransmission
