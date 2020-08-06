@@ -21,6 +21,7 @@
 
 namespace libtransmission
 {
+
 namespace test
 {
 
@@ -241,4 +242,5 @@ TEST_F(MakemetaTest, singleDirectoryRandomPayload)
 }
 
 } // namespace test
+
 } // namespace libtransmission

@@ -34,8 +34,8 @@ protected:
     auto bencParseInt(std::string const& in, uint8_t const** end, int64_t* val)
     {
         return tr_bencParseInt(in.data(),
-                               in.data() + in.size(),
-                               end, val);
+            in.data() + in.size(),
+            end, val);
     }
 };
 
@@ -74,7 +74,7 @@ TEST_F(VariantTest, parseIntWithMissingEnd)
 
 TEST_F(VariantTest, parseIntEmptyBuffer)
 {
-    auto const in = std::string { };
+    auto const in = std::string {};
     auto constexpr InitVal = int64_t { 888 };
 
     uint8_t const* end = {};

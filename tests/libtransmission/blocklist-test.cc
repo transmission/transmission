@@ -22,6 +22,7 @@
 
 namespace libtransmission
 {
+
 namespace test
 {
 
@@ -141,4 +142,5 @@ TEST_F(BlocklistTest, updating)
 }
 
 } // namespace test
+
 } // namespace libtransmission

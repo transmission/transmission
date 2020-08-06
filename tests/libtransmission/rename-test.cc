@@ -24,6 +24,7 @@
 
 namespace libtransmission
 {
+
 namespace test
 {
 
@@ -531,4 +532,5 @@ TEST_F(RenameTest, partialFile)
 }
 
 } // namespace test
+
 } // namespace libtransmission

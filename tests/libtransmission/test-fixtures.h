@@ -27,6 +27,7 @@
 
 namespace libtransmission
 {
+
 namespace test
 {
 
@@ -479,4 +480,5 @@ protected:
 };
 
 } // namespace test
+
 } // namespace libtransmission

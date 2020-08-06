@@ -20,6 +20,7 @@
 
 namespace libtransmission
 {
+
 namespace test
 {
 
@@ -185,4 +186,5 @@ TEST_F(MoveTest, setLocation)
 }
 
 } // namespace test
+
 } // namespace libtransmission

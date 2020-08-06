@@ -20,6 +20,7 @@
 
 namespace libtransmission
 {
+
 namespace test
 {
 
@@ -182,4 +183,5 @@ TEST_F(RpcTest, sessionGet)
 }
 
 } // namespace test
+
 } // namespace libtransmission

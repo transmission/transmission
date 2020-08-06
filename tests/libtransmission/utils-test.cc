@@ -68,19 +68,19 @@ TEST_F(UtilsTest, trStrstrip)
 
 TEST_F(UtilsTest, trStrjoin)
 {
-    auto const in1 = std::array<char const*, 2> { "one", "two" };
+    auto const in1 = std::array<char const*, 2>{ "one", "two" };
     auto out = makeString(tr_strjoin(in1.data(), in1.size(), ", "));
     EXPECT_EQ("one, two", out);
 
-    auto const in2 = std::array<char const*, 1> { "hello" };
+    auto const in2 = std::array<char const*, 1>{ "hello" };
     out = makeString(tr_strjoin(in2.data(), in2.size(), "###"));
     EXPECT_EQ("hello", out);
 
-    auto const in3 = std::array<char const*, 5> { "a", "b", "ccc", "d", "eeeee" };
+    auto const in3 = std::array<char const*, 5>{ "a", "b", "ccc", "d", "eeeee" };
     out = makeString(tr_strjoin(in3.data(), in3.size(), " "));
     EXPECT_EQ("a b ccc d eeeee", out);
 
-    auto const in4 = std::array<char const*, 3> { "7", "ate", "9" };
+    auto const in4 = std::array<char const*, 3>{ "7", "ate", "9" };
     out = makeString(tr_strjoin(in4.data(), in4.size(), ""));
     EXPECT_EQ("7ate9", out);
 
@@ -185,8 +185,8 @@ int compareInts(void const* va, void const* vb)
 TEST_F(UtilsTest, lowerbound)
 {
     auto constexpr A = std::array<int, 7>{ 1, 2, 3, 3, 3, 5, 8 };
-    auto const expected_pos = std::array<int, 10> { 0, 1, 2, 5, 5, 6, 6, 6, 7, 7 };
-    auto const expected_exact = std::array<bool, 10> { true, true, true, false, true, false, false, true, false, false };
+    auto const expected_pos = std::array<int, 10>{ 0, 1, 2, 5, 5, 6, 6, 6, 7, 7 };
+    auto const expected_exact = std::array<bool, 10>{ true, true, true, false, true, false, false, true, false, false };
 
     for (int i = 1; i <= 10; i++)
     {
@@ -236,17 +236,17 @@ TEST_F(UtilsTest, trBinaryHex)
 {
     auto const hex_in = std::string { "fb5ef5507427b17e04b69cef31fa3379b456735a" };
 
-    auto binary = std::array<uint8_t, SHA_DIGEST_LENGTH> {};
+    auto binary = std::array<uint8_t, SHA_DIGEST_LENGTH>{};
     tr_hex_to_binary(hex_in.data(), binary.data(), hex_in.size() / 2);
 
-    auto hex_out = std::array<uint8_t, SHA_DIGEST_LENGTH*2 + 1> {};
+    auto hex_out = std::array<uint8_t, SHA_DIGEST_LENGTH*2 + 1>{};
     tr_binary_to_hex(binary.data(), hex_out.data(), 20);
     EXPECT_EQ(hex_in, reinterpret_cast<char const*>(hex_out.data()));
 }
 
 TEST_F(UtilsTest, array)
 {
-    auto array = std::array<size_t, 10> { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+    auto array = std::array<size_t, 10>{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
     auto n = array.size();
 
     tr_removeElementFromArray(array.data(), 5U, sizeof(size_t), n);
@@ -320,7 +320,7 @@ TEST_F(UtilsTest, trHttpUnescape)
 
 TEST_F(UtilsTest, truncd)
 {
-    auto buf = std::array<char, 32> {};
+    auto buf = std::array<char, 32>{};
 
     tr_snprintf(buf.data(), buf.size(), "%.2f%%", 99.999);
     EXPECT_STREQ("100.00%", buf.data());

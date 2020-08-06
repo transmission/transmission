@@ -36,6 +36,7 @@
 
 namespace libtransmission
 {
+
 namespace test
 {
 
@@ -1493,4 +1494,5 @@ TEST_F(FileTest, dirRead)
 }
 
 } // namespace test
+
 } // namespace libtransmission

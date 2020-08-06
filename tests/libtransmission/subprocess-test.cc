@@ -28,6 +28,7 @@
 
 namespace libtransmission
 {
+
 namespace test
 {
 
@@ -175,7 +176,7 @@ TEST_P(SubprocessTest, SpawnAsyncArgs)
 
     auto const test_arg1 = std::string { "arg1 " };
     auto const test_arg2 = std::string { " arg2" };
-    auto const test_arg3 = std::string { };
+    auto const test_arg3 = std::string {};
     auto const test_arg4 = std::string { "\"arg3'^! $PATH %PATH% \\" };
 
     auto args = std::array<char*, 8>{
@@ -404,4 +405,5 @@ INSTANTIATE_TEST_SUITE_P(
 #endif
 
 } // namespace test
+
 } // namespace libtransmission

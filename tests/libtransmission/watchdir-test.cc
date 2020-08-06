@@ -33,13 +33,16 @@ extern struct timeval tr_watchdir_retry_max_interval;
 
 namespace
 {
+
 auto constexpr FiftyMsec = timeval { 0, 50000 };
 auto constexpr OneHundredMsec = timeval { 0, 100000 };
 auto constexpr TwoHundredMsec = timeval { 0, 200000 };
+
 }
 
 namespace libtransmission
 {
+
 namespace test
 {
 
@@ -364,4 +367,5 @@ INSTANTIATE_TEST_SUITE_P(
     );
 
 } // namespace test
+
 } // namespace libtransmission
