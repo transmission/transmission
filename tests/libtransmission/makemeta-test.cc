@@ -39,7 +39,8 @@ protected:
         // create a single input file
         auto input_file = makeString(tr_buildPath(sandboxDir().data(), "test.XXXXXX", nullptr));
         createTmpfileWithContents(input_file, payload, payloadSize);
-        auto* builder = tr_metaInfoBuilderCreate(input_file.data());
+        tr_sys_path_native_separators(input_file.data());
+        auto* builder = tr_metaInfoBuilderCreate(input_file.c_str());
         EXPECT_EQ(tr_file_index_t{ 1 }, builder->fileCount);
         EXPECT_STREQ(input_file.data(), builder->top);
         EXPECT_STREQ(input_file.data(), builder->files[0].filename);
@@ -90,6 +91,7 @@ protected:
     {
         // create the top temp directory
         auto* top = tr_buildPath(sandboxDir().data(), "folder.XXXXXX", nullptr);
+        tr_sys_path_native_separators(top);
         tr_sys_dir_create_temp(top, nullptr);
 
         // build the payload files that go into the top temp directory
