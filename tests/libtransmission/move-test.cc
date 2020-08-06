@@ -15,7 +15,6 @@
 
 #include "test-fixtures.h"
 
-#include <optional>
 #include <string>
 #include <utility>
 
@@ -57,14 +56,13 @@ TEST_P(IncompleteDirTest, incompleteDir)
     EXPECT_EQ(tor->info.pieceSize, tr_torrentStat(tor)->leftUntilDone);
 
     // auto constexpr completeness_unset = tr_completeness { -1 };
-    using maybe_completeness = std::optional<tr_completeness>;
-    maybe_completeness completeness;
     // auto completeness = completeness_unset;
+    int completeness = -1;
     auto const zeroes_completeness_func = [](
-        tr_torrent* /*torrent*/, tr_completeness completeness,
-        bool /*was_running*/, void* user_data)
+        tr_torrent* /*torrent*/, tr_completeness c,
+        bool /*was_running*/, void* vc)
         {
-            *static_cast<maybe_completeness*>(user_data) = completeness;
+            *static_cast<tr_completeness*>(vc) = c;
         };
     tr_torrentSetCompletenessCallback(tor, zeroes_completeness_func, &completeness);
 
@@ -119,7 +117,7 @@ TEST_P(IncompleteDirTest, incompleteDir)
     blockingTorrentVerify(tor);
     EXPECT_EQ(0, tr_torrentStat(tor)->leftUntilDone);
 
-    auto test = [&completeness]() { return completeness.has_value(); };
+    auto test = [&completeness]() { return completeness != -1; };
     EXPECT_TRUE(waitFor(test, 300));
     EXPECT_EQ(TR_SEED, completeness);
 
