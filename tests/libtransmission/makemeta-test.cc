@@ -42,8 +42,8 @@ protected:
         tr_sys_path_native_separators(input_file.data());
         auto* builder = tr_metaInfoBuilderCreate(input_file.c_str());
         EXPECT_EQ(tr_file_index_t{ 1 }, builder->fileCount);
-        EXPECT_STREQ(input_file.data(), builder->top);
-        EXPECT_STREQ(input_file.data(), builder->files[0].filename);
+        EXPECT_STREQ(input_file.c_str(), builder->top);
+        EXPECT_STREQ(input_file.c_str(), builder->files[0].filename);
         EXPECT_EQ(payloadSize, builder->files[0].size);
         EXPECT_EQ(payloadSize, builder->totalSize);
         EXPECT_FALSE(builder->isFolder);
@@ -105,6 +105,7 @@ protected:
             tr_snprintf(tmpl.data(), tmpl.size(), "file.%04zu%s", i, "XXXXXX");
             auto path = makeString(tr_buildPath(top, tmpl.data(), nullptr));
             createTmpfileWithContents(path, payloads[i], payload_sizes[i]);
+            tr_sys_path_native_separators(path.data());
             files.push_back(path);
             total_size += payload_sizes[i];
         }
