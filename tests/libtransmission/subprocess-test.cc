@@ -201,7 +201,7 @@ TEST_P(SubprocessTest, SpawnAsyncArgs)
     tr_error* error = nullptr;
     bool const ret = tr_spawn_async(args.data(), nullptr, nullptr, &error);
     EXPECT_TRUE(ret) << args[0] << ' ' << args[1];
-    EXPECT_EQ(nullptr, error);
+    EXPECT_EQ(nullptr, error) << error->code << ", " << error->message;
 
     waitForFileToExist(result_path);
 
