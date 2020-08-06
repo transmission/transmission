@@ -173,7 +173,7 @@ protected:
         auto const dir = makeString(tr_sys_path_dirname(path_sz.data(), nullptr));
         tr_error* error = nullptr;
         tr_sys_dir_create(dir.data(), TR_SYS_DIR_CREATE_PARENTS, 0700, &error);
-        EXPECT_EQ(nullptr, error);
+        EXPECT_EQ(nullptr, error) << dir << ' ' << error->message;
 
         errno = tmperr;
     }

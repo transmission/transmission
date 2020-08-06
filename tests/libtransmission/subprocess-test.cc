@@ -199,7 +199,7 @@ TEST_P(SubprocessTest, SpawnAsyncArgs)
     };
 
     tr_error* error = nullptr;
-    bool const ret = tr_spawn_async(args.data(), nullptr, nullptr, &error);
+    bool const ret = tr_spawn_async(args.data(), nullptr, nullptr, &error) << self_path[0] << ' ' << self_path[1];
     EXPECT_TRUE(ret);
     EXPECT_EQ(nullptr, error);
 
