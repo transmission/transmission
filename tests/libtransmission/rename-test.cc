@@ -74,7 +74,7 @@ protected:
         size_t metainfo_len;
         auto* metainfo = static_cast<char*>(tr_base64_decode_str(metainfo_base64, &metainfo_len));
         EXPECT_NE(nullptr, metainfo);
-        EXPECT_LT(0, metainfo_len);
+        EXPECT_LT(size_t(0), metainfo_len);
         tr_ctorSetMetainfo(ctor, reinterpret_cast<uint8_t const*>(metainfo), metainfo_len);
         tr_ctorSetPaused(ctor, TR_FORCE, true);
 
