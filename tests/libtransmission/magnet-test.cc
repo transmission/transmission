@@ -47,8 +47,8 @@ TEST(Magnet, magnetParse)
         EXPECT_EQ(1, info->webseedCount);
         EXPECT_STREQ("http://server.webseed.org/path/to/file", info->webseeds[0]);
         EXPECT_STREQ("Display Name", info->displayName);
-        EXPECT_EQ(std::size(ExpectedHash), sizeof(info->hash));
-        EXPECT_EQ(0, memcmp(info->hash, std::data(ExpectedHash), std::size(ExpectedHash)));
+        EXPECT_EQ(ExpectedHash.size(), sizeof(info->hash));
+        EXPECT_EQ(0, memcmp(info->hash, ExpectedHash.data(), ExpectedHash.size()));
         tr_magnetFree(info);
     }
 }

@@ -51,7 +51,7 @@ protected:
     auto createTestDir(char const* name)
     {
         auto const test_dir = makeString(tr_buildPath(tr_sessionGetConfigDir(session_), name, nullptr));
-        tr_sys_dir_create(std::data(test_dir), 0, 0777, nullptr);
+        tr_sys_dir_create(test_dir.data(), 0, 0777, nullptr);
         return test_dir;
     }
 
@@ -234,8 +234,8 @@ TEST_F(FileTest, getInfo)
     auto const test_dir = createTestDir(__FUNCTION__);
     tr_sys_path_info info;
 
-    char* path1 = tr_buildPath(std::data(test_dir), "a", nullptr);
-    char* path2 = tr_buildPath(std::data(test_dir), "b", nullptr);
+    char* path1 = tr_buildPath(test_dir.data(), "a", nullptr);
+    char* path2 = tr_buildPath(test_dir.data(), "b", nullptr);
 
     // Can't get info of non-existent file/directory
     tr_error* err = nullptr;
@@ -341,8 +341,8 @@ TEST_F(FileTest, pathExists)
 {
     auto const test_dir = createTestDir(__FUNCTION__);
 
-    auto* path1 = tr_buildPath(std::data(test_dir), "a", nullptr);
-    auto* path2 = tr_buildPath(std::data(test_dir), "b", nullptr);
+    auto* path1 = tr_buildPath(test_dir.data(), "a", nullptr);
+    auto* path2 = tr_buildPath(test_dir.data(), "b", nullptr);
 
     // Non-existent file does not exist
     tr_error* err = nullptr;
@@ -449,8 +449,8 @@ TEST_F(FileTest, pathIsSame)
     char* path2;
     char* path3;
 
-    path1 = tr_buildPath(std::data(test_dir), "a", nullptr);
-    path2 = tr_buildPath(std::data(test_dir), "b", nullptr);
+    path1 = tr_buildPath(test_dir.data(), "a", nullptr);
+    path2 = tr_buildPath(test_dir.data(), "b", nullptr);
     path3 = tr_buildPath(path2, "c", nullptr);
 
     /* Two non-existent files are not the same */
@@ -501,9 +501,9 @@ TEST_F(FileTest, pathIsSame)
     if (createSymlink(path1, ".", true))
     {
         /* Directory and symlink pointing to it are the same */
-        EXPECT_TRUE(tr_sys_path_is_same(path1, std::data(test_dir), &err));
+        EXPECT_TRUE(tr_sys_path_is_same(path1, test_dir.data(), &err));
         EXPECT_EQ(nullptr, err);
-        EXPECT_TRUE(tr_sys_path_is_same(std::data(test_dir), path1, &err));
+        EXPECT_TRUE(tr_sys_path_is_same(test_dir.data(), path1, &err));
         EXPECT_EQ(nullptr, err);
 
         /* Non-existent file and symlink are not the same */
@@ -593,7 +593,7 @@ TEST_F(FileTest, pathIsSame)
     }
 
     tr_free(path3);
-    path3 = tr_buildPath(std::data(test_dir), "c", nullptr);
+    path3 = tr_buildPath(test_dir.data(), "c", nullptr);
 
     createFileWithContents(path1, "test");
 
@@ -659,8 +659,8 @@ TEST_F(FileTest, pathResolve)
     char* path1;
     char* path2;
 
-    path1 = tr_buildPath(std::data(test_dir), "a", nullptr);
-    path2 = tr_buildPath(std::data(test_dir), "b", nullptr);
+    path1 = tr_buildPath(test_dir.data(), "a", nullptr);
+    path2 = tr_buildPath(test_dir.data(), "b", nullptr);
 
     createFileWithContents(path1, "test");
 
@@ -755,8 +755,8 @@ TEST_F(FileTest, pathBasenameDirname)
 #endif
     };
 
-    testPathXname(std::data(common_xname_tests), std::size(common_xname_tests), tr_sys_path_basename);
-    testPathXname(std::data(common_xname_tests), std::size(common_xname_tests), tr_sys_path_dirname);
+    testPathXname(common_xname_tests.data(), common_xname_tests.size(), tr_sys_path_basename);
+    testPathXname(common_xname_tests.data(), common_xname_tests.size(), tr_sys_path_dirname);
 
     auto const basename_tests = std::vector<XnameTestData>{
         XnameTestData{ "a", "a" },
@@ -783,7 +783,7 @@ TEST_F(FileTest, pathBasenameDirname)
 #endif
     };
 
-    testPathXname(std::data(basename_tests), std::size(basename_tests), tr_sys_path_basename);
+    testPathXname(basename_tests.data(), basename_tests.size(), tr_sys_path_basename);
 
     auto const dirname_tests = std::vector<XnameTestData>{
         XnameTestData{ "/a/b/c", "/a/b" },
@@ -815,7 +815,7 @@ TEST_F(FileTest, pathBasenameDirname)
 #endif
     };
 
-    testPathXname(std::data(dirname_tests), std::size(dirname_tests), tr_sys_path_dirname);
+    testPathXname(dirname_tests.data(), dirname_tests.size(), tr_sys_path_dirname);
 
     /* TODO: is_same(dirname(x) + '/' + basename(x), x) */
 }
@@ -825,8 +825,8 @@ TEST_F(FileTest, pathRename)
     auto const test_dir = createTestDir(__FUNCTION__);
     tr_error* err = nullptr;
 
-    auto* path1 = tr_buildPath(std::data(test_dir), "a", nullptr);
-    auto* path2 = tr_buildPath(std::data(test_dir), "b", nullptr);
+    auto* path1 = tr_buildPath(test_dir.data(), "a", nullptr);
+    auto* path2 = tr_buildPath(test_dir.data(), "b", nullptr);
     auto* path3 = tr_buildPath(path2, "c", nullptr);
 
     createFileWithContents(path1, "test");
@@ -881,7 +881,7 @@ TEST_F(FileTest, pathRename)
     tr_sys_path_remove(path2, nullptr);
 
     tr_free(path3);
-    path3 = tr_buildPath(std::data(test_dir), "c", nullptr);
+    path3 = tr_buildPath(test_dir.data(), "c", nullptr);
 
     if (createSymlink(path2, path1, false))
     {
@@ -937,8 +937,8 @@ TEST_F(FileTest, pathRemove)
     auto const test_dir = createTestDir(__FUNCTION__);
     tr_error* err = nullptr;
 
-    auto* path1 = tr_buildPath(std::data(test_dir), "a", nullptr);
-    auto* path2 = tr_buildPath(std::data(test_dir), "b", nullptr);
+    auto* path1 = tr_buildPath(test_dir.data(), "a", nullptr);
+    auto* path2 = tr_buildPath(test_dir.data(), "b", nullptr);
     auto* path3 = tr_buildPath(path2, "c", nullptr);
 
     /* Can't remove non-existent file/directory */
@@ -1005,7 +1005,7 @@ TEST_F(FileTest, pathNativeSeparators)
         auto buf = std::string(test.input);
         char* const output = tr_sys_path_native_separators(&buf.front());
         EXPECT_EQ(test.expected_output, output);
-        EXPECT_EQ(std::data(buf), output);
+        EXPECT_EQ(buf.data(), output);
     }
 }
 
@@ -1014,7 +1014,7 @@ TEST_F(FileTest, fileOpen)
     auto const test_dir = createTestDir(__FUNCTION__);
 
     // can't open non-existent file
-    auto* path1 = tr_buildPath(std::data(test_dir), "a", nullptr);
+    auto* path1 = tr_buildPath(test_dir.data(), "a", nullptr);
     EXPECT_FALSE(tr_sys_path_exists(path1, nullptr));
     tr_error* err = nullptr;
     EXPECT_TRUE(tr_sys_file_open(path1, TR_SYS_FILE_READ, 0600, &err) == TR_BAD_SYS_FILE);
@@ -1106,7 +1106,7 @@ TEST_F(FileTest, fileReadWriteSeek)
 {
     auto const test_dir = createTestDir(__FUNCTION__);
 
-    auto* path1 = tr_buildPath(std::data(test_dir), "a", nullptr);
+    auto* path1 = tr_buildPath(test_dir.data(), "a", nullptr);
     auto const fd = tr_sys_file_open(path1, TR_SYS_FILE_READ | TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE, 0600, nullptr);
 
     uint64_t n;
@@ -1128,11 +1128,11 @@ TEST_F(FileTest, fileReadWriteSeek)
     EXPECT_EQ(0, n);
 
     auto buf = std::array<char, 100>{};
-    EXPECT_TRUE(tr_sys_file_read(fd, std::data(buf), std::size(buf), &n, &err));
+    EXPECT_TRUE(tr_sys_file_read(fd, buf.data(), buf.size(), &n, &err));
     EXPECT_EQ(nullptr, err);
     EXPECT_EQ(4, n);
 
-    EXPECT_EQ(0, memcmp("test", std::data(buf), 4));
+    EXPECT_EQ(0, memcmp("test", buf.data(), 4));
 
     EXPECT_TRUE(tr_sys_file_seek(fd, -3, TR_SEEK_CUR, &n, &err));
     EXPECT_EQ(nullptr, err);
@@ -1146,11 +1146,11 @@ TEST_F(FileTest, fileReadWriteSeek)
     EXPECT_EQ(nullptr, err);
     EXPECT_EQ(0, n);
 
-    EXPECT_TRUE(tr_sys_file_read(fd, std::data(buf), std::size(buf), &n, &err));
+    EXPECT_TRUE(tr_sys_file_read(fd, buf.data(), buf.size(), &n, &err));
     EXPECT_EQ(nullptr, err);
     EXPECT_EQ(4, n);
 
-    EXPECT_EQ(0, memcmp("tEst", std::data(buf), 4));
+    EXPECT_EQ(0, memcmp("tEst", buf.data(), 4));
 
     EXPECT_TRUE(tr_sys_file_seek(fd, 0, TR_SEEK_END, &n, &err));
     EXPECT_EQ(nullptr, err);
@@ -1164,21 +1164,21 @@ TEST_F(FileTest, fileReadWriteSeek)
     EXPECT_EQ(nullptr, err);
     EXPECT_EQ(0, n);
 
-    EXPECT_TRUE(tr_sys_file_read(fd, std::data(buf), std::size(buf), &n, &err));
+    EXPECT_TRUE(tr_sys_file_read(fd, buf.data(), buf.size(), &n, &err));
     EXPECT_EQ(nullptr, err);
     EXPECT_EQ(7, n);
 
-    EXPECT_EQ(0, memcmp("tEst ok", std::data(buf), 7));
+    EXPECT_EQ(0, memcmp("tEst ok", buf.data(), 7));
 
     EXPECT_TRUE(tr_sys_file_write_at(fd, "-", 1, 4, &n, &err));
     EXPECT_EQ(nullptr, err);
     EXPECT_EQ(1, n);
 
-    EXPECT_TRUE(tr_sys_file_read_at(fd, std::data(buf), 5, 2, &n, &err));
+    EXPECT_TRUE(tr_sys_file_read_at(fd, buf.data(), 5, 2, &n, &err));
     EXPECT_EQ(nullptr, err);
     EXPECT_EQ(5, n);
 
-    EXPECT_EQ(0, memcmp("st-ok", std::data(buf), 5));
+    EXPECT_EQ(0, memcmp("st-ok", buf.data(), 5));
 
     tr_sys_file_close(fd, nullptr);
 
@@ -1238,7 +1238,7 @@ TEST_F(FileTest, filePreallocate)
 {
     auto const test_dir = createTestDir(__FUNCTION__);
 
-    auto* path1 = tr_buildPath(std::data(test_dir), "a", nullptr);
+    auto* path1 = tr_buildPath(test_dir.data(), "a", nullptr);
 
     auto fd = tr_sys_file_open(path1, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE, 0600, nullptr);
 
@@ -1289,15 +1289,15 @@ TEST_F(FileTest, filePreallocate)
 TEST_F(FileTest, map)
 {
     auto const test_dir = createTestDir(__FUNCTION__);
-    auto* path1 = tr_buildPath(std::data(test_dir), "a", nullptr);
+    auto* path1 = tr_buildPath(test_dir.data(), "a", nullptr);
 
     auto constexpr Contents = std::string_view { "test" };
-    createFileWithContents(path1, std::data(Contents));
+    createFileWithContents(path1, Contents.data());
 
     auto fd = tr_sys_file_open(path1, TR_SYS_FILE_READ | TR_SYS_FILE_WRITE, 0600, nullptr);
 
     tr_error* err = nullptr;
-    auto map_len = std::size(Contents);
+    auto map_len = Contents.size();
     auto* view = static_cast<char*>(tr_sys_file_map_for_reading(fd, 0, map_len, &err));
     EXPECT_NE(nullptr, view);
     EXPECT_EQ(nullptr, err);
@@ -1307,8 +1307,8 @@ TEST_F(FileTest, map)
 
     auto constexpr Contents2 = std::string_view { "more" };
     auto n_written = uint64_t {};
-    tr_sys_file_write_at(fd, std::data(Contents2), std::size(Contents2), 0, &n_written, &err);
-    EXPECT_EQ(map_len, std::size(Contents2));
+    tr_sys_file_write_at(fd, Contents2.data(), Contents2.size(), 0, &n_written, &err);
+    EXPECT_EQ(map_len, Contents2.size());
     EXPECT_EQ(map_len, n_written);
     EXPECT_EQ(nullptr, err);
     EXPECT_EQ(Contents2, std::string_view(view, map_len));
@@ -1328,41 +1328,41 @@ TEST_F(FileTest, map)
 TEST_F(FileTest, fileUtilities)
 {
     auto const test_dir = createTestDir(__FUNCTION__);
-    auto* path1 = tr_buildPath(std::data(test_dir), "a", nullptr);
+    auto* path1 = tr_buildPath(test_dir.data(), "a", nullptr);
     auto constexpr Contents = std::string_view { "a\nbc\r\ndef\nghij\r\n\n\nklmno\r" };
-    createFileWithContents(path1, std::data(Contents));
+    createFileWithContents(path1, Contents.data());
 
     auto fd = tr_sys_file_open(path1, TR_SYS_FILE_READ, 0, nullptr);
 
     tr_error* err = nullptr;
     auto buffer = std::array<char, 16>{};
-    EXPECT_TRUE(tr_sys_file_read_line(fd, std::data(buffer), std::size(buffer), &err));
+    EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), &err));
     EXPECT_EQ(nullptr, err);
-    EXPECT_STREQ("a", std::data(buffer));
-    EXPECT_TRUE(tr_sys_file_read_line(fd, std::data(buffer), std::size(buffer), &err));
+    EXPECT_STREQ("a", buffer.data());
+    EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), &err));
     EXPECT_EQ(nullptr, err);
-    EXPECT_STREQ("bc", std::data(buffer));
-    EXPECT_TRUE(tr_sys_file_read_line(fd, std::data(buffer), std::size(buffer), &err));
+    EXPECT_STREQ("bc", buffer.data());
+    EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), &err));
     EXPECT_EQ(nullptr, err);
-    EXPECT_STREQ("def", std::data(buffer));
-    EXPECT_TRUE(tr_sys_file_read_line(fd, std::data(buffer), std::size(buffer), &err));
+    EXPECT_STREQ("def", buffer.data());
+    EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), &err));
     EXPECT_EQ(nullptr, err);
-    EXPECT_STREQ("ghij", std::data(buffer));
-    EXPECT_TRUE(tr_sys_file_read_line(fd, std::data(buffer), std::size(buffer), &err));
+    EXPECT_STREQ("ghij", buffer.data());
+    EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), &err));
     EXPECT_EQ(nullptr, err);
-    EXPECT_STREQ("", std::data(buffer));
-    EXPECT_TRUE(tr_sys_file_read_line(fd, std::data(buffer), std::size(buffer), &err));
+    EXPECT_STREQ("", buffer.data());
+    EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), &err));
     EXPECT_EQ(nullptr, err);
-    EXPECT_STREQ("", std::data(buffer));
-    EXPECT_TRUE(tr_sys_file_read_line(fd, std::data(buffer), 4, &err));
+    EXPECT_STREQ("", buffer.data());
+    EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), 4, &err));
     EXPECT_EQ(nullptr, err);
-    EXPECT_STREQ("klmn", std::data(buffer));
-    EXPECT_TRUE(tr_sys_file_read_line(fd, std::data(buffer), std::size(buffer), &err));
+    EXPECT_STREQ("klmn", buffer.data());
+    EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), &err));
     EXPECT_EQ(nullptr, err);
-    EXPECT_STREQ("o", std::data(buffer));
-    EXPECT_FALSE(tr_sys_file_read_line(fd, std::data(buffer), std::size(buffer), &err));
+    EXPECT_STREQ("o", buffer.data());
+    EXPECT_FALSE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), &err));
     EXPECT_EQ(nullptr, err);
-    EXPECT_STREQ("o", std::data(buffer)); // on EOF, buffer stays unchanged
+    EXPECT_STREQ("o", buffer.data()); // on EOF, buffer stays unchanged
 
     tr_sys_file_close(fd, nullptr);
 
@@ -1385,30 +1385,30 @@ TEST_F(FileTest, fileUtilities)
 
     tr_sys_file_seek(fd, 0, TR_SEEK_SET, nullptr, nullptr);
 
-    EXPECT_TRUE(tr_sys_file_read_line(fd, std::data(buffer), std::size(buffer), &err));
+    EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), &err));
     EXPECT_EQ(nullptr, err);
-    EXPECT_STREQ("p", std::data(buffer));
-    EXPECT_TRUE(tr_sys_file_read_line(fd, std::data(buffer), std::size(buffer), &err));
+    EXPECT_STREQ("p", buffer.data());
+    EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), &err));
     EXPECT_EQ(nullptr, err);
-    EXPECT_STREQ("", std::data(buffer));
-    EXPECT_TRUE(tr_sys_file_read_line(fd, std::data(buffer), std::size(buffer), &err));
+    EXPECT_STREQ("", buffer.data());
+    EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), &err));
     EXPECT_EQ(nullptr, err);
-    EXPECT_STREQ("qr", std::data(buffer));
-    EXPECT_TRUE(tr_sys_file_read_line(fd, std::data(buffer), std::size(buffer), &err));
+    EXPECT_STREQ("qr", buffer.data());
+    EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), &err));
     EXPECT_EQ(nullptr, err);
-    EXPECT_STREQ("stu", std::data(buffer));
-    EXPECT_TRUE(tr_sys_file_read_line(fd, std::data(buffer), std::size(buffer), &err));
+    EXPECT_STREQ("stu", buffer.data());
+    EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), &err));
     EXPECT_EQ(nullptr, err);
-    EXPECT_STREQ("", std::data(buffer));
-    EXPECT_TRUE(tr_sys_file_read_line(fd, std::data(buffer), std::size(buffer), &err));
+    EXPECT_STREQ("", buffer.data());
+    EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), &err));
     EXPECT_EQ(nullptr, err);
-    EXPECT_STREQ("", std::data(buffer));
-    EXPECT_TRUE(tr_sys_file_read_line(fd, std::data(buffer), std::size(buffer), &err));
+    EXPECT_STREQ("", buffer.data());
+    EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), &err));
     EXPECT_EQ(nullptr, err);
-    EXPECT_STREQ("vwxy2", std::data(buffer));
-    EXPECT_FALSE(tr_sys_file_read_line(fd, std::data(buffer), std::size(buffer), &err));
+    EXPECT_STREQ("vwxy2", buffer.data());
+    EXPECT_FALSE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), &err));
     EXPECT_EQ(nullptr, err);
-    EXPECT_STREQ("vwxy2", std::data(buffer)); // on EOF, buffer stays unchanged
+    EXPECT_STREQ("vwxy2", buffer.data()); // on EOF, buffer stays unchanged
 
     tr_sys_file_close(fd, nullptr);
 
@@ -1421,7 +1421,7 @@ TEST_F(FileTest, dirCreate)
 {
     auto const test_dir = createTestDir(__FUNCTION__);
 
-    auto* path1 = tr_buildPath(std::data(test_dir), "a", nullptr);
+    auto* path1 = tr_buildPath(test_dir.data(), "a", nullptr);
     auto* path2 = tr_buildPath(path1, "b", nullptr);
 
     // Can create directory which has parent
@@ -1474,8 +1474,8 @@ TEST_F(FileTest, dirCreate)
 TEST_F(FileTest, dirRead)
 {
     auto const test_dir = createTestDir(__FUNCTION__);
-    auto* path1 = tr_buildPath(std::data(test_dir), "a", nullptr);
-    auto* path2 = tr_buildPath(std::data(test_dir), "b", nullptr);
+    auto* path1 = tr_buildPath(test_dir.data(), "a", nullptr);
+    auto* path2 = tr_buildPath(test_dir.data(), "b", nullptr);
 
     bool have1;
     bool have2;

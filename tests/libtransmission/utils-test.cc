@@ -117,27 +117,27 @@ TEST_F(UtilsTest, trUtf8clean)
     // this version is not utf-8 (but cp866)
     in = "\x92\xE0\xE3\xA4\xAD\xAE \xA1\xEB\xE2\xEC \x81\xAE\xA3\xAE\xAC";
     out = makeString(tr_utf8clean(in, 17));
-    EXPECT_TRUE(std::size(out) == 17 || std::size(out) == 33);
-    EXPECT_TRUE(tr_utf8_validate(out.c_str(), std::size(out), nullptr));
+    EXPECT_TRUE(out.size() == 17 || out.size() == 33);
+    EXPECT_TRUE(tr_utf8_validate(out.c_str(), out.size(), nullptr));
 
     // same string, but utf-8 clean
     in = "Трудно быть Богом";
     out = makeString(tr_utf8clean(in, TR_BAD_SIZE));
-    EXPECT_NE(nullptr, std::data(out));
-    EXPECT_TRUE(tr_utf8_validate(out.c_str(), std::size(out), nullptr));
+    EXPECT_NE(nullptr, out.data());
+    EXPECT_TRUE(tr_utf8_validate(out.c_str(), out.size(), nullptr));
     EXPECT_EQ(in, out);
 
     in = "\xF4\x00\x81\x82";
     out = makeString(tr_utf8clean(in, 4));
-    EXPECT_NE(nullptr, std::data(out));
-    EXPECT_TRUE(std::size(out) == 1 || std::size(out) == 2);
-    EXPECT_TRUE(tr_utf8_validate(out.c_str(), std::size(out), nullptr));
+    EXPECT_NE(nullptr, out.data());
+    EXPECT_TRUE(out.size() == 1 || out.size() == 2);
+    EXPECT_TRUE(tr_utf8_validate(out.c_str(), out.size(), nullptr));
 
     in = "\xF4\x33\x81\x82";
     out = makeString(tr_utf8clean(in, 4));
-    EXPECT_NE(nullptr, std::data(out));
-    EXPECT_TRUE(std::size(out) == 4 || std::size(out) == 7);
-    EXPECT_TRUE(tr_utf8_validate(out.c_str(), std::size(out), nullptr));
+    EXPECT_NE(nullptr, out.data());
+    EXPECT_TRUE(out.size() == 4 || out.size() == 7);
+    EXPECT_TRUE(tr_utf8_validate(out.c_str(), out.size(), nullptr));
 }
 
 TEST_F(UtilsTest, numbers)
@@ -197,7 +197,7 @@ TEST_F(UtilsTest, lowerbound)
     for (int i = 1; i <= 10; i++)
     {
         bool exact;
-        auto const pos = tr_lowerBound(&i, std::data(A), std::size(A), sizeof(int), compareInts, &exact);
+        auto const pos = tr_lowerBound(&i, A.data(), A.size(), sizeof(int), compareInts, &exact);
         EXPECT_EQ(expected_pos[i - 1], pos);
         EXPECT_EQ(expected_exact[i - 1], exact);
     }
@@ -224,7 +224,7 @@ TEST_F(UtilsTest, trQuickfindfirstk)
     auto buf = std::array<int, 100>{};
     for (auto i = 0; i != NumTrials; ++i)
     {
-        run_test(K, std::size(buf), std::data(buf), 100);
+        run_test(K, buf.size(), buf.data(), 100);
     }
 }
 
@@ -233,9 +233,9 @@ TEST_F(UtilsTest, trMemmem)
     auto constexpr Haystack = std::string_view { "abcabcabcabc" };
     auto constexpr Needle = std::string_view { "cab" };
 
-    EXPECT_EQ(Haystack, tr_memmem(std::data(Haystack), std::size(Haystack), std::data(Haystack), std::size(Haystack)));
-    EXPECT_EQ(Haystack.substr(2), tr_memmem(std::data(Haystack), std::size(Haystack), std::data(Needle), std::size(Needle)));
-    EXPECT_EQ(nullptr, tr_memmem(std::data(Needle), std::size(Needle), std::data(Haystack), std::size(Haystack)));
+    EXPECT_EQ(Haystack, tr_memmem(Haystack.data(), Haystack.size(), Haystack.data(), Haystack.size()));
+    EXPECT_EQ(Haystack.substr(2), tr_memmem(Haystack.data(), Haystack.size(), Needle.data(), Needle.size()));
+    EXPECT_EQ(nullptr, tr_memmem(Needle.data(), Needle.size(), Haystack.data(), Haystack.size()));
 }
 
 TEST_F(UtilsTest, trBinaryHex)
@@ -243,7 +243,7 @@ TEST_F(UtilsTest, trBinaryHex)
     auto constexpr HexIn = std::string_view { "fb5ef5507427b17e04b69cef31fa3379b456735a" };
 
     uint8_t binary[20];
-    tr_hex_to_binary(std::data(HexIn), binary, std::size(HexIn) / 2);
+    tr_hex_to_binary(HexIn.data(), binary, HexIn.size() / 2);
 
     char hex_out[41];
     tr_binary_to_hex(binary, hex_out, 20);
@@ -320,7 +320,7 @@ TEST_F(UtilsTest, url)
 TEST_F(UtilsTest, trHttpUnescape)
 {
     auto constexpr Url = std::string_view { "http%3A%2F%2Fwww.example.com%2F~user%2F%3Ftest%3D1%26test1%3D2" };
-    auto str = makeString(tr_http_unescape(std::data(Url), std::size(Url)));
+    auto str = makeString(tr_http_unescape(Url.data(), Url.size()));
     EXPECT_EQ("http://www.example.com/~user/?test=1&test1=2", str);
 }
 

@@ -50,7 +50,7 @@ TEST_P(JSONTest, testElements)
     };
 
     tr_variant top;
-    int err = tr_variantFromJson(&top, std::data(In), std::size(In));
+    int err = tr_variantFromJson(&top, In.data(), In.size());
     EXPECT_EQ(0, err);
     EXPECT_TRUE(tr_variantIsDict(&top));
 
@@ -95,7 +95,7 @@ TEST_P(JSONTest, testUtf8)
     int err;
     tr_quark const key = tr_quark_new("key", 3);
 
-    err = tr_variantFromJson(&top, std::data(in), std::size(in));
+    err = tr_variantFromJson(&top, in.data(), in.size());
     EXPECT_EQ(0, err);
     EXPECT_TRUE(tr_variantIsDict(&top));
     EXPECT_TRUE(tr_variantDictFindStr(&top, key, &str, nullptr));
@@ -107,7 +107,7 @@ TEST_P(JSONTest, testUtf8)
     }
 
     in = std::string_view { R"({ "key": "\u005C" })" };
-    err = tr_variantFromJson(&top, std::data(in), std::size(in));
+    err = tr_variantFromJson(&top, in.data(), in.size());
     EXPECT_EQ(0, err);
     EXPECT_TRUE(tr_variantIsDict(&top));
     EXPECT_TRUE(tr_variantDictFindStr(&top, key, &str, nullptr));
@@ -127,7 +127,7 @@ TEST_P(JSONTest, testUtf8)
      * 6. Confirm that the result is UTF-8.
      */
     in = std::string_view { R"({ "key": "Let\u00f6lt\u00e9sek" })" };
-    err = tr_variantFromJson(&top, std::data(in), std::size(in));
+    err = tr_variantFromJson(&top, in.data(), in.size());
     EXPECT_EQ(0, err);
     EXPECT_TRUE(tr_variantIsDict(&top));
     EXPECT_TRUE(tr_variantDictFindStr(&top, key, &str, nullptr));
@@ -174,7 +174,7 @@ TEST_P(JSONTest, test1)
     };
 
     tr_variant top;
-    auto const err = tr_variantFromJson(&top, std::data(In), std::size(In));
+    auto const err = tr_variantFromJson(&top, In.data(), In.size());
 
     char const* str;
     int64_t i;
@@ -212,7 +212,7 @@ TEST_P(JSONTest, test2)
     auto constexpr In = std::string_view { " " };
 
     top.type = 0;
-    int err = tr_variantFromJson(&top, std::data(In), std::size(In));
+    int err = tr_variantFromJson(&top, In.data(), In.size());
 
     EXPECT_NE(0, err);
     EXPECT_FALSE(tr_variantIsDict(&top));
@@ -229,7 +229,7 @@ TEST_P(JSONTest, test3)
     };
 
     tr_variant top;
-    auto const err = tr_variantFromJson(&top, std::data(In), std::size(In));
+    auto const err = tr_variantFromJson(&top, In.data(), In.size());
     EXPECT_EQ(0, err);
 
     char const* str;
@@ -243,7 +243,7 @@ TEST_P(JSONTest, unescape)
 {
     tr_variant top;
     auto constexpr In = std::string_view { R"({ "string-1": "\/usr\/lib" })" };
-    int const err = tr_variantFromJson(&top, std::data(In), std::size(In));
+    int const err = tr_variantFromJson(&top, In.data(), In.size());
     EXPECT_EQ(0, err);
 
     char const* str;

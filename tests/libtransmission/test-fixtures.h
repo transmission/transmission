@@ -105,7 +105,7 @@ protected:
 
     static std::string create_sandbox(std::string const& parent_dir, std::string const& tmpl)
     {
-        auto* path = tr_buildPath(std::data(parent_dir), std::data(tmpl), nullptr);
+        auto* path = tr_buildPath(parent_dir.data(), tmpl.data(), nullptr);
         tr_sys_dir_create_temp(path, nullptr);
         tr_sys_path_native_separators(path);
         auto const ret = std::string { path };
@@ -118,10 +118,10 @@ protected:
         std::vector<std::string> ret;
 
         tr_sys_path_info info;
-        if (tr_sys_path_get_info(std::data(path), 0, &info, nullptr) &&
+        if (tr_sys_path_get_info(path.data(), 0, &info, nullptr) &&
             (info.type == TR_SYS_PATH_IS_DIRECTORY))
         {
-            auto const odir = tr_sys_dir_open(std::data(path), nullptr);
+            auto const odir = tr_sys_dir_open(path.data(), nullptr);
             if (odir != TR_BAD_SYS_DIR)
             {
                 char const* name;
@@ -129,7 +129,7 @@ protected:
                 {
                     if (strcmp(name, ".") != 0 && strcmp(name, "..") != 0)
                     {
-                        ret.push_back(makeString(tr_buildPath(std::data(path), name, nullptr)));
+                        ret.push_back(makeString(tr_buildPath(path.data(), name, nullptr)));
                     }
                 }
 
@@ -152,7 +152,7 @@ protected:
             std::cerr << "cleanup: removing '" << path << "'" << std::endl;
         }
 
-        tr_sys_path_remove(std::data(path), nullptr);
+        tr_sys_path_remove(path.data(), nullptr);
     }
 
 private:
@@ -169,10 +169,10 @@ protected:
     {
         auto const tmperr = errno;
 
-        auto const path_sz = std::string(std::data(path), std::size(path));
-        auto const dir = makeString(tr_sys_path_dirname(std::data(path_sz), nullptr));
+        auto const path_sz = std::string(path.data(), path.size());
+        auto const dir = makeString(tr_sys_path_dirname(path_sz.data(), nullptr));
         tr_error* error = nullptr;
-        tr_sys_dir_create(std::data(dir), TR_SYS_DIR_CREATE_PARENTS, 0700, &error);
+        tr_sys_dir_create(dir.data(), TR_SYS_DIR_CREATE_PARENTS, 0700, &error);
         EXPECT_EQ(nullptr, error);
 
         errno = tmperr;
@@ -206,7 +206,7 @@ protected:
         buildParentDir(tmpl);
 
         // NOLINTNEXTLINE(clang-analyzer-cplusplus.InnerPointer)
-        auto const fd = tr_sys_file_open_temp(std::data(tmpl), nullptr);
+        auto const fd = tr_sys_file_open_temp(tmpl.data(), nullptr);
         blockingFileWrite(fd, payload, n);
         tr_sys_file_close(fd, nullptr);
         sync();
@@ -220,8 +220,8 @@ protected:
 
         buildParentDir(path);
 
-        auto const path_sz = std::string(std::data(path), std::size(path));
-        auto const fd = tr_sys_file_open(std::data(path_sz),
+        auto const path_sz = std::string(path.data(), path.size());
+        auto const fd = tr_sys_file_open(path_sz.data(),
             TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE,
             0600, nullptr);
         blockingFileWrite(fd, payload, n);
@@ -233,7 +233,7 @@ protected:
 
     void createFileWithContents(std::string_view path, std::string_view str) const
     {
-        createFileWithContents(path, std::data(str), std::size(str));
+        createFileWithContents(path, str.data(), str.size());
     }
 
     bool verbose = false;
@@ -293,21 +293,21 @@ private:
         char const* str;
         auto q = TR_KEY_download_dir;
         auto const download_dir = tr_variantDictFindStr(settings, q, &str, &len) ?
-            makeString(tr_strdup_printf("%s/%*.*s", std::data(sandboxDir()), (int)len, (int)len, str)) :
-            makeString(tr_buildPath(std::data(sandboxDir()), "Downloads", nullptr));
-        tr_sys_dir_create(std::data(download_dir), TR_SYS_DIR_CREATE_PARENTS, 0700, nullptr);
-        tr_variantDictAddStr(settings, q, std::data(download_dir));
+            makeString(tr_strdup_printf("%s/%*.*s", sandboxDir().data(), (int)len, (int)len, str)) :
+            makeString(tr_buildPath(sandboxDir().data(), "Downloads", nullptr));
+        tr_sys_dir_create(download_dir.data(), TR_SYS_DIR_CREATE_PARENTS, 0700, nullptr);
+        tr_variantDictAddStr(settings, q, download_dir.data());
 
         // incomplete dir
         q = TR_KEY_incomplete_dir;
         auto const incomplete_dir = tr_variantDictFindStr(settings, q, &str, &len) ?
-            makeString(tr_strdup_printf("%s/%*.*s", std::data(sandboxDir()), (int)len, (int)len, str)) :
-            makeString(tr_buildPath(std::data(sandboxDir()), "Incomplete", nullptr));
-        tr_variantDictAddStr(settings, q, std::data(incomplete_dir));
+            makeString(tr_strdup_printf("%s/%*.*s", sandboxDir().data(), (int)len, (int)len, str)) :
+            makeString(tr_buildPath(sandboxDir().data(), "Incomplete", nullptr));
+        tr_variantDictAddStr(settings, q, incomplete_dir.data());
 
         // blocklists
-        auto const blocklist_dir = makeString(tr_buildPath(std::data(sandboxDir()), "blocklists", nullptr));
-        tr_sys_dir_create(std::data(blocklist_dir), TR_SYS_DIR_CREATE_PARENTS, 0700, nullptr);
+        auto const blocklist_dir = makeString(tr_buildPath(sandboxDir().data(), "blocklists", nullptr));
+        tr_sys_dir_create(blocklist_dir.data(), TR_SYS_DIR_CREATE_PARENTS, 0700, nullptr);
 
         // fill in any missing settings
 
@@ -329,7 +329,7 @@ private:
             tr_variantDictAddInt(settings, q, verbose ? TR_LOG_DEBUG : TR_LOG_ERROR);
         }
 
-        return tr_sessionInit(std::data(sandboxDir()), !verbose, settings);
+        return tr_sessionInit(sandboxDir().data(), !verbose, settings);
     }
 
     void sessionClose(tr_session* session)
@@ -395,7 +395,7 @@ protected:
                 makeString(tr_strdup_printf("%s%c%s", tor->currentDir, TR_PATH_DELIMITER, file.name));
 
             auto const dirname = makeString(tr_sys_path_dirname(path.c_str(), nullptr));
-            tr_sys_dir_create(std::data(dirname), TR_SYS_DIR_CREATE_PARENTS, 0700, nullptr);
+            tr_sys_dir_create(dirname.data(), TR_SYS_DIR_CREATE_PARENTS, 0700, nullptr);
             auto fd = tr_sys_file_open(
                 path.c_str(), TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE, 0600, nullptr);
 

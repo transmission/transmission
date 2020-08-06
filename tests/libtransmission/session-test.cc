@@ -34,22 +34,22 @@ TEST(Session, peerId)
     {
         // get a new peer-id
         auto buf = std::array<uint8_t, PEER_ID_LEN + 1>{};
-        tr_peerIdInit(std::data(buf));
+        tr_peerIdInit(buf.data());
 
         // confirm that it has the right length
-        EXPECT_EQ(PEER_ID_LEN, strlen(reinterpret_cast<char const*>(std::data(buf))));
+        EXPECT_EQ(PEER_ID_LEN, strlen(reinterpret_cast<char const*>(buf.data())));
 
         // confirm that it begins with PeerIdPrefix
-        auto const peer_id = std::string_view(reinterpret_cast<char const*>(std::data(buf)), PEER_ID_LEN);
-        EXPECT_EQ(PeerIdPrefix, peer_id.substr(0, std::size(PeerIdPrefix)));
+        auto const peer_id = std::string_view(reinterpret_cast<char const*>(buf.data()), PEER_ID_LEN);
+        EXPECT_EQ(PeerIdPrefix, peer_id.substr(0, PeerIdPrefix.size()));
 
         // confirm that its total is evenly divisible by 36
         int val = 0;
-        auto const suffix = peer_id.substr(std::size(PeerIdPrefix));
+        auto const suffix = peer_id.substr(PeerIdPrefix.size());
         for (char const ch : suffix)
         {
             auto const tmp = std::array<char, 2>{ ch, '\0' };
-            val += strtoul(std::data(tmp), nullptr, 36);
+            val += strtoul(tmp.data(), nullptr, 36);
         }
 
         EXPECT_EQ(0, val % 36);

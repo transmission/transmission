@@ -31,8 +31,8 @@ protected:
     {
         auto const incomplete_dir = GetParam().first;
         auto const download_dir = GetParam().second;
-        tr_variantDictAddStr(settings(), TR_KEY_download_dir, std::data(download_dir));
-        tr_variantDictAddStr(settings(), TR_KEY_incomplete_dir, std::data(incomplete_dir));
+        tr_variantDictAddStr(settings(), TR_KEY_download_dir, download_dir.data());
+        tr_variantDictAddStr(settings(), TR_KEY_incomplete_dir, incomplete_dir.data());
         tr_variantDictAddBool(settings(), TR_KEY_incomplete_dir_enabled, true);
 
         SessionTest::SetUp();
@@ -153,7 +153,7 @@ using MoveTest = SessionTest;
 TEST_F(MoveTest, setLocation)
 {
     auto const target_dir = makeString(tr_buildPath(tr_sessionGetConfigDir(session_), "target", nullptr));
-    tr_sys_dir_create(std::data(target_dir), TR_SYS_DIR_CREATE_PARENTS, 0777, nullptr);
+    tr_sys_dir_create(target_dir.data(), TR_SYS_DIR_CREATE_PARENTS, 0777, nullptr);
 
     // init a torrent.
     auto* tor = zeroTorrentInit();
@@ -163,7 +163,7 @@ TEST_F(MoveTest, setLocation)
 
     // now move it
     auto state = int{ -1 };
-    tr_torrentSetLocation(tor, std::data(target_dir), true, nullptr, &state);
+    tr_torrentSetLocation(tor, target_dir.data(), true, nullptr, &state);
     auto test = [&state]() { return state == TR_LOC_DONE; };
     EXPECT_TRUE(waitFor(test, 300));
     EXPECT_EQ(TR_LOC_DONE, state);
@@ -176,7 +176,7 @@ TEST_F(MoveTest, setLocation)
     sync();
     for (tr_file_index_t file_index = 0; file_index < tor->info.fileCount; ++file_index)
     {
-        EXPECT_EQ(makeString(tr_buildPath(std::data(target_dir), tor->info.files[file_index].name, nullptr)),
+        EXPECT_EQ(makeString(tr_buildPath(target_dir.data(), tor->info.files[file_index].name, nullptr)),
             makeString(tr_torrentFindFile(tor, file_index)));
     }
 

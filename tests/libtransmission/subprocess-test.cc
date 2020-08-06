@@ -38,7 +38,7 @@ namespace libtransmission::test
 std::string getSelfPath()
 {
     auto const exec = ::testing::internal::GetArgvs().front();
-    return makeString(tr_sys_path_resolve(std::data(exec), nullptr));
+    return makeString(tr_sys_path_resolve(exec.data(), nullptr));
 }
 
 std::string getCmdSelfPath()
@@ -46,8 +46,8 @@ std::string getCmdSelfPath()
     auto constexpr NewSuffix = std::string_view { ".cmd" };
     auto exec = getSelfPath();
     // replace ".exe" suffix with ".cmd"
-    exec.resize(std::size(exec) - std::size(NewSuffix));
-    exec.append(std::data(NewSuffix), std::size(NewSuffix));
+    exec.resize(exec.size() - NewSuffix.size());
+    exec.append(NewSuffix.data(), NewSuffix.size());
     return exec;
 }
 
@@ -62,7 +62,7 @@ protected:
     {
         auto* tmp = tr_strdup_printf("%s%c%*.*s",
             sandbox_.path().c_str(), TR_PATH_DELIMITER,
-            int(std::size(filename)), int(std::size(filename)), std::data(filename));
+            int(filename.size()), int(filename.size()), filename.data());
         tr_sys_path_native_separators(tmp);
         auto const path = std::string { tmp };
         tr_free(tmp);
@@ -92,7 +92,7 @@ protected:
     static void processCommandLineArgs()
     {
         auto const argv = ::testing::internal::GetArgvs();
-        if (std::size(argv) < 3)
+        if (argv.size() < 3)
         {
             return;
         }
@@ -101,7 +101,7 @@ protected:
         auto const& test_action = argv[2];
         auto const tmp_result_path = result_path + ".tmp";
 
-        auto const fd = tr_sys_file_open(std::data(tmp_result_path),
+        auto const fd = tr_sys_file_open(tmp_result_path.data(),
             TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE,
             0644, nullptr);
 
@@ -112,17 +112,17 @@ protected:
 
         if (test_action == ArgDumpArgs)
         {
-            for (int i = 3; i < int(std::size(argv)); ++i)
+            for (int i = 3; i < int(argv.size()); ++i)
             {
-                tr_sys_file_write_line(fd, std::data(argv[i]), nullptr);
+                tr_sys_file_write_line(fd, argv[i].data(), nullptr);
             }
         }
         else if (test_action == ArgDumpEnv)
         {
-            for (int i = 3; i < int(std::size(argv)); ++i)
+            for (int i = 3; i < int(argv.size()); ++i)
             {
-                auto const value = makeString(tr_env_get_string(std::data(argv[i]), "<null>"));
-                tr_sys_file_write_line(fd, std::data(value), nullptr);
+                auto const value = makeString(tr_env_get_string(argv[i].data(), "<null>"));
+                tr_sys_file_write_line(fd, value.data(), nullptr);
             }
         }
         else if (test_action == ArgDumpCwd)
@@ -134,18 +134,18 @@ protected:
         else
         {
             tr_sys_file_close(fd, nullptr);
-            tr_sys_path_remove(std::data(tmp_result_path), nullptr);
+            tr_sys_path_remove(tmp_result_path.data(), nullptr);
             exit(1);
         }
 
         tr_sys_file_close(fd, nullptr);
-        tr_sys_path_rename(std::data(tmp_result_path), std::data(result_path), nullptr);
+        tr_sys_path_rename(tmp_result_path.data(), result_path.data(), nullptr);
         exit(0);
     }
 
     void waitForFileToExist(std::string const& path)
     {
-        auto const test = [path]() { return tr_sys_path_exists(std::data(path), nullptr); };
+        auto const test = [path]() { return tr_sys_path_exists(path.data(), nullptr); };
         EXPECT_TRUE(waitFor(test, 2000));
     }
 
@@ -162,12 +162,12 @@ TEST_P(SubprocessTest, SpawnAsyncMissingExec)
 
     auto args = std::array<char*, 2>{
         //  FIXME(ckerr): remove tr_strdup()s after https://github.com/transmission/transmission/issues/1384
-        tr_strdup(std::data(MissingExePath)),
+        tr_strdup(MissingExePath.data()),
         nullptr
     };
 
     tr_error* error = nullptr;
-    auto const ret = tr_spawn_async(std::data(args), nullptr, nullptr, &error);
+    auto const ret = tr_spawn_async(args.data(), nullptr, nullptr, &error);
     EXPECT_FALSE(ret);
     EXPECT_NE(nullptr, error);
     EXPECT_NE(0, error->code);
@@ -189,43 +189,43 @@ TEST_P(SubprocessTest, SpawnAsyncArgs)
     auto args = std::array<char*, 8>{
         //  FIXME(ckerr): remove tr_strdup()s after https://github.com/transmission/transmission/issues/1384
         tr_strdup(self_path_.c_str()),
-        tr_strdup(std::data(result_path)),
-        tr_strdup(std::data(ArgDumpArgs)),
-        tr_strdup(std::data(TestArg1)),
-        tr_strdup(std::data(TestArg2)),
-        tr_strdup(std::data(TestArg3)),
-        tr_strdup(allow_batch_metachars ? std::data(TestArg4) : nullptr),
+        tr_strdup(result_path.data()),
+        tr_strdup(ArgDumpArgs.data()),
+        tr_strdup(TestArg1.data()),
+        tr_strdup(TestArg2.data()),
+        tr_strdup(TestArg3.data()),
+        tr_strdup(allow_batch_metachars ? TestArg4.data() : nullptr),
         nullptr
     };
 
     tr_error* error = nullptr;
-    bool const ret = tr_spawn_async(std::data(args), nullptr, nullptr, &error);
+    bool const ret = tr_spawn_async(args.data(), nullptr, nullptr, &error);
     EXPECT_TRUE(ret);
     EXPECT_EQ(nullptr, error);
 
     waitForFileToExist(result_path);
 
-    auto const fd = tr_sys_file_open(std::data(result_path), TR_SYS_FILE_READ, 0, nullptr);
+    auto const fd = tr_sys_file_open(result_path.data(), TR_SYS_FILE_READ, 0, nullptr);
     EXPECT_NE(TR_BAD_SYS_FILE, fd);
 
     auto buffer = std::array<char, 1024>{};
 
-    EXPECT_TRUE(tr_sys_file_read_line(fd, std::data(buffer), std::size(buffer), nullptr));
-    EXPECT_EQ(TestArg1, std::data(buffer));
+    EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), nullptr));
+    EXPECT_EQ(TestArg1, buffer.data());
 
-    EXPECT_TRUE(tr_sys_file_read_line(fd, std::data(buffer), std::size(buffer), nullptr));
-    EXPECT_EQ(TestArg2, std::data(buffer));
+    EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), nullptr));
+    EXPECT_EQ(TestArg2, buffer.data());
 
-    EXPECT_TRUE(tr_sys_file_read_line(fd, std::data(buffer), std::size(buffer), nullptr));
-    EXPECT_EQ(TestArg3, std::data(buffer));
+    EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), nullptr));
+    EXPECT_EQ(TestArg3, buffer.data());
 
     if (allow_batch_metachars)
     {
-        EXPECT_TRUE(tr_sys_file_read_line(fd, std::data(buffer), std::size(buffer), nullptr));
-        EXPECT_EQ(TestArg4, std::data(buffer));
+        EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), nullptr));
+        EXPECT_EQ(TestArg4, buffer.data());
     }
 
-    EXPECT_FALSE(tr_sys_file_read_line(fd, std::data(buffer), std::size(buffer), nullptr));
+    EXPECT_FALSE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), nullptr));
 
     tr_sys_file_close(fd, nullptr);
 }
@@ -250,23 +250,23 @@ TEST_P(SubprocessTest, SpawnAsyncEnv)
     auto args = std::array<char*, 10>{
         //  FIXME(ckerr): remove tr_strdup()s after https://github.com/transmission/transmission/issues/1384
         tr_strdup(self_path_.c_str()),
-        tr_strdup(std::data(result_path)),
-        tr_strdup(std::data(ArgDumpEnv)),
-        tr_strdup(std::data(TestEnvKey1)),
-        tr_strdup(std::data(TestEnvKey2)),
-        tr_strdup(std::data(TestEnvKey3)),
-        tr_strdup(std::data(TestEnvKey4)),
-        tr_strdup(std::data(TestEnvKey5)),
-        tr_strdup(std::data(TestEnvKey6)),
+        tr_strdup(result_path.data()),
+        tr_strdup(ArgDumpEnv.data()),
+        tr_strdup(TestEnvKey1.data()),
+        tr_strdup(TestEnvKey2.data()),
+        tr_strdup(TestEnvKey3.data()),
+        tr_strdup(TestEnvKey4.data()),
+        tr_strdup(TestEnvKey5.data()),
+        tr_strdup(TestEnvKey6.data()),
         nullptr
     };
 
     auto env = std::array<char*, 5>{
         //  FIXME(ckerr): remove tr_strdup()s after https://github.com/transmission/transmission/issues/1384
-        tr_strdup_printf("%s=%s", std::data(TestEnvKey1), std::data(TestEnvValue1)),
-        tr_strdup_printf("%s=%s", std::data(TestEnvKey2), std::data(TestEnvValue2)),
-        tr_strdup_printf("%s=%s", std::data(TestEnvKey3), std::data(TestEnvValue3)),
-        tr_strdup_printf("%s=%s", std::data(TestEnvKey5), std::data(TestEnvValue5)),
+        tr_strdup_printf("%s=%s", TestEnvKey1.data(), TestEnvValue1.data()),
+        tr_strdup_printf("%s=%s", TestEnvKey2.data(), TestEnvValue2.data()),
+        tr_strdup_printf("%s=%s", TestEnvKey3.data(), TestEnvValue3.data()),
+        tr_strdup_printf("%s=%s", TestEnvKey5.data(), TestEnvValue5.data()),
         nullptr
     };
 
@@ -274,36 +274,36 @@ TEST_P(SubprocessTest, SpawnAsyncEnv)
     setenv("ZOO", "tar", true); // overridden
 
     tr_error* error = nullptr;
-    bool const ret = tr_spawn_async(std::data(args), std::data(env), nullptr, &error);
+    bool const ret = tr_spawn_async(args.data(), env.data(), nullptr, &error);
     EXPECT_TRUE(ret);
     EXPECT_EQ(nullptr, error);
 
     waitForFileToExist(result_path);
 
-    auto const fd = tr_sys_file_open(std::data(result_path), TR_SYS_FILE_READ, 0, nullptr);
+    auto const fd = tr_sys_file_open(result_path.data(), TR_SYS_FILE_READ, 0, nullptr);
     EXPECT_NE(TR_BAD_SYS_FILE, fd);
 
     auto buffer = std::array<char, 1024>{};
 
-    EXPECT_TRUE(tr_sys_file_read_line(fd, std::data(buffer), std::size(buffer), nullptr));
-    EXPECT_EQ(TestEnvValue1, std::data(buffer));
+    EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), nullptr));
+    EXPECT_EQ(TestEnvValue1, buffer.data());
 
-    EXPECT_TRUE(tr_sys_file_read_line(fd, std::data(buffer), std::size(buffer), nullptr));
-    EXPECT_EQ(TestEnvValue2, std::data(buffer));
+    EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), nullptr));
+    EXPECT_EQ(TestEnvValue2, buffer.data());
 
-    EXPECT_TRUE(tr_sys_file_read_line(fd, std::data(buffer), std::size(buffer), nullptr));
-    EXPECT_EQ(TestEnvValue3, std::data(buffer));
+    EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), nullptr));
+    EXPECT_EQ(TestEnvValue3, buffer.data());
 
-    EXPECT_TRUE(tr_sys_file_read_line(fd, std::data(buffer), std::size(buffer), nullptr));
-    EXPECT_EQ(TestEnvValue4, std::data(buffer));
+    EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), nullptr));
+    EXPECT_EQ(TestEnvValue4, buffer.data());
 
-    EXPECT_TRUE(tr_sys_file_read_line(fd, std::data(buffer), std::size(buffer), nullptr));
-    EXPECT_EQ(TestEnvValue5, std::data(buffer));
+    EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), nullptr));
+    EXPECT_EQ(TestEnvValue5, buffer.data());
 
-    EXPECT_TRUE(tr_sys_file_read_line(fd, std::data(buffer), std::size(buffer), nullptr));
-    EXPECT_STREQ("<null>", std::data(buffer));
+    EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), nullptr));
+    EXPECT_STREQ("<null>", buffer.data());
 
-    EXPECT_FALSE(tr_sys_file_read_line(fd, std::data(buffer), std::size(buffer), nullptr));
+    EXPECT_FALSE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), nullptr));
 
     tr_sys_file_close(fd, nullptr);
 
@@ -321,27 +321,27 @@ TEST_P(SubprocessTest, SpawnAsyncCwdExplicit)
     auto args = std::array<char*, 4>{
         //  FIXME(ckerr): remove tr_strdup()s after https://github.com/transmission/transmission/issues/1384
         tr_strdup(self_path_.c_str()),
-        tr_strdup(std::data(result_path)),
-        tr_strdup(std::data(ArgDumpCwd)),
+        tr_strdup(result_path.data()),
+        tr_strdup(ArgDumpCwd.data()),
         nullptr
     };
 
     tr_error* error = nullptr;
-    bool const ret = tr_spawn_async(std::data(args), nullptr, test_dir.c_str(), &error);
+    bool const ret = tr_spawn_async(args.data(), nullptr, test_dir.c_str(), &error);
     EXPECT_TRUE(ret);
     EXPECT_EQ(nullptr, error);
 
     waitForFileToExist(result_path);
 
-    auto const fd = tr_sys_file_open(std::data(result_path), TR_SYS_FILE_READ, 0, nullptr);
+    auto const fd = tr_sys_file_open(result_path.data(), TR_SYS_FILE_READ, 0, nullptr);
     EXPECT_NE(TR_BAD_SYS_FILE, fd);
 
     auto buffer = std::array<char, 1024>{};
-    EXPECT_TRUE(tr_sys_file_read_line(fd, std::data(buffer), std::size(buffer), nullptr));
+    EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), nullptr));
     EXPECT_EQ(makeString(tr_sys_path_native_separators(tr_strdup(test_dir.c_str()))),
-        tr_sys_path_native_separators(std::data(buffer)));
+        tr_sys_path_native_separators(buffer.data()));
 
-    EXPECT_FALSE(tr_sys_file_read_line(fd, std::data(buffer), std::size(buffer), nullptr));
+    EXPECT_FALSE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), nullptr));
 
     tr_sys_file_close(fd, nullptr);
 }
@@ -354,24 +354,24 @@ TEST_P(SubprocessTest, SpawnAsyncCwdInherit)
     auto args = std::array<char*, 4>{
         //  FIXME(ckerr): remove tr_strdup()s after https://github.com/transmission/transmission/issues/1384
         tr_strdup(self_path_.c_str()),
-        tr_strdup(std::data(result_path)),
-        tr_strdup(std::data(ArgDumpCwd)),
+        tr_strdup(result_path.data()),
+        tr_strdup(ArgDumpCwd.data()),
         nullptr
     };
 
     tr_error* error = nullptr;
-    auto const ret = tr_spawn_async(std::data(args), nullptr, nullptr, &error);
+    auto const ret = tr_spawn_async(args.data(), nullptr, nullptr, &error);
     EXPECT_TRUE(ret);
     EXPECT_EQ(nullptr, error);
 
     waitForFileToExist(result_path);
-    auto const fd = tr_sys_file_open(std::data(result_path), TR_SYS_FILE_READ, 0, nullptr);
+    auto const fd = tr_sys_file_open(result_path.data(), TR_SYS_FILE_READ, 0, nullptr);
     EXPECT_NE(TR_BAD_SYS_FILE, fd);
 
     auto buffer = std::array<char, 1024>{};
-    EXPECT_TRUE(tr_sys_file_read_line(fd, std::data(buffer), std::size(buffer), nullptr));
-    EXPECT_EQ(expected_cwd, tr_sys_path_native_separators(std::data(buffer)));
-    EXPECT_FALSE(tr_sys_file_read_line(fd, std::data(buffer), std::size(buffer), nullptr));
+    EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), nullptr));
+    EXPECT_EQ(expected_cwd, tr_sys_path_native_separators(buffer.data()));
+    EXPECT_FALSE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), nullptr));
 
     tr_sys_file_close(fd, nullptr);
 }
@@ -383,13 +383,13 @@ TEST_P(SubprocessTest, SpawnAsyncCwdMissing)
     auto args = std::array<char*, 4>{
         //  FIXME(ckerr): remove tr_strdup()s after https://github.com/transmission/transmission/issues/1384
         tr_strdup(self_path_.c_str()),
-        tr_strdup(std::data(result_path)),
-        tr_strdup(std::data(ArgDumpCwd)),
+        tr_strdup(result_path.data()),
+        tr_strdup(ArgDumpCwd.data()),
         nullptr
     };
 
     tr_error* error = nullptr;
-    auto const ret = tr_spawn_async(std::data(args), nullptr, TR_IF_WIN32("C:\\", "/") "tr-missing-test-work-dir", &error);
+    auto const ret = tr_spawn_async(args.data(), nullptr, TR_IF_WIN32("C:\\", "/") "tr-missing-test-work-dir", &error);
     EXPECT_FALSE(ret);
     EXPECT_NE(nullptr, error);
     EXPECT_NE(0, error->code);

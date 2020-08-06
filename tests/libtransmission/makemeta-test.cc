@@ -37,19 +37,19 @@ protected:
         tr_info inf;
 
         // create a single input file
-        auto input_file = makeString(tr_buildPath(std::data(sandboxDir()), "test.XXXXXX", nullptr));
+        auto input_file = makeString(tr_buildPath(sandboxDir().data(), "test.XXXXXX", nullptr));
         createTmpfileWithContents(input_file, payload, payloadSize);
-        auto* builder = tr_metaInfoBuilderCreate(std::data(input_file));
+        auto* builder = tr_metaInfoBuilderCreate(input_file.data());
         EXPECT_EQ(tr_file_index_t{ 1 }, builder->fileCount);
-        EXPECT_STREQ(std::data(input_file), builder->top);
-        EXPECT_STREQ(std::data(input_file), builder->files[0].filename);
+        EXPECT_STREQ(input_file.data(), builder->top);
+        EXPECT_STREQ(input_file.data(), builder->files[0].filename);
         EXPECT_EQ(payloadSize, builder->files[0].size);
         EXPECT_EQ(payloadSize, builder->totalSize);
         EXPECT_FALSE(builder->isFolder);
         EXPECT_FALSE(builder->abortFlag);
 
         // have tr_makeMetaInfo() build the .torrent file
-        auto* torrent_file = tr_strdup_printf("%s.torrent", std::data(input_file));
+        auto* torrent_file = tr_strdup_printf("%s.torrent", input_file.data());
         tr_makeMetaInfo(builder, torrent_file, trackers, trackerCount, comment, isPrivate);
         EXPECT_EQ(isPrivate, builder->isPrivate);
         EXPECT_STREQ(torrent_file, builder->outputFile);
@@ -70,7 +70,7 @@ protected:
 
         // quick check of some of the parsed metainfo
         EXPECT_EQ(payloadSize, inf.totalSize);
-        EXPECT_EQ(makeString(tr_sys_path_basename(std::data(input_file), nullptr)), inf.name);
+        EXPECT_EQ(makeString(tr_sys_path_basename(input_file.data(), nullptr)), inf.name);
         EXPECT_STREQ(comment, inf.comment);
         EXPECT_EQ(tr_file_index_t{ 1 }, inf.fileCount);
         EXPECT_EQ(isPrivate, inf.isPrivate);
@@ -89,7 +89,7 @@ protected:
         bool const is_private)
     {
         // create the top temp directory
-        auto* top = tr_buildPath(std::data(sandboxDir()), "folder.XXXXXX", nullptr);
+        auto* top = tr_buildPath(sandboxDir().data(), "folder.XXXXXX", nullptr);
         tr_sys_dir_create_temp(top, nullptr);
 
         // build the payload files that go into the top temp directory
@@ -100,8 +100,8 @@ protected:
         for (size_t i = 0; i < payload_count; i++)
         {
             auto tmpl = std::array<char, 16>{};
-            tr_snprintf(std::data(tmpl), std::size(tmpl), "file.%04zu%s", i, "XXXXXX");
-            auto path = makeString(tr_buildPath(top, std::data(tmpl), nullptr));
+            tr_snprintf(tmpl.data(), tmpl.size(), "file.%04zu%s", i, "XXXXXX");
+            auto path = makeString(tr_buildPath(top, tmpl.data(), nullptr));
             createTmpfileWithContents(path, payloads[i], payload_sizes[i]);
             files.push_back(path);
             total_size += payload_sizes[i];
@@ -210,8 +210,8 @@ TEST_F(MakemetaTest, singleFile)
     auto constexpr Payload = std::string_view { "Hello, World!\n" };
     char const* const comment = "This is the comment";
     bool const is_private = false;
-    testSingleFileImpl(std::data(trackers), tracker_count,
-        std::data(Payload), std::size(Payload),
+    testSingleFileImpl(trackers.data(), tracker_count,
+        Payload.data(), Payload.size(),
         comment, is_private);
 }
 
@@ -233,7 +233,7 @@ TEST_F(MakemetaTest, singleDirectoryRandomPayload)
 
     for (size_t i = 0; i < 10; ++i)
     {
-        testSingleDirectoryRandomPayloadImpl(std::data(trackers), tracker_count,
+        testSingleDirectoryRandomPayloadImpl(trackers.data(), tracker_count,
             DefaultMaxFileCount,
             DefaultMaxFileSize,
             comment, is_private);

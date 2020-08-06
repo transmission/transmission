@@ -39,7 +39,7 @@ TEST_F(QuarkTest, allPredefinedKeysCanBeLookedUp)
         auto const str = quarkGetString(i);
 
         tr_quark q;
-        EXPECT_TRUE(tr_quark_lookup(std::data(str), std::size(str), &q));
+        EXPECT_TRUE(tr_quark_lookup(str.data(), str.size(), &q));
         EXPECT_EQ(i, q);
     }
 }

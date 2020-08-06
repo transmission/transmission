@@ -43,8 +43,8 @@ protected:
 
     auto bencParseInt(std::string_view in, uint8_t const** end, int64_t* val)
     {
-        return tr_bencParseInt(std::data(in),
-            std::data(in) + std::size(in),
+        return tr_bencParseInt(in.data(),
+            in.data() + in.size(),
             end, val);
     }
 };
@@ -66,7 +66,7 @@ TEST_F(VariantTest, parseInt)
     auto const err = bencParseInt(In, &end, &val);
     EXPECT_EQ(0, err);
     EXPECT_EQ(ExpectVal, val);
-    EXPECT_EQ(reinterpret_cast<decltype(end)>(std::data(In) + std::size(In)), end);
+    EXPECT_EQ(reinterpret_cast<decltype(end)>(In.data() + In.size()), end);
 }
 
 TEST_F(VariantTest, parseIntWithMissingEnd)
@@ -117,7 +117,7 @@ TEST_F(VariantTest, parseNegativeInt)
     auto const err = bencParseInt(In, &end, &val);
     EXPECT_EQ(0, err);
     EXPECT_EQ(-3, val);
-    EXPECT_EQ(reinterpret_cast<decltype(end)>(std::data(In) + std::size(In)), end);
+    EXPECT_EQ(reinterpret_cast<decltype(end)>(In.data() + In.size()), end);
 }
 
 TEST_F(VariantTest, parseIntZero)
@@ -129,7 +129,7 @@ TEST_F(VariantTest, parseIntZero)
     auto const err = bencParseInt(In, &end, &val);
     EXPECT_EQ(0, err);
     EXPECT_EQ(0, val);
-    EXPECT_EQ(reinterpret_cast<decltype(end)>(std::data(In) + std::size(In)), end);
+    EXPECT_EQ(reinterpret_cast<decltype(end)>(In.data() + In.size()), end);
 }
 
 TEST_F(VariantTest, parseIntWithLeadingZero)
@@ -155,7 +155,7 @@ TEST_F(VariantTest, str)
     size_t len;
 
     // string len is designed to overflow
-    n = tr_snprintf(std::data(buf), std::size(buf), "%zu:boat", size_t(SIZE_MAX - 2));
+    n = tr_snprintf(buf.data(), buf.size(), "%zu:boat", size_t(SIZE_MAX - 2));
     err = tr_bencParseStr(&buf[0], &buf[n], &end, &str, &len);
     EXPECT_EQ(EILSEQ, err);
     EXPECT_EQ(0, len);
@@ -163,12 +163,12 @@ TEST_F(VariantTest, str)
     EXPECT_EQ(nullptr, end);
 
     // good string
-    n = tr_snprintf(std::data(buf), std::size(buf), "4:boat");
+    n = tr_snprintf(buf.data(), buf.size(), "4:boat");
     err = tr_bencParseStr(&buf[0], &buf[n], &end, &str, &len);
     EXPECT_EQ(0, err);
     EXPECT_EQ(4, len);
     EXPECT_EQ(0, memcmp("boat", str, len));
-    EXPECT_EQ(std::data(buf) + n, end);
+    EXPECT_EQ(buf.data() + n, end);
     str = nullptr;
     end = nullptr;
     len = 0;
@@ -181,18 +181,18 @@ TEST_F(VariantTest, str)
     EXPECT_EQ(nullptr, end);
 
     // empty string
-    n = tr_snprintf(std::data(buf), std::size(buf), "0:");
+    n = tr_snprintf(buf.data(), buf.size(), "0:");
     err = tr_bencParseStr(&buf[0], &buf[n], &end, &str, &len);
     EXPECT_EQ(0, err);
     EXPECT_EQ(0, len);
     EXPECT_EQ('\0', *str);
-    EXPECT_EQ(std::data(buf) + n, end);
+    EXPECT_EQ(buf.data() + n, end);
     str = nullptr;
     end = nullptr;
     len = 0;
 
     // short string
-    n = tr_snprintf(std::data(buf), std::size(buf), "3:boat");
+    n = tr_snprintf(buf.data(), buf.size(), "3:boat");
     err = tr_bencParseStr(&buf[0], &buf[n], &end, &str, &len);
     EXPECT_EQ(0, err);
     EXPECT_EQ(3, len);
@@ -210,16 +210,16 @@ TEST_F(VariantTest, parse)
 
     tr_variant val;
     char const* end;
-    auto n = tr_snprintf(std::data(buf), std::size(buf), "i64e");
-    auto err = tr_variantFromBencFull(&val, std::data(buf), n, nullptr, &end);
+    auto n = tr_snprintf(buf.data(), buf.size(), "i64e");
+    auto err = tr_variantFromBencFull(&val, buf.data(), n, nullptr, &end);
     EXPECT_EQ(0, err);
     EXPECT_TRUE(tr_variantGetInt(&val, &i));
     EXPECT_EQ(64, i);
-    EXPECT_EQ(reinterpret_cast<char const*>(std::data(buf)) + n, end);
+    EXPECT_EQ(reinterpret_cast<char const*>(buf.data()) + n, end);
     tr_variantFree(&val);
 
-    n = tr_snprintf(std::data(buf), std::size(buf), "li64ei32ei16ee");
-    err = tr_variantFromBencFull(&val, std::data(buf), n, nullptr, &end);
+    n = tr_snprintf(buf.data(), buf.size(), "li64ei32ei16ee");
+    err = tr_variantFromBencFull(&val, buf.data(), n, nullptr, &end);
     EXPECT_EQ(0, err);
     EXPECT_EQ(reinterpret_cast<char const*>(&buf[n]), end);
     EXPECT_EQ(3, tr_variantListSize(&val));
@@ -233,20 +233,20 @@ TEST_F(VariantTest, parse)
     size_t len;
     auto* saved = tr_variantToStr(&val, TR_VARIANT_FMT_BENC, &len);
     EXPECT_EQ(n, len);
-    EXPECT_STREQ(reinterpret_cast<char const*>(std::data(buf)), saved);
+    EXPECT_STREQ(reinterpret_cast<char const*>(buf.data()), saved);
     tr_free(saved);
 
     tr_variantFree(&val);
     end = nullptr;
 
-    n = tr_snprintf(std::data(buf), std::size(buf), "lllee");
-    err = tr_variantFromBencFull(&val, std::data(buf), n, nullptr, &end);
+    n = tr_snprintf(buf.data(), buf.size(), "lllee");
+    err = tr_variantFromBencFull(&val, buf.data(), n, nullptr, &end);
     EXPECT_NE(0, err);
     EXPECT_EQ(nullptr, end);
 
     end = nullptr;
-    n = tr_snprintf(std::data(buf), std::size(buf), "le");
-    err = tr_variantFromBencFull(&val, std::data(buf), n, nullptr, &end);
+    n = tr_snprintf(buf.data(), buf.size(), "le");
+    err = tr_variantFromBencFull(&val, buf.data(), n, nullptr, &end);
     EXPECT_EQ(0, err);
     EXPECT_EQ(reinterpret_cast<char const*>(&buf[n]), end);
 
@@ -280,7 +280,7 @@ TEST_F(VariantTest, bencParseAndReencode) {
     {
         tr_variant val;
         char const* end = nullptr;
-        auto const err = tr_variantFromBencFull(&val, std::data(test.benc), std::size(test.benc), nullptr, &end);
+        auto const err = tr_variantFromBencFull(&val, test.benc.data(), test.benc.size(), nullptr, &end);
         if (!test.is_good)
         {
             EXPECT_NE(0, err);
@@ -305,9 +305,9 @@ TEST_F(VariantTest, bencSortWhenSerializing)
 
     tr_variant val;
     char const* end;
-    auto const err = tr_variantFromBencFull(&val, std::data(In), std::size(In), nullptr, &end);
+    auto const err = tr_variantFromBencFull(&val, In.data(), In.size(), nullptr, &end);
     EXPECT_EQ(0, err);
-    EXPECT_EQ(reinterpret_cast<decltype(end)>(std::data(In) + std::size(In)), end);
+    EXPECT_EQ(reinterpret_cast<decltype(end)>(In.data() + In.size()), end);
 
     auto len = size_t{};
     auto* saved = tr_variantToStr(&val, TR_VARIANT_FMT_BENC, &len);
@@ -324,9 +324,9 @@ TEST_F(VariantTest, bencMalformedTooManyEndings)
 
     tr_variant val;
     char const* end;
-    auto const err = tr_variantFromBencFull(&val, std::data(In), std::size(In), nullptr, &end);
+    auto const err = tr_variantFromBencFull(&val, In.data(), In.size(), nullptr, &end);
     EXPECT_EQ(0, err);
-    EXPECT_EQ(std::begin(In) + std::size(ExpectedOut), end);
+    EXPECT_EQ(std::begin(In) + ExpectedOut.size(), end);
 
     auto len = size_t{};
     auto* saved = tr_variantToStr(&val, TR_VARIANT_FMT_BENC, &len);
@@ -340,14 +340,14 @@ TEST_F(VariantTest, bencMalformedNoEnding)
 {
     auto constexpr In = std::string_view { "l1:a1:b1:c" };
     tr_variant val;
-    EXPECT_EQ(EILSEQ, tr_variantFromBenc(&val, std::data(In), std::size(In)));
+    EXPECT_EQ(EILSEQ, tr_variantFromBenc(&val, In.data(), In.size()));
 }
 
 TEST_F(VariantTest, bencMalformedIncompleteString)
 {
     auto constexpr In = std::string_view { "1:" };
     tr_variant val;
-    EXPECT_EQ(EILSEQ, tr_variantFromBenc(&val, std::data(In), std::size(In)));
+    EXPECT_EQ(EILSEQ, tr_variantFromBenc(&val, In.data(), In.size()));
 }
 
 TEST_F(VariantTest, bencToJson)
@@ -369,7 +369,7 @@ TEST_F(VariantTest, bencToJson)
     for (auto const& test : Tests)
     {
         tr_variant top;
-        tr_variantFromBenc(&top, std::data(test.benc), std::size(test.benc));
+        tr_variantFromBenc(&top, test.benc.data(), test.benc.size());
 
         auto len = size_t{};
         auto* str = tr_variantToStr(&top, TR_VARIANT_FMT_JSON_LEAN, &len);
@@ -449,9 +449,9 @@ TEST_F(VariantTest, stackSmash)
     // confirm that it parses
     char const* end;
     tr_variant val;
-    auto err = tr_variantFromBencFull(&val, std::data(in), std::size(in), nullptr, &end);
+    auto err = tr_variantFromBencFull(&val, in.data(), in.size(), nullptr, &end);
     EXPECT_EQ(0, err);
-    EXPECT_EQ(std::data(in) + std::size(in), end);
+    EXPECT_EQ(in.data() + in.size(), end);
 
     // confirm that we can serialize it back again
     size_t len;
@@ -519,7 +519,7 @@ TEST_F(VariantTest, dictFindType)
     tr_variantDictAddBool(&top, key_bool, ExpectedBool);
     tr_variantDictAddInt(&top, key_int, ExpectedInt);
     tr_variantDictAddReal(&top, key_real, ExpectedReal);
-    tr_variantDictAddStr(&top, key_str, std::data(ExpectedStr));
+    tr_variantDictAddStr(&top, key_str, ExpectedStr.data());
 
     // look up the keys as strings
     char const* str = {};

@@ -66,7 +66,7 @@ TEST(Client, clientForId)
     for (auto const& test : Tests)
     {
         auto buf = std::array<char, 128>{};
-        tr_clientForId(std::data(buf), std::size(buf), test.peer_id);
-        EXPECT_STREQ(test.expected_client, std::data(buf));
+        tr_clientForId(buf.data(), buf.size(), test.peer_id);
+        EXPECT_STREQ(test.expected_client, buf.data());
     }
 }

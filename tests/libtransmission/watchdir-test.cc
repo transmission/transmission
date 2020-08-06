@@ -81,7 +81,7 @@ protected:
     {
         auto path = std::string(parent_dir);
         path += TR_PATH_DELIMITER;
-        path.append(std::data(name), std::size(name));
+        path.append(name.data(), name.size());
 
         createFileWithContents(path, "");
 
@@ -92,7 +92,7 @@ protected:
     {
         auto path = std::string(parent_dir);
         path += TR_PATH_DELIMITER;
-        path.append(std::data(name), std::size(name));
+        path.append(name.data(), name.size());
 
         tr_sys_dir_create(path.c_str(), 0, 0700, nullptr);
 

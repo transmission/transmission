@@ -36,7 +36,7 @@ protected:
 
         int c;
         char const* optarg;
-        while ((c = tr_getopt("summary", argc, argv, std::data(Options), &optarg)) != TR_OPT_DONE)
+        while ((c = tr_getopt("summary", argc, argv, Options.data(), &optarg)) != TR_OPT_DONE)
         {
             EXPECT_LT(n, expected_n);
             EXPECT_EQ(expected_c[n], c);
@@ -54,7 +54,7 @@ TEST_F(GetoptTest, noOptions)
     auto constexpr ExpectedN = 0;
     auto constexpr ExpectedC = std::array<int, ExpectedN>{};
     auto constexpr ExpectedOptArg = std::array<char const*, ExpectedN>{};
-    runTest(std::size(Args), std::data(Args), ExpectedN, std::data(ExpectedC), std::data(ExpectedOptArg));
+    runTest(Args.size(), Args.data(), ExpectedN, ExpectedC.data(), ExpectedOptArg.data());
 }
 
 TEST_F(GetoptTest, shortNoarg)
@@ -63,7 +63,7 @@ TEST_F(GetoptTest, shortNoarg)
     auto constexpr ExpectedN = 1;
     auto constexpr ExpectedC = std::array<int, ExpectedN>{ 'p' };
     auto constexpr ExpectedOptArg = std::array<char const*, ExpectedN>{ nullptr };
-    runTest(std::size(Args), std::data(Args), ExpectedN, std::data(ExpectedC), std::data(ExpectedOptArg));
+    runTest(Args.size(), Args.data(), ExpectedN, ExpectedC.data(), ExpectedOptArg.data());
 }
 
 TEST_F(GetoptTest, longNoarg)
@@ -72,7 +72,7 @@ TEST_F(GetoptTest, longNoarg)
     auto constexpr ExpectedN = 1;
     auto constexpr ExpectedC = std::array<int, ExpectedN>{ 'p' };
     auto constexpr ExpectedOptArg = std::array<char const*, ExpectedN>{ nullptr };
-    runTest(std::size(Args), std::data(Args), ExpectedN, std::data(ExpectedC), std::data(ExpectedOptArg));
+    runTest(Args.size(), Args.data(), ExpectedN, ExpectedC.data(), ExpectedOptArg.data());
 }
 
 TEST_F(GetoptTest, shortWithArg)
@@ -81,7 +81,7 @@ TEST_F(GetoptTest, shortWithArg)
     auto constexpr ExpectedN = 1;
     auto constexpr ExpectedC = std::array<int, ExpectedN>{ 'o' };
     auto constexpr ExpectedOptArg = std::array<char const*, ExpectedN>{ "/tmp/outfile" };
-    runTest(std::size(Args), std::data(Args), ExpectedN, std::data(ExpectedC), std::data(ExpectedOptArg));
+    runTest(Args.size(), Args.data(), ExpectedN, ExpectedC.data(), ExpectedOptArg.data());
 }
 
 TEST_F(GetoptTest, longWithArg)
@@ -90,7 +90,7 @@ TEST_F(GetoptTest, longWithArg)
     auto constexpr ExpectedN = 1;
     auto constexpr ExpectedC = std::array<int, ExpectedN>{ 'o' };
     auto constexpr ExpectedOptArg = std::array<char const*, ExpectedN>{ "/tmp/outfile" };
-    runTest(std::size(Args), std::data(Args), ExpectedN, std::data(ExpectedC), std::data(ExpectedOptArg));
+    runTest(Args.size(), Args.data(), ExpectedN, ExpectedC.data(), ExpectedOptArg.data());
 }
 
 TEST_F(GetoptTest, shortWithArgAfterEq)
@@ -99,7 +99,7 @@ TEST_F(GetoptTest, shortWithArgAfterEq)
     auto constexpr ExpectedN = 1;
     auto constexpr ExpectedC = std::array<int, ExpectedN>{ 'o' };
     auto constexpr ExpectedOptArg = std::array<char const*, ExpectedN>{ "/tmp/outfile" };
-    runTest(std::size(Args), std::data(Args), ExpectedN, std::data(ExpectedC), std::data(ExpectedOptArg));
+    runTest(Args.size(), Args.data(), ExpectedN, ExpectedC.data(), ExpectedOptArg.data());
 }
 
 TEST_F(GetoptTest, longWithArgAfterEq)
@@ -108,7 +108,7 @@ TEST_F(GetoptTest, longWithArgAfterEq)
     auto constexpr ExpectedN = 1;
     auto constexpr ExpectedC = std::array<int, ExpectedN>{ 'o' };
     auto constexpr ExpectedOptArg = std::array<char const*, ExpectedN>{ "/tmp/outfile" };
-    runTest(std::size(Args), std::data(Args), ExpectedN, std::data(ExpectedC), std::data(ExpectedOptArg));
+    runTest(Args.size(), Args.data(), ExpectedN, ExpectedC.data(), ExpectedOptArg.data());
 }
 
 TEST_F(GetoptTest, unknownOption)
@@ -117,7 +117,7 @@ TEST_F(GetoptTest, unknownOption)
     auto constexpr ExpectedN = 1;
     auto constexpr ExpectedC = std::array<int, ExpectedN>{ TR_OPT_UNK };
     auto constexpr ExpectedOptArg = std::array<char const*, ExpectedN>{ "-z" };
-    runTest(std::size(Args), std::data(Args), ExpectedN, std::data(ExpectedC), std::data(ExpectedOptArg));
+    runTest(Args.size(), Args.data(), ExpectedN, ExpectedC.data(), ExpectedOptArg.data());
 }
 
 TEST_F(GetoptTest, missingArg)
@@ -126,7 +126,7 @@ TEST_F(GetoptTest, missingArg)
     auto constexpr ExpectedN = 1;
     auto constexpr ExpectedC = std::array<int, ExpectedN>{ TR_OPT_ERR };
     auto constexpr ExpectedOptArg = std::array<char const*, ExpectedN>{ nullptr };
-    runTest(std::size(Args), std::data(Args), ExpectedN, std::data(ExpectedC), std::data(ExpectedOptArg));
+    runTest(Args.size(), Args.data(), ExpectedN, ExpectedC.data(), ExpectedOptArg.data());
 }
 
 TEST_F(GetoptTest, lotsOfOptions)
@@ -136,7 +136,7 @@ TEST_F(GetoptTest, lotsOfOptions)
     auto constexpr ExpectedN = 4;
     auto constexpr ExpectedC = std::array<int, ExpectedN>{ 's', 'c', 'p', 't' };
     auto constexpr ExpectedOptArg = std::array<char const*, ExpectedN>{ "4", "hello world", nullptr, "foo" };
-    runTest(std::size(Args), std::data(Args), ExpectedN, std::data(ExpectedC), std::data(ExpectedOptArg));
+    runTest(Args.size(), Args.data(), ExpectedN, ExpectedC.data(), ExpectedOptArg.data());
 }
 
 TEST_F(GetoptTest, matchLongerKey)
@@ -146,5 +146,5 @@ TEST_F(GetoptTest, matchLongerKey)
     auto constexpr ExpectedN = 1;
     auto constexpr ExpectedC = std::array<int, ExpectedN>{ 'q' };
     auto constexpr ExpectedOptArg = std::array<char const*, ExpectedN>{ nullptr };
-    runTest(std::size(Args), std::data(Args), ExpectedN, std::data(ExpectedC), std::data(ExpectedOptArg));
+    runTest(Args.size(), Args.data(), ExpectedN, ExpectedC.data(), ExpectedOptArg.data());
 }
