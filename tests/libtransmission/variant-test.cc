@@ -197,7 +197,7 @@ TEST_F(VariantTest, str)
     EXPECT_EQ(0, err);
     EXPECT_EQ(3, len);
     EXPECT_EQ(0, memcmp("boa", str, len));
-    EXPECT_EQ(std::begin(buf) + 5, end);
+    EXPECT_EQ(buf.data() + 5, end);
     str = nullptr;
     end = nullptr;
     len = 0;
@@ -288,7 +288,7 @@ TEST_F(VariantTest, bencParseAndReencode) {
         else
         {
             EXPECT_EQ(0, err);
-            EXPECT_EQ(std::end(test.benc), end);
+            EXPECT_EQ(test.benc.data() + test.benc.size(), end);
             auto saved_len = size_t{};
             auto* saved = tr_variantToStr(&val, TR_VARIANT_FMT_BENC, &saved_len);
             EXPECT_EQ(test.benc, std::string_view(saved, saved_len));
@@ -326,7 +326,7 @@ TEST_F(VariantTest, bencMalformedTooManyEndings)
     char const* end;
     auto const err = tr_variantFromBencFull(&val, In.data(), In.size(), nullptr, &end);
     EXPECT_EQ(0, err);
-    EXPECT_EQ(std::begin(In) + ExpectedOut.size(), end);
+    EXPECT_EQ(In.data() + ExpectedOut.size(), end);
 
     auto len = size_t{};
     auto* saved = tr_variantToStr(&val, TR_VARIANT_FMT_BENC, &len);
