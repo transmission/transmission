@@ -105,12 +105,10 @@ protected:
 
     static std::string create_sandbox(std::string const& parent_dir, std::string const& tmpl)
     {
-        auto* path = tr_buildPath(parent_dir.data(), tmpl.data(), nullptr);
-        tr_sys_dir_create_temp(path, nullptr);
-        tr_sys_path_native_separators(path);
-        auto const ret = std::string { path };
-        tr_free(path);
-        return ret;
+        auto path = makeString(tr_buildPath(parent_dir.data(), tmpl.data(), nullptr));
+        tr_sys_dir_create_temp(path.data(), nullptr);
+        tr_sys_path_native_separators(path.data());
+        return path;
     }
 
     static auto get_folder_files(std::string const& path)
