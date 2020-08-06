@@ -28,8 +28,6 @@ protected:
         auto s = in;
         s.erase(s.begin(), std::find_if_not(s.begin(), s.end(), ::isspace));
         s.erase(std::find_if_not(s.rbegin(), s.rend(), ::isspace).base(), s.end());
-        std::cerr << "in [" << in << ']' << std::endl;
-        std::cerr << " s [" << s << ']' << std::endl;
         return s;
     }
 
@@ -42,9 +40,9 @@ protected:
 };
 
 #ifndef _WIN32
-#define STACK_SMASH_DEPTH (1 * 1000 * 1000)
+# define STACK_SMASH_DEPTH (1 * 1000 * 1000)
 #else
-#define STACK_SMASH_DEPTH (100 * 1000)
+# define STACK_SMASH_DEPTH (100 * 1000)
 #endif
 
 TEST_F(VariantTest, parseInt)
