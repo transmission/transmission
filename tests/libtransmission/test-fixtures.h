@@ -102,7 +102,7 @@ protected:
 
     static std::string create_sandbox(std::string const& parent_dir, std::string const& tmpl)
     {
-        auto path = makeString(tr_buildPath(parent_dir.data(), tmpl.data(), nullptr));
+        std::string path = makeString(tr_buildPath(parent_dir.data(), tmpl.data(), nullptr));
         tr_sys_dir_create_temp(path.data(), nullptr);
         tr_sys_path_native_separators(path.data());
         return path;
