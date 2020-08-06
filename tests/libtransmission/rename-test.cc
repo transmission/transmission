@@ -45,22 +45,22 @@ protected:
     void createSingleFileTorrentContents(char const* top)
     {
         auto const path = makeString(tr_buildPath(top, "hello-world.txt", nullptr));
-        createFileWithContents(path.c_str(), "hello, world!\n");
+        createFileWithContents(path, "hello, world!\n");
     }
 
     void createMultifileTorrentContents(char const* top)
     {
         auto path = makeString(tr_buildPath(top, "Felidae", "Felinae", "Acinonyx", "Cheetah", "Chester", nullptr));
-        createFileWithContents(path.c_str(), "It ain't easy bein' cheesy.\n");
+        createFileWithContents(path, "It ain't easy bein' cheesy.\n");
 
         path = makeString(tr_buildPath(top, "Felidae", "Pantherinae", "Panthera", "Tiger", "Tony", nullptr));
-        createFileWithContents(path.c_str(), "They’re Grrrrreat!\n");
+        createFileWithContents(path, "They’re Grrrrreat!\n");
 
         path = makeString(tr_buildPath(top, "Felidae", "Felinae", "Felis", "catus", "Kyphi", nullptr));
-        createFileWithContents(path.c_str(), "Inquisitive\n");
+        createFileWithContents(path, "Inquisitive\n");
 
         path = makeString(tr_buildPath(top, "Felidae", "Felinae", "Felis", "catus", "Saffron", nullptr));
-        createFileWithContents(path.c_str(), "Tough\n");
+        createFileWithContents(path, "Tough\n");
 
         sync();
     }
@@ -141,7 +141,7 @@ TEST_F(RenameTest, singleFilenameTorrent)
     uint64_t loaded;
     static auto constexpr TotalSize = size_t{ 14 };
 
-    /* this is a single-file torrent whose file is hello-world.txt, holding the string "hello, world!" */
+    // this is a single-file torrent whose file is hello-world.txt, holding the string "hello, world!"
     auto* ctor = tr_ctorNew(session_);
     auto* tor = createTorrentFromBase64Metainfo(ctor,
         "ZDEwOmNyZWF0ZWQgYnkyNTpUcmFuc21pc3Npb24vMi42MSAoMTM0MDcpMTM6Y3JlYXRpb24gZGF0"
@@ -177,7 +177,7 @@ TEST_F(RenameTest, singleFilenameTorrent)
     ***  renaming a single-file torrent
     **/
 
-    /* confirm that bad inputs get caught */
+    // confirm that bad inputs get caught
 
     EXPECT_EQ(EINVAL, torrentRenameAndWait(tor, "hello-world.txt", nullptr));
     EXPECT_EQ(EINVAL, torrentRenameAndWait(tor, "hello-world.txt", ""));
@@ -197,16 +197,16 @@ TEST_F(RenameTest, singleFilenameTorrent)
     EXPECT_TRUE(tr_sys_path_exists(tmpstr.c_str(), nullptr));
     EXPECT_STREQ("hello-world.txt", tr_torrentName(tor));
     EXPECT_EQ(0, torrentRenameAndWait(tor, tor->info.name, "foobar"));
-    EXPECT_FALSE(tr_sys_path_exists(tmpstr.c_str(), nullptr)); /* confirm the old filename can't be found */
-    EXPECT_TRUE(tor->info.files[0].is_renamed); /* confirm the file's 'renamed' flag is set */
-    EXPECT_STREQ("foobar", tr_torrentName(tor)); /* confirm the torrent's name is now 'foobar' */
-    EXPECT_STREQ("foobar", tor->info.files[0].name); /* confirm the file's name is now 'foobar' in our struct */
-    EXPECT_STREQ(nullptr, strstr(tor->info.torrent, "foobar")); /* confirm the name in the .torrent file hasn't changed */
+    EXPECT_FALSE(tr_sys_path_exists(tmpstr.c_str(), nullptr)); // confirm the old filename can't be found
+    EXPECT_TRUE(tor->info.files[0].is_renamed); // confirm the file's 'renamed' flag is set
+    EXPECT_STREQ("foobar", tr_torrentName(tor)); // confirm the torrent's name is now 'foobar'
+    EXPECT_STREQ("foobar", tor->info.files[0].name); // confirm the file's name is now 'foobar' in our struct
+    EXPECT_STREQ(nullptr, strstr(tor->info.torrent, "foobar")); // confirm the name in the .torrent file hasn't changed
     tmpstr = makeString(tr_buildPath(tor->currentDir, "foobar", nullptr));
-    EXPECT_TRUE(tr_sys_path_exists(tmpstr.c_str(), nullptr)); /* confirm the file's name is now 'foobar' on the disk */
-    EXPECT_TRUE(testFileExistsAndConsistsOfThisString(tor, 0, "hello, world!\n")); /* confirm the contents are right */
+    EXPECT_TRUE(tr_sys_path_exists(tmpstr.c_str(), nullptr)); // confirm the file's name is now 'foobar' on the disk
+    EXPECT_TRUE(testFileExistsAndConsistsOfThisString(tor, 0, "hello, world!\n")); // confirm the contents are right
 
-    /* (while it's renamed: confirm that the .resume file remembers the changes) */
+    // (while it's renamed: confirm that the .resume file remembers the changes)
     tr_torrentSaveResume(tor);
     sync();
     loaded = tr_torrentLoadResume(tor, ~0, ctor, nullptr);
@@ -226,7 +226,7 @@ TEST_F(RenameTest, singleFilenameTorrent)
     EXPECT_STREQ("hello-world.txt", tr_torrentName(tor));
     EXPECT_TRUE(testFileExistsAndConsistsOfThisString(tor, 0, "hello, world!\n"));
 
-    /* cleanup */
+    // cleanup
     tr_ctorFree(ctor);
     torrentRemoveAndWait(tor, 0);
 }
@@ -241,14 +241,14 @@ TEST_F(RenameTest, multifileTorrent)
 {
     char* str;
     auto constexpr TotalSize = size_t{ 67 };
-    auto const ExpectedFiles = std::array<std::string, 4>
+    auto const expected_files = std::array<std::string, 4>
     {
         "Felidae/Felinae/Acinonyx/Cheetah/Chester",
         "Felidae/Felinae/Felis/catus/Kyphi",
         "Felidae/Felinae/Felis/catus/Saffron",
         "Felidae/Pantherinae/Panthera/Tiger/Tony"
     };
-    auto const ExpectedContents = std::array<std::string, 4>
+    auto const expected_contents = std::array<std::string, 4>
     {
         "It ain't easy bein' cheesy.\n",
         "Inquisitive\n",
@@ -276,7 +276,7 @@ TEST_F(RenameTest, multifileTorrent)
 
     for (tr_file_index_t i = 0; i < 4; ++i)
     {
-        EXPECT_EQ(ExpectedFiles[i], files[i].name);
+        EXPECT_EQ(expected_files[i], files[i].name);
     }
 
     // sanity check the (empty) stats
@@ -301,48 +301,48 @@ TEST_F(RenameTest, multifileTorrent)
     ***  okay! let's test renaming.
     **/
 
-    /* rename a leaf... */
+    // rename a leaf...
     EXPECT_EQ(0, torrentRenameAndWait(tor, "Felidae/Felinae/Felis/catus/Kyphi", "placeholder"));
     EXPECT_STREQ("Felidae/Felinae/Felis/catus/placeholder", files[1].name);
     EXPECT_TRUE(testFileExistsAndConsistsOfThisString(tor, 1, "Inquisitive\n"));
 
-    /* ...and back again */
+    // ...and back again
     EXPECT_EQ(0, torrentRenameAndWait(tor, "Felidae/Felinae/Felis/catus/placeholder", "Kyphi"));
     EXPECT_STREQ("Felidae/Felinae/Felis/catus/Kyphi", files[1].name);
     testFileExistsAndConsistsOfThisString(tor, 1, "Inquisitive\n");
 
-    /* rename a branch... */
+    // rename a branch...
     EXPECT_EQ(0, torrentRenameAndWait(tor, "Felidae/Felinae/Felis/catus", "placeholder"));
-    EXPECT_EQ(ExpectedFiles[0], files[0].name);
+    EXPECT_EQ(expected_files[0], files[0].name);
     EXPECT_STREQ("Felidae/Felinae/Felis/placeholder/Kyphi", files[1].name);
     EXPECT_STREQ("Felidae/Felinae/Felis/placeholder/Saffron", files[2].name);
-    EXPECT_EQ(ExpectedFiles[3], files[3].name);
-    EXPECT_TRUE(testFileExistsAndConsistsOfThisString(tor, 1, ExpectedContents[1]));
-    EXPECT_TRUE(testFileExistsAndConsistsOfThisString(tor, 2, ExpectedContents[2]));
+    EXPECT_EQ(expected_files[3], files[3].name);
+    EXPECT_TRUE(testFileExistsAndConsistsOfThisString(tor, 1, expected_contents[1]));
+    EXPECT_TRUE(testFileExistsAndConsistsOfThisString(tor, 2, expected_contents[2]));
     EXPECT_FALSE(files[0].is_renamed);
     EXPECT_TRUE(files[1].is_renamed);
     EXPECT_TRUE(files[2].is_renamed);
     EXPECT_FALSE(files[3].is_renamed);
 
-    /* (while the branch is renamed: confirm that the .resume file remembers the changes) */
+    // (while the branch is renamed: confirm that the .resume file remembers the changes)
     tr_torrentSaveResume(tor);
-    /* this is a bit dodgy code-wise, but let's make sure the .resume file got the name */
+    // this is a bit dodgy code-wise, but let's make sure the .resume file got the name
     tr_free(files[1].name);
     tor->info.files[1].name = tr_strdup("gabba gabba hey");
     auto const loaded = tr_torrentLoadResume(tor, ~0, ctor, nullptr);
     EXPECT_NE(0, (loaded & TR_FR_FILENAMES));
-    EXPECT_EQ(ExpectedFiles[0], files[0].name);
+    EXPECT_EQ(expected_files[0], files[0].name);
     EXPECT_STREQ("Felidae/Felinae/Felis/placeholder/Kyphi", files[1].name);
     EXPECT_STREQ("Felidae/Felinae/Felis/placeholder/Saffron", files[2].name);
-    EXPECT_EQ(ExpectedFiles[3], files[3].name);
+    EXPECT_EQ(expected_files[3], files[3].name);
 
-    /* ...and back again */
+    // ...and back again
     EXPECT_EQ(0, torrentRenameAndWait(tor, "Felidae/Felinae/Felis/placeholder", "catus"));
 
     for (tr_file_index_t i = 0; i < 4; ++i)
     {
-        EXPECT_EQ(ExpectedFiles[i], files[i].name);
-        EXPECT_TRUE(testFileExistsAndConsistsOfThisString(tor, i, ExpectedContents[i]));
+        EXPECT_EQ(expected_files[i], files[i].name);
+        EXPECT_TRUE(testFileExistsAndConsistsOfThisString(tor, i, expected_contents[i]));
     }
 
     EXPECT_FALSE(files[0].is_renamed);
@@ -368,7 +368,7 @@ TEST_F(RenameTest, multifileTorrent)
     tr_free(str);
     sync();
     blockingTorrentVerify(tor);
-    testFileExistsAndConsistsOfThisString(tor, 0, ExpectedContents[0]);
+    testFileExistsAndConsistsOfThisString(tor, 0, expected_contents[0]);
 
     for (tr_file_index_t i = 1; i <= 2; ++i)
     {
@@ -377,21 +377,21 @@ TEST_F(RenameTest, multifileTorrent)
         tr_free(str);
     }
 
-    testFileExistsAndConsistsOfThisString(tor, 3, ExpectedContents[3]);
+    testFileExistsAndConsistsOfThisString(tor, 3, expected_contents[3]);
 
-    /* rename a branch... */
+    // rename a branch...
     EXPECT_EQ(0, torrentRenameAndWait(tor, "Felidae/Felinae/Felis/catus", "foo"));
-    EXPECT_EQ(ExpectedFiles[0], files[0].name);
+    EXPECT_EQ(expected_files[0], files[0].name);
     EXPECT_STREQ("Felidae/Felinae/Felis/foo/Kyphi", files[1].name);
     EXPECT_STREQ("Felidae/Felinae/Felis/foo/Saffron", files[2].name);
-    EXPECT_EQ(ExpectedFiles[3], files[3].name);
+    EXPECT_EQ(expected_files[3], files[3].name);
 
-    /* ...and back again */
+    // ...and back again
     EXPECT_EQ(0, torrentRenameAndWait(tor, "Felidae/Felinae/Felis/foo", "catus"));
 
     for (tr_file_index_t i = 0; i < 4; ++i)
     {
-        EXPECT_EQ(ExpectedFiles[i], files[i].name);
+        EXPECT_EQ(expected_files[i], files[i].name);
     }
 
     EXPECT_EQ(0, torrentRenameAndWait(tor, "Felidae", "gabba"));
@@ -404,10 +404,10 @@ TEST_F(RenameTest, multifileTorrent)
     for (tr_file_index_t i = 0; i < 4; ++i)
     {
         EXPECT_STREQ(strings[i], files[i].name);
-        testFileExistsAndConsistsOfThisString(tor, i, ExpectedContents[i]);
+        testFileExistsAndConsistsOfThisString(tor, i, expected_contents[i]);
     }
 
-    /* rename the root, then a branch, and then a leaf... */
+    // rename the root, then a branch, and then a leaf...
     EXPECT_EQ(0, torrentRenameAndWait(tor, "gabba", "Felidae"));
     EXPECT_EQ(0, torrentRenameAndWait(tor, "Felidae/Pantherinae/Panthera/Tiger", "Snow Leopard"));
     EXPECT_EQ(0, torrentRenameAndWait(tor, "Felidae/Pantherinae/Panthera/Snow Leopard/Tony", "10.6"));
@@ -419,7 +419,7 @@ TEST_F(RenameTest, multifileTorrent)
     for (tr_file_index_t i = 0; i < 4; ++i)
     {
         EXPECT_STREQ(strings[i], files[i].name);
-        testFileExistsAndConsistsOfThisString(tor, i, ExpectedContents[i]);
+        testFileExistsAndConsistsOfThisString(tor, i, expected_contents[i]);
     }
 
     tr_ctorFree(ctor);
@@ -442,7 +442,7 @@ TEST_F(RenameTest, multifileTorrent)
     EXPECT_TRUE(tr_isTorrent(tor));
     files = tor->info.files;
 
-    /* rename prefix of top */
+    // rename prefix of top
     EXPECT_EQ(EINVAL, torrentRenameAndWait(tor, "Feli", "FelidaeX"));
     EXPECT_STREQ("Felidae", tor->info.name);
     EXPECT_FALSE(files[0].is_renamed);
@@ -450,7 +450,7 @@ TEST_F(RenameTest, multifileTorrent)
     EXPECT_FALSE(files[2].is_renamed);
     EXPECT_FALSE(files[3].is_renamed);
 
-    /* rename false path */
+    // rename false path
     EXPECT_EQ(EINVAL, torrentRenameAndWait(tor, "Felidae/FelinaeX", "Genus Felinae"));
     EXPECT_STREQ("Felidae", tor->info.name);
     EXPECT_FALSE(files[0].is_renamed);
@@ -462,7 +462,7 @@ TEST_F(RenameTest, multifileTorrent)
     ****
     ***/
 
-    /* cleanup */
+    // cleanup
     tr_ctorFree(ctor);
     torrentRemoveAndWait(tor, 0);
 }

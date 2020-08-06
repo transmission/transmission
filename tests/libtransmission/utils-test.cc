@@ -68,20 +68,20 @@ TEST_F(UtilsTest, trStrstrip)
 
 TEST_F(UtilsTest, trStrjoin)
 {
-    char const* in1[] = { "one", "two" };
-    auto out = makeString(tr_strjoin(in1, 2, ", "));
+    auto const in1 = std::array<char const*, 2> { "one", "two" };
+    auto out = makeString(tr_strjoin(in1.data(), in1.size(), ", "));
     EXPECT_EQ("one, two", out);
 
-    char const* in2[] = { "hello" };
-    out = makeString(tr_strjoin(in2, 1, "###"));
+    auto const in2 = std::array<char const*, 1> { "hello" };
+    out = makeString(tr_strjoin(in2.data(), in2.size(), "###"));
     EXPECT_EQ("hello", out);
 
-    char const* in3[] = { "a", "b", "ccc", "d", "eeeee" };
-    out = makeString(tr_strjoin(in3, 5, " "));
+    auto const in3 = std::array<char const*, 5> { "a", "b", "ccc", "d", "eeeee" };
+    out = makeString(tr_strjoin(in3.data(), in3.size(), " "));
     EXPECT_EQ("a b ccc d eeeee", out);
 
-    char const* in4[] = { "7", "ate", "9" };
-    out = makeString(tr_strjoin(in4, 3, ""));
+    auto const in4 = std::array<char const*, 3> { "7", "ate", "9" };
+    out = makeString(tr_strjoin(in4.data(), in4.size(), ""));
     EXPECT_EQ("7ate9", out);
 
     char const** in5 = nullptr;
@@ -185,8 +185,8 @@ int compareInts(void const* va, void const* vb)
 TEST_F(UtilsTest, lowerbound)
 {
     auto constexpr A = std::array<int, 7>{ 1, 2, 3, 3, 3, 5, 8 };
-    int const expected_pos[] = { 0, 1, 2, 5, 5, 6, 6, 6, 7, 7 };
-    bool const expected_exact[] = { true, true, true, false, true, false, false, true, false, false };
+    auto const expected_pos = std::array<int, 10> { 0, 1, 2, 5, 5, 6, 6, 6, 7, 7 };
+    auto const expected_exact = std::array<bool, 10> { true, true, true, false, true, false, false, true, false, false };
 
     for (int i = 1; i <= 10; i++)
     {
@@ -224,32 +224,32 @@ TEST_F(UtilsTest, trQuickfindfirstk)
 
 TEST_F(UtilsTest, trMemmem)
 {
-    auto const Haystack = std::string { "abcabcabcabc" };
-    auto const Needle = std::string { "cab" };
+    auto const haystack = std::string { "abcabcabcabc" };
+    auto const needle = std::string { "cab" };
 
-    EXPECT_EQ(Haystack, tr_memmem(Haystack.data(), Haystack.size(), Haystack.data(), Haystack.size()));
-    EXPECT_EQ(Haystack.substr(2), tr_memmem(Haystack.data(), Haystack.size(), Needle.data(), Needle.size()));
-    EXPECT_EQ(nullptr, tr_memmem(Needle.data(), Needle.size(), Haystack.data(), Haystack.size()));
+    EXPECT_EQ(haystack, tr_memmem(haystack.data(), haystack.size(), haystack.data(), haystack.size()));
+    EXPECT_EQ(haystack.substr(2), tr_memmem(haystack.data(), haystack.size(), needle.data(), needle.size()));
+    EXPECT_EQ(nullptr, tr_memmem(needle.data(), needle.size(), haystack.data(), haystack.size()));
 }
 
 TEST_F(UtilsTest, trBinaryHex)
 {
-    auto const HexIn = std::string { "fb5ef5507427b17e04b69cef31fa3379b456735a" };
+    auto const hex_in = std::string { "fb5ef5507427b17e04b69cef31fa3379b456735a" };
 
-    uint8_t binary[20];
-    tr_hex_to_binary(HexIn.data(), binary, HexIn.size() / 2);
+    auto binary = std::array<uint8_t, SHA_DIGEST_LENGTH> {};
+    tr_hex_to_binary(hex_in.data(), binary.data(), hex_in.size() / 2);
 
-    char hex_out[41];
-    tr_binary_to_hex(binary, hex_out, 20);
-    EXPECT_EQ(HexIn, hex_out);
+    auto hex_out = std::array<uint8_t, SHA_DIGEST_LENGTH*2 + 1> {};
+    tr_binary_to_hex(binary.data(), hex_out.data(), 20);
+    EXPECT_EQ(hex_in, reinterpret_cast<char const*>(hex_out.data()));
 }
 
 TEST_F(UtilsTest, array)
 {
-    size_t array[10] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
-    size_t n = TR_N_ELEMENTS(array);
+    auto array = std::array<size_t, 10> { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+    auto n = array.size();
 
-    tr_removeElementFromArray(array, 5U, sizeof(size_t), n);
+    tr_removeElementFromArray(array.data(), 5U, sizeof(size_t), n);
     --n;
 
     for (size_t i = 0; i < n; ++i)
@@ -257,7 +257,7 @@ TEST_F(UtilsTest, array)
         EXPECT_EQ(array[i], i < 5 ? i : i + 1);
     }
 
-    tr_removeElementFromArray(array, 0U, sizeof(size_t), n);
+    tr_removeElementFromArray(array.data(), 0U, sizeof(size_t), n);
     --n;
 
     for (size_t i = 0; i < n; ++i)
@@ -265,7 +265,7 @@ TEST_F(UtilsTest, array)
         EXPECT_EQ(array[i], i < 4 ? i + 1 : i + 2);
     }
 
-    tr_removeElementFromArray(array, n - 1, sizeof(size_t), n);
+    tr_removeElementFromArray(array.data(), n - 1, sizeof(size_t), n);
     --n;
 
     for (size_t i = 0; i < n; ++i)
@@ -313,53 +313,53 @@ TEST_F(UtilsTest, url)
 
 TEST_F(UtilsTest, trHttpUnescape)
 {
-    auto const Url = std::string { "http%3A%2F%2Fwww.example.com%2F~user%2F%3Ftest%3D1%26test1%3D2" };
-    auto str = makeString(tr_http_unescape(Url.data(), Url.size()));
+    auto const url = std::string { "http%3A%2F%2Fwww.example.com%2F~user%2F%3Ftest%3D1%26test1%3D2" };
+    auto str = makeString(tr_http_unescape(url.data(), url.size()));
     EXPECT_EQ("http://www.example.com/~user/?test=1&test1=2", str);
 }
 
 TEST_F(UtilsTest, truncd)
 {
-    char buf[32];
+    auto buf = std::array<char, 32> {};
 
-    tr_snprintf(buf, sizeof(buf), "%.2f%%", 99.999);
-    EXPECT_STREQ("100.00%", buf);
+    tr_snprintf(buf.data(), buf.size(), "%.2f%%", 99.999);
+    EXPECT_STREQ("100.00%", buf.data());
 
-    tr_snprintf(buf, sizeof(buf), "%.2f%%", tr_truncd(99.999, 2));
-    EXPECT_STREQ("99.99%", buf);
+    tr_snprintf(buf.data(), buf.size(), "%.2f%%", tr_truncd(99.999, 2));
+    EXPECT_STREQ("99.99%", buf.data());
 
-    tr_snprintf(buf, sizeof(buf), "%.4f", tr_truncd(403650.656250, 4));
-    EXPECT_STREQ("403650.6562", buf);
+    tr_snprintf(buf.data(), buf.size(), "%.4f", tr_truncd(403650.656250, 4));
+    EXPECT_STREQ("403650.6562", buf.data());
 
-    tr_snprintf(buf, sizeof(buf), "%.2f", tr_truncd(2.15, 2));
-    EXPECT_STREQ("2.15", buf);
+    tr_snprintf(buf.data(), buf.size(), "%.2f", tr_truncd(2.15, 2));
+    EXPECT_STREQ("2.15", buf.data());
 
-    tr_snprintf(buf, sizeof(buf), "%.2f", tr_truncd(2.05, 2));
-    EXPECT_STREQ("2.05", buf);
+    tr_snprintf(buf.data(), buf.size(), "%.2f", tr_truncd(2.05, 2));
+    EXPECT_STREQ("2.05", buf.data());
 
-    tr_snprintf(buf, sizeof(buf), "%.2f", tr_truncd(3.3333, 2));
-    EXPECT_STREQ("3.33", buf);
+    tr_snprintf(buf.data(), buf.size(), "%.2f", tr_truncd(3.3333, 2));
+    EXPECT_STREQ("3.33", buf.data());
 
-    tr_snprintf(buf, sizeof(buf), "%.0f", tr_truncd(3.3333, 0));
-    EXPECT_STREQ("3", buf);
+    tr_snprintf(buf.data(), buf.size(), "%.0f", tr_truncd(3.3333, 0));
+    EXPECT_STREQ("3", buf.data());
 
-    tr_snprintf(buf, sizeof(buf), "%.0f", tr_truncd(3.9999, 0));
-    EXPECT_STREQ("3", buf);
+    tr_snprintf(buf.data(), buf.size(), "%.0f", tr_truncd(3.9999, 0));
+    EXPECT_STREQ("3", buf.data());
 
 #if !(defined(_MSC_VER) || (defined(__MINGW32__) && defined(__MSVCRT__)))
     /* FIXME: MSCVRT behaves differently in case of nan */
-    auto const nan = sqrt(-1.0f);
-    tr_snprintf(buf, sizeof(buf), "%.2f", tr_truncd(nan, 2));
-    EXPECT_TRUE(strstr(buf, "nan") != nullptr || strstr(buf, "NaN") != nullptr);
+    auto const nan = sqrt(-1.0);
+    tr_snprintf(buf.data(), buf.size(), "%.2f", tr_truncd(nan, 2));
+    EXPECT_TRUE(strstr(buf.data(), "nan") != nullptr || strstr(buf.data(), "NaN") != nullptr);
 #endif
 }
 
 namespace
 {
 
-char* test_strdup_printf_valist(char const* fmt, ...) TR_GNUC_PRINTF(1, 2);
+char* testStrdupPrintfValist(char const* fmt, ...) TR_GNUC_PRINTF(1, 2);
 
-char* test_strdup_printf_valist(char const* fmt, ...)
+char* testStrdupPrintfValist(char const* fmt, ...)
 {
     va_list args;
     va_start(args, fmt);
@@ -368,12 +368,12 @@ char* test_strdup_printf_valist(char const* fmt, ...)
     return ret;
 }
 
-}
+} // unnamed namespace
 
 TEST_F(UtilsTest, trStrdupVprintf)
 {
     // NOLINTNEXTLINE(cert-dcl50-cpp)
-    auto s = makeString(test_strdup_printf_valist("\n-%s-%s-%s-\n", "\r", "\t", "\b"));
+    auto s = makeString(testStrdupPrintfValist("\n-%s-%s-%s-\n", "\r", "\t", "\b"));
     EXPECT_EQ("\n-\r-\t-\b-\n", s);
 }
 

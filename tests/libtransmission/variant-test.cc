@@ -74,7 +74,7 @@ TEST_F(VariantTest, parseIntWithMissingEnd)
 
 TEST_F(VariantTest, parseIntEmptyBuffer)
 {
-    auto const in = std::string { "" };
+    auto const in = std::string { };
     auto constexpr InitVal = int64_t { 888 };
 
     uint8_t const* end = {};
@@ -254,7 +254,7 @@ TEST_F(VariantTest, bencParseAndReencode) {
         bool is_good;
     };
 
-    auto const Tests = std::array<Test, 9>{
+    auto const tests = std::array<Test, 9>{
         Test{ "llleee", true },
         { "d3:cow3:moo4:spam4:eggse", true },
         { "d4:spaml1:a1:bee", true },
@@ -266,7 +266,7 @@ TEST_F(VariantTest, bencParseAndReencode) {
         { " ", false }
     };
 
-    for (const auto& test : Tests)
+    for (const auto& test : tests)
     {
         tr_variant val;
         char const* end = nullptr;
@@ -348,7 +348,7 @@ TEST_F(VariantTest, bencToJson)
         std::string expected;
     };
 
-    auto const Tests = std::array<Test, 5>{
+    auto const tests = std::array<Test, 5>{
         Test{ "i6e", "6" },
         { "d5:helloi1e5:worldi2ee", R"({"hello":1,"world":2})" },
         { "d5:helloi1e5:worldi2e3:fooli1ei2ei3eee", R"({"foo":[1,2,3],"hello":1,"world":2})" },
@@ -356,7 +356,7 @@ TEST_F(VariantTest, bencToJson)
         { "d4:argsd6:statusle7:status2lee6:result7:successe", R"({"args":{"status":[],"status2":[]},"result":"success"})" }
     };
 
-    for (auto const& test : Tests)
+    for (auto const& test : tests)
     {
         tr_variant top;
         tr_variantFromBenc(&top, test.benc.data(), test.benc.size());

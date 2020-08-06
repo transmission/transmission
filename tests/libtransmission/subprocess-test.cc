@@ -70,9 +70,9 @@ protected:
         return path;
     }
 
-    std::string const arg_dump_args { "--dump-args" };
-    std::string const arg_dump_env { "--dump-env" };
-    std::string const arg_dump_cwd { "--dump-cwd" };
+    std::string const arg_dump_args_ { "--dump-args" };
+    std::string const arg_dump_env_ { "--dump-env" };
+    std::string const arg_dump_cwd_ { "--dump-cwd" };
 
     std::string self_path_;
 
@@ -102,14 +102,14 @@ protected:
             exit(1);
         }
 
-        if (test_action == arg_dump_args)
+        if (test_action == arg_dump_args_)
         {
             for (int i = 3; i < int(argv.size()); ++i)
             {
                 tr_sys_file_write_line(fd, argv[i].data(), nullptr);
             }
         }
-        else if (test_action == arg_dump_env)
+        else if (test_action == arg_dump_env_)
         {
             for (int i = 3; i < int(argv.size()); ++i)
             {
@@ -117,7 +117,7 @@ protected:
                 tr_sys_file_write_line(fd, value.data(), nullptr);
             }
         }
-        else if (test_action == arg_dump_cwd)
+        else if (test_action == arg_dump_cwd_)
         {
             char* const value = tr_sys_dir_get_current(nullptr);
             tr_sys_file_write_line(fd, value != nullptr ? value : "<null>", nullptr);
@@ -175,14 +175,14 @@ TEST_P(SubprocessTest, SpawnAsyncArgs)
 
     auto const test_arg1 = std::string { "arg1 " };
     auto const test_arg2 = std::string { " arg2" };
-    auto const test_arg3 = std::string { "" };
+    auto const test_arg3 = std::string { };
     auto const test_arg4 = std::string { "\"arg3'^! $PATH %PATH% \\" };
 
     auto args = std::array<char*, 8>{
         //  FIXME(ckerr): remove tr_strdup()s after https://github.com/transmission/transmission/issues/1384
         tr_strdup(self_path_.c_str()),
         tr_strdup(result_path.data()),
-        tr_strdup(arg_dump_args.data()),
+        tr_strdup(arg_dump_args_.data()),
         tr_strdup(test_arg1.data()),
         tr_strdup(test_arg2.data()),
         tr_strdup(test_arg3.data()),
@@ -243,7 +243,7 @@ TEST_P(SubprocessTest, SpawnAsyncEnv)
         //  FIXME(ckerr): remove tr_strdup()s after https://github.com/transmission/transmission/issues/1384
         tr_strdup(self_path_.c_str()),
         tr_strdup(result_path.data()),
-        tr_strdup(arg_dump_env.data()),
+        tr_strdup(arg_dump_env_.data()),
         tr_strdup(test_env_key1.data()),
         tr_strdup(test_env_key2.data()),
         tr_strdup(test_env_key3.data()),
@@ -314,7 +314,7 @@ TEST_P(SubprocessTest, SpawnAsyncCwdExplicit)
         //  FIXME(ckerr): remove tr_strdup()s after https://github.com/transmission/transmission/issues/1384
         tr_strdup(self_path_.c_str()),
         tr_strdup(result_path.data()),
-        tr_strdup(arg_dump_cwd.data()),
+        tr_strdup(arg_dump_cwd_.data()),
         nullptr
     };
 
@@ -347,7 +347,7 @@ TEST_P(SubprocessTest, SpawnAsyncCwdInherit)
         //  FIXME(ckerr): remove tr_strdup()s after https://github.com/transmission/transmission/issues/1384
         tr_strdup(self_path_.c_str()),
         tr_strdup(result_path.data()),
-        tr_strdup(arg_dump_cwd.data()),
+        tr_strdup(arg_dump_cwd_.data()),
         nullptr
     };
 
@@ -376,7 +376,7 @@ TEST_P(SubprocessTest, SpawnAsyncCwdMissing)
         //  FIXME(ckerr): remove tr_strdup()s after https://github.com/transmission/transmission/issues/1384
         tr_strdup(self_path_.c_str()),
         tr_strdup(result_path.data()),
-        tr_strdup(arg_dump_cwd.data()),
+        tr_strdup(arg_dump_cwd_.data()),
         nullptr
     };
 

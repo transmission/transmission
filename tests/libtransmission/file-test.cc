@@ -104,25 +104,25 @@ protected:
         while (*p != '\0')
         {
             tr_sys_path_info info;
-            char const* slashPos = strchr(p, '/');
+            char const* slash_pos = strchr(p, '/');
 
 #ifdef _WIN32
 
-            char const* backslashPos = strchr(p, '\\');
+            char const* backslash_pos = strchr(p, '\\');
 
-            if (slashPos == nullptr || (backslashPos != nullptr && backslashPos < slashPos))
+            if (slash_pos == nullptr || (backslash_pos != nullptr && backslash_pos < slash_pos))
             {
-                slashPos = backslashPos;
+                slash_pos = backslash_pos;
             }
 
 #endif
 
-            if (slashPos == nullptr)
+            if (slash_pos == nullptr)
             {
-                slashPos = p + strlen(p) - 1;
+                slash_pos = p + strlen(p) - 1;
             }
 
-            auto const path_part = makeString(tr_strndup(path, size_t(slashPos - path + 1)));
+            auto const path_part = makeString(tr_strndup(path, size_t(slash_pos - path + 1)));
 
             if (!tr_sys_path_get_info(path_part.c_str(), TR_SYS_PATH_NO_FOLLOW, &info, nullptr) ||
                 (info.type != TR_SYS_PATH_IS_FILE && info.type != TR_SYS_PATH_IS_DIRECTORY))
@@ -130,7 +130,7 @@ protected:
                 return false;
             }
 
-            p = slashPos + 1;
+            p = slash_pos + 1;
         }
 
         return true;
@@ -980,7 +980,7 @@ TEST_F(FileTest, pathNativeSeparators)
         std::string expected_output;
     };
 
-    auto const Tests = std::array<Test, 5>
+    auto const tests = std::array<Test, 5>
     {
         Test{ "", "" },
         { "a", TR_IF_WIN32("a", "a") },
@@ -989,7 +989,7 @@ TEST_F(FileTest, pathNativeSeparators)
         { "C:\\a/b\\c", TR_IF_WIN32("C:\\a\\b\\c", "C:\\a/b\\c") },
     };
 
-    for (auto const& test : Tests)
+    for (auto const& test : tests)
     {
         auto buf = std::string(test.input);
         char* const output = tr_sys_path_native_separators(&buf.front());

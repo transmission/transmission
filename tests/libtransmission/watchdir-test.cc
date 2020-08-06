@@ -264,27 +264,27 @@ TEST_P(WatchDirTest, watchTwoDirs)
     // be testing.
     wd1_data = CallbackData(TR_WATCHDIR_IGNORE);
     wd2_data = CallbackData(TR_WATCHDIR_IGNORE);
-    auto const File3 = std::string { "test3.txt" };
-    auto const File4 = std::string { "test4.txt" };
-    createFile(dir1, File3);
-    createFile(dir2, File4);
+    auto const file3 = std::string { "test3.txt" };
+    auto const file4 = std::string { "test4.txt" };
+    createFile(dir1, file3);
+    createFile(dir2, file4);
     processEvents();
     EXPECT_EQ(wd1, wd1_data.wd);
-    EXPECT_EQ(File3, wd1_data.name);
+    EXPECT_EQ(file3, wd1_data.name);
     EXPECT_EQ(wd2, wd2_data.wd);
-    EXPECT_EQ(File4, wd2_data.name);
+    EXPECT_EQ(file4, wd2_data.name);
 
     // confirm that callbacks don't get confused
     // when there's a new file in directory 'a'
     // and a new directory in directory 'b'
     wd1_data = CallbackData(TR_WATCHDIR_ACCEPT);
     wd2_data = CallbackData(TR_WATCHDIR_ACCEPT);
-    auto const File5 = std::string { "test5.txt" };
-    createFile(dir1, File5);
-    createDir(dir2, File5);
+    auto const file5 = std::string { "test5.txt" };
+    createFile(dir1, file5);
+    createDir(dir2, file5);
     processEvents();
     EXPECT_EQ(wd1, wd1_data.wd);
-    EXPECT_EQ(File5, wd1_data.name);
+    EXPECT_EQ(file5, wd1_data.name);
     EXPECT_EQ(nullptr, wd2_data.wd);
     EXPECT_EQ("", wd2_data.name);
 
@@ -294,23 +294,23 @@ TEST_P(WatchDirTest, watchTwoDirs)
     // and a new directory in directory 'a'
     wd1_data = CallbackData(TR_WATCHDIR_ACCEPT);
     wd2_data = CallbackData(TR_WATCHDIR_ACCEPT);
-    auto const File6 = std::string { "test6.txt" };
-    createDir(dir1, File6);
-    createFile(dir2, File6);
+    auto const file6 = std::string { "test6.txt" };
+    createDir(dir1, file6);
+    createFile(dir2, file6);
     processEvents();
     EXPECT_EQ(nullptr, wd1_data.wd);
     EXPECT_EQ("", wd1_data.name);
     EXPECT_EQ(wd2, wd2_data.wd);
-    EXPECT_EQ(File6, wd2_data.name);
+    EXPECT_EQ(file6, wd2_data.name);
 
     // confirm that creating new directories in BOTH
     // watchdirs still triggers no callbacks
     wd1_data = CallbackData(TR_WATCHDIR_ACCEPT);
     wd2_data = CallbackData(TR_WATCHDIR_ACCEPT);
-    auto const File7 = std::string { "test7.txt" };
-    auto const File8 = std::string { "test8.txt" };
-    createDir(dir1, File7);
-    createDir(dir2, File8);
+    auto const file7 = std::string { "test7.txt" };
+    auto const file8 = std::string { "test8.txt" };
+    createDir(dir1, file7);
+    createDir(dir2, file8);
     processEvents();
     EXPECT_EQ(nullptr, wd1_data.wd);
     EXPECT_EQ("", wd1_data.name);
