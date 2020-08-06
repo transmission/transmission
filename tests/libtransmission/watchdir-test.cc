@@ -31,6 +31,13 @@ extern struct timeval tr_watchdir_retry_start_interval;
 extern struct timeval tr_watchdir_retry_max_interval;
 }
 
+namespace
+{
+auto constexpr FiftyMsec = timeval { 0, 50000 };
+auto constexpr OneHundredMsec = timeval { 0, 100000 };
+auto constexpr TwoHundredMsec = timeval { 0, 200000 };
+}
+
 namespace libtransmission
 {
 namespace test
@@ -47,10 +54,6 @@ private:
     std::shared_ptr<struct event_base> ev_base_;
 
 protected:
-    static auto constexpr FiftyMsec = timeval { 0, 50000 };
-    static auto constexpr OneHundredMsec = timeval { 0, 100000 };
-    static auto constexpr TwoHundredMsec = timeval { 0, 200000 };
-
     void SetUp() override
     {
         SandboxedTest::SetUp();
