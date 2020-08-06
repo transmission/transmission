@@ -37,7 +37,7 @@ protected:
         // create a single input file
         auto input_file = makeString(tr_buildPath(sandboxDir().data(), "test.XXXXXX", nullptr));
         createTmpfileWithContents(input_file, payload, payloadSize);
-        tr_sys_path_native_separators(input_file.data());
+        tr_sys_path_native_separators(&input_file.front());
         auto* builder = tr_metaInfoBuilderCreate(input_file.c_str());
         EXPECT_EQ(tr_file_index_t{ 1 }, builder->fileCount);
         EXPECT_STREQ(input_file.c_str(), builder->top);
@@ -103,7 +103,7 @@ protected:
             tr_snprintf(tmpl.data(), tmpl.size(), "file.%04zu%s", i, "XXXXXX");
             auto path = makeString(tr_buildPath(top, tmpl.data(), nullptr));
             createTmpfileWithContents(path, payloads[i], payload_sizes[i]);
-            tr_sys_path_native_separators(path.data());
+            tr_sys_path_native_separators(&path.front());
             files.push_back(path);
             total_size += payload_sizes[i];
         }

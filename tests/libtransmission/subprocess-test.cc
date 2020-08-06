@@ -332,7 +332,7 @@ TEST_P(SubprocessTest, SpawnAsyncCwdExplicit)
     auto buffer = std::array<char, 1024>{};
     EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), nullptr));
     EXPECT_EQ(makeString(tr_sys_path_native_separators(tr_strdup(test_dir.c_str()))),
-        tr_sys_path_native_separators(buffer.data()));
+        tr_sys_path_native_separators(&buffer.front()));
 
     EXPECT_FALSE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), nullptr));
 
@@ -363,7 +363,7 @@ TEST_P(SubprocessTest, SpawnAsyncCwdInherit)
 
     auto buffer = std::array<char, 1024>{};
     EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), nullptr));
-    EXPECT_EQ(expected_cwd, tr_sys_path_native_separators(buffer.data()));
+    EXPECT_EQ(expected_cwd, tr_sys_path_native_separators(&buffer.front()));
     EXPECT_FALSE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), nullptr));
 
     tr_sys_file_close(fd, nullptr);
