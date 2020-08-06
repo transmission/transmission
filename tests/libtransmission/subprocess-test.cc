@@ -59,14 +59,14 @@ protected:
         auto path = sandbox_.path();
         path += TR_PATH_DELIMITER;
         path += filename;
-        tr_sys_path_native_separators(path.data());
+        tr_sys_path_native_separators(&path.front());
         return path;
     }
 
     [[nodiscard]] static std::string nativeCwd()
     {
         auto path = makeString(tr_sys_dir_get_current(nullptr));
-        tr_sys_path_native_separators(path.data());
+        tr_sys_path_native_separators(&path.front());
         return path;
     }
 
