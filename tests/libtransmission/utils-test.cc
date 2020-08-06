@@ -26,12 +26,6 @@
 #include <cmath> // sqrt()
 #include <cstdlib> // setenv(), unsetenv()
 #include <string>
-#if !defined(__has_include) || __has_include(<string_view>)
-# include <string_view>
-#else
-# include <experimental/string_view>
-# define string_view experimental::string_view
-#endif
 
 using ::libtransmission::test::makeString;
 
@@ -230,8 +224,8 @@ TEST_F(UtilsTest, trQuickfindfirstk)
 
 TEST_F(UtilsTest, trMemmem)
 {
-    auto constexpr Haystack = std::string_view { "abcabcabcabc" };
-    auto constexpr Needle = std::string_view { "cab" };
+    auto const Haystack = std::string { "abcabcabcabc" };
+    auto const Needle = std::string { "cab" };
 
     EXPECT_EQ(Haystack, tr_memmem(Haystack.data(), Haystack.size(), Haystack.data(), Haystack.size()));
     EXPECT_EQ(Haystack.substr(2), tr_memmem(Haystack.data(), Haystack.size(), Needle.data(), Needle.size()));
@@ -240,14 +234,14 @@ TEST_F(UtilsTest, trMemmem)
 
 TEST_F(UtilsTest, trBinaryHex)
 {
-    auto constexpr HexIn = std::string_view { "fb5ef5507427b17e04b69cef31fa3379b456735a" };
+    auto const HexIn = std::string { "fb5ef5507427b17e04b69cef31fa3379b456735a" };
 
     uint8_t binary[20];
     tr_hex_to_binary(HexIn.data(), binary, HexIn.size() / 2);
 
     char hex_out[41];
     tr_binary_to_hex(binary, hex_out, 20);
-    EXPECT_EQ(HexIn, std::string_view(hex_out));
+    EXPECT_EQ(HexIn, hex_out);
 }
 
 TEST_F(UtilsTest, array)
@@ -319,7 +313,7 @@ TEST_F(UtilsTest, url)
 
 TEST_F(UtilsTest, trHttpUnescape)
 {
-    auto constexpr Url = std::string_view { "http%3A%2F%2Fwww.example.com%2F~user%2F%3Ftest%3D1%26test1%3D2" };
+    auto const Url = std::string { "http%3A%2F%2Fwww.example.com%2F~user%2F%3Ftest%3D1%26test1%3D2" };
     auto str = makeString(tr_http_unescape(Url.data(), Url.size()));
     EXPECT_EQ("http://www.example.com/~user/?test=1&test1=2", str);
 }

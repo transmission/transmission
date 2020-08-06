@@ -20,12 +20,7 @@
 #include <cerrno>
 #include <cstdio> // fopen()
 #include <cstring> // strcmp()
-#if !defined(__has_include) || __has_include(<string_view>)
-# include <string_view>
-#else
-# include <experimental/string_view>
-# define string_view experimental::string_view
-#endif
+#include <string>
 
 namespace libtransmission::test
 {
@@ -88,7 +83,7 @@ protected:
         return tor;
     }
 
-    bool testFileExistsAndConsistsOfThisString(tr_torrent const* tor, tr_file_index_t file_index, std::string_view str)
+    bool testFileExistsAndConsistsOfThisString(tr_torrent const* tor, tr_file_index_t file_index, std::string const& str)
     {
         auto const str_len = str.size();
         auto success = false;
@@ -244,14 +239,14 @@ TEST_F(RenameTest, multifileTorrent)
 {
     char* str;
     auto constexpr TotalSize = size_t{ 67 };
-    auto constexpr ExpectedFiles = std::array<std::string_view, 4>
+    auto const ExpectedFiles = std::array<std::string, 4>
     {
         "Felidae/Felinae/Acinonyx/Cheetah/Chester",
         "Felidae/Felinae/Felis/catus/Kyphi",
         "Felidae/Felinae/Felis/catus/Saffron",
         "Felidae/Pantherinae/Panthera/Tiger/Tony"
     };
-    auto constexpr ExpectedContents = std::array<std::string_view, 4>
+    auto const ExpectedContents = std::array<std::string, 4>
     {
         "It ain't easy bein' cheesy.\n",
         "Inquisitive\n",

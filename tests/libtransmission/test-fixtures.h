@@ -16,17 +16,12 @@
 #include "variant.h"
 
 #include <chrono>
+#include <cstring> // strlen()
 #include <memory>
 #include <thread>
 #include <mutex> // std::once_flag()
 #include <string>
 #include <cstdlib> // getenv()
-#if !defined(__has_include) || __has_include(<string_view>)
-# include <string_view>
-#else
-# include <experimental/string_view>
-# define string_view experimental::string_view
-#endif
 
 #include "gtest/gtest.h"
 
@@ -172,15 +167,14 @@ protected:
         return child;
     }
 
-    void buildParentDir(std::string_view path) const
+    void buildParentDir(std::string const& path) const
     {
         auto const tmperr = errno;
 
-        auto const path_sz = std::string(path.data(), path.size());
-        auto const dir = makeString(tr_sys_path_dirname(path_sz.data(), nullptr));
+        auto const dir = makeString(tr_sys_path_dirname(path.c_str(), nullptr));
         tr_error* error = nullptr;
         tr_sys_dir_create(dir.data(), TR_SYS_DIR_CREATE_PARENTS, 0700, &error);
-        EXPECT_EQ(nullptr, error) << "path_sz[" << path_sz << "] dir[" << dir << "] " << error->code << ", " << error->message;
+        EXPECT_EQ(nullptr, error) << "path[" << path << "] dir[" << dir << "] " << error->code << ", " << error->message;
 
         errno = tmperr;
     }
@@ -221,14 +215,13 @@ protected:
         errno = tmperr;
     }
 
-    void createFileWithContents(std::string_view path, void const* payload, size_t n) const
+    void createFileWithContents(std::string const& path, void const* payload, size_t n) const
     {
         auto const tmperr = errno;
 
         buildParentDir(path);
 
-        auto const path_sz = std::string(path.data(), path.size());
-        auto const fd = tr_sys_file_open(path_sz.data(),
+        auto const fd = tr_sys_file_open(path.c_str(),
             TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE,
             0600, nullptr);
         blockingFileWrite(fd, payload, n);
@@ -238,9 +231,9 @@ protected:
         errno = tmperr;
     }
 
-    void createFileWithContents(std::string_view path, std::string_view str) const
+    void createFileWithContents(std::string const& path, void const* payload) const
     {
-        createFileWithContents(path, str.data(), str.size());
+        createFileWithContents(path, payload, strlen(static_cast<char const*>(payload)));
     }
 
     bool verbose = false;

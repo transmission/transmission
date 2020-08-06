@@ -15,12 +15,6 @@
 #include <array>
 #include <cerrno>
 #include <cstring>
-#if !defined(__has_include) || __has_include(<string_view>)
-# include <string_view>
-#else
-# include <experimental/string_view>
-# define string_view experimental::string_view
-#endif
 
 TEST(Metainfo, magnetLink)
 {

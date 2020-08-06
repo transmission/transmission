@@ -15,12 +15,6 @@
 #include <array>
 #include <cstring>
 #include <string>
-#if !defined(__has_include) || __has_include(<string_view>)
-# include <string_view>
-#else
-# include <experimental/string_view>
-# define string_view experimental::string_view
-#endif
 
 #ifndef _WIN32
 #include <sys/types.h>
@@ -980,11 +974,11 @@ TEST_F(FileTest, pathNativeSeparators)
 
     struct Test
     {
-        std::string_view input;
-        std::string_view expected_output;
+        std::string input;
+        std::string expected_output;
     };
 
-    auto constexpr Tests = std::array<Test, 5>
+    auto const Tests = std::array<Test, 5>
     {
         Test{ "", "" },
         { "a", TR_IF_WIN32("a", "a") },
@@ -1283,27 +1277,27 @@ TEST_F(FileTest, map)
     auto const test_dir = createTestDir(currentTestName());
 
     auto* path1 = tr_buildPath(test_dir.data(), "a", nullptr);
-    auto constexpr Contents = std::string_view { "test" };
-    createFileWithContents(path1, Contents.data());
+    auto const contents = std::string { "test" };
+    createFileWithContents(path1, contents.data());
 
     auto fd = tr_sys_file_open(path1, TR_SYS_FILE_READ | TR_SYS_FILE_WRITE, 0600, nullptr);
 
     tr_error* err = nullptr;
-    auto map_len = Contents.size();
+    auto map_len = contents.size();
     auto* view = static_cast<char*>(tr_sys_file_map_for_reading(fd, 0, map_len, &err));
     EXPECT_NE(nullptr, view);
     EXPECT_EQ(nullptr, err);
-    EXPECT_EQ(Contents, std::string_view(view, map_len));
+    EXPECT_EQ(contents, std::string(view, map_len));
 
 #ifdef HAVE_UNIFIED_BUFFER_CACHE
 
-    auto constexpr Contents2 = std::string_view { "more" };
+    auto const contents_2 = std::string { "more" };
     auto n_written = uint64_t {};
-    tr_sys_file_write_at(fd, Contents2.data(), Contents2.size(), 0, &n_written, &err);
-    EXPECT_EQ(map_len, Contents2.size());
+    tr_sys_file_write_at(fd, contents_2.data(), contents_2.size(), 0, &n_written, &err);
+    EXPECT_EQ(map_len, contents_2.size());
     EXPECT_EQ(map_len, n_written);
     EXPECT_EQ(nullptr, err);
-    EXPECT_EQ(Contents2, std::string_view(view, map_len));
+    EXPECT_EQ(contents_2, std::string(view, map_len));
 
 #endif
 
@@ -1322,8 +1316,8 @@ TEST_F(FileTest, fileUtilities)
     auto const test_dir = createTestDir(currentTestName());
 
     auto* path1 = tr_buildPath(test_dir.data(), "a", nullptr);
-    auto constexpr Contents = std::string_view { "a\nbc\r\ndef\nghij\r\n\n\nklmno\r" };
-    createFileWithContents(path1, Contents.data());
+    auto const contents = std::string { "a\nbc\r\ndef\nghij\r\n\n\nklmno\r" };
+    createFileWithContents(path1, contents.data());
 
     auto fd = tr_sys_file_open(path1, TR_SYS_FILE_READ, 0, nullptr);
 

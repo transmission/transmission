@@ -19,16 +19,11 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#if !defined(__has_include) || __has_include(<string_view>)
-# include <string_view>
-#else
-# include <experimental/string_view>
-# define string_view experimental::string_view
-#endif
+#include <string>
 
 TEST(Session, peerId)
 {
-    auto constexpr PeerIdPrefix = std::string_view { PEERID_PREFIX };
+    auto const peer_id_prefix = std::string { PEERID_PREFIX };
 
     for (int i = 0; i < 100000; ++i)
     {
@@ -39,13 +34,13 @@ TEST(Session, peerId)
         // confirm that it has the right length
         EXPECT_EQ(PEER_ID_LEN, strlen(reinterpret_cast<char const*>(buf.data())));
 
-        // confirm that it begins with PeerIdPrefix
-        auto const peer_id = std::string_view(reinterpret_cast<char const*>(buf.data()), PEER_ID_LEN);
-        EXPECT_EQ(PeerIdPrefix, peer_id.substr(0, PeerIdPrefix.size()));
+        // confirm that it begins with peer_id_prefix
+        auto const peer_id = std::string(reinterpret_cast<char const*>(buf.data()), PEER_ID_LEN);
+        EXPECT_EQ(peer_id_prefix, peer_id.substr(0, peer_id_prefix.size()));
 
         // confirm that its total is evenly divisible by 36
         int val = 0;
-        auto const suffix = peer_id.substr(PeerIdPrefix.size());
+        auto const suffix = peer_id.substr(peer_id_prefix.size());
         for (char const ch : suffix)
         {
             auto const tmp = std::array<char, 2>{ ch, '\0' };

@@ -16,34 +16,28 @@
 #include <array>
 #include <cmath> // lrint()
 #include <cctype> // isspace()
-#if !defined(__has_include) || __has_include(<string_view>)
-# include <string_view>
-#else
-# include <experimental/string_view>
-# define string_view experimental::string_view
-#endif
+#include <string>
 
 #include "gtest/gtest.h"
 
 class VariantTest : public ::testing::Test
 {
 protected:
-    std::string_view stripWhitespace(std::string_view in)
+    std::string stripWhitespace(std::string const& in)
     {
-        // sometimes isspace is a macro and can't be used as a UnaryPredicate
-        // auto constexpr space_test = [](char ch){return ::isspace(ch);};
-
-        auto out = in;
-        out.remove_prefix(std::distance(std::cbegin(out), std::find_if_not(std::cbegin(out), std::cend(out), ::isspace)));
-        out.remove_suffix(std::distance(std::crbegin(out), std::find_if_not(std::crbegin(out), std::crend(out), ::isspace)));
-        return out;
+        auto s = in;
+        s.erase(s.begin(), std::find_if_not(s.begin(), s.end(), ::isspace));
+        s.erase(std::find_if_not(s.rbegin(), s.rend(), ::isspace).base(), s.end());
+        std::cerr << "in [" << in << ']' << std::endl;
+        std::cerr << " s [" << s << ']' << std::endl;
+        return s;
     }
 
-    auto bencParseInt(std::string_view in, uint8_t const** end, int64_t* val)
+    auto bencParseInt(std::string const& in, uint8_t const** end, int64_t* val)
     {
         return tr_bencParseInt(in.data(),
-            in.data() + in.size(),
-            end, val);
+                               in.data() + in.size(),
+                               end, val);
     }
 };
 
@@ -55,26 +49,26 @@ protected:
 
 TEST_F(VariantTest, parseInt)
 {
-    auto constexpr In = std::string_view { "i64e" };
+    auto const in = std::string { "i64e" };
     auto constexpr InitVal = int64_t { 888 };
     auto constexpr ExpectVal = int64_t { 64 };
 
     uint8_t const* end = {};
     auto val = int64_t { InitVal };
-    auto const err = bencParseInt(In, &end, &val);
+    auto const err = bencParseInt(in, &end, &val);
     EXPECT_EQ(0, err);
     EXPECT_EQ(ExpectVal, val);
-    EXPECT_EQ(reinterpret_cast<decltype(end)>(In.data() + In.size()), end);
+    EXPECT_EQ(reinterpret_cast<decltype(end)>(in.data() + in.size()), end);
 }
 
 TEST_F(VariantTest, parseIntWithMissingEnd)
 {
-    auto constexpr In = std::string_view { "i64" };
+    auto const in = std::string { "i64" };
     auto constexpr InitVal = int64_t { 888 };
 
     uint8_t const* end = {};
     auto val = int64_t { InitVal };
-    auto const err = bencParseInt(In, &end, &val);
+    auto const err = bencParseInt(in, &end, &val);
     EXPECT_EQ(EILSEQ, err);
     EXPECT_EQ(InitVal, val);
     EXPECT_EQ(nullptr, end);
@@ -82,12 +76,12 @@ TEST_F(VariantTest, parseIntWithMissingEnd)
 
 TEST_F(VariantTest, parseIntEmptyBuffer)
 {
-    auto constexpr In = std::string_view { "" };
+    auto const in = std::string { "" };
     auto constexpr InitVal = int64_t { 888 };
 
     uint8_t const* end = {};
     auto val = int64_t { InitVal };
-    auto const err = bencParseInt(In, &end, &val);
+    auto const err = bencParseInt(in, &end, &val);
     EXPECT_EQ(EILSEQ, err);
     EXPECT_EQ(InitVal, val);
     EXPECT_EQ(nullptr, end);
@@ -95,12 +89,12 @@ TEST_F(VariantTest, parseIntEmptyBuffer)
 
 TEST_F(VariantTest, parseIntWithBadDigits)
 {
-    auto constexpr In = std::string_view { "i6z4e" };
+    auto const in = std::string { "i6z4e" };
     auto constexpr InitVal = int64_t { 888 };
 
     uint8_t const* end = {};
     auto val = int64_t { InitVal };
-    auto const err = bencParseInt(In, &end, &val);
+    auto const err = bencParseInt(in, &end, &val);
     EXPECT_EQ(EILSEQ, err);
     EXPECT_EQ(InitVal, val);
     EXPECT_EQ(nullptr, end);
@@ -108,36 +102,36 @@ TEST_F(VariantTest, parseIntWithBadDigits)
 
 TEST_F(VariantTest, parseNegativeInt)
 {
-    auto constexpr In = std::string_view { "i-3e" };
+    auto const in = std::string { "i-3e" };
 
     uint8_t const* end = {};
     auto val = int64_t {};
-    auto const err = bencParseInt(In, &end, &val);
+    auto const err = bencParseInt(in, &end, &val);
     EXPECT_EQ(0, err);
     EXPECT_EQ(-3, val);
-    EXPECT_EQ(reinterpret_cast<decltype(end)>(In.data() + In.size()), end);
+    EXPECT_EQ(reinterpret_cast<decltype(end)>(in.data() + in.size()), end);
 }
 
 TEST_F(VariantTest, parseIntZero)
 {
-    auto constexpr In = std::string_view { "i0e" };
+    auto const in = std::string { "i0e" };
 
     uint8_t const* end = {};
     auto val = int64_t {};
-    auto const err = bencParseInt(In, &end, &val);
+    auto const err = bencParseInt(in, &end, &val);
     EXPECT_EQ(0, err);
     EXPECT_EQ(0, val);
-    EXPECT_EQ(reinterpret_cast<decltype(end)>(In.data() + In.size()), end);
+    EXPECT_EQ(reinterpret_cast<decltype(end)>(in.data() + in.size()), end);
 }
 
 TEST_F(VariantTest, parseIntWithLeadingZero)
 {
-    auto constexpr In = std::string_view { "i04e" };
+    auto const in = std::string { "i04e" };
     auto constexpr InitVal = int64_t { 888 };
 
     uint8_t const* end = {};
     auto val = int64_t { InitVal };
-    auto const err = bencParseInt(In, &end, &val);
+    auto const err = bencParseInt(in, &end, &val);
     EXPECT_EQ(EILSEQ, err); // no leading zeroes allowed
     EXPECT_EQ(InitVal, val);
     EXPECT_EQ(nullptr, end);
@@ -258,11 +252,11 @@ TEST_F(VariantTest, parse)
 TEST_F(VariantTest, bencParseAndReencode) {
     struct Test
     {
-        std::string_view benc;
+        std::string benc;
         bool is_good;
     };
 
-    auto constexpr Tests = std::array<Test, 9>{
+    auto const Tests = std::array<Test, 9>{
         Test{ "llleee", true },
         { "d3:cow3:moo4:spam4:eggse", true },
         { "d4:spaml1:a1:bee", true },
@@ -289,7 +283,7 @@ TEST_F(VariantTest, bencParseAndReencode) {
             EXPECT_EQ(test.benc.data() + test.benc.size(), end);
             auto saved_len = size_t{};
             auto* saved = tr_variantToStr(&val, TR_VARIANT_FMT_BENC, &saved_len);
-            EXPECT_EQ(test.benc, std::string_view(saved, saved_len));
+            EXPECT_EQ(test.benc, std::string(saved, saved_len));
             tr_free(saved);
             tr_variantFree(&val);
         }
@@ -298,18 +292,18 @@ TEST_F(VariantTest, bencParseAndReencode) {
 
 TEST_F(VariantTest, bencSortWhenSerializing)
 {
-    auto constexpr In = std::string_view { "lld1:bi32e1:ai64eeee" };
-    auto constexpr ExpectedOut = std::string_view { "lld1:ai64e1:bi32eeee" };
+    auto const in = std::string { "lld1:bi32e1:ai64eeee" };
+    auto const expected_out = std::string { "lld1:ai64e1:bi32eeee" };
 
     tr_variant val;
     char const* end;
-    auto const err = tr_variantFromBencFull(&val, In.data(), In.size(), nullptr, &end);
+    auto const err = tr_variantFromBencFull(&val, in.data(), in.size(), nullptr, &end);
     EXPECT_EQ(0, err);
-    EXPECT_EQ(reinterpret_cast<decltype(end)>(In.data() + In.size()), end);
+    EXPECT_EQ(reinterpret_cast<decltype(end)>(in.data() + in.size()), end);
 
     auto len = size_t{};
     auto* saved = tr_variantToStr(&val, TR_VARIANT_FMT_BENC, &len);
-    EXPECT_EQ(ExpectedOut, std::string_view(saved, len));
+    EXPECT_EQ(expected_out, std::string(saved, len));
     tr_free(saved);
 
     tr_variantFree(&val);
@@ -317,18 +311,18 @@ TEST_F(VariantTest, bencSortWhenSerializing)
 
 TEST_F(VariantTest, bencMalformedTooManyEndings)
 {
-    auto constexpr In = std::string_view { "leee" };
-    auto constexpr ExpectedOut = std::string_view { "le" };
+    auto const in = std::string { "leee" };
+    auto const expected_out = std::string { "le" };
 
     tr_variant val;
     char const* end;
-    auto const err = tr_variantFromBencFull(&val, In.data(), In.size(), nullptr, &end);
+    auto const err = tr_variantFromBencFull(&val, in.data(), in.size(), nullptr, &end);
     EXPECT_EQ(0, err);
-    EXPECT_EQ(In.data() + ExpectedOut.size(), end);
+    EXPECT_EQ(in.data() + expected_out.size(), end);
 
     auto len = size_t{};
     auto* saved = tr_variantToStr(&val, TR_VARIANT_FMT_BENC, &len);
-    EXPECT_EQ(ExpectedOut, std::string_view(saved, len));
+    EXPECT_EQ(expected_out, std::string(saved, len));
     tr_free(saved);
 
     tr_variantFree(&val);
@@ -336,27 +330,27 @@ TEST_F(VariantTest, bencMalformedTooManyEndings)
 
 TEST_F(VariantTest, bencMalformedNoEnding)
 {
-    auto constexpr In = std::string_view { "l1:a1:b1:c" };
+    auto const in = std::string { "l1:a1:b1:c" };
     tr_variant val;
-    EXPECT_EQ(EILSEQ, tr_variantFromBenc(&val, In.data(), In.size()));
+    EXPECT_EQ(EILSEQ, tr_variantFromBenc(&val, in.data(), in.size()));
 }
 
 TEST_F(VariantTest, bencMalformedIncompleteString)
 {
-    auto constexpr In = std::string_view { "1:" };
+    auto const in = std::string { "1:" };
     tr_variant val;
-    EXPECT_EQ(EILSEQ, tr_variantFromBenc(&val, In.data(), In.size()));
+    EXPECT_EQ(EILSEQ, tr_variantFromBenc(&val, in.data(), in.size()));
 }
 
 TEST_F(VariantTest, bencToJson)
 {
     struct Test
     {
-        std::string_view benc;
-        std::string_view expected;
+        std::string benc;
+        std::string expected;
     };
 
-    auto constexpr Tests = std::array<Test, 5>{
+    auto const Tests = std::array<Test, 5>{
         Test{ "i6e", "6" },
         { "d5:helloi1e5:worldi2ee", R"({"hello":1,"world":2})" },
         { "d5:helloi1e5:worldi2e3:fooli1ei2ei3eee", R"({"foo":[1,2,3],"hello":1,"world":2})" },
@@ -371,7 +365,7 @@ TEST_F(VariantTest, bencToJson)
 
         auto len = size_t{};
         auto* str = tr_variantToStr(&top, TR_VARIANT_FMT_JSON_LEAN, &len);
-        EXPECT_EQ(test.expected, stripWhitespace(std::string_view(str, len)));
+        EXPECT_EQ(test.expected, stripWhitespace(std::string(str, len)));
         tr_free(str);
         tr_variantFree(&top);
     }
@@ -454,7 +448,7 @@ TEST_F(VariantTest, stackSmash)
     // confirm that we can serialize it back again
     size_t len;
     auto* saved = tr_variantToStr(&val, TR_VARIANT_FMT_BENC, &len);
-    EXPECT_EQ(in, std::string_view(saved, len));
+    EXPECT_EQ(in, std::string(saved, len));
     tr_free(saved);
 
     tr_variantFree(&val);
@@ -501,10 +495,10 @@ TEST_F(VariantTest, boolAndIntRecast)
 
 TEST_F(VariantTest, dictFindType)
 {
-    auto constexpr ExpectedStr = std::string_view { "this-is-a-string" };
-    auto constexpr ExpectedBool = bool{ true };
-    auto constexpr ExpectedInt = int{ 1234 };
-    auto constexpr ExpectedReal = double{ 0.3 };
+    auto const expected_str = std::string { "this-is-a-string" };
+    auto const expected_bool = bool{ true };
+    auto const expected_int = int{ 1234 };
+    auto const expected_real = double{ 0.3 };
 
     auto const key_bool = tr_quark_new("this-is-a-bool", TR_BAD_SIZE);
     auto const key_real = tr_quark_new("this-is-a-real", TR_BAD_SIZE);
@@ -514,10 +508,10 @@ TEST_F(VariantTest, dictFindType)
     // populate a dict
     tr_variant top;
     tr_variantInitDict(&top, 0);
-    tr_variantDictAddBool(&top, key_bool, ExpectedBool);
-    tr_variantDictAddInt(&top, key_int, ExpectedInt);
-    tr_variantDictAddReal(&top, key_real, ExpectedReal);
-    tr_variantDictAddStr(&top, key_str, ExpectedStr.data());
+    tr_variantDictAddBool(&top, key_bool, expected_bool);
+    tr_variantDictAddInt(&top, key_int, expected_int);
+    tr_variantDictAddReal(&top, key_real, expected_real);
+    tr_variantDictAddStr(&top, key_str, expected_str.data());
 
     // look up the keys as strings
     char const* str = {};
@@ -526,7 +520,7 @@ TEST_F(VariantTest, dictFindType)
     EXPECT_FALSE(tr_variantDictFindStr(&top, key_real, &str, &len));
     EXPECT_FALSE(tr_variantDictFindStr(&top, key_int, &str, &len));
     EXPECT_TRUE(tr_variantDictFindStr(&top, key_str, &str, &len));
-    EXPECT_EQ(ExpectedStr, std::string_view(str, len));
+    EXPECT_EQ(expected_str, std::string(str, len));
 
     // look up the keys as bools
     auto b = bool{};
@@ -534,25 +528,25 @@ TEST_F(VariantTest, dictFindType)
     EXPECT_FALSE(tr_variantDictFindBool(&top, key_real, &b));
     EXPECT_FALSE(tr_variantDictFindBool(&top, key_str, &b));
     EXPECT_TRUE(tr_variantDictFindBool(&top, key_bool, &b));
-    EXPECT_EQ(ExpectedBool, b);
+    EXPECT_EQ(expected_bool, b);
 
     // look up the keys as doubles
     auto d = double{};
     EXPECT_FALSE(tr_variantDictFindReal(&top, key_bool, &d));
     EXPECT_TRUE(tr_variantDictFindReal(&top, key_int, &d));
-    EXPECT_EQ(ExpectedInt, std::lrint(d));
+    EXPECT_EQ(expected_int, std::lrint(d));
     EXPECT_FALSE(tr_variantDictFindReal(&top, key_str, &d));
     EXPECT_TRUE(tr_variantDictFindReal(&top, key_real, &d));
-    EXPECT_EQ(std::lrint(ExpectedReal * 100), std::lrint(d * 100));
+    EXPECT_EQ(std::lrint(expected_real * 100), std::lrint(d * 100));
 
     // look up the keys as ints
     auto i = int64_t {};
     EXPECT_TRUE(tr_variantDictFindInt(&top, key_bool, &i));
-    EXPECT_EQ(ExpectedBool ? 1 : 0, i);
+    EXPECT_EQ(expected_bool ? 1 : 0, i);
     EXPECT_FALSE(tr_variantDictFindInt(&top, key_real, &i));
     EXPECT_FALSE(tr_variantDictFindInt(&top, key_str, &i));
     EXPECT_TRUE(tr_variantDictFindInt(&top, key_int, &i));
-    EXPECT_EQ(ExpectedInt, i);
+    EXPECT_EQ(expected_int, i);
 
     tr_variantFree(&top);
 }

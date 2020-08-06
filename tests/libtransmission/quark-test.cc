@@ -12,23 +12,18 @@
 #include "gtest/gtest.h"
 
 #include <cstring>
-#if !defined(__has_include) || __has_include(<string_view>)
-# include <string_view>
-#else
-# include <experimental/string_view>
-# define string_view experimental::string_view
-#endif
+#include <string>
 
 class QuarkTest : public ::testing::Test
 {
 protected:
     template<typename T>
-    std::string_view quarkGetString(T i)
+    std::string quarkGetString(T i)
     {
         size_t len;
         char const* const str = tr_quark_get_string(tr_quark(i), &len);
         EXPECT_EQ(strlen(str), len);
-        return std::string_view(str, len);
+        return std::string(str, len);
     }
 };
 
@@ -58,5 +53,5 @@ TEST_F(QuarkTest, newEmptyQuarkReturnsNone)
 {
     auto const q = tr_quark_new(nullptr, TR_BAD_SIZE);
     EXPECT_EQ(TR_KEY_NONE, q);
-    EXPECT_EQ(std::string_view{ "" }, quarkGetString(q));
+    EXPECT_EQ(std::string{ "" }, quarkGetString(q));
 }

@@ -17,12 +17,7 @@
 #include <array>
 #include <cstdlib> // mktemp()
 #include <cstring> // strlen()
-#if !defined(__has_include) || __has_include(<string_view>)
-# include <string_view>
-#else
-# include <experimental/string_view>
-# define string_view experimental::string_view
-#endif
+#include <string>
 
 namespace libtransmission::test
 {
@@ -210,11 +205,11 @@ TEST_F(MakemetaTest, singleFile)
     trackers[tracker_count].tier = tracker_count;
     trackers[tracker_count].announce = const_cast<char*>("udp://tracker.publicbt.com:80");
     ++tracker_count;
-    auto constexpr Payload = std::string_view { "Hello, World!\n" };
+    auto const payload = std::string { "Hello, World!\n" };
     char const* const comment = "This is the comment";
     bool const is_private = false;
     testSingleFileImpl(trackers.data(), tracker_count,
-        Payload.data(), Payload.size(),
+        payload.data(), payload.size(),
         comment, is_private);
 }
 

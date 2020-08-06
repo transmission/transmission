@@ -19,12 +19,6 @@
 #include <cstring>
 #include <string>
 #include <unordered_set>
-#if !defined(__has_include) || __has_include(<string_view>)
-# include <string_view>
-#else
-# include <experimental/string_view>
-# define string_view experimental::string_view
-#endif
 
 TEST(Crypto, torrentHash)
 {
@@ -82,25 +76,25 @@ TEST(Crypto, encryptDecrypt)
     EXPECT_TRUE(tr_cryptoComputeSecret(&a, tr_cryptoGetMyPublicKey_(&b, &public_key_length)));
     EXPECT_TRUE(tr_cryptoComputeSecret_(&b, tr_cryptoGetMyPublicKey(&a, &public_key_length)));
 
-    auto constexpr Input1 = std::string_view { "test1" };
-    auto encrypted1 = std::array<char, Input1.size()>{};
-    auto decrypted1 = std::array<char, Input1.size()>{};
+    auto const input1 = std::string { "test1" };
+    auto encrypted1 = std::array<char, 128>{};
+    auto decrypted1 = std::array<char, 128>{};
 
     tr_cryptoEncryptInit(&a);
-    tr_cryptoEncrypt(&a, Input1.size(), Input1.data(), encrypted1.data());
+    tr_cryptoEncrypt(&a, input1.size(), input1.data(), encrypted1.data());
     tr_cryptoDecryptInit_(&b);
-    tr_cryptoDecrypt_(&b, encrypted1.size(), encrypted1.data(), decrypted1.data());
-    EXPECT_EQ(Input1, std::string_view(decrypted1.data(), decrypted1.size()));
+    tr_cryptoDecrypt_(&b, input1.size(), encrypted1.data(), decrypted1.data());
+    EXPECT_EQ(input1, std::string(decrypted1.data(), input1.size()));
 
-    auto constexpr Input2 = std::string_view { "@#)C$@)#(*%bvkdjfhwbc039bc4603756VB3)" };
-    auto encrypted2 = std::array<char, Input2.size()>{};
-    auto decrypted2 = std::array<char, Input2.size()>{};
+    auto const input2 = std::string { "@#)C$@)#(*%bvkdjfhwbc039bc4603756VB3)" };
+    auto encrypted2 = std::array<char, 128>{};
+    auto decrypted2 = std::array<char, 128>{};
 
     tr_cryptoEncryptInit_(&b);
-    tr_cryptoEncrypt_(&b, Input2.size(), Input2.data(), encrypted2.data());
+    tr_cryptoEncrypt_(&b, input2.size(), input2.data(), encrypted2.data());
     tr_cryptoDecryptInit(&a);
-    tr_cryptoDecrypt(&a, encrypted2.size(), encrypted2.data(), decrypted2.data());
-    EXPECT_EQ(Input2, std::string_view(decrypted2.data(), decrypted2.size()));
+    tr_cryptoDecrypt(&a, input2.size(), encrypted2.data(), decrypted2.data());
+    EXPECT_EQ(input2, std::string(decrypted2.data(), input2.size()));
 
     tr_cryptoDestruct_(&b);
     tr_cryptoDestruct(&a);

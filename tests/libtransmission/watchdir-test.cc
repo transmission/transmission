@@ -18,12 +18,6 @@
 
 #include <map>
 #include <string>
-#if !defined(__has_include) || __has_include(<string_view>)
-# include <string_view>
-#else
-# include <experimental/string_view>
-# define string_view experimental::string_view
-#endif
 
 /***
 ****
@@ -40,12 +34,12 @@ extern struct timeval tr_watchdir_retry_max_interval;
 namespace libtransmission::test
 {
 
-auto constexpr Native = std::string_view { "native" };
-auto constexpr Generic = std::string_view { "generic" };
+auto const Native = std::string { "native" };
+auto const Generic = std::string { "generic" };
 
 class WatchDirTest :
     public SandboxedTest,
-    public ::testing::WithParamInterface<std::string_view>
+    public ::testing::WithParamInterface<std::string>
 {
 private:
     std::shared_ptr<struct event_base> ev_base_;
@@ -77,22 +71,22 @@ protected:
         return tr_watchdir_new(path.c_str(), cb, cb_data, ev_base_.get(), force_generic);
     }
 
-    std::string createFile(std::string_view parent_dir, std::string_view name)
+    std::string createFile(std::string const& parent_dir, std::string const& name)
     {
-        auto path = std::string(parent_dir);
+        auto path = parent_dir;
         path += TR_PATH_DELIMITER;
-        path.append(name.data(), name.size());
+        path += name;
 
         createFileWithContents(path, "");
 
         return path;
     }
 
-    std::string createDir(std::string_view parent_dir, std::string_view name)
+    std::string createDir(std::string const& parent_dir, std::string const& name)
     {
-        auto path = std::string(parent_dir);
+        auto path = parent_dir;
         path += TR_PATH_DELIMITER;
-        path.append(name.data(), name.size());
+        path += name;
 
         tr_sys_dir_create(path.c_str(), 0, 0700, nullptr);
 
@@ -162,8 +156,8 @@ TEST_P(WatchDirTest, initialScan)
     }
 
     // add a file
-    auto constexpr Basename = std::string_view { "test.txt" };
-    createFile(path, Basename);
+    auto const base_name = std::string { "test.txt" };
+    createFile(path, base_name);
 
     // confirm that a wd will pick up the file that
     // was created before the wd was instantiated
@@ -174,7 +168,7 @@ TEST_P(WatchDirTest, initialScan)
 
         processEvents();
         EXPECT_EQ(wd, wd_data.wd);
-        EXPECT_EQ(Basename, wd_data.name);
+        EXPECT_EQ(base_name, wd_data.name);
 
         tr_watchdir_free(wd);
     }
@@ -193,19 +187,19 @@ TEST_P(WatchDirTest, watch)
     EXPECT_EQ("", wd_data.name);
 
     // test that a new file in an empty directory shows up
-    auto constexpr File1 = std::string_view { "test1" };
-    createFile(path, File1);
+    auto const file1 = std::string { "test1" };
+    createFile(path, file1);
     processEvents();
     EXPECT_EQ(wd, wd_data.wd);
-    EXPECT_EQ(File1, wd_data.name);
+    EXPECT_EQ(file1, wd_data.name);
 
     // test that a new file in a nonempty directory shows up
     wd_data = CallbackData(TR_WATCHDIR_ACCEPT);
-    auto constexpr File2 = std::string_view { "test2" };
-    createFile(path, File2);
+    auto const file2 = std::string { "test2" };
+    createFile(path, file2);
     processEvents();
     EXPECT_EQ(wd, wd_data.wd);
-    EXPECT_EQ(File2, wd_data.name);
+    EXPECT_EQ(file2, wd_data.name);
 
     // test that folders don't trigger the callback
     wd_data = CallbackData(TR_WATCHDIR_ACCEPT);
@@ -240,11 +234,11 @@ TEST_P(WatchDirTest, watchTwoDirs)
 
     // add a file into directory 1 and confirm it triggers
     // a callback with the right wd
-    auto constexpr File1 = std::string_view { "test.txt" };
-    createFile(dir1, File1);
+    auto const file1 = std::string { "test.txt" };
+    createFile(dir1, file1);
     processEvents();
     EXPECT_EQ(wd1, wd1_data.wd);
-    EXPECT_EQ(File1, wd1_data.name);
+    EXPECT_EQ(file1, wd1_data.name);
     EXPECT_EQ(nullptr, wd2_data.wd);
     EXPECT_EQ("", wd2_data.name);
 
@@ -252,21 +246,21 @@ TEST_P(WatchDirTest, watchTwoDirs)
     // a callback with the right wd
     wd1_data = CallbackData(TR_WATCHDIR_ACCEPT);
     wd2_data = CallbackData(TR_WATCHDIR_ACCEPT);
-    auto constexpr File2 = std::string_view { "test2.txt" };
-    createFile(dir2, File2);
+    auto const file2 = std::string { "test2.txt" };
+    createFile(dir2, file2);
     processEvents();
     EXPECT_EQ(nullptr, wd1_data.wd);
     EXPECT_EQ("", wd1_data.name);
     EXPECT_EQ(wd2, wd2_data.wd);
-    EXPECT_EQ(File2, wd2_data.name);
+    EXPECT_EQ(file2, wd2_data.name);
 
     // TODO(ckerr): watchdir.c seems to treat IGNORE and ACCEPT identically
     // so I'm not sure what's intended or what this is supposed to
     // be testing.
     wd1_data = CallbackData(TR_WATCHDIR_IGNORE);
     wd2_data = CallbackData(TR_WATCHDIR_IGNORE);
-    auto constexpr File3 = std::string_view { "test3.txt" };
-    auto constexpr File4 = std::string_view { "test4.txt" };
+    auto const File3 = std::string { "test3.txt" };
+    auto const File4 = std::string { "test4.txt" };
     createFile(dir1, File3);
     createFile(dir2, File4);
     processEvents();
@@ -280,7 +274,7 @@ TEST_P(WatchDirTest, watchTwoDirs)
     // and a new directory in directory 'b'
     wd1_data = CallbackData(TR_WATCHDIR_ACCEPT);
     wd2_data = CallbackData(TR_WATCHDIR_ACCEPT);
-    auto constexpr File5 = std::string_view { "test5.txt" };
+    auto const File5 = std::string { "test5.txt" };
     createFile(dir1, File5);
     createDir(dir2, File5);
     processEvents();
@@ -295,7 +289,7 @@ TEST_P(WatchDirTest, watchTwoDirs)
     // and a new directory in directory 'a'
     wd1_data = CallbackData(TR_WATCHDIR_ACCEPT);
     wd2_data = CallbackData(TR_WATCHDIR_ACCEPT);
-    auto constexpr File6 = std::string_view { "test6.txt" };
+    auto const File6 = std::string { "test6.txt" };
     createDir(dir1, File6);
     createFile(dir2, File6);
     processEvents();
@@ -308,8 +302,8 @@ TEST_P(WatchDirTest, watchTwoDirs)
     // watchdirs still triggers no callbacks
     wd1_data = CallbackData(TR_WATCHDIR_ACCEPT);
     wd2_data = CallbackData(TR_WATCHDIR_ACCEPT);
-    auto constexpr File7 = std::string_view { "test7.txt" };
-    auto constexpr File8 = std::string_view { "test8.txt" };
+    auto const File7 = std::string { "test7.txt" };
+    auto const File8 = std::string { "test8.txt" };
     createDir(dir1, File7);
     createDir(dir2, File8);
     processEvents();
@@ -344,8 +338,8 @@ TEST_P(WatchDirTest, retry)
     EXPECT_EQ(nullptr, wd_data.wd);
     EXPECT_EQ("", wd_data.name);
 
-    auto constexpr TestFile = std::string_view { "test" };
-    createFile(path, TestFile);
+    auto const test_file = std::string { "test" };
+    createFile(path, test_file);
     processEvents();
     EXPECT_EQ(nullptr, wd_data.wd);
     EXPECT_EQ("", wd_data.name);
@@ -355,7 +349,7 @@ TEST_P(WatchDirTest, retry)
     wd_data = CallbackData(TR_WATCHDIR_ACCEPT);
     processEvents();
     EXPECT_EQ(wd, wd_data.wd);
-    EXPECT_EQ(TestFile, wd_data.name);
+    EXPECT_EQ(test_file, wd_data.name);
 }
 
 INSTANTIATE_TEST_SUITE_P(
