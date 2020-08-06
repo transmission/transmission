@@ -13,8 +13,6 @@
 #include "variant-common.h"
 #include "variant.h"
 
-#include <event2/buffer.h>
-
 #include <array>
 #include <cmath> // lrint()
 #include <cctype> // isspace()
