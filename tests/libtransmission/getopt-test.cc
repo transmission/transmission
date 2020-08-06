@@ -33,18 +33,18 @@ class GetoptTest : public ::testing::Test
 {
 protected:
     void runTest(int argc, char const* const* argv, int expected_n, int const* expected_c,
-        char const* const* expected_optarg) const
+        char const* const* expected_args) const
     {
         auto n = int{};
         tr_optind = 1;
 
         int c;
-        char const* optarg;
-        while ((c = tr_getopt("summary", argc, argv, Options.data(), &optarg)) != TR_OPT_DONE)
+        char const* argstr;
+        while ((c = tr_getopt("summary", argc, argv, Options.data(), &argstr)) != TR_OPT_DONE)
         {
             EXPECT_LT(n, expected_n);
             EXPECT_EQ(expected_c[n], c);
-            EXPECT_STREQ(expected_optarg[n], optarg);
+            EXPECT_STREQ(expected_args[n], argstr);
             ++n;
         }
 

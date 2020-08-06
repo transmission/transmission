@@ -98,7 +98,7 @@ static gboolean spun_cb_idle(gpointer spin)
     struct spin_idle_data* data = g_object_get_data(o, IDLE_DATA);
 
     /* has the user stopped making changes? */
-    if (g_timer_elapsed(data->last_change, NULL) > 0.33F)
+    if (g_timer_elapsed(data->last_change, NULL) > 0.33)
     {
         /* update the core */
         tr_quark const key = GPOINTER_TO_INT(g_object_get_data(o, PREF_KEY));

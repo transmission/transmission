@@ -375,6 +375,8 @@ if(WIN32)
     endforeach()
 endif()
 
+## Compiler standard version
+
 if(CMAKE_VERSION VERSION_LESS "3.1")
     if(CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
         set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu99")
@@ -387,45 +389,69 @@ else()
     set(CMAKE_CXX_STANDARD_REQUIRED ON)
 endif()
 
+## Compiler Warnings
+
 set(C_WARNING_FLAGS)
 set(CXX_WARNING_FLAGS)
 
-if(CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
-    set(COMPILER_WARNING_FLAGS
-        -Wall
-        -W
-        -Wcast-align
-        -Wfloat-equal
-        -Wmissing-format-attribute
-        -Wpointer-arith
-        -Wredundant-decls
-        -Wunused-parameter
-        -Wwrite-strings
-    )
+include(CheckCCompilerFlag)
+include(CheckCXXCompilerFlag)
 
-    if(NOT CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_VERSION VERSION_GREATER "3.3")
-        list(APPEND COMPILER_WARNING_FLAGS
-            -Wextra
-            -Winit-self)
-    endif()
+set(WARNING_CANDIDATES
+    -Wall
+    -Wcast-align
+    -Wduplicated-cond
+    -Wextra
+    -Wfloat-equal
+    -Winit-self
+    -Wlogical-op
+    -Wmissing-format-attribute
+    -Wnested-externs
+    -Wnull-dereference
+    -Wpointer-arith
+    -Wredundant-decls
+    -Wrestrict
+    -Wstrict-prototypes
+    -Wunused-parameter
+    -Wwrite-strings
+)
 
-    if(MINGW)
-        # Disable excessive warnings since we're using __USE_MINGW_ANSI_STDIO
-        # Hopefully, any potential issues will be spotted on other platforms
-        list(APPEND COMPILER_WARNING_FLAGS -Wno-format)
-    else()
-        list(APPEND COMPILER_WARNING_FLAGS -Wformat-security)
-    endif()
-
-    list(APPEND C_WARNING_FLAGS
-         ${COMPILER_WARNING_FLAGS}
-        -Wnested-externs
-        -Wstrict-prototypes
-    )
-    list(APPEND CXX_WARNING_FLAGS
-        ${COMPILER_WARNING_FLAGS}
-    )
+if(MINGW)
+    # Disable excessive warnings since we're using __USE_MINGW_ANSI_STDIO
+    # Hopefully, any potential issues will be spotted on other platforms
+    list(APPEND WARNING_CANDIDATES -Wno-format)
+else()
+    list(APPEND WARNING_CANDIDATES -Wformat-security)
 endif()
+
+foreach(FLAG ${WARNING_CANDIDATES})
+    # -Wnull-dereference --> wnull_dereference
+    set(DISPLAY_NAME "${FLAG}")
+    string(REPLACE "-W" "W" DISPLAY_NAME "${DISPLAY_NAME}")
+    string(REPLACE "-" "_" DISPLAY_NAME "${DISPLAY_NAME}")
+    string(TOLOWER "${DISPLAY_NAME}" DISPLAY_NAME)
+
+    # does the C compiler support this flag
+    set(CACHE_NAME "c_has_warning_${DISPLAY_NAME}")
+    check_c_compiler_flag(${FLAG} ${CACHE_NAME})
+    if (${CACHE_NAME})
+        list(APPEND C_WARNING_FLAGS ${FLAG})
+    endif()
+
+    # does the CXX compiler support this flag
+    set(CACHE_NAME "cxx_has_warning_${DISPLAY_NAME}")
+    check_cxx_compiler_flag(${FLAG} ${CACHE_NAME})
+    if (${CACHE_NAME})
+        list(APPEND CXX_WARNING_FLAGS ${FLAG})
+    endif()
+
+    unset(CACHE_NAME)
+    unset(DISPLAY_NAME)
+endforeach()
+
+unset(WARNING_CANDIDATES)
+
+##
 
 include(LargeFileSupport)
 

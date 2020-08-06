@@ -25,7 +25,7 @@ TEST(Bitfield, countRange)
         tr_bitfield bf;
         tr_bitfieldConstruct(&bf, bit_count);
 
-        for (int i = 0, n = tr_rand_int_weak(bit_count); i < n; ++i)
+        for (int j = 0, n = tr_rand_int_weak(bit_count); j < n; ++j)
         {
             tr_bitfieldAdd(&bf, tr_rand_int_weak(bit_count));
         }
@@ -48,9 +48,9 @@ TEST(Bitfield, countRange)
 
         // test the bitfield
         unsigned long count1 = {};
-        for (int i = begin; i < end; ++i)
+        for (auto j = begin; j < end; ++j)
         {
-            if (tr_bitfieldHas(&bf, i))
+            if (tr_bitfieldHas(&bf, j))
             {
                 ++count1;
             }

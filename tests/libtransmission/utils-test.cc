@@ -400,6 +400,7 @@ TEST_F(UtilsTest, trStrdupPrintf)
     s2[2047] = '%';
     s2[2048] = 's';
 
+    // NOLINTNEXTLINE(clang-diagnostic-format-nonliteral)
     s = makeString(tr_strdup_printf(s2, "test"));
     EXPECT_EQ(s3, s);
 
