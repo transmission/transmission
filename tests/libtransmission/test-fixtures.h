@@ -103,8 +103,8 @@ protected:
     static std::string create_sandbox(std::string const& parent_dir, std::string const& tmpl)
     {
         std::string path = makeString(tr_buildPath(parent_dir.data(), tmpl.data(), nullptr));
-        tr_sys_dir_create_temp(path.data(), nullptr);
-        tr_sys_path_native_separators(path.data());
+        tr_sys_dir_create_temp(&path.front(), nullptr);
+        tr_sys_path_native_separators(&path.front());
         return path;
     }
 
@@ -209,7 +209,7 @@ protected:
         buildParentDir(tmpl);
 
         // NOLINTNEXTLINE(clang-analyzer-cplusplus.InnerPointer)
-        auto const fd = tr_sys_file_open_temp(tmpl.data(), nullptr);
+        auto const fd = tr_sys_file_open_temp(&tmpl.front(), nullptr);
         blockingFileWrite(fd, payload, n);
         tr_sys_file_close(fd, nullptr);
         sync();
