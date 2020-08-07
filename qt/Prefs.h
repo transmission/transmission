@@ -18,6 +18,7 @@
 #include <libtransmission/quark.h>
 
 #include "Filters.h"
+#include "Macros.h"
 
 class QDateTime;
 
@@ -29,6 +30,7 @@ struct tr_variant;
 class Prefs : public QObject
 {
     Q_OBJECT
+    TR_DISABLE_COPY_MOVE(Prefs)
 
 public:
     enum

@@ -9,6 +9,7 @@
 #pragma once
 
 #include "tr-macros.h"
+#include "transmission.h"
 
 TR_BEGIN_DECLS
 

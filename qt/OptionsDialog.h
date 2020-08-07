@@ -18,8 +18,8 @@
 
 #include "AddData.h" // AddData
 #include "BaseDialog.h"
+#include "Macros.h"
 #include "Torrent.h" // FileList
-
 #include "ui_OptionsDialog.h"
 
 class Prefs;
@@ -33,6 +33,7 @@ struct tr_variant;
 class OptionsDialog : public BaseDialog
 {
     Q_OBJECT
+    TR_DISABLE_COPY_MOVE(OptionsDialog)
 
 public:
     OptionsDialog(Session& session, Prefs const& prefs, AddData addme, QWidget* parent = nullptr);

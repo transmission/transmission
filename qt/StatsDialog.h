@@ -9,7 +9,7 @@
 #pragma once
 
 #include "BaseDialog.h"
-
+#include "Macros.h"
 #include "ui_StatsDialog.h"
 
 class QTimer;
@@ -19,6 +19,7 @@ class Session;
 class StatsDialog : public BaseDialog
 {
     Q_OBJECT
+    TR_DISABLE_COPY_MOVE(StatsDialog)
 
 public:
     StatsDialog(Session&, QWidget* parent = nullptr);

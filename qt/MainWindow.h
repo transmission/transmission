@@ -19,10 +19,10 @@
 #include <QWidgetList>
 
 #include "Filters.h"
+#include "Macros.h"
 #include "Speed.h"
 #include "TorrentFilter.h"
 #include "Typedefs.h"
-
 #include "ui_MainWindow.h"
 
 class QAction;
@@ -51,6 +51,7 @@ struct tr_variant;
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
+    TR_DISABLE_COPY_MOVE(MainWindow)
 
 public:
     MainWindow(Session&, Prefs&, TorrentModel&, bool minized);

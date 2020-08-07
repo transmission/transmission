@@ -6,6 +6,8 @@
  *
  */
 
+#include "PrefsDialog.h"
+
 #ifdef _WIN32
 #include <winsock2.h> // FD_SETSIZE
 #else
@@ -36,10 +38,9 @@
 #include <QVBoxLayout>
 
 #include "ColumnResizer.h"
-#include "FreeSpaceLabel.h"
 #include "Formatter.h"
+#include "FreeSpaceLabel.h"
 #include "Prefs.h"
-#include "PrefsDialog.h"
 #include "Session.h"
 #include "Utils.h"
 

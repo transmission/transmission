@@ -25,6 +25,8 @@
 #include <libtransmission/quark.h>
 #include <libtransmission/variant.h>
 
+#include "Macros.h"
+
 class QByteArray;
 class QNetworkAccessManager;
 
@@ -53,6 +55,7 @@ using RpcResponseFuture = QFuture<RpcResponse>;
 class RpcClient : public QObject
 {
     Q_OBJECT
+    TR_DISABLE_COPY_MOVE(RpcClient)
 
 public:
     RpcClient(QObject* parent = nullptr);

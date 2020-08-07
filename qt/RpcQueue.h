@@ -18,11 +18,13 @@
 #include <QPair>
 #include <QQueue>
 
+#include "Macros.h"
 #include "RpcClient.h"
 
 class RpcQueue : public QObject
 {
     Q_OBJECT
+    TR_DISABLE_COPY_MOVE(RpcQueue)
 
 public:
     explicit RpcQueue(QObject* parent = nullptr);

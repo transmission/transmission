@@ -14,6 +14,7 @@
 #include <QAbstractListModel>
 #include <QVector>
 
+#include "Macros.h"
 #include "Torrent.h"
 #include "Typedefs.h"
 
@@ -28,6 +29,7 @@ struct tr_variant;
 class TorrentModel : public QAbstractListModel
 {
     Q_OBJECT
+    TR_DISABLE_COPY_MOVE(TorrentModel)
 
 public:
     enum Role

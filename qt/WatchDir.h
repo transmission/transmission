@@ -15,11 +15,14 @@
 #include <QSet>
 #include <QString>
 
+#include "Macros.h"
+
 class TorrentModel;
 
 class WatchDir : public QObject
 {
     Q_OBJECT
+    TR_DISABLE_COPY_MOVE(WatchDir)
 
 public:
     WatchDir(TorrentModel const&);

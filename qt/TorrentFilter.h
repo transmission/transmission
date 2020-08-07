@@ -14,6 +14,7 @@
 #include <QTimer>
 
 #include "Filters.h"
+#include "Macros.h"
 
 class QString;
 
@@ -24,6 +25,7 @@ class Torrent;
 class TorrentFilter : public QSortFilterProxyModel
 {
     Q_OBJECT
+    TR_DISABLE_COPY_MOVE(TorrentFilter)
 
 public:
     enum TextMode

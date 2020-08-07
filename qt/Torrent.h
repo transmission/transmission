@@ -20,6 +20,7 @@
 #include <libtransmission/quark.h>
 
 #include "FaviconCache.h"
+#include "Macros.h"
 #include "Speed.h"
 
 #ifdef ERROR
@@ -105,6 +106,7 @@ using FileList = QVector<TorrentFile>;
 class Torrent : public QObject
 {
     Q_OBJECT
+    TR_DISABLE_COPY_MOVE(Torrent)
 
 public:
     Torrent(Prefs const&, int id);

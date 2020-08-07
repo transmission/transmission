@@ -8,8 +8,8 @@
 
 #include "VariantHelpers.h"
 
-#include <QtGlobal> // qFuzzyCompare
 #include <QUrl>
+#include <QtGlobal> // qFuzzyCompare
 
 #include "Application.h" // qApp
 #include "Filters.h"

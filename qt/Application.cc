@@ -6,6 +6,8 @@
  *
  */
 
+#include "Application.h"
+
 #include <algorithm>
 #include <array>
 #include <ctime>
@@ -24,13 +26,12 @@
 #include <QDBusReply>
 #endif
 
-#include <libtransmission/transmission.h>
 #include <libtransmission/tr-getopt.h>
+#include <libtransmission/transmission.h>
 #include <libtransmission/utils.h>
 #include <libtransmission/version.h>
 
 #include "AddData.h"
-#include "Application.h"
 #include "Formatter.h"
 #include "InteropHelper.h"
 #include "MainWindow.h"
