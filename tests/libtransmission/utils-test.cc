@@ -208,8 +208,8 @@ TEST_F(UtilsTest, trQuickfindfirstk)
             tr_quickfindFirstK(buf, n, sizeof(int), compareInts, k);
 
             // confirm that the smallest K ints are in the first slots K slots in buf
-            auto const highest_low = std::max_element(buf, buf + k);
-            auto const lowest_high = std::min_element(buf + k, buf + n);
+            auto const* highest_low = std::max_element(buf, buf + k);
+            auto const* lowest_high = std::min_element(buf + k, buf + n);
             EXPECT_LE(highest_low, lowest_high);
         };
 

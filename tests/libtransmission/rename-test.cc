@@ -152,7 +152,7 @@ TEST_F(RenameTest, singleFilenameTorrent)
     EXPECT_TRUE(tr_isTorrent(tor));
 
     // sanity check the info
-    EXPECT_EQ(1, tor->info.fileCount);
+    EXPECT_EQ(tr_file_index_t(1), tor->info.fileCount);
     EXPECT_STREQ("hello-world.txt", tor->info.files[0].name);
     EXPECT_FALSE(tor->info.files[0].is_renamed);
 
@@ -212,7 +212,7 @@ TEST_F(RenameTest, singleFilenameTorrent)
     sync();
     loaded = tr_torrentLoadResume(tor, ~0, ctor, nullptr);
     EXPECT_STREQ("foobar", tr_torrentName(tor));
-    EXPECT_NE(0, (loaded & TR_FR_NAME));
+    EXPECT_NE(decltype(loaded){0}, (loaded & TR_FR_NAME));
 
     /***
     ****  ...and rename it back again
@@ -289,7 +289,7 @@ TEST_F(RenameTest, multifileTorrent)
 
     // sanity check the (full) stats
     blockingTorrentVerify(tor);
-    auto* st = tr_torrentStat(tor);
+    auto const* st = tr_torrentStat(tor);
     EXPECT_EQ(TR_STATUS_STOPPED, st->activity);
     EXPECT_EQ(TR_STAT_OK, st->error);
     EXPECT_EQ(0, st->leftUntilDone);
@@ -497,7 +497,7 @@ TEST_F(RenameTest, partialFile)
     EXPECT_EQ(Length[1], fst[1].bytesCompleted);
     EXPECT_EQ(Length[2], fst[2].bytesCompleted);
     tr_torrentFilesFree(fst, tor->info.fileCount);
-    auto* st = tr_torrentStat(tor);
+    auto const* st = tr_torrentStat(tor);
     EXPECT_EQ(TotalSize, st->sizeWhenDone);
     EXPECT_EQ(PieceSize, st->leftUntilDone);
 
