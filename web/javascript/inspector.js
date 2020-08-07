@@ -301,6 +301,7 @@ function Inspector(controller) {
             // last activity
             //
 
+            str = '';
             latest = -1;
             if (torrents.length < 1) {
                 str = none;
@@ -308,17 +309,26 @@ function Inspector(controller) {
                 baseline = torrents[0].getLastActivity();
                 for (i = 0; t = torrents[i]; ++i) {
                     d = t.getLastActivity();
-                    if (latest < d) {
+                    if (baseline != d) {
+                        str = mixed;
+                        break;
+                    } else if (latest < d) {
                         latest = d;
                     };
                 };
-                d = now / 1000 - latest; // seconds since last activity
-                if (d < 0) {
-                    str = none;
-                } else if (d < 5) {
-                    str = 'Active now';
-                } else {
-                    str = fmt.timeInterval(d) + ' ago';
+                if (!str.length) {
+                    if (!latest) {
+                        str = 'Never';
+                    } else {
+                        d = now / 1000 - latest; // seconds since last activity
+                        if (d < 0) {
+                            str = none;
+                        } else if (d < 5) {
+                            str = 'Active now';
+                        } else {
+                            str = fmt.timeInterval(d) + ' ago';
+                        };
+                    };
                 };
             };
             setTextContent(e.last_activity_lb, str);
