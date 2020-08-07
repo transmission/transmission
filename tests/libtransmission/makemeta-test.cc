@@ -83,7 +83,7 @@ protected:
         tr_metaInfoBuilderFree(builder);
     }
 
-    void testSingleDirectoryImpl(tr_tracker_info const* trackers, size_t const tracker_count, void const** payloads,
+    void testSingleDirectoryImpl(tr_tracker_info const* trackers, int const tracker_count, void const** payloads,
         size_t const* payload_sizes, size_t const payload_count, char const* comment,
         bool const is_private)
     {
@@ -162,7 +162,7 @@ protected:
         tr_free(top);
     }
 
-    void testSingleDirectoryRandomPayloadImpl(tr_tracker_info const* trackers, size_t const tracker_count,
+    void testSingleDirectoryRandomPayloadImpl(tr_tracker_info const* trackers, int const tracker_count,
         size_t const max_file_count, size_t const max_file_size, char const* comment,
         bool const is_private)
     {
@@ -201,7 +201,7 @@ protected:
 TEST_F(MakemetaTest, singleFile)
 {
     auto trackers = std::array<tr_tracker_info, 16>{};
-    auto tracker_count = size_t{};
+    auto tracker_count = int{};
     trackers[tracker_count].tier = tracker_count;
     trackers[tracker_count].announce = const_cast<char*>("udp://tracker.openbittorrent.com:80");
     ++tracker_count;
@@ -222,7 +222,7 @@ TEST_F(MakemetaTest, singleDirectoryRandomPayload)
     auto constexpr DefaultMaxFileSize = size_t{ 1024 };
 
     auto trackers = std::array<tr_tracker_info, 16>{};
-    auto tracker_count = size_t{};
+    auto tracker_count = int{};
     trackers[tracker_count].tier = tracker_count;
     trackers[tracker_count].announce = const_cast<char*>("udp://tracker.openbittorrent.com:80");
     ++tracker_count;

@@ -45,7 +45,7 @@ class FileTest : public SessionTest
 protected:
     auto createTestDir(std::string const& child_name)
     {
-        auto const test_dir = makeString(tr_buildPath(tr_sessionGetConfigDir(session_), child_name.c_str(), nullptr));
+        auto test_dir = makeString(tr_buildPath(tr_sessionGetConfigDir(session_), child_name.c_str(), nullptr));
         tr_sys_dir_create(test_dir.data(), 0, 0777, nullptr);
         return test_dir;
     }
