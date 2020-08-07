@@ -388,6 +388,7 @@ extern unsigned int tr_size_K;
 /* format a speed from KBps into a user-readable string. */
 char* tr_formatter_speed_KBps(char* buf, double KBps, size_t buflen);
 
+// FIXME(ckerr): bytes should be a size_t
 /* format a memory size from bytes into a user-readable string. */
 char* tr_formatter_mem_B(char* buf, int64_t bytes, size_t buflen);
 
@@ -397,6 +398,7 @@ static inline char* tr_formatter_mem_MB(char* buf, double MBps, size_t buflen)
     return tr_formatter_mem_B(buf, (int64_t)(MBps * tr_mem_K * tr_mem_K), buflen);
 }
 
+// FIXME(ckerr): bytes should be a size_t
 /* format a file size from bytes into a user-readable string. */
 char* tr_formatter_size_B(char* buf, int64_t bytes, size_t buflen);
 
