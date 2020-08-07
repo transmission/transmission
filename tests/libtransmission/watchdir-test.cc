@@ -46,12 +46,15 @@ namespace libtransmission
 namespace test
 {
 
-auto const Native = std::string { "native" };
-auto const Generic = std::string { "generic" };
+enum class WatchMode
+{
+    NATIVE,
+    GENERIC
+};
 
 class WatchDirTest :
     public SandboxedTest,
-    public ::testing::WithParamInterface<std::string>
+    public ::testing::WithParamInterface<WatchMode>
 {
 private:
     std::shared_ptr<struct event_base> ev_base_;
@@ -71,11 +74,11 @@ protected:
         ev_base_.reset();
 
         SandboxedTest::TearDown();
-    };
+    }
 
     auto createWatchDir(std::string const& path, tr_watchdir_cb cb, void* cb_data)
     {
-        auto const force_generic = GetParam() == Generic;
+        auto const force_generic = GetParam() == WatchMode::GENERIC;
         return tr_watchdir_new(path.c_str(), cb, cb_data, ev_base_.get(), force_generic);
     }
 
@@ -111,7 +114,7 @@ protected:
     {
         explicit CallbackData(tr_watchdir_status status = TR_WATCHDIR_ACCEPT) :
             result{status} {}
-        tr_watchdir_status result;
+        tr_watchdir_status result {};
 
         tr_watchdir_t wd = {};
         std::string name = {};
@@ -363,7 +366,7 @@ TEST_P(WatchDirTest, retry)
 INSTANTIATE_TEST_SUITE_P(
     WatchDir,
     WatchDirTest,
-    ::testing::Values(Native, Generic)
+    ::testing::Values(WatchMode::NATIVE, WatchMode::GENERIC)
     );
 
 } // namespace test

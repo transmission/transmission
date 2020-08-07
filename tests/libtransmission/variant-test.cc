@@ -149,7 +149,7 @@ TEST_F(VariantTest, str)
     n = tr_snprintf(buf.data(), buf.size(), "%zu:boat", size_t(SIZE_MAX - 2));
     err = tr_bencParseStr(&buf[0], &buf[n], &end, &str, &len);
     EXPECT_EQ(EILSEQ, err);
-    EXPECT_EQ(0, len);
+    EXPECT_EQ(decltype(len){0}, len);
     EXPECT_EQ(nullptr, str);
     EXPECT_EQ(nullptr, end);
 

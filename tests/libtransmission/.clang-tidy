@@ -9,7 +9,7 @@ Checks: >
   -cert-dcl50-cpp,
   -cert-err58-cpp,
   clang-analyzer-optin*,
-  -clang-diagnostic-c++98-compat*,
+  -clang-diagnostic-c++98*,
   -clang-diagnostic-global-constructors,
   -clang-diagnostic-missing-prototypes,
   -clang-diagnostic-nonportable-system-include-path,
@@ -51,6 +51,7 @@ Checks: >
   -readability-implicit-bool-conversion,
   -readability-inconsistent-declaration-parameter-name,
   -readability-magic-numbers,
+  -readability-qualified-auto,
   -readability-redundant-access-specifiers,
   -readability-static-accessed-through-instance
 
