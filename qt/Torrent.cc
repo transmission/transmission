@@ -371,11 +371,11 @@ Torrent::fields_t Torrent::update(tr_quark const* keys, tr_variant const* const*
 
             case TR_KEY_trackers:
                 {
-                    FaviconCache::Keys keys;
+                    FaviconCache::Keys tmp;
                     std::transform(std::cbegin(tracker_stats_), std::cend(tracker_stats_),
-                        std::inserter(keys, std::end(keys)),
+                        std::inserter(tmp, std::end(tmp)),
                         [](auto const& ts) { return ts.favicon_key; });
-                    std::swap(tracker_keys_, keys);
+                    std::swap(tracker_keys_, tmp);
                     break;
                 }
             }
