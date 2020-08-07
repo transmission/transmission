@@ -111,6 +111,7 @@ set(QT5_MINIMUM             5.2)
 
 if(WIN32)
     foreach(L C CXX)
+        set(CMAKE_${L}_FLAGS "${CMAKE_${L}_FLAGS} -DWIN32")
         # Target version (Vista and up)
         set(CMAKE_${L}_FLAGS "${CMAKE_${L}_FLAGS} -DWINVER=0x0600 -D_WIN32_WINNT=0x0600")
         # Use Unicode API (although we always use W or A names explicitly)
