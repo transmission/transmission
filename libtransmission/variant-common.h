@@ -8,7 +8,7 @@
 
 #pragma once
 
-#ifndef __LIBTRANSMISSION_VARIANT_MODULE__
+#ifndef LIBTRANSMISSION_VARIANT_MODULE__
 #error only libtransmission/variant-*.c should #include this header.
 #endif
 
