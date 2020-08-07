@@ -13,7 +13,7 @@
 #include <event2/buffer.h>
 #include <event2/http.h> /* for HTTP_OK */
 
-#define __LIBTRANSMISSION_ANNOUNCER_MODULE__
+#define LIBTRANSMISSION_ANNOUNCER_MODULE
 
 #include "transmission.h"
 #include "announcer-common.h"

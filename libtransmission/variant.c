@@ -31,7 +31,7 @@
 
 #include <event2/buffer.h>
 
-#define LIBTRANSMISSION_VARIANT_MODULE__
+#define LIBTRANSMISSION_VARIANT_MODULE
 
 #include "transmission.h"
 #include "ConvertUTF.h"

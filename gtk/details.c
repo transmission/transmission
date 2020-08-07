@@ -656,7 +656,7 @@ static char* get_short_date_string(time_t t)
     tr_localtime_r(&t, &tm);
     strftime(buf, sizeof(buf), "%d %b %Y", &tm);
     return g_locale_to_utf8(buf, -1, NULL, NULL, NULL);
-};
+}
 
 static void refreshInfo(struct DetailsImpl* di, tr_torrent** torrents, int n)
 {

@@ -104,14 +104,14 @@ protected:
 
         if (test_action == arg_dump_args_)
         {
-            for (int i = 3; i < int(argv.size()); ++i)
+            for (size_t i = 3; i < argv.size(); ++i)
             {
                 tr_sys_file_write_line(fd, argv[i].data(), nullptr);
             }
         }
         else if (test_action == arg_dump_env_)
         {
-            for (int i = 3; i < int(argv.size()); ++i)
+            for (size_t i = 3; i < argv.size(); ++i)
             {
                 auto const value = makeString(tr_env_get_string(argv[i].data(), "<null>"));
                 tr_sys_file_write_line(fd, value.data(), nullptr);

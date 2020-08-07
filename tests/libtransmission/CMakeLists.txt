@@ -19,7 +19,6 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/tests/libtransmission
   ${CMAKE_BINARY_DIR}/libtransmission
 )
-
 include_directories(
   SYSTEM
   ${CURL_INCLUDE_DIRS}

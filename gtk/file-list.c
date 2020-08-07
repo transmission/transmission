@@ -22,9 +22,7 @@
 #include "tr-prefs.h"
 #include "util.h"
 
-#define TR_DOWNLOAD_KEY "tr-download-key"
 #define TR_COLUMN_ID_KEY "tr-model-column-id-key"
-#define TR_PRIORITY_KEY "tr-priority-key"
 
 enum
 {

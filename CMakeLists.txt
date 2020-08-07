@@ -402,20 +402,41 @@ include(CheckCXXCompilerFlag)
 
 set(WARNING_CANDIDATES
     -Wall
+    -Wextra
     -Wcast-align
     -Wduplicated-cond
-    -Wextra
+    -Wextra-semi
+    -Wextra-semi-stmt
+    -Wextra-tokens
     -Wfloat-equal
+    -Wgnu
     -Winit-self
+    -Wint-in-bool-context
     -Wlogical-op
     -Wmissing-format-attribute
     -Wnested-externs
     -Wnull-dereference
     -Wpointer-arith
     -Wredundant-decls
+    -Wredundant-move
+    -Wreorder-ctor
     -Wrestrict
+    -Wreturn-std-move
+    -Wself-assign
+    -Wself-move
+    -Wsemicolon-before-method-body
+    -Wsentinel
+    -Wsign-compare
+    -Wsometimes-uninitialized
     -Wstrict-prototypes
+    -Wstring-conversion
+    -Wsuggest-destructor-override
+    -Wsuggest-override
+    -Wunreachable-code
+    -Wunused
+    -Wunused-const-variable
     -Wunused-parameter
+    -Wunused-result
     -Wwrite-strings
 )
 
@@ -428,28 +449,25 @@ else()
 endif()
 
 foreach(FLAG ${WARNING_CANDIDATES})
-    # -Wnull-dereference --> wnull_dereference
-    set(DISPLAY_NAME "${FLAG}")
-    string(REPLACE "-W" "W" DISPLAY_NAME "${DISPLAY_NAME}")
-    string(REPLACE "-" "_" DISPLAY_NAME "${DISPLAY_NAME}")
-    string(TOLOWER "${DISPLAY_NAME}" DISPLAY_NAME)
+    tr_make_id("${FLAG}" FLAG_ID)
+    string(TOLOWER "${FLAG_ID}" FLAG_ID)
 
-    # does the C compiler support this flag
-    set(CACHE_NAME "c_has_warning_${DISPLAY_NAME}")
-    check_c_compiler_flag(${FLAG} ${CACHE_NAME})
-    if (${CACHE_NAME})
+    # if available, add to C warnings
+    set(CACHE_ID "c_has_warning${FLAG_ID}")
+    check_c_compiler_flag(${FLAG} ${CACHE_ID})
+    if (${CACHE_ID})
         list(APPEND C_WARNING_FLAGS ${FLAG})
     endif()
 
-    # does the CXX compiler support this flag
-    set(CACHE_NAME "cxx_has_warning_${DISPLAY_NAME}")
-    check_cxx_compiler_flag(${FLAG} ${CACHE_NAME})
-    if (${CACHE_NAME})
+    # if available, add to CXX warnings
+    set(CACHE_ID "cxx_has_warning${FLAG_ID}")
+    check_cxx_compiler_flag(${FLAG} ${CACHE_ID})
+    if (${CACHE_ID})
         list(APPEND CXX_WARNING_FLAGS ${FLAG})
     endif()
 
-    unset(CACHE_NAME)
-    unset(DISPLAY_NAME)
+    unset(CACHE_ID)
+    unset(FLAG_ID)
 endforeach()
 
 unset(WARNING_CANDIDATES)

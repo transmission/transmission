@@ -10,7 +10,7 @@
 
 #include <event2/event.h>
 
-#define __LIBTRANSMISSION_WATCHDIR_MODULE__
+#define LIBTRANSMISSION_WATCHDIR_MODULE
 
 #include "transmission.h"
 #include "log.h"

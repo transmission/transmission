@@ -128,11 +128,11 @@ bool change(TrackerStat& setme, tr_variant const* value)
             HANDLE_KEY(downloadCount, download_count)
             HANDLE_KEY(hasAnnounced, has_announced)
             HANDLE_KEY(hasScraped, has_scraped)
-            HANDLE_KEY(host, host);
-            HANDLE_KEY(id, id);
-            HANDLE_KEY(isBackup, is_backup);
-            HANDLE_KEY(lastAnnouncePeerCount, last_announce_peer_count);
-            HANDLE_KEY(lastAnnounceResult, last_announce_result);
+            HANDLE_KEY(host, host)
+            HANDLE_KEY(id, id)
+            HANDLE_KEY(isBackup, is_backup)
+            HANDLE_KEY(lastAnnouncePeerCount, last_announce_peer_count)
+            HANDLE_KEY(lastAnnounceResult, last_announce_result)
             HANDLE_KEY(lastAnnounceStartTime, last_announce_start_time)
             HANDLE_KEY(lastAnnounceSucceeded, last_announce_succeeded)
             HANDLE_KEY(lastAnnounceTime, last_announce_time)

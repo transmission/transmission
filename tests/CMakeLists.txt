@@ -3,6 +3,7 @@
 include(GoogleTest)
 
 include_directories(
+  SYSTEM
   ${CMAKE_SOURCE_DIR}/third-party/googletest/googletest/include
   ${CMAKE_SOURCE_DIR}/third-party/googletest/googletest
 )

@@ -186,6 +186,9 @@ endif()
 include_directories(
     ${CMAKE_SOURCE_DIR}
     ${PROJECT_SOURCE_DIR}
+)
+include_directories(
+    SYSTEM
     ${PROJECT_BINARY_DIR}
     ${CURL_INCLUDE_DIRS}
     ${EVENT2_INCLUDE_DIRS}

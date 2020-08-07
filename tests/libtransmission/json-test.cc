@@ -6,7 +6,7 @@
  *
  */
 
-#define LIBTRANSMISSION_VARIANT_MODULE__
+#define LIBTRANSMISSION_VARIANT_MODULE
 
 #include "transmission.h"
 #include "utils.h" // tr_free()

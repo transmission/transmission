@@ -6,7 +6,7 @@
  *
  */
 
-#define LIBTRANSMISSION_VARIANT_MODULE__
+#define LIBTRANSMISSION_VARIANT_MODULE
 
 #include "transmission.h"
 #include "utils.h" /* tr_free */
@@ -149,7 +149,7 @@ TEST_F(VariantTest, str)
     n = tr_snprintf(buf.data(), buf.size(), "%zu:boat", size_t(SIZE_MAX - 2));
     err = tr_bencParseStr(&buf[0], &buf[n], &end, &str, &len);
     EXPECT_EQ(EILSEQ, err);
-    EXPECT_EQ(decltype(len){0}, len);
+    EXPECT_EQ(size_t{}, len);
     EXPECT_EQ(nullptr, str);
     EXPECT_EQ(nullptr, end);
 
@@ -157,7 +157,7 @@ TEST_F(VariantTest, str)
     n = tr_snprintf(buf.data(), buf.size(), "4:boat");
     err = tr_bencParseStr(&buf[0], &buf[n], &end, &str, &len);
     EXPECT_EQ(0, err);
-    EXPECT_EQ(4, len);
+    EXPECT_EQ(size_t{ 4 }, len);
     EXPECT_EQ(0, memcmp("boat", str, len));
     EXPECT_EQ(buf.data() + n, end);
     str = nullptr;
@@ -167,7 +167,7 @@ TEST_F(VariantTest, str)
     // string goes past end of buffer
     err = tr_bencParseStr(&buf[0], &buf[n - 1], &end, &str, &len);
     EXPECT_EQ(EILSEQ, err);
-    EXPECT_EQ(0, len);
+    EXPECT_EQ(size_t{}, len);
     EXPECT_EQ(nullptr, str);
     EXPECT_EQ(nullptr, end);
 
@@ -175,7 +175,7 @@ TEST_F(VariantTest, str)
     n = tr_snprintf(buf.data(), buf.size(), "0:");
     err = tr_bencParseStr(&buf[0], &buf[n], &end, &str, &len);
     EXPECT_EQ(0, err);
-    EXPECT_EQ(0, len);
+    EXPECT_EQ(size_t{}, len);
     EXPECT_EQ('\0', *str);
     EXPECT_EQ(buf.data() + n, end);
     str = nullptr;
@@ -186,7 +186,7 @@ TEST_F(VariantTest, str)
     n = tr_snprintf(buf.data(), buf.size(), "3:boat");
     err = tr_bencParseStr(&buf[0], &buf[n], &end, &str, &len);
     EXPECT_EQ(0, err);
-    EXPECT_EQ(3, len);
+    EXPECT_EQ(size_t{ 3 }, len);
     EXPECT_EQ(0, memcmp("boa", str, len));
     EXPECT_EQ(buf.data() + 5, end);
     str = nullptr;
@@ -205,7 +205,7 @@ TEST_F(VariantTest, parse)
     auto err = tr_variantFromBencFull(&val, buf.data(), n, nullptr, &end);
     EXPECT_EQ(0, err);
     EXPECT_TRUE(tr_variantGetInt(&val, &i));
-    EXPECT_EQ(64, i);
+    EXPECT_EQ(int64_t(64), i);
     EXPECT_EQ(reinterpret_cast<char const*>(buf.data()) + n, end);
     tr_variantFree(&val);
 
@@ -223,7 +223,7 @@ TEST_F(VariantTest, parse)
 
     size_t len;
     auto* saved = tr_variantToStr(&val, TR_VARIANT_FMT_BENC, &len);
-    EXPECT_EQ(n, len);
+    EXPECT_EQ(static_cast<size_t>(n), len);
     EXPECT_STREQ(reinterpret_cast<char const*>(buf.data()), saved);
     tr_free(saved);
 
@@ -242,7 +242,7 @@ TEST_F(VariantTest, parse)
     EXPECT_EQ(reinterpret_cast<char const*>(&buf[n]), end);
 
     saved = tr_variantToStr(&val, TR_VARIANT_FMT_BENC, &len);
-    EXPECT_EQ(n, len);
+    EXPECT_EQ(static_cast<size_t>(n), len);
     EXPECT_STREQ("le", saved);
     tr_free(saved);
     tr_variantFree(&val);
@@ -415,16 +415,16 @@ TEST_F(VariantTest, merge)
     size_t len;
     char const* s;
     EXPECT_TRUE(tr_variantDictFindStr(&dest, s5, &s, &len));
-    EXPECT_EQ(3, len);
+    EXPECT_EQ(size_t{ 3 }, len);
     EXPECT_STREQ("abc", s);
     EXPECT_TRUE(tr_variantDictFindStr(&dest, s6, &s, &len));
-    EXPECT_EQ(3, len);
+    EXPECT_EQ(size_t{ 3 }, len);
     EXPECT_STREQ("xyz", s);
     EXPECT_TRUE(tr_variantDictFindStr(&dest, s7, &s, &len));
-    EXPECT_EQ(9, len);
+    EXPECT_EQ(size_t{ 9 }, len);
     EXPECT_STREQ("127.0.0.1", s);
     EXPECT_TRUE(tr_variantDictFindStr(&dest, s8, &s, &len));
-    EXPECT_EQ(3, len);
+    EXPECT_EQ(size_t{ 3 }, len);
     EXPECT_STREQ("ghi", s);
 
     tr_variantFree(&dest);

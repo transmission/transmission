@@ -15,7 +15,7 @@
 #include <event2/buffer.h> /* evbuffer_add() */
 #include <event2/util.h> /* evutil_strtoll() */
 
-#define LIBTRANSMISSION_VARIANT_MODULE__
+#define LIBTRANSMISSION_VARIANT_MODULE
 
 #include "transmission.h"
 #include "ConvertUTF.h"

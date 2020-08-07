@@ -15,7 +15,7 @@
 
 #include "ConvertUTF.h"
 
-#define LIBTRANSMISSION_VARIANT_MODULE__
+#define LIBTRANSMISSION_VARIANT_MODULE
 
 #include "transmission.h"
 #include "ptrarray.h"

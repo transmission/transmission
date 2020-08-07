@@ -61,8 +61,6 @@ enum
     /* max number of peers to ask for per second overall.
      * this throttle is to avoid overloading the router */
     MAX_CONNECTIONS_PER_SECOND = 12,
-    /* */
-    MAX_CONNECTIONS_PER_PULSE = (int)(MAX_CONNECTIONS_PER_SECOND * (RECONNECT_PERIOD_MSEC / 1000.0)),
     /* number of bad pieces a peer is allowed to send before we ban them */
     MAX_BAD_PIECES_PER_PEER = 5,
     /* amount of time to keep a list of request pieces lying around
@@ -3780,6 +3778,7 @@ static void reconnectPulse(evutil_socket_t foo UNUSED, short bar UNUSED, void* v
     }
 
     /* try to make new peer connections */
+    int const MAX_CONNECTIONS_PER_PULSE = (int)(MAX_CONNECTIONS_PER_SECOND * (RECONNECT_PERIOD_MSEC / 1000.0));
     makeNewPeerConnections(mgr, MAX_CONNECTIONS_PER_PULSE);
 }
 
