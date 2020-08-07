@@ -221,7 +221,7 @@ TEST(Crypto, base64)
     EXPECT_EQ(strlen(out), len);
     EXPECT_TRUE(base64Eq("WU9ZTyE=", out));
     auto* in = static_cast<char*>(tr_base64_decode_str(out, &len));
-    EXPECT_EQ(decltype(len){5}, len);
+    EXPECT_EQ(decltype(len) { 5 }, len);
     EXPECT_STREQ("YOYO!", in);
     tr_free(in);
     tr_free(out);

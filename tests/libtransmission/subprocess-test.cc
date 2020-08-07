@@ -93,7 +93,6 @@ protected:
         auto const& test_action = argv[2];
         auto const tmp_result_path = result_path + ".tmp";
 
-
         auto fd = tr_sys_file_open(tmp_result_path.data(), // NOLINT
             TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE,
             0644, nullptr);
