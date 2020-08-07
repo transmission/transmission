@@ -93,7 +93,8 @@ protected:
         auto const& test_action = argv[2];
         auto const tmp_result_path = result_path + ".tmp";
 
-        auto fd = tr_sys_file_open(tmp_result_path.data(),
+
+        auto fd = tr_sys_file_open(tmp_result_path.data(), // NOLINT
             TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE,
             0644, nullptr);
 
@@ -197,7 +198,7 @@ TEST_P(SubprocessTest, SpawnAsyncArgs)
 
     waitForFileToExist(result_path);
 
-    auto fd = tr_sys_file_open(result_path.data(), TR_SYS_FILE_READ, 0, nullptr);
+    auto fd = tr_sys_file_open(result_path.data(), TR_SYS_FILE_READ, 0, nullptr); // NOLINT
     EXPECT_NE(TR_BAD_SYS_FILE, fd);
 
     auto buffer = std::array<char, 1024>{};
@@ -272,7 +273,7 @@ TEST_P(SubprocessTest, SpawnAsyncEnv)
 
     waitForFileToExist(result_path);
 
-    auto fd = tr_sys_file_open(result_path.data(), TR_SYS_FILE_READ, 0, nullptr);
+    auto fd = tr_sys_file_open(result_path.data(), TR_SYS_FILE_READ, 0, nullptr); // NOLINT
     EXPECT_NE(TR_BAD_SYS_FILE, fd);
 
     auto buffer = std::array<char, 1024>{};
@@ -325,7 +326,7 @@ TEST_P(SubprocessTest, SpawnAsyncCwdExplicit)
 
     waitForFileToExist(result_path);
 
-    auto fd = tr_sys_file_open(result_path.data(), TR_SYS_FILE_READ, 0, nullptr);
+    auto fd = tr_sys_file_open(result_path.data(), TR_SYS_FILE_READ, 0, nullptr); // NOLINT
     EXPECT_NE(TR_BAD_SYS_FILE, fd);
 
     auto buffer = std::array<char, 1024>{};
@@ -357,7 +358,7 @@ TEST_P(SubprocessTest, SpawnAsyncCwdInherit)
     EXPECT_EQ(nullptr, error);
 
     waitForFileToExist(result_path);
-    auto fd = tr_sys_file_open(result_path.data(), TR_SYS_FILE_READ, 0, nullptr);
+    auto fd = tr_sys_file_open(result_path.data(), TR_SYS_FILE_READ, 0, nullptr); // NOLINT
     EXPECT_NE(TR_BAD_SYS_FILE, fd);
 
     auto buffer = std::array<char, 1024>{};
