@@ -1024,7 +1024,7 @@ bool tr_urlParse(char const* url, size_t url_len, char** setme_scheme, char** se
 ****
 ***/
 
-void tr_removeElementFromArray(void* array, unsigned int index_to_remove, size_t sizeof_element, size_t nmemb)
+void tr_removeElementFromArray(void* array, size_t index_to_remove, size_t sizeof_element, size_t nmemb)
 {
     char* a = array;
 

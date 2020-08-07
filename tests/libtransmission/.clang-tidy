@@ -9,7 +9,7 @@ Checks: >
   -cert-dcl50-cpp,
   -cert-err58-cpp,
   clang-analyzer-optin*,
-  -clang-diagnostic-c++98-compat,
+  -clang-diagnostic-c++98-compat*,
   -clang-diagnostic-global-constructors,
   -clang-diagnostic-missing-prototypes,
   -clang-diagnostic-nonportable-system-include-path,

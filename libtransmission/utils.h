@@ -333,7 +333,7 @@ int tr_gettimeofday(struct timeval* tv);
 bool tr_moveFile(char const* oldpath, char const* newpath, struct tr_error** error) TR_GNUC_NONNULL(1, 2);
 
 /** @brief convenience function to remove an item from an array */
-void tr_removeElementFromArray(void* array, unsigned int index_to_remove, size_t sizeof_element, size_t nmemb);
+void tr_removeElementFromArray(void* array, size_t index_to_remove, size_t sizeof_element, size_t nmemb);
 
 /***
 ****
