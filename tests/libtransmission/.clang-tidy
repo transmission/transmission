@@ -14,6 +14,7 @@ Checks: >
   -clang-diagnostic-missing-prototypes,
   -clang-diagnostic-nonportable-system-include-path,
   -clang-diagnostic-old-style-cast,
+  -clang-diagnostic-sign-compare,
   -clang-diagnostic-sign-conversion,
   cppcoreguidelines-*,
   -cppcoreguidelines-avoid-magic-numbers,

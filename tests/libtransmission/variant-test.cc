@@ -213,7 +213,7 @@ TEST_F(VariantTest, parse)
     err = tr_variantFromBencFull(&val, buf.data(), n, nullptr, &end);
     EXPECT_EQ(0, err);
     EXPECT_EQ(reinterpret_cast<char const*>(&buf[n]), end);
-    EXPECT_EQ(3, tr_variantListSize(&val));
+    EXPECT_EQ(size_t{ 3 }, tr_variantListSize(&val));
     EXPECT_TRUE(tr_variantGetInt(tr_variantListChild(&val, 0), &i));
     EXPECT_EQ(64, i);
     EXPECT_TRUE(tr_variantGetInt(tr_variantListChild(&val, 1), &i));

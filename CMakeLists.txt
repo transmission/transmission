@@ -432,6 +432,7 @@ set(WARNING_CANDIDATES
     -Wstring-conversion
     -Wsuggest-destructor-override
     -Wsuggest-override
+    -Wuninitialized
     -Wunreachable-code
     -Wunused
     -Wunused-const-variable
@@ -450,17 +451,18 @@ endif()
 
 foreach(FLAG ${WARNING_CANDIDATES})
     tr_make_id("${FLAG}" FLAG_ID)
-    string(TOLOWER "${FLAG_ID}" FLAG_ID)
 
     # if available, add to C warnings
-    set(CACHE_ID "c_has_warning${FLAG_ID}")
+    set(CACHE_ID "${CMAKE_C_COMPILER_ID}_C_HAS${FLAG_ID}")
+    string(TOLOWER "${CACHE_ID}" CACHE_ID)
     check_c_compiler_flag(${FLAG} ${CACHE_ID})
     if (${CACHE_ID})
         list(APPEND C_WARNING_FLAGS ${FLAG})
     endif()
 
     # if available, add to CXX warnings
-    set(CACHE_ID "cxx_has_warning${FLAG_ID}")
+    set(CACHE_ID "${CMAKE_CXX_COMPILER_ID}_CXX_HAS${FLAG_ID}")
+    string(TOLOWER "${CACHE_ID}" CACHE_ID)
     check_cxx_compiler_flag(${FLAG} ${CACHE_ID})
     if (${CACHE_ID})
         list(APPEND CXX_WARNING_FLAGS ${FLAG})

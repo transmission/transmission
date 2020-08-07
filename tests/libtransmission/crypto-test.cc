@@ -227,7 +227,7 @@ TEST(Crypto, base64)
     tr_free(out);
 
     out = static_cast<char*>(tr_base64_encode("", 0, &len));
-    EXPECT_EQ(0, len);
+    EXPECT_EQ(size_t{}, len);
     EXPECT_STREQ("", out);
     tr_free(out);
     out = static_cast<char*>(tr_base64_decode("", 0, &len));
