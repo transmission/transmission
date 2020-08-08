@@ -285,9 +285,7 @@ endif()
 # inspired by this workaround:
 # https://gitlab.kitware.com/cmake/cmake/-/issues/17904#note_426342
 if (MSVC AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 19.14 AND NOT CMAKE_INCLUDE_SYSTEM_FLAG_CXX)
-    set(CMAKE_INCLUDE_SYSTEM_FLAG_CXX "/external:I ")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /experimental:external /external:W0 ")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /experimental:external /external:W0 ")
+    set(CMAKE_INCLUDE_SYSTEM_FLAG_CXX "/experimental:external /external:W0 /external:I ")
 endif()
 
 set(THIRD_PARTY_DIR ${CMAKE_SOURCE_DIR}/third-party)
