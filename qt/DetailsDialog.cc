@@ -508,8 +508,10 @@ void DetailsDialog::refreshUI()
             }
         }
 
-        double const d = size_when_done != 0 ? 100.0 * (size_when_done - left_until_done) / size_when_done : 100.0;
-        QString pct = Formatter::percentToString(d);
+        double const d = size_when_done == 0
+            ? 100.0
+            : 100.0 * static_cast<double>(size_when_done - left_until_done) / static_cast<double>(size_when_done);
+        auto const pct = Formatter::percentToString(d);
 
         if (have_unverified == 0 && left_until_done == 0)
         {
@@ -548,7 +550,8 @@ void DetailsDialog::refreshUI()
     }
     else
     {
-        string = QStringLiteral("%1%").arg(Formatter::percentToString((100.0 * available) / size_when_done));
+        auto const percent = 100.0 * static_cast<double>(available) / static_cast<double>(size_when_done);
+        string = QStringLiteral("%1%").arg(Formatter::percentToString(percent));
     }
 
     ui_.availabilityValueLabel->setText(string);
