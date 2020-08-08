@@ -401,6 +401,7 @@ include(CheckCCompilerFlag)
 include(CheckCXXCompilerFlag)
 
 set(WARNING_CANDIDATES
+    -W
     -Wall
     -Wextra
     -Wcast-align
