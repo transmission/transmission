@@ -808,7 +808,7 @@ void tr_dhtCallback(unsigned char* buf, int buflen, struct sockaddr* from, sockl
 
     /* Being slightly late is fine,
        and has the added benefit of adding some jitter. */
-    tr_timerAdd(dht_timer, tosleep, tr_rand_int_weak(1000000));
+    tr_timerAdd(dht_timer, (int)tosleep, tr_rand_int_weak(1000000));
 }
 
 static void timer_callback(evutil_socket_t s UNUSED, short type UNUSED, void* session)
