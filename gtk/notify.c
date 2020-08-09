@@ -74,7 +74,7 @@ static void get_capabilities_callback(GObject* source, GAsyncResult* res, gpoint
     g_variant_unref(result);
 }
 
-static void g_signal_callback(GDBusProxy* proxy UNUSED, char* sender_name UNUSED, char* signal_name, GVariant* params,
+static void g_signal_callback(GDBusProxy* dbus_proxy UNUSED, char* sender_name UNUSED, char* signal_name, GVariant* params,
     gpointer user_data UNUSED)
 {
     guint id;

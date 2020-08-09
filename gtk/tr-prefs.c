@@ -804,8 +804,6 @@ static GtkWidget* remotePage(GObject* core)
         GtkCellRenderer* r;
         GtkTreeSelection* sel;
         GtkTreeView* v;
-        GtkWidget* w;
-        GtkWidget* h;
 
         page->store = GTK_LIST_STORE(m);
         w = gtk_tree_view_new_with_model(m);

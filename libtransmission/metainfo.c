@@ -595,14 +595,14 @@ static char const* tr_metainfoParseImpl(tr_session const* session, tr_info* inf,
     }
     else
     {
-        size_t len;
-        char* bstr = tr_variantToStr(infoDict, TR_VARIANT_FMT_BENC, &len);
-        tr_sha1(inf->hash, bstr, (int)len, NULL);
+        size_t blen;
+        char* bstr = tr_variantToStr(infoDict, TR_VARIANT_FMT_BENC, &blen);
+        tr_sha1(inf->hash, bstr, (int)blen, NULL);
         tr_sha1_to_hex(inf->hashString, inf->hash);
 
         if (infoDictLength != NULL)
         {
-            *infoDictLength = len;
+            *infoDictLength = blen;
         }
 
         tr_free(bstr);
@@ -706,9 +706,9 @@ static char const* tr_metainfoParseImpl(tr_session const* session, tr_info* inf,
         inf->pieceCount = len / SHA_DIGEST_LENGTH;
         inf->pieces = tr_new0(tr_piece, inf->pieceCount);
 
-        for (tr_piece_index_t i = 0; i < inf->pieceCount; i++)
+        for (tr_piece_index_t pi = 0; pi < inf->pieceCount; ++pi)
         {
-            memcpy(inf->pieces[i].hash, &raw[i * SHA_DIGEST_LENGTH], SHA_DIGEST_LENGTH);
+            memcpy(inf->pieces[pi].hash, &raw[pi * SHA_DIGEST_LENGTH], SHA_DIGEST_LENGTH);
         }
     }
 

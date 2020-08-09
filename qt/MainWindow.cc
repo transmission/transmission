@@ -806,29 +806,33 @@ void MainWindow::refreshStatusBar(TransferStats const& stats)
 
     ui_.networkLabel->setVisible(!session_.isServer());
 
-    QString const mode(prefs_.getString(Prefs::STATUSBAR_STATS));
-    QString str;
+    auto const mode = prefs_.getString(Prefs::STATUSBAR_STATS);
+    auto str = QString {};
 
     if (mode == SessionRatioStatsModeName)
     {
-        str = tr("Ratio: %1").arg(Formatter::ratioToString(session_.getStats().ratio));
+        str = tr("Ratio: %1")
+            .arg(Formatter::ratioToString(session_.getStats().ratio));
     }
     else if (mode == SessionTransferStatsModeName)
     {
-        tr_session_stats const& stats(session_.getStats());
-        str = tr("Down: %1, Up: %2").arg(Formatter::sizeToString(stats.downloadedBytes)).
-            arg(Formatter::sizeToString(stats.uploadedBytes));
+        auto const& st = session_.getStats();
+        str = tr("Down: %1, Up: %2")
+            .arg(Formatter::sizeToString(st.downloadedBytes))
+            .arg(Formatter::sizeToString(st.uploadedBytes));
     }
     else if (mode == TotalTransferStatsModeName)
     {
-        tr_session_stats const& stats(session_.getCumulativeStats());
-        str = tr("Down: %1, Up: %2").arg(Formatter::sizeToString(stats.downloadedBytes)).
-            arg(Formatter::sizeToString(stats.uploadedBytes));
+        auto const& st = session_.getCumulativeStats();
+        str = tr("Down: %1, Up: %2")
+            .arg(Formatter::sizeToString(st.downloadedBytes))
+            .arg(Formatter::sizeToString(st.uploadedBytes));
     }
     else // default is "total-ratio"
     {
         assert(mode == TotalRatioStatsModeName);
-        str = tr("Ratio: %1").arg(Formatter::ratioToString(session_.getCumulativeStats().ratio));
+        str = tr("Ratio: %1")
+            .arg(Formatter::ratioToString(session_.getCumulativeStats().ratio));
     }
 
     ui_.statsLabel->setText(str);

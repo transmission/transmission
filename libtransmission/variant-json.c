@@ -243,8 +243,7 @@ static char* extract_escaped_string(char const* in, size_t in_len, size_t* len, 
 
                             if (ConvertUTF32toUTF8(&str32_walk, str32_end, &str8_walk, str8_end, 0) == 0)
                             {
-                                size_t const len = str8_walk - str8_buf;
-                                evbuffer_add(buf, str8_buf, len);
+                                evbuffer_add(buf, str8_buf, str8_walk - str8_buf);
                                 unescaped = true;
                             }
 

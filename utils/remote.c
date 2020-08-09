@@ -964,12 +964,11 @@ static void printDetails(tr_variant* top)
 
             if (tr_variantDictFindList(t, TR_KEY_labels, &l))
             {
-                int const n = tr_variantListSize(l);
-                char const* str;
-                printf("  Labels: ");
-                for (int i = 0; i < n; i++)
+                size_t child_pos = 0;
+                tr_variant* child;
+                while ((child = tr_variantListChild(l, child_pos++)))
                 {
-                    if (tr_variantGetStr(tr_variantListChild(l, i), &str, NULL))
+                    if (tr_variantGetStr(child, &str, NULL))
                     {
                         printf(i == 0 ? "%s" : ", %s", str);
                     }
@@ -1703,11 +1702,13 @@ static void printTrackers(tr_variant* top)
 static void printSession(tr_variant* top)
 {
     tr_variant* args;
+    char buf[128];
+    char buf2[128];
+    char buf3[128];
 
     if (tr_variantDictFindDict(top, TR_KEY_arguments, &args))
     {
         int64_t i;
-        char buf[64];
         bool boolVal;
         char const* str;
 
@@ -1815,10 +1816,6 @@ static void printSession(tr_variant* top)
                 tr_variantDictFindReal(args, TR_KEY_seedRatioLimit, &seedRatioLimit) &&
                 tr_variantDictFindBool(args, TR_KEY_seedRatioLimited, &seedRatioLimited))
             {
-                char buf[128];
-                char buf2[128];
-                char buf3[128];
-
                 printf("LIMITS\n");
                 printf("  Peer limit: %" PRId64 "\n", peerLimit);
 

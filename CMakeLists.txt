@@ -427,6 +427,7 @@ set(WARNING_CANDIDATES
     -Wself-move
     -Wsemicolon-before-method-body
     -Wsentinel
+    -Wshadow
     -Wsign-compare
     -Wsometimes-uninitialized
     -Wstrict-prototypes
