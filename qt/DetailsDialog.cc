@@ -508,9 +508,9 @@ void DetailsDialog::refreshUI()
             }
         }
 
-        double const d = size_when_done == 0
-            ? 100.0
-            : 100.0 * static_cast<double>(size_when_done - left_until_done) / static_cast<double>(size_when_done);
+        double const d = size_when_done == 0 ?
+            100.0 :
+            100.0 * static_cast<double>(size_when_done - left_until_done) / static_cast<double>(size_when_done);
         auto const pct = Formatter::percentToString(d);
 
         if (have_unverified == 0 && left_until_done == 0)

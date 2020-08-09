@@ -442,7 +442,8 @@ void TorrentDelegate::setProgressBarPercentDone(QStyleOptionViewItem const& opti
     if (tor.isSeeding() && tor.getSeedRatio(seed_ratio_limit))
     {
         auto const seed_rate_ratio = tor.ratio() / seed_ratio_limit;
-        auto const scaled_progress = static_cast<int>(seed_rate_ratio * (progress_bar_style_.maximum - progress_bar_style_.minimum));
+        auto const scaled_progress =
+            static_cast<int>(seed_rate_ratio * (progress_bar_style_.maximum - progress_bar_style_.minimum));
         progress_bar_style_.progress = progress_bar_style_.minimum + scaled_progress;
     }
     else
