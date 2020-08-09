@@ -433,10 +433,10 @@ protected:
         EXPECT_NE(nullptr, tor->session);
         EXPECT_FALSE(tr_amInEventThread(tor->session));
 
-        auto constexpr onVerifyDone = [](tr_torrent*, bool, void* done)
-            {
-                *static_cast<bool*>(done) = true;
-            };
+        auto constexpr onVerifyDone = [] (tr_torrent*, bool, void* done) noexcept
+        {
+            *static_cast<bool*>(done) = true;
+        };
 
         bool done = false;
         tr_torrentVerify(tor, onVerifyDone, &done);

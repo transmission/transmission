@@ -211,7 +211,7 @@ QNetworkAccessManager* RpcClient::networkAccessManager()
     return nam_;
 }
 
-void RpcClient::localSessionCallback(tr_session* s, tr_variant* response, void* vself)
+void RpcClient::localSessionCallback(tr_session* s, tr_variant* response, void* vself) noexcept
 {
     Q_UNUSED(s)
 

@@ -173,7 +173,7 @@ TEST_F(UtilsTest, numbers)
 namespace
 {
 
-int compareInts(void const* va, void const* vb)
+int compareInts(void const* va, void const* vb) noexcept
 {
     auto const a = *static_cast<int const*>(va);
     auto const b = *static_cast<int const*>(vb);

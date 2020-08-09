@@ -59,12 +59,12 @@ TEST_P(IncompleteDirTest, incompleteDir)
     // auto constexpr completeness_unset = tr_completeness { -1 };
     // auto completeness = completeness_unset;
     int completeness = -1;
-    auto const zeroes_completeness_func = [](
+    auto const zeroes_completeness_func = [] (
         tr_torrent* /*torrent*/, tr_completeness c,
-        bool /*was_running*/, void* vc)
-        {
-            *static_cast<tr_completeness*>(vc) = c;
-        };
+        bool /*was_running*/, void* vc) noexcept
+    {
+        *static_cast<tr_completeness*>(vc) = c;
+    };
     tr_torrentSetCompletenessCallback(tor, zeroes_completeness_func, &completeness);
 
     struct TestIncompleteDirData
@@ -78,13 +78,13 @@ TEST_P(IncompleteDirTest, incompleteDir)
         bool done = {};
     };
 
-    auto const test_incomplete_dir_threadfunc = [](void* vdata)
-        {
-            auto* data = static_cast<TestIncompleteDirData*>(vdata);
-            tr_cacheWriteBlock(data->session->cache, data->tor, 0, data->offset, data->tor->blockSize, data->buf);
-            tr_torrentGotBlock(data->tor, data->block);
-            data->done = true;
-        };
+    auto const test_incomplete_dir_threadfunc = [] (void* vdata) noexcept
+    {
+        auto* data = static_cast<TestIncompleteDirData*>(vdata);
+        tr_cacheWriteBlock(data->session->cache, data->tor, 0, data->offset, data->tor->blockSize, data->buf);
+        tr_torrentGotBlock(data->tor, data->block);
+        data->done = true;
+    };
 
     // now finish writing it
     {

@@ -121,13 +121,13 @@ protected:
 
     int torrentRenameAndWait(tr_torrent* tor, char const* oldpath, char const* newname)
     {
-        auto const on_rename_done = [](
+        auto const on_rename_done = [] (
             tr_torrent* /*tor*/, char const* /*oldpath*/,
             char const* /*newname*/, int error,
-            void* user_data)
-            {
-                *static_cast<int*>(user_data) = error;
-            };
+            void* user_data) noexcept
+        {
+            *static_cast<int*>(user_data) = error;
+        };
 
         int error = -1;
         tr_torrentRenamePath(tor, oldpath, newname, on_rename_done, &error);

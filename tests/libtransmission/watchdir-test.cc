@@ -120,7 +120,7 @@ protected:
         std::string name = {};
     };
 
-    static tr_watchdir_status callback(tr_watchdir_t wd, char const* name, void* vdata)
+    static tr_watchdir_status callback(tr_watchdir_t wd, char const* name, void* vdata) noexcept
     {
         auto* data = static_cast<CallbackData*>(vdata);
         auto const result = data->result;
