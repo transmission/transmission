@@ -20,6 +20,7 @@ Checks: >
   -clang-diagnostic-sign-conversion,
   -clang-diagnostic-switch-enum,
   -clang-diagnostic-undefined-reinterpret-cast,
++ -clang-diagnostic-unused-member-function,
   cppcoreguidelines-*,
   -cppcoreguidelines-avoid-magic-numbers,
   -cppcoreguidelines-init-variables,
