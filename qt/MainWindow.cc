@@ -50,16 +50,6 @@
 #define STATS_MODE_KEY "stats-mode"
 #define SORT_MODE_KEY "sort-mode"
 
-namespace
-{
-
-auto const TotalRatioStatsModeName = QStringLiteral("total-ratio");
-auto const TotalTransferStatsModeName = QStringLiteral("total-transfer");
-auto const SessionRatioStatsModeName = QStringLiteral("session-ratio");
-auto const SessionTransferStatsModeName = QStringLiteral("session-transfer");
-
-} // namespace
-
 /**
  * This is a proxy-style for that forces it to be always disabled.
  * We use this to make our torrent list view behave consistently on
@@ -147,6 +137,11 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     torrent_delegate_(new TorrentDelegate(this)),
     torrent_delegate_min_(new TorrentDelegateMin(this)),
     network_timer_(this),
+    total_ratio_stats_mode_name_(QStringLiteral("total-ratio")),
+    total_transfer_stats_mode_name_(QStringLiteral("total-transfer")),
+    session_ratio_stats_mode_name_(QStringLiteral("session-ratio")),
+    session_transfer_stats_mode_name_(QStringLiteral("session-transfer")),
+    show_options_checkbox_name_(QStringLiteral("show-options-checkbox")),
     refresh_timer_(this)
 {
     setAcceptDrops(true);
@@ -485,10 +480,10 @@ QMenu* MainWindow::createStatsModeMenu()
 {
     std::array<QPair<QAction*, QString>, 4> stats_modes =
     {
-        qMakePair(ui_.action_TotalRatio, TotalRatioStatsModeName),
-        qMakePair(ui_.action_TotalTransfer, TotalTransferStatsModeName),
-        qMakePair(ui_.action_SessionRatio, SessionRatioStatsModeName),
-        qMakePair(ui_.action_SessionTransfer, SessionTransferStatsModeName)
+        qMakePair(ui_.action_TotalRatio, total_ratio_stats_mode_name_),
+        qMakePair(ui_.action_TotalTransfer, total_transfer_stats_mode_name_),
+        qMakePair(ui_.action_SessionRatio, session_ratio_stats_mode_name_),
+        qMakePair(ui_.action_SessionTransfer, session_transfer_stats_mode_name_)
     };
 
     auto* action_group = new QActionGroup(this);
@@ -809,19 +804,19 @@ void MainWindow::refreshStatusBar(TransferStats const& stats)
     auto const mode = prefs_.getString(Prefs::STATUSBAR_STATS);
     auto str = QString {};
 
-    if (mode == SessionRatioStatsModeName)
+    if (mode == session_ratio_stats_mode_name_)
     {
         str = tr("Ratio: %1")
             .arg(Formatter::ratioToString(session_.getStats().ratio));
     }
-    else if (mode == SessionTransferStatsModeName)
+    else if (mode == session_transfer_stats_mode_name_)
     {
         auto const& st = session_.getStats();
         str = tr("Down: %1, Up: %2")
             .arg(Formatter::sizeToString(st.downloadedBytes))
             .arg(Formatter::sizeToString(st.uploadedBytes));
     }
-    else if (mode == TotalTransferStatsModeName)
+    else if (mode == total_transfer_stats_mode_name_)
     {
         auto const& st = session_.getCumulativeStats();
         str = tr("Down: %1, Up: %2")
@@ -830,7 +825,7 @@ void MainWindow::refreshStatusBar(TransferStats const& stats)
     }
     else // default is "total-ratio"
     {
-        assert(mode == TotalRatioStatsModeName);
+        assert(mode == total_ratio_stats_mode_name_);
         str = tr("Ratio: %1")
             .arg(Formatter::ratioToString(session_.getCumulativeStats().ratio));
     }
@@ -1252,13 +1247,6 @@ void MainWindow::refreshPref(int key)
 ****
 ***/
 
-namespace
-{
-
-auto const ShowOptionsCheckboxName = QStringLiteral("show-options-checkbox");
-
-} // namespace
-
 void MainWindow::newTorrent()
 {
     auto* dialog = new MakeDialog(session_, this);
@@ -1280,7 +1268,7 @@ void MainWindow::openTorrent()
     {
         auto* b = new QCheckBox(tr("Show &options dialog"));
         b->setChecked(prefs_.getBool(Prefs::OPTIONS_PROMPT));
-        b->setObjectName(ShowOptionsCheckboxName);
+        b->setObjectName(show_options_checkbox_name_);
         l->addWidget(b, l->rowCount(), 0, 1, -1, Qt::AlignLeft);
     }
 
@@ -1314,7 +1302,7 @@ void MainWindow::addTorrents(QStringList const& filenames)
 
     if (file_dialog != nullptr)
     {
-        auto const* const b = file_dialog->findChild<QCheckBox const*>(ShowOptionsCheckboxName);
+        auto const* const b = file_dialog->findChild<QCheckBox const*>(show_options_checkbox_name_);
 
         if (b != nullptr)
         {

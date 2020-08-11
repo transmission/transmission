@@ -180,6 +180,13 @@ private:
     QAction* alt_speed_action_ = {};
     QString error_message_;
 
+    QString const total_ratio_stats_mode_name_;
+    QString const total_transfer_stats_mode_name_;
+    QString const session_ratio_stats_mode_name_;
+    QString const session_transfer_stats_mode_name_;
+
+    QString const show_options_checkbox_name_;
+
     struct TransferStats
     {
         Speed speed_up;
