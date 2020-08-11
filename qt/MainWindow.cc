@@ -415,7 +415,8 @@ QMenu* MainWindow::createOptionsMenu()
             action_group->addAction(off_action);
             connect(off_action, SIGNAL(triggered(bool)), this, SLOT(onSetPrefs(bool)));
 
-            on_action = menu->addAction(tr("Limited at %1").arg(Formatter::get().speedToString(Speed::fromKBps(current_value))));
+            on_action =
+                menu->addAction(tr("Limited at %1").arg(Formatter::get().speedToString(Speed::fromKBps(current_value))));
             on_action->setCheckable(true);
             on_action->setProperty(PREF_VARIANTS_KEY, QVariantList() << pref << current_value << enabled_pref << true);
             action_group->addAction(on_action);
@@ -781,7 +782,8 @@ void MainWindow::refreshTrayIcon(TransferStats const& stats)
     }
     else if (stats.peers_sending != 0)
     {
-        tip = Formatter::get().downloadSpeedToString(stats.speed_down) + QStringLiteral("   ") + Formatter::get().uploadSpeedToString(
+        tip = Formatter::get().downloadSpeedToString(stats.speed_down) + QStringLiteral("   ") +
+            Formatter::get().uploadSpeedToString(
             stats.speed_up);
     }
     else if (stats.peers_receiving != 0)
@@ -1144,7 +1146,8 @@ void MainWindow::refreshPref(int key)
         break;
 
     case Prefs::DSPEED:
-        dlimit_on_action_->setText(tr("Limited at %1").arg(Formatter::get().speedToString(Speed::fromKBps(prefs_.get<int>(key)))));
+        dlimit_on_action_->setText(tr("Limited at %1").arg(Formatter::get().speedToString(Speed::fromKBps(prefs_.get<int>(
+            key)))));
         break;
 
     case Prefs::USPEED_ENABLED:
@@ -1152,7 +1155,8 @@ void MainWindow::refreshPref(int key)
         break;
 
     case Prefs::USPEED:
-        ulimit_on_action_->setText(tr("Limited at %1").arg(Formatter::get().speedToString(Speed::fromKBps(prefs_.get<int>(key)))));
+        ulimit_on_action_->setText(tr("Limited at %1").arg(Formatter::get().speedToString(Speed::fromKBps(prefs_.get<int>(
+            key)))));
         break;
 
     case Prefs::RATIO_ENABLED:

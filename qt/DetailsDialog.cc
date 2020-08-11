@@ -605,7 +605,8 @@ void DetailsDialog::refreshUI()
             d += t->downloadedEver();
         }
 
-        string = tr("%1 (Ratio: %2)").arg(Formatter::get().sizeToString(u)).arg(Formatter::get().ratioToString(tr_getRatio(u, d)));
+        string = tr("%1 (Ratio: %2)").arg(Formatter::get().sizeToString(u)).arg(Formatter::get().ratioToString(tr_getRatio(u,
+            d)));
     }
 
     ui_.uploadedValueLabel->setText(string);
@@ -1158,7 +1159,8 @@ void DetailsDialog::refreshUI()
             }
 
             item->setText(COL_UP, peer.rate_to_peer.isZero() ? QString() : Formatter::get().speedToString(peer.rate_to_peer));
-            item->setText(COL_DOWN, peer.rate_to_client.isZero() ? QString() : Formatter::get().speedToString(peer.rate_to_client));
+            item->setText(COL_DOWN,
+                peer.rate_to_client.isZero() ? QString() : Formatter::get().speedToString(peer.rate_to_client));
             item->setText(COL_PERCENT, peer.progress > 0 ? QStringLiteral("%1%").arg(int(peer.progress * 100.0)) :
                 QString());
             item->setText(COL_STATUS, code);

@@ -196,6 +196,7 @@ QIcon Utils::guessMimeIcon(QString const& filename)
 
 #endif
 }
+
 #endif
 
 QIcon Utils::getIconFromIndex(QModelIndex const& index)

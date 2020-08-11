@@ -615,33 +615,39 @@ std::vector<std::string_view> const& Session::getKeyNames(TorrentProperties prop
             TR_KEY_name
         };
 
-        auto const append = [&names](tr_quark key) {
-            size_t len = {};
-            char const* str = tr_quark_get_string(key, &len);
-            names.emplace_back(str, len);
-        };
+        auto const append = [&names](tr_quark key)
+            {
+                size_t len = {};
+                char const* str = tr_quark_get_string(key, &len);
+                names.emplace_back(str, len);
+            };
 
         switch (props)
         {
-            case TorrentProperties::DetailInfo:
-                std::for_each(DetailInfoKeys.begin(), DetailInfoKeys.end(), append);
-                break;
-            case TorrentProperties::DetailStat:
-                std::for_each(DetailStatKeys.begin(), DetailStatKeys.end(), append);
-                break;
-            case TorrentProperties::MainAll:
-                std::for_each(MainInfoKeys.begin(), MainInfoKeys.end(), append);
-                std::for_each(MainStatKeys.begin(), MainStatKeys.end(), append);
-                break;
-            case TorrentProperties::MainInfo:
-                std::for_each(MainInfoKeys.begin(), MainInfoKeys.end(), append);
-                break;
-            case TorrentProperties::MainStats:
-                std::for_each(MainStatKeys.begin(), MainStatKeys.end(), append);
-                break;
-            case TorrentProperties::Rename:
-                std::for_each(RenameKeys.begin(), RenameKeys.end(), append);
-                break;
+        case TorrentProperties::DetailInfo:
+            std::for_each(DetailInfoKeys.begin(), DetailInfoKeys.end(), append);
+            break;
+
+        case TorrentProperties::DetailStat:
+            std::for_each(DetailStatKeys.begin(), DetailStatKeys.end(), append);
+            break;
+
+        case TorrentProperties::MainAll:
+            std::for_each(MainInfoKeys.begin(), MainInfoKeys.end(), append);
+            std::for_each(MainStatKeys.begin(), MainStatKeys.end(), append);
+            break;
+
+        case TorrentProperties::MainInfo:
+            std::for_each(MainInfoKeys.begin(), MainInfoKeys.end(), append);
+            break;
+
+        case TorrentProperties::MainStats:
+            std::for_each(MainStatKeys.begin(), MainStatKeys.end(), append);
+            break;
+
+        case TorrentProperties::Rename:
+            std::for_each(RenameKeys.begin(), RenameKeys.end(), append);
+            break;
         }
 
         // must be in every torrent req
@@ -659,7 +665,7 @@ void Session::refreshTorrents(torrent_ids_t const& ids, TorrentProperties props)
 {
     tr_variant args;
     tr_variantInitDict(&args, 3);
-    dictAdd(&args, TR_KEY_format, std::string_view { "table "});
+    dictAdd(&args, TR_KEY_format, std::string_view{ "table " });
     dictAdd(&args, TR_KEY_fields, getKeyNames(props));
     addOptionalIds(&args, ids);
 
@@ -765,7 +771,7 @@ void Session::refreshActiveTorrents()
 void Session::refreshAllTorrents()
 {
     // if an empty ids object is used, all torrents are queried.
-    torrent_ids_t const ids = { };
+    torrent_ids_t const ids = {};
     refreshTorrents(ids, TorrentProperties::MainStats);
 }
 

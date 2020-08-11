@@ -105,7 +105,8 @@ public:
     void reannounceTorrents(torrent_ids_t const& torrent_ids);
     void refreshExtraStats(torrent_ids_t const& ids);
 
-    enum class TorrentProperties {
+    enum class TorrentProperties
+    {
         MainInfo,
         MainStats,
         MainAll,

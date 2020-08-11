@@ -27,8 +27,7 @@
 
 using ::trqt::variant_helpers::change;
 
-Torrent::Torrent(Prefs const& prefs,
-                 int id) :
+Torrent::Torrent(Prefs const& prefs, int id) :
     id_(id),
     icon_(IconCache::get().fileIcon()),
     prefs_(prefs)

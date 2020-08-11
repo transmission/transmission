@@ -38,7 +38,7 @@ IconCache& IconCache::get()
     return singleton;
 }
 
-IconCache::IconCache():
+IconCache::IconCache() :
     folder_icon_(QFileIconProvider().icon(QFileIconProvider::Folder)),
     file_icon_(QFileIconProvider().icon(QFileIconProvider::Folder))
 {

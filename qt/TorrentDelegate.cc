@@ -176,8 +176,10 @@ QString TorrentDelegate::progressString(Torrent const& tor)
         //: %1 is how much we've got,
         //: %2 is how much we'll have when done,
         //: %3 is a percentage of the two
-        str = tr("%1 of %2 (%3%)").arg(Formatter::get().sizeToString(have_total)).arg(Formatter::get().sizeToString(tor.sizeWhenDone())).
-            arg(Formatter::get().percentToString(tor.percentDone() * 100.0));
+        str =
+            tr("%1 of %2 (%3%)").arg(Formatter::get().sizeToString(have_total)).arg(Formatter::get().sizeToString(
+            tor.sizeWhenDone())).
+                arg(Formatter::get().percentToString(tor.percentDone() * 100.0));
     }
     else if (!is_seed) // partial seed
     {
@@ -287,7 +289,8 @@ QString TorrentDelegate::shortStatusString(Torrent const& tor)
 
     case TR_STATUS_DOWNLOAD:
     case TR_STATUS_SEED:
-        str = shortTransferString(tor) + QStringLiteral("    ") + tr("Ratio: %1").arg(Formatter::get().ratioToString(tor.ratio()));
+        str = shortTransferString(tor) + QStringLiteral("    ") + tr("Ratio: %1").arg(Formatter::get().ratioToString(
+            tor.ratio()));
         break;
 
     default:

@@ -21,8 +21,8 @@ Formatter& Formatter::get()
     return singleton;
 }
 
-Formatter::Formatter():
-    UnitStrings {{
+Formatter::Formatter() :
+    UnitStrings{{
         { tr("B/s"), tr("kB/s"), tr("MB/s"), tr("GB/s"), tr("TB/s") }, // SPEED
         { tr("B"), tr("kB"), tr("MB"), tr("GB"), tr("TB") }, // SIZE
         { tr("B"), tr("KiB"), tr("MiB"), tr("GiB"), tr("TiB") } // MEM

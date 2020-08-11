@@ -140,7 +140,7 @@ Prefs::Prefs(QString config_dir) :
         std::make_pair(FilterMode::SHOW_FINISHED, QStringLiteral("show-finished")),
         std::make_pair(FilterMode::SHOW_VERIFYING, QStringLiteral("show-verifying")),
         std::make_pair(FilterMode::SHOW_ERROR, QStringLiteral("show-error"))
-    },
+        },
     SortModes{
         std::make_pair(SortMode::SORT_BY_NAME, QStringLiteral("sort-by-name")),
         std::make_pair(SortMode::SORT_BY_ACTIVITY, QStringLiteral("sort-by-activity")),
@@ -152,7 +152,7 @@ Prefs::Prefs(QString config_dir) :
         std::make_pair(SortMode::SORT_BY_SIZE, QStringLiteral("sort-by-size")),
         std::make_pair(SortMode::SORT_BY_STATE, QStringLiteral("sort-by-state")),
         std::make_pair(SortMode::SORT_BY_ID, QStringLiteral("sort-by-id"))
-    }
+        }
 {
     static_assert(sizeof(Items) / sizeof(Items[0]) == PREFS_COUNT);
 
@@ -194,7 +194,7 @@ Prefs::Prefs(QString config_dir) :
                 auto const value = getValue<QString>(b);
                 if (value)
                 {
-                    auto test = [&value](auto const& item){ return item.second == *value; };
+                    auto test = [&value](auto const& item) { return item.second == *value; };
                     auto it = std::find_if(std::cbegin(SortModes), std::cend(SortModes), test);
                     auto const& pair = it == std::end(SortModes) ? SortModes[0] : *it;
                     values_[i] = QVariant::fromValue(SortMode(pair.first));
@@ -207,7 +207,7 @@ Prefs::Prefs(QString config_dir) :
                 auto const value = getValue<QString>(b);
                 if (value)
                 {
-                    auto test = [&value](auto const& item){ return item.second == *value; };
+                    auto test = [&value](auto const& item) { return item.second == *value; };
                     auto it = std::find_if(std::cbegin(FilterModes), std::cend(FilterModes), test);
                     auto const& pair = it == std::end(FilterModes) ? FilterModes[0] : *it;
                     values_[i] = QVariant::fromValue(FilterMode(pair.first));
@@ -289,7 +289,7 @@ Prefs::~Prefs()
         case CustomVariantType::SortModeType:
             {
                 auto const mode = val.value<SortMode>().mode();
-                auto test = [&mode](auto const& item){ return item.first == mode; };
+                auto test = [&mode](auto const& item) { return item.first == mode; };
                 auto it = std::find_if(std::cbegin(SortModes), std::cend(SortModes), test);
                 auto const& pair = it == std::end(SortModes) ? SortModes[0] : *it;
                 dictAdd(&current_settings, key, pair.second);
@@ -299,7 +299,7 @@ Prefs::~Prefs()
         case CustomVariantType::FilterModeType:
             {
                 auto const mode = val.value<FilterMode>().mode();
-                auto test = [&mode](auto const& item){ return item.first == mode; };
+                auto test = [&mode](auto const& item) { return item.first == mode; };
                 auto it = std::find_if(std::cbegin(FilterModes), std::cend(FilterModes), test);
                 auto const& pair = it == std::end(FilterModes) ? FilterModes[0] : *it;
                 dictAdd(&current_settings, key, pair.second);
