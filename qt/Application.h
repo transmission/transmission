@@ -69,6 +69,9 @@ private:
     QTranslator qt_translator_;
     QTranslator app_translator_;
     FaviconCache favicons_;
+
+    QString const config_name_;
+    QString const display_name_;
 };
 
 #undef qApp
