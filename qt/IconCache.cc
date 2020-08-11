@@ -17,13 +17,14 @@
 #include <QFileIconProvider>
 #include <QFileInfo>
 #include <QIcon>
-#include <QMimeDatabase>
-#include <QMimeType>
 #include <QObject>
-#include <QPixmapCache>
 
 #ifdef _WIN32
+#include <QPixmapCache>
 #include <QtWin>
+#else
+#include <QMimeDatabase>
+#include <QMimeType>
 #endif
 
 #include <libtransmission/transmission.h>

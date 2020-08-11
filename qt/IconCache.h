@@ -8,10 +8,12 @@
 
 #pragma once
 
-#if !defined(_WIN32)
-#include <unordered_map>
-#include <unordered_set>
-#include "Utils.h" // std::hash<QString>()
+#if defined(_WIN32)
+ class QFileInfo;
+#else
+ #include <unordered_map>
+ #include <unordered_set>
+ #include "Utils.h" // std::hash<QString>()
 #endif
 
 #include <QIcon>
