@@ -19,6 +19,7 @@
 #include <libtransmission/variant.h>
 
 #include "Application.h"
+#include "IconCache.h"
 #include "Prefs.h"
 #include "Torrent.h"
 #include "Utils.h"
@@ -29,7 +30,7 @@ using ::trqt::variant_helpers::change;
 Torrent::Torrent(Prefs const& prefs,
                  int id) :
     id_(id),
-    icon_(Utils::getFileIcon()),
+    icon_(IconCache::get().fileIcon()),
     prefs_(prefs)
 {
 }
@@ -163,20 +164,21 @@ int Torrent::compareETA(Torrent const& that) const
 void Torrent::updateMimeIcon()
 {
     auto const& files = files_;
+    auto const& icon_cache = IconCache::get();
 
     QIcon icon;
 
     if (files.size() > 1)
     {
-        icon = Utils::getFolderIcon();
+        icon = icon_cache.folderIcon();
     }
     else if (files.size() == 1)
     {
-        icon = Utils::guessMimeIcon(files.at(0).filename);
+        icon = icon_cache.guessMimeIcon(files.at(0).filename);
     }
     else
     {
-        icon = Utils::guessMimeIcon(name());
+        icon = icon_cache.guessMimeIcon(name());
     }
 
     icon_ = icon;

@@ -92,8 +92,6 @@ Application::Application(int& argc, char** argv) :
     setApplicationName(config_name_);
     loadTranslations();
 
-    Formatter::initUnits();
-
 #if defined(_WIN32) || defined(__APPLE__)
 
     if (QIcon::themeName().isEmpty())
