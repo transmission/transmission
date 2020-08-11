@@ -206,7 +206,9 @@ DetailsDialog::DetailsDialog(Session& session, Prefs& prefs, TorrentModel const&
     BaseDialog(parent),
     session_(session),
     prefs_(prefs),
-    model_(model)
+    model_(model),
+    icon_encrypted_(QStringLiteral(":/icons/encrypted.png")),
+    icon_unencrypted_()
 {
     ui_.setupUi(this);
 
@@ -1072,13 +1074,11 @@ void DetailsDialog::refreshUI()
 
             if (item == nullptr) // new peer has connected
             {
-                static QIcon const EncryptionIcon(QStringLiteral(":/icons/encrypted.png"));
-                static QIcon const EmptyIcon;
                 item = new PeerItem(peer);
                 item->setTextAlignment(COL_UP, Qt::AlignRight | Qt::AlignVCenter);
                 item->setTextAlignment(COL_DOWN, Qt::AlignRight | Qt::AlignVCenter);
                 item->setTextAlignment(COL_PERCENT, Qt::AlignRight | Qt::AlignVCenter);
-                item->setIcon(COL_LOCK, peer.is_encrypted ? EncryptionIcon : EmptyIcon);
+                item->setIcon(COL_LOCK, peer.is_encrypted ? icon_encrypted_ : icon_unencrypted_);
                 item->setToolTip(COL_LOCK, peer.is_encrypted ? tr("Encrypted connection") : QString());
                 item->setText(COL_ADDRESS, peer.address);
                 item->setText(COL_CLIENT, peer.client_name);
