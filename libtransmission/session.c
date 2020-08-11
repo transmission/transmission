@@ -21,6 +21,7 @@
 #include <event2/dns.h> /* evdns_base_free() */
 #include <event2/event.h>
 
+#include <stdint.h>
 #include <libutp/utp.h>
 
 // #define TR_SHOW_DEPRECATED
@@ -1489,7 +1490,7 @@ static void turtleUpdateTable(struct tr_turtle_info* t)
                 end += MINUTES_PER_DAY;
             }
 
-            for (int i = begin; i < end; ++i)
+            for (time_t i = begin; i < end; ++i)
             {
                 tr_bitfieldAdd(b, (i + day * MINUTES_PER_DAY) % MINUTES_PER_WEEK);
             }

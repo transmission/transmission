@@ -10,12 +10,15 @@
 
 #include <QItemDelegate>
 
+#include "Macros.h"
+
 class QAbstractItemModel;
 class QComboBox;
 
 class FilterBarComboBoxDelegate : public QItemDelegate
 {
     Q_OBJECT
+    TR_DISABLE_COPY_MOVE(FilterBarComboBoxDelegate)
 
 public:
     FilterBarComboBoxDelegate(QObject* parent, QComboBox* combo);

@@ -11,12 +11,15 @@
 #include <QObject>
 #include <QSet>
 
+#include "Macros.h"
+
 class QGridLayout;
 class QTimer;
 
 class ColumnResizer : public QObject
 {
     Q_OBJECT
+    TR_DISABLE_COPY_MOVE(ColumnResizer)
 
 public:
     ColumnResizer(QObject* parent = nullptr);

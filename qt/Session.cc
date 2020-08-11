@@ -6,6 +6,8 @@
  *
  */
 
+#include "Session.h"
+
 #include <cassert>
 #include <iostream>
 
@@ -21,8 +23,8 @@
 #include <QStyle>
 #include <QTextStream>
 
-#include <libtransmission/transmission.h>
 #include <libtransmission/session-id.h>
+#include <libtransmission/transmission.h>
 #include <libtransmission/utils.h> // tr_free
 #include <libtransmission/variant.h>
 
@@ -30,7 +32,6 @@
 #include "CustomVariantType.h"
 #include "Prefs.h"
 #include "RpcQueue.h"
-#include "Session.h"
 #include "SessionDialog.h"
 #include "Torrent.h"
 #include "Utils.h"

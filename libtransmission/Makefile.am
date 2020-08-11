@@ -37,6 +37,7 @@ libtransmission_a_SOURCES = \
   handshake.c \
   history.c \
   inout.c \
+  jsonsl.c \
   list.c \
   log.c \
   magnet.c \
@@ -133,7 +134,6 @@ noinst_HEADERS = \
   inout.h \
   jsonsl.c \
   jsonsl.h \
-  libtransmission-test.h \
   list.h \
   log.h \
   magnet.h \
@@ -180,31 +180,6 @@ noinst_HEADERS = \
   web.h \
   webseed.h
 
-TESTS = \
-  bitfield-test \
-  blocklist-test \
-  clients-test \
-  crypto-test \
-  error-test \
-  file-test \
-  history-test \
-  json-test \
-  magnet-test \
-  makemeta-test \
-  metainfo-test \
-  move-test \
-  peer-msgs-test \
-  quark-test \
-  rename-test \
-  rpc-test \
-  session-test \
-  subprocess-test \
-  tr-getopt-test \
-  utils-test \
-  variant-test \
-  watchdir-test \
-  watchdir-generic-test
-
 noinst_PROGRAMS = $(TESTS)
 
 apps_ldadd = \
@@ -222,100 +197,3 @@ apps_ldadd = \
   @ZLIB_LIBS@ \
   ${LIBM}
 
-TEST_SOURCES = libtransmission-test.c
-
-bitfield_test_SOURCES = bitfield-test.c $(TEST_SOURCES)
-bitfield_test_LDADD = ${apps_ldadd}
-bitfield_test_LDFLAGS = ${apps_ldflags}
-
-blocklist_test_SOURCES = blocklist-test.c $(TEST_SOURCES)
-blocklist_test_LDADD = ${apps_ldadd}
-blocklist_test_LDFLAGS = ${apps_ldflags}
-
-clients_test_SOURCES = clients-test.c $(TEST_SOURCES)
-clients_test_LDADD = ${apps_ldadd}
-clients_test_LDFLAGS = ${apps_ldflags}
-
-crypto_test_SOURCES = crypto-test.c crypto-test-ref.h $(TEST_SOURCES)
-crypto_test_LDADD = ${apps_ldadd}
-crypto_test_LDFLAGS = ${apps_ldflags}
-
-error_test_SOURCES = error-test.c $(TEST_SOURCES)
-error_test_LDADD = ${apps_ldadd}
-error_test_LDFLAGS = ${apps_ldflags}
-
-file_test_SOURCES = file-test.c $(TEST_SOURCES)
-file_test_LDADD = ${apps_ldadd}
-file_test_LDFLAGS = ${apps_ldflags}
-
-history_test_SOURCES = history-test.c $(TEST_SOURCES)
-history_test_LDADD = ${apps_ldadd}
-history_test_LDFLAGS = ${apps_ldflags}
-
-json_test_SOURCES = json-test.c $(TEST_SOURCES)
-json_test_LDADD = ${apps_ldadd}
-json_test_LDFLAGS = ${apps_ldflags}
-
-quark_test_SOURCES = quark-test.c $(TEST_SOURCES)
-quark_test_LDADD = ${apps_ldadd}
-quark_test_LDFLAGS = ${apps_ldflags}
-
-magnet_test_SOURCES = magnet-test.c $(TEST_SOURCES)
-magnet_test_LDADD = ${apps_ldadd}
-magnet_test_LDFLAGS = ${apps_ldflags}
-
-metainfo_test_SOURCES = metainfo-test.c $(TEST_SOURCES)
-metainfo_test_LDADD = ${apps_ldadd}
-metainfo_test_LDFLAGS = ${apps_ldflags}
-
-makemeta_test_SOURCES = makemeta-test.c $(TEST_SOURCES)
-makemeta_test_LDADD = ${apps_ldadd}
-makemeta_test_LDFLAGS = ${apps_ldflags}
-
-move_test_SOURCES = move-test.c $(TEST_SOURCES)
-move_test_LDADD = ${apps_ldadd}
-move_test_LDFLAGS = ${apps_ldflags}
-
-peer_msgs_test_SOURCES = peer-msgs-test.c $(TEST_SOURCES)
-peer_msgs_test_LDADD = ${apps_ldadd}
-peer_msgs_test_LDFLAGS = ${apps_ldflags}
-
-rpc_test_SOURCES = rpc-test.c $(TEST_SOURCES)
-rpc_test_LDADD = ${apps_ldadd}
-rpc_test_LDFLAGS = ${apps_ldflags}
-
-session_test_SOURCES = session-test.c $(TEST_SOURCES)
-session_test_LDADD = ${apps_ldadd}
-session_test_LDFLAGS = ${apps_ldflags}
-
-subprocess_test_SOURCES = subprocess-test.c $(TEST_SOURCES)
-subprocess_test_LDADD = ${apps_ldadd}
-subprocess_test_LDFLAGS = ${apps_ldflags}
-
-tr_getopt_test_SOURCES = tr-getopt-test.c $(TEST_SOURCES)
-tr_getopt_test_LDADD = ${apps_ldadd}
-tr_getopt_test_LDFLAGS = ${apps_ldflags}
-
-utils_test_SOURCES = utils-test.c $(TEST_SOURCES)
-utils_test_LDADD = ${apps_ldadd}
-utils_test_LDFLAGS = ${apps_ldflags}
-
-variant_test_SOURCES = variant-test.c $(TEST_SOURCES)
-variant_test_LDADD = ${apps_ldadd}
-variant_test_LDFLAGS = ${apps_ldflags}
-
-watchdir_test_SOURCES = watchdir-test.c $(TEST_SOURCES)
-watchdir_test_LDADD = ${apps_ldadd}
-watchdir_test_LDFLAGS = ${apps_ldflags}
-
-watchdir_generic_test_SOURCES = watchdir-test.c $(TEST_SOURCES)
-watchdir_generic_test_LDADD = ${apps_ldadd}
-watchdir_generic_test_LDFLAGS = ${apps_ldflags}
-watchdir_generic_test_CPPFLAGS = -DWATCHDIR_TEST_FORCE_GENERIC $(AM_CPPFLAGS)
-
-rename_test_SOURCES = rename-test.c $(TEST_SOURCES)
-rename_test_LDADD = ${apps_ldadd}
-rename_test_LDFLAGS = ${apps_ldflags}
-
-EXTRA_DIST = \
-  subprocess-test.cmd

@@ -6,19 +6,20 @@
  *
  */
 
+#include "MakeDialog.h"
+
 #include <QDir>
 #include <QFileInfo>
 #include <QMimeData>
 #include <QPushButton>
 #include <QTimer>
 
-#include <libtransmission/transmission.h>
 #include <libtransmission/makemeta.h>
+#include <libtransmission/transmission.h>
 #include <libtransmission/utils.h>
 
 #include "ColumnResizer.h"
 #include "Formatter.h"
-#include "MakeDialog.h"
 #include "Session.h"
 #include "Utils.h"
 

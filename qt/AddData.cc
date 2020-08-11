@@ -6,11 +6,11 @@
  *
  */
 
-#include <QFile>
 #include <QDir>
+#include <QFile>
 
-#include <libtransmission/transmission.h>
 #include <libtransmission/crypto-utils.h> // tr_base64_encode()
+#include <libtransmission/transmission.h>
 
 #include "AddData.h"
 #include "Utils.h"

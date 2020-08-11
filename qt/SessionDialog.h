@@ -11,7 +11,7 @@
 #include <QWidgetList>
 
 #include "BaseDialog.h"
-
+#include "Macros.h"
 #include "ui_SessionDialog.h"
 
 class Prefs;
@@ -20,6 +20,7 @@ class Session;
 class SessionDialog : public BaseDialog
 {
     Q_OBJECT
+    TR_DISABLE_COPY_MOVE(SessionDialog)
 
 public:
     SessionDialog(Session& session, Prefs& prefs, QWidget* parent = nullptr);

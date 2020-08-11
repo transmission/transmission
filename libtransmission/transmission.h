@@ -14,11 +14,6 @@
 
 #pragma once
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
 /***
 ****
 ****  Basic Types
@@ -31,6 +26,8 @@ extern "C"
 #include <time.h> /* time_t */
 
 #include "tr-macros.h"
+
+TR_BEGIN_DECLS
 
 typedef uint32_t tr_file_index_t;
 typedef uint32_t tr_piece_index_t;
@@ -721,6 +718,7 @@ void tr_sessionSetTorrentDoneScript(tr_session*, char const* scriptFilename);
 
 typedef enum
 {
+    TR_LOG_SILENT = 0,
     TR_LOG_ERROR = 1,
     TR_LOG_INFO = 2,
     TR_LOG_DEBUG = 3,
@@ -1888,6 +1886,4 @@ static inline bool tr_isDirection(tr_direction d)
     return d == TR_UP || d == TR_DOWN;
 }
 
-#ifdef __cplusplus
-}
-#endif
+TR_END_DECLS

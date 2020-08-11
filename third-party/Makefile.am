@@ -23,6 +23,7 @@ SUBDIRS = \
 
 EXTRA_DIST = \
   curl \
+  googletest \
   libevent \
   openssl \
   macosx-libevent-config.h \

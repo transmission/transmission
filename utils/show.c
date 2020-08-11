@@ -11,7 +11,7 @@
 #include <stdlib.h> /* qsort() */
 #include <time.h>
 
-#define CURL_DISABLE_TYPECHECK /* otherwise -Wunreachable-code goes insane */
+// #define CURL_DISABLE_TYPECHECK /* otherwise -Wunreachable-code goes insane */
 #include <curl/curl.h>
 
 #include <event2/buffer.h>
@@ -279,11 +279,11 @@ static void doScrape(tr_info const* inf)
                 {
                     if (tr_variantDictFindDict(&top, TR_KEY_files, &files))
                     {
-                        int i = 0;
+                        size_t child_pos = 0;
                         tr_quark key;
                         tr_variant* val;
 
-                        while (tr_variantDictChild(files, i, &key, &val))
+                        while (tr_variantDictChild(files, child_pos, &key, &val))
                         {
                             if (memcmp(inf->hash, tr_quark_get_string(key, NULL), SHA_DIGEST_LENGTH) == 0)
                             {
@@ -303,7 +303,7 @@ static void doScrape(tr_info const* inf)
                                 matched = true;
                             }
 
-                            ++i;
+                            ++child_pos;
                         }
                     }
 

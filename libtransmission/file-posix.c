@@ -844,6 +844,8 @@ skip_darwin_fcntl:
 
 bool tr_sys_file_preallocate(tr_sys_file_t handle, uint64_t size, int flags, tr_error** error)
 {
+    (void)size;
+
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
 
     bool ret = false;

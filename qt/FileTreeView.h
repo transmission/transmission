@@ -11,6 +11,7 @@
 #include <QSet>
 #include <QTreeView>
 
+#include "Macros.h"
 #include "Torrent.h" // FileList
 
 class QAction;
@@ -23,6 +24,7 @@ class FileTreeModel;
 class FileTreeView : public QTreeView
 {
     Q_OBJECT
+    TR_DISABLE_COPY_MOVE(FileTreeView)
 
 public:
     FileTreeView(QWidget* parent = nullptr, bool editable = true);

@@ -17,10 +17,12 @@
 #include <QString>
 #include <QVariant>
 
+#include "Macros.h"
+
 class FileTreeItem
 {
     Q_DECLARE_TR_FUNCTIONS(FileTreeItem)
-    Q_DISABLE_COPY(FileTreeItem)
+    TR_DISABLE_COPY_MOVE(FileTreeItem)
 
 public:
 /* *INDENT-OFF* */

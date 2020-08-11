@@ -12,6 +12,10 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include "tr-macros.h"
+
+TR_BEGIN_DECLS
+
 enum
 {
     TR_FR_DOWNLOADED = (1 << 0),
@@ -49,3 +53,5 @@ void tr_torrentSaveResume(tr_torrent* tor);
 void tr_torrentRemoveResume(tr_torrent const* tor);
 
 int tr_torrentRenameResume(tr_torrent const* tor, char const* newname);
+
+TR_END_DECLS

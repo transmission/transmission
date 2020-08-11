@@ -6,6 +6,8 @@
  *
  */
 
+#include "RpcClient.h"
+
 #include <cstring>
 #include <iostream>
 
@@ -15,12 +17,11 @@
 #include <QNetworkReply>
 #include <QNetworkRequest>
 
-#include <libtransmission/transmission.h>
 #include <libtransmission/rpcimpl.h>
+#include <libtransmission/transmission.h>
 #include <libtransmission/utils.h> // tr_free
 #include <libtransmission/version.h> // LONG_VERSION_STRING
 
-#include "RpcClient.h"
 #include "VariantHelpers.h"
 
 // #define DEBUG_HTTP
@@ -210,7 +211,7 @@ QNetworkAccessManager* RpcClient::networkAccessManager()
     return nam_;
 }
 
-void RpcClient::localSessionCallback(tr_session* s, tr_variant* response, void* vself)
+void RpcClient::localSessionCallback(tr_session* s, tr_variant* response, void* vself) noexcept
 {
     Q_UNUSED(s)
 

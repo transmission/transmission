@@ -17,6 +17,7 @@
 #include <libtransmission/transmission.h>
 #include <libtransmission/quark.h>
 
+#include "Macros.h"
 #include "RpcClient.h"
 #include "RpcQueue.h"
 #include "Torrent.h"
@@ -33,6 +34,7 @@ struct tr_variant;
 class Session : public QObject
 {
     Q_OBJECT
+    TR_DISABLE_COPY_MOVE(Session)
 
 public:
     Session(QString config_dir, Prefs& prefs);

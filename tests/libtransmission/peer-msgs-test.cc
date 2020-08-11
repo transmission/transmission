@@ -6,16 +6,13 @@
  *
  */
 
-#include <memory.h>
-#include <stdio.h>
-
 #include "transmission.h"
 #include "peer-msgs.h"
 #include "utils.h"
 
-#include "libtransmission-test.h"
+#include "gtest/gtest.h"
 
-int main(void)
+TEST(PeerMsgs, placeholder)
 {
 #if 0
 
@@ -42,6 +39,4 @@ int main(void)
     check_mem(buf, ==, pieces, numgot);
 
 #endif
-
-    return 0;
 }

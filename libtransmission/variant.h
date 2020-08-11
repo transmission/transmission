@@ -8,13 +8,12 @@
 
 #pragma once
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
+#include <inttypes.h> /* int64_t */
 
-#include <inttypes.h> /* for int64_t */
+#include "tr-macros.h"
 #include "quark.h"
+
+TR_BEGIN_DECLS
 
 struct evbuffer;
 
@@ -280,6 +279,4 @@ void tr_variantMergeDicts(tr_variant* dict_target, tr_variant const* dict_source
 
 /* @} */
 
-#ifdef __cplusplus
-}
-#endif
+TR_END_DECLS

@@ -394,7 +394,6 @@ static void tr_webThreadFunc(void* vsession)
     CURLM* multi;
     struct tr_web* web;
     int taskCount = 0;
-    struct tr_web_task* task;
     tr_session* session = vsession;
     uint32_t repeats = 0;
 
@@ -457,7 +456,7 @@ static void tr_webThreadFunc(void* vsession)
         while (web->tasks != NULL)
         {
             /* pop the task */
-            task = web->tasks;
+            struct tr_web_task* task = web->tasks;
             web->tasks = task->next;
             task->next = NULL;
 
@@ -563,7 +562,7 @@ static void tr_webThreadFunc(void* vsession)
      * This is rare, but can happen on shutdown with unresponsive trackers. */
     while (web->tasks != NULL)
     {
-        task = web->tasks;
+        struct tr_web_task* task = web->tasks;
         web->tasks = task->next;
         dbgmsg("Discarding task \"%s\"", task->url);
         task_free(task);

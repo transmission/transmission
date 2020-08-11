@@ -1,5 +1,7 @@
 project(trgtk)
 
+add_compile_options(${C_WARNING_FLAGS})
+
 if(WITH_LIBAPPINDICATOR)
     add_definitions(-DHAVE_LIBAPPINDICATOR)
 endif()
@@ -119,6 +121,9 @@ set(${PROJECT_NAME}_HEADERS
 include_directories(
     ${CMAKE_SOURCE_DIR}
     ${PROJECT_BINARY_DIR}
+)
+include_directories(
+    SYSTEM
     ${LIBAPPINDICATOR_INCLUDE_DIRS}
     ${GTK_INCLUDE_DIRS}
     ${CURL_INCLUDE_DIRS}

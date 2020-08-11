@@ -14,6 +14,7 @@
 #include <QTimer>
 
 #include "BaseDialog.h"
+#include "Macros.h"
 #include "Session.h"
 #include "Typedefs.h"
 
@@ -32,6 +33,7 @@ class TrackerModelFilter;
 class DetailsDialog : public BaseDialog
 {
     Q_OBJECT
+    TR_DISABLE_COPY_MOVE(DetailsDialog)
 
 public:
     DetailsDialog(Session&, Prefs&, TorrentModel const&, QWidget* parent = nullptr);

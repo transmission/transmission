@@ -47,6 +47,33 @@
 namespace
 {
 
+bool isSlashChar(QChar const& c)
+{
+    return c == QLatin1Char('/') || c == QLatin1Char('\\');
+}
+
+QIcon folderIcon()
+{
+    static QIcon icon;
+    if (icon.isNull())
+    {
+        icon = QFileIconProvider().icon(QFileIconProvider::Folder);
+    }
+
+    return icon;
+}
+
+QIcon fileIcon()
+{
+    static QIcon icon;
+    if (icon.isNull())
+    {
+        icon = QFileIconProvider().icon(QFileIconProvider::File);
+    }
+
+    return icon;
+}
+
 #ifdef _WIN32
 
 void addAssociatedFileIcon(QFileInfo const& file_info, UINT icon_size, QIcon& icon)
@@ -81,34 +108,7 @@ void addAssociatedFileIcon(QFileInfo const& file_info, UINT icon_size, QIcon& ic
     }
 }
 
-#endif
-
-bool isSlashChar(QChar const& c)
-{
-    return c == QLatin1Char('/') || c == QLatin1Char('\\');
-}
-
-QIcon folderIcon()
-{
-    static QIcon icon;
-    if (icon.isNull())
-    {
-        icon = QFileIconProvider().icon(QFileIconProvider::Folder);
-    }
-
-    return icon;
-}
-
-QIcon fileIcon()
-{
-    static QIcon icon;
-    if (icon.isNull())
-    {
-        icon = QFileIconProvider().icon(QFileIconProvider::File);
-    }
-
-    return icon;
-}
+#else
 
 std::unordered_map<QString, QIcon> icon_cache;
 
@@ -155,6 +155,8 @@ QIcon getMimeIcon(QString const& filename)
 
     return icon;
 }
+
+#endif
 
 } // namespace
 

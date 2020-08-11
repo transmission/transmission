@@ -15,6 +15,7 @@
 #include <QWidget>
 
 #include "FaviconCache.h"
+#include "Macros.h"
 #include "Torrent.h"
 #include "Typedefs.h"
 
@@ -31,6 +32,7 @@ class TorrentModel;
 class FilterBar : public QWidget
 {
     Q_OBJECT
+    TR_DISABLE_COPY_MOVE(FilterBar)
 
 public:
     FilterBar(Prefs& prefs, TorrentModel const& torrents, TorrentFilter const& filter, QWidget* parent = nullptr);

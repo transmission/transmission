@@ -10,9 +10,12 @@
 
 #include <QSortFilterProxyModel>
 
+#include "Macros.h"
+
 class TrackerModelFilter : public QSortFilterProxyModel
 {
     Q_OBJECT
+    TR_DISABLE_COPY_MOVE(TrackerModelFilter)
 
 public:
     TrackerModelFilter(QObject* parent = nullptr);
@@ -26,7 +29,7 @@ public:
 
 protected:
     // QSortFilterProxyModel
-    virtual bool filterAcceptsRow(int source_row, QModelIndex const& source_parent) const;
+    virtual bool filterAcceptsRow(int source_row, QModelIndex const& source_parent) const override;
 
 private:
     bool show_backups_ = {};

@@ -205,7 +205,7 @@ double FileTreeItem::progress() const
 
     if (total != 0)
     {
-        d = have / double(total);
+        d = static_cast<double>(have) / static_cast<double>(total);
     }
 
     return d;

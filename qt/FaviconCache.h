@@ -15,7 +15,8 @@
 #include <QObject>
 #include <QPixmap>
 
-#include <Utils.h> // std::hash<QString>
+#include "Macros.h"
+#include "Utils.h" // std::hash<QString>
 
 class QNetworkAccessManager;
 class QNetworkReply;
@@ -24,6 +25,7 @@ class QUrl;
 class FaviconCache : public QObject
 {
     Q_OBJECT
+    TR_DISABLE_COPY_MOVE(FaviconCache)
 
 public:
     FaviconCache();

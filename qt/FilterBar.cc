@@ -6,6 +6,8 @@
  *
  */
 
+#include "FilterBar.h"
+
 #include <cstdint> // uint64_t
 #include <map>
 #include <unordered_map>
@@ -17,10 +19,9 @@
 
 #include "Application.h"
 #include "FaviconCache.h"
-#include "Filters.h"
-#include "FilterBar.h"
 #include "FilterBarComboBox.h"
 #include "FilterBarComboBoxDelegate.h"
+#include "Filters.h"
 #include "Prefs.h"
 #include "Torrent.h"
 #include "TorrentFilter.h"

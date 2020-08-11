@@ -656,7 +656,7 @@ static char* get_short_date_string(time_t t)
     tr_localtime_r(&t, &tm);
     strftime(buf, sizeof(buf), "%d %b %Y", &tm);
     return g_locale_to_utf8(buf, -1, NULL, NULL, NULL);
-};
+}
 
 static void refreshInfo(struct DetailsImpl* di, tr_torrent** torrents, int n)
 {
@@ -1993,7 +1993,7 @@ static void setPeerViewColumns(GtkTreeView* peer_view)
        so create a non-visible column and assign it as the
        'expander column. */
     {
-        GtkTreeViewColumn* c = gtk_tree_view_column_new();
+        c = gtk_tree_view_column_new();
         gtk_tree_view_column_set_visible(c, FALSE);
         gtk_tree_view_append_column(GTK_TREE_VIEW(peer_view), c);
         gtk_tree_view_set_expander_column(GTK_TREE_VIEW(peer_view), c);
@@ -2374,7 +2374,6 @@ static void refreshTracker(struct DetailsImpl* di, tr_torrent** torrents, int n)
             if (g_hash_table_lookup(hash, gstr->str) == NULL)
             {
                 GtkTreePath* p;
-                GtkTreeIter iter;
                 GtkTreeRowReference* ref;
 
                 gtk_list_store_insert_with_values(store, &iter, -1,

@@ -43,9 +43,12 @@
 
 #include <QLabel>
 
+#include "Macros.h"
+
 class SqueezeLabel : public QLabel
 {
     Q_OBJECT
+    TR_DISABLE_COPY_MOVE(SqueezeLabel)
 
 public:
     SqueezeLabel(QWidget* parent = nullptr);
