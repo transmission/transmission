@@ -105,6 +105,15 @@ public:
     void reannounceTorrents(torrent_ids_t const& torrent_ids);
     void refreshExtraStats(torrent_ids_t const& ids);
 
+    enum class TorrentProperties {
+        MainInfo,
+        MainStats,
+        MainAll,
+        DetailInfo,
+        DetailStat,
+        Rename
+    };
+
 public slots:
     void addTorrent(AddData const& addme);
     void launchWebInterface();
@@ -141,13 +150,18 @@ private:
     void sessionSet(tr_quark const key, QVariant const& variant);
     void pumpRequests();
     void sendTorrentRequest(std::string_view request, torrent_ids_t const& torrent_ids);
-    void refreshTorrents(torrent_ids_t const& torrent_ids, Torrent::KeyList const& keys);
+    void refreshTorrents(torrent_ids_t const& ids, TorrentProperties props);
+    std::vector<std::string_view> const& getKeyNames(TorrentProperties props);
 
     static void updateStats(tr_variant* d, tr_session_stats* stats);
+
+    void addOptionalIds(tr_variant* args, torrent_ids_t const& ids);
 
 private:
     QString const config_dir_;
     Prefs& prefs_;
+
+    std::map<TorrentProperties, std::vector<std::string_view>> names_;
 
     int64_t blocklist_size_ = -1;
     tr_session* session_ = {};
@@ -158,4 +172,5 @@ private:
     QString session_id_;
     bool is_definitely_local_session_ = true;
     RpcClient rpc_;
+    torrent_ids_t const RecentlyActiveIDs = { -1 };
 };

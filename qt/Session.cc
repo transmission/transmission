@@ -8,6 +8,7 @@
 
 #include "Session.h"
 
+#include <algorithm>
 #include <cassert>
 #include <iostream>
 
@@ -45,19 +46,6 @@ using ::trqt::variant_helpers::listAdd;
 /***
 ****
 ***/
-
-namespace
-{
-
-using KeyList = Torrent::KeyList;
-
-// If this object is passed as "ids" (compared by address), then recently active torrents are queried.
-auto const RecentlyActiveIDs = torrent_ids_t{ -1 };
-
-// If this object is passed as "ids" (compared by being empty), then all torrents are queried.
-auto const AllIDs = torrent_ids_t{};
-
-} // namespace
 
 void Session::sessionSet(tr_quark const key, QVariant const& value)
 {
@@ -405,10 +393,7 @@ bool Session::isLocal() const
 ****
 ***/
 
-namespace
-{
-
-void addOptionalIds(tr_variant* args, torrent_ids_t const& ids)
+void Session::addOptionalIds(tr_variant* args, torrent_ids_t const& ids)
 {
     auto constexpr RecentlyActiveKey = std::string_view { "recently-active" };
 
@@ -421,8 +406,6 @@ void addOptionalIds(tr_variant* args, torrent_ids_t const& ids)
         dictAdd(args, TR_KEY_ids, ids);
     }
 }
-
-} // namespace
 
 Session::Tag Session::torrentSetImpl(tr_variant* args)
 {
@@ -541,30 +524,143 @@ void Session::torrentRenamePath(torrent_ids_t const& ids, QString const& oldpath
 
     q->add([this, ids](RpcResponse const& /*r*/)
         {
-            refreshTorrents(ids, { TR_KEY_fileStats, TR_KEY_files, TR_KEY_id, TR_KEY_name });
+            refreshTorrents(ids, TorrentProperties::Rename);
         });
 
     q->run();
 }
 
-void Session::refreshTorrents(torrent_ids_t const& ids, KeyList const& keys)
+std::vector<std::string_view> const& Session::getKeyNames(TorrentProperties props)
 {
-    auto constexpr TableKey = std::string_view { "table" };
+    std::vector<std::string_view>& names = names_[props];
 
-    tr_variant args;
-    tr_variantInitDict(&args, 3);
-    dictAdd(&args, TR_KEY_format, TableKey);
-
-    std::vector<std::string_view> keystrs;
-    keystrs.reserve(keys.size());
-    for (auto const& key : keys)
+    if (names.empty())
     {
-        auto len = size_t{};
-        auto const* str = tr_quark_get_string(key, &len);
-        keystrs.emplace_back(str, len);
+        // unchanging fields needed by the main window
+        static constexpr std::array<tr_quark, 6> MainInfoKeys {
+            TR_KEY_addedDate,
+            TR_KEY_downloadDir,
+            TR_KEY_hashString,
+            TR_KEY_name,
+            TR_KEY_totalSize,
+            TR_KEY_trackers,
+        };
+
+        // changing fields needed by the main window
+        static constexpr std::array<tr_quark, 25> MainStatKeys {
+            TR_KEY_downloadedEver,
+            TR_KEY_editDate,
+            TR_KEY_error,
+            TR_KEY_errorString,
+            TR_KEY_eta,
+            TR_KEY_haveUnchecked,
+            TR_KEY_haveValid,
+            TR_KEY_isFinished,
+            TR_KEY_leftUntilDone,
+            TR_KEY_manualAnnounceTime,
+            TR_KEY_metadataPercentComplete,
+            TR_KEY_peersConnected,
+            TR_KEY_peersGettingFromUs,
+            TR_KEY_peersSendingToUs,
+            TR_KEY_percentDone,
+            TR_KEY_queuePosition,
+            TR_KEY_rateDownload,
+            TR_KEY_rateUpload,
+            TR_KEY_recheckProgress,
+            TR_KEY_seedRatioLimit,
+            TR_KEY_seedRatioMode,
+            TR_KEY_sizeWhenDone,
+            TR_KEY_status,
+            TR_KEY_uploadedEver,
+            TR_KEY_webseedsSendingToUs
+        };
+
+        // unchanging fields needed by the details dialog
+        static constexpr std::array<tr_quark, 8> DetailInfoKeys {
+            TR_KEY_comment,
+            TR_KEY_creator,
+            TR_KEY_dateCreated,
+            TR_KEY_files,
+            TR_KEY_isPrivate,
+            TR_KEY_pieceCount,
+            TR_KEY_pieceSize,
+            TR_KEY_trackers
+        };
+
+        // changing fields needed by the details dialog
+        static constexpr std::array<tr_quark, 17> DetailStatKeys {
+            TR_KEY_activityDate,
+            TR_KEY_bandwidthPriority,
+            TR_KEY_corruptEver,
+            TR_KEY_desiredAvailable,
+            TR_KEY_downloadedEver,
+            TR_KEY_downloadLimit,
+            TR_KEY_downloadLimited,
+            TR_KEY_fileStats,
+            TR_KEY_honorsSessionLimits,
+            TR_KEY_peer_limit,
+            TR_KEY_peers,
+            TR_KEY_seedIdleLimit,
+            TR_KEY_seedIdleMode,
+            TR_KEY_startDate,
+            TR_KEY_trackerStats,
+            TR_KEY_uploadLimit,
+            TR_KEY_uploadLimited
+        };
+
+        // keys needed after renaming a torrent
+        static constexpr std::array<tr_quark, 3> RenameKeys {
+            TR_KEY_fileStats,
+            TR_KEY_files,
+            TR_KEY_name
+        };
+
+        auto const append = [&names](tr_quark key) {
+            size_t len = {};
+            char const* str = tr_quark_get_string(key, &len);
+            names.emplace_back(str, len);
+        };
+
+        switch (props)
+        {
+            case TorrentProperties::DetailInfo:
+                std::for_each(DetailInfoKeys.begin(), DetailInfoKeys.end(), append);
+                break;
+            case TorrentProperties::DetailStat:
+                std::for_each(DetailStatKeys.begin(), DetailStatKeys.end(), append);
+                break;
+            case TorrentProperties::MainAll:
+                std::for_each(MainInfoKeys.begin(), MainInfoKeys.end(), append);
+                std::for_each(MainStatKeys.begin(), MainStatKeys.end(), append);
+                break;
+            case TorrentProperties::MainInfo:
+                std::for_each(MainInfoKeys.begin(), MainInfoKeys.end(), append);
+                break;
+            case TorrentProperties::MainStats:
+                std::for_each(MainStatKeys.begin(), MainStatKeys.end(), append);
+                break;
+            case TorrentProperties::Rename:
+                std::for_each(RenameKeys.begin(), RenameKeys.end(), append);
+                break;
+        }
+
+        // must be in every torrent req
+        append(TR_KEY_id);
+
+        // sort and remove dupes
+        std::sort(names.begin(), names.end());
+        names.erase(std::unique(names.begin(), names.end()), names.end());
     }
 
-    dictAdd(&args, TR_KEY_fields, keystrs);
+    return names;
+}
+
+void Session::refreshTorrents(torrent_ids_t const& ids, TorrentProperties props)
+{
+    tr_variant args;
+    tr_variantInitDict(&args, 3);
+    dictAdd(&args, TR_KEY_format, std::string_view { "table "});
+    dictAdd(&args, TR_KEY_fields, getKeyNames(props));
     addOptionalIds(&args, ids);
 
     auto* q = new RpcQueue();
@@ -596,12 +692,12 @@ void Session::refreshTorrents(torrent_ids_t const& ids, KeyList const& keys)
 
 void Session::refreshDetailInfo(torrent_ids_t const& ids)
 {
-    refreshTorrents(ids, Torrent::DetailInfoKeys);
+    refreshTorrents(ids, TorrentProperties::DetailInfo);
 }
 
 void Session::refreshExtraStats(torrent_ids_t const& ids)
 {
-    refreshTorrents(ids, Torrent::MainStatKeys + Torrent::DetailStatKeys);
+    refreshTorrents(ids, TorrentProperties::DetailStat);
 }
 
 void Session::sendTorrentRequest(std::string_view request, torrent_ids_t const& ids)
@@ -619,7 +715,7 @@ void Session::sendTorrentRequest(std::string_view request, torrent_ids_t const& 
 
     q->add([this, ids]()
         {
-            refreshTorrents(ids, Torrent::MainStatKeys);
+            refreshTorrents(ids, TorrentProperties::MainStats);
         });
 
     q->run();
@@ -662,17 +758,20 @@ void Session::queueMoveBottom(torrent_ids_t const& ids)
 
 void Session::refreshActiveTorrents()
 {
-    refreshTorrents(RecentlyActiveIDs, Torrent::MainStatKeys);
+    // If this object is passed as "ids" (compared by address), then recently active torrents are queried.
+    refreshTorrents(RecentlyActiveIDs, TorrentProperties::MainStats);
 }
 
 void Session::refreshAllTorrents()
 {
-    refreshTorrents(AllIDs, Torrent::MainStatKeys);
+    // if an empty ids object is used, all torrents are queried.
+    torrent_ids_t const ids = { };
+    refreshTorrents(ids, TorrentProperties::MainStats);
 }
 
 void Session::initTorrents(torrent_ids_t const& ids)
 {
-    refreshTorrents(ids, Torrent::AllMainKeys);
+    refreshTorrents(ids, TorrentProperties::MainAll);
 }
 
 void Session::refreshSessionStats()
