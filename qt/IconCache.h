@@ -9,6 +9,7 @@
 #pragma once
 
 #if defined(_WIN32)
+ #include <windows.h> // UINT
  class QFileInfo;
 #else
  #include <unordered_map>
