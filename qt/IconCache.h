@@ -9,12 +9,12 @@
 #pragma once
 
 #if defined(_WIN32)
- #include <windows.h> // UINT
- class QFileInfo;
+#include <windows.h>  // UINT
+class QFileInfo;
 #else
- #include <unordered_map>
- #include <unordered_set>
- #include "Utils.h" // std::hash<QString>()
+#include <unordered_map>
+#include <unordered_set>
+#include "Utils.h"  // std::hash<QString>()
 #endif
 
 #include <QIcon>
