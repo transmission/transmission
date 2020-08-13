@@ -75,7 +75,7 @@ QIcon IconCache::guessMimeIcon(QString const& filename) const
 
 #ifdef _WIN32
 
-void IconCache::addAssociatedFileIcon(QFileInfo const& file_info, UINT icon_size, QIcon& icon)
+void IconCache::addAssociatedFileIcon(QFileInfo const& file_info, UINT icon_size, QIcon& icon) const
 {
     QString const pixmap_cache_key = QStringLiteral("tr_file_ext_") + QString::number(icon_size) + QLatin1Char('_') +
         file_info.suffix();
