@@ -251,7 +251,7 @@ void Session::updatePref(int key)
         case Prefs::RPC_PORT:
             if (session_ != nullptr)
             {
-                tr_sessionSetRPCPort(session_, prefs_.getInt(key));
+                tr_sessionSetRPCPort(session_, static_cast<tr_port>(prefs_.getInt(key)));
             }
 
             break;
@@ -877,7 +877,7 @@ void Session::updateStats(tr_variant* d, tr_session_stats* stats)
         stats->secondsActive = *value;
     }
 
-    stats->ratio = tr_getRatio(stats->uploadedBytes, stats->downloadedBytes);
+    stats->ratio = static_cast<float>(tr_getRatio(stats->uploadedBytes, stats->downloadedBytes));
 }
 
 void Session::updateStats(tr_variant* d)
