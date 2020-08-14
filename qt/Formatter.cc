@@ -28,21 +28,21 @@ Formatter::Formatter() :
         { tr("B"), tr("KiB"), tr("MiB"), tr("GiB"), tr("TiB") } // MEM
     }}
 {
-    auto& speed = UnitStrings[SPEED];
+    auto const& speed = UnitStrings[SPEED];
     tr_formatter_speed_init(SpeedBase,
         speed[KB].toUtf8().constData(),
         speed[MB].toUtf8().constData(),
         speed[GB].toUtf8().constData(),
         speed[TB].toUtf8().constData());
 
-    auto& size = UnitStrings[SIZE];
+    auto const& size = UnitStrings[SIZE];
     tr_formatter_size_init(SizeBase,
         size[KB].toUtf8().constData(),
         size[MB].toUtf8().constData(),
         size[GB].toUtf8().constData(),
         size[TB].toUtf8().constData());
 
-    auto& mem = UnitStrings[MEM];
+    auto const& mem = UnitStrings[MEM];
     tr_formatter_mem_init(MemBase,
         mem[KB].toUtf8().constData(),
         mem[MB].toUtf8().constData(),
