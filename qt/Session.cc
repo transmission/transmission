@@ -9,8 +9,10 @@
 #include "Session.h"
 
 #include <algorithm>
+#include <array>
 #include <cassert>
 #include <iostream>
+#include <string_view>
 
 #include <QApplication>
 #include <QByteArray>
@@ -108,11 +110,12 @@ void Session::portTest()
 void Session::copyMagnetLinkToClipboard(int torrent_id)
 {
     auto constexpr MagnetLinkKey = std::string_view { "magnetLink" };
+    auto constexpr Fields = std::array<std::string_view, 1>{ MagnetLinkKey };
 
     tr_variant args;
     tr_variantInitDict(&args, 2);
     dictAdd(&args, TR_KEY_ids, std::array<int, 1>{ torrent_id });
-    dictAdd(&args, TR_KEY_fields, std::array<std::string_view, 1>{ MagnetLinkKey });
+    dictAdd(&args, TR_KEY_fields, Fields);
 
     auto* q = new RpcQueue();
 
@@ -537,7 +540,7 @@ std::vector<std::string_view> const& Session::getKeyNames(TorrentProperties prop
     if (names.empty())
     {
         // unchanging fields needed by the main window
-        static constexpr std::array<tr_quark, 6> MainInfoKeys {
+        static auto constexpr MainInfoKeys = std::array<tr_quark, 6>{
             TR_KEY_addedDate,
             TR_KEY_downloadDir,
             TR_KEY_hashString,
@@ -547,7 +550,7 @@ std::vector<std::string_view> const& Session::getKeyNames(TorrentProperties prop
         };
 
         // changing fields needed by the main window
-        static constexpr std::array<tr_quark, 25> MainStatKeys {
+        static auto constexpr MainStatKeys = std::array<tr_quark, 25>{
             TR_KEY_downloadedEver,
             TR_KEY_editDate,
             TR_KEY_error,
@@ -576,7 +579,7 @@ std::vector<std::string_view> const& Session::getKeyNames(TorrentProperties prop
         };
 
         // unchanging fields needed by the details dialog
-        static constexpr std::array<tr_quark, 8> DetailInfoKeys {
+        static auto constexpr DetailInfoKeys = std::array<tr_quark, 8>{
             TR_KEY_comment,
             TR_KEY_creator,
             TR_KEY_dateCreated,
@@ -588,7 +591,7 @@ std::vector<std::string_view> const& Session::getKeyNames(TorrentProperties prop
         };
 
         // changing fields needed by the details dialog
-        static constexpr std::array<tr_quark, 17> DetailStatKeys {
+        static auto constexpr DetailStatKeys = std::array<tr_quark, 17>{
             TR_KEY_activityDate,
             TR_KEY_bandwidthPriority,
             TR_KEY_corruptEver,
@@ -609,7 +612,7 @@ std::vector<std::string_view> const& Session::getKeyNames(TorrentProperties prop
         };
 
         // keys needed after renaming a torrent
-        static constexpr std::array<tr_quark, 3> RenameKeys {
+        static auto constexpr RenameKeys = std::array<tr_quark, 3>{
             TR_KEY_fileStats,
             TR_KEY_files,
             TR_KEY_name
@@ -663,9 +666,11 @@ std::vector<std::string_view> const& Session::getKeyNames(TorrentProperties prop
 
 void Session::refreshTorrents(torrent_ids_t const& ids, TorrentProperties props)
 {
+    auto constexpr Table = std::string_view{ "table" };
+
     tr_variant args;
     tr_variantInitDict(&args, 3);
-    dictAdd(&args, TR_KEY_format, std::string_view{ "table " });
+    dictAdd(&args, TR_KEY_format, Table);
     dictAdd(&args, TR_KEY_fields, getKeyNames(props));
     addOptionalIds(&args, ids);
 
