@@ -145,6 +145,7 @@ bool TorrentFilter::lessThan(QModelIndex const& left, QModelIndex const& right) 
             val = compare(a->peersWeAreUploadingTo() + a->webseedsWeAreDownloadingFrom(),
                 b->peersWeAreUploadingTo() + b->webseedsWeAreDownloadingFrom());
         }
+
         [[fallthrough]];
 
     case SortMode::SORT_BY_STATE:
@@ -167,6 +168,7 @@ bool TorrentFilter::lessThan(QModelIndex const& left, QModelIndex const& right) 
         {
             val = compare(a->hasError(), b->hasError());
         }
+
         [[fallthrough]];
 
     case SortMode::SORT_BY_PROGRESS:
@@ -189,6 +191,7 @@ bool TorrentFilter::lessThan(QModelIndex const& left, QModelIndex const& right) 
         {
             val = -compare(a->queuePosition(), b->queuePosition());
         }
+
         [[fallthrough]];
 
     case SortMode::SORT_BY_RATIO:
