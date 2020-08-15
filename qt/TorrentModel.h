@@ -12,13 +12,14 @@
 #include <vector>
 
 #include <QAbstractListModel>
-// #include <QVector>
+#include <QVector>
 
-#include <Typedefs.h>
+#include "Macros.h"
+#include "Torrent.h"
+#include "Typedefs.h"
 
 class Prefs;
 class Speed;
-class Torrent;
 
 extern "C"
 {
@@ -28,6 +29,7 @@ struct tr_variant;
 class TorrentModel : public QAbstractListModel
 {
     Q_OBJECT
+    TR_DISABLE_COPY_MOVE(TorrentModel)
 
 public:
     enum Role
@@ -57,7 +59,7 @@ public slots:
 
 signals:
     void torrentsAdded(torrent_ids_t const&);
-    void torrentsChanged(torrent_ids_t const&);
+    void torrentsChanged(torrent_ids_t const&, Torrent::fields_t const& fields);
     void torrentsCompleted(torrent_ids_t const&);
     void torrentsEdited(torrent_ids_t const&);
     void torrentsNeedInfo(torrent_ids_t const&);

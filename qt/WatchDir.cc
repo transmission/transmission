@@ -81,20 +81,13 @@ void WatchDir::setPath(QString const& path, bool is_enabled)
 {
     // clear out any remnants of the previous watcher, if any
     watch_dir_files_.clear();
-
-    if (watcher_ != nullptr)
-    {
-        delete watcher_;
-        watcher_ = nullptr;
-    }
+    watcher_.reset();
 
     // maybe create a new watcher
     if (is_enabled)
     {
-        watcher_ = new QFileSystemWatcher();
-        watcher_->addPath(path);
-        connect(watcher_, SIGNAL(directoryChanged(QString)), this, SLOT(watcherActivated(QString)));
-        // std::cerr << "watching " << qPrintable(path) << " for new .torrent files" << std::endl;
+        watcher_ = std::make_unique<QFileSystemWatcher>(QStringList{ path });
+        connect(watcher_.get(), SIGNAL(directoryChanged(QString)), this, SLOT(watcherActivated(QString)));
         QTimer::singleShot(0, this, SLOT(rescanAllWatchedDirectories())); // trigger the watchdir for .torrent files in there already
     }
 }
@@ -150,12 +143,12 @@ void WatchDir::watcherActivated(QString const& path)
 
 void WatchDir::rescanAllWatchedDirectories()
 {
-    if (watcher_ == nullptr)
+    if (!watcher_)
     {
         return;
     }
 
-    for (QString const& path : watcher_->directories())
+    for (auto const& path : watcher_->directories())
     {
         watcherActivated(path);
     }

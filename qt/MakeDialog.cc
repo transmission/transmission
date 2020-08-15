@@ -6,19 +6,20 @@
  *
  */
 
+#include "MakeDialog.h"
+
 #include <QDir>
 #include <QFileInfo>
 #include <QMimeData>
 #include <QPushButton>
 #include <QTimer>
 
-#include <libtransmission/transmission.h>
 #include <libtransmission/makemeta.h>
+#include <libtransmission/transmission.h>
 #include <libtransmission/utils.h>
 
 #include "ColumnResizer.h"
 #include "Formatter.h"
-#include "MakeDialog.h"
 #include "Session.h"
 #include "Utils.h"
 
@@ -220,8 +221,8 @@ void MakeDialog::onSourceChanged()
     {
         QString files = tr("%Ln File(s)", nullptr, builder_->fileCount);
         QString pieces = tr("%Ln Piece(s)", nullptr, builder_->pieceCount);
-        text = tr("%1 in %2; %3 @ %4").arg(Formatter::sizeToString(builder_->totalSize)).arg(files).arg(pieces).
-            arg(Formatter::sizeToString(builder_->pieceSize));
+        text = tr("%1 in %2; %3 @ %4").arg(Formatter::get().sizeToString(builder_->totalSize)).arg(files).arg(pieces).
+            arg(Formatter::get().sizeToString(builder_->pieceSize));
     }
 
     ui_.sourceSizeLabel->setText(text);

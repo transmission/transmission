@@ -11,7 +11,7 @@
 #include <memory>
 
 #include "BaseDialog.h"
-
+#include "Macros.h"
 #include "ui_MakeDialog.h"
 
 class QAbstractButton;
@@ -26,6 +26,7 @@ struct tr_metainfo_builder;
 class MakeDialog : public BaseDialog
 {
     Q_OBJECT
+    TR_DISABLE_COPY_MOVE(MakeDialog)
 
 public:
     MakeDialog(Session&, QWidget* parent = nullptr);

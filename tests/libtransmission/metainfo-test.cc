@@ -6,44 +6,42 @@
  *
  */
 
-#include "libtransmission-test.h"
-
 #include "transmission.h"
 #include "metainfo.h"
 #include "utils.h"
 
-#include <errno.h>
+#include "gtest/gtest.h"
 
-static int test_magnet_link(void)
+#include <array>
+#include <cerrno>
+#include <cstring>
+
+TEST(Metainfo, magnetLink)
 {
-    tr_info inf;
-    tr_ctor* ctor;
-    char const* magnet_link;
-    tr_parse_result parse_result;
-
-    /* background info @ http://wiki.theory.org/BitTorrent_Magnet-URI_Webseeding */
-    magnet_link =
+    // background info @ http://wiki.theory.org/BitTorrent_Magnet-URI_Webseeding
+    char const constexpr* const MagnetLink =
         "magnet:?"
         "xt=urn:btih:14FFE5DD23188FD5CB53A1D47F1289DB70ABF31E"
         "&dn=ubuntu+12+04+1+desktop+32+bit"
         "&tr=http%3A%2F%2Ftracker.publicbt.com%2Fannounce"
         "&tr=udp%3A%2F%2Ftracker.publicbt.com%3A80"
         "&ws=http://transmissionbt.com ";
-    ctor = tr_ctorNew(NULL);
-    tr_ctorSetMetainfoFromMagnetLink(ctor, magnet_link);
-    parse_result = tr_torrentParse(ctor, &inf);
-    check_int(inf.fileCount, ==, 0); /* cos it's a magnet link */
-    check_int(parse_result, ==, TR_PARSE_OK);
-    check_int(inf.trackerCount, ==, 2);
-    check_str(inf.trackers[0].announce, ==, "http://tracker.publicbt.com/announce");
-    check_str(inf.trackers[1].announce, ==, "udp://tracker.publicbt.com:80");
-    check_int(inf.webseedCount, ==, 1);
-    check_str(inf.webseeds[0], ==, "http://transmissionbt.com");
+
+    auto* ctor = tr_ctorNew(nullptr);
+    tr_ctorSetMetainfoFromMagnetLink(ctor, MagnetLink);
+    tr_info inf;
+    auto const parse_result = tr_torrentParse(ctor, &inf);
+    EXPECT_EQ(TR_PARSE_OK, parse_result);
+    EXPECT_EQ(0, inf.fileCount); // because it's a magnet link
+    EXPECT_EQ(2, inf.trackerCount);
+    EXPECT_STREQ("http://tracker.publicbt.com/announce", inf.trackers[0].announce);
+    EXPECT_STREQ("udp://tracker.publicbt.com:80", inf.trackers[1].announce);
+    EXPECT_EQ(1, inf.webseedCount);
+    EXPECT_STREQ("http://transmissionbt.com", inf.webseeds[0]);
 
     /* cleanup */
     tr_metainfoFree(&inf);
     tr_ctorFree(ctor);
-    return 0;
 }
 
 #define BEFORE_PATH \
@@ -51,17 +49,18 @@ static int test_magnet_link(void)
 #define AFTER_PATH \
     "eed6:lengthi2e4:pathl5:b.txteee4:name3:foo12:piece lengthi32768e6:pieces20:ÞÉ`âMs¡Å;Ëº¬.åÂà7:privatei0eee"
 
-static int test_metainfo(void)
+// FIXME: split these into parameterized tests?
+TEST(Metainfo, bucket)
 {
-    struct
+    struct Test
     {
         int expected_benc_err;
         int expected_parse_result;
         void const* benc;
-    }
-    const metainfo[] =
-    {
-        { 0, TR_PARSE_OK, BEFORE_PATH "5:a.txt" AFTER_PATH },
+    };
+
+    auto constexpr Tests = std::array<Test, 9>{
+        Test{ 0, TR_PARSE_OK, BEFORE_PATH "5:a.txt" AFTER_PATH },
 
         /* allow empty components, but not =all= empty components, see bug #5517 */
         { 0, TR_PARSE_OK, BEFORE_PATH "0:5:a.txt" AFTER_PATH },
@@ -82,65 +81,63 @@ static int test_metainfo(void)
         { EILSEQ, TR_PARSE_ERR, "" }
     };
 
-    tr_logSetLevel(0); /* yes, we already know these will generate errors, thank you... */
+    tr_logSetLevel(TR_LOG_SILENT);
 
-    for (size_t i = 0; i < TR_N_ELEMENTS(metainfo); i++)
+    for (auto const& test : Tests)
     {
-        tr_ctor* ctor = tr_ctorNew(NULL);
-        int const err = tr_ctorSetMetainfo(ctor, metainfo[i].benc, strlen(metainfo[i].benc));
-        check_int(err, ==, metainfo[i].expected_benc_err);
+        auto* ctor = tr_ctorNew(nullptr);
+        int const err = tr_ctorSetMetainfo(ctor, test.benc, strlen(static_cast<char const*>(test.benc)));
+        EXPECT_EQ(test.expected_benc_err, err);
 
         if (err == 0)
         {
-            tr_parse_result const parse_result = tr_torrentParse(ctor, NULL);
-            check_int(parse_result, ==, metainfo[i].expected_parse_result);
+            tr_parse_result const parse_result = tr_torrentParse(ctor, nullptr);
+            EXPECT_EQ(test.expected_parse_result, parse_result);
         }
 
         tr_ctorFree(ctor);
     }
-
-    return 0;
 }
 
-static int test_sanitize(void)
+TEST(Metainfo, sanitize)
 {
-    struct
+    struct Test
     {
         char const* str;
         size_t len;
         char const* expected_result;
         bool expected_is_adjusted;
-    }
-    const test_data[] =
-    {
-        /* skipped */
-        { "", 0, NULL, false },
-        { ".", 1, NULL, false },
-        { "..", 2, NULL, true },
-        { ".....", 5, NULL, false },
-        { "  ", 2, NULL, false },
-        { " . ", 3, NULL, false },
-        { ". . .", 5, NULL, false },
-        /* replaced with '_'  */
+    };
+
+    auto constexpr Tests = std::array<Test, 29>{
+        // skipped
+        Test{ "", 0, nullptr, false },
+        { ".", 1, nullptr, false },
+        { "..", 2, nullptr, true },
+        { ".....", 5, nullptr, false },
+        { "  ", 2, nullptr, false },
+        { " . ", 3, nullptr, false },
+        { ". . .", 5, nullptr, false },
+        // replaced with '_'
         { "/", 1, "_", true },
         { "////", 4, "____", true },
         { "\\\\", 2, "__", true },
         { "/../", 4, "_.._", true },
         { "foo<bar:baz/boo", 15, "foo_bar_baz_boo", true },
         { "t\0e\x01s\tt\ri\nn\fg", 13, "t_e_s_t_i_n_g", true },
-        /* appended with '_' */
+        // appended with '_'
         { "con", 3, "con_", true },
         { "cOm4", 4, "cOm4_", true },
         { "LPt9.txt", 8, "LPt9_.txt", true },
         { "NUL.tar.gz", 10, "NUL_.tar.gz", true },
-        /* trimmed */
+        // trimmed
         { " foo", 4, "foo", true },
         { "foo ", 4, "foo", true },
         { " foo ", 5, "foo", true },
         { "foo.", 4, "foo", true },
         { "foo...", 6, "foo", true },
         { " foo... ", 8, "foo", true },
-        /* unmodified */
+        // unmodified
         { "foo", 3, "foo", false },
         { ".foo", 4, ".foo", false },
         { "..foo", 5, "..foo", false },
@@ -149,32 +146,18 @@ static int test_sanitize(void)
         { "compass", 7, "compass", false }
     };
 
-    for (size_t i = 0; i < TR_N_ELEMENTS(test_data); ++i)
+    for (auto const& test : Tests)
     {
         bool is_adjusted;
-        char* const result = tr_metainfo_sanitize_path_component(test_data[i].str, test_data[i].len, &is_adjusted);
+        char* const result = tr_metainfo_sanitize_path_component(test.str, test.len, &is_adjusted);
 
-        check_str(result, ==, test_data[i].expected_result);
+        EXPECT_STREQ(test.expected_result, result);
 
-        if (test_data[i].expected_result != NULL)
+        if (test.expected_result != nullptr)
         {
-            check_bool(is_adjusted, ==, test_data[i].expected_is_adjusted);
+            EXPECT_EQ(test.expected_is_adjusted, is_adjusted);
         }
 
         tr_free(result);
     }
-
-    return 0;
-}
-
-int main(void)
-{
-    testFunc const tests[] =
-    {
-        test_magnet_link,
-        test_metainfo,
-        test_sanitize
-    };
-
-    return runTests(tests, NUM_TESTS(tests));
 }

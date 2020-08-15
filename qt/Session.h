@@ -8,6 +8,10 @@
 
 #pragma once
 
+#include <map>
+#include <string_view>
+#include <vector>
+
 #include <QObject>
 #include <QString>
 #include <QStringList>
@@ -15,7 +19,9 @@
 #include <libtransmission/transmission.h>
 #include <libtransmission/quark.h>
 
+#include "Macros.h"
 #include "RpcClient.h"
+#include "RpcQueue.h"
 #include "Torrent.h"
 #include "Typedefs.h"
 
@@ -30,6 +36,7 @@ struct tr_variant;
 class Session : public QObject
 {
     Q_OBJECT
+    TR_DISABLE_COPY_MOVE(Session)
 
 public:
     Session(QString config_dir, Prefs& prefs);
@@ -75,14 +82,16 @@ public:
     bool isLocal() const;
 
     RpcResponseFuture exec(tr_quark method, tr_variant* args);
-    RpcResponseFuture exec(char const* method, tr_variant* args);
+    RpcResponseFuture exec(std::string_view method, tr_variant* args);
 
-    void torrentSet(torrent_ids_t const& ids, tr_quark const key, bool val);
-    void torrentSet(torrent_ids_t const& ids, tr_quark const key, int val);
-    void torrentSet(torrent_ids_t const& ids, tr_quark const key, double val);
-    void torrentSet(torrent_ids_t const& ids, tr_quark const key, QList<int> const& val);
-    void torrentSet(torrent_ids_t const& ids, tr_quark const key, QStringList const& val);
-    void torrentSet(torrent_ids_t const& ids, tr_quark const key, QPair<int, QString> const& val);
+    using Tag = RpcQueue::Tag;
+    Tag torrentSet(torrent_ids_t const& ids, tr_quark const key, bool val);
+    Tag torrentSet(torrent_ids_t const& ids, tr_quark const key, int val);
+    Tag torrentSet(torrent_ids_t const& ids, tr_quark const key, double val);
+    Tag torrentSet(torrent_ids_t const& ids, tr_quark const key, QList<int> const& val);
+    Tag torrentSet(torrent_ids_t const& ids, tr_quark const key, QStringList const& val);
+    Tag torrentSet(torrent_ids_t const& ids, tr_quark const key, QPair<int, QString> const& val);
+
     void torrentSetLocation(torrent_ids_t const& ids, QString const& path, bool do_move);
     void torrentRenamePath(torrent_ids_t const& ids, QString const& oldpath, QString const& newname);
     void addTorrent(AddData const& addme, tr_variant* top, bool trash_original);
@@ -97,6 +106,16 @@ public:
     void verifyTorrents(torrent_ids_t const& torrent_ids);
     void reannounceTorrents(torrent_ids_t const& torrent_ids);
     void refreshExtraStats(torrent_ids_t const& ids);
+
+    enum class TorrentProperties
+    {
+        MainInfo,
+        MainStats,
+        MainAll,
+        DetailInfo,
+        DetailStat,
+        Rename
+    };
 
 public slots:
     void addTorrent(AddData const& addme);
@@ -118,6 +137,7 @@ signals:
     void blocklistUpdated(int);
     void torrentsUpdated(tr_variant* torrent_list, bool complete_list);
     void torrentsRemoved(tr_variant* torrent_list);
+    void sessionCalled(Tag);
     void dataReadProgress();
     void dataSendProgress();
     void networkResponse(QNetworkReply::NetworkError code, QString const& message);
@@ -129,16 +149,22 @@ private:
     void updateStats(tr_variant* args);
     void updateInfo(tr_variant* args);
 
+    Tag torrentSetImpl(tr_variant* args);
     void sessionSet(tr_quark const key, QVariant const& variant);
     void pumpRequests();
-    void sendTorrentRequest(char const* request, torrent_ids_t const& torrent_ids);
-    void refreshTorrents(torrent_ids_t const& torrent_ids, Torrent::KeyList const& keys);
+    void sendTorrentRequest(std::string_view request, torrent_ids_t const& torrent_ids);
+    void refreshTorrents(torrent_ids_t const& ids, TorrentProperties props);
+    std::vector<std::string_view> const& getKeyNames(TorrentProperties props);
 
     static void updateStats(tr_variant* d, tr_session_stats* stats);
+
+    void addOptionalIds(tr_variant* args, torrent_ids_t const& ids);
 
 private:
     QString const config_dir_;
     Prefs& prefs_;
+
+    std::map<TorrentProperties, std::vector<std::string_view>> names_;
 
     int64_t blocklist_size_ = -1;
     tr_session* session_ = {};
@@ -149,4 +175,5 @@ private:
     QString session_id_;
     bool is_definitely_local_session_ = true;
     RpcClient rpc_;
+    torrent_ids_t const RecentlyActiveIDs = { -1 };
 };

@@ -13,10 +13,9 @@
 #include <stddef.h> /* size_t */
 #include <time.h> /* time_t */
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
+#include "tr-macros.h"
+
+TR_BEGIN_DECLS
 
 /***
 ****
@@ -229,10 +228,10 @@ char* tr_strdup_printf(char const* fmt, ...) TR_GNUC_MALLOC TR_GNUC_PRINTF(1, 2)
 char* tr_strdup_vprintf(char const* fmt, va_list args) TR_GNUC_MALLOC TR_GNUC_PRINTF(1, 0);
 
 /** @brief Portability wrapper for strlcpy() that uses the system implementation if available */
-size_t tr_strlcpy(char* dst, void const* src, size_t siz);
+size_t tr_strlcpy(void* dst, void const* src, size_t siz);
 
 /** @brief Portability wrapper for snprintf() that uses the system implementation if available */
-int tr_snprintf(char* buf, size_t buflen, char const* fmt, ...) TR_GNUC_PRINTF(3, 4) TR_GNUC_NONNULL(1, 3);
+int tr_snprintf(void* buf, size_t buflen, char const* fmt, ...) TR_GNUC_PRINTF(3, 4) TR_GNUC_NONNULL(1, 3);
 
 /** @brief Convenience wrapper around strerorr() guaranteed to not return NULL
     @param errnum the error number to describe */
@@ -263,8 +262,8 @@ char* tr_strjoin(char const* const* arr, size_t len, char const* delim);
 
 int compareInt(void const* va, void const* vb);
 
-void tr_binary_to_hex(void const* input, char* output, size_t byte_length) TR_GNUC_NONNULL(1, 2);
-void tr_hex_to_binary(char const* input, void* output, size_t byte_length) TR_GNUC_NONNULL(1, 2);
+void tr_binary_to_hex(void const* input, void* output, size_t byte_length) TR_GNUC_NONNULL(1, 2);
+void tr_hex_to_binary(void const* input, void* output, size_t byte_length) TR_GNUC_NONNULL(1, 2);
 
 /** @brief convenience function to determine if an address is an IP address (IPv4 or IPv6) */
 bool tr_addressIsIP(char const* address);
@@ -334,7 +333,7 @@ int tr_gettimeofday(struct timeval* tv);
 bool tr_moveFile(char const* oldpath, char const* newpath, struct tr_error** error) TR_GNUC_NONNULL(1, 2);
 
 /** @brief convenience function to remove an item from an array */
-void tr_removeElementFromArray(void* array, unsigned int index_to_remove, size_t sizeof_element, size_t nmemb);
+void tr_removeElementFromArray(void* array, size_t index_to_remove, size_t sizeof_element, size_t nmemb);
 
 /***
 ****
@@ -389,6 +388,7 @@ extern unsigned int tr_size_K;
 /* format a speed from KBps into a user-readable string. */
 char* tr_formatter_speed_KBps(char* buf, double KBps, size_t buflen);
 
+// FIXME(ckerr): bytes should be a size_t
 /* format a memory size from bytes into a user-readable string. */
 char* tr_formatter_mem_B(char* buf, int64_t bytes, size_t buflen);
 
@@ -398,6 +398,7 @@ static inline char* tr_formatter_mem_MB(char* buf, double MBps, size_t buflen)
     return tr_formatter_mem_B(buf, (int64_t)(MBps * tr_mem_K * tr_mem_K), buflen);
 }
 
+// FIXME(ckerr): bytes should be a size_t
 /* format a file size from bytes into a user-readable string. */
 char* tr_formatter_size_B(char* buf, int64_t bytes, size_t buflen);
 
@@ -422,12 +423,6 @@ char* tr_env_get_string(char const* key, char const* default_value);
 
 void tr_net_init(void);
 
-/***
-****
-***/
-
-#ifdef __cplusplus
-}
-#endif
-
 /** @} */
+
+TR_END_DECLS

@@ -593,7 +593,6 @@ static uint64_t loadProgress(tr_variant* dict, tr_torrent* tor)
         uint8_t const* raw;
         size_t rawlen;
         tr_variant* l;
-        tr_variant* b;
         struct tr_bitfield blocks = TR_BITFIELD_INIT;
 
         if (tr_variantDictFindList(prog, TR_KEY_time_checked, &l))
@@ -667,6 +666,7 @@ static uint64_t loadProgress(tr_variant* dict, tr_torrent* tor)
         err = NULL;
         tr_bitfieldConstruct(&blocks, tor->blockCount);
 
+        tr_variant* b;
         if ((b = tr_variantDictFind(prog, TR_KEY_blocks)) != NULL)
         {
             size_t buflen;

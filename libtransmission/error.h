@@ -12,10 +12,7 @@
 
 #include "tr-macros.h"
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
+TR_BEGIN_DECLS
 
 /**
  * @addtogroup error Error reporting
@@ -134,6 +131,4 @@ void tr_error_propagate_prefixed(tr_error** new_error, tr_error** old_error, cha
 
 /** @} */
 
-#ifdef __cplusplus
-}
-#endif
+TR_END_DECLS

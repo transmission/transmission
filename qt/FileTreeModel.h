@@ -14,11 +14,14 @@
 #include <QMap>
 #include <QSet>
 
+#include "Macros.h"
+
 class FileTreeItem;
 
 class FileTreeModel final : public QAbstractItemModel
 {
     Q_OBJECT
+    TR_DISABLE_COPY_MOVE(FileTreeModel)
 
 public:
     enum

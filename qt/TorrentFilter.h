@@ -14,6 +14,7 @@
 #include <QTimer>
 
 #include "Filters.h"
+#include "Macros.h"
 
 class QString;
 
@@ -24,6 +25,7 @@ class Torrent;
 class TorrentFilter : public QSortFilterProxyModel
 {
     Q_OBJECT
+    TR_DISABLE_COPY_MOVE(TorrentFilter)
 
 public:
     enum TextMode
@@ -47,9 +49,6 @@ private slots:
     void refilter();
 
 private:
-    bool activityFilterAcceptsTorrent(Torrent const* tor, FilterMode const& mode) const;
-    bool trackerFilterAcceptsTorrent(Torrent const* tor, QString const& tracker) const;
-
     QTimer refilter_timer_;
     Prefs const& prefs_;
 };

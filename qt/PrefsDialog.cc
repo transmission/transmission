@@ -6,6 +6,8 @@
  *
  */
 
+#include "PrefsDialog.h"
+
 #ifdef _WIN32
 #include <winsock2.h> // FD_SETSIZE
 #else
@@ -36,10 +38,9 @@
 #include <QVBoxLayout>
 
 #include "ColumnResizer.h"
-#include "FreeSpaceLabel.h"
 #include "Formatter.h"
+#include "FreeSpaceLabel.h"
 #include "Prefs.h"
-#include "PrefsDialog.h"
 #include "Session.h"
 #include "Utils.h"
 
@@ -323,7 +324,7 @@ void PrefsDialog::altSpeedDaysEdited(int i)
 
 void PrefsDialog::initSpeedTab()
 {
-    QString const speed_unit_str = Formatter::unitStr(Formatter::SPEED, Formatter::KB);
+    QString const speed_unit_str = Formatter::get().unitStr(Formatter::get().SPEED, Formatter::get().KB);
     auto const suffix = QStringLiteral(" %1").arg(speed_unit_str);
     QLocale const locale;
 

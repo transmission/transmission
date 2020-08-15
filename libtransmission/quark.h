@@ -8,10 +8,9 @@
 
 #pragma once
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
+#include "tr-macros.h"
+
+TR_BEGIN_DECLS
 
 /* Quarks — a 2-way association between a string and a unique integer identifier */
 typedef size_t tr_quark;
@@ -435,6 +434,4 @@ tr_quark tr_quark_new(void const* str, size_t len);
 ****
 ***/
 
-#ifdef __cplusplus
-}
-#endif
+TR_END_DECLS

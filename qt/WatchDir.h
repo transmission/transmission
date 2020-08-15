@@ -8,17 +8,21 @@
 
 #pragma once
 
+#include <memory>
+
 #include <QObject>
+#include <QFileSystemWatcher>
 #include <QSet>
 #include <QString>
 
-class QFileSystemWatcher;
+#include "Macros.h"
 
 class TorrentModel;
 
 class WatchDir : public QObject
 {
     Q_OBJECT
+    TR_DISABLE_COPY_MOVE(WatchDir)
 
 public:
     WatchDir(TorrentModel const&);
@@ -49,5 +53,5 @@ private:
     TorrentModel const& model_;
 
     QSet<QString> watch_dir_files_;
-    QFileSystemWatcher* watcher_ = {};
+    std::unique_ptr<QFileSystemWatcher> watcher_;
 };

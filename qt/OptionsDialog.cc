@@ -20,6 +20,10 @@
 #include "Session.h"
 #include "Torrent.h"
 #include "Utils.h"
+#include "VariantHelpers.h"
+
+using ::trqt::variant_helpers::dictAdd;
+using ::trqt::variant_helpers::listAdd;
 
 /***
 ****
@@ -260,15 +264,15 @@ void OptionsDialog::onAccepted()
         download_dir = ui_.destinationEdit->text();
     }
 
-    tr_variantDictAddStr(&args, TR_KEY_download_dir, download_dir.toUtf8().constData());
+    dictAdd(&args, TR_KEY_download_dir, download_dir);
 
     // paused
-    tr_variantDictAddBool(&args, TR_KEY_paused, !ui_.startCheck->isChecked());
+    dictAdd(&args, TR_KEY_paused, !ui_.startCheck->isChecked());
 
     // priority
     int const index = ui_.priorityCombo->currentIndex();
     int const priority = ui_.priorityCombo->itemData(index).toInt();
-    tr_variantDictAddInt(&args, TR_KEY_bandwidthPriority, priority);
+    dictAdd(&args, TR_KEY_bandwidthPriority, priority);
 
     // files-unwanted
     int count = wanted_.count(false);
@@ -281,7 +285,7 @@ void OptionsDialog::onAccepted()
         {
             if (!wanted_.at(i))
             {
-                tr_variantListAddInt(l, i);
+                listAdd(l, i);
             }
         }
     }
@@ -297,7 +301,7 @@ void OptionsDialog::onAccepted()
         {
             if (priorities_.at(i) == TR_PRI_LOW)
             {
-                tr_variantListAddInt(l, i);
+                listAdd(l, i);
             }
         }
     }
@@ -313,7 +317,7 @@ void OptionsDialog::onAccepted()
         {
             if (priorities_.at(i) == TR_PRI_HIGH)
             {
-                tr_variantListAddInt(l, i);
+                listAdd(l, i);
             }
         }
     }

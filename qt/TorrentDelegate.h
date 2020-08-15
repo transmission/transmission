@@ -12,6 +12,8 @@
 
 #include <QStyledItemDelegate>
 
+#include "Macros.h"
+
 class QStyle;
 class QStyleOptionProgressBar;
 
@@ -20,6 +22,7 @@ class Torrent;
 class TorrentDelegate : public QStyledItemDelegate
 {
     Q_OBJECT
+    TR_DISABLE_COPY_MOVE(TorrentDelegate)
 
 public:
     explicit TorrentDelegate(QObject* parent = nullptr);

@@ -11,7 +11,7 @@
 #include <event2/event.h>
 #include <event2/util.h>
 
-#define __LIBTRANSMISSION_WATCHDIR_MODULE__
+#define LIBTRANSMISSION_WATCHDIR_MODULE
 
 #include "transmission.h"
 #include "error.h"

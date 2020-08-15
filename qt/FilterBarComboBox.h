@@ -10,9 +10,12 @@
 
 #include <QComboBox>
 
+#include "Macros.h"
+
 class FilterBarComboBox : public QComboBox
 {
     Q_OBJECT
+    TR_DISABLE_COPY_MOVE(FilterBarComboBox)
 
 public:
     enum

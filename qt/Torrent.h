@@ -8,17 +8,19 @@
 
 #pragma once
 
+#include <bitset>
 #include <ctime> // time_t
 
 #include <QIcon>
 #include <QMetaType>
 #include <QObject>
 #include <QString>
-#include <QStringList>
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/quark.h>
 
+#include "FaviconCache.h"
+#include "Macros.h"
 #include "Speed.h"
 
 #ifdef ERROR
@@ -80,6 +82,7 @@ struct TrackerStat
     int scrape_state;
     int seeder_count;
     int tier;
+    FaviconCache::Key favicon_key;
     QString announce;
     QString host;
     QString last_announce_result;
@@ -103,6 +106,7 @@ using FileList = QVector<TorrentFile>;
 class Torrent : public QObject
 {
     Q_OBJECT
+    TR_DISABLE_COPY_MOVE(Torrent)
 
 public:
     Torrent(Prefs const&, int id);
@@ -295,6 +299,11 @@ public:
         return date_created_;
     }
 
+    time_t dateEdited() const
+    {
+        return edit_date_;
+    }
+
     time_t manualAnnounceTime() const
     {
         return manual_announce_time_;
@@ -350,7 +359,12 @@ public:
         return recheck_progress_;
     }
 
-    bool hasTrackerSubstring(QString const& substr) const;
+    bool includesTracker(FaviconCache::Key const& key) const;
+
+    FaviconCache::Keys const& trackerKeys() const
+    {
+        return tracker_keys_;
+    }
 
     Speed uploadLimit() const
     {
@@ -405,16 +419,6 @@ public:
     TrackerStatsList const& trackerStats() const
     {
         return tracker_stats_;
-    }
-
-    QStringList const& trackers() const
-    {
-        return trackers_;
-    }
-
-    QStringList const& trackerDisplayNames() const
-    {
-        return tracker_display_names_;
     }
 
     PeerList const& peers() const
@@ -494,24 +498,77 @@ public:
         return isWaitingToDownload() || isWaitingToSeed();
     }
 
-    bool update(tr_quark const* keys, tr_variant const* const* values, size_t n);
-
     QIcon getMimeTypeIcon() const
     {
         return icon_;
     }
 
-    using KeyList = QSet<tr_quark>;
-    static KeyList const AllMainKeys;
-    static KeyList const DetailInfoKeys;
-    static KeyList const DetailStatKeys;
-    static KeyList const MainInfoKeys;
-    static KeyList const MainStatKeys;
+    enum Field
+    {
+        ACTIVITY_DATE,
+        ADDED_DATE,
+        BANDWIDTH_PRIORITY,
+        COMMENT,
+        CREATOR,
+        DATE_CREATED,
+        DESIRED_AVAILABLE,
+        DOWNLOADED_EVER,
+        DOWNLOAD_DIR,
+        DOWNLOAD_LIMIT,
+        DOWNLOAD_LIMITED,
+        DOWNLOAD_SPEED,
+        EDIT_DATE,
+        ERROR,
+        ERROR_STRING,
+        ETA,
+        FAILED_EVER,
+        FILES,
+        HASH_STRING,
+        HAVE_UNCHECKED,
+        HAVE_VERIFIED,
+        HONORS_SESSION_LIMITS,
+        ICON,
+        IS_FINISHED,
+        IS_PRIVATE,
+        IS_STALLED,
+        LEFT_UNTIL_DONE,
+        MANUAL_ANNOUNCE_TIME,
+        METADATA_PERCENT_COMPLETE,
+        NAME,
+        PEERS,
+        PEERS_CONNECTED,
+        PEERS_GETTING_FROM_US,
+        PEERS_SENDING_TO_US,
+        PEER_LIMIT,
+        PERCENT_DONE,
+        PIECE_COUNT,
+        PIECE_SIZE,
+        QUEUE_POSITION,
+        RECHECK_PROGRESS,
+        SEED_IDLE_LIMIT,
+        SEED_IDLE_MODE,
+        SEED_RATIO_LIMIT,
+        SEED_RATIO_MODE,
+        SIZE_WHEN_DONE,
+        START_DATE,
+        STATUS,
+        TOTAL_SIZE,
+        TRACKER_STATS,
+        UPLOADED_EVER,
+        UPLOAD_LIMIT,
+        UPLOAD_LIMITED,
+        UPLOAD_SPEED,
+        WEBSEEDS_SENDING_TO_US,
+
+        N_FIELDS
+    };
+    using fields_t = std::bitset<N_FIELDS>;
+
+    fields_t update(tr_quark const* keys, tr_variant const* const* values, size_t n);
 
 private:
     void updateMimeIcon();
 
-private:
     int const id_;
 
     bool download_limited_ = {};
@@ -573,8 +630,7 @@ private:
     PeerList peers_;
     FileList files_;
 
-    QStringList trackers_;
-    QStringList tracker_display_names_;
+    FaviconCache::Keys tracker_keys_;
     TrackerStatsList tracker_stats_;
 
     Speed upload_speed_;

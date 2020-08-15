@@ -710,13 +710,13 @@ GtkWidget* gtr_window_new(GtkApplication* app, GtkUIManager* ui_mgr, TrCore* cor
 
     {
         /* this is to determine the maximum width/height for the label */
-        int w = 0;
-        int h = 0;
+        int width = 0;
+        int height = 0;
         PangoLayout* pango_layout;
         pango_layout = gtk_widget_create_pango_layout(ul_lb, "999.99 kB/s");
-        pango_layout_get_pixel_size(pango_layout, &w, &h);
-        gtk_widget_set_size_request(ul_lb, w, h);
-        gtk_widget_set_size_request(dl_lb, w, h);
+        pango_layout_get_pixel_size(pango_layout, &width, &height);
+        gtk_widget_set_size_request(ul_lb, width, height);
+        gtk_widget_set_size_request(dl_lb, width, height);
         g_object_set(ul_lb, "halign", GTK_ALIGN_END, "valign", GTK_ALIGN_CENTER, NULL);
         g_object_set(dl_lb, "halign", GTK_ALIGN_END, "valign", GTK_ALIGN_CENTER, NULL);
         g_object_unref(G_OBJECT(pango_layout));

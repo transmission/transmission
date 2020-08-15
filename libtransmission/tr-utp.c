@@ -23,6 +23,7 @@ THE SOFTWARE.
 
 #include <event2/event.h>
 
+#include <stdint.h>
 #include <libutp/utp.h>
 
 #include "transmission.h"
@@ -36,11 +37,11 @@ THE SOFTWARE.
 #include "tr-utp.h"
 #include "utils.h"
 
+#ifndef WITH_UTP
+
 #define MY_NAME "UTP"
 
 #define dbgmsg(...) tr_logAddDeepNamed(MY_NAME, __VA_ARGS__)
-
-#ifndef WITH_UTP
 
 void UTP_Close(struct UTPSocket* socket)
 {

@@ -6,6 +6,9 @@
  *
  */
 
+#include "Application.h"
+
+#include <algorithm>
 #include <array>
 #include <ctime>
 #include <iostream>
@@ -23,13 +26,12 @@
 #include <QDBusReply>
 #endif
 
-#include <libtransmission/transmission.h>
 #include <libtransmission/tr-getopt.h>
+#include <libtransmission/transmission.h>
 #include <libtransmission/utils.h>
 #include <libtransmission/version.h>
 
 #include "AddData.h"
-#include "Application.h"
 #include "Formatter.h"
 #include "InteropHelper.h"
 #include "MainWindow.h"
@@ -41,9 +43,6 @@
 
 namespace
 {
-
-auto const MyConfigName = QStringLiteral("transmission");
-auto const MyReadableName = QStringLiteral("transmission-qt");
 
 std::array<tr_option, 8> const Opts =
 {
@@ -86,12 +85,12 @@ bool loadTranslation(QTranslator& translator, QString const& name, QLocale const
 } // namespace
 
 Application::Application(int& argc, char** argv) :
-    QApplication(argc, argv)
+    QApplication(argc, argv),
+    config_name_{QStringLiteral("transmission")},
+    display_name_{QStringLiteral("transmission-qt")}
 {
-    setApplicationName(MyConfigName);
+    setApplicationName(config_name_);
     loadTranslations();
-
-    Formatter::initUnits();
 
 #if defined(_WIN32) || defined(__APPLE__)
 
@@ -160,13 +159,13 @@ Application::Application(int& argc, char** argv) :
             break;
 
         case 'v':
-            std::cerr << qPrintable(MyReadableName) << ' ' << LONG_VERSION_STRING << std::endl;
+            std::cerr << qPrintable(display_name_) << ' ' << LONG_VERSION_STRING << std::endl;
             quitLater();
             return;
 
         case TR_OPT_ERR:
             std::cerr << qPrintable(QObject::tr("Invalid option")) << std::endl;
-            tr_getopt_usage(qPrintable(MyReadableName), getUsage(), Opts.data());
+            tr_getopt_usage(qPrintable(display_name_), getUsage(), Opts.data());
             quitLater();
             return;
 
@@ -285,6 +284,7 @@ Application::Application(int& argc, char** argv) :
 
     connect(model_, &TorrentModel::torrentsAdded, this, &Application::onTorrentsAdded);
     connect(model_, &TorrentModel::torrentsCompleted, this, &Application::onTorrentsCompleted);
+    connect(model_, &TorrentModel::torrentsEdited, this, &Application::onTorrentsEdited);
     connect(model_, &TorrentModel::torrentsNeedInfo, this, &Application::onTorrentsNeedInfo);
     connect(prefs_, &Prefs::changed, this, &Application::refreshPref);
     connect(session_, &Session::sourceChanged, this, &Application::onSessionSourceChanged);
@@ -376,8 +376,8 @@ void Application::loadTranslations()
         installTranslator(&qt_translator_);
     }
 
-    if (loadTranslation(app_translator_, MyConfigName, locale, app_qm_dirs) ||
-        loadTranslation(app_translator_, MyConfigName, english_locale, app_qm_dirs))
+    if (loadTranslation(app_translator_, config_name_, locale, app_qm_dirs) ||
+        loadTranslation(app_translator_, config_name_, english_locale, app_qm_dirs))
     {
         installTranslator(&app_translator_);
     }
@@ -600,7 +600,9 @@ bool Application::notifyApp(QString const& title, QString const& body) const
         args.append(title); // summary
         args.append(body); // body
         args.append(QStringList()); // actions - unused for plain passive popups
-        args.append(QVariantMap()); // hints - unused atm
+        args.append(QVariantMap({
+            std::make_pair(QStringLiteral("category"), QVariant(QStringLiteral("transfer.complete")))
+        })); // hints
         args.append(static_cast<int32_t>(-1)); // use the default timeout period
         m.setArguments(args);
         QDBusReply<quint32> const reply_msg = bus.call(m);

@@ -9,6 +9,7 @@
 #pragma once
 
 #include <ctime>
+#include <memory>
 
 #include <QMainWindow>
 #include <QNetworkReply>
@@ -18,10 +19,10 @@
 #include <QWidgetList>
 
 #include "Filters.h"
+#include "Macros.h"
 #include "Speed.h"
 #include "TorrentFilter.h"
 #include "Typedefs.h"
-
 #include "ui_MainWindow.h"
 
 class QAction;
@@ -32,6 +33,7 @@ class QStringList;
 class AboutDialog;
 class AddData;
 class DetailsDialog;
+class ListViewProxyStyle;
 class Prefs;
 class PrefsDialog;
 class Session;
@@ -49,6 +51,7 @@ struct tr_variant;
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
+    TR_DISABLE_COPY_MOVE(MainWindow)
 
 public:
     MainWindow(Session&, Prefs&, TorrentModel&, bool minized);
@@ -142,6 +145,8 @@ private:
     Prefs& prefs_;
     TorrentModel& model_;
 
+    std::shared_ptr<ListViewProxyStyle> lvp_style_;
+
     QPixmap pixmap_network_error_;
     QPixmap pixmap_network_idle_;
     QPixmap pixmap_network_receive_;
@@ -174,6 +179,13 @@ private:
     QWidget* filter_bar_ = {};
     QAction* alt_speed_action_ = {};
     QString error_message_;
+
+    QString const total_ratio_stats_mode_name_;
+    QString const total_transfer_stats_mode_name_;
+    QString const session_ratio_stats_mode_name_;
+    QString const session_transfer_stats_mode_name_;
+
+    QString const show_options_checkbox_name_;
 
     struct TransferStats
     {

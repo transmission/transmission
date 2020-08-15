@@ -18,6 +18,7 @@
 #include <libtransmission/quark.h>
 
 #include "Filters.h"
+#include "Macros.h"
 
 class QDateTime;
 
@@ -29,6 +30,7 @@ struct tr_variant;
 class Prefs : public QObject
 {
     Q_OBJECT
+    TR_DISABLE_COPY_MOVE(Prefs)
 
 public:
     enum
@@ -144,11 +146,6 @@ public:
         return !isCore(key);
     }
 
-    char const* keyStr(int i) const
-    {
-        return tr_quark_get_string(Items[i].key, nullptr);
-    }
-
     tr_quark getKey(int i) const
     {
         return Items[i].key;
@@ -204,10 +201,11 @@ private:
 
     void initDefaults(tr_variant*);
 
-    // Intentionally not implemented
-    void set(int key, char const* value);
+    void set(int key, char const* value) = delete;
 
     QString const config_dir_;
+    std::array<std::pair<int, QString>, FilterMode::NUM_MODES> const FilterModes;
+    std::array<std::pair<int, QString>, SortMode::NUM_MODES> const SortModes;
 
     QSet<int> temporary_prefs_;
     QVariant mutable values_[PREFS_COUNT];

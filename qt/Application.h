@@ -13,6 +13,7 @@
 #include <QTranslator>
 
 #include "FaviconCache.h"
+#include "Macros.h"
 #include "Typedefs.h"
 
 class AddData;
@@ -26,6 +27,7 @@ class WatchDir;
 class Application : public QApplication
 {
     Q_OBJECT
+    TR_DISABLE_COPY_MOVE(Application)
 
 public:
     Application(int& argc, char** argv);
@@ -67,6 +69,9 @@ private:
     QTranslator qt_translator_;
     QTranslator app_translator_;
     FaviconCache favicons_;
+
+    QString const config_name_;
+    QString const display_name_;
 };
 
 #undef qApp

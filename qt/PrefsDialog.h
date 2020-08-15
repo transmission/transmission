@@ -11,8 +11,8 @@
 #include <QMap>
 
 #include "BaseDialog.h"
+#include "Macros.h"
 #include "Prefs.h"
-
 #include "ui_PrefsDialog.h"
 
 class QHttp;
@@ -25,6 +25,7 @@ class Session;
 class PrefsDialog : public BaseDialog
 {
     Q_OBJECT
+    TR_DISABLE_COPY_MOVE(PrefsDialog)
 
 public:
     PrefsDialog(Session&, Prefs&, QWidget* parent = nullptr);

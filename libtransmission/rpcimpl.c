@@ -121,7 +121,6 @@ static tr_torrent** getTorrents(tr_session* session, tr_variant* args, int* setm
 
         for (int i = 0; i < n; ++i)
         {
-            char const* str;
             tr_torrent* tor;
             tr_variant* node = tr_variantListChild(ids, i);
 
@@ -730,9 +729,9 @@ static void initField(tr_torrent* const tor, tr_info const* const inf, tr_stat c
         {
             size_t byte_count = 0;
             void* bytes = tr_torrentCreatePieceBitfield(tor, &byte_count);
-            char* str = tr_base64_encode(bytes, byte_count, NULL);
-            tr_variantInitStr(initme, str != NULL ? str : "", TR_BAD_SIZE);
-            tr_free(str);
+            char* enc = tr_base64_encode(bytes, byte_count, NULL);
+            tr_variantInitStr(initme, enc != NULL ? enc : "", TR_BAD_SIZE);
+            tr_free(enc);
             tr_free(bytes);
         }
         else

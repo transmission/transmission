@@ -10,6 +10,8 @@
 
 #include <QItemDelegate>
 
+#include "Macros.h"
+
 class QStyle;
 
 class Session;
@@ -18,6 +20,7 @@ struct TrackerInfo;
 class TrackerDelegate : public QItemDelegate
 {
     Q_OBJECT
+    TR_DISABLE_COPY_MOVE(TrackerDelegate)
 
 public:
     TrackerDelegate(QObject* parent = nullptr) :

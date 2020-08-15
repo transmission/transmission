@@ -21,6 +21,7 @@
  *****************************************************************************/
 
 #include <errno.h>
+#include <limits.h>
 #include <string.h>
 
 #include <sys/types.h>
@@ -33,6 +34,7 @@
 
 #include <event2/util.h>
 
+#include <stdint.h>
 #include <libutp/utp.h>
 
 #include "transmission.h"
@@ -347,8 +349,11 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const
         ret = tr_peer_socket_tcp_create(s);
     }
 
-    tr_logAddDeep(__FILE__, __LINE__, NULL, "New OUTGOING connection %" PRIdMAX " (%s)", (intmax_t)s,
-        tr_peerIoAddrStr(addr, port));
+    if (tr_logGetDeepEnabled())
+    {
+        tr_logAddDeep(__FILE__, __LINE__, NULL, "New OUTGOING connection %" PRIdMAX " (%s)", (intmax_t)s,
+            tr_peerIoAddrStr(addr, port));
+    }
 
     return ret;
 }
@@ -473,7 +478,12 @@ static tr_socket_t tr_netBindTCPImpl(tr_address const* addr, tr_port port, bool 
 
 #endif
 
-    if (listen(fd, 128) == -1)
+#ifdef _WIN32
+    if (listen(fd, SOMAXCONN) == -1)
+#else /* _WIN32 */
+    /* Listen queue backlog will be capped to the operating system's limit. */
+    if (listen(fd, INT_MAX) == -1)
+#endif /* _WIN32 */
     {
         *errOut = sockerrno;
         tr_netCloseSocket(fd);
@@ -756,4 +766,18 @@ bool tr_address_is_valid_for_peers(tr_address const* addr, tr_port port)
 {
     return port != 0 && tr_address_is_valid(addr) && !isIPv6LinkLocalAddress(addr) && !isIPv4MappedAddress(addr) &&
         !isMartianAddr(addr);
+}
+
+struct tr_peer_socket tr_peer_socket_tcp_create(tr_socket_t const handle)
+{
+    TR_ASSERT(handle != TR_BAD_SOCKET);
+    struct tr_peer_socket const ret = { .type = TR_PEER_SOCKET_TYPE_TCP, .handle.tcp = handle };
+    return ret;
+}
+
+struct tr_peer_socket tr_peer_socket_utp_create(struct UTPSocket* const handle)
+{
+    TR_ASSERT(handle != NULL);
+    struct tr_peer_socket const ret = { .type = TR_PEER_SOCKET_TYPE_UTP, .handle.utp = handle };
+    return ret;
 }

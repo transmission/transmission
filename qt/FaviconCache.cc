@@ -74,14 +74,14 @@ void FaviconCache::ensureCacheDirHasBeenScanned()
 ****
 ***/
 
-QString FaviconCache::getDisplayName(QString const& key)
+QString FaviconCache::getDisplayName(Key const& key)
 {
     auto name = key;
     name[0] = name.at(0).toTitleCase();
     return name;
 }
 
-QString FaviconCache::getKey(QUrl const& url)
+FaviconCache::Key FaviconCache::getKey(QUrl const& url)
 {
     auto host = url.host();
 
@@ -94,7 +94,7 @@ QString FaviconCache::getKey(QUrl const& url)
     return pos < 0 ? host : host.remove(0, pos + 1);
 }
 
-QString FaviconCache::getKey(QString const& displayName)
+FaviconCache::Key FaviconCache::getKey(QString const& displayName)
 {
     return displayName.toLower();
 }
@@ -104,18 +104,18 @@ QSize FaviconCache::getIconSize()
     return QSize(16, 16);
 }
 
-QPixmap FaviconCache::find(QString const& key)
+QPixmap FaviconCache::find(Key const& key)
 {
     ensureCacheDirHasBeenScanned();
 
     return pixmaps_[key];
 }
 
-QString FaviconCache::add(QUrl const& url)
+FaviconCache::Key FaviconCache::add(QUrl const& url)
 {
     ensureCacheDirHasBeenScanned();
 
-    QString const key = getKey(url);
+    Key const key = getKey(url);
 
     if (pixmaps_.count(key) == 0)
     {

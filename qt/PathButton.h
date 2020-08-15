@@ -10,9 +10,12 @@
 
 #include <QToolButton>
 
+#include "Macros.h"
+
 class PathButton : public QToolButton
 {
     Q_OBJECT
+    TR_DISABLE_COPY_MOVE(PathButton)
 
 public:
     enum Mode

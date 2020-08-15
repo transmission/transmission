@@ -13,6 +13,7 @@
 
 #include <event2/event.h>
 
+#include <stdint.h>
 #include <libutp/utp.h>
 
 #include "transmission.h"
@@ -60,8 +61,6 @@ enum
     /* max number of peers to ask for per second overall.
      * this throttle is to avoid overloading the router */
     MAX_CONNECTIONS_PER_SECOND = 12,
-    /* */
-    MAX_CONNECTIONS_PER_PULSE = (int)(MAX_CONNECTIONS_PER_SECOND * (RECONNECT_PERIOD_MSEC / 1000.0)),
     /* number of bad pieces a peer is allowed to send before we ban them */
     MAX_BAD_PIECES_PER_PEER = 5,
     /* amount of time to keep a list of request pieces lying around
@@ -2098,7 +2097,6 @@ static bool myHandshakeDoneCB(tr_handshake* handshake, tr_peerIo* io, bool readA
             else
             {
                 tr_quark client;
-                tr_peerIo* io;
                 char buf[128];
 
                 if (peer_id != NULL)
@@ -2110,9 +2108,9 @@ static bool myHandshakeDoneCB(tr_handshake* handshake, tr_peerIo* io, bool readA
                     client = TR_KEY_NONE;
                 }
 
-                io = tr_handshakeStealIO(handshake); /* this steals its refcount too, which is balanced by our unref in peerDelete() */
-                tr_peerIoSetParent(io, &s->tor->bandwidth);
-                createBitTorrentPeer(s->tor, io, atom, client);
+                tr_peerIo* stolen = tr_handshakeStealIO(handshake); /* this steals its refcount too, which is balanced by our unref in peerDelete() */
+                tr_peerIoSetParent(stolen, &s->tor->bandwidth);
+                createBitTorrentPeer(s->tor, stolen, atom, client);
 
                 success = true;
             }
@@ -2559,17 +2557,17 @@ void tr_peerUpdateProgress(tr_torrent* tor, tr_peer* peer)
     }
 
     /* clamp the progress range */
-    if (peer->progress < 0.0)
+    if (peer->progress < 0.0f)
     {
-        peer->progress = 0.0;
+        peer->progress = 0.0f;
     }
 
-    if (peer->progress > 1.0)
+    if (peer->progress > 1.0f)
     {
-        peer->progress = 1.0;
+        peer->progress = 1.0f;
     }
 
-    if (peer->atom != NULL && peer->progress >= 1.0)
+    if (peer->atom != NULL && peer->progress >= 1.0f)
     {
         atomSetSeed(tor->swarm, peer->atom);
     }
@@ -2699,9 +2697,9 @@ uint64_t tr_peerMgrGetDesiredAvailable(tr_torrent const* tor)
         return 0;
     }
 
-    size_t const n = tr_ptrArraySize(&s->peers);
+    size_t const peer_count = tr_ptrArraySize(&s->peers);
 
-    if (n == 0)
+    if (peer_count == 0)
     {
         return 0;
     }
@@ -2709,7 +2707,7 @@ uint64_t tr_peerMgrGetDesiredAvailable(tr_torrent const* tor)
     {
         tr_peer const** peers = (tr_peer const**)tr_ptrArrayBase(&s->peers);
 
-        for (size_t i = 0; i < n; ++i)
+        for (size_t i = 0; i < peer_count; ++i)
         {
             if (peers[i]->atom != NULL && atomIsSeed(peers[i]->atom))
             {
@@ -3779,6 +3777,7 @@ static void reconnectPulse(evutil_socket_t foo UNUSED, short bar UNUSED, void* v
     }
 
     /* try to make new peer connections */
+    int const MAX_CONNECTIONS_PER_PULSE = (int)(MAX_CONNECTIONS_PER_SECOND * (RECONNECT_PERIOD_MSEC / 1000.0));
     makeNewPeerConnections(mgr, MAX_CONNECTIONS_PER_PULSE);
 }
 
@@ -4002,7 +4001,7 @@ static void atomPulse(evutil_socket_t foo UNUSED, short bar UNUSED, void* vmgr)
             s->pool = TR_PTR_ARRAY_INIT;
             qsort(keep, keepCount, sizeof(struct peer_atom*), compareAtomPtrsByAddress);
 
-            for (int i = 0; i < keepCount; ++i)
+            for (i = 0; i < keepCount; ++i)
             {
                 tr_ptrArrayAppend(&s->pool, keep[i]);
             }

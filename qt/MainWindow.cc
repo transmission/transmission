@@ -8,6 +8,7 @@
 
 #include <array>
 #include <cassert>
+#include <functional>
 #include <utility>
 
 #include <QCheckBox>
@@ -48,16 +49,6 @@
 #define PREF_VARIANTS_KEY "pref-variants-list"
 #define STATS_MODE_KEY "stats-mode"
 #define SORT_MODE_KEY "sort-mode"
-
-namespace
-{
-
-auto const TotalRatioStatsModeName = QStringLiteral("total-ratio");
-auto const TotalTransferStatsModeName = QStringLiteral("total-transfer");
-auto const SessionRatioStatsModeName = QStringLiteral("session-ratio");
-auto const SessionTransferStatsModeName = QStringLiteral("session-transfer");
-
-} // namespace
 
 /**
  * This is a proxy-style for that forces it to be always disabled.
@@ -141,10 +132,16 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     session_(session),
     prefs_(prefs),
     model_(model),
+    lvp_style_(new ListViewProxyStyle{}),
     filter_model_(prefs),
     torrent_delegate_(new TorrentDelegate(this)),
     torrent_delegate_min_(new TorrentDelegateMin(this)),
     network_timer_(this),
+    total_ratio_stats_mode_name_(QStringLiteral("total-ratio")),
+    total_transfer_stats_mode_name_(QStringLiteral("total-transfer")),
+    session_ratio_stats_mode_name_(QStringLiteral("session-ratio")),
+    session_transfer_stats_mode_name_(QStringLiteral("session-transfer")),
+    show_options_checkbox_name_(QStringLiteral("show-options-checkbox")),
     refresh_timer_(this)
 {
     setAcceptDrops(true);
@@ -154,7 +151,7 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
 
     ui_.setupUi(this);
 
-    ui_.listView->setStyle(new ListViewProxyStyle);
+    ui_.listView->setStyle(lvp_style_.get());
     ui_.listView->setAttribute(Qt::WA_MacShowFocusRect, false);
 
     // icons
@@ -244,7 +241,7 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     connect(&model_, &TorrentModel::modelReset, this, refresh_soon_adapter);
     connect(&model_, &TorrentModel::rowsRemoved, this, refresh_soon_adapter);
     connect(&model_, &TorrentModel::rowsInserted, this, refresh_soon_adapter);
-    connect(&model_, &TorrentModel::dataChanged, this, refresh_soon_adapter);
+    connect(&model_, &TorrentModel::torrentsChanged, this, refresh_soon_adapter);
 
     ui_.listView->setModel(&filter_model_);
     connect(ui_.listView->selectionModel(), &QItemSelectionModel::selectionChanged, refresh_action_sensitivity_soon);
@@ -393,7 +390,7 @@ void MainWindow::initStatusBar()
     ui_.optionsButton->setMenu(createOptionsMenu());
 
     int const minimum_speed_width =
-        ui_.downloadSpeedLabel->fontMetrics().boundingRect(Formatter::uploadSpeedToString(Speed::fromKBps(999.99))).width();
+        ui_.downloadSpeedLabel->fontMetrics().boundingRect(Formatter::get().uploadSpeedToString(Speed::fromKBps(999.99))).width();
     ui_.downloadSpeedLabel->setMinimumWidth(minimum_speed_width);
     ui_.uploadSpeedLabel->setMinimumWidth(minimum_speed_width);
 
@@ -418,7 +415,8 @@ QMenu* MainWindow::createOptionsMenu()
             action_group->addAction(off_action);
             connect(off_action, SIGNAL(triggered(bool)), this, SLOT(onSetPrefs(bool)));
 
-            on_action = menu->addAction(tr("Limited at %1").arg(Formatter::speedToString(Speed::fromKBps(current_value))));
+            on_action =
+                menu->addAction(tr("Limited at %1").arg(Formatter::get().speedToString(Speed::fromKBps(current_value))));
             on_action->setCheckable(true);
             on_action->setProperty(PREF_VARIANTS_KEY, QVariantList() << pref << current_value << enabled_pref << true);
             action_group->addAction(on_action);
@@ -428,7 +426,7 @@ QMenu* MainWindow::createOptionsMenu()
 
             for (int const i : stock_speeds)
             {
-                QAction* action = menu->addAction(Formatter::speedToString(Speed::fromKBps(i)));
+                QAction* action = menu->addAction(Formatter::get().speedToString(Speed::fromKBps(i)));
                 action->setProperty(PREF_VARIANTS_KEY, QVariantList() << pref << i << enabled_pref << true);
                 connect(action, SIGNAL(triggered(bool)), this, SLOT(onSetPrefs()));
             }
@@ -448,7 +446,7 @@ QMenu* MainWindow::createOptionsMenu()
             action_group->addAction(off_action);
             connect(off_action, SIGNAL(triggered(bool)), this, SLOT(onSetPrefs(bool)));
 
-            on_action = menu->addAction(tr("Stop at Ratio (%1)").arg(Formatter::ratioToString(current_value)));
+            on_action = menu->addAction(tr("Stop at Ratio (%1)").arg(Formatter::get().ratioToString(current_value)));
             on_action->setCheckable(true);
             on_action->setProperty(PREF_VARIANTS_KEY, QVariantList() << pref << current_value << enabled_pref << true);
             action_group->addAction(on_action);
@@ -458,7 +456,7 @@ QMenu* MainWindow::createOptionsMenu()
 
             for (double const i : stock_ratios)
             {
-                QAction* action = menu->addAction(Formatter::ratioToString(i));
+                QAction* action = menu->addAction(Formatter::get().ratioToString(i));
                 action->setProperty(PREF_VARIANTS_KEY, QVariantList() << pref << i << enabled_pref << true);
                 connect(action, SIGNAL(triggered(bool)), this, SLOT(onSetPrefs()));
             }
@@ -483,10 +481,10 @@ QMenu* MainWindow::createStatsModeMenu()
 {
     std::array<QPair<QAction*, QString>, 4> stats_modes =
     {
-        qMakePair(ui_.action_TotalRatio, TotalRatioStatsModeName),
-        qMakePair(ui_.action_TotalTransfer, TotalTransferStatsModeName),
-        qMakePair(ui_.action_SessionRatio, SessionRatioStatsModeName),
-        qMakePair(ui_.action_SessionTransfer, SessionTransferStatsModeName)
+        qMakePair(ui_.action_TotalRatio, total_ratio_stats_mode_name_),
+        qMakePair(ui_.action_TotalTransfer, total_transfer_stats_mode_name_),
+        qMakePair(ui_.action_SessionRatio, session_ratio_stats_mode_name_),
+        qMakePair(ui_.action_SessionTransfer, session_transfer_stats_mode_name_)
     };
 
     auto* action_group = new QActionGroup(this);
@@ -784,12 +782,13 @@ void MainWindow::refreshTrayIcon(TransferStats const& stats)
     }
     else if (stats.peers_sending != 0)
     {
-        tip = Formatter::downloadSpeedToString(stats.speed_down) + QStringLiteral("   ") + Formatter::uploadSpeedToString(
+        tip = Formatter::get().downloadSpeedToString(stats.speed_down) + QStringLiteral("   ") +
+            Formatter::get().uploadSpeedToString(
             stats.speed_up);
     }
     else if (stats.peers_receiving != 0)
     {
-        tip = Formatter::uploadSpeedToString(stats.speed_up);
+        tip = Formatter::get().uploadSpeedToString(stats.speed_up);
     }
 
     tray_icon_.setToolTip(tip);
@@ -797,36 +796,40 @@ void MainWindow::refreshTrayIcon(TransferStats const& stats)
 
 void MainWindow::refreshStatusBar(TransferStats const& stats)
 {
-    ui_.uploadSpeedLabel->setText(Formatter::uploadSpeedToString(stats.speed_up));
+    ui_.uploadSpeedLabel->setText(Formatter::get().uploadSpeedToString(stats.speed_up));
     ui_.uploadSpeedLabel->setVisible(stats.peers_sending || stats.peers_receiving);
-    ui_.downloadSpeedLabel->setText(Formatter::downloadSpeedToString(stats.speed_down));
+    ui_.downloadSpeedLabel->setText(Formatter::get().downloadSpeedToString(stats.speed_down));
     ui_.downloadSpeedLabel->setVisible(stats.peers_sending);
 
     ui_.networkLabel->setVisible(!session_.isServer());
 
-    QString const mode(prefs_.getString(Prefs::STATUSBAR_STATS));
-    QString str;
+    auto const mode = prefs_.getString(Prefs::STATUSBAR_STATS);
+    auto str = QString {};
 
-    if (mode == SessionRatioStatsModeName)
+    if (mode == session_ratio_stats_mode_name_)
     {
-        str = tr("Ratio: %1").arg(Formatter::ratioToString(session_.getStats().ratio));
+        str = tr("Ratio: %1")
+            .arg(Formatter::get().ratioToString(session_.getStats().ratio));
     }
-    else if (mode == SessionTransferStatsModeName)
+    else if (mode == session_transfer_stats_mode_name_)
     {
-        tr_session_stats const& stats(session_.getStats());
-        str = tr("Down: %1, Up: %2").arg(Formatter::sizeToString(stats.downloadedBytes)).
-            arg(Formatter::sizeToString(stats.uploadedBytes));
+        auto const& st = session_.getStats();
+        str = tr("Down: %1, Up: %2")
+            .arg(Formatter::get().sizeToString(st.downloadedBytes))
+            .arg(Formatter::get().sizeToString(st.uploadedBytes));
     }
-    else if (mode == TotalTransferStatsModeName)
+    else if (mode == total_transfer_stats_mode_name_)
     {
-        tr_session_stats const& stats(session_.getCumulativeStats());
-        str = tr("Down: %1, Up: %2").arg(Formatter::sizeToString(stats.downloadedBytes)).
-            arg(Formatter::sizeToString(stats.uploadedBytes));
+        auto const& st = session_.getCumulativeStats();
+        str = tr("Down: %1, Up: %2")
+            .arg(Formatter::get().sizeToString(st.downloadedBytes))
+            .arg(Formatter::get().sizeToString(st.uploadedBytes));
     }
     else // default is "total-ratio"
     {
-        assert(mode == TotalRatioStatsModeName);
-        str = tr("Ratio: %1").arg(Formatter::ratioToString(session_.getCumulativeStats().ratio));
+        assert(mode == total_ratio_stats_mode_name_);
+        str = tr("Ratio: %1")
+            .arg(Formatter::get().ratioToString(session_.getCumulativeStats().ratio));
     }
 
     ui_.statsLabel->setText(str);
@@ -849,64 +852,52 @@ void MainWindow::refreshTorrentViewHeader()
 
 void MainWindow::refreshActionSensitivity()
 {
-    int paused(0);
-    int selected(0);
-    int selected_and_can_announce(0);
-    int selected_and_paused(0);
-    int selected_and_queued(0);
-    int selected_with_metadata(0);
-    QAbstractItemModel const* model(ui_.listView->model());
-    QItemSelectionModel const* selection_model(ui_.listView->selectionModel());
-    bool const has_selection = selection_model->hasSelection();
-    int const row_count(model->rowCount());
+    auto const* model = ui_.listView->model();
+    auto const* selection_model = ui_.listView->selectionModel();
+    auto const row_count = model->rowCount();
 
     // count how many torrents are selected, paused, etc
+    auto selected = int{};
+    auto selected_and_can_announce = int{};
+    auto selected_and_paused = int{};
+    auto selected_and_queued = int{};
+    auto selected_with_metadata = int{};
     auto const now = time(nullptr);
-    for (int row = 0; row < row_count; ++row)
+    for (auto const& row : selection_model->selectedRows())
     {
-        QModelIndex const model_index(model->index(row, 0));
-        auto const& tor = model->data(model_index, TorrentModel::TorrentRole).value<Torrent const*>();
+        auto const& tor = model->data(row, TorrentModel::TorrentRole).value<Torrent const*>();
 
-        if (tor != nullptr)
+        ++selected;
+
+        if (tor->isPaused())
         {
-            bool const is_selected = has_selection && selection_model->isSelected(model_index);
-            bool const is_paused = tor->isPaused();
+            ++selected_and_paused;
+        }
 
-            if (is_paused)
-            {
-                ++paused;
-            }
+        if (tor->isQueued())
+        {
+            ++selected_and_queued;
+        }
 
-            if (is_selected)
-            {
-                ++selected;
+        if (tor->hasMetadata())
+        {
+            ++selected_with_metadata;
+        }
 
-                if (is_paused)
-                {
-                    ++selected_and_paused;
-                }
-
-                if (tor->isQueued())
-                {
-                    ++selected_and_queued;
-                }
-
-                if (tor->hasMetadata())
-                {
-                    ++selected_with_metadata;
-                }
-
-                if (tor->canManualAnnounceAt(now))
-                {
-                    ++selected_and_can_announce;
-                }
-            }
+        if (tor->canManualAnnounceAt(now))
+        {
+            ++selected_and_can_announce;
         }
     }
 
-    bool const have_selection(selected > 0);
-    bool const have_selection_with_metadata = selected_with_metadata > 0;
-    bool const one_selection(selected == 1);
+    auto const& torrents = model_.torrents();
+    auto const is_paused = [](auto const* tor) { return tor->isPaused(); };
+    auto const any_paused = std::any_of(std::begin(torrents), std::end(torrents), is_paused);
+    auto const any_not_paused = std::any_of(std::begin(torrents), std::end(torrents), std::not_fn(is_paused));
+
+    auto const have_selection = selected > 0;
+    auto const have_selection_with_metadata = selected_with_metadata > 0;
+    auto const one_selection = selected == 1;
 
     ui_.action_Verify->setEnabled(have_selection_with_metadata);
     ui_.action_Remove->setEnabled(have_selection);
@@ -919,8 +910,8 @@ void MainWindow::refreshActionSensitivity()
     ui_.action_CopyMagnetToClipboard->setEnabled(one_selection);
 
     ui_.action_SelectAll->setEnabled(selected < row_count);
-    ui_.action_StartAll->setEnabled(paused > 0);
-    ui_.action_PauseAll->setEnabled(paused < row_count);
+    ui_.action_StartAll->setEnabled(any_paused);
+    ui_.action_PauseAll->setEnabled(any_not_paused);
     ui_.action_Start->setEnabled(selected_and_paused > 0);
     ui_.action_StartNow->setEnabled(selected_and_paused + selected_and_queued > 0);
     ui_.action_Pause->setEnabled(selected_and_paused < selected);
@@ -1155,7 +1146,8 @@ void MainWindow::refreshPref(int key)
         break;
 
     case Prefs::DSPEED:
-        dlimit_on_action_->setText(tr("Limited at %1").arg(Formatter::speedToString(Speed::fromKBps(prefs_.get<int>(key)))));
+        dlimit_on_action_->setText(tr("Limited at %1").arg(Formatter::get().speedToString(Speed::fromKBps(prefs_.get<int>(
+            key)))));
         break;
 
     case Prefs::USPEED_ENABLED:
@@ -1163,7 +1155,8 @@ void MainWindow::refreshPref(int key)
         break;
 
     case Prefs::USPEED:
-        ulimit_on_action_->setText(tr("Limited at %1").arg(Formatter::speedToString(Speed::fromKBps(prefs_.get<int>(key)))));
+        ulimit_on_action_->setText(tr("Limited at %1").arg(Formatter::get().speedToString(Speed::fromKBps(prefs_.get<int>(
+            key)))));
         break;
 
     case Prefs::RATIO_ENABLED:
@@ -1171,7 +1164,7 @@ void MainWindow::refreshPref(int key)
         break;
 
     case Prefs::RATIO:
-        ratio_on_action_->setText(tr("Stop at Ratio (%1)").arg(Formatter::ratioToString(prefs_.get<double>(key))));
+        ratio_on_action_->setText(tr("Stop at Ratio (%1)").arg(Formatter::get().ratioToString(prefs_.get<double>(key))));
         break;
 
     case Prefs::FILTERBAR:
@@ -1245,7 +1238,7 @@ void MainWindow::refreshPref(int key)
                 tr("Click to enable Temporary Speed Limits\n (%1 down, %2 up)");
             Speed const d = Speed::fromKBps(prefs_.getInt(Prefs::ALT_SPEED_LIMIT_DOWN));
             Speed const u = Speed::fromKBps(prefs_.getInt(Prefs::ALT_SPEED_LIMIT_UP));
-            ui_.altSpeedButton->setToolTip(fmt.arg(Formatter::speedToString(d)).arg(Formatter::speedToString(u)));
+            ui_.altSpeedButton->setToolTip(fmt.arg(Formatter::get().speedToString(d)).arg(Formatter::get().speedToString(u)));
             break;
         }
 
@@ -1257,13 +1250,6 @@ void MainWindow::refreshPref(int key)
 /***
 ****
 ***/
-
-namespace
-{
-
-auto const ShowOptionsCheckboxName = QStringLiteral("show-options-checkbox");
-
-} // namespace
 
 void MainWindow::newTorrent()
 {
@@ -1286,7 +1272,7 @@ void MainWindow::openTorrent()
     {
         auto* b = new QCheckBox(tr("Show &options dialog"));
         b->setChecked(prefs_.getBool(Prefs::OPTIONS_PROMPT));
-        b->setObjectName(ShowOptionsCheckboxName);
+        b->setObjectName(show_options_checkbox_name_);
         l->addWidget(b, l->rowCount(), 0, 1, -1, Qt::AlignLeft);
     }
 
@@ -1320,7 +1306,7 @@ void MainWindow::addTorrents(QStringList const& filenames)
 
     if (file_dialog != nullptr)
     {
-        auto const* const b = file_dialog->findChild<QCheckBox const*>(ShowOptionsCheckboxName);
+        auto const* const b = file_dialog->findChild<QCheckBox const*>(show_options_checkbox_name_);
 
         if (b != nullptr)
         {
@@ -1505,7 +1491,7 @@ void MainWindow::updateNetworkIcon()
     }
     else if (seconds_since_last_read < 60 * 2)
     {
-        tip = tr("%1 last responded %2 ago").arg(url).arg(Formatter::timeToString(seconds_since_last_read));
+        tip = tr("%1 last responded %2 ago").arg(url).arg(Formatter::get().timeToString(seconds_since_last_read));
     }
     else
     {

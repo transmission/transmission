@@ -31,7 +31,7 @@
 
 #include <event2/buffer.h>
 
-#define __LIBTRANSMISSION_VARIANT_MODULE__
+#define LIBTRANSMISSION_VARIANT_MODULE
 
 #include "transmission.h"
 #include "ConvertUTF.h"
@@ -821,13 +821,13 @@ static void nodeDestruct(struct SaveNode* node)
  * easier to read, but was vulnerable to a smash-stacking
  * attack via maliciously-crafted data. (#667)
  */
-void tr_variantWalk(tr_variant const* v, struct VariantWalkFuncs const* walkFuncs, void* user_data, bool sort_dicts)
+void tr_variantWalk(tr_variant const* v_in, struct VariantWalkFuncs const* walkFuncs, void* user_data, bool sort_dicts)
 {
     int stackSize = 0;
     int stackAlloc = 64;
     struct SaveNode* stack = tr_new(struct SaveNode, stackAlloc);
 
-    nodeConstruct(&stack[stackSize++], v, sort_dicts);
+    nodeConstruct(&stack[stackSize++], v_in, sort_dicts);
 
     while (stackSize > 0)
     {

@@ -374,8 +374,8 @@ char const* gtr_get_help_uri(void)
 
     if (uri == NULL)
     {
-        char const* fmt = "https://transmissionbt.com/help/gtk/%d.%dx";
-        uri = g_strdup_printf(fmt, MAJOR_VERSION, MINOR_VERSION / 10);
+        uri = g_strdup_printf("https://transmissionbt.com/help/gtk/%d.%dx",
+            MAJOR_VERSION, MINOR_VERSION / 10);
     }
 
     return uri;

@@ -21,6 +21,7 @@
 #include <event2/dns.h> /* evdns_base_free() */
 #include <event2/event.h>
 
+#include <stdint.h>
 #include <libutp/utp.h>
 
 // #define TR_SHOW_DEPRECATED
@@ -173,8 +174,12 @@ static void accept_incoming_peer(evutil_socket_t fd, short what UNUSED, void* vs
 
     if (clientSocket != TR_BAD_SOCKET)
     {
-        tr_logAddDeep(__FILE__, __LINE__, NULL, "new incoming connection %" PRIdMAX " (%s)", (intmax_t)clientSocket,
-            tr_peerIoAddrStr(&clientAddr, clientPort));
+        if (tr_logGetDeepEnabled())
+        {
+            tr_logAddDeep(__FILE__, __LINE__, NULL, "new incoming connection %" PRIdMAX " (%s)", (intmax_t)clientSocket,
+                tr_peerIoAddrStr(&clientAddr, clientPort));
+        }
+
         tr_peerMgrAddIncoming(session->peerMgr, &clientAddr, clientPort, tr_peer_socket_tcp_create(clientSocket));
     }
 }
@@ -373,7 +378,7 @@ void tr_sessionGetDefaultSettings(tr_variant* d)
     tr_variantDictAddBool(d, TR_KEY_rpc_whitelist_enabled, true);
     tr_variantDictAddStr(d, TR_KEY_rpc_host_whitelist, TR_DEFAULT_RPC_HOST_WHITELIST);
     tr_variantDictAddBool(d, TR_KEY_rpc_host_whitelist_enabled, true);
-    tr_variantDictAddInt(d, TR_KEY_rpc_port, atoi(TR_DEFAULT_RPC_PORT_STR));
+    tr_variantDictAddInt(d, TR_KEY_rpc_port, TR_DEFAULT_RPC_PORT);
     tr_variantDictAddStr(d, TR_KEY_rpc_url, TR_DEFAULT_RPC_URL_STR);
     tr_variantDictAddBool(d, TR_KEY_scrape_paused_torrents_enabled, true);
     tr_variantDictAddStr(d, TR_KEY_script_torrent_done_filename, "");
@@ -1485,7 +1490,7 @@ static void turtleUpdateTable(struct tr_turtle_info* t)
                 end += MINUTES_PER_DAY;
             }
 
-            for (int i = begin; i < end; ++i)
+            for (time_t i = begin; i < end; ++i)
             {
                 tr_bitfieldAdd(b, (i + day * MINUTES_PER_DAY) % MINUTES_PER_WEEK);
             }

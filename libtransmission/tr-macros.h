@@ -173,3 +173,12 @@
 #define TR_INET6_ADDRSTRLEN 46
 
 #define TR_BAD_SIZE ((size_t)-1)
+
+/* Guard C code in headers, while including them from C++ */
+#ifdef  __cplusplus
+#define TR_BEGIN_DECLS  extern "C" {
+#define TR_END_DECLS    }
+#else
+#define TR_BEGIN_DECLS
+#define TR_END_DECLS
+#endif

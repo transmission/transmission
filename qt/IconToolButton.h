@@ -10,9 +10,12 @@
 
 #include <QToolButton>
 
+#include "Macros.h"
+
 class IconToolButton : public QToolButton
 {
     Q_OBJECT
+    TR_DISABLE_COPY_MOVE(IconToolButton)
 
 public:
     IconToolButton(QWidget* parent = nullptr);

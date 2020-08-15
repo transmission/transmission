@@ -379,6 +379,6 @@ int tr_main(int argc, char* argv[])
 
     printf("Changed %d files\n", changedCount);
 
-    tr_free(files);
+    tr_free((void*)files);
     return EXIT_SUCCESS;
 }

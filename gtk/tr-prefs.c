@@ -98,7 +98,7 @@ static gboolean spun_cb_idle(gpointer spin)
     struct spin_idle_data* data = g_object_get_data(o, IDLE_DATA);
 
     /* has the user stopped making changes? */
-    if (g_timer_elapsed(data->last_change, NULL) > 0.33F)
+    if (g_timer_elapsed(data->last_change, NULL) > 0.33)
     {
         /* update the core */
         tr_quark const key = GPOINTER_TO_INT(g_object_get_data(o, PREF_KEY));
@@ -804,8 +804,6 @@ static GtkWidget* remotePage(GObject* core)
         GtkCellRenderer* r;
         GtkTreeSelection* sel;
         GtkTreeView* v;
-        GtkWidget* w;
-        GtkWidget* h;
 
         page->store = GTK_LIST_STORE(m);
         w = gtk_tree_view_new_with_model(m);
@@ -839,12 +837,12 @@ static GtkWidget* remotePage(GObject* core)
         page->whitelist_widgets = g_slist_prepend(page->whitelist_widgets, w);
 
         h = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, GUI_PAD);
-        w = gtk_button_new_from_stock(GTK_STOCK_REMOVE);
+        w = gtk_button_new_with_mnemonic(_("_Remove"));
         g_signal_connect(w, "clicked", G_CALLBACK(onRemoveWhitelistClicked), page);
         page->remove_button = w;
         onWhitelistSelectionChanged(sel, page);
         gtk_box_pack_start(GTK_BOX(h), w, TRUE, TRUE, 0);
-        w = gtk_button_new_from_stock(GTK_STOCK_ADD);
+        w = gtk_button_new_with_mnemonic(_("_Add"));
         page->whitelist_widgets = g_slist_prepend(page->whitelist_widgets, w);
         g_signal_connect(w, "clicked", G_CALLBACK(onAddWhitelistClicked), page);
         g_object_set(h, "halign", GTK_ALIGN_END, "valign", GTK_ALIGN_CENTER, NULL);
@@ -1241,8 +1239,10 @@ GtkWidget* gtr_prefs_dialog_new(GtkWindow* parent, GObject* core)
     data->core = TR_CORE(core);
     data->core_prefs_tag = g_signal_connect(TR_CORE(core), "prefs-changed", G_CALLBACK(on_core_prefs_changed), data);
 
-    d = gtk_dialog_new_with_buttons(_("Transmission Preferences"), parent, GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_HELP,
-        GTK_RESPONSE_HELP, GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE, NULL);
+    d = gtk_dialog_new_with_buttons(_("Transmission Preferences"), parent, GTK_DIALOG_DESTROY_WITH_PARENT,
+        _("_Help"), GTK_RESPONSE_HELP,
+        _("_Close"), GTK_RESPONSE_CLOSE,
+        NULL);
     g_object_weak_ref(G_OBJECT(d), on_prefs_dialog_destroyed, data);
     gtk_window_set_role(GTK_WINDOW(d), "transmission-preferences-dialog");
     gtk_container_set_border_width(GTK_CONTAINER(d), GUI_PAD);

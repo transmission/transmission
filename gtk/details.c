@@ -656,7 +656,7 @@ static char* get_short_date_string(time_t t)
     tr_localtime_r(&t, &tm);
     strftime(buf, sizeof(buf), "%d %b %Y", &tm);
     return g_locale_to_utf8(buf, -1, NULL, NULL, NULL);
-};
+}
 
 static void refreshInfo(struct DetailsImpl* di, tr_torrent** torrents, int n)
 {
@@ -1993,7 +1993,7 @@ static void setPeerViewColumns(GtkTreeView* peer_view)
        so create a non-visible column and assign it as the
        'expander column. */
     {
-        GtkTreeViewColumn* c = gtk_tree_view_column_new();
+        c = gtk_tree_view_column_new();
         gtk_tree_view_column_set_visible(c, FALSE);
         gtk_tree_view_append_column(GTK_TREE_VIEW(peer_view), c);
         gtk_tree_view_set_expander_column(GTK_TREE_VIEW(peer_view), c);
@@ -2374,7 +2374,6 @@ static void refreshTracker(struct DetailsImpl* di, tr_torrent** torrents, int n)
             if (g_hash_table_lookup(hash, gstr->str) == NULL)
             {
                 GtkTreePath* p;
-                GtkTreeIter iter;
                 GtkTreeRowReference* ref;
 
                 gtk_list_store_insert_with_values(store, &iter, -1,
@@ -2601,8 +2600,10 @@ static void on_edit_trackers(GtkButton* button, gpointer data)
 
         g_string_truncate(gstr, 0);
         g_string_append_printf(gstr, _("%s - Edit Trackers"), tr_torrentName(tor));
-        d = gtk_dialog_new_with_buttons(gstr->str, win, GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_CANCEL,
-            GTK_RESPONSE_CANCEL, GTK_STOCK_SAVE, GTK_RESPONSE_ACCEPT, NULL);
+        d = gtk_dialog_new_with_buttons(gstr->str, win, GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
+            _("_Cancel"), GTK_RESPONSE_CANCEL,
+            _("_Save"), GTK_RESPONSE_ACCEPT,
+            NULL);
         g_signal_connect(d, "response", G_CALLBACK(on_edit_trackers_response), data);
 
         row = 0;
@@ -2711,8 +2712,10 @@ static void on_tracker_list_add_button_clicked(GtkButton* button UNUSED, gpointe
 
         g_string_truncate(gstr, 0);
         g_string_append_printf(gstr, _("%s - Add Tracker"), tr_torrentName(tor));
-        w = gtk_dialog_new_with_buttons(gstr->str, GTK_WINDOW(di->dialog), GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_CANCEL,
-            GTK_RESPONSE_CANCEL, GTK_STOCK_ADD, GTK_RESPONSE_ACCEPT, NULL);
+        w = gtk_dialog_new_with_buttons(gstr->str, GTK_WINDOW(di->dialog), GTK_DIALOG_DESTROY_WITH_PARENT,
+            _("_Cancel"), GTK_RESPONSE_CANCEL,
+            _("_Add"), GTK_RESPONSE_ACCEPT,
+            NULL);
         g_signal_connect(w, "response", G_CALLBACK(on_add_tracker_response), gdi);
 
         row = 0;
@@ -2837,7 +2840,6 @@ static GtkWidget* tracker_page_new(struct DetailsImpl* di)
     gtk_box_pack_start(GTK_BOX(v), w, FALSE, FALSE, 0);
 
     w = gtk_button_new_with_mnemonic(_("_Edit"));
-    gtk_button_set_image(GTK_BUTTON(w), gtk_image_new_from_icon_name(GTK_STOCK_EDIT, GTK_ICON_SIZE_BUTTON));
     g_signal_connect(w, "clicked", G_CALLBACK(on_edit_trackers), di);
     di->edit_trackers_button = w;
     gtk_box_pack_start(GTK_BOX(v), w, FALSE, FALSE, 0);
@@ -2899,7 +2901,6 @@ static gboolean periodic_refresh(gpointer data)
 
 static void on_details_window_size_allocated(GtkWidget* gtk_window, GtkAllocation* alloc UNUSED, gpointer gdata UNUSED)
 {
-    GdkWindow* gdk_window = gtk_widget_get_window(gtk_window);
     int w, h;
     gtk_window_get_size(GTK_WINDOW(gtk_window), &w, &h);
     gtr_pref_int_set(TR_KEY_details_window_width, w);
@@ -2940,12 +2941,16 @@ GtkWidget* gtr_torrent_details_dialog_new(GtkWindow* parent, TrCore* core)
     /* create the dialog */
     di->core = core;
     di->gstr = g_string_new(NULL);
-    d = gtk_dialog_new_with_buttons(NULL, parent, 0, GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE, NULL);
+    d = gtk_dialog_new_with_buttons(NULL, parent, 0,
+        _("_Close"), GTK_RESPONSE_CLOSE,
+        NULL);
     di->dialog = d;
     gtk_window_set_role(GTK_WINDOW(d), "tr-info");
 
     /* return saved window size */
-    gtk_window_resize(d, gtr_pref_int_get(TR_KEY_details_window_width), gtr_pref_int_get(TR_KEY_details_window_height));
+    gtk_window_resize(GTK_WINDOW(d),
+        gtr_pref_int_get(TR_KEY_details_window_width),
+        gtr_pref_int_get(TR_KEY_details_window_height));
     g_signal_connect(d, "size-allocate", G_CALLBACK(on_details_window_size_allocated), NULL);
 
     g_signal_connect_swapped(d, "response", G_CALLBACK(gtk_widget_destroy), d);

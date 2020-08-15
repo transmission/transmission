@@ -87,7 +87,7 @@ static int core_is_disposed(TrCore const* core)
     return core == NULL || core->priv->sorted_model == NULL;
 }
 
-G_DEFINE_TYPE_WITH_CODE(TrCore, tr_core, G_TYPE_OBJECT, G_ADD_PRIVATE(TrCore));
+G_DEFINE_TYPE_WITH_CODE(TrCore, tr_core, G_TYPE_OBJECT, G_ADD_PRIVATE(TrCore))
 
 static void core_dispose(GObject* o)
 {

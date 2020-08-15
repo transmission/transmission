@@ -7,6 +7,7 @@
  */
 
 #include <algorithm>
+#include <cassert>
 #include <iostream>
 #include <utility>
 
@@ -17,6 +18,9 @@
 #include "Torrent.h"
 #include "TorrentDelegate.h"
 #include "TorrentModel.h"
+#include "VariantHelpers.h"
+
+using ::trqt::variant_helpers::getValue;
 
 /***
 ****
@@ -131,17 +135,14 @@ void TorrentModel::removeTorrents(tr_variant* list)
     tr_variant* child;
     while ((child = tr_variantListChild(list, i++)) != nullptr)
     {
-        int64_t id;
-        Torrent* torrent = nullptr;
-
-        if (tr_variantGetInt(child, &id))
+        auto const id = getValue<int>(child);
+        if (id)
         {
-            torrent = getTorrentFromId(id);
-        }
-
-        if (torrent != nullptr)
-        {
-            torrents.push_back(torrent);
+            auto* torrent = getTorrentFromId(*id);
+            if (torrent != nullptr)
+            {
+                torrents.push_back(torrent);
+            }
         }
     }
 
@@ -157,9 +158,11 @@ void TorrentModel::updateTorrents(tr_variant* torrents, bool is_complete_list)
     auto added = torrent_ids_t{};
     auto changed = torrent_ids_t{};
     auto completed = torrent_ids_t{};
+    auto edited = torrent_ids_t{};
     auto instantiated = torrents_t{};
     auto needinfo = torrent_ids_t{};
     auto processed = torrents_t{};
+    auto changed_fields = Torrent::fields_t{};
 
     auto const now = time(nullptr);
     auto const recently_added = [now](auto const& tor)
@@ -240,46 +243,49 @@ void TorrentModel::updateTorrents(tr_variant* torrents, bool is_complete_list)
         }
 
         // Find the torrent id
-        int64_t id;
-        if (!tr_variantGetInt(values[id_pos], &id))
+        auto const id = getValue<int>(values[id_pos]);
+        if (!id)
         {
             continue;
         }
 
-        Torrent* tor = getTorrentFromId(id);
-        std::optional<uint64_t> left_until_done;
+        Torrent* tor = getTorrentFromId(*id);
         bool is_new = false;
 
         if (tor == nullptr)
         {
-            tor = new Torrent(prefs_, id);
+            tor = new Torrent(prefs_, *id);
             instantiated.push_back(tor);
             is_new = true;
         }
-        else
+
+        auto const fields = tor->update(keys.data(), values.data(), keys.size());
+
+        if (fields.any())
         {
-            left_until_done = tor->leftUntilDone();
+            changed_fields |= fields;
+            changed.insert(*id);
         }
 
-        if (tor->update(keys.data(), values.data(), keys.size()))
+        if (fields.test(Torrent::EDIT_DATE))
         {
-            changed.insert(id);
+            edited.insert(*id);
         }
 
         if (is_new && !tor->hasName())
         {
-            needinfo.insert(id);
+            needinfo.insert(*id);
         }
 
-        if (recently_added(tor) && tor->hasName() && !already_added_.count(id))
+        if (recently_added(tor) && tor->hasName() && !already_added_.count(*id))
         {
-            added.insert(id);
-            already_added_.insert(id);
+            added.insert(*id);
+            already_added_.insert(*id);
         }
 
-        if (left_until_done && (*left_until_done > 0) && (tor->leftUntilDone() == 0) && (tor->downloadedEver() > 0))
+        if (fields.test(Torrent::LEFT_UNTIL_DONE) && (tor->leftUntilDone() == 0) && (tor->downloadedEver() > 0))
         {
-            completed.insert(id);
+            completed.insert(*id);
         }
 
         processed.push_back(tor);
@@ -290,6 +296,11 @@ void TorrentModel::updateTorrents(tr_variant* torrents, bool is_complete_list)
     if (!instantiated.empty())
     {
         rowsAdd(instantiated);
+    }
+
+    if (!edited.empty())
+    {
+        emit torrentsEdited(edited);
     }
 
     if (!changed.empty())
@@ -311,7 +322,7 @@ void TorrentModel::updateTorrents(tr_variant* torrents, bool is_complete_list)
 
     if (!changed.empty())
     {
-        emit torrentsChanged(changed);
+        emit torrentsChanged(changed, changed_fields);
     }
 
     if (!completed.empty())

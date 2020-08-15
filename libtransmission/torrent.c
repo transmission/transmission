@@ -1301,14 +1301,14 @@ tr_torrent_activity tr_torrentGetActivity(tr_torrent const* tor)
     return ret;
 }
 
-static time_t torrentGetIdleSecs(tr_torrent const* tor)
+static int torrentGetIdleSecs(tr_torrent const* tor)
 {
     int idle_secs;
     tr_torrent_activity const activity = tr_torrentGetActivity(tor);
 
     if ((activity == TR_STATUS_DOWNLOAD || activity == TR_STATUS_SEED) && tor->startDate != 0)
     {
-        idle_secs = difftime(tr_time(), MAX(tor->startDate, tor->activityDate));
+        idle_secs = (int)difftime(tr_time(), MAX(tor->startDate, tor->activityDate));
     }
     else
     {

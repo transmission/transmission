@@ -10,8 +10,16 @@
 
 #include "RpcQueue.h"
 
+namespace
+{
+
+auto next_tag = RpcQueue::Tag {};
+
+}
+
 RpcQueue::RpcQueue(QObject* parent) :
-    QObject(parent)
+    QObject(parent),
+    tag_(next_tag++)
 {
     connect(&future_watcher_, SIGNAL(finished()), SLOT(stepFinished()));
 }
