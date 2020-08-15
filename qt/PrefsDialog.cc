@@ -324,7 +324,7 @@ void PrefsDialog::altSpeedDaysEdited(int i)
 
 void PrefsDialog::initSpeedTab()
 {
-    QString const speed_unit_str = Formatter::unitStr(Formatter::SPEED, Formatter::KB);
+    QString const speed_unit_str = Formatter::get().unitStr(Formatter::get().SPEED, Formatter::get().KB);
     auto const suffix = QStringLiteral(" %1").arg(speed_unit_str);
     QLocale const locale;
 

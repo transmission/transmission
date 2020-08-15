@@ -166,7 +166,7 @@ QString timeToStringRounded(int seconds)
         seconds -= seconds % 60;
     }
 
-    return Formatter::timeToString(seconds);
+    return Formatter::get().timeToString(seconds);
 }
 
 } // namespace

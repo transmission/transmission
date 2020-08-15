@@ -18,7 +18,7 @@
 #include "FileTreeItem.h"
 #include "FileTreeModel.h"
 #include "Formatter.h"
-#include "Utils.h" // mime icons
+#include "IconCache.h"
 
 QHash<QString, int> const& FileTreeItem::getMyChildRows()
 {
@@ -171,7 +171,7 @@ QVariant FileTreeItem::data(int column, int role) const
             }
             else
             {
-                value = Utils::guessMimeIcon(name());
+                value = IconCache::get().guessMimeIcon(name());
             }
         }
 
@@ -213,7 +213,7 @@ double FileTreeItem::progress() const
 
 QString FileTreeItem::sizeString() const
 {
-    return Formatter::sizeToString(size());
+    return Formatter::get().sizeToString(size());
 }
 
 uint64_t FileTreeItem::size() const

@@ -44,9 +44,6 @@
 namespace
 {
 
-auto const MyConfigName = QStringLiteral("transmission");
-auto const MyReadableName = QStringLiteral("transmission-qt");
-
 std::array<tr_option, 8> const Opts =
 {
     tr_option{ 'g', "config-dir", "Where to look for configuration files", "g", true, "<path>" },
@@ -88,12 +85,12 @@ bool loadTranslation(QTranslator& translator, QString const& name, QLocale const
 } // namespace
 
 Application::Application(int& argc, char** argv) :
-    QApplication(argc, argv)
+    QApplication(argc, argv),
+    config_name_{QStringLiteral("transmission")},
+    display_name_{QStringLiteral("transmission-qt")}
 {
-    setApplicationName(MyConfigName);
+    setApplicationName(config_name_);
     loadTranslations();
-
-    Formatter::initUnits();
 
 #if defined(_WIN32) || defined(__APPLE__)
 
@@ -162,13 +159,13 @@ Application::Application(int& argc, char** argv) :
             break;
 
         case 'v':
-            std::cerr << qPrintable(MyReadableName) << ' ' << LONG_VERSION_STRING << std::endl;
+            std::cerr << qPrintable(display_name_) << ' ' << LONG_VERSION_STRING << std::endl;
             quitLater();
             return;
 
         case TR_OPT_ERR:
             std::cerr << qPrintable(QObject::tr("Invalid option")) << std::endl;
-            tr_getopt_usage(qPrintable(MyReadableName), getUsage(), Opts.data());
+            tr_getopt_usage(qPrintable(display_name_), getUsage(), Opts.data());
             quitLater();
             return;
 
@@ -379,8 +376,8 @@ void Application::loadTranslations()
         installTranslator(&qt_translator_);
     }
 
-    if (loadTranslation(app_translator_, MyConfigName, locale, app_qm_dirs) ||
-        loadTranslation(app_translator_, MyConfigName, english_locale, app_qm_dirs))
+    if (loadTranslation(app_translator_, config_name_, locale, app_qm_dirs) ||
+        loadTranslation(app_translator_, config_name_, english_locale, app_qm_dirs))
     {
         installTranslator(&app_translator_);
     }

@@ -10,10 +10,6 @@
 
 #include <array>
 
-#include <QMetaType>
-#include <QString>
-#include <QVariant>
-
 #include "Torrent.h"
 
 class FilterMode
@@ -38,26 +34,9 @@ public:
     {
     }
 
-    FilterMode(QString const& name) :
-        mode_(modeFromName(name))
-    {
-    }
-
     int mode() const
     {
         return mode_;
-    }
-
-    QString const& name() const
-    {
-        return nameFromMode(mode_);
-    }
-
-    static int modeFromName(QString const& name);
-
-    static QString const& nameFromMode(int mode)
-    {
-        return Names[mode];
     }
 
     /* The Torrent properties that can affect this filter.
@@ -75,8 +54,6 @@ public:
 
 private:
     int mode_;
-
-    static std::array<QString, NUM_MODES> const Names;
 };
 
 Q_DECLARE_METATYPE(FilterMode)
@@ -105,28 +82,13 @@ public:
     {
     }
 
-    SortMode(QString const& name) :
-        mode_(modeFromName(name))
-    {
-    }
-
     int mode() const
     {
         return mode_;
     }
 
-    QString const& name() const
-    {
-        return Names[mode_];
-    }
-
-    static int modeFromName(QString const& name);
-    static QString const& nameFromMode(int mode);
-
 private:
     int mode_ = SORT_BY_ID;
-
-    static std::array<QString, NUM_MODES> const Names;
 };
 
 Q_DECLARE_METATYPE(SortMode)

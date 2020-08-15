@@ -8,8 +8,10 @@
 
 #include "VariantHelpers.h"
 
+#include <cmath>
+#include <limits>
+
 #include <QUrl>
-#include <QtGlobal> // qFuzzyCompare
 
 #include "Application.h" // qApp
 #include "Filters.h"
@@ -21,7 +23,7 @@ namespace trqt::variant_helpers
 
 bool change(double& setme, double const& value)
 {
-    bool const changed = !qFuzzyCompare(setme + 1, value + 1);
+    bool const changed = std::fabs(setme - value) > std::numeric_limits<double>::epsilon();
 
     if (changed)
     {

@@ -19,6 +19,7 @@ set(${PROJECT_NAME}_SOURCES
     Filters.cc
     Formatter.cc
     FreeSpaceLabel.cc
+    IconCache.cc
     IconToolButton.cc
     InteropHelper.cc
     InteropObject.cc
@@ -84,6 +85,7 @@ set(${PROJECT_NAME}_HEADERS
     Filters.h
     Formatter.h
     FreeSpaceLabel.h
+    IconCache.h
     IconToolButton.h
     InteropHelper.h
     InteropObject.h

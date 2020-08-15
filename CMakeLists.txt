@@ -406,6 +406,7 @@ set(WARNING_CANDIDATES
     -Wextra
     -Wcast-align
     -Wduplicated-cond
+    -Wexit-time-destructors
     -Wextra-semi
     -Wextra-semi-stmt
     -Wextra-tokens

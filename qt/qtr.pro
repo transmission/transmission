@@ -91,6 +91,7 @@ SOURCES += AboutDialog.cc \
            Filters.cc \
            Formatter.cc \
            FreeSpaceLabel.cc \
+           IconCache.cc \
            IconToolButton.cc \
            InteropHelper.cc \
            InteropObject.cc \

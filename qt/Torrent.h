@@ -503,13 +503,6 @@ public:
         return icon_;
     }
 
-    using KeyList = QSet<tr_quark>;
-    static KeyList const AllMainKeys;
-    static KeyList const DetailInfoKeys;
-    static KeyList const DetailStatKeys;
-    static KeyList const MainInfoKeys;
-    static KeyList const MainStatKeys;
-
     enum Field
     {
         ACTIVITY_DATE,

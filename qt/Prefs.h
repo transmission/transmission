@@ -204,6 +204,8 @@ private:
     void set(int key, char const* value) = delete;
 
     QString const config_dir_;
+    std::array<std::pair<int, QString>, FilterMode::NUM_MODES> const FilterModes;
+    std::array<std::pair<int, QString>, SortMode::NUM_MODES> const SortModes;
 
     QSet<int> temporary_prefs_;
     QVariant mutable values_[PREFS_COUNT];

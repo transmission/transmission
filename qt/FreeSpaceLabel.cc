@@ -84,7 +84,7 @@ void FreeSpaceLabel::onTimer()
             auto const bytes = dictFind<int64_t>(r.args.get(), TR_KEY_size_bytes);
             if (bytes && *bytes > 1)
             {
-                setText(tr("%1 free").arg(Formatter::sizeToString(*bytes)));
+                setText(tr("%1 free").arg(Formatter::get().sizeToString(*bytes)));
             }
             else
             {

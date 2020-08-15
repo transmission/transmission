@@ -132,4 +132,7 @@ private:
     TrackerDelegate* tracker_delegate_ = {};
 
     QMap<QString, QTreeWidgetItem*> peers_;
+
+    QIcon const icon_encrypted_;
+    QIcon const icon_unencrypted_;
 };

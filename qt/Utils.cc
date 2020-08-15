@@ -52,6 +52,7 @@ bool isSlashChar(QChar const& c)
     return c == QLatin1Char('/') || c == QLatin1Char('\\');
 }
 
+#if 0
 QIcon folderIcon()
 {
     static QIcon icon;
@@ -157,9 +158,11 @@ QIcon getMimeIcon(QString const& filename)
 }
 
 #endif
+#endif
 
 } // namespace
 
+#if 0
 QIcon Utils::getFolderIcon()
 {
     return folderIcon();
@@ -193,6 +196,8 @@ QIcon Utils::guessMimeIcon(QString const& filename)
 
 #endif
 }
+
+#endif
 
 QIcon Utils::getIconFromIndex(QModelIndex const& index)
 {

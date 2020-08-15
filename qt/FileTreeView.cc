@@ -89,9 +89,10 @@ void FileTreeView::resizeEvent(QResizeEvent* event)
         switch (column)
         {
         case FileTreeModel::COL_SIZE:
-            for (int s = Formatter::B; s <= Formatter::TB; ++s)
+            for (int s = Formatter::get().B; s <= Formatter::get().TB; ++s)
             {
-                item_texts << QStringLiteral("999.9 ") + Formatter::unitStr(Formatter::MEM, static_cast<Formatter::Size>(s));
+                item_texts << QStringLiteral("999.9 ") + Formatter::get().unitStr(Formatter::MEM,
+                    static_cast<Formatter::Size>(s));
             }
 
             break;
