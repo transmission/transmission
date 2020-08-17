@@ -111,26 +111,30 @@ QPixmap FaviconCache::find(Key const& key)
     return pixmaps_[key];
 }
 
-FaviconCache::Key FaviconCache::add(QUrl const& url)
+FaviconCache::Key FaviconCache::add(QString const& url_str)
 {
     ensureCacheDirHasBeenScanned();
 
-    Key const key = getKey(url);
-
-    if (pixmaps_.count(key) == 0)
+    // find or add this url's key
+    auto k_it = keys_.find(url_str);
+    if (k_it != keys_.end())
     {
-        // add a placholder s.t. we only ping the server once per session
-        pixmaps_[key] = QPixmap();
+        return k_it->second;
+    }
+    auto const url = QUrl { url_str };
+    auto const key = getKey(url);
+    keys_.insert({ url_str, key });
 
-        // try to download the favicon
+    // Try to download a favicon if we don't have one.
+    // Add a placeholder to prevent repeat downloads.
+    if (pixmaps_.try_emplace(key).second)
+    {
         QString const path = QStringLiteral("http://") + url.host() + QStringLiteral("/favicon.");
-        QStringList suffixes;
-        suffixes << QStringLiteral("ico") << QStringLiteral("png") << QStringLiteral("gif") << QStringLiteral("jpg");
-
-        for (QString const& suffix : suffixes)
-        {
-            nam_->get(QNetworkRequest(path + suffix));
-        }
+        nam_->get(QNetworkRequest(path + QStringLiteral("gif")));
+        nam_->get(QNetworkRequest(path + QStringLiteral("ico")));
+        nam_->get(QNetworkRequest(path + QStringLiteral("jpg")));
+        nam_->get(QNetworkRequest(path + QStringLiteral("png")));
+        nam_->get(QNetworkRequest(path + QStringLiteral("svg")));
     }
 
     return key;
@@ -165,4 +169,6 @@ void FaviconCache::onRequestFinished(QNetworkReply* reply)
         // notify listeners
         emit pixmapReady(key);
     }
+
+    reply->deleteLater();
 }
