@@ -121,6 +121,7 @@ FaviconCache::Key FaviconCache::add(QString const& url_str)
     {
         return k_it->second;
     }
+
     auto const url = QUrl { url_str };
     auto const key = getKey(url);
     keys_.insert({ url_str, key });
