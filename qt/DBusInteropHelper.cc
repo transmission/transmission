@@ -26,7 +26,7 @@ QVariant DBusInteropHelper::addMetainfo(QString const& metainfo)
 {
     auto request = QDBusMessage::createMethodCall(
         QStringLiteral("com.transmissionbt.Transmission"),
-        QStringLiteral("com/transmissionbt/Transmission"),
+        QStringLiteral("/com/transmissionbt/Transmission"),
         QStringLiteral("com.transmissionbt.Transmission"),
         QStringLiteral("AddMetainfo")
         );
@@ -50,7 +50,7 @@ void DBusInteropHelper::registerObject(QObject* parent)
         std::cerr << "couldn't register " << qPrintable(service_name) << std::endl;
     }
 
-    auto const object_path = QStringLiteral("com/transmissionbt/Transmission");
+    auto const object_path = QStringLiteral("/com/transmissionbt/Transmission");
     if (!bus.registerObject(object_path, new InteropObject(parent), QDBusConnection::ExportAllSlots))
     {
         std::cerr << "couldn't register " << qPrintable(object_path) << std::endl;
