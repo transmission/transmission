@@ -135,6 +135,10 @@ find_package(Threads)
 find_package(PkgConfig QUIET)
 
 find_package(CURL ${CURL_MINIMUM} REQUIRED)
+if(TARGET CURL::libcurl)
+    set(CURL_LIBRARIES CURL::libcurl)
+    set(CURL_INCLUDE_DIRS)
+endif()
 
 find_package(ICONV)
 
