@@ -26,6 +26,7 @@
 #include <libtransmission/error.h>
 #include <libtransmission/file.h>
 #include <libtransmission/tr-getopt.h>
+#include <libtransmission/tr-macros.h>
 #include <libtransmission/log.h>
 #include <libtransmission/utils.h>
 #include <libtransmission/variant.h>
@@ -311,7 +312,7 @@ static void printMessage(tr_sys_file_t logfile, int level, char const* name, cha
 
 #else
 
-    (void)level;
+    TR_UNUSED(level);
 
 #endif
 }
@@ -622,6 +623,10 @@ static void daemon_stop(void* arg)
 
 static int daemon_start(void* raw_arg, bool foreground)
 {
+#ifndef HAVE_SYSLOG
+    TR_UNUSED(foreground);
+#endif
+
     bool boolVal;
     char const* pid_filename;
     bool pidfile_created = false;
@@ -632,10 +637,6 @@ static int daemon_start(void* raw_arg, bool foreground)
     struct daemon_data* const arg = raw_arg;
     tr_variant* const settings = &arg->settings;
     char const* const configDir = arg->configDir;
-
-#ifndef HAVE_SYSLOG
-    (void)foreground;
-#endif
 
     sd_notifyf(0, "MAINPID=%d\n", (int)getpid());
 

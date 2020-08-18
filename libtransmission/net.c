@@ -44,6 +44,7 @@
 #include "peer-io.h" /* tr_peerIoAddrStr() FIXME this should be moved to net.h */
 #include "session.h" /* tr_sessionGetPublicAddress() */
 #include "tr-assert.h"
+#include "tr-macros.h"
 #include "tr-utp.h" /* tr_utpSendTo() */
 #include "utils.h" /* tr_time(), tr_logAddDebug() */
 
@@ -170,8 +171,8 @@ void tr_netSetTOS(tr_socket_t s, int tos, tr_address_type type)
 
 #else
 
-        (void)s;
-        (void)tos;
+        TR_UNUSED(s);
+        TR_UNUSED(tos);
 
 #endif
     }
@@ -187,8 +188,8 @@ void tr_netSetTOS(tr_socket_t s, int tos, tr_address_type type)
 
 #else
 
-        (void)s;
-        (void)tos;
+        TR_UNUSED(s);
+        TR_UNUSED(tos);
 
 #endif
     }
@@ -212,8 +213,8 @@ void tr_netSetCongestionControl(tr_socket_t s, char const* algorithm)
 
 #else
 
-    (void)s;
-    (void)algorithm;
+    TR_UNUSED(s);
+    TR_UNUSED(algorithm);
 
 #endif
 }

@@ -66,6 +66,7 @@
 #endif
 
 #include "transmission.h"
+#include "tr-macros.h"
 #include "utils.h"
 #include "platform-quota.h"
 
@@ -449,7 +450,7 @@ static int64_t tr_getQuotaFreeSpace(struct tr_device_info const* info)
 
 #else /* _WIN32 */
 
-    (void)info;
+    TR_UNUSED(info);
 
 #endif /* _WIN32 */
 

@@ -831,11 +831,11 @@ skip_darwin_fcntl:
 
 #else
 
-    (void)handle;
-    (void)offset;
-    (void)size;
-    (void)advice;
-    (void)error;
+    TR_UNUSED(handle);
+    TR_UNUSED(offset);
+    TR_UNUSED(size);
+    TR_UNUSED(advice);
+    TR_UNUSED(error);
 
 #endif
 
@@ -844,7 +844,7 @@ skip_darwin_fcntl:
 
 bool tr_sys_file_preallocate(tr_sys_file_t handle, uint64_t size, int flags, tr_error** error)
 {
-    (void)size;
+    TR_UNUSED(size);
 
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
 
@@ -1052,8 +1052,8 @@ bool tr_sys_file_lock(tr_sys_file_t handle, int operation, tr_error** error)
 
 #else
 
-    (void)handle;
-    (void)operation;
+    TR_UNUSED(handle);
+    TR_UNUSED(operation);
 
     errno = ENOSYS;
     ret = false;
