@@ -456,6 +456,20 @@ else()
     list(APPEND WARNING_CANDIDATES -Wformat-security)
 endif()
 
+set(CMAKE_REQUIRED_FLAGS)
+
+foreach(FLAG -Werror /WX)
+    tr_make_id("${FLAG}" FLAG_ID)
+    set(CACHE_ID "${CMAKE_C_COMPILER_ID}_C_HAS${FLAG_ID}")
+    string(TOLOWER "${CACHE_ID}" CACHE_ID)
+    check_c_compiler_flag(${FLAG} ${CACHE_ID})
+    if (${CACHE_ID})
+        # Make sure the next loop only adds flags that are relevant for a particular language
+        set(CMAKE_REQUIRED_FLAGS ${FLAG})
+        break()
+    endif()
+endforeach()
+
 foreach(FLAG ${WARNING_CANDIDATES})
     tr_make_id("${FLAG}" FLAG_ID)
 
@@ -479,6 +493,7 @@ foreach(FLAG ${WARNING_CANDIDATES})
     unset(FLAG_ID)
 endforeach()
 
+unset(CMAKE_REQUIRED_FLAGS)
 unset(WARNING_CANDIDATES)
 
 ###
