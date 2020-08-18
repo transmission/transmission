@@ -1611,8 +1611,8 @@ static char const* torrentRenamePath(tr_session* session, tr_variant* args_in, t
 ****
 ***/
 
-static void portTested(tr_session* session, bool did_connect, bool did_timeout, long response_code,
-    void const* response, size_t response_byte_count, void* user_data)
+static void portTested(tr_session* session, bool did_connect, bool did_timeout, long response_code, void const* response,
+    size_t response_byte_count, void* user_data)
 {
     TR_UNUSED(session);
     TR_UNUSED(did_connect);
@@ -1636,8 +1636,7 @@ static void portTested(tr_session* session, bool did_connect, bool did_timeout, 
     tr_idle_function_done(data, result);
 }
 
-static char const* portTest(tr_session* session, tr_variant* args_in, tr_variant* args_out,
-    struct tr_rpc_idle_data* idle_data)
+static char const* portTest(tr_session* session, tr_variant* args_in, tr_variant* args_out, struct tr_rpc_idle_data* idle_data)
 {
     TR_UNUSED(args_in);
     TR_UNUSED(args_out);
@@ -1653,8 +1652,8 @@ static char const* portTest(tr_session* session, tr_variant* args_in, tr_variant
 ****
 ***/
 
-static void gotNewBlocklist(tr_session* session, bool did_connect, bool did_timeout, long response_code,
-    void const* response, size_t response_byte_count, void* user_data)
+static void gotNewBlocklist(tr_session* session, bool did_connect, bool did_timeout, long response_code, void const* response,
+    size_t response_byte_count, void* user_data)
 {
     TR_UNUSED(did_connect);
     TR_UNUSED(did_timeout);
@@ -2563,8 +2562,7 @@ static void addSessionField(tr_session* s, tr_variant* d, tr_quark key)
     }
 }
 
-static char const* sessionGet(tr_session* s, tr_variant* args_in, tr_variant* args_out,
-    struct tr_rpc_idle_data* idle_data)
+static char const* sessionGet(tr_session* s, tr_variant* args_in, tr_variant* args_out, struct tr_rpc_idle_data* idle_data)
 {
     TR_UNUSED(idle_data);
 
@@ -2606,8 +2604,7 @@ static char const* sessionGet(tr_session* s, tr_variant* args_in, tr_variant* ar
     return NULL;
 }
 
-static char const* freeSpace(tr_session* session, tr_variant* args_in, tr_variant* args_out,
-    struct tr_rpc_idle_data* idle_data)
+static char const* freeSpace(tr_session* session, tr_variant* args_in, tr_variant* args_out, struct tr_rpc_idle_data* idle_data)
 {
     TR_UNUSED(idle_data);
 

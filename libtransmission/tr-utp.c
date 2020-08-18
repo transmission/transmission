@@ -65,8 +65,7 @@ bool UTP_Write(struct UTPSocket* socket, size_t count)
     return false;
 }
 
-int tr_utpPacket(unsigned char const* buf, size_t buflen, struct sockaddr const* from,
-    socklen_t fromlen, tr_session* ss)
+int tr_utpPacket(unsigned char const* buf, size_t buflen, struct sockaddr const* from, socklen_t fromlen, tr_session* ss)
 {
     TR_UNUSED(buf);
     TR_UNUSED(buflen);
@@ -77,8 +76,7 @@ int tr_utpPacket(unsigned char const* buf, size_t buflen, struct sockaddr const*
     return -1;
 }
 
-struct UTPSocket* UTP_Create(SendToProc* send_to_proc, void* send_to_userdata, struct sockaddr const* addr,
-    socklen_t addrlen)
+struct UTPSocket* UTP_Create(SendToProc* send_to_proc, void* send_to_userdata, struct sockaddr const* addr, socklen_t addrlen)
 {
     TR_UNUSED(send_to_proc);
     TR_UNUSED(send_to_userdata);
@@ -94,8 +92,7 @@ void tr_utpClose(tr_session* ss)
     TR_UNUSED(ss);
 }
 
-void tr_utpSendTo(void* closure, unsigned char const* buf, size_t buflen, struct sockaddr const* to,
-    socklen_t tolen)
+void tr_utpSendTo(void* closure, unsigned char const* buf, size_t buflen, struct sockaddr const* to, socklen_t tolen)
 {
     TR_UNUSED(closure);
     TR_UNUSED(buf);

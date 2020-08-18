@@ -191,8 +191,7 @@ struct counts_data
     int stopped_count;
 };
 
-static void get_selected_torrent_counts_foreach(GtkTreeModel* model, GtkTreePath* path, GtkTreeIter* iter,
-    gpointer user_data)
+static void get_selected_torrent_counts_foreach(GtkTreeModel* model, GtkTreePath* path, GtkTreeIter* iter, gpointer user_data)
 {
     TR_UNUSED(path);
 
@@ -223,8 +222,7 @@ static void get_selected_torrent_counts(struct cbdata* data, struct counts_data*
     gtk_tree_selection_selected_foreach(data->sel, get_selected_torrent_counts_foreach, counts);
 }
 
-static void count_updatable_foreach(GtkTreeModel* model, GtkTreePath* path, GtkTreeIter* iter,
-    gpointer accumulated_status)
+static void count_updatable_foreach(GtkTreeModel* model, GtkTreePath* path, GtkTreeIter* iter, gpointer accumulated_status)
 {
     TR_UNUSED(path);
 

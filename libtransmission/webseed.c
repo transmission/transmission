@@ -361,8 +361,8 @@ static void on_idle(tr_webseed* w)
     }
 }
 
-static void web_response_func(tr_session* session, bool did_connect, bool did_timeout, long response_code,
-    void const* response, size_t response_byte_count, void* vtask)
+static void web_response_func(tr_session* session, bool did_connect, bool did_timeout, long response_code, void const* response,
+    size_t response_byte_count, void* vtask)
 {
     TR_UNUSED(did_connect);
     TR_UNUSED(did_timeout);

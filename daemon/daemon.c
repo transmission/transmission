@@ -359,8 +359,8 @@ static void periodicUpdate(evutil_socket_t fd, short what, void* context)
     reportStatus();
 }
 
-static tr_rpc_callback_status on_rpc_callback(tr_session* session, tr_rpc_callback_type type,
-    struct tr_torrent* tor, void* user_data)
+static tr_rpc_callback_status on_rpc_callback(tr_session* session, tr_rpc_callback_type type, struct tr_torrent* tor,
+    void* user_data)
 {
     TR_UNUSED(session);
     TR_UNUSED(tor);

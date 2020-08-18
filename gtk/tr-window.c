@@ -88,8 +88,7 @@ static void on_popup_menu(GtkWidget* self, GdkEventButton* event)
 #endif
 }
 
-static void view_row_activated(GtkTreeView* tree_view, GtkTreePath* path, GtkTreeViewColumn* column,
-    gpointer user_data)
+static void view_row_activated(GtkTreeView* tree_view, GtkTreePath* path, GtkTreeViewColumn* column, gpointer user_data)
 {
     TR_UNUSED(tree_view);
     TR_UNUSED(path);
@@ -302,8 +301,8 @@ static void findMaxAnnounceTime(GtkTreeModel* model, GtkTreePath* path, GtkTreeI
     *maxTime = MAX(*maxTime, torStat->manualAnnounceTime);
 }
 
-static gboolean onAskTrackerQueryTooltip(GtkWidget* widget, gint x, gint y, gboolean keyboard_tip,
-    GtkTooltip* tooltip, gpointer gdata)
+static gboolean onAskTrackerQueryTooltip(GtkWidget* widget, gint x, gint y, gboolean keyboard_tip, GtkTooltip* tooltip,
+    gpointer gdata)
 {
     TR_UNUSED(widget);
     TR_UNUSED(x);

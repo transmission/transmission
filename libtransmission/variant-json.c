@@ -102,8 +102,7 @@ static int error_callback(jsonsl_t jsn, jsonsl_error_t error, struct jsonsl_stat
     return 0; /* bail */
 }
 
-static void action_callback_PUSH(jsonsl_t jsn, jsonsl_action_t action, struct jsonsl_state_st* state,
-    jsonsl_char_t const* buf)
+static void action_callback_PUSH(jsonsl_t jsn, jsonsl_action_t action, struct jsonsl_state_st* state, jsonsl_char_t const* buf)
 {
     TR_UNUSED(action);
     TR_UNUSED(buf);
@@ -303,8 +302,7 @@ static char const* extract_string(jsonsl_t jsn, struct jsonsl_state_st* state, s
     return ret;
 }
 
-static void action_callback_POP(jsonsl_t jsn, jsonsl_action_t action, struct jsonsl_state_st* state,
-    jsonsl_char_t const* buf)
+static void action_callback_POP(jsonsl_t jsn, jsonsl_action_t action, struct jsonsl_state_st* state, jsonsl_char_t const* buf)
 {
     TR_UNUSED(action);
     TR_UNUSED(buf);

@@ -330,8 +330,7 @@ static void tracker_model_update_idle(gpointer tracker_model)
     }
 }
 
-static void torrent_model_row_changed(GtkTreeModel* tmodel, GtkTreePath* path, GtkTreeIter* iter,
-    gpointer tracker_model)
+static void torrent_model_row_changed(GtkTreeModel* tmodel, GtkTreePath* path, GtkTreeIter* iter, gpointer tracker_model)
 {
     TR_UNUSED(tmodel);
     TR_UNUSED(path);
@@ -629,8 +628,8 @@ static GtkTreeModel* activity_filter_model_new(GtkTreeModel* tmodel)
     return GTK_TREE_MODEL(store);
 }
 
-static void render_activity_pixbuf_func(GtkCellLayout* cell_layout, GtkCellRenderer* cell_renderer,
-    GtkTreeModel* tree_model, GtkTreeIter* iter, gpointer data)
+static void render_activity_pixbuf_func(GtkCellLayout* cell_layout, GtkCellRenderer* cell_renderer, GtkTreeModel* tree_model,
+    GtkTreeIter* iter, gpointer data)
 {
     TR_UNUSED(cell_layout);
     TR_UNUSED(data);
@@ -669,8 +668,7 @@ static void activity_torrent_model_row_changed(GtkTreeModel* tmodel, GtkTreePath
     activity_model_update_idle(activity_model);
 }
 
-static void activity_torrent_model_row_deleted_cb(GtkTreeModel* tmodel, GtkTreePath* path,
-    gpointer activity_model)
+static void activity_torrent_model_row_deleted_cb(GtkTreeModel* tmodel, GtkTreePath* path, gpointer activity_model)
 {
     TR_UNUSED(tmodel);
     TR_UNUSED(path);
@@ -931,8 +929,7 @@ static void update_count_label_idle(struct filter_data* data)
     }
 }
 
-static void on_filter_model_row_inserted(GtkTreeModel* tree_model, GtkTreePath* path, GtkTreeIter* iter,
-    gpointer data)
+static void on_filter_model_row_inserted(GtkTreeModel* tree_model, GtkTreePath* path, GtkTreeIter* iter, gpointer data)
 {
     TR_UNUSED(tree_model);
     TR_UNUSED(path);
