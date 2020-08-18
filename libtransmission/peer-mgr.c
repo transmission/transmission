@@ -1501,8 +1501,11 @@ bool tr_peerMgrDidPeerRequest(tr_torrent const* tor, tr_peer const* peer, tr_blo
 }
 
 /* cancel requests that are too old */
-static void refillUpkeep(evutil_socket_t foo UNUSED, short bar UNUSED, void* vmgr)
+static void refillUpkeep(evutil_socket_t fd, short what, void* vmgr)
 {
+    TR_UNUSED(fd);
+    TR_UNUSED(what);
+
     time_t now;
     time_t too_old;
     tr_torrent* tor;
@@ -1608,9 +1611,11 @@ static void addStrike(tr_swarm* s, tr_peer* peer)
     }
 }
 
-static void peerSuggestedPiece(tr_swarm* s UNUSED, tr_peer* peer UNUSED, tr_piece_index_t pieceIndex UNUSED,
-    int isFastAllowed UNUSED)
+static void peerSuggestedPiece(tr_swarm* s, tr_peer* peer, tr_piece_index_t pieceIndex,
+    int isFastAllowed)
 {
+    TR_UNUSED(s);
+
 #if 0
 
     TR_ASSERT(t != NULL);
@@ -1660,6 +1665,12 @@ static void peerSuggestedPiece(tr_swarm* s UNUSED, tr_peer* peer UNUSED, tr_piec
             }
         }
     }
+
+#else
+
+    TR_UNUSED(peer);
+    TR_UNUSED(pieceIndex);
+    TR_UNUSED(isFastAllowed);
 
 #endif
 }
@@ -3332,8 +3343,11 @@ static void rechokeUploads(tr_swarm* s, uint64_t const now)
     tr_free(choke);
 }
 
-static void rechokePulse(evutil_socket_t foo UNUSED, short bar UNUSED, void* vmgr)
+static void rechokePulse(evutil_socket_t fd, short what, void* vmgr)
 {
+    TR_UNUSED(fd);
+    TR_UNUSED(what);
+
     tr_torrent* tor = NULL;
     tr_peerMgr* mgr = vmgr;
     uint64_t const now = tr_time_msec();
@@ -3736,8 +3750,11 @@ static void enforceSessionPeerLimit(tr_session* session, uint64_t now)
 
 static void makeNewPeerConnections(tr_peerMgr* mgr, int const max);
 
-static void reconnectPulse(evutil_socket_t foo UNUSED, short bar UNUSED, void* vmgr)
+static void reconnectPulse(evutil_socket_t fd, short what, void* vmgr)
 {
+    TR_UNUSED(fd);
+    TR_UNUSED(what);
+
     tr_torrent* tor;
     tr_peerMgr* mgr = vmgr;
     time_t const now_sec = tr_time();
@@ -3831,8 +3848,11 @@ static void queuePulse(tr_session* session, tr_direction dir)
     }
 }
 
-static void bandwidthPulse(evutil_socket_t foo UNUSED, short bar UNUSED, void* vmgr)
+static void bandwidthPulse(evutil_socket_t fd, short what, void* vmgr)
 {
+    TR_UNUSED(fd);
+    TR_UNUSED(what);
+
     tr_torrent* tor;
     tr_peerMgr* mgr = vmgr;
     tr_session* session = mgr->session;
@@ -3942,8 +3962,11 @@ static int getMaxAtomCount(tr_torrent const* tor)
     return MIN(50, tor->maxConnectedPeers * 3);
 }
 
-static void atomPulse(evutil_socket_t foo UNUSED, short bar UNUSED, void* vmgr)
+static void atomPulse(evutil_socket_t fd, short what, void* vmgr)
 {
+    TR_UNUSED(fd);
+    TR_UNUSED(what);
+
     tr_torrent* tor = NULL;
     tr_peerMgr* mgr = vmgr;
     managerLock(mgr);

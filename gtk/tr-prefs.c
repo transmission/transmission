@@ -42,8 +42,10 @@ struct prefs_dialog_data
 
 #define PREF_KEY "pref-key"
 
-static void response_cb(GtkDialog* dialog, int response, gpointer unused UNUSED)
+static void response_cb(GtkDialog* dialog, int response, gpointer user_data)
 {
+    TR_UNUSED(user_data);
+
     if (response == GTK_RESPONSE_HELP)
     {
         char* uri = g_strconcat(gtr_get_help_uri(), "/html/preferences.html", NULL);
@@ -415,8 +417,10 @@ static void updateBlocklistText(GtkWidget* w, TrCore* core)
 }
 
 /* prefs dialog is being destroyed, so stop listening to blocklist updates */
-static void privacyPageDestroyed(gpointer gdata, GObject* dead UNUSED)
+static void privacyPageDestroyed(gpointer gdata, GObject* dead)
 {
+    TR_UNUSED(dead);
+
     struct blocklist_data* data = gdata;
 
     if (data->updateBlocklistTag > 0)
@@ -428,8 +432,10 @@ static void privacyPageDestroyed(gpointer gdata, GObject* dead UNUSED)
 }
 
 /* user hit "close" in the blocklist-update dialog */
-static void onBlocklistUpdateResponse(GtkDialog* dialog, gint response UNUSED, gpointer gdata)
+static void onBlocklistUpdateResponse(GtkDialog* dialog, gint response, gpointer gdata)
 {
+    TR_UNUSED(response);
+
     struct blocklist_data* data = gdata;
     gtk_widget_destroy(GTK_WIDGET(dialog));
     gtk_widget_set_sensitive(data->updateBlocklistButton, TRUE);
@@ -630,8 +636,10 @@ static void refreshWhitelist(struct remote_page* page)
     g_string_free(gstr, TRUE);
 }
 
-static void onAddressEdited(GtkCellRendererText* r UNUSED, gchar* path_string, gchar* address, gpointer gpage)
+static void onAddressEdited(GtkCellRendererText* r, gchar* path_string, gchar* address, gpointer gpage)
 {
+    TR_UNUSED(r);
+
     GtkTreeIter iter;
     struct remote_page* page = gpage;
     GtkTreeModel* model = GTK_TREE_MODEL(page->store);
@@ -646,8 +654,10 @@ static void onAddressEdited(GtkCellRendererText* r UNUSED, gchar* path_string, g
     refreshWhitelist(page);
 }
 
-static void onAddWhitelistClicked(GtkButton* b UNUSED, gpointer gpage)
+static void onAddWhitelistClicked(GtkButton* b, gpointer gpage)
 {
+    TR_UNUSED(b);
+
     GtkTreeIter iter;
     GtkTreePath* path;
     struct remote_page* page = gpage;
@@ -660,8 +670,10 @@ static void onAddWhitelistClicked(GtkButton* b UNUSED, gpointer gpage)
     gtk_tree_path_free(path);
 }
 
-static void onRemoveWhitelistClicked(GtkButton* b UNUSED, gpointer gpage)
+static void onRemoveWhitelistClicked(GtkButton* b, gpointer gpage)
 {
+    TR_UNUSED(b);
+
     struct remote_page* page = gpage;
     GtkTreeSelection* sel = gtk_tree_view_get_selection(page->view);
     GtkTreeIter iter;
@@ -700,18 +712,25 @@ static void refreshRPCSensitivity(struct remote_page* page)
     gtk_widget_set_sensitive(page->remove_button, rpc_active && have_addr && n_rules > 1);
 }
 
-static void onRPCToggled(GtkToggleButton* tb UNUSED, gpointer page)
+static void onRPCToggled(GtkToggleButton* tb, gpointer page)
 {
+    TR_UNUSED(tb);
+
     refreshRPCSensitivity(page);
 }
 
-static void onWhitelistSelectionChanged(GtkTreeSelection* sel UNUSED, gpointer page)
+static void onWhitelistSelectionChanged(GtkTreeSelection* sel, gpointer page)
 {
+    TR_UNUSED(sel);
+
     refreshRPCSensitivity(page);
 }
 
-static void onLaunchClutchCB(GtkButton* w UNUSED, gpointer data UNUSED)
+static void onLaunchClutchCB(GtkButton* w, gpointer data)
 {
+    TR_UNUSED(w);
+    TR_UNUSED(data);
+
     char* uri;
     int const port = gtr_pref_int_get(TR_KEY_rpc_port);
 
@@ -874,8 +893,10 @@ static void refreshSchedSensitivity(struct BandwidthPage* p)
     }
 }
 
-static void onSchedToggled(GtkToggleButton* tb UNUSED, gpointer user_data)
+static void onSchedToggled(GtkToggleButton* tb, gpointer user_data)
 {
+    TR_UNUSED(tb);
+
     refreshSchedSensitivity(user_data);
 }
 
@@ -1054,8 +1075,10 @@ struct network_page_data
     gulong prefsTag;
 };
 
-static void onCorePrefsChanged(TrCore* core UNUSED, tr_quark const key, gpointer gdata)
+static void onCorePrefsChanged(TrCore* core, tr_quark const key, gpointer gdata)
 {
+    TR_UNUSED(core);
+
     if (key == TR_KEY_peer_port)
     {
         struct network_page_data* data = gdata;
@@ -1065,8 +1088,10 @@ static void onCorePrefsChanged(TrCore* core UNUSED, tr_quark const key, gpointer
     }
 }
 
-static void networkPageDestroyed(gpointer gdata, GObject* dead UNUSED)
+static void networkPageDestroyed(gpointer gdata, GObject* dead)
 {
+    TR_UNUSED(dead);
+
     struct network_page_data* data = gdata;
 
     if (data->prefsTag > 0)
@@ -1082,8 +1107,10 @@ static void networkPageDestroyed(gpointer gdata, GObject* dead UNUSED)
     g_free(data);
 }
 
-static void onPortTested(TrCore* core UNUSED, gboolean isOpen, gpointer vdata)
+static void onPortTested(TrCore* core, gboolean isOpen, gpointer vdata)
 {
+    TR_UNUSED(core);
+
     struct network_page_data* data = vdata;
     char const* markup = isOpen ? _("Port is <b>open</b>") : _("Port is <b>closed</b>");
 
@@ -1094,8 +1121,10 @@ static void onPortTested(TrCore* core UNUSED, gboolean isOpen, gpointer vdata)
     // gdk_threads_leave();
 }
 
-static void onPortTest(GtkButton* button UNUSED, gpointer vdata)
+static void onPortTest(GtkButton* button, gpointer vdata)
 {
+    TR_UNUSED(button);
+
     struct network_page_data* data = vdata;
     gtk_widget_set_sensitive(data->portButton, FALSE);
     gtk_widget_set_sensitive(data->portSpin, FALSE);

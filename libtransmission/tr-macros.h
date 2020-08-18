@@ -55,13 +55,7 @@
 ****
 ***/
 
-#ifndef UNUSED
-#if __has_attribute(__unused__) || TR_GNUC_CHECK_VERSION(2, 7)
-#define UNUSED __attribute__((__unused__))
-#else
-#define UNUSED
-#endif
-#endif
+#define TR_UNUSED(x) (void)(x)
 
 /***
 ****

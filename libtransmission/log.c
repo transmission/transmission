@@ -33,8 +33,9 @@ static inline bool IsDebuggerPresent(void)
     return false;
 }
 
-static inline void OutputDebugStringA(void const* unused UNUSED)
+static inline void OutputDebugStringA(void const* data)
 {
+    TR_UNUSED(data);
 }
 
 #endif

@@ -2697,8 +2697,10 @@ static void on_add_tracker_response(GtkDialog* dialog, int response, gpointer gd
     }
 }
 
-static void on_tracker_list_add_button_clicked(GtkButton* button UNUSED, gpointer gdi)
+static void on_tracker_list_add_button_clicked(GtkButton* button, gpointer gdi)
 {
+    TR_UNUSED(button);
+
     struct DetailsImpl* di = gdi;
     tr_torrent* tor = tracker_list_get_current_torrent(di);
 
@@ -2732,8 +2734,10 @@ static void on_tracker_list_add_button_clicked(GtkButton* button UNUSED, gpointe
     }
 }
 
-static void on_tracker_list_remove_button_clicked(GtkButton* button UNUSED, gpointer gdi)
+static void on_tracker_list_remove_button_clicked(GtkButton* button, gpointer gdi)
 {
+    TR_UNUSED(button);
+
     GtkTreeIter iter;
     GtkTreeModel* model;
     struct DetailsImpl* di = gdi;
@@ -2899,8 +2903,11 @@ static gboolean periodic_refresh(gpointer data)
     return G_SOURCE_CONTINUE;
 }
 
-static void on_details_window_size_allocated(GtkWidget* gtk_window, GtkAllocation* alloc UNUSED, gpointer gdata UNUSED)
+static void on_details_window_size_allocated(GtkWidget* gtk_window, GtkAllocation* alloc, gpointer gdata)
 {
+    TR_UNUSED(alloc);
+    TR_UNUSED(gdata);
+
     int w, h;
     gtk_window_get_size(GTK_WINDOW(gtk_window), &w, &h);
     gtr_pref_int_set(TR_KEY_details_window_width, w);

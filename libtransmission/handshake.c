@@ -1201,8 +1201,11 @@ static void gotError(tr_peerIo* io, short what, void* vhandshake)
 ***
 **/
 
-static void handshakeTimeout(evutil_socket_t foo UNUSED, short bar UNUSED, void* handshake)
+static void handshakeTimeout(evutil_socket_t s, short type, void* handshake)
 {
+    TR_UNUSED(s);
+    TR_UNUSED(type);
+
     tr_handshakeAbort(handshake);
 }
 

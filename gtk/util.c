@@ -313,8 +313,10 @@ gboolean on_tree_view_button_pressed(GtkWidget* view, GdkEventButton* event, gpo
 
 /* if the user clicked in an empty area of the list,
  * clear all the selections. */
-gboolean on_tree_view_button_released(GtkWidget* view, GdkEventButton* event, gpointer unused UNUSED)
+gboolean on_tree_view_button_released(GtkWidget* view, GdkEventButton* event, gpointer user_data)
 {
+    TR_UNUSED(user_data);
+
     GtkTreeView* tv = GTK_TREE_VIEW(view);
 
     if (!gtk_tree_view_get_path_at_pos(tv, (gint)event->x, (gint)event->y, NULL, NULL, NULL, NULL))

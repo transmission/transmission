@@ -38,12 +38,16 @@
 
 #else
 
-static void sd_notify(int status UNUSED, char const* str UNUSED)
+static void sd_notify(int status, char const* str)
 {
+    TR_UNUSED(status);
+    TR_UNUSED(str);
 }
 
-static void sd_notifyf(int status UNUSED, char const* fmt UNUSED, ...)
+static void sd_notifyf(int status, char const* fmt, ...)
 {
+    TR_UNUSED(status);
+    TR_UNUSED(fmt);
 }
 
 #endif
@@ -344,15 +348,23 @@ static void reportStatus(void)
     }
 }
 
-static void periodicUpdate(evutil_socket_t fd UNUSED, short what UNUSED, void* context UNUSED)
+static void periodicUpdate(evutil_socket_t fd, short what, void* context)
 {
+    TR_UNUSED(fd);
+    TR_UNUSED(what);
+    TR_UNUSED(context);
+
     pumpLogMessages(logfile);
     reportStatus();
 }
 
-static tr_rpc_callback_status on_rpc_callback(tr_session* session UNUSED, tr_rpc_callback_type type,
-    struct tr_torrent* tor UNUSED, void* user_data UNUSED)
+static tr_rpc_callback_status on_rpc_callback(tr_session* session, tr_rpc_callback_type type,
+    struct tr_torrent* tor, void* user_data)
 {
+    TR_UNUSED(session);
+    TR_UNUSED(tor);
+    TR_UNUSED(user_data);
+
     if (type == TR_RPC_SESSION_CLOSE)
     {
         event_base_loopexit(ev_base, NULL);
@@ -570,8 +582,10 @@ struct daemon_data
     bool paused;
 };
 
-static void daemon_reconfigure(void* arg UNUSED)
+static void daemon_reconfigure(void* arg)
 {
+    TR_UNUSED(arg);
+
     if (mySession == NULL)
     {
         tr_logAddInfo("Deferring reload until session is fully started.");
@@ -599,8 +613,10 @@ static void daemon_reconfigure(void* arg UNUSED)
     }
 }
 
-static void daemon_stop(void* arg UNUSED)
+static void daemon_stop(void* arg)
 {
+    TR_UNUSED(arg);
+
     event_base_loopexit(ev_base, NULL);
 }
 

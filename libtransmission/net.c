@@ -359,8 +359,10 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const
 }
 
 struct tr_peer_socket tr_netOpenPeerUTPSocket(tr_session* session, tr_address const* addr, tr_port port,
-    bool clientIsSeed UNUSED)
+    bool clientIsSeed)
 {
+    TR_UNUSED(clientIsSeed);
+
     struct tr_peer_socket ret = TR_PEER_SOCKET_INIT;
 
     if (tr_address_is_valid_for_peers(addr, port))

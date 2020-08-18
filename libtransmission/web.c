@@ -128,8 +128,10 @@ static size_t writeFunc(void* ptr, size_t size, size_t nmemb, void* vtask)
 
 #ifdef USE_LIBCURL_SOCKOPT
 
-static int sockoptfunction(void* vtask, curl_socket_t fd, curlsocktype purpose UNUSED)
+static int sockoptfunction(void* vtask, curl_socket_t fd, curlsocktype purpose)
 {
+    TR_UNUSED(purpose);
+
     struct tr_web_task* task = vtask;
     bool const isScrape = strstr(task->url, "scrape") != NULL;
     bool const isAnnounce = strstr(task->url, "announce") != NULL;

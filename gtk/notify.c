@@ -42,8 +42,10 @@ static void tr_notification_free(gpointer data)
     g_free(n);
 }
 
-static void get_capabilities_callback(GObject* source, GAsyncResult* res, gpointer user_data UNUSED)
+static void get_capabilities_callback(GObject* source, GAsyncResult* res, gpointer user_data)
 {
+    TR_UNUSED(user_data);
+
     char** caps;
     GVariant* result;
 
@@ -74,9 +76,13 @@ static void get_capabilities_callback(GObject* source, GAsyncResult* res, gpoint
     g_variant_unref(result);
 }
 
-static void g_signal_callback(GDBusProxy* dbus_proxy UNUSED, char* sender_name UNUSED, char* signal_name, GVariant* params,
-    gpointer user_data UNUSED)
+static void g_signal_callback(GDBusProxy* dbus_proxy, char* sender_name, char* signal_name, GVariant* params,
+    gpointer user_data)
 {
+    TR_UNUSED(dbus_proxy);
+    TR_UNUSED(sender_name);
+    TR_UNUSED(user_data);
+
     guint id;
     TrNotification* n;
 
@@ -123,8 +129,11 @@ static void g_signal_callback(GDBusProxy* dbus_proxy UNUSED, char* sender_name U
     }
 }
 
-static void dbus_proxy_ready_callback(GObject* source UNUSED, GAsyncResult* res, gpointer user_data UNUSED)
+static void dbus_proxy_ready_callback(GObject* source, GAsyncResult* res, gpointer user_data)
 {
+    TR_UNUSED(source);
+    TR_UNUSED(user_data);
+
     proxy = g_dbus_proxy_new_for_bus_finish(res, NULL);
 
     if (proxy == NULL)

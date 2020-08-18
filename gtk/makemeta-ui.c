@@ -126,8 +126,10 @@ static gboolean onProgressDialogRefresh(gpointer data)
     return G_SOURCE_CONTINUE;
 }
 
-static void onProgressDialogDestroyed(gpointer data, GObject* dead UNUSED)
+static void onProgressDialogDestroyed(gpointer data, GObject* dead)
 {
+    TR_UNUSED(dead);
+
     MakeMetaUI* ui = data;
     g_source_remove(ui->progress_tag);
 }
@@ -384,9 +386,14 @@ static char const* getDefaultSavePath(void)
     return g_get_user_special_dir(G_USER_DIRECTORY_DESKTOP);
 }
 
-static void on_drag_data_received(GtkWidget* widget UNUSED, GdkDragContext* drag_context, gint x UNUSED, gint y UNUSED,
-    GtkSelectionData* selection_data, guint info UNUSED, guint time_, gpointer user_data)
+static void on_drag_data_received(GtkWidget* widget, GdkDragContext* drag_context, gint x, gint y,
+    GtkSelectionData* selection_data, guint info, guint time_, gpointer user_data)
 {
+    TR_UNUSED(widget);
+    TR_UNUSED(x);
+    TR_UNUSED(y);
+    TR_UNUSED(info);
+
     gboolean success = FALSE;
     MakeMetaUI* ui = user_data;
     char** uris = gtk_selection_data_get_uris(selection_data);
