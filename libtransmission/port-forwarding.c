@@ -140,8 +140,11 @@ static void set_evtimer_from_status(tr_shared* s)
     }
 }
 
-static void onTimer(evutil_socket_t fd UNUSED, short what UNUSED, void* vshared)
+static void onTimer(evutil_socket_t fd, short what, void* vshared)
 {
+    TR_UNUSED(fd);
+    TR_UNUSED(what);
+
     tr_shared* s = vshared;
 
     TR_ASSERT(s != NULL);

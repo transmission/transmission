@@ -66,7 +66,7 @@
 
 static struct event* dht_timer = NULL;
 static unsigned char myid[20];
-static tr_session* session = NULL;
+static tr_session* session_ = NULL;
 
 static void timer_callback(evutil_socket_t s, short type, void* ignore);
 
@@ -145,7 +145,7 @@ static void bootstrap_from_name(char const* name, tr_port port, int af)
 
         nap(15);
 
-        if (bootstrap_done(session, af))
+        if (bootstrap_done(session_, af))
         {
             break;
         }
@@ -162,7 +162,7 @@ static void dht_bootstrap(void* closure)
     int num = cl->len / 6;
     int num6 = cl->len6 / 18;
 
-    if (session != cl->session)
+    if (session_ != cl->session)
     {
         return;
     }
@@ -217,7 +217,7 @@ static void dht_bootstrap(void* closure)
             nap(15);
         }
 
-        if (bootstrap_done(session, 0))
+        if (bootstrap_done(session_, 0))
         {
             break;
         }
@@ -265,7 +265,7 @@ static void dht_bootstrap(void* closure)
 
                 *p = '\0';
 
-                bootstrap_from_name(buf, port, bootstrap_af(session));
+                bootstrap_from_name(buf, port, bootstrap_af(session_));
 
                 if (bootstrap_done(cl->session, 0))
                 {
@@ -299,7 +299,7 @@ static void dht_bootstrap(void* closure)
                 tr_logAddNamedInfo("DHT", "Attempting bootstrap from dht.transmissionbt.com");
             }
 
-            bootstrap_from_name("dht.transmissionbt.com", 6881, bootstrap_af(session));
+            bootstrap_from_name("dht.transmissionbt.com", 6881, bootstrap_af(session_));
         }
     }
 
@@ -330,7 +330,7 @@ int tr_dhtInit(tr_session* ss)
     size_t len6;
     struct bootstrap_closure* cl;
 
-    if (session != NULL) /* already initialized */
+    if (session_ != NULL) /* already initialized */
     {
         return -1;
     }
@@ -397,17 +397,17 @@ int tr_dhtInit(tr_session* ss)
         goto fail;
     }
 
-    session = ss;
+    session_ = ss;
 
     cl = tr_new(struct bootstrap_closure, 1);
-    cl->session = session;
+    cl->session = session_;
     cl->nodes = nodes;
     cl->nodes6 = nodes6;
     cl->len = len;
     cl->len6 = len6;
     tr_threadNew(dht_bootstrap, cl);
 
-    dht_timer = evtimer_new(session->event_base, timer_callback, session);
+    dht_timer = evtimer_new(session_->event_base, timer_callback, session_);
     tr_timerAdd(dht_timer, 0, tr_rand_int_weak(1000000));
 
     tr_logAddNamedDbg("DHT", "DHT initialized");
@@ -419,13 +419,13 @@ fail:
     tr_free(nodes);
 
     tr_logAddNamedDbg("DHT", "DHT initialization failed (errno = %d)", errno);
-    session = NULL;
+    session_ = NULL;
     return -1;
 }
 
 void tr_dhtUninit(tr_session* ss)
 {
-    if (session != ss)
+    if (session_ != ss)
     {
         return;
     }
@@ -492,12 +492,12 @@ void tr_dhtUninit(tr_session* ss)
     dht_uninit();
     tr_logAddNamedDbg("DHT", "Done uninitializing DHT");
 
-    session = NULL;
+    session_ = NULL;
 }
 
 bool tr_dhtEnabled(tr_session const* ss)
 {
-    return ss != NULL && ss == session;
+    return ss != NULL && ss == session_;
 }
 
 struct getstatus_closure
@@ -639,13 +639,15 @@ char const* tr_dhtPrintableStatus(int status)
     }
 }
 
-static void callback(void* ignore UNUSED, int event, unsigned char const* info_hash, void const* data, size_t data_len)
+static void callback(void* ignore, int event, unsigned char const* info_hash, void const* data, size_t data_len)
 {
+    TR_UNUSED(ignore);
+
     if (event == DHT_EVENT_VALUES || event == DHT_EVENT_VALUES6)
     {
         tr_torrent* tor;
-        tr_sessionLock(session);
-        tor = tr_torrentFindFromHash(session, info_hash);
+        tr_sessionLock(session_);
+        tor = tr_torrentFindFromHash(session_, info_hash);
 
         if (tor != NULL && tr_torrentAllowsDHT(tor))
         {
@@ -670,11 +672,11 @@ static void callback(void* ignore UNUSED, int event, unsigned char const* info_h
             tr_logAddTorDbg(tor, "Learned %d %s peers from DHT", (int)n, event == DHT_EVENT_VALUES6 ? "IPv6" : "IPv4");
         }
 
-        tr_sessionUnlock(session);
+        tr_sessionUnlock(session_);
     }
     else if (event == DHT_EVENT_SEARCH_DONE || event == DHT_EVENT_SEARCH_DONE6)
     {
-        tr_torrent* tor = tr_torrentFindFromHash(session, info_hash);
+        tr_torrent* tor = tr_torrentFindFromHash(session_, info_hash);
 
         if (tor != NULL)
         {
@@ -714,7 +716,7 @@ static int tr_dhtAnnounce(tr_torrent* tor, int af, bool announce)
 
     if (status >= TR_DHT_POOR)
     {
-        rc = dht_search(tor->info.hash, announce ? tr_sessionGetPeerPort(session) : 0, af, callback, NULL);
+        rc = dht_search(tor->info.hash, announce ? tr_sessionGetPeerPort(session_) : 0, af, callback, NULL);
 
         if (rc >= 1)
         {
@@ -779,7 +781,7 @@ void tr_dhtCallback(unsigned char* buf, int buflen, struct sockaddr* from, sockl
 {
     TR_ASSERT(tr_isSession(sv));
 
-    if (sv != session)
+    if (sv != session_)
     {
         return;
     }
@@ -808,11 +810,14 @@ void tr_dhtCallback(unsigned char* buf, int buflen, struct sockaddr* from, sockl
 
     /* Being slightly late is fine,
        and has the added benefit of adding some jitter. */
-    tr_timerAdd(dht_timer, tosleep, tr_rand_int_weak(1000000));
+    tr_timerAdd(dht_timer, (int)tosleep, tr_rand_int_weak(1000000));
 }
 
-static void timer_callback(evutil_socket_t s UNUSED, short type UNUSED, void* session)
+static void timer_callback(evutil_socket_t s, short type, void* session)
 {
+    TR_UNUSED(s);
+    TR_UNUSED(type);
+
     tr_dhtCallback(NULL, 0, NULL, 0, session);
 }
 
@@ -822,8 +827,11 @@ static void timer_callback(evutil_socket_t s UNUSED, short type UNUSED, void* se
    free to add support to your private copy as long as you don't
    redistribute it. */
 
-int dht_blacklisted(struct sockaddr const* sa UNUSED, int salen UNUSED)
+int dht_blacklisted(struct sockaddr const* sa, int salen)
 {
+    TR_UNUSED(sa);
+    TR_UNUSED(salen);
+
     return 0;
 }
 

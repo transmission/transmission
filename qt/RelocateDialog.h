@@ -8,10 +8,9 @@
 
 #pragma once
 
-#include <QSet>
-
 #include "BaseDialog.h"
-
+#include "Macros.h"
+#include "Typedefs.h"
 #include "ui_RelocateDialog.h"
 
 class Session;
@@ -20,13 +19,10 @@ class TorrentModel;
 class RelocateDialog : public BaseDialog
 {
     Q_OBJECT
+    TR_DISABLE_COPY_MOVE(RelocateDialog)
 
 public:
-    RelocateDialog(Session&, TorrentModel const&, QSet<int> const& ids, QWidget* parent = nullptr);
-
-    virtual ~RelocateDialog()
-    {
-    }
+    RelocateDialog(Session&, TorrentModel const&, torrent_ids_t ids, QWidget* parent = nullptr);
 
 private:
     QString newLocation() const;
@@ -36,10 +32,10 @@ private slots:
     void onMoveToggled(bool);
 
 private:
-    Session& mySession;
-    QSet<int> const myIds;
+    Session& session_;
+    torrent_ids_t const ids_;
 
-    Ui::RelocateDialog ui;
+    Ui::RelocateDialog ui_ = {};
 
-    static bool myMoveFlag;
+    static bool move_flag;
 };

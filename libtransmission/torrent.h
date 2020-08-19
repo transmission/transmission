@@ -16,8 +16,11 @@
 #include "completion.h" /* tr_completion */
 #include "session.h" /* tr_sessionLock(), tr_sessionUnlock() */
 #include "tr-assert.h"
+#include "tr-macros.h"
 #include "utils.h" /* TR_GNUC_PRINTF */
 #include "ptrarray.h"
+
+TR_BEGIN_DECLS
 
 struct tr_torrent_tiers;
 struct tr_magnet_info;
@@ -86,6 +89,12 @@ void tr_torrentCheckSeedLimit(tr_torrent* tor);
 void tr_torrentSave(tr_torrent* tor);
 
 void tr_torrentSetLocalError(tr_torrent* tor, char const* fmt, ...) TR_GNUC_PRINTF(2, 3);
+
+void tr_torrentSetDateAdded(tr_torrent* torrent, time_t addedDate);
+
+void tr_torrentSetDateActive(tr_torrent* torrent, time_t activityDate);
+
+void tr_torrentSetDateDone(tr_torrent* torrent, time_t doneDate);
 
 typedef enum
 {
@@ -185,11 +194,12 @@ struct tr_torrent
     uint64_t etaULSpeedCalculatedAt;
     unsigned int etaULSpeed_Bps;
 
-    time_t addedDate;
     time_t activityDate;
-    time_t doneDate;
-    time_t startDate;
+    time_t addedDate;
     time_t anyDate;
+    time_t doneDate;
+    time_t editDate;
+    time_t startDate;
 
     int secondsDownloading;
     int secondsSeeding;
@@ -343,6 +353,14 @@ static inline void tr_torrentSetDirty(tr_torrent* tor)
     tor->isDirty = true;
 }
 
+/* note that the torrent's tr_info just changed */
+static inline void tr_torrentMarkEdited(tr_torrent* tor)
+{
+    TR_ASSERT(tr_isTorrent(tor));
+
+    tor->editDate = tr_time();
+}
+
 uint32_t tr_getBlockSize(uint32_t pieceSize);
 
 /**
@@ -451,3 +469,5 @@ static inline tr_direction tr_torrentGetQueueDirection(tr_torrent const* tor)
 {
     return tr_torrentIsSeed(tor) ? TR_UP : TR_DOWN;
 }
+
+TR_END_DECLS

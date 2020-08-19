@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 set -euo pipefail
 
@@ -27,6 +27,7 @@ xargs \
 
 find \
         qt \
+        tests \
     \( -name '*.cc' -o -name '*.h' \) \
     -print0 |
 xargs \

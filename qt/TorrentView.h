@@ -10,9 +10,12 @@
 
 #include <QListView>
 
+#include "Macros.h"
+
 class TorrentView : public QListView
 {
     Q_OBJECT
+    TR_DISABLE_COPY_MOVE(TorrentView)
 
 public:
     TorrentView(QWidget* parent = nullptr);
@@ -24,14 +27,12 @@ signals:
     void headerDoubleClicked();
 
 protected:
-    virtual void resizeEvent(QResizeEvent* event);
+    void resizeEvent(QResizeEvent* event) override;
 
 private:
     class HeaderWidget;
 
-private:
     void adjustHeaderPosition();
 
-private:
-    HeaderWidget* const myHeaderWidget;
+    HeaderWidget* const header_widget_ = {};
 };

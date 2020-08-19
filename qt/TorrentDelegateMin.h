@@ -8,11 +8,13 @@
 
 #pragma once
 
+#include "Macros.h"
 #include "TorrentDelegate.h"
 
 class TorrentDelegateMin : public TorrentDelegate
 {
     Q_OBJECT
+    TR_DISABLE_COPY_MOVE(TorrentDelegateMin)
 
 public:
     explicit TorrentDelegateMin(QObject* parent = nullptr) :
@@ -20,12 +22,8 @@ public:
     {
     }
 
-    virtual ~TorrentDelegateMin()
-    {
-    }
-
 protected:
     // TorrentDelegate
-    virtual QSize sizeHint(QStyleOptionViewItem const&, Torrent const&) const;
-    virtual void drawTorrent(QPainter* painter, QStyleOptionViewItem const& option, Torrent const&) const;
+    QSize sizeHint(QStyleOptionViewItem const&, Torrent const&) const override;
+    void drawTorrent(QPainter* painter, QStyleOptionViewItem const& option, Torrent const&) const override;
 };

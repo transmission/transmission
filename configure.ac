@@ -16,7 +16,7 @@ AC_CONFIG_MACRO_DIR([m4])
 
 dnl AM_CONFIG_HEADER(config.h)
 AC_CONFIG_SRCDIR(libtransmission/transmission.h)
-AM_INIT_AUTOMAKE([1.9 tar-pax no-dist-gzip dist-xz foreign])
+AM_INIT_AUTOMAKE([1.9 tar-pax no-dist-gzip dist-xz foreign subdir-objects])
 LT_INIT
 LT_LIB_M
 
@@ -39,7 +39,7 @@ AM_CONDITIONAL(HAVE_REVISION_FILE, test -f REVISION)
 ##
 ##
 
-CURL_MINIMUM=7.15.4
+CURL_MINIMUM=7.28.0
 AC_SUBST(CURL_MINIMUM)
 LIBEVENT_MINIMUM=2.0.10
 AC_SUBST(LIBEVENT_MINIMUM)
@@ -83,7 +83,7 @@ AC_PROG_CXX
 AC_C_INLINE
 if test "x$GCC" = "xyes" ; then
 
-    CFLAGS="$CFLAGS -std=gnu99 -ggdb3 -Wall -W -Wpointer-arith -Wformat-security -Wundef -Wcast-align -Wstrict-prototypes -Wmissing-declarations -Wmissing-format-attribute -Wredundant-decls -Wnested-externs -Wunused-parameter -Wwrite-strings -Winline -Wfloat-equal"
+    CFLAGS="$CFLAGS -std=gnu99 -ggdb3 -Wall -W -Wpointer-arith -Wformat-security -Wundef -Wcast-align -Wstrict-prototypes -Wmissing-declarations -Wmissing-format-attribute -Wredundant-decls -Wnested-externs -Wunused-parameter -Wwrite-strings -Wfloat-equal"
 
     dnl figure out gcc version
     AC_MSG_CHECKING([gcc version])
@@ -675,6 +675,9 @@ AC_CONFIG_FILES([Makefile
                  web/style/transmission/images/buttons/Makefile
                  web/javascript/Makefile
                  web/javascript/jquery/Makefile
+                 tests/Makefile
+                 tests/gtest/Makefile
+                 tests/libtransmission/Makefile
                  po/Makefile.in])
 
 AC_OUTPUT

@@ -134,16 +134,20 @@ typedef enum
 
 #define DONATE_NAG_TIME (60 * 60 * 24 * 7)
 
-static void altSpeedToggledCallback(tr_session * handle UNUSED, bool active, bool byUser, void * controller)
+static void altSpeedToggledCallback(tr_session * handle, bool active, bool byUser, void * controller)
 {
+    TR_UNUSED(handle);
+
     NSDictionary * dict = [[NSDictionary alloc] initWithObjects: @[@(active), @(byUser)] forKeys: @[@"Active", @"ByUser"]];
     [(__bridge Controller *)controller performSelectorOnMainThread: @selector(altSpeedToggledCallbackIsLimited:)
         withObject: dict waitUntilDone: NO];
 }
 
-static tr_rpc_callback_status rpcCallback(tr_session * handle UNUSED, tr_rpc_callback_type type, struct tr_torrent * torrentStruct,
+static tr_rpc_callback_status rpcCallback(tr_session * handle, tr_rpc_callback_type type, struct tr_torrent * torrentStruct,
                                             void * controller)
 {
+    TR_UNUSED(handle);
+
     [(__bridge Controller *)controller rpcCallback: type forTorrentStruct: torrentStruct];
     return TR_RPC_NOREMOVE; //we'll do the remove manually
 }
@@ -1269,8 +1273,15 @@ static void removeKeRangerRansomware()
             else
                 urlString = [@"http://" stringByAppendingString: urlString];
         }
+        
+        NSURL * url = [NSURL URLWithString: urlString];
+        if (url == nil)
+        {
+            NSLog(@"Detected non-URL string \"%@\". Ignoring.", urlString);
+            return;
+        }
 
-        NSURLRequest * request = [NSURLRequest requestWithURL: [NSURL URLWithString: urlString]
+        NSURLRequest * request = [NSURLRequest requestWithURL: url
                                     cachePolicy: NSURLRequestReloadIgnoringLocalAndRemoteCacheData timeoutInterval: 60];
 
         if (fPendingTorrentDownloads[[request URL]])

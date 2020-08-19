@@ -42,7 +42,7 @@
 <context>
     <name>Application</name>
     <message>
-        <location filename="../Application.cc" line="+355"/>
+        <location filename="../Application.cc" line="+343"/>
         <source>&lt;b&gt;Transmission is a file sharing program.&lt;/b&gt;</source>
         <translation>&lt;b&gt;Transmission er et fildelingsprogram.&lt;/b&gt;</translation>
     </message>
@@ -56,21 +56,27 @@
         <source>I &amp;Agree</source>
         <translation>Jeg &amp;accepterer</translation>
     </message>
-    <message>
-        <location line="+92"/>
-        <source>Torrent Completed</source>
-        <translation>Torrent fuldført</translation>
+    <message numerus="yes">
+        <location line="+77"/>
+        <source>Torrent(s) Added</source>
+        <translation>
+            <numerusform>Torrent tilføjet</numerusform>
+            <numerusform>Torrents tilføjet</numerusform>
+        </translation>
     </message>
-    <message>
-        <location line="+26"/>
-        <source>Torrent Added</source>
-        <translation>Torrent tilføjet</translation>
+    <message numerus="yes">
+        <location line="+10"/>
+        <source>Torrent Completed</source>
+        <translation>
+            <numerusform>Torrent fuldført</numerusform>
+            <numerusform>Torrents fuldført</numerusform>
+        </translation>
     </message>
 </context>
 <context>
     <name>DetailsDialog</name>
     <message>
-        <location filename="../DetailsDialog.cc" line="+408"/>
+        <location filename="../DetailsDialog.cc" line="+378"/>
         <source>None</source>
         <translation>Ingen</translation>
     </message>
@@ -96,7 +102,7 @@
         <translation>På pause</translation>
     </message>
     <message>
-        <location line="+250"/>
+        <location line="+251"/>
         <source>Active now</source>
         <translation>Aktiv nu</translation>
     </message>
@@ -137,14 +143,14 @@
         <translation>Oprettet af %1</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+5"/>
         <source>Created on %1</source>
-        <translation>Oprettet d. %1</translation>
+        <translation>Oprettet %1</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+5"/>
         <source>Created by %1 on %2</source>
-        <translation>Oprettet af %1 d. %2</translation>
+        <translation>Oprettet af %1 %2</translation>
     </message>
     <message>
         <location line="+185"/>
@@ -203,7 +209,7 @@
         <translation>Modpart er en indgående forbindelse</translation>
     </message>
     <message numerus="yes">
-        <location line="+136"/>
+        <location line="+142"/>
         <source> minute(s)</source>
         <extracomment>Spin box suffix, &quot;Stop seeding if idle for: [ 5 minutes ]&quot; (includes leading space after the number, if needed)</extracomment>
         <translation>
@@ -224,7 +230,7 @@
         <translation>Tracker findes allerede.</translation>
     </message>
     <message>
-        <location line="-815"/>
+        <location line="-824"/>
         <source>%1 (100%)</source>
         <extracomment>Text following the &quot;Have:&quot; label in torrent properties dialog; %1 is amount of downloaded and verified data</extracomment>
         <translation>%1 (100%)</translation>
@@ -252,17 +258,17 @@
         <translation>%1 (Forhold: %2)</translation>
     </message>
     <message>
-        <location line="+276"/>
+        <location line="+277"/>
         <source>N/A</source>
         <translation>-</translation>
     </message>
     <message>
-        <location line="+260"/>
+        <location line="+262"/>
         <source>Peer is connected over uTP</source>
         <translation>Modpart er forbundet over uTP</translation>
     </message>
     <message>
-        <location line="+166"/>
+        <location line="+172"/>
         <source>Add URL </source>
         <translation>Tilføj URL </translation>
     </message>
@@ -288,7 +294,7 @@
         <translation>Rediger tracker-annoncerings-URL:</translation>
     </message>
     <message>
-        <location line="+61"/>
+        <location line="+59"/>
         <source>High</source>
         <translation>Høj</translation>
     </message>
@@ -329,7 +335,7 @@
         <translation>Stop med at seede efter:</translation>
     </message>
     <message>
-        <location line="+62"/>
+        <location line="+64"/>
         <source>Up</source>
         <translation>Op</translation>
     </message>
@@ -496,7 +502,7 @@
     <message>
         <location line="+32"/>
         <source>Options</source>
-        <translation>undefined</translation>
+        <translation>Indstillinger</translation>
     </message>
     <message>
         <location line="+9"/>
@@ -506,7 +512,7 @@
     <message>
         <location line="+12"/>
         <source>Honor global &amp;limits</source>
-        <translation>Respektér globale &amp;grænser</translation>
+        <translation>Overhold globale &amp;grænser</translation>
     </message>
     <message>
         <location line="+7"/>
@@ -637,19 +643,19 @@
     <message>
         <location line="+1"/>
         <source>Rename...</source>
-        <translation>Omdøb...</translation>
+        <translation>Omdøb ...</translation>
     </message>
 </context>
 <context>
     <name>FilterBar</name>
     <message>
-        <location filename="../FilterBar.cc" line="+67"/>
-        <location line="+167"/>
+        <location filename="../FilterBar.cc" line="+47"/>
+        <location line="+133"/>
         <source>All</source>
         <translation>Alle</translation>
     </message>
     <message>
-        <location line="-160"/>
+        <location line="-126"/>
         <source>Active</source>
         <translation>Aktive</translation>
     </message>
@@ -684,14 +690,14 @@
         <translation>Fejl</translation>
     </message>
     <message>
-        <location line="+165"/>
+        <location line="+131"/>
         <source>Show:</source>
         <translation>Vis:</translation>
     </message>
     <message>
         <location line="+14"/>
         <source>Search...</source>
-        <translation>Søg...</translation>
+        <translation>Søg ...</translation>
     </message>
 </context>
 <context>
@@ -830,7 +836,7 @@
     <message>
         <location filename="../FreeSpaceLabel.cc" line="+52"/>
         <source>&lt;i&gt;Calculating Free Space...&lt;/i&gt;</source>
-        <translation>&lt;i&gt;Udregner ledig plads...&lt;/i&gt;</translation>
+        <translation>&lt;i&gt;Udregner ledig plads ...&lt;/i&gt;</translation>
     </message>
     <message>
         <location line="+35"/>
@@ -881,7 +887,7 @@
     <message>
         <location line="+66"/>
         <source>&amp;New...</source>
-        <translation>&amp;Ny...</translation>
+        <translation>&amp;Ny ...</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -911,7 +917,7 @@
     <message>
         <location line="+122"/>
         <source>&amp;Open...</source>
-        <translation>&amp;Åbn...</translation>
+        <translation>&amp;Åbn ...</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -1132,7 +1138,7 @@
     <message>
         <location line="+8"/>
         <source>Total Ratio</source>
-        <translation>Total forhold</translation>
+        <translation>Samlet forhold</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -1142,7 +1148,7 @@
     <message>
         <location line="+8"/>
         <source>Total Transfer</source>
-        <translation>Total overførsel</translation>
+        <translation>Samlet overførsel</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -1162,7 +1168,7 @@
     <message>
         <location line="+5"/>
         <source>&amp;Change Session...</source>
-        <translation>&amp;Skift session...</translation>
+        <translation>&amp;Skift session ...</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -1173,7 +1179,7 @@
     <message>
         <location line="+5"/>
         <source>Set &amp;Location...</source>
-        <translation>Angiv &amp;placering...</translation>
+        <translation>Angiv &amp;placering ...</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -1183,7 +1189,7 @@
     <message>
         <location line="+5"/>
         <source>Open &amp;URL...</source>
-        <translation>Åbn &amp;URL...</translation>
+        <translation>Åbn &amp;URL ...</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -1226,7 +1232,7 @@
         <translation>Sortér efter &amp;kø</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cc" line="+471"/>
+        <location filename="../MainWindow.cc" line="+465"/>
         <source>Limit Download Speed</source>
         <translation>Begræns downloadhastighed</translation>
     </message>
@@ -1237,13 +1243,13 @@
     </message>
     <message>
         <location line="+6"/>
-        <location line="+702"/>
+        <location line="+734"/>
         <location line="+8"/>
         <source>Limited at %1</source>
         <translation>Begrænset ved %1</translation>
     </message>
     <message>
-        <location line="-661"/>
+        <location line="-693"/>
         <source>Limit Upload Speed</source>
         <translation>Begræns uploadhastighed</translation>
     </message>
@@ -1259,23 +1265,23 @@
     </message>
     <message>
         <location line="+6"/>
-        <location line="+689"/>
+        <location line="+721"/>
         <source>Stop at Ratio (%1)</source>
         <translation>Stop ved forhold (%1)</translation>
     </message>
     <message>
-        <location line="-441"/>
+        <location line="-406"/>
         <source> - %1:%2</source>
         <extracomment>Second (optional) part of main window title &quot;Transmission - host:port&quot; (added when connected to remote session); notice that leading space (before the dash) is included here</extracomment>
         <translation> - %1:%2</translation>
     </message>
     <message>
-        <location line="+31"/>
+        <location line="+16"/>
         <source>Idle</source>
         <translation>Inaktiv</translation>
     </message>
     <message>
-        <location line="+34"/>
+        <location line="+29"/>
         <location line="+17"/>
         <source>Ratio: %1</source>
         <translation>Forhold: %1</translation>
@@ -1287,7 +1293,7 @@
         <translation>Ned: %1, op: %2</translation>
     </message>
     <message>
-        <location line="+470"/>
+        <location line="+455"/>
         <source>Torrent Files (*.torrent);;All Files (*.*)</source>
         <translation>Torrent-filer (*.torrent);;Alle filer (*.*)</translation>
     </message>
@@ -1302,17 +1308,17 @@
         <translation>Åbn torrent</translation>
     </message>
     <message>
-        <location line="-972"/>
+        <location line="-988"/>
         <source>Speed Limits</source>
         <translation>Hastighedsgrænser</translation>
     </message>
     <message>
-        <location line="+454"/>
+        <location line="+490"/>
         <source>Network Error</source>
         <translation>Netværksfejl</translation>
     </message>
     <message>
-        <location line="+484"/>
+        <location line="+464"/>
         <source>Click to disable Temporary Speed Limits
  (%1 down, %2 up)</source>
         <translation>Klik for at deaktivere midlertidige hastighedsbegrænsninger
@@ -1344,7 +1350,7 @@
         </translation>
     </message>
     <message numerus="yes">
-        <location line="-555"/>
+        <location line="-540"/>
         <source>Showing %L1 of %Ln torrent(s)</source>
         <translation>
             <numerusform>Viser %L1 af %Ln torrent</numerusform>
@@ -1352,7 +1358,7 @@
         </translation>
     </message>
     <message numerus="yes">
-        <location line="+560"/>
+        <location line="+545"/>
         <source>Delete these %Ln torrent(s)&apos; downloaded files?</source>
         <translation>
             <numerusform>Slet denne torrents downloadede filer?</numerusform>
@@ -1362,12 +1368,12 @@
     <message>
         <location line="+6"/>
         <source>Once removed, continuing the transfer will require the torrent file or magnet link.</source>
-        <translation>Når den er fjernet vil fortsættelse af overførslen kræve torrent-filen eller magnet-linket.</translation>
+        <translation>Når den er blevet fjernet kræver det torrent-filen eller magnet-linket for at fortsætte overførslen.</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Once removed, continuing the transfers will require the torrent files or magnet links.</source>
-        <translation>Når den er fjernet vil fortsættelse af overførslerne kræve torrent-filen eller magnet-linket.</translation>
+        <translation>Når de er blevet fjernet kræver det torrent-filerne eller magnet-linkene for at fortsætte overførslerne.</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -1410,7 +1416,7 @@
         <translation>Nogle af disse torrents er ikke færdige med at blive downloadet.</translation>
     </message>
     <message>
-        <location line="+72"/>
+        <location line="+69"/>
         <source>%1 has not responded yet</source>
         <translation>%1 har ikke svaret endnu</translation>
     </message>
@@ -1886,7 +1892,7 @@ For at tilføje en anden primære URL, skal du tilføje den efter en tom linje.<
     <message>
         <location line="+7"/>
         <source>&lt;b&gt;Update Blocklist&lt;/b&gt;&lt;p&gt;Getting new blocklist...</source>
-        <translation>&lt;b&gt;Opdater blokeringsliste&lt;/b&gt;&lt;p&gt;Henter ny blokeringsliste...</translation>
+        <translation>&lt;b&gt;Opdater blokeringsliste&lt;/b&gt;&lt;p&gt;Henter ny blokeringsliste ...</translation>
     </message>
     <message>
         <location filename="../PrefsDialog.ui" line="-193"/>
@@ -1932,7 +1938,7 @@ For at tilføje en anden primære URL, skal du tilføje den efter en tom linje.<
     <message>
         <location line="+12"/>
         <source>Show Transmission icon in the &amp;notification area</source>
-        <translation>Vis Transmission-ikon i &amp;notifikationsområdet</translation>
+        <translation>Vis Transmission-ikon i &amp;underretningsområdet</translation>
     </message>
     <message>
         <location line="-213"/>
@@ -2002,22 +2008,22 @@ For at tilføje en anden primære URL, skal du tilføje den efter en tom linje.<
     <message>
         <location line="+836"/>
         <source>Start &amp;minimized in notification area</source>
-        <translation>Start &amp;minimeret i notifikationsområde</translation>
+        <translation>Start &amp;minimeret i underretningsområde</translation>
     </message>
     <message>
         <location line="+28"/>
         <source>Notification</source>
-        <translation>Notifikation</translation>
+        <translation>Underretning</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Show a notification when torrents are a&amp;dded</source>
-        <translation>Vis en &amp;notifikation når der tilføjes torrents</translation>
+        <translation>Vis en &amp;underretning når der tilføjes torrents</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Show a notification when torrents &amp;finish</source>
-        <translation>Vis en notifikation når torrents bliver &amp;færdige</translation>
+        <translation>Vis en underretning når torrents bliver &amp;færdige</translation>
     </message>
     <message>
         <location line="+7"/>
@@ -2027,7 +2033,7 @@ For at tilføje en anden primære URL, skal du tilføje den efter en tom linje.<
     <message>
         <location filename="../PrefsDialog.cc" line="-73"/>
         <source>Testing TCP Port...</source>
-        <translation>Tester TCP-port...</translation>
+        <translation>Tester TCP-port ...</translation>
     </message>
     <message>
         <location filename="../PrefsDialog.ui" line="-229"/>
@@ -2153,13 +2159,13 @@ For at tilføje en anden primære URL, skal du tilføje den efter en tom linje.<
     <message>
         <location filename="../PrefsDialog.cc" line="+95"/>
         <source>Not supported by remote sessions</source>
-        <translation>Ikke understøttet af fjern-sessioner</translation>
+        <translation>Ikke understøttet af fjernsessioner</translation>
     </message>
 </context>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../Application.cc" line="-301"/>
+        <location filename="../Application.cc" line="-258"/>
         <source>Invalid option</source>
         <translation>Ugyldig valgmulighed</translation>
     </message>
@@ -2200,7 +2206,7 @@ For at tilføje en anden primære URL, skal du tilføje den efter en tom linje.<
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+546"/>
+        <location filename="../Session.cc" line="+531"/>
         <source>Error Renaming Path</source>
         <translation>Fejl ved omdøbning af sti</translation>
     </message>
@@ -2210,7 +2216,7 @@ For at tilføje en anden primære URL, skal du tilføje den efter en tom linje.<
         <translation>&lt;p&gt;&lt;b&gt;Kunne ikke omdøbe &quot;%1&quot; som &quot;%2&quot;: %3.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Ret venligst fejlene og prøv igen.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location line="+449"/>
+        <location line="+450"/>
         <source>Error Adding Torrent</source>
         <translation>Fejl ved tilføjelse af torrent</translation>
     </message>
@@ -2245,7 +2251,7 @@ For at tilføje en anden primære URL, skal du tilføje den efter en tom linje.<
     <message>
         <location line="+7"/>
         <source>Connect to &amp;Remote Session</source>
-        <translation>Opret forbindelse til &amp;fjern-session</translation>
+        <translation>Opret forbindelse til &amp;fjernsession</translation>
     </message>
     <message>
         <location line="+7"/>
@@ -2312,7 +2318,7 @@ For at tilføje en anden primære URL, skal du tilføje den efter en tom linje.<
     <message>
         <location line="-61"/>
         <source>Total</source>
-        <translation>Total</translation>
+        <translation>Samlet</translation>
     </message>
     <message numerus="yes">
         <location filename="../StatsDialog.cc" line="+72"/>
@@ -2326,7 +2332,7 @@ For at tilføje en anden primære URL, skal du tilføje den efter en tom linje.<
 <context>
     <name>Torrent</name>
     <message>
-        <location filename="../Torrent.cc" line="+1014"/>
+        <location filename="../Torrent.cc" line="+1043"/>
         <source>Verifying local data</source>
         <translation>Verificerer lokale data</translation>
     </message>
@@ -2506,7 +2512,7 @@ For at tilføje en anden primære URL, skal du tilføje den efter en tom linje.<
 <context>
     <name>TrackerDelegate</name>
     <message numerus="yes">
-        <location filename="../TrackerDelegate.cc" line="+218"/>
+        <location filename="../TrackerDelegate.cc" line="+211"/>
         <source>Got a list of%1 %Ln peer(s)%2 %3 ago</source>
         <extracomment>%1 and %2 are replaced with HTML markup, %3 is duration</extracomment>
         <translation>
@@ -2546,15 +2552,15 @@ For at tilføje en anden primære URL, skal du tilføje den efter en tom linje.<
         <location line="+8"/>
         <source>Asking for more peers now... &lt;small&gt;%1&lt;/small&gt;</source>
         <extracomment>%1 is duration</extracomment>
-        <translation>Efterspørger flere modparter nu... &lt;small&gt;%1&lt;/small&gt;</translation>
+        <translation>Efterspørger flere modparter nu ... &lt;small&gt;%1&lt;/small&gt;</translation>
     </message>
     <message numerus="yes">
         <location line="+18"/>
         <source>Tracker had%1 %Ln seeder(s)%2</source>
         <extracomment>First part of phrase &quot;Tracker had ... seeder(s) and ... leecher(s) ... ago&quot;; %1 and %2 are replaced with HTML markup</extracomment>
         <translation>
-            <numerusform>Tracker havde %1 %Ln seeder %2</numerusform>
-            <numerusform>Tracker havde %1 %Ln seedere %2</numerusform>
+            <numerusform>Tracker havde%1 %Ln seeder%2</numerusform>
+            <numerusform>Tracker havde%1 %Ln seedere%2</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -2570,13 +2576,13 @@ For at tilføje en anden primære URL, skal du tilføje den efter en tom linje.<
         <location line="+6"/>
         <source>Tracker had %1no information%2 on peer counts %3 ago</source>
         <extracomment>%1 and %2 are replaced with HTML markup, %3 is duration</extracomment>
-        <translation>Tracker havde %1 ingen information %2 på modpartsantal %3 siden</translation>
+        <translation>Tracker havde %1ingen information%2 på modpartsantal %3 siden</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Got a scrape error %1&quot;%2&quot;%3 %4 ago</source>
         <extracomment>%1 and %3 are replaced with HTML markup, %2 is error message, %4 is duration</extracomment>
-        <translation>Fik en scrape-fejl %1&quot;%2&quot;%3 %4 siden</translation>
+        <translation>Fik en fejl ved scrape %1&quot;%2&quot;%3 %4 siden</translation>
     </message>
     <message>
         <location line="+15"/>
@@ -2593,7 +2599,7 @@ For at tilføje en anden primære URL, skal du tilføje den efter en tom linje.<
         <location line="+9"/>
         <source>Asking for peer counts now... &lt;small&gt;%1&lt;/small&gt;</source>
         <extracomment>%1 is duration</extracomment>
-        <translation>Efterspørger modpartsantal nu... &lt;small&gt;%1&lt;/small&gt;</translation>
+        <translation>Efterspørger modpartsantal nu ... &lt;small&gt;%1&lt;/small&gt;</translation>
     </message>
 </context>
 </TS>

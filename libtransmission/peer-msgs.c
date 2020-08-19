@@ -619,8 +619,10 @@ size_t tr_generateAllowedSet(tr_piece_index_t* setmePieces, size_t desiredSetSiz
     return setSize;
 }
 
-static void updateFastSet(tr_peerMsgs* msgs UNUSED)
+static void updateFastSet(tr_peerMsgs* msgs)
 {
+    TR_UNUSED(msgs);
+
     bool const fext = tr_peerIoSupportsFEXT(msgs->io);
     bool const peerIsNeedy = msgs->peer->progress < 0.10;
 
@@ -736,8 +738,10 @@ static void sendInterest(tr_peerMsgs* msgs, bool b)
     dbgOutMessageLen(msgs);
 }
 
-static void updateInterest(tr_peerMsgs* msgs UNUSED)
+static void updateInterest(tr_peerMsgs* msgs)
 {
+    TR_UNUSED(msgs);
+
     /* FIXME -- might need to poke the mgr on startup */
 }
 
@@ -1117,15 +1121,15 @@ static void parseUtMetadata(tr_peerMsgs* msgs, uint32_t msglen, struct evbuffer*
         }
         else
         {
-            tr_variant tmp;
+            tr_variant v;
             struct evbuffer* payload;
             struct evbuffer* out = msgs->outMessages;
 
             /* build the rejection message */
-            tr_variantInitDict(&tmp, 2);
-            tr_variantDictAddInt(&tmp, TR_KEY_msg_type, METADATA_MSG_TYPE_REJECT);
-            tr_variantDictAddInt(&tmp, TR_KEY_piece, piece);
-            payload = tr_variantToBuf(&tmp, TR_VARIANT_FMT_BENC);
+            tr_variantInitDict(&v, 2);
+            tr_variantDictAddInt(&v, TR_KEY_msg_type, METADATA_MSG_TYPE_REJECT);
+            tr_variantDictAddInt(&v, TR_KEY_piece, piece);
+            payload = tr_variantToBuf(&v, TR_VARIANT_FMT_BENC);
 
             /* write it out as a LTEP message to our outMessages buffer */
             evbuffer_add_uint32(out, 2 * sizeof(uint8_t) + evbuffer_get_length(payload));
@@ -1137,7 +1141,7 @@ static void parseUtMetadata(tr_peerMsgs* msgs, uint32_t msglen, struct evbuffer*
 
             /* cleanup */
             evbuffer_free(payload);
-            tr_variantFree(&tmp);
+            tr_variantFree(&v);
         }
     }
 
@@ -2216,8 +2220,10 @@ void tr_peerMsgsPulse(tr_peerMsgs* msgs)
     }
 }
 
-static void gotError(tr_peerIo* io UNUSED, short what, void* vmsgs)
+static void gotError(tr_peerIo* io, short what, void* vmsgs)
 {
+    TR_UNUSED(io);
+
     if ((what & BEV_EVENT_TIMEOUT) != 0)
     {
         dbgmsg(vmsgs, "libevent got a timeout, what=%hd", what);
@@ -2557,8 +2563,11 @@ static void sendPex(tr_peerMsgs* msgs)
     }
 }
 
-static void pexPulse(evutil_socket_t foo UNUSED, short bar UNUSED, void* vmsgs)
+static void pexPulse(evutil_socket_t fd, short what, void* vmsgs)
 {
+    TR_UNUSED(fd);
+    TR_UNUSED(what);
+
     struct tr_peerMsgs* msgs = vmsgs;
 
     sendPex(msgs);

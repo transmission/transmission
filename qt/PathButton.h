@@ -10,9 +10,12 @@
 
 #include <QToolButton>
 
+#include "Macros.h"
+
 class PathButton : public QToolButton
 {
     Q_OBJECT
+    TR_DISABLE_COPY_MOVE(PathButton)
 
 public:
     enum Mode
@@ -26,20 +29,24 @@ public:
 
     void setMode(Mode mode);
     void setTitle(QString const& title);
-    void setNameFilter(QString const& nameFilter);
+    void setNameFilter(QString const& name_filter);
 
     void setPath(QString const& path);
     QString const& path() const;
 
     // QWidget
-    virtual QSize sizeHint() const;
+    QSize sizeHint() const override;
 
 signals:
     void pathChanged(QString const& path);
 
 protected:
     // QWidget
-    virtual void paintEvent(QPaintEvent* event);
+    void paintEvent(QPaintEvent* event) override;
+
+private slots:
+    void onClicked();
+    void onFileSelected(QString const& path);
 
 private:
     void updateAppearance();
@@ -47,13 +54,8 @@ private:
     bool isDirMode() const;
     QString effectiveTitle() const;
 
-private slots:
-    void onClicked();
-    void onFileSelected(QString const& path);
-
-private:
-    Mode myMode;
-    QString myTitle;
-    QString myNameFilter;
-    QString myPath;
+    QString name_filter_;
+    QString path_;
+    QString title_;
+    Mode mode_;
 };

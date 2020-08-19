@@ -17,8 +17,11 @@
 #include "bandwidth.h"
 #include "bitfield.h"
 #include "net.h"
+#include "tr-macros.h"
 #include "utils.h"
 #include "variant.h"
+
+TR_BEGIN_DECLS
 
 typedef enum
 {
@@ -320,3 +323,5 @@ bool tr_sessionGetActiveSpeedLimit_Bps(tr_session const* session, tr_direction d
 void tr_sessionGetNextQueuedTorrents(tr_session* session, tr_direction dir, size_t numwanted, tr_ptrArray* setme);
 
 int tr_sessionCountQueueFreeSlots(tr_session* session, tr_direction);
+
+TR_END_DECLS

@@ -10,12 +10,15 @@
 
 #include <QItemDelegate>
 
+#include "Macros.h"
+
 class QAbstractItemModel;
 class QComboBox;
 
 class FilterBarComboBoxDelegate : public QItemDelegate
 {
     Q_OBJECT
+    TR_DISABLE_COPY_MOVE(FilterBarComboBoxDelegate)
 
 public:
     FilterBarComboBoxDelegate(QObject* parent, QComboBox* combo);
@@ -25,9 +28,9 @@ public:
 
 protected:
     // QAbstractItemDelegate
-    virtual void paint(QPainter*, QStyleOptionViewItem const&, QModelIndex const&) const;
-    virtual QSize sizeHint(QStyleOptionViewItem const&, QModelIndex const&) const;
+    void paint(QPainter*, QStyleOptionViewItem const&, QModelIndex const&) const override;
+    QSize sizeHint(QStyleOptionViewItem const&, QModelIndex const&) const override;
 
 private:
-    QComboBox* const myCombo;
+    QComboBox* const combo_ = {};
 };

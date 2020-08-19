@@ -81,12 +81,6 @@ enum
 #define HANDSHAKE_SET_DHT(bits) ((void)0)
 #endif
 
-/* http://www.azureuswiki.com/index.php/Extension_negotiation_protocol
-   these macros are to be used if both extended messaging and the
-   azureus protocol is supported, they indicate which protocol is preferred */
-#define HANDSHAKE_GET_EXTPREF(reserved) ((reserved)[5] & 0x03)
-#define HANDSHAKE_SET_EXTPREF(reserved, val) ((reserved)[5] |= 0x03 & (val))
-
 /**
 ***
 **/
@@ -1079,6 +1073,7 @@ static ReadState canRead(struct tr_peerIo* io, void* arg, size_t* piece)
             break;
 
         default:
+            ret = READ_ERR;
             TR_ASSERT_MSG(false, "unhandled handshake state %d", (int)handshake->state);
         }
 
@@ -1206,8 +1201,11 @@ static void gotError(tr_peerIo* io, short what, void* vhandshake)
 ***
 **/
 
-static void handshakeTimeout(evutil_socket_t foo UNUSED, short bar UNUSED, void* handshake)
+static void handshakeTimeout(evutil_socket_t s, short type, void* handshake)
 {
+    TR_UNUSED(s);
+    TR_UNUSED(type);
+
     tr_handshakeAbort(handshake);
 }
 
@@ -1249,14 +1247,6 @@ tr_handshake* tr_handshakeNew(tr_peerIo* io, tr_encryption_mode encryptionMode, 
     }
 
     return handshake;
-}
-
-struct tr_peerIo* tr_handshakeGetIO(tr_handshake* handshake)
-{
-    TR_ASSERT(handshake != NULL);
-    TR_ASSERT(handshake->io != NULL);
-
-    return handshake->io;
 }
 
 struct tr_peerIo* tr_handshakeStealIO(tr_handshake* handshake)

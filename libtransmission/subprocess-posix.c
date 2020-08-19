@@ -22,8 +22,10 @@
 #include "tr-macros.h"
 #include "utils.h"
 
-static void handle_sigchld(int i UNUSED)
+static void handle_sigchld(int i)
 {
+    TR_UNUSED(i);
+
     int rc;
 
     do

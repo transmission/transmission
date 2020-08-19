@@ -42,8 +42,10 @@ struct prefs_dialog_data
 
 #define PREF_KEY "pref-key"
 
-static void response_cb(GtkDialog* dialog, int response, gpointer unused UNUSED)
+static void response_cb(GtkDialog* dialog, int response, gpointer user_data)
 {
+    TR_UNUSED(user_data);
+
     if (response == GTK_RESPONSE_HELP)
     {
         char* uri = g_strconcat(gtr_get_help_uri(), "/html/preferences.html", NULL);
@@ -98,7 +100,7 @@ static gboolean spun_cb_idle(gpointer spin)
     struct spin_idle_data* data = g_object_get_data(o, IDLE_DATA);
 
     /* has the user stopped making changes? */
-    if (g_timer_elapsed(data->last_change, NULL) > 0.33F)
+    if (g_timer_elapsed(data->last_change, NULL) > 0.33)
     {
         /* update the core */
         tr_quark const key = GPOINTER_TO_INT(g_object_get_data(o, PREF_KEY));
@@ -280,7 +282,7 @@ static GtkWidget* downloadingPage(GObject* core, struct prefs_dialog_data* data)
     hig_workarea_add_row(t, &row, _("Save to _Location:"), w, NULL);
 
     l = data->freespace_label = gtr_freespace_label_new(TR_CORE(core), NULL);
-    gtk_misc_set_alignment(GTK_MISC(l), 1.0F, 0.5F);
+    g_object_set(l, "halign", GTK_ALIGN_END, "valign", GTK_ALIGN_CENTER, NULL);
     hig_workarea_add_wide_control(t, &row, l);
 
     hig_workarea_add_section_divider(t, &row);
@@ -415,8 +417,10 @@ static void updateBlocklistText(GtkWidget* w, TrCore* core)
 }
 
 /* prefs dialog is being destroyed, so stop listening to blocklist updates */
-static void privacyPageDestroyed(gpointer gdata, GObject* dead UNUSED)
+static void privacyPageDestroyed(gpointer gdata, GObject* dead)
 {
+    TR_UNUSED(dead);
+
     struct blocklist_data* data = gdata;
 
     if (data->updateBlocklistTag > 0)
@@ -428,8 +432,10 @@ static void privacyPageDestroyed(gpointer gdata, GObject* dead UNUSED)
 }
 
 /* user hit "close" in the blocklist-update dialog */
-static void onBlocklistUpdateResponse(GtkDialog* dialog, gint response UNUSED, gpointer gdata)
+static void onBlocklistUpdateResponse(GtkDialog* dialog, gint response, gpointer gdata)
 {
+    TR_UNUSED(response);
+
     struct blocklist_data* data = gdata;
     gtk_widget_destroy(GTK_WIDGET(dialog));
     gtk_widget_set_sensitive(data->updateBlocklistButton, TRUE);
@@ -526,7 +532,7 @@ static GtkWidget* privacyPage(GObject* core)
     target_cb(b, e);
 
     w = gtk_label_new("");
-    gtk_misc_set_alignment(GTK_MISC(w), 0.0F, 0.5F);
+    g_object_set(w, "halign", GTK_ALIGN_START, "valign", GTK_ALIGN_CENTER, NULL);
     updateBlocklistText(w, TR_CORE(core));
     data->label = w;
     h = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, GUI_PAD_BIG);
@@ -630,8 +636,10 @@ static void refreshWhitelist(struct remote_page* page)
     g_string_free(gstr, TRUE);
 }
 
-static void onAddressEdited(GtkCellRendererText* r UNUSED, gchar* path_string, gchar* address, gpointer gpage)
+static void onAddressEdited(GtkCellRendererText* r, gchar* path_string, gchar* address, gpointer gpage)
 {
+    TR_UNUSED(r);
+
     GtkTreeIter iter;
     struct remote_page* page = gpage;
     GtkTreeModel* model = GTK_TREE_MODEL(page->store);
@@ -646,8 +654,10 @@ static void onAddressEdited(GtkCellRendererText* r UNUSED, gchar* path_string, g
     refreshWhitelist(page);
 }
 
-static void onAddWhitelistClicked(GtkButton* b UNUSED, gpointer gpage)
+static void onAddWhitelistClicked(GtkButton* b, gpointer gpage)
 {
+    TR_UNUSED(b);
+
     GtkTreeIter iter;
     GtkTreePath* path;
     struct remote_page* page = gpage;
@@ -660,8 +670,10 @@ static void onAddWhitelistClicked(GtkButton* b UNUSED, gpointer gpage)
     gtk_tree_path_free(path);
 }
 
-static void onRemoveWhitelistClicked(GtkButton* b UNUSED, gpointer gpage)
+static void onRemoveWhitelistClicked(GtkButton* b, gpointer gpage)
 {
+    TR_UNUSED(b);
+
     struct remote_page* page = gpage;
     GtkTreeSelection* sel = gtk_tree_view_get_selection(page->view);
     GtkTreeIter iter;
@@ -700,18 +712,25 @@ static void refreshRPCSensitivity(struct remote_page* page)
     gtk_widget_set_sensitive(page->remove_button, rpc_active && have_addr && n_rules > 1);
 }
 
-static void onRPCToggled(GtkToggleButton* tb UNUSED, gpointer page)
+static void onRPCToggled(GtkToggleButton* tb, gpointer page)
 {
+    TR_UNUSED(tb);
+
     refreshRPCSensitivity(page);
 }
 
-static void onWhitelistSelectionChanged(GtkTreeSelection* sel UNUSED, gpointer page)
+static void onWhitelistSelectionChanged(GtkTreeSelection* sel, gpointer page)
 {
+    TR_UNUSED(sel);
+
     refreshRPCSensitivity(page);
 }
 
-static void onLaunchClutchCB(GtkButton* w UNUSED, gpointer data UNUSED)
+static void onLaunchClutchCB(GtkButton* w, gpointer data)
 {
+    TR_UNUSED(w);
+    TR_UNUSED(data);
+
     char* uri;
     int const port = gtr_pref_int_get(TR_KEY_rpc_port);
 
@@ -804,8 +823,6 @@ static GtkWidget* remotePage(GObject* core)
         GtkCellRenderer* r;
         GtkTreeSelection* sel;
         GtkTreeView* v;
-        GtkWidget* w;
-        GtkWidget* h;
 
         page->store = GTK_LIST_STORE(m);
         w = gtk_tree_view_new_with_model(m);
@@ -834,24 +851,22 @@ static GtkWidget* remotePage(GObject* core)
 
         s = _("Addresses:");
         w = hig_workarea_add_row(t, &row, s, w, NULL);
-        gtk_misc_set_alignment(GTK_MISC(w), 0.0F, 0.0F);
-        gtk_misc_set_padding(GTK_MISC(w), 0, GUI_PAD);
+        g_object_set(w, "halign", GTK_ALIGN_START, "valign", GTK_ALIGN_START, "margin-top", GUI_PAD, "margin-bottom", GUI_PAD,
+            NULL);
         page->whitelist_widgets = g_slist_prepend(page->whitelist_widgets, w);
 
         h = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, GUI_PAD);
-        w = gtk_button_new_from_stock(GTK_STOCK_REMOVE);
+        w = gtk_button_new_with_mnemonic(_("_Remove"));
         g_signal_connect(w, "clicked", G_CALLBACK(onRemoveWhitelistClicked), page);
         page->remove_button = w;
         onWhitelistSelectionChanged(sel, page);
         gtk_box_pack_start(GTK_BOX(h), w, TRUE, TRUE, 0);
-        w = gtk_button_new_from_stock(GTK_STOCK_ADD);
+        w = gtk_button_new_with_mnemonic(_("_Add"));
         page->whitelist_widgets = g_slist_prepend(page->whitelist_widgets, w);
         g_signal_connect(w, "clicked", G_CALLBACK(onAddWhitelistClicked), page);
+        g_object_set(h, "halign", GTK_ALIGN_END, "valign", GTK_ALIGN_CENTER, NULL);
         gtk_box_pack_start(GTK_BOX(h), w, TRUE, TRUE, 0);
-        w = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-        gtk_box_pack_start(GTK_BOX(w), gtk_alignment_new(0, 0, 0, 0), TRUE, TRUE, 0);
-        gtk_box_pack_start(GTK_BOX(w), h, FALSE, FALSE, 0);
-        hig_workarea_add_wide_control(t, &row, w);
+        hig_workarea_add_wide_control(t, &row, h);
     }
 
     refreshRPCSensitivity(page);
@@ -878,8 +893,10 @@ static void refreshSchedSensitivity(struct BandwidthPage* p)
     }
 }
 
-static void onSchedToggled(GtkToggleButton* tb UNUSED, gpointer user_data)
+static void onSchedToggled(GtkToggleButton* tb, gpointer user_data)
 {
+    TR_UNUSED(tb);
+
     refreshSchedSensitivity(user_data);
 }
 
@@ -994,10 +1011,10 @@ static GtkWidget* speedPage(GObject* core)
     h = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, GUI_PAD);
     g_snprintf(buf, sizeof(buf), "<b>%s</b>", _("Alternative Speed Limits"));
     w = gtk_label_new(buf);
-    gtk_misc_set_alignment(GTK_MISC(w), 0.0F, 0.5F);
+    g_object_set(w, "halign", GTK_ALIGN_START, "valign", GTK_ALIGN_CENTER, NULL);
     gtk_label_set_use_markup(GTK_LABEL(w), TRUE);
     gtk_box_pack_start(GTK_BOX(h), w, FALSE, FALSE, 0);
-    w = gtk_image_new_from_stock("alt-speed-on", -1);
+    w = gtk_image_new_from_icon_name("alt-speed-on", GTK_ICON_SIZE_MENU);
     gtk_box_pack_start(GTK_BOX(h), w, FALSE, FALSE, 0);
     hig_workarea_add_section_title_widget(t, &row, h);
 
@@ -1005,7 +1022,7 @@ static GtkWidget* speedPage(GObject* core)
     g_snprintf(buf, sizeof(buf), "<small>%s</small>", s);
     w = gtk_label_new(buf);
     gtk_label_set_use_markup(GTK_LABEL(w), TRUE);
-    gtk_misc_set_alignment(GTK_MISC(w), 0.0F, 0.5F);
+    g_object_set(w, "halign", GTK_ALIGN_START, "valign", GTK_ALIGN_CENTER, NULL);
     hig_workarea_add_wide_control(t, &row, w);
 
     g_snprintf(buf, sizeof(buf), _("U_pload (%s):"), _(speed_K_str));
@@ -1058,8 +1075,10 @@ struct network_page_data
     gulong prefsTag;
 };
 
-static void onCorePrefsChanged(TrCore* core UNUSED, tr_quark const key, gpointer gdata)
+static void onCorePrefsChanged(TrCore* core, tr_quark const key, gpointer gdata)
 {
+    TR_UNUSED(core);
+
     if (key == TR_KEY_peer_port)
     {
         struct network_page_data* data = gdata;
@@ -1069,8 +1088,10 @@ static void onCorePrefsChanged(TrCore* core UNUSED, tr_quark const key, gpointer
     }
 }
 
-static void networkPageDestroyed(gpointer gdata, GObject* dead UNUSED)
+static void networkPageDestroyed(gpointer gdata, GObject* dead)
 {
+    TR_UNUSED(dead);
+
     struct network_page_data* data = gdata;
 
     if (data->prefsTag > 0)
@@ -1086,8 +1107,10 @@ static void networkPageDestroyed(gpointer gdata, GObject* dead UNUSED)
     g_free(data);
 }
 
-static void onPortTested(TrCore* core UNUSED, gboolean isOpen, gpointer vdata)
+static void onPortTested(TrCore* core, gboolean isOpen, gpointer vdata)
 {
+    TR_UNUSED(core);
+
     struct network_page_data* data = vdata;
     char const* markup = isOpen ? _("Port is <b>open</b>") : _("Port is <b>closed</b>");
 
@@ -1098,8 +1121,10 @@ static void onPortTested(TrCore* core UNUSED, gboolean isOpen, gpointer vdata)
     // gdk_threads_leave();
 }
 
-static void onPortTest(GtkButton* button UNUSED, gpointer vdata)
+static void onPortTest(GtkButton* button, gpointer vdata)
 {
+    TR_UNUSED(button);
+
     struct network_page_data* data = vdata;
     gtk_widget_set_sensitive(data->portButton, FALSE);
     gtk_widget_set_sensitive(data->portSpin, FALSE);
@@ -1137,7 +1162,7 @@ static GtkWidget* networkPage(GObject* core)
 
     h = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, GUI_PAD_BIG);
     l = data->portLabel = gtk_label_new(_("Status unknown"));
-    gtk_misc_set_alignment(GTK_MISC(l), 0.0F, 0.5F);
+    g_object_set(l, "halign", GTK_ALIGN_START, "valign", GTK_ALIGN_CENTER, NULL);
     gtk_box_pack_start(GTK_BOX(h), l, TRUE, TRUE, 0);
     w = data->portButton = gtk_button_new_with_mnemonic(_("Te_st Port"));
     gtk_box_pack_end(GTK_BOX(h), w, FALSE, FALSE, 0);
@@ -1243,8 +1268,10 @@ GtkWidget* gtr_prefs_dialog_new(GtkWindow* parent, GObject* core)
     data->core = TR_CORE(core);
     data->core_prefs_tag = g_signal_connect(TR_CORE(core), "prefs-changed", G_CALLBACK(on_core_prefs_changed), data);
 
-    d = gtk_dialog_new_with_buttons(_("Transmission Preferences"), parent, GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_HELP,
-        GTK_RESPONSE_HELP, GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE, NULL);
+    d = gtk_dialog_new_with_buttons(_("Transmission Preferences"), parent, GTK_DIALOG_DESTROY_WITH_PARENT,
+        _("_Help"), GTK_RESPONSE_HELP,
+        _("_Close"), GTK_RESPONSE_CLOSE,
+        NULL);
     g_object_weak_ref(G_OBJECT(d), on_prefs_dialog_destroyed, data);
     gtk_window_set_role(GTK_WINDOW(d), "transmission-preferences-dialog");
     gtk_container_set_border_width(GTK_CONTAINER(d), GUI_PAD);

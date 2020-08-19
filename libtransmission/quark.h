@@ -8,10 +8,9 @@
 
 #pragma once
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
+#include "tr-macros.h"
+
+TR_BEGIN_DECLS
 
 /* Quarks — a 2-way association between a string and a unique integer identifier */
 typedef size_t tr_quark;
@@ -82,6 +81,8 @@ enum
     TR_KEY_delete_local_data,
     TR_KEY_desiredAvailable,
     TR_KEY_destination,
+    TR_KEY_details_window_height,
+    TR_KEY_details_window_width,
     TR_KEY_dht_enabled,
     TR_KEY_display_name,
     TR_KEY_dnd,
@@ -105,6 +106,7 @@ enum
     TR_KEY_dropped,
     TR_KEY_dropped6,
     TR_KEY_e,
+    TR_KEY_editDate,
     TR_KEY_encoding,
     TR_KEY_encryption,
     TR_KEY_error,
@@ -125,6 +127,7 @@ enum
     TR_KEY_filter_trackers,
     TR_KEY_flagStr,
     TR_KEY_flags,
+    TR_KEY_format,
     TR_KEY_fromCache,
     TR_KEY_fromDht,
     TR_KEY_fromIncoming,
@@ -431,6 +434,4 @@ tr_quark tr_quark_new(void const* str, size_t len);
 ****
 ***/
 
-#ifdef __cplusplus
-}
-#endif
+TR_END_DECLS

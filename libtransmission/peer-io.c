@@ -13,6 +13,7 @@
 #include <event2/buffer.h>
 #include <event2/bufferevent.h>
 
+#include <stdint.h>
 #include <libutp/utp.h>
 
 #include "transmission.h"
@@ -259,8 +260,10 @@ static void canReadWrapper(tr_peerIo* io)
     tr_peerIoUnref(io);
 }
 
-static void event_read_cb(evutil_socket_t fd, short event UNUSED, void* vio)
+static void event_read_cb(evutil_socket_t fd, short event, void* vio)
 {
+    TR_UNUSED(event);
+
     tr_peerIo* io = vio;
 
     TR_ASSERT(tr_isPeerIo(io));
@@ -345,8 +348,10 @@ static int tr_evbuffer_write(tr_peerIo* io, int fd, size_t howmuch)
     return n;
 }
 
-static void event_write_cb(evutil_socket_t fd, short event UNUSED, void* vio)
+static void event_write_cb(evutil_socket_t fd, short event, void* vio)
 {
+    TR_UNUSED(event);
+
     tr_peerIo* io = vio;
 
     TR_ASSERT(tr_isPeerIo(io));
@@ -554,8 +559,10 @@ static void utp_on_error(void* closure, int errcode)
     }
 }
 
-static void utp_on_overhead(void* closure, uint8_t /* bool */ send, size_t count, int type UNUSED)
+static void utp_on_overhead(void* closure, uint8_t /* bool */ send, size_t count, int type)
 {
+    TR_UNUSED(type);
+
     tr_peerIo* io = closure;
 
     TR_ASSERT(tr_isPeerIo(io));
@@ -579,35 +586,51 @@ static struct UTPFunctionTable utp_function_table =
 /* We switch a UTP socket to use these after the associated peerIo has been
    destroyed -- see io_dtor. */
 
-static void dummy_read(void* closure UNUSED, unsigned char const* buf UNUSED, size_t buflen UNUSED)
+static void dummy_read(void* closure, unsigned char const* buf, size_t buflen)
 {
+    TR_UNUSED(closure);
+    TR_UNUSED(buf);
+    TR_UNUSED(buflen);
+
     /* This cannot happen, as far as I'm aware. */
     tr_logAddNamedError("UTP", "On_read called on closed socket");
 }
 
-static void dummy_write(void* closure UNUSED, unsigned char* buf, size_t buflen)
+static void dummy_write(void* closure, unsigned char* buf, size_t buflen)
 {
+    TR_UNUSED(closure);
+
     /* This can very well happen if we've shut down a peer connection that
        had unflushed buffers.  Complain and send zeroes. */
     tr_logAddNamedDbg("UTP", "On_write called on closed socket");
     memset(buf, 0, buflen);
 }
 
-static size_t dummy_get_rb_size(void* closure UNUSED)
+static size_t dummy_get_rb_size(void* closure)
 {
+    TR_UNUSED(closure);
+
     return 0;
 }
 
-static void dummy_on_state_change(void* closure UNUSED, int state UNUSED)
+static void dummy_on_state_change(void* closure, int state)
 {
+    TR_UNUSED(closure);
+    TR_UNUSED(state);
 }
 
-static void dummy_on_error(void* closure UNUSED, int errcode UNUSED)
+static void dummy_on_error(void* closure, int errcode)
 {
+    TR_UNUSED(closure);
+    TR_UNUSED(errcode);
 }
 
-static void dummy_on_overhead(void* closure UNUSED, uint8_t /* bool */ send UNUSED, size_t count UNUSED, int type UNUSED)
+static void dummy_on_overhead(void* closure, uint8_t /* bool */ send, size_t count, int type)
 {
+    TR_UNUSED(closure);
+    TR_UNUSED(send);
+    TR_UNUSED(count);
+    TR_UNUSED(type);
 }
 
 static struct UTPFunctionTable dummy_utp_function_table =

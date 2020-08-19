@@ -11,7 +11,7 @@
 #include <event2/event.h>
 #include <event2/util.h>
 
-#define __LIBTRANSMISSION_WATCHDIR_MODULE__
+#define LIBTRANSMISSION_WATCHDIR_MODULE
 
 #include "transmission.h"
 #include "error.h"
@@ -144,8 +144,11 @@ static int compare_retry_names(void const* a, void const* b)
 
 static void tr_watchdir_retry_free(tr_watchdir_retry* retry);
 
-static void tr_watchdir_on_retry_timer(evutil_socket_t fd UNUSED, short type UNUSED, void* context)
+static void tr_watchdir_on_retry_timer(evutil_socket_t fd, short type, void* context)
 {
+    TR_UNUSED(fd);
+    TR_UNUSED(type);
+
     TR_ASSERT(context != NULL);
 
     tr_watchdir_retry* const retry = context;

@@ -8,13 +8,18 @@
 
 #pragma once
 
+#include <optional>
+#include <vector>
+
 #include <QAbstractListModel>
-#include <QSet>
 #include <QVector>
+
+#include "Macros.h"
+#include "Torrent.h"
+#include "Typedefs.h"
 
 class Prefs;
 class Speed;
-class Torrent;
 
 extern "C"
 {
@@ -24,6 +29,7 @@ struct tr_variant;
 class TorrentModel : public QAbstractListModel
 {
     Q_OBJECT
+    TR_DISABLE_COPY_MOVE(TorrentModel)
 
 public:
     enum Role
@@ -31,43 +37,43 @@ public:
         TorrentRole = Qt::UserRole
     };
 
-public:
-    TorrentModel(Prefs const& prefs);
-    virtual ~TorrentModel();
-
+    explicit TorrentModel(Prefs const& prefs);
+    virtual ~TorrentModel() override;
     void clear();
-    bool hasTorrent(QString const& hashString) const;
+
+    bool hasTorrent(QString const& hash_string) const;
 
     Torrent* getTorrentFromId(int id);
     Torrent const* getTorrentFromId(int id) const;
 
-    void getTransferSpeed(Speed& uploadSpeed, size_t& uploadPeerCount, Speed& downloadSpeed, size_t& downloadPeerCount);
+    using torrents_t = QVector<Torrent*>;
+    torrents_t const& torrents() const { return torrents_; }
 
     // QAbstractItemModel
-    virtual int rowCount(QModelIndex const& parent = QModelIndex()) const;
-    virtual QVariant data(QModelIndex const& index, int role = Qt::DisplayRole) const;
+    int rowCount(QModelIndex const& parent = QModelIndex()) const override;
+    QVariant data(QModelIndex const& index, int role = Qt::DisplayRole) const override;
 
 public slots:
-    void updateTorrents(tr_variant* torrentList, bool isCompleteList);
-    void removeTorrents(tr_variant* torrentList);
-    void removeTorrent(int id);
+    void updateTorrents(tr_variant* torrent_list, bool is_complete_list);
+    void removeTorrents(tr_variant* torrent_list);
 
 signals:
-    void torrentsAdded(QSet<int>);
+    void torrentsAdded(torrent_ids_t const&);
+    void torrentsChanged(torrent_ids_t const&, Torrent::fields_t const& fields);
+    void torrentsCompleted(torrent_ids_t const&);
+    void torrentsEdited(torrent_ids_t const&);
+    void torrentsNeedInfo(torrent_ids_t const&);
 
 private:
-    typedef QVector<Torrent*> torrents_t;
+    void rowsAdd(torrents_t const& torrents);
+    void rowsRemove(torrents_t const& torrents);
+    void rowsEmitChanged(torrent_ids_t const& ids);
 
-private:
-    void addTorrent(Torrent*);
-    void addTorrents(torrents_t&& torrents, QSet<int>& addIds);
-    QSet<int> getIds() const;
+    std::optional<int> getRow(int id) const;
+    using span_t = std::pair<int, int>;
+    std::vector<span_t> getSpans(torrent_ids_t const& ids) const;
 
-private slots:
-    void onTorrentChanged(int propertyId);
-
-private:
-    Prefs const& myPrefs;
-
-    torrents_t myTorrents;
+    Prefs const& prefs_;
+    torrent_ids_t already_added_;
+    torrents_t torrents_;
 };

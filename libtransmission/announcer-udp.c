@@ -13,7 +13,7 @@
 #include <event2/dns.h>
 #include <event2/util.h>
 
-#define __LIBTRANSMISSION_ANNOUNCER_MODULE__
+#define LIBTRANSMISSION_ANNOUNCER_MODULE
 
 #include "transmission.h"
 #include "announcer.h"
@@ -37,11 +37,11 @@ static void tau_sockaddr_setport(struct sockaddr* sa, tr_port port)
 {
     if (sa->sa_family == AF_INET)
     {
-        ((struct sockaddr_in*)sa)->sin_port = htons(port);
+        TR_DISCARD_ALIGN(sa, struct sockaddr_in*)->sin_port = htons(port);
     }
     else if (sa->sa_family == AF_INET6)
     {
-        ((struct sockaddr_in6*)sa)->sin6_port = htons(port);
+        TR_DISCARD_ALIGN(sa, struct sockaddr_in6*)->sin6_port = htons(port);
     }
 }
 

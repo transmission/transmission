@@ -10,9 +10,12 @@
 
 #include <QItemDelegate>
 
+#include "Macros.h"
+
 class FileTreeDelegate : public QItemDelegate
 {
     Q_OBJECT
+    TR_DISABLE_COPY_MOVE(FileTreeDelegate)
 
 public:
     FileTreeDelegate(QObject* parent = nullptr) :
@@ -20,12 +23,8 @@ public:
     {
     }
 
-    virtual ~FileTreeDelegate()
-    {
-    }
-
 public:
     // QAbstractItemDelegate
-    virtual QSize sizeHint(QStyleOptionViewItem const&, QModelIndex const&) const;
-    virtual void paint(QPainter*, QStyleOptionViewItem const&, QModelIndex const&) const;
+    QSize sizeHint(QStyleOptionViewItem const&, QModelIndex const&) const override;
+    void paint(QPainter*, QStyleOptionViewItem const&, QModelIndex const&) const override;
 };

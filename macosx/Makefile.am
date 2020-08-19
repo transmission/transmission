@@ -95,6 +95,8 @@ EXTRA_DIST = \
     InfoTabButtonBack.m \
     InfoTabButtonCell.h \
     InfoTabButtonCell.m \
+    InfoTabMatrix.h \
+    InfoTabMatrix.m \
     InfoTextField.h \
     InfoTextField.m \
     InfoActivityViewController.h \
