@@ -27,6 +27,7 @@ xargs \
 
 find \
         qt \
+        tests \
     \( -name '*.cc' -o -name '*.h' \) \
     -print0 |
 xargs \

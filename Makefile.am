@@ -24,11 +24,12 @@ SUBDIRS = \
   $(CLI_DIR) \
   $(GTK_DIR) \
   $(MAC_DIR) \
-  web
+  web \
+  tests
 
 EXTRA_DIST = \
   qt \
-  NEWS \
+  NEWS.md \
   AUTHORS \
   COPYING \
   README.md \

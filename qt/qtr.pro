@@ -91,6 +91,7 @@ SOURCES += AboutDialog.cc \
            Filters.cc \
            Formatter.cc \
            FreeSpaceLabel.cc \
+           IconCache.cc \
            IconToolButton.cc \
            InteropHelper.cc \
            InteropObject.cc \
@@ -119,6 +120,7 @@ SOURCES += AboutDialog.cc \
            TrackerModel.cc \
            TrackerModelFilter.cc \
            Utils.cc \
+           VariantHelpers.cc \
            WatchDir.cc
 HEADERS += $$replace(SOURCES, .cc, .h)
 HEADERS += BaseDialog.h CustomVariantType.h Speed.h Typedefs.h

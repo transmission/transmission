@@ -10,11 +10,6 @@
 #include <inttypes.h>
 #include <string.h>
 
-#ifndef _WIN32
-#include <sys/time.h> /* getrlimit */
-#include <sys/resource.h> /* getrlimit */
-#endif
-
 #include "transmission.h"
 #include "error.h"
 #include "error-types.h"
@@ -389,27 +384,6 @@ static void ensureSessionFdInfoExists(tr_session* session)
         i = tr_new0(struct tr_fdInfo, 1);
         fileset_construct(&i->fileset, FILE_CACHE_SIZE);
         session->fdInfo = i;
-
-#ifndef _WIN32
-
-        /* set the open-file limit to the largest safe size wrt FD_SETSIZE */
-        struct rlimit limit;
-
-        if (getrlimit(RLIMIT_NOFILE, &limit) == 0)
-        {
-            int const old_limit = (int)limit.rlim_cur;
-            int const new_limit = MIN(limit.rlim_max, FD_SETSIZE);
-
-            if (new_limit != old_limit)
-            {
-                limit.rlim_cur = new_limit;
-                setrlimit(RLIMIT_NOFILE, &limit);
-                getrlimit(RLIMIT_NOFILE, &limit);
-                tr_logAddInfo("Changed open file limit from %d to %d", old_limit, (int)limit.rlim_cur);
-            }
-        }
-
-#endif
     }
 }
 

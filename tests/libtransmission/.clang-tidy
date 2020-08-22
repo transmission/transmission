@@ -1,0 +1,78 @@
+---
+# Many of these checks are disabled only because the code hasn't been
+# cleaned up yet. Pull requests welcomed.
+Checks: >
+  bugprone-*,
+  -bugprone-branch-clone,
+  -bugprone-narrowing-conversions,
+  cert-*,
+  -cert-dcl50-cpp,
+  -cert-err58-cpp,
+  clang-analyzer-optin*,
+  -clang-diagnostic-c++98*,
+  -clang-diagnostic-global-constructors,
+  -clang-diagnostic-missing-prototypes,
+  -clang-diagnostic-nonportable-system-include-path,
+  -clang-diagnostic-old-style-cast,
+  -clang-diagnostic-shorten-64-to-32,
+  -clang-diagnostic-sign-compare,
+  -clang-diagnostic-sign-conversion,
+  cppcoreguidelines-*,
+  -cppcoreguidelines-avoid-magic-numbers,
+  -cppcoreguidelines-init-variables,
+  -cppcoreguidelines-macro-usage,
+  -cppcoreguidelines-narrowing-conversions,
+  -cppcoreguidelines-non-private-member-variables-in-classes,
+  -cppcoreguidelines-owning-memory,
+  -cppcoreguidelines-pro-bounds-array-to-pointer-decay,
+  -cppcoreguidelines-pro-bounds-constant-array-index,
+  -cppcoreguidelines-pro-bounds-pointer-arithmetic,
+  -cppcoreguidelines-pro-type-const-cast,
+  -cppcoreguidelines-pro-type-cstyle-cast,
+  -cppcoreguidelines-pro-type-reinterpret-cast,
+  -cppcoreguidelines-pro-type-static-cast-downcast,
+  -cppcoreguidelines-pro-type-vararg,
+  -cppcoreguidelines-special-member-functions,
+  google-readability-*,
+  google-runtime-operator,
+  hicpp-*,
+  -hicpp-multiway-paths-covered,
+  -hicpp-no-array-decay,
+  -hicpp-signed-bitwise,
+  -hicpp-special-member-functions,
+  -hicpp-vararg,
+  misc-*,
+  -misc-no-recursion,
+  -misc-non-private-member-variables-in-classes,
+  modernize-*,
+  -modernize-raw-string-literal,
+  -modernize-concat-nested-namespaces,
+  -modernize-use-trailing-return-type,
+  performance-*,
+  readability-*,
+  -readability-convert-member-functions-to-static,
+  -readability-implicit-bool-conversion,
+  -readability-inconsistent-declaration-parameter-name,
+  -readability-magic-numbers,
+  -readability-qualified-auto,
+  -readability-redundant-access-specifiers,
+  -readability-static-accessed-through-instance
+
+WarningsAsErrors: >
+  *
+
+CheckOptions:
+  - { key: readability-identifier-naming.ClassCase,                value: CamelCase  }
+  - { key: readability-identifier-naming.ClassMethodCase,          value: camelBack  }
+  - { key: readability-identifier-naming.ConstexprVariableCase,    value: CamelCase  }
+  - { key: readability-identifier-naming.EnumConstantCase,         value: UPPER_CASE }
+  - { key: readability-identifier-naming.FunctionCase,             value: camelBack  }
+  - { key: readability-identifier-naming.GlobalConstantCase,       value: CamelCase  }
+  - { key: readability-identifier-naming.MemberConstantCase,       value: CamelCase  }
+  - { key: readability-identifier-naming.NamespaceCase,            value: lower_case }
+  - { key: readability-identifier-naming.PrivateMemberSuffix,      value: _          }
+  - { key: readability-identifier-naming.ProtectedMemberSuffix,    value: _          }
+  - { key: readability-identifier-naming.StaticConstantCase,       value: CamelCase  }
+  - { key: readability-identifier-naming.StructCase,               value: CamelCase  }
+  - { key: readability-identifier-naming.TemplateParameterCase,    value: CamelCase  }
+  - { key: readability-identifier-naming.VariableCase,             value: lower_case }

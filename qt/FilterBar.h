@@ -8,9 +8,16 @@
 
 #pragma once
 
-#include <unordered_map>
+#include <bitset>
+#include <map>
 
+#include <QString>
 #include <QWidget>
+
+#include "FaviconCache.h"
+#include "Macros.h"
+#include "Torrent.h"
+#include "Typedefs.h"
 
 class QLabel;
 class QLineEdit;
@@ -25,10 +32,10 @@ class TorrentModel;
 class FilterBar : public QWidget
 {
     Q_OBJECT
+    TR_DISABLE_COPY_MOVE(FilterBar)
 
 public:
     FilterBar(Prefs& prefs, TorrentModel const& torrents, TorrentFilter const& filter, QWidget* parent = nullptr);
-    virtual ~FilterBar();
 
 public slots:
     void clear();
@@ -38,25 +45,40 @@ private:
     FilterBarComboBox* createActivityCombo();
     void refreshTrackers();
 
+    enum
+    {
+        ACTIVITY,
+        TRACKERS,
+
+        NUM_FLAGS
+    };
+
+    using Pending = std::bitset<NUM_FLAGS>;
+
+    Prefs& prefs_;
+    TorrentModel const& torrents_;
+    TorrentFilter const& filter_;
+
+    std::map<FaviconCache::Key, int> tracker_counts_;
+    FilterBarComboBox* activity_combo_ = {};
+    FilterBarComboBox* tracker_combo_ = {};
+    QLabel* count_label_ = {};
+    QStandardItemModel* tracker_model_ = {};
+    QTimer* recount_timer_ = {};
+    QLineEdit* line_edit_ = {};
+    Pending pending_ = {};
+    bool is_bootstrapping_ = {};
+
 private slots:
-    void recountSoon();
     void recount();
+    void recountSoon(Pending const& fields);
+    void recountActivitySoon() { recountSoon(Pending().set(ACTIVITY)); }
+    void recountTrackersSoon() { recountSoon(Pending().set(TRACKERS)); }
+    void recountAllSoon() { recountSoon(Pending().set(ACTIVITY).set(TRACKERS)); }
+
     void refreshPref(int key);
     void onActivityIndexChanged(int index);
-    void onTrackerIndexChanged(int index);
     void onTextChanged(QString const&);
-
-private:
-    Prefs& myPrefs;
-    TorrentModel const& myTorrents;
-    TorrentFilter const& myFilter;
-
-    FilterBarComboBox* myActivityCombo;
-    FilterBarComboBox* myTrackerCombo;
-    QLabel* myCountLabel;
-    QStandardItemModel* myTrackerModel;
-    QTimer* myRecountTimer;
-    bool myIsBootstrapping;
-    QLineEdit* myLineEdit;
-    std::map<QString, int> myTrackerCounts;
+    void onTorrentsChanged(torrent_ids_t const&, Torrent::fields_t const& fields);
+    void onTrackerIndexChanged(int index);
 };

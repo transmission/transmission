@@ -80,7 +80,7 @@ static tr_socket_t lpd_socket2; /**<and multicast send socket */
 static struct event* lpd_event = NULL;
 static tr_port lpd_port;
 
-static tr_torrent* lpd_torStaticType UNUSED; /* just a helper for static type analysis */
+static tr_torrent* lpd_torStaticType; /* just a helper for static type analysis */
 static tr_session* session;
 
 enum
@@ -295,8 +295,10 @@ static void on_upkeep_timer(evutil_socket_t, short, void*);
 * @remark Since the LPD service does not use another protocol family yet, this code is
 * IPv4 only for the time being.
 */
-int tr_lpdInit(tr_session* ss, tr_address* tr_addr UNUSED)
+int tr_lpdInit(tr_session* ss, tr_address* tr_addr)
 {
+    TR_UNUSED(tr_addr);
+
     struct ip_mreq mcastReq;
     int const opt_on = 1;
     int const opt_off = 0;
@@ -458,7 +460,7 @@ bool tr_lpdEnabled(tr_session const* ss)
 * @remark Declared inline for the compiler not to allege us of feeding unused
 * functions. In any other respect, lpd_consistencyCheck is an orphaned function.
 */
-UNUSED static inline void lpd_consistencyCheck(void)
+static inline void lpd_consistencyCheck(void)
 {
     /* if the following check fails, the definition of a hash string has changed
      * without our knowledge; revise string handling in functions tr_lpdSendAnnounce
@@ -692,8 +694,12 @@ static int tr_lpdAnnounceMore(time_t const now, int const interval)
     return announcesSent;
 }
 
-static void on_upkeep_timer(evutil_socket_t foo UNUSED, short bar UNUSED, void* vsession UNUSED)
+static void on_upkeep_timer(evutil_socket_t s, short type, void* user_data)
 {
+    TR_UNUSED(s);
+    TR_UNUSED(type);
+    TR_UNUSED(user_data);
+
     time_t const now = tr_time();
     tr_lpdAnnounceMore(now, UPKEEP_INTERVAL_SECS);
     tr_timerAdd(upkeep_timer, UPKEEP_INTERVAL_SECS, 0);
@@ -703,8 +709,11 @@ static void on_upkeep_timer(evutil_socket_t foo UNUSED, short bar UNUSED, void* 
 * @brief Processing of timeout notifications and incoming data on the socket
 * @note maximum rate of read events is limited according to @a lpd_maxAnnounceCap
 * @see DoS */
-static void event_callback(evutil_socket_t s UNUSED, short type, void* ignore UNUSED)
+static void event_callback(evutil_socket_t s, short type, void* user_data)
 {
+    TR_UNUSED(s);
+    TR_UNUSED(user_data);
+
     TR_ASSERT(tr_isSession(session));
 
     /* do not allow announces to be processed if LPD is disabled */

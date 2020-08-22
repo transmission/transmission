@@ -81,7 +81,6 @@ static bool check_openssl_result(int result, int expected_result, bool expected_
 }
 
 #define check_result(result) check_openssl_result((result), 1, true, __FILE__, __LINE__)
-#define check_result_eq(result, x_result) check_openssl_result((result), (x_result), true, __FILE__, __LINE__)
 #define check_result_neq(result, x_result) check_openssl_result((result), (x_result), false, __FILE__, __LINE__)
 
 static bool check_openssl_pointer(void* pointer, char const* file, int line)

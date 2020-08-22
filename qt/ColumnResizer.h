@@ -11,12 +11,15 @@
 #include <QObject>
 #include <QSet>
 
+#include "Macros.h"
+
 class QGridLayout;
 class QTimer;
 
 class ColumnResizer : public QObject
 {
     Q_OBJECT
+    TR_DISABLE_COPY_MOVE(ColumnResizer)
 
 public:
     ColumnResizer(QObject* parent = nullptr);
@@ -32,7 +35,6 @@ public slots:
 private:
     void scheduleUpdate();
 
-private:
-    QTimer* myTimer;
-    QSet<QGridLayout*> myLayouts;
+    QTimer* timer_ = {};
+    QSet<QGridLayout*> layouts_;
 };

@@ -9,7 +9,9 @@
 #pragma once
 
 #include <cctype> // isxdigit()
+#include <functional>
 
+#include <QHash>
 #include <QPointer>
 #include <QRect>
 #include <QString>
@@ -20,12 +22,27 @@ class QHeaderView;
 class QIcon;
 class QModelIndex;
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
+
+namespace std
+{
+
+template<>
+struct hash<QString>
+{
+    std::size_t operator ()(QString const& s) const
+    {
+        return qHash(s);
+    }
+};
+
+} // namespace std
+
+#endif
+
 class Utils
 {
 public:
-    static QIcon getFileIcon();
-    static QIcon getFolderIcon();
-    static QIcon guessMimeIcon(QString const& filename);
     static QIcon getIconFromIndex(QModelIndex const& index);
 
     // Test if string is UTF-8 or not
@@ -70,7 +87,7 @@ public:
 
     static bool isMagnetLink(QString const& s)
     {
-        return s.startsWith(QString::fromUtf8("magnet:?"));
+        return s.startsWith(QStringLiteral("magnet:?"));
     }
 
     static bool isHexHashcode(QString const& s)
@@ -98,21 +115,3 @@ public:
             s.startsWith(QStringLiteral("https://"));
     }
 };
-
-#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
-
-namespace std
-{
-
-template<>
-struct hash<QString>
-{
-    std::size_t operator ()(QString const& s) const
-    {
-        return qHash(s);
-    }
-};
-
-} // namespace std
-
-#endif

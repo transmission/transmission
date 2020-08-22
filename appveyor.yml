@@ -1,0 +1,95 @@
+version: '{build}'
+
+environment:
+  AWS_ACCESS_KEY_ID:
+    secure: JH2KJ09654cSwhYup2MKb80kK60+nezvUmFzBay7tUI=
+  AWS_SECRET_ACCESS_KEY:
+    secure: fum5aRKLhJvxh3UQhiQVt2acV4eke8GiGdMhHIW/uuQC7wztj4T9tJWp5IO1U7m4
+  AWS_S3_BUCKET_NAME:
+    secure: Bf3x1Iruxg+l3tp+an+g9kWhBexLLw/69gEt9bEu7Zk=
+
+  matrix:
+  - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
+    TR_ARCH: x86
+  - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
+    TR_ARCH: x64
+
+for:
+-
+  matrix:
+    only:
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
+
+  clone_folder: '%SystemDrive%\%TR_ARCH%-project'
+
+  install:
+  - pwsh: |
+      $Version = git describe --tags --abbrev=10 --always
+      if ($Version -ne $Env:APPVEYOR_REPO_BRANCH) {
+          $version += "-${Env:APPVEYOR_REPO_BRANCH}"
+      }
+
+      $BuildIndex = 0
+      appveyor UpdateBuild -Version $Version
+      while ($LastExitCode -ne 0) {
+          $BuildIndex += 1
+          appveyor UpdateBuild -Version "${Version}+${BuildIndex}"
+      }
+
+      git submodule update --init --recursive
+
+      choco install ActivePerl
+      choco install nasm
+      choco install jom
+      choco install imagemagick.tool
+      choco install wixtoolset --version 3.11.2
+
+      Remove-Item -Path (Join-Path $Env:SystemDrive OpenSSL-Win32) -Recurse
+      Remove-Item -Path (Join-Path $Env:SystemDrive OpenSSL-Win64) -Recurse
+
+      Install-Module -Name SignPath
+
+  build_script:
+  - pwsh: |
+      $Env:PATH = @(
+          (Join-Path $Env:SystemDrive Perl64 bin)
+          (Join-Path $Env:ProgramFiles NASM)
+          (Join-Path ${Env:ProgramFiles(x86)} 'WiX Toolset v3.11' bin)
+          $Env:PATH
+      ) -join [System.IO.Path]::PathSeparator
+
+      Set-ExecutionPolicy -Scope Process Bypass
+
+      try {
+          & (Join-Path $Env:APPVEYOR_BUILD_FOLDER release windows main.ps1) `
+              -Mode Build `
+              -BuildArch $env:TR_ARCH
+      } catch {
+          Write-Error ("{1}{0}{2}{0}{3}" -f [Environment]::NewLine, $_.ToString(), $_.InvocationInfo.PositionMessage, $_.ScriptStackTrace) -ErrorAction Continue
+          exit 1
+      }
+
+  test_script:
+  - pwsh: |
+      Set-ExecutionPolicy -Scope Process Bypass
+
+      try {
+          & (Join-Path $Env:APPVEYOR_BUILD_FOLDER release windows main.ps1) `
+              -Mode Test `
+              -BuildArch $env:TR_ARCH
+      } catch {
+          Write-Error ("{1}{0}{2}{0}{3}" -f [Environment]::NewLine, $_.ToString(), $_.InvocationInfo.PositionMessage, $_.ScriptStackTrace) -ErrorAction Continue
+          exit 1
+      }
+
+  artifacts:
+  - path: '*.msi'
+  - path: '*-pdb.zip'
+
+  deploy:
+  - provider: Webhook
+    url: https://app.signpath.io/API/v1/8c96c8c9-a72c-4b46-a53c-80aad617f6bc/Integrations/AppVeyor?ProjectKey=transmission&SigningPolicyKey=release-signing
+    authorization:
+       secure: PrvcykaHmPgJ0ENht1q58tCfjRcmybiOeHYrvtQtAGsfahWvniAfP66DqHxv872acpyf3FpJn2ETCeszoVuFGA==
+    on:
+      APPVEYOR_REPO_TAG: true

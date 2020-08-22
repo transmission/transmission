@@ -43,12 +43,11 @@ static struct FileList* getFiles(char const* dir, char const* base, struct FileL
         return NULL;
     }
 
-    char* buf;
+    char* buf = tr_buildPath(dir, base, NULL);
+    tr_sys_path_native_separators(buf);
+
     tr_sys_path_info info;
     tr_error* error = NULL;
-
-    buf = tr_buildPath(dir, base, NULL);
-
     if (!tr_sys_path_get_info(buf, 0, &info, &error))
     {
         tr_logAddError(_("Torrent Creator is skipping file \"%s\": %s"), buf, error->message);
@@ -534,8 +533,10 @@ static tr_lock* getQueueLock(void)
     return lock;
 }
 
-static void makeMetaWorkerFunc(void* unused UNUSED)
+static void makeMetaWorkerFunc(void* user_data)
 {
+    TR_UNUSED(user_data);
+
     for (;;)
     {
         tr_metainfo_builder* builder = NULL;

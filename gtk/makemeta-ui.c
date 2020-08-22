@@ -126,8 +126,10 @@ static gboolean onProgressDialogRefresh(gpointer data)
     return G_SOURCE_CONTINUE;
 }
 
-static void onProgressDialogDestroyed(gpointer data, GObject* dead UNUSED)
+static void onProgressDialogDestroyed(gpointer data, GObject* dead)
 {
+    TR_UNUSED(dead);
+
     MakeMetaUI* ui = data;
     g_source_remove(ui->progress_tag);
 }
@@ -181,7 +183,10 @@ static void makeProgressDialog(GtkWidget* parent, MakeMetaUI* ui)
     GtkWidget* fr;
 
     d = gtk_dialog_new_with_buttons(_("New Torrent"), GTK_WINDOW(parent), GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
-        GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE, GTK_STOCK_ADD, GTK_RESPONSE_ACCEPT, NULL);
+        _("_Cancel"), GTK_RESPONSE_CANCEL,
+        _("_Close"), GTK_RESPONSE_CLOSE,
+        _("_Add"), GTK_RESPONSE_ACCEPT,
+        NULL);
     ui->progress_dialog = d;
     g_signal_connect(d, "response", G_CALLBACK(onProgressDialogResponse), ui);
 
@@ -381,9 +386,14 @@ static char const* getDefaultSavePath(void)
     return g_get_user_special_dir(G_USER_DIRECTORY_DESKTOP);
 }
 
-static void on_drag_data_received(GtkWidget* widget UNUSED, GdkDragContext* drag_context, gint x UNUSED, gint y UNUSED,
-    GtkSelectionData* selection_data, guint info UNUSED, guint time_, gpointer user_data)
+static void on_drag_data_received(GtkWidget* widget, GdkDragContext* drag_context, gint x, gint y,
+    GtkSelectionData* selection_data, guint info, guint time_, gpointer user_data)
 {
+    TR_UNUSED(widget);
+    TR_UNUSED(x);
+    TR_UNUSED(y);
+    TR_UNUSED(info);
+
     gboolean success = FALSE;
     MakeMetaUI* ui = user_data;
     char** uris = gtk_selection_data_get_uris(selection_data);
@@ -431,8 +441,10 @@ GtkWidget* gtr_torrent_creation_dialog_new(GtkWindow* parent, TrCore* core)
 
     ui->core = core;
 
-    d = gtk_dialog_new_with_buttons(_("New Torrent"), parent, GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_CLOSE,
-        GTK_RESPONSE_CLOSE, GTK_STOCK_NEW, GTK_RESPONSE_ACCEPT, NULL);
+    d = gtk_dialog_new_with_buttons(_("New Torrent"), parent, GTK_DIALOG_DESTROY_WITH_PARENT,
+        _("_Close"), GTK_RESPONSE_CLOSE,
+        _("_New"), GTK_RESPONSE_ACCEPT,
+        NULL);
     ui->dialog = d;
     g_signal_connect(d, "response", G_CALLBACK(onResponse), ui);
     g_object_set_data_full(G_OBJECT(d), "ui", ui, freeMetaUI);

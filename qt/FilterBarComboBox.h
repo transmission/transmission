@@ -10,9 +10,12 @@
 
 #include <QComboBox>
 
+#include "Macros.h"
+
 class FilterBarComboBox : public QComboBox
 {
     Q_OBJECT
+    TR_DISABLE_COPY_MOVE(FilterBarComboBox)
 
 public:
     enum
@@ -25,8 +28,6 @@ public:
 public:
     FilterBarComboBox(QWidget* parent = nullptr);
 
-    int currentCount() const;
-
     // QWidget
     QSize minimumSizeHint() const override;
     QSize sizeHint() const override;
@@ -36,5 +37,5 @@ protected:
     void paintEvent(QPaintEvent* e) override;
 
 private:
-    QSize calculateSize(QSize const& textSize, QSize const& countSize) const;
+    QSize calculateSize(QSize const& text_size, QSize const& count_size) const;
 };

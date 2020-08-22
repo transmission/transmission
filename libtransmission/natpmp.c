@@ -168,11 +168,11 @@ int tr_natpmpPulse(struct tr_natpmp* nat, tr_port private_port, bool is_enabled,
 
         if (val >= 0)
         {
-            int const private_port = resp.pnu.newportmapping.privateport;
+            int const unmapped_port = resp.pnu.newportmapping.privateport;
 
-            tr_logAddNamedInfo(getKey(), _("no longer forwarding port %d"), private_port);
+            tr_logAddNamedInfo(getKey(), _("no longer forwarding port %d"), unmapped_port);
 
-            if (nat->private_port == private_port)
+            if (nat->private_port == unmapped_port)
             {
                 nat->private_port = 0;
                 nat->public_port = 0;

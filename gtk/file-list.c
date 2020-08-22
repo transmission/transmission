@@ -22,9 +22,7 @@
 #include "tr-prefs.h"
 #include "util.h"
 
-#define TR_DOWNLOAD_KEY "tr-download-key"
 #define TR_COLUMN_ID_KEY "tr-model-column-id-key"
-#define TR_PRIORITY_KEY "tr-priority-key"
 
 enum
 {
@@ -93,8 +91,10 @@ struct RefreshData
     FileData* file_data;
 };
 
-static gboolean refreshFilesForeach(GtkTreeModel* model, GtkTreePath* path UNUSED, GtkTreeIter* iter, gpointer gdata)
+static gboolean refreshFilesForeach(GtkTreeModel* model, GtkTreePath* path, GtkTreeIter* iter, gpointer gdata)
 {
+    TR_UNUSED(path);
+
     struct RefreshData* refresh_data = gdata;
     FileData* data = refresh_data->file_data;
     unsigned int index;
@@ -309,8 +309,10 @@ struct ActiveData
     size_t indexCount;
 };
 
-static gboolean getSelectedFilesForeach(GtkTreeModel* model, GtkTreePath* path UNUSED, GtkTreeIter* iter, gpointer gdata)
+static gboolean getSelectedFilesForeach(GtkTreeModel* model, GtkTreePath* path, GtkTreeIter* iter, gpointer gdata)
 {
+    TR_UNUSED(path);
+
     gboolean const is_file = !gtk_tree_model_iter_has_child(model, iter);
 
     if (is_file)
@@ -591,6 +593,10 @@ void gtr_file_list_set_torrent(GtkWidget* w, int torrentId)
     }
 
     gtk_tree_view_set_model(GTK_TREE_VIEW(data->view), data->model);
+
+    /* set default sort by label */
+    gtk_tree_sortable_set_sort_column_id(GTK_TREE_SORTABLE(data->store), FC_LABEL, GTK_SORT_ASCENDING);
+
     gtk_tree_view_expand_all(GTK_TREE_VIEW(data->view));
     g_object_unref(data->model);
 }
@@ -599,17 +605,23 @@ void gtr_file_list_set_torrent(GtkWidget* w, int torrentId)
 ****
 ***/
 
-static void renderDownload(GtkTreeViewColumn* column UNUSED, GtkCellRenderer* renderer, GtkTreeModel* model, GtkTreeIter* iter,
-    gpointer data UNUSED)
+static void renderDownload(GtkTreeViewColumn* column, GtkCellRenderer* renderer, GtkTreeModel* model, GtkTreeIter* iter,
+    gpointer data)
 {
+    TR_UNUSED(column);
+    TR_UNUSED(data);
+
     gboolean enabled;
     gtk_tree_model_get(model, iter, FC_ENABLED, &enabled, -1);
     g_object_set(renderer, "inconsistent", enabled == MIXED, "active", enabled == TRUE, NULL);
 }
 
-static void renderPriority(GtkTreeViewColumn* column UNUSED, GtkCellRenderer* renderer, GtkTreeModel* model, GtkTreeIter* iter,
-    gpointer data UNUSED)
+static void renderPriority(GtkTreeViewColumn* column, GtkCellRenderer* renderer, GtkTreeModel* model, GtkTreeIter* iter,
+    gpointer data)
 {
+    TR_UNUSED(column);
+    TR_UNUSED(data);
+
     int priority;
     char const* text;
     gtk_tree_model_get(model, iter, FC_PRIORITY, &priority, -1);
@@ -658,8 +670,10 @@ static char* buildFilename(tr_torrent* tor, GtkTreeModel* model, GtkTreePath* pa
     return ret;
 }
 
-static gboolean onRowActivated(GtkTreeView* view, GtkTreePath* path, GtkTreeViewColumn* col UNUSED, gpointer gdata)
+static gboolean onRowActivated(GtkTreeView* view, GtkTreePath* path, GtkTreeViewColumn* col, gpointer gdata)
 {
+    TR_UNUSED(col);
+
     gboolean handled = FALSE;
     FileData* data = gdata;
     tr_torrent* tor = gtr_core_find_torrent(data->core, data->torrentId);

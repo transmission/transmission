@@ -193,8 +193,10 @@ static tr_lock* getVerifyLock(void)
     return lock;
 }
 
-static void verifyThreadFunc(void* unused UNUSED)
+static void verifyThreadFunc(void* user_data)
 {
+    TR_UNUSED(user_data);
+
     for (;;)
     {
         bool changed = false;
@@ -334,8 +336,10 @@ void tr_verifyRemove(tr_torrent* tor)
     tr_lockUnlock(lock);
 }
 
-void tr_verifyClose(tr_session* session UNUSED)
+void tr_verifyClose(tr_session* session)
 {
+    TR_UNUSED(session);
+
     tr_lockLock(getVerifyLock());
 
     stopCurrent = true;

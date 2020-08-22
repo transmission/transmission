@@ -22,5 +22,9 @@ SUBDIRS = \
   $(UTP_DIR)
 
 EXTRA_DIST = \
+  curl \
+  googletest \
+  libevent \
+  openssl \
   macosx-libevent-config.h \
   macosx-libevent-event-config.h

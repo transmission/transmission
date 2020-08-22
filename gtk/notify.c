@@ -42,8 +42,10 @@ static void tr_notification_free(gpointer data)
     g_free(n);
 }
 
-static void get_capabilities_callback(GObject* source, GAsyncResult* res, gpointer user_data UNUSED)
+static void get_capabilities_callback(GObject* source, GAsyncResult* res, gpointer user_data)
 {
+    TR_UNUSED(user_data);
+
     char** caps;
     GVariant* result;
 
@@ -74,9 +76,13 @@ static void get_capabilities_callback(GObject* source, GAsyncResult* res, gpoint
     g_variant_unref(result);
 }
 
-static void g_signal_callback(GDBusProxy* proxy UNUSED, char* sender_name UNUSED, char* signal_name, GVariant* params,
-    gpointer user_data UNUSED)
+static void g_signal_callback(GDBusProxy* dbus_proxy, char* sender_name, char* signal_name, GVariant* params,
+    gpointer user_data)
 {
+    TR_UNUSED(dbus_proxy);
+    TR_UNUSED(sender_name);
+    TR_UNUSED(user_data);
+
     guint id;
     TrNotification* n;
 
@@ -123,8 +129,11 @@ static void g_signal_callback(GDBusProxy* proxy UNUSED, char* sender_name UNUSED
     }
 }
 
-static void dbus_proxy_ready_callback(GObject* source UNUSED, GAsyncResult* res, gpointer user_data UNUSED)
+static void dbus_proxy_ready_callback(GObject* source, GAsyncResult* res, gpointer user_data)
 {
+    TR_UNUSED(source);
+    TR_UNUSED(user_data);
+
     proxy = g_dbus_proxy_new_for_bus_finish(res, NULL);
 
     if (proxy == NULL)
@@ -171,7 +180,6 @@ static void notify_callback(GObject* source, GAsyncResult* res, gpointer user_da
 
 void gtr_notify_torrent_completed(TrCore* core, int torrent_id)
 {
-    GVariantBuilder actions_builder;
     TrNotification* n;
     tr_torrent* tor;
     char const* cmd = gtr_pref_string_get(TR_KEY_torrent_complete_sound_command);
@@ -195,8 +203,8 @@ void gtr_notify_torrent_completed(TrCore* core, int torrent_id)
     n->core = core;
     n->torrent_id = torrent_id;
 
+    GVariantBuilder actions_builder;
     g_variant_builder_init(&actions_builder, G_VARIANT_TYPE("as"));
-
     if (server_supports_actions)
     {
         tr_info const* inf = tr_torrentInfo(tor);
@@ -213,8 +221,12 @@ void gtr_notify_torrent_completed(TrCore* core, int torrent_id)
         }
     }
 
+    GVariantBuilder hints_builder;
+    g_variant_builder_init(&hints_builder, G_VARIANT_TYPE("a{sv}"));
+    g_variant_builder_add(&hints_builder, "{sv}", "category", g_variant_new_string("transfer.complete"));
+
     g_dbus_proxy_call(proxy, "Notify", g_variant_new("(susssasa{sv}i)", "Transmission", n->id, "transmission",
-        _("Torrent Complete"), tr_torrentName(tor), &actions_builder, NULL, -1), G_DBUS_CALL_FLAGS_NONE, -1, NULL,
+        _("Torrent Complete"), tr_torrentName(tor), &actions_builder, &hints_builder, -1), G_DBUS_CALL_FLAGS_NONE, -1, NULL,
         notify_callback, n);
 }
 

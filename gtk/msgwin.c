@@ -206,15 +206,19 @@ static void onSaveDialogResponse(GtkWidget* d, int response, gpointer data)
 static void onSaveRequest(GtkWidget* w, gpointer data)
 {
     GtkWindow* window = GTK_WINDOW(gtk_widget_get_toplevel(w));
-    GtkWidget* d = gtk_file_chooser_dialog_new(_("Save Log"), window, GTK_FILE_CHOOSER_ACTION_SAVE, GTK_STOCK_CANCEL,
-        GTK_RESPONSE_CANCEL, GTK_STOCK_SAVE, GTK_RESPONSE_ACCEPT, NULL);
+    GtkWidget* d = gtk_file_chooser_dialog_new(_("Save Log"), window, GTK_FILE_CHOOSER_ACTION_SAVE,
+        _("_Cancel"), GTK_RESPONSE_CANCEL,
+        _("_Save"), GTK_RESPONSE_ACCEPT,
+        NULL);
 
     g_signal_connect(d, "response", G_CALLBACK(onSaveDialogResponse), data);
     gtk_widget_show(d);
 }
 
-static void onClearRequest(GtkWidget* w UNUSED, gpointer gdata)
+static void onClearRequest(GtkWidget* w, gpointer gdata)
 {
+    TR_UNUSED(w);
+
     struct MsgData* data = gdata;
 
     gtk_list_store_clear(data->store);
@@ -248,9 +252,11 @@ static char const* getForegroundColor(int msgLevel)
     }
 }
 
-static void renderText(GtkTreeViewColumn* column UNUSED, GtkCellRenderer* renderer, GtkTreeModel* tree_model, GtkTreeIter* iter,
+static void renderText(GtkTreeViewColumn* column, GtkCellRenderer* renderer, GtkTreeModel* tree_model, GtkTreeIter* iter,
     gpointer gcol)
 {
+    TR_UNUSED(column);
+
     int const col = GPOINTER_TO_INT(gcol);
     char* str = NULL;
     struct tr_log_message const* node;
@@ -259,9 +265,12 @@ static void renderText(GtkTreeViewColumn* column UNUSED, GtkCellRenderer* render
     g_object_set(renderer, "text", str, "foreground", getForegroundColor(node->level), "ellipsize", PANGO_ELLIPSIZE_END, NULL);
 }
 
-static void renderTime(GtkTreeViewColumn* column UNUSED, GtkCellRenderer* renderer, GtkTreeModel* tree_model, GtkTreeIter* iter,
-    gpointer data UNUSED)
+static void renderTime(GtkTreeViewColumn* column, GtkCellRenderer* renderer, GtkTreeModel* tree_model, GtkTreeIter* iter,
+    gpointer data)
 {
+    TR_UNUSED(column);
+    TR_UNUSED(data);
+
     struct tm tm;
     char buf[16];
     struct tr_log_message const* node;
@@ -343,8 +352,10 @@ static gboolean isRowVisible(GtkTreeModel* model, GtkTreeIter* iter, gpointer gd
     return node->level <= data->maxLevel;
 }
 
-static void onWindowDestroyed(gpointer gdata, GObject* deadWindow UNUSED)
+static void onWindowDestroyed(gpointer gdata, GObject* deadWindow)
 {
+    TR_UNUSED(deadWindow);
+
     struct MsgData* data = gdata;
 
     g_source_remove(data->refresh_tag);
@@ -467,21 +478,36 @@ GtkWidget* gtr_message_log_window_new(GtkWindow* parent, TrCore* core)
     gtk_toolbar_set_style(GTK_TOOLBAR(toolbar), GTK_TOOLBAR_BOTH_HORIZ);
     gtk_style_context_add_class(gtk_widget_get_style_context(toolbar), GTK_STYLE_CLASS_PRIMARY_TOOLBAR);
 
-    item = gtk_tool_button_new_from_stock(GTK_STOCK_SAVE_AS);
-    g_object_set(G_OBJECT(item), "is-important", TRUE, NULL);
+    item = gtk_tool_button_new(NULL, NULL);
+    g_object_set(item,
+        "icon-name", "document-save-as",
+        "is-important", TRUE,
+        "label", _("Save _As"),
+        "use-underline", TRUE,
+        NULL);
     g_signal_connect(item, "clicked", G_CALLBACK(onSaveRequest), data);
     gtk_toolbar_insert(GTK_TOOLBAR(toolbar), item, -1);
 
-    item = gtk_tool_button_new_from_stock(GTK_STOCK_CLEAR);
-    g_object_set(G_OBJECT(item), "is-important", TRUE, NULL);
+    item = gtk_tool_button_new(NULL, NULL);
+    g_object_set(item,
+        "icon-name", "edit-clear",
+        "is-important", TRUE,
+        "label", _("Clear"),
+        "use-underline", TRUE,
+        NULL);
     g_signal_connect(item, "clicked", G_CALLBACK(onClearRequest), data);
     gtk_toolbar_insert(GTK_TOOLBAR(toolbar), item, -1);
 
     item = gtk_separator_tool_item_new();
     gtk_toolbar_insert(GTK_TOOLBAR(toolbar), item, -1);
 
-    item = gtk_toggle_tool_button_new_from_stock(GTK_STOCK_MEDIA_PAUSE);
-    g_object_set(G_OBJECT(item), "is-important", TRUE, NULL);
+    item = gtk_toggle_tool_button_new();
+    g_object_set(G_OBJECT(item),
+        "icon-name", "media-playback-pause",
+        "is-important", TRUE,
+        "label", _("P_ause"),
+        "use-underline", TRUE,
+        NULL);
     g_signal_connect(item, "toggled", G_CALLBACK(onPauseToggled), data);
     gtk_toolbar_insert(GTK_TOOLBAR(toolbar), item, -1);
 

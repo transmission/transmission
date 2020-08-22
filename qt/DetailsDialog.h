@@ -14,6 +14,8 @@
 #include <QTimer>
 
 #include "BaseDialog.h"
+#include "Macros.h"
+#include "Session.h"
 #include "Typedefs.h"
 
 #include "ui_DetailsDialog.h"
@@ -31,6 +33,7 @@ class TrackerModelFilter;
 class DetailsDialog : public BaseDialog
 {
     Q_OBJECT
+    TR_DISABLE_COPY_MOVE(DetailsDialog)
 
 public:
     DetailsDialog(Session&, Prefs&, TorrentModel const&, QWidget* parent = nullptr);
@@ -51,18 +54,17 @@ private:
     void initFilesTab();
     void initOptionsTab();
 
-    void getNewData();
-
     QIcon getStockIcon(QString const& freedesktop_name, int fallback);
     void setEnabled(bool);
 
 private slots:
-    void refresh();
+    void refreshModel();
     void refreshPref(int key);
-    void onTimer();
+    void refreshUI();
 
-    void onTorrentEdited(torrent_ids_t const& ids);
-    void onTorrentsChanged(torrent_ids_t const& ids);
+    void onTorrentsEdited(torrent_ids_t const& ids);
+    void onTorrentsChanged(torrent_ids_t const& ids, Torrent::fields_t const& fields);
+    void onSessionCalled(Session::Tag tag);
 
     // Tracker tab
     void onTrackerSelectionChanged();
@@ -73,9 +75,9 @@ private slots:
     void onShowBackupTrackersToggled(bool);
 
     // Files tab
-    void onFilePriorityChanged(QSet<int> const& fileIndices, int);
-    void onFileWantedChanged(QSet<int> const& fileIndices, bool);
-    void onPathEdited(QString const& oldpath, QString const& newname);
+    void onFilePriorityChanged(QSet<int> const& file_indices, int);
+    void onFileWantedChanged(QSet<int> const& file_indices, bool);
+    void onPathEdited(QString const& old_path, QString const& new_name);
     void onOpenRequested(QString const& path);
 
     // Options tab
@@ -89,20 +91,48 @@ private slots:
     void onIdleLimitChanged();
 
 private:
-    Session& mySession;
-    Prefs& myPrefs;
-    TorrentModel const& myModel;
+    /* When a torrent property is edited in the details dialog (e.g.
+       file priority, speed limits, etc.), don't update those UI fields
+       until we know the server has processed the request. This keeps
+       the UI from appearing to undo the change if we receive a refresh
+       that was already in-flight _before_ the property was edited. */
+    bool canEdit() const { return std::empty(pending_changes_tags_); }
+    std::unordered_set<Session::Tag> pending_changes_tags_;
+    QMetaObject::Connection pending_changes_connection_;
 
-    Ui::DetailsDialog ui;
+    template<typename T>
+    void torrentSet(torrent_ids_t const& ids, tr_quark key, T val)
+    {
+        auto const tag = session_.torrentSet(ids, key, val);
+        pending_changes_tags_.insert(tag);
+        if (!pending_changes_connection_)
+        {
+            pending_changes_connection_ = connect(&session_, &Session::sessionCalled, this, &DetailsDialog::onSessionCalled);
+        }
+    }
 
-    torrent_ids_t myIds;
-    QTimer myTimer;
-    bool myChangedTorrents;
-    bool myHavePendingRefresh;
+    template<typename T>
+    void torrentSet(tr_quark key, T val)
+    {
+        torrentSet(ids_, key, val);
+    }
 
-    TrackerModel* myTrackerModel;
-    TrackerModelFilter* myTrackerFilter;
-    TrackerDelegate* myTrackerDelegate;
+    Session& session_;
+    Prefs& prefs_;
+    TorrentModel const& model_;
 
-    QMap<QString, QTreeWidgetItem*> myPeers;
+    Ui::DetailsDialog ui_ = {};
+
+    torrent_ids_t ids_;
+    QTimer model_timer_;
+    QTimer ui_debounce_timer_;
+
+    TrackerModel* tracker_model_ = {};
+    TrackerModelFilter* tracker_filter_ = {};
+    TrackerDelegate* tracker_delegate_ = {};
+
+    QMap<QString, QTreeWidgetItem*> peers_;
+
+    QIcon const icon_encrypted_;
+    QIcon const icon_unencrypted_;
 };

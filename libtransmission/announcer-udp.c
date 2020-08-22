@@ -13,7 +13,7 @@
 #include <event2/dns.h>
 #include <event2/util.h>
 
-#define __LIBTRANSMISSION_ANNOUNCER_MODULE__
+#define LIBTRANSMISSION_ANNOUNCER_MODULE
 
 #include "transmission.h"
 #include "announcer.h"

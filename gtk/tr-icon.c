@@ -23,23 +23,29 @@ static TR_DEFINE_QUARK(tr_core, core)
 
 #ifdef HAVE_LIBAPPINDICATOR
 
-void gtr_icon_refresh(gpointer vindicator UNUSED)
+void gtr_icon_refresh(gpointer vindicator)
 {
+    TR_UNUSED(vindicator);
 }
 
 #else
 
-static void activated(GtkStatusIcon* self UNUSED, gpointer user_data UNUSED)
+static void activated(GtkStatusIcon* self, gpointer user_data)
 {
+    TR_UNUSED(self);
+    TR_UNUSED(user_data);
+
     gtr_action_activate("toggle-main-window");
 }
 
-static void popup(GtkStatusIcon* self, guint button, guint when, gpointer data UNUSED)
+static void popup(GtkStatusIcon* self, guint button, guint when, gpointer data)
 {
+    TR_UNUSED(data);
+
     GtkWidget* w = gtr_action_get_widget("/icon-popup");
 
 #if GTK_CHECK_VERSION(3, 22, 0)
-    gtk_menu_popup_at_widget(GTK_MENU(w), GTK_WIDGET(self), GDK_GRAVITY_SOUTH, GDK_GRAVITY_NORTH, NULL);
+    gtk_menu_popup_at_pointer(GTK_MENU(w), NULL);
 #else
     gtk_menu_popup(GTK_MENU(w), NULL, NULL, gtk_status_icon_position_menu, self, button, when);
 #endif

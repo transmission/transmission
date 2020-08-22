@@ -17,9 +17,9 @@
 
 #include <ctype.h> /* isdigit(), tolower() */
 #include <errno.h>
-#include <float.h> /* DBL_EPSILON */
+#include <float.h> /* DBL_DIG */
 #include <locale.h> /* localeconv() */
-#include <math.h> /* pow(), fabs(), floor() */
+#include <math.h> /* fabs(), floor() */
 #include <stdio.h>
 #include <stdlib.h> /* getenv() */
 #include <string.h> /* strerror(), memset(), memmem() */
@@ -587,6 +587,37 @@ char* tr_strsep(char** str, char const* delims)
 #endif
 }
 
+char* tr_strjoin(char const* const* arr, size_t len, char const* delim)
+{
+    size_t total_len = 1;
+    size_t delim_len = strlen(delim);
+    for (size_t i = 0; i < len; ++i)
+    {
+        total_len += strlen(arr[i]);
+    }
+
+    total_len += len > 0 ? (len - 1) * delim_len : 0;
+
+    char* const ret = tr_new(char, total_len);
+    char* p = ret;
+
+    for (size_t i = 0; i < len; ++i)
+    {
+        if (i > 0)
+        {
+            memcpy(p, delim, delim_len);
+            p += delim_len;
+        }
+
+        size_t const part_len = strlen(arr[i]);
+        memcpy(p, arr[i], part_len);
+        p += part_len;
+    }
+
+    *p = '\0';
+    return ret;
+}
+
 char* tr_strstrip(char* str)
 {
     if (str != NULL)
@@ -671,7 +702,7 @@ void tr_wait_msec(long int msec)
 ****
 ***/
 
-int tr_snprintf(char* buf, size_t buflen, char const* fmt, ...)
+int tr_snprintf(void* buf, size_t buflen, char const* fmt, ...)
 {
     int len;
     va_list args;
@@ -687,7 +718,7 @@ int tr_snprintf(char* buf, size_t buflen, char const* fmt, ...)
  * will be copied. Always NUL terminates (unless siz == 0).
  * Returns strlen (src); if retval >= siz, truncation occurred.
  */
-size_t tr_strlcpy(char* dst, void const* src, size_t siz)
+size_t tr_strlcpy(void* dst, void const* src, size_t siz)
 {
     TR_ASSERT(dst != NULL);
     TR_ASSERT(src != NULL);
@@ -756,35 +787,39 @@ double tr_getRatio(uint64_t numerator, uint64_t denominator)
     return ratio;
 }
 
-void tr_binary_to_hex(void const* input, char* output, size_t byte_length)
+void tr_binary_to_hex(void const* vinput, void* voutput, size_t byte_length)
 {
     static char const hex[] = "0123456789abcdef";
-    uint8_t const* input_octets = input;
+
+    uint8_t const* input = vinput;
+    char* output = voutput;
 
     /* go from back to front to allow for in-place conversion */
-    input_octets += byte_length;
+    input += byte_length;
     output += byte_length * 2;
 
     *output = '\0';
 
     while (byte_length-- > 0)
     {
-        unsigned int const val = *(--input_octets);
+        unsigned int const val = *(--input);
         *(--output) = hex[val & 0xf];
         *(--output) = hex[val >> 4];
     }
 }
 
-void tr_hex_to_binary(char const* input, void* output, size_t byte_length)
+void tr_hex_to_binary(void const* vinput, void* voutput, size_t byte_length)
 {
     static char const hex[] = "0123456789abcdef";
-    uint8_t* output_octets = output;
+
+    uint8_t const* input = (uint8_t const*)vinput;
+    uint8_t* output = voutput;
 
     for (size_t i = 0; i < byte_length; ++i)
     {
         int const hi = strchr(hex, tolower(*input++)) - hex;
         int const lo = strchr(hex, tolower(*input++)) - hex;
-        *output_octets++ = (uint8_t)((hi << 4) | lo);
+        *output++ = (uint8_t)((hi << 4) | lo);
     }
 }
 
@@ -989,7 +1024,7 @@ bool tr_urlParse(char const* url, size_t url_len, char** setme_scheme, char** se
 ****
 ***/
 
-void tr_removeElementFromArray(void* array, unsigned int index_to_remove, size_t sizeof_element, size_t nmemb)
+void tr_removeElementFromArray(void* array, size_t index_to_remove, size_t sizeof_element, size_t nmemb)
 {
     char* a = array;
 
@@ -1625,8 +1660,7 @@ double tr_truncd(double x, int precision)
 {
     char* pt;
     char buf[128];
-    int const max_precision = (int)log10(1.0 / DBL_EPSILON) - 1;
-    tr_snprintf(buf, sizeof(buf), "%.*f", max_precision, x);
+    tr_snprintf(buf, sizeof(buf), "%.*f", DBL_DIG, x);
 
     if ((pt = strstr(buf, localeconv()->decimal_point)) != NULL)
     {

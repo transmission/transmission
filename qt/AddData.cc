@@ -6,11 +6,11 @@
  *
  */
 
-#include <QFile>
 #include <QDir>
+#include <QFile>
 
-#include <libtransmission/transmission.h>
 #include <libtransmission/crypto-utils.h> // tr_base64_encode()
+#include <libtransmission/transmission.h>
 
 #include "AddData.h"
 #include "Utils.h"
@@ -39,7 +39,7 @@ int AddData::set(QString const& key)
     }
     else if (Utils::isHexHashcode(key))
     {
-        magnet = QString::fromUtf8("magnet:?xt=urn:btih:") + key;
+        magnet = QStringLiteral("magnet:?xt=urn:btih:") + key;
         type = MAGNET;
     }
     else
@@ -100,7 +100,7 @@ QString AddData::readableName() const
             tr_info inf;
             tr_ctor* ctor = tr_ctorNew(nullptr);
 
-            tr_ctorSetMetainfo(ctor, reinterpret_cast<quint8 const*>(metainfo.constData()), metainfo.size());
+            tr_ctorSetMetainfo(ctor, metainfo.constData(), metainfo.size());
 
             if (tr_torrentParse(ctor, &inf) == TR_PARSE_OK)
             {

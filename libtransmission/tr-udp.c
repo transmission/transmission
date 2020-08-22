@@ -32,6 +32,7 @@ THE SOFTWARE.
 
 #include <event2/event.h>
 
+#include <stdint.h>
 #include <libutp/utp.h>
 
 #include "transmission.h"
@@ -238,8 +239,10 @@ fail:
     }
 }
 
-static void event_callback(evutil_socket_t s, short type UNUSED, void* sv)
+static void event_callback(evutil_socket_t s, short type, void* sv)
 {
+    TR_UNUSED(type);
+
     TR_ASSERT(tr_isSession(sv));
     TR_ASSERT(type == EV_READ);
 

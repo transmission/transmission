@@ -31,7 +31,7 @@
 
 #include <event2/buffer.h>
 
-#define __LIBTRANSMISSION_VARIANT_MODULE__
+#define LIBTRANSMISSION_VARIANT_MODULE
 
 #include "transmission.h"
 #include "ConvertUTF.h"
@@ -758,7 +758,7 @@ static int compareKeyIndex(void const* va, void const* vb)
 struct SaveNode
 {
     tr_variant const* v;
-    tr_variant sorted;
+    tr_variant* sorted;
     size_t childIndex;
     bool isVisited;
 };
@@ -783,30 +783,36 @@ static void nodeConstruct(struct SaveNode* node, tr_variant const* v, bool sort_
 
         qsort(tmp, n, sizeof(struct KeyIndex), compareKeyIndex);
 
-        tr_variantInitDict(&node->sorted, n);
+        node->sorted = tr_new(tr_variant, 1);
+        tr_variantInitDict(node->sorted, n);
 
         for (size_t i = 0; i < n; ++i)
         {
-            node->sorted.val.l.vals[i] = *tmp[i].val;
+            node->sorted->val.l.vals[i] = *tmp[i].val;
         }
 
-        node->sorted.val.l.count = n;
+        node->sorted->val.l.count = n;
 
         tr_free(tmp);
 
-        node->v = &node->sorted;
+        v = node->sorted;
     }
     else
     {
-        node->v = v;
+        node->sorted = NULL;
     }
+
+    node->v = v;
 }
 
 static void nodeDestruct(struct SaveNode* node)
 {
-    if (node->v == &node->sorted)
+    TR_ASSERT(node != NULL);
+
+    if (node->sorted != NULL)
     {
-        tr_free(node->sorted.val.l.vals);
+        tr_free(node->sorted->val.l.vals);
+        tr_free(node->sorted);
     }
 }
 
@@ -815,13 +821,13 @@ static void nodeDestruct(struct SaveNode* node)
  * easier to read, but was vulnerable to a smash-stacking
  * attack via maliciously-crafted data. (#667)
  */
-void tr_variantWalk(tr_variant const* v, struct VariantWalkFuncs const* walkFuncs, void* user_data, bool sort_dicts)
+void tr_variantWalk(tr_variant const* v_in, struct VariantWalkFuncs const* walkFuncs, void* user_data, bool sort_dicts)
 {
     int stackSize = 0;
     int stackAlloc = 64;
     struct SaveNode* stack = tr_new(struct SaveNode, stackAlloc);
 
-    nodeConstruct(&stack[stackSize++], v, sort_dicts);
+    nodeConstruct(&stack[stackSize++], v_in, sort_dicts);
 
     while (stackSize > 0)
     {
@@ -930,17 +936,23 @@ void tr_variantWalk(tr_variant const* v, struct VariantWalkFuncs const* walkFunc
 *****
 ****/
 
-static void freeDummyFunc(tr_variant const* v UNUSED, void* buf UNUSED)
+static void freeDummyFunc(tr_variant const* v, void* buf)
 {
+    TR_UNUSED(v);
+    TR_UNUSED(buf);
 }
 
-static void freeStringFunc(tr_variant const* v, void* unused UNUSED)
+static void freeStringFunc(tr_variant const* v, void* user_data)
 {
+    TR_UNUSED(user_data);
+
     tr_variant_string_clear(&((tr_variant*)v)->val.s);
 }
 
-static void freeContainerEndFunc(tr_variant const* v, void* unused UNUSED)
+static void freeContainerEndFunc(tr_variant const* v, void* user_data)
 {
+    TR_UNUSED(user_data);
+
     tr_free(v->val.l.vals);
 }
 

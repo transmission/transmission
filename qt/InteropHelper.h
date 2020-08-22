@@ -15,9 +15,7 @@
 #include "DBusInteropHelper.h"
 #endif
 
-class QAxObject;
 class QString;
-class QVariant;
 
 class InteropHelper
 {
@@ -31,9 +29,9 @@ public:
 
 private:
 #ifdef ENABLE_DBUS_INTEROP
-    DBusInteropHelper myDbusClient;
+    DBusInteropHelper dbus_client_ = {};
 #endif
 #ifdef ENABLE_COM_INTEROP
-    ComInteropHelper myComClient;
+    ComInteropHelper com_client_ = {};
 #endif
 };

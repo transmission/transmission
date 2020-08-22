@@ -216,7 +216,8 @@ static void getShortStatusString(GString* gstr, tr_torrent const* tor, tr_stat c
             tr_strlratio(ratioStr, st->ratio, sizeof(ratioStr));
             getShortTransferString(tor, st, uploadSpeed_KBps, downloadSpeed_KBps, speedStr, sizeof(speedStr));
             /* download/upload speed, ratio */
-            g_string_append_printf(gstr, "%1$s  Ratio: %2$s", speedStr, ratioStr);
+            g_string_append_printf(gstr, "%s  ", speedStr);
+            g_string_append_printf(gstr, _("Ratio: %s"), ratioStr);
             break;
         }
 
@@ -569,9 +570,10 @@ static void gtr_cell_renderer_render(GtkCellRenderer* renderer, GtrDrawable* dra
 }
 
 static void render_compact(TorrentCellRenderer* cell, GtrDrawable* window, GtkWidget* widget,
-    GdkRectangle const* background_area, GdkRectangle const* cell_area UNUSED,
-    GtkCellRendererState flags)
+    GdkRectangle const* background_area, GdkRectangle const* cell_area, GtkCellRendererState flags)
 {
+    TR_UNUSED(cell_area);
+
     int xpad;
     int ypad;
     GtkRequisition size;
@@ -645,8 +647,10 @@ static void render_compact(TorrentCellRenderer* cell, GtrDrawable* window, GtkWi
 }
 
 static void render_full(TorrentCellRenderer* cell, GtrDrawable* window, GtkWidget* widget, GdkRectangle const* background_area,
-    GdkRectangle const* cell_area UNUSED, GtkCellRendererState flags)
+    GdkRectangle const* cell_area, GtkCellRendererState flags)
 {
+    TR_UNUSED(cell_area);
+
     int xpad;
     int ypad;
     GtkRequisition size;

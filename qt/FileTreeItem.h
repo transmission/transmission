@@ -17,10 +17,12 @@
 #include <QString>
 #include <QVariant>
 
+#include "Macros.h"
+
 class FileTreeItem
 {
     Q_DECLARE_TR_FUNCTIONS(FileTreeItem)
-    Q_DISABLE_COPY(FileTreeItem)
+    TR_DISABLE_COPY_MOVE(FileTreeItem)
 
 public:
 /* *INDENT-OFF* */
@@ -33,64 +35,58 @@ public:
 /* *INDENT-ON* */
 
 public:
-    FileTreeItem(QString const& name = QString(), int fileIndex = -1, uint64_t size = 0) :
-        myName(name),
-        myFileIndex(fileIndex),
-        myTotalSize(size),
-        myParent(nullptr),
-        myPriority(0),
-        myIsWanted(false),
-        myHaveSize(0),
-        myFirstUnhashedRow(0)
+    FileTreeItem(QString const& name = QString(), int file_index = -1, uint64_t size = 0) :
+        name_(name),
+        total_size_(size),
+        file_index_(file_index)
     {
     }
 
     ~FileTreeItem();
 
-public:
     void appendChild(FileTreeItem* child);
     FileTreeItem* child(QString const& filename);
 
     FileTreeItem* child(int row)
     {
-        return myChildren.at(row);
+        return children_.at(row);
     }
 
     int childCount() const
     {
-        return myChildren.size();
+        return children_.size();
     }
 
     FileTreeItem* parent()
     {
-        return myParent;
+        return parent_;
     }
 
     FileTreeItem const* parent() const
     {
-        return myParent;
+        return parent_;
     }
 
     int row() const;
 
     QString const& name() const
     {
-        return myName;
+        return name_;
     }
 
     QVariant data(int column, int role) const;
-    std::pair<int, int> update(QString const& name, bool want, int priority, uint64_t have, bool updateFields);
-    void setSubtreeWanted(bool, QSet<int>& fileIds);
-    void setSubtreePriority(int priority, QSet<int>& fileIds);
+    std::pair<int, int> update(QString const& name, bool want, int priority, uint64_t have, bool update_fields);
+    void setSubtreeWanted(bool, QSet<int>& file_ids);
+    void setSubtreePriority(int priority, QSet<int>& file_ids);
 
     int fileIndex() const
     {
-        return myFileIndex;
+        return file_index_;
     }
 
     uint64_t totalSize() const
     {
-        return myTotalSize;
+        return total_size_;
     }
 
     QString path() const;
@@ -106,16 +102,14 @@ private:
     uint64_t size() const;
     QHash<QString, int> const& getMyChildRows();
 
-private:
-    QString myName;
-    int const myFileIndex;
-    uint64_t const myTotalSize;
-
-    FileTreeItem* myParent;
-    QList<FileTreeItem*> myChildren;
-    QHash<QString, int> myChildRows;
-    int myPriority;
-    bool myIsWanted;
-    uint64_t myHaveSize;
-    size_t myFirstUnhashedRow;
+    FileTreeItem* parent_ = {};
+    QHash<QString, int> child_rows_;
+    QList<FileTreeItem*> children_;
+    QString name_;
+    uint64_t const total_size_ = {};
+    uint64_t have_size_ = {};
+    size_t first_unhashed_row_ = {};
+    int const file_index_ = {};
+    int priority_ = {};
+    bool is_wanted_ = {};
 };

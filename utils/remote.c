@@ -16,7 +16,6 @@
 #include <event2/buffer.h>
 #include <event2/util.h>
 
-#define CURL_DISABLE_TYPECHECK /* otherwise -Wunreachable-code goes insane */
 #include <curl/curl.h>
 
 #include <libtransmission/transmission.h>
@@ -32,27 +31,24 @@
 
 #define MY_NAME "transmission-remote"
 #define DEFAULT_HOST "localhost"
-#define DEFAULT_PORT atoi(TR_DEFAULT_RPC_PORT_STR)
+#define DEFAULT_PORT TR_DEFAULT_RPC_PORT
 #define DEFAULT_URL TR_DEFAULT_RPC_URL_STR "rpc/"
 
 #define ARGUMENTS TR_KEY_arguments
 
 #define MEM_K 1024
-#define MEM_B_STR "B"
 #define MEM_K_STR "KiB"
 #define MEM_M_STR "MiB"
 #define MEM_G_STR "GiB"
 #define MEM_T_STR "TiB"
 
 #define DISK_K 1000
-#define DISK_B_STR "B"
 #define DISK_K_STR "kB"
 #define DISK_M_STR "MB"
 #define DISK_G_STR "GB"
 #define DISK_T_STR "TB"
 
 #define SPEED_K 1000
-#define SPEED_B_STR "B/s"
 #define SPEED_K_STR "kB/s"
 #define SPEED_M_STR "MB/s"
 #define SPEED_G_STR "GB/s"
@@ -787,8 +783,10 @@ static size_t writeFunc(void* ptr, size_t size, size_t nmemb, void* buf)
 }
 
 /* look for a session id in the header in case the server gives back a 409 */
-static size_t parseResponseHeader(void* ptr, size_t size, size_t nmemb, void* stream UNUSED)
+static size_t parseResponseHeader(void* ptr, size_t size, size_t nmemb, void* stream)
 {
+    TR_UNUSED(stream);
+
     char const* line = ptr;
     size_t const line_len = size * nmemb;
     char const* key = TR_RPC_SESSION_ID_HEADER ": ";
@@ -968,12 +966,11 @@ static void printDetails(tr_variant* top)
 
             if (tr_variantDictFindList(t, TR_KEY_labels, &l))
             {
-                int const n = tr_variantListSize(l);
-                char const* str;
-                printf("  Labels: ");
-                for (int i = 0; i < n; i++)
+                size_t child_pos = 0;
+                tr_variant* child;
+                while ((child = tr_variantListChild(l, child_pos++)))
                 {
-                    if (tr_variantGetStr(tr_variantListChild(l, i), &str, NULL))
+                    if (tr_variantGetStr(child, &str, NULL))
                     {
                         printf(i == 0 ? "%s" : ", %s", str);
                     }
@@ -1707,11 +1704,13 @@ static void printTrackers(tr_variant* top)
 static void printSession(tr_variant* top)
 {
     tr_variant* args;
+    char buf[128];
+    char buf2[128];
+    char buf3[128];
 
     if (tr_variantDictFindDict(top, TR_KEY_arguments, &args))
     {
         int64_t i;
-        char buf[64];
         bool boolVal;
         char const* str;
 
@@ -1819,10 +1818,6 @@ static void printSession(tr_variant* top)
                 tr_variantDictFindReal(args, TR_KEY_seedRatioLimit, &seedRatioLimit) &&
                 tr_variantDictFindBool(args, TR_KEY_seedRatioLimited, &seedRatioLimited))
             {
-                char buf[128];
-                char buf2[128];
-                char buf3[128];
-
                 printf("LIMITS\n");
                 printf("  Peer limit: %" PRId64 "\n", peerLimit);
 

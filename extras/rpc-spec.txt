@@ -807,8 +807,8 @@
          |         | yes       | session-get          | new arg "session-id"
          |         | yes       | torrent-get          | new arg "labels"
          |         | yes       | torrent-set          | new arg "labels"
-         |         | yes       | torrent-set          | new arg "editDate"
-         |         | yes       | torrent-get          | new arg "format"
+         |         | yes       | torrent-get          | new arg "editDate"
+         |         | yes       | torrent-get          | new request arg "format"
 
 
 5.1.  Upcoming Breakage

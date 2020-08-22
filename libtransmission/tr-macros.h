@@ -55,13 +55,7 @@
 ****
 ***/
 
-#ifndef UNUSED
-#if __has_attribute(__unused__) || TR_GNUC_CHECK_VERSION(2, 7)
-#define UNUSED __attribute__((__unused__))
-#else
-#define UNUSED
-#endif
-#endif
+#define TR_UNUSED(x) (void)(x)
 
 /***
 ****
@@ -139,15 +133,12 @@
  * @def TR_STATIC_ASSERT
  * @brief This helper allows to perform static checks at compile time
  */
-#if defined(static_assert)
+#if defined(__cplusplus) || defined(static_assert)
 #define TR_STATIC_ASSERT static_assert
-#elif __has_feature(c_static_assert) || __has_extension(c_static_assert)
+#elif __has_feature(c_static_assert) || __has_extension(c_static_assert) || TR_GNUC_CHECK_VERSION(4, 6)
 #define TR_STATIC_ASSERT _Static_assert
 #else
-#define TR_STATIC_ASSERT(x, msg) \
-    { \
-        typedef char __tr_static_check__ [(x) ? 1 : -1] UNUSED; \
-    }
+#define TR_STATIC_ASSERT(x, msg) (void)(x)
 #endif
 
 /* Sometimes the system defines MAX/MIN, sometimes not.
@@ -173,3 +164,12 @@
 #define TR_INET6_ADDRSTRLEN 46
 
 #define TR_BAD_SIZE ((size_t)-1)
+
+/* Guard C code in headers, while including them from C++ */
+#ifdef  __cplusplus
+#define TR_BEGIN_DECLS  extern "C" {
+#define TR_END_DECLS    }
+#else
+#define TR_BEGIN_DECLS
+#define TR_END_DECLS
+#endif

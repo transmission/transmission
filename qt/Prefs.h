@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include <array>
+
 #include <QObject>
 #include <QSet>
 #include <QString>
@@ -16,6 +18,7 @@
 #include <libtransmission/quark.h>
 
 #include "Filters.h"
+#include "Macros.h"
 
 class QDateTime;
 
@@ -27,6 +30,7 @@ struct tr_variant;
 class Prefs : public QObject
 {
     Q_OBJECT
+    TR_DISABLE_COPY_MOVE(Prefs)
 
 public:
     enum
@@ -129,7 +133,7 @@ public:
     };
 
 public:
-    Prefs(QString const& configDir);
+    Prefs(QString config_dir);
     virtual ~Prefs();
 
     bool isCore(int key) const
@@ -142,24 +146,19 @@ public:
         return !isCore(key);
     }
 
-    char const* keyStr(int i) const
-    {
-        return tr_quark_get_string(myItems[i].key, nullptr);
-    }
-
     tr_quark getKey(int i) const
     {
-        return myItems[i].key;
+        return Items[i].key;
     }
 
     int type(int i) const
     {
-        return myItems[i].type;
+        return Items[i].type;
     }
 
     QVariant const& variant(int i) const
     {
-        return myValues[i];
+        return values_[i];
     }
 
     int getInt(int key) const;
@@ -171,13 +170,13 @@ public:
     template<typename T>
     T get(int key) const
     {
-        return myValues[key].value<T>();
+        return values_[key].value<T>();
     }
 
     template<typename T>
     void set(int key, T const& value)
     {
-        QVariant& v(myValues[key]);
+        QVariant& v(values_[key]);
         QVariant const tmp = QVariant::fromValue(value);
 
         if (v.isNull() || v != tmp)
@@ -200,17 +199,16 @@ private:
         int type;
     };
 
-private:
     void initDefaults(tr_variant*);
 
-    // Intentionally not implemented
-    void set(int key, char const* value);
+    void set(int key, char const* value) = delete;
 
-private:
-    QString const myConfigDir;
+    QString const config_dir_;
+    std::array<std::pair<int, QString>, FilterMode::NUM_MODES> const FilterModes;
+    std::array<std::pair<int, QString>, SortMode::NUM_MODES> const SortModes;
 
-    QSet<int> myTemporaryPrefs;
-    QVariant mutable myValues[PREFS_COUNT];
+    QSet<int> temporary_prefs_;
+    QVariant mutable values_[PREFS_COUNT];
 
-    static PrefItem myItems[];
+    static std::array<PrefItem, PREFS_COUNT> const Items;
 };

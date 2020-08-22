@@ -14,11 +14,6 @@
 
 #pragma once
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
 /***
 ****
 ****  Basic Types
@@ -31,6 +26,8 @@ extern "C"
 #include <time.h> /* time_t */
 
 #include "tr-macros.h"
+
+TR_BEGIN_DECLS
 
 typedef uint32_t tr_file_index_t;
 typedef uint32_t tr_piece_index_t;
@@ -113,6 +110,7 @@ char const* tr_getDefaultDownloadDir(void);
 #define TR_DEFAULT_RPC_WHITELIST "127.0.0.1,::1"
 #define TR_DEFAULT_RPC_HOST_WHITELIST ""
 #define TR_DEFAULT_RPC_PORT_STR "9091"
+#define TR_DEFAULT_RPC_PORT 9091
 #define TR_DEFAULT_RPC_URL_STR "/transmission/"
 #define TR_DEFAULT_PEER_PORT_STR "51413"
 #define TR_DEFAULT_PEER_SOCKET_TOS_STR "default"
@@ -566,7 +564,6 @@ tr_sched_day tr_sessionGetAltSpeedDay(tr_session const*);
 
 typedef void (* tr_altSpeedFunc)(tr_session*, bool active, bool userDriven, void*);
 
-void tr_sessionClearAltSpeedFunc(tr_session*);
 void tr_sessionSetAltSpeedFunc(tr_session*, tr_altSpeedFunc, void*);
 
 bool tr_sessionGetActiveSpeedLimit_KBps(tr_session const* session, tr_direction dir, double* setme);
@@ -721,6 +718,7 @@ void tr_sessionSetTorrentDoneScript(tr_session*, char const* scriptFilename);
 
 typedef enum
 {
+    TR_LOG_SILENT = 0,
     TR_LOG_ERROR = 1,
     TR_LOG_INFO = 2,
     TR_LOG_DEBUG = 3,
@@ -854,7 +852,7 @@ void tr_ctorSetDeleteSource(tr_ctor* ctor, bool doDelete);
 int tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, char const* magnet);
 
 /** @brief Set the constructor's metainfo from a raw benc already in memory */
-int tr_ctorSetMetainfo(tr_ctor* ctor, uint8_t const* metainfo, size_t len);
+int tr_ctorSetMetainfo(tr_ctor* ctor, void const* metainfo, size_t len);
 
 /** @brief Set the constructor's metainfo from a local .torrent file */
 int tr_ctorSetMetainfoFromFile(tr_ctor* ctor, char const* filename);
@@ -1888,6 +1886,4 @@ static inline bool tr_isDirection(tr_direction d)
     return d == TR_UP || d == TR_DOWN;
 }
 
-#ifdef __cplusplus
-}
-#endif
+TR_END_DECLS

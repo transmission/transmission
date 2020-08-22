@@ -13,7 +13,7 @@
 #include <event2/buffer.h>
 #include <event2/http.h> /* for HTTP_OK */
 
-#define __LIBTRANSMISSION_ANNOUNCER_MODULE__
+#define LIBTRANSMISSION_ANNOUNCER_MODULE
 
 #include "transmission.h"
 #include "announcer-common.h"
@@ -396,8 +396,6 @@ static void on_scrape_done(tr_session* session, bool did_connect, bool did_timeo
         int64_t intVal;
         tr_variant* files;
         tr_variant* flags;
-        size_t len;
-        char const* str;
         bool const variant_loaded = tr_variantFromBenc(&top, msg, msglen) == 0;
 
         if (tr_env_key_exists("TR_CURL_VERBOSE"))
@@ -424,6 +422,8 @@ static void on_scrape_done(tr_session* session, bool did_connect, bool did_timeo
 
         if (variant_loaded)
         {
+            size_t len;
+            char const* str;
             if (tr_variantDictFindStr(&top, TR_KEY_failure_reason, &str, &len))
             {
                 response->errmsg = tr_strndup(str, len);

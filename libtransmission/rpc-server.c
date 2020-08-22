@@ -376,8 +376,11 @@ static void add_time_header(struct evkeyvalq* headers, char const* key, time_t v
     evhttp_add_header(headers, key, buf);
 }
 
-static void evbuffer_ref_cleanup_tr_free(void const* data UNUSED, size_t datalen UNUSED, void* extra)
+static void evbuffer_ref_cleanup_tr_free(void const* data, size_t datalen, void* extra)
 {
+    TR_UNUSED(data);
+    TR_UNUSED(datalen);
+
     tr_free(extra);
 }
 
@@ -476,8 +479,10 @@ struct rpc_response_data
     struct tr_rpc_server* server;
 };
 
-static void rpc_response_func(tr_session* session UNUSED, tr_variant* response, void* user_data)
+static void rpc_response_func(tr_session* session, tr_variant* response, void* user_data)
 {
+    TR_UNUSED(session);
+
     struct rpc_response_data* data = user_data;
     struct evbuffer* response_buf = tr_variantToBuf(response, TR_VARIANT_FMT_JSON_LEAN);
     struct evbuffer* buf = evbuffer_new();
@@ -764,8 +769,11 @@ enum
 
 static void startServer(void* vserver);
 
-static void rpc_server_on_start_retry(evutil_socket_t fd UNUSED, short type UNUSED, void* context)
+static void rpc_server_on_start_retry(evutil_socket_t fd, short type, void* context)
 {
+    TR_UNUSED(fd);
+    TR_UNUSED(type);
+
     startServer(context);
 }
 
