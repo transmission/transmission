@@ -730,7 +730,7 @@
 "Priority Not Available" = "Priorité non disponible";
 
 /* Inspector -> private torrent */
-"Private Torrent, non-tracker peer discovery disabled" = "Torrent privé, utilisation des pairs du traqueur uniquement\n";
+"Private Torrent, non-tracker peer discovery disabled" = "Torrent privé, utilisation des pairs du traqueur uniquement";
 
 /* Message window -> table column */
 "Process" = "Processus";
