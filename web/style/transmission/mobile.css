@@ -194,7 +194,17 @@ ul.torrent_list {
       ul.torrent_list li.torrent div.torrent_name.paused {
         font-weight: normal;
         color: #777; }
+    ul.torrent_list li.torrent div.torrent_labels {
+      line-height: 1.3em;
+      display: inline-block;
+      margin-left: 10px;
+      margin-top: 2px;
+      margin-bottom: 2px;
+      overflow: hidden; }
+    ul.torrent_list li.torrent div.torrent_labels.compact {
+        line-height: 1.0em; }
     ul.torrent_list li.torrent div.torrent_progress_details,
+    /* TODO: */
     ul.torrent_list li.torrent div.torrent_peer_details {
       clear: left;
       overflow: hidden;

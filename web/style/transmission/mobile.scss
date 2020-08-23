@@ -1,10 +1,10 @@
 @mixin verticalGradient($topColor, $bottomColor) {
 	background-color: mix($topColor, $bottomColor);
-	background-image: -webkit-gradient(linear, left top, left bottom, from($topColor), to($bottomColor)); 
-	background-image: -webkit-linear-gradient(top, $topColor, $bottomColor); 
-	background-image:    -moz-linear-gradient(top, $topColor, $bottomColor); 
-	background-image:     -ms-linear-gradient(top, $topColor, $bottomColor); 
-	background-image:      -o-linear-gradient(top, $topColor, $bottomColor); 
+	background-image: -webkit-gradient(linear, left top, left bottom, from($topColor), to($bottomColor));
+	background-image: -webkit-linear-gradient(top, $topColor, $bottomColor);
+	background-image:    -moz-linear-gradient(top, $topColor, $bottomColor);
+	background-image:     -ms-linear-gradient(top, $topColor, $bottomColor);
+	background-image:      -o-linear-gradient(top, $topColor, $bottomColor);
 	background-image:         linear-gradient(top, $topColor, $bottomColor);
 }
 
@@ -282,6 +282,19 @@ ul.torrent_list
 
 			&.compact { font-size: 1.0em; font-weight: normal; }
 			&.paused { font-weight: normal; color: #777; }
+		}
+
+		div.torrent_labels {
+			line-height: 1.3em;
+			display: inline-block;
+			margin-left: 10px;
+			margin-top: 2px;
+			margin-bottom: 2px;
+			overflow: hidden;
+
+			&.compact {
+				line-height: 1.0em;
+			}
 		}
 
 		div.torrent_progress_details,
@@ -570,7 +583,7 @@ div#torrent_inspector
 
 	div.inspector_torrent_file_list_entry_name {
 		font-size: 1.2em;
-		color: black; 
+		color: black;
 		display: inline;
 		margin-left: 0px;
 	}

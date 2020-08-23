@@ -125,6 +125,19 @@ TransmissionRemote.prototype = {
         this.sendRequest(o, callback, context);
     },
 
+    setLabels: function (torrentIds, labels) {
+        var remote = this;
+        var args = {
+            ids: torrentIds,
+            labels: labels
+        };
+        this.sendRequest({arguments: args, method: 'torrent-set'},
+                         function () {
+                             var fields = ['id'].concat(Torrent.Fields.Stats);
+                             remote._controller.updateTorrents(torrentIds, fields);
+                         });
+    },
+
     loadDaemonStats: function (callback, context, async) {
         var o = {
             method: 'session-stats'

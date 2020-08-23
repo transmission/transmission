@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-		<meta http-equiv="X-UA-Compatible" content="IE=8,IE=9,IE=10"><!-- ticket #4555 --> 
+		<meta http-equiv="X-UA-Compatible" content="IE=8,IE=9,IE=10"><!-- ticket #4555 -->
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
 		<meta name="apple-mobile-web-app-capable" content="yes" />
 		<link href="./images/favicon.ico" rel="icon" />
@@ -221,6 +221,7 @@
 					<div class="row"><div class="key">Privacy:</div><div class="value" id="inspector-info-privacy">&nbsp;</div></div>
 					<div class="row"><div class="key">Origin:</div><div class="value" id="inspector-info-origin">&nbsp;</div></div>
 					<div class="row"><div class="key">Comment:</div><div class="value" id="inspector-info-comment">&nbsp;</div></div>
+					<div class="row"><div class="key">Labels:</div><div class="value" id="inspector-info-labels">&nbsp;</div></div>
 				</div>
 			</div><!-- id="inspector_tab_info_container" -->
 
@@ -403,6 +404,20 @@
             </div>
         </div>
 
+        <div class="dialog_container ui-helper-hidden" id="set_labels_container">
+            <div class="dialog_top_bar"></div>
+            <div class="dialog_window">
+                <div class="dialog_logo"></div>
+                <h2 class="dialog_heading">Set torrent labels</h2>
+                <div class="dialog_message">
+                    <label for="torrent_labels">Labels:</label>
+                    <input type="text" id="torrent_labels"/>
+                </div>
+                <a href="#rename" id="set_labels_confirm_button">Save</a>
+                <a href="#cancel" id="set_labels_cancel_button">Cancel</a>
+            </div>
+        </div>
+
 		<div class="dialog_container ui-helper-hidden" id="move_container">
 			<div class="dialog_top_bar"></div>
 			<div class="dialog_window">
@@ -512,6 +527,7 @@
 			<li data-command="verify">Verify Local Data</li>
 			<li data-command="move">Set Location…</li>
 			<li data-command="rename">Rename…</li>
+			<li data-command="set_labels">Set Labels…</li>
 			<li>---</li>
 			<li data-command="reannounce">Ask tracker for more peers</li>
 			<li>---</li>

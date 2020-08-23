@@ -131,7 +131,7 @@ div#toolbar {
     margin-left: 5px; }
     #statusbar #filter input#torrent_search {
       height: 18px;
-      width: 100px;
+      width: 160px;
       border-radius: 6px; }
       #statusbar #filter input#torrent_search.blur {
         color: #999; }
@@ -232,6 +232,7 @@ ul.torrent_list {
     ul.torrent_list li.torrent div.torrent_name {
       font-size: 1.3em;
       font-weight: bold;
+      display: inline-block;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -244,6 +245,15 @@ ul.torrent_list {
       ul.torrent_list li.torrent div.torrent_name.paused {
         font-weight: normal;
         color: #777; }
+    ul.torrent_list li.torrent div.torrent_labels {
+      line-height: 1.3em;
+      display: inline-block;
+      margin-left: 10px;
+      margin-top: 2px;
+      margin-bottom: 2px;
+      overflow: hidden; }
+    ul.torrent_list li.torrent div.torrent_labels.compact {
+        line-height: 1.0em; }
     ul.torrent_list li.torrent div.torrent_progress_details,
     ul.torrent_list li.torrent div.torrent_peer_details {
       clear: left;

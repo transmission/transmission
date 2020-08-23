@@ -53,6 +53,9 @@ Transmission.prototype = {
         $('#rename_confirm_button').click($.proxy(this.confirmRenameClicked, this));
         $('#rename_cancel_button').click($.proxy(this.hideRenameDialog, this));
 
+        $('#set_labels_confirm_button').click($.proxy(this.confirmSetLabelsClicked, this));
+        $('#set_labels_cancel_button').click($.proxy(this.hideSetLabelsDialog, this));
+
         $('#move_confirm_button').click($.proxy(this.confirmMoveClicked, this));
         $('#move_cancel_button').click($.proxy(this.hideMoveDialog, this));
 
@@ -165,7 +168,7 @@ Transmission.prototype = {
                 if (this.value === '') {
                     $(this).addClass('blur');
                     this.value = 'Filter';
-                    tr.setFilterText(null);
+                    tr.setFilterText('');
                 };
             }).bind('focus', function () {
                 if ($(this).is('.blur')) {
@@ -205,6 +208,9 @@ Transmission.prototype = {
             },
             rename: function () {
                 tr.renameSelectedTorrents();
+            },
+            set_labels: function () {
+                tr.setLabels();
             },
             reannounce: function () {
                 tr.reannounceSelectedTorrents();
@@ -504,6 +510,12 @@ Transmission.prototype = {
                 this.confirmRenameClicked();
                 handled = true;
             }
+
+            // handle set labels dialog
+            if ($('#set_labels_container').is(':visible')) {
+                this.confirmSetLabelsClicked();
+                handled = true;
+            }
         }
 
         if (esc_key) {
@@ -528,6 +540,12 @@ Transmission.prototype = {
             // handle rename dialog
             if ($('#rename_container').is(':visible')) {
                 this.hideRenameDialog();
+                handled = true;
+            }
+
+            // handle set labels dialog
+            if ($('#set_labels_container').is(':visible')) {
+                this.hideSetLabelsDialog();
                 handled = true;
             }
         }
@@ -765,6 +783,27 @@ Transmission.prototype = {
         this.hideRenameDialog();
     },
 
+    hideSetLabelsDialog: function () {
+        $('body.open_showing').removeClass('open_showing');
+        $('#set_labels_container').hide();
+    },
+
+    confirmSetLabelsClicked: function () {
+        var torrents = this.getSelectedTorrents()
+            .map(function (t) {
+                return t.getId();
+            });
+        var labels = $('#set_labels_container input#torrent_labels')
+            .attr('value')
+            .split(/ *, */)
+            .filter(function (l) {
+                return l.length > 0;
+            });
+
+        this.remote.setLabels(torrents, labels);
+        this.hideSetLabelsDialog();
+    },
+
     removeClicked: function (ev) {
         if (this.isButtonEnabled(ev)) {
             this.removeSelectedTorrents();
@@ -821,7 +860,7 @@ Transmission.prototype = {
     },
 
     setFilterText: function (search) {
-        this.filterText = search ? search.trim() : null;
+        this.filterText = search ? search.trim() : '';
         this.refilter(true);
     },
 
@@ -1258,6 +1297,16 @@ Transmission.prototype = {
         };
     },
 
+    setLabels: function () {
+        var torrents = this.getSelectedTorrents();
+        var torrent = torrents[0];
+
+        $('body').addClass('open_showing');
+        $('#set_labels_container input#torrent_labels').attr('value', torrent.getLabels().join(", "));
+        $('#set_labels_container').show();
+        $('#set_labels_container input#torrent_labels').focus();
+    },
+
     onTorrentRenamed: function (response) {
         var torrent;
         if ((response.result === 'success') && (response.arguments) && ((torrent = this._torrents[response.arguments.id]))) {
@@ -1587,10 +1636,20 @@ Transmission.prototype = {
         var sort_mode = this[Prefs._SortMethod];
         var sort_direction = this[Prefs._SortDirection];
         var filter_mode = this[Prefs._FilterMode];
-        var filter_text = this.filterText;
         var filter_tracker = this.filterTracker;
         var renderer = this.torrentRenderer;
         var list = this.elements.torrent_list;
+
+        var filter_text;
+        var labels;
+        var m = /^labels:([\w,]*)(.*)$/.exec(this.filterText);
+        if (m) {
+            filter_text = m[2].trim();
+            labels = m[1].split(",");
+        } else {
+            filter_text = this.filterText;
+            labels = [];
+        }
 
         old_sel_count = $(list).children('.selected').length;
 
@@ -1631,7 +1690,7 @@ Transmission.prototype = {
         for (i = 0; row = dirty_rows[i]; ++i) {
             id = row.getTorrentId();
             t = this._torrents[id];
-            if (t && t.test(filter_mode, filter_text, filter_tracker)) {
+            if (t && t.test(filter_mode, filter_tracker, filter_text, labels)) {
                 tmp.push(row);
             };
             delete this.dirtyTorrents[id];
@@ -1642,7 +1701,7 @@ Transmission.prototype = {
         // but don't already have a row
         for (id in this.dirtyTorrents) {
             t = this._torrents[id];
-            if (t && t.test(filter_mode, filter_text, filter_tracker)) {
+            if (t && t.test(filter_mode, filter_tracker, filter_text, labels)) {
                 row = new TorrentRow(renderer, this, t);
                 e = row.getElement();
                 e.row = row;

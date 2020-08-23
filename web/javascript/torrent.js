@@ -59,6 +59,7 @@ Torrent.Fields.Stats = [
     'eta',
     'isFinished',
     'isStalled',
+    'labels',
     'leftUntilDone',
     'metadataPercentComplete',
     'peersConnected',
@@ -262,6 +263,9 @@ Torrent.prototype = {
     getId: function () {
         return this.fields.id;
     },
+    getLabels: function () {
+        return this.fields.labels;
+    },
     getLastActivity: function () {
         return this.fields.activityDate;
     },
@@ -457,18 +461,36 @@ Torrent.prototype = {
     },
 
     /**
-     * @param filter one of Prefs._Filter*
-     * @param search substring to look for, or null
+     * @param state one of Prefs._Filter*
+     * @param tracker tracker name
+     * @param search substring to look for. Empty string matches all.
+     * @param labels array of labels. Empty array matches all.
      * @return true if it passes the test, false if it fails
      */
-    test: function (state, search, tracker) {
+    test: function (state, tracker, search, labels) {
         // flter by state...
         var pass = this.testState(state);
 
         // maybe filter by text...
-        if (pass && search && search.length) {
+        if (pass && search) {
             pass = this.getCollatedName().indexOf(search.toLowerCase()) !== -1;
         };
+
+        // maybe filter by labels...
+        if (pass) {
+            for (var i = 0; i < labels.length; i++) {
+                var l = labels[i];
+                var m = false;
+                for (var j = 0; j < this.getLabels().length; j++) {
+                    if (l == this.getLabels()[j]) {
+                        m = true;
+                        break;
+                    }
+                }
+
+                pass = pass && m;
+            }
+        }
 
         // maybe filter by tracker...
         if (pass && tracker && tracker.length) {
