@@ -1015,7 +1015,7 @@
 
         tr_sessionSetRPCPassword(fHandle, fullPassword);
 
-        fRPCPassword = @(fullPassword);
+        fRPCPassword = [[NSString alloc] initWithUTF8String: fullPassword];
         fRPCPasswordField.stringValue = fRPCPassword;
     }
     else
