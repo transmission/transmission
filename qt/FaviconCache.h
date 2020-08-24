@@ -52,7 +52,6 @@ private slots:
 
 private:
     static Key getKey(QUrl const& url);
-    QString getCacheDir();
     void ensureCacheDirHasBeenScanned();
 
     QNetworkAccessManager* nam_ = {};
