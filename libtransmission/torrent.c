@@ -586,8 +586,10 @@ static void tr_torrentClearError(tr_torrent* tor)
     tor->errorTracker[0] = '\0';
 }
 
-static void onTrackerResponse(tr_torrent* tor, tr_tracker_event const* event, void* unused UNUSED)
+static void onTrackerResponse(tr_torrent* tor, tr_tracker_event const* event, void* user_data)
 {
+    TR_UNUSED(user_data);
+
     switch (event->messageType)
     {
     case TR_TRACKER_PEERS:
@@ -1596,8 +1598,10 @@ tr_file_stat* tr_torrentFiles(tr_torrent const* tor, tr_file_index_t* fileCount)
     return files;
 }
 
-void tr_torrentFilesFree(tr_file_stat* files, tr_file_index_t fileCount UNUSED)
+void tr_torrentFilesFree(tr_file_stat* files, tr_file_index_t fileCount)
 {
+    TR_UNUSED(fileCount);
+
     tr_free(files);
 }
 
@@ -1619,8 +1623,10 @@ tr_peer_stat* tr_torrentPeers(tr_torrent const* tor, int* peerCount)
     return tr_peerMgrPeerStats(tor, peerCount);
 }
 
-void tr_torrentPeersFree(tr_peer_stat* peers, int peerCount UNUSED)
+void tr_torrentPeersFree(tr_peer_stat* peers, int peerCount)
 {
+    TR_UNUSED(peerCount);
+
     tr_free(peers);
 }
 

@@ -77,8 +77,10 @@ static gboolean updateStats(gpointer gdata)
     return G_SOURCE_CONTINUE;
 }
 
-static void dialogDestroyed(gpointer p, GObject* dialog UNUSED)
+static void dialogDestroyed(gpointer p, GObject* dialog)
 {
+    TR_UNUSED(dialog);
+
     g_source_remove(GPOINTER_TO_UINT(p));
 }
 

@@ -39,8 +39,11 @@ static GtkRadioActionEntry sort_radio_entries[] =
     { "sort-by-size", NULL, N_("Sort by Si_ze"), NULL, NULL, 8 }
 };
 
-static void sort_changed_cb(GtkAction* action UNUSED, GtkRadioAction* current, gpointer user_data UNUSED)
+static void sort_changed_cb(GtkAction* action, GtkRadioAction* current, gpointer user_data)
 {
+    TR_UNUSED(action);
+    TR_UNUSED(user_data);
+
     tr_quark const key = TR_KEY_sort_mode;
     int const i = gtk_radio_action_get_current_value(current);
     char const* val = sort_radio_entries[i].name;
@@ -54,8 +57,10 @@ static GtkToggleActionEntry show_toggle_entries[] =
     { "toggle-message-log", NULL, N_("Message _Log"), NULL, NULL, G_CALLBACK(action_cb), FALSE }
 };
 
-static void toggle_pref_cb(GtkToggleAction* action, gpointer user_data UNUSED)
+static void toggle_pref_cb(GtkToggleAction* action, gpointer user_data)
 {
+    TR_UNUSED(user_data);
+
     char const* key = gtk_action_get_name(GTK_ACTION(action));
     gboolean const val = gtk_toggle_action_get_active(action);
 

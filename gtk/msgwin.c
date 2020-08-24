@@ -215,8 +215,10 @@ static void onSaveRequest(GtkWidget* w, gpointer data)
     gtk_widget_show(d);
 }
 
-static void onClearRequest(GtkWidget* w UNUSED, gpointer gdata)
+static void onClearRequest(GtkWidget* w, gpointer gdata)
 {
+    TR_UNUSED(w);
+
     struct MsgData* data = gdata;
 
     gtk_list_store_clear(data->store);
@@ -250,9 +252,11 @@ static char const* getForegroundColor(int msgLevel)
     }
 }
 
-static void renderText(GtkTreeViewColumn* column UNUSED, GtkCellRenderer* renderer, GtkTreeModel* tree_model, GtkTreeIter* iter,
+static void renderText(GtkTreeViewColumn* column, GtkCellRenderer* renderer, GtkTreeModel* tree_model, GtkTreeIter* iter,
     gpointer gcol)
 {
+    TR_UNUSED(column);
+
     int const col = GPOINTER_TO_INT(gcol);
     char* str = NULL;
     struct tr_log_message const* node;
@@ -261,9 +265,12 @@ static void renderText(GtkTreeViewColumn* column UNUSED, GtkCellRenderer* render
     g_object_set(renderer, "text", str, "foreground", getForegroundColor(node->level), "ellipsize", PANGO_ELLIPSIZE_END, NULL);
 }
 
-static void renderTime(GtkTreeViewColumn* column UNUSED, GtkCellRenderer* renderer, GtkTreeModel* tree_model, GtkTreeIter* iter,
-    gpointer data UNUSED)
+static void renderTime(GtkTreeViewColumn* column, GtkCellRenderer* renderer, GtkTreeModel* tree_model, GtkTreeIter* iter,
+    gpointer data)
 {
+    TR_UNUSED(column);
+    TR_UNUSED(data);
+
     struct tm tm;
     char buf[16];
     struct tr_log_message const* node;
@@ -345,8 +352,10 @@ static gboolean isRowVisible(GtkTreeModel* model, GtkTreeIter* iter, gpointer gd
     return node->level <= data->maxLevel;
 }
 
-static void onWindowDestroyed(gpointer gdata, GObject* deadWindow UNUSED)
+static void onWindowDestroyed(gpointer gdata, GObject* deadWindow)
 {
+    TR_UNUSED(deadWindow);
+
     struct MsgData* data = gdata;
 
     g_source_remove(data->refresh_tag);

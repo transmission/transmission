@@ -65,26 +65,40 @@ bool UTP_Write(struct UTPSocket* socket, size_t count)
     return false;
 }
 
-int tr_utpPacket(unsigned char const* buf UNUSED, size_t buflen UNUSED, struct sockaddr const* from UNUSED,
-    socklen_t fromlen UNUSED, tr_session* ss UNUSED)
+int tr_utpPacket(unsigned char const* buf, size_t buflen, struct sockaddr const* from, socklen_t fromlen, tr_session* ss)
 {
+    TR_UNUSED(buf);
+    TR_UNUSED(buflen);
+    TR_UNUSED(from);
+    TR_UNUSED(fromlen);
+    TR_UNUSED(ss);
+
     return -1;
 }
 
-struct UTPSocket* UTP_Create(SendToProc* send_to_proc UNUSED, void* send_to_userdata UNUSED, struct sockaddr const* addr UNUSED,
-    socklen_t addrlen UNUSED)
+struct UTPSocket* UTP_Create(SendToProc* send_to_proc, void* send_to_userdata, struct sockaddr const* addr, socklen_t addrlen)
 {
+    TR_UNUSED(send_to_proc);
+    TR_UNUSED(send_to_userdata);
+    TR_UNUSED(addr);
+    TR_UNUSED(addrlen);
+
     errno = ENOSYS;
     return NULL;
 }
 
-void tr_utpClose(tr_session* ss UNUSED)
+void tr_utpClose(tr_session* ss)
 {
+    TR_UNUSED(ss);
 }
 
-void tr_utpSendTo(void* closure UNUSED, unsigned char const* buf UNUSED, size_t buflen UNUSED, struct sockaddr const* to UNUSED,
-    socklen_t tolen UNUSED)
+void tr_utpSendTo(void* closure, unsigned char const* buf, size_t buflen, struct sockaddr const* to, socklen_t tolen)
 {
+    TR_UNUSED(closure);
+    TR_UNUSED(buf);
+    TR_UNUSED(buflen);
+    TR_UNUSED(to);
+    TR_UNUSED(tolen);
 }
 
 #else
@@ -158,8 +172,11 @@ static void reset_timer(tr_session* ss)
     tr_timerAdd(ss->utp_timer, sec, usec);
 }
 
-static void timer_callback(evutil_socket_t s UNUSED, short type UNUSED, void* closure)
+static void timer_callback(evutil_socket_t s, short type, void* closure)
 {
+    TR_UNUSED(s);
+    TR_UNUSED(type);
+
     tr_session* ss = closure;
     UTP_CheckTimeouts();
     reset_timer(ss);

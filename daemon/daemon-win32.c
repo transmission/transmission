@@ -13,6 +13,7 @@
 #include <libtransmission/transmission.h>
 #include <libtransmission/error.h>
 #include <libtransmission/log.h>
+#include <libtransmission/tr-macros.h>
 #include <libtransmission/utils.h>
 
 #include "daemon.h"
@@ -74,7 +75,7 @@ static void do_log_system_error(char const* file, int line, tr_log_level level, 
 
 static BOOL WINAPI handle_console_ctrl(DWORD control_type)
 {
-    (void)control_type;
+    TR_UNUSED(control_type);
 
     callbacks->on_stop(callback_arg);
     return TRUE;
@@ -141,9 +142,9 @@ static void stop_service(void)
 
 static DWORD WINAPI handle_service_ctrl(DWORD control_code, DWORD event_type, LPVOID event_data, LPVOID context)
 {
-    (void)event_type;
-    (void)event_data;
-    (void)context;
+    TR_UNUSED(event_type);
+    TR_UNUSED(event_data);
+    TR_UNUSED(context);
 
     switch (control_code)
     {
@@ -167,15 +168,15 @@ static DWORD WINAPI handle_service_ctrl(DWORD control_code, DWORD event_type, LP
 
 static unsigned int __stdcall service_thread_main(void* context)
 {
-    (void)context;
+    TR_UNUSED(context);
 
     return callbacks->on_start(callback_arg, false);
 }
 
 static VOID WINAPI service_main(DWORD argc, LPWSTR* argv)
 {
-    (void)argc;
-    (void)argv;
+    TR_UNUSED(argc);
+    TR_UNUSED(argv);
 
     status_handle = RegisterServiceCtrlHandlerExW(service_name, &handle_service_ctrl, NULL);
 

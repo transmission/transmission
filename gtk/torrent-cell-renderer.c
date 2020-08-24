@@ -570,9 +570,10 @@ static void gtr_cell_renderer_render(GtkCellRenderer* renderer, GtrDrawable* dra
 }
 
 static void render_compact(TorrentCellRenderer* cell, GtrDrawable* window, GtkWidget* widget,
-    GdkRectangle const* background_area, GdkRectangle const* cell_area UNUSED,
-    GtkCellRendererState flags)
+    GdkRectangle const* background_area, GdkRectangle const* cell_area, GtkCellRendererState flags)
 {
+    TR_UNUSED(cell_area);
+
     int xpad;
     int ypad;
     GtkRequisition size;
@@ -646,8 +647,10 @@ static void render_compact(TorrentCellRenderer* cell, GtrDrawable* window, GtkWi
 }
 
 static void render_full(TorrentCellRenderer* cell, GtrDrawable* window, GtkWidget* widget, GdkRectangle const* background_area,
-    GdkRectangle const* cell_area UNUSED, GtkCellRendererState flags)
+    GdkRectangle const* cell_area, GtkCellRendererState flags)
 {
+    TR_UNUSED(cell_area);
+
     int xpad;
     int ypad;
     GtkRequisition size;

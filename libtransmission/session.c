@@ -163,8 +163,10 @@ static void free_incoming_peer_port(tr_session* session)
     session->public_ipv6 = NULL;
 }
 
-static void accept_incoming_peer(evutil_socket_t fd, short what UNUSED, void* vsession)
+static void accept_incoming_peer(evutil_socket_t fd, short what, void* vsession)
 {
+    TR_UNUSED(what);
+
     tr_socket_t clientSocket;
     tr_port clientPort;
     tr_address clientAddr;
@@ -566,8 +568,11 @@ void tr_sessionSaveSettings(tr_session* session, char const* configDir, tr_varia
  * status has recently changed. This prevents loss of metadata
  * in the case of a crash, unclean shutdown, clumsy user, etc.
  */
-static void onSaveTimer(evutil_socket_t foo UNUSED, short bar UNUSED, void* vsession)
+static void onSaveTimer(evutil_socket_t fd, short what, void* vsession)
 {
+    TR_UNUSED(fd);
+    TR_UNUSED(what);
+
     tr_torrent* tor = NULL;
     tr_session* session = vsession;
 
@@ -651,8 +656,11 @@ tr_session* tr_sessionInit(char const* configDir, bool messageQueuingEnabled, tr
 
 static void turtleCheckClock(tr_session* s, struct tr_turtle_info* t);
 
-static void onNowTimer(evutil_socket_t foo UNUSED, short bar UNUSED, void* vsession)
+static void onNowTimer(evutil_socket_t fd, short what, void* vsession)
 {
+    TR_UNUSED(fd);
+    TR_UNUSED(what);
+
     tr_session* session = vsession;
 
     TR_ASSERT(tr_isSession(session));
@@ -1911,7 +1919,7 @@ static int compareTorrentByCur(void const* va, void const* vb)
 
 static void closeBlocklists(tr_session*);
 
-static void sessionCloseImplWaitForIdleUdp(evutil_socket_t foo UNUSED, short bar UNUSED, void* vsession);
+static void sessionCloseImplWaitForIdleUdp(evutil_socket_t fd, short what, void* vsession);
 
 static void sessionCloseImplStart(tr_session* session)
 {
@@ -1973,8 +1981,11 @@ static void sessionCloseImplStart(tr_session* session)
 
 static void sessionCloseImplFinish(tr_session* session);
 
-static void sessionCloseImplWaitForIdleUdp(evutil_socket_t foo UNUSED, short bar UNUSED, void* vsession)
+static void sessionCloseImplWaitForIdleUdp(evutil_socket_t fd, short what, void* vsession)
 {
+    TR_UNUSED(fd);
+    TR_UNUSED(what);
+
     tr_session* session = vsession;
 
     TR_ASSERT(tr_isSession(session));

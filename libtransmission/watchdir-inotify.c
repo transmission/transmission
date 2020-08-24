@@ -55,8 +55,11 @@ tr_watchdir_inotify;
 ****
 ***/
 
-static void tr_watchdir_inotify_on_first_scan(evutil_socket_t fd UNUSED, short type UNUSED, void* context)
+static void tr_watchdir_inotify_on_first_scan(evutil_socket_t fd, short type, void* context)
 {
+    TR_UNUSED(fd);
+    TR_UNUSED(type);
+
     tr_watchdir_t const handle = context;
 
     tr_watchdir_scan(handle, NULL);

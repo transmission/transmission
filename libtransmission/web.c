@@ -27,6 +27,7 @@
 #include "platform.h" /* mutex */
 #include "session.h"
 #include "tr-assert.h"
+#include "tr-macros.h"
 #include "trevent.h" /* tr_runInEventThread() */
 #include "utils.h"
 #include "version.h" /* User-Agent */
@@ -128,8 +129,10 @@ static size_t writeFunc(void* ptr, size_t size, size_t nmemb, void* vtask)
 
 #ifdef USE_LIBCURL_SOCKOPT
 
-static int sockoptfunction(void* vtask, curl_socket_t fd, curlsocktype purpose UNUSED)
+static int sockoptfunction(void* vtask, curl_socket_t fd, curlsocktype purpose)
 {
+    TR_UNUSED(purpose);
+
     struct tr_web_task* task = vtask;
     bool const isScrape = strstr(task->url, "scrape") != NULL;
     bool const isAnnounce = strstr(task->url, "announce") != NULL;
@@ -151,9 +154,6 @@ static int sockoptfunction(void* vtask, curl_socket_t fd, curlsocktype purpose U
 
 static CURLcode ssl_context_func(CURL* curl, void* ssl_ctx, void* user_data)
 {
-    (void)curl;
-    (void)user_data;
-
     tr_x509_store_t const cert_store = tr_ssl_get_x509_store(ssl_ctx);
     if (cert_store == NULL)
     {
@@ -204,6 +204,11 @@ static CURLcode ssl_context_func(CURL* curl, void* ssl_ctx, void* user_data)
 
         CertCloseStore(sys_cert_store, 0);
     }
+
+#else
+
+    TR_UNUSED(curl);
+    TR_UNUSED(user_data);
 
 #endif
 

@@ -135,6 +135,10 @@ find_package(Threads)
 find_package(PkgConfig QUIET)
 
 find_package(CURL ${CURL_MINIMUM} REQUIRED)
+if(TARGET CURL::libcurl)
+    set(CURL_LIBRARIES CURL::libcurl)
+    set(CURL_INCLUDE_DIRS)
+endif()
 
 find_package(ICONV)
 
@@ -379,14 +383,14 @@ endif()
 ## Compiler standard version
 
 if(CMAKE_VERSION VERSION_LESS "3.1")
-    if(CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
-        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu99")
+    if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu11")
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++17")
     elseif(CMAKE_C_COMPILER_ID STREQUAL "MSVC")
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++17")
     endif()
 else()
-    set(CMAKE_C_STANDARD 99)
+    set(CMAKE_C_STANDARD 11)
     set(CMAKE_C_STANDARD_REQUIRED ON)
     set(CMAKE_CXX_STANDARD 17)
     set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -400,82 +404,105 @@ set(CXX_WARNING_FLAGS)
 include(CheckCCompilerFlag)
 include(CheckCXXCompilerFlag)
 
-set(WARNING_CANDIDATES
-    -W
-    -Wall
-    -Wextra
-    -Wcast-align
-    -Wduplicated-cond
-    -Wexit-time-destructors
-    -Wextra-semi
-    -Wextra-semi-stmt
-    -Wextra-tokens
-    -Wfloat-equal
-    -Wgnu
-    -Winit-self
-    -Wint-in-bool-context
-    -Wlogical-op
-    -Wmissing-format-attribute
-    -Wnested-externs
-    -Wnull-dereference
-    -Wpointer-arith
-    -Wredundant-decls
-    -Wredundant-move
-    -Wreorder-ctor
-    -Wrestrict
-    -Wreturn-std-move
-    -Wself-assign
-    -Wself-move
-    -Wsemicolon-before-method-body
-    -Wsentinel
-    -Wshadow
-    -Wsign-compare
-    -Wsometimes-uninitialized
-    -Wstrict-prototypes
-    -Wstring-conversion
-    -Wsuggest-destructor-override
-    -Wsuggest-override
-    -Wuninitialized
-    -Wunreachable-code
-    -Wunused
-    -Wunused-const-variable
-    -Wunused-parameter
-    -Wunused-result
-    -Wwrite-strings
-)
+if(MSVC)
+    set(WARNING_CANDIDATES
+        /W4)
 
-if(MINGW)
-    # Disable excessive warnings since we're using __USE_MINGW_ANSI_STDIO
-    # Hopefully, any potential issues will be spotted on other platforms
-    list(APPEND WARNING_CANDIDATES -Wno-format)
-else()
-    list(APPEND WARNING_CANDIDATES -Wformat-security)
-endif()
-
-foreach(FLAG ${WARNING_CANDIDATES})
-    tr_make_id("${FLAG}" FLAG_ID)
-
-    # if available, add to C warnings
-    set(CACHE_ID "${CMAKE_C_COMPILER_ID}_C_HAS${FLAG_ID}")
-    string(TOLOWER "${CACHE_ID}" CACHE_ID)
-    check_c_compiler_flag(${FLAG} ${CACHE_ID})
-    if (${CACHE_ID})
+    foreach(FLAG ${WARNING_CANDIDATES})
         list(APPEND C_WARNING_FLAGS ${FLAG})
-    endif()
-
-    # if available, add to CXX warnings
-    set(CACHE_ID "${CMAKE_CXX_COMPILER_ID}_CXX_HAS${FLAG_ID}")
-    string(TOLOWER "${CACHE_ID}" CACHE_ID)
-    check_cxx_compiler_flag(${FLAG} ${CACHE_ID})
-    if (${CACHE_ID})
         list(APPEND CXX_WARNING_FLAGS ${FLAG})
+    endforeach()
+else()
+    set(WARNING_CANDIDATES
+        -W
+        -Wall
+        -Wextra
+        -Wcast-align
+        -Wduplicated-cond
+        -Wexit-time-destructors
+        -Wextra-semi
+        -Wextra-semi-stmt
+        -Wextra-tokens
+        -Wfloat-equal
+        -Wgnu
+        -Winit-self
+        -Wint-in-bool-context
+        -Wlogical-op
+        -Wmissing-format-attribute
+        -Wnested-externs
+        -Wnull-dereference
+        -Wpointer-arith
+        -Wredundant-decls
+        -Wredundant-move
+        -Wreorder-ctor
+        -Wrestrict
+        -Wreturn-std-move
+        -Wself-assign
+        -Wself-move
+        -Wsemicolon-before-method-body
+        -Wsentinel
+        -Wshadow
+        -Wsign-compare
+        -Wsometimes-uninitialized
+        -Wstrict-prototypes
+        -Wstring-conversion
+        -Wsuggest-destructor-override
+        -Wsuggest-override
+        -Wuninitialized
+        -Wunreachable-code
+        -Wunused
+        -Wunused-const-variable
+        -Wunused-parameter
+        -Wunused-result
+        -Wwrite-strings)
+
+    if(MINGW)
+        # Disable excessive warnings since we're using __USE_MINGW_ANSI_STDIO
+        # Hopefully, any potential issues will be spotted on other platforms
+        list(APPEND WARNING_CANDIDATES -Wno-format)
+    else()
+        list(APPEND WARNING_CANDIDATES -Wformat-security)
     endif()
 
-    unset(CACHE_ID)
-    unset(FLAG_ID)
-endforeach()
+    set(CMAKE_REQUIRED_FLAGS)
 
-unset(WARNING_CANDIDATES)
+    foreach(FLAG -Werror /WX)
+        tr_make_id("${FLAG}" FLAG_ID)
+        set(CACHE_ID "${CMAKE_C_COMPILER_ID}_C_HAS${FLAG_ID}")
+        string(TOLOWER "${CACHE_ID}" CACHE_ID)
+        check_c_compiler_flag(${FLAG} ${CACHE_ID})
+        if (${CACHE_ID})
+            # Make sure the next loop only adds flags that are relevant for a particular language
+            set(CMAKE_REQUIRED_FLAGS ${FLAG})
+            break()
+        endif()
+    endforeach()
+
+    foreach(FLAG ${WARNING_CANDIDATES})
+        tr_make_id("${FLAG}" FLAG_ID)
+
+        # if available, add to C warnings
+        set(CACHE_ID "${CMAKE_C_COMPILER_ID}_C_HAS${FLAG_ID}")
+        string(TOLOWER "${CACHE_ID}" CACHE_ID)
+        check_c_compiler_flag(${FLAG} ${CACHE_ID})
+        if (${CACHE_ID})
+            list(APPEND C_WARNING_FLAGS ${FLAG})
+        endif()
+
+        # if available, add to CXX warnings
+        set(CACHE_ID "${CMAKE_CXX_COMPILER_ID}_CXX_HAS${FLAG_ID}")
+        string(TOLOWER "${CACHE_ID}" CACHE_ID)
+        check_cxx_compiler_flag(${FLAG} ${CACHE_ID})
+        if (${CACHE_ID})
+            list(APPEND CXX_WARNING_FLAGS ${FLAG})
+        endif()
+
+        unset(CACHE_ID)
+        unset(FLAG_ID)
+    endforeach()
+
+    unset(CMAKE_REQUIRED_FLAGS)
+endif()
 
 ###
 

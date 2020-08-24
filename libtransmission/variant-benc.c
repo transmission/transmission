@@ -366,18 +366,24 @@ static void saveStringFunc(tr_variant const* v, void* evbuf)
     evbuffer_add(evbuf, str, len);
 }
 
-static void saveDictBeginFunc(tr_variant const* val UNUSED, void* evbuf)
+static void saveDictBeginFunc(tr_variant const* val, void* evbuf)
 {
+    TR_UNUSED(val);
+
     evbuffer_add(evbuf, "d", 1);
 }
 
-static void saveListBeginFunc(tr_variant const* val UNUSED, void* evbuf)
+static void saveListBeginFunc(tr_variant const* val, void* evbuf)
 {
+    TR_UNUSED(val);
+
     evbuffer_add(evbuf, "l", 1);
 }
 
-static void saveContainerEndFunc(tr_variant const* val UNUSED, void* evbuf)
+static void saveContainerEndFunc(tr_variant const* val, void* evbuf)
 {
+    TR_UNUSED(val);
+
     evbuffer_add(evbuf, "e", 1);
 }
 

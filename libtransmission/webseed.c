@@ -361,9 +361,14 @@ static void on_idle(tr_webseed* w)
     }
 }
 
-static void web_response_func(tr_session* session, bool did_connect UNUSED, bool did_timeout UNUSED, long response_code,
-    void const* response UNUSED, size_t response_byte_count UNUSED, void* vtask)
+static void web_response_func(tr_session* session, bool did_connect, bool did_timeout, long response_code, void const* response,
+    size_t response_byte_count, void* vtask)
 {
+    TR_UNUSED(did_connect);
+    TR_UNUSED(did_timeout);
+    TR_UNUSED(response);
+    TR_UNUSED(response_byte_count);
+
     tr_webseed* w;
     tr_torrent* tor;
     struct tr_webseed_task* t = vtask;
@@ -501,8 +506,11 @@ static void task_request_next_chunk(struct tr_webseed_task* t)
 ****
 ***/
 
-static void webseed_timer_func(evutil_socket_t foo UNUSED, short bar UNUSED, void* vw)
+static void webseed_timer_func(evutil_socket_t fd, short what, void* vw)
 {
+    TR_UNUSED(fd);
+    TR_UNUSED(what);
+
     tr_webseed* w = vw;
 
     if (w->retry_tickcount != 0)

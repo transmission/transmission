@@ -9,6 +9,7 @@
 #include "transmission.h"
 #include "error.h"
 #include "file.h"
+#include "tr-macros.h"
 
 #include "test-fixtures.h"
 
@@ -54,7 +55,7 @@ protected:
     {
 #ifndef _WIN32
 
-        (void)dst_is_dir;
+        TR_UNUSED(dst_is_dir);
 
         return symlink(src_path, dst_path) != -1;
 
@@ -146,8 +147,8 @@ protected:
 
 #else
 
-        (void)path;
-        (void)permissions;
+        TR_UNUSED(path);
+        TR_UNUSED(permissions);
 
         /* No UNIX permissions on Windows */
         return true;

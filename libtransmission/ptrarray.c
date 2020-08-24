@@ -10,6 +10,7 @@
 
 #include "ptrarray.h"
 #include "tr-assert.h"
+#include "tr-macros.h"
 #include "utils.h"
 
 #define FLOOR 32
@@ -238,7 +239,7 @@ void tr_ptrArrayRemoveSortedPointer(tr_ptrArray* t, void const* ptr, tr_voidptr_
 
 #ifndef TR_ENABLE_ASSERTS
 
-    (void)removed;
+    TR_UNUSED(removed);
 
 #else
 

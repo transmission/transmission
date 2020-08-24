@@ -639,8 +639,10 @@ char const* tr_dhtPrintableStatus(int status)
     }
 }
 
-static void callback(void* ignore UNUSED, int event, unsigned char const* info_hash, void const* data, size_t data_len)
+static void callback(void* ignore, int event, unsigned char const* info_hash, void const* data, size_t data_len)
 {
+    TR_UNUSED(ignore);
+
     if (event == DHT_EVENT_VALUES || event == DHT_EVENT_VALUES6)
     {
         tr_torrent* tor;
@@ -811,8 +813,11 @@ void tr_dhtCallback(unsigned char* buf, int buflen, struct sockaddr* from, sockl
     tr_timerAdd(dht_timer, (int)tosleep, tr_rand_int_weak(1000000));
 }
 
-static void timer_callback(evutil_socket_t s UNUSED, short type UNUSED, void* session)
+static void timer_callback(evutil_socket_t s, short type, void* session)
 {
+    TR_UNUSED(s);
+    TR_UNUSED(type);
+
     tr_dhtCallback(NULL, 0, NULL, 0, session);
 }
 
@@ -822,8 +827,11 @@ static void timer_callback(evutil_socket_t s UNUSED, short type UNUSED, void* se
    free to add support to your private copy as long as you don't
    redistribute it. */
 
-int dht_blacklisted(struct sockaddr const* sa UNUSED, int salen UNUSED)
+int dht_blacklisted(struct sockaddr const* sa, int salen)
 {
+    TR_UNUSED(sa);
+    TR_UNUSED(salen);
+
     return 0;
 }
 
