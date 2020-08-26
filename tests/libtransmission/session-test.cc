@@ -23,45 +23,31 @@
 
 TEST(Session, peerId)
 {
-    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     auto const peer_id_prefix = std::string { PEERID_PREFIX };
 
-    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     for (int i = 0; i < 100000; ++i)
     {
         // get a new peer-id
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         auto buf = std::array<uint8_t, PEER_ID_LEN + 1>{};
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         tr_peerIdInit(buf.data());
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
 
         // confirm that it has the right length
         EXPECT_EQ(PEER_ID_LEN, strlen(reinterpret_cast<char const*>(buf.data())));
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
 
         // confirm that it begins with peer_id_prefix
         auto const peer_id = std::string(reinterpret_cast<char const*>(buf.data()), PEER_ID_LEN);
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         EXPECT_EQ(peer_id_prefix, peer_id.substr(0, peer_id_prefix.size()));
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
 
         // confirm that its total is evenly divisible by 36
         int val = 0;
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         auto const suffix = peer_id.substr(peer_id_prefix.size());
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         for (char const ch : suffix)
         {
-            std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
             auto const tmp = std::array<char, 2>{ ch, '\0' };
-            std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
             val += strtoul(tmp.data(), nullptr, 36);
-            std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         }
 
         EXPECT_EQ(0, val % 36);
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     }
 }
 
