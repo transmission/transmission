@@ -35,104 +35,164 @@ class RenameTest : public SessionTest
 protected:
     void torrentRemoveAndWait(tr_torrent* tor, int expected_torrent_count)
     {
+        std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
         tr_torrentRemove(tor, false, nullptr);
+        std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
         auto const test = [this, expected_torrent_count]()
             {
+                std::cerr << __FILE__ << ':' << __LINE__ << ':' << std::endl;
                 return tr_sessionCountTorrents(session_) == expected_torrent_count;
             };
+        std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
         EXPECT_TRUE(waitFor(test, MaxWaitMsec));
+        std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
     }
 
     void createSingleFileTorrentContents(char const* top)
     {
+        std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
         auto const path = makeString(tr_buildPath(top, "hello-world.txt", nullptr));
+        std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
         createFileWithContents(path, "hello, world!\n");
+        std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
     }
 
     void createMultifileTorrentContents(char const* top)
     {
+        std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
         auto path = makeString(tr_buildPath(top, "Felidae", "Felinae", "Acinonyx", "Cheetah", "Chester", nullptr));
+        std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
         createFileWithContents(path, "It ain't easy bein' cheesy.\n");
+        std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
 
+        std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
         path = makeString(tr_buildPath(top, "Felidae", "Pantherinae", "Panthera", "Tiger", "Tony", nullptr));
+        std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
         createFileWithContents(path, "They’re Grrrrreat!\n");
+        std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
 
+        std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
         path = makeString(tr_buildPath(top, "Felidae", "Felinae", "Felis", "catus", "Kyphi", nullptr));
+        std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
         createFileWithContents(path, "Inquisitive\n");
+        std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
 
+        std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
         path = makeString(tr_buildPath(top, "Felidae", "Felinae", "Felis", "catus", "Saffron", nullptr));
+        std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
         createFileWithContents(path, "Tough\n");
+        std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
 
+        std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
         sync();
+        std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
     }
 
     tr_torrent* createTorrentFromBase64Metainfo(tr_ctor* ctor, char const* metainfo_base64)
     {
+        std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
         // create the torrent ctor
         size_t metainfo_len;
+        std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
         auto* metainfo = static_cast<char*>(tr_base64_decode_str(metainfo_base64, &metainfo_len));
+        std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
         EXPECT_NE(nullptr, metainfo);
+        std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
         EXPECT_LT(size_t(0), metainfo_len);
+        std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
         tr_ctorSetMetainfo(ctor, reinterpret_cast<uint8_t const*>(metainfo), metainfo_len);
+        std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
         tr_ctorSetPaused(ctor, TR_FORCE, true);
+        std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
 
         // create the torrent
+        std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
         auto err = int{};
+        std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
         auto* tor = tr_torrentNew(ctor, &err, nullptr);
+        std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
         EXPECT_EQ(0, err);
 
         // cleanup
+        std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
         tr_free(metainfo);
+        std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
         return tor;
     }
 
     bool testFileExistsAndConsistsOfThisString(tr_torrent const* tor, tr_file_index_t file_index, std::string const& str)
     {
+        std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
         auto const str_len = str.size();
+        std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
         auto success = false;
+        std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
 
         auto* path = tr_torrentFindFile(tor, file_index);
+        std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
         if (path != nullptr)
         {
+            std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
             EXPECT_TRUE(tr_sys_path_exists(path, nullptr));
+            std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
 
             size_t contents_len;
             uint8_t* contents = tr_loadFile(path, &contents_len, nullptr);
 
+            std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
             success = contents != nullptr && str_len == contents_len && memcmp(contents, str.data(), contents_len) == 0;
 
+            std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
             tr_free(contents);
+            std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
             tr_free(path);
         }
 
+        std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
         return success;
     }
 
     void expectHaveNone(tr_torrent* tor, uint64_t total_size)
     {
+        std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
         auto const* tst = tr_torrentStat(tor);
+        std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
         EXPECT_EQ(TR_STATUS_STOPPED, tst->activity);
+        std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
         EXPECT_EQ(TR_STAT_OK, tst->error);
+        std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
         EXPECT_EQ(total_size, tst->sizeWhenDone);
+        std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
         EXPECT_EQ(total_size, tst->leftUntilDone);
+        std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
         EXPECT_EQ(total_size, tor->info.totalSize);
+        std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
         EXPECT_EQ(0, tst->haveValid);
+        std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
     }
 
     int torrentRenameAndWait(tr_torrent* tor, char const* oldpath, char const* newname)
     {
+        std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
         auto const on_rename_done = [] (
             tr_torrent* /*tor*/, char const* /*oldpath*/,
             char const* /*newname*/, int error,
             void* user_data) noexcept
         {
+            std::cerr << __FILE__ << ':' << __LINE__ << ':' << std::endl;
             *static_cast<int*>(user_data) = error;
+            std::cerr << __FILE__ << ':' << __LINE__ << ':' << std::endl;
         };
 
+        std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
         int error = -1;
+        std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
         tr_torrentRenamePath(tor, oldpath, newname, on_rename_done, &error);
+        std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
         auto test = [&error]() { return error != -1; };
+        std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
         EXPECT_TRUE(waitFor(test, MaxWaitMsec));
+        std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
         return error;
     }
 };
@@ -474,61 +534,100 @@ TEST_F(RenameTest, multifileTorrent)
 
 TEST_F(RenameTest, partialFile)
 {
+    std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
     auto constexpr PieceCount = uint32_t { 33 };
+    std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
     auto constexpr PieceSize = uint32_t { 32768 };
+    std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
     auto constexpr Length = std::array<uint32_t, 3>{ 1048576, 4096, 512 };
+    std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
     auto constexpr TotalSize = uint64_t(Length[0]) + Length[1] + Length[2];
+    std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
 
     /***
     ****  create our test torrent with an incomplete .part file
     ***/
 
+    std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
     auto* tor = zeroTorrentInit();
+    std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
     EXPECT_EQ(TotalSize, tor->info.totalSize);
+    std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
     EXPECT_EQ(PieceSize, tor->info.pieceSize);
+    std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
     EXPECT_EQ(PieceCount, tor->info.pieceCount);
+    std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
     EXPECT_STREQ("files-filled-with-zeroes/1048576", tor->info.files[0].name);
+    std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
     EXPECT_STREQ("files-filled-with-zeroes/4096", tor->info.files[1].name);
+    std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
     EXPECT_STREQ("files-filled-with-zeroes/512", tor->info.files[2].name);
+    std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
 
     zeroTorrentPopulate(tor, false);
+    std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
     auto* fst = tr_torrentFiles(tor, nullptr);
+    std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
     EXPECT_EQ(Length[0] - PieceSize, fst[0].bytesCompleted);
+    std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
     EXPECT_EQ(Length[1], fst[1].bytesCompleted);
+    std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
     EXPECT_EQ(Length[2], fst[2].bytesCompleted);
+    std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
     tr_torrentFilesFree(fst, tor->info.fileCount);
+    std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
     auto const* st = tr_torrentStat(tor);
+    std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
     EXPECT_EQ(TotalSize, st->sizeWhenDone);
+    std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
     EXPECT_EQ(PieceSize, st->leftUntilDone);
+    std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
 
     /***
     ****
     ***/
 
+    std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
     EXPECT_EQ(0, torrentRenameAndWait(tor, "files-filled-with-zeroes", "foo"));
+    std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
     EXPECT_EQ(0, torrentRenameAndWait(tor, "foo/1048576", "bar"));
+    std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
     auto strings = std::array<char const*, 3>{};
+    std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
     strings[0] = "foo/bar";
+    std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
     strings[1] = "foo/4096";
+    std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
     strings[2] = "foo/512";
+    std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
 
     for (tr_file_index_t i = 0; i < 3; ++i)
     {
+        std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
         EXPECT_STREQ(strings[i], tor->info.files[i].name);
+        std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
     }
 
     strings[0] = "foo/bar.part";
 
     for (tr_file_index_t i = 0; i < 3; ++i)
     {
+        std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
         char* expected = tr_buildPath(tor->currentDir, strings[i], nullptr);
+        std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
         char* path = tr_torrentFindFile(tor, i);
+        std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
         EXPECT_STREQ(expected, path);
+        std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
         tr_free(path);
+        std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
         tr_free(expected);
+        std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
     }
 
+    std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
     torrentRemoveAndWait(tor, 0);
+    std::cerr << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl;
 }
 
 } // namespace test
