@@ -46,6 +46,10 @@ static void popup(GtkStatusIcon* self, guint button, guint when, gpointer data)
 
 #if GTK_CHECK_VERSION(3, 22, 0)
     gtk_menu_popup_at_pointer(GTK_MENU(w), NULL);
+
+    TR_UNUSED(self);
+    TR_UNUSED(button);
+    TR_UNUSED(when);
 #else
     gtk_menu_popup(GTK_MENU(w), NULL, NULL, gtk_status_icon_position_menu, self, button, when);
 #endif
