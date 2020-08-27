@@ -114,22 +114,20 @@ char const* tr_address_to_string(tr_address const* addr)
 
 bool tr_address_from_string(tr_address* dst, char const* src)
 {
-    bool ok;
+    bool success = false;
 
-    if ((ok = evutil_inet_pton(AF_INET, src, &dst->addr) == 1))
+    if (evutil_inet_pton(AF_INET, src, &dst->addr) == 1)
     {
         dst->type = TR_AF_INET;
+        success = true;
     }
-
-    if (!ok) /* try IPv6 */
+    else if (evutil_inet_pton(AF_INET6, src, &dst->addr) == 1)
     {
-        if ((ok = evutil_inet_pton(AF_INET6, src, &dst->addr) == 1))
-        {
-            dst->type = TR_AF_INET6;
-        }
+        dst->type = TR_AF_INET6;
+        success = true;
     }
 
-    return ok;
+    return success;
 }
 
 /*

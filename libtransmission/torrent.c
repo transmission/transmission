@@ -3511,7 +3511,7 @@ bool tr_torrentFindFile2(tr_torrent const* tor, tr_file_index_t fileNum, char co
     tr_file const* file;
     char const* b = NULL;
     char const* s = NULL;
-    tr_sys_path_info file_info;
+    tr_sys_path_info file_info = { 0 };
 
     file = &tor->info.files[fileNum];
 

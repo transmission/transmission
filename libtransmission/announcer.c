@@ -1931,8 +1931,9 @@ static void copy_tier_attributes(struct tr_torrent_tiers* tt, tr_tier const* src
     {
         for (int j = 0; !found && j < tt->tiers[i].tracker_count; ++j)
         {
-            if ((found = tr_strcmp0(src->currentTracker->announce, tt->tiers[i].trackers[j].announce) == 0))
+            if ((tr_strcmp0(src->currentTracker->announce, tt->tiers[i].trackers[j].announce) == 0))
             {
+                found = true;
                 copy_tier_attributes_impl(&tt->tiers[i], j, src);
             }
         }

@@ -57,6 +57,8 @@ typedef uint16_t in_port_t; /* all missing */
 #include "utils.h"
 #include "version.h"
 
+#define SIZEOF_HASH_STRING (sizeof(((struct tr_info*)0)->hashString))
+
 /**
 * @brief Local Peer Discovery
 * @file tr-lpd.c
@@ -80,7 +82,6 @@ static tr_socket_t lpd_socket2; /**<and multicast send socket */
 static struct event* lpd_event = NULL;
 static tr_port lpd_port;
 
-static tr_torrent* lpd_torStaticType; /* just a helper for static type analysis */
 static tr_session* session;
 
 enum
@@ -299,6 +300,12 @@ int tr_lpdInit(tr_session* ss, tr_address* tr_addr)
 {
     TR_UNUSED(tr_addr);
 
+    /* if this check fails (i.e. the definition of hashString changed), update
+     * string handling in tr_lpdSendAnnounce() and tr_lpdConsiderAnnounce().
+     * However, the code should work as long as interfaces to the rest of
+     * libtransmission are compatible with char* strings. */
+    TR_STATIC_ASSERT(sizeof(((struct tr_info*)0)->hashString[0]) == sizeof(char), "");
+
     struct ip_mreq mcastReq;
     int const opt_on = 1;
     int const opt_off = 0;
@@ -455,21 +462,6 @@ bool tr_lpdEnabled(tr_session const* ss)
 }
 
 /**
-* @cond
-* @brief Performs some (internal) software consistency checks at compile time.
-* @remark Declared inline for the compiler not to allege us of feeding unused
-* functions. In any other respect, lpd_consistencyCheck is an orphaned function.
-*/
-static inline void lpd_consistencyCheck(void)
-{
-    /* if the following check fails, the definition of a hash string has changed
-     * without our knowledge; revise string handling in functions tr_lpdSendAnnounce
-     * and tr_lpdConsiderAnnounce. However, the code is designed to function as long
-     * as interfaces to the rest of the lib remain compatible with char* strings. */
-    TR_STATIC_ASSERT(sizeof(lpd_torStaticType->info.hashString[0]) == sizeof(char), "");
-}
-
-/**
 * @endcond */
 
 /**
@@ -497,7 +489,7 @@ bool tr_lpdSendAnnounce(tr_torrent const* t)
         CRLF
         CRLF;
 
-    char hashString[lengthof(t->info.hashString)];
+    char hashString[SIZEOF_HASH_STRING];
     char query[lpd_maxDatagramLength + 1] = { 0 };
 
     if (t == NULL)
@@ -553,7 +545,7 @@ static int tr_lpdConsiderAnnounce(tr_pex* peer, char const* const msg)
     enum
     {
         maxValueLen = 25,
-        maxHashLen = lengthof(lpd_torStaticType->info.hashString)
+        maxHashLen = SIZEOF_HASH_STRING
     };
 
     struct lpd_protocolVersion ver = { .major = -1, .minor = -1 };

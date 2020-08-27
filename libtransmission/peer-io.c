@@ -1055,13 +1055,15 @@ void tr_peerIoSetPeersId(tr_peerIo* io, uint8_t const* peer_id)
 {
     TR_ASSERT(tr_isPeerIo(io));
 
-    if ((io->peerIdIsSet = peer_id != NULL))
+    if (peer_id == NULL)
     {
-        memcpy(io->peerId, peer_id, 20);
+        memset(io->peerId, '\0', sizeof(io->peerId));
+        io->peerIdIsSet = false;
     }
     else
     {
-        memset(io->peerId, '\0', 20);
+        memcpy(io->peerId, peer_id, sizeof(io->peerId));
+        io->peerIdIsSet = true;
     }
 }
 
