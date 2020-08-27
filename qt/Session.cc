@@ -311,6 +311,9 @@ Session::Session(QString config_dir, Prefs& prefs) :
     connect(&rpc_, SIGNAL(dataSendProgress()), this, SIGNAL(dataSendProgress()));
     connect(&rpc_, SIGNAL(networkResponse(QNetworkReply::NetworkError, QString)), this,
         SIGNAL(networkResponse(QNetworkReply::NetworkError, QString)));
+
+    duplicates_timer_.setSingleShot(true);
+    connect(&duplicates_timer_, &QTimer::timeout, this, &Session::onDuplicatesTimer);
 }
 
 Session::~Session()
@@ -1100,23 +1103,30 @@ void Session::addTorrent(AddData const& add_me, tr_variant* args, bool trash_ori
             d->show();
         });
 
-    q->add([add_me](RpcResponse const& r)
+    q->add([this, add_me](RpcResponse const& r)
         {
             tr_variant* dup;
+            bool session_has_torrent = false;
 
-            if (!tr_variantDictFindDict(r.args.get(), TR_KEY_torrent_duplicate, &dup))
+            if (tr_variantDictFindDict(r.args.get(), TR_KEY_torrent_added, &dup))
             {
-                return;
+                session_has_torrent = true;
+            }
+            else if (tr_variantDictFindDict(r.args.get(), TR_KEY_torrent_duplicate, &dup))
+            {
+                session_has_torrent = true;
+
+                auto const hash = dictFind<QString>(dup, TR_KEY_hashString);
+                if (hash)
+                {
+                    duplicates_.try_emplace(add_me.readableShortName(), *hash);
+                    duplicates_timer_.start(1000);
+                }
             }
 
-            auto const name = dictFind<QString>(dup, TR_KEY_name);
-            if (name)
+            if (session_has_torrent && !add_me.filename.isEmpty())
             {
-                auto* d = new QMessageBox(QMessageBox::Warning, tr("Add Torrent"),
-                    tr(R"(<p><b>Unable to add "%1".</b></p><p>It is a duplicate of "%2" which is already added.</p>)").
-                        arg(add_me.readableShortName()).arg(*name), QMessageBox::Close, qApp->activeWindow());
-                QObject::connect(d, &QMessageBox::rejected, d, &QMessageBox::deleteLater);
-                d->show();
+                QFile(add_me.filename).rename(QStringLiteral("%1.added").arg(add_me.filename));
             }
         });
 
@@ -1131,6 +1141,32 @@ void Session::addTorrent(AddData const& add_me, tr_variant* args, bool trash_ori
     }
 
     q->run();
+}
+
+void Session::onDuplicatesTimer()
+{
+    decltype(duplicates_) duplicates;
+    duplicates.swap(duplicates_);
+
+    QStringList lines;
+    for (auto it : duplicates_)
+    {
+        lines.push_back(tr("%1 (copy of %2)")
+            .arg(it.first)
+            .arg(it.second.left(7)));
+    }
+
+    if (!lines.empty())
+    {
+        lines.sort(Qt::CaseInsensitive);
+        auto* d = new QMessageBox(QMessageBox::Warning,
+            tr("Unable to add Duplicate Torrent(s)", "", lines.size()),
+            lines.join(QStringLiteral("\n")),
+            QMessageBox::Close,
+            qApp->activeWindow());
+        QObject::connect(d, &QMessageBox::rejected, d, &QMessageBox::deleteLater);
+        d->show();
+    }
 }
 
 void Session::addTorrent(AddData const& add_me)
