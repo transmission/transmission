@@ -55,15 +55,12 @@ struct tr_watchdir
 static bool is_regular_file(char const* dir, char const* name)
 {
     char* const path = tr_buildPath(dir, name, NULL);
-    tr_sys_path_info path_info;
+    tr_sys_path_info path_info = { 0 };
     tr_error* error = NULL;
-    bool ret;
 
-    if ((ret = tr_sys_path_get_info(path, 0, &path_info, &error)))
-    {
-        ret = path_info.type == TR_SYS_PATH_IS_FILE;
-    }
-    else
+    bool const ret = tr_sys_path_get_info(path, 0, &path_info, &error) && (path_info.type == TR_SYS_PATH_IS_FILE);
+
+    if (error != NULL)
     {
         if (!TR_ERROR_IS_ENOENT(error->code))
         {
