@@ -154,6 +154,9 @@ static int sockoptfunction(void* vtask, curl_socket_t fd, curlsocktype purpose)
 
 static CURLcode ssl_context_func(CURL* curl, void* ssl_ctx, void* user_data)
 {
+    TR_UNUSED(curl);
+    TR_UNUSED(user_data);
+
     tr_x509_store_t const cert_store = tr_ssl_get_x509_store(ssl_ctx);
     if (cert_store == NULL)
     {
@@ -204,12 +207,6 @@ static CURLcode ssl_context_func(CURL* curl, void* ssl_ctx, void* user_data)
 
         CertCloseStore(sys_cert_store, 0);
     }
-
-#else
-
-    TR_UNUSED(curl);
-    TR_UNUSED(user_data);
-
 #endif
 
     return CURLE_OK;
