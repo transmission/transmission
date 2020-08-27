@@ -326,8 +326,8 @@ int tr_dhtInit(tr_session* ss)
     uint8_t* nodes = NULL;
     uint8_t* nodes6 = NULL;
     uint8_t const* raw;
-    size_t len;
-    size_t len6;
+    size_t len = 0;
+    size_t len6 = 0;
     struct bootstrap_closure* cl;
 
     if (session_ != NULL) /* already initialized */

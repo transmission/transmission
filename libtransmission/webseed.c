@@ -242,19 +242,14 @@ static void on_content_changed(struct evbuffer* buf, struct evbuffer_cb_info con
 
         if (task->response_code == 0)
         {
-            tr_webGetTaskInfo(task->web_task, TR_WEB_GET_CODE, &task->response_code);
+            task->response_code = tr_webGetTaskResponseCode(task->web_task);
 
             if (task->response_code == 206)
             {
-                char const* url;
                 struct connection_succeeded_data* data;
-
-                url = NULL;
-                tr_webGetTaskInfo(task->web_task, TR_WEB_GET_REAL_URL, &url);
-
                 data = tr_new(struct connection_succeeded_data, 1);
                 data->webseed = w;
-                data->real_url = tr_strdup(url);
+                data->real_url = tr_strdup(tr_webGetTaskRealUrl(task->web_task));
                 data->piece_index = task->piece_index;
                 data->piece_offset = task->piece_offset + task->blocks_done * task->block_size + len - 1;
 
