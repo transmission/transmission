@@ -207,6 +207,7 @@ static CURLcode ssl_context_func(CURL* curl, void* ssl_ctx, void* user_data)
 
         CertCloseStore(sys_cert_store, 0);
     }
+
 #endif
 
     return CURLE_OK;
