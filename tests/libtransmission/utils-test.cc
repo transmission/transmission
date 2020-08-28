@@ -12,14 +12,16 @@
 #define unsetenv(key) SetEnvironmentVariableA(key, nullptr)
 #endif
 
-#include "transmission.h"
-#include "ConvertUTF.h" // tr_utf8_validate()
-#include "platform.h"
-#include "crypto-utils.h" // tr_rand_int_weak()
-#include "utils.h"
-#include "web.h" // tr_http_unescape()
+#include "libtransmission/transmission.h"
+#include "libtransmission/ConvertUTF.h" // tr_utf8_validate()
+#include "libtransmission/platform.h"
+#include "libtransmission/crypto-utils.h" // tr_rand_int_weak()
+#include "libtransmission/utils.h"
+#include "libtransmission/web.h" // tr_http_unescape()
 
-#include "test-fixtures.h"
+#include "tests/helpers/utils.h" // makeString()
+
+#include "gtest/gtest.h"
 
 #include <algorithm>
 #include <array>
@@ -27,7 +29,7 @@
 #include <cstdlib> // setenv(), unsetenv()
 #include <string>
 
-using ::libtransmission::test::makeString;
+using ::transmission::tests::helpers::makeString;
 
 using UtilsTest = ::testing::Test;
 

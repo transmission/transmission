@@ -6,9 +6,9 @@
  *
  */
 
-#include "transmission.h"
-#include "metainfo.h"
-#include "utils.h"
+#include "libtransmission/transmission.h"
+#include "libtransmission/metainfo.h"
+#include "libtransmission/utils.h"
 
 #include "gtest/gtest.h"
 

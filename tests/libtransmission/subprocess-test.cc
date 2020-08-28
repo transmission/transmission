@@ -6,15 +6,17 @@
  *
  */
 
-#include "transmission.h"
-#include "error.h"
-#include "file.h"
-#include "subprocess.h"
-#include "utils.h"
+#include "libtransmission/transmission.h"
+#include "libtransmission/error.h"
+#include "libtransmission/file.h"
+#include "libtransmission/platform.h" // TR_PATH_DELIMITER
+#include "libtransmission/subprocess.h"
+#include "libtransmission/utils.h"
+
+#include "tests/helpers/utils.h"
+#include "tests/helpers/sandbox.h"
 
 #include "gtest/internal/gtest-port.h" // GetArgvs()
-
-#include "test-fixtures.h"
 
 #include <array>
 #include <cstdlib>
@@ -25,11 +27,14 @@
 #define setenv(key, value, unused) SetEnvironmentVariableA(key, value)
 #endif
 
-namespace libtransmission
+namespace transmission
 {
 
-namespace test
+namespace tests
 {
+
+using helpers::makeString;
+using helpers::waitFor;
 
 std::string getSelfPath()
 {
@@ -52,7 +57,7 @@ class SubprocessTest :
     public testing::WithParamInterface<std::string>
 {
 protected:
-    Sandbox sandbox_;
+    helpers::Sandbox sandbox_;
 
     [[nodiscard]] std::string buildSandboxPath(std::string const& filename) const
     {
@@ -403,6 +408,6 @@ INSTANTIATE_TEST_SUITE_P(
     );
 #endif
 
-} // namespace test
+} // namespace tests
 
-} // namespace libtransmission
+} // namespace transmission

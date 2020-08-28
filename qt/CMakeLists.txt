@@ -220,7 +220,9 @@ if(ENABLE_QT_COM_INTEROP)
     set_source_files_properties(transmission-qt.idl ${CMAKE_CURRENT_BINARY_DIR}/transmission-qt.tlb PROPERTIES HEADER_FILE_ONLY ON)
 endif()
 
-add_executable(${TR_NAME}-qt WIN32
+set(LIB_NAME ${PROJECT_NAME})
+
+add_library(${LIB_NAME} STATIC
     ${${PROJECT_NAME}_SOURCES}
     ${${PROJECT_NAME}_UI_SOURCES}
     ${${PROJECT_NAME}_QRC_SOURCES}
@@ -229,35 +231,51 @@ add_executable(${TR_NAME}-qt WIN32
     ${${PROJECT_NAME}_WIN32_RC_FILE}
 )
 
-target_link_libraries(${TR_NAME}-qt
+target_link_libraries(${LIB_NAME}
     ${TR_NAME}
     ${QT_TARGETS}
-    ${CURL_LIBRARIES}
-    ${EVENT2_LIBRARIES}
 )
 
-target_compile_definitions(${TR_NAME}-qt PRIVATE
-    "TRANSLATIONS_DIR=\"${CMAKE_INSTALL_FULL_DATADIR}/${TR_NAME}/translations\""
+set_target_properties(${LIB_NAME}
+    PROPERTIES
+    AUTOMOC TRUE
+)
+
+set(INSTALL_TRANSLATIONS_DIR "${CMAKE_INSTALL_FULL_DATADIR}/${TR_NAME}/translations")
+
+target_compile_definitions(${LIB_NAME} PRIVATE
+    "TRANSLATIONS_DIR=\"${INSTALL_TRANSLATIONS_DIR}\""
     QT_NO_CAST_FROM_ASCII
+    QT_NO_CAST_TO_ASCII
     $<$<BOOL:${ENABLE_QT_COM_INTEROP}>:ENABLE_COM_INTEROP>
-    $<$<BOOL:${ENABLE_QT_DBUS_INTEROP}>:ENABLE_DBUS_INTEROP>)
+    $<$<BOOL:${ENABLE_QT_DBUS_INTEROP}>:ENABLE_DBUS_INTEROP>
+)
+
+set(EXE_NAME ${TR_NAME}-qt)
+
+add_executable(${EXE_NAME} WIN32
+    Main.cc
+)
+
+target_link_libraries(${EXE_NAME}
+    ${LIB_NAME}
+    ${QT_TARGETS}
+)
 
 if(MSVC)
-    tr_append_target_property(${TR_NAME}-qt LINK_FLAGS "/ENTRY:mainCRTStartup")
+    tr_append_target_property(${EXE_NAME} LINK_FLAGS "/ENTRY:mainCRTStartup")
 endif()
 
-set_target_properties(${TR_NAME}-qt PROPERTIES AUTOMOC TRUE)
-
-install(TARGETS ${TR_NAME}-qt DESTINATION ${CMAKE_INSTALL_BINDIR})
+install(TARGETS ${EXE_NAME} DESTINATION ${CMAKE_INSTALL_BINDIR})
 
 if(INSTALL_DOC)
-    install(FILES ${TR_NAME}-qt.1 DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
+    install(FILES ${EXE_NAME}.1 DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
 endif()
 
 install(FILES transmission-qt.desktop DESTINATION ${CMAKE_INSTALL_DATADIR}/applications)
 
 if(ENABLE_NLS)
-    install(FILES ${${PROJECT_NAME}_QM_FILES} DESTINATION ${CMAKE_INSTALL_DATADIR}/${TR_NAME}/translations)
+    install(FILES ${${PROJECT_NAME}_QM_FILES} DESTINATION "${INSTALL_TRANSLATIONS_DIR}")
 endif()
 
 if(WIN32)

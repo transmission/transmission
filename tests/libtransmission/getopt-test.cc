@@ -6,8 +6,8 @@
  *
  */
 
-#include "transmission.h"
-#include "tr-getopt.h"
+#include "libtransmission/transmission.h"
+#include "libtransmission/tr-getopt.h"
 
 #include "gtest/gtest.h"
 

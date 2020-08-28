@@ -8,10 +8,10 @@
 
 #define LIBTRANSMISSION_VARIANT_MODULE
 
-#include "transmission.h"
-#include "utils.h" /* tr_free */
-#include "variant-common.h"
-#include "variant.h"
+#include "libtransmission/transmission.h"
+#include "libtransmission/utils.h" /* tr_free */
+#include "libtransmission/variant-common.h"
+#include "libtransmission/variant.h"
 
 #include <algorithm>
 #include <array>

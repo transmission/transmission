@@ -6,13 +6,14 @@
  *
  */
 
-#include "transmission.h"
-#include "file.h"
-#include "net.h"
-#include "utils.h"
-#include "watchdir.h"
+#include "libtransmission/transmission.h"
+#include "libtransmission/file.h"
+#include "libtransmission/net.h"
+#include "libtransmission/platform.h"
+#include "libtransmission/utils.h"
+#include "libtransmission/watchdir.h"
 
-#include "test-fixtures.h"
+#include "tests/helpers/sandbox.h"
 
 #include <event2/event.h>
 
@@ -40,10 +41,10 @@ auto constexpr TwoHundredMsec = timeval { 0, 200000 };
 
 }
 
-namespace libtransmission
+namespace transmission
 {
 
-namespace test
+namespace tests
 {
 
 enum class WatchMode
@@ -53,7 +54,7 @@ enum class WatchMode
 };
 
 class WatchDirTest :
-    public SandboxedTest,
+    public helpers::SandboxedTest,
     public ::testing::WithParamInterface<WatchMode>
 {
 private:
@@ -369,6 +370,6 @@ INSTANTIATE_TEST_SUITE_P(
     ::testing::Values(WatchMode::NATIVE, WatchMode::GENERIC)
     );
 
-} // namespace test
+} // namespace tests
 
-} // namespace libtransmission
+} // namespace transmission

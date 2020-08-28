@@ -6,8 +6,8 @@
  *
  */
 
-#include "transmission.h"
-#include "quark.h"
+#include "libtransmission/transmission.h"
+#include "libtransmission/quark.h"
 
 #include "gtest/gtest.h"
 

@@ -8,8 +8,8 @@
 
 #include <array>
 
-#include "transmission.h"
-#include "clients.h"
+#include "libtransmission/transmission.h"
+#include "libtransmission/clients.h"
 
 #include "gtest/gtest.h"
 

@@ -6,26 +6,29 @@
  *
  */
 
-#include "transmission.h"
-#include "crypto-utils.h"
-#include "file.h"
-#include "makemeta.h"
-#include "utils.h" // tr_free()
+#include "libtransmission/transmission.h"
+#include "libtransmission/crypto-utils.h"
+#include "libtransmission/file.h"
+#include "libtransmission/makemeta.h"
+#include "libtransmission/utils.h" // tr_free()
 
-#include "test-fixtures.h"
+#include "tests/helpers/sandbox.h"
 
 #include <array>
 #include <cstdlib> // mktemp()
 #include <cstring> // strlen()
 #include <string>
 
-namespace libtransmission
+namespace transmission
 {
 
-namespace test
+namespace tests
 {
 
-class MakemetaTest : public SandboxedTest
+using helpers::makeString;
+using helpers::waitFor;
+
+class MakemetaTest : public helpers::SandboxedTest
 {
 protected:
     void testSingleFileImpl(tr_tracker_info const* trackers, int const trackerCount, void const* payload,
@@ -241,6 +244,6 @@ TEST_F(MakemetaTest, singleDirectoryRandomPayload)
     }
 }
 
-} // namespace test
+} // namespace tests
 
-} // namespace libtransmission
+} // namespace transmission

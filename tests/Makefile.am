@@ -1,6 +1,8 @@
 SUBDIRS = \
   gtest \
-  libtransmission
+  helpers \
+  libtransmission \
+  qt
 
 EXTRA_DIST = \
   CMakeLists.txt

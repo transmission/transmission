@@ -6,15 +6,15 @@
  *
  */
 
-#include "transmission.h"
-#include "crypto-utils.h"
-#include "file.h"
-#include "resume.h"
-#include "torrent.h" // tr_isTorrent()
-#include "tr-assert.h"
-#include "variant.h"
+#include "libtransmission/transmission.h"
+#include "libtransmission/crypto-utils.h"
+#include "libtransmission/file.h"
+#include "libtransmission/resume.h"
+#include "libtransmission/torrent.h" // tr_isTorrent()
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/variant.h"
 
-#include "test-fixtures.h"
+#include "tests/helpers/session.h"
 
 #include <array>
 #include <cerrno>
@@ -22,13 +22,16 @@
 #include <cstring> // strcmp()
 #include <string>
 
-namespace libtransmission
+namespace transmission
 {
 
-namespace test
+namespace tests
 {
 
-class RenameTest : public SessionTest
+using helpers::makeString;
+using helpers::waitFor;
+
+class RenameTest : public helpers::SessionTest
 {
     static auto constexpr MaxWaitMsec = 3000;
 
@@ -531,6 +534,6 @@ TEST_F(RenameTest, partialFile)
     torrentRemoveAndWait(tor, 0);
 }
 
-} // namespace test
+} // namespace tests
 
-} // namespace libtransmission
+} // namespace transmission

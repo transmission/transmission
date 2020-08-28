@@ -6,9 +6,9 @@
  *
  */
 
-#include "transmission.h"
-#include "magnet.h"
-#include "utils.h"
+#include "libtransmission/transmission.h"
+#include "libtransmission/magnet.h"
+#include "libtransmission/utils.h"
 
 #include "gtest/gtest.h"
 

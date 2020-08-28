@@ -89,5 +89,4 @@ test_watchdir_SOURCES = watchdir-test.cc
 EXTRA_DIST = \
   CMakeLists.txt \
   subprocess-test.cmd \
-  crypto-test-ref.h \
-  test-fixtures.h
+  crypto-test-ref.h

@@ -6,10 +6,10 @@
  *
  */
 
-#include "transmission.h"
-#include "crypto.h"
-#include "crypto-utils.h"
-#include "utils.h"
+#include "libtransmission/transmission.h"
+#include "libtransmission/crypto.h"
+#include "libtransmission/crypto-utils.h"
+#include "libtransmission/utils.h"
 
 #include "crypto-test-ref.h"
 

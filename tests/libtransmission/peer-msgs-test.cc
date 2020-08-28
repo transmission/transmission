@@ -6,9 +6,9 @@
  *
  */
 
-#include "transmission.h"
-#include "peer-msgs.h"
-#include "utils.h"
+#include "libtransmission/transmission.h"
+#include "libtransmission/peer-msgs.h"
+#include "libtransmission/utils.h"
 
 #include "gtest/gtest.h"
 

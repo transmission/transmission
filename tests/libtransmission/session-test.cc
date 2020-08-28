@@ -6,11 +6,11 @@
  *
  */
 
-#include "transmission.h"
-#include "session.h"
-#include "session-id.h"
-#include "utils.h"
-#include "version.h"
+#include "libtransmission/transmission.h"
+#include "libtransmission/session.h"
+#include "libtransmission/session-id.h"
+#include "libtransmission/utils.h"
+#include "libtransmission/version.h"
 
 #include "gtest/gtest.h"
 

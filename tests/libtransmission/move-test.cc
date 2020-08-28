@@ -8,24 +8,27 @@
 
 #include <event2/buffer.h>
 
-#include "transmission.h"
-#include "cache.h" // tr_cacheWriteBlock()
-#include "file.h" // tr_sys_path_*()
-#include "variant.h"
+#include "libtransmission/transmission.h"
+#include "libtransmission/cache.h" // tr_cacheWriteBlock()
+#include "libtransmission/file.h" // tr_sys_path_*()
+#include "libtransmission/variant.h"
 
-#include "test-fixtures.h"
+#include "tests/helpers/session.h"
 
 #include <string>
 #include <utility>
 
-namespace libtransmission
+namespace transmission
 {
 
-namespace test
+namespace tests
 {
+
+using helpers::makeString;
+using helpers::waitFor;
 
 class IncompleteDirTest :
-    public SessionTest,
+    public helpers::SessionTest,
     public ::testing::WithParamInterface<std::pair<std::string, std::string>>
 {
 protected:
@@ -149,7 +152,7 @@ INSTANTIATE_TEST_SUITE_P(
 ****
 ***/
 
-using MoveTest = SessionTest;
+using MoveTest = helpers::SessionTest;
 
 TEST_F(MoveTest, setLocation)
 {
@@ -185,6 +188,6 @@ TEST_F(MoveTest, setLocation)
     tr_torrentRemove(tor, true, tr_sys_path_remove);
 }
 
-} // namespace test
+} // namespace tests
 
-} // namespace libtransmission
+} // namespace transmission

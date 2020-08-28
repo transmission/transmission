@@ -6,8 +6,8 @@
  *
  */
 
-#include "transmission.h"
-#include "history.h"
+#include "libtransmission/transmission.h"
+#include "libtransmission/history.h"
 
 #include "gtest/gtest.h"
 

@@ -10,23 +10,25 @@
 #include <cstring> // strlen()
 // #include <unistd.h> // sync()
 
-#include "transmission.h"
-#include "blocklist.h"
-#include "file.h"
-#include "peer-socket.h"
-#include "net.h"
-#include "session.h" // tr_sessionIsAddressBlocked()
-#include "utils.h"
+#include "libtransmission/transmission.h"
+#include "libtransmission/blocklist.h"
+#include "libtransmission/file.h"
+#include "libtransmission/peer-socket.h"
+#include "libtransmission/net.h"
+#include "libtransmission/session.h" // tr_sessionIsAddressBlocked()
+#include "libtransmission/utils.h"
 
-#include "test-fixtures.h"
+#include "tests/helpers/session.h"
 
-namespace libtransmission
+namespace transmission
 {
 
-namespace test
+namespace tests
 {
 
-class BlocklistTest : public SessionTest
+using helpers::makeString;
+
+class BlocklistTest : public helpers::SessionTest
 {
 protected:
     static char const constexpr* const Contents1 =
@@ -141,6 +143,6 @@ TEST_F(BlocklistTest, updating)
     tr_free(path);
 }
 
-} // namespace test
+} // namespace tests
 
-} // namespace libtransmission
+} // namespace transmission

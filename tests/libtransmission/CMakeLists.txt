@@ -15,6 +15,7 @@ add_definitions(
 )
 
 include_directories(
+  ${CMAKE_SOURCE_DIR}
   ${CMAKE_SOURCE_DIR}/libtransmission
   ${CMAKE_SOURCE_DIR}/tests/libtransmission
   ${CMAKE_BINARY_DIR}/libtransmission

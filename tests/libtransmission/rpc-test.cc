@@ -6,25 +6,25 @@
  *
  */
 
-#include "transmission.h"
-#include "rpcimpl.h"
-#include "utils.h"
-#include "variant.h"
+#include "libtransmission/transmission.h"
+#include "libtransmission/rpcimpl.h"
+#include "libtransmission/utils.h"
+#include "libtransmission/variant.h"
 
-#include "test-fixtures.h"
+#include "tests/helpers/session.h"
 
 #include <algorithm>
 #include <array>
 #include <set>
 #include <vector>
 
-namespace libtransmission
+namespace transmission
 {
 
-namespace test
+namespace tests
 {
 
-using RpcTest = SessionTest;
+using RpcTest = helpers::SessionTest;
 
 TEST_F(RpcTest, list)
 {
@@ -182,6 +182,6 @@ TEST_F(RpcTest, sessionGet)
     tr_torrentRemove(tor, false, nullptr);
 }
 
-} // namespace test
+} // namespace tests
 
-} // namespace libtransmission
+} // namespace transmission

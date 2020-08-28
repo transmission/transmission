@@ -623,21 +623,3 @@ FaviconCache& Application::faviconCache()
 {
     return favicons_;
 }
-
-/***
-****
-***/
-
-int tr_main(int argc, char** argv)
-{
-    InteropHelper::initialize();
-
-#if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
-    Application::setAttribute(Qt::AA_EnableHighDpiScaling);
-#endif
-
-    Application::setAttribute(Qt::AA_UseHighDpiPixmaps);
-
-    Application app(argc, argv);
-    return app.exec();
-}

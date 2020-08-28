@@ -6,12 +6,12 @@
  *
  */
 
-#include "transmission.h"
-#include "error.h"
-#include "file.h"
-#include "tr-macros.h"
+#include "libtransmission/transmission.h"
+#include "libtransmission/error.h"
+#include "libtransmission/file.h"
+#include "libtransmission/tr-macros.h"
 
-#include "test-fixtures.h"
+#include "tests/helpers/session.h"
 
 #include <array>
 #include <cstring>
@@ -35,13 +35,15 @@
 #define NATIVE_PATH_SEP "\\"
 #endif
 
-namespace libtransmission
+namespace transmission
 {
 
-namespace test
+namespace tests
 {
 
-class FileTest : public SessionTest
+using helpers::makeString;
+
+class FileTest : public helpers::SessionTest
 {
 protected:
     auto createTestDir(std::string const& child_name)
@@ -1494,6 +1496,6 @@ TEST_F(FileTest, dirRead)
     tr_free(path1);
 }
 
-} // namespace test
+} // namespace tests
 
-} // namespace libtransmission
+} // namespace transmission
