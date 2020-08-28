@@ -417,13 +417,6 @@ bool Prefs::getBool(int key) const
 QString Prefs::getString(int key) const
 {
     assert(Items[key].type == QVariant::String);
-    QByteArray const b = values_[key].toByteArray();
-
-    if (Utils::isValidUtf8(b.constData()))
-    {
-        values_[key].setValue(QString::fromUtf8(b.constData()));
-    }
-
     return values_[key].toString();
 }
 
