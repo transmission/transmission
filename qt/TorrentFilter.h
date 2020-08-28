@@ -13,6 +13,7 @@
 #include <QSortFilterProxyModel>
 #include <QTimer>
 
+#include "FaviconCache.h"
 #include "Filters.h"
 #include "Macros.h"
 
@@ -51,4 +52,6 @@ private slots:
 private:
     QTimer refilter_timer_;
     Prefs const& prefs_;
+    FaviconCache::Key tracker_key_;
+    FilterMode filter_mode_;
 };

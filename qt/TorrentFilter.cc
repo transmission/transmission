@@ -17,7 +17,9 @@
 #include "Utils.h"
 
 TorrentFilter::TorrentFilter(Prefs const& prefs) :
-    prefs_(prefs)
+    prefs_(prefs),
+    tracker_key_(FaviconCache::getKey(prefs_.getString(Prefs::FILTER_TRACKERS))),
+    filter_mode_(prefs_.get<FilterMode>(Prefs::FILTER_MODE))
 {
     connect(&prefs_, &Prefs::changed, this, &TorrentFilter::onPrefChanged);
     connect(&refilter_timer_, &QTimer::timeout, this, &TorrentFilter::refilter);
@@ -47,8 +49,16 @@ void TorrentFilter::onPrefChanged(int key)
         msec = prefs_.getString(key).isEmpty() ? FastMSec : SlowMSec;
         break;
 
-    case Prefs::FILTER_MODE:
     case Prefs::FILTER_TRACKERS:
+        tracker_key_ = FaviconCache::getKey(prefs_.getString(key));
+        msec = FastMSec;
+        break;
+
+    case Prefs::FILTER_MODE:
+        filter_mode_ = prefs_.get<FilterMode>(key);
+        msec = FastMSec;
+        break;
+
     case Prefs::SORT_MODE:
     case Prefs::SORT_REVERSED:
         msec = FastMSec;
@@ -239,15 +249,12 @@ bool TorrentFilter::filterAcceptsRow(int source_row, QModelIndex const& source_p
 
     if (accepts)
     {
-        auto const m = prefs_.get<FilterMode>(Prefs::FILTER_MODE);
-        accepts = m.test(tor);
+        accepts = filter_mode_.test(tor);
     }
 
     if (accepts)
     {
-        auto const display_name = prefs_.getString(Prefs::FILTER_TRACKERS);
-        auto const key = FaviconCache::getKey(display_name);
-        accepts = key.isEmpty() || tor.includesTracker(key);
+        accepts = tracker_key_.isEmpty() || tor.includesTracker(tracker_key_);
     }
 
     if (accepts)

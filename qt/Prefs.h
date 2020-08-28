@@ -179,7 +179,7 @@ public:
         QVariant& v(values_[key]);
         QVariant const tmp = QVariant::fromValue(value);
 
-        if (v.isNull() || v != tmp)
+        if (!v.isValid() || v != tmp)
         {
             v = tmp;
             emit changed(key);
