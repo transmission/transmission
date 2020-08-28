@@ -47,6 +47,10 @@ EXTRA_DIST += \
   libtransmission/version.h.in \
   po/CMakeLists.txt \
   qt/CMakeLists.txt \
+  tests/CMakeLists.txt \
+  tests/helpers/CMakeLists.txt \
+  tests/libtransmission/CMakeLists.txt \
+  tests/qt/CMakeLists.txt \
   utils/CMakeLists.txt
 
 if HAVE_REVISION_FILE
