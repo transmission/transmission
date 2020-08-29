@@ -1607,6 +1607,37 @@ static char const* torrentRenamePath(tr_session* session, tr_variant* args_in, t
     return errmsg;
 }
 
+static char const* torrentRemoveTracker(tr_session* session, tr_variant* args_in, tr_variant* args_out,
+    struct tr_rpc_idle_data* idle_data)
+{
+    TR_UNUSED(args_out);
+
+    int torrentCount;
+    tr_torrent** torrents;
+    char const* oldpath = NULL;
+    char const* newname = NULL;
+    char const* errmsg = NULL;
+
+    tr_variantDictFindStr(args_in, TR_KEY_path, &oldpath, NULL);
+    tr_variantDictFindStr(args_in, TR_KEY_name, &newname, NULL);
+    torrents = getTorrents(session, args_in, &torrentCount);
+
+    if (torrentCount == 1)
+    {
+        tr_torrentRenamePath(torrents[0], oldpath, newname, torrentRenamePathDone, idle_data);
+    }
+    else
+    {
+        errmsg = "torrent-rename-path requires 1 torrent";
+    }
+
+    /* cleanup */
+    tr_free(torrents);
+    return errmsg;
+}
+
+
+
 /***
 ****
 ***/
@@ -2685,6 +2716,7 @@ methods[] =
     { "torrent-get", true, torrentGet },
     { "torrent-remove", true, torrentRemove },
     { "torrent-rename-path", false, torrentRenamePath },
+    { "torrent-remove-tracker", false, torrentRemoveTracker },
     { "torrent-set", true, torrentSet },
     { "torrent-set-location", true, torrentSetLocation },
     { "torrent-start", true, torrentStart },

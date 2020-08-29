@@ -774,6 +774,10 @@ function Inspector(controller) {
 
                         html.push('<div class="inspector_group_label">',
                             'Tier ', tier + 1, '</div>',
+                            '<button class="favorite styled"',
+                            'type="button">',
+                            'Delete tracker',
+                            '</button>',
                             '<ul class="tier_list">');
                     }
 
