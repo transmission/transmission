@@ -53,10 +53,10 @@ TEST_F(PrefsTest, emitsChanged)
     auto constexpr Key = Prefs::DOWNLOAD_DIR;
     using collection = std::set<int>;
     auto changed_properties = collection{};
-    auto const expected_pre = collection{}; 
-    auto const expected_post = collection{ Key }; 
+    auto const expected_pre = collection{};
+    auto const expected_post = collection{ Key };
 
-    auto on_received = [&](int id){ changed_properties.insert(id); };
+    auto on_received = [&](int id) { changed_properties.insert(id); };
     QObject::connect(prefs_.get(), &Prefs::changed, on_received);
 
     EXPECT_EQ(expected_pre, changed_properties);
