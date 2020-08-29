@@ -96,6 +96,7 @@ SOURCES += AboutDialog.cc \
            InteropHelper.cc \
            InteropObject.cc \
            LicenseDialog.cc \
+           Main.cc \
            MainWindow.cc \
            MakeDialog.cc \
            OptionsDialog.cc \
