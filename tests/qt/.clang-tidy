@@ -49,6 +49,7 @@ Checks: >
   -modernize-concat-nested-namespaces,
   -modernize-use-trailing-return-type,
   performance-*,
+  -performance-no-automatic-move,
   readability-*,
   -readability-convert-member-functions-to-static,
   -readability-implicit-bool-conversion,
