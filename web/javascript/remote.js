@@ -125,6 +125,17 @@ TransmissionRemote.prototype = {
         this.sendRequest(o, callback, context);
     },
 
+    removeTrackerFromTorrent: function (torrentId, trackerId, callback, context) {
+        var o = {
+            method: 'torrent-remove-tracker',
+            arguments: {
+                'torrentid': torrentId,
+                'trackerid': trackerId,
+            }
+        };
+        this.sendRequest(o, callback, context);
+    },
+
     loadDaemonStats: function (callback, context, async) {
         var o = {
             method: 'session-stats'
