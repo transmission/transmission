@@ -149,8 +149,6 @@ void TorrentDelegateMin::drawTorrent(QPainter* painter, QStyleOptionViewItem con
     bool const is_item_enabled((option.state & QStyle::State_Enabled) != 0);
     bool const is_item_active((option.state & QStyle::State_Active) != 0);
 
-    painter->save();
-
     if (is_item_selected)
     {
         QPalette::ColorGroup cg = is_item_enabled ? QPalette::Normal : QPalette::Disabled;
@@ -278,6 +276,4 @@ void TorrentDelegateMin::drawTorrent(QPainter* painter, QStyleOptionViewItem con
     progress_bar_style_.textAlignment = Qt::AlignCenter;
     setProgressBarPercentDone(option, tor);
     style->drawControl(QStyle::CE_ProgressBar, &progress_bar_style_, painter);
-
-    painter->restore();
 }
