@@ -677,7 +677,9 @@ AC_CONFIG_FILES([Makefile
                  web/javascript/jquery/Makefile
                  tests/Makefile
                  tests/gtest/Makefile
+                 tests/helpers/Makefile
                  tests/libtransmission/Makefile
+                 tests/qt/Makefile
                  po/Makefile.in])
 
 AC_OUTPUT

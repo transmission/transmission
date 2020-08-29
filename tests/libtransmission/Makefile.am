@@ -15,7 +15,7 @@ AM_CPPFLAGS = \
   @LIBEVENT_CFLAGS@ \
   @LIBCURL_CFLAGS@ \
   -I$(top_srcdir)/third-party/googletest/googletest/include \
-  -I$(top_srcdir)/libtransmission \
+  -I$(top_srcdir) \
   -I$(srcdir) \
   -pthread
 

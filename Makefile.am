@@ -46,9 +46,7 @@ EXTRA_DIST += \
   libtransmission/CMakeLists.txt \
   libtransmission/version.h.in \
   po/CMakeLists.txt \
-  qt/CMakeLists.txt \
   tests/CMakeLists.txt \
-  tests/helpers/CMakeLists.txt \
   tests/libtransmission/CMakeLists.txt \
   tests/qt/CMakeLists.txt \
   utils/CMakeLists.txt
