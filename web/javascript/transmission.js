@@ -1801,6 +1801,10 @@ Transmission.prototype = {
         return ret;
     },
 
+    removeTrackerFromTorrent: function (Torrent, Trackername) {
+        this.remote.removeTrackerFromTorrent(Torrent, Trackername, null, this);
+    },
+
     /***
      ****
      ****  Compact Mode

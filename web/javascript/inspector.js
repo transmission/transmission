@@ -775,7 +775,7 @@ function Inspector(controller) {
                         html.push('<div class="inspector_group_label">',
                             'Tier ', tier + 1, '</div>',
                             '<button class="favorite styled"',
-                            'type="button">',
+                            'type="button" onclick=transmission.removeTrackerFromTorrent(null,null)>',
                             'Delete tracker',
                             '</button>',
                             '<ul class="tier_list">');

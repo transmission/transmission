@@ -1613,18 +1613,20 @@ static char const* torrentRemoveTracker(tr_session* session, tr_variant* args_in
     TR_UNUSED(args_out);
 
     int torrentCount;
+    int64_t trackerId;
     tr_torrent** torrents;
-    char const* oldpath = NULL;
-    char const* newname = NULL;
+    tr_variant* trackers;
     char const* errmsg = NULL;
 
-    tr_variantDictFindStr(args_in, TR_KEY_path, &oldpath, NULL);
-    tr_variantDictFindStr(args_in, TR_KEY_name, &newname, NULL);
+    tr_variantDictFindInt(args_in, TR_KEY_tracker_id, &trackerId);
+    tr_variantListAddInt(trackers, trackerId);
+    
     torrents = getTorrents(session, args_in, &torrentCount);
 
     if (torrentCount == 1)
     {
-        tr_torrentRenamePath(torrents[0], oldpath, newname, torrentRenamePathDone, idle_data);
+        //tr_torrentRenamePath(torrents[0], oldpath, newname, torrentRenamePathDone, idle_data);
+        removeTrackers(torrents[0],trackers);
     }
     else
     {
