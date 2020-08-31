@@ -10,6 +10,7 @@
 #include <errno.h>
 #include <stdlib.h> /* strtol */
 #include <string.h> /* strcmp */
+#include <stdio.h>
 
 #include <zlib.h>
 
@@ -1613,24 +1614,30 @@ static char const* torrentRemoveTracker(tr_session* session, tr_variant* args_in
     TR_UNUSED(args_out);
 
     int torrentCount;
-    int64_t trackerId;
+    int64_t trackerId = 0;
+    char const* trackerIdstr = NULL;
     tr_torrent** torrents;
     tr_variant* trackers;
     char const* errmsg = NULL;
 
-    tr_variantDictFindInt(args_in, TR_KEY_tracker_id, &trackerId);
-    tr_variantListAddInt(trackers, trackerId);
+    tr_variant* ids;
+
+    if (!tr_variantDictFindList(args_in, "trackerid", &ids)){
+        fprintf(stderr,"Error reading list \n");
+    }
+    if (!tr_variantDictFindStr(args_in, "trackerid", &trackerIdstr, NULL)){
+        fprintf(stderr,"Error reading list \n");
+    }
     
     torrents = getTorrents(session, args_in, &torrentCount);
 
     if (torrentCount == 1)
     {
-        //tr_torrentRenamePath(torrents[0], oldpath, newname, torrentRenamePathDone, idle_data);
-        removeTrackers(torrents[0],trackers);
+        //removeTrackers(torrents[0], trackers);
     }
     else
     {
-        errmsg = "torrent-rename-path requires 1 torrent";
+        errmsg = "torrent-remove-tracker requires 1 torrent";
     }
 
     /* cleanup */
@@ -2718,7 +2725,7 @@ methods[] =
     { "torrent-get", true, torrentGet },
     { "torrent-remove", true, torrentRemove },
     { "torrent-rename-path", false, torrentRenamePath },
-    { "torrent-remove-tracker", false, torrentRemoveTracker },
+    { "torrent-remove-tracker", true, torrentRemoveTracker },
     { "torrent-set", true, torrentSet },
     { "torrent-set-location", true, torrentSetLocation },
     { "torrent-start", true, torrentStart },

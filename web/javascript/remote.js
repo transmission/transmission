@@ -129,7 +129,7 @@ TransmissionRemote.prototype = {
         var o = {
             method: 'torrent-remove-tracker',
             arguments: {
-                'torrentid': torrentId,
+                'ids': torrentId,
                 'trackerid': trackerId,
             }
         };
