@@ -29,7 +29,7 @@ public:
 
     QIcon folderIcon() const { return folder_icon_; }
     QIcon fileIcon() const { return file_icon_; }
-    QIcon guessMimeIcon(QString const& filename) const;
+    QIcon guessMimeIcon(QString const& filename, QIcon fallback = {}) const;
 
 protected:
     IconCache();

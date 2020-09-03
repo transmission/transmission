@@ -41,15 +41,15 @@ IconCache& IconCache::get()
 
 IconCache::IconCache() :
     folder_icon_(QFileIconProvider().icon(QFileIconProvider::Folder)),
-    file_icon_(QFileIconProvider().icon(QFileIconProvider::Folder))
+    file_icon_(QFileIconProvider().icon(QFileIconProvider::File))
 {
 }
 
-QIcon IconCache::guessMimeIcon(QString const& filename) const
+QIcon IconCache::guessMimeIcon(QString const& filename, QIcon fallback) const
 {
-#ifdef _WIN32
-
     QIcon icon;
+
+#ifdef _WIN32
 
     if (!filename.isEmpty())
     {
@@ -60,13 +60,18 @@ QIcon IconCache::guessMimeIcon(QString const& filename) const
         addAssociatedFileIcon(file_info, SHGFI_LARGEICON, icon);
     }
 
-    return icon;
-
 #else
 
-    return getMimeIcon(filename);
+    icon = getMimeIcon(filename, fallback);
 
 #endif
+
+    if (icon.isNull())
+    {
+        icon = fallback;
+    }
+
+    return icon;
 }
 
 /***
@@ -111,8 +116,6 @@ void IconCache::addAssociatedFileIcon(QFileInfo const& file_info, UINT icon_size
 
 QIcon IconCache::getMimeIcon(QString const& filename) const
 {
-    // If the suffix doesn't match a mime type, treat it as a folder.
-    // This heuristic is fast and yields good results for torrent names.
     if (suffixes_.empty())
     {
         for (auto const& type : QMimeDatabase().allMimeTypes())
@@ -125,7 +128,7 @@ QIcon IconCache::getMimeIcon(QString const& filename) const
     auto const ext = QFileInfo(filename).suffix();
     if (suffixes_.count(ext) == 0)
     {
-        return folder_icon_;
+        return {};
     }
 
     QIcon& icon = icon_cache_[ext];
@@ -145,7 +148,7 @@ QIcon IconCache::getMimeIcon(QString const& filename) const
 
         if (icon.isNull())
         {
-            icon = file_icon_;
+            icon = {};
         }
     }
 
