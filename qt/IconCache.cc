@@ -62,7 +62,7 @@ QIcon IconCache::guessMimeIcon(QString const& filename, QIcon fallback) const
 
 #else
 
-    icon = getMimeIcon(filename, fallback);
+    icon = getMimeIcon(filename);
 
 #endif
 
