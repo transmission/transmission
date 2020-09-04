@@ -405,6 +405,18 @@ include(CheckCCompilerFlag)
 include(CheckCXXCompilerFlag)
 
 if(MSVC)
+    # Replace /W3 with /W4 in defaults.
+    # https://cmake.org/cmake/help/git-stage/policy/CMP0092.html
+    if(CMAKE_VERSION VERSION_LESS "3.15.0")
+        foreach (flag_var
+                 CMAKE_C_FLAGS CMAKE_C_FLAGS_DEBUG CMAKE_C_FLAGS_RELEASE
+                 CMAKE_C_FLAGS_MINSIZEREL CMAKE_C_FLAGS_RELWITHDEBINFO
+                 CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
+                 CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO)
+          string(REPLACE "/W3" "/W4" ${flag_var} "${${flag_var}}")
+        endforeach()
+    endif()
+
     set(WARNING_CANDIDATES
         /W4)
 
@@ -614,6 +626,11 @@ endif()
 if(ENABLE_TESTS)
     include(CTest)
     enable_testing()
+
+    if(NOT CMAKE_VERSION VERSION_LESS "3.17.0")
+        set(CMAKE_CTEST_ARGUMENTS "--output-on-failure")
+    endif()
+
     add_subdirectory(tests)
 endif()
 
