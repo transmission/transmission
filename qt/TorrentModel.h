@@ -48,6 +48,7 @@ public:
 
     using torrents_t = QVector<Torrent*>;
     torrents_t const& torrents() const { return torrents_; }
+    Torrent const* torrent(QModelIndex const& index) const;
 
     // QAbstractItemModel
     int rowCount(QModelIndex const& parent = QModelIndex()) const override;

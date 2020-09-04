@@ -29,6 +29,11 @@ TorrentFilter::TorrentFilter(Prefs const& prefs) :
     refilter();
 }
 
+Torrent const* TorrentFilter::torrent(QModelIndex const& index) const
+{
+    return static_cast<TorrentModel*>(sourceModel())->torrent(index);
+}
+
 /***
 ****
 ***/
@@ -107,8 +112,9 @@ int compare(T const a, T const b)
 bool TorrentFilter::lessThan(QModelIndex const& left, QModelIndex const& right) const
 {
     int val = 0;
-    auto const* a = sourceModel()->data(left, TorrentModel::TorrentRole).value<Torrent const*>();
-    auto const* b = sourceModel()->data(right, TorrentModel::TorrentRole).value<Torrent const*>();
+    auto source_model = static_cast<TorrentModel*>(sourceModel());
+    auto const* const a = source_model->torrent(left);
+    auto const* const b = source_model->torrent(right);
 
     switch (prefs_.get<SortMode>(Prefs::SORT_MODE).mode())
     {
@@ -243,8 +249,8 @@ bool TorrentFilter::lessThan(QModelIndex const& left, QModelIndex const& right) 
 
 bool TorrentFilter::filterAcceptsRow(int source_row, QModelIndex const& source_parent) const
 {
-    QModelIndex child_index = sourceModel()->index(source_row, 0, source_parent);
-    auto const& tor = *child_index.model()->data(child_index, TorrentModel::TorrentRole).value<Torrent const*>();
+    auto const child_index = sourceModel()->index(source_row, 0, source_parent);
+    auto const& tor = *torrent(child_index);
     bool accepts = true;
 
     if (accepts)

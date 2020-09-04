@@ -852,7 +852,7 @@ void MainWindow::refreshTorrentViewHeader()
 
 void MainWindow::refreshActionSensitivity()
 {
-    auto const* model = ui_.listView->model();
+    auto const* model = &filter_model_;
     auto const* selection_model = ui_.listView->selectionModel();
     auto const row_count = model->rowCount();
 
@@ -865,7 +865,7 @@ void MainWindow::refreshActionSensitivity()
     auto const now = time(nullptr);
     for (auto const& row : selection_model->selectedRows())
     {
-        auto const& tor = model->data(row, TorrentModel::TorrentRole).value<Torrent const*>();
+        auto const* tor = model->torrent(row);
 
         ++selected;
 
@@ -941,10 +941,11 @@ void MainWindow::clearSelection()
 torrent_ids_t MainWindow::getSelectedTorrents(bool with_metadata_only) const
 {
     torrent_ids_t ids;
+    auto const* model = &filter_model_;
 
     for (QModelIndex const& index : ui_.listView->selectionModel()->selectedRows())
     {
-        auto const* tor(index.data(TorrentModel::TorrentRole).value<Torrent const*>());
+        auto const* tor = model->torrent(index);
 
         if (tor != nullptr && (!with_metadata_only || tor->hasMetadata()))
         {
@@ -1337,6 +1338,7 @@ void MainWindow::addTorrent(AddData const& addMe, bool show_options)
 
 void MainWindow::removeTorrents(bool const delete_files)
 {
+    auto const* model = &filter_model_;
     torrent_ids_t ids;
     QMessageBox msg_box(this);
     QString primary_text;
@@ -1347,7 +1349,7 @@ void MainWindow::removeTorrents(bool const delete_files)
 
     for (QModelIndex const& index : ui_.listView->selectionModel()->selectedRows())
     {
-        auto const* tor(index.data(TorrentModel::TorrentRole).value<Torrent const*>());
+        auto const* tor = model->torrent(index);
         ids.insert(tor->id());
 
         if (tor->connectedPeers())

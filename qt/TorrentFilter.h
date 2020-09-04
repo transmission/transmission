@@ -39,6 +39,7 @@ public:
 public:
     explicit TorrentFilter(Prefs const& prefs);
     [[nodiscard]] std::array<int, FilterMode::NUM_MODES> countTorrentsPerMode() const;
+    Torrent const* torrent(QModelIndex const& index) const;
 
 protected:
     // QSortFilterProxyModel

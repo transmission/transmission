@@ -91,27 +91,27 @@ int TorrentModel::rowCount(QModelIndex const& parent) const
     return torrents_.size();
 }
 
+Torrent const* TorrentModel::torrent(QModelIndex const& index) const
+{
+    return torrents_.value(index.row(), nullptr);
+}
+
 QVariant TorrentModel::data(QModelIndex const& index, int role) const
 {
-    QVariant var;
-
-    Torrent const* t = torrents_.value(index.row(), nullptr);
+    auto const* t = torrent(index);
 
     if (t != nullptr)
     {
         switch (role)
         {
         case Qt::DisplayRole:
-            var.setValue(t->name());
-            break;
+            return t->name();
 
         case Qt::DecorationRole:
-            var.setValue(t->getMimeTypeIcon());
-            break;
+            return t->getMimeTypeIcon();
 
         case TorrentRole:
-            var = QVariant::fromValue(t);
-            break;
+            return QVariant::fromValue(t);
 
         default:
             // std::cerr << "Unhandled role: " << role << std::endl;
@@ -119,7 +119,7 @@ QVariant TorrentModel::data(QModelIndex const& index, int role) const
         }
     }
 
-    return var;
+    return QVariant {};
 }
 
 /***
