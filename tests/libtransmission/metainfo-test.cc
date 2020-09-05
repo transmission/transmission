@@ -59,7 +59,7 @@ TEST(Metainfo, bucket)
         void const* benc;
     };
 
-    auto constexpr Tests = std::array<Test, 9>{
+    auto const tests = std::array<Test, 9>{
         Test{ 0, TR_PARSE_OK, BEFORE_PATH "5:a.txt" AFTER_PATH },
 
         /* allow empty components, but not =all= empty components, see bug #5517 */
@@ -83,7 +83,7 @@ TEST(Metainfo, bucket)
 
     tr_logSetLevel(TR_LOG_SILENT);
 
-    for (auto const& test : Tests)
+    for (auto const& test : tests)
     {
         auto* ctor = tr_ctorNew(nullptr);
         int const err = tr_ctorSetMetainfo(ctor, test.benc, strlen(static_cast<char const*>(test.benc)));
@@ -109,7 +109,7 @@ TEST(Metainfo, sanitize)
         bool expected_is_adjusted;
     };
 
-    auto constexpr Tests = std::array<Test, 29>{
+    auto const tests = std::array<Test, 29>{
         // skipped
         Test{ "", 0, nullptr, false },
         { ".", 1, nullptr, false },
@@ -146,7 +146,7 @@ TEST(Metainfo, sanitize)
         { "compass", 7, "compass", false }
     };
 
-    for (auto const& test : Tests)
+    for (auto const& test : tests)
     {
         bool is_adjusted;
         char* const result = tr_metainfo_sanitize_path_component(test.str, test.len, &is_adjusted);
