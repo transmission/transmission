@@ -406,7 +406,7 @@ include(CheckCXXCompilerFlag)
 
 if(MSVC)
     set(WARNING_CANDIDATES
-        /W4)
+        /W3)
 
     foreach(FLAG ${WARNING_CANDIDATES})
         list(APPEND C_WARNING_FLAGS ${FLAG})
