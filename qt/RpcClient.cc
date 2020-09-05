@@ -158,9 +158,9 @@ void RpcClient::sendNetworkRequest(TrVariantPtr json, QFutureInterface<RpcRespon
 #ifdef DEBUG_HTTP
     std::cerr << "sending " << "POST " << qPrintable(url_.path()) << std::endl;
 
-    for (QByteArray const& b : request.rawHeaderList())
+    for (QByteArray const& b : request_->rawHeaderList())
     {
-        std::cerr << b.constData() << ": " << request.rawHeader(b).constData() << std::endl;
+        std::cerr << b.constData() << ": " << request_->rawHeader(b).constData() << std::endl;
     }
 
     std::cerr << "Body:\n" << json_data.constData() << std::endl;

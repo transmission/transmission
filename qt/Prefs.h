@@ -134,7 +134,7 @@ public:
 
 public:
     Prefs(QString config_dir);
-    virtual ~Prefs();
+    ~Prefs() override;
 
     bool isCore(int key) const
     {
