@@ -130,7 +130,7 @@ TEST(Crypto, ssha1)
 
     auto constexpr Tests = std::array<Test, 2>{
         Test{ "test", "{15ad0621b259a84d24dcd4e75b09004e98a3627bAMbyRHJy" },
-        { "QNY)(*#$B)!_X$B !_B#($^!)*&$%CV!#)&$C!@$(P*)", "{10e2d7acbb104d970514a147cd16d51dfa40fb3c0OSwJtOL" }
+        Test{ "QNY)(*#$B)!_X$B !_B#($^!)*&$%CV!#)&$C!@$(P*)", "{10e2d7acbb104d970514a147cd16d51dfa40fb3c0OSwJtOL" }
     };
 
     auto constexpr HashCount = size_t{ 4 * 1024 };
