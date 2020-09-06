@@ -25,7 +25,6 @@
 #include "RpcQueue.h"
 #include "Torrent.h"
 #include "Typedefs.h"
-#include "Utils.h" // std::hash<QString>
 
 class AddData;
 class Prefs;
