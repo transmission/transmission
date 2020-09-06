@@ -1161,7 +1161,7 @@ void Session::onDuplicatesTimer()
         lines.sort(Qt::CaseInsensitive);
         auto const title = tr("Duplicate Torrent(s)", "", lines.size());
         auto const detail = lines.join(QStringLiteral("\n"));
-        auto const detail_text = tr("Unable to add %1 duplicate torrents", "", lines.size()).arg(lines.size());
+        auto const detail_text = tr("Unable to add %n duplicate torrent(s)", "", lines.size());
         auto const use_detail = lines.size() > 1;
         auto const text = use_detail ? detail_text : detail;
 
