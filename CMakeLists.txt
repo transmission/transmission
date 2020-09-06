@@ -616,7 +616,7 @@ if(ENABLE_TESTS)
     enable_testing()
 
     if(NOT CMAKE_VERSION VERSION_LESS "3.17.0")
-        set(CMAKE_CTEST_ARGUMENTS "--output-on-failure")
+        set(CMAKE_CTEST_ARGUMENTS --output-on-failure -VV)
     endif()
 
     add_subdirectory(tests)
