@@ -1149,7 +1149,7 @@ void Session::onDuplicatesTimer()
     duplicates.swap(duplicates_);
 
     QStringList lines;
-    for (auto it : duplicates_)
+    for (auto it : duplicates)
     {
         lines.push_back(tr("%1 (copy of %2)")
             .arg(it.first)
