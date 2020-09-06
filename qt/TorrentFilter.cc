@@ -112,7 +112,7 @@ int compare(T const a, T const b)
 bool TorrentFilter::lessThan(QModelIndex const& left, QModelIndex const& right) const
 {
     int val = 0;
-    auto source_model = static_cast<TorrentModel*>(sourceModel());
+    auto* source_model = static_cast<TorrentModel*>(sourceModel());
     auto const* const a = source_model->torrent(left);
     auto const* const b = source_model->torrent(right);
 
