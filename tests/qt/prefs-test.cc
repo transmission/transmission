@@ -29,6 +29,10 @@ protected:
     void SetUp() override
     {
         std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
+        SandboxedTest::SetUp();
+        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
+        auto prefs = std::make_unique<Prefs>(sandboxDir().c_str());
+        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     }
 
     void TearDown() override
