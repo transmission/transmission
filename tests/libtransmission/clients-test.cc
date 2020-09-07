@@ -15,14 +15,14 @@
 
 TEST(Client, clientForId)
 {
-    struct Test
+    struct LocalTest
     {
         char const* peer_id;
         char const* expected_client;
     };
 
-    auto const tests = std::array<Test, 24>{
-        Test{ "-BT791B-", "BitTorrent 7.9.1 (Beta)" },
+    auto const tests = std::array<LocalTest, 24>{
+        LocalTest{ "-BT791B-", "BitTorrent 7.9.1 (Beta)" },
         { "-BT791\0-", "BitTorrent 7.9.1" },
         { "-FC1013-", "FileCroc 1.0.1.3" },
         { "-FC1013-", "FileCroc 1.0.1.3" },

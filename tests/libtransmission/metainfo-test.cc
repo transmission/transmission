@@ -52,15 +52,15 @@ TEST(Metainfo, magnetLink)
 // FIXME: split these into parameterized tests?
 TEST(Metainfo, bucket)
 {
-    struct Test
+    struct LocalTest
     {
         int expected_benc_err;
         int expected_parse_result;
         void const* benc;
     };
 
-    auto const tests = std::array<Test, 9>{
-        Test{ 0, TR_PARSE_OK, BEFORE_PATH "5:a.txt" AFTER_PATH },
+    auto const tests = std::array<LocalTest, 9>{
+        LocalTest{ 0, TR_PARSE_OK, BEFORE_PATH "5:a.txt" AFTER_PATH },
 
         /* allow empty components, but not =all= empty components, see bug #5517 */
         { 0, TR_PARSE_OK, BEFORE_PATH "0:5:a.txt" AFTER_PATH },
@@ -101,7 +101,7 @@ TEST(Metainfo, bucket)
 
 TEST(Metainfo, sanitize)
 {
-    struct Test
+    struct LocalTest
     {
         char const* str;
         size_t len;
@@ -109,9 +109,9 @@ TEST(Metainfo, sanitize)
         bool expected_is_adjusted;
     };
 
-    auto const tests = std::array<Test, 29>{
+    auto const tests = std::array<LocalTest, 29>{
         // skipped
-        Test{ "", 0, nullptr, false },
+        LocalTest{ "", 0, nullptr, false },
         { ".", 1, nullptr, false },
         { "..", 2, nullptr, true },
         { ".....", 5, nullptr, false },
