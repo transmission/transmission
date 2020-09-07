@@ -122,14 +122,14 @@ TEST(Crypto, sha1)
 
 TEST(Crypto, ssha1)
 {
-    struct Test
+    struct Test_local
     {
         char const* const plain_text;
         char const* const ssha1;
     };
 
-    auto constexpr Tests = std::array<Test, 2>{
-        Test{ "test", "{15ad0621b259a84d24dcd4e75b09004e98a3627bAMbyRHJy" },
+    auto constexpr Tests = std::array<Test_local, 2>{
+        Test_local{ "test", "{15ad0621b259a84d24dcd4e75b09004e98a3627bAMbyRHJy" },
         { "QNY)(*#$B)!_X$B !_B#($^!)*&$%CV!#)&$C!@$(P*)", "{10e2d7acbb104d970514a147cd16d51dfa40fb3c0OSwJtOL" }
     };
 
