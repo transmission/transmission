@@ -297,12 +297,8 @@ Session::Session(QString config_dir, Prefs& prefs) :
     config_dir_(std::move(config_dir)),
     prefs_(prefs)
 {
+    stats_ = { };
     stats_.ratio = TR_RATIO_NA;
-    stats_.uploadedBytes = 0;
-    stats_.downloadedBytes = 0;
-    stats_.filesAdded = 0;
-    stats_.sessionCount = 0;
-    stats_.secondsActive = 0;
     cumulative_stats_ = stats_;
 
     connect(&prefs_, SIGNAL(changed(int)), this, SLOT(updatePref(int)));
@@ -859,28 +855,28 @@ RpcResponseFuture Session::exec(std::string_view method, tr_variant* args)
 
 void Session::updateStats(tr_variant* d, tr_session_stats* stats)
 {
-    auto value = dictFind<int>(d, TR_KEY_uploadedBytes);
+    auto value = dictFind<uint64_t>(d, TR_KEY_uploadedBytes);
     if (value)
     {
         stats->uploadedBytes = *value;
     }
 
-    if ((value = dictFind<int>(d, TR_KEY_downloadedBytes)))
+    if ((value = dictFind<uint64_t>(d, TR_KEY_downloadedBytes)))
     {
         stats->downloadedBytes = *value;
     }
 
-    if ((value = dictFind<int>(d, TR_KEY_filesAdded)))
+    if ((value = dictFind<uint64_t>(d, TR_KEY_filesAdded)))
     {
         stats->filesAdded = *value;
     }
 
-    if ((value = dictFind<int>(d, TR_KEY_sessionCount)))
+    if ((value = dictFind<uint64_t>(d, TR_KEY_sessionCount)))
     {
         stats->sessionCount = *value;
     }
 
-    if ((value = dictFind<int>(d, TR_KEY_secondsActive)))
+    if ((value = dictFind<uint64_t>(d, TR_KEY_secondsActive)))
     {
         stats->secondsActive = *value;
     }
