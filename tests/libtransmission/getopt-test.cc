@@ -16,7 +16,7 @@
 namespace
 {
 
-auto constexpr Options = std::array<tr_option, 8>{
+auto const Options = std::array<tr_option, 8>{
     tr_option{ 'p', "private", "Allow this torrent to only be used with the specified tracker(s)", "p", false, nullptr },
     { 'o', "outfile", "Save the generated .torrent to this filename", "o", true, "<file>" },
     { 's', "piecesize", "Set how many KiB each piece should be, overriding the preferred default", "s", true, "<size in KiB>" },
@@ -54,101 +54,101 @@ protected:
 
 TEST_F(GetoptTest, noOptions)
 {
-    auto constexpr Args = std::array<char const*, 1>{ "/some/path/tr-getopt-test" };
+    auto const args = std::array<char const*, 1>{ "/some/path/tr-getopt-test" };
     auto constexpr ExpectedN = 0;
-    auto constexpr ExpectedC = std::array<int, ExpectedN>{};
-    auto constexpr ExpectedOptArg = std::array<char const*, ExpectedN>{};
-    runTest(Args.size(), Args.data(), ExpectedN, ExpectedC.data(), ExpectedOptArg.data());
+    auto const expected_c = std::array<int, ExpectedN>{};
+    auto const expected_opt_arg = std::array<char const*, ExpectedN>{};
+    runTest(args.size(), args.data(), ExpectedN, expected_c.data(), expected_opt_arg.data());
 }
 
 TEST_F(GetoptTest, shortNoarg)
 {
-    auto constexpr Args = std::array<char const*, 2>{ "/some/path/tr-getopt-test", "-p" };
+    auto const args = std::array<char const*, 2>{ "/some/path/tr-getopt-test", "-p" };
     auto constexpr ExpectedN = 1;
-    auto constexpr ExpectedC = std::array<int, ExpectedN>{ 'p' };
-    auto constexpr ExpectedOptArg = std::array<char const*, ExpectedN>{ nullptr };
-    runTest(Args.size(), Args.data(), ExpectedN, ExpectedC.data(), ExpectedOptArg.data());
+    auto const expected_c = std::array<int, ExpectedN>{ 'p' };
+    auto const expected_opt_arg = std::array<char const*, ExpectedN>{ nullptr };
+    runTest(args.size(), args.data(), ExpectedN, expected_c.data(), expected_opt_arg.data());
 }
 
 TEST_F(GetoptTest, longNoarg)
 {
-    auto constexpr Args = std::array<char const*, 2>{ "/some/path/tr-getopt-test", "--private" };
+    auto const args = std::array<char const*, 2>{ "/some/path/tr-getopt-test", "--private" };
     auto constexpr ExpectedN = 1;
-    auto constexpr ExpectedC = std::array<int, ExpectedN>{ 'p' };
-    auto constexpr ExpectedOptArg = std::array<char const*, ExpectedN>{ nullptr };
-    runTest(Args.size(), Args.data(), ExpectedN, ExpectedC.data(), ExpectedOptArg.data());
+    auto const expected_c = std::array<int, ExpectedN>{ 'p' };
+    auto const expected_opt_arg = std::array<char const*, ExpectedN>{ nullptr };
+    runTest(args.size(), args.data(), ExpectedN, expected_c.data(), expected_opt_arg.data());
 }
 
 TEST_F(GetoptTest, shortWithArg)
 {
-    auto constexpr Args = std::array<char const*, 3>{ "/some/path/tr-getopt-test", "-o", "/tmp/outfile" };
+    auto const args = std::array<char const*, 3>{ "/some/path/tr-getopt-test", "-o", "/tmp/outfile" };
     auto constexpr ExpectedN = 1;
-    auto constexpr ExpectedC = std::array<int, ExpectedN>{ 'o' };
-    auto constexpr ExpectedOptArg = std::array<char const*, ExpectedN>{ "/tmp/outfile" };
-    runTest(Args.size(), Args.data(), ExpectedN, ExpectedC.data(), ExpectedOptArg.data());
+    auto const expected_c = std::array<int, ExpectedN>{ 'o' };
+    auto const expected_opt_arg = std::array<char const*, ExpectedN>{ "/tmp/outfile" };
+    runTest(args.size(), args.data(), ExpectedN, expected_c.data(), expected_opt_arg.data());
 }
 
 TEST_F(GetoptTest, longWithArg)
 {
-    auto constexpr Args = std::array<char const*, 3>{ "/some/path/tr-getopt-test", "--outfile", "/tmp/outfile" };
+    auto const args = std::array<char const*, 3>{ "/some/path/tr-getopt-test", "--outfile", "/tmp/outfile" };
     auto constexpr ExpectedN = 1;
-    auto constexpr ExpectedC = std::array<int, ExpectedN>{ 'o' };
-    auto constexpr ExpectedOptArg = std::array<char const*, ExpectedN>{ "/tmp/outfile" };
-    runTest(Args.size(), Args.data(), ExpectedN, ExpectedC.data(), ExpectedOptArg.data());
+    auto const expected_c = std::array<int, ExpectedN>{ 'o' };
+    auto const expected_opt_arg = std::array<char const*, ExpectedN>{ "/tmp/outfile" };
+    runTest(args.size(), args.data(), ExpectedN, expected_c.data(), expected_opt_arg.data());
 }
 
 TEST_F(GetoptTest, shortWithArgAfterEq)
 {
-    auto constexpr Args = std::array<char const*, 2>{ "/some/path/tr-getopt-test", "-o=/tmp/outfile" };
+    auto const args = std::array<char const*, 2>{ "/some/path/tr-getopt-test", "-o=/tmp/outfile" };
     auto constexpr ExpectedN = 1;
-    auto constexpr ExpectedC = std::array<int, ExpectedN>{ 'o' };
-    auto constexpr ExpectedOptArg = std::array<char const*, ExpectedN>{ "/tmp/outfile" };
-    runTest(Args.size(), Args.data(), ExpectedN, ExpectedC.data(), ExpectedOptArg.data());
+    auto const expected_c = std::array<int, ExpectedN>{ 'o' };
+    auto const expected_opt_arg = std::array<char const*, ExpectedN>{ "/tmp/outfile" };
+    runTest(args.size(), args.data(), ExpectedN, expected_c.data(), expected_opt_arg.data());
 }
 
 TEST_F(GetoptTest, longWithArgAfterEq)
 {
-    auto constexpr Args = std::array<char const*, 2>{ "/some/path/tr-getopt-test", "--outfile=/tmp/outfile" };
+    auto const args = std::array<char const*, 2>{ "/some/path/tr-getopt-test", "--outfile=/tmp/outfile" };
     auto constexpr ExpectedN = 1;
-    auto constexpr ExpectedC = std::array<int, ExpectedN>{ 'o' };
-    auto constexpr ExpectedOptArg = std::array<char const*, ExpectedN>{ "/tmp/outfile" };
-    runTest(Args.size(), Args.data(), ExpectedN, ExpectedC.data(), ExpectedOptArg.data());
+    auto const expected_c = std::array<int, ExpectedN>{ 'o' };
+    auto const expected_opt_arg = std::array<char const*, ExpectedN>{ "/tmp/outfile" };
+    runTest(args.size(), args.data(), ExpectedN, expected_c.data(), expected_opt_arg.data());
 }
 
 TEST_F(GetoptTest, unknownOption)
 {
-    auto constexpr Args = std::array<char const*, 2>{ "/some/path/tr-getopt-test", "-z" };
+    auto const args = std::array<char const*, 2>{ "/some/path/tr-getopt-test", "-z" };
     auto constexpr ExpectedN = 1;
-    auto constexpr ExpectedC = std::array<int, ExpectedN>{ TR_OPT_UNK };
-    auto constexpr ExpectedOptArg = std::array<char const*, ExpectedN>{ "-z" };
-    runTest(Args.size(), Args.data(), ExpectedN, ExpectedC.data(), ExpectedOptArg.data());
+    auto const expected_c = std::array<int, ExpectedN>{ TR_OPT_UNK };
+    auto const expected_opt_arg = std::array<char const*, ExpectedN>{ "-z" };
+    runTest(args.size(), args.data(), ExpectedN, expected_c.data(), expected_opt_arg.data());
 }
 
 TEST_F(GetoptTest, missingArg)
 {
-    auto constexpr Args = std::array<char const*, 2>{ "/some/path/tr-getopt-test", "-o" };
+    auto const args = std::array<char const*, 2>{ "/some/path/tr-getopt-test", "-o" };
     auto constexpr ExpectedN = 1;
-    auto constexpr ExpectedC = std::array<int, ExpectedN>{ TR_OPT_ERR };
-    auto constexpr ExpectedOptArg = std::array<char const*, ExpectedN>{ nullptr };
-    runTest(Args.size(), Args.data(), ExpectedN, ExpectedC.data(), ExpectedOptArg.data());
+    auto const expected_c = std::array<int, ExpectedN>{ TR_OPT_ERR };
+    auto const expected_opt_arg = std::array<char const*, ExpectedN>{ nullptr };
+    runTest(args.size(), args.data(), ExpectedN, expected_c.data(), expected_opt_arg.data());
 }
 
 TEST_F(GetoptTest, lotsOfOptions)
 {
-    auto constexpr Args =
+    auto const args =
         std::array<char const*, 6>{ "/some/path/tr-getopt-test", "--piecesize=4", "-c", "hello world", "-p", "--tracker=foo" };
     auto constexpr ExpectedN = 4;
-    auto constexpr ExpectedC = std::array<int, ExpectedN>{ 's', 'c', 'p', 't' };
-    auto constexpr ExpectedOptArg = std::array<char const*, ExpectedN>{ "4", "hello world", nullptr, "foo" };
-    runTest(Args.size(), Args.data(), ExpectedN, ExpectedC.data(), ExpectedOptArg.data());
+    auto const expected_c = std::array<int, ExpectedN>{ 's', 'c', 'p', 't' };
+    auto const expected_opt_arg = std::array<char const*, ExpectedN>{ "4", "hello world", nullptr, "foo" };
+    runTest(args.size(), args.data(), ExpectedN, expected_c.data(), expected_opt_arg.data());
 }
 
 TEST_F(GetoptTest, matchLongerKey)
 {
     // confirm that this resolves to 'q' and not 'p'
-    auto constexpr Args = std::array<char const*, 2>{ "/some/path/tr-getopt-test", "-pk" };
+    auto const args = std::array<char const*, 2>{ "/some/path/tr-getopt-test", "-pk" };
     auto constexpr ExpectedN = 1;
-    auto constexpr ExpectedC = std::array<int, ExpectedN>{ 'q' };
-    auto constexpr ExpectedOptArg = std::array<char const*, ExpectedN>{ nullptr };
-    runTest(Args.size(), Args.data(), ExpectedN, ExpectedC.data(), ExpectedOptArg.data());
+    auto const expected_c = std::array<int, ExpectedN>{ 'q' };
+    auto const expected_opt_arg = std::array<char const*, ExpectedN>{ nullptr };
+    runTest(args.size(), args.data(), ExpectedN, expected_c.data(), expected_opt_arg.data());
 }
