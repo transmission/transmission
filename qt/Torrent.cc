@@ -173,11 +173,11 @@ void Torrent::updateMimeIcon()
     }
     else if (files.size() == 1)
     {
-        icon = icon_cache.guessMimeIcon(files.at(0).filename);
+        icon = icon_cache.guessMimeIcon(files.at(0).filename, icon_cache.fileIcon());
     }
     else
     {
-        icon = icon_cache.guessMimeIcon(name());
+        icon = icon_cache.guessMimeIcon(name(), icon_cache.folderIcon());
     }
 
     icon_ = icon;
