@@ -76,7 +76,7 @@ function global:Test-Transmission([string] $DepsPrefixDir, [string] $SourceDir) 
     ) -join [System.IO.Path]::PathSeparator
 
     try {
-        Invoke-VcEnvCommand cmake -E chdir $BuildDir ctest -T Test --output-on-failure -VV
+        Invoke-VcEnvCommand cmake -E chdir $BuildDir ctest -T Test --output-on-failure -VV --timeout 120
     } finally {
         Publish-CTestResults (Join-Path $BuildDir Testing '*' Test.xml)
     }
