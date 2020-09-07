@@ -9,7 +9,9 @@
 #pragma once
 
 #include <array>
+#include <optional>
 
+#include <QRegExp>
 #include <QSortFilterProxyModel>
 #include <QTimer>
 
@@ -49,6 +51,7 @@ private slots:
     void refilter();
 
 private:
+    std::optional<QRegExp> regex_;
     QTimer refilter_timer_;
     Prefs const& prefs_;
 };

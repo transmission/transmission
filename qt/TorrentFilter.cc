@@ -42,10 +42,18 @@ void TorrentFilter::onPrefChanged(int key)
     std::optional<int> msec;
     switch (key)
     {
-    case Prefs::FILTER_TEXT:
+    case Prefs::FILTER_TEXT: {
         // special case for isEmpty: user probably hit the 'clear' button
-        msec = prefs_.getString(key).isEmpty() ? FastMSec : SlowMSec;
+        auto const text = prefs_.getString(key);
+        if (text.isEmpty()) {
+            msec = FastMSec;
+            regex_.reset();
+        } else {
+            msec = SlowMSec;
+            regex_.emplace(text, Qt::CaseInsensitive);
+        }
         break;
+    }
 
     case Prefs::FILTER_MODE:
     case Prefs::FILTER_TRACKERS:
@@ -252,10 +260,9 @@ bool TorrentFilter::filterAcceptsRow(int source_row, QModelIndex const& source_p
 
     if (accepts)
     {
-        auto const text = prefs_.getString(Prefs::FILTER_TEXT);
-        accepts = text.isEmpty() ||
-            tor.name().contains(text, Qt::CaseInsensitive) ||
-            tor.hashString().contains(text, Qt::CaseInsensitive);
+        accepts = !regex_ ||
+            (regex_->indexIn(tor.name()) != -1) ||
+            (regex_->indexIn(tor.hashString()) != -1);
     }
 
     return accepts;
