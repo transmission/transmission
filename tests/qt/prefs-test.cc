@@ -6,14 +6,6 @@
  *
  */
 
-#if 1
-
-int main()
-{
-    return 0;
-}
-
-#else
 #include "qt/Prefs.h"
 
 #include "tests/helpers/sandbox.h"
@@ -28,6 +20,38 @@ namespace transmission
 namespace tests
 {
 
+#if 1
+
+class PrefsTest : public ::testing::Test
+{
+protected:
+    void SetUp() override
+    {
+        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
+    }
+
+    void TearDown() override
+    {
+        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
+    }
+};
+
+TEST_F(PrefsTest, helloWorld)
+{
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
+}
+
+#endif
+
+#if 0
+int main()
+{
+    return 0;
+}
+
+#endif
+
+#if 0
 class PrefsTest : public helpers::SandboxedTest
 {
 protected:
@@ -103,8 +127,8 @@ TEST_F(PrefsTest, emitsChanged)
     std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
 }
 #endif
+#endif
 
 } // namespace tests
 
 } // namespace transmission
-#endif
