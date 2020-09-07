@@ -297,7 +297,7 @@ Session::Session(QString config_dir, Prefs& prefs) :
     config_dir_(std::move(config_dir)),
     prefs_(prefs)
 {
-    stats_ = { };
+    stats_ = {};
     stats_.ratio = TR_RATIO_NA;
     cumulative_stats_ = stats_;
 
