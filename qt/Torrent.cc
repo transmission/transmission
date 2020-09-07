@@ -222,7 +222,7 @@ Torrent::fields_t Torrent::update(tr_quark const* keys, tr_variant const* const*
             HANDLE_KEY(eta, eta, ETA)
             HANDLE_KEY(fileStats, files, FILES)
             HANDLE_KEY(files, files, FILES)
-            HANDLE_KEY(hashString, hash_string, HASH_STRING)
+            HANDLE_KEY(hashString, hash, HASH)
             HANDLE_KEY(haveUnchecked, have_unchecked, HAVE_UNCHECKED)
             HANDLE_KEY(haveValid, have_verified, HAVE_VERIFIED)
             HANDLE_KEY(honorsSessionLimits, honors_session_limits, HONORS_SESSION_LIMITS)

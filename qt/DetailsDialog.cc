@@ -794,20 +794,17 @@ void DetailsDialog::refreshUI()
     ui_.sizeValueLabel->setText(string);
 
     // myHashLabel
-    string = none;
-
-    if (!torrents.empty())
+    if (torrents.empty())
     {
-        string = torrents[0]->hashString();
-
-        for (Torrent const* const t : torrents)
-        {
-            if (string != t->hashString())
-            {
-                string = mixed;
-                break;
-            }
-        }
+        string = none;
+    }
+    else if (torrents.size() > 1)
+    {
+        string = mixed;
+    }
+    else
+    {
+        string = torrents.front()->hash().toString();
     }
 
     ui_.hashValueLabel->setText(string);

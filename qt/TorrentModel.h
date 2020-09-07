@@ -41,7 +41,7 @@ public:
     virtual ~TorrentModel() override;
     void clear();
 
-    bool hasTorrent(QString const& hash_string) const;
+    bool hasTorrent(TorrentHash const& hash) const;
 
     Torrent* getTorrentFromId(int id);
     Torrent const* getTorrentFromId(int id) const;
