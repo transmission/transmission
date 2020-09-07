@@ -19,6 +19,7 @@
 class QByteArray;
 
 class Speed;
+class TorrentHash;
 struct Peer;
 struct TorrentFile;
 struct TrackerStat;
@@ -88,6 +89,20 @@ auto getValue(tr_variant const* variant)
     return ret;
 }
 
+template<typename T, typename std::enable_if<std::is_same_v<T, std::string_view>>::type* = nullptr>
+auto getValue(tr_variant const* variant)
+{
+    std::optional<T> ret;
+    char const* str;
+    size_t len;
+    if (tr_variantGetStr(variant, &str, &len))
+    {
+        ret = std::string_view(str, len);
+    }
+
+    return ret;
+}
+
 template<typename T>
 bool change(T& setme, T const& value)
 {
@@ -105,6 +120,7 @@ bool change(double& setme, double const& value);
 bool change(Speed& setme, tr_variant const* value);
 bool change(Peer& setme, tr_variant const* value);
 bool change(TorrentFile& setme, tr_variant const* value);
+bool change(TorrentHash& setme, tr_variant const* value);
 bool change(TrackerStat& setme, tr_variant const* value);
 
 template<typename T>
