@@ -22,7 +22,8 @@ namespace tests
 
 #if 1
 
-class PrefsTest : public ::testing::Test
+// class PrefsTest : public ::testing::Test
+class PrefsTest : public helpers::SandboxedTest
 {
 protected:
     void SetUp() override
