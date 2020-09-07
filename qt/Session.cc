@@ -1145,7 +1145,7 @@ void Session::onDuplicatesTimer()
     duplicates.swap(duplicates_);
 
     QStringList lines;
-    for (auto it : duplicates_)
+    for (auto it : duplicates)
     {
         lines.push_back(tr("%1 (copy of %2)")
             .arg(it.first)
@@ -1155,11 +1155,18 @@ void Session::onDuplicatesTimer()
     if (!lines.empty())
     {
         lines.sort(Qt::CaseInsensitive);
-        auto* d = new QMessageBox(QMessageBox::Warning,
-            tr("Unable to add Duplicate Torrent(s)", "", lines.size()),
-            lines.join(QStringLiteral("\n")),
-            QMessageBox::Close,
-            qApp->activeWindow());
+        auto const title = tr("Duplicate Torrent(s)", "", lines.size());
+        auto const detail = lines.join(QStringLiteral("\n"));
+        auto const detail_text = tr("Unable to add %n duplicate torrent(s)", "", lines.size());
+        auto const use_detail = lines.size() > 1;
+        auto const text = use_detail ? detail_text : detail;
+
+        auto* d = new QMessageBox(QMessageBox::Warning, title, text, QMessageBox::Close, qApp->activeWindow());
+        if (use_detail)
+        {
+            d->setDetailedText(detail);
+        }
+
         QObject::connect(d, &QMessageBox::rejected, d, &QMessageBox::deleteLater);
         d->show();
     }
