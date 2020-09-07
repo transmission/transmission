@@ -28,7 +28,7 @@ Transmission.prototype = {
         this.isMenuEnabled = !isMobileDevice;
 
         // Initialize the implementation fields
-        this.filterText = '';
+        this.filterRegex = null;
         this._torrents = {};
         this._rows = [];
         this.dirtyTorrents = {};
@@ -156,7 +156,7 @@ Transmission.prototype = {
         var tr = this;
         var search_box = $('#torrent_search');
         search_box.bind('keyup click', function () {
-            tr.setFilterText(this.value);
+            tr.setFilterRegex(this.value);
         });
         if (!$.browser.safari) {
             search_box.addClass('blur');
@@ -165,7 +165,7 @@ Transmission.prototype = {
                 if (this.value === '') {
                     $(this).addClass('blur');
                     this.value = 'Filter';
-                    tr.setFilterText(null);
+                    tr.setFilterRegex(null);
                 };
             }).bind('focus', function () {
                 if ($(this).is('.blur')) {
@@ -820,8 +820,12 @@ Transmission.prototype = {
         }
     },
 
-    setFilterText: function (search) {
-        this.filterText = search ? search.trim() : null;
+    setFilterRegex: function (search) {
+        if (typeof search != 'string') {
+            search = '';
+        }
+        search = search.trim();
+        this.filterRegex = search.length > 0 ? new RegExp(search.trim(), 'i') : null;
         this.refilter(true);
     },
 
@@ -1587,7 +1591,7 @@ Transmission.prototype = {
         var sort_mode = this[Prefs._SortMethod];
         var sort_direction = this[Prefs._SortDirection];
         var filter_mode = this[Prefs._FilterMode];
-        var filter_text = this.filterText;
+        var filter_regex = this.filterRegex;
         var filter_tracker = this.filterTracker;
         var renderer = this.torrentRenderer;
         var list = this.elements.torrent_list;
@@ -1631,7 +1635,7 @@ Transmission.prototype = {
         for (i = 0; row = dirty_rows[i]; ++i) {
             id = row.getTorrentId();
             t = this._torrents[id];
-            if (t && t.test(filter_mode, filter_text, filter_tracker)) {
+            if (t && t.test(filter_mode, filter_regex, filter_tracker)) {
                 tmp.push(row);
             };
             delete this.dirtyTorrents[id];
@@ -1642,7 +1646,7 @@ Transmission.prototype = {
         // but don't already have a row
         for (id in this.dirtyTorrents) {
             t = this._torrents[id];
-            if (t && t.test(filter_mode, filter_text, filter_tracker)) {
+            if (t && t.test(filter_mode, filter_regex, filter_tracker)) {
                 row = new TorrentRow(renderer, this, t);
                 e = row.getElement();
                 e.row = row;

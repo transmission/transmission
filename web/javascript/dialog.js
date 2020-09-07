@@ -87,7 +87,9 @@ Dialog.prototype = {
         this._callback = callback;
         $('body').addClass('dialog_showing');
         this._container.show();
-        transmission.updateButtonStates();
+        if (transmission) {
+            transmission.updateButtonStates();
+        }
         if (isMobileDevice) {
             transmission.hideMobileAddressbar();
         };

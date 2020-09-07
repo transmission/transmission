@@ -461,13 +461,13 @@ Torrent.prototype = {
      * @param search substring to look for, or null
      * @return true if it passes the test, false if it fails
      */
-    test: function (state, search, tracker) {
+    test: function (state, regex, tracker) {
         // flter by state...
         var pass = this.testState(state);
 
         // maybe filter by text...
-        if (pass && search && search.length) {
-            pass = this.getCollatedName().indexOf(search.toLowerCase()) !== -1;
+        if (pass && regex) {
+            pass = regex.test(this.getCollatedName());
         };
 
         // maybe filter by tracker...
