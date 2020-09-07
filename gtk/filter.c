@@ -22,7 +22,7 @@
 
 static GQuark DIRTY_KEY = 0;
 static GQuark SESSION_KEY = 0;
-static GQuark TEXT_KEY = 0;
+static GQuark REGEX_KEY = 0;
 static GQuark TORRENT_MODEL_KEY = 0;
 
 /***
@@ -726,35 +726,37 @@ static GtkWidget* activity_combo_box_new(GtkTreeModel* tmodel)
 *****
 ****/
 
-static gboolean testText(tr_torrent const* tor, char const* key)
+static gboolean testRegex(tr_torrent const* tor, GRegex* regex)
 {
-    gboolean ret = FALSE;
-
-    if (tr_str_is_empty(key))
+    if (regex == NULL)
     {
-        ret = TRUE;
+        return TRUE;
     }
-    else
+
+    tr_info const* inf = tr_torrentInfo(tor);
+
+    /* test the torrent name... */
+    if (g_regex_match(regex, tr_torrentName(tor), 0, NULL))
     {
-        tr_info const* inf = tr_torrentInfo(tor);
+         return TRUE;
+    }
 
-        /* test the torrent name... */
+    /* test the files... */
+    for (tr_file_index_t i = 0; i < inf->fileCount; ++i)
+    {
+        if (g_regex_match(regex, inf->files[i].name, 0, NULL))
         {
-            char* pch = g_utf8_casefold(tr_torrentName(tor), -1);
-            ret = key == NULL || strstr(pch, key) != NULL;
-            g_free(pch);
-        }
-
-        /* test the files... */
-        for (tr_file_index_t i = 0; i < inf->fileCount && !ret; ++i)
-        {
-            char* pch = g_utf8_casefold(inf->files[i].name, -1);
-            ret = key == NULL || strstr(pch, key) != NULL;
-            g_free(pch);
+            return TRUE;
         }
     }
 
-    return ret;
+    /* test the hash... */
+    if (g_regex_match(regex, inf->hashString, 0, NULL))
+    {
+        return TRUE;
+    }
+
+    return FALSE;
 }
 
 static void entry_clear(GtkEntry* e)
@@ -764,14 +766,32 @@ static void entry_clear(GtkEntry* e)
 
 static void filter_entry_changed(GtkEditable* e, gpointer filter_model)
 {
-    char* pch;
-    char* folded;
+    char* pattern = gtk_editable_get_chars(e, 0, -1);
+    g_strstrip(pattern);
 
-    pch = gtk_editable_get_chars(e, 0, -1);
-    folded = g_utf8_casefold(pch, -1);
-    g_strstrip(folded);
-    g_object_set_qdata_full(filter_model, TEXT_KEY, folded, g_free);
-    g_free(pch);
+    GRegex* regex = NULL;
+
+    if (*pattern != '\0')
+    {
+        GError* err = NULL;
+        regex = g_regex_new(pattern, G_REGEX_CASELESS | G_REGEX_OPTIMIZE, 0, &err);
+        if (err != NULL)
+        {
+            g_warning("Unable to compile regex \"%s\": %s", pattern, err->message);
+            g_clear_error(&err);
+        }
+    }
+
+    if (regex != NULL)
+    {
+        g_object_set_qdata_full(filter_model, REGEX_KEY, regex, (void*)g_regex_unref);
+    }
+    else
+    {
+        g_object_set_qdata(filter_model, REGEX_KEY, NULL);
+    }
+
+    g_free(pattern);
 
     gtk_tree_model_filter_refilter(GTK_TREE_MODEL_FILTER(filter_model));
 }
@@ -796,17 +816,16 @@ struct filter_data
 
 static gboolean is_row_visible(GtkTreeModel* model, GtkTreeIter* iter, gpointer vdata)
 {
-    char const* text;
-    tr_torrent* tor;
     struct filter_data* data = vdata;
     GObject* o = G_OBJECT(data->filter_model);
 
+    tr_torrent* tor;
     gtk_tree_model_get(model, iter, MC_TORRENT, &tor, -1);
 
-    text = (char const*)g_object_get_qdata(o, TEXT_KEY);
+    GRegex* regex = (GRegex*)g_object_get_qdata(o, REGEX_KEY);
 
     return tor != NULL && test_tracker(tor, data->active_tracker_type, data->active_tracker_host) &&
-        test_torrent_activity(tor, data->active_activity_type) && testText(tor, text);
+        test_torrent_activity(tor, data->active_activity_type) && testRegex(tor, regex);
 }
 
 static void selection_changed_cb(GtkComboBox* combo, gpointer vdata)
@@ -962,7 +981,7 @@ GtkWidget* gtr_filter_bar_new(tr_session* session, GtkTreeModel* tmodel, GtkTree
     struct filter_data* data;
 
     g_assert(DIRTY_KEY == 0);
-    TEXT_KEY = g_quark_from_static_string("tr-filter-text-key");
+    REGEX_KEY = g_quark_from_static_string("tr-filter-regex-key");
     DIRTY_KEY = g_quark_from_static_string("tr-filter-dirty-key");
     SESSION_KEY = g_quark_from_static_string("tr-session-key");
     TORRENT_MODEL_KEY = g_quark_from_static_string("tr-filter-torrent-model-key");
