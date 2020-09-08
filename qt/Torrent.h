@@ -606,8 +606,6 @@ public:
     fields_t update(tr_quark const* keys, tr_variant const* const* values, size_t n);
 
 private:
-    void updateMimeIcon();
-
     int const id_;
 
     bool download_limited_ = {};
