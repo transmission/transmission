@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <cassert>
 #include <iterator>
+#include <set>
 
 #include <QApplication>
 #include <QString>
@@ -207,18 +208,14 @@ Torrent::fields_t Torrent::update(tr_quark const* keys, tr_variant const* const*
             HANDLE_KEY(activityDate, activity_date, ACTIVITY_DATE)
             HANDLE_KEY(addedDate, added_date, ADDED_DATE)
             HANDLE_KEY(bandwidthPriority, bandwidth_priority, BANDWIDTH_PRIORITY)
-            HANDLE_KEY(comment, comment, COMMENT)
             HANDLE_KEY(corruptEver, failed_ever, FAILED_EVER)
-            HANDLE_KEY(creator, creator, CREATOR)
             HANDLE_KEY(dateCreated, date_created, DATE_CREATED)
             HANDLE_KEY(desiredAvailable, desired_available, DESIRED_AVAILABLE)
-            HANDLE_KEY(downloadDir, download_dir, DOWNLOAD_DIR)
             HANDLE_KEY(downloadLimit, download_limit, DOWNLOAD_LIMIT) // KB/s
             HANDLE_KEY(downloadLimited, download_limited, DOWNLOAD_LIMITED)
             HANDLE_KEY(downloadedEver, downloaded_ever, DOWNLOADED_EVER)
             HANDLE_KEY(editDate, edit_date, EDIT_DATE)
             HANDLE_KEY(error, error, ERROR)
-            HANDLE_KEY(errorString, error_string, ERROR_STRING)
             HANDLE_KEY(eta, eta, ETA)
             HANDLE_KEY(fileStats, files, FILES)
             HANDLE_KEY(files, files, FILES)
@@ -259,6 +256,22 @@ Torrent::fields_t Torrent::update(tr_quark const* keys, tr_variant const* const*
             HANDLE_KEY(uploadLimited, upload_limited, UPLOAD_LIMITED)
             HANDLE_KEY(uploadedEver, uploaded_ever, UPLOADED_EVER)
             HANDLE_KEY(webseedsSendingToUs, webseeds_sending_to_us, WEBSEEDS_SENDING_TO_US)
+#undef HANDLE_KEY
+
+#define HANDLE_KEY(key, field, bit) case TR_KEY_ ## key: \
+    field_changed = change(field ## _, child); \
+    if (field_changed) \
+    { \
+        field ##_  = qApp->intern(field ## _); \
+    } \
+    changed.set(bit, field_changed); \
+    break;
+
+            HANDLE_KEY(comment, comment, COMMENT)
+            HANDLE_KEY(creator, creator, CREATOR)
+            HANDLE_KEY(downloadDir, download_dir, DOWNLOAD_DIR)
+            HANDLE_KEY(errorString, error_string, ERROR_STRING)
+
 #undef HANDLE_KEY
         default:
             break;
