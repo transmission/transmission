@@ -152,14 +152,12 @@ QModelIndexList FileTreeModel::getOrphanIndices(QModelIndexList const& indices) 
 
 QVariant FileTreeModel::data(QModelIndex const& index, int role) const
 {
-    QVariant value;
-
     if (index.isValid())
     {
-        value = itemFromIndex(index)->data(index.column(), role);
+        return itemFromIndex(index)->data(index.column(), role);
     }
 
-    return value;
+    return {};
 }
 
 Qt::ItemFlags FileTreeModel::flags(QModelIndex const& index) const
@@ -193,30 +191,28 @@ bool FileTreeModel::setData(QModelIndex const& index, QVariant const& newname, i
 
 QVariant FileTreeModel::headerData(int column, Qt::Orientation orientation, int role) const
 {
-    QVariant data;
-
     if (orientation == Qt::Horizontal && role == Qt::DisplayRole)
     {
         switch (column)
         {
         case COL_NAME:
-            data.setValue(tr("File"));
+            return tr("File");
             break;
 
         case COL_SIZE:
-            data.setValue(tr("Size"));
+            return tr("Size");
             break;
 
         case COL_PROGRESS:
-            data.setValue(tr("Progress"));
+            return tr("Progress");
             break;
 
         case COL_WANTED:
-            data.setValue(tr("Download"));
+            return tr("Download");
             break;
 
         case COL_PRIORITY:
-            data.setValue(tr("Priority"));
+            return tr("Priority");
             break;
 
         default:
@@ -224,7 +220,7 @@ QVariant FileTreeModel::headerData(int column, Qt::Orientation orientation, int 
         }
     }
 
-    return data;
+    return {};
 }
 
 QModelIndex FileTreeModel::index(int row, int column, QModelIndex const& parent) const
