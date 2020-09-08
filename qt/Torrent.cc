@@ -68,7 +68,7 @@ bool Torrent::getSeedRatio(double& setmeRatio) const
 
 bool Torrent::includesTracker(FaviconCache::Key const& key) const
 {
-    return tracker_keys_.count(key) != 0;
+    return std::binary_search(std::begin(tracker_keys_), std::end(tracker_keys_), key);
 }
 
 int Torrent::compareSeedRatio(Torrent const& that) const
@@ -300,11 +300,13 @@ Torrent::fields_t Torrent::update(tr_quark const* keys, tr_variant const* const*
 
             case TR_KEY_trackers:
                 {
-                    FaviconCache::Keys tmp;
-                    std::transform(std::cbegin(tracker_stats_), std::cend(tracker_stats_),
-                        std::inserter(tmp, std::end(tmp)),
-                        [](auto const& ts) { return ts.favicon_key; });
-                    std::swap(tracker_keys_, tmp);
+                    std::set<FaviconCache::Key> tmp;
+                    for (auto const& ts : tracker_stats_)
+                    {
+                        tmp.insert(ts.favicon_key);
+                    }
+
+                    tracker_keys_ = FaviconCache::Keys(std::begin(tmp), std::end(tmp));
                     break;
                 }
             }
