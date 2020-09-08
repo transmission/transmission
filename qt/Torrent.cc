@@ -262,7 +262,7 @@ Torrent::fields_t Torrent::update(tr_quark const* keys, tr_variant const* const*
     field_changed = change(field ## _, child); \
     if (field_changed) \
     { \
-        field ##_  = qApp->intern(field ## _); \
+        field ## _ = qApp->intern(field ## _); \
     } \
     changed.set(bit, field_changed); \
     break;
