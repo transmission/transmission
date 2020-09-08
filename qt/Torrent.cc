@@ -161,27 +161,28 @@ int Torrent::compareETA(Torrent const& that) const
 ****
 ***/
 
-void Torrent::updateMimeIcon()
+QIcon Torrent::getMimeTypeIcon() const
 {
-    auto const& files = files_;
-    auto const& icon_cache = IconCache::get();
-
-    QIcon icon;
-
-    if (files.size() > 1)
+    if (icon_.isNull())
     {
-        icon = icon_cache.folderIcon();
-    }
-    else if (files.size() == 1)
-    {
-        icon = icon_cache.guessMimeIcon(files.at(0).filename, icon_cache.fileIcon());
-    }
-    else
-    {
-        icon = icon_cache.guessMimeIcon(name(), icon_cache.folderIcon());
+        auto const& files = files_;
+        auto const& icon_cache = IconCache::get();
+
+        if (files.size() > 1)
+        {
+            icon_ = icon_cache.folderIcon();
+        }
+        else if (files.size() == 1)
+        {
+            icon_ = icon_cache.guessMimeIcon(files.at(0).filename, icon_cache.fileIcon());
+        }
+        else
+        {
+            icon_ = icon_cache.guessMimeIcon(name(), icon_cache.folderIcon());
+        }
     }
 
-    icon_ = icon;
+    return icon_;
 }
 
 /***
@@ -283,13 +284,13 @@ Torrent::fields_t Torrent::update(tr_quark const* keys, tr_variant const* const*
             {
             case TR_KEY_name:
                 {
-                    updateMimeIcon();
+                    icon_ = {};
                     break;
                 }
 
             case TR_KEY_files:
                 {
-                    updateMimeIcon();
+                    icon_ = {};
                     for (int i = 0; i < files_.size(); ++i)
                     {
                         files_[i].index = i;

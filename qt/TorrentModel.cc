@@ -93,8 +93,6 @@ int TorrentModel::rowCount(QModelIndex const& parent) const
 
 QVariant TorrentModel::data(QModelIndex const& index, int role) const
 {
-    QVariant var;
-
     Torrent const* t = torrents_.value(index.row(), nullptr);
 
     if (t != nullptr)
@@ -102,15 +100,15 @@ QVariant TorrentModel::data(QModelIndex const& index, int role) const
         switch (role)
         {
         case Qt::DisplayRole:
-            var.setValue(t->name());
+            return t->name();
             break;
 
         case Qt::DecorationRole:
-            var.setValue(t->getMimeTypeIcon());
+            return t->getMimeTypeIcon();
             break;
 
         case TorrentRole:
-            var = QVariant::fromValue(t);
+            return QVariant::fromValue(t);
             break;
 
         default:
@@ -119,7 +117,7 @@ QVariant TorrentModel::data(QModelIndex const& index, int role) const
         }
     }
 
-    return var;
+    return {};
 }
 
 /***
