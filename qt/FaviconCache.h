@@ -9,11 +9,11 @@
 #pragma once
 
 #include <unordered_map>
-#include <unordered_set>
+#include <vector>
 
-#include <QString>
 #include <QObject>
 #include <QPixmap>
+#include <QString>
 
 #include "Macros.h"
 #include "Utils.h" // std::hash<QString>
@@ -31,7 +31,7 @@ public:
     FaviconCache();
 
     using Key = QString;
-    using Keys = std::unordered_set<Key>;
+    using Keys = std::vector<Key>;
 
     // returns a cached pixmap, or a NULL pixmap if there's no match in the cache
     QPixmap find(Key const& key);
