@@ -349,6 +349,7 @@ Application::Application(int& argc, char** argv) :
     }
 
     InteropHelper::registerObject(this);
+    QTimer::singleShot(1000 * 60 * 10, this, SLOT(quit()));
 }
 
 void Application::loadTranslations()

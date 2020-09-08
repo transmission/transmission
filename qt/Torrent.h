@@ -540,10 +540,7 @@ public:
         return isWaitingToDownload() || isWaitingToSeed();
     }
 
-    QIcon getMimeTypeIcon() const
-    {
-        return icon_;
-    }
+    QIcon getMimeTypeIcon() const;
 
     enum Field
     {
@@ -666,7 +663,8 @@ private:
     QString error_string_;
     QString name_;
 
-    QIcon icon_;
+    // mutable because it's a lazy lookup
+    mutable QIcon icon_;
 
     PeerList peers_;
     FileList files_;
