@@ -31,6 +31,10 @@ protected:
         std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         SandboxedTest::SetUp();
         std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
+        auto const tmp = sandboxDir();
+        std::cerr << __FILE__ << ':' << __LINE__ << ' ' << tmp << std::endl;
+        auto const dir = QString::fromStdString(tmp);
+        std::cerr << __FILE__ << ':' << __LINE__ << ' ' << qPrintable(dir) << std::endl;
         // auto prefs = std::make_unique<Prefs>(sandboxDir().c_str());
         // std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     }
