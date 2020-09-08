@@ -485,8 +485,8 @@ void TorrentModel::rowsRemove(torrents_t const& torrents)
 ****
 ***/
 
-bool TorrentModel::hasTorrent(QString const& hash_string) const
+bool TorrentModel::hasTorrent(TorrentHash const& hash) const
 {
-    auto test = [hash_string](auto const& tor) { return tor->hashString() == hash_string; };
+    auto test = [hash](auto const& tor) { return tor->hash() == hash; };
     return std::any_of(torrents_.cbegin(), torrents_.cend(), test);
 }
