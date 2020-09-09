@@ -315,7 +315,7 @@ Prefs::~Prefs()
                 auto const test = [&mode](auto const& item) { return item.first == mode; };
                 // NOLINTNEXTLINE(readability-qualified-auto)
                 auto const it = std::find_if(std::cbegin(FilterModes), std::cend(FilterModes), test);
-                auto const& pair = it == std::end(FilterModes) ? FilterModes.front(): *it;
+                auto const& pair = it == std::end(FilterModes) ? FilterModes.front() : *it;
                 dictAdd(&current_settings, key, pair.second);
                 break;
             }
