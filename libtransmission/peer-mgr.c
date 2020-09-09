@@ -3124,8 +3124,13 @@ static void rechokeDownloads(tr_swarm* s)
         tr_free(piece_is_interesting);
     }
 
+    if ((rechoke != NULL) && (rechoke_count > 0))
+    {
+        qsort(rechoke, rechoke_count, sizeof(struct tr_rechoke_info), compare_rechoke_info);
+    }
+
     /* now that we know which & how many peers to be interested in... update the peer interest */
-    qsort(rechoke, rechoke_count, sizeof(struct tr_rechoke_info), compare_rechoke_info);
+
     s->interestedCount = MIN(maxPeers, rechoke_count);
 
     for (int i = 0; i < rechoke_count; ++i)
