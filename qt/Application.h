@@ -34,7 +34,7 @@ class Application : public QApplication
 
 public:
     Application(int& argc, char** argv);
-    virtual ~Application();
+    ~Application() override;
 
     void raise();
     bool notifyApp(QString const& title, QString const& body) const;

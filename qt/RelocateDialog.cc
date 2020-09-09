@@ -13,6 +13,7 @@
 #include "Torrent.h"
 #include "TorrentModel.h"
 
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
 bool RelocateDialog::move_flag = true;
 
 void RelocateDialog::onSetLocation()

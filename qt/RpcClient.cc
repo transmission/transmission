@@ -144,7 +144,7 @@ void RpcClient::sendNetworkRequest(TrVariantPtr json, QFutureInterface<RpcRespon
     }
 
     size_t raw_json_data_length;
-    char* raw_json_data = tr_variantToStr(json.get(), TR_VARIANT_FMT_JSON_LEAN, &raw_json_data_length);
+    auto* raw_json_data = tr_variantToStr(json.get(), TR_VARIANT_FMT_JSON_LEAN, &raw_json_data_length);
     QByteArray json_data(raw_json_data, raw_json_data_length);
     tr_free(raw_json_data);
 

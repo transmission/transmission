@@ -10,12 +10,8 @@
 
 #include "RpcQueue.h"
 
-namespace
-{
-
-auto next_tag = RpcQueue::Tag {};
-
-}
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
+RpcQueue::Tag RpcQueue::next_tag = {};
 
 RpcQueue::RpcQueue(QObject* parent) :
     QObject(parent),

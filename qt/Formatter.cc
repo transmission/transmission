@@ -17,6 +17,7 @@
 
 Formatter& Formatter::get()
 {
+    // NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
     static auto& singleton = *new Formatter();
     return singleton;
 }

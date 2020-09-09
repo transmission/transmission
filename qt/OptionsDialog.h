@@ -37,7 +37,7 @@ class OptionsDialog : public BaseDialog
 
 public:
     OptionsDialog(Session& session, Prefs const& prefs, AddData addme, QWidget* parent = nullptr);
-    virtual ~OptionsDialog();
+    ~OptionsDialog() override;
 
 private:
     using mybins_t = QMap<uint32_t, int32_t>;
