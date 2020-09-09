@@ -45,7 +45,7 @@ int WatchDir::metainfoTest(QString const& filename) const
     {
         ret = ERROR;
     }
-    else if (model_.hasTorrent(QString::fromUtf8(inf.hashString)))
+    else if (model_.hasTorrent(TorrentHash(inf.hashString)))
     {
         ret = DUPLICATE;
     }

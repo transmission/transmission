@@ -24,8 +24,6 @@
 
 #include "VariantHelpers.h"
 
-// #define DEBUG_HTTP
-
 using ::trqt::variant_helpers::dictAdd;
 using ::trqt::variant_helpers::dictFind;
 using ::trqt::variant_helpers::variantInit;
@@ -35,6 +33,8 @@ namespace
 
 char const constexpr* const RequestDataPropertyKey { "requestData" };
 char const constexpr* const RequestFutureinterfacePropertyKey { "requestReplyFutureInterface" };
+
+bool const Verbose = tr_env_key_exists("TR_RPC_VERBOSE");
 
 void destroyVariant(tr_variant* json)
 {
@@ -144,7 +144,7 @@ void RpcClient::sendNetworkRequest(TrVariantPtr json, QFutureInterface<RpcRespon
     }
 
     size_t raw_json_data_length;
-    char* raw_json_data = tr_variantToStr(json.get(), TR_VARIANT_FMT_JSON_LEAN, &raw_json_data_length);
+    auto* raw_json_data = tr_variantToStr(json.get(), TR_VARIANT_FMT_JSON_LEAN, &raw_json_data_length);
     QByteArray json_data(raw_json_data, raw_json_data_length);
     tr_free(raw_json_data);
 
@@ -155,16 +155,17 @@ void RpcClient::sendNetworkRequest(TrVariantPtr json, QFutureInterface<RpcRespon
     connect(reply, SIGNAL(downloadProgress(qint64, qint64)), this, SIGNAL(dataReadProgress()));
     connect(reply, SIGNAL(uploadProgress(qint64, qint64)), this, SIGNAL(dataSendProgress()));
 
-#ifdef DEBUG_HTTP
-    std::cerr << "sending " << "POST " << qPrintable(url_.path()) << std::endl;
-
-    for (QByteArray const& b : request.rawHeaderList())
+    if (Verbose)
     {
-        std::cerr << b.constData() << ": " << request.rawHeader(b).constData() << std::endl;
-    }
+        std::cerr << "sending " << "POST " << qPrintable(url_.path()) << std::endl;
 
-    std::cerr << "Body:\n" << json_data.constData() << std::endl;
-#endif
+        for (QByteArray const& b : request_->rawHeaderList())
+        {
+            std::cerr << b.constData() << ": " << request_->rawHeader(b).constData() << std::endl;
+        }
+
+        std::cerr << "Body:\n" << json_data.constData() << std::endl;
+    }
 }
 
 void RpcClient::sendLocalRequest(TrVariantPtr json, QFutureInterface<RpcResponse> const& promise, int64_t tag)
@@ -233,16 +234,17 @@ void RpcClient::networkRequestFinished(QNetworkReply* reply)
     auto promise = reply->property(RequestFutureinterfacePropertyKey).
         value<QFutureInterface<RpcResponse>>();
 
-#ifdef DEBUG_HTTP
-    std::cerr << "http response header: " << std::endl;
-
-    for (QByteArray const& b : reply->rawHeaderList())
+    if (Verbose)
     {
-        std::cerr << b.constData() << ": " << reply->rawHeader(b).constData() << std::endl;
-    }
+        std::cerr << "http response header: " << std::endl;
 
-    std::cerr << "json:\n" << reply->peek(reply->bytesAvailable()).constData() << std::endl;
-#endif
+        for (QByteArray const& b : reply->rawHeaderList())
+        {
+            std::cerr << b.constData() << ": " << reply->rawHeader(b).constData() << std::endl;
+        }
+
+        std::cerr << "json:\n" << reply->peek(reply->bytesAvailable()).constData() << std::endl;
+    }
 
     if (reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() == 409 &&
         reply->hasRawHeader(TR_RPC_SESSION_ID_HEADER))

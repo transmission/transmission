@@ -15,14 +15,14 @@
 
 TEST(Client, clientForId)
 {
-    struct Test
+    struct LocalTest
     {
         char const* peer_id;
         char const* expected_client;
     };
 
-    auto constexpr Tests = std::array<Test, 24>{
-        Test{ "-BT791B-", "BitTorrent 7.9.1 (Beta)" },
+    auto const tests = std::array<LocalTest, 24>{
+        LocalTest{ "-BT791B-", "BitTorrent 7.9.1 (Beta)" },
         { "-BT791\0-", "BitTorrent 7.9.1" },
         { "-FC1013-", "FileCroc 1.0.1.3" },
         { "-FC1013-", "FileCroc 1.0.1.3" },
@@ -63,7 +63,7 @@ TEST(Client, clientForId)
         { "\x65\x78\x62\x63\x00\x38\x4C\x4F\x52\x44\x32\x00\x04\x8E\xCE\xD5\x7B\xD7\x10\x28", "BitLord 0.56" }
     };
 
-    for (auto const& test : Tests)
+    for (auto const& test : tests)
     {
         auto buf = std::array<char, 128>{};
         tr_clientForId(buf.data(), buf.size(), test.peer_id);

@@ -25,7 +25,6 @@
 #include "RpcQueue.h"
 #include "Torrent.h"
 #include "Typedefs.h"
-#include "Utils.h" // std::hash<QString>
 
 class AddData;
 class Prefs;
@@ -42,7 +41,7 @@ class Session : public QObject
 
 public:
     Session(QString config_dir, Prefs& prefs);
-    virtual ~Session();
+    ~Session() override;
 
     void stop();
     void restart();
@@ -122,7 +121,6 @@ public:
 public slots:
     void addTorrent(AddData const& addme);
     void launchWebInterface();
-    void onDuplicatesTimer();
     void queueMoveBottom(torrent_ids_t const& torrentIds = {});
     void queueMoveDown(torrent_ids_t const& torrentIds = {});
     void queueMoveTop(torrent_ids_t const& torrentIds = {});
@@ -182,4 +180,7 @@ private:
 
     std::map<QString, QString> duplicates_;
     QTimer duplicates_timer_;
+
+private slots:
+    void onDuplicatesTimer();
 };

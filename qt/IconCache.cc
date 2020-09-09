@@ -35,6 +35,7 @@
 
 IconCache& IconCache::get()
 {
+    // NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
     static auto& singleton = *new IconCache();
     return singleton;
 }

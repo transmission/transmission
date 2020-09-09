@@ -45,12 +45,12 @@ protected:
     static QString shortStatusString(Torrent const& tor);
     static QString shortTransferString(Torrent const& tor);
 
-    static QColor blue_brush;
-    static QColor green_brush;
-    static QColor silver_brush;
-    static QColor blue_back;
-    static QColor green_back;
-    static QColor silver_back;
+    QColor const blue_back;
+    QColor const blue_brush;
+    QColor const green_back;
+    QColor const green_brush;
+    QColor const silver_back;
+    QColor const silver_brush;
 
     mutable QStyleOptionProgressBar progress_bar_style_ = {};
 

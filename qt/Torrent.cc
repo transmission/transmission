@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <cassert>
 #include <iterator>
+#include <set>
 
 #include <QApplication>
 #include <QString>
@@ -67,7 +68,7 @@ bool Torrent::getSeedRatio(double& setmeRatio) const
 
 bool Torrent::includesTracker(FaviconCache::Key const& key) const
 {
-    return tracker_keys_.count(key) != 0;
+    return std::binary_search(std::begin(tracker_keys_), std::end(tracker_keys_), key);
 }
 
 int Torrent::compareSeedRatio(Torrent const& that) const
@@ -160,27 +161,28 @@ int Torrent::compareETA(Torrent const& that) const
 ****
 ***/
 
-void Torrent::updateMimeIcon()
+QIcon Torrent::getMimeTypeIcon() const
 {
-    auto const& files = files_;
-    auto const& icon_cache = IconCache::get();
-
-    QIcon icon;
-
-    if (files.size() > 1)
+    if (icon_.isNull())
     {
-        icon = icon_cache.folderIcon();
-    }
-    else if (files.size() == 1)
-    {
-        icon = icon_cache.guessMimeIcon(files.at(0).filename, icon_cache.fileIcon());
-    }
-    else
-    {
-        icon = icon_cache.guessMimeIcon(name(), icon_cache.folderIcon());
+        auto const& files = files_;
+        auto const& icon_cache = IconCache::get();
+
+        if (files.size() > 1)
+        {
+            icon_ = icon_cache.folderIcon();
+        }
+        else if (files.size() == 1)
+        {
+            icon_ = icon_cache.guessMimeIcon(files.at(0).filename, icon_cache.fileIcon());
+        }
+        else
+        {
+            icon_ = icon_cache.guessMimeIcon(name(), icon_cache.folderIcon());
+        }
     }
 
-    icon_ = icon;
+    return icon_;
 }
 
 /***
@@ -207,22 +209,18 @@ Torrent::fields_t Torrent::update(tr_quark const* keys, tr_variant const* const*
             HANDLE_KEY(activityDate, activity_date, ACTIVITY_DATE)
             HANDLE_KEY(addedDate, added_date, ADDED_DATE)
             HANDLE_KEY(bandwidthPriority, bandwidth_priority, BANDWIDTH_PRIORITY)
-            HANDLE_KEY(comment, comment, COMMENT)
             HANDLE_KEY(corruptEver, failed_ever, FAILED_EVER)
-            HANDLE_KEY(creator, creator, CREATOR)
             HANDLE_KEY(dateCreated, date_created, DATE_CREATED)
             HANDLE_KEY(desiredAvailable, desired_available, DESIRED_AVAILABLE)
-            HANDLE_KEY(downloadDir, download_dir, DOWNLOAD_DIR)
             HANDLE_KEY(downloadLimit, download_limit, DOWNLOAD_LIMIT) // KB/s
             HANDLE_KEY(downloadLimited, download_limited, DOWNLOAD_LIMITED)
             HANDLE_KEY(downloadedEver, downloaded_ever, DOWNLOADED_EVER)
             HANDLE_KEY(editDate, edit_date, EDIT_DATE)
             HANDLE_KEY(error, error, ERROR)
-            HANDLE_KEY(errorString, error_string, ERROR_STRING)
             HANDLE_KEY(eta, eta, ETA)
             HANDLE_KEY(fileStats, files, FILES)
             HANDLE_KEY(files, files, FILES)
-            HANDLE_KEY(hashString, hash_string, HASH_STRING)
+            HANDLE_KEY(hashString, hash, HASH)
             HANDLE_KEY(haveUnchecked, have_unchecked, HAVE_UNCHECKED)
             HANDLE_KEY(haveValid, have_verified, HAVE_VERIFIED)
             HANDLE_KEY(honorsSessionLimits, honors_session_limits, HONORS_SESSION_LIMITS)
@@ -260,6 +258,22 @@ Torrent::fields_t Torrent::update(tr_quark const* keys, tr_variant const* const*
             HANDLE_KEY(uploadedEver, uploaded_ever, UPLOADED_EVER)
             HANDLE_KEY(webseedsSendingToUs, webseeds_sending_to_us, WEBSEEDS_SENDING_TO_US)
 #undef HANDLE_KEY
+
+#define HANDLE_KEY(key, field, bit) case TR_KEY_ ## key: \
+    field_changed = change(field ## _, child); \
+    if (field_changed) \
+    { \
+        field ## _ = qApp->intern(field ## _); \
+    } \
+    changed.set(bit, field_changed); \
+    break;
+
+            HANDLE_KEY(comment, comment, COMMENT)
+            HANDLE_KEY(creator, creator, CREATOR)
+            HANDLE_KEY(downloadDir, download_dir, DOWNLOAD_DIR)
+            HANDLE_KEY(errorString, error_string, ERROR_STRING)
+
+#undef HANDLE_KEY
         default:
             break;
         }
@@ -270,13 +284,13 @@ Torrent::fields_t Torrent::update(tr_quark const* keys, tr_variant const* const*
             {
             case TR_KEY_name:
                 {
-                    updateMimeIcon();
+                    icon_ = {};
                     break;
                 }
 
             case TR_KEY_files:
                 {
-                    updateMimeIcon();
+                    icon_ = {};
                     for (int i = 0; i < files_.size(); ++i)
                     {
                         files_[i].index = i;
@@ -287,11 +301,13 @@ Torrent::fields_t Torrent::update(tr_quark const* keys, tr_variant const* const*
 
             case TR_KEY_trackers:
                 {
-                    FaviconCache::Keys tmp;
-                    std::transform(std::cbegin(tracker_stats_), std::cend(tracker_stats_),
-                        std::inserter(tmp, std::end(tmp)),
-                        [](auto const& ts) { return ts.favicon_key; });
-                    std::swap(tracker_keys_, tmp);
+                    std::set<FaviconCache::Key> tmp;
+                    for (auto const& ts : tracker_stats_)
+                    {
+                        tmp.insert(ts.favicon_key);
+                    }
+
+                    tracker_keys_ = FaviconCache::Keys(std::begin(tmp), std::end(tmp));
                     break;
                 }
             }

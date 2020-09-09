@@ -738,7 +738,7 @@ static gboolean testRegex(tr_torrent const* tor, GRegex* regex)
     /* test the torrent name... */
     if (g_regex_match(regex, tr_torrentName(tor), 0, NULL))
     {
-         return TRUE;
+        return TRUE;
     }
 
     /* test the files... */

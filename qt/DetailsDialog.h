@@ -37,7 +37,7 @@ class DetailsDialog : public BaseDialog
 
 public:
     DetailsDialog(Session&, Prefs&, TorrentModel const&, QWidget* parent = nullptr);
-    virtual ~DetailsDialog();
+    ~DetailsDialog() override;
 
     void setIds(torrent_ids_t const& ids);
 
