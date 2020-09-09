@@ -1583,16 +1583,15 @@ static char const* torrentRenamePath(tr_session* session, tr_variant* args_in, t
 {
     TR_UNUSED(args_out);
 
-    int torrentCount;
-    tr_torrent** torrents;
-    char const* oldpath = NULL;
-    char const* newname = NULL;
     char const* errmsg = NULL;
 
-    tr_variantDictFindStr(args_in, TR_KEY_path, &oldpath, NULL);
-    tr_variantDictFindStr(args_in, TR_KEY_name, &newname, NULL);
-    torrents = getTorrents(session, args_in, &torrentCount);
+    char const* oldpath = NULL;
+    (void)tr_variantDictFindStr(args_in, TR_KEY_path, &oldpath, NULL);
+    char const* newname = NULL;
+    (void)tr_variantDictFindStr(args_in, TR_KEY_name, &newname, NULL);
 
+    int torrentCount = 0;
+    tr_torrent** torrents = getTorrents(session, args_in, &torrentCount);
     if (torrentCount == 1)
     {
         tr_torrentRenamePath(torrents[0], oldpath, newname, torrentRenamePathDone, idle_data);
@@ -1897,10 +1896,10 @@ static char const* torrentAdd(tr_session* session, tr_variant* args_in, tr_varia
     TR_ASSERT(idle_data != NULL);
 
     char const* filename = NULL;
-    char const* metainfo_base64 = NULL;
+    (void)tr_variantDictFindStr(args_in, TR_KEY_filename, &filename, NULL);
 
-    tr_variantDictFindStr(args_in, TR_KEY_filename, &filename, NULL);
-    tr_variantDictFindStr(args_in, TR_KEY_metainfo, &metainfo_base64, NULL);
+    char const* metainfo_base64 = NULL;
+    (void)tr_variantDictFindStr(args_in, TR_KEY_metainfo, &metainfo_base64, NULL);
 
     if (filename == NULL && metainfo_base64 == NULL)
     {
@@ -1920,12 +1919,12 @@ static char const* torrentAdd(tr_session* session, tr_variant* args_in, tr_varia
     int64_t i;
     bool boolVal;
     tr_variant* l;
-    char const* cookies = NULL;
     tr_ctor* ctor = tr_ctorNew(session);
 
     /* set the optional arguments */
 
-    tr_variantDictFindStr(args_in, TR_KEY_cookies, &cookies, NULL);
+    char const* cookies = NULL;
+    (void)tr_variantDictFindStr(args_in, TR_KEY_cookies, &cookies, NULL);
 
     if (download_dir != NULL)
     {

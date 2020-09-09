@@ -981,9 +981,9 @@ static void sessionSetImpl(void* vdata)
 
     free_incoming_peer_port(session);
 
-    tr_variantDictFindStr(settings, TR_KEY_bind_address_ipv4, &str, NULL);
-
-    if (!tr_address_from_string(&b.addr, str) || b.addr.type != TR_AF_INET)
+    if (!tr_variantDictFindStr(settings, TR_KEY_bind_address_ipv4, &str, NULL) ||
+        !tr_address_from_string(&b.addr, str) ||
+        b.addr.type != TR_AF_INET)
     {
         b.addr = tr_inaddr_any;
     }
@@ -991,9 +991,9 @@ static void sessionSetImpl(void* vdata)
     b.socket = TR_BAD_SOCKET;
     session->public_ipv4 = tr_memdup(&b, sizeof(struct tr_bindinfo));
 
-    tr_variantDictFindStr(settings, TR_KEY_bind_address_ipv6, &str, NULL);
-
-    if (!tr_address_from_string(&b.addr, str) || b.addr.type != TR_AF_INET6)
+    if (!tr_variantDictFindStr(settings, TR_KEY_bind_address_ipv6, &str, NULL) ||
+        !tr_address_from_string(&b.addr, str) ||
+        b.addr.type != TR_AF_INET6)
     {
         b.addr = tr_in6addr_any;
     }
@@ -2692,15 +2692,13 @@ static void metainfoLookupInit(tr_session* session)
 
 char const* tr_sessionFindTorrentFile(tr_session const* session, char const* hashString)
 {
-    char const* filename = NULL;
-
     if (session->metainfoLookup == NULL)
     {
         metainfoLookupInit((tr_session*)session);
     }
 
-    tr_variantDictFindStr(session->metainfoLookup, tr_quark_new(hashString, TR_BAD_SIZE), &filename, NULL);
-
+    char const* filename = NULL;
+    (void)tr_variantDictFindStr(session->metainfoLookup, tr_quark_new(hashString, TR_BAD_SIZE), &filename, NULL);
     return filename;
 }
 
