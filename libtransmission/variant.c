@@ -1007,7 +1007,7 @@ static void tr_variantListCopy(tr_variant* target, tr_variant const* src)
         {
             size_t len = 0;
             char const* str = NULL;
-            (void) tr_variantGetStr(val, &str, &len);
+            (void)tr_variantGetStr(val, &str, &len);
             tr_variantListAddRaw(target, str, len);
         }
         else if (tr_variantIsDict(val))
@@ -1087,7 +1087,7 @@ void tr_variantMergeDicts(tr_variant* target, tr_variant const* source)
             {
                 size_t len = 0;
                 char const* str = NULL;
-                (void) tr_variantGetStr(val, &str, &len);
+                (void)tr_variantGetStr(val, &str, &len);
                 tr_variantDictAddRaw(target, key, str, len);
             }
             else if (tr_variantIsDict(val) && tr_variantDictFindDict(target, key, &t))

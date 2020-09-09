@@ -565,7 +565,7 @@ static void jsonStringFunc(tr_variant const* val, void* vdata)
 
     char const* str = NULL;
     size_t len = 0;
-    (void) tr_variantGetStr(val, &str, &len);
+    (void)tr_variantGetStr(val, &str, &len);
     it = (unsigned char const*)str;
     end = it + len;
 
