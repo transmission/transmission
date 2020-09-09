@@ -185,11 +185,8 @@ QString TrackerDelegate::getText(TrackerInfo const& inf) const
 
     // hostname
     str += inf.st.is_backup ? QStringLiteral("<i>") : QStringLiteral("<b>");
-    char* host = nullptr;
-    int port = 0;
-    tr_urlParse(inf.st.announce.toUtf8().constData(), TR_BAD_SIZE, nullptr, &host, &port, nullptr);
-    str += QStringLiteral("%1:%2").arg(QString::fromUtf8(host)).arg(port);
-    tr_free(host);
+    auto const url = QUrl(inf.st.announce);
+    str += QStringLiteral("%1:%2").arg(url.host()).arg(url.port(80));
 
     if (!key.isEmpty())
     {
