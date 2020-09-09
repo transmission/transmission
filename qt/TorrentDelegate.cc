@@ -28,13 +28,6 @@ enum
     BAR_HEIGHT = 12
 };
 
-QColor TorrentDelegate::green_brush;
-QColor TorrentDelegate::blue_brush;
-QColor TorrentDelegate::silver_brush;
-QColor TorrentDelegate::green_back;
-QColor TorrentDelegate::blue_back;
-QColor TorrentDelegate::silver_back;
-
 namespace
 {
 
@@ -127,19 +120,16 @@ ItemLayout::ItemLayout(QString name_text, QString status_text, QString progress_
 } // namespace
 
 TorrentDelegate::TorrentDelegate(QObject* parent) :
-    QStyledItemDelegate(parent)
+    QStyledItemDelegate{parent},
+    blue_back{"lightgrey"},
+    blue_brush{"steelblue"},
+    green_back{"darkseagreen"},
+    green_brush{"forestgreen"},
+    silver_back{"grey"},
+    silver_brush{"silver"}
 {
     progress_bar_style_.minimum = 0;
     progress_bar_style_.maximum = 1000;
-
-    green_brush = QColor("forestgreen");
-    green_back = QColor("darkseagreen");
-
-    blue_brush = QColor("steelblue");
-    blue_back = QColor("lightgrey");
-
-    silver_brush = QColor("silver");
-    silver_back = QColor("grey");
 }
 
 /***
