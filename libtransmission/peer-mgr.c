@@ -996,14 +996,17 @@ static void pieceListSort(tr_swarm* s, enum piece_sort_state state)
 {
     TR_ASSERT(state == PIECES_SORTED_BY_INDEX || state == PIECES_SORTED_BY_WEIGHT);
 
-    if (state == PIECES_SORTED_BY_WEIGHT)
+    if ((s->pieceCount > 0) && (s->pieces != NULL))
     {
-        setComparePieceByWeightTorrent(s);
-        qsort(s->pieces, s->pieceCount, sizeof(struct weighted_piece), comparePieceByWeight);
-    }
-    else
-    {
-        qsort(s->pieces, s->pieceCount, sizeof(struct weighted_piece), comparePieceByIndex);
+        if (state == PIECES_SORTED_BY_WEIGHT)
+        {
+            setComparePieceByWeightTorrent(s);
+            qsort(s->pieces, s->pieceCount, sizeof(struct weighted_piece), comparePieceByWeight);
+        }
+        else
+        {
+            qsort(s->pieces, s->pieceCount, sizeof(struct weighted_piece), comparePieceByIndex);
+        }
     }
 
     s->pieceSortState = state;
