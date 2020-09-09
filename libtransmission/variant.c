@@ -34,7 +34,6 @@
 #define LIBTRANSMISSION_VARIANT_MODULE
 
 #include "transmission.h"
-#include "ConvertUTF.h"
 #include "error.h"
 #include "file.h"
 #include "log.h"
