@@ -19,6 +19,7 @@ Checks: >
   -clang-diagnostic-sign-conversion,
   cppcoreguidelines-*,
   -cppcoreguidelines-avoid-magic-numbers,
+  -cppcoreguidelines-avoid-non-const-global-variables,
   -cppcoreguidelines-init-variables,
   -cppcoreguidelines-macro-usage,
   -cppcoreguidelines-narrowing-conversions,
