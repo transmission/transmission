@@ -41,7 +41,7 @@ class Session : public QObject
 
 public:
     Session(QString config_dir, Prefs& prefs);
-    virtual ~Session();
+    ~Session() override;
 
     void stop();
     void restart();
