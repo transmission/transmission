@@ -13,8 +13,6 @@
 
 #include <event2/buffer.h>
 
-#include "ConvertUTF.h"
-
 #define LIBTRANSMISSION_VARIANT_MODULE
 
 #include "transmission.h"

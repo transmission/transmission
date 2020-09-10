@@ -996,14 +996,17 @@ static void pieceListSort(tr_swarm* s, enum piece_sort_state state)
 {
     TR_ASSERT(state == PIECES_SORTED_BY_INDEX || state == PIECES_SORTED_BY_WEIGHT);
 
-    if (state == PIECES_SORTED_BY_WEIGHT)
+    if ((s->pieceCount > 0) && (s->pieces != NULL))
     {
-        setComparePieceByWeightTorrent(s);
-        qsort(s->pieces, s->pieceCount, sizeof(struct weighted_piece), comparePieceByWeight);
-    }
-    else
-    {
-        qsort(s->pieces, s->pieceCount, sizeof(struct weighted_piece), comparePieceByIndex);
+        if (state == PIECES_SORTED_BY_WEIGHT)
+        {
+            setComparePieceByWeightTorrent(s);
+            qsort(s->pieces, s->pieceCount, sizeof(struct weighted_piece), comparePieceByWeight);
+        }
+        else
+        {
+            qsort(s->pieces, s->pieceCount, sizeof(struct weighted_piece), comparePieceByIndex);
+        }
     }
 
     s->pieceSortState = state;
@@ -3118,8 +3121,13 @@ static void rechokeDownloads(tr_swarm* s)
         tr_free(piece_is_interesting);
     }
 
+    if ((rechoke != NULL) && (rechoke_count > 0))
+    {
+        qsort(rechoke, rechoke_count, sizeof(struct tr_rechoke_info), compare_rechoke_info);
+    }
+
     /* now that we know which & how many peers to be interested in... update the peer interest */
-    qsort(rechoke, rechoke_count, sizeof(struct tr_rechoke_info), compare_rechoke_info);
+
     s->interestedCount = MIN(maxPeers, rechoke_count);
 
     for (int i = 0; i < rechoke_count; ++i)
