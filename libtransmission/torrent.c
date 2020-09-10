@@ -2602,7 +2602,9 @@ void tr_torrentGetBlockLocation(tr_torrent const* tor, tr_block_index_t block, t
     uint64_t pos = block;
     pos *= tor->blockSize;
     *piece = pos / tor->info.pieceSize;
-    *offset = pos - *piece * tor->info.pieceSize;
+    uint64_t piece_begin = tor->info.pieceSize;
+    piece_begin *= *piece;
+    *offset = pos - piece_begin;
     *length = tr_torBlockCountBytes(tor, block);
 }
 
