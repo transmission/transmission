@@ -543,40 +543,40 @@ static char* getEncodedMetainfo(char const* filename)
     return b64;
 }
 
-static void addIdArg(tr_variant* args, char const* id, char const* fallback)
+static void addIdArg(tr_variant* args, char const* id_str, char const* fallback)
 {
-    if (tr_str_is_empty(id))
+    if (tr_str_is_empty(id_str))
     {
         id = fallback;
 
-        if (tr_str_is_empty(id))
+        if (tr_str_is_empty(id_str))
         {
             fprintf(stderr, "No torrent specified!  Please use the -t option first.\n");
-            id = "-1"; /* no torrent will have this ID, so will act as a no-op */
+            id_str = "-1"; /* no torrent will have this ID, so will act as a no-op */
         }
     }
 
-    if (tr_strcmp0(id, "active") == 0)
+    if (tr_strcmp0(id_str, "active") == 0)
     {
         tr_variantDictAddStr(args, TR_KEY_ids, "recently-active");
     }
-    else if (strcmp(id, "all") != 0)
+    else if (strcmp(id_str, "all") != 0)
     {
-        bool isList = strchr(id, ',') != NULL || strchr(id, '-') != NULL;
+        bool isList = strchr(id_str, ',') != NULL || strchr(id_str, '-') != NULL;
         bool isNum = true;
 
-        for (char const* pch = id; isNum && *pch != '\0'; ++pch)
+        for (char const* pch = id_str; isNum && *pch != '\0'; ++pch)
         {
             isNum = isdigit(*pch);
         }
 
         if (isNum || isList)
         {
-            tr_rpc_parse_list_str(tr_variantDictAdd(args, TR_KEY_ids), id, strlen(id));
+            tr_rpc_parse_list_str(tr_variantDictAdd(args, TR_KEY_ids), id_str, strlen(id_str));
         }
         else
         {
-            tr_variantDictAddStr(args, TR_KEY_ids, id); /* it's a torrent sha hash */
+            tr_variantDictAddStr(args, TR_KEY_ids, id_str); /* it's a torrent sha hash */
         }
     }
 }
