@@ -21,7 +21,7 @@ Transmission.prototype = {
 
         // Initialize the helper classes
         this.remote = new TransmissionRemote(this);
-        this.inspector = new Inspector(this, this.remote);
+        this.inspector = new Inspector(this);
         this.prefsDialog = new PrefsDialog(this.remote);
         $(this.prefsDialog).bind('closed', $.proxy(this.onPrefsDialogClosed, this));
 
