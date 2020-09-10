@@ -616,7 +616,7 @@ static int tr_lpdConsiderAnnounce(tr_pex* peer, char const* const msg)
 * Further, by setting interval to zero (or negative) the caller may actually disable LPD
 * announces on a per-interval basis.
 *
-* FIXME: since this function's been made private and is called by a periodic timer,
+* TODO: since this function's been made private and is called by a periodic timer,
 * most of the previous paragraph isn't true anymore... we weren't using that functionality
 * before. are there cases where we should? if not, should we remove the bells & whistles?
 */
