@@ -299,7 +299,6 @@ function Inspector(controller) {
             if (torrents.length < 1) {
                 str = none;
             } else {
-                baseline = torrents[0].getLastActivity();
                 for (i = 0; t = torrents[i]; ++i) {
                     d = t.getLastActivity();
                     if (latest < d) {
