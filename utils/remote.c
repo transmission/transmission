@@ -547,7 +547,7 @@ static void addIdArg(tr_variant* args, char const* id_str, char const* fallback)
 {
     if (tr_str_is_empty(id_str))
     {
-        id = fallback;
+        id_str = fallback;
 
         if (tr_str_is_empty(id_str))
         {
@@ -1536,7 +1536,7 @@ static void printTrackersImpl(tr_variant* trackerStats)
         bool hasAnnounced;
         bool hasScraped;
         char const* host;
-        int64_t id;
+        int64_t trackerId;
         bool isBackup;
         int64_t lastAnnouncePeerCount;
         char const* lastAnnounceResult;
@@ -1561,7 +1561,7 @@ static void printTrackersImpl(tr_variant* trackerStats)
             tr_variantDictFindBool(t, TR_KEY_hasAnnounced, &hasAnnounced) &&
             tr_variantDictFindBool(t, TR_KEY_hasScraped, &hasScraped) &&
             tr_variantDictFindStr(t, TR_KEY_host, &host, NULL) &&
-            tr_variantDictFindInt(t, TR_KEY_id, &id) &&
+            tr_variantDictFindInt(t, TR_KEY_id, &trackerId) &&
             tr_variantDictFindBool(t, TR_KEY_isBackup, &isBackup) &&
             tr_variantDictFindInt(t, TR_KEY_announceState, &announceState) &&
             tr_variantDictFindInt(t, TR_KEY_scrapeState, &scrapeState) &&
@@ -1585,7 +1585,7 @@ static void printTrackersImpl(tr_variant* trackerStats)
             time_t const now = time(NULL);
 
             printf("\n");
-            printf("  Tracker %d: %s\n", (int)(id), host);
+            printf("  Tracker %d: %s\n", (int)trackerId, host);
 
             if (isBackup)
             {
