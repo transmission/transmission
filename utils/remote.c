@@ -922,6 +922,14 @@ static char const* bandwidthPriorityNames[] =
     "Invalid"
 };
 
+static char* format_date(char* buf, size_t buflen, time_t now)
+{
+    struct tm tm;
+    tr_localtime_r(&now, &tm);
+    strftime(buf, buflen, "%a %b %2e %T %Y%n", &tm); /* ctime equiv */
+    return buf;
+}
+
 static void printDetails(tr_variant* top)
 {
     tr_variant* args;
@@ -1101,26 +1109,22 @@ static void printDetails(tr_variant* top)
 
             if (tr_variantDictFindInt(t, TR_KEY_addedDate, &i) && i != 0)
             {
-                time_t const tt = i;
-                printf("  Date added:       %s", ctime(&tt));
+                printf("  Date added:       %s", format_date(buf, sizeof(buf), i));
             }
 
             if (tr_variantDictFindInt(t, TR_KEY_doneDate, &i) && i != 0)
             {
-                time_t const tt = i;
-                printf("  Date finished:    %s", ctime(&tt));
+                printf("  Date finished:    %s", format_date(buf, sizeof(buf), i));
             }
 
             if (tr_variantDictFindInt(t, TR_KEY_startDate, &i) && i != 0)
             {
-                time_t const tt = i;
-                printf("  Date started:     %s", ctime(&tt));
+                printf("  Date started:     %s", format_date(buf, sizeof(buf), i));
             }
 
             if (tr_variantDictFindInt(t, TR_KEY_activityDate, &i) && i != 0)
             {
-                time_t const tt = i;
-                printf("  Latest activity:  %s", ctime(&tt));
+                printf("  Latest activity:  %s", format_date(buf, sizeof(buf), i));
             }
 
             if (tr_variantDictFindInt(t, TR_KEY_secondsDownloading, &i) && i > 0)
@@ -1139,8 +1143,7 @@ static void printDetails(tr_variant* top)
 
             if (tr_variantDictFindInt(t, TR_KEY_dateCreated, &i) && i != 0)
             {
-                time_t const tt = i;
-                printf("  Date created: %s", ctime(&tt));
+                printf("  Date created: %s", format_date(buf, sizeof(buf), i));
             }
 
             if (tr_variantDictFindBool(t, TR_KEY_isPrivate, &boolVal))
