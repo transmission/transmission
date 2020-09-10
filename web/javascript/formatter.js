@@ -7,11 +7,9 @@
 
 Transmission.fmt = (function () {
     var speed_K = 1000;
-    var speed_B_str = 'B/s';
     var speed_K_str = 'kB/s';
     var speed_M_str = 'MB/s';
     var speed_G_str = 'GB/s';
-    var speed_T_str = 'TB/s';
 
     var size_K = 1000;
     var size_B_str = 'B';
@@ -290,5 +288,5 @@ Transmission.fmt = (function () {
 
             return formattedFlags.join('');
         }
-    }
+    };
 })();

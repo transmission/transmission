@@ -149,7 +149,6 @@ TransmissionRemote.prototype = {
     },
 
     getFreeSpace: function (dir, callback, context) {
-        var remote = this;
         var o = {
             method: 'free-space',
             arguments: {
@@ -201,7 +200,6 @@ TransmissionRemote.prototype = {
     },
 
     moveTorrents: function (torrent_ids, new_location, callback, context) {
-        var remote = this;
         this.sendTorrentSetRequests('torrent-set-location', torrent_ids, {
             "move": true,
             "location": new_location

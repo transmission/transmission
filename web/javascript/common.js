@@ -30,7 +30,7 @@ $.fn.tabbedDialog = function (dialog_opts) {
     this.parent().addClass('ui-tabs').prepend(tabul).draggable('option', 'handle', tabul);
     this.siblings('.ui-dialog-titlebar').remove();
     tabul.addClass('ui-dialog-titlebar');
-}
+};
 
 /**
  * Checks to see if the content actually changed before poking the DOM.
@@ -224,7 +224,7 @@ jQuery.fn.forceNumeric = function () {
                 key === 46 || key === 45;
         });
     });
-}
+};
 
 /**
  * http://blog.stevenlevithan.com/archives/parseuri

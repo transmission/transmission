@@ -572,7 +572,7 @@ Transmission.prototype = {
             }
 
             if (m_key || l_key) {
-                this.moveSelectedTorrents()
+                this.moveSelectedTorrents();
                 handled = true;
             }
 
@@ -1086,7 +1086,6 @@ Transmission.prototype = {
      * Select a torrent file to upload
      */
     uploadTorrentFile: function (confirmed) {
-        var i, file, reader;
         var fileInput = $('input#torrent_upload_file');
         var folderInput = $('input#add-dialog-folder-input');
         var startInput = $('input#torrent_auto_start');
@@ -1424,7 +1423,6 @@ Transmission.prototype = {
 
     updateFilterSelect: function () {
         var i, names, name, str, o;
-        var e = $('#filter-tracker');
         var trackers = this.getTrackers();
 
         // build a sorted list of names
@@ -1697,10 +1695,7 @@ Transmission.prototype = {
         this.dirtyTorrents = {};
 
         // jquery's even/odd starts with 1 not 0, so invert its logic
-        e = []
-        for (i = 0; row = rows[i]; ++i) {
-            e.push(row.getElement());
-        };
+        e = rows.map(row => row.getElement());
         $(e).filter(":odd").addClass('even');
         $(e).filter(":even").removeClass('even');
 
