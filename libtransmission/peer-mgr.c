@@ -2093,10 +2093,7 @@ static bool myHandshakeDoneCB(tr_handshake* handshake, tr_peerIo* io, bool readA
         {
             tordbg(s, "banned peer %s tried to reconnect", tr_atomAddrStr(atom));
         }
-        else if (tr_peerIoIsIncoming(io) && getPeerCount(s) >= getMaxPeerCount(s->tor))
-        {
-        }
-        else
+        else if (!tr_peerIoIsIncoming(io) && getPeerCount(s) < getMaxPeerCount(s->tor))
         {
             tr_peer* peer = atom->peer;
 
