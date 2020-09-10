@@ -323,6 +323,9 @@ char* tr_strratio(char* buf, size_t buflen, double ratio, char const* infinity) 
 /** @brief Portability wrapper for localtime_r() that uses the system implementation if available */
 struct tm* tr_localtime_r(time_t const* _clock, struct tm* _result);
 
+/** @brief Portability wrapper for gmtime_r() that uses the system implementation if available */
+struct tm* tr_gmtime_r(time_t const* _clock, struct tm* _result);
+
 /** @brief Portability wrapper for gettimeofday(), with tz argument dropped */
 int tr_gettimeofday(struct timeval* tv);
 

@@ -533,8 +533,11 @@ set(NEEDED_FUNCTIONS
     flock
     getmntent
     getpagesize
+    gmtime_r
+    gmtime_s
     htonll
     localtime_r
+    localtime_s
     memmem
     mkdtemp
     ntohll
