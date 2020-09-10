@@ -163,17 +163,13 @@ function FileRow(torrent, depth, name, indices, even) {
         e = document.createElement('div');
         e.className = "inspector_torrent_file_list_entry_name";
         setTextContent(e, name);
-        $(e).click(function () {
-            fireNameClicked(-1);
-        });
+        $(e).click(fireNameClicked);
         root.appendChild(e);
 
         e = document.createElement('div');
         e.className = "inspector_torrent_file_list_entry_progress";
         root.appendChild(e);
-        $(e).click(function () {
-            fireNameClicked(-1);
-        });
+        $(e).click(fireNameClicked);
         elements.progress = e;
 
         $(root).css('margin-left', '' + (depth * 16) + 'px');
