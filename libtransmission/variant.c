@@ -34,7 +34,6 @@
 #define LIBTRANSMISSION_VARIANT_MODULE
 
 #include "transmission.h"
-#include "ConvertUTF.h"
 #include "error.h"
 #include "file.h"
 #include "log.h"
@@ -1006,9 +1005,9 @@ static void tr_variantListCopy(tr_variant* target, tr_variant const* src)
         }
         else if (tr_variantIsString(val))
         {
-            size_t len;
-            char const* str;
-            tr_variantGetStr(val, &str, &len);
+            size_t len = 0;
+            char const* str = NULL;
+            (void)tr_variantGetStr(val, &str, &len);
             tr_variantListAddRaw(target, str, len);
         }
         else if (tr_variantIsDict(val))
@@ -1086,9 +1085,9 @@ void tr_variantMergeDicts(tr_variant* target, tr_variant const* source)
             }
             else if (tr_variantIsString(val))
             {
-                size_t len;
-                char const* str;
-                tr_variantGetStr(val, &str, &len);
+                size_t len = 0;
+                char const* str = NULL;
+                (void)tr_variantGetStr(val, &str, &len);
                 tr_variantDictAddRaw(target, key, str, len);
             }
             else if (tr_variantIsDict(val) && tr_variantDictFindDict(target, key, &t))

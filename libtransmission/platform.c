@@ -595,10 +595,10 @@ char const* tr_getWebClientDir(tr_session const* session)
 
             /* XDG_DATA_DIRS are the backup directories */
             {
-                char const* pkg = PACKAGE_DATA_DIR;
+                char const* const pkg = PACKAGE_DATA_DIR;
                 char* xdg = tr_env_get_string("XDG_DATA_DIRS", NULL);
                 char const* fallback = "/usr/local/share:/usr/share";
-                char* buf = tr_strdup_printf("%s:%s:%s", pkg != NULL ? pkg : "", xdg != NULL ? xdg : "", fallback);
+                char* buf = tr_strdup_printf("%s:%s:%s", pkg, xdg != NULL ? xdg : "", fallback);
                 tr_free(xdg);
                 tmp = buf;
 
