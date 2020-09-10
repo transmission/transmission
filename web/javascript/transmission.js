@@ -1590,7 +1590,7 @@ Transmission.prototype = {
         var renderer = this.torrentRenderer;
         var list = this.elements.torrent_list;
 
-        old_sel_count = $(list).children('.selected').length;
+        const old_sel_count = $(list).children('.selected').length;
 
         this.updateFilterSelect();
 
