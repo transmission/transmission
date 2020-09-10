@@ -1453,7 +1453,7 @@ static void printTorrentList(tr_variant* top)
 
         for (int i = 0, n = tr_variantListSize(list); i < n; ++i)
         {
-            int64_t id;
+            int64_t torId;
             int64_t eta;
             int64_t status;
             int64_t up;
@@ -1465,7 +1465,7 @@ static void printTorrentList(tr_variant* top)
             tr_variant* d = tr_variantListChild(list, i);
 
             if (tr_variantDictFindInt(d, TR_KEY_eta, &eta) &&
-                tr_variantDictFindInt(d, TR_KEY_id, &id) &&
+                tr_variantDictFindInt(d, TR_KEY_id, &torId) &&
                 tr_variantDictFindInt(d, TR_KEY_leftUntilDone, &leftUntilDone) &&
                 tr_variantDictFindStr(d, TR_KEY_name, &name, NULL) &&
                 tr_variantDictFindInt(d, TR_KEY_rateDownload, &down) &&
@@ -1510,7 +1510,7 @@ static void printTorrentList(tr_variant* top)
                     errorMark = ' ';
                 }
 
-                printf("%6d%c  %4s  %9s  %-8s  %6.1f  %6.1f  %5s  %-11s  %s\n", (int)id, errorMark, doneStr, haveStr, etaStr,
+                printf("%6d%c  %4s  %9s  %-8s  %6.1f  %6.1f  %5s  %-11s  %s\n", (int)torId, errorMark, doneStr, haveStr, etaStr,
                     up / (double)tr_speed_K, down / (double)tr_speed_K, strlratio2(ratioStr, ratio, sizeof(ratioStr)),
                     getStatusString(d, statusStr, sizeof(statusStr)), name);
 
