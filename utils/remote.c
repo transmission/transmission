@@ -583,7 +583,7 @@ static void addIdArg(tr_variant* args, char const* id_str, char const* fallback)
 
 static void addTime(tr_variant* args, tr_quark const key, char const* arg)
 {
-    int time;
+    int time = 0;
     bool success = false;
 
     if (arg != NULL && strlen(arg) == 4)
