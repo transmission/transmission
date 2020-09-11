@@ -2612,11 +2612,20 @@ tr_block_index_t _tr_block(tr_torrent const* tor, tr_piece_index_t index, uint32
 {
     TR_ASSERT(tr_isTorrent(tor));
 
-    tr_block_index_t ret;
+    tr_block_index_t ret = 0;
 
-    ret = index;
-    ret *= tor->info.pieceSize / tor->blockSize;
-    ret += offset / tor->blockSize;
+    if (tor->blockSize > 0)
+    {
+        ret = index;
+        ret *= tor->info.pieceSize / tor->blockSize;
+        ret += offset / tor->blockSize;
+    }
+    else
+    {
+        tr_logAddTorErr(tor, "Cannot calculate block number when blockSize is zero");
+        TR_ASSERT(tor->blockSize > 0);
+    }
+
     return ret;
 }
 
