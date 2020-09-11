@@ -664,8 +664,7 @@ static int daemon_start(void* raw_arg, bool foreground)
     tr_sessionSaveSettings(session, configDir, settings);
 
     pid_filename = NULL;
-    tr_variantDictFindStr(settings, key_pidfile, &pid_filename, NULL);
-
+    (void) tr_variantDictFindStr(settings, key_pidfile, &pid_filename, NULL);
     if (!tr_str_is_empty(pid_filename))
     {
         tr_error* error = NULL;
