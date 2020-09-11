@@ -333,7 +333,7 @@ static struct tr_cached_file* fileset_get_empty_slot(struct tr_fileset* set)
 {
     struct tr_cached_file* cull = NULL;
 
-    if (set->begin != NULL)
+    if (set != NULL && set->begin != NULL)
     {
         /* try to find an unused slot */
         for (struct tr_cached_file* o = set->begin; o != set->end; ++o)

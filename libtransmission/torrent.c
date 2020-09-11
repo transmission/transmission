@@ -975,7 +975,7 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     torrentInitFromInfo(tor);
 
     bool didRenameResumeFileToHashOnlyName = false;
-    loaded = tr_torrentLoadResume(tor, ~0, ctor, &didRenameResumeFileToHashOnlyName);
+    loaded = tr_torrentLoadResume(tor, ~(uint64_t)0, ctor, &didRenameResumeFileToHashOnlyName);
 
     if (didRenameResumeFileToHashOnlyName)
     {
