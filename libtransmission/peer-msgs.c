@@ -2601,36 +2601,37 @@ static bool peermsgs_is_transferring_pieces(struct tr_peer const* peer, uint64_t
 
 static void peermsgs_destruct(tr_peer* peer)
 {
-    tr_peerMsgs* msgs = PEER_MSGS(peer);
-
+    tr_peerMsgs* const msgs = PEER_MSGS(peer);
     TR_ASSERT(msgs != NULL);
-
-    tr_peerMsgsSetActive(msgs, TR_UP, false);
-    tr_peerMsgsSetActive(msgs, TR_DOWN, false);
-
-    if (msgs->pexTimer != NULL)
+    if (msgs != NULL)
     {
-        event_free(msgs->pexTimer);
+        tr_peerMsgsSetActive(msgs, TR_UP, false);
+        tr_peerMsgsSetActive(msgs, TR_DOWN, false);
+
+        if (msgs->pexTimer != NULL)
+        {
+            event_free(msgs->pexTimer);
+        }
+
+        if (msgs->incoming.block != NULL)
+        {
+            evbuffer_free(msgs->incoming.block);
+        }
+
+        if (msgs->io != NULL)
+        {
+            tr_peerIoClear(msgs->io);
+            tr_peerIoUnref(msgs->io); /* balanced by the ref in handshakeDoneCB() */
+        }
+
+        evbuffer_free(msgs->outMessages);
+        tr_free(msgs->pex6);
+        tr_free(msgs->pex);
+
+        tr_peerDestruct(&msgs->peer);
+
+        memset(msgs, ~0, sizeof(tr_peerMsgs));
     }
-
-    if (msgs->incoming.block != NULL)
-    {
-        evbuffer_free(msgs->incoming.block);
-    }
-
-    if (msgs->io != NULL)
-    {
-        tr_peerIoClear(msgs->io);
-        tr_peerIoUnref(msgs->io); /* balanced by the ref in handshakeDoneCB() */
-    }
-
-    evbuffer_free(msgs->outMessages);
-    tr_free(msgs->pex6);
-    tr_free(msgs->pex);
-
-    tr_peerDestruct(&msgs->peer);
-
-    memset(msgs, ~0, sizeof(tr_peerMsgs));
 }
 
 static struct tr_peer_virtual_funcs const my_funcs =
