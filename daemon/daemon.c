@@ -261,20 +261,20 @@ static tr_watchdir_status onFileAdded(tr_watchdir_t dir, char const* name, void*
     return err == TR_PARSE_ERR ? TR_WATCHDIR_RETRY : TR_WATCHDIR_ACCEPT;
 }
 
-static void printMessage(tr_sys_file_t file, int level, char const* name, char const* message, char const* file, int line)
+static void printMessage(tr_sys_file_t file, int level, char const* name, char const* message, char const* filename, int line)
 {
-    if (logfile != TR_BAD_SYS_FILE)
+    if (file != TR_BAD_SYS_FILE)
     {
         char timestr[64];
         tr_logGetTimeStr(timestr, sizeof(timestr));
 
         if (name != NULL)
         {
-            tr_sys_file_write_fmt(file, "[%s] %s %s (%s:%d)" TR_NATIVE_EOL_STR, NULL, timestr, name, message, file, line);
+            tr_sys_file_write_fmt(file, "[%s] %s %s (%s:%d)" TR_NATIVE_EOL_STR, NULL, timestr, name, message, filename, line);
         }
         else
         {
-            tr_sys_file_write_fmt(file, "[%s] %s (%s:%d)" TR_NATIVE_EOL_STR, NULL, timestr, message, file, line);
+            tr_sys_file_write_fmt(file, "[%s] %s (%s:%d)" TR_NATIVE_EOL_STR, NULL, timestr, message, filename, line);
         }
     }
 
@@ -302,11 +302,11 @@ static void printMessage(tr_sys_file_t file, int level, char const* name, char c
 
         if (name != NULL)
         {
-            syslog(priority, "%s %s (%s:%d)", name, message, file, line);
+            syslog(priority, "%s %s (%s:%d)", name, message, filename, line);
         }
         else
         {
-            syslog(priority, "%s (%s:%d)", message, file, line);
+            syslog(priority, "%s (%s:%d)", message, filename, line);
         }
     }
 
