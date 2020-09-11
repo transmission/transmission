@@ -81,6 +81,7 @@ struct tm* tr_gmtime_r(time_t const* timep, struct tm* result)
         *result = *p;
         return result;
     }
+
     return NULL;
 
 #endif
@@ -104,6 +105,7 @@ struct tm* tr_localtime_r(time_t const* timep, struct tm* result)
         *result = *p;
         return result;
     }
+
     return NULL;
 
 #endif
