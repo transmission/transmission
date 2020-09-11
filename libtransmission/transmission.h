@@ -1636,7 +1636,8 @@ struct tr_info
 
 static inline bool tr_torrentHasMetadata(tr_torrent const* tor)
 {
-    return tr_torrentInfo(tor)->fileCount > 0;
+    tr_info const* const inf = tr_torrentInfo(tor);
+    return (inf != NULL) && (inf->fileCount >0);
 }
 
 /**

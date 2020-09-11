@@ -2746,9 +2746,11 @@ time_t tr_torrentGetFileMTime(tr_torrent const* tor, tr_file_index_t i)
 
 bool tr_torrentPieceNeedsCheck(tr_torrent const* tor, tr_piece_index_t p)
 {
-    uint64_t unused;
-    tr_file_index_t f;
-    tr_info const* inf = tr_torrentInfo(tor);
+    tr_info const* const inf = tr_torrentInfo(tor);
+    if (inf == NULL)
+    {
+        return false;
+    }
 
     /* if we've never checked this piece, then it needs to be checked */
     if (inf->pieces[p].timeChecked == 0)
@@ -2759,6 +2761,8 @@ bool tr_torrentPieceNeedsCheck(tr_torrent const* tor, tr_piece_index_t p)
     /* If we think we've completed one of the files in this piece,
      * but it's been modified since we last checked it,
      * then it needs to be rechecked */
+    tr_file_index_t f;
+    uint64_t unused;
     tr_ioFindFileLocation(tor, p, 0, &f, &unused);
 
     for (tr_file_index_t i = f; i < inf->fileCount && pieceHasFile(p, &inf->files[i]); ++i)
