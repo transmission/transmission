@@ -81,7 +81,7 @@ static bool tr_spawn_async_in_child(char* const* cmd, char* const* env, char con
     return true;
 
 fail:
-    write(pipe_fd, &errno, sizeof(errno));
+    (void)write(pipe_fd, &errno, sizeof(errno));
     return false;
 }
 
