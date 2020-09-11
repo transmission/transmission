@@ -279,7 +279,7 @@ static void on_content_changed(struct evbuffer* buf, struct evbuffer_cb_info con
 
             /* we don't use locking on this evbuffer so we must copy out the data
                that will be needed when writing the block in a different thread */
-            evbuffer_remove_buffer(task->content, data->content, block_size * completed);
+            evbuffer_remove_buffer(task->content, data->content, (size_t)block_size * (size_t)completed);
 
             tr_runInEventThread(w->session, write_block_func, data);
             task->blocks_done += completed;
@@ -475,7 +475,7 @@ static void task_request_next_chunk(struct tr_webseed_task* t)
 
         uint64_t const total_offset = tr_pieceOffset(tor, t->piece_index, t->piece_offset, t->length - remain);
         tr_piece_index_t const step_piece = total_offset / inf->pieceSize;
-        uint64_t const step_piece_offset = total_offset - inf->pieceSize * step_piece;
+        uint64_t const step_piece_offset = total_offset - (uint64_t)inf->pieceSize * step_piece;
 
         tr_file_index_t file_index;
         tr_file const* file;

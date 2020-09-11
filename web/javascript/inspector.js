@@ -14,13 +14,7 @@ function Inspector(controller) {
         },
 
         needsExtraInfo = function (torrents) {
-            var i, id, tor;
-
-            for (i = 0; tor = torrents[i]; i++)
-                if (!tor.hasExtraInfo())
-                    return true;
-
-            return false;
+            return torrents.some(tor => !tor.hasExtraInfo());
         },
 
         refreshTorrents = function (callback) {
@@ -96,7 +90,7 @@ function Inspector(controller) {
                 unknown = 'Unknown',
                 isMixed, allPaused, allFinished,
                 str,
-                baseline, it, s, i, t,
+                baseline, it, i, t,
                 sizeWhenDone = 0,
                 leftUntilDone = 0,
                 available = 0,
@@ -110,7 +104,7 @@ function Inspector(controller) {
                 pieceSize,
                 creator, mixed_creator,
                 date, mixed_date,
-                v, u, f, d, pct,
+                v, u, f, d,
                 uri,
                 now = Date.now();
 
@@ -305,7 +299,6 @@ function Inspector(controller) {
             if (torrents.length < 1) {
                 str = none;
             } else {
-                baseline = torrents[0].getLastActivity();
                 for (i = 0; t = torrents[i]; ++i) {
                     d = t.getLastActivity();
                     if (latest < d) {
@@ -524,7 +517,7 @@ function Inspector(controller) {
         },
 
         createFileTreeModel = function (tor) {
-            var i, j, n, name, tokens, walk, tree, token, sub,
+            var i, j, n, name, tokens, walk, token, sub,
                 leaves = [],
                 tree = {
                     children: {},
@@ -806,8 +799,6 @@ function Inspector(controller) {
 
         initialize = function (controller) {
 
-            var ti = '#torrent_inspector_';
-
             data.controller = controller;
 
             $('.inspector-tab').click(onTabClicked);
@@ -851,8 +842,7 @@ function Inspector(controller) {
      ****/
 
     this.setTorrents = function (torrents) {
-        var d = data,
-            that = this;
+        var d = data;
 
         // update the inspector when a selected torrent's data changes.
         $(d.torrents).unbind('dataChanged.inspector');

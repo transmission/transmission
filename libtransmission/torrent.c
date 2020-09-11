@@ -975,7 +975,7 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     torrentInitFromInfo(tor);
 
     bool didRenameResumeFileToHashOnlyName = false;
-    loaded = tr_torrentLoadResume(tor, ~0, ctor, &didRenameResumeFileToHashOnlyName);
+    loaded = tr_torrentLoadResume(tor, ~(uint64_t)0, ctor, &didRenameResumeFileToHashOnlyName);
 
     if (didRenameResumeFileToHashOnlyName)
     {
@@ -2226,21 +2226,6 @@ void tr_torrentClearIdleLimitHitCallback(tr_torrent* torrent)
     tr_torrentSetIdleLimitHitCallback(torrent, NULL, NULL);
 }
 
-static void get_local_time_str(char* const buffer, size_t const buffer_len)
-{
-    time_t const now = tr_time();
-
-    tr_strlcpy(buffer, ctime(&now), buffer_len);
-
-    char* newline_pos = strchr(buffer, '\n');
-
-    /* ctime() includes '\n', but it's better to be safe */
-    if (newline_pos != NULL)
-    {
-        *newline_pos = '\0';
-    }
-}
-
 static void torrentCallScript(tr_torrent const* tor, char const* script)
 {
     if (tr_str_is_empty(script))
@@ -2248,8 +2233,11 @@ static void torrentCallScript(tr_torrent const* tor, char const* script)
         return;
     }
 
-    char time_str[32];
-    get_local_time_str(time_str, TR_N_ELEMENTS(time_str));
+    time_t const now = tr_time();
+    struct tm tm;
+    char ctime_str[32];
+    tr_localtime_r(&now, &tm);
+    strftime(ctime_str, sizeof(ctime_str), "%a %b %2e %T %Y%n", &tm); /* ctime equiv */
 
     char* const torrent_dir = tr_sys_path_native_separators(tr_strdup(tor->currentDir));
 
@@ -2264,7 +2252,7 @@ static void torrentCallScript(tr_torrent const* tor, char const* script)
     char* const env[] =
     {
         tr_strdup_printf("TR_APP_VERSION=%s", SHORT_VERSION_STRING),
-        tr_strdup_printf("TR_TIME_LOCALTIME=%s", time_str),
+        tr_strdup_printf("TR_TIME_LOCALTIME=%s", ctime_str),
         tr_strdup_printf("TR_TORRENT_DIR=%s", torrent_dir),
         tr_strdup_printf("TR_TORRENT_HASH=%s", tor->info.hashString),
         tr_strdup_printf("TR_TORRENT_ID=%d", tr_torrentId(tor)),
@@ -2614,7 +2602,9 @@ void tr_torrentGetBlockLocation(tr_torrent const* tor, tr_block_index_t block, t
     uint64_t pos = block;
     pos *= tor->blockSize;
     *piece = pos / tor->info.pieceSize;
-    *offset = pos - *piece * tor->info.pieceSize;
+    uint64_t piece_begin = tor->info.pieceSize;
+    piece_begin *= *piece;
+    *offset = pos - piece_begin;
     *length = tr_torBlockCountBytes(tor, block);
 }
 
@@ -2756,9 +2746,11 @@ time_t tr_torrentGetFileMTime(tr_torrent const* tor, tr_file_index_t i)
 
 bool tr_torrentPieceNeedsCheck(tr_torrent const* tor, tr_piece_index_t p)
 {
-    uint64_t unused;
-    tr_file_index_t f;
-    tr_info const* inf = tr_torrentInfo(tor);
+    tr_info const* const inf = tr_torrentInfo(tor);
+    if (inf == NULL)
+    {
+        return false;
+    }
 
     /* if we've never checked this piece, then it needs to be checked */
     if (inf->pieces[p].timeChecked == 0)
@@ -2769,6 +2761,8 @@ bool tr_torrentPieceNeedsCheck(tr_torrent const* tor, tr_piece_index_t p)
     /* If we think we've completed one of the files in this piece,
      * but it's been modified since we last checked it,
      * then it needs to be rechecked */
+    tr_file_index_t f;
+    uint64_t unused;
     tr_ioFindFileLocation(tor, p, 0, &f, &unused);
 
     for (tr_file_index_t i = f; i < inf->fileCount && pieceHasFile(p, &inf->files[i]); ++i)

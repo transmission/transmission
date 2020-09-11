@@ -241,7 +241,7 @@ function PrefsDialog(remote) {
 
     // update the dialog's controls
     this.set = function (o) {
-        var e, i, key, val, option;
+        var e, i, key, val;
         var keys = data.keys;
         var root = data.elements.root;
 

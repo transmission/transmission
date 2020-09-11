@@ -127,15 +127,18 @@ static inline bool cached_file_is_open(struct tr_cached_file const* o)
 {
     TR_ASSERT(o != NULL);
 
-    return o->fd != TR_BAD_SYS_FILE;
+    return (o != NULL) && (o->fd != TR_BAD_SYS_FILE);
 }
 
 static void cached_file_close(struct tr_cached_file* o)
 {
     TR_ASSERT(cached_file_is_open(o));
 
-    tr_sys_file_close(o->fd, NULL);
-    o->fd = TR_BAD_SYS_FILE;
+    if (o != NULL)
+    {
+        tr_sys_file_close(o->fd, NULL);
+        o->fd = TR_BAD_SYS_FILE;
+    }
 }
 
 /**
@@ -333,7 +336,7 @@ static struct tr_cached_file* fileset_get_empty_slot(struct tr_fileset* set)
 {
     struct tr_cached_file* cull = NULL;
 
-    if (set->begin != NULL)
+    if (set != NULL && set->begin != NULL)
     {
         /* try to find an unused slot */
         for (struct tr_cached_file* o = set->begin; o != set->end; ++o)

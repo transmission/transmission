@@ -44,7 +44,7 @@ static struct FileList* getFiles(char const* dir, char const* base, struct FileL
     }
 
     char* buf = tr_buildPath(dir, base, NULL);
-    tr_sys_path_native_separators(buf);
+    (void)tr_sys_path_native_separators(buf);
 
     tr_sys_path_info info;
     tr_error* error = NULL;

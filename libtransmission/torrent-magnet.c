@@ -411,7 +411,7 @@ double tr_torrentGetMetadataPercent(tr_torrent const* tor)
     return ret;
 }
 
-/* FIXME: this should be renamed tr_metainfoGetMagnetLink() and moved to metainfo.c for consistency */
+/* TODO: this should be renamed tr_metainfoGetMagnetLink() and moved to metainfo.c for consistency */
 char* tr_torrentInfoGetMagnetLink(tr_info const* inf)
 {
     char const* name;

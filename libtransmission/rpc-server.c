@@ -368,10 +368,11 @@ static void add_response(struct evhttp_request* req, struct tr_rpc_server* serve
 
 static void add_time_header(struct evkeyvalq* headers, char const* key, time_t value)
 {
+    char buf[128];
+    struct tm tm;
     /* According to RFC 2616 this must follow RFC 1123's date format,
        so use gmtime instead of localtime... */
-    char buf[128];
-    struct tm tm = *gmtime(&value);
+    tr_gmtime_r(&value, &tm);
     strftime(buf, sizeof(buf), "%a, %d %b %Y %H:%M:%S GMT", &tm);
     evhttp_add_header(headers, key, buf);
 }

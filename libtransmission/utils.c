@@ -63,22 +63,50 @@ time_t __tr_current_time = 0;
 ****
 ***/
 
-struct tm* tr_localtime_r(time_t const* _clock, struct tm* _result)
+struct tm* tr_gmtime_r(time_t const* timep, struct tm* result)
 {
-#ifdef HAVE_LOCALTIME_R
+#if defined(HAVE_GMTIME_R)
 
-    return localtime_r(_clock, _result);
+    return gmtime_r(timep, result);
+
+#elif defined(HAVE_GMTIME_S)
+
+    return gmtime_s(result, timep) == 0 ? result : NULL;
 
 #else
 
-    struct tm* p = localtime(_clock);
-
+    struct tm* p = gmtime(timep);
     if (p != NULL)
     {
-        *(_result) = *p;
+        *result = *p;
+        return result;
     }
 
-    return p;
+    return NULL;
+
+#endif
+}
+
+struct tm* tr_localtime_r(time_t const* timep, struct tm* result)
+{
+#if defined(HAVE_LOCALTIME_R)
+
+    return localtime_r(timep, result);
+
+#elif defined(HAVE_LOCALTIME_S)
+
+    return localtime_s(result, timep) == 0 ? result : NULL;
+
+#else
+
+    struct tm* p = localtime(timep);
+    if (p != NULL)
+    {
+        *result = *p;
+        return result;
+    }
+
+    return NULL;
 
 #endif
 }
