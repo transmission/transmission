@@ -33,11 +33,6 @@ static inline bool IsDebuggerPresent(void)
     return false;
 }
 
-static inline void OutputDebugStringA(void const* data)
-{
-    TR_UNUSED(data);
-}
-
 #endif
 
 /***
@@ -175,13 +170,10 @@ void tr_logAddDeep(char const* file, int line, char const* name, char const* fmt
 
     if (fp != TR_BAD_SYS_FILE || IsDebuggerPresent())
     {
-        va_list args;
-        char timestr[64];
-        char* message;
-        size_t message_len;
         struct evbuffer* buf = evbuffer_new();
         char* base = tr_sys_path_basename(file, NULL);
 
+        char timestr[64];
         evbuffer_add_printf(buf, "[%s] ", tr_logGetTimeStr(timestr, sizeof(timestr)));
 
         if (name != NULL)
@@ -189,13 +181,18 @@ void tr_logAddDeep(char const* file, int line, char const* name, char const* fmt
             evbuffer_add_printf(buf, "%s ", name);
         }
 
+        va_list args;
         va_start(args, fmt);
         evbuffer_add_vprintf(buf, fmt, args);
         va_end(args);
         evbuffer_add_printf(buf, " (%s:%d)" TR_NATIVE_EOL_STR, base, line);
-        /* FIXME (libevent2) ifdef this out for nonwindows platforms */
-        message = evbuffer_free_to_str(buf, &message_len);
+
+        size_t message_len = 0;
+        char* const message = evbuffer_free_to_str(buf, &message_len);
+
+#ifdef _WIN32
         OutputDebugStringA(message);
+#endif
 
         if (fp != TR_BAD_SYS_FILE)
         {
