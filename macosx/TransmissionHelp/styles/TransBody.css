@@ -128,7 +128,7 @@ td {
 	padding-right: 6px
 }
 
-#taskbox {
+.taskbox {
 	background-color: #e6edff;
 	list-style-type: decimal;
 	list-style-position: outside;
