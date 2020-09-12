@@ -41,7 +41,7 @@
 #include "fdlimit.h" /* tr_fdSocketClose() */
 #include "log.h"
 #include "net.h"
-#include "peer-io.h" /* tr_peerIoAddrStr() FIXME this should be moved to net.h */
+#include "peer-socket.h" /* for struct tr_peer_socket */
 #include "session.h" /* tr_sessionGetPublicAddress() */
 #include "tr-assert.h"
 #include "tr-macros.h"
@@ -83,6 +83,15 @@ char* tr_net_strerror(char* buf, size_t buflen, int err)
 
 #endif
 
+    return buf;
+}
+
+char const* tr_address_and_port_to_string(char* buf, size_t buflen,
+                                          tr_address const* addr, tr_port port)
+{
+    char addr_buf[INET6_ADDRSTRLEN];
+    tr_address_to_string_with_buf(addr, addr_buf, sizeof(addr_buf));
+    tr_snprintf(buf, buflen, "[%s]:%u", addr_buf, ntohs(port));
     return buf;
 }
 
@@ -350,8 +359,9 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const
 
     if (tr_logGetDeepEnabled())
     {
-        tr_logAddDeep(__FILE__, __LINE__, NULL, "New OUTGOING connection %" PRIdMAX " (%s)", (intmax_t)s,
-            tr_peerIoAddrStr(addr, port));
+        char addrstr[TR_ADDRSTRLEN];
+        tr_address_and_port_to_string(addrstr, sizeof(addrstr), addr, port);
+        tr_logAddDeep(__FILE__, __LINE__, NULL, "New OUTGOING connection %" PRIdMAX " (%s)", (intmax_t)s, addrstr);
     }
 
     return ret;

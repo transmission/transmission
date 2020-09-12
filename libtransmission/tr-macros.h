@@ -164,6 +164,8 @@
 
 #define TR_INET6_ADDRSTRLEN 46
 
+#define TR_ADDRSTRLEN 64
+
 #define TR_BAD_SIZE ((size_t)-1)
 
 /* Guard C code in headers, while including them from C++ */
