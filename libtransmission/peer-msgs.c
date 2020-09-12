@@ -660,13 +660,6 @@ static bool tr_peerMsgsCalculateActive(tr_peerMsgs const* msgs, tr_direction dir
     if (direction == TR_CLIENT_TO_PEER)
     {
         is_active = tr_peerMsgsIsPeerInterested(msgs) && !tr_peerMsgsIsPeerChoked(msgs);
-
-        /* FIXME: https://trac.transmissionbt.com/ticket/5505
-        if (is_active)
-        {
-            TR_ASSERT(!tr_peerIsSeed(&msgs->peer));
-        }
-        */
     }
     else /* TR_PEER_TO_CLIENT */
     {
