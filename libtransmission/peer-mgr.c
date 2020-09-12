@@ -3869,7 +3869,6 @@ static void bandwidthPulse(evutil_socket_t fd, short what, void* vmgr)
     tr_session* session = mgr->session;
     managerLock(mgr);
 
-    /* FIXME: this next line probably isn't necessary... */
     pumpAllPeers(mgr);
 
     /* allocate bandwidth to the peers */
