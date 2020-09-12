@@ -5,5 +5,4 @@ dist_data_DATA = \
   jquery-migrate.min.js \
   jquery.min.js \
   jquery.ui-contextmenu.min.js \
-  jquery.transmenu.min.js \
-  json2.min.js
+  jquery.transmenu.min.js

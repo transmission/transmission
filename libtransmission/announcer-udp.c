@@ -722,7 +722,7 @@ static void tau_tracker_upkeep_ex(struct tau_tracker* tracker, bool timeout_reqs
         evbuffer_add_hton_64(buf, 0x41727101980LL);
         evbuffer_add_hton_32(buf, TAU_ACTION_CONNECT);
         evbuffer_add_hton_32(buf, tracker->connection_transaction_id);
-        tau_sendto(tracker->session, tracker->addr, tracker->port, evbuffer_pullup(buf, -1), evbuffer_get_length(buf));
+        (void)tau_sendto(tracker->session, tracker->addr, tracker->port, evbuffer_pullup(buf, -1), evbuffer_get_length(buf));
         evbuffer_free(buf);
         return;
     }
