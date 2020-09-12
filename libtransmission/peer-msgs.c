@@ -2703,7 +2703,6 @@ bool tr_peerMsgsIsIncomingConnection(tr_peerMsgs const* msgs)
 
 bool tr_isPeerMsgs(void const* msgs)
 {
-    /* FIXME: this is pretty crude */
     return msgs != NULL && ((struct tr_peerMsgs*)msgs)->magic_number == MAGIC_NUMBER;
 }
 
