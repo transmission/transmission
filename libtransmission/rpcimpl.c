@@ -2280,12 +2280,12 @@ static char const* sessionSet(tr_session* session, tr_variant* args_in, tr_varia
         }
     }
 
-    if(tr_bencDictFindInt(args_in, TR_KEY_anti_brute_force_threshold, &i))
+    if(tr_variantDictFindInt(args_in, TR_KEY_anti_brute_force_threshold, &i))
     {
         tr_sessionSetAntiBruteForceThreshold(session, i);
     }
 
-    if(tr_bencDictFindBool(args_in, TR_KEY_anti_brute_force_enabled, &boolVal))
+    if(tr_variantDictFindBool(args_in, TR_KEY_anti_brute_force_enabled, &boolVal))
     {
         tr_sessionSetAntiBruteForceEnabled(session, boolVal);
     }
