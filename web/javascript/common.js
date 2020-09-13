@@ -16,9 +16,7 @@ $.fn.tabbedDialog = function (dialog_opts) {
     selected: 0,
   });
   this.dialog(dialog_opts);
-  this.find('.ui-tab-dialog-close').append(
-    this.parent().find('.ui-dialog-titlebar-close')
-  );
+  this.find('.ui-tab-dialog-close').append(this.parent().find('.ui-dialog-titlebar-close'));
   this.find('.ui-tab-dialog-close').css({
     position: 'absolute',
     right: '0',
@@ -29,10 +27,7 @@ $.fn.tabbedDialog = function (dialog_opts) {
     padding: '0',
   });
   var tabul = this.find('ul:first');
-  this.parent()
-    .addClass('ui-tabs')
-    .prepend(tabul)
-    .draggable('option', 'handle', tabul);
+  this.parent().addClass('ui-tabs').prepend(tabul).draggable('option', 'handle', tabul);
   this.siblings('.ui-dialog-titlebar').remove();
   tabul.addClass('ui-dialog-titlebar');
 };
@@ -76,10 +71,7 @@ Math.ratio = function (numerator, denominator) {
   var result = Math.floor((100 * numerator) / denominator) / 100;
 
   // check for special cases
-  if (
-    result == Number.POSITIVE_INFINITY ||
-    result == Number.NEGATIVE_INFINITY
-  ) {
+  if (result == Number.POSITIVE_INFINITY || result == Number.NEGATIVE_INFINITY) {
     result = -2;
   } else if (isNaN(result)) {
     result = -1;
@@ -159,8 +151,7 @@ Prefs.setValue = function (key, val) {
 
   var date = new Date();
   date.setFullYear(date.getFullYear() + 1);
-  document.cookie =
-    key + '=' + val + '; expires=' + date.toGMTString() + '; path=/';
+  document.cookie = key + '=' + val + '; expires=' + date.toGMTString() + '; path=/';
 };
 
 /**

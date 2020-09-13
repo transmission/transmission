@@ -173,21 +173,13 @@ function Inspector(controller) {
           }
         }
 
-        d =
-          100.0 *
-          (sizeWhenDone ? (sizeWhenDone - leftUntilDone) / sizeWhenDone : 1);
+        d = 100.0 * (sizeWhenDone ? (sizeWhenDone - leftUntilDone) / sizeWhenDone : 1);
         str = fmt.percentString(d);
 
         if (!haveUnverified && !leftUntilDone) {
           str = fmt.size(haveVerified) + ' (100%)';
         } else if (!haveUnverified) {
-          str =
-            fmt.size(haveVerified) +
-            ' of ' +
-            fmt.size(sizeWhenDone) +
-            ' (' +
-            str +
-            '%)';
+          str = fmt.size(haveVerified) + ' of ' + fmt.size(sizeWhenDone) + ' (' + str + '%)';
         } else {
           str =
             fmt.size(haveVerified) +
@@ -256,8 +248,7 @@ function Inspector(controller) {
             u += t.getUploadedEver();
           }
         }
-        str =
-          fmt.size(u) + ' (Ratio: ' + fmt.ratioString(Math.ratio(u, d)) + ')';
+        str = fmt.size(u) + ' (Ratio: ' + fmt.ratioString(Math.ratio(u, d)) + ')';
       }
       setTextContent(e.uploaded_lb, str);
 
@@ -386,8 +377,7 @@ function Inspector(controller) {
             fmt.mem(pieceSize) +
             ')';
         } else {
-          str =
-            fmt.size(size) + ' (' + pieces.toStringWithCommas() + ' pieces)';
+          str = fmt.size(size) + ' (' + pieces.toStringWithCommas() + ' pieces)';
         }
       }
       setTextContent(e.size_lb, str);
@@ -417,9 +407,7 @@ function Inspector(controller) {
         str = none;
       } else {
         baseline = torrents[0].getPrivateFlag();
-        str = baseline
-          ? 'Private to this tracker -- DHT and PEX disabled'
-          : 'Public torrent';
+        str = baseline ? 'Private to this tracker -- DHT and PEX disabled' : 'Public torrent';
         for (i = 0; (t = torrents[i]); ++i) {
           if (baseline != t.getPrivateFlag()) {
             str = mixed;
@@ -450,10 +438,7 @@ function Inspector(controller) {
       uri = parseUri(str);
       if (uri.protocol == 'http' || uri.protocol == 'https') {
         str = encodeURI(str);
-        setInnerHTML(
-          e.comment_lb,
-          '<a href="' + str + '" target="_blank" >' + str + '</a>'
-        );
+        setInnerHTML(e.comment_lb, '<a href="' + str + '" target="_blank" >' + str + '</a>');
       } else {
         setTextContent(e.comment_lb, str);
       }
@@ -488,11 +473,7 @@ function Inspector(controller) {
         } else if (empty_creator && !empty_date) {
           str = 'Created on ' + new Date(date * 1000).toDateString();
         } else {
-          str =
-            'Created by ' +
-            creator +
-            ' on ' +
-            new Date(date * 1000).toDateString();
+          str = 'Created by ' + creator + ' on ' + new Date(date * 1000).toDateString();
         }
       }
       setTextContent(e.origin_lb, str);
@@ -651,8 +632,7 @@ function Inspector(controller) {
         file_list.appendChild(fragment);
       } else {
         // ...refresh the already-existing file list
-        for (i = 0, n = data.file_rows.length; i < n; ++i)
-          data.file_rows[i].refresh();
+        for (i = 0, n = data.file_rows.length; i < n; ++i) data.file_rows[i].refresh();
       }
     },
     /****
@@ -675,11 +655,7 @@ function Inspector(controller) {
         peers = tor.getPeers();
         html.push('<div class="inspector_group">');
         if (torrents.length > 1) {
-          html.push(
-            '<div class="inspector_torrent_label">',
-            sanitizeText(tor.getName()),
-            '</div>'
-          );
+          html.push('<div class="inspector_torrent_label">', sanitizeText(tor.getName()), '</div>');
         }
         if (!peers || !peers.length) {
           html.push('<br></div>'); // firefox won't paint the top border if the div is empty
@@ -748,22 +724,17 @@ function Inspector(controller) {
           s = 'Announce in progress';
           break;
         case Torrent._TrackerWaiting:
-          timeUntilAnnounce =
-            tracker.nextAnnounceTime - new Date().getTime() / 1000;
+          timeUntilAnnounce = tracker.nextAnnounceTime - new Date().getTime() / 1000;
           if (timeUntilAnnounce < 0) {
             timeUntilAnnounce = 0;
           }
-          s =
-            'Next announce in ' +
-            Transmission.fmt.timeInterval(timeUntilAnnounce);
+          s = 'Next announce in ' + Transmission.fmt.timeInterval(timeUntilAnnounce);
           break;
         case Torrent._TrackerQueued:
           s = 'Announce is queued';
           break;
         case Torrent._TrackerInactive:
-          s = tracker.isBackup
-            ? 'Tracker will be used as a backup'
-            : 'Announce not scheduled';
+          s = tracker.isBackup ? 'Tracker will be used as a backup' : 'Announce not scheduled';
           break;
         default:
           s = 'unknown announce state: ' + tracker.announceState;
@@ -781,19 +752,13 @@ function Inspector(controller) {
           lastAnnounce = [
             lastAnnounceTime,
             ' (got ',
-            Transmission.fmt.countString(
-              'peer',
-              'peers',
-              tracker.lastAnnouncePeerCount
-            ),
+            Transmission.fmt.countString('peer', 'peers', tracker.lastAnnouncePeerCount),
             ')',
           ];
         } else {
           lastAnnounceLabel = 'Announce error';
           lastAnnounce = [
-            tracker.lastAnnounceResult
-              ? tracker.lastAnnounceResult + ' - '
-              : '',
+            tracker.lastAnnounceResult ? tracker.lastAnnounceResult + ' - ' : '',
             lastAnnounceTime,
           ];
         }
@@ -815,8 +780,7 @@ function Inspector(controller) {
         } else {
           lastScrapeLabel = 'Scrape error';
           lastScrape =
-            (tracker.lastScrapeResult ? tracker.lastScrapeResult + ' - ' : '') +
-            lastScrapeTime;
+            (tracker.lastScrapeResult ? tracker.lastScrapeResult + ' - ' : '') + lastScrapeTime;
         }
       }
       return {
@@ -847,11 +811,7 @@ function Inspector(controller) {
         html.push('<div class="inspector_group">');
 
         if (torrents.length > 1) {
-          html.push(
-            '<div class="inspector_torrent_label">',
-            sanitizeText(tor.getName()),
-            '</div>'
-          );
+          html.push('<div class="inspector_torrent_label">', sanitizeText(tor.getName()), '</div>');
         }
 
         tier = -1;

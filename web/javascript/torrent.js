@@ -126,11 +126,7 @@ Torrent.prototype = {
     if (o[name] === value) {
       return false;
     }
-    if (
-      o == this.fields &&
-      this.fieldObservers[name] &&
-      this.fieldObservers[name].length
-    ) {
+    if (o == this.fields && this.fieldObservers[name] && this.fieldObservers[name].length) {
       for (i = 0; (observer = this.fieldObservers[name][i]); ++i) {
         observer.call(this, value, o[name], name);
       }
@@ -456,9 +452,7 @@ Torrent.prototype = {
       case Prefs._FilterSeeding:
         return s === Torrent._StatusSeed || s === Torrent._StatusSeedWait;
       case Prefs._FilterDownloading:
-        return (
-          s === Torrent._StatusDownload || s === Torrent._StatusDownloadWait
-        );
+        return s === Torrent._StatusDownload || s === Torrent._StatusDownloadWait;
       case Prefs._FilterPaused:
         return this.isStopped();
       case Prefs._FilterFinished:
@@ -501,10 +495,7 @@ Torrent.compareById = function (ta, tb) {
   return ta.getId() - tb.getId();
 };
 Torrent.compareByName = function (ta, tb) {
-  return (
-    ta.getCollatedName().localeCompare(tb.getCollatedName()) ||
-    Torrent.compareById(ta, tb)
-  );
+  return ta.getCollatedName().localeCompare(tb.getCollatedName()) || Torrent.compareById(ta, tb);
 };
 Torrent.compareByQueue = function (ta, tb) {
   return ta.getQueuePosition() - tb.getQueuePosition();

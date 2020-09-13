@@ -37,9 +37,7 @@ if (!Array.from) {
 
       // 3. ReturnIfAbrupt(items).
       if (arrayLike == null) {
-        throw new TypeError(
-          'Array.from requires an array-like object - not null or undefined'
-        );
+        throw new TypeError('Array.from requires an array-like object - not null or undefined');
       }
 
       // 4. If mapfn is undefined, then let mapping be false.
@@ -49,9 +47,7 @@ if (!Array.from) {
         // 5. else
         // 5. a If IsCallable(mapfn) is false, throw a TypeError exception.
         if (!isCallable(mapFn)) {
-          throw new TypeError(
-            'Array.from: when provided, the second argument must be a function'
-          );
+          throw new TypeError('Array.from: when provided, the second argument must be a function');
         }
 
         // 5. b. If thisArg was supplied, let T be thisArg; else let T be undefined.
@@ -76,10 +72,7 @@ if (!Array.from) {
       while (k < len) {
         kValue = items[k];
         if (mapFn) {
-          A[k] =
-            typeof T === 'undefined'
-              ? mapFn(kValue, k)
-              : mapFn.call(T, kValue, k);
+          A[k] = typeof T === 'undefined' ? mapFn(kValue, k) : mapFn.call(T, kValue, k);
         } else {
           A[k] = kValue;
         }

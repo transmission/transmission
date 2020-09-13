@@ -185,13 +185,7 @@ TransmissionRemote.prototype = {
     );
   },
 
-  sendTorrentSetRequests: function (
-    method,
-    torrent_ids,
-    args,
-    callback,
-    context
-  ) {
+  sendTorrentSetRequests: function (method, torrent_ids, args, callback, context) {
     if (!args) {
       args = {};
     }
@@ -212,12 +206,7 @@ TransmissionRemote.prototype = {
     this.sendTorrentActionRequests(name, torrent_ids, callback, context);
   },
   stopTorrents: function (torrent_ids, callback, context) {
-    this.sendTorrentActionRequests(
-      'torrent-stop',
-      torrent_ids,
-      callback,
-      context
-    );
+    this.sendTorrentActionRequests('torrent-stop', torrent_ids, callback, context);
   },
 
   moveTorrents: function (torrent_ids, new_location, callback, context) {
@@ -234,12 +223,7 @@ TransmissionRemote.prototype = {
   },
 
   removeTorrents: function (torrent_ids, callback, context) {
-    this.sendTorrentActionRequests(
-      'torrent-remove',
-      torrent_ids,
-      callback,
-      context
-    );
+    this.sendTorrentActionRequests('torrent-remove', torrent_ids, callback, context);
   },
   removeTorrentsAndData: function (torrents) {
     var remote = this;
@@ -261,20 +245,10 @@ TransmissionRemote.prototype = {
     });
   },
   verifyTorrents: function (torrent_ids, callback, context) {
-    this.sendTorrentActionRequests(
-      'torrent-verify',
-      torrent_ids,
-      callback,
-      context
-    );
+    this.sendTorrentActionRequests('torrent-verify', torrent_ids, callback, context);
   },
   reannounceTorrents: function (torrent_ids, callback, context) {
-    this.sendTorrentActionRequests(
-      'torrent-reannounce',
-      torrent_ids,
-      callback,
-      context
-    );
+    this.sendTorrentActionRequests('torrent-reannounce', torrent_ids, callback, context);
   },
   addTorrentByUrl: function (url, options) {
     var remote = this;
@@ -314,35 +288,15 @@ TransmissionRemote.prototype = {
 
   // Added queue calls
   moveTorrentsToTop: function (torrent_ids, callback, context) {
-    this.sendTorrentActionRequests(
-      RPC._QueueMoveTop,
-      torrent_ids,
-      callback,
-      context
-    );
+    this.sendTorrentActionRequests(RPC._QueueMoveTop, torrent_ids, callback, context);
   },
   moveTorrentsToBottom: function (torrent_ids, callback, context) {
-    this.sendTorrentActionRequests(
-      RPC._QueueMoveBottom,
-      torrent_ids,
-      callback,
-      context
-    );
+    this.sendTorrentActionRequests(RPC._QueueMoveBottom, torrent_ids, callback, context);
   },
   moveTorrentsUp: function (torrent_ids, callback, context) {
-    this.sendTorrentActionRequests(
-      RPC._QueueMoveUp,
-      torrent_ids,
-      callback,
-      context
-    );
+    this.sendTorrentActionRequests(RPC._QueueMoveUp, torrent_ids, callback, context);
   },
   moveTorrentsDown: function (torrent_ids, callback, context) {
-    this.sendTorrentActionRequests(
-      RPC._QueueMoveDown,
-      torrent_ids,
-      callback,
-      context
-    );
+    this.sendTorrentActionRequests(RPC._QueueMoveDown, torrent_ids, callback, context);
   },
 };

@@ -121,8 +121,7 @@ function FileRow(torrent, depth, name, indices, even) {
     var e, root, box;
 
     root = document.createElement('li');
-    root.className =
-      'inspector_torrent_file_list_entry' + (even ? 'even' : 'odd');
+    root.className = 'inspector_torrent_file_list_entry' + (even ? 'even' : 'odd');
     elements.root = root;
 
     e = document.createElement('input');

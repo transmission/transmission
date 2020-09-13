@@ -238,10 +238,7 @@ Transmission.fmt = (function () {
     },
 
     countString: function (msgid, msgid_plural, n) {
-      return [
-        n.toStringWithCommas(),
-        this.ngettext(msgid, msgid_plural, n),
-      ].join(' ');
+      return [n.toStringWithCommas(), this.ngettext(msgid, msgid_plural, n)].join(' ');
     },
 
     peerStatus: function (flagStr) {
@@ -274,8 +271,7 @@ Transmission.fmt = (function () {
             explanation = 'Encrypted Connection';
             break;
           case 'H':
-            explanation =
-              'Peer was discovered through Distributed Hash Table (DHT)';
+            explanation = 'Peer was discovered through Distributed Hash Table (DHT)';
             break;
           case 'X':
             explanation = 'Peer was discovered through Peer Exchange (PEX)';
@@ -292,13 +288,7 @@ Transmission.fmt = (function () {
           formattedFlags.push(flag);
         } else {
           formattedFlags.push(
-            '<span title="' +
-              flag +
-              ': ' +
-              explanation +
-              '">' +
-              flag +
-              '</span>'
+            '<span title="' + flag + ': ' + explanation + '">' + flag + '</span>'
           );
         }
       }

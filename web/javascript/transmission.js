@@ -261,11 +261,7 @@ Transmission.prototype = {
           var tl = $(event.target);
           tl.contextmenu('enableEntry', 'pause_selected', s.activeSel > 0);
           tl.contextmenu('enableEntry', 'resume_selected', s.pausedSel > 0);
-          tl.contextmenu(
-            'enableEntry',
-            'resume_now_selected',
-            s.pausedSel > 0 || s.queuedSel > 0
-          );
+          tl.contextmenu('enableEntry', 'resume_now_selected', s.pausedSel > 0 || s.queuedSel > 0);
           tl.contextmenu('enableEntry', 'rename', s.sel == 1);
         });
       }, this),
@@ -439,9 +435,7 @@ Transmission.prototype = {
   selectionChanged: function () {
     this.updateButtonStates();
 
-    this.inspector.setTorrents(
-      this.inspectorIsVisible() ? this.getSelectedTorrents() : []
-    );
+    this.inspector.setTorrents(this.inspectorIsVisible() ? this.getSelectedTorrents() : []);
 
     clearTimeout(this.selectionChangedTimer);
     delete this.selectionChangedTimer;
@@ -469,8 +463,7 @@ Transmission.prototype = {
     var rows = this._rows;
     var isInputFocused = $(ev.target).is('input');
     var isDialogVisible =
-      $('.dialog_heading:visible').length > 0 ||
-      $('.ui-dialog:visible').length > 0;
+      $('.dialog_heading:visible').length > 0 || $('.ui-dialog:visible').length > 0;
 
     // hotkeys
     var up_key = ev.keyCode === 38; // up key pressed
@@ -631,10 +624,7 @@ Transmission.prototype = {
           // with the shift + arrow keys...
           if ((anchor <= last && last < i) || (anchor >= last && last > i)) {
             this.selectRow(r);
-          } else if (
-            (anchor >= last && i > last) ||
-            (anchor <= last && last > i)
-          ) {
+          } else if ((anchor >= last && i > last) || (anchor <= last && last > i)) {
             this.deselectRow(rows[last]);
           }
         } else {
@@ -781,10 +771,7 @@ Transmission.prototype = {
 
   confirmRenameClicked: function () {
     var torrents = this.getSelectedTorrents();
-    this.renameTorrent(
-      torrents[0],
-      $('input#torrent_rename_name').attr('value')
-    );
+    this.renameTorrent(torrents[0], $('input#torrent_rename_name').attr('value'));
     this.hideRenameDialog();
   },
 
@@ -984,8 +971,7 @@ Transmission.prototype = {
           $.proxy(function (newValue, oldValue) {
             if (
               oldValue === Torrent._StatusDownload &&
-              (newValue == Torrent._StatusSeed ||
-                newValue == Torrent._StatusSeedWait)
+              (newValue == Torrent._StatusSeed || newValue == Torrent._StatusSeedWait)
             ) {
               $(this).trigger('downloadComplete', [t]);
             } else if (
@@ -1197,12 +1183,7 @@ Transmission.prototype = {
       $('#torrent_path').focus();
     } else {
       var ids = this.getTorrentIds(torrents);
-      this.remote.moveTorrents(
-        ids,
-        $('input#torrent_path').val(),
-        this.refreshTorrents,
-        this
-      );
+      this.remote.moveTorrents(ids, $('input#torrent_path').val(), this.refreshTorrents, this);
       $('#move_container').hide();
     }
   },
@@ -1289,11 +1270,7 @@ Transmission.prototype = {
   renameSelectedTorrents: function () {
     var torrents = this.getSelectedTorrents();
     if (torrents.length != 1) {
-      dialog.alert(
-        'Renaming',
-        'You can rename only one torrent at a time.',
-        'Ok'
-      );
+      dialog.alert('Renaming', 'You can rename only one torrent at a time.', 'Ok');
     } else {
       this.promptToRenameTorrent(torrents[0]);
     }
@@ -1312,13 +1289,7 @@ Transmission.prototype = {
 
   renameTorrent: function (torrent, newname) {
     var oldpath = torrent.getName();
-    this.remote.renameTorrent(
-      [torrent.getId()],
-      oldpath,
-      newname,
-      this.onTorrentRenamed,
-      this
-    );
+    this.remote.renameTorrent([torrent.getId()], oldpath, newname, this.onTorrentRenamed, this);
   },
 
   verifySelectedTorrents: function () {
@@ -1340,33 +1311,20 @@ Transmission.prototype = {
   },
 
   startTorrents: function (torrents, force) {
-    this.remote.startTorrents(
-      this.getTorrentIds(torrents),
-      force,
-      this.refreshTorrents,
-      this
-    );
+    this.remote.startTorrents(this.getTorrentIds(torrents), force, this.refreshTorrents, this);
   },
   verifyTorrent: function (torrent) {
     this.verifyTorrents([torrent]);
   },
   verifyTorrents: function (torrents) {
-    this.remote.verifyTorrents(
-      this.getTorrentIds(torrents),
-      this.refreshTorrents,
-      this
-    );
+    this.remote.verifyTorrents(this.getTorrentIds(torrents), this.refreshTorrents, this);
   },
 
   reannounceTorrent: function (torrent) {
     this.reannounceTorrents([torrent]);
   },
   reannounceTorrents: function (torrents) {
-    this.remote.reannounceTorrents(
-      this.getTorrentIds(torrents),
-      this.refreshTorrents,
-      this
-    );
+    this.remote.reannounceTorrents(this.getTorrentIds(torrents), this.refreshTorrents, this);
   },
 
   stopAllTorrents: function () {
@@ -1379,11 +1337,7 @@ Transmission.prototype = {
     this.stopTorrents([torrent]);
   },
   stopTorrents: function (torrents) {
-    this.remote.stopTorrents(
-      this.getTorrentIds(torrents),
-      this.refreshTorrents,
-      this
-    );
+    this.remote.stopTorrents(this.getTorrentIds(torrents), this.refreshTorrents, this);
   },
   changeFileCommand: function (torrentId, rowIndices, command) {
     this.remote.changeFileCommand(torrentId, rowIndices, command);
@@ -1403,32 +1357,16 @@ Transmission.prototype = {
 
   // Queue
   moveTop: function () {
-    this.remote.moveTorrentsToTop(
-      this.getSelectedTorrentIds(),
-      this.refreshTorrents,
-      this
-    );
+    this.remote.moveTorrentsToTop(this.getSelectedTorrentIds(), this.refreshTorrents, this);
   },
   moveUp: function () {
-    this.remote.moveTorrentsUp(
-      this.getSelectedTorrentIds(),
-      this.refreshTorrents,
-      this
-    );
+    this.remote.moveTorrentsUp(this.getSelectedTorrentIds(), this.refreshTorrents, this);
   },
   moveDown: function () {
-    this.remote.moveTorrentsDown(
-      this.getSelectedTorrentIds(),
-      this.refreshTorrents,
-      this
-    );
+    this.remote.moveTorrentsDown(this.getSelectedTorrentIds(), this.refreshTorrents, this);
   },
   moveBottom: function () {
-    this.remote.moveTorrentsToBottom(
-      this.getSelectedTorrentIds(),
-      this.refreshTorrents,
-      this
-    );
+    this.remote.moveTorrentsToBottom(this.getSelectedTorrentIds(), this.refreshTorrents, this);
   },
 
   /***
@@ -1460,11 +1398,7 @@ Transmission.prototype = {
       e.attr('title', text);
     }
 
-    if (
-      this.isMenuEnabled &&
-      RPC._DownSpeedLimited in o &&
-      RPC._DownSpeedLimit in o
-    ) {
+    if (this.isMenuEnabled && RPC._DownSpeedLimited in o && RPC._DownSpeedLimit in o) {
       limit = o[RPC._DownSpeedLimit];
       limited = o[RPC._DownSpeedLimited];
 
@@ -1477,11 +1411,7 @@ Transmission.prototype = {
       e.selectMenuItem();
     }
 
-    if (
-      this.isMenuEnabled &&
-      RPC._UpSpeedLimited in o &&
-      RPC._UpSpeedLimit in o
-    ) {
+    if (this.isMenuEnabled && RPC._UpSpeedLimited in o && RPC._UpSpeedLimit in o) {
       limit = o[RPC._UpSpeedLimit];
       limited = o[RPC._UpSpeedLimited];
 
@@ -1515,9 +1445,7 @@ Transmission.prototype = {
     $('#speed-dn-label').text(fmt.speedBps(d));
 
     // visible torrents
-    $('#filter-count').text(
-      fmt.countString('Transfer', 'Transfers', this._rows.length)
-    );
+    $('#filter-count').text(fmt.countString('Transfer', 'Transfers', this._rows.length));
   },
 
   setEnabled: function (key, flag) {
@@ -1677,11 +1605,7 @@ Transmission.prototype = {
       id2row[tor.getId()] = row;
     }
 
-    Torrent.sortTorrents(
-      torrents,
-      this[Prefs._SortMethod],
-      this[Prefs._SortDirection]
-    );
+    Torrent.sortTorrents(torrents, this[Prefs._SortMethod], this[Prefs._SortDirection]);
 
     for (i = 0; (tor = torrents[i]); ++i) {
       rows[i] = id2row[tor.getId()];
@@ -1938,9 +1862,7 @@ Transmission.prototype = {
     $('#compact-button').toggleClass('selected', compact);
 
     // update the ui: torrent list
-    this.torrentRenderer = compact
-      ? new TorrentRendererCompact()
-      : new TorrentRendererFull();
+    this.torrentRenderer = compact ? new TorrentRendererCompact() : new TorrentRendererFull();
     this.refilter(true);
   },
 
