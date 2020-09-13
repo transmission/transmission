@@ -273,10 +273,10 @@ static void myDebug(char const* file, int line, struct tr_peerMsgs const* msgs, 
         char* message;
 
         evbuffer_add_printf(buf, "[%s] %s - %s [%s]: ",
-                tr_logGetTimeStr(timestr, sizeof(timestr)),
-                tr_torrentName(msgs->torrent),
-                tr_peerIoGetAddrStr(msgs->io, addrstr, sizeof(addrstr)),
-                tr_quark_get_string(msgs->peer.client, NULL));
+            tr_logGetTimeStr(timestr, sizeof(timestr)),
+            tr_torrentName(msgs->torrent),
+            tr_peerIoGetAddrStr(msgs->io, addrstr, sizeof(addrstr)),
+            tr_quark_get_string(msgs->peer.client, NULL));
         va_start(args, fmt);
         evbuffer_add_vprintf(buf, fmt, args);
         va_end(args);

@@ -156,9 +156,9 @@ static bool tr_isAtom(struct peer_atom const* atom)
 static char const* tr_atomAddrStr(struct peer_atom const* atom)
 {
     static char addrstr[TR_ADDRSTRLEN];
-    return atom != NULL
-        ? tr_address_and_port_to_string(addrstr, sizeof(addrstr), &atom->addr, atom->port)
-        : "[no atom]";
+    return atom != NULL ?
+        tr_address_and_port_to_string(addrstr, sizeof(addrstr), &atom->addr, atom->port) :
+        "[no atom]";
 }
 
 struct block_request

@@ -86,8 +86,7 @@ char* tr_net_strerror(char* buf, size_t buflen, int err)
     return buf;
 }
 
-char const* tr_address_and_port_to_string(char* buf, size_t buflen,
-                                          tr_address const* addr, tr_port port)
+char const* tr_address_and_port_to_string(char* buf, size_t buflen, tr_address const* addr, tr_port port)
 {
     char addr_buf[INET6_ADDRSTRLEN];
     tr_address_to_string_with_buf(addr, addr_buf, sizeof(addr_buf));
@@ -414,8 +413,8 @@ static tr_socket_t tr_netBindTCPImpl(tr_address const* addr, tr_port port, bool 
     }
 
     optval = 1;
-    setsockopt(fd, SOL_SOCKET, SO_KEEPALIVE, (void const*)&optval, sizeof(optval));
-    setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, (void const*)&optval, sizeof(optval));
+    (void)setsockopt(fd, SOL_SOCKET, SO_KEEPALIVE, (void const*)&optval, sizeof(optval));
+    (void)setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, (void const*)&optval, sizeof(optval));
 
 #ifdef IPV6_V6ONLY
 

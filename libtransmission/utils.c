@@ -1975,12 +1975,8 @@ enum
     TR_FMT_TB
 };
 
-static void formatter_init(struct formatter_units* units,
-        size_t kilo,
-        char const* kb,
-        char const* mb,
-        char const* gb,
-        char const* tb)
+static void formatter_init(struct formatter_units* units, size_t kilo, char const* kb, char const* mb, char const* gb,
+    char const* tb)
 {
     size_t value;
 
