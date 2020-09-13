@@ -182,9 +182,7 @@ static inline tr_session* tr_peerIoGetSession(tr_peerIo* io)
     return io->session;
 }
 
-char const* tr_peerIoAddrStr(struct tr_address const* addr, tr_port port);
-
-char const* tr_peerIoGetAddrStr(tr_peerIo const* io);
+char const* tr_peerIoGetAddrStr(tr_peerIo const* io, char* buf, size_t buflen);
 
 struct tr_address const* tr_peerIoGetAddress(tr_peerIo const* io, tr_port* port);
 
