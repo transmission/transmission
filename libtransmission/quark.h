@@ -45,6 +45,8 @@ enum
     TR_KEY_announce, /* metainfo */
     TR_KEY_announce_list, /* metainfo */
     TR_KEY_announceState, /* rpc */
+    TR_KEY_anti_brute_force_enabled, /* rpc */
+    TR_KEY_anti_brute_force_threshold, /* rpc */
     TR_KEY_arguments, /* rpc */
     TR_KEY_bandwidth_priority,
     TR_KEY_bandwidthPriority,

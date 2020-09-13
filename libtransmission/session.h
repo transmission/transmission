@@ -126,6 +126,9 @@ struct tr_session
     int queueSize[2];
     int queueStalledMinutes;
 
+    bool antiBruteForceEnabled;
+    int antiBruteForceThreshold;
+
     int umask;
 
     unsigned int speedLimit_Bps[2];

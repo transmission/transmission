@@ -2280,6 +2280,15 @@ static char const* sessionSet(tr_session* session, tr_variant* args_in, tr_varia
         }
     }
 
+    if( tr_bencDictFindInt( args_in, TR_PREFS_KEY_ANTI_BRUTE_FORCE_THRESHOLD, &i ) )
+    {
+        tr_sessionSetAntiBruteForceThreshold( session, i );
+    }
+    if( tr_bencDictFindBool( args_in, TR_PREFS_KEY_ANTI_BRUTE_FORCE_ENABLED, &boolVal ) )
+    {
+        tr_sessionSetAntiBruteForceEnabled( session, boolVal );
+    }
+
     notify(session, TR_RPC_SESSION_CHANGED, NULL);
 
     return NULL;
@@ -2522,6 +2531,14 @@ static void addSessionField(tr_session* s, tr_variant* d, tr_quark key)
 
     case TR_KEY_queue_stalled_minutes:
         tr_variantDictAddInt(d, key, tr_sessionGetQueueStalledMinutes(s));
+        break;
+
+    case TR_KEY_anti_brute_force_enabled:
+        tr_variantDictAddBool(d, key, tr_sessionGetAntiBruteForceEnabled(s));
+        break;
+
+    case TR_KEY_anti_brute_force_threshold:
+        tr_variantDictAddInt(d, key, tr_sessionGetAntiBruteForceThreshold(s));
         break;
 
     case TR_KEY_units:

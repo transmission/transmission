@@ -402,6 +402,8 @@ void tr_sessionGetDefaultSettings(tr_variant* d)
     tr_variantDictAddStr(d, TR_KEY_bind_address_ipv6, TR_DEFAULT_BIND_ADDRESS_IPV6);
     tr_variantDictAddBool(d, TR_KEY_start_added_torrents, true);
     tr_variantDictAddBool(d, TR_KEY_trash_original_torrent_files, false);
+    tr_variantDictAddInt(d, TR_KEY_anti_brute_force_threshold, 100);
+    tr_variantDictAddBool(d, TR_KEY_anti_brute_force_enabled, true);
 }
 
 void tr_sessionGetSettings(tr_session* s, tr_variant* d)
@@ -473,6 +475,8 @@ void tr_sessionGetSettings(tr_session* s, tr_variant* d)
     tr_variantDictAddStr(d, TR_KEY_bind_address_ipv6, tr_address_to_string(&s->public_ipv6->addr));
     tr_variantDictAddBool(d, TR_KEY_start_added_torrents, !tr_sessionGetPaused(s));
     tr_variantDictAddBool(d, TR_KEY_trash_original_torrent_files, tr_sessionGetDeleteSource(s));
+    tr_variantDictAddInt(d, TR_KEY_anti_brute_force_threshold, tr_sessionGetAntiBruteForceThreshold(s));
+    tr_variantDictAddBool(d, TR_KEY_anti_brute_force_enabled, tr_sessionGetAntiBruteForceEnabled(s));
 }
 
 bool tr_sessionLoadSettings(tr_variant* dict, char const* configDir, char const* appName)
@@ -1141,6 +1145,20 @@ static void sessionSetImpl(void* vdata)
     if (tr_variantDictFindBool(settings, TR_KEY_scrape_paused_torrents_enabled, &boolVal))
     {
         session->scrapePausedTorrents = boolVal;
+    }
+
+    /**
+    ***  BruteForce
+    **/
+
+    if (tr_variantDictFindInt(settings, TR_KEY_anti_brute_force_threshold, &i))
+    {
+        tr_sessionSetAntiBruteForceThreshold(session, i);
+    }
+
+    if (tr_variantDictFindBool(settings, TR_KEY_anti_brute_force_enabled, &boolVal))
+    {
+        tr_sessionSetAntiBruteForceEnabled(session, boolVal);
     }
 
     data->done = true;
@@ -2944,6 +2962,34 @@ int tr_sessionGetQueueStalledMinutes(tr_session const* session)
     TR_ASSERT(tr_isSession(session));
 
     return session->queueStalledMinutes;
+}
+
+void tr_sessionSetAntiBruteForceThreshold(tr_session* session, int bad_requests)
+{
+    TR_ASSERT(tr_isSession(session));
+    TR_ASSERT(bad_requests > 0);
+    tr_rpcSetAntiBruteForceThreshold(session->rpcServer, bad_requests);
+}
+
+void tr_sessionSetAntiBruteForceEnabled(tr_session* session, bool is_enabled)
+{
+    TR_ASSERT(tr_isSession(session));
+
+    tr_rpcSetAntiBruteForceEnabled(session->rpcServer, isEnabled);
+}
+
+bool tr_sessionGetAntiBruteForceEnabled(tr_session const* session)
+{
+    TR_ASSERT(tr_isSession(session));
+
+    return tr_rpcGetAntiBruteForceEnabled(session->rpcServer);
+}
+
+int tr_sessionGetAntiBruteForceThreshold(tr_session const* session)
+{
+    TR_ASSERT(tr_isSession(session));
+
+    return tr_rpcSetAntiBruteForceEnabled(session->rpcServer);
 }
 
 struct TorrentAndPosition
