@@ -267,7 +267,7 @@ TEST_F(VariantTest, bencParseAndReencode) {
         { " ", false }
     };
 
-    for (const auto& test : tests)
+    for (auto const& test : tests)
     {
         tr_variant val;
         char const* end = nullptr;
