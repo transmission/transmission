@@ -1959,7 +1959,7 @@ uint64_t tr_ntohll(uint64_t x)
 struct formatter_unit
 {
     char* name;
-    int64_t value;
+    size_t value;
 };
 
 struct formatter_units
@@ -1975,10 +1975,10 @@ enum
     TR_FMT_TB
 };
 
-static void formatter_init(struct formatter_units* units, unsigned int kilo, char const* kb, char const* mb, char const* gb,
+static void formatter_init(struct formatter_units* units, size_t kilo, char const* kb, char const* mb, char const* gb,
     char const* tb)
 {
-    uint64_t value;
+    size_t value;
 
     value = kilo;
     units->units[TR_FMT_KB].name = tr_strdup(kb);
@@ -1997,7 +1997,7 @@ static void formatter_init(struct formatter_units* units, unsigned int kilo, cha
     units->units[TR_FMT_TB].value = value;
 }
 
-static char* formatter_get_size_str(struct formatter_units const* u, char* buf, int64_t bytes, size_t buflen)
+static char* formatter_get_size_str(struct formatter_units const* u, char* buf, size_t bytes, size_t buflen)
 {
     int precision;
     double value;
@@ -2043,21 +2043,21 @@ static char* formatter_get_size_str(struct formatter_units const* u, char* buf, 
 
 static struct formatter_units size_units;
 
-void tr_formatter_size_init(unsigned int kilo, char const* kb, char const* mb, char const* gb, char const* tb)
+void tr_formatter_size_init(size_t kilo, char const* kb, char const* mb, char const* gb, char const* tb)
 {
     formatter_init(&size_units, kilo, kb, mb, gb, tb);
 }
 
-char* tr_formatter_size_B(char* buf, int64_t bytes, size_t buflen)
+char* tr_formatter_size_B(char* buf, size_t bytes, size_t buflen)
 {
     return formatter_get_size_str(&size_units, buf, bytes, buflen);
 }
 
 static struct formatter_units speed_units;
 
-unsigned int tr_speed_K = 0U;
+size_t tr_speed_K = 0;
 
-void tr_formatter_speed_init(unsigned int kilo, char const* kb, char const* mb, char const* gb, char const* tb)
+void tr_formatter_speed_init(size_t kilo, char const* kb, char const* mb, char const* gb, char const* tb)
 {
     tr_speed_K = kilo;
     formatter_init(&speed_units, kilo, kb, mb, gb, tb);
@@ -2095,15 +2095,15 @@ char* tr_formatter_speed_KBps(char* buf, double KBps, size_t buflen)
 
 static struct formatter_units mem_units;
 
-unsigned int tr_mem_K = 0U;
+size_t tr_mem_K = 0;
 
-void tr_formatter_mem_init(unsigned int kilo, char const* kb, char const* mb, char const* gb, char const* tb)
+void tr_formatter_mem_init(size_t kilo, char const* kb, char const* mb, char const* gb, char const* tb)
 {
     tr_mem_K = kilo;
     formatter_init(&mem_units, kilo, kb, mb, gb, tb);
 }
 
-char* tr_formatter_mem_B(char* buf, int64_t bytes_per_second, size_t buflen)
+char* tr_formatter_mem_B(char* buf, size_t bytes_per_second, size_t buflen)
 {
     return formatter_get_size_str(&mem_units, buf, bytes_per_second, buflen);
 }

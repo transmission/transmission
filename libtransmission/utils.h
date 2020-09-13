@@ -378,32 +378,30 @@ uint64_t tr_ntohll(uint64_t);
 
 /* example: tr_formatter_size_init(1024, _("KiB"), _("MiB"), _("GiB"), _("TiB")); */
 
-void tr_formatter_size_init(unsigned int kilo, char const* kb, char const* mb, char const* gb, char const* tb);
+void tr_formatter_size_init(size_t kilo, char const* kb, char const* mb, char const* gb, char const* tb);
 
-void tr_formatter_speed_init(unsigned int kilo, char const* kb, char const* mb, char const* gb, char const* tb);
+void tr_formatter_speed_init(size_t kilo, char const* kb, char const* mb, char const* gb, char const* tb);
 
-void tr_formatter_mem_init(unsigned int kilo, char const* kb, char const* mb, char const* gb, char const* tb);
+void tr_formatter_mem_init(size_t kilo, char const* kb, char const* mb, char const* gb, char const* tb);
 
-extern unsigned int tr_speed_K;
-extern unsigned int tr_mem_K;
-extern unsigned int tr_size_K;
+extern size_t tr_speed_K;
+extern size_t tr_mem_K;
+extern size_t tr_size_K;
 
 /* format a speed from KBps into a user-readable string. */
 char* tr_formatter_speed_KBps(char* buf, double KBps, size_t buflen);
 
-// FIXME(ckerr): bytes should be a size_t
 /* format a memory size from bytes into a user-readable string. */
-char* tr_formatter_mem_B(char* buf, int64_t bytes, size_t buflen);
+char* tr_formatter_mem_B(char* buf, size_t bytes, size_t buflen);
 
 /* format a memory size from MB into a user-readable string. */
 static inline char* tr_formatter_mem_MB(char* buf, double MBps, size_t buflen)
 {
-    return tr_formatter_mem_B(buf, (int64_t)(MBps * tr_mem_K * tr_mem_K), buflen);
+    return tr_formatter_mem_B(buf, (size_t)(MBps * tr_mem_K * tr_mem_K), buflen);
 }
 
-// FIXME(ckerr): bytes should be a size_t
 /* format a file size from bytes into a user-readable string. */
-char* tr_formatter_size_B(char* buf, int64_t bytes, size_t buflen);
+char* tr_formatter_size_B(char* buf, size_t bytes, size_t buflen);
 
 void tr_formatter_get_units(void* dict);
 
