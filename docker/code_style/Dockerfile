@@ -6,4 +6,5 @@ RUN apk add --no-cache \
         perl \
         uncrustify \
     && npm install -g \
+        eslint
         prettier
