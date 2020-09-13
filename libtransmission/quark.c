@@ -46,6 +46,8 @@ static struct tr_key_struct const my_static[] =
     Q("announce"),
     Q("announce-list"),
     Q("announceState"),
+    Q("anti-brute-force-enabled"),
+    Q("anti-brute-force-threshold"),
     Q("arguments"),
     Q("bandwidth-priority"),
     Q("bandwidthPriority"),
