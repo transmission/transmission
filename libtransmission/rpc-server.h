@@ -60,7 +60,7 @@ bool tr_rpcIsPasswordEnabled(tr_rpc_server const* session);
 
 bool tr_rpcGetAntiBruteForceEnabled(tr_rpc_server const* server);
 
-void tr_rpcSetAntiBruteForceEnabled(tr_rpc_server* server, bool isEnabled);
+void tr_rpcSetAntiBruteForceEnabled(tr_rpc_server* server, bool is_enabled);
 
 int tr_rpcGetAntiBruteForceThreshold(tr_rpc_server const* server);
 

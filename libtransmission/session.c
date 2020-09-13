@@ -2975,7 +2975,7 @@ void tr_sessionSetAntiBruteForceEnabled(tr_session* session, bool is_enabled)
 {
     TR_ASSERT(tr_isSession(session));
 
-    tr_rpcSetAntiBruteForceEnabled(session->rpcServer, isEnabled);
+    tr_rpcSetAntiBruteForceEnabled(session->rpcServer, is_enabled);
 }
 
 bool tr_sessionGetAntiBruteForceEnabled(tr_session const* session)
