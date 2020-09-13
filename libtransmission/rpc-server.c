@@ -682,9 +682,11 @@ static void handle_request(struct evhttp_request* req, void* arg)
             !tr_ssha1_matches(server->password, pass)))
         {
             evhttp_add_header(req->output_headers, "WWW-Authenticate", "Basic realm=\"" MY_REALM "\"");
-            if(server-> isAntiBruteForceEnabled){
+            if (server-> isAntiBruteForceEnabled)
+            {
                 server->loginattempts++;
             }
+
             char* unauthuser = tr_strdup_printf("<p>Unauthorized User. %d unsuccessful login attempts.</p>",
                 server->loginattempts);
             send_simple_response(req, 401, unauthuser);
@@ -1077,7 +1079,8 @@ bool tr_rpcGetAntiBruteForceEnabled(tr_rpc_server const* server)
 void tr_rpcSetAntiBruteForceEnabled(tr_rpc_server* server, bool isEnabled)
 {
     server->isAntiBruteForceEnabled = isEnabled;
-    if(!isEnabled){
+    if (!isEnabled)
+    {
         server->loginattempts = 0;
     }
 }
@@ -1254,7 +1257,6 @@ tr_rpc_server* tr_rpcInit(tr_session* session, tr_variant* settings)
         tr_rpcSetPassword(s, str);
     }
 
-
     key = TR_KEY_anti_brute_force_enabled;
 
     if (!tr_variantDictFindBool(settings, key, &boolVal))
@@ -1276,7 +1278,6 @@ tr_rpc_server* tr_rpcInit(tr_session* session, tr_variant* settings)
     {
         tr_rpcSetAntiBruteForceThreshold(s, i);
     }
-
 
     key = TR_KEY_rpc_bind_address;
 
