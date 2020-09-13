@@ -5,4 +5,4 @@ RUN apk add --no-cache \
         perl \
         uncrustify \
     && npm install -g \
-        js-beautify
+        prettier
