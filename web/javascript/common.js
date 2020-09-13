@@ -5,7 +5,7 @@
  * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  */
 
-var transmission,
+let transmission,
   dialog,
   isMobileDevice = RegExp('(iPhone|iPod|Android)').test(navigator.userAgent),
   scroll_timeout;
@@ -26,7 +26,7 @@ $.fn.tabbedDialog = function (dialog_opts) {
     float: 'none',
     padding: '0',
   });
-  var tabul = this.find('ul:first');
+  const tabul = this.find('ul:first');
   this.parent().addClass('ui-tabs').prepend(tabul).draggable('option', 'handle', tabul);
   this.siblings('.ui-dialog-titlebar').remove();
   tabul.addClass('ui-dialog-titlebar');
@@ -68,7 +68,7 @@ function setTextContent(e, text) {
  *   Given a numerator and denominator, return a ratio string
  */
 Math.ratio = function (numerator, denominator) {
-  var result = Math.floor((100 * numerator) / denominator) / 100;
+  let result = Math.floor((100 * numerator) / denominator) / 100;
 
   // check for special cases
   if (result == Number.POSITIVE_INFINITY || result == Number.NEGATIVE_INFINITY) {
@@ -84,7 +84,7 @@ Math.ratio = function (numerator, denominator) {
  * Round a string of a number to a specified number of decimal places
  */
 Number.prototype.toTruncFixed = function (place) {
-  var ret = Math.floor(this * Math.pow(10, place)) / Math.pow(10, place);
+  const ret = Math.floor(this * Math.pow(10, place)) / Math.pow(10, place);
   return ret.toFixed(place);
 };
 
@@ -149,7 +149,7 @@ Prefs.setValue = function (key, val) {
     console.warn("unrecognized preference key '%s'", key);
   }
 
-  var date = new Date();
+  const date = new Date();
   date.setFullYear(date.getFullYear() + 1);
   document.cookie = key + '=' + val + '; expires=' + date.toGMTString() + '; path=/';
 };
@@ -161,16 +161,16 @@ Prefs.setValue = function (key, val) {
  * @param fallback if the option isn't set, return this instead
  */
 Prefs.getValue = function (key, fallback) {
-  var val;
+  let val;
 
   if (!(key in Prefs._Defaults)) {
     console.warn("unrecognized preference key '%s'", key);
   }
 
-  var lines = document.cookie.split(';');
-  for (var i = 0, len = lines.length; !val && i < len; ++i) {
-    var line = lines[i].trim();
-    var delim = line.indexOf('=');
+  const lines = document.cookie.split(';');
+  for (let i = 0, len = lines.length; !val && i < len; ++i) {
+    const line = lines[i].trim();
+    const delim = line.indexOf('=');
     if (delim === key.length && line.indexOf(key) === 0) {
       val = line.substring(delim + 1);
     }
@@ -196,7 +196,7 @@ Prefs.getClutchPrefs = function (o) {
   if (!o) {
     o = {};
   }
-  for (var key in Prefs._Defaults) {
+  for (const key in Prefs._Defaults) {
     o[key] = Prefs.getValue(key, Prefs._Defaults[key]);
   }
   return o;
@@ -206,7 +206,7 @@ Prefs.getClutchPrefs = function (o) {
 jQuery.fn.forceNumeric = function () {
   return this.each(function () {
     $(this).keydown(function (e) {
-      var key = e.which || e.keyCode;
+      const key = e.which || e.keyCode;
       return (
         (!e.shiftKey &&
           !e.altKey &&
@@ -237,59 +237,4 @@ jQuery.fn.forceNumeric = function () {
       );
     });
   });
-};
-
-/**
- * http://blog.stevenlevithan.com/archives/parseuri
- *
- * parseUri 1.2.2
- * (c) Steven Levithan <stevenlevithan.com>
- * MIT License
- */
-function parseUri(str) {
-  var o = parseUri.options;
-  var m = o.parser[o.strictMode ? 'strict' : 'loose'].exec(str);
-  var uri = {};
-  var i = 14;
-
-  while (i--) {
-    uri[o.key[i]] = m[i] || '';
-  }
-
-  uri[o.q.name] = {};
-  uri[o.key[12]].replace(o.q.parser, function ($0, $1, $2) {
-    if ($1) {
-      uri[o.q.name][$1] = $2;
-    }
-  });
-
-  return uri;
-}
-
-parseUri.options = {
-  strictMode: false,
-  key: [
-    'source',
-    'protocol',
-    'authority',
-    'userInfo',
-    'user',
-    'password',
-    'host',
-    'port',
-    'relative',
-    'path',
-    'directory',
-    'file',
-    'query',
-    'anchor',
-  ],
-  q: {
-    name: 'queryKey',
-    parser: /(?:^|&)([^&=]*)=?([^&]*)/g,
-  },
-  parser: {
-    strict: /^(?:([^:\/?#]+):)?(?:\/\/((?:(([^:@]*)(?::([^:@]*))?)?@)?([^:\/?#]*)(?::(\d*))?))?((((?:[^?#\/]*\/)*)([^?#]*))(?:\?([^#]*))?(?:#(.*))?)/,
-    loose: /^(?:(?![^:@]+:[^:@\/]*@)([^:\/?#.]+):)?(?:\/\/)?((?:(([^:@]*)(?::([^:@]*))?)?@)?([^:\/?#]*)(?::(\d*))?)(((\/(?:[^?#](?![^?#\/]*\.[^?#\/.]+(?:[?#]|$)))*\/?)?([^?#\/]*))(?:\?([^#]*))?(?:#(.*))?)/,
-  },
 };

@@ -17,7 +17,7 @@ Transmission.prototype = {
    ****/
 
   initialize: function () {
-    var e;
+    let e;
 
     // Initialize the helper classes
     this.remote = new TransmissionRemote(this);
@@ -103,7 +103,7 @@ Transmission.prototype = {
     this.initializeSettings();
 
     // Get preferences & torrents from the daemon
-    var async = false;
+    const async = false;
     this.loadDaemonPrefs(async);
     this.loadDaemonStats(async);
     this.initializeTorrents();
@@ -116,7 +116,7 @@ Transmission.prototype = {
   loadDaemonPrefs: function (async, callback) {
     this.remote.loadDaemonPrefs(
       function (data) {
-        var o = data['arguments'];
+        const o = data['arguments'];
         Prefs.getClutchPrefs(o);
         this.updateGuiFromSession(o);
         this.sessionProperties = o;
@@ -157,8 +157,8 @@ Transmission.prototype = {
    * Set up the search box
    */
   setupSearchBox: function () {
-    var tr = this;
-    var search_box = $('#torrent_search');
+    const tr = this;
+    const search_box = $('#torrent_search');
     search_box.bind('keyup click', function () {
       tr.setFilterText(this.value);
     });
@@ -186,8 +186,8 @@ Transmission.prototype = {
    * Create the torrent right-click menu
    */
   createContextMenu: function () {
-    var tr = this;
-    var bindings = {
+    const tr = this;
+    const bindings = {
       pause_selected: function () {
         tr.stopSelectedTorrents();
       },
@@ -251,14 +251,14 @@ Transmission.prototype = {
         bindings[ui.cmd]();
       },
       beforeOpen: $.proxy(function (event, ui) {
-        var element = $(event.currentTarget);
-        var i = $('#torrent_list > li').index(element);
+        const element = $(event.currentTarget);
+        const i = $('#torrent_list > li').index(element);
         if (i !== -1 && !this._rows[i].isSelected()) {
           this.setSelectedRow(this._rows[i]);
         }
 
         this.calculateTorrentStates(function (s) {
-          var tl = $(event.target);
+          const tl = $(event.target);
           tl.contextmenu('enableEntry', 'pause_selected', s.activeSel > 0);
           tl.contextmenu('enableEntry', 'resume_selected', s.pausedSel > 0);
           tl.contextmenu('enableEntry', 'resume_now_selected', s.pausedSel > 0 || s.queuedSel > 0);
@@ -288,12 +288,12 @@ Transmission.prototype = {
    ****/
 
   updateFreeSpaceInAddDialog: function () {
-    var formdir = $('input#add-dialog-folder-input').val();
+    const formdir = $('input#add-dialog-folder-input').val();
     this.remote.getFreeSpace(formdir, this.onFreeSpaceResponse, this);
   },
 
   onFreeSpaceResponse: function (dir, bytes) {
-    var e, str, formdir;
+    let e, str, formdir;
 
     formdir = $('input#add-dialog-folder-input').val();
     if (formdir == dir) {
@@ -314,8 +314,8 @@ Transmission.prototype = {
    ****/
 
   getAllTorrents: function () {
-    var torrents = [];
-    for (var key in this._torrents) {
+    const torrents = [];
+    for (const key in this._torrents) {
       torrents.push(this._torrents[key]);
     }
     return torrents;
@@ -330,11 +330,11 @@ Transmission.prototype = {
   scrollToRow: function (row) {
     if (isMobileDevice) {
       // FIXME: why? return
-      var list = $('#torrent_container');
-      var scrollTop = list.scrollTop();
-      var innerHeight = list.innerHeight();
-      var offsetTop = row.getElement().offsetTop;
-      var offsetHeight = $(row.getElement()).outerHeight();
+      const list = $('#torrent_container');
+      const scrollTop = list.scrollTop();
+      const innerHeight = list.innerHeight();
+      const offsetTop = row.getElement().offsetTop;
+      const offsetHeight = $(row.getElement()).outerHeight();
 
       if (offsetTop < scrollTop) {
         list.scrollTop(offsetTop);
@@ -345,7 +345,7 @@ Transmission.prototype = {
   },
 
   seedRatioLimit: function () {
-    var p = this.sessionProperties;
+    const p = this.sessionProperties;
     if (p && p.seedRatioLimited) {
       return p.seedRatioLimit;
     }
@@ -415,16 +415,16 @@ Transmission.prototype = {
 
   // Select a range from this row to the last clicked torrent
   selectRange: function (row) {
-    var last = this.indexOfLastTorrent();
+    const last = this.indexOfLastTorrent();
 
     if (last === -1) {
       this.selectRow(row);
     } else {
       // select the range between the prevous & current
-      var next = this._rows.indexOf(row);
-      var min = Math.min(last, next);
-      var max = Math.max(last, next);
-      for (var i = min; i <= max; ++i) {
+      const next = this._rows.indexOf(row);
+      const min = Math.min(last, next);
+      const max = Math.max(last, next);
+      for (let i = min; i <= max; ++i) {
         this.selectRow(this._rows[i]);
       }
     }
@@ -443,7 +443,7 @@ Transmission.prototype = {
 
   callSelectionChangedSoon: function () {
     if (!this.selectionChangedTimer) {
-      var callback = $.proxy(this.selectionChanged, this),
+      const callback = $.proxy(this.selectionChanged, this),
         msec = 200;
       this.selectionChangedTimer = setTimeout(callback, msec);
     }
@@ -459,33 +459,33 @@ Transmission.prototype = {
    * Process key event
    */
   keyDown: function (ev) {
-    var handled = false;
-    var rows = this._rows;
-    var isInputFocused = $(ev.target).is('input');
-    var isDialogVisible =
+    let handled = false;
+    const rows = this._rows;
+    const isInputFocused = $(ev.target).is('input');
+    const isDialogVisible =
       $('.dialog_heading:visible').length > 0 || $('.ui-dialog:visible').length > 0;
 
     // hotkeys
-    var up_key = ev.keyCode === 38; // up key pressed
-    var dn_key = ev.keyCode === 40; // down key pressed
-    var a_key = ev.keyCode === 65; // a key pressed
-    var c_key = ev.keyCode === 67; // c key pressed
-    var d_key = ev.keyCode === 68; // d key pressed
-    var i_key = ev.keyCode === 73; // i key pressed
-    var l_key = ev.keyCode === 76; // l key pressed
-    var m_key = ev.keyCode === 77; // m key pressed
-    var o_key = ev.keyCode === 79; // o key pressed
-    var p_key = ev.keyCode === 80; // p key pressed
-    var r_key = ev.keyCode === 82; // r key pressed
-    var t_key = ev.keyCode === 84; // t key pressed
-    var u_key = ev.keyCode === 85; // u key pressed
-    var shift_key = ev.keyCode === 16; // shift key pressed
-    var slash_key = ev.keyCode === 191; // slash (/) key pressed
-    var backspace_key = ev.keyCode === 8; // backspace key pressed
-    var del_key = ev.keyCode === 46; // delete key pressed
-    var enter_key = ev.keyCode === 13; // enter key pressed
-    var esc_key = ev.keyCode === 27; // esc key pressed
-    var comma_key = ev.keyCode === 188; // comma key pressed
+    const up_key = ev.keyCode === 38; // up key pressed
+    const dn_key = ev.keyCode === 40; // down key pressed
+    const a_key = ev.keyCode === 65; // a key pressed
+    const c_key = ev.keyCode === 67; // c key pressed
+    const d_key = ev.keyCode === 68; // d key pressed
+    const i_key = ev.keyCode === 73; // i key pressed
+    const l_key = ev.keyCode === 76; // l key pressed
+    const m_key = ev.keyCode === 77; // m key pressed
+    const o_key = ev.keyCode === 79; // o key pressed
+    const p_key = ev.keyCode === 80; // p key pressed
+    const r_key = ev.keyCode === 82; // r key pressed
+    const t_key = ev.keyCode === 84; // t key pressed
+    const u_key = ev.keyCode === 85; // u key pressed
+    const shift_key = ev.keyCode === 16; // shift key pressed
+    const slash_key = ev.keyCode === 191; // slash (/) key pressed
+    const backspace_key = ev.keyCode === 8; // backspace key pressed
+    const del_key = ev.keyCode === 46; // delete key pressed
+    const enter_key = ev.keyCode === 13; // enter key pressed
+    const esc_key = ev.keyCode === 27; // esc key pressed
+    const comma_key = ev.keyCode === 188; // comma key pressed
 
     if (enter_key) {
       // handle other dialogs
@@ -607,7 +607,6 @@ Transmission.prototype = {
         var last = this.indexOfLastTorrent(),
           i = last,
           anchor = this._shift_index,
-          r,
           min = 0,
           max = rows.length - 1;
 
@@ -617,7 +616,7 @@ Transmission.prototype = {
           --i;
         }
 
-        var r = rows[i];
+        const r = rows[i];
 
         if (anchor >= 0) {
           // user is extending the selection
@@ -653,7 +652,7 @@ Transmission.prototype = {
   },
 
   isButtonEnabled: function (ev) {
-    var p = (ev.target || ev.srcElement).parentNode;
+    const p = (ev.target || ev.srcElement).parentNode;
     return p.className !== 'disabled' && p.parentNode.className !== 'disabled';
   },
 
@@ -695,8 +694,8 @@ Transmission.prototype = {
 
   dragenter: function (ev) {
     if (ev.dataTransfer && ev.dataTransfer.types) {
-      var types = ['text/uri-list', 'text/plain'];
-      for (var i = 0; i < types.length; ++i) {
+      const types = ['text/uri-list', 'text/plain'];
+      for (let i = 0; i < types.length; ++i) {
         // it would be better to look at the links here;
         // sadly, with Firefox, trying would throw.
         if (ev.dataTransfer.types.contains(types[i])) {
@@ -713,10 +712,10 @@ Transmission.prototype = {
   },
 
   drop: function (ev) {
-    var i, uri;
-    var uris = null;
-    var types = ['text/uri-list', 'text/plain'];
-    var paused = this.shouldAddedTorrentsStart();
+    let i, uri;
+    let uris = null;
+    const types = ['text/uri-list', 'text/plain'];
+    const paused = this.shouldAddedTorrentsStart();
 
     if (!ev.dataTransfer || !ev.dataTransfer.types) {
       return true;
@@ -770,7 +769,7 @@ Transmission.prototype = {
   },
 
   confirmRenameClicked: function () {
-    var torrents = this.getSelectedTorrents();
+    const torrents = this.getSelectedTorrents();
     this.renameTorrent(torrents[0], $('input#torrent_rename_name').attr('value'));
     this.hideRenameDialog();
   },
@@ -784,7 +783,7 @@ Transmission.prototype = {
 
   // turn the periodic ajax session refresh on & off
   togglePeriodicSessionRefresh: function (enabled) {
-    var that = this,
+    const that = this,
       msec = 8000;
 
     function callback() {
@@ -804,7 +803,7 @@ Transmission.prototype = {
   },
 
   toggleTurtleClicked: function () {
-    var o = {};
+    const o = {};
     o[RPC._TurtleState] = !$('#turtle-button').hasClass('selected');
     this.remote.savePrefs(o);
   },
@@ -820,10 +819,11 @@ Transmission.prototype = {
   },
 
   togglePrefsDialogClicked: function (ev) {
-    var e = $('#prefs-button');
+    const e = $('#prefs-button');
 
-    if (e.hasClass('selected')) this.prefsDialog.close();
-    else {
+    if (e.hasClass('selected')) {
+      this.prefsDialog.close();
+    } else {
       e.addClass('selected');
       this.prefsDialog.show();
     }
@@ -845,10 +845,10 @@ Transmission.prototype = {
   },
 
   onMenuClicked: function (event, ui) {
-    var o, dir;
-    var id = ui.id;
-    var remote = this.remote;
-    var element = ui.target;
+    let o, dir;
+    const id = ui.id;
+    const remote = this.remote;
+    const element = ui.target;
 
     if (ui.group == 'sort-mode') {
       element.selectMenuItem();
@@ -947,8 +947,8 @@ Transmission.prototype = {
   },
 
   updateFromTorrentGet: function (updates, removed_ids) {
-    var i, o, t, id, needed, callback, fields;
-    var needinfo = [];
+    let i, o, t, id, needed, callback, fields;
+    const needinfo = [];
 
     for (i = 0; (o = updates[i]); ++i) {
       id = o.id;
@@ -964,7 +964,9 @@ Transmission.prototype = {
         callback = $.proxy(this.onTorrentChanged, this);
         $(t).bind('dataChanged', callback);
         // do we need more info for this torrent?
-        if (!('name' in t.fields) || !('status' in t.fields)) needinfo.push(id);
+        if (!('name' in t.fields) || !('status' in t.fields)) {
+          needinfo.push(id);
+        }
 
         t.notifyOnFieldChange(
           'status',
@@ -1002,7 +1004,7 @@ Transmission.prototype = {
   },
 
   updateTorrents: function (ids, fields, callback) {
-    var that = this;
+    const that = this;
 
     function f(updates, removedIds) {
       if (callback) {
@@ -1016,9 +1018,9 @@ Transmission.prototype = {
   },
 
   refreshTorrents: function () {
-    var callback = $.proxy(this.refreshTorrents, this);
-    var msec = this[Prefs._RefreshRate] * 1000;
-    var fields = ['id'].concat(Torrent.Fields.Stats);
+    const callback = $.proxy(this.refreshTorrents, this);
+    const msec = this[Prefs._RefreshRate] * 1000;
+    const fields = ['id'].concat(Torrent.Fields.Stats);
 
     // send a request right now
     this.updateTorrents('recently-active', fields);
@@ -1029,12 +1031,12 @@ Transmission.prototype = {
   },
 
   initializeTorrents: function () {
-    var fields = ['id'].concat(Torrent.Fields.Metadata, Torrent.Fields.Stats);
+    const fields = ['id'].concat(Torrent.Fields.Metadata, Torrent.Fields.Stats);
     this.updateTorrents(null, fields);
   },
 
   onRowClicked: function (ev) {
-    var meta_key = ev.metaKey || ev.ctrlKey,
+    const meta_key = ev.metaKey || ev.ctrlKey,
       row = ev.currentTarget.row;
 
     // handle the per-row "torrent_resume" button
@@ -1054,7 +1056,9 @@ Transmission.prototype = {
     ev.stopPropagation();
 
     if (isMobileDevice) {
-      if (row.isSelected()) this.setInspectorVisible(true);
+      if (row.isSelected()) {
+        this.setInspectorVisible(true);
+      }
       this.setSelectedRow(row);
     } else if (ev.shiftKey) {
       this.selectRange(row);
@@ -1082,7 +1086,7 @@ Transmission.prototype = {
   },
 
   deleteTorrents: function (ids) {
-    var i, id;
+    let i, id;
 
     if (ids && ids.length) {
       for (i = 0; (id = ids[i]); ++i) {
@@ -1101,10 +1105,10 @@ Transmission.prototype = {
    * Select a torrent file to upload
    */
   uploadTorrentFile: function (confirmed) {
-    var fileInput = $('input#torrent_upload_file');
-    var folderInput = $('input#add-dialog-folder-input');
-    var startInput = $('input#torrent_auto_start');
-    var urlInput = $('input#torrent_upload_url');
+    const fileInput = $('input#torrent_upload_file');
+    const folderInput = $('input#add-dialog-folder-input');
+    const startInput = $('input#torrent_auto_start');
+    const urlInput = $('input#torrent_upload_url');
 
     if (!confirmed) {
       // update the upload dialog's fields
@@ -1119,19 +1123,19 @@ Transmission.prototype = {
       $('#upload_container').show();
       urlInput.focus();
     } else {
-      var paused = !startInput.is(':checked');
-      var destination = folderInput.val();
-      var remote = this.remote;
+      const paused = !startInput.is(':checked');
+      const destination = folderInput.val();
+      const remote = this.remote;
 
       jQuery.each(fileInput[0].files, function (i, file) {
-        var reader = new FileReader();
+        const reader = new FileReader();
         reader.onload = function (e) {
-          var contents = e.target.result;
-          var key = 'base64,';
-          var index = contents.indexOf(key);
+          const contents = e.target.result;
+          const key = 'base64,';
+          const index = contents.indexOf(key);
           if (index > -1) {
-            var metainfo = contents.substring(index + key.length);
-            var o = {
+            const metainfo = contents.substring(index + key.length);
+            const o = {
               method: 'torrent-add',
               arguments: {
                 paused: paused,
@@ -1140,20 +1144,21 @@ Transmission.prototype = {
               },
             };
             remote.sendRequest(o, function (response) {
-              if (response.result != 'success')
+              if (response.result != 'success') {
                 alert('Error adding "' + file.name + '": ' + response.result);
+              }
             });
           }
         };
         reader.readAsDataURL(file);
       });
 
-      var url = $('#torrent_upload_url').val();
+      let url = $('#torrent_upload_url').val();
       if (url != '') {
         if (url.match(/^[0-9a-f]{40}$/i)) {
           url = 'magnet:?xt=urn:btih:' + url;
         }
-        var o = {
+        const o = {
           method: 'torrent-add',
           arguments: {
             paused: paused,
@@ -1172,7 +1177,7 @@ Transmission.prototype = {
 
   promptSetLocation: function (confirmed, torrents) {
     if (!confirmed) {
-      var path;
+      let path;
       if (torrents.length === 1) {
         path = torrents[0].getDownloadDir();
       } else {
@@ -1182,28 +1187,28 @@ Transmission.prototype = {
       $('#move_container').show();
       $('#torrent_path').focus();
     } else {
-      var ids = this.getTorrentIds(torrents);
+      const ids = this.getTorrentIds(torrents);
       this.remote.moveTorrents(ids, $('input#torrent_path').val(), this.refreshTorrents, this);
       $('#move_container').hide();
     }
   },
 
   moveSelectedTorrents: function (confirmed) {
-    var torrents = this.getSelectedTorrents();
+    const torrents = this.getSelectedTorrents();
     if (torrents.length) {
       this.promptSetLocation(confirmed, torrents);
     }
   },
 
   removeSelectedTorrents: function () {
-    var torrents = this.getSelectedTorrents();
+    const torrents = this.getSelectedTorrents();
     if (torrents.length) {
       this.promptToRemoveTorrents(torrents);
     }
   },
 
   removeSelectedTorrentsAndData: function () {
-    var torrents = this.getSelectedTorrents();
+    const torrents = this.getSelectedTorrents();
     if (torrents.length) {
       this.promptToRemoveTorrentsAndData(torrents);
     }
@@ -1211,19 +1216,17 @@ Transmission.prototype = {
 
   promptToRemoveTorrents: function (torrents) {
     if (torrents.length === 1) {
-      var torrent = torrents[0];
-      var header = 'Remove ' + torrent.getName() + '?';
-      var message =
+      const torrent = torrents[0];
+      const header = 'Remove ' + torrent.getName() + '?';
+      const message =
         'Once removed, continuing the transfer will require the torrent file. Are you sure you want to remove it?';
-
       dialog.confirm(header, message, 'Remove', function () {
         transmission.removeTorrents(torrents);
       });
     } else {
-      var header = 'Remove ' + torrents.length + ' transfers?';
-      var message =
+      const header = 'Remove ' + torrents.length + ' transfers?';
+      const message =
         'Once removed, continuing the transfers will require the torrent files. Are you sure you want to remove them?';
-
       dialog.confirm(header, message, 'Remove', function () {
         transmission.removeTorrents(torrents);
       });
@@ -1232,17 +1235,17 @@ Transmission.prototype = {
 
   promptToRemoveTorrentsAndData: function (torrents) {
     if (torrents.length === 1) {
-      var torrent = torrents[0];
-      var header = 'Remove ' + torrent.getName() + ' and delete data?';
-      var message =
+      const torrent = torrents[0];
+      const header = 'Remove ' + torrent.getName() + ' and delete data?';
+      const message =
         'All data downloaded for this torrent will be deleted. Are you sure you want to remove it?';
 
       dialog.confirm(header, message, 'Remove', function () {
         transmission.removeTorrentsAndData(torrents);
       });
     } else {
-      var header = 'Remove ' + torrents.length + ' transfers and delete data?';
-      var message =
+      const header = 'Remove ' + torrents.length + ' transfers and delete data?';
+      const message =
         'All data downloaded for these torrents will be deleted. Are you sure you want to remove them?';
 
       dialog.confirm(header, message, 'Remove', function () {
@@ -1252,7 +1255,7 @@ Transmission.prototype = {
   },
 
   removeTorrents: function (torrents) {
-    var ids = this.getTorrentIds(torrents);
+    const ids = this.getTorrentIds(torrents);
     this.remote.removeTorrents(ids, this.refreshTorrents, this);
   },
 
@@ -1268,7 +1271,7 @@ Transmission.prototype = {
   },
 
   renameSelectedTorrents: function () {
-    var torrents = this.getSelectedTorrents();
+    const torrents = this.getSelectedTorrents();
     if (torrents.length != 1) {
       dialog.alert('Renaming', 'You can rename only one torrent at a time.', 'Ok');
     } else {
@@ -1277,7 +1280,7 @@ Transmission.prototype = {
   },
 
   onTorrentRenamed: function (response) {
-    var torrent;
+    let torrent;
     if (
       response.result === 'success' &&
       response.arguments &&
@@ -1288,7 +1291,7 @@ Transmission.prototype = {
   },
 
   renameTorrent: function (torrent, newname) {
-    var oldpath = torrent.getName();
+    const oldpath = torrent.getName();
     this.remote.renameTorrent([torrent.getId()], oldpath, newname, this.onTorrentRenamed, this);
   },
 
@@ -1345,8 +1348,8 @@ Transmission.prototype = {
 
   hideMobileAddressbar: function (delaySecs) {
     if (isMobileDevice && !scroll_timeout) {
-      var callback = $.proxy(this.doToolbarHide, this);
-      var msec = delaySecs * 1000 || 150;
+      const callback = $.proxy(this.doToolbarHide, this);
+      const msec = delaySecs * 1000 || 150;
       scroll_timeout = setTimeout(callback, msec);
     }
   },
@@ -1374,9 +1377,9 @@ Transmission.prototype = {
    ***/
 
   updateGuiFromSession: function (o) {
-    var limit, limited, e, b, text;
-    var fmt = Transmission.fmt;
-    var menu = $('#footer_super_menu');
+    let limit, limited, e, b, text;
+    const fmt = Transmission.fmt;
+    const menu = $('#footer_super_menu');
 
     this.serverVersion = o.version;
 
@@ -1426,11 +1429,11 @@ Transmission.prototype = {
   },
 
   updateStatusbar: function () {
-    var i, row;
-    var u = 0;
-    var d = 0;
-    var fmt = Transmission.fmt;
-    var torrents = this.getAllTorrents();
+    let i, row;
+    let u = 0;
+    let d = 0;
+    const fmt = Transmission.fmt;
+    const torrents = this.getAllTorrents();
 
     // up/down speed
     for (i = 0; (row = torrents[i]); ++i) {
@@ -1453,8 +1456,8 @@ Transmission.prototype = {
   },
 
   updateFilterSelect: function () {
-    var i, names, name, str, o;
-    var trackers = this.getTrackers();
+    let i, names, name, str, o;
+    const trackers = this.getTrackers();
 
     // build a sorted list of names
     names = [];
@@ -1486,15 +1489,15 @@ Transmission.prototype = {
 
   updateButtonsSoon: function () {
     if (!this.buttonRefreshTimer) {
-      var callback = $.proxy(this.updateButtonStates, this);
-      var msec = 100;
+      const callback = $.proxy(this.updateButtonStates, this);
+      const msec = 100;
 
       this.buttonRefreshTimer = setTimeout(callback, msec);
     }
   },
 
   calculateTorrentStates: function (callback) {
-    var stats = {
+    const stats = {
       total: 0,
       active: 0,
       paused: 0,
@@ -1508,9 +1511,9 @@ Transmission.prototype = {
     delete this.buttonRefreshTimer;
 
     for (var i = 0, row; (row = this._rows[i]); ++i) {
-      var isStopped = row.getTorrent().isStopped();
-      var isSelected = row.isSelected();
-      var isQueued = row.getTorrent().isQueued();
+      const isStopped = row.getTorrent().isStopped();
+      const isSelected = row.isSelected();
+      const isQueued = row.getTorrent().isQueued();
       ++stats.total;
       if (!isStopped) {
         ++stats.active;
@@ -1536,8 +1539,8 @@ Transmission.prototype = {
   },
 
   updateButtonStates: function () {
-    var tr = this;
-    var e = this.elements;
+    const tr = this;
+    const e = this.elements;
 
     this.calculateTorrentStates(function (s) {
       tr.setEnabled(e.toolbar_pause_button, s.activeSel > 0);
@@ -1570,7 +1573,7 @@ Transmission.prototype = {
     if (isMobileDevice) {
       $('body').toggleClass('inspector_showing', visible);
     } else {
-      var w = visible ? $('#torrent_inspector').outerWidth() + 1 + 'px' : '0px';
+      const w = visible ? $('#torrent_inspector').outerWidth() + 1 + 'px' : '0px';
       $('#torrent_container')[0].style.right = w;
     }
   },
@@ -1583,7 +1586,7 @@ Transmission.prototype = {
 
   refilterSoon: function () {
     if (!this.refilterTimer) {
-      var tr = this,
+      const tr = this,
         callback = function () {
           tr.refilter(false);
         },
@@ -1593,7 +1596,7 @@ Transmission.prototype = {
   },
 
   sortRows: function (rows) {
-    var i,
+    let i,
       tor,
       row,
       id2row = {},
@@ -1613,14 +1616,14 @@ Transmission.prototype = {
   },
 
   refilter: function (rebuildEverything) {
-    var i, e, id, t, row, tmp, rows, clean_rows, dirty_rows, frag;
-    var sort_mode = this[Prefs._SortMethod];
-    var sort_direction = this[Prefs._SortDirection];
-    var filter_mode = this[Prefs._FilterMode];
-    var filter_text = this.filterText;
-    var filter_tracker = this.filterTracker;
-    var renderer = this.torrentRenderer;
-    var list = this.elements.torrent_list;
+    let i, e, id, t, row, tmp, rows, clean_rows, dirty_rows, frag;
+    const sort_mode = this[Prefs._SortMethod];
+    const sort_direction = this[Prefs._SortDirection];
+    const filter_mode = this[Prefs._FilterMode];
+    const filter_text = this.filterText;
+    const filter_tracker = this.filterTracker;
+    const renderer = this.torrentRenderer;
+    const list = this.elements.torrent_list;
 
     const old_sel_count = $(list).children('.selected').length;
 
@@ -1688,9 +1691,9 @@ Transmission.prototype = {
     // now we have two sorted arrays of rows
     // and can do a simple two-way sorted merge.
     rows = [];
-    var ci = 0,
+    let ci = 0,
       cmax = clean_rows.length;
-    var di = 0,
+    let di = 0,
       dmax = dirty_rows.length;
     frag = document.createDocumentFragment();
     while (ci != cmax || di != dmax) {
@@ -1701,7 +1704,7 @@ Transmission.prototype = {
       } else if (di == dmax) {
         push_clean = true;
       } else {
-        var c = Torrent.compareTorrents(
+        const c = Torrent.compareTorrents(
           clean_rows[ci].getTorrent(),
           dirty_rows[di].getTorrent(),
           sort_mode,
@@ -1756,14 +1759,14 @@ Transmission.prototype = {
   },
 
   onFilterTrackerClicked: function (ev) {
-    var tracker = $('#filter-tracker').val();
+    const tracker = $('#filter-tracker').val();
     this.setFilterTracker(tracker === 'all' ? null : tracker);
   },
 
   setFilterTracker: function (domain) {
     // update which tracker is selected in the popup
-    var key = domain ? this.getReadableDomain(domain) : 'all';
-    var id = '#show-tracker-' + key;
+    const key = domain ? this.getReadableDomain(domain) : 'all';
+    const id = '#show-tracker-' + key;
 
     $(id).addClass('selected').siblings().removeClass('selected');
 
@@ -1773,7 +1776,7 @@ Transmission.prototype = {
 
   // example: "tracker.ubuntu.com" returns "ubuntu.com"
   getDomainName: function (host) {
-    var dot = host.indexOf('.');
+    const dot = host.indexOf('.');
     if (dot !== host.lastIndexOf('.')) {
       host = host.slice(dot + 1);
     }
@@ -1786,7 +1789,7 @@ Transmission.prototype = {
     if (name.length) {
       name = name.charAt(0).toUpperCase() + name.slice(1);
     }
-    var dot = name.indexOf('.');
+    const dot = name.indexOf('.');
     if (dot !== -1) {
       name = name.slice(0, dot);
     }
@@ -1794,21 +1797,21 @@ Transmission.prototype = {
   },
 
   getTrackers: function () {
-    var ret = {};
+    const ret = {};
 
-    var torrents = this.getAllTorrents();
-    for (var i = 0, torrent; (torrent = torrents[i]); ++i) {
-      var names = [];
-      var trackers = torrent.getTrackers();
+    const torrents = this.getAllTorrents();
+    for (let i = 0, torrent; (torrent = torrents[i]); ++i) {
+      const names = [];
+      const trackers = torrent.getTrackers();
 
-      for (var j = 0, tracker; (tracker = trackers[j]); ++j) {
+      for (let j = 0, tracker; (tracker = trackers[j]); ++j) {
         var uri,
           announce = tracker.announce;
 
         if (announce in this.uriCache) {
           uri = this.uriCache[announce];
         } else {
-          uri = this.uriCache[announce] = parseUri(announce);
+          uri = this.uriCache[announce] = new URL(announce);
           uri.domain = this.getDomainName(uri.host);
           uri.name = this.getReadableDomain(uri.domain);
         }
@@ -1826,7 +1829,7 @@ Transmission.prototype = {
         }
       }
 
-      for (var j = 0, name; (name = names[j]); ++j) {
+      for (const name of names) {
         ret[name].count++;
       }
     }
@@ -1844,8 +1847,8 @@ Transmission.prototype = {
     this.setCompactMode(!this[Prefs._CompactDisplayState]);
   },
   setCompactMode: function (is_compact) {
-    var key = Prefs._CompactDisplayState;
-    var was_compact = this[key];
+    const key = Prefs._CompactDisplayState;
+    const was_compact = this[key];
 
     if (was_compact !== is_compact) {
       this.setPref(key, is_compact);
@@ -1856,7 +1859,7 @@ Transmission.prototype = {
     this.onCompactModeChanged();
   },
   onCompactModeChanged: function () {
-    var compact = this[Prefs._CompactDisplayState];
+    const compact = this[Prefs._CompactDisplayState];
 
     // update the ui: footer button
     $('#compact-button').toggleClass('selected', compact);
@@ -1874,7 +1877,7 @@ Transmission.prototype = {
 
   // turn the periodic ajax stats refresh on & off
   togglePeriodicStatsRefresh: function (enabled) {
-    var that = this,
+    const that = this,
       msec = 5000;
 
     function callback() {
@@ -1909,8 +1912,8 @@ Transmission.prototype = {
 
   // Process new session stats from the server
   updateStats: function (stats) {
-    var s, ratio;
-    var fmt = Transmission.fmt;
+    let s, ratio;
+    const fmt = Transmission.fmt;
 
     s = stats['current-stats'];
     ratio = Math.ratio(s.uploadedBytes, s.downloadedBytes);

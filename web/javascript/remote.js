@@ -5,7 +5,7 @@
  * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  */
 
-var RPC = {
+const RPC = {
   _DaemonVersion: 'version',
   _DownSpeedLimit: 'speed-limit-down',
   _DownSpeedLimited: 'speed-limit-down-enabled',
@@ -41,8 +41,8 @@ TransmissionRemote.prototype = {
    * or on a 409, globally set the X-Transmission-Session-Id and resend
    */
   ajaxError: function (request, error_string, exception, ajaxObject) {
-    var token;
-    var remote = this;
+    let token;
+    const remote = this;
 
     // set the Transmission-Session-Id on a 409
     if (
@@ -80,7 +80,7 @@ TransmissionRemote.prototype = {
   },
 
   sendRequest: function (data, callback, context, async) {
-    var remote = this;
+    const remote = this;
     if (typeof async != 'boolean') {
       async = true;
     }
@@ -107,21 +107,21 @@ TransmissionRemote.prototype = {
   },
 
   loadDaemonPrefs: function (callback, context, async) {
-    var o = {
+    const o = {
       method: 'session-get',
     };
     this.sendRequest(o, callback, context, async);
   },
 
   checkPort: function (callback, context, async) {
-    var o = {
+    const o = {
       method: 'port-test',
     };
     this.sendRequest(o, callback, context, async);
   },
 
   renameTorrent: function (torrentIds, oldpath, newname, callback, context) {
-    var o = {
+    const o = {
       method: 'torrent-rename-path',
       arguments: {
         ids: torrentIds,
@@ -133,14 +133,14 @@ TransmissionRemote.prototype = {
   },
 
   loadDaemonStats: function (callback, context, async) {
-    var o = {
+    const o = {
       method: 'session-stats',
     };
     this.sendRequest(o, callback, context, async);
   },
 
   updateTorrents: function (torrentIds, fields, callback, context) {
-    var o = {
+    const o = {
       method: 'torrent-get',
       arguments: {
         fields: fields,
@@ -150,26 +150,26 @@ TransmissionRemote.prototype = {
       o['arguments'].ids = torrentIds;
     }
     this.sendRequest(o, function (response) {
-      var args = response['arguments'];
+      const args = response['arguments'];
       callback.call(context, args.torrents, args.removed);
     });
   },
 
   getFreeSpace: function (dir, callback, context) {
-    var o = {
+    const o = {
       method: 'free-space',
       arguments: {
         path: dir,
       },
     };
     this.sendRequest(o, function (response) {
-      var args = response['arguments'];
+      const args = response['arguments'];
       callback.call(context, args.path, args['size-bytes']);
     });
   },
 
   changeFileCommand: function (torrentId, fileIndices, command) {
-    var remote = this,
+    const remote = this,
       args = {
         ids: [torrentId],
       };
@@ -190,7 +190,7 @@ TransmissionRemote.prototype = {
       args = {};
     }
     args['ids'] = torrent_ids;
-    var o = {
+    const o = {
       method: method,
       arguments: args,
     };
@@ -202,7 +202,7 @@ TransmissionRemote.prototype = {
   },
 
   startTorrents: function (torrent_ids, noqueue, callback, context) {
-    var name = noqueue ? 'torrent-start-now' : 'torrent-start';
+    const name = noqueue ? 'torrent-start-now' : 'torrent-start';
     this.sendTorrentActionRequests(name, torrent_ids, callback, context);
   },
   stopTorrents: function (torrent_ids, callback, context) {
@@ -226,8 +226,8 @@ TransmissionRemote.prototype = {
     this.sendTorrentActionRequests('torrent-remove', torrent_ids, callback, context);
   },
   removeTorrentsAndData: function (torrents) {
-    var remote = this;
-    var o = {
+    const remote = this;
+    const o = {
       method: 'torrent-remove',
       arguments: {
         'delete-local-data': true,
@@ -236,7 +236,7 @@ TransmissionRemote.prototype = {
     };
 
     if (torrents) {
-      for (var i = 0, len = torrents.length; i < len; ++i) {
+      for (let i = 0, len = torrents.length; i < len; ++i) {
         o.arguments.ids.push(torrents[i].getId());
       }
     }
@@ -251,11 +251,11 @@ TransmissionRemote.prototype = {
     this.sendTorrentActionRequests('torrent-reannounce', torrent_ids, callback, context);
   },
   addTorrentByUrl: function (url, options) {
-    var remote = this;
+    const remote = this;
     if (url.match(/^[0-9a-f]{40}$/i)) {
       url = 'magnet:?xt=urn:btih:' + url;
     }
-    var o = {
+    const o = {
       method: 'torrent-add',
       arguments: {
         paused: options.paused,
@@ -267,8 +267,8 @@ TransmissionRemote.prototype = {
     });
   },
   savePrefs: function (args) {
-    var remote = this;
-    var o = {
+    const remote = this;
+    const o = {
       method: 'session-set',
       arguments: args,
     };
@@ -277,8 +277,8 @@ TransmissionRemote.prototype = {
     });
   },
   updateBlocklist: function () {
-    var remote = this;
-    var o = {
+    const remote = this;
+    const o = {
       method: 'blocklist-update',
     };
     this.sendRequest(o, function () {

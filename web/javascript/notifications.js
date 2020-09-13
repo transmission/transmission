@@ -1,18 +1,18 @@
-var Notifications = {};
+const Notifications = {};
 
 $(document).ready(function () {
   if (!window.webkitNotifications) {
     return;
   }
 
-  var notificationsEnabled = window.webkitNotifications.checkPermission() === 0;
-  var toggle = $('#toggle_notifications');
+  let notificationsEnabled = window.webkitNotifications.checkPermission() === 0;
+  const toggle = $('#toggle_notifications');
 
   toggle.show();
   updateMenuTitle();
   $(transmission).bind('downloadComplete seedingComplete', function (event, torrent) {
     if (notificationsEnabled) {
-      var title = (event.type == 'downloadComplete' ? 'Download' : 'Seeding') + ' complete',
+      let title = (event.type == 'downloadComplete' ? 'Download' : 'Seeding') + ' complete',
         content = torrent.getName(),
         notification;
 

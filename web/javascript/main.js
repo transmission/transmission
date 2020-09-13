@@ -10,7 +10,9 @@ function main() {
   if (jQuery.browser.msie) {
     try {
       document.execCommand('BackgroundImageCache', false, true);
-    } catch (err) {}
+    } catch (err) {
+      // no-op
+    }
   }
 
   if (jQuery.browser.safari) {

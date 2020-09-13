@@ -15,7 +15,7 @@ function Inspector(controller) {
       return torrents.some((tor) => !tor.hasExtraInfo());
     },
     refreshTorrents = function (callback) {
-      var fields,
+      let fields,
         ids = $.map(data.torrents.slice(0), function (t) {
           return t.getId();
         });
@@ -31,7 +31,7 @@ function Inspector(controller) {
       }
     },
     onTabClicked = function (ev) {
-      var tab = ev.currentTarget;
+      const tab = ev.currentTarget;
 
       if (isMobileDevice) {
         ev.stopPropagation();
@@ -49,7 +49,7 @@ function Inspector(controller) {
       updateInspector();
     },
     updateInspector = function () {
-      var e = data.elements,
+      let e = data.elements,
         torrents = data.torrents,
         name;
 
@@ -79,7 +79,7 @@ function Inspector(controller) {
      ****/
 
     updateInfoPage = function () {
-      var torrents = data.torrents,
+      let torrents = data.torrents,
         e = data.elements,
         fmt = Transmission.fmt,
         none = 'None',
@@ -112,7 +112,6 @@ function Inspector(controller) {
         u,
         f,
         d,
-        uri,
         now = Date.now();
 
       //
@@ -156,8 +155,9 @@ function Inspector(controller) {
       //  have_lb
       //
 
-      if (torrents.length < 1) str = none;
-      else {
+      if (torrents.length < 1) {
+        str = none;
+      } else {
         baseline = torrents[0].getStatus();
         for (i = 0; (t = torrents[i]); ++i) {
           if (!t.needsMetaData()) {
@@ -435,8 +435,8 @@ function Inspector(controller) {
       if (!str) {
         str = none;
       }
-      uri = parseUri(str);
-      if (uri.protocol == 'http' || uri.protocol == 'https') {
+      const uri = new URL(str);
+      if (uri.protocol == 'http:' || uri.protocol == 'https:') {
         str = encodeURI(str);
         setInnerHTML(e.comment_lb, '<a href="' + str + '" target="_blank" >' + str + '</a>');
       } else {
@@ -462,8 +462,8 @@ function Inspector(controller) {
             mixed_date = true;
           }
         }
-        var empty_creator = !creator || !creator.length;
-        var empty_date = !date;
+        const empty_creator = !creator || !creator.length;
+        const empty_date = !date;
         if (mixed_creator || mixed_date) {
           str = mixed;
         } else if (empty_creator && empty_date) {
@@ -500,14 +500,14 @@ function Inspector(controller) {
      ****/
 
     changeFileCommand = function (fileIndices, command) {
-      var torrentId = data.file_torrent.getId();
+      const torrentId = data.file_torrent.getId();
       data.controller.changeFileCommand(torrentId, fileIndices, command);
     },
     onFileWantedToggled = function (ev, fileIndices, want) {
       changeFileCommand(fileIndices, want ? 'files-wanted' : 'files-unwanted');
     },
     onFilePriorityToggled = function (ev, fileIndices, priority) {
-      var command;
+      let command;
       switch (priority) {
         case -1:
           command = 'priority-low';
@@ -531,7 +531,7 @@ function Inspector(controller) {
       delete data.file_rows;
     },
     createFileTreeModel = function (tor) {
-      var i,
+      let i,
         j,
         n,
         name,
@@ -581,7 +581,7 @@ function Inspector(controller) {
       return tree;
     },
     addNodeToView = function (tor, parent, sub, i) {
-      var row;
+      let row;
       row = new FileRow(tor, sub.depth, sub.name, sub.file_indices, i % 2);
       data.file_rows.push(row);
       parent.appendChild(row.getElement());
@@ -590,7 +590,7 @@ function Inspector(controller) {
       $(row).bind('nameClicked', onNameClicked);
     },
     addSubtreeToView = function (tor, parent, sub, i) {
-      var key, div;
+      let key, div;
       div = document.createElement('div');
       if (sub.parent) {
         addNodeToView(tor, div, sub, i++);
@@ -604,7 +604,7 @@ function Inspector(controller) {
       return i;
     },
     updateFilesPage = function () {
-      var i,
+      let i,
         n,
         tor,
         fragment,
@@ -632,7 +632,9 @@ function Inspector(controller) {
         file_list.appendChild(fragment);
       } else {
         // ...refresh the already-existing file list
-        for (i = 0, n = data.file_rows.length; i < n; ++i) data.file_rows[i].refresh();
+        for (i = 0, n = data.file_rows.length; i < n; ++i) {
+          data.file_rows[i].refresh();
+        }
       }
     },
     /****
@@ -640,7 +642,7 @@ function Inspector(controller) {
      ****/
 
     updatePeersPage = function () {
-      var i,
+      let i,
         k,
         tor,
         peers,
@@ -717,7 +719,7 @@ function Inspector(controller) {
      ****/
 
     getAnnounceState = function (tracker) {
-      var timeUntilAnnounce,
+      let timeUntilAnnounce,
         s = '';
       switch (tracker.announceState) {
         case Torrent._TrackerActive:
@@ -742,7 +744,7 @@ function Inspector(controller) {
       return s;
     },
     lastAnnounceStatus = function (tracker) {
-      var lastAnnounceLabel = 'Last Announce',
+      let lastAnnounceLabel = 'Last Announce',
         lastAnnounce = ['N/A'],
         lastAnnounceTime;
 
@@ -769,7 +771,7 @@ function Inspector(controller) {
       };
     },
     lastScrapeStatus = function (tracker) {
-      var lastScrapeLabel = 'Last Scrape',
+      let lastScrapeLabel = 'Last Scrape',
         lastScrape = 'N/A',
         lastScrapeTime;
 
@@ -789,7 +791,7 @@ function Inspector(controller) {
       };
     },
     updateTrackersPage = function () {
-      var i,
+      let i,
         j,
         tier,
         tracker,
@@ -928,7 +930,7 @@ function Inspector(controller) {
    ****/
 
   this.setTorrents = function (torrents) {
-    var d = data;
+    const d = data;
 
     // update the inspector when a selected torrent's data changes.
     $(d.torrents).unbind('dataChanged.inspector');

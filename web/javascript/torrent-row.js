@@ -8,9 +8,9 @@
 function TorrentRendererHelper() {}
 
 TorrentRendererHelper.getProgressInfo = function (controller, t) {
-  var pct, extra;
-  var s = t.getStatus();
-  var seed_ratio_limit = t.seedRatioLimit(controller);
+  let pct, extra;
+  const s = t.getStatus();
+  const seed_ratio_limit = t.seedRatioLimit(controller);
 
   if (t.needsMetaData()) {
     pct = t.getMetadataPercentComplete() * 100;
@@ -47,7 +47,7 @@ TorrentRendererHelper.getProgressInfo = function (controller, t) {
 };
 
 TorrentRendererHelper.createProgressbar = function (classes) {
-  var complete, incomplete, progressbar;
+  let complete, incomplete, progressbar;
 
   complete = document.createElement('div');
   complete.className = 'torrent_progress_bar complete';
@@ -68,8 +68,8 @@ TorrentRendererHelper.createProgressbar = function (classes) {
 };
 
 TorrentRendererHelper.renderProgressbar = function (controller, t, progressbar) {
-  var e, style, width, display;
-  var info = TorrentRendererHelper.getProgressInfo(controller, t);
+  let e, style, width, display;
+  const info = TorrentRendererHelper.getProgressInfo(controller, t);
 
   // update the complete progressbar
   e = progressbar.complete;
@@ -109,7 +109,7 @@ TorrentRendererHelper.formatDL = function (t) {
 };
 
 TorrentRendererHelper.formatETA = function (t) {
-  var eta = t.getETA();
+  const eta = t.getETA();
   if (eta < 0 || eta >= 999 * 60 * 60) {
     return '';
   }
@@ -124,7 +124,7 @@ TorrentRendererHelper.formatETA = function (t) {
 function TorrentRendererFull() {}
 TorrentRendererFull.prototype = {
   createRow: function () {
-    var root, name, peers, progressbar, details, image, button;
+    let root, name, peers, progressbar, details, image, button;
 
     root = document.createElement('li');
     root.className = 'torrent';
@@ -161,7 +161,7 @@ TorrentRendererFull.prototype = {
   },
 
   getPeerDetails: function (t) {
-    var err,
+    let err,
       peer_count,
       webseed_count,
       fmt = Transmission.fmt;
@@ -234,11 +234,11 @@ TorrentRendererFull.prototype = {
 
   getProgressDetails: function (controller, t) {
     if (t.needsMetaData()) {
-      var MetaDataStatus = 'retrieving';
+      let MetaDataStatus = 'retrieving';
       if (t.isStopped()) {
         MetaDataStatus = 'needs';
       }
-      var percent = 100 * t.getMetadataPercentComplete();
+      const percent = 100 * t.getMetadataPercentComplete();
       return [
         'Magnetized transfer - ' + MetaDataStatus + ' metadata (',
         Transmission.fmt.percentString(percent),
@@ -246,10 +246,10 @@ TorrentRendererFull.prototype = {
       ].join('');
     }
 
-    var c;
-    var sizeWhenDone = t.getSizeWhenDone();
-    var totalSize = t.getTotalSize();
-    var is_done = t.isDone() || t.isSeeding();
+    let c;
+    const sizeWhenDone = t.getSizeWhenDone();
+    const totalSize = t.getTotalSize();
+    const is_done = t.isDone() || t.isSeeding();
 
     if (is_done) {
       if (totalSize === sizeWhenDone) {
@@ -289,7 +289,7 @@ TorrentRendererFull.prototype = {
     // maybe append eta
     if (!t.isStopped() && (!is_done || t.seedRatioLimit(controller) > 0)) {
       c.push(' - ');
-      var eta = t.getETA();
+      const eta = t.getETA();
       if (eta < 0 || eta >= 999 * 60 * 60 /* arbitrary */) {
         c.push('remaining time unknown');
       } else {
@@ -308,8 +308,8 @@ TorrentRendererFull.prototype = {
     TorrentRendererHelper.renderProgressbar(controller, t, root._progressbar);
 
     // peer details
-    var has_error = t.getError() !== Torrent._ErrNone;
-    var e = root._peer_details_container;
+    const has_error = t.getError() !== Torrent._ErrNone;
+    let e = root._peer_details_container;
     $(e).toggleClass('error', has_error);
     setTextContent(e, this.getPeerDetails(t));
 
@@ -318,7 +318,7 @@ TorrentRendererFull.prototype = {
     setTextContent(e, this.getProgressDetails(controller, t));
 
     // pause/resume button
-    var is_stopped = t.isStopped();
+    const is_stopped = t.isStopped();
     e = root._pause_resume_button_image;
     e.alt = is_stopped ? 'Resume' : 'Pause';
     e.className = is_stopped ? 'torrent_resume' : 'torrent_pause';
@@ -333,7 +333,7 @@ TorrentRendererFull.prototype = {
 function TorrentRendererCompact() {}
 TorrentRendererCompact.prototype = {
   createRow: function () {
-    var progressbar, details, name, root;
+    let progressbar, details, name, root;
 
     progressbar = TorrentRendererHelper.createProgressbar('compact');
 
@@ -355,18 +355,18 @@ TorrentRendererCompact.prototype = {
   },
 
   getPeerDetails: function (t) {
-    var c;
+    let c;
     if ((c = t.getErrorMessage())) {
       return c;
     }
     if (t.isDownloading()) {
-      var have_dn = t.getDownloadSpeed() > 0;
-      var have_up = t.getUploadSpeed() > 0;
+      const have_dn = t.getDownloadSpeed() > 0;
+      const have_up = t.getUploadSpeed() > 0;
 
       if (!have_up && !have_dn) {
         return 'Idle';
       }
-      var s = '';
+      let s = '';
       if (!isMobileDevice) {
         s = TorrentRendererHelper.formatETA(t) + ' ';
       }
@@ -394,13 +394,13 @@ TorrentRendererCompact.prototype = {
 
   render: function (controller, t, root) {
     // name
-    var is_stopped = t.isStopped();
-    var e = root._name_container;
+    const is_stopped = t.isStopped();
+    let e = root._name_container;
     $(e).toggleClass('paused', is_stopped);
     setTextContent(e, t.getName());
 
     // peer details
-    var has_error = t.getError() !== Torrent._ErrNone;
+    const has_error = t.getError() !== Torrent._ErrNone;
     e = root._details_container;
     $(e).toggleClass('error', has_error);
     setTextContent(e, this.getPeerDetails(t));
@@ -420,7 +420,7 @@ function TorrentRow(view, controller, torrent) {
 }
 TorrentRow.prototype = {
   initialize: function (view, controller, torrent) {
-    var row = this;
+    const row = this;
     this._view = view;
     this._torrent = torrent;
     this._element = view.createRow();
@@ -433,7 +433,7 @@ TorrentRow.prototype = {
     return this._element;
   },
   render: function (controller) {
-    var tor = this.getTorrent();
+    const tor = this.getTorrent();
     if (tor) {
       this._view.render(controller, tor, this.getElement());
     }

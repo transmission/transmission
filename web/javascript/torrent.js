@@ -121,7 +121,7 @@ Torrent.prototype = {
   },
 
   setField: function (o, name, value) {
-    var i, observer;
+    let i, observer;
 
     if (o[name] === value) {
       return false;
@@ -137,10 +137,10 @@ Torrent.prototype = {
 
   // fields.files is an array of unions of RPC's "files" and "fileStats" objects.
   updateFiles: function (files) {
-    var changed = false;
-    var myfiles = this.fields.files || [];
-    var keys = ['length', 'name', 'bytesCompleted', 'wanted', 'priority'];
-    var i, f, j, key, myfile;
+    let changed = false;
+    const myfiles = this.fields.files || [];
+    const keys = ['length', 'name', 'bytesCompleted', 'wanted', 'priority'];
+    let i, f, j, key, myfile;
 
     for (i = 0; (f = files[i]); ++i) {
       myfile = myfiles[i] || {};
@@ -156,19 +156,12 @@ Torrent.prototype = {
   },
 
   collateTrackers: function (trackers) {
-    var i,
-      t,
-      announces = [];
-
-    for (i = 0; (t = trackers[i]); ++i) {
-      announces.push(t.announce.toLowerCase());
-    }
-    return announces.join('\t');
+    return trackers.map((t) => t.announce.toLowerCase()).join('\t');
   },
 
   refreshFields: function (data) {
-    var key;
-    var changed = false;
+    let key;
+    let changed = false;
 
     for (key in data) {
       switch (key) {
@@ -407,7 +400,7 @@ Torrent.prototype = {
     }
   },
   getErrorMessage: function () {
-    var str = this.getErrorString();
+    const str = this.getErrorString();
     switch (this.getError()) {
       case Torrent._ErrTrackerWarning:
         return 'Tracker returned a warning: ' + str;
@@ -420,14 +413,14 @@ Torrent.prototype = {
     }
   },
   getCollatedName: function () {
-    var f = this.fields;
+    const f = this.fields;
     if (!f.collatedName && f.name) {
       f.collatedName = f.name.toLowerCase();
     }
     return f.collatedName || '';
   },
   getCollatedTrackers: function () {
-    var f = this.fields;
+    const f = this.fields;
     if (!f.collatedTrackers && f.trackers) {
       f.collatedTrackers = this.collateTrackers(f.trackers);
     }
@@ -439,7 +432,7 @@ Torrent.prototype = {
    ****/
 
   testState: function (state) {
-    var s = this.getStatus();
+    const s = this.getStatus();
 
     switch (state) {
       case Prefs._FilterActive:
@@ -469,7 +462,7 @@ Torrent.prototype = {
    */
   test: function (state, search, tracker) {
     // flter by state...
-    var pass = this.testState(state);
+    let pass = this.testState(state);
 
     // maybe filter by text...
     if (pass && search && search.length) {
@@ -501,26 +494,26 @@ Torrent.compareByQueue = function (ta, tb) {
   return ta.getQueuePosition() - tb.getQueuePosition();
 };
 Torrent.compareByAge = function (ta, tb) {
-  var a = ta.getDateAdded();
-  var b = tb.getDateAdded();
+  const a = ta.getDateAdded();
+  const b = tb.getDateAdded();
 
   return b - a || Torrent.compareByQueue(ta, tb);
 };
 Torrent.compareByState = function (ta, tb) {
-  var a = ta.getStatus();
-  var b = tb.getStatus();
+  const a = ta.getStatus();
+  const b = tb.getStatus();
 
   return b - a || Torrent.compareByQueue(ta, tb);
 };
 Torrent.compareByActivity = function (ta, tb) {
-  var a = ta.getActivity();
-  var b = tb.getActivity();
+  const a = ta.getActivity();
+  const b = tb.getActivity();
 
   return b - a || Torrent.compareByState(ta, tb);
 };
 Torrent.compareByRatio = function (ta, tb) {
-  var a = ta.getUploadRatio();
-  var b = tb.getUploadRatio();
+  const a = ta.getUploadRatio();
+  const b = tb.getUploadRatio();
 
   if (a < b) {
     return 1;
@@ -531,20 +524,20 @@ Torrent.compareByRatio = function (ta, tb) {
   return Torrent.compareByState(ta, tb);
 };
 Torrent.compareByProgress = function (ta, tb) {
-  var a = ta.getPercentDone();
-  var b = tb.getPercentDone();
+  const a = ta.getPercentDone();
+  const b = tb.getPercentDone();
 
   return a - b || Torrent.compareByRatio(ta, tb);
 };
 Torrent.compareBySize = function (ta, tb) {
-  var a = ta.getTotalSize();
-  var b = tb.getTotalSize();
+  const a = ta.getTotalSize();
+  const b = tb.getTotalSize();
 
   return a - b || Torrent.compareByName(ta, tb);
 };
 
 Torrent.compareTorrents = function (a, b, sortMethod, sortDirection) {
-  var i;
+  let i;
 
   switch (sortMethod) {
     case Prefs._SortByActivity:

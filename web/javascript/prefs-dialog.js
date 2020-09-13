@@ -6,7 +6,7 @@
  */
 
 function PrefsDialog(remote) {
-  var data = {
+  const data = {
     dialog: null,
     remote: null,
     elements: {},
@@ -60,8 +60,8 @@ function PrefsDialog(remote) {
     },
   };
 
-  var initTimeDropDown = function (e) {
-    var i, hour, mins, value, content;
+  const initTimeDropDown = function (e) {
+    let i, hour, mins, value, content;
 
     for (i = 0; i < 24 * 4; ++i) {
       hour = parseInt(i / 4, 10);
@@ -72,15 +72,15 @@ function PrefsDialog(remote) {
     }
   };
 
-  var onPortChecked = function (response) {
-    var is_open = response['arguments']['port-is-open'];
-    var text = 'Port is <b>' + (is_open ? 'Open' : 'Closed') + '</b>';
-    var e = data.elements.root.find('#port-label');
+  const onPortChecked = function (response) {
+    const is_open = response['arguments']['port-is-open'];
+    const text = 'Port is <b>' + (is_open ? 'Open' : 'Closed') + '</b>';
+    const e = data.elements.root.find('#port-label');
     setInnerHTML(e[0], text);
   };
 
-  var setGroupEnabled = function (parent_key, enabled) {
-    var i, key, keys, root;
+  const setGroupEnabled = function (parent_key, enabled) {
+    let i, key, keys, root;
 
     if (parent_key in data.groups) {
       root = data.elements.root;
@@ -92,19 +92,19 @@ function PrefsDialog(remote) {
     }
   };
 
-  var onBlocklistUpdateClicked = function () {
+  const onBlocklistUpdateClicked = function () {
     data.remote.updateBlocklist();
     setBlocklistButtonEnabled(false);
   };
 
   var setBlocklistButtonEnabled = function (b) {
-    var e = data.elements.blocklist_button;
+    const e = data.elements.blocklist_button;
     e.attr('disabled', !b);
     e.val(b ? 'Update' : 'Updating...');
   };
 
-  var getValue = function (e) {
-    var str;
+  const getValue = function (e) {
+    let str;
 
     switch (e[0].type) {
       case 'checkbox':
@@ -133,8 +133,8 @@ function PrefsDialog(remote) {
 
   /* this callback is for controls whose changes can be applied
        immediately, like checkboxs, radioboxes, and selects */
-  var onControlChanged = function (ev) {
-    var o = {};
+  const onControlChanged = function (ev) {
+    const o = {};
     o[ev.target.id] = getValue($(ev.target));
     data.remote.savePrefs(o);
   };
@@ -142,21 +142,21 @@ function PrefsDialog(remote) {
   /* these two callbacks are for controls whose changes can't be applied
        immediately -- like a text entry field -- because it takes many
        change events for the user to get to the desired result */
-  var onControlFocused = function (ev) {
+  const onControlFocused = function (ev) {
     data.oldValue = getValue($(ev.target));
   };
 
-  var onControlBlurred = function (ev) {
-    var newValue = getValue($(ev.target));
+  const onControlBlurred = function (ev) {
+    const newValue = getValue($(ev.target));
     if (newValue !== data.oldValue) {
-      var o = {};
+      const o = {};
       o[ev.target.id] = newValue;
       data.remote.savePrefs(o);
       delete data.oldValue;
     }
   };
 
-  var getDefaultMobileOptions = function () {
+  const getDefaultMobileOptions = function () {
     return {
       width: $(window).width(),
       height: $(window).height(),
@@ -164,8 +164,8 @@ function PrefsDialog(remote) {
     };
   };
 
-  var initialize = function (remote) {
-    var i, key, e, o;
+  const initialize = function (remote) {
+    let i, key, e, o;
 
     data.remote = remote;
 
@@ -207,6 +207,7 @@ function PrefsDialog(remote) {
         case 'search':
           e.focus(onControlFocused);
           e.blur(onControlBlurred);
+          break;
 
         default:
           break;
@@ -214,8 +215,8 @@ function PrefsDialog(remote) {
     }
   };
 
-  var getValues = function () {
-    var i,
+  const getValues = function () {
+    let i,
       key,
       val,
       o = {},
@@ -244,9 +245,9 @@ function PrefsDialog(remote) {
 
   // update the dialog's controls
   this.set = function (o) {
-    var e, i, key, val;
-    var keys = data.keys;
-    var root = data.elements.root;
+    let e, i, key, val;
+    const keys = data.keys;
+    const root = data.elements.root;
 
     setBlocklistButtonEnabled(true);
 
@@ -257,7 +258,7 @@ function PrefsDialog(remote) {
       if (key === 'blocklist-size') {
         // special case -- regular text area
         e.text('' + val.toStringWithCommas());
-      } else
+      } else {
         switch (e[0].type) {
           case 'checkbox':
           case 'radio':
@@ -281,6 +282,7 @@ function PrefsDialog(remote) {
           default:
             break;
         }
+      }
     }
   };
 

@@ -23,6 +23,7 @@ check=0
 exitcode=0
 staged=0
 root="$(git rev-parse --show-toplevel)"
+eslint_args=(-c "${root}/format/eslint.config.json")
 prettier_args=(--config "${root}/format/prettier.config.json" --loglevel warn)
 uncrustify_args=(-c "${root}/format/uncrustify.cfg")
 
@@ -47,6 +48,7 @@ if [ "${check}" -ne "0" ]; then
   prettier_args+=(--check);
   uncrustify_args+=(--check -q);
 else
+  eslint_args+=(--fix)
   prettier_args+=(--write)
   uncrustify_args+=(--replace --no-backup)
 fi
@@ -55,11 +57,11 @@ fi
 cd "${root}" || exit 1
 
 # format C/C++ files
-formatter='uncrustify'
-formatter_args=("${uncrustify_args[@]}")
+tool='uncrustify'
+tool_args=("${uncrustify_args[@]}")
 cish_files=()
-if ! command -v "${formatter}" &> /dev/null; then
-  echo "skipping $formatter (not found)"
+if ! command -v "${tool}" &> /dev/null; then
+  echo "skipping $tool (not found)"
 else
   # C
   dirs=(cli daemon gtk libtransmission utils)
@@ -67,7 +69,7 @@ else
   filestr=$(echo "$filestr" | grep -e "\.[ch]$") # remove non-C files
   IFS=$'\n' read -d '' -ra files <<< "${filestr}"; # convert to array
   if [ ${#files[@]} -ne 0 ]; then
-    "${formatter}" "${formatter_args[@]}" -l C "${files[@]}" 1>/dev/null || exitcode=1
+    "${tool}" "${tool_args[@]}" -l C "${files[@]}" 1>/dev/null || exitcode=1
     cish_files+=("${files[@]}")
   fi
 
@@ -77,23 +79,8 @@ else
   filestr=$(echo "$filestr" | grep -e "\.cc$" -e "\.h$") # remove non-C++ files
   IFS=$'\n' read -d '' -ra files <<< "${filestr}"; # convert to array
   if [ ${#files[@]} -ne 0 ]; then
-    "${formatter}" "${formatter_args[@]}" -l CPP "${files[@]}" 1>/dev/null || exitcode=1
+    "${tool}" "${tool_args[@]}" -l CPP "${files[@]}" 1>/dev/null || exitcode=1
     cish_files+=("${files[@]}")
-  fi
-fi
-
-# format JS files
-formatter='prettier'
-formatter_args=("${prettier_args[@]}")
-if ! command -v "${formatter}" &> /dev/null; then
-  echo "skipping $formatter (not found)"
-else
-  dirs=(web)
-  filestr=$(find_sourcefiles_in_dirs "${dirs[@]}") # newline-delimited string
-  filestr=$(echo "$filestr" | grep -e "\.js$") # remove non-JS files
-  IFS=$'\n' read -d '' -ra files <<< "${filestr}"; # convert to array
-  if [ ${#files[@]} -ne 0 ]; then
-    "${formatter}" "${formatter_args[@]}" "${files[@]}" || exitcode=1
   fi
 fi
 
@@ -115,6 +102,37 @@ fi
 if [ "${check}" -ne "0" ]; then
   if [ "${exitcode}" -eq "1" ]; then
     echo "style check failed. re-run format/format.sh without --check to reformat."
+  fi
+fi
+
+
+# format JS files
+tool='prettier'
+tool_args=("${prettier_args[@]}")
+if ! command -v "${tool}" &> /dev/null; then
+  echo "skipping $tool (not found)"
+else
+  dirs=(web)
+  filestr=$(find_sourcefiles_in_dirs "${dirs[@]}") # newline-delimited string
+  filestr=$(echo "$filestr" | grep -e "\.js$") # remove non-JS files
+  IFS=$'\n' read -d '' -ra files <<< "${filestr}"; # convert to array
+  if [ ${#files[@]} -ne 0 ]; then
+    "${tool}" "${tool_args[@]}" "${files[@]}" || exitcode=1
+  fi
+fi
+
+# lint JS files
+tool='eslint'
+tool_args=("${eslint_args[@]}")
+if ! command -v "${tool}" &> /dev/null; then
+  echo "skipping $tool (not found)"
+else
+  dirs=(web)
+  filestr=$(find_sourcefiles_in_dirs "${dirs[@]}") # newline-delimited string
+  filestr=$(echo "$filestr" | grep -e "\.js$") # remove non-JS files
+  IFS=$'\n' read -d '' -ra files <<< "${filestr}"; # convert to array
+  if [ ${#files[@]} -ne 0 ]; then
+    "${tool}" "${tool_args[@]}" "${files[@]}" || exitcode=1
   fi
 fi
 

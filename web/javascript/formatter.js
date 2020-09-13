@@ -6,24 +6,24 @@
  */
 
 Transmission.fmt = (function () {
-  var speed_K = 1000;
-  var speed_K_str = 'kB/s';
-  var speed_M_str = 'MB/s';
-  var speed_G_str = 'GB/s';
+  const speed_K = 1000;
+  const speed_K_str = 'kB/s';
+  const speed_M_str = 'MB/s';
+  const speed_G_str = 'GB/s';
 
-  var size_K = 1000;
-  var size_B_str = 'B';
-  var size_K_str = 'kB';
-  var size_M_str = 'MB';
-  var size_G_str = 'GB';
-  var size_T_str = 'TB';
+  const size_K = 1000;
+  const size_B_str = 'B';
+  const size_K_str = 'kB';
+  const size_M_str = 'MB';
+  const size_G_str = 'GB';
+  const size_T_str = 'TB';
 
-  var mem_K = 1024;
-  var mem_B_str = 'B';
-  var mem_K_str = 'KiB';
-  var mem_M_str = 'MiB';
-  var mem_G_str = 'GiB';
-  var mem_T_str = 'TiB';
+  const mem_K = 1024;
+  const mem_B_str = 'B';
+  const mem_K_str = 'KiB';
+  const mem_M_str = 'MiB';
+  const mem_G_str = 'GiB';
+  const mem_T_str = 'TiB';
 
   return {
     /*
@@ -58,10 +58,12 @@ Transmission.fmt = (function () {
      * @return {String} human-readable string
      */
     mem: function (bytes) {
-      if (bytes < mem_K) return [bytes, mem_B_str].join(' ');
+      if (bytes < mem_K) {
+        return [bytes, mem_B_str].join(' ');
+      }
 
-      var convertedSize;
-      var unit;
+      let convertedSize;
+      let unit;
 
       if (bytes < Math.pow(mem_K, 2)) {
         convertedSize = bytes / mem_K;
@@ -93,8 +95,8 @@ Transmission.fmt = (function () {
         return [bytes, size_B_str].join(' ');
       }
 
-      var convertedSize;
-      var unit;
+      let convertedSize;
+      let unit;
 
       if (bytes < Math.pow(size_K, 2)) {
         convertedSize = bytes / size_K;
@@ -125,7 +127,7 @@ Transmission.fmt = (function () {
     },
 
     speed: function (KBps) {
-      var speed = KBps;
+      let speed = KBps;
 
       if (speed <= 999.95) {
         // 0 KBps to 999 K
@@ -149,14 +151,14 @@ Transmission.fmt = (function () {
     },
 
     timeInterval: function (seconds) {
-      var days = Math.floor(seconds / 86400),
-        hours = Math.floor((seconds % 86400) / 3600),
-        minutes = Math.floor((seconds % 3600) / 60),
-        seconds = Math.floor(seconds % 60),
-        d = days + ' ' + (days > 1 ? 'days' : 'day'),
-        h = hours + ' ' + (hours > 1 ? 'hours' : 'hour'),
-        m = minutes + ' ' + (minutes > 1 ? 'minutes' : 'minute'),
-        s = seconds + ' ' + (seconds > 1 ? 'seconds' : 'second');
+      const days = Math.floor(seconds / 86400);
+      const hours = Math.floor((seconds % 86400) / 3600);
+      const minutes = Math.floor((seconds % 3600) / 60);
+      seconds = Math.floor(seconds % 60);
+      const d = days + ' ' + (days > 1 ? 'days' : 'day');
+      const h = hours + ' ' + (hours > 1 ? 'hours' : 'hour');
+      const m = minutes + ' ' + (minutes > 1 ? 'minutes' : 'minute');
+      const s = seconds + ' ' + (seconds > 1 ? 'seconds' : 'second');
 
       if (days) {
         if (days >= 4 || !hours) {
@@ -184,16 +186,16 @@ Transmission.fmt = (function () {
         return 'N/A';
       }
 
-      var myDate = new Date(seconds * 1000);
-      var now = new Date();
+      const myDate = new Date(seconds * 1000);
+      const now = new Date();
 
-      var date = '';
-      var time = '';
+      let date = '';
+      let time = '';
 
-      var sameYear = now.getFullYear() === myDate.getFullYear();
-      var sameMonth = now.getMonth() === myDate.getMonth();
+      const sameYear = now.getFullYear() === myDate.getFullYear();
+      const sameMonth = now.getMonth() === myDate.getMonth();
 
-      var dateDiff = now.getDate() - myDate.getDate();
+      const dateDiff = now.getDate() - myDate.getDate();
       if (sameYear && sameMonth && Math.abs(dateDiff) <= 1) {
         if (dateDiff === 0) {
           date = 'Today';
@@ -206,8 +208,8 @@ Transmission.fmt = (function () {
         date = myDate.toDateString();
       }
 
-      var hours = myDate.getHours();
-      var period = 'AM';
+      let hours = myDate.getHours();
+      let period = 'AM';
       if (hours > 12) {
         hours = hours - 12;
         period = 'PM';
@@ -218,11 +220,11 @@ Transmission.fmt = (function () {
       if (hours < 10) {
         hours = '0' + hours;
       }
-      var minutes = myDate.getMinutes();
+      let minutes = myDate.getMinutes();
       if (minutes < 10) {
         minutes = '0' + minutes;
       }
-      var seconds = myDate.getSeconds();
+      seconds = myDate.getSeconds();
       if (seconds < 10) {
         seconds = '0' + seconds;
       }
@@ -242,9 +244,9 @@ Transmission.fmt = (function () {
     },
 
     peerStatus: function (flagStr) {
-      var formattedFlags = [];
+      const formattedFlags = [];
       for (var i = 0, flag; (flag = flagStr[i]); ++i) {
-        var explanation = null;
+        let explanation = null;
         switch (flag) {
           case 'O':
             explanation = 'Optimistic unchoke';

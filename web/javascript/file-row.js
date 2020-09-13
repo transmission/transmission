@@ -6,7 +6,7 @@
  */
 
 function FileRow(torrent, depth, name, indices, even) {
-  var fields = {
+  const fields = {
     have: 0,
     indices: [],
     isWanted: true,
@@ -18,7 +18,7 @@ function FileRow(torrent, depth, name, indices, even) {
     torrent: null,
   };
 
-  var elements = {
+  const elements = {
     priority_low_button: null,
     priority_normal_button: null,
     priority_high_button: null,
@@ -26,23 +26,23 @@ function FileRow(torrent, depth, name, indices, even) {
     root: null,
   };
 
-  var initialize = function (torrent, depth, name, indices, even) {
+  const initialize = function (torrent, depth, name, indices, even) {
     fields.torrent = torrent;
     fields.indices = indices;
     createRow(torrent, depth, name, even);
   };
 
-  var refreshWantedHTML = function () {
-    var e = $(elements.root);
+  const refreshWantedHTML = function () {
+    const e = $(elements.root);
     e.toggleClass('skip', !fields.isWanted);
     e.toggleClass('complete', isDone());
     $(e[0].checkbox).prop('disabled', !isEditable());
     $(e[0].checkbox).prop('checked', fields.isWanted);
   };
 
-  var refreshProgressHTML = function () {
-    var pct = 100 * (fields.size ? fields.have / fields.size : 1.0);
-    var c = [
+  const refreshProgressHTML = function () {
+    const pct = 100 * (fields.size ? fields.have / fields.size : 1.0);
+    const c = [
       Transmission.fmt.size(fields.have),
       ' of ',
       Transmission.fmt.size(fields.size),
@@ -53,8 +53,8 @@ function FileRow(torrent, depth, name, indices, even) {
     setTextContent(elements.progress, c);
   };
 
-  var refreshImpl = function () {
-    var i,
+  const refreshImpl = function () {
+    let i,
       file,
       have = 0,
       size = 0,
@@ -118,7 +118,7 @@ function FileRow(torrent, depth, name, indices, even) {
   };
 
   var createRow = function (torrent, depth, name, even) {
-    var e, root, box;
+    let e, root, box;
 
     root = document.createElement('li');
     root.className = 'inspector_torrent_file_list_entry' + (even ? 'even' : 'odd');
