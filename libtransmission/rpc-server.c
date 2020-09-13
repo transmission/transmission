@@ -682,7 +682,7 @@ static void handle_request(struct evhttp_request* req, void* arg)
             !tr_ssha1_matches(server->password, pass)))
         {
             evhttp_add_header(req->output_headers, "WWW-Authenticate", "Basic realm=\"" MY_REALM "\"");
-            if (server-> isAntiBruteForceEnabled)
+            if (server->isAntiBruteForceEnabled)
             {
                 server->loginattempts++;
             }
