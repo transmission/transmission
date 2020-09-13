@@ -1274,7 +1274,7 @@ tr_rpc_server* tr_rpcInit(tr_session* session, tr_variant* settings)
     }
     else
     {
-        tr_rpcSetPassword(s, i);
+        tr_rpcSetAntiBruteForceThreshold(s, i);
     }
 
 

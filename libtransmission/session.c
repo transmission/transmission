@@ -2989,7 +2989,7 @@ int tr_sessionGetAntiBruteForceThreshold(tr_session const* session)
 {
     TR_ASSERT(tr_isSession(session));
 
-    return tr_rpcSetAntiBruteForceEnabled(session->rpcServer);
+    return tr_rpcGetAntiBruteForceThreshold(session->rpcServer);
 }
 
 struct TorrentAndPosition
