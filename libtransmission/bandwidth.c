@@ -7,7 +7,6 @@
  */
 
 #include <string.h> /* memset() */
-#include <stdio.h>
 
 #include "transmission.h"
 #include "session.h"
@@ -16,6 +15,7 @@
 #include "log.h"
 #include "peer-io.h"
 #include "tr-assert.h"
+#include "quark.h"
 #include "utils.h"
 #include "error.h"
 
@@ -415,8 +415,8 @@ void tr_bandwidthUsed(tr_bandwidth* b, tr_direction dir, size_t byteCount, bool 
 void tr_bandwidthGroupGetLimits(tr_bandwidth_group* group, bool* up_limited, unsigned int* up_limit, bool* down_limited,
     unsigned int* down_limit)
 {
-    *up_limit = tr_bandwidthGetDesiredSpeed_Bps(&group->bandwidth, TR_UP);
-    *down_limit = tr_bandwidthGetDesiredSpeed_Bps(&group->bandwidth, TR_DOWN);
+    *up_limit = toSpeedKBps(tr_bandwidthGetDesiredSpeed_Bps(&group->bandwidth, TR_UP));
+    *down_limit = toSpeedKBps(tr_bandwidthGetDesiredSpeed_Bps(&group->bandwidth, TR_DOWN));
     *up_limited = tr_bandwidthIsLimited(&group->bandwidth, TR_UP);
     *down_limited = tr_bandwidthIsLimited(&group->bandwidth, TR_DOWN);
 }
@@ -424,8 +424,8 @@ void tr_bandwidthGroupGetLimits(tr_bandwidth_group* group, bool* up_limited, uns
 void tr_bandwidthGroupSetLimits(tr_bandwidth_group* group, bool up_limited, unsigned int up_limit, bool down_limited,
     unsigned int down_limit)
 {
-    tr_bandwidthSetDesiredSpeed_Bps(&group->bandwidth, TR_UP, up_limit);
-    tr_bandwidthSetDesiredSpeed_Bps(&group->bandwidth, TR_DOWN, down_limit);
+    tr_bandwidthSetDesiredSpeed_Bps(&group->bandwidth, TR_UP, toSpeedBytes(up_limit));
+    tr_bandwidthSetDesiredSpeed_Bps(&group->bandwidth, TR_DOWN, toSpeedBytes(down_limit));
     tr_bandwidthSetLimited(&group->bandwidth, TR_UP, up_limited);
     tr_bandwidthSetLimited(&group->bandwidth, TR_DOWN, down_limited);
 }
@@ -479,75 +479,80 @@ tr_bandwidth_group* tr_bandwidthGroupFind(tr_session* session, char const* name)
 void tr_bandwidthGroupRead(tr_session* session, char const* configDir)
 {
     char* filename;
-    char* buf;
-    size_t len;
-
+    tr_variant group_list;
     filename = tr_buildPath(configDir, "bandwidthGroups", NULL);
-    buf = (char*)tr_loadFile(filename, &len, NULL);
-    if (buf)
+    if (tr_variantFromFile(&group_list, TR_VARIANT_FMT_JSON, filename, NULL) &&
+        tr_variantIsList(&group_list))
     {
-        char* line = buf - 1;
-        char* next;
-        while (line)
+        int n = tr_variantListSize(&group_list);
+
+        for (int i = 0; i < n; i++)
         {
-            int u, d, n;
-            uint32_t up, down;
-            char s[64];
-            line++;
-            next = strchr(line, '\n');
-            if ((next - line < 64) && (line[0] != '#'))
+            tr_variant* dict = tr_variantListChild(&group_list, i);
+            char const* name = NULL;
+            tr_variantDictFindStr(dict, TR_KEY_name, &name, NULL);
+            if (name)
             {
-                n = sscanf(line, "%s %d %u %d %u", s, &u, &up, &d, &down);
-                if (n == 5)
+                bool u = false, d = false;
+                uint32_t up = 0, down = 0;
+                int64_t val;
+
+                tr_variantDictFindBool(dict, TR_KEY_uploadLimited, &u);
+                if (tr_variantDictFindInt(dict, TR_KEY_uploadLimit, &val))
                 {
-                    tr_bandwidth_group* group;
-                    group = tr_bandwidthGroupFind(session, s);
-                    tr_bandwidthGroupSetLimits(group, u, up, d, down);
+                    up = val;
                 }
+
+                tr_variantDictFindBool(dict, TR_KEY_downloadLimited, &d);
+                if (tr_variantDictFindInt(dict, TR_KEY_downloadLimit, &val))
+                {
+                    down = val;
+                }
+
+                tr_bandwidth_group* group;
+                group = tr_bandwidthGroupFind(session, name);
+                tr_bandwidthGroupSetLimits(group, u, up, d, down);
             }
-
-            line = next;
         }
-
-        tr_free(buf);
     }
-
-    tr_free(filename);
 }
 
 int tr_bandwidthGroupWrite(tr_session* session, char const* configDir)
 {
     char* filename;
-    int fd;
-    tr_error* error = NULL;
-    int err = 0;
+    tr_variant group_list;
+    tr_bandwidth_group* group;
+    int n;
+    int ret;
+
+    n = 0;
+    group = session->groups;
+    while (group)
+    {
+        n++;
+        group = group->next;
+    }
+
+    tr_variantInitList(&group_list, n);
+    group = session->groups;
+    while (group)
+    {
+        tr_variant* dict;
+        bool u, d;
+        uint32_t up, down;
+        dict = tr_variantListAddDict(&group_list, 5);
+        tr_bandwidthGroupGetLimits(group, &u, &up, &d, &down);
+        tr_variantDictAddStr(dict, TR_KEY_name, group->name);
+        tr_variantDictAddBool(dict, TR_KEY_uploadLimited, u);
+        tr_variantDictAddInt(dict, TR_KEY_uploadLimit, up);
+        tr_variantDictAddBool(dict, TR_KEY_downloadLimited, d);
+        tr_variantDictAddInt(dict, TR_KEY_downloadLimit, down);
+        group = group->next;
+    }
 
     filename = tr_buildPath(configDir, "bandwidthGroups", NULL);
-    fd = tr_sys_file_open(filename, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE, 0600, &error);
-
-    if (fd != TR_BAD_SYS_FILE)
-    {
-        tr_bandwidth_group* group;
-
-        group = session->groups;
-        while (group)
-        {
-            bool u, d;
-            uint32_t up, down;
-            tr_bandwidthGroupGetLimits(group, &u, &up, &d, &down);
-            dprintf(fd, "%s %d %u %d %u\n", group->name, u, up, d, down);
-            group = group->next;
-        }
-
-        tr_sys_file_close(fd, NULL);
-    }
-    else
-    {
-        err = error->code;
-        tr_logAddError(_("Couldn't save temporary file \"%1$s\": %2$s"), filename, error->message);
-        tr_error_free(error);
-    }
-
+    ret = tr_variantToFile(&group_list, TR_VARIANT_FMT_JSON, filename);
     tr_free(filename);
-    return err;
+    tr_variantFree(&group_list);
+    return ret;
 }

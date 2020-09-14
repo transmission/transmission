@@ -2063,13 +2063,13 @@ static char const* groupSet(tr_session* session, tr_variant* args_in, tr_variant
         tr_variantDictFindBool(args_in, TR_KEY_speed_limit_down_enabled, &d);
         if (d && tr_variantDictFindInt(args_in, TR_KEY_speed_limit_down, &intVal))
         {
-            down = toSpeedBytes(intVal);
+            down = intVal;
         }
 
         tr_variantDictFindBool(args_in, TR_KEY_speed_limit_up_enabled, &u);
         if (u && tr_variantDictFindInt(args_in, TR_KEY_speed_limit_up, &intVal))
         {
-            up = toSpeedBytes(intVal);
+            up = intVal;
         }
 
         tr_bandwidthGroupSetLimits(group, u, up, d, down);
