@@ -7,14 +7,17 @@
  */
 
 #include <string.h> /* memset() */
+#include <stdio.h>
 
 #include "transmission.h"
+#include "session.h"
 #include "bandwidth.h"
 #include "crypto-utils.h" /* tr_rand_int_weak() */
 #include "log.h"
 #include "peer-io.h"
 #include "tr-assert.h"
 #include "utils.h"
+#include "error.h"
 
 #define dbgmsg(...) tr_logAddDeepNamed(NULL, __VA_ARGS__)
 
@@ -403,4 +406,148 @@ void tr_bandwidthUsed(tr_bandwidth* b, tr_direction dir, size_t byteCount, bool 
     {
         tr_bandwidthUsed(b->parent, dir, byteCount, isPieceData, now);
     }
+}
+
+/***
+****
+***/
+
+void tr_bandwidthGroupGetLimits(tr_bandwidth_group* group, bool* up_limited, unsigned int* up_limit, bool* down_limited,
+    unsigned int* down_limit)
+{
+    *up_limit = tr_bandwidthGetDesiredSpeed_Bps(&group->bandwidth, TR_UP);
+    *down_limit = tr_bandwidthGetDesiredSpeed_Bps(&group->bandwidth, TR_DOWN);
+    *up_limited = tr_bandwidthIsLimited(&group->bandwidth, TR_UP);
+    *down_limited = tr_bandwidthIsLimited(&group->bandwidth, TR_DOWN);
+}
+
+void tr_bandwidthGroupSetLimits(tr_bandwidth_group* group, bool up_limited, unsigned int up_limit, bool down_limited,
+    unsigned int down_limit)
+{
+    tr_bandwidthSetDesiredSpeed_Bps(&group->bandwidth, TR_UP, up_limit);
+    tr_bandwidthSetDesiredSpeed_Bps(&group->bandwidth, TR_DOWN, down_limit);
+    tr_bandwidthSetLimited(&group->bandwidth, TR_UP, up_limited);
+    tr_bandwidthSetLimited(&group->bandwidth, TR_DOWN, down_limited);
+}
+
+/* Should only be called if the group does not exist */
+tr_bandwidth_group* tr_bandwidthGroupNew(tr_session* session, char const* name)
+{
+    tr_bandwidth_group* group;
+    group = tr_new0(tr_bandwidth_group, 1);
+    group->next = NULL;
+    group->name = tr_strdup(name);
+    tr_bandwidthConstruct(&group->bandwidth, session, &session->bandwidth);
+    return group;
+}
+
+/* Find a bandwidth group by name. Create if it does not exist */
+tr_bandwidth_group* tr_bandwidthGroupFind(tr_session* session, char const* name)
+{
+    tr_bandwidth_group* group;
+    tr_bandwidth_group* last;
+
+    group = session->groups;
+    last = NULL;
+
+    while (group && strcmp(name, group->name))
+    {
+        last = group;
+        group = group->next;
+    }
+
+    if (group)
+    {
+        return group;
+    }
+    else
+    {
+        group = tr_bandwidthGroupNew(session, name);
+        if (last)
+        {
+            last->next = group;
+        }
+        else
+        {
+            session->groups = group;
+        }
+
+        return group;
+    }
+}
+
+void tr_bandwidthGroupRead(tr_session* session, char const* configDir)
+{
+    char* filename;
+    char* buf;
+    size_t len;
+
+    filename = tr_buildPath(configDir, "bandwidthGroups", NULL);
+    buf = (char*)tr_loadFile(filename, &len, NULL);
+    if (buf)
+    {
+        char* line = buf - 1;
+        char* next;
+        while (line)
+        {
+            int u, d, n;
+            uint32_t up, down;
+            char s[64];
+            line++;
+            next = strchr(line, '\n');
+            if ((next - line < 64) && (line[0] != '#'))
+            {
+                n = sscanf(line, "%s %d %u %d %u", s, &u, &up, &d, &down);
+                if (n == 5)
+                {
+                    tr_bandwidth_group* group;
+                    group = tr_bandwidthGroupFind(session, s);
+                    tr_bandwidthGroupSetLimits(group, u, up, d, down);
+                }
+            }
+
+            line = next;
+        }
+
+        tr_free(buf);
+    }
+
+    tr_free(filename);
+}
+
+int tr_bandwidthGroupWrite(tr_session* session, char const* configDir)
+{
+    char* filename;
+    int fd;
+    tr_error* error = NULL;
+    int err = 0;
+
+    filename = tr_buildPath(configDir, "bandwidthGroups", NULL);
+    fd = tr_sys_file_open(filename, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE, 0600, &error);
+
+    if (fd != TR_BAD_SYS_FILE)
+    {
+        tr_bandwidth_group* group;
+
+        group = session->groups;
+        while (group)
+        {
+            bool u, d;
+            uint32_t up, down;
+            tr_bandwidthGroupGetLimits(group, &u, &up, &d, &down);
+            dprintf(fd, "%s %d %u %d %u\n", group->name, u, up, d, down);
+            group = group->next;
+        }
+
+        tr_sys_file_close(fd, NULL);
+    }
+    else
+    {
+        err = error->code;
+        tr_logAddError(_("Couldn't save temporary file \"%1$s\": %2$s"), filename, error->message);
+        tr_error_free(error);
+    }
+
+    tr_free(filename);
+    return err;
 }

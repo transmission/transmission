@@ -121,6 +121,27 @@ tr_bandwidth;
 ***
 **/
 
+typedef struct tr_bandwidth_group
+{
+    tr_bandwidth bandwidth;
+    char* name;
+    struct tr_bandwidth_group* next;
+}
+tr_bandwidth_group;
+
+void tr_bandwidthGroupSetLimits(tr_bandwidth_group* group, bool up_limited, unsigned int up_limit, bool down_limited,
+    unsigned int down_limit);
+void tr_bandwidthGroupGetLimits(tr_bandwidth_group* group, bool* up_limited, unsigned int* up_limit, bool* down_limited,
+    unsigned int* down_limit);
+tr_bandwidth_group* tr_bandwidthGroupNew(tr_session* session, char const* name);
+tr_bandwidth_group* tr_bandwidthGroupFind(tr_session* session, char const* name);
+void tr_bandwidthGroupRead(tr_session* session, char const* configDir);
+int tr_bandwidthGroupWrite(tr_session* session, char const* configDir);
+
+/**
+***
+**/
+
 void tr_bandwidthConstruct(tr_bandwidth* bandwidth, tr_session* session, tr_bandwidth* parent);
 
 void tr_bandwidthDestruct(tr_bandwidth* bandwidth);

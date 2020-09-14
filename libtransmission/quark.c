@@ -136,6 +136,7 @@ static struct tr_key_struct const my_static[] =
     Q("fromLtep"),
     Q("fromPex"),
     Q("fromTracker"),
+    Q("group"),
     Q("hasAnnounced"),
     Q("hasScraped"),
     Q("hashString"),

@@ -149,6 +149,29 @@ static uint64_t loadLabels(tr_variant* dict, tr_torrent* tor)
 ****
 ***/
 
+static void saveGroup(tr_variant* dict, tr_torrent const* tor)
+{
+    tr_variantDictAddStr(dict, TR_KEY_group, tor->group);
+}
+
+static uint64_t loadGroup(tr_variant* dict, tr_torrent* tor)
+{
+    uint64_t ret = 0;
+    char const* group;
+
+    if (tr_variantDictFindStr(dict, TR_KEY_group, &group, NULL))
+    {
+        ret = TR_FR_GROUP;
+        tr_torrentSetGroup(tor, group);
+    }
+
+    return ret;
+}
+
+/***
+****
+***/
+
 static void saveDND(tr_variant* dict, tr_torrent const* tor)
 {
     tr_variant* list;
@@ -774,6 +797,7 @@ void tr_torrentSaveResume(tr_torrent* tor)
     saveFilenames(&top, tor);
     saveName(&top, tor);
     saveLabels(&top, tor);
+    saveGroup(&top, tor);
 
     filename = getResumeFilename(tor, TR_METAINFO_BASENAME_HASH);
 
@@ -985,6 +1009,11 @@ static uint64_t loadFromFile(tr_torrent* tor, uint64_t fieldsToLoad, bool* didRe
     if ((fieldsToLoad & TR_FR_LABELS) != 0)
     {
         fieldsLoaded |= loadLabels(&top, tor);
+    }
+
+    if ((fieldsToLoad & TR_FR_GROUP) != 0)
+    {
+        fieldsLoaded |= loadGroup(&top, tor);
     }
 
     /* loading the resume file triggers of a lot of changes,

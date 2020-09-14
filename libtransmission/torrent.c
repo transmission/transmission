@@ -2525,6 +2525,27 @@ void tr_torrentSetFileDLs(tr_torrent* tor, tr_file_index_t const* files, tr_file
 ****
 ***/
 
+void tr_torrentSetGroup(tr_torrent* tor, char const* group)
+{
+    TR_ASSERT(tr_isTorrent(tor));
+
+    tr_torrentLock(tor);
+
+    tr_free(tor->group);
+    tor->group = tr_strdup(group);
+    tr_bandwidth_group* bw_group;
+    bw_group = tr_bandwidthGroupFind(tor->session, group);
+    tr_bandwidthSetParent(&tor->bandwidth, &bw_group->bandwidth);
+
+    tr_torrentSetDirty(tor);
+
+    tr_torrentUnlock(tor);
+}
+
+/***
+****
+***/
+
 void tr_torrentSetLabels(tr_torrent* tor, tr_ptrArray* labels)
 {
     TR_ASSERT(tr_isTorrent(tor));

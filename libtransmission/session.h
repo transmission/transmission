@@ -225,6 +225,8 @@ struct tr_session
 
     struct tr_bindinfo* public_ipv4;
     struct tr_bindinfo* public_ipv6;
+
+    tr_bandwidth_group* groups;
 };
 
 static inline tr_port tr_sessionGetPublicPeerPort(tr_session const* session)
