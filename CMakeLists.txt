@@ -61,23 +61,24 @@ endif()
 
 set(TR_VCS_REVISION_FILE "${CMAKE_SOURCE_DIR}/REVISION")
 
+if(IS_DIRECTORY ${CMAKE_SOURCE_DIR}/.git)
+    find_package(Git)
+endif()
+
 if(NOT "$ENV{JENKINS_URL}" STREQUAL "" AND NOT "$ENV{GIT_COMMIT}" STREQUAL "")
     set(TR_VCS_REVISION "$ENV{GIT_COMMIT}")
 elseif(NOT "$ENV{TEAMCITY_PROJECT_NAME}" STREQUAL "" AND NOT "$ENV{BUILD_VCS_NUMBER}" STREQUAL "")
     set(TR_VCS_REVISION "$ENV{BUILD_VCS_NUMBER}")
-elseif(IS_DIRECTORY ${CMAKE_SOURCE_DIR}/.git)
-    find_package(Git)
-    if(GIT_FOUND)
-        execute_process(
-            COMMAND
-                ${GIT_EXECUTABLE} rev-list --max-count=1 HEAD
-            WORKING_DIRECTORY
-                ${CMAKE_SOURCE_DIR}
-            OUTPUT_VARIABLE
-                TR_VCS_REVISION
-            OUTPUT_STRIP_TRAILING_WHITESPACE
-        )
-    endif()
+elseif(GIT_FOUND)
+    execute_process(
+        COMMAND
+            ${GIT_EXECUTABLE} rev-list --max-count=1 HEAD
+        WORKING_DIRECTORY
+            ${CMAKE_SOURCE_DIR}
+        OUTPUT_VARIABLE
+            TR_VCS_REVISION
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
 endif()
 
 if("${TR_VCS_REVISION}" STREQUAL "" AND EXISTS "${TR_VCS_REVISION_FILE}")
@@ -663,5 +664,33 @@ set(CPACK_SOURCE_PACKAGE_FILE_NAME "${TR_NAME}-${TR_USER_AGENT_PREFIX}")
 set(CPACK_SOURCE_IGNORE_FILES
     \\\\.git
 )
+
+## Code Formatting
+
+if(GIT_FOUND)
+    message(STATUS "Looking for uncrustify")
+    execute_process(COMMAND
+        "${GIT_EXECUTABLE}" rev-parse --show-toplevel
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        OUTPUT_VARIABLE TR_GIT_ROOT
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+    if(TR_GIT_ROOT)
+        configure_file(
+            "${CMAKE_SOURCE_DIR}/format/pre-commit"
+            "${TR_GIT_ROOT}/.git/hooks/pre-commit"
+            COPYONLY
+        )
+        add_custom_target(check-format
+            COMMAND "${CMAKE_SOURCE_DIR}/format/format.sh" --all --check
+            WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+        )
+        add_custom_target(format
+            COMMAND "${CMAKE_SOURCE_DIR}/format/format.sh" --all
+            WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+        )
+    endif(TR_GIT_ROOT)
+    unset(TR_GIT_ROOT)
+endif(GIT_FOUND)
 
 include(CPack)

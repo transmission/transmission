@@ -1,0 +1,12 @@
+libtransmission/ConvertUTF.c
+libtransmission/ConvertUTF.h
+libtransmission/jsonsl.c
+libtransmission/jsonsl.h
+libtransmission/wildmat.c
+web/javascript/jquery/jquery-migrate.min.js
+web/javascript/jquery/jquery.min.js
+web/javascript/jquery/jquery.transmenu.js
+web/javascript/jquery/jquery.transmenu.min.js
+web/javascript/jquery/jquery.ui-contextmenu.js
+web/javascript/jquery/jquery.ui-contextmenu.min.js
+web/javascript/jquery/jquery-ui.min.js
