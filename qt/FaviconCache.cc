@@ -6,6 +6,7 @@
  *
  */
 
+#include <array>
 #include <iostream>
 
 #include <QDir>
