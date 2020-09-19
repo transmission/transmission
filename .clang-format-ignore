@@ -1,8 +1,0 @@
-libtransmission/ConvertUTF.c
-libtransmission/ConvertUTF.h
-libtransmission/jsonsl.c
-libtransmission/jsonsl.h
-libtransmission/wildmat.c
-macos/*
-third-party/*
-web/*
