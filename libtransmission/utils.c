@@ -26,9 +26,10 @@
 #include <time.h>   /* nanosleep() */
 
 #ifdef _WIN32
+#include <windows.h> /* Sleep(), GetSystemTimeAsFileTime(), GetEnvironmentVariable() */
+
 #include <shellapi.h> /* CommandLineToArgv() */
 #include <shlwapi.h>  /* StrStrIA() */
-#include <windows.h>  /* Sleep(), GetSystemTimeAsFileTime(), GetEnvironmentVariable() */
 #include <ws2tcpip.h> /* WSAStartup() */
 #else
 #include <sys/time.h>

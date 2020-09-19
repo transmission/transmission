@@ -60,14 +60,14 @@ IncludeCategories:
     Priority:        0
   - Regex:           '<libtransmission\/transmission\.h>'
     Priority:        0
+  - Regex:           '^<windows\.h>'
+    Priority:        0
   - Regex:           '^<.*\.h>'
     Priority:        1
   - Regex:           '^<.*'
     Priority:        2
   - Regex:           '.*'
     Priority:        3
-IncludeIsMainRegex: '([-_](test|unittest))?$'
-IncludeIsMainSourceRegex: ''
 IndentCaseLabels: true
 IndentCaseBlocks: false
 IndentGotoLabels: true
@@ -129,7 +129,7 @@ RawStringFormats:
     CanonicalDelimiter: ''
     BasedOnStyle:    google
 ReflowComments:  true
-SortIncludes:    true
+SortIncludes:    false
 SortUsingDeclarations: true
 SpaceAfterCStyleCast: false
 SpaceAfterLogicalNot: false
