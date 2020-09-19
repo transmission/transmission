@@ -9,8 +9,9 @@
 #include <string.h> /* strlen(), strstr() */
 
 #ifdef _WIN32
-#include <wincrypt.h>
 #include <windows.h>
+
+#include <wincrypt.h>
 #endif
 
 #include <curl/curl.h>

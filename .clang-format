@@ -159,8 +159,9 @@ TabWidth:        8
 UseCRLF:         false
 UseTab:          Never
 WhitespaceSensitiveMacros:
-  - STRINGIZE
-  - PP_STRINGIZE
+  - API_HEADER_CRYPT
   - BOOST_PP_STRINGIZE
+  - PP_STRINGIZE
+  - STRINGIZE
 ...
 
