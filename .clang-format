@@ -159,6 +159,7 @@ TabWidth:        8
 UseCRLF:         false
 UseTab:          Never
 WhitespaceSensitiveMacros:
+  - API_HEADER
   - API_HEADER_CRYPT
   - BOOST_PP_STRINGIZE
   - PP_STRINGIZE

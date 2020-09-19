@@ -9,12 +9,12 @@
 /* *INDENT-OFF* */
 #if defined(CYASSL_IS_WOLFSSL)
 #define API_HEADER(x) <wolfssl/x>
-#define API_HEADER_CRYPT(x) API_HEADER(wolfcrypt / x)
+#define API_HEADER_CRYPT(x) API_HEADER(wolfcrypt/x)
 #define API(x) wc_##x
 #define API_VERSION_HEX LIBWOLFSSL_VERSION_HEX
 #else
 #define API_HEADER(x) <cyassl/x>
-#define API_HEADER_CRYPT(x) API_HEADER(ctaocrypt / x)
+#define API_HEADER_CRYPT(x) API_HEADER(ctaocrypt/x)
 #define API(x) x
 #define API_VERSION_HEX LIBCYASSL_VERSION_HEX
 #endif
