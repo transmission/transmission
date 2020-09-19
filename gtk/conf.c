@@ -91,7 +91,8 @@ static void tr_prefs_init_defaults(tr_variant* d)
     tr_variantDictAddStr(d, TR_KEY_statusbar_stats, "total-ratio");
     tr_variantDictAddBool(d, TR_KEY_torrent_added_notification_enabled, true);
     tr_variantDictAddBool(d, TR_KEY_torrent_complete_notification_enabled, true);
-    tr_variantDictAddStr(d, TR_KEY_torrent_complete_sound_command,
+    tr_variantDictAddStr(
+        d, TR_KEY_torrent_complete_sound_command,
         "canberra-gtk-play -i complete-download -d 'transmission torrent downloaded'");
     tr_variantDictAddBool(d, TR_KEY_torrent_complete_sound_enabled, true);
     tr_variantDictAddBool(d, TR_KEY_show_options_window, TRUE);

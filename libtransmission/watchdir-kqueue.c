@@ -9,11 +9,11 @@
 #include <errno.h>
 #include <string.h> /* strcmp() */
 
-#include <fcntl.h> /* open() */
+#include <fcntl.h>  /* open() */
 #include <unistd.h> /* close() */
 
-#include <sys/types.h>
 #include <sys/event.h>
+#include <sys/types.h>
 
 #ifndef O_EVTONLY
 #define O_EVTONLY O_RDONLY
@@ -28,15 +28,17 @@
 #include "ptrarray.h"
 #include "tr-assert.h"
 #include "utils.h"
-#include "watchdir.h"
 #include "watchdir-common.h"
+#include "watchdir.h"
 
 /***
 ****
 ***/
 
-#define log_error(...) (!tr_logLevelIsActive(TR_LOG_ERROR) ? (void)0 : \
-    tr_logAddMessage(__FILE__, __LINE__, TR_LOG_ERROR, "watchdir:kqueue", __VA_ARGS__))
+#define log_error(...)                  \
+    (!tr_logLevelIsActive(TR_LOG_ERROR) \
+         ? (void)0                      \
+         : tr_logAddMessage(__FILE__, __LINE__, TR_LOG_ERROR, "watchdir:kqueue", __VA_ARGS__))
 
 /***
 ****
@@ -50,8 +52,7 @@ typedef struct tr_watchdir_kqueue
     int dirfd;
     struct event* event;
     tr_ptrArray dir_entries;
-}
-tr_watchdir_kqueue;
+} tr_watchdir_kqueue;
 
 #define BACKEND_UPCAST(b) ((tr_watchdir_kqueue*)(b))
 
@@ -69,7 +70,7 @@ static void tr_watchdir_kqueue_on_event(evutil_socket_t fd, short type, void* co
     tr_watchdir_t const handle = context;
     tr_watchdir_kqueue* const backend = BACKEND_UPCAST(tr_watchdir_get_backend(handle));
     struct kevent ke;
-    struct timespec const ts = { .tv_sec = 0, .tv_nsec = 0 };
+    struct timespec const ts = {.tv_sec = 0, .tv_nsec = 0};
 
     if (kevent(backend->kq, NULL, 0, &ke, 1, &ts) == -1)
     {
@@ -138,17 +139,21 @@ tr_watchdir_backend* tr_watchdir_kqueue_new(tr_watchdir_t handle)
     }
 
     /* Register kevent filter with kqueue descriptor */
-    EV_SET(&ke, backend->dirfd, EVFILT_VNODE, EV_ADD | EV_ENABLE | EV_CLEAR, KQUEUE_WATCH_MASK, 0, NULL);
+    EV_SET(&ke, backend->dirfd, EVFILT_VNODE, EV_ADD | EV_ENABLE | EV_CLEAR, KQUEUE_WATCH_MASK, 0,
+           NULL);
 
     if (kevent(backend->kq, &ke, 1, NULL, 0, NULL) == -1)
     {
-        log_error("Failed to set directory event filter with fd %d: %s", backend->kq, tr_strerror(errno));
+        log_error("Failed to set directory event filter with fd %d: %s", backend->kq,
+                  tr_strerror(errno));
         goto fail;
     }
 
     /* Create libevent task for event descriptor */
-    if ((backend->event = event_new(tr_watchdir_get_event_base(handle), backend->kq, EV_READ | EV_ET | EV_PERSIST,
-        &tr_watchdir_kqueue_on_event, handle)) == NULL)
+    if ((backend->event =
+             event_new(tr_watchdir_get_event_base(handle), backend->kq,
+                       EV_READ | EV_ET | EV_PERSIST, &tr_watchdir_kqueue_on_event, handle))
+        == NULL)
     {
         log_error("Failed to create event: %s", tr_strerror(errno));
         goto fail;

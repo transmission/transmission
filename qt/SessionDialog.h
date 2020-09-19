@@ -22,17 +22,17 @@ class SessionDialog : public BaseDialog
     Q_OBJECT
     TR_DISABLE_COPY_MOVE(SessionDialog)
 
-public:
+   public:
     SessionDialog(Session& session, Prefs& prefs, QWidget* parent = nullptr);
 
-public slots:
+   public slots:
     // QDialog
     void accept() override;
 
-private slots:
+   private slots:
     void resensitize();
 
-private:
+   private:
     Session& session_;
     Prefs& prefs_;
 

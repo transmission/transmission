@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include <inttypes.h>
 #include <libtransmission/transmission.h> /* tr_variant, tr_session */
+#include <inttypes.h>
 #include <libtransmission/quark.h>
 
 void gtr_pref_init(char const* config_dir);

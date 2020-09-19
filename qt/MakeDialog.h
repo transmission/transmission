@@ -20,7 +20,7 @@ class Session;
 
 extern "C"
 {
-struct tr_metainfo_builder;
+    struct tr_metainfo_builder;
 }
 
 class MakeDialog : public BaseDialog
@@ -28,22 +28,22 @@ class MakeDialog : public BaseDialog
     Q_OBJECT
     TR_DISABLE_COPY_MOVE(MakeDialog)
 
-public:
+   public:
     MakeDialog(Session&, QWidget* parent = nullptr);
 
-protected:
+   protected:
     // QWidget
     void dragEnterEvent(QDragEnterEvent*) override;
     void dropEvent(QDropEvent*) override;
 
-private:
+   private:
     QString getSource() const;
 
-private slots:
+   private slots:
     void onSourceChanged();
     void makeTorrent();
 
-private:
+   private:
     Session& session_;
 
     Ui::MakeDialog ui_ = {};

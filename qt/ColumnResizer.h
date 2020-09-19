@@ -21,7 +21,7 @@ class ColumnResizer : public QObject
     Q_OBJECT
     TR_DISABLE_COPY_MOVE(ColumnResizer)
 
-public:
+   public:
     ColumnResizer(QObject* parent = nullptr);
 
     void addLayout(QGridLayout* layout);
@@ -29,10 +29,10 @@ public:
     // QObject
     bool eventFilter(QObject* object, QEvent* event) override;
 
-public slots:
+   public slots:
     void update();
 
-private:
+   private:
     void scheduleUpdate();
 
     QTimer* timer_ = {};

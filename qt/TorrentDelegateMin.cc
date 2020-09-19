@@ -45,14 +45,13 @@ enum
 
 namespace
 {
-
 class ItemLayout
 {
-private:
+   private:
     QString name_text_;
     QString status_text_;
 
-public:
+   public:
     QFont name_font;
     QFont status_font;
 
@@ -62,8 +61,9 @@ public:
     QRect status_rect;
     QRect bar_rect;
 
-    ItemLayout(QString name_text, QString status_text, QIcon const& emblem_icon, QFont const& base_font,
-        Qt::LayoutDirection direction, QPoint const& top_left, int width);
+    ItemLayout(QString name_text, QString status_text, QIcon const& emblem_icon,
+               QFont const& base_font, Qt::LayoutDirection direction, QPoint const& top_left,
+               int width);
 
     [[nodiscard]] QSize size() const
     {
@@ -75,24 +75,22 @@ public:
         return elidedText(name_font, name_text_, name_rect.width());
     }
 
-    [[nodiscard]] QString statusText() const
-    {
-        return status_text_;
-    }
+    [[nodiscard]] QString statusText() const { return status_text_; }
 
-private:
+   private:
     [[nodiscard]] QString elidedText(QFont const& font, QString const& text, int width) const
     {
         return QFontMetrics(font).elidedText(text, Qt::ElideRight, width);
     }
 };
 
-ItemLayout::ItemLayout(QString name_text, QString status_text, QIcon const& emblem_icon, QFont const& base_font,
-    Qt::LayoutDirection direction, QPoint const& top_left, int width) :
-    name_text_(std::move(name_text)),
-    status_text_(std::move(status_text)),
-    name_font(base_font),
-    status_font(base_font)
+ItemLayout::ItemLayout(QString name_text, QString status_text, QIcon const& emblem_icon,
+                       QFont const& base_font, Qt::LayoutDirection direction,
+                       QPoint const& top_left, int width)
+    : name_text_(std::move(name_text)),
+      status_text_(std::move(status_text)),
+      name_font(base_font),
+      status_font(base_font)
 {
     QStyle const* style(qApp->style());
     int const icon_size(style->pixelMetric(QStyle::PM_SmallIconSize));
@@ -109,36 +107,43 @@ ItemLayout::ItemLayout(QString name_text, QString status_text, QIcon const& embl
     bar_style.maximum = 100;
     bar_style.progress = 100;
     bar_style.textVisible = true;
-    QSize const bar_size(bar_style.rect.width() * 2 - style->subElementRect(QStyle::SE_ProgressBarGroove, &bar_style).width(),
+    QSize const bar_size(
+        bar_style.rect.width() * 2
+            - style->subElementRect(QStyle::SE_ProgressBarGroove, &bar_style).width(),
         bar_style.rect.height());
 
-    QRect base_rect(top_left,
-        QSize(width, std::max({ icon_size, name_size.height(), status_size.height(), bar_size.height() })));
+    QRect base_rect(top_left, QSize(width, std::max({icon_size, name_size.height(),
+                                                     status_size.height(), bar_size.height()})));
 
-    icon_rect = style->alignedRect(direction, Qt::AlignLeft | Qt::AlignVCenter, QSize(icon_size, icon_size), base_rect);
-    emblem_rect = style->alignedRect(direction, Qt::AlignRight | Qt::AlignBottom, emblem_icon.actualSize(icon_rect.size() / 2,
-        QIcon::Normal, QIcon::On), icon_rect);
-    bar_rect = style->alignedRect(direction, Qt::AlignRight | Qt::AlignVCenter, bar_size, base_rect);
-    Utils::narrowRect(base_rect, icon_rect.width() + GUI_PAD, bar_rect.width() + GUI_PAD, direction);
-    status_rect = style->alignedRect(direction, Qt::AlignRight | Qt::AlignVCenter, QSize(status_size.width(),
-        base_rect.height()),
-        base_rect);
+    icon_rect = style->alignedRect(direction, Qt::AlignLeft | Qt::AlignVCenter,
+                                   QSize(icon_size, icon_size), base_rect);
+    emblem_rect = style->alignedRect(
+        direction, Qt::AlignRight | Qt::AlignBottom,
+        emblem_icon.actualSize(icon_rect.size() / 2, QIcon::Normal, QIcon::On), icon_rect);
+    bar_rect =
+        style->alignedRect(direction, Qt::AlignRight | Qt::AlignVCenter, bar_size, base_rect);
+    Utils::narrowRect(base_rect, icon_rect.width() + GUI_PAD, bar_rect.width() + GUI_PAD,
+                      direction);
+    status_rect = style->alignedRect(direction, Qt::AlignRight | Qt::AlignVCenter,
+                                     QSize(status_size.width(), base_rect.height()), base_rect);
     Utils::narrowRect(base_rect, 0, status_rect.width() + GUI_PAD, direction);
     name_rect = base_rect;
 }
 
-} // namespace
+}  // namespace
 
 QSize TorrentDelegateMin::sizeHint(QStyleOptionViewItem const& option, Torrent const& tor) const
 {
     bool const is_magnet(!tor.hasMetadata());
     QSize const m(margin(*qApp->style()));
-    ItemLayout const layout(is_magnet ? progressString(tor) : tor.name(), shortStatusString(tor), QIcon(), option.font,
-        option.direction, QPoint(0, 0), option.rect.width() - m.width() * 2);
+    ItemLayout const layout(is_magnet ? progressString(tor) : tor.name(), shortStatusString(tor),
+                            QIcon(), option.font, option.direction, QPoint(0, 0),
+                            option.rect.width() - m.width() * 2);
     return layout.size() + m * 2;
 }
 
-void TorrentDelegateMin::drawTorrent(QPainter* painter, QStyleOptionViewItem const& option, Torrent const& tor) const
+void TorrentDelegateMin::drawTorrent(QPainter* painter, QStyleOptionViewItem const& option,
+                                     Torrent const& tor) const
 {
     QStyle const* style(qApp->style());
 
@@ -227,8 +232,9 @@ void TorrentDelegateMin::drawTorrent(QPainter* painter, QStyleOptionViewItem con
     // layout
     QSize const m(margin(*style));
     QRect const content_rect(option.rect.adjusted(m.width(), m.height(), -m.width(), -m.height()));
-    ItemLayout const layout(is_magnet ? progressString(tor) : tor.name(), shortStatusString(tor), emblem_icon, option.font,
-        option.direction, content_rect.topLeft(), content_rect.width());
+    ItemLayout const layout(is_magnet ? progressString(tor) : tor.name(), shortStatusString(tor),
+                            emblem_icon, option.font, option.direction, content_rect.topLeft(),
+                            content_rect.width());
 
     // render
     if (tor.hasError() && !is_item_selected)
@@ -273,7 +279,8 @@ void TorrentDelegateMin::drawTorrent(QPainter* painter, QStyleOptionViewItem con
     }
 
     progress_bar_style_.state = progress_bar_state;
-    progress_bar_style_.text = QStringLiteral("%1%").arg(static_cast<int>(tr_truncd(100.0 * tor.percentDone(), 0)));
+    progress_bar_style_.text =
+        QStringLiteral("%1%").arg(static_cast<int>(tr_truncd(100.0 * tor.percentDone(), 0)));
     progress_bar_style_.textVisible = true;
     progress_bar_style_.textAlignment = Qt::AlignCenter;
     setProgressBarPercentDone(option, tor);

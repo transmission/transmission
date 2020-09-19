@@ -8,9 +8,9 @@
 
 #pragma once
 
-#include <QString>
 #include <QMap>
 #include <QSet>
+#include <QString>
 #include <QTimer>
 
 #include "BaseDialog.h"
@@ -35,19 +35,16 @@ class DetailsDialog : public BaseDialog
     Q_OBJECT
     TR_DISABLE_COPY_MOVE(DetailsDialog)
 
-public:
+   public:
     DetailsDialog(Session&, Prefs&, TorrentModel const&, QWidget* parent = nullptr);
     ~DetailsDialog() override;
 
     void setIds(torrent_ids_t const& ids);
 
     // QWidget
-    QSize sizeHint() const override
-    {
-        return QSize(440, 460);
-    }
+    QSize sizeHint() const override { return QSize(440, 460); }
 
-private:
+   private:
     void initPeersTab();
     void initTrackerTab();
     void initInfoTab();
@@ -57,7 +54,7 @@ private:
     QIcon getStockIcon(QString const& freedesktop_name, int fallback);
     void setEnabled(bool);
 
-private slots:
+   private slots:
     void refreshModel();
     void refreshPref(int key);
     void refreshUI();
@@ -90,7 +87,7 @@ private slots:
     void onIdleModeChanged(int);
     void onIdleLimitChanged();
 
-private:
+   private:
     /* When a torrent property is edited in the details dialog (e.g.
        file priority, speed limits, etc.), don't update those UI fields
        until we know the server has processed the request. This keeps
@@ -100,18 +97,19 @@ private:
     std::unordered_set<Session::Tag> pending_changes_tags_;
     QMetaObject::Connection pending_changes_connection_;
 
-    template<typename T>
+    template <typename T>
     void torrentSet(torrent_ids_t const& ids, tr_quark key, T val)
     {
         auto const tag = session_.torrentSet(ids, key, val);
         pending_changes_tags_.insert(tag);
         if (!pending_changes_connection_)
         {
-            pending_changes_connection_ = connect(&session_, &Session::sessionCalled, this, &DetailsDialog::onSessionCalled);
+            pending_changes_connection_ =
+                connect(&session_, &Session::sessionCalled, this, &DetailsDialog::onSessionCalled);
         }
     }
 
-    template<typename T>
+    template <typename T>
     void torrentSet(tr_quark key, T val)
     {
         torrentSet(ids_, key, val);

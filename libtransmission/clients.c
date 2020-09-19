@@ -8,7 +8,7 @@
 
 /* thanks amc1! */
 
-#include <ctype.h> /* isprint() */
+#include <ctype.h>  /* isprint() */
 #include <stdlib.h> /* strtol() */
 #include <string.h>
 
@@ -76,32 +76,29 @@ static char const* getMnemonicEnd(uint8_t ch)
 {
     switch (ch)
     {
-    case 'b':
-    case 'B':
-        return " (Beta)";
+        case 'b':
+        case 'B': return " (Beta)";
 
-    case 'd':
-        return " (Debug)";
+        case 'd': return " (Debug)";
 
-    case 'x':
-    case 'X':
-    case 'Z':
-        return " (Dev)";
+        case 'x':
+        case 'X':
+        case 'Z': return " (Dev)";
 
-    default:
-        return "";
+        default: return "";
     }
 }
 
 static void three_digits(char* buf, size_t buflen, char const* name, uint8_t const* digits)
 {
-    tr_snprintf(buf, buflen, "%s %d.%d.%d", name, charint(digits[0]), charint(digits[1]), charint(digits[2]));
+    tr_snprintf(buf, buflen, "%s %d.%d.%d", name, charint(digits[0]), charint(digits[1]),
+                charint(digits[2]));
 }
 
 static void four_digits(char* buf, size_t buflen, char const* name, uint8_t const* digits)
 {
-    tr_snprintf(buf, buflen, "%s %d.%d.%d.%d", name, charint(digits[0]), charint(digits[1]), charint(digits[2]),
-        charint(digits[3]));
+    tr_snprintf(buf, buflen, "%s %d.%d.%d.%d", name, charint(digits[0]), charint(digits[1]),
+                charint(digits[2]), charint(digits[3]));
 }
 
 static void two_major_two_minor(char* buf, size_t buflen, char const* name, uint8_t const* digits)
@@ -210,29 +207,29 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
             }
             else /* current client style: -TR111Z- is 1.11+ */
             {
-                tr_snprintf(buf, buflen, "Transmission %d.%02d%s", strint(id + 3, 1), strint(id + 4, 2),
-                    (id[6] == 'Z' || id[6] == 'X') ? "+" : "");
+                tr_snprintf(buf, buflen, "Transmission %d.%02d%s", strint(id + 3, 1),
+                            strint(id + 4, 2), (id[6] == 'Z' || id[6] == 'X') ? "+" : "");
             }
         }
         else if (strncmp(chid + 1, "UT", 2) == 0)
         {
-            tr_snprintf(buf, buflen, "\xc2\xb5Torrent %d.%d.%d%s", strint(id + 3, 1), strint(id + 4, 1), strint(id + 5, 1),
-                getMnemonicEnd(id[6]));
+            tr_snprintf(buf, buflen, "\xc2\xb5Torrent %d.%d.%d%s", strint(id + 3, 1),
+                        strint(id + 4, 1), strint(id + 5, 1), getMnemonicEnd(id[6]));
         }
         else if (strncmp(chid + 1, "BT", 2) == 0)
         {
-            tr_snprintf(buf, buflen, "BitTorrent %d.%d.%d%s", strint(id + 3, 1), strint(id + 4, 1), strint(id + 5, 1),
-                getMnemonicEnd(id[6]));
+            tr_snprintf(buf, buflen, "BitTorrent %d.%d.%d%s", strint(id + 3, 1), strint(id + 4, 1),
+                        strint(id + 5, 1), getMnemonicEnd(id[6]));
         }
         else if (strncmp(chid + 1, "UM", 2) == 0)
         {
-            tr_snprintf(buf, buflen, "\xc2\xb5Torrent Mac %d.%d.%d%s", strint(id + 3, 1), strint(id + 4, 1), strint(id + 5, 1),
-                getMnemonicEnd(id[6]));
+            tr_snprintf(buf, buflen, "\xc2\xb5Torrent Mac %d.%d.%d%s", strint(id + 3, 1),
+                        strint(id + 4, 1), strint(id + 5, 1), getMnemonicEnd(id[6]));
         }
         else if (strncmp(chid + 1, "UE", 2) == 0)
         {
-            tr_snprintf(buf, buflen, "\xc2\xb5Torrent Embedded %d.%d.%d%s", strint(id + 3, 1), strint(id + 4, 1),
-                strint(id + 5, 1), getMnemonicEnd(id[6]));
+            tr_snprintf(buf, buflen, "\xc2\xb5Torrent Embedded %d.%d.%d%s", strint(id + 3, 1),
+                        strint(id + 4, 1), strint(id + 5, 1), getMnemonicEnd(id[6]));
         }
         /* */
         else if (strncmp(chid + 1, "AZ", 2) == 0)
@@ -251,11 +248,13 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
         {
             if (id[5] == 'D')
             {
-                tr_snprintf(buf, buflen, "KTorrent %d.%d Dev %d", charint(id[3]), charint(id[4]), charint(id[6]));
+                tr_snprintf(buf, buflen, "KTorrent %d.%d Dev %d", charint(id[3]), charint(id[4]),
+                            charint(id[6]));
             }
             else if (id[5] == 'R')
             {
-                tr_snprintf(buf, buflen, "KTorrent %d.%d RC %d", charint(id[3]), charint(id[4]), charint(id[6]));
+                tr_snprintf(buf, buflen, "KTorrent %d.%d RC %d", charint(id[3]), charint(id[4]),
+                            charint(id[6]));
             }
             else
             {
@@ -561,11 +560,13 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
         }
         else if (strncmp(chid + 1, "CT", 2) == 0)
         {
-            tr_snprintf(buf, buflen, "CTorrent %d.%d.%02d", charint(id[3]), charint(id[4]), strint(id + 5, 2));
+            tr_snprintf(buf, buflen, "CTorrent %d.%d.%02d", charint(id[3]), charint(id[4]),
+                        strint(id + 5, 2));
         }
         else if (strncmp(chid + 1, "XC", 2) == 0 || strncmp(chid + 1, "XX", 2) == 0)
         {
-            tr_snprintf(buf, buflen, "Xtorrent %d.%d (%d)", charint(id[3]), charint(id[4]), strint(id + 5, 2));
+            tr_snprintf(buf, buflen, "Xtorrent %d.%d (%d)", charint(id[3]), charint(id[4]),
+                        strint(id + 5, 2));
         }
         else if (strncmp(chid + 1, "BOW", 3) == 0)
         {
@@ -594,12 +595,14 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
             }
             else
             {
-                tr_snprintf(buf, buflen, "Xfplay %d.%d.%d", strint(id + 3, 1), strint(id + 4, 1), strint(id + 5, 2));
+                tr_snprintf(buf, buflen, "Xfplay %d.%d.%d", strint(id + 3, 1), strint(id + 4, 1),
+                            strint(id + 5, 2));
             }
         }
         else if (strncmp(chid + 1, "PI", 2) == 0)
         {
-            tr_snprintf(buf, buflen, "PicoTorrent %d.%d%d.%d", charint(id[3]), charint(id[4]), charint(id[5]), charint(id[6]));
+            tr_snprintf(buf, buflen, "PicoTorrent %d.%d%d.%d", charint(id[3]), charint(id[4]),
+                        charint(id[5]), charint(id[6]));
         }
         else if (strncmp(chid + 1, "FD", 2) == 0)
         {
@@ -607,11 +610,13 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
 
             if (getFDMInt(id[5], &c))
             {
-                tr_snprintf(buf, buflen, "Free Download Manager %d.%d.%d", charint(id[3]), charint(id[4]), c);
+                tr_snprintf(buf, buflen, "Free Download Manager %d.%d.%d", charint(id[3]),
+                            charint(id[4]), c);
             }
             else
             {
-                tr_snprintf(buf, buflen, "Free Download Manager %d.%d.x", charint(id[3]), charint(id[4]));
+                tr_snprintf(buf, buflen, "Free Download Manager %d.%d.x", charint(id[3]),
+                            charint(id[4]));
             }
         }
         else if (strncmp(chid + 1, "FL", 2) == 0)
@@ -634,18 +639,18 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
     {
         if (strncmp(chid + 1, "UT", 2) == 0)
         {
-            tr_snprintf(buf, buflen, "\xc2\xb5Torrent %d.%d.%d%s", strint(id + 3, 1), strint(id + 4, 1), strint(id + 5, 2),
-                getMnemonicEnd(id[7]));
+            tr_snprintf(buf, buflen, "\xc2\xb5Torrent %d.%d.%d%s", strint(id + 3, 1),
+                        strint(id + 4, 1), strint(id + 5, 2), getMnemonicEnd(id[7]));
         }
         else if (strncmp(chid + 1, "UM", 2) == 0)
         {
-            tr_snprintf(buf, buflen, "\xc2\xb5Torrent Mac %d.%d.%d%s", strint(id + 3, 1), strint(id + 4, 1), strint(id + 5, 2),
-                getMnemonicEnd(id[7]));
+            tr_snprintf(buf, buflen, "\xc2\xb5Torrent Mac %d.%d.%d%s", strint(id + 3, 1),
+                        strint(id + 4, 1), strint(id + 5, 2), getMnemonicEnd(id[7]));
         }
         else if (strncmp(chid + 1, "UE", 2) == 0)
         {
-            tr_snprintf(buf, buflen, "\xc2\xb5Torrent Embedded %d.%d.%d%s", strint(id + 3, 1), strint(id + 4, 1),
-                strint(id + 5, 2), getMnemonicEnd(id[7]));
+            tr_snprintf(buf, buflen, "\xc2\xb5Torrent Embedded %d.%d.%d%s", strint(id + 3, 1),
+                        strint(id + 4, 1), strint(id + 5, 2), getMnemonicEnd(id[7]));
         }
 
         if (!tr_str_is_empty(buf))
@@ -746,7 +751,8 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
     }
     else if (strncmp(chid, "DNA", 3) == 0)
     {
-        tr_snprintf(buf, buflen, "BitTorrent DNA %d.%d.%d", strint(id + 3, 2), strint(id + 5, 2), strint(id + 7, 2));
+        tr_snprintf(buf, buflen, "BitTorrent DNA %d.%d.%d", strint(id + 3, 2), strint(id + 5, 2),
+                    strint(id + 7, 2));
     }
     else if (strncmp(chid, "Plus", 4) == 0)
     {
@@ -754,7 +760,8 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
     }
     else if (strncmp(chid, "XBT", 3) == 0)
     {
-        tr_snprintf(buf, buflen, "XBT Client %c.%c.%c%s", id[3], id[4], id[5], getMnemonicEnd(id[6]));
+        tr_snprintf(buf, buflen, "XBT Client %c.%c.%c%s", id[3], id[4], id[5],
+                    getMnemonicEnd(id[6]));
     }
     else if (strncmp(chid, "Mbrst", 5) == 0)
     {
@@ -796,39 +803,26 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
         int b;
         int c;
 
-        if (strchr("AOQRSTU", id[0]) != NULL && getShadowInt(id[1], &a) && getShadowInt(id[2], &b) && getShadowInt(id[3], &c))
+        if (strchr("AOQRSTU", id[0]) != NULL && getShadowInt(id[1], &a) && getShadowInt(id[2], &b)
+            && getShadowInt(id[3], &c))
         {
             char const* name = NULL;
 
             switch (id[0])
             {
-            case 'A':
-                name = "ABC";
-                break;
+                case 'A': name = "ABC"; break;
 
-            case 'O':
-                name = "Osprey";
-                break;
+                case 'O': name = "Osprey"; break;
 
-            case 'Q':
-                name = "BTQueue";
-                break;
+                case 'Q': name = "BTQueue"; break;
 
-            case 'R':
-                name = "Tribler";
-                break;
+                case 'R': name = "Tribler"; break;
 
-            case 'S':
-                name = "Shad0w";
-                break;
+                case 'S': name = "Shad0w"; break;
 
-            case 'T':
-                name = "BitTornado";
-                break;
+                case 'T': name = "BitTornado"; break;
 
-            case 'U':
-                name = "UPnP NAT Bit Torrent";
-                break;
+                case 'U': name = "UPnP NAT Bit Torrent"; break;
             }
 
             if (name != NULL)

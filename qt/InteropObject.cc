@@ -6,14 +6,11 @@
  *
  */
 
+#include "InteropObject.h"
 #include "AddData.h"
 #include "Application.h"
-#include "InteropObject.h"
 
-InteropObject::InteropObject(QObject* parent) :
-    QObject(parent)
-{
-}
+InteropObject::InteropObject(QObject* parent) : QObject(parent) {}
 
 // NOLINTNEXTLINE(readability-identifier-naming)
 bool InteropObject::PresentWindow()

@@ -2,12 +2,12 @@
  * icons.[ch] written by Paolo Bacchilega, who writes:
  * "There is no problem for me, you can license my code
  * under whatever licence you wish :)"
- *
  */
 
+#include <gio/gio.h>
 #include <glib.h>
 #include <gtk/gtk.h>
-#include <gio/gio.h>
+
 #include "icons.h"
 
 #define VOID_PIXBUF_KEY "void-pixbuf"
@@ -34,10 +34,9 @@ typedef struct
     GtkIconTheme* icon_theme;
     int icon_size;
     GHashTable* cache;
-}
-IconCache;
+} IconCache;
 
-static IconCache* icon_cache[7] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL };
+static IconCache* icon_cache[7] = {NULL, NULL, NULL, NULL, NULL, NULL, NULL};
 
 static GdkPixbuf* create_void_pixbuf(int width, int height)
 {
@@ -67,8 +66,8 @@ static IconCache* icon_cache_new(GtkWidget* for_widget, int icon_size)
     icons->icon_size = get_size_in_pixels(for_widget, icon_size);
     icons->cache = g_hash_table_new_full(g_str_hash, g_str_equal, NULL, g_object_unref);
 
-    g_hash_table_insert(icons->cache, (void*)VOID_PIXBUF_KEY, create_void_pixbuf(icons->icon_size,
-        icons->icon_size));
+    g_hash_table_insert(icons->cache, (void*)VOID_PIXBUF_KEY,
+                        create_void_pixbuf(icons->icon_size, icons->icon_size));
 
     return icons;
 }
@@ -120,7 +119,8 @@ static GdkPixbuf* get_themed_icon_pixbuf(GThemedIcon* icon, int size, GtkIconThe
 
     if (icon_info == NULL)
     {
-        icon_info = gtk_icon_theme_lookup_icon(icon_theme, "text-x-generic", size, GTK_ICON_LOOKUP_USE_BUILTIN);
+        icon_info = gtk_icon_theme_lookup_icon(icon_theme, "text-x-generic", size,
+                                               GTK_ICON_LOOKUP_USE_BUILTIN);
     }
 
     pixbuf = gtk_icon_info_load_icon(icon_info, &error);
@@ -216,39 +216,26 @@ static GdkPixbuf* icon_cache_get_mime_type_icon(IconCache* icons, char const* mi
     return pixbuf;
 }
 
-GdkPixbuf* gtr_get_mime_type_icon(char const* mime_type, GtkIconSize icon_size, GtkWidget* for_widget)
+GdkPixbuf* gtr_get_mime_type_icon(char const* mime_type, GtkIconSize icon_size,
+                                  GtkWidget* for_widget)
 {
     int n;
 
     switch (icon_size)
     {
-    case GTK_ICON_SIZE_MENU:
-        n = 1;
-        break;
+        case GTK_ICON_SIZE_MENU: n = 1; break;
 
-    case GTK_ICON_SIZE_SMALL_TOOLBAR:
-        n = 2;
-        break;
+        case GTK_ICON_SIZE_SMALL_TOOLBAR: n = 2; break;
 
-    case GTK_ICON_SIZE_LARGE_TOOLBAR:
-        n = 3;
-        break;
+        case GTK_ICON_SIZE_LARGE_TOOLBAR: n = 3; break;
 
-    case GTK_ICON_SIZE_BUTTON:
-        n = 4;
-        break;
+        case GTK_ICON_SIZE_BUTTON: n = 4; break;
 
-    case GTK_ICON_SIZE_DND:
-        n = 5;
-        break;
+        case GTK_ICON_SIZE_DND: n = 5; break;
 
-    case GTK_ICON_SIZE_DIALOG:
-        n = 6;
-        break;
+        case GTK_ICON_SIZE_DIALOG: n = 6; break;
 
-    default: /*GTK_ICON_SIZE_INVALID*/
-        n = 0;
-        break;
+        default: /*GTK_ICON_SIZE_INVALID*/ n = 0; break;
     }
 
     if (icon_cache[n] == NULL)

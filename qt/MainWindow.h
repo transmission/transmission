@@ -45,7 +45,7 @@ class TorrentModel;
 
 extern "C"
 {
-struct tr_variant;
+    struct tr_variant;
 }
 
 class MainWindow : public QMainWindow
@@ -53,15 +53,12 @@ class MainWindow : public QMainWindow
     Q_OBJECT
     TR_DISABLE_COPY_MOVE(MainWindow)
 
-public:
+   public:
     MainWindow(Session&, Prefs&, TorrentModel&, bool minized);
 
-    QSystemTrayIcon& trayIcon()
-    {
-        return tray_icon_;
-    }
+    QSystemTrayIcon& trayIcon() { return tray_icon_; }
 
-public slots:
+   public slots:
     void startAll();
     void startSelected();
     void startSelectedNow();
@@ -85,13 +82,13 @@ public slots:
 
     void openSession();
 
-protected:
+   protected:
     // QWidget
     void contextMenuEvent(QContextMenuEvent*) override;
     void dragEnterEvent(QDragEnterEvent*) override;
     void dropEvent(QDropEvent*) override;
 
-private:
+   private:
     QIcon getStockIcon(QString const&, int fallback = -1);
     QIcon addEmblem(QIcon icon, QStringList const& emblem_names);
 
@@ -109,7 +106,7 @@ private:
     void hideEvent(QHideEvent* event) override;
     void showEvent(QShowEvent* event) override;
 
-private slots:
+   private slots:
     void addTorrents(QStringList const& filenames);
     void copyMagnetLinkToClipboard();
     void dataReadProgress();
@@ -140,7 +137,7 @@ private slots:
     void toggleWindows(bool do_show);
     void trayActivated(QSystemTrayIcon::ActivationReason);
 
-private:
+   private:
     Session& session_;
     Prefs& prefs_;
     TorrentModel& model_;

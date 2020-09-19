@@ -23,7 +23,7 @@ class Speed;
 
 extern "C"
 {
-struct tr_variant;
+    struct tr_variant;
 }
 
 class TorrentModel : public QAbstractListModel
@@ -31,7 +31,7 @@ class TorrentModel : public QAbstractListModel
     Q_OBJECT
     TR_DISABLE_COPY_MOVE(TorrentModel)
 
-public:
+   public:
     enum Role
     {
         TorrentRole = Qt::UserRole
@@ -53,18 +53,18 @@ public:
     int rowCount(QModelIndex const& parent = QModelIndex()) const override;
     QVariant data(QModelIndex const& index, int role = Qt::DisplayRole) const override;
 
-public slots:
+   public slots:
     void updateTorrents(tr_variant* torrent_list, bool is_complete_list);
     void removeTorrents(tr_variant* torrent_list);
 
-signals:
+   signals:
     void torrentsAdded(torrent_ids_t const&);
     void torrentsChanged(torrent_ids_t const&, Torrent::fields_t const& fields);
     void torrentsCompleted(torrent_ids_t const&);
     void torrentsEdited(torrent_ids_t const&);
     void torrentsNeedInfo(torrent_ids_t const&);
 
-private:
+   private:
     void rowsAdd(torrents_t const& torrents);
     void rowsRemove(torrents_t const& torrents);
     void rowsEmitChanged(torrent_ids_t const& ids);

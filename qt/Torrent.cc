@@ -28,10 +28,8 @@
 
 using ::trqt::variant_helpers::change;
 
-Torrent::Torrent(Prefs const& prefs, int id) :
-    id_(id),
-    icon_(IconCache::get().fileIcon()),
-    prefs_(prefs)
+Torrent::Torrent(Prefs const& prefs, int id)
+    : id_(id), icon_(IconCache::get().fileIcon()), prefs_(prefs)
 {
 }
 
@@ -45,22 +43,22 @@ bool Torrent::getSeedRatio(double& setmeRatio) const
 
     switch (seedRatioMode())
     {
-    case TR_RATIOLIMIT_SINGLE:
-        is_limited = true;
-        setmeRatio = seedRatioLimit();
-        break;
+        case TR_RATIOLIMIT_SINGLE:
+            is_limited = true;
+            setmeRatio = seedRatioLimit();
+            break;
 
-    case TR_RATIOLIMIT_GLOBAL:
-        if ((is_limited = prefs_.getBool(Prefs::RATIO_ENABLED)))
-        {
-            setmeRatio = prefs_.getDouble(Prefs::RATIO);
-        }
+        case TR_RATIOLIMIT_GLOBAL:
+            if ((is_limited = prefs_.getBool(Prefs::RATIO_ENABLED)))
+            {
+                setmeRatio = prefs_.getDouble(Prefs::RATIO);
+            }
 
-        break;
+            break;
 
-    default: // TR_RATIOLIMIT_UNLIMITED:
-        is_limited = false;
-        break;
+        default:  // TR_RATIOLIMIT_UNLIMITED:
+            is_limited = false;
+            break;
     }
 
     return is_limited;
@@ -191,7 +189,7 @@ QIcon Torrent::getMimeTypeIcon() const
 
 Torrent::fields_t Torrent::update(tr_quark const* keys, tr_variant const* const* values, size_t n)
 {
-    auto changed = fields_t{};
+    auto changed = fields_t {};
 
     for (size_t pos = 0; pos < n; ++pos)
     {
@@ -201,10 +199,11 @@ Torrent::fields_t Torrent::update(tr_quark const* keys, tr_variant const* const*
 
         switch (key)
         {
-#define HANDLE_KEY(key, field, bit) case TR_KEY_ ## key: \
-    field_changed = change(field ## _, child); \
-    changed.set(bit, field_changed); \
-    break;
+#define HANDLE_KEY(key, field, bit)              \
+    case TR_KEY_##key:                           \
+        field_changed = change(field##_, child); \
+        changed.set(bit, field_changed);         \
+        break;
 
             HANDLE_KEY(activityDate, activity_date, ACTIVITY_DATE)
             HANDLE_KEY(addedDate, added_date, ADDED_DATE)
@@ -212,7 +211,7 @@ Torrent::fields_t Torrent::update(tr_quark const* keys, tr_variant const* const*
             HANDLE_KEY(corruptEver, failed_ever, FAILED_EVER)
             HANDLE_KEY(dateCreated, date_created, DATE_CREATED)
             HANDLE_KEY(desiredAvailable, desired_available, DESIRED_AVAILABLE)
-            HANDLE_KEY(downloadLimit, download_limit, DOWNLOAD_LIMIT) // KB/s
+            HANDLE_KEY(downloadLimit, download_limit, DOWNLOAD_LIMIT)  // KB/s
             HANDLE_KEY(downloadLimited, download_limited, DOWNLOAD_LIMITED)
             HANDLE_KEY(downloadedEver, downloaded_ever, DOWNLOADED_EVER)
             HANDLE_KEY(editDate, edit_date, EDIT_DATE)
@@ -229,7 +228,8 @@ Torrent::fields_t Torrent::update(tr_quark const* keys, tr_variant const* const*
             HANDLE_KEY(isStalled, is_stalled, IS_STALLED)
             HANDLE_KEY(leftUntilDone, left_until_done, LEFT_UNTIL_DONE)
             HANDLE_KEY(manualAnnounceTime, manual_announce_time, MANUAL_ANNOUNCE_TIME)
-            HANDLE_KEY(metadataPercentComplete, metadata_percent_complete, METADATA_PERCENT_COMPLETE)
+            HANDLE_KEY(metadataPercentComplete, metadata_percent_complete,
+                       METADATA_PERCENT_COMPLETE)
             HANDLE_KEY(name, name, NAME)
             HANDLE_KEY(peer_limit, peer_limit, PEER_LIMIT)
             HANDLE_KEY(peers, peers, PEERS)
@@ -253,20 +253,21 @@ Torrent::fields_t Torrent::update(tr_quark const* keys, tr_variant const* const*
             HANDLE_KEY(totalSize, total_size, TOTAL_SIZE)
             HANDLE_KEY(trackerStats, tracker_stats, TRACKER_STATS)
             HANDLE_KEY(trackers, tracker_stats, TRACKER_STATS)
-            HANDLE_KEY(uploadLimit, upload_limit, UPLOAD_LIMIT) // KB/s
+            HANDLE_KEY(uploadLimit, upload_limit, UPLOAD_LIMIT)  // KB/s
             HANDLE_KEY(uploadLimited, upload_limited, UPLOAD_LIMITED)
             HANDLE_KEY(uploadedEver, uploaded_ever, UPLOADED_EVER)
             HANDLE_KEY(webseedsSendingToUs, webseeds_sending_to_us, WEBSEEDS_SENDING_TO_US)
 #undef HANDLE_KEY
 
-#define HANDLE_KEY(key, field, bit) case TR_KEY_ ## key: \
-    field_changed = change(field ## _, child); \
-    if (field_changed) \
-    { \
-        field ## _ = qApp->intern(field ## _); \
-    } \
-    changed.set(bit, field_changed); \
-    break;
+#define HANDLE_KEY(key, field, bit)              \
+    case TR_KEY_##key:                           \
+        field_changed = change(field##_, child); \
+        if (field_changed)                       \
+        {                                        \
+            field##_ = qApp->intern(field##_);   \
+        }                                        \
+        changed.set(bit, field_changed);         \
+        break;
 
             HANDLE_KEY(comment, comment, COMMENT)
             HANDLE_KEY(creator, creator, CREATOR)
@@ -274,21 +275,20 @@ Torrent::fields_t Torrent::update(tr_quark const* keys, tr_variant const* const*
             HANDLE_KEY(errorString, error_string, ERROR_STRING)
 
 #undef HANDLE_KEY
-        default:
-            break;
+            default: break;
         }
 
         if (field_changed)
         {
             switch (key)
             {
-            case TR_KEY_name:
+                case TR_KEY_name:
                 {
                     icon_ = {};
                     break;
                 }
 
-            case TR_KEY_files:
+                case TR_KEY_files:
                 {
                     icon_ = {};
                     for (int i = 0; i < files_.size(); ++i)
@@ -299,7 +299,7 @@ Torrent::fields_t Torrent::update(tr_quark const* keys, tr_variant const* const*
                     break;
                 }
 
-            case TR_KEY_trackers:
+                case TR_KEY_trackers:
                 {
                     std::set<FaviconCache::Key> tmp;
                     for (auto const& ts : tracker_stats_)
@@ -323,33 +323,19 @@ QString Torrent::activityString() const
 
     switch (getActivity())
     {
-    case TR_STATUS_STOPPED:
-        str = isFinished() ? tr("Finished") : tr("Paused");
-        break;
+        case TR_STATUS_STOPPED: str = isFinished() ? tr("Finished") : tr("Paused"); break;
 
-    case TR_STATUS_CHECK_WAIT:
-        str = tr("Queued for verification");
-        break;
+        case TR_STATUS_CHECK_WAIT: str = tr("Queued for verification"); break;
 
-    case TR_STATUS_CHECK:
-        str = tr("Verifying local data");
-        break;
+        case TR_STATUS_CHECK: str = tr("Verifying local data"); break;
 
-    case TR_STATUS_DOWNLOAD_WAIT:
-        str = tr("Queued for download");
-        break;
+        case TR_STATUS_DOWNLOAD_WAIT: str = tr("Queued for download"); break;
 
-    case TR_STATUS_DOWNLOAD:
-        str = tr("Downloading");
-        break;
+        case TR_STATUS_DOWNLOAD: str = tr("Downloading"); break;
 
-    case TR_STATUS_SEED_WAIT:
-        str = tr("Queued for seeding");
-        break;
+        case TR_STATUS_SEED_WAIT: str = tr("Queued for seeding"); break;
 
-    case TR_STATUS_SEED:
-        str = tr("Seeding");
-        break;
+        case TR_STATUS_SEED: str = tr("Seeding"); break;
     }
 
     return str;
@@ -361,21 +347,13 @@ QString Torrent::getError() const
 
     switch (error_)
     {
-    case TR_STAT_TRACKER_WARNING:
-        s = tr("Tracker gave a warning: %1").arg(s);
-        break;
+        case TR_STAT_TRACKER_WARNING: s = tr("Tracker gave a warning: %1").arg(s); break;
 
-    case TR_STAT_TRACKER_ERROR:
-        s = tr("Tracker gave an error: %1").arg(s);
-        break;
+        case TR_STAT_TRACKER_ERROR: s = tr("Tracker gave an error: %1").arg(s); break;
 
-    case TR_STAT_LOCAL_ERROR:
-        s = tr("Error: %1").arg(s);
-        break;
+        case TR_STAT_LOCAL_ERROR: s = tr("Error: %1").arg(s); break;
 
-    default:
-        s.clear();
-        break;
+        default: s.clear(); break;
     }
 
     return s;

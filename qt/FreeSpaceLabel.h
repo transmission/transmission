@@ -18,7 +18,7 @@ class Session;
 
 extern "C"
 {
-struct tr_variant;
+    struct tr_variant;
 }
 
 class FreeSpaceLabel : public QLabel
@@ -26,16 +26,16 @@ class FreeSpaceLabel : public QLabel
     Q_OBJECT
     TR_DISABLE_COPY_MOVE(FreeSpaceLabel)
 
-public:
+   public:
     FreeSpaceLabel(QWidget* parent = nullptr);
 
     void setSession(Session& session);
     void setPath(QString const& folder);
 
-private slots:
+   private slots:
     void onTimer();
 
-private:
+   private:
     Session* session_ = {};
     QString path_;
     QTimer timer_;

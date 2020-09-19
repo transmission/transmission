@@ -21,8 +21,8 @@ THE SOFTWARE.
 
 */
 
-#include <string.h> /* memcmp(), memcpy(), memset() */
 #include <stdlib.h> /* malloc(), free() */
+#include <string.h> /* memcmp(), memcpy(), memset() */
 
 #ifdef _WIN32
 #include <io.h> /* dup2() */
@@ -32,8 +32,8 @@ THE SOFTWARE.
 
 #include <event2/event.h>
 
-#include <stdint.h>
 #include <libutp/utp.h>
+#include <stdint.h>
 
 #include "transmission.h"
 #include "log.h"
@@ -41,8 +41,8 @@ THE SOFTWARE.
 #include "session.h"
 #include "tr-assert.h"
 #include "tr-dht.h"
-#include "tr-utp.h"
 #include "tr-udp.h"
+#include "tr-utp.h"
 
 /* Since we use a single UDP socket in order to implement multiple
    uTP sockets, try to set up huge buffers. */
@@ -66,7 +66,8 @@ static void set_socket_buffers(tr_socket_t fd, bool large)
 
     if (rc < 0)
     {
-        tr_logAddNamedError("UDP", "Failed to set receive buffer: %s", tr_net_strerror(err_buf, sizeof(err_buf), sockerrno));
+        tr_logAddNamedError("UDP", "Failed to set receive buffer: %s",
+                            tr_net_strerror(err_buf, sizeof(err_buf), sockerrno));
     }
 
     size = large ? SEND_BUFFER_SIZE : SMALL_BUFFER_SIZE;
@@ -74,7 +75,8 @@ static void set_socket_buffers(tr_socket_t fd, bool large)
 
     if (rc < 0)
     {
-        tr_logAddNamedError("UDP", "Failed to set send buffer: %s", tr_net_strerror(err_buf, sizeof(err_buf), sockerrno));
+        tr_logAddNamedError("UDP", "Failed to set send buffer: %s",
+                            tr_net_strerror(err_buf, sizeof(err_buf), sockerrno));
     }
 
     if (large)
@@ -95,17 +97,23 @@ static void set_socket_buffers(tr_socket_t fd, bool large)
 
         if (rbuf < RECV_BUFFER_SIZE)
         {
-            tr_logAddNamedError("UDP", "Failed to set receive buffer: requested %d, got %d", RECV_BUFFER_SIZE, rbuf);
+            tr_logAddNamedError("UDP", "Failed to set receive buffer: requested %d, got %d",
+                                RECV_BUFFER_SIZE, rbuf);
 #ifdef __linux__
-            tr_logAddNamedInfo("UDP", "Please add the line \"net.core.rmem_max = %d\" to /etc/sysctl.conf", RECV_BUFFER_SIZE);
+            tr_logAddNamedInfo("UDP",
+                               "Please add the line \"net.core.rmem_max = %d\" to /etc/sysctl.conf",
+                               RECV_BUFFER_SIZE);
 #endif
         }
 
         if (sbuf < SEND_BUFFER_SIZE)
         {
-            tr_logAddNamedError("UDP", "Failed to set send buffer: requested %d, got %d", SEND_BUFFER_SIZE, sbuf);
+            tr_logAddNamedError("UDP", "Failed to set send buffer: requested %d, got %d",
+                                SEND_BUFFER_SIZE, sbuf);
 #ifdef __linux__
-            tr_logAddNamedInfo("UDP", "Please add the line \"net.core.wmem_max = %d\" to /etc/sysctl.conf", SEND_BUFFER_SIZE);
+            tr_logAddNamedInfo("UDP",
+                               "Please add the line \"net.core.wmem_max = %d\" to /etc/sysctl.conf",
+                               SEND_BUFFER_SIZE);
 #endif
         }
     }
@@ -341,7 +349,8 @@ void tr_udpInit(tr_session* ss)
         goto ipv6;
     }
 
-    ss->udp_event = event_new(ss->event_base, ss->udp_socket, EV_READ | EV_PERSIST, event_callback, ss);
+    ss->udp_event =
+        event_new(ss->event_base, ss->udp_socket, EV_READ | EV_PERSIST, event_callback, ss);
 
     if (ss->udp_event == NULL)
     {
@@ -356,7 +365,8 @@ ipv6:
 
     if (ss->udp6_socket != TR_BAD_SOCKET)
     {
-        ss->udp6_event = event_new(ss->event_base, ss->udp6_socket, EV_READ | EV_PERSIST, event_callback, ss);
+        ss->udp6_event =
+            event_new(ss->event_base, ss->udp6_socket, EV_READ | EV_PERSIST, event_callback, ss);
 
         if (ss->udp6_event == NULL)
         {

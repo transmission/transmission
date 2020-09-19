@@ -40,8 +40,7 @@ typedef struct _TrCore
 
     /*< private >*/
     struct TrCorePrivate* priv;
-}
-TrCore;
+} TrCore;
 
 enum tr_core_err
 {
@@ -54,15 +53,14 @@ typedef struct _TrCoreClass
 {
     GObjectClass parent_class;
 
-    void (* add_error)(TrCore*, enum tr_core_err, char const* name);
-    void (* add_prompt)(TrCore*, gpointer ctor);
-    void (* blocklist_updated)(TrCore*, int ruleCount);
-    void (* busy)(TrCore*, gboolean is_busy);
-    void (* prefs_changed)(TrCore*, tr_quark const key);
-    void (* port_tested)(TrCore*, gboolean is_open);
-    void (* quit)(TrCore*);
-}
-TrCoreClass;
+    void (*add_error)(TrCore*, enum tr_core_err, char const* name);
+    void (*add_prompt)(TrCore*, gpointer ctor);
+    void (*blocklist_updated)(TrCore*, int ruleCount);
+    void (*busy)(TrCore*, gboolean is_busy);
+    void (*prefs_changed)(TrCore*, tr_quark const key);
+    void (*port_tested)(TrCore*, gboolean is_open);
+    void (*quit)(TrCore*);
+} TrCoreClass;
 
 GType tr_core_get_type(void) G_GNUC_CONST;
 
@@ -102,7 +100,8 @@ void gtr_core_load(TrCore* self, gboolean forcepaused);
  * May pop up dialogs for each torrent if that preference is enabled.
  * May trigger one or more "error" signals with TR_CORE_ERR_ADD_TORRENT
  */
-void gtr_core_add_files(TrCore* core, GSList* files, gboolean do_start, gboolean do_prompt, gboolean do_notify);
+void gtr_core_add_files(TrCore* core, GSList* files, gboolean do_start, gboolean do_prompt,
+                        gboolean do_notify);
 
 /** @brief Add a torrent from a URL */
 bool gtr_core_add_from_url(TrCore* core, char const* url);

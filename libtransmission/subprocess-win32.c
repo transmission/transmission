@@ -51,7 +51,8 @@ static void set_system_error(tr_error** error, DWORD code, char const* what)
     tr_free(message);
 }
 
-static void append_to_env_block(wchar_t** env_block, size_t* env_block_len, wchar_t const* part, size_t part_len)
+static void append_to_env_block(wchar_t** env_block, size_t* env_block_len, wchar_t const* part,
+                                size_t part_len)
 {
     *env_block = tr_renew(wchar_t, *env_block, *env_block_len + part_len + 1);
     wmemcpy(*env_block + *env_block_len, part, part_len);
@@ -92,7 +93,8 @@ static bool parse_env_block_part(wchar_t const* part, size_t* full_len, size_t* 
     return true;
 }
 
-static int compare_wide_strings_ci(wchar_t const* lhs, size_t lhs_len, wchar_t const* rhs, size_t rhs_len)
+static int compare_wide_strings_ci(wchar_t const* lhs, size_t lhs_len, wchar_t const* rhs,
+                                   size_t rhs_len)
 {
     int diff = wcsnicmp(lhs, rhs, MIN(lhs_len, rhs_len));
 
@@ -277,13 +279,9 @@ static void append_argument(char** arguments, char const* argument)
 
         switch (*src)
         {
-        case '\0':
-            backslash_count = backslash_count * 2;
-            break;
+            case '\0': backslash_count = backslash_count * 2; break;
 
-        case '"':
-            backslash_count = backslash_count * 2 + 1;
-            break;
+            case '"': backslash_count = backslash_count * 2 + 1; break;
         }
 
         if (backslash_count != 0)
@@ -305,7 +303,10 @@ static void append_argument(char** arguments, char const* argument)
 static bool contains_batch_metachars(char const* text)
 {
     /* First part - chars explicitly documented by `cmd.exe /?` as "special" */
-    return strpbrk(text, "&<>()@^|" "%!^\"") != NULL;
+    return strpbrk(text,
+                   "&<>()@^|"
+                   "%!^\"")
+           != NULL;
 }
 
 static enum tr_app_type get_app_type(char const* app)
@@ -324,21 +325,18 @@ static void append_app_launcher_arguments(enum tr_app_type app_type, char** args
 {
     switch (app_type)
     {
-    case TR_APP_TYPE_EXE:
-        break;
+        case TR_APP_TYPE_EXE: break;
 
-    case TR_APP_TYPE_BATCH:
-        append_argument(args, "cmd.exe");
-        append_argument(args, "/d");
-        append_argument(args, "/e:off");
-        append_argument(args, "/v:off");
-        append_argument(args, "/s");
-        append_argument(args, "/c");
-        break;
+        case TR_APP_TYPE_BATCH:
+            append_argument(args, "cmd.exe");
+            append_argument(args, "/d");
+            append_argument(args, "/e:off");
+            append_argument(args, "/v:off");
+            append_argument(args, "/s");
+            append_argument(args, "/c");
+            break;
 
-    default:
-        TR_ASSERT_MSG(false, "unsupported application type %d", (int)app_type);
-        break;
+        default: TR_ASSERT_MSG(false, "unsupported application type %d", (int)app_type); break;
     }
 }
 
@@ -356,7 +354,8 @@ static bool construct_cmd_line(char const* const* cmd, wchar_t** cmd_line)
     {
         if (app_type == TR_APP_TYPE_BATCH && i > 0 && contains_batch_metachars(cmd[i]))
         {
-            /* FIXME: My attempts to escape them one or another way didn't lead to anything good so far */
+            /* FIXME: My attempts to escape them one or another way didn't lead to anything good so
+             * far */
             goto cleanup;
         }
 
@@ -392,17 +391,14 @@ bool tr_spawn_async(char* const* cmd, char* const* env, char const* work_dir, tr
 
     wchar_t* current_dir = work_dir != NULL ? tr_win32_utf8_to_native(work_dir, -1) : NULL;
 
-    STARTUPINFOW si =
-    {
-        .cb = sizeof(si),
-        .dwFlags = STARTF_USESHOWWINDOW,
-        .wShowWindow = SW_HIDE
-    };
+    STARTUPINFOW si = {.cb = sizeof(si), .dwFlags = STARTF_USESHOWWINDOW, .wShowWindow = SW_HIDE};
 
     PROCESS_INFORMATION pi;
 
-    bool const ret = CreateProcessW(NULL, cmd_line, NULL, NULL, FALSE, NORMAL_PRIORITY_CLASS | CREATE_UNICODE_ENVIRONMENT |
-        CREATE_NO_WINDOW | CREATE_DEFAULT_ERROR_MODE, env_block, current_dir, &si, &pi);
+    bool const ret = CreateProcessW(NULL, cmd_line, NULL, NULL, FALSE,
+                                    NORMAL_PRIORITY_CLASS | CREATE_UNICODE_ENVIRONMENT
+                                        | CREATE_NO_WINDOW | CREATE_DEFAULT_ERROR_MODE,
+                                    env_block, current_dir, &si, &pi);
 
     if (ret)
     {

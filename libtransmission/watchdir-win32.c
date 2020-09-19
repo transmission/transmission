@@ -25,15 +25,17 @@
 #include "net.h"
 #include "tr-assert.h"
 #include "utils.h"
-#include "watchdir.h"
 #include "watchdir-common.h"
+#include "watchdir.h"
 
 /***
 ****
 ***/
 
-#define log_error(...) (!tr_logLevelIsActive(TR_LOG_ERROR) ? (void)0 : \
-    tr_logAddMessage(__FILE__, __LINE__, TR_LOG_ERROR, "watchdir:win32", __VA_ARGS__))
+#define log_error(...)                  \
+    (!tr_logLevelIsActive(TR_LOG_ERROR) \
+         ? (void)0                      \
+         : tr_logAddMessage(__FILE__, __LINE__, TR_LOG_ERROR, "watchdir:win32", __VA_ARGS__))
 
 /***
 ****
@@ -49,28 +51,29 @@ typedef struct tr_watchdir_win32
     evutil_socket_t notify_pipe[2];
     struct bufferevent* event;
     HANDLE thread;
-}
-tr_watchdir_win32;
+} tr_watchdir_win32;
 
 #define BACKEND_UPCAST(b) ((tr_watchdir_win32*)(b))
 
-#define WIN32_WATCH_MASK (FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_SIZE | FILE_NOTIFY_CHANGE_LAST_WRITE)
+#define WIN32_WATCH_MASK \
+    (FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_SIZE | FILE_NOTIFY_CHANGE_LAST_WRITE)
 
 /***
 ****
 ***/
 
-static BOOL tr_get_overlapped_result_ex(HANDLE handle, LPOVERLAPPED overlapped, LPDWORD bytes_transferred, DWORD timeout,
-    BOOL alertable)
+static BOOL tr_get_overlapped_result_ex(HANDLE handle, LPOVERLAPPED overlapped,
+                                        LPDWORD bytes_transferred, DWORD timeout, BOOL alertable)
 {
-    typedef BOOL (WINAPI* impl_t)(HANDLE, LPOVERLAPPED, LPDWORD, DWORD, BOOL);
+    typedef BOOL(WINAPI * impl_t)(HANDLE, LPOVERLAPPED, LPDWORD, DWORD, BOOL);
 
     static impl_t real_impl = NULL;
     static bool is_real_impl_valid = false;
 
     if (!is_real_impl_valid)
     {
-        real_impl = (impl_t)GetProcAddress(GetModuleHandleW(L"kernel32.dll"), "GetOverlappedResultEx");
+        real_impl =
+            (impl_t)GetProcAddress(GetModuleHandleW(L"kernel32.dll"), "GetOverlappedResultEx");
         is_real_impl_valid = true;
     }
 
@@ -103,7 +106,8 @@ static unsigned int __stdcall tr_watchdir_win32_thread(void* context)
     tr_watchdir_win32* const backend = BACKEND_UPCAST(tr_watchdir_get_backend(handle));
     DWORD bytes_transferred;
 
-    while (tr_get_overlapped_result_ex(backend->fd, &backend->overlapped, &bytes_transferred, INFINITE, FALSE))
+    while (tr_get_overlapped_result_ex(backend->fd, &backend->overlapped, &bytes_transferred,
+                                       INFINITE, FALSE))
     {
         PFILE_NOTIFY_INFORMATION info = (PFILE_NOTIFY_INFORMATION)backend->buffer;
 
@@ -116,8 +120,8 @@ static unsigned int __stdcall tr_watchdir_win32_thread(void* context)
 
         send(backend->notify_pipe[1], (char const*)backend->buffer, bytes_transferred, 0);
 
-        if (!ReadDirectoryChangesW(backend->fd, backend->buffer, sizeof(backend->buffer), FALSE, WIN32_WATCH_MASK, NULL,
-            &backend->overlapped, NULL))
+        if (!ReadDirectoryChangesW(backend->fd, backend->buffer, sizeof(backend->buffer), FALSE,
+                                   WIN32_WATCH_MASK, NULL, &backend->overlapped, NULL))
         {
             log_error("Failed to read directory changes");
             return 0;
@@ -193,7 +197,8 @@ static void tr_watchdir_win32_on_event(struct bufferevent* event, void* context)
             break;
         }
 
-        if (ev->Action == FILE_ACTION_ADDED || ev->Action == FILE_ACTION_MODIFIED || ev->Action == FILE_ACTION_RENAMED_NEW_NAME)
+        if (ev->Action == FILE_ACTION_ADDED || ev->Action == FILE_ACTION_MODIFIED
+            || ev->Action == FILE_ACTION_RENAMED_NEW_NAME)
         {
             char* name = tr_win32_native_to_utf8(ev->FileName, ev->FileNameLength / sizeof(WCHAR));
 
@@ -270,8 +275,10 @@ tr_watchdir_backend* tr_watchdir_win32_new(tr_watchdir_t handle)
         goto fail;
     }
 
-    if ((backend->fd = CreateFileW(wide_path, FILE_LIST_DIRECTORY, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL,
-        OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OVERLAPPED, NULL)) == INVALID_HANDLE_VALUE)
+    if ((backend->fd = CreateFileW(
+             wide_path, FILE_LIST_DIRECTORY, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+             NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OVERLAPPED, NULL))
+        == INVALID_HANDLE_VALUE)
     {
         log_error("Failed to open directory \"%s\"", path);
         goto fail;
@@ -282,8 +289,8 @@ tr_watchdir_backend* tr_watchdir_win32_new(tr_watchdir_t handle)
 
     backend->overlapped.Pointer = handle;
 
-    if (!ReadDirectoryChangesW(backend->fd, backend->buffer, sizeof(backend->buffer), FALSE, WIN32_WATCH_MASK, NULL,
-        &backend->overlapped, NULL))
+    if (!ReadDirectoryChangesW(backend->fd, backend->buffer, sizeof(backend->buffer), FALSE,
+                               WIN32_WATCH_MASK, NULL, &backend->overlapped, NULL))
     {
         log_error("Failed to read directory changes");
         goto fail;
@@ -295,7 +302,9 @@ tr_watchdir_backend* tr_watchdir_win32_new(tr_watchdir_t handle)
         goto fail;
     }
 
-    if ((backend->event = bufferevent_socket_new(tr_watchdir_get_event_base(handle), backend->notify_pipe[0], 0)) == NULL)
+    if ((backend->event =
+             bufferevent_socket_new(tr_watchdir_get_event_base(handle), backend->notify_pipe[0], 0))
+        == NULL)
     {
         log_error("Failed to create event buffer: %s", tr_strerror(errno));
         goto fail;
@@ -305,15 +314,18 @@ tr_watchdir_backend* tr_watchdir_win32_new(tr_watchdir_t handle)
     bufferevent_setcb(backend->event, &tr_watchdir_win32_on_event, NULL, NULL, handle);
     bufferevent_enable(backend->event, EV_READ);
 
-    if ((backend->thread = (HANDLE)_beginthreadex(NULL, 0, &tr_watchdir_win32_thread, handle, 0, NULL)) == NULL)
+    if ((backend->thread =
+             (HANDLE)_beginthreadex(NULL, 0, &tr_watchdir_win32_thread, handle, 0, NULL))
+        == NULL)
     {
         log_error("Failed to create thread");
         goto fail;
     }
 
     /* Perform an initial scan on the directory */
-    if (event_base_once(tr_watchdir_get_event_base(handle), -1, EV_TIMEOUT, &tr_watchdir_win32_on_first_scan, handle,
-        NULL) == -1)
+    if (event_base_once(tr_watchdir_get_event_base(handle), -1, EV_TIMEOUT,
+                        &tr_watchdir_win32_on_first_scan, handle, NULL)
+        == -1)
     {
         log_error("Failed to perform initial scan: %s", tr_strerror(errno));
     }

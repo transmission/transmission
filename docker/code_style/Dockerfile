@@ -1,8 +1,7 @@
 FROM alpine
 
-RUN apk add --no-cache \
-        bash \
-        git \
-        perl \
-        uncrustify \
-        yarn 
+RUN apk add --no-cache bash \
+                       clang-format \
+                       git \
+                       python \
+                       yarn 

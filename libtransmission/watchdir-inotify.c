@@ -23,15 +23,17 @@
 #include "log.h"
 #include "tr-assert.h"
 #include "utils.h"
-#include "watchdir.h"
 #include "watchdir-common.h"
+#include "watchdir.h"
 
 /***
 ****
 ***/
 
-#define log_error(...) (!tr_logLevelIsActive(TR_LOG_ERROR) ? (void)0 : \
-    tr_logAddMessage(__FILE__, __LINE__, TR_LOG_ERROR, "watchdir:inotify", __VA_ARGS__))
+#define log_error(...)                  \
+    (!tr_logLevelIsActive(TR_LOG_ERROR) \
+         ? (void)0                      \
+         : tr_logAddMessage(__FILE__, __LINE__, TR_LOG_ERROR, "watchdir:inotify", __VA_ARGS__))
 
 /***
 ****
@@ -44,8 +46,7 @@ typedef struct tr_watchdir_inotify
     int infd;
     int inwd;
     struct bufferevent* event;
-}
-tr_watchdir_inotify;
+} tr_watchdir_inotify;
 
 #define BACKEND_UPCAST(b) ((tr_watchdir_inotify*)(b))
 
@@ -90,7 +91,8 @@ static void tr_watchdir_inotify_on_event(struct bufferevent* event, void* contex
 
         if (nread != sizeof(ev))
         {
-            log_error("Failed to read inotify event: expected %zu, got %zu bytes.", sizeof(ev), nread);
+            log_error("Failed to read inotify event: expected %zu, got %zu bytes.", sizeof(ev),
+                      nread);
             break;
         }
 
@@ -113,7 +115,8 @@ static void tr_watchdir_inotify_on_event(struct bufferevent* event, void* contex
 
         if (nread != ev.len)
         {
-            log_error("Failed to read inotify name: expected %" PRIu32 ", got %zu bytes.", ev.len, nread);
+            log_error("Failed to read inotify name: expected %" PRIu32 ", got %zu bytes.", ev.len,
+                      nread);
             break;
         }
 
@@ -169,13 +172,16 @@ tr_watchdir_backend* tr_watchdir_inotify_new(tr_watchdir_t handle)
         goto fail;
     }
 
-    if ((backend->inwd = inotify_add_watch(backend->infd, path, INOTIFY_WATCH_MASK | IN_ONLYDIR)) == -1)
+    if ((backend->inwd = inotify_add_watch(backend->infd, path, INOTIFY_WATCH_MASK | IN_ONLYDIR))
+        == -1)
     {
         log_error("Failed to setup watchdir \"%s\": %s (%d)", path, tr_strerror(errno), errno);
         goto fail;
     }
 
-    if ((backend->event = bufferevent_socket_new(tr_watchdir_get_event_base(handle), backend->infd, 0)) == NULL)
+    if ((backend->event =
+             bufferevent_socket_new(tr_watchdir_get_event_base(handle), backend->infd, 0))
+        == NULL)
     {
         log_error("Failed to create event buffer: %s", tr_strerror(errno));
         goto fail;
@@ -188,8 +194,9 @@ tr_watchdir_backend* tr_watchdir_inotify_new(tr_watchdir_t handle)
     bufferevent_enable(backend->event, EV_READ);
 
     /* Perform an initial scan on the directory */
-    if (event_base_once(tr_watchdir_get_event_base(handle), -1, EV_TIMEOUT, &tr_watchdir_inotify_on_first_scan, handle,
-        NULL) == -1)
+    if (event_base_once(tr_watchdir_get_event_base(handle), -1, EV_TIMEOUT,
+                        &tr_watchdir_inotify_on_first_scan, handle, NULL)
+        == -1)
     {
         log_error("Failed to perform initial scan: %s", tr_strerror(errno));
     }

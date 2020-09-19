@@ -22,10 +22,7 @@
 ****
 ***/
 
-WatchDir::WatchDir(TorrentModel const& model) :
-    model_(model)
-{
-}
+WatchDir::WatchDir(TorrentModel const& model) : model_(model) {}
 
 /***
 ****
@@ -86,9 +83,12 @@ void WatchDir::setPath(QString const& path, bool is_enabled)
     // maybe create a new watcher
     if (is_enabled)
     {
-        watcher_ = std::make_unique<QFileSystemWatcher>(QStringList{ path });
-        connect(watcher_.get(), SIGNAL(directoryChanged(QString)), this, SLOT(watcherActivated(QString)));
-        QTimer::singleShot(0, this, SLOT(rescanAllWatchedDirectories())); // trigger the watchdir for .torrent files in there already
+        watcher_ = std::make_unique<QFileSystemWatcher>(QStringList {path});
+        connect(watcher_.get(), SIGNAL(directoryChanged(QString)), this,
+                SLOT(watcherActivated(QString)));
+        QTimer::singleShot(0, this,
+                           SLOT(rescanAllWatchedDirectories()));  // trigger the watchdir for
+                                                                  // .torrent files in there already
     }
 }
 
@@ -116,14 +116,11 @@ void WatchDir::watcherActivated(QString const& path)
 
             switch (metainfoTest(filename))
             {
-            case OK:
-                emit torrentFileAdded(filename);
-                break;
+                case OK: emit torrentFileAdded(filename); break;
 
-            case DUPLICATE:
-                break;
+                case DUPLICATE: break;
 
-            case ERROR:
+                case ERROR:
                 {
                     // give the .torrent a few seconds to finish downloading
                     auto* t = new QTimer(this);

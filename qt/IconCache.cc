@@ -9,8 +9,8 @@
 #include "IconCache.h"
 
 #ifdef _WIN32
-#include <windows.h>
 #include <shellapi.h>
+#include <windows.h>
 #endif
 
 #include <QFile>
@@ -40,9 +40,9 @@ IconCache& IconCache::get()
     return singleton;
 }
 
-IconCache::IconCache() :
-    folder_icon_(QFileIconProvider().icon(QFileIconProvider::Folder)),
-    file_icon_(QFileIconProvider().icon(QFileIconProvider::File))
+IconCache::IconCache()
+    : folder_icon_(QFileIconProvider().icon(QFileIconProvider::Folder)),
+      file_icon_(QFileIconProvider().icon(QFileIconProvider::File))
 {
 }
 
@@ -83,8 +83,8 @@ QIcon IconCache::guessMimeIcon(QString const& filename, QIcon fallback) const
 
 void IconCache::addAssociatedFileIcon(QFileInfo const& file_info, UINT icon_size, QIcon& icon) const
 {
-    QString const pixmap_cache_key = QStringLiteral("tr_file_ext_") + QString::number(icon_size) + QLatin1Char('_') +
-        file_info.suffix();
+    QString const pixmap_cache_key = QStringLiteral("tr_file_ext_") + QString::number(icon_size)
+                                     + QLatin1Char('_') + file_info.suffix();
 
     QPixmap pixmap;
 
@@ -95,7 +95,9 @@ void IconCache::addAssociatedFileIcon(QFileInfo const& file_info, UINT icon_size
         SHFILEINFO shell_file_info;
 
         if (::SHGetFileInfoW(filename.data(), FILE_ATTRIBUTE_NORMAL, &shell_file_info,
-            sizeof(shell_file_info), SHGFI_ICON | icon_size | SHGFI_USEFILEATTRIBUTES) != 0)
+                             sizeof(shell_file_info),
+                             SHGFI_ICON | icon_size | SHGFI_USEFILEATTRIBUTES)
+            != 0)
         {
             if (shell_file_info.hIcon != nullptr)
             {
@@ -133,7 +135,7 @@ QIcon IconCache::getMimeIcon(QString const& filename) const
     }
 
     QIcon& icon = icon_cache_[ext];
-    if (icon.isNull()) // cache miss
+    if (icon.isNull())  // cache miss
     {
         QMimeDatabase mime_db;
         QMimeType type = mime_db.mimeTypeForFile(filename, QMimeDatabase::MatchExtension);

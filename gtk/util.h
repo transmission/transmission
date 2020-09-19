@@ -8,9 +8,9 @@
 
 #pragma once
 
-#include <sys/types.h>
 #include <glib.h>
 #include <gtk/gtk.h>
+#include <sys/types.h>
 
 #include <libtransmission/transmission.h>
 
@@ -38,17 +38,17 @@ extern char const* speed_T_str;
 
 #else
 
-#define TR_DEFINE_QUARK(QN, q_n) \
-    GQuark q_n ## _quark(void) \
-    { \
-        static GQuark q; \
-        \
-        if (G_UNLIKELY(q == 0)) \
-        { \
+#define TR_DEFINE_QUARK(QN, q_n)                 \
+    GQuark q_n##_quark(void)                     \
+    {                                            \
+        static GQuark q;                         \
+                                                 \
+        if (G_UNLIKELY(q == 0))                  \
+        {                                        \
             q = g_quark_from_static_string(#QN); \
-        } \
-        \
-        return q; \
+        }                                        \
+                                                 \
+        return q;                                \
     }
 
 #endif
@@ -133,7 +133,8 @@ void gtr_freespace_label_set_dir(GtkWidget* label, char const* dir);
 
 void gtr_unrecognized_url_dialog(GtkWidget* parent, char const* url);
 
-void gtr_add_torrent_error_dialog(GtkWidget* window_or_child, int err, tr_torrent* duplicate_torrent, char const* filename);
+void gtr_add_torrent_error_dialog(GtkWidget* window_or_child, int err,
+                                  tr_torrent* duplicate_torrent, char const* filename);
 
 /* pop up the context menu if a user right-clicks.
    if the row they right-click on isn't selected, select it. */

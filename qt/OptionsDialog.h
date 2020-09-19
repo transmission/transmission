@@ -16,10 +16,10 @@
 #include <QTimer>
 #include <QVector>
 
-#include "AddData.h" // AddData
+#include "AddData.h"  // AddData
 #include "BaseDialog.h"
 #include "Macros.h"
-#include "Torrent.h" // FileList
+#include "Torrent.h"  // FileList
 #include "ui_OptionsDialog.h"
 
 class Prefs;
@@ -27,7 +27,7 @@ class Session;
 
 extern "C"
 {
-struct tr_variant;
+    struct tr_variant;
 }
 
 class OptionsDialog : public BaseDialog
@@ -35,20 +35,20 @@ class OptionsDialog : public BaseDialog
     Q_OBJECT
     TR_DISABLE_COPY_MOVE(OptionsDialog)
 
-public:
+   public:
     OptionsDialog(Session& session, Prefs const& prefs, AddData addme, QWidget* parent = nullptr);
     ~OptionsDialog() override;
 
-private:
+   private:
     using mybins_t = QMap<uint32_t, int32_t>;
 
-private:
+   private:
     void reload();
     void updateWidgetsLocality();
     void clearInfo();
     void clearVerify();
 
-private slots:
+   private slots:
     void onAccepted();
     void onPriorityChanged(QSet<int> const& file_indices, int);
     void onWantedChanged(QSet<int> const& file_indices, bool);
@@ -60,7 +60,7 @@ private slots:
 
     void onSessionUpdated();
 
-private:
+   private:
     AddData add_;
     FileList files_;
     QCryptographicHash verify_hash_;

@@ -14,7 +14,7 @@
 
 class AddData
 {
-public:
+   public:
     enum
     {
         NONE,
@@ -24,13 +24,10 @@ public:
         METAINFO
     };
 
-public:
+   public:
     AddData() = default;
 
-    AddData(QString const& str)
-    {
-        set(str);
-    }
+    AddData(QString const& str) { set(str); }
 
     int set(QString const&);
 
@@ -38,10 +35,7 @@ public:
     QString readableName() const;
     QString readableShortName() const;
 
-    static bool isSupported(QString const& str)
-    {
-        return AddData(str).type != NONE;
-    }
+    static bool isSupported(QString const& str) { return AddData(str).type != NONE; }
 
     int type = NONE;
     QByteArray metainfo;

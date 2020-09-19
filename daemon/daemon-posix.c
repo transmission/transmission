@@ -8,10 +8,10 @@
 
 #include <assert.h>
 #include <errno.h>
+#include <fcntl.h> /* open() */
 #include <pthread.h>
 #include <signal.h>
 #include <stdlib.h> /* abort(), daemon(), exit() */
-#include <fcntl.h> /* open() */
 #include <unistd.h> /* fork(), setsid(), chdir(), dup2(), close(), pipe() */
 
 #include <libtransmission/transmission.h>
@@ -46,17 +46,12 @@ static void handle_signal(int sig)
 {
     switch (sig)
     {
-    case SIGHUP:
-        callbacks->on_reconfigure(callback_arg);
-        break;
+        case SIGHUP: callbacks->on_reconfigure(callback_arg); break;
 
-    case SIGINT:
-    case SIGTERM:
-        callbacks->on_stop(callback_arg);
-        break;
+        case SIGINT:
+        case SIGTERM: callbacks->on_stop(callback_arg); break;
 
-    default:
-        assert(!"Unexpected signal");
+        default: assert(!"Unexpected signal");
     }
 }
 
@@ -145,7 +140,8 @@ static bool setup_signal_handler(int sig, tr_error** error)
 ****
 ***/
 
-bool dtr_daemon(dtr_callbacks const* cb, void* cb_arg, bool foreground, int* exit_code, tr_error** error)
+bool dtr_daemon(dtr_callbacks const* cb, void* cb_arg, bool foreground, int* exit_code,
+                tr_error** error)
 {
     callbacks = cb;
     callback_arg = cb_arg;
@@ -169,16 +165,11 @@ bool dtr_daemon(dtr_callbacks const* cb, void* cb_arg, bool foreground, int* exi
 
         switch (fork())
         {
-        case -1:
-            set_system_error(error, errno, "fork() failed");
-            return false;
+            case -1: set_system_error(error, errno, "fork() failed"); return false;
 
-        case 0:
-            break;
+            case 0: break;
 
-        default:
-            *exit_code = 0;
-            return true;
+            default: *exit_code = 0; return true;
         }
 
         if (setsid() == -1)
@@ -213,7 +204,8 @@ bool dtr_daemon(dtr_callbacks const* cb, void* cb_arg, bool foreground, int* exi
         return false;
     }
 
-    if (!setup_signal_handler(SIGINT, error) || !setup_signal_handler(SIGTERM, error) || !setup_signal_handler(SIGHUP, error))
+    if (!setup_signal_handler(SIGINT, error) || !setup_signal_handler(SIGTERM, error)
+        || !setup_signal_handler(SIGHUP, error))
     {
         destroy_signal_handler_thread(signal_thread);
         return false;

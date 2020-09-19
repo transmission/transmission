@@ -70,7 +70,7 @@ static void getopts_usage_line(tr_option const* opt, int longWidth, int shortWid
     char const* d = opt->description;
 
     printf(" %s%-*s %s%-*s %-*s ", tr_str_is_empty(shortName) ? " " : "-", shortWidth, shortName,
-        tr_str_is_empty(longName) ? "  " : "--", longWidth, longName, argWidth, arg);
+           tr_str_is_empty(longName) ? "  " : "--", longWidth, longName, argWidth, arg);
     len = get_next_line_len(d, d_width);
     printf("%*.*s\n", len, len, d);
 
@@ -158,8 +158,9 @@ static tr_option const* findOption(tr_option const* opts, char const* str, char 
     {
         size_t len = o->longName != NULL ? strlen(o->longName) : 0;
 
-        if (matchlen < len && str[0] == '-' && str[1] == '-' && strncmp(str + 2, o->longName, len) == 0 &&
-            (str[len + 2] == '\0' || (o->has_arg && str[len + 2] == '=')))
+        if (matchlen < len && str[0] == '-' && str[1] == '-'
+            && strncmp(str + 2, o->longName, len) == 0
+            && (str[len + 2] == '\0' || (o->has_arg && str[len + 2] == '=')))
         {
             matchlen = len;
             match = o;
@@ -168,24 +169,19 @@ static tr_option const* findOption(tr_option const* opts, char const* str, char 
 
         len = o->shortName != NULL ? strlen(o->shortName) : 0;
 
-        if (matchlen < len && str[0] == '-' && strncmp(str + 1, o->shortName, len) == 0 && (str[len + 1] == '\0' || o->has_arg))
+        if (matchlen < len && str[0] == '-' && strncmp(str + 1, o->shortName, len) == 0
+            && (str[len + 1] == '\0' || o->has_arg))
         {
             matchlen = len;
             match = o;
 
             switch (str[len + 1])
             {
-            case '\0':
-                arg = NULL;
-                break;
+                case '\0': arg = NULL; break;
 
-            case '=':
-                arg = str + len + 2;
-                break;
+                case '=': arg = str + len + 2; break;
 
-            default:
-                arg = str + len + 1;
-                break;
+                default: arg = str + len + 1; break;
             }
         }
     }
@@ -198,7 +194,8 @@ static tr_option const* findOption(tr_option const* opts, char const* str, char 
     return match;
 }
 
-int tr_getopt(char const* usage, int argc, char const* const* argv, tr_option const* opts, char const** setme_optarg)
+int tr_getopt(char const* usage, int argc, char const* const* argv, tr_option const* opts,
+              char const** setme_optarg)
 {
     char const* arg = NULL;
     tr_option const* o = NULL;

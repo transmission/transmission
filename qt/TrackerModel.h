@@ -30,13 +30,13 @@ class TrackerModel : public QAbstractListModel
     Q_OBJECT
     TR_DISABLE_COPY_MOVE(TrackerModel)
 
-public:
+   public:
     enum Role
     {
         TrackerRole = Qt::UserRole
     };
 
-public:
+   public:
     TrackerModel() = default;
 
     void refresh(TorrentModel const&, torrent_ids_t const& ids);
@@ -46,9 +46,9 @@ public:
     int rowCount(QModelIndex const& parent = QModelIndex()) const override;
     QVariant data(QModelIndex const& index, int role = Qt::DisplayRole) const override;
 
-private:
+   private:
     using rows_t = QVector<TrackerInfo>;
 
-private:
+   private:
     rows_t rows_;
 };

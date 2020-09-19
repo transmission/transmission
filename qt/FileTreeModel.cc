@@ -9,20 +9,17 @@
 #include <algorithm>
 #include <cassert>
 
-#include <libtransmission/transmission.h> // priorities
+#include <libtransmission/transmission.h>  // priorities
 
 #include "FileTreeItem.h"
 #include "FileTreeModel.h"
 
 namespace
 {
-
 class PathIteratorBase
 {
-protected:
-    PathIteratorBase(QString const& path, int slash_index) :
-        path_(path),
-        slash_index_(slash_index)
+   protected:
+    PathIteratorBase(QString const& path, int slash_index) : path_(path), slash_index_(slash_index)
     {
         token_.reserve(path.size() / 2);
     }
@@ -38,16 +35,10 @@ QChar const PathIteratorBase::SlashChar = QLatin1Char('/');
 
 class ForwardPathIterator : public PathIteratorBase
 {
-public:
-    explicit ForwardPathIterator(QString const& path) :
-        PathIteratorBase(path, path.size() - 1)
-    {
-    }
+   public:
+    explicit ForwardPathIterator(QString const& path) : PathIteratorBase(path, path.size() - 1) {}
 
-    [[nodiscard]] bool hasNext() const
-    {
-        return slash_index_ > -1;
-    }
+    [[nodiscard]] bool hasNext() const { return slash_index_ > -1; }
 
     QString const& next()
     {
@@ -61,16 +52,10 @@ public:
 
 class BackwardPathIterator : public PathIteratorBase
 {
-public:
-    explicit BackwardPathIterator(QString const& path) :
-        PathIteratorBase(path, 0)
-    {
-    }
+   public:
+    explicit BackwardPathIterator(QString const& path) : PathIteratorBase(path, 0) {}
 
-    [[nodiscard]] bool hasNext() const
-    {
-        return slash_index_ < path_.size();
-    }
+    [[nodiscard]] bool hasNext() const { return slash_index_ < path_.size(); }
 
     QString const& next()
     {
@@ -88,12 +73,10 @@ public:
     }
 };
 
-} // namespace
+}  // namespace
 
-FileTreeModel::FileTreeModel(QObject* parent, bool is_editable) :
-    QAbstractItemModel(parent),
-    root_item_(new FileTreeItem),
-    is_editable_(is_editable)
+FileTreeModel::FileTreeModel(QObject* parent, bool is_editable)
+    : QAbstractItemModel(parent), root_item_(new FileTreeItem), is_editable_(is_editable)
 {
 }
 
@@ -186,7 +169,7 @@ bool FileTreeModel::setData(QModelIndex const& index, QVariant const& newname, i
         emit pathEdited(item->path(), newname.toString());
     }
 
-    return false; // don't update the view until the session confirms the change
+    return false;  // don't update the view until the session confirms the change
 }
 
 QVariant FileTreeModel::headerData(int column, Qt::Orientation orientation, int role) const
@@ -195,28 +178,17 @@ QVariant FileTreeModel::headerData(int column, Qt::Orientation orientation, int 
     {
         switch (column)
         {
-        case COL_NAME:
-            return tr("File");
-            break;
+            case COL_NAME: return tr("File"); break;
 
-        case COL_SIZE:
-            return tr("Size");
-            break;
+            case COL_SIZE: return tr("Size"); break;
 
-        case COL_PROGRESS:
-            return tr("Progress");
-            break;
+            case COL_PROGRESS: return tr("Progress"); break;
 
-        case COL_WANTED:
-            return tr("Download");
-            break;
+            case COL_WANTED: return tr("Download"); break;
 
-        case COL_PRIORITY:
-            return tr("Priority");
-            break;
+            case COL_PRIORITY: return tr("Priority"); break;
 
-        default:
-            break;
+            default: break;
         }
     }
 
@@ -253,7 +225,7 @@ QModelIndex FileTreeModel::index(int row, int column, QModelIndex const& parent)
 
 QModelIndex FileTreeModel::parent(QModelIndex const& child) const
 {
-    return parent(child, 0); // QAbstractItemModel::parent() wants col 0
+    return parent(child, 0);  // QAbstractItemModel::parent() wants col 0
 }
 
 QModelIndex FileTreeModel::parent(QModelIndex const& child, int column) const
@@ -270,9 +242,7 @@ QModelIndex FileTreeModel::parent(QModelIndex const& child, int column) const
 
 int FileTreeModel::rowCount(QModelIndex const& parent) const
 {
-    FileTreeItem* parent_item = parent.isValid() ?
-        itemFromIndex(parent) :
-        root_item_;
+    FileTreeItem* parent_item = parent.isValid() ? itemFromIndex(parent) : root_item_;
 
     return parent_item->childCount();
 }
@@ -332,14 +302,14 @@ FileTreeItem* FileTreeModel::findItemForFileIndex(int file_index) const
     return index_cache_.value(file_index, nullptr);
 }
 
-void FileTreeModel::addFile(int file_index, QString const& filename, bool wanted, int priority, uint64_t total_size,
-    uint64_t have, bool update_fields)
+void FileTreeModel::addFile(int file_index, QString const& filename, bool wanted, int priority,
+                            uint64_t total_size, uint64_t have, bool update_fields)
 {
     FileTreeItem* item;
 
     item = findItemForFileIndex(file_index);
 
-    if (item != nullptr) // this file is already in the tree, we've added this
+    if (item != nullptr)  // this file is already in the tree, we've added this
     {
         QModelIndex index_with_changed_parents;
         ForwardPathIterator filename_it(filename);
@@ -347,13 +317,15 @@ void FileTreeModel::addFile(int file_index, QString const& filename, bool wanted
         while (filename_it.hasNext())
         {
             QString const& token = filename_it.next();
-            std::pair<int, int> const changed = item->update(token, wanted, priority, have, update_fields);
+            std::pair<int, int> const changed =
+                item->update(token, wanted, priority, have, update_fields);
 
             if (changed.first >= 0)
             {
                 emit dataChanged(indexOf(item, changed.first), indexOf(item, changed.second));
 
-                if (!index_with_changed_parents.isValid() && changed.first <= COL_PRIORITY && changed.second >= COL_SIZE)
+                if (!index_with_changed_parents.isValid() && changed.first <= COL_PRIORITY
+                    && changed.second >= COL_SIZE)
                 {
                     index_with_changed_parents = indexOf(item, 0);
                 }
@@ -369,7 +341,7 @@ void FileTreeModel::addFile(int file_index, QString const& filename, bool wanted
             emitParentsChanged(index_with_changed_parents, COL_SIZE, COL_PRIORITY);
         }
     }
-    else // we haven't build the FileTreeItems for these tokens yet
+    else  // we haven't build the FileTreeItems for these tokens yet
     {
         bool added = false;
 
@@ -412,7 +384,8 @@ void FileTreeModel::addFile(int file_index, QString const& filename, bool wanted
 
             index_cache_[file_index] = item;
 
-            std::pair<int, int> const changed = item->update(item->name(), wanted, priority, have, added || update_fields);
+            std::pair<int, int> const changed =
+                item->update(item->name(), wanted, priority, have, added || update_fields);
 
             if (changed.first >= 0)
             {
@@ -423,7 +396,7 @@ void FileTreeModel::addFile(int file_index, QString const& filename, bool wanted
 }
 
 void FileTreeModel::emitParentsChanged(QModelIndex const& index, int first_column, int last_column,
-    QSet<QModelIndex>* visited_parent_indices)
+                                       QSet<QModelIndex>* visited_parent_indices)
 {
     assert(first_column <= last_column);
 

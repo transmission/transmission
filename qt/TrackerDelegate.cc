@@ -28,26 +28,23 @@
 
 namespace
 {
+auto constexpr Spacing = int {6};
 
-auto constexpr Spacing = int{ 6 };
-
-auto constexpr Margin = QSize{ 10, 10 };
+auto constexpr Margin = QSize {10, 10};
 
 class ItemLayout
 {
-private:
+   private:
     QTextDocument text_document_;
 
-public:
+   public:
     QRect icon_rect;
     QRect text_rect;
 
-    ItemLayout(QString const& text, bool suppress_colors, Qt::LayoutDirection direction, QPoint const& top_left, int width);
+    ItemLayout(QString const& text, bool suppress_colors, Qt::LayoutDirection direction,
+               QPoint const& top_left, int width);
 
-    [[nodiscard]] QSize size() const
-    {
-        return (icon_rect | text_rect).size();
-    }
+    [[nodiscard]] QSize size() const { return (icon_rect | text_rect).size(); }
 
     [[nodiscard]] QAbstractTextDocumentLayout* textLayout() const
     {
@@ -55,8 +52,8 @@ public:
     }
 };
 
-ItemLayout::ItemLayout(QString const& text, bool suppress_colors, Qt::LayoutDirection direction, QPoint const& top_left,
-    int width)
+ItemLayout::ItemLayout(QString const& text, bool suppress_colors, Qt::LayoutDirection direction,
+                       QPoint const& top_left, int width)
 {
     QStyle const* style(qApp->style());
     QSize const icon_size = FaviconCache::getIconSize();
@@ -84,7 +81,7 @@ ItemLayout::ItemLayout(QString const& text, bool suppress_colors, Qt::LayoutDire
     text_rect.setSize(text_document_.size().toSize());
 }
 
-} // namespace
+}  // namespace
 
 /***
 ****
@@ -92,7 +89,8 @@ ItemLayout::ItemLayout(QString const& text, bool suppress_colors, Qt::LayoutDire
 
 QSize TrackerDelegate::sizeHint(QStyleOptionViewItem const& option, TrackerInfo const& info) const
 {
-    ItemLayout const layout(getText(info), true, option.direction, QPoint(0, 0), option.rect.width() - Margin.width() * 2);
+    ItemLayout const layout(getText(info), true, option.direction, QPoint(0, 0),
+                            option.rect.width() - Margin.width() * 2);
     return layout.size() + Margin * 2;
 }
 
@@ -102,7 +100,8 @@ QSize TrackerDelegate::sizeHint(QStyleOptionViewItem const& option, QModelIndex 
     return sizeHint(option, tracker_info);
 }
 
-void TrackerDelegate::paint(QPainter* painter, QStyleOptionViewItem const& option, QModelIndex const& index) const
+void TrackerDelegate::paint(QPainter* painter, QStyleOptionViewItem const& option,
+                            QModelIndex const& index) const
 {
     auto const tracker_info = index.data(TrackerModel::TrackerRole).value<TrackerInfo>();
     painter->save();
@@ -113,7 +112,8 @@ void TrackerDelegate::paint(QPainter* painter, QStyleOptionViewItem const& optio
     painter->restore();
 }
 
-void TrackerDelegate::drawTracker(QPainter* painter, QStyleOptionViewItem const& option, TrackerInfo const& inf) const
+void TrackerDelegate::drawTracker(QPainter* painter, QStyleOptionViewItem const& option,
+                                  TrackerInfo const& inf) const
 {
     bool const is_item_selected((option.state & QStyle::State_Selected) != 0);
     bool const is_item_enabled((option.state & QStyle::State_Enabled) != 0);
@@ -121,8 +121,10 @@ void TrackerDelegate::drawTracker(QPainter* painter, QStyleOptionViewItem const&
 
     QIcon tracker_icon(inf.st.getFavicon());
 
-    QRect const content_rect(option.rect.adjusted(Margin.width(), Margin.height(), -Margin.width(), -Margin.height()));
-    ItemLayout const layout(getText(inf), is_item_selected, option.direction, content_rect.topLeft(), content_rect.width());
+    QRect const content_rect(
+        option.rect.adjusted(Margin.width(), Margin.height(), -Margin.width(), -Margin.height()));
+    ItemLayout const layout(getText(inf), is_item_selected, option.direction,
+                            content_rect.topLeft(), content_rect.width());
 
     painter->save();
 
@@ -138,12 +140,13 @@ void TrackerDelegate::drawTracker(QPainter* painter, QStyleOptionViewItem const&
         painter->fillRect(option.rect, option.palette.brush(cg, QPalette::Highlight));
     }
 
-    tracker_icon.paint(painter, layout.icon_rect, Qt::AlignCenter, is_item_selected ? QIcon::Selected : QIcon::Normal,
-        QIcon::On);
+    tracker_icon.paint(painter, layout.icon_rect, Qt::AlignCenter,
+                       is_item_selected ? QIcon::Selected : QIcon::Normal, QIcon::On);
 
     QAbstractTextDocumentLayout::PaintContext paint_context;
     paint_context.clip = layout.text_rect.translated(-layout.text_rect.topLeft());
-    paint_context.palette.setColor(QPalette::Text,
+    paint_context.palette.setColor(
+        QPalette::Text,
         option.palette.color(is_item_selected ? QPalette::HighlightedText : QPalette::Text));
     painter->translate(layout.text_rect.topLeft());
     layout.textLayout()->draw(painter, paint_context);
@@ -158,7 +161,6 @@ void TrackerDelegate::setShowMore(bool b)
 
 namespace
 {
-
 QString timeToStringRounded(int seconds)
 {
     if (seconds > 60)
@@ -169,7 +171,7 @@ QString timeToStringRounded(int seconds)
     return Formatter::get().timeToString(seconds);
 }
 
-} // namespace
+}  // namespace
 
 QString TrackerDelegate::getText(TrackerInfo const& inf) const
 {
@@ -206,31 +208,39 @@ QString TrackerDelegate::getText(TrackerInfo const& inf) const
             if (inf.st.last_announce_succeeded)
             {
                 //: %1 and %2 are replaced with HTML markup, %3 is duration
-                str += tr("Got a list of%1 %Ln peer(s)%2 %3 ago", nullptr, inf.st.last_announce_peer_count).
-                    arg(success_markup_begin).arg(success_markup_end).arg(tstr);
+                str += tr("Got a list of%1 %Ln peer(s)%2 %3 ago", nullptr,
+                          inf.st.last_announce_peer_count)
+                           .arg(success_markup_begin)
+                           .arg(success_markup_end)
+                           .arg(tstr);
             }
             else if (inf.st.last_announce_timed_out)
             {
                 //: %1 and %2 are replaced with HTML markup, %3 is duration
-                str += tr("Peer list request %1timed out%2 %3 ago; will retry").arg(timeout_markup_begin).
-                    arg(timeout_markup_end).arg(tstr);
+                str += tr("Peer list request %1timed out%2 %3 ago; will retry")
+                           .arg(timeout_markup_begin)
+                           .arg(timeout_markup_end)
+                           .arg(tstr);
             }
             else
             {
                 //: %1 and %3 are replaced with HTML markup, %2 is error message, %4 is duration
-                str += tr("Got an error %1\"%2\"%3 %4 ago").arg(err_markup_begin).arg(inf.st.last_announce_result).
-                    arg(err_markup_end).arg(tstr);
+                str += tr("Got an error %1\"%2\"%3 %4 ago")
+                           .arg(err_markup_begin)
+                           .arg(inf.st.last_announce_result)
+                           .arg(err_markup_end)
+                           .arg(tstr);
             }
         }
 
         switch (inf.st.announce_state)
         {
-        case TR_TRACKER_INACTIVE:
-            str += QStringLiteral("<br/>\n");
-            str += tr("No updates scheduled");
-            break;
+            case TR_TRACKER_INACTIVE:
+                str += QStringLiteral("<br/>\n");
+                str += tr("No updates scheduled");
+                break;
 
-        case TR_TRACKER_WAITING:
+            case TR_TRACKER_WAITING:
             {
                 QString const tstr(timeToStringRounded(inf.st.next_announce_time - now));
                 str += QStringLiteral("<br/>\n");
@@ -239,12 +249,12 @@ QString TrackerDelegate::getText(TrackerInfo const& inf) const
                 break;
             }
 
-        case TR_TRACKER_QUEUED:
-            str += QStringLiteral("<br/>\n");
-            str += tr("Queued to ask for more peers");
-            break;
+            case TR_TRACKER_QUEUED:
+                str += QStringLiteral("<br/>\n");
+                str += tr("Queued to ask for more peers");
+                break;
 
-        case TR_TRACKER_ACTIVE:
+            case TR_TRACKER_ACTIVE:
             {
                 QString const tstr(timeToStringRounded(now - inf.st.last_announce_start_time));
                 str += QStringLiteral("<br/>\n");
@@ -265,37 +275,44 @@ QString TrackerDelegate::getText(TrackerInfo const& inf) const
                 {
                     if (inf.st.seeder_count >= 0 && inf.st.leecher_count >= 0)
                     {
-                        //: First part of phrase "Tracker had ... seeder(s) and ... leecher(s) ... ago";
-                        //: %1 and %2 are replaced with HTML markup
-                        str += tr("Tracker had%1 %Ln seeder(s)%2", nullptr, inf.st.seeder_count).arg(success_markup_begin).
-                            arg(success_markup_end);
-                        //: Second part of phrase "Tracker had ... seeder(s) and ... leecher(s) ... ago";
-                        //: %1 and %2 are replaced with HTML markup, %3 is duration;
-                        //: notice that leading space (before "and") is included here
-                        str += tr(" and%1 %Ln leecher(s)%2 %3 ago", nullptr, inf.st.leecher_count).arg(success_markup_begin).
-                            arg(success_markup_end).arg(tstr);
+                        //: First part of phrase "Tracker had ... seeder(s) and ... leecher(s) ...
+                        // ago"; : %1 and %2 are replaced with HTML markup
+                        str += tr("Tracker had%1 %Ln seeder(s)%2", nullptr, inf.st.seeder_count)
+                                   .arg(success_markup_begin)
+                                   .arg(success_markup_end);
+                        //: Second part of phrase "Tracker had ... seeder(s) and ... leecher(s) ...
+                        // ago"; : %1 and %2 are replaced with HTML markup, %3 is duration; : notice
+                        // that leading space (before "and") is included here
+                        str += tr(" and%1 %Ln leecher(s)%2 %3 ago", nullptr, inf.st.leecher_count)
+                                   .arg(success_markup_begin)
+                                   .arg(success_markup_end)
+                                   .arg(tstr);
                     }
                     else
                     {
                         //: %1 and %2 are replaced with HTML markup, %3 is duration
-                        str += tr("Tracker had %1no information%2 on peer counts %3 ago").arg(success_markup_begin).
-                            arg(success_markup_end).arg(tstr);
+                        str += tr("Tracker had %1no information%2 on peer counts %3 ago")
+                                   .arg(success_markup_begin)
+                                   .arg(success_markup_end)
+                                   .arg(tstr);
                     }
                 }
                 else
                 {
                     //: %1 and %3 are replaced with HTML markup, %2 is error message, %4 is duration
-                    str += tr("Got a scrape error %1\"%2\"%3 %4 ago").arg(err_markup_begin).arg(inf.st.last_scrape_result).
-                        arg(err_markup_end).arg(tstr);
+                    str += tr("Got a scrape error %1\"%2\"%3 %4 ago")
+                               .arg(err_markup_begin)
+                               .arg(inf.st.last_scrape_result)
+                               .arg(err_markup_end)
+                               .arg(tstr);
                 }
             }
 
             switch (inf.st.scrape_state)
             {
-            case TR_TRACKER_INACTIVE:
-                break;
+                case TR_TRACKER_INACTIVE: break;
 
-            case TR_TRACKER_WAITING:
+                case TR_TRACKER_WAITING:
                 {
                     str += QStringLiteral("<br/>\n");
                     QString const tstr(timeToStringRounded(inf.st.next_scrape_time - now));
@@ -304,14 +321,14 @@ QString TrackerDelegate::getText(TrackerInfo const& inf) const
                     break;
                 }
 
-            case TR_TRACKER_QUEUED:
+                case TR_TRACKER_QUEUED:
                 {
                     str += QStringLiteral("<br/>\n");
                     str += tr("Queued to ask for peer counts");
                     break;
                 }
 
-            case TR_TRACKER_ACTIVE:
+                case TR_TRACKER_ACTIVE:
                 {
                     str += QStringLiteral("<br/>\n");
                     QString const tstr(timeToStringRounded(now - inf.st.last_scrape_start_time));

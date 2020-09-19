@@ -14,7 +14,7 @@ class QVariant;
 
 class DBusInteropHelper
 {
-public:
+   public:
     DBusInteropHelper() = default;
 
     bool isConnected() const;

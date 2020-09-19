@@ -1,0 +1,20 @@
+#!/usr/bin/env sh
+
+[ -z "$TR_SKIP_HOOKS" ] || exit 0
+
+root="$(git rev-parse --show-toplevel)"
+exitcode=0
+
+cd "${root}" || exit 1
+if ! ./run-clang-format.py -q -r cli daemon gtk libtransmission qt tests utils; then
+  echo 'please format C/C++ code first'
+  exitcode=1
+fi
+
+cd "${root}/web" || exit 1
+if ! yarn -s install && yarn -s lint; then
+  echo 'please format JS code first'
+  exitcode=1
+fi
+
+exit $exitcode

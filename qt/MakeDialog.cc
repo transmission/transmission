@@ -14,8 +14,8 @@
 #include <QPushButton>
 #include <QTimer>
 
-#include <libtransmission/makemeta.h>
 #include <libtransmission/transmission.h>
+#include <libtransmission/makemeta.h>
 #include <libtransmission/utils.h>
 
 #include "ColumnResizer.h"
@@ -27,35 +27,34 @@
 
 namespace
 {
-
 class MakeProgressDialog : public BaseDialog
 {
     Q_OBJECT
 
-public:
+   public:
     MakeProgressDialog(Session& session, tr_metainfo_builder& builder, QWidget* parent = nullptr);
 
-private slots:
+   private slots:
     void onButtonBoxClicked(QAbstractButton* button);
     void onProgress();
 
-private:
+   private:
     Session& session_;
     tr_metainfo_builder& builder_;
     Ui::MakeProgressDialog ui_ = {};
     QTimer timer_;
 };
 
-} // namespace
+}  // namespace
 
-MakeProgressDialog::MakeProgressDialog(Session& session, tr_metainfo_builder& builder, QWidget* parent) :
-    BaseDialog(parent),
-    session_(session),
-    builder_(builder)
+MakeProgressDialog::MakeProgressDialog(Session& session, tr_metainfo_builder& builder,
+                                       QWidget* parent)
+    : BaseDialog(parent), session_(session), builder_(builder)
 {
     ui_.setupUi(this);
 
-    connect(ui_.dialogButtons, SIGNAL(clicked(QAbstractButton*)), this, SLOT(onButtonBoxClicked(QAbstractButton*)));
+    connect(ui_.dialogButtons, SIGNAL(clicked(QAbstractButton*)), this,
+            SLOT(onButtonBoxClicked(QAbstractButton*)));
 
     connect(&timer_, SIGNAL(timeout()), this, SLOT(onProgress()));
     timer_.start(100);
@@ -67,17 +66,16 @@ void MakeProgressDialog::onButtonBoxClicked(QAbstractButton* button)
 {
     switch (ui_.dialogButtons->standardButton(button))
     {
-    case QDialogButtonBox::Open:
-        session_.addNewlyCreatedTorrent(QString::fromUtf8(builder_.outputFile),
-            QFileInfo(QString::fromUtf8(builder_.top)).dir().path());
-        break;
+        case QDialogButtonBox::Open:
+            session_.addNewlyCreatedTorrent(
+                QString::fromUtf8(builder_.outputFile),
+                QFileInfo(QString::fromUtf8(builder_.top)).dir().path());
+            break;
 
-    case QDialogButtonBox::Abort:
-        builder_.abortFlag = true;
-        break;
+        case QDialogButtonBox::Abort: builder_.abortFlag = true; break;
 
-    default: // QDialogButtonBox::Ok:
-        break;
+        default:  // QDialogButtonBox::Ok:
+            break;
     }
 
     close();
@@ -113,13 +111,15 @@ void MakeProgressDialog::onProgress()
     }
     else if (b.result == TR_MAKEMETA_IO_READ)
     {
-        str = tr("Error reading \"%1\": %2").arg(QString::fromUtf8(b.errfile)).
-            arg(QString::fromUtf8(tr_strerror(b.my_errno)));
+        str = tr("Error reading \"%1\": %2")
+                  .arg(QString::fromUtf8(b.errfile))
+                  .arg(QString::fromUtf8(tr_strerror(b.my_errno)));
     }
     else if (b.result == TR_MAKEMETA_IO_WRITE)
     {
-        str = tr("Error writing \"%1\": %2").arg(QString::fromUtf8(b.errfile)).
-            arg(QString::fromUtf8(tr_strerror(b.my_errno)));
+        str = tr("Error writing \"%1\": %2")
+                  .arg(QString::fromUtf8(b.errfile))
+                  .arg(QString::fromUtf8(tr_strerror(b.my_errno)));
     }
 
     ui_.progressLabel->setText(str);
@@ -127,7 +127,8 @@ void MakeProgressDialog::onProgress()
     // buttons
     ui_.dialogButtons->button(QDialogButtonBox::Abort)->setEnabled(!b.isDone);
     ui_.dialogButtons->button(QDialogButtonBox::Ok)->setEnabled(b.isDone);
-    ui_.dialogButtons->button(QDialogButtonBox::Open)->setEnabled(b.isDone && b.result == TR_MAKEMETA_OK);
+    ui_.dialogButtons->button(QDialogButtonBox::Open)
+        ->setEnabled(b.isDone && b.result == TR_MAKEMETA_OK);
 }
 
 #include "MakeDialog.moc"
@@ -178,8 +179,10 @@ void MakeDialog::makeTorrent()
     }
 
     // start making the torrent
-    tr_makeMetaInfo(builder_.get(), target.toUtf8().constData(), trackers.isEmpty() ? nullptr : trackers.data(),
-        trackers.size(), comment.isEmpty() ? nullptr : comment.toUtf8().constData(), ui_.privateCheck->isChecked());
+    tr_makeMetaInfo(builder_.get(), target.toUtf8().constData(),
+                    trackers.isEmpty() ? nullptr : trackers.data(), trackers.size(),
+                    comment.isEmpty() ? nullptr : comment.toUtf8().constData(),
+                    ui_.privateCheck->isChecked());
 
     // pop up the dialog
     auto* dialog = new MakeProgressDialog(session_, *builder_, this);
@@ -193,7 +196,8 @@ void MakeDialog::makeTorrent()
 
 QString MakeDialog::getSource() const
 {
-    return (ui_.sourceFileRadio->isChecked() ? ui_.sourceFileButton : ui_.sourceFolderButton)->path();
+    return (ui_.sourceFileRadio->isChecked() ? ui_.sourceFileButton : ui_.sourceFolderButton)
+        ->path();
 }
 
 /***
@@ -221,17 +225,18 @@ void MakeDialog::onSourceChanged()
     {
         QString files = tr("%Ln File(s)", nullptr, builder_->fileCount);
         QString pieces = tr("%Ln Piece(s)", nullptr, builder_->pieceCount);
-        text = tr("%1 in %2; %3 @ %4").arg(Formatter::get().sizeToString(builder_->totalSize)).arg(files).arg(pieces).
-            arg(Formatter::get().sizeToString(builder_->pieceSize));
+        text = tr("%1 in %2; %3 @ %4")
+                   .arg(Formatter::get().sizeToString(builder_->totalSize))
+                   .arg(files)
+                   .arg(pieces)
+                   .arg(Formatter::get().sizeToString(builder_->pieceSize));
     }
 
     ui_.sourceSizeLabel->setText(text);
 }
 
-MakeDialog::MakeDialog(Session& session, QWidget* parent) :
-    BaseDialog(parent),
-    session_(session),
-    builder_(nullptr, &tr_metaInfoBuilderFree)
+MakeDialog::MakeDialog(Session& session, QWidget* parent)
+    : BaseDialog(parent), session_(session), builder_(nullptr, &tr_metaInfoBuilderFree)
 {
     ui_.setupUi(this);
 
@@ -285,7 +290,7 @@ void MakeDialog::dropEvent(QDropEvent* event)
             ui_.sourceFolderRadio->setChecked(true);
             ui_.sourceFolderButton->setPath(filename);
         }
-        else // it's a file
+        else  // it's a file
         {
             ui_.sourceFileRadio->setChecked(true);
             ui_.sourceFileButton->setPath(filename);

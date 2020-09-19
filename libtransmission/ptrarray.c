@@ -102,7 +102,8 @@ void tr_ptrArrayErase(tr_ptrArray* t, int begin, int end)
 ***
 **/
 
-int tr_ptrArrayLowerBound(tr_ptrArray const* t, void const* ptr, tr_voidptr_compare_func compare, bool* exact_match)
+int tr_ptrArrayLowerBound(tr_ptrArray const* t, void const* ptr, tr_voidptr_compare_func compare,
+                          bool* exact_match)
 {
     int pos = -1;
     bool match = false;
@@ -184,7 +185,8 @@ static void assertArrayIsSortedAndUnique(tr_ptrArray const* t, tr_voidptr_compar
     }
 }
 
-static void assertIndexIsSortedAndUnique(tr_ptrArray const* t, int pos, tr_voidptr_compare_func compare)
+static void assertIndexIsSortedAndUnique(tr_ptrArray const* t, int pos,
+                                         tr_voidptr_compare_func compare)
 {
     if (pos > 0)
     {
@@ -219,7 +221,8 @@ void* tr_ptrArrayFindSorted(tr_ptrArray* t, void const* ptr, tr_voidptr_compare_
     return match ? t->items[pos] : NULL;
 }
 
-static void* tr_ptrArrayRemoveSortedValue(tr_ptrArray* t, void const* ptr, tr_voidptr_compare_func compare)
+static void* tr_ptrArrayRemoveSortedValue(tr_ptrArray* t, void const* ptr,
+                                          tr_voidptr_compare_func compare)
 {
     int pos;
     bool match;
@@ -240,7 +243,8 @@ static void* tr_ptrArrayRemoveSortedValue(tr_ptrArray* t, void const* ptr, tr_vo
     return ret;
 }
 
-void tr_ptrArrayRemoveSortedPointer(tr_ptrArray* t, void const* ptr, tr_voidptr_compare_func compare)
+void tr_ptrArrayRemoveSortedPointer(tr_ptrArray* t, void const* ptr,
+                                    tr_voidptr_compare_func compare)
 {
     void* removed = tr_ptrArrayRemoveSortedValue(t, ptr, compare);
 

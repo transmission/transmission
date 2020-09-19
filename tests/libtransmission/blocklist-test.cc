@@ -7,28 +7,26 @@
  */
 
 #include <cstdio>
-#include <cstring> // strlen()
+#include <cstring>  // strlen()
 // #include <unistd.h> // sync()
 
 #include "transmission.h"
 #include "blocklist.h"
 #include "file.h"
-#include "peer-socket.h"
 #include "net.h"
-#include "session.h" // tr_sessionIsAddressBlocked()
+#include "peer-socket.h"
+#include "session.h"  // tr_sessionIsAddressBlocked()
 #include "utils.h"
 
 #include "test-fixtures.h"
 
 namespace libtransmission
 {
-
 namespace test
 {
-
 class BlocklistTest : public SessionTest
 {
-protected:
+   protected:
     static char const constexpr* const Contents1 =
         "10.5.6.7/8\n"
         "Austin Law Firm:216.16.1.144-216.16.1.151\n"
@@ -76,7 +74,8 @@ TEST_F(BlocklistTest, parsing)
     EXPECT_EQ(0, tr_blocklistGetRuleCount(session_));
 
     // init the blocklist
-    auto const path = makeString(tr_buildPath(tr_sessionGetConfigDir(session_), "blocklists", "level1", nullptr));
+    auto const path =
+        makeString(tr_buildPath(tr_sessionGetConfigDir(session_), "blocklists", "level1", nullptr));
     createFileWithContents(path, Contents1);
     tr_sessionReloadBlocklists(session_);
     EXPECT_TRUE(tr_blocklistExists(session_));
@@ -141,6 +140,6 @@ TEST_F(BlocklistTest, updating)
     tr_free(path);
 }
 
-} // namespace test
+}  // namespace test
 
-} // namespace libtransmission
+}  // namespace libtransmission

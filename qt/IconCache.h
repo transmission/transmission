@@ -9,12 +9,12 @@
 #pragma once
 
 #if defined(_WIN32)
-#include <windows.h> // UINT
+#include <windows.h>  // UINT
 class QFileInfo;
 #else
 #include <unordered_map>
 #include <unordered_set>
-#include "Utils.h" // std::hash<QString>()
+#include "Utils.h"  // std::hash<QString>()
 #endif
 
 #include <QIcon>
@@ -24,17 +24,17 @@ class QModelIndex;
 
 class IconCache
 {
-public:
+   public:
     static IconCache& get();
 
     QIcon folderIcon() const { return folder_icon_; }
     QIcon fileIcon() const { return file_icon_; }
     QIcon guessMimeIcon(QString const& filename, QIcon fallback = {}) const;
 
-protected:
+   protected:
     IconCache();
 
-private:
+   private:
     QIcon const folder_icon_;
     QIcon const file_icon_;
 

@@ -28,16 +28,14 @@ typedef enum
     TR_NET_OK,
     TR_NET_ERROR,
     TR_NET_WAIT
-}
-tr_tristate_t;
+} tr_tristate_t;
 
 typedef enum
 {
     TR_AUTO_SWITCH_UNUSED,
     TR_AUTO_SWITCH_ON,
     TR_AUTO_SWITCH_OFF,
-}
-tr_auto_switch_state_t;
+} tr_auto_switch_state_t;
 
 enum
 {
@@ -248,7 +246,8 @@ void tr_sessionUnlock(tr_session*);
 
 bool tr_sessionIsLocked(tr_session const*);
 
-struct tr_address const* tr_sessionGetPublicAddress(tr_session const* session, int tr_af_type, bool* is_default_value);
+struct tr_address const* tr_sessionGetPublicAddress(tr_session const* session, int tr_af_type,
+                                                    bool* is_default_value);
 
 struct tr_bindsockets* tr_sessionGetBindSockets(tr_session*);
 
@@ -308,7 +307,7 @@ static inline int toMemMB(uint64_t B)
 }
 
 /**
-**/
+ **/
 
 unsigned int tr_sessionGetSpeedLimit_Bps(tr_session const*, tr_direction);
 unsigned int tr_sessionGetAltSpeed_Bps(tr_session const*, tr_direction);
@@ -318,9 +317,11 @@ unsigned int tr_sessionGetPieceSpeed_Bps(tr_session const*, tr_direction);
 void tr_sessionSetSpeedLimit_Bps(tr_session*, tr_direction, unsigned int Bps);
 void tr_sessionSetAltSpeed_Bps(tr_session*, tr_direction, unsigned int Bps);
 
-bool tr_sessionGetActiveSpeedLimit_Bps(tr_session const* session, tr_direction dir, unsigned int* setme);
+bool tr_sessionGetActiveSpeedLimit_Bps(tr_session const* session, tr_direction dir,
+                                       unsigned int* setme);
 
-void tr_sessionGetNextQueuedTorrents(tr_session* session, tr_direction dir, size_t numwanted, tr_ptrArray* setme);
+void tr_sessionGetNextQueuedTorrents(tr_session* session, tr_direction dir, size_t numwanted,
+                                     tr_ptrArray* setme);
 
 int tr_sessionCountQueueFreeSlots(tr_session* session, tr_direction);
 

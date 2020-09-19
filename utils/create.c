@@ -6,7 +6,7 @@
  *
  */
 
-#include <stdio.h> /* fprintf() */
+#include <stdio.h>  /* fprintf() */
 #include <stdlib.h> /* strtoul(), EXIT_FAILURE */
 
 #include <libtransmission/transmission.h>
@@ -32,16 +32,16 @@ static char const* outfile = NULL;
 static char const* infile = NULL;
 static uint32_t piecesize_kib = 0;
 
-static tr_option options[] =
-{
-    { 'p', "private", "Allow this torrent to only be used with the specified tracker(s)", "p", false, NULL },
-    { 'o', "outfile", "Save the generated .torrent to this filename", "o", true, "<file>" },
-    { 's', "piecesize", "Set how many KiB each piece should be, overriding the preferred default", "s", true, "<size in KiB>" },
-    { 'c', "comment", "Add a comment", "c", true, "<comment>" },
-    { 't', "tracker", "Add a tracker's announce URL", "t", true, "<url>" },
-    { 'V', "version", "Show version number and exit", "V", false, NULL },
-    { 0, NULL, NULL, NULL, false, NULL }
-};
+static tr_option options[] = {
+    {'p', "private", "Allow this torrent to only be used with the specified tracker(s)", "p", false,
+     NULL},
+    {'o', "outfile", "Save the generated .torrent to this filename", "o", true, "<file>"},
+    {'s', "piecesize", "Set how many KiB each piece should be, overriding the preferred default",
+     "s", true, "<size in KiB>"},
+    {'c', "comment", "Add a comment", "c", true, "<comment>"},
+    {'t', "tracker", "Add a tracker's announce URL", "t", true, "<url>"},
+    {'V', "version", "Show version number and exit", "V", false, NULL},
+    {0, NULL, NULL, NULL, false, NULL}};
 
 static char const* getUsage(void)
 {
@@ -57,52 +57,41 @@ static int parseCommandLine(int argc, char const* const* argv)
     {
         switch (c)
         {
-        case 'V':
-            showVersion = true;
-            break;
+            case 'V': showVersion = true; break;
 
-        case 'p':
-            isPrivate = true;
-            break;
+            case 'p': isPrivate = true; break;
 
-        case 'o':
-            outfile = optarg;
-            break;
+            case 'o': outfile = optarg; break;
 
-        case 'c':
-            comment = optarg;
-            break;
+            case 'c': comment = optarg; break;
 
-        case 't':
-            if (trackerCount + 1 < MAX_TRACKERS)
-            {
-                trackers[trackerCount].tier = trackerCount;
-                trackers[trackerCount].announce = (char*)optarg;
-                ++trackerCount;
-            }
-
-            break;
-
-        case 's':
-            if (optarg != NULL)
-            {
-                char* endptr = NULL;
-                piecesize_kib = strtoul(optarg, &endptr, 10);
-
-                if (endptr != NULL && *endptr == 'M')
+            case 't':
+                if (trackerCount + 1 < MAX_TRACKERS)
                 {
-                    piecesize_kib *= KiB;
+                    trackers[trackerCount].tier = trackerCount;
+                    trackers[trackerCount].announce = (char*)optarg;
+                    ++trackerCount;
                 }
-            }
 
-            break;
+                break;
 
-        case TR_OPT_UNK:
-            infile = optarg;
-            break;
+            case 's':
+                if (optarg != NULL)
+                {
+                    char* endptr = NULL;
+                    piecesize_kib = strtoul(optarg, &endptr, 10);
 
-        default:
-            return 1;
+                    if (endptr != NULL && *endptr == 'M')
+                    {
+                        piecesize_kib *= KiB;
+                    }
+                }
+
+                break;
+
+            case TR_OPT_UNK: infile = optarg; break;
+
+            default: return 1;
         }
     }
 
@@ -162,7 +151,8 @@ int tr_main(int argc, char* argv[])
 
         if (base == NULL)
         {
-            fprintf(stderr, "ERROR: Cannot deduce output path from input path: %s\n", error->message);
+            fprintf(stderr, "ERROR: Cannot deduce output path from input path: %s\n",
+                    error->message);
             return EXIT_FAILURE;
         }
 
@@ -216,25 +206,19 @@ int tr_main(int argc, char* argv[])
 
     switch (b->result)
     {
-    case TR_MAKEMETA_OK:
-        printf("done!");
-        break;
+        case TR_MAKEMETA_OK: printf("done!"); break;
 
-    case TR_MAKEMETA_URL:
-        printf("bad announce URL: \"%s\"", b->errfile);
-        break;
+        case TR_MAKEMETA_URL: printf("bad announce URL: \"%s\"", b->errfile); break;
 
-    case TR_MAKEMETA_IO_READ:
-        printf("error reading \"%s\": %s", b->errfile, tr_strerror(b->my_errno));
-        break;
+        case TR_MAKEMETA_IO_READ:
+            printf("error reading \"%s\": %s", b->errfile, tr_strerror(b->my_errno));
+            break;
 
-    case TR_MAKEMETA_IO_WRITE:
-        printf("error writing \"%s\": %s", b->errfile, tr_strerror(b->my_errno));
-        break;
+        case TR_MAKEMETA_IO_WRITE:
+            printf("error writing \"%s\": %s", b->errfile, tr_strerror(b->my_errno));
+            break;
 
-    case TR_MAKEMETA_CANCELLED:
-        printf("cancelled");
-        break;
+        case TR_MAKEMETA_CANCELLED: printf("cancelled"); break;
     }
 
     putc('\n', stdout);

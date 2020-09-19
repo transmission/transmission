@@ -18,13 +18,11 @@
 #include "PathButton.h"
 #include "Utils.h"
 
-PathButton::PathButton(QWidget* parent) :
-    QToolButton(parent),
-    mode_(DirectoryMode)
+PathButton::PathButton(QWidget* parent) : QToolButton(parent), mode_(DirectoryMode)
 {
     setSizePolicy(QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed));
     setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-    setText(tr("(None)")); // for minimum width
+    setText(tr("(None)"));  // for minimum width
 
     updateAppearance();
 
@@ -84,10 +82,13 @@ void PathButton::paintEvent(QPaintEvent* /*event*/)
     QStyleOptionToolButton option;
     initStyleOption(&option);
 
-    QSize const fake_content_size(qMax(100, qApp->globalStrut().width()), qMax(100, qApp->globalStrut().height()));
-    QSize const fake_size_hint = style()->sizeFromContents(QStyle::CT_ToolButton, &option, fake_content_size, this);
+    QSize const fake_content_size(qMax(100, qApp->globalStrut().width()),
+                                  qMax(100, qApp->globalStrut().height()));
+    QSize const fake_size_hint =
+        style()->sizeFromContents(QStyle::CT_ToolButton, &option, fake_content_size, this);
 
-    int text_width = width() - (fake_size_hint.width() - fake_content_size.width()) - iconSize().width() - 6;
+    int text_width =
+        width() - (fake_size_hint.width() - fake_content_size.width()) - iconSize().width() - 6;
 
     if (popupMode() == MenuButtonPopup)
     {
@@ -95,7 +96,8 @@ void PathButton::paintEvent(QPaintEvent* /*event*/)
     }
 
     QFileInfo const path_info(path_);
-    option.text = path_.isEmpty() ? tr("(None)") : (path_info.fileName().isEmpty() ? path_ : path_info.fileName());
+    option.text = path_.isEmpty() ? tr("(None)")
+                                  : (path_info.fileName().isEmpty() ? path_ : path_info.fileName());
     option.text = fontMetrics().elidedText(option.text, Qt::ElideMiddle, text_width);
 
     painter.drawComplexControl(QStyle::CC_ToolButton, option);
@@ -161,7 +163,8 @@ void PathButton::updateAppearance()
 
     if (icon.isNull())
     {
-        icon = icon_provider.icon(isDirMode() ? QFileIconProvider::Folder : QFileIconProvider::File);
+        icon =
+            icon_provider.icon(isDirMode() ? QFileIconProvider::Folder : QFileIconProvider::File);
     }
 
     setIconSize(QSize(icon_size, icon_size));

@@ -21,7 +21,8 @@
  */
 
 /**
- * @brief invoked by tr_sessionInit() to set up the locations of the resume, torrent, and clutch directories.
+ * @brief invoked by tr_sessionInit() to set up the locations of the resume, torrent, and clutch
+ * directories.
  * @see tr_getResumeDir()
  * @see tr_getTorrentDir()
  * @see tr_getWebClientDir()
@@ -50,7 +51,7 @@ char* tr_getSessionIdDir(void);
 typedef struct tr_thread tr_thread;
 
 /** @brief Instantiate a new process thread */
-tr_thread* tr_threadNew(void (* func)(void*), void* arg);
+tr_thread* tr_threadNew(void (*func)(void*), void* arg);
 
 /** @brief Return nonzero if this function is being called from `thread'
     @param thread the thread being tested */

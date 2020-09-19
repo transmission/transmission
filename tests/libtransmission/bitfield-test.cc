@@ -6,16 +6,16 @@
  *
  */
 
+#include "bitfield.h"
 #include "transmission.h"
 #include "crypto-utils.h"
-#include "bitfield.h"
 #include "utils.h" /* tr_free */
 
 #include "gtest/gtest.h"
 
 TEST(Bitfield, countRange)
 {
-    auto constexpr IterCount = int{ 10000 };
+    auto constexpr IterCount = int {10000};
 
     for (auto i = 0; i < IterCount; ++i)
     {
@@ -35,8 +35,7 @@ TEST(Bitfield, countRange)
         do
         {
             end = tr_rand_int_weak(bit_count);
-        }
-        while (end == begin);
+        } while (end == begin);
 
         // ensure end <= begin
         if (end < begin)

@@ -12,7 +12,8 @@
 
 #define TORRENT_CELL_RENDERER_TYPE (torrent_cell_renderer_get_type())
 
-#define TORRENT_CELL_RENDERER(o) (G_TYPE_CHECK_INSTANCE_CAST((o), TORRENT_CELL_RENDERER_TYPE, TorrentCellRenderer))
+#define TORRENT_CELL_RENDERER(o) \
+    (G_TYPE_CHECK_INSTANCE_CAST((o), TORRENT_CELL_RENDERER_TYPE, TorrentCellRenderer))
 
 typedef struct TorrentCellRenderer TorrentCellRenderer;
 

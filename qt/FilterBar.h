@@ -34,13 +34,14 @@ class FilterBar : public QWidget
     Q_OBJECT
     TR_DISABLE_COPY_MOVE(FilterBar)
 
-public:
-    FilterBar(Prefs& prefs, TorrentModel const& torrents, TorrentFilter const& filter, QWidget* parent = nullptr);
+   public:
+    FilterBar(Prefs& prefs, TorrentModel const& torrents, TorrentFilter const& filter,
+              QWidget* parent = nullptr);
 
-public slots:
+   public slots:
     void clear();
 
-private:
+   private:
     FilterBarComboBox* createTrackerCombo(QStandardItemModel*);
     FilterBarComboBox* createActivityCombo();
     void refreshTrackers();
@@ -69,7 +70,7 @@ private:
     Pending pending_ = {};
     bool is_bootstrapping_ = {};
 
-private slots:
+   private slots:
     void recount();
     void recountSoon(Pending const& fields);
     void recountActivitySoon() { recountSoon(Pending().set(ACTIVITY)); }

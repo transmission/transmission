@@ -13,8 +13,8 @@
 #include <event2/util.h> /* evutil_ascii_strcasecmp() */
 
 #ifndef _WIN32
-#include <unistd.h> /* getuid() */
 #include <sys/types.h> /* types needed by quota.h */
+#include <unistd.h>    /* getuid() */
 #if defined(__FreeBSD__) || defined(__OpenBSD__)
 #include <ufs/ufs/quota.h> /* quotactl() */
 #elif defined(__DragonFly__)
@@ -41,9 +41,9 @@
 #include <paths.h> /* _PATH_MOUNTED */
 #endif
 #else /* BSD derived systems */
+#include <sys/mount.h>
 #include <sys/param.h>
 #include <sys/ucred.h>
-#include <sys/mount.h>
 #endif
 #endif
 
@@ -66,9 +66,9 @@
 #endif
 
 #include "transmission.h"
+#include "platform-quota.h"
 #include "tr-macros.h"
 #include "utils.h"
-#include "platform-quota.h"
 
 /***
 ****
@@ -370,9 +370,9 @@ static int64_t getquota(char const* device)
 #elif defined(__UCLIBC__) && !TR_UCLIBC_CHECK_VERSION(1, 0, 18)
         spaceused = (int64_t)btodb(dq.dqb_curblocks);
 #elif defined(__sun) || (defined(_LINUX_QUOTA_VERSION) && _LINUX_QUOTA_VERSION < 2)
-        spaceused = (int64_t)dq.dqb_curblocks >> 1;
+    spaceused = (int64_t)dq.dqb_curblocks >> 1;
 #else
-        spaceused = btodb(dq.dqb_curspace);
+    spaceused = btodb(dq.dqb_curspace);
 #endif
 
         freespace = limit - spaceused;

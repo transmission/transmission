@@ -12,15 +12,15 @@
 #include <stdarg.h>
 #include <string.h> /* strchr(), strrchr(), strlen(), strstr() */
 
-#include <gtk/gtk.h>
-#include <glib/gi18n.h>
 #include <gio/gio.h> /* g_file_trash() */
+#include <glib/gi18n.h>
+#include <gtk/gtk.h>
 
 #include <libtransmission/transmission.h> /* TR_RATIO_NA, TR_RATIO_INF */
 #include <libtransmission/error.h>
-#include <libtransmission/utils.h> /* tr_strratio() */
-#include <libtransmission/web.h> /* tr_webResponseStr() */
+#include <libtransmission/utils.h>   /* tr_strratio() */
 #include <libtransmission/version.h> /* SHORT_VERSION_STRING */
+#include <libtransmission/web.h>     /* tr_webResponseStr() */
 
 #include "conf.h"
 #include "hig.h"
@@ -58,20 +58,15 @@ char const* gtr_get_unicode_string(int i)
 {
     switch (i)
     {
-    case GTR_UNICODE_UP:
-        return "\xE2\x96\xB4";
+        case GTR_UNICODE_UP: return "\xE2\x96\xB4";
 
-    case GTR_UNICODE_DOWN:
-        return "\xE2\x96\xBE";
+        case GTR_UNICODE_DOWN: return "\xE2\x96\xBE";
 
-    case GTR_UNICODE_INF:
-        return "\xE2\x88\x9E";
+        case GTR_UNICODE_INF: return "\xE2\x88\x9E";
 
-    case GTR_UNICODE_BULLET:
-        return "\xE2\x88\x99";
+        case GTR_UNICODE_BULLET: return "\xE2\x88\x99";
 
-    default:
-        return "err";
+        default: return "err";
     }
 }
 
@@ -205,8 +200,9 @@ void gtr_get_host_from_url(char* buf, size_t buflen, char const* url)
 
 static gboolean gtr_is_supported_url(char const* str)
 {
-    return str != NULL && (g_str_has_prefix(str, "ftp://") || g_str_has_prefix(str, "http://") ||
-        g_str_has_prefix(str, "https://"));
+    return str != NULL
+           && (g_str_has_prefix(str, "ftp://") || g_str_has_prefix(str, "http://")
+               || g_str_has_prefix(str, "https://"));
 }
 
 gboolean gtr_is_magnet_link(char const* str)
@@ -247,7 +243,8 @@ static GtkWindow* getWindow(GtkWidget* w)
     return GTK_WINDOW(gtk_widget_get_ancestor(w, GTK_TYPE_WINDOW));
 }
 
-void gtr_add_torrent_error_dialog(GtkWidget* child, int err, tr_torrent* duplicate_torrent, char const* filename)
+void gtr_add_torrent_error_dialog(GtkWidget* child, int err, tr_torrent* duplicate_torrent,
+                                  char const* filename)
 {
     char* secondary;
     GtkWidget* w;
@@ -259,23 +256,24 @@ void gtr_add_torrent_error_dialog(GtkWidget* child, int err, tr_torrent* duplica
     }
     else if (err == TR_PARSE_DUPLICATE)
     {
-        secondary = g_strdup_printf(_("The torrent file \"%s\" is already in use by \"%s.\""), filename,
-            tr_torrentName(duplicate_torrent));
+        secondary = g_strdup_printf(_("The torrent file \"%s\" is already in use by \"%s.\""),
+                                    filename, tr_torrentName(duplicate_torrent));
     }
     else
     {
-        secondary = g_strdup_printf(_("The torrent file \"%s\" encountered an unknown error."), filename);
+        secondary =
+            g_strdup_printf(_("The torrent file \"%s\" encountered an unknown error."), filename);
     }
 
-    w = gtk_message_dialog_new(win, GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, "%s",
-        _("Error opening torrent"));
+    w = gtk_message_dialog_new(win, GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_ERROR,
+                               GTK_BUTTONS_CLOSE, "%s", _("Error opening torrent"));
     gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(w), "%s", secondary);
     g_signal_connect_swapped(w, "response", G_CALLBACK(gtk_widget_destroy), w);
     gtk_widget_show_all(w);
     g_free(secondary);
 }
 
-typedef void (* PopupFunc)(GtkWidget*, GdkEventButton*);
+typedef void (*PopupFunc)(GtkWidget*, GdkEventButton*);
 
 /* pop up the context menu if a user right-clicks.
    if the row they right-click on isn't selected, select it. */
@@ -289,7 +287,8 @@ gboolean on_tree_view_button_pressed(GtkWidget* view, GdkEventButton* event, gpo
         GtkTreePath* path;
         GtkTreeSelection* selection = gtk_tree_view_get_selection(tv);
 
-        if (gtk_tree_view_get_path_at_pos(tv, (gint)event->x, (gint)event->y, &path, NULL, NULL, NULL))
+        if (gtk_tree_view_get_path_at_pos(tv, (gint)event->x, (gint)event->y, &path, NULL, NULL,
+                                          NULL))
         {
             if (!gtk_tree_selection_path_is_selected(selection, path))
             {
@@ -376,8 +375,8 @@ char const* gtr_get_help_uri(void)
 
     if (uri == NULL)
     {
-        uri = g_strdup_printf("https://transmissionbt.com/help/gtk/%d.%dx",
-            MAJOR_VERSION, MINOR_VERSION / 10);
+        uri = g_strdup_printf("https://transmissionbt.com/help/gtk/%d.%dx", MAJOR_VERSION,
+                              MINOR_VERSION / 10);
     }
 
     return uri;
@@ -414,7 +413,7 @@ void gtr_open_uri(char const* uri)
 
         if (!opened)
         {
-            char* argv[] = { (char*)"xdg-open", (char*)uri, NULL };
+            char* argv[] = {(char*)"xdg-open", (char*)uri, NULL};
             opened = g_spawn_async(NULL, argv, NULL, G_SPAWN_SEARCH_PATH, NULL, NULL, NULL, NULL);
         }
 
@@ -487,8 +486,7 @@ GtkWidget* gtr_combo_box_new_enum(char const* text_1, ...)
             int const val = va_arg(vl, int);
             gtk_list_store_insert_with_values(store, NULL, INT_MAX, 0, val, 1, text, -1);
             text = va_arg(vl, char const*);
-        }
-        while (text != NULL);
+        } while (text != NULL);
 
         va_end(vl);
     }
@@ -518,11 +516,8 @@ int gtr_combo_box_get_active_enum(GtkComboBox* combo_box)
 
 GtkWidget* gtr_priority_combo_new(void)
 {
-    return gtr_combo_box_new_enum(
-        _("High"), TR_PRI_HIGH,
-        _("Normal"), TR_PRI_NORMAL,
-        _("Low"), TR_PRI_LOW,
-        NULL);
+    return gtr_combo_box_new_enum(_("High"), TR_PRI_HIGH, _("Normal"), TR_PRI_NORMAL, _("Low"),
+                                  TR_PRI_LOW, NULL);
 }
 
 /***
@@ -593,15 +588,19 @@ void gtr_unrecognized_url_dialog(GtkWidget* parent, char const* url)
 
     GString* gstr = g_string_new(NULL);
 
-    GtkWidget* w = gtk_message_dialog_new(window, 0, GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, "%s", _("Unrecognized URL"));
+    GtkWidget* w = gtk_message_dialog_new(window, 0, GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, "%s",
+                                          _("Unrecognized URL"));
 
     g_string_append_printf(gstr, _("Transmission doesn't know how to use \"%s\""), url);
 
     if (gtr_is_magnet_link(url) && strstr(url, xt) == NULL)
     {
         g_string_append_printf(gstr, "\n \n");
-        g_string_append_printf(gstr, _("This magnet link appears to be intended for something other than BitTorrent. "
-            "BitTorrent magnet links have a section containing \"%s\"."), xt);
+        g_string_append_printf(
+            gstr,
+            _("This magnet link appears to be intended for something other than BitTorrent. "
+              "BitTorrent magnet links have a section containing \"%s\"."),
+            xt);
     }
 
     gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(w), "%s", gstr->str);
@@ -616,17 +615,16 @@ void gtr_unrecognized_url_dialog(GtkWidget* parent, char const* url)
 
 void gtr_paste_clipboard_url_into_entry(GtkWidget* e)
 {
-    char* text[] =
-    {
+    char* text[] = {
         g_strstrip(gtk_clipboard_wait_for_text(gtk_clipboard_get(GDK_SELECTION_PRIMARY))),
-        g_strstrip(gtk_clipboard_wait_for_text(gtk_clipboard_get(GDK_SELECTION_CLIPBOARD)))
-    };
+        g_strstrip(gtk_clipboard_wait_for_text(gtk_clipboard_get(GDK_SELECTION_CLIPBOARD)))};
 
     for (size_t i = 0; i < G_N_ELEMENTS(text); ++i)
     {
         char* s = text[i];
 
-        if (s != NULL && (gtr_is_supported_url(s) || gtr_is_magnet_link(s) || gtr_is_hex_hashcode(s)))
+        if (s != NULL
+            && (gtr_is_supported_url(s) || gtr_is_magnet_link(s) || gtr_is_hex_hashcode(s)))
         {
             gtk_entry_set_text(GTK_ENTRY(e), s);
             break;
@@ -689,7 +687,7 @@ static void freespace_label_data_free(gpointer gdata)
 
 static TR_DEFINE_QUARK(freespace_label_data, freespace_label_data)
 
-static void on_freespace_label_core_destroyed(gpointer gdata, GObject* dead_core G_GNUC_UNUSED)
+    static void on_freespace_label_core_destroyed(gpointer gdata, GObject* dead_core G_GNUC_UNUSED)
 {
     struct freespace_label_data* data = gdata;
     data->core = NULL;

@@ -43,16 +43,19 @@ static void tr_dh_secret_align(struct tr_dh_secret* handle, size_t current_key_l
     tr_dh_align_key(handle->key, current_key_length, handle->key_length);
 }
 
-bool tr_dh_secret_derive(tr_dh_secret_t raw_handle, void const* prepend_data, size_t prepend_data_size, void const* append_data,
-    size_t append_data_size, uint8_t* hash)
+bool tr_dh_secret_derive(tr_dh_secret_t raw_handle, void const* prepend_data,
+                         size_t prepend_data_size, void const* append_data, size_t append_data_size,
+                         uint8_t* hash)
 {
     TR_ASSERT(raw_handle != NULL);
     TR_ASSERT(hash != NULL);
 
     struct tr_dh_secret* handle = raw_handle;
 
-    return tr_sha1(hash, prepend_data == NULL ? "" : prepend_data, prepend_data == NULL ? 0 : (int)prepend_data_size,
-        handle->key, (int)handle->key_length, append_data, append_data == NULL ? 0 : (int)append_data_size, NULL);
+    return tr_sha1(hash, prepend_data == NULL ? "" : prepend_data,
+                   prepend_data == NULL ? 0 : (int)prepend_data_size, handle->key,
+                   (int)handle->key_length, append_data,
+                   append_data == NULL ? 0 : (int)append_data_size, NULL);
 }
 
 void tr_dh_secret_free(tr_dh_secret_t handle)

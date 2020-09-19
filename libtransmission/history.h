@@ -42,10 +42,8 @@ typedef struct tr_recentHistory
     {
         unsigned int n;
         time_t date;
-    }
-    slices[TR_RECENT_HISTORY_PERIOD_SEC];
-}
-tr_recentHistory;
+    } slices[TR_RECENT_HISTORY_PERIOD_SEC];
+} tr_recentHistory;
 
 /**
  * @brief add a counter to the recent history object.

@@ -62,22 +62,23 @@ char* tr_metainfoGetBasename(tr_info const* inf, enum tr_metainfo_basename_forma
 {
     switch (format)
     {
-    case TR_METAINFO_BASENAME_NAME_AND_PARTIAL_HASH:
-        return metainfoGetBasenameNameAndPartialHash(inf);
+        case TR_METAINFO_BASENAME_NAME_AND_PARTIAL_HASH:
+            return metainfoGetBasenameNameAndPartialHash(inf);
 
-    case TR_METAINFO_BASENAME_HASH:
-        return metainfoGetBasenameHashOnly(inf);
+        case TR_METAINFO_BASENAME_HASH: return metainfoGetBasenameHashOnly(inf);
 
-    default:
-        TR_ASSERT_MSG(false, "unknown metainfo basename format %d", (int)format);
-        return NULL;
+        default:
+            TR_ASSERT_MSG(false, "unknown metainfo basename format %d", (int)format);
+            return NULL;
     }
 }
 
-static char* getTorrentFilename(tr_session const* session, tr_info const* inf, enum tr_metainfo_basename_format format)
+static char* getTorrentFilename(tr_session const* session, tr_info const* inf,
+                                enum tr_metainfo_basename_format format)
 {
     char* base = tr_metainfoGetBasename(inf, format);
-    char* filename = tr_strdup_printf("%s" TR_PATH_DELIMITER_STR "%s.torrent", tr_getTorrentDir(session), base);
+    char* filename =
+        tr_strdup_printf("%s" TR_PATH_DELIMITER_STR "%s.torrent", tr_getTorrentDir(session), base);
     tr_free(base);
     return filename;
 }
@@ -97,12 +98,9 @@ char* tr_metainfo_sanitize_path_component(char const* str, size_t len, bool* is_
 
     /* https://docs.microsoft.com/en-us/windows/desktop/FileIO/naming-a-file */
     char const* const reserved_chars = "<>:\"/\\|?*";
-    char const* const reserved_names[] =
-    {
-        "CON", "PRN", "AUX", "NUL",
-        "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9",
-        "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9"
-    };
+    char const* const reserved_names[] = {
+        "CON",  "PRN",  "AUX",  "NUL",  "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7",
+        "COM8", "COM9", "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9"};
 
     char* const ret = tr_new(char, len + 2);
     memcpy(ret, str, len);
@@ -120,8 +118,8 @@ char* tr_metainfo_sanitize_path_component(char const* str, size_t len, bool* is_
     for (size_t i = 0; i < TR_N_ELEMENTS(reserved_names); ++i)
     {
         size_t const reserved_name_len = strlen(reserved_names[i]);
-        if (evutil_ascii_strncasecmp(ret, reserved_names[i], reserved_name_len) != 0 ||
-            (ret[reserved_name_len] != '\0' && ret[reserved_name_len] != '.'))
+        if (evutil_ascii_strncasecmp(ret, reserved_names[i], reserved_name_len) != 0
+            || (ret[reserved_name_len] != '\0' && ret[reserved_name_len] != '.'))
         {
             continue;
         }
@@ -163,7 +161,8 @@ char* tr_metainfo_sanitize_path_component(char const* str, size_t len, bool* is_
     return ret;
 }
 
-static bool getfile(char** setme, bool* is_adjusted, char const* root, tr_variant* path, struct evbuffer* buf)
+static bool getfile(char** setme, bool* is_adjusted, char const* root, tr_variant* path,
+                    struct evbuffer* buf)
 {
     bool success = false;
     size_t root_len = 0;
@@ -233,7 +232,8 @@ static char const* parseFiles(tr_info* inf, tr_variant* files, tr_variant const*
     inf->totalSize = 0;
 
     bool is_root_adjusted;
-    char* const root_name = tr_metainfo_sanitize_path_component(inf->name, strlen(inf->name), &is_root_adjusted);
+    char* const root_name =
+        tr_metainfo_sanitize_path_component(inf->name, strlen(inf->name), &is_root_adjusted);
     if (root_name == NULL)
     {
         return "path";
@@ -512,7 +512,8 @@ static void geturllist(tr_info* inf, tr_variant* meta)
             }
         }
     }
-    else if (tr_variantDictFindStr(meta, TR_KEY_url_list, &url, NULL)) /* handle single items in webseeds */
+    else if (tr_variantDictFindStr(meta, TR_KEY_url_list, &url,
+                                   NULL)) /* handle single items in webseeds */
     {
         char* fixed_url = fix_webseed_url(inf, url);
 
@@ -525,8 +526,8 @@ static void geturllist(tr_info* inf, tr_variant* meta)
     }
 }
 
-static char const* tr_metainfoParseImpl(tr_session const* session, tr_info* inf, bool* hasInfoDict, size_t* infoDictLength,
-    tr_variant const* meta_in)
+static char const* tr_metainfoParseImpl(tr_session const* session, tr_info* inf, bool* hasInfoDict,
+                                        size_t* infoDictLength, tr_variant const* meta_in)
 {
     int64_t i;
     size_t len;
@@ -715,8 +716,9 @@ static char const* tr_metainfoParseImpl(tr_session const* session, tr_info* inf,
     /* files */
     if (!isMagnet)
     {
-        if ((str = parseFiles(inf, tr_variantDictFind(infoDict, TR_KEY_files), tr_variantDictFind(infoDict,
-            TR_KEY_length))) != NULL)
+        if ((str = parseFiles(inf, tr_variantDictFind(infoDict, TR_KEY_files),
+                              tr_variantDictFind(infoDict, TR_KEY_length)))
+            != NULL)
         {
             return str;
         }
@@ -743,13 +745,14 @@ static char const* tr_metainfoParseImpl(tr_session const* session, tr_info* inf,
 
     /* filename of Transmission's copy */
     tr_free(inf->torrent);
-    inf->torrent = session != NULL ? getTorrentFilename(session, inf, TR_METAINFO_BASENAME_HASH) : NULL;
+    inf->torrent =
+        session != NULL ? getTorrentFilename(session, inf, TR_METAINFO_BASENAME_HASH) : NULL;
 
     return NULL;
 }
 
-bool tr_metainfoParse(tr_session const* session, tr_variant const* meta_in, tr_info* inf, bool* hasInfoDict,
-    size_t* infoDictLength)
+bool tr_metainfoParse(tr_session const* session, tr_variant const* meta_in, tr_info* inf,
+                      bool* hasInfoDict, size_t* infoDictLength)
 {
     char const* badTag = tr_metainfoParseImpl(session, inf, hasInfoDict, infoDictLength, meta_in);
     bool const success = badTag == NULL;
@@ -808,15 +811,17 @@ void tr_metainfoRemoveSaved(tr_session const* session, tr_info const* inf)
     tr_free(filename);
 }
 
-void tr_metainfoMigrateFile(tr_session const* session, tr_info const* info, enum tr_metainfo_basename_format old_format,
-    enum tr_metainfo_basename_format new_format)
+void tr_metainfoMigrateFile(tr_session const* session, tr_info const* info,
+                            enum tr_metainfo_basename_format old_format,
+                            enum tr_metainfo_basename_format new_format)
 {
     char* old_filename = getTorrentFilename(session, info, old_format);
     char* new_filename = getTorrentFilename(session, info, new_format);
 
     if (tr_sys_path_rename(old_filename, new_filename, NULL))
     {
-        tr_logAddNamedError(info->name, "Migrated torrent file from \"%s\" to \"%s\"", old_filename, new_filename);
+        tr_logAddNamedError(info->name, "Migrated torrent file from \"%s\" to \"%s\"", old_filename,
+                            new_filename);
     }
 
     tr_free(new_filename);

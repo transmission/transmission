@@ -6,11 +6,11 @@
  *
  */
 
+#include "stats.h"
 #include "transmission.h"
-#include "session.h"
 #include "log.h"
 #include "platform.h" /* tr_sessionGetConfigDir() */
-#include "stats.h"
+#include "session.h"
 #include "utils.h" /* tr_buildPath */
 #include "variant.h"
 
@@ -18,15 +18,12 @@
 ****
 ***/
 
-struct tr_session_stats const TR_SESSION_STATS_INIT =
-{
-    .ratio = 0.0F,
-    .uploadedBytes = 0,
-    .downloadedBytes = 0,
-    .filesAdded = 0,
-    .sessionCount = 0,
-    .secondsActive = 0
-};
+struct tr_session_stats const TR_SESSION_STATS_INIT = {.ratio = 0.0F,
+                                                       .uploadedBytes = 0,
+                                                       .downloadedBytes = 0,
+                                                       .filesAdded = 0,
+                                                       .sessionCount = 0,
+                                                       .secondsActive = 0};
 
 /** @brief Opaque, per-session data structure for bandwidth use statistics */
 struct tr_stats_handle

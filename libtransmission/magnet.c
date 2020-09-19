@@ -6,8 +6,8 @@
  *
  */
 
+#include <stdio.h>  /* sscanf() */
 #include <string.h> /* strchr() */
-#include <stdio.h> /* sscanf() */
 
 #include "transmission.h"
 #include "crypto-utils.h" /* tr_hex_to_sha1() */
@@ -24,8 +24,7 @@
 /* this base32 code converted from code by Robert Kaye and Gordon Mohr
  * and is public domain. see http://bitzi.com/publicdomain for more info */
 
-static int const base32Lookup[] =
-{
+static int const base32Lookup[] = {
     0xFF, 0xFF, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F, /* '0', '1', '2', '3', '4', '5', '6', '7' */
     0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, /* '8', '9', ':', ';', '<', '=', '>', '?' */
     0xFF, 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, /* '@', 'A', 'B', 'C', 'D', 'E', 'F', 'G' */
@@ -35,7 +34,7 @@ static int const base32Lookup[] =
     0xFF, 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, /* '`', 'a', 'b', 'c', 'd', 'e', 'f', 'g' */
     0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, /* 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o' */
     0x0F, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, /* 'p', 'q', 'r', 's', 't', 'u', 'v', 'w' */
-    0x17, 0x18, 0x19, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF /* 'x', 'y', 'z', '{', '|', '}', '~', 'DEL' */
+    0x17, 0x18, 0x19, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF  /* 'x', 'y', 'z', '{', '|', '}', '~', 'DEL' */
 };
 
 static void base32_to_sha1(uint8_t* out, char const* in, size_t const inlen)
@@ -155,7 +154,8 @@ tr_magnet_info* tr_magnetParse(char const* uri)
                 vallen = strlen(val);
             }
 
-            if (keylen == 2 && memcmp(key, "xt", 2) == 0 && val != NULL && strncmp(val, "urn:btih:", 9) == 0)
+            if (keylen == 2 && memcmp(key, "xt", 2) == 0 && val != NULL
+                && strncmp(val, "urn:btih:", 9) == 0)
             {
                 char const* hash = val + 9;
                 size_t const hashlen = vallen - 9;

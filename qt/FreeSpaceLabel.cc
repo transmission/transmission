@@ -22,14 +22,11 @@ using ::trqt::variant_helpers::dictFind;
 
 namespace
 {
-
 int const IntervalMSec = 15000;
 
-} // namespace
+}  // namespace
 
-FreeSpaceLabel::FreeSpaceLabel(QWidget* parent) :
-    QLabel(parent),
-    timer_(this)
+FreeSpaceLabel::FreeSpaceLabel(QWidget* parent) : QLabel(parent), timer_(this)
 {
     timer_.setSingleShot(true);
     timer_.setInterval(IntervalMSec);
@@ -73,30 +70,26 @@ void FreeSpaceLabel::onTimer()
 
     auto* q = new RpcQueue();
 
-    q->add([this, &args]()
+    q->add([this, &args]() { return session_->exec("free-space", &args); });
+
+    q->add([this](RpcResponse const& r) {
+        // update the label
+        auto const bytes = dictFind<int64_t>(r.args.get(), TR_KEY_size_bytes);
+        if (bytes && *bytes > 1)
         {
-            return session_->exec("free-space", &args);
-        });
-
-    q->add([this](RpcResponse const& r)
+            setText(tr("%1 free").arg(Formatter::get().sizeToString(*bytes)));
+        }
+        else
         {
-            // update the label
-            auto const bytes = dictFind<int64_t>(r.args.get(), TR_KEY_size_bytes);
-            if (bytes && *bytes > 1)
-            {
-                setText(tr("%1 free").arg(Formatter::get().sizeToString(*bytes)));
-            }
-            else
-            {
-                setText(QString());
-            }
+            setText(QString());
+        }
 
-            // update the tooltip
-            auto const path = dictFind<QString>(r.args.get(), TR_KEY_path);
-            setToolTip(QDir::toNativeSeparators(path ? *path : QString()));
+        // update the tooltip
+        auto const path = dictFind<QString>(r.args.get(), TR_KEY_path);
+        setToolTip(QDir::toNativeSeparators(path ? *path : QString()));
 
-            timer_.start();
-        });
+        timer_.start();
+    });
 
     q->run();
 }

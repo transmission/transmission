@@ -12,7 +12,7 @@
 #include <QTreeView>
 
 #include "Macros.h"
-#include "Torrent.h" // FileList
+#include "Torrent.h"  // FileList
 
 class QAction;
 class QMenu;
@@ -26,7 +26,7 @@ class FileTreeView : public QTreeView
     Q_OBJECT
     TR_DISABLE_COPY_MOVE(FileTreeView)
 
-public:
+   public:
     FileTreeView(QWidget* parent = nullptr, bool editable = true);
 
     void clear();
@@ -34,13 +34,13 @@ public:
 
     void setEditable(bool editable);
 
-signals:
+   signals:
     void priorityChanged(QSet<int> const& file_indices, int priority);
     void wantedChanged(QSet<int> const& file_indices, bool wanted);
     void pathEdited(QString const& old_path, QString const& new_name);
     void openRequested(QString const& path);
 
-protected:
+   protected:
     // QWidget
     void resizeEvent(QResizeEvent* event) override;
     void keyPressEvent(QKeyEvent* event) override;
@@ -50,7 +50,7 @@ protected:
     // QAbstractItemView
     bool edit(QModelIndex const& index, EditTrigger trigger, QEvent* event) override;
 
-private slots:
+   private slots:
     void onClicked(QModelIndex const& index);
 
     void checkSelectedItems();
@@ -62,13 +62,13 @@ private slots:
 
     void refreshContextMenuActionsSensitivity();
 
-private:
+   private:
     void initContextMenu();
     QModelIndexList selectedSourceRows(int column = 0) const;
 
     static Qt::CheckState getCumulativeCheckState(QModelIndexList const& indices);
 
-private:
+   private:
     FileTreeModel* model_ = {};
     QSortFilterProxyModel* proxy_ = {};
     FileTreeDelegate* delegate_ = {};

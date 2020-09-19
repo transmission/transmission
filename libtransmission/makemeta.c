@@ -17,9 +17,9 @@
 #include "error.h"
 #include "file.h"
 #include "log.h"
-#include "session.h"
 #include "makemeta.h"
 #include "platform.h" /* threads, locks */
+#include "session.h"
 #include "tr-assert.h"
 #include "utils.h" /* buildpath */
 #include "variant.h"
@@ -56,7 +56,8 @@ static struct FileList* getFiles(char const* dir, char const* base, struct FileL
         return list;
     }
 
-    tr_sys_dir_t odir = info.type == TR_SYS_PATH_IS_DIRECTORY ? tr_sys_dir_open(buf, NULL) : TR_BAD_SYS_DIR;
+    tr_sys_dir_t odir =
+        info.type == TR_SYS_PATH_IS_DIRECTORY ? tr_sys_dir_open(buf, NULL) : TR_BAD_SYS_DIR;
 
     if (odir != TR_BAD_SYS_DIR)
     {
@@ -149,7 +150,8 @@ tr_metainfo_builder* tr_metaInfoBuilderCreate(char const* topFileArg)
 
     {
         tr_sys_path_info info;
-        ret->isFolder = tr_sys_path_get_info(ret->top, 0, &info, NULL) && info.type == TR_SYS_PATH_IS_DIRECTORY;
+        ret->isFolder =
+            tr_sys_path_get_info(ret->top, 0, &info, NULL) && info.type == TR_SYS_PATH_IS_DIRECTORY;
     }
 
     /* build a list of files containing top file and,
@@ -267,7 +269,8 @@ static uint8_t* getHashInfo(tr_metainfo_builder* b)
     buf = tr_valloc(b->pieceSize);
     b->pieceIndex = 0;
     totalRemain = b->totalSize;
-    fd = tr_sys_file_open(b->files[fileIndex].filename, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, &error);
+    fd = tr_sys_file_open(b->files[fileIndex].filename, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL,
+                          0, &error);
 
     if (fd == TR_BAD_SYS_FILE)
     {
@@ -305,7 +308,8 @@ static uint8_t* getHashInfo(tr_metainfo_builder* b)
 
                 if (++fileIndex < b->fileCount)
                 {
-                    fd = tr_sys_file_open(b->files[fileIndex].filename, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, &error);
+                    fd = tr_sys_file_open(b->files[fileIndex].filename,
+                                          TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, &error);
 
                     if (fd == TR_BAD_SYS_FILE)
                     {
@@ -348,8 +352,8 @@ static uint8_t* getHashInfo(tr_metainfo_builder* b)
     return ret;
 }
 
-static void getFileInfo(char const* topFile, tr_metainfo_builder_file const* file, tr_variant* uninitialized_length,
-    tr_variant* uninitialized_path)
+static void getFileInfo(char const* topFile, tr_metainfo_builder_file const* file,
+                        tr_variant* uninitialized_length, tr_variant* uninitialized_path)
 {
     size_t offset;
 
@@ -444,7 +448,8 @@ static void tr_realMakeMetaInfo(tr_metainfo_builder* builder)
 
     tr_variantInitDict(&top, 6);
 
-    if (builder->fileCount == 0 || builder->totalSize == 0 || builder->pieceSize == 0 || builder->pieceCount == 0)
+    if (builder->fileCount == 0 || builder->totalSize == 0 || builder->pieceSize == 0
+        || builder->pieceCount == 0)
     {
         builder->errfile[0] = '\0';
         builder->my_errno = ENOENT;
@@ -565,8 +570,9 @@ static void makeMetaWorkerFunc(void* user_data)
     workerThread = NULL;
 }
 
-void tr_makeMetaInfo(tr_metainfo_builder* builder, char const* outputFile, tr_tracker_info const* trackers, int trackerCount,
-    char const* comment, bool isPrivate)
+void tr_makeMetaInfo(tr_metainfo_builder* builder, char const* outputFile,
+                     tr_tracker_info const* trackers, int trackerCount, char const* comment,
+                     bool isPrivate)
 {
     tr_lock* lock;
 

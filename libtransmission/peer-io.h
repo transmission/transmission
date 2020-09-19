@@ -40,22 +40,22 @@ typedef enum
     READ_NOW,
     READ_LATER,
     READ_ERR
-}
-ReadState;
+} ReadState;
 
 typedef enum
 {
     /* these match the values in MSE's crypto_select */
     PEER_ENCRYPTION_NONE = (1 << 0),
     PEER_ENCRYPTION_RC4 = (1 << 1)
-}
-tr_encryption_type;
+} tr_encryption_type;
 
-typedef ReadState (* tr_can_read_cb)(struct tr_peerIo* io, void* user_data, size_t* setme_piece_byte_count);
+typedef ReadState (*tr_can_read_cb)(struct tr_peerIo* io, void* user_data,
+                                    size_t* setme_piece_byte_count);
 
-typedef void (* tr_did_write_cb)(struct tr_peerIo* io, size_t bytesWritten, bool wasPieceData, void* userData);
+typedef void (*tr_did_write_cb)(struct tr_peerIo* io, size_t bytesWritten, bool wasPieceData,
+                                void* userData);
 
-typedef void (* tr_net_error_cb)(struct tr_peerIo* io, short what, void* userData);
+typedef void (*tr_net_error_cb)(struct tr_peerIo* io, short what, void* userData);
 
 typedef struct tr_peerIo
 {
@@ -102,18 +102,19 @@ typedef struct tr_peerIo
 
     struct event* event_read;
     struct event* event_write;
-}
-tr_peerIo;
+} tr_peerIo;
 
 /**
 ***
 **/
 
-tr_peerIo* tr_peerIoNewOutgoing(tr_session* session, struct tr_bandwidth* parent, struct tr_address const* addr, tr_port port,
-    uint8_t const* torrentHash, bool isSeed, bool utp);
+tr_peerIo* tr_peerIoNewOutgoing(tr_session* session, struct tr_bandwidth* parent,
+                                struct tr_address const* addr, tr_port port,
+                                uint8_t const* torrentHash, bool isSeed, bool utp);
 
-tr_peerIo* tr_peerIoNewIncoming(tr_session* session, struct tr_bandwidth* parent, struct tr_address const* addr, tr_port port,
-    struct tr_peer_socket const socket);
+tr_peerIo* tr_peerIoNewIncoming(tr_session* session, struct tr_bandwidth* parent,
+                                struct tr_address const* addr, tr_port port,
+                                struct tr_peer_socket const socket);
 
 void tr_peerIoRefImpl(char const* file, int line, tr_peerIo* io);
 
@@ -127,8 +128,8 @@ void tr_peerIoUnrefImpl(char const* file, int line, tr_peerIo* io);
 
 static inline bool tr_isPeerIo(tr_peerIo const* io)
 {
-    return io != NULL && io->magicNumber == PEER_IO_MAGIC_NUMBER && io->refCount >= 0 && tr_isBandwidth(&io->bandwidth) &&
-        tr_address_is_valid(&io->addr);
+    return io != NULL && io->magicNumber == PEER_IO_MAGIC_NUMBER && io->refCount >= 0
+           && tr_isBandwidth(&io->bandwidth) && tr_address_is_valid(&io->addr);
 }
 
 /**
@@ -222,7 +223,8 @@ static inline uint8_t const* tr_peerIoGetPeersId(tr_peerIo const* io)
 ***
 **/
 
-void tr_peerIoSetIOFuncs(tr_peerIo* io, tr_can_read_cb readcb, tr_did_write_cb writecb, tr_net_error_cb errcb, void* user_data);
+void tr_peerIoSetIOFuncs(tr_peerIo* io, tr_can_read_cb readcb, tr_did_write_cb writecb,
+                         tr_net_error_cb errcb, void* user_data);
 
 void tr_peerIoClear(tr_peerIo* io);
 
@@ -270,7 +272,8 @@ static inline void evbuffer_add_hton_64(struct evbuffer* buf, uint64_t val)
     evbuffer_add_uint64(buf, val);
 }
 
-void tr_peerIoReadBytesToBuf(tr_peerIo* io, struct evbuffer* inbuf, struct evbuffer* outbuf, size_t byteCount);
+void tr_peerIoReadBytesToBuf(tr_peerIo* io, struct evbuffer* inbuf, struct evbuffer* outbuf,
+                             size_t byteCount);
 
 void tr_peerIoReadBytes(tr_peerIo* io, struct evbuffer* inbuf, void* bytes, size_t byteCount);
 
@@ -298,14 +301,16 @@ static inline void tr_peerIoSetParent(tr_peerIo* io, struct tr_bandwidth* parent
     tr_bandwidthSetParent(&io->bandwidth, parent);
 }
 
-void tr_peerIoBandwidthUsed(tr_peerIo* io, tr_direction direction, size_t byteCount, int isPieceData);
+void tr_peerIoBandwidthUsed(tr_peerIo* io, tr_direction direction, size_t byteCount,
+                            int isPieceData);
 
 static inline bool tr_peerIoHasBandwidthLeft(tr_peerIo const* io, tr_direction dir)
 {
     return tr_bandwidthClamp(&io->bandwidth, dir, 1024) > 0;
 }
 
-static inline unsigned int tr_peerIoGetPieceSpeed_Bps(tr_peerIo const* io, uint64_t now, tr_direction dir)
+static inline unsigned int tr_peerIoGetPieceSpeed_Bps(tr_peerIo const* io, uint64_t now,
+                                                      tr_direction dir)
 {
     return tr_bandwidthGetPieceSpeed_Bps(&io->bandwidth, now, dir);
 }

@@ -17,10 +17,10 @@
 #include <QNetworkReply>
 #include <QNetworkRequest>
 
-#include <libtransmission/rpcimpl.h>
 #include <libtransmission/transmission.h>
-#include <libtransmission/utils.h> // tr_free
-#include <libtransmission/version.h> // LONG_VERSION_STRING
+#include <libtransmission/rpcimpl.h>
+#include <libtransmission/utils.h>    // tr_free
+#include <libtransmission/version.h>  // LONG_VERSION_STRING
 
 #include "VariantHelpers.h"
 
@@ -30,9 +30,8 @@ using ::trqt::variant_helpers::variantInit;
 
 namespace
 {
-
-char const constexpr* const RequestDataPropertyKey { "requestData" };
-char const constexpr* const RequestFutureinterfacePropertyKey { "requestReplyFutureInterface" };
+char const constexpr* const RequestDataPropertyKey {"requestData"};
+char const constexpr* const RequestFutureinterfacePropertyKey {"requestReplyFutureInterface"};
 
 bool const Verbose = tr_env_key_exists("TR_RPC_VERBOSE");
 
@@ -47,10 +46,9 @@ TrVariantPtr createVariant()
     return TrVariantPtr(tr_new0(tr_variant, 1), &destroyVariant);
 }
 
-} // namespace
+}  // namespace
 
-RpcClient::RpcClient(QObject* parent) :
-    QObject(parent)
+RpcClient::RpcClient(QObject* parent) : QObject(parent)
 {
     qRegisterMetaType<TrVariantPtr>("TrVariantPtr");
 }
@@ -102,7 +100,7 @@ QUrl const& RpcClient::url() const
 
 RpcResponseFuture RpcClient::exec(tr_quark method, tr_variant* args)
 {
-    auto len = size_t{};
+    auto len = size_t {};
     auto const* str = tr_quark_get_string(method, &len);
     return exec(std::string_view(str, len), args);
 }
@@ -132,8 +130,9 @@ void RpcClient::sendNetworkRequest(TrVariantPtr json, QFutureInterface<RpcRespon
     {
         QNetworkRequest request;
         request.setUrl(url_);
-        request.setRawHeader("User-Agent", (qApp->applicationName() + QLatin1Char('/') + QString::fromUtf8(
-            LONG_VERSION_STRING)).toUtf8());
+        request.setRawHeader("User-Agent", (qApp->applicationName() + QLatin1Char('/')
+                                            + QString::fromUtf8(LONG_VERSION_STRING))
+                                               .toUtf8());
         request.setRawHeader("Content-Type", "application/json; charset=UTF-8");
         if (!session_id_.isEmpty())
         {
@@ -144,7 +143,8 @@ void RpcClient::sendNetworkRequest(TrVariantPtr json, QFutureInterface<RpcRespon
     }
 
     size_t raw_json_data_length;
-    auto* raw_json_data = tr_variantToStr(json.get(), TR_VARIANT_FMT_JSON_LEAN, &raw_json_data_length);
+    auto* raw_json_data =
+        tr_variantToStr(json.get(), TR_VARIANT_FMT_JSON_LEAN, &raw_json_data_length);
     QByteArray json_data(raw_json_data, raw_json_data_length);
     tr_free(raw_json_data);
 
@@ -157,7 +157,8 @@ void RpcClient::sendNetworkRequest(TrVariantPtr json, QFutureInterface<RpcRespon
 
     if (Verbose)
     {
-        std::cerr << "sending " << "POST " << qPrintable(url_.path()) << std::endl;
+        std::cerr << "sending "
+                  << "POST " << qPrintable(url_.path()) << std::endl;
 
         for (QByteArray const& b : request_->rawHeaderList())
         {
@@ -168,7 +169,8 @@ void RpcClient::sendNetworkRequest(TrVariantPtr json, QFutureInterface<RpcRespon
     }
 }
 
-void RpcClient::sendLocalRequest(TrVariantPtr json, QFutureInterface<RpcResponse> const& promise, int64_t tag)
+void RpcClient::sendLocalRequest(TrVariantPtr json, QFutureInterface<RpcResponse> const& promise,
+                                 int64_t tag)
 {
     local_requests_.insert(tag, promise);
     tr_rpc_request_exec_json(session_, json.get(), localSessionCallback, this);
@@ -203,10 +205,11 @@ QNetworkAccessManager* RpcClient::networkAccessManager()
     {
         nam_ = new QNetworkAccessManager();
 
-        connect(nam_, SIGNAL(finished(QNetworkReply*)), this, SLOT(networkRequestFinished(QNetworkReply*)));
+        connect(nam_, SIGNAL(finished(QNetworkReply*)), this,
+                SLOT(networkRequestFinished(QNetworkReply*)));
 
         connect(nam_, SIGNAL(authenticationRequired(QNetworkReply*, QAuthenticator*)), this,
-            SIGNAL(httpAuthenticationRequired()));
+                SIGNAL(httpAuthenticationRequired()));
     }
 
     return nam_;
@@ -224,15 +227,16 @@ void RpcClient::localSessionCallback(tr_session* s, tr_variant* response, void* 
 
     // this callback is invoked in the libtransmission thread, so we don't want
     // to process the response here... let's push it over to the Qt thread.
-    QMetaObject::invokeMethod(self, "localRequestFinished", Qt::QueuedConnection, Q_ARG(TrVariantPtr, json));
+    QMetaObject::invokeMethod(self, "localRequestFinished", Qt::QueuedConnection,
+                              Q_ARG(TrVariantPtr, json));
 }
 
 void RpcClient::networkRequestFinished(QNetworkReply* reply)
 {
     reply->deleteLater();
 
-    auto promise = reply->property(RequestFutureinterfacePropertyKey).
-        value<QFutureInterface<RpcResponse>>();
+    auto promise =
+        reply->property(RequestFutureinterfacePropertyKey).value<QFutureInterface<RpcResponse>>();
 
     if (Verbose)
     {
@@ -246,8 +250,8 @@ void RpcClient::networkRequestFinished(QNetworkReply* reply)
         std::cerr << "json:\n" << reply->peek(reply->bytesAvailable()).constData() << std::endl;
     }
 
-    if (reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() == 409 &&
-        reply->hasRawHeader(TR_RPC_SESSION_ID_HEADER))
+    if (reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() == 409
+        && reply->hasRawHeader(TR_RPC_SESSION_ID_HEADER))
     {
         // we got a 409 telling us our session id has expired.
         // update it and resubmit the request.

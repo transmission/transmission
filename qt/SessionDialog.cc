@@ -6,9 +6,9 @@
  *
  */
 
+#include "SessionDialog.h"
 #include "Prefs.h"
 #include "Session.h"
-#include "SessionDialog.h"
 
 /***
 ****
@@ -46,10 +46,8 @@ void SessionDialog::resensitize()
 ****
 ***/
 
-SessionDialog::SessionDialog(Session& session, Prefs& prefs, QWidget* parent) :
-    BaseDialog(parent),
-    session_(session),
-    prefs_(prefs)
+SessionDialog::SessionDialog(Session& session, Prefs& prefs, QWidget* parent)
+    : BaseDialog(parent), session_(session), prefs_(prefs)
 {
     ui_.setupUi(this);
 

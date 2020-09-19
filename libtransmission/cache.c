@@ -73,7 +73,8 @@ struct run_info
 static int getBlockRun(tr_cache const* cache, int pos, struct run_info* info)
 {
     int const n = tr_ptrArraySize(&cache->blocks);
-    struct cache_block const* const* blocks = (struct cache_block const* const*)tr_ptrArrayBase(&cache->blocks);
+    struct cache_block const* const* blocks =
+        (struct cache_block const* const*)tr_ptrArrayBase(&cache->blocks);
     struct cache_block const* ref = blocks[pos];
     tr_block_index_t block = ref->block;
     int len = 0;
@@ -92,7 +93,8 @@ static int getBlockRun(tr_cache const* cache, int pos, struct run_info* info)
             break;
         }
 
-        // fprintf(stderr, "pos %d tor %d block %zu time %zu\n", i, b->tor->uniqueId, (size_t)b->block, (size_t)b->time);
+        // fprintf(stderr, "pos %d tor %d block %zu time %zu\n", i, b->tor->uniqueId,
+        // (size_t)b->block, (size_t)b->time);
     }
 
     // fprintf(stderr, "run is %d long from [%d to %d)\n", len, pos, pos + len);
@@ -153,7 +155,8 @@ static int calcRuns(tr_cache* cache, struct run_info* runs)
 
         runs[i].rank = rank;
 
-        // fprintf(stderr, "block run at pos %d of length %d and age %ld adjusted +%d\n", runs[i].pos, runs[i].len,
+        // fprintf(stderr, "block run at pos %d of length %d and age %ld adjusted +%d\n",
+        // runs[i].pos, runs[i].len,
         //     now - runs[i].last_block_time, rank - runs[i].len);
     }
 
@@ -309,7 +312,8 @@ static int cache_block_compare(void const* va, void const* vb)
     return 0;
 }
 
-static struct cache_block* findBlock(tr_cache* cache, tr_torrent* torrent, tr_piece_index_t piece, uint32_t offset)
+static struct cache_block* findBlock(tr_cache* cache, tr_torrent* torrent, tr_piece_index_t piece,
+                                     uint32_t offset)
 {
     struct cache_block key;
     key.tor = torrent;
@@ -317,8 +321,8 @@ static struct cache_block* findBlock(tr_cache* cache, tr_torrent* torrent, tr_pi
     return tr_ptrArrayFindSorted(&cache->blocks, &key, cache_block_compare);
 }
 
-int tr_cacheWriteBlock(tr_cache* cache, tr_torrent* torrent, tr_piece_index_t piece, uint32_t offset, uint32_t length,
-    struct evbuffer* writeme)
+int tr_cacheWriteBlock(tr_cache* cache, tr_torrent* torrent, tr_piece_index_t piece,
+                       uint32_t offset, uint32_t length, struct evbuffer* writeme)
 {
     TR_ASSERT(tr_amInEventThread(torrent->session));
 
@@ -349,8 +353,8 @@ int tr_cacheWriteBlock(tr_cache* cache, tr_torrent* torrent, tr_piece_index_t pi
     return cacheTrim(cache);
 }
 
-int tr_cacheReadBlock(tr_cache* cache, tr_torrent* torrent, tr_piece_index_t piece, uint32_t offset, uint32_t len,
-    uint8_t* setme)
+int tr_cacheReadBlock(tr_cache* cache, tr_torrent* torrent, tr_piece_index_t piece, uint32_t offset,
+                      uint32_t len, uint8_t* setme)
 {
     int err = 0;
     struct cache_block* cb = findBlock(cache, torrent, piece, offset);
@@ -367,7 +371,8 @@ int tr_cacheReadBlock(tr_cache* cache, tr_torrent* torrent, tr_piece_index_t pie
     return err;
 }
 
-int tr_cachePrefetchBlock(tr_cache* cache, tr_torrent* torrent, tr_piece_index_t piece, uint32_t offset, uint32_t len)
+int tr_cachePrefetchBlock(tr_cache* cache, tr_torrent* torrent, tr_piece_index_t piece,
+                          uint32_t offset, uint32_t len)
 {
     int err = 0;
     struct cache_block* cb = findBlock(cache, torrent, piece, offset);
@@ -427,7 +432,8 @@ int tr_cacheFlushFile(tr_cache* cache, tr_torrent* torrent, tr_file_index_t i)
 
     tr_torGetFileBlockRange(torrent, i, &first, &last);
     pos = findBlockPos(cache, torrent, first);
-    dbgmsg("flushing file %d from cache to disk: blocks [%zu...%zu]", (int)i, (size_t)first, (size_t)last);
+    dbgmsg("flushing file %d from cache to disk: blocks [%zu...%zu]", (int)i, (size_t)first,
+           (size_t)last);
 
     /* flush out all the blocks in that file */
     while (err == 0 && pos < tr_ptrArraySize(&cache->blocks))

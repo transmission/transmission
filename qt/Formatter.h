@@ -9,9 +9,9 @@
 #pragma once
 
 #include <array>
-#include <cstdint> // int64_t
+#include <cstdint>  // int64_t
 
-#include <QCoreApplication> // Q_DECLARE_TR_FUNCTIONS
+#include <QCoreApplication>  // Q_DECLARE_TR_FUNCTIONS
 #include <QString>
 
 class Speed;
@@ -20,7 +20,7 @@ class Formatter
 {
     Q_DECLARE_TR_FUNCTIONS(Formatter)
 
-public:
+   public:
     enum Size
     {
         B,
@@ -57,9 +57,9 @@ public:
     QString downloadSpeedToString(Speed const& down) const;
     QString unitStr(Type t, Size s) const;
 
-protected:
+   protected:
     Formatter();
 
-private:
+   private:
     std::array<std::array<QString, Formatter::NUM_SIZES>, Formatter::NUM_TYPES> const UnitStrings;
 };

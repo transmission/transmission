@@ -21,16 +21,16 @@ class StatsDialog : public BaseDialog
     Q_OBJECT
     TR_DISABLE_COPY_MOVE(StatsDialog)
 
-public:
+   public:
     StatsDialog(Session&, QWidget* parent = nullptr);
 
     // QWidget
     void setVisible(bool visible) override;
 
-private slots:
+   private slots:
     void updateStats();
 
-private:
+   private:
     Session& session_;
 
     Ui::StatsDialog ui_ = {};

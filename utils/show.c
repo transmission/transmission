@@ -6,9 +6,9 @@
  *
  */
 
-#include <stdio.h> /* fprintf() */
-#include <string.h> /* strcmp(), strchr(), memcmp() */
+#include <stdio.h>  /* fprintf() */
 #include <stdlib.h> /* qsort() */
+#include <string.h> /* strcmp(), strchr(), memcmp() */
 #include <time.h>
 
 // #define CURL_DISABLE_TYPECHECK /* otherwise -Wunreachable-code goes insane */
@@ -19,23 +19,22 @@
 #include <libtransmission/transmission.h>
 #include <libtransmission/tr-getopt.h>
 #include <libtransmission/utils.h>
-#include <libtransmission/web.h> /* tr_webGetResponseStr() */
 #include <libtransmission/variant.h>
 #include <libtransmission/version.h>
+#include <libtransmission/web.h> /* tr_webGetResponseStr() */
 
 #include "units.h"
 
 #define MY_NAME "transmission-show"
 #define TIMEOUT_SECS 30
 
-static tr_option options[] =
-{
-    { 'm', "magnet", "Give a magnet link for the specified torrent", "m", false, NULL },
-    { 's', "scrape", "Ask the torrent's trackers how many peers are in the torrent's swarm", "s", false, NULL },
-    { 'u', "unsorted", "Do not sort files by name", "u", false, NULL },
-    { 'V', "version", "Show version number and exit", "V", false, NULL },
-    { 0, NULL, NULL, NULL, false, NULL }
-};
+static tr_option options[] = {
+    {'m', "magnet", "Give a magnet link for the specified torrent", "m", false, NULL},
+    {'s', "scrape", "Ask the torrent's trackers how many peers are in the torrent's swarm", "s",
+     false, NULL},
+    {'u', "unsorted", "Do not sort files by name", "u", false, NULL},
+    {'V', "version", "Show version number and exit", "V", false, NULL},
+    {0, NULL, NULL, NULL, false, NULL}};
 
 static char const* getUsage(void)
 {
@@ -57,28 +56,17 @@ static int parseCommandLine(int argc, char const* const* argv)
     {
         switch (c)
         {
-        case 'm':
-            magnetFlag = true;
-            break;
+            case 'm': magnetFlag = true; break;
 
-        case 's':
-            scrapeFlag = true;
-            break;
+            case 's': scrapeFlag = true; break;
 
-        case 'u':
-            unsorted = true;
-            break;
+            case 'u': unsorted = true; break;
 
-        case 'V':
-            showVersion = true;
-            break;
+            case 'V': showVersion = true; break;
 
-        case TR_OPT_UNK:
-            filename = optarg;
-            break;
+            case TR_OPT_UNK: filename = optarg; break;
 
-        default:
-            return 1;
+            default: return 1;
         }
     }
 
@@ -189,7 +177,8 @@ static void showInfo(tr_info const* inf)
 
     for (unsigned int i = 0; i < inf->fileCount; ++i)
     {
-        printf("  %s (%s)\n", files[i]->name, tr_formatter_size_B(buf, files[i]->length, sizeof(buf)));
+        printf("  %s (%s)\n", files[i]->name,
+               tr_formatter_size_B(buf, files[i]->length, sizeof(buf)));
     }
 
     tr_free(files);
@@ -232,7 +221,8 @@ static void doScrape(tr_info const* inf)
 
         tr_http_escape_sha1(escaped, inf->hash);
 
-        url = tr_strdup_printf("%s%cinfo_hash=%s", scrape, strchr(scrape, '?') != NULL ? '&' : '?', escaped);
+        url = tr_strdup_printf("%s%cinfo_hash=%s", scrape, strchr(scrape, '?') != NULL ? '&' : '?',
+                               escaped);
 
         printf("%s ... ", url);
         fflush(stdout);
@@ -253,7 +243,8 @@ static void doScrape(tr_info const* inf)
 
             if (response != 200)
             {
-                printf("error: unexpected response %ld \"%s\"\n", response, tr_webGetResponseStr(response));
+                printf("error: unexpected response %ld \"%s\"\n", response,
+                       tr_webGetResponseStr(response));
             }
             else /* HTTP OK */
             {
@@ -272,7 +263,8 @@ static void doScrape(tr_info const* inf)
 
                         while (tr_variantDictChild(files, child_pos, &key, &val))
                         {
-                            if (memcmp(inf->hash, tr_quark_get_string(key, NULL), SHA_DIGEST_LENGTH) == 0)
+                            if (memcmp(inf->hash, tr_quark_get_string(key, NULL), SHA_DIGEST_LENGTH)
+                                == 0)
                             {
                                 int64_t seeders;
                                 if (!tr_variantDictFindInt(val, TR_KEY_complete, &seeders))

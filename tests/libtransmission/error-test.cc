@@ -6,8 +6,8 @@
  *
  */
 
-#include "transmission.h"
 #include "error.h"
+#include "transmission.h"
 
 #include "gtest/gtest.h"
 

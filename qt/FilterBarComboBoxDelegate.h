@@ -20,17 +20,17 @@ class FilterBarComboBoxDelegate : public QItemDelegate
     Q_OBJECT
     TR_DISABLE_COPY_MOVE(FilterBarComboBoxDelegate)
 
-public:
+   public:
     FilterBarComboBoxDelegate(QObject* parent, QComboBox* combo);
 
     static bool isSeparator(QModelIndex const& index);
     static void setSeparator(QAbstractItemModel* model, QModelIndex const& index);
 
-protected:
+   protected:
     // QAbstractItemDelegate
     void paint(QPainter*, QStyleOptionViewItem const&, QModelIndex const&) const override;
     QSize sizeHint(QStyleOptionViewItem const&, QModelIndex const&) const override;
 
-private:
+   private:
     QComboBox* const combo_ = {};
 };

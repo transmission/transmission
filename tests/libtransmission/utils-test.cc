@@ -13,18 +13,18 @@
 #endif
 
 #include "transmission.h"
-#include "ConvertUTF.h" // tr_utf8_validate()
+#include "ConvertUTF.h"    // tr_utf8_validate()
+#include "crypto-utils.h"  // tr_rand_int_weak()
 #include "platform.h"
-#include "crypto-utils.h" // tr_rand_int_weak()
 #include "utils.h"
-#include "web.h" // tr_http_unescape()
+#include "web.h"  // tr_http_unescape()
 
 #include "test-fixtures.h"
 
 #include <algorithm>
 #include <array>
-#include <cmath> // sqrt()
-#include <cstdlib> // setenv(), unsetenv()
+#include <cmath>    // sqrt()
+#include <cstdlib>  // setenv(), unsetenv()
 #include <string>
 
 using ::libtransmission::test::makeString;
@@ -68,19 +68,19 @@ TEST_F(UtilsTest, trStrstrip)
 
 TEST_F(UtilsTest, trStrjoin)
 {
-    auto const in1 = std::array<char const*, 2>{ "one", "two" };
+    auto const in1 = std::array<char const*, 2> {"one", "two"};
     auto out = makeString(tr_strjoin(in1.data(), in1.size(), ", "));
     EXPECT_EQ("one, two", out);
 
-    auto const in2 = std::array<char const*, 1>{ "hello" };
+    auto const in2 = std::array<char const*, 1> {"hello"};
     out = makeString(tr_strjoin(in2.data(), in2.size(), "###"));
     EXPECT_EQ("hello", out);
 
-    auto const in3 = std::array<char const*, 5>{ "a", "b", "ccc", "d", "eeeee" };
+    auto const in3 = std::array<char const*, 5> {"a", "b", "ccc", "d", "eeeee"};
     out = makeString(tr_strjoin(in3.data(), in3.size(), " "));
     EXPECT_EQ("a b ccc d eeeee", out);
 
-    auto const in4 = std::array<char const*, 3>{ "7", "ate", "9" };
+    auto const in4 = std::array<char const*, 3> {"7", "ate", "9"};
     out = makeString(tr_strjoin(in4.data(), in4.size(), ""));
     EXPECT_EQ("7ate9", out);
 
@@ -136,7 +136,7 @@ TEST_F(UtilsTest, trUtf8clean)
 
 TEST_F(UtilsTest, numbers)
 {
-    auto count = int{};
+    auto count = int {};
     auto* numbers = tr_parseNumberRange("1-10,13,16-19", TR_BAD_SIZE, &count);
     EXPECT_EQ(15, count);
     EXPECT_EQ(1, numbers[0]);
@@ -172,7 +172,6 @@ TEST_F(UtilsTest, numbers)
 
 namespace
 {
-
 int compareInts(void const* va, void const* vb) noexcept
 {
     auto const a = *static_cast<int const*>(va);
@@ -180,13 +179,14 @@ int compareInts(void const* va, void const* vb) noexcept
     return a - b;
 }
 
-} // unnamed namespace
+}  // unnamed namespace
 
 TEST_F(UtilsTest, lowerbound)
 {
-    auto const a = std::array<int, 7>{ 1, 2, 3, 3, 3, 5, 8 };
-    auto const expected_pos = std::array<int, 10>{ 0, 1, 2, 5, 5, 6, 6, 6, 7, 7 };
-    auto const expected_exact = std::array<bool, 10>{ true, true, true, false, true, false, false, true, false, false };
+    auto const a = std::array<int, 7> {1, 2, 3, 3, 3, 5, 8};
+    auto const expected_pos = std::array<int, 10> {0, 1, 2, 5, 5, 6, 6, 6, 7, 7};
+    auto const expected_exact =
+        std::array<bool, 10> {true, true, true, false, true, false, false, true, false, false};
 
     for (int i = 1; i <= 10; i++)
     {
@@ -199,23 +199,22 @@ TEST_F(UtilsTest, lowerbound)
 
 TEST_F(UtilsTest, trQuickfindfirstk)
 {
-    auto const run_test = [](size_t const k, size_t const n, int* buf, int range)
-        {
-            // populate buf with random ints
-            std::generate(buf, buf + n, [range]() { return tr_rand_int_weak(range); });
+    auto const run_test = [](size_t const k, size_t const n, int* buf, int range) {
+        // populate buf with random ints
+        std::generate(buf, buf + n, [range]() { return tr_rand_int_weak(range); });
 
-            // find the best k
-            tr_quickfindFirstK(buf, n, sizeof(int), compareInts, k);
+        // find the best k
+        tr_quickfindFirstK(buf, n, sizeof(int), compareInts, k);
 
-            // confirm that the smallest K ints are in the first slots K slots in buf
-            auto const* highest_low = std::max_element(buf, buf + k);
-            auto const* lowest_high = std::min_element(buf + k, buf + n);
-            EXPECT_LE(highest_low, lowest_high);
-        };
+        // confirm that the smallest K ints are in the first slots K slots in buf
+        auto const* highest_low = std::max_element(buf, buf + k);
+        auto const* lowest_high = std::min_element(buf + k, buf + n);
+        EXPECT_LE(highest_low, lowest_high);
+    };
 
-    auto constexpr K = size_t{ 10 };
-    auto constexpr NumTrials = size_t{ 1000 };
-    auto buf = std::array<int, 100>{};
+    auto constexpr K = size_t {10};
+    auto constexpr NumTrials = size_t {1000};
+    auto buf = std::array<int, 100> {};
     for (auto i = 0; i != NumTrials; ++i)
     {
         run_test(K, buf.size(), buf.data(), 100);
@@ -224,29 +223,31 @@ TEST_F(UtilsTest, trQuickfindfirstk)
 
 TEST_F(UtilsTest, trMemmem)
 {
-    auto const haystack = std::string { "abcabcabcabc" };
-    auto const needle = std::string { "cab" };
+    auto const haystack = std::string {"abcabcabcabc"};
+    auto const needle = std::string {"cab"};
 
-    EXPECT_EQ(haystack, tr_memmem(haystack.data(), haystack.size(), haystack.data(), haystack.size()));
-    EXPECT_EQ(haystack.substr(2), tr_memmem(haystack.data(), haystack.size(), needle.data(), needle.size()));
+    EXPECT_EQ(haystack,
+              tr_memmem(haystack.data(), haystack.size(), haystack.data(), haystack.size()));
+    EXPECT_EQ(haystack.substr(2),
+              tr_memmem(haystack.data(), haystack.size(), needle.data(), needle.size()));
     EXPECT_EQ(nullptr, tr_memmem(needle.data(), needle.size(), haystack.data(), haystack.size()));
 }
 
 TEST_F(UtilsTest, trBinaryHex)
 {
-    auto const hex_in = std::string { "fb5ef5507427b17e04b69cef31fa3379b456735a" };
+    auto const hex_in = std::string {"fb5ef5507427b17e04b69cef31fa3379b456735a"};
 
-    auto binary = std::array<uint8_t, SHA_DIGEST_LENGTH>{};
+    auto binary = std::array<uint8_t, SHA_DIGEST_LENGTH> {};
     tr_hex_to_binary(hex_in.data(), binary.data(), hex_in.size() / 2);
 
-    auto hex_out = std::array<uint8_t, SHA_DIGEST_LENGTH*2 + 1>{};
+    auto hex_out = std::array<uint8_t, SHA_DIGEST_LENGTH * 2 + 1> {};
     tr_binary_to_hex(binary.data(), hex_out.data(), 20);
     EXPECT_EQ(hex_in, reinterpret_cast<char const*>(hex_out.data()));
 }
 
 TEST_F(UtilsTest, array)
 {
-    auto array = std::array<size_t, 10>{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+    auto array = std::array<size_t, 10> {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
     auto n = array.size();
 
     tr_removeElementFromArray(array.data(), 5U, sizeof(size_t), n);
@@ -313,14 +314,14 @@ TEST_F(UtilsTest, url)
 
 TEST_F(UtilsTest, trHttpUnescape)
 {
-    auto const url = std::string { "http%3A%2F%2Fwww.example.com%2F~user%2F%3Ftest%3D1%26test1%3D2" };
+    auto const url = std::string {"http%3A%2F%2Fwww.example.com%2F~user%2F%3Ftest%3D1%26test1%3D2"};
     auto str = makeString(tr_http_unescape(url.data(), url.size()));
     EXPECT_EQ("http://www.example.com/~user/?test=1&test1=2", str);
 }
 
 TEST_F(UtilsTest, truncd)
 {
-    auto buf = std::array<char, 32>{};
+    auto buf = std::array<char, 32> {};
 
     tr_snprintf(buf.data(), buf.size(), "%.2f%%", 99.999);
     EXPECT_STREQ("100.00%", buf.data());
@@ -356,7 +357,6 @@ TEST_F(UtilsTest, truncd)
 
 namespace
 {
-
 char* testStrdupPrintfValist(char const* fmt, ...) TR_GNUC_PRINTF(1, 2);
 
 char* testStrdupPrintfValist(char const* fmt, ...)
@@ -368,7 +368,7 @@ char* testStrdupPrintfValist(char const* fmt, ...)
     return ret;
 }
 
-} // unnamed namespace
+}  // unnamed namespace
 
 TEST_F(UtilsTest, trStrdupVprintf)
 {

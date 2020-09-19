@@ -11,16 +11,16 @@
 
 #include <dirent.h>
 #include <errno.h>
-#include <fcntl.h> /* O_LARGEFILE, posix_fadvise(), [posix_]fallocate(), fcntl() */
+#include <fcntl.h>  /* O_LARGEFILE, posix_fadvise(), [posix_]fallocate(), fcntl() */
 #include <libgen.h> /* basename(), dirname() */
 #include <limits.h> /* PATH_MAX */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/types.h>
 #include <sys/file.h> /* flock() */
 #include <sys/mman.h> /* mmap(), munmap() */
 #include <sys/stat.h>
+#include <sys/types.h>
 #include <unistd.h> /* lseek(), write(), ftruncate(), pread(), pwrite(), pathconf(), etc */
 
 #ifdef HAVE_XFS_XFS_H
@@ -455,21 +455,15 @@ tr_sys_file_t tr_sys_file_get_std(tr_std_sys_file_t std_file, tr_error** error)
 
     switch (std_file)
     {
-    case TR_STD_SYS_FILE_IN:
-        ret = STDIN_FILENO;
-        break;
+        case TR_STD_SYS_FILE_IN: ret = STDIN_FILENO; break;
 
-    case TR_STD_SYS_FILE_OUT:
-        ret = STDOUT_FILENO;
-        break;
+        case TR_STD_SYS_FILE_OUT: ret = STDOUT_FILENO; break;
 
-    case TR_STD_SYS_FILE_ERR:
-        ret = STDERR_FILENO;
-        break;
+        case TR_STD_SYS_FILE_ERR: ret = STDERR_FILENO; break;
 
-    default:
-        TR_ASSERT_MSG(false, "unknown standard file %d", (int)std_file);
-        set_system_error(error, EINVAL);
+        default:
+            TR_ASSERT_MSG(false, "unknown standard file %d", (int)std_file);
+            set_system_error(error, EINVAL);
     }
 
     return ret;
@@ -496,13 +490,12 @@ tr_sys_file_t tr_sys_file_open(char const* path, int flags, int permissions, tr_
         native_flags |= O_WRONLY;
     }
 
-    native_flags |=
-        ((flags & TR_SYS_FILE_CREATE) != 0 ? O_CREAT : 0) |
-        ((flags & TR_SYS_FILE_CREATE_NEW) != 0 ? O_CREAT | O_EXCL : 0) |
-        ((flags & TR_SYS_FILE_APPEND) != 0 ? O_APPEND : 0) |
-        ((flags & TR_SYS_FILE_TRUNCATE) != 0 ? O_TRUNC : 0) |
-        ((flags & TR_SYS_FILE_SEQUENTIAL) != 0 ? O_SEQUENTIAL : 0) |
-        O_BINARY | O_LARGEFILE | O_CLOEXEC;
+    native_flags |= ((flags & TR_SYS_FILE_CREATE) != 0 ? O_CREAT : 0)
+                    | ((flags & TR_SYS_FILE_CREATE_NEW) != 0 ? O_CREAT | O_EXCL : 0)
+                    | ((flags & TR_SYS_FILE_APPEND) != 0 ? O_APPEND : 0)
+                    | ((flags & TR_SYS_FILE_TRUNCATE) != 0 ? O_TRUNC : 0)
+                    | ((flags & TR_SYS_FILE_SEQUENTIAL) != 0 ? O_SEQUENTIAL : 0) | O_BINARY
+                    | O_LARGEFILE | O_CLOEXEC;
 
     ret = open(path, native_flags, permissions);
 
@@ -571,7 +564,8 @@ bool tr_sys_file_get_info(tr_sys_file_t handle, tr_sys_path_info* info, tr_error
     return ret;
 }
 
-bool tr_sys_file_seek(tr_sys_file_t handle, int64_t offset, tr_seek_origin_t origin, uint64_t* new_offset, tr_error** error)
+bool tr_sys_file_seek(tr_sys_file_t handle, int64_t offset, tr_seek_origin_t origin,
+                      uint64_t* new_offset, tr_error** error)
 {
     TR_STATIC_ASSERT(TR_SEEK_SET == SEEK_SET, "values should match");
     TR_STATIC_ASSERT(TR_SEEK_CUR == SEEK_CUR, "values should match");
@@ -604,7 +598,8 @@ bool tr_sys_file_seek(tr_sys_file_t handle, int64_t offset, tr_seek_origin_t ori
     return ret;
 }
 
-bool tr_sys_file_read(tr_sys_file_t handle, void* buffer, uint64_t size, uint64_t* bytes_read, tr_error** error)
+bool tr_sys_file_read(tr_sys_file_t handle, void* buffer, uint64_t size, uint64_t* bytes_read,
+                      tr_error** error)
 {
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
     TR_ASSERT(buffer != NULL || size == 0);
@@ -633,8 +628,8 @@ bool tr_sys_file_read(tr_sys_file_t handle, void* buffer, uint64_t size, uint64_
     return ret;
 }
 
-bool tr_sys_file_read_at(tr_sys_file_t handle, void* buffer, uint64_t size, uint64_t offset, uint64_t* bytes_read,
-    tr_error** error)
+bool tr_sys_file_read_at(tr_sys_file_t handle, void* buffer, uint64_t size, uint64_t offset,
+                         uint64_t* bytes_read, tr_error** error)
 {
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
     TR_ASSERT(buffer != NULL || size == 0);
@@ -680,7 +675,8 @@ bool tr_sys_file_read_at(tr_sys_file_t handle, void* buffer, uint64_t size, uint
     return ret;
 }
 
-bool tr_sys_file_write(tr_sys_file_t handle, void const* buffer, uint64_t size, uint64_t* bytes_written, tr_error** error)
+bool tr_sys_file_write(tr_sys_file_t handle, void const* buffer, uint64_t size,
+                       uint64_t* bytes_written, tr_error** error)
 {
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
     TR_ASSERT(buffer != NULL || size == 0);
@@ -709,8 +705,8 @@ bool tr_sys_file_write(tr_sys_file_t handle, void const* buffer, uint64_t size, 
     return ret;
 }
 
-bool tr_sys_file_write_at(tr_sys_file_t handle, void const* buffer, uint64_t size, uint64_t offset, uint64_t* bytes_written,
-    tr_error** error)
+bool tr_sys_file_write_at(tr_sys_file_t handle, void const* buffer, uint64_t size, uint64_t offset,
+                          uint64_t* bytes_written, tr_error** error)
 {
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
     TR_ASSERT(buffer != NULL || size == 0);
@@ -784,7 +780,8 @@ bool tr_sys_file_truncate(tr_sys_file_t handle, uint64_t size, tr_error** error)
     return ret;
 }
 
-bool tr_sys_file_advise(tr_sys_file_t handle, uint64_t offset, uint64_t size, tr_sys_file_advice_t advice, tr_error** error)
+bool tr_sys_file_advise(tr_sys_file_t handle, uint64_t offset, uint64_t size,
+                        tr_sys_file_advice_t advice, tr_error** error)
 {
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
     TR_ASSERT(size > 0);
@@ -794,8 +791,10 @@ bool tr_sys_file_advise(tr_sys_file_t handle, uint64_t offset, uint64_t size, tr
 
 #if defined(HAVE_POSIX_FADVISE)
 
-    int const native_advice = advice == TR_SYS_FILE_ADVICE_WILL_NEED ? POSIX_FADV_WILLNEED :
-        (advice == TR_SYS_FILE_ADVICE_DONT_NEED ? POSIX_FADV_DONTNEED : POSIX_FADV_NORMAL);
+    int const native_advice =
+        advice == TR_SYS_FILE_ADVICE_WILL_NEED
+            ? POSIX_FADV_WILLNEED
+            : (advice == TR_SYS_FILE_ADVICE_DONT_NEED ? POSIX_FADV_DONTNEED : POSIX_FADV_NORMAL);
 
     TR_ASSERT(native_advice != POSIX_FADV_NORMAL);
 
@@ -814,11 +813,7 @@ bool tr_sys_file_advise(tr_sys_file_t handle, uint64_t offset, uint64_t size, tr
         goto skip_darwin_fcntl;
     }
 
-    struct radvisory const radv =
-    {
-        .ra_offset = offset,
-        .ra_count = size
-    };
+    struct radvisory const radv = {.ra_offset = offset, .ra_count = size};
 
     ret = fcntl(handle, F_RDADVISE, &radv) != -1;
 
@@ -931,7 +926,7 @@ bool tr_sys_file_preallocate(tr_sys_file_t handle, uint64_t size, int flags, tr_
 #endif
 
 #if defined(HAVE_XFS_XFS_H) || defined(__APPLE__)
-non_sparse_out:
+    non_sparse_out:
 #endif
         errno = code;
     }
@@ -948,7 +943,8 @@ out:
     return ret;
 }
 
-void* tr_sys_file_map_for_reading(tr_sys_file_t handle, uint64_t offset, uint64_t size, tr_error** error)
+void* tr_sys_file_map_for_reading(tr_sys_file_t handle, uint64_t offset, uint64_t size,
+                                  tr_error** error)
 {
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
     TR_ASSERT(size > 0);
@@ -982,38 +978,37 @@ bool tr_sys_file_unmap(void const* address, uint64_t size, tr_error** error)
 bool tr_sys_file_lock(tr_sys_file_t handle, int operation, tr_error** error)
 {
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
-    TR_ASSERT((operation & ~(TR_SYS_FILE_LOCK_SH | TR_SYS_FILE_LOCK_EX | TR_SYS_FILE_LOCK_NB | TR_SYS_FILE_LOCK_UN)) == 0);
-    TR_ASSERT(!!(operation & TR_SYS_FILE_LOCK_SH) + !!(operation & TR_SYS_FILE_LOCK_EX) +
-        !!(operation & TR_SYS_FILE_LOCK_UN) == 1);
+    TR_ASSERT(
+        (operation
+         & ~(TR_SYS_FILE_LOCK_SH | TR_SYS_FILE_LOCK_EX | TR_SYS_FILE_LOCK_NB | TR_SYS_FILE_LOCK_UN))
+        == 0);
+    TR_ASSERT(!!(operation & TR_SYS_FILE_LOCK_SH) + !!(operation & TR_SYS_FILE_LOCK_EX)
+                  + !!(operation & TR_SYS_FILE_LOCK_UN)
+              == 1);
 
     bool ret;
 
 #if defined(F_OFD_SETLK)
 
-    struct flock fl = { 0 };
+    struct flock fl = {0};
 
     switch (operation & (TR_SYS_FILE_LOCK_SH | TR_SYS_FILE_LOCK_EX | TR_SYS_FILE_LOCK_UN))
     {
-    case TR_SYS_FILE_LOCK_SH:
-        fl.l_type = F_RDLCK;
-        break;
+        case TR_SYS_FILE_LOCK_SH: fl.l_type = F_RDLCK; break;
 
-    case TR_SYS_FILE_LOCK_EX:
-        fl.l_type = F_WRLCK;
-        break;
+        case TR_SYS_FILE_LOCK_EX: fl.l_type = F_WRLCK; break;
 
-    case TR_SYS_FILE_LOCK_UN:
-        fl.l_type = F_UNLCK;
-        break;
+        case TR_SYS_FILE_LOCK_UN: fl.l_type = F_UNLCK; break;
     }
 
     fl.l_whence = SEEK_SET;
 
     do
     {
-        ret = fcntl(handle, (operation & TR_SYS_FILE_LOCK_NB) != 0 ? F_OFD_SETLK : F_OFD_SETLKW, &fl) != -1;
-    }
-    while (!ret && errno == EINTR);
+        ret =
+            fcntl(handle, (operation & TR_SYS_FILE_LOCK_NB) != 0 ? F_OFD_SETLK : F_OFD_SETLKW, &fl)
+            != -1;
+    } while (!ret && errno == EINTR);
 
     if (!ret && errno == EAGAIN)
     {
@@ -1047,8 +1042,7 @@ bool tr_sys_file_lock(tr_sys_file_t handle, int operation, tr_error** error)
     do
     {
         ret = flock(handle, native_operation) != -1;
-    }
-    while (!ret && errno == EINTR);
+    } while (!ret && errno == EINTR);
 
 #else
 
@@ -1090,8 +1084,7 @@ char* tr_sys_dir_get_current(tr_error** error)
 
             ret = getcwd(tmp, size);
             size += 2048;
-        }
-        while (ret == NULL && errno == ERANGE);
+        } while (ret == NULL && errno == ERANGE);
 
         if (ret == NULL)
         {

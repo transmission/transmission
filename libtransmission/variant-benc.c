@@ -18,8 +18,8 @@
 #include "transmission.h"
 #include "ptrarray.h"
 #include "utils.h" /* tr_snprintf() */
-#include "variant.h"
 #include "variant-common.h"
+#include "variant.h"
 
 #define MAX_BENC_STR_LENGTH (128 * 1024 * 1024) /* arbitrary */
 
@@ -37,7 +37,8 @@
  * but to handle it as a signed 64bit integer is mandatory to handle
  * "large files" aka .torrent for more that 4Gbyte
  */
-int tr_bencParseInt(void const* vbuf, void const* vbufend, uint8_t const** setme_end, int64_t* setme_val)
+int tr_bencParseInt(void const* vbuf, void const* vbufend, uint8_t const** setme_end,
+                    int64_t* setme_val)
 {
     uint8_t const* const buf = (uint8_t const*)vbuf;
     uint8_t const* const bufend = (uint8_t const*)vbufend;
@@ -88,8 +89,8 @@ int tr_bencParseInt(void const* vbuf, void const* vbufend, uint8_t const** setme
  * Note that there is no constant beginning delimiter, and no ending delimiter.
  * Example: 4:spam represents the string "spam"
  */
-int tr_bencParseStr(void const* vbuf, void const* vbufend, uint8_t const** setme_end, uint8_t const** setme_str,
-    size_t* setme_strlen)
+int tr_bencParseStr(void const* vbuf, void const* vbufend, uint8_t const** setme_end,
+                    uint8_t const** setme_str, size_t* setme_strlen)
 {
     uint8_t const* const buf = (uint8_t const*)vbuf;
     uint8_t const* const bufend = (uint8_t const*)vbufend;
@@ -180,7 +181,8 @@ static tr_variant* get_node(tr_ptrArray* stack, tr_quark* key, tr_variant* top, 
  * easier to read, but was vulnerable to a smash-stacking
  * attack via maliciously-crafted bencoded data. (#667)
  */
-int tr_variantParseBenc(void const* buf_in, void const* bufend_in, tr_variant* top, char const** setme_end)
+int tr_variantParseBenc(void const* buf_in, void const* bufend_in, tr_variant* top,
+                        char const** setme_end)
 {
     int err = 0;
     uint8_t const* buf = buf_in;
@@ -385,16 +387,9 @@ static void saveContainerEndFunc(tr_variant const* val, void* evbuf)
     evbuffer_add(evbuf, "e", 1);
 }
 
-static struct VariantWalkFuncs const walk_funcs =
-{
-    saveIntFunc,
-    saveBoolFunc,
-    saveRealFunc,
-    saveStringFunc,
-    saveDictBeginFunc,
-    saveListBeginFunc,
-    saveContainerEndFunc
-};
+static struct VariantWalkFuncs const walk_funcs = {
+    saveIntFunc,       saveBoolFunc,      saveRealFunc,        saveStringFunc,
+    saveDictBeginFunc, saveListBeginFunc, saveContainerEndFunc};
 
 void tr_variantToBufBenc(tr_variant const* top, struct evbuffer* buf)
 {

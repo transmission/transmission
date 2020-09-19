@@ -29,14 +29,14 @@ using ::trqt::variant_helpers::listAdd;
 ****
 ***/
 
-OptionsDialog::OptionsDialog(Session& session, Prefs const& prefs, AddData addme, QWidget* parent) :
-    BaseDialog(parent),
-    add_(std::move(addme)),
-    verify_hash_(QCryptographicHash::Sha1),
-    verify_button_(new QPushButton(tr("&Verify Local Data"), this)),
-    edit_timer_(this),
-    session_(session),
-    is_local_(session_.isLocal())
+OptionsDialog::OptionsDialog(Session& session, Prefs const& prefs, AddData addme, QWidget* parent)
+    : BaseDialog(parent),
+      add_(std::move(addme)),
+      verify_hash_(QCryptographicHash::Sha1),
+      verify_button_(new QPushButton(tr("&Verify Local Data"), this)),
+      edit_timer_(this),
+      session_(session),
+      is_local_(session_.isLocal())
 {
     ui_.setupUi(this);
 
@@ -78,10 +78,14 @@ OptionsDialog::OptionsDialog(Session& session, Prefs const& prefs, AddData addme
     ui_.sourceLabel->setBuddy(ui_.sourceStack->currentWidget());
 
     QFontMetrics const font_metrics(font());
-    int const width = font_metrics.size(0, QStringLiteral("This is a pretty long torrent filename indeed.torrent")).width();
+    int const width =
+        font_metrics
+            .size(0, QStringLiteral("This is a pretty long torrent filename indeed.torrent"))
+            .width();
     ui_.sourceStack->setMinimumWidth(width);
 
-    QString const download_dir(Utils::removeTrailingDirSeparator(prefs.getString(Prefs::DOWNLOAD_DIR)));
+    QString const download_dir(
+        Utils::removeTrailingDirSeparator(prefs.getString(Prefs::DOWNLOAD_DIR)));
     ui_.freeSpaceLabel->setSession(session_);
     ui_.freeSpaceLabel->setPath(download_dir);
 
@@ -95,7 +99,8 @@ OptionsDialog::OptionsDialog(Session& session, Prefs const& prefs, AddData addme
         local_destination_.setPath(download_dir);
     }
 
-    connect(ui_.destinationButton, SIGNAL(pathChanged(QString)), this, SLOT(onDestinationChanged()));
+    connect(ui_.destinationButton, SIGNAL(pathChanged(QString)), this,
+            SLOT(onDestinationChanged()));
     connect(ui_.destinationEdit, SIGNAL(textEdited(QString)), &edit_timer_, SLOT(start()));
     connect(ui_.destinationEdit, SIGNAL(editingFinished()), this, SLOT(onDestinationChanged()));
 
@@ -104,7 +109,7 @@ OptionsDialog::OptionsDialog(Session& session, Prefs const& prefs, AddData addme
     ui_.priorityCombo->addItem(tr("High"), TR_PRI_HIGH);
     ui_.priorityCombo->addItem(tr("Normal"), TR_PRI_NORMAL);
     ui_.priorityCombo->addItem(tr("Low"), TR_PRI_LOW);
-    ui_.priorityCombo->setCurrentIndex(1); // Normal
+    ui_.priorityCombo->setCurrentIndex(1);  // Normal
 
     ui_.dialogButtons->addButton(verify_button_, QDialogButtonBox::ActionRole);
     connect(verify_button_, SIGNAL(clicked(bool)), this, SLOT(onVerify()));
@@ -115,8 +120,10 @@ OptionsDialog::OptionsDialog(Session& session, Prefs const& prefs, AddData addme
     connect(ui_.dialogButtons, SIGNAL(rejected()), this, SLOT(deleteLater()));
     connect(ui_.dialogButtons, SIGNAL(accepted()), this, SLOT(onAccepted()));
 
-    connect(ui_.filesView, SIGNAL(priorityChanged(QSet<int>, int)), this, SLOT(onPriorityChanged(QSet<int>, int)));
-    connect(ui_.filesView, SIGNAL(wantedChanged(QSet<int>, bool)), this, SLOT(onWantedChanged(QSet<int>, bool)));
+    connect(ui_.filesView, SIGNAL(priorityChanged(QSet<int>, int)), this,
+            SLOT(onPriorityChanged(QSet<int>, int)));
+    connect(ui_.filesView, SIGNAL(wantedChanged(QSet<int>, bool)), this,
+            SLOT(onWantedChanged(QSet<int>, bool)));
 
     connect(&verify_timer_, SIGNAL(timeout()), this, SLOT(onTimeout()));
 
@@ -155,20 +162,19 @@ void OptionsDialog::reload()
 
     switch (add_.type)
     {
-    case AddData::MAGNET:
-        tr_ctorSetMetainfoFromMagnetLink(ctor, add_.magnet.toUtf8().constData());
-        break;
+        case AddData::MAGNET:
+            tr_ctorSetMetainfoFromMagnetLink(ctor, add_.magnet.toUtf8().constData());
+            break;
 
-    case AddData::FILENAME:
-        tr_ctorSetMetainfoFromFile(ctor, add_.filename.toUtf8().constData());
-        break;
+        case AddData::FILENAME:
+            tr_ctorSetMetainfoFromFile(ctor, add_.filename.toUtf8().constData());
+            break;
 
-    case AddData::METAINFO:
-        tr_ctorSetMetainfo(ctor, add_.metainfo.constData(), add_.metainfo.size());
-        break;
+        case AddData::METAINFO:
+            tr_ctorSetMetainfo(ctor, add_.metainfo.constData(), add_.metainfo.size());
+            break;
 
-    default:
-        break;
+        default: break;
     }
 
     int const err = tr_torrentParse(ctor, &info_);
@@ -184,7 +190,8 @@ void OptionsDialog::reload()
 
     ui_.filesView->setVisible(have_files_to_show);
     verify_button_->setEnabled(have_files_to_show);
-    layout()->setSizeConstraint(have_files_to_show ? QLayout::SetDefaultConstraint : QLayout::SetFixedSize);
+    layout()->setSizeConstraint(have_files_to_show ? QLayout::SetDefaultConstraint
+                                                   : QLayout::SetFixedSize);
 
     if (have_info_)
     {
@@ -209,8 +216,10 @@ void OptionsDialog::reload()
 
 void OptionsDialog::updateWidgetsLocality()
 {
-    ui_.destinationStack->setCurrentWidget(is_local_ ? static_cast<QWidget*>(ui_.destinationButton) : ui_.destinationEdit);
-    ui_.destinationStack->setFixedHeight(ui_.destinationStack->currentWidget()->sizeHint().height());
+    ui_.destinationStack->setCurrentWidget(is_local_ ? static_cast<QWidget*>(ui_.destinationButton)
+                                                     : ui_.destinationEdit);
+    ui_.destinationStack->setFixedHeight(
+        ui_.destinationStack->currentWidget()->sizeHint().height());
     ui_.destinationLabel->setBuddy(ui_.destinationStack->currentWidget());
 
     // hide the % done when non-local, since we've no way of knowing
@@ -389,7 +398,6 @@ void OptionsDialog::onVerify()
 
 namespace
 {
-
 uint64_t getPieceSize(tr_info const* info, tr_piece_index_t piece_index)
 {
     if (piece_index != info->pieceCount - 1)
@@ -400,7 +408,7 @@ uint64_t getPieceSize(tr_info const* info, tr_piece_index_t piece_index)
     return info->totalSize % info->pieceSize;
 }
 
-} // namespace
+}  // namespace
 
 void OptionsDialog::onTimeout()
 {
@@ -444,7 +452,9 @@ void OptionsDialog::onTimeout()
     if (left_in_piece == 0)
     {
         QByteArray const result(verify_hash_.result());
-        bool const matches = memcmp(result.constData(), info_.pieces[verify_piece_index_].hash, SHA_DIGEST_LENGTH) == 0;
+        bool const matches =
+            memcmp(result.constData(), info_.pieces[verify_piece_index_].hash, SHA_DIGEST_LENGTH)
+            == 0;
         verify_flags_[verify_piece_index_] = matches;
         verify_piece_pos_ = 0;
         ++verify_piece_index_;
@@ -484,7 +494,7 @@ void OptionsDialog::onTimeout()
             have += f.have;
         }
 
-        if (have == 0) // everything failed
+        if (have == 0)  // everything failed
         {
             // did the user accidentally specify the child directory instead of the parent?
             QStringList const tokens = QString::fromUtf8(file->name).split(QLatin1Char('/'));

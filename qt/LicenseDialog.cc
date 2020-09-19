@@ -8,8 +8,7 @@
 
 #include "LicenseDialog.h"
 
-LicenseDialog::LicenseDialog(QWidget* parent) :
-    BaseDialog(parent)
+LicenseDialog::LicenseDialog(QWidget* parent) : BaseDialog(parent)
 {
     ui_.setupUi(this);
 }

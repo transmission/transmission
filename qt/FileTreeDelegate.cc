@@ -18,20 +18,18 @@ QSize FileTreeDelegate::sizeHint(QStyleOptionViewItem const& item, QModelIndex c
 
     switch (index.column())
     {
-    case FileTreeModel::COL_PROGRESS:
-    case FileTreeModel::COL_WANTED:
-        size = QSize(20, 1);
-        break;
+        case FileTreeModel::COL_PROGRESS:
+        case FileTreeModel::COL_WANTED: size = QSize(20, 1); break;
 
-    default:
-        size = QItemDelegate::sizeHint(item, index);
+        default: size = QItemDelegate::sizeHint(item, index);
     }
 
-    size.rheight() += 8; // make the spacing a little nicer
+    size.rheight() += 8;  // make the spacing a little nicer
     return size;
 }
 
-void FileTreeDelegate::paint(QPainter* painter, QStyleOptionViewItem const& option, QModelIndex const& index) const
+void FileTreeDelegate::paint(QPainter* painter, QStyleOptionViewItem const& option,
+                             QModelIndex const& index) const
 {
     int const column(index.column());
 
@@ -67,7 +65,8 @@ void FileTreeDelegate::paint(QPainter* painter, QStyleOptionViewItem const& opti
     {
         QStyleOptionViewItem vi(option);
         vi.features |= QStyleOptionViewItem::HasCheckIndicator;
-        QRect check_rect = style->subElementRect(QStyle::SE_ItemViewItemCheckIndicator, &vi, nullptr);
+        QRect check_rect =
+            style->subElementRect(QStyle::SE_ItemViewItemCheckIndicator, &vi, nullptr);
         check_rect.moveCenter(option.rect.center());
         drawCheck(painter, vi, check_rect, static_cast<Qt::CheckState>(index.data().toInt()));
     }

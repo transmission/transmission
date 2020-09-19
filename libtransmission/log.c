@@ -71,13 +71,9 @@ tr_sys_file_t tr_logGetFile(void)
 
         switch (fd)
         {
-        case 1:
-            file = tr_sys_file_get_std(TR_STD_SYS_FILE_OUT, NULL);
-            break;
+            case 1: file = tr_sys_file_get_std(TR_STD_SYS_FILE_OUT, NULL); break;
 
-        case 2:
-            file = tr_sys_file_get_std(TR_STD_SYS_FILE_ERR, NULL);
-            break;
+            case 2: file = tr_sys_file_get_std(TR_STD_SYS_FILE_ERR, NULL); break;
         }
 
         initialized = true;
@@ -208,7 +204,8 @@ void tr_logAddDeep(char const* file, int line, char const* name, char const* fmt
 ****
 ***/
 
-void tr_logAddMessage(char const* file, int line, tr_log_level level, char const* name, char const* fmt, ...)
+void tr_logAddMessage(char const* file, int line, tr_log_level level, char const* name,
+                      char const* fmt, ...)
 {
     int const err = errno; /* message logging shouldn't affect errno */
     char buf[1024];
@@ -287,7 +284,8 @@ void tr_logAddMessage(char const* file, int line, tr_log_level level, char const
 
             if (name != NULL)
             {
-                tr_sys_file_write_fmt(fp, "[%s] %s: %s" TR_NATIVE_EOL_STR, NULL, timestr, name, buf);
+                tr_sys_file_write_fmt(fp, "[%s] %s: %s" TR_NATIVE_EOL_STR, NULL, timestr, name,
+                                      buf);
             }
             else
             {

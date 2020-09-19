@@ -27,7 +27,7 @@ class TorrentFilter : public QSortFilterProxyModel
     Q_OBJECT
     TR_DISABLE_COPY_MOVE(TorrentFilter)
 
-public:
+   public:
     enum TextMode
     {
         FILTER_BY_NAME,
@@ -35,20 +35,20 @@ public:
         FILTER_BY_TRACKER
     };
 
-public:
+   public:
     explicit TorrentFilter(Prefs const& prefs);
     [[nodiscard]] std::array<int, FilterMode::NUM_MODES> countTorrentsPerMode() const;
 
-protected:
+   protected:
     // QSortFilterProxyModel
     bool filterAcceptsRow(int, QModelIndex const&) const override;
     bool lessThan(QModelIndex const&, QModelIndex const&) const override;
 
-private slots:
+   private slots:
     void onPrefChanged(int key);
     void refilter();
 
-private:
+   private:
     QTimer refilter_timer_;
     Prefs const& prefs_;
 };

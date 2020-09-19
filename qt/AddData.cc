@@ -9,8 +9,8 @@
 #include <QDir>
 #include <QFile>
 
-#include <libtransmission/crypto-utils.h> // tr_base64_encode()
 #include <libtransmission/transmission.h>
+#include <libtransmission/crypto-utils.h>  // tr_base64_encode()
 
 #include "AddData.h"
 #include "Utils.h"
@@ -83,19 +83,13 @@ QString AddData::readableName() const
 
     switch (type)
     {
-    case FILENAME:
-        ret = filename;
-        break;
+        case FILENAME: ret = filename; break;
 
-    case MAGNET:
-        ret = magnet;
-        break;
+        case MAGNET: ret = magnet; break;
 
-    case URL:
-        ret = url.toString();
-        break;
+        case URL: ret = url.toString(); break;
 
-    case METAINFO:
+        case METAINFO:
         {
             tr_info inf;
             tr_ctor* ctor = tr_ctorNew(nullptr);
@@ -104,7 +98,7 @@ QString AddData::readableName() const
 
             if (tr_torrentParse(ctor, &inf) == TR_PARSE_OK)
             {
-                ret = QString::fromUtf8(inf.name); // metainfo is required to be UTF-8
+                ret = QString::fromUtf8(inf.name);  // metainfo is required to be UTF-8
                 tr_metainfoFree(&inf);
             }
 
@@ -120,13 +114,10 @@ QString AddData::readableShortName() const
 {
     switch (type)
     {
-    case FILENAME:
-        return QFileInfo(filename).baseName();
+        case FILENAME: return QFileInfo(filename).baseName();
 
-    case URL:
-        return url.path().split(QLatin1Char('/')).last();
+        case URL: return url.path().split(QLatin1Char('/')).last();
 
-    default:
-        return readableName();
+        default: return readableName();
     }
 }

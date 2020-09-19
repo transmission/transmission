@@ -13,7 +13,7 @@
 #include <QApplication>
 #include <QStyle>
 
-#include <libtransmission/transmission.h> // priorities
+#include <libtransmission/transmission.h>  // priorities
 
 #include "FileTreeItem.h"
 #include "FileTreeModel.h"
@@ -90,95 +90,83 @@ QVariant FileTreeItem::data(int column, int role) const
 
     switch (role)
     {
-    case FileTreeModel::FileIndexRole:
-        value.setValue(file_index_);
-        break;
+        case FileTreeModel::FileIndexRole: value.setValue(file_index_); break;
 
-    case FileTreeModel::WantedRole:
-        value.setValue(isSubtreeWanted());
-        break;
+        case FileTreeModel::WantedRole: value.setValue(isSubtreeWanted()); break;
 
-    case FileTreeModel::CompleteRole:
-        value.setValue(isComplete());
-        break;
+        case FileTreeModel::CompleteRole: value.setValue(isComplete()); break;
 
-    case Qt::ToolTipRole:
-    case Qt::EditRole:
-        if (column == FileTreeModel::COL_NAME)
-        {
-            value.setValue(name());
-        }
-
-        break;
-
-    case Qt::TextAlignmentRole:
-        if (column == FileTreeModel::COL_SIZE)
-        {
-            value = Qt::AlignRight + Qt::AlignVCenter;
-        }
-
-        break;
-
-    case Qt::DisplayRole:
-    case FileTreeModel::SortRole:
-        switch (column)
-        {
-        case FileTreeModel::COL_NAME:
-            value.setValue(name());
-            break;
-
-        case FileTreeModel::COL_SIZE:
-            if (role == Qt::DisplayRole)
+        case Qt::ToolTipRole:
+        case Qt::EditRole:
+            if (column == FileTreeModel::COL_NAME)
             {
-                value.setValue(sizeString());
-            }
-            else
-            {
-                value.setValue<quint64>(size());
+                value.setValue(name());
             }
 
             break;
 
-        case FileTreeModel::COL_PROGRESS:
-            value.setValue(progress());
-            break;
-
-        case FileTreeModel::COL_WANTED:
-            value.setValue(isSubtreeWanted());
-            break;
-
-        case FileTreeModel::COL_PRIORITY:
-            if (role == Qt::DisplayRole)
+        case Qt::TextAlignmentRole:
+            if (column == FileTreeModel::COL_SIZE)
             {
-                value.setValue(priorityString());
-            }
-            else
-            {
-                value.setValue(priority());
+                value = Qt::AlignRight + Qt::AlignVCenter;
             }
 
             break;
-        }
 
-        break;
-
-    case Qt::DecorationRole:
-        if (column == FileTreeModel::COL_NAME)
-        {
-            if (file_index_ < 0)
+        case Qt::DisplayRole:
+        case FileTreeModel::SortRole:
+            switch (column)
             {
-                value = qApp->style()->standardIcon(QStyle::SP_DirOpenIcon);
-            }
-            else
-            {
-                auto& icon_cache = IconCache::get();
-                value = childCount() > 0 ?
-                    icon_cache.folderIcon() :
-                    icon_cache.guessMimeIcon(name(), icon_cache.fileIcon());
-            }
-        }
+                case FileTreeModel::COL_NAME: value.setValue(name()); break;
 
-        break;
+                case FileTreeModel::COL_SIZE:
+                    if (role == Qt::DisplayRole)
+                    {
+                        value.setValue(sizeString());
+                    }
+                    else
+                    {
+                        value.setValue<quint64>(size());
+                    }
+
+                    break;
+
+                case FileTreeModel::COL_PROGRESS: value.setValue(progress()); break;
+
+                case FileTreeModel::COL_WANTED: value.setValue(isSubtreeWanted()); break;
+
+                case FileTreeModel::COL_PRIORITY:
+                    if (role == Qt::DisplayRole)
+                    {
+                        value.setValue(priorityString());
+                    }
+                    else
+                    {
+                        value.setValue(priority());
+                    }
+
+                    break;
+            }
+
+            break;
+
+        case Qt::DecorationRole:
+            if (column == FileTreeModel::COL_NAME)
+            {
+                if (file_index_ < 0)
+                {
+                    value = qApp->style()->standardIcon(QStyle::SP_DirOpenIcon);
+                }
+                else
+                {
+                    auto& icon_cache = IconCache::get();
+                    value = childCount() > 0
+                                ? icon_cache.folderIcon()
+                                : icon_cache.guessMimeIcon(name(), icon_cache.fileIcon());
+                }
+            }
+
+            break;
     }
 
     return value;
@@ -232,7 +220,8 @@ uint64_t FileTreeItem::size() const
     return total;
 }
 
-std::pair<int, int> FileTreeItem::update(QString const& name, bool wanted, int priority, uint64_t have_size, bool update_fields)
+std::pair<int, int> FileTreeItem::update(QString const& name, bool wanted, int priority,
+                                         uint64_t have_size, bool update_fields)
 {
     int changed_count = 0;
     std::array<int, FileTreeModel::NUM_COLUMNS> changed_columns = {};
@@ -290,17 +279,13 @@ QString FileTreeItem::priorityString() const
 
     switch (i)
     {
-    case LOW:
-        return tr("Low");
+        case LOW: return tr("Low");
 
-    case HIGH:
-        return tr("High");
+        case HIGH: return tr("High");
 
-    case NORMAL:
-        return tr("Normal");
+        case NORMAL: return tr("Normal");
 
-    default:
-        return tr("Mixed");
+        default: return tr("Mixed");
     }
 }
 
@@ -312,17 +297,11 @@ int FileTreeItem::priority() const
     {
         switch (priority_)
         {
-        case TR_PRI_LOW:
-            i |= LOW;
-            break;
+            case TR_PRI_LOW: i |= LOW; break;
 
-        case TR_PRI_HIGH:
-            i |= HIGH;
-            break;
+            case TR_PRI_HIGH: i |= HIGH; break;
 
-        default:
-            i |= NORMAL;
-            break;
+            default: i |= NORMAL; break;
         }
     }
 

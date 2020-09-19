@@ -52,33 +52,32 @@ typedef enum
     TR_PEER_CLIENT_GOT_HAVE_NONE,
     TR_PEER_PEER_GOT_PIECE_DATA,
     TR_PEER_ERROR
-}
-PeerEventType;
+} PeerEventType;
 
 typedef struct
 {
     PeerEventType eventType;
 
-    uint32_t pieceIndex; /* for GOT_BLOCK, GOT_HAVE, CANCEL, ALLOWED, SUGGEST */
+    uint32_t pieceIndex;          /* for GOT_BLOCK, GOT_HAVE, CANCEL, ALLOWED, SUGGEST */
     struct tr_bitfield* bitfield; /* for GOT_BITFIELD */
-    uint32_t offset; /* for GOT_BLOCK */
-    uint32_t length; /* for GOT_BLOCK + GOT_PIECE_DATA */
-    int err; /* errno for GOT_ERROR */
-    tr_port port; /* for GOT_PORT */
-}
-tr_peer_event;
+    uint32_t offset;              /* for GOT_BLOCK */
+    uint32_t length;              /* for GOT_BLOCK + GOT_PIECE_DATA */
+    int err;                      /* errno for GOT_ERROR */
+    tr_port port;                 /* for GOT_PORT */
+} tr_peer_event;
 
 extern tr_peer_event const TR_PEER_EVENT_INIT;
 
-typedef void (* tr_peer_callback)(struct tr_peer* peer, tr_peer_event const* event, void* client_data);
+typedef void (*tr_peer_callback)(struct tr_peer* peer, tr_peer_event const* event,
+                                 void* client_data);
 
 /***
 ****
 ***/
 
-typedef void (* tr_peer_destruct_func)(struct tr_peer* peer);
-typedef bool (* tr_peer_is_transferring_pieces_func)(struct tr_peer const* peer, uint64_t now, tr_direction direction,
-    unsigned int* Bps);
+typedef void (*tr_peer_destruct_func)(struct tr_peer* peer);
+typedef bool (*tr_peer_is_transferring_pieces_func)(struct tr_peer const* peer, uint64_t now,
+                                                    tr_direction direction, unsigned int* Bps);
 
 struct tr_peer_virtual_funcs
 {
@@ -119,7 +118,8 @@ typedef struct tr_peer
     struct tr_bitfield have;
 
     /* the client name.
-       For BitTorrent peers, this is the app name derived from the `v' string in LTEP's handshake dictionary */
+       For BitTorrent peers, this is the app name derived from the `v' string in LTEP's handshake
+       dictionary */
     tr_quark client;
 
     tr_recentHistory blocksSentToClient;
@@ -129,8 +129,7 @@ typedef struct tr_peer
     tr_recentHistory cancelsSentToPeer;
 
     struct tr_peer_virtual_funcs const* funcs;
-}
-tr_peer;
+} tr_peer;
 
 void tr_peerConstruct(struct tr_peer* peer, tr_torrent const* tor);
 
@@ -151,8 +150,7 @@ typedef struct tr_swarm_stats
     int activeWebseedCount;
     int peerCount;
     int peerFromCount[TR_PEER_FROM__MAX];
-}
-tr_swarm_stats;
+} tr_swarm_stats;
 
 extern tr_swarm_stats const TR_SWARM_STATS_INIT;
 

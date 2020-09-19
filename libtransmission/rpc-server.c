@@ -17,8 +17,8 @@
 #include <event2/http_struct.h> /* TODO: eventually remove this */
 
 #include "transmission.h"
-#include "crypto.h" /* tr_ssha1_matches() */
 #include "crypto-utils.h" /* tr_rand_buffer() */
+#include "crypto.h"       /* tr_ssha1_matches() */
 #include "error.h"
 #include "fdlimit.h"
 #include "list.h"
@@ -26,10 +26,10 @@
 #include "net.h"
 #include "platform.h" /* tr_getWebClientDir() */
 #include "ptrarray.h"
-#include "rpcimpl.h"
 #include "rpc-server.h"
-#include "session.h"
+#include "rpcimpl.h"
 #include "session-id.h"
+#include "session.h"
 #include "tr-assert.h"
 #include "trevent.h"
 #include "utils.h"
@@ -117,15 +117,18 @@ static void tr_mimepart_free(struct tr_mimepart* p)
     tr_free(p);
 }
 
-static void extract_parts_from_multipart(struct evkeyvalq const* headers, struct evbuffer* body, tr_ptrArray* setme_parts)
+static void extract_parts_from_multipart(struct evkeyvalq const* headers, struct evbuffer* body,
+                                         tr_ptrArray* setme_parts)
 {
     char const* content_type = evhttp_find_header(headers, "Content-Type");
     char const* in = (char const*)evbuffer_pullup(body, -1);
     size_t inlen = evbuffer_get_length(body);
 
     char const* boundary_key = "boundary=";
-    char const* boundary_key_begin = content_type != NULL ? strstr(content_type, boundary_key) : NULL;
-    char const* boundary_val = boundary_key_begin != NULL ? boundary_key_begin + strlen(boundary_key) : "arglebargle";
+    char const* boundary_key_begin =
+        content_type != NULL ? strstr(content_type, boundary_key) : NULL;
+    char const* boundary_val =
+        boundary_key_begin != NULL ? boundary_key_begin + strlen(boundary_key) : "arglebargle";
     char* boundary = tr_strdup_printf("--%s", boundary_val);
     size_t const boundary_len = strlen(boundary);
 
@@ -270,17 +273,13 @@ static char const* mimetype_guess(char const* path)
     {
         char const* suffix;
         char const* mime_type;
-    }
-    const types[] =
-    {
-        /* these are the ones we need for serving the web client's files... */
-        { "css", "text/css" },
-        { "gif", "image/gif" },
-        { "html", "text/html" },
-        { "ico", "image/vnd.microsoft.icon" },
-        { "js", "application/javascript" },
-        { "png", "image/png" }
-    };
+    } const types[] = {/* these are the ones we need for serving the web client's files... */
+                       {"css", "text/css"},
+                       {"gif", "image/gif"},
+                       {"html", "text/html"},
+                       {"ico", "image/vnd.microsoft.icon"},
+                       {"js", "application/javascript"},
+                       {"png", "image/png"}};
     char const* dot = strrchr(path, '.');
 
     for (unsigned int i = 0; dot != NULL && i < TR_N_ELEMENTS(types); ++i)
@@ -294,8 +293,8 @@ static char const* mimetype_guess(char const* path)
     return "application/octet-stream";
 }
 
-static void add_response(struct evhttp_request* req, struct tr_rpc_server* server, struct evbuffer* out,
-    struct evbuffer* content)
+static void add_response(struct evhttp_request* req, struct tr_rpc_server* server,
+                         struct evbuffer* out, struct evbuffer* content)
 {
     char const* key = "Accept-Encoding";
     char const* encoding = evhttp_find_header(req->input_headers, key);
@@ -328,7 +327,8 @@ static void add_response(struct evhttp_request* req, struct tr_rpc_server* serve
 #else
             compressionLevel = Z_BEST_COMPRESSION;
 #endif
-            deflateInit2(&server->stream, compressionLevel, Z_DEFLATED, 15 + 16, 8, Z_DEFAULT_STRATEGY);
+            deflateInit2(&server->stream, compressionLevel, Z_DEFLATED, 15 + 16, 8,
+                         Z_DEFAULT_STRATEGY);
         }
 
         server->stream.next_in = content_ptr;
@@ -385,7 +385,8 @@ static void evbuffer_ref_cleanup_tr_free(void const* data, size_t datalen, void*
     tr_free(extra);
 }
 
-static void serve_file(struct evhttp_request* req, struct tr_rpc_server* server, char const* filename)
+static void serve_file(struct evhttp_request* req, struct tr_rpc_server* server,
+                       char const* filename)
 {
     if (req->type != EVHTTP_REQ_GET)
     {
@@ -437,14 +438,14 @@ static void handle_web_client(struct evhttp_request* req, struct tr_rpc_server* 
     if (tr_str_is_empty(webClientDir))
     {
         send_simple_response(req, HTTP_NOTFOUND,
-            "<p>Couldn't find Transmission's web interface files!</p>"
-            "<p>Users: to tell Transmission where to look, "
-            "set the TRANSMISSION_WEB_HOME environment "
-            "variable to the folder where the web interface's "
-            "index.html is located.</p>"
-            "<p>Package Builders: to set a custom default at compile time, "
-            "#define PACKAGE_DATA_DIR in libtransmission/platform.c "
-            "or tweak tr_getClutchDir() by hand.</p>");
+                             "<p>Couldn't find Transmission's web interface files!</p>"
+                             "<p>Users: to tell Transmission where to look, "
+                             "set the TRANSMISSION_WEB_HOME environment "
+                             "variable to the folder where the web interface's "
+                             "index.html is located.</p>"
+                             "<p>Package Builders: to set a custom default at compile time, "
+                             "#define PACKAGE_DATA_DIR in libtransmission/platform.c "
+                             "or tweak tr_getClutchDir() by hand.</p>");
     }
     else
     {
@@ -465,7 +466,7 @@ static void handle_web_client(struct evhttp_request* req, struct tr_rpc_server* 
         else
         {
             char* filename = tr_strdup_printf("%s%s%s", webClientDir, TR_PATH_DELIMITER_STR,
-                tr_str_is_empty(subpath) ? "index.html" : subpath);
+                                              tr_str_is_empty(subpath) ? "index.html" : subpath);
             serve_file(req, server, filename);
             tr_free(filename);
         }
@@ -497,7 +498,8 @@ static void rpc_response_func(tr_session* session, tr_variant* response, void* u
     tr_free(data);
 }
 
-static void handle_rpc_from_json(struct evhttp_request* req, struct tr_rpc_server* server, char const* json, size_t json_len)
+static void handle_rpc_from_json(struct evhttp_request* req, struct tr_rpc_server* server,
+                                 char const* json, size_t json_len)
 {
     tr_variant top;
     bool have_content = tr_variantFromJson(&top, json, json_len) == 0;
@@ -520,7 +522,7 @@ static void handle_rpc(struct evhttp_request* req, struct tr_rpc_server* server)
     if (req->type == EVHTTP_REQ_POST)
     {
         handle_rpc_from_json(req, server, (char const*)evbuffer_pullup(req->input_buffer, -1),
-            evbuffer_get_length(req->input_buffer));
+                             evbuffer_get_length(req->input_buffer));
         return;
     }
 
@@ -642,17 +644,23 @@ static void handle_request(struct evhttp_request* req, void* arg)
 
         if (server->loginattempts == 100)
         {
-            send_simple_response(req, 403, "<p>Too many unsuccessful login attempts. Please restart transmission-daemon.</p>");
+            send_simple_response(
+                req, 403,
+                "<p>Too many unsuccessful login attempts. Please restart transmission-daemon.</p>");
             return;
         }
 
         if (!isAddressAllowed(server, req->remote_host))
         {
-            send_simple_response(req, 403,
+            send_simple_response(
+                req, 403,
                 "<p>Unauthorized IP Address.</p>"
                 "<p>Either disable the IP address whitelist or add your address to it.</p>"
-                "<p>If you're editing settings.json, see the 'rpc-whitelist' and 'rpc-whitelist-enabled' entries.</p>"
-                "<p>If you're still using ACLs, use a whitelist instead. See the transmission-daemon manpage for details.</p>");
+                "<p>If you're editing settings.json, see the 'rpc-whitelist' and "
+                "'rpc-whitelist-enabled' entries.</p>"
+                "<p>If you're still using ACLs, use a whitelist instead. See the "
+                "transmission-daemon manpage for "
+                "details.</p>");
             return;
         }
 
@@ -676,13 +684,15 @@ static void handle_request(struct evhttp_request* req, void* arg)
             }
         }
 
-        if (server->isPasswordEnabled && (pass == NULL || user == NULL || strcmp(server->username, user) != 0 ||
-            !tr_ssha1_matches(server->password, pass)))
+        if (server->isPasswordEnabled
+            && (pass == NULL || user == NULL || strcmp(server->username, user) != 0
+                || !tr_ssha1_matches(server->password, pass)))
         {
-            evhttp_add_header(req->output_headers, "WWW-Authenticate", "Basic realm=\"" MY_REALM "\"");
+            evhttp_add_header(req->output_headers, "WWW-Authenticate",
+                              "Basic realm=\"" MY_REALM "\"");
             server->loginattempts++;
-            char* unauthuser = tr_strdup_printf("<p>Unauthorized User. %d unsuccessful login attempts.</p>",
-                server->loginattempts);
+            char* unauthuser = tr_strdup_printf(
+                "<p>Unauthorized User. %d unsuccessful login attempts.</p>", server->loginattempts);
             send_simple_response(req, 401, unauthuser);
             tr_free(unauthuser);
             tr_free(user);
@@ -715,7 +725,9 @@ static void handle_request(struct evhttp_request* req, void* arg)
                 "<li>Enable password authentication, then any hostname is allowed.</li>"
                 "<li>Add the hostname you want to use to the whitelist in settings.</li>"
                 "</ul></p>"
-                "<p>If you're editing settings.json, see the 'rpc-host-whitelist' and 'rpc-host-whitelist-enabled' entries.</p>"
+                "<p>If you're editing settings.json, see the 'rpc-host-whitelist' and "
+                "'rpc-host-whitelist-enabled' "
+                "entries.</p>"
                 "<p>This requirement has been added to help prevent "
                 "<a href=\"https://en.wikipedia.org/wiki/DNS_rebinding\">DNS Rebinding</a> "
                 "attacks.</p>");
@@ -731,9 +743,11 @@ static void handle_request(struct evhttp_request* req, void* arg)
             char* tmp = tr_strdup_printf(
                 "<p>Your request had an invalid session-id header.</p>"
                 "<p>To fix this, follow these steps:"
-                "<ol><li> When reading a response, get its X-Transmission-Session-Id header and remember it"
+                "<ol><li> When reading a response, get its X-Transmission-Session-Id header and "
+                "remember it"
                 "<li> Add the updated header to your outgoing requests"
-                "<li> When you get this 409 error message, resend your request with the updated header"
+                "<li> When you get this 409 error message, resend your request with the updated "
+                "header"
                 "</ol></p>"
                 "<p>This requirement has been added to help prevent "
                 "<a href=\"https://en.wikipedia.org/wiki/Cross-site_request_forgery\">CSRF</a> "
@@ -780,12 +794,14 @@ static void rpc_server_on_start_retry(evutil_socket_t fd, short type, void* cont
 
 static int rpc_server_start_retry(tr_rpc_server* server)
 {
-    int retry_delay = (server->start_retry_counter / SERVER_START_RETRY_DELAY_STEP + 1) * SERVER_START_RETRY_DELAY_INCREMENT;
+    int retry_delay = (server->start_retry_counter / SERVER_START_RETRY_DELAY_STEP + 1)
+                      * SERVER_START_RETRY_DELAY_INCREMENT;
     retry_delay = MIN(retry_delay, SERVER_START_RETRY_MAX_DELAY);
 
     if (server->start_retry_timer == NULL)
     {
-        server->start_retry_timer = evtimer_new(server->session->event_base, rpc_server_on_start_retry, server);
+        server->start_retry_timer =
+            evtimer_new(server->session->event_base, rpc_server_on_start_retry, server);
     }
 
     tr_timerAdd(server->start_retry_timer, retry_delay, 0);
@@ -828,12 +844,13 @@ static void startServer(void* vserver)
         {
             int const retry_delay = rpc_server_start_retry(server);
 
-            tr_logAddNamedDbg(MY_NAME, "Unable to bind to %s:%d, retrying in %d seconds", address, port, retry_delay);
+            tr_logAddNamedDbg(MY_NAME, "Unable to bind to %s:%d, retrying in %d seconds", address,
+                              port, retry_delay);
             return;
         }
 
-        tr_logAddNamedError(MY_NAME, "Unable to bind to %s:%d after %d attempts, giving up", address, port,
-            SERVER_START_RETRY_COUNT);
+        tr_logAddNamedError(MY_NAME, "Unable to bind to %s:%d after %d attempts, giving up",
+                            address, port, SERVER_START_RETRY_COUNT);
     }
     else
     {
@@ -958,7 +975,9 @@ static void tr_rpcSetList(char const* whitelistStr, tr_list** list)
         if (strcspn(token, "+-") < len)
         {
             tr_logAddNamedInfo(MY_NAME,
-                "Adding address to whitelist: %s (And it has a '+' or '-'!  Are you using an old ACL by mistake?)", token);
+                               "Adding address to whitelist: %s (And it has a '+' or '-'!  Are you "
+                               "using an old ACL by mistake?)",
+                               token);
         }
         else
         {
@@ -1241,7 +1260,9 @@ tr_rpc_server* tr_rpcInit(tr_session* session, tr_variant* settings)
     }
     else if (address.type != TR_AF_INET && address.type != TR_AF_INET6)
     {
-        tr_logAddNamedError(MY_NAME, _("%s is not an IPv4 or IPv6 address. RPC listeners must be IPv4 or IPv6"), str);
+        tr_logAddNamedError(
+            MY_NAME, _("%s is not an IPv4 or IPv6 address. RPC listeners must be IPv4 or IPv6"),
+            str);
         address = tr_inaddr_any;
     }
 
@@ -1249,8 +1270,8 @@ tr_rpc_server* tr_rpcInit(tr_session* session, tr_variant* settings)
 
     if (s->isEnabled)
     {
-        tr_logAddNamedInfo(MY_NAME, _("Serving RPC and Web requests on %s:%d%s"), tr_rpcGetBindAddress(s), (int)s->port,
-            s->url);
+        tr_logAddNamedInfo(MY_NAME, _("Serving RPC and Web requests on %s:%d%s"),
+                           tr_rpcGetBindAddress(s), (int)s->port, s->url);
         tr_runInEventThread(session, startServer, s);
 
         if (s->isWhitelistEnabled)

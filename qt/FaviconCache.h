@@ -16,7 +16,7 @@
 #include <QString>
 
 #include "Macros.h"
-#include "Utils.h" // std::hash<QString>
+#include "Utils.h"  // std::hash<QString>
 
 class QNetworkAccessManager;
 class QNetworkReply;
@@ -27,7 +27,7 @@ class FaviconCache : public QObject
     Q_OBJECT
     TR_DISABLE_COPY_MOVE(FaviconCache)
 
-public:
+   public:
     FaviconCache();
 
     using Key = QString;
@@ -44,13 +44,13 @@ public:
     static QString getDisplayName(Key const& key);
     static QSize getIconSize();
 
-signals:
+   signals:
     void pixmapReady(Key const& key);
 
-private slots:
+   private slots:
     void onRequestFinished(QNetworkReply* reply);
 
-private:
+   private:
     static Key getKey(QUrl const& url);
     void ensureCacheDirHasBeenScanned();
 

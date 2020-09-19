@@ -1,6 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-"${DIR}/format/format.sh" --all
-
-cd web && yarn -s install && yarn -s lint
+./run-clang-format.py -i -r cli daemon gtk libtransmission qt tests utils
+cd web && yarn -s install && yarn -s lint:fix

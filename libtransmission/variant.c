@@ -39,8 +39,8 @@
 #include "log.h"
 #include "tr-assert.h"
 #include "utils.h" /* tr_new(), tr_free() */
-#include "variant.h"
 #include "variant-common.h"
+#include "variant.h"
 
 /* don't use newlocale/uselocale on old versions of uClibc because they're buggy.
  * https://trac.transmissionbt.com/ticket/6006 */
@@ -80,7 +80,8 @@ static void use_numeric_locale(struct locale_context* context, char const* local
 #endif
 
     context->category = LC_NUMERIC;
-    tr_strlcpy(context->old_locale, setlocale(context->category, NULL), sizeof(context->old_locale));
+    tr_strlcpy(context->old_locale, setlocale(context->category, NULL),
+               sizeof(context->old_locale));
     setlocale(context->category, locale_name);
 
 #endif
@@ -115,8 +116,8 @@ static bool tr_variantIsContainer(tr_variant const* v)
 
 static bool tr_variantIsSomething(tr_variant const* v)
 {
-    return tr_variantIsContainer(v) || tr_variantIsInt(v) || tr_variantIsString(v) || tr_variantIsReal(v) ||
-        tr_variantIsBool(v);
+    return tr_variantIsContainer(v) || tr_variantIsInt(v) || tr_variantIsString(v)
+           || tr_variantIsReal(v) || tr_variantIsBool(v);
 }
 
 void tr_variantInit(tr_variant* v, char type)
@@ -129,13 +130,10 @@ void tr_variantInit(tr_variant* v, char type)
 ****
 ***/
 
-static struct tr_variant_string const STRING_INIT =
-{
-    .type = TR_STRING_TYPE_QUARK,
-    .quark = TR_KEY_NONE,
-    .len = 0,
-    .str.str = ""
-};
+static struct tr_variant_string const STRING_INIT = {.type = TR_STRING_TYPE_QUARK,
+                                                     .quark = TR_KEY_NONE,
+                                                     .len = 0,
+                                                     .str.str = ""};
 
 static void tr_variant_string_clear(struct tr_variant_string* str)
 {
@@ -154,20 +152,13 @@ static char const* tr_variant_string_get_string(struct tr_variant_string const* 
 
     switch (str->type)
     {
-    case TR_STRING_TYPE_BUF:
-        ret = str->str.buf;
-        break;
+        case TR_STRING_TYPE_BUF: ret = str->str.buf; break;
 
-    case TR_STRING_TYPE_HEAP:
-        ret = str->str.str;
-        break;
+        case TR_STRING_TYPE_HEAP: ret = str->str.str; break;
 
-    case TR_STRING_TYPE_QUARK:
-        ret = str->str.str;
-        break;
+        case TR_STRING_TYPE_QUARK: ret = str->str.str; break;
 
-    default:
-        ret = NULL;
+        default: ret = NULL;
     }
 
     return ret;
@@ -182,7 +173,8 @@ static void tr_variant_string_set_quark(struct tr_variant_string* str, tr_quark 
     str->str.str = tr_quark_get_string(quark, &str->len);
 }
 
-static void tr_variant_string_set_string(struct tr_variant_string* str, char const* bytes, size_t len)
+static void tr_variant_string_set_string(struct tr_variant_string* str, char const* bytes,
+                                         size_t len)
 {
     tr_variant_string_clear(str);
 
@@ -247,7 +239,8 @@ tr_variant* tr_variantDictFind(tr_variant* dict, tr_quark const key)
     return i < 0 ? NULL : dict->val.l.vals + i;
 }
 
-static bool tr_variantDictFindType(tr_variant* dict, tr_quark const key, int type, tr_variant** setme)
+static bool tr_variantDictFindType(tr_variant* dict, tr_quark const key, int type,
+                                   tr_variant** setme)
 {
     *setme = tr_variantDictFind(dict, key);
     return tr_variantIsType(*setme, type);
@@ -445,7 +438,8 @@ bool tr_variantDictFindDict(tr_variant* dict, tr_quark const key, tr_variant** s
     return tr_variantDictFindType(dict, key, TR_VARIANT_TYPE_DICT, setme);
 }
 
-bool tr_variantDictFindRaw(tr_variant* dict, tr_quark const key, uint8_t const** setme_raw, size_t* setme_len)
+bool tr_variantDictFindRaw(tr_variant* dict, tr_quark const key, uint8_t const** setme_raw,
+                           size_t* setme_len)
 {
     tr_variant* child = tr_variantDictFind(dict, key);
     return tr_variantGetRaw(child, setme_raw, setme_len);
@@ -820,7 +814,8 @@ static void nodeDestruct(struct SaveNode* node)
  * easier to read, but was vulnerable to a smash-stacking
  * attack via maliciously-crafted data. (#667)
  */
-void tr_variantWalk(tr_variant const* v_in, struct VariantWalkFuncs const* walkFuncs, void* user_data, bool sort_dicts)
+void tr_variantWalk(tr_variant const* v_in, struct VariantWalkFuncs const* walkFuncs,
+                    void* user_data, bool sort_dicts)
 {
     int stackSize = 0;
     int stackAlloc = 64;
@@ -868,62 +863,54 @@ void tr_variantWalk(tr_variant const* v_in, struct VariantWalkFuncs const* walkF
         {
             switch (v->type)
             {
-            case TR_VARIANT_TYPE_INT:
-                walkFuncs->intFunc(v, user_data);
-                break;
+                case TR_VARIANT_TYPE_INT: walkFuncs->intFunc(v, user_data); break;
 
-            case TR_VARIANT_TYPE_BOOL:
-                walkFuncs->boolFunc(v, user_data);
-                break;
+                case TR_VARIANT_TYPE_BOOL: walkFuncs->boolFunc(v, user_data); break;
 
-            case TR_VARIANT_TYPE_REAL:
-                walkFuncs->realFunc(v, user_data);
-                break;
+                case TR_VARIANT_TYPE_REAL: walkFuncs->realFunc(v, user_data); break;
 
-            case TR_VARIANT_TYPE_STR:
-                walkFuncs->stringFunc(v, user_data);
-                break;
+                case TR_VARIANT_TYPE_STR: walkFuncs->stringFunc(v, user_data); break;
 
-            case TR_VARIANT_TYPE_LIST:
-                if (v == node->v)
-                {
-                    walkFuncs->listBeginFunc(v, user_data);
-                }
-                else
-                {
-                    if (stackAlloc == stackSize)
+                case TR_VARIANT_TYPE_LIST:
+                    if (v == node->v)
                     {
-                        stackAlloc *= 2;
-                        stack = tr_renew(struct SaveNode, stack, stackAlloc);
+                        walkFuncs->listBeginFunc(v, user_data);
+                    }
+                    else
+                    {
+                        if (stackAlloc == stackSize)
+                        {
+                            stackAlloc *= 2;
+                            stack = tr_renew(struct SaveNode, stack, stackAlloc);
+                        }
+
+                        nodeConstruct(&stack[stackSize++], v, sort_dicts);
                     }
 
-                    nodeConstruct(&stack[stackSize++], v, sort_dicts);
-                }
+                    break;
 
-                break;
-
-            case TR_VARIANT_TYPE_DICT:
-                if (v == node->v)
-                {
-                    walkFuncs->dictBeginFunc(v, user_data);
-                }
-                else
-                {
-                    if (stackAlloc == stackSize)
+                case TR_VARIANT_TYPE_DICT:
+                    if (v == node->v)
                     {
-                        stackAlloc *= 2;
-                        stack = tr_renew(struct SaveNode, stack, stackAlloc);
+                        walkFuncs->dictBeginFunc(v, user_data);
+                    }
+                    else
+                    {
+                        if (stackAlloc == stackSize)
+                        {
+                            stackAlloc *= 2;
+                            stack = tr_renew(struct SaveNode, stack, stackAlloc);
+                        }
+
+                        nodeConstruct(&stack[stackSize++], v, sort_dicts);
                     }
 
-                    nodeConstruct(&stack[stackSize++], v, sort_dicts);
-                }
+                    break;
 
-                break;
-
-            default:
-                /* did caller give us an uninitialized val? */
-                tr_logAddError("%s", _("Invalid metadata"));
-                break;
+                default:
+                    /* did caller give us an uninitialized val? */
+                    tr_logAddError("%s", _("Invalid metadata"));
+                    break;
             }
         }
     }
@@ -955,16 +942,9 @@ static void freeContainerEndFunc(tr_variant const* v, void* user_data)
     tr_free(v->val.l.vals);
 }
 
-static struct VariantWalkFuncs const freeWalkFuncs =
-{
-    freeDummyFunc,
-    freeDummyFunc,
-    freeDummyFunc,
-    freeStringFunc,
-    freeDummyFunc,
-    freeDummyFunc,
-    freeContainerEndFunc
-};
+static struct VariantWalkFuncs const freeWalkFuncs = {
+    freeDummyFunc, freeDummyFunc, freeDummyFunc,       freeStringFunc,
+    freeDummyFunc, freeDummyFunc, freeContainerEndFunc};
 
 void tr_variantFree(tr_variant* v)
 {
@@ -1098,7 +1078,8 @@ void tr_variantMergeDicts(tr_variant* target, tr_variant const* source)
             {
                 if (tr_variantDictFind(target, key) == NULL)
                 {
-                    tr_variantListCopy(tr_variantDictAddList(target, key, tr_variantListSize(val)), val);
+                    tr_variantListCopy(tr_variantDictAddList(target, key, tr_variantListSize(val)),
+                                       val);
                 }
             }
             else if (tr_variantIsDict(val))
@@ -1117,7 +1098,8 @@ void tr_variantMergeDicts(tr_variant* target, tr_variant const* source)
             }
             else
             {
-                tr_logAddDebug("tr_variantMergeDicts skipping \"%s\"", tr_quark_get_string(key, NULL));
+                tr_logAddDebug("tr_variantMergeDicts skipping \"%s\"",
+                               tr_quark_get_string(key, NULL));
             }
         }
     }
@@ -1139,17 +1121,11 @@ struct evbuffer* tr_variantToBuf(tr_variant const* v, tr_variant_fmt fmt)
 
     switch (fmt)
     {
-    case TR_VARIANT_FMT_BENC:
-        tr_variantToBufBenc(v, buf);
-        break;
+        case TR_VARIANT_FMT_BENC: tr_variantToBufBenc(v, buf); break;
 
-    case TR_VARIANT_FMT_JSON:
-        tr_variantToBufJson(v, buf, false);
-        break;
+        case TR_VARIANT_FMT_JSON: tr_variantToBufJson(v, buf, false); break;
 
-    case TR_VARIANT_FMT_JSON_LEAN:
-        tr_variantToBufJson(v, buf, true);
-        break;
+        case TR_VARIANT_FMT_JSON_LEAN: tr_variantToBufJson(v, buf, true); break;
     }
 
     /* restore the previous locale */
@@ -1250,7 +1226,8 @@ int tr_variantToFile(tr_variant const* v, tr_variant_fmt fmt, char const* filena
 ****
 ***/
 
-bool tr_variantFromFile(tr_variant* setme, tr_variant_fmt fmt, char const* filename, tr_error** error)
+bool tr_variantFromFile(tr_variant* setme, tr_variant_fmt fmt, char const* filename,
+                        tr_error** error)
 {
     bool ret = false;
     uint8_t* buf;
@@ -1275,8 +1252,8 @@ bool tr_variantFromFile(tr_variant* setme, tr_variant_fmt fmt, char const* filen
     return ret;
 }
 
-int tr_variantFromBuf(tr_variant* setme, tr_variant_fmt fmt, void const* buf, size_t buflen, char const* optional_source,
-    char const** setme_end)
+int tr_variantFromBuf(tr_variant* setme, tr_variant_fmt fmt, void const* buf, size_t buflen,
+                      char const* optional_source, char const** setme_end)
 {
     int err;
     struct locale_context locale_ctx;
@@ -1286,14 +1263,14 @@ int tr_variantFromBuf(tr_variant* setme, tr_variant_fmt fmt, void const* buf, si
 
     switch (fmt)
     {
-    case TR_VARIANT_FMT_JSON:
-    case TR_VARIANT_FMT_JSON_LEAN:
-        err = tr_jsonParse(optional_source, buf, buflen, setme, setme_end);
-        break;
+        case TR_VARIANT_FMT_JSON:
+        case TR_VARIANT_FMT_JSON_LEAN:
+            err = tr_jsonParse(optional_source, buf, buflen, setme, setme_end);
+            break;
 
-    default /* TR_VARIANT_FMT_BENC */:
-        err = tr_variantParseBenc(buf, (char const*)buf + buflen, setme, setme_end);
-        break;
+        default /* TR_VARIANT_FMT_BENC */:
+            err = tr_variantParseBenc(buf, (char const*)buf + buflen, setme, setme_end);
+            break;
     }
 
     /* restore the previous locale */

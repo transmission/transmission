@@ -10,65 +10,41 @@
 
 class Speed
 {
-public:
+   public:
     Speed() = default;
 
     double getKBps() const;
 
-    [[nodiscard]] int getBps() const
-    {
-        return bytes_per_second_;
-    }
+    [[nodiscard]] int getBps() const { return bytes_per_second_; }
 
-    [[nodiscard]] bool isZero() const
-    {
-        return bytes_per_second_ == 0;
-    }
+    [[nodiscard]] bool isZero() const { return bytes_per_second_ == 0; }
 
     static Speed fromKBps(double KBps);
 
-    static Speed fromBps(int Bps)
-    {
-        return Speed{ Bps };
-    }
+    static Speed fromBps(int Bps) { return Speed {Bps}; }
 
-    void setBps(int Bps)
-    {
-        bytes_per_second_ = Bps;
-    }
+    void setBps(int Bps) { bytes_per_second_ = Bps; }
 
-    Speed& operator +=(Speed const& that)
+    Speed& operator+=(Speed const& that)
     {
         bytes_per_second_ += that.bytes_per_second_;
         return *this;
     }
 
-    [[nodiscard]] Speed operator +(Speed const& that) const
+    [[nodiscard]] Speed operator+(Speed const& that) const
     {
-        return Speed{ getBps() + that.getBps() };
+        return Speed {getBps() + that.getBps()};
     }
 
-    [[nodiscard]] bool operator <(Speed const& that) const
-    {
-        return getBps() < that.getBps();
-    }
+    [[nodiscard]] bool operator<(Speed const& that) const { return getBps() < that.getBps(); }
 
-    [[nodiscard]] bool operator ==(Speed const& that) const
-    {
-        return getBps() == that.getBps();
-    }
+    [[nodiscard]] bool operator==(Speed const& that) const { return getBps() == that.getBps(); }
 
-    [[nodiscard]] bool operator !=(Speed const& that) const
-    {
-        return getBps() != that.getBps();
-    }
+    [[nodiscard]] bool operator!=(Speed const& that) const { return getBps() != that.getBps(); }
 
-private:
-    explicit Speed(int bytes_per_second) :
-        bytes_per_second_{bytes_per_second}
-    {
-    }
+   private:
+    explicit Speed(int bytes_per_second) : bytes_per_second_ {bytes_per_second} {}
 
-private:
+   private:
     int bytes_per_second_ = {};
 };

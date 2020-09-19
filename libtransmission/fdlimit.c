@@ -11,8 +11,8 @@
 #include <string.h>
 
 #include "transmission.h"
-#include "error.h"
 #include "error-types.h"
+#include "error.h"
 #include "fdlimit.h"
 #include "file.h"
 #include "log.h"
@@ -51,12 +51,14 @@ static bool preallocate_file_sparse(tr_sys_file_t fd, uint64_t length, tr_error*
         tr_error_clear(&my_error);
 
         /* fallback: the old-style seek-and-write */
-        if (tr_sys_file_write_at(fd, &zero, 1, length - 1, NULL, &my_error) && tr_sys_file_truncate(fd, length, &my_error))
+        if (tr_sys_file_write_at(fd, &zero, 1, length - 1, NULL, &my_error)
+            && tr_sys_file_truncate(fd, length, &my_error))
         {
             return true;
         }
 
-        dbgmsg("Preallocating (sparse, fallback) failed (%d): %s", my_error->code, my_error->message);
+        dbgmsg("Preallocating (sparse, fallback) failed (%d): %s", my_error->code,
+               my_error->message);
     }
 
     tr_error_propagate(error, &my_error);
@@ -146,8 +148,8 @@ static void cached_file_close(struct tr_cached_file* o)
  * errno values include ENOENT if the parent folder doesn't exist,
  * plus the errno values set by tr_sys_dir_create () and tr_sys_file_open ().
  */
-static int cached_file_open(struct tr_cached_file* o, char const* filename, bool writable, tr_preallocation_mode allocation,
-    uint64_t file_size)
+static int cached_file_open(struct tr_cached_file* o, char const* filename, bool writable,
+                            tr_preallocation_mode allocation, uint64_t file_size)
 {
     int flags;
     tr_sys_path_info info;
@@ -163,7 +165,8 @@ static int cached_file_open(struct tr_cached_file* o, char const* filename, bool
 
         if (dir == NULL)
         {
-            tr_logAddError(_("Couldn't get directory for \"%1$s\": %2$s"), filename, error->message);
+            tr_logAddError(_("Couldn't get directory for \"%1$s\": %2$s"), filename,
+                           error->message);
             goto fail;
         }
 
@@ -177,7 +180,8 @@ static int cached_file_open(struct tr_cached_file* o, char const* filename, bool
         tr_free(dir);
     }
 
-    already_existed = tr_sys_path_get_info(filename, 0, &info, NULL) && info.type == TR_SYS_PATH_IS_FILE;
+    already_existed =
+        tr_sys_path_get_info(filename, 0, &info, NULL) && info.type == TR_SYS_PATH_IS_FILE;
 
     /* we can't resize the file w/o write permissions */
     resize_needed = already_existed && (file_size < info.size);
@@ -214,12 +218,14 @@ static int cached_file_open(struct tr_cached_file* o, char const* filename, bool
 
         if (!success)
         {
-            tr_logAddError(_("Couldn't preallocate file \"%1$s\" (%2$s, size: %3$" PRIu64 "): %4$s"),
-                filename, type, file_size, error->message);
+            tr_logAddError(
+                _("Couldn't preallocate file \"%1$s\" (%2$s, size: %3$" PRIu64 "): %4$s"), filename,
+                type, file_size, error->message);
             goto fail;
         }
 
-        tr_logAddDebug(_("Preallocated file \"%1$s\" (%2$s, size: %3$" PRIu64 ")"), filename, type, file_size);
+        tr_logAddDebug(_("Preallocated file \"%1$s\" (%2$s, size: %3$" PRIu64 ")"), filename, type,
+                       file_size);
     }
 
     /* If the file already exists and it's too large, truncate it.
@@ -238,17 +244,17 @@ static int cached_file_open(struct tr_cached_file* o, char const* filename, bool
     return 0;
 
 fail:
+{
+    int const err = error->code;
+    tr_error_free(error);
+
+    if (fd != TR_BAD_SYS_FILE)
     {
-        int const err = error->code;
-        tr_error_free(error);
-
-        if (fd != TR_BAD_SYS_FILE)
-        {
-            tr_sys_file_close(fd, NULL);
-        }
-
-        return err;
+        tr_sys_file_close(fd, NULL);
     }
+
+    return err;
+}
 }
 
 /***
@@ -263,14 +269,11 @@ struct tr_fileset
 
 static void fileset_construct(struct tr_fileset* set, int n)
 {
-    struct tr_cached_file const TR_CACHED_FILE_INIT =
-    {
-        .is_writable = false,
-        .fd = TR_BAD_SYS_FILE,
-        .torrent_id = 0,
-        .file_index = 0,
-        .used_at = 0
-    };
+    struct tr_cached_file const TR_CACHED_FILE_INIT = {.is_writable = false,
+                                                       .fd = TR_BAD_SYS_FILE,
+                                                       .torrent_id = 0,
+                                                       .file_index = 0,
+                                                       .used_at = 0};
 
     set->begin = tr_new(struct tr_cached_file, n);
     set->end = set->begin + n;
@@ -316,7 +319,8 @@ static void fileset_close_torrent(struct tr_fileset* set, int torrent_id)
     }
 }
 
-static struct tr_cached_file* fileset_lookup(struct tr_fileset* set, int torrent_id, tr_file_index_t i)
+static struct tr_cached_file* fileset_lookup(struct tr_fileset* set, int torrent_id,
+                                             tr_file_index_t i)
 {
     if (set != NULL)
     {
@@ -449,7 +453,7 @@ tr_sys_file_t tr_fdFileGetCached(tr_session* s, int torrent_id, tr_file_index_t 
 bool tr_fdFileGetCachedMTime(tr_session* s, int torrent_id, tr_file_index_t i, time_t* mtime)
 {
     struct tr_cached_file const* o = fileset_lookup(get_fileset(s), torrent_id, i);
-    tr_sys_path_info info = { 0 };
+    tr_sys_path_info info = {0};
     bool const success = o != NULL && tr_sys_file_get_info(o->fd, &info, NULL);
 
     if (success)
@@ -468,8 +472,9 @@ void tr_fdTorrentClose(tr_session* session, int torrent_id)
 }
 
 /* returns an fd on success, or a TR_BAD_SYS_FILE on failure and sets errno */
-tr_sys_file_t tr_fdFileCheckout(tr_session* session, int torrent_id, tr_file_index_t i, char const* filename, bool writable,
-    tr_preallocation_mode allocation, uint64_t file_size)
+tr_sys_file_t tr_fdFileCheckout(tr_session* session, int torrent_id, tr_file_index_t i,
+                                char const* filename, bool writable,
+                                tr_preallocation_mode allocation, uint64_t file_size)
 {
     struct tr_fileset* set = get_fileset(session);
     struct tr_cached_file* o = fileset_lookup(set, torrent_id, i);
@@ -527,7 +532,8 @@ tr_socket_t tr_fdSocketCreate(tr_session* session, int domain, int type)
             if (sockerrno != EAFNOSUPPORT)
             {
                 char err_buf[512];
-                tr_logAddError(_("Couldn't create socket: %s"), tr_net_strerror(err_buf, sizeof(err_buf), sockerrno));
+                tr_logAddError(_("Couldn't create socket: %s"),
+                               tr_net_strerror(err_buf, sizeof(err_buf), sockerrno));
             }
         }
     }

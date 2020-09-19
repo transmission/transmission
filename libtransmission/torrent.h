@@ -12,13 +12,13 @@
 #error only libtransmission should #include this header.
 #endif
 
-#include "bandwidth.h" /* tr_bandwidth */
+#include "bandwidth.h"  /* tr_bandwidth */
 #include "completion.h" /* tr_completion */
+#include "ptrarray.h"
 #include "session.h" /* tr_sessionLock(), tr_sessionUnlock() */
 #include "tr-assert.h"
 #include "tr-macros.h"
 #include "utils.h" /* TR_GNUC_PRINTF */
-#include "ptrarray.h"
 
 TR_BEGIN_DECLS
 
@@ -44,7 +44,8 @@ void tr_ctorInitTorrentWanted(tr_ctor const* ctor, tr_torrent* tor);
 **/
 
 /* just like tr_torrentSetFileDLs but doesn't trigger a fastresume save */
-void tr_torrentInitFileDLs(tr_torrent* tor, tr_file_index_t const* files, tr_file_index_t fileCount, bool do_download);
+void tr_torrentInitFileDLs(tr_torrent* tor, tr_file_index_t const* files, tr_file_index_t fileCount,
+                           bool do_download);
 
 void tr_torrentSetLabels(tr_torrent* tor, tr_ptrArray* labels);
 
@@ -64,18 +65,20 @@ bool tr_torrentIsPieceTransferAllowed(tr_torrent const* torrent, tr_direction di
 
 tr_block_index_t _tr_block(tr_torrent const* tor, tr_piece_index_t index, uint32_t offset);
 
-bool tr_torrentReqIsValid(tr_torrent const* tor, tr_piece_index_t index, uint32_t offset, uint32_t length);
+bool tr_torrentReqIsValid(tr_torrent const* tor, tr_piece_index_t index, uint32_t offset,
+                          uint32_t length);
 
-uint64_t tr_pieceOffset(tr_torrent const* tor, tr_piece_index_t index, uint32_t offset, uint32_t length);
+uint64_t tr_pieceOffset(tr_torrent const* tor, tr_piece_index_t index, uint32_t offset,
+                        uint32_t length);
 
-void tr_torrentGetBlockLocation(tr_torrent const* tor, tr_block_index_t block, tr_piece_index_t* piece, uint32_t* offset,
-    uint32_t* length);
+void tr_torrentGetBlockLocation(tr_torrent const* tor, tr_block_index_t block,
+                                tr_piece_index_t* piece, uint32_t* offset, uint32_t* length);
 
-void tr_torGetFileBlockRange(tr_torrent const* tor, tr_file_index_t const file, tr_block_index_t* first,
-    tr_block_index_t* last);
+void tr_torGetFileBlockRange(tr_torrent const* tor, tr_file_index_t const file,
+                             tr_block_index_t* first, tr_block_index_t* last);
 
-void tr_torGetPieceBlockRange(tr_torrent const* tor, tr_piece_index_t const piece, tr_block_index_t* first,
-    tr_block_index_t* last);
+void tr_torGetPieceBlockRange(tr_torrent const* tor, tr_piece_index_t const piece,
+                              tr_block_index_t* first, tr_block_index_t* last);
 
 void tr_torrentInitFilePriority(tr_torrent* tor, tr_file_index_t fileIndex, tr_priority_t priority);
 
@@ -101,8 +104,7 @@ typedef enum
     TR_VERIFY_NONE,
     TR_VERIFY_WAIT,
     TR_VERIFY_NOW
-}
-tr_verify_state;
+} tr_verify_state;
 
 void tr_torrentSetVerifyState(tr_torrent* tor, tr_verify_state state);
 
@@ -219,7 +221,7 @@ struct tr_torrent
     void* idle_limit_hit_func_user_data;
 
     void* queue_started_user_data;
-    void (* queue_started_callback)(tr_torrent*, void* queue_started_user_data);
+    void (*queue_started_callback)(tr_torrent*, void* queue_started_user_data);
 
     bool isRunning;
     bool isStopping;
@@ -381,7 +383,8 @@ void tr_torrentGotBlock(tr_torrent* tor, tr_block_index_t blockIndex);
  * @param subpath on success, this pointer is assigned a newly-allocated
  *                string holding the second half of the filename.
  */
-bool tr_torrentFindFile2(tr_torrent const*, tr_file_index_t fileNo, char const** base, char** subpath, time_t* mtime);
+bool tr_torrentFindFile2(tr_torrent const*, tr_file_index_t fileNo, char const** base,
+                         char** subpath, time_t* mtime);
 
 /* Returns a newly-allocated version of the tr_file.name string
  * that's been modified to denote that it's not a complete file yet.

@@ -71,11 +71,11 @@
 #undef TR_ENCRYPTION_H
 #undef TR_CRYPTO_UTILS_H
 
-#include "crypto.h"
+#include "crypto-utils-openssl.c"
+#include "crypto-utils.c"
 #include "crypto-utils.h"
 #include "crypto.c"
-#include "crypto-utils.c"
-#include "crypto-utils-openssl.c"
+#include "crypto.h"
 
 #undef KEY_LEN_
 

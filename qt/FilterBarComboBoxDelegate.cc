@@ -18,17 +18,15 @@
 
 namespace
 {
-
 int getHSpacing(QWidget const* w)
 {
     return qMax(3, w->style()->pixelMetric(QStyle::PM_LayoutHorizontalSpacing, nullptr, w));
 }
 
-} // namespace
+}  // namespace
 
-FilterBarComboBoxDelegate::FilterBarComboBoxDelegate(QObject* parent, QComboBox* combo) :
-    QItemDelegate(parent),
-    combo_(combo)
+FilterBarComboBoxDelegate::FilterBarComboBoxDelegate(QObject* parent, QComboBox* combo)
+    : QItemDelegate(parent), combo_(combo)
 {
 }
 
@@ -50,7 +48,8 @@ void FilterBarComboBoxDelegate::setSeparator(QAbstractItemModel* model, QModelIn
     }
 }
 
-void FilterBarComboBoxDelegate::paint(QPainter* painter, QStyleOptionViewItem const& option, QModelIndex const& index) const
+void FilterBarComboBoxDelegate::paint(QPainter* painter, QStyleOptionViewItem const& option,
+                                      QModelIndex const& index) const
 {
     if (isSeparator(index))
     {
@@ -68,10 +67,12 @@ void FilterBarComboBoxDelegate::paint(QPainter* painter, QStyleOptionViewItem co
     else
     {
         QStyleOptionViewItem disabled_option = option;
-        QPalette::ColorRole const disabled_color_role = (disabled_option.state & QStyle::State_Selected) != 0 ?
-            QPalette::HighlightedText : QPalette::Text;
-        disabled_option.palette.setColor(disabled_color_role, Utils::getFadedColor(disabled_option.palette.color(
-            disabled_color_role)));
+        QPalette::ColorRole const disabled_color_role =
+            (disabled_option.state & QStyle::State_Selected) != 0 ? QPalette::HighlightedText
+                                                                  : QPalette::Text;
+        disabled_option.palette.setColor(
+            disabled_color_role,
+            Utils::getFadedColor(disabled_option.palette.color(disabled_color_role)));
 
         QRect bounding_box = option.rect;
 
@@ -80,26 +81,30 @@ void FilterBarComboBoxDelegate::paint(QPainter* painter, QStyleOptionViewItem co
 
         QRect decoration_rect = rect(option, index, Qt::DecorationRole);
         decoration_rect.setSize(combo_->iconSize());
-        decoration_rect = QStyle::alignedRect(option.direction, Qt::AlignLeft | Qt::AlignVCenter, decoration_rect.size(),
-            bounding_box);
+        decoration_rect = QStyle::alignedRect(option.direction, Qt::AlignLeft | Qt::AlignVCenter,
+                                              decoration_rect.size(), bounding_box);
         Utils::narrowRect(bounding_box, decoration_rect.width() + hmargin, 0, option.direction);
 
         QRect count_rect = rect(option, index, FilterBarComboBox::CountStringRole);
-        count_rect = QStyle::alignedRect(option.direction, Qt::AlignRight | Qt::AlignVCenter, count_rect.size(), bounding_box);
+        count_rect = QStyle::alignedRect(option.direction, Qt::AlignRight | Qt::AlignVCenter,
+                                         count_rect.size(), bounding_box);
         Utils::narrowRect(bounding_box, 0, count_rect.width() + hmargin, option.direction);
         QRect const display_rect = bounding_box;
 
         QIcon const icon = Utils::getIconFromIndex(index);
 
         drawBackground(painter, option, index);
-        icon.paint(painter, decoration_rect, Qt::AlignCenter, StyleHelper::getIconMode(option.state), QIcon::Off);
+        icon.paint(painter, decoration_rect, Qt::AlignCenter,
+                   StyleHelper::getIconMode(option.state), QIcon::Off);
         drawDisplay(painter, option, display_rect, index.data(Qt::DisplayRole).toString());
-        drawDisplay(painter, disabled_option, count_rect, index.data(FilterBarComboBox::CountStringRole).toString());
+        drawDisplay(painter, disabled_option, count_rect,
+                    index.data(FilterBarComboBox::CountStringRole).toString());
         drawFocus(painter, option, display_rect | count_rect);
     }
 }
 
-QSize FilterBarComboBoxDelegate::sizeHint(QStyleOptionViewItem const& option, QModelIndex const& index) const
+QSize FilterBarComboBoxDelegate::sizeHint(QStyleOptionViewItem const& option,
+                                          QModelIndex const& index) const
 {
     if (isSeparator(index))
     {
