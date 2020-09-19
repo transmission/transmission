@@ -1,0 +1,64 @@
+{
+  "name": "transmission-web",
+  "main": "index.js",
+  "repository": "https://github.com/transmission/transmission",
+  "license": "MIT",
+  "babel": {
+    "plugins": [
+      "@babel/plugin-proposal-class-properties"
+    ],
+    "presets": []
+  },
+  "eslintConfig": {
+    "env": {
+      "browser": true,
+      "es6": true,
+      "jquery": true
+    },
+    "extends": "eslint:recommended",
+    "parser": "@babel/eslint-parser",
+    "parserOptions": {
+      "sourceType": "module"
+    },
+    "rules": {
+      "curly": ["error", "all"],
+      "no-undef": "off",
+      "no-unused-vars": "off",
+      "no-var": "off",
+      "prefer-const": "off",
+      "semi": ["error", "always"]
+    }
+  },
+  "prettier": {
+    "arrowParens": "always",
+    "bracketSpacing": true,
+    "embeddedLanguageFormatting": "auto",
+    "htmlWhitespaceSensitivity": "css",
+    "insertPragma": false,
+    "jsxBracketSameLine": false,
+    "jsxSingleQuote": false,
+    "printWidth": 100,
+    "proseWrap": "preserve",
+    "quoteProps": "as-needed",
+    "requirePragma": false,
+    "semi": true,
+    "singleQuote": true,
+    "tabWidth": 2,
+    "trailingComma": "es5",
+    "useTabs": false,
+    "vueIndentScriptAndStyle": false
+  },
+  "scripts": {
+    "lint": "prettier --loglevel warn --check javascript/*js && eslint javascript/*js",
+    "lint:changed": "git diff --name-only -z javascript/*js | xargs -0 -n1 -IFILE -- sh -c \"prettier --loglevel warn --check '../FILE' && eslint '../FILE'\"",
+    "lint:fix": "prettier --loglevel warn package.json javascript/*js && eslint --fix javascript/*js",
+    "lint:staged": "git diff --staged --name-only -z javascript/*js | xargs -0 -n1 -IFILE -- sh -c \"prettier --loglevel warn --check '../FILE' && eslint '../FILE'\""
+  },
+  "devDependencies": {
+    "@babel/core": "^7.11.6",
+    "@babel/eslint-parser": "^7.11.5",
+    "@babel/plugin-proposal-class-properties": "^7.10.4",
+    "eslint": "^7.9.0",
+    "prettier": "^2.1.2"
+  }
+}
