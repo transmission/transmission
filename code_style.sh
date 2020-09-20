@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 # Usage: ./code_style.sh
 # Usage: ./code_style.sh --check
