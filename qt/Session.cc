@@ -520,7 +520,7 @@ void Session::torrentRenamePath(torrent_ids_t const& ids, QString const& oldpath
                 tr(R"(<p><b>Unable to rename "%1" as "%2": %3.</b></p><p>Please correct the errors and try again.</p>)").
                     arg(path).arg(name).arg(r.result), QMessageBox::Close,
                 qApp->activeWindow());
-            QObject::connect(d, &QMessageBox::rejected, d, &QMessageBox::deleteLater);
+            d->connect(d, &QMessageBox::rejected, d, &QMessageBox::deleteLater);
             d->show();
         });
 
@@ -1095,7 +1095,7 @@ void Session::addTorrent(AddData const& add_me, tr_variant* args, bool trash_ori
             auto* d = new QMessageBox(QMessageBox::Warning, tr("Error Adding Torrent"),
                 QStringLiteral("<p><b>%1</b></p><p>%2</p>").arg(r.result).arg(add_me.readableName()), QMessageBox::Close,
                 qApp->activeWindow());
-            QObject::connect(d, &QMessageBox::rejected, d, &QMessageBox::deleteLater);
+            d->connect(d, &QMessageBox::rejected, d, &QMessageBox::deleteLater);
             d->show();
         });
 
@@ -1167,7 +1167,7 @@ void Session::onDuplicatesTimer()
             d->setDetailedText(detail);
         }
 
-        QObject::connect(d, &QMessageBox::rejected, d, &QMessageBox::deleteLater);
+        d->connect(d, &QMessageBox::rejected, d, &QMessageBox::deleteLater);
         d->show();
     }
 }
