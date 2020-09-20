@@ -109,15 +109,15 @@ function FileRow(torrent, depth, name, indices, even) {
     }
   };
 
-  var isDone = function () {
+  const isDone = function () {
     return fields.have >= fields.size;
   };
 
-  var isEditable = function () {
+  const isEditable = function () {
     return fields.torrent.getFileCount() > 1 && !isDone();
   };
 
-  var createRow = function (torrent, depth, name, even) {
+  const createRow = function (torrent, depth, name, even) {
     let e;
 
     const root = document.createElement('li');
@@ -185,15 +185,15 @@ function FileRow(torrent, depth, name, indices, even) {
     return root;
   };
 
-  var fireWantedChanged = function (do_want) {
+  const fireWantedChanged = function (do_want) {
     $(fields.me).trigger('wantedToggled', [fields.indices, do_want]);
   };
 
-  var firePriorityChanged = function (priority) {
+  const firePriorityChanged = function (priority) {
     $(fields.me).trigger('priorityToggled', [fields.indices, priority]);
   };
 
-  var fireNameClicked = function () {
+  const fireNameClicked = function () {
     $(fields.me).trigger('nameClicked', [fields.me, fields.indices]);
   };
 

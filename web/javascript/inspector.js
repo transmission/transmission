@@ -6,7 +6,7 @@
  */
 
 function Inspector(controller) {
-  var data = {
+  const data = {
       controller: null,
       elements: {},
       torrents: [],

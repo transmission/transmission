@@ -85,7 +85,7 @@ TransmissionRemote.prototype = {
       async = true;
     }
 
-    var ajaxSettings = {
+    const ajaxSettings = {
       url: RPC._Root,
       type: 'POST',
       contentType: 'json',

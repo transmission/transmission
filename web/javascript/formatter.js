@@ -245,7 +245,7 @@ Transmission.fmt = (function () {
 
     peerStatus: function (flagStr) {
       const formattedFlags = [];
-      for (var i = 0, flag; (flag = flagStr[i]); ++i) {
+      for (const flag of flagStr) {
         let explanation = null;
         switch (flag) {
           case 'O':

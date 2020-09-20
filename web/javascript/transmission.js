@@ -130,12 +130,6 @@ Transmission.prototype = {
     );
   },
 
-  loadImages: function () {
-    for (var i = 0, row; (row = arguments[i]); ++i) {
-      jQuery('<img>').attr('src', row);
-    }
-  },
-
   /*
    * Load the clutch prefs and init the GUI according to those prefs
    */
@@ -405,12 +399,7 @@ Transmission.prototype = {
   },
 
   indexOfLastTorrent: function () {
-    for (var i = 0, r; (r = this._rows[i]); ++i) {
-      if (r.getTorrentId() === this._last_torrent_clicked) {
-        return i;
-      }
-    }
-    return -1;
+    return this._rows.findIndex((row) => row.getTorrentId() === this._last_torrent_clicked);
   },
 
   // Select a range from this row to the last clicked torrent
@@ -604,11 +593,11 @@ Transmission.prototype = {
       }
 
       if ((up_key || dn_key) && rows.length) {
-        var last = this.indexOfLastTorrent(),
-          i = last,
-          anchor = this._shift_index,
-          min = 0,
-          max = rows.length - 1;
+        const last = this.indexOfLastTorrent();
+        const anchor = this._shift_index;
+        const min = 0;
+        const max = rows.length - 1;
+        let i = last;
 
         if (dn_key && i + 1 <= max) {
           ++i;
@@ -1504,7 +1493,7 @@ Transmission.prototype = {
     clearTimeout(this.buttonRefreshTimer);
     delete this.buttonRefreshTimer;
 
-    for (var i = 0, row; (row = this._rows[i]); ++i) {
+    for (const row of this._rows) {
       const isStopped = row.getTorrent().isStopped();
       const isSelected = row.isSelected();
       const isQueued = row.getTorrent().isQueued();
@@ -1681,7 +1670,7 @@ Transmission.prototype = {
     let ci = 0;
     let di = 0;
     while (ci != cmax || di != dmax) {
-      var push_clean;
+      let push_clean;
 
       if (ci == cmax) {
         push_clean = false;
@@ -1789,9 +1778,9 @@ Transmission.prototype = {
       const trackers = torrent.getTrackers();
 
       for (let j = 0, tracker; (tracker = trackers[j]); ++j) {
-        var uri,
-          announce = tracker.announce;
+        const announce = tracker.announce;
 
+        let uri;
         if (announce in this.uriCache) {
           uri = this.uriCache[announce];
         } else {

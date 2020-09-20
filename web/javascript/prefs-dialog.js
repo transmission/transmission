@@ -97,7 +97,7 @@ function PrefsDialog(remote) {
     setBlocklistButtonEnabled(false);
   };
 
-  var setBlocklistButtonEnabled = function (b) {
+  const setBlocklistButtonEnabled = function (b) {
     const e = data.elements.blocklist_button;
     e.attr('disabled', !b);
     e.val(b ? 'Update' : 'Updating...');
@@ -229,7 +229,7 @@ function PrefsDialog(remote) {
     return o;
   };
 
-  var onDialogClosed = function () {
+  const onDialogClosed = function () {
     transmission.hideMobileAddressbar();
 
     $(data.dialog).trigger('closed', getValues());
