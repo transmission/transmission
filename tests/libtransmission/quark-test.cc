@@ -6,8 +6,8 @@
  *
  */
 
-#include "quark.h"
 #include "transmission.h"
+#include "quark.h"
 
 #include "gtest/gtest.h"
 
@@ -16,8 +16,8 @@
 
 class QuarkTest : public ::testing::Test
 {
-   protected:
-    template <typename T>
+protected:
+    template<typename T>
     std::string quarkGetString(T i)
     {
         size_t len;
@@ -53,5 +53,5 @@ TEST_F(QuarkTest, newEmptyQuarkReturnsNone)
 {
     auto const q = tr_quark_new(nullptr, TR_BAD_SIZE);
     EXPECT_EQ(TR_KEY_NONE, q);
-    EXPECT_EQ(std::string {""}, quarkGetString(q));
+    EXPECT_EQ(std::string{ "" }, quarkGetString(q));
 }

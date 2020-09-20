@@ -13,13 +13,14 @@
 
 #include <QUrl>
 
-#include "Application.h"  // qApp
+#include "Application.h" // qApp
 #include "Filters.h"
 #include "Speed.h"
 #include "Torrent.h"
 
 namespace trqt::variant_helpers
 {
+
 bool change(double& setme, double const& value)
 {
     bool const changed = std::fabs(setme - value) > std::numeric_limits<double>::epsilon();
@@ -55,8 +56,8 @@ bool change(Peer& setme, tr_variant const* value)
     {
         switch (key)
         {
-#define HANDLE_KEY(key, field) \
-    case TR_KEY_##key: changed = change(setme.field, child) || changed; break;
+#define HANDLE_KEY(key, field) case TR_KEY_ ## key: \
+    changed = change(setme.field, child) || changed; break;
 
             HANDLE_KEY(address, address)
             HANDLE_KEY(clientIsChoked, client_is_choked)
@@ -74,7 +75,8 @@ bool change(Peer& setme, tr_variant const* value)
             HANDLE_KEY(rateToClient, rate_to_client)
             HANDLE_KEY(rateToPeer, rate_to_peer)
 #undef HANDLE_KEY
-            default: break;
+        default:
+            break;
         }
     }
 
@@ -92,21 +94,22 @@ bool change(TorrentFile& setme, tr_variant const* value)
     {
         switch (key)
         {
-#define HANDLE_KEY(key) \
-    case TR_KEY_##key: changed = change(setme.key, child) || changed; break;
+#define HANDLE_KEY(key) case TR_KEY_ ## key: \
+    changed = change(setme.key, child) || changed; break;
 
             HANDLE_KEY(have)
             HANDLE_KEY(priority)
             HANDLE_KEY(wanted)
 #undef HANDLE_KEY
-#define HANDLE_KEY(key, field) \
-    case TR_KEY_##key: changed = change(setme.field, child) || changed; break;
+#define HANDLE_KEY(key, field) case TR_KEY_ ## key: \
+    changed = change(setme.field, child) || changed; break;
 
             HANDLE_KEY(bytesCompleted, have)
             HANDLE_KEY(length, size)
             HANDLE_KEY(name, filename)
 #undef HANDLE_KEY
-            default: break;
+        default:
+            break;
         }
     }
 
@@ -126,8 +129,8 @@ bool change(TrackerStat& setme, tr_variant const* value)
 
         switch (key)
         {
-#define HANDLE_KEY(key, field) \
-    case TR_KEY_##key: field_changed = change(setme.field, child); break;
+#define HANDLE_KEY(key, field) case TR_KEY_ ## key: \
+    field_changed = change(setme.field, child); break;
             HANDLE_KEY(announce, announce)
             HANDLE_KEY(announceState, announce_state)
             HANDLE_KEY(downloadCount, download_count)
@@ -154,7 +157,8 @@ bool change(TrackerStat& setme, tr_variant const* value)
             HANDLE_KEY(tier, tier)
 
 #undef HANDLE_KEY
-            default: break;
+        default:
+            break;
         }
 
         if (field_changed)
@@ -214,4 +218,4 @@ void variantInit(tr_variant* init_me, std::string_view value)
     tr_variantInitStr(init_me, std::data(value), std::size(value));
 }
 
-}  // namespace trqt::variant_helpers
+} // namespace trqt::variant_helpers

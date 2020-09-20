@@ -10,9 +10,6 @@
 
 #include "tr-macros.h"
 
-#include <stdbool.h>
-#include <stddef.h>  // size_t
-
 TR_BEGIN_DECLS
 
 /* Quarks — a 2-way association between a string and a unique integer identifier */
@@ -27,28 +24,28 @@ typedef size_t tr_quark;
  */
 enum
 {
-    TR_KEY_NONE,                   /* represented as an empty string */
-    TR_KEY_activeTorrentCount,     /* rpc */
-    TR_KEY_activity_date,          /* resume file */
-    TR_KEY_activityDate,           /* rpc */
-    TR_KEY_added,                  /* pex */
-    TR_KEY_added_date,             /* rpc */
-    TR_KEY_added_f,                /* pex */
-    TR_KEY_added6,                 /* pex */
-    TR_KEY_added6_f,               /* pex */
-    TR_KEY_addedDate,              /* rpc */
-    TR_KEY_address,                /* rpc */
-    TR_KEY_alt_speed_down,         /* rpc, settings */
-    TR_KEY_alt_speed_enabled,      /* rpc, settings */
-    TR_KEY_alt_speed_time_begin,   /* rpc, settings */
-    TR_KEY_alt_speed_time_day,     /* rpc, settings */
+    TR_KEY_NONE, /* represented as an empty string */
+    TR_KEY_activeTorrentCount, /* rpc */
+    TR_KEY_activity_date, /* resume file */
+    TR_KEY_activityDate, /* rpc */
+    TR_KEY_added, /* pex */
+    TR_KEY_added_date, /* rpc */
+    TR_KEY_added_f, /* pex */
+    TR_KEY_added6, /* pex */
+    TR_KEY_added6_f, /* pex */
+    TR_KEY_addedDate, /* rpc */
+    TR_KEY_address, /* rpc */
+    TR_KEY_alt_speed_down, /* rpc, settings */
+    TR_KEY_alt_speed_enabled, /* rpc, settings */
+    TR_KEY_alt_speed_time_begin, /* rpc, settings */
+    TR_KEY_alt_speed_time_day, /* rpc, settings */
     TR_KEY_alt_speed_time_enabled, /* rpc, settings */
-    TR_KEY_alt_speed_time_end,     /* rpc, settings */
-    TR_KEY_alt_speed_up,           /* rpc, settings */
-    TR_KEY_announce,               /* metainfo */
-    TR_KEY_announce_list,          /* metainfo */
-    TR_KEY_announceState,          /* rpc */
-    TR_KEY_arguments,              /* rpc */
+    TR_KEY_alt_speed_time_end, /* rpc, settings */
+    TR_KEY_alt_speed_up, /* rpc, settings */
+    TR_KEY_announce, /* metainfo */
+    TR_KEY_announce_list, /* metainfo */
+    TR_KEY_announceState, /* rpc */
+    TR_KEY_arguments, /* rpc */
     TR_KEY_bandwidth_priority,
     TR_KEY_bandwidthPriority,
     TR_KEY_bind_address_ipv4,

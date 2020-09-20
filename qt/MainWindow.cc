@@ -57,10 +57,9 @@
  */
 class ListViewProxyStyle : public QProxyStyle
 {
-   public:
-    int styleHint(StyleHint hint, QStyleOption const* option = nullptr,
-                  QWidget const* widget = nullptr,
-                  QStyleHintReturn* return_data = nullptr) const override
+public:
+    int styleHint(StyleHint hint, QStyleOption const* option = nullptr, QWidget const* widget = nullptr,
+        QStyleHintReturn* return_data = nullptr) const override
     {
         if (hint == QStyle::SH_ItemView_ActivateItemOnSingleClick)
         {
@@ -112,9 +111,8 @@ QIcon MainWindow::addEmblem(QIcon base_icon, QStringList const& emblem_names)
     for (QSize const& size : base_icon.availableSizes())
     {
         QSize const emblem_size = size / 2;
-        QRect const emblem_rect =
-            QStyle::alignedRect(layoutDirection(), Qt::AlignBottom | Qt::AlignRight, emblem_size,
-                                QRect(QPoint(0, 0), size));
+        QRect const emblem_rect = QStyle::alignedRect(layoutDirection(), Qt::AlignBottom | Qt::AlignRight, emblem_size,
+            QRect(QPoint(0, 0), size));
 
         QPixmap pixmap = base_icon.pixmap(size);
         QPixmap emblem_pixmap = emblem_icon.pixmap(emblem_size);
@@ -130,21 +128,21 @@ QIcon MainWindow::addEmblem(QIcon base_icon, QStringList const& emblem_names)
     return icon;
 }
 
-MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool minimized)
-    : session_(session),
-      prefs_(prefs),
-      model_(model),
-      lvp_style_(new ListViewProxyStyle {}),
-      filter_model_(prefs),
-      torrent_delegate_(new TorrentDelegate(this)),
-      torrent_delegate_min_(new TorrentDelegateMin(this)),
-      network_timer_(this),
-      total_ratio_stats_mode_name_(QStringLiteral("total-ratio")),
-      total_transfer_stats_mode_name_(QStringLiteral("total-transfer")),
-      session_ratio_stats_mode_name_(QStringLiteral("session-ratio")),
-      session_transfer_stats_mode_name_(QStringLiteral("session-transfer")),
-      show_options_checkbox_name_(QStringLiteral("show-options-checkbox")),
-      refresh_timer_(this)
+MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool minimized) :
+    session_(session),
+    prefs_(prefs),
+    model_(model),
+    lvp_style_(new ListViewProxyStyle{}),
+    filter_model_(prefs),
+    torrent_delegate_(new TorrentDelegate(this)),
+    torrent_delegate_min_(new TorrentDelegateMin(this)),
+    network_timer_(this),
+    total_ratio_stats_mode_name_(QStringLiteral("total-ratio")),
+    total_transfer_stats_mode_name_(QStringLiteral("total-transfer")),
+    session_ratio_stats_mode_name_(QStringLiteral("session-ratio")),
+    session_transfer_stats_mode_name_(QStringLiteral("session-transfer")),
+    show_options_checkbox_name_(QStringLiteral("show-options-checkbox")),
+    refresh_timer_(this)
 {
     setAcceptDrops(true);
 
@@ -157,21 +155,15 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     ui_.listView->setAttribute(Qt::WA_MacShowFocusRect, false);
 
     // icons
-    QIcon const icon_play =
-        getStockIcon(QStringLiteral("media-playback-start"), QStyle::SP_MediaPlay);
-    QIcon const icon_pause =
-        getStockIcon(QStringLiteral("media-playback-pause"), QStyle::SP_MediaPause);
-    QIcon const icon_open =
-        getStockIcon(QStringLiteral("document-open"), QStyle::SP_DialogOpenButton);
+    QIcon const icon_play = getStockIcon(QStringLiteral("media-playback-start"), QStyle::SP_MediaPlay);
+    QIcon const icon_pause = getStockIcon(QStringLiteral("media-playback-pause"), QStyle::SP_MediaPause);
+    QIcon const icon_open = getStockIcon(QStringLiteral("document-open"), QStyle::SP_DialogOpenButton);
     ui_.action_OpenFile->setIcon(icon_open);
-    ui_.action_AddURL->setIcon(
-        addEmblem(icon_open, QStringList() << QStringLiteral("emblem-web")
-                                           << QStringLiteral("applications-internet")));
+    ui_.action_AddURL->setIcon(addEmblem(icon_open,
+        QStringList() << QStringLiteral("emblem-web") << QStringLiteral("applications-internet")));
     ui_.action_New->setIcon(getStockIcon(QStringLiteral("document-new"), QStyle::SP_DesktopIcon));
-    ui_.action_Properties->setIcon(
-        getStockIcon(QStringLiteral("document-properties"), QStyle::SP_DesktopIcon));
-    ui_.action_OpenFolder->setIcon(
-        getStockIcon(QStringLiteral("folder-open"), QStyle::SP_DirOpenIcon));
+    ui_.action_Properties->setIcon(getStockIcon(QStringLiteral("document-properties"), QStyle::SP_DesktopIcon));
+    ui_.action_OpenFolder->setIcon(getStockIcon(QStringLiteral("folder-open"), QStyle::SP_DirOpenIcon));
     ui_.action_Start->setIcon(icon_play);
     ui_.action_StartNow->setIcon(icon_play);
     ui_.action_Announce->setIcon(getStockIcon(QStringLiteral("network-transmit-receive")));
@@ -182,35 +174,31 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     ui_.action_PauseAll->setIcon(icon_pause);
     ui_.action_Quit->setIcon(getStockIcon(QStringLiteral("application-exit")));
     ui_.action_SelectAll->setIcon(getStockIcon(QStringLiteral("edit-select-all")));
-    ui_.action_ReverseSortOrder->setIcon(
-        getStockIcon(QStringLiteral("view-sort-ascending"), QStyle::SP_ArrowDown));
+    ui_.action_ReverseSortOrder->setIcon(getStockIcon(QStringLiteral("view-sort-ascending"), QStyle::SP_ArrowDown));
     ui_.action_Preferences->setIcon(getStockIcon(QStringLiteral("preferences-system")));
-    ui_.action_Contents->setIcon(
-        getStockIcon(QStringLiteral("help-contents"), QStyle::SP_DialogHelpButton));
+    ui_.action_Contents->setIcon(getStockIcon(QStringLiteral("help-contents"), QStyle::SP_DialogHelpButton));
     ui_.action_About->setIcon(getStockIcon(QStringLiteral("help-about")));
     ui_.action_QueueMoveTop->setIcon(getStockIcon(QStringLiteral("go-top")));
     ui_.action_QueueMoveUp->setIcon(getStockIcon(QStringLiteral("go-up"), QStyle::SP_ArrowUp));
-    ui_.action_QueueMoveDown->setIcon(
-        getStockIcon(QStringLiteral("go-down"), QStyle::SP_ArrowDown));
+    ui_.action_QueueMoveDown->setIcon(getStockIcon(QStringLiteral("go-down"), QStyle::SP_ArrowDown));
     ui_.action_QueueMoveBottom->setIcon(getStockIcon(QStringLiteral("go-bottom")));
 
-    auto make_network_pixmap = [this](QString name, QSize size = {16, 16}) {
-        return getStockIcon(name, QStyle::SP_DriveNetIcon).pixmap(size);
-    };
+    auto make_network_pixmap = [this](QString name, QSize size = { 16, 16 })
+        {
+            return getStockIcon(name, QStyle::SP_DriveNetIcon).pixmap(size);
+        };
     pixmap_network_error_ = make_network_pixmap(QStringLiteral("network-error"));
     pixmap_network_idle_ = make_network_pixmap(QStringLiteral("network-idle"));
     pixmap_network_receive_ = make_network_pixmap(QStringLiteral("network-receive"));
     pixmap_network_transmit_ = make_network_pixmap(QStringLiteral("network-transmit"));
-    pixmap_network_transmit_receive_ =
-        make_network_pixmap(QStringLiteral("network-transmit-receive"));
+    pixmap_network_transmit_receive_ = make_network_pixmap(QStringLiteral("network-transmit-receive"));
 
     // ui signals
     connect(ui_.action_Toolbar, SIGNAL(toggled(bool)), this, SLOT(setToolbarVisible(bool)));
     connect(ui_.action_Filterbar, SIGNAL(toggled(bool)), this, SLOT(setFilterbarVisible(bool)));
     connect(ui_.action_Statusbar, SIGNAL(toggled(bool)), this, SLOT(setStatusbarVisible(bool)));
     connect(ui_.action_CompactView, SIGNAL(toggled(bool)), this, SLOT(setCompactView(bool)));
-    connect(ui_.action_ReverseSortOrder, SIGNAL(toggled(bool)), this,
-            SLOT(setSortAscendingPref(bool)));
+    connect(ui_.action_ReverseSortOrder, SIGNAL(toggled(bool)), this, SLOT(setSortAscendingPref(bool)));
     connect(ui_.action_Start, SIGNAL(triggered()), this, SLOT(startSelected()));
     connect(ui_.action_QueueMoveTop, SIGNAL(triggered()), this, SLOT(queueMoveTop()));
     connect(ui_.action_QueueMoveUp, SIGNAL(triggered()), this, SLOT(queueMoveUp()));
@@ -233,8 +221,7 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     connect(ui_.action_About, SIGNAL(triggered()), this, SLOT(openAbout()));
     connect(ui_.action_Contents, SIGNAL(triggered()), this, SLOT(openHelp()));
     connect(ui_.action_OpenFolder, SIGNAL(triggered()), this, SLOT(openFolder()));
-    connect(ui_.action_CopyMagnetToClipboard, SIGNAL(triggered()), this,
-            SLOT(copyMagnetLinkToClipboard()));
+    connect(ui_.action_CopyMagnetToClipboard, SIGNAL(triggered()), this, SLOT(copyMagnetLinkToClipboard()));
     connect(ui_.action_SetLocation, SIGNAL(triggered()), this, SLOT(setLocation()));
     connect(ui_.action_Properties, SIGNAL(triggered()), this, SLOT(openProperties()));
     connect(ui_.action_SessionDialog, SIGNAL(triggered()), this, SLOT(openSession()));
@@ -257,19 +244,20 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     connect(&model_, &TorrentModel::torrentsChanged, this, refresh_soon_adapter);
 
     ui_.listView->setModel(&filter_model_);
-    connect(ui_.listView->selectionModel(), &QItemSelectionModel::selectionChanged,
-            refresh_action_sensitivity_soon);
+    connect(ui_.listView->selectionModel(), &QItemSelectionModel::selectionChanged, refresh_action_sensitivity_soon);
 
-    std::array<std::pair<QAction*, int>, 9> const sort_modes = {
-        {{ui_.action_SortByActivity, SortMode::SORT_BY_ACTIVITY},
-         {ui_.action_SortByAge, SortMode::SORT_BY_AGE},
-         {ui_.action_SortByETA, SortMode::SORT_BY_ETA},
-         {ui_.action_SortByName, SortMode::SORT_BY_NAME},
-         {ui_.action_SortByProgress, SortMode::SORT_BY_PROGRESS},
-         {ui_.action_SortByQueue, SortMode::SORT_BY_QUEUE},
-         {ui_.action_SortByRatio, SortMode::SORT_BY_RATIO},
-         {ui_.action_SortBySize, SortMode::SORT_BY_SIZE},
-         {ui_.action_SortByState, SortMode::SORT_BY_STATE}}};
+    std::array<std::pair<QAction*, int>, 9> const sort_modes =
+    {{
+        { ui_.action_SortByActivity, SortMode::SORT_BY_ACTIVITY },
+        { ui_.action_SortByAge, SortMode::SORT_BY_AGE },
+        { ui_.action_SortByETA, SortMode::SORT_BY_ETA },
+        { ui_.action_SortByName, SortMode::SORT_BY_NAME },
+        { ui_.action_SortByProgress, SortMode::SORT_BY_PROGRESS },
+        { ui_.action_SortByQueue, SortMode::SORT_BY_QUEUE },
+        { ui_.action_SortByRatio, SortMode::SORT_BY_RATIO },
+        { ui_.action_SortBySize, SortMode::SORT_BY_SIZE },
+        { ui_.action_SortByState, SortMode::SORT_BY_STATE }
+    }};
 
     // NOLINTNEXTLINE(clang-analyzer-cplusplus.NewDeleteLeaks)
     auto* action_group = new QActionGroup(this);
@@ -302,13 +290,12 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     menu->addSeparator();
     menu->addAction(ui_.action_Quit);
     tray_icon_.setContextMenu(menu);
-    tray_icon_.setIcon(
-        QIcon::fromTheme(QStringLiteral("transmission-tray-icon"), qApp->windowIcon()));
+    tray_icon_.setIcon(QIcon::fromTheme(QStringLiteral("transmission-tray-icon"), qApp->windowIcon()));
 
     connect(&prefs_, SIGNAL(changed(int)), this, SLOT(refreshPref(int)));
     connect(ui_.action_ShowMainWindow, SIGNAL(triggered(bool)), this, SLOT(toggleWindows(bool)));
     connect(&tray_icon_, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this,
-            SLOT(trayActivated(QSystemTrayIcon::ActivationReason)));
+        SLOT(trayActivated(QSystemTrayIcon::ActivationReason)));
 
     toggleWindows(!minimized);
     ui_.action_TrayIcon->setChecked(minimized || prefs.getBool(Prefs::SHOW_TRAY_ICON));
@@ -323,7 +310,8 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     connect(&filter_model_, &TorrentFilter::rowsRemoved, this, refresh_header_soon);
     connect(ui_.listView, SIGNAL(headerDoubleClicked()), filter_bar_, SLOT(clear()));
 
-    static std::array<int, 16> constexpr InitKeys = {
+    static std::array<int, 16> constexpr InitKeys =
+    {
         Prefs::ALT_SPEED_LIMIT_ENABLED,
         Prefs::COMPACT_VIEW,
         Prefs::DSPEED,
@@ -353,7 +341,7 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     connect(&session_, SIGNAL(dataSendProgress()), this, SLOT(dataSendProgress()));
     connect(&session_, SIGNAL(httpAuthenticationRequired()), this, SLOT(wrongAuthentication()));
     connect(&session_, SIGNAL(networkResponse(QNetworkReply::NetworkError, QString)), this,
-            SLOT(onNetworkResponse(QNetworkReply::NetworkError, QString)));
+        SLOT(onNetworkResponse(QNetworkReply::NetworkError, QString)));
 
     if (session_.isServer())
     {
@@ -402,9 +390,7 @@ void MainWindow::initStatusBar()
     ui_.optionsButton->setMenu(createOptionsMenu());
 
     int const minimum_speed_width =
-        ui_.downloadSpeedLabel->fontMetrics()
-            .boundingRect(Formatter::get().uploadSpeedToString(Speed::fromKBps(999.99)))
-            .width();
+        ui_.downloadSpeedLabel->fontMetrics().boundingRect(Formatter::get().uploadSpeedToString(Speed::fromKBps(999.99))).width();
     ui_.downloadSpeedLabel->setMinimumWidth(minimum_speed_width);
     ui_.uploadSpeedLabel->setMinimumWidth(minimum_speed_width);
 
@@ -415,95 +401,91 @@ void MainWindow::initStatusBar()
 
 QMenu* MainWindow::createOptionsMenu()
 {
-    auto const init_speed_sub_menu = [this](QMenu* menu, QAction*& off_action, QAction*& on_action,
-                                            int pref, int enabled_pref) {
-        std::array<int, 13> stock_speeds = {5,   10,  20,  30,  40,  50, 75,
-                                            100, 150, 200, 250, 500, 750};
-        int const current_value = prefs_.get<int>(pref);
-
-        // NOLINTNEXTLINE(clang-analyzer-cplusplus.NewDeleteLeaks)
-        auto* action_group = new QActionGroup(this);
-
-        off_action = menu->addAction(tr("Unlimited"));
-        off_action->setCheckable(true);
-        off_action->setProperty(PREF_VARIANTS_KEY, QVariantList() << enabled_pref << false);
-        action_group->addAction(off_action);
-        connect(off_action, SIGNAL(triggered(bool)), this, SLOT(onSetPrefs(bool)));
-
-        on_action = menu->addAction(
-            tr("Limited at %1")
-                .arg(Formatter::get().speedToString(Speed::fromKBps(current_value))));
-        on_action->setCheckable(true);
-        on_action->setProperty(PREF_VARIANTS_KEY,
-                               QVariantList() << pref << current_value << enabled_pref << true);
-        action_group->addAction(on_action);
-        connect(on_action, SIGNAL(triggered(bool)), this, SLOT(onSetPrefs(bool)));
-
-        menu->addSeparator();
-
-        for (int const i : stock_speeds)
+    auto const init_speed_sub_menu = [this](QMenu* menu, QAction*& off_action, QAction*& on_action, int pref, int enabled_pref)
         {
-            QAction* action = menu->addAction(Formatter::get().speedToString(Speed::fromKBps(i)));
-            action->setProperty(PREF_VARIANTS_KEY, QVariantList()
-                                                       << pref << i << enabled_pref << true);
-            connect(action, SIGNAL(triggered(bool)), this, SLOT(onSetPrefs()));
-        }
-    };
+            std::array<int, 13> stock_speeds = { 5, 10, 20, 30, 40, 50, 75, 100, 150, 200, 250, 500, 750 };
+            int const current_value = prefs_.get<int>(pref);
 
-    auto const init_seed_ratio_sub_menu = [this](QMenu* menu, QAction*& off_action,
-                                                 QAction*& on_action, int pref, int enabled_pref) {
-        std::array<double, 7> stock_ratios = {0.25, 0.50, 0.75, 1, 1.5, 2, 3};
-        auto const current_value = prefs_.get<double>(pref);
+            // NOLINTNEXTLINE(clang-analyzer-cplusplus.NewDeleteLeaks)
+            auto* action_group = new QActionGroup(this);
 
-        auto* action_group = new QActionGroup(this);
+            off_action = menu->addAction(tr("Unlimited"));
+            off_action->setCheckable(true);
+            off_action->setProperty(PREF_VARIANTS_KEY, QVariantList() << enabled_pref << false);
+            action_group->addAction(off_action);
+            connect(off_action, SIGNAL(triggered(bool)), this, SLOT(onSetPrefs(bool)));
 
-        off_action = menu->addAction(tr("Seed Forever"));
-        off_action->setCheckable(true);
-        off_action->setProperty(PREF_VARIANTS_KEY, QVariantList() << enabled_pref << false);
-        action_group->addAction(off_action);
-        connect(off_action, SIGNAL(triggered(bool)), this, SLOT(onSetPrefs(bool)));
+            on_action =
+                menu->addAction(tr("Limited at %1").arg(Formatter::get().speedToString(Speed::fromKBps(current_value))));
+            on_action->setCheckable(true);
+            on_action->setProperty(PREF_VARIANTS_KEY, QVariantList() << pref << current_value << enabled_pref << true);
+            action_group->addAction(on_action);
+            connect(on_action, SIGNAL(triggered(bool)), this, SLOT(onSetPrefs(bool)));
 
-        on_action = menu->addAction(
-            tr("Stop at Ratio (%1)").arg(Formatter::get().ratioToString(current_value)));
-        on_action->setCheckable(true);
-        on_action->setProperty(PREF_VARIANTS_KEY,
-                               QVariantList() << pref << current_value << enabled_pref << true);
-        action_group->addAction(on_action);
-        connect(on_action, SIGNAL(triggered(bool)), this, SLOT(onSetPrefs(bool)));
+            menu->addSeparator();
 
-        menu->addSeparator();
+            for (int const i : stock_speeds)
+            {
+                QAction* action = menu->addAction(Formatter::get().speedToString(Speed::fromKBps(i)));
+                action->setProperty(PREF_VARIANTS_KEY, QVariantList() << pref << i << enabled_pref << true);
+                connect(action, SIGNAL(triggered(bool)), this, SLOT(onSetPrefs()));
+            }
+        };
 
-        for (double const i : stock_ratios)
+    auto const init_seed_ratio_sub_menu =
+        [this](QMenu* menu, QAction*& off_action, QAction*& on_action, int pref, int enabled_pref)
         {
-            QAction* action = menu->addAction(Formatter::get().ratioToString(i));
-            action->setProperty(PREF_VARIANTS_KEY, QVariantList()
-                                                       << pref << i << enabled_pref << true);
-            connect(action, SIGNAL(triggered(bool)), this, SLOT(onSetPrefs()));
-        }
-    };
+            std::array<double, 7> stock_ratios = { 0.25, 0.50, 0.75, 1, 1.5, 2, 3 };
+            auto const current_value = prefs_.get<double>(pref);
+
+            auto* action_group = new QActionGroup(this);
+
+            off_action = menu->addAction(tr("Seed Forever"));
+            off_action->setCheckable(true);
+            off_action->setProperty(PREF_VARIANTS_KEY, QVariantList() << enabled_pref << false);
+            action_group->addAction(off_action);
+            connect(off_action, SIGNAL(triggered(bool)), this, SLOT(onSetPrefs(bool)));
+
+            on_action = menu->addAction(tr("Stop at Ratio (%1)").arg(Formatter::get().ratioToString(current_value)));
+            on_action->setCheckable(true);
+            on_action->setProperty(PREF_VARIANTS_KEY, QVariantList() << pref << current_value << enabled_pref << true);
+            action_group->addAction(on_action);
+            connect(on_action, SIGNAL(triggered(bool)), this, SLOT(onSetPrefs(bool)));
+
+            menu->addSeparator();
+
+            for (double const i : stock_ratios)
+            {
+                QAction* action = menu->addAction(Formatter::get().ratioToString(i));
+                action->setProperty(PREF_VARIANTS_KEY, QVariantList() << pref << i << enabled_pref << true);
+                connect(action, SIGNAL(triggered(bool)), this, SLOT(onSetPrefs()));
+            }
+        };
 
     auto* menu = new QMenu(this);
 
-    init_speed_sub_menu(menu->addMenu(tr("Limit Download Speed")), dlimit_off_action_,
-                        dlimit_on_action_, Prefs::DSPEED, Prefs::DSPEED_ENABLED);
-    init_speed_sub_menu(menu->addMenu(tr("Limit Upload Speed")), ulimit_off_action_,
-                        ulimit_on_action_, Prefs::USPEED, Prefs::USPEED_ENABLED);
+    init_speed_sub_menu(menu->addMenu(tr("Limit Download Speed")), dlimit_off_action_, dlimit_on_action_, Prefs::DSPEED,
+        Prefs::DSPEED_ENABLED);
+    init_speed_sub_menu(menu->addMenu(tr("Limit Upload Speed")), ulimit_off_action_, ulimit_on_action_, Prefs::USPEED,
+        Prefs::USPEED_ENABLED);
 
     menu->addSeparator();
 
-    init_seed_ratio_sub_menu(menu->addMenu(tr("Stop Seeding at Ratio")), ratio_off_action_,
-                             ratio_on_action_, Prefs::RATIO, Prefs::RATIO_ENABLED);
+    init_seed_ratio_sub_menu(menu->addMenu(tr("Stop Seeding at Ratio")), ratio_off_action_, ratio_on_action_, Prefs::RATIO,
+        Prefs::RATIO_ENABLED);
 
     return menu;
 }
 
 QMenu* MainWindow::createStatsModeMenu()
 {
-    std::array<QPair<QAction*, QString>, 4> stats_modes = {
+    std::array<QPair<QAction*, QString>, 4> stats_modes =
+    {
         qMakePair(ui_.action_TotalRatio, total_ratio_stats_mode_name_),
         qMakePair(ui_.action_TotalTransfer, total_transfer_stats_mode_name_),
         qMakePair(ui_.action_SessionRatio, session_ratio_stats_mode_name_),
-        qMakePair(ui_.action_SessionTransfer, session_transfer_stats_mode_name_)};
+        qMakePair(ui_.action_SessionTransfer, session_transfer_stats_mode_name_)
+    };
 
     auto* action_group = new QActionGroup(this);
     auto* menu = new QMenu(this);
@@ -589,6 +571,7 @@ void MainWindow::setLocation()
 
 namespace
 {
+
 // Open Folder & select torrent's file or top folder
 #undef HAVE_OPEN_SELECT
 
@@ -617,20 +600,18 @@ void openSelect(QString const& path)
 void openSelect(QString const& path)
 {
     QStringList script_args;
-    script_args
-        << QStringLiteral("-e")
-        << QStringLiteral("tell application \"Finder\" to reveal POSIX file \"%1\"").arg(path);
+    script_args << QStringLiteral("-e") <<
+        QStringLiteral("tell application \"Finder\" to reveal POSIX file \"%1\"").arg(path);
     QProcess::execute(QStringLiteral("/usr/bin/osascript"), script_args);
 
     script_args.clear();
-    script_args << QStringLiteral("-e")
-                << QStringLiteral("tell application \"Finder\" to activate");
+    script_args << QStringLiteral("-e") << QStringLiteral("tell application \"Finder\" to activate");
     QProcess::execute(QStringLiteral("/usr/bin/osascript"), script_args);
 }
 
 #endif
 
-}  // namespace
+} // namespace
 
 void MainWindow::openFolder()
 {
@@ -701,9 +682,8 @@ void MainWindow::openAbout()
 
 void MainWindow::openHelp()
 {
-    QDesktopServices::openUrl(QUrl(QStringLiteral("https://transmissionbt.com/help/gtk/%1.%2x")
-                                       .arg(MAJOR_VERSION)
-                                       .arg(MINOR_VERSION / 10)));
+    QDesktopServices::openUrl(QUrl(QStringLiteral("https://transmissionbt.com/help/gtk/%1.%2x").arg(MAJOR_VERSION).
+        arg(MINOR_VERSION / 10)));
 }
 
 /****
@@ -780,9 +760,8 @@ void MainWindow::refreshTitle()
 
     if (!url.isEmpty())
     {
-        //: Second (optional) part of main window title "Transmission - host:port" (added when
-        // connected to remote
-        // session); : notice that leading space (before the dash) is included here
+        //: Second (optional) part of main window title "Transmission - host:port" (added when connected to remote session);
+        //: notice that leading space (before the dash) is included here
         title += tr(" - %1:%2").arg(url.host()).arg(url.port());
     }
 
@@ -803,8 +782,9 @@ void MainWindow::refreshTrayIcon(TransferStats const& stats)
     }
     else if (stats.peers_sending != 0)
     {
-        tip = Formatter::get().downloadSpeedToString(stats.speed_down) + QStringLiteral("   ")
-              + Formatter::get().uploadSpeedToString(stats.speed_up);
+        tip = Formatter::get().downloadSpeedToString(stats.speed_down) + QStringLiteral("   ") +
+            Formatter::get().uploadSpeedToString(
+            stats.speed_up);
     }
     else if (stats.peers_receiving != 0)
     {
@@ -828,27 +808,28 @@ void MainWindow::refreshStatusBar(TransferStats const& stats)
 
     if (mode == session_ratio_stats_mode_name_)
     {
-        str = tr("Ratio: %1").arg(Formatter::get().ratioToString(session_.getStats().ratio));
+        str = tr("Ratio: %1")
+            .arg(Formatter::get().ratioToString(session_.getStats().ratio));
     }
     else if (mode == session_transfer_stats_mode_name_)
     {
         auto const& st = session_.getStats();
         str = tr("Down: %1, Up: %2")
-                  .arg(Formatter::get().sizeToString(st.downloadedBytes))
-                  .arg(Formatter::get().sizeToString(st.uploadedBytes));
+            .arg(Formatter::get().sizeToString(st.downloadedBytes))
+            .arg(Formatter::get().sizeToString(st.uploadedBytes));
     }
     else if (mode == total_transfer_stats_mode_name_)
     {
         auto const& st = session_.getCumulativeStats();
         str = tr("Down: %1, Up: %2")
-                  .arg(Formatter::get().sizeToString(st.downloadedBytes))
-                  .arg(Formatter::get().sizeToString(st.uploadedBytes));
+            .arg(Formatter::get().sizeToString(st.downloadedBytes))
+            .arg(Formatter::get().sizeToString(st.uploadedBytes));
     }
-    else  // default is "total-ratio"
+    else // default is "total-ratio"
     {
         assert(mode == total_ratio_stats_mode_name_);
         str = tr("Ratio: %1")
-                  .arg(Formatter::get().ratioToString(session_.getCumulativeStats().ratio));
+            .arg(Formatter::get().ratioToString(session_.getCumulativeStats().ratio));
     }
 
     ui_.statsLabel->setText(str);
@@ -865,8 +846,7 @@ void MainWindow::refreshTorrentViewHeader()
     }
     else
     {
-        ui_.listView->setHeaderText(
-            tr("Showing %L1 of %Ln torrent(s)", nullptr, total_count).arg(visible_count));
+        ui_.listView->setHeaderText(tr("Showing %L1 of %Ln torrent(s)", nullptr, total_count).arg(visible_count));
     }
 }
 
@@ -877,11 +857,11 @@ void MainWindow::refreshActionSensitivity()
     auto const row_count = model->rowCount();
 
     // count how many torrents are selected, paused, etc
-    auto selected = int {};
-    auto selected_and_can_announce = int {};
-    auto selected_and_paused = int {};
-    auto selected_and_queued = int {};
-    auto selected_with_metadata = int {};
+    auto selected = int{};
+    auto selected_and_can_announce = int{};
+    auto selected_and_paused = int{};
+    auto selected_and_queued = int{};
+    auto selected_with_metadata = int{};
     auto const now = time(nullptr);
     for (auto const& row : selection_model->selectedRows())
     {
@@ -926,8 +906,7 @@ void MainWindow::refreshActionSensitivity()
     ui_.action_DeselectAll->setEnabled(have_selection);
     ui_.action_SetLocation->setEnabled(have_selection);
 
-    ui_.action_OpenFolder->setEnabled(one_selection && have_selection_with_metadata
-                                      && session_.isLocal());
+    ui_.action_OpenFolder->setEnabled(one_selection && have_selection_with_metadata && session_.isLocal());
     ui_.action_CopyMagnetToClipboard->setEnabled(one_selection);
 
     ui_.action_SelectAll->setEnabled(selected < row_count);
@@ -1133,94 +1112,90 @@ void MainWindow::refreshPref(int key)
 
     switch (key)
     {
-        case Prefs::STATUSBAR_STATS:
-            str = prefs_.getString(key);
-            action_group = ui_.action_TotalRatio->actionGroup();
-            assert(action_group != nullptr);
+    case Prefs::STATUSBAR_STATS:
+        str = prefs_.getString(key);
+        action_group = ui_.action_TotalRatio->actionGroup();
+        assert(action_group != nullptr);
 
-            for (QAction* action : action_group->actions())
-            {
-                action->setChecked(str == action->property(STATS_MODE_KEY).toString());
-            }
-
-            refreshSoon(REFRESH_STATUS_BAR);
-            break;
-
-        case Prefs::SORT_REVERSED:
-            ui_.action_ReverseSortOrder->setChecked(prefs_.getBool(key));
-            break;
-
-        case Prefs::SORT_MODE:
-            i = prefs_.get<SortMode>(key).mode();
-            action_group = ui_.action_SortByActivity->actionGroup();
-            assert(action_group != nullptr);
-
-            for (QAction* action : action_group->actions())
-            {
-                action->setChecked(i == action->property(SORT_MODE_KEY).toInt());
-            }
-
-            break;
-
-        case Prefs::DSPEED_ENABLED:
-            (prefs_.get<bool>(key) ? dlimit_on_action_ : dlimit_off_action_)->setChecked(true);
-            break;
-
-        case Prefs::DSPEED:
-            dlimit_on_action_->setText(
-                tr("Limited at %1")
-                    .arg(Formatter::get().speedToString(Speed::fromKBps(prefs_.get<int>(key)))));
-            break;
-
-        case Prefs::USPEED_ENABLED:
-            (prefs_.get<bool>(key) ? ulimit_on_action_ : ulimit_off_action_)->setChecked(true);
-            break;
-
-        case Prefs::USPEED:
-            ulimit_on_action_->setText(
-                tr("Limited at %1")
-                    .arg(Formatter::get().speedToString(Speed::fromKBps(prefs_.get<int>(key)))));
-            break;
-
-        case Prefs::RATIO_ENABLED:
-            (prefs_.get<bool>(key) ? ratio_on_action_ : ratio_off_action_)->setChecked(true);
-            break;
-
-        case Prefs::RATIO:
-            ratio_on_action_->setText(
-                tr("Stop at Ratio (%1)")
-                    .arg(Formatter::get().ratioToString(prefs_.get<double>(key))));
-            break;
-
-        case Prefs::FILTERBAR:
-            b = prefs_.getBool(key);
-            filter_bar_->setVisible(b);
-            ui_.action_Filterbar->setChecked(b);
-            break;
-
-        case Prefs::STATUSBAR:
-            b = prefs_.getBool(key);
-            ui_.statusBar->setVisible(b);
-            ui_.action_Statusbar->setChecked(b);
-            break;
-
-        case Prefs::TOOLBAR:
-            b = prefs_.getBool(key);
-            ui_.toolBar->setVisible(b);
-            ui_.action_Toolbar->setChecked(b);
-            break;
-
-        case Prefs::SHOW_TRAY_ICON:
-            b = prefs_.getBool(key);
-            ui_.action_TrayIcon->setChecked(b);
-            tray_icon_.setVisible(b);
-            qApp->setQuitOnLastWindowClosed(!b);
-            refreshSoon(REFRESH_TRAY_ICON);
-            break;
-
-        case Prefs::COMPACT_VIEW:
+        for (QAction* action : action_group->actions())
         {
-#if QT_VERSION < QT_VERSION_CHECK(5, 4, 0)  // QTBUG-33537
+            action->setChecked(str == action->property(STATS_MODE_KEY).toString());
+        }
+
+        refreshSoon(REFRESH_STATUS_BAR);
+        break;
+
+    case Prefs::SORT_REVERSED:
+        ui_.action_ReverseSortOrder->setChecked(prefs_.getBool(key));
+        break;
+
+    case Prefs::SORT_MODE:
+        i = prefs_.get<SortMode>(key).mode();
+        action_group = ui_.action_SortByActivity->actionGroup();
+        assert(action_group != nullptr);
+
+        for (QAction* action : action_group->actions())
+        {
+            action->setChecked(i == action->property(SORT_MODE_KEY).toInt());
+        }
+
+        break;
+
+    case Prefs::DSPEED_ENABLED:
+        (prefs_.get<bool>(key) ? dlimit_on_action_ : dlimit_off_action_)->setChecked(true);
+        break;
+
+    case Prefs::DSPEED:
+        dlimit_on_action_->setText(tr("Limited at %1").arg(Formatter::get().speedToString(Speed::fromKBps(prefs_.get<int>(
+            key)))));
+        break;
+
+    case Prefs::USPEED_ENABLED:
+        (prefs_.get<bool>(key) ? ulimit_on_action_ : ulimit_off_action_)->setChecked(true);
+        break;
+
+    case Prefs::USPEED:
+        ulimit_on_action_->setText(tr("Limited at %1").arg(Formatter::get().speedToString(Speed::fromKBps(prefs_.get<int>(
+            key)))));
+        break;
+
+    case Prefs::RATIO_ENABLED:
+        (prefs_.get<bool>(key) ? ratio_on_action_ : ratio_off_action_)->setChecked(true);
+        break;
+
+    case Prefs::RATIO:
+        ratio_on_action_->setText(tr("Stop at Ratio (%1)").arg(Formatter::get().ratioToString(prefs_.get<double>(key))));
+        break;
+
+    case Prefs::FILTERBAR:
+        b = prefs_.getBool(key);
+        filter_bar_->setVisible(b);
+        ui_.action_Filterbar->setChecked(b);
+        break;
+
+    case Prefs::STATUSBAR:
+        b = prefs_.getBool(key);
+        ui_.statusBar->setVisible(b);
+        ui_.action_Statusbar->setChecked(b);
+        break;
+
+    case Prefs::TOOLBAR:
+        b = prefs_.getBool(key);
+        ui_.toolBar->setVisible(b);
+        ui_.action_Toolbar->setChecked(b);
+        break;
+
+    case Prefs::SHOW_TRAY_ICON:
+        b = prefs_.getBool(key);
+        ui_.action_TrayIcon->setChecked(b);
+        tray_icon_.setVisible(b);
+        qApp->setQuitOnLastWindowClosed(!b);
+        refreshSoon(REFRESH_TRAY_ICON);
+        break;
+
+    case Prefs::COMPACT_VIEW:
+        {
+#if QT_VERSION < QT_VERSION_CHECK(5, 4, 0) // QTBUG-33537
 
             QItemSelectionModel* selection_model(ui_.listView->selectionModel());
             QItemSelection const selection(selection_model->selection());
@@ -1232,10 +1207,10 @@ void MainWindow::refreshPref(int key)
             ui_.action_CompactView->setChecked(b);
             ui_.listView->setItemDelegate(b ? torrent_delegate_min_ : torrent_delegate_);
 
-#if QT_VERSION < QT_VERSION_CHECK(5, 4, 0)  // QTBUG-33537
+#if QT_VERSION < QT_VERSION_CHECK(5, 4, 0) // QTBUG-33537
 
             selectionModel->clear();
-            ui_.listView->reset();  // force the rows to resize
+            ui_.listView->reset(); // force the rows to resize
             selectionModel->select(selection, QItemSelectionModel::Select);
             selectionModel->setCurrentIndex(current_index, QItemSelectionModel::NoUpdate);
 
@@ -1244,32 +1219,31 @@ void MainWindow::refreshPref(int key)
             break;
         }
 
-        case Prefs::MAIN_WINDOW_X:
-        case Prefs::MAIN_WINDOW_Y:
-        case Prefs::MAIN_WINDOW_WIDTH:
-        case Prefs::MAIN_WINDOW_HEIGHT:
-            setGeometry(prefs_.getInt(Prefs::MAIN_WINDOW_X), prefs_.getInt(Prefs::MAIN_WINDOW_Y),
-                        prefs_.getInt(Prefs::MAIN_WINDOW_WIDTH),
-                        prefs_.getInt(Prefs::MAIN_WINDOW_HEIGHT));
-            break;
+    case Prefs::MAIN_WINDOW_X:
+    case Prefs::MAIN_WINDOW_Y:
+    case Prefs::MAIN_WINDOW_WIDTH:
+    case Prefs::MAIN_WINDOW_HEIGHT:
+        setGeometry(prefs_.getInt(Prefs::MAIN_WINDOW_X), prefs_.getInt(Prefs::MAIN_WINDOW_Y),
+            prefs_.getInt(Prefs::MAIN_WINDOW_WIDTH), prefs_.getInt(Prefs::MAIN_WINDOW_HEIGHT));
+        break;
 
-        case Prefs::ALT_SPEED_LIMIT_ENABLED:
-        case Prefs::ALT_SPEED_LIMIT_UP:
-        case Prefs::ALT_SPEED_LIMIT_DOWN:
+    case Prefs::ALT_SPEED_LIMIT_ENABLED:
+    case Prefs::ALT_SPEED_LIMIT_UP:
+    case Prefs::ALT_SPEED_LIMIT_DOWN:
         {
             b = prefs_.getBool(Prefs::ALT_SPEED_LIMIT_ENABLED);
             alt_speed_action_->setChecked(b);
             ui_.altSpeedButton->setChecked(b);
-            QString const fmt = b ? tr("Click to disable Temporary Speed Limits\n (%1 down, %2 up)")
-                                  : tr("Click to enable Temporary Speed Limits\n (%1 down, %2 up)");
+            QString const fmt = b ? tr("Click to disable Temporary Speed Limits\n (%1 down, %2 up)") :
+                tr("Click to enable Temporary Speed Limits\n (%1 down, %2 up)");
             Speed const d = Speed::fromKBps(prefs_.getInt(Prefs::ALT_SPEED_LIMIT_DOWN));
             Speed const u = Speed::fromKBps(prefs_.getInt(Prefs::ALT_SPEED_LIMIT_UP));
-            ui_.altSpeedButton->setToolTip(
-                fmt.arg(Formatter::get().speedToString(d)).arg(Formatter::get().speedToString(u)));
+            ui_.altSpeedButton->setToolTip(fmt.arg(Formatter::get().speedToString(d)).arg(Formatter::get().speedToString(u)));
             break;
         }
 
-        default: break;
+    default:
+        break;
     }
 }
 
@@ -1288,7 +1262,7 @@ void MainWindow::openTorrent()
 {
     QFileDialog* d;
     d = new QFileDialog(this, tr("Open Torrent"), prefs_.getString(Prefs::OPEN_DIALOG_FOLDER),
-                        tr("Torrent Files (*.torrent);;All Files (*.*)"));
+        tr("Torrent Files (*.torrent);;All Files (*.*)"));
     d->setFileMode(QFileDialog::ExistingFiles);
     d->setAttribute(Qt::WA_DeleteOnClose);
 
@@ -1396,41 +1370,36 @@ void MainWindow::removeTorrents(bool const delete_files)
 
     if (!delete_files)
     {
-        primary_text =
-            count == 1 ? tr("Remove torrent?") : tr("Remove %Ln torrent(s)?", nullptr, count);
+        primary_text = count == 1 ? tr("Remove torrent?") : tr("Remove %Ln torrent(s)?", nullptr, count);
     }
     else
     {
-        primary_text = count == 1
-                           ? tr("Delete this torrent's downloaded files?")
-                           : tr("Delete these %Ln torrent(s)' downloaded files?", nullptr, count);
+        primary_text = count == 1 ? tr("Delete this torrent's downloaded files?") :
+            tr("Delete these %Ln torrent(s)' downloaded files?", nullptr, count);
     }
 
     if (incomplete == 0 && connected == 0)
     {
-        secondary_text = count == 1 ? tr(
-                             "Once removed, continuing the transfer will require the torrent file "
-                             "or magnet link.")
-                                    : tr(
-                                        "Once removed, continuing the transfers will require the "
-                                        "torrent files or magnet links.");
+        secondary_text = count == 1 ?
+            tr("Once removed, continuing the transfer will require the torrent file or magnet link.") :
+            tr("Once removed, continuing the transfers will require the torrent files or magnet links.");
     }
     else if (count == incomplete)
     {
-        secondary_text = count == 1 ? tr("This torrent has not finished downloading.")
-                                    : tr("These torrents have not finished downloading.");
+        secondary_text = count == 1 ? tr("This torrent has not finished downloading.") :
+            tr("These torrents have not finished downloading.");
     }
     else if (count == connected)
     {
-        secondary_text = count == 1 ? tr("This torrent is connected to peers.")
-                                    : tr("These torrents are connected to peers.");
+        secondary_text = count == 1 ? tr("This torrent is connected to peers.") :
+            tr("These torrents are connected to peers.");
     }
     else
     {
         if (connected != 0)
         {
-            secondary_text = connected == 1 ? tr("One of these torrents is connected to peers.")
-                                            : tr("Some of these torrents are connected to peers.");
+            secondary_text = connected == 1 ? tr("One of these torrents is connected to peers.") :
+                tr("Some of these torrents are connected to peers.");
         }
 
         if (connected != 0 && incomplete != 0)
@@ -1440,9 +1409,8 @@ void MainWindow::removeTorrents(bool const delete_files)
 
         if (incomplete != 0)
         {
-            secondary_text += incomplete == 1
-                                  ? tr("One of these torrents has not finished downloading.")
-                                  : tr("Some of these torrents have not finished downloading.");
+            secondary_text += incomplete == 1 ? tr("One of these torrents has not finished downloading.") :
+                tr("Some of these torrents have not finished downloading.");
         }
     }
 
@@ -1523,9 +1491,7 @@ void MainWindow::updateNetworkIcon()
     }
     else if (seconds_since_last_read < 60 * 2)
     {
-        tip = tr("%1 last responded %2 ago")
-                  .arg(url)
-                  .arg(Formatter::get().timeToString(seconds_since_last_read));
+        tip = tr("%1 last responded %2 ago").arg(url).arg(Formatter::get().timeToString(seconds_since_last_read));
     }
     else
     {
@@ -1557,8 +1523,7 @@ void MainWindow::dataSendProgress()
 void MainWindow::onNetworkResponse(QNetworkReply::NetworkError code, QString const& message)
 {
     bool const had_error = network_error_;
-    bool const have_error =
-        code != QNetworkReply::NoError && code != QNetworkReply::UnknownContentError;
+    bool const have_error = code != QNetworkReply::NoError && code != QNetworkReply::UnknownContentError;
 
     network_error_ = have_error;
     error_message_ = message;
@@ -1587,9 +1552,9 @@ void MainWindow::dragEnterEvent(QDragEnterEvent* event)
 {
     QMimeData const* mime = event->mimeData();
 
-    if (mime->hasFormat(QStringLiteral("application/x-bittorrent")) || mime->hasUrls()
-        || mime->text().trimmed().endsWith(QStringLiteral(".torrent"), Qt::CaseInsensitive)
-        || mime->text().startsWith(QStringLiteral("magnet:"), Qt::CaseInsensitive))
+    if (mime->hasFormat(QStringLiteral("application/x-bittorrent")) || mime->hasUrls() ||
+        mime->text().trimmed().endsWith(QStringLiteral(".torrent"), Qt::CaseInsensitive) ||
+        mime->text().startsWith(QStringLiteral("magnet:"), Qt::CaseInsensitive))
     {
         event->acceptProposedAction();
     }

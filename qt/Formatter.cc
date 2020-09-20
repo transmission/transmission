@@ -7,7 +7,7 @@
  */
 
 #include <libtransmission/transmission.h>
-#include <libtransmission/utils.h>  // tr_formatter
+#include <libtransmission/utils.h> // tr_formatter
 
 #include "Formatter.h"
 #include "Speed.h"
@@ -22,25 +22,33 @@ Formatter& Formatter::get()
     return singleton;
 }
 
-Formatter::Formatter()
-    : UnitStrings {{
-        {tr("B/s"), tr("kB/s"), tr("MB/s"), tr("GB/s"), tr("TB/s")},  // SPEED
-        {tr("B"), tr("kB"), tr("MB"), tr("GB"), tr("TB")},            // SIZE
-        {tr("B"), tr("KiB"), tr("MiB"), tr("GiB"), tr("TiB")}         // MEM
+Formatter::Formatter() :
+    UnitStrings{{
+        { tr("B/s"), tr("kB/s"), tr("MB/s"), tr("GB/s"), tr("TB/s") }, // SPEED
+        { tr("B"), tr("kB"), tr("MB"), tr("GB"), tr("TB") }, // SIZE
+        { tr("B"), tr("KiB"), tr("MiB"), tr("GiB"), tr("TiB") } // MEM
     }}
 {
     auto const& speed = UnitStrings[SPEED];
-    tr_formatter_speed_init(SpeedBase, speed[KB].toUtf8().constData(),
-                            speed[MB].toUtf8().constData(), speed[GB].toUtf8().constData(),
-                            speed[TB].toUtf8().constData());
+    tr_formatter_speed_init(SpeedBase,
+        speed[KB].toUtf8().constData(),
+        speed[MB].toUtf8().constData(),
+        speed[GB].toUtf8().constData(),
+        speed[TB].toUtf8().constData());
 
     auto const& size = UnitStrings[SIZE];
-    tr_formatter_size_init(SizeBase, size[KB].toUtf8().constData(), size[MB].toUtf8().constData(),
-                           size[GB].toUtf8().constData(), size[TB].toUtf8().constData());
+    tr_formatter_size_init(SizeBase,
+        size[KB].toUtf8().constData(),
+        size[MB].toUtf8().constData(),
+        size[GB].toUtf8().constData(),
+        size[TB].toUtf8().constData());
 
     auto const& mem = UnitStrings[MEM];
-    tr_formatter_mem_init(MemBase, mem[KB].toUtf8().constData(), mem[MB].toUtf8().constData(),
-                          mem[GB].toUtf8().constData(), mem[TB].toUtf8().constData());
+    tr_formatter_mem_init(MemBase,
+        mem[KB].toUtf8().constData(),
+        mem[MB].toUtf8().constData(),
+        mem[GB].toUtf8().constData(),
+        mem[TB].toUtf8().constData());
 }
 
 QString Formatter::unitStr(Type t, Size s) const
@@ -60,7 +68,7 @@ QString Formatter::memToString(int64_t bytes) const
         return tr("None");
     }
 
-    auto buf = std::array<char, 128> {};
+    auto buf = std::array<char, 128>{};
     tr_formatter_mem_B(buf.data(), bytes, buf.size());
     return QString::fromUtf8(buf.data());
 }
@@ -77,14 +85,14 @@ QString Formatter::sizeToString(int64_t bytes) const
         return tr("None");
     }
 
-    auto buf = std::array<char, 128> {};
+    auto buf = std::array<char, 128>{};
     tr_formatter_size_B(buf.data(), bytes, buf.size());
     return QString::fromUtf8(buf.data());
 }
 
 QString Formatter::speedToString(Speed const& speed) const
 {
-    auto buf = std::array<char, 128> {};
+    auto buf = std::array<char, 128>{};
     tr_formatter_speed_KBps(buf.data(), speed.getKBps(), buf.size());
     return QString::fromUtf8(buf.data());
 }
@@ -105,13 +113,13 @@ QString Formatter::downloadSpeedToString(Speed const& download_speed) const
 
 QString Formatter::percentToString(double x) const
 {
-    auto buf = std::array<char, 128> {};
+    auto buf = std::array<char, 128>{};
     return QString::fromUtf8(tr_strpercent(buf.data(), x, buf.size()));
 }
 
 QString Formatter::ratioToString(double ratio) const
 {
-    auto buf = std::array<char, 128> {};
+    auto buf = std::array<char, 128>{};
     return QString::fromUtf8(tr_strratio(buf.data(), buf.size(), ratio, "\xE2\x88\x9E"));
 }
 
@@ -182,5 +190,5 @@ double Speed::getKBps() const
 
 Speed Speed::fromKBps(double KBps)
 {
-    return Speed {static_cast<int>(KBps * Formatter::SpeedBase)};
+    return Speed{ static_cast<int>(KBps * Formatter::SpeedBase) };
 }

@@ -14,29 +14,25 @@
 #define LIBTRANSMISSION_WATCHDIR_MODULE
 
 #include "transmission.h"
-#include "error-types.h"
 #include "error.h"
+#include "error-types.h"
 #include "file.h"
 #include "log.h"
 #include "ptrarray.h"
 #include "tr-assert.h"
 #include "utils.h"
-#include "watchdir-common.h"
 #include "watchdir.h"
+#include "watchdir-common.h"
 
 /***
 ****
 ***/
 
-#define log_debug(...)                  \
-    (!tr_logLevelIsActive(TR_LOG_DEBUG) \
-         ? (void)0                      \
-         : tr_logAddMessage(__FILE__, __LINE__, TR_LOG_DEBUG, "watchdir", __VA_ARGS__))
+#define log_debug(...) (!tr_logLevelIsActive(TR_LOG_DEBUG) ? (void)0 : \
+    tr_logAddMessage(__FILE__, __LINE__, TR_LOG_DEBUG, "watchdir", __VA_ARGS__))
 
-#define log_error(...)                  \
-    (!tr_logLevelIsActive(TR_LOG_ERROR) \
-         ? (void)0                      \
-         : tr_logAddMessage(__FILE__, __LINE__, TR_LOG_ERROR, "watchdir", __VA_ARGS__))
+#define log_error(...) (!tr_logLevelIsActive(TR_LOG_ERROR) ? (void)0 : \
+    tr_logAddMessage(__FILE__, __LINE__, TR_LOG_ERROR, "watchdir", __VA_ARGS__))
 
 /***
 ****
@@ -59,11 +55,10 @@ struct tr_watchdir
 static bool is_regular_file(char const* dir, char const* name)
 {
     char* const path = tr_buildPath(dir, name, NULL);
-    tr_sys_path_info path_info = {0};
+    tr_sys_path_info path_info = { 0 };
     tr_error* error = NULL;
 
-    bool const ret = tr_sys_path_get_info(path, 0, &path_info, &error)
-                     && (path_info.type == TR_SYS_PATH_IS_FILE);
+    bool const ret = tr_sys_path_get_info(path, 0, &path_info, &error) && (path_info.type == TR_SYS_PATH_IS_FILE);
 
     if (error != NULL)
     {
@@ -83,13 +78,17 @@ static char const* watchdir_status_to_string(tr_watchdir_status status)
 {
     switch (status)
     {
-        case TR_WATCHDIR_ACCEPT: return "accept";
+    case TR_WATCHDIR_ACCEPT:
+        return "accept";
 
-        case TR_WATCHDIR_IGNORE: return "ignore";
+    case TR_WATCHDIR_IGNORE:
+        return "ignore";
 
-        case TR_WATCHDIR_RETRY: return "retry";
+    case TR_WATCHDIR_RETRY:
+        return "retry";
 
-        default: return "???";
+    default:
+        return "???";
     }
 }
 
@@ -121,19 +120,18 @@ typedef struct tr_watchdir_retry
     unsigned int counter;
     struct event* timer;
     struct timeval interval;
-} tr_watchdir_retry;
+}
+tr_watchdir_retry;
 
 /* Non-static and mutable for unit tests */
 unsigned int tr_watchdir_retry_limit = 3;
-struct timeval tr_watchdir_retry_start_interval = {.tv_sec = 1, .tv_usec = 0};
-struct timeval tr_watchdir_retry_max_interval = {.tv_sec = 10, .tv_usec = 0};
+struct timeval tr_watchdir_retry_start_interval = { .tv_sec = 1, .tv_usec = 0 };
+struct timeval tr_watchdir_retry_max_interval = { .tv_sec = 10, .tv_usec = 0 };
 
 #define tr_watchdir_retries_init(r) (void)0
-#define tr_watchdir_retries_destroy(r) \
-    tr_ptrArrayDestruct((r), (PtrArrayForeachFunc)&tr_watchdir_retry_free)
+#define tr_watchdir_retries_destroy(r) tr_ptrArrayDestruct((r), (PtrArrayForeachFunc) & tr_watchdir_retry_free)
 #define tr_watchdir_retries_insert(r, v) tr_ptrArrayInsertSorted((r), (v), &compare_retry_names)
-#define tr_watchdir_retries_remove(r, v) \
-    tr_ptrArrayRemoveSortedPointer((r), (v), &compare_retry_names)
+#define tr_watchdir_retries_remove(r, v) tr_ptrArrayRemoveSortedPointer((r), (v), &compare_retry_names)
 #define tr_watchdir_retries_find(r, v) tr_ptrArrayFindSorted((r), (v), &compare_retry_names)
 
 static int compare_retry_names(void const* a, void const* b)
@@ -225,7 +223,7 @@ static void tr_watchdir_retry_restart(tr_watchdir_retry* retry)
 ***/
 
 tr_watchdir_t tr_watchdir_new(char const* path, tr_watchdir_cb callback, void* callback_user_data,
-                              struct event_base* event_base, bool force_generic)
+    struct event_base* event_base, bool force_generic)
 {
     tr_watchdir_t handle;
 
@@ -331,7 +329,7 @@ void tr_watchdir_process(tr_watchdir_t handle, char const* name)
 {
     TR_ASSERT(handle != NULL);
 
-    tr_watchdir_retry const search_key = {.name = (char*)name};
+    tr_watchdir_retry const search_key = { .name = (char*)name };
     tr_watchdir_retry* existing_retry;
 
     if ((existing_retry = tr_watchdir_retries_find(&handle->active_retries, &search_key)) != NULL)
@@ -357,8 +355,7 @@ void tr_watchdir_scan(tr_watchdir_t handle, tr_ptrArray* dir_entries)
 
     if ((dir = tr_sys_dir_open(handle->path, &error)) == TR_BAD_SYS_DIR)
     {
-        log_error("Failed to open directory \"%s\" (%d): %s", handle->path, error->code,
-                  error->message);
+        log_error("Failed to open directory \"%s\" (%d): %s", handle->path, error->code, error->message);
         tr_error_free(error);
         return;
     }
@@ -385,8 +382,7 @@ void tr_watchdir_scan(tr_watchdir_t handle, tr_ptrArray* dir_entries)
 
     if (error != NULL)
     {
-        log_error("Failed to read directory \"%s\" (%d): %s", handle->path, error->code,
-                  error->message);
+        log_error("Failed to read directory \"%s\" (%d): %s", handle->path, error->code, error->message);
         tr_error_free(error);
     }
 

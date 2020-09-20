@@ -45,5 +45,4 @@ int tr_dhtStatus(tr_session*, int af, int* setme_nodeCount);
 char const* tr_dhtPrintableStatus(int status);
 bool tr_dhtAddNode(tr_session*, tr_address const*, tr_port, bool bootstrap);
 void tr_dhtUpkeep(tr_session*);
-void tr_dhtCallback(unsigned char* buf, int buflen, struct sockaddr* from, socklen_t fromlen,
-                    void* sv);
+void tr_dhtCallback(unsigned char* buf, int buflen, struct sockaddr* from, socklen_t fromlen, void* sv);

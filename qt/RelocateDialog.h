@@ -21,17 +21,17 @@ class RelocateDialog : public BaseDialog
     Q_OBJECT
     TR_DISABLE_COPY_MOVE(RelocateDialog)
 
-   public:
+public:
     RelocateDialog(Session&, TorrentModel const&, torrent_ids_t ids, QWidget* parent = nullptr);
 
-   private:
+private:
     QString newLocation() const;
 
-   private slots:
+private slots:
     void onSetLocation();
     void onMoveToggled(bool);
 
-   private:
+private:
     Session& session_;
     torrent_ids_t const ids_;
 

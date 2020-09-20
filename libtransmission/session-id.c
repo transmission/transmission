@@ -15,8 +15,8 @@
 
 #include "transmission.h"
 #include "crypto-utils.h"
-#include "error-types.h"
 #include "error.h"
+#include "error-types.h"
 #include "file.h"
 #include "log.h"
 #include "platform.h"
@@ -73,8 +73,7 @@ static tr_sys_file_t create_session_id_lock_file(char const* session_id)
     tr_sys_file_t lock_file;
     tr_error* error = NULL;
 
-    lock_file = tr_sys_file_open(
-        lock_file_path, TR_SYS_FILE_READ | TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE, 0600, &error);
+    lock_file = tr_sys_file_open(lock_file_path, TR_SYS_FILE_READ | TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE, 0600, &error);
 
     if (lock_file != TR_BAD_SYS_FILE)
     {
@@ -203,8 +202,7 @@ bool tr_session_id_is_local(char const* session_id)
 
         if (error != NULL)
         {
-            tr_logAddError("Unable to open session lock file (%d): %s", error->code,
-                           error->message);
+            tr_logAddError("Unable to open session lock file (%d): %s", error->code, error->message);
             tr_error_free(error);
         }
 

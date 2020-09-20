@@ -24,7 +24,7 @@ class QDateTime;
 
 extern "C"
 {
-    struct tr_variant;
+struct tr_variant;
 }
 
 class Prefs : public QObject
@@ -32,7 +32,7 @@ class Prefs : public QObject
     Q_OBJECT
     TR_DISABLE_COPY_MOVE(Prefs)
 
-   public:
+public:
     enum
     {
         /* client prefs */
@@ -132,19 +132,34 @@ class Prefs : public QObject
         PREFS_COUNT
     };
 
-   public:
+public:
     Prefs(QString config_dir);
     ~Prefs() override;
 
-    bool isCore(int key) const { return FIRST_CORE_PREF <= key && key <= LAST_CORE_PREF; }
+    bool isCore(int key) const
+    {
+        return FIRST_CORE_PREF <= key && key <= LAST_CORE_PREF;
+    }
 
-    bool isClient(int key) const { return !isCore(key); }
+    bool isClient(int key) const
+    {
+        return !isCore(key);
+    }
 
-    tr_quark getKey(int i) const { return Items[i].key; }
+    tr_quark getKey(int i) const
+    {
+        return Items[i].key;
+    }
 
-    int type(int i) const { return Items[i].type; }
+    int type(int i) const
+    {
+        return Items[i].type;
+    }
 
-    QVariant const& variant(int i) const { return values_[i]; }
+    QVariant const& variant(int i) const
+    {
+        return values_[i];
+    }
 
     int getInt(int key) const;
     bool getBool(int key) const;
@@ -152,13 +167,13 @@ class Prefs : public QObject
     double getDouble(int key) const;
     QDateTime getDateTime(int key) const;
 
-    template <typename T>
+    template<typename T>
     T get(int key) const
     {
         return values_[key].value<T>();
     }
 
-    template <typename T>
+    template<typename T>
     void set(int key, T const& value)
     {
         QVariant& v(values_[key]);
@@ -173,10 +188,10 @@ class Prefs : public QObject
 
     void toggleBool(int key);
 
-   signals:
+signals:
     void changed(int key);
 
-   private:
+private:
     struct PrefItem
     {
         int id;

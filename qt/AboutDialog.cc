@@ -18,13 +18,13 @@
 #include "LicenseDialog.h"
 #include "Utils.h"
 
-AboutDialog::AboutDialog(QWidget* parent) : BaseDialog(parent)
+AboutDialog::AboutDialog(QWidget* parent) :
+    BaseDialog(parent)
 {
     ui_.setupUi(this);
 
     ui_.iconLabel->setPixmap(qApp->windowIcon().pixmap(48));
-    ui_.titleLabel->setText(tr("<b style='font-size:x-large'>Transmission %1</b>")
-                                .arg(QStringLiteral(LONG_VERSION_STRING)));
+    ui_.titleLabel->setText(tr("<b style='font-size:x-large'>Transmission %1</b>").arg(QStringLiteral(LONG_VERSION_STRING)));
 
     QPushButton* b;
 
@@ -39,10 +39,10 @@ AboutDialog::AboutDialog(QWidget* parent) : BaseDialog(parent)
 
 void AboutDialog::showCredits()
 {
-    QMessageBox::about(this, tr("Credits"),
-                       QString::fromUtf8("Charles Kerr (Backend; Daemon; GTK+; Qt)\n"
-                                         "Mitchell Livingston (OS X)\n"
-                                         "Mike Gelfand\n"));
+    QMessageBox::about(this, tr("Credits"), QString::fromUtf8(
+        "Charles Kerr (Backend; Daemon; GTK+; Qt)\n"
+        "Mitchell Livingston (OS X)\n"
+        "Mike Gelfand\n"));
 }
 
 void AboutDialog::showLicense()

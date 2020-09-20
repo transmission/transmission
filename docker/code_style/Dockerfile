@@ -1,3 +1,3 @@
 FROM alpine
 
-RUN apk add --no-cache bash clang git perl yarn 
+RUN apk add --no-cache bash git perl uncrustify yarn 

@@ -8,17 +8,17 @@
 
 #include <stdlib.h> /* qsort() */
 
-#include <glib/gi18n.h>
 #include <gtk/gtk.h>
+#include <glib/gi18n.h>
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h>
 
 #include "favicon.h" /* gtr_get_favicon() */
 #include "filter.h"
-#include "hig.h"     /* GUI_PAD */
+#include "hig.h" /* GUI_PAD */
 #include "tr-core.h" /* MC_TORRENT */
-#include "util.h"    /* gtr_get_host_from_url() */
+#include "util.h" /* gtr_get_host_from_url() */
 
 static GQuark DIRTY_KEY = 0;
 static GQuark SESSION_KEY = 0;
@@ -40,7 +40,7 @@ enum
 
 enum
 {
-    TRACKER_FILTER_COL_NAME,  /* human-readable name; ie, Legaltorrents */
+    TRACKER_FILTER_COL_NAME, /* human-readable name; ie, Legaltorrents */
     TRACKER_FILTER_COL_COUNT, /* how many matches there are */
     TRACKER_FILTER_COL_TYPE,
     TRACKER_FILTER_COL_HOST, /* pattern-matching text; ie, legaltorrents.com */
@@ -185,7 +185,8 @@ static gboolean tracker_filter_model_update(gpointer gstore)
             g_free(keys);
 
             ++all;
-        } while (gtk_tree_model_iter_next(tmodel, &iter));
+        }
+        while (gtk_tree_model_iter_next(tmodel, &iter));
     }
 
     qsort(hosts->pdata, hosts->len, sizeof(char*), pstrcmp);
@@ -201,8 +202,7 @@ static gboolean tracker_filter_model_update(gpointer gstore)
     for (int i = 0, n = hosts->len;;)
     {
         gboolean const new_hosts_done = i >= n;
-        gboolean const old_hosts_done =
-            !gtk_tree_model_iter_nth_child(model, &iter, NULL, store_pos);
+        gboolean const old_hosts_done = !gtk_tree_model_iter_nth_child(model, &iter, NULL, store_pos);
         gboolean remove_row = FALSE;
         gboolean insert_row = FALSE;
 
@@ -255,10 +255,12 @@ static gboolean tracker_filter_model_update(gpointer gstore)
             char const* host = hosts->pdata[i];
             char* name = get_name_from_host(host);
             int const count = *(int*)g_hash_table_lookup(hosts_hash, host);
-            gtk_tree_store_insert_with_values(
-                store, &add, NULL, store_pos, TRACKER_FILTER_COL_HOST, host,
-                TRACKER_FILTER_COL_NAME, name, TRACKER_FILTER_COL_COUNT, count,
-                TRACKER_FILTER_COL_TYPE, TRACKER_FILTER_TYPE_HOST, -1);
+            gtk_tree_store_insert_with_values(store, &add, NULL, store_pos,
+                TRACKER_FILTER_COL_HOST, host,
+                TRACKER_FILTER_COL_NAME, name,
+                TRACKER_FILTER_COL_COUNT, count,
+                TRACKER_FILTER_COL_TYPE, TRACKER_FILTER_TYPE_HOST,
+                -1);
             path = gtk_tree_model_get_path(model, &add);
             reference = gtk_tree_row_reference_new(model, path);
             gtr_get_favicon(session, host, favicon_ready_cb, reference);
@@ -286,13 +288,20 @@ static gboolean tracker_filter_model_update(gpointer gstore)
 
 static GtkTreeModel* tracker_filter_model_new(GtkTreeModel* tmodel)
 {
-    GtkTreeStore* store = gtk_tree_store_new(TRACKER_FILTER_N_COLS, G_TYPE_STRING, G_TYPE_INT,
-                                             G_TYPE_INT, G_TYPE_STRING, GDK_TYPE_PIXBUF);
+    GtkTreeStore* store = gtk_tree_store_new(TRACKER_FILTER_N_COLS,
+        G_TYPE_STRING,
+        G_TYPE_INT,
+        G_TYPE_INT,
+        G_TYPE_STRING,
+        GDK_TYPE_PIXBUF);
 
-    gtk_tree_store_insert_with_values(store, NULL, NULL, -1, TRACKER_FILTER_COL_NAME, _("All"),
-                                      TRACKER_FILTER_COL_TYPE, TRACKER_FILTER_TYPE_ALL, -1);
-    gtk_tree_store_insert_with_values(store, NULL, NULL, -1, TRACKER_FILTER_COL_TYPE,
-                                      TRACKER_FILTER_TYPE_SEPARATOR, -1);
+    gtk_tree_store_insert_with_values(store, NULL, NULL, -1,
+        TRACKER_FILTER_COL_NAME, _("All"),
+        TRACKER_FILTER_COL_TYPE, TRACKER_FILTER_TYPE_ALL,
+        -1);
+    gtk_tree_store_insert_with_values(store, NULL, NULL, -1,
+        TRACKER_FILTER_COL_TYPE, TRACKER_FILTER_TYPE_SEPARATOR,
+        -1);
 
     g_object_set_qdata(G_OBJECT(store), TORRENT_MODEL_KEY, tmodel);
     tracker_filter_model_update(store);
@@ -321,8 +330,7 @@ static void tracker_model_update_idle(gpointer tracker_model)
     }
 }
 
-static void torrent_model_row_changed(GtkTreeModel* tmodel, GtkTreePath* path, GtkTreeIter* iter,
-                                      gpointer tracker_model)
+static void torrent_model_row_changed(GtkTreeModel* tmodel, GtkTreePath* path, GtkTreeIter* iter, gpointer tracker_model)
 {
     TR_UNUSED(tmodel);
     TR_UNUSED(path);
@@ -331,8 +339,7 @@ static void torrent_model_row_changed(GtkTreeModel* tmodel, GtkTreePath* path, G
     tracker_model_update_idle(tracker_model);
 }
 
-static void torrent_model_row_deleted_cb(GtkTreeModel* tmodel, GtkTreePath* path,
-                                         gpointer tracker_model)
+static void torrent_model_row_deleted_cb(GtkTreeModel* tmodel, GtkTreePath* path, gpointer tracker_model)
 {
     TR_UNUSED(tmodel);
     TR_UNUSED(path);
@@ -340,8 +347,8 @@ static void torrent_model_row_deleted_cb(GtkTreeModel* tmodel, GtkTreePath* path
     tracker_model_update_idle(tracker_model);
 }
 
-static void render_pixbuf_func(GtkCellLayout* cell_layout, GtkCellRenderer* cell_renderer,
-                               GtkTreeModel* tree_model, GtkTreeIter* iter, gpointer data)
+static void render_pixbuf_func(GtkCellLayout* cell_layout, GtkCellRenderer* cell_renderer, GtkTreeModel* tree_model,
+    GtkTreeIter* iter, gpointer data)
 {
     TR_UNUSED(cell_layout);
     TR_UNUSED(data);
@@ -354,8 +361,8 @@ static void render_pixbuf_func(GtkCellLayout* cell_layout, GtkCellRenderer* cell
     g_object_set(cell_renderer, "width", width, NULL);
 }
 
-static void render_number_func(GtkCellLayout* cell_layout, GtkCellRenderer* cell_renderer,
-                               GtkTreeModel* tree_model, GtkTreeIter* iter, gpointer data)
+static void render_number_func(GtkCellLayout* cell_layout, GtkCellRenderer* cell_renderer, GtkTreeModel* tree_model,
+    GtkTreeIter* iter, gpointer data)
 {
     TR_UNUSED(cell_layout);
     TR_UNUSED(data);
@@ -381,8 +388,8 @@ static GtkCellRenderer* number_renderer_new(void)
 {
     GtkCellRenderer* r = gtk_cell_renderer_text_new();
 
-    g_object_set(G_OBJECT(r), "alignment", PANGO_ALIGN_RIGHT, "weight", PANGO_WEIGHT_ULTRALIGHT,
-                 "xalign", 1.0, "xpad", GUI_PAD, NULL);
+    g_object_set(G_OBJECT(r), "alignment", PANGO_ALIGN_RIGHT, "weight", PANGO_WEIGHT_ULTRALIGHT, "xalign", 1.0, "xpad", GUI_PAD,
+        NULL);
 
     return r;
 }
@@ -494,26 +501,30 @@ static gboolean test_torrent_activity(tr_torrent* tor, int type)
 
     switch (type)
     {
-        case ACTIVITY_FILTER_DOWNLOADING:
-            return st->activity == TR_STATUS_DOWNLOAD || st->activity == TR_STATUS_DOWNLOAD_WAIT;
+    case ACTIVITY_FILTER_DOWNLOADING:
+        return st->activity == TR_STATUS_DOWNLOAD || st->activity == TR_STATUS_DOWNLOAD_WAIT;
 
-        case ACTIVITY_FILTER_SEEDING:
-            return st->activity == TR_STATUS_SEED || st->activity == TR_STATUS_SEED_WAIT;
+    case ACTIVITY_FILTER_SEEDING:
+        return st->activity == TR_STATUS_SEED || st->activity == TR_STATUS_SEED_WAIT;
 
-        case ACTIVITY_FILTER_ACTIVE:
-            return st->peersSendingToUs > 0 || st->peersGettingFromUs > 0
-                   || st->webseedsSendingToUs > 0 || st->activity == TR_STATUS_CHECK;
+    case ACTIVITY_FILTER_ACTIVE:
+        return st->peersSendingToUs > 0 || st->peersGettingFromUs > 0 || st->webseedsSendingToUs > 0 ||
+            st->activity == TR_STATUS_CHECK;
 
-        case ACTIVITY_FILTER_PAUSED: return st->activity == TR_STATUS_STOPPED;
+    case ACTIVITY_FILTER_PAUSED:
+        return st->activity == TR_STATUS_STOPPED;
 
-        case ACTIVITY_FILTER_FINISHED: return st->finished == TRUE;
+    case ACTIVITY_FILTER_FINISHED:
+        return st->finished == TRUE;
 
-        case ACTIVITY_FILTER_VERIFYING:
-            return st->activity == TR_STATUS_CHECK || st->activity == TR_STATUS_CHECK_WAIT;
+    case ACTIVITY_FILTER_VERIFYING:
+        return st->activity == TR_STATUS_CHECK || st->activity == TR_STATUS_CHECK_WAIT;
 
-        case ACTIVITY_FILTER_ERROR: return st->error != 0;
+    case ACTIVITY_FILTER_ERROR:
+        return st->error != 0;
 
-        default: /* ACTIVITY_FILTER_ALL */ return TRUE;
+    default: /* ACTIVITY_FILTER_ALL */
+        return TRUE;
     }
 }
 
@@ -562,11 +573,13 @@ static gboolean activity_filter_model_update(gpointer gstore)
                     {
                         ++hits;
                     }
-                } while (gtk_tree_model_iter_next(tmodel, &torrent_iter));
+                }
+                while (gtk_tree_model_iter_next(tmodel, &torrent_iter));
             }
 
             status_model_update_count(store, &iter, hits);
-        } while (gtk_tree_model_iter_next(model, &iter));
+        }
+        while (gtk_tree_model_iter_next(model, &iter));
     }
 
     return G_SOURCE_REMOVE;
@@ -580,28 +593,34 @@ static GtkTreeModel* activity_filter_model_new(GtkTreeModel* tmodel)
         char const* context;
         char const* name;
         char const* icon_name;
-    } types[] = {
-        {ACTIVITY_FILTER_ALL, NULL, N_("All"), NULL},
-        {ACTIVITY_FILTER_SEPARATOR, NULL, NULL, NULL},
-        {ACTIVITY_FILTER_ACTIVE, NULL, N_("Active"), "system-run"},
-        {ACTIVITY_FILTER_DOWNLOADING, "Verb", NC_("Verb", "Downloading"), "network-receive"},
-        {ACTIVITY_FILTER_SEEDING, "Verb", NC_("Verb", "Seeding"), "network-transmit"},
-        {ACTIVITY_FILTER_PAUSED, NULL, N_("Paused"), "media-playback-pause"},
-        {ACTIVITY_FILTER_FINISHED, NULL, N_("Finished"), "media-playback-stop"},
-        {ACTIVITY_FILTER_VERIFYING, "Verb", NC_("Verb", "Verifying"), "view-refresh"},
-        {ACTIVITY_FILTER_ERROR, NULL, N_("Error"), "dialog-error"}};
+    }
+    types[] =
+    {
+        { ACTIVITY_FILTER_ALL, NULL, N_("All"), NULL },
+        { ACTIVITY_FILTER_SEPARATOR, NULL, NULL, NULL },
+        { ACTIVITY_FILTER_ACTIVE, NULL, N_("Active"), "system-run" },
+        { ACTIVITY_FILTER_DOWNLOADING, "Verb", NC_("Verb", "Downloading"), "network-receive" },
+        { ACTIVITY_FILTER_SEEDING, "Verb", NC_("Verb", "Seeding"), "network-transmit" },
+        { ACTIVITY_FILTER_PAUSED, NULL, N_("Paused"), "media-playback-pause" },
+        { ACTIVITY_FILTER_FINISHED, NULL, N_("Finished"), "media-playback-stop" },
+        { ACTIVITY_FILTER_VERIFYING, "Verb", NC_("Verb", "Verifying"), "view-refresh" },
+        { ACTIVITY_FILTER_ERROR, NULL, N_("Error"), "dialog-error" }
+    };
 
-    GtkListStore* store = gtk_list_store_new(ACTIVITY_FILTER_N_COLS, G_TYPE_STRING, G_TYPE_INT,
-                                             G_TYPE_INT, G_TYPE_STRING);
+    GtkListStore* store = gtk_list_store_new(ACTIVITY_FILTER_N_COLS,
+        G_TYPE_STRING,
+        G_TYPE_INT,
+        G_TYPE_INT,
+        G_TYPE_STRING);
 
     for (size_t i = 0; i < G_N_ELEMENTS(types); ++i)
     {
-        char const* name = types[i].context != NULL
-                               ? g_dpgettext2(NULL, types[i].context, types[i].name)
-                               : _(types[i].name);
-        gtk_list_store_insert_with_values(store, NULL, -1, ACTIVITY_FILTER_COL_NAME, name,
-                                          ACTIVITY_FILTER_COL_TYPE, types[i].type,
-                                          ACTIVITY_FILTER_COL_ICON_NAME, types[i].icon_name, -1);
+        char const* name = types[i].context != NULL ? g_dpgettext2(NULL, types[i].context, types[i].name) : _(types[i].name);
+        gtk_list_store_insert_with_values(store, NULL, -1,
+            ACTIVITY_FILTER_COL_NAME, name,
+            ACTIVITY_FILTER_COL_TYPE, types[i].type,
+            ACTIVITY_FILTER_COL_ICON_NAME, types[i].icon_name,
+            -1);
     }
 
     g_object_set_qdata(G_OBJECT(store), TORRENT_MODEL_KEY, tmodel);
@@ -609,8 +628,8 @@ static GtkTreeModel* activity_filter_model_new(GtkTreeModel* tmodel)
     return GTK_TREE_MODEL(store);
 }
 
-static void render_activity_pixbuf_func(GtkCellLayout* cell_layout, GtkCellRenderer* cell_renderer,
-                                        GtkTreeModel* tree_model, GtkTreeIter* iter, gpointer data)
+static void render_activity_pixbuf_func(GtkCellLayout* cell_layout, GtkCellRenderer* cell_renderer, GtkTreeModel* tree_model,
+    GtkTreeIter* iter, gpointer data)
 {
     TR_UNUSED(cell_layout);
     TR_UNUSED(data);
@@ -639,8 +658,8 @@ static void activity_model_update_idle(gpointer activity_model)
     }
 }
 
-static void activity_torrent_model_row_changed(GtkTreeModel* tmodel, GtkTreePath* path,
-                                               GtkTreeIter* iter, gpointer activity_model)
+static void activity_torrent_model_row_changed(GtkTreeModel* tmodel, GtkTreePath* path, GtkTreeIter* iter,
+    gpointer activity_model)
 {
     TR_UNUSED(tmodel);
     TR_UNUSED(path);
@@ -649,8 +668,7 @@ static void activity_torrent_model_row_changed(GtkTreeModel* tmodel, GtkTreePath
     activity_model_update_idle(activity_model);
 }
 
-static void activity_torrent_model_row_deleted_cb(GtkTreeModel* tmodel, GtkTreePath* path,
-                                                  gpointer activity_model)
+static void activity_torrent_model_row_deleted_cb(GtkTreeModel* tmodel, GtkTreePath* path, gpointer activity_model)
 {
     TR_UNUSED(tmodel);
     TR_UNUSED(path);
@@ -681,8 +699,9 @@ static GtkWidget* activity_combo_box_new(GtkTreeModel* tmodel)
 
     r = gtk_cell_renderer_pixbuf_new();
     gtk_cell_layout_pack_start(c_cell_layout, r, FALSE);
-    gtk_cell_layout_set_attributes(c_cell_layout, r, "icon-name", ACTIVITY_FILTER_COL_ICON_NAME,
-                                   NULL);
+    gtk_cell_layout_set_attributes(c_cell_layout, r,
+        "icon-name", ACTIVITY_FILTER_COL_ICON_NAME,
+        NULL);
     gtk_cell_layout_set_cell_data_func(c_cell_layout, r, render_activity_pixbuf_func, NULL, NULL);
 
     r = gtk_cell_renderer_text_new();
@@ -694,12 +713,9 @@ static GtkWidget* activity_combo_box_new(GtkTreeModel* tmodel)
     gtk_cell_layout_set_cell_data_func(c_cell_layout, r, render_number_func, NULL, NULL);
 
     g_object_weak_ref(G_OBJECT(activity_model), disconnect_activity_model_callbacks, tmodel);
-    g_signal_connect(tmodel, "row-changed", G_CALLBACK(activity_torrent_model_row_changed),
-                     activity_model);
-    g_signal_connect(tmodel, "row-inserted", G_CALLBACK(activity_torrent_model_row_changed),
-                     activity_model);
-    g_signal_connect(tmodel, "row-deleted", G_CALLBACK(activity_torrent_model_row_deleted_cb),
-                     activity_model);
+    g_signal_connect(tmodel, "row-changed", G_CALLBACK(activity_torrent_model_row_changed), activity_model);
+    g_signal_connect(tmodel, "row-inserted", G_CALLBACK(activity_torrent_model_row_changed), activity_model);
+    g_signal_connect(tmodel, "row-deleted", G_CALLBACK(activity_torrent_model_row_deleted_cb), activity_model);
 
     return c;
 }
@@ -789,8 +805,8 @@ static gboolean is_row_visible(GtkTreeModel* model, GtkTreeIter* iter, gpointer 
 
     text = (char const*)g_object_get_qdata(o, TEXT_KEY);
 
-    return tor != NULL && test_tracker(tor, data->active_tracker_type, data->active_tracker_host)
-           && test_torrent_activity(tor, data->active_activity_type) && testText(tor, text);
+    return tor != NULL && test_tracker(tor, data->active_tracker_type, data->active_tracker_host) &&
+        test_torrent_activity(tor, data->active_activity_type) && testText(tor, text);
 }
 
 static void selection_changed_cb(GtkComboBox* combo, gpointer vdata)
@@ -822,8 +838,10 @@ static void selection_changed_cb(GtkComboBox* combo, gpointer vdata)
 
     if (gtk_combo_box_get_active_iter(combo, &iter))
     {
-        gtk_tree_model_get(model, &iter, TRACKER_FILTER_COL_TYPE, &type, TRACKER_FILTER_COL_HOST,
-                           &host, -1);
+        gtk_tree_model_get(model, &iter,
+            TRACKER_FILTER_COL_TYPE, &type,
+            TRACKER_FILTER_COL_HOST, &host,
+            -1);
     }
     else
     {
@@ -911,8 +929,7 @@ static void update_count_label_idle(struct filter_data* data)
     }
 }
 
-static void on_filter_model_row_inserted(GtkTreeModel* tree_model, GtkTreePath* path,
-                                         GtkTreeIter* iter, gpointer data)
+static void on_filter_model_row_inserted(GtkTreeModel* tree_model, GtkTreePath* path, GtkTreeIter* iter, gpointer data)
 {
     TR_UNUSED(tree_model);
     TR_UNUSED(path);
@@ -933,8 +950,7 @@ static void on_filter_model_row_deleted(GtkTreeModel* tree_model, GtkTreePath* p
 ****
 ***/
 
-GtkWidget* gtr_filter_bar_new(tr_session* session, GtkTreeModel* tmodel,
-                              GtkTreeModel** filter_model)
+GtkWidget* gtr_filter_bar_new(tr_session* session, GtkTreeModel* tmodel, GtkTreeModel** filter_model)
 {
     GtkWidget* l;
     GtkWidget* w;
@@ -956,17 +972,13 @@ GtkWidget* gtr_filter_bar_new(tr_session* session, GtkTreeModel* tmodel,
     data->activity = activity = activity_combo_box_new(tmodel);
     data->tracker = tracker = tracker_combo_box_new(tmodel);
     data->filter_model = gtk_tree_model_filter_new(tmodel, NULL);
-    g_signal_connect(data->filter_model, "row-deleted", G_CALLBACK(on_filter_model_row_deleted),
-                     data);
-    g_signal_connect(data->filter_model, "row-inserted", G_CALLBACK(on_filter_model_row_inserted),
-                     data);
+    g_signal_connect(data->filter_model, "row-deleted", G_CALLBACK(on_filter_model_row_deleted), data);
+    g_signal_connect(data->filter_model, "row-inserted", G_CALLBACK(on_filter_model_row_inserted), data);
 
     g_object_set(G_OBJECT(data->tracker), "width-request", 170, NULL);
-    g_object_set_qdata(G_OBJECT(gtk_combo_box_get_model(GTK_COMBO_BOX(data->tracker))), SESSION_KEY,
-                       session);
+    g_object_set_qdata(G_OBJECT(gtk_combo_box_get_model(GTK_COMBO_BOX(data->tracker))), SESSION_KEY, session);
 
-    gtk_tree_model_filter_set_visible_func(GTK_TREE_MODEL_FILTER(data->filter_model),
-                                           is_row_visible, data, g_free);
+    gtk_tree_model_filter_set_visible_func(GTK_TREE_MODEL_FILTER(data->filter_model), is_row_visible, data, g_free);
 
     g_signal_connect(data->tracker, "changed", G_CALLBACK(selection_changed_cb), data);
     g_signal_connect(data->activity, "changed", G_CALLBACK(selection_changed_cb), data);

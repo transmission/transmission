@@ -17,20 +17,19 @@
 
 #include <ctype.h> /* isdigit(), tolower() */
 #include <errno.h>
-#include <float.h>  /* DBL_DIG */
+#include <float.h> /* DBL_DIG */
 #include <locale.h> /* localeconv() */
-#include <math.h>   /* fabs(), floor() */
+#include <math.h> /* fabs(), floor() */
 #include <stdio.h>
 #include <stdlib.h> /* getenv() */
 #include <string.h> /* strerror(), memset(), memmem() */
-#include <time.h>   /* nanosleep() */
+#include <time.h> /* nanosleep() */
 
 #ifdef _WIN32
-#include <windows.h> /* Sleep(), GetSystemTimeAsFileTime(), GetEnvironmentVariable() */
-
-#include <shellapi.h> /* CommandLineToArgv() */
-#include <shlwapi.h>  /* StrStrIA() */
 #include <ws2tcpip.h> /* WSAStartup() */
+#include <windows.h> /* Sleep(), GetSystemTimeAsFileTime(), GetEnvironmentVariable() */
+#include <shellapi.h> /* CommandLineToArgv() */
+#include <shlwapi.h> /* StrStrIA() */
 #else
 #include <sys/time.h>
 #include <unistd.h> /* getpagesize() */
@@ -44,15 +43,15 @@
 #include <event2/event.h>
 
 #include "transmission.h"
-#include "ConvertUTF.h"
-#include "error-types.h"
 #include "error.h"
+#include "error-types.h"
 #include "file.h"
+#include "ConvertUTF.h"
 #include "list.h"
 #include "log.h"
 #include "net.h"
-#include "platform-quota.h" /* tr_device_info_create(), tr_device_info_get_free_space(), tr_device_info_free() */
 #include "platform.h" /* tr_lockLock() */
+#include "platform-quota.h" /* tr_device_info_create(), tr_device_info_get_free_space(), tr_device_info_free() */
 #include "tr-assert.h"
 #include "utils.h"
 #include "variant.h"
@@ -455,8 +454,7 @@ char* tr_strndup(void const* in, size_t len)
     return out;
 }
 
-char const* tr_memmem(char const* haystack, size_t haystacklen, char const* needle,
-                      size_t needlelen)
+char const* tr_memmem(char const* haystack, size_t haystacklen, char const* needle, size_t needlelen)
 {
 #ifdef HAVE_MEMMEM
 
@@ -579,8 +577,7 @@ int tr_memcmp0(void const* lhs, void const* rhs, size_t size)
 *****
 ****/
 
-/* https://bugs.launchpad.net/percona-patches/+bug/526863/+attachment/1160199/+files/solaris_10_fix.patch
- */
+/* https://bugs.launchpad.net/percona-patches/+bug/526863/+attachment/1160199/+files/solaris_10_fix.patch */
 char* tr_strsep(char** str, char const* delims)
 {
 #ifdef HAVE_STRSEP
@@ -863,18 +860,18 @@ static bool isValidURLChars(char const* url, size_t url_len)
     static char const rfc2396_valid_chars[] =
         "abcdefghijklmnopqrstuvwxyz" /* lowalpha */
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ" /* upalpha */
-        "0123456789"                 /* digit */
-        "-_.!~*'()"                  /* mark */
-        ";/?:@&=+$,"                 /* reserved */
-        "<>#%<\""                    /* delims */
-        "{}|\\^[]`";                 /* unwise */
+        "0123456789" /* digit */
+        "-_.!~*'()" /* mark */
+        ";/?:@&=+$," /* reserved */
+        "<>#%<\"" /* delims */
+        "{}|\\^[]`"; /* unwise */
 
     if (url == NULL)
     {
         return false;
     }
 
-    for (char const *c = url, *end = url + url_len; c < end && *c != '\0'; ++c)
+    for (char const* c = url, * end = url + url_len; c < end && *c != '\0'; ++c)
     {
         if (memchr(rfc2396_valid_chars, *c, sizeof(rfc2396_valid_chars) - 1) == NULL)
         {
@@ -894,9 +891,8 @@ bool tr_urlIsValidTracker(char const* url)
 
     size_t const url_len = strlen(url);
 
-    return isValidURLChars(url, url_len) && tr_urlParse(url, url_len, NULL, NULL, NULL, NULL)
-           && (memcmp(url, "http://", 7) == 0 || memcmp(url, "https://", 8) == 0
-               || memcmp(url, "udp://", 6) == 0);
+    return isValidURLChars(url, url_len) && tr_urlParse(url, url_len, NULL, NULL, NULL, NULL) &&
+        (memcmp(url, "http://", 7) == 0 || memcmp(url, "https://", 8) == 0 || memcmp(url, "udp://", 6) == 0);
 }
 
 bool tr_urlIsValid(char const* url, size_t url_len)
@@ -911,9 +907,9 @@ bool tr_urlIsValid(char const* url, size_t url_len)
         url_len = strlen(url);
     }
 
-    return isValidURLChars(url, url_len) && tr_urlParse(url, url_len, NULL, NULL, NULL, NULL)
-           && (memcmp(url, "http://", 7) == 0 || memcmp(url, "https://", 8) == 0
-               || memcmp(url, "ftp://", 6) == 0 || memcmp(url, "sftp://", 7) == 0);
+    return isValidURLChars(url, url_len) && tr_urlParse(url, url_len, NULL, NULL, NULL, NULL) &&
+        (memcmp(url, "http://", 7) == 0 || memcmp(url, "https://", 8) == 0 || memcmp(url, "ftp://", 6) == 0 ||
+            memcmp(url, "sftp://", 7) == 0);
 }
 
 bool tr_addressIsIP(char const* str)
@@ -947,8 +943,15 @@ static int get_port_for_scheme(char const* scheme, size_t scheme_len)
         int port;
     };
 
-    static struct known_scheme const known_schemes[] = {{"udp", 80},  {"ftp", 21},    {"sftp", 22},
-                                                        {"http", 80}, {"https", 443}, {NULL, 0}};
+    static struct known_scheme const known_schemes[] =
+    {
+        { "udp", 80 },
+        { "ftp", 21 },
+        { "sftp", 22 },
+        { "http", 80 },
+        { "https", 443 },
+        { NULL, 0 }
+    };
 
     for (struct known_scheme const* s = known_schemes; s->name != NULL; ++s)
     {
@@ -961,8 +964,7 @@ static int get_port_for_scheme(char const* scheme, size_t scheme_len)
     return -1;
 }
 
-bool tr_urlParse(char const* url, size_t url_len, char** setme_scheme, char** setme_host,
-                 int* setme_port, char** setme_path)
+bool tr_urlParse(char const* url, size_t url_len, char** setme_scheme, char** setme_host, int* setme_port, char** setme_path)
 {
     if (url_len == TR_BAD_SIZE)
     {
@@ -1028,8 +1030,7 @@ bool tr_urlParse(char const* url, size_t url_len, char** setme_scheme, char** se
 
     if (setme_port != NULL)
     {
-        *setme_port = port_len > 0 ? parse_port(host_end + 1, port_len)
-                                   : get_port_for_scheme(scheme, scheme_len);
+        *setme_port = port_len > 0 ? parse_port(host_end + 1, port_len) : get_port_for_scheme(scheme, scheme_len);
     }
 
     if (setme_path != NULL)
@@ -1051,17 +1052,16 @@ bool tr_urlParse(char const* url, size_t url_len, char** setme_scheme, char** se
 ****
 ***/
 
-void tr_removeElementFromArray(void* array, size_t index_to_remove, size_t sizeof_element,
-                               size_t nmemb)
+void tr_removeElementFromArray(void* array, size_t index_to_remove, size_t sizeof_element, size_t nmemb)
 {
     char* a = array;
 
     memmove(a + sizeof_element * index_to_remove, a + sizeof_element * (index_to_remove + 1),
-            sizeof_element * (--nmemb - index_to_remove));
+        sizeof_element * (--nmemb - index_to_remove));
 }
 
-int tr_lowerBound(void const* key, void const* base, size_t nmemb, size_t size,
-                  tr_voidptr_compare_func compar, bool* exact_match)
+int tr_lowerBound(void const* key, void const* base, size_t nmemb, size_t size, tr_voidptr_compare_func compar,
+    bool* exact_match)
 {
     size_t first = 0;
     char const* cbase = base;
@@ -1100,25 +1100,27 @@ int tr_lowerBound(void const* key, void const* base, size_t nmemb, size_t size,
 
 /* Byte-wise swap two items of size SIZE.
    From glibc, written by Douglas C. Schmidt, LGPL 2.1 or higher */
-#define SWAP(a, b, size)                 \
-    do                                   \
-    {                                    \
+#define SWAP(a, b, size) \
+    do \
+    { \
         register size_t __size = (size); \
-        register char* __a = (a);        \
-        register char* __b = (b);        \
-        if (__a != __b)                  \
-        {                                \
-            do                           \
-            {                            \
-                char __tmp = *__a;       \
-                *__a++ = *__b;           \
-                *__b++ = __tmp;          \
-            } while (--__size > 0);      \
-        }                                \
-    } while (0)
+        register char* __a = (a); \
+        register char* __b = (b); \
+        if (__a != __b) \
+        { \
+            do \
+            { \
+                char __tmp = *__a; \
+                *__a++ = *__b; \
+                *__b++ = __tmp; \
+            } \
+            while (--__size > 0); \
+        } \
+    } \
+    while (0)
 
-static size_t quickfindPartition(char* base, size_t left, size_t right, size_t size,
-                                 tr_voidptr_compare_func compar, size_t pivotIndex)
+static size_t quickfindPartition(char* base, size_t left, size_t right, size_t size, tr_voidptr_compare_func compar,
+    size_t pivotIndex)
 {
     size_t storeIndex;
 
@@ -1160,15 +1162,13 @@ static size_t quickfindPartition(char* base, size_t left, size_t right, size_t s
     return storeIndex;
 }
 
-static void quickfindFirstK(char* base, size_t left, size_t right, size_t size,
-                            tr_voidptr_compare_func compar, size_t k)
+static void quickfindFirstK(char* base, size_t left, size_t right, size_t size, tr_voidptr_compare_func compar, size_t k)
 {
     if (right > left)
     {
         size_t const pivotIndex = left + (right - left) / 2U;
 
-        size_t const pivotNewIndex =
-            quickfindPartition(base, left, right, size, compar, pivotIndex);
+        size_t const pivotNewIndex = quickfindPartition(base, left, right, size, compar, pivotIndex);
 
         if (pivotNewIndex > left + k) /* new condition */
         {
@@ -1176,16 +1176,14 @@ static void quickfindFirstK(char* base, size_t left, size_t right, size_t size,
         }
         else if (pivotNewIndex < left + k)
         {
-            quickfindFirstK(base, pivotNewIndex + 1, right, size, compar,
-                            k + left - pivotNewIndex - 1);
+            quickfindFirstK(base, pivotNewIndex + 1, right, size, compar, k + left - pivotNewIndex - 1);
         }
     }
 }
 
 #ifdef TR_ENABLE_ASSERTS
 
-static void checkBestScoresComeFirst(char* base, size_t nmemb, size_t size,
-                                     tr_voidptr_compare_func compar, size_t k)
+static void checkBestScoresComeFirst(char* base, size_t nmemb, size_t size, tr_voidptr_compare_func compar, size_t k)
 {
     size_t worstFirstPos = 0;
 
@@ -1210,8 +1208,7 @@ static void checkBestScoresComeFirst(char* base, size_t nmemb, size_t size,
 
 #endif
 
-void tr_quickfindFirstK(void* base, size_t nmemb, size_t size, tr_voidptr_compare_func compar,
-                        size_t k)
+void tr_quickfindFirstK(void* base, size_t nmemb, size_t size, tr_voidptr_compare_func compar, size_t k)
 {
     if (k < nmemb)
     {
@@ -1252,7 +1249,7 @@ static char* to_utf8(char const* in, size_t inlen)
 
 #ifdef HAVE_ICONV
 
-    char const* encodings[] = {"CURRENT", "ISO-8859-15"};
+    char const* encodings[] = { "CURRENT", "ISO-8859-15" };
     size_t const buflen = inlen * 4 + 10;
     char* out = tr_new(char, buflen);
 
@@ -1323,8 +1320,8 @@ char* tr_win32_native_to_utf8(wchar_t const* text, int text_size)
     return tr_win32_native_to_utf8_ex(text, text_size, 0, 0, NULL);
 }
 
-char* tr_win32_native_to_utf8_ex(wchar_t const* text, int text_size, int extra_chars_before,
-                                 int extra_chars_after, int* real_result_size)
+char* tr_win32_native_to_utf8_ex(wchar_t const* text, int text_size, int extra_chars_before, int extra_chars_after,
+    int* real_result_size)
 {
     char* ret = NULL;
     int size;
@@ -1342,8 +1339,7 @@ char* tr_win32_native_to_utf8_ex(wchar_t const* text, int text_size, int extra_c
     }
 
     ret = tr_new(char, size + extra_chars_before + extra_chars_after + 1);
-    size = WideCharToMultiByte(CP_UTF8, 0, text, text_size, ret + extra_chars_before, size, NULL,
-                               NULL);
+    size = WideCharToMultiByte(CP_UTF8, 0, text, text_size, ret + extra_chars_before, size, NULL, NULL);
 
     if (size == 0)
     {
@@ -1370,8 +1366,8 @@ wchar_t* tr_win32_utf8_to_native(char const* text, int text_size)
     return tr_win32_utf8_to_native_ex(text, text_size, 0, 0, NULL);
 }
 
-wchar_t* tr_win32_utf8_to_native_ex(char const* text, int text_size, int extra_chars_before,
-                                    int extra_chars_after, int* real_result_size)
+wchar_t* tr_win32_utf8_to_native_ex(char const* text, int text_size, int extra_chars_before, int extra_chars_after,
+    int* real_result_size)
 {
     wchar_t* ret = NULL;
     int size;
@@ -1418,8 +1414,7 @@ char* tr_win32_format_message(uint32_t code)
     char* text = NULL;
     size_t text_size;
 
-    wide_size = FormatMessageW(
-        FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+    wide_size = FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
         NULL, code, 0, (LPWSTR)&wide_text, 0, NULL);
 
     if (wide_size == 0)
@@ -1497,7 +1492,7 @@ void tr_win32_make_args_utf8(int* argc, char*** argv)
     LocalFree(my_wide_argv);
 }
 
-int tr_main_win32(int argc, char** argv, int (*real_main)(int, char**))
+int tr_main_win32(int argc, char** argv, int (* real_main)(int, char**))
 {
     tr_win32_make_args_utf8(&argc, &argv);
     SetConsoleCP(CP_UTF8);
@@ -1771,8 +1766,7 @@ bool tr_moveFile(char const* oldpath, char const* newpath, tr_error** error)
     /* make sure the target directory exists */
     {
         char* newdir = tr_sys_path_dirname(newpath, error);
-        bool const i =
-            newdir != NULL && tr_sys_dir_create(newdir, TR_SYS_DIR_CREATE_PARENTS, 0777, error);
+        bool const i = newdir != NULL && tr_sys_dir_create(newdir, TR_SYS_DIR_CREATE_PARENTS, 0777, error);
         tr_free(newdir);
 
         if (!i)
@@ -1797,8 +1791,7 @@ bool tr_moveFile(char const* oldpath, char const* newpath, tr_error** error)
         return false;
     }
 
-    out = tr_sys_file_open(newpath, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE,
-                           0666, error);
+    out = tr_sys_file_open(newpath, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE, 0666, error);
 
     if (out == TR_BAD_SYS_FILE)
     {
@@ -1922,13 +1915,13 @@ uint64_t tr_htonll(uint64_t x)
 
 #else
 
-    /* fallback code by bdonlan at
-     * http://stackoverflow.com/questions/809902/64-bit-ntohl-in-c/875505#875505 */
+    /* fallback code by bdonlan at http://stackoverflow.com/questions/809902/64-bit-ntohl-in-c/875505#875505 */
     union
     {
         uint32_t lx[2];
         uint64_t llx;
-    } u;
+    }
+    u;
     u.lx[0] = htonl(x >> 32);
     u.lx[1] = htonl(x & 0xFFFFFFFFULL);
     return u.llx;
@@ -1944,13 +1937,13 @@ uint64_t tr_ntohll(uint64_t x)
 
 #else
 
-    /* fallback code by bdonlan at
-     * http://stackoverflow.com/questions/809902/64-bit-ntohl-in-c/875505#875505 */
+    /* fallback code by bdonlan at http://stackoverflow.com/questions/809902/64-bit-ntohl-in-c/875505#875505 */
     union
     {
         uint32_t lx[2];
         uint64_t llx;
-    } u;
+    }
+    u;
     u.llx = x;
     return ((uint64_t)ntohl(u.lx[0]) << 32) | (uint64_t)ntohl(u.lx[1]);
 
@@ -1982,8 +1975,8 @@ enum
     TR_FMT_TB
 };
 
-static void formatter_init(struct formatter_units* units, size_t kilo, char const* kb,
-                           char const* mb, char const* gb, char const* tb)
+static void formatter_init(struct formatter_units* units, size_t kilo, char const* kb, char const* mb, char const* gb,
+    char const* tb)
 {
     size_t value;
 
@@ -2004,8 +1997,7 @@ static void formatter_init(struct formatter_units* units, size_t kilo, char cons
     units->units[TR_FMT_TB].value = value;
 }
 
-static char* formatter_get_size_str(struct formatter_units const* u, char* buf, size_t bytes,
-                                    size_t buflen)
+static char* formatter_get_size_str(struct formatter_units const* u, char* buf, size_t bytes, size_t buflen)
 {
     int precision;
     double value;
@@ -2051,8 +2043,7 @@ static char* formatter_get_size_str(struct formatter_units const* u, char* buf, 
 
 static struct formatter_units size_units;
 
-void tr_formatter_size_init(size_t kilo, char const* kb, char const* mb, char const* gb,
-                            char const* tb)
+void tr_formatter_size_init(size_t kilo, char const* kb, char const* mb, char const* gb, char const* tb)
 {
     formatter_init(&size_units, kilo, kb, mb, gb, tb);
 }
@@ -2066,8 +2057,7 @@ static struct formatter_units speed_units;
 
 size_t tr_speed_K = 0;
 
-void tr_formatter_speed_init(size_t kilo, char const* kb, char const* mb, char const* gb,
-                             char const* tb)
+void tr_formatter_speed_init(size_t kilo, char const* kb, char const* mb, char const* gb, char const* tb)
 {
     tr_speed_K = kilo;
     formatter_init(&speed_units, kilo, kb, mb, gb, tb);
@@ -2107,8 +2097,7 @@ static struct formatter_units mem_units;
 
 size_t tr_mem_K = 0;
 
-void tr_formatter_mem_init(size_t kilo, char const* kb, char const* mb, char const* gb,
-                           char const* tb)
+void tr_formatter_mem_init(size_t kilo, char const* kb, char const* mb, char const* gb, char const* tb)
 {
     tr_mem_K = kilo;
     formatter_init(&mem_units, kilo, kb, mb, gb, tb);

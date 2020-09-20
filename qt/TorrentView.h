@@ -17,19 +17,19 @@ class TorrentView : public QListView
     Q_OBJECT
     TR_DISABLE_COPY_MOVE(TorrentView)
 
-   public:
+public:
     TorrentView(QWidget* parent = nullptr);
 
-   public slots:
+public slots:
     void setHeaderText(QString const& text);
 
-   signals:
+signals:
     void headerDoubleClicked();
 
-   protected:
+protected:
     void resizeEvent(QResizeEvent* event) override;
 
-   private:
+private:
     class HeaderWidget;
 
     void adjustHeaderPosition();

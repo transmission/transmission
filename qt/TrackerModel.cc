@@ -6,11 +6,11 @@
  *
  */
 
-#include <algorithm>  // std::sort()
+#include <algorithm> // std::sort()
 
 #include <QUrl>
 
-#include "Application.h"  // Application
+#include "Application.h" // Application
 #include "TorrentModel.h"
 #include "TrackerModel.h"
 
@@ -33,13 +33,20 @@ QVariant TrackerModel::data(QModelIndex const& index, int role) const
 
         switch (role)
         {
-            case Qt::DisplayRole: var = tracker_info.st.announce; break;
+        case Qt::DisplayRole:
+            var = tracker_info.st.announce;
+            break;
 
-            case Qt::DecorationRole: var = QIcon(tracker_info.st.getFavicon()); break;
+        case Qt::DecorationRole:
+            var = QIcon(tracker_info.st.getFavicon());
+            break;
 
-            case TrackerRole: var = QVariant::fromValue(tracker_info); break;
+        case TrackerRole:
+            var = QVariant::fromValue(tracker_info);
+            break;
 
-            default: break;
+        default:
+            break;
         }
     }
 
@@ -52,7 +59,7 @@ QVariant TrackerModel::data(QModelIndex const& index, int role) const
 
 struct CompareTrackers
 {
-    bool operator()(TrackerInfo const& a, TrackerInfo const& b) const
+    bool operator ()(TrackerInfo const& a, TrackerInfo const& b) const
     {
         if (a.torrent_id != b.torrent_id)
         {
@@ -118,15 +125,14 @@ void TrackerModel::refresh(TorrentModel const& torrent_model, torrent_ids_t cons
             ++old_index;
             ++new_index;
         }
-        else if (is_end_of_new
-                 || (!is_end_of_old && comp(rows_.at(old_index), trackers.at(new_index))))
+        else if (is_end_of_new || (!is_end_of_old && comp(rows_.at(old_index), trackers.at(new_index))))
         {
             // remove this old row
             beginRemoveRows(QModelIndex(), old_index, old_index);
             rows_.remove(old_index);
             endRemoveRows();
         }
-        else  // update existing row
+        else // update existing row
         {
             rows_[old_index].st = trackers.at(new_index).st;
             emit dataChanged(index(old_index, 0), index(old_index, 0));

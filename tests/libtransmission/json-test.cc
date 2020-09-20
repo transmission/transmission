@@ -9,19 +9,19 @@
 #define LIBTRANSMISSION_VARIANT_MODULE
 
 #include "transmission.h"
-#include "utils.h"  // tr_free()
-#include "variant-common.h"
+#include "utils.h" // tr_free()
 #include "variant.h"
+#include "variant-common.h"
 
 #include "gtest/gtest.h"
 
-#include <clocale>  // setlocale()
-#include <cstring>  // strlen()
+#include <clocale> // setlocale()
+#include <cstring> // strlen()
 #include <string>
 
 class JSONTest : public ::testing::TestWithParam<char const*>
 {
-   protected:
+protected:
     void SetUp() override
     {
         auto const* locale_str = GetParam();
@@ -41,7 +41,8 @@ TEST_P(JSONTest, testElements)
         "  \"float\": 6.5, "
         "  \"true\": true, "
         "  \"false\": false, "
-        "  \"null\": null }"};
+        "  \"null\": null }"
+    };
 
     tr_variant top;
     int err = tr_variantFromJson(&top, in.data(), in.size());
@@ -60,11 +61,11 @@ TEST_P(JSONTest, testElements)
     EXPECT_TRUE(tr_variantDictFindInt(&top, tr_quark_new("int", 3), &i));
     EXPECT_EQ(5, i);
 
-    auto d = double {};
+    auto d = double{};
     EXPECT_TRUE(tr_variantDictFindReal(&top, tr_quark_new("float", 5), &d));
     EXPECT_EQ(65, int(d * 10));
 
-    auto f = bool {};
+    auto f = bool{};
     EXPECT_TRUE(tr_variantDictFindBool(&top, tr_quark_new("true", 4), &f));
     EXPECT_TRUE(f);
 
@@ -82,7 +83,7 @@ TEST_P(JSONTest, testElements)
 
 TEST_P(JSONTest, testUtf8)
 {
-    auto in = std::string {"{ \"key\": \"Letöltések\" }"};
+    auto in = std::string { "{ \"key\": \"Letöltések\" }" };
     tr_variant top;
     char const* str;
     char* json;
@@ -100,7 +101,7 @@ TEST_P(JSONTest, testUtf8)
         tr_variantFree(&top);
     }
 
-    in = std::string {R"({ "key": "\u005C" })"};
+    in = std::string { R"({ "key": "\u005C" })" };
     err = tr_variantFromJson(&top, in.data(), in.size());
     EXPECT_EQ(0, err);
     EXPECT_TRUE(tr_variantIsDict(&top));
@@ -120,7 +121,7 @@ TEST_P(JSONTest, testUtf8)
      * 5. Dogfood that result back into the parser.
      * 6. Confirm that the result is UTF-8.
      */
-    in = std::string {R"({ "key": "Let\u00f6lt\u00e9sek" })"};
+    in = std::string { R"({ "key": "Let\u00f6lt\u00e9sek" })" };
     err = tr_variantFromJson(&top, in.data(), in.size());
     EXPECT_EQ(0, err);
     EXPECT_TRUE(tr_variantIsDict(&top));
@@ -164,7 +165,8 @@ TEST_P(JSONTest, test1)
         "            \"ids\": [ 7, 10 ]\n"
         "        }\n"
         "    }\n"
-        "}\n"};
+        "}\n"
+    };
 
     tr_variant top;
     auto const err = tr_variantFromJson(&top, in.data(), in.size());
@@ -202,7 +204,7 @@ TEST_P(JSONTest, test1)
 TEST_P(JSONTest, test2)
 {
     tr_variant top;
-    auto const in = std::string {" "};
+    auto const in = std::string { " " };
 
     top.type = 0;
     int err = tr_variantFromJson(&top, in.data(), in.size());
@@ -218,7 +220,8 @@ TEST_P(JSONTest, test3)
         "  \"errorString\": \"torrent not registered with this tracker 6UHsVW'*C\","
         "  \"eta\": 262792,"
         "  \"id\": 25,"
-        "  \"leftUntilDone\": 2275655680 }"};
+        "  \"leftUntilDone\": 2275655680 }"
+    };
 
     tr_variant top;
     auto const err = tr_variantFromJson(&top, in.data(), in.size());
@@ -234,7 +237,7 @@ TEST_P(JSONTest, test3)
 TEST_P(JSONTest, unescape)
 {
     tr_variant top;
-    auto const in = std::string {R"({ "string-1": "\/usr\/lib" })"};
+    auto const in = std::string { R"({ "string-1": "\/usr\/lib" })" };
     int const err = tr_variantFromJson(&top, in.data(), in.size());
     EXPECT_EQ(0, err);
 
@@ -245,5 +248,8 @@ TEST_P(JSONTest, unescape)
     tr_variantFree(&top);
 }
 
-INSTANTIATE_TEST_SUITE_P(JSON, JSONTest,
-                         ::testing::Values("C", "da_DK.UTF-8", "fr_FR.UTF-8", "ru_RU.UTF-8"));
+INSTANTIATE_TEST_SUITE_P(
+    JSON,
+    JSONTest,
+    ::testing::Values("C", "da_DK.UTF-8", "fr_FR.UTF-8", "ru_RU.UTF-8")
+    );

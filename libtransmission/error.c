@@ -6,8 +6,8 @@
  *
  */
 
-#include "error.h"
 #include "transmission.h"
+#include "error.h"
 #include "tr-assert.h"
 #include "utils.h"
 
@@ -106,8 +106,7 @@ void tr_error_clear(tr_error** error)
     *error = NULL;
 }
 
-static void error_prefix_valist(tr_error** error, char const* prefix_format, va_list args)
-    TR_GNUC_PRINTF(2, 0);
+static void error_prefix_valist(tr_error** error, char const* prefix_format, va_list args) TR_GNUC_PRINTF(2, 0);
 
 static void error_prefix_valist(tr_error** error, char const* prefix_format, va_list args)
 {
@@ -140,8 +139,7 @@ void tr_error_prefix(tr_error** error, char const* prefix_format, ...)
     va_end(args);
 }
 
-void tr_error_propagate_prefixed(tr_error** new_error, tr_error** old_error,
-                                 char const* prefix_format, ...)
+void tr_error_propagate_prefixed(tr_error** new_error, tr_error** old_error, char const* prefix_format, ...)
 {
     TR_ASSERT(prefix_format != NULL);
 

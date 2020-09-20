@@ -6,8 +6,8 @@
  *
  */
 
-#include "completion.h"
 #include "transmission.h"
+#include "completion.h"
 #include "torrent.h"
 #include "tr-assert.h"
 #include "utils.h"

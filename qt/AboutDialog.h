@@ -21,15 +21,15 @@ class AboutDialog : public BaseDialog
     Q_OBJECT
     TR_DISABLE_COPY_MOVE(AboutDialog)
 
-   public:
+public:
     AboutDialog(QWidget* parent = nullptr);
 
-   private slots:
+private slots:
     void showCredits();
     void showLicense();
 
-   private:
-    Ui::AboutDialog ui_ {};
+private:
+    Ui::AboutDialog ui_{};
 
     QPointer<LicenseDialog> license_dialog_;
 };

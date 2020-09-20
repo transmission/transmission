@@ -27,9 +27,10 @@ void RelocateDialog::onMoveToggled(bool b)
     move_flag = b;
 }
 
-RelocateDialog::RelocateDialog(Session& session, TorrentModel const& model, torrent_ids_t ids,
-                               QWidget* parent)
-    : BaseDialog(parent), session_(session), ids_(std::move(ids))
+RelocateDialog::RelocateDialog(Session& session, TorrentModel const& model, torrent_ids_t ids, QWidget* parent) :
+    BaseDialog(parent),
+    session_(session),
+    ids_(std::move(ids))
 {
     ui_.setupUi(this);
 
@@ -72,8 +73,7 @@ RelocateDialog::RelocateDialog(Session& session, TorrentModel const& model, torr
         ui_.newLocationEdit->selectAll();
     }
 
-    ui_.newLocationStack->setFixedHeight(
-        ui_.newLocationStack->currentWidget()->sizeHint().height());
+    ui_.newLocationStack->setFixedHeight(ui_.newLocationStack->currentWidget()->sizeHint().height());
     ui_.newLocationLabel->setBuddy(ui_.newLocationStack->currentWidget());
 
     if (move_flag)
@@ -92,7 +92,6 @@ RelocateDialog::RelocateDialog(Session& session, TorrentModel const& model, torr
 
 QString RelocateDialog::newLocation() const
 {
-    return ui_.newLocationStack->currentWidget() == ui_.newLocationButton
-               ? ui_.newLocationButton->path()
-               : ui_.newLocationEdit->text();
+    return ui_.newLocationStack->currentWidget() == ui_.newLocationButton ? ui_.newLocationButton->path() :
+        ui_.newLocationEdit->text();
 }

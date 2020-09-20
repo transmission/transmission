@@ -17,9 +17,9 @@ class LicenseDialog : public BaseDialog
     Q_OBJECT
     TR_DISABLE_COPY_MOVE(LicenseDialog)
 
-   public:
+public:
     LicenseDialog(QWidget* parent = nullptr);
 
-   private:
+private:
     Ui::LicenseDialog ui_ = {};
 };

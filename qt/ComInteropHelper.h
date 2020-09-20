@@ -18,7 +18,7 @@ class QVariant;
 
 class ComInteropHelper
 {
-   public:
+public:
     ComInteropHelper();
 
     bool isConnected() const;
@@ -28,6 +28,6 @@ class ComInteropHelper
     static void initialize();
     static void registerObject(QObject* parent);
 
-   private:
+private:
     std::unique_ptr<QAxObject> client_;
 };

@@ -15,8 +15,8 @@
 #include <QFuture>
 #include <QFutureInterface>
 #include <QHash>
-#include <QNetworkReply>
 #include <QNetworkRequest>
+#include <QNetworkReply>
 #include <QObject>
 #include <QString>
 #include <QUrl>
@@ -35,8 +35,8 @@ Q_DECLARE_METATYPE(TrVariantPtr)
 
 extern "C"
 {
-    struct evbuffer;
-    struct tr_session;
+struct evbuffer;
+struct tr_session;
 }
 
 struct RpcResponse
@@ -57,7 +57,7 @@ class RpcClient : public QObject
     Q_OBJECT
     TR_DISABLE_COPY_MOVE(RpcClient)
 
-   public:
+public:
     RpcClient(QObject* parent = nullptr);
 
     void stop();
@@ -70,24 +70,23 @@ class RpcClient : public QObject
     RpcResponseFuture exec(tr_quark method, tr_variant* args);
     RpcResponseFuture exec(std::string_view method, tr_variant* args);
 
-   signals:
+signals:
     void httpAuthenticationRequired();
     void dataReadProgress();
     void dataSendProgress();
     void networkResponse(QNetworkReply::NetworkError code, QString const& message);
 
-   private slots:
+private slots:
     void networkRequestFinished(QNetworkReply* reply);
     void localRequestFinished(TrVariantPtr response);
 
-   private:
+private:
     RpcResponseFuture sendRequest(TrVariantPtr json);
     QNetworkAccessManager* networkAccessManager();
     int64_t getNextTag();
 
     void sendNetworkRequest(TrVariantPtr json, QFutureInterface<RpcResponse> const& promise);
-    void sendLocalRequest(TrVariantPtr json, QFutureInterface<RpcResponse> const& promise,
-                          int64_t tag);
+    void sendLocalRequest(TrVariantPtr json, QFutureInterface<RpcResponse> const& promise, int64_t tag);
     int64_t parseResponseTag(tr_variant& response);
     RpcResponse parseResponseData(tr_variant& response);
 

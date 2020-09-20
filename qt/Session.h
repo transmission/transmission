@@ -31,7 +31,7 @@ class Prefs;
 
 extern "C"
 {
-    struct tr_variant;
+struct tr_variant;
 }
 
 class Session : public QObject
@@ -39,22 +39,37 @@ class Session : public QObject
     Q_OBJECT
     TR_DISABLE_COPY_MOVE(Session)
 
-   public:
+public:
     Session(QString config_dir, Prefs& prefs);
     ~Session() override;
 
     void stop();
     void restart();
 
-    QUrl const& getRemoteUrl() const { return rpc_.url(); }
+    QUrl const& getRemoteUrl() const
+    {
+        return rpc_.url();
+    }
 
-    tr_session_stats const& getStats() const { return stats_; }
+    tr_session_stats const& getStats() const
+    {
+        return stats_;
+    }
 
-    tr_session_stats const& getCumulativeStats() const { return cumulative_stats_; }
+    tr_session_stats const& getCumulativeStats() const
+    {
+        return cumulative_stats_;
+    }
 
-    QString const& sessionVersion() const { return session_version_; }
+    QString const& sessionVersion() const
+    {
+        return session_version_;
+    }
 
-    int64_t blocklistSize() const { return blocklist_size_; }
+    int64_t blocklistSize() const
+    {
+        return blocklist_size_;
+    }
 
     void setBlocklistSize(int64_t i);
     void updateBlocklist();
@@ -79,8 +94,7 @@ class Session : public QObject
     Tag torrentSet(torrent_ids_t const& ids, tr_quark const key, QPair<int, QString> const& val);
 
     void torrentSetLocation(torrent_ids_t const& ids, QString const& path, bool do_move);
-    void torrentRenamePath(torrent_ids_t const& ids, QString const& oldpath,
-                           QString const& newname);
+    void torrentRenamePath(torrent_ids_t const& ids, QString const& oldpath, QString const& newname);
     void addTorrent(AddData const& addme, tr_variant* top, bool trash_original);
     void initTorrents(torrent_ids_t const& ids = {});
     void pauseTorrents(torrent_ids_t const& torrentIds = {});
@@ -104,7 +118,7 @@ class Session : public QObject
         Rename
     };
 
-   public slots:
+public slots:
     void addTorrent(AddData const& addme);
     void launchWebInterface();
     void queueMoveBottom(torrent_ids_t const& torrentIds = {});
@@ -116,7 +130,7 @@ class Session : public QObject
     void removeTorrents(torrent_ids_t const& torrent_ids, bool delete_files = false);
     void updatePref(int key);
 
-   signals:
+signals:
     void sourceChanged();
     void portTested(bool is_open);
     void statsUpdated();
@@ -130,7 +144,7 @@ class Session : public QObject
     void networkResponse(QNetworkReply::NetworkError code, QString const& message);
     void httpAuthenticationRequired();
 
-   private:
+private:
     void start();
 
     void updateStats(tr_variant* args);
@@ -147,7 +161,7 @@ class Session : public QObject
 
     void addOptionalIds(tr_variant* args, torrent_ids_t const& ids);
 
-   private:
+private:
     QString const config_dir_;
     Prefs& prefs_;
 
@@ -162,11 +176,11 @@ class Session : public QObject
     QString session_id_;
     bool is_definitely_local_session_ = true;
     RpcClient rpc_;
-    torrent_ids_t const RecentlyActiveIDs = {-1};
+    torrent_ids_t const RecentlyActiveIDs = { -1 };
 
     std::map<QString, QString> duplicates_;
     QTimer duplicates_timer_;
 
-   private slots:
+private slots:
     void onDuplicatesTimer();
 };

@@ -20,8 +20,10 @@
 
 namespace libtransmission
 {
+
 namespace test
 {
+
 using RpcTest = SessionTest;
 
 TEST_F(RpcTest, list)
@@ -79,8 +81,8 @@ TEST_F(RpcTest, list)
 
 TEST_F(RpcTest, sessionGet)
 {
-    auto const rpc_response_func = [](tr_session* /*session*/, tr_variant* response,
-                                      void* setme) noexcept {
+    auto const rpc_response_func = [] (tr_session* /*session*/, tr_variant* response, void* setme) noexcept
+    {
         *static_cast<tr_variant*>(setme) = *response;
         tr_variantInitBool(response, false);
     };
@@ -100,56 +102,58 @@ TEST_F(RpcTest, sessionGet)
     EXPECT_TRUE(tr_variantDictFindDict(&response, TR_KEY_arguments, &args));
 
     // what we expected
-    auto const expected_keys = std::array<tr_quark, 50> {TR_KEY_alt_speed_down,
-                                                         TR_KEY_alt_speed_enabled,
-                                                         TR_KEY_alt_speed_time_begin,
-                                                         TR_KEY_alt_speed_time_day,
-                                                         TR_KEY_alt_speed_time_enabled,
-                                                         TR_KEY_alt_speed_time_end,
-                                                         TR_KEY_alt_speed_up,
-                                                         TR_KEY_blocklist_enabled,
-                                                         TR_KEY_blocklist_size,
-                                                         TR_KEY_blocklist_url,
-                                                         TR_KEY_cache_size_mb,
-                                                         TR_KEY_config_dir,
-                                                         TR_KEY_dht_enabled,
-                                                         TR_KEY_download_dir,
-                                                         TR_KEY_download_dir_free_space,
-                                                         TR_KEY_download_queue_enabled,
-                                                         TR_KEY_download_queue_size,
-                                                         TR_KEY_encryption,
-                                                         TR_KEY_idle_seeding_limit,
-                                                         TR_KEY_idle_seeding_limit_enabled,
-                                                         TR_KEY_incomplete_dir,
-                                                         TR_KEY_incomplete_dir_enabled,
-                                                         TR_KEY_lpd_enabled,
-                                                         TR_KEY_peer_limit_global,
-                                                         TR_KEY_peer_limit_per_torrent,
-                                                         TR_KEY_peer_port,
-                                                         TR_KEY_peer_port_random_on_start,
-                                                         TR_KEY_pex_enabled,
-                                                         TR_KEY_port_forwarding_enabled,
-                                                         TR_KEY_queue_stalled_enabled,
-                                                         TR_KEY_queue_stalled_minutes,
-                                                         TR_KEY_rename_partial_files,
-                                                         TR_KEY_rpc_version,
-                                                         TR_KEY_rpc_version_minimum,
-                                                         TR_KEY_script_torrent_done_enabled,
-                                                         TR_KEY_script_torrent_done_filename,
-                                                         TR_KEY_seed_queue_enabled,
-                                                         TR_KEY_seed_queue_size,
-                                                         TR_KEY_seedRatioLimit,
-                                                         TR_KEY_seedRatioLimited,
-                                                         TR_KEY_session_id,
-                                                         TR_KEY_speed_limit_down,
-                                                         TR_KEY_speed_limit_down_enabled,
-                                                         TR_KEY_speed_limit_up,
-                                                         TR_KEY_speed_limit_up_enabled,
-                                                         TR_KEY_start_added_torrents,
-                                                         TR_KEY_trash_original_torrent_files,
-                                                         TR_KEY_units,
-                                                         TR_KEY_utp_enabled,
-                                                         TR_KEY_version};
+    auto const expected_keys = std::array<tr_quark, 50>{
+        TR_KEY_alt_speed_down,
+        TR_KEY_alt_speed_enabled,
+        TR_KEY_alt_speed_time_begin,
+        TR_KEY_alt_speed_time_day,
+        TR_KEY_alt_speed_time_enabled,
+        TR_KEY_alt_speed_time_end,
+        TR_KEY_alt_speed_up,
+        TR_KEY_blocklist_enabled,
+        TR_KEY_blocklist_size,
+        TR_KEY_blocklist_url,
+        TR_KEY_cache_size_mb,
+        TR_KEY_config_dir,
+        TR_KEY_dht_enabled,
+        TR_KEY_download_dir,
+        TR_KEY_download_dir_free_space,
+        TR_KEY_download_queue_enabled,
+        TR_KEY_download_queue_size,
+        TR_KEY_encryption,
+        TR_KEY_idle_seeding_limit,
+        TR_KEY_idle_seeding_limit_enabled,
+        TR_KEY_incomplete_dir,
+        TR_KEY_incomplete_dir_enabled,
+        TR_KEY_lpd_enabled,
+        TR_KEY_peer_limit_global,
+        TR_KEY_peer_limit_per_torrent,
+        TR_KEY_peer_port,
+        TR_KEY_peer_port_random_on_start,
+        TR_KEY_pex_enabled,
+        TR_KEY_port_forwarding_enabled,
+        TR_KEY_queue_stalled_enabled,
+        TR_KEY_queue_stalled_minutes,
+        TR_KEY_rename_partial_files,
+        TR_KEY_rpc_version,
+        TR_KEY_rpc_version_minimum,
+        TR_KEY_script_torrent_done_enabled,
+        TR_KEY_script_torrent_done_filename,
+        TR_KEY_seed_queue_enabled,
+        TR_KEY_seed_queue_size,
+        TR_KEY_seedRatioLimit,
+        TR_KEY_seedRatioLimited,
+        TR_KEY_session_id,
+        TR_KEY_speed_limit_down,
+        TR_KEY_speed_limit_down_enabled,
+        TR_KEY_speed_limit_up,
+        TR_KEY_speed_limit_up_enabled,
+        TR_KEY_start_added_torrents,
+        TR_KEY_trash_original_torrent_files,
+        TR_KEY_units,
+        TR_KEY_utp_enabled,
+        TR_KEY_version
+    };
 
     // what we got
     std::set<tr_quark> actual_keys;
@@ -161,16 +165,16 @@ TEST_F(RpcTest, sessionGet)
         actual_keys.insert(key);
     }
 
-    auto missing_keys = std::vector<tr_quark> {};
-    std::set_difference(std::begin(expected_keys), std::end(expected_keys), std::begin(actual_keys),
-                        std::end(actual_keys),
-                        std::inserter(missing_keys, std::begin(missing_keys)));
+    auto missing_keys = std::vector<tr_quark>{};
+    std::set_difference(std::begin(expected_keys), std::end(expected_keys),
+        std::begin(actual_keys), std::end(actual_keys),
+        std::inserter(missing_keys, std::begin(missing_keys)));
     EXPECT_EQ(decltype(missing_keys) {}, missing_keys);
 
-    auto unexpected_keys = std::vector<tr_quark> {};
-    std::set_difference(std::begin(actual_keys), std::end(actual_keys), std::begin(expected_keys),
-                        std::end(expected_keys),
-                        std::inserter(unexpected_keys, std::begin(unexpected_keys)));
+    auto unexpected_keys = std::vector<tr_quark>{};
+    std::set_difference(std::begin(actual_keys), std::end(actual_keys),
+        std::begin(expected_keys), std::end(expected_keys),
+        std::inserter(unexpected_keys, std::begin(unexpected_keys)));
     EXPECT_EQ(decltype(unexpected_keys) {}, unexpected_keys);
 
     // cleanup
@@ -178,6 +182,6 @@ TEST_F(RpcTest, sessionGet)
     tr_torrentRemove(tor, false, nullptr);
 }
 
-}  // namespace test
+} // namespace test
 
-}  // namespace libtransmission
+} // namespace libtransmission

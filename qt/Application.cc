@@ -26,8 +26,8 @@
 #include <QDBusReply>
 #endif
 
-#include <libtransmission/transmission.h>
 #include <libtransmission/tr-getopt.h>
+#include <libtransmission/transmission.h>
 #include <libtransmission/utils.h>
 #include <libtransmission/version.h>
 
@@ -43,23 +43,23 @@
 
 namespace
 {
-std::array<tr_option, 8> const Opts = {
-    tr_option {'g', "config-dir", "Where to look for configuration files", "g", true, "<path>"},
-    {'m', "minimized", "Start minimized in system tray", "m", false, nullptr},
-    {'p', "port", "Port to use when connecting to an existing session", "p", true, "<port>"},
-    {'r', "remote", "Connect to an existing session at the specified hostname", "r", true,
-     "<host>"},
-    {'u', "username", "Username to use when connecting to an existing session", "u", true,
-     "<username>"},
-    {'v', "version", "Show version number and exit", "v", false, nullptr},
-    {'w', "password", "Password to use when connecting to an existing session", "w", true,
-     "<password>"},
-    {0, nullptr, nullptr, nullptr, false, nullptr}};
+
+std::array<tr_option, 8> const Opts =
+{
+    tr_option{ 'g', "config-dir", "Where to look for configuration files", "g", true, "<path>" },
+    { 'm', "minimized", "Start minimized in system tray", "m", false, nullptr },
+    { 'p', "port", "Port to use when connecting to an existing session", "p", true, "<port>" },
+    { 'r', "remote", "Connect to an existing session at the specified hostname", "r", true, "<host>" },
+    { 'u', "username", "Username to use when connecting to an existing session", "u", true, "<username>" },
+    { 'v', "version", "Show version number and exit", "v", false, nullptr },
+    { 'w', "password", "Password to use when connecting to an existing session", "w", true, "<password>" },
+    { 0, nullptr, nullptr, nullptr, false, nullptr }
+};
 
 char const* getUsage()
 {
     return "Usage:\n"
-           "  transmission [OPTIONS...] [torrent files]";
+        "  transmission [OPTIONS...] [torrent files]";
 }
 
 enum
@@ -69,8 +69,7 @@ enum
     MODEL_REFRESH_INTERVAL_MSEC = 3000
 };
 
-bool loadTranslation(QTranslator& translator, QString const& name, QLocale const& locale,
-                     QStringList const& search_directories)
+bool loadTranslation(QTranslator& translator, QString const& name, QLocale const& locale, QStringList const& search_directories)
 {
     for (QString const& directory : search_directories)
     {
@@ -83,12 +82,12 @@ bool loadTranslation(QTranslator& translator, QString const& name, QLocale const
     return false;
 }
 
-}  // namespace
+} // namespace
 
-Application::Application(int& argc, char** argv)
-    : QApplication(argc, argv),
-      config_name_ {QStringLiteral("transmission")},
-      display_name_ {QStringLiteral("transmission-qt")}
+Application::Application(int& argc, char** argv) :
+    QApplication(argc, argv),
+    config_name_{QStringLiteral("transmission")},
+    display_name_{QStringLiteral("transmission-qt")}
 {
     setApplicationName(config_name_);
     loadTranslations();
@@ -107,8 +106,7 @@ Application::Application(int& argc, char** argv)
 
     if (icon.isNull())
     {
-        static std::array<int, 11> constexpr Sizes = {16, 22, 24,  32,  48, 64,
-                                                      72, 96, 128, 192, 256};
+        static std::array<int, 11> constexpr Sizes = { 16, 22, 24, 32, 48, 64, 72, 96, 128, 192, 256 };
         for (auto const size : Sizes)
         {
             icon.addPixmap(QPixmap(QStringLiteral(":/icons/transmission-%1.png").arg(size)));
@@ -132,35 +130,48 @@ Application::Application(int& argc, char** argv)
     QString config_dir;
     QStringList filenames;
 
-    while ((c = tr_getopt(getUsage(), argc, const_cast<char const**>(argv), Opts.data(), &optarg))
-           != TR_OPT_DONE)
+    while ((c = tr_getopt(getUsage(), argc, const_cast<char const**>(argv), Opts.data(), &optarg)) != TR_OPT_DONE)
     {
         switch (c)
         {
-            case 'g': config_dir = QString::fromUtf8(optarg); break;
+        case 'g':
+            config_dir = QString::fromUtf8(optarg);
+            break;
 
-            case 'p': port = QString::fromUtf8(optarg); break;
+        case 'p':
+            port = QString::fromUtf8(optarg);
+            break;
 
-            case 'r': host = QString::fromUtf8(optarg); break;
+        case 'r':
+            host = QString::fromUtf8(optarg);
+            break;
 
-            case 'u': username = QString::fromUtf8(optarg); break;
+        case 'u':
+            username = QString::fromUtf8(optarg);
+            break;
 
-            case 'w': password = QString::fromUtf8(optarg); break;
+        case 'w':
+            password = QString::fromUtf8(optarg);
+            break;
 
-            case 'm': minimized = true; break;
+        case 'm':
+            minimized = true;
+            break;
 
-            case 'v':
-                std::cerr << qPrintable(display_name_) << ' ' << LONG_VERSION_STRING << std::endl;
-                quitLater();
-                return;
+        case 'v':
+            std::cerr << qPrintable(display_name_) << ' ' << LONG_VERSION_STRING << std::endl;
+            quitLater();
+            return;
 
-            case TR_OPT_ERR:
-                std::cerr << qPrintable(QObject::tr("Invalid option")) << std::endl;
-                tr_getopt_usage(qPrintable(display_name_), getUsage(), Opts.data());
-                quitLater();
-                return;
+        case TR_OPT_ERR:
+            std::cerr << qPrintable(QObject::tr("Invalid option")) << std::endl;
+            tr_getopt_usage(qPrintable(display_name_), getUsage(), Opts.data());
+            quitLater();
+            return;
 
-            default: filenames.append(QString::fromUtf8(optarg)); break;
+        default:
+            filenames.append(QString::fromUtf8(optarg));
+            break;
         }
     }
 
@@ -180,14 +191,21 @@ Application::Application(int& argc, char** argv)
 
             switch (a.type)
             {
-                case AddData::URL: metainfo = a.url.toString(); break;
+            case AddData::URL:
+                metainfo = a.url.toString();
+                break;
 
-                case AddData::MAGNET: metainfo = a.magnet; break;
+            case AddData::MAGNET:
+                metainfo = a.magnet;
+                break;
 
-                case AddData::FILENAME:
-                case AddData::METAINFO: metainfo = QString::fromUtf8(a.toBase64()); break;
+            case AddData::FILENAME:
+            case AddData::METAINFO:
+                metainfo = QString::fromUtf8(a.toBase64());
+                break;
 
-                default: break;
+            default:
+                break;
             }
 
             if (!metainfo.isEmpty() && interop_client.addMetainfo(metainfo))
@@ -275,7 +293,7 @@ Application::Application(int& argc, char** argv)
     connect(watch_dir_, &WatchDir::torrentFileAdded, this, &Application::addTorrent);
 
     // init from preferences
-    for (auto const key : {Prefs::DIR_WATCH})
+    for (auto const key : { Prefs::DIR_WATCH })
     {
         refreshPref(key);
     }
@@ -312,10 +330,8 @@ Application::Application(int& argc, char** argv)
     if (!prefs_->getBool(Prefs::USER_HAS_GIVEN_INFORMED_CONSENT))
     {
         auto* dialog = new QMessageBox(QMessageBox::Information, QString(),
-                                       tr("<b>Transmission is a file sharing program.</b>"),
-                                       QMessageBox::Ok | QMessageBox::Cancel, window_);
-        dialog->setInformativeText(tr(
-            "When you run a torrent, its data will be made available to others by means of upload. "
+            tr("<b>Transmission is a file sharing program.</b>"), QMessageBox::Ok | QMessageBox::Cancel, window_);
+        dialog->setInformativeText(tr("When you run a torrent, its data will be made available to others by means of upload. "
             "Any content you share is your sole responsibility."));
         dialog->button(QMessageBox::Ok)->setText(tr("I &Agree"));
         dialog->setDefaultButton(QMessageBox::Ok);
@@ -337,32 +353,31 @@ Application::Application(int& argc, char** argv)
 
 void Application::loadTranslations()
 {
-    QStringList const qt_qm_dirs = QStringList()
-                                   << QLibraryInfo::location(QLibraryInfo::TranslationsPath) <<
+    QStringList const qt_qm_dirs = QStringList() << QLibraryInfo::location(QLibraryInfo::TranslationsPath) <<
 #ifdef TRANSLATIONS_DIR
-                                   QStringLiteral(TRANSLATIONS_DIR) <<
+        QStringLiteral(TRANSLATIONS_DIR) <<
 #endif
-                                   (applicationDirPath() + QStringLiteral("/translations"));
+        (applicationDirPath() + QStringLiteral("/translations"));
 
     QStringList const app_qm_dirs = QStringList() <<
 #ifdef TRANSLATIONS_DIR
-                                    QStringLiteral(TRANSLATIONS_DIR) <<
+        QStringLiteral(TRANSLATIONS_DIR) <<
 #endif
-                                    (applicationDirPath() + QStringLiteral("/translations"));
+        (applicationDirPath() + QStringLiteral("/translations"));
 
     auto const qt_file_name = QStringLiteral("qtbase");
 
     QLocale const locale;
     QLocale const english_locale(QLocale::English, QLocale::UnitedStates);
 
-    if (loadTranslation(qt_translator_, qt_file_name, locale, qt_qm_dirs)
-        || loadTranslation(qt_translator_, qt_file_name, english_locale, qt_qm_dirs))
+    if (loadTranslation(qt_translator_, qt_file_name, locale, qt_qm_dirs) ||
+        loadTranslation(qt_translator_, qt_file_name, english_locale, qt_qm_dirs))
     {
         installTranslator(&qt_translator_);
     }
 
-    if (loadTranslation(app_translator_, config_name_, locale, app_qm_dirs)
-        || loadTranslation(app_translator_, config_name_, english_locale, app_qm_dirs))
+    if (loadTranslation(app_translator_, config_name_, locale, app_qm_dirs) ||
+        loadTranslation(app_translator_, config_name_, english_locale, app_qm_dirs))
     {
         installTranslator(&app_translator_);
     }
@@ -470,10 +485,12 @@ void Application::refreshPref(int key)
 {
     switch (key)
     {
-        case Prefs::BLOCKLIST_UPDATES_ENABLED: maybeUpdateBlocklist(); break;
+    case Prefs::BLOCKLIST_UPDATES_ENABLED:
+        maybeUpdateBlocklist();
+        break;
 
-        case Prefs::DIR_WATCH:
-        case Prefs::DIR_WATCH_ENABLED:
+    case Prefs::DIR_WATCH:
+    case Prefs::DIR_WATCH_ENABLED:
         {
             QString const path(prefs_->getString(Prefs::DIR_WATCH));
             bool const is_enabled(prefs_->getBool(Prefs::DIR_WATCH_ENABLED));
@@ -481,7 +498,8 @@ void Application::refreshPref(int key)
             break;
         }
 
-        default: break;
+    default:
+        break;
     }
 }
 
@@ -573,18 +591,19 @@ bool Application::notifyApp(QString const& title, QString const& body) const
 
     if (bus.isConnected())
     {
-        QDBusMessage m = QDBusMessage::createMethodCall(
-            dbus_service_name, dbus_path, dbus_interface_name, QStringLiteral("Notify"));
+        QDBusMessage m =
+            QDBusMessage::createMethodCall(dbus_service_name, dbus_path, dbus_interface_name, QStringLiteral("Notify"));
         QVariantList args;
-        args.append(QStringLiteral("Transmission"));  // app_name
-        args.append(0U);                              // replaces_id
-        args.append(QStringLiteral("transmission"));  // icon
-        args.append(title);                           // summary
-        args.append(body);                            // body
-        args.append(QStringList());                   // actions - unused for plain passive popups
-        args.append(QVariantMap({std::make_pair(
-            QStringLiteral("category"), QVariant(QStringLiteral("transfer.complete")))}));  // hints
-        args.append(static_cast<int32_t>(-1));  // use the default timeout period
+        args.append(QStringLiteral("Transmission")); // app_name
+        args.append(0U); // replaces_id
+        args.append(QStringLiteral("transmission")); // icon
+        args.append(title); // summary
+        args.append(body); // body
+        args.append(QStringList()); // actions - unused for plain passive popups
+        args.append(QVariantMap({
+            std::make_pair(QStringLiteral("category"), QVariant(QStringLiteral("transfer.complete")))
+        })); // hints
+        args.append(static_cast<int32_t>(-1)); // use the default timeout period
         m.setArguments(args);
         QDBusReply<quint32> const reply_msg = bus.call(m);
 

@@ -14,6 +14,7 @@
 
 namespace
 {
+
 int itemColumnSpan(QGridLayout* layout, QLayoutItem const* item)
 {
     for (int i = 0, count = layout->count(); i < count; ++i)
@@ -34,9 +35,11 @@ int itemColumnSpan(QGridLayout* layout, QLayoutItem const* item)
     return 0;
 }
 
-}  // namespace
+} // namespace
 
-ColumnResizer::ColumnResizer(QObject* parent) : QObject(parent), timer_(new QTimer(this))
+ColumnResizer::ColumnResizer(QObject* parent) :
+    QObject(parent),
+    timer_(new QTimer(this))
 {
     timer_->setSingleShot(true);
     connect(timer_, SIGNAL(timeout()), SLOT(update()));

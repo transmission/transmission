@@ -8,11 +8,9 @@
 
 #pragma once
 
-#include <libtransmission/transmission.h>
 #include <gtk/gtk.h>
+#include <libtransmission/transmission.h>
 
-void gtr_get_favicon(tr_session* session, char const* host, GFunc pixbuf_ready_func,
-                     gpointer pixbuf_ready_func_data);
+void gtr_get_favicon(tr_session* session, char const* host, GFunc pixbuf_ready_func, gpointer pixbuf_ready_func_data);
 
-void gtr_get_favicon_from_url(tr_session* session, char const* url, GFunc pixbuf_ready_func,
-                              gpointer pixbuf_ready_func_data);
+void gtr_get_favicon_from_url(tr_session* session, char const* url, GFunc pixbuf_ready_func, gpointer pixbuf_ready_func_data);

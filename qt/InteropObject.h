@@ -29,10 +29,10 @@ class InteropObject : public QObject
     Q_CLASSINFO("Description", "Transmission Qt Client Class")
 #endif
 
-   public:
+public:
     InteropObject(QObject* parent = nullptr);
 
-   public slots:
+public slots:
     bool PresentWindow();
     bool AddMetainfo(QString const& metainfo);
 };

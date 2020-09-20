@@ -13,8 +13,8 @@
 #include <event2/event.h>
 
 #include "transmission.h"
-#include "log.h"
 #include "natpmp_local.h"
+#include "log.h"
 #include "net.h"
 #include "peer-mgr.h"
 #include "port-forwarding.h"
@@ -53,15 +53,20 @@ static char const* getNatStateStr(int state)
 {
     switch (state)
     {
-        case TR_PORT_MAPPING: return _("Starting");
+    case TR_PORT_MAPPING:
+        return _("Starting");
 
-        case TR_PORT_MAPPED: return _("Forwarded");
+    case TR_PORT_MAPPED:
+        return _("Forwarded");
 
-        case TR_PORT_UNMAPPING: return _("Stopping");
+    case TR_PORT_UNMAPPING:
+        return _("Stopping");
 
-        case TR_PORT_UNMAPPED: return _("Not forwarded");
+    case TR_PORT_UNMAPPED:
+        return _("Not forwarded");
 
-        default: return "???";
+    default:
+        return "???";
     }
 }
 
@@ -98,8 +103,8 @@ static void natPulse(tr_shared* s, bool do_check)
 
     if (newStatus != oldStatus)
     {
-        tr_logAddNamedInfo(getKey(), _("State changed from \"%1$s\" to \"%2$s\""),
-                           getNatStateStr(oldStatus), getNatStateStr(newStatus));
+        tr_logAddNamedInfo(getKey(), _("State changed from \"%1$s\" to \"%2$s\""), getNatStateStr(oldStatus),
+            getNatStateStr(newStatus));
     }
 }
 
@@ -111,22 +116,22 @@ static void set_evtimer_from_status(tr_shared* s)
     /* when to wake up again */
     switch (tr_sharedTraversalStatus(s))
     {
-        case TR_PORT_MAPPED:
-            /* if we're mapped, everything is fine... check back in 20 minutes
-             * to renew the port forwarding if it's expired */
-            s->doPortCheck = true;
-            sec = 60 * 20;
-            break;
+    case TR_PORT_MAPPED:
+        /* if we're mapped, everything is fine... check back in 20 minutes
+         * to renew the port forwarding if it's expired */
+        s->doPortCheck = true;
+        sec = 60 * 20;
+        break;
 
-        case TR_PORT_ERROR:
-            /* some kind of an error. wait 60 seconds and retry */
-            sec = 60;
-            break;
+    case TR_PORT_ERROR:
+        /* some kind of an error. wait 60 seconds and retry */
+        sec = 60;
+        break;
 
-        default:
-            /* in progress. pulse frequently. */
-            msec = 333000;
-            break;
+    default:
+        /* in progress. pulse frequently. */
+        msec = 333000;
+        break;
     }
 
     if (s->timer != NULL)

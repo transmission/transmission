@@ -50,11 +50,11 @@ class SqueezeLabel : public QLabel
     Q_OBJECT
     TR_DISABLE_COPY_MOVE(SqueezeLabel)
 
-   public:
+public:
     SqueezeLabel(QWidget* parent = nullptr);
     SqueezeLabel(QString const& text, QWidget* parent = nullptr);
 
-   protected:
+protected:
     // QWidget
     void paintEvent(QPaintEvent* paint_event) override;
 };

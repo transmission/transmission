@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <cctype>  // isxdigit()
+#include <cctype> // isxdigit()
 #include <functional>
 
 #include <QHash>
@@ -26,19 +26,23 @@ class QModelIndex;
 
 namespace std
 {
-template <>
+
+template<>
 struct hash<QString>
 {
-    std::size_t operator()(QString const& s) const { return qHash(s); }
+    std::size_t operator ()(QString const& s) const
+    {
+        return qHash(s);
+    }
 };
 
-}  // namespace std
+} // namespace std
 
 #endif
 
 class Utils
 {
-   public:
+public:
     static QIcon getIconFromIndex(QModelIndex const& index);
 
     // Test if string is UTF-8 or not
@@ -61,7 +65,7 @@ class Utils
 
     static QColor getFadedColor(QColor const& color);
 
-    template <typename DialogT, typename... ArgsT>
+    template<typename DialogT, typename... ArgsT>
     static void openDialog(QPointer<DialogT>& dialog, ArgsT&&... args)
     {
         if (dialog.isNull())
@@ -81,7 +85,10 @@ class Utils
     /// URLs
     ///
 
-    static bool isMagnetLink(QString const& s) { return s.startsWith(QStringLiteral("magnet:?")); }
+    static bool isMagnetLink(QString const& s)
+    {
+        return s.startsWith(QStringLiteral("magnet:?"));
+    }
 
     static bool isHexHashcode(QString const& s)
     {
@@ -103,7 +110,8 @@ class Utils
 
     static bool isUriWithSupportedScheme(QString const& s)
     {
-        return s.startsWith(QStringLiteral("ftp://")) || s.startsWith(QStringLiteral("http://"))
-               || s.startsWith(QStringLiteral("https://"));
+        return s.startsWith(QStringLiteral("ftp://")) ||
+            s.startsWith(QStringLiteral("http://")) ||
+            s.startsWith(QStringLiteral("https://"));
     }
 };

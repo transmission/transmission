@@ -6,7 +6,7 @@
  *
  */
 
-#include <errno.h>  /* errno, EAFNOSUPPORT */
+#include <errno.h> /* errno, EAFNOSUPPORT */
 #include <string.h> /* memcpy(), memset() */
 
 #include <event2/buffer.h>
@@ -16,8 +16,8 @@
 #define LIBTRANSMISSION_ANNOUNCER_MODULE
 
 #include "transmission.h"
-#include "announcer-common.h"
 #include "announcer.h"
+#include "announcer-common.h"
 #include "crypto-utils.h" /* tr_rand_buffer() */
 #include "log.h"
 #include "peer-io.h"
@@ -45,8 +45,7 @@ static void tau_sockaddr_setport(struct sockaddr* sa, tr_port port)
     }
 }
 
-static int tau_sendto(tr_session* session, struct evutil_addrinfo* ai, tr_port port,
-                      void const* buf, size_t buflen)
+static int tau_sendto(tr_session* session, struct evutil_addrinfo* ai, tr_port port, void const* buf, size_t buflen)
 {
     tr_socket_t sockfd;
 
@@ -118,7 +117,8 @@ typedef enum
     TAU_ACTION_ANNOUNCE = 1,
     TAU_ACTION_SCRAPE = 2,
     TAU_ACTION_ERROR = 3
-} tau_action_t;
+}
+tau_action_t;
 
 static bool is_tau_response_message(tau_action_t action, size_t msglen)
 {
@@ -170,9 +170,8 @@ struct tau_scrape_request
     void* user_data;
 };
 
-static struct tau_scrape_request* tau_scrape_request_new(tr_scrape_request const* in,
-                                                         tr_scrape_response_func callback,
-                                                         void* user_data)
+static struct tau_scrape_request* tau_scrape_request_new(tr_scrape_request const* in, tr_scrape_response_func callback,
+    void* user_data)
 {
     struct evbuffer* buf;
     struct tau_scrape_request* req;
@@ -228,8 +227,7 @@ static void tau_scrape_request_finished(struct tau_scrape_request const* request
     }
 }
 
-static void tau_scrape_request_fail(struct tau_scrape_request* request, bool did_connect,
-                                    bool did_timeout, char const* errmsg)
+static void tau_scrape_request_fail(struct tau_scrape_request* request, bool did_connect, bool did_timeout, char const* errmsg)
 {
     request->response.did_connect = did_connect;
     request->response.did_timeout = did_timeout;
@@ -237,8 +235,7 @@ static void tau_scrape_request_fail(struct tau_scrape_request* request, bool did
     tau_scrape_request_finished(request);
 }
 
-static void on_scrape_response(struct tau_scrape_request* request, tau_action_t action,
-                               struct evbuffer* buf)
+static void on_scrape_response(struct tau_scrape_request* request, tau_action_t action, struct evbuffer* buf)
 {
     request->response.did_connect = true;
     request->response.did_timeout = false;
@@ -308,25 +305,29 @@ typedef enum
     TAU_ANNOUNCE_EVENT_COMPLETED = 1,
     TAU_ANNOUNCE_EVENT_STARTED = 2,
     TAU_ANNOUNCE_EVENT_STOPPED = 3
-} tau_announce_event;
+}
+tau_announce_event;
 
 static tau_announce_event get_tau_announce_event(tr_announce_event e)
 {
     switch (e)
     {
-        case TR_ANNOUNCE_EVENT_COMPLETED: return TAU_ANNOUNCE_EVENT_COMPLETED;
+    case TR_ANNOUNCE_EVENT_COMPLETED:
+        return TAU_ANNOUNCE_EVENT_COMPLETED;
 
-        case TR_ANNOUNCE_EVENT_STARTED: return TAU_ANNOUNCE_EVENT_STARTED;
+    case TR_ANNOUNCE_EVENT_STARTED:
+        return TAU_ANNOUNCE_EVENT_STARTED;
 
-        case TR_ANNOUNCE_EVENT_STOPPED: return TAU_ANNOUNCE_EVENT_STOPPED;
+    case TR_ANNOUNCE_EVENT_STOPPED:
+        return TAU_ANNOUNCE_EVENT_STOPPED;
 
-        default: return TAU_ANNOUNCE_EVENT_NONE;
+    default:
+        return TAU_ANNOUNCE_EVENT_NONE;
     }
 }
 
-static struct tau_announce_request* tau_announce_request_new(tr_announce_request const* in,
-                                                             tr_announce_response_func callback,
-                                                             void* user_data)
+static struct tau_announce_request* tau_announce_request_new(tr_announce_request const* in, tr_announce_response_func callback,
+    void* user_data)
 {
     struct evbuffer* buf;
     struct tau_announce_request* req;
@@ -383,8 +384,8 @@ static void tau_announce_request_finished(struct tau_announce_request const* req
     }
 }
 
-static void tau_announce_request_fail(struct tau_announce_request* request, bool did_connect,
-                                      bool did_timeout, char const* errmsg)
+static void tau_announce_request_fail(struct tau_announce_request* request, bool did_connect, bool did_timeout,
+    char const* errmsg)
 {
     request->response.did_connect = did_connect;
     request->response.did_timeout = did_timeout;
@@ -392,8 +393,7 @@ static void tau_announce_request_fail(struct tau_announce_request* request, bool
     tau_announce_request_finished(request);
 }
 
-static void on_announce_response(struct tau_announce_request* request, tau_action_t action,
-                                 struct evbuffer* buf)
+static void on_announce_response(struct tau_announce_request* request, tau_action_t action, struct evbuffer* buf)
 {
     size_t const buflen = evbuffer_get_length(buf);
 
@@ -406,8 +406,8 @@ static void on_announce_response(struct tau_announce_request* request, tau_actio
         resp->interval = evbuffer_read_ntoh_32(buf);
         resp->leechers = evbuffer_read_ntoh_32(buf);
         resp->seeders = evbuffer_read_ntoh_32(buf);
-        resp->pex = tr_peerMgrCompactToPex(evbuffer_pullup(buf, -1), evbuffer_get_length(buf), NULL,
-                                           0, &request->response.pex_count);
+        resp->pex = tr_peerMgrCompactToPex(evbuffer_pullup(buf, -1), evbuffer_get_length(buf), NULL, 0,
+            &request->response.pex_count);
         tau_announce_request_finished(request);
     }
     else
@@ -475,8 +475,7 @@ static void tau_tracker_free(struct tau_tracker* t)
     tr_free(t);
 }
 
-static void tau_tracker_fail_all(struct tau_tracker* tracker, bool did_connect, bool did_timeout,
-                                 char const* errmsg)
+static void tau_tracker_fail_all(struct tau_tracker* tracker, bool did_connect, bool did_timeout, char const* errmsg)
 {
     tr_ptrArray* reqs;
 
@@ -525,15 +524,13 @@ static void tau_tracker_on_dns(int errcode, struct evutil_addrinfo* addr, void* 
     }
 }
 
-static void tau_tracker_send_request(struct tau_tracker* tracker, void const* payload,
-                                     size_t payload_len)
+static void tau_tracker_send_request(struct tau_tracker* tracker, void const* payload, size_t payload_len)
 {
     struct evbuffer* buf = evbuffer_new();
     dbgmsg(tracker->key, "sending request w/connection id %" PRIu64 "\n", tracker->connection_id);
     evbuffer_add_hton_64(buf, tracker->connection_id);
     evbuffer_add_reference(buf, payload, payload_len, NULL, NULL);
-    (void)tau_sendto(tracker->session, tracker->addr, tracker->port, evbuffer_pullup(buf, -1),
-                     evbuffer_get_length(buf));
+    (void)tau_sendto(tracker->session, tracker->addr, tracker->port, evbuffer_pullup(buf, -1), evbuffer_get_length(buf));
     evbuffer_free(buf);
 }
 
@@ -592,8 +589,7 @@ static void tau_tracker_send_reqs(struct tau_tracker* tracker)
     }
 }
 
-static void on_tracker_connection_response(struct tau_tracker* tracker, tau_action_t action,
-                                           struct evbuffer* buf)
+static void on_tracker_connection_response(struct tau_tracker* tracker, tau_action_t action, struct evbuffer* buf)
 {
     time_t const now = tr_time();
 
@@ -604,8 +600,7 @@ static void on_tracker_connection_response(struct tau_tracker* tracker, tau_acti
     {
         tracker->connection_id = evbuffer_read_ntoh_64(buf);
         tracker->connection_expiration_time = now + TAU_CONNECTION_TTL_SECS;
-        dbgmsg(tracker->key, "Got a new connection ID from tracker: %" PRIu64,
-               tracker->connection_id);
+        dbgmsg(tracker->key, "Got a new connection ID from tracker: %" PRIu64, tracker->connection_id);
     }
     else
     {
@@ -677,8 +672,7 @@ static void tau_tracker_timeout_reqs(struct tau_tracker* tracker)
 
 static bool tau_tracker_is_idle(struct tau_tracker const* tracker)
 {
-    return tr_ptrArrayEmpty(&tracker->announces) && tr_ptrArrayEmpty(&tracker->scrapes)
-           && tracker->dns_request == NULL;
+    return tr_ptrArrayEmpty(&tracker->announces) && tr_ptrArrayEmpty(&tracker->scrapes) && tracker->dns_request == NULL;
 }
 
 static void tau_tracker_upkeep_ex(struct tau_tracker* tracker, bool timeout_reqs)
@@ -709,30 +703,26 @@ static void tau_tracker_upkeep_ex(struct tau_tracker* tracker, bool timeout_reqs
         hints.ai_socktype = SOCK_DGRAM;
         hints.ai_protocol = IPPROTO_UDP;
         dbgmsg(tracker->host, "Trying a new DNS lookup");
-        tracker->dns_request = evdns_getaddrinfo(tracker->session->evdns_base, tracker->host, NULL,
-                                                 &hints, tau_tracker_on_dns, tracker);
+        tracker->dns_request = evdns_getaddrinfo(tracker->session->evdns_base, tracker->host, NULL, &hints, tau_tracker_on_dns,
+            tracker);
         return;
     }
 
-    dbgmsg(tracker->key, "addr %p -- connected %d (%zu %zu) -- connecting_at %zu",
-           (void*)tracker->addr, (int)(tracker->connection_expiration_time > now),
-           (size_t)tracker->connection_expiration_time, (size_t)now,
-           (size_t)tracker->connecting_at);
+    dbgmsg(tracker->key, "addr %p -- connected %d (%zu %zu) -- connecting_at %zu", (void*)tracker->addr,
+        (int)(tracker->connection_expiration_time > now), (size_t)tracker->connection_expiration_time, (size_t)now,
+        (size_t)tracker->connecting_at);
 
     /* also need a valid connection ID... */
-    if (tracker->addr != NULL && tracker->connection_expiration_time <= now
-        && tracker->connecting_at == 0)
+    if (tracker->addr != NULL && tracker->connection_expiration_time <= now && tracker->connecting_at == 0)
     {
         struct evbuffer* buf = evbuffer_new();
         tracker->connecting_at = now;
         tracker->connection_transaction_id = tau_transaction_new();
-        dbgmsg(tracker->key, "Trying to connect. Transaction ID is %u",
-               tracker->connection_transaction_id);
+        dbgmsg(tracker->key, "Trying to connect. Transaction ID is %u", tracker->connection_transaction_id);
         evbuffer_add_hton_64(buf, 0x41727101980LL);
         evbuffer_add_hton_32(buf, TAU_ACTION_CONNECT);
         evbuffer_add_hton_32(buf, tracker->connection_transaction_id);
-        (void)tau_sendto(tracker->session, tracker->addr, tracker->port, evbuffer_pullup(buf, -1),
-                         evbuffer_get_length(buf));
+        (void)tau_sendto(tracker->session, tracker->addr, tracker->port, evbuffer_pullup(buf, -1), evbuffer_get_length(buf));
         evbuffer_free(buf);
         return;
     }
@@ -993,8 +983,8 @@ bool tau_handle_message(tr_session* session, uint8_t const* msg, size_t msglen)
     return false;
 }
 
-void tr_tracker_udp_announce(tr_session* session, tr_announce_request const* request,
-                             tr_announce_response_func response_func, void* user_data)
+void tr_tracker_udp_announce(tr_session* session, tr_announce_request const* request, tr_announce_response_func response_func,
+    void* user_data)
 {
     struct tr_announcer_udp* tau = announcer_udp_get(session);
     struct tau_tracker* tracker = tau_session_get_tracker(tau, request->url);
@@ -1003,8 +993,8 @@ void tr_tracker_udp_announce(tr_session* session, tr_announce_request const* req
     tau_tracker_upkeep_ex(tracker, false);
 }
 
-void tr_tracker_udp_scrape(tr_session* session, tr_scrape_request const* request,
-                           tr_scrape_response_func response_func, void* user_data)
+void tr_tracker_udp_scrape(tr_session* session, tr_scrape_request const* request, tr_scrape_response_func response_func,
+    void* user_data)
 {
     struct tr_announcer_udp* tau = announcer_udp_get(session);
     struct tau_tracker* tracker = tau_session_get_tracker(tau, request->url);

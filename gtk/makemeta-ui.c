@@ -41,7 +41,8 @@ typedef struct
     GtkTextBuffer* announce_text_buffer;
     TrCore* core;
     tr_metainfo_builder* builder;
-} MakeMetaUI;
+}
+MakeMetaUI;
 
 static void freeMetaUI(gpointer p)
 {
@@ -154,21 +155,22 @@ static void onProgressDialogResponse(GtkDialog* d, int response, gpointer data)
 
     switch (response)
     {
-        case GTK_RESPONSE_CANCEL:
-            ui->builder->abortFlag = TRUE;
-            gtk_widget_destroy(GTK_WIDGET(d));
-            break;
+    case GTK_RESPONSE_CANCEL:
+        ui->builder->abortFlag = TRUE;
+        gtk_widget_destroy(GTK_WIDGET(d));
+        break;
 
-        case GTK_RESPONSE_ACCEPT:
-            addTorrent(ui);
+    case GTK_RESPONSE_ACCEPT:
+        addTorrent(ui);
 
-            /* fall-through */
+    /* fall-through */
 
-        case GTK_RESPONSE_CLOSE:
-            gtk_widget_destroy(ui->builder->result ? GTK_WIDGET(d) : ui->dialog);
-            break;
+    case GTK_RESPONSE_CLOSE:
+        gtk_widget_destroy(ui->builder->result ? GTK_WIDGET(d) : ui->dialog);
+        break;
 
-        default: g_assert(0 && "unhandled response");
+    default:
+        g_assert(0 && "unhandled response");
     }
 }
 
@@ -180,10 +182,11 @@ static void makeProgressDialog(GtkWidget* parent, MakeMetaUI* ui)
     GtkWidget* v;
     GtkWidget* fr;
 
-    d = gtk_dialog_new_with_buttons(_("New Torrent"), GTK_WINDOW(parent),
-                                    GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT, _("_Cancel"),
-                                    GTK_RESPONSE_CANCEL, _("_Close"), GTK_RESPONSE_CLOSE, _("_Add"),
-                                    GTK_RESPONSE_ACCEPT, NULL);
+    d = gtk_dialog_new_with_buttons(_("New Torrent"), GTK_WINDOW(parent), GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
+        _("_Cancel"), GTK_RESPONSE_CANCEL,
+        _("_Close"), GTK_RESPONSE_CLOSE,
+        _("_Add"), GTK_RESPONSE_ACCEPT,
+        NULL);
     ui->progress_dialog = d;
     g_signal_connect(d, "response", G_CALLBACK(onProgressDialogResponse), ui);
 
@@ -203,8 +206,7 @@ static void makeProgressDialog(GtkWidget* parent, MakeMetaUI* ui)
     ui->progress_bar = w;
     gtk_box_pack_start(GTK_BOX(v), w, FALSE, FALSE, 0);
 
-    ui->progress_tag = gdk_threads_add_timeout_seconds(SECONDARY_WINDOW_REFRESH_INTERVAL_SECONDS,
-                                                       onProgressDialogRefresh, ui);
+    ui->progress_tag = gdk_threads_add_timeout_seconds(SECONDARY_WINDOW_REFRESH_INTERVAL_SECONDS, onProgressDialogRefresh, ui);
     g_object_weak_ref(G_OBJECT(d), onProgressDialogDestroyed, ui);
     onProgressDialogRefresh(ui);
 
@@ -269,8 +271,7 @@ static void onResponse(GtkDialog* d, int response, gpointer user_data)
 
             /* build the .torrent */
             makeProgressDialog(GTK_WIDGET(d), ui);
-            tr_makeMetaInfo(ui->builder, ui->target, trackers, n, useComment ? comment : NULL,
-                            isPrivate);
+            tr_makeMetaInfo(ui->builder, ui->target, trackers, n, useComment ? comment : NULL, isPrivate);
 
             /* cleanup */
             g_free(trackers);
@@ -311,14 +312,12 @@ static void updatePiecesLabel(MakeMetaUI* ui)
     {
         char buf[128];
         tr_strlsize(buf, builder->totalSize, sizeof(buf));
-        g_string_append_printf(
-            gstr, ngettext("%1$s; %2$'d File", "%1$s; %2$'d Files", builder->fileCount), buf,
+        g_string_append_printf(gstr, ngettext("%1$s; %2$'d File", "%1$s; %2$'d Files", builder->fileCount), buf,
             builder->fileCount);
         g_string_append(gstr, "; ");
 
         tr_formatter_mem_B(buf, builder->pieceSize, sizeof(buf));
-        g_string_append_printf(
-            gstr, ngettext("%1$'d Piece @ %2$s", "%1$'d Pieces @ %2$s", builder->pieceCount),
+        g_string_append_printf(gstr, ngettext("%1$'d Piece @ %2$s", "%1$'d Pieces @ %2$s", builder->pieceCount),
             builder->pieceCount, buf);
     }
 
@@ -388,8 +387,7 @@ static char const* getDefaultSavePath(void)
 }
 
 static void on_drag_data_received(GtkWidget* widget, GdkDragContext* drag_context, gint x, gint y,
-                                  GtkSelectionData* selection_data, guint info, guint time_,
-                                  gpointer user_data)
+    GtkSelectionData* selection_data, guint info, guint time_, gpointer user_data)
 {
     TR_UNUSED(widget);
     TR_UNUSED(x);
@@ -444,8 +442,9 @@ GtkWidget* gtr_torrent_creation_dialog_new(GtkWindow* parent, TrCore* core)
     ui->core = core;
 
     d = gtk_dialog_new_with_buttons(_("New Torrent"), parent, GTK_DIALOG_DESTROY_WITH_PARENT,
-                                    _("_Close"), GTK_RESPONSE_CLOSE, _("_New"), GTK_RESPONSE_ACCEPT,
-                                    NULL);
+        _("_Close"), GTK_RESPONSE_CLOSE,
+        _("_New"), GTK_RESPONSE_ACCEPT,
+        NULL);
     ui->dialog = d;
     g_signal_connect(d, "response", G_CALLBACK(onResponse), ui);
     g_object_set_data_full(G_OBJECT(d), "ui", ui, freeMetaUI);
@@ -496,17 +495,15 @@ GtkWidget* gtr_torrent_creation_dialog_new(GtkWindow* parent, TrCore* core)
     w = gtk_text_view_new_with_buffer(ui->announce_text_buffer);
     gtk_widget_set_size_request(w, -1, 80);
     sw = gtk_scrolled_window_new(NULL, NULL);
-    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(sw), GTK_POLICY_AUTOMATIC,
-                                   GTK_POLICY_AUTOMATIC);
+    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(sw), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
     gtk_container_add(GTK_CONTAINER(sw), w);
     fr = gtk_frame_new(NULL);
     gtk_frame_set_shadow_type(GTK_FRAME(fr), GTK_SHADOW_IN);
     gtk_container_add(GTK_CONTAINER(fr), sw);
     gtk_box_pack_start(GTK_BOX(v), fr, TRUE, TRUE, 0);
     l = gtk_label_new(NULL);
-    gtk_label_set_markup(GTK_LABEL(l),
-                         _("To add a backup URL, add it on the line after the primary URL.\n"
-                           "To add another primary URL, add it after a blank line."));
+    gtk_label_set_markup(GTK_LABEL(l), _("To add a backup URL, add it on the line after the primary URL.\n"
+        "To add another primary URL, add it after a blank line."));
     gtk_label_set_justify(GTK_LABEL(l), GTK_JUSTIFY_LEFT);
     g_object_set(l, "halign", GTK_ALIGN_START, "valign", GTK_ALIGN_CENTER, NULL);
     gtk_box_pack_start(GTK_BOX(v), l, FALSE, FALSE, 0);

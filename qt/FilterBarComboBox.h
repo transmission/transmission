@@ -17,7 +17,7 @@ class FilterBarComboBox : public QComboBox
     Q_OBJECT
     TR_DISABLE_COPY_MOVE(FilterBarComboBox)
 
-   public:
+public:
     enum
     {
         CountRole = Qt::UserRole + 1,
@@ -25,17 +25,17 @@ class FilterBarComboBox : public QComboBox
         UserRole
     };
 
-   public:
+public:
     FilterBarComboBox(QWidget* parent = nullptr);
 
     // QWidget
     QSize minimumSizeHint() const override;
     QSize sizeHint() const override;
 
-   protected:
+protected:
     // QWidget
     void paintEvent(QPaintEvent* e) override;
 
-   private:
+private:
     QSize calculateSize(QSize const& text_size, QSize const& count_size) const;
 };

@@ -17,17 +17,20 @@ class TrackerModelFilter : public QSortFilterProxyModel
     Q_OBJECT
     TR_DISABLE_COPY_MOVE(TrackerModelFilter)
 
-   public:
+public:
     TrackerModelFilter(QObject* parent = nullptr);
 
     void setShowBackupTrackers(bool);
 
-    bool showBackupTrackers() const { return show_backups_; }
+    bool showBackupTrackers() const
+    {
+        return show_backups_;
+    }
 
-   protected:
+protected:
     // QSortFilterProxyModel
     virtual bool filterAcceptsRow(int source_row, QModelIndex const& source_parent) const override;
 
-   private:
+private:
     bool show_backups_ = {};
 };

@@ -6,8 +6,8 @@
  *
  */
 
-#include "hig.h"
 #include <gtk/gtk.h>
+#include "hig.h"
 
 GtkWidget* hig_workarea_create(void)
 {
@@ -67,8 +67,7 @@ void hig_workarea_add_wide_tall_control(GtkWidget* t, guint* row, GtkWidget* w)
     hig_workarea_add_wide_control(t, row, w);
 }
 
-GtkWidget* hig_workarea_add_wide_checkbutton(GtkWidget* t, guint* row, char const* mnemonic_string,
-                                             gboolean is_active)
+GtkWidget* hig_workarea_add_wide_checkbutton(GtkWidget* t, guint* row, char const* mnemonic_string, gboolean is_active)
 {
     GtkWidget* w = gtk_check_button_new_with_mnemonic(mnemonic_string);
 
@@ -87,8 +86,11 @@ void hig_workarea_add_label_w(GtkWidget* t, guint row, GtkWidget* w)
 
     if (GTK_IS_LABEL(w))
     {
-        g_object_set(w, "halign", GTK_ALIGN_START, "valign", GTK_ALIGN_CENTER, "use-markup", TRUE,
-                     NULL);
+        g_object_set(w,
+            "halign", GTK_ALIGN_START,
+            "valign", GTK_ALIGN_CENTER,
+            "use-markup", TRUE,
+            NULL);
     }
 
     gtk_grid_attach(GTK_GRID(t), w, 0, row, 1, 1);
@@ -98,7 +100,10 @@ static void hig_workarea_add_tall_control(GtkWidget* t, guint row, GtkWidget* co
 {
     if (GTK_IS_LABEL(control))
     {
-        g_object_set(control, "halign", GTK_ALIGN_START, "valign", GTK_ALIGN_CENTER, NULL);
+        g_object_set(control,
+            "halign", GTK_ALIGN_START,
+            "valign", GTK_ALIGN_CENTER,
+            NULL);
     }
 
     g_object_set(control, "expand", TRUE, NULL);
@@ -109,15 +114,17 @@ static void hig_workarea_add_control(GtkWidget* t, guint row, GtkWidget* control
 {
     if (GTK_IS_LABEL(control))
     {
-        g_object_set(control, "halign", GTK_ALIGN_START, "valign", GTK_ALIGN_CENTER, NULL);
+        g_object_set(control,
+            "halign", GTK_ALIGN_START,
+            "valign", GTK_ALIGN_CENTER,
+            NULL);
     }
 
     gtk_widget_set_hexpand(control, TRUE);
     gtk_grid_attach(GTK_GRID(t), control, 1, row, 1, 1);
 }
 
-void hig_workarea_add_row_w(GtkWidget* t, guint* row, GtkWidget* label, GtkWidget* control,
-                            GtkWidget* mnemonic)
+void hig_workarea_add_row_w(GtkWidget* t, guint* row, GtkWidget* label, GtkWidget* control, GtkWidget* mnemonic)
 {
     hig_workarea_add_label_w(t, *row, label);
     hig_workarea_add_control(t, *row, control);
@@ -130,8 +137,7 @@ void hig_workarea_add_row_w(GtkWidget* t, guint* row, GtkWidget* label, GtkWidge
     ++*row;
 }
 
-GtkWidget* hig_workarea_add_row(GtkWidget* t, guint* row, char const* mnemonic_string,
-                                GtkWidget* control, GtkWidget* mnemonic)
+GtkWidget* hig_workarea_add_row(GtkWidget* t, guint* row, char const* mnemonic_string, GtkWidget* control, GtkWidget* mnemonic)
 {
     GtkWidget* l = gtk_label_new_with_mnemonic(mnemonic_string);
 
@@ -139,8 +145,8 @@ GtkWidget* hig_workarea_add_row(GtkWidget* t, guint* row, char const* mnemonic_s
     return l;
 }
 
-GtkWidget* hig_workarea_add_tall_row(GtkWidget* table, guint* row, char const* mnemonic_string,
-                                     GtkWidget* control, GtkWidget* mnemonic)
+GtkWidget* hig_workarea_add_tall_row(GtkWidget* table, guint* row, char const* mnemonic_string, GtkWidget* control,
+    GtkWidget* mnemonic)
 {
     GtkWidget* l = gtk_label_new_with_mnemonic(mnemonic_string);
     GtkWidget* h = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);

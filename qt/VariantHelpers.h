@@ -8,8 +8,8 @@
 
 #pragma once
 
-#include <optional>
 #include <string_view>
+#include <optional>
 
 #include <QString>
 #include <QVector>
@@ -26,9 +26,12 @@ struct TrackerStat;
 
 namespace trqt
 {
+
 namespace variant_helpers
 {
-template <typename T, typename std::enable_if<std::is_same_v<T, bool>>::type* = nullptr>
+
+template<typename T,
+    typename std::enable_if<std::is_same_v<T, bool>>::type* = nullptr>
 auto getValue(tr_variant const* variant)
 {
     std::optional<T> ret;
@@ -41,13 +44,11 @@ auto getValue(tr_variant const* variant)
     return ret;
 }
 
-template <
-    typename T,
-    typename std::enable_if<
-        std::is_same_v<
-            T,
-            int64_t> || std::is_same_v<T, uint64_t> || std::is_same_v<T, int> || std::is_same_v<T, time_t>>::
-        type* = nullptr>
+template<typename T,
+    typename std::enable_if<std::is_same_v<T, int64_t>||
+    std::is_same_v<T, uint64_t>||
+    std::is_same_v<T, int>||
+    std::is_same_v<T, time_t>>::type* = nullptr>
 auto getValue(tr_variant const* variant)
 {
     std::optional<T> ret;
@@ -60,7 +61,8 @@ auto getValue(tr_variant const* variant)
     return ret;
 }
 
-template <typename T, typename std::enable_if<std::is_same_v<T, double>>::type* = nullptr>
+template<typename T,
+    typename std::enable_if<std::is_same_v<T, double>>::type* = nullptr>
 auto getValue(tr_variant const* variant)
 {
     std::optional<T> ret;
@@ -73,7 +75,7 @@ auto getValue(tr_variant const* variant)
     return ret;
 }
 
-template <typename T, typename std::enable_if<std::is_same_v<T, QString>>::type* = nullptr>
+template<typename T, typename std::enable_if<std::is_same_v<T, QString>>::type* = nullptr>
 auto getValue(tr_variant const* variant)
 {
     std::optional<T> ret;
@@ -87,7 +89,7 @@ auto getValue(tr_variant const* variant)
     return ret;
 }
 
-template <typename T, typename std::enable_if<std::is_same_v<T, std::string_view>>::type* = nullptr>
+template<typename T, typename std::enable_if<std::is_same_v<T, std::string_view>>::type* = nullptr>
 auto getValue(tr_variant const* variant)
 {
     std::optional<T> ret;
@@ -101,7 +103,7 @@ auto getValue(tr_variant const* variant)
     return ret;
 }
 
-template <typename T>
+template<typename T>
 bool change(T& setme, T const& value)
 {
     bool const changed = setme != value;
@@ -121,14 +123,14 @@ bool change(TorrentFile& setme, tr_variant const* value);
 bool change(TorrentHash& setme, tr_variant const* value);
 bool change(TrackerStat& setme, tr_variant const* value);
 
-template <typename T>
+template<typename T>
 bool change(T& setme, tr_variant const* variant)
 {
     auto const value = getValue<T>(variant);
     return value && change(setme, *value);
 }
 
-template <typename T>
+template<typename T>
 bool change(QVector<T>& setme, tr_variant const* value)
 {
     bool changed = false;
@@ -142,8 +144,7 @@ bool change(QVector<T>& setme, tr_variant const* value)
 
     for (int i = 0; i < n; ++i)
     {
-        changed =
-            change(setme[i], tr_variantListChild(const_cast<tr_variant*>(value), i)) || changed;
+        changed = change(setme[i], tr_variantListChild(const_cast<tr_variant*>(value), i)) || changed;
     }
 
     return changed;
@@ -151,7 +152,7 @@ bool change(QVector<T>& setme, tr_variant const* value)
 
 ///
 
-template <typename T>
+template<typename T>
 auto dictFind(tr_variant* dict, tr_quark key)
 {
     std::optional<T> ret;
@@ -174,9 +175,9 @@ void variantInit(tr_variant* init_me, double value);
 void variantInit(tr_variant* init_me, QByteArray const& value);
 void variantInit(tr_variant* init_me, QString const& value);
 void variantInit(tr_variant* init_me, std::string_view value);
-void variantInit(tr_variant* init_me, char const* value) = delete;  // use string_view
+void variantInit(tr_variant* init_me, char const* value) = delete; // use string_view
 
-template <typename C, typename T = typename C::value_type>
+template<typename C, typename T = typename C::value_type>
 void variantInit(tr_variant* init_me, C const& value)
 {
     tr_variantInitList(init_me, std::size(value));
@@ -186,18 +187,18 @@ void variantInit(tr_variant* init_me, C const& value)
     }
 }
 
-template <typename T>
+template<typename T>
 void listAdd(tr_variant* list, T const& value)
 {
     variantInit(tr_variantListAdd(list), value);
 }
 
-template <typename T>
+template<typename T>
 void dictAdd(tr_variant* dict, tr_quark key, T const& value)
 {
     variantInit(tr_variantDictAdd(dict, key), value);
 }
 
-}  // namespace variant_helpers
+} // namespace variant_helpers
 
-}  // namespace trqt
+} // trqt

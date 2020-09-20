@@ -23,14 +23,14 @@ static TR_DEFINE_QUARK(tr_core, core)
 
 #ifdef HAVE_LIBAPPINDICATOR
 
-    void gtr_icon_refresh(gpointer vindicator)
+void gtr_icon_refresh(gpointer vindicator)
 {
     TR_UNUSED(vindicator);
 }
 
 #else
 
-    static void activated(GtkStatusIcon* self, gpointer user_data)
+static void activated(GtkStatusIcon* self, gpointer user_data)
 {
     TR_UNUSED(self);
     TR_UNUSED(user_data);
@@ -116,8 +116,7 @@ void gtr_icon_refresh(gpointer vicon)
      * %2$s: current upload limit, if any
      * %3$s: current download speed
      * %4$s: current download limit, if any */
-    g_snprintf(tip, sizeof(tip), _("Transmission\nUp: %1$s %2$s\nDown: %3$s %4$s"), up, upLimit,
-               down, downLimit);
+    g_snprintf(tip, sizeof(tip), _("Transmission\nUp: %1$s %2$s\nDown: %3$s %4$s"), up, upLimit, down, downLimit);
 
     gtk_status_icon_set_tooltip_text(GTK_STATUS_ICON(icon), tip);
 }
@@ -138,8 +137,7 @@ static char const* getIconName(void)
     }
     else
     {
-        GtkIconInfo* icon_info =
-            gtk_icon_theme_lookup_icon(theme, TRAY_ICON, 48, GTK_ICON_LOOKUP_USE_BUILTIN);
+        GtkIconInfo* icon_info = gtk_icon_theme_lookup_icon(theme, TRAY_ICON, 48, GTK_ICON_LOOKUP_USE_BUILTIN);
         gboolean const icon_is_builtin = gtk_icon_info_get_filename(icon_info) == NULL;
 
 #if GTK_CHECK_VERSION(3, 8, 0)
@@ -160,8 +158,7 @@ gpointer gtr_icon_new(TrCore* core)
 
     GtkWidget* w;
     char const* icon_name = getIconName();
-    AppIndicator* indicator =
-        app_indicator_new(ICON_NAME, icon_name, APP_INDICATOR_CATEGORY_SYSTEM_SERVICES);
+    AppIndicator* indicator = app_indicator_new(ICON_NAME, icon_name, APP_INDICATOR_CATEGORY_SYSTEM_SERVICES);
     app_indicator_set_status(indicator, APP_INDICATOR_STATUS_ACTIVE);
     w = gtr_action_get_widget("/icon-popup");
     app_indicator_set_menu(indicator, GTK_MENU(w));

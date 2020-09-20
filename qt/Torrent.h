@@ -10,7 +10,7 @@
 
 #include <array>
 #include <bitset>
-#include <ctime>  // time_t
+#include <ctime> // time_t
 
 #include <QIcon>
 #include <QMetaType>
@@ -35,7 +35,7 @@ class Prefs;
 
 extern "C"
 {
-    struct tr_variant;
+struct tr_variant;
 }
 
 struct Peer
@@ -106,21 +106,36 @@ using FileList = QVector<TorrentFile>;
 
 class TorrentHash
 {
-   private:
+private:
     std::array<uint8_t, SHA_DIGEST_LENGTH> data_ = {};
 
-   public:
+public:
     TorrentHash() {}
 
-    TorrentHash(char const* str) { tr_hex_to_sha1(data_.data(), str); }
+    TorrentHash(char const* str)
+    {
+        tr_hex_to_sha1(data_.data(), str);
+    }
 
-    TorrentHash(QString const& str) { tr_hex_to_sha1(data_.data(), str.toUtf8().constData()); }
+    TorrentHash(QString const& str)
+    {
+        tr_hex_to_sha1(data_.data(), str.toUtf8().constData());
+    }
 
-    bool operator==(TorrentHash const& that) const { return data_ == that.data_; }
+    bool operator ==(TorrentHash const& that) const
+    {
+        return data_ == that.data_;
+    }
 
-    bool operator!=(TorrentHash const& that) const { return data_ != that.data_; }
+    bool operator !=(TorrentHash const& that) const
+    {
+        return data_ != that.data_;
+    }
 
-    bool operator<(TorrentHash const& that) const { return data_ < that.data_; }
+    bool operator <(TorrentHash const& that) const
+    {
+        return data_ < that.data_;
+    }
 
     QString toString() const
     {
@@ -135,56 +150,122 @@ class Torrent : public QObject
     Q_OBJECT
     TR_DISABLE_COPY_MOVE(Torrent)
 
-   public:
+public:
     Torrent(Prefs const&, int id);
 
-    int getBandwidthPriority() const { return bandwidth_priority_; }
+    int getBandwidthPriority() const
+    {
+        return bandwidth_priority_;
+    }
 
-    int id() const { return id_; }
+    int id() const
+    {
+        return id_;
+    }
 
-    QString const& name() const { return name_; }
+    QString const& name() const
+    {
+        return name_;
+    }
 
-    bool hasName() const { return !name_.isEmpty(); }
+    bool hasName() const
+    {
+        return !name_.isEmpty();
+    }
 
-    QString const& creator() const { return creator_; }
+    QString const& creator() const
+    {
+        return creator_;
+    }
 
-    QString const& comment() const { return comment_; }
+    QString const& comment() const
+    {
+        return comment_;
+    }
 
-    QString const& getPath() const { return download_dir_; }
+    QString const& getPath() const
+    {
+        return download_dir_;
+    }
 
     QString getError() const;
 
-    TorrentHash const& hash() const { return hash_; }
+    TorrentHash const& hash() const
+    {
+        return hash_;
+    }
 
-    bool hasError() const { return error_ != TR_STAT_OK; }
+    bool hasError() const
+    {
+        return error_ != TR_STAT_OK;
+    }
 
-    bool isDone() const { return leftUntilDone() == 0; }
+    bool isDone() const
+    {
+        return leftUntilDone() == 0;
+    }
 
-    bool isSeed() const { return haveVerified() >= totalSize(); }
+    bool isSeed() const
+    {
+        return haveVerified() >= totalSize();
+    }
 
-    bool isPrivate() const { return is_private_; }
+    bool isPrivate() const
+    {
+        return is_private_;
+    }
 
     bool getSeedRatio(double& setmeRatio) const;
 
-    uint64_t haveVerified() const { return have_verified_; }
+    uint64_t haveVerified() const
+    {
+        return have_verified_;
+    }
 
-    uint64_t haveUnverified() const { return have_unchecked_; }
+    uint64_t haveUnverified() const
+    {
+        return have_unchecked_;
+    }
 
-    uint64_t desiredAvailable() const { return desired_available_; }
+    uint64_t desiredAvailable() const
+    {
+        return desired_available_;
+    }
 
-    uint64_t haveTotal() const { return haveVerified() + haveUnverified(); }
+    uint64_t haveTotal() const
+    {
+        return haveVerified() + haveUnverified();
+    }
 
-    uint64_t totalSize() const { return total_size_; }
+    uint64_t totalSize() const
+    {
+        return total_size_;
+    }
 
-    uint64_t sizeWhenDone() const { return size_when_done_; }
+    uint64_t sizeWhenDone() const
+    {
+        return size_when_done_;
+    }
 
-    uint64_t leftUntilDone() const { return left_until_done_; }
+    uint64_t leftUntilDone() const
+    {
+        return left_until_done_;
+    }
 
-    uint64_t pieceSize() const { return piece_size_; }
+    uint64_t pieceSize() const
+    {
+        return piece_size_;
+    }
 
-    bool hasMetadata() const { return metadataPercentDone() >= 1.0; }
+    bool hasMetadata() const
+    {
+        return metadataPercentDone() >= 1.0;
+    }
 
-    int pieceCount() const { return piece_count_; }
+    int pieceCount() const
+    {
+        return piece_count_;
+    }
 
     double ratio() const
     {
@@ -206,120 +287,258 @@ class Torrent : public QObject
         return s ? double(s - l) / s : 0.0;
     }
 
-    double metadataPercentDone() const { return metadata_percent_complete_; }
+    double metadataPercentDone() const
+    {
+        return metadata_percent_complete_;
+    }
 
-    uint64_t downloadedEver() const { return downloaded_ever_; }
+    uint64_t downloadedEver() const
+    {
+        return downloaded_ever_;
+    }
 
-    uint64_t uploadedEver() const { return uploaded_ever_; }
+    uint64_t uploadedEver() const
+    {
+        return uploaded_ever_;
+    }
 
-    uint64_t failedEver() const { return failed_ever_; }
+    uint64_t failedEver() const
+    {
+        return failed_ever_;
+    }
 
     int compareSeedRatio(Torrent const&) const;
     int compareRatio(Torrent const&) const;
     int compareETA(Torrent const&) const;
 
-    bool hasETA() const { return getETA() >= 0; }
+    bool hasETA() const
+    {
+        return getETA() >= 0;
+    }
 
-    int getETA() const { return eta_; }
+    int getETA() const
+    {
+        return eta_;
+    }
 
-    time_t lastActivity() const { return activity_date_; }
+    time_t lastActivity() const
+    {
+        return activity_date_;
+    }
 
-    time_t lastStarted() const { return start_date_; }
+    time_t lastStarted() const
+    {
+        return start_date_;
+    }
 
-    time_t dateAdded() const { return added_date_; }
+    time_t dateAdded() const
+    {
+        return added_date_;
+    }
 
-    time_t dateCreated() const { return date_created_; }
+    time_t dateCreated() const
+    {
+        return date_created_;
+    }
 
-    time_t dateEdited() const { return edit_date_; }
+    time_t dateEdited() const
+    {
+        return edit_date_;
+    }
 
-    time_t manualAnnounceTime() const { return manual_announce_time_; }
+    time_t manualAnnounceTime() const
+    {
+        return manual_announce_time_;
+    }
 
     bool canManualAnnounceAt(time_t t) const
     {
         return isReadyToTransfer() && (manualAnnounceTime() <= t);
     }
 
-    int peersWeAreDownloadingFrom() const { return peers_sending_to_us_; }
+    int peersWeAreDownloadingFrom() const
+    {
+        return peers_sending_to_us_;
+    }
 
-    int webseedsWeAreDownloadingFrom() const { return webseeds_sending_to_us_; }
+    int webseedsWeAreDownloadingFrom() const
+    {
+        return webseeds_sending_to_us_;
+    }
 
-    int peersWeAreUploadingTo() const { return peers_getting_from_us_; }
+    int peersWeAreUploadingTo() const
+    {
+        return peers_getting_from_us_;
+    }
 
-    bool isUploading() const { return peersWeAreUploadingTo() > 0; }
+    bool isUploading() const
+    {
+        return peersWeAreUploadingTo() > 0;
+    }
 
-    int connectedPeers() const { return peers_connected_; }
+    int connectedPeers() const
+    {
+        return peers_connected_;
+    }
 
     int connectedPeersAndWebseeds() const
     {
         return connectedPeers() + webseedsWeAreDownloadingFrom();
     }
 
-    Speed const& downloadSpeed() const { return download_speed_; }
+    Speed const& downloadSpeed() const
+    {
+        return download_speed_;
+    }
 
-    Speed const& uploadSpeed() const { return upload_speed_; }
+    Speed const& uploadSpeed() const
+    {
+        return upload_speed_;
+    }
 
-    double getVerifyProgress() const { return recheck_progress_; }
+    double getVerifyProgress() const
+    {
+        return recheck_progress_;
+    }
 
     bool includesTracker(FaviconCache::Key const& key) const;
 
-    FaviconCache::Keys const& trackerKeys() const { return tracker_keys_; }
+    FaviconCache::Keys const& trackerKeys() const
+    {
+        return tracker_keys_;
+    }
 
-    Speed uploadLimit() const { return Speed::fromKBps(upload_limit_); }
+    Speed uploadLimit() const
+    {
+        return Speed::fromKBps(upload_limit_);
+    }
 
-    Speed downloadLimit() const { return Speed::fromKBps(download_limit_); }
+    Speed downloadLimit() const
+    {
+        return Speed::fromKBps(download_limit_);
+    }
 
-    bool uploadIsLimited() const { return upload_limited_; }
+    bool uploadIsLimited() const
+    {
+        return upload_limited_;
+    }
 
-    bool downloadIsLimited() const { return download_limited_; }
+    bool downloadIsLimited() const
+    {
+        return download_limited_;
+    }
 
-    bool honorsSessionLimits() const { return honors_session_limits_; }
+    bool honorsSessionLimits() const
+    {
+        return honors_session_limits_;
+    }
 
-    int peerLimit() const { return peer_limit_; }
+    int peerLimit() const
+    {
+        return peer_limit_;
+    }
 
-    double seedRatioLimit() const { return seed_ratio_limit_; }
+    double seedRatioLimit() const
+    {
+        return seed_ratio_limit_;
+    }
 
-    tr_ratiolimit seedRatioMode() const { return static_cast<tr_ratiolimit>(seed_ratio_mode_); }
+    tr_ratiolimit seedRatioMode() const
+    {
+        return static_cast<tr_ratiolimit>(seed_ratio_mode_);
+    }
 
-    int seedIdleLimit() const { return seed_idle_limit_; }
+    int seedIdleLimit() const
+    {
+        return seed_idle_limit_;
+    }
 
-    tr_idlelimit seedIdleMode() const { return static_cast<tr_idlelimit>(seed_idle_mode_); }
+    tr_idlelimit seedIdleMode() const
+    {
+        return static_cast<tr_idlelimit>(seed_idle_mode_);
+    }
 
-    TrackerStatsList const& trackerStats() const { return tracker_stats_; }
+    TrackerStatsList const& trackerStats() const
+    {
+        return tracker_stats_;
+    }
 
-    PeerList const& peers() const { return peers_; }
+    PeerList const& peers() const
+    {
+        return peers_;
+    }
 
-    FileList const& files() const { return files_; }
+    FileList const& files() const
+    {
+        return files_;
+    }
 
-    int queuePosition() const { return queue_position_; }
+    int queuePosition() const
+    {
+        return queue_position_;
+    }
 
-    bool isStalled() const { return is_stalled_; }
+    bool isStalled() const
+    {
+        return is_stalled_;
+    }
 
     QString activityString() const;
 
-    tr_torrent_activity getActivity() const { return static_cast<tr_torrent_activity>(status_); }
+    tr_torrent_activity getActivity() const
+    {
+        return static_cast<tr_torrent_activity>(status_);
+    }
 
-    bool isFinished() const { return is_finished_; }
+    bool isFinished() const
+    {
+        return is_finished_;
+    }
 
-    bool isPaused() const { return getActivity() == TR_STATUS_STOPPED; }
+    bool isPaused() const
+    {
+        return getActivity() == TR_STATUS_STOPPED;
+    }
 
-    bool isWaitingToVerify() const { return getActivity() == TR_STATUS_CHECK_WAIT; }
+    bool isWaitingToVerify() const
+    {
+        return getActivity() == TR_STATUS_CHECK_WAIT;
+    }
 
-    bool isVerifying() const { return getActivity() == TR_STATUS_CHECK; }
+    bool isVerifying() const
+    {
+        return getActivity() == TR_STATUS_CHECK;
+    }
 
-    bool isDownloading() const { return getActivity() == TR_STATUS_DOWNLOAD; }
+    bool isDownloading() const
+    {
+        return getActivity() == TR_STATUS_DOWNLOAD;
+    }
 
-    bool isWaitingToDownload() const { return getActivity() == TR_STATUS_DOWNLOAD_WAIT; }
+    bool isWaitingToDownload() const
+    {
+        return getActivity() == TR_STATUS_DOWNLOAD_WAIT;
+    }
 
-    bool isSeeding() const { return getActivity() == TR_STATUS_SEED; }
+    bool isSeeding() const
+    {
+        return getActivity() == TR_STATUS_SEED;
+    }
 
-    bool isWaitingToSeed() const { return getActivity() == TR_STATUS_SEED_WAIT; }
+    bool isWaitingToSeed() const
+    {
+        return getActivity() == TR_STATUS_SEED_WAIT;
+    }
 
     bool isReadyToTransfer() const
     {
         return getActivity() == TR_STATUS_DOWNLOAD || getActivity() == TR_STATUS_SEED;
     }
 
-    bool isQueued() const { return isWaitingToDownload() || isWaitingToSeed(); }
+    bool isQueued() const
+    {
+        return isWaitingToDownload() || isWaitingToSeed();
+    }
 
     QIcon getMimeTypeIcon() const;
 
@@ -386,7 +605,7 @@ class Torrent : public QObject
 
     fields_t update(tr_quark const* keys, tr_variant const* const* values, size_t n);
 
-   private:
+private:
     int const id_;
 
     bool download_limited_ = {};

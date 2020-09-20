@@ -6,10 +6,13 @@
  *
  */
 
-#include "TrackerModelFilter.h"
 #include "TrackerModel.h"
+#include "TrackerModelFilter.h"
 
-TrackerModelFilter::TrackerModelFilter(QObject* parent) : QSortFilterProxyModel(parent) {}
+TrackerModelFilter::TrackerModelFilter(QObject* parent) :
+    QSortFilterProxyModel(parent)
+{
+}
 
 void TrackerModelFilter::setShowBackupTrackers(bool b)
 {

@@ -12,7 +12,6 @@
 
 #ifdef _WIN32
 #include <windows.h>
-
 #include <shellapi.h>
 #endif
 
@@ -37,7 +36,7 @@
 #endif
 
 #include <libtransmission/transmission.h>
-#include <libtransmission/utils.h>  // tr_formatter
+#include <libtransmission/utils.h> // tr_formatter
 
 #include "Utils.h"
 
@@ -47,12 +46,13 @@
 
 namespace
 {
+
 bool isSlashChar(QChar const& c)
 {
     return c == QLatin1Char('/') || c == QLatin1Char('\\');
 }
 
-}  // namespace
+} // namespace
 
 QIcon Utils::getIconFromIndex(QModelIndex const& index)
 {
@@ -60,27 +60,30 @@ QIcon Utils::getIconFromIndex(QModelIndex const& index)
 
     switch (variant.type())
     {
-        case QVariant::Icon: return qvariant_cast<QIcon>(variant);
+    case QVariant::Icon:
+        return qvariant_cast<QIcon>(variant);
 
-        case QVariant::Pixmap: return QIcon(qvariant_cast<QPixmap>(variant));
+    case QVariant::Pixmap:
+        return QIcon(qvariant_cast<QPixmap>(variant));
 
-        default: return QIcon();
+    default:
+        return QIcon();
     }
 }
 
 bool Utils::isValidUtf8(char const* s)
 {
-    int n;  // number of bytes in a UTF-8 sequence
+    int n; // number of bytes in a UTF-8 sequence
 
     for (char const* c = s; *c != '\0'; c += n)
     {
         if ((*c & 0x80) == 0x00)
         {
-            n = 1;  // ASCII
+            n = 1; // ASCII
         }
         else if ((*c & 0xc0) == 0x80)
-        {                  // NOLINT(bugprone-branch-clone)
-            return false;  // not valid
+        { // NOLINT(bugprone-branch-clone)
+            return false; // not valid
         }
         else if ((*c & 0xe0) == 0xc0)
         {
@@ -140,10 +143,8 @@ int Utils::measureViewItem(QAbstractItemView* view, QString const& text)
     option.textElideMode = Qt::ElideNone;
     option.font = view->font();
 
-    return view->style()
-        ->sizeFromContents(QStyle::CT_ItemViewItem, &option,
-                           QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX), view)
-        .width();
+    return view->style()->sizeFromContents(QStyle::CT_ItemViewItem, &option, QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX), view).
+        width();
 }
 
 int Utils::measureHeaderItem(QHeaderView* view, QString const& text)
@@ -151,12 +152,9 @@ int Utils::measureHeaderItem(QHeaderView* view, QString const& text)
     QStyleOptionHeader option;
     option.initFrom(view);
     option.text = text;
-    option.sortIndicator =
-        view->isSortIndicatorShown() ? QStyleOptionHeader::SortDown : QStyleOptionHeader::None;
+    option.sortIndicator = view->isSortIndicatorShown() ? QStyleOptionHeader::SortDown : QStyleOptionHeader::None;
 
-    return view->style()
-        ->sizeFromContents(QStyle::CT_HeaderSection, &option, QSize(), view)
-        .width();
+    return view->style()->sizeFromContents(QStyle::CT_HeaderSection, &option, QSize(), view).width();
 }
 
 QColor Utils::getFadedColor(QColor const& color)

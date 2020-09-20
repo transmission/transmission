@@ -13,23 +13,28 @@ bool FilterMode::test(Torrent const& tor, int mode)
 {
     switch (mode)
     {
-        case SHOW_ACTIVE:
-            return tor.peersWeAreUploadingTo() > 0 || tor.peersWeAreDownloadingFrom() > 0
-                   || tor.isVerifying();
+    case SHOW_ACTIVE:
+        return tor.peersWeAreUploadingTo() > 0 || tor.peersWeAreDownloadingFrom() > 0 || tor.isVerifying();
 
-        case SHOW_DOWNLOADING: return tor.isDownloading() || tor.isWaitingToDownload();
+    case SHOW_DOWNLOADING:
+        return tor.isDownloading() || tor.isWaitingToDownload();
 
-        case SHOW_ERROR: return tor.hasError();
+    case SHOW_ERROR:
+        return tor.hasError();
 
-        case SHOW_FINISHED: return tor.isFinished();
+    case SHOW_FINISHED:
+        return tor.isFinished();
 
-        case SHOW_PAUSED: return tor.isPaused();
+    case SHOW_PAUSED:
+        return tor.isPaused();
 
-        case SHOW_SEEDING: return tor.isSeeding() || tor.isWaitingToSeed();
+    case SHOW_SEEDING:
+        return tor.isSeeding() || tor.isWaitingToSeed();
 
-        case SHOW_VERIFYING: return tor.isVerifying() || tor.isWaitingToVerify();
+    case SHOW_VERIFYING:
+        return tor.isVerifying() || tor.isWaitingToVerify();
 
-        default:  // SHOW_ALL
-            return true;
+    default: // SHOW_ALL
+        return true;
     }
 }

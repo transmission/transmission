@@ -50,8 +50,7 @@ static void log_openssl_error(char const* file, int line)
 
         if (!strings_loaded)
         {
-#if OPENSSL_VERSION_NUMBER < 0x10100000 \
-    || (defined(LIBRESSL_VERSION_NUMBER) && LIBRESSL_VERSION_NUMBER < 0x20700000)
+#if OPENSSL_VERSION_NUMBER < 0x10100000 || (defined(LIBRESSL_VERSION_NUMBER) && LIBRESSL_VERSION_NUMBER < 0x20700000)
             ERR_load_crypto_strings();
 #else
             OPENSSL_init_crypto(OPENSSL_INIT_LOAD_CRYPTO_STRINGS, NULL);
@@ -69,8 +68,7 @@ static void log_openssl_error(char const* file, int line)
 
 #define log_error() log_openssl_error(__FILE__, __LINE__)
 
-static bool check_openssl_result(int result, int expected_result, bool expected_equal,
-                                 char const* file, int line)
+static bool check_openssl_result(int result, int expected_result, bool expected_equal, char const* file, int line)
 {
     bool const ret = (result == expected_result) == expected_equal;
 
@@ -83,8 +81,7 @@ static bool check_openssl_result(int result, int expected_result, bool expected_
 }
 
 #define check_result(result) check_openssl_result((result), 1, true, __FILE__, __LINE__)
-#define check_result_neq(result, x_result) \
-    check_openssl_result((result), (x_result), false, __FILE__, __LINE__)
+#define check_result_neq(result, x_result) check_openssl_result((result), (x_result), false, __FILE__, __LINE__)
 
 static bool check_openssl_pointer(void* pointer, char const* file, int line)
 {
@@ -241,8 +238,7 @@ void tr_rc4_process(tr_rc4_ctx_t handle, void const* input, void* output, size_t
 ****
 ***/
 
-#if OPENSSL_VERSION_NUMBER < 0x10100000 \
-    || (defined(LIBRESSL_VERSION_NUMBER) && LIBRESSL_VERSION_NUMBER < 0x20700000)
+#if OPENSSL_VERSION_NUMBER < 0x10100000 || (defined(LIBRESSL_VERSION_NUMBER) && LIBRESSL_VERSION_NUMBER < 0x20700000)
 
 static inline int DH_set0_pqg(DH* dh, BIGNUM* p, BIGNUM* q, BIGNUM* g)
 {
@@ -301,8 +297,8 @@ static inline void DH_get0_key(DH const* dh, BIGNUM const** pub_key, BIGNUM cons
 
 #endif
 
-tr_dh_ctx_t tr_dh_new(uint8_t const* prime_num, size_t prime_num_length,
-                      uint8_t const* generator_num, size_t generator_num_length)
+tr_dh_ctx_t tr_dh_new(uint8_t const* prime_num, size_t prime_num_length, uint8_t const* generator_num,
+    size_t generator_num_length)
 {
     TR_ASSERT(prime_num != NULL);
     TR_ASSERT(generator_num != NULL);
@@ -335,8 +331,7 @@ void tr_dh_free(tr_dh_ctx_t handle)
     DH_free(handle);
 }
 
-bool tr_dh_make_key(tr_dh_ctx_t raw_handle, size_t private_key_length, uint8_t* public_key,
-                    size_t* public_key_length)
+bool tr_dh_make_key(tr_dh_ctx_t raw_handle, size_t private_key_length, uint8_t* public_key, size_t* public_key_length)
 {
     TR_ASSERT(raw_handle != NULL);
     TR_ASSERT(public_key != NULL);
@@ -368,8 +363,7 @@ bool tr_dh_make_key(tr_dh_ctx_t raw_handle, size_t private_key_length, uint8_t* 
     return true;
 }
 
-tr_dh_secret_t tr_dh_agree(tr_dh_ctx_t handle, uint8_t const* other_public_key,
-                           size_t other_public_key_length)
+tr_dh_secret_t tr_dh_agree(tr_dh_ctx_t handle, uint8_t const* other_public_key, size_t other_public_key_length)
 {
     TR_ASSERT(handle != NULL);
     TR_ASSERT(other_public_key != NULL);

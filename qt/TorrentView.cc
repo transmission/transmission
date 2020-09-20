@@ -14,8 +14,10 @@
 
 class TorrentView::HeaderWidget : public QWidget
 {
-   public:
-    explicit HeaderWidget(TorrentView* parent) : QWidget(parent), text_()
+public:
+    explicit HeaderWidget(TorrentView* parent) :
+        QWidget(parent),
+        text_()
     {
         setFont(qApp->font("QMiniFont"));
     }
@@ -37,7 +39,7 @@ class TorrentView::HeaderWidget : public QWidget
         return QSize(100, fontMetrics().height() + (option.rect.height() - label_rect.height()));
     }
 
-   protected:
+protected:
     // QWidget
     void paintEvent(QPaintEvent* /*event*/) override
     {
@@ -50,8 +52,7 @@ class TorrentView::HeaderWidget : public QWidget
         painter.drawControl(QStyle::CE_HeaderSection, option);
 
         option.rect = style()->subElementRect(QStyle::SE_HeaderLabel, &option, this);
-        painter.drawItemText(option.rect, Qt::AlignCenter, option.palette, true, text_,
-                             QPalette::ButtonText);
+        painter.drawItemText(option.rect, Qt::AlignCenter, option.palette, true, text_, QPalette::ButtonText);
     }
 
     void mouseDoubleClickEvent(QMouseEvent* /*event*/) override
@@ -59,12 +60,13 @@ class TorrentView::HeaderWidget : public QWidget
         emit static_cast<TorrentView*>(parent())->headerDoubleClicked();
     }
 
-   private:
+private:
     QString text_;
 };
 
-TorrentView::TorrentView(QWidget* parent)
-    : QListView(parent), header_widget_(new HeaderWidget(this))
+TorrentView::TorrentView(QWidget* parent) :
+    QListView(parent),
+    header_widget_(new HeaderWidget(this))
 {
 }
 

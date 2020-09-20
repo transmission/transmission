@@ -17,14 +17,14 @@ class PathButton : public QToolButton
     Q_OBJECT
     TR_DISABLE_COPY_MOVE(PathButton)
 
-   public:
+public:
     enum Mode
     {
         DirectoryMode,
         FileMode
     };
 
-   public:
+public:
     PathButton(QWidget* parent = nullptr);
 
     void setMode(Mode mode);
@@ -37,18 +37,18 @@ class PathButton : public QToolButton
     // QWidget
     QSize sizeHint() const override;
 
-   signals:
+signals:
     void pathChanged(QString const& path);
 
-   protected:
+protected:
     // QWidget
     void paintEvent(QPaintEvent* event) override;
 
-   private slots:
+private slots:
     void onClicked();
     void onFileSelected(QString const& path);
 
-   private:
+private:
     void updateAppearance();
 
     bool isDirMode() const;

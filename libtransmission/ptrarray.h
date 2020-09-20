@@ -28,16 +28,14 @@ typedef struct tr_ptrArray
     void** items;
     int n_items;
     int n_alloc;
-} tr_ptrArray;
+}
+tr_ptrArray;
 
 typedef tr_voidptr_compare_func PtrArrayCompareFunc;
 
-typedef void (*PtrArrayForeachFunc)(void*);
+typedef void (* PtrArrayForeachFunc)(void*);
 
-#define TR_PTR_ARRAY_INIT_STATIC \
-    {                            \
-        NULL, 0, 0               \
-    }
+#define TR_PTR_ARRAY_INIT_STATIC { NULL, 0, 0 }
 
 extern tr_ptrArray const TR_PTR_ARRAY_INIT;
 
@@ -115,16 +113,14 @@ static inline bool tr_ptrArrayEmpty(tr_ptrArray const* a)
     return tr_ptrArraySize(a) == 0;
 }
 
-int tr_ptrArrayLowerBound(tr_ptrArray const* array, void const* key,
-                          tr_voidptr_compare_func compare, bool* exact_match);
+int tr_ptrArrayLowerBound(tr_ptrArray const* array, void const* key, tr_voidptr_compare_func compare, bool* exact_match);
 
 /** @brief Insert a pointer into the array at the position determined by the sort function
     @return the index of the stored pointer */
 int tr_ptrArrayInsertSorted(tr_ptrArray* array, void* value, tr_voidptr_compare_func compare);
 
 /** @brief Remove this specific pointer from a sorted ptrarray */
-void tr_ptrArrayRemoveSortedPointer(tr_ptrArray* t, void const* ptr,
-                                    tr_voidptr_compare_func compare);
+void tr_ptrArrayRemoveSortedPointer(tr_ptrArray* t, void const* ptr, tr_voidptr_compare_func compare);
 
 /** @brief Find a pointer from an array sorted by the specified sort function
     @return the matching pointer, or NULL if no match was found */

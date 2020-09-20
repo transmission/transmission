@@ -31,7 +31,8 @@ typedef struct tr_bitfield
        This occurs when a magnet link's peers send have all / have none */
     bool have_all_hint;
     bool have_none_hint;
-} tr_bitfield;
+}
+tr_bitfield;
 
 /***
 ****

@@ -7,7 +7,7 @@
  */
 
 #include <limits.h> /* USHRT_MAX */
-#include <stdio.h>  /* fprintf() */
+#include <stdio.h> /* fprintf() */
 #include <string.h> /* strchr(), memcmp(), memcpy() */
 
 #include <event2/buffer.h>
@@ -18,7 +18,7 @@
 #include "transmission.h"
 #include "announcer-common.h"
 #include "log.h"
-#include "net.h"      /* tr_globalIPv6() */
+#include "net.h" /* tr_globalIPv6() */
 #include "peer-mgr.h" /* pex */
 #include "torrent.h"
 #include "trevent.h" /* tr_runInEventThread() */
@@ -59,19 +59,28 @@ static char* announce_url_new(tr_session const* session, tr_announce_request con
     evbuffer_expand(buf, 1024);
 
     evbuffer_add_printf(buf,
-                        "%s"
-                        "%c"
-                        "info_hash=%s"
-                        "&peer_id=%*.*s"
-                        "&port=%d"
-                        "&uploaded=%" PRIu64 "&downloaded=%" PRIu64 "&left=%" PRIu64
-                        "&numwant=%d"
-                        "&key=%x"
-                        "&compact=1"
-                        "&supportcrypto=1",
-                        req->url, strchr(req->url, '?') != NULL ? '&' : '?', escaped_info_hash,
-                        PEER_ID_LEN, PEER_ID_LEN, req->peer_id, req->port, req->up, req->down,
-                        req->leftUntilComplete, req->numwant, req->key);
+        "%s"
+        "%c"
+        "info_hash=%s"
+        "&peer_id=%*.*s"
+        "&port=%d"
+        "&uploaded=%" PRIu64
+        "&downloaded=%" PRIu64
+        "&left=%" PRIu64
+        "&numwant=%d"
+        "&key=%x"
+        "&compact=1"
+        "&supportcrypto=1",
+        req->url,
+        strchr(req->url, '?') != NULL ? '&' : '?',
+        escaped_info_hash,
+        PEER_ID_LEN, PEER_ID_LEN, req->peer_id,
+        req->port,
+        req->up,
+        req->down,
+        req->leftUntilComplete,
+        req->numwant,
+        req->key);
 
     if (session->encryptionMode == TR_ENCRYPTION_REQUIRED)
     {
@@ -196,8 +205,8 @@ static void on_announce_done_eventthread(void* vdata)
     tr_free(data);
 }
 
-static void on_announce_done(tr_session* session, bool did_connect, bool did_timeout,
-                             long response_code, void const* msg, size_t msglen, void* vdata)
+static void on_announce_done(tr_session* session, bool did_connect, bool did_timeout, long response_code, void const* msg,
+    size_t msglen, void* vdata)
 {
     tr_announce_response* response;
     struct announce_data* data = vdata;
@@ -315,9 +324,8 @@ static void on_announce_done(tr_session* session, bool did_connect, bool did_tim
     tr_runInEventThread(session, on_announce_done_eventthread, data);
 }
 
-void tr_tracker_http_announce(tr_session* session, tr_announce_request const* request,
-                              tr_announce_response_func response_func,
-                              void* response_func_user_data)
+void tr_tracker_http_announce(tr_session* session, tr_announce_request const* request, tr_announce_response_func response_func,
+    void* response_func_user_data)
 {
     struct announce_data* d;
     char* url = announce_url_new(session, request);
@@ -365,8 +373,8 @@ static void on_scrape_done_eventthread(void* vdata)
     tr_free(data);
 }
 
-static void on_scrape_done(tr_session* session, bool did_connect, bool did_timeout,
-                           long response_code, void const* msg, size_t msglen, void* vdata)
+static void on_scrape_done(tr_session* session, bool did_connect, bool did_timeout, long response_code, void const* msg,
+    size_t msglen, void* vdata)
 {
     tr_scrape_response* response;
     struct scrape_data* data = vdata;
@@ -441,9 +449,7 @@ static void on_scrape_done(tr_session* session, bool did_connect, bool did_timeo
                     {
                         struct tr_scrape_response_row* row = &response->rows[j];
 
-                        if (memcmp(tr_quark_get_string(key, NULL), row->info_hash,
-                                   SHA_DIGEST_LENGTH)
-                            == 0)
+                        if (memcmp(tr_quark_get_string(key, NULL), row->info_hash, SHA_DIGEST_LENGTH) == 0)
                         {
                             if (tr_variantDictFindInt(val, TR_KEY_complete, &intVal))
                             {
@@ -497,8 +503,8 @@ static char* scrape_url_new(tr_scrape_request const* req)
     return evbuffer_free_to_str(buf, NULL);
 }
 
-void tr_tracker_http_scrape(tr_session* session, tr_scrape_request const* request,
-                            tr_scrape_response_func response_func, void* response_func_user_data)
+void tr_tracker_http_scrape(tr_session* session, tr_scrape_request const* request, tr_scrape_response_func response_func,
+    void* response_func_user_data)
 {
     struct scrape_data* d;
     char* url = scrape_url_new(request);

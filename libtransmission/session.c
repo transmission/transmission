@@ -6,7 +6,7 @@
  *
  */
 
-#include <errno.h>  /* ENOENT */
+#include <errno.h> /* ENOENT */
 #include <limits.h> /* INT_MAX */
 #include <stdlib.h>
 #include <string.h> /* memcpy */
@@ -14,15 +14,15 @@
 #include <signal.h>
 
 #ifndef _WIN32
-#include <sys/stat.h>  /* umask() */
 #include <sys/types.h> /* umask() */
+#include <sys/stat.h> /* umask() */
 #endif
 
 #include <event2/dns.h> /* evdns_base_free() */
 #include <event2/event.h>
 
-#include <libutp/utp.h>
 #include <stdint.h>
+#include <libutp/utp.h>
 
 // #define TR_SHOW_DEPRECATED
 #include "transmission.h"
@@ -31,8 +31,8 @@
 #include "blocklist.h"
 #include "cache.h"
 #include "crypto-utils.h"
-#include "error-types.h"
 #include "error.h"
+#include "error-types.h"
 #include "fdlimit.h"
 #include "file.h"
 #include "list.h"
@@ -40,19 +40,19 @@
 #include "net.h"
 #include "peer-io.h"
 #include "peer-mgr.h"
+#include "platform.h" /* tr_lock, tr_getTorrentDir() */
 #include "platform-quota.h" /* tr_device_info_free() */
-#include "platform.h"       /* tr_lock, tr_getTorrentDir() */
 #include "port-forwarding.h"
 #include "rpc-server.h"
-#include "session-id.h"
 #include "session.h"
+#include "session-id.h"
 #include "stats.h"
 #include "torrent.h"
 #include "tr-assert.h"
 #include "tr-dht.h" /* tr_dhtUpkeep() */
-#include "tr-lpd.h"
 #include "tr-udp.h"
 #include "tr-utp.h"
+#include "tr-lpd.h"
 #include "trevent.h"
 #include "utils.h"
 #include "variant.h"
@@ -120,8 +120,7 @@ tr_encryption_mode tr_sessionGetEncryption(tr_session* session)
 void tr_sessionSetEncryption(tr_session* session, tr_encryption_mode mode)
 {
     TR_ASSERT(session != NULL);
-    TR_ASSERT(mode == TR_ENCRYPTION_PREFERRED || mode == TR_ENCRYPTION_REQUIRED
-              || mode == TR_CLEAR_PREFERRED);
+    TR_ASSERT(mode == TR_ENCRYPTION_PREFERRED || mode == TR_ENCRYPTION_REQUIRED || mode == TR_CLEAR_PREFERRED);
 
     session->encryptionMode = mode;
 }
@@ -181,12 +180,11 @@ static void accept_incoming_peer(evutil_socket_t fd, short what, void* vsession)
         {
             char addrstr[TR_ADDRSTRLEN];
             tr_address_and_port_to_string(addrstr, sizeof(addrstr), &clientAddr, clientPort);
-            tr_logAddDeep(__FILE__, __LINE__, NULL, "new incoming connection %" PRIdMAX " (%s)",
-                          (intmax_t)clientSocket, addrstr);
+            tr_logAddDeep(__FILE__, __LINE__, NULL, "new incoming connection %" PRIdMAX " (%s)", (intmax_t)clientSocket,
+                addrstr);
         }
 
-        tr_peerMgrAddIncoming(session->peerMgr, &clientAddr, clientPort,
-                              tr_peer_socket_tcp_create(clientSocket));
+        tr_peerMgrAddIncoming(session->peerMgr, &clientAddr, clientPort, tr_peer_socket_tcp_create(clientSocket));
     }
 }
 
@@ -200,8 +198,7 @@ static void open_incoming_peer_port(tr_session* session)
 
     if (b->socket != TR_BAD_SOCKET)
     {
-        b->ev = event_new(session->event_base, b->socket, EV_READ | EV_PERSIST,
-                          accept_incoming_peer, session);
+        b->ev = event_new(session->event_base, b->socket, EV_READ | EV_PERSIST, accept_incoming_peer, session);
         event_add(b->ev, NULL);
     }
 
@@ -213,35 +210,33 @@ static void open_incoming_peer_port(tr_session* session)
 
         if (b->socket != TR_BAD_SOCKET)
         {
-            b->ev = event_new(session->event_base, b->socket, EV_READ | EV_PERSIST,
-                              accept_incoming_peer, session);
+            b->ev = event_new(session->event_base, b->socket, EV_READ | EV_PERSIST, accept_incoming_peer, session);
             event_add(b->ev, NULL);
         }
     }
 }
 
-tr_address const* tr_sessionGetPublicAddress(tr_session const* session, int tr_af_type,
-                                             bool* is_default_value)
+tr_address const* tr_sessionGetPublicAddress(tr_session const* session, int tr_af_type, bool* is_default_value)
 {
     char const* default_value;
     struct tr_bindinfo const* bindinfo;
 
     switch (tr_af_type)
     {
-        case TR_AF_INET:
-            bindinfo = session->public_ipv4;
-            default_value = TR_DEFAULT_BIND_ADDRESS_IPV4;
-            break;
+    case TR_AF_INET:
+        bindinfo = session->public_ipv4;
+        default_value = TR_DEFAULT_BIND_ADDRESS_IPV4;
+        break;
 
-        case TR_AF_INET6:
-            bindinfo = session->public_ipv6;
-            default_value = TR_DEFAULT_BIND_ADDRESS_IPV6;
-            break;
+    case TR_AF_INET6:
+        bindinfo = session->public_ipv6;
+        default_value = TR_DEFAULT_BIND_ADDRESS_IPV6;
+        break;
 
-        default:
-            bindinfo = NULL;
-            default_value = "";
-            break;
+    default:
+        bindinfo = NULL;
+        default_value = "";
+        break;
     }
 
     if (is_default_value != NULL && bindinfo != NULL)
@@ -318,17 +313,24 @@ static char const* format_tos(int value)
 
     switch (value)
     {
-        case 0: return "default";
+    case 0:
+        return "default";
 
-        case TR_IPTOS_LOWCOST: return "lowcost";
+    case TR_IPTOS_LOWCOST:
+        return "lowcost";
 
-        case TR_IPTOS_THRUPUT: return "throughput";
+    case TR_IPTOS_THRUPUT:
+        return "throughput";
 
-        case TR_IPTOS_RELIABLE: return "reliability";
+    case TR_IPTOS_RELIABLE:
+        return "reliability";
 
-        case TR_IPTOS_LOWDELAY: return "lowdelay";
+    case TR_IPTOS_LOWDELAY:
+        return "lowdelay";
 
-        default: tr_snprintf(buf, 8, "%d", value); return buf;
+    default:
+        tr_snprintf(buf, 8, "%d", value);
+        return buf;
     }
 }
 
@@ -388,8 +390,8 @@ void tr_sessionGetDefaultSettings(tr_variant* d)
     tr_variantDictAddInt(d, TR_KEY_seed_queue_size, 10);
     tr_variantDictAddBool(d, TR_KEY_seed_queue_enabled, false);
     tr_variantDictAddBool(d, TR_KEY_alt_speed_enabled, false);
-    tr_variantDictAddInt(d, TR_KEY_alt_speed_up, 50);          /* half the regular */
-    tr_variantDictAddInt(d, TR_KEY_alt_speed_down, 50);        /* half the regular */
+    tr_variantDictAddInt(d, TR_KEY_alt_speed_up, 50); /* half the regular */
+    tr_variantDictAddInt(d, TR_KEY_alt_speed_down, 50); /* half the regular */
     tr_variantDictAddInt(d, TR_KEY_alt_speed_time_begin, 540); /* 9am */
     tr_variantDictAddBool(d, TR_KEY_alt_speed_time_enabled, false);
     tr_variantDictAddInt(d, TR_KEY_alt_speed_time_end, 1020); /* 5pm */
@@ -443,8 +445,7 @@ void tr_sessionGetSettings(tr_session* s, tr_variant* d)
     tr_variantDictAddInt(d, TR_KEY_queue_stalled_minutes, tr_sessionGetQueueStalledMinutes(s));
     tr_variantDictAddReal(d, TR_KEY_ratio_limit, s->desiredRatio);
     tr_variantDictAddBool(d, TR_KEY_ratio_limit_enabled, s->isRatioLimited);
-    tr_variantDictAddBool(d, TR_KEY_rename_partial_files,
-                          tr_sessionIsIncompleteFileNamingEnabled(s));
+    tr_variantDictAddBool(d, TR_KEY_rename_partial_files, tr_sessionIsIncompleteFileNamingEnabled(s));
     tr_variantDictAddBool(d, TR_KEY_rpc_authentication_required, tr_sessionIsRPCPasswordEnabled(s));
     tr_variantDictAddStr(d, TR_KEY_rpc_bind_address, tr_sessionGetRPCBindAddress(s));
     tr_variantDictAddBool(d, TR_KEY_rpc_enabled, tr_sessionIsRPCEnabled(s));
@@ -455,8 +456,7 @@ void tr_sessionGetSettings(tr_session* s, tr_variant* d)
     tr_variantDictAddStr(d, TR_KEY_rpc_whitelist, tr_sessionGetRPCWhitelist(s));
     tr_variantDictAddBool(d, TR_KEY_rpc_whitelist_enabled, tr_sessionGetRPCWhitelistEnabled(s));
     tr_variantDictAddBool(d, TR_KEY_scrape_paused_torrents_enabled, s->scrapePausedTorrents);
-    tr_variantDictAddBool(d, TR_KEY_script_torrent_done_enabled,
-                          tr_sessionIsTorrentDoneScriptEnabled(s));
+    tr_variantDictAddBool(d, TR_KEY_script_torrent_done_enabled, tr_sessionIsTorrentDoneScriptEnabled(s));
     tr_variantDictAddStr(d, TR_KEY_script_torrent_done_filename, tr_sessionGetTorrentDoneScript(s));
     tr_variantDictAddInt(d, TR_KEY_seed_queue_size, tr_sessionGetQueueSize(s, TR_UP));
     tr_variantDictAddBool(d, TR_KEY_seed_queue_enabled, tr_sessionGetQueueEnabled(s, TR_UP));
@@ -521,8 +521,7 @@ bool tr_sessionLoadSettings(tr_variant* dict, char const* configDir, char const*
     return success;
 }
 
-void tr_sessionSaveSettings(tr_session* session, char const* configDir,
-                            tr_variant const* clientSettings)
+void tr_sessionSaveSettings(tr_session* session, char const* configDir, tr_variant const* clientSettings)
 {
     TR_ASSERT(tr_variantIsDict(clientSettings));
 
@@ -609,8 +608,7 @@ struct init_data
     tr_variant* clientSettings;
 };
 
-tr_session* tr_sessionInit(char const* configDir, bool messageQueuingEnabled,
-                           tr_variant* clientSettings)
+tr_session* tr_sessionInit(char const* configDir, bool messageQueuingEnabled, tr_variant* clientSettings)
 {
     TR_ASSERT(tr_variantIsDict(clientSettings));
 
@@ -738,8 +736,7 @@ static void tr_sessionInitImpl(void* vdata)
     TR_ASSERT(tr_amInEventThread(session));
     TR_ASSERT(tr_variantIsDict(clientSettings));
 
-    dbgmsg("tr_sessionInit: the session's top-level bandwidth object is %p",
-           (void*)&session->bandwidth);
+    dbgmsg("tr_sessionInit: the session's top-level bandwidth object is %p", (void*)&session->bandwidth);
 
     tr_variant settings;
 
@@ -986,8 +983,9 @@ static void sessionSetImpl(void* vdata)
 
     free_incoming_peer_port(session);
 
-    if (!tr_variantDictFindStr(settings, TR_KEY_bind_address_ipv4, &str, NULL)
-        || !tr_address_from_string(&b.addr, str) || b.addr.type != TR_AF_INET)
+    if (!tr_variantDictFindStr(settings, TR_KEY_bind_address_ipv4, &str, NULL) ||
+        !tr_address_from_string(&b.addr, str) ||
+        b.addr.type != TR_AF_INET)
     {
         b.addr = tr_inaddr_any;
     }
@@ -995,8 +993,9 @@ static void sessionSetImpl(void* vdata)
     b.socket = TR_BAD_SOCKET;
     session->public_ipv4 = tr_memdup(&b, sizeof(struct tr_bindinfo));
 
-    if (!tr_variantDictFindStr(settings, TR_KEY_bind_address_ipv6, &str, NULL)
-        || !tr_address_from_string(&b.addr, str) || b.addr.type != TR_AF_INET6)
+    if (!tr_variantDictFindStr(settings, TR_KEY_bind_address_ipv6, &str, NULL) ||
+        !tr_address_from_string(&b.addr, str) ||
+        b.addr.type != TR_AF_INET6)
     {
         b.addr = tr_in6addr_any;
     }
@@ -1038,7 +1037,7 @@ static void sessionSetImpl(void* vdata)
     }
 
     /**
-     **/
+    **/
 
     if (tr_variantDictFindInt(settings, TR_KEY_upload_slots_per_torrent, &i))
     {
@@ -1432,8 +1431,7 @@ uint16_t tr_sessionGetIdleLimit(tr_session const* session)
 ****
 ***/
 
-bool tr_sessionGetActiveSpeedLimit_Bps(tr_session const* session, tr_direction dir,
-                                       unsigned int* setme_Bps)
+bool tr_sessionGetActiveSpeedLimit_Bps(tr_session const* session, tr_direction dir, unsigned int* setme_Bps)
 {
     bool isLimited = true;
 
@@ -1458,8 +1456,7 @@ bool tr_sessionGetActiveSpeedLimit_Bps(tr_session const* session, tr_direction d
     return isLimited;
 }
 
-bool tr_sessionGetActiveSpeedLimit_KBps(tr_session const* session, tr_direction dir,
-                                        double* setme_KBps)
+bool tr_sessionGetActiveSpeedLimit_KBps(tr_session const* session, tr_direction dir, double* setme_KBps)
 {
     unsigned int Bps = 0;
     bool const is_active = tr_sessionGetActiveSpeedLimit_Bps(session, dir, &Bps);
@@ -2050,8 +2047,8 @@ void tr_sessionClose(tr_session* session)
 
     time_t const deadline = time(NULL) + SHUTDOWN_MAX_SECONDS;
 
-    dbgmsg("shutting down transmission session %p... now is %zu, deadline is %zu", (void*)session,
-           (size_t)time(NULL), (size_t)deadline);
+    dbgmsg("shutting down transmission session %p... now is %zu, deadline is %zu", (void*)session, (size_t)time(NULL),
+        (size_t)deadline);
 
     /* close the session */
     tr_runInEventThread(session, sessionCloseImpl, session);
@@ -2066,13 +2063,11 @@ void tr_sessionClose(tr_session* session)
      * so we need to keep the transmission thread alive
      * for a bit while they tell the router & tracker
      * that we're closing now */
-    while ((session->shared != NULL || session->web != NULL || session->announcer != NULL
-            || session->announcer_udp != NULL)
-           && !deadlineReached(deadline))
+    while ((session->shared != NULL || session->web != NULL || session->announcer != NULL || session->announcer_udp != NULL) &&
+        !deadlineReached(deadline))
     {
-        dbgmsg("waiting on port unmap (%p) or announcer (%p)... now %zu deadline %zu",
-               (void*)session->shared, (void*)session->announcer, (size_t)time(NULL),
-               (size_t)deadline);
+        dbgmsg("waiting on port unmap (%p) or announcer (%p)... now %zu deadline %zu", (void*)session->shared,
+            (void*)session->announcer, (size_t)time(NULL), (size_t)deadline);
         tr_wait_msec(50);
     }
 
@@ -2084,8 +2079,7 @@ void tr_sessionClose(tr_session* session)
     while (session->events != NULL)
     {
         static bool forced = false;
-        dbgmsg("waiting for libtransmission thread to finish... now %zu deadline %zu",
-               (size_t)time(NULL), (size_t)deadline);
+        dbgmsg("waiting for libtransmission thread to finish... now %zu deadline %zu", (size_t)time(NULL), (size_t)deadline);
         tr_wait_msec(100);
 
         if (deadlineReached(deadline) && !forced)
@@ -2149,10 +2143,8 @@ static void sessionLoadTorrents(void* vdata)
 
     tr_sys_path_info info;
     char const* dirname = tr_getTorrentDir(data->session);
-    tr_sys_dir_t odir =
-        (tr_sys_path_get_info(dirname, 0, &info, NULL) && info.type == TR_SYS_PATH_IS_DIRECTORY)
-            ? tr_sys_dir_open(dirname, NULL)
-            : TR_BAD_SYS_DIR;
+    tr_sys_dir_t odir = (tr_sys_path_get_info(dirname, 0, &info, NULL) && info.type == TR_SYS_PATH_IS_DIRECTORY) ?
+        tr_sys_dir_open(dirname, NULL) : TR_BAD_SYS_DIR;
 
     if (odir != TR_BAD_SYS_DIR)
     {
@@ -2477,8 +2469,8 @@ static void loadBlocklists(tr_session* session)
 
                 tr_blocklistFileFree(b);
             }
-            else if (tr_sys_path_get_info(path, 0, &path_info, NULL)
-                     && path_info.last_modified_at >= binname_info.last_modified_at) /* update it */
+            else if (tr_sys_path_get_info(path, 0, &path_info, NULL) &&
+                path_info.last_modified_at >= binname_info.last_modified_at) /* update it */
             {
                 char* old;
                 tr_blocklistFile* b;
@@ -2663,10 +2655,8 @@ static void metainfoLookupInit(tr_session* session)
 
     tr_sys_path_info info;
     char const* dirname = tr_getTorrentDir(session);
-    tr_sys_dir_t odir =
-        (tr_sys_path_get_info(dirname, 0, &info, NULL) && info.type == TR_SYS_PATH_IS_DIRECTORY)
-            ? tr_sys_dir_open(dirname, NULL)
-            : TR_BAD_SYS_DIR;
+    tr_sys_dir_t odir = (tr_sys_path_get_info(dirname, 0, &info, NULL) && info.type == TR_SYS_PATH_IS_DIRECTORY) ?
+        tr_sys_dir_open(dirname, NULL) : TR_BAD_SYS_DIR;
 
     if (odir != TR_BAD_SYS_DIR)
     {
@@ -2710,8 +2700,7 @@ char const* tr_sessionFindTorrentFile(tr_session const* session, char const* has
     }
 
     char const* filename = NULL;
-    (void)tr_variantDictFindStr(session->metainfoLookup, tr_quark_new(hashString, TR_BAD_SIZE),
-                                &filename, NULL);
+    (void)tr_variantDictFindStr(session->metainfoLookup, tr_quark_new(hashString, TR_BAD_SIZE), &filename, NULL);
     return filename;
 }
 
@@ -2723,8 +2712,7 @@ void tr_sessionSetTorrentFile(tr_session* session, char const* hashString, char 
      * lookup table hasn't been built yet */
     if (session->metainfoLookup != NULL)
     {
-        tr_variantDictAddStr(session->metainfoLookup, tr_quark_new(hashString, TR_BAD_SIZE),
-                             filename);
+        tr_variantDictAddStr(session->metainfoLookup, tr_quark_new(hashString, TR_BAD_SIZE), filename);
     }
 }
 
@@ -2988,8 +2976,7 @@ static int compareTorrentAndPositions(void const* va, void const* vb)
     return ret;
 }
 
-void tr_sessionGetNextQueuedTorrents(tr_session* session, tr_direction direction, size_t num_wanted,
-                                     tr_ptrArray* setme)
+void tr_sessionGetNextQueuedTorrents(tr_session* session, tr_direction direction, size_t num_wanted, tr_ptrArray* setme)
 {
     TR_ASSERT(tr_isSession(session));
     TR_ASSERT(tr_isDirection(direction));
@@ -3024,8 +3011,8 @@ void tr_sessionGetNextQueuedTorrents(tr_session* session, tr_direction direction
     }
     else if (num_wanted < num_candidates)
     {
-        tr_quickfindFirstK(candidates, num_candidates, sizeof(struct TorrentAndPosition),
-                           compareTorrentAndPositions, num_wanted);
+        tr_quickfindFirstK(candidates, num_candidates, sizeof(struct TorrentAndPosition), compareTorrentAndPositions,
+            num_wanted);
     }
 
     /* add them to the return array */

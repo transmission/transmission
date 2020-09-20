@@ -25,36 +25,41 @@
 
 extern "C"
 {
-    extern struct timeval tr_watchdir_generic_interval;
-    extern unsigned int tr_watchdir_retry_limit;
-    extern struct timeval tr_watchdir_retry_start_interval;
-    extern struct timeval tr_watchdir_retry_max_interval;
+extern struct timeval tr_watchdir_generic_interval;
+extern unsigned int tr_watchdir_retry_limit;
+extern struct timeval tr_watchdir_retry_start_interval;
+extern struct timeval tr_watchdir_retry_max_interval;
 }
 
 namespace
 {
-auto constexpr FiftyMsec = timeval {0, 50000};
-auto constexpr OneHundredMsec = timeval {0, 100000};
-auto constexpr TwoHundredMsec = timeval {0, 200000};
 
-}  // namespace
+auto constexpr FiftyMsec = timeval { 0, 50000 };
+auto constexpr OneHundredMsec = timeval { 0, 100000 };
+auto constexpr TwoHundredMsec = timeval { 0, 200000 };
+
+}
 
 namespace libtransmission
 {
+
 namespace test
 {
+
 enum class WatchMode
 {
     NATIVE,
     GENERIC
 };
 
-class WatchDirTest : public SandboxedTest, public ::testing::WithParamInterface<WatchMode>
+class WatchDirTest :
+    public SandboxedTest,
+    public ::testing::WithParamInterface<WatchMode>
 {
-   private:
+private:
     std::shared_ptr<struct event_base> ev_base_;
 
-   protected:
+protected:
     void SetUp() override
     {
         SandboxedTest::SetUp();
@@ -107,7 +112,8 @@ class WatchDirTest : public SandboxedTest, public ::testing::WithParamInterface<
 
     struct CallbackData
     {
-        explicit CallbackData(tr_watchdir_status status = TR_WATCHDIR_ACCEPT) : result {status} {}
+        explicit CallbackData(tr_watchdir_status status = TR_WATCHDIR_ACCEPT) :
+            result{status} {}
         tr_watchdir_status result {};
 
         tr_watchdir_t wd = {};
@@ -161,7 +167,7 @@ TEST_P(WatchDirTest, initialScan)
     }
 
     // add a file
-    auto const base_name = std::string {"test.txt"};
+    auto const base_name = std::string { "test.txt" };
     createFile(path, base_name);
 
     // confirm that a wd will pick up the file that
@@ -192,7 +198,7 @@ TEST_P(WatchDirTest, watch)
     EXPECT_EQ("", wd_data.name);
 
     // test that a new file in an empty directory shows up
-    auto const file1 = std::string {"test1"};
+    auto const file1 = std::string { "test1" };
     createFile(path, file1);
     processEvents();
     EXPECT_EQ(wd, wd_data.wd);
@@ -200,7 +206,7 @@ TEST_P(WatchDirTest, watch)
 
     // test that a new file in a nonempty directory shows up
     wd_data = CallbackData(TR_WATCHDIR_ACCEPT);
-    auto const file2 = std::string {"test2"};
+    auto const file2 = std::string { "test2" };
     createFile(path, file2);
     processEvents();
     EXPECT_EQ(wd, wd_data.wd);
@@ -239,7 +245,7 @@ TEST_P(WatchDirTest, watchTwoDirs)
 
     // add a file into directory 1 and confirm it triggers
     // a callback with the right wd
-    auto const file1 = std::string {"test.txt"};
+    auto const file1 = std::string { "test.txt" };
     createFile(dir1, file1);
     processEvents();
     EXPECT_EQ(wd1, wd1_data.wd);
@@ -251,7 +257,7 @@ TEST_P(WatchDirTest, watchTwoDirs)
     // a callback with the right wd
     wd1_data = CallbackData(TR_WATCHDIR_ACCEPT);
     wd2_data = CallbackData(TR_WATCHDIR_ACCEPT);
-    auto const file2 = std::string {"test2.txt"};
+    auto const file2 = std::string { "test2.txt" };
     createFile(dir2, file2);
     processEvents();
     EXPECT_EQ(nullptr, wd1_data.wd);
@@ -264,8 +270,8 @@ TEST_P(WatchDirTest, watchTwoDirs)
     // be testing.
     wd1_data = CallbackData(TR_WATCHDIR_IGNORE);
     wd2_data = CallbackData(TR_WATCHDIR_IGNORE);
-    auto const file3 = std::string {"test3.txt"};
-    auto const file4 = std::string {"test4.txt"};
+    auto const file3 = std::string { "test3.txt" };
+    auto const file4 = std::string { "test4.txt" };
     createFile(dir1, file3);
     createFile(dir2, file4);
     processEvents();
@@ -279,7 +285,7 @@ TEST_P(WatchDirTest, watchTwoDirs)
     // and a new directory in directory 'b'
     wd1_data = CallbackData(TR_WATCHDIR_ACCEPT);
     wd2_data = CallbackData(TR_WATCHDIR_ACCEPT);
-    auto const file5 = std::string {"test5.txt"};
+    auto const file5 = std::string { "test5.txt" };
     createFile(dir1, file5);
     createDir(dir2, file5);
     processEvents();
@@ -294,7 +300,7 @@ TEST_P(WatchDirTest, watchTwoDirs)
     // and a new directory in directory 'a'
     wd1_data = CallbackData(TR_WATCHDIR_ACCEPT);
     wd2_data = CallbackData(TR_WATCHDIR_ACCEPT);
-    auto const file6 = std::string {"test6.txt"};
+    auto const file6 = std::string { "test6.txt" };
     createDir(dir1, file6);
     createFile(dir2, file6);
     processEvents();
@@ -307,8 +313,8 @@ TEST_P(WatchDirTest, watchTwoDirs)
     // watchdirs still triggers no callbacks
     wd1_data = CallbackData(TR_WATCHDIR_ACCEPT);
     wd2_data = CallbackData(TR_WATCHDIR_ACCEPT);
-    auto const file7 = std::string {"test7.txt"};
-    auto const file8 = std::string {"test8.txt"};
+    auto const file7 = std::string { "test7.txt" };
+    auto const file8 = std::string { "test8.txt" };
     createDir(dir1, file7);
     createDir(dir2, file8);
     processEvents();
@@ -343,7 +349,7 @@ TEST_P(WatchDirTest, retry)
     EXPECT_EQ(nullptr, wd_data.wd);
     EXPECT_EQ("", wd_data.name);
 
-    auto const test_file = std::string {"test"};
+    auto const test_file = std::string { "test" };
     createFile(path, test_file);
     processEvents();
     EXPECT_EQ(nullptr, wd_data.wd);
@@ -357,9 +363,12 @@ TEST_P(WatchDirTest, retry)
     EXPECT_EQ(test_file, wd_data.name);
 }
 
-INSTANTIATE_TEST_SUITE_P(WatchDir, WatchDirTest,
-                         ::testing::Values(WatchMode::NATIVE, WatchMode::GENERIC));
+INSTANTIATE_TEST_SUITE_P(
+    WatchDir,
+    WatchDirTest,
+    ::testing::Values(WatchMode::NATIVE, WatchMode::GENERIC)
+    );
 
-}  // namespace test
+} // namespace test
 
-}  // namespace libtransmission
+} // namespace libtransmission

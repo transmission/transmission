@@ -81,8 +81,8 @@ void tr_rc4_process(tr_rc4_ctx_t handle, void const* input, void* output, size_t
 /**
  * @brief Allocate and initialize new Diffie-Hellman (DH) key exchange context.
  */
-tr_dh_ctx_t tr_dh_new(uint8_t const* prime_num, size_t prime_num_length,
-                      uint8_t const* generator_num, size_t generator_num_length);
+tr_dh_ctx_t tr_dh_new(uint8_t const* prime_num, size_t prime_num_length, uint8_t const* generator_num,
+    size_t generator_num_length);
 
 /**
  * @brief Free DH key exchange context.
@@ -92,21 +92,19 @@ void tr_dh_free(tr_dh_ctx_t handle);
 /**
  * @brief Generate private and public DH keys, export public key.
  */
-bool tr_dh_make_key(tr_dh_ctx_t handle, size_t private_key_length, uint8_t* public_key,
-                    size_t* public_key_length);
+bool tr_dh_make_key(tr_dh_ctx_t handle, size_t private_key_length, uint8_t* public_key, size_t* public_key_length);
 
 /**
  * @brief Perform DH key exchange, generate secret key.
  */
-tr_dh_secret_t tr_dh_agree(tr_dh_ctx_t handle, uint8_t const* other_public_key,
-                           size_t other_public_key_length);
+tr_dh_secret_t tr_dh_agree(tr_dh_ctx_t handle, uint8_t const* other_public_key, size_t other_public_key_length);
 
 /**
  * @brief Calculate SHA1 hash of DH secret key, prepending and/or appending
  *        given data to the key during calculation.
  */
-bool tr_dh_secret_derive(tr_dh_secret_t handle, void const* prepend_data, size_t prepend_data_size,
-                         void const* append_data, size_t append_data_size, uint8_t* hash);
+bool tr_dh_secret_derive(tr_dh_secret_t handle, void const* prepend_data, size_t prepend_data_size, void const* append_data,
+    size_t append_data_size, uint8_t* hash);
 
 /**
  * @brief Free DH secret key returned by @ref tr_dh_agree.
@@ -170,8 +168,7 @@ bool tr_ssha1_matches(char const* ssha1, char const* plain_text);
  * @brief Translate a block of bytes into base64.
  * @return a newly-allocated null-terminated string that can be freed with tr_free()
  */
-void* tr_base64_encode(void const* input, size_t input_length,
-                       size_t* output_length) TR_GNUC_MALLOC;
+void* tr_base64_encode(void const* input, size_t input_length, size_t* output_length) TR_GNUC_MALLOC;
 
 /**
  * @brief Translate null-terminated string into base64.
@@ -183,8 +180,7 @@ void* tr_base64_encode_str(char const* input, size_t* output_length) TR_GNUC_MAL
  * @brief Translate a block of bytes from base64 into raw form.
  * @return a newly-allocated null-terminated string that can be freed with tr_free()
  */
-void* tr_base64_decode(void const* input, size_t input_length,
-                       size_t* output_length) TR_GNUC_MALLOC;
+void* tr_base64_decode(void const* input, size_t input_length, size_t* output_length) TR_GNUC_MALLOC;
 
 /**
  * @brief Translate null-terminated string from base64 into raw form.

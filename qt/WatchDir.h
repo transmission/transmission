@@ -10,8 +10,8 @@
 
 #include <memory>
 
-#include <QFileSystemWatcher>
 #include <QObject>
+#include <QFileSystemWatcher>
 #include <QSet>
 #include <QString>
 
@@ -24,15 +24,15 @@ class WatchDir : public QObject
     Q_OBJECT
     TR_DISABLE_COPY_MOVE(WatchDir)
 
-   public:
+public:
     WatchDir(TorrentModel const&);
 
     void setPath(QString const& path, bool is_enabled);
 
-   signals:
+signals:
     void torrentFileAdded(QString const& filename);
 
-   private:
+private:
     enum
     {
         OK,
@@ -40,16 +40,16 @@ class WatchDir : public QObject
         ERROR
     };
 
-   private:
+private:
     int metainfoTest(QString const& filename) const;
 
-   private slots:
+private slots:
     void watcherActivated(QString const& path);
     void onTimeout();
 
     void rescanAllWatchedDirectories();
 
-   private:
+private:
     TorrentModel const& model_;
 
     QSet<QString> watch_dir_files_;

@@ -34,8 +34,7 @@ bool tr_isPeerMsgs(void const* msgs);
 
 tr_peerMsgs* tr_peerMsgsCast(void* msgs);
 
-tr_peerMsgs* tr_peerMsgsNew(struct tr_torrent* torrent, struct tr_peerIo* io,
-                            tr_peer_callback callback, void* callback_data);
+tr_peerMsgs* tr_peerMsgsNew(struct tr_torrent* torrent, struct tr_peerIo* io, tr_peer_callback callback, void* callback_data);
 
 bool tr_peerMsgsIsPeerChoked(tr_peerMsgs const* msgs);
 
@@ -69,8 +68,7 @@ void tr_peerMsgsPulse(tr_peerMsgs* msgs);
 
 void tr_peerMsgsCancel(tr_peerMsgs* msgs, tr_block_index_t block);
 
-size_t tr_generateAllowedSet(tr_piece_index_t* setmePieces, size_t desiredSetSize,
-                             size_t pieceCount, uint8_t const* infohash,
-                             struct tr_address const* addr);
+size_t tr_generateAllowedSet(tr_piece_index_t* setmePieces, size_t desiredSetSize, size_t pieceCount, uint8_t const* infohash,
+    struct tr_address const* addr);
 
 /* @} */

@@ -6,8 +6,8 @@
  *
  */
 
-#include "session.h"
 #include "transmission.h"
+#include "session.h"
 #include "session-id.h"
 #include "utils.h"
 #include "version.h"
@@ -23,12 +23,12 @@
 
 TEST(Session, peerId)
 {
-    auto const peer_id_prefix = std::string {PEERID_PREFIX};
+    auto const peer_id_prefix = std::string { PEERID_PREFIX };
 
     for (int i = 0; i < 100000; ++i)
     {
         // get a new peer-id
-        auto buf = std::array<uint8_t, PEER_ID_LEN + 1> {};
+        auto buf = std::array<uint8_t, PEER_ID_LEN + 1>{};
         tr_peerIdInit(buf.data());
 
         // confirm that it has the right length
@@ -43,7 +43,7 @@ TEST(Session, peerId)
         auto const suffix = peer_id.substr(peer_id_prefix.size());
         for (char const ch : suffix)
         {
-            auto const tmp = std::array<char, 2> {ch, '\0'};
+            auto const tmp = std::array<char, 2>{ ch, '\0' };
             val += strtoul(tmp.data(), nullptr, 36);
         }
 

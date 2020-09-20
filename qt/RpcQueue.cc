@@ -13,7 +13,9 @@
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
 RpcQueue::Tag RpcQueue::next_tag = {};
 
-RpcQueue::RpcQueue(QObject* parent) : QObject(parent), tag_(next_tag++)
+RpcQueue::RpcQueue(QObject* parent) :
+    QObject(parent),
+    tag_(next_tag++)
 {
     connect(&future_watcher_, SIGNAL(finished()), SLOT(stepFinished()));
 }
@@ -56,8 +58,7 @@ void RpcQueue::stepFinished()
         assert(queue_.isEmpty());
 
         // one way or another, the last step returned nothing.
-        // assume it is OK and ensure that we're not going to give an empty response object to any
-        // of the next steps.
+        // assume it is OK and ensure that we're not going to give an empty response object to any of the next steps.
         result.success = true;
     }
 

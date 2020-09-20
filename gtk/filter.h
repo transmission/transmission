@@ -8,8 +8,7 @@
 
 #pragma once
 
-#include <libtransmission/transmission.h>
 #include <gtk/gtk.h>
+#include <libtransmission/transmission.h>
 
-GtkWidget* gtr_filter_bar_new(tr_session* session, GtkTreeModel* torrent_model,
-                              GtkTreeModel** filter_model);
+GtkWidget* gtr_filter_bar_new(tr_session* session, GtkTreeModel* torrent_model, GtkTreeModel** filter_model);

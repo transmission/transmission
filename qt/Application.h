@@ -17,7 +17,7 @@
 #include "FaviconCache.h"
 #include "Macros.h"
 #include "Typedefs.h"
-#include "Utils.h"  // std::hash<QString>
+#include "Utils.h" // std::hash<QString>
 
 class AddData;
 class Prefs;
@@ -32,7 +32,7 @@ class Application : public QApplication
     Q_OBJECT
     TR_DISABLE_COPY_MOVE(Application)
 
-   public:
+public:
     Application(int& argc, char** argv);
     ~Application() override;
 
@@ -42,10 +42,10 @@ class Application : public QApplication
     QString const& intern(QString const& in) { return *interned_strings_.insert(in).first; }
     FaviconCache& faviconCache();
 
-   public slots:
+public slots:
     void addTorrent(AddData const&);
 
-   private slots:
+private slots:
     void consentGiven(int result);
     void onSessionSourceChanged();
     void onTorrentsAdded(torrent_ids_t const& torrents);
@@ -55,7 +55,7 @@ class Application : public QApplication
     void refreshPref(int key);
     void refreshTorrents();
 
-   private:
+private:
     void maybeUpdateBlocklist();
     void loadTranslations();
     QStringList getNames(torrent_ids_t const& ids) const;

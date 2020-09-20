@@ -18,8 +18,8 @@
 #include "magnet.h"
 #include "metainfo.h"
 #include "resume.h"
-#include "torrent-magnet.h"
 #include "torrent.h"
+#include "torrent-magnet.h"
 #include "tr-assert.h"
 #include "utils.h"
 #include "variant.h"
@@ -73,9 +73,7 @@ bool tr_torrentSetMetadataSizeHint(tr_torrent* tor, int64_t size)
         return false;
     }
 
-    int const n = (size <= 0 || size > INT_MAX)
-                      ? -1
-                      : size / METADATA_PIECE_SIZE + (size % METADATA_PIECE_SIZE != 0 ? 1 : 0);
+    int const n = (size <= 0 || size > INT_MAX) ? -1 : size / METADATA_PIECE_SIZE + (size % METADATA_PIECE_SIZE != 0 ? 1 : 0);
 
     dbgmsg(tor, "metadata is %" PRId64 " bytes in %d pieces", size, n);
 
@@ -132,8 +130,7 @@ static size_t findInfoDictOffset(tr_torrent const* tor)
             {
                 size_t infoLen;
                 char* infoContents = tr_variantToStr(infoDict, TR_VARIANT_FMT_BENC, &infoLen);
-                uint8_t const* i =
-                    (uint8_t const*)tr_memmem((char*)fileContents, fileLen, infoContents, infoLen);
+                uint8_t const* i = (uint8_t const*)tr_memmem((char*)fileContents, fileLen, infoContents, infoLen);
                 offset = i != NULL ? i - fileContents : 0;
                 tr_free(infoContents);
             }
@@ -182,9 +179,7 @@ void* tr_torrentGetMetadataPiece(tr_torrent* tor, int piece, size_t* len)
 
             if (tr_sys_file_seek(fd, tor->infoDictOffset + o, TR_SEEK_SET, NULL, NULL))
             {
-                size_t const l = o + METADATA_PIECE_SIZE <= tor->infoDictLength
-                                     ? METADATA_PIECE_SIZE
-                                     : tor->infoDictLength - o;
+                size_t const l = o + METADATA_PIECE_SIZE <= tor->infoDictLength ? METADATA_PIECE_SIZE : tor->infoDictLength - o;
 
                 if (0 < l && l <= METADATA_PIECE_SIZE)
                 {
@@ -265,8 +260,7 @@ void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, in
 
     memcpy(m->metadata + offset, data, len);
 
-    tr_removeElementFromArray(m->piecesNeeded, neededPieceIndex, sizeof(struct metadata_node),
-                              m->piecesNeededCount);
+    tr_removeElementFromArray(m->piecesNeeded, neededPieceIndex, sizeof(struct metadata_node), m->piecesNeededCount);
     --m->piecesNeededCount;
 
     dbgmsg(tor, "saving metainfo piece %d... %d remain", piece, m->piecesNeededCount);
@@ -308,17 +302,14 @@ void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, in
                     tr_torrentRemoveResume(tor);
 
                     dbgmsg(tor, "Saving completed metadata to \"%s\"", path);
-                    tr_variantMergeDicts(tr_variantDictAddDict(&newMetainfo, TR_KEY_info, 0),
-                                         &infoDict);
+                    tr_variantMergeDicts(tr_variantDictAddDict(&newMetainfo, TR_KEY_info, 0), &infoDict);
 
                     memset(&info, 0, sizeof(tr_info));
-                    success = tr_metainfoParse(tor->session, &newMetainfo, &info, &hasInfo,
-                                               &infoDictLength);
+                    success = tr_metainfoParse(tor->session, &newMetainfo, &info, &hasInfo, &infoDictLength);
 
                     if (success && tr_getBlockSize(info.pieceSize) == 0)
                     {
-                        tr_torrentSetLocalError(tor, "%s",
-                                                _("Magnet torrent's metadata is not usable"));
+                        tr_torrentSetLocalError(tor, "%s", _("Magnet torrent's metadata is not usable"));
                         tr_metainfoFree(&info);
                         success = false;
                     }
@@ -331,8 +322,7 @@ void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, in
 
                         /* save the new .torrent file */
                         tr_variantToFile(&newMetainfo, TR_VARIANT_FMT_BENC, tor->info.torrent);
-                        tr_sessionSetTorrentFile(tor->session, tor->info.hashString,
-                                                 tor->info.torrent);
+                        tr_sessionSetTorrentFile(tor->session, tor->info.hashString, tor->info.torrent);
                         tr_torrentGotNewInfoDict(tor);
                         tr_torrentSetDirty(tor);
                     }
@@ -367,8 +357,7 @@ void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, in
             m->piecesNeededCount = n;
             dbgmsg(tor, "metadata error; trying again. %d pieces left", n);
 
-            tr_logAddError("magnet status: checksum passed %d, metainfo parsed %d",
-                           (int)checksumPassed, (int)metainfoParsed);
+            tr_logAddError("magnet status: checksum passed %d, metainfo parsed %d", (int)checksumPassed, (int)metainfoParsed);
         }
     }
 }
@@ -380,12 +369,10 @@ bool tr_torrentGetNextMetadataRequest(tr_torrent* tor, time_t now, int* setme_pi
     bool have_request = false;
     struct tr_incomplete_metadata* m = tor->incompleteMetadata;
 
-    if (m != NULL && m->piecesNeededCount > 0
-        && m->piecesNeeded[0].requestedAt + MIN_REPEAT_INTERVAL_SECS < now)
+    if (m != NULL && m->piecesNeededCount > 0 && m->piecesNeeded[0].requestedAt + MIN_REPEAT_INTERVAL_SECS < now)
     {
         int const piece = m->piecesNeeded[0].piece;
-        tr_removeElementFromArray(m->piecesNeeded, 0, sizeof(struct metadata_node),
-                                  m->piecesNeededCount);
+        tr_removeElementFromArray(m->piecesNeeded, 0, sizeof(struct metadata_node), m->piecesNeededCount);
 
         int i = m->piecesNeededCount - 1;
         m->piecesNeeded[i].piece = piece;
@@ -424,8 +411,7 @@ double tr_torrentGetMetadataPercent(tr_torrent const* tor)
     return ret;
 }
 
-/* TODO: this should be renamed tr_metainfoGetMagnetLink() and moved to metainfo.c for consistency
- */
+/* TODO: this should be renamed tr_metainfoGetMagnetLink() and moved to metainfo.c for consistency */
 char* tr_torrentInfoGetMagnetLink(tr_info const* inf)
 {
     char const* name;

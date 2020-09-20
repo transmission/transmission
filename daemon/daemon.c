@@ -7,7 +7,7 @@
  */
 
 #include <errno.h>
-#include <stdio.h>  /* printf */
+#include <stdio.h> /* printf */
 #include <stdlib.h> /* atoi */
 
 #ifdef HAVE_SYSLOG
@@ -25,9 +25,9 @@
 #include <libtransmission/transmission.h>
 #include <libtransmission/error.h>
 #include <libtransmission/file.h>
-#include <libtransmission/log.h>
 #include <libtransmission/tr-getopt.h>
 #include <libtransmission/tr-macros.h>
+#include <libtransmission/log.h>
 #include <libtransmission/utils.h>
 #include <libtransmission/variant.h>
 #include <libtransmission/version.h>
@@ -91,80 +91,73 @@ static struct event_base* ev_base = NULL;
 
 static char const* getUsage(void)
 {
-    return "Transmission " LONG_VERSION_STRING
-           "  https://transmissionbt.com/\n"
-           "A fast and easy BitTorrent client\n"
-           "\n" MY_NAME
-           " is a headless Transmission session\n"
-           "that can be controlled via transmission-remote\n"
-           "or the web interface.\n"
-           "\n"
-           "Usage: " MY_NAME " [options]";
+    return "Transmission " LONG_VERSION_STRING "  https://transmissionbt.com/\n"
+        "A fast and easy BitTorrent client\n"
+        "\n"
+        MY_NAME " is a headless Transmission session\n"
+        "that can be controlled via transmission-remote\n"
+        "or the web interface.\n"
+        "\n"
+        "Usage: " MY_NAME " [options]";
 }
 
-static struct tr_option const options[] = {
-    {'a', "allowed", "Allowed IP addresses. (Default: " TR_DEFAULT_RPC_WHITELIST ")", "a", true,
-     "<list>"},
-    {'b', "blocklist", "Enable peer blocklists", "b", false, NULL},
-    {'B', "no-blocklist", "Disable peer blocklists", "B", false, NULL},
-    {'c', "watch-dir", "Where to watch for new .torrent files", "c", true, "<directory>"},
-    {'C', "no-watch-dir", "Disable the watch-dir", "C", false, NULL},
-    {941, "incomplete-dir", "Where to store new torrents until they're complete", NULL, true,
-     "<directory>"},
-    {942, "no-incomplete-dir", "Don't store incomplete torrents in a different location", NULL,
-     false, NULL},
-    {'d', "dump-settings", "Dump the settings and exit", "d", false, NULL},
-    {'e', "logfile", "Dump the log messages to this filename", "e", true, "<filename>"},
-    {'f', "foreground", "Run in the foreground instead of daemonizing", "f", false, NULL},
-    {'g', "config-dir", "Where to look for configuration files", "g", true, "<path>"},
-    {'p', "port", "RPC port (Default: " TR_DEFAULT_RPC_PORT_STR ")", "p", true, "<port>"},
-    {'t', "auth", "Require authentication", "t", false, NULL},
-    {'T', "no-auth", "Don't require authentication", "T", false, NULL},
-    {'u', "username", "Set username for authentication", "u", true, "<username>"},
-    {'v', "password", "Set password for authentication", "v", true, "<password>"},
-    {'V', "version", "Show version number and exit", "V", false, NULL},
-    {810, "log-error", "Show error messages", NULL, false, NULL},
-    {811, "log-info", "Show error and info messages", NULL, false, NULL},
-    {812, "log-debug", "Show error, info, and debug messages", NULL, false, NULL},
-    {'w', "download-dir", "Where to save downloaded data", "w", true, "<path>"},
-    {800, "paused", "Pause all torrents on startup", NULL, false, NULL},
-    {'o', "dht", "Enable distributed hash tables (DHT)", "o", false, NULL},
-    {'O', "no-dht", "Disable distributed hash tables (DHT)", "O", false, NULL},
-    {'y', "lpd", "Enable local peer discovery (LPD)", "y", false, NULL},
-    {'Y', "no-lpd", "Disable local peer discovery (LPD)", "Y", false, NULL},
-    {830, "utp", "Enable uTP for peer connections", NULL, false, NULL},
-    {831, "no-utp", "Disable uTP for peer connections", NULL, false, NULL},
-    {'P', "peerport", "Port for incoming peers (Default: " TR_DEFAULT_PEER_PORT_STR ")", "P", true,
-     "<port>"},
-    {'m', "portmap", "Enable portmapping via NAT-PMP or UPnP", "m", false, NULL},
-    {'M', "no-portmap", "Disable portmapping", "M", false, NULL},
-    {'L', "peerlimit-global",
-     "Maximum overall number of peers (Default: " TR_DEFAULT_PEER_LIMIT_GLOBAL_STR ")", "L", true,
-     "<limit>"},
-    {'l', "peerlimit-torrent",
-     "Maximum number of peers per torrent (Default: " TR_DEFAULT_PEER_LIMIT_TORRENT_STR ")", "l",
-     true, "<limit>"},
-    {910, "encryption-required", "Encrypt all peer connections", "er", false, NULL},
-    {911, "encryption-preferred", "Prefer encrypted peer connections", "ep", false, NULL},
-    {912, "encryption-tolerated", "Prefer unencrypted peer connections", "et", false, NULL},
-    {'i', "bind-address-ipv4", "Where to listen for peer connections", "i", true, "<ipv4 addr>"},
-    {'I', "bind-address-ipv6", "Where to listen for peer connections", "I", true, "<ipv6 addr>"},
-    {'r', "rpc-bind-address", "Where to listen for RPC connections", "r", true, "<ip addr>"},
-    {953, "global-seedratio",
-     "All torrents, unless overridden by a per-torrent setting, should seed until a specific ratio",
-     "gsr", true, "ratio"},
-    {954, "no-global-seedratio",
-     "All torrents, unless overridden by a per-torrent setting, should seed regardless of ratio",
-     "GSR", false, NULL},
-    {'x', "pid-file", "Enable PID file", "x", true, "<pid-file>"},
-    {0, NULL, NULL, NULL, false, NULL}};
+static struct tr_option const options[] =
+{
+    { 'a', "allowed", "Allowed IP addresses. (Default: " TR_DEFAULT_RPC_WHITELIST ")", "a", true, "<list>" },
+    { 'b', "blocklist", "Enable peer blocklists", "b", false, NULL },
+    { 'B', "no-blocklist", "Disable peer blocklists", "B", false, NULL },
+    { 'c', "watch-dir", "Where to watch for new .torrent files", "c", true, "<directory>" },
+    { 'C', "no-watch-dir", "Disable the watch-dir", "C", false, NULL },
+    { 941, "incomplete-dir", "Where to store new torrents until they're complete", NULL, true, "<directory>" },
+    { 942, "no-incomplete-dir", "Don't store incomplete torrents in a different location", NULL, false, NULL },
+    { 'd', "dump-settings", "Dump the settings and exit", "d", false, NULL },
+    { 'e', "logfile", "Dump the log messages to this filename", "e", true, "<filename>" },
+    { 'f', "foreground", "Run in the foreground instead of daemonizing", "f", false, NULL },
+    { 'g', "config-dir", "Where to look for configuration files", "g", true, "<path>" },
+    { 'p', "port", "RPC port (Default: " TR_DEFAULT_RPC_PORT_STR ")", "p", true, "<port>" },
+    { 't', "auth", "Require authentication", "t", false, NULL },
+    { 'T', "no-auth", "Don't require authentication", "T", false, NULL },
+    { 'u', "username", "Set username for authentication", "u", true, "<username>" },
+    { 'v', "password", "Set password for authentication", "v", true, "<password>" },
+    { 'V', "version", "Show version number and exit", "V", false, NULL },
+    { 810, "log-error", "Show error messages", NULL, false, NULL },
+    { 811, "log-info", "Show error and info messages", NULL, false, NULL },
+    { 812, "log-debug", "Show error, info, and debug messages", NULL, false, NULL },
+    { 'w', "download-dir", "Where to save downloaded data", "w", true, "<path>" },
+    { 800, "paused", "Pause all torrents on startup", NULL, false, NULL },
+    { 'o', "dht", "Enable distributed hash tables (DHT)", "o", false, NULL },
+    { 'O', "no-dht", "Disable distributed hash tables (DHT)", "O", false, NULL },
+    { 'y', "lpd", "Enable local peer discovery (LPD)", "y", false, NULL },
+    { 'Y', "no-lpd", "Disable local peer discovery (LPD)", "Y", false, NULL },
+    { 830, "utp", "Enable uTP for peer connections", NULL, false, NULL },
+    { 831, "no-utp", "Disable uTP for peer connections", NULL, false, NULL },
+    { 'P', "peerport", "Port for incoming peers (Default: " TR_DEFAULT_PEER_PORT_STR ")", "P", true, "<port>" },
+    { 'm', "portmap", "Enable portmapping via NAT-PMP or UPnP", "m", false, NULL },
+    { 'M', "no-portmap", "Disable portmapping", "M", false, NULL },
+    { 'L', "peerlimit-global", "Maximum overall number of peers (Default: " TR_DEFAULT_PEER_LIMIT_GLOBAL_STR ")", "L", true,
+        "<limit>" },
+    { 'l', "peerlimit-torrent", "Maximum number of peers per torrent (Default: " TR_DEFAULT_PEER_LIMIT_TORRENT_STR ")", "l",
+        true, "<limit>" },
+    { 910, "encryption-required", "Encrypt all peer connections", "er", false, NULL },
+    { 911, "encryption-preferred", "Prefer encrypted peer connections", "ep", false, NULL },
+    { 912, "encryption-tolerated", "Prefer unencrypted peer connections", "et", false, NULL },
+    { 'i', "bind-address-ipv4", "Where to listen for peer connections", "i", true, "<ipv4 addr>" },
+    { 'I', "bind-address-ipv6", "Where to listen for peer connections", "I", true, "<ipv6 addr>" },
+    { 'r', "rpc-bind-address", "Where to listen for RPC connections", "r", true, "<ip addr>" },
+    { 953, "global-seedratio", "All torrents, unless overridden by a per-torrent setting, should seed until a specific ratio",
+        "gsr", true, "ratio" },
+    { 954, "no-global-seedratio", "All torrents, unless overridden by a per-torrent setting, should seed regardless of ratio",
+        "GSR", false, NULL },
+    { 'x', "pid-file", "Enable PID file", "x", true, "<pid-file>" },
+    { 0, NULL, NULL, NULL, false, NULL }
+};
 
 static bool reopen_log_file(char const* filename)
 {
     tr_error* error = NULL;
     tr_sys_file_t const old_log_file = logfile;
-    tr_sys_file_t const new_log_file = tr_sys_file_open(
-        filename, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_APPEND, 0666, &error);
+    tr_sys_file_t const new_log_file = tr_sys_file_open(filename, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_APPEND,
+        0666, &error);
 
     if (new_log_file == TR_BAD_SYS_FILE)
     {
@@ -268,8 +261,7 @@ static tr_watchdir_status onFileAdded(tr_watchdir_t dir, char const* name, void*
     return err == TR_PARSE_ERR ? TR_WATCHDIR_RETRY : TR_WATCHDIR_ACCEPT;
 }
 
-static void printMessage(tr_sys_file_t file, int level, char const* name, char const* message,
-                         char const* filename, int line)
+static void printMessage(tr_sys_file_t file, int level, char const* name, char const* message, char const* filename, int line)
 {
     if (file != TR_BAD_SYS_FILE)
     {
@@ -278,13 +270,11 @@ static void printMessage(tr_sys_file_t file, int level, char const* name, char c
 
         if (name != NULL)
         {
-            tr_sys_file_write_fmt(file, "[%s] %s %s (%s:%d)" TR_NATIVE_EOL_STR, NULL, timestr, name,
-                                  message, filename, line);
+            tr_sys_file_write_fmt(file, "[%s] %s %s (%s:%d)" TR_NATIVE_EOL_STR, NULL, timestr, name, message, filename, line);
         }
         else
         {
-            tr_sys_file_write_fmt(file, "[%s] %s (%s:%d)" TR_NATIVE_EOL_STR, NULL, timestr, message,
-                                  filename, line);
+            tr_sys_file_write_fmt(file, "[%s] %s (%s:%d)" TR_NATIVE_EOL_STR, NULL, timestr, message, filename, line);
         }
     }
 
@@ -297,11 +287,17 @@ static void printMessage(tr_sys_file_t file, int level, char const* name, char c
         /* figure out the syslog priority */
         switch (level)
         {
-            case TR_LOG_ERROR: priority = LOG_ERR; break;
+        case TR_LOG_ERROR:
+            priority = LOG_ERR;
+            break;
 
-            case TR_LOG_DEBUG: priority = LOG_DEBUG; break;
+        case TR_LOG_DEBUG:
+            priority = LOG_DEBUG;
+            break;
 
-            default: priority = LOG_INFO; break;
+        default:
+            priority = LOG_INFO;
+            break;
         }
 
         if (name != NULL)
@@ -363,8 +359,8 @@ static void periodicUpdate(evutil_socket_t fd, short what, void* context)
     reportStatus();
 }
 
-static tr_rpc_callback_status on_rpc_callback(tr_session* session, tr_rpc_callback_type type,
-                                              struct tr_torrent* tor, void* user_data)
+static tr_rpc_callback_status on_rpc_callback(tr_session* session, tr_rpc_callback_type type, struct tr_torrent* tor,
+    void* user_data)
 {
     TR_UNUSED(session);
     TR_UNUSED(tor);
@@ -378,8 +374,8 @@ static tr_rpc_callback_status on_rpc_callback(tr_session* session, tr_rpc_callba
     return TR_RPC_OK;
 }
 
-static bool parse_args(int argc, char const** argv, tr_variant* settings, bool* paused,
-                       bool* dump_settings, bool* foreground, int* exit_code)
+static bool parse_args(int argc, char const** argv, tr_variant* settings, bool* paused, bool* dump_settings, bool* foreground,
+    int* exit_code)
 {
     int c;
     char const* optarg;
@@ -394,125 +390,186 @@ static bool parse_args(int argc, char const** argv, tr_variant* settings, bool* 
     {
         switch (c)
         {
-            case 'a':
-                tr_variantDictAddStr(settings, TR_KEY_rpc_whitelist, optarg);
-                tr_variantDictAddBool(settings, TR_KEY_rpc_whitelist_enabled, true);
-                break;
+        case 'a':
+            tr_variantDictAddStr(settings, TR_KEY_rpc_whitelist, optarg);
+            tr_variantDictAddBool(settings, TR_KEY_rpc_whitelist_enabled, true);
+            break;
 
-            case 'b': tr_variantDictAddBool(settings, TR_KEY_blocklist_enabled, true); break;
+        case 'b':
+            tr_variantDictAddBool(settings, TR_KEY_blocklist_enabled, true);
+            break;
 
-            case 'B': tr_variantDictAddBool(settings, TR_KEY_blocklist_enabled, false); break;
+        case 'B':
+            tr_variantDictAddBool(settings, TR_KEY_blocklist_enabled, false);
+            break;
 
-            case 'c':
-                tr_variantDictAddStr(settings, TR_KEY_watch_dir, optarg);
-                tr_variantDictAddBool(settings, TR_KEY_watch_dir_enabled, true);
-                break;
+        case 'c':
+            tr_variantDictAddStr(settings, TR_KEY_watch_dir, optarg);
+            tr_variantDictAddBool(settings, TR_KEY_watch_dir_enabled, true);
+            break;
 
-            case 'C': tr_variantDictAddBool(settings, TR_KEY_watch_dir_enabled, false); break;
+        case 'C':
+            tr_variantDictAddBool(settings, TR_KEY_watch_dir_enabled, false);
+            break;
 
-            case 941:
-                tr_variantDictAddStr(settings, TR_KEY_incomplete_dir, optarg);
-                tr_variantDictAddBool(settings, TR_KEY_incomplete_dir_enabled, true);
-                break;
+        case 941:
+            tr_variantDictAddStr(settings, TR_KEY_incomplete_dir, optarg);
+            tr_variantDictAddBool(settings, TR_KEY_incomplete_dir_enabled, true);
+            break;
 
-            case 942: tr_variantDictAddBool(settings, TR_KEY_incomplete_dir_enabled, false); break;
+        case 942:
+            tr_variantDictAddBool(settings, TR_KEY_incomplete_dir_enabled, false);
+            break;
 
-            case 'd': *dump_settings = true; break;
+        case 'd':
+            *dump_settings = true;
+            break;
 
-            case 'e':
-                if (reopen_log_file(optarg))
-                {
-                    logfileName = optarg;
-                }
+        case 'e':
+            if (reopen_log_file(optarg))
+            {
+                logfileName = optarg;
+            }
 
-                break;
+            break;
 
-            case 'f': *foreground = true; break;
+        case 'f':
+            *foreground = true;
+            break;
 
-            case 'g': /* handled above */ break;
+        case 'g': /* handled above */
+            break;
 
-            case 'V': /* version */
-                fprintf(stderr, "%s %s\n", MY_NAME, LONG_VERSION_STRING);
-                *exit_code = 0;
-                return false;
+        case 'V': /* version */
+            fprintf(stderr, "%s %s\n", MY_NAME, LONG_VERSION_STRING);
+            *exit_code = 0;
+            return false;
 
-            case 'o': tr_variantDictAddBool(settings, TR_KEY_dht_enabled, true); break;
+        case 'o':
+            tr_variantDictAddBool(settings, TR_KEY_dht_enabled, true);
+            break;
 
-            case 'O': tr_variantDictAddBool(settings, TR_KEY_dht_enabled, false); break;
+        case 'O':
+            tr_variantDictAddBool(settings, TR_KEY_dht_enabled, false);
+            break;
 
-            case 'p': tr_variantDictAddInt(settings, TR_KEY_rpc_port, atoi(optarg)); break;
+        case 'p':
+            tr_variantDictAddInt(settings, TR_KEY_rpc_port, atoi(optarg));
+            break;
 
-            case 't':
-                tr_variantDictAddBool(settings, TR_KEY_rpc_authentication_required, true);
-                break;
+        case 't':
+            tr_variantDictAddBool(settings, TR_KEY_rpc_authentication_required, true);
+            break;
 
-            case 'T':
-                tr_variantDictAddBool(settings, TR_KEY_rpc_authentication_required, false);
-                break;
+        case 'T':
+            tr_variantDictAddBool(settings, TR_KEY_rpc_authentication_required, false);
+            break;
 
-            case 'u': tr_variantDictAddStr(settings, TR_KEY_rpc_username, optarg); break;
+        case 'u':
+            tr_variantDictAddStr(settings, TR_KEY_rpc_username, optarg);
+            break;
 
-            case 'v': tr_variantDictAddStr(settings, TR_KEY_rpc_password, optarg); break;
+        case 'v':
+            tr_variantDictAddStr(settings, TR_KEY_rpc_password, optarg);
+            break;
 
-            case 'w': tr_variantDictAddStr(settings, TR_KEY_download_dir, optarg); break;
+        case 'w':
+            tr_variantDictAddStr(settings, TR_KEY_download_dir, optarg);
+            break;
 
-            case 'P': tr_variantDictAddInt(settings, TR_KEY_peer_port, atoi(optarg)); break;
+        case 'P':
+            tr_variantDictAddInt(settings, TR_KEY_peer_port, atoi(optarg));
+            break;
 
-            case 'm': tr_variantDictAddBool(settings, TR_KEY_port_forwarding_enabled, true); break;
+        case 'm':
+            tr_variantDictAddBool(settings, TR_KEY_port_forwarding_enabled, true);
+            break;
 
-            case 'M': tr_variantDictAddBool(settings, TR_KEY_port_forwarding_enabled, false); break;
+        case 'M':
+            tr_variantDictAddBool(settings, TR_KEY_port_forwarding_enabled, false);
+            break;
 
-            case 'L': tr_variantDictAddInt(settings, TR_KEY_peer_limit_global, atoi(optarg)); break;
+        case 'L':
+            tr_variantDictAddInt(settings, TR_KEY_peer_limit_global, atoi(optarg));
+            break;
 
-            case 'l':
-                tr_variantDictAddInt(settings, TR_KEY_peer_limit_per_torrent, atoi(optarg));
-                break;
+        case 'l':
+            tr_variantDictAddInt(settings, TR_KEY_peer_limit_per_torrent, atoi(optarg));
+            break;
 
-            case 800: *paused = true; break;
+        case 800:
+            *paused = true;
+            break;
 
-            case 910:
-                tr_variantDictAddInt(settings, TR_KEY_encryption, TR_ENCRYPTION_REQUIRED);
-                break;
+        case 910:
+            tr_variantDictAddInt(settings, TR_KEY_encryption, TR_ENCRYPTION_REQUIRED);
+            break;
 
-            case 911:
-                tr_variantDictAddInt(settings, TR_KEY_encryption, TR_ENCRYPTION_PREFERRED);
-                break;
+        case 911:
+            tr_variantDictAddInt(settings, TR_KEY_encryption, TR_ENCRYPTION_PREFERRED);
+            break;
 
-            case 912: tr_variantDictAddInt(settings, TR_KEY_encryption, TR_CLEAR_PREFERRED); break;
+        case 912:
+            tr_variantDictAddInt(settings, TR_KEY_encryption, TR_CLEAR_PREFERRED);
+            break;
 
-            case 'i': tr_variantDictAddStr(settings, TR_KEY_bind_address_ipv4, optarg); break;
+        case 'i':
+            tr_variantDictAddStr(settings, TR_KEY_bind_address_ipv4, optarg);
+            break;
 
-            case 'I': tr_variantDictAddStr(settings, TR_KEY_bind_address_ipv6, optarg); break;
+        case 'I':
+            tr_variantDictAddStr(settings, TR_KEY_bind_address_ipv6, optarg);
+            break;
 
-            case 'r': tr_variantDictAddStr(settings, TR_KEY_rpc_bind_address, optarg); break;
+        case 'r':
+            tr_variantDictAddStr(settings, TR_KEY_rpc_bind_address, optarg);
+            break;
 
-            case 953:
-                tr_variantDictAddReal(settings, TR_KEY_ratio_limit, atof(optarg));
-                tr_variantDictAddBool(settings, TR_KEY_ratio_limit_enabled, true);
-                break;
+        case 953:
+            tr_variantDictAddReal(settings, TR_KEY_ratio_limit, atof(optarg));
+            tr_variantDictAddBool(settings, TR_KEY_ratio_limit_enabled, true);
+            break;
 
-            case 954: tr_variantDictAddBool(settings, TR_KEY_ratio_limit_enabled, false); break;
+        case 954:
+            tr_variantDictAddBool(settings, TR_KEY_ratio_limit_enabled, false);
+            break;
 
-            case 'x': tr_variantDictAddStr(settings, key_pidfile, optarg); break;
+        case 'x':
+            tr_variantDictAddStr(settings, key_pidfile, optarg);
+            break;
 
-            case 'y': tr_variantDictAddBool(settings, TR_KEY_lpd_enabled, true); break;
+        case 'y':
+            tr_variantDictAddBool(settings, TR_KEY_lpd_enabled, true);
+            break;
 
-            case 'Y': tr_variantDictAddBool(settings, TR_KEY_lpd_enabled, false); break;
+        case 'Y':
+            tr_variantDictAddBool(settings, TR_KEY_lpd_enabled, false);
+            break;
 
-            case 810: tr_variantDictAddInt(settings, TR_KEY_message_level, TR_LOG_ERROR); break;
+        case 810:
+            tr_variantDictAddInt(settings, TR_KEY_message_level, TR_LOG_ERROR);
+            break;
 
-            case 811: tr_variantDictAddInt(settings, TR_KEY_message_level, TR_LOG_INFO); break;
+        case 811:
+            tr_variantDictAddInt(settings, TR_KEY_message_level, TR_LOG_INFO);
+            break;
 
-            case 812: tr_variantDictAddInt(settings, TR_KEY_message_level, TR_LOG_DEBUG); break;
+        case 812:
+            tr_variantDictAddInt(settings, TR_KEY_message_level, TR_LOG_DEBUG);
+            break;
 
-            case 830: tr_variantDictAddBool(settings, TR_KEY_utp_enabled, true); break;
+        case 830:
+            tr_variantDictAddBool(settings, TR_KEY_utp_enabled, true);
+            break;
 
-            case 831: tr_variantDictAddBool(settings, TR_KEY_utp_enabled, false); break;
+        case 831:
+            tr_variantDictAddBool(settings, TR_KEY_utp_enabled, false);
+            break;
 
-            default:
-                tr_getopt_usage(MY_NAME, getUsage(), options);
-                *exit_code = 0;
-                return false;
+        default:
+            tr_getopt_usage(MY_NAME, getUsage(), options);
+            *exit_code = 0;
+            return false;
         }
     }
 
@@ -611,8 +668,7 @@ static int daemon_start(void* raw_arg, bool foreground)
     if (!tr_str_is_empty(pid_filename))
     {
         tr_error* error = NULL;
-        tr_sys_file_t fp = tr_sys_file_open(
-            pid_filename, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE, 0666,
+        tr_sys_file_t fp = tr_sys_file_open(pid_filename, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE, 0666,
             &error);
 
         if (fp != TR_BAD_SYS_FILE)
@@ -657,8 +713,7 @@ static int daemon_start(void* raw_arg, bool foreground)
         {
             tr_logAddInfo("Watching \"%s\" for new .torrent files", dir);
 
-            if ((watchdir = tr_watchdir_new(dir, &onFileAdded, mySession, ev_base, force_generic))
-                == NULL)
+            if ((watchdir = tr_watchdir_new(dir, &onFileAdded, mySession, ev_base, force_generic)) == NULL)
             {
                 goto cleanup;
             }
@@ -691,7 +746,7 @@ static int daemon_start(void* raw_arg, bool foreground)
 
     /* Create new timer event to report daemon status */
     {
-        struct timeval one_sec = {.tv_sec = 1, .tv_usec = 0};
+        struct timeval one_sec = { .tv_sec = 1, .tv_usec = 0 };
         status_ev = event_new(ev_base, -1, EV_PERSIST, &periodicUpdate, NULL);
 
         if (status_ev == NULL)
@@ -757,8 +812,7 @@ cleanup:
     return 0;
 }
 
-static bool init_daemon_data(int argc, char* argv[], struct daemon_data* data, bool* foreground,
-                             int* ret)
+static bool init_daemon_data(int argc, char* argv[], struct daemon_data* data, bool* foreground, int* ret)
 {
     data->configDir = getConfigDir(argc, (char const* const*)argv);
 
@@ -772,8 +826,7 @@ static bool init_daemon_data(int argc, char* argv[], struct daemon_data* data, b
     *ret = 0;
 
     /* overwrite settings from the command line */
-    if (!parse_args(argc, (char const**)argv, &data->settings, &data->paused, &dumpSettings,
-                    foreground, ret))
+    if (!parse_args(argc, (char const**)argv, &data->settings, &data->paused, &dumpSettings, foreground, ret))
     {
         goto exit_early;
     }
@@ -785,8 +838,7 @@ static bool init_daemon_data(int argc, char* argv[], struct daemon_data* data, b
 
     if (!loaded)
     {
-        printMessage(logfile, TR_LOG_ERROR, MY_NAME, "Error loading config file -- exiting.",
-                     __FILE__, __LINE__);
+        printMessage(logfile, TR_LOG_ERROR, MY_NAME, "Error loading config file -- exiting.", __FILE__, __LINE__);
         *ret = 1;
         goto exit_early;
     }
@@ -820,7 +872,8 @@ int tr_main(int argc, char* argv[])
         return ret;
     }
 
-    dtr_callbacks const cb = {
+    dtr_callbacks const cb =
+    {
         .on_start = &daemon_start,
         .on_stop = &daemon_stop,
         .on_reconfigure = &daemon_reconfigure,

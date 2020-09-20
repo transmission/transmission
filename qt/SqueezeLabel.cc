@@ -45,15 +45,19 @@
 
 #include "SqueezeLabel.h"
 
-SqueezeLabel::SqueezeLabel(QString const& text, QWidget* parent) : QLabel(text, parent) {}
+SqueezeLabel::SqueezeLabel(QString const& text, QWidget* parent) :
+    QLabel(text, parent)
+{
+}
 
-SqueezeLabel::SqueezeLabel(QWidget* parent) : QLabel(parent) {}
+SqueezeLabel::SqueezeLabel(QWidget* parent) :
+    QLabel(parent)
+{
+}
 
 void SqueezeLabel::paintEvent(QPaintEvent* paintEvent)
 {
-    if (hasFocus()
-        && (textInteractionFlags() & (Qt::TextSelectableByKeyboard | Qt::TextSelectableByMouse))
-               != 0)
+    if (hasFocus() && (textInteractionFlags() & (Qt::TextSelectableByKeyboard | Qt::TextSelectableByMouse)) != 0)
     {
         return QLabel::paintEvent(paintEvent);
     }
@@ -64,10 +68,9 @@ void SqueezeLabel::paintEvent(QPaintEvent* paintEvent)
     opt.initFrom(this);
     auto const full_text = text();
     auto const elided_text = fm.elidedText(full_text, Qt::ElideRight, width());
-    style()->drawItemText(&painter, contentsRect(), alignment(), opt.palette, isEnabled(),
-                          elided_text, foregroundRole());
+    style()->drawItemText(&painter, contentsRect(), alignment(), opt.palette, isEnabled(), elided_text, foregroundRole());
 
 #ifndef QT_NO_TOOLTIP
-    setToolTip(full_text != elided_text ? full_text : QString {});
+    setToolTip(full_text != elided_text ? full_text : QString{});
 #endif
 }

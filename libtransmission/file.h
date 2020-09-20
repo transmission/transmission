@@ -9,7 +9,6 @@
 #pragma once
 
 #include <inttypes.h>
-#include <stdbool.h>
 #include <time.h>
 
 #ifdef _WIN32
@@ -58,7 +57,8 @@ typedef enum
     TR_STD_SYS_FILE_IN,
     TR_STD_SYS_FILE_OUT,
     TR_STD_SYS_FILE_ERR
-} tr_std_sys_file_t;
+}
+tr_std_sys_file_t;
 
 typedef enum
 {
@@ -69,14 +69,16 @@ typedef enum
     TR_SYS_FILE_APPEND = (1 << 4),
     TR_SYS_FILE_TRUNCATE = (1 << 5),
     TR_SYS_FILE_SEQUENTIAL = (1 << 6)
-} tr_sys_file_open_flags_t;
+}
+tr_sys_file_open_flags_t;
 
 typedef enum
 {
     TR_SEEK_SET,
     TR_SEEK_CUR,
     TR_SEEK_END
-} tr_seek_origin_t;
+}
+tr_seek_origin_t;
 
 typedef enum
 {
@@ -84,42 +86,49 @@ typedef enum
     TR_SYS_FILE_LOCK_EX = (1 << 1),
     TR_SYS_FILE_LOCK_NB = (1 << 2),
     TR_SYS_FILE_LOCK_UN = (1 << 3)
-} tr_sys_file_lock_flags_t;
+}
+tr_sys_file_lock_flags_t;
 
 typedef enum
 {
     TR_SYS_PATH_NO_FOLLOW = (1 << 0)
-} tr_sys_path_get_info_flags_t;
+}
+tr_sys_path_get_info_flags_t;
 
 typedef enum
 {
     TR_SYS_FILE_ADVICE_WILL_NEED,
     TR_SYS_FILE_ADVICE_DONT_NEED
-} tr_sys_file_advice_t;
+}
+tr_sys_file_advice_t;
 
 typedef enum
 {
     TR_SYS_FILE_PREALLOC_SPARSE = (1 << 0)
-} tr_sys_file_preallocate_flags_t;
+}
+tr_sys_file_preallocate_flags_t;
 
 typedef enum
 {
     TR_SYS_DIR_CREATE_PARENTS = (1 << 0)
-} tr_sys_dir_create_flags_t;
+}
+tr_sys_dir_create_flags_t;
 
 typedef enum
 {
     TR_SYS_PATH_IS_FILE,
     TR_SYS_PATH_IS_DIRECTORY,
     TR_SYS_PATH_IS_OTHER
-} tr_sys_path_type_t;
+}
+tr_sys_path_type_t;
 
 typedef struct tr_sys_path_info
 {
     tr_sys_path_type_t type;
     uint64_t size;
     time_t last_modified_at;
-} tr_sys_path_info;
+}
+tr_sys_path_info;
 
 /**
  * @name Platform-specific wrapper functions
@@ -146,8 +155,7 @@ typedef struct tr_sys_path_info
  *
  * @return `True` on success, `false` otherwise (with `error` set accordingly).
  */
-bool tr_sys_path_get_info(char const* path, int flags, tr_sys_path_info* info,
-                          struct tr_error** error);
+bool tr_sys_path_get_info(char const* path, int flags, tr_sys_path_info* info, struct tr_error** error);
 
 /**
  * @brief Portability wrapper for `access()`.
@@ -294,8 +302,7 @@ tr_sys_file_t tr_sys_file_get_std(tr_std_sys_file_t std_file, struct tr_error** 
  * @return Opened file descriptor on success, `TR_BAD_SYS_FILE` otherwise (with
  *         `error` set accordingly).
  */
-tr_sys_file_t tr_sys_file_open(char const* path, int flags, int permissions,
-                               struct tr_error** error);
+tr_sys_file_t tr_sys_file_open(char const* path, int flags, int permissions, struct tr_error** error);
 
 /**
  * @brief Portability wrapper for `mkstemp()`.
@@ -349,8 +356,8 @@ bool tr_sys_file_get_info(tr_sys_file_t handle, tr_sys_path_info* info, struct t
  *
  * @return `True` on success, `false` otherwise (with `error` set accordingly).
  */
-bool tr_sys_file_seek(tr_sys_file_t handle, int64_t offset, tr_seek_origin_t origin,
-                      uint64_t* new_offset, struct tr_error** error);
+bool tr_sys_file_seek(tr_sys_file_t handle, int64_t offset, tr_seek_origin_t origin, uint64_t* new_offset,
+    struct tr_error** error);
 
 /**
  * @brief Portability wrapper for `read()`.
@@ -365,8 +372,7 @@ bool tr_sys_file_seek(tr_sys_file_t handle, int64_t offset, tr_seek_origin_t ori
  *
  * @return `True` on success, `false` otherwise (with `error` set accordingly).
  */
-bool tr_sys_file_read(tr_sys_file_t handle, void* buffer, uint64_t size, uint64_t* bytes_read,
-                      struct tr_error** error);
+bool tr_sys_file_read(tr_sys_file_t handle, void* buffer, uint64_t size, uint64_t* bytes_read, struct tr_error** error);
 
 /**
  * @brief Like `pread()`, except that the position is undefined afterwards.
@@ -383,8 +389,8 @@ bool tr_sys_file_read(tr_sys_file_t handle, void* buffer, uint64_t size, uint64_
  *
  * @return `True` on success, `false` otherwise (with `error` set accordingly).
  */
-bool tr_sys_file_read_at(tr_sys_file_t handle, void* buffer, uint64_t size, uint64_t offset,
-                         uint64_t* bytes_read, struct tr_error** error);
+bool tr_sys_file_read_at(tr_sys_file_t handle, void* buffer, uint64_t size, uint64_t offset, uint64_t* bytes_read,
+    struct tr_error** error);
 
 /**
  * @brief Portability wrapper for `write()`.
@@ -399,8 +405,8 @@ bool tr_sys_file_read_at(tr_sys_file_t handle, void* buffer, uint64_t size, uint
  *
  * @return `True` on success, `false` otherwise (with `error` set accordingly).
  */
-bool tr_sys_file_write(tr_sys_file_t handle, void const* buffer, uint64_t size,
-                       uint64_t* bytes_written, struct tr_error** error);
+bool tr_sys_file_write(tr_sys_file_t handle, void const* buffer, uint64_t size, uint64_t* bytes_written,
+    struct tr_error** error);
 
 /**
  * @brief Like `pwrite()`, except that the position is undefined afterwards.
@@ -417,8 +423,8 @@ bool tr_sys_file_write(tr_sys_file_t handle, void const* buffer, uint64_t size,
  *
  * @return `True` on success, `false` otherwise (with `error` set accordingly).
  */
-bool tr_sys_file_write_at(tr_sys_file_t handle, void const* buffer, uint64_t size, uint64_t offset,
-                          uint64_t* bytes_written, struct tr_error** error);
+bool tr_sys_file_write_at(tr_sys_file_t handle, void const* buffer, uint64_t size, uint64_t offset, uint64_t* bytes_written,
+    struct tr_error** error);
 
 /**
  * @brief Portability wrapper for `fsync()`.
@@ -454,8 +460,8 @@ bool tr_sys_file_truncate(tr_sys_file_t handle, uint64_t size, struct tr_error**
  *
  * @return `True` on success, `false` otherwise (with `error` set accordingly).
  */
-bool tr_sys_file_advise(tr_sys_file_t handle, uint64_t offset, uint64_t size,
-                        tr_sys_file_advice_t advice, struct tr_error** error);
+bool tr_sys_file_advise(tr_sys_file_t handle, uint64_t offset, uint64_t size, tr_sys_file_advice_t advice,
+    struct tr_error** error);
 
 /**
  * @brief Preallocate file to specified size in full or sparse mode.
@@ -468,8 +474,7 @@ bool tr_sys_file_advise(tr_sys_file_t handle, uint64_t offset, uint64_t size,
  *
  * @return `True` on success, `false` otherwise (with `error` set accordingly).
  */
-bool tr_sys_file_preallocate(tr_sys_file_t handle, uint64_t size, int flags,
-                             struct tr_error** error);
+bool tr_sys_file_preallocate(tr_sys_file_t handle, uint64_t size, int flags, struct tr_error** error);
 
 /**
  * @brief Portability wrapper for `mmap()` for files.
@@ -483,8 +488,7 @@ bool tr_sys_file_preallocate(tr_sys_file_t handle, uint64_t size, int flags,
  * @return Pointer to mapped file data on success, `NULL` otherwise (with
  *         `error` set accordingly).
  */
-void* tr_sys_file_map_for_reading(tr_sys_file_t handle, uint64_t offset, uint64_t size,
-                                  struct tr_error** error);
+void* tr_sys_file_map_for_reading(tr_sys_file_t handle, uint64_t offset, uint64_t size, struct tr_error** error);
 
 /**
  * @brief Portability wrapper for `munmap()` for files.
@@ -536,8 +540,7 @@ bool tr_sys_file_lock(tr_sys_file_t handle, int operation, struct tr_error** err
  *         you need to distinguish the two, check if `error` is `NULL`
  *         afterwards.
  */
-bool tr_sys_file_read_line(tr_sys_file_t handle, char* buffer, size_t buffer_size,
-                           struct tr_error** error);
+bool tr_sys_file_read_line(tr_sys_file_t handle, char* buffer, size_t buffer_size, struct tr_error** error);
 
 /**
  * @brief Portability wrapper for `fputs()`, appending EOL internally.
@@ -574,8 +577,7 @@ bool tr_sys_file_write_line(tr_sys_file_t handle, char const* buffer, struct tr_
  *
  * @return `True` on success, `false` otherwise (with `error` set accordingly).
  */
-bool tr_sys_file_write_fmt(tr_sys_file_t handle, char const* format, struct tr_error** error, ...)
-    TR_GNUC_PRINTF(2, 4);
+bool tr_sys_file_write_fmt(tr_sys_file_t handle, char const* format, struct tr_error** error, ...) TR_GNUC_PRINTF(2, 4);
 
 /* Directory-related wrappers */
 

@@ -12,15 +12,13 @@
 #error only the libtransmission watchdir module should #include this header.
 #endif
 
-#include "transmission.h"
-#include "watchdir.h"
-
 struct tr_ptrArray;
 
 typedef struct tr_watchdir_backend
 {
-    void (*free_func)(struct tr_watchdir_backend*);
-} tr_watchdir_backend;
+    void (* free_func)(struct tr_watchdir_backend*);
+}
+tr_watchdir_backend;
 
 #define BACKEND_DOWNCAST(b) ((tr_watchdir_backend*)(b))
 

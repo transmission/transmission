@@ -12,5 +12,4 @@
 
 char const* gtr_get_mime_type_from_filename(char const* file);
 
-GdkPixbuf* gtr_get_mime_type_icon(char const* mime_type, GtkIconSize icon_size,
-                                  GtkWidget* for_widget);
+GdkPixbuf* gtr_get_mime_type_icon(char const* mime_type, GtkIconSize icon_size, GtkWidget* for_widget);

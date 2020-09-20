@@ -32,4 +32,4 @@ bool tr_lpdEnabled(tr_session const*);
 bool tr_lpdSendAnnounce(tr_torrent const*);
 
 /**
- * @} */
+* @} */

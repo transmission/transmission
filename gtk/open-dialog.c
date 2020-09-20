@@ -128,8 +128,7 @@ static void addResponseCB(GtkDialog* dialog, gint response, gpointer gdata)
         }
         else
         {
-            tr_torrentSetPriority(o->tor,
-                                  gtr_priority_combo_get_value(GTK_COMBO_BOX(o->priority_combo)));
+            tr_torrentSetPriority(o->tor, gtr_priority_combo_get_value(GTK_COMBO_BOX(o->priority_combo)));
 
             if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(o->run_check)))
             {
@@ -193,8 +192,7 @@ static void sourceChanged(GtkFileChooserButton* b, gpointer gdata)
         int duplicate_id = 0;
         tr_torrent* torrent;
 
-        if (filename != NULL
-            && (o->filename == NULL || !tr_sys_path_is_same(filename, o->filename, NULL)))
+        if (filename != NULL && (o->filename == NULL || !tr_sys_path_is_same(filename, o->filename, NULL)))
         {
             g_free(o->filename);
             o->filename = g_strdup(filename);
@@ -238,8 +236,7 @@ static void downloadDirChanged(GtkFileChooserButton* b, gpointer gdata)
     struct OpenData* data = gdata;
     char* fname = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(b));
 
-    if (fname != NULL
-        && (data->downloadDir == NULL || !tr_sys_path_is_same(fname, data->downloadDir, NULL)))
+    if (fname != NULL && (data->downloadDir == NULL || !tr_sys_path_is_same(fname, data->downloadDir, NULL)))
     {
         g_free(data->downloadDir);
         data->downloadDir = g_strdup(fname);
@@ -285,8 +282,9 @@ GtkWidget* gtr_torrent_options_dialog_new(GtkWindow* parent, TrCore* core, tr_ct
 
     /* make the dialog */
     d = gtk_dialog_new_with_buttons(_("Torrent Options"), parent, GTK_DIALOG_DESTROY_WITH_PARENT,
-                                    _("_Cancel"), GTK_RESPONSE_CANCEL, _("_Open"),
-                                    GTK_RESPONSE_ACCEPT, NULL);
+        _("_Cancel"), GTK_RESPONSE_CANCEL,
+        _("_Open"), GTK_RESPONSE_ACCEPT,
+        NULL);
     gtk_dialog_set_default_response(GTK_DIALOG(d), GTK_RESPONSE_ACCEPT);
 
     if (!tr_ctorGetDownloadDir(ctor, TR_FORCE, &str))
@@ -335,8 +333,7 @@ GtkWidget* gtr_torrent_options_dialog_new(GtkWindow* parent, TrCore* core, tr_ct
     l = gtk_label_new_with_mnemonic(_("_Destination folder:"));
     g_object_set(l, "halign", GTK_ALIGN_START, "valign", GTK_ALIGN_CENTER, NULL);
     gtk_grid_attach(grid, l, 0, row, 1, 1);
-    w = gtk_file_chooser_button_new(_("Select Destination Folder"),
-                                    GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER);
+    w = gtk_file_chooser_button_new(_("Select Destination Folder"), GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER);
 
     if (!gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(w), data->downloadDir))
     {
@@ -458,8 +455,9 @@ GtkWidget* gtr_torrent_open_from_file_dialog_new(GtkWindow* parent, TrCore* core
     char const* folder;
 
     w = gtk_file_chooser_dialog_new(_("Open a Torrent"), parent, GTK_FILE_CHOOSER_ACTION_OPEN,
-                                    _("_Cancel"), GTK_RESPONSE_CANCEL, _("_Open"),
-                                    GTK_RESPONSE_ACCEPT, NULL);
+        _("_Cancel"), GTK_RESPONSE_CANCEL,
+        _("_Open"), GTK_RESPONSE_ACCEPT,
+        NULL);
     gtk_file_chooser_set_select_multiple(GTK_FILE_CHOOSER(w), TRUE);
     addTorrentFilters(GTK_FILE_CHOOSER(w));
     g_signal_connect(w, "response", G_CALLBACK(onOpenDialogResponse), core);
@@ -470,8 +468,7 @@ GtkWidget* gtr_torrent_open_from_file_dialog_new(GtkWindow* parent, TrCore* core
     }
 
     c = gtk_check_button_new_with_mnemonic(_("Show _options dialog"));
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(c),
-                                 gtr_pref_flag_get(TR_KEY_show_options_window));
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(c), gtr_pref_flag_get(TR_KEY_show_options_window));
     gtk_file_chooser_set_extra_widget(GTK_FILE_CHOOSER(w), c);
     gtk_widget_show(c);
 
@@ -523,8 +520,9 @@ GtkWidget* gtr_torrent_open_from_url_dialog_new(GtkWindow* parent, TrCore* core)
     GtkWidget* w;
 
     w = gtk_dialog_new_with_buttons(_("Open URL"), parent, GTK_DIALOG_DESTROY_WITH_PARENT,
-                                    _("_Cancel"), GTK_RESPONSE_CANCEL, _("_Open"),
-                                    GTK_RESPONSE_ACCEPT, NULL);
+        _("_Cancel"), GTK_RESPONSE_CANCEL,
+        _("_Open"), GTK_RESPONSE_ACCEPT,
+        NULL);
     g_signal_connect(w, "response", G_CALLBACK(onOpenURLResponse), core);
 
     row = 0;
@@ -544,8 +542,7 @@ GtkWidget* gtr_torrent_open_from_url_dialog_new(GtkWindow* parent, TrCore* core)
     }
     else
     {
-        gtk_widget_grab_focus(
-            gtk_dialog_get_widget_for_response(GTK_DIALOG(w), GTK_RESPONSE_ACCEPT));
+        gtk_widget_grab_focus(gtk_dialog_get_widget_for_response(GTK_DIALOG(w), GTK_RESPONSE_ACCEPT));
     }
 
     return w;

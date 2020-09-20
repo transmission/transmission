@@ -19,7 +19,7 @@ skipfiles=(
   libtransmission/jsonsl\.[ch]
   libtransmission/wildmat\.c
 )
-candidates=(
+cfile_candidates=(
   cli/*\.[ch]
   daemon/*\.[ch]
   gtk/*\.[ch]
@@ -30,18 +30,22 @@ candidates=(
   tests/*/*\.h
   utils/*\.[ch]
 )
-for file in "${candidates[@]}"; do
+for file in "${cfile_candidates[@]}"; do
   if [[ ! " ${skipfiles[*]} " =~ ${file} ]]; then
     cfiles+=("${file}");
   fi
 done
 
 # format C/C++
-if [ -n "$fix"  ]; then
-  ./run-clang-format.py --in-place "${cfiles[@]}"
-elif ! ./run-clang-format.py --quiet "${cfiles[@]}"; then
-  echo 'C/C++ code needs formatting'
-  exitcode=1
+cores=$(($(nproc) + 1))
+if [ -n "$fix" ]; then
+  printf "%s\0" "${cfiles[@]}" | xargs -0 -P$cores -I FILE uncrustify -c uncrustify.cfg --no-backup -q FILE
+else
+  printf "%s\0" "${cfiles[@]}" | xargs -0 -P$cores -I FILE uncrustify -c uncrustify.cfg --check FILE > /dev/null
+  if [ "${PIPESTATUS[1]}" -ne "0" ]; then
+    echo 'C/C++ code needs formatting'
+    exitcode=1
+  fi
 fi
 
 # enforce east const

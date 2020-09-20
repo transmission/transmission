@@ -10,7 +10,6 @@
 
 #ifdef _WIN32
 #include <windows.h>
-
 #include <wincrypt.h>
 #endif
 
@@ -23,10 +22,10 @@
 #include "file.h"
 #include "list.h"
 #include "log.h"
-#include "net.h"      /* tr_address */
+#include "net.h" /* tr_address */
+#include "torrent.h"
 #include "platform.h" /* mutex */
 #include "session.h"
-#include "torrent.h"
 #include "tr-assert.h"
 #include "tr-macros.h"
 #include "trevent.h" /* tr_runInEventThread() */
@@ -174,7 +173,11 @@ static CURLcode ssl_context_func(CURL* curl, void* ssl_ctx, void* user_data)
         return CURLE_OK;
     }
 
-    static LPCWSTR const sys_store_names[] = {L"CA", L"ROOT"};
+    static LPCWSTR const sys_store_names[] =
+    {
+        L"CA",
+        L"ROOT"
+    };
 
     for (size_t i = 0; i < TR_N_ELEMENTS(sys_store_names); ++i)
     {
@@ -188,15 +191,13 @@ static CURLcode ssl_context_func(CURL* curl, void* ssl_ctx, void* user_data)
 
         while (true)
         {
-            sys_cert = CertFindCertificateInStore(sys_cert_store, X509_ASN_ENCODING, 0,
-                                                  CERT_FIND_ANY, NULL, sys_cert);
+            sys_cert = CertFindCertificateInStore(sys_cert_store, X509_ASN_ENCODING, 0, CERT_FIND_ANY, NULL, sys_cert);
             if (sys_cert == NULL)
             {
                 break;
             }
 
-            tr_x509_cert_t const cert =
-                tr_x509_cert_new(sys_cert->pbCertEncoded, sys_cert->cbCertEncoded);
+            tr_x509_cert_t const cert = tr_x509_cert_new(sys_cert->pbCertEncoded, sys_cert->cbCertEncoded);
             if (cert == NULL)
             {
                 continue;
@@ -284,13 +285,11 @@ static CURL* createEasy(tr_session* s, struct tr_web* web, struct tr_web_task* t
     curl_easy_setopt(e, CURLOPT_WRITEDATA, task);
     curl_easy_setopt(e, CURLOPT_WRITEFUNCTION, writeFunc);
 
-    if ((addr = tr_sessionGetPublicAddress(s, TR_AF_INET, &is_default_value)) != NULL
-        && !is_default_value)
+    if ((addr = tr_sessionGetPublicAddress(s, TR_AF_INET, &is_default_value)) != NULL && !is_default_value)
     {
         curl_easy_setopt(e, CURLOPT_INTERFACE, tr_address_to_string(addr));
     }
-    else if ((addr = tr_sessionGetPublicAddress(s, TR_AF_INET6, &is_default_value)) != NULL
-             && !is_default_value)
+    else if ((addr = tr_sessionGetPublicAddress(s, TR_AF_INET6, &is_default_value)) != NULL && !is_default_value)
     {
         curl_easy_setopt(e, CURLOPT_INTERFACE, tr_address_to_string(addr));
     }
@@ -326,9 +325,8 @@ static void task_finish_func(void* vtask)
 
     if (task->done_func != NULL)
     {
-        (*task->done_func)(task->session, task->did_connect, task->did_timeout, task->code,
-                           evbuffer_pullup(task->response, -1), evbuffer_get_length(task->response),
-                           task->done_func_user_data);
+        (*task->done_func)(task->session, task->did_connect, task->did_timeout, task->code, evbuffer_pullup(task->response, -1),
+            evbuffer_get_length(task->response), task->done_func_user_data);
     }
 
     task_free(task);
@@ -340,10 +338,9 @@ static void task_finish_func(void* vtask)
 
 static void tr_webThreadFunc(void* vsession);
 
-static struct tr_web_task* tr_webRunImpl(tr_session* session, int torrentId, char const* url,
-                                         char const* range, char const* cookies,
-                                         tr_web_done_func done_func, void* done_func_user_data,
-                                         struct evbuffer* buffer)
+static struct tr_web_task* tr_webRunImpl(tr_session* session, int torrentId, char const* url, char const* range,
+    char const* cookies, tr_web_done_func done_func, void* done_func_user_data,
+    struct evbuffer* buffer)
 {
     struct tr_web_task* task = NULL;
 
@@ -379,24 +376,21 @@ static struct tr_web_task* tr_webRunImpl(tr_session* session, int torrentId, cha
     return task;
 }
 
-struct tr_web_task* tr_webRunWithCookies(tr_session* session, char const* url, char const* cookies,
-                                         tr_web_done_func done_func, void* done_func_user_data)
+struct tr_web_task* tr_webRunWithCookies(tr_session* session, char const* url, char const* cookies, tr_web_done_func done_func,
+    void* done_func_user_data)
 {
     return tr_webRunImpl(session, -1, url, NULL, cookies, done_func, done_func_user_data, NULL);
 }
 
-struct tr_web_task* tr_webRun(tr_session* session, char const* url, tr_web_done_func done_func,
-                              void* done_func_user_data)
+struct tr_web_task* tr_webRun(tr_session* session, char const* url, tr_web_done_func done_func, void* done_func_user_data)
 {
     return tr_webRunWithCookies(session, url, NULL, done_func, done_func_user_data);
 }
 
-struct tr_web_task* tr_webRunWebseed(tr_torrent* tor, char const* url, char const* range,
-                                     tr_web_done_func done_func, void* done_func_user_data,
-                                     struct evbuffer* buffer)
+struct tr_web_task* tr_webRunWebseed(tr_torrent* tor, char const* url, char const* range, tr_web_done_func done_func,
+    void* done_func_user_data, struct evbuffer* buffer)
 {
-    return tr_webRunImpl(tor->session, tr_torrentId(tor), url, range, NULL, done_func,
-                         done_func_user_data, buffer);
+    return tr_webRunImpl(tor->session, tr_torrentId(tor), url, range, NULL, done_func, done_func_user_data, buffer);
 }
 
 static void tr_webThreadFunc(void* vsession)
@@ -426,13 +420,9 @@ static void tr_webThreadFunc(void* vsession)
     if (web->curl_ssl_verify)
     {
         tr_logAddNamedInfo("web", "will verify tracker certs using envvar CURL_CA_BUNDLE: %s",
-                           web->curl_ca_bundle == NULL ? "none" : web->curl_ca_bundle);
-        tr_logAddNamedInfo(
-            "web",
-            "NB: this only works if you built against libcurl with openssl or gnutls, NOT nss");
-        tr_logAddNamedInfo("web",
-                           "NB: invalid certs will show up as 'Could not connect to tracker' like "
-                           "many other errors");
+            web->curl_ca_bundle == NULL ? "none" : web->curl_ca_bundle);
+        tr_logAddNamedInfo("web", "NB: this only works if you built against libcurl with openssl or gnutls, NOT nss");
+        tr_logAddNamedInfo("web", "NB: invalid certs will show up as 'Could not connect to tracker' like many other errors");
     }
 
     str = tr_buildPath(session->configDir, "cookies.txt", NULL);
@@ -543,7 +533,8 @@ static void tr_webThreadFunc(void* vsession)
         do
         {
             mcode = curl_multi_perform(multi, &unused);
-        } while (mcode == CURLM_CALL_MULTI_PERFORM);
+        }
+        while (mcode == CURLM_CALL_MULTI_PERFORM);
 
         /* pump completed tasks from the multi */
         while ((msg = curl_multi_info_read(multi, &unused)) != NULL)
@@ -631,91 +622,134 @@ char const* tr_webGetResponseStr(long code)
 {
     switch (code)
     {
-        case 0: return "No Response";
+    case 0:
+        return "No Response";
 
-        case 101: return "Switching Protocols";
+    case 101:
+        return "Switching Protocols";
 
-        case 200: return "OK";
+    case 200:
+        return "OK";
 
-        case 201: return "Created";
+    case 201:
+        return "Created";
 
-        case 202: return "Accepted";
+    case 202:
+        return "Accepted";
 
-        case 203: return "Non-Authoritative Information";
+    case 203:
+        return "Non-Authoritative Information";
 
-        case 204: return "No Content";
+    case 204:
+        return "No Content";
 
-        case 205: return "Reset Content";
+    case 205:
+        return "Reset Content";
 
-        case 206: return "Partial Content";
+    case 206:
+        return "Partial Content";
 
-        case 300: return "Multiple Choices";
+    case 300:
+        return "Multiple Choices";
 
-        case 301: return "Moved Permanently";
+    case 301:
+        return "Moved Permanently";
 
-        case 302: return "Found";
+    case 302:
+        return "Found";
 
-        case 303: return "See Other";
+    case 303:
+        return "See Other";
 
-        case 304: return "Not Modified";
+    case 304:
+        return "Not Modified";
 
-        case 305: return "Use Proxy";
+    case 305:
+        return "Use Proxy";
 
-        case 306: return " (Unused)";
+    case 306:
+        return " (Unused)";
 
-        case 307: return "Temporary Redirect";
+    case 307:
+        return "Temporary Redirect";
 
-        case 400: return "Bad Request";
+    case 400:
+        return "Bad Request";
 
-        case 401: return "Unauthorized";
+    case 401:
+        return "Unauthorized";
 
-        case 402: return "Payment Required";
+    case 402:
+        return "Payment Required";
 
-        case 403: return "Forbidden";
+    case 403:
+        return "Forbidden";
 
-        case 404: return "Not Found";
+    case 404:
+        return "Not Found";
 
-        case 405: return "Method Not Allowed";
+    case 405:
+        return "Method Not Allowed";
 
-        case 406: return "Not Acceptable";
+    case 406:
+        return "Not Acceptable";
 
-        case 407: return "Proxy Authentication Required";
+    case 407:
+        return "Proxy Authentication Required";
 
-        case 408: return "Request Timeout";
+    case 408:
+        return "Request Timeout";
 
-        case 409: return "Conflict";
+    case 409:
+        return "Conflict";
 
-        case 410: return "Gone";
+    case 410:
+        return "Gone";
 
-        case 411: return "Length Required";
+    case 411:
+        return "Length Required";
 
-        case 412: return "Precondition Failed";
+    case 412:
+        return "Precondition Failed";
 
-        case 413: return "Request Entity Too Large";
+    case 413:
+        return "Request Entity Too Large";
 
-        case 414: return "Request-URI Too Long";
+    case 414:
+        return "Request-URI Too Long";
 
-        case 415: return "Unsupported Media Type";
+    case 415:
+        return "Unsupported Media Type";
 
-        case 416: return "Requested Range Not Satisfiable";
+    case 416:
+        return "Requested Range Not Satisfiable";
 
-        case 417: return "Expectation Failed";
+    case 417:
+        return "Expectation Failed";
 
-        case 421: return "Misdirected Request";
+    case 421:
+        return "Misdirected Request";
 
-        case 500: return "Internal Server Error";
+    case 500:
+        return "Internal Server Error";
 
-        case 501: return "Not Implemented";
+    case 501:
+        return "Not Implemented";
 
-        case 502: return "Bad Gateway";
+    case 502:
+        return "Bad Gateway";
 
-        case 503: return "Service Unavailable";
+    case 503:
+        return "Service Unavailable";
 
-        case 504: return "Gateway Timeout";
+    case 504:
+        return "Gateway Timeout";
 
-        case 505: return "HTTP Version Not Supported";
+    case 505:
+        return "HTTP Version Not Supported";
 
-        default: return "Unknown Error";
+    default:
+        return "Unknown Error";
     }
 }
 
@@ -733,9 +767,8 @@ void tr_http_escape(struct evbuffer* out, char const* str, size_t len, bool esca
 
     for (char const* end = str + len; str != end; ++str)
     {
-        if (*str == ',' || *str == '-' || *str == '.' || ('0' <= *str && *str <= '9')
-            || ('A' <= *str && *str <= 'Z') || ('a' <= *str && *str <= 'z')
-            || (*str == '/' && !escape_slashes))
+        if (*str == ',' || *str == '-' || *str == '.' || ('0' <= *str && *str <= '9') || ('A' <= *str && *str <= 'Z') ||
+            ('a' <= *str && *str <= 'z') || (*str == '/' && !escape_slashes))
         {
             evbuffer_add_printf(out, "%c", *str);
         }
@@ -756,8 +789,8 @@ char* tr_http_unescape(char const* str, size_t len)
 
 static bool is_rfc2396_alnum(uint8_t ch)
 {
-    return ('0' <= ch && ch <= '9') || ('A' <= ch && ch <= 'Z') || ('a' <= ch && ch <= 'z')
-           || ch == '.' || ch == '-' || ch == '_' || ch == '~';
+    return ('0' <= ch && ch <= '9') || ('A' <= ch && ch <= 'Z') || ('a' <= ch && ch <= 'z') || ch == '.' || ch == '-' ||
+        ch == '_' || ch == '~';
 }
 
 void tr_http_escape_sha1(char* out, uint8_t const* sha1_digest)

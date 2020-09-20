@@ -8,7 +8,7 @@
 
 #include "FilterBar.h"
 
-#include <cstdint>  // uint64_t
+#include <cstdint> // uint64_t
 #include <map>
 #include <unordered_map>
 
@@ -50,7 +50,7 @@ FilterBarComboBox* FilterBar::createActivityCombo()
     row->setData(FilterMode::SHOW_ALL, ACTIVITY_ROLE);
     model->appendRow(row);
 
-    model->appendRow(new QStandardItem);  // separator
+    model->appendRow(new QStandardItem); // separator
     delegate->setSeparator(model, model->index(1, 0));
 
     row = new QStandardItem(QIcon::fromTheme(QStringLiteral("system-run")), tr("Active"));
@@ -91,27 +91,28 @@ FilterBarComboBox* FilterBar::createActivityCombo()
 
 namespace
 {
+
 QString getCountString(int n)
 {
     return QStringLiteral("%L1").arg(n);
 }
 
-Torrent::fields_t constexpr TrackerFields = {(uint64_t(1) << Torrent::TRACKER_STATS)};
+Torrent::fields_t constexpr TrackerFields = {
+    (uint64_t(1) << Torrent::TRACKER_STATS)
+    };
 
 auto constexpr ActivityFields = FilterMode::TorrentFields;
 
-}  // namespace
+} // namespace
 
 void FilterBar::refreshTrackers()
 {
     enum
     {
-        ROW_TOTALS = 0,
-        ROW_SEPARATOR,
-        ROW_FIRST_TRACKER
+        ROW_TOTALS = 0, ROW_SEPARATOR, ROW_FIRST_TRACKER
     };
 
-    auto torrents_per_tracker = std::unordered_map<FaviconCache::Key, int> {};
+    auto torrents_per_tracker = std::unordered_map<FaviconCache::Key, int>{};
     for (auto const& tor : torrents_.torrents())
     {
         for (auto const& key : tor->trackerKeys())
@@ -126,23 +127,23 @@ void FilterBar::refreshTrackers()
     item->setData(int(num_trackers), FilterBarComboBox::CountRole);
     item->setData(getCountString(num_trackers), FilterBarComboBox::CountStringRole);
 
-    auto update_tracker_item = [](QStandardItem* i, auto const& it) {
-        auto const& key = it->first;
-        auto const& display_name = FaviconCache::getDisplayName(key);
-        auto const& count = it->second;
-        auto const icon = qApp->faviconCache().find(key);
+    auto update_tracker_item = [](QStandardItem* i, auto const& it)
+        {
+            auto const& key = it->first;
+            auto const& display_name = FaviconCache::getDisplayName(key);
+            auto const& count = it->second;
+            auto const icon = qApp->faviconCache().find(key);
 
-        i->setData(display_name, Qt::DisplayRole);
-        i->setData(display_name, TRACKER_ROLE);
-        i->setData(getCountString(count), FilterBarComboBox::CountStringRole);
-        i->setData(icon, Qt::DecorationRole);
-        i->setData(int(count), FilterBarComboBox::CountRole);
+            i->setData(display_name, Qt::DisplayRole);
+            i->setData(display_name, TRACKER_ROLE);
+            i->setData(getCountString(count), FilterBarComboBox::CountStringRole);
+            i->setData(icon, Qt::DecorationRole);
+            i->setData(int(count), FilterBarComboBox::CountRole);
 
-        return i;
-    };
+            return i;
+        };
 
-    auto new_trackers =
-        std::map<FaviconCache::Key, int>(torrents_per_tracker.begin(), torrents_per_tracker.end());
+    auto new_trackers = std::map<FaviconCache::Key, int>(torrents_per_tracker.begin(), torrents_per_tracker.end());
     auto old_it = tracker_counts_.cbegin();
     auto new_it = new_trackers.cbegin();
     auto const old_end = tracker_counts_.cend();
@@ -164,7 +165,7 @@ void FilterBar::refreshTrackers()
             tracker_model_->removeRow(row);
             ++old_it;
         }
-        else  // update
+        else // update
         {
             update_tracker_item(tracker_model_->item(row), new_it);
             ++old_it;
@@ -173,7 +174,7 @@ void FilterBar::refreshTrackers()
         }
     }
 
-    if (any_added)  // the one added might match our filter...
+    if (any_added) // the one added might match our filter...
     {
         refreshPref(Prefs::FILTER_TRACKERS);
     }
@@ -194,7 +195,7 @@ FilterBarComboBox* FilterBar::createTrackerCombo(QStandardItemModel* model)
     row->setData(getCountString(count), FilterBarComboBox::CountStringRole);
     model->appendRow(row);
 
-    model->appendRow(new QStandardItem);  // separator
+    model->appendRow(new QStandardItem); // separator
     delegate->setSeparator(model, model->index(1, 0));
 
     c->setModel(model);
@@ -205,14 +206,13 @@ FilterBarComboBox* FilterBar::createTrackerCombo(QStandardItemModel* model)
 ****
 ***/
 
-FilterBar::FilterBar(Prefs& prefs, TorrentModel const& torrents, TorrentFilter const& filter,
-                     QWidget* parent)
-    : QWidget(parent),
-      prefs_(prefs),
-      torrents_(torrents),
-      filter_(filter),
-      recount_timer_(new QTimer(this)),
-      is_bootstrapping_(true)
+FilterBar::FilterBar(Prefs& prefs, TorrentModel const& torrents, TorrentFilter const& filter, QWidget* parent) :
+    QWidget(parent),
+    prefs_(prefs),
+    torrents_(torrents),
+    filter_(filter),
+    recount_timer_(new QTimer(this)),
+    is_bootstrapping_(true)
 {
     auto* h = new QHBoxLayout(this);
     h->setContentsMargins(3, 3, 3, 3);
@@ -238,23 +238,20 @@ FilterBar::FilterBar(Prefs& prefs, TorrentModel const& torrents, TorrentFilter c
 
     // listen for changes from the other players
     connect(&prefs_, SIGNAL(changed(int)), this, SLOT(refreshPref(int)));
-    connect(activity_combo_, SIGNAL(currentIndexChanged(int)), this,
-            SLOT(onActivityIndexChanged(int)));
-    connect(tracker_combo_, SIGNAL(currentIndexChanged(int)), this,
-            SLOT(onTrackerIndexChanged(int)));
+    connect(activity_combo_, SIGNAL(currentIndexChanged(int)), this, SLOT(onActivityIndexChanged(int)));
+    connect(tracker_combo_, SIGNAL(currentIndexChanged(int)), this, SLOT(onTrackerIndexChanged(int)));
     connect(&torrents_, &TorrentModel::modelReset, this, &FilterBar::recountAllSoon);
     connect(&torrents_, &TorrentModel::rowsInserted, this, &FilterBar::recountAllSoon);
     connect(&torrents_, &TorrentModel::rowsRemoved, this, &FilterBar::recountAllSoon);
     connect(&torrents_, &TorrentModel::torrentsChanged, this, &FilterBar::onTorrentsChanged);
     connect(recount_timer_, SIGNAL(timeout()), this, SLOT(recount()));
-    connect(&qApp->faviconCache(), &FaviconCache::pixmapReady, this,
-            &FilterBar::recountTrackersSoon);
+    connect(&qApp->faviconCache(), &FaviconCache::pixmapReady, this, &FilterBar::recountTrackersSoon);
 
     recountAllSoon();
     is_bootstrapping_ = false;
 
     // initialize our state
-    for (int const key : {Prefs::FILTER_MODE, Prefs::FILTER_TRACKERS})
+    for (int const key : { Prefs::FILTER_MODE, Prefs::FILTER_TRACKERS })
     {
         refreshPref(key);
     }
@@ -279,7 +276,7 @@ void FilterBar::refreshPref(int key)
 {
     switch (key)
     {
-        case Prefs::FILTER_MODE:
+    case Prefs::FILTER_MODE:
         {
             auto const m = prefs_.get<FilterMode>(key);
             QAbstractItemModel* model = activity_combo_->model();
@@ -288,7 +285,7 @@ void FilterBar::refreshPref(int key)
             break;
         }
 
-        case Prefs::FILTER_TRACKERS:
+    case Prefs::FILTER_TRACKERS:
         {
             auto const display_name = prefs_.getString(key);
             auto rows = tracker_model_->findItems(display_name);
@@ -296,7 +293,7 @@ void FilterBar::refreshPref(int key)
             {
                 tracker_combo_->setCurrentIndex(rows.front()->row());
             }
-            else  // hm, we don't seem to have this tracker anymore...
+            else // hm, we don't seem to have this tracker anymore...
             {
                 bool const is_bootstrapping = tracker_model_->rowCount() <= 2;
 

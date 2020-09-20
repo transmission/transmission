@@ -22,22 +22,24 @@ class TrackerDelegate : public QItemDelegate
     Q_OBJECT
     TR_DISABLE_COPY_MOVE(TrackerDelegate)
 
-   public:
-    TrackerDelegate(QObject* parent = nullptr) : QItemDelegate(parent) {}
+public:
+    TrackerDelegate(QObject* parent = nullptr) :
+        QItemDelegate(parent)
+    {
+    }
 
     void setShowMore(bool b);
 
     // QAbstractItemDelegate
     QSize sizeHint(QStyleOptionViewItem const& option, QModelIndex const& index) const override;
-    void paint(QPainter* painter, QStyleOptionViewItem const& option,
-               QModelIndex const& index) const override;
+    void paint(QPainter* painter, QStyleOptionViewItem const& option, QModelIndex const& index) const override;
 
-   protected:
+protected:
     QString getText(TrackerInfo const&) const;
 
     QSize sizeHint(QStyleOptionViewItem const&, TrackerInfo const&) const;
     void drawTracker(QPainter*, QStyleOptionViewItem const&, TrackerInfo const&) const;
 
-   private:
+private:
     bool show_more_ = false;
 };

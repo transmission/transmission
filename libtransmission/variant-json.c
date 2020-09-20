@@ -7,13 +7,13 @@
  */
 
 #include <ctype.h>
-#include <errno.h> /* EILSEQ, EINVAL */
-#include <math.h>  /* fabs() */
+#include <math.h> /* fabs() */
 #include <stdio.h>
 #include <string.h>
+#include <errno.h> /* EILSEQ, EINVAL */
 
 #include <event2/buffer.h> /* evbuffer_add() */
-#include <event2/util.h>   /* evutil_strtoll() */
+#include <event2/util.h> /* evutil_strtoll() */
 
 #define LIBTRANSMISSION_VARIANT_MODULE
 
@@ -25,8 +25,8 @@
 #include "ptrarray.h"
 #include "tr-assert.h"
 #include "utils.h"
-#include "variant-common.h"
 #include "variant.h"
+#include "variant-common.h"
 
 /* arbitrary value... this is much deeper than our code goes */
 #define MAX_DEPTH 64
@@ -77,8 +77,7 @@ static tr_variant* get_node(struct jsonsl_st* jsn)
     return node;
 }
 
-static void error_handler(jsonsl_t jsn, jsonsl_error_t error, struct jsonsl_state_st* state,
-                          jsonsl_char_t const* buf)
+static void error_handler(jsonsl_t jsn, jsonsl_error_t error, struct jsonsl_state_st* state, jsonsl_char_t const* buf)
 {
     TR_UNUSED(state);
 
@@ -86,27 +85,24 @@ static void error_handler(jsonsl_t jsn, jsonsl_error_t error, struct jsonsl_stat
 
     if (data->source != NULL)
     {
-        tr_logAddError("JSON parse failed in %s at pos %zu: %s -- remaining text \"%.16s\"",
-                       data->source, jsn->pos, jsonsl_strerror(error), buf);
+        tr_logAddError("JSON parse failed in %s at pos %zu: %s -- remaining text \"%.16s\"", data->source, jsn->pos,
+            jsonsl_strerror(error), buf);
     }
     else
     {
-        tr_logAddError("JSON parse failed at pos %zu: %s -- remaining text \"%.16s\"", jsn->pos,
-                       jsonsl_strerror(error), buf);
+        tr_logAddError("JSON parse failed at pos %zu: %s -- remaining text \"%.16s\"", jsn->pos, jsonsl_strerror(error), buf);
     }
 
     data->error = EILSEQ;
 }
 
-static int error_callback(jsonsl_t jsn, jsonsl_error_t error, struct jsonsl_state_st* state,
-                          jsonsl_char_t* at)
+static int error_callback(jsonsl_t jsn, jsonsl_error_t error, struct jsonsl_state_st* state, jsonsl_char_t* at)
 {
     error_handler(jsn, error, state, at);
     return 0; /* bail */
 }
 
-static void action_callback_PUSH(jsonsl_t jsn, jsonsl_action_t action,
-                                 struct jsonsl_state_st* state, jsonsl_char_t const* buf)
+static void action_callback_PUSH(jsonsl_t jsn, jsonsl_action_t action, struct jsonsl_state_st* state, jsonsl_char_t const* buf)
 {
     TR_UNUSED(action);
     TR_UNUSED(buf);
@@ -165,14 +161,14 @@ static bool decode_hex_string(char const* in, unsigned int* setme)
         {
             return false;
         }
-    } while (++in != end);
+    }
+    while (++in != end);
 
     *setme = val;
     return true;
 }
 
-static char* extract_escaped_string(char const* in, size_t in_len, size_t* len,
-                                    struct evbuffer* buf)
+static char* extract_escaped_string(char const* in, size_t in_len, size_t* len, struct evbuffer* buf)
 {
     char const* const in_end = in + in_len;
 
@@ -186,55 +182,55 @@ static char* extract_escaped_string(char const* in, size_t in_len, size_t* len,
         {
             switch (in[1])
             {
-                case 'b':
-                    evbuffer_add(buf, "\b", 1);
-                    in += 2;
-                    unescaped = true;
-                    break;
+            case 'b':
+                evbuffer_add(buf, "\b", 1);
+                in += 2;
+                unescaped = true;
+                break;
 
-                case 'f':
-                    evbuffer_add(buf, "\f", 1);
-                    in += 2;
-                    unescaped = true;
-                    break;
+            case 'f':
+                evbuffer_add(buf, "\f", 1);
+                in += 2;
+                unescaped = true;
+                break;
 
-                case 'n':
-                    evbuffer_add(buf, "\n", 1);
-                    in += 2;
-                    unescaped = true;
-                    break;
+            case 'n':
+                evbuffer_add(buf, "\n", 1);
+                in += 2;
+                unescaped = true;
+                break;
 
-                case 'r':
-                    evbuffer_add(buf, "\r", 1);
-                    in += 2;
-                    unescaped = true;
-                    break;
+            case 'r':
+                evbuffer_add(buf, "\r", 1);
+                in += 2;
+                unescaped = true;
+                break;
 
-                case 't':
-                    evbuffer_add(buf, "\t", 1);
-                    in += 2;
-                    unescaped = true;
-                    break;
+            case 't':
+                evbuffer_add(buf, "\t", 1);
+                in += 2;
+                unescaped = true;
+                break;
 
-                case '/':
-                    evbuffer_add(buf, "/", 1);
-                    in += 2;
-                    unescaped = true;
-                    break;
+            case '/':
+                evbuffer_add(buf, "/", 1);
+                in += 2;
+                unescaped = true;
+                break;
 
-                case '"':
-                    evbuffer_add(buf, "\"", 1);
-                    in += 2;
-                    unescaped = true;
-                    break;
+            case '"':
+                evbuffer_add(buf, "\"", 1);
+                in += 2;
+                unescaped = true;
+                break;
 
-                case '\\':
-                    evbuffer_add(buf, "\\", 1);
-                    in += 2;
-                    unescaped = true;
-                    break;
+            case '\\':
+                evbuffer_add(buf, "\\", 1);
+                in += 2;
+                unescaped = true;
+                break;
 
-                case 'u':
+            case 'u':
                 {
                     if (in_end - in >= 6)
                     {
@@ -242,15 +238,14 @@ static char* extract_escaped_string(char const* in, size_t in_len, size_t* len,
 
                         if (decode_hex_string(in, &val))
                         {
-                            UTF32 str32_buf[2] = {val, 0};
+                            UTF32 str32_buf[2] = { val, 0 };
                             UTF32 const* str32_walk = str32_buf;
                             UTF32 const* str32_end = str32_buf + 1;
-                            UTF8 str8_buf[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+                            UTF8 str8_buf[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
                             UTF8* str8_walk = str8_buf;
                             UTF8* str8_end = str8_buf + 8;
 
-                            if (ConvertUTF32toUTF8(&str32_walk, str32_end, &str8_walk, str8_end, 0)
-                                == 0)
+                            if (ConvertUTF32toUTF8(&str32_walk, str32_end, &str8_walk, str8_end, 0) == 0)
                             {
                                 evbuffer_add(buf, str8_buf, str8_walk - str8_buf);
                                 unescaped = true;
@@ -275,8 +270,7 @@ static char* extract_escaped_string(char const* in, size_t in_len, size_t* len,
     return (char*)evbuffer_pullup(buf, -1);
 }
 
-static char const* extract_string(jsonsl_t jsn, struct jsonsl_state_st* state, size_t* len,
-                                  struct evbuffer* buf)
+static char const* extract_string(jsonsl_t jsn, struct jsonsl_state_st* state, size_t* len, struct evbuffer* buf)
 {
     char const* ret;
     char const* in_begin;
@@ -308,8 +302,7 @@ static char const* extract_string(jsonsl_t jsn, struct jsonsl_state_st* state, s
     return ret;
 }
 
-static void action_callback_POP(jsonsl_t jsn, jsonsl_action_t action, struct jsonsl_state_st* state,
-                                jsonsl_char_t const* buf)
+static void action_callback_POP(jsonsl_t jsn, jsonsl_action_t action, struct jsonsl_state_st* state, jsonsl_char_t const* buf)
 {
     TR_UNUSED(action);
     TR_UNUSED(buf);
@@ -365,8 +358,7 @@ static void action_callback_POP(jsonsl_t jsn, jsonsl_action_t action, struct jso
     }
 }
 
-int tr_jsonParse(char const* source, void const* vbuf, size_t len, tr_variant* setme_variant,
-                 char const** setme_end)
+int tr_jsonParse(char const* source, void const* vbuf, size_t len, tr_variant* setme_variant, char const** setme_end)
 {
     int error;
     jsonsl_t jsn;
@@ -436,7 +428,7 @@ struct jsonWalk
 
 static void jsonIndent(struct jsonWalk* data)
 {
-    static char buf[1024] = {'\0'};
+    static char buf[1024] = { '\0' };
 
     if (*buf == '\0')
     {
@@ -458,7 +450,7 @@ static void jsonChildFunc(struct jsonWalk* data)
 
         switch (pstate->variantType)
         {
-            case TR_VARIANT_TYPE_DICT:
+        case TR_VARIANT_TYPE_DICT:
             {
                 int const i = pstate->childIndex;
                 ++pstate->childIndex;
@@ -481,7 +473,7 @@ static void jsonChildFunc(struct jsonWalk* data)
                 break;
             }
 
-            case TR_VARIANT_TYPE_LIST:
+        case TR_VARIANT_TYPE_LIST:
             {
                 ++pstate->childIndex;
                 bool const isLast = pstate->childIndex == pstate->childCount;
@@ -495,7 +487,8 @@ static void jsonChildFunc(struct jsonWalk* data)
                 break;
             }
 
-            default: break;
+        default:
+            break;
         }
     }
 }
@@ -587,62 +580,61 @@ static void jsonStringFunc(tr_variant const* val, void* vdata)
     {
         switch (*it)
         {
-            case '\b':
-                *outwalk++ = '\\';
-                *outwalk++ = 'b';
-                break;
+        case '\b':
+            *outwalk++ = '\\';
+            *outwalk++ = 'b';
+            break;
 
-            case '\f':
-                *outwalk++ = '\\';
-                *outwalk++ = 'f';
-                break;
+        case '\f':
+            *outwalk++ = '\\';
+            *outwalk++ = 'f';
+            break;
 
-            case '\n':
-                *outwalk++ = '\\';
-                *outwalk++ = 'n';
-                break;
+        case '\n':
+            *outwalk++ = '\\';
+            *outwalk++ = 'n';
+            break;
 
-            case '\r':
-                *outwalk++ = '\\';
-                *outwalk++ = 'r';
-                break;
+        case '\r':
+            *outwalk++ = '\\';
+            *outwalk++ = 'r';
+            break;
 
-            case '\t':
-                *outwalk++ = '\\';
-                *outwalk++ = 't';
-                break;
+        case '\t':
+            *outwalk++ = '\\';
+            *outwalk++ = 't';
+            break;
 
-            case '"':
-                *outwalk++ = '\\';
-                *outwalk++ = '"';
-                break;
+        case '"':
+            *outwalk++ = '\\';
+            *outwalk++ = '"';
+            break;
 
-            case '\\':
-                *outwalk++ = '\\';
-                *outwalk++ = '\\';
-                break;
+        case '\\':
+            *outwalk++ = '\\';
+            *outwalk++ = '\\';
+            break;
 
-            default:
-                if (isprint(*it))
+        default:
+            if (isprint(*it))
+            {
+                *outwalk++ = *it;
+            }
+            else
+            {
+                UTF8 const* tmp = it;
+                UTF32 buf[1] = { 0 };
+                UTF32* u32 = buf;
+                ConversionResult result = ConvertUTF8toUTF32(&tmp, end, &u32, buf + 1, 0);
+
+                if ((result == conversionOK || result == targetExhausted) && tmp != it)
                 {
-                    *outwalk++ = *it;
+                    outwalk += tr_snprintf(outwalk, outend - outwalk, "\\u%04x", (unsigned int)buf[0]);
+                    it = tmp - 1;
                 }
-                else
-                {
-                    UTF8 const* tmp = it;
-                    UTF32 buf[1] = {0};
-                    UTF32* u32 = buf;
-                    ConversionResult result = ConvertUTF8toUTF32(&tmp, end, &u32, buf + 1, 0);
+            }
 
-                    if ((result == conversionOK || result == targetExhausted) && tmp != it)
-                    {
-                        outwalk +=
-                            tr_snprintf(outwalk, outend - outwalk, "\\u%04x", (unsigned int)buf[0]);
-                        it = tmp - 1;
-                    }
-                }
-
-                break;
+            break;
         }
     }
 
@@ -704,9 +696,16 @@ static void jsonContainerEndFunc(tr_variant const* val, void* vdata)
     jsonChildFunc(data);
 }
 
-static struct VariantWalkFuncs const walk_funcs = {
-    jsonIntFunc,       jsonBoolFunc,      jsonRealFunc,        jsonStringFunc,
-    jsonDictBeginFunc, jsonListBeginFunc, jsonContainerEndFunc};
+static struct VariantWalkFuncs const walk_funcs =
+{
+    jsonIntFunc,
+    jsonBoolFunc,
+    jsonRealFunc,
+    jsonStringFunc,
+    jsonDictBeginFunc,
+    jsonListBeginFunc,
+    jsonContainerEndFunc
+};
 
 void tr_variantToBufJson(tr_variant const* top, struct evbuffer* buf, bool lean)
 {

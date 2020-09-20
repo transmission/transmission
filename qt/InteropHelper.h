@@ -19,7 +19,7 @@ class QString;
 
 class InteropHelper
 {
-   public:
+public:
     bool isConnected() const;
 
     bool addMetainfo(QString const& metainfo);
@@ -27,7 +27,7 @@ class InteropHelper
     static void initialize();
     static void registerObject(QObject* parent);
 
-   private:
+private:
 #ifdef ENABLE_DBUS_INTEROP
     DBusInteropHelper dbus_client_ = {};
 #endif

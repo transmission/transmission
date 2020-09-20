@@ -6,8 +6,8 @@
  *
  */
 
-#include "metainfo.h"
 #include "transmission.h"
+#include "metainfo.h"
 #include "utils.h"
 
 #include "gtest/gtest.h"
@@ -32,7 +32,7 @@ TEST(Metainfo, magnetLink)
     tr_info inf;
     auto const parse_result = tr_torrentParse(ctor, &inf);
     EXPECT_EQ(TR_PARSE_OK, parse_result);
-    EXPECT_EQ(0, inf.fileCount);  // because it's a magnet link
+    EXPECT_EQ(0, inf.fileCount); // because it's a magnet link
     EXPECT_EQ(2, inf.trackerCount);
     EXPECT_STREQ("http://tracker.publicbt.com/announce", inf.trackers[0].announce);
     EXPECT_STREQ("udp://tracker.publicbt.com:80", inf.trackers[1].announce);
@@ -44,12 +44,10 @@ TEST(Metainfo, magnetLink)
     tr_ctorFree(ctor);
 }
 
-#define BEFORE_PATH                                          \
-    "d10:created by25:Transmission/2.82 (14160)13:creation " \
-    "datei1402280218e8:encoding5:UTF-84:infod5:filesld6:lengthi2e4:pathl"
-#define AFTER_PATH                                        \
-    "eed6:lengthi2e4:pathl5:b.txteee4:name3:foo12:piece " \
-    "lengthi32768e6:pieces20:ÞÉ`âMs¡Å;Ëº¬.åÂà7:privatei0eee"
+#define BEFORE_PATH \
+    "d10:created by25:Transmission/2.82 (14160)13:creation datei1402280218e8:encoding5:UTF-84:infod5:filesld6:lengthi2e4:pathl"
+#define AFTER_PATH \
+    "eed6:lengthi2e4:pathl5:b.txteee4:name3:foo12:piece lengthi32768e6:pieces20:ÞÉ`âMs¡Å;Ëº¬.åÂà7:privatei0eee"
 
 // FIXME: split these into parameterized tests?
 TEST(Metainfo, bucket)
@@ -61,34 +59,34 @@ TEST(Metainfo, bucket)
         void const* benc;
     };
 
-    auto const tests = std::array<LocalTest, 9> {
-        LocalTest {0, TR_PARSE_OK, BEFORE_PATH "5:a.txt" AFTER_PATH},
+    auto const tests = std::array<LocalTest, 9>{
+        LocalTest{ 0, TR_PARSE_OK, BEFORE_PATH "5:a.txt" AFTER_PATH },
 
         /* allow empty components, but not =all= empty components, see bug #5517 */
-        {0, TR_PARSE_OK, BEFORE_PATH "0:5:a.txt" AFTER_PATH},
-        {0, TR_PARSE_ERR, BEFORE_PATH "0:0:" AFTER_PATH},
+        { 0, TR_PARSE_OK, BEFORE_PATH "0:5:a.txt" AFTER_PATH },
+        { 0, TR_PARSE_ERR, BEFORE_PATH "0:0:" AFTER_PATH },
 
         /* allow path separators in a filename (replaced with '_') */
-        {0, TR_PARSE_OK, BEFORE_PATH "7:a/a.txt" AFTER_PATH},
+        { 0, TR_PARSE_OK, BEFORE_PATH "7:a/a.txt" AFTER_PATH },
 
         /* allow "." components (skipped) */
-        {0, TR_PARSE_OK, BEFORE_PATH "1:.5:a.txt" AFTER_PATH},
-        {0, TR_PARSE_OK, BEFORE_PATH "5:a.txt1:." AFTER_PATH},
+        { 0, TR_PARSE_OK, BEFORE_PATH "1:.5:a.txt" AFTER_PATH },
+        { 0, TR_PARSE_OK, BEFORE_PATH "5:a.txt1:." AFTER_PATH },
 
         /* allow ".." components (replaced with "__") */
-        {0, TR_PARSE_OK, BEFORE_PATH "2:..5:a.txt" AFTER_PATH},
-        {0, TR_PARSE_OK, BEFORE_PATH "5:a.txt2:.." AFTER_PATH},
+        { 0, TR_PARSE_OK, BEFORE_PATH "2:..5:a.txt" AFTER_PATH },
+        { 0, TR_PARSE_OK, BEFORE_PATH "5:a.txt2:.." AFTER_PATH },
 
         /* fail on empty string */
-        {EILSEQ, TR_PARSE_ERR, ""}};
+        { EILSEQ, TR_PARSE_ERR, "" }
+    };
 
     tr_logSetLevel(TR_LOG_SILENT);
 
     for (auto const& test : tests)
     {
         auto* ctor = tr_ctorNew(nullptr);
-        int const err =
-            tr_ctorSetMetainfo(ctor, test.benc, strlen(static_cast<char const*>(test.benc)));
+        int const err = tr_ctorSetMetainfo(ctor, test.benc, strlen(static_cast<char const*>(test.benc)));
         EXPECT_EQ(test.expected_benc_err, err);
 
         if (err == 0)
@@ -111,41 +109,42 @@ TEST(Metainfo, sanitize)
         bool expected_is_adjusted;
     };
 
-    auto const tests =
-        std::array<LocalTest, 29> {// skipped
-                                   LocalTest {"", 0, nullptr, false},
-                                   {".", 1, nullptr, false},
-                                   {"..", 2, nullptr, true},
-                                   {".....", 5, nullptr, false},
-                                   {"  ", 2, nullptr, false},
-                                   {" . ", 3, nullptr, false},
-                                   {". . .", 5, nullptr, false},
-                                   // replaced with '_'
-                                   {"/", 1, "_", true},
-                                   {"////", 4, "____", true},
-                                   {"\\\\", 2, "__", true},
-                                   {"/../", 4, "_.._", true},
-                                   {"foo<bar:baz/boo", 15, "foo_bar_baz_boo", true},
-                                   {"t\0e\x01s\tt\ri\nn\fg", 13, "t_e_s_t_i_n_g", true},
-                                   // appended with '_'
-                                   {"con", 3, "con_", true},
-                                   {"cOm4", 4, "cOm4_", true},
-                                   {"LPt9.txt", 8, "LPt9_.txt", true},
-                                   {"NUL.tar.gz", 10, "NUL_.tar.gz", true},
-                                   // trimmed
-                                   {" foo", 4, "foo", true},
-                                   {"foo ", 4, "foo", true},
-                                   {" foo ", 5, "foo", true},
-                                   {"foo.", 4, "foo", true},
-                                   {"foo...", 6, "foo", true},
-                                   {" foo... ", 8, "foo", true},
-                                   // unmodified
-                                   {"foo", 3, "foo", false},
-                                   {".foo", 4, ".foo", false},
-                                   {"..foo", 5, "..foo", false},
-                                   {"foo.bar.baz", 11, "foo.bar.baz", false},
-                                   {"null", 4, "null", false},
-                                   {"compass", 7, "compass", false}};
+    auto const tests = std::array<LocalTest, 29>{
+        // skipped
+        LocalTest{ "", 0, nullptr, false },
+        { ".", 1, nullptr, false },
+        { "..", 2, nullptr, true },
+        { ".....", 5, nullptr, false },
+        { "  ", 2, nullptr, false },
+        { " . ", 3, nullptr, false },
+        { ". . .", 5, nullptr, false },
+        // replaced with '_'
+        { "/", 1, "_", true },
+        { "////", 4, "____", true },
+        { "\\\\", 2, "__", true },
+        { "/../", 4, "_.._", true },
+        { "foo<bar:baz/boo", 15, "foo_bar_baz_boo", true },
+        { "t\0e\x01s\tt\ri\nn\fg", 13, "t_e_s_t_i_n_g", true },
+        // appended with '_'
+        { "con", 3, "con_", true },
+        { "cOm4", 4, "cOm4_", true },
+        { "LPt9.txt", 8, "LPt9_.txt", true },
+        { "NUL.tar.gz", 10, "NUL_.tar.gz", true },
+        // trimmed
+        { " foo", 4, "foo", true },
+        { "foo ", 4, "foo", true },
+        { " foo ", 5, "foo", true },
+        { "foo.", 4, "foo", true },
+        { "foo...", 6, "foo", true },
+        { " foo... ", 8, "foo", true },
+        // unmodified
+        { "foo", 3, "foo", false },
+        { ".foo", 4, ".foo", false },
+        { "..foo", 5, "..foo", false },
+        { "foo.bar.baz", 11, "foo.bar.baz", false },
+        { "null", 4, "null", false },
+        { "compass", 7, "compass", false }
+    };
 
     for (auto const& test : tests)
     {

@@ -6,8 +6,8 @@
  *
  */
 
-#include "magnet.h"
 #include "transmission.h"
+#include "magnet.h"
 #include "utils.h"
 
 #include "gtest/gtest.h"
@@ -16,8 +16,10 @@
 
 TEST(Magnet, magnetParse)
 {
-    auto const expected_hash = std::array<uint8_t, SHA_DIGEST_LENGTH> {
-        210, 53, 64, 16, 163, 202, 74, 222, 91, 116, 39, 187, 9, 58, 98, 163, 137, 159, 243, 129};
+    auto const expected_hash = std::array<uint8_t, SHA_DIGEST_LENGTH>{
+        210, 53, 64, 16, 163, 202, 74, 222, 91, 116,
+        39, 187, 9, 58, 98, 163, 137, 159, 243, 129
+    };
 
     char const* const uri_hex =
         "magnet:?xt=urn:btih:"
@@ -35,7 +37,7 @@ TEST(Magnet, magnetParse)
         "&ws=http%3A%2F%2Fserver.webseed.org%2Fpath%2Fto%2Ffile"
         "&tr=http%3A%2F%2Ftracker.opentracker.org%2Fannounce";
 
-    for (auto const& uri : {uri_hex, uri_base32})
+    for (auto const& uri : { uri_hex, uri_base32 })
     {
         auto* info = tr_magnetParse(uri);
         EXPECT_NE(nullptr, info);

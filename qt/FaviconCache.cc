@@ -21,7 +21,8 @@
 ****
 ***/
 
-FaviconCache::FaviconCache() : nam_(new QNetworkAccessManager(this))
+FaviconCache::FaviconCache() :
+    nam_(new QNetworkAccessManager(this))
 {
     connect(nam_, SIGNAL(finished(QNetworkReply*)), this, SLOT(onRequestFinished(QNetworkReply*)));
 }
@@ -32,10 +33,10 @@ FaviconCache::FaviconCache() : nam_(new QNetworkAccessManager(this))
 
 namespace
 {
+
 QPixmap scale(QPixmap pixmap)
 {
-    return pixmap.scaled(FaviconCache::getIconSize(), Qt::KeepAspectRatio,
-                         Qt::SmoothTransformation);
+    return pixmap.scaled(FaviconCache::getIconSize(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
 }
 
 QString getCacheDir()
@@ -60,7 +61,7 @@ void markUrlAsScraped(QString const& url_str)
     }
 }
 
-}  // unnamed namespace
+} // unnamed namespace
 
 void FaviconCache::ensureCacheDirHasBeenScanned()
 {
@@ -80,8 +81,8 @@ void FaviconCache::ensureCacheDirHasBeenScanned()
         while (!skip_file.atEnd())
         {
             auto const url = QString::fromUtf8(skip_file.readLine()).trimmed();
-            auto const key = getKey(QUrl {url});
-            keys_.insert({url, key});
+            auto const key = getKey(QUrl{ url });
+            keys_.insert({ url, key });
             pixmaps_.try_emplace(key);
         }
     }
@@ -152,9 +153,9 @@ FaviconCache::Key FaviconCache::add(QString const& url_str)
         return k_it->second;
     }
 
-    auto const url = QUrl {url_str};
+    auto const url = QUrl { url_str };
     auto const key = getKey(url);
-    keys_.insert({url_str, key});
+    keys_.insert({ url_str, key });
 
     // Try to download a favicon if we don't have one.
     // Add a placeholder to prevent repeat downloads.
@@ -162,22 +163,28 @@ FaviconCache::Key FaviconCache::add(QString const& url_str)
     {
         markUrlAsScraped(url_str);
 
-        auto const scrape = [this](auto const host) {
-            auto const schemes =
-                std::array<QString, 2> {QStringLiteral("http"), QStringLiteral("https")};
-            auto const suffixes = std::array<QString, 5> {
-                QStringLiteral("gif"), QStringLiteral("ico"), QStringLiteral("jpg"),
-                QStringLiteral("png"), QStringLiteral("svg")};
-            for (auto const& scheme : schemes)
+        auto const scrape = [this](auto const host)
             {
-                for (auto const& suffix : suffixes)
+                auto const schemes = std::array<QString, 2>{
+                    QStringLiteral("http"),
+                    QStringLiteral("https")
+                };
+                auto const suffixes = std::array<QString, 5>{
+                    QStringLiteral("gif"),
+                    QStringLiteral("ico"),
+                    QStringLiteral("jpg"),
+                    QStringLiteral("png"),
+                    QStringLiteral("svg")
+                };
+                for (auto const& scheme : schemes)
                 {
-                    auto const path =
-                        QStringLiteral("%1://%2/favicon.%3").arg(scheme).arg(host).arg(suffix);
-                    nam_->get(QNetworkRequest(path));
+                    for (auto const& suffix : suffixes)
+                    {
+                        auto const path = QStringLiteral("%1://%2/favicon.%3").arg(scheme).arg(host).arg(suffix);
+                        nam_->get(QNetworkRequest(path));
+                    }
                 }
-            }
-        };
+            };
 
         // tracker.domain.com
         auto host = url.host();

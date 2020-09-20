@@ -50,25 +50,24 @@ static void set_system_error(tr_error** error, DWORD code, char const* message)
     tr_free(system_message);
 }
 
-static void do_log_system_error(char const* file, int line, tr_log_level level, DWORD code,
-                                char const* message)
+static void do_log_system_error(char const* file, int line, tr_log_level level, DWORD code, char const* message)
 {
     char* const system_message = tr_win32_format_message(code);
-    tr_logAddMessage(file, line, level, "[dtr_daemon] %s (0x%08lx): %s", message, code,
-                     system_message);
+    tr_logAddMessage(file, line, level, "[dtr_daemon] %s (0x%08lx): %s", message, code, system_message);
     tr_free(system_message);
 }
 
-#define log_system_error(level, code, message)                                       \
-    do                                                                               \
-    {                                                                                \
-        DWORD const local_code = (code);                                             \
-                                                                                     \
-        if (tr_logLevelIsActive((level)))                                            \
-        {                                                                            \
+#define log_system_error(level, code, message) \
+    do \
+    { \
+        DWORD const local_code = (code); \
+        \
+        if (tr_logLevelIsActive((level))) \
+        { \
             do_log_system_error(__FILE__, __LINE__, (level), local_code, (message)); \
-        }                                                                            \
-    } while (0)
+        } \
+    } \
+    while (0)
 
 /***
 ****
@@ -82,19 +81,15 @@ static BOOL WINAPI handle_console_ctrl(DWORD control_type)
     return TRUE;
 }
 
-static void update_service_status(DWORD new_state, DWORD win32_exit_code,
-                                  DWORD service_specific_exit_code, DWORD check_point,
-                                  DWORD wait_hint)
+static void update_service_status(DWORD new_state, DWORD win32_exit_code, DWORD service_specific_exit_code, DWORD check_point,
+    DWORD wait_hint)
 {
     SERVICE_STATUS status;
     status.dwServiceType = SERVICE_WIN32_OWN_PROCESS;
     status.dwCurrentState = new_state;
-    status.dwControlsAccepted = new_state != SERVICE_RUNNING
-                                    ? 0
-                                    : SERVICE_ACCEPT_PRESHUTDOWN | SERVICE_ACCEPT_SHUTDOWN
-                                          | SERVICE_ACCEPT_STOP | SERVICE_ACCEPT_PARAMCHANGE;
-    status.dwWin32ExitCode =
-        service_specific_exit_code == 0 ? win32_exit_code : ERROR_SERVICE_SPECIFIC_ERROR;
+    status.dwControlsAccepted = new_state != SERVICE_RUNNING ? 0 : SERVICE_ACCEPT_PRESHUTDOWN | SERVICE_ACCEPT_SHUTDOWN |
+        SERVICE_ACCEPT_STOP | SERVICE_ACCEPT_PARAMCHANGE;
+    status.dwWin32ExitCode = service_specific_exit_code == 0 ? win32_exit_code : ERROR_SERVICE_SPECIFIC_ERROR;
     status.dwServiceSpecificExitCode = service_specific_exit_code;
     status.dwCheckPoint = check_point;
     status.dwWaitHint = wait_hint;
@@ -116,12 +111,10 @@ static unsigned int __stdcall service_stop_thread_main(void* param)
     DWORD const sleep_time = 500;
     DWORD wait_time = (DWORD)(UINT_PTR)param;
 
-    for (DWORD checkpoint = 2; WaitForSingleObject(service_thread, sleep_time) == WAIT_TIMEOUT;
-         ++checkpoint)
+    for (DWORD checkpoint = 2; WaitForSingleObject(service_thread, sleep_time) == WAIT_TIMEOUT; ++checkpoint)
     {
         wait_time = wait_time >= sleep_time ? wait_time - sleep_time : 0;
-        update_service_status(SERVICE_STOP_PENDING, NO_ERROR, 0, checkpoint,
-                              MAX(wait_time, sleep_time * 2));
+        update_service_status(SERVICE_STOP_PENDING, NO_ERROR, 0, checkpoint, MAX(wait_time, sleep_time * 2));
     }
 
     return 0;
@@ -138,19 +131,16 @@ static void stop_service(void)
 
     update_service_status(SERVICE_STOP_PENDING, NO_ERROR, 0, 1, wait_time);
 
-    service_stop_thread = (HANDLE)_beginthreadex(NULL, 0, &service_stop_thread_main,
-                                                 (LPVOID)(UINT_PTR)wait_time, 0, NULL);
+    service_stop_thread = (HANDLE)_beginthreadex(NULL, 0, &service_stop_thread_main, (LPVOID)(UINT_PTR)wait_time, 0, NULL);
 
     if (service_stop_thread == NULL)
     {
-        log_system_error(TR_LOG_DEBUG, GetLastError(),
-                         "_beginthreadex() failed, trying to stop synchronously");
+        log_system_error(TR_LOG_DEBUG, GetLastError(), "_beginthreadex() failed, trying to stop synchronously");
         service_stop_thread_main((LPVOID)(UINT_PTR)wait_time);
     }
 }
 
-static DWORD WINAPI handle_service_ctrl(DWORD control_code, DWORD event_type, LPVOID event_data,
-                                        LPVOID context)
+static DWORD WINAPI handle_service_ctrl(DWORD control_code, DWORD event_type, LPVOID event_data, LPVOID context)
 {
     TR_UNUSED(event_type);
     TR_UNUSED(event_data);
@@ -158,15 +148,19 @@ static DWORD WINAPI handle_service_ctrl(DWORD control_code, DWORD event_type, LP
 
     switch (control_code)
     {
-        case SERVICE_CONTROL_PRESHUTDOWN:
-        case SERVICE_CONTROL_SHUTDOWN:
-        case SERVICE_CONTROL_STOP: stop_service(); return NO_ERROR;
+    case SERVICE_CONTROL_PRESHUTDOWN:
+    case SERVICE_CONTROL_SHUTDOWN:
+    case SERVICE_CONTROL_STOP:
+        stop_service();
+        return NO_ERROR;
 
-        case SERVICE_CONTROL_PARAMCHANGE: callbacks->on_reconfigure(callback_arg); return NO_ERROR;
+    case SERVICE_CONTROL_PARAMCHANGE:
+        callbacks->on_reconfigure(callback_arg);
+        return NO_ERROR;
 
-        case SERVICE_CONTROL_INTERROGATE:
-            update_service_status(current_state, NO_ERROR, 0, 0, 0);
-            return NO_ERROR;
+    case SERVICE_CONTROL_INTERROGATE:
+        update_service_status(current_state, NO_ERROR, 0, 0, 0);
+        return NO_ERROR;
     }
 
     return ERROR_CALL_NOT_IMPLEMENTED;
@@ -231,8 +225,7 @@ static VOID WINAPI service_main(DWORD argc, LPWSTR* argv)
 ****
 ***/
 
-bool dtr_daemon(dtr_callbacks const* cb, void* cb_arg, bool foreground, int* exit_code,
-                tr_error** error)
+bool dtr_daemon(dtr_callbacks const* cb, void* cb_arg, bool foreground, int* exit_code, tr_error** error)
 {
     callbacks = cb;
     callback_arg = cb_arg;
@@ -251,8 +244,11 @@ bool dtr_daemon(dtr_callbacks const* cb, void* cb_arg, bool foreground, int* exi
     }
     else
     {
-        SERVICE_TABLE_ENTRY const service_table[] = {{(LPWSTR)service_name, &service_main},
-                                                     {NULL, NULL}};
+        SERVICE_TABLE_ENTRY const service_table[] =
+        {
+            { (LPWSTR)service_name, &service_main },
+            { NULL, NULL }
+        };
 
         if (!StartServiceCtrlDispatcherW(service_table))
         {

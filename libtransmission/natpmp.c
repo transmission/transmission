@@ -7,8 +7,8 @@
  */
 
 #include <errno.h>
-#include <inttypes.h>
 #include <time.h>
+#include <inttypes.h>
 
 #include <event2/util.h> /* evutil_inet_ntop() */
 
@@ -16,8 +16,8 @@
 #include "natpmp.h"
 
 #include "transmission.h"
-#include "log.h"
 #include "natpmp_local.h"
+#include "log.h"
 #include "net.h" /* tr_netCloseSocket */
 #include "port-forwarding.h"
 #include "utils.h"
@@ -40,7 +40,8 @@ typedef enum
     TR_NATPMP_RECV_MAP,
     TR_NATPMP_SEND_UNMAP,
     TR_NATPMP_RECV_UNMAP
-} tr_natpmp_state;
+}
+tr_natpmp_state;
 
 struct tr_natpmp
 {
@@ -73,8 +74,8 @@ static void logVal(char const* func, int ret)
     }
     else
     {
-        tr_logAddNamedDbg(getKey(), "%s failed. Natpmp returned %d (%s); errno is %d (%s)", func,
-                          ret, strnatpmperr(ret), errno, tr_strerror(errno));
+        tr_logAddNamedDbg(getKey(), "%s failed. Natpmp returned %d (%s); errno is %d (%s)", func, ret, strnatpmperr(ret), errno,
+            tr_strerror(errno));
     }
 }
 
@@ -109,8 +110,7 @@ static void setCommandTime(struct tr_natpmp* nat)
     nat->command_time = tr_time() + COMMAND_WAIT_SECS;
 }
 
-int tr_natpmpPulse(struct tr_natpmp* nat, tr_port private_port, bool is_enabled,
-                   tr_port* public_port)
+int tr_natpmpPulse(struct tr_natpmp* nat, tr_port private_port, bool is_enabled, tr_port* public_port)
 {
     int ret;
 
@@ -154,8 +154,7 @@ int tr_natpmpPulse(struct tr_natpmp* nat, tr_port private_port, bool is_enabled,
 
     if (nat->state == TR_NATPMP_SEND_UNMAP && canSendCommand(nat))
     {
-        int const val = sendnewportmappingrequest(&nat->natpmp, NATPMP_PROTOCOL_TCP,
-                                                  nat->private_port, nat->public_port, 0);
+        int const val = sendnewportmappingrequest(&nat->natpmp, NATPMP_PROTOCOL_TCP, nat->private_port, nat->public_port, 0);
         logVal("sendnewportmappingrequest", val);
         nat->state = val < 0 ? TR_NATPMP_ERR : TR_NATPMP_RECV_UNMAP;
         setCommandTime(nat);
@@ -201,8 +200,7 @@ int tr_natpmpPulse(struct tr_natpmp* nat, tr_port private_port, bool is_enabled,
 
     if (nat->state == TR_NATPMP_SEND_MAP && canSendCommand(nat))
     {
-        int const val = sendnewportmappingrequest(&nat->natpmp, NATPMP_PROTOCOL_TCP, private_port,
-                                                  private_port, LIFETIME_SECS);
+        int const val = sendnewportmappingrequest(&nat->natpmp, NATPMP_PROTOCOL_TCP, private_port, private_port, LIFETIME_SECS);
         logVal("sendnewportmappingrequest", val);
         nat->state = val < 0 ? TR_NATPMP_ERR : TR_NATPMP_RECV_MAP;
         setCommandTime(nat);
@@ -231,21 +229,29 @@ int tr_natpmpPulse(struct tr_natpmp* nat, tr_port private_port, bool is_enabled,
 
     switch (nat->state)
     {
-        case TR_NATPMP_IDLE:
-            *public_port = nat->public_port;
-            return nat->is_mapped ? TR_PORT_MAPPED : TR_PORT_UNMAPPED;
-            break;
+    case TR_NATPMP_IDLE:
+        *public_port = nat->public_port;
+        return nat->is_mapped ? TR_PORT_MAPPED : TR_PORT_UNMAPPED;
+        break;
 
-        case TR_NATPMP_DISCOVER: ret = TR_PORT_UNMAPPED; break;
+    case TR_NATPMP_DISCOVER:
+        ret = TR_PORT_UNMAPPED;
+        break;
 
-        case TR_NATPMP_RECV_PUB:
-        case TR_NATPMP_SEND_MAP:
-        case TR_NATPMP_RECV_MAP: ret = TR_PORT_MAPPING; break;
+    case TR_NATPMP_RECV_PUB:
+    case TR_NATPMP_SEND_MAP:
+    case TR_NATPMP_RECV_MAP:
+        ret = TR_PORT_MAPPING;
+        break;
 
-        case TR_NATPMP_SEND_UNMAP:
-        case TR_NATPMP_RECV_UNMAP: ret = TR_PORT_UNMAPPING; break;
+    case TR_NATPMP_SEND_UNMAP:
+    case TR_NATPMP_RECV_UNMAP:
+        ret = TR_PORT_UNMAPPING;
+        break;
 
-        default: ret = TR_PORT_ERROR; break;
+    default:
+        ret = TR_PORT_ERROR;
+        break;
     }
 
     return ret;

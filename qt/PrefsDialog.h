@@ -27,13 +27,13 @@ class PrefsDialog : public BaseDialog
     Q_OBJECT
     TR_DISABLE_COPY_MOVE(PrefsDialog)
 
-   public:
+public:
     PrefsDialog(Session&, Prefs&, QWidget* parent = nullptr);
 
-   private:
+private:
     using key2widget_t = QMap<int, QWidget*>;
 
-   private:
+private:
     bool updateWidgetValue(QWidget* widget, int pref_key);
     void linkWidgetToPref(QWidget* widget, int pref_key);
     void updateBlocklistLabel();
@@ -49,7 +49,7 @@ class PrefsDialog : public BaseDialog
     void initDesktopTab();
     void initRemoteTab();
 
-   private slots:
+private slots:
     void checkBoxToggled(bool checked);
     void spinBoxEditingFinished();
     void timeEditingFinished();
@@ -69,7 +69,7 @@ class PrefsDialog : public BaseDialog
     void onBlocklistDialogDestroyed(QObject*);
     void onBlocklistUpdated(int n);
 
-   private:
+private:
     Session& session_;
     Prefs& prefs_;
 

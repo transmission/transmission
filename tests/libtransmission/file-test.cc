@@ -6,9 +6,9 @@
  *
  */
 
-#include "file.h"
 #include "transmission.h"
 #include "error.h"
+#include "file.h"
 #include "tr-macros.h"
 
 #include "test-fixtures.h"
@@ -18,8 +18,8 @@
 #include <string>
 
 #ifndef _WIN32
-#include <sys/stat.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <unistd.h>
 #else
 #include <windows.h>
@@ -37,15 +37,16 @@
 
 namespace libtransmission
 {
+
 namespace test
 {
+
 class FileTest : public SessionTest
 {
-   protected:
+protected:
     auto createTestDir(std::string const& child_name)
     {
-        auto test_dir =
-            makeString(tr_buildPath(tr_sessionGetConfigDir(session_), child_name.c_str(), nullptr));
+        auto test_dir = makeString(tr_buildPath(tr_sessionGetConfigDir(session_), child_name.c_str(), nullptr));
         tr_sys_dir_create(test_dir.data(), 0, 0777, nullptr);
         return test_dir;
     }
@@ -62,8 +63,7 @@ class FileTest : public SessionTest
         wchar_t* wide_src_path = tr_win32_utf8_to_native(src_path, -1);
         wchar_t* wide_dst_path = tr_win32_utf8_to_native(dst_path, -1);
 
-        auto const ret = CreateSymbolicLinkW(wide_dst_path, wide_src_path,
-                                             dst_is_dir ? SYMBOLIC_LINK_FLAG_DIRECTORY : 0);
+        auto const ret = CreateSymbolicLinkW(wide_dst_path, wide_src_path, dst_is_dir ? SYMBOLIC_LINK_FLAG_DIRECTORY : 0);
 
         tr_free(wide_dst_path);
         tr_free(wide_src_path);
@@ -94,7 +94,10 @@ class FileTest : public SessionTest
 #endif
     }
 
-    void clearPathInfo(tr_sys_path_info* info) { *info = {}; }
+    void clearPathInfo(tr_sys_path_info* info)
+    {
+        *info = {};
+    }
 
     bool pathContainsNoSymlinks(char const* path)
     {
@@ -123,8 +126,8 @@ class FileTest : public SessionTest
 
             auto const path_part = makeString(tr_strndup(path, size_t(slash_pos - path + 1)));
 
-            if (!tr_sys_path_get_info(path_part.c_str(), TR_SYS_PATH_NO_FOLLOW, &info, nullptr)
-                || (info.type != TR_SYS_PATH_IS_FILE && info.type != TR_SYS_PATH_IS_DIRECTORY))
+            if (!tr_sys_path_get_info(path_part.c_str(), TR_SYS_PATH_NO_FOLLOW, &info, nullptr) ||
+                (info.type != TR_SYS_PATH_IS_FILE && info.type != TR_SYS_PATH_IS_DIRECTORY))
             {
                 return false;
             }
@@ -159,8 +162,7 @@ class FileTest : public SessionTest
         char const* output;
     };
 
-    void testPathXname(XnameTestData const* data, size_t data_size,
-                       char* (*func)(char const*, tr_error**))
+    void testPathXname(XnameTestData const* data, size_t data_size, char* (*func)(char const*, tr_error**))
     {
         for (size_t i = 0; i < data_size; ++i)
         {
@@ -310,8 +312,7 @@ TEST_F(FileTest, getInfo)
         // Good directory info
         t = time(nullptr);
         tr_sys_dir_create(path2, 0, 0777, nullptr);
-        EXPECT_TRUE(
-            createSymlink(path1, path2, true)); /* Win32: directory and file symlinks differ :( */
+        EXPECT_TRUE(createSymlink(path1, path2, true)); /* Win32: directory and file symlinks differ :( */
         clearPathInfo(&info);
         EXPECT_TRUE(tr_sys_path_get_info(path1, 0, &info, &err));
         EXPECT_EQ(nullptr, err);
@@ -374,8 +375,7 @@ TEST_F(FileTest, pathExists)
 
         /* Create directory and see that it exists (via symlink) */
         tr_sys_dir_create(path2, 0, 0777, nullptr);
-        EXPECT_TRUE(
-            createSymlink(path1, path2, true)); /* Win32: directory and file symlinks differ :( */
+        EXPECT_TRUE(createSymlink(path1, path2, true)); /* Win32: directory and file symlinks differ :( */
         EXPECT_TRUE(tr_sys_path_exists(path1, &err));
         EXPECT_EQ(nullptr, err);
 
@@ -633,8 +633,7 @@ TEST_F(FileTest, pathIsSame)
     }
     else
     {
-        fprintf(stderr, "WARNING: [%s] unable to run combined symlink and hardlink tests\n",
-                __FUNCTION__);
+        fprintf(stderr, "WARNING: [%s] unable to run combined symlink and hardlink tests\n", __FUNCTION__);
     }
 
     tr_sys_path_remove(path3, nullptr);
@@ -666,8 +665,7 @@ TEST_F(FileTest, pathResolve)
         tr_sys_path_remove(path1, nullptr);
 
         tr_sys_dir_create(path1, 0, 0755, nullptr);
-        EXPECT_TRUE(
-            createSymlink(path2, path1, true)); /* Win32: directory and file symlinks differ :( */
+        EXPECT_TRUE(createSymlink(path2, path1, true)); /* Win32: directory and file symlinks differ :( */
         tmp = makeString(tr_sys_path_resolve(path2, &err));
         EXPECT_EQ(nullptr, err);
         EXPECT_TRUE(pathContainsNoSymlinks(tmp.c_str()));
@@ -709,91 +707,102 @@ TEST_F(FileTest, pathResolve)
 
 TEST_F(FileTest, pathBasenameDirname)
 {
-    auto const common_xname_tests = std::vector<XnameTestData> {XnameTestData {"/", "/"},
-                                                                {"", "."},
+    auto const common_xname_tests = std::vector<XnameTestData>{
+        XnameTestData{ "/", "/" },
+        { "", "." },
 #ifdef _WIN32
-                                                                {"\\", "/"},
-                                                                /* Invalid paths */
-                                                                {"\\\\\\", nullptr},
-                                                                {"123:", nullptr},
-                                                                /* Reserved characters */
-                                                                {"<", nullptr},
-                                                                {">", nullptr},
-                                                                {":", nullptr},
-                                                                {"\"", nullptr},
-                                                                {"|", nullptr},
-                                                                {"?", nullptr},
-                                                                {"*", nullptr},
-                                                                {"a\\<", nullptr},
-                                                                {"a\\>", nullptr},
-                                                                {"a\\:", nullptr},
-                                                                {"a\\\"", nullptr},
-                                                                {"a\\|", nullptr},
-                                                                {"a\\?", nullptr},
-                                                                {"a\\*", nullptr},
-                                                                {"c:\\a\\b<c\\d", nullptr},
-                                                                {"c:\\a\\b>c\\d", nullptr},
-                                                                {"c:\\a\\b:c\\d", nullptr},
-                                                                {"c:\\a\\b\"c\\d", nullptr},
-                                                                {"c:\\a\\b|c\\d", nullptr},
-                                                                {"c:\\a\\b?c\\d", nullptr},
-                                                                {"c:\\a\\b*c\\d", nullptr}
+        {
+            "\\", "/"
+        },
+        /* Invalid paths */
+        { "\\\\\\", nullptr },
+        { "123:", nullptr },
+        /* Reserved characters */
+        { "<", nullptr },
+        { ">", nullptr },
+        { ":", nullptr },
+        { "\"", nullptr },
+        { "|", nullptr },
+        { "?", nullptr },
+        { "*", nullptr },
+        { "a\\<", nullptr },
+        { "a\\>", nullptr },
+        { "a\\:", nullptr },
+        { "a\\\"", nullptr },
+        { "a\\|", nullptr },
+        { "a\\?", nullptr },
+        { "a\\*", nullptr },
+        { "c:\\a\\b<c\\d", nullptr },
+        { "c:\\a\\b>c\\d", nullptr },
+        { "c:\\a\\b:c\\d", nullptr },
+        { "c:\\a\\b\"c\\d", nullptr },
+        { "c:\\a\\b|c\\d", nullptr },
+        { "c:\\a\\b?c\\d", nullptr },
+        { "c:\\a\\b*c\\d", nullptr }
 #else
-                                                                {"////", "/"}
+        {
+            "////", "/"
+        }
 #endif
     };
 
     testPathXname(common_xname_tests.data(), common_xname_tests.size(), tr_sys_path_basename);
     testPathXname(common_xname_tests.data(), common_xname_tests.size(), tr_sys_path_dirname);
 
-    auto const basename_tests = std::vector<XnameTestData> {XnameTestData {"a", "a"},
-                                                            {"aa", "aa"},
-                                                            {"/aa", "aa"},
-                                                            {"/a/b/c", "c"},
-                                                            {"/a/b/c/", "c"},
+    auto const basename_tests = std::vector<XnameTestData>{
+        XnameTestData{ "a", "a" },
+        { "aa", "aa" },
+        { "/aa", "aa" },
+        { "/a/b/c", "c" },
+        { "/a/b/c/", "c" },
 #ifdef _WIN32
-                                                            {"c:\\a\\b\\c", "c"},
-                                                            {"c:", "/"},
-                                                            {"c:/", "/"},
-                                                            {"c:\\", "/"},
-                                                            {"c:a/b", "b"},
-                                                            {"c:a", "a"},
-                                                            {"\\\\a\\b\\c", "c"},
-                                                            {"//a/b", "b"},
-                                                            {"//1.2.3.4/b", "b"},
-                                                            {"\\\\a", "a"},
-                                                            {"\\\\1.2.3.4", "1.2.3.4"},
-                                                            {"\\", "/"},
-                                                            {"\\a", "a"}
+        {
+            "c:\\a\\b\\c", "c"
+        },
+        { "c:", "/" },
+        { "c:/", "/" },
+        { "c:\\", "/" },
+        { "c:a/b", "b" },
+        { "c:a", "a" },
+        { "\\\\a\\b\\c", "c" },
+        { "//a/b", "b" },
+        { "//1.2.3.4/b", "b" },
+        { "\\\\a", "a" },
+        { "\\\\1.2.3.4", "1.2.3.4" },
+        { "\\", "/" },
+        { "\\a", "a" }
 #endif
     };
 
     testPathXname(basename_tests.data(), basename_tests.size(), tr_sys_path_basename);
 
-    auto const dirname_tests = std::vector<XnameTestData> {XnameTestData {"/a/b/c", "/a/b"},
-                                                           {"a/b/c", "a/b"},
-                                                           {"a/b/c/", "a/b"},
-                                                           {"a", "."},
-                                                           {"a/", "."},
+    auto const dirname_tests = std::vector<XnameTestData>{
+        XnameTestData{ "/a/b/c", "/a/b" },
+        { "a/b/c", "a/b" },
+        { "a/b/c/", "a/b" },
+        { "a", "." },
+        { "a/", "." },
 #ifdef _WIN32
-                                                           {"C:\\a/b\\c", "C:\\a/b"},
-                                                           {"C:\\a/b\\c\\", "C:\\a/b"},
-                                                           {"C:\\a/b", "C:\\a"},
-                                                           {"C:/a", "C:"},
-                                                           {"C:", "C:"},
-                                                           {"C:/", "C:"},
-                                                           {"C:\\", "C:"},
-                                                           {"c:a/b", "c:a"},
-                                                           {"c:a", "c:."},
-                                                           {"c:.", "c:."},
-                                                           {"\\\\a\\b\\c", "\\\\a\\b"},
-                                                           {"\\\\a\\b\\c/", "\\\\a\\b"},
-                                                           {"//a/b", "//a"},
-                                                           {"//1.2.3.4/b", "//1.2.3.4"},
-                                                           {"\\\\a", "\\\\"},
-                                                           {"\\\\1.2.3.4", "\\\\"},
-                                                           {"\\\\", "\\\\"},
-                                                           {"a/b\\c", "a/b"}
+        {
+            "C:\\a/b\\c", "C:\\a/b"
+        },
+        { "C:\\a/b\\c\\", "C:\\a/b" },
+        { "C:\\a/b", "C:\\a" },
+        { "C:/a", "C:" },
+        { "C:", "C:" },
+        { "C:/", "C:" },
+        { "C:\\", "C:" },
+        { "c:a/b", "c:a" },
+        { "c:a", "c:." },
+        { "c:.", "c:." },
+        { "\\\\a\\b\\c", "\\\\a\\b" },
+        { "\\\\a\\b\\c/", "\\\\a\\b" },
+        { "//a/b", "//a" },
+        { "//1.2.3.4/b", "//1.2.3.4" },
+        { "\\\\a", "\\\\" },
+        { "\\\\1.2.3.4", "\\\\" },
+        { "\\\\", "\\\\" },
+        { "a/b\\c", "a/b" }
 #endif
     };
 
@@ -973,12 +982,13 @@ TEST_F(FileTest, pathNativeSeparators)
         std::string expected_output;
     };
 
-    auto const tests = std::array<LocalTest, 5> {
-        LocalTest {"", ""},
-        {"a", TR_IF_WIN32("a", "a")},
-        {"/", TR_IF_WIN32("\\", "/")},
-        {"/a/b/c", TR_IF_WIN32("\\a\\b\\c", "/a/b/c")},
-        {"C:\\a/b\\c", TR_IF_WIN32("C:\\a\\b\\c", "C:\\a/b\\c")},
+    auto const tests = std::array<LocalTest, 5>
+    {
+        LocalTest{ "", "" },
+        { "a", TR_IF_WIN32("a", "a") },
+        { "/", TR_IF_WIN32("\\", "/") },
+        { "/a/b/c", TR_IF_WIN32("\\a\\b\\c", "/a/b/c") },
+        { "C:\\a/b\\c", TR_IF_WIN32("C:\\a\\b\\c", "C:\\a/b\\c") },
     };
 
     for (auto const& test : tests)
@@ -1058,8 +1068,7 @@ TEST_F(FileTest, fileOpen)
     fd = tr_sys_file_open(path1, TR_SYS_FILE_WRITE | TR_SYS_FILE_APPEND, 0600, &err);
     EXPECT_NE(TR_BAD_SYS_FILE, fd);
     EXPECT_EQ(nullptr, err);
-    tr_sys_file_write(fd, "s", 1, nullptr,
-                      nullptr); /* On *NIX, pointer is positioned on each write but not initially */
+    tr_sys_file_write(fd, "s", 1, nullptr, nullptr); /* On *NIX, pointer is positioned on each write but not initially */
     auto n = uint64_t {};
     tr_sys_file_seek(fd, 0, TR_SEEK_CUR, &n, nullptr);
     EXPECT_EQ(5, n);
@@ -1089,8 +1098,7 @@ TEST_F(FileTest, fileReadWriteSeek)
     auto const test_dir = createTestDir(currentTestName());
 
     auto* path1 = tr_buildPath(test_dir.data(), "a", nullptr);
-    auto const fd = tr_sys_file_open(
-        path1, TR_SYS_FILE_READ | TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE, 0600, nullptr);
+    auto const fd = tr_sys_file_open(path1, TR_SYS_FILE_READ | TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE, 0600, nullptr);
 
     uint64_t n;
     tr_error* err = nullptr;
@@ -1110,7 +1118,7 @@ TEST_F(FileTest, fileReadWriteSeek)
     EXPECT_EQ(nullptr, err);
     EXPECT_EQ(0, n);
 
-    auto buf = std::array<char, 100> {};
+    auto buf = std::array<char, 100>{};
     EXPECT_TRUE(tr_sys_file_read(fd, buf.data(), buf.size(), &n, &err));
     EXPECT_EQ(nullptr, err);
     EXPECT_EQ(4, n);
@@ -1225,7 +1233,7 @@ TEST_F(FileTest, filePreallocate)
     auto fd = tr_sys_file_open(path1, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE, 0600, nullptr);
 
     tr_error* err = nullptr;
-    auto prealloc_size = size_t {50};
+    auto prealloc_size = size_t{ 50 };
     if (tr_sys_file_preallocate(fd, prealloc_size, 0, &err))
     {
         EXPECT_EQ(nullptr, err);
@@ -1236,8 +1244,7 @@ TEST_F(FileTest, filePreallocate)
     else
     {
         EXPECT_NE(nullptr, err);
-        fprintf(stderr, "WARNING: [%s] unable to preallocate file (full): %s (%d)\n", __FUNCTION__,
-                err->message, err->code);
+        fprintf(stderr, "WARNING: [%s] unable to preallocate file (full): %s (%d)\n", __FUNCTION__, err->message, err->code);
         tr_error_clear(&err);
     }
 
@@ -1258,8 +1265,7 @@ TEST_F(FileTest, filePreallocate)
     else
     {
         EXPECT_NE(nullptr, err);
-        fprintf(stderr, "WARNING: [%s] unable to preallocate file (sparse): %s (%d)\n",
-                __FUNCTION__, err->message, err->code);
+        fprintf(stderr, "WARNING: [%s] unable to preallocate file (sparse): %s (%d)\n", __FUNCTION__, err->message, err->code);
         tr_error_clear(&err);
     }
 
@@ -1275,7 +1281,7 @@ TEST_F(FileTest, map)
     auto const test_dir = createTestDir(currentTestName());
 
     auto* path1 = tr_buildPath(test_dir.data(), "a", nullptr);
-    auto const contents = std::string {"test"};
+    auto const contents = std::string { "test" };
     createFileWithContents(path1, contents.data());
 
     auto fd = tr_sys_file_open(path1, TR_SYS_FILE_READ | TR_SYS_FILE_WRITE, 0600, nullptr);
@@ -1289,7 +1295,7 @@ TEST_F(FileTest, map)
 
 #ifdef HAVE_UNIFIED_BUFFER_CACHE
 
-    auto const contents_2 = std::string {"more"};
+    auto const contents_2 = std::string { "more" };
     auto n_written = uint64_t {};
     tr_sys_file_write_at(fd, contents_2.data(), contents_2.size(), 0, &n_written, &err);
     EXPECT_EQ(map_len, contents_2.size());
@@ -1314,13 +1320,13 @@ TEST_F(FileTest, fileUtilities)
     auto const test_dir = createTestDir(currentTestName());
 
     auto* path1 = tr_buildPath(test_dir.data(), "a", nullptr);
-    auto const contents = std::string {"a\nbc\r\ndef\nghij\r\n\n\nklmno\r"};
+    auto const contents = std::string { "a\nbc\r\ndef\nghij\r\n\n\nklmno\r" };
     createFileWithContents(path1, contents.data());
 
     auto fd = tr_sys_file_open(path1, TR_SYS_FILE_READ, 0, nullptr);
 
     tr_error* err = nullptr;
-    auto buffer = std::array<char, 16> {};
+    auto buffer = std::array<char, 16>{};
     EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), &err));
     EXPECT_EQ(nullptr, err);
     EXPECT_STREQ("a", buffer.data());
@@ -1347,12 +1353,11 @@ TEST_F(FileTest, fileUtilities)
     EXPECT_STREQ("o", buffer.data());
     EXPECT_FALSE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), &err));
     EXPECT_EQ(nullptr, err);
-    EXPECT_STREQ("o", buffer.data());  // on EOF, buffer stays unchanged
+    EXPECT_STREQ("o", buffer.data()); // on EOF, buffer stays unchanged
 
     tr_sys_file_close(fd, nullptr);
 
-    fd = tr_sys_file_open(path1, TR_SYS_FILE_READ | TR_SYS_FILE_WRITE | TR_SYS_FILE_TRUNCATE, 0,
-                          nullptr);
+    fd = tr_sys_file_open(path1, TR_SYS_FILE_READ | TR_SYS_FILE_WRITE | TR_SYS_FILE_TRUNCATE, 0, nullptr);
 
     EXPECT_TRUE(tr_sys_file_write_line(fd, "p", &err));
     EXPECT_EQ(nullptr, err);
@@ -1394,7 +1399,7 @@ TEST_F(FileTest, fileUtilities)
     EXPECT_STREQ("vwxy2", buffer.data());
     EXPECT_FALSE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), &err));
     EXPECT_EQ(nullptr, err);
-    EXPECT_STREQ("vwxy2", buffer.data());  // on EOF, buffer stays unchanged
+    EXPECT_STREQ("vwxy2", buffer.data()); // on EOF, buffer stays unchanged
 
     tr_sys_file_close(fd, nullptr);
 
@@ -1489,6 +1494,6 @@ TEST_F(FileTest, dirRead)
     tr_free(path1);
 }
 
-}  // namespace test
+} // namespace test
 
-}  // namespace libtransmission
+} // namespace libtransmission

@@ -135,8 +135,8 @@ static void doSave(GtkWindow* parent, struct MsgData* data, char const* filename
 
     if (fp == NULL)
     {
-        GtkWidget* w = gtk_message_dialog_new(parent, 0, GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE,
-                                              _("Couldn't save \"%s\""), filename);
+        GtkWidget* w = gtk_message_dialog_new(parent, 0, GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, _("Couldn't save \"%s\""),
+            filename);
         gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(w), "%s", g_strerror(errno));
         g_signal_connect_swapped(w, "response", G_CALLBACK(gtk_widget_destroy), w);
         gtk_widget_show(w);
@@ -158,18 +158,24 @@ static void doSave(GtkWindow* parent, struct MsgData* data, char const* filename
 
                 switch (node->level)
                 {
-                    case TR_LOG_DEBUG: levelStr = "debug"; break;
+                case TR_LOG_DEBUG:
+                    levelStr = "debug";
+                    break;
 
-                    case TR_LOG_ERROR: levelStr = "error"; break;
+                case TR_LOG_ERROR:
+                    levelStr = "error";
+                    break;
 
-                    default: levelStr = "     "; break;
+                default:
+                    levelStr = "     ";
+                    break;
                 }
 
-                fprintf(fp, "%s\t%s\t%s\t%s\n", date, levelStr,
-                        node->name != NULL ? node->name : "",
-                        node->message != NULL ? node->message : "");
+                fprintf(fp, "%s\t%s\t%s\t%s\n", date, levelStr, node->name != NULL ? node->name : "",
+                    node->message != NULL ? node->message : "");
                 g_free(date);
-            } while (gtk_tree_model_iter_next(model, &iter));
+            }
+            while (gtk_tree_model_iter_next(model, &iter));
         }
 
         fclose(fp);
@@ -192,8 +198,9 @@ static void onSaveRequest(GtkWidget* w, gpointer data)
 {
     GtkWindow* window = GTK_WINDOW(gtk_widget_get_toplevel(w));
     GtkWidget* d = gtk_file_chooser_dialog_new(_("Save Log"), window, GTK_FILE_CHOOSER_ACTION_SAVE,
-                                               _("_Cancel"), GTK_RESPONSE_CANCEL, _("_Save"),
-                                               GTK_RESPONSE_ACCEPT, NULL);
+        _("_Cancel"), GTK_RESPONSE_CANCEL,
+        _("_Save"), GTK_RESPONSE_ACCEPT,
+        NULL);
 
     g_signal_connect(d, "response", G_CALLBACK(onSaveDialogResponse), data);
     gtk_widget_show(d);
@@ -221,18 +228,23 @@ static char const* getForegroundColor(int msgLevel)
 {
     switch (msgLevel)
     {
-        case TR_LOG_DEBUG: return "forestgreen";
+    case TR_LOG_DEBUG:
+        return "forestgreen";
 
-        case TR_LOG_INFO: return "black";
+    case TR_LOG_INFO:
+        return "black";
 
-        case TR_LOG_ERROR: return "red";
+    case TR_LOG_ERROR:
+        return "red";
 
-        default: g_assert_not_reached(); return "black";
+    default:
+        g_assert_not_reached();
+        return "black";
     }
 }
 
-static void renderText(GtkTreeViewColumn* column, GtkCellRenderer* renderer,
-                       GtkTreeModel* tree_model, GtkTreeIter* iter, gpointer gcol)
+static void renderText(GtkTreeViewColumn* column, GtkCellRenderer* renderer, GtkTreeModel* tree_model, GtkTreeIter* iter,
+    gpointer gcol)
 {
     TR_UNUSED(column);
 
@@ -241,12 +253,11 @@ static void renderText(GtkTreeViewColumn* column, GtkCellRenderer* renderer,
     struct tr_log_message const* node;
 
     gtk_tree_model_get(tree_model, iter, col, &str, COL_TR_MSG, &node, -1);
-    g_object_set(renderer, "text", str, "foreground", getForegroundColor(node->level), "ellipsize",
-                 PANGO_ELLIPSIZE_END, NULL);
+    g_object_set(renderer, "text", str, "foreground", getForegroundColor(node->level), "ellipsize", PANGO_ELLIPSIZE_END, NULL);
 }
 
-static void renderTime(GtkTreeViewColumn* column, GtkCellRenderer* renderer,
-                       GtkTreeModel* tree_model, GtkTreeIter* iter, gpointer data)
+static void renderTime(GtkTreeViewColumn* column, GtkCellRenderer* renderer, GtkTreeModel* tree_model, GtkTreeIter* iter,
+    gpointer data)
 {
     TR_UNUSED(column);
     TR_UNUSED(data);
@@ -268,45 +279,54 @@ static void appendColumn(GtkTreeView* view, int col)
 
     switch (col)
     {
-        case COL_SEQUENCE: title = _("Time"); break;
+    case COL_SEQUENCE:
+        title = _("Time");
+        break;
 
-        /* noun. column title for a list */
-        case COL_NAME: title = _("Name"); break;
+    /* noun. column title for a list */
+    case COL_NAME:
+        title = _("Name");
+        break;
 
-        /* noun. column title for a list */
-        case COL_MESSAGE: title = _("Message"); break;
+    /* noun. column title for a list */
+    case COL_MESSAGE:
+        title = _("Message");
+        break;
 
-        default: g_assert_not_reached();
+    default:
+        g_assert_not_reached();
     }
 
     switch (col)
     {
-        case COL_NAME:
-            r = gtk_cell_renderer_text_new();
-            c = gtk_tree_view_column_new_with_attributes(title, r, NULL);
-            gtk_tree_view_column_set_cell_data_func(c, r, renderText, GINT_TO_POINTER(col), NULL);
-            gtk_tree_view_column_set_sizing(c, GTK_TREE_VIEW_COLUMN_FIXED);
-            gtk_tree_view_column_set_fixed_width(c, 200);
-            gtk_tree_view_column_set_resizable(c, TRUE);
-            break;
+    case COL_NAME:
+        r = gtk_cell_renderer_text_new();
+        c = gtk_tree_view_column_new_with_attributes(title, r, NULL);
+        gtk_tree_view_column_set_cell_data_func(c, r, renderText, GINT_TO_POINTER(col), NULL);
+        gtk_tree_view_column_set_sizing(c, GTK_TREE_VIEW_COLUMN_FIXED);
+        gtk_tree_view_column_set_fixed_width(c, 200);
+        gtk_tree_view_column_set_resizable(c, TRUE);
+        break;
 
-        case COL_MESSAGE:
-            r = gtk_cell_renderer_text_new();
-            c = gtk_tree_view_column_new_with_attributes(title, r, NULL);
-            gtk_tree_view_column_set_cell_data_func(c, r, renderText, GINT_TO_POINTER(col), NULL);
-            gtk_tree_view_column_set_sizing(c, GTK_TREE_VIEW_COLUMN_FIXED);
-            gtk_tree_view_column_set_fixed_width(c, 500);
-            gtk_tree_view_column_set_resizable(c, TRUE);
-            break;
+    case COL_MESSAGE:
+        r = gtk_cell_renderer_text_new();
+        c = gtk_tree_view_column_new_with_attributes(title, r, NULL);
+        gtk_tree_view_column_set_cell_data_func(c, r, renderText, GINT_TO_POINTER(col), NULL);
+        gtk_tree_view_column_set_sizing(c, GTK_TREE_VIEW_COLUMN_FIXED);
+        gtk_tree_view_column_set_fixed_width(c, 500);
+        gtk_tree_view_column_set_resizable(c, TRUE);
+        break;
 
-        case COL_SEQUENCE:
-            r = gtk_cell_renderer_text_new();
-            c = gtk_tree_view_column_new_with_attributes(title, r, NULL);
-            gtk_tree_view_column_set_cell_data_func(c, r, renderTime, NULL, NULL);
-            gtk_tree_view_column_set_resizable(c, TRUE);
-            break;
+    case COL_SEQUENCE:
+        r = gtk_cell_renderer_text_new();
+        c = gtk_tree_view_column_new_with_attributes(title, r, NULL);
+        gtk_tree_view_column_set_cell_data_func(c, r, renderTime, NULL, NULL);
+        gtk_tree_view_column_set_resizable(c, TRUE);
+        break;
 
-        default: g_assert_not_reached(); break;
+    default:
+        g_assert_not_reached();
+        break;
     }
 
     gtk_tree_view_append_column(view, c);
@@ -343,8 +363,12 @@ static tr_log_message* addMessages(GtkListStore* store, struct tr_log_message* h
     {
         char const* name = i->name != NULL ? i->name : default_name;
 
-        gtk_list_store_insert_with_values(store, NULL, 0, COL_TR_MSG, i, COL_NAME, name,
-                                          COL_MESSAGE, i->message, COL_SEQUENCE, ++sequence, -1);
+        gtk_list_store_insert_with_values(store, NULL, 0,
+            COL_TR_MSG, i,
+            COL_NAME, name,
+            COL_MESSAGE, i->message,
+            COL_SEQUENCE, ++sequence,
+            -1);
 
         /* if it's an error message, dump it to the terminal too */
         if (i->level == TR_LOG_ERROR)
@@ -403,8 +427,11 @@ static gboolean onRefresh(gpointer gdata)
 
 static GtkWidget* debug_level_combo_new(void)
 {
-    GtkWidget* w = gtr_combo_box_new_enum(_("Error"), TR_LOG_ERROR, _("Information"), TR_LOG_INFO,
-                                          _("Debug"), TR_LOG_DEBUG, NULL);
+    GtkWidget* w = gtr_combo_box_new_enum(
+        _("Error"), TR_LOG_ERROR,
+        _("Information"), TR_LOG_INFO,
+        _("Debug"), TR_LOG_DEBUG,
+        NULL);
     gtr_combo_box_set_active_enum(GTK_COMBO_BOX(w), gtr_pref_int_get(TR_KEY_message_level));
     return w;
 }
@@ -439,18 +466,25 @@ GtkWidget* gtr_message_log_window_new(GtkWindow* parent, TrCore* core)
 
     toolbar = gtk_toolbar_new();
     gtk_toolbar_set_style(GTK_TOOLBAR(toolbar), GTK_TOOLBAR_BOTH_HORIZ);
-    gtk_style_context_add_class(gtk_widget_get_style_context(toolbar),
-                                GTK_STYLE_CLASS_PRIMARY_TOOLBAR);
+    gtk_style_context_add_class(gtk_widget_get_style_context(toolbar), GTK_STYLE_CLASS_PRIMARY_TOOLBAR);
 
     item = gtk_tool_button_new(NULL, NULL);
-    g_object_set(item, "icon-name", "document-save-as", "is-important", TRUE, "label",
-                 _("Save _As"), "use-underline", TRUE, NULL);
+    g_object_set(item,
+        "icon-name", "document-save-as",
+        "is-important", TRUE,
+        "label", _("Save _As"),
+        "use-underline", TRUE,
+        NULL);
     g_signal_connect(item, "clicked", G_CALLBACK(onSaveRequest), data);
     gtk_toolbar_insert(GTK_TOOLBAR(toolbar), item, -1);
 
     item = gtk_tool_button_new(NULL, NULL);
-    g_object_set(item, "icon-name", "edit-clear", "is-important", TRUE, "label", _("Clear"),
-                 "use-underline", TRUE, NULL);
+    g_object_set(item,
+        "icon-name", "edit-clear",
+        "is-important", TRUE,
+        "label", _("Clear"),
+        "use-underline", TRUE,
+        NULL);
     g_signal_connect(item, "clicked", G_CALLBACK(onClearRequest), data);
     gtk_toolbar_insert(GTK_TOOLBAR(toolbar), item, -1);
 
@@ -458,8 +492,12 @@ GtkWidget* gtr_message_log_window_new(GtkWindow* parent, TrCore* core)
     gtk_toolbar_insert(GTK_TOOLBAR(toolbar), item, -1);
 
     item = gtk_toggle_tool_button_new();
-    g_object_set(G_OBJECT(item), "icon-name", "media-playback-pause", "is-important", TRUE, "label",
-                 _("P_ause"), "use-underline", TRUE, NULL);
+    g_object_set(G_OBJECT(item),
+        "icon-name", "media-playback-pause",
+        "is-important", TRUE,
+        "label", _("P_ause"),
+        "use-underline", TRUE,
+        NULL);
     g_signal_connect(item, "toggled", G_CALLBACK(onPauseToggled), data);
     gtk_toolbar_insert(GTK_TOOLBAR(toolbar), item, -1);
 
@@ -484,10 +522,11 @@ GtkWidget* gtr_message_log_window_new(GtkWindow* parent, TrCore* core)
     ***  messages
     **/
 
-    data->store = gtk_list_store_new(N_COLUMNS, G_TYPE_UINT, /* sequence */
-                                     G_TYPE_POINTER,         /* category */
-                                     G_TYPE_POINTER,         /* message */
-                                     G_TYPE_POINTER);        /* struct tr_log_message */
+    data->store = gtk_list_store_new(N_COLUMNS,
+        G_TYPE_UINT, /* sequence */
+        G_TYPE_POINTER, /* category */
+        G_TYPE_POINTER, /* message */
+        G_TYPE_POINTER); /* struct tr_log_message */
 
     addMessages(data->store, myHead);
     onRefresh(data); /* much faster to populate *before* it has listeners */
@@ -495,11 +534,9 @@ GtkWidget* gtr_message_log_window_new(GtkWindow* parent, TrCore* core)
     data->filter = gtk_tree_model_filter_new(GTK_TREE_MODEL(data->store), NULL);
     data->sort = gtk_tree_model_sort_new_with_model(data->filter);
     g_object_unref(data->filter);
-    gtk_tree_sortable_set_sort_column_id(GTK_TREE_SORTABLE(data->sort), COL_SEQUENCE,
-                                         GTK_SORT_ASCENDING);
+    gtk_tree_sortable_set_sort_column_id(GTK_TREE_SORTABLE(data->sort), COL_SEQUENCE, GTK_SORT_ASCENDING);
     data->maxLevel = gtr_pref_int_get(TR_KEY_message_level);
-    gtk_tree_model_filter_set_visible_func(GTK_TREE_MODEL_FILTER(data->filter), isRowVisible, data,
-                                           NULL);
+    gtk_tree_model_filter_set_visible_func(GTK_TREE_MODEL_FILTER(data->filter), isRowVisible, data, NULL);
 
     view = gtk_tree_view_new_with_model(data->sort);
     g_object_unref(data->sort);
@@ -509,15 +546,13 @@ GtkWidget* gtr_message_log_window_new(GtkWindow* parent, TrCore* core)
     appendColumn(data->view, COL_NAME);
     appendColumn(data->view, COL_MESSAGE);
     w = gtk_scrolled_window_new(NULL, NULL);
-    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(w), GTK_POLICY_AUTOMATIC,
-                                   GTK_POLICY_AUTOMATIC);
+    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(w), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
     gtk_scrolled_window_set_shadow_type(GTK_SCROLLED_WINDOW(w), GTK_SHADOW_IN);
     gtk_container_add(GTK_CONTAINER(w), view);
     gtk_box_pack_start(GTK_BOX(vbox), w, TRUE, TRUE, 0);
     gtk_container_add(GTK_CONTAINER(win), vbox);
 
-    data->refresh_tag =
-        gdk_threads_add_timeout_seconds(SECONDARY_WINDOW_REFRESH_INTERVAL_SECONDS, onRefresh, data);
+    data->refresh_tag = gdk_threads_add_timeout_seconds(SECONDARY_WINDOW_REFRESH_INTERVAL_SECONDS, onRefresh, data);
     g_object_weak_ref(G_OBJECT(win), onWindowDestroyed, data);
 
     scroll_to_bottom(data);

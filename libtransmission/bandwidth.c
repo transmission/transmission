@@ -22,8 +22,7 @@
 ****
 ***/
 
-static unsigned int getSpeed_Bps(struct bratecontrol const* r, unsigned int interval_msec,
-                                 uint64_t now)
+static unsigned int getSpeed_Bps(struct bratecontrol const* r, unsigned int interval_msec, uint64_t now)
 {
     if (now == 0)
     {
@@ -150,8 +149,8 @@ void tr_bandwidthSetParent(tr_bandwidth* b, tr_bandwidth* parent)
 ****
 ***/
 
-static void allocateBandwidth(tr_bandwidth* b, tr_priority_t parent_priority, tr_direction dir,
-                              unsigned int period_msec, tr_ptrArray* peer_pool)
+static void allocateBandwidth(tr_bandwidth* b, tr_priority_t parent_priority, tr_direction dir, unsigned int period_msec,
+    tr_ptrArray* peer_pool)
 {
     TR_ASSERT(tr_isBandwidth(b));
     TR_ASSERT(tr_isDirection(dir));
@@ -246,11 +245,14 @@ void tr_bandwidthAllocate(tr_bandwidth* b, tr_direction dir, unsigned int period
 
         switch (io->priority)
         {
-            case TR_PRI_HIGH: tr_ptrArrayAppend(&high, io); /* fall through */
+        case TR_PRI_HIGH:
+            tr_ptrArrayAppend(&high, io); /* fall through */
 
-            case TR_PRI_NORMAL: tr_ptrArrayAppend(&normal, io); /* fall through */
+        case TR_PRI_NORMAL:
+            tr_ptrArrayAppend(&normal, io); /* fall through */
 
-            default: tr_ptrArrayAppend(&low, io);
+        default:
+            tr_ptrArrayAppend(&low, io);
         }
     }
 
@@ -295,8 +297,7 @@ void tr_bandwidthSetPeer(tr_bandwidth* b, tr_peerIo* peer)
 ****
 ***/
 
-static unsigned int bandwidthClamp(tr_bandwidth const* b, uint64_t now, tr_direction dir,
-                                   unsigned int byteCount)
+static unsigned int bandwidthClamp(tr_bandwidth const* b, uint64_t now, tr_direction dir, unsigned int byteCount)
 {
     TR_ASSERT(tr_isBandwidth(b));
     TR_ASSERT(tr_isDirection(dir));
@@ -353,8 +354,7 @@ unsigned int tr_bandwidthClamp(tr_bandwidth const* b, tr_direction dir, unsigned
     return bandwidthClamp(b, 0, dir, byteCount);
 }
 
-unsigned int tr_bandwidthGetRawSpeed_Bps(tr_bandwidth const* b, uint64_t const now,
-                                         tr_direction const dir)
+unsigned int tr_bandwidthGetRawSpeed_Bps(tr_bandwidth const* b, uint64_t const now, tr_direction const dir)
 {
     TR_ASSERT(tr_isBandwidth(b));
     TR_ASSERT(tr_isDirection(dir));
@@ -362,8 +362,7 @@ unsigned int tr_bandwidthGetRawSpeed_Bps(tr_bandwidth const* b, uint64_t const n
     return getSpeed_Bps(&b->band[dir].raw, HISTORY_MSEC, now);
 }
 
-unsigned int tr_bandwidthGetPieceSpeed_Bps(tr_bandwidth const* b, uint64_t const now,
-                                           tr_direction const dir)
+unsigned int tr_bandwidthGetPieceSpeed_Bps(tr_bandwidth const* b, uint64_t const now, tr_direction const dir)
 {
     TR_ASSERT(tr_isBandwidth(b));
     TR_ASSERT(tr_isDirection(dir));
@@ -371,8 +370,7 @@ unsigned int tr_bandwidthGetPieceSpeed_Bps(tr_bandwidth const* b, uint64_t const
     return getSpeed_Bps(&b->band[dir].piece, HISTORY_MSEC, now);
 }
 
-void tr_bandwidthUsed(tr_bandwidth* b, tr_direction dir, size_t byteCount, bool isPieceData,
-                      uint64_t now)
+void tr_bandwidthUsed(tr_bandwidth* b, tr_direction dir, size_t byteCount, bool isPieceData, uint64_t now)
 {
     TR_ASSERT(tr_isBandwidth(b));
     TR_ASSERT(tr_isDirection(dir));
@@ -388,8 +386,8 @@ void tr_bandwidthUsed(tr_bandwidth* b, tr_direction dir, size_t byteCount, bool 
 
     if (dir == DEBUG_DIRECTION && band->isLimited)
     {
-        fprintf(stderr, "%p consumed %5zu bytes of %5s data... was %6zu, now %6zu left\n", b,
-                byteCount, isPieceData ? "piece" : "raw", oldBytesLeft, band->bytesLeft);
+        fprintf(stderr, "%p consumed %5zu bytes of %5s data... was %6zu, now %6zu left\n", b, byteCount,
+            isPieceData ? "piece" : "raw", oldBytesLeft, band->bytesLeft);
     }
 
 #endif

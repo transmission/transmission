@@ -6,9 +6,9 @@
  *
  */
 
-#include <stdio.h>  /* fprintf() */
-#include <stdlib.h> /* EXIT_FAILURE */
+#include <stdio.h> /* fprintf() */
 #include <string.h> /* strlen(), strstr(), strcmp() */
+#include <stdlib.h> /* EXIT_FAILURE */
 
 #include <event2/buffer.h>
 
@@ -26,15 +26,16 @@ static bool showVersion = false;
 static char const** files = NULL;
 static char const* add = NULL;
 static char const* deleteme = NULL;
-static char const* replace[2] = {NULL, NULL};
+static char const* replace[2] = { NULL, NULL };
 
-static tr_option options[] = {
-    {'a', "add", "Add a tracker's announce URL", "a", true, "<url>"},
-    {'d', "delete", "Delete a tracker's announce URL", "d", true, "<url>"},
-    {'r', "replace", "Search and replace a substring in the announce URLs", "r", true,
-     "<old> <new>"},
-    {'V', "version", "Show version number and exit", "V", false, NULL},
-    {0, NULL, NULL, NULL, false, NULL}};
+static tr_option options[] =
+{
+    { 'a', "add", "Add a tracker's announce URL", "a", true, "<url>" },
+    { 'd', "delete", "Delete a tracker's announce URL", "d", true, "<url>" },
+    { 'r', "replace", "Search and replace a substring in the announce URLs", "r", true, "<old> <new>" },
+    { 'V', "version", "Show version number and exit", "V", false, NULL },
+    { 0, NULL, NULL, NULL, false, NULL }
+};
 
 static char const* getUsage(void)
 {
@@ -50,27 +51,36 @@ static int parseCommandLine(int argc, char const* const* argv)
     {
         switch (c)
         {
-            case 'a': add = optarg; break;
+        case 'a':
+            add = optarg;
+            break;
 
-            case 'd': deleteme = optarg; break;
+        case 'd':
+            deleteme = optarg;
+            break;
 
-            case 'r':
-                replace[0] = optarg;
-                c = tr_getopt(getUsage(), argc, argv, options, &optarg);
+        case 'r':
+            replace[0] = optarg;
+            c = tr_getopt(getUsage(), argc, argv, options, &optarg);
 
-                if (c != TR_OPT_UNK)
-                {
-                    return 1;
-                }
+            if (c != TR_OPT_UNK)
+            {
+                return 1;
+            }
 
-                replace[1] = optarg;
-                break;
+            replace[1] = optarg;
+            break;
 
-            case 'V': showVersion = true; break;
+        case 'V':
+            showVersion = true;
+            break;
 
-            case TR_OPT_UNK: files[fileCount++] = optarg; break;
+        case TR_OPT_UNK:
+            files[fileCount++] = optarg;
+            break;
 
-            default: return 1;
+        default:
+            return 1;
         }
     }
 
@@ -104,8 +114,7 @@ static bool removeURL(tr_variant* metainfo, char const* url)
             {
                 if (tr_variantGetStr(node, &str, NULL) && strcmp(str, url) == 0)
                 {
-                    printf("\tRemoved \"%s\" from \"announce-list\" tier #%d\n", str,
-                           tierIndex + 1);
+                    printf("\tRemoved \"%s\" from \"announce-list\" tier #%d\n", str, tierIndex + 1);
                     tr_variantListRemove(tier, nodeIndex);
                     changed = true;
                 }
@@ -205,8 +214,7 @@ static bool replaceURL(tr_variant* metainfo, char const* in, char const* out)
                 if (tr_variantGetStr(node, &str, NULL) && strstr(str, in) != NULL)
                 {
                     char* newstr = replaceSubstr(str, in, out);
-                    printf("\tReplaced in \"announce-list\" tier %d: \"%s\" --> \"%s\"\n",
-                           tierCount + 1, str, newstr);
+                    printf("\tReplaced in \"announce-list\" tier %d: \"%s\" --> \"%s\"\n", tierCount + 1, str, newstr);
                     tr_variantFree(node);
                     tr_variantInitStr(node, newstr, TR_BAD_SIZE);
                     tr_free(newstr);
@@ -256,8 +264,7 @@ static bool addURL(tr_variant* metainfo, char const* url)
     tr_variant* announce_list = NULL;
     bool changed = false;
     bool const had_announce = tr_variantDictFindStr(metainfo, TR_KEY_announce, &announce, NULL);
-    bool const had_announce_list =
-        tr_variantDictFindList(metainfo, TR_KEY_announce_list, &announce_list);
+    bool const had_announce_list = tr_variantDictFindList(metainfo, TR_KEY_announce_list, &announce_list);
 
     if (!had_announce && !had_announce_list)
     {
@@ -287,8 +294,7 @@ static bool addURL(tr_variant* metainfo, char const* url)
         {
             tr_variant* tier = tr_variantListAddList(announce_list, 1);
             tr_variantListAddStr(tier, url);
-            printf("\tAdded \"%s\" to \"announce-list\" tier %zu\n", url,
-                   tr_variantListSize(announce_list));
+            printf("\tAdded \"%s\" to \"announce-list\" tier %zu\n", url, tr_variantListSize(announce_list));
             changed = true;
         }
     }

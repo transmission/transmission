@@ -16,14 +16,16 @@
 
 namespace
 {
+
 int getHSpacing(QWidget const* w)
 {
     return qMax(3, w->style()->pixelMetric(QStyle::PM_LayoutHorizontalSpacing, nullptr, w));
 }
 
-}  // namespace
+} // namespace
 
-FilterBarComboBox::FilterBarComboBox(QWidget* parent) : QComboBox(parent)
+FilterBarComboBox::FilterBarComboBox(QWidget* parent) :
+    QComboBox(parent)
 {
     setSizeAdjustPolicy(QComboBox::AdjustToContents);
 }
@@ -68,9 +70,7 @@ QSize FilterBarComboBox::calculateSize(QSize const& text_size, QSize const& coun
     content_size.rwidth() += hmargin + text_size.width();
     content_size.rwidth() += hmargin + count_size.width();
 
-    return style()
-        ->sizeFromContents(QStyle::CT_ComboBox, &option, content_size, this)
-        .expandedTo(qApp->globalStrut());
+    return style()->sizeFromContents(QStyle::CT_ComboBox, &option, content_size, this).expandedTo(qApp->globalStrut());
 }
 
 void FilterBarComboBox::paintEvent(QPaintEvent* e)
@@ -93,8 +93,7 @@ void FilterBarComboBox::paintEvent(QPaintEvent* e)
         QStyle* s = style();
         int const hmargin = getHSpacing(this);
 
-        QRect rect =
-            s->subControlRect(QStyle::CC_ComboBox, &opt, QStyle::SC_ComboBoxEditField, this);
+        QRect rect = s->subControlRect(QStyle::CC_ComboBox, &opt, QStyle::SC_ComboBoxEditField, this);
         rect.adjust(2, 1, -2, -1);
 
         // draw the icon
@@ -102,10 +101,8 @@ void FilterBarComboBox::paintEvent(QPaintEvent* e)
 
         if (!icon.isNull())
         {
-            QRect const icon_rect = QStyle::alignedRect(
-                opt.direction, Qt::AlignLeft | Qt::AlignVCenter, opt.iconSize, rect);
-            icon.paint(&painter, icon_rect, Qt::AlignCenter, StyleHelper::getIconMode(opt.state),
-                       QIcon::Off);
+            QRect const icon_rect = QStyle::alignedRect(opt.direction, Qt::AlignLeft | Qt::AlignVCenter, opt.iconSize, rect);
+            icon.paint(&painter, icon_rect, Qt::AlignCenter, StyleHelper::getIconMode(opt.state), QIcon::Off);
             Utils::narrowRect(rect, icon_rect.width() + hmargin, 0, opt.direction);
         }
 
@@ -116,8 +113,7 @@ void FilterBarComboBox::paintEvent(QPaintEvent* e)
         {
             QPen const pen = painter.pen();
             painter.setPen(Utils::getFadedColor(pen.color()));
-            QRect const text_rect = QStyle::alignedRect(
-                opt.direction, Qt::AlignRight | Qt::AlignVCenter,
+            QRect const text_rect = QStyle::alignedRect(opt.direction, Qt::AlignRight | Qt::AlignVCenter,
                 QSize(opt.fontMetrics.boundingRect(text).width(), rect.height()), rect);
             painter.drawText(text_rect, Qt::AlignRight | Qt::AlignVCenter, text);
             Utils::narrowRect(rect, 0, text_rect.width() + hmargin, opt.direction);

@@ -209,8 +209,7 @@ bool tr_blocklistFileHasAddress(tr_blocklistFile* b, tr_address const* addr)
 
     needle = ntohl(addr->addr.addr4.s_addr);
 
-    range = bsearch(&needle, b->rules, b->ruleCount, sizeof(struct tr_ipv4_range),
-                    compareAddressToRange);
+    range = bsearch(&needle, b->rules, b->ruleCount, sizeof(struct tr_ipv4_range), compareAddressToRange);
 
     return range != NULL;
 }
@@ -237,9 +236,7 @@ static bool parseLine1(char const* line, struct tr_ipv4_range* range)
 
     ++walk; /* walk past the colon */
 
-    if (sscanf(walk, "%d.%d.%d.%d-%d.%d.%d.%d", &b[0], &b[1], &b[2], &b[3], &e[0], &e[1], &e[2],
-               &e[3])
-        != 8)
+    if (sscanf(walk, "%d.%d.%d.%d-%d.%d.%d.%d", &b[0], &b[1], &b[2], &b[3], &e[0], &e[1], &e[2], &e[3]) != 8)
     {
         return false;
     }
@@ -277,9 +274,8 @@ static bool parseLine2(char const* line, struct tr_ipv4_range* range)
     char str[32];
     tr_address addr;
 
-    if (sscanf(line, "%3d.%3d.%3d.%3d - %3d.%3d.%3d.%3d , %3d , ", &a[0], &a[1], &a[2], &a[3],
-               &b[0], &b[1], &b[2], &b[3], &unk)
-        != 9)
+    if (sscanf(line, "%3d.%3d.%3d.%3d - %3d.%3d.%3d.%3d , %3d , ", &a[0], &a[1], &a[2], &a[3], &b[0], &b[1], &b[2], &b[3],
+        &unk) != 9)
     {
         return false;
     }
@@ -384,8 +380,7 @@ int tr_blocklistFileSetContent(tr_blocklistFile* b, char const* filename)
 
     blocklistClose(b);
 
-    out = tr_sys_file_open(
-        b->filename, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE, 0666, &error);
+    out = tr_sys_file_open(b->filename, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE, 0666, &error);
 
     if (out == TR_BAD_SYS_FILE)
     {
@@ -423,8 +418,7 @@ int tr_blocklistFileSetContent(tr_blocklistFile* b, char const* filename)
         struct tr_ipv4_range* keep = ranges;
 
         /* sort */
-        qsort(ranges, ranges_count, sizeof(struct tr_ipv4_range),
-              compareAddressRangesByFirstAddress);
+        qsort(ranges, ranges_count, sizeof(struct tr_ipv4_range), compareAddressRangesByFirstAddress);
 
         /* merge */
         for (size_t i = 1; i < ranges_count; ++i)

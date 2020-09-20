@@ -199,28 +199,27 @@ int tr_ctorSetMetainfoFromHash(tr_ctor* ctor, char const* hashString)
 ****
 ***/
 
-void tr_ctorSetFilePriorities(tr_ctor* ctor, tr_file_index_t const* files,
-                              tr_file_index_t fileCount, tr_priority_t priority)
+void tr_ctorSetFilePriorities(tr_ctor* ctor, tr_file_index_t const* files, tr_file_index_t fileCount, tr_priority_t priority)
 {
     tr_file_index_t** myfiles;
     tr_file_index_t* mycount;
 
     switch (priority)
     {
-        case TR_PRI_LOW:
-            myfiles = &ctor->low;
-            mycount = &ctor->lowSize;
-            break;
+    case TR_PRI_LOW:
+        myfiles = &ctor->low;
+        mycount = &ctor->lowSize;
+        break;
 
-        case TR_PRI_HIGH:
-            myfiles = &ctor->high;
-            mycount = &ctor->highSize;
-            break;
+    case TR_PRI_HIGH:
+        myfiles = &ctor->high;
+        mycount = &ctor->highSize;
+        break;
 
-        default /*TR_PRI_NORMAL*/:
-            myfiles = &ctor->normal;
-            mycount = &ctor->normalSize;
-            break;
+    default /*TR_PRI_NORMAL*/:
+        myfiles = &ctor->normal;
+        mycount = &ctor->normalSize;
+        break;
     }
 
     tr_free(*myfiles);
@@ -246,8 +245,7 @@ void tr_ctorInitTorrentPriorities(tr_ctor const* ctor, tr_torrent* tor)
     }
 }
 
-void tr_ctorSetFilesWanted(tr_ctor* ctor, tr_file_index_t const* files, tr_file_index_t fileCount,
-                           bool wanted)
+void tr_ctorSetFilesWanted(tr_ctor* ctor, tr_file_index_t const* files, tr_file_index_t fileCount, bool wanted)
 {
     tr_file_index_t** myfiles = wanted ? &ctor->want : &ctor->notWant;
     tr_file_index_t* mycount = wanted ? &ctor->wantSize : &ctor->notWantSize;

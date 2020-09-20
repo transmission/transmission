@@ -16,7 +16,8 @@
 #include "TorrentModel.h"
 #include "Utils.h"
 
-TorrentFilter::TorrentFilter(Prefs const& prefs) : prefs_(prefs)
+TorrentFilter::TorrentFilter(Prefs const& prefs) :
+    prefs_(prefs)
 {
     connect(&prefs_, &Prefs::changed, this, &TorrentFilter::onPrefChanged);
     connect(&refilter_timer_, &QTimer::timeout, this, &TorrentFilter::refilter);
@@ -41,15 +42,17 @@ void TorrentFilter::onPrefChanged(int key)
     std::optional<int> msec;
     switch (key)
     {
-        case Prefs::FILTER_TEXT:
-            // special case for isEmpty: user probably hit the 'clear' button
-            msec = prefs_.getString(key).isEmpty() ? FastMSec : SlowMSec;
-            break;
+    case Prefs::FILTER_TEXT:
+        // special case for isEmpty: user probably hit the 'clear' button
+        msec = prefs_.getString(key).isEmpty() ? FastMSec : SlowMSec;
+        break;
 
-        case Prefs::FILTER_MODE:
-        case Prefs::FILTER_TRACKERS:
-        case Prefs::SORT_MODE:
-        case Prefs::SORT_REVERSED: msec = FastMSec; break;
+    case Prefs::FILTER_MODE:
+    case Prefs::FILTER_TRACKERS:
+    case Prefs::SORT_MODE:
+    case Prefs::SORT_REVERSED:
+        msec = FastMSec;
+        break;
     }
 
     // if this pref change affects filtering, ensure that a refilter is queued
@@ -72,7 +75,8 @@ void TorrentFilter::refilter()
 
 namespace
 {
-template <typename T>
+
+template<typename T>
 int compare(T const a, T const b)
 {
     if (a < b)
@@ -88,7 +92,7 @@ int compare(T const a, T const b)
     return 0;
 }
 
-}  // namespace
+} // namespace
 
 bool TorrentFilter::lessThan(QModelIndex const& left, QModelIndex const& right) const
 {
@@ -98,116 +102,116 @@ bool TorrentFilter::lessThan(QModelIndex const& left, QModelIndex const& right) 
 
     switch (prefs_.get<SortMode>(Prefs::SORT_MODE).mode())
     {
-        case SortMode::SORT_BY_QUEUE:
-            if (val == 0)
-            {
-                val = -compare(a->queuePosition(), b->queuePosition());
-            }
+    case SortMode::SORT_BY_QUEUE:
+        if (val == 0)
+        {
+            val = -compare(a->queuePosition(), b->queuePosition());
+        }
 
-            break;
+        break;
 
-        case SortMode::SORT_BY_SIZE:
-            if (val == 0)
-            {
-                val = compare(a->sizeWhenDone(), b->sizeWhenDone());
-            }
+    case SortMode::SORT_BY_SIZE:
+        if (val == 0)
+        {
+            val = compare(a->sizeWhenDone(), b->sizeWhenDone());
+        }
 
-            break;
+        break;
 
-        case SortMode::SORT_BY_AGE:
-            if (val == 0)
-            {
-                val = compare(a->dateAdded(), b->dateAdded());
-            }
+    case SortMode::SORT_BY_AGE:
+        if (val == 0)
+        {
+            val = compare(a->dateAdded(), b->dateAdded());
+        }
 
-            break;
+        break;
 
-        case SortMode::SORT_BY_ID:
-            if (val == 0)
-            {
-                val = compare(a->id(), b->id());
-            }
+    case SortMode::SORT_BY_ID:
+        if (val == 0)
+        {
+            val = compare(a->id(), b->id());
+        }
 
-            break;
+        break;
 
-        case SortMode::SORT_BY_ACTIVITY:
-            if (val == 0)
-            {
-                val = compare(a->downloadSpeed() + a->uploadSpeed(),
-                              b->downloadSpeed() + b->uploadSpeed());
-            }
+    case SortMode::SORT_BY_ACTIVITY:
+        if (val == 0)
+        {
+            val = compare(a->downloadSpeed() + a->uploadSpeed(), b->downloadSpeed() + b->uploadSpeed());
+        }
 
-            if (val == 0)
-            {
-                val = compare(a->peersWeAreUploadingTo() + a->webseedsWeAreDownloadingFrom(),
-                              b->peersWeAreUploadingTo() + b->webseedsWeAreDownloadingFrom());
-            }
+        if (val == 0)
+        {
+            val = compare(a->peersWeAreUploadingTo() + a->webseedsWeAreDownloadingFrom(),
+                b->peersWeAreUploadingTo() + b->webseedsWeAreDownloadingFrom());
+        }
 
-            [[fallthrough]];
+        [[fallthrough]];
 
-        case SortMode::SORT_BY_STATE:
-            if (val == 0)
-            {
-                val = -compare(a->isPaused(), b->isPaused());
-            }
+    case SortMode::SORT_BY_STATE:
+        if (val == 0)
+        {
+            val = -compare(a->isPaused(), b->isPaused());
+        }
 
-            if (val == 0)
-            {
-                val = compare(a->getActivity(), b->getActivity());
-            }
+        if (val == 0)
+        {
+            val = compare(a->getActivity(), b->getActivity());
+        }
 
-            if (val == 0)
-            {
-                val = -compare(a->queuePosition(), b->queuePosition());
-            }
+        if (val == 0)
+        {
+            val = -compare(a->queuePosition(), b->queuePosition());
+        }
 
-            if (val == 0)
-            {
-                val = compare(a->hasError(), b->hasError());
-            }
+        if (val == 0)
+        {
+            val = compare(a->hasError(), b->hasError());
+        }
 
-            [[fallthrough]];
+        [[fallthrough]];
 
-        case SortMode::SORT_BY_PROGRESS:
-            if (val == 0)
-            {
-                val = compare(a->metadataPercentDone(), b->metadataPercentDone());
-            }
+    case SortMode::SORT_BY_PROGRESS:
+        if (val == 0)
+        {
+            val = compare(a->metadataPercentDone(), b->metadataPercentDone());
+        }
 
-            if (val == 0)
-            {
-                val = compare(a->percentComplete(), b->percentComplete());
-            }
+        if (val == 0)
+        {
+            val = compare(a->percentComplete(), b->percentComplete());
+        }
 
-            if (val == 0)
-            {
-                val = a->compareSeedRatio(*b);
-            }
+        if (val == 0)
+        {
+            val = a->compareSeedRatio(*b);
+        }
 
-            if (val == 0)
-            {
-                val = -compare(a->queuePosition(), b->queuePosition());
-            }
+        if (val == 0)
+        {
+            val = -compare(a->queuePosition(), b->queuePosition());
+        }
 
-            [[fallthrough]];
+        [[fallthrough]];
 
-        case SortMode::SORT_BY_RATIO:
-            if (val == 0)
-            {
-                val = a->compareRatio(*b);
-            }
+    case SortMode::SORT_BY_RATIO:
+        if (val == 0)
+        {
+            val = a->compareRatio(*b);
+        }
 
-            break;
+        break;
 
-        case SortMode::SORT_BY_ETA:
-            if (val == 0)
-            {
-                val = a->compareETA(*b);
-            }
+    case SortMode::SORT_BY_ETA:
+        if (val == 0)
+        {
+            val = a->compareETA(*b);
+        }
 
-            break;
+        break;
 
-        default: break;
+    default:
+        break;
     }
 
     if (val == 0)
@@ -230,8 +234,7 @@ bool TorrentFilter::lessThan(QModelIndex const& left, QModelIndex const& right) 
 bool TorrentFilter::filterAcceptsRow(int source_row, QModelIndex const& source_parent) const
 {
     QModelIndex child_index = sourceModel()->index(source_row, 0, source_parent);
-    auto const& tor =
-        *child_index.model()->data(child_index, TorrentModel::TorrentRole).value<Torrent const*>();
+    auto const& tor = *child_index.model()->data(child_index, TorrentModel::TorrentRole).value<Torrent const*>();
     bool accepts = true;
 
     if (accepts)
