@@ -54,6 +54,7 @@
       "object-shorthand": ["error", "always"],
       "prefer-const": "error",
       "prefer-spread": "error",
+      "prefer-rest-params": "error",
       "prefer-template": "error",
       "semi": ["error", "always"]
     }
