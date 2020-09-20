@@ -7,4 +7,4 @@ services:
       - .:/src
       - ./code_style.sh:/code_style.sh:ro
       - ./format:/format:ro
-    command: ["/bin/bash", "/code_style.sh", "/src"]
+    command: ["/bin/bash", "-c", "cd /src && ./code_style.sh"]
