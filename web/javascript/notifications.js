@@ -8,6 +8,10 @@ $(document).ready(function () {
   let notificationsEnabled = window.webkitNotifications.checkPermission() === 0;
   const toggle = $('#toggle_notifications');
 
+  function updateMenuTitle() {
+    toggle.html(`${notificationsEnabled ? 'Disable' : 'Enable'} Notifications`);
+  }
+
   toggle.show();
   updateMenuTitle();
   $(transmission).bind('downloadComplete seedingComplete', function (event, torrent) {
@@ -25,10 +29,6 @@ $(document).ready(function () {
       }, 5000);
     }
   });
-
-  function updateMenuTitle() {
-    toggle.html(`${notificationsEnabled ? 'Disable' : 'Enable'} Notifications`);
-  }
 
   Notifications.toggle = function () {
     if (window.webkitNotifications.checkPermission() !== 0) {

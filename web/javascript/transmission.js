@@ -113,17 +113,13 @@ Transmission.prototype = {
     this.updateButtonsSoon();
   },
 
-  loadDaemonPrefs(async, callback) {
+  loadDaemonPrefs(async) {
     this.remote.loadDaemonPrefs(
       function (data) {
         const o = data['arguments'];
         Prefs.getClutchPrefs(o);
         this.updateGuiFromSession(o);
         this.sessionProperties = o;
-
-        if (callback) {
-          callback();
-        }
       },
       this,
       async
@@ -772,22 +768,16 @@ Transmission.prototype = {
 
   // turn the periodic ajax session refresh on & off
   togglePeriodicSessionRefresh(enabled) {
-    const that = this,
-      msec = 8000;
-
-    function callback() {
-      that.loadDaemonPrefs(undefined, rescheduleTimeout);
+    if (!enabled && this.sessionInterval) {
+      clearInterval(this.sessionInterval);
+      delete this.sessionInterval;
     }
-
-    function rescheduleTimeout() {
-      that.sessionTimeout = setTimeout(callback, msec);
-    }
-
-    clearTimeout(this.sessionTimeout);
-    delete this.sessionTimeout;
-
     if (enabled) {
-      rescheduleTimeout();
+      this.loadDaemonPrefs();
+      if (!this.sessionInterval) {
+        const msec = 8000;
+        this.sessionInterval = setInterval(this.loadDaemonPrefs.bind(this), msec);
+      }
     }
   },
 
@@ -1545,9 +1535,7 @@ Transmission.prototype = {
     this.setInspectorVisible(!this.inspectorIsVisible());
   },
   setInspectorVisible(visible) {
-    if (visible) {
-      this.inspector.setTorrents(this.getSelectedTorrents());
-    }
+    this.inspector.setTorrents(visible ? this.getSelectedTorrents() : []);
 
     // update the ui widgetry
     $('#torrent_inspector').toggle(visible);
@@ -1850,33 +1838,24 @@ Transmission.prototype = {
 
   // turn the periodic ajax stats refresh on & off
   togglePeriodicStatsRefresh(enabled) {
-    const that = this,
-      msec = 5000;
-
-    function callback() {
-      that.loadDaemonStats(undefined, rescheduleTimeout);
+    if (!enabled && this.statsInterval) {
+      clearInterval(this.statsInterval);
+      delete this.statsInterval;
     }
-
-    function rescheduleTimeout() {
-      that.statsTimeout = setTimeout(callback, msec);
-    }
-
-    clearTimeout(this.statsTimeout);
-    delete this.statsTimeout;
-
     if (enabled) {
-      rescheduleTimeout();
+      this.loadDaemonStats();
+      if (!this.statsInterval) {
+        const msec = 5000;
+        this.statsInterval = setInterval(this.loadDaemonStats.bind(this), msec);
+      }
     }
   },
 
-  loadDaemonStats(async, callback) {
+  loadDaemonStats(async) {
+    console.log('loadDaemonStats');
     this.remote.loadDaemonStats(
       function (data) {
         this.updateStats(data['arguments']);
-
-        if (callback) {
-          callback();
-        }
       },
       this,
       async

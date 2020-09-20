@@ -26,10 +26,12 @@ function FileRow(torrent, depth, name, indices, even) {
     root: null,
   };
 
-  const initialize = function (torrent, depth, name, indices, even) {
-    fields.torrent = torrent;
-    fields.indices = indices;
-    createRow(torrent, depth, name, even);
+  const isDone = function () {
+    return fields.have >= fields.size;
+  };
+
+  const isEditable = function () {
+    return fields.torrent.getFileCount() > 1 && !isDone();
   };
 
   const refreshWantedHTML = function () {
@@ -109,12 +111,16 @@ function FileRow(torrent, depth, name, indices, even) {
     }
   };
 
-  const isDone = function () {
-    return fields.have >= fields.size;
+  const fireWantedChanged = function (do_want) {
+    $(fields.me).trigger('wantedToggled', [fields.indices, do_want]);
   };
 
-  const isEditable = function () {
-    return fields.torrent.getFileCount() > 1 && !isDone();
+  const firePriorityChanged = function (priority) {
+    $(fields.me).trigger('priorityToggled', [fields.indices, priority]);
+  };
+
+  const fireNameClicked = function () {
+    $(fields.me).trigger('nameClicked', [fields.me, fields.indices]);
   };
 
   const createRow = function (torrent, depth, name, even) {
@@ -185,16 +191,10 @@ function FileRow(torrent, depth, name, indices, even) {
     return root;
   };
 
-  const fireWantedChanged = function (do_want) {
-    $(fields.me).trigger('wantedToggled', [fields.indices, do_want]);
-  };
-
-  const firePriorityChanged = function (priority) {
-    $(fields.me).trigger('priorityToggled', [fields.indices, priority]);
-  };
-
-  const fireNameClicked = function () {
-    $(fields.me).trigger('nameClicked', [fields.me, fields.indices]);
+  const initialize = function (torrent, depth, name, indices, even) {
+    fields.torrent = torrent;
+    fields.indices = indices;
+    createRow(torrent, depth, name, even);
   };
 
   /***

@@ -30,53 +30,7 @@ function Inspector(controller) {
         data.controller.updateTorrents(ids, fields, callback);
       }
     },
-    onTabClicked = function (ev) {
-      const tab = ev.currentTarget;
-
-      if (isMobileDevice) {
-        ev.stopPropagation();
-      }
-
-      // select this tab and deselect the others
-      $(tab).addClass('selected').siblings().removeClass('selected');
-
-      // show this tab and hide the others
-      $(`#${tab.id.replace('tab', 'page')}`)
-        .show()
-        .siblings('.inspector-page')
-        .hide();
-
-      updateInspector();
-    },
-    updateInspector = function () {
-      const e = data.elements;
-      const torrents = data.torrents;
-
-      // update the name, which is shown on all the pages
-      let name;
-      if (!torrents || !torrents.length) {
-        name = 'No Selection';
-      } else if (torrents.length === 1) {
-        name = torrents[0].getName();
-      } else {
-        name = `${torrents.length} Transfers Selected`;
-      }
-      setTextContent(e.name_lb, name || 'Not Applicable');
-
-      // update the visible page
-      if ($(e.info_page).is(':visible')) {
-        updateInfoPage();
-      } else if ($(e.peers_page).is(':visible')) {
-        updatePeersPage();
-      } else if ($(e.trackers_page).is(':visible')) {
-        updateTrackersPage();
-      } else if ($(e.files_page).is(':visible')) {
-        updateFilesPage();
-      }
-    },
-    /****
-     *****  GENERAL INFO PAGE
-     ****/
+    /// GENERAL INFO PAGE
 
     updateInfoPage = function () {
       const none = 'None';
@@ -477,138 +431,7 @@ function Inspector(controller) {
       }
       setTextContent(e.foldername_lb, str);
     },
-    /****
-     *****  FILES PAGE
-     ****/
-
-    changeFileCommand = function (fileIndices, command) {
-      const torrentId = data.file_torrent.getId();
-      data.controller.changeFileCommand(torrentId, fileIndices, command);
-    },
-    onFileWantedToggled = function (ev, fileIndices, want) {
-      changeFileCommand(fileIndices, want ? 'files-wanted' : 'files-unwanted');
-    },
-    onFilePriorityToggled = function (ev, fileIndices, priority) {
-      let command;
-      switch (priority) {
-        case -1:
-          command = 'priority-low';
-          break;
-        case 1:
-          command = 'priority-high';
-          break;
-        default:
-          command = 'priority-normal';
-          break;
-      }
-      changeFileCommand(fileIndices, command);
-    },
-    onNameClicked = function (ev, fileRow) {
-      $(fileRow.getElement()).siblings().slideToggle();
-    },
-    clearFileList = function () {
-      $(data.elements.file_list).empty();
-      delete data.file_torrent;
-      delete data.file_torrent_n;
-      delete data.file_rows;
-    },
-    createFileTreeModel = function (tor) {
-      const leaves = [];
-      const tree = {
-        children: {},
-        file_indices: [],
-      };
-      let i, j, name, tokens, walk, token, sub;
-
-      const n = tor.getFileCount();
-      for (i = 0; i < n; ++i) {
-        name = tor.getFile(i).name;
-        tokens = name.split('/');
-        walk = tree;
-        for (j = 0; j < tokens.length; ++j) {
-          token = tokens[j];
-          sub = walk.children[token];
-          if (!sub) {
-            walk.children[token] = sub = {
-              name: token,
-              parent: walk,
-              children: {},
-              file_indices: [],
-              depth: j,
-            };
-          }
-          walk = sub;
-        }
-        walk.file_index = i;
-        delete walk.children;
-        leaves.push(walk);
-      }
-
-      for (i = 0; i < leaves.length; ++i) {
-        walk = leaves[i];
-        j = walk.file_index;
-        do {
-          walk.file_indices.push(j);
-          walk = walk.parent;
-        } while (walk);
-      }
-
-      return tree;
-    },
-    addNodeToView = function (tor, parent, sub, i) {
-      const row = new FileRow(tor, sub.depth, sub.name, sub.file_indices, i % 2);
-      data.file_rows.push(row);
-      parent.appendChild(row.getElement());
-      $(row).bind('wantedToggled', onFileWantedToggled);
-      $(row).bind('priorityToggled', onFilePriorityToggled);
-      $(row).bind('nameClicked', onNameClicked);
-    },
-    addSubtreeToView = function (tor, parent, sub, i) {
-      const div = document.createElement('div');
-      if (sub.parent) {
-        addNodeToView(tor, div, sub, i++);
-      }
-      if (sub.children) {
-        for (const key in sub.children) {
-          i = addSubtreeToView(tor, div, sub.children[key]);
-        }
-      }
-      parent.appendChild(div);
-      return i;
-    },
-    updateFilesPage = function () {
-      const file_list = data.elements.file_list;
-      const torrents = data.torrents;
-      let i, n, fragment, tree;
-
-      // only show one torrent at a time
-      if (torrents.length !== 1) {
-        clearFileList();
-        return;
-      }
-
-      const tor = torrents[0];
-      n = tor ? tor.getFileCount() : 0;
-      if (tor != data.file_torrent || n != data.file_torrent_n) {
-        // rebuild the file list...
-        clearFileList();
-        data.file_torrent = tor;
-        data.file_torrent_n = n;
-        data.file_rows = [];
-        fragment = document.createDocumentFragment();
-        tree = createFileTreeModel(tor);
-        addSubtreeToView(tor, fragment, tree, 0);
-        file_list.appendChild(fragment);
-      } else {
-        // ...refresh the already-existing file list
-        for (i = 0, n = data.file_rows.length; i < n; ++i) {
-          data.file_rows[i].refresh();
-        }
-      }
-    },
-    /****
-     *****  PEERS PAGE
-     ****/
+    ///  PEERS PAGE
 
     updatePeersPage = function () {
       const html = [];
@@ -678,9 +501,7 @@ function Inspector(controller) {
 
       setInnerHTML(peers_list, html.join(''));
     },
-    /****
-     *****  TRACKERS PAGE
-     ****/
+    /// TRACKERS PAGE
 
     getAnnounceState = function (tracker) {
       let timeUntilAnnounce,
@@ -849,6 +670,177 @@ function Inspector(controller) {
 
       setInnerHTML(trackers_list, html.join(''));
     },
+    ///  FILES PAGE
+
+    changeFileCommand = function (fileIndices, command) {
+      const torrentId = data.file_torrent.getId();
+      data.controller.changeFileCommand(torrentId, fileIndices, command);
+    },
+    onFileWantedToggled = function (ev, fileIndices, want) {
+      changeFileCommand(fileIndices, want ? 'files-wanted' : 'files-unwanted');
+    },
+    onFilePriorityToggled = function (ev, fileIndices, priority) {
+      let command;
+      switch (priority) {
+        case -1:
+          command = 'priority-low';
+          break;
+        case 1:
+          command = 'priority-high';
+          break;
+        default:
+          command = 'priority-normal';
+          break;
+      }
+      changeFileCommand(fileIndices, command);
+    },
+    onNameClicked = function (ev, fileRow) {
+      $(fileRow.getElement()).siblings().slideToggle();
+    },
+    clearFileList = function () {
+      $(data.elements.file_list).empty();
+      delete data.file_torrent;
+      delete data.file_torrent_n;
+      delete data.file_rows;
+    },
+    createFileTreeModel = function (tor) {
+      const leaves = [];
+      const tree = {
+        children: {},
+        file_indices: [],
+      };
+      let i, j, name, tokens, walk, token, sub;
+
+      const n = tor.getFileCount();
+      for (i = 0; i < n; ++i) {
+        name = tor.getFile(i).name;
+        tokens = name.split('/');
+        walk = tree;
+        for (j = 0; j < tokens.length; ++j) {
+          token = tokens[j];
+          sub = walk.children[token];
+          if (!sub) {
+            walk.children[token] = sub = {
+              name: token,
+              parent: walk,
+              children: {},
+              file_indices: [],
+              depth: j,
+            };
+          }
+          walk = sub;
+        }
+        walk.file_index = i;
+        delete walk.children;
+        leaves.push(walk);
+      }
+
+      for (i = 0; i < leaves.length; ++i) {
+        walk = leaves[i];
+        j = walk.file_index;
+        do {
+          walk.file_indices.push(j);
+          walk = walk.parent;
+        } while (walk);
+      }
+
+      return tree;
+    },
+    addNodeToView = function (tor, parent, sub, i) {
+      const row = new FileRow(tor, sub.depth, sub.name, sub.file_indices, i % 2);
+      data.file_rows.push(row);
+      parent.appendChild(row.getElement());
+      $(row).bind('wantedToggled', onFileWantedToggled);
+      $(row).bind('priorityToggled', onFilePriorityToggled);
+      $(row).bind('nameClicked', onNameClicked);
+    },
+    addSubtreeToView = function (tor, parent, sub, i) {
+      const div = document.createElement('div');
+      if (sub.parent) {
+        addNodeToView(tor, div, sub, i++);
+      }
+      if (sub.children) {
+        for (const key in sub.children) {
+          i = addSubtreeToView(tor, div, sub.children[key]);
+        }
+      }
+      parent.appendChild(div);
+      return i;
+    },
+    updateFilesPage = function () {
+      const file_list = data.elements.file_list;
+      const torrents = data.torrents;
+      let i, n, fragment, tree;
+
+      // only show one torrent at a time
+      if (torrents.length !== 1) {
+        clearFileList();
+        return;
+      }
+
+      const tor = torrents[0];
+      n = tor ? tor.getFileCount() : 0;
+      if (tor != data.file_torrent || n != data.file_torrent_n) {
+        // rebuild the file list...
+        clearFileList();
+        data.file_torrent = tor;
+        data.file_torrent_n = n;
+        data.file_rows = [];
+        fragment = document.createDocumentFragment();
+        tree = createFileTreeModel(tor);
+        addSubtreeToView(tor, fragment, tree, 0);
+        file_list.appendChild(fragment);
+      } else {
+        // ...refresh the already-existing file list
+        for (i = 0, n = data.file_rows.length; i < n; ++i) {
+          data.file_rows[i].refresh();
+        }
+      }
+    },
+    updateInspector = function () {
+      const e = data.elements;
+      const torrents = data.torrents;
+
+      // update the name, which is shown on all the pages
+      let name;
+      if (!torrents || !torrents.length) {
+        name = 'No Selection';
+      } else if (torrents.length === 1) {
+        name = torrents[0].getName();
+      } else {
+        name = `${torrents.length} Transfers Selected`;
+      }
+      setTextContent(e.name_lb, name || 'Not Applicable');
+
+      // update the visible page
+      if ($(e.info_page).is(':visible')) {
+        updateInfoPage();
+      } else if ($(e.peers_page).is(':visible')) {
+        updatePeersPage();
+      } else if ($(e.trackers_page).is(':visible')) {
+        updateTrackersPage();
+      } else if ($(e.files_page).is(':visible')) {
+        updateFilesPage();
+      }
+    },
+    onTabClicked = function (ev) {
+      const tab = ev.currentTarget;
+
+      if (isMobileDevice) {
+        ev.stopPropagation();
+      }
+
+      // select this tab and deselect the others
+      $(tab).addClass('selected').siblings().removeClass('selected');
+
+      // show this tab and hide the others
+      $(`#${tab.id.replace('tab', 'page')}`)
+        .show()
+        .siblings('.inspector-page')
+        .hide();
+
+      updateInspector();
+    },
     initialize = function (controller) {
       data.controller = controller;
 
@@ -900,19 +892,13 @@ function Inspector(controller) {
     $(torrents).bind('dataChanged.inspector', $.proxy(updateInspector, this));
     d.torrents = torrents;
 
-    // periodically ask for updates to the inspector's torrents
-    clearTimeout(d.refreshTimeout);
-
-    function callback() {
-      refreshTorrents(rescheduleTimeout);
+    // periodically ping the server for updates to this torrent
+    clearInterval(data.timer);
+    data.timer = null;
+    if (d.torrents && d.torrents.length) {
+      refreshTorrents();
+      data.timer = setInterval(refreshTorrents, 2000);
     }
-
-    function rescheduleTimeout() {
-      d.refreshTimeout = setTimeout(callback, 2000);
-    }
-
-    rescheduleTimeout();
-    refreshTorrents();
 
     // refresh the inspector's UI
     updateInspector();

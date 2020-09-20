@@ -92,15 +92,15 @@ function PrefsDialog(remote) {
     }
   };
 
-  const onBlocklistUpdateClicked = function () {
-    data.remote.updateBlocklist();
-    setBlocklistButtonEnabled(false);
-  };
-
   const setBlocklistButtonEnabled = function (b) {
     const e = data.elements.blocklist_button;
     e.attr('disabled', !b);
     e.val(b ? 'Update' : 'Updating...');
+  };
+
+  const onBlocklistUpdateClicked = function () {
+    data.remote.updateBlocklist();
+    setBlocklistButtonEnabled(false);
   };
 
   const getValue = function (e) {
@@ -164,6 +164,26 @@ function PrefsDialog(remote) {
     };
   };
 
+  const getValues = function () {
+    const o = {};
+    const root = data.elements.root;
+
+    for (const key of data.keys) {
+      const val = getValue(root.find(`#${key}`));
+      if (val !== null) {
+        o[key] = val;
+      }
+    }
+
+    return o;
+  };
+
+  const onDialogClosed = function () {
+    transmission.hideMobileAddressbar();
+
+    $(data.dialog).trigger('closed', getValues());
+  };
+
   const initialize = function (remote) {
     let i, key, e;
 
@@ -213,26 +233,6 @@ function PrefsDialog(remote) {
           break;
       }
     }
-  };
-
-  const getValues = function () {
-    const o = {};
-    const root = data.elements.root;
-
-    for (const key of data.keys) {
-      const val = getValue(root.find(`#${key}`));
-      if (val !== null) {
-        o[key] = val;
-      }
-    }
-
-    return o;
-  };
-
-  const onDialogClosed = function () {
-    transmission.hideMobileAddressbar();
-
-    $(data.dialog).trigger('closed', getValues());
   };
 
   /****
