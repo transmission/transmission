@@ -17,9 +17,19 @@
     },
     "extends": "eslint:recommended",
     "globals": {
+      "Dialog": "readonly",
       "FileRow": "readonly",
       "Inspector": "readonly",
+      "Notifications": "readonly",
+      "Prefs": "readonly",
       "PrefsDialog": "readonly",
+      "RPC": "readonly",
+      "Torrent": "readonly",
+      "TorrentRendererCompact": "readonly",
+      "TorrentRendererFull": "readonly",
+      "TorrentRow": "readonly",
+      "Transmission": "readonly",
+      "TransmissionRemote": "readonly",
       "isMobileDevice": "readonly",
       "sanitizeText": "readonly",
       "setInnerHTML": "readonly",
@@ -35,7 +45,6 @@
     },
     "rules": {
       "curly": ["error", "all"],
-      "no-undef": "off",
       "no-var": "off",
       "no-unused-vars": ["error", {
         "args": "after-used",

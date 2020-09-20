@@ -61,7 +61,7 @@ function Inspector(controller) {
       } else {
         name = '' + torrents.length + ' Transfers Selected';
       }
-      setTextContent(e.name_lb, name || na);
+      setTextContent(e.name_lb, name || 'Not Applicable');
 
       // update the visible page
       if ($(e.info_page).is(':visible')) {
