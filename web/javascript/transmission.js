@@ -16,7 +16,7 @@ Transmission.prototype = {
    *****
    ****/
 
-  initialize () {
+  initialize() {
     let e;
 
     // Initialize the helper classes
@@ -113,7 +113,7 @@ Transmission.prototype = {
     this.updateButtonsSoon();
   },
 
-  loadDaemonPrefs (async, callback) {
+  loadDaemonPrefs(async, callback) {
     this.remote.loadDaemonPrefs(
       function (data) {
         const o = data['arguments'];
@@ -133,7 +133,7 @@ Transmission.prototype = {
   /*
    * Load the clutch prefs and init the GUI according to those prefs
    */
-  initializeSettings () {
+  initializeSettings() {
     Prefs.getClutchPrefs(this);
 
     if (this.isMenuEnabled) {
@@ -150,7 +150,7 @@ Transmission.prototype = {
   /*
    * Set up the search box
    */
-  setupSearchBox () {
+  setupSearchBox() {
     const tr = this;
     const search_box = $('#torrent_search');
     search_box.bind('keyup click', function () {
@@ -179,52 +179,52 @@ Transmission.prototype = {
   /**
    * Create the torrent right-click menu
    */
-  createContextMenu () {
+  createContextMenu() {
     const tr = this;
     const bindings = {
-      pause_selected () {
+      pause_selected() {
         tr.stopSelectedTorrents();
       },
-      resume_selected () {
+      resume_selected() {
         tr.startSelectedTorrents(false);
       },
-      resume_now_selected () {
+      resume_now_selected() {
         tr.startSelectedTorrents(true);
       },
-      move () {
+      move() {
         tr.moveSelectedTorrents(false);
       },
-      remove () {
+      remove() {
         tr.removeSelectedTorrents();
       },
-      remove_data () {
+      remove_data() {
         tr.removeSelectedTorrentsAndData();
       },
-      verify () {
+      verify() {
         tr.verifySelectedTorrents();
       },
-      rename () {
+      rename() {
         tr.renameSelectedTorrents();
       },
-      reannounce () {
+      reannounce() {
         tr.reannounceSelectedTorrents();
       },
-      move_top () {
+      move_top() {
         tr.moveTop();
       },
-      move_up () {
+      move_up() {
         tr.moveUp();
       },
-      move_down () {
+      move_down() {
         tr.moveDown();
       },
-      move_bottom () {
+      move_bottom() {
         tr.moveBottom();
       },
-      select_all () {
+      select_all() {
         tr.selectAll();
       },
-      deselect_all () {
+      deselect_all() {
         tr.deselectAll();
       },
     };
@@ -241,7 +241,7 @@ Transmission.prototype = {
       hide: {
         effect: 'none',
       },
-      select (event, ui) {
+      select(event, ui) {
         bindings[ui.cmd]();
       },
       beforeOpen: $.proxy(function (event) {
@@ -262,12 +262,12 @@ Transmission.prototype = {
     });
   },
 
-  createSettingsMenu () {
+  createSettingsMenu() {
     $('#footer_super_menu').transMenu({
-      open () {
+      open() {
         $('#settings_menu').addClass('selected');
       },
-      close () {
+      close() {
         $('#settings_menu').removeClass('selected');
       },
       select: $.proxy(this.onMenuClicked, this),
@@ -281,12 +281,12 @@ Transmission.prototype = {
    *****
    ****/
 
-  updateFreeSpaceInAddDialog () {
+  updateFreeSpaceInAddDialog() {
     const formdir = $('input#add-dialog-folder-input').val();
     this.remote.getFreeSpace(formdir, this.onFreeSpaceResponse, this);
   },
 
-  onFreeSpaceResponse (dir, bytes) {
+  onFreeSpaceResponse(dir, bytes) {
     let e, str;
 
     const formdir = $('input#add-dialog-folder-input').val();
@@ -307,7 +307,7 @@ Transmission.prototype = {
    *****
    ****/
 
-  getAllTorrents () {
+  getAllTorrents() {
     const torrents = [];
     for (const key in this._torrents) {
       torrents.push(this._torrents[key]);
@@ -315,13 +315,13 @@ Transmission.prototype = {
     return torrents;
   },
 
-  getTorrentIds (torrents) {
+  getTorrentIds(torrents) {
     return $.map(torrents.slice(0), function (t) {
       return t.getId();
     });
   },
 
-  scrollToRow (row) {
+  scrollToRow(row) {
     if (isMobileDevice) {
       // FIXME: why? return
       const list = $('#torrent_container');
@@ -338,7 +338,7 @@ Transmission.prototype = {
     }
   },
 
-  seedRatioLimit () {
+  seedRatioLimit() {
     const p = this.sessionProperties;
     if (p && p.seedRatioLimited) {
       return p.seedRatioLimit;
@@ -346,7 +346,7 @@ Transmission.prototype = {
     return -1;
   },
 
-  setPref (key, val) {
+  setPref(key, val) {
     this[key] = val;
     Prefs.setValue(key, val);
   },
@@ -357,53 +357,53 @@ Transmission.prototype = {
    *****
    ****/
 
-  getSelectedRows () {
+  getSelectedRows() {
     return $.grep(this._rows, function (r) {
       return r.isSelected();
     });
   },
 
-  getSelectedTorrents () {
+  getSelectedTorrents() {
     return $.map(this.getSelectedRows(), function (r) {
       return r.getTorrent();
     });
   },
 
-  getSelectedTorrentIds () {
+  getSelectedTorrentIds() {
     return this.getTorrentIds(this.getSelectedTorrents());
   },
 
-  setSelectedRow (row) {
+  setSelectedRow(row) {
     $(this.elements.torrent_list).children('.selected').removeClass('selected');
     this.selectRow(row);
   },
 
-  selectRow (row) {
+  selectRow(row) {
     $(row.getElement()).addClass('selected');
     this.callSelectionChangedSoon();
   },
 
-  deselectRow (row) {
+  deselectRow(row) {
     $(row.getElement()).removeClass('selected');
     this.callSelectionChangedSoon();
   },
 
-  selectAll () {
+  selectAll() {
     $(this.elements.torrent_list).children().addClass('selected');
     this.callSelectionChangedSoon();
   },
-  deselectAll () {
+  deselectAll() {
     $(this.elements.torrent_list).children('.selected').removeClass('selected');
     this.callSelectionChangedSoon();
     delete this._last_torrent_clicked;
   },
 
-  indexOfLastTorrent () {
+  indexOfLastTorrent() {
     return this._rows.findIndex((row) => row.getTorrentId() === this._last_torrent_clicked);
   },
 
   // Select a range from this row to the last clicked torrent
-  selectRange (row) {
+  selectRange(row) {
     const last = this.indexOfLastTorrent();
 
     if (last === -1) {
@@ -421,7 +421,7 @@ Transmission.prototype = {
     this.callSelectionChangedSoon();
   },
 
-  selectionChanged () {
+  selectionChanged() {
     this.updateButtonStates();
 
     this.inspector.setTorrents(this.inspectorIsVisible() ? this.getSelectedTorrents() : []);
@@ -430,7 +430,7 @@ Transmission.prototype = {
     delete this.selectionChangedTimer;
   },
 
-  callSelectionChangedSoon () {
+  callSelectionChangedSoon() {
     if (!this.selectionChangedTimer) {
       const callback = $.proxy(this.selectionChanged, this),
         msec = 200;
@@ -447,7 +447,7 @@ Transmission.prototype = {
   /*
    * Process key event
    */
-  keyDown (ev) {
+  keyDown(ev) {
     let handled = false;
     const rows = this._rows;
     const isInputFocused = $(ev.target).is('input');
@@ -633,47 +633,47 @@ Transmission.prototype = {
     return !handled;
   },
 
-  keyUp (ev) {
+  keyUp(ev) {
     if (ev.keyCode === 16) {
       // shift key pressed
       delete this._shift_index;
     }
   },
 
-  isButtonEnabled (ev) {
+  isButtonEnabled(ev) {
     const p = (ev.target || ev.srcElement).parentNode;
     return p.className !== 'disabled' && p.parentNode.className !== 'disabled';
   },
 
-  stopSelectedClicked (ev) {
+  stopSelectedClicked(ev) {
     if (this.isButtonEnabled(ev)) {
       this.stopSelectedTorrents();
       this.hideMobileAddressbar();
     }
   },
 
-  startSelectedClicked (ev) {
+  startSelectedClicked(ev) {
     if (this.isButtonEnabled(ev)) {
       this.startSelectedTorrents(false);
       this.hideMobileAddressbar();
     }
   },
 
-  stopAllClicked (ev) {
+  stopAllClicked(ev) {
     if (this.isButtonEnabled(ev)) {
       this.stopAllTorrents();
       this.hideMobileAddressbar();
     }
   },
 
-  startAllClicked (ev) {
+  startAllClicked(ev) {
     if (this.isButtonEnabled(ev)) {
       this.startAllTorrents(false);
       this.hideMobileAddressbar();
     }
   },
 
-  openTorrentClicked (ev) {
+  openTorrentClicked(ev) {
     if (this.isButtonEnabled(ev)) {
       $('body').addClass('open_showing');
       this.uploadTorrentFile();
@@ -681,7 +681,7 @@ Transmission.prototype = {
     }
   },
 
-  dragenter (ev) {
+  dragenter(ev) {
     if (ev.dataTransfer && ev.dataTransfer.types) {
       const types = ['text/uri-list', 'text/plain'];
       for (let i = 0; i < types.length; ++i) {
@@ -700,7 +700,7 @@ Transmission.prototype = {
     return true;
   },
 
-  drop (ev) {
+  drop(ev) {
     let i, uri;
     let uris = null;
     const types = ['text/uri-list', 'text/plain'];
@@ -731,39 +731,39 @@ Transmission.prototype = {
     return false;
   },
 
-  hideUploadDialog () {
+  hideUploadDialog() {
     $('body.open_showing').removeClass('open_showing');
     $('#upload_container').hide();
     this.updateButtonStates();
   },
 
-  confirmUploadClicked () {
+  confirmUploadClicked() {
     this.uploadTorrentFile(true);
     this.hideUploadDialog();
   },
 
-  hideMoveDialog () {
+  hideMoveDialog() {
     $('#move_container').hide();
     this.updateButtonStates();
   },
 
-  confirmMoveClicked () {
+  confirmMoveClicked() {
     this.moveSelectedTorrents(true);
     this.hideUploadDialog();
   },
 
-  hideRenameDialog () {
+  hideRenameDialog() {
     $('body.open_showing').removeClass('open_showing');
     $('#rename_container').hide();
   },
 
-  confirmRenameClicked () {
+  confirmRenameClicked() {
     const torrents = this.getSelectedTorrents();
     this.renameTorrent(torrents[0], $('input#torrent_rename_name').attr('value'));
     this.hideRenameDialog();
   },
 
-  removeClicked (ev) {
+  removeClicked(ev) {
     if (this.isButtonEnabled(ev)) {
       this.removeSelectedTorrents();
       this.hideMobileAddressbar();
@@ -771,7 +771,7 @@ Transmission.prototype = {
   },
 
   // turn the periodic ajax session refresh on & off
-  togglePeriodicSessionRefresh (enabled) {
+  togglePeriodicSessionRefresh(enabled) {
     const that = this,
       msec = 8000;
 
@@ -791,7 +791,7 @@ Transmission.prototype = {
     }
   },
 
-  toggleTurtleClicked () {
+  toggleTurtleClicked() {
     const o = {};
     o[RPC._TurtleState] = !$('#turtle-button').hasClass('selected');
     this.remote.savePrefs(o);
@@ -803,11 +803,11 @@ Transmission.prototype = {
    *
    *--------------------------------------------*/
 
-  onPrefsDialogClosed () {
+  onPrefsDialogClosed() {
     $('#prefs-button').removeClass('selected');
   },
 
-  togglePrefsDialogClicked () {
+  togglePrefsDialogClicked() {
     const e = $('#prefs-button');
 
     if (e.hasClass('selected')) {
@@ -818,22 +818,22 @@ Transmission.prototype = {
     }
   },
 
-  setFilterText (search) {
+  setFilterText(search) {
     this.filterText = search ? search.trim() : null;
     this.refilter(true);
   },
 
-  setSortMethod (sort_method) {
+  setSortMethod(sort_method) {
     this.setPref(Prefs._SortMethod, sort_method);
     this.refilter(true);
   },
 
-  setSortDirection (direction) {
+  setSortDirection(direction) {
     this.setPref(Prefs._SortDirection, direction);
     this.refilter(true);
   },
 
-  onMenuClicked (event, ui) {
+  onMenuClicked(event, ui) {
     let o, dir;
     const id = ui.id;
     const remote = this.remote;
@@ -926,7 +926,7 @@ Transmission.prototype = {
     }
   },
 
-  onTorrentChanged (ev, tor) {
+  onTorrentChanged(ev, tor) {
     // update our dirty fields
     this.dirtyTorrents[tor.getId()] = true;
 
@@ -935,7 +935,7 @@ Transmission.prototype = {
     this.updateButtonsSoon();
   },
 
-  updateFromTorrentGet (updates, removed_ids) {
+  updateFromTorrentGet(updates, removed_ids) {
     let i, o, t, id, needed, callback, fields;
     const needinfo = [];
 
@@ -992,7 +992,7 @@ Transmission.prototype = {
     }
   },
 
-  updateTorrents (ids, fields, callback) {
+  updateTorrents(ids, fields, callback) {
     const that = this;
 
     function f(updates, removedIds) {
@@ -1006,7 +1006,7 @@ Transmission.prototype = {
     this.remote.updateTorrents(ids, fields, f);
   },
 
-  refreshTorrents () {
+  refreshTorrents() {
     const callback = $.proxy(this.refreshTorrents, this);
     const msec = this[Prefs._RefreshRate] * 1000;
     const fields = ['id'].concat(Torrent.Fields.Stats);
@@ -1019,12 +1019,12 @@ Transmission.prototype = {
     this.refreshTorrentsTimeout = setTimeout(callback, msec);
   },
 
-  initializeTorrents () {
+  initializeTorrents() {
     const fields = ['id'].concat(Torrent.Fields.Metadata, Torrent.Fields.Stats);
     this.updateTorrents(null, fields);
   },
 
-  onRowClicked (ev) {
+  onRowClicked(ev) {
     const meta_key = ev.metaKey || ev.ctrlKey,
       row = ev.currentTarget.row;
 
@@ -1074,7 +1074,7 @@ Transmission.prototype = {
     this._last_torrent_clicked = row.getTorrentId();
   },
 
-  deleteTorrents (ids) {
+  deleteTorrents(ids) {
     let i, id;
 
     if (ids && ids.length) {
@@ -1086,14 +1086,14 @@ Transmission.prototype = {
     }
   },
 
-  shouldAddedTorrentsStart () {
+  shouldAddedTorrentsStart() {
     return this.prefsDialog.shouldAddedTorrentsStart();
   },
 
   /*
    * Select a torrent file to upload
    */
-  uploadTorrentFile (confirmed) {
+  uploadTorrentFile(confirmed) {
     const fileInput = $('input#torrent_upload_file');
     const folderInput = $('input#add-dialog-folder-input');
     const startInput = $('input#torrent_auto_start');
@@ -1164,7 +1164,7 @@ Transmission.prototype = {
     }
   },
 
-  promptSetLocation (confirmed, torrents) {
+  promptSetLocation(confirmed, torrents) {
     if (!confirmed) {
       let path;
       if (torrents.length === 1) {
@@ -1182,28 +1182,28 @@ Transmission.prototype = {
     }
   },
 
-  moveSelectedTorrents (confirmed) {
+  moveSelectedTorrents(confirmed) {
     const torrents = this.getSelectedTorrents();
     if (torrents.length) {
       this.promptSetLocation(confirmed, torrents);
     }
   },
 
-  removeSelectedTorrents () {
+  removeSelectedTorrents() {
     const torrents = this.getSelectedTorrents();
     if (torrents.length) {
       this.promptToRemoveTorrents(torrents);
     }
   },
 
-  removeSelectedTorrentsAndData () {
+  removeSelectedTorrentsAndData() {
     const torrents = this.getSelectedTorrents();
     if (torrents.length) {
       this.promptToRemoveTorrentsAndData(torrents);
     }
   },
 
-  promptToRemoveTorrents (torrents) {
+  promptToRemoveTorrents(torrents) {
     if (torrents.length === 1) {
       const torrent = torrents[0];
       const header = `Remove ${torrent.getName()}?`;
@@ -1222,7 +1222,7 @@ Transmission.prototype = {
     }
   },
 
-  promptToRemoveTorrentsAndData (torrents) {
+  promptToRemoveTorrentsAndData(torrents) {
     if (torrents.length === 1) {
       const torrent = torrents[0];
       const header = `Remove ${torrent.getName()} and delete data?`;
@@ -1243,23 +1243,23 @@ Transmission.prototype = {
     }
   },
 
-  removeTorrents (torrents) {
+  removeTorrents(torrents) {
     const ids = this.getTorrentIds(torrents);
     this.remote.removeTorrents(ids, this.refreshTorrents, this);
   },
 
-  removeTorrentsAndData (torrents) {
+  removeTorrentsAndData(torrents) {
     this.remote.removeTorrentsAndData(torrents);
   },
 
-  promptToRenameTorrent (torrent) {
+  promptToRenameTorrent(torrent) {
     $('body').addClass('open_showing');
     $('input#torrent_rename_name').attr('value', torrent.getName());
     $('#rename_container').show();
     $('#torrent_rename_name').focus();
   },
 
-  renameSelectedTorrents () {
+  renameSelectedTorrents() {
     const torrents = this.getSelectedTorrents();
     if (torrents.length != 1) {
       dialog.alert('Renaming', 'You can rename only one torrent at a time.', 'Ok');
@@ -1268,7 +1268,7 @@ Transmission.prototype = {
     }
   },
 
-  onTorrentRenamed (response) {
+  onTorrentRenamed(response) {
     let torrent;
     if (
       response.result === 'success' &&
@@ -1279,85 +1279,85 @@ Transmission.prototype = {
     }
   },
 
-  renameTorrent (torrent, newname) {
+  renameTorrent(torrent, newname) {
     const oldpath = torrent.getName();
     this.remote.renameTorrent([torrent.getId()], oldpath, newname, this.onTorrentRenamed, this);
   },
 
-  verifySelectedTorrents () {
+  verifySelectedTorrents() {
     this.verifyTorrents(this.getSelectedTorrents());
   },
 
-  reannounceSelectedTorrents () {
+  reannounceSelectedTorrents() {
     this.reannounceTorrents(this.getSelectedTorrents());
   },
 
-  startAllTorrents (force) {
+  startAllTorrents(force) {
     this.startTorrents(this.getAllTorrents(), force);
   },
-  startSelectedTorrents (force) {
+  startSelectedTorrents(force) {
     this.startTorrents(this.getSelectedTorrents(), force);
   },
-  startTorrent (torrent) {
+  startTorrent(torrent) {
     this.startTorrents([torrent], false);
   },
 
-  startTorrents (torrents, force) {
+  startTorrents(torrents, force) {
     this.remote.startTorrents(this.getTorrentIds(torrents), force, this.refreshTorrents, this);
   },
-  verifyTorrent (torrent) {
+  verifyTorrent(torrent) {
     this.verifyTorrents([torrent]);
   },
-  verifyTorrents (torrents) {
+  verifyTorrents(torrents) {
     this.remote.verifyTorrents(this.getTorrentIds(torrents), this.refreshTorrents, this);
   },
 
-  reannounceTorrent (torrent) {
+  reannounceTorrent(torrent) {
     this.reannounceTorrents([torrent]);
   },
-  reannounceTorrents (torrents) {
+  reannounceTorrents(torrents) {
     this.remote.reannounceTorrents(this.getTorrentIds(torrents), this.refreshTorrents, this);
   },
 
-  stopAllTorrents () {
+  stopAllTorrents() {
     this.stopTorrents(this.getAllTorrents());
   },
-  stopSelectedTorrents () {
+  stopSelectedTorrents() {
     this.stopTorrents(this.getSelectedTorrents());
   },
-  stopTorrent (torrent) {
+  stopTorrent(torrent) {
     this.stopTorrents([torrent]);
   },
-  stopTorrents (torrents) {
+  stopTorrents(torrents) {
     this.remote.stopTorrents(this.getTorrentIds(torrents), this.refreshTorrents, this);
   },
-  changeFileCommand (torrentId, rowIndices, command) {
+  changeFileCommand(torrentId, rowIndices, command) {
     this.remote.changeFileCommand(torrentId, rowIndices, command);
   },
 
-  hideMobileAddressbar (delaySecs) {
+  hideMobileAddressbar(delaySecs) {
     if (isMobileDevice && !scroll_timeout) {
       const callback = $.proxy(this.doToolbarHide, this);
       const msec = delaySecs * 1000 || 150;
       scroll_timeout = setTimeout(callback, msec);
     }
   },
-  doToolbarHide () {
+  doToolbarHide() {
     window.scrollTo(0, 1);
     scroll_timeout = null;
   },
 
   // Queue
-  moveTop () {
+  moveTop() {
     this.remote.moveTorrentsToTop(this.getSelectedTorrentIds(), this.refreshTorrents, this);
   },
-  moveUp () {
+  moveUp() {
     this.remote.moveTorrentsUp(this.getSelectedTorrentIds(), this.refreshTorrents, this);
   },
-  moveDown () {
+  moveDown() {
     this.remote.moveTorrentsDown(this.getSelectedTorrentIds(), this.refreshTorrents, this);
   },
-  moveBottom () {
+  moveBottom() {
     this.remote.moveTorrentsToBottom(this.getSelectedTorrentIds(), this.refreshTorrents, this);
   },
 
@@ -1365,7 +1365,7 @@ Transmission.prototype = {
    ****
    ***/
 
-  updateGuiFromSession (o) {
+  updateGuiFromSession(o) {
     let limit, limited, e, b, text;
     const fmt = Transmission.fmt;
     const menu = $('#footer_super_menu');
@@ -1417,7 +1417,7 @@ Transmission.prototype = {
     }
   },
 
-  updateStatusbar () {
+  updateStatusbar() {
     let i, row;
     let u = 0;
     let d = 0;
@@ -1440,11 +1440,11 @@ Transmission.prototype = {
     $('#filter-count').text(fmt.countString('Transfer', 'Transfers', this._rows.length));
   },
 
-  setEnabled (key, flag) {
+  setEnabled(key, flag) {
     $(key).toggleClass('disabled', !flag);
   },
 
-  updateFilterSelect () {
+  updateFilterSelect() {
     const trackers = this.getTrackers();
     const names = Object.keys(trackers).sort();
 
@@ -1470,7 +1470,7 @@ Transmission.prototype = {
     }
   },
 
-  updateButtonsSoon () {
+  updateButtonsSoon() {
     if (!this.buttonRefreshTimer) {
       const callback = $.proxy(this.updateButtonStates, this);
       const msec = 100;
@@ -1479,7 +1479,7 @@ Transmission.prototype = {
     }
   },
 
-  calculateTorrentStates (callback) {
+  calculateTorrentStates(callback) {
     const stats = {
       total: 0,
       active: 0,
@@ -1521,7 +1521,7 @@ Transmission.prototype = {
     callback(stats);
   },
 
-  updateButtonStates () {
+  updateButtonStates() {
     const tr = this;
     const e = this.elements;
 
@@ -1538,13 +1538,13 @@ Transmission.prototype = {
    *****
    ****/
 
-  inspectorIsVisible () {
+  inspectorIsVisible() {
     return $('#torrent_inspector').is(':visible');
   },
-  toggleInspector () {
+  toggleInspector() {
     this.setInspectorVisible(!this.inspectorIsVisible());
   },
-  setInspectorVisible (visible) {
+  setInspectorVisible(visible) {
     if (visible) {
       this.inspector.setTorrents(this.getSelectedTorrents());
     }
@@ -1567,7 +1567,7 @@ Transmission.prototype = {
    *****
    ****/
 
-  refilterSoon () {
+  refilterSoon() {
     if (!this.refilterTimer) {
       const tr = this,
         callback = function () {
@@ -1578,7 +1578,7 @@ Transmission.prototype = {
     }
   },
 
-  sortRows (rows) {
+  sortRows(rows) {
     const torrents = rows.map((row) => row.getTorrent());
     const id2row = rows.reduce((acc, row) => {
       acc[row.getTorrent().getId()] = row;
@@ -1588,7 +1588,7 @@ Transmission.prototype = {
     torrents.forEach((tor, idx) => (rows[idx] = id2row[tor.getId()]));
   },
 
-  refilter (rebuildEverything) {
+  refilter(rebuildEverything) {
     let i, e, id, t, row, dirty_rows;
     const sort_mode = this[Prefs._SortMethod];
     const sort_direction = this[Prefs._SortDirection];
@@ -1719,7 +1719,7 @@ Transmission.prototype = {
     }
   },
 
-  setFilterMode (mode) {
+  setFilterMode(mode) {
     // set the state
     this.setPref(Prefs._FilterMode, mode);
 
@@ -1727,16 +1727,16 @@ Transmission.prototype = {
     this.refilter(true);
   },
 
-  onFilterModeClicked () {
+  onFilterModeClicked() {
     this.setFilterMode($('#filter-mode').val());
   },
 
-  onFilterTrackerClicked () {
+  onFilterTrackerClicked() {
     const tracker = $('#filter-tracker').val();
     this.setFilterTracker(tracker === 'all' ? null : tracker);
   },
 
-  setFilterTracker (domain) {
+  setFilterTracker(domain) {
     // update which tracker is selected in the popup
     const key = domain ? this.getReadableDomain(domain) : 'all';
     const id = `#show-tracker-${key}`;
@@ -1748,7 +1748,7 @@ Transmission.prototype = {
   },
 
   // example: "tracker.ubuntu.com" returns "ubuntu.com"
-  getDomainName (host) {
+  getDomainName(host) {
     const dot = host.indexOf('.');
     if (dot !== host.lastIndexOf('.')) {
       host = host.slice(dot + 1);
@@ -1758,7 +1758,7 @@ Transmission.prototype = {
   },
 
   // example: "ubuntu.com" returns "Ubuntu"
-  getReadableDomain (name) {
+  getReadableDomain(name) {
     if (name.length) {
       name = name.charAt(0).toUpperCase() + name.slice(1);
     }
@@ -1769,7 +1769,7 @@ Transmission.prototype = {
     return name;
   },
 
-  getTrackers () {
+  getTrackers() {
     const ret = {};
 
     const torrents = this.getAllTorrents();
@@ -1816,10 +1816,10 @@ Transmission.prototype = {
    ****
    ***/
 
-  toggleCompactClicked () {
+  toggleCompactClicked() {
     this.setCompactMode(!this[Prefs._CompactDisplayState]);
   },
-  setCompactMode (is_compact) {
+  setCompactMode(is_compact) {
     const key = Prefs._CompactDisplayState;
     const was_compact = this[key];
 
@@ -1828,10 +1828,10 @@ Transmission.prototype = {
       this.onCompactModeChanged();
     }
   },
-  initCompactMode () {
+  initCompactMode() {
     this.onCompactModeChanged();
   },
-  onCompactModeChanged () {
+  onCompactModeChanged() {
     const compact = this[Prefs._CompactDisplayState];
 
     // update the ui: footer button
@@ -1849,7 +1849,7 @@ Transmission.prototype = {
    ***/
 
   // turn the periodic ajax stats refresh on & off
-  togglePeriodicStatsRefresh (enabled) {
+  togglePeriodicStatsRefresh(enabled) {
     const that = this,
       msec = 5000;
 
@@ -1869,7 +1869,7 @@ Transmission.prototype = {
     }
   },
 
-  loadDaemonStats (async, callback) {
+  loadDaemonStats(async, callback) {
     this.remote.loadDaemonStats(
       function (data) {
         this.updateStats(data['arguments']);
@@ -1884,7 +1884,7 @@ Transmission.prototype = {
   },
 
   // Process new session stats from the server
-  updateStats (stats) {
+  updateStats(stats) {
     let s, ratio;
     const fmt = Transmission.fmt;
 
@@ -1904,7 +1904,7 @@ Transmission.prototype = {
     $('#stats-total-duration').html(fmt.timeInterval(s.secondsActive));
   },
 
-  showStatsDialog () {
+  showStatsDialog() {
     this.loadDaemonStats();
     this.hideMobileAddressbar();
     this.togglePeriodicStatsRefresh(true);
@@ -1916,7 +1916,7 @@ Transmission.prototype = {
     });
   },
 
-  onStatsDialogClosed () {
+  onStatsDialogClosed() {
     this.hideMobileAddressbar();
     this.togglePeriodicStatsRefresh(false);
   },
@@ -1926,7 +1926,7 @@ Transmission.prototype = {
    ****  Hotkeys
    ****
    ***/
-  showHotkeysDialog () {
+  showHotkeysDialog() {
     $('#hotkeys-dialog').dialog({
       title: 'Hotkeys',
       show: 'fade',

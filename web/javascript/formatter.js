@@ -29,7 +29,7 @@ Transmission.fmt = (function () {
     /*
      *   Format a percentage to a string
      */
-    percentString (x) {
+    percentString(x) {
       if (x < 10.0) {
         return x.toTruncFixed(2);
       } else if (x < 100.0) {
@@ -42,7 +42,7 @@ Transmission.fmt = (function () {
     /*
      *   Format a ratio to a string
      */
-    ratioString (x) {
+    ratioString(x) {
       if (x === -1) {
         return 'None';
       }
@@ -57,7 +57,7 @@ Transmission.fmt = (function () {
      * @param {Number} bytes the filesize in bytes
      * @return {String} human-readable string
      */
-    mem (bytes) {
+    mem(bytes) {
       if (bytes < mem_K) {
         return [bytes, mem_B_str].join(' ');
       }
@@ -90,7 +90,7 @@ Transmission.fmt = (function () {
      * @param {Number} bytes the filesize in bytes
      * @return {String} human-readable string
      */
-    size (bytes) {
+    size(bytes) {
       if (bytes < size_K) {
         return [bytes, size_B_str].join(' ');
       }
@@ -118,15 +118,15 @@ Transmission.fmt = (function () {
         : [convertedSize.toTruncFixed(1), unit].join(' ');
     },
 
-    speedBps (Bps) {
+    speedBps(Bps) {
       return this.speed(this.toKBps(Bps));
     },
 
-    toKBps (Bps) {
+    toKBps(Bps) {
       return Math.floor(Bps / speed_K);
     },
 
-    speed (KBps) {
+    speed(KBps) {
       let speed = KBps;
 
       if (speed <= 999.95) {
@@ -150,7 +150,7 @@ Transmission.fmt = (function () {
       return [speed.toTruncFixed(2), speed_G_str].join(' ');
     },
 
-    timeInterval (seconds) {
+    timeInterval(seconds) {
       const days = Math.floor(seconds / 86400);
       const hours = Math.floor((seconds % 86400) / 3600);
       const minutes = Math.floor((seconds % 3600) / 60);
@@ -181,7 +181,7 @@ Transmission.fmt = (function () {
       return s;
     },
 
-    timestamp (seconds) {
+    timestamp(seconds) {
       if (!seconds) {
         return 'N/A';
       }
@@ -234,16 +234,16 @@ Transmission.fmt = (function () {
       return [date, time, period].join(' ');
     },
 
-    ngettext (msgid, msgid_plural, n) {
+    ngettext(msgid, msgid_plural, n) {
       // TODO(i18n): http://doc.qt.digia.com/4.6/i18n-plural-rules.html
       return n === 1 ? msgid : msgid_plural;
     },
 
-    countString (msgid, msgid_plural, n) {
+    countString(msgid, msgid_plural, n) {
       return [n.toStringWithCommas(), this.ngettext(msgid, msgid_plural, n)].join(' ');
     },
 
-    peerStatus (flagStr) {
+    peerStatus(flagStr) {
       const formattedFlags = [];
       for (const flag of flagStr) {
         let explanation = null;

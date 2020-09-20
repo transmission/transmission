@@ -121,7 +121,7 @@ TorrentRendererHelper.formatETA = function (t) {
 
 function TorrentRendererFull() {}
 TorrentRendererFull.prototype = {
-  createRow () {
+  createRow() {
     const root = document.createElement('li');
     root.className = 'torrent';
 
@@ -156,7 +156,7 @@ TorrentRendererFull.prototype = {
     return root;
   },
 
-  getPeerDetails (t) {
+  getPeerDetails(t) {
     let err, peer_count, webseed_count;
     const fmt = Transmission.fmt;
 
@@ -226,7 +226,7 @@ TorrentRendererFull.prototype = {
     return t.getStateString();
   },
 
-  getProgressDetails (controller, t) {
+  getProgressDetails(controller, t) {
     if (t.needsMetaData()) {
       let MetaDataStatus = 'retrieving';
       if (t.isStopped()) {
@@ -294,7 +294,7 @@ TorrentRendererFull.prototype = {
     return c.join('');
   },
 
-  render (controller, t, root) {
+  render(controller, t, root) {
     // name
     setTextContent(root._name_container, t.getName());
 
@@ -326,7 +326,7 @@ TorrentRendererFull.prototype = {
 
 function TorrentRendererCompact() {}
 TorrentRendererCompact.prototype = {
-  createRow () {
+  createRow() {
     const progressbar = TorrentRendererHelper.createProgressbar('compact');
 
     const details = document.createElement('div');
@@ -346,7 +346,7 @@ TorrentRendererCompact.prototype = {
     return root;
   },
 
-  getPeerDetails (t) {
+  getPeerDetails(t) {
     let c;
     if ((c = t.getErrorMessage())) {
       return c;
@@ -384,7 +384,7 @@ TorrentRendererCompact.prototype = {
     return t.getStateString();
   },
 
-  render (controller, t, root) {
+  render(controller, t, root) {
     // name
     const is_stopped = t.isStopped();
     let e = root._name_container;
@@ -411,7 +411,7 @@ function TorrentRow(view, controller, torrent) {
   this.initialize(view, controller, torrent);
 }
 TorrentRow.prototype = {
-  initialize (view, controller, torrent) {
+  initialize(view, controller, torrent) {
     const row = this;
     this._view = view;
     this._torrent = torrent;
@@ -421,23 +421,23 @@ TorrentRow.prototype = {
       row.render(controller);
     });
   },
-  getElement () {
+  getElement() {
     return this._element;
   },
-  render (controller) {
+  render(controller) {
     const tor = this.getTorrent();
     if (tor) {
       this._view.render(controller, tor, this.getElement());
     }
   },
-  isSelected () {
+  isSelected() {
     return this.getElement().className.indexOf('selected') !== -1;
   },
 
-  getTorrent () {
+  getTorrent() {
     return this._torrent;
   },
-  getTorrentId () {
+  getTorrentId() {
     return this.getTorrent().getId();
   },
 };

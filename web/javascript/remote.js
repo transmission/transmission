@@ -30,7 +30,7 @@ TransmissionRemote.prototype = {
   /*
    * Constructor
    */
-  initialize (controller) {
+  initialize(controller) {
     this._controller = controller;
     this._error = '';
     this._token = '';
@@ -40,7 +40,7 @@ TransmissionRemote.prototype = {
    * Display an error if an ajax request fails, and stop sending requests
    * or on a 409, globally set the X-Transmission-Session-Id and resend
    */
-  ajaxError (request, error_string, exception, ajaxObject) {
+  ajaxError(request, error_string, exception, ajaxObject) {
     let token;
     const remote = this;
 
@@ -73,13 +73,13 @@ TransmissionRemote.prototype = {
     remote._controller.togglePeriodicSessionRefresh(false);
   },
 
-  appendSessionId (XHR) {
+  appendSessionId(XHR) {
     if (this._token) {
       XHR.setRequestHeader('X-Transmission-Session-Id', this._token);
     }
   },
 
-  sendRequest (data, callback, context, async) {
+  sendRequest(data, callback, context, async) {
     const remote = this;
     if (typeof async != 'boolean') {
       async = true;
@@ -92,10 +92,10 @@ TransmissionRemote.prototype = {
       dataType: 'json',
       cache: false,
       data: JSON.stringify(data),
-      beforeSend (XHR) {
+      beforeSend(XHR) {
         remote.appendSessionId(XHR);
       },
-      error (request, error_string, exception) {
+      error(request, error_string, exception) {
         remote.ajaxError(request, error_string, exception, ajaxSettings);
       },
       success: callback,
@@ -106,21 +106,21 @@ TransmissionRemote.prototype = {
     $.ajax(ajaxSettings);
   },
 
-  loadDaemonPrefs (callback, context, async) {
+  loadDaemonPrefs(callback, context, async) {
     const o = {
       method: 'session-get',
     };
     this.sendRequest(o, callback, context, async);
   },
 
-  checkPort (callback, context, async) {
+  checkPort(callback, context, async) {
     const o = {
       method: 'port-test',
     };
     this.sendRequest(o, callback, context, async);
   },
 
-  renameTorrent (torrentIds, oldpath, newname, callback, context) {
+  renameTorrent(torrentIds, oldpath, newname, callback, context) {
     const o = {
       method: 'torrent-rename-path',
       arguments: {
@@ -132,14 +132,14 @@ TransmissionRemote.prototype = {
     this.sendRequest(o, callback, context);
   },
 
-  loadDaemonStats (callback, context, async) {
+  loadDaemonStats(callback, context, async) {
     const o = {
       method: 'session-stats',
     };
     this.sendRequest(o, callback, context, async);
   },
 
-  updateTorrents (torrentIds, fields, callback, context) {
+  updateTorrents(torrentIds, fields, callback, context) {
     const o = {
       method: 'torrent-get',
       arguments: {
@@ -155,7 +155,7 @@ TransmissionRemote.prototype = {
     });
   },
 
-  getFreeSpace (dir, callback, context) {
+  getFreeSpace(dir, callback, context) {
     const o = {
       method: 'free-space',
       arguments: {
@@ -168,7 +168,7 @@ TransmissionRemote.prototype = {
     });
   },
 
-  changeFileCommand (torrentId, fileIndices, command) {
+  changeFileCommand(torrentId, fileIndices, command) {
     const remote = this,
       args = {
         ids: [torrentId],
@@ -185,7 +185,7 @@ TransmissionRemote.prototype = {
     );
   },
 
-  sendTorrentSetRequests (method, torrent_ids, args, callback, context) {
+  sendTorrentSetRequests(method, torrent_ids, args, callback, context) {
     if (!args) {
       args = {};
     }
@@ -197,19 +197,19 @@ TransmissionRemote.prototype = {
     this.sendRequest(o, callback, context);
   },
 
-  sendTorrentActionRequests (method, torrent_ids, callback, context) {
+  sendTorrentActionRequests(method, torrent_ids, callback, context) {
     this.sendTorrentSetRequests(method, torrent_ids, null, callback, context);
   },
 
-  startTorrents (torrent_ids, noqueue, callback, context) {
+  startTorrents(torrent_ids, noqueue, callback, context) {
     const name = noqueue ? 'torrent-start-now' : 'torrent-start';
     this.sendTorrentActionRequests(name, torrent_ids, callback, context);
   },
-  stopTorrents (torrent_ids, callback, context) {
+  stopTorrents(torrent_ids, callback, context) {
     this.sendTorrentActionRequests('torrent-stop', torrent_ids, callback, context);
   },
 
-  moveTorrents (torrent_ids, new_location, callback, context) {
+  moveTorrents(torrent_ids, new_location, callback, context) {
     this.sendTorrentSetRequests(
       'torrent-set-location',
       torrent_ids,
@@ -222,10 +222,10 @@ TransmissionRemote.prototype = {
     );
   },
 
-  removeTorrents (torrent_ids, callback, context) {
+  removeTorrents(torrent_ids, callback, context) {
     this.sendTorrentActionRequests('torrent-remove', torrent_ids, callback, context);
   },
-  removeTorrentsAndData (torrents) {
+  removeTorrentsAndData(torrents) {
     const remote = this;
     const o = {
       method: 'torrent-remove',
@@ -244,13 +244,13 @@ TransmissionRemote.prototype = {
       remote._controller.refreshTorrents();
     });
   },
-  verifyTorrents (torrent_ids, callback, context) {
+  verifyTorrents(torrent_ids, callback, context) {
     this.sendTorrentActionRequests('torrent-verify', torrent_ids, callback, context);
   },
-  reannounceTorrents (torrent_ids, callback, context) {
+  reannounceTorrents(torrent_ids, callback, context) {
     this.sendTorrentActionRequests('torrent-reannounce', torrent_ids, callback, context);
   },
-  addTorrentByUrl (url, options) {
+  addTorrentByUrl(url, options) {
     const remote = this;
     if (url.match(/^[0-9a-f]{40}$/i)) {
       url = `magnet:?xt=urn:btih:${url}`;
@@ -266,7 +266,7 @@ TransmissionRemote.prototype = {
       remote._controller.refreshTorrents();
     });
   },
-  savePrefs (args) {
+  savePrefs(args) {
     const remote = this;
     const o = {
       method: 'session-set',
@@ -276,7 +276,7 @@ TransmissionRemote.prototype = {
       remote._controller.loadDaemonPrefs();
     });
   },
-  updateBlocklist () {
+  updateBlocklist() {
     const remote = this;
     const o = {
       method: 'blocklist-update',
@@ -287,16 +287,16 @@ TransmissionRemote.prototype = {
   },
 
   // Added queue calls
-  moveTorrentsToTop (torrent_ids, callback, context) {
+  moveTorrentsToTop(torrent_ids, callback, context) {
     this.sendTorrentActionRequests(RPC._QueueMoveTop, torrent_ids, callback, context);
   },
-  moveTorrentsToBottom (torrent_ids, callback, context) {
+  moveTorrentsToBottom(torrent_ids, callback, context) {
     this.sendTorrentActionRequests(RPC._QueueMoveBottom, torrent_ids, callback, context);
   },
-  moveTorrentsUp (torrent_ids, callback, context) {
+  moveTorrentsUp(torrent_ids, callback, context) {
     this.sendTorrentActionRequests(RPC._QueueMoveUp, torrent_ids, callback, context);
   },
-  moveTorrentsDown (torrent_ids, callback, context) {
+  moveTorrentsDown(torrent_ids, callback, context) {
     this.sendTorrentActionRequests(RPC._QueueMoveDown, torrent_ids, callback, context);
   },
 };
