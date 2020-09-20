@@ -229,7 +229,7 @@ Torrent.prototype = {
   getETA: function () {
     return this.fields.eta;
   },
-  getFailedEver: function (i) {
+  getFailedEver: function () {
     return this.fields.corruptEver;
   },
   getFile: function (i) {

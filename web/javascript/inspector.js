@@ -99,7 +99,6 @@ function Inspector(controller) {
         available = 0,
         haveVerified = 0,
         haveUnverified = 0,
-        verifiedPieces = 0,
         latest,
         pieces,
         size,
@@ -163,9 +162,6 @@ function Inspector(controller) {
             haveUnverified += t.getHaveUnchecked();
             v = t.getHaveValid();
             haveVerified += v;
-            if (t.getPieceSize()) {
-              verifiedPieces += v / t.getPieceSize();
-            }
             sizeWhenDone += t.getSizeWhenDone();
             leftUntilDone += t.getLeftUntilDone();
             available += t.getHave() + t.getDesiredAvailable();
@@ -519,7 +515,7 @@ function Inspector(controller) {
       }
       changeFileCommand(fileIndices, command);
     },
-    onNameClicked = function (ev, fileRow, fileIndices) {
+    onNameClicked = function (ev, fileRow) {
       $(fileRow.getElement()).siblings().slideToggle();
     },
     clearFileList = function () {

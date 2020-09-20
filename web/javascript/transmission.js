@@ -250,7 +250,7 @@ Transmission.prototype = {
       select: function (event, ui) {
         bindings[ui.cmd]();
       },
-      beforeOpen: $.proxy(function (event, ui) {
+      beforeOpen: $.proxy(function (event) {
         const element = $(event.currentTarget);
         const i = $('#torrent_list > li').index(element);
         if (i !== -1 && !this._rows[i].isSelected()) {
@@ -278,7 +278,7 @@ Transmission.prototype = {
       },
       select: $.proxy(this.onMenuClicked, this),
     });
-    $('#settings_menu').click(function (event) {
+    $('#settings_menu').click(function () {
       $('#footer_super_menu').transMenu('open');
     });
   },
@@ -818,7 +818,7 @@ Transmission.prototype = {
     $('#prefs-button').removeClass('selected');
   },
 
-  togglePrefsDialogClicked: function (ev) {
+  togglePrefsDialogClicked: function () {
     const e = $('#prefs-button');
 
     if (e.hasClass('selected')) {
@@ -1738,11 +1738,11 @@ Transmission.prototype = {
     this.refilter(true);
   },
 
-  onFilterModeClicked: function (ev) {
+  onFilterModeClicked: function () {
     this.setFilterMode($('#filter-mode').val());
   },
 
-  onFilterTrackerClicked: function (ev) {
+  onFilterTrackerClicked: function () {
     const tracker = $('#filter-tracker').val();
     this.setFilterTracker(tracker === 'all' ? null : tracker);
   },
