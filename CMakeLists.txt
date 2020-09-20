@@ -677,7 +677,7 @@ if(GIT_FOUND)
     )
     if(TR_GIT_ROOT)
         configure_file(
-            "${CMAKE_SOURCE_DIR}/format/pre-commit"
+            "${CMAKE_SOURCE_DIR}/extras/pre-commit"
             "${TR_GIT_ROOT}/.git/hooks/pre-commit"
             COPYONLY
         )
