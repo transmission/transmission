@@ -10,7 +10,7 @@ else
 fi
 
 root="$(git rev-parse --show-toplevel)"
-if [ -n "${root}"  ]; then
+if [ -n "${root}" ]; then
   cd "${root}" || exit 1
 fi
 
@@ -49,20 +49,19 @@ else
 fi
 
 # enforce east const
-matches="$(grep --line-number --with-filename -P '((?:^|[(,;]|\bstatic\s+)\s*)\b(const)\b(?!\s+\w+\s*\[)' "${cfiles[@]}")"
-if [ -n "${matches}" ]; then
-  echo 'const in wrong place:'
-  echo "${matches}"
+matches="$(perl -ne 'print "west const:",$ARGV,":",$_ if /((?:^|[(,;]|\bstatic\s+)\s*)\b(const)\b(?!\s+\w+\s*\[)/' "${cfiles[@]}")"
+if [ -n "$matches" ]; then
+  echo "$matches"
   exitcode=1
 fi
-if [ -n "$fix"  ]; then
+if [ -n "$fix" ]; then
   perl -pi -e 's/((?:^|[(,;]|\bstatic\s+)\s*)\b(const)\b(?!\s+\w+\s*\[)/\1>\2</g' "${cfiles[@]}"
 fi
 
 # format JS
 cd "${root}/web" || exit 1
-if [ -n "$fix"  ]; then
-  cd "${root}/web" && yarn --silent install && yarn --silent lint:fix
+if [ -n "$fix" ]; then
+  cd "${root}/web" && yarn --silent install && yarn --silent 'lint:fix'
 elif ! yarn -s install && yarn --silent lint; then
   echo 'JS code needs formatting'
   exitcode=1
