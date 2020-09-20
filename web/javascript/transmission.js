@@ -293,9 +293,9 @@ Transmission.prototype = {
   },
 
   onFreeSpaceResponse: function (dir, bytes) {
-    let e, str, formdir;
+    let e, str;
 
-    formdir = $('input#add-dialog-folder-input').val();
+    const formdir = $('input#add-dialog-folder-input').val();
     if (formdir == dir) {
       e = $('label#add-dialog-folder-label');
       if (bytes > 0) {
@@ -1456,24 +1456,18 @@ Transmission.prototype = {
   },
 
   updateFilterSelect: function () {
-    let i, names, name, str, o;
     const trackers = this.getTrackers();
-
-    // build a sorted list of names
-    names = [];
-    for (name in trackers) {
-      names.push(name);
-    }
-    names.sort();
+    const names = Object.keys(trackers).sort();
 
     // build the new html
+    let str;
     if (!this.filterTracker) {
       str = '<option value="all" selected="selected">All</option>';
     } else {
       str = '<option value="all">All</option>';
     }
-    for (i = 0; (name = names[i]); ++i) {
-      o = trackers[name];
+    for (const name of names) {
+      const o = trackers[name];
       str += '<option value="' + o.domain + '"';
       if (trackers[name].domain === this.filterTracker) {
         str += ' selected="selected"';
@@ -1596,27 +1590,17 @@ Transmission.prototype = {
   },
 
   sortRows: function (rows) {
-    let i,
-      tor,
-      row,
-      id2row = {},
-      torrents = [];
-
-    for (i = 0; (row = rows[i]); ++i) {
-      tor = row.getTorrent();
-      torrents.push(tor);
-      id2row[tor.getId()] = row;
-    }
-
+    const torrents = rows.map((row) => row.getTorrent());
+    const id2row = rows.reduce((acc, row) => {
+      acc[row.getTorrent().getId()] = row;
+      return acc;
+    }, {});
     Torrent.sortTorrents(torrents, this[Prefs._SortMethod], this[Prefs._SortDirection]);
-
-    for (i = 0; (tor = torrents[i]); ++i) {
-      rows[i] = id2row[tor.getId()];
-    }
+    torrents.forEach((tor, idx) => (rows[idx] = id2row[tor.getId()]));
   },
 
   refilter: function (rebuildEverything) {
-    let i, e, id, t, row, tmp, rows, clean_rows, dirty_rows, frag;
+    let i, e, id, t, row, dirty_rows;
     const sort_mode = this[Prefs._SortMethod];
     const sort_direction = this[Prefs._SortDirection];
     const filter_mode = this[Prefs._FilterMode];
@@ -1642,7 +1626,7 @@ Transmission.prototype = {
 
     // rows that overlap with dirtyTorrents need to be refiltered.
     // those that don't are 'clean' and don't need refiltering.
-    clean_rows = [];
+    const clean_rows = [];
     dirty_rows = [];
     for (i = 0; (row = this._rows[i]); ++i) {
       if (row.getTorrentId() in this.dirtyTorrents) {
@@ -1660,7 +1644,7 @@ Transmission.prototype = {
     $(e).detach();
 
     // drop any dirty rows that don't pass the filter test
-    tmp = [];
+    const tmp = [];
     for (i = 0; (row = dirty_rows[i]); ++i) {
       id = row.getTorrentId();
       t = this._torrents[id];
@@ -1690,12 +1674,12 @@ Transmission.prototype = {
 
     // now we have two sorted arrays of rows
     // and can do a simple two-way sorted merge.
-    rows = [];
-    let ci = 0,
-      cmax = clean_rows.length;
-    let di = 0,
-      dmax = dirty_rows.length;
-    frag = document.createDocumentFragment();
+    const rows = [];
+    const cmax = clean_rows.length;
+    const dmax = dirty_rows.length;
+    const frag = document.createDocumentFragment();
+    let ci = 0;
+    let di = 0;
     while (ci != cmax || di != dmax) {
       var push_clean;
 

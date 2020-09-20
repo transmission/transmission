@@ -47,15 +47,13 @@ TorrentRendererHelper.getProgressInfo = function (controller, t) {
 };
 
 TorrentRendererHelper.createProgressbar = function (classes) {
-  let complete, incomplete, progressbar;
-
-  complete = document.createElement('div');
+  const complete = document.createElement('div');
   complete.className = 'torrent_progress_bar complete';
 
-  incomplete = document.createElement('div');
+  const incomplete = document.createElement('div');
   incomplete.className = 'torrent_progress_bar incomplete';
 
-  progressbar = document.createElement('div');
+  const progressbar = document.createElement('div');
   progressbar.className = 'torrent_progress_bar_container ' + classes;
   progressbar.appendChild(complete);
   progressbar.appendChild(incomplete);
@@ -68,13 +66,13 @@ TorrentRendererHelper.createProgressbar = function (classes) {
 };
 
 TorrentRendererHelper.renderProgressbar = function (controller, t, progressbar) {
-  let e, style, width, display;
+  let e, display;
   const info = TorrentRendererHelper.getProgressInfo(controller, t);
 
   // update the complete progressbar
   e = progressbar.complete;
-  style = e.style;
-  width = '' + info.percent + '%';
+  const style = e.style;
+  const width = '' + info.percent + '%';
   display = info.percent > 0 ? 'block' : 'none';
   if (style.width !== width || style.display !== display) {
     $(e).css({
@@ -124,24 +122,22 @@ TorrentRendererHelper.formatETA = function (t) {
 function TorrentRendererFull() {}
 TorrentRendererFull.prototype = {
   createRow: function () {
-    let root, name, peers, progressbar, details, image, button;
-
-    root = document.createElement('li');
+    const root = document.createElement('li');
     root.className = 'torrent';
 
-    name = document.createElement('div');
+    const name = document.createElement('div');
     name.className = 'torrent_name';
 
-    peers = document.createElement('div');
+    const peers = document.createElement('div');
     peers.className = 'torrent_peer_details';
 
-    progressbar = TorrentRendererHelper.createProgressbar('full');
+    const progressbar = TorrentRendererHelper.createProgressbar('full');
 
-    details = document.createElement('div');
+    const details = document.createElement('div');
     details.className = 'torrent_progress_details';
 
-    image = document.createElement('div');
-    button = document.createElement('a');
+    const image = document.createElement('div');
+    const button = document.createElement('a');
     button.appendChild(image);
 
     root.appendChild(name);
@@ -161,10 +157,8 @@ TorrentRendererFull.prototype = {
   },
 
   getPeerDetails: function (t) {
-    let err,
-      peer_count,
-      webseed_count,
-      fmt = Transmission.fmt;
+    let err, peer_count, webseed_count;
+    const fmt = Transmission.fmt;
 
     if ((err = t.getErrorMessage())) {
       return err;
@@ -333,17 +327,15 @@ TorrentRendererFull.prototype = {
 function TorrentRendererCompact() {}
 TorrentRendererCompact.prototype = {
   createRow: function () {
-    let progressbar, details, name, root;
+    const progressbar = TorrentRendererHelper.createProgressbar('compact');
 
-    progressbar = TorrentRendererHelper.createProgressbar('compact');
-
-    details = document.createElement('div');
+    const details = document.createElement('div');
     details.className = 'torrent_peer_details compact';
 
-    name = document.createElement('div');
+    const name = document.createElement('div');
     name.className = 'torrent_name compact';
 
-    root = document.createElement('li');
+    const root = document.createElement('li');
     root.appendChild(progressbar.element);
     root.appendChild(details);
     root.appendChild(name);

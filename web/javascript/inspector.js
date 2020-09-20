@@ -15,10 +15,10 @@ function Inspector(controller) {
       return torrents.some((tor) => !tor.hasExtraInfo());
     },
     refreshTorrents = function (callback) {
-      let fields,
-        ids = $.map(data.torrents.slice(0), function (t) {
-          return t.getId();
-        });
+      let fields;
+      const ids = $.map(data.torrents.slice(0), function (t) {
+        return t.getId();
+      });
 
       if (ids && ids.length) {
         fields = ['id'].concat(Torrent.Fields.StatsExtra);
@@ -49,11 +49,11 @@ function Inspector(controller) {
       updateInspector();
     },
     updateInspector = function () {
-      let e = data.elements,
-        torrents = data.torrents,
-        name;
+      const e = data.elements;
+      const torrents = data.torrents;
 
       // update the name, which is shown on all the pages
+      let name;
       if (!torrents || !torrents.length) {
         name = 'No Selection';
       } else if (torrents.length === 1) {
@@ -79,13 +79,14 @@ function Inspector(controller) {
      ****/
 
     updateInfoPage = function () {
-      let torrents = data.torrents,
-        e = data.elements,
-        fmt = Transmission.fmt,
-        none = 'None',
-        mixed = 'Mixed',
-        unknown = 'Unknown',
-        isMixed,
+      const none = 'None';
+      const mixed = 'Mixed';
+      const unknown = 'Unknown';
+      const fmt = Transmission.fmt;
+      const now = Date.now();
+      const torrents = data.torrents;
+      const e = data.elements;
+      let isMixed,
         allPaused,
         allFinished,
         str,
@@ -99,7 +100,6 @@ function Inspector(controller) {
         haveVerified = 0,
         haveUnverified = 0,
         verifiedPieces = 0,
-        stateString,
         latest,
         pieces,
         size,
@@ -111,8 +111,7 @@ function Inspector(controller) {
         v,
         u,
         f,
-        d,
-        now = Date.now();
+        d;
 
       //
       //  state_lb
@@ -149,7 +148,7 @@ function Inspector(controller) {
         }
       }
       setTextContent(e.state_lb, str);
-      stateString = str;
+      const stateString = str;
 
       //
       //  have_lb
@@ -530,21 +529,14 @@ function Inspector(controller) {
       delete data.file_rows;
     },
     createFileTreeModel = function (tor) {
-      let i,
-        j,
-        n,
-        name,
-        tokens,
-        walk,
-        token,
-        sub,
-        leaves = [],
-        tree = {
-          children: {},
-          file_indices: [],
-        };
+      const leaves = [];
+      const tree = {
+        children: {},
+        file_indices: [],
+      };
+      let i, j, name, tokens, walk, token, sub;
 
-      n = tor.getFileCount();
+      const n = tor.getFileCount();
       for (i = 0; i < n; ++i) {
         name = tor.getFile(i).name;
         tokens = name.split('/');
@@ -580,8 +572,7 @@ function Inspector(controller) {
       return tree;
     },
     addNodeToView = function (tor, parent, sub, i) {
-      let row;
-      row = new FileRow(tor, sub.depth, sub.name, sub.file_indices, i % 2);
+      const row = new FileRow(tor, sub.depth, sub.name, sub.file_indices, i % 2);
       data.file_rows.push(row);
       parent.appendChild(row.getElement());
       $(row).bind('wantedToggled', onFileWantedToggled);
@@ -589,13 +580,12 @@ function Inspector(controller) {
       $(row).bind('nameClicked', onNameClicked);
     },
     addSubtreeToView = function (tor, parent, sub, i) {
-      let key, div;
-      div = document.createElement('div');
+      const div = document.createElement('div');
       if (sub.parent) {
         addNodeToView(tor, div, sub, i++);
       }
       if (sub.children) {
-        for (key in sub.children) {
+        for (const key in sub.children) {
           i = addSubtreeToView(tor, div, sub.children[key]);
         }
       }
@@ -603,13 +593,9 @@ function Inspector(controller) {
       return i;
     },
     updateFilesPage = function () {
-      let i,
-        n,
-        tor,
-        fragment,
-        tree,
-        file_list = data.elements.file_list,
-        torrents = data.torrents;
+      const file_list = data.elements.file_list;
+      const torrents = data.torrents;
+      let i, n, fragment, tree;
 
       // only show one torrent at a time
       if (torrents.length !== 1) {
@@ -617,7 +603,7 @@ function Inspector(controller) {
         return;
       }
 
-      tor = torrents[0];
+      const tor = torrents[0];
       n = tor ? tor.getFileCount() : 0;
       if (tor != data.file_torrent || n != data.file_torrent_n) {
         // rebuild the file list...
@@ -641,16 +627,11 @@ function Inspector(controller) {
      ****/
 
     updatePeersPage = function () {
-      let i,
-        k,
-        tor,
-        peers,
-        peer,
-        parity,
-        html = [],
-        fmt = Transmission.fmt,
-        peers_list = data.elements.peers_list,
-        torrents = data.torrents;
+      const html = [];
+      const fmt = Transmission.fmt;
+      const peers_list = data.elements.peers_list;
+      const torrents = data.torrents;
+      let i, k, tor, peers, peer, parity;
 
       for (k = 0; (tor = torrents[k]); ++k) {
         peers = tor.getPeers();
@@ -790,24 +771,23 @@ function Inspector(controller) {
       };
     },
     updateTrackersPage = function () {
+      const na = 'N/A';
+      const trackers_list = data.elements.trackers_list;
+      const torrents = data.torrents;
       let i,
         j,
         tier,
         tracker,
         trackers,
         tor,
-        html,
         parity,
         lastAnnounceStatusHash,
         announceState,
-        lastScrapeStatusHash,
-        na = 'N/A',
-        trackers_list = data.elements.trackers_list,
-        torrents = data.torrents;
+        lastScrapeStatusHash;
 
       // By building up the HTML as as string, then have the browser
       // turn this into a DOM tree, this is a fast operation.
-      html = [];
+      const html = [];
       for (i = 0; (tor = torrents[i]); ++i) {
         html.push('<div class="inspector_group">');
 

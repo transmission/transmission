@@ -118,9 +118,9 @@ function FileRow(torrent, depth, name, indices, even) {
   };
 
   var createRow = function (torrent, depth, name, even) {
-    let e, root, box;
+    let e;
 
-    root = document.createElement('li');
+    const root = document.createElement('li');
     root.className = 'inspector_torrent_file_list_entry' + (even ? 'even' : 'odd');
     elements.root = root;
 
@@ -136,7 +136,7 @@ function FileRow(torrent, depth, name, indices, even) {
 
     e = document.createElement('div');
     e.className = 'file-priority-radiobox';
-    box = e;
+    const box = e;
 
     e = document.createElement('div');
     e.className = 'low';

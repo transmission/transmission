@@ -5,10 +5,9 @@
  * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  */
 
-let transmission,
-  dialog,
-  isMobileDevice = RegExp('(iPhone|iPod|Android)').test(navigator.userAgent),
-  scroll_timeout;
+let transmission, dialog, scroll_timeout;
+
+const isMobileDevice = RegExp('(iPhone|iPod|Android)').test(navigator.userAgent);
 
 // http://forum.jquery.com/topic/combining-ui-dialog-and-tabs
 $.fn.tabbedDialog = function (dialog_opts) {

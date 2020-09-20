@@ -25,7 +25,7 @@
       "no-undef": "off",
       "no-unused-vars": "off",
       "no-var": "off",
-      "prefer-const": "off",
+      "prefer-const": "error",
       "semi": ["error", "always"]
     }
   },

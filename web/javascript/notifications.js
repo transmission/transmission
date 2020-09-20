@@ -12,11 +12,9 @@ $(document).ready(function () {
   updateMenuTitle();
   $(transmission).bind('downloadComplete seedingComplete', function (event, torrent) {
     if (notificationsEnabled) {
-      let title = (event.type == 'downloadComplete' ? 'Download' : 'Seeding') + ' complete',
-        content = torrent.getName(),
-        notification;
-
-      notification = window.webkitNotifications.createNotification(
+      const title = (event.type == 'downloadComplete' ? 'Download' : 'Seeding') + ' complete';
+      const content = torrent.getName();
+      const notification = window.webkitNotifications.createNotification(
         'style/transmission/images/logo.png',
         title,
         content

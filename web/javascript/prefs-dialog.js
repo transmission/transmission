@@ -165,7 +165,7 @@ function PrefsDialog(remote) {
   };
 
   const initialize = function (remote) {
-    let i, key, e, o;
+    let i, key, e;
 
     data.remote = remote;
 
@@ -175,7 +175,7 @@ function PrefsDialog(remote) {
     initTimeDropDown(e.find('#alt-speed-time-begin')[0]);
     initTimeDropDown(e.find('#alt-speed-time-end')[0]);
 
-    o = isMobileDevice
+    const o = isMobileDevice
       ? getDefaultMobileOptions()
       : {
           width: 350,
@@ -216,15 +216,11 @@ function PrefsDialog(remote) {
   };
 
   const getValues = function () {
-    let i,
-      key,
-      val,
-      o = {},
-      keys = data.keys,
-      root = data.elements.root;
+    const o = {};
+    const root = data.elements.root;
 
-    for (i = 0; (key = keys[i]); ++i) {
-      val = getValue(root.find('#' + key));
+    for (const key of data.keys) {
+      const val = getValue(root.find('#' + key));
       if (val !== null) {
         o[key] = val;
       }
