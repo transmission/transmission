@@ -13,13 +13,10 @@ root="$(git rev-parse --show-toplevel)"
 cd "${root}" || exit 1
 
 skipfiles=(
-  libtransmission/ConvertUTF.c
-  libtransmission/ConvertUTF.h
-  libtransmission/jsonsl.c
-  libtransmission/jsonsl.h
-  libtransmission/wildmat.c
+  libtransmission/ConvertUTF\.[ch]
+  libtransmission/jsonsl\.[ch]
+  libtransmission/wildmat\.c
 )
-
 candidates=(
   cli/*\.[ch]
   daemon/*\.[ch]
@@ -31,7 +28,6 @@ candidates=(
   tests/*/*\.h
   utils/*\.[ch]
 )
-
 for file in "${candidates[@]}"; do
   if [[ ! " ${skipfiles[*]} " =~ ${file} ]]; then
     cfiles+=("${file}");
@@ -40,9 +36,9 @@ done
 
 # format C/C++
 if [ -n "$fix"  ]; then
-  ./run-clang-format.py -i -r "${cfiles[@]}"
-elif ! ./run-clang-format.py -q -r "${cfiles[@]}"; then
-  echo 'please format C/C++ code first'
+  ./run-clang-format.py --in-place "${cfiles[@]}"
+elif ! ./run-clang-format.py --quiet "${cfiles[@]}"; then
+  echo 'C/C++ code needs formatting'
   exitcode=1
 fi
 
@@ -60,9 +56,9 @@ fi
 # format JS
 cd "${root}/web" || exit 1
 if [ -n "$fix"  ]; then
-  cd "${root}/web" && yarn -s install && yarn -s lint:fix
-elif ! yarn -s install && yarn -s lint; then
-  echo 'please format JS code first'
+  cd "${root}/web" && yarn --silent install && yarn --silent lint:fix
+elif ! yarn -s install && yarn --silent lint; then
+  echo 'JS code needs formatting'
   exitcode=1
 fi
 
