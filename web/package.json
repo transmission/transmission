@@ -53,8 +53,9 @@
       }],
       "object-shorthand": ["error", "always"],
       "prefer-const": "error",
-      "prefer-spread": "error",
+      "prefer-numeric-literals": "error",
       "prefer-rest-params": "error",
+      "prefer-spread": "error",
       "prefer-template": "error",
       "semi": ["error", "always"]
     }
