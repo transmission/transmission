@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Usage: ./code_style.sh
 # Usage: ./code_style.sh --check
@@ -10,7 +10,9 @@ else
 fi
 
 root="$(git rev-parse --show-toplevel)"
-cd "${root}" || exit 1
+if [ -n "${root}"  ]; then
+  cd "${root}" || exit 1
+fi
 
 skipfiles=(
   libtransmission/ConvertUTF\.[ch]
